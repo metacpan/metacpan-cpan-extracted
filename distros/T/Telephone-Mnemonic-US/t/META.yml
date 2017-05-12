@@ -1,0 +1,40 @@
+---
+abstract: "Maps US telephone numbers from mnemonic 'easy-to-remember' words to digits, it"
+author:
+  - 'Ioannis Tambouras <ioannis@cpan.org>'
+build_requires:
+  Expect: 1.21
+  ExtUtils::MakeMaker: 6.42
+  Test::CPAN::Meta: 0.18
+  Test::Dependencies: 0.12
+  Test::Exception: 0.31
+  Test::HasVersion: 0.012
+  Test::MinimumVersion: 0.101080
+  Test::Pod: 1.45
+  Test::Pod::Coverage: 1.08
+  Test::Spelling: 0.15
+  Test::Strict: 0.14
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Telephone-Mnemonic-US
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Getopt::Compact: 0.04
+  List::MoreUtils: 0.32
+  List::Util: 1.23
+  Moose: 2.0007
+  Tie::DictFile: 0.03
+  namespace::autoclean: 0.12
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

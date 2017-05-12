@@ -1,0 +1,20 @@
+#title links
+
+*** Breakout
+
+[[http://test.org/" target="blank"]]
+
+[[http://test.org/" target="_blank"][html injection]]
+
+*** Nesting brackets
+
+[[[http://en.wikipedia.org/wiki/Prime (symbol)][This is *a prime*]] hello]
+
+[[[http://en.wikipedia.org/wiki/Prime (symbol)][This is *a prime*]]]
+
+*** Complicated urls
+
+[[http://laltromondo.dynalias.net/gitweb/?p=AMuseWiki.git;a=summary][git repo]]
+
+[[http://laltromondo.dynalias.net/gitweb/?p=AMuseWiki.git;a=summary]]
+

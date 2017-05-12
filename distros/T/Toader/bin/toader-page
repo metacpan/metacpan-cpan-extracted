@@ -1,0 +1,952 @@
+#!/usr/bin/perl
+#Copyright (c) 2013, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PsURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Toader::Page;
+use Toader::Page::Manage;
+use Toader;
+use Cwd;
+use Term::CallEditor qw/solicit/;
+use Sys::Hostname;
+use Text::Template;
+use Toader::Render::Page;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "toader-page 0.1.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"Switches:\n".
+		"-a <action> - The action to perform.\n".
+		"-b <body file> - The file to read for the body.".
+		"-f <from> - The author's email address\n".
+		"-F <file> - The file for a part.\n".
+		"-n <name> - The name of the page.\n".
+		"-p - Print the returned value for the render check.\n".
+		"-P - The publish value. Either '0' or '1'.\n".
+		"-r <render> - The render to use.\n".
+		"-s <summary> - What to set for the summary.\n".
+		"-S <summary template> - The template to use for the summary.\n".
+		"-n <name> - The name for the new page.\n".
+		"\n".
+		"Environmental Variables:\n".
+		"Toader_outputdir - The output directory to use.\n".
+		"Toader_from - The author's email address. Overrode by -f. ".
+		"Toader_page_summary - The formatting for the display of the summary of the pages.\n".
+		"\n".
+		"Actions:\n".
+		"create - Creates a page.\n".
+		"be - Edits the body of the specified page\n".
+		"bg - Prints the body of the specified page\n".
+		"bs - Sets the body of the specified page\n".
+		"fs - Sets the author/from.\n".
+		"fg - Gets the author/from.\n".
+		"ls - Lists the pages in the specified directory.\n".
+		"lp - Lists the published pages in the specified directory.\n".
+		"pa - Adds a subpart.\n".
+		"pe - Extracts the subpart.\n".
+		"pl - List the subparts.\n".
+		"pr - Removes a subpart.\n".
+		"pubg - Gets the publish value.".
+		"pubs - Sets the publish value, a boolean value of either '0' or '1'.".
+		"rc - Checks if the content of a page can be rendered.\n".
+		"render - Renders the page.\n".
+		"rg - Gets the renderer.\n".
+		"rm - Removes the specified page.\n".
+		"rp - Prints the raw page.\n".
+		"rs - Sets the renderer.\n".
+		"rm - Removes the specified page.\n".
+		"summary - Prints a summary.\n".
+		"ss - Sets the summary.\n".
+		"sg - Gets the summary.\n".
+		"\n".
+		"From:".
+		"A from address is required by Toader::Page. If not specified via either switch or".
+		"environmental variable, It is formed via getlogin.'\@'.hostname .\n".
+		"\n".
+		"Page Summary Formatting:\n".
+		"The page summary is a Text::Template template. The default is '[\$name] - [\$from] - [\$summary]' The delimiters are '[' and ']' and the variables are as below.\n".
+		"\$from - This is the author.\n".
+		"\$name - This is the name for a page.\n".
+		"\$renderer - This is the renderer to use.\n".
+		"\$summary - This is the page summary.\n";
+}
+
+#gets the options
+my %opts=();
+getopts('a:b:e:f:F:r:s:S:n:pP:', \%opts);
+
+if ( ! defined( $opts{a} ) ){
+	$opts{a}='ls';
+}
+
+if ( ! defined( $opts{S} ) ){
+	if ( defined( $ENV{'Toader_page_summary'} ) ){
+		$opts{S}=$ENV{'Toader_page_summary'};
+	}else{
+		$opts{S}='[$name] - [$from] - [$summary]';
+	}
+}
+
+#make sure a valid action is present
+if (
+	( $opts{a} ne 'ls' ) &&
+	( $opts{a} ne 'lp' ) &&
+	( $opts{a} ne 'rm' ) &&
+	( $opts{a} ne 'bs' ) &&
+	( $opts{a} ne 'bg' ) &&
+	( $opts{a} ne 'rp' ) &&
+	( $opts{a} ne 'ss' ) &&
+	( $opts{a} ne 'create' ) &&
+	( $opts{a} ne 'summary' ) &&
+	( $opts{a} ne 'be' ) &&
+	( $opts{a} ne 'ss' ) &&
+	( $opts{a} ne 'sg' ) &&
+	( $opts{a} ne 'ns' ) &&
+	( $opts{a} ne 'ng' ) &&
+	( $opts{a} ne 'fs' ) &&
+	( $opts{a} ne 'fg' ) &&
+	( $opts{a} ne 'rc' ) &&
+	( $opts{a} ne 'rs' ) &&
+	( $opts{a} ne 'rg' ) &&
+	( $opts{a} ne 'pl' ) &&
+	( $opts{a} ne 'pa' ) &&
+	( $opts{a} ne 'pr' ) &&
+	( $opts{a} ne 'pe' ) &&
+	( $opts{a} ne 'pubg' ) &&
+	( $opts{a} ne 'pubs' ) &&
+	( $opts{a} ne 'render' )
+	){
+	warn('toader-page: No valid action specified');
+	exit 254;
+}
+
+#get the current directory
+my $dir=getcwd;
+
+#figure out what to use for the from if not specified via a switch
+if ( ! defined( $opts{f} ) ){
+	if(! defined( $ENV{'Toader_from'} ) ){
+		$opts{f}=getlogin.'@'.hostname;
+	}else{
+		$opts{f}=$ENV{'Toader_from'};
+	}
+}
+
+#initialize Toader as a bit of a test and it may be used later
+my $toader=Toader->new({ dir=>$dir });
+if ( $toader->error){
+	warn('toader-page: Failed to initialize Toader. error="'.$toader->error.
+		 '" errorString="'.$toader->errorString.'"');
+	exit $toader->error;
+}
+
+#
+if ( defined( $ENV{'Toader_outputdir'} ) ){
+	$toader->setOutputDir( $ENV{'Toader_outputdir'} );
+	if ( $toader->error ){
+		warn('toader-page: Failed to set the output directory. error="'.$toader->error.
+			 '" errorString="'.$toader->errorString.'"');
+		exit $toader->error;
+	}
+}
+
+#create a new Toader page
+if ( $opts{a} eq 'create' ){
+	my $body='';
+	if ( defined( $opts{b} ) ){
+		my $fh;
+		if ( ! open( $fh, '<', $opts{b} ) ){
+			warn('toader-page: Failed to open "'.$opts{b}.'" to read for the body');
+			exit 254;
+		}
+		my $body=join( '', <$fh> );
+		close( $fh );
+	}
+
+	my $page=Toader::Page->new({
+		body=>$body,
+		from=>$opts{f},
+		renderer=>$opts{r},
+		summary=>$opts{s},
+		name=>$opts{n},
+		toader=>$toader,
+		});
+	if ( $page->error  ){
+		warn('toader-page: Failed to create the new page. error="'.$page->error.
+			 '" errorString="'.$page->errorString.'"');
+		exit $page->error;
+	}
+	$page->dirSet($dir);
+	if ( $page->error  ){
+		warn('toader-page: Failed to set the Toader directory for the page. error="'.
+			 $page->error.'" errorString="'.$page->errorString.'"');
+		exit $page->error;
+	}
+	$page->write;
+	if ( $page->error  ){
+		warn('toader-page: Failed to write the page. error="'.
+			 $page->error.'" errorString="'.$page->errorString.'"');
+		exit $page->error;
+	}
+
+	exit 0;
+}
+
+#gets a summary
+if ( $opts{a} eq 'summary' ){
+	my $phelper=Toader::Page::Helper->new( $toader );
+	$phelper->setDir($dir);
+	if ( $phelper->error ){
+		warn('toader-page: Failed to set the directory for the helper object. error="'.
+			 $phelper->error.'" errorString="'.$phelper->errorString.'"');
+		exit $phelper->error;
+	}
+
+	my %summary=$phelper->summary;
+	if ( $phelper->error ){
+        warn('toader-page: Failed to generate a summary of the pages. error="'.
+             $phelper->error.'" errorString="'.$phelper->errorString.'"');
+        exit $phelper->error;
+    }
+
+	my $template = Text::Template->new(
+		TYPE => 'STRING',
+		SOURCE => $opts{S},
+		DELIMITERS=>[ '[', ']' ],
+		);
+
+	warn('needs finished');
+	exit 254;
+
+	#prints each one
+#	my @pages=sort(keys(%summary));
+#	my $int=0;
+#	while( defined( $pages[$int] ) ){
+#		print $template->fill_in(
+#			HASH=>{
+#				from=>$summary{ $entries[$int] }{from},
+#				title=>$summary{ $entries[$int] }{title},
+#				renderer=>$summary{ $entries[$int] }{renderer},
+#				summary=>$summary{ $entries[$int] }{summary},
+#				})."\n";
+#
+#		$int++;
+#	}
+
+	exit 0;
+}
+
+#initialize this here as it used by both remove and ls
+my $pmanage=Toader::Page::Manage->new( $toader );
+$pmanage->setDir( $dir );
+if ( $pmanage->error  ){
+	warn('toader-page: Failed to set the directory for the manage object. error="'.
+		 $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+	exit $pmanage->error;
+}
+
+#lists the pages
+if ( $opts{a} eq 'ls' ){
+	my @pages=$pmanage->list;
+	if ( $pmanage->error  ){
+		warn('toader-page: Failed to list the pages. error="'.
+			 $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+		exit $pmanage->error;
+	}
+	if ( ! defined( $pages[0] ) ){
+		exit 0;
+	}
+	print join( "\n", @pages )."\n";
+	exit 0;
+}
+
+#lists the pages
+if ( $opts{a} eq 'lp' ){
+	my @pages=$pmanage->published;
+	if ( $pmanage->error  ){
+		warn('toader-page: Failed to list the pages. error="'.
+			 $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+		exit $pmanage->error;
+	}
+	if ( ! defined( $pages[0] ) ){
+		exit 0;
+	}
+	print join( "\n", @pages )."\n";
+	exit 0;
+}
+
+#removes a page
+if ( $opts{a} eq 'rm' ){
+	$pmanage->remove( $opts{n} );
+	if ( $pmanage->error  ){
+		warn('toader-page: Failed to remove the specified page. error="'.
+			 $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+		exit $pmanage->error;
+	}
+	exit 0;
+}
+
+#prints the body of a page
+if ( $opts{a} eq 'bg' ){
+	my $page=$pmanage->read($opts{n});
+	if ( $pmanage->error  ){
+		warn('toader-page: Failed to to read the page. error="'.
+			 $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+		exit $pmanage->error;
+	}
+	print $page->bodyGet;
+	exit 0;
+}
+
+#sets the body of a page
+if ( $opts{a} eq 'bs' ){
+	my $page=$pmanage->read($opts{n});
+	if ( $pmanage->error  ){
+		warn('toader-page: Failed to to read the page. error="'.
+			 $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+		exit $pmanage->error;
+	}
+	my $body;
+	if ( defined( $opts{b} ) ){
+		my $fh;
+		if ( ! open( $fh, '<', $opts{b} ) ){
+			warn('toader-page: Failed to open "'.$opts{b}.'" to read for the body');
+			exit 254;
+		}
+		$body=join( '', <$fh> );
+		close( $fh );
+	}else{
+		warn('toader-page: Nothing file specified via the -b flag');
+		exit 254;
+	}
+	$page->bodySet($body);
+	$page->write;
+	if ( $page->error ){
+		warn('toader-page: Failed to safe the modified page');
+		exit $page->error;
+	}
+	exit 0;
+}
+
+#edits the body of a page
+if ( $opts{a} eq 'be' ){
+	my $page=$pmanage->read($opts{n});
+	if ( $pmanage->error  ){
+		warn('toader-page: Failed to to read the page. error="'.
+			 $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+		exit $pmanage->error;
+	}
+	my $body=$page->bodyGet;
+	my $fh=solicit($body);
+	$body=join( '', <$fh> );
+	$page->bodySet($body);
+	$page->write;
+    if ( $page->error  ){
+        warn('toader-page: Failed to write the page out. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+	exit 0;
+}
+
+#prints the raw page
+if ( $opts{a} eq 'rp' ){
+	my $page=$pmanage->read($opts{n});
+	if ( $pmanage->error  ){
+		warn('toader-page: Failed to to read the page. error="'.
+			 $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+		exit $pmanage->error;
+	}
+	print $page->as_string;
+	exit 0;
+}
+
+#prints the summary
+if ( $opts{a} eq 'ss' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	$page->summarySet($opts{n});
+    if ( $page->error  ){
+        warn('toader-page: Failed to set the summary. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+	$page->write;
+    if ( $page->error  ){
+        warn('toader-page: Failed to write the page out. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+    exit 0;
+}
+
+#gets the summary of a page
+if ( $opts{a} eq 'sg' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	my $summary=$page->summaryGet;
+    if ( $page->error  ){
+        warn('toader-page: Failed to set the summary. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+	print $summary."\n";
+	exit 0;
+}
+
+#prints the from/author
+if ( $opts{a} eq 'fs' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	$page->fromSet($opts{f});
+    if ( $page->error  ){
+        warn('toader-page: Failed to set the from/author. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+	$page->write;
+    if ( $page->error  ){
+        warn('toader-page: Failed to write the page out. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+    exit 0;
+}
+
+#gets the from/author of a page
+if ( $opts{a} eq 'fg' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	my $from=$page->fromGet;
+    if ( $page->error  ){
+        warn('toader-page: Failed to get the from/author. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+	print $from."\n";
+	exit 0;
+}
+
+#sets the renderer
+if ( $opts{a} eq 'rs' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	$page->rendererSet($opts{r});
+    if ( $page->error  ){
+        warn('toader-page: Failed to set the renderer. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+	$page->write;
+    if ( $page->error  ){
+        warn('toader-page: Failed to write the page out. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+    exit 0;
+}
+
+#gets the renderer of a page
+if ( $opts{a} eq 'rg' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	my $renderer=$page->rendererGet;
+    if ( $page->error  ){
+        warn('toader-page: Failed to get the renderer. error="'.
+             $page->error.'" errorString="'.$page->errorString.'"');
+        exit $page->error;
+    }
+	print $renderer."\n";
+	exit 0;
+}
+
+#does a render check for the content
+if ( $opts{a} eq 'rc' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	my $renderer=Toader::Render::Page->new({
+		obj=>$page,
+		toader=>$toader,
+		});
+	if ( $renderer->error ){
+		warn('toader-page: Failed To initializae Toader::Render::Page. error="'.
+			$renderer->error.'" errorString="'.$renderer->errorString.'"');
+		exit $renderer->error;
+	}
+	my $content=$renderer->content;
+
+	if ( $opts{p} ){
+		print $content;
+	}
+
+    exit 0;
+}
+
+#this lists the parts
+if ( $opts{a} eq 'pl' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	my @files=$page->subpartsList;
+	print join ("\n", @files)."\n";
+	exit 0;
+}
+
+#this adds a new part
+if ( $opts{a} eq 'pa' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	$page->subpartsAdd( $opts{F} );
+	if ( $page->error ){
+		warn('toader-page: Failed to add "'.$opts{F}.'" as a subpart for "'.$opts{e}.'"');
+		exit $page->error;
+	}
+	$page->write;
+	exit 0;
+}
+
+#this removes a part
+if ( $opts{a} eq 'pr' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	$page->subpartsRemove( $opts{F} );
+	if ( $page->error ){
+		warn('toader-page: Failed to add "'.$opts{F}.'" as a subpart for "'.$opts{e}.'"');
+		exit $page->error;
+	}
+	$page->write;
+	exit 0;
+}
+
+#this removes a part
+if ( $opts{a} eq 'pe' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	$page->subpartsExtract( $opts{F} );
+	if ( $page->error ){
+		warn('toader-page: Failed to extract to "'.$opts{F}.'"');
+		exit $page->error;
+	}
+	$page->write;
+	exit 0;
+}
+
+#this gets the publish value
+if ( $opts{a} eq 'pubg' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	my $publish=$page->publishGet;
+    if ( $page->error ){
+        warn('toader-page: Failed to get the publish value');
+        exit $page->error;
+    }
+	print $publish."\n";
+    exit 0;
+}
+
+#this sets the publish value
+if ( $opts{a} eq 'pubs' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	$page->publishSet( $opts{P} );
+    if ( $page->error ){
+        warn('toader-page: Failed to set the publish value, "'.$opts{P}.'",');
+        exit $page->error;
+    }
+	$page->write;
+	if ( $page->error ){
+        warn('toader-page: Failed write the page out');
+        exit $page->error;		
+	}
+    exit 0;
+}
+
+#this renders it
+if ( $opts{a} eq 'render' ){
+    my $page=$pmanage->read($opts{n});
+    if ( $pmanage->error  ){
+        warn('toader-page: Failed to to read the page. error="'.
+             $pmanage->error.'" errorString="'.$pmanage->errorString.'"');
+        exit $pmanage->error;
+    }
+	my $renderer=Toader::Render::Page->new(
+		{
+			obj=>$page,
+			toader=>$toader,
+		}
+		);
+	if ( $renderer->error ){
+        warn('toader-page: Failed to initiate the renderer. error="'.
+             $renderer->error.'" errorString="'.$renderer->errorString.'"');
+        exit $renderer->error;
+    }
+	$renderer->render;
+	if ( $renderer->error ){
+		warn('toader-page: Failed to render the page. error="'.
+			 $renderer->error.'" errorString="'.$renderer->errorString.'"');
+		exit $renderer->error;
+	}
+	exit 0;
+}
+
+=head1 NAME
+
+toader-page - A tool for manipulating a Toader page.
+
+=head1 SYNOPSIS
+
+toader-page -a be -n <page>
+
+toader-page -a bg -n <page>
+
+toader-page -a bs -n <page> -b <body file>
+
+toader-page -a create -n <page>
+
+toader-page -a fg -n <page>
+
+toader-page -a fs -n <page> -f <from>
+
+toader-page -a ls
+
+toader-page -a pa -n <page> -F <file>
+
+toader-page -a pe -n <page> -F <file>
+
+toader-page -a pl -n <page>
+
+toader-page -a pr -n <page> -F <file>
+
+toader-page -a rp -n <page>
+
+toader-page -a sg -n <page>
+
+toader-page -a ss -n <page> -s <summary>
+
+toader-page -a rc [-p]  -n <page>
+
+toader-page -a render  -n <page>
+
+toader-page -a rg -n <page>
+
+toader-page -a rs -n <page> -r <renderer>
+
+toader-page -a summary
+
+toader-page -a sg -p <page>
+
+toader-page -a ss -p <page> -s <summary>
+
+=head1 SWITCHES
+
+=head2 -a <action>
+
+The specified action to perform.
+
+=head2 -b <body file>
+
+The body file to use.
+
+=head2 -F <file>
+
+The file to use, file part to remove, or
+directory to extract them to.
+
+=head2 -p
+
+Print the rendered content.
+
+=head2 -r <renderer>
+
+The renderer to use.
+
+=head2 -s <summary>
+
+The summary to use.
+
+=head1 ACTIONS
+
+=head2 be
+
+Edits the body of the page.
+
+Required switches...
+
+	-n <name>
+
+=head2 bg
+
+Prints the body of the page.
+
+Required switches...
+
+	-n <name>
+
+=head2 bs
+
+Sets the body of the page.
+
+Required switches...
+
+    -b <body file>
+	-n <name>
+
+=head2 fg
+
+Gets the author/from for the page.
+
+Required switches...
+
+	-n <name>
+
+=head2 fs
+
+Sets the author/from for the page.
+
+Required switches...
+
+    -f <from>
+	-n <name>
+
+=head2 ls
+
+List the pages.
+
+=head2 pa
+
+Adds a subpart.
+
+Required switches...
+
+    -F <file>
+	-n <name>
+
+=head2 pe
+
+Extracts the subparts.
+
+Required switches...
+
+    -F <directory>
+	-n <name>
+
+=head2 pl
+
+List the subparts.
+
+Required switches...
+
+	-n <name>
+
+=head2 pr
+
+Removes a subpart.
+
+Required switches...
+
+    -F <file>
+	-n <name>
+
+=head2 rp
+
+Prints the raw page.
+
+Required switches...
+
+	-n <name>
+    -r <renderer>
+
+=head2 sg
+
+Gets the summary
+
+Required switches...
+
+	-n <name>
+
+=head2 ss
+
+Sets the summary.
+
+Required switches...
+
+	-n <name>
+    -s <summary>
+
+=head2 summary
+
+Print a summary of the pages.
+
+=head2 rc
+
+Checks if the content of a entry can be rendered.
+
+Requires switches...
+
+	-n <name>
+
+Optional switches...
+
+    -p
+
+=head2 render
+
+Renders the page.
+
+Required switches...
+
+	-n <name>
+
+=head2 rg
+
+Gets the renderer.
+
+Required switches...
+
+	-n <name>
+
+=head2 rs
+
+Sets the renderer.
+
+Required switches...
+
+	-n <name>
+    -r <renderer>
+
+=head1 Environmental Variables:
+
+=head2 Toader_from
+
+The author's email address. Overrode by -f.
+
+=head2 Toader_outputdir
+
+The output directory to use.
+
+=head1 Page Summary Formatting:
+
+The page summary is a Text::Template template. The default is '[$name] - [$from] - [$summary]'
+The delimiters are '[' and ']' and the variables are as below.
+
+    $from - This is the author.
+    $name - This is the name for a page.
+    $renderer - This is the renderer to use.
+    $summary - This is the page summary.
+
+=head1 AUTHOR
+
+Copyright (c) 2013, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+unix
+
+=head1 README
+
+toader-page - A tool for manipulating a Toader page.
+
+=cut
+

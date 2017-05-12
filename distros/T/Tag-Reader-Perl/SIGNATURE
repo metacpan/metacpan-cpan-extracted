@@ -1,0 +1,114 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 df7f39f39efe1aa8523373b59cfc4bb9acb40a2b Changes
+SHA1 cab706f69fd9557eea74081f7a8d767f383fad76 LICENSE
+SHA1 8a1dce085601a29fdf9e8c45e538ada9552a3d03 MANIFEST
+SHA1 b41b0d31a6bdae696afd61de62a4480a1b909569 META.yml
+SHA1 9fda26592b0c28fe86204f3484ecd4db76ed1003 Makefile.PL
+SHA1 8dc428bbf3ad5765de380bf6718d57bd5da9a28c Perl.pm
+SHA1 9e51466d410b73c835bdac65a28b02c25ce01ddf README
+SHA1 859229798191109bf55926d52ba32e0ce43bd668 examples/ex1.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 dbbe15b6e6d3930f9e5815b40b8765bc80aca99f t/Tag-Reader-Perl/01-use.t
+SHA1 ced37c1c584b6872e7583a7d7dcd19a38dab85cf t/Tag-Reader-Perl/02-version.t
+SHA1 b6035894ea770bc96c45a2c72ecb290aaa1ac604 t/Tag-Reader-Perl/03-new.t
+SHA1 7e2ff3a4df64818fbf4863ad6bdf2d1d455d1ed2 t/Tag-Reader-Perl/04-gettoken-start_element.t
+SHA1 e56c539ad2441db4c92e10759795b6c9667d4b0f t/Tag-Reader-Perl/05-gettoken-end_element.t
+SHA1 70ab13303bb1989b406247fa8978abd5e4bcb2d7 t/Tag-Reader-Perl/06-gettoken-comment.t
+SHA1 dd4476be516b0d1b01bcbe827dce8030ac760bd9 t/Tag-Reader-Perl/07-gettoken-element.t
+SHA1 08e859338d0b9b04270a38af195885f9c5f1964f t/Tag-Reader-Perl/08-gettoken-instruction.t
+SHA1 7b0c43a9f9f7564be8f846cf66599920876cfd7a t/Tag-Reader-Perl/09-gettoken-doc.t
+SHA1 cf198b9df012b1b5af92c11499db3cdbbdcbfd2c t/Tag-Reader-Perl/10-gettoken-conditional.t
+SHA1 f0907eba15dc6794c084263f14d023252605a304 t/Tag-Reader-Perl/11-gettoken-dtd-element.t
+SHA1 415c9716e73b753d5b3fd34b9b9d8adf3d06aaa8 t/Tag-Reader-Perl/12-gettoken-dtd-attlist.t
+SHA1 6f33a202fe6fed46ae469a9c5ef58a0de1b46125 t/Tag-Reader-Perl/13-gettoken-dtd-entity.t
+SHA1 fc7b06c6f86a118d2167368c7ad7cd5db051a7b6 t/Tag-Reader-Perl/14-gettoken-dtd-notation.t
+SHA1 b24434adb4f43e3fb8e2dd833484d9c4d355cd7a t/data/comment1.sgml
+SHA1 edcbc1b634ff2e7c0fde7262931a185f5e6bda66 t/data/comment2.sgml
+SHA1 afc5aa86b10c48732b95038ecd1c7467da11b34a t/data/comment3.sgml
+SHA1 dc83b70ecb7bd35e2d778a4ca439cae2ee4f9d8f t/data/conditional1.sgml
+SHA1 c54c6aa077e6d14f8c49cab00dcaaec420fe6c6a t/data/conditional2.sgml
+SHA1 c9272bf0026e7c2ad710581e9a38e437e5854e31 t/data/doc1.sgml
+SHA1 4bf92b492dc049c2349c50a1eb214aef60d77f97 t/data/doc2.sgml
+SHA1 a9e4dee3085874f06d09cb96917e109087f55313 t/data/doc3.sgml
+SHA1 be68539880180608eaa2dc21d8618551b34b60bf t/data/doc4.sgml
+SHA1 2f74750e6d50efd377036fe6b0a03b8843f5a89c t/data/dtd-attlist1.sgml
+SHA1 9589b74b5561c8677e4e0e6869e725feddcdc08f t/data/dtd-attlist2.sgml
+SHA1 1545736d1a7ba3d8c370fc4fda6857a97f131940 t/data/dtd-attlist3.sgml
+SHA1 84679eb16a7b1ae5b52fbf6f2b09e5d112e35222 t/data/dtd-attlist4.sgml
+SHA1 7cd653bd8ed68d747adb883ed20fcccfd90cffba t/data/dtd-attlist5.sgml
+SHA1 ee793f67c93cf9a907d5dfcac1e505ba55e527aa t/data/dtd-attlist6.sgml
+SHA1 bee6bfc0f4193fd603de0bdaa19921d2fd145dc4 t/data/dtd-element1.sgml
+SHA1 dbb9296dd213e748f0ac8293683fc6811f2a9f47 t/data/dtd-element10.sgml
+SHA1 3b51b1fb817b862fd177a2c2691bbfed6151b0fd t/data/dtd-element2.sgml
+SHA1 115e1bbb1fc4eaf94a9b169a178e0d38eec28bc4 t/data/dtd-element3.sgml
+SHA1 30f44edcf72a5eebf11a2df06bb2a84924b1e0c9 t/data/dtd-element4.sgml
+SHA1 2d5e5194710e6524bc98d024bcff865afdae7949 t/data/dtd-element5.sgml
+SHA1 430ffdb276d2fcc371909ee0405a3f5a08ecd487 t/data/dtd-element6.sgml
+SHA1 efd459b547e48196f6f3101ad7a74803e16b2c57 t/data/dtd-element7.sgml
+SHA1 ae3155cf735b38463a31e2661114811f34abe146 t/data/dtd-element8.sgml
+SHA1 1f84f2a6364a10a871711fddbdbab803846a4667 t/data/dtd-element9.sgml
+SHA1 b4946c6a033a45d5d7023b6822eebdc305dde969 t/data/dtd-entity1.sgml
+SHA1 31655aa3896e6d3d14affbecf3580419f9873c80 t/data/dtd-entity10.sgml
+SHA1 852cc2baae7925770fbece534a7b286acad78c91 t/data/dtd-entity11.sgml
+SHA1 35b36fe0f1732d44d5799b9ae7f3b48564def3e3 t/data/dtd-entity12.sgml
+SHA1 c2086d6fa6b7ac34df6f70d03aa0b026eaaf6ae6 t/data/dtd-entity2.sgml
+SHA1 6ac47187984f649cee09fee0580bb255b55e32b2 t/data/dtd-entity3.sgml
+SHA1 05e6aed0ef0cf532b636a7dbe7eae13d59f48ed4 t/data/dtd-entity4.sgml
+SHA1 dd1bf6e5471092e4e4f6c9e942bd88ea851fe827 t/data/dtd-entity5.sgml
+SHA1 8d37e5bee47f286c4aa45462ef2b9e9daea49f01 t/data/dtd-entity6.sgml
+SHA1 2fc2795bf55b9d0f97ecae1c19e5d546a0414019 t/data/dtd-entity7.sgml
+SHA1 999664c37be27fa563715a08a09b7669a7b684a2 t/data/dtd-entity8.sgml
+SHA1 749ab111f7aba7c76bc8eeaebf2a59f32c4ff4a7 t/data/dtd-entity9.sgml
+SHA1 32a9aa168926eabb9e0c7e5db5b45c4e8d093755 t/data/dtd-notation1.sgml
+SHA1 cc36d562563e6a588b59c4dc18cb35bb5c2f7362 t/data/dtd-notation2.sgml
+SHA1 63a58ac42d4a64d417be4d0316d1a10fc3578688 t/data/element1.sgml
+SHA1 e8c2a843db2ab599f16e037d9b450952b31867a6 t/data/element2.sgml
+SHA1 36f6ac6b2f96066ff912f8901edec9b2a2a99910 t/data/element3.sgml
+SHA1 f6254b01ae481d2f6f6308a85a1164120ac153f4 t/data/element4.sgml
+SHA1 97d838463926f50f695cfc1645c10a523a611225 t/data/end_element1.sgml
+SHA1 6e7cc2da0f8cfbc5f3f9945cfd34df3b8b971db1 t/data/end_element2.sgml
+SHA1 a77be79915df001950e8066854e2bc82de915c22 t/data/instruction1.sgml
+SHA1 fa334df4583e3682398d7a85415bae0a60d40be3 t/data/instruction2.sgml
+SHA1 1e2d4c6ac4ba4402240c8a8c8732bfb6b045e712 t/data/instruction3.sgml
+SHA1 8e79d370d5885da4bc3dac58e6588d8eb7122150 t/data/start_element1.sgml
+SHA1 4c97b058c3abbf095d5d71fabc968c8c04baa842 t/data/start_element2.sgml
+SHA1 732231cd8ed6fe90b70ff04a3fa24f8e4e129f7d t/data/start_element3.sgml
+SHA1 bc7fe72dfab8252359a1a6ee320b715ba2cbe938 t/data/start_element4.sgml
+SHA1 e4c9081fa38b32f0e7d6f99335cc2100cdd4ba55 xt/Tag-Reader-Perl/01-pod_coverage.t
+SHA1 166a76c71a5ef992019b712076402f2ad4e45ffe xt/Tag-Reader-Perl/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXF5T7AAoJEJe+XXKaIuTl2OoH/AnBxz/wAJd0PmAUxYoqItr7
+XyVnRL5lnvHU+Gmo2lQRazEIRfk3sCYg/GHeGPUqzTHiYoZVtZlYTBGmvj9DXBnw
+v9eOeaTdYr0etEo7HqUTMzwjlT8AxETK/MO2o+6gV70MQtk0QQMHLmlupJ1G8JW3
+sjlnLFRUqOZ57i4DpdJqJZd9cP9nI1zFiGfFLnjvfTFx9xqsHRYrwELH/VHT5d5h
+dn2LER9BEcPe8tI6MlytuMYw6v28e9WiOlChEAsllaPaG1/9risZKMTACGsWG8VR
+gjmHj/upjsNqWn+0kH/mUzh1tGT2VVTyWmZKo8kiBi3R68VdBLtxLZD1NlTBbh4=
+=mXyp
+-----END PGP SIGNATURE-----

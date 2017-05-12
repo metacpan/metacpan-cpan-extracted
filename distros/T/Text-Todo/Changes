@@ -1,0 +1,37 @@
+Revision history for Text-Todo
+
+0.2.2  Sun Jan 25 21:17:25 PST 2015
+       Corrected _parse_line to correctly match exports.
+       Thanks to svetoslav.chingov [...] gmail.com
+
+0.2.1  Sat Dec 27 19:39:17 PST 2014
+       Fixed RT Bug #101154 Thanks to svetoslav.chingov [...] gmail.com
+       Moved repo to https://github.com/afresh1/Text-Todo
+
+0.2.0  Mon Feb 15 18:06:02 2010
+       Add the ability for an Entry to learn new tags instead of only in new()
+       Make Todo.pm manage tags for the entries in its list
+       todo.pl now saves after you add an item
+
+0.1.1  Thu Jan 21 18:26:42 2010
+       No more List::Utils dependency, was silly.
+       todo.pl works again
+       list.t now uses File::Spec->catfile (to fix Win32 failures)
+       should build a new Makefile.PL so that should work.
+
+0.1.0  Tue Jan 19 11:52:12 2010
+       Fix BEGIN blocks in tests, Bug #53713
+       Move to public CVS:
+         http://cvs.afresh1.com/cgi-bin/cvsweb/todotxt/
+       Fix the required modules list
+       make perlcritic happier with todo.pl
+       add more features to todo.pl
+       More work on the POD for everything
+       Cleanup object on destruction
+       Include a todo.cgi that will not be maintained, 
+         it was the start of Text::Todo::REST::API
+
+0.0.1  Sun Jan 10 19:57:01 2010
+       Initial release.
+
+$AFresh1: Changes,v 1.6 2010/02/14 06:08:07 andrew Exp $

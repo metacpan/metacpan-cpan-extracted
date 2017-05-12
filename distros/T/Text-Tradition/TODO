@@ -1,0 +1,4 @@
+* support and test deletion of a tradition
+* make proper tests for Collation::Reading
+* split out Directory / User into separate persistence module
+* modularize serialization and parsing of traditions

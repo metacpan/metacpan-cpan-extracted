@@ -1,0 +1,74 @@
+Revision history for Perl extension Taint.
+
+0.09  Thu Oct  2 13:20    1997
+	- AT LAST found a way to taint without
+	    stringifying!
+	- Added taintedness().
+	- Removed taint_defined. I don't like it.
+	- Fixed docs about turning off taint
+	    checking (you can't do it).
+	- Fixed bug which prevented inlining of
+	    TAINT and TAINT0, renamed them to
+	    tainted_null and tainted_zero
+	- Added notes about possible problems with
+	    added taint checks
+	- Added internal docs about taint_in_passing
+	- Made sure taint()'s return value is useless.
+	- Many undocumented changes. :-)
+	- Fixed to allow use in modules when taint
+	    checking is off. Lots of related docs
+	    and tests, including third test set.
+	- Added better disclaimer
+	- Added function make_extractor
+	- Added constant taint_checking
+	- Renamed untaint to unconditional_untaint
+	- Added $DEBUGGING (used only in make_untainter,
+	    so far)
+	- Changed the implementation of the untainter
+	    so that it's unreachable without importing.
+	- Added awesome diagnostics
+
+0.08  Mon Apr 14 11:52    1997
+	- Many small fixes
+	- Added second test set, for untaint
+	- Fixed word choices in docs
+
+0.07  Fri Mar 14 16:15    1997
+	- Fixed a bug which prevented use of untaint.
+	- Improved some subs
+	- Attempt to taint a read-only value now carps
+
+0.06  Mon Mar 10 16:10    1997
+	- Speeded up startup
+	- Removed VMS stuff, which should no longer be needed
+	- Documented more bugs  :-(
+	- Made compatible with 5.003
+	- Preserved $@ during sub calls
+	- Added explanation of taint-detection code
+	- Fixed ordering of Changes to reverse-chron
+	- Added sanity check for length of $TAINT
+	- Put in better (?) jokes
+	- Added taint_defined routine
+	- Added tests, made warnings fatal in tests
+	- Improved the docs
+
+0.05  Mon Mar 10 12:55    1997
+	- Improved the docs
+	- Wrapped globs in eval{}, in case they fail
+	- Made test suite use -w
+	- first distributed version, for testing only
+
+0.04  Sun Mar  9 07:51    1997
+	- Made tgzdist target more generalized
+	- Added what I think is needed for VMS; by Tom
+
+0.03  Sat Mar  8 15:14    1997
+	- Added tgzdist target; by Tom
+
+0.02  Sat Mar  8 12:31    1997
+	- Added routines, test suite, prepped for trial distribution;
+	by Tom Phoenix <rootbeer@teleport.com>
+
+0.01  Sat Mar  8 00:31:15 1997
+	- original version; created by h2xs 1.16
+

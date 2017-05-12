@@ -1,0 +1,12 @@
+Revision history for Text-SpanningTable
+
+1.000000  2017-02-07 00:39:02+02:00 Asia/Jerusalem
+	- Feature: ability to print table with no decorations at all
+	- Bugfix: zeros and other false values failed to appear in columns
+    - Other: move to the Apache License 2.0
+
+0.2       2010-10-17 14:26:14 Asia/Jerusalem
+	- Just some documentation fixes.
+
+0.1       2010-10-16 17:05:06 Asia/Jerusalem
+	- Initial release

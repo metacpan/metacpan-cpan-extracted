@@ -1,0 +1,106 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::Widget::Layout::Desktop::Window
+at lib/Tickit/Widget/Layout/Desktop/Window.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Tickit::Widget::Layout::Desktop - provides a holder for "desktop-like" widget behaviour
+
+=head1 VERSION
+
+version 0.010
+
+=head1 METHODS
+
+=head2 position_is_maximise
+
+Returns true if this location is the maximise button.
+
+=head2 position_is_close
+
+Returns true if this location is the close button.
+
+=head2 mouse_press
+
+Override mouse click events to mark this window as active
+before continuing with the usual move/resize detection logic.
+
+Provides click-to-raise and click-to-focus behaviour.
+
+=head2 with_rb
+
+Runs the given coderef with a L<Tickit::RenderBuffer>, saving
+and restoring the context around the call.
+
+Returns $self.
+
+=head2 content_rect
+
+Represents the inner area of this window, i.e. the
+content without the frame.
+
+=head2 render_to_rb
+
+Returns $self.
+
+=head2 change_geometry
+
+Override geometry changes to allow welding and constraints.
+
+We have a set of rules for each widget, of the following form:
+
+ {
+  left => [
+   left => $w1,
+   right => $w2,
+  ],
+  top => [
+   top => $w2
+  ]
+ }
+
+If the left edge changes, the left edge of $w1 and the right edge of $w2 would move by the same amount.
+
+If the top changes, the top of $w2 would move by the same amount
+
+That's about it. The idea is that edges can be "joined", meaning that resizing applies to multiple widgets at once.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::WidgetRole::Movable>
+
+L<export_subs_for|Tickit::WidgetRole::Movable/export_subs_for>, L<mouse_drag|Tickit::WidgetRole::Movable/mouse_drag>, L<mouse_release|Tickit::WidgetRole::Movable/mouse_release>, L<move|Tickit::WidgetRole::Movable/move>, L<on_mouse|Tickit::WidgetRole::Movable/on_mouse>, L<position_is_corner|Tickit::WidgetRole::Movable/position_is_corner>, L<position_is_edge|Tickit::WidgetRole::Movable/position_is_edge>, L<position_is_title|Tickit::WidgetRole::Movable/position_is_title>, L<resize_from_corner|Tickit::WidgetRole::Movable/resize_from_corner>, L<resize_from_edge|Tickit::WidgetRole::Movable/resize_from_edge>, L<start_moving|Tickit::WidgetRole::Movable/start_moving>, L<start_resize_from_corner|Tickit::WidgetRole::Movable/start_resize_from_corner>, L<start_resize_from_edge|Tickit::WidgetRole::Movable/start_resize_from_edge>
+
+=item L<Tickit::WidgetRole>
+
+L<import|Tickit::WidgetRole/import>
+
+=item L<Tickit::SingleChildWidget>
+
+L<add|Tickit::SingleChildWidget/add>, L<child|Tickit::SingleChildWidget/child>, L<children|Tickit::SingleChildWidget/children>, L<set_child|Tickit::SingleChildWidget/set_child>
+
+=item L<Tickit::ContainerWidget>
+
+L<child_opts|Tickit::ContainerWidget/child_opts>, L<child_resized|Tickit::ContainerWidget/child_resized>, L<find_child|Tickit::ContainerWidget/find_child>, L<focus_next|Tickit::ContainerWidget/focus_next>, L<remove|Tickit::ContainerWidget/remove>, L<set_child_opts|Tickit::ContainerWidget/set_child_opts>, L<window_lost|Tickit::ContainerWidget/window_lost>
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2015. Licensed under the same terms as Perl itself.

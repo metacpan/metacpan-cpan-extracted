@@ -1,0 +1,11 @@
+Revision history for Task-Trepan
+1.0  - Jan 15 2012
+
+- Add debugger commads: 
+     "disassemble", 
+     "shell", 
+- Better Terminal completion handling (Term::ReadLine::Perl)
+- Enter Debugger Dynamically (Enbugger)
+- Evaluation of 'my' and our with frames other than the top-most one
+  (Eval::WithLexicals)
+- Better display of expressions (Data::Print)

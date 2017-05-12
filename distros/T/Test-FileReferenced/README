@@ -1,0 +1,259 @@
+NAME
+    Test::FileReferenced - Test against reference data stored in file(s).
+
+SYNOPSIS
+     use Test::FileReferenced;
+ 
+     # Optional:
+     Test::FileReferenced::set_serializer('mydump', \&My::Dumper::Load, \&My::Dumper::Dump);
+ 
+     is_referenced_ok( complex_data_structure(), "complex data structure" );
+ 
+     is_referenced_in_file ( data_structure(), "data structure", "data_structure" );
+ 
+     # Optional:
+     Test::FileReferenced::at_exit();
+
+DESCRIPTION
+    Test::FileReferenced helps testing routines returning complex data
+    structures. This is achieved by serializing test's output (using
+    YAML::Any), and allowing the Developer to compare it with reference
+    data.
+
+    In case there are differences between reference and actual result,
+    comparison can be made using traditional UNIX diff-like (diff, vimdiff,
+    gvimdiff, kdiff) utilities.
+
+    In such case, Test::FileReferenced - after the test completes - will ask
+    the Developer to run diff on result and reference data. If all
+    differences ware intended, Developer may just replace reference data
+    with actual test results.
+
+SUBROUTINES
+    is_referenced_ok ( $data, $name, $comparator )
+        Compare $data with reference stored under key $name in default
+        reference file.
+
+        If $comparator is a CODE reference, it is used to compare results.
+        If this parameter is not given, Test::More::is_deeply is used.
+
+        Returns:
+
+        Value returned by comparison routine. By default (when is_deeply is
+        used) it will be 1 if the test passed, and 0 if it failed.
+
+    is_referenced_in_file ( $data, $file_basename, $name, $comparator )
+        Compare $data with reference stored in custom file:
+        $file_basename.yaml (assuming the serializer is YAML::Any).
+
+        If $comparator is a CODE reference, it is used to compare results.
+        If this parameter is not given, Test::More::is_deeply is used.
+
+        Both $name and $comparator are optional parameters.
+
+        Returns:
+
+        Value returned by comparison routine. By default (when is_deeply is
+        used) it will be 1 if the test passed, and 0 if it failed.
+
+    set_serializer ( $extension, $load_coderef, $dump_coderef )
+        Changes default serializing functions to ones provided by the
+        Developer. $extension must also be provided, so Test::FileReferenced
+        can automatically create the default reference file, if needed.
+
+        You do not need to use this function, if You are happy with
+        YAML::Any usage.
+
+        Returns: undef
+
+    at_exit ()
+        If there ware failed tests, "at_exit()" will dump results from the
+        test in temporary file, and then prompt to inspect changes.
+
+        If there ware no failures, "at_exit()" will check, if results file
+        (from any previous run) exists, and if so - remove it. Nothing will
+        be printed in this case.
+
+        Normally this function does not need to be run explicitly, as
+        Test::FileReferenced will run it from it's "END {}" sections.
+
+        Returns: undef
+
+REFERENCE FILES
+    Reference files are data dumps using - by default - YAML::Any.
+
+    Default reference file
+        Default reference file contains data for all "is_referenced_ok"
+        calls in the test. Each test case has it's own key in the file. For
+        the following example test:
+
+         is_referenced_ok(\%ENV, 'env');
+         is_referenced_ok(\@INC, 'inc');
+
+        ...we have the following reference file:
+
+         ---
+         env:
+           LANG: pl_PL
+           LANGUAGE: pl_PL
+           LC_ALL: pl_PL.UTF-8
+         inc:
+           /usr/lib/perl5/site_perl
+           /usr/lib/perl5/vendor_perl/5.10.1
+           /usr/lib/perl5/vendor_perl
+           /usr/lib/perl5/5.10.1
+
+        Name for the reference file is based on the tests's filename, with
+        *.t* replaced with extension native to the used dumper. Example: if
+        default serializer (YAML::Any) is used, foo/bar.t will use
+        foo/bar.yaml.
+
+    Custom reference files
+        Custom reference files are used by "is_referenced_in_file" function.
+        Each file contains reference data for single test case. For the
+        following example test:
+
+         is_referenced_in_file(\%ENV, 'env', 'environment');
+
+        ...we have the following reference file, named environment.yaml:
+
+         ---
+         LANG: pl_PL
+         LANGUAGE: pl_PL
+         LC_ALL: pl_PL.UTF-8
+
+TEST FAILURES
+    If there are differences between referenced, and actual data, at the end
+    of the test prompt will be printed, similar to:
+
+     Resulting and reference files differ. To see differences run one of:
+           diff foo-results.yaml foo.yaml
+       gvimdiff foo-results.yaml foo.yaml
+ 
+     If the differences ware intended, reference data can be updated by running:
+             mv foo-results.yaml foo.yaml
+
+    If there is no foo.yaml yet (first test run, for example) then the
+    message will be similar to:
+
+     No reference file found. It'a a good idea to create one from scratch manually.
+     To inspect current results run:
+            cat foo-results.yaml
+
+     If You trust Your test output, You can use it to initialize deference file, by running:
+             mv foo-results.yaml foo.yaml
+
+    In this case, the first time is_referenced_ok is used, it will dump the
+    following diagnostic message:
+
+     No reference file found. All calls to is_referenced_ok WILL fail.
+
+    This is to ensure, that the User get's the idea, that something is not
+    OK, even if - for some reason - the END block does not run.
+
+CUSTOM COMPARISON ROUTINES
+    For the moment, it's an undocumented, experimental feature. Use at Your
+    own risk.
+
+TDD
+    Test-driven development is possible with Test::FileReferenced. One of
+    the ways, is to follow the following steps:
+
+    Initialize reference files
+        To initialize the reference file(s), run a script similar to the
+        example bellow:
+
+         #!/usr/bin/perl -w
+         use strict;
+         use Test::More tests=>3;
+         use Test::FileReferenced;
+
+         is_referenced_ok(undef, "First test");
+         is_referenced_ok(undef, "Second test");
+
+         is_referenced_in_file(undef, "foo", "Second test");
+
+        This will allow You to create an empty default reference file for
+        the test, and one ('foo.yaml') custom reference file.
+
+    Fill reference files
+        At this point, test should pass cleanly. Our goal is to write the
+        data structures, that We expect to have, into reference files
+        created above.
+
+        After doing this, test will no longer pass.
+
+    Generate test data
+        At this point, test fails because test script provides incorrect
+        data: undef's have to be replaced with actual data - probably
+        generated by calls to tested subroutines.
+
+    Implement tested code
+        At this point, test still fails. Tested subroutines have to be
+        properly implemented. Once this is done, test should pass, and the
+        process is completed.
+
+CAVEATS
+    Most caveats listed here will - most probably - apply to any other Test
+    module. They have been listed for convenience, as they have been been
+    found to be the most common issues a Developer might run into, while
+    using Test::FileReferenced.
+
+    Random ordering
+        Note, that Test::FileReferenced does not sort the data. If Your data
+        is returned in random order (order is not actually important), You
+        should use the following:
+
+         is_referenced_ok( [ sort @randomly_ordered_data ], "Test 01" )
+
+    Date and/or time
+        Your reference data is 'frozen' as it is in given time point. If
+        results contain some elements derived from date/time, they will be
+        different each time You run the test. This will most likely create
+        false negative results.
+
+    Host-based data
+        If Your test data contains some host-related data (URLs), tests will
+        pass on Your host, but will probably fail on other machines.
+
+TODO
+    Make result files as unique as possible
+        Result files should be unique (add PID? Timestamp?), so it is
+        possible to run the same test in two copies at a time. At the moment
+        race conditions may happen. This does not seem to be a common use
+        case, but still.
+
+        Will be fixed in next (0.02) version.
+
+    External tmp directory
+        At the moment, result files are written in the same directory as
+        tests, which may not always be writable. This should be solved by
+        using '/tmp', or any other User-supplied directory.
+
+        Will be fixed in next (0.02) version.
+
+    Propose better commands
+        Currently, Test::FileReferenced assumes that the User has Unix-like
+        commands, like diff, mv and cat.
+
+        On systems, that do not have them, module should work fins, yet the
+        usefulness of the prompt will be reduced.
+
+        I do not know how (if) this is important - if You need this to be
+        improved, please let me know (patches welcomed).
+
+SEE ALSO
+    Test::More
+
+    Test::FileReferenced::Deep (WIP!)
+
+    Test::FileReferenced::Framework (WIP!)
+
+COPYRIGHT
+    Copyright 2010, Bartłomiej Syguła (natanael@natanael.krakow.pl)
+
+    This is free software. It is licensed, and can be distributed under the
+    same terms as Perl itself.
+
+    For more, see my website: http://natanael.krakow.pl/
+

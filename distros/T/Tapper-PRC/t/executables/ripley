@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo $1
+echo $2
+
+if [ -e "$TAPPER_OUTPUT_PATH/ripley" ] ; then
+    echo "ok - If we find this, capturing works with outfile name appendices"
+else
+    echo "ok - No file appendix. May be the first iteration"
+    touch "$TAPPER_OUTPUT_PATH/ripley"
+fi
+
+
+exit 1;

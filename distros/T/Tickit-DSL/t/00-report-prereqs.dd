@@ -1,0 +1,71 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'perl' => '5.010001'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.48'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Synopsis' => '0',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Tickit::Async' => '0'
+                                      },
+                      'requires' => {
+                                      'Exporter' => '0',
+                                      'List::UtilsBy' => '0',
+                                      'Tickit' => '0.60',
+                                      'Tickit::Console' => '0.06',
+                                      'Tickit::Widget::Breadcrumb' => '0.003',
+                                      'Tickit::Widget::Calendars' => '0.001',
+                                      'Tickit::Widget::Choice' => '0.02',
+                                      'Tickit::Widget::Decoration' => '0.004',
+                                      'Tickit::Widget::Figlet' => '0.003',
+                                      'Tickit::Widget::FileViewer' => '0.004',
+                                      'Tickit::Widget::FloatBox' => '0.02',
+                                      'Tickit::Widget::Layout::Desktop' => '0.010',
+                                      'Tickit::Widget::Layout::Relative' => '0.005',
+                                      'Tickit::Widget::LogAny' => '0.005',
+                                      'Tickit::Widget::Menu' => '0.08',
+                                      'Tickit::Widget::Progressbar' => '0.101',
+                                      'Tickit::Widget::ScrollBox' => '0.07',
+                                      'Tickit::Widget::Scroller' => '0.22',
+                                      'Tickit::Widget::SegmentDisplay' => '0.02',
+                                      'Tickit::Widget::SparkLine' => '0.104',
+                                      'Tickit::Widget::Statusbar' => '0.004',
+                                      'Tickit::Widget::Tabbed' => '0.018',
+                                      'Tickit::Widget::Table' => '0.216',
+                                      'Tickit::Widget::Term' => '0.002',
+                                      'Tickit::Widget::Tree' => '0.114',
+                                      'Tickit::Widget::VHBox' => '0.001',
+                                      'Tickit::Widgets' => '0.19',
+                                      'parent' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::CheckDeps' => '0.010',
+                                   'Test::More' => '0.98'
+                                 }
+                 }
+     };
+  $x;
+ }

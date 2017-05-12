@@ -1,0 +1,19 @@
+show_columns.pl - Takes a bunch of texts, whether in plaintext or XML
+format, and outputs the collation results in tabular format.  Can
+output as text table or as CSV, or even as a "storable" object for use
+with the other scripts once you're satisfied with the collation
+itself.
+
+see_links.pl - Another visualization script; just shows the "similar"
+vs. "different variant" links between the matched words.
+
+make_apparatus.pl - Takes a bunch of texts (or a Storable object as
+produced by show_columns) and outputs parallel-segmentation TEI XML.
+
+do_edit.pl - Takes the output of make_apparatus and presents the user
+with the editing choices that must be made.  Simple STDIN/STDOUT
+interface.
+
+stemma_data.pl - Takes collation output and creates a file suitable
+for analysis in a PARS package,
+e.g. http://mobyle.pasteur.fr/cgi-bin/MobylePortal/portal.py?form=pars

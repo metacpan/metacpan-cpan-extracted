@@ -1,0 +1,289 @@
+=head1 NAME
+
+TUWF::XML - Easy XML and HTML generation with Perl
+
+=head1 DESCRIPTION
+
+This module provides an easy and simple method for generating XML (and with
+that, HTML) documents in Perl. Unlike most other TUWF modules, this one can be
+used separately, outside of the TUWF framework.
+
+The goal of this module is to make HTML generation B<easier>, it is certainly
+not a goal to abstract HTML generation behind generalized functions and
+objects. Nor is it a goal to ensure the correctness of the generated HTML, that
+remains the responsibility of the programmer (although this module can
+certainly help). You will still be writing HTML yourself, the only difference
+is that you use a more convenient syntax and you won't have to manually escape
+everything you output.
+
+The primary aim of this module was to generate XHTML, and since XHTML is a
+subset of XML, extending it to write XML was a small step. In fact, this module
+is basically an XML generator with convenience functions for XHTML.
+
+This module provides two interfaces: a functional interface and an object
+interface. Both can be used, even at the same time. The object interface is
+required in threaded environments or when you want to generate multiple
+documents simultaneously, while the functional interface is far more
+convenient, but has some limitations and contributes to namespace pollution.
+
+The functional interface looks like this:
+
+  use TUWF::XML ':html';
+  # -- or, from within a TUWF website:
+  use TUWF ':html';
+  
+  TUWF::XML->new(default => 1);
+  html;
+   head;
+    title 'Document title!';
+   end;
+  end 'html';
+
+And the equivalent, using the object interface:
+
+  # not required when used within a TUWF website
+  use TUWF::XML;
+  
+  my $xml = TUWF::XML->new();
+  $xml->html;
+   $xml->head;
+    $xml->title('Document title!');
+   $xml->end;
+  $xml->end('html');
+
+You may also combine the two interfaces by setting the I<default> option in
+C<new()> and mixing method calls and function calls, but that is rather
+inconsistent and messy.
+
+TUWF automatically calls C<TUWF::XML-E<gt>new(default =E<gt> 1, ..)> at the start of
+each request, so you can start generating XML or HTML using the functional
+interface without having to initialize this module. Of course, if you wish to
+generate an other XML document while processing a request, you should use the
+object interface for that, otherwise this may cause problems with other
+functions within the TUWF framework that assume that the default C<TUWF::XML>
+object has been set to output to TUWF.
+
+=head1 FUNCTION-ONLY FUNCTIONS
+
+=head2 new(options)
+
+Creates a new XML generator object, accepts the following options:
+
+=over
+
+=item default
+
+0/1. When set to a true value, the newly created object will be used as the
+default object: Any regular function call (that is, without an object) to any
+of the functions listed in L<METHODS & FUNCTIONS|/"METHODS & FUNCTIONS"> will
+act as if they were called on this object. Until a new object is created with
+the I<default> option set, in which case the default object will be overwritten
+again. Default: 0.
+
+=item write
+
+Should contain a subroutine reference that accepts a string as argument. This
+subroutine will be called whenever there is data to output. If this option is
+not specified, a default function that writes to C<stdout> is used.
+
+=item pretty
+
+Set to a positive integer to pretty-print the generated XML, set to 0 to
+disable pretty-printing. The integer indicates the number of spaces to use for
+each new level of indentation. It is recommended to have pretty-printing
+disabled when generating HTML, since white-space around HTML elements tends to
+have significance when being rendered, and with pretty-printing you will lose
+the control on where to (not) insert whitespace. Default: 0 (disabled).
+
+=back
+
+=head2 xml_escape(string)
+
+Returns the XML-escaped string. The characters C<&>, C<E<lt>>, C<E<gt>> and
+C<"> will be replaced with their XML entity.
+
+=head2 html_escape(string)
+
+Does the same as C<xml_escape()>, but also replaced newlines with
+C<E<lt>br /E<gt>> tags.
+
+=head1 METHODS & FUNCTIONS
+
+=head2 lit(string)
+
+Output the given string B<lit>erally, without modification or escaping. This is
+equivalent to just calling the I<write> subroutine passed to C<new()>.
+
+=head2 txt(string)
+
+XML-escape the string and then output it, equivalent to
+C<lit(xml_escape $string)>.
+
+=head2 xml()
+
+Writes the following XML header:
+
+  <?xml version="1.0" encoding="UTF-8"?>
+
+Since this function does not open a tag, it does not have to be C<end()>'ed.
+
+=head2 html(options)
+
+Writes an XHTML doctype and opens an C<E<lt>htmlE<gt>> tag. Accepts the
+following options:
+
+=over
+
+=item doctype
+
+Specify the doctype to use. Can be one of the following:
+
+  xhtml1-strict xhtml1-transitional xhtml1-frameset
+  xhtml11 xhtml-basic11 xhtml-math-svg
+
+These refer to the doctypes found at
+L<http://www.w3.org/QA/2002/04/valid-dtd-list.html>. Default: xhtml1-strict.
+
+=item lang
+
+Specifies the (human) language of the generated content. This will generate a
+C<lang> and C<xml:lang> attribute for the html open tag.
+
+=item I<anything else>
+
+Any option besides I<doctype> and I<lang> is added as attribute to html open
+tag.
+
+=back
+
+Since this opens an C<E<lt>htmlE<gt>> tag, it should be closed with an
+C<end()>.
+
+=head2 tag(name, attribute => value, .., contents)
+
+Generates an XML tag or element. The first argument is the name of the tag,
+attributes can be specified after that with key/value pairs and finally the
+contents can be specified. If the I<contents> argument is not present, an open
+tag will be generated, which should be closed later on using C<end()>. If
+I<contents> is present but undef, the generated tag will be self-closing, i.e.
+it will end with a C</E<gt>> instead of a regular C<E<gt>>. If I<contents> is
+present and not undef, it will be used as the contents of the tag, after which
+the tag will be closed with a closing tag (C<E<lt>/tagnameE<gt>>).
+
+The tag name and attribute names are outputted as-is, after some very basic
+validation. The attribute values and contents are passed through
+C<xml_escape()>.
+
+Some example function calls and their output:
+
+  tag('items');
+  # <items>
+  end();
+  # </items>
+  
+  tag('link', href => '/', undef);
+  # <link href="/" />
+  
+  tag('a', href => '/?f&c', title => 'Homepage', 'link');
+  # <a href="/f&amp;c" title="Homepage">link</a>
+  
+  tag('summary', type => 'html', 'I can write in <b>bold</b>');
+  # <summary type="html">I can write in &lt;b&gt;bold&lt;/b&gt;</summary>
+  
+  tag qw{content type xhtml xml:base http://example.com/ xml:lang en}, $content;
+  # is equivalent to:
+  lit '<content type="xhtml" xml:base="http://example.com/" xml:lang="en">';
+  txt $content;
+  lit '</content>';
+  # except tag() can do pretty-printing when requested
+
+=head2 end(name)
+
+Closes the last tag opened by C<tag()> or C<html()>. The I<name> argument is
+optional, when given, it will be used as validation. If the given I<name> does
+not equal the last opened tag, an error is thrown.
+
+=head2 <xhtml-tag>(attribute => value, .., contents)
+
+For convenience, all XHTML 1.0 tags have their own function that acts as a
+shorthand for calling C<tag()>. The following functions are defined:
+
+  a abbr acronym address area b base bdo big blockquote body br button caption
+  cite code col colgroup dd del dfn div dl dt em fieldset form h1 h2 h3 h4 h5
+  h6 head i img input ins kbd label legend li Link Map meta noscript object ol
+  optgroup option p param pre q samp script Select small span strong style Sub
+  sup table tbody td textarea tfoot th thead title Tr tt ul var
+
+Note that some functions start with an upper-case character. This is to avoid
+problems with reserved words or overriding Perl core functions with the same
+name.
+
+Some tags are I<boolean>, meaning that they should always be self-closing and
+not have any contents. To generate these tags with C<tag()>, you have to
+specify undef as the I<contents> argument. This is not required when using
+these convenience functions, the undef argument is automatically added for the
+following tags:
+
+  area base br img input Link param
+
+Again, some examples:
+  
+  br;  # tag 'br', undef;
+  div; # tag 'div';
+
+  title 'Page title';
+  # tag 'title', 'Page title';
+
+  Link rel => 'shortcut icon', href => '/favicon.ico';
+  # tag 'link', rel => 'shortcut icon', href => '/favicon.ico', undef;
+
+  textarea rows => 10, cols => 50, $content;
+  # tag 'textarea', rows => 10, cols => 50, $content;
+
+
+=head1 IMPORT OPTIONS
+
+By default, TUWF::XML does not export anything. You can import any specific
+function (except C<new()>) by specifying it on the C<use> line:
+
+  use TUWF::XML 'lit', 'html_escape', 'br';
+
+  # after which you can call those functions as follows:
+  lit html_escape $content;
+  br;
+
+Or you can import an entire group of functions by adding C<:xml> or C<:html> to
+the list. The C<:xml> group consists of the functions C<xml()>, C<lit()>,
+C<txt()>, C<tag()>, and C<end()>. The C<:html> group consists of all xhtml-tag
+functions in addition to the following: C<html()>, C<lit()>, C<txt()>,
+C<tag()> and C<end()>.
+
+When using this module in a TUWF website, you can substitute C<TUWF::XML> with
+C<TUWF>. The main TUWF module will then redirect its import argments to this
+module. This saves some typing, and allows you to import functions from other
+TUWF modules on the same C<use> line.
+
+
+=head1 SEE ALSO
+
+L<TUWF>.
+
+This module was inspired by L<XML::Writer|XML::Writer>, which is more powerful
+but less convenient.
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008-2015 Yoran Heling.
+
+This module is part of the TUWF framework and is free software available under
+the liberal MIT license. See the COPYING file in the TUWF distribution for the
+details.
+
+
+=head1 AUTHOR
+
+Yoran Heling <projects@yorhel.nl>
+
+=cut
+

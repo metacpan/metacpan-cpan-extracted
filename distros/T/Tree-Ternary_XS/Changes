@@ -1,0 +1,16 @@
+Revision history for Perl extension Tree::Ternary_XS.
+
+0.04  Sun Apr  9 19:53:47 2000
+	- Hopefully fixed all portability bugs so it should
+          run on Perl 5.6 and downwards (now use ppport.h)
+
+0.03  Tue Apr  4 22:44:51 2000
+        - bug fixes to be more Perl 5.6-compatible
+
+0.02  Sat Apr  1 20:15:03 2000
+        - bug fixes for two of the tests - they still
+          used Tree::Ternary
+
+0.01  Mon Mar 27 10:20:26 2000
+	- released initial version
+

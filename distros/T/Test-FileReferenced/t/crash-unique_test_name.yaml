@@ -1,0 +1,8 @@
+---
+"This will pass":
+  a: 'A'
+  b: 'B'
+"This will pass, again":
+  x: 'X'
+  y: 'Y'
+

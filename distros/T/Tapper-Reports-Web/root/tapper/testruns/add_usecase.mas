@@ -1,0 +1,14 @@
+<%args>
+$form
+</%args>
+
+% if ($c->session->{valid}) {
+<h3>Choose a use case for this testrun</h3>
+<fieldset>
+<% $form|n %>
+<p><a href="/tapper/testruns/create/">Back</a></p>
+</fieldset>
+% } else {
+<h1>Error: You followed an incorrect deep link. Session data is missing</h1>
+% }
+<p><a href="/tapper/start/">Cancel</a></p>

@@ -1,0 +1,6 @@
+(A) entry 1 @one +uno
+entry 2 @two +dos
+
+x completed entry 4
+(B) entry 5 is priority
+entry 6 +delete

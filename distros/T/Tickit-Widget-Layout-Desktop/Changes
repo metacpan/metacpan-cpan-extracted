@@ -1,0 +1,66 @@
+Revision history for Tickit-Widget-Layout-Desktop
+
+0.010     2016-12-31 19:39:00+08:00 Asia/Kuala_Lumpur
+	No new features.
+
+	Deprecation fixes:
+	* Use ->bind_event instead of ->on_geom_changed, for newer Tickit versions
+	* Set cursor position explicitly in new panes, since without this we tend
+	to trigger warnings on focus change
+
+0.009     2015-02-06 20:09:42+00:00 Europe/London
+	New features:
+	* ->weld on the desktop instance for attaching panel edges. Previously
+	available in 0.003 but was not exposed via public methods.
+
+0.008     2015-02-06 18:23:07+00:00 Europe/London
+	New features:
+	* ->close_panel support for closing the window and removing a panel
+
+0.007     2015-02-04 01:24:25+00:00 Europe/London
+	New features:
+	* Re-enabled rounded corners
+
+	Dependencies:
+	* Tickit 0.48+, for ->get_cell translation handling
+
+0.006     2015-01-24 14:00:26+00:00 Europe/London
+	New features:
+	* New panels can be given position in %, and there is now suppport for
+	'right' and 'bottom' attributes (distance from bottom and right of the
+	desktop, respectively)
+	* Disabled rounded corners, since ->get_cell has changed in newer Tickit
+	versions
+
+0.005     2014-08-31 15:00:19+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Stick-to-bottom-right behaviour - was using the wrong value for lines,
+	causing windows to leap to full height occasionally for no good reason
+	* Panels now get a default position if none provide in ->create_panel
+
+0.004     2014-08-31 01:22:30+01:00 Europe/London
+	New features:
+	* Menu popup for max/min/weld/close features
+	* Restore windows after maximise
+
+0.003     2014-08-20 19:59:52+01:00 Europe/London
+	New features:
+	* Ability to join edges on windows for moving things in parallel
+	* Clamp-to-edge
+	* Rounded corners are back
+
+	Bugs fixed:
+	* Expose handling improved, slightly faster but still plenty of room
+	for optimisation.
+	* When moving windows, limit them to the available space
+
+0.002     2014-08-16 18:24:47+01:00 Europe/London
+	No new features.
+
+	Documentation updates:
+	* Provide a screenshot to make things slightly more obvious
+
+0.001     2014-08-16 18:15:28+01:00 Europe/London
+	Initial CPAN release

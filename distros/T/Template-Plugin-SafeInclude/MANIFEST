@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Template/Plugin/SafeInclude.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/01.safe-include.t
+t/99.perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/template/test.inc

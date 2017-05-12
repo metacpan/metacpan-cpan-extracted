@@ -1,0 +1,45 @@
+---
+abstract: 'Dispatch to language-specific Time::Duration module.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Duration-Locale
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+optional_features:
+  maximum_languages:
+    description: 'Have all language-specific Time::Duration modules available (those known at the time of writing ...).'
+    requires:
+      Time::Duration::es: '0'
+      Time::Duration::fr: '0'
+      Time::Duration::id: '0'
+      Time::Duration::ja: '0'
+      Time::Duration::pl: '0'
+      Time::Duration::pt: '0'
+      Time::Duration::sv: '0'
+requires:
+  Class::Singleton: '0'
+  I18N::LangTags: '0.30'
+  I18N::LangTags::Detect: '0'
+  Module::Load: '0'
+  Test::More: '0'
+  Time::Duration: '0'
+  perl: '5.004'
+resources:
+  homepage: http://user42.tuxfamily.org/time-duration-locale/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

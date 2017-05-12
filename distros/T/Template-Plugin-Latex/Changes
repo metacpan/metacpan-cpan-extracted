@@ -1,0 +1,179 @@
+#================================================= -*- indented-text -*-
+#
+# Changes
+#
+# DESCRIPTION
+#   Revision history for the Template Toolkit Latex plugin.
+#
+# AUTHOR
+#   Chris Travers   <chris.travers@gmail.com>
+#
+#
+#------------------------------------------------------------------------
+#========================================================================
+
+
+#------------------------------------------------------------------------
+# Version 3.11
+# -----------------------------------------------------------------------
+
+* Enclose version number in quotes (3.10 was recognized as 3.1)
+
+#------------------------------------------------------------------------
+# Version 3.10
+# -----------------------------------------------------------------------
+
+* Fix spelling errors
+* Fix rt.cpan.org#106894: Include path incorrectly determined with
+    coderef for INCLUDE_PATH
+
+#------------------------------------------------------------------------
+# Version 3.09
+# -----------------------------------------------------------------------
+
+* Add 3.08 Changelog item
+
+#------------------------------------------------------------------------
+# Version 3.08
+# -----------------------------------------------------------------------
+
+* Fixed test case
+* Updated README and MANIFEST files
+
+#------------------------------------------------------------------------
+# Version 3.07
+# -----------------------------------------------------------------------
+
+* Tests no longer obfuscate the fact they didn't run
+* Tests now explicitly run pdflatex or xelatex (adjusting to LaTeX::Driver)
+
+#------------------------------------------------------------------------
+# Version 3.06
+# -----------------------------------------------------------------------
+
+* Makefile now generates without user input
+* Test cases should now run on all smoketesters.
+
+#------------------------------------------------------------------------
+# Version 3.03 to 03.05
+#------------------------------------------------------------------------
+
+* Minor packaging fixes which correct issues relating to CPAN indexing as
+  a co-committer.  No code changes.
+
+#------------------------------------------------------------------------
+# Version 3.02.01 - 2014-02-25
+#------------------------------------------------------------------------
+
+* Fixed test case failures based on differing escape returns from
+  LaTeX::Encode
+
+#------------------------------------------------------------------------
+# Version 3.02 - 2009-03-12
+#------------------------------------------------------------------------
+
+* fixed skip_all call (use Template::Test rather than Test::More - 
+  despite Template::Test being incompatible with TAP)
+
+#------------------------------------------------------------------------
+# Version 3.01 - 2009-03-11
+#------------------------------------------------------------------------
+
+* tidied up tests to avoid spurious failures (skip_all if the 'dvitype'
+  program is not available)
+
+* expanded documentation
+
+#------------------------------------------------------------------------
+# Version 3.00 - 2009-03-09
+#------------------------------------------------------------------------
+
+* first non-developer release - no changes from 3.00_05
+
+
+#------------------------------------------------------------------------
+# Version 3.00_05 - 2007-10-13
+#------------------------------------------------------------------------
+
+* Removed "use Template" from Makefile.PL as that was unnecessary and
+  was causing build failures where Template was not already installed.
+
+
+#------------------------------------------------------------------------
+# Version 3.00_04 - 2007-10-13
+#------------------------------------------------------------------------
+
+* Added a test script for the "table" method
+
+* Updated dependency on LaTeX::Driver to 0.07 as 0.06 failed to build
+  on cpantesters machines
+
+* mark 11-plugin-errors.t as all skipped, as the error messages that
+  are checked for are not what the driver module produces - I need to
+  review this test script and change some of the individual checks to
+  do meaningful things
+
+#------------------------------------------------------------------------
+# Version 3.00_03 - 2007-10-03
+#------------------------------------------------------------------------
+
+* Added a "table" method to the plugin to interface to the
+  LaTeX::Table module.  This will generate the LaTeX commands to
+  format a table from raw data.
+
+#------------------------------------------------------------------------
+# Version 3.00_02 - 2007-10-03
+#------------------------------------------------------------------------
+
+* Restructured again so that Template::Latex calls the
+  Template::Plugin::Latex module, which in turn builds on
+  LaTeX::Driver to format the document.  (Removed the
+  Template::Latex::Paths module as the paths are now held in the
+  LaTeX::Driver module.)
+
+* Expanded the test suite and the documentaton.
+
+#------------------------------------------------------------------------
+# Version 3.00_01 - 2007-09-13
+#------------------------------------------------------------------------
+
+* I have restructured the plugin fairly extensively, and added
+  radically new features, so this release has a new major version
+  number, i.e. 3.x.
+
+* Restructured Template::Latex to run latex multiple times if
+  necessary and also to run bibtex if citations are detected and
+  makeindex if indexing is detected.
+
+* The TEXINPUTS environment variable is set up to include the original
+  directory so that include files can be found there.
+
+* Change the format of the commands passed to system() so that the cd
+  into the temporary directory is done in the command rather than in
+  the module.  That way the module does not need to change back to the
+  original directory, simplifying error handling.  
+  (The Win32 idiom is: 'cmd /c "cd DIR && COMMAND"')
+
+* Split the driver code in Template::Latex out into its own module
+  (Template::Latex::Driver).
+
+* The LaTeX macro \TTLATEX is defined when latex or pdflatex is run
+
+* The static filter detex is defined by the plugin
+
+#------------------------------------------------------------------------
+# Version 2.17 - 2006-06-07
+#------------------------------------------------------------------------
+
+* Changes dependency on Template to version 2.15 as version 2.16 of
+  Template, which was specified as the dependency has not been relased.
+
+* Added files: Changes (this file) and TODO
+
+
+#------------------------------------------------------------------------
+# Version 2.16 - 2006-05-31
+#------------------------------------------------------------------------
+
+First release of the plugin as a separate distribution to the core
+Template Toolkit distribution.  New maintainer: Andrew Ford.

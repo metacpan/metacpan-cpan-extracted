@@ -1,0 +1,4 @@
+Revision history for Task-KiokuDB
+
+0.07  2012-05-02
+      - Remove ::Backend::Files, since it's been failing for a while.

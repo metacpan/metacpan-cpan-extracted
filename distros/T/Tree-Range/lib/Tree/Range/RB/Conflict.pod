@@ -1,0 +1,72 @@
+### Conflict.pod --- Document Tree::Range::RB::Conflict  -*- POD -*-
+
+### Ivan Shmakov, 2013
+
+## To the extent possible under law, the author(s) have dedicated all
+## copyright and related and neighboring rights to this software to the
+## public domain worldwide.  This software is distributed without any
+## warranty.
+
+## You should have received a copy of the CC0 Public Domain Dedication
+## along with this software.  If not, see
+## <http://creativecommons.org/publicdomain/zero/1.0/>.
+
+### Code:
+
+=head1 NAME
+
+Tree::Range::RB::Conflict E<ndash> range tree implemented on top
+of L<Tree::RB>, which fails instead of writing over
+
+=head1 SYNOPSIS
+
+    require Tree::Range::RB::Conflict;
+
+    sub ncmp { $_[0] <=> $_[1]; }
+    my $nrt
+        = Tree::Range::RB->new ({ "cmp" => \&ncmp });
+    $nrt->range_set (100, 200, "foo");
+    $nrt->range_set (200, 300, "bar");
+    ## this last range_set () raises an exception
+    $nrt->range_set (150, 250, "baz");
+
+=head1 DESCRIPTION
+
+This class implements a I<range tree>
+(as described in L<Tree::Range::base>)
+on top of the L<Tree::RB> red-black tree implementation,
+with the ranges being E<ldquo>overwrite-protectedZ<>E<rdquo>
+(as described in L<Tree::Range::conflict>.)
+
+It inherits from both L<Tree::Range::RB> and
+L<Tree::Range::conflict>.
+Please refer to the L<Tree::Range::RB> documentation
+for additional information and examples.
+
+B<Note> that the C<range_set_over> method
+remains available, so itE<rsquo>s still possible to
+overwrite an arbitrary rangeE<rsquo>s association,
+or to effectively E<ldquo>removeZ<>E<rdquo> one
+(by associating it with the I<leftmost> value.)
+
+=head1 SEE ALSO
+
+L<Tree::Range::RB>,
+L<Tree::Range::base>,
+L<Tree::Range::conflict>.
+
+=head1 AUTHOR
+
+Ivan Shmakov <oneingray@gmail.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the 3-clause BSD license, as
+included within the code.
+
+=cut
+
+### Emacs trailer
+## Local variables:
+## coding: us-ascii
+## End:
+### Conflict.pod ends here

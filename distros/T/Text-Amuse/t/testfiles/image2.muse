@@ -1,0 +1,110 @@
+#title Image testing
+
+An alternative may be to use the morefloats package. The package will allocate more “float skeletons” than LaTeX does by default; each such skeleton may then be used to store a float. Beware that even with morefloats, the number you can allocate is limited; even with the etex package (which makes available many more registers, etc., than LaTeX does by default; e-TeX can create lots more registers, but none of those “beyond the original TeX default” may be used in float skeletons). Thus, etex may offer some relief, but it can not be regarded as a panacea 
+
+[[float.png 15 r][floating right]]
+
+An alternative may be to use the morefloats package. The package will allocate more “float skeletons” than LaTeX does by default; each such skeleton may then be used to store a float. Beware that even with morefloats, the number you can allocate is limited; even with the etex package (which makes available many more registers, etc., than LaTeX does by default; e-TeX can create lots more registers, but none of those “beyond the original TeX default” may be used in float skeletons). Thus, etex may offer some relief, but it can not be regarded as a panacea 
+
+[[float.png 10 r]]
+
+An alternative may be to use the morefloats package. The package will allocate more “float skeletons” than LaTeX does by default; each such skeleton may then be used to store a float. Beware that even with morefloats, the number you can allocate is limited; even with the etex package (which makes available many more registers, etc., than LaTeX does by default; e-TeX can create lots more registers, but none of those “beyond the original TeX default” may be used in float skeletons). Thus, etex may offer some relief, but it can not be regarded as a panacea 
+
+
+[[float.png 15 l][floating left]]
+
+
+An alternative may be to use the morefloats package. The package will allocate more “float skeletons” than LaTeX does by default; each such skeleton may then be used to store a float. Beware that even with morefloats, the number you can allocate is limited; even with the etex package (which makes available many more registers, etc., than LaTeX does by default; e-TeX can create lots more registers, but none of those “beyond the original TeX default” may be used in float skeletons). Thus, etex may offer some relief, but it can not be regarded as a panacea 
+
+[[float.png 10 l]]
+
+An alternative may be to use the morefloats package. The package will allocate more “float skeletons” than LaTeX does by default; each such skeleton may then be used to store a float. Beware that even with morefloats, the number you can allocate is limited; even with the etex package (which makes available many more registers, etc., than LaTeX does by default; e-TeX can create lots more registers, but none of those “beyond the original TeX default” may be used in float skeletons). Thus, etex may offer some relief, but it can not be regarded as a panacea 
+
+An alternative may be to use the morefloats package. The package will allocate more “float skeletons” than LaTeX does by default; each such skeleton may then be used to store a float. Beware that even with morefloats, the number you can allocate is limited; even with the etex package (which makes available many more registers, etc., than LaTeX does by default; e-TeX can create lots more registers, but none of those “beyond the original TeX default” may be used in float skeletons). Thus, etex may offer some relief, but it can not be regarded as a panacea 
+
+An alternative may be to use the morefloats package. The package will allocate more “float skeletons” than LaTeX does by default; each such skeleton may then be used to store a float. Beware that even with morefloats, the number you can allocate is limited; even with the etex package (which makes available many more registers, etc., than LaTeX does by default; e-TeX can create lots more registers, but none of those “beyond the original TeX default” may be used in float skeletons). Thus, etex may offer some relief, but it can not be regarded as a panacea 
+
+An alternative may be to use the morefloats package. The package will allocate more “float skeletons” than LaTeX does by default; each such skeleton may then be used to store a float. Beware that even with morefloats, the number you can allocate is limited; even with the etex package (which makes available many more registers, etc., than LaTeX does by default; e-TeX can create lots more registers, but none of those “beyond the original TeX default” may be used in float skeletons). Thus, etex may offer some relief, but it can not be regarded as a panacea 
+
+** Chapter with a lot of figures
+
+[[float.png 30 f][A *figure*]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+[[float.png f]]
+
+
+
+
+
+
+
+

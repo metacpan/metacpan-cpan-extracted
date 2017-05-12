@@ -1,0 +1,20 @@
+Revision history for Test-Command-Simple
+
+0.05    2015-Jun-07
+        ! It does work on darwin, though.
+        ! Fix the NAME of the module in the POD.
+        ! Fix export of exit_status.
+
+0.04    2012-Nov-29
+        ! This method of running subcommands doesn't work hot on
+          Windows (except cygwin).  Instead of hanging the cpantesters,
+          we'll instead drop the platform altogether.
+
+0.03    2010-Nov-23
+        + Add stdin for run function.
+
+0.02    2010-Nov-17
+        ! Unfortunately clobbered existing module, renamed.
+
+0.01    2010-Nov-17
+        First version, released on an unsuspecting world.

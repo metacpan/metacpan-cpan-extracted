@@ -1,0 +1,305 @@
+---
+abstract: 'modules I use'
+author:
+  - 'Jesse Luehrs <doy@tozt.net>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132830'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-BeLike-DOY
+provides:
+  Task::BeLike::DOY:
+    file: lib/Task/BeLike/DOY.pm
+    version: 0.12
+requires:
+  App::ForkProve: 0
+  App::Nopaste: 0.20
+  App::PAUSE::Comaint: 0
+  App::Termcast: 0.06
+  App::Ttyrec: 0
+  App::cpanminus: 1.5007
+  App::cpanoutdated: 0.05
+  App::ph: 0
+  App::pmuninstall: 0
+  Archive::Zip: 0
+  B::Keywords: 0
+  Bread::Board::Declare: 0
+  CPAN::Changes: 0
+  CPAN::DistnameInfo: 0
+  CPAN::Mini: 0
+  Carp::Always::Color: 0.03
+  Carp::Reply: 0
+  Clipboard: 0
+  Config::INI::Reader: 0
+  Data::Dump: 0
+  Data::ICal: 0
+  Data::ICal::DateTime: 0
+  DateTime: 0
+  Devel::Cover: 0
+  Devel::FindRef: 0
+  Devel::NYTProf: 3.00
+  Devel::PartialDump: 0
+  Devel::STDERR::Indent: 0
+  Devel::Trace: 0
+  Dist::Zilla: 4.00
+  Dist::Zilla::PluginBundle::DOY: 0.09
+  ExtUtils::MakeMaker::Dist::Zilla::Develop: 0
+  File::pushd: 0
+  HTTP::Parser::XS: 0
+  IO::Pty::Easy: 0.08
+  JSON: 0
+  LWP: 0
+  LWP::Protocol::https: 0
+  LastFM::Export: 0
+  Module::Which: 0
+  Moose: 2.0400
+  Parse::CPAN::Packages::Fast: 0
+  Path::Class: 0.25
+  Plack: 0
+  Pod::Coverage::TrustPod: 0
+  Pod::Cpandoc: 0
+  Proc::InvokeEditor: 0
+  Reply: 0
+  Scope::Guard: 0
+  Term::ProgressBar: 0
+  Term::ReadKey: 0
+  Term::ReadLine::Gnu: 0
+  Term::TtyRec::Plus: 0.09
+  Test::Fatal: 0
+  Test::More: 0.88
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Test::Pretty: 0
+  Test::Requires: 0
+  Test::Without::Module: 0
+  Unicode::Tussle: 0
+  WWW::Mechanize: 0
+  WWW::Wunderground::API: 0
+  YAML: 0
+  autodie: 0
+  circular::require: 0
+  lib::require::all: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: https://github.com/doy/task-belike-doy/issues
+  homepage: http://metacpan.org/release/Task-BeLike-DOY
+  repository: git://github.com/doy/task-belike-doy.git
+version: 0.12
+x_Dist_Zilla:
+  perl:
+    version: 5.018001
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@DOY/TestMoreDoneTesting'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@DOY/GatherDir'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@DOY/PruneCruft'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@DOY/ManifestSkip'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@DOY/MetaYAML'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@DOY/License'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@DOY/Readme'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      name: '@DOY/RunExtraTests'
+      version: 0.013
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DOY/ExecDir'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DOY/ShareDir'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@DOY/MakeMaker'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@DOY/Manifest'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@DOY/TestRelease'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@DOY/ConfirmRelease'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@DOY/MetaConfig'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@DOY/MetaJSON'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@DOY/NextRelease'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@DOY/CheckChangesHasContent'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@DOY/PkgVersion'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@DOY/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@DOY/PodCoverageTests'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@DOY/PodSyntaxTests'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@DOY/NoTabsTests'
+      version: 0.05
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@DOY/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@DOY/Test::Compile'
+      version: 2.037
+    -
+      class: Dist::Zilla::Plugin::Metadata
+      name: '@DOY/Metadata'
+      version: 3.03
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@DOY/MetaResources'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@DOY/Git::Check'
+      version: 2.016
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@DOY/Git::Commit'
+      version: 2.016
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@DOY/Git::Tag'
+      version: 2.016
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@DOY/Git::NextVersion'
+      version: 2.016
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@DOY/ContributorsFromGit'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@DOY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package: {}
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+      name: '@DOY/MetaProvides::Package'
+      version: 1.15000000
+    -
+      class: Dist::Zilla::Plugin::TaskWeaver
+      name: '@DOY/TaskWeaver'
+      version: 0.101624
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@DOY/UploadToCPAN'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: 5.008
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 5.008
+x_authority: cpan:DOY

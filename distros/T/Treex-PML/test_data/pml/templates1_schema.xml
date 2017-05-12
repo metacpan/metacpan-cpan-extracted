@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pml_schema
+  xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/"
+  version="1.2">
+  <template name="x">
+    <template name="y">
+      <type name="z"><constant>z1</constant></type>
+      <type name="w">
+	<structure>
+	  <member name="M" type="z"/>
+	  <member name="K" type="u"/>
+	</structure>
+      </type>
+    </template>
+    <type name="z"><constant>z2</constant></type>
+    <type name="u">
+      <structure>
+	<member name="N" type="z"/>
+      </structure>
+    </type>
+  </template>
+  <type name="z"><constant>z3</constant></type>
+  <copy template="x" prefix="a"/>
+</pml_schema>

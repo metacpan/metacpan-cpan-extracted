@@ -1,0 +1,45 @@
+NAME
+    Task::DataFlow - The DataFlow Module Collection (new flavor)
+
+VERSION
+    version 0.008
+
+TASK CONTENTS
+  DataFlow Core
+    The core features of the DataFlow framework.
+
+   DataFlow 1.121690
+    Version 1.121690 required because: Using builders instead of defaults
+    (Moose)
+
+  DataFlow Converters
+   DataFlow::Proc::MessagePack 1.112100
+    No tests yet!!
+
+   DataFlow::Proc::JSON 1.112100
+    No tests yet!!
+
+   DataFlow::Proc::YAML 1.112100
+    No tests yet!!
+
+   DataFlow::Proc::DBF
+    First module contributed to DataFlow. Thanks Garu!! :-)
+
+  DataFlow for Web
+    Processors to help scraping the dirt out of the web.
+
+   DataFlow::Proc::URLRetriever 1.112100
+   DataFlow::Proc::HTMLFilter 1.112100
+    A powerful HTML filter based on XPath.
+
+  Others
+   DataFlow::Proc::DPath 1.112100
+AUTHOR
+    Alexei Znamensky <russoz@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Alexei Znamensky.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,88 @@
+Revision history for Perl extension Test::DBUnit.
+
+0.20 Sat Feb 21 2009
+    - Added empty table check in expected_dataset as table => []
+
+0.19 Sun Jan 11 2009
+    - extended documentation
+
+0.18 Mon Jan 04 2009
+    - added Test::DBUnit::Generator->schema_validator method
+
+0.17 Wen Dec 24 2008
+    - added has_sequence mwthod, extended tests.
+
+0.16 Mon Dec 22 2008
+    - added plsql / excpetion test methods:
+	execute_ok
+	throws_ok
+
+    - added schema tests methods:
+
+	execute_ok
+	throws_ok
+	has_table
+	hasnt_table
+	has_view
+	hasnt_view
+	has_column
+	hasnt_column
+	has_columns
+	column_is_null
+	column_is_not_null
+	column_type_is_ok
+	has_pk
+	has_fk
+	has_index
+	index_is_unique
+	index_is_primary
+	index_is_type
+	has_trigger
+	trigger_is
+	has_routine
+
+
+0.15 Mon Nov 24 2008
+    - Fix generator tests
+
+0.14 Sun Nov 22 2008
+    - Added dataset generator class
+
+0.13 Thu Sep 18 2008
+    - Added dybanic test for xml
+    - Fix tests
+    - Fix META.yml
+
+0.12 Wen Sep 17 2007
+    - Added dynamic tests callbacks
+
+0.11 Tue Sep 16 2007
+    - All xxx_ok methods now return true if test's result is possitive
+
+0.10 Tue Aug 19 2008
+    - Extends the database tests for multiple database connections
+
+0.08 Thr Jun 12 2008
+    - Improved documentation perl examples.
+
+0.07 Say May 31 2008
+    - Fix empty tables issue (explicit deletion)
+
+0.06 Mon May 26 2008
+    - Added lob tests feature
+    - Fix refresh load strategy.
+    - Added DBUnit::_exists_in_database method
+    
+0.05 Mon May 19 2008
+    - Fix pod documentation
+
+0.03  Wen May 07 2008
+    - Fix skip in t/dbunit.t
+    - Reformating pod
+
+0.02  Tue May 06 2008
+    - Fix pod documentation
+    Change method name: DBUnit::xml_expected_dataset to DBUnit::expected_xml_dataset
+
+0.01  Mon May 05 2008
+    -  Initial import to CPAN.

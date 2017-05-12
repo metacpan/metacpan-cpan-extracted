@@ -1,0 +1,140 @@
+NAME
+    Text::Query - Query processing framework
+
+SYNOPSIS
+        use Text::Query;
+        
+    # Constructor
+        $query = Text::Query->new([QSTRING] [OPTIONS]);
+
+        # Methods
+        $query->prepare(QSTRING [OPTIONS]);
+        $query->match([TARGET]);
+        $query->matchscalar([TARGET]);
+
+DESCRIPTION
+    This module provides an object that matches a data source against a
+    query expression.
+
+    Query expressions are compiled into an internal form when a new object
+    is created or the "prepare" method is called; they are not recompiled on
+    each match.
+
+    The class provided by this module uses four packages to process the
+    query. The query parser parses the question and calls a query expression
+    builder (internal form of the question). The optimizer is then called to
+    reduce the complexity of the expression. The solver applies the
+    expression on a data source.
+
+    The following parsers are provided:
+
+    Text::Query::ParseAdvanced
+    Text::Query::ParseSimple
+
+    The following builders are provided:
+
+    Text::Query::BuildAdvancedString
+    Text::Query::BuildSimpleString
+
+    The following solver is provided:
+
+    Text::Query::SolveSimpleString
+    Text::Query::SolveAdvancedString
+
+EXAMPLES
+      use Text::Query;
+      my $q=new Text::Query('hello and world',
+                            -parse => 'Text::Query::ParseAdvanced',
+                            -solve => 'Text::Query::SolveAdvancedString',
+                            -build => 'Text::Query::BuildAdvancedString');
+      die "bad query expression" if not defined $q;
+      print if $q->match;
+      ...
+      $q->prepare('goodbye or adios or ta ta',
+                  -litspace => 1,
+                  -case => 1);
+      #requires single space between the two ta's
+      if($q->match($line)) {
+      #doesn't match "Goodbye"
+      ...
+      $q->prepare('"and" or "or"');
+      #quoting operators for literal match
+      ...
+      $q->prepare('\\bintegrate\\b', -regexp => 1);
+      #won't match "disintegrated"
+
+CONSTRUCTOR
+    new ([QSTRING] [OPTIONS])
+        This is the constructor for a new Text::Query object. If a "QSTRING"
+        is given it will be compiled to internal form.
+
+        "OPTIONS" are passed in a hash like fashion, using key and value
+        pairs. Possible options are:
+
+        -parse - Package name of the parser. Default is
+        Text::Query::ParseSimple.
+
+        -build - Package name of the builder. Default is Text::Query::Build.
+
+        -optimize - Package name of the optimizer. Default is
+        Text::Query::Optimize.
+
+        -solve - Package name of the solver. Default is Text::Query::Solve.
+
+        -mode - Name of predefined group of packages to use. Options are
+        currently "simple_text" and "advanced_text".
+
+        These options are handled by the "configure" method.
+
+        All other options are passed to the parser "prepare" function. See
+        the corresponding manual pages for a description.
+
+        If "QSTRING" is undefined, the prepare function is not called.
+
+        The constructor will croak if a "QSTRING" was supplied and had
+        illegal syntax.
+
+METHODS
+    configure ([OPTIONS])
+        Set the "parse", "build", "optimize" or "solve" packages. See the
+        "CONSTRUCTOR" description for explanations.
+
+    prepare (QSTRING [OPTIONS])
+        Compiles the query expression in "QSTRING" to internal form and sets
+        any options (same as in the constructor). "prepare" may be used to
+        change the query expression and options for an existing query
+        object. If "OPTIONS" are omitted, any options set by a previous call
+        to "prepare" are persistent.
+
+        The optimizer (-optimize) is called with the result of the parser
+        (-parse). The parser uses the builder (-build) to construct the
+        internal form.
+
+        This method returns a reference to the query object if the syntax of
+        the expression was legal, or croak if not.
+
+    match ([TARGET])
+        Calls the match method of the solver (-solve).
+
+    matchscalar ([TARGET])
+        Calls the matchscalar method of the solver (-solve).
+
+SEE ALSO
+    Text::Query::ParseAdvanced(3), Text::Query::ParseSimple(3),
+    Text::Query::BuildSimpleString(3), Text::Query::BuildAdvanedString(3),
+    Text::Query::SolveSimpleString(3), Text::Query::SolveAdvancedString(3),
+
+    Text::Query::Build(3), Text::Query::Parse(3), Text::Query::Solve(3),
+    Text::Query::Optimize(3)
+
+MAINTENANCE
+    https://github.com/jonjensen/Text-Query
+    https://rt.cpan.org//Dist/Display.html?Queue=Text-Query
+
+AUTHORS
+    Eric Bohlman (ebohlman@netcom.com)
+
+    Loic Dachary (loic@senga.org)
+
+    Jon Jensen, jon@endpoint.com
+

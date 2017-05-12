@@ -1,0 +1,44 @@
+#!/usr/local/bin/perl
+
+use lib 'alpha';
+use Tk;
+use Tk::IFrame;
+
+
+$mw = new MainWindow;
+
+$if = $mw->IFrame;
+
+$f = $if->addCard("one", -label => 'one');
+
+
+$f->gridRowconfigure(0,-weight => 1.0);
+$f->gridRowconfigure(1,-weight => 1.0);
+$f->gridColumnconfigure(0,-weight => 1.0);
+$f->gridColumnconfigure(1,-weight => 1.0);
+$f->gridColumnconfigure(2,-weight => 1.0);
+$f->gridColumnconfigure(3,-weight => 1.0);
+
+{
+ $f->Label(-text => 'Show Toolbars As:')->grid(-row => 0, -column => 0, -sticky => 'e');
+ my $rv = 0;
+ @rv = (qw(Pictures Text),"Pictures and Text");
+ for($i = 0 ; $i < @rv ; $i++) {
+  $f->Radiobutton(-text => $rv[$i], -value => $i, -variable => \$rv)->grid(-row => 0, -column => $i+1, -sticky => 'w');
+ }
+}
+$x = $f->Label(-text => 'Toolbar Tips Are:');
+$x->grid(-row => 1, -column => 0, -sticky => 'e');
+
+$f->Checkbutton(-text => 'Enabled')->grid(-row => 1, -column => 1, -sticky => 'w');
+
+
+
+
+$f = $if->addCard("two", -label => 'two');
+
+$f->Button(-text => "Fred")->pack;
+
+$if->pack(-side => 'top', -fill => 'both',-expand => 1);
+
+Tk::MainLoop;

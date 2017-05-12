@@ -1,0 +1,105 @@
+[1.03] Released on 2015-02-03
+
+     all_critic_ok() will now run tests in parallel over multiple cores. So if
+     you have 8 cores, your Perl::Critic tests could run 8x faster. However,
+     the actual performance depends on the size and shape of your code base and
+     your Perl::Critic configuration. Thank you Mario Roy for writing the
+     wonderful MCE module that makes this all possible!
+
+     If you're using the critic_ok() function directly (perhaps because you
+     want more control over which files are tested) then you won't see any
+     performance boost. I recommend gathering your list of files first, and
+     then passing the list to all_critic_ok().
+
+     The deprecated function all_code_files() has now been removed from
+     Test::Perl::Critic. Use Perl::Critic::Utils::all_perl_files() instead.
+
+[1.02] Released on 2009-10-22
+
+     Documentation changes.  META.yml "enhancements".  Moved author tests out
+     of the way of normal testing.
+
+     Now requires Perl-Critic version 1.105 or newer.  Fixed source code to be
+     compliant with this version. Reported by Xavier Caron.
+
+[1.01] Released on 2007-01-24
+
+     PRODUCTION RELEASE: You may now consider the public API of
+     Test::Perl::Critic as stable.
+
+     Edited documentation.  Includes better example for using
+     Test::Perl::Critic in CPAN distributions.
+
+     Added a t/perlcritic.t test to further demonstrate the typical usage for
+     CPAN distributions.
+
+     No code changes.
+
+[0.08] Released on 2006-11-05
+
+     All parameters to Test::Perl::Critic can now be controlled through the
+     .perlcriticrc file.  See the Perl::Critic POD for more info.
+
+     Now compatible with the perlcritic.t test script that is generate by
+     Module::Starter::PBP.  In my humble opinion, the test script is flawed,
+     but at least it will work now.
+
+[0.07] Released on 2006-08-20
+
+     All exceptions during testing are now fatal.
+
+     Now supports -verbose option, just like `perlcritic` does.
+
+     Added support for PPI::Cache, which can speedup repeated tests. See
+     Test::Perl::Critic documentation for more details.
+
+     Now requires Perl-Critic version 0.19 or higher.
+
+[0.06] Released on 2006-05-14
+
+     No functionality changes or bug fixes, just refactorings.
+
+     The all_code_files() function is now deprecated.  See all_perl_files() in
+     Perl::Critic::Utils instead
+
+     Now requires Perl::Critic version 0.15_03 or higher.
+
+[0.05] Released on 2006-03-26
+
+     Modified import() interface to pass all arguments to Perl::Critic. This
+     give you a direct hook to configure Perl::Critic and should still be
+     backward compatible.
+
+[0.04] Released on 2006-01-15
+
+     Updated to be compatible with Perl-Critic 0.14, but is not backward
+     compatible with older versions of Perl-Critic.  If you want to use the
+     -severity option with Perl-Critic, you need to use Perl-Critic version
+     0.14 or later.
+
+[0.03] Released on 2005-10-31
+
+     Now catching exceptions from Perl::Critic so the tests fail gracefully if
+     PPI has errors.
+
+     Added -format option, which is similar to the -verbose option that
+     perlcritic has.  I'm not sure why I didn't make it exactly the same.
+
+     Added a few more test cases.  In general, this module doesn't have very
+     good test coverage because I haven't really figured out how to test a
+     Test.
+
+[0.02] Released on 2005-09-30
+
+     Some minor tweaks; Edited POD.
+
+     Removed Test::Pod and Test::Pod::Coverage from the prerequisites list.
+     Those tests only run if the modules are installed.
+
+     Test::Perl::Critic is going to require Perl::Critic version 0.08 or
+     later, or it won't pass its own criticism tests.
+
+[0.01] Not released
+
+     "Plan to throw one away" -Frederick Brooks
+

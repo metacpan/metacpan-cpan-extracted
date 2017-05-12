@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+bin/vspark
+cpanfile
+cpanfile.snapshot
+lib/Term/Vspark.pm
+minil.toml
+t/00_compile.t
+t/basic.t
+t/char.t
+META.yml
+MANIFEST

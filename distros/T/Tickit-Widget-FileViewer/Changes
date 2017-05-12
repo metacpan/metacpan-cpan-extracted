@@ -1,0 +1,23 @@
+Revision history for Tickit-Widget-FileViewer
+
+0.004     2014-08-31 13:28:04+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Jump to current line on window gained
+
+0.003     2014-08-31 02:45:57+01:00 Europe/London
+	This release changes the default tabstop to 4. Ideally it should be
+	configurable, but it isn't.
+
+	Features:
+	* Support jump-to-line via ->configure
+
+0.002     2014-08-16 04:25:13+01:00 Europe/London
+	No new features
+
+	Bugs fixed:
+	* Fix blank line rendering
+
+0.001     2014-08-16 04:01:01+01:00 Europe/London
+	Initial CPAN release

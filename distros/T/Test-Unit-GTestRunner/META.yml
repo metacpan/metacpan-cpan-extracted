@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Test-Unit-GTestRunner
+version:             0.04
+abstract:            Gtk+ Based Unit Test Runner for Perl
+license:             gpl
+generated_by:        ExtUtils::MakeMaker version 6.30_01
+author:              Guido Flohr <guido@imperia.net>
+distribution_type:   module
+requires:     
+    Gtk2:                          0
+    Gtk2::GladeXML:                0
+    Locale::TextDomain:            1.16
+    Test::Unit:                    0
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1
+no_index:
+    dir:
+        - Suites

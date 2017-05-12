@@ -1,0 +1,1 @@
+prove -r -I lib

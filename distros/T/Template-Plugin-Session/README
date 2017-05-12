@@ -1,0 +1,39 @@
+Description
+-----------
+This is version 0.01 of Template::Plugin::Session
+
+This package is a Template Toolkit plugin that provides an interface to 
+Apache::Session module wich provides a persistence framework for session data.
+
+See perldoc Template::Plugin::Session for module documentation and use
+
+Changes from previous version
+-----------------------------
+
+This is a first (alpha) release. 
+
+Installation
+------------
+In order to install and use this package you will need Perl version
+5.005 or better.  Installation as usual:
+ 
+   % perl Makefile.PL
+   % make
+   % make test
+   % su
+     Password: *******
+   % make install
+
+Prerequisites
+-------------
+- Apache::Session >= 1.54 is required
+     (http://www.cpan.org/modules/by-module/Apache/Apache-Session-x.yy.tar.gz)
+- Template Toolikt >= 2.07 is required.
+     (http://www.cpan.org/modules/by-module/Template/Template-Toolkit-x.yy.tar.gz)
+  
+Copyright (C) 2001-2003 Enrico Sorcinelli. All rights reserved.
+This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself. 
+
+Author: Enrico Sorcinelli <enrico@sorcinelli.it>
+

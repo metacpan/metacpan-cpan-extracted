@@ -1,0 +1,87 @@
+{
+   "abstract" : "Metabolic preforking AnyEvent HTTP server for PSGI",
+   "author" : [
+      "INA Lintaro <tarao.gnn@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Twiggy-Prefork-Metabolic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Twiggy::Prefork" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "HTTP::Headers" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "Plack" : "0",
+            "Test::More" : "0",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Handler::Twiggy::Prefork::Metabolic" : {
+         "file" : "lib/Plack/Handler/Twiggy/Prefork/Metabolic.pm"
+      },
+      "Twiggy::Prefork::Metabolic" : {
+         "file" : "lib/Twiggy/Prefork/Metabolic.pm",
+         "version" : "0.02"
+      },
+      "Twiggy::Prefork::Metabolic::Server" : {
+         "file" : "lib/Twiggy/Prefork/Metabolic/Server.pm"
+      },
+      "Twiggy::Prefork::Metabolic::Server::SS" : {
+         "file" : "lib/Twiggy/Prefork/Metabolic/Server/SS.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tarao/perl5-Twiggy-Prefork-Metabolic/issues"
+      },
+      "homepage" : "https://github.com/tarao/perl5-Twiggy-Prefork-Metabolic",
+      "repository" : {
+         "url" : "git://github.com/tarao/perl5-Twiggy-Prefork-Metabolic.git",
+         "web" : "https://github.com/tarao/perl5-Twiggy-Prefork-Metabolic"
+      }
+   },
+   "version" : "0.02"
+}

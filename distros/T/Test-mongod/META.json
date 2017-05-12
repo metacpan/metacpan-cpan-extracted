@@ -1,0 +1,76 @@
+{
+   "abstract" : "run a temporrary instance of MongoDB",
+   "author" : [
+      "Jesse Shy <jshy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-mongod",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::ZOMG" : "0",
+            "File::Temp" : "0",
+            "File::Which" : "0",
+            "FindBin" : "0",
+            "Hash::Merge" : "0",
+            "Moose" : "0",
+            "Net::EmptyPort" : "0",
+            "POSIX" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jshy/Test-mongod/issues"
+      },
+      "homepage" : "https://github.com/jshy/Test-mongod",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jshy/Test-mongod.git",
+         "web" : "https://github.com/jshy/Test-mongod"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Jesse Shy <jesse@classmith.com>",
+      "jshy <jesse@holdtheplan.com>"
+   ]
+}
+

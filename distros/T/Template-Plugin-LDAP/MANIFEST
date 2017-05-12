@@ -1,0 +1,6 @@
+Changes
+lib/Template/Plugin/LDAP.pm
+MANIFEST
+Makefile.PL
+t/00_basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/Skeleton/Generator.pm
+minil.toml
+script/generate_perl_test_skeleton
+t/Test/Skeleton/Generator.t
+META.yml
+MANIFEST

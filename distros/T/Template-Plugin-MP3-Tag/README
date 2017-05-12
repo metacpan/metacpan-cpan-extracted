@@ -1,0 +1,19 @@
+Template-Plugin-MP3-Tag version 0.01
+==============================================================================
+
+To install the Template::Plugin::MP3::Tag module you do stereotype things:
+
+perl Makefile.PL
+make
+make test
+make install (as root)
+
+If you find some errors while doing this, please send me
+an email describing the problems.
+
+In the directory 'script' and 'template', you will find script 'sample.pl' and
+'sample.tt', how to use this module.
+
+And perldoc MP3::Tag for methods implemented this module.
+
+Thank you for using this module.

@@ -1,0 +1,10 @@
+Changes
+lib/MyModule.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+testlib/Test/Run/CmdLine/WithTestManifest.pm
+t/pod-coverage.t
+t/pod.t
+t/test_manifest

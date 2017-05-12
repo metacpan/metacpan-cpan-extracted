@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 bccf8453027fa850efabd973123f9f4c912fdd01 .gitignore
+SHA1 17b81a6fb7afd64895091d8d5bdf432c597c00d0 .perlcriticrc
+SHA1 51c6e811ccbbc70bbe2a78ba222a7e925580e301 Changes
+SHA1 48f9830d08433691ddbfaefe4cb84d1c20b04478 MANIFEST
+SHA1 86056af0a8522c31c2f34652f03149d0fd712c19 MANIFEST.SKIP
+SHA1 5c85451c9bcefd912172b9e0534722c6fe511476 META.json
+SHA1 cb4506f9156317dc7e2d9bbb9337939d37d54566 META.yml
+SHA1 0783198540c16a63604a34a23546952c03cac2ab Makefile.PL
+SHA1 442010647739e6c5fd2582985c318888fab76ebd README
+SHA1 7dc4be1b2eef234d4ae245bc20406ed254ac1d95 bin/find2tree.pl
+SHA1 4823396a8cba94d9a3e7aa6c4c1f076c5f944f1e lib/Text/FileTree.pm
+SHA1 e29b4151878e17aff2943b295ed305f07dd33369 t/00-perl-critic.t
+SHA1 0041aa9cc5249bb8409f513223ee3b68bbe3a164 t/01-distribution.t
+SHA1 86795f27235fac6085ab0a7abdbcc2907c191035 t/02-normal.t
+SHA1 cca799bf6870215cbc17d11e25a29bf47a27458f t/02-windows.t
+SHA1 397baa208d47e7af0cee5b63e5881759369c8949 t/data/reference
+SHA1 246eadb8c2d059bd889a2f09ffb1adfdd2b57347 t/data/windows
+SHA1 5726a07ea066d8a1c99c0359dc6e4bf489e07ced t/lib/Test/Text/FileTree.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJV6eA+AAoJEFDVLxLOThOZHlwP+wYiIjsqRRDFIhXQD8SGU7hz
+KTKAyN2xx2Ki7AIt5tgnOCMMulAIMyg2SzajN204uelCL8xfZyMn6sFmaMgkrZmd
+zTeRF2WNrSiNXEDB3dppINSMejXUBJCJegNdidbxp65TsJCq0dtCxZ/mSEmJheKG
+v1L1V/l1SiqJE7x9Ceg8ZRn902twQswi+IsLxts9IkFAu/t83qIEtL4QckIk3XN+
+6/p2x/eSiLtgcTijLGcWiHTBM9rZ5xoHJUxGkJEyc4Y4fOcMcbpvEPlcS65jwu6q
+aZ3HOfVLumw/0l5ENYyKNatXPcWifMXzytGJeATg583MITkkeeFAF3k+1lgQ/LDK
+a6ITEU1JZFF9yiAC6MWx7Qyn/Fv8uC2yThdKLt2U+ouiALSf9y3GQ7549dWzMJSd
+8N4ZF/QaI9meLKlEtrww69C+alVU0QpU1IxpABEHdXSI/xXW+FUpcorsuqvISLOM
+3KQbBn0BnFnAJrmN8sOL0Zy8IGQxYPfsmZaagNXVYzo3jX6xlp2plUMV9YyzoS+O
+yMTB89j20sBGxftD7pWBVUjPZyPB23yIOYDHdfaTcYWTlqTgr+DPGk50AsBE8i9y
+62Dj4OplO8h2vSMvOE2HzVuvs9Z/1lyMizQ7GVKG5OfNy3TfYJZgFEg6/+2ZhbZv
+W3LfxTZT3EsOkLP6rIXG
+=0+Jt
+-----END PGP SIGNATURE-----

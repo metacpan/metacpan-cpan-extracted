@@ -1,0 +1,40 @@
+Revision history for Tie-Ispell
+
+0.08    2011, 23 November (22:26)
+        - declare variables in test files, since some some cpantesters
+          complain about it.
+
+0.07    2011, 22 June (18:58)
+        - bail out if we do not have ([ia]|hun)spell.
+
+0.06    2011, 10 April (22:01)
+        - Fixed configure-requires deprendency
+
+0.05    2010, 10 November (18:46)
+        - support to detect ispell, aspell or hunspell
+        - skip tests if no english dictionary available
+        - changed from ExtUtils::MakeMaker to Module::Build
+        - Probably I will just stop maintaining this module as nobody
+          uses it (as far as I know). So, if you are interested in it
+          (if you use it or want to maintain it) let me know.
+
+0.04    2005, 24 January (16:33)
+	- Added support to choose if you want to use nearmisses
+	- Added test and code to support unkown dictionaries
+
+0.03    2005, 23 January (19:50)
+	- Added support for nearmisses
+	- Changed test so we can work with aspell emulation mode
+	for ispell. Note that this way the morphological information
+	get lost (for example, $dic{dogs} will be "dogs" instead of
+	the ispell answer "dog");
+
+0.02    2004, 17 December (13:13)
+	- Added support for exist($dic{word})
+	- Added support for store: $dic{word} = "now exists";
+
+0.01    2004, 17 December (11:57)
+        - First version, released on an unsuspecting world
+	- First working minimally working version.
+
+

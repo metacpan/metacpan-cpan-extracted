@@ -1,0 +1,6 @@
+<html>
+<head><title>Blue Hello [% name || 'World!' %]!</title></body>
+<body>
+Blue Hello [% name %]!
+</body>
+</html>

@@ -1,0 +1,10 @@
+Template-Plugin-DtFormatter-RelativeDate
+
+	return relative date like finder on mac.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 bokutin
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Test/Lazy.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+lib/Test/Lazy/Template.pm
+lib/Test/Lazy/Tester.pm
+t/01-Test-Lazy.t
+Makefile.PL

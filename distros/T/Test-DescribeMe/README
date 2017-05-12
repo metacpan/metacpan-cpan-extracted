@@ -1,0 +1,13 @@
+Test::DescribeMe - Ask or tell when certain types of tests should be run
+
+See lib/Test/DescribeMe.pm for example usage.
+
+To play with Test::DescribeMe (Uses Dist::Zilla):
+
+  git clone git://github.com/wolfsage/Test-DescribeMe.git
+
+  cd Test-DescribeMe
+
+  dzil build
+
+-- Matthew Horsfall (alh)

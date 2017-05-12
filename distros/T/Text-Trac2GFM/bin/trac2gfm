@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Slurp;
+use Text::Trac2GFM qw( trac2gfm );
+
+my $trac_markup;
+
+if (@ARGV) {
+    if (@ARGV == 1 && -r $ARGV[0]) {
+        $trac_markup = read_file($ARGV[0]);
+    } else {
+        die "Argument must be a pathname to a file containing TracWiki markup.\n";
+    }
+} else {
+    while (my $l = <STDIN>) {
+        $trac_markup .= $l;
+    }
+}
+
+my $gfm_markup = trac2gfm($trac_markup);
+print $gfm_markup;

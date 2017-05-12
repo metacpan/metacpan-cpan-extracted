@@ -1,0 +1,6 @@
+#!perl -T
+use strict;
+use utf8::all;
+use warnings;
+# here is a comment containing ütf8 characters
+print "À noite, vovô Kowalsky vê o ímã cair no pé do pingüim queixoso e vovó põe açúcar no chá de tâmaras do jabuti feliz.\n";

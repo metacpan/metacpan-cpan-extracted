@@ -1,0 +1,17 @@
+Tk::SlideShow::Dict->Get('org/c')->place(1328,418);
+Tk::SlideShow::Dict->Get('org/c_b1')->place(1159,486);
+Tk::SlideShow::Dict->Get('org/c_b2')->place(1397,486);
+Tk::SlideShow::Dict->Get('org/c_b1_1')->place(948,595);
+Tk::SlideShow::Dict->Get('org/c_b1_2')->place(1109,594);
+Tk::SlideShow::Dict->Get('org/c_b1_3')->place(1238,594);
+Tk::SlideShow::Dict->Get('org/c_b2_1')->place(1346,594);
+Tk::SlideShow::Dict->Get('org/c_b2_2')->place(1479,595);
+Tk::SlideShow::Dict->Get('org/oli')->place(436,326);
+Tk::SlideShow::Dict->Get('org/c-org/c_b1')->ftpos(5,1);
+Tk::SlideShow::Dict->Get('org/c-org/c_b2')->ftpos(5,1);
+Tk::SlideShow::Dict->Get('org/c_b1-org/c_b1_1')->ftpos(5,1);
+Tk::SlideShow::Dict->Get('org/c_b1-org/c_b1_2')->ftpos(5,1);
+Tk::SlideShow::Dict->Get('org/c_b1-org/c_b1_3')->ftpos(5,1);
+Tk::SlideShow::Dict->Get('org/c_b2-org/c_b2_1')->ftpos(5,1);
+Tk::SlideShow::Dict->Get('org/c_b2-org/c_b2_2')->ftpos(5,1);
+Tk::SlideShow::Dict->Get('org/c_b1_1-org/oli')->ftpos(5,1);

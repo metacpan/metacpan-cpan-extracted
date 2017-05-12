@@ -1,0 +1,23 @@
+---
+abstract: 'Test::Mojo and more.'
+author:
+  - 'coolmen <coolmen78@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mojo-More
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '0'
+  perl: '5.01'
+version: 0.061

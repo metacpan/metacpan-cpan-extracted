@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="format.css" ?>
+<!DOCTYPE TEI PUBLIC "-//TEI//DTD TEI P5//EN" "tei.dtd" >
+<TEI>
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>JK test_A.xml</title>
+        <author>JoelK</author>
+      </titleStmt>
+      <publicationStmt>
+        <p> </p>
+      </publicationStmt>
+      <notesStmt>
+        <note>Created by the <ref target="http://www.oeaw.ac.at/kvk/cte/">Classical Text
+            Editor</ref></note>
+      </notesStmt>
+    </fileDesc>
+    <encodingDesc>
+      <variantEncoding method="double-end-point" location="internal"/>
+      <tagsDecl>
+        <rendition xml:id="rd-Text" scheme="css"
+          >margin-left:0mm;margin-right:0mm;text-indent:8.5mm;line-height:14pt;margin-top:0pt;margin-bottom:0pt;text-align:justify;font-family:Times
+          New
+          Roman;font-size:11.5pt;color:#000000;font-style:normal;font-weight:normal;text-decoration:none;text-underline-position:0pt;text-decoration:none;text-transform:none;font-variant:normal;display:block;vertical-align:baseline;letter-spacing:0pt;direction:ltr;position:relative;top:0pt;</rendition>
+        <rendition xml:id="rd-N1" scheme="css"
+          >text-indent:0mm;line-height:12pt;font-size:9.5pt;</rendition>
+        <rendition xml:id="rd-A1" scheme="css"
+          >text-indent:0mm;line-height:12pt;font-size:9.5pt;</rendition>
+      </tagsDecl>
+    </encodingDesc>
+  </teiHeader>
+  <text xml:space="preserve" rendition="#rd-Text"><body><p rendition="#rd-Text">First paragraph</p><p rendition="#rd-Text">This is a test to try to figure out how the program can be constructed so as to generate an XML file (TEI-compliant) that respects the manuscript tradition.</p></body></text>
+</TEI>

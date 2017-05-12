@@ -1,0 +1,89 @@
+$Id: README 0.12 2000/01/11 06:56:47 rurban Exp $
+
+                                 Tie::CArray
+
+         A perl5 module for space-efficient typed external C Arrays
+
+                                 Reini Urban
+                               rurban@x-ray.at
+
+INTRODUCTION
+    Several XS classes and methods to deal with typed, space-efficient
+    C arrays are provided.
+    For the three basic C-types array of INT, DOUBLE and STRING and some
+    sequential aggregate types int[2][], int[3][], int[4][], double[2][],
+    double[3][] hand-optimized, fast XS versions are provided.
+
+    This roughly reflects to:
+
+        CArray
+            CIntArray               int[]
+                CInt2Array          int[][2]
+                CInt3Array          int[][3]
+                CInt4Array          int[][4]
+            CDoubleArray            double[]
+                CDouble2Array       double[][2]
+                CDouble3Array       double[][3]
+            CStringArray            *char[]
+
+    External C arrays limit communication overhead with large simple
+    data structures, where size or time constraints become serious,
+    optionally manipulated by external XS modules. Such as various
+    computional geometry modules dealing with 10.000 - 200.000
+    double[3]. Modification is done in-place and preferably in bulk.
+
+    It might also be easier to write XSUBs by converting the data to
+    CArray's before, pass this pointer to the C func, and handle the
+    results in Perl then instead of writing wrappers just for C arrays.
+
+    Not all perl array methods are provided since perl tie doesn't support the
+    full range yet (i.e. no push, pop, shift, unshift, lvalue slice, ...).
+    But there are efficient methods for grow, init, copy, delete,
+    C++ style rvalue slice, indirect sort, destructive reverse and
+    conversions between the raw and supported sequential types.
+    Displaced arrays (mappings with arbitary offsets) and more attributes
+    (fill-pointer, read-only, C++ gslice, ...) are not yet supported.
+
+    See the file Changes for user-visible changes.
+    See Tie::CArray.pm for usage.
+    See Geometry::Points, Geometry::Delaunay for samples.
+
+    Copyright (c) 1999 Reini Urban.
+    This module is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+MODULE DESCRIPTION
+
+Name           DSLI  Description                                  Info
+-------------  ----  -------------------------------------------- -----
+Tie::CArray    adpO  Space-efficient, typed, external C Arrays    RURBAN
+
+INSTALLATION
+
+    C<cpan Tie::CArray>
+
+    Prerequisites needed:
+      Tie::Array (standard since 5.005)
+      C compiler
+
+    Tie::CArray installs as a standard Perl module:
+
+      perl Makefile.pl
+      make               (resp. nmake, dmake)
+      make test
+      make clean
+      make install
+
+    Tested Platforms:
+      Tie::CArray was developed under Win32 - MSVC6 - perl5.00502,
+      5.00558 w/wo threads/debugging and additionally tested
+      with cygwin32 - gcc 2.95 - 5.00562.
+      Please report other platforms to the author.
+      I see no major difficulty for gcc supported platforms,
+      though Win32 is less strict than others.
+      No special platform-specific headers or libraries are used.
+
+    This is alpha:
+      Interface syntax for arbitrary structures by pack-style templates might
+      change. Method names and arguments may change.
+    Not fully tested yet!

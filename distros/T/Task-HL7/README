@@ -1,0 +1,32 @@
+NAME
+    Task::HL7 - Install the HL7 modules.
+
+SYNOPSIS
+     cpanm Task::HL7
+
+SEE ALSO
+    App::HL7::Dump
+        Base class for hl7dump script.
+
+    App::HL7::Send
+        Base class for hl7send script.
+
+    Net::HL7
+        The Net-HL7 package is a simple Perl API for creating, parsing
+        sending and receiving HL7 messages.
+
+REPOSITORY
+    <https://github.com/tupinek/Task-HL7>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

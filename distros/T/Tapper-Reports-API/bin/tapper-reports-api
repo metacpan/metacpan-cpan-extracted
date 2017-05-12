@@ -1,0 +1,63 @@
+#! /usr/bin/perl
+
+# PODNAME: tapper-reports-api
+# ABSTRACT: cmdline frontend to Tapper::Reports::API
+
+use strict;
+use warnings;
+
+use Tapper::Reports::API;
+use Tapper::Config;
+use Log::Log4perl;
+
+my $EUID = `id -u`; chomp $EUID;
+my $EGID = `id -g`; chomp $EGID;
+
+Log::Log4perl->init(
+    Tapper::Config->subconfig->{files}{log4perl_cfg}
+);
+
+Tapper::Reports::API->run(
+    port              => 7358,
+    log_level         => 2,
+    min_servers       => 3,
+    min_spare_servers => 2,
+    max_servers       => 20,
+    max_requests      => 100,
+    user              => $EUID,
+    group             => $EGID,
+);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-reports-api - cmdline frontend to Tapper::Reports::API
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=item *
+
+Tapper Team <tapper-ops@amazon.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

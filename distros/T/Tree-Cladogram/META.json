@@ -1,0 +1,73 @@
+{
+   "abstract" : "Render a cladogram using Imager or Image::Magick",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tree-Cladogram",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Slurper" : "0.008",
+            "Getopt::Long" : "0",
+            "Imager" : "1.004",
+            "Imager::Fill" : "1.012",
+            "Moo" : "2.000002",
+            "Pod::Usage" : "1.67",
+            "Tree::DAG_Node" : "1.27",
+            "Types::Standard" : "1",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::Pod" : "1.51",
+            "Test::Simple" : "1.302052"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-Cladogram"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Tree-Cladogram.git",
+         "web" : "https://github.com/ronsavage/Tree-Cladogram"
+      }
+   },
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

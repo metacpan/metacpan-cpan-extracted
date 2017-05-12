@@ -1,0 +1,3 @@
+en: Residual Current Device
+ja: 配線用遮断器
+de: Fehlerstrom-Schutzschalter

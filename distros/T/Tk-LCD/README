@@ -1,0 +1,27 @@
+
+DESCRIPTION
+       Tk::LCD is a Canvas derived widget, based on a code snip-
+       pet from Donal K. Fellows' Maze game. LCD symbols are dis-
+       played in elements composed of 8 segments, labeled "a"
+       though "g", some on and some off.  For instance, the num-
+       ber 8 requires one LCD element that has all 8 segments
+       lit:
+
+            b
+
+            -
+        a  | | c
+            -      <------  g
+        f  | | d
+            _
+
+            e
+
+       A Tk::LCD widget can consist of any number of elements,
+       specified during widget creation.  To actually display an
+       LCD number, either invoke the set() method, or use the
+       -variable option.
+
+Steve Lidie
+2002/09/14
+sol0@lehigh.edu

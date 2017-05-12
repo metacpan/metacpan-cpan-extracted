@@ -1,0 +1,33 @@
+---
+abstract: 'Collection of distributions for continuous integration using Jenkins'
+author:
+  - 'Jonas B. Nielsen (JONASBN)'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Jenkins
+provides:
+  Task::Jenkins:
+    file: lib/Task/Jenkins.pm
+    version: 0.05
+requires:
+  App::Prove: 0
+  Devel::Cover: 0
+  Devel::Cover::Report::Clover: 0
+  TAP::Formatter::JUnit: 0
+  perl: v5.6.0
+resources:
+  ProjectChangelog: http://logiclab.jira.com/browse/TJENKINS#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+  ProjectSite: http://logicLAB.jira.com/browse/TJENKINS
+  ProjectWiki: http://logiclab.jira.com/wiki/display/TJENKINS/Home
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Jenkins
+  homepage: http://logiclab.jira.com/wiki/display/TJENKINS/Home
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/jonasbn/tjenkins.git
+version: 0.05

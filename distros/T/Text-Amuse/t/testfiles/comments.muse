@@ -1,0 +1,7 @@
+#title Comments
+
+; <script>"hello"</script>
+
+<comment>
+This is <script>alert</script> a comment \emph
+</comment>

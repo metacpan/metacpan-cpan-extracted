@@ -1,0 +1,201 @@
+2.37	 - 2016-10-07
+
+	* Make minimum version of ExtUtils::MakeMaker 6.58
+	* Better support parallel builds by making 'dynamic' a dependency of the ReadKey.pm
+	* Add a 'provides' META section to help indexing
+
+2.36	 - 2016-10-07
+
+	* Add a package declaration to the ReadKey_pm.PL to aid indexing
+
+2.35	 - 2016-10-06
+
+	* Use FULLPERLRUNINST to run the ReadKey_pm.PL to get the 'blib'
+
+2.34	 - 2016-10-06
+
+	* Fix GetTerminalSize() argument handling
+	* Fix miniperl build on Win32
+	* Remove unused Cwd
+	* Fix TAP output
+	* Fix warnings in XS file
+	* Don't attempt some tests if STDIN is not a terminal
+	* Generate ReadKey.pm from  ReadKey_pm.PL to expand blockoptions
+	* demand-load Carp,
+	* remove unneeded AutoLoader,
+	* Improve genchars.pl, support make -s silence.
+	* Improve Makefile.PL add SIGN, fix pure_site_install, support dual-life, fix realclean
+
+2.33	 - 2015-06-04
+
+	* Make genchars.pl output reproducible by sorting hash keys
+	* Fix for "[rt.cpan.org #100932] Parallel build fails" from Petr Pisar
+	* Move tests to t directory from Sébastien Deseille <sebastien.deseille@gmail.com>
+	* Move original test to example directory
+	* Don't use 'resize' or 'stty' on MS Windows
+
+2.32	 - 2014-05-10
+
+	* Makefile.PL: Makefile.PL more specific
+	* Fix some warnings
+	* Don't index Configure.pm
+	* POD fixes
+	* Change licensing to optional Artistic
+
+2.31	 - 2013-10-26
+	
+	* Update pport.h
+	* Added additional metadata to Makefile.PL
+
+2.30.02  - 2011-02-07
+
+2.30.01  - 2008-06-24
+
+2.30	 - 2005-01-12
+
+	* Skip tests if /dev/tty for automated testing 
+	* Fixed POD 
+	* Fixed example in synopsis
+	* Update ppport.h
+
+2.21	 - 2002-07-28
+
+	2002-07-28  Jonathan Stowe <jns@gellyfish.co.uk>
+	* README, ReadKey.pm, ReadKey.xs, ppport.h, test.pl: import
+	TermReadKey 2.21 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.21
+	git-cpan-authorid: JSTOWE git-cpan-file:
+	authors/id/J/JS/JSTOWE/TermReadKey-2.21.tar.gz
+
+2.20	 - 2002-05-24
+
+	2002-05-24  Jonathan Stowe <jns@gellyfish.co.uk>
+	* README, ReadKey.pm, ReadKey.xs: import TermReadKey 2.20 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.20
+	git-cpan-authorid: JSTOWE git-cpan-file:
+	authors/id/J/JS/JSTOWE/TermReadKey-2.20.tar.gz
+
+2.19	 - 2002-03-21
+
+	2002-03-21  Jonathan Stowe <jns@gellyfish.co.uk>
+	* README, ReadKey.pm, ReadKey.xs: import TermReadKey 2.19 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.19
+	git-cpan-authorid: JSTOWE git-cpan-file:
+	authors/id/J/JS/JSTOWE/TermReadKey-2.19.tar.gz
+
+2.18	 - 2002-02-10
+
+	2002-02-10  Jonathan Stowe <jns@gellyfish.co.uk>
+	* Configure.pm, Makefile.PL, README, ReadKey.pm, ReadKey.xs,
+	genchars.pl: import TermReadKey 2.18 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.18
+	git-cpan-authorid: JSTOWE git-cpan-file:
+	authors/id/J/JS/JSTOWE/TermReadKey-2.18.tar.gz
+
+2.17	 - 2002-01-25
+
+	2002-01-25  Jonathan Stowe <jns@gellyfish.co.uk>
+	* Makefile.PL, README, ReadKey.pm, ReadKey.xs, test.pl: import
+	TermReadKey 2.17 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.17
+	git-cpan-authorid: JSTOWE git-cpan-file:
+	authors/id/J/JS/JSTOWE/TermReadKey-2.17.tar.gz
+
+2.16	 - 2001-11-29
+
+	2001-11-29  Jonathan Stowe <jns@gellyfish.co.uk>
+	* ReadKey.pm, ReadKey.xs, genchars.pl, ppport.h: import TermReadKey
+	2.16 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.16
+	git-cpan-authorid: JSTOWE git-cpan-file:
+	authors/id/J/JS/JSTOWE/TermReadKey-2.16.tar.gz
+
+2.15	 - 2001-11-07
+
+	2001-11-07  Jonathan Stowe <jns@gellyfish.co.uk>
+	* ReadKey.pm, ReadKey.xs: import TermReadKey 2.15 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.15
+	git-cpan-authorid: JSTOWE git-cpan-file:
+	authors/id/J/JS/JSTOWE/TermReadKey-2.15.tar.gz
+
+2.14	 - 1999-03-29
+1999-03-29  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, ReadKey.pm, ReadKey.xs, ppport.h: import TermReadKey
+	2.14 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.14
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.14.tar.gz
+
+2.13	 - 1999-03-24
+1999-03-24  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* MANIFEST, Makefile.PL, README, ReadKey.pm, ReadKey.xs,
+	genchars.pl, ppport.h: import TermReadKey 2.13 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.13
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.13.tar.gz
+
+2.12	 - 1998-01-07
+1998-01-07  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, README, ReadKey.pm, ReadKey.xs, test.pl: import
+	TermReadKey 2.12 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.12
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.12.tar.gz
+
+2.11	 - 1997-12-14
+1997-12-13  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, README, ReadKey.pm, ReadKey.xs, test.pl: import
+	TermReadKey 2.11 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.11
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.11.tar.gz
+
+2.09	 - 1997-10-07
+1997-10-07  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, ReadKey.pm, ReadKey.xs, genchars.pl: import
+	TermReadKey 2.09 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.09
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.09.tar.gz
+
+2.08	 - 1997-10-06
+1997-10-06  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, README, ReadKey.pm, ReadKey.xs: import TermReadKey
+	2.08 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.08
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.08.tar.gz
+
+2.07	 - 1997-01-27
+1997-01-27  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, ReadKey.pm, ReadKey.xs: import TermReadKey 2.07 from
+	CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.07
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.07.tar.gz
+
+2.06	 - 1996-11-26
+1996-11-25  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, README, ReadKey.pm, ReadKey.xs, test.pl: import
+	TermReadKey 2.06 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.06
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.06.tar.gz
+
+2.05	 - 1996-03-14
+1996-03-14  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, README, ReadKey.pm, ReadKey.xs: import TermReadKey
+	2.05 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.05
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.05.tar.gz
+
+2.04	 - 1995-10-11
+1995-10-11  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL, README, ReadKey.xs: import TermReadKey 2.04 from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.04
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.04.tar.gz
+
+2.03	 - 1995-09-29
+1995-09-29  Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Configure.pm, MANIFEST, Makefile.PL, README, ReadKey.pm,
+	ReadKey.xs, genchars.pl, test.pl: initial import of TermReadKey 2.03
+	from CPAN git-cpan-module:   TermReadKey git-cpan-version:  2.03
+	git-cpan-authorid: KJALB git-cpan-file:
+	authors/id/K/KJ/KJALB/TermReadKey-2.03.tar.gz
+

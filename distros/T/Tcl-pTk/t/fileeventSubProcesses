@@ -1,0 +1,15 @@
+#
+# Test process that takes several seconds to complete.
+#  Used for testing the ProcControl Object
+#
+#
+
+$| = 1; # Pipes hot
+
+foreach ( 1..5){
+
+	print "Sleep ".$_."\n";
+	sleep 1;
+}
+
+

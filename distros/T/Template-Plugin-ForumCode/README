@@ -1,0 +1,181 @@
+NAME
+    Template::Plugin::ForumCode - class for "ForumCode" filter
+
+SYNOPSIS
+    Standard usage in a Template Toolkit file:
+
+      # load the TT module
+      [% USE ForumCode %]
+
+      # ForumCodify some text
+      [% ForumCode.forumcode('[b]bold[/u] [u]underlined[/u] [i]italic[/i]') %]
+      [% ForumCode.forumcode('**bold** __underlined__') %]
+
+    Usage in a perl module:
+
+      use Template::Plugin::ForumCode;
+
+      my $tt_forum  = Template::Plugin::ForumCode->new();
+      my $formatted = $tt_forum->forumcode($text);
+
+DESCRIPTION
+    This module implements ForumCode, a simple markup language inspired by
+    the likes of BBCode.
+
+    ForumCode allows end-users (of a web-site) limited access to a set of
+    HTML markup through a HTML-esque syntax.
+
+    This module works by using Template::Plugin::HTML to escape all HTML
+    entities and markup. It then performs a series of transformations to
+    convert ForumCode markup into the appropriate HTML markup.
+
+MARKUP
+    The ForumCode plugin will perform the following transformations:
+
+    [b]...[/b] or **...**
+        Make the text between the markers *bold*.
+
+    [u]...[/u] or __...___
+        Make the text between the markers *underlined*.
+
+    [i]...[/i]
+        Make the text between the markers *italicised*.
+
+    [url]http://...[/url] or [url="http://..."]LinkText[/url]
+        Make the text between the markers into a *HTML link*. If you would
+        like to give the link a name, use the following format:
+
+        [url name="..."]http://...[/url]
+
+    [img]http://...[/img]
+        Insert an *image*, specified by the URL between the markers.
+
+        You may also include extra attributes such as title=, alt=, etc.
+        Research the HTML <img> tag for the full list of attributes.
+
+          e.g.
+           [img title='Powered by Catalyst' width='50']http://.../images/button.png[/img]
+
+    [colour=*code*]...[/colour]
+        Make a block of text appear in the *colour* specified by *code*.
+
+        *code* can be any of the named colours: red, orange, yellow, green,
+        blue, black, white.
+
+        *code* may also be a #RGB value in either the #XYZ or #XXYYZZ
+        format.
+
+        For the sake of international relations "[color=*code*]...[/color]"
+        may also be used.
+
+          e.g. red text
+           [colour=red]Red Text[/colour]
+           [colour=#ff0000]Red Text[/colour]
+
+    [list]...[/list]
+        Create an ordered or unordered list of items. To create an
+        *unordered list* use [*] to mark the start of each list item. To
+        create an *ordered list* use [1] to mark the start of each list
+        item.
+
+          e.g. an unordered list
+           [list]
+           [*]apple
+           [*]orange
+           [*]banana
+           [/list]
+
+          e.g. an ordered list
+           [list]
+           [1]first
+           [1]second
+           [1]third
+           [/list]
+
+    [code]...[/code]
+        Marks a block of text with the CSS *forumcode_code* class. How this
+        displays is dependant on the CSS definitions in your application
+        templates.
+
+          /* Example CSS */
+
+          .forumcode_code {
+            font-family:        monospace;
+            border:             1px solid #333;
+            font-size:          95%;
+            margin:             15px 20px 15px 20px;
+            padding:            6px;
+            width:              85%;
+            overflow:           auto;
+            white-space:        pre;
+
+            color:              #ff0;
+            background-color:   #333;
+            border:             1px solid #666;
+          }
+
+    [pre]...[/pre]
+        Marks a block of text with the CSS *forumcode_pre* class. How this
+        displays is dependant on the CSS definitions in your application
+        templates.
+
+          /* Example CSS */
+
+          .forumcode_pre {
+            background-color:   transparent;
+            font-family:        monospace;
+            font-size:          95%;
+            border:             1px dashed #333;
+            margin:             15px 20px 15px 20px;
+            padding:            6px;
+            width:              85%;
+            overflow:           auto;
+            white-space:        pre;
+          }
+
+    [quote]...[/quote]
+        Marks a block of text with the CSS *forumcode_pre* class. How this
+        displays is dependant on the CSS definitions in your application
+        templates.
+
+        You may specify the name of ther person you are quoting using the
+        following addition to the markup:
+
+        [quote quoting="..."]Lorem ipsum ...[/quote]
+
+        The quoted text will be prefixed with Quoting Name:. This extra
+        output will be wrapped in with the CSS *forumcode_quoting* class.
+
+          /* Example CSS */
+
+          .forumcode_quote {
+            background-color:   #eee;
+            font-family:        monospace;
+            font-style:         italic;
+            border:             1px dotted #333;
+            font-size:          95%;
+            margin:             15px 20px 15px 20px;
+            padding:            6px;
+            width:              85%;
+            overflow:           auto;
+          }
+
+          .forumcode_quoting {
+            font-weight:        bold;
+            margin-bottom:      3px;
+          }
+
+PUBLIC METHODS
+  new
+    Create a new instance of the plugin for TT usage
+
+  forumcode
+    The transformation function
+
+AUTHOR
+    Chisel Wright "<chiselwright@users.berlios.de>"
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

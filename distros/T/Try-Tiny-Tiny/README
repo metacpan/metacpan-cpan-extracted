@@ -1,0 +1,42 @@
+Try::Tiny::Tiny
+
+The reason this module exists is that Try::Tiny will try naming the
+blocks it is passed, if it can load a module for doing so. This takes
+meaningful time, is only useful in stack traces, and then may defeat
+code that tries to examine the stack to print a more helpful error
+message.
+
+Now, you yourself can avoid using Try::Tiny in the first place, but you
+will almost inevitably still pull it in through your dependency chain,
+and it is not likely to be feasible to scrub it out.
+
+This module helps sanitise your dependency chain a bit without patching
+all of it by loading Try::Tiny in such a way that it is forced to skip
+naming its callbacks. In order to be useful, you must use this module
+before using any other module that loads Try::Tiny. In practice that
+means you probably want to load it as early as possible, such as through
+PERL5OPT.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

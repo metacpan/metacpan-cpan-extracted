@@ -1,0 +1,15 @@
+In 2014, it looks like character processing and regex processing take similar time for 1,000 iterations:
+ 
+$ date
+Thu Oct 16 00:28:38 PDT 2014
+
+$ time ./sample.pl; time ./wrap_prop-regex_slow.pl 
+
+real	0m0.171s
+user	0m0.171s
+sys	0m0.001s
+
+real	0m0.210s
+user	0m0.207s
+sys	0m0.002s
+

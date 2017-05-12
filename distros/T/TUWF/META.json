@@ -1,0 +1,75 @@
+{
+   "abstract" : "The Ultimate Website Framework",
+   "author" : [
+      "Yoran Heling <yorhel@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TUWF",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBI" : "0",
+            "FCGI" : "0",
+            "PerlIO::gzip" : "0"
+         },
+         "requires" : {
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "TUWF" : {
+         "file" : "lib/TUWF.pm",
+         "version" : "1.0"
+      },
+      "TUWF::DB" : {
+         "file" : "lib/TUWF/DB.pm",
+         "version" : "1.0"
+      },
+      "TUWF::Misc" : {
+         "file" : "lib/TUWF/Misc.pm",
+         "version" : "1.0"
+      },
+      "TUWF::Object" : {
+         "file" : "lib/TUWF.pm"
+      },
+      "TUWF::Request" : {
+         "file" : "lib/TUWF/Request.pm",
+         "version" : "1.0"
+      },
+      "TUWF::Response" : {
+         "file" : "lib/TUWF/Response.pm",
+         "version" : "1.0"
+      },
+      "TUWF::XML" : {
+         "file" : "lib/TUWF/XML.pm",
+         "version" : "1.0"
+      },
+      "TUWF::func" : {
+         "file" : "lib/TUWF.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "http://g.blicky.net/tuwf.git/"
+      }
+   },
+   "version" : "1.0"
+}

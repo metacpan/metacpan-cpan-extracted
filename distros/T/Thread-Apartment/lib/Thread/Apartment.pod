@@ -1,0 +1,1088 @@
+=pod
+
+=head1 NAME
+
+Thread::Apartment - Apartment threading wrapper for Perl objects
+
+=head1 SYNOPSIS
+
+	package MyClass;
+
+	use Thread::Apartment::Server;
+	use base qw(Thread::Apartment::Server);
+
+	sub new {
+	#
+	#	the usual constructor
+	#
+	}
+	#
+	#	mark some methods as simplex
+	#
+	sub get_simplex_methods {
+		return { 'bar' => 1 };
+	}
+	#
+	#	mark some methods as urgent
+	#
+	sub get_urgent_methods {
+		return { 'bingo' => 1 };
+	}
+
+	sub foo {
+	#
+	#	do something
+	#
+	}
+
+	sub bar {
+	#
+	#	do something else
+	#
+	}
+
+	sub bingo {
+		print "BINGO!\n";
+	}
+
+	1;
+
+	#
+	#	create pool of 20 apartment threads
+	#
+	Thread::Apartment->create_pool(AptPoolSize => 20);
+
+	my $apt = Thread::Apartment->new(
+		AptClass => 'MyClass',		# class to install in apartment
+		AptTimeout => 10,			# timeout secs for TQD responses
+		AptRequire => {				# classes to require into the thread
+			'This::Class' => '1.234',
+			'That::Class' => '0.02'
+			},
+		AptParams => \@params_for_MyClass) || die $@;
+
+	my $result = $apt->foo(@params);
+	die $@ unless $result;
+	#
+	#	bar is simplex
+	#
+	$apt->bar(@params);
+
+=head1 DESCRIPTION
+
+Thread::Apartment provides an apartment threading wrapper for Perl
+classes. "Apartment threading" is a method for isolating an object
+(or object hierarchy) in its own thread, and providing external
+interfaces via lightweight client proxy objects. This approach
+is especially valuable in the Perl threads environment, which
+doesn't provide a direct means of passing complex, nested structure
+objects between threads, and for non-threadsafe legacy object
+architectures, e.g., L<Perl/Tk|Tk>.
+
+By using lightweight client proxy objects that implement the
+L<Thread::Queue::Queueable> interface, with L<Thread::Queue::Duplex>
+objects as the communication channel between client proxies and
+apartment threads (I<or between threads in general>), a more thread-friendly
+OO environment is provided, I<ala> Java, i.e., the ability to pass
+arbitrary objects between arbitrary threads.
+
+Thread::Apartment is a fundamental component of the PSiCHE framework
+(L<http://www.presicient.com/psiche>).
+
+=head2 Glossary
+
+=over 4
+
+=item B<TQD - >L<Thread::Queue::Duplex>
+
+The communications channel used between apartment threads.
+
+=item B<TQQ - >L<Thread::Queue::Queueable>
+
+Abstract class that specifies the B<curse()> and B<redeem()> methods
+used for marshalling objects across a TQD.
+
+=item B<POPO - Plain Old Perl Object>
+
+An object that does B<not> implement Thread::Apartment::Server
+
+=item B<thread governor>
+
+The primary control loop of an apartment thread. Usually provided by the
+C<Thread::Apartment>'s internal C<_run()> method, it is responsible for managing the
+installation of an instance into the apartment thread, unmarshalling method
+calls from the TQD, invoking the calls on the TAS object(s), and
+marshalling and returning results to the caller (via the TAC). The default
+governor may be overridden by either providing an externally created
+thread to the T::A::new() factory method, or by implementing a
+Thread::Apartment::MuxServer object (see B<TAMS> below).
+
+=item B<T::A - Thread::Apartment object>
+
+A Singleton class that acts as a factory for Thread::Apartment::Client
+objects, and creates or installs instances of their Thread::Apartment::Server
+counterparts in a thread.
+
+=item B<TAS - Thread::Apartment::Server>
+
+Base class to be subclassed by objects which will run
+as proxied objects in their own thread. Also acts as a container
+class for POPO's.
+
+=item B<TAC - Thread::Apartment::Client>
+
+A L<threads::shared> object that provides the proxy for Thread::Apartment::Server
+objects, and can be shared/passed between threads.
+
+=item B<TACo - Thread::Apartment::Container>
+
+A lightweight, non-shared proxy container object that resides in the same thread as its
+C<install()>ed (B<not> created) TAS object. It implements TQQ such that,
+when passed to a proxy object for another thread, it will pass its proxied object's
+TAC to the other thread. TACo's permit C<install()>'ed objects to be manipulated
+by the application within the installed thread before turning over control of the
+thread to the apartment threaded object.
+
+=item B<TAES - Thread::Apartment::EventServer>
+
+Subclass of Thread::Apartment::Server to provide
+a B<poll()> method that is called by the thread governor at regular intervals
+to detect and process class-specific events, e.g., polling I/O handles.
+
+=item B<TAMS - Thread::Apartment::MuxServer>
+
+Subclass of Thread::Apartment::Server that inverts the
+control scheme for classes which must implement their own thread governor,
+e.g., L<Tk::Threaded>.
+
+=item B<TACl - Thread::Apartment::Closure>
+
+A simple class used to contain and marshal closures between apartment
+threads.
+
+=back
+
+=head1 METHODS
+
+Refer to the included classdocs for summary and detailed method
+descriptions.
+
+=head2 Application Notes and Restrictions
+
+=head3 Closures must be passed from TAS objects.
+
+In the general case, closures cannot be passed between threads. Hence,
+a special mapping scheme is used to proxy a closure originating
+in one TAS but passed to another TAS. As such, closures originating
+outside a TAS cannot be passed to T::A object.
+
+If your application needs to pass a closure to a T::A object from the
+main processing flow (e.g., to supply a closure to L<Tk::Threaded>),
+you'll need to create a class and create or install an instance
+of it in an apartment thread.
+
+=head3 Passing filehandles
+
+Filehandles (I<aka GLOBs>) cannot be passed between ithreads; hence, any
+objects which contain GLOB's (e.g., IO::Socket) also cannot readily be passed.
+The recommended method for passing filehandles between threads
+is to pass the fileno() and reconstruct the filehandle in
+the receiving thread (via either L<IO::Handle>::fdopen()
+or open(FH, "&$fileno")).
+
+Despite best efforts, no consistent solution for
+marshalling and esp. unmarshalling filehandles - while preserving
+their access modes and L<PerlIO> layers - could be found. As of Perl 5.8.6,
+there appear to be bugs in open() and binmode() regarding mixing
+fileno open()'s and layers, and Win32 doesn't
+appear to have any means of recovering access modes from an existing
+filehandle.
+
+Therefore, applications are responsible for providing their own
+mechanisms for marshalling filehandles between threads.
+
+=head3 Cannot Provide Proxied Access to Members of Tied Objects
+
+Since TAC is itself a threads::shared object, and threads::shared
+objects cannot be tied, it is not possible to proxy the tied
+C<STORE>, C<FETCH>, etc. methods. Note that this does B<not>
+preclude using a tied object in an T::A, but the resulting
+TAC will not be able to access the tied elements of the proxied
+object.
+
+It may be possible to create a non-threads::shared subclass
+of TAC to support the tied capability; refer to L<DBIx::Threaded>
+for hints on how to support tied objects.
+
+=head3 Proxied operator overloading not supported
+
+Operator overloading is not currently supported.
+A future version of T::A may provide a means to
+proxy overloaded operators, I<ala> proxied closures.
+
+=head3 Proxied lvalue methods not supported
+
+Due to the inability to capture the actual assignment
+event associated with lvalue subs, it is not possible for
+the proxy TAC to safely pass the assigned value back to the
+proxied object.
+
+However, clever subclasses of TAC - and associated TAS subclasses -
+may overcome this limitation by creating lvalue'd subs in the TAC,
+and permitting the TAS to directly reference the TAC's members
+I<(since the TAC is threads::shared, it members are available to
+the TAS thread)>.
+Implementors of such subclasses are urged to be mindful of the
+probable locking requirements, and the inability to determine
+the precise instance when an lvalue assignment occurs.
+
+=head3 AUTOLOADing in Apartment Threaded Packages
+
+In order to minimize proxy overhead, when an object is
+installed into an apartment thread, the object's C<@ISA>
+hierarchy (as reported by L<Class::ISA>::self_and_super_path),
+and the list of available public methods (as reported by
+L<Class::Inspector>::methods()) are exported to the client
+proxy objects, so that C<isa()> and C<can()> will execute locally
+without the overhead of a request/response exchange over
+the TQD. As a result, the installed object should explicitly declare
+and/or implement all public methods.
+
+However, classes which need to rely on AUTOLOADing can specify that
+in a number of ways:
+
+=over 4
+
+=item *
+
+override TAS's C<introspect()> method by including the AUTOLOAD method
+name in the returned list of declared methods
+
+=item *
+
+override TAS's C<introspect()> method and call T::A's C<set_autoload>
+method to force AUTOLOAD support for all objects within the apartment.
+
+=item *
+
+specify a true value for T::A::new/install() C<AptAutoload> parameter
+(useful for creating apartment threaded POPO's which need AUTOLOADing)
+
+=back
+
+When an undeclared public (i.e., no leading underscore) method is
+invoked, if AUTOLOADing has been enabled by any of these methods,
+the object's TAC will pass the method call
+to the TAS, which can AUTOLOAD if needed. Note that undeclared methods
+are always executed as duplex, non-urgent methods, and that
+C<can()> method calls will be passed to the TAS if an undeclared
+method is referenced
+
+=head3 Use C<$self-E<gt>isa()>, not C<ref $self>
+
+Due to the exported C<@ISA> described above, using the
+C<ref> operator on the client stub objects will report
+a TAC or TACo object, rather than
+the proxied object. TAC overrides
+the C<UNIVERSAL::isa()> method to test the exported C<@ISA>
+hierarchy.
+
+=head3 Subclassing Thread::Apartment::Server
+
+TAS provides implementations of several abstract methods which may
+be overridden in subclasses. Refer
+to the Thread::Apartment::Server classdocs for method details.
+
+=head3 I/O Bound Classes
+
+Classes which detect/trap I/O (or other async) events should inherit from
+TAES and provide an implementation of its C<poll()> method, in order to interleave
+the apartment thread's TQD C<dequeue()> calls and the detection of
+internal events. E.g., a network socket monitor which calls
+C<select()> to detect socket events
+would implement the C<select()> call with some small timeout inside its
+C<poll()> implementation. C<Thread::Apartment::run()> detects the
+installation of a TAES object, and will use TQD's C<dequeue_nb()> method,
+rather than C<dequeue()>, to check for incoming method calls, and, if none
+are available, will call the object's C<poll()> method to permit the object
+to field any events.
+
+=head3 Classes with Control Loops
+
+Classes which encapsulate their own control loops (e.g., L<Perl/Tk|Tk>)
+should inherit from TAMS and frequently call C<Thread::Apartment::MuxServer::handle_method_requests()>
+to check for and process any external proxied method calls.
+T::A detects the installation of a TAMS object, and cedes control to the TAMS's
+C<run()> method when the internal T::A::_run() method is called.
+
+=head3 Subclassing Thread::Apartment::Client
+
+When a TAS based class is used, the class may override the C<create_client()>
+method to manufacture its own TAC. By subclassing TAC, the implementation
+can provide optimizations of TAC behavior, e.g., providing thread local
+accessor/mutator methods for static scalar values, or for L<threads::shared>
+scalar, array, or hash refs, in order to avoid the overhead of making a
+proxied method call.
+
+Refer to the Thread::Apartment::Client classdocs for detailed descriptions
+of its methods.
+
+=head3 Installing POPO's
+
+In order to provide the greatest possible flexibility, T::A supports
+installing I<Plain Old Perl Objects> aka I<POPOs>. POPOs do B<not>
+implement the TAS class, and thus can be nearly any existing class definition,
+with the following limitations:
+
+=over 4
+
+=item *
+
+B<Constructor must be> C<new()>
+
+=item *
+
+B<All methods must be declared, i.e., no AUTOLOAD support>
+
+=item *
+
+B<All methods are called as duplex, non-urgent>
+
+=item *
+
+B<Methods that return> C<undef> B<are assumed to be returning an error,
+with any error text in> C<$@>
+
+=back
+
+=head3 Externally Created Threads Must Run C<Thread::Apartment::run()>
+
+In the event an application wants to supply threads to the
+Thread::Apartment constructor (e.g., from a pre-created thread pool),
+the threads should use the C<Thread::Apartment::run()> method, e.g.,
+
+	#
+	#	create our backchannel
+	#
+	my $cmdq = Thread::Queue::Duplex(ListenerRequired => 1);
+	$cmdq->listen();
+	#
+	#	...some more code...
+	#
+	#	create our thread pool:
+	#		start the threads first, then retrieve their
+	#		TQDs; this minimizes the context the started
+	#		threads inherit
+	#
+	my %tqds;
+	my @my_threads;
+
+	push @my_threads, threads->create(\&Thread::Apartment::run, $cmdq)
+		foreach (1..$poolsize);
+	#
+	#	now get their TQDs: the thread
+	#		posts them to the backchannel, along
+	#		with the thread ID from which it came
+	#
+	foreach (1..$poolsize) {
+		my $resp = $cmdq->dequeue();
+		$tqds->{$resp->[0]} = $resp->[1]
+			if $resp;
+	}
+
+=head3 Errors Returned as C<undef>, with Error Text in C<$@>
+
+T::A assumes that any non-simplex method that returns
+C<undef> has an error, and the error message is available in
+C<$@> (as for C<eval{}> operations). An application specific
+adapter class may be required to adapt existing classes to
+this error reporting behavior.
+
+=head3 Object-returning Methods
+
+When an object reference is returned from a T::A managed object,
+T::A checks if the object is a TQQ object (i.e., it implements
+C<curse()> and C<redeem()> methods). If it is, then the
+object is marshalled to the TQD as usual. Otherwise,
+T::A assumes the returned object is part of an
+object hierarchy to be executed within its current apartment
+thread (I<aka "Zone Threading">), and will
+
+=over 4
+
+=item *
+
+add it to its object heirarchy map
+
+=item *
+
+assign it a unique ID
+
+=item *
+
+generate a TAC for it, using the current T::A's TQD
+
+=item *
+
+return the TAC instance, rather than the object itself
+
+=back
+
+Note that, in the event the object has previously been mapped
+in the hierarchy, the existing TAC instance for the object will
+be reused.
+
+T::A (I<via TAS::marshalResults()>) does
+B<not> do a deep inspection of returned values to
+detect instances of non-TAC objects.
+
+If an application returns objects within a returned data structure,
+it will need to provide an appropriate subclass to implement the needed
+marshal/unmarshal methods.
+
+=head3 Cyclic Object/Method Dependencies
+
+If TAS object A calls method1() on TAS object B,
+which in turn calls method2() on TAS A, then the
+associated apartment threads will deadlock (A is waiting
+for a response from B, while B is waiting on a response
+from A). Such problems may be avoided by any of
+
+=over 4
+
+=item *
+
+declaring A's method2() as simplex. However, this option is
+B<not> viable if C<method2()> returns a value, and deadlock
+may still result if object A starts another blocking proxied call
+after the call to C<method2()>.
+
+=item *
+
+using an asynchronous method call with a completion closure
+(see L<Asynchronous Method Calls>). However, this approach
+is a bit non-obvious, and may require object A's logic to
+be structure to inject some wait states for the results
+of method2().
+
+=item *
+
+using re-entrancy on object A's thread while calling
+object B. Re-entrancy can be set in any of the following ways:
+
+=back
+
+=over 8
+
+=item setting the B<AptReentrant> constructor parameter
+
+=item calling C<T::A::set_reentrancy(1)>
+
+=item using the C<ta_reentrant_> method prefix for method1()
+
+=back
+
+The re-entrancy approach causes the TAC
+for object B to use a special C<Thread::Apartment::run_wait()> method
+which will field any incoming proxy method requests for object A
+at the same time as it waits for the results from the call
+to C<method2>. The class-method version of L<Thread::Queue::Duplex>::wait()
+is used to wait on both the local proxied object's TQD, as well as
+waiting on the response to the specific method request sent
+to object B's TQD.
+
+Note that using the C<ta_reentrant_> method prefix has a transient effect,
+i.e., it only applies to the single method call; the other 2
+approaches will persist the re-entrant behavior for all proxied method
+calls from all objects within the thread, including closure calls,
+until C<Thread::Apartment::set_reentrancy(0)> is called to disable
+re-entrancy.
+
+Finally, note that re-entrancy should be used with caution,
+as it could lead to inadvertantly deep recursions; process-wide performance
+degradation (due to the lock signalling required); and unexpected
+object states compared to the non-threaded, sequentially executed
+equivalent.
+
+=head3 Unexpected TAC AUTOLOADs for Indirect Object References
+
+If an object is indirectly referenced via a hash, e.g.,
+C<$objmap-E<gt>{'MyObject'}-E<gt>someMethod();>, TAC's AUTOLOAD may
+get a DESTROY method reference, rather than the expected
+'someMethod' value I<(the reasons for this are not yet clear...)>.
+As a result, it may be neccesary to dereference the object into
+a lexical variable to invoke the method, e.g.,
+
+	my $temp = $objmap->{'MyObject'};
+	$temp->someMethod();
+
+Further investigation is needed to determine the reason for this
+behavior.
+
+=head3 Passing/Invoking Closures Between T::A Objects
+
+Managing closures in T::A relies on ithread's isolation of class
+variables between threads, i.e., assume SomeClass declares
+
+	package SomeClass;
+
+	our $variable;
+
+Further assume that SomeClass is loaded into 2 different threads.
+Then modifying C<$SomeClass::variable> in thread A B<does not>
+effect the current value of C<$SomeClass::variable> in thread B.
+
+Hence, T::A declares the following non-threads::shared class variables:
+
+=over 4
+
+=item B<%closure_map>
+
+A map of B<closure IDs> to their actual CODEREF. A closure ID is used
+to lookup the closure to be called when the recipient of the
+closure eventually invokes it.
+
+=item B<$next_closure_id>
+
+A generator for unique integer closure ID's. Note that the 2 least significant
+bits of a closure ID indicate the simplex (bit 0) and/or urgent (bit 1)
+property of the closure.
+
+=item B<$closure_signature>
+
+Set to the timestamp when an object was installed in the T::A thread. Provides
+a sanity check for recycled T::A threads; when closure calls are made on objects which
+have been evicted, the signature will not match, and hence the call is not
+made, and an error is returned.
+
+=item B<$closure_tac>
+
+A TAC used to proxy all closures generated within the thread.
+
+=back
+
+When a new root object is installed into an apartment thread, the C<%closure_map>
+and C<$next_closure_id> variables are reset, and C<$closure_signature> is
+set to the current timestamp.
+
+2 methods for passing closures are supported: either directly as CODEREF's,
+or by creating Thread::Apartment::Closure I<aka> TACl instances. The latter
+method permits the closure generator to specify the simplex/and or urgent
+properties of a closure. When specified as a simple CODEREF, the closure
+recipient will always assume the closure is duplex (i.e., will
+wait for a returned result) and non-urgent.
+
+The following methods are provided to support creating TACl's explicitly:
+
+=over 4
+
+=item B<$self-E<gt>new_tacl>(I<CODEREF>)
+
+Generates a regular TACl object. CODEREF will be invoked
+in duplex, non-urgent mode.
+
+=item B<$self-E<gt>new_simplex_tacl>(I<CODEREF>)
+
+Generates a simplex TACl object. CODEREF will be invoked in
+simplex, non-urgent mode.
+
+=item B<$self-E<gt>new_urgent_tacl>(I<CODEREF>)
+
+Generates an urgent TACl object. CODEREF will be invoked in
+duplex, non-urgent mode.
+
+=item B<$self-E<gt>new_urgent_simplex_tacl>(I<CODEREF>)
+
+Generates a simplex, urgent TACl object. CODEREF will be invoked in
+simplex, urgent mode.
+
+=back
+
+E.g.,
+
+	#
+	#	regular CODEREF: $recvr will wait for the closure to complete
+	#
+	$recvr->someMethod(-command => sub { print "in a closure"; });
+	#
+	#	TACl: $recvr will not wait for the closure to complete
+	#
+	$recvr->someMethod(-command => $self->new_simplex_tacl(sub { print "in a closure"; }));
+
+Simplex closures may be useful in situations where 2 apartments may "ping-pong"
+closure calls on each other, in order to avoid deadlock. They may also be
+useful to expedite processing when no returned values are needed.
+
+Default closure call behavior can be modified via either
+
+=over 4
+
+=item *
+
+Setting the C<T::A::new/install(AptClosureCalls)> parameter to 'Simplex', 'Urgent',
+or both, e.g.
+
+	my $tac = Thread::Apartment->new(...
+		AptClosureCalls => [ 'Simplex', 'Urgent'],
+		...);
+
+(useful for specifying behavior for POPO's).
+
+=item *
+
+Overriding the default TAS C<introspect> method to call C<T::A::set_closure_behavior()>
+with a bitmask of the C<TA_SIMPLEX> and/or C<TA_URGENT> values.
+
+=back
+
+The following acronyms are used in the following detailed discussion:
+
+=over 4
+
+=item CRTAC - Closure Recipient TAC
+
+TAC for the object to which the closure is being passed.
+
+=item CRTAS - Closure Recipient TAS
+
+TAS for the object to which the closure is being passed.
+
+=item CGTAC - Closure Generator TAC
+
+TAC for the object which generated the closure.
+
+=item CGTAS - Closure Generator TAC
+
+TAS for the object which generated the closure.
+
+=back
+
+=head4 Processing of CODEREF Closures
+
+When a CGTAS object passes a CODEREF to a CRTAC, the CRTAC's marshalling
+logic will detect the CODEREF (within the T::A::Common::marshal method).
+At that point in time, the CRTAC is executing within the CGTAS's
+thread, and hence, any assignment to the thread's Thread::Apartment class
+variables will be private to that thread.
+
+=over 4
+
+=item 1
+
+The CRTAC calls B<Thread::Apartment::register_closure>, passing the CODEREF.
+
+=item 2
+
+C<register_closure> generates a new duplex, non-urgent closure ID,
+maps the CODEREF into its %closure_map, and returns the $closure_siganture,
+the generated ID, and the CGTAC.
+
+=item 3
+
+The CRTAC then marshals the signature, ID, and CGTAC as a
+TACl object in the marshalled stream.
+
+=item 4
+
+When the CRTAS detects the TACl object in the request stream,
+it converts the object into a local closure call on the CGTAC:
+
+	sub { $cgtac->ta_invoke_closure($signature, $id, @_); }
+
+which the CRTAS can then apply in the proxied method call as a regular
+CODEREF.
+
+=item 5
+
+When the CRTAS eventually calls the closure, the invoke_closure()
+method is marshalled as usual by the CGTAC (I<possibly including the marshalling of
+proxied closures from the CRTAS>),
+except that the simplex and urgent bits if C<$id> are checked to determine
+if the closure requires any special queueing (as for a simplex or urgent
+method).
+
+=item 6
+
+The CGTAS recognizes the C<ta_invoke_closure()> method, and looks
+up the closure in its map. If the $id does not exist, or the signature
+does not equal the current $closure_signature, an error is returned
+(assuming a duplex closure call). Otherwise, the mapped closure is called, along
+with any passed parameters, as for a normal method call, and any results are
+likewise returned as for a normal method call.
+
+=back
+
+=head4 Processing of TACl Closures
+
+When a CGTAS wishes to apply simplex or urgent properties to a closure,
+it must create a complete TACl object. The TACl object behaves much like
+the CRTAC for the CODEREF case: it calls class-level methods to allocate an ID,
+applies the simplex and/or urgent bits to the ID, then maps the closure into
+the thread's map, and installs the local TAC into the TACl.
+
+When the CRTAC detects the TACl while marshalling the method call, it
+simply invokes TACL's curse() method to marshal the signature, ID, and CGTAC.
+
+The remainder of the closure processing is identical to the CODREF case.
+
+=head4 Closures as Return Values
+
+Thus far, closures have been discussed solely as method arguments; however,
+closures may also be return values. In such cases, the CRTAC
+will marshall the closure as for the CODEREF or TACl cases described above,
+and they'll be recovered in the CRTAS when the return values are unmarshalled.
+The invokation of the closures remains the same.
+
+=head4 Limitations
+
+In its current implementation, the marshalling/unmarshalling process
+does not detect closures deep within structures passed between threads.
+In such cases, the L<Storable> package used to marshal/unmarshal complex
+non-threads::shared structures between threads will throw an error.
+
+If an application needs to pass such complex structure between threads,
+it will need to provide its own TAC subclasses, with appropriate marshalling
+logic to map the closures.
+
+=head3 Asynchronous Method Calls
+
+As an additional means of avoiding deadlock situations as described
+above, and to simplify execution of concurrent operations,
+T::A provides support for asynchronous method calls on duplex
+methods. Two async method call mechanisms are supported:
+
+=over 4
+
+=item *
+
+If a called method is prefixed with B<"ta_async_">, and a closure
+is provided as the first argument for the method call, then the TAC
+will return immediately without any results (as for simplex calls), and
+the closure will be invoked when the called object returns its results,
+using the previously described proxied closure mechanism. The closure will
+be called with the method's returned results. E.g.,
+
+	#
+	#	in the caller
+	#
+	$tac->ta_async_some_method(
+		sub {
+			$self->recv_async_results('some_method_1', @_);
+		}
+	);
+	#
+	#	later in the caller
+	#
+	sub recv_async_results {
+		my $self = shift;
+		my $unique_id = shift;
+		#
+		# some_method()'s returned results are in @_
+		#
+	}
+
+Note the unique indentifier included in the closure definition;
+while not required, including some unique ID may be a best practice
+when attempting to handle multiple async closure invokations.
+
+=item *
+
+Using Thread::Apartment's C<start()> and C<rendezvous()> methods to
+start a method or closure, and then later wait for it (and possibly
+other pending requests). E.g.,
+
+	#
+	#	using the full class qualifier
+	#
+	Thread::Apartment->start($tac1)->someMethod(@params);
+	#
+	#	using the exported method name
+	#
+	use Thread::Apartment qw(start rendezvous);
+
+	start($tac2)->otherMethod(@params);
+	my $closuretac = start($closure)->(@params);
+	...some other code...
+	my @tacs = rendezvous();
+	#
+	#	then check the returned results
+	#
+	print "Got ", $_->get_pending_results(), "\n"
+		foreach (@tacs);
+
+Refer to the classdocs for detailed descriptions of the various
+T::A rendezvous methods, and the supporting TAC methods.
+
+=back
+
+=head2 Best Practices
+
+=head3 Allocate threads and TQDs early
+
+Due to Perl's heavyweight thread model (i.e., cloning
+the entire parent thread context), threads that are spawned
+after many modules have been loaded, or lots of objects
+have been created, may consume significant unneeded resources.
+By creating threads as early as possible, and deferring module
+loading (i.e., not C<use>'ing many/any modules, but rather
+C<require>'ing when needed), the apartment threads will be created
+within the minimum required context.
+
+=head3 Use T::A::set_single_threaded() for debugging
+
+Debugging threaded applications
+can be very challenging (not only Perl, but any language).
+Perl's current debugger provides little or
+no support for differentiating between the execution context
+of different threads. Therefore, using the single threaded
+implementation for preliminary test and debug is highly recommended.
+While it may not surface issues related to concurrency, it will
+usually be sufficient for finding and fixing most application logic
+bugs.
+
+=head3 Wrap Filehandles With Access Discipline Objects
+
+Given Perl's inability to marshall filehandles between
+threads, wrapping handles with classes that provide the
+access disciplines can be used to provide a marshal-able
+solution, e.g., a Logger class that provides logging methods,
+as well as file open, truncation, and close methods, and is
+provided (as a TAC) to any other objects needing a logger.
+
+=head1 PREREQUISITES
+
+=over 4
+
+=item Perl 5.8.4 or higher
+
+=item L<Thread::Queue::Duplex> 0.92 or higher
+
+=item L<Class::ISA> 0.13 or later
+
+=item L<Class::Inspector> 1.08 or later
+
+=item L<Storable> 2.13 or later
+
+=back
+
+=head1 CHANGE HISTORY
+
+=head3 Release 0.50
+
+=over 4
+
+=item *
+
+Renamed Thread::Apartment::IOServer to Thread::Apartment::EventServer
+(TAIO to TAES) to more accurately reflect its purpose.
+
+=item *
+
+Renamed Thread::Apartment::setSingleThreaded to Thread::Apartment::set_single_threaded,
+to conform to other naming. Also exported it.
+
+=item *
+
+Changed object hierarchy map from lexical in run() to a Thread::Apartment
+class variables, with exported class methods to manipulate it.
+
+=item *
+
+Added CLONE methods to Thread::Apartment and Thread::Apartment::Server
+to clear out class variables on thread clone
+
+=item *
+
+Added closure support
+
+=item *
+
+Added Thread::Apartment::MuxServer
+
+=item *
+
+Added Thread::Apartment::Container
+
+=item *
+
+Added support for async method return closures
+
+=item *
+
+Switched to Academic Free License
+
+=item *
+
+Added psichedocs
+
+=item *
+
+Added re-entrancy support via ta_reentrant_ prefix, AptReentrant,
+and the set_/get_reentrant class methods
+
+=back
+
+=head3 Release 0.10
+
+=over 4
+
+=item *
+
+Initial release.
+
+=back
+
+=head1 TO DO
+
+=head3 Filehandle marshalling support
+
+Some means of transparently passing filehandles (as either
+GLOBs, or subclasses of L<IO::Handle>) would be nice. However,
+it appears B<lots> of things in Perl need to be fixed for
+that to be a realistic option.I<<sigh/E<gt>>
+
+=head3 Operator overloading
+
+Some proxied method of supporting L<operator overloading|overload> is needed
+I<(Though I personally dislike operator overloading)>. An early design
+would add
+
+	use overload nomethod => \&operAutoLoad;
+
+to TACs, so that operators applied to a TAC could get redirected to
+the associated TAS. However, a means of operator overload introspection
+is also required so the TAS can report its operator overloads to the
+TAC.
+
+=head3 lvalue methods
+
+Might be useful, but difficult to implement without some means
+to detect the actual assignment event. Can be supported by TAC's
+B<if> the target variable is threads::shared, but then requires
+some locking support as well.
+
+=head3 Provide multiprocess/distributed implementation
+
+The infrastructure contained within Thread::Apartment should be readily
+extendable to a multiprocess version, possibly using some lightweight IPC
+mechanism in place of TQD's, and Storable to marshal/unmarshal
+objects and method calls. Likewise, a fully distributed implementation should
+be feasible using sockets in place of TQD's.
+
+=head3 Implement AptSimplex, AptUrgent method attributes
+
+Rather than requiring a TAS subclass to provide get_simplex_methods()
+and get_urgent_methods(), method L<attributes> could be provided;
+however, the status of attribute support in Perl 5 is a bit nebulous at
+this time.
+
+=head3 Support CLONE_SKIP()
+
+CLONE_SKIP has been added in Perl 5.8.8 to help avoid unneeded object
+cloning (and thus improve performance and reduce memory footprint).
+It would probably be useful to support this for the proxied objects.
+
+=head3 Implement as C/XS or Inline::C
+
+Given the "CORE-ish" nature of T::A's behavior, a better performing
+and more lightweight solution using C/XS would be desirable. But I suspect
+there be dragons there...
+
+=head3 Implement T::A wrappers for commonly useful modules
+
+E.g., L<HTTP::Daemon>, L<HTTP::Daemon::SSL>, L<Class::DBI>, etc.
+I<DBI and Perl/Tk are already covered...>
+
+=head3 Support for L<Thread::Queue::Multiplex>
+
+I have vague notions of how a publish/subscribe architecture
+might exploit T::A, but need a reference application to get
+a better idea how to implement.
+
+=head3 Better Support for DESTROY
+
+At present, reference counting and proxied object destruction are
+not fully implemented. In addition, DESTROY events in the
+TAC occur frequently, and appear to be duplicates or accidental,
+e.g., in some instances, simply dereferencing a TAC from a hash
+causes a DESTROY, even though the TAC has not bee removed from the
+hash. Hence, it's difficult to determine when the proxied object should
+be advised of a DESTROY event. At present, applications should assume
+that apartment threaded objects will be retained for the life
+of the application's execution.
+
+=head3 Add a Thread::Apartment::Rendezvous class
+
+The current implementation doesn't readily support initiation of
+concurrent method requests, and waiting for them all to complete.
+While asynchronous methods is a partial solution, it doesn't provide
+a coordinated wait mechanism.
+
+By adding a Thread::Apartment::Rendezvous
+object, the initiating application could wait for completion
+of all the started methods, and then proceed with processing.
+An initial design would use an alternate method signature for async methods;
+instead of passing a closure to be called when the method completed,
+a T::A::Rendezvous I<aka> B<TAR> object would be provided. When the
+method call was initiated, the TAC would pass itself and the generated
+method request ID to the Rendezvous object.
+
+Once the application had inititated all the methods, it would
+invoke the TAR's C<rendezvous()> method to wait for completion of
+all the methods. Upon completion, the application could retrieve
+results from individual TAC's using the request identifiers returned by
+the previous async method call.
+
+Example:
+
+	my $rdvu = Thread::Apartment::Rendezvous->new();
+	...
+	my @pending = ();
+
+	push @pending, $tac1->ta_async_methodA($rdvu, @args);
+	push @pending, $tac2->ta_async_methodB($rdvu, @args);
+	push @pending, $tac3->ta_async_methodC($rdvu, @args);
+
+	$rdvu->rendezvous();
+
+	my $result1 = $tac1->ta_get_results(shift @pending);
+	my $result2 = $tac2->ta_get_results(shift @pending);
+	my $result3 = $tac3->ta_get_results(shift @pending);
+
+However, some challenges remain:
+
+=over 4
+
+=item *
+
+handling of returned results
+
+=item *
+
+coordinating simplex and duplex methods
+
+=item *
+
+coordinating re-entrant calls on the same TAC
+
+=back
+
+=head1 SEE ALSO
+
+L<Thread::Queue::Duplex>, L<Thread::Queue::Queueable>,
+L<DBIx::Threaded>, L<Tk::Threaded>, L<Thread::Resource::RWLock>,
+L<threads::shared>, L<perlthrtut>, L<Class::ISA>, L<Class::Inspector>
+
+L<Pots> and L<Thread::Isolate> provide somewhat similar functionality,
+but aren't quite as transparent as Thread::Apartment. They also do not
+appear to support passing closures between threaded objects.
+
+=head1 AUTHOR & COPYRIGHT
+
+Copyright(C) 2005, 2006, Dean Arnold, Presicient Corp., USA
+
+Licensed under the Academic Free License version 2.1, as specified in the
+License.txt file included in this software package, or at OpenSource.org
+L<http://www.opensource.org/licenses/afl-2.1.php>.
+
+=cut

@@ -1,0 +1,34 @@
+Tie-IxHash-FixedSize
+
+This module provides a Tie::IxHash that will only hold at most a fixed maximum
+number of keys.  When additional keys are added to the hash, the oldest keys
+are removed to make room for the new keys.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Tie::IxHash
+
+COPYRIGHT AND LICENSE
+
+   Copyright (C) 2008 by Michael Schout
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of either:
+
+   *   the GNU General Public License as published by the Free Software
+       Foundation; either version 1, or (at your option) any later
+       version, or
+
+   *   the Artistic License version 2.0.
+

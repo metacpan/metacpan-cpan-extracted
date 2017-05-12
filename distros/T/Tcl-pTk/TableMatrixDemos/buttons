@@ -1,0 +1,97 @@
+## buttons.tcl
+##
+## demonstrates the simulation of a button array
+##
+## ellson@lucent.com
+## modifications made by jeff.hobbs@acm.org
+##  Modified by John Cerney for perl/tk and Tcl::pTk
+
+use Tcl::pTk (qw/ :perlTk /);
+
+use Tcl::pTk::TableMatrix;
+
+use Data::Dumper qw( DumperX);
+my $top = MainWindow->new;
+
+my $tab = {};
+my ($rows,$cols) = (10,10); # number of rows/cols
+
+# create the table
+my $t = $top->Scrolled('TableMatrix', -rows => $rows, -cols => $cols, 
+		-titlerows =>  1, -titlecols => 1 ,
+		-roworigin => -1, -colorigin => -1 ,
+		-colwidth => 4 ,
+		-width => 8, -height => 8 ,
+		-variable => $tab ,
+		-flashmode => 'off',
+		-cursor => 'top_left_arrow' ,
+		-borderwidth => 2 ,
+		-state => 'disabled'
+                    );
+$t->pack;
+
+# set up tags for the various states of the buttons
+$t->tagConfigure('OFF', -bg => 'red', -relief => 'raised');
+$t->tagConfigure('ON', -bg => 'green', -relief => 'sunken');
+$t->tagConfigure('sel', -bg => 'gray75', -relief => 'flat');
+
+
+
+# clean up if mouse leaves the widget
+$t->bind('<FocusOut>',sub{ 
+	    my $w = shift;
+	    $w->selectionClear('all');
+	    });
+
+
+
+
+# highlight the cell under the mouse
+$t->bind('<Motion>', sub{
+    my $w = shift;
+    my $Ev = $w->XEvent;
+    if( $w->selectionIncludes('@' . $Ev->x.",".$Ev->y)){
+    	Tcl::pTk->break;
+    }
+    $w->selectionClear('all');
+    $w->selectionSet('@' . $Ev->x.",".$Ev->y);
+    Tcl::pTk->break;
+    ## "break" prevents the call to TableMatrixCheckBorder
+});
+
+
+
+# mousebutton 1 toggles the value of the cell
+# use of "selection includes" would work here
+$t->bind('<1>', sub {
+    my $w = shift;
+    $w->focus;
+    my $dude = $w->curselection;
+    my ($rc) = @{$w->curselection};
+    my $var = $w->cget(-variable);
+    if( $var->{$rc} =~ /ON/ ){
+	$var->{$rc} = 'OFF';
+        $w->tagCell('OFF',$rc);
+    }
+    else{
+	$var->{$rc} = 'ON';
+        $w->tagCell('ON',$rc);
+    }
+});
+
+
+# inititialize the array, titles, and celltags
+for( $i = 0; $i < $rows; $i++){
+	$tab->{"$i,-1"} = $i;
+	for( $j = 0; $j < $cols; $j++){
+		unless($i) { $tab->{"-1,$j"}= $j;};
+		$tab->{"$i,$j"} = "OFF";
+		$t->tagCell('OFF', "$i,$j");
+	}
+}
+
+
+MainLoop;
+
+
+

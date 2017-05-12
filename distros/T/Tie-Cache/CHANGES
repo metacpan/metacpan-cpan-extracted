@@ -1,0 +1,137 @@
+$MODULE = "Tie::Cache"; $VERSION = .21; $DATE = '05/19/2014';
+
++ fixed internal $VERSION number
+
+$MODULE = "Tie::Cache"; $VERSION = .19; $DATE = '02/23/2012';
+
++ added cleaner ref() checking for data size calculations when using a MaxBytes cache, to address bug
+   https://rt.cpan.org/Public/Bug/Display.html?id=69976
+
++ updated test.pl to "use Tie::Cache" to prevent test conflicts with Cache.pm
+
+$MODULE = "Tie::Cache"; $VERSION = .17; $DATE = '07/03/2002';
+
++ added tied(%cache)->flush() method to sync dirty writes
+  that have been cache with WriteSync => 0 config for a true
+  cache inherited object.  Added testing to cover in test.pl
+
+$MODULE = "Tie::Cache"; $VERSION = .15; $DATE = '03/20/2001';
+
++ Better test.pl timing output, also differentiate between
+  cache with MaxBytes setting and one with just MaxCount,
+  as MaxBytes is a bit slower for data size calculations.
+
++ Better Tie::Cache options / object config error checking,
+  die() on obvious misconfigurations that will get developers
+  in trouble.
+
+- MaxSize only set if MaxSize or MaxBytes are defined,
+  was defaulting to 1 otherwise, killing basic MaxCount config.
+
++ Optimizations for common use where Tie::Cache is not 
+  subclassed for write()/read() API
+
+$MODULE = "Tie::Cache"; $VERSION = .11; $DATE = '03/18/2001';
+
++ use of arrays for internal nodes structure instead of
+  hashes for savings on memory and lookup speed.
+
++ MaxBytes now more accurate with recursive length calculations
+  on reference keys & values, and added estimates of 240 bytes
+  per key/value pair, + 16 bytes per reference found, in addition
+  to the length of the data being stored.
+
+  A MaxBytes setting of 1000000 would then try to really limit
+  total memory consumption of the entire cache to 1M.  This is
+  relevant when being used in high process environments like mod_perl
+  where memory savings are critical.
+
++ MaxSize has default of MaxBytes/10, so large cache entries don't
+  purge many others.  If cache entry exceeds MaxSize in bytes, then
+  that value won't be cached.
+
+$MODULE = "Tie::Cache"; $VERSION = .10; $DATE = '11/22/00';
+
+- Allow for undef values to be stored like $cache{1} = undef
+  Really doesn't affect cache, but got rid off error message
+  in this case.
+
+$MODULE = "Tie::Cache"; $VERSION = .09; $DATE = 'TBA';
+
++ Added benchmark section comparing Tie::Cache & Tie::Cache::LRU
+
+$MODULE = "Tie::Cache"; $VERSION = .08; $DATE = '12/14/99';
+
+- FETCH, or %cache reads like $cache{key} would returned
+  a defined value, null, when it should have been undefined.
+  This would breaks tests that test for defined($cache{$key}),
+  and is a big problem.  I introduced this bug with my 
+  tuning in .07 :(
+
+$MODULE = "Tie::Cache"; $VERSION = .07; $DATE = '12/13/99';
+
++ Improved test suite to do some benchmarking, and 
+  real interpreted tests.
+
++ Performance tuning making the cache about 5-10% faster.
+
++ MaxSize setting makes it so that key/value pair lengths 
+  of MaxSize or greater will not be stored in the cache.
+  This prevents odd large entries from flushing the cache
+  of many smaller entries.
+
+- setting Debug for one Tie::Cache hash is independent of
+  another's Debug setting, before one setting would affect
+  all the rest.  To set Debug value for all Tie::Cache
+  hashes, set $Tie::Cache::Debug.
+
+$MODULE = "Tie::Cache"; $VERSION = .06; $DATE = '2/16/99';
+
++ WriteSynch config option for TRUE CACHE.  WriteSynch => 0 
+  will have the dirty data be written back as late as possible.  
+  WriteSynch => 1 is immediate write-through for data dirtied.
+
+- STORE returns value stored; $cache{$key} = $value returns $value now
+
++ decomped FETCH better so it doesn't use STORE internally
+  necessary for new WriteSynch functionality
+
++ WriteSynch => 0 config set in test.pl to demostrate use.
+
++ Optimizations, especially for refreshing entries in cache on FETCH
+
+$MODULE = "Tie::Cache"; $VERSION = .05;
+
++ Keep track of hits / misses even without debug option set.
+
+$MODULE = "Tie::Cache"; $VERSION = .04;
+
+- Get rid of -w warnings in test.pl.
+
+$MODULE = "Tie::Cache"; $VERSION = .031;
+
+- Removed test2.pl from installation as it was getting installed
+  with Tie::Cache :(
+
+$MODULE = "Tie::Cache"; $VERSION = .03;
+
+- Global destructor bug fixed.  Wasn't flushing cache consistently.
+
+$MODULE = "Tie::Cache"; $VERSION = .02;
+
++ MaxBytes config option is new.  It allows cache size to 
+  be based on the bytes the cache holds.
+
++ test.pl output has Debug set to 2, so full debugging output is
+  displayed.  This allows a new user to see how cache works.
+
+$MODULE = "Tie::Cache"; $VERSION = .01;
+
+First release of module.
+
+
+
+
+
+
+

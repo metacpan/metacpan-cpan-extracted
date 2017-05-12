@@ -1,0 +1,27 @@
+Revision history for Perl module TAP::Harness::Multiple
+
+0.07 Mon Nov 21 21:35:00 2011
+    - Update LICENSE per recommendation of Gerd Pokorra
+
+0.06 Tue Nov 01 22:20:00 2011
+    - PAUSE refuses to index a lower VERSION (and no VERSION counts as 0)
+
+0.05 Tue Nov 01 21:12:00 2011
+    - only define VERSION in one location (in this instance, Makefile.PL)
+    - modify one test failing superfluously on MSWin32
+
+0.04 Sun Oct 30 09:11:30 2011
+    - include LICENSE in Makefile.PL
+
+0.03 Sat Oct 29 19:09:00 2011
+    - require File::Path 2.07 in Makefile.PL
+    - include LICENSE
+
+0.02 Fri Oct 28 19:46:00 2011
+    - remove unneeded module imports;
+    - File::Path::make_path() can be imported from v2.07 of that module
+
+0.01 Sun Oct 23 08:20:39 2011
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

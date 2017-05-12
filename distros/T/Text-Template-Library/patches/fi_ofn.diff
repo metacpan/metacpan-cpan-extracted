@@ -1,0 +1,95 @@
+--- lib/Text/Template.pm~	2008-06-17 17:42:12.000000000 +0200
++++ lib/Text/Template.pm	2008-06-17 17:31:09.000000000 +0200
+@@ -292,15 +292,23 @@
+   }
+ 
+   my $fi_r = '';
++  my $fi_ofn;
++  if(defined $fi_ofh) {
++    if(ref $fi_ofh eq 'CODE') {
++      $fi_ofn = $fi_ofh;
++    } elsif(ref $fi_ofh eq 'GLOB') {
++      $fi_ofn = sub {print $fi_ofh $_[0]};
++    } else {			# object that can ->print()
++      $fi_ofn = sub {$fi_ofh->print($_[0])};
++    }
++  } else {
++    $fi_ofn = sub {$fi_r .= $_[0]};
++  }
+   my $fi_item;
+   foreach $fi_item (@{$fi_self->{SOURCE}}) {
+     my ($fi_type, $fi_text, $fi_lineno) = @$fi_item;
+     if ($fi_type eq 'TEXT') {
+-      if ($fi_ofh) {
+-	print $fi_ofh $fi_text;
+-      } else {
+-	$fi_r .= $fi_text;
+-      }
++      &$fi_ofn($fi_text);
+     } elsif ($fi_type eq 'PROG') {
+       no strict;
+       my $fi_lcomment = "#line $fi_lineno $fi_filename";
+@@ -333,20 +341,12 @@
+ 			       arg => $fi_broken_arg,
+ 			       );
+ 	if (defined $fi_res) {
+-	  if (defined $fi_ofh) {
+-	    print $fi_ofh $fi_res;
+-	  } else {
+-	    $fi_r .= $fi_res;
+-	  }
++	  &$fi_ofn($fi_res);
+ 	} else {
+ 	  return $fi_res;		# Undefined means abort processing
+ 	}
+       } else {
+-	if (defined $fi_ofh) {
+-	  print $fi_ofh $fi_res;
+-	} else {
+-	  $fi_r .= $fi_res;
+-	}
++	&$fi_ofn($fi_res);
+       }
+     } else {
+       die "Can't happen error #2";
+--- t/06-ofh.t~	2008-04-17 01:39:41.000000000 +0200
++++ t/06-ofh.t	2008-06-17 17:40:10.000000000 +0200
+@@ -11,7 +11,7 @@
+ Aborting"
+   unless $Text::Template::VERSION == 1.45;
+ 
+-print "1..2\n";
++print "1..6\n";
+ 
+ $n=1;
+ 
+@@ -35,5 +35,29 @@
+ print +($t eq "My process ID is $$" ? '' : 'not '), "ok $n\n";
+ $n++;
+ 
++$t='';
++sub X::print {$t.=$_[$#_]}	# is called as object method and as function
++
++$text = $template->fill_in(OUTPUT => \&X::print);
++
++# (3) No $text should have been constructed.  Return value should be true.
++print +($text eq '1' ? '' : 'not '), "ok $n\n";
++$n++;
++
++# (4) The text should have been printed to the file
++print +($t eq "My process ID is $$" ? '' : 'not '), "ok $n\n";
++$n++;
++
++$t='';
++$text = $template->fill_in(OUTPUT => bless({},'X'));
++
++# (5) No $text should have been constructed.  Return value should be true.
++print +($text eq '1' ? '' : 'not '), "ok $n\n";
++$n++;
++
++# (6) The text should have been printed to the file
++print +($t eq "My process ID is $$" ? '' : 'not '), "ok $n\n";
++$n++;
++
+ exit;
+ 

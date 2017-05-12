@@ -1,0 +1,39 @@
+---
+abstract: 'Retry test functions on failure'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Retry
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Retry:
+    file: lib/Test/Retry.pm
+    version: '0.01'
+requires:
+  Test::Builder: '0'
+  Time::HiRes: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/motemen/perl5-Test-Retry/issues
+  homepage: https://github.com/motemen/perl5-Test-Retry
+  repository: git://github.com/motemen/perl5-Test-Retry.git
+version: '0.01'

@@ -1,0 +1,20 @@
+
+=== ChangeLog and Future Plans ===
+
+plan
+- improve output timing when OHANDLE option is set
+- reduce buffer copying overhead
+- review inheritance design of "new" constructor.
+
+0.36
+- Updated to prevent wierd segmentation fault in recent Perl (5.6.X).
+
+0.35
+- general code review
+- complete documentation update
+- test routine update (should now pass under non-UNIX environment)
+
+0.32
+- updated constructor for better support of chained template
+- added DELIM option to pack/load method
+- test routine update (more tests)

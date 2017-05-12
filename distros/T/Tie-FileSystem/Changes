@@ -1,0 +1,14 @@
+What's new in version 2.15:
+
+  Cleaning POD from KA::Tie::Dir references
+
+What's new in version 2.12:
+
+  Move from KA::Tie::Dir into Tie::FileSystem name space,
+  Cosmetic changes in POD.
+
+What's new in version 2.9:
+
+  Testing under ActiveState Perl.
+  Extensive rework of debug code.
+

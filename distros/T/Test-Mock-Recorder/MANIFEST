@@ -1,0 +1,23 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Test/Mock/Recorder.pm
+lib/Test/Mock/Recorder/Expectation.pm
+lib/Test/Mock/Recorder/InvalidArguments.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.pod
+t/arguments.t
+t/chain.t
+t/expects.t
+t/replay.t
+t/synopsis.t
+t/test_name.t
+t/use.t
+t/verify_ok.t

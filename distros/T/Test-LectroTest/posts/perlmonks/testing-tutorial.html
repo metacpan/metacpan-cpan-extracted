@@ -1,0 +1,648 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+    <head><title>Title</title>
+          <meta name="content-type" value="text/plain; charset=utf-8">
+</head>
+
+<body>
+<div>
+
+<hr>
+
+
+I recently wrote an automatic, specification-based testing system for
+Perl called <a
+href="http://community.moertel.com/LectroTest">LectroTest</a>.
+Because specification-based testing takes a while to grok, I'm trying
+to write some helpful introductory documentation.  One bit o' docs I
+just finished is an tutorial-style introduction to testing that works
+through Test::More and ends up at LectroTest.
+
+<p>But I have a problem.  I wrote the tutorial and, worse, I wrote
+LectroTest.  I <em>know</em> how the darn thing works.  If my
+tutorial has holes in it (or gaping, thorn-filled chasms for that
+matter), I won't notice because I'll subconsciously fill in the
+blanks.
+
+<p>That's where I need your help.  Would you mind taking a critical
+read of my tutorial and giving me some feedback?  It might even be
+fun.  (If you're into that kind of thing.  Or if you just want to mock
+my writing.)
+
+<p>To all those who dare to venture within, many thanks!
+
+<hr>
+
+<readmore>
+
+In this tutorial we'll take a look at testing our Perl code.  First,
+we'll quickly review why it's a good idea to test.  Then, we'll create
+a small program to test and test it with Test::More.  Next, we'll test
+our program more extensively with the relatively new LectroTest
+system.  Finally, after a quick review, we'll grab an espresso
+and return to coding with renewed vigor.
+
+
+<h4>Why test?</h4>
+
+
+<p>Let's say we are writing a program.  Being hackers of good character,
+we naturally want our program to be <em>correct</em>.  In other words,
+we want to be confident that our program will behave as we expect it
+to behave.  One way of gaining that confidence is through testing.
+
+<p>Testing is a practice in which we compare our program's behavior
+to its expected behavior on a case-by-case basis.  We, the humans
+who know what our program is expected to do, create the test cases.
+Each test case says, "For <em>this</em> particular set of conditions,
+the expected behavior of our program is <em>that</em>."  We then run
+our program under the given set of conditions, observe its behavior,
+and compare what we observed to the expected behavior for the test
+case.  If the observed and expected behaviors match, the program is
+said to have passed the test.  Otherwise, it fails, and we ought to
+examine our code for errors.
+
+<h4>It's easy to test in Perl with Test::More</h4>
+
+<p>It's easy to create test cases in Perl.  To see how the process
+works, let's first write some code to test.  Below is an
+implementation of <code>angdiff</code>, a subroutine that computes the
+difference between two input angles, <em>a</em> and <em>b</em>, given
+in degrees.  The expected result is the smallest positive angle
+between the two.  For convenience, we'll put <code>angdiff</code> in
+its own module called <code>AngularDifference</code>:
+
+<code>
+# File: AngularDifference.pm
+
+package AngularDifference;
+
+BEGIN {
+    use Exporter;
+    our @ISA = qw( Exporter );
+    our @EXPORT = qw( &angdiff );
+}
+
+# compute the difference between angles $a and $b
+
+sub angdiff($$) {
+    my ($a, $b) = @_;
+    return abs($a - $b) % 360;
+}
+
+1;
+</code>
+
+Take a look at the code for <code>angdiff</code>.  It takes the
+absolute value of the difference between <code>$a</code> and
+<code>$b</code> and then "clamps" the result modulo 360 because two
+angles can never be more than a full circle -- 360 degrees -- apart.
+
+<p>It seems straightforward enough, but how confident are we that
+there's not a subtle error lurking in the code?  Let's create some
+test cases to raise our confidence.
+
+<p>The Test::More module was created to make this kind of testing
+easy:
+
+<code>
+# File: AngularDifference.t
+
+use AngularDifference;  # provides angdiff
+use Test::More tests => 6;
+
+# identical angles should have a diff of zero
+is( angdiff(  0,  0),   # observed result
+    0,                  # expected result
+    "zero at 0"         # name of the test case
+);                                           # case 1
+is( angdiff( 90, 90),   0, "zero at 90" );   # case 2
+
+# order of angles shouldn't matter to diff
+is( angdiff(  0, 45),  45, "0,45 -> 45" );   # case 3
+is( angdiff( 45,  0),  45, "45,0 -> 45" );   # case 4
+
+# should return the smallest angle between
+is( angdiff(  0,270),  90, "0,270 -> 90, not 270" );  # case 5
+
+# multiples of 360-degrees shouldn't matter
+my ($a,$b) = (360 * 2, 360 * 4);
+is( angdiff($a,$b+23),23, "$a,$b+23 -> 23" );  # case 6
+</code>
+
+<p>Here we have created a suite of six test cases.  The suite, itself,
+is nothing more than a small Perl program that uses Test::More.
+
+<p>First, we imported the code we wanted to test, which is in the
+AngularDifference package.  Then we loaded Test::More and told it that
+we have six test cases.
+
+<p>Next comes the test cases.  Each takes the form of an
+<code>is</code> statement that compares the observed output of
+<code>angdiff</code> with the expected, correct result for the given
+set of conditions.  The first test case is commented to show each part
+clearly.  Each case also has a name.  Always provide good names for
+your test cases because it makes your life easier in the long run,
+especially when your test suites become large.
+
+<p>Note that our small suite includes cases designed to
+flush out common programming errors that might be lurking
+around zeroes and argument ordering.  We also have a few
+domain-specific cases that deal with properties of
+angles and circles.  The idea is to exercise our
+code and make it sweat.
+
+<p>To run the tests, just run the program:
+
+<p>
+<code>
+$ perl AngularDifference.t
+1..6
+ok 1 - zero at zero
+ok 2 - zero at 90
+ok 3 - 0,45 -> 45
+ok 4 - 45,0 -> 45
+not ok 5 - 0,270 -> 90, not 270
+#     Failed test (AngularDifference.t at line 15)
+#          got: '270'
+#     expected: '90'
+ok 6 - 720,1440+23 -> 23
+# Looks like you failed 1 tests of 6.
+</code>
+
+<p>Looks like we have a problem!  Our implementation of
+<code>angdiff</code> failed the 5th test case.  We asked it to compute
+the difference between 0 and 270 degrees, and it returned 270.
+However, the correct result is the <em>smallest</em> angle between 0
+and 270, which is 90 degrees.
+
+<p>It looks like our intuition to use modulo-360 truncation was wrong.
+Let's bring the truncation threshold down to 180 instead:
+
+<code>
+sub angdiff($$) {
+    my ($a, $b) = @_;
+    return abs($a - $b) % 180;
+}
+</code>
+
+<p>And now, let's re-run our tests:
+
+<code>
+$ perl AngularDifference.t
+1..6
+ok 1 - zero at zero
+ok 2 - zero at 90
+ok 3 - 0,45 -> 45
+ok 4 - 45,0 -> 45
+ok 5 - 0,270 -> 90, not 270
+ok 6 - 720,1440+23 -> 23
+</code>
+
+<p>Ah, that looks better.  Our revised implementation passes all
+six test cases.
+
+<h4>Automatic, specification-based testing with LectroTest</h4>
+
+With a small investment of six test cases, we were able to find a
+problem in our implementation of <code>angdiff</code>.  What if we
+considered more test cases?  What if we considered <em>all
+possible</em> test cases?  If we could show that the actual and expected
+behaviors of our implementation were identical for all cases, we would
+actually <em>prove</em> that our implementation was correct.  We would
+earn the ultimate kind of confidence!
+
+<p>Unfortunately, using testing to prove a program's
+correctness is impractical for almost all real-world programs.  The
+typical program's behavior represents a surprisingly vast space to
+test, and there is no reasonable way to test all of the possible cases
+within it.
+
+<p>But we can test <em>samples</em> from that vast space to gain some
+degree of confidence in our program's correctness.  Many common
+programming mistakes pollute a large portion of the "test space" with
+detectable deviations from expected behavior. The more samples we
+take, the more likely we are to find these deviations and the more
+reason we have to be confident when we don't find them.
+
+<p>Right now, we take six samples from the test space of
+<code>angdiff</code>'s behavior.  That's not many. While we could
+double our sample size by writing six more test cases, that approach
+gets expensive quickly.  What if we really wanted 100 test cases?
+Creating them by hand would get old fast.
+
+<p>What we really need is a way to automate the process.  Let's think
+about that idea.  Consider our second case from earlier:
+
+<code>
+is( angdiff( 90, 90),   0, "zero at 90" );   # case 2
+</code>
+
+We can interpret it as saying, "For <code>$a</code>=90 and
+<code>$b</code>=90, we assert that <code>angdiff($a,$b)</code> must be
+0."  Wouldn't it be great if we could generalize that claim?  We would
+like to be able to say, "For <em>all</em> <code>$a</code> and
+<code>$b</code>, we assert that <code>angdiff($a,$b)</code> must be
+<em>X</em>."
+
+<p>But there's a rub.  It's that pesky placeholder for the correct
+behavior, <em>X</em>.  If we were given some random angles
+<code>$a</code> and <code>$b</code> to check as a test case, we could
+certainly determine the <em>actual</em> behavior of
+<code>angdiff($a,$b)</code> &#8211; just call the function.  But how
+could we determine the expected, <em>correct</em> behavior?  That's
+tricky.  If we could do that, we wouldn't need to test
+<code>angdiff</code> in the first place: Our code for determining the
+correct behavior would <em>be</em> the correct implementation of
+<code>angdiff</code>!
+
+<p>But not all is lost.  What if we could change the way we look at
+the "test space" so that we could construct any random test case
+<em>and</em> the correct behavior for that case at the same time?
+
+<p>If we picked any angles <code>$a</code> and <code>$b</code>, we
+would have the problem of determining the correct difference between
+them &#8211; back to square one.  But, if we instead picked
+<code>$a</code> and <em>the correct, expected difference</em> first,
+we could then determine a corresponding <code>$b</code> by working
+backward.  Then we would know <code>$a</code>, <code>$b</code>, and
+the correct difference.  That's everything we need for a test case!
+
+<p>Let's formalize this plan as a recipe:
+
+<ol>
+
+<li>Pick a random angle <code>$a</code>.</li>
+
+<li>Pick a random difference <code>$diff</code>, in the range -180 to
+180.</li>
+
+<li>Compute <code>$b = $a + $diff.</code></li>
+
+<li>Now we have a test case: We assert that <code>angdiff($a,$b)</code> 
+must equal <code>abs($diff)</code>.</li>
+
+</ol>
+
+If you think about it, our recipe above is actually a specification of
+a general property that our implementation must hold to: "For all
+angles <em>a</em> and for all angles <em>diff</em> in the range -180
+to 180, we assert that <code>angdiff($a, $a + $diff)</code> must equal
+<code>abs($diff)</code>."
+
+<p>This is where LectroTest comes in.  It is an automatic,
+specification-based testing system.  It is designed to take property
+specifications (like the one we just created) and check them by
+running large numbers of random trials against the software we're
+testing.  Each trial is an attempt to "break" one of our property
+assertions at a particular point in the test space.  Because
+LectroTest is automated, it can quickly and painlessly check
+thousands of test cases for us, giving us a much higher degree of
+confidence than is practical with manual test cases.
+
+<p>To see how LectroTest works, let's convert our recipe into a real,
+live LectroTest property specification that we can check.  Like before
+with Test::More, we create a simple Perl program to hold our
+properties.  This time, however, we use Test::LectroTest and declare a
+property instead of individual test cases:
+
+<code>
+# File: AngularDifference.l.t
+
+use AngularDifference;
+use Test::LectroTest;
+
+Property {
+    ##[ a <- Int, diff <- Int(range=>[-180,180]) ]##
+    angdiff($a, $a + $diff) == abs($diff)
+}, name => "angdiff holds to defn of angular difference";
+</code>
+
+The first part of the property specification is a <em>generator
+binding</em>.  It tells LectroTest to automatically set up variables
+for you to use in a behavior test that comes later:
+
+<code>
+    ##[ a <- Int, diff <- Int(range=>[-180,180]) ]##
+</code>
+
+It reads, "For all integers <em>a</em> and for all integers
+<em>diff</em> in the range -180 to 180."  Sound familiar?
+The only twist is that we are representing angles as
+integers for convenience.
+
+<p>The second part of the property specification is a behavior
+test.  It uses the variables we bound earlier to test whether
+<code>angdiff</code> has the expected behavior at a particular
+instance of <em>a</em> and <em>diff</em> in the test space:
+
+<code>
+    angdiff($a, $a + $diff) == abs($diff)
+</code>
+
+Note that the behavior test is just a block of code that has a true or
+false result.  True means that <code>angdiff</code> had the expected
+behavior and thus passed the test for this particular case of
+<em>a</em> and <em>diff</em>.  False means that it failed the test.
+
+<p>Finally, like before, we provide a meaningful name.  Because our
+property is general and derived from the mathematical definition of
+angular difference, we name it "angdiff holds to defn of angular
+difference".
+
+<p>Now let's run our property check.  Again, we just run the program:
+
+<code>
+$ perl AngularDifference.l.t
+1..1
+not ok 1 - 'angdiff holds to defn of angular difference' falsified in 535 attempts
+# Counterexample:
+# $a = 148;
+# $diff = 180;
+</code>
+
+Oops!  LectroTest was able to falsify our property claim.  That means
+it was able to find a point in the test space where our claim didn't
+hold for our revised <code>angdiff</code> implementation.  It also
+emitted a counterexample, which shows exactly where that point is.
+
+<p>We can plug the counterexample into our code to debug the problem.
+After we fix the problem, we can add the counterexample to a list of
+test cases for regression testing to make sure that future
+modifications to <code>angdiff</code> don't reintroduce the same
+erroneous behavior.
+
+<p>By examining the counterexample, we see that <code>angdiff</code>
+"broke" when <code>$diff</code> was set at 180 degrees.  Looking back
+at our new angdiff code, we can see the problem: Our modulo-180
+truncation wraps sharply when the difference increases to 180 degrees,
+when it shouldn't.  Let's compute a small table by hand that shows the
+correct differences for various values of <code>$b</code> when
+<code>$a</code> is fixed at 0 degrees:
+
+<code>
+When $a = 0
+
+And $b is    The expected   And angdiff
+             result is      returns
+=========    ============   ===========
+  150           150            150
+  160           160            160
+  170           170            170
+  180           180              0  <-- Oops
+  190           170             10  <-- Oops
+  200           160             20  <-- Oops
+  210           150             30  <-- Oops
+</code>
+
+See how the expected result climbs up toward 180 and then starts down
+again?  See how <code>angdiff</code> wraps around sharply?  That's
+the problem.  With this knowledge, we can fix the bug:
+
+<code>
+sub angdiff($$) {
+    my ($a, $b) = @_;
+    my $delta = ($a - $b) % 360;
+    return $delta > 180 ? 360 - $delta : $delta;
+}
+</code>
+
+Let's repeat our property check by re-running the program:
+
+<code>
+$ perl AngularDifference.l.t
+1..1
+ok 1 - 'angdiff holds to defn of angular difference' (1000 attempts)
+</code>
+
+Ah, now that is more like it!
+
+<p>Still, having been burned once before by overconfidence in our
+testing, we should be cautious.  Yes, LectroTest was able to find a
+problem that our manual test cases didn't, but do we have reason to
+believe there aren't more errors in hiding?
+
+<p>Maybe we should try to quantify the kinds of test cases that
+LectroTest is creating for us behind the scenes.  In our property
+specification, we can make use of the magic object
+<code>$tcon</code>, which LectroTest provides to let us interact with
+the test controller.  One of the things we can ask the test controller
+to do is attach labels to individual trials.  At the end of our
+property check, LectroTest will tabulate the trials based on the
+labels we have attached and provide us with summary statistics.
+
+<p>One thing we might want to examine is how far apart the input
+angles <code>$a</code> and <code>$b</code> are.  (Remember, we're
+letting <code>$b = $a + $diff</code>, so <code>$diff</code> tells us
+how far apart <code>$a</code> and <code>$b</code> are.)  Here's one
+way to categorize them:
+
+<code>
+Property {
+
+    ##[ a <- Int, diff <- Int(range=>[-180,180]) ]##
+ 
+    if    ($diff == 0)         { $tcon->label("zero") }
+    elsif (abs($diff) <= 90)   { $tcon->label("1 to 90") }
+    elsif (abs($diff) <= 180)  { $tcon->label("91 to 180") }
+    elsif (abs($diff) <= 360)  { $tcon->label("181 to 360") }
+    else                       { $tcon->label("> 360") }
+
+    angdiff($a, $a + $diff) == abs($diff)
+
+}, name => "angdiff holds to defn of angular difference";
+</code>
+
+<p>Re-running our check reveals the statistics:
+
+<code>
+1..1
+ok 1 - 'angdiff holds to defn of angular difference' (1000 attempts)
+#  58% 1 to 90
+#  41% 91 to 180
+#   0% zero
+</code>
+
+Looking at the statistics tells us that we aren't checking any cases
+were the input angles are farther than 180 degrees apart.  This seems
+like a hole in our testing strategy because in the real world, angles
+can be farther apart than that.  The problem is that we constrain our
+<code>$diff</code> to a 180-degree magnitude, so that's as far apart
+our input angles will ever be.
+
+<p>To introduce a greater spread, we can add random multiples
+of 360 degrees to our calculation for the second input angle
+<code>$b</code>.  Such multiples won't affect our assertion
+that the expected result is <code>abs($diff)</code>, which
+is what makes our testing strategy work.  Here's the
+rewritten property:
+
+<code>
+Property {
+
+    ##[ a <- Int, n <- Int, diff <- Int(range=>[-180,180]) ]##
+ 
+    my $b = $a + 360*$n + $diff;
+    my $delta = abs($b - $a);
+
+    if    ($delta == 0)    { $tcon->label("zero") }
+    elsif ($delta <= 90)   { $tcon->label("1 to 90") }
+    elsif ($delta <= 180)  { $tcon->label("91 to 180") }
+    elsif ($delta <= 360)  { $tcon->label("181 to 360") }
+    else                   { $tcon->label("> 360") }
+
+    angdiff($a, $b) == abs($diff)
+
+}, name => "angdiff holds to defn of angular difference";
+</code>
+
+Now, let's run our check yet again and examine the frequencies:
+
+<code>
+1..1
+ok 1 - 'angdiff holds to defn of angular difference' (1000 attempts)
+#  98% > 360
+#   0% 181 to 360
+#   0% 1 to 90
+</code>
+
+Now it seems that we have the opposite problem.  We're testing the
+really large differences most of the time, but not the smaller ones.
+Nevertheless, we <em>are</em> testing the lower ranges, if just a
+little, because even though they have a 0% frequency, the fact that
+they show up in the list at all means they were tested at least once.
+
+<p>Still, let's do the right thing and try to re-balance the
+distribution evenly.  What unbalanced it was the introduction of
+<code>$n</code>, which is multiplied by 360.  Any time <code>$n</code>
+is greater than one, we'll be in the "> 360" case.  Why not, then,
+make <code>$n</code> pick a small integer half of the time and a large
+integer the other half?  That way, we'll get an even distribution
+among our categories.
+
+<p>Believe it or not, this kind of thing is easy to do in LectroTest.
+We can use a special <em>generator combinator</em> <code>OneOf</code>
+to combine simple generators into a more complex one that does
+what we want:
+
+<code>
+n <- OneOf( Int(range=>[-1,1]), Int )
+</code>
+
+As you might expect from its name, <code>OneOf</code> chooses <em>one
+of</em> the generators we've given it at random, and uses that
+generator to generate its final result.  So we're choosing between a
+small-range generator and an unconstrained generator.  Putting it all
+together, we get the following, revised property:
+
+<code>
+Property {
+
+    ##[ a    <- Int,
+        n    <- OneOf( Int(range=>[-1,1]), Int ),
+        diff <- Int( range=>[-180,180] )  ]##
+ 
+    my $b = $a + 360*$n + $diff;
+    my $delta = abs($b - $a);
+
+    if    ($delta == 0)    { $tcon->label("zero") }
+    elsif ($delta <= 90)   { $tcon->label("1 to 90") }
+    elsif ($delta <= 180)  { $tcon->label("91 to 180") }
+    elsif ($delta <= 360)  { $tcon->label("181 to 360") }
+    else                   { $tcon->label("> 360") }
+
+    angdiff($a, $b) == abs($diff)
+
+}, name => "angdiff holds to defn of angular difference";
+</code>
+
+Running the property check:
+
+<code>
+1..1
+ok 1 - 'angdiff holds to defn of angular difference' (1000 attempts)
+#  67% > 360
+#  17% 181 to 360
+#   9% 1 to 90
+#   6% 91 to 180
+#   0% zero
+</code>
+
+That's better, but we're still placing too much emphasis on the large
+differences.  Well, we can take care of that, too.  Let's replace the
+<code>OneOf</code> combinator with <code>Frequency</code>, which lets
+us hand-tune the frequencies with which its sub-generators are chosen.
+We'll give the small-range generator a 20-to-1 advantage:
+
+<code>
+n <- Frequency( [20,Int(range=>[-1,1])], [1,Int] )
+</code>
+
+With this change in place, we get more-agreeable coverage:
+
+<code>
+1..1
+ok 1 - 'angdiff holds to defn of angular difference' (1000 attempts)
+#  37% > 360
+#  32% 181 to 360
+#  18% 1 to 90
+#  10% 91 to 180
+#   0% zero
+</code>
+
+With this result, we have good reason to be confident that our
+implementation of <code>angdiff</code> is correct.  We created a
+property that specified the expected behavior of our implementation
+for all possible inputs.  We tested the implementation against our
+specification by running thousands of test cases that were distributed
+randomly throughout the overall test space.  Further, we quantified
+the distribution of cases that we were testing to ensure that there
+were no holes.
+
+<p>Mission accomplished!  (Now would be a good time to enjoy a
+celebratory espresso.)
+
+<h4>Let's review</h4>
+
+Testing is an effective technique for improving our confidence in the
+software we write.  Lucky for us, Perl makes it easy to create good
+test suites.
+
+<p>Test::More gives us a simple, low-overhead way to test how our
+software behaves in specific cases that we define by hand.  Often,
+that's all we'll need.
+
+<p>When we do need more, one option is LectroTest.  It allows us to
+specify behaviors that ought to hold across large test spaces, and
+then it randomly samples those spaces to see whether the properties
+actually hold.  It can't prove that our properties hold, but for many
+kinds of properties it can quickly and easily give us good reason
+to be confident.
+
+<p>To ensure good coverage when we use a tool like LectroTest, it's a
+good idea to understand how the tool is sampling the test spaces we
+give it.  Labeling is an easy way to quantify the sampling
+distribution.  If it turns out that we need to adjust the
+distribution, generator combinators like <code>OneOf</code> and
+<code>Frequency</code> provide the tuning knobs we need.
+
+<h4>Sources for more information</h4>
+
+If you're interested in checking out any of these tools &#8211; and
+you ought to because we only scratched the surface here &#8211;
+they're easy to find.  Test::More is probably included in your Perl
+installation already, out of the box.  LectroTest is available as <a
+href="http://search.cpan.org/dist/Test-LectroTest/">Test::LectroTest</a>
+on CPAN, and you can find more information about it at the <a
+href="http://community.moertel.com/LectroTest">LectroTest Home</a>.
+Both tools provide much more depth than we covered here.
+
+</readmore>
+
+
+<p><small>20040914 Edit by [tmoertel]: Fixed typos and some usage problems. Thanks, [schodckwm]!</small></p>
+<p><small>20040914 Edit by [castaway]: Changed title from 'Care you lend me your widsom? And your eyes, too?'</small></p>
+
+</div> </body> </html>

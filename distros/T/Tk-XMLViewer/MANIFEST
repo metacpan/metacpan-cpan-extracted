@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+XMLViewer.pm
+README
+tkxmlview
+prereqinst.pl
+t/module.t
+t/script.t
+t/test.xml
+t/testutf8.xml
+META.yml                                 Module meta-data (added by MakeMaker)

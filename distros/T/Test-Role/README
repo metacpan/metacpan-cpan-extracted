@@ -1,0 +1,50 @@
+NAME
+    Test::Roles - test that a class or object performs a role
+
+SYNOPSIS
+     use Test::Roles;
+
+     use Foo;
+     does_ok(Foo, 'bar');
+
+     my $foo = Foo->new;
+     does_ok($foo, 'bar');
+
+DESCRIPTION
+    Test::Roles provides a test for classes and object that implement roles
+    using the Class::Roles module.
+
+    Test::Roles exports a single function does_ok. does_ok takes two
+    required arguments: a class or object and a role which that class or
+    object must perform. A third optional argument may be used to provide a
+    more specific name of what is being testing (for example 'Test
+    customer'). in the absence of this argument, 'the object' will be used
+    instead.
+
+    Test::Roles is implemented using Test::Builder, so it's tests integrate
+    seamlessly with other test modules such as Test::More and
+    Test::Exception.
+
+TODO
+    Update once Class::Roles (by chromatic) and Class::Role (another 'trait'
+    implementation by Luke Palmer) are merged in the near future.
+
+ACKNOWLEDGEMENTS
+    Michael Schwern for Test::Builder::isa_ok on which this is based.
+
+    chromatic for Class::Roles, this module's raison d'etre.
+
+SEE ALSO
+    Test::Builder
+
+    Class::Roles
+
+AUTHOR
+    James FitzGibbon <jfitz@CPAN.org>
+
+COPYRIGHT
+    Copyright (c) 2003, James FitzGibbon. All Rights Reserved.
+
+    This module is free software. You may use it under the same terms as
+    perl itself.
+

@@ -1,0 +1,184 @@
+=head1 NAME
+
+Test::Chimps::Howto
+
+=head1 SYNOPSIS
+
+This document briefly describes how to set up a Chimps server and a
+Chimps smoker to smoke a project.
+
+=head1 THE SERVER
+
+We will be setting up a smoke server for an imaginary company
+called Bananas 2.0, who make a trendy AJAX website for ordering
+bananas for primates online.  To install the Chimps server, install
+the Test::Chimps package from CPAN on the machine that will be
+hosting the server CGI (in this case gorilla.bananas2.com).
+
+    root@gorilla:~# cpan Test::Chimps
+
+This will install the various libraries that Chimps needs on the
+server-side.  Next, you are going to need to create the server
+CGI.  There is an example in the Test-Chimps distribution that
+looks a lot like this:
+
+    #!/usr/bin/env perl
+
+    use Test::Chimps::Server;
+
+    my $server = Test::Chimps::Server->new(
+      base_dir                  => '/home/chimps',
+      list_template             => 'list.tmpl',
+      variables_validation_spec => {
+        project   => 1,
+        revision  => 1,
+        committer => 1,
+        duration  => 1,
+        osname    => 1,
+        osvers    => 1,
+        archname  => 1
+      }
+    );
+
+    $server->handle_request;
+
+This file should be put somewhere where the webserver can execute
+CGIs.  In this case, it will be dropped in C</usr/lib/cgi-bin> and
+called C<chimps-server.pl>.
+
+The call to the C<Test::Chimps::Server> constructor passes three
+arguments.  The C<base_dir> argument specifies that C</home/chimps>
+will be where the Chimps server will store its database, rate
+limiting file, and templates.  The C<list_template> argument says
+that the file C<list.tmpl> will be used as the template for the
+front page (where smoke reports are listed).  This file can be
+found in the examples subdirectory of the Test-Chimps distribution
+(and it's too large to reproduce here).  You should drop
+C<list.tmpl> into C</home/chimps/templates>.  Finally,
+C<variables_validation_spec> tells the Chimps server which report
+variables the server will require.  See L<Test::Chimps/"REPORT
+VARIABLES"> for more information about report variables.  There are
+also many more options that can be passed to the
+C<Test::Chimps::Server> constructor for specifying where things
+should be stored and how to serve smoke reports.
+
+You should now be able to hit
+C<http://gorilla.banana2.com/cgi-bin/chimps-server.pl> and see an
+empty listing of smoke reports.  We'll fix the problem of it being
+empty in the next section.
+
+=head1 THE SMOKER
+
+One common way of running a smoke server is for one box to run both
+the server CGI and the smoker process.  We are going to adopt this
+model because I don't want to have to come up with another
+monkey-related hostname, but the smoker could just as easily run on
+another box.
+
+Install the Chimps client utilities by installing
+Test::Chimps::Client from CPAN:
+
+    root@gorilla:~# cpan Test::Chimps::Client
+
+The distribution comes with program called C<chimps-smoker.pl> in
+the C<bin> subdirectory.  You are going to want to copy this to
+C</home/chimps/bin>.
+
+Before you can usefully run it, you are going to need to create
+configuration file.  This smoker will smoke the
+C<Test::Dependencies> module.  Put the following in
+C</home/chimps/smoker-config.yml>:
+
+    ---
+    Test-Dependencies:
+      configure_cmd: perl Makefile.PL --defaultdeps && make
+      revision: 5751
+      root_dir: .
+      svn_uri: svn://svn.bestpractical.com/svn/bps-public/Test-Dependencies/trunk
+
+Most of the options are pretty straightforward (you can read about
+the rest in L<Test::Chimps::Smoker/"CONFIGURATION FILE">), but
+C<revision> probably needs a word of warning.  When setting up your
+first project, you should set the C<revision> number to some
+relatively recent revision of your repository.  If you set it to 0,
+chimps will try to smoke every revision of your project.  You
+probably do B<not> want this!
+
+Now, just start up the smoker.  You might want to run it in a
+screen session so that it doesn't die when your terminal exits.
+You also probably want to redirect its output to a file so that you
+can look at what went wrong if your projects fail tests.
+
+    chimps@gorilla:~$ bin/chimps-smoker.pl -s http://gorilla.banana2.com/cgi-bin/chimps-server.pl &> log
+
+That's it!  You now have a smoker that will continually check out
+new revisions of C<Test::Dependencies>, run the test suite, and
+upload the results to the Chimps server for display on your
+website.  You can add more projects as necessary to the
+configuration file.
+
+=head1 OTHER CONFIGURATIONS
+
+You do not have to run a smoker.  If you'd rather have smoke tests
+part of your build process (and maybe allow anyone building your
+module to submit smoke reports), or do something else more
+complicated, you can use C<Test::Chimps::Client>, which takes care
+of uploading data to the server.  Take a look at
+C<chimps-client.pl> in the examples subdirectory of the
+Test-Chimps-Client distribution.
+
+=head1 AUTHOR
+
+Zev Benjamin, C<< <zev at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-test-chimps at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Chimps>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Test::Chimps
+
+You can also look for information at:
+
+=over 4
+
+=item * Mailing list
+
+Chimps has a mailman mailing list at
+L<chimps@bestpractical.com>.  You can subscribe via the web
+interface at
+L<http://lists.bestpractical.com/cgi-bin/mailman/listinfo/chimps>.
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Test-Chimps>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Test-Chimps>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Chimps>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Test-Chimps>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Best Practical Solutions.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

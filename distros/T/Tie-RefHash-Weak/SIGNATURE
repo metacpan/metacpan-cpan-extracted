@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cca661de3f7fb9b941393af161431adbff5034d4 Changes
+SHA1 08bb8f7c311a8361b0d1defe78b146f4e78bb3df MANIFEST
+SHA1 ddb918d4e02cc06f4b9fe77adeca65403f8fdd56 MANIFEST.SKIP
+SHA1 126321f7e957f409ff08ee7c3d9c61ebe7542fff META.yml
+SHA1 671cb0205c15d3d680eb7bdc577731c886080282 Makefile.PL
+SHA1 e5e7fbf8ee6bd82b6a57f51901c9e836d40bfcd8 TODO
+SHA1 bdc9edd09d0426c0af2abfecb75eca1b8bde211a lib/Tie/RefHash/Weak.pm
+SHA1 264cbe5dd6df60229b9da06a7d389deb2876d417 t/01basic.t
+SHA1 58b89b0f01b67805ee99d923008b618a8b6ce4a3 t/02gc.t
+SHA1 e26274f99f7fca5a1ae27e76944c37fc3d58bca5 t/fieldhash.t
+SHA1 be0dab62022a0174c9ac4a6e2b467fbf211ee64a t/overload.t
+SHA1 e291095ccf408d33daa7fb7c94aaf3b7fd2fec65 t/thread_clone.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFI+WLoVCwRwOvSdBgRAsqiAKC90eoP4heA5rITQ8LWKVgNY7r+mQCfWqOY
+D2jSXv+uf4s7Y40hhVea6u8=
+=3bZi
+-----END PGP SIGNATURE-----

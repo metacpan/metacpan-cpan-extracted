@@ -1,0 +1,9 @@
+0.003 2015-09-01
+    - Allow $user to be unblessed.  An ->id accessor is no longer required,
+      if it stringifies to the id.
+
+0.002 2014-09-30
+    - Added variant support.
+
+0.001 2014-08-04
+    - Initial release.

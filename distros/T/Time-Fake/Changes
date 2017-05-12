@@ -1,0 +1,8 @@
+Revision history for Perl extension Time::Fake:
+
+0.11	Thu Jan 17, 2008
+	- bugfix for {local,gm}time with argument (thanks Ash Berlin)
+
+0.10	Fri Jan 04, 2008
+	- Initial release.
+	- see http://perlmonks.org/?node_id=660449 for inspiration

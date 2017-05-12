@@ -1,0 +1,437 @@
+NAME
+    Tk::AbstractCanvas - Canvas with Abstract center, zoom, && rotate
+    methods
+
+VERSION
+    This documentation refers to version 1.4.A7QFZHF of Tk::AbstractCanvas,
+    which was released on Mon Jul 26 15:35:17:15 2010.
+
+SYNOPSIS
+      #!/usr/bin/perl -w
+      use strict;
+      use Tk;
+      use Tk::AbstractCanvas;
+      my $mwin = Tk::MainWindow->new();
+      my $acnv = $mwin->AbstractCanvas()->pack('-expand' => 1,
+        '-fill'  =>  'both');
+      #$acnv->invertY(   1); # uncomment for inverted y-axis
+      $acnv->controlNav(1); # advanced CtrlKey+MouseDrag Navigation
+      $acnv->rectToPoly(1);
+      #$acnv->ovalToPoly(1); # uncomment for oval to rot w/ canvas
+      my $rect   = $acnv->createRectangle( 7,  8, 24, 23,
+        '-fill'  =>   'red');
+      my $oval   = $acnv->createOval(     23, 24, 32, 27,
+        '-fill'  => 'green');
+      my $line   = $acnv->createLine(      0,  1, 31, 32,
+        '-fill'  =>  'blue',
+        '-arrow' =>  'last');
+      my $labl   = $mwin->Label('-text' => 'Hello AbstractCanvas! =)');
+      my $wind   = $acnv->createWindow(15, 16, '-window' => $labl);
+      $acnv->CanvasBind('<Button-1>' => sub { $acnv->zoom(1.04); });
+      $acnv->CanvasBind('<Button-2>' => sub {
+        $acnv->rotate($rect,  5);
+        $acnv->rotate($wind,  5); # this rot should do nothing because
+        $acnv->rotate($oval, -5); #      can't rotate about own center
+        $acnv->rotate($line, -5);
+      });
+      $acnv->CanvasBind('<Button-3>' => sub { $acnv->zoom(0.97); });
+      $acnv->viewAll();
+      MainLoop();
+
+DESCRIPTION
+    AbstractCanvas provides an alternative to a Tk::Canvas object which
+    partially abstracts the coordinates of objects drawn onto itself. This
+    allows the entire Canvas to be zoomed or rotated. Rotations modify the
+    coordinates that the original object was placed at but zooming the whole
+    canvas does not.
+
+    Tk::AbstractCanvas is derived from the excellent modules Tk::WorldCanvas
+    by Joseph Skrovan <Joseph@Skrovan.Com> (which was itself based on a
+    version by Rudy Albachten <Rudy@Albachten.Com>) && Tk::RotCanvas by Ala
+    Qumsieh <AQumsieh@CPAN.Org>.
+
+2DU
+    - add Math::Geometry::Planar && others to polygonize, find_CM, test
+    intersections, etc.
+    - abstract rotations fully away like zoom
+    - What else does AbstractCanvas need?
+
+USAGE
+DESCRIPTION
+    This module is a wrapper around the Canvas widget that maps the user's
+    coordinate system to the now mostly hidden coordinate system of the
+    Canvas widget. There is an option to make the abstract coordinates
+    y-axis increase in the upward direction rather than the default
+    downward.
+
+    *AbstractCanvas* is meant to be a useful alternative to a regular
+    Canvas. Typically, you should call $acnv->viewAll() (or
+    $acnv->viewArea(@box)) before calling MainLoop().
+
+    Most of the *AbstractCanvas* methods are the same as regular *Canvas*
+    methods except that they accept && return abstract coordinates instead
+    of widget coordinates.
+
+    *AbstractCanvas* also adds a new rotate() method to allow rotation of
+    canvas objects by arbitrary angles.
+
+NEW METHODS
+    *$acnv*->zoom(*zoom factor*)
+      Zooms the display by the specified amount. Example:
+
+        $acnv->CanvasBind('<i>' => sub {$acnv->zoom(1.25)});
+        $acnv->CanvasBind('<o>' => sub {$acnv->zoom(0.8 )});
+
+        # If you are using the 'Scrolled' constructor as in:
+        my $acnv = $mwin->Scrolled('AbstractCanvas', -scrollbars => 'nw',); # ...
+        #   you want to bind the key-presses to the 'AbstractCanvas' Subwidget of Scrolled.
+        my $scrolled_canvas = $acnv->Subwidget('abstractcanvas'); # note the lowercase
+        $scrolled_canvas->CanvasBind('<i>' => sub {$scrolled_canvas->zoom(1.25)});
+        $scrolled_canvas->CanvasBind('<o>' => sub {$scrolled_canvas->zoom(0.8 )});
+
+        # If you don't like the scrollbars taking the focus when you
+        #   <ctrl>-tab through the windows, you can:
+        $acnv->Subwidget('xscrollbar')->configure(-takefocus => 0);
+        $acnv->Subwidget('yscrollbar')->configure(-takefocus => 0);
+
+    *$acnv*->center(*x, y*)
+      Centers the display around abstract coordinates x, y. Example:
+
+        $acnv->CanvasBind('<2>' => sub {
+          $acnv->CanvasFocus();
+          $acnv->center($acnv->eventLocation());
+        });
+
+    *$acnv*->centerTags([-exact => {0 | 1}], *TagOrID, [TagOrID, ...]*)
+      Centers the display around the center of the bounding box containing
+      the specified TagOrIDs without changing the current magnification of
+      the display.
+
+      '-exact => 1' will cause the canvas to be scaled twice to get an
+      accurate bounding box. This will be an expensive computation if the
+      canvas contains a large number of objects.
+
+    *$acnv*->eventLocation()
+      Returns the abstract coordinates (x, y) of the last Xevent.
+
+    *$acnv*->panAbstract(*dx, dy*)
+      Pans the display by the specified abstract distances. panAbstract is
+      not meant to replace the xview/yview panning methods. Most user
+      interfaces will want the arrow keys tied to the xview/yview panning
+      methods (the default bindings), which pan in widget coordinates.
+
+      If you do want to change the arrow key-bindings to pan in abstract
+      coordinates using panAbstract you must disable the default arrow
+      key-bindings. Example:
+
+        $mwin->bind('AbstractCanvas',    '<Up>' => '');
+        $mwin->bind('AbstractCanvas',  '<Down>' => '');
+        $mwin->bind('AbstractCanvas',  '<Left>' => '');
+        $mwin->bind('AbstractCanvas', '<Right>' => '');
+
+        $acnv->CanvasBind(   '<Up>' => sub {$acnv->panAbstract(0,  100)});
+        $acnv->CanvasBind( '<Down>' => sub {$acnv->panAbstract(0, -100)});
+        $acnv->CanvasBind( '<Left>' => sub {$acnv->panAbstract(-100, 0)});
+        $acnv->CanvasBind('<Right>' => sub {$acnv->panAbstract( 100, 0)});
+
+      This is not usually desired, as the percentage of the display that is
+      shifted will be dependent on the current display magnification.
+
+    *$acnv*->invertY([new_value])
+      Returns the state of whether the y-axis of the abstract coordinate
+      system is inverted. The default of this value is 0. An optional
+      parameter can be supplied to set the value.
+
+    *$acnv*->rectToPoly([new_value])
+      Returns the state of whether created rectangles should be
+      auto-converted into polygons (so that they can be rotated about their
+      center by the rotate() method). The default of this value is 0. An
+      optional parameter can be supplied to set the value.
+
+    *$acnv*->ovalToPoly([new_value])
+      Returns the state of whether created ovals should be auto-converted
+      into polygons (so that they can be rotated about their center by the
+      rotate() method). The default of this value is 0. An optional
+      parameter can be supplied to set the value.
+
+    *$acnv*->controlNav([new_value])
+      Returns the state of whether special Control+MouseButton drag
+      navigation bindings are set. When true, Control-Button-1 mouse
+      dragging rotates the whole AbstractCanvas, 2 pans, && 3 zooms. The
+      default of this value is 0 but this option is very useful if you don't
+      need Control-Button bindings for some other purpose. An optional
+      parameter can be supplied to set the value.
+
+    *$acnv*->controlNavBusy([new_value])
+      Returns the state of whether special Control+MouseButton actions are
+      busy handling events. An optional parameter can be supplied to set the
+      value.
+
+    *$acnv*->controlZoomScale([new_value])
+      Returns the value of the special controlNav zoom scale (activated by
+      Control-Button-3 dragging). The default value is -0.001. The zoom
+      function takes the distance dragged in pixels across the positive x &&
+      y axes scaled by the zoom factor to determine the zoom result. If you
+      make the scale positive, it will invert the directions which zoom in
+      && out. If you make the number larger (e.g., -0.003 or 0.003), zooming
+      will become more twitchy. If you make the number smaller (e.g.,
+      -0.0007 or 0.0007), zooming will happen more smoothly. An optional
+      parameter can be supplied to set the value.
+
+    *$acnv*->controlRotScale([new_value])
+      Returns the value of the special controlNav rotation scale (activated
+      by Control-Button-1 dragging). The default value is -0.3. The rotation
+      function takes the distance dragged in pixels across the positive x &&
+      y axes scaled by the rotation factor to determine the rotation result.
+      If you make the scale positive, it will invert the directions which
+      rotate positive or negative degrees. If you make the number larger
+      (e.g., -0.7 or 0.7), rotations will become more twitchy. If you make
+      the number smaller (e.g., -0.07 or 0.07), rotations will happen more
+      smoothly. An optional parameter can be supplied to set the value.
+
+    *$acnv*->controlRotMoCB([\&new_callback])
+      Returns the value of the special controlNav rotation motion callback.
+      This will let a user tidy up whatever coordinates are necessary to
+      keep sub-groups of widgets in certain orientations together while the
+      whole canvas is rotated. An optional parameter can be supplied to set
+      the value.
+
+    *$acnv*->controlRotRlCB([\&new_callback])
+      Returns the value of the special controlNav rotation release callback.
+      This will let a user tidy up whatever coordinates are necessary to
+      keep sub-groups of widgets in certain orientations together after the
+      whole canvas is done being rotated. An optional parameter can be
+      supplied to set the value.
+
+    *$acnv*->controlScale([new_value])
+      Returns the scale value of the AbstractCanvas relative to the
+      underlying canvas. An optional parameter can be supplied to set the
+      value although the zoom function should almost always be employed
+      instead of manipulating the scale directly through this accessor.
+
+    *$acnv*->eventX([new_value])
+      Returns the x-coordinate of where the last special Control+MouseButton
+      event occurred. An optional parameter can be supplied to set the
+      value.
+
+    *$acnv*->eventY([new_value])
+      Returns the y-coordinate of where the last special Control+MouseButton
+      event occurred. An optional parameter can be supplied to set the
+      value.
+
+    *$acnv*->rotate(*TagOrID, angle* ?,*x, y*?)
+      This method rotates the object identified by TagOrID by *angle*. The
+      angle is specified in *degrees*. If an *x, y* coordinate is specified,
+      then the object is rotated about that point. Otherwise, the object is
+      rotated about its center point, if that can be determined.
+
+    *$acnv*->pixelSize()
+      Returns the width (in abstract coordinates) of a pixel (at the current
+      magnification).
+
+    *$acnv*->rubberBand(*{0|1|2}*)
+      Creates a rubber banding box that allows the user to graphically
+      select a region. rubberBand is called with a step parameter '0', '1',
+      or '2'. '0' to start a new box, '1' to stretch the box, && '2' to
+      finish the box. When called with '2', the specified box is returned
+      (x1, y1, x2, y2)
+
+      The band color is set with the *AbstractCanvas* option '-bandColor'.
+      The default color is 'red'. Example specifying a region to delete:
+
+        $acnv->configure(-bandColor => 'purple');
+        $acnv->CanvasBind('<3>'               => sub {$acnv->CanvasFocus;
+                                                      $acnv->rubberBand(0)});
+        $acnv->CanvasBind('<B3-Motion>'       => sub {$acnv->rubberBand(1)});
+        $acnv->CanvasBind('<ButtonRelease-3>' => sub {
+                                            my @box = $acnv->rubberBand(2);
+                                            my @ids = $acnv->find('enclosed', @box);
+                                   for my $id (@ids) {$acnv->delete($id)} });
+        # Note: '<B3-ButtonRelease>' will be called for any ButtonRelease!  Use '<ButtonRelease-3>' instead.
+
+        # If you want the rubber band to look smooth during panning && zooming, add
+        #   rubberBand(1) update calls to the appropriate key-bindings:
+        $acnv->CanvasBind(   '<Up>' => sub {                   $acnv->rubberBand(1)});
+        $acnv->CanvasBind( '<Down>' => sub {                   $acnv->rubberBand(1)});
+        $acnv->CanvasBind( '<Left>' => sub {                   $acnv->rubberBand(1)});
+        $acnv->CanvasBind('<Right>' => sub {                   $acnv->rubberBand(1)});
+        $acnv->CanvasBind(    '<i>' => sub {$acnv->zoom(1.25); $acnv->rubberBand(1)});
+        $acnv->CanvasBind(    '<o>' => sub {$acnv->zoom(0.8 ); $acnv->rubberBand(1)});
+
+      This box avoids the overhead of bounding box calculations that can
+      occur if you create your own rubberBand outside of *AbstractCanvas*.
+
+    *$acnv*->viewAll([-border => number])
+      Displays at maximum possible zoom all objects centered in the
+      *AbstractCanvas*. The switch '-border' specifies, as a percentage of
+      the screen, the minimum amount of white space to be left on the edges
+      of the display. Default '-border' is 0.02.
+
+    *$acnv*->viewArea(x1, y1, x2, y2, [-border => number]))
+      Displays at maximum possible zoom the specified region centered in the
+      *AbstractCanvas*.
+
+    *$acnv*->viewFit([-border => number], *TagOrID*, [*TagOrID*, ...])
+      Adjusts the AbstractCanvas to display all of the specified tags. The
+      '-border' switch specifies (as a percentage) how much extra
+      surrounding space should be shown.
+
+    *$acnv*->getView()
+      Returns the rectangle of the current view (x1, y1, x2, y2)
+
+    *$acnv*->widgetx(*x*)
+    *$acnv*->widgety(*y*)
+    *$acnv*->widgetxy(*x, y*)
+      Convert abstract coordinates to widget coordinates.
+
+    *$acnv*->abstractx(*x*)
+    *$acnv*->abstracty(*y*)
+    *$acnv*->abstractxy(*x, y*)
+      Convert widget coordinates to abstract coordinates.
+
+CHANGED METHODS
+    Abstract coordinates are supplied && returned to AbstractCanvas methods
+    instead of widget coordinates unless otherwise specified. (i.e., These
+    methods take && return abstract coordinates: center, panAbstract,
+    viewArea, find, coords, scale, move, bbox, rubberBand, eventLocation,
+    pixelSize, && create*)
+
+    *$acnv*->bbox([-exact => {0 | 1}], *TagOrID*, [*TagOrID*, ...])
+      '-exact => 1' is only needed if the TagOrID is not 'all'. It will
+      cause the canvas to be scaled twice to get an accurate bounding box.
+      This will be expensive computationally if the canvas contains a large
+      number of objects.
+
+      Neither setting of exact will produce exact results because the
+      underlying canvas bbox method returns a slightly larger box to insure
+      that everything is contained. It appears that a number close to '2' is
+      added or subtracted. The '-exact => 1' zooms in to reduce this error.
+
+      If the underlying canvas bbox method returns a bounding box that is
+      small (high error percentage) then '-exact => 1' is done
+      automatically.
+
+    *$acnv*->scale(*'all', xOrigin, yOrigin, xScale, yScale*)
+      Scale should not be used to 'zoom' the display in && out as it will
+      change the abstract coordinates of the scaled objects. Methods zoom,
+      viewArea, && viewAll should be used to change the scale of the display
+      without affecting the dimensions of the objects.
+
+VIEW AREA CHANGE CALLBACK
+    *Tk::AbstractCanvas* option '-changeView' can be used to specify a
+    callback for a change of the view area. This is useful for updating a
+    second AbstractCanvas which is displaying the view region of the first
+    AbstractCanvas.
+
+    The callback subroutine will be passed the coordinates of the displayed
+    box (x1, y1, x2, y2). These arguments are added after any extra
+    arguments specifed by the user calling 'configure'. Example:
+
+      $acnv->configure(-changeView => [\&changeView, $acn2]);
+      # viewAll if 2nd AbstractCanvas widget is resized.
+      $acn2->CanvasBind('<Configure>' => sub {$acn2->viewAll});
+      {
+        my $viewBox;
+        sub changeView {
+          my($canvas2, @coords) = @_;
+          $canvas2->delete($viewBox) if $viewBox;
+          $viewBox = $canvas2->createRectangle(@coords, -outline => 'orange');
+        }
+      }
+
+SCROLL REGION NOTES
+    (1) The underlying *Tk::Canvas* has a '-confine' option which is set to
+    '1' by default there. With '-confine => 1' the canvas will not allow the
+    display to go outside of the scroll region. This causes some methods not
+    to work accurately, for example, the 'center' method will not be able to
+    center on coordinates near to the edge of the scroll region && 'zoom
+    out' near the edge will zoom out && pan towards the center.
+
+    *Tk::AbstractCanvas* sets '-confine => 0' by default to avoid these
+    problems. You can change it back with:
+
+      $acnv->configure(-confine => 1);
+
+    (2) '-scrollregion' is maintained by *AbstractCanvas* to include all
+    objects on the canvas. '-scrollregion' will be adjusted automatically as
+    objects are added, deleted, scaled, moved, etc.. (You can create a
+    static scrollregion by adding a border rectangle to the canvas.)
+
+    (3) The bounding box of all objects is required to set the scroll
+    region. Calculating this bounding box is expensive if the canvas has a
+    large number of objects. So for performance reasons these operations
+    will not immediately change the bounding box if they potentially shrink
+    it:
+
+      coords
+      delete
+      move
+      scale
+
+    Instead they will mark the bounding box as invalid, && it will be
+    updated at the next zoom or pan operation. The only downside to this is
+    that the scrollbars will be incorrect until the update.
+
+    If these operations increase the size of the box, changing the box is
+    trivial && the update is immediate.
+
+ROTATION LIMITATIONS
+    As it stands, the module can only rotate the following object types
+    about their centers:
+
+    * Lines
+    * Polygons
+    * Rectangles (if rectToPoly(1) is called)
+    * Ovals (if ovalToPoly(1) is called)
+
+    All other object types (bitmap, image, arc, text, && window) can only be
+    rotated about another point. A warning is issued if the user tries to
+    rotate one of these object types about their center. Hopefully, more
+    types will be able to center-rotate in the future.
+
+ROTATION DETAILS
+    To be able to rotate rectangles && ovals, this module is capable of
+    intercepting any calls to create(), createRectangle(), && createOval()
+    to change them to polygons. The user should not be alarmed if type()
+    returns *polygon* when a *rectangle* or *oval* was created.
+    Additionally, if you call coords() on a polygonized object, expect to
+    have to manipulate all the additionally generated coordinates.
+
+CHANGES
+    Revision history for Perl extension Tk::AbstractCanvas:
+
+    - 1.4.A7QFZHF Mon Jul 26 15:35:17:15 2010
+      * updated license to GPLv3
+
+    - 1.2.75L75Nr Mon May 21 07:05:23:53 2007
+      * added ex/* examples && tidied everything up
+
+      * added Ctrl rot callbacks (mocb, rlcb) && limited Motion && Release
+      to just Ctrl + one MouseButton events
+
+    - 1.0.56BHMOt Sat Jun 11 17:22:24:55 2005
+      * original version
+
+INSTALL
+    Please run:
+
+      `perl -MCPAN -e "install Tk::AbstractCanvas"`
+
+    or uncompress the package && run the standard:
+
+      `perl Makefile.PL; make; make test; make install`
+
+LICENSE
+    Most source code should be Free! Code I have lawful authority over is &&
+    shall be! Copyright: (c) 2005-2010, Pip Stuart. Copyleft : This software
+    is licensed under the GNU General Public License (version 3). Please
+    consult the Free Software Foundation (HTTP://FSF.Org) for important
+    information about your freedom.
+
+AUTHORS
+    Pip Stuart (*Pip@CPAN.Org*)
+
+    AbstractCanvas is derived from code by: Joseph Skrovan
+    (*Joseph@Skrovan.Com*) Rudy Albachten (*Rudy@Albachten.Com*) Ala Qumsieh
+    (*AQumsieh@CPAN.Org*)
+

@@ -1,0 +1,51 @@
+This tests Multiele operations:
+[% USE NDS_Multi -%]
+
+Eles                                   :
+[%- FOREACH ele = NDS_Multi.eles(obj) -%]
+ [% ele -%]
+[% END %]
+
+Ele (one)                              : [% NDS_Multi.ele(obj,'one') %]
+Ele (zero)                             : [% NDS_Multi.ele(obj,'zero') %]
+
+Value  (three,/a)                      : [% NDS_Multi.value(obj,'three','/a') %]
+Value  (three,/l)                      : [% NDS_Multi.value(obj,'three','/l') %]
+Value  (three,/z1)                     : [% NDS_Multi.value(obj,'three','/z1') %]
+
+Values (three,/a)                      :[% FOREACH val = NDS_Multi.values(obj,'three','/a') -%]
+ [% val -%]
+[% END %]
+Values (three,/l)                      :[% FOREACH val = NDS_Multi.values(obj,'three','/l') -%]
+ [% val -%]
+[% END %]
+Values (three,/z1)                     :[% FOREACH val = NDS_Multi.values(obj,'three','/z1') -%]
+ [% val -%]
+[% END %]
+Values (five,/l)                       :[% FOREACH val = NDS_Multi.values(obj,'five','/l') -%]
+ [% val -%]
+[% END %]
+Values (four,/d)                       :[% FOREACH val = NDS_Multi.values(obj,'four','/d') -%]
+ [% val -%]
+[% END %]
+
+Keys (four,/d)                         :[% FOREACH val = NDS_Multi.keys(obj,'four','/d') -%]
+ [% val -%]
+[% END %]
+Keys (four,/l)                         :[% FOREACH val = NDS_Multi.keys(obj,'four','/l') -%]
+ [% val -%]
+[% END %]
+Keys (six,/l)                          :[% FOREACH val = NDS_Multi.keys(obj,'six','/l') -%]
+ [% val -%]
+[% END %]
+Keys (four,/z1)                        :[% FOREACH val = NDS_Multi.keys(obj,'four','/z1') -%]
+ [% val -%]
+[% END %]
+
+Which (/b bb)                          :[% FOREACH ele = NDS_Multi.which(obj,'/b','bb') -%]
+ [% ele -%]
+[% END %]
+Which (/c cc)                          :[% FOREACH ele = NDS_Multi.which(obj,'/c','cc') -%]
+ [% ele -%]
+[% END %]
+

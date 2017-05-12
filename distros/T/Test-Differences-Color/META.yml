@@ -1,0 +1,29 @@
+---
+abstract: 'colorize the result of Test::Differences'
+author:
+  - 'Alec Chen <alec@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Differences-Color
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Exporter: 5.63
+  Sub::Override: 0.08
+  Term::ANSIColor: 2.01
+  Test::Differences: 0.4801
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

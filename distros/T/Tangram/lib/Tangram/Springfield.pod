@@ -1,0 +1,25 @@
+=head1 NAME
+
+Tangram::Springfield - classes and schema used in the Guided Tour
+
+=head1 SYNOPSIS
+
+   use Tangram;
+   use Tangram::Springfield;
+
+   # deploy the storage
+   # store & retrieve objects
+
+=head1 DESCRIPTION
+
+This modules contains the declarations of the classes used in the
+Guided Tour. It also creates Schema object for that class system,
+and stores it in the $schema variable. That variable is exported to
+the C<main> package by default.
+
+The UML diagram for the classes can be found in L<Tangram>.
+
+=head1 SEE ALSO
+
+L<Tangram>, L<Tangram::Schema>, L<Tangram::Relational>,
+L<Tangram::Storage>, L<Tangram::Deploy>.

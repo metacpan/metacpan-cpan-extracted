@@ -1,0 +1,34 @@
+LineGraphDataset  version 0.01
+==============================
+
+    Tk::LineGraphDataset - Store data and meta date for graphing by TK::LineGraph
+
+    WARNING: This is a beta version.  Tested on RedHat 7 Linux and Windows/XP.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk, Tk::LineGraph
+
+TODO
+
+    Lots of things!
+
+COPYRIGHT AND LICENCE
+
+  (c) 2006 Tom Clifford. All rights reserved.
+
+  This library is distributed under the terms of the GPL
+
+
+Send bug reports, comments and suggestions to Still_Aimless@yahoo.com
+

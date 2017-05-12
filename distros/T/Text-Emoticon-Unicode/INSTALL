@@ -1,0 +1,16 @@
+Text::Emoticon::Unicode Installation
+
+# install via cpanminus
+cpanm Text::Emoticon::Unicode
+
+# install via CPAN shell
+cpan Text::Emoticon::Unicode
+
+# install via ActivePerl
+ppm install Text::Emoticon::Unicode
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

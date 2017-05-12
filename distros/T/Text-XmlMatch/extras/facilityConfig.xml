@@ -1,0 +1,77 @@
+<config>
+  <pattern name="COID-$1">
+    <inclusion>^(\d{5})\w{0,2}-\w+-\d+-\w-\w\.\w{3}\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-DisasterDC">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(sun)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Columbus">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(cdc)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-FortWorth">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(fdc)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Louisville">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(ldc)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Nashville">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(ndc)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Orlando">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(odc)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Phoenix">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(pdc)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-SanAntonio">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(sdc)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Allen-TX-CoLocation">
+    <inclusion>^atclo-\w{4}-\d+-\w-\w\.(clo)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Orlando-FL-CoLocation">
+    <inclusion>^ofclo-\w{4}-\d+-\w-\w\.(clo)\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="CPCS-$1">
+    <inclusion>^cpcs(\w{3})-\w+-\d+-\w-\w\.\w{3}\./</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="MSO-$1">
+    <inclusion>^msod(\d{2,3})-\w+-\d+-\w-\w\.mso\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="AAS-$1">
+    <inclusion>^aasd(\d{3})-\w+-\d+-\w-\w\.aas\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Nashville">
+    <inclusion>^corp-</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+</config>

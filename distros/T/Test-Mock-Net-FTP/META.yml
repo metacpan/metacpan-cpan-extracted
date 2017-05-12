@@ -1,0 +1,46 @@
+---
+abstract: 'Mock Object for Net::FTP'
+author:
+  - 'Takuya Tsuchida <tsucchi at cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.94'
+  parent: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mock-Net-FTP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Mock::Net::FTP:
+    file: lib/Test/Mock/Net/FTP.pm
+    version: '0.03'
+requires:
+  File::Path: '2.07'
+  File::Slurp: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tsucchi/Test-Mock-Net-FTP/issues
+  homepage: https://github.com/tsucchi/Test-Mock-Net-FTP
+  repository: git://github.com/tsucchi/Test-Mock-Net-FTP.git
+version: '0.03'
+x_contributors:
+  - 'tsucchi <takuya.tsuchida at gmail.com>'
+  - 'Diab Jerius <djerius@cfa.harvard.edu>'
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

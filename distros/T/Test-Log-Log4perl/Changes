@@ -1,0 +1,12 @@
+Revision history for Perl extension Test::Log::Log4perl
+
+0.32 Sat Feb 16 17:39:25 CST 2013
+        - fix 79662: missing interceptors for $log->trace(...)
+        - fix 79664: allow logging of multiple scalars, e.g.,
+          $log->error("hello", " world")
+
+0.30 Sat Dec 25 21:08:08 CST 2010
+        - fix tests for perl 5.13.5+
+
+0.29 Sat Oct  9 17:42:36 CST 2010
+        - original version, forked from Test::Log4perl

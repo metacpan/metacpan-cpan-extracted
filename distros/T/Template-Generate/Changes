@@ -1,0 +1,51 @@
+____________________________________________________________________________
+[  8169] By: autrijus                              on 2003/09/18  06:21:31
+        Log: * This be 0.04.
+             * Added support for nested [% FOREACH %].
+             * Refactored regex-emitting code into _set().
+             * Supports zero-width assertions, and eliminated the \0
+	       hack. 
+	   ! lib/Template/Generate.pm t/1-basic.t
+____________________________________________________________________________
+[  8137] By: autrijus                              on 2003/09/14  20:18:55
+        Log: * so we are 5.6.1 only for now.
+	   ! Makefile.PL lib/Template/Generate.pm
+____________________________________________________________________________
+[  8136] By: autrijus                              on 2003/09/14  20:15:14
+        Log: * This be 0.03.
+	   ! lib/Template/Generate.pm
+____________________________________________________________________________
+[  8135] By: autrijus                              on 2003/09/14  20:13:59
+        Log: * try to avoid eval-in-regex totally.
+	   ! lib/Template/Generate.pm
+____________________________________________________________________________
+[  8134] By: autrijus                              on 2003/09/14  20:01:32
+        Log: * coraline points out that length(undef) is emitting
+	       warnings
+	   ! lib/Template/Generate.pm
+____________________________________________________________________________
+[  7899] By: autrijus                              on 2003/09/05  15:58:45
+        Log: * oops. was not printing out the regex even if DEBUG is
+	       set.
+	   ! lib/Template/Generate.pm
+____________________________________________________________________________
+[  7850] By: autrijus                              on 2003/09/03  20:38:46
+        Log: * oops, should be 5 tests.
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  7849] By: autrijus                              on 2003/09/03  20:36:51
+        Log: * This be 0.02.
+             * primitive support for one-level [% FOREACH %] block;
+             see t/1-basic.t for details.
+	   ! lib/Template/Generate.pm t/1-basic.t
+____________________________________________________________________________
+[  7844] By: autrijus                              on 2003/09/02  19:04:03
+        Log: * Randal Schwartz points out a recursive
+	       L<Template::Generate>
+	   ! lib/Template/Generate.pm
+____________________________________________________________________________
+[  7841] By: autrijus                              on 2003/09/02  16:54:33
+        Log: * This be the 0.01, initial release.
+             * (without [% FOREACH %] or [% ... %]).
+	   + Makefile.PL README lib/Template/Generate.pm
+	   + t/0-signature.t t/1-basic.t

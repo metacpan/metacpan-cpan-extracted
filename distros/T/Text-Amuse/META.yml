@@ -1,0 +1,29 @@
+---
+abstract: 'Generate HTML and LaTeX documents from Emacs Muse markup.'
+author:
+  - 'Marco Pessotto <melmothx@gmail.com>'
+build_requires:
+  Data::Dumper: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Amuse
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Temp: '0'
+resources:
+  IRC: irc://chat.freenode.net/#amusewiki
+  WebIRC: https://webchat.freenode.net/?channels=#amusewiki
+  homepage: http://amusewiki.org
+  repository: https://github.com/melmothx/text-amuse
+version: '0.82'

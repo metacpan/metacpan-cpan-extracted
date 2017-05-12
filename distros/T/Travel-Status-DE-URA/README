@@ -1,0 +1,38 @@
+Travel::Status::DE::URA - interface to URA-based departure monitors
+-----------------------------------------------
+
+* <http://finalrewind.org/projects/Travel-Status-DE-URA/>
+
+
+Dependencies
+------------
+
+ * perl version 5.10.1 or newer
+ * Class::Accessor
+ * DateTime
+ * DateTime::Format::Duration
+ * List::MoreUtils
+ * LWP::UserAgent
+ * Text::CSV
+
+
+Installation
+------------
+
+From a release tarball:
+
+$ perl Build.PL
+$ ./Build
+$ sudo ./Build install
+
+From git:
+
+$ perl Build.PL
+$ ./Build
+$ ./Build manifest
+$ sudo ./Build install
+
+See also the Module::Build documentation.
+
+You can then run 'man Travel::Status::DE::URA'.
+This distribution also ships the script 'ura-m', see 'man ura-m'.

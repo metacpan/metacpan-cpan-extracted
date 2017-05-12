@@ -1,0 +1,104 @@
+Revision history for Tapper-CLI
+
+5.0.5     2017-02-14
+        - testplan-pause ... pause testrun by setting state to 'prepared'
+        - testplan-continue ... continue a paused testrun by setting state to 'schedule'
+
+5.0.4     2016-03-30
+        - testplan-new --dryrun to just print an evaluated macro precondition
+
+5.0.3     2016-03-30
+        - more explicit dependencies
+
+5.0.2     2016-03-03
+        - let EU:MM decide bin path
+
+5.0.1     2016-03-03
+        - ...but do not throw away the complete testplan frontend but
+          only the non-working parts in it
+
+5.0.0     2016-02-15
+        - drop obsolete Tapper::Testplan usage
+
+4.1.3     2012-11-26
+        - fix tests for changed testplan subcommand
+
+4.1.2     2012-11-22
+        - [RFK] 'tapper-testrun newtestplan' is now 'tapper testplan-new'
+        - dzil pluginbundle TAPPER
+
+4.1.1     2012-11-19
+        - new command: 'tapper init' to initialize a $HOME/.tapper
+
+4.1.0     2012-10-19
+        * PostgreSQL support
+        - [FIX] slow first() usage
+        - rename USER into OWNER
+
+        * Cobbler
+        - [FEAT] $cmd-new alias for $cmd-add
+        - [FEAT] cobbler CLI commands
+
+        * Towards a single frontend:
+        - [FEAT] more subcommands migrated from the soon-to-be-deprecated
+          "tapper-testrun" to the new central frontend "testrun" tool
+
+        * Features and Misc
+        - [FEAT] queues and host_id for host-list --yaml
+        - [FEAT] testplan handling for TaskJuggler
+        - [FEAT] renamequeue command
+        - [FEAT] testplan-send: allow --file with list of tasknames
+        - [FEAT] sanity check for host bind and deny
+        - [FEAT] host blacklisting per queue ("denied hosts")
+        - [FEAT] show comments only at high verbosity level
+        - [FIX] reworked all commands for overall consistency
+        - [FIX] Queue command went to Host, deleted Queue module
+        - [FIX] notification tests
+
+4.0.1     2012-05-16
+        - introduce new App::Rad based primary frontend tool "tapper"
+        - [FEAT] Render testplans using Tapper::Reports::DPath::TT
+        - [FEAT] new CLI commands for notification commands
+        - [FEAT] new CLI commands for handling users
+        - [FEAT] new CLI commands for zipfiles
+        - [FEAT] new CLI commands for testplans
+        - [FEAT] newtestplan: new option --guide/-g for self-doc
+        - [FEAT] newtestplan: new option --dryrun/-n for just output
+        - [FEAT] change grub entry of deleted hosts to a passive/useful entry
+        - [FEAT] update grub using action daemon
+        - [FEAT] delete host by setting deleted flag
+        - big Dist::Zilla roundhouse kick
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* rewritable shebang line
+	* [FIX] freehost adapted to MCP message receiver
+	* release version++ roundhouse kick
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* repository and bugtracker urls
+
+	* more overviewish README
+
+	* [FIX] more substitute /usr/bin/env perl
+
+	* handling of nonexisting requested hosts
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.2
+
+	* try to force YAML versions
+
+	* accept testplan instance name in CLI now
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

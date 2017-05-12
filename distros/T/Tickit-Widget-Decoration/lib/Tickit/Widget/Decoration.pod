@@ -1,0 +1,89 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::Widget::Decoration
+at lib/Tickit/Widget/Decoration.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Tickit::Widget::Decoration - do nothing, in a visually-appealing way
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+ use Tickit;
+ use Tickit::Widget::Decoration;
+ Tickit->new(root => Tickit::Widget::Decoration->new)->run;
+
+=head1 DESCRIPTION
+
+Renders a pattern.
+
+=begin HTML
+
+<p><img src="http://tickit.perlsite.co.uk/cpan-screenshot/tickit-widget-decoration1.png" alt="Decoration widget example" width="272" height="21"></p>
+
+=end HTML
+
+=head1 STYLE
+
+Future versions are likely to offer more customisation features,
+for now you get the following:
+
+=over 4
+
+=item * start_fg - foreground colour to use as the starting point
+
+=item * start_bg - background colour to use as the starting point
+
+=item * end_fg - foreground colour to use as the ending point
+
+=item * end_bg - background colour to use as the ending point
+
+=item * gradient_direction - horizontal or vertical, determines which way
+the gradient runs, default horizontal
+
+=back
+
+Only numeric values supported. Terms and conditions may apply.
+
+=head1 METHODS
+
+No user-serviceable parts inside.
+
+=head2 lines
+
+Number of lines. Defaults to 1.
+
+=head2 cols
+
+Number of cols. Defaults to 1.
+
+=head2 render_to_rb
+
+Render to the given renderbuffer.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<new|Tickit::Widget/new>, L<on_pen_changed|Tickit::Widget/on_pen_changed>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<reshape|Tickit::Widget/reshape>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_pen|Tickit::Widget/set_pen>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>, L<window_gained|Tickit::Widget/window_gained>, L<window_lost|Tickit::Widget/window_lost>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2013. Licensed under the same terms as Perl itself.

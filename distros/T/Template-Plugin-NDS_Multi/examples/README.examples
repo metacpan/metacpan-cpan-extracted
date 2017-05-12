@@ -1,0 +1,10 @@
+Please refer to the ../t directory for examples of how to use this
+module.
+
+Every test has a .in and a .exp file. For example, there may be
+files 01.in and 01.exp .
+
+The .in file is a file which has a mixture of text and template
+functions. The .exp file is the result of running the .in file
+through the Template::Toolkit modules.
+

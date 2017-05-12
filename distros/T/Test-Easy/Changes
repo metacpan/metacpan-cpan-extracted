@@ -1,0 +1,29 @@
+---
+version: 1.11
+date:    2015-07-08
+changes:
+- Add back Makefile.PL to MANIFEST, durr
+---
+version: 1.10
+date:    2015-07-08
+changes:
+- bug fix - wiretap objects now clean up when they exit scope
+---
+version: 1.09
+date:    2014-05-01
+changes:
+- bug fix - setting a proper TZ when handling hardcoded epochtimes in tests
+---
+version: 1.08
+date:    2014-04-30
+changes:
+- bug fix - fixed the failing nearly.t 
+- doc tweaks
+---
+version: 1.07
+date:    2013-09-18
+changes:
+- run_where() handles left-hand-side of statelets being a reference to your intended target
+- run_where() handles array references as first-order data types
+- doc updates to reflect above
+

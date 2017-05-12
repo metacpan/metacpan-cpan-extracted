@@ -1,0 +1,12 @@
+Revision history for Thread-CriticalSection
+
+0.02    Thu Jun 19 07:07:29 GMT 2008
+
+        Make pod tests author only. You need to set TEST_AUTHOR to run
+        them.
+
+0.01    Wed Jun 18 12:10:29 GMT 2008
+
+        First version, still some warnings, probably some bugs.
+        You know, real beta stuff.
+

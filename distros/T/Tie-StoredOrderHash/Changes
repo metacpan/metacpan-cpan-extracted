@@ -1,0 +1,7 @@
+Revision history for Perl extension Tie::StoredOrderHash.
+
+0.22  Mon Aug 16 13:22:25 2009
+	- Remove nasty autovivification bug in FETCH
+0.21  Mon Jul 20 23:02:25 2009
+	- Proper modularisation of Tie::StoredOrderHash
+

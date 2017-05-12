@@ -1,0 +1,22 @@
+Revision history for Perl extension Text.
+
+0.07  Mon Jun 03
+	- Fixed bug where nested for loops shared separators
+    - Fixed bug where nested for loops overwrite outer-loop variables
+    - Added toFile({},'file_name') method
+0.06  Fri May 17
+	- Removed an extra space erroneously inserted on callsub interpolations.
+0.05  Fri May 17
+	- Applied var-substitution to set, callsub commands.
+0.04  Fri May 17
+    - Added the "set" command: #set foo val....
+    - Added Array/Hash substitution values ##foo[id]##, ##foo{id}##
+    - Added parameters to invoked sub's; added ##ARG[id]##
+
+0.03  Wed May 15 16:58:00 2002
+	- Removed include-within-sub viability.
+	- Added inherited scoping (w/in for-loops)
+0.01  Sat May 11 13:25:57 2002
+	- original version; created by h2xs 1.21 with options
+		-n Text -X
+

@@ -1,0 +1,85 @@
+SYNOPSIS
+
+     use Tree::Dump; # exports td() and tdmp()
+     td($tree);
+
+    Sample output:
+
+     (Tree::Example::HashNode) {_parent=>undef,id=>1,level=>0}
+     |-- (Tree::Example::HashNode::Sub1) {id=>2,level=>1}
+     |   \-- (Tree::Example::HashNode::Sub2) {id=>5,level=>2}
+     |       |-- (Tree::Example::HashNode::Sub1) {id=>7,level=>3}
+     |       |   \-- (Tree::Example::HashNode::Sub2) {id=>15,level=>4}
+     |       |-- (Tree::Example::HashNode::Sub1) {id=>8,level=>3}
+     |       |-- (Tree::Example::HashNode::Sub1) {id=>9,level=>3}
+     |       \-- (Tree::Example::HashNode::Sub1) {id=>10,level=>3}
+     |-- (Tree::Example::HashNode::Sub1) {id=>3,level=>1}
+     |   \-- (Tree::Example::HashNode::Sub2) {id=>6,level=>2}
+     |       |-- (Tree::Example::HashNode::Sub1) {id=>11,level=>3}
+     |       |   \-- (Tree::Example::HashNode::Sub2) {id=>16,level=>4}
+     |       |-- (Tree::Example::HashNode::Sub1) {id=>12,level=>3}
+     |       |-- (Tree::Example::HashNode::Sub1) {id=>13,level=>3}
+     |       \-- (Tree::Example::HashNode::Sub1) {id=>14,level=>3}
+     \-- (Tree::Example::HashNode::Sub1) {id=>4,level=>1}
+
+    Sample output when rendering an array-backed tree:
+
+     (Tree::Example::ArrayNode) [undef,undef,undef,"<obj>","<obj>","<obj>"]
+     |-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>","<obj>"]
+     |   \-- (Tree::Example::ArrayNode::Sub2) [undef,undef,"<obj>","<obj>","<obj>","<obj>","<obj>"]
+     |       |-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>","<obj>"]
+     |       |   \-- (Tree::Example::ArrayNode::Sub2) [undef,undef,"<obj>"]
+     |       |-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>"]
+     |       |-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>"]
+     |       \-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>"]
+     |-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>","<obj>"]
+     |   \-- (Tree::Example::ArrayNode::Sub2) [undef,undef,"<obj>","<obj>","<obj>","<obj>","<obj>"]
+     |       |-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>","<obj>"]
+     |       |   \-- (Tree::Example::ArrayNode::Sub2) [undef,undef,"<obj>"]
+     |       |-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>"]
+     |       |-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>"]
+     |       \-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>"]
+     \-- (Tree::Example::ArrayNode::Sub1) [undef,undef,"<obj>"]
+
+DESCRIPTION
+
+    This module is useful for debugging. The interface is modeled after
+    Data::Dmp (which in turn is modeled after Data::Dump). Instead of dd,
+    this module exports td which you can use to dump a tree object to
+    STDOUT. There is also tdmp (like Data::Dmp's dmp) which return dumped
+    data in a string.
+
+    Any tree object can be printed as long as it supports parent and
+    children methods. See Role::TinyCommons::Tree::Node for more
+    information about the requirements.
+
+FUNCTIONS
+
+ td([ \%opts, ] $tree) => str
+
+    Dump tree to STDOUT and return it. See tdmp for list of known options.
+
+ tdmp([ \%opts, ] $tree) => str
+
+    Return dumped tree. If first argument is a plain hashref, it will be
+    regarded as options. Known options:
+
+      * get_children_method => str (default: children)
+
+      Example:
+
+       get_children_method => "get_children"
+
+      By default, children is the method that will be used on node objects
+      to retrieve children nodes. But you can customize that using this
+      option. Note that the method must return either a list or arrayref of
+      nodes.
+
+      * indent => int (default: 2)
+
+      Number of spaces for each indent level.
+
+SEE ALSO
+
+    Tree::To::TextLines
+

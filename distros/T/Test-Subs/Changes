@@ -1,0 +1,41 @@
+Revision history for Perl module Test::Subs
+
+0.08 2013-03-17
+
+ - Fix some typo in the documentation
+ - Add a warning when the test are run in debug mode
+
+0.07 2013-02-21
+
+ - Add a 'skip' functionnalities
+
+0.06 2013-02-06
+
+ - Check the presence of a ';' after the tests
+
+0.05 2013-01-26
+
+ - Documents the test_pod function.
+ - Add a 'path_to_lib' option for the 'test_pod' function.
+ - Add a 'pod_warn' option to control the verbosity of 'test_pod'.
+ - Fix a typo in 'debug' prototype.
+ - Fix a bug with the automatic comment of the 'fail' function.
+
+0.04 2013-01-15
+
+ - Add support for POD::Checker.
+ - Extend the functionnalities of the debug mode.
+
+0.03 2013-01-14
+
+ - Added a debug mode to the test scripts.
+
+0.02 2013-01-07
+
+ - Correction to the documentation w.r.t. Test::Builder.
+ - minor corrections to the code.
+ - Makefile.PL more CPAN Testers friendly.
+
+ 0.01 2012-12-31
+
+ - Initial release

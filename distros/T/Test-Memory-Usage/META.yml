@@ -1,0 +1,22 @@
+---
+abstract: "make sure code doesn't unexpectedly eat all your memory"
+author:
+  - 'Chisel <chisel@chizography.net>'
+build_requires:
+  Test::Most: 0
+  Test::UseAllModules: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Memory-Usage
+requires:
+  Memory::Usage: 0
+resources:
+  bugtracker: http://github.com/chiselwright/Test-Memory-Usage/issues
+  repository: git://github.com/chiselwright/test-memory-usage.git
+version: 0.0.5

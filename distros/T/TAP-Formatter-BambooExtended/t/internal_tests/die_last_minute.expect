@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-die_last_minute_test" errors="0" failures="0" tests="4" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/die_last_minute.test">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Explanation:
+    non-zero exit code (1)
+Test output:
+    not ok - t/internal_tests/die_last_minute.test
+]]>
+    </failure>
+  </testcase>
+  <testcase name="test 1"/>
+  <testcase name="test 2"/>
+  <testcase name="test 3"/>
+  <testcase name="test 4"/>
+</testsuite>

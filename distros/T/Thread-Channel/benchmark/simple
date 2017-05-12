@@ -1,0 +1,165 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use Benchmark qw(cmpthese);
+
+use threads;
+use Thread::Semaphore;
+
+
+######################################################################
+
+package model;
+
+use Thread::Semaphore;
+
+sub new {
+	my $class = shift @_;
+	my $self = {};
+	$self->{_start_sem} = Thread::Semaphore->new(0);
+	$self->{_end_sem} = Thread::Semaphore->new(0);
+	bless $self, $class;
+	return $self;
+}
+
+sub run_ipc() {
+	my $self = shift @_;
+	$self->{_start_sem}->up();
+	$self->{_end_sem}->down();
+	$self->{_src_thr}->join();
+	$self->{_dest_thr}->join();
+	return;
+}
+
+1;
+
+##############################
+
+package model::queue;
+
+use Thread::Queue;
+
+use base 'model';
+
+sub new {
+	my $class = shift @_;
+	my $self = $class->SUPER::new(@_);
+	bless $self, $class;
+
+	$self->{_send_count} = $_[0];
+
+	my $q = $self->{_q} = Thread::Queue->new;
+	$self->{_src_thr} = threads->create(sub {
+		$self->{_start_sem}->down();
+		my $send_count = $self->{_send_count};
+		for (my $i = 0; $i < $send_count; $i++) {
+			$q->enqueue($i);
+		}
+		$q->enqueue(undef);
+	});
+	$self->{_dest_thr} = threads->create(sub {
+		for (;;) {
+			my $i = $q->dequeue();
+			last if (!defined($i));
+		}
+		$self->{_end_sem}->up();
+	});
+	return $self;
+}
+
+package model::channel;
+
+use Thread::Channel;
+
+use base 'model';
+
+sub new {
+	my $class = shift @_;
+	my $self = $class->SUPER::new(@_);
+	bless $self, $class;
+
+	$self->{_send_count} = $_[0];
+
+	my $q = $self->{_q} = Thread::Channel->new;
+	$self->{_src_thr} = threads->create(sub {
+		$self->{_start_sem}->down();
+		my $send_count = $self->{_send_count};
+		for (my $i = 0; $i < $send_count; $i++) {
+			$q->enqueue($i);
+		}
+		$q->enqueue(undef);
+	});
+	$self->{_dest_thr} = threads->create(sub {
+		for (;;) {
+			my $i = $q->dequeue();
+			last if (!defined($i));
+		}
+		$self->{_end_sem}->up();
+	});
+	return $self;
+}
+
+package model::pipe;
+
+use IO::Pipe;
+
+use base 'model';
+
+sub new {
+	my $class = shift @_;
+	my $self = $class->SUPER::new(@_);
+	bless $self, $class;
+
+	$self->{_send_count} = $_[0];
+
+	my $p = new IO::Pipe;
+
+	$self->{_src_thr} = threads->create(sub {
+		$self->{_start_sem}->down();
+		my $send_count = $self->{_send_count};
+		$p->writer();
+		for (my $i = 0; $i < $send_count; $i++) {
+			print $p "$i\n";
+		}
+		$p->close;
+	});
+	$self->{_dest_thr} = threads->create(sub {
+		$p->reader();
+		for (;;) {
+			my $i = $p->getline;
+			last if (!defined($i));
+		}
+		$p->close;
+		$self->{_end_sem}->up();
+	});
+	return $self;
+}
+
+package main;
+
+Getopt::Long::Configure ("bundling");
+pod2usage(2) if ($#ARGV >= 0 && $ARGV[0] eq '-?');
+#my(@orig_argv) = @ARGV;
+
+my($prog) = $0;
+my ($debug, $verbose, $mode);
+my ($send_count, $repetitions) = (50_000, 10);
+
+GetOptions(
+ 	'help|?' => sub { pod2usage(1); },
+	'man' => sub { pod2usage(-verbose => 2); },
+	'N|number_to_send=i' => \$send_count,   
+	'R|repetitions=i' => \$repetitions,   
+	'd|debug+' => \$debug,   
+	'v|verbose+' => \$verbose) or pod2usage(2);
+
+pod2usage("$prog: no arguments, please.\n") if (@ARGV != 0);
+
+cmpthese($repetitions, {
+	pipe	=> sub { model::pipe->new($send_count)->run_ipc		},
+	channel => sub { model::channel->new($send_count)->run_ipc	},
+	queue	=> sub { model::queue->new($send_count)->run_ipc	},
+});
+

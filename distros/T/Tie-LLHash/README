@@ -1,0 +1,42 @@
+Tie-LLHash
+==========
+
+This is the Tie::LLHash module -- a class for implementing ordered Perl
+hashes. It is designed to be flexible and sub-classible.
+
+INSTALLATION
+------------
+
+To install the module from CPAN, use
+
+  cpan Tie::LLHash
+
+If you have the App::cpanminus installer, you may prefer
+
+  cpanm Tie::LLHash
+
+To install this module from tarball archive file containing this distribution,
+type
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DOCUMENTATION
+-------------
+
+For more specific information, please see the documentation inside
+LLHash.pm, by doing "pod2txt LLHash.pm", or "perldoc Tie::LLHash" once
+you've installed the module.
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright 1998 Ken Williams <kenahoo@gmail.com>. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included with
+this module.

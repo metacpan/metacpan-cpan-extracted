@@ -1,0 +1,165 @@
+-*- Indented-text -*-
+#	$Id: INSTALL 487 2015-05-23 08:00:11Z hayashi $
+
+1. How to Install Term::ReadLine::Gnu
+
+	You need the GNU Readline library installed.  Except for this,
+	you can install this module by the standard method, i.e.
+
+	% perl Makefile.PL; make install
+
+1.1 Install GNU Readline library 2.1 or later and their header files.
+
+	See the section `How to Install GNU Readline Library'.
+
+1.2 Make and install
+
+	% perl Makefile.PL [--prefix=...] [--includedir=...] [--libdir=...]
+	% make
+	% make test
+	% make install
+
+	If you have installed the GNU Readline Library
+	(libreadline.{a,so} and readline/readline.h, etc.) on
+	directories for which your perl is not configured to search
+	(refer the value of ccflags and libpath in the output of `perl
+	-V'), specify the paths as follows;
+
+	% perl Makefile.PL --includedir=/mydir/include --libdir=/mydir/lib
+
+	This example is equivalent to the following;
+
+	% perl Makefile.PL --prefix=/mydir
+
+	If you are not an administrator and cannot install Perl module
+	in your system directory, try
+		perldoc perlfaq8
+	and see the section 'How do I keep my own module/library
+	directory?' (This section is found in the Perl 5.6
+	documentation).
+
+1.3 Trouble Shooting
+
+        If you have any trouble when using or installing this module
+	or find a bug, please open a ticket on the bug tracker at
+	rt.cpan.org;
+	<http://rt.cpan.org/Dist/Display.html?Queue=Term-ReadLine-Gnu>
+
+	It will help other people who have same problems.
+
+	When you report your trouble, be sure to send me the following
+	information;
+
+	- output of
+		% perl -V
+		% perl Makefile.PL verbose
+		% make test TEST_VERBOSE=1
+		% perl -Mblib t/00checkver.t
+		% echo $TERM
+	- terminal emulator which you are using
+	- compiler which is used to compile the GNU Readline Library
+	  (libreadline.a) if you can know.
+
+1.3.1 Segmentation fault by the pager command in Perl debugger
+
+	If the pager command (| or ||) in Perl debugger causes
+	segmentation fault, you need to fix perl5db.pl.  See
+	<https://rt.perl.org/Public/Bug/Display.html?id=121456>
+	for details.
+
+2. How to Install GNU Readline Library
+
+	Now this module supports only GNU Readline Library 2.1 and
+	later.  But GNU Readline 2.2 has some bugs, so Use 2.2.1
+	instead.  GNU Readline Library 4.2 is not supported.  Use 4.2a
+	instead.
+
+	If you have any reasons in which use must use one of the follows;
+		GNU Readline Library 2.1
+		libreadline.a in bash-2.0.tar.gz
+		Cygwin b20.1
+	see INSTALL file which is included in Term-ReadLine-Gnu-1.11.
+
+	Executing `perl Makefile.PL` detects which version of
+	the GNU Readline Library is already installed and warns you if
+	you have the unsupported version.
+
+	In the following example, the install prefix directory is
+	`/usr/local/gnu'.
+	
+	You can specify any directory for the GNU Readline library and
+	its header files, by editing `LIBS' and/or `INC' section in
+	Makefile.PL.
+
+2.1. Install from the GNU Readline Library Source
+
+	1. get and extract readline-XX.tar.gz
+
+	2. configure
+		% ./configure --prefix=/usr/local/gnu
+	3. make and install
+		% make install
+
+2.1.1. Install on Mac OS X
+
+	/usr/bin/perl on Mac OS X 10.5 (Leopard) and later supports
+	32bit/64bit universal binary.  Make Makefile as follows;
+
+	# tested only on Mavericks
+	ARCHFLAGS='-arch x86_64' perl Makefile.PL --prefix=/usr/local/gnu
+
+	Or build 32bit/64bit-universal GNU Readline Library as
+	follows.  (works on GNU Readline 6.3 and later)
+
+	Enable the following lines in support/shobj-conf in GNU
+        Readline 6.3 distribution;
+
+	# for 32 and 64bit universal library
+	#SHOBJ_ARCHFLAGS='-arch i386 -arch x86_64'
+	#SHOBJ_CFLAGS=${SHOBJ_CFLAGS}' -arch i386 -arch x86_64'
+
+	run configure script and do 'make install' and make Makefile simply;
+	# tested only on Mavericks
+	perl Makefile.PL --prefix=/usr/local/gnu
+
+2.2. Using Package
+
+2.2.1. RPM on Linux
+
+	On Linux you need to install 'ncurses-devel' package in
+	addition to 'readline-devel' package.  On distributions using
+	RPM do follows;
+
+	% sudo yum install ncurses-devel
+	% sudo yum install readline-devel
+
+2.2.2. homebrew on Mac OS X
+
+       1. Install homebrew
+	See http://brew.sh/.
+
+       2. Use homebrew to install the GNU Readline Library:
+       		% brew install readline
+
+	Because the GNU Readline library conflicts with the the
+	similarly-named-but-different library installed in the base
+	OS, homebrew does not link readline into /usr/local (it is
+	"keg-only").
+
+	Makefile.PL uses `brew prefix readline' to find and use the
+	"keg" directory so things work seamlessly.
+
+	3. Build Term::ReadLine::Gnu as described above:
+		% perl Makefile.PL
+		% make
+		% make test
+		% make install
+
+	`brew cleanup' will not remove keg-only formula, to avoid
+	breaking things that have been linked against it.  However, if
+	you force it, `brew cleanup --force', then it will remove the
+	keg-only formula and Term::ReadLine::Gnu will cease to work.
+	You'll need to rebuild Term::ReadLine::GNU so that it links
+	against whichever newer version you have installed.
+
+EOF

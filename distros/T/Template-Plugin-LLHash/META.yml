@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Template-Plugin-LLHash
+version:             0.01
+abstract:            Module abstract (<= 44 characters) goes here
+license:             ~
+author:              
+    - Kevin C. McGrath (kmcgrath@baknet.com)
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Template::Plugin:              0
+    Test::Simple:                  0.44
+    Tie::LLHash:                   1.003
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

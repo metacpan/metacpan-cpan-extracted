@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Text-Markdown-ApacheHandler
+version:      0.04
+version_from: lib/Text/Markdown/ApacheHandler.pm
+installdirs:  site
+requires:
+    Apache::Constants:             0
+    Apache::File:                  0
+    CGI:                           0
+    Test::More:                    0
+    Text::Markdown:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

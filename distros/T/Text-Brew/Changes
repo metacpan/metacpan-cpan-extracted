@@ -1,0 +1,11 @@
+Change file for Text::Brew
+Keith C. Ivey <kcivey@cpcug.org>
+Dree Mistrut <dree@friuli.to>
+
+0.02  2005-04-02
+   KCIVEY took over as maintainer
+   Fixed bug that prevented most initial INS and DEL edits
+
+0.01  2003-01-13
+   No changes -- initial release
+

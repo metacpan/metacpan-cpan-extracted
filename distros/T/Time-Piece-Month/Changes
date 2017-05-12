@@ -1,0 +1,8 @@
+Revision history for Time::Piece::Month
+
+1.00  Sat Sep  3 22:00:09 UTC 2005
+	- Fixed POD errors
+
+0.01  Oct 15 2003
+	- original version 
+

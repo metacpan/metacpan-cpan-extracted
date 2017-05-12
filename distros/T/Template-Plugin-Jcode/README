@@ -1,0 +1,28 @@
+NNAAMMEE
+       Template::Plugin::Jcode - TT plugin using Jcode methods as
+       virtual method
+
+SSYYNNOOPPSSIISS
+         [% USE Jcode %]
+
+         # Convert some string to japanese euc.
+         [% foo = 'some string' %]
+         [% foo.jcode.euc %]
+
+         # It can use with other virtual methods.
+         [% bar = '012-345-678' %]
+         [% bar.split('-').0.jcode.tr(from, to) %]
+
+DDEESSCCRRIIPPTTIIOONN
+       Template::Plugin::Jcode is plugin for TT, which can use
+       Jcode methods as virtual method.
+
+AAUUTTHHOORR
+       Yoshiki KURIHARA <kurihara@cpan.org>
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+
+SSEEEE AALLSSOO
+       Template, Jcode
+

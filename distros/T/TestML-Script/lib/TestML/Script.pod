@@ -1,0 +1,35 @@
+=encoding utf8
+
+=head1 NAME
+
+TestML::Script - Support for running TestML as a script
+
+=head1 SYNOPSIS
+
+    #!/usr/bin/env testml
+
+    %TestML 1.0
+
+    Print("Hello, world");
+
+=head1 DESCRIPTION
+
+TestML is a computer programming language for writing Acmeist unit tests (unit
+tests that run under any programming language and any test framework).
+
+This module will let you run TestML as a standalone script.
+
+=head1 AUTHOR
+
+Ingy döt Net <ingy@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2011. Ingy döt Net.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

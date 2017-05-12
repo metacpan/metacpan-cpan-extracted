@@ -1,0 +1,47 @@
+commit fca321963eba6eabee34922384a9f1809c5b8c5a (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:07:12 2009 +0100
+
+    FIXED: dependencies
+
+commit c21b60bb4c00887873ad14ef41ccaf10ab3d59c9
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Jan 12 12:09:42 2009 +0100
+
+    ADDED: URL to bash completion library
+
+commit 1c0b43323d0e7bbb101d76ffbf6c5536848e6768
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Jan 5 20:30:59 2009 +0100
+
+    CHANGED: better script name ni documentation
+
+commit c1921396b833c6dbbe3728f2f63effb73565dd28
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Jan 5 20:18:41 2009 +0100
+
+    CHANGED: remove perl critic errors
+
+commit 0b945af2d221c394a79413540534d2902656dcc8
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Jan 5 19:54:00 2009 +0100
+
+    CHANGED: completed script
+
+commit ad88e2ab5538153b1d898274533793bed6b24e11
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Jan 5 18:47:39 2009 +0100
+
+    CHANGED: perl completion script handles options starting with dash
+
+commit 1db9480a003ba64bed902a57b05354f5bb4cb82b
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Jan 5 16:05:08 2009 +0100
+
+    CHANGED: better completion function generation
+
+commit a9d8cd3df522567f8ef958541849ab6072c9e258
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Jan 5 15:13:44 2009 +0100
+
+    ADDED: Initial commit

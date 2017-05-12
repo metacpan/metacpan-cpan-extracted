@@ -1,0 +1,39 @@
+{
+   "abstract" : "launch your test in parallel",
+   "author" : [
+      "Nicolas R. <atoomic@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Parallel",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Sys::Statistics::Linux::MemStats" : 0
+         },
+         "requires" : {
+            "Parallel::ForkManager" : 0,
+            "Sys::Info" : 0,
+            "Sys::Statistics::Linux::MemStats" : 0,
+            "Test::More" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.20"
+}
+

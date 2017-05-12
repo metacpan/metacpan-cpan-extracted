@@ -1,0 +1,41 @@
+Build.PL
+Changes
+ChangeLog
+GNUmakefile
+LICENSE
+MANIFEST
+META.json
+META.yml
+Build.PL
+Makefile.PL
+README.pod			     # General overview
+lib/Term/ReadLine/Perl5.pm
+lib/Term/ReadLine/Perl5/CHANGES	     # What's up?
+lib/Term/ReadLine/Perl5/Dumb.pm
+lib/Term/ReadLine/Perl5/History.pm
+lib/Term/ReadLine/Perl5/Keymap.pm
+lib/Term/ReadLine/Perl5/Common.pm
+lib/Term/ReadLine/Perl5/OO.pm
+lib/Term/ReadLine/Perl5/OO/History.pm
+lib/Term/ReadLine/Perl5/OO/Keymap.pm
+lib/Term/ReadLine/Perl5/OO/State.pm
+lib/Term/ReadLine/Perl5/TermCap.pm
+lib/Term/ReadLine/Perl5/Tie.pm
+lib/Term/ReadLine/Perl5/readline-guide.pod
+lib/Term/ReadLine/Perl5/readline.pm
+t/00test-pod.t				# Make sure POD is Kosher
+t/01test-OO-compile.t
+t/02test-OO-history-max-len.t
+t/10test-basic.t
+t/10test-common.t
+t/10test-changecase.t
+t/10test-filelist.t
+t/10test-history.t
+t/10test-motion.t
+t/10test-readline.t
+t/15test-unescape.t
+t/20test-read-input-file.t
+t/Helper.pm
+t/data/undo.inputrc
+test.pl					# Old-style test program
+SIGNATURE    Added here by Module::Build

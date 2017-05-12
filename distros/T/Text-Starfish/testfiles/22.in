@@ -1,0 +1,13 @@
+# A simple example, after running SLePerl.pl on the following file:
+#     <? $O= "test" !>
+
+<? echo "Hello world!" !>
+
+<?
+# echo "Hello 2nd!" !>
+
+<? # nothing !>
+
+<?
+## ignore this one too
+!>

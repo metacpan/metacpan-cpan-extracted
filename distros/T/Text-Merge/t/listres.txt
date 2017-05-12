@@ -1,0 +1,34 @@
+
+Test of complete list: 
+
+======================
+    FRUIT BASKET
+======================
+
+The apple is a round, red fruit that is medium in size.
+
+---------------------- 
+
+The pear is a oblong, green fruit that is medium in size.
+
+---------------------- 
+
+The grape is a round, purple fruit that is small in size.
+
+---------------------- 
+
+The pumpkin is a round, orange fruit that is large in size.
+
+======================
+
+
+
+Test of empty list:
+
+This list is empty.
+
+
+
+Test of null list:
+
+

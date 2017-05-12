@@ -1,0 +1,20 @@
+Proposed changes to Text::Lossy :
+
+Script:
+- man page
+
+Stashes: DEFERRED
+The "stash" mechanism was supposed to allow filters to carry
+state. Since this violates the principle of least surprise,
+the idea has been postponed indefinitely.
+
+- add a 'filter stash' hashref to pass to each filter
+- add a 'eof' method and 'eof' filter parameter
+- add a 'rewind' method to clear stashes
+
+Basic filters:
+
+Other filters:
+- Unicode:
+  - unidecode (via Text::Unidecode)
+  - unicode_normalize (via Unicode::Normalize)

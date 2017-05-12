@@ -1,0 +1,37 @@
+NAME
+    Template::Plugin::HTML::Template - HTML::Template filter in TT
+
+SYNOPSIS
+      my $tt = Template->new;
+      $tt->process('html-template.tt', { myname => 'foo' });
+
+      # html-template.tt
+      [% USE HTML.Template %]
+      [% FILTER html_template %]
+      My name is <TMPL_VAR name=myname>
+      [% END %]
+
+      # HTML::Template parameters
+      [% USE ht = HTML.Template(loop_context_vars = 1) %]
+      [% FILTER $ht %]
+      <TMPL_LOOP employee>
+         <TMPL_IF __FIRST__>...</TMPL_IF>
+      </TMPL_LOOP>
+      [% END %]
+
+DESCRIPTION
+    Template::Plugin::HTML::Template is a TT plugin to filter HTML::Template
+    templates. It might sound just silly, but it can be handy when you want
+    to reuse existent HTML::Template templates inside TT.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    darren chamberlain <darren@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Template manpage, the HTML::Template manpage
+

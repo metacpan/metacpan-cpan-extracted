@@ -1,0 +1,23 @@
+---
+abstract: 'relay CPAN Testers reports received via HTTP'
+author:
+  - 'Ricardo Signes <rjbs@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.71'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Test-Reporter-HTTPGateway
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CGI: 0.000
+  Email::Send: 0.000
+  Email::Simple: 0.000
+  Email::Simple::Creator: 0.000
+  perl: 5.6.0
+tests: 't/*.t xt/*.t'
+version: 0.001

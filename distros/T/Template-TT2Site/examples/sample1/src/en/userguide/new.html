@@ -1,0 +1,35 @@
+<p>To set up a new <tt>Template::TT2Site</tt> site, create a new
+directory. In this directory, issue the following command:
+
+<pre>  $ tt2site setup
+</pre>
+
+<p>This will populate the directory with the necessary files and
+directories to create the web site. You can consult section <a
+href="struct.html">Site Structure</a> for the details on the installed
+files.
+
+First, you'll have to modify the files <tt>config/site</tt> and
+<tt>config/images</tt> that were installed in the <tt>lib</tt>
+directory.
+
+<br>If you want to make a multi-lingual site you need to create an
+appropriate <tt>config/lang</tt>. But in many cases this will be all
+you need to get started creating your web pages.
+
+
+<p>You can use the following subcommands with <tt>tt2site</tt>:
+
+<ul>
+  <li><b>build</b> (default)
+      <br>Run the <tt>ttree</tt> application to update all site data.
+  <li><b>rebuild</b>
+      <br>Run <tt>ttree</tt> to completely rebuild all site data.
+  <li><b>clean</b>
+      <br>Cleanup the generated data (and some other things, like
+      editor backup files).
+  <li><b>realclean</b>
+      <br>Cleanup the generated data and the files originally
+      installed with the setup.
+</ul>
+

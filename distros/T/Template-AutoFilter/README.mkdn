@@ -1,0 +1,99 @@
+# NAME
+
+Template::AutoFilter - Template::Toolkit with automatic filtering
+
+# VERSION
+
+version 0.143050
+
+# SYNOPSIS
+
+    use Template::AutoFilter;
+
+    my $templ = "[% str %]  [% str | none %]  [% str | url %]";
+
+    my $out;
+    Template::AutoFilter->new->process( \$templ, { str => '<a>' }, \$out );
+
+    print $out; # "&lt;a&gt;  <a>  %3Ca%3E"
+
+    my $out;
+    Template::AutoFilter->new( AUTO_FILTER => 'upper' )->process( \$templ, { str => '<a>' }, \$out );
+
+    print $out; # "<A>  <a>  %3Ca%3E"
+
+# DESCRIPTION
+
+Template::AutoFilter is a subclass of Template::Toolkit which loads a
+specific Parser that is subclassed from Template::Parser. It adds a
+filter instruction to each interpolation token found in templates
+loaded by the TT engine. Tokens that already have a filter instruction
+are left unchanged.
+
+By default this automatic filter is set to be 'html', but can be modified
+during object creation by passing the AUTO\_FILTER option with the name
+of the wanted filter.
+
+Additionally a pass-through filter called 'none' is added to the object to
+allow exclusion of tokens from being filtered.
+
+Lastly, if you have problems with the directives which get auto filters
+applied, you can see the [Template::AutoFilter::Parser](https://metacpan.org/pod/Template::AutoFilter::Parser) docs for how you
+can customize that.
+
+WARNING: This module is highly experimental. I have not done a lot of
+testing and things might blow up in unexpected ways. The API and behavior
+might change with any release (until 1.0). If you'd like to see any changes
+implemented, let me know via RT, email, IRC or by opening a pull request on
+github.
+
+Use at your own risk.
+
+# METHODS
+
+## new
+
+Pre-processes the parameters passed on to Template's new(). Adds the
+pass-through filter and creates the AutoFilter Parser.
+
+All parameters passed to this new() will also be passed to the parser's
+new().
+
+# CONTRIBUTORS
+
+Ryan Olson (cpan:GIMPSON) <ryan@ziprecruiter.com>
+
+Aran Deltac (cpan:BLUEFEET) <aran@ziprecruiter.com>
+
+Thomas Sibley (cpan:TSIBLEY) <tsibley@cpan.org>
+
+# SUPPORT
+
+## Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at [http://rt.cpan.org/Public/Dist/Display.html?Name=Template-AutoFilter](http://rt.cpan.org/Public/Dist/Display.html?Name=Template-AutoFilter).
+You will be notified automatically of any progress on your issue.
+
+## Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+[https://github.com/wchristian/Template-AutoFilter](https://github.com/wchristian/Template-AutoFilter)
+
+    git clone https://github.com/wchristian/Template-AutoFilter.git
+
+# AUTHOR
+
+Christian Walde <walde.christian@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+Christian Walde has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.

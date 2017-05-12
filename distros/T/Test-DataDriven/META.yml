@@ -1,0 +1,25 @@
+---
+name: Test-DataDriven
+version: 0.03
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+abstract: when Test::Base is not enough
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Spiffy: 0.12
+  File::Slurp: 0
+  Test::Base: 0
+  Test::Differences: 0
+  Test::More: 0
+provides:
+  Test::DataDriven:
+    file: lib/Test/DataDriven.pm
+    version: 0.03
+  Test::DataDriven::Plugin:
+    file: lib/Test/DataDriven/Plugin.pm
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

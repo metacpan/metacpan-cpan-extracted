@@ -1,0 +1,1225 @@
+<!doctype html public '-//w3c//dtd html 3.2//en'>
+<html>
+<head>
+  <title>Tk::MListbox - Multi-column Listbox</title>
+  <link rel='stylesheet' type='text/css' href='ptkdocs.css'>
+  <meta name='Version' content='0.02'>
+ </head>
+ <body background="bg.gif">
+
+<table cellpadding=4 width='100%'>
+<tr valign=middle>
+  <td class="header"><br><h1>&nbsp; Tk::MListbox</h1></td>
+  <th class='subheader' width = '10%'>Package Info</th>
+</tr>
+<tr>
+  <td><a  href="MListbox/tutorial.html">Tutorial</a> <b>|</b> 
+         <a href=""></a>FAQ <b>|</b> 
+         <a href="MListbox/change.html">Changes/Bug fixes</a>
+  </td>
+  <td valign="top" width ="30%" height='100%' rowspan=2>
+    <table width="100%" >
+      <tr valign=top><th align=right>Version:</th><td>1.11</td></tr>
+      <tr valign=top><th align=right>DSLIP:</th><td>bdpOp</td></tr>
+      <tr valign=top><th align=right>Author:</th><td nowrap>Hans J. Helgesen</td></tr>
+      <tr valign=top><th align=right>Maintainer:</th><td nowrap><a href="mailto:robseegel@aol.com">Rob Seegel</a></td></tr>
+      <tr valign=top><th align=right>Package:</b></td><td>MListbox</td></tr>
+      <tr valign=top><th align=right>Platforms:</th><td>Linux<br>Unix<br>Windows</td>
+    </table>      
+  </td>
+</tr>
+<tr><td>
+<!-- Table of contents -->
+<ul>
+    <li><a href='#synopsis'>Synopsis</a></li>
+   <li><a href='#heirarchy'>Heirarchy</a></li>
+    <li><a href='#description'>Description</a></li>
+    <li><a href='#components'>Components</a></li>
+    <li><a href='#options'>Options</a></li>
+    <ul>
+        <li><a href='#defoptions'>MListbox-defined</a></li>
+        <li><a href='#frameoptions'>Inherited from Frame</a></li>
+    </ul>
+    <li><a href='#methods'>Methods</a></li>
+    <ul>
+        <li><a href='#colindices'>Column Indices</a></li>
+        <li><a href='#rowindices'>Row Indices</a></li>
+    </ul>
+    <li><a href='#kbindings'>Keyboard bindings</a></li>
+</ul>
+</td></tr>
+</table>
+<hr>
+
+
+<a name='synopsis'><h2>Synopsis</h2></a>
+<pre>
+use Tk::MListbox;
+...
+my $ml = $parent-&gt;<b>MListbox</b>(?<a href='#options'>options</a>, ...?)<br></pre>
+<p class='pMargin'>
+  Creates and returns a MListbox widget. The appearance and behavior of the widget 
+  can be configured by passing one or more <a href='#options'>options</a>, described
+  in more detail below.</p>
+<hr>
+
+<a name='heirarchy'><h2>Heirarchy</h2></a>
+<p class='pMargin'>
+<a href='Widget.html'></a>Widget // <a href='Frame.html'></a>Frame // <b>MListbox</b><br>
+</p>
+<hr>
+
+<a name='description'><h2>Description</h2></a>
+<p class='pMargin'>
+  Tk::MListbox is a composite widget used to display and manipulate tabular data. 
+  It can display one or more columns that can each be resized, sorted, or moved.  
+  The name MListbox is short for Multi-Listbox, since it is composed of one or more
+   Listbox widgets (one per column) and shares many of the same methods with Listbox.
+</p>
+
+<p class='pMargin'>
+   MListbox handles tasks that can also be accomplished using the <b>HList</b>, 
+   <b>TixGrid</b>, or <b>Table</b> widgets from the main Tk Distribution. 
+   <b>Columns</b> and <b>TableMatrix</b> (available on CPAN) are
+   other common alternatives. 
+</p>   
+<p class='pMargin'>
+ MListbox distinguishes itself from the others by providing commonly used 
+ features associated with tabular display widgets. Among them is the ability to 
+ change the order of columns using drag and drop, and the ability to hide or show
+ individual columns. These two features are not currently supported by any of the 
+ previously mentioned widgets.
+</p>
+
+<p class='pMargin'>
+  For more detailed information on using this widget,  refer to the MListbox 
+  <a href='MListbox/tutorial.html'>tutorial</a>.
+</p>
+  
+<hr>
+<a name='components'><h2>Components</h2></a>
+<p class='pMargin'>
+   MListbox is a collection of <a href="MListbox/MLColumn.html">MLColumn</a>
+   widgets, packed into a Pane. These widgets are internal to MListbox and not 
+   meant to be used outside of it.  Although these subwidgets are not advertised,  
+   it is possible to access them using the <a href="#columnGet">columnGet()</a> 
+   method. The <a href="#columnInsert">columnInsert()</a> method also returns a 
+   reference to a MLColumn widget after creating and inserting it.
+</p>
+<p class='pMargin'>
+  Aside from the columns, MListbox has one advertised subwidget.
+</p>
+   
+<table width='95%' border=2 cellpadding=2>
+<tr><td colspan=2 class='subheader'><a name='wsoptions'></a>
+   &nbsp; Subwidgets:</td></TR>
+
+<!-- pane -->
+<tr valign=top><td width='25%'><a name='height'></a>
+    <table border=0>
+        <tr><th align=right>Name:</th><td>pane</td></tr>
+        <tr><th align=right>Class:</th><td><a href="Pane.html"></a>Pane</td></tr>
+    </table></td>
+    <td>
+      This is the container that holds all MListbox columns (for horizontal scrolling).
+   </td>
+</tr>
+</table>
+<br>
+
+<hr>
+<a name='options'><h2>Options</h2></a>
+<p class='pMargin'>
+  At creation time, all MListbox-defined options <i>except</i> for <nobr>-columns</nobr>, 
+  <nobr>-configurecommand</nobr>, <nobr>-moveable</nobr>, <nobr>-width</nobr>,  
+  <nobr>-xscrollcommand</nobr>,  and <nobr>-yscrollcommand</nobr> serve as default 
+  options for each column that is created.  Any options set for individual columns using the 
+  -columns option will override the defaults.  These options, when reconfigured after 
+  widget creation, will override the values for <i>all</i> columns. 
+</p>
+
+<a name='defoptions'></a>
+<table width='95%' border=2 cellpadding=3>
+<tr><td colspan=2 class='subheader'>
+   &nbsp; MListbox defined:</td></tr>
+<tr><td colspan=2>
+<table width='100%'>
+<tr valign=top><td width="25%" NOWRAP>
+  -<a href='#bg'>background</a><br>
+  -<a href='#columns'>columns</a><br>
+  -<a href='#configurecommand'>configurecommand</a><br>
+  -<a href='#font'>font</a><br>
+  -<a href='#fg'>foreground</a><br>
+</td>
+<td width="25%" NOWRAP>
+  -<a href='#height'>height</a><br>
+  -<a href='#moveable'>moveable</a><br>
+  -<a href='#resizable'>resizeable</a><br>
+  -<a href='#selectbg'>selectbackground</a><br>
+  -<a href='#selectbd'>selectborderwidth</a><br>
+</td>
+<td width="25%" NOWRAP>
+  -<a href='#selectfg'>selectforeground</a><br>
+  -<a href='#selectmode'>selectmode</a><br>
+  -<a href='#separatorcolor'>separatorcolor</a><br>
+  -<a href='#separatorwidth'>separatorwidth</a><br>
+  -<a href='#sortable'>sortable</a><br>
+</td>
+<td width="25%" NOWRAP>
+  -<a href='#takefocus'>takefocus</a><br>
+  -<a href='#textwidth'>textwidth</a><br>
+  -<a href='#width'>width</a><br>
+  -<a href='#xscrollcomand'>xscrollcommand</a><br>
+  -<a href='#yscrollcomand'>yscrollcommand</a><br>
+</td>
+</tr>
+</table></td></tr>
+</table>
+<br>
+
+<a name='frameoptions'></a>
+<table width='95%' border=2 cellpadding=3>
+<tr><td colspan=2 class='subheader'>
+   &nbsp; Inherited from Frame:</td></tr>
+<tr><td colspan=2>
+<table width='100%' >
+<tr valign=top><td width="25%" NOWRAP>
+  -<a href='Frame.html#borderwidth'></a>borderwidth<br>
+  -<a href='Frame.html#highlightbackground'></a>highlightbackground<br>
+</td>
+<td NOWRAP width="25%">
+  -<a href='Frame.html#highlightcolor'></a>highlightcolor<br>
+  -<a href='Frame.html#highlightthickness'></a>highlightthickness<br>
+</td>
+<td NOWRAP width="25%">
+  -<a href='Frame.html#relief'></a>relief<br>
+</td>
+<td NOWRAP width="25%">&nbsp;
+</td>
+</tr>
+</table></td></tr>
+</table>
+<br>
+
+<table width='95%' border=2 cellpadding=3>
+<!-- background-->
+<tr valign=top><td width='10%'><a name='bg'></a>
+  <table cellpadding=0 cellspacing=1>
+        <tr><th align=right>Name:</th><td nowrap>background</td></tr>
+        <tr><th align=right>Class:</th><td nowrap>Background</td></tr>
+        <tr><th align=right>Switch:</th><td nowrap>-background</td></tr>
+        <tr><th align=right>Alias:</th><td nowrap>-bg</td></tr>  
+    </table>
+</td>
+<td width = '75%'>Sets the background color for the base widget, the internal Pane, and 
+      for all columns. On Unix platforms, the value defaults to <b>#d9d9d9</b> and on 
+      Win32 platforms, <b>SystemButtonFace</b>. 
+</td></tr>         
+
+<!-- columns-->
+<tr valign=top><td width='25%'><a name='columns'></a>
+    <table cellspacing=0 cellpadding=1> 
+        <tr><th align=right>Switch:</th><td nowrap>-columns</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top>
+        <td>Defines the columns in the widget. This option takes an <i>array reference</i> for it's value 
+           (an array reference of array references to be precise).  
+           Refer to the <a  href="MListbox/tutorial.html#addingcolumns">adding columns</a> section in 
+           the tutorial. This option can be used to define all columns used, or each column can be 
+           inserted individually using the <a href="#insertcolumn">insertColumn()</a> method. By default,
+           the value is undefined.
+        </td></tr>         
+    </table>
+</td></tr>
+
+<!-- configurecommand-->
+<tr valign=top><td width='25%'><a name='configurecommand'></a> 
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Switch:</th><td nowrap>-configurecommand</td></tr> 
+        <tr><th align=right>Alias:</th><td nowrap>-configcmd</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top>
+        <td>The <i>callback</i> which is passed to this option will be called whenever the layout of the
+               widget has changed due to user interaction (ie. a user resizing a column by dragging a
+               separator or moving a column by dragging a column header would trigger this callback.)
+        </td></tr>         
+    </table>
+</td></tr>
+
+<!-- font -->
+<tr valign=top><td width='25%'><a name='font'></a> 
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Switch:</th><td NOWRAP>-font</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top>
+        <td>Sets the default font to be used throughout the MListbox.  On Unix, this 
+        defaults to <b>"Helvetica -12 bold"</b>, and on Win32, <b>"{MS Sans Serif} 8"</b>
+        </td></tr>         
+    </table>
+</td></tr>
+
+<!-- foreground-->
+<tr valign=top><td width='25%'><a name='fg'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Switch:</th><td nowrap>-foreground</td></tr> 
+        <tr><th align=right>Aliases:</th><td nowrap>-fg</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top>
+        <td>
+	    Sets the foreground (font) color for all MListbox columns. On Unix, this defaults to <b>black</b>
+          and on Win32, <b>SystemButtonText</b>.
+        </td></tr>         
+    </table>
+</td></tr>
+
+<!-- moveable-->
+<tr valign=top><td width='25%'><a name='height'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td nowrap>height</td></tr>
+        <tr><th align=right>Class:</th><td nowrap>Height</td></tr>
+        <tr><th align=right>Switch:</th><td nowrap>-height</td></tr>
+    </table>
+<td>
+    <table><tr><td>
+ 	     Specifies the number of rows, excluding the heading, that will be displayed in
+       the MListbox.  A value of 0 will cause the height to dynamically resize depending on
+       the amount of rows in the widget (and can easily get out of control so is not recommended). 
+       The value defaults to <b>10</b>.
+ </td></tr></table>
+</td></tr>
+
+
+<!-- moveable-->
+<tr valign=top><td width='25%'><a name='moveable'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td nowrap>moveable</td></tr>
+        <tr><th align=right>Class:</th><td nowrap>Moveable</td></tr>
+        <tr><th align=right>Switch:</th><td nowrap>-moveable</td></tr>
+    </table>
+<td>
+    <table><tr><td>
+ 	     <i>Boolean</i> value which enables or disables moveable columns.
+           A value of <b>1</b> enables all columns to be reordered by allowing
+           drag-and-drop of column headers. A value of <b>0</b> disables this
+           feature.	     
+     </td></tr></table>
+</td></tr>
+
+<!-- resizeable -->
+<tr valign=top><td width='25%'><a name='resizeable'></a> 
+    <table cellspacing=0 cellpadding=1>
+       <tr ><th align=right>Name:</th><td nowrap>resizeable</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>Resizeable</th></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-resizeable</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr><td>
+       <i>Boolean</i> value that determines whether or not individual columns can 
+       be resized by dragging on their separator.  A setting of <b>1</b> enables resizing
+       for all columns, and setting of <b>0</b> disables it.  
+    </td></tr></table>
+</td></tr>
+
+<!-- selectbackground -->
+<tr valign=top><td width='25%'><a name='selectbg'></a>
+    <table cellspacing=0 cellpadding=1>
+         <tr><th align=right>Name:</th><td nowrap>selectBackground</td></tr> 
+         <tr><th align=right>Class:</th><td nowrap>Background</td></tr>        
+         <tr><th align=right>Switch:</th><td nowrap>-selectbackground</td></tr> 
+         <tr><th align=right>Alias:</th><td nowrap>-selectbg</td></tr>  
+   </table>
+<td valign=top>
+   <table><tr valign=top><td>
+      Specifies background color used for selected rows. Defaults: <b>#c3c3c3</b> (Unix) and
+      <b>SystemHighlight</b> (Win32).
+   </td></tr></table>
+</td></tr>
+
+<!-- selectborderwidth -->
+<tr valign=top><td width='25%'><a name='selectbd'></a>
+    <table cellspacing=0 cellpadding=1>
+         <tr><th align=right>Name:</th><td nowrap>selectBorderwidth</td></tr> 
+         <tr><th align=right>Class:</th><td nowrap>Borderwidth</td></tr>        
+         <tr><th align=right>Switch:</th><td nowrap>-selectborderwidth</td></tr> 
+         <tr><th align=right>Alias:</th><td nowrap>-selectbd</td></tr>  
+   </table>
+<td valign=top>
+   <table><tr valign=top><td>
+      Specifies border width to be used for selected rows. Can be used to give the row
+      a more pronounced 3D appearance.  Default setting: <b>1</b>. 
+   </td></tr></table>
+</td></tr>
+
+<!-- selectforeground-->
+<tr valign=top><td width='25%'><a name='selectfg'></a>
+    <table cellspacing=0 cellpadding=1>
+       <tr><th align=right>Name:</th><td nowrap>selectForeground</td></tr> 
+       <tr><th align=right>Class:</th><td nowrap>Foreground</td></tr> 
+       <tr><th align=right>Switch:</th><td nowrap>-selectforeground</td></tr> 
+       <tr><th align=right>Alias:</th><td nowrap>-selectfg</td></tr>  
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+    Sets a foreground (font) color for selected rows. Defaults: <b>black</b> (Unix) 
+    and <b>SystemHighlightText</b> (Win32).
+    </td></tr></table>
+</td></tr>
+
+<!-- selectmode -->
+<tr valign=top><td width='25%'><a name='selectmode'></a>
+    <table cellspacing=0 cellpadding=1>
+       <tr><th align=right>Name:</th><td nowrap>selectMode</td></tr> 
+       <tr><th align=right>Class:</th><td nowrap>Mode</td></tr> 
+       <tr><th align=right>Switch:</th><td nowrap>-selectmode</td></tr>
+    </table>
+<td valign=top>
+   <table><tr valign=top><td>
+      Determines the type of selection allowed within MListbox. Valid choices
+      include: single, browse, multiple, and extended. To get a description of
+      each of these modes, refer to the <a href="Listbox.html#selectmode"></a>
+      Tk::Listbox documentation. The default setting is <b>browse</b>.
+   </td></tr></table>
+</td></tr>
+
+<!-- separatorcolor -->
+<tr valign=top><td width='25%'><a name='separatorcolor'></a>
+    <table cellspacing=0 cellspadding=1>        
+        <tr><th align=right>Name:</th><td nowrap>separatorColor</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>SeparatorColor</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-separatorcolor</td></tr> 
+        <tr><th align=right>Alias:</th><td nowrap>-sepcolor</td></tr> 
+    </table>
+<td valign=top>
+   <table><tr valign=top><td>
+      Sets the default color to be used for the separator bar (the bar that is dragged by
+      the user to resize a column).  Default setting: <b>black</b>.  
+   </td></tr></table>
+</td></tr>
+
+<!-- separatorwidth-->
+<tr valign=top><td width='25%'><a name='separatorwidth'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td nowrap>separatorWidth</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>SeparatorWidth</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-separatorwidth</td></tr> 
+        <tr><th align=right>Alias:</th><td nowrap>-sepwidth</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+        Specifies the width to be used for all column separators (the bar that a user can drag to 
+        to resize a column).  Default: <b>1</b>.
+    </td></tr></table>         
+</td></tr>
+
+<!-- sortable -->
+<tr valign=top><td width='25%'><a name='sortable'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td nowrap>sortable</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>Sortable</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-sortable</td></tr> 
+    </table>
+<td valign=top>
+   <table><tr valign=top><td>
+       Specifies whether or not sorting will be enabled for all columns. (a sort is initiated by pressing the 
+       header of a column). Possible values are 1 (enabled) and 0 (disabled). Default setting: <b>1</b>
+   </td></tr></table>         
+</td></tr>
+
+<!-- takefocus-->
+<tr valign=top><td width='25%'><a name='takefocus'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td>takeFocus</td></tr> 
+        <tr><th align=right>Class:</th><td>Focus</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-takefocus</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+        Specifies whether or not the widget will accept focus during a keyboard traversal (a move from
+        widget to widget using the TAB key).  MListbox has keyboard bindings that can be used when
+        it has the focus. Possible values are 1 (enabled) and 0 (disabled).  Default setting: <b>1</b>
+    </td></tr></table>
+</td></tr>
+
+<!-- textwidth-->
+<tr valign=top><td width='25%'><a name='textwidth'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td>textwidth</td></tr> 
+        <tr><th align=right>Class:</th><td>Width</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-textwidth</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+        Specifies the number of characters to be displayed in each column. The display can
+        be off when using non-fixed width fonts.  This option is used when columns are used
+        to control the width of the widget. Default setting: <b>10</b>.
+    </td></tr></table>
+</td></tr>
+
+<!-- width-->
+<tr valign=top><td width='25%'><a name='width'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td>width</td></tr> 
+        <tr><th align=right>Class:</th><td>Width</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-width</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+        Specifies the desired width for the MListbox, in screen units. If this value is
+        0 then MListbox will be sized so that all columns are displayed. The
+        default setting is undefined.
+    </td></tr></table>
+</td></tr>
+
+
+<!-- xscrollcommand -->
+<tr valign=top><td width='25%'><a name='xscrollcommand'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Switch:</th><td nowrap>-xscrollcommand</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+        Specifies a <i>callback</i> used to communicate with horizontal scrollbars. For full description, refer to
+        <a href="CommonOptions.html#xscrollcommand"></a>Tk::options docs.
+    </td></tr></table>         
+</td></tr>
+
+<!-- yscrollcommand -->
+<tr valign=top><td width='25%'><a name='yscrollcommand'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Switch:</th><td nowrap>-yscrollcommand</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+    Specifies a <i>callback</i> used to communicate with vertical scrollbars. This
+    option is used the same as -yscrollcommand, except for vertical scrollbars.
+    </td></tr></table>         
+</td></tr>
+</table><br>
+
+<hr>
+<a name='methods'><h2>Methods</h2></a>
+
+<a name='colindices'></a><h3>Indices</h3>
+<p class=pMargin>
+  Many of the methods for MListbox take one more indices as arguments. MListbox
+has two general kinds of indices: column and row. Column indices are used for 
+all methods which begin with the word column, and row indices are used for all
+other methods.
+</p>
+<p>Column Indices</P>
+<dl class=pMargin>
+  <dt><i>number</i></dt>
+  <dd>Specifies the element as a numerical index, where 0 corresponds to the first element.</dd>
+  <dt><b>end</b></dt>
+  <dd>Indicates the index of the last column in the MListbox</dd>
+  <dt><i>MLColumn</i></dt>
+  <dd>Indicates the integer index that this widget occupies.</dd>
+</dl>
+
+<p>Row Indices</p>
+<p class=pMargin>
+  Refer to Indices section in Tk::Listbox documentation
+</p> 
+
+<br>
+<table width='95%' border=2 cellpadding=3>
+<tr><td colspan=2 class='subheader'><a name='wsoptions'></a>
+   &nbsp; MListbox defined:</td></tr>
+<tr valign=top>
+  <td width='15%' nowrap><i>void</i></td>
+  <td><a href='#activate'><b>activate</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%' nowrap><a href="MListbox/tutorial.html#bindreturn">(various)</a></td>
+  <td><a href='#bindcolumns'><b>bindColumns</b></a>( <i>sequence</i>, <i>callback</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><a href="MListbox/tutorial.html#bindreturn">(various)</a></td>
+  <td><a href='#bindrows'><b>bindRows</b></a>( <i>sequence</i>, <i>callback</i> ) </td>
+</tr>
+<tr valign=top>
+  <td width='15%'><a href="MListbox/tutorial.html#bindreturn">(various)</a></td>
+  <td><a href='#bindseparators'><b>bindSeparators</b></a>( <i>sequence</i>, <i>callback</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>arrayref</i></td>
+  <td><a href='#columnconfigure'><b>columnConfigure</b></a>( <i>index</i>, <i>?option =&gt; value</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>@remainingColumns</i></td>
+  <td><a href='#columndelete'><b>columnDelete</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>@columns</i></a></td>
+  <td><a href='#columnget'><b>columnGet</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#columnhide'><b>columnHide</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>integer</i></td>
+  <td><a href='#columnindex'><b>columnIndex</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><a href="Mlistbox/MLColumn.html"><i>MLColumn</i></a></td>
+  <td><a href='#columninsert'><b>columnInsert</b></a>( <i>index</i>, <i>?option =&gt; value</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#columnpack'><b>columnPack</b></a>( <i>@elements</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>@elements</i></td>
+  <td><a href='#columnpackinfo'><b>columnPackInfo</b></a>()</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#columnshow'><b>columnShow</b></a>( <i>index</i>, <i>?option =&gt; value</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>selection/@selection</i></td>
+  <td><a href='#curselection'><b>curselection</b></a>()</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#delete'><b>delete</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>@rowContents</i></td>
+  <td><a href='#get'><b>get</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>column/@row</i></td>
+  <td><a href='#getrow'><b>getRow</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>Integer</i></td>
+  <td><a href='#index'><b>index</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#insert'><b>insert</b></a>( <i>index</i>, <i>@data</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>Integer</i></td>
+  <td><a href='#nearest'><b>nearest</b></a>()</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#see'><b>see</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#selectionanchor'><b>selectionAnchor</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#selectionclear'><b>selectionClear</b></a>()</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>Integer</i></td>
+  <td><a href='#selectionincludes'><b>selectionIncludes</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#selectionset'><b>selectionSet</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>Integer</i></td>
+  <td><a href='#size'><b>size</b></a>()</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#sort'><b>sort</b></a>( <i>descending</i>, <i>index</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><a href="#xviewopts">(various)</a></td>
+  <td><a href='#xview'><b>xview</b></a>( <i>descending</i>, <i>index</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><a href="#xviewopts">(various)</a></td>
+  <td><a href='#yview'><b>yview</b></a>( <i>descending</i>, <i>index</i>, ... )</td>
+</tr>
+</table>
+<br>
+
+<hr width='75%' align=left>
+<a name='activate'></a>
+<p><b>activate</b>( <i>index</i> )</p>
+<p class='pMargin'>
+  Sets the active element to the one indicated by <i>index</i>.
+  If index is outside the range of elements in the listbox then the 
+  closest element is marked. Currently, an active row does not 
+  appear any different from an inactive one ( In Listbox, the active
+  element is underlined ).  
+</p>
+<hr width='75%' align=left>
+
+<!-- bindColumns -->
+<a name='bindcolumns'></a>
+<p><b>bindColumns</b>( <i>sequence</i>, <i>callback</i> )</p>
+<p class='pMargin'>
+   A convenience method, this binds a <i>callback</i> to a specified <i>sequence</i>
+   for the <a href="MListbox/MLColumn.html#header">header</a> subwidget
+   in each of the <a href="MListbox/MLColumn.html">columns</a>.
+</p>
+<p class='pMargin'>
+   Unlike the normal bind() method, bindColumns will pass two parameters
+   to whatever <i>callback</i> is defined instead of one. These include a 
+   reference to the MListbox widget, and a hash reference containing:
+</p>
+ 
+<p>
+<dl class='pMargin'>
+  <dt><b>-subwidget</b> =&gt; <i>$sw</i></dt>
+  <dd style='list-item-indent: .5in'>
+    A reference to the header subwidget that triggered the <i>callback</i>
+  </dd>
+  <dt><b>-column</b> =&gt; <i>index</i></dt>
+  <dd style='list-item-indent: .5in'>
+    The index of the column that contained the header subwidget
+  </dd>
+</dl>
+</p>
+<p>See also</p>
+<p class='pMargin'>
+    <a href="MListbox/tutorial.html#binding">binding events to MListbox</a>
+   in the tutorial.
+</p>
+<hr width='75%' align=left>
+
+<!-- bindrows -->
+<a name='bindrows'></a>
+<p><b>bindRows</b>( <i>sequence</i>, <i>callback</i> )</p>
+<p class='pMargin'>
+   A convenience method, this binds a <i>callback</i> to a specified <i>sequence</i>
+   for the <a href="MListbox/MLColumn.html#listbox">listbox</a> subwidget
+   in each of the <a href="MListbox/MLColumn.html">columns</a>.
+</p>
+<p class='pMargin'>
+   Unlike the normal bind() method, bindColumns will pass two parameters
+   to whatever <i>callback</i> is defined instead of one. These include a 
+   reference to the MListbox widget, and a hash reference containing:
+</p>
+ 
+<p>
+<dl class='pMargin'>
+  <dt><b>-subwidget</b> =&gt; <i>$sw</i></dt>
+  <dd style='list-item-indent: .5in'>
+    A reference to the listbox subwidget that triggered the <i>callback</i>
+  </dd>
+  <dt><b>-column</b> =&gt; <i>index</i></dt>
+  <dd style='list-item-indent: .5in'>
+    The index of the column that contained the listbox subwidget
+  </dd>
+  <dt><b>-row</b> =&gt; <i>index</i></dt>
+  <dd style='list-item-indent: .5in'>
+    The index of the row directly underneath the mouse pointer. The value
+    will be <b>-1</b> in cases where there is no row directly underneath
+    the mouse pointer.
+  </dd>
+</dl>
+</p>
+
+<p>Example:</p>
+<pre>$ml->bindRows('&lt;ButtonRelease-1&gt;',  sub {
+    my ($w, $infoHR) = @_;
+    print "You pressed row: " . $infoHR->{-row} .
+          " in column: " . $infoHR->{-column} . "\n";
+});</pre>
+<p>See also</p>
+<p class='pMargin'>
+   <a href="MListbox/tutorial.html#binding">binding events to MListbox</a>
+   in the tutorial.
+</p>
+<hr width='75%' align=left>
+
+<!-- bindSeparators -->
+<a name='bindseparators'></a>
+<p><b>bindSeparators</b>( <i>sequence</i>, <i>callback</i> )</p>
+<p class='pMargin'>
+   A convenience method, this binds a <i>callback</i> to a specified <i>sequence</i>
+   for the <a href="MListbox/MLColumn.html#separator">separator</a> subwidget
+   in each of the <a href="MListbox/MLColumn.html">columns</a>.
+</p>
+
+<p class='pMargin'>
+   Unlike the normal bind() method, bindColumns will pass two parameters
+   to whatever <i>callback</i> is defined instead of one. These include a 
+   reference to the MListbox widget, and a hash reference containing:
+</p>
+ 
+<p>
+<dl class='pMargin'>
+  <dt><b>-subwidget</b> =&gt; <i>$sw</i></dt>
+  <dd style='list-item-indent: .5in'>
+    A reference to the separator subwidget that triggered the <i>callback</i>
+  </dd>
+  <dt><b>-column</b> =&gt; <i>index</i></dt>
+  <dd style='list-item-indent: .5in'>
+    The index of the column that contained the separator subwidget
+  </dd>
+</dl>
+</p>
+<p>See also</p>
+<p class='pMargin'>
+   <a href="MListbox/tutorial.html#binding">binding events to MListbox</a>
+   in the tutorial.
+</p>
+<hr width='75%' align=left>
+
+<!-- columnconfigure -->
+<a name='columnconfigure'></a>
+<p><b>columnConfigure</b>( <i>index</i>, <i>?option =&gt; value</i>, ... )</p>
+<p class='pMargin'>
+  Sets option values for a specific column, indicated by <i>index</i>. 
+</p>
+<p>Options:</p>
+<p class='pMargin'>
+   Any valid MLColumn <a href="MListbox/MLColumn.html#options">option</a>.
+</p>
+
+<p>Example:</p>
+<pre>$ml->columnConfigure( 0, 
+    -background => 'blue',
+    -foreground => 'white',
+    -textwidth => 0,
+    -separatorcolor => 'white'
+);</pre>
+<hr width='75%' align=left>
+
+<!-- columnDelete -->
+<a name='columndelete'></a>
+<p><b>columnDelete</b>( <i>first</i>, <i>?last</i> )</p>
+ <p class='pMargin'>
+   Deletes all column from <i>first</i> index to <i>last</i> or just <i>first</i>
+    if <i>last</i> is ommitted. Column indices are updated to reflect the deletes.
+</p>
+<p>Returns</p>
+<p class='pMargin'>An array of the remaining columns.</p>
+<hr width='75%' align=left>
+
+<!-- columnGet -->
+<a name='columnget'></a>
+<p><b>columnGet</b>( <i>first</i>, <i>?last</i> )</p>
+<p class='pMargin'>Returns an array of <a href="MListbox/MLColumn.html">MLColumn</a>
+  widgets specified by the range set with <i>first</i> and <i>last</i>, or a single
+  widget if <i>last</i> is omitted.
+</p>
+<hr width='75%' align=left>
+
+<!-- columnhide -->
+<a name='columnhide'></a>
+<p><b>columnHide</b>( <i>first</i>, <i>?last</i> )</p>
+<p class='pMargin'>
+    Hides all columns specified by the range of indices <i>first</i> and <i>last</i>, or only one
+    if <i>last</i> is omitted. Hidden columns, and their contents are not deleted, and column
+    indices are <i>unchanged</i>. (This can mean that indices  appear not to match what 
+    is displayed when columns are hidden.)
+</p>
+<p>See also</p>
+<p class='pMargin'>
+    <a href="#columnshow">columnShow</a>().
+</p>
+<hr width='75%' align=left>
+
+<!-- columnIndex -->
+<a name='columnindex'></a>
+<p><b>columnIndex</b>( <i>index</i> )</p>
+<p class='pMargin'>
+   Returns an integer index value for the column specified by <i>index</i>.
+</p>
+<p>See also</p>
+<p class=pMargin>
+    <a href='#colindices'>Column indices</a>.
+</p>
+<hr width='75%' align=left>
+
+<!-- columnInsert -->
+<a name='columninsert'>
+<p><b>columnInsert</b>( <i>index</i>, <i>?option =&gt; value</i>, ... )</p>
+<p class='pMargin'>
+    Creates a new column in the MListbox widget. The column will get the index specified by 
+    <i>index</i>. If <i>index</i> is <b>end</b> the new column's index will be one more than the
+    previous highest column index.
+</p>
+<p class='pMargin'>
+    If column <i>index</i> exists, the new column will be placed to the left of this column, and
+    the indices of all columns that follow <i>index</i> will be incremented by one.
+</p>
+<p>Options</p>
+<p class=pMargin>
+    Any valid MLColumn <a href="MListbox/MLColumn.html#options">option</a>.
+</p>   
+<p>Returns</p>
+<p class=pMargin>
+    The newly created <a href="MListbox/MLColumn.html">MLColumn</a> widget.
+</p>
+<hr width='75%' align=left>
+
+<!-- columnPack -->
+<a name='columnpack'></a>
+<p><b>columnPack</b>( <i>@elements</i> )</p>
+<p class='pMargin'>
+    Reorders the display of columns in the MListbox according to the specifications in 
+    the <i>elements</i> array. Each element is a string with the format <b>index:width</b>
+    where <i>index</i> is the index of the column to occupy this position, and <i>width</i>
+    specifies the width in pixels (and can be omitted). Columns are ordered from left to
+    right, and columns not specified are not displayed.
+</p>
+
+<p>Example</p>
+<div class='pMargin'>
+  In a MListbox with six columns, the following would reverse the order of the 
+  first three, hide the last three, and resize the second element to a 
+  ridiculously narrow width.
+</div>
+<pre>$ml->columnPack(qw/2 1:5 0/);</pre>
+<p>See also</p>
+<p class=pMargin>
+    <a href="#columnpackinfo">columnPackInfo</a>().
+</p>
+<hr width='75%' align=left>
+
+<!-- columnPackInfo -->
+<a name='columnpackinfo'></a>
+<p><b>columnPackInfo</b>()</p>
+<p class='pMargin'>
+    Returns an array of elements describing the currently layout of the MListbox widget. Each
+    element of the array describes a visible column in the widget in the order in which they 
+    appear from left to right. An element is a string formatted <b>index:width</b>. Where 
+    <i>index</i> is a column index, and <i>width</i> describes the width of the column in 
+    pixels. 
+</p>
+<p>See also</p>
+<p class=pMargin>
+     <a href="#columnpack">columnPack</a>().
+</p>   
+<hr width='75%' align=left>
+
+<!-- columnShow -->
+<a name='columnshow'></a>
+<p><b>columnShow</b>( <i>index</i>, <i>?option =&gt; value</i> )</p>
+<p class='pMargin'>
+    Shows a column specified by <i>index</i> that has been hidden. By default the column
+    will be displayed as the last ( far right ) element in the MListbox. This can be overridden
+    by specifying an optional value.</p>
+
+<p>Options:
+<dl class='pMargin'>
+  <dt><b>-after</b> =&gt; <i>index</i></dt>
+  <dd style='list-item-indent: .5in'>
+    Displays the column after (to the right of) the column specified by <i>index</i><br><br>
+  </dd>
+  <dt><b>-before</b> =&gt; <i>index</i></dt>
+  <dd style='list-item-indent: .5in'>
+    Displays the column before (to the left of) the column specified by <i>index</i>
+  </dd>
+</dl>
+</p>
+<p>See also</p>
+<p class='pMargin'>
+     <a href="#columnhide">columnHide</a>().
+</p>
+<hr width='75%' align=left>
+
+<!-- curselection -->
+<a name='curselection'></a>
+<p><b>curselection</b>()</p>
+<p class='pMargin'>
+    Returns either an array containing the indices of all selected rows, or a scalar
+    containing the index of the first selected row of those selected depending on
+    the context.
+</p>
+<p>Example</p>
+<div class='pMargin'>
+  In a MListbox with the third row selected...
+</div>
+<pre>$result = $ml->curselection();  ## $result = 2
+@result = $ml->curselection();  ## @result = ( 2 )
+</pre>
+
+<hr width='75%' align=left>
+
+<!-- delete -->
+<a name='delete'></a>
+<p><b>delete</b>( <i>first</i>, <i>?last</i> )</p>
+<p class='pMargin'>
+    Deletes one or more rows from the MListbox, in a range specified by 
+    <i>first</i> and <i>last</i>. If <i>last</i> is not specified than a single
+    row will be deleted.
+</p>
+<hr width='75%' align=left>
+
+<!-- get -->
+<a name='get'></a>
+<p><b>get</b>( <i>first</i>, <i>?last</i> )</p>
+<p class='pMargin'>
+   Returns the contents of rows specified by a range of row indices from <i>first</i>
+   to <i>last</i>, inclusive, or returns only one row if <i>last</i> is omitted.  The return
+   value is an array of array references. 
+</p>
+<hr width='75%' align=left>
+
+<!-- getrow -->
+<a name='getrow'></a>
+<p><b>getRow</b>( <i>index</i> )</p>
+<p class="pMargin">
+  A simplified version of <a href="#get">get</a>(), this method returns either an array
+  of the content in each column for the row specified by <i>index</i>, or it will return the
+  content of only the first column in the row depending on the context.
+</p>
+<p>Example</p>
+<div class='pMargin'>
+  In a MListbox with one row, and four columns containing:  a,  b,  c, and d...
+</div>
+<pre>$result = $ml->getRow(0);  ## $result = "a"
+@result = $ml->getRow(0);  ## @result = ( "a", "b", "c", "d" )
+</pre>
+<hr width='75%' align=left>
+
+<!-- index -->
+<a name='index'></a>
+<p><b>index</b>( <i>index</i> )</p>
+<p class='pMargin'>
+   Returns the integer index value that corresponds to <i>index</i>. If <i>index</i>
+   is <b>end</b>, the return value is the count of the number of rows in the 
+   MListbox (The index after the current last element).
+</p>
+<p>See also</p>
+<p class=pMargin>
+    The section on <a href="#rowindices">Row Indices</a>.
+</p>
+<hr width='75%' align=left>
+
+<!-- insert -->
+<a name='insert'></a>
+<p><b>insert</b>( <i>index</i>, <i>@rows</i> )</p>
+<p class='pMargin'>
+   Inserts one or more rows into the MListbox before the element at <i>index</i>.
+   A single row element is an array reference to the column values for that row.
+   If an inserted row doesn't contain sufficient values to set each column for 
+   the row, than empty strings will be substituted.
+</p>
+<p>Example</p>
+<div class=pMargin>
+  For a MListbox with four columns, the following would add three new rows.
+</div>
+<pre>$ml->insert("end",
+    [qw/Row0:Col0 Row0:Col1 Row0:Col2 Row0:Col3/],
+    [qw/Row1:Col0 Row1:Col1 Row1:Col2 Row1:Col3/],
+    [qw/Row2:Col0 Row2:Col1 Row2:Col2 Row2:Col3/]
+);
+</pre>
+<hr width='75%' align=left>
+
+<!-- nearest -->
+<a name='nearest'></a>
+<p><b>nearest</b>( <i>y-coordinate</i> )</p>
+<p class='pMargin'>
+  Given a <i>y-coordinate</i> from the MListbox window, this method return the
+  integer index of the (visible) row nearest to that y-coordinate.
+</p>
+<hr width='75%' align=left>
+
+<!-- see -->
+<a name='see'></a>
+<p><b>see</b>( <i>index</i> )</p>
+<p class='pMargin'>
+  Adjusts the view in the MListbox so that the row specified by <i>index</i> is visible.
+  If the element is already visible then the command has no effect.
+</p>
+<hr width='75%' align=left>
+
+<!-- selectionAnchor -->
+<a name='selectionanchor'></a>
+<p><b>selectionAnchor</b>( <i>index</i> )</p>
+<p class='pMargin'>
+  Sets the selection anchor to the element given by <i>index</i>. The selection anchor is the
+  end of the selection that is fixed while dragging out a selection with the mouse. The index
+  <b>anchor</b> may be used to refer to the anchor element.
+</p>
+<hr width='75%' align=left>
+
+<!-- selectionClear -->
+<a name='selectionclear'></a>
+<p><b>selectionClear</b>( <i>first</i>, <i>?last</i>)</p>
+<p class='pMargin'>
+  Deselects any rows within the range specified by <i>first</i> and <i>last</i> if 
+  they are selected. Will deselect only one row, specified by <i>first</i> if <i>last</i>
+  is omitted.
+</p>
+<hr width='75%' align=left>
+
+<!-- selectionIncludes -->
+<a name='selectionincludes'></a>
+<p><b>selectionIncludes</b>( <i>index</i> )</p>
+<p class='pMargin'>
+   Returns <b>1</b> if the row specified by <i>index</i> is selected. Otherwise, returns
+   <b>0</b>.
+</p>
+<hr width='75%' align=left>
+
+<!-- selectionSet -->
+<a name='selectionset'></a>
+<p><b>selectionSet</b>( <i>first</i>, <i>?last</i> )</p>
+<p class='pMargin'>
+    Selects all of the rows indiciated in the range specified by <i>first</i> and <i>last</i>
+    without affecting the selection state of elements outside that range.
+</p>
+<hr width='75%' align=left>
+
+<!-- size -->
+<a name='size'></a>
+<p><b>size</b>()</p>
+<p class='pMargin'>
+   Returns an integer iindicating the total number of rows in the MListbox.
+</p>
+<hr width='75%' align=left>
+
+<!-- sort -->
+<a name='sort'></a>
+<p><b>sort</b>( <i>descending</i>, <i>?@indices</i> )</p>
+<p class='pMargin'>
+    Sorts the content of the MListbox, if <i>descending</i> is a true value, the sort
+    order will be descending, and otherwise will be ascending. By default, this value
+    is <b>0</b> (ascending). Zero or more column indicies may be specified to use
+    as the key to sort by. The first would be primary, then secondary, etc. By default,
+    all columns are sort keys, sorted in order.
+</p>
+<hr width='75%' align=left>
+
+<!-- xview -->
+<a name='xview'></a>
+<p><b>xview</b>( <i>?option</i>, ... )</p>
+<p class=pMargin>
+  This method performs a variety of different tasks related to vertical view for 
+  MListbox. The task depends on the specified parameters.   
+</p>
+<p class='pMargin'>Options<a name="xviewopts"></a></p>
+<dl class=pMargin>
+  <dt>&lt;No Option&gt;</dt>
+  <dd>
+    Returns a list containing two elements. Each element is a real fraction between 0 and 1;
+    together they described the span that is visible in the window.
+  </dd>
+  <dt><b>index</b></dt>
+  <dd>
+    Adjusts the view in the window so that character position given by <i>index</i>
+    is displayed at the left (xview) or top (yview) side of the window.
+  </dd>
+  <dt><b>moveto</b> =&gt; <i>fraction</i></dt>
+  <dd>
+    Adjusts the view in the window so that the element given by fraction appears 
+    at the top of the window. <i>fraction</i> is a value between 0 and 1; 0
+    indicates the first element in the listbox, 0.33 indicates one-third the
+    way through, etc.
+  </dd>
+  <dt><b>scroll</b> =&gt; <i>number</i>, <i>type</i></dt>
+  <dd>Ajusts the view in the window forward or backward. The amount moved depends
+      on the <i>type</i> of units, and the <i>number</i> of units. <i>number</i>
+      can be positive or negative for forward and backward respectively, <i>type</i>
+      can be <b>units</b> (1 char), or <b>pages</b> (screenfulls).
+
+  </dd>
+</dl>
+<hr width='75%' align=left>
+
+<!--  yview -->
+<a name='yview'></a>
+<p><b>yview</b>( <i>?option</i>, ... )</p>
+<p class='pMargin'>
+  This method performs a variety of different tasks related to vertical view for 
+  MListbox. The task depends on the specified parameters. 
+</p>
+<p>Options</p>
+<p class=pMargin>
+    See <a href="#xview">xview</a>() options.
+</p>
+<hr>
+
+<a name='kbindings'><a>
+<h2>Keyboard Mappings</h2>
+<p class=pMargin>
+   The following keyboard mappings are bound and work if the widget has focus.
+</p>
+
+
+<table width='95%' border=2 cellpadding=3>
+<tr><th width="20%">Sequence</th><th>Description</th></tr>
+<tr>
+  <td nowrap>&lt;Down&gt;</td>
+  <td>
+Moves the location cursor (active row) down by one elment
+and changes the selection while in <b>browse</b> or <b>extended</b>
+selectmode.
+  </td>
+</tr>
+<tr>
+  <td nowrap>&lt;Up&gt;</td>
+  <td>
+Moves the location cursor up by one element and changes the selection 
+while in <b>browse</b> or <b>extended</b> selectmode.
+  </td>
+</tr>
+<tr>
+  <td nowrap>&lt;Shift-Down&gt;</td>
+  <td>
+Moves the location cursor down by one, and extends the selection
+while in <b>extended</b> selectmode.
+  </td>
+</tr>
+<tr>
+  <td nowrap>&lt;Shift-Up&gt;</td>
+  <td>
+Moves the location cursor up by one, and extends the selection
+while in <b>extended</b> selectmode.
+  </td>
+</tr>
+<tr>
+  <td nowrap>&lt;Shift-Control-Home&gt;</td>
+  <td>
+Extends the selection to the first row.
+  </td>
+</tr>
+<tr>
+  <td nowrap>&lt;Shift-Control-End&gt;</td>
+  <td>
+Extends the selection to the last row.
+  </td>
+</tr>
+<tr>
+  <td nowrap>&lt;Control-Home&gt;</td>
+  <td>
+Moves the location cursor to the first row, selects it, and clears
+all other selected rows.
+  </td>
+</tr>
+<tr>
+  <td nowrap>&lt;Control-End&gt;</td>
+  <td>
+Moves the location cursor to the last row, selects it, and clears
+all other selected rows.
+  </td>
+</tr>
+<tr>
+  <td nowrap>&lt;Control-Slash&gt;</td>
+  <td>Selects all rows.</td></tr>
+<tr>
+  <td nowrap>&lt;Control-Backslash&gt;</td>
+  <td>Deselects all rows.</td></tr>
+</table>
+<br>
+<hr>
+
+<Address>
+This document was updated by Rob Seegel on 26 Dec 2001
+</Address>
+
+</body>
+</html>

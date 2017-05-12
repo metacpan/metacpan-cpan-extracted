@@ -1,0 +1,63 @@
+Revision history for Perl extension Test::Usage.
+
+0.08
+  + Same as 0.07_50
+
+0.07_50
+  + The fail option is now named 'f' instead of 'fail'.
+  + Windows colors are now explicity associated to their package.
+  + Added plabels() method.
+  + Save Windows color before changing it, so it can be restored.
+  + Improved the 'test' file contents.
+  + Supplied template renamed to TEMPLATE_T.pm.
+  + t/t4.t now has "1..1" after the "ok 1", instead of the other way
+    round (may have caused failing tests on some platforms; anyway, it
+    was wrong the other way round).
+  + Now has simpler README.
+  + Moved Manual type info from Test/Usage.pm to Test/Usage/Manual.pm.
+
+0.07 Tue Oct 25 10:42:05 2005
+  + files() calculates total elapsed time by using the clock rather
+    than by adding up subshelled times.
+  + t/Foo.pm doesn't require perl 5.8.3 anymore.
+  + Subshelled perl to run files() tests are now invoked with -w.
+  + files() now follows symlinks. Should perhaps be an option...
+
+0.06 Wed Jul 13 11:16:00 2005
+  + Improved the POD.
+  + Summary lines now with more color.
+  + Removed methods time_took(), nb_fail(), nb_succ(), died(),
+    warned().
+  + Got rid of the TestUsageSample.
+  + Supplied a Template_T.pm file.
+
+0.05 Thu Jun 23 15:44:07 2005 
+  + Fixed issues with spaces in file and directory names.
+
+0.04 Sun Jun 19 01:41:26 2005
+  + Improved the docs.
+  + Moved TestUsageSample to ./share and improved it.
+  + Now supports Win32::Console for color (FR).
+  + Now invokes system() with correct quotes for both Unix and Win32,
+    and other Unix vs. Win32 fixes (FR).
+  + (FR) : Thanks to Fabrice Rivard.
+  + Module tests now not in color (simpler to handle).
+
+0.03 Thu May 12 2005
+  + Corrected bug: $_D{f}{t} is now {} instead of ''.
+  + Now exports labels().
+  + files() now has test() not print a '1..N' line.
+  + test() and files() can now take a 'c => ...' option.
+  + files() now correctly passes 't => ...' to test().
+  + files(i => ..., i2 => ...) instead of splitting single 'i'.
+  + Now can do files(d => ..., d2 => ...).
+  + test(a => ..., e => ...) now take strings only, not arefs.
+
+0.02 Tue Apr 12 00:13:04 2005
+  + Default options can now be set in Usage.pm.
+  + files() now displays the module name before starting its tests.
+
+0.01 Sat Apr  9 21:25:36 2005
+  + Original version, refactored from my old Test::TestMod,
+    Test::TestMods, and Test::Scenarios modules.
+

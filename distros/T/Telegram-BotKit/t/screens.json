@@ -1,0 +1,35 @@
+{
+  "screens" : [
+    { "name": "item_select", "start_command": "/book", "welcome_msg": "Please select an item to book", "keyboard":
+      [
+        { "key": "Item 1", "answ" : "Good" },
+        { "key": "Item 2", "answ" : "Well" },
+        { "key": "Item 3", "answ" : "Fine" }
+      ] 
+    }, 
+    { "name": "day_select", "parent": "item_select", "welcome_msg": "Please select a day", "keyboard":
+      [
+        { "key": "today" }, 
+        { "key": "tomorrow" }
+      ]
+    },
+    { "name": "time_range_select", "parent": "day_select", "welcome_msg": "Please select atime range", "keyboard":
+      [
+        { "key": "morning", "answ" : "You are early bird" },
+        { "key": "day", "answ" : "Good choice" },
+        { "key": "evening", "answ" : "Owl" }
+      ]
+    },
+    { "name": "morning_time_range_select", 
+      "parent": "time_range_select", 
+      "callback_msg": "morning", 
+      "kb_build_func": "dynamic1_build_func"
+    },
+    { "name": "dynamic2", 
+      "parent": "time_range_select", 
+      "callback_msg": "day", 
+      "kb_build_func": "dynamic2_build_func"
+    },
+    { "name": "info", "start_command": "/info", "welcome_msg": "Get info", "kb_build_func": "info_build_func" }
+  ]
+}

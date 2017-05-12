@@ -1,0 +1,44 @@
+Test::WWW::Mechanize::Mojo - Test::WWW::Mechanize for Mojo
+
+Test::WWW::Mechanize::Mojo is a module to test Mojo applications using
+Test::WWW::Mechanize and WWW::Mechanize.
+
+It is based on Test::WWW::Mechanize::Catalyst .
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Test::WWW::Mechanize::Mojo
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-WWW-Mechanize-Mojo/
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test::WWW::Mechanize::Mojo
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Test::WWW::Mechanize::Mojo
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Test::WWW::Mechanize::Mojo
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-8, Leon Brocard
+
+This module is free software; you can redistribute it or modify it
+under the same terms as Perl itself.
+

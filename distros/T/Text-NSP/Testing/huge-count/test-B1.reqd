@@ -1,0 +1,2 @@
+ERROR(huge-count.pl):
+        ARGV[2]=test-B1.data2 should be a plain file.

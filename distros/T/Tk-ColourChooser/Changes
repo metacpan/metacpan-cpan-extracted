@@ -1,0 +1,90 @@
+1.52  Fri Mar 28 20:49:18 CET 2008
+- Bugfix: $win->transient caused error message
+- Re-added Changes file
+
+1.51 
+- Took over from Mark Summerfield, reorganized files
+
+2000/05/05
+
+Changed the handling of colour names internally; should be faster to load and
+also should use less memory since all instances now share the same colour name
+data.
+
+
+2000/01/19
+
+Added -showhex option which if set to 1, (default is 0), will show the hex
+value of the colour in the title bar.
+
+
+1999/10/01
+
+Changed the Show() method so that it is now compatible with Tk800.015 as well
+as earlier Tk800 versions.
+
+1999/09/21
+
+I've now had a go at adding 'de' (german) and 'fr' (french) as valid -language
+options - translations by Babelfish so please let me know if they're wrong!
+
+1999/09/11  
+
+Added -language option so that the title and labels will come up in the
+language you've chosen. Current language is english, 'en'. If people supply
+translations I will add them. 
+
+1999/09/06  
+
+Reinstated the test program, it is now called `example'. NB This module is
+incompatible with Tk800.015 (which I believe is broken); it works fine with
+earlier Tk8 and Tk4 versions and is expected to work with Tk800.016 onwards.
+
+1999/09/04  
+
+Removed ColourChooser.t - it was only a simple example but being interactive
+messes up CPAN's automatic testing. Plus tiny fixes.
+
+1999/09/01  
+
+Added Makefile.PL.
+
+1999/08/29  
+
+Minor code changes.
+
+1999/08/08  
+
+Changed licence to LGPL.
+
+1999/08/05  
+
+Just changed the files to make them more CPAN friendly.
+
+1999/04/21  
+
+Updating the colour when you move the scrollbar with the mouse is buggy --
+can't figure out why so have reverted.
+
+1999/03/02  
+
+Now when you scroll with the scrollbar both the colourname and the colour
+shown are updated (the same as when you move up and down with the arrow keys).
+
+1999/02/23  
+
+Should now be Windows compatible.
+
+1999/02/17  
+
+If a colour is given as lowercase hex it is now properly recognised.
+
+1999/02/15  
+
+Improved handling of initial colour so that it copes better with the variety
+of valid colour name inputs.
+
+1999/01/29  
+
+First version.
+

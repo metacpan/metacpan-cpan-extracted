@@ -1,0 +1,22 @@
+README for Tie::Filehandle::Preempt::Stdin
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you are on a Windows box you should use 'nmake' rather than 'make'.
+
+DEPENDENCIES
+
+None.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

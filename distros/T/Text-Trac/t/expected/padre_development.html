@@ -1,0 +1,140 @@
+<p>
+[[PageOutline(1-2)]]
+</p>
+<h1 id="Developmentingeneral">Development in general</h1>
+<p>
+We are using Subversion for version control.
+The main development of Padre is in the trunk <a class="ext-link" href="http://svn.perlide.org/padre/trunk/Padre"><span class="icon"></span>http://svn.perlide.org/padre/trunk/Padre</a> but there are several 
+additional projects and almost all the plugins of Padre also live in the same repository so the best if you check 
+out the whole trunk <a class="ext-link" href="http://svn.perlide.org/padre/trunk"><span class="icon"></span>http://svn.perlide.org/padre/trunk</a>
+</p>
+<pre class="wiki">
+$ svn co http://svn.perlide.org/padre/trunk padre
+</pre>
+<p>
+Then you can run the standard CPAN module process:
+</p>
+<p>
+Make sure you have all of the needed prerequisites. See <a class="ext-link" href="http://padre.perlide.org/trac/wiki/Download"><span class="icon"></span>http://padre.perlide.org/trac/wiki/Download</a>
+</p>
+<pre class="wiki">
+$ cd padre/Padre
+$ perl Makefile.PL      # which will tell about all the missing dependencies of Padre
+                        # this may fail if you don't have Module::Install
+                        # if so, start cpan and install it with all its prerequisites
+$ make
+$ make test
+</pre>
+<p>
+For a more detailed set of instructions on how to install the dependencies visit the <a class="wiki" href="/wiki/Download">Download</a>
+</p>
+<p>
+Once all the above works well you can launch Padre from the SVN tree by running
+<tt>
+$ perl dev
+</tt>
+</p>
+<p>
+dev has some more parameters you can see by typing
+<tt>
+$ perl dev -h
+</tt>
+</p>
+<p>
+The most important being
+<tt>
+$ perl dev -a
+</tt>
+that will include the path to all the plugins located in trunk/
+</p>
+<h2 id="Coding">Coding</h2>
+<p>
+See the <a class="ext-link" href="http://search.cpan.org/dist/Padre/lib/Padre/Manual/Hacking.pod"><span class="icon"></span>http://search.cpan.org/dist/Padre/lib/Padre/Manual/Hacking.pod</a> file for Core Padre development
+and <a class="ext-link" href="http://search.cpan.org/dist/Padre/lib/Padre/Plugin.pm"><span class="icon"></span>http://search.cpan.org/dist/Padre/lib/Padre/Plugin.pm</a> for Plugin development.
+</p>
+<h2 id="Translation">Translation</h2>
+<p>
+Translation is basically part of the development effort. For more details please take a look at this page:
+See <a class="wiki" href="/wiki/[wiki:TranslationIntro]">[wiki:TranslationIntro]</a>
+</p>
+<h2 id="Documentation">Documentation</h2>
+<p>
+The documentation of Padre is standard POD embedded in the .pm files. If you'd like to 
+improve those you should check out the source code of Padre as described above and send
+patches or ask for commit bit. The documentation is part of the regular development process.
+</p>
+<h2 id="QA/Testing">QA/Testing</h2>
+<p>
+Unfortunately Padre has not enough automated test mostly due to the fact that 
+we hardly know how to test GUI applications. The existing tests are located 
+in the standard t/ directory. 
+If you'd like to help in this and if you are on Windows you could take a look at the 
+t/win32/ directory where we have a few tests written using Win32::GUItest.
+You would be very highly regarded if you improved the test coverage of Padre!!
+</p>
+<h2 id="ReleaseManagement">Release Management</h2>
+<p>
+See separate page about <a class="wiki" href="/wiki/Release">Release</a>
+</p>
+<h1 id="Developmentinabranch">Development in a branch</h1>
+<p>
+Most of our development is done on the trunk but occasionally we prefer to make our private corner for experimental changes
+or changes that might not be stable for some time.
+Instructions on how to do that:
+</p>
+<p>
+Create a branch and work on it:
+</p>
+<p>
+Assuming you have already checked out <a class="ext-link" href="http://svn.perlide.org/padre/trunk/"><span class="icon"></span>http://svn.perlide.org/padre/trunk/</a> to /path/to/padre
+</p>
+<pre class="wiki">
+$ svn cp http://svn.perlide.org/padre/trunk/Padre http://svn.perlide.org/padre/branches/My-branch -m'some messages'
+$ cd /path/to/padre/Padre
+$ svn switch http://svn.perlide.org/padre/branches/My-branch .
+</pre>
+<p>
+If you run 
+<tt>
+svn st ..
+</tt>
+</p>
+<p>
+You will see a letter S infront to the Padre directory as that one is switched.
+</p>
+<p>
+Now you can edit, test and commit as usual. Your changes will be committed to the branch.
+</p>
+<p>
+When done and you would like to merge your changes
+</p>
+<p>
+1. Make sure everything is committed
+</p>
+<pre class="wiki">
+$ cd /path/to/padre/Padre
+$ svn switch http://svn.perlide.org/padre/trunk/Padre
+$ svn log --stop-on-copy http://svn.perlide.org/padre/branches/My-branch
+</pre>
+<p>
+This will show you the changes you made on the branch. Take the FIRST and LAST revision numbers in this log and
+use the following command to see the full change you made:
+<tt>
+svn diff -rFIRST:LAST <a class="ext-link" href="http://svn.perlide.org/padre/branches/My-branch"><span class="icon"></span>http://svn.perlide.org/padre/branches/My-branch</a>
+</tt>
+</p>
+<p>
+use the following to merge it back to trunk
+<tt>
+svn merge -rFIRST:LAST <a class="ext-link" href="http://svn.perlide.org/padre/branches/My-branch"><span class="icon"></span>http://svn.perlide.org/padre/branches/My-branch</a> .
+svn commit -m'merged  -rFIRST:LAST <a class="ext-link" href="http://svn.perlide.org/padre/branches/My-branch"><span class="icon"></span>http://svn.perlide.org/padre/branches/My-branch</a> '
+svn rm <a class="ext-link" href="http://svn.perlide.org/padre/branches/My-branch"><span class="icon"></span>http://svn.perlide.org/padre/branches/My-branch</a> -m'My-branch is not needed any more'
+</tt>
+</p>
+<p>
+If you decided it was a dead-end you can just switch back to trunk and remove the branch.
+</p>
+<h2 id="Tickets">Tickets</h2>
+<p>
+[[TicketQuery(component=development,order=id,desc=1,format=table,col=resolution|summary|owner|reporter)]]
+</p>

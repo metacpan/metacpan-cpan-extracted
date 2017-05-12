@@ -1,0 +1,12 @@
+Revision history for Text-GuessEncoding
+
+0.07 2010-06-21, jnw, use POSIX, so that POSIX:VMIN becomes valid under use strict;
+
+0.06  2010-06-21, added tty_* functions, added guess_encoding.pl
+
+0.03  2010-05-20, fixed test suite to no longer require Text::ToAscii
+
+0.02  2010-05-20, fixed docu and pushed onto cpan.
+
+0.01  2010-01-21, initial draught. Renamed from Text::ToAscii
+

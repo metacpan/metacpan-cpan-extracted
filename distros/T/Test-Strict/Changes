@@ -1,0 +1,159 @@
+Revision history for Test::Strict.
+
+0.39  2016-12-02 12:10:00 MANWAR
+      - Merged pull request #21, thanks @arc.
+
+0.38  2016-12-01 12:50:00 MANWAR
+      - Merged pull request #20, thanks @tomhukins.
+
+0.37  2016-06-09 10:30:00 MANWAR
+      - Merged pull request #19, thanks @shlomif.
+
+0.36  2016-01-17 02:10:00 MANWAR
+      - Fixed issue RT# 55112 (svn directories incorrectly filtered out).
+
+0.35  2016-01-16 08:45:00 MANWAR
+      - Fixed Github issue #16.
+
+0.34  2015-11-15 08:50:00 MANWAR
+      - Added key 'provides' to the Makefile.PL script.
+
+0.33  2015-11-13 10:35:00 MANWAR
+      - Tidied up Changes file.
+      - Added unit test to check Changes file (t/95-changes.t) against the standard.
+
+0.32  2015-11-03 10:10:00 MANWAR
+      - Added LICENSE file.
+      - Added standard unit test script (t/00-load.t).
+
+0.31  2015-10-27 10:35:00 MANWAR
+      - Upgraded the min perl version to 5.006 as proposed by Perl::MinimumVersion.
+      - Added MIN_PERL_VERSION to the Makefile.PL script.
+      - Updated unit test script t/02fail.t to comply with perl 5.006.
+
+0.30  2015-10-24 MANWAR
+      - Tidied up Makefile.PL script.
+      - Removed the executable attributes from some of the unit test script.
+
+0.29  2015-10-19 MANWAR
+      - Updated link to github repository in the Makefile.PL script
+      - Updated bugtracker link in the Makefile.PL script.
+      - Updated x_contributors list in the Makefile.PL script
+      - Updated link to github repository in the pod document of Test::Strict package.
+      - Updated MAINTAINER section in the pod document of Test::Strict package.
+
+0.28  2015-10-02
+      - Make syntax_ok check modules without '::' in their names (Petr Šabata)
+
+0.27  2015-04-12
+      - accept -t -w (Athos Ribeiro)
+
+0.26  2014.-10.16
+      - Add test using Test::DistManifest and Test::CheckManifest
+      - Add author test using Test::Version
+
+0.25  2014-10-16T07:52:00Z
+      - Link to GitHub bugtracker - is it working now?
+      - Some tests refactored.
+
+0.25  2014-10-15T19:52:00Z
+      - Update Makefile.PL to point to GitHub as bug tracking system
+      - use 5.012; enables use strict; #7
+
+0.24  2014-10-05T08:28:00Z
+      - add Catmandu::Sane, Moo::Role, MooseX::Role::Parameterized, Role::Tiny
+        to the list of modules implying strict and warnings. #6
+
+0.23  2014-03-06T10:39:05Z
+      - Standardize dates in the Changes file.
+      -  Replace modules_enabling_warnings() by @Test::Strict::MODULES_ENABLING_WARNINGS
+         and modules_enabling_strict() by @Test::Strict::MODULES_ENABLING_STRICT
+         and by that allow the user to customize it. (thaljef - Jeffrey Thalhammer)
+         RT #93443
+
+0.22  2013-03-01T07:39:05Z
+      - Exclude the MYMETA files from the distribution.
+
+0.21  2013-02-26T20:32:03Z
+      - Add x_contributors to the META files.
+      - Add Moose::Exporter to the strict and warnings providers (Graham Knop)
+
+0.20  2013-02-22T12:32:03Z
+      - Add more modules that set strict and warnings. (suggested by RIBASUSHI, DAXIM)
+      - Remove warnings::register
+      - Experimental function modules_enabling_strict() to return those module names.
+      - Experimental function modules_enabling_warnings() to return those module names.
+
+0.19  2013-02-20T11:12:39Z
+      - Skip test if Moose::Autobox is not installed.
+
+0.18  2013-02-17T13:54:13Z
+      - RT #83388 - use Moose::Autobox should not be seen as use Moose; (Peter Vereshagin)
+
+0.17  2012-12-30T08:13:42Z
+      - Add license field to META files
+      - eliminate unwanted dependency on Modern::Perl
+
+0.16  2012-12-28T09:38:47Z
+      - Fix the Windows recognition regex in the code as well.
+      - rt #80341: Accept use Modern::Perl as strict and warnings. (Peter Vereshagin)
+      - rt #55186: Be less strict about filenames when calling syntax_ok directly (Frank Lichtenheld)
+
+0.15  2012-12-27T09:59:29Z
+      - rt #81849 and rt #79515: disable the coverage testing unless a flag is enabled as that was stuck on Windows.
+      - rt #44187: Fix test on Cygwin.
+      - Add link to Github repository.
+      - Co-maintainer: Gabor Szabo (SZABGAB).
+
+0.14  2010-02-13T19:40:00Z
+      - rt #44216: now taint safe - thanks Lars
+      - rt #44607: compatible with Moose and Mouse - thanks Apocalypse
+      - Removed Test::Pod dependency
+
+0.13  2009-01-30T19:25:00Z
+      - rt #42922: Assignment to read only value - thanks Andreas
+
+0.12  2009-01-25T17:55:00Z
+      - rt #42575: Can deal with filenames with spaces - thanks Renee
+      - rt #42576: Deal with windows dos shorten filnames - thanks Renee
+
+0.11  2009-01-18T20:30:00Z
+      - rt #41604: Allow to skip "trusted" files - thanks Jon
+
+0.10  2009-01-18T19:50:00Z
+      - rt #41524: Fixed warning "no_plan takes no arguments ..." - thanks Apocalypse
+
+0.09  2008-02-23T23:50:00Z
+      - Addressed rt #32704 Cleaning up /tmp directory (ANDK)
+      - Added $DEVEL_COVER_OPTIONS to give more control on which files to select for code coverage
+
+0.08  2006-09-05T16:50:00Z
+      - Adressed ticket #21196. (smueller)
+      - Made the untaint pattern less vulnerable to win32 paths. (smueller)
+      - Now quoting meta-characters before use in regex. (smueller)
+      - Skipping tests that fail on win32 because of the testing procedure (smueller)
+
+0.07  2005-05-29T03:45:00Z
+      - Skip blib/man directory in all_perl_files_ok() and all_cover_ok()
+
+0.06  2005-03-25T00:10:00Z
+      - Skip blib/libdoc directory in all_perl_files_ok() and all_cover_ok()
+
+0.05  2005-03-21T21:10:00Z
+      - Added $TEST_SYNTAX, $TEST_STRICT, $TEST_WARNINGS, Thanks Christopher Laco
+
+0.04  2005-03-21T20:40:00Z
+      - Fixed warnings_ok() - now it detects "use warnings FATAL => 'all';" - Thanks Christopher Laco
+
+0.03  2005-03-20T23:10:00Z
+      - Added untainting - Thanks Christopher Laco
+      - Added $Test::Strict::UNTAINT_PATTERN
+      - Added better detection of cover binary
+      - Added warnings_ok()
+
+0.02  2005-03-19T00:17:00Z
+      - Added detection of 'cover' binary
+      - Added $Test::Strict::COVER
+
+0.01  2005-03-12T01:14:13Z
+      - Initial release

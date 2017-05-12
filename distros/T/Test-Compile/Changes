@@ -1,0 +1,157 @@
+Revision history for Perl extension Test-Compile
+
+v1.3.0    2015-09-24              (Evan Giles <egiles@cpan.org>)
+    - Announce the deprecation the procedural functions (long overdue)
+    - Remove the 'use 5.6.2' statements, they cause warnings.
+    - Fix some spelling errors
+    - Move the xt tests into the main test directory
+    - Protect against strange PERL5LIB chars (CPAN-RT 104614)
+
+v1.2.1    2014-12-09              (Evan Giles <egiles@cpan.org>)
+    - Fix (skip where appropriate) failing CPAN test
+    - Avoid warnings for empty files in all_pl_files (Nigel Gregoire)
+
+v1.2.0    2014-08-08              (Evan Giles <egiles@cpan.org>)
+    - Files without extension may not be perl (rt83917)
+    - Small POD fix
+
+v1.1.0    2014-07-18              (Evan Giles <egiles@cpan.org>)
+    - Allow use of Test::Compile in an object oriented manner
+    - Promote the OO interface in the POD
+    - Test::Compile::Internal is now verbose by default
+    - Correct the dependancy information
+
+v1.0.1    2014-03-20              (Evan Giles <egiles@cpan.org>)
+    - Fix stupid omission from the MANAIFEST (tests failed everywhere)
+
+v1.0.0    2014-03-19              (Evan Giles <egiles@cpan.org>)
+    - Try to use Sematic Versioning - http://semver.org
+    - Add diagnostics on compilation failure        (Micheal G. Schwern)
+    - require, don't use                            (Micheal G. Schwern)
+    - Test for truth, not an integer.               (Micheal G. Schwern)
+    - Small POD fix                                 (Micheal G. Schwern)
+    - OS X is not a crazy OS from a redirection POV (Micheal G. Schwern)
+
+0.24  2013 02 22                  (Evan Giles <egiles@cpan.org>)
+    - Update POD to explain more problems with Test::Compile
+
+0.23  2013.01.23                  (Evan Giles <egiles@cpan.org>)
+    - Update Copyright for 2013
+    - CPAN-RT #82887, Sébastien Aperghis-Tramoni <sebastien@aperghis.net>
+        - Correct handling of PERL5LIB
+        - fix regexp to detect taint mode
+
+0.22  2012.10.31                  (Evan Giles <egiles@cpan.org>)
+    - Set verbose on for the Test::Compile library (rt80187)
+
+0.21  2012.09.05                  (Evan Giles <egiles@cpan.org>)
+    - Finally test that the verbose method actaully works.
+    - Update the POD - mostly to simplify it.
+    - Remove redundant code, yet more tests.
+    - Test::Compile::Internal is no longer 'beta'.
+
+0.20  2012.08.08                  (Evan Giles <egiles@cpan.org>)
+    - Tests should also work outside unix (rt78810)
+
+0.19  2012.08.03                  (Evan Giles <egiles@cpan.org>)
+    - Introduce Test::Compile::Internal.pm
+    - Utilise Test::Compile::Internal to get better test coverage
+
+0.18  2012.07.16                  (Evan Giles <egiles@cpan.org>)
+    - Fix a warning that leaks out (rt78363)
+
+0.17  2012.02.25                   (Evan Giles <egiles@cpan.org>)
+    - Another few tests for taint logic
+
+0.16_1 2012.02.23                   (Evan Giles <egiles@cpan.org>)
+    - Reapply patches from Nicholas Bamber (rt55837 & rt72557)
+
+0.16   2012.02.21                   (Evan Giles <egiles@cpan.org>)
+    - Skip tests if there are not files to test (rt69297)
+    - Handle taint mode correctly (rt55837)
+    - Add 'blib/lib' to the search path for scripts (rt72557)
+
+0.15  Fri 2012.02.03 20:33:55 NZST (Evan Giles <egiles@cpan.org>)
+    - Fork, and run compile tests in the child process (rt73290 & rt73291)
+
+0.14  Tue 2012.01.10 20:03:24 NZST (Evan Giles <egiles@cpan.org>)
+    - Convert to Module::Build
+    - Improved test for pl_file_ok()
+    - Better test coverage (which files do we process, failed to compile, etc)
+    - Remove duplicate code
+
+0.13  Tue 2010.03.02 15:57:02 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - require Test::More 0.88 so done_testing works without no_plan (thanks
+      jozef)
+
+0.12  Thu 2010.02.11 15:16:22 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - updated skeleton files
+    - recommend, not require, Devel::CheckOS - only needed for VMS anyway
+
+0.11  Tue 2009.12.08 12:19:25 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - made author tests more robust
+
+0.10  Thu 2009.10.08 22:29:11 CEST (Marcel Gruenauer <marcel@cpan.org>)
+    - re-release with fixed inc::Module::Install::ReadmeMarkdownFromPod
+
+0.09  Wed 2009.10.07 00:57:14 CEST (Marcel Gruenauer <marcel@cpan.org>)
+     - Always report name of .pl files (thanks xsawyerx).
+     - pm_file_ok() can now handle Windows paths (thanks clonezone).
+     - fixed version number used in documentation (thanks JKUTEJ).
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.08  Thu, 29 May 2008 12:08:32 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.08
+     - we now check for Devel::CheckOS with UNIVERSAL::require so we don't
+       use() it so Devel::CheckOS won't be included when using Test::Compile as
+       part of Module::Install::StandardTests
+     - .shipit: fixed svk.tagpattern
+
+0.07  Thu, 06 Dec 2007 19:24:25 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.07
+     - fixed bug in pl_file_ok() where a SKIP block was used when Test->skip()
+       should have been used
+     - added t/04_pl_file_ok-vms.t to verify that
+     - updated MANIFEST
+     - added t/04_pl_file_ok-vms.t
+
+0.06  Thu, 06 Dec 2007 13:16:02 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - added capability to test scripts as well (thanks Sagar R. Shah)
+     - added t/03_pl_file_ok.t
+     - added t/scripts
+     - tags: NEWFEATURE
+
+0.05  Sun, 21 Oct 2007 13:40:23 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - no longer uses standard tests, since they require Test::Compile
+       themselves. Instead, copied the standard tests's pod and pod coverage
+       test files into this distribution. Thanks Andreas Koenig for catching
+       that circular dependency.
+
+0.04  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+
+0.03  Wed, 03 Oct 2007 22:31:43 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - made things cleaner by using UNIVERSAL::require on the suspected module
+     - The documentation now uses Test::More->builder->BAIL_OUT() in order to
+       stop the testsuite from running if a compilation fails. Also, the
+       documentation now urges that Test::Compile be mandatory (like
+       Test::Exception often is) instead of optional (like Test::Pod often is).
+       Thanks to Rob Kinyon for the suggestion.
+     - bumped version numbers to '0.03'
+
+0.02  Wed, 03 Oct 2007 18:30:17 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - made things cleaner by using UNIVERSAL::require on the suspected module
+       name instead of do() on the file name, which introduced potential bugs
+       by running at run time what would otherwise happen at compile time
+     - bumped version numbers to '0.02'
+
+0.01  Sat, 22 Sep 2007 23:35:34 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

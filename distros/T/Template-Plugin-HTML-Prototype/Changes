@@ -1,0 +1,6 @@
+Revision history for Perl extension Template::Plugin::HTML::Prototype.
+
+0.01  Sat May  7 00:53:32 2005
+	- original version; created by h2xs 1.22 with options
+		-n Template::Plugin::HTML::Prototype -X -A
+

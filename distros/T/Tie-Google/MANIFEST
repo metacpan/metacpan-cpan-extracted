@@ -1,0 +1,10 @@
+Google.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+SIGNATURE
+t/array.t
+t/hash.t
+t/options.t
+t/scalar.t

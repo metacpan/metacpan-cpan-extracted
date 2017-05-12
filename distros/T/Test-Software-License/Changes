@@ -1,0 +1,45 @@
+Revision history for Test-Software-License
+
+0.004000  2014-10-12 18:29:10 BST
+ - switch to List::AllUtils
+
+0.003_07 2014-09-20T20:53:20Z
+ - we now have a working meta license and resourse.license with comparisom
+   working
+ - switch to File::Slurp::Tiny
+
+0.002000 2013-11-07T19:49:42Z +0000 GMT
+ - rename and relocate software-licence.t
+ - remove Carp as we are not using it
+ - add author name check to _check_for_license_file
+ - refactor and rename test files
+
+0.001007 2013-10-26T19:10:33Z +0100 BST
+ - Add option support for strict option
+ - drop dependencies for travis completion
+ - pass all relevant local xt's
+ - drop perl min version to support 5.8.4
+
+0.001006 2013-10-26T17:46:24Z +0100 BST
+ - Up-Date Changes to strict [22a9ee2]
+
+0.001005 2013-10-18T23:55:22Z BST
+ - tweak dependencies for travis
+
+0.001004 2013-10-18T23:02:36Z BST
+ - try and sort out my bad with version license and milla
+ - drop min perl to 5.008009
+ - remove some cruff
+
+0.001003 2013-10-16T22:02:02Z BST
+ - Add a hacked local LicenseUtils
+ - get rid of the script and provide it in eg
+
+0.001002 2013-10-15
+ - skipped
+
+0.001001 2013-10-14T23:34:09Z BST
+ - let's share what we have done so far
+
+0.001000 2013-10-10T15:03:34Z
+ - Initial release.

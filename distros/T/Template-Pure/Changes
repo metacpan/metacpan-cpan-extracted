@@ -1,0 +1,198 @@
+The following logs changes for the CPAN distribution Template::Pure
+
+0.033   26 January 2017
+       - Copyright updates
+       - coderef data values can now return an arrayref, which will be considered
+         as subdirectives under the current DOM match point and data path.
+
+0.032   22 December 2016
+       - Fixed distribution metadata that prevented correct installation :(
+
+0.031   22 December 2016
+       - Allow a loop to assign directly to a coderef or another Template::Pure
+         instance.
+       - When loop is assigning directly to a datapath, respect existing scope
+         on the CSS match.
+        - Memoize most of the parsing, should be a speed boost for repeated
+          renders on the same template.
+
+0.030   13 September 2016
+       - Fixed regression in interator introduced by last release
+
+0.029   12 September 2016
+       - Fixed a bug when the value returned by an iterator is undef
+
+0.028   31 August 2016
+       - If your match specification does not match anything in the template, you now
+         get an error.
+       - The iterator modifiers filter, grep, order_by can now take a scalar that is
+         a path to an anonymous subroutine on the data context.
+
+0.027   28 August 2016
+        - Fixed bug in data path specifications with placeholders that caused the
+          final character to be deleted in some cases.
+        - !!BREAKING CHANGE!!: On iterator, the special key 'filter' is now 'grep', to
+          match inconsistent docs.  Special key 'grep' does what 'filter' used to do
+          which is to allow or skip a row in the iterator based on some logic.  However
+          we also have now in addition to the new 'grep' a new 'filter', which is used
+          to filter or transform the iterator row in some way.  Docs and tests updated.
+          Should be a simple search and replace for you if you are using iterators with
+          the old 'filter' keyword.
+        - !!BREAKING CHANGE!!  We documented the old 'filter' (now 'grep') iterator
+          keyword to say that the anonymous subroutine received the $pure object as its
+          first argument.  This was not the case.  Code has been fixed to match the
+          documented behavior, but if you relied on the previous code you will need to
+          make some minor changes.
+        - New Filter: 'cond'.  Basically a filter tha works like the conditional operator
+          (?).  See docs.  Added this to save myself having to drop to a coderef so much.
+        - Test case around when you want to match several specs to a single action.
+
+0.026   25 August 2016
+        - Fixed bug where in a loop and using a prepend or append match specification
+          the values aggregate rather than replace.
+        - Allow a new shorthand syntax in a loop when you are just doing a simple
+          one value replacement of the current matched node.
+        - Allow you to set the current data context directly in a loop 
+        - More tests to stress loops inside of loops.
+        - Minor improvements to error warnings
+        - POD fixes
+
+0.025   17 August 2016
+        - Updated dependencies
+        - fixed typo in code that does error messages.  Should improve messaging.
+        - More undocumented work on components / custom tags
+
+0.024   08 August 2016
+        - Regexp patch to silence warnings (zostay++)
+        - Allow one to indicate an action is a literal string
+
+0.023   29 July 2016
+        - New Processing Instruction: Filter.  Takes a node as its source template.
+        - I no longer consider this module a wild alpha version.  I will only break
+          the existing test suite and documented behavior if I have obsolutely not
+          other path forward.  See main docs for blockers on removing 'early access'
+          status.
+
+0.022   20 July 2016
+        - Some error messages around missing data paths are now more useful. Requires
+          Class::MOP (which is not listed as a dependency, you should install it for
+          debugging in development).
+
+0.021   18 July 2016
+        - Fixed processing instruction include when listing arguments
+        - Updated some dependency requirements
+
+0.020   13 July 2016
+        - Bugfixes for object iterator
+        - When the matchspec is 'append' or 'prepend' and the target action
+          is undef we no longer delete the matched node.
+        - If an action with a template that contains literals and placeholders
+          has a trailing filter(s) we now apply the filters.
+
+0.019   07 July 2016
+        - You may now use a data placeholder in a match specification
+        - You may now pass a coderef to replace a match => action pair
+          for custom or speciality processing.
+
+0.018   27 June 2016
+        - Fixed VERSION typo preventing properly upgrade installation.
+        - Components now are responsible for adding any styles and scripts
+          to the DOM root.
+        - New component hook to modify setup parameters.
+        - Components now can override how the render callback is created.
+
+0.017   22 June 2016
+        - Use Digest::MD5 instead of the pure Perl version since its actually
+          bundled with older Perls anyway.
+        - Methods that return a coderef can now return an object as well as a
+          scalar from the coderef.
+
+0.016   17 June 2016
+        - 'Dark launch' of new components feature.  No docs, but you can look
+          at the test case (t/components.t) and at Template::Pure::Component
+          source code for the idea.  Docs to come.
+
+0.015   10 June 2016
+        - Code is considered less experimental than before and I am moving toward
+          feeling committed to the current test suite and documentation.
+        - Corrected Changed document.
+        - POD Fixes
+        - New test case that combines looping with a processing instruction
+        - Fixed bug where passing parameters to a processing instruction
+          did not work as documented.
+
+0.014   19 April 2016
+        - Migration from DOM::Tiny to Mojo::DOM58.  This is just a namespace change
+          it does not add Mojolicious as a dependency to the application.  This
+          could also be a breaking change for you if you are hardcoding instances
+          of Mojo::DOM58.  Should be a simple search and replace job.  I did warn you
+          this is experimental code right :)
+        - Fixed a bug where you could not delete an attribute by setting it to undef.
+        - New Feature: Template processing instructions.  Lets the template author
+          embed processing instructions into the HTML so that she can have easier control
+          over the template structure without needing to learn Perl and the Template::Pure
+          API.  
+
+0.013   11 April 2016
+        - We now expose 'self', the current instance of the Pure object in your
+          data context.  This makes it easier to follow the new best practice
+          recommendation of using a subclass to encapsulate your view logic and
+          view related data.
+        - Using 'data_at_path' is now required in coderef actions where you are
+          pulling values out of the data context.  This could be a breaking change
+          if you did not follow the recommended best practice.
+
+0.012   25 March 2016
+        - Require the newest version of Mojo::DOM58
+        - You may now set the target of an action to a Mojo::DOM58 object instance.
+
+0.011   22 March 2016
+        - Now if the result of a scalar action is an object that does 'TO_HTML' we
+          process the object rather than stringify it.
+
+0.010   21 March 2016
+        - I'm setting the minimum Perl version to 5.10.0 since we are using
+          some regular expression constructs that only work on 5.10+ and its making
+          the testing reports noisy.  I'd love to support 5.8.8 if I could, if anyone
+          is a regexp ninja and wants to help, the issue is in Template::Pure::ParseUtils
+          where I am using named/number capture buffers (that requires 5.10+).  If we can
+          redo that regexp to not use those features that would grant us 5.8 compatibility.
+
+0.009   17 March 2016
+        - Make sure templates state is properly reset.
+
+0.008   17 March 2016
+        - Fixed issue with wrapper templates
+        - New Feature: you may now set a template object in the data section
+          and expect it to render.
+
+0.007   16 March 2016
+        - You may now assign the value of an action to any object that does
+          a method called 'TO_HTML'.
+
+0.006   15 March 2016
+        - Removed some testing code accidentally left in the distribution
+          in the last release
+
+0.005   14 March 2016
+        - pod tests and pod fixes (manwar++)
+        - Setup for Travis CI
+        - Tweaked some regular expressions for compatibility with more
+          versions of Perl
+        - new feature: let you assign a the target of a data context directly
+          to a sub template.
+
+0.004   14 March 2016
+        - Rename Utils to ParseUtils
+        - Fixed some reported errors
+
+0.003   12 March 2016
+        - Fixes for code actions and filters when the match css matches
+          more than on node.
+
+0.002   11 March 2016
+        - Fix to properly mark scalar ref actions as encoded
+
+0.001   11 March 2016
+        - First usable version, with caveats (its still earlly access)
+

@@ -1,0 +1,85 @@
+NAME
+    Thread::Cleanup - Hook thread destruction.
+
+VERSION
+    Version 0.07
+
+SYNOPSIS
+        use Thread::Cleanup;
+
+        use threads;
+
+        Thread::Cleanup::register {
+         my $tid = threads->tid();
+         warn "Thread $tid finished\n";
+        };
+
+DESCRIPTION
+    This module allows you to hook thread destruction without fiddling with
+    the internals of threads.
+
+    It acts globally on all the threads that may spawn anywhere in your
+    program, with the exception of the main thread.
+
+    The hooks registered with this module will also be called when
+    pseudo-forks (i.e. processes spawn on Windows for the "fork" emulation)
+    terminate.
+
+FUNCTIONS
+  "register"
+        register { ... };
+        &register($coderef);
+
+    Specify that the given block or code reference $coderef will have to be
+    called (in void context, without arguments) every time a thread or a
+    pseudo-fork terminates. More precisely :
+
+    *   For joined threads, it will be called when "join" succeeds, after
+        any "END" block local to the spawn thread ;
+
+    *   For detached threads, it will be called if and only if the thread
+        terminates before the main thread, and the hook will then fire at
+        global "END" time ;
+
+    *   For pseudo-forks, it will be called when "waitpid" succeeds, after
+        any local or global "END" block ;
+
+    *   It will never trigger for the destruction of the main thread.
+
+EXPORT
+    None.
+
+DEPENDENCIES
+    perl 5.8.
+
+    A C compiler. This module may happen to build with a C++ compiler as
+    well, but don't rely on it, as no guarantee is made in this regard.
+
+    threads 1.07.
+
+    XSLoader.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+BUGS
+    Please report any bugs or feature requests to "bug-thread-cleanup at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Thread-Cleanup>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Thread::Cleanup
+
+ACKNOWLEDGEMENTS
+    Inspired by a question from TonyC on #p5p.
+
+COPYRIGHT & LICENSE
+    Copyright 2009,2010,2013,2014 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

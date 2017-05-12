@@ -1,0 +1,7 @@
+name = "Test-Deep-ArrayEachNotEmpty"
+badges = ["travis"]
+authority="cpan:MIHYAERU"
+license="MIT"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,75 @@
+Revision history for Test-WithDB
+
+0.08    2016-07-10 (PERLANCAR)
+
+        - Add DBD::SQLite as a dependency.
+
+        - Test schema migration during release, not author testing (I
+          practically never run tests with AUTHOR_TESTING=1).
+
+
+0.07    2015-09-27 (PERLANCAR)
+
+	- Switch to Mo.
+
+        - Observe TWDB_KEEP_TEMP_DBS to allow preventing automatic cleanup of
+          temp databases.
+
+        - Add methods: drop_dbs(), created_dbs().
+
+        - Add attribute: name_pattern to allow customizing random database name
+          pattern.
+
+	- [doc] Mention DBIx::TempDB.
+
+
+0.06    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.05    2015-04-22 (PERLANCAR)
+
+	- [Bugfix] Test::WithDB::SQLite: Remove extraneous 'dbname=...'
+	  parameter in DBI connection string which causes a garbage file
+	  'xxx' to be created.
+
+
+0.04    2015-04-22 (PERLANCAR)
+
+	- Add class: Test::WithDB::SQLite.
+
+
+0.03    2014-09-18 (PERLANCAR)
+
+        - Add config: sqlite_db_dir.
+
+        - Check ~/twdb.ini as well as ~/test-withdb.ini.
+
+        - Check required config vars.
+
+        - Observe env TWDB_CONFIG_PATH & TWDB_CONFIG_PROFILE.
+
+        - Add basic (author) tests for each db driver.
+
+        [Documentation]
+
+        - Document known config vars.
+
+
+0.02    2014-09-12 (PERLANCAR)
+
+        - Add attribute: config_profile.
+
+        - [Incompatible change] Rename configuration test_* -> user_*.
+
+        - Add configuration: init_sql_admin, init_sql_user.
+
+        - Add CLI script: drop-all-test-dbs.
+
+
+0.01    2014-09-12 (PERLANCAR)
+
+        - First release.

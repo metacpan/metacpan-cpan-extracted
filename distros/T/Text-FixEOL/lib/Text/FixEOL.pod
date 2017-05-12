@@ -1,0 +1,413 @@
+
+=head1 NAME
+
+Text::FixEOL - Canonicalizes text to a specified EOL/EOF convention, repairing any 'mixed' usages
+
+=head1 SYNOPSIS
+
+ use Text::FixEOL;
+
+ my $fixer = Text::FixEOL->new({ EOL     => 'platform|asis|mac|dos|unix|vms|netware|network|os2|cygwin|crlf|cr|lf|literal:$value',
+                                 EOF     => 'platform|add|asis|remove|mac|dos|unix|vms|netware|cygwin|network|os2',
+                                 FixLast => 'platform|yes|no|mac|dos|unix|vms|netware|network|os2|cygwin',
+             });
+ my $fixed_text = $fixer->fix_eol($string);
+
+ my $mac_text     = $fixer->eol_to_mac($string);
+ my $windows_text = $fixer->eol_to_dos($string);
+ my $unix_text    = $fixer->eol_to_unix($string);
+ my $crlf_text    = $fixer->to_crlf($string);
+ my $network_text = $fixer->to_network($string);
+
+=head1 DESCRIPTION
+
+Converts the EOL and EOF conventions in the passed string to a canonicalization form
+that handles 'mixed' EOL conventions.
+
+It canonicalizes EOL as \n (the platform defined EOL) if it does not know the particular
+platform. Can also 'fix' the end-of-file mark if needed and ensure that the last line of
+the string is EOL terminated.
+
+=head1 CHANGES
+
+ 1.00 2005.05.02 - Initial Release
+
+ 1.01 2005.05.03 - Changes to Build.PL to have Test::NoWarnings
+                   and Test::More as prerequisite modules and changes
+                   to META.yml to try to make CPANPLUS happy. Small documentation
+                   change to 'new'. No functional changes.
+
+ 1.02 2005.05.05 - Added more build tests and made various bug
+                   fixes and tweaks. 100% code coverage for
+                   tests reached. Added Test::Pod to tests.
+                   Changed text in POD for licence to correctly
+                   identify license as dual Artistic/GPL.
+
+ 1.03 2005.06.17 - Removed NoWarnings test to improve ability to build on
+                   older installations. Added pod coverage test. Made all
+                   pod tests optional. No functional changes.
+
+ 1.04 2005.09.09 - Tweaked POD build tests. Tweaked META.yml. Extended
+                   license statement and appended liability disclaimer.
+                   Appended Artistic and GPL licenses to distribution.
+                   No functional changes.
+
+ 1.05 2005.09.13 - Changed pod tests to be more CPANTS friendly.
+                   Removed usage of 'warnings' pragma  and 'our'
+                   for Perl 5.005 compatibility.
+
+ 1.06 2011.07.30 - Replaced inadvertent Unicode usage in POD with non-Unicode.
+                   No functional changes.
+
+=head1 METHODS
+
+=over 4
+
+=item new({ [EOL => 'B<platform>|asis|mac|dos|unix|vms|netware|network|os2|cygwin|crlf|cr|lf|literal:$value', ]
+            [EOF => 'B<platform>|add|asis|remove|mac|dos|unix|vms|netware|network|os2|cygwin', ]
+            [FixLast => 'B<platform>|yes|no|mac|dos|unix|vms|netware|network|os2|cygwin', ]
+           });
+
+Instantates a new Text::FixEOL object and (optionally) allows setting the modes of operation.
+
+=back
+
+=over 4
+
+=item fix_eol($input);
+
+Converts the EOLs/EOF in the passed text to a canonicalization form.
+This includes fixing EOLs to the appropriate values, as well as handling
+EOF issues. Specifically, the presence of terminal Ctrl-Z characters (EOF)
+and whether or not the last line of the string is terminated with EOL (FixLast).
+
+When running in default mode (all setting at 'platform') on an unrecognized platform,
+it will attempt to convert to the local machine conventions using \n for EOL,
+'remove' for EOF and 'yes' for FixLast.
+
+It attempts to 'Do What I Mean' (DWIM) for mixed EOL values (text where there is a mixture
+of differing EOL conventions such as can happen when a document is editted in more
+than one environment).
+
+Example:
+
+   my $fixed_string = $fixer->fix_eol($string);
+
+The full grid of platform defaults is as follows:
+
+                   EOL        EOF       FixLast
+ unix              \012      remove       yes
+ dos           \015\012        asis       yes
+ windows       \015\012        asis       yes
+ mswin32       \015\012        asis       yes
+ mac               \015      remove       yes
+ macos             \015      remove       yes
+ vms           \015\012      remove       yes
+ os2           \015\012        asis       yes
+ netware       \015\012        asis       yes
+ cygwin        \015\012        asis       yes
+ network       \015\012      remove       yes
+
+The EOL canonicalization form is premised on the following example
+map which attempts to 'DWIM' for all cases of between 1 and 4
+consecutive CR/LF characters. The values shown in the table are
+for I<illustrative> purposes only. The actual values depend on the
+conversion modes specified.
+
+  ["\012" => "\012"],
+  ["\015" => "\012"],
+
+  ["\012\015" => "\012"],
+  ["\015\012" => "\012"],
+  ["\015\012\015" => "\012\012"],
+  ["\012\015\012" => "\012\012"],
+
+  ["\012a\012b\012" => "\012a\012b\012"],
+  ["\012a\012b\015" => "\012a\012b\012"],
+  ["\012a\015b\012" => "\012a\012b\012"],
+  ["\012a\015b\015" => "\012a\012b\012"],
+  ["\015a\012b\012" => "\012a\012b\012"],
+  ["\015a\012b\015" => "\012a\012b\012"],
+  ["\015a\015b\012" => "\012a\012b\012"],
+  ["\015a\015b\015" => "\012a\012b\012"],
+
+  ["\012\015a\012\015b\012\015" => "\012a\012b\012"],
+  ["\012\015a\012\015b\015"     => "\012a\012b\012"],
+  ["\012\015a\015b\012\015"     => "\012a\012b\012"],
+  ["\012\015a\015b\015"         => "\012a\012b\012"],
+  ["\015a\012\015b\012\015"     => "\012a\012b\012"],
+  ["\015a\012\015b\015"         => "\012a\012b\012"],
+  ["\015a\015b\012\015"         => "\012a\012b\012"],
+
+  ["\015\012a\015\012b\015\012" => "\012a\012b\012"],
+  ["\015\012a\015\012b\015"     => "\012a\012b\012"],
+  ["\015\012a\015b\015\012"     => "\012a\012b\012"],
+  ["\015\012a\015b\015"         => "\012a\012b\012"],
+  ["\015a\015\012b\015\012"     => "\012a\012b\012"],
+  ["\015a\015\012b\015"         => "\012a\012b\012"],
+  ["\015a\015b\015\012"         => "\012a\012b\012"],
+  ["\015\012\015a\015\012\015b\015\012\015" => "\012\012a\012\012b\012\012"],
+  ["\015\012\015a\015\012\015b\015"         => "\012\012a\012\012b\012"],
+  ["\015\012\015a\015b\015\012\015"         => "\012\012a\012b\012\012"],
+  ["\015\012\015a\015b\015"                 => "\012\012a\012b\012"],
+  ["\015a\015\012\015b\015\012\015"         => "\012a\012\012b\012\012"],
+  ["\015a\015\012\015b\015"                 => "\012a\012\012b\012"],
+  ["\015a\015b\015\012\015"                 => "\012a\012b\012\012"],
+
+  ["\012\012\012a\012\012\012b\012\012\012" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\012\012\015a\012\012\015b\012\012\015" => "\012\012a\012\012b\012\012"],
+  ["\012\015\012a\012\015\012b\012\015\012" => "\012\012a\012\012b\012\012"],
+  ["\012\015\015a\012\015\015b\012\015\015" => "\012\012a\012\012b\012\012"],
+  ["\015\012\012a\015\012\012b\015\012\012" => "\012\012a\012\012b\012\012"],
+  ["\015\012\015a\015\012\015b\015\012\015" => "\012\012a\012\012b\012\012"],
+  ["\015\015\012a\015\015\012b\015\015\012" => "\012\012a\012\012b\012\012"],
+  ["\015\015\015a\015\015\015b\015\015\015" => "\012\012\012a\012\012\012b\012\012\012"],
+
+
+  ["\012\012\012\012a\012\012\012\012b\012\012\012\012" => "\012\012\012\012a\012\012\012\012b\012\012\012\012"],
+  ["\012\012\012\015a\012\012\012\015b\012\012\012\015" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\012\012\015\012a\012\012\015\012b\012\012\015\012" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\012\012\015\015a\012\012\015\015b\012\012\015\015" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\012\015\012\012a\012\015\012\012b\012\015\012\012" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\012\015\012\015a\012\015\012\015b\012\015\012\015" => "\012\012a\012\012b\012\012"],
+  ["\012\015\015\012a\012\015\015\012b\012\015\015\012" => "\012\012a\012\012b\012\012"],
+  ["\012\015\015\015a\012\015\015\015b\012\015\015\015" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\015\012\012\012a\015\012\012\012b\015\012\012\012" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\015\012\012\015a\015\012\012\015b\015\012\012\015" => "\012\012a\012\012b\012\012"],
+  ["\015\012\015\012a\015\012\015\012b\015\012\015\012" => "\012\012a\012\012b\012\012"],
+  ["\015\012\015\015a\015\012\015\015b\015\012\015\015" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\015\015\012\012a\015\015\012\012b\015\015\012\012" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\015\015\012\015a\015\015\012\015b\015\015\012\015" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\015\015\015\012a\015\015\015\012b\015\015\015\012" => "\012\012\012a\012\012\012b\012\012\012"],
+  ["\015\015\015\015a\015\015\015\015b\015\015\015\015" => "\012\012\012\012a\012\012\012\012b\012\012\012\012"],
+
+Additionally any Ctrl-Z (EOF) characters are processed according to the EOF setting.
+
+=back
+
+=over 4
+
+=item eol_to_unix($string);
+
+Converts the passed string to Unix EOL/EOF conventions.
+This is equivalent to using fix_eol with
+
+   EOL     => 'unix',
+   EOF     => 'unix',
+   FixLast => 'unix'
+
+The Unix EOL convention terminates all lines with \012. Ctrl-Z (EOF)
+characters at the end of the string are removed.
+
+=back
+
+=over 4
+
+=item eol_to_dos($string);
+
+Converts the passed string to Windows/DOS EOL/EOF conventions
+This is equivalent to using fix_eol with
+
+   EOL     => 'dos',
+   EOF     => 'dos',
+   FixLast => 'dos'
+
+The DOS EOL convention terminates all lines with \015\012. Ctrl-Z (EOF) characters
+at the end of the string are left alone if present.
+
+=back
+
+=over 4
+
+=item eol_to_mac($string);
+
+Converts the passed string to Macintosh EOL/EOF conventions
+This is equivalent to using fix_eol with
+
+   EOL     => 'mac',
+   EOF     => 'mac',
+   FixLast => 'mac'
+
+The Mac EOL convention terminates all lines with \012. Ctrl-Z (EOF) characters
+at the end of the string are removed.
+
+=back
+
+=over 4
+
+=item eol_to_network($string);
+
+Converts the passed string to network EOL/EOF conventions.
+This is equivalent to using fix_eol with
+
+   EOL     => 'network',
+   EOF     => 'network',
+   FixLast => 'network'
+
+The network EOL convention terminates all lines with \015\012. Ctrl-Z (EOF)
+characters at the end of the string are removed.
+
+=back
+
+=over 4
+
+=item eol_to_crlf($string);
+
+Converts the passed string to CRLF format without
+otherwise changing it.
+
+This is equivalent to using fix_eol with
+
+   EOL     => 'crlf',
+   EOF     => 'asis',
+   FixLast => 'no'
+
+=back
+
+=over 4
+
+=item fix_last_handling(['B<platform>|yes|no|mac|dos|unix|vms|netware|network|os2|cygwin']);
+
+Get/set accessor that specifies whether or not the last line of the string should have an EOL added if
+missing. Default is 'platform'.
+
+=back
+
+=over 4
+
+=item fix_last_mode;
+
+Returns the current mode ('yes' or 'no') for the handling of the last line of the string
+(the actual 'yes'/'no' value rather than the mnemomic used for configuration).
+
+'yes' indicates the processor will ensure the last line is terminated with an EOL value, appending
+one if needed.
+
+'no' indicates the processor will not append a EOL if it is missing.
+
+=back
+
+=over 4
+
+=item eol_handling(['platform|asis|mac|dos|unix|vms|netware|network|os2|cygwin|crlf|cr|lf|literal:$value']);
+
+Sets/gets the end-of-line character handling property. The default is 'platform'.
+
+The full list of supported settings is as follows:
+
+  mac      - use Macintosh default (\015)
+  macos    - use Macintosh default (\015)
+  dos      - use DOS default       (\015\012)
+  windows  - use DOS default       (\015\012)
+  mswin32  - use DOS default       (\015\012)
+  unix     - use Unix default      (\012)
+  vms      - use vms default       (\015\012)
+  netware  - use netware default   (\015\012)
+  network  - use network default   (\015\012)
+  os2      - use OS/2 default      (\015\012)
+  cygwin   - use CygWin default    (\015\012)
+  platform - use the current execution environment default.
+  asis     - leave EOLs alone.
+  crlf     - use CRLF              (\015\012)
+  cr       - use CR                (\015)
+  lf       - use LF                (\012)
+
+ 'literal:$value' where you replace '$value' with a string value
+        instructs the converter to use the literal you specify
+        for EOL.
+
+=back
+
+=over 4
+
+=item eol_mode;
+
+Returns the current EOL string (the actual string value(s) for the EOL).
+This is the literal string value, not the mnemomic name used for configuration.
+
+=back
+
+=over 4
+
+=item eof_handling(['B<platform>|add|asis|remove|mac|dos|unix|vms|netware|network|os2|cygwin']);
+
+Specifies what is to be done with DOS end-of-file characters (control-Z).
+
+ 'add'      a Ctrl-Z (EOF) will be appended if not already present.
+ 'asis'     the EOF (whatever it is) will be left alone.
+ 'remove'   any trailing Ctrl-Z (EOF) characters will be removed.
+ 'platform' use the current execution environment platform's default for EOF handling.
+
+ The platforms have the following default EOF handling behaviors:
+
+             EOF Handling
+ unix           remove
+ dos              asis
+ windows          asis
+ mswin32          asis
+ mac            remove
+ macos          remove
+ vms            remove
+ os2              asis
+ netware          asis
+ cygwin           asis
+ network        remove
+
+=back
+
+=over 4
+
+=item eof_mode;
+
+Returns the current EOF mode ('C<asis>', 'C<remove>' or 'C<add>'). This is the actual
+mode rather than the mnemomic used for configuration.
+
+=back
+
+=head1 COPYRIGHT
+
+2005 Benjamin Franz <snowhare@nihongo.org>.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify it under
+either the terms the GNU Public License (GPL) version 1 or later, or under the
+Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=head1 BUGS
+
+None known.
+
+=head1 TODO
+
+Nothing.
+
+=head1 VERSION
+
+1.06 released 2011.07.30
+
+=cut

@@ -1,0 +1,13 @@
+/var/log/toadfarm.log
+{
+	rotate 7
+	daily
+	missingok
+	compress
+	sharedscripts
+	delaycompress
+	create 644 www www
+	postrotate
+		invoke-rc.d toadfarm restart >/dev/null 2>&1 || true
+	endscript
+}

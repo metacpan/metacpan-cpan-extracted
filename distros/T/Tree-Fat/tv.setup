@@ -1,0 +1,43 @@
+/* Be careful to only edit the *.tmpl file. [-*-C-*- source!] 
+
+NOTE: You do not need to rename anything in this file.  tvgen.pl does
+the renaming for you.  However, when you use the API you will need to
+use the prefix'd names.
+
+*/
+
+#ifndef _tv_setup_
+#define _tv_setup_
+
+
+/* Tree node size.  Cannot be set at runtime since field offsets must
+   be compile time for performance.  Should be >= 5. */
+#define TnWIDTH		19
+
+/* Either use real keys or implied index locations. */
+#define TV_KEYD /**/
+
+
+/* You should not call these directly. */
+#define NEW_TN(ret, near)	tvmalloc(sizeof(TN))
+
+#define TnDATA_T		/* SV* */
+#define TV_PLANT_DAT(d)		/* *d = newSVsv(*d) */
+#define TV_UPROOT_DAT(d)	/* SvREFCNT_dec(d) */
+#ifdef TV_TEST
+#define TV_DAT_2STRING(d)	/* SvPV(d, na) */
+#endif
+
+#if defined(TV_KEYD) && !defined(TnKEY_T)
+/*
+#define TnKEY_T			char*
+#define TV_KEYCMP(cmp,a,b) \
+	cmp = strcmp(a,b)
+#define TV_PLANT_KEY(k)		k=strdup(k)
+#define TV_UPROOT_KEY(k)	free(k)
+*/
+#endif
+
+#include "tv.public"
+
+#endif

@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Test::Reporter::HTTPGateway;
+
+Test::Reporter::HTTPGateway->handle;
+
+1;

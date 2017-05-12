@@ -1,0 +1,14 @@
+Revision history for Perl extension Tree::FP.
+
+0.01  Thu Sep  4 08:31:06 2003
+	- original version; created by h2xs 1.21 with options
+		-XAn Tree::FP
+0.02  Wed Sep 10 16:15:00 2003
+	- updated fp_growth method
+
+0.03  Thu Sep 11 14:58:41 2003
+	- several bug fixes to fp_growth method
+
+0.04  Sun Sep 14 14:37:23 2003
+	- improved documentation format
+

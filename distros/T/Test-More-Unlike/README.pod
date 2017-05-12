@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Test::More::Unlike>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Test-More-Unlike"><img src="https://secure.travis-ci.org/bayashi/Test-More-Unlike.png"/></a> <a href="https://coveralls.io/r/bayashi/Test-More-Unlike"><img src="https://coveralls.io/repos/bayashi/Test-More-Unlike/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Test::More::Unlike installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Test::More::Unlike
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Test::More::Unlike documentation is available as in POD. So you can do:
+
+    % perldoc Test::More::Unlike
+
+
+=head1 REPOSITORY
+
+Test::More::Unlike is hosted on github
+L<http://github.com/bayashi/Test-More-Unlike>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

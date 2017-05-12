@@ -1,0 +1,27 @@
+Tkx-SplashScreen version 0.14
+================================
+
+Tkx::SplashScreen is a megawidget that describes an image that
+appears while application is loading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tkx
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2009-2010 Alexander Nusov <alexander.nusov+cpan <at> gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

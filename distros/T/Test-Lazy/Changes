@@ -1,0 +1,27 @@
+TODO:
+- Add the capability to take lists of tests to Test::Lazy::try
+- Didn't I do this already: Added the capability to use (and deparse) a code reference with Test::Lazy::try 
+
+0.061 Sunday November 04 22:00:01 PST 2007:
+- B::Deparse is now optional
+
+0.060 Sunday November 04 12:11:16 PST 2007:
+- New documentation reflecting the refactoring
+- Explantation of structural versus scalar comparison
+- More robust notice handling: escaping %% and using %? as the notice marker (by default)
+
+0.050_2 Friday November 02 16:32:20 PDT 2007:
+- Objectification of the interface via Test::Lazy::Tester
+- Customizable via instantiation (new) or ->cmp_scalar, ->cmp_structure, ->render accessors
+- Custom rendering based on value type (e.g. HASH, ARRAY, Path::Class::File, etc.)
+- More robust testing using Test::Deep
+- JSON::XS requirement dropped, using Data::Dumper instead
+
+0.03 Sunday August 05 11:37:34 PDT 2007: 
+- Switch to using JSON::XS
+
+0.02 Sunday July 01 15:33:35 PDT 2007
+- Added $base_stmt capability to Test::Lazy::Template::test
+
+0.01 Saturday June 30 14:00:38 PDT 2007:
+- Initial version

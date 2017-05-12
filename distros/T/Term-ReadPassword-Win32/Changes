@@ -1,0 +1,38 @@
+History for Term::ReadPassword::Win32
+
+0.05 2014.08.26
+    - Link to GitHub from META files.
+    - dos2unix files
+
+0.04 2013.12.12
+
+    - Avoid including the MYMETA files (#91253)
+    - Move Japanese POD document to lib/POD2. (Tatsuhiko Miyagawa)
+    - Convert encoding to UTF-8, added =encoding POD header. :w(Tatsuhiko Miyagawa)
+      (also Géraud CONTINSOUZAS)
+
+0.03  2012.09.04
+
+    - Fix RT 79144 - listing prerequistes in Makefile.PL
+    -     RT 65402 - probably fixed by avove
+    - Fix RT 19070 - now restoring STDIN
+
+    - Reogranize directory layout
+    - use Test::More
+
+    - New maintainer: Gabor Szabo (SZABGAB)
+
+0.02  2005.12.20
+
+    - The namespace and the function name were changed.
+      Term::ReadPasswd::read_passwd -> Term::ReadPassword::Win32::read_password
+
+0.01  2005.12.18
+
+    - The function name ReadPasswd was changed to read_passwd.
+
+0.00  2005/12/15
+
+    - The first release.
+
+

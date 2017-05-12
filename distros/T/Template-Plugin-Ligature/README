@@ -1,0 +1,51 @@
+NAME
+    Template::Plugin::Ligature - Typographic ligature filter for TT
+
+VERSION
+    This document describes Template::Plugin::Ligature version 0.04.
+
+SYNOPSIS
+    Template:
+
+        [% USE Ligature %]
+
+        [% FILTER ligature %]
+        Offloading floral offices refines effectiveness.
+        [% END %]
+
+    Output:
+
+        Oﬄoading ﬂoral oﬃces reﬁnes eﬀectiveness.
+
+DESCRIPTION
+    This is a Template::Toolkit plugin to filter text, replacing sequences
+    of characters with corresponding typographic ligatures using
+    Text::Ligature.
+
+    When using this filter in HTML templates, one of the following steps
+    will also need to be performed in order to properly display these
+    Unicode ligatures.
+
+    *   Set the "charset" to "UTF-8" in the HTTP response "Content-Type"
+        header
+
+            Content-Type: text/html; charset="UTF-8"
+
+    *   Set the "charset" to "UTF-8" in the HTML "Content-Type" meta element
+
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    *   Convert the ligatures to HTML entities using the "html_entity"
+        filter
+
+            [% $content | ligature | html_entity %]
+
+AUTHOR
+    Nick Patch <patch@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2011, 2012 Nick Patch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

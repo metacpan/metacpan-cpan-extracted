@@ -1,0 +1,26 @@
+
+    Text::Table::Tiny - a Perl 5 module for formatting text tables
+
+This distribution contains a Perl 5 module which can generate
+simple text tables from two-dimensional arrays. It provides
+some basic capabilities for configuring the appearance of the tables.
+
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/Module::Info
+
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+
+This software is copyright (c) 2012 by Creighton Higgins.
+It is now being maintained by Neil Bowers <neilb@cpan.org>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

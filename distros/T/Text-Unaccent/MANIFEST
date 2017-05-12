@@ -1,0 +1,11 @@
+ChangeLog
+COPYING
+MANIFEST
+Makefile.PL
+README
+Unaccent.pm
+Unaccent.xs
+t/unac.t
+unac.c
+unac.h
+META.yml                                 Module meta-data (added by MakeMaker)

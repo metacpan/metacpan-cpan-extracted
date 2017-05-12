@@ -1,0 +1,67 @@
+[% DEFAULT
+    name   = 'Archive1'
+    author = 'Agent Zhang'
+    email  = 'agent2002@126.com'
+    samples = [
+        { file = 'AIDS.pl',
+          problem = 'An article in the Los Angeles Times...',
+          src = "use strict;\nuse warnings;\n...",
+          output = '500 acts of intercourse lead to...' }
+        { file = 'balls.pl',
+          problem = 'An urn contains three red balls and...',
+          src = "my \$nexps = shift;\n\$nexps = 100_000 unless...",
+          output = 'The probability that they are both red is...' }
+    ]
+-%]
+
+=head1 NAME
+
+[% name %] - Perl Simulation for Mathematical Statistics
+
+=head1 DESCRIPTION
+
+For each problem, there is a tiny perl script corresponding to it,
+which verify the answers to the problem or algorithms associated
+with it. Some of the scripts require additional CPAN module, such
+as Math::Combinatorics and Math::Random, to run successfully. Hence,
+if you don't have them installed in your perl distribution, please
+download these modules from L<http://www.cpan.org> (or use PPM
+directly for the ActivePerl users).
+
+[%- FOREACH sample IN samples -%]
+
+=head1 [% sample.file %]
+
+=head2 PROBLEM
+
+[% sample.problem %]
+
+=head2 PROGRAM SOURCE
+
+[% sample.src %]
+
+=head2 SELECTED OUTPUT
+
+[% sample.output %]
+
+[%- END -%]
+
+[%- IF author == 'Agent Zhang';
+        cn_name = ' (ียาเดบ)';
+    END
+-%]
+
+=head1 COPYRIGHT
+
+Copyright 2005 [% author %]. All rights reserved.
+
+This software and its documents are free; you can redistribute it and/or modify
+it under the same terms as Perl.
+
+[%- IF email -%]
+
+=head1 AUTHOR
+
+[% author %][% cn_name %] E<lt>[% email %]E<gt>
+
+[%- END -%]

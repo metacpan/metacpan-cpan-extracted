@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               Text-Playlist
+version:            0.02
+abstract:           Collection of modules for work with various playlist formats
+author:
+    - Alex 'AdUser' Z <aduser@cpan.org>
+license:            perl_5
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::More:  0
+requires:  {}
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,22 @@
+Revision history for Perl extension Tie::Hash::Expire.
+
+0.01	Thu Jan 29 16:27:58 PST 2004
+	- original version
+
+0.02
+	- If "expire_seconds" is set to zero all hash keys will expire
+		immediately.  If "expire_seconds" is omitted or set to undef
+		hash keys will not expire at all.
+	- Support for Time::HiRes included.  If Time::HiRes is available, 
+		expiration will occur at the highest resolution available
+		through that module.  Decimal expiration times are now
+		available.  If decimal expirations are specified and
+		Time::HiRes is not available, a warning is generated, but the
+		code will function as though the next larger integer was
+		specified.
+
+0.03
+	- Bug Fix:  Fixed problem with keys expire during iteration with
+		FIRSTKEY / NEXTKEY
+
+

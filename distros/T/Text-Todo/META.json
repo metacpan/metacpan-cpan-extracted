@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl interface to todotxt files",
+   "author" : [
+      "Andrew Fresh <andrew@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Todo",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.82"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Std::Utils" : "0",
+            "File::Spec" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Todo" : {
+         "file" : "lib/Text/Todo.pm",
+         "version" : "v0.2.2"
+      },
+      "Text::Todo::Entry" : {
+         "file" : "lib/Text/Todo/Entry.pm",
+         "version" : "v0.2.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/afresh1/Text-Todo"
+      }
+   },
+   "version" : "v0.2.2"
+}

@@ -1,0 +1,107 @@
+Revision history for Perl extension Term::ProgressBar
+
+2.18  2016-12-06 MANWAR
+      - Add MANIFEST file.
+      - Removed META.yml file.
+      - Updated .gitignore to exclude MANIFEST file.
+      - General tidy up pod document.
+
+2.17  2015-01-23
+      - Handle case when the maximum number of items is unknown (LukeGoodsell)
+
+2.16  2014-09-09 17:00:00
+      - Cygwin width issue  RT #8344 (LukeGoodsell)
+      - Remove unused DEBUG variables.
+      - Stop exorting $PACKAGE $VERSION.
+      - Add use warnings;
+
+2.15  2014-04-13 23:23:23
+      - Add Term::ProgressBar::IO (DON)
+
+2.14  2013-07-21 13:34:52
+      - Document the term_width argument to the constructor (OVID)
+      - Add a "silent" option to the constructor (OVID)
+
+2.13  2012-05-18 06:24:42
+      - remove unused and invalid SIGNATURE file
+      - move content of BUGS to Changes
+      - Remove the INSTALL and configure files,
+        people should use the standard CPAN installation tools
+      - Add standard prerequisites to Makefile.PL
+
+2.12  2012-05-16 12:47:16
+      - use strict; use warnings; in examples
+      - remove bareword from POD (JBAKER)
+      - make lbrack and rbrack official.
+
+2.11  2012-02-17 12:31:04
+      - skip the signature verification
+
+2.10  2011-12-21 11:18:26
+      - remove Build.PL (keep the Makefile.PL only)
+      - Replace home-made testing tools with CPAN-ish tools
+      - Require Capture::Tiny for testing
+      - New co-maintainer: Gabor Szabo
+
+2.09  2005-03-13 21:17 GMT
+      - Fix for incorrect formatting of 'D...' time done at end
+
+2.08  2005-03-12 11:47 GMT
+      - Add remove option
+      - Add patch to account for weird terminal sizing under Windoze
+       (thanks to Andrew Peters for the patch).
+
+2.07  2005-03-06 13:31 GMT
+      - Correct handling of non-term mode to output stats but no PB
+      - Print time taken to complete in ETA mode when Done
+      - Add use of 'name' to example in 'new' doc
+      - Add doc of use of minor characters to description
+      - Add doc. for name value to new
+
+2.06  2004-03-14 10:46 GMT
+      - Add patch to cope when terminal size cannot be detected or is
+        too small.
+        Thanks to Ed Avis (<ed at membled dot com>) for the patch.
+      - Add patch to test to avoid failure on windoze due to unlinking open
+        files
+      - Add patch to cope when Term::ReadKey fails to initialize for some
+        reason.
+        Thanks to Scott Cain (<cain at cshl dot org>) for the patch.
+      - Add patch to suppress unnecessary terminal updates
+        Thanks to Ed Avis (<ed at membled dot com>) for the patch.
+
+2.05  2003-08-30 16:23 GMT
+      - Fix test.pm to handle OS (e.g., Solaris) who refuse to delete the cwd
+
+2.04  2003-08-14 16:38 GMT
+      - Change build system to accomodate CPAN & automated tests
+
+2.03  2003-01-11 15:47 GMT
+      - Fix incorrect reset of progress bar in message method
+        Thanks to Frank Maas (<frank dot maas at cheiron-it dot nl>) for
+        the patch.
+      - Improve documentation of ETA display formats.
+
+2.02  2002-11-19 10:08 GMT
+      - Fix behaviour in terminals where GetTerminalSize fails (e.g.,
+        resized Emacs term windows).  Thanks to Ed Avis for the patch.
+
+2.01  2002-10-07 21:12 GMT
+      - Make it 5.005_03-compatible, with thanks to Ed Avis
+
+2.00  2002-03-10 05:26 GMT
+      - New API added; now takes one hashref as argument (see docs)
+      - v1 API remains, but is deprecated
+      - Add message method to Term::ProgressBar
+      - Add v2 tests
+
+1.51  2001-12-02 12:22 GMT
+      - Correct Bug #001
+        Wrong minor character (= should be *) selected by default.
+
+1.50  2001-12-01 13:11 GMT
+      - Merged with Utility::Progress by Martyn J. Pearce
+
+1.00  2001-10-30
+      - original version
+      - by Edward Avis, <epa98 at sync32>

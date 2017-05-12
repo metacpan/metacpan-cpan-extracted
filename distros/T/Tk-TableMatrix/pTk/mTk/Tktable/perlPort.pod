@@ -1,0 +1,184 @@
+
+=head1 NAME
+
+perlPort.pod - Notes on Porting tkTable from tcl to perltk
+
+
+=head1 DESCRIPTION
+
+
+
+=head1 file notes
+
+
+=over 1
+
+=item * tkTableInitScript.h
+
+This contains a TCL script that is run when table is loaded. This will
+probably have to be completly converted to perl. B<Excluded>.
+
+=item * conf* Files
+
+Used by gnu autoconfigure in the TCL scripts. B<Excluded>.
+
+=item * mac_* Files
+
+Used for mac port. Don't worry about for now.
+
+=item * mm.h
+
+Command structure lookup definitions. Called out by tkTable.h
+
+=item * tkAppInit.c
+
+TCL application Init. A similar file is excluded in ../tclUnix, ../tclWin, etc.
+B<Excluded>.
+
+=item * tkTable.c/h
+
+Main tkTable code/header file.
+
+=item * tkTableCell.c
+
+Functions for the tkTable Cells
+
+=item * tkTableCmd.c
+
+Implements general commands of the table widget
+
+=item * tkTableEdit.c
+
+Implements editing functions for the table widget.
+
+=item * tkTablePs.c
+
+Implements postscript output for table widgets.
+
+=item * tkTableTag.c
+
+Implements tags for table widgets.
+
+=item * tkTableWin.c
+
+Implements embedded windows for table widgets
+
+
+=back
+
+=head1 Top Level perlTk Calling Notes
+
+As an example, Scale.xs references C<Tk_ScaleCmd>, which is defined in tkScale.c. 
+Should the top leved Table.xs do a similar thing?
+
+=head1 Conversion from Native tcl/tk notes:
+
+These notes are taken from looking at the difference between the tkScale.h and
+tkScale.c files in the stock tk8.0.5 distribution and the Tk800.022/pTk/mTk
+distribution.
+
+=head2 .h files
+
+=over 1
+
+=item * Add tkVMacro.h to include
+
+Also add:
+
+ #include "tkPort.h"
+ #include "tkInt.h"
+ #include "tkVMacro.h"
+
+=item * Remove UID type references?
+
+Or change to Tk_State type?
+
+=item * Change name of variables from char type to Var type
+
+=item * Change command variables from char type to LangCallback type.
+
+=back
+
+=head2 .c files
+
+=over
+
+=item * Change any tclMath refs to <math.h> 
+
+=item * Add #include "tkVMacro.h"
+
+Before "tkScale.h" or equivalent.
+
+=item * Change Tk_ConfigSpec table
+
+C<Tk_CONFIG_STRINGS> for commands to C<TK_CONFIG_CALLBACK>.
+
+Removed/Change UID type variables
+
+Change TK_CONFIG_STRING to TK_CONFIG_SCALAR_VAR for -variable type
+entries.
+
+=item * Change XXXVarProc items
+
+From char * name to Var name where appropriate.
+
+=item * Change tkNormalUID states to TK_STATE_NORMAL
+
+Also for disabled (TK_STATE_DISABLED)
+
+=item * Change Tk_SetClass call to TkClassOption calls (Not Needed?)
+
+=item * Change any numeric conversions.
+
+Anything like C<value = strtod(stringValue, &end)> should be converted
+to a C<Arg stringValue;> type and a C<(Tcl_GetDouble(interp, stringValue, &value)>
+call.
+
+=item * Change name of variables from char type to Var type
+
+=item * Change any calls to Tcl_CreateCommand to Lang_CreateWidget
+
+Similar to the way this was changed in the tkCanvas.c file in the main tk distribution.
+
+=item * Modify the command routine to return a value like tkCanvas
+
+Replace Tcl_SetStringObj with Tcl_ArgResult similar to what is in tkCanvas.c
+
+=item * Tcl_VarEval Conversion
+
+Any calls to Tcl_VarEval are converted to LangDoCallback
+
+=item * Tcl_SplitList Conversion
+
+Any calls to Tcl_SplitList are changed to Tcl_ListObjGetElements.
+
+=item * Tcl_Merge Conversion
+
+Any calls to Tcl_Merge are changed to Tcl_NewListObj.
+
+=item * Tcl_GetStringResult Conversion
+
+Any calls to Tcl_GetStringResult are changed to Tcl_GetResult. 
+Tcl_GetStringResult wasn't provided as part of the tkGlue.c parkage
+and Tcl_GetResult appeared to do the same thing.
+
+=item * Tcl_GlobalEval/ExpandPercents Conversion
+
+The original tktable widget accepts TCL scripts (text) to be
+used as callbacks (Like for -browsecommand, and the -command options).
+The tcl/tk code takes the TCL script and performs Expand Percents on
+it, and then evals it, using Tcl_GlobalEval. To work with perltk, this sequence
+was changed to a LangDoCallBack.
+
+=back
+
+=head2 .tcl files
+
+Files in the lib directory (tkTable.tcl) are equivalent to the .pm files for 
+the widget, so the tkTable.tcl file has to be converted to perl. See the various
+.pm files in the Tk distribution for examples. 
+
+Note the tcl2perl script in the Tk distribution can provided a starting point
+for the translation. Much hand-editing is still required however.
+
+

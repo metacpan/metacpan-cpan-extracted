@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e1a52080f6ee8ecc4f84b37fc8513c39efd38e72 Build.PL
+SHA1 263cf309b12cd86e6172b82764288a099c3c89b5 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 1fecf05e5dbc2ba4028b49f164429ccc442ece77 MANIFEST
+SHA1 ebc2facbc128e18087c2fe54979a2513732f55bc META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 1edc94863c5e933e3e12baeb3dcdc659b80ff5af README
+SHA1 5ac57f890620c30ec55e2e5f0f118b6723febe06 lib/Thesaurus.pm
+SHA1 8270870bd32916649f21f510a62197e12a4bc38f lib/Thesaurus/BerkeleyDB.pm
+SHA1 94697d5d8ddc5b40750a2efccaac44392c30270e lib/Thesaurus/CSV.pm
+SHA1 97526e4d8d5958e306e681353eea5950b18b783f t/01_basic.t
+SHA1 23c79900fc6cdbc3feac773f1c41dd311e4be162 t/02_bdb.t
+SHA1 615adb04e9874b62e208122b631a72331a307fb8 t/03_csv.t
+SHA1 f1b106dde7532e88fbc89a35f6cceec0bfede9cd t/SharedTests.pm
+SHA1 0390e9acebe8aa195981bc15fd81b754c0eea338 t/pod-coverage.t
+SHA1 0b6ee3329771b9d5fefeafcdaf6f7c5510c0c58f t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFGDnrw3Or3ZzQuifMRAsQQAKCO1XGcE1+z+4YyF+nXONle9N7kuQCfZjCd
+zXjpa50endMkGX/0VEML7Ss=
+=KXTV
+-----END PGP SIGNATURE-----

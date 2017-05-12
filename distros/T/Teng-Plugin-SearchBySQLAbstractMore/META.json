@@ -1,0 +1,89 @@
+{
+   "abstract" : "use L<SQL::Abstract::More> as Query Builder for Teng",
+   "author" : [
+      "Ktat, C<< <ktat at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.4",
+   "license" : "gpl_1",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Teng-Plugin-SearchBySQLAbstractMore",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Page" : "0",
+            "Data::Page::NoTotalEntries" : "0",
+            "SQL::Abstract::More" : "0",
+            "Teng" : "0.17"
+         }
+      }
+   },
+   "provides" : {
+      "Teng::Plugin::SearchBySQLAbstractMore" : {
+         "file" : "lib/Teng/Plugin/SearchBySQLAbstractMore.pm",
+         "version" : "0.12"
+      },
+      "Teng::Plugin::SearchBySQLAbstractMore::Pager" : {
+         "file" : "lib/Teng/Plugin/SearchBySQLAbstractMore/Pager.pm"
+      },
+      "Teng::Plugin::SearchBySQLAbstractMore::Pager::Count" : {
+         "file" : "lib/Teng/Plugin/SearchBySQLAbstractMore/Pager/Count.pm"
+      },
+      "Teng::Plugin::SearchBySQLAbstractMore::Pager::CountOrMySQLFoundRows" : {
+         "file" : "lib/Teng/Plugin/SearchBySQLAbstractMore/Pager/CountOrMySQLFoundRows.pm"
+      },
+      "Teng::Plugin::SearchBySQLAbstractMore::Pager::MySQLFoundRows" : {
+         "file" : "lib/Teng/Plugin/SearchBySQLAbstractMore/Pager/MySQLFoundRows.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ktat/Teng-Plugin-SearchBySQLAbstractMore/issues"
+      },
+      "homepage" : "https://github.com/ktat/Teng-Plugin-SearchBySQLAbstractMore",
+      "repository" : {
+         "url" : "git://github.com/ktat/Teng-Plugin-SearchBySQLAbstractMore.git",
+         "web" : "https://github.com/ktat/Teng-Plugin-SearchBySQLAbstractMore"
+      }
+   },
+   "version" : "0.12",
+   "x_contributors" : [
+      "ktat <ktat.is@gmail.com>"
+   ]
+}

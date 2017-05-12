@@ -1,0 +1,213 @@
+NAME
+     Tags::Output::Structure - Structure class for 'Tags' output.
+
+SYNOPSYS
+     use Tags::Output::Structure;
+     my $obj = Tags::Output::Structure->new(%parameters);
+     $obj->finalize;
+     my $ret_ar = $obj->flush($reset_flag);
+     my @tags = $obj->open_tags;
+     $obj->put(@data);
+     $obj->reset;
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "auto_flush"
+
+                     Auto flush flag.
+                     Default value is 0.
+
+            *       "output_callback"
+
+                     Output callback.
+                     Default value is undef.
+
+            *       "output_handler"
+
+                     Set output handler.
+                     Default value is undef.
+
+            *       "output_sep"
+
+                     Output separator.
+                     Default value is newline.
+
+            *       "skip_bad_data"
+
+                     Skip bad tags.
+                     Default value is 0.
+
+            *       "strict_instruction"
+
+                     Strict instruction.
+                     Default value is 1.
+
+    "finalize()"
+             Finalize Tags output.
+             Automaticly puts end of all opened tags.
+             Returns undef.
+
+    "flush($reset_flag)"
+             Flush tags in object.
+             Or returns code.
+             If enabled $reset_flag, then resets internal variables via reset method.
+
+    "open_tags()"
+             Returns array of opened tags.
+
+    "put(@data)"
+             Put tags code in tags format.
+             Returns undef.
+
+    "reset()"
+             Resets internal variables.
+             Returns undef.
+
+ERRORS
+     new():
+             Auto-flush can't use without output handler.
+             Output handler is bad file handler.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     flush():
+             Cannot write to output handler.
+
+     put():
+             Ending bad tag: '%s' in block of tag '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Data::Printer;
+     use Tags::Output::Structure;
+
+     # Object.
+     my $tags = Tags::Output::Structure->new;
+
+     # Put all tag types.
+     $tags->put(
+             ['b', 'tag'],
+             ['a', 'par', 'val'],
+             ['c', 'data', \'data'],
+             ['e', 'tag'],
+             ['i', 'target', 'data'],
+             ['b', 'tag'],
+             ['d', 'data', 'data'],
+             ['e', 'tag'],
+     );
+
+     # Print out.
+     my $ret_ar = $tags->flush;
+
+     # Dump out.
+     p $ret_ar;
+
+     # Output:
+     # \ [
+     #     [0] [
+     #         [0] "b",
+     #         [1] "tag"
+     #     ],
+     #     [1] [
+     #         [0] "a",
+     #         [1] "par",
+     #         [2] "val"
+     #     ],
+     #     [2] [
+     #         [0] "c",
+     #         [1] "data",
+     #         [2] \ "data"
+     #     ],
+     #     [3] [
+     #         [0] "e",
+     #         [1] "tag"
+     #     ],
+     #     [4] [
+     #         [0] "i",
+     #         [1] "target",
+     #         [2] "data"
+     #     ],
+     #     [5] [
+     #         [0] "b",
+     #         [1] "tag"
+     #     ],
+     #     [6] [
+     #         [0] "d",
+     #         [1] "data",
+     #         [2] "data"
+     #     ],
+     #     [7] [
+     #         [0] "e",
+     #         [1] "tag"
+     #     ]
+     # ]
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Tags::Output::Structure;
+
+     # Object.
+     my $tags = Tags::Output::Structure->new(
+             'output_handler' => \*STDOUT,
+     );
+
+     # Put all tag types.
+     $tags->put(
+             ['b', 'tag'],
+             ['a', 'par', 'val'],
+             ['c', 'data', \'data'],
+             ['e', 'tag'],
+             ['i', 'target', 'data'],
+             ['b', 'tag'],
+             ['d', 'data', 'data'],
+             ['e', 'tag'],
+     );
+
+     # Print out.
+     $tags->flush;
+
+     # Output:
+     # ['b', 'tag']
+     # ['a', 'par', 'val']
+     # ['c', 'data', 'SCALAR(0x143d9c0)']
+     # ['e', 'tag']
+     # ['i', 'target', 'data']
+     # ['b', 'tag']
+     # ['d', 'data', 'data']
+     # ['e', 'tag']
+
+DEPENDENCIES
+    Error::Pure, Tags::Output.
+
+SEE ALSO
+    Tags
+        Structure oriented SGML/XML/HTML/etc. elements manipulation.
+
+    Tags::Output
+        Base class for Tags::Output::*.
+
+    Task::Tags
+        Install the Tags modules.
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2012-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Test/XML/Valid.pm
+t/basic.t
+t/pod.t
+t/simple_valid.xhtml

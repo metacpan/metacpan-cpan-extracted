@@ -1,0 +1,8 @@
+Tie::Hash::Random
+
+	* Instalation
+		perl Makefile.PL
+		make
+		make install
+	
+	

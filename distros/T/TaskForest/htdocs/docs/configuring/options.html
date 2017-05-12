@@ -1,0 +1,354 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Required Options</div>
+
+  <p>
+    The following options are required.  If they are not specified on the
+    command line, the environment will be searched for corresponding
+    environment variables or look for them in the configuration file.  I
+    recommend that you specify all options in the configuration file.
+  </p>
+  
+  <div class="option_def"><a name="run_wrapper">--run_wrapper=/a/b/r  [or environment variable TF_RUN_WRAPPER]</a></div>
+
+  <p>
+    This is the location of the run wrapper that is used to execute the
+    job files.  The run wrapper is also responsible for creating the
+    semaphore files that denote whether a job ran successfully or not.
+    The system comes with two run wrappers: bin/run and bin/run_with_log
+  </p>
+
+  <p>
+   The first provides the most basic functionality, while the second
+   also captures the stdout and stderr from the invoked job and saves
+   it to a file in the log directory.  You may use either run wrapper.
+   If you need additional functionality, you can create your own run
+   wrapper, as long as it preserves the functionality of the default
+   run_wrapper.
+  </p>
+
+  <p>
+   <em>You are encouraged to use run_with_log</em> because of the extra
+   functionality available to you.  If you also use the included web
+   server to look at the status of today's job, or to browser the logs
+   from earlier days, clicking on a the status of a job that's already
+   run will bring up the log file associated with that job.  This is
+   very convenient if you're trying to investigate a job failure.
+  </p>
+
+   <div class="option_def"><a name="log_dir">--log_dir=/a/b/l  [or environment variable TF_LOG_DIR]</a></div>
+
+  <p>
+   This is called the root log directory.  Every day a dated directory
+   named in the form YYYYMMDD will be created and the semaphore files
+   will be created in that directory.
+
+  <div class="option_def"><a name="job_dir">--job_dir=/a/b/j  [or environment variable TF_JOB_DIR]</a></div>
+
+  <p>
+   This is the location of all the job files.  Each job file should be
+   an executable file (e.g.: a binary file, a shell script, a perl or
+   python script).  The file names are used as job names in the family
+   configuration files.  Job names may only contain the characters
+   a-z, A-Z, 0-9 and _.  You may create aliases to jobs within this
+   directory.
+  </p>
+
+  <p>
+   If a job J1 is present in a family config file, any other
+   occurrance of J1 in that family refers TO THAT SAME JOB INSTANCE.
+   It does not mean that the job will be run twice.
+  </p>
+
+  <p>
+   If you want the same job running twice, you will have to put it in
+   different families, or make soft links to it and have the soft
+   link(s) in the family file along with the actual file name.
+  </p>
+
+  <p>
+   If a job is to run repeatedly every x minutes, you could specify
+   that using the 'repeat/every' syntax shown above.
+  </p>
+  
+  <div class="option_def"><a name="family_dir">--family_dir=/a/b/f  [or environment variable TF_FAMILY_DIR]</a></div>
+
+  <p>
+   This is the location of all the family files.  As is the case with
+   jobs, family names are the file names.  Family names may only
+   contain the characters a-z, A-Z, 0-9 and _.
+  </p>
+
+<div class="new_section_header">The following options are optional</div>
+
+  <p>
+  <div class="option_def"><a name="once_only">--once_only</a></div>
+  </p>
+
+  <p>
+   If this option is set, the system will check each family once, run
+   any jobs in the Ready state and then exit.  This is useful for
+   testing, or if you want to invoke the program via cron or some
+   similar system, or if you just want the program to run on demand,
+   and not run and sleep all day.
+
+  <div class="option_def"><a name="end_time">--end_time=HH:MM</a></div>
+
+  <p>
+   If once_only is not set, this option determines when the main
+   program loop should end.  This refers to the local time in 24-hour
+   format.  By default it is set to 23:55.  This is the recommended
+   maximum.
+  </p>
+
+  <div class="option_def"><a name="wait_time">--wait_time</a></div>
+
+  <p>
+   This is the amount of seconds to sleep at the end of every
+   loop. The default value is 60.
+  </p>
+
+  <div class="option_def"><a name="verbose">--verbose</a></div>
+
+  <p>
+   Print a lot of debugging information
+  </p>
+
+  <div class="option_def"><a name="help">--help</a></div>
+
+  <p>
+   Display help text
+  </p>
+
+  <div class="option_def"><a name="log">--log</a></div>
+
+  <p>
+   Log stdout and stderr to files.  Before the logging start, the program
+   will print onto stdout the names of the log file and error file. The
+   program logs incidents at different levels ("debug", "info", "warning",
+   "error" and "fatal"). The <a href="#log_threshold">log_threshold</a>
+   option sets the level at which logs are written to the stdout file. If
+   the value of log_threshold is "info", then only those log messages with
+   a level of "info" or above ("warning", "error" or "fatal") will be
+   written to the stdout log file. The stderr log file always has logs
+   printed at level "error" or above, as well as anything printed
+   explicitly to STDERR.
+  </p>
+
+  <div class="option_def"><a name="log_threshold">--log_threshold=t</a></div>
+
+  <p>
+   Log messages at level t and above only will be printed to the
+   stdout log file.  The default value is "warn".
+  </p>
+
+  <div class="option_def"><a name="log_file">--log_file=o</a></div>
+
+  <p>
+   Messages printed to stdout are saved to file o in the log_directory
+   (if --log is set).  The default value is "stdout".
+  </p>
+
+  <div class="option_def"><a name="err_file">--err_file=e</a></div>
+
+  <p>
+   Messages printed to stderr are saved to file e in the log_directory
+   (if --log is set).  The default value is "stderr".
+  </p>
+
+  <div class="option_def"><a name="config_file">--config_file=f</a></div>
+
+  <p>
+   Read configuration settings from config file f.
+  </p>
+
+  <div class="option_def"><a name="chained">--chained</a></div>
+
+  <p>
+   If this is set, all recurring jobs will have the chained attribute
+   set to 1 unless specified explicitly in the family file. 
+  </p>
+
+  <div class="option_def"><a name="collapse">--collapse</a></div>
+
+  <p>
+   If this option is set then the status command will behave as if the
+   --collapse options was specified on the command line.
+  </p>
+
+  <div class="option_def"><a name="ignore_regex">--ignore_regex=r</a></div>
+
+  <p>
+   If this option is set then the family files whose names match the
+   perl regular expression r will be ignored.  You can specify this
+   option more than once on the command line or in the configuration
+   file, but if you use the environment to set this option, you can
+   only set it to one value.  Look at the included configuration
+   file taskforest.cfg for examples.
+  </p>
+
+  <div class="option_def"><a name="default_time_zone">--default_time_zone</a></div>
+
+  <p>
+   This is the time zone in which jobs that ran on days in the past will
+   be displayed.  When looking at previous days' status, the system has no
+   way of knowing what time zone the job was originally scheduled for.
+   Therefore, the system will choose the time zone denoted by this
+   option.  The default value for this option is "America/Chicago".
+  </p>
+  
+  <div class="option_def"><a name="token">token</a></div>
+
+  <p>
+    This is a configuration option that can only be set in the
+    configuration file.  A token is a dependency.  It is something that a
+    job must 'possess' before it can run, if that job needs that token.
+    You can create different types of tokens, giving each type a common
+    name.  You can also specify how many instances of tokens of each type
+    are to exist.  The syntax for specifying the different types of tokens
+    and the number of instances each type can have is as follows:
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 | ...   
+02 | &lt;token T&gt;
+03 |   number = 1
+04 | &lt;/token&gt;
+05 | &lt;token U&gt;
+06 |   number = 2
+07 | &lt;/token&gt;
+08 | ...
+   +-------------------------------------------------------
+</code></pre></div>
+
+  <p>
+    For more details on tokens, please see
+    the <a href="/docs/tokens.html">tokens page</a>.
+  </p>
+  
+  <div class="option_def"><a name="calendar_dir">--calendar_dir=/a/b/f</a></div>
+
+  <p>
+   This is the location of all the <a href="/docs/configuring/calendars.html">calendar</a> files.  As is the case with
+   jobs, calendar names are the file names.  Calendar names may only
+   contain the characters a-z, A-Z, 0-9 and _.
+  </p>
+
+
+
+
+  <div class="option_def"><a name="num_retries">--num_retries=n</a></div>
+  <p>
+    This is the number of times to <a href="/docs/configuring/retry.html">automatically retry</a> running a job that
+    fails.  The default value is 0.
+  </p>
+
+  
+  <div class="option_def"><a name="retry_sleep">--retry_sleep=n</a></div>
+  <p>
+    Wait these many seconds before <a href="/docs/configuring/retry.html">automatically retrying</a> running a job
+    that fails.  The default value is 60.
+  </p>
+
+
+  <div class="option_def"><a name="smtp_server">--smtp_server=server_name</a></div>
+  <p>
+    This is the SMTP server that will be used to <a href="/docs/configuring/email.html">send emails</a> out when a
+    job fails, for example
+  </p>
+
+  <div class="option_def"><a name="smtp_port">--smtp_port=p</a></div>
+  <p>
+    This is the SMTP server port.  If not defined it defaults to 25. 
+  </p>
+
+  <div class="option_def"><a name="smtp_timeout">--smtp_timeout=t</a></div>
+  <p>
+    This is the SMTP timeout in seconds. If not defined it defaults to 60. 
+  </p>
+
+  <div class="option_def"><a name="smtp_sender">--smtp_sender=s</a></div>
+  <p>
+    This is the SMTP envelope sender (the text after "MAIL FROM:")
+  </p>
+
+  <div class="option_def"><a name="mail_from">--mail_from=f</a></div>
+  <p>
+    This is the email address that appears in the From: mail header
+  </p>
+
+  <div class="option_def"><a name="mail_reply_to">--mail_reply_to=r</a></div>
+  <p>
+    If a user replies to a received email, the reply will go to this
+    address instead of the From: address.  This address is set in the
+    Reply-To mail header.
+  </p>
+
+  <div class="option_def"><a name="mail_return_path">--mail_return_path=p</a></div>
+  <p>
+    This is the address to which bounces will be sent if they occur at the
+    SMTP server (as opposed to the receiving Mail Transfer Agent).
+  </p>
+
+
+  <div class="option_def"><a name="instructions_dir">--instructions_dir=i</a></div>
+  <p>
+    This is the directory that stores the contents of the emails that are
+    sent by the system.
+  </p>
+
+
+  <div class="option_def"><a name="email">--email=e</a></div>
+  <p>
+    When a job fails, <a href="/docs/configuring/email.html">emails are sent</a> to this address.
+  </p>
+
+  <div class="option_def"><a name="retry_email">--retry_email=e</a></div>
+  <p>
+    When a job fails, but is being <a href="/docs/configuring/retry.html">automatically
+    retried</a>, <a href="/docs/configuring/email.html">emails are sent</a> to this address, as opposed to the one
+    stored in the 'email' setting.  If <a href="/docs/configuring/options.html#no_retry_email">no_retry_mail</a> is
+    set, then no email will be sent in this case.
+  </p>
+
+  <div class="option_def"><a name="retry_success_email">--retry_success_email=e</a></div>
+  <p>
+    When a job fails, is <a href="/docs/configuring/retry.html">automatically retried</a> one or more times and then
+    suceeds, <a href="/docs/configuring/email.html">emails are sent</a> to this address, as opposed to any of the
+    others.  If <a href="/docs/configuring/options.html#no_retry_success_email">no_retry_success_email</a> is set, then no
+    email will be sent in this case.
+  </p>
+
+
+  <div class="option_def"><a name="no_retry_email">--no_retry_email=n</a></div>
+  <p>
+    If this is set to 1, then an <a href="/docs/configuring/email.html">email</a> will not be sent when a job fails and
+    is being <a href="/docs/configuring/retry.html">automatically retried</a>.  The default value is 0 (retry emails
+    will be sent).
+  </p>
+
+
+  <div class="option_def"><a name="no_retry_success_email">--no_retry_success_email=n</a></div>
+  <p>
+    If this is set to 1, then an <a href="/docs/configuring/email.html">email</a> will not be sent when a job fails, was
+    <a href="/docs/configuring/retry.html">automatically retried</a> one or more times and then finally succeeded.  The
+    default value is 0 (retry_success emails will be sent).
+  </p>
+
+
+  
+
+
+
+
+<div class="clear_both"></div>
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

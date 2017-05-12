@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9456e86b87351a6166df4c1f93121db88e03a341 Changes
+SHA1 0131a3f06ce7d7b7cfd582095d32063619affb15 MANIFEST
+SHA1 89d634d429380bcc46a733f2d0a1bf49f8a9807c META.yml
+SHA1 e2e8b754f9d7482f2626c6be4e48da39d1baeef5 Makefile.PL
+SHA1 fdcee570c416cb644606150c4e426ea89e2549df README
+SHA1 7d4cc6556090c2c3b2c7e3dc69176b70d1f888d4 lib/Test/Steering.pm
+SHA1 506a301d4ae6bf3b1934b56460d7ebb4fe59977c lib/Test/Steering/Wheel.pm
+SHA1 e891f8ef3de573724d83105d72451ce612f56d6d t/00.load.t
+SHA1 3ee0088406a197f0c78d6bd6d2d07a8882cfc7bd t/author.t
+SHA1 bee97ed472ce7620b726b5a8117a3efab11fc72d t/conformance.t
+SHA1 7d7d6ec26c32cb141b155e40bb50ff2e0216b7d7 t/delegation.t
+SHA1 95fb86c308370087a90d842e9b070a42765b2495 t/demux.t
+SHA1 ef187beb9cbbffd6d0cdf2a478790d855040b9c2 t/sample-tests/bailout
+SHA1 d9f0dd7d1ed18775826e04768651d9fca8156528 t/sample-tests/descriptive
+SHA1 e4291958db6e998e0744471bdce1474ec85e0bc1 t/sample-tests/die
+SHA1 83f3b012892cb5d1d3b5df5276e56e2099fbd62c t/sample-tests/no_nums
+SHA1 b96d55a9c1ed574b8578422973a92579ad115834 t/sample-tests/simple
+SHA1 3c1d88ca9bfe22c8a329e55785b1eb1cbb7bc69d t/sample-tests/simple_fail
+SHA1 c3aa71d41d6c3775c95eb63a1ae7e54cf96f4693 t/sample-tests/simple_yaml
+SHA1 ea987bf7fb363dc8e26d8aceb75224ffdd8d3039 xt/author/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 xt/author/pod.t
+SHA1 d7a82b9179dec2e96a02d4abc86b7dfdfae5edbc xt/misc/all-in-one.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.8 (SunOS)
+
+iEYEARECAAYFAkfLLH0ACgkQwoknRJZQnCFz1QCgk/qa0XaPGoqy4FJBA0I67z4t
+2ZUAoKfxcbbZOB6pWK5tl97J+48p+tXx
+=w9Ts
+-----END PGP SIGNATURE-----

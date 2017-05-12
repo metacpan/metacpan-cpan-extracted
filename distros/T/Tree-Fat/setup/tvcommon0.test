@@ -1,0 +1,41 @@
+#define MIN_PERL_DEFINE 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#ifdef __cplusplus
+}
+#endif
+
+#define strdup my_strdup
+static char *my_strdup(char *in)
+{
+  STRLEN len = strlen(in);
+  char *out = safemalloc(len+1);
+  memcpy(out, in, len+1);
+  return out;
+}
+
+/* Add extra fields to the structures that would normally be
+   provided by an embedder & enable maximum assertions. */
+#define TV_TEST /**/
+
+/* Enable optional runtime debugging (for development) */
+#define TV_DEBUG /**/
+
+/* Include *_dump methods */
+#define TV_DUMP /**/
+
+/* Enable code to record performance stats in each cursor and include
+code for calculating interesting metrics. */
+#define TV_STATS /**/
+
+#define TV_PANIC		croak
+
+#define TV_FREE(ptr)		safefree(ptr)
+
+/* You should not call these directly */
+#define NEW_TCE(ret,near,xx)	ret = (TCE*) safemalloc(sizeof(TCE)*xx)

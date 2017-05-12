@@ -1,0 +1,129 @@
+NAME
+    Task::BeLike::JONASBN - Collection of modules often used by jonasbn
+
+SYNOPSIS
+        perl -MCPAN -e 'install Task::BeLike::JONASBN'
+
+CONTENTS
+    *   App::Ack
+
+    *   App::Prove
+
+    *   AppConfig
+
+    *   CPAN::Mini
+
+    *   CPAN::Reporter
+
+    *   Class::Accessor
+
+    *   Cwd
+
+    *   DBD::Mock
+
+    *   DBI
+
+    *   Data::Dumper
+
+    *   Data::FormValidator
+
+    *   Date::Calc
+
+    *   DateTime
+
+    *   Devel::Cover
+
+    *   Error
+
+    *   ExtUtils::Install, 1.47
+
+    *   File::Copy
+
+    *   File::Find::Rule
+
+    *   File::Path
+
+    *   File::Slurp
+
+    *   File::Which
+
+    *   Hash::Merge
+
+    *   JSON
+
+    *   List::MoreUtils
+
+    *   Module::Build, 0.35
+
+    *   Module::Info::File
+
+    *   Module::Load
+
+    *   Params::Validate, 0.85
+
+    *   Perl::Critic
+
+    *   Perl::Critic
+
+    *   Perl::Critic::Bangs
+
+    *   Perl::Tidy
+
+    *   Pod::Simple::Wiki
+
+    *   Spreadsheet::WriteExcel
+
+    *   TAP::Formatter::JUnit
+
+    *   Task::Jenkins
+
+    *   Template
+
+    *   Term::ReadLine::Perl
+
+    *   Test::Class
+
+    *   Test::CPAN::Changes
+
+    *   Test::DatabaseRow
+
+    *   Test::Exception
+
+    *   Test::Fatal
+
+    *   Test::Kwalitee
+
+    *   Test::MockObject::Extends
+
+    *   Test::More
+
+    *   Test::Perl::Critic
+
+    *   Test::Pod, 1.14
+
+    *   Test::Pod::Coverage, 1.04
+
+    *   Test::Prereq
+
+    *   Tie::IxHash
+
+    *   Try::Tiny
+
+    *   WWW::Mechanize
+
+    *   WWW::Mechanize::Cached
+
+    *   XML::Simple
+
+    *   YAML
+
+    *   YAML::Shell
+
+    *   local::lib
+
+COPYRIGHT & LICENSE
+    Copyright 2009-2014 Jonas B. Nielsen (jonasbn), All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

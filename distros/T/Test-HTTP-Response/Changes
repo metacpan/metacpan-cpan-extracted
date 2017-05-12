@@ -1,0 +1,22 @@
+Revision history for Perl extension Test::HTTP::Response.
+
+0.06  Jan 08 2013
+	Added missing dependancy on HTTP::Cookies, added LICENSE to meta.json
+0.05  Jan 05 2013
+	Hopefully fixed bug RT #81644 'Test failures due to hash randomisation in perl 5.17.6'
+	Added git repo metadata
+
+0.04  Mar 22 2011
+	Added headers_match (Robin Edwards)
+	Added headers_all_match (Robin Edwards)
+
+0.03  Dec 3 2009
+	Tiny pod improvement
+	Fixed dependancies in Makefile.PL
+
+0.02  Nov 27 2009
+	Fix caching of cookies
+	POD fixes/improvements
+
+0.01  Nov 26 2009 
+	Initial Release

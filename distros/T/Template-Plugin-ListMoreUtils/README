@@ -1,0 +1,116 @@
+NAME
+    Template::Plugin::ListMoreUtils - TT2 plugin to use List::MoreUtils
+
+SYNOPSIS
+      [% my1to9even = [ 2, 4, 6, 8 ];
+         my1to9prim = [ 2, 3, 5, 7 ];
+         my1to9odd  = [ 1, 3, 5, 7, 9 ]; %]
+
+      [% USE ListMoreUtils %]
+      [% my1to9all = ListMoreUtils.uniq( my1to9even.merge( my1to9prim, my1to9odd ) ); %]
+      1 .. 9 are [% my1to9all.size() %]
+
+DESCRIPTION
+    This module provides an Template::Toolkit interface to Tassilo von
+    Parseval's List::MoreUtils. It extends the built-in functions dealing
+    with lists as well as Template::Plugin::ListUtil.
+
+USAGE
+    To use this module from templates, you can choose between class
+    interface
+
+      [% my1to9even = [ 2, 4, 6, 8 ];
+         my1to9prim = [ 2, 3, 5, 7 ];
+         my1to9odd  = [ 1, 3, 5, 7, 9 ]; %]
+
+      [% USE ListMoreUtils %]
+      [% my1to9all = ListMoreUtils.uniq( my1to9even.merge( my1to9prim, my1to9odd ) ); %]
+      1 .. 9 are [% my1to9all.size() %]
+
+    or the virtual method interface, which is described in
+    Template::Plugin::ListMoreUtilsVMethods.
+
+FUNCTIONS PROVIDED
+    All functions behave as documented in List::MoreUtils. I don't plan to
+    copy the entire POD from there. Template::Toolkit provides lists as list
+    reference, so they were expanded before the appropriate function in
+    "List::MoreUtils" is called.
+
+  any BLOCK LIST
+  all BLOCK LIST
+  none BLOCK LIST
+  notall BLOCK LIST
+  true BLOCK LIST
+  false BLOCK LIST
+  firstidx BLOCK LIST
+  first_index BLOCK LIST
+  lastidx BLOCK LIST
+  last_index BLOCK LIST
+  insert_after BLOCK VALUE LIST
+  insert_after_string STRING VALUE LIST
+  apply BLOCK LIST
+  after BLOCK LIST
+  after_incl BLOCK LIST
+  before BLOCK LIST
+  before_incl BLOCK LIST
+  indexes BLOCK LIST
+  firstval BLOCK LIST
+  first_value BLOCK LIST
+  lastval BLOCK LIST
+  last_value BLOCK LIST
+  pairwise BLOCK LIST LIST
+    Unlike the original "pairwise", both variables are given through @_.
+    Template::Toolkit uses eval to evaluate the perl code declared there and
+    passes neither $a nor $b (which sounds reasonable to me).
+
+  minmax LIST
+  uniq LIST
+  mesh
+  zip
+  part BLOCK LIST
+  bsearch BLOCK LIST
+    This function is available only when List::MoreUtils 0.23 or newer is
+    used.
+
+    Unlike the original "bsearch", the value to compare with is passed in
+    $_[0]. Template::Toolkit uses eval to evaluate the perl code declared
+    there and don't pass $_ (which sounds reasonable to me).
+
+INSTALL
+    To install this module, use
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+LIMITATION
+    Except the typical limitations known from perl functions embedded in
+    Template::Toolkit, the only limitation I currently miss is being able to
+    use TT2 defined macros as callback.
+
+SUPPORT
+    Free support can be requested via regular CPAN bug-tracking system.
+    There is no guaranteed reaction time or solution time. It depends on
+    business load. That doesn't mean that ticket via rt aren't handles as
+    soon as possible, that means that soon depends on how much I have to do.
+
+    Business and commercial support should be aquired via preferred
+    freelancer agencies.
+
+AUTHOR
+        Jens Rehsack
+        CPAN ID: REHSACK
+        rehsack@cpan.org
+        http://search.cpan.org/~rehsack/
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1), List::MoreUtils, <Template::Plugin::ListUtil>
+

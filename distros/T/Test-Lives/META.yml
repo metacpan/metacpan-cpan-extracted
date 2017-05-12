@@ -1,0 +1,28 @@
+---
+abstract: 'the 1UP approach to testing exceptional code'
+author:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::Builder::Tester: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Lives
+requires:
+  Exporter::Tidy: 0
+  Test::Builder: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/ap/Test-Lives/issues
+  repository: git://github.com/ap/Test-Lives.git
+version: 1.001

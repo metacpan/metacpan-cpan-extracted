@@ -1,0 +1,191 @@
+--- ./gnuterm/term.c-pre	Mon Sep  2 14:03:26 2002
++++ ./gnuterm/term.c	Fri Sep  6 15:18:30 2002
+@@ -1128,7 +1128,8 @@ typedef void (*void_fp) __PROTO((void));
+  * term_tbl[] contains an entry for each terminal.  "unknown" must be the
+  *   first, since term is initialized to 0.
+  */
+-static struct termentry term_tbl[] =
++extern struct termentry term_tbl[];
++struct termentry term_tbl[] =
+ {
+     {"unknown", "Unknown terminal type - not a plotting device",
+      100, 100, 1, 1,
+--- ./plot.h-pre	Tue Nov 14 07:35:50 2000
++++ ./plot.h	Fri Sep  6 20:47:10 2002
+@@ -81,4 +81,7 @@ void take_privilege __PROTO((void));
+ int ExecuteMacro __PROTO((char *, int));
+ #endif
+ 
++#define StGiFy(a)	#a
++#define STRINGIFY(a)	StGiFy(a)
++
+ #endif /* GNUPLOT_PLOT_H */
+--- ./term/pm.trm-pre	Fri Jul 26 09:42:28 2002
++++ ./term/pm.trm	Fri Sep  6 20:54:02 2002
+@@ -179,6 +179,52 @@ static void PM_query(void);
+ static void PM_make_servername(char *);
+ static void PM_abortplot();
+ 
++#ifndef EXENAME_PM
++#  define EXENAME_PM gnupmdrv
++#endif
++
++/* Can't use DosSearchPath, it tests startup-environment, not environ */
++static int
++mySearchPath(int curdirtoo, char *env, char *file, char *buf, int bufsize)
++{
++  char *p = getenv(env);
++  int l = strlen(file);
++  char *path = curdirtoo ? "." : p;
++
++  while (path && *path) {
++    char *s = strchr(path, ';');
++    int len;
++    char dirbuf[256];
++    char *dir;
++
++    if (s)
++      len = s - path;
++    else
++      len = strlen(path);
++    if (len) {
++      if (len + 1 + l >= bufsize)
++        return 0;
++      strncpy(buf, path, len);
++      buf[len] = '/';
++      strcpy(buf + len + 1, file);
++      if (access(buf, 0) == 0)
++        return 1;
++    }
++    path = s ? s + 1 : 0;
++    if (!path && curdirtoo) {
++      curdirtoo = 0;
++      path = p;
++    }
++  }
++  return 0;
++}
++
++
++#ifdef CANT_ACCEPT_COMMANDS
++extern int can_accept_commands;
++#endif
++
++#define EXENAME_PM_EXE STRINGIFY(EXENAME_PM) ".exe"
+ TERM_PUBLIC void
+ PM_init()
+ {
+@@ -227,37 +273,45 @@ PM_init()
+ 	strcpy(pipename, "\\pipe\\");
+ 	strcat(semname, tempname);
+ 	strcat(pipename, tempname);
+-	strcat(PM_path, "\\gnupmdrv.exe");
++	strcat(PM_path, "\\" EXENAME_PM_EXE);
+ 	rc = access(PM_path, 0);
+ 	/* find exe file */
+ 	if (rc != 0)
+-	    rc = DosSearchPath(0x0002,	/* search GNUPLOT environment */
++	    rc = !mySearchPath(0,	/* search GNUPLOT environment */
+ 			       "GNUPLOT",
+-			       "gnupmdrv.exe",
++			       EXENAME_PM_EXE,
+ 			       PM_path,
+ 			       256);
+ 
+ 	if (rc != 0)
+-	    rc = DosSearchPath(0x0003,	/* then try current directory & path */
++	    rc = !mySearchPath(1,	/* then try current directory & path */
+ 			       "PATH",
+-			       "gnupmdrv.exe",
++			       EXENAME_PM_EXE,
+ 			       PM_path,
+ 			       256);
+ 	if (rc != 0) {
+-	    fputs("Cannot find gnupmdrv.exe !\n", stderr);
++	    fputs("Cannot find " EXENAME_PM_EXE " !\n", stderr);
++#if 1
+ 	    exit(3);
++#else
++	    strcpy(PM_path, EXENAME_PM_EXE);  /* Try without dir */
++#endif
+ 	}
+ 	rc = DosCreateEventSem(semname, &hev, 1, 0);
+ 	if (rc != 0) {
+ 	    fputs("Cannot create semaphore !\n", stderr);
+ 	    exit(3);
+ 	}
+-	spawnmode = P_SESSION | P_DEFAULT;
+-	if (PM_optargs != 0)
++/*	spawnmode = P_SESSION | P_DEFAULT;
++*/
++	spawnmode = P_PM;
++ 	if (PM_optargs != 0)
+ 	    spawnmode |= P_UNRELATED;
+ 	pid = spawnl(spawnmode, PM_path, "GnuplotPM", tempname, PM_opts, NULL);
+ 	if (pid == -1) {
+-	    fputs("Cannot spawn gnupmdrv.exe !\n", stderr);
++	    fputs("Cannot spawn " EXENAME_PM_EXE ": ", stderr);
++	    fputs(strerror(errno), stderr);
++	    fputs("\n", stderr);
+ 	    exit(3);
+ 	}
+ 	DosGetInfoBlocks(&tib, &pib);
+@@ -265,7 +319,7 @@ PM_init()
+ 	DosCloseEventSem(hev);
+ 	PM_pipe = fopen(pipename, "r+b");
+ 	if (PM_pipe == NULL) {
+-	    fputs("Cannot open pipe to gnupmdrv.exe !\n", stderr);
++	    fputs("Cannot open pipe to " EXENAME_PM_EXE " !\n", stderr);
+ 	    exit(3);
+ 	} else if (PM_termmode == 0)
+ 	    PM_savepipe = PM_pipe;
+--- ./term/x11.trm-pre	Fri Sep  6 15:50:00 2002
++++ ./term/x11.trm	Fri Sep  6 20:51:32 2002
+@@ -159,14 +159,18 @@ static FILE *X11_ipc = (FILE *) 0;
+ #define X11_ipc_back_fd ipc_back_fd
+ #endif
+ 
++#ifndef EXENAME_X11
++#  define EXENAME_X11 gnuplot_x11
++#endif
++
+ static char **xargv = (char **) NULL;
+ /* reserve a minimum 10 driver opts */
+ static char *optvec[2 * X11_nopts + 1 + 10];
+ # if defined(OS2) || defined(_Windows)
+-static char X11_default_command[] = "gnuplot_x11.exe";
++static char X11_default_command[] = STRINGIFY(EXENAME_X11) ".exe";
+ # else
+ # ifndef GNUPLOT_X11
+-static char X11_default_command[] = "gnuplot_x11";
++static char X11_default_command[] = STRINGIFY(EXENAME_X11);
+ # else
+ static char X11_default_command[] = GNUPLOT_X11;
+ # endif
+--- ./x_exec/gplt_x11.c-ini	Thu Sep  5 12:42:48 2002
++++ ./x_exec/gplt_x11.c	Tue Sep 17 15:41:06 2002
+@@ -167,21 +167,22 @@ Error. Incompatible options.
+ # define GP_SYSTEMINFO(host) gethostname ((host), MAXHOSTNAMELEN)
+ #endif /* HAVE_SYS_SYSTEMINFO_H && HAVE_SYSINFO */
+ 
+-#ifdef USE_MOUSE
+ # ifdef OS2_IPC
+ #  define INCL_DOSPROCESS
+ #  define INCL_DOSSEMAPHORES
+ #  include <os2.h>
+ #  include "os2/dialogs.h"
+ # endif
++#ifdef USE_MOUSE
+ # include "gpexecute.h"
+ # include "mouse.h"
+ # include <unistd.h>
+ # include <fcntl.h>
+-# include <errno.h>
+ static unsigned long gnuplotXID = 0; /* WINDOWID of gnuplot */
+ 
+ #endif /* USE_MOUSE */
++
++#include <errno.h>
+ 
+ #ifdef __EMX__
+ /* for gethostname ... */

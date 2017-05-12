@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+
+package populatedbic;
+{
+  $populatedbic::VERSION = 'v4.1.1';
+}
+
+use strict;
+use DBIx::Class::Fixtures;
+use Path::Class;
+use Archive::Tar;
+use File::Find::Rule;
+use File::Temp;
+use feature qw/say/;
+use Getopt::Long::Descriptive;
+use File::Spec::Functions;
+use Bio::Chado::Schema;
+use File::Basename;
+
+my ( $opt, $usage ) = describe_options(
+    '%c %o preset-file',
+    [ 'dsn=s',    'Database dsn', { required => 1 } ],
+    [ 'user|u:s', 'Database username' ],
+    [ 'pass|p:s', 'Database password' ],
+    [   'pg-schema:s',
+        'Name of Postgresql schema to use for dumping fixtures, default is ignored unless it is explicitly set for postgresql backend'
+    ],
+    [ 'help|h' => 'Print this help' ]
+);
+
+say $usage->text, exit if $opt->help;
+
+if ( !$ARGV[0] ) {
+    say '!!! preset file is missing';
+    say $usage->text, exit;
+}
+
+my $pg_schema = $opt->pg_schema;
+my $schema
+    = $pg_schema
+    ? Bio::Chado::Schema->connect( $opt->dsn, $opt->user, $opt->pass,
+    { on_connect_do => "SET schema '$pg_schema'" } )
+    : Bio::Chado::Schema->connect( $opt->dsn, $opt->user, $opt->pass );
+
+$schema->unregister_source('Sequence::Cvtermsynonym');
+
+my $staging_temp = File::Temp->newdir;
+my $archive      = Archive::Tar->new( $ARGV[0] );
+$archive->setcwd($staging_temp);
+$archive->extract;
+
+my $config_dir = catdir( $staging_temp, 'config' );
+my $fixture = DBIx::Class::Fixtures->new(
+    {   config_dir => $config_dir,
+    }
+);
+
+my @all_configs = map { basename $_}
+    File::Find::Rule->file->name(qr/\.json$/)->in($config_dir);
+
+for my $config_file (@all_configs) {
+    my $fixture_dir = catdir( $staging_temp, 'fixtures',
+        ( ( split /\./, $config_file ) )[0] );
+    $fixture->populate(
+        {   directory => $fixture_dir,
+            no_deploy => 1,
+            schema    => $schema,
+        }
+    );
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+populatedbic
+
+=head1 VERSION
+
+version v4.1.1
+
+=head1 NAME
+
+tc-populate-fixture - Popluate chado database from DBIC-Fixtures
+
+=head1 AUTHOR
+
+Siddhartha Basu <biosidd@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Siddhartha Basu.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

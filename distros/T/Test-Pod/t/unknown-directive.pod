@@ -1,0 +1,25 @@
+# $Id: unknown-directive.pod 91 2004-01-26 03:50:06Z petdance $
+
+=head1 NAME
+
+Test::Pod test pod -- a valid pod file
+
+=head1 DESCRIPTION
+
+=over4
+
+This is a pod file with an incorrect =over.
+
+=under 4
+
+This is a pod file with a bad directive.
+
+=head1 AUTHOR
+
+brian d foy, E<lt>bdfoy@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2002, brian d foy
+
+=cut

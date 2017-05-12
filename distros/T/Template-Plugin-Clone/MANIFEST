@@ -1,0 +1,9 @@
+Build.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+lib/Template/Plugin/Clone.pm
+lib/Template/Plugin/CloneVMethods.pm
+t/01basic.t
+t/02vmethod.t
+Makefile.PL
+META.yml

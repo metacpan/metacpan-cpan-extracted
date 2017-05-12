@@ -1,0 +1,28 @@
+---
+abstract: 'a fast, middleweight template engine.'
+author:
+  - 'Kathryn Andersen <perlkat@katspace.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-NeatTemplate
+requires:
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/rubykat/Text-NeatTemplate
+  repository: https://github.com/rubykat/Text-NeatTemplate.git
+version: '0.1101'

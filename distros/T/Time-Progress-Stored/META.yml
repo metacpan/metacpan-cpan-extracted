@@ -1,0 +1,28 @@
+---
+abstract: 'Report progress + store and retrieve the current status'
+author:
+  - 'Johan Lindstrom <johanl@cpan.org>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Progress-Stored
+requires:
+  JSON::Tiny: '0'
+  List::AllUtils: '0'
+  Moo: '0'
+  Time::Progress: '0'
+  Types::Standard: '0'
+  autobox::Core: '0'
+  perl: v5.10.0
+  'true': '0'
+resources:
+  bugtracker: https://github.com/jplindstrom/p5-Time-Progress-Stored/issues
+version: '1.002'

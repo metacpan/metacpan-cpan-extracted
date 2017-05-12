@@ -1,0 +1,86 @@
+NAME
+    Text::Quoted - Extract the structure of a quoted mail message
+
+SYNOPSIS
+        use Text::Quoted;
+        my $structure = extract($text);
+
+        # Optionally, customize recognized quote characters:
+        Text::Quoted::set_quote_characters( qr/[:]/ );
+
+DESCRIPTION
+    "Text::Quoted" examines the structure of some text which may contain
+    multiple different levels of quoting, and turns the text into a nested
+    data structure.
+
+    The structure is an array reference containing hash references for each
+    paragraph belonging to the same author. Each level of quoting
+    recursively adds another list reference. So for instance, this:
+
+        > foo
+        > # Bar
+        > baz
+
+        quux
+
+    turns into:
+
+        [
+          [
+            { text => 'foo', quoter => '>', raw => '> foo' },
+            [
+                { text => 'Bar', quoter => '> #', raw => '> # Bar' }
+            ],
+            { text => 'baz', quoter => '>', raw => '> baz' }
+          ],
+
+          { empty => 1 },
+          { text => 'quux', quoter => '', raw => 'quux' }
+        ];
+
+    This also tells you about what's in the hash references: "raw" is the
+    paragraph of text as it appeared in the original input; "text" is what
+    it looked like when we stripped off the quotation characters, and
+    "quoter" is the quotation string.
+
+FUNCTIONS
+  extract
+    Takes a single string argument which is the text to extract quote
+    structure from. Returns a nested datastructure as described above.
+
+    Exported by default.
+
+  set_quote_characters
+    Takes a regex ("qr//") matching characters that should indicate a quoted
+    line. By default, a very liberal set is used:
+
+        set_quote_characters(qr/[!#%=|:]/);
+
+    The character ">" is always recognized as a quoting character.
+
+    If "undef" is provided instead of a regex, only ">" will remain as a
+    quote character.
+
+    Not exported by default, but exportable.
+
+  combine_hunks
+      my $text = combine_hunks( $arrayref_of_hunks );
+
+    Takes the output of "extract" and turns it back into text.
+
+    Not exported by default, but exportable.
+
+CREDITS
+    Most of the heavy lifting is done by a modified version of Damian
+    Conway's "Text::Autoformat".
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2004-2015 by Best Practical Solutions,
+    LLC
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

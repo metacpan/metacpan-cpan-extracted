@@ -1,0 +1,15 @@
+Revision history for Perl extension Tie::Scalar::MarginOfError.
+
+0.03 Wed Nov 19 20:00:00 2003
+
+       - added haiku docs
+
+0.02 Tue Nov 18 16:00:00 2003
+
+       - added ability to call subref when margin exceeded
+          thanks to Geert Jan Bex for that!
+
+0.01  Tue Nov 18 09:53:50 2003
+	- original version; created by h2xs 1.23 with options
+		-X -c Tie::Scalar::MarginOfError
+

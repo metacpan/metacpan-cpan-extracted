@@ -1,0 +1,26 @@
+ProseClock version 1.02
+=======================
+
+Digital and analog time displays are ubiquitous in programming
+contexts.  But everyday speech is prosaic: "just after ten of three in
+the afternoon" is the kind of output you will achieve with ProseClock.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other non-standard modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-Eternity Gerald Gold and channelping
+
+This library is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself. 

@@ -1,0 +1,99 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: mhentsc3
+  data:
+    id: 12
+    name: Maik Hentsche
+    login: mhentsc3
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- job data
+
+
+- schema: Testrun
+  name: Cobbler
+  data:
+    id: 1
+    owner_id: 12
+    shortname: Cobbler
+    notes: Cobbler
+    topic_name: Software
+
+- schema: TestrunScheduling
+  name: Cobber_job
+  data:
+    id: 101
+    testrun_id: 1
+    queue_id: 1
+    host_id: 1
+
+
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: Cobbler precondition
+  data:
+    id: 1
+    shortname: cobbler_precondition
+    precondition: |
+      precondition_type: cobbler
+      profile: ubuntu-for-testing
+
+- schema: Precondition
+  name: testprogram_cobbler
+  data:
+    id: 2
+    shortname: testprogram_cobbler
+    precondition: |
+      precondition_type: testprogram
+      program: /bin/tapper-testsuite-oprofile
+      timeout: 600
+
+# -------------------- 
+
+- schema: TestrunPrecondition
+  name: 1st cobbler
+  data:
+    testrun_id: 1
+    precondition_id: 1
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 1st cobbler
+  data:
+    testrun_id: 1
+    precondition_id: 2
+    succession: 2
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 1
+    name: iring
+    free: 1
+    active: 1
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+    active: 1

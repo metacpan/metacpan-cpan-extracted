@@ -1,0 +1,13 @@
+Revision history for Test-TAPv13
+
+0.002     2012-08-07
+        - request Test::Builder singelton everytime to respond to changes
+          there [Michael Schwern]
+
+0.001     2012-06-03
+        - initial module to use TAPv13 features in Test::Builder driven
+          tests
+        - "tap13_version" prints TAP version statement;
+          called automatically on "use"
+        - "tap13_pragma" prints out a pragma line
+        - "tap13_yaml" prints out an indented YAML block of data

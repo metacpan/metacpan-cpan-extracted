@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tangram
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Date: '0'
+  DBI: '0'
+  Data::Lazy: '0.6'
+  Scalar::Util: '1.14'
+  Set::Object: '1.1'
+  Test::More: '0'
+  Time::Piece: '0'
+version: '2.12'

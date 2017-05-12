@@ -1,0 +1,21 @@
+Changes
+lib/Text/Graph.pm
+lib/Text/Graph/DataSet.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+t/Graph_config.t
+t/Graph_Bar.t
+t/Graph_Line.t
+t/Graph_Errors.t
+t/Graph-DataSet.t
+t/Graph.t
+t/Graph_arrayref.t
+xt/critic.t
+xt/hasversion.t
+xt/minimumversion.t
+xt/pod.t
+xt/podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

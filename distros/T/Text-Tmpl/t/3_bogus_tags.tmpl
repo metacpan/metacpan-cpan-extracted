@@ -1,0 +1,10 @@
+nonexistent simple tag: <!--#nonexistent-->
+mismatched quotes:      <!--#echo "asdf-->
+                        <!--#echo $var1"-->
+                        <!--#echo "$var1-->
+                        <!--#echo "asdf\"-->
+last char is a slash:   <!--#echo \-->
+                        <!--#echo "\-->
+no spacing:             <!--#echo $var2$var1-->
+                        <!--#echo $var2"poot"$var1-->
+                        <!--#echo "poot""poot"-->

@@ -1,0 +1,35 @@
+Revision history for Tree-ToText
+
+0.05    2016-11-23 (PERLANCAR)
+
+	- [Incompatible change] Rename children_method option to
+	  get_children_method.
+
+
+0.04    2016-11-21 (PERLANCAR)
+
+	- Allow customizing name of method to get children via
+	  'children_method' option.
+
+
+0.03    2016-03-31 (PERLANCAR)
+
+	- Tweak output format: class name is now shown at the front using
+          "(NAME) ", by default 'show_class_name' is now turned off. Attribute
+          value rendering is now more sophisticated, using Data::Dmp to show
+          unsafe values.
+
+        - Try hash key when accessor/getter method for an attribute does not
+          exist. When that fail too, use undef instead of dying.
+
+        - Add option 'on_show_node' to completely customize node rendering.
+
+
+0.02    2016-03-30 (PERLANCAR)
+
+	- Handle case when children() returns (undef).
+
+
+0.01    2016-03-27 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,37 @@
+Revision history for Template::Timer
+
+Template::Timer is now hosted on github at
+http://github.com/petdance/template-timer/
+
+
+1.00    Fri Mar  6 23:32:49 CST 2009
+====================================
+[ENHANCEMENTS]
+Measurements are now in milliseconds, not seconds.
+
+Now shows nesting level in the notes.
+
+The times are all shown as a summary at the end, not throughout
+the page.
+
+
+0.04    Sun Oct 16 22:56:51 CDT 2005
+====================================
+[FIXES]
+When calling
+
+    [% PROCESS block_1 + block_2 %]
+
+the block names are passed as an array reference to process().
+Template::Timer was assuming that any ref() passed was an object
+and calling ->name on that object.  Thanks to Bill Moseley.
+
+
+0.02    Tue Oct 26 11:08:33 CDT 2004
+====================================
+First actual working version.  Fixed bonheaded typo.
+
+
+0.01    Tue Oct 26 09:58:24 CDT 2004
+====================================
+First rudimentary version.  Patches and comments welcome.

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/mysqld/DatadirDumper.pm
+lib/Test/mysqld/DatadirDumper/CLI.pm
+minil.toml
+script/dump-test-mysqld-datadir
+t/00_compile.t
+t/01_basic.t
+t/data/ddl.sql
+t/data/item.yml
+META.yml
+MANIFEST

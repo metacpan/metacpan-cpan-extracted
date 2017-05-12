@@ -1,0 +1,5 @@
+--- 
+match:
+  distribution: '^CNANDOR/Mac-AppleEvents-Simple-\d'
+test: 
+  commandline: "echo SKIPPING make test"

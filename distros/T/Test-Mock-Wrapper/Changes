@@ -1,0 +1,87 @@
+Revision history for Test-Mock-Wrapper
+
+0.18 Tue May 10 2016
+
+  - Fix for DESTROY problems in 5.23.8
+
+0.17 Fri May 15 2015
+
+  - require 5.18.0
+
+0.16 Wed May 06 2015
+
+  - Fixed typo in documentation
+
+0.15 Wed May 06 2015
+
+  - Fixing stuck versioning
+
+0.14 Tue May 05 2015
+
+  - Adding the ability to mock methods inherited from parent classes
+
+0.13 Tue May 05 2015
+
+  - Correcting a bug in the "with" modifier in Verify.pm
+
+0.12 Mon Mar 23 2015
+
+  - Correct bug to method for finding correct version of a mock to use
+    when both conditional and default mocks specified.
+
+  - Allow use of object instance to limit conditional mocks
+
+  - Tests to exercise bugs found
+
+0.11 Mon Mar 23 2015
+
+  - Fixed bug to getCallsTo for methods not explicitly mocked.
+
+0.10 Mon Mar 23 2015
+
+  - Revamped addMock flow
+
+0.09 Wed Mar 11 2015
+
+  - Added use strict and use warnings to verify sub packages
+
+0.08 Tue Mar 10 2015
+
+  - Added import method to allow for compile time package mocking
+
+0.07 Tue Mar 10 2015
+
+  - Allow mocked pacakges to capture calls to new.
+  - Added "resetAll" method.
+  - Update destrcutor to prevent internmitent failures in globabl destruction on objects created from mocked pacakge
+    
+
+0.06.1 Fri Mar 06 2015
+
+  - Updated package mocking stucture to allow mocks to pass moose type constraints when used in moose objects.
+
+0.06 Thu Mar 05 2015
+
+  - Added support for immutable packages, and test for same.
+
+0.05 Thu Mar 05 2015
+
+  - Refine returns to allow methods to return arrays
+  - Update pod so that version increments correctly
+  - Added documentation about package mocking
+
+0.04 Wed Mar 04 2015
+
+   - Refined "resetCalls" to allow only history of specific methods to be clear.
+   - Added tests for "resetCalls"
+   - Added method "resetMocks" to reset the state of specified mock conditions, with tests for same.
+
+0.03 Wed Mar 04 2015
+
+  - Added method "resetCalls" to allow clearing the call records. Useful if you use the same mock wrapper in multiple tests rather than creating a new on for each.
+
+0.02 Wed Mar 04 2015
+
+  - Revampd package mocking algorithm to use metaclass. much more eligant than hacking on the symbol table directly.
+
+0.001 Thu Feb 26 2015

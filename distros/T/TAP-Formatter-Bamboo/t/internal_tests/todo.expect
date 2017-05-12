@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testsuites>
+  <testsuite name="t/internal_tests/todo.test" errors="0" failures="0" tests="5">
+    <system-out/>
+    <testcase name="t/internal_tests/todo.test" time="TEST_TIME">
+      <failure><![CDATA[Fail reason(s):
+    unexpected TODO passed (2)
+Test output:
+1..5 todo 3 2;
+ok 1
+ok 2
+not ok 3
+ok 4
+ok 5
+
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

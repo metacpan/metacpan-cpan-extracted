@@ -1,0 +1,33 @@
+### Test for the DragShadow Widget #########
+###
+###  Expected Results:
+###   A Grey window should display. 
+###   After 2 seconds, and dark grey frame should appear inside the frame
+###   After 2 seconds, the frame should disappear
+###
+
+use Tk;
+use Tk::IDEdragShadow;
+
+my $mw = new MainWindow ();
+
+my $Frame = $mw->Frame(-width => 100, -height => 200);
+$Frame->pack();
+
+$mw->after(2000,sub {
+	
+	my $geometry = $Frame->geometry;
+	
+	print "Frame G = $geometry\n";
+	print "MW G = ".$mw->geometry."\n";
+	
+	my $widget = $Frame->IDEdragShadow(-geometry => $geometry);
+	
+	$mw->after(2000, sub{
+		$widget->placeForget();
+	});
+	#$widget->pack();
+}
+);
+
+MainLoop;

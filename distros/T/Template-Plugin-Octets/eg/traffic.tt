@@ -1,0 +1,16 @@
+[%- USE Octets %]
+[%
+    traffic = {
+        'jane doe' => [ 1211100, 2323230, 4545450, 3212421 ],
+        'john doe' => [ 2222200, 3333330, 2323230, 5266129 ],
+    }
+-%]
+---------------------------------------------------------------
+                Local                   Internet
+Username    RECV,       XMIT,       RECV,       XMIT,
+            KB          KB          KB          KB
+---------------------------------------------------------------
+[% FOREACH u IN traffic.keys -%]
+[% u %]    [% Octets.kio(traffic.$u.0) %]      [% Octets.kio(traffic.$u.1) %]      [% Octets.kio(traffic.$u.2) %]      [% Octets.kio(traffic.$u.3) %]
+[% END -%]
+---------------------------------------------------------------

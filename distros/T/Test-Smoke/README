@@ -1,0 +1,265 @@
+=head1 NAME
+
+README - Perl Core Test Smoke Suite (1.62)
+
+=head1 SYNOPSIS
+
+  $ perl configsmoke.pl      # will generate smokecurrent.sh
+  $ sh smokecurrent.sh
+
+or on windows:
+
+    C:\smoke>configsmoke     # will generate smokecurrent.bat
+    C:\smoke>smokecurrent
+
+For the impatient: see the section L</"GETTING STARTED">
+
+=head1 DESCRIPTION
+
+The perl core test smoke suite is a set of scripts and modules that try to
+run the perl core tests on as many configurations as possible and combine
+the results into an easy to read report.
+
+The basic cycle looks like:
+
+    fetch_sourcetree
+    foreach $config ( @configurations ) {
+        make distclean
+        ./Configure $config
+        make
+        make test (and log failures)
+    }
+    create_report()
+    mail_report()
+
+Before you start "smoking" we expect you have tried to build some of
+the configurations "by hand" to check if your environment is okay.
+
+=head1 INSTALLATION
+
+The Test::Smoke suite has been designed to be installed outside of the
+normal Perl library-tree. It will also run from the directory in which
+it was un-tar-gzipped, but if you like to keep up to date with
+Test::Smoke releases, it might be useful to use the standard
+perl-module installation commands:
+
+    $ perl Makefile.PL
+    $ make test
+    $ make install
+
+The F<Makefile.PL> program will ask for a directory in which
+Test::Smoke should be installed (this will set I<PREFIX>,
+I<INSTALLSCRIPT> and I<LIB> all to that directory).
+
+I<If you want to automate the Makefile.PL step you need to set two
+environment variables: $ENV{SMOKE_INSTDIR}='../p5smoke' and
+$ENV{AUTOMATED_TESTING}=1>
+
+=head1 GETTING STARTED
+
+You are now ready to run the F<configsmoke.pl> configuration program:
+
+    $ perl configsmoke.pl
+
+You will have to answer some questions that help create a
+configuration file for the Test::Smoke suite.
+
+You should check the F<perlcurrent.cfg> (or F<w32current.cfg> on MSWin32)
+build-configurations file and remove options that are not supported for your
+platform.
+
+Now you are set to go:
+
+    $ sh smokecurrent.sh
+
+If something useful happens, do it every night using a scheduler.
+
+=head1 CONFIGURATION
+
+=over 4
+
+=item Test::Smoke configuration
+
+You can create configurations by running the F<configsmoke.pl>
+program. Please see its L<documentation|configsmoke.pl>.
+
+=item Build configurations
+
+At the moment there are no guidelines of how to change the
+build-configuration best to fit the needs of perl5-porters while still
+getting as much smoke out of the test as possible, simply because the
+needs of perl5-porters change over time:).
+
+This also makes Test::Smoke somewhat volatile, as we aim to please the
+perl5-porters as much as possible, to help make perl even better, more
+stable and as thoroughly tested as possible.
+
+=back
+
+=head1 Note to MSWin32 users
+
+To make it clear, the perl core test smoke suite treats B<cygwin> and
+B<DJGPP> as unixy platforms and not as true MSWin32.
+
+To keep in sync with the source-tree, it is recommended you use L<git>. As long
+as you use a version that also comes with a command-line tool.
+
+Some problems have been reported with older versions of cygwin and the
+patch program during the C<< S<[nd]make test> >> stage of
+Test::Smoke. Don't worry about it if you do not intend to use patch.
+
+During smoke testing stuff might crash and give a popup. You'll want to disable Windows error reporting:
+
+    Action Center (from Control Panel)
+      -> Maintenance
+          -> Settings
+              -> Never check for solutions
+
+For more information see:
+    http://serverfault.com/questions/29678/disabling-myapp-has-stopped-working-dialog
+
+In "older" Windows versions (before 7) we have found some problems with the default
+windows debugger B<Dr.Watson>. By default Dr.Watson will pop-up when the moral
+equivalent of a segmentation fault happens, this will make the smoke wait for
+user input. You can disable this by starting F<drwtsn32.exe> and un-check the
+B<Visual Notification> and B<Sound Notification> check-boxes and press B<OK>.
+
+
+=head1 Slow Systems
+
+It can happen that your system is not able to pursue all the tests, either
+because it is too slow or because some of the configurations are not
+supported by the system. At first, don't worry, they are detected by the
+report creation script and shown as such.
+
+After the first run gave you some idea of how long the smoke will run on
+your system,  you can create your own copy of smoke.cfg where you either
+add new combinations and/or test levels, or delete lines to speed up the
+run time of Test::Smoke.
+
+=head1 Availability and references
+
+=over 4
+
+=item B<Distribution>
+
+    http://search.cpan.org/dist/Test-Smoke/
+
+    https://github.com/abeltje/Test-Smoke
+
+=item B<Archives>
+
+=over 4
+
+=item B<Reports>
+
+    <daily-build-reports@perl.org> 
+        [subscribe: <daily-build-reports-subscribe@perl.org>]
+    http://www.nntp.perl.org/group/perl.daily-build.reports
+    news:nntp.perl.org/perl.daily-build.reports
+
+=item B<Smokers>
+
+    <daily-build@perl.org> 
+        [subscribe: <daily-build-subscribe@perl.org>]
+    http://www.nntp.perl.org/group/perl.daily-build
+    news:nntp.perl.org/perl.daily-build
+
+=item B<Others>
+
+  Perl general QA: perl-qa@perl.org
+  Development:     perl5-porters@perl.org
+
+=item B<CoreSmokeDB>
+
+We also keep a database of smokereports that are created by Test::Smoke
+1.58 or higher.
+
+    http://perl5.test-smoke.org/
+
+=back
+
+=back
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2001-2014
+
+  * H.Merijn Brand
+  * Abe Timmerman
+
+This suite is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, without consulting the author.
+
+(Future) Co-Authors and or contributors should agree to this before
+submitting patches.
+
+See:
+
+=over 4
+
+=item * http://www.perl.com/perl/misc/Artistic.html
+
+=item * http://www.gnu.org/copyleft/gpl.html
+
+=back
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+=head1 AUTHOR
+
+The perl core test smoke suite is maintained by Abe Timmerman
+<abeltje@cpan.org>.
+
+H.Merijn Brand <h.m.brand@hccnet.nl> in dialogue and consultation with
+Michael Schwern <schwern@pobox.com>, the Perl QA pumpkin.
+
+Contributors and/or co-authors:
+
+    Configurations and
+      nuts and bolts    Nicholas Clark <nick@plum.flirble.org>
+    smoke.sh            Jarkko Hietaniemi
+    Portability issues  Will Coleda - IMG <wjc@infomg.com>
+    Safety              Richard Soderberg
+    Win32/MSC5/dmake    Mattia Barbon
+                        Abe Timmerman <abeltje@cpan.org>
+                        Christian Walde <mithaldu@cpan.org> *
+    Cygwin              John Peacock <jpeacock@rowman.com>
+    Sharing issues      Blair Zajac
+    Good ideas          Jos Boumans <kane@dwim.org>
+    VMS                 Craig Berry *
+    SysInfo             Alain Barbet
+                        Merijn Brand *
+                        Alan Burlison
+                        Allen Smith
+                        David Woolger
+                        Campo Wijerman
+
+and all the people having useful suggestions and nits, starting at
+YAPC::Europe-2.0.01, where Michael talked Merijn into simplifying his own
+test-suite and sharing it with the community.
+
+The Test::Smoke team.
+
+=head1 MISC
+
+As always, have the appropriate amount of fun!
+
+=head1 SEE ALSO
+
+L<ReleaseNotes>, L<FAQ>
+
+=head1 TODO
+
+=over 4
+
+=item * More test-suite
+
+=item * VMS?
+
+=back
+
+=cut

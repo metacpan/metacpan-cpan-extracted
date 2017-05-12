@@ -1,0 +1,15 @@
+
+HOW TO INSTALL Text::Template::Inline
+
+# The prefered method is to use Module::Build:
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+# Otherwise you can fall back on ExtUtils::MakeMaker:
+perl Makefile.PL
+make
+make test
+make install
+

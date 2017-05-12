@@ -1,0 +1,19 @@
+#!/usr/bin/perl 
+
+=head1 NAME
+
+This is a pretend script that we need to check
+
+=head1 DESCRIPTION
+
+This is a pod file without errors.
+
+=head1 AUTHOR
+
+Andy Lester, garbage-address@aol.com
+
+=head1 COPYRIGHT
+
+Copyright 2004, Andy Lester
+
+=cut

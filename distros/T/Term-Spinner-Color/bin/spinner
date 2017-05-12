@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+package spinner;
+use strict;
+use warnings;
+use 5.010;
+use Term::Spinner::Color;
+use Getopt::Long qw( GetOptionsFromArray );
+use Pod::Usage;
+use Time::HiRes qw(sleep);
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+use sigtrap qw/handler finished normal-signals/;
+# I have no idea if this works.
+if ($^O eq 'MSWin32') {
+  require Win32::Console::ANSI;
+  Win32::Console::ANSI->import();
+}
+use Term::ANSIScreen qw(:cursor);
+
+my $done; # Set this in signal handleer to stop spinning.
+my $last_size;
+
+sub main {
+  my ( $argv ) = @_;
+  my %opt;
+  GetOptionsFromArray( $argv, \%opt,
+    'help|h',
+    'color|c',
+    'colorcycle|r',
+    'seq|s',
+  );
+  pod2usage(0) if $opt{help};
+
+  # setup the arguments for constructing the spinner
+  my %args;
+  if ($opt{seq}) { $args{seq} = $opt{seq} };
+  if ($opt{color}) { $args{color} = $opt{color} };
+  if ($opt{colorcycle}) { $args{colorcycle} = $opt{colorcycle} || 0 };
+  if ($opt{delay}) { $args{delay} = $opt{delay} };
+  unless ($args{delay}) { $args{delay} = 0.2 };
+
+  my $s = Term::Spinner::Color->new(
+    %args
+  );
+
+  # XXX Maybe hacky. Store current cursor position.
+  savepos();
+  $s->start();
+  while (1) {
+    $last_size = $s->{last_size};
+    sleep $args{delay};
+    $s->next();
+  }
+  return 0;
+}
+
+sub finished {
+  my $done = 1;
+  my $bksp = chr(0x08);
+  # try two ways to get back to original position
+  print $bksp x $last_size;
+  loadpos();
+  print "\x1b[?25h"; # Show cursor
+  exit 0;
+}
+
+exit main( \@ARGV );
+
+__END__
+
+=head1 NAME
+
+spinner - A command to print a spinner and wait for a signal to stop.
+
+=head1 SYNOPSIS
+
+One-liner from a POSIX-y shell:
+
+    # spinner &; PID=$!; sleep 5; kill $PID
+
+In a POSIX-y script:
+
+    spinner &
+    PID=$!
+    # Do some stuff
+    sleep 5
+    kill $PID
+
+In the above examples, "sleep 5" would be replaced with whatever long-running
+work you need to do. It can be one command or many.
+
+=head1 DESCRIPTION
+
+This command can be used in shell scripts to print a spinner while you do
+stuff in the background. Once you've completed your work, you stop the spinner
+by sending a signal to the PID of the spinner process.
+
+If you're working with Perl, you should use the Term::Spinner::Color module
+directly instead. If you prefer a pure-shell implementation, I've also built
+https://github.com/swelljoe/spinner which has nearly identical behavior, but
+only requires a POSIX-y shell.

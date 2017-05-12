@@ -1,0 +1,15 @@
+Revision history for Perl extension Tk::EntryCheck.
+
+0.01  Thu May  6 12:39:17 2004
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.5.0 -n Tk::EntryCheck
+
+0.02  Thu Oct  21 14:18:17 2004
+       - changed to inherit from Tk::Entry by Tk::Derived
+
+0.03  Sun Sep  4 10:27:00 2005
+       - removed uninitialized value warning if used exactly as Tk::Entry
+       
+0.04  Tue May  9 23:51:31 2006
+	- pattern and maxlength can now be accessed by ->configure (bugfix)
+

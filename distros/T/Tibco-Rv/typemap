@@ -1,0 +1,30 @@
+const char *	T_PV
+tibrv_bool	T_IV
+tibrv_i8	T_IV
+tibrv_u8	T_IV
+tibrv_i16	T_IV
+tibrv_u16	T_IV
+tibrv_i32	T_IV
+tibrv_u32	T_IV
+tibrv_i64	T_IV
+tibrv_u64	T_IV
+tibrv_f32	T_NV
+tibrv_f64	T_NV
+tibrv_ipport16	T_IV
+tibrv_ipaddr32	T_IV
+tibrv_status	T_IV
+tibrvMsgField *	T_IV
+tibrvMsgDateTime *	T_IV
+const tibrvMsgDateTime *	T_IV
+tibrvIOType	T_IV
+tibrvQueueLimitPolicy	T_IV
+tibrvDispatchable	T_IV
+tibrvTransportBatchMode	T_IV
+tibrvMsg	T_IV
+tibrvEvent	T_IV
+tibrvQueue	T_IV
+tibrvQueueGroup	T_IV
+tibrvDispatcher	T_IV
+tibrvTransport	T_IV
+tibrvcmEvent	T_IV
+tibrvcmTransport	T_IV

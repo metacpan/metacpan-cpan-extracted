@@ -1,0 +1,69 @@
+Template-Sandbox
+
+Template::Sandbox is Yet Another Templating module, designed primarily
+for use in a webserver environment but usable anywhere, providing a more
+secure "sandboxed" environment than most templating systems.
+
+The core design philosiphy for Template::Sandbox is that the template
+logic should have no access outside the template beyond that which you
+choose to permit it, this is frequently known as sandboxing.
+
+Unlike many other template systems, available on CPAN or in other languages,
+Template::Sandbox doesn't give the template access to the global variables
+of your application or to the core functions of the language.
+
+This means that your template authors only have access to the data and
+functionality that your application developers choose to grant them,
+this encourages both to work with "published" interfaces between the
+two systems - your template authors can't reach into the application's
+internal-only data, and so your application developers can change that
+internal data without worrying that the templates will stop working or
+expose confidential information.
+
+Template::Sandbox also provides the usual gamut of behaviours and
+optional features: caching compiled templates, includes, flow control,
+embedded expressions, cascading template candidates, and useful
+debugging information in case of errors.
+
+Furthermore, Template::Sandbox is designed to be subclassable should
+you wish to customize or extend other of its features.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Template::Sandbox
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Sandbox
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Template-Sandbox
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Template-Sandbox
+
+    Search CPAN
+        http://search.cpan.org/dist/Template-Sandbox
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2009 Sam Graham
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

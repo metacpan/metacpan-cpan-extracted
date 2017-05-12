@@ -1,0 +1,19 @@
+0.05 2016-12-09T03:18:39Z
+	FIX: deps
+
+0.04 2016-12-08T11:12:13Z
+	FIX: tests
+
+2010-12-07  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.02:
+	Fixed root childrean probrem.
+	Fixed dependencies.
+
+2010-12-06  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01:
+	inital release
+
+
+vim:set ft=changelog:

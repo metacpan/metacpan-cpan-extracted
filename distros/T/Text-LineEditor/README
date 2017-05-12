@@ -1,0 +1,37 @@
+
+Text::LineEditor 
+
+This module implements a -very- simple editor like Berkley mail used
+to use.  Remember that?
+
+
+INSTALLING
+==========
+
+After unzipping and untarring the distribution directory, you install
+the module by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+OTHER STUFF
+===========
+
+I can be contact at <gossamer@tertius.net.au>.
+
+Much of my code is available on the web, look for the latest
+release of things at:
+   http://www.tertius.net.au/~gossamer/code/
+
+
+LEGAL STUFF
+===========
+
+Copyright (c) 1998 Bek Oberin. All rights reserved. 
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f467912a4a5874f0bb3b7c3cf97fc7255fbc810e Changes
+SHA1 ecec73beff956fc76e8b8199687ac9bb85103e96 LICENSE
+SHA1 b43e2e6f6ce39911e3f3d3979ed988e7a307cd15 MANIFEST
+SHA1 9cd3013d20502b23ae5eee93f39a942be8b7026b META.yml
+SHA1 8e97b0a0eb84be8513a64a25c708e567f596f486 Makefile.PL
+SHA1 595fa21a76517dd85ba69a0002c23d3953b22a0c PYX.pm
+SHA1 cd20f1056649d94ed0a4d5f47dacb0d86127040b README
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 277aa71fb153457b834d640a238790577c6599b4 t/Task-PYX/01-use.t
+SHA1 d806b060770e442a365cfa4882deb9f8497efb83 t/Task-PYX/02-version.t
+SHA1 88d2baec8ee89b21eba794bfe8a4e6a0e6a3f161 xt/Task-PYX/01-pod_coverage.t
+SHA1 3c8bea75fb30827bf6c294fa7273809c6e8c825c xt/Task-PYX/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWxFM2AAoJEJe+XXKaIuTl9uUH/A7jL+M4SZkoT/ujXyWLCM21
+11DgJvR7sdDzb8yxm6+YezPz6Z2VQOCZXwV8g9DJywvMDW2S0/EawhxDifVZKIHv
+3bKYg6sXvk28LKcAfqshu0woN/y61Z26dGazpGu0g7Rgjk7eJfLBp1u0+IASx00N
+mUrqCQZixk6gC7OfSh8nZs4WF/sxAWNn5Udk1ibLof5O6ursbgEkCr8L2CPulsvu
+DguLoYmACK5YPxkYXEX05Infib0yUI3J4uN5MAeZ9Gkcuc0HBg3luOKDnXYHpy8P
+OA9gxWuRTRkDTKGFU7DReuUlpCD5oGfJmASqeRevFuSAF+RWMYDLhAYpbRkAaD0=
+=MmM+
+-----END PGP SIGNATURE-----

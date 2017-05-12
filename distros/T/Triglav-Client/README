@@ -1,0 +1,57 @@
+NAME
+    Triglav::Client - A Perl Interface to Triglav API
+
+SYNOPSIS
+      use Triglav::Client;
+
+      my $client = Triglav::Client->new(
+        base_url  => 'http://example.com/', # Base URL which your Triglav is located at
+        api_token => 'xxxxxxxxxxxxxxxxxxx', # You can get it from your page on Triglav
+      );
+
+      # Services
+      $client->services;                    #=> Returns all the services registered on Triglav
+
+      # Roles
+      $client->roles;                       #=> Returns all the roles registered on Triglav
+      $client->roles_in('sqale');           #=> Only roles in the service
+
+      # Active hosts (default behaviour)
+      $client->hosts;                       #=> Returns all the hosts registered on Triglav
+      $client->hosts_in('sqale');           #=> Only hosts in the service
+      $client->hosts_in('sqale', 'users');  #=> Only hosts in the service and which have the role
+
+      # All hosts including inactive ones
+      $client->hosts(with_inactive => 1);
+      $client->hosts_in('sqale',   undef, with_inactive => 1);
+      $client->hosts_in('sqale', 'users', with_inactive => 1);
+
+DESCRIPTION
+    Triglav is a server management tool. This module is a Perl interface to
+    its API.
+
+    <http://github.com/kentaro/triglav>
+
+CAVEAT
+    This module is in alpha stage. You should be conscious about the changes
+    of this module and API spec.
+
+REPOSITORY
+    *   triglav-client-perl
+
+        <https://github.com/kentaro/triglav-client-perl>
+
+SEE ALSO
+    *   Triglav
+
+        <http://github.com/kentaro/triglav>
+
+AUTHOR
+    Kentaro Kuribayashi <kentarok@gmail.com>
+
+LICENSE
+    Copyright (C) Kentaro Kuribayashi
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,26 @@
+---
+abstract: 'Template plugin to group lists into simple subgroups'
+author:
+  - 'Adam Kennedy <cpan@ali.as>'
+build_requires:
+  File::Spec: 0.82
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Template::Plugin::Group
+name: Template-Plugin-Group
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Params::Util: 0.25
+  Template: 2.10
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.03

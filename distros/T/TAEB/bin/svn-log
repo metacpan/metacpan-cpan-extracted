@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use DateTime;
+use DateTime::TimeZone;
+use DateTime::Format::Strptime;
+
+use YAML qw/LoadFile/;
+use File::Basename;
+
+open my $changes, '-|', 'darcs changes --summary';
+
+my ($message) = (undef);
+my $tz = DateTime::TimeZone->new(name => 'local');
+my $parser = new DateTime::Format::Strptime(
+    pattern   => '%a %b %d %H:%M:%S %z %Y',
+    on_error  => 'croak',
+    time_zone => $tz,
+);
+
+my $dt = DateTime->now();
+
+$dt->set(day => 1, month => 7);
+my $dst_short = $tz->short_name_for_datetime($dt);
+my $dst_re = qr/$dst_short/o;
+my $dst_offset = sprintf '%05d', $tz->offset_for_datetime($dt) / 36;
+
+$dt->set(day => 1, month => 1);
+my $nodst_short = $tz->short_name_for_datetime($dt);
+my $nodst_re = qr/$nodst_short/o;
+my $nodst_offset = sprintf '%05d', $tz->offset_for_datetime($dt) / 36;
+
+my $author_map = LoadFile((fileparse($0))[1] . '../etc/nicks.yml');
+
+while (<$changes>) {
+    # start of new patch
+    if (/^((?:Sun|Mon|Tue|Wed|Thu|Fri|Sat) .+)$/) {
+        print "\n", $message, "\n" if defined $message;
+
+        my @line = split '  ', $1;
+        my $author = pop @line;
+        my $date = join '  ', @line;
+        $date =~ s/$dst_re/$dst_offset/;
+        $date =~ s/$nodst_re/$nodst_offset/;
+        $author =~ s/.*<(.*)>.*/$1/;
+        my ($user) = exists $author_map->{$author} ? $author_map->{$author}
+                                                   : $author;
+
+        my $dt = $parser->parse_datetime($date);
+        #warn 'failed' unless $parser->success;
+
+        $message = '-'x72 . "\nr00 | " . $user . ' | ' .
+              $dt->strftime('%Y-%m-%d %H:%M:%S %z (%a, %d %b %Y)') .
+              " | 1 line\nChanged paths:\n";
+    }
+    elsif (/^  \* (.*)$/) {
+        # this is a commit, so print out the header
+        print $message;
+        $message = $1;
+    }
+    elsif (/^  tagged/) {
+        $message = undef;
+    }
+    elsif (/^    (.)\S? \.(.+)$/) {
+        my @line = split ' ', $2;
+        my $file = shift @line;
+        my $mod = $1;
+
+        $mod = 'D' if $mod eq 'R';
+
+        print '   ', $mod, ' ', $file, "\n";
+    }
+}
+
+if (defined $message) {
+    print "\n", $message, "\n";
+    print '-'x72,"\n";
+}
+
+close $changes;

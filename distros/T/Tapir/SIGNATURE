@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e189f5f2e2060a714f0a96b4c8517c466485f849 Build.PL
+SHA1 9d43d1633456cb4201f56cbf15d3c04edaee25af MANIFEST
+SHA1 038c3e52db3e90002ae0b9d8fe97a8b8799cd7e3 MANIFEST.SKIP
+SHA1 ae40f52ec7a15a3bb192bacf57bf626266c893de META.json
+SHA1 c2363e447878d55f6cc7c149ae9cec803e011629 META.yml
+SHA1 84ed757df8b7e0e2bfd98a77ae072d6df4f4f007 Makefile.PL
+SHA1 aa7b65d99008681d3105ee0907e44a206dc8146c README
+SHA1 20b2185cee8dc66c63742f18f2b75301bd08d454 bin/tapir.mjs
+SHA1 9aa9b9b1c544e17fce0e48dd05bf879c04e88d33 bin/tapir_audit
+SHA1 403a053e8cd394fb90a28e47ba54e50ee7f722b4 bin/tapir_buildjs
+SHA1 52ab7694f6dc18282a304e2ac94c4746fbeeef6d bin/tapir_docgen
+SHA1 9937819ccc5d8ce87556c9371f02ead4f1211afe htdocs/api_test.html
+SHA1 339c7805a7bbd9874b8eab2507a66d685cea7a92 htdocs/js/Tapir.js
+SHA1 4525a54ad6f66384dfdc9b16e17a20d7ac885962 htdocs/js/Tappy.js
+SHA1 0c27fbda4690bda40823d1c7e40f796113c26e7e htdocs/js/utils.js
+SHA1 d475a384d2bbd276c747540c4beca94db163d72d lib/Tapir.pm
+SHA1 21305b35d8ebcd607b0a9a453db6f9e61df7661d lib/Tapir/Documentation/NaturalDocs.pm
+SHA1 d0db8167c02e5ffc9f0899e7407729aa715c5c49 lib/Tapir/Exceptions.pm
+SHA1 03985fdda1841d99e25aa990b642a8ece02ed344 lib/Tapir/Logger.pm
+SHA1 30c52c06cdddbabb9433fa5e9927e4d9a72555bd lib/Tapir/MethodCall.pm
+SHA1 bccff65dd6f7e60226797235a71ac6ec526b9eb6 lib/Tapir/Server.pm
+SHA1 bf500e151ceffa4590f9696d3046a1018a10957f lib/Tapir/Server/Handler.pm
+SHA1 4b474198aabf5d72ce4a34f7af1abd6f47d86902 lib/Tapir/Server/Handler/Class.pm
+SHA1 a987ad64ee013dda6723d495b5b537ccb0e9cca0 lib/Tapir/Server/Handler/Signatures.pm
+SHA1 e0e9730a964d0c76dadc783e9bc9bac33cb1ec49 lib/Tapir/Server/Transport.pm
+SHA1 e1978509d6c2abbd0fc81eb2b949948e611818c9 lib/Tapir/Validator.pm
+SHA1 3fb36d69f2aee38492d9714698940b9a23d1ba80 lib/Tapir/Validator/Length.pm
+SHA1 b1d4dd865f1a72eca5b028880b7530c388ddb014 lib/Tapir/Validator/Range.pm
+SHA1 a3b4aeefc90c2519e94d458fe06cd44ba277debe lib/Tapir/Validator/Regex.pm
+SHA1 55214a226dcfd629ec7ba95c7ca6117ee2e632d4 t/001_handler_plain.t
+SHA1 1b09eeae4ee56d763af8b6e7d440f5e31bea40fc t/002_handler_signatures.t
+SHA1 6bce01da408016bcc4218ae6aef4aed597627b38 t/003_methodcall.t
+SHA1 013036c47998dabc46c2791f4db28750624ae532 t/004_handler_call.t
+SHA1 47e442d3b0ea6c0f7d1562c6237f3acb4374b3f0 t/005_documentation.t
+SHA1 1cf1ad5412ce3c2a467b21612a50eba02e82ad44 t/006_validator.t
+SHA1 1c3cb707008273b62f6fbc84de8de4f231221514 t/bin/run_tests_on_change.pl
+SHA1 e9df5ac859bac9d8a414c641fa1b24d47a58d8b8 t/docs/Service.Accounts.txt
+SHA1 9aca48b4d8c056f34ca16843e97ab899e182a732 t/docs/Thrift.txt
+SHA1 20c25545ac3ab51a044703a18e944bd52396aeec t/docs/Types.txt
+SHA1 7dd0209d9810778f0b51105d34c8954b8c7feeca t/thrift/example.thrift
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (Darwin)
+
+iEYEARECAAYFAlB069MACgkQHHIpFH/pKkLFawCeOMwjQHLBrjYvg3Rg68Awjnk+
+CwcAnirPJUbabzM+pWhU0QHAtEHPAlY/
+=zz0w
+-----END PGP SIGNATURE-----

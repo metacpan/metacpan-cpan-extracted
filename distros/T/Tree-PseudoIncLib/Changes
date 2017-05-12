@@ -1,0 +1,60 @@
+Revision history for Perl extension Tree::PseudoIncLib.
+
+0.05  Fri Nov 05 15:00:00 2004
+	- further development version.
+	- unnecessary warnings were commented in t/01_structure.t
+	- documentation was edited.
+
+0.04  Sat Oct 16 16:25:00 2004
+	- further development version.
+	- on-click actions and on-mouse-over prompts were added to the allow_files hash.
+	- public method application_directory() was added.
+	- bug in the action over the icon click of shaded file was fixed:
+		[Thu Nov  4 12:25:20 2004] [error] [client 192.168.0.4] (2)No such file or directory:
+		 file permissions deny server access:
+		 /var/www/html/display-document/usr/lib/perl5/vendor_perl/5.6.1/Archive/Tar.pm
+	- tests were edited appropriately in order to create dynamically empty directories and symlinks.
+	37629 Nov  5 08:32 Tree-PseudoIncLib-0.04.tar.gz
+
+0.03  Mon Sep 20 18:00:00 2004
+	- further development version.
+	- DBI API was removed along with documentation.
+	- private methods _link_text_overLib() and _link_icon_overLib() were added.
+	- export_to_DHTML was modified in order to take incoming parameters.
+	- public and private methods were resorted out in order to have better structure.
+	- tests were edited appropriately.
+	- META.yml was added manually.
+	36097 Oct 10 15:52 Tree-PseudoIncLib-0.03.tar.gz
+
+0.02  Fri Sep 10 20:00:00 2004
+	- debug version; many minor changes...
+	  09/10/04 bug: appears in 712 Tree::PseudoIncLib::object_list - undefined
+	  level value when the size=0; trapped at the point of first appearance.
+	  Fixed in Tree::PseudoIncLib::from_scratch.
+	- skip options for mode, owner, and group were added. - DBI test breaks down:
+	  t/01_basic..........ok
+	  t/02_fromscratch....ok
+	  t/03_dbi............ok 10/18
+	        skip_group :: 0 =>
+	        skip_mode :: 0 =>
+	        skip_user :: 0 =>
+	  t/03_dbi............NOK 11#     Failed test (t/03_dbi.t at line 81)
+	  t/03_dbi............ok 18/18# Looks like you failed 1 tests of 18.
+	  t/03_dbi............dubious
+	        Test returned status 1 (wstat 256, 0x100)
+	  DIED. FAILED test 11
+	        Failed 1/18 tests, 94.44% okay
+	  t/04_dhtml..........ok
+	  Failed Test Stat Wstat Total Fail  Failed  List of Failed
+	  -------------------------------------------------------------------------------
+	  t/03_dbi.t     1   256    18    1   5.56%  11
+	  Failed 1/4 test scripts, 75.00% okay. 1/60 subtests failed, 98.33% okay.
+	  make: *** [test_dynamic] Error 11
+	- distro is created in order to keep a check-point of further development.
+	39275 Sep 20 10:52 Tree-PseudoIncLib-0.02.tar.gz
+
+0.01  Sun Aug 29 04:46:14 2004
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Tree::PseudoIncLib
+	- original source was created using my other older projects
+	38436 Sep  7 14:16 Tree-PseudoIncLib-0.01.tar.gz

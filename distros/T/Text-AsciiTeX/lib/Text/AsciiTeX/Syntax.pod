@@ -1,0 +1,153 @@
+=head1 NAME
+
+Text::AsciiTeX::Syntax - A description of the syntax accepted by Text::AsciiTeX
+
+=head1 SYNTAX
+
+=over
+
+=item C<\frac{a}{b}>
+
+A fraction of C<a> and C<b>.
+
+=item C<a^{b}>
+
+A superscript. One can also omit the braces. In this case the first character following C<^> will be superscripted.
+
+=item C<a_{b}>
+
+A subscript.  Works just like the superscript (well, not exactly of course).
+
+=item C<\sqrt[n]{a}>
+
+A C<n>-th root of C<a>, the argument C<[n]> is optional. Without it it produces the square root of C<a>.
+
+=item C<\sum>
+
+Expands to a sigma
+
+=item C<\prod>
+
+Expands to the product mark (pi).
+
+=item C<\int>
+
+Expands to the integral mark.
+
+=item C<\oint>
+
+A closed path integral.
+
+=item C<\left(> , C<\right)>
+
+Expands to braces which adept to the height of their content. Available left braces are: C<([{|> The correspondingright braces are:  C<)]}|>  All brace types can be opened by C<\left.>  or closed by <\right.>, producing a single right or left brace, respectively.
+
+=item C<\leadsto>
+
+Expands to an arrow (C<< ~> >>), May look ugly depending on your fonts.
+
+=item C<\to>
+
+Expands to an arrow (C<< -> >>).
+
+=item C<\limit{x}>
+
+Expands to a limit, i.e. C<< \limit{x \to 0} >>.
+
+=item C<\overline{X}>
+
+Draws a line above expression C<X>
+
+=item C<\underline{X}>
+
+Draws a line under expression C<X>
+
+=item C<\lceil>
+
+Left ceiling symbol
+
+=item C<\rceil>
+
+Right ceiling symbol
+
+=item C<\lfloor>
+
+Left floor symbol
+
+=item C<\rfloor>
+
+Right floor symbol
+
+=item C<< \\ >>
+
+Insert a line break.
+
+=item C<\a>
+       
+Escapes the character C<a>. Useful for inserting characters like C<^>, and C<_> in your equation.
+
+=item array environment
+       
+ \begin{array}[pos]{column alignments}
+   a00 & a01 & ... a0n \\
+   a10 & a11 & ... a1n \\
+   ... & ... & ... ... \\
+   am0 & am1 & ... amn
+ \end{array}
+       
+Makes an array. The optional argument C<pos> sets  the  alignment  of  the
+array to C<t> (top), C<b> (bottom) or C<c> (center). The column alignments consist of
+one character per column, C<l> (left), C<c> (center), or C<r> (right). Currently asciiTeX
+does  not support vertical or horizontal lines, e.g. the column-
+alignment specification C<{|c|}> will lead to  errors.  Note, that the
+string C<\begin{array}> must not contain spaces. Cells of the array may
+contain formulas and sub-arrays.
+
+=back
+
+
+=head1 EXAMPLES
+
+You can pass any of these examples to C<render> to see what it does.
+
+ \frac{1}{1+x}
+
+ \lfloorx\rfloor = x -\frac{1}{2} + \sum_{k=1}^{\infty}
+ \frac{sin(2 Pi k x)}{pi k}
+
+ \begin{array}{ccc}
+ x_{11} & x_{12} & x_{13}\\
+ x_{21} & x_{22} & x_{23}\\
+ x_{31} & x_{32} & x_{33}
+ \end{array}
+
+ \left[
+ \begin{array}{ccc}
+ x_{11} & x_{12} & x_{13}\\
+ x_{21} & x_{22} & x_{23}\\
+ x_{31} & x_{32} & x_{33}
+ \end{array}
+ \right]
+
+ \int_0^W \frac{np}{n+p}dx = \int_0^W \frac{n_0}{exp \left( 
+ \frac{E_0(x-x_0)}{kT} \right)+exp \left( -\frac{E_0(x-x_0)}{kT}\right)}
+ dx=\frac{n_0kT}{E_0} \left[ arctan \left( exp 
+ \left[\frac{E_0(x-x_0)}{kT}\right]\right)\right]^{x=W}_{x=0}~ 
+ \frac{n_0kT}{E_0} pi
+
+ f(x) = \left{\begin{array}{lr} 
+ \frac{1}{x+1} +12 & \-12<x<0\\
+   & \\ 13-x & x<\-12, x>0
+ \end{array}\right.
+
+ a = \frac{1}{\sqrt{2} + 
+ \frac{1}{\sqrt{2} + 
+ \frac{1}{\sqrt{2} + 
+ \frac{1}{\sqrt{2} + ...
+ }}}}
+ 
+=head1 AUTHOR
+ 
+This document is a direct port from the documenation of asciiTeX program written by Bart Pieters. See L<http://asciitex.sourceforge.net/>.
+
+=cut

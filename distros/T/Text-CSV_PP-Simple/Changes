@@ -1,0 +1,10 @@
+Revision history for Text-CSV_PP-Simple
+
+0.0.2  Wed Nov 21 16:19:02 2007
+       Initial release.
+
+0.0.4  Sat Nov 24 07:15:00 2007
+       Added want_fields.
+
+0.0.4  Mon Nov 26 17:03:00 2007
+       use Module::Install.

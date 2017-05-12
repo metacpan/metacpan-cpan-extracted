@@ -1,0 +1,139 @@
+=head1 NAME 
+
+Tk::Gpack - Abbreviated geometry arguments for pack, grid and place geometry managers.
+
+=head1 DESCRIPTION
+
+This module exports four functions for each of the different geometry mananers into the Tk namespace.
+These functions provide a variety of styles for controlling the indevidual geometry of one, 
+or bulk groups of widgets.  Each geometry manager has a series of single letter abbreviations 
+allowing a significant reduction in code, while remaining fairly intuitive. 
+
+=head1 SYNOPSIS 
+
+	use Tk::Gpack ; 
+
+gpack, ggrid, and gplace are group packers, they recieve an even numbered list of alternating widgets and abbreviations. 
+
+	gpack($one, 'slan' $two, 'sran' $three, 'slanx1fb')     ; # group pack
+	ggrid($one, 'r25c10', $two, 'c9r15', $three, 'c1r1se' ) ; # group grid
+	gplace($one, 'w40h40x120y120anw', $two, 'x40y40ase', $three, 'aww20h20x25y140') ; # group placer 
+
+tpack, tgrid, and tplace are target packers, and use exactly the same format except they take a preceding target widget, (typically a frame) which will be automatically be used in conjunction with the -in => argument. 
+
+	tpack($FRAME1, $one, 'slan' $two, 'sran' $three, 'slanx1fb')        ; # target pack
+	tgrid($TOPLEVEL1, $one, 'r25c10', $two, 'c9r15', $three, 'c1r1se' ) ; # target grid
+	tplace($MW, $one, 'w40h40x120y120anw', $two, 'x40y40ase', $three, 'aww20h20x25y140') ; # target placer 
+
+xpack xgrid and xplace are expand packers, and used inline as a direct replacement to pack grid and place. The first string passed is the abbreviation string, while anything remaining will be parsed as the standard verbose options. 
+
+	$one->xpack('slan', -in => $FRAME1)      ; # expand pack  
+	$two->xgrid('r4c4sw', -in => $TOPLEVEL2) ; # expand grid
+	$three->xplace('x20y20aw', -in => $MW)   ; # expand place 
+
+spack sgrid and splace are self packers, they assume that an abbreviation is embedded in the widget as an option called '-geometry'. You must be using derived widgets for this to work, and have defined a configspec '-geometry'. The self packers perform the same as xpack in that they permit additional verbose option pairs to be passed which will be appended to the expansion of the embedded abbreviation. If you are using a default widget geometry as shown below, you can still override it by simply using xpack in place of spack. (spack won't take the abbreviation as an argument) This is particularly handly for templated code. To use spack splace and sgrid do the following: 
+
+	package DerivedButton ; 
+	...
+	sub Populate {
+	$self->ConfigSpecs(-geometry => ['PASSIVE',     'data',       'Data',       'slan']) ; # <------ Abbreviation
+	}
+	#!/usr/bin/perl -w 
+	use Tk ; 
+	... 
+	my $DButton = $mw->DerivedButton()->spack(-in => $foo) ; 
+
+Obviously this last example is not complete. Once you've built a derived widget it should make sense though. 
+
+=head1 DETAILS
+
+The abbreviations are fairly intuitive. All supported options are represented by a single character. For the pack geometry manager all passed values are also single characters. For grid and place passed values may be multiple characters. Numeric arguments for grid and place are variable length integers for example. There are a few redundant characters, but they work as expected.  
+
+NOT ALL OPTIONS TRANSLATE, in this version. (And probably for quite a few versions to come) But the most used ones do. Please review the following translation lists to see How things are supported at this time. 
+
+=head1 SUPPORTED TRANSLATIONS
+
+	# OPTIONS pack() 
+	################### 
+	x = '-expand'  
+	s = '-side'    
+	a = '-anchor'  
+	f = '-fill'   
+	X = '-padx'  
+	Y = '-pady' 
+
+	# VALUES pack() 
+	#################### 
+	c = 'center'   
+	l = 'left'      
+	r = 'right'     
+	t = 'top'      
+	n = 'n'         
+	s = 's'       
+	e = 'e'	      
+	w = 'w'	       
+	y = 'y'        
+	x = 'x'        
+	b = 'both'    
+	b = 'bottom'    
+
+	# OPTIONS grid() 
+	#################### 
+	r = '-row'   
+	c = '-column'
+	s = '-sticky'
+
+	# VALUES grid() 
+	#################### 
+	n = 'n'
+	s = 's'
+	e = 'e'
+	w = 'w'
+
+        # OPTIONS place()
+        ####################
+	w = '-width' 
+	h = '-height' 
+	x = '-x' 
+	y = '-y' 
+	a = '-anchor' 
+
+	# VALUES place() 
+	#################### 
+	n = 'n' 
+	ne = 'ne' 
+	nw = 'nw' 
+	s = 's'
+	se = 'se' 
+	sw = 'sw' 
+	e = 'e' 
+	w = 'w'
+
+=head1 INSTALLATION 
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make install
+
+=head1 DEPENDENCIES
+
+	use Tk ; # (duh) 
+
+Not all options currently supported. I've been using this for a while now, and it 
+seems to work OK. 
+
+=head1 TODO
+
+Add more supported options. Tighten up some of the code. 
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 IT Operators (http://www.itoperators.com) 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

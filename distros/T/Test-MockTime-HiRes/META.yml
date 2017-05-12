@@ -1,0 +1,46 @@
+---
+abstract: 'Replaces actual time with simulated high resolution time'
+author:
+  - 'INA Lintaro <tarao.gnn@gmail.com>'
+build_requires:
+  Test::Class: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-MockTime-HiRes
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::MockTime::HiRes:
+    file: lib/Test/MockTime/HiRes.pm
+    version: '0.07'
+requires:
+  Test::MockTime: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/tarao/perl5-Test-MockTime-HiRes/issues
+  homepage: https://github.com/tarao/perl5-Test-MockTime-HiRes
+  repository: git://github.com/tarao/perl5-Test-MockTime-HiRes.git
+version: '0.07'
+x_authority: cpan:TARAO
+x_contributors:
+  - 'Torsten Förtsch <torsten@binary.com>'
+  - 'Asato Wakisaka <asato.wakisaka@gmail.com>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Dave Webb <github@d5ve.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

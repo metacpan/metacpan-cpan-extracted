@@ -1,0 +1,55 @@
+NAME
+    Test::Environment - Base module for loading Test::Environment::Plugin::*
+
+SYNOPSIS
+            use Test::Environment qw{
+                    PostgreSQL
+                    Dump
+            };
+        
+            # now we have 'psql', 'dump_with_name', ... functions in current namespace.
+            # imported from Test::Environment::Plugin::PostreSQL and Test::Environment::Plugin::Dump
+
+            eq_or_diff(
+                    [ psql(
+                            'switches' => '--expanded',
+                            'command'  => 'SELECT * FROM Table LEFT JOIN OtherTable USING (other_id) ORDER BY other_id;',
+                    ) ],
+                    [ dump_with_name('test_01.dump') ],
+                    'check db loading',
+            );
+
+DESCRIPTION
+    This is the base module to load Test::Environment::Plugin::* modules.
+
+    Also sets:
+
+            $ENV{'RUNNING_ENVIRONMENT'} = 'testing';
+
+    The basic idea is to call all the plugins you will need in your testing
+    script. The plugins will export their routines so you can use them in
+    your tests easily. By the $ENV{'RUNNING_ENVIRONMENT'} you can announce
+    that you are running in the testing mode to all the components of your
+    tool. For example MyApp::Config module can decide uppon the %ENV from
+    where to run the configuration file. (for testing look in t/conf/
+    instead of conf/ for ordinary usage)
+
+FUNCTIONS
+  import()
+    Will load choosen Test::Environment::Plugin::? plugins.
+
+SEE ALSO
+    Test::Environment::Plugin::*
+    http://search.cpan.org/search?query=Test%3A%3AEnvironment%3A%3APlugin%3A
+    %3A&mode=module
+
+AUTHOR
+    Jozef Kutej, <jkutej@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Jozef Kutej
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

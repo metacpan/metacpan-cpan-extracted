@@ -1,0 +1,21 @@
+Revision history for Perl extension Term::ReadLine::EditLine
+
+1.1.1 2013-06-13T22:45:12Z
+
+    - Push Term::ReadLine::Stub to its own @ISA so that modules like Term::UI can work.
+      (miyagawa)
+
+1.1.0 2013-01-26T18:56:08
+
+    - fixed simple bug in addhistory method
+      (tokuhirom)
+    - Make emacs mode as default. It is same behaviour between other
+      Term::ReadLine::* modules.
+    - added example code
+
+1.0.0 2013-01-26T18:11:24
+
+    - initial release for CPAN
+
+0.01    Sat Jan 26 17:14:45 2013
+    - original version

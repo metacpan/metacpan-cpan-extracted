@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Text-Balanced
+version:            2.03
+abstract:           Extract delimited text sequences from strings
+author:
+    - Adam Kennedy <adamk@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0.47
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

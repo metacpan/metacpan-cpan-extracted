@@ -1,0 +1,11 @@
+Changes
+lib/Test/Doctest.pm
+lib/Test/Doctest/Example.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/Doctest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+## [<: $path.stringify :>](<: $path.relative :>)
+
+: for $requests -> $request {
+: next if !$request.response;
+* <: $request.label :>
+: }
+
+

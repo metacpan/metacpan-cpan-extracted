@@ -1,0 +1,12 @@
+0.000003  2016-05-31 07:12:36-07:00 America/Los_Angeles
+
+    - Stop using Import::Into (too many deps)
+    - Remove experimental notice
+
+0.000002  2016-05-30 07:43:48-07:00 America/Los_Angeles
+
+    - Update for stable Test2
+
+0.000001  2016-02-04 22:09:14-08:00 America/Los_Angeles
+
+    - Initial Commit

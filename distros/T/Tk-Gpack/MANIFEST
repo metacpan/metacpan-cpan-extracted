@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-Gpack.t
+lib/Tk/Gpack.pm

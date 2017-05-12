@@ -1,0 +1,495 @@
+
+=head1 NAME
+
+Tk::StyledButton - Stylized Button widget
+
+=head1 SYNOPSIS
+
+	use Tk::StyledButton;
+	...
+	$b = $MW->StyledButton(
+		-style         => 'shiny' | 'round' | 'gel' | 'flat' | 'image',
+		-shape         => 'rectangle' | 'oval' | 'round' | 'bevel' | 'folio' | [ @coords ],
+		-dispersion    => fractional-number,
+		-angle         => fractional-number,
+		-image         => "Tk::Photo variable",
+		-state         => 'normal' | 'disabled',
+		-command       => [ sub {a callback} ],
+		-text          => 'OK',
+		-font          => $font,
+		-compound      => 'left',
+		-orient        => 'horizontal' | 'vertical',
+		-tooltip       => 'Some helpful text'
+	)->pack();
+	...
+	MainLoop;
+
+=begin html
+
+<a href='Tk-StyledButton-0.10.tar.gz'>Tk-StyledButton-0.10.tar.gz</a>
+
+=end html
+
+=head2 Screenshots
+
+=begin html
+
+<table border=0>
+<tr>
+<td align=center valign=center><img src='imgs/rectangle_round.png' title='Rectangle rounded'></td>
+<td align=center valign=center><img src='imgs/rectangle_shiny.png' title='Rectangle shiny'></td>
+<td align=center valign=center><img src='imgs/rectangle_gel.png' title='Rectangle gel'></td>
+<td align=center valign=center><img src='imgs/rectangle_flat.png' title='Rectangle flat'></td>
+</tr>
+<tr>
+<td align=center valign=center><img src='imgs/oval_round.png' title='Oval rounded'></td>
+<td align=center valign=center><img src='imgs/oval_shiny.png' title='Oval shiny'></td>
+<td align=center valign=center><img src='imgs/oval_gel.png' title='Oval gel'></td>
+<td align=center valign=center><img src='imgs/oval_flat.png' title='Oval flat'></td>
+</tr>
+<tr>
+<td align=center valign=center><img src='imgs/round_round.png' title='Round rounded'></td>
+<td align=center valign=center><img src='imgs/round_shiny.png' title='Round shiny'></td>
+<td align=center valign=center><img src='imgs/round_gel.png' title='Round gel'></td>
+<td align=center valign=center><img src='imgs/round_flat.png' title='Round flat'></td>
+</tr>
+<tr>
+<td align=center valign=center><img src='imgs/bevel_round.png' title='Bevel rounded'></td>
+<td align=center valign=center><img src='imgs/bevel_shiny.png' title='Bevel shiny'></td>
+<td align=center valign=center><img src='imgs/bevel_gel.png' title='Bevel gel'></td>
+<td align=center valign=center><img src='imgs/bevel_flat.png' title='Bevel flat'></td>
+</tr>
+<tr>
+<td align=center valign=center><img src='imgs/folio_round.png' title='Folio rounded'></td>
+<td align=center valign=center><img src='imgs/folio_shiny.png' title='Folio shiny'></td>
+<td align=center valign=center><img src='imgs/folio_gel.png' title='Folio gel'></td>
+<td align=center valign=center><img src='imgs/folio_flat.png' title='Folio flat'></td>
+</tr>
+</table>
+
+=end html
+
+=head1 DESCRIPTION
+
+B<Tk::StyledButton> provides a shaped button with stylized shading,
+using a L<Tk::Canvas> object to implement the button rendering. The usual
+L<Tk::Button> options and behaviors are preserved as much as possible.
+
+When a button is rendered, 2 versions are created:
+
+=over 4
+
+=item B<idle> version
+
+This version uses the unmodified C<-background> value to render
+the button.
+
+=item B<active> version
+
+This version uses the uses a brightened version of the C<-background> value
+to render the button.
+
+=back
+
+If the L<GD> I<(min. version 2.30)> and L<GD::Text> modules are installed,
+the button images can be rendered via GD and captured for external
+use.
+
+Note that some option values (I<e.g., -shape =E<gt> 'folio', -orient =E<gt> 'vertical'>)
+are provided for use by L<Tk::StyledNB> I<(derived from >L<Tk::DynaTabFrame> I<)>, and
+have minimal value for general use.
+
+=head1 OPTIONS
+
+B<Tk::StyledButton> supports the following L<Tk::Button> options:
+
+B<-anchor> B<-background> B<-bitmap> B<-command> B<-compound>
+B<-font> B<-foreground> B<-height> B<-image> B<-justify> B<-padx> B<-pady>
+B<-state> B<-text> B<-textvariable> B<-width> B<-wraplength>
+
+In addition, the following additional options are supported:
+
+=over 4
+
+=item B<-activeimage> C<=E<gt>> I<Tk::Photo object>
+
+When specified with the C<-style =E<gt> 'image'> option,
+specifies an image to use for the entire button when active.
+
+=item B<-angle> C<=E<gt>> I<fractional-number>
+
+Optional shading angle for round or shiny style buttons (i.e., the position on the
+button which is the brightest). Can be any fractional value between
+0 and 1.0; values less than 0.01 may cause divide-by-zero errors. Default depends
+on L<-shape>.
+
+=item B<-dispersion> C<=E<gt>> I<fractional-number>
+
+Optional fractional dispersion factor applied to the shading style for the button
+(i.e., the amount of "spread" of bright areas).
+Can be any fractional value between 0 and 1.0. Default is 0.80.
+
+=item B<-idleimage> C<=E<gt>> I<Tk::Photo object>
+
+When specified with the C<-style =E<gt> 'image'> option,
+specifies an image to use for the entire button when idle.
+
+=item B<-orient> C<=E<gt>> I<$orientation>
+
+Optional orientation of the button. C<$orientation> may be any of
+'n', 's', 'e', 'w', 'nw', 'ne', 'sw', 'se', 'wn', 'ws', 'en', 'es'.
+Default is 'ne'. Intended for use with L<Tk::StyledNB>, may not be
+useful for general purposes.
+
+=item B<-shape> C<=E<gt>> B<'rectangle'> C<| 'round' | 'oval' | 'bevel' | 'folio' | [ @coords ] >
+
+Optional shape for the button. Default is rectangle. Note that bevel and
+folio shapes are intended for L<Tk::StyledNB>, and may not be
+appropriate for general use. The shape is used both to render the buttons,
+and to define the event binding area over the button images.
+
+If the C<-style> is 'image', the application may supply its own set of
+binding coordinates via an arrayref of polygon (X, Y) vertices, thereby
+permitting arbitrary bounding areas for the button (e.g., triangle,
+half circle, octagon, etc.) that match the appropriate edges of the
+image.
+
+=item B<-style> C<=E<gt>> B<'shiny'> C<| 'round' | 'gel' | 'flat' | 'image'>
+
+Optional shading style for the button. Default is shiny. C<'image'>
+indicates that the C<-idleimage> and C<-activeimage> option values
+should be used for the entire button, with the active area determined
+by the C<-shape> option. This option is intended to optimize rendering
+for static buttons.
+
+=item B<-tooltip> C<=E<gt>> I<$text> B<|> I<[ $text, $delay ]>
+
+Optional tooltip to be attached to the button. Causes a L<Tk::Balloon>
+to be attached to the bidnign area of the button, using the supplied
+C<$text> and C<$delay>. If a scalar is supplied, the default C<$delay>
+is 300 milliseconds.
+
+=item B<-usegd> C<=E<gt>> B<0> C< | 1>
+
+Causes the button to be rendered as a single GD image embedded
+in a Tk::Canvas, rather than a assembling the various components
+into a Tk::Canvas. Primarily used for the C<capture()> method.
+Note that L<GD> and L<GD::Text> are required to support this option.
+
+=item B<-verticaltext> C<=E<gt>> B<'Tk'> C<| 'GD' | undef>
+
+Causes the text of vertically oriented buttons to be drawn using the
+specified method. This option is provided primarily for use
+by L<Tk::StyledNB> to render left and right side tabs. If set to 'GD',
+the text is rendered as a GD image, then rotated 90 degrees before
+being embedded in the button. If set to 'Tk' (the default), the text
+is broken up so as to "stack" the characters vertically in the button,
+and the text is then rendered using the normal Tk methods. If set
+to C<undef>, then the text is rendered horizontally using Tk
+(resulting in wide side tabs).
+
+=back
+
+=head1 WIDGET METHODS
+
+B<StyledButton> is a subclass of L<Tk::Canvas>.
+This widget supports the B<configure> and B<cget> methods
+described in L<Tk::options> which can be used to enquire and
+modify the options described above.
+The widget also inherits all the methods provided by the generic
+L<Tk::Widget> class.
+
+=over 4
+
+=item (C<$active_image, $active_coords, $idle_image, $idle_coords>) = I<$button>-E<gt>B<capture>(  I<%options> )
+
+Captures the active and idle images and binding coordinates of the button in the
+specified $format, as defined by the L<GD> module (default 'PNG'). Requires the
+installation of L<GD> and L<GD::Text> modules; also requires L<Win32::Font::NameToFile>
+module for Win32 platforms.
+
+C<$active_image> and C<$idle_image> are returned as scalars as output from the GD
+rendering methods. C<$active_coords> and C<$idle_coords> are arrayrefs of the (X, Y)
+polygon vertex coordinates used to create a transparent binding area on top of the images; active
+and idle coordinates are usually the same, but both are provided for completeness.
+Useful for later reusing static button images with the C<-style =E<gt> 'image'> option.
+
+I<%options> may include:
+
+=back
+
+=over 8
+
+=item B<-format> I<=E<gt>> C<$format>
+
+Specifies the output format of the image; can be any of
+'PNG', 'GIF', or 'JPEG'. Default is 'PNG'.
+
+=item B<-omittext> I<=E<gt> boolean>
+
+If set to a true value, any text assigned to the button will
+be omitted from the rendered image. Useful for creating general
+purpose buttons that can be overlaid with text later.
+
+=item B<-omitimage> I<=E<gt> boolean>
+
+If set to a true value, any image assigned to the button will
+be omitted from the rendered button image. Useful for creating general
+purpose buttons that can be overlaid with an image later.
+If no image or text has been assigned to the button, then
+the C<-height> and C<width> values will be used to as the bounding box
+for the button.
+
+=item B<-gdfont> I<=E<gt> 'string' | \&coderef >
+
+Specifies a GD-compatible font for any text to be included
+in the captured image; ignored if no text has been applied to
+the button, or the L<-omittext> option has been set true.
+
+Perl/Tk font specifications are not
+compatible with L<GD::Text>, which only supports TrueType
+fonts, or the internal GD default fonts. In addition, TrueType
+fonts are specified to GD::Text as I<filenames>, rather than
+the X11 font formats usually supported by L<Tk::Font>.
+
+In order to provide some means of translating between the
+2 font systems, the B<-gdfont> option provides a means
+to specify a GD::Text font. If the option value is a scalar,
+it is passed directly to the L<GD::Text>::set_font() method;
+if it is a coderef, it will be called with the B<-family>,
+B<-weight>, B<-slant>, and B<-size> options of the current
+Tk::Font in use by the StyledButton, and should return
+a list of (fontfile, size) that can be passed to GD::Text::set_font.
+
+Note that the filename passed to GD::Text::set_font() must either
+include absolute pathnames, or any of the GD::Text font environment
+variables must be set (e.g., B<FONT_PATH>).
+
+Also note that Perl/Tk can support TrueType fonts, but may apply
+internal modifications to render bold or italic versions; in such cases,
+GD::Text may be unable render the same weight or slant.
+
+Win32 platforms may omit this option if a TrueType font is being used
+and its filename can be generated via L<Win32::Font::NameToFile>.
+
+If the B<-gdfont> option is not specified and the font filename
+cannot be resolved, then a default font is selected from the
+GD internal font set, based on the size, weight, and slant
+of the button's font.
+
+Finally, note that Perl/Tk returns font sizes in pixels, rather than
+points, and that GD::Text font specifications require a point, rather than
+pixel, size. Therefore, this module selects the proper point size
+to use by iterating over point sizes and computing the button text
+size via GD::Text until the resulting width is the same (or neary same)
+as the Perl/Tk computed width. This iteration may take some time
+to complete.
+
+=back
+
+=over 4
+
+=item I<$button>-E<gt>B<flash>( [ I<$interval> ] )
+
+Same as L<Tk::Button>::flash() method, except that an
+optional interval parameter is supported.
+
+If no C<$interval> is specified, the behavior is the same as
+Tk::Button::flash(), i.e., 3 very quick flashes.
+
+If C<$interval> is zero, then any current flash operation
+is cancelled.
+
+If C<$interval> is non-zero, then the button rotates between
+the bright and dark versions every $interval milliseconds,
+until it is explicitly cancelled via C<flash(0)>, or any
+other mouse or keyboard initiated event is applied to the button.
+
+=item I<$button>-E<gt>B<invoke>
+
+Same as L<Tk::Button> method.
+
+=back
+
+=head1 EXAMPLES
+
+The following examples are in the C<demo> directory:
+
+=head4 onebtn.pl
+
+Simple script to display a single button. Button traits are
+specified via command line parameters:
+
+=head4 flashbtn.pl
+
+Simple script to flash a button.
+
+=head4 btnstudio.pl
+
+A simple button "studio" with the ability to interactively set
+various parameters for a button, and then capture the button images
+to a file (e.g., for use in a website's Javascript rollover navigation
+bar, or for use with the C<-style =E<gt> 'image'>).
+
+=head1 NOTES
+
+=over 4
+
+=item C<-underline> B<not currently supported>
+
+Due to the limits of Canvas text elements, support for
+-underline is difficult, if not impossible.
+
+=item C<-width> and C<-height> B<considerations>
+
+If no explicit width/height values are set, the width/height
+of the button is determined by the -padx/-pady values, the
+bounding box coordinates of any applied text, image, and/or bitmap,
+and the -compound setting. If no text or image is applied,
+the default width and height are 100 and 30, respectively.
+
+If width or height is explicitly set, then the rendered button
+shape will be constrained to those parameters, which may
+result in scaling the button contents to fit within the
+specified width or height.
+
+Button contents are scaled as follows:
+
+=back
+
+=over 8
+
+=item *
+
+Either C<-width> and/or C<-height> have been explicitly set, and the
+specified width/height is smaller than the bounding box computed from
+the text, image, and bitmap, the C<-padx> and C<-pady> values, and
+the C<-compound> value. In this case, the button is first rendered to
+the computed size, then scaled to the explicitly specified dimensions.
+
+=item *
+
+When C<-style =E<gt>> I<'image'>, and the dimensions of the activeimage
+and/or idleimage are smaller than the computed bounding box for
+any supplied text/image/bitmap, the active/idle images are first
+scaled up to fit the contents before the contents are supplied.
+
+=item *
+
+When C<-style =E<gt>> I<'image'>, and C<-width> and/or C<-height> have been
+explicitly set, the active and idle images are first scaled to fit any
+text/image/bitmap contents, and then the result is scaled up or down as needed
+to fit the specified dimensions,
+
+=back
+
+=over 4
+
+=item B<Values returned by >I<$button>-E<gt>cget(C<-width>, C<-height>)
+
+When retrieving the C<-width> or C<-height> via C<cget()>,
+the returned value is the width/height of the enclosing
+Canvas object, which is usually determined by the implicit
+width/height computed from the defaults, or the applied
+text/image values.
+
+=item B<Externally >C<bind()>B<ing to a StyledButton>
+
+Tk::StyledButton overrides the default widget bind() method
+in order to assure that any key or mouse events are bound to
+the transparent binding element, rather than the entire
+canvas. The following events are routed to the
+L<Tk::Canvas>::CanvasBind() method:
+
+	Activate          Deactivate  MapRequest
+	Circulate         Destroy     Property
+	CirculateRequest  Expose      Reparent
+	Colormap          FocusIn     ResizeRequest
+	Configure         FocusOut    Unmap
+	ConfigureRequest  Gravity     Visibility
+	Create            Map
+
+
+=item C<capture()> B<doesn't render >C<-bitmap>
+
+GD doesn't provide an interface for rendering Tk's notion
+of bitmaps; hence, L<capture>() will not include the C<-bitmap>
+image in its rendered button.
+
+=item C<-image> B<and> C<-bitmap> B<are mutually exclusive>
+
+A StyledButton may have either image or bitmap content, but not
+both. If both are specified, image will take precendence (i.e.,
+the bitmap will not be added).
+
+=item B<Round buttons binding uses polygon, not oval>
+
+Due to a bug win Perl/TK 804.027 on Win32, transparent stipples
+do not work with oval items in canvases. In order to provide
+a binding area for C<-shape =E<gt> 'round' | 'oval'>, a 12 sided
+polygon is used instead, which leaves some small unbound
+areas near the edges of the button. I<(oval buttons use the
+polygon for the rounded endcaps)>.
+
+=item B<Bind area for> C<-style =E<gt> 'image'>
+
+If the dimensions of the C<-activeimage> is different than the
+dimensions of the C<-idleimage>, the bind area will be mapped to the
+dimensions of the smaller image.
+
+=back
+
+=head1 TO DO
+
+=over 4
+
+=item B<Support >C<-style =E<gt> \&callback>
+
+Like C<-shape =E<gt> \@vertices>, this option would permit
+applications to provide their gradient styling, and leave the
+mechanics of responding to various Button events to Tk::StyledButton.
+Since the gradient computation is relatively isolated
+internally, it should be feasible to expose an interface
+which permits applications to supply their own gradient
+functions.
+
+=item B<fix focus()>
+
+=item B<test on non-Win32 (esp fonts)>
+
+=item B<test wraplength, justify, image shape/style>
+
+=item B<figure out -underline>
+
+=item B<better round gel rendering>
+
+=item B<true aqua rendering>
+
+=item B<figure out why geometry request in DialogBox doesn't work>
+
+=item B<finish vertical/bottom StyledNB tab buttons>
+
+=item B<implement StyledNB>
+
+=back
+
+=head1 AUTHOR, COPYRIGHT, and LICENSE
+
+Copyright(C) 2006, Dean Arnold, Presicient Corp., USA. All rights reserved.
+
+Dean Arnold L<mailto:darnold@presicient.com>
+
+This software is provided as-is...You may use this software under the same terms
+as Perl itself, with the following addendum:
+
+=head1 SEE ALSO
+
+L<Tk::Button>, L<Tk::Font>, L<GD>, L<GD::Text>, L<Win32::Font::NameToFile>,
+L<Tk::StyledNB>, L<Tk::StyledDlgBox>, L<Tk::StyledDialog>
+
+=head1 HISTORY
+
+2006-01-01		Coded.
+
+=cut
+

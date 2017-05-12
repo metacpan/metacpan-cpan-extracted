@@ -1,0 +1,28 @@
+---
+abstract: 'Test strings and data structures and show differences if not ok'
+author:
+  - 'David Cantrell <david@cantrell.org.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Differences
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.24'
+  Data::Dumper: '2.126'
+  Test::More: '0.88'
+  Text::Diff: '1.43'
+resources:
+  bugtracker: https://github.com/Ovid/Test-Differences/issues
+  repository: https://github.com/Ovid/Test-Differences
+version: '0.64'

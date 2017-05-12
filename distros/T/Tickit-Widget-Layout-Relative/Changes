@@ -1,0 +1,38 @@
+Revision history for Tickit-Widget-Layout-Relative
+
+0.005     2014-06-10 21:02:26+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Latest Tickit has a proper API for retrieving cell contents,
+	apply patch to use this instead of our previous hack (thanks to Paul Evans)
+
+0.004     2014-04-01 23:12:26+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Some visibility issues resolved when calculating layout
+
+	Documentation:
+	* Fixed synopsis example
+	* Added example to ->add to clarify the passing of the widget
+	as first parameter
+
+0.003     2013-09-15 16:41:32 Europe/London
+	No new features.
+
+	Examples:
+	* Provided a Tickit::DSL-based version of the base.pl example
+
+0.002     2013-09-15 03:55:49 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Remove stray 'warn' output from previous release
+
+	Documentation:
+	* Add note about API stability
+	* Add screenshot
+
+0.001     2013-09-15 03:30:42 Europe/London
+	Initial CPAN release

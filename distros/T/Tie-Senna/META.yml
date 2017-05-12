@@ -1,0 +1,15 @@
+---
+name: Tie-Senna
+version: 0.02
+author:
+  - '(c) Copyright 2005 - Daisuke Maki E<lt>dmaki@cpan.orgE<gt>.'
+abstract: Tie Senna With Hashes
+license: perl
+requires:
+  Senna: >= 0.06
+  Tie::Hash: 0
+provides:
+  Tie::Senna:
+    file: lib/Tie/Senna.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

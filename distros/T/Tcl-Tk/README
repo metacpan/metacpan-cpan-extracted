@@ -1,0 +1,56 @@
+NAME
+    Tcl::Tk extension module for Perl5
+
+DESCRIPTION
+    
+    The Tcl::Tk extension (not to be confused with the "native" perl5
+    Perl/Tk extension) provides a raw but complete interface to the whole
+    of Tk via the Tcl extension.
+
+    Have incomplete but quite much support for perlTk syntax (i.e. you can use
+    perlTk syntax to use create Tcl/Tk GUI from perl), and existing Tcl/Tk GUI
+    could be embedded to Perl without extra coding, including pure-Tcl widgets
+    and any widgets that exist in you current Tcl/Tk.
+
+Build in the usual way for a perl extension:
+
+1. Tweak Makefile.PL is necessary only if your Tcl or Tk include files could
+not be found automatically by Makefile.PL script. Normally you just make
+sure you have right tcl/tk in your path at a moment of running Makefile.PL
+script.
+
+2. perl Makefile.PL
+   make
+   make install
+
+In rare case when you do cross-compiling for WinCE, you need to edit
+Makefile.PL to reflect your paths, and then invoke as
+  perl -MCross=[your-cross-name] Makefile.PL
+Please see into Makefile.PL for more details on that.
+
+AUTHOR
+    Malcolm Beattie	mbeattie@sable.ox.ac.uk
+
+MAINTAINERS
+    Vadim Konovalov	vkonovalov@peterstar.ru
+    Jeff Hobbs
+    Gisle Aas
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+        a) the GNU General Public License as published by the Free
+        Software Foundation; either version 1, or (at your option) any
+        later version, or
+
+        b) the "Artistic License" which comes with every Perl distribution.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+    the GNU General Public License or the Artistic License for more details.
+
+	      Copyright (c) 1994-1997  Malcolm Beattie
+			All rights reserved.
+    

@@ -1,0 +1,34 @@
+---
+abstract: "A Task to install all BINGOS' Module::Install extensions"
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Module-Install-BINGOS
+requires:
+  Module::Install: '1'
+  Module::Install::AssertOS: '0.1'
+  Module::Install::AutoLicense: '0.08'
+  Module::Install::AutomatedTester: '0.02'
+  Module::Install::CheckLib: '0.08'
+  Module::Install::GithubMeta: '0.1'
+  Module::Install::NoAutomatedTesting: '0.06'
+  Module::Install::ReadmeFromPod: '0.12'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/perl-task-modules
+  repository: https://github.com/bingos/perl-task-modules.git
+version: '1.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

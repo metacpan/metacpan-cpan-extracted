@@ -1,0 +1,127 @@
+NAME
+    Test::Dist - Distribution kwalitee tests in one command
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use Test::More;
+        use Test::Dist as => 0.01;
+        # using as => $version in use you may avoid breakage
+        # due to future tests additions to this module
+        use lib::abs '../lib';
+        chdir lib::abs::path('..');
+
+        Test::Dist::dist_ok(
+        '+'   => 1, # Add one more test to plan due to NoWarnings
+        run   => 1, # Start condition. By default uses $ENV{TEST_AUTHOR}
+        skip  => [qw(prereq)], # Skip prereq from testing
+        fixme => { # For options, see Test::Fixme
+            match => qr/FIXIT|!!!/, # Your own fixme patterns
+        },
+        kwalitee => {
+            req => [qw( has_separate_license_file has_example )], # Optional metrics, that you require to pass
+        },
+        );
+
+        # Also, see examples and tests in this distribution
+
+FUNCTIONS
+  dist_ok(%options)
+TESTS
+    kwalitee
+        Use Module::CPANTS::Analyse for testing kwalitee
+
+    metayml
+        Check "META.yml" using Test::YAML::Meta
+
+    changes
+        Check the correctness of "Changelog" file
+
+    fixme
+        Test all modules and scripts using Test::Fixme
+
+    useok
+        Loading all modules by Test::More"::use:ok"
+
+    syntax
+        Checking all scripts by perl -c $file
+
+    podcover
+        Checking all modules for POD coverage using Test::Pod::Coverage
+
+    prereq
+        Checking prereq list using Test::Prereq
+
+OPTIONS
+    '+' => 1|0
+        How many tests add to plan
+
+    run [ = $ENV{TEST_AUTHOR} ]
+        Run condition for test
+
+    skip => [ TESTS ]
+        Skip some of tests
+
+    kwalitee : { req => [ LIST ] }
+        Force checking for some of optional metrics
+
+    metayml : [ LIST ]
+        For options see Test::YAML::Meta
+
+    fixme
+        For options see Test::Fixme
+
+    useok : { ... }
+        useok => {
+            file_match => qr{^lib/.*\.pm$},
+            mod_skip   => [ 'Module::Developed', qr{^Module::Developed::} ],
+        }
+
+    syntax
+        syntax => {
+            file_match => qr{^(lib|bin|script)/.*\.p(?:m|l|od)$},
+            file_skip  => [ 'script/dummy.pl', qr{^bin/t/} ],
+            match      => qr{!!!},
+        }
+
+    podcover
+        podcover => {
+            mod_match  => qr{^Only::Some::Scope},
+            mod_skip   => [ 'Only::Some::Scope::Developed', qr{^Only::Some::Scope::Developed::} ],
+        }
+
+    prereq
+        For options see Test::Prereq
+
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-test-dist at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Dist>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    Thanks to
+
+    *   Alexandr Ciornii for Module::CPANTS::Analyse
+
+    *   brian d. foy for Test::Prereq
+
+    *   Barbie for Test::YAML::Meta
+
+    *   Edmund von der Burg for Test::Fixme
+
+    *   Andy Lester for Test::Pod::Coverage
+
+    *   G. Allen Morris III for Test::CheckChanges
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

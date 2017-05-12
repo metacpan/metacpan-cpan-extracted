@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/main.t
+lib/Text/Record/Deduper.pm
+META.yml

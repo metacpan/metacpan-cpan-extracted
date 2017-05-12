@@ -1,0 +1,30 @@
+Revision history for Perl extension Telephone::Mnemonic::US.
+
+0.07  Sat Aug 27 09:11:14 2011
+	- Checked pod spelling
+	- Added expect tests for scripts
+
+0.06  Thu Aug 18 08:01:15 2011
+	- More checks and refactored Moose
+    - Less symbol leakage
+    - Ready to complete transition to tt2 compatability
+
+0.05  Wed Aug 17 20:02:35 2011
+	- Added checks and refactored Moose
+
+0.04  Wed Aug 12 10:08:01 2011
+	- Added Moose obj
+	- More tests
+
+0.03  Wed Aug 10 10:20:33 2011
+	- Adjusted tests with multiplatform considerations
+	- Added more coverage tests
+	- Minor fixes
+
+0.02  Tue Aug  9 12:23:32 2011
+	- Added embeded documentation
+
+0.01  Fri Aug  5 19:03:30 2011
+	- original version; created by h2xs 1.23 with options
+		-AX Telephone::Mnemonic::US
+

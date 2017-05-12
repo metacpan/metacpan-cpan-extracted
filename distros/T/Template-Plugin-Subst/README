@@ -1,0 +1,125 @@
+NAME
+    Template::Plugin::Subst - s/// functionality for Template Toolkit
+    templates
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+  As a vemthod
+      [% USE Subst %]
+
+      [% str = 'foobar' %]
+
+      [% str.subst('(foo)(bar)', '$2$1', 1) %]
+
+  As a filter
+      [% USE filt = Subst
+                    pattern = '(foo)(bar)'
+                    replacement = '$2$1'
+                    global = 1 %]
+
+    Then
+
+      [% text | $filt %]
+
+    or
+
+      [% FILTER $filt %]
+      foobar
+      [% END %]
+
+DESCRIPTION
+    Template::Plugin::Subst acts as a filter and a virtual method to carry
+    out regular expression substitutions with back references on text and
+    variables in the Template Toolkit.
+
+    That's the advantage of this approach over the built-in "replace"
+    method. "replace" doesn't deal with backrefs, so code like this:
+
+      [% str = 'foobar' %]
+      [% str.replace('(foo)(bar)', '$2$1') %]
+
+    inserts a literal "$2$1" in to your document.
+
+    But with Template::Plugin::Subst;
+
+      [% USE Subst %]
+      [% str = 'foobar' %]
+      [% str.subst('(foo)(bar)', '$2$1') %]
+
+    you get the expected "barfoo".
+
+    It can also be used as a filter, in which case it's very useful for
+    finding information in text and augmenting it in a useful fashion.
+
+    For example, suppose you want all strings of the form "rt#\d+", which
+    reference RT ticket numbers, to be converted to links to your local RT
+    installation.
+
+    First, instatiate the filter:
+
+      [% USE rt = Subst
+                    pattern = 'rt#(\d+)'
+                    replacement = '<a href="/rt.cgi?t=$1">rt#$1</a>' %]
+
+    and then use it to filter arbitrary text:
+
+      [% text_variable | $rt %]
+
+OPTIONS
+  vmethod
+      .subst($pattern, $replacement[, $global])
+
+    As a vmethod the first two arguments are the pattern to search for and
+    the string to replace it with. These arguments are mandatory.
+
+    The third argument is a boolean that specifies whether or the
+    search/replace should be global, and behaves in the same way as the "g"
+    modifier on a "s///" operation. The default value is '1'. Note that this
+    differs from the default setting on the "s///" operator.
+
+  Filter
+      [% USE filt = Subst
+                      pattern = '...'
+                      replacement = '...'
+                      global = 1 %]
+
+    These three named arguments have the same semantics as the arguments to
+    the vmethod. "global" is optional, and defaults to 1.
+
+AUTHOR
+    Nik Clayton, "<nik@FreeBSD.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-template-plugin-subst@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-Subst>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2005 Nik Clayton All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+     1. Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+    THE POSSIBILITY OF SUCH DAMAGE.
+

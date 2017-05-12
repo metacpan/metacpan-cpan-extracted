@@ -1,0 +1,11 @@
+Changes
+lib/Tie/Constrained.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00load.t
+t/03init.t
+t/10basics.t
+t/pod-coverage.t
+t/pod.t

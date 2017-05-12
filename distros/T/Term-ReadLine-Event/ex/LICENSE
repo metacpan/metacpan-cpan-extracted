@@ -1,0 +1,26 @@
+The *.pl files in this directory, and only this directory, exclusive
+of any files in any subdirectory, are hereby considered part of the
+Public Domain.  All warrantees are disclaimed.  Specifically, the
+examples contained herein are intended for use in code that uses
+Term::ReadLine and the appropriate event loop as detailed in each
+individual example and otherwise meets the license requirements of
+those modules.
+
+Attribution is not required for reusing the code covered by this
+license.
+
+This license does not give special license or waive any rights of any
+other authors, or even of the authors of this code with respect to any
+code other than that contained in this directory of this distribution.
+
+The purpose of this license is solely to encourage the widest possible
+audience of users without requiring the engagement of additional legal
+resources.
+
+The use of Term::ReadLine::Event, or any other file not included in
+this directory, is NOT COVERED by this license.  Use of other files
+still needs to meet the legal requirements of their respective license.
+
+Contributors to the code in this directory must agree that their code
+will follow this license as well or not submit changes to this
+directory.

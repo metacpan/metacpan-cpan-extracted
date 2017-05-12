@@ -1,0 +1,60 @@
+Revision history for Perl extension Tie::DBI.
+
+1.06 Fri Apr 5 2013 Todd Rinaldo
+     Bump to production release now tests all pass on cpan testers
+
+1.05_01 Thu Mar 28 2013 Todd Rinaldo
+       Fix for RT 58813 - Fix for File based DBDs
+       Fix for RT 84125 - Fix for mysqlPP
+
+1.05 Sat Apr10 01:00 2010
+       need to make DBD::SQLite to pre-req to get tests to succeed. This shouldn't really be an undue burden
+
+1.04 Mon Mar 31 22:25 2010
+	Add DBD::SQLite to build_requires meta so automated testing won't fail
+
+1.03 Mon Mar 29 13:00 2010
+	RT 3695 - SQLite support - Thanks RURBAN
+	RT 19833 - Don't Chomp blanks. The user can do that in their script if they intended it.
+	   NOTE!!! This may break your code if you were depending on this behavior. Please open an RT ticket if you feel this needs to be put back in.
+	Test suite to Test::More
+
+1.02 Wed Dec 28 12:57:18 EST 2005
+	Clarified requirement that column used as hash key must be declared
+		unique when table is created.
+
+1.01 Mon Mar  7 18:51:27 EST 2005
+	More minor documentation fixes. (darn!)
+
+1.00 Mon Mar  7 18:47:59 EST 2005
+	Minor documentation fix.
+
+0.95 Wed Jan 19 13:03:54 EST 2005
+	Autrijus Tang fix for clobbered $_.
+
+0.94 Wed Nov 17 17:05:07 EST 2004
+	Fix tests so that they work under PostGres, courtesy Arshavir Grigora
+
+0.93 Fri Jul 18 13:24:30 EDT 2003
+	Improved support for Oracle data types courtesy Luogang <lgjut@sina.com>.
+
+0.92 Tue Dec 31 12:50:33 EST 2002
+	ODBC support courtesy Autrijus Tang <autrijus@autrijus.org>
+
+0.86 August 7, 2000
+	Fixed bug in EXISTS that shows up when using DBD::InterBase.
+	Thanks to Michael Samanov for this.
+
+0.85 April 26, 1999
+	Fixed stupid mistake: $DBI::error should be $DBI::err.
+
+0.70 September 25, 1998
+	- Now correctly supports Oracle.
+
+0.60 January 28, 1998
+	- Tested on mSQL and mySQL
+	- Does not work correctly with Oracle or Sybase
+
+0.01  Sun Jan 11 16:50:57 1998
+	- original version; created by h2xs 1.18
+

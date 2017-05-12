@@ -1,0 +1,14 @@
+pm_to_blib
+Text-Smart-
+blib
+.*\.bak
+CVS
+.cvsignore
+.*~
+.#.*
+#.*
+^Makefile$
+build-stamp
+^\.hg
+^cover_db
+

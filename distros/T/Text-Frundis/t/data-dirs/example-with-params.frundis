@@ -1,0 +1,103 @@
+.X set epub-uuid very-unique-identifier
+.X set epub-subject "very interesting subject"
+.X set epub-css t/data-dirs/example-with-params.css
+.X set epub-metadata t/data-dirs/example-with-params-metadata.xhtml
+.X set xhtml-top t/data-dirs/example-with-params-top.xhtml
+.X set xhtml-bottom t/data-dirs/example-with-params-bottom.xhtml
+.X set xhtml-css ../../../examples/stylesheet.css
+.X set epub-cover t/data-dirs/img/image.png
+.X set latex-preamble examples/preamble.tex
+.X set title-page 1
+.X set document-author "The author"
+.X set document-title "The Title"
+.X set document-date 2042
+.X set lang en
+.#de -f epub,latex keyword
+.#.
+.#de -f xhtml -perl keyword
+    my $self = shift;
+    my $close_delim = $self->get_close_delim();
+    my $vars = $self->vars;
+    $vars->{index_count}++;
+    my $id   = "kwd$vars->{index_count}";
+    my $text = $self->escape_text(join(" ", @Arg));
+    unless ($self->process) {
+        $self->new_id($id);
+        $self->loX_entry_infos(
+           {
+               title       => $text,
+               count       => $vars->{index_count},
+               class       => "lok",
+               href_prefix => "kwd",
+           }
+        );
+        return;
+    }
+    $self->phrasing_macro_begin();
+    print qq|<span class="keyword" id="$id">|,
+      $text, "</span>", $close_delim;
+.#.
+.#de -f xhtml -perl print-lok
+    my $self = shift;
+    return unless $self->process;
+    # enclose within a <div> and terminate any paragraph
+    $self->call("Bd");
+    $self->xhtml_loX("lok");  # print the list
+    $self->call("Ed");
+.#.
+.#de -f epub,latex print-lok
+.#.
+.Tc -summary -title "Summary" -nonum
+.Im t/data-dirs/img/image.png
+.Sh -nonum Abstract
+Text.
+.Sm -id label1 Emphasized text with a label .
+.Pt Part1
+.Tc -mini -summary
+.Ch Chap1
+Text.
+.Ch Chap2
+.Tc -mini
+Text.
+.P Title of paragraph
+Text.
+.Bl -t table -columns 2 Table1
+.It a
+.Ta b
+.El
+.P
+Normal paragraph.
+.keyword word1&
+.keyword word2
+.Sh Section1
+Text.
+.Ss Subsection1
+Text.
+.Sh Section2
+Text.
+.Bl -t table -columns 2 Table2
+.It c
+.Ta d
+.It e
+.Ta f
+.El
+.Ss Subsection2
+Text.
+.Pt Part2
+.Ch Chap3
+.Tc -mini -title "Mini Toc"
+Text. Some cross-references:
+.Sx Section2
+.Sx Chap1
+.Sx Part2
+.Sx Abstract
+.Sx -t lot Table2
+.Sx -name "Link to emphasized text" -id label1
+.#if -f xhtml
+.Sx -id kwd1
+.Sx -id kwd2
+.#;
+.Sh Section3
+Text.
+.Tc -lot
+.print-lok

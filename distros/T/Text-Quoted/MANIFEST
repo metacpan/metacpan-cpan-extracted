@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Text/Quoted.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/basics.t
+t/empty_text.t
+t/expand_tab_segfault.t
+t/life_sample.1.t
+t/life_sample.2.t
+t/life_sample.3.t
+t/separator.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

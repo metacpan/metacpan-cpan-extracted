@@ -1,0 +1,33 @@
+Revision history for Tie-Diamond
+
+0.06    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.05    2013-11-11 (SHARYANTO)
+
+        - Add option: utf8.
+
+
+0.04    2012-09-06 (SHARYANTO)
+
+        - No functional changes. Use Syntax::Feature::EachOnArray to support perl
+          < 5.12.
+
+
+0.03    2012-07-13 (SHARYANTO)
+
+        - Add 'chomp' option.
+
+
+0.02    2012-07-13 (SHARYANTO)
+
+        - No functional changes. Write a bit more documentation.
+
+
+0.01    2012-07-13 (SHARYANTO)
+
+        - First version.

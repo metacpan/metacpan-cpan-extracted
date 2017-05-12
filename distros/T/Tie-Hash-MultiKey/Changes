@@ -1,0 +1,40 @@
+Revision history for Perl extension Tie::Hash::MultiKey
+
+0.08  Thu Mar 27 01:48:41 PDT 2014
+	change 'sub new' to support inheritance
+
+	add _rordkeys and _rordvals to reset the key and value
+	indices in the event the hash is reused enough to make
+	the indices > 2**48 which approaches the point where perl
+	will convert the number to a float and it will no be unique
+
+	add extension capablity to FETCH, STORE, NEXTKEY, EXISTS, etc...
+	so that an action can be taken when a key/value pair is touched
+
+0.07  Sat Mar  8 12:48:22 PST 2014
+	add 'size' method to return the number of stored values
+	add 'ordered_vals' method to return ordered list of values
+
+	add decision tree in FETCH so that a STORE followed by an
+	auto FETCH as in $x = $ptr->{k1,k2,...} = item  will
+	properly return the item.
+
+0.06  Fri Mar  7 11:42:45 PST 2014
+	correct documentation errors
+
+0.05  Wed Feb 19 20:10:52 PST 2014
+	add methods 'new', 'copy', 'clone'
+
+0.04  Wed Feb 19 01:47:49 PST 2014
+	add ordered key capability
+
+0.03  Tue Feb 18 04:12:19 PST 2014
+	add normalization in test routines for reference 
+	dumps so that different versions of perl do not 
+	produce different test results
+
+0.02  Tue Feb 18 02:22:57 PST 2014
+	update documentation
+
+0.01  Feb 2015, undated
+	initial release

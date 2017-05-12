@@ -1,0 +1,86 @@
+#!/usr/bin/perl -Tw
+
+=for Description
+
+    Use this program to transform ANSI markup text to HTML snippets.
+    The input is drawn from STDIN and the output is printed to STDOUT.
+
+    Usage:
+
+        $: ansi_emitting_program.pl | ansi2html
+
+    It was intended to create the POD snippets but the hex values
+    are wrong which makes this program an undocumented TODO item.
+
+=cut
+
+use strict;
+use warnings;
+{
+    use English qw( -no_match_vars $INPUT_RECORD_SEPARATOR );
+}
+
+my $Depth = 0;
+
+my $compute_hex_rc = sub {
+    my ($color) = @_;
+    my ( $r, $g, $b, $n );
+    $n = $color - 16;
+    $r = int $n / 36;
+    $n = $n - $r * 36;
+    $g = int $n / 6;
+    $n = $n - $g * 6;
+    $b = $n;
+
+    # FIXME
+    my $hex = sprintf '%02X%02X%02X', $r * 36, $g * 6, $b;
+
+    return $hex;
+};
+
+my $ansi2html_rc = sub {
+    my ( $fg_bg, $color ) = @_;
+
+    if ( !$fg_bg ) {
+
+        my $html = '</span>' x $Depth;
+
+        $Depth = 0;
+
+        return "$html\n";
+    }
+
+    $Depth++;
+
+    my $hex = $compute_hex_rc->($color);
+    my $bg = $fg_bg == 38 ? "" : 'background-';
+
+    return sprintf qq{<span style="%scolor:#%s">}, $bg, $hex;
+};
+
+my $entitize_rc = sub {
+    my ($char) = @_;
+
+    my $unicode = ord $char;
+
+    return $char
+        if $unicode < 128;
+
+    return sprintf '&#%04d;', $unicode;
+};
+
+my $text = do { local $INPUT_RECORD_SEPARATOR = undef; <>; };
+
+exit 0
+    if !$text;
+
+utf8::decode($text);
+
+$text =~ s{ . \[ ( \d+ ) (?: ;5;( \d+ ) )? m }{ $ansi2html_rc->($1,$2) }xmseg;
+$text =~ s{\n}{<br/>\n}xmsg;
+
+$text = join '', map { $entitize_rc->($_) } split //, $text;
+
+print $text;
+
+__END__

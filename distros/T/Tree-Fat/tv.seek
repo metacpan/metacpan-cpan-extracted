@@ -1,0 +1,168 @@
+/* -*-C-*-
+
+This is the number-one most heavily executed method.  OPTIMIZE!!
+Finds the first element (left to right) equal to the search key.
+
+Use these macros to instantiate a customized seek method:
+
+  TC_SEEK_FDECL
+  TC_SEEK_LDECL
+  TC_SEEK_SETUP
+  TC_SEEK_CMP(cmp, key, dat);
+  TC_SEEK_CMPf(cmp, kc);
+
+Obviously it would be impolite to change any variable names or
+calling convensions below.  These changes will be minimized.
+
+Also see:
+  TC_SEEK_DEBUG
+*/
+
+#ifndef TC_SEEK_BREAKEVEN
+#  define TC_SEEK_BREAKEVEN 5
+#endif
+
+TC_SEEK_FDECL
+{
+  XPVTV *tv;
+  TCE *ce;
+  TN *tn;
+  int cmp;
+  int leftmatch=0;
+  TC_SEEK_LDECL
+  /*  int unique = 0; /**/
+
+  assert(TC_SEEK_BREAKEVEN >= 4);
+  tc_reset(tc);
+  tv=TcTV(tc);
+  tn = TvROOT(tv);
+  if (!tn) {
+    return 0;
+  }
+  TcMATCH_off(tc);
+  TcSTARTEND_off(tc);
+  TcFORWARD_on(tc);
+  TcPOS(tc) = 0;
+  TcPUSH(tc, tn);
+  TC_SEEK_SETUP
+
+ DOWN:
+  ce = TcCEx(tc);
+  tn = CeTN(ce);
+  CeLEFT_on(ce);
+  if (TnLEFT(tn)) {
+#ifdef TV_KCACHE
+    TC_SEEK_CMPf(cmp, TnKCACHE(tn,0));
+#else
+    TC_SEEK_CMP(cmp, TnKEY(tn,TnSTART(tn)), TnDAT(tn,TnSTART(tn)));
+#endif
+    TcRSTAT(tc, TCS_KEYCMP, 1);
+    TcSLOT(tc) = 0;
+    if (unique && cmp == 0) {
+      TcPOS(tc) += TnTREEFILL(TnLEFT(tn));
+      TcMATCH_on(tc);
+      goto OK;
+    }
+    if (cmp <= 0) {
+      leftmatch += cmp == 0;
+      TcPUSH(tc, TnLEFT(tn));
+      goto DOWN;
+    }
+    TcPOS(tc) += TnTREEFILL(TnLEFT(tn));
+  }
+  if (TnRIGHT(tn)) {
+#ifdef TV_KCACHE
+    TC_SEEK_CMPf(cmp, TnKCACHE(tn,1));
+#else
+    TC_SEEK_CMP(cmp, TnKEY(tn,TnLAST(tn)), TnDAT(tn,TnLAST(tn)));
+#endif
+    TcRSTAT(tc, TCS_KEYCMP, 1);
+    TcSLOT(tc) = TnFILL(tn)-1;
+    if (unique && cmp == 0) {
+      TcPOS(tc) += TcSLOT(tc);
+      TcMATCH_on(tc);
+      goto OK;
+    }
+    if (cmp > 0) {
+      TcPOS(tc) += TnFILL(tn);
+      CeLEFT_off(ce);
+      CeRIGHT_on(ce);
+      TcPUSH(tc, TnRIGHT(tn));
+      goto DOWN;
+    }
+  }
+  SCOPE {
+    int xl = TnSTART(tn);
+    int xr = TnLAST(tn);
+    int xw = xr - xl + 1;
+    int xm;
+
+  DIVIDE:
+    xm = xl + xw/2;
+#ifdef TC_SEEK_DEBUG
+    if (TcDEBUGSEEK(tc)) warn("between %d and %d; xm=%d", xl, xr, xm);
+#endif
+    TC_SEEK_CMP(cmp, TnKEY(tn,xm), TnDAT(tn,xm));
+    TcRSTAT(tc, TCS_KEYCMP, 1);
+
+#ifdef TC_SEEK_DEBUG
+    if (TcDEBUGSEEK(tc)) warn("cmp = %d", cmp);
+#endif
+    if (unique && cmp == 0) {
+      TcSLOT(tc) = xm - TnSTART(tn);
+      TcPOS(tc) += TcSLOT(tc);
+      TcMATCH_on(tc);
+      goto OK;
+    }
+    if (cmp <= 0) {
+      xr = xm;
+    } else if (cmp > 0) {
+      xl = xm;
+    }
+    xw = xr - xl + 1;
+    if (xw >= TC_SEEK_BREAKEVEN) goto DIVIDE;
+
+    for (xm=xl; xm <= xr; xm++) {
+      TC_SEEK_CMP(cmp, TnKEY(tn,xm), TnDAT(tn,xm));
+      TcRSTAT(tc, TCS_KEYCMP, 1);
+
+#ifdef TC_SEEK_DEBUG
+      if (TcDEBUGSEEK(tc)) warn("cmp[%d] = %d", xm, cmp);
+#endif
+      if (cmp == 0) {
+	TcSLOT(tc) = xm - TnSTART(tn);
+	TcPOS(tc) += TcSLOT(tc);
+	TcMATCH_on(tc);
+	goto OK;
+      } else if (cmp < 0) {
+	TcSLOT(tc) = xm - TnSTART(tn) - 1;
+	TcPOS(tc) += TcSLOT(tc);
+	goto OK;
+      }
+    }
+#ifdef TC_SEEK_DEBUG
+    if (TcDEBUGSEEK(tc)) warn("leftmatch = %d", leftmatch);
+#endif
+    assert(cmp > 0);
+    if (leftmatch) {
+      TcPOS(tc) += TnFILL(tn);
+      tc_stepnode(tc, 1);
+      TcSLOT(tc) = 0;
+      TcMATCH_on(tc);
+    } else {
+      /* right most */
+      TcSLOT(tc) = TnFILL(tn)-1;
+      TcPOS(tc) += TcSLOT(tc);
+    }
+  }
+
+ OK:
+  assert(tc_happy(tc));
+  return TcMATCH(tc) != 0;
+}
+
+#undef TC_SEEK_FDECL
+#undef TC_SEEK_LDECL
+#undef TC_SEEK_SETUP
+#undef TC_SEEK_CMP
+#undef TC_SEEK_CMPf

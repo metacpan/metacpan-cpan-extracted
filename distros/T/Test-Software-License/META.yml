@@ -1,0 +1,45 @@
+---
+abstract: 'just another xt, for Software::License'
+author:
+  - 'Kevin Dawson <bowtie@cpan.org>'
+build_requires:
+  Test::More: '1.001006'
+  Test::Requires: '0.08'
+configure_requires:
+  Module::Build::Tiny: '0.038'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Software-License
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Exporter: '5.7'
+  File::Find::Rule: '0.33'
+  File::Find::Rule::Perl: '1.13'
+  File::Slurp::Tiny: '0.003'
+  List::AllUtils: '0.09'
+  Parse::CPAN::Meta: '1.4414'
+  Software::LicenseUtils: '0.10301'
+  Test::Builder: '1.001006'
+  Try::Tiny: '0.22'
+  constant: '1.27'
+  parent: '0.228'
+  perl: '5.008004'
+  version: '0.9909'
+resources:
+  bugtracker: https://github.com/kevindawson/Test-Software-License/issues
+  homepage: https://github.com/kevindawson/Test-Software-License
+  repository: https://github.com/kevindawson/Test-Software-License.git
+version: '0.004000'
+x_contributors:
+  - 'bowtie <bowtie@cpan.org>'

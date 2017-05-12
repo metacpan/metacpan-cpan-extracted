@@ -1,0 +1,61 @@
+NAME
+    Task::BeLike::RSRCHBOY::Web - Web-related modules RSRCHBOY uses!
+
+VERSION
+    version 0.002
+
+DESCRIPTION
+    This is a task package cataloging the web-related modules I often use.
+    I've broken it out of Task::BeLike::RSRCHBOY so as to reduce that
+    package's footprint on machines where these are not needed.
+
+TASK CONTENTS
+  Other Tasks
+   Task::Catalyst
+   Task::BeLike::RSRCHBOY 0.002
+  Catalyst
+   Catalyst::Runtime 5.9
+   Catalyst::Devel
+   CatalystX::SimpleLogin
+   CatalystX::RoleApplicator
+   Catalyst::Plugin::Authentication
+   Catalyst::Plugin::Authorization::ACL
+   Catalyst::Plugin::Authorization::Roles
+   Catalyst::Plugin::AutoCRUD 1.112560
+   Catalyst::Plugin::RedirectAndDetach
+   Catalyst::Plugin::Session
+   Catalyst::Plugin::Session::State::Cookie
+   Catalyst::Plugin::Session::Store::File
+   Catalyst::TraitFor::Request::BrowserDetect
+   Catalyst::TraitFor::Request::REST::ForBrowsers
+   Catalyst::Controller::REST
+   Catalyst::Model::DBIC::Schema 0.59
+   Catalyst::View::TT
+   Catalyst::View::Haml
+   MooseX::MethodAttributes::Role
+  Dancer
+   Dancer
+  Plack / PSGI
+   Plack
+   Plack::Middleware::Debug
+   Plack::Middleware::MethodOverride 0.10
+   Plack::Middleware::SetAccept
+   Starlet
+   Starman
+  Forms
+   HTML::FormHandler
+  Templating / etc
+   HTML::Builder 0.006
+   Text::Haml
+   Template
+   Template::Plugin::JSON::Escape
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

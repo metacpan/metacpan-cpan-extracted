@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Test/Fork.pm
+MANIFEST
+META.yml
+t/failed_fork.t
+t/fork.t
+t/fork_ok_return.t
+SIGNATURE    Added here by Module::Build

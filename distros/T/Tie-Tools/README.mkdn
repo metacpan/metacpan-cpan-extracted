@@ -1,0 +1,39 @@
+[![CPAN version](https://badge.fury.io/pl/Tie-Tools.svg)](http://badge.fury.io/pl/Tie-Tools)
+[![Build Status](https://travis-ci.org/jonasbn/Tie-Tools.svg?branch=master)](https://travis-ci.org/jonasbn/Tie-Tools)
+[![Coverage Status](https://coveralls.io/repos/jonasbn/Tie-Tools/badge.png)](https://coveralls.io/r/jonasbn/Tie-Tools)
+
+# NAME
+
+Tie::Tools - a collection of tying tools
+
+# DESCRIPTION
+
+Tie::Tools consist of several modules each in their own namespace.
+
+- [Tie::DeepTied](https://metacpan.org/pod/Tie::DeepTied)
+- [Tie::Depth](https://metacpan.org/pod/Tie::Depth)
+- [Tie::Func](https://metacpan.org/pod/Tie::Func)
+- [Tie::NormalArray](https://metacpan.org/pod/Tie::NormalArray)
+- [Tie::Parent](https://metacpan.org/pod/Tie::Parent)
+
+# LICENSE
+
+Tie::Tools is free software and is released under the Artistic License.
+See <http://www.perl.com/language/misc/Artistic.html> for details.
+
+# AUTHOR
+
+This is originally the work of Ariel Brosh, a member of Israel.pm and
+author of several contributions to CPAN. He has unfortunately passed
+away and have left behind several Perl modules where this is just one
+of them.
+
+I volunteered to contribute further to the development of the modules,
+but it is still kept under the name of Ariel Brosh - the original
+author.
+
+Jonas B. Nielsen <jonasbn@cpan.org>
+
+# ACKNOWLEDGEMENTS
+
+- patch from Brian Dowling resulting in release 1.06

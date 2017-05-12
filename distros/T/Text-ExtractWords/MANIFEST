@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+examples/extract.pl
+ExtractWords.pm
+ExtractWords.xs
+t/words_count.t
+t/words_list.t

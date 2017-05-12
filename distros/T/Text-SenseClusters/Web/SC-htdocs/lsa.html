@@ -1,0 +1,26 @@
+<html>
+<title>Latent Semantic Analysis</title>
+<body>
+<h1>Latent Semantic Analysis</h1>
+</body>
+</html>
+
+Our implementation of Latent Semantic Analysis supports clustering of  
+similar contexts and clustering of lexical features. This provides the  
+same functionality as is available in the native SenseClusters 
+methodology, but using a different underlying representation. 
+<br><br>
+Traditionally LSA represents text using a term by document matrix. Our  
+implementation generalizes this to a feature by context matrix, where  
+terms are but one kind of feature, and documents on kind of context. 
+Features may be unigrams, bigrams, co-occurrences, and target  
+co-occurrences. Contexts may be units of text of any length, although  
+typically they are sentences, paragraphs, or short articles.
+<br><br>
+The basic assumption behind LSA feature clustering is that features can be  
+differentiated from each other and divided into classes or clusters based  
+on the contexts in which they occur. Features that occur in similar 
+contexts are assumed to be similar to each other. A similar assumption 
+underlies LSA context clustering, in that contexts that are made up of 
+features that have occurred in similar contexts should be considered 
+similar to each other. 

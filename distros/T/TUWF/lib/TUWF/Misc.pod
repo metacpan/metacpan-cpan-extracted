@@ -1,0 +1,295 @@
+=head1 NAME
+
+TUWF::Misc - Miscellaneous utility functions and methods for TUWF
+
+=head1 DESCRIPTION
+
+This module provides a few methods for the main TUWF object and optionally
+exports a few handy functions. The methods can be used from within any TUWF
+website without requiring any additional magic, TUWF automatically loads this
+module at initialization.
+
+The exported functions can be imported through TUWF (C<use TUWF 'uri_escape';>)
+or by using this module directly (C<use TUWF::Misc 'uri_escape';>). The latter
+form is useful if you wish to use a function outside of the TUWF framework.
+
+=head1 METHODS
+
+=head2 formValidate(@fields)
+
+Shorthand for calling C<kv_validate()> with the following sources:
+
+  Name    TUWF Method
+   post    reqPosts()
+   get     reqGets()
+   param   reqParams()
+   cookie  reqCookie()
+
+The L<validate_templates|TUWF/validate_templates> configuration setting is
+passed as the I<templates> option.
+
+=head2 mail(body, header => value, ..)
+
+Very simple email sending function. The C<Content-Type> header defaults to
+C<text/plain; charset='UTF-8'>, and the C<From> header to the
+L<mail_from|TUWF/mail_from> configuration setting. The mail is sent using the
+sendmail program configured with L<mail_sendmail|TUWF/mail_sendmail>, you
+should make sure both that option is correct and the server is configured to
+allow using the sendmail program to actually send mail.
+
+=head1 FUNCTIONS
+
+=head2 uri_escape(string)
+
+Percent-encodes the given string and returns a string suitable for use as a
+parameter value in a URI. The given string is assumed to be in Perls native
+unicode format, and the escaped string will have UTF-8 encoded
+percent-escaping.
+
+This function is equivalent to C<uri_escape_utf8()> provided by
+L<URI::Escape|URI::Escape>, and the C<encodeURIComponent()> function in
+JavaScript.
+
+=head2 kv_validate(sources, templates, fields)
+
+Validates a set of key/value pairs against a list of constraints and data
+definitions. Returns the (optionally modified) key/value pairs and, if a field
+did not validate, an error indication. This function was designed to validate
+form input data, and can as such also validate keys (or I<fields>) which
+represent multiple values. This function is rarely used directly,
+C<formValidate()> does everything you need when validating common input data.
+
+I<sources> is a hashref explaining where the values should be fetched from.
+Each key in the hash represents the I<name> of the source, and its value is a
+subroutine reference. This subroutine should accept one argument: the name of
+the field, and is expected return a list of values, or an empty list if there
+are no values with that key. The following example defines a source by the name
+"param", and tells C<kv_validate()> to fetch the values using
+L<reqParams()|TUWF::Request>.
+
+  kv_validate(
+    { param => sub { $TUWF::OBJ->reqParams(shift) } },
+    ..
+  );
+
+The I<templates> argument should be reference to a (possibly empty) hash
+providing templates for commonly used constraints and data definitions.
+
+The I<fields> argument should be an arrayref, where each item in the array
+represents a single field. Each field should be a hashref with options. The
+following options are accepted:
+
+=over
+
+=item <source name> => <field name>
+
+String, indicates from which source the field should be fetched, and which name
+to use. Note that even though C<kv_validate()> accepts validating data from
+multiple sources, each field should only have one source option, and there
+should not be a field from a different source with the same name.
+
+Using the I<sources> example above, specifying C<param =E<gt> 'foo'> as field
+option tells C<kv_validate()> to fetch the value(s) for this field from
+C<reqParams('foo')>.
+
+=item required
+
+0/1. Indicates whether the field is required or not. Default: 1.
+
+=item default
+
+Specifies the default value to return when the field is not present or left
+empty. Only makes sense for fields that are not required.
+
+=item rmwhitespace
+
+0/1. Removes any whitespace before and after the value before doing any other
+validation. All occurences of C<\r> are also removed from the value. Default:
+1.
+
+=item maxlength
+
+Number. Maximum length (in number of characters) of the value.
+
+=item minlength
+
+Number. Minimum length of the value.
+
+=item enum
+
+Arrayref. The value must be equal to any of the strings in the array. Note that
+even though a string comparison is used, this works fine numbers as well.
+
+=item regex
+
+Validate the value against a regular expression. For identification, this
+option can also be set to an arrayref, of which the first item contains the
+regular expression. All other elements in the array are ignored by
+C<kv_validate()>, but are still returned in the error structure and can
+therefore be used in your code.
+
+=item func
+
+Subroutine reference. Validate the value against a function. The subroutine is
+passed two arguments: The value, and a hash reference with the I<fields> in the
+scope that the I<func> is defined. The subroutine should return false if the
+value is invalid, true otherwise. The value argument is passed as a reference,
+and may be modified in-place to perform normalization. This option can also be
+set to an arrayref, which works the same as with the I<regex> option. This
+constraint is only executed after the other constraints have been validated. So
+the subroutine is not called if, for example, the value is empty and the
+I<required> flag is set.
+
+The extra I<fields> argument can be used to read additional information for
+validation. For example,
+
+  { func => sub { $_[0] =~ /^$_[1]{prefix}/ },
+    prefix => 'hello' }
+
+The subroutine verifies that the value is prefixed by the value of the
+I<prefix> field, which is passed to the subroutine as second argument.
+
+=item template
+
+String, refers to a key in the I<templates> hash. Validates the value against
+the options in I<%{$templates{$string}}>, which may contain any of the above
+mentioned options (except <source name>).
+
+When a template contains a I<func> field, the fields that are passed to the
+subroutine only include the fields that are specified in the template options.
+Using the example above, the following will not work as expected:
+
+  $templates{prefix} = { func => sub { $_[0] =~ /^$_[1]{prefix} } };
+  # In the field definitions
+  { template => 'prefix', prefix => 'hello' }
+
+In this example, the only field that is passed to the subroutine is the 'func'
+field that is in the template definition itself. The subroutine has no access
+to 'prefix' field that is defined outside of the template. To work around this
+issue, a special I<inherit> option exists to allow the template to inherit
+certain fields from the parent scope. The template definition can be changed as
+follows:
+
+  $templates{prefix} = {
+    func => sub { $_[0] =~ /^$_[1]{prefix} },
+    inherit => ['prefix'],
+  };
+
+This causes the 'prefix' field from the user of the template to be passed into
+the context of the template itself, so the subroutine can access it.
+
+=item multi
+
+0/1, indicates whether there should be only one value or multiple values. If
+this option is disabled (as is the default), only the first value will be
+validated and returned.  Otherwise, each value is validated separately against
+the above options and an arrayref with values is returned. Validating this
+field is stopped when one value does not match. The I<required> and I<default>
+options are also evaluated per-value: if required is true, each value should be
+non-empty. Empty values are set to the default.
+
+=item maxcount
+
+Number. When I<multi> is true, specifies the maximum number of values to be
+present. Whether they are empty or not is ignored in this count.
+
+=item mincount
+
+Number. See I<mincount>.
+
+=back
+
+C<kv_validate()> returns a hashref with field name to value mappings. When one
+or more fields did not validate, a special C<_err> field is added. Its value is
+an arrayref where each item represents an invalid field. Each invalid field is
+represented again by an arrayref containing three items: the name of the field,
+the option that caused it to fail and the value of that option.
+
+The following templates are provided by default. These templates can be safely
+overridden with the I<templates> argument to C<kv_validate> or removed
+completely by setting the template to C<undef>.
+
+=over
+
+=item num
+
+The value must be a (JSON-like) number. Two extra fields are available when
+this template is used: I<min> to specify the lower bound on the number, and
+I<max> the upper bound. This template automatically coorces the value into a
+Perl number.
+
+=item int
+
+Similar to the I<num> template, except the value must be a whole number, no
+fractions or exponents are allowed.
+
+=item uint
+
+Similar to the I<int> template, but the number must be positive.
+
+=item ascii
+
+The value must consist entirely of printable ASCII characters.
+
+=item email
+
+The value must be a valid e-mail address. Note that this is just simple
+validation using a regular expression. A valid e-mail address in this context
+does not imply that the email exists, or that all mail clients or servers will
+accept it. For more precise validation, there's always L<Data::Validate::Email>
+and L<Email::Address>.
+
+=item weburl
+
+The value must be a valid HTTP or HTTPS URL.
+
+=back
+
+Usage example:
+
+  my $r = kv_validate(
+    # sources
+    { param => sub { $TUWF::OBJ->reqParams(shift) } },
+    # templates
+    { crc32_hex => {
+      regex => qr/^[0-9a-f]+$/i,
+      maxlength => 8,
+      minlength => 8,
+    } },
+    # field definitions
+    [
+      { param => 'name', maxlength => 100 },
+      { param => 'age',  min => 18, max => 120 },
+      { param => 'crc',  required => 0, template => 'crc32_hex' },
+    ],
+  );
+
+  # Depending on the input, $r may look something like:
+  {
+    name => 'John Doe',
+    age => 28,
+    crc => 'This does not look like a CRC32 string',
+    _err => [
+      [ 'crc', 'template', 'crc32_hex' ]
+    ]
+  }
+
+=head1 SEE ALSO
+
+L<TUWF>, L<URI::Escape>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008-2015 Yoran Heling.
+
+This module is part of the TUWF framework and is free software available under
+the liberal MIT license. See the COPYING file in the TUWF distribution for the
+details.
+
+
+=head1 AUTHOR
+
+Yoran Heling <projects@yorhel.nl>
+
+=cut
+

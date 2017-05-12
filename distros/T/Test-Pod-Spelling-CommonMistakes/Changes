@@ -1,0 +1,14 @@
+Revision history for Test-Pod-Spelling-CommonMistakes
+
+1.001 2014-10-31T21:36:00Z UTC
+ - Updates to the automatically-generated files ( thanks RT#76845 )
+
+ [STATISTICS]
+ - code churn: 3 files changed, 5 insertions(+), 4 deletions(-)
+
+1.000 2011-02-21T23:38:36Z UTC
+ - Converted to Dist::Zilla for the release process!
+
+0.01 0000-00-00T00:00:00Z UTC
+ - initial release
+

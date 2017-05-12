@@ -1,0 +1,87 @@
+Text-TemplateLite
+
+Text::TemplateLite is a pure-Perl template system intended primarily
+for "string-sized" templating (e.g. for message localization rather
+than entire "pages") using compact (terse?) templates with a
+(relatively) simple syntax.
+
+It is anticipated that templates may (at least sometimes) be entered or
+managed by users whose skill set does not include "Perl programmer"
+(perhaps a web site administrator, translator, or non-Perl programmer).
+
+Basic length and execution limits provide a measure of protection
+against accidental or malicious time- and/or space-based resource
+attacks. These are managed by the rendering companion class,
+Text::TemplateLite::Renderer.
+
+By design, only basic functionality is included in this module. Use
+parts or all of the Text::TemplateLite::Standard function library
+and/or create your own custom library to extend its capabilities.
+
+
+ABOUT THE MODULE NAME
+
+You can legitimately argue that Text::TemplateLite violates at least
+the spirit of the "avoid Simple, Easy, Reduced, Tiny, Fast, Small,
+Super, Hyper" rule.
+
+However, it does reflect several key design goals (without suggesting
+that the module's application is limited only to, e.g., message
+localization):
+
+- Light-weight syntax:
+  Bare-bones syntax to minimize the learning curve for non-(Perl)-
+  programmers (it has only code entrance/exit, comments, literals,
+  variables, and calls)
+
+- Light-weight templates:
+  Templates compact enough that computed localizations for short messages
+  still have a chance to fit in small database fields
+
+- Light-weight resource usage:
+  Limitable resource usage (to prevent time- or space-based resource
+  attacks)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::TemplateLite
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-TemplateLite
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-TemplateLite
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-TemplateLite
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-TemplateLite/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Brian Katzung
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::MethodName
+
+0.01    Sun Feb 17 09:59:47 JST 2013
+        - original version
+            special thanks to:
+              tokuhirom(Module::Functions) and dann(Test::LoadAllModules)

@@ -1,0 +1,27 @@
+---
+abstract: 'Some text based utility functions '
+author:
+  - 'Klaus Eichner <klaus03@gmail.com>'
+build_requires:
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Fy-Utils
+requires:
+  Carp: '0'
+  Encode: '0'
+  Exporter: '0'
+  Unicode::Normalize: '0'
+  perl: '5.020'
+  warnings: '0'
+resources:
+  homepage: https://github.com/klaus03/Text-Fy-Utils
+  repository: https://github.com/klaus03/Text-Fy-Utils.git
+version: '0.10'

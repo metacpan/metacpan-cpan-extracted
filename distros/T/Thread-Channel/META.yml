@@ -1,0 +1,34 @@
+---
+abstract: 'Fast thread queues'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.4004
+  Test::Fatal: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4004
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Thread-Channel
+provides:
+  Thread::Channel:
+    file: lib/Thread/Channel.pm
+    version: 0.003
+requires:
+  Sereal: 0
+  XSLoader: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Thread-Channel
+  repository: git://github.com/Leont/thread-channel.git
+version: 0.003

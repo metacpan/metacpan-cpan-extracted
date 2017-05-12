@@ -1,0 +1,103 @@
+Test-RDF
+========
+
+Created:      2010-09-03
+Home page:    <https://metacpan.org/module/Test::RDF>
+Bug tracker:  <https://github.com/kjetilk/Test-RDF/issues>
+Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
+
+1.20	2014-10-16	Fix packaging.
+
+ - Added: Skip README.pod for CPAN.
+
+1.19	2014-10-15	Cosmetic changes and diagnostics.
+
+ [ Bug Fixes ]
+ - Old metadata wasn't overwritten, deleted to allow Dist::Inkt to work.
+
+ [ Other ]
+ - Added: Add links to Debian.
+ - Removed: Remove inc/
+
+1.18	2014-10-14	Cosmetic changes and diagnostics.
+
+ - Added: Improve diagnostics if a model isn't given.
+ - Added: Improve package metadata.
+ - Use Dist::Inkt packaging.
+
+1.16	2013-06-27	Bugfix and hasnt_literal.
+
+ [ Bug Fixes ]
+ - The new Turtle parser reports errors on a different spot.
+ - With the new URI tests, my tests needs to check.
+
+ [ Other ]
+ - Added: Add new hasnt_literal test.
+
+1.14	2012-11-21	Scalar::Util strange bug.
+
+ - Updated: Dependency on Scalar::Util is anything but 1.23, set it to
+   1.24.
+
+1.11	2012-10-17	Update to RDF::Trine 1.001.
+
+ - Updated: Update test to check the new errors of
+   RDF::Trine::Parser::Turtle 1.001.
+
+1.10	2012-09-10	Add pattern_fail.
+
+ - Added: Function to test if pattern doesn't exist.
+ - Use RDF-based packaging.
+
+1.00	2012-06-30	Stable release.
+
+ - Added: Add a description to the POD.
+
+0.26	2012-06-11	New hasnt_uri test.
+
+ - Added: Add hasnt uri test.
+ - Added: Improve pattern_ok diagnostics.
+ - Added: Minor cosmetics.
+ - Reorgnize metadata to exploit new modules
+ - Use github issue tracker.
+
+0.24	2011-10-10	Pattern tests.
+
+ [ Bug Fixes ]
+ - Parser may need an empty sub sometimes.
+
+ [ Other ]
+ - Added: Minor cosmetics.
+ - Added: New pattern_ok and pattern_target functions.
+   Toby Inkster++
+ - Added: Test for empty RDF strings
+
+0.22	2011-04-01	Subgraph tests.
+
+ - Added: Add a are_subgraphs function for testing if one graph is a
+   subgraph of another.
+ - Added: More documentation.
+ - Added: Use the RDF::Graph::Trine error function for diagnostics
+ - Removed: Remove the now unneeded dependency on Text::Diff::Table.
+
+0.20	2010-12-18	Add functions for testing resources and literals.
+
+ - Added: has_literal function to test if a literal is present.
+ - Added: has_object_uri function to test if a URI is present as object.
+ - Added: has_predicate function to test if a URI is present as predicate.
+ - Added: has_subject function to test if a URI is present as subject.
+ - Added: has_uri function to test if a URI is present at all in the graph.
+ - Check Redland error messages in addition to Trine.
+
+0.11	2010-11-08	Fix tainting problem.
+
+ - Fix the tainting problem many cpantesters have.
+ - Got authorized!.
+ - Small cosmetic changes.
+
+0.10	2010-11-06	Complete rewrite.
+
+ - A complete rewrite from scratch using RDF::Trine.
+ - Backwards incompatible with previous releases.
+
+0.0.3	2006-13-04	Michael Hendricks old release based on RDF::Redland.

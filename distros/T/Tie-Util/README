@@ -1,0 +1,77 @@
+Tie::Util, version 0.04 (beta)
+
+This module provides a few subroutines for examining and modifying
+tied variables,  including those that hold weak references to  the
+objects to which they are tied,  and variables tied to packages as
+opposed to objects.
+
+
+RECENT CHANGES
+
+0.04
+----
+Bug fix: Fixed to work with perl 5.21.6.
+
+0.03
+----
+Bug fix:  Suppress ‘Ambiguous use’ warnings introduced in perl 5.13.3.
+
+0.02
+----
+Incompatible change:
+• is_weak_tie now returns false for a variable tied to undef, because
+  the tie does not actually hold a weak reference; it holds no refe-
+  rence at all.
+New features:
+• Added support for tying to a package (or anything else)
+• Added a ‘tied’ function that returns the actual scalar the tie uses.
+Bug fixes:
+• Tying $@ no longer makes is_tied die.
+• weak_tie now returns the same scalar that holds the tie, the way
+ ‘tie’ does.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install Tie::Util"
+
+    [sudo] cpan Tie::Util
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires perl 5.8.0 or later and the following
+Perl modules:
+
+• Exporter 5.57 or later
+• Scalar::Util 1.09 or later
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc Tie::Util
+
+Or try using man (it's faster, in my experience):
+
+    man Tie::Util
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-15 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl.

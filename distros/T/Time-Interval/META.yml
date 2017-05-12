@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Time-Interval
+version:            1.233
+abstract:           Converts time intervals of days, hours, minutes, and seconds
+author:
+    - Andrew N. HIcox <andrew@hicox.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Date::Parse:  2.20
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

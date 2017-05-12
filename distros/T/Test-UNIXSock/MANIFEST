@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/UNIXSock.pm
+minil.toml
+t/00_compile.t
+t/14_simple_unix.t
+t/15_oo_unix.t
+t/Server.pm
+t/ServerUNIX.pm
+META.yml
+MANIFEST

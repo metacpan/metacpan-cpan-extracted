@@ -1,0 +1,81 @@
+Revision history for Test-Kwalitee-Extra
+
+v0.3.1    2015-08-10 23:51:09+09:00 Asia/Tokyo
+    [Non-functional Change]
+        - Fix false alarm for warnings (gh-20, rt.cpan.org#104113).
+        - Fix minor grammatical error in error message (thanks Paul Cochrane).
+
+v0.3.0    2014-08-17 11:45:34JST+0900 Asia/Tokyo
+    [Functional Change]
+        - Adopt to new stash layout of Module::CPANTS::Analyse since 0.93_01 (gh-19).
+
+v0.2.1    2014-03-30 13:05:16 Asia/Tokyo
+    [Non-functional Change]
+        - Add explicit caution and workaround for network access in POD (gh-17).
+
+v0.2.0    2013-09-26 16:21:30 Asia/Tokyo
+    [Functional Change]
+        - Add retry feature.
+    [Non-functional Change]
+        - Update DZP::Test::Compile to avoid possible Win32 hangs in tests.
+
+v0.1.3    2013-09-10 01:49:22 Asia/Tokyo
+    [Functional Change]
+        - Count tests correctly for prereq_matches_use and build_prereq_matches_use (close gh-13).
+    [Non-functional Change]
+        - Do not fake expected failure (close gh-14).
+        - Use DZP::Test::Compile 2.027.
+
+v0.1.2    2013-09-02 22:56:41 Asia/Tokyo
+    [Functional Change]
+        - Ignore entries including sigil because they are likely to be variables (close gh-12).
+        - Trap query errors by MetaCPAN::API::Tiny (close gh-12).
+    [Non-functional Change]
+        - Add fake use of File::Temp to keep our test behavior because DZP::Test::Compile no longer depends on it.
+
+v0.1.1    2013-08-06 22:22:25 Asia/Tokyo
+    [Non-functional Change]
+        - Fix missing "use version" in tests (close gh-11).
+
+v0.1.0    2013-08-05 03:27:59 Asia/Tokyo
+    [Functional Change]
+        - Check validity for Module::CPANTS::Analyse from 0.88 to 0.90_02.
+            - proper_libs is disabled for 0.88 and 0.90+.
+            - Make prereq_matches_use and build_prereq_matches_use available though deleted in 0.88 and 0.90+.
+            - Consider exclusion of use in eval for prereq_matches_use.
+    [Non-functional Change]
+        - Use DZPB::Author::YAKEX.
+
+v0.0.8    2013-06-18 23:02:32 Asia/Tokyo
+    [Non-functional Change]
+        - Add minimum version of Module::CoreList (thanks Guillaume Aubert).
+
+v0.0.7    2013-04-29 19:08:15 Asia/Tokyo
+    - Account for modules in the no_index section of META.yml (thanks Guillaume Aubert).
+    - Output results one-by-one.
+    - Re-enable metayml_conforms_* indicators because rt.cpan.org #80225 has been fixed.
+
+v0.0.6    2013-01-31 00:39:49 Asia/Tokyo
+    - Do not exclude Test::Pod* in build_prereq_matches_use as the CPANTS site.
+
+v0.0.5    2012-12-06 09:11:16 Asia/Tokyo
+    [Non-functional Change]
+        - Require 0.86 of Module::CPANTS::Analyse, to avoid trouble by renamed module.
+        - Avoid magic number for the number of indicators in t/02-exclude-class.t.
+        - Remove unnecessary eval guard in tests.
+
+v0.0.4    2012-11-12 22:39:29 Asia/Tokyo
+    [Non-functional Change]
+        - Avoid each ARRAY to loosen minimum perl requirement.
+
+v0.0.3    2012-11-05 23:03:20 Asia/Tokyo
+    [Functional Change]
+        - Fix incorrect `each' iteration to avoid false alaram of prereq_matches_use.
+    [Non-functional Change]
+        - Use Pod::Weaver.
+
+v0.0.2    2012-10-24 06:42:18 Asia/Tokyo
+    - Ignore require for perl version in prereq check.
+
+v0.0.1    2012-10-23 13:18:28 Asia/Tokyo
+    - Initial release.

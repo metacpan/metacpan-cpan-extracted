@@ -1,0 +1,17 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="1"
+             tests="3"
+             name="data_tap_die_unfinished">
+    <testcase name="1"></testcase>
+    <testcase name="2"></testcase>
+    <testcase name="3"></testcase>
+    <system-out><![CDATA[1..4
+ok 1
+ok 2
+ok 3
+]]></system-out>
+    <system-err></system-err>
+    <error message="Looks like you planned 4 tests but ran 3." />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,14 @@
+Changes
+examples/perldb
+examples/tack
+lib/TextMate/JumpTo.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/jumpto.t
+t/pod-coverage.t
+t/pod.t
+t/tmloc.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

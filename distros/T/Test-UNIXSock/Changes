@@ -1,0 +1,6 @@
+Revision history for Perl extension Test-UNIXSock
+
+0.1 2015-12-02T06:39:22Z
+
+    - original version.
+    - copied and modified from Test::TCP.

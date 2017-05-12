@@ -1,0 +1,20 @@
+<specification>
+<container name="errors" value="errors" class="alert"/>
+<container name="payment_error" value="payment_error" class="payment-error">
+<value name="payment_error" class="payment-error"/>
+</container>
+<form name="payment" link="name">
+<field name="first_name"/>
+<field name="last_name"/>
+<field name="street_address"/>
+<field name="zip"/>
+<field name="city"/>
+<field name="phone"/>
+<field name="email"/>
+<!-- credit card fields -->
+<field name="cc_number"/>
+<field name="cvc_number"/>
+<field name="cc_month" iterator="months"/>
+<field name="cc_year" iterator="years"/>
+</form>
+</specification>

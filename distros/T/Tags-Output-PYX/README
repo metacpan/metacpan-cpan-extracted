@@ -1,0 +1,150 @@
+NAME
+     Tags::Output::PYX - PYX class for line oriented output for 'Tags'.
+
+SYNOPSYS
+     use Tags::Output::PYX;
+     my $obj = Tags::Output::PYX->new(%parameters);
+     $obj->finalize;
+     my $ret = $obj->flush($reset_flag);
+     my @tags = $obj->open_tags;
+     $obj->put(@data);
+     $obj->reset;
+
+PYX LINE CHARS
+     ?  - Instruction.
+     (  - Open tag.
+     )  - Close tag.
+     A  - Attribute.
+     -  - Normal data.
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "auto_flush"
+
+                     Auto flush flag.
+                     Default value is 0.
+
+            *       "output_callback"
+
+                     Output callback.
+                     Default value is undef.
+
+            *       "output_handler"
+
+                     Set output handler.
+                     Default value is undef.
+
+            *       "output_sep"
+
+                     Output separator.
+                     Default value is newline.
+
+            *       "skip_bad_data"
+
+                     Skip bad tags.
+                     Default value is 0.
+
+            *       "strict_instruction"
+
+                     Strict instruction.
+                     Default value is 1.
+
+    "finalize()"
+             Finalize Tags output.
+             Automaticly puts end of all opened tags.
+             Returns undef.
+
+    "flush($reset_flag)"
+             Flush tags in object.
+             If defined 'output_handler' flush to its.
+             Or returns code.
+             If enabled $reset_flag, then resets internal variables via reset method.
+
+    "open_tags()"
+             Returns array of opened tags.
+
+    "put(@data)"
+             Put tags code in tags format.
+             Returns undef.
+
+    "reset()"
+             Resets internal variables.
+             Returns undef.
+
+ERRORS
+     new():
+             Auto-flush can't use without output handler.
+             Output handler is bad file handler.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     flush():
+             Cannot write to output handler.
+
+     put():
+             Bad data.
+             Bad type of data.
+             Bad number of arguments. 'Tags' structure %s 
+             Ending bad tag: '%s' in block of tag '%s'.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Tags::Output::PYX;
+
+     # Object.
+     my $tags = Tags::Output::PYX->new;
+
+     # Put all tag types.
+     $tags->put(
+             ['b', 'tag'],
+             ['a', 'par', 'val'],
+             ['c', 'data', \'data'],
+             ['e', 'tag'],
+             ['i', 'target', 'data'],
+             ['b', 'tag'],
+             ['d', 'data', 'data'],
+             ['e', 'tag'],
+     );
+
+     # Print out.
+     print $tags->flush."\n";
+
+     # Output:
+     # (tag
+     # Apar val
+     # -<!--data--><!--SCALAR(0x1570740)-->
+     # )tag
+     # ?target data
+     # (tag
+     # -datadata
+     # )tag
+
+DEPENDENCIES
+    Error::Pure, Readonly, Tags::Output, Tags::Utils.
+
+SEE ALSO
+    Tags
+        Structure oriented SGML/XML/HTML/etc. elements manipulation.
+
+    Task::PYX
+        Install the PYX modules.
+
+    Task::Tags
+        Install the Tags modules.
+
+AUTHOR
+    Michal Špaček skim@cpan.org
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

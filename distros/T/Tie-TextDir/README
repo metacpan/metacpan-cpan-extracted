@@ -1,0 +1,27 @@
+Hi,
+
+This is the Tie::TextDir module.  It is a TIEHASH interface which lets you
+tie a Perl hash to a directory of textfiles:
+
+ use Tie::TextDir;
+ tie (%hash, 'Tie::TextDir', '/some_directory', 'rw');  # Open in read/write mode
+ $hash{'one'} = "some text";         # Creates file /some_directory/one
+                                     # with contents "some text"
+ untie %hash;
+
+ tie (%hash, 'Tie::TextDir', '/etc');    # Defaults to read-only mode
+ print $hash{'passwd'};  # Prints contents of /etc/passwd
+
+
+For more specific information, please see the documentation inside
+TextDir.pm, by doing "pod2txt TextDir.pm", or "perldoc Tie::TextDir" once
+you've installed the module.
+
+To install the module, do the usual:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+-Ken Williams

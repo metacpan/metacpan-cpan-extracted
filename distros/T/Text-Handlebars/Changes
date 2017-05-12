@@ -1,0 +1,20 @@
+Revision history for Text-Handlebars
+
+0.05  2015-12-03
+      - fix raw variable references inside block helpers (reported by
+        belousandrey, #6)
+
+0.04  2014-04-16
+      - fix '..' in block helpers (reported by Jörg Prante, RT#94792)
+
+0.03  2013-03-07
+      - convert to Mouse, since Text::Xslate did
+
+0.02  2013-01-02
+      - update to Text::Xslate 1.6, which allows us a lot more functionality
+        to be implemented natively, which should speed some things up
+      - fix using .. inside of helper blocks
+      - implement passing a new context to partials
+
+0.01  2012-10-08
+      - Initial release

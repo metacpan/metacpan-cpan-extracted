@@ -1,0 +1,34 @@
+Tree-Suffix
+===========
+
+This module provides an interface to the libstree generic suffix tree
+library.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    libstree from http://www.icir.org/christian/libstree/
+    Test::More
+
+A C compiler is required to build this module.
+
+NOTES
+
+Versions of libstree < .4.2 will exhibit a memory leak.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2009 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

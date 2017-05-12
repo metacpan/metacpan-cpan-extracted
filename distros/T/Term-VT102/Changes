@@ -1,0 +1,47 @@
+Changes that have been made over time:
+
+0.91 - 9 November 2008
+  - patch from Joerg Walter to fix Unicode handling
+  - minor escape sequence processing cleanup
+  - properly ignore / process sequences ending in ESC \
+  - new callback STRING for receiving strings from the above
+  - new method to return row text with SGR colour/attributes
+  - fixed line wrapping to wrap AFTER last column filled
+  - implemented tab stops
+  - added example script that strips control codes from log files
+  - new GOTO and LINEFEED callbacks
+
+0.82 - 29 September 2004
+  - added example script showing how to use Term::VT102 with SSH
+  - minor undef warning fix in SM/RM handling
+
+0.80 - 25 April 2004
+  - implemented XON/XOFF and added new option IGNOREXOFF
+
+0.79 - 9 December 2003
+  - documentation additions
+  - investigated bug reported by Paul Stoddard
+  - very minor code cleanups
+
+0.78 - 13 December 2002
+  - partial implementation of SM/RM
+  - DECTCEM (cursor on/off)
+
+0.77 - 27 November 2002
+  - implemented DECSC/DECRC (state save/restore)
+  - implemented CUPSV/CUPRS (cursor position save/restore)
+
+0.75 - 4 August 2002
+  - corrected attribute behaviour when lines inserted/deleted/scrolled
+  - example script showing how to use Term::VT102 with Net::Telnet
+  - added optional column params to row_attr(), row_text(), row_plaintext()
+  - implemented DECALN
+
+0.74 - 29 April 2002
+  - imported into CVS
+  - directory structure flattened (no more pointless lib/Term directory)
+  - created files TODO and Changes
+  - code formatting changes (i.e. use TABs for indent, spaces for formatting)
+  - fixed silly TAB handling problem - no longer write spaces when TABbing
+
+0.73 - 2 November 2001

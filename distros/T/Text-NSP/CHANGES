@@ -1,0 +1,256 @@
+NAME
+    CHANGES Changelog for the Ngram Statistics Package (Text-NSP)
+
+SYNOPSIS
+    Revision history for Perl module Text::NSP
+
+DESCRIPTION
+    1.31
+        Released October 4, 2015 all changes by BTM
+
+        *   generalized the rank.pl program format to accept any input in
+            the w1<>w2<>rank format -- it does not look at any additional
+            information if exists after the rank
+
+        *   modified the Testing programs for rank
+
+    1.29
+        Released October 3, 2015 all changes by TDP
+
+        *   remove defined(@array) from statistic.pl, now deprecated in Perl
+
+    1.27
+        Released Feb 16, 2013 all changes by BTM
+
+        *   Fixed rank.pl so that it checks for required ngram count in
+            first line.
+
+    1.25
+        Released Jan 15, 2012 all changes by BTM
+
+        *   Added tscore for 3D and 4D along with test cases
+
+        *   Updated rank.pl to work with ties
+
+        *   Added --N option to rank.pl to return the number of ngrams being
+            used to calculate the correlation.
+
+    1.23
+        Release March 31, 2011 all changes by YL
+
+        *   Changed printf to print in huge-split.pl, huge-sort.pl,
+            huge-merge.pl, and count2huge.pl.
+
+            Replaced the tail hash of huge-merge.pl by without use hash.
+
+    1.21
+        Released November 12, 2010 all changes by BTM
+
+        *   Added the Log Likelihood Measure for 4-grams
+
+    1.19
+        Released November 1, 2010 all changes by YL
+
+        *   Created find-compounds.pl and its testing files.
+            find-compounds.pl helps to pick out the compound words in the
+            text file.
+
+    1.17
+        Released April 26, 2010 all changes by YL
+
+        *   Created count2huge.pl and its testing files. count2huge.pl helps
+            to convert the output of count.pl to huge-count.pl.
+
+    1.15
+        Released April 7, 2010 all changes by YL
+
+        *   Created huge-split.pl and huge-delete.pl in order to remove this
+            functionality from huge-count.pl and huge-merge.pl (and make it
+            easier to use these different components in more flexible ways).
+
+    1.13
+        Released March 5, 2010 all changes by TDP and YL
+
+        *   Replaced huge-count.pl with a more efficient version that counts
+            large number of bigrams by creating multiple files, sorting, and
+            merging them. The sorting and merging are carried out by
+            huge-sort and huge-merge.pl. Note that the previous versions of
+            huge-count.pl and associated utilities can be found in
+            /Text-NSP/bin/utils/deprecated and will remain there for at
+            least one more release. They will not however be installed
+            automatically. (YL)
+
+        *   Added --uremove and --ufrequency options to count.pl. This allow
+            for frequency cutoffs based on ngrams occuring more than a given
+            number of times (rather than just less than, which is what
+            --remove and --frequency enable). This is a long standing item
+            on the NSP Todo list that has finally been checked off! (YL)
+
+        *   Introduced /bin/utils/contributed to allow for the distribution
+            of user contributed programs that might be useful to other
+            users. These programs do not get installed automatically with
+            NSP, and are not included in our standard testing streams, but
+            could still prove very useful to users. Please let us know if
+            you have code you might like to include here. (TDP)
+
+        *   Added nsp-stoplist.regex to distribution (in
+            /Text-NSP/bin/utils), to serve as a default stoplist. (TDP)
+
+             Reported here : <L http://tech.groups.yahoo.com/group/ngram/message/280>
+
+            This was not added in 1.11 due to failure to rebuilt MANIFEST.
+
+        *   Added support for 4-d log-likelihood
+            (Text::NSP::Measures::4D::MI:ll). (TDP)
+
+    1.11
+        Released Nov 5, 2009 all changes by TDP
+
+        *   Fixed bug in statistic.pl which caused long form of pmi
+            (Text::NSP::Measures::3D::MI::pmi) not to be handled correctly
+            on the command line, and that caused pmi_exp not to be properly
+            initialize when using the long form of pmi.
+
+              Reported here : <L http://tech.groups.yahoo.com/group/ngram/message/240>
+
+        *   Added nsp-stoplist.regex to distribution (in
+            /Text-NSP/bin/utils), to serve as a default stoplist.
+
+              Reported here : <L http://tech.groups.yahoo.com/group/ngram/message/280>
+
+        *   Fixed link to class diagram in FAQ.pod.
+
+              Reported here : <L http://tech.groups.yahoo.com/group/ngram/message/230>
+
+        *   Fixed documentation Text::NSP::Measures::3D::MI::pmi to
+            correctly show how we are computing expected values.
+
+              Reported here : <L http://tech.groups.yahoo.com/group/ngram/message/290>
+
+        *   Fixed a few broken links in README.pod that were discovered
+            while preparng this release
+
+    1.09
+        Released March 26, 2008 all changes by TDP
+
+        *   Spell checked the modules
+
+        *   Relaxed test cases 27, 29 for ll, 20 for x2, and 13 for phi, due
+            to arithmetic differences on 64 bit architectures
+
+        *   Modified Makefile.PL to go back to more standard methods of
+            testing and installation.
+
+        *   Modified structure of /t directory for 'make test'. It appears
+            that the use of subdirectories in /t with test cases might have
+            been causing problems for Windows testing, so we have moved all
+            test files to the top level of /t, and also removed the TEST
+            program so that things are called in a more standard or generic
+            fashion.
+
+    1.07
+        Released March 24, 2008 all changes by TDP
+
+        *   Updated Makefile.PL to no longer require 5.8.5 - have dropped
+            back to 5.6
+
+        *   Updated FAQ with some explanation of ALL-TESTS.sh
+
+        *   Renamed /docs as /doc to be consistent with other packages
+
+        *   Added descriptive labels in POD in NAME field of .pl programs to
+            provide that info on CPAN display
+
+        *   Fixed duplicate Copyright message bug in documentation of
+            Measures.pm
+
+        *   Removed "help" messages from Makefile.PL execution so as to
+            (hopefully) avoid problems with installations on Windows.
+
+        *   Corrected error in INSTALL instructions - csh ./ALL-TESTS.sh
+            must be performed after 'make install'
+
+    1.05
+        Released March 20, 2008 all changes by TDP
+
+        *   Fixed problem with file Testing/statistic/t2 would appear
+            (mysteriously) but not be in the MANIFEST. This file was left
+            behind during /Testing/statistic/normal-op.sh and is now being
+            removed.
+
+        *   Fixed problem in /Testing where .sh files are sometimes not
+            executable. Those files are now invoked via 'csh test.sh' rather
+            than './test.sh', meaning that they no longer need to be
+            executable.
+
+        *   Fixed ticket number 24061 from rt.cpan.org regarding incorrect
+            version information coming from Measures.pm
+
+        *   Archived all old ChangeLogs to doc/ChangeLogs directory. Began
+            to use pod in CHANGES directory instead
+
+        *   Added doc/update-pod.sh to automatically refresh top level read
+            only documentation including README, CHANGES, TODO and INSTALL
+
+        *   Fixed Makefile.PL to avoid problems during Windows install. This
+            problem and fix was reported by Richard Churchill to the ngram
+            mailing list. This may also address ticket #20371 from
+            rt.cpan.org.
+
+        *   Modified Makefile.PL to allow for use of 'make dist' and also
+            creation of META.yml
+
+BUGS
+    There is a limitation in huge-count.pl. When the size of the corpus is
+    very large (>16G) and the some of the terms of the bigrams is very long
+    (>30 chars), the program could run out of memory at huge-merge.pl step.
+    This is because huge-merge use two hashes to count the frequencies of
+    the first and second term of the bigrams. These two hashes could use up
+    the memory with the increase of the length of the terms and the increase
+    of the number of the terms. If just for normal text, terms are within
+    limited length and numbers, the software won't use up the memory.
+
+AUTHORS
+     Ying Liu, University of Minnesota, Twin Cities 
+     liux0395 at umn.edu
+
+     Ted Pedersen, University of Minnesota, Duluth
+     tpederse at d.umn.edu
+
+    This document last modified by : $Id: CHANGES.pod,v 1.36 2015/10/04
+    14:04:32 btmcinnes Exp $
+
+SEE ALSO
+    <http://ngram.sourceforge.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2004-2011 Ted Pedersen
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt. Ted Pedersen, University of Minnesota, Duluth
+    tpederse at d.umn.edu
+
+    This document last modified by : $Id: CHANGES.pod,v 1.36 2015/10/04
+    14:04:32 btmcinnes Exp $
+
+SEE ALSO
+    <http://ngram.sourceforge.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2004-2011 Ted Pedersen
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

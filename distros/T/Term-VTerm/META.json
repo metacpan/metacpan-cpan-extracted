@@ -1,0 +1,56 @@
+{
+   "abstract" : "emulate a virtual terminal using F<libvterm>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-VTerm",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::PkgConfig" : "0",
+            "Module::Build" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Refcount" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Term::VTerm" : {
+         "file" : "lib/Term/VTerm.pm",
+         "version" : "0.02"
+      },
+      "Term::VTerm::Screen" : {
+         "file" : "lib/Term/VTerm/Screen.pm",
+         "version" : "0.02"
+      },
+      "Term::VTerm::State" : {
+         "file" : "lib/Term/VTerm/State.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

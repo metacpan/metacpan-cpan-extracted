@@ -1,0 +1,175 @@
+? +
+<math title="+">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>+</mo>
+  </mstyle>
+</math>
+$$+$$
+
+? -
+<math title="-">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>-</mo>
+  </mstyle>
+</math>
+$$-$$
+
+? *
+<math title="*">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&sdot;</mo>
+  </mstyle>
+</math>
+$$\cdot$$
+
+? **
+<math title="**">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Star;</mo>
+  </mstyle>
+</math>
+$$\star$$
+
+? //
+<math title="//">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>/</mo>
+  </mstyle>
+</math>
+$$/$$
+
+? \\ 
+<math title="\\ ">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>\</mo>
+  </mstyle>
+</math>
+$$\backslash$$
+
+? xx
+<math title="xx">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&times;</mo>
+  </mstyle>
+</math>
+$$\times$$
+
+? -:
+<math title="-:">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&divide;</mo>
+  </mstyle>
+</math>
+$$\div$$
+
+? @
+<math title="@">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&SmallCircle;</mo>
+  </mstyle>
+</math>
+$$\circ$$
+
+? o+
+<math title="o+">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&oplus;</mo>
+  </mstyle>
+</math>
+$$\oplus$$
+
+? ox
+<math title="ox">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&otimes;</mo>
+  </mstyle>
+</math>
+$$\otimes$$
+
+? o.
+<math title="o.">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&CircleDot;</mo>
+  </mstyle>
+</math>
+$$\odot$$
+
+? sum
+<math title="sum">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&sum;</mo>
+  </mstyle>
+</math>
+$$\sum$$
+
+? prod
+<math title="prod">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&prod;</mo>
+  </mstyle>
+</math>
+$$\prod$$
+
+? ^^
+<math title="^^">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&and;</mo>
+  </mstyle>
+</math>
+$$\wedge$$
+
+? ^^^
+<math title="^^^">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Wedge;</mo>
+  </mstyle>
+</math>
+$$\bigwedge$$
+
+? vv
+<math title="vv">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&or;</mo>
+  </mstyle>
+</math>
+$$\vee$$
+
+? vvv
+<math title="vvv">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Vee;</mo>
+  </mstyle>
+</math>
+$$\bigvee$$
+
+? nn
+<math title="nn">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&cap;</mo>
+  </mstyle>
+</math>
+$$\cap$$
+
+? nnn
+<math title="nnn">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Intersection;</mo>
+  </mstyle>
+</math>
+$$\bigcap$$
+
+? uu
+<math title="uu">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&cup;</mo>
+  </mstyle>
+</math>
+$$\cup$$
+
+? uuu
+<math title="uuu">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Union;</mo>
+  </mstyle>
+</math>
+$$\bigcup$$

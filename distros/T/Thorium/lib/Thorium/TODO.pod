@@ -1,0 +1,53 @@
+# PODNAME: Thorium::TODO
+
+
+__END__
+=pod
+
+=head1 NAME
+
+Thorium::TODO
+
+=head1 VERSION
+
+version 0.510
+
+=head1 Thorium TODO
+
+=head2 Higher Priority
+
+=over 4
+
+=item * make preset location configurable
+
+=item * get Thorium::Utils added when Proc::ProcessTable works on most platforms
+
+=item * T::BuildConf: implement currently selected through dlg_current_listitem() from util.c
+
+=item * T::BuildConf: figure out why resizing the term (sig winch) forces it to exit with value 0
+
+=back
+
+=head2 Lower Priority
+
+=over 4
+
+=item * more knob types
+
+=item * move Unix* to Unix/* ?
+
+=back
+
+=head1 AUTHOR
+
+Adam Flott <adam@npjh.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Adam Flott <adam@npjh.com>, CIDC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

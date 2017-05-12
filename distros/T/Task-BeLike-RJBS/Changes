@@ -1,0 +1,88 @@
+Revision history for Task-BeLike-RJBS
+
+20150423.001 2015-04-23 13:20:43-04:00 America/New_York
+              allow rjbs.pm to work on 5.20, with fewer features; this is going
+              to be a hard minimum
+
+20150423.000 2015-04-23 09:25:13-04:00 America/New_York
+              add the rjbs.pm module, to quickly turn on all kinds of nonsense
+
+20131116.000 2013-11-16 17:09:04 America/New_York
+              stop trying to install perlbrew
+
+              require dzil 5!
+
+20131018.001 2013-10-18 11:40:55 America/New_York
+              update bugtracker and repo
+
+              remove Moose::Autobox
+
+20120926.000 2012-09-26 12:09:52 America/New_York
+              add App::grindperl, App::perlbrew, perl 5.14.0
+
+              add Pod::Cpandoc
+
+20120310.000 2012-03-10 14:04:11 America/New_York
+              add Unicode::Tussle, because it's cool
+
+              add MooseX::StrictConstructor; please use it!
+
+              switch from List::MoreUtils to List::AllUtils
+
+20110621.000 2011-06-21 22:16:40 America/New_York
+              add Module::Which, for which_pm, which I use a lot
+
+              add App::Uni, for uni, which I also use a lot
+
+20110516.000 2011-05-16 16:53:43 America/New_York
+
+              require LWP::Protocol::https to make sure I can use LWP on SSL
+
+20110324.000 2011-03-24 11:01:14 America/New_York
+              improve behavior of App::Nopaste by adding its optional prereqs
+
+20101201.000 2010-12-01 18:21:32 America/New_York
+              require perl 5.12.0
+
+              drop CPAN, CPAN::Reporter, CPAN::Uploader
+              add cpanminus and cpan-outdated
+
+              drop Perl::Critic
+
+              bump Log::Dispatchouli to 2
+
+              bump Moose to 1.19
+
+              replace Exception::Class with Throwable, Throwable::X, and
+              Try::Tiny
+
+20100611.000 2010-06-11 16:11:21 America/New_York
+              drop pip, Module::Install, YAML::XS
+              add perl 5.10.0
+              bump up some prereqs
+
+20091203.000 2009-12-03
+              taskweaver now provides tests
+
+20091129.000 2009-11-29 12:08:39 America/New_York
+              use TaskWeaver to build bundle
+
+20090219     2009-02-19
+              dzil
+
+1.003        2009-01-16
+              update my whims
+              add repo
+
+1.002        2008-04-12
+              tell smokers to skip this
+              drop Rubric, which is huge and rarely needed
+              require 5.008 in Makefile.PL
+
+1.001        2008-04-07
+              add version number
+              add changelog
+              add stupid tests
+
+undef        2008-02-05
+              first release

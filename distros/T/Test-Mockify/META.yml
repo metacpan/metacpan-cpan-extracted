@@ -1,0 +1,61 @@
+---
+abstract: 'minimal mocking framework for perl'
+author:
+  - 'ePages GmbH'
+build_requires:
+  Devel::Cover: '1.23'
+  Devel::Cover::Report::Clover: '1.01'
+  Minilla: v3.0.0
+  Module::Build::Tiny: '0.039'
+  Perl::Critic: '1.123'
+  TAP::Harness::Archive: '0.18'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.8, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mockify
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Mockify:
+    file: lib/Test/Mockify.pm
+    version: '0.9'
+  Test::Mockify::MethodCallCounter:
+    file: lib/Test/Mockify/MethodCallCounter.pm
+  Test::Mockify::Tools:
+    file: lib/Test/Mockify/Tools.pm
+  Test::Mockify::TypeTests:
+    file: lib/Test/Mockify/TypeTests.pm
+  Test::Mockify::Verify:
+    file: lib/Test/Mockify/Verify.pm
+requires:
+  Data::Compare: '0'
+  Module::Load: '0'
+  Test::MockObject::Extends: '0'
+  experimental: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/ePages-de/Mockify/issues
+  homepage: https://github.com/ePages-de/Mockify
+  repository: git://github.com/ePages-de/Mockify.git
+version: '0.9'
+x_authority: cpan:CHRISBR
+x_contributors:
+  - 'Christian Breitkreutz <c.breitkreutz@epages.com>'
+  - 'Alexander Sandau <a.sandau@epages.com>'
+  - 'Birgit Bader <b.bader@epages.com>'
+  - 'Christian Breitkreutz <cbreitkreutz@epages.com>'
+  - 'Oliver Trosien <otrosien@epages.com>'

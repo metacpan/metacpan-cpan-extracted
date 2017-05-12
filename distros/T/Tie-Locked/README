@@ -1,0 +1,228 @@
+NAME
+
+    Tie::Locked -- lock hashes so that they cannot be easily changed
+
+SYNOPSIS
+
+     use Tie::Locked ':all';
+     
+     # creates locked hash with initial value x=>1
+     tie %hash, 'Tie::Locked::Tied', x=>1;
+     
+     # get tied hashref with initial value x=>1
+     my $ref = locked_hashref('x'=>1);
+     
+     # the following commands cause fatal errors
+     print $ref->{'y'};       # references non-existent key
+     $ref->{'y'} = 'yyyyy';   # assigns to non-existent key
+     $ref->{'x'} = 'yyyyy';   # assigns to existent key
+     
+     # but this command is ok
+     $dummy = $ref->{'x'};    # references existent key
+     
+     # get unlocked hashref
+     my $ref = locked_hashref('x'=>1);
+     
+     # the following commands do NOT cause errors because the hash isn't locked
+     print $ref->{'y'};
+     $ref->{'y'} = 'yyyyy';
+     
+     # now lock the hashref
+     $ref->lock;
+     
+     # many other features...
+
+DESCRIPTION
+
+    Tie::Locked allows you to create hashes in which the values of the hash
+    cannot be easily changed. If an element that does not exist is
+    referenced then the code croaks. Tie::Locked is useful for situations
+    where you want to make sure your code doesn't accidentally change
+    values. If code attempts to change or delete an existing element, then
+    the code dies.
+
+    I created Tier::Locked when I wrote buggy code something like this:
+
+     my $whatever = {};
+    
+     # a bunch of code that, under some conditions, never creates or sets
+     # the value $whatever->{'done'}
+     
+     if (! $whatever->{'done'}) {
+        ...
+     }
+
+    It took an hour of debugging to figure out, so I created this module to
+    avoid losing more time from things I'd rather do, like write non-buggy
+    code.
+
+    Please note: I never actually use Tie::Locked to tie hashes directly. I
+    use locked_hashref() and unlocked_hashref() to get hash references.
+    This documentation is going to focus on that usage.
+
+INSTALLATION
+
+    Tie::Locked can be installed with the usual routine:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+FUNCTIONS
+
+ locked_hashref
+
+    locked_hashref() returns a reference to a locked hash. All options sent
+    to locked_hashref() are set as the locked values of the hash. So, for
+    example, the following code creates a hashref with one key 'x' with a
+    value of 1:
+
+     my $ref = locked_hashref('x'=>1);
+
+ unlocked_hashref
+
+    unlocked_hashref() returns a reference to an unlocked hash. This is
+    useful for the situation where you want to initialize the values in the
+    hash before locking it. For example, the following code creates a
+    Tie::Locked object, sets some values in it, then locks the hash.
+
+     my $ref = unlocked_hashref();
+     
+     $ref->{'Mbala'} = 1;
+     $ref->{'Josh'} = 2;
+     $ref->{'Starflower'} = 3;
+     
+     $ref->lock();
+
+ $ref->lock()
+
+    The lock() method (not to be confused with Perl's native lock function)
+    locks the Tie::Locked object. For example, the following code creates
+    an unlocked Tie::Locked object, sets some values, then locks the hash.
+
+     my $ref = unlocked_hashref();
+     
+     $ref->{'Mbala'} = 1;
+     $ref->{'Josh'} = 2;
+     $ref->{'Starflower'} = 3;
+     
+     $ref->lock();
+
+ $ref->unlock()
+
+    Unlocks the hash. For example, the following code unlocks the hash,
+    sets some values, then relocks it.
+
+     $ref->unlock();
+     $ref->{'x'} = 'yyyyy';
+     $ref->{'z'} = 'yyyyy';
+     
+     # relock
+     $ref->lock;
+
+ $ref->autolocker()
+
+    autolocker() unlocks the hash and returns an object that, when it goes
+    out of scope, relocks the hash. This is useful for situations where you
+    want to unlock the hash and be sure it gets relocked even if the
+    routine exits midway.
+
+    For example, the following code creates an autolocker object in the
+    do{} block, so setting the hash does not cause an error in that block.
+    However, after the locker has gone out of scope, the hash is locked
+    again.
+
+     my $ref = locked_hashref('x'=>1);
+     
+     do {
+        my $locker = $ref->autolocker();
+        $ref->{'steve'} = 1; # does not cause an error
+     };
+     
+     $ref->{'fred'} = 2; # causes an error
+
+ $ref->locked()
+
+    Returns true if the hash is locked.
+
+ $ref->unlocked()
+
+    Returns true if the hash is not locked.
+
+ $ref->unlock_fields(field1, field2, ...)
+
+    This method allows you to unlock just specific fields in the hash. For
+    example, in the following code, the fields 'first', 'middle', and
+    'last' are unlocked, but the id field is not. Notice that the fields do
+    not need to actually exist in order to be unlocked.
+
+     # create customer hash
+     my $customer = locked_hashref(id=>'3245');
+     
+     # unlock name fields
+     $customer->unlock_fields('first', 'middle', 'last');
+     
+     # set name fields - does not cause any errors
+     $customer->{'first'} = 'Michael';
+     $customer->{'middle'} = 'Jadin';
+     $customer->{'last'} = 'Forsyth';
+     
+     # but this line causes an error:
+     $customer->{'id'} = 2087;
+
+    Each call to unlock_fields() adds to the list of unlocked fields, so
+    the following code accomplishes the same thing as above.
+
+     $customer->unlock_fields('first');
+     $customer->unlock_fields('middle');
+     $customer->unlock_fields('last');
+
+ $ref->lock_fields(field1, field2, ...)
+
+    The opposite of unlock_fields(), this method locks the given fields.
+
+ $ref->lock_all_fields()
+
+    Locks all fields.
+
+ $ref->unlocked_fields()
+
+    Returns an array of fields that are not locked.
+
+Known bugs
+
+    The autolocker object does not go out of scope if it is created in a
+    one-command block. For example, the following code does NOT cause an
+    error even though it should.
+
+     my $ref = locked_hashref();
+     
+     do {
+        my $locker = $ref->autolocker();
+     };
+     
+     # does not cause an error
+     $ref->{'Steve'} = 4;
+
+TERMS AND CONDITIONS
+
+    Copyright (c) 2013 by Miko O'Sullivan. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. This software comes with NO
+    WARRANTY of any kind.
+
+AUTHORS
+
+    Miko O'Sullivan miko@idocs.com
+
+RELEASE HISTORY
+
+    Version 1.0 March 21, 2013
+
+      Initial release
+
+    Version 1.1 April 25, 2014
+
+      Fixed error in META.yml.
+

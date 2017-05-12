@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 6edbc423ad3b57033749d302541639c8f24ce1ee COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 4597b8ae79a238fe90f530bbabd0209c6737fcdd Changes
+SHA1 ed15ca20fc4e2127847561de5ab3d99839c6d0e7 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 828d845c8776a74632c6e7e8226da72d9a983be8 MANIFEST
+SHA1 00851d6945e56d101754d68f51e006bb1ed97ca2 META.json
+SHA1 050ea88e6c5bf9ed4234fea3a63a4427fb24b1aa META.yml
+SHA1 219d5fa6bf55a6e3952568c8d6f117ff4366d8d9 Makefile.PL
+SHA1 50eb85b23e22035534b90770b016ea7e4834fd00 README
+SHA1 612e409fdd3cfe2cd8289f16f94ddb1d6203e754 dist.ini
+SHA1 0dbd87e5b2d1e6181d9552aa35d924ce7e2f7809 doap.ttl
+SHA1 83d91b766a20baa9efae086aa4c5640b8c3c654b lib/Tie/Moose.pm
+SHA1 47b165edc84ab07b95cd0d1b8b00d9e8c0a90096 lib/Tie/Moose/FallbackHash.pm
+SHA1 c2701f17ab71dc6c65c9db20d9bc51b7664b75b9 lib/Tie/Moose/FallbackSlot.pm
+SHA1 954929772894bfa423bb6928f9670b6711d791f5 lib/Tie/Moose/Forgiving.pm
+SHA1 610c3afcfed5696fde6b3135603e2531695f03ba lib/Tie/Moose/ReadOnly.pm
+SHA1 a7e73f991764953b5900a05a025c8cdb0e8ad533 t/01basic.t
+SHA1 21fc756bade8d384aa81843da63f4a805fc11066 t/02fbslot.t
+SHA1 34aee38040c42d6df30529b6d84af804e7476e50 t/03fbhash.t
+SHA1 b6fc892feda38a37f308b532a72bb5ada8cafa21 t/04ro.t
+SHA1 7f8d002db122e33adf9432f4710768c0531be48b t/05forgiving.t
+SHA1 a205aec6bb2421cd5282d9426aff985eb9a145bd t/06combine.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQt0E8ACgkQzr+BKGoqfTkT1wCgqIwHHjudiAV1W7/rJOdAvmJC
+M1AAn2ZTn1HRqnB6sqxFKaJE33mvbRrj
+=LwYf
+-----END PGP SIGNATURE-----

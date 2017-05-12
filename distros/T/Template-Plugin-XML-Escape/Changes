@@ -1,0 +1,8 @@
+Revision history for Perl extension Template::Plugin::XML::Escape.
+
+0.01  Fri Jun 16 12:14:20 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.6.1 -n Template::Plugin::XML::Escape --use-new-tests --skip-exporter
+
+0.02  Fri Jun 16 13:10:00 2006
+    - First version uploaded to CPAN.

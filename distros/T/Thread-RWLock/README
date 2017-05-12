@@ -1,0 +1,65 @@
+$Id: README,v 1.2 2001/06/29 02:11:49 af Exp $
+
+========================================================================
+Thread::RWLock is Copyright (c) 2001 Andreas Ferber <aferber@cpan.org>
+It can be redistributed or modified under the same terms as Perl itself.
+========================================================================
+
+for more information:
+
+        perldoc Thread::RWLock
+
+
+NAME
+    Thread::RWLock - rwlock implementation for perl threads
+
+SYNOPSIS
+        use Thread::RWLock;
+
+        my $rwlock = new Thread::RWLock;
+
+        # Reader
+        $rwlock->down_read;
+        $rwlock->up_read;
+
+        # Writer
+        $rwlock->down_write;
+        $rwlock->up_write;
+
+DESCRIPTION
+    RWLocks provide a mechanism to regulate access to resources. Multiple
+    concurrent reader may hold the rwlock at the same time, while a writer
+    holds the lock exclusively.
+
+    New reader threads are blocked if any writer are currently waiting to
+    obtain the lock. The read lock gets through after all write lock
+    requests have completed.
+
+    This RWLock implementation also takes into account that one thread may
+    obtain multiple readlocks at the same time and prevents deadlocking in
+    this case.
+
+FUNCTIONS AND METHODS
+    new     `new' creates a new rwlock. The new rwlock is unlocked.
+
+    down_read
+            The `down_read' method obtains a read lock. If the lock is
+            currantly held by a writer or writer are waiting for the lock,
+            `down_read' blocks until the lock is available.
+
+    up_read Releases a read lock previously obtained via `down_read'.
+
+    down_write
+            Obtains a write lock from the rwlock. Write locks are exclusive,
+            so no other reader or writer are allowed until the lock is
+            released. `down_write' blocks until the lock is available.
+
+    up_write
+            Release a write lock previously obtained via `down_write'.
+
+SEE ALSO
+    the Thread::Semaphore manpage
+
+AUTHOR
+    Andreas Ferber <aferber@cpan.org>
+

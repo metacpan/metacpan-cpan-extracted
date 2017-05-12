@@ -1,0 +1,23 @@
+---
+name: Text-Pipe-RandomCase
+version: 0.03
+author:
+  - 'Mario Domgoergen <mdom@cpan.org>'
+abstract: Text::Pipe filter to randomize character case
+license: perl
+resources:
+  license: ~
+  repository: http://github.com/mdom/text-pipe-randomcase
+requires:
+  Text::Pipe: 0
+  parent: 0
+build_requires:
+  Test::More: 0
+provides:
+  Text::Pipe::RandomCase:
+    file: lib/Text/Pipe/RandomCase.pm
+    version: 0.03
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

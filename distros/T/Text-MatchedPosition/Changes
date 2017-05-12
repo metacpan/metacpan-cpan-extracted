@@ -1,0 +1,10 @@
+Revision history for Perl extension Text::MatchedPosition
+
+0.03    Sat Sep  7 17:49:29 JST 2013
+        - removed dependency: Class::Accessor::Lite
+
+0.02    Sat Sep  7 17:22:34 JST 2013
+        - fixed bug: got a wrong offset
+
+0.01    Sun Sep  1 10:57:59 JST 2013
+        - original version

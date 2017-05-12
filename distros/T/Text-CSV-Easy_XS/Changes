@@ -1,0 +1,31 @@
+Revision history for Text-CSV-Easy_XS
+
+0.53    2014-01-14
+        Adds more unit tests.
+
+0.52    2013-02-10
+        Code improvements to Easy_XS.xs
+
+0.51    2013-02-09
+        Improves documentation.
+        Properly handles CRLF.
+
+0.50    2013-02-09
+        Supports RFC 4180.
+
+0.05    2013-02-08
+        Metadata updates.
+
+0.04    2013-02-08
+        Adds a new unit test.
+
+0.03    2013-02-07
+        Fixes UTF-8 issue on linux builds.
+        Handles empty strings and undef values properly.
+
+0.02    2013-02-06
+        Minor changes.
+
+0.01    2013-02-06
+        First version, released on an unsuspecting world.
+

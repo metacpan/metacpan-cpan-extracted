@@ -1,0 +1,18 @@
+Makefile.PL
+Build.PL
+MANIFEST			This list of files
+META.yml
+README
+t/a_use.t
+t/b_tie.t
+t/c_storefetch.t
+t/d_keeptidy.t
+samples/demo.pl
+samples/dump.pl
+samples/demo.ics
+samples/uniquify.pl
+samples/outlooksync.pl
+TODO
+CHANGES
+lib/Tie/iCal.pm
+META.json

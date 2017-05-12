@@ -1,0 +1,23 @@
+---
+abstract: 'A hash that remembers where its keys were set'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Hash-Blame
+requires:
+  parent: 0
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/hoelzro/tie-hash-blame/issues
+  homepage: https://github.com/hoelzro/tie-hash-blame
+  repository: https://github.com/hoelzro/tie-hash-blame.git
+version: 0.01

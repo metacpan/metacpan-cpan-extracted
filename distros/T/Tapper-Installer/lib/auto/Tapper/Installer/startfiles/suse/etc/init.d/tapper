@@ -1,0 +1,49 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Required-Start: $ALL $network $remote_fs $syslog $xend
+# Provides: tapper
+# Default-Start: 3 5 
+# Default-Stop: 1 6
+# Required-Stop:
+# Description: (suse) Start tapper program run control
+### END INIT INFO
+# chkconfig: 35 99 99
+# description: (suse) Start tapper program run control
+
+# do not execute again at shutdown
+if ( test "$1" = 'stop' ); then
+    exit 0
+fi
+
+# Some images seem to not start network per default. Try to fix.
+if ( ! ping -c 1 tapper 2>&1 > /dev/null) ; then
+    dhclient eth0
+fi
+
+#needed for NFS, some OS fail to load it
+if [[ -e /etc/init.d/portmap ]]
+then
+	/etc/init.d/portmap start
+fi
+
+STARTSCRIPT=
+FILENAME="tapper-automatic-test.pl"
+POSSIBLE_PATHS="
+/opt/tapper/perl/perls/current/bin/
+/mnt/opt/tapper/perl/perls/current/bin/
+"
+
+# Some guest images have /opt/tapper mounted to /mnt/opt/tapper
+# without a symlink. Make sure Tapper also works there.
+for DIR in $POSSIBLE_PATHS; do
+    STARTSCRIPT=${DIR}/$FILENAME
+    if [[ -e $STARTSCRIPT ]]
+    then
+        # show network configuration so we can log into virtualisation guest
+        /sbin/ifconfig
+
+        ${DIR}/perl $STARTSCRIPT $*
+        exit 0
+    fi
+done

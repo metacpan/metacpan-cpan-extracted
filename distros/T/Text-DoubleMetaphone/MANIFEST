@@ -1,0 +1,12 @@
+README
+Changes
+DoubleMetaphone.pm
+DoubleMetaphone.xs
+double_metaphone.c
+double_metaphone.h
+MANIFEST
+Makefile.PL
+t/words.t
+t/words.txt
+eg/dmeta
+typemap

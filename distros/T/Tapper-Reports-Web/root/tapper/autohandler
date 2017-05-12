@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<& /tapper/title.mas &>
+<meta name="keywords" content="tapper test framework tap" />
+<meta name="description" content="tapper reports" />
+<link rel="stylesheet" type="text/css" title="Red" href="/tapper/static/css/style_red.css" />
+<link rel="stylesheet" type="text/css" title="Red" href="/tapper/static/css/formfu.css" />
+<link rel="stylesheet" type="text/css" title="Red" href="/tapper/static/css/qtip.css" />
+
+<!-- Title tip support -->
+<script language="JavaScript"  type="text/javascript" src="/tapper/static/js/qTip.js"></script>
+<script language="JavaScript"  type="text/javascript" src="/tapper/static/js/jquery-2.0.3.min.js"></script>
+
+%   if ( $c->stash->{css_files} ) {
+%       my %h_css_files;
+%       my $i_counter = 0;
+%       for my $s_key ( @{$c->stash->{css_files}} ) {
+%           $h_css_files{$s_key} ||= $i_counter++;
+%       }
+%       for my $s_css_file ( sort { $h_css_files{$a} <=> $h_css_files{$b} } keys %h_css_files ) {
+            <link rel="stylesheet" type="text/css" href="<% $s_css_file %>" />
+%       }
+%   }
+
+<style type="text/css" media="print">
+    #secondaryContent_2columns { display: none; }
+    #primaryContent_2columns   { margin-right: 1.5em; }
+    #footer                    { display: none; }
+</style>
+
+</head>
+<body>
+
+<style type="text/css">
+    #secondaryContent_2columns img {
+        cursor: pointer;
+        border: none;
+        margin-bottom: -3px;
+    }
+    #idx_reportlist_pager div {
+        text-align: center;
+        float: left;
+        width: 60px;
+        height: 16px;
+        border: 1px solid #585858;
+        margin: 1px;
+    }
+    #idx_reportlist_pager div.clickable {
+        cursor: pointer;
+    }
+    #idx_reportlist_pager div.clickable:hover {
+        background-color: #66000F;
+        color: #FFF;
+    }
+    div#idx_pager_interval_div {
+        width: 80px;
+    }
+    input#idx_pager_interval_input {
+        width: 20px;
+        border: 0px solid;
+        background-color: transparent;
+        text-align: right;
+        color: #585858;
+    }
+    #idx_reportlist_pager div.pager_date {
+        width: 120px;
+    }
+    #columnA_2columns div.pager_date {
+        cursor: pointer;
+        font-weight: bold;
+    }
+    #columnA_2columns div.pager_date:hover {
+        background-color: #66000F;
+        color: #FFF;
+    }
+    #idx_reportlist td > div.pager_date {
+        margin-top: 30px;
+        margin-bottom: 5px;
+        border: 1px solid #585858;
+        text-align: center;
+        width: 100%;
+    }
+    input#idx_pager_interval_input:focus {
+        outline: none;
+    }
+    #idx_reportlist div.plus,
+    #idx_reportlist div.minus {
+        cursor: pointer;
+        width: 9px;
+        height: 9px;
+        float: left;
+        margin-right: 3px;
+        margin-top: 3px;
+    }
+    #idx_reportlist div.plus {
+        background-image: url(/tapper/static/images/plus.png);
+    }
+    #idx_reportlist div.minus {
+        background-image: url(/tapper/static/images/minus.png);
+    }
+    #idx_reportlist div.sratio {
+        height: 16px;
+        cursor: pointer;
+        float: left;
+    }
+    #idx_reportlist div.bgred {
+        background-color: #ef5440;
+    }
+    #idx_reportlist div.bggreen {
+        background-color: #79df46;
+    }
+    #idx_reportlist div.dbgred {
+        background-color: #ff6450;
+    }
+    #idx_reportlist div.dbggreen {
+        background-color: #a9ff76;
+    }
+    #idx_reportlist td.transparent div.bggreen,
+    #idx_reportlist td.transparent div.bgred {
+        background-color: #EDEDED;
+    }
+    #idx_reportlist td.yellow div.bggreen,
+    #idx_reportlist td.yellow div.bgred {
+        background-color: #FFD549;
+    }
+</style>
+
+<%args>
+   $top_menu => {}
+</%args>
+
+<div id="header">
+
+	<div id="header_inner" class="fluid">
+
+<& /tapper/logo.mas &>
+
+		<div id="menu">
+			<ul>
+% foreach my $element  ( @{$top_menu} ) {
+
+                                <li><a href="<% $element->{uri} %>"
+%     if ($element->{active}) {
+                                     class="active"
+%     }
+% #    Keep the closing > in the followin line. It closes the < href above.
+                                    ><% $element->{text} %></a></li>
+% }
+			</ul>
+		</div>
+
+	</div>
+</div>
+
+<div id="main">
+
+	<div id="main_inner" class="fluid">
+
+		<div id="primaryContent_2columns">
+
+			<div id="columnA_2columns">
+
+				<br class="clear" />
+
+				<div class="post">
+
+% $m->call_next;
+
+				</div>
+
+			</div>
+
+		</div>
+
+		<div id="secondaryContent_2columns">
+
+			<div id="columnC_2columns">
+
+<& /tapper/navi.mas &>
+
+			</div>
+
+		</div>
+
+		<br class="clear" />
+
+	</div>
+
+</div>
+
+<& /tapper/footer.mas &>
+
+%   if ( $c->stash->{js_files} ) {
+%       my %h_js_files;
+%       my $i_counter = 0;
+%       for my $s_key ( @{$c->stash->{js_files}} ) {
+%           $h_js_files{$s_key} ||= $i_counter++;
+%       }
+%       for my $s_js_file ( sort { $h_js_files{$a} <=> $h_js_files{$b} } keys %h_js_files ) {
+            <script type="text/javascript" src="<% $s_js_file %>"></script>
+%       }
+%   }
+
+</body>
+</html>
+<!-- Local Variables: -->
+<!-- buffer-file-coding-system: utf-8 -->
+<!-- mode: html -->
+<!-- End: -->

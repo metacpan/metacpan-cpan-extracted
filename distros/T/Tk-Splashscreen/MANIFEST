@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+Splashscreen.pm
+test.pl
+waitVariableX.pm
+splashscreen.pl

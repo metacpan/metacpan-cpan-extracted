@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/test.pl
+lib/TAP/Runner.pm
+lib/TAP/Runner/Option.pm
+lib/TAP/Runner/Test.pm
+t/examples/test.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/runner_option.t
+t/runner_test.t

@@ -1,0 +1,28 @@
+Time-NT version 0.007
+========================
+
+This module provides functions for converting NT System time format
+to unix time and vice versa. This time format is used extensively
+in Microsoft Active Directory attributes.
+
+This module side steps any need for 64bit math, when dealing with
+the 64bit NT system time.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT & LICENSE
+
+Copyright (C) 2010 by Jason Fried. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

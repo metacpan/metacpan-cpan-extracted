@@ -1,0 +1,49 @@
+Revision history for Perl extension Transform::Canvas.
+
+0.14     January 23, 2009
+        Changed initialize to _initialize
+
+0.13	January 20, 2009
+	Improved META.yml
+
+0.09    April 21, 2008
+	Improved META.yml
+
+0.08    April 21, 2008
+	Improved META.yml
+
+0.06    April 15, 2008
+	Improved tests
+
+
+0.05    April 14, 2008
+	Fixed Makefile.PL
+
+
+0.03    Wed, Sept 19, 2007
+	Fixed Makefile.PL
+
+0.02    Wed, Nov 01, 2005
+	Changed use statement to allow perl 5.6 to implement.
+	Added set/get support to the helper methods dx0 dx1 dy0 dy1 cx0 cx1 cy0 cy1
+
+
+0.01	Tues June 07 2005 21:01
+	Added Max and Min helper methods. 
+	They may not really belong here but they constantly show up in 
+	my needs to determine the scale of the axes, so they are being added.
+
+0.005 	Fri Feb 11 2005 16:15
+	Improved the dependency declarations for testing. 
+	The tests require the SVG module.
+
+0.004 	Fri Feb 11 2005 16:15
+	Updated the pod to reflect my appreciation of Adam Kennedy's criticism.
+	I was not pleased.
+
+0.003   Original release to CPAN
+
+0.00_01  Fri Sep 24 2004 08:33:12
+	- original version; created by h2xs 1.23 with options
+		-B -X -c -e -k -n Transform::Canvas
+

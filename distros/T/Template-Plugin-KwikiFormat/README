@@ -1,0 +1,23 @@
+Template::Plugin::KwikiFormat
+
+A filter-plugin for Template Toolkit to allow Kwiki-formatted text be
+converted to html
+
+See http://www.kwiki.org/?KwikiFormattingRules for a description of
+kwiki formatting rules
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Thomas Klausner, ZSI
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

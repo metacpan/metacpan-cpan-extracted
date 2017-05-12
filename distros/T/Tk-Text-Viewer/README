@@ -1,0 +1,101 @@
+Tk::Text::Viewer Version 0.95   README              2010 03 07
+
+NAME
+    Tk::Text::Viewer - Simple Text Viewer
+
+SYNOPSIS
+        use Tk;
+        use Tk::Text::Viewer;
+        .....
+        my $mw = MainWindow->new;
+        my $t1 = $mw->Scrolled('Viewer', -wrap => 'none'......);
+        $t1->LabelText("Search:");# Change label text
+        or:
+        my $t1 = $mw->Viewer()->pack();
+        .....
+        $t1->Load($filename)); 
+    Also:
+        viewer.pl [TextFile]
+
+DESCRIPTION
+    Tk::Text::Viewer IS A text widget that can display text files under TK.
+    It enable the user to search text and navigate in a Text widget. The
+    reason for creating this module is that it doesn't require downloading
+    of modules other that Tk; Look for widget options in Tk::Text.
+
+    A separate viewer.pl program is included that can be used as a stand
+    alone file browser.
+
+WIDGET METHODS
+    The Viewer widget also inherits all the methods provided by the generic
+    Tk::Widget and Tk::Text classes.
+
+    The following additional method is available for viewer widgets:
+
+    *$text_view*->Load(*$filename*)
+        Load file into the text widget.
+
+    *$text_view*->LabelConfig(string or hash ref)
+
+        *   $text_view->LabelConfig(*"Search:"*)
+
+            Change label for the search entry field. You might want to
+            change this label if the widget is used in a non English
+            application.
+
+        *   $text_view->LabelConfig(*"-cursor=> 'dot'"*)
+
+            Change one label widget option (for example cursor).
+
+        *   $text_view->LabelConfig(*{text=>'Find:',-cursor=>'dot',...}*)
+
+            Replace label widget options with your own set of options. Do
+            not change the 'Name' option of the label widget. See Tk::Label
+            for valid options
+
+    *$text_view*->EntryConfig(string or hash ref)
+        Change the entry widget options. Read LabelConfig for information
+        about parameters. See Tk::Entry for valid options.
+
+BINDINGS
+    For inherited bindings look Tk::Text. Following are class specific
+    bindings.
+
+    "Space"
+        Clicking Space will move text one page ahead.
+
+    "BackSpace"
+        Clicking BackSpace will move text one page up.
+
+    "Slash"
+        Clicking "/" will open text search window.
+
+    "n" Clicking "n" will move to next search match.
+
+    "N" Clicking "N" will move to next previous match.
+
+    "Control-A"
+        Find all occurrences of searched item.
+
+UNICODE
+    If $ENV{LANG} is a 'UTF-8' locale, file load will assume "utf8"
+    characters in file.
+
+SEE ALSO
+    viewer.pl - A utility using Tk::Text::Viewer included with this package.
+
+    Tk::Text, Tk::Widget, Tk::More, Tk documentation.
+
+AUTHOR
+        Tk::Text::Viewer was written by Oded S. Resnik <raz@raz.co.il> in
+        2003.
+
+        Copyright (c) 2003-2004 RAZ Information Systems All rights reserved.
+        *http://www.raz.co.il/*
+
+        You may distribute under the terms of either the GNU General Public
+        License or the Artistic License, as specified in the Perl README
+        file
+
+=== README Viewer.pod done ...
+=== Viewer.html done ...

@@ -1,0 +1,19 @@
+Changes
+GentooFunctions.pm
+GentooFunctions.pod
+MANIFEST
+Makefile.PL
+README
+t/01_load_them.t
+t/03_call_all.t
+t/05_execute_things.t
+t/07_do_things.t
+t/09_test_edo_returns.t
+t/10_edo_under_quiet.t
+test_scripts/makefile_rmfile.pl
+test_scripts/spinner.pl
+test_scripts/test_edo_returns.pl
+test_scripts/test_edo_various_recurse.pl
+test_scripts/really_long.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

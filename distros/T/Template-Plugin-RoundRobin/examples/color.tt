@@ -1,0 +1,11 @@
+[% USE RoundRobin %]
+[% SET rr = RoundRobin.new("blue","red","green") %]
+
+<table>
+[% FOR row = rows %]
+<tr style="color:[% rr.next %]">
+    <td>...</td>
+</tr>
+[% END %]
+</table>
+

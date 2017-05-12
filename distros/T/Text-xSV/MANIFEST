@@ -1,0 +1,10 @@
+Changes
+lib/Text/xSV.pm
+MANIFEST
+Makefile.PL
+test.pl
+test.csv
+README
+Build.PL
+Build
+META.yml

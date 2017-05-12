@@ -1,0 +1,27 @@
+---
+abstract: 'Normalize text based on the NACO rules'
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Normalize-NACO
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Text::Unidecode: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bricas/text-normalize-naco/tree/master
+version: 0.13

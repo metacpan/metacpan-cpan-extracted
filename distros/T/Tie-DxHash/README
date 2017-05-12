@@ -1,0 +1,44 @@
+Tie-DxHash
+==========
+
+
+
+DESCRIPTION
+
+Tie::DxHash implements a hash which preserves insertion order and allows
+duplicate keys.  It was written to facilitate the use of more complex
+mod_rewrite rules in Apache configuration files written with Perl Sections.
+See the module's POD for details.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001, Kevin Ruscoe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

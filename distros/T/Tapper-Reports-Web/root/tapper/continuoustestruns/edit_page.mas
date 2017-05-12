@@ -1,0 +1,184 @@
+<style type="text/css">
+
+    #bt_error_idx {
+        color: red;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    #bt_add_continuous_testrun_idx {
+        width: 946px;
+    }
+
+    table {
+        width: 950px;
+        border-collapse: collapse;
+    }
+    table tr > td:nth-child(1) {
+        width: 120px;
+        font-weight: bold;
+        vertical-align: top;
+    }
+    table td {
+        background-color: #d3d3d3;
+        border: 1px solid #585858;
+        padding: 2px;
+    }
+    table img {
+        border: none;
+        margin-bottom: -3px;
+        margin-right: -5px;
+        cursor: pointer;
+    }
+    table select {
+        width: 827px;
+    }
+
+    input.intopic {
+        width: 820px;
+    }
+    input.achost,
+    input.prcshort {
+        width: 805px;
+    }
+    textarea {
+        width:  805px;
+        height: 150px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        margin-left: 14px;
+    }
+
+</style>
+
+<div id="bt_error_idx" style="display:<% $c->stash->{error} ? 'block' : 'none' %>"><% $c->stash->{error} || q## %></div>
+
+<a href="/tapper/continuoustestruns">&laquo; back to overview</a>
+
+<br /><br />
+
+<form id="fo_save_idx" action="/tapper/continuoustestruns/save">
+    <input type="hidden" name="command" value="<% $c->stash->{command} %>" />
+    <input type="hidden" name="testrun_id" value="<% $c->stash->{continuous_testrun}{testrun_id} %>" />
+    <table id="tb_testruns_idx">
+        <tr>
+            <td>Topic:</td>
+            <td><input type="text" class="intopic" name="topic" value="<% $c->stash->{continuous_testrun}{topic} %>"</td>
+        </tr>
+        <tr>
+            <td>Queue:</td>
+            <td>
+                <select name="queue">
+                    <& /tapper/selects/queue.mas, queue => $c->stash->{continuous_testrun}{queue} &>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Requested Host(s):</td>
+            <td>
+%               my $i_host_counter = 0;
+%               for my $ar_host ( @{$c->stash->{continuous_testrun}{host}} ) {
+%                   if ( $i_host_counter++ ) {
+                        <img src="/tapper/static/images/minus.png" class="delhost" />
+%                   }
+%                   else {
+                        <img src="/tapper/static/images/plus.png" class="addhost" />
+%                   }
+                    <input type="hidden" name="host" value="<% $ar_host->[0] %>" />
+                    <input type="text" class="achost" value="<% $ar_host->[1] %>" />
+%               }
+            </td>
+        </tr>
+        <tr>
+            <td>Precondition(s):</td>
+            <td>
+%               my $i_precondition_counter = 0;
+%               for my $hr_precondition ( @{$c->stash->{continuous_testrun}{preconditions}} ) {
+%                   if ( $i_precondition_counter++ ) {
+                        <img src="/tapper/static/images/minus.png" class="delprec" />
+%                   }
+%                   else {
+                        <img src="/tapper/static/images/plus.png" class="addprec" />
+%                   }
+                    <input type="text" placeholder="shortname" name="precondition_short" class="prcshort" value="<% $hr_precondition->{shortname} %>" />
+                    <textarea placeholder="precondition" class="tx_precondition" name="precondition_text"><% $hr_precondition->{text} %></textarea>
+%               }
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="button" id="bt_add_continuous_testrun_idx" value="Save" /></td>
+        </tr>
+    </table>
+</form>
+
+<link rel="stylesheet" type="text/css" href="/tapper/static/css/jquery-ui/jquery.ui.css" />
+
+<script language="JavaScript" type="text/javascript" src="/tapper/static/js/jquery-ui/jquery-ui-autocomplete.js"></script>
+<script type="text/javascript">
+
+    var available_hosts = [<% q#{# . join( q#},{#, map { '"label":"' . $_->name . '","value":"' . $_->name . '","id":' . $_->id } $c->model('TestrunDB')->resultset('Host')->search({ is_deleted => 0 }) ) . q#}# | n %>];
+
+    $(document).ready(function(){
+
+        var acoptions = {
+            source: available_hosts,
+            change: function (event, ui) {
+                if(! ui.item ){
+                    $(event.target).val('');
+                }
+                else {
+                    $(event.target).prevAll('input[type="hidden"]:first').val(ui.item.id);
+                }
+            },
+            focus: function (event, ui) {
+                return false;
+            }
+        };
+
+        $('input.achost').autocomplete(acoptions);
+        $('#tb_testruns_idx').click(function( e ){
+            var $target = $(e.target);
+            if ( $target.is('img') ) {
+                if ( $target.hasClass('addhost') ) {
+                    $target.parent().append(
+                          '<img src="/tapper/static/images/minus.png" class="delhost" /> '
+                        + '<input type="hidden" name="host" value="" />'
+                        + '<input type="text" class="achost" value="" />'
+                    ).find('input:last').autocomplete(acoptions);
+                }
+                else if ( $target.hasClass('addprec') ) {
+                    $target.parent().append(
+                          '<img src="/tapper/static/images/minus.png" class="delprec" /> '
+                        + '<input type="text" placeholder="shortname" name="precondition_short" class="prcshort" value="" />'
+                        + '<textarea placeholder="precondition" class="tx_precondition" name="precondition_text"></textarea>'
+                    );
+                }
+                else if ( $target.hasClass('delhost') || $target.hasClass('delprec') ) {
+                    $target.nextUntil('img').add($target).remove();
+                }
+            }
+        });
+
+        $('#bt_add_continuous_testrun_idx').click(function(){
+            var $inputs =
+                $('#tb_testruns_idx input:text, #tb_testruns_idx textarea')
+                    .removeClass('redborder')
+                    .not('.prcshort')
+                    .filter(function(){ return (/^\s*$/).test( $(this).val() ) })
+                    .addClass('redborder')
+                    .first()
+                        .focus()
+                    .end()
+            ;
+            if ( $inputs.length > 0 ) {
+                $('#bt_error_idx').text('empty text fields found');
+                $('#bt_error_idx').show();
+            }
+            else {
+                $('#bt_error_idx').hide();
+                $('#fo_save_idx').submit();
+            }
+        });
+
+    });
+
+</script>

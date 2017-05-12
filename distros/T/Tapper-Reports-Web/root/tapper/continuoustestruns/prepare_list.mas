@@ -1,0 +1,117 @@
+<link rel="stylesheet" type="text/css" href="/tapper/static/css/jquery-plugins/jquery.tablesorter.css" />
+<style type="text/css">
+
+    #idx_dv_error {
+        font-weight: bold;
+        color:red;
+        margin: 20px;
+    }
+    #idx_continuous_table img {
+        cursor: pointer;
+        margin-left: 10px;
+        margin-bottom: -4px;
+    }
+    #idx_continuous_table tr:nth-child(even) {
+        background-color: #EDEDED;
+    }
+    td, th {
+        vertical-align: top;
+    }
+    th {
+        height: 20px;
+    }
+
+
+</style>
+
+%   if( $c->stash->{error} ) {
+        <div id="idx_dv_error"><% $c->stash->{error} %></div>
+%   }
+
+<table id="idx_continuous_table" class="reportlist tablesorter">
+    <thead>
+        <tr>
+             <th>ID</th>
+             <th>Created At (GMT)</th>
+             <th>Topic</th>
+             <th>Queue</th>
+             <th>Requested Hosts</th>
+             <th>Owner</th>
+             <th colspan="4">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+
+%   for my $hr_testrun ( @{$c->stash->{continuous_testruns}} ) {
+        <tr>
+            <td>
+                <a title="Click to show details" href="/tapper/testruns/id/<% $hr_testrun->{testrun_id} %>">tr<% $hr_testrun->{testrun_id} %></a>
+            </td>
+            <td><% $hr_testrun->{testrun_date} %></td>
+            <td><% $hr_testrun->{topic_name} %></td>
+            <td><% $hr_testrun->{queue_name} %></td>
+            <td><% join '<br />', split /,/, $hr_testrun->{hosts} | n %></td>
+            <td><% $hr_testrun->{owner} %></td>
+            <td>
+%               if ( $hr_testrun->{status} eq 'prepare' ) {
+                    <img src="/tapper/static/images/continue.small.png" class="continue" title="continue continuous testing" />
+%               }
+%               else {
+                    <img src="/tapper/static/images/pause.small.png" class="pause" title="pause continuous testing" />
+%               }
+            </td>
+            <td>
+                <img src="/tapper/static/images/edit.small.png" class="edit" title="edit continuous testrun" />
+            </td>
+            <td>
+                <img src="/tapper/static/images/clone.small.png" class="clone" title="clone continuous testrun" />
+            </td>
+            <td>
+                <img src="/tapper/static/images/delete.small.png" class="cancel" title="cancel continuous testrun" />
+            </td>
+        </tr>
+%   }
+
+    </tbody>
+</table>
+
+<script language="JavaScript" type="text/javascript" src="/tapper/static/js/jquery-plugins/jquery.tablesorter.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function(){
+
+        $.tablesorter.addParser({
+            id      : 'testrunid',
+            is      : function(){ return false },
+            format  : function(s) {
+                return s.replace(/\D/g,'');
+            },
+            type    : 'numeric'
+        });
+
+        $('#idx_continuous_table')
+            .click(function( e ){
+                var $target  = $(e.target);
+                var commands = ['pause','continue','edit','clone','cancel'];
+                for ( var i = 0; i < commands.length; i = i + 1 ) {
+                    if ( $target.hasClass(commands[i]) ) {
+                        if ( commands[i] == 'cancel' ) {
+                            if (! confirm("Really delete?") ){
+                                break;
+                            }
+                        }
+                        location.href = "/tapper/continuoustestruns/" + commands[i] + "?testrun_id=" + $target.closest('tr').find('td:first').text().replace(/\D/g,'');
+                        break;
+                    }
+                }
+            })
+            .tablesorter({
+                headers : {
+                    0 : { sorter : 'testrunid' },
+                    6 : { sorter : false }
+                }
+            })
+        ;
+
+    });
+</script>

@@ -1,0 +1,24 @@
+Revision history for Types::DBIx::Class
+
+1.000006 June 2, 2015
+
+    * Remove "make_immutable" calls to Type::Tiny, it is not needed, and can interfere with non-Moose/Mouse tests.
+
+1.000005 May 28, 2015
+
+    * Older Sub::Quote didn't set package, so be explicit when calling _eq_array
+
+1.000003 & 004 May 26, 2015
+
+    * Added test prereq SQL::Translator, thanks to CPANTESTER smokers.
+    * Declared Perl 5.010 required due to using defined-OR. Can remove that feature if there's demand to run under Perl 5.0008
+
+1.000002 May 25, 2015
+
+    * Fixed typo in META dependency list. Thanks A. Ciornii for reporting.
+
+1.000000 April 27, 2015
+1.000001 May 13, 2015
+
+    * Initial version, forked from MooseX::Types::DBIx::Class
+    * plus minor packaging and test improvements for CPAN release

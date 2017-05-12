@@ -1,0 +1,10 @@
+---
+version: 0.11
+date:    Sun Jun 12 03:15:54 PDT 2005
+changes:
+- Use Test::Base for testing
+---
+version: 0.10
+date:    Sat May 14 18:51:50 PDT 2005
+changes:
+- Initial version of Test::Less

@@ -1,0 +1,85 @@
+Revision history for Perl module Test::Number::Delta
+
+1.06      2014-11-25 07:09:08-05:00 America/New_York
+
+    [Fixed]
+
+    - Make 0 and 0 compare equal with a relative epsilon
+
+    [Documented]
+
+    - Added SEE ALSO with Number::Tolerant and Test::Deep::NumberTolerant
+
+1.05      2014-11-24 11:08:11-05:00 America/New_York
+
+    [Fixed]
+
+    - relative comparison of array reference elements now works as intended
+
+    - diagnostics of delta_not_ok and delta_not_within clarified under
+      relative comparison
+
+1.04      2013-11-20 18:43:32 America/New_York
+
+    - Modernized distribution metadata and licensing
+
+    - Distribution now managed with Dist::Zilla
+
+1.03 Sun Sep  3 03:21:59 EDT 2006
+    - fixed logic errors for delta_not_*
+    - changed epsilon restriction to just non-zero; negative epsilons are
+      the same as positive
+    
+1.02 Tue Aug 29 05:37:53 EDT 2006
+    - added error checking to ensure that values of epsilon are always positive
+    - added delta_not_within() and delta_not_ok() for inequality checking
+
+1.01 Thu Jul 27 11:34:29 EDT 2006
+    - changed comparison to less than epsilon, as checking "equal to"
+      epsilon is, of course, not robust for floating point numbers
+      
+1.00 Tue Jul 25 18:19:51 EDT 2006
+    - bumped version to 1.00 to indicate "release" status
+    - added support for comparing arrays or matrices
+    - bumped Test::Builder dependency to match my installed version
+
+0.18 Sun Feb  5 06:48:15 EST 2006
+    - removed Test::Exception as dependency
+    - restored pod/pod-coverage tests as optional (skipped by default)
+    - edited Pod for bugs/license tests
+    - removed 5.006 syntax (warnings!) from test files
+
+0.17 Mon Aug  1 10:55:13 EDT 2005
+    - build_requires moved to requires to workaround CPANPLUS bug
+
+0.16 Thu Jun  9 15:55:03 EDT 2005
+    - removed pod/podcoverage testing to minimize dependencies
+
+0.15 Tue Jun  7 17:46:36 EDT 2005
+    - updated Build.PL for dependencies and traditional makefiles
+
+0.14 Tue Mar  8 22:43:31 EST 2005
+    - added pod and pod coverage testing
+
+0.13 Wed Feb  2 22:06:56 EST 2005
+    - added ability to pass through a test plan
+    - added a parameter to specify that the default epsilon for delta_ok
+      should be relative to the size of the arguments
+    - updated pod in several areas for clarity and consistency
+
+0.12 Mon Jan 24 23:45:21 EST 2005
+    - pod fix
+    - Build.PL cleanup
+
+0.11 Tue Jan  4 00:01:20 EST 2005
+    - renamed to Test::Number::Delta
+    - renamed cmp_float() to delta_ok()
+    - added delta_within()
+    - added extra decimal place to numbers under comparison when printing
+      diagnostics
+
+0.10 Sun Dec 26 14:18:36 EST 2004
+    - initial release as Test::Float
+
+0.01 Sun Dec 26 13:12:10 2004
+	- original version; created by ExtUtils::ModuleMaker::TT

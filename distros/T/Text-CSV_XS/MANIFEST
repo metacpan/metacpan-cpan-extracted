@@ -1,0 +1,49 @@
+ChangeLog		Change history
+README			Docs
+MANIFEST		This file
+CONTRIBUTING.md		Guide in how to contribute
+CSV_XS.pm		Perl part of the module
+CSV_XS.xs		C part of the module
+Makefile.PL		Makefile generator
+ppport.h		Perl/Pollution/Portability script/include file
+t/00_pod.t		Check if pod is valid
+t/01_pod.t		Check if pod covers all
+t/10_base.t		Base tests (combine and parse only)
+t/12_acc.t		Accessor methods
+t/15_flags.t		Basic flag tests
+t/20_file.t		IO tests (print and getline) global  handles
+t/21_lexicalio.t	IO tests (print and getline) lexical handles
+t/22_scalario.t		IO tests (print and getline) scalar io (perlio)
+t/30_types.t		Tests for the "types" attribute.
+t/40_misc.t		Binary mode tests
+t/41_null.t		NULL test in combination with line endings
+t/45_eol.t		Embedded EOL
+t/46_eol_si.t		Embedded EOL using scalar io (perlio)
+t/50_utf8.t		Unicode stress tests
+t/51_utf8.t		Unicode IO encoding tests
+t/55_combi.t		Different CSV character combinations
+t/60_samples.t		Miscellaneous problems from the modules history.
+t/65_allow.t		Allow bad formats
+t/70_rt.t		Tests based on RT reports
+t/75_hashref.t		getline_hr related tests
+t/76_magic.t		array_ref from magic
+t/77_getall.t		Get all rows at once
+t/78_fragment.t		Get fragments according to RFC7111 specs
+t/79_callbacks.t	Test callback features
+t/80_diag.t		Error diagnostics
+t/81_subclass.t		Subclassed
+t/85_util.t		Test for utility methods
+t/90_csv.t		Function csv () checks
+t/91_csv_cb.t		Callbacks with csv function
+t/util.pl		Extra test utilities
+examples/csv2xls	Script to onvert CSV files to M$Excel       XLS
+examples/csv2xlsx	Script to onvert CSV files to M$Excel 2007+ XLSX
+examples/csv-check	Script to check a CSV file/stream
+examples/csvdiff	Script to shoff diff between sorted CSV files
+examples/parser-xs.pl	Parse CSV stream, be forgiving on bad lines
+examples/rewrite.pl	Simple CSV rewriter
+examples/speed.pl	Small benchmark script
+files/macosx.csv	A CSV files exported on MacOSX
+files/utf8.csv		A UTF-8 encode test file
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

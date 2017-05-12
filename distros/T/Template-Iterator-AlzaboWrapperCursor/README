@@ -1,0 +1,69 @@
+NAME
+    Template::Iterator::AlzaboWrapperCursor - Turns a
+    Class::AlzaboWrapper::Cursor object into a TT2 iterator
+
+SYNOPSIS
+      my $users =
+          Template::Iterator::AlzaboWrapperCursor->new($cursor);
+      # pass $users to a template
+
+      my $users_with_pages =
+          Template::Iterator::AlzaboWrapperCursor->new($users_with_pages);
+
+    In a template:
+
+      [% FOREACH user = users %]
+        Name: [% user.name %]<br />
+      [% END %]
+
+      [% FOREACH user_with_page = users_with_pages %]
+        [% user_with_page.user.name %]: [% user_with_page.page.title %]
+      [% END %]
+
+DESCRIPTION
+    This module allows a "Class::AlzaboWrapper::Cursor" object to be used as
+    a TT2 iterator.
+
+USAGE
+    For a cursor which returns one object at a time, the iterator simply
+    returns one object per iteration. When the cursor returns multiple
+    objects, the iterator returns a hash reference where the keys are the
+    table name of the object's class in lower-case, with camel-casing turned
+    into underscores. The values of the hash are the objects.
+
+    So if the cursor returns "Foo::User" and "Foo::Page" objects, the keys
+    are "user" and "page".
+
+METHODS
+    This class provides the following methods:
+
+  new($cursor)
+    This method accepts a "Class::AlzaboWrapper::Cursor" object and returns
+    an iterator suitable for use in TT2 templates.
+
+WISHLIST
+    I wish that TT2 allowed multiple assignment in "FOREACH" loops so we
+    could just do this:
+
+      [% FOREACH user, page = users_with_pages %]
+
+    That's so much cleaner.
+
+AUTHOR
+    Dave Rolsky, <autarch@urth.org>
+
+    Initially written for Socialtext, Inc.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-template-iterator-alzabowrappercursor@rt.cpan.org", or through the
+    web interface at <http://rt.cpan.org>. I will be notified, and then
+    you'll automatically be notified of progress on your bug as I make
+    changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Dave Rolsky, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

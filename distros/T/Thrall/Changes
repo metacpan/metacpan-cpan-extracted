@@ -1,0 +1,74 @@
+0.0305  2017-01-03      Thomas Stinner <me@stinnux.de>
+
+* Allow setting of SSL CA and SSL Verification Mode
+
+0.0304  2016-03-28      Piotr Roszatycki <dexter@cpan.org>
+
+* Use address 127.0.0.1 rather than localhost for testing.
+
+0.0303  2015-08-02      Piotr Roszatycki <dexter@cpan.org>
+
+* The default protocol is HTTP/1.0.
+* Bugfix for 08chunked_req.t: should not use external files.
+
+0.0302  2014-11-16      Piotr Roszatycki <dexter@cpan.org>
+
+* Workaround for HTTP::Tiny + Test::TCP conflict, which prevented installing
+  this package.
+
+0.0301  2014-06-30      Piotr Roszatycki <dexter@cpan.org>
+
+* Minor fixes in POD documentation
+
+0.0300  2014-06-28      Piotr Roszatycki <dexter@cpan.org>
+
+* Based on Starlight 0.0302
+* Does not hang up on daemonize without error log file.
+* Bugfix for streaming mode (Use of uninitialized value).
+* Requirement for Time::HiRes is optional.
+* Suggests Time::TZOffset on Windows.
+* Support for "quiet", "user", "group", "umask", "daemonize", "pid" and
+  "error-log" options.
+
+0.0202  2014-01-21      Piotr Roszatycki <dexter@cpan.org>
+
+* Handle SIGINT (ctrl-c) gracefully.
+
+0.0201  2013-12-29      Piotr Roszatycki <dexter@cpan.org>
+
+* Unset http_proxy environment variable on tests.
+
+0.0200  2013-12-24      Piotr Roszatycki <dexter@cpan.org>
+
+* Based on Starlet 0.21
+* Supports HTTP/1.1
+* Supports IPv6 and SSL
+* Supports UNIX socket
+* Thrall::Server class accepts listen_sock as an argument
+
+0.0103  2013-12-11      Piotr Roszatycki <dexter@cpan.org>
+
+* Non joined threads are detached. It might increase stability on
+  Windows.
+* The default loader is Delayed because of problems with preloaded apps by
+  threaded server.
+* New option --thread-stack-size sets a new default per-thread stack size.
+* Tests are skipped on Windows because of broken Test::TCP on this
+  platform.
+
+0.0102  2013-07-14      Piotr Roszatycki <dexter@cpan.org>
+
+* Increased default max-reqs-per-child to 1000.
+* Supports psgix.harakiri mode.
+* Supports forks if threads are unavailable.
+* More detailed Server header.
+* Increased stability on Windows XP and 7.
+* Handles errors in threads and converts them into warnings.
+
+0.0101  2013-06-15      Piotr Roszatycki <dexter@cpan.org>
+
+* Build.PL checks if threads are available.
+
+0.01    2013-06-15      Piotr Roszatycki <dexter@cpan.org>
+
+* First CPAN release.

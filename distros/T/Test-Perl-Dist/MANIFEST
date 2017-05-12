@@ -1,0 +1,26 @@
+Build.PL
+Changes
+lib/Test/Perl/Dist.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+releaserc
+t/001_compile.t
+t/settings/perlcritic.txt
+t/settings/perltidy.txt
+xt/author/800_perlcritic.t
+xt/author/801_pod.t
+xt/author/802_pod_coverage.t
+xt/author/803_minimumversion.t
+xt/author/804_manifest.t
+xt/author/805_meta.t
+xt/author/806_portability.t
+xt/author/807_version.t
+xt/author/808_changes.t
+xt/author/809_fixme.t
+xt/author/810_common_mistakes.t
+xt/author/899_prereq.t
+xt/settings/perlcritic.txt
+xt/settings/perltidy.txt

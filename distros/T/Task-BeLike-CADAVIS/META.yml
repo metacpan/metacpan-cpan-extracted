@@ -1,0 +1,48 @@
+---
+abstract: "Chad's favorites"
+author:
+  - 'Chad A Davis <chad.a.davis@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-BeLike-CADAVIS
+requires:
+  Bundle::CPAN: 0
+  Class::DBI: 0
+  DBD::mysql: 0
+  Log::Any: 0
+  Mason: 0
+  PDL: 0
+  Sort::Key: 0
+  Task::CPAN::Reporter: 0
+  Task::Catalyst: 0
+  Task::Dist::Zilla: 0
+  Task::Kensho::CLI: 0
+  Task::Kensho::DBDev: 0
+  Task::Kensho::Exceptions: 0
+  Task::Kensho::Hackery: 0
+  Task::Kensho::ModuleDev: 0
+  Task::Kensho::OOP: 0
+  Task::Kensho::Scalability: 0
+  Task::Kensho::Testing: 0
+  Task::Kensho::Toolchain: 0
+  Test::Approx: 0
+  Test::Class: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/chadadavis/Task-BeLike-CADAVIS/issues
+  homepage: https://github.com/chadadavis/Task-BeLike-CADAVIS
+  repository: https://github.com/chadadavis/Task-BeLike-CADAVIS.git
+version: 20111013

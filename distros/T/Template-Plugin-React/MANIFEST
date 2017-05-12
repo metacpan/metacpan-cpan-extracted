@@ -1,0 +1,12 @@
+lib/Template/Plugin/React.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+src/Makefile.PL
+src/MYMETA.json
+src/MYMETA.yml
+src/RESimple.cxx
+src/RESimple.h
+src/RESimple.i
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

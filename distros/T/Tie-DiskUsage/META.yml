@@ -1,0 +1,32 @@
+---
+abstract: 'Tie disk usage to a hash'
+author:
+  - 'Steven Schubiger <schubiger@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-DiskUsage
+provides:
+  Tie::DiskUsage:
+    file: lib/Tie/DiskUsage.pm
+    version: '0.22'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Which: '0'
+  Symbol: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/stsc/Tie-DiskUsage
+version: '0.22'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

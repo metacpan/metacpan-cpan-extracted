@@ -1,0 +1,19 @@
+<%args>
+$done
+$precondition
+</%args>
+
+% if (not $done){
+<H3>Do you really want to delete Precondition <% $precondition->id %>?</h3>
+<ul class="additional_table">
+  <li><a href="/tapper/preconditions/delete/<% $precondition->id %>/force/">Really delete Precondition <% $precondition->id %></a></li>
+  <li><a href="/tapper/preconditions/id/<% $precondition->id %>">Go back to overview of Precondition <% $precondition->id %></a></li>
+</ul>
+% } else {
+
+<h1>Precondition <% $precondition->id %> deleted</h1>
+% }
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+

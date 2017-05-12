@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+Build.PL
+MANIFEST
+README
+t/Template-Plugin-Textile2.t
+lib/Template/Plugin/Textile2.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,310 @@
+#!/usr/bin/perl
+
+###############################################################################
+#
+# This file copyright (c) 2009 by Randy J. Ray, all rights reserved
+#
+# Copying and distribution are permitted under the terms of the Artistic
+# License 2.0 (http://www.opensource.org/licenses/artistic-license-2.0.php) or
+# the GNU LGPL (http://www.opensource.org/licenses/lgpl-2.1.php).
+#
+###############################################################################
+#
+#   Description:    Command-line processor for converting Textile markup to
+#                   other formats.
+#
+#   Libraries:      Getopt::Long
+#                   App::Textile2x
+#
+#   Global Consts:  $VERSION
+#                   $USAGE
+#                   $cmd
+#
+###############################################################################
+
+use 5.008;
+use strict;
+use vars qw($cmd $USAGE $VERSION);
+use subs qw(process);
+
+use Getopt::Long;
+
+use App::Textile2x;
+
+$VERSION = '0.100';
+($cmd = $0) =~ s|.*/||;
+$USAGE = "$cmd [ --help ] [ --input FILE ] [ --output FILE ] [ --format FMT ]
+\t[ --convert FILE1 --convert FILE2 ... ]";
+
+our (%opts, $input, $output, $format, %suffixes, $app, @queue);
+GetOptions(\%opts, qw(help input=s output=s format=s convert=s@))
+    or die "Usage:\n$USAGE\nStopped";
+
+if ($opts{help})
+{
+    print "Usage:
+$USAGE
+
+where:
+
+--input FILE          Specify a file to read as input, containing Textile
+--output FILE         Specify a file to write to as output, with converted
+                        content
+--format FMT          Select a format to convert the Textile input to, one of
+                        'plaintext' (the default), 'postscript' or 'rtf'
+
+--convert NAME        Convert the named file, writing the output to a file with
+                        the same base-name but different suffix (see manual
+                        page for details)
+
+--help                Display this summary
+";
+    exit 0;
+}
+
+$app      = App::Textile2x->new();
+%suffixes = (plaintext => 'txt', postscript => 'ps', rtf => 'rtf');
+$format   = $opts{format} ? lc $opts{format} : 'plaintext';
+die "Unknown format: $format, stopped" unless $suffixes{$format};
+
+if ($opts{convert})
+{
+    my $localfmt;
+    my %suffixmap = reverse %suffixes;
+
+    for my $opt (@{$opts{convert}})
+    {
+        ($input, $output) = split(/=/, $opt, 2);
+        if ($output)
+        {
+            # If they specified an output destination, use the suffix (if there
+            # is one) to determine output format:
+            if (($output =~ /^.*\.(.*)$/) && $suffixmap{$1})
+            {
+                $localfmt = $suffixmap{$1};
+            }
+            else
+            {
+                # If no suffix or an unrecognized suffix, fall back to the
+                # --format argument, which itself defaults to "plaintext":
+                $localfmt = $format;
+            }
+        }
+        else
+        {
+            # If they didn't specify the conversion destination, take the input
+            # name, strip any suffix, and apply the proper suffix for the
+            # format given in --format (which may just be the default of
+            # "plaintext"):
+            ($output = $input) =~ s/(.*)\..*/$1/;
+            $output .= ".$suffixes{$format}";
+            $localfmt = $format;
+        }
+
+        push(@queue, [$input, $output, $localfmt]);
+    }
+}
+else
+{
+    # In absence of any --convert options, use --input and --output, with
+    # defaulting to STDIN and STDOUT:
+    $input  = $opts{input}  || \*STDIN;
+    $output = $opts{output} || \*STDOUT;
+
+    @queue = ([$input, $output, $format]);
+}
+
+for (@queue)
+{
+    my ($source, $sink);
+    ($input, $output, $format) = @$_;
+
+    if (ref($input))
+    {
+        $source = $input;
+    }
+    else
+    {
+        unless (open($source, '<', "$input"))
+        {
+            warn "Could not open $input for reading: $!, skipping";
+            next;
+        }
+    }
+    if (ref($output))
+    {
+        $sink = $output;
+    }
+    else
+    {
+        unless (open($sink, '>', "$output"))
+        {
+            warn "Could not open $output for writing: $!, skipping";
+            next;
+        }
+    }
+
+    eval { $app->convert($source, $sink, $format); };
+    warn $@ if $@;
+}
+
+exit 0;
+
+=head1 NAME
+
+textile2x - Convert Textile markup from the command-line
+
+=head1 SYNOPSIS
+
+    # Each of these does the exact same thing
+
+    textile2x --input README.textile --output README
+
+    textile2x < README.textile > README
+
+    textile2x --convert README.textile=README
+
+=head1 DESCRIPTION
+
+B<textile2x> is a simple script that converts Textile markup to any of the
+formats supported by the C<Text-Textile-Plaintext> CPAN distribution.
+Currently, the list of formats includes:
+
+=over 4
+
+=item Plain text
+
+=item PostScript
+
+=item Rich-Text Format
+
+=back
+
+One or more inputs can be converted at a time, and not all inputs have to be
+converted to the same output format. See L</OPTIONS>.
+
+Depending on the command-line options, input may be redirected from STDIN, and
+output may be redirected to STDOUT.
+
+=head1 OPTIONS
+
+The following options are recognized by B<textile2x>:
+
+=over 4
+
+=item --format FORMAT
+
+Specifies the default format for conversions. The default conversion format is
+C<plaintext>. The allowable values are:
+
+=over 8
+
+=item plaintext
+
+=item postscript
+
+=item rtf
+
+The argument to C<--format> is not case-sensitive.
+
+=back
+
+=item --input FILE
+
+Specify a file to read from. If this option is not present and there are no
+instances of the C<--convert> option, then standard-input is read.
+
+=item --output FILE
+
+Specify the file to write to. If this option is not present and there are no
+instances of the C<--convert> option, then the converted content is written
+to standard-output.
+
+=item --convert NAME[=NAME]
+
+This option may appear more than once, to allow multiple conversions done in
+a single invocation of the tool.
+
+Each name provided is read as Textile content, and converted. If a second name
+is provided (using C<=> to separate them, no spaces are allowed between the
+names and the C<=>), it is used as the output destination. If the output file
+has a suffix, it is used to determine the format of the output:
+
+=over 8
+
+=item .txt
+
+Output will be C<plaintext>.
+
+=item .ps
+
+Output will be C<postscript>.
+
+=item .rtf
+
+Output will be C<rtf> (Rich-Text Format).
+
+=back
+
+If no output name is given, the input name is used. Any suffix it has is
+removed, and a suffix corresponding to the default format (as specified by
+the C<--format> option, or defaulting to C<plaintext>) is used.
+
+=item --help
+
+Displays a short help-message with a summary of the options.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-text-textile-plaintext at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Textile-Plaintext>. I
+will be notified, and then you'll automatically be notified of progress on your
+bug as I make changes.
+
+=head1 SUPPORT
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Textile-Plaintext>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Text-Textile-Plaintext>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Text-Textile-Plaintext>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Text-Textile-Plaintext>
+
+=item * Source code on GitHub
+
+L<http://github.com/rjray/text-textile-plaintext/tree/master>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+This file and the code within are copyright (c) 2009 by Randy J. Ray.
+
+Copying and distribution are permitted under the terms of the Artistic
+License 2.0 (L<http://www.opensource.org/licenses/artistic-license-2.0.php>) or
+the GNU LGPL 2.1 (L<http://www.opensource.org/licenses/lgpl-2.1.php>).
+
+=head1 SEE ALSO
+
+L<Text::Textile::Plaintext>, L<Text::Textile::PostScript>,
+L<Text::Textile::RTF>
+
+=head1 AUTHOR
+
+Randy J. Ray C<< <rjray@blackperl.com> >>
+
+=cut

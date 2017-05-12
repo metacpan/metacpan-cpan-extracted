@@ -1,0 +1,46 @@
+Revision history for Test::Corpus::Audio::MPD
+
+1.120990  2012-04-08 11:11:16 Europe/Paris
+ - rt#76383 - fix ipv4/ipv6 binding tests (florian schlich)
+
+1.113282  2011-11-24 14:49:26 Europe/Paris
+ - new file to test "genre" tag
+
+1.113281  2011-11-24 14:41:04 Europe/Paris
+ - listen on ipv6
+
+1.113280  2011-11-24 14:00:10 Europe/Paris
+ - fix rt#71202 - using software mixer to prevent volume setting perm
+
+1.111260  2011-05-06 14:15:25 Europe/Paris
+ - fix rt#67982 - use mpd return value to see if there was an error
+
+1.110710  2011-03-12 16:00:56 Europe/Paris
+ - fix rt#66573 - unrecognized config parameter in mpd 0.16 (Alessandro
+   Ghedini)
+
+1.110600  2011-03-01 14:20:28 Europe/Paris
+ - rt#66262 - since mpd 0.16.x, option --create-db has been removed
+
+1.100500  2010-02-19 11:17:34 Europe/Paris
+ - clarify ogg files license for debian
+
+1.100430  2010-02-12 13:58:06 Europe/Paris
+ - WARNING: no more makefile.pl supplied, only a build.pl
+ - using file::sharedir for embedded test files
+ - using path::class internally
+
+1.093230  2009-11-19 17:16:35 Europe/Paris
+ - pod update
+
+1.092920 Mon Oct 19 16:48:42 2009
+ - require perl 5.8.x
+ - add checks to see if mpd (really music player daemon) is installed
+
+1.092900 Sat Oct 17 16:36:33 2009
+ - null output cannot setvol with mpd 0.15
+ - playlist need to be in a writable directory for tests
+
+1.092890 Fri Oct 16 15:54:46 2009
+ - original release, taken from audio-mpd
+ - fixed to match mpd 0.15 behaviour

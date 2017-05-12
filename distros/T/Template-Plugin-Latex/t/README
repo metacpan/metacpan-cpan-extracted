@@ -1,0 +1,11 @@
+This is the Template::Latex unit test directory.
+
+It contains the unit test files and the directories:
+
+    lib     contains a test helper module
+    input   contains test input files
+    output  this is the destination for testing of generated DVI/PS/PDF documents
+
+The unit test 11-plugin-errors.t is does not yet pass - the errors are
+in the test script. I have marked the script as skip_all until I get
+round to sorting out the tests again.

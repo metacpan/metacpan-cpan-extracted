@@ -1,0 +1,18 @@
+Tree::Simple::DepthFirst is Copytight © 2017 by René Nyffenegger
+
+LICENSE INFORMATION
+  please see the file LICENSE
+
+INSTALLING
+
+  Use the usual trilogy
+    perl Makefile.PL
+    make
+   [make test]
+    su
+    make install
+
+    note: on MS Windows-like systems, 'make' might be called 'nmake' or 'dmake'
+
+  or
+    cpan Tree::Create::DepthFirst

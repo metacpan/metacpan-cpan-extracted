@@ -1,0 +1,109 @@
+=head1 NAME
+
+Toadfarm::Manual::Config - Config format for Toadfarm apps
+
+=head1 DESCRIPTION
+
+This manual gives in-depth information about the config options that can
+be given to an application.
+
+=head2 Basics
+
+The basic structure of the application is shown below. This document
+covers the C<%config> part given to L<Toadfarm::Manual::DSL/mount>.
+
+  #!/usr/bin/perl
+  use Toadfarm -init;
+  mount "MyApp" => \%config;
+  start;
+
+=head2 Apps
+
+The L<mount|Toadfarm::Manual::DSL/mount> function is used to define the
+available apps that L<Toadfarm> should serve.
+
+The C<%config> is either HTTP headers to trigger on or L</Special fields>.
+
+The config example below contain all the special fields that you can use and
+a list of example headers to filter on. Each key (except "config") is used
+to filter the incoming request, and ALL the specified values must match
+for the request to get passed on to a given application.
+
+  mount "Some::Application" => {
+
+    # headers
+    "Host"           => qr{^(www.)?example.com$},
+    "User-Agent"     => qr{curl},
+    "X-Request-Base" => "http://example.com/whatever",
+
+    # special fields
+    config         => {some_key => "value"},
+    local_port     => 8080,
+    mount_point    => "/myapp",
+    remote_address => "127.0.0.1",
+  };
+
+Example HTTP request that will get sent to "Some::Application":
+
+  -- Connect (http:example.com:8080)
+  -- Client >>> Server (http://example.com/myapp)
+  GET /myapp HTTP/1.1
+  Connection: keep-alive
+  Content-Length: 0
+  Accept-Encoding: gzip
+  Host: example.com
+  User-Agent: curl/7.32.0
+  X-Request-Base: http://example.com/whatever
+
+So if "User-Agent" is "Mojolicious (Perl)" instead, but all the other headers
+match, then the request will NOT be passed on to "Some::Application".
+
+Got difficulties getting a request through to an application? Try removing
+rules until the request gets through.
+
+=head3 Special fields
+
+Fields that are defined in the list below are special fields.
+
+=over 4
+
+=item * config => \%hash
+
+This config param will override any L<config|Mojolicious/config> parameters
+already known in the target application. It will also generate a temporary
+config file which is available as C<MOJO_CONFIG|Mojolicious::Plugin::Config/file>
+to the target application.
+
+Note: These config params are set I<after> L<startup()|Mojolicious/startup>
+is called. (This will hopefully be changed/fixed in future release of Toadfarm)
+
+=item * local_port => $str|$regex
+
+Used to only accept requests on a given L<port|Mojo::Transaction/local_port>
+access.
+
+=item * mount_point => $str
+
+The default mount point is "/". Setting this to "/foo" will only make the
+application accessible under "http://domain.com/foo".
+
+=item * remote_address => $str|$regex
+
+Used to only accept from a given L<address|Mojo::Transaction/remote_address>
+access.
+
+=item * X-Request-Base => $str
+
+This header will also set L<request base url|Mojo::URL/base> when this rule
+match. This is the same funtionality that is provided by
+L<Mojolicious::Plugin::RequestBase>.
+
+=back
+
+Additional special fields might be added, but they will always be in lower case.
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

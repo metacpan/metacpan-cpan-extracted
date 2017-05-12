@@ -1,0 +1,63 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Group::SQL::Result - construct field lists for SELECT and format the result set
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder;
+	my $placeholder = Text::Placeholder->new(
+		my $sql_result = '::SQL::Result');
+	$sql_result->placeholder_re('^fld_(\w+)$');
+	$placeholder->compile('<td>[=fld_some_name=]</td>');
+
+	my $statement = "SELECT ". join(', ', @{$sql_result->fields}). " FROM some_table";
+	print "$statement\n";
+
+	# my $rows = $dbh->selectall_arrayref($statement, ...);
+	# foreach my $row (@$rows) {...
+	my $row = [7, 8, 9];
+	$sql_result->subject($row);
+
+	print ${$placeholder->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+Provides placeholder placeholders based on a configurable RE, which needs one capture group. Placeholders are substituted by the captured pattern. A list of captures can be obtained, from which SQL statements can be constructed.
+
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item subject($row)
+
+Sets or gets the retrieved row.
+
+=item fields
+
+Gets the captured placeholder parts.
+
+=item placeholder_re
+
+The regular expression for matching placeholders.
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

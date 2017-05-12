@@ -1,0 +1,31 @@
+Text-Amuse-Compile
+
+Helpers to use Text::Amuse and produce the final products (notably,
+PDF and EPUB, which can't be produced by Text::Amuse alone without any
+other module).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::Amuse::Compile
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+

@@ -1,0 +1,23 @@
+NAME
+    Task::BeLike::CHIM::Cabinet - Install all the CPAN modules needed by
+    Cabinet
+
+VERSION
+    version 0.15
+
+DESCRIPTION
+    This Task module installs all the dependencies for the stable version of
+    Cabinet.
+
+SEE ALSO
+    Task
+
+AUTHOR
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

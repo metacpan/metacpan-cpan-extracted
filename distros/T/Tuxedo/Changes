@@ -1,0 +1,20 @@
+Revision history for Perl extension TUXEDO.
+
+0.01  Thu Dec  2 11:59:49 1999
+	- original version; created by h2xs 1.19
+
+2.05 - changed calloc to malloc + memset because calloc caused perl crash on windows when freeing memory during global destruction.
+     - Now builds and runs on WIN32
+
+2.06 - changed module and package name from 'TUXEDO' to 'Tuxedo' to follow cpan standards. 
+
+2.07 - created PERLSVR tuxedo server that runs perl subs as tuxedo services. 
+
+2.08 - now builds successfully in the following environments...
+   operating system      perl      compiler         tuxedo version
+======================================================================
+   SunOS 5.8 64bit       5.8.6     SUNWspro C 5.4   8.1 64bit RP 107
+   SunOS 5.8 32bit       5.005_03  SUNWspro C 5.4   8.0
+   AIX   5.2 64bit       5.8.4     xlC              8.1 64bit RP 107
+   HPUX  11.11 64bit     5.8.6     cc               8.1 64bit RP 107
+   WinXP SP2             5.8.6     VC++ 2003        8.1 

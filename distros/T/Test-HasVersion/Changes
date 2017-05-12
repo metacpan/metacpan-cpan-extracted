@@ -1,0 +1,28 @@
+Revision history for Perl extension Test-HasVersion.
+
+0.014 Sat Jan 2 2016
+        - add LICENSE file to the distribution (#1)
+        - fix all_pm_version_ok() failure reporting (CPAN #78758)
+        - rewrite t/04_all_ok.t using Test::Builder::Tester (CPAN #78758)
+
+0.013 Sat Jan 2 2016
+        - fix spelling error in manpage (CPAN #110709)
+
+0.012 Sat Sep 7 2006
+        - Test::Builder is a prereq
+        - test_version has version (same as HasVersion.pm)
+
+0.011 Mon Jul 17 2006
+        - Test::Builder::Tester 1.04 restored compabibility
+          and demanded changes to t/02_basic.t
+        - minor tweaks in Makefile.PL (we a have a license there now)
+
+0.01  Sat Jul 15 2006
+        - first release to CPAN
+
+undef Wed Jul 12 2006
+        - Gabor Szabo posts a message to perl-qa@perl.org wondering
+          about a Test module to check modules in a distro
+          provide correct version information.
+          <d8a74af10607120341s465fec42o52ff2874b5eab5ce@mail.gmail.com>
+          http://www.nntp.perl.org/group/perl.qa/6384

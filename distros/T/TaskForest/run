@@ -1,0 +1,220 @@
+#!/usr/bin/perl
+
+################################################################################
+#
+# File:    run
+# Date:    $Date: 2008-04-06 20:13:45 -0500 (Sun, 06 Apr 2008) $
+# Version: $Revision: 119 $
+#
+# This is the default run wrapper program.  A run wrapper is responsible for
+# executing a job and maintaining 
+#
+################################################################################
+
+use strict;
+use warnings;
+use Net::SMTP;
+
+
+my $family_name            = $ENV{TASKFOREST_FAMILY_NAME}      ;
+my $job_name               = $ENV{TASKFOREST_JOB_NAME}         ;
+my $job_file_name          = $ENV{TASKFOREST_JOB_FILE_NAME}    ;
+my $log_dir                = $ENV{TASKFOREST_LOG_DIR}          ;
+my $script_dir             = $ENV{TASKFOREST_JOB_DIR}          ;
+my $pid_file               = $ENV{TASKFOREST_PID_FILE}         ;
+my $success_file           = $ENV{TASKFOREST_SUCCESS_FILE}     ;
+my $failure_file           = $ENV{TASKFOREST_FAILURE_FILE}     ;
+my $unique_id              = $ENV{TASKFOREST_UNIQUE_ID}        ;
+my $num_retries            = $ENV{TASKFOREST_NUM_RETRIES}      ; 
+my $retry_sleep            = $ENV{TASKFOREST_RETRY_SLEEP}      ; 
+my $email                  = $ENV{TASKFOREST_EMAIL}            ;
+my $retry_email            = $ENV{TASKFOREST_RETRY_EMAIL}      ;
+my $no_retry_email         = $ENV{TASKFOREST_NO_RETRY_EMAIL}   ;
+my $instructions_dir       = $ENV{TASKFOREST_INSTRUCTIONS_DIR} ;
+my $smtp_server            = $ENV{TASKFOREST_SMTP_SERVER}      ;
+my $smtp_port              = $ENV{TASKFOREST_SMTP_PORT}        ;
+my $smtp_sender            = $ENV{TASKFOREST_SMTP_SENDER}      ;
+my $mail_from              = $ENV{TASKFOREST_MAIL_FROM}        ;
+my $mail_reply_to          = $ENV{TASKFOREST_MAIL_REPLY_TO}    ;
+my $mail_return_path       = $ENV{TASKFOREST_MAIL_RETURN_PATH}    ;
+my $smtp_timeout           = $ENV{TASKFOREST_SMTP_TIMEOUT}     ;
+my $retry_success_email    = $ENV{TASKFOREST_RETRY_SUCCESS_EMAIL}      ;
+my $no_retry_success_email = $ENV{TASKFOREST_NO_RETRY_SUCCESS_EMAIL}   ;
+
+$num_retries         =  0 unless $num_retries =~ /^\d+$/;
+$retry_sleep         = 60 unless $retry_sleep =~ /^\d+$/;
+
+print "Running job $family_name $job_name with pid $$\n";
+open (PID,  ">$pid_file") || die "Can't open PID file $pid_file";
+print PID "pid: $$\n";
+print PID "actual_start: ", time, "\n";
+print PID "unique_id: $unique_id\n";
+close PID;
+
+my $script = "$script_dir/$job_file_name";
+
+my $retry = 0;
+my $rc;
+while ($retry <= $num_retries) {
+    system("$script");
+    $rc = $?;
+    $ENV{TASKFOREST_RC} = $rc;
+
+    if ($rc != 0 && $retry < $num_retries) {
+        $retry++;
+        $ENV{TASKFOREST_RETRY} = $retry;
+        
+        my $current_time = localtime(time);
+        sendEmail('retry');
+        sleep ($retry_sleep);
+    }
+    else {
+        if ($rc != 0) {
+            sendEmail('fail');
+        }
+        elsif ($retry) {
+            sendEmail('retry_success');
+        }
+        last;
+    }
+}
+
+open (PID,  ">>$pid_file") || die "Can't open PID file $pid_file";
+print PID "stop: ", time, "\n";
+
+my $status_file;
+if ($rc) { 
+    $status_file = $failure_file;
+}
+else { 
+    $status_file = $success_file;
+}
+
+print PID "rc: $rc\n";
+close PID;
+
+# touch status file
+open (S, ">$status_file") || die "can't open $status_file status file";
+print S "$rc\n";
+close S;
+
+
+sub sendEmail {
+    
+    my ($reason) = @_;
+
+    # Try to exit without doing anything first.
+    #
+    return if ($reason eq 'retry_success' && $no_retry_success_email);
+
+    return if ($reason eq 'retry_success' && !$retry_success_email && !$retry_email && !$email);
+
+    return if ($reason eq 'retry' && $no_retry_email);
+
+    return if ($reason eq 'retry' && !$retry_email && !$email);
+
+    return if ($reason eq 'fail' && !$email);
+
+    return if (!$smtp_server);
+
+    my $to = $email;
+    if ($reason eq 'retry') {
+        $to = $retry_email if $retry_email;
+    }
+
+    if ($reason eq 'retry_success') {
+        $to = $retry_email if $retry_email;
+        $to = $retry_success_email if $retry_success_email;
+    }
+
+    if (!$mail_from && !$smtp_sender) {
+        $mail_from = $smtp_sender = $ENV{USER};
+    }
+    elsif (!$mail_from) {
+        $mail_from = $smtp_sender;
+    }
+    elsif (!$smtp_sender) {
+        $smtp_sender = $mail_from;
+    }
+    
+        
+
+    # get text that needs to be sent out
+    #
+    my @text = ();
+    my $found = 0;
+    
+    if ($instructions_dir && -d $instructions_dir) { 
+        if (-e "$instructions_dir/HEADER") {
+            push (@text, contentsOf("$instructions_dir/HEADER"));
+        }
+        
+        if (-e "$instructions_dir/HEADER.$reason") {
+            push (@text, contentsOf("$instructions_dir/HEADER.$reason"));
+        }
+        
+        if (-e "$instructions_dir/FAMILY_$family_name.$reason") {
+            push (@text, contentsOf("$instructions_dir/FAMILY_$family_name.$reason"));
+        }
+        
+        if (-e "$instructions_dir/JOB_$job_name.$reason") {
+            push (@text, contentsOf("$instructions_dir/JOB_$job_name.$reason"));
+        }
+        
+        if (-e "$instructions_dir/FOOTER.$reason") {
+            push (@text, contentsOf("$instructions_dir/FOOTER.$reason"));
+        }
+
+        if (-e "$instructions_dir/FOOTER") {
+            push (@text, contentsOf("$instructions_dir/FOOTER"));
+        }
+    }
+
+    my $subject = uc($reason). " $family_name"."::$job_name";
+
+    my $body = join("\n", @text);
+
+    my $smtp = Net::SMTP->new(
+        Host      => "$smtp_server:$smtp_port",
+        Timeout   => $smtp_timeout,
+        Hello     => $smtp_sender,
+        );
+
+    return unless $smtp;
+    
+    $smtp->mail($smtp_sender);
+    $smtp->to($to);
+
+    $mail_return_path = $mail_from unless $mail_return_path;
+    $mail_reply_to    = $mail_from unless $mail_reply_to;
+
+    $smtp->data();
+    $smtp->datasend(join("\n",
+                    "From: $mail_from",
+                    "Return-Path: $mail_return_path",
+                    "Reply-To: $mail_reply_to",
+                    "To: $to",
+                    "Subject: $subject"));
+    $smtp->datasend("\n\n");
+    $smtp->datasend($body);
+    $smtp->dataend();
+    $smtp->quit;
+
+}
+
+
+
+sub contentsOf {
+    my $file = shift;
+
+    if (open (F, $file)) {
+        my $lines = join("", <F>);
+        $lines =~ s/\$([a-z0-9_\-]+)/$ENV{$1}/gis;
+        $lines =~ s/\$\{([a-z0-9_\-]+)\}/$ENV{$1}/gis;
+        close F;
+        return $lines;
+   }
+    else {
+        return ("[Error: Could not open file '$file']\n");
+    }
+}

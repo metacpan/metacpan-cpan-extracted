@@ -1,0 +1,19 @@
+Revision history for Perl extension Test::Declare
+
+0.06
+      - FIX: MANIFEST etc.(RT: #47537)
+
+0.05 
+      - FIX: prototype bug fixed. (thanks tokuhirom)
+
+0.04 2009/04/09
+      - FIX: auto set message and more (thanks tokuhirom)
+
+0.03 
+      - FIX: Makefile.pl
+
+0.02  Thu Apr 10 2008
+      - FIX: Makefile.pl
+
+0.01  Thu Jan 24 17:20:30 2008
+      - original version

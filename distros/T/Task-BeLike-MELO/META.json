@@ -1,0 +1,538 @@
+{
+   "abstract" : "All the stuff I install with a fresh perl",
+   "author" : [
+      "Pedro Melo <melo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-MELO",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::C3" : "0.08",
+            "AnyEvent" : "7.04",
+            "AnyEvent::AIO" : "1.1",
+            "AnyEvent::Gearman" : "0.10",
+            "AnyEvent::HTTP" : "2.15",
+            "AnyEvent::HTTPD" : "0.93",
+            "AnyEvent::Redis" : "0.24",
+            "AnyEvent::Twitter::Stream" : "0.26",
+            "AnyEvent::XMPP" : "0.54",
+            "AnyMQ" : "0.35",
+            "App::Ack" : "2.04",
+            "App::Adenosine" : "2.001005",
+            "App::ArchiveDevelCover" : "1.002",
+            "App::BashComplete" : "0.008",
+            "App::Genpass" : "2.33",
+            "App::HTTPThis" : "0.002",
+            "App::Nopaste" : "0.92",
+            "App::Notifo" : "0.001",
+            "App::Uni" : "8",
+            "App::Whiff" : "0.003",
+            "App::autotest" : "0.005",
+            "App::cpanminus" : "1.6923",
+            "App::cpanoutdated" : "0.28",
+            "App::p" : "0.0304",
+            "App::pod2pdf" : "0.42",
+            "Archive::Tar" : "1.92",
+            "Archive::Tar::Wrapper" : "0.17",
+            "Archive::Zip" : "1.30",
+            "Async::Hooks" : "0.16",
+            "Authen::Simple::Passwd" : "0.6",
+            "CGI::Emulate::PSGI" : "0.15",
+            "CGI::Fast" : "1.09",
+            "CHI" : "0.56",
+            "CPAN" : "2.00",
+            "CPAN::Mini" : "1.111013",
+            "CPAN::Mini::Webserver" : "0.58",
+            "CPAN::Reporter" : "1.2010",
+            "CPAN::SQLite" : "0.203",
+            "CSS::Minifier" : "0.01",
+            "Cache::CacheFactory" : "1.10",
+            "Carp::Always" : "0.12",
+            "Carp::Clan" : "6.04",
+            "Carton" : "0.009015",
+            "Check::ISA" : "0.04",
+            "Class::C3" : "0.25",
+            "Class::C3::XS" : "0.13",
+            "Class::Load" : "0.20",
+            "Class::MOP" : "2.0802",
+            "Class::XSAccessor" : "1.18",
+            "Clipboard" : "0.13",
+            "Code::TidyAll" : "0.17",
+            "Code::TidyAll::Plugin::Perl::AlignMooseAttributes" : "0.01",
+            "Code::TidyAll::Plugin::Perl::IgnoreMethodSignaturesSimple" : "0.02",
+            "Code::TidyAll::Plugin::PerlTidy" : "0.17",
+            "Code::TidyAll::Plugin::PodTidy" : "0.17",
+            "Compress::Raw::Bzip2" : "2.061",
+            "Compress::Raw::Zlib" : "2.061",
+            "Compress::Zlib" : "2.061",
+            "Config::Any" : "0.23",
+            "Config::GitLike" : "1.10",
+            "Config::TOML" : "0.01",
+            "Coro" : "6.31",
+            "Crypt::Eksblowfish::Bcrypt" : "0.009",
+            "Crypt::PBKDF2" : "000003",
+            "Crypt::SSLeay" : "0.64",
+            "DBD::SQLite" : "1.39",
+            "DBD::mysql" : "4.023",
+            "DBI" : "1.627",
+            "DBICx::DataDictionary" : "0.002",
+            "DBICx::Indexing" : "0.002",
+            "DBICx::Shortcuts" : "0.007",
+            "DBIx::Class" : "0.08250",
+            "DBIx::Class::Candy" : "0.002104",
+            "DBIx::Class::DeploymentHandler" : "0.002206",
+            "DBIx::Class::EncodedColumn" : "0.00012",
+            "DBIx::Class::Helpers" : "2.018001",
+            "DBIx::Class::InflateColumn::Currency" : "0.02005",
+            "DBIx::Class::InflateColumn::Serializer" : "0.06",
+            "DBIx::Class::InflateColumn::URI" : "0.01002",
+            "DBIx::Class::Schema::Loader" : "0.07036",
+            "DBIx::Class::TimeStamp" : "0.14",
+            "DBIx::Connector" : "0.53",
+            "DBIx::Tracer" : "0.02",
+            "Dancer2" : "0.04",
+            "Data::Dump" : "1.22",
+            "Data::Dumper" : "2.145",
+            "Data::ObjectDriver" : "0.09",
+            "Data::UUID::MT" : "1.001",
+            "Date::Manip" : "6.40",
+            "Date::Tiny" : "1.04",
+            "DateTime" : "1.03",
+            "DateTime::Format::DateParse" : "0.05",
+            "DateTime::Format::Excel" : "0.31",
+            "DateTime::Format::MSSQL" : "1.000000",
+            "DateTime::Format::MySQL" : "0.04",
+            "DateTime::Format::SQLite" : "0.11",
+            "Devel::BeginLift" : "0.001003",
+            "Devel::Cycle" : "1.11",
+            "Devel::LeakGuard::Object" : "0.06",
+            "Devel::NYTProf" : "5.05",
+            "Devel::REPL" : "1.003020",
+            "Devel::StackTrace" : "1.30",
+            "Devel::StackTrace::WithLexicals" : "0.10",
+            "Devel::TraceUse" : "2.09",
+            "Digest::HMAC" : "1.03",
+            "Digest::MD5" : "2.53",
+            "Digest::SHA" : "5.85",
+            "Digest::SHA1" : "2.13",
+            "Dist::Zilla" : "4.300035",
+            "Dist::Zilla::App::Command::cover" : "1.101001",
+            "Dist::Zilla::Plugin::InstallGuide" : "1.200000",
+            "Dist::Zilla::Plugin::LatestPrereqs" : "0.4",
+            "Dist::Zilla::Plugin::PodPurler" : "0.093401",
+            "Dist::Zilla::PluginBundle::Author::MELO" : "0.012",
+            "EV" : "4.15",
+            "Email::Abstract" : "3.004",
+            "Email::Simple" : "2.201",
+            "Eval::Closure" : "0.10",
+            "Excel::Writer::XLSX" : "0.70",
+            "ExtUtils::CBuilder" : "0.280205",
+            "ExtUtils::MakeMaker" : "6.68",
+            "File::ChangeNotify" : "0.23",
+            "File::HomeDir" : "1.00",
+            "File::HomeDir::PathClass" : "1.112060",
+            "File::MMagic" : "1.30",
+            "File::Spec" : "3.40",
+            "File::Temp" : "0.2301",
+            "File::Which" : "1.09",
+            "Format::Human::Bytes" : "0.06",
+            "GD" : "2.50",
+            "Gearman::Client" : "1.11",
+            "Gearman::Worker" : "0",
+            "Getopt::Long" : "2.41",
+            "Github::Import" : "0.07",
+            "Graph::Easy" : "0.73",
+            "GraphViz" : "2.14",
+            "Guard" : "1.022",
+            "HTML::Mason" : "1.51",
+            "HTTP::Headers" : "6.05",
+            "HTTP::Parser" : "0.06",
+            "HTTP::Parser::XS" : "0.16",
+            "HTTP::Tiny" : "0.034",
+            "IO::AIO" : "4.18",
+            "IO::Compress::Base" : "2.061",
+            "IO::Handle::Util" : "0.01",
+            "IO::Socket::SSL" : "1.952",
+            "IO::Uncompress::Gunzip" : "2.061",
+            "IO::Zlib" : "1.10",
+            "Image::Size" : "3.232",
+            "JSON::XS" : "2.34",
+            "KiokuDB" : "0.54",
+            "KiokuDB::Backend::DBI" : "1.22",
+            "KiokuDB::Backend::Redis" : "0.02",
+            "LWP::Protocol::https" : "6.04",
+            "LWP::Simple" : "6.00",
+            "List::Util" : "1.27",
+            "Log::Any" : "0.15",
+            "Log::Any::Adapter" : "0.11",
+            "Log::Any::Adapter::Log4perl" : "0.06",
+            "Log::Log4perl" : "1.41",
+            "MIME::Base64" : "3.09",
+            "MIME::Entity" : "5.504",
+            "MIME::Lite" : "3.029",
+            "MIME::Parser" : "5.504",
+            "MIME::WordDecoder" : "0",
+            "Mail::Address" : "2.12",
+            "Mail::IMAPClient" : "3.33",
+            "Markapl" : "0.14",
+            "Mason" : "2.20",
+            "Mason::Tidy" : "2.57",
+            "Math::Round" : "0.06",
+            "Message::Passing" : "0.112",
+            "Message::Passing::Redis" : "0.006",
+            "Method::Signatures::Simple" : "1.07",
+            "Modern::Perl" : "1.20121103",
+            "Module::Build" : "0.4005",
+            "Module::CoreList" : "2.92",
+            "Module::Info" : "0.34",
+            "Module::Which" : "0.0207",
+            "Mojo" : "0",
+            "Moo" : "1.000003",
+            "Moose" : "2.0802",
+            "Moose::Exporter" : "2.0802",
+            "MooseX::Aliases" : "0.11",
+            "MooseX::AttributeShortcuts" : "0.019",
+            "MooseX::ConfigFromFile" : "0.11",
+            "MooseX::Declare" : "0.35",
+            "MooseX::Getopt" : "0.56",
+            "MooseX::Has::Sugar" : "0.05070421",
+            "MooseX::HasDefaults::RO" : "0",
+            "MooseX::LazyRequire" : "0.10",
+            "MooseX::MethodAttributes" : "0.28",
+            "MooseX::MultiMethods" : "0.10",
+            "MooseX::Role::WithOverloading" : "0.13",
+            "MooseX::StrictConstructor" : "0.19",
+            "MooseX::Traits" : "0.11",
+            "MooseX::Types" : "0.36",
+            "MooseX::Types::DateTime" : "0.08",
+            "MooseX::Types::Moose" : "0.36",
+            "Mozilla::CA" : "20130114",
+            "NTS::Template" : "2.1",
+            "Net::Bonjour" : "0.96",
+            "Net::Cmd" : "2.29",
+            "Net::DNS" : "0.72",
+            "Net::FTP" : "2.77",
+            "Net::Rendezvous" : "0.92",
+            "Net::Rendezvous::Publish::Backend::Apple" : "0.02",
+            "Net::SMTP" : "2.31",
+            "Net::SMTP::TLS::ButMaintained" : "0.24",
+            "Net::SSLeay" : "1.55",
+            "Object::Event" : "1.23",
+            "POE" : "1.354",
+            "POE::XS::Queue::Array" : "0.006",
+            "PPI" : "1.215",
+            "PPI::HTML" : "1.08",
+            "Package::Stash" : "0.35",
+            "Package::Stash::XS" : "0.26",
+            "Parallel::Prefork" : "0.14",
+            "Params::Coerce" : "0.14",
+            "Parse::CPAN::Meta" : "1.4404",
+            "Parse::RecDescent" : "1.967009",
+            "Path::Class" : "0.32",
+            "Perl::Critic" : "1.118",
+            "Perl::PrereqScanner" : "1.016",
+            "Perl::Tidy" : "20121207",
+            "Plack" : "1.0028",
+            "Plack::Middleware::Debug" : "0.14",
+            "Plack::Middleware::Debug::DBIC::QueryLog" : "0.09",
+            "Plack::Middleware::Debug::DBIProfile" : "0.102",
+            "Plack::Server::ReverseHTTP" : "0.03",
+            "Pod::Coverage::TrustPod" : "0.100002",
+            "Pod::Cpandoc" : "0.15",
+            "Pod::Elemental" : "0.102362",
+            "Pod::POM::Web" : "1.19",
+            "Pod::PseudoPod" : "0.18",
+            "Pod::Tidy" : "0.10",
+            "Poet" : "0.13",
+            "Redis" : "1.961",
+            "Scalar::Util" : "1.27",
+            "Server::Starter" : "0.14",
+            "Spreadsheet::XLSX" : "0.13",
+            "String::CRC32" : "1.4",
+            "String::FriendlyID" : "0.019",
+            "Sub::Name" : "0.05",
+            "Sys::UniqueID" : "1.0",
+            "TAP::Formatter::HTML" : "0.11",
+            "TAP::Formatter::TextMate" : "0.1",
+            "Task::Devel::Cover::Recommended" : "0.990000",
+            "Task::Kensho" : "0.33",
+            "Task::Moose" : "0.03",
+            "Task::Plack" : "0.28",
+            "Tenjin" : "0.070001",
+            "Term::ProgressBar" : "2.13",
+            "Term::ReadKey" : "2.30",
+            "Term::ReadLine::Gnu" : "1.20",
+            "Term::ReadLine::Perl" : "1.0303",
+            "Test::Base" : "0.60",
+            "Test::CPAN::Meta" : "0.23",
+            "Test::Compile" : "0.24",
+            "Test::Continuous" : "0.73",
+            "Test::Deep" : "0.110",
+            "Test::Exception" : "0.32",
+            "Test::Fatal" : "0.010",
+            "Test::Harness" : "3.28",
+            "Test::Inline::Extract" : "2.213",
+            "Test::Kit" : "0.101",
+            "Test::More" : "0.98",
+            "Test::Output" : "1.02",
+            "Test::Reporter" : "1.59",
+            "Test::Reporter::Transport::Metabase" : "1.999008",
+            "Test::TCP" : "2.00",
+            "Test::WWW::Mechanize::Catalyst" : "0.58",
+            "Text::Autoformat" : "1.669003",
+            "Text::Glob" : "0.09",
+            "Text::Markdown" : "1.000031",
+            "Text::MicroMason" : "2.13",
+            "Text::MultiMarkdown" : "1.000034",
+            "Text::ParseWords" : "3.29",
+            "Text::Textile" : "2.12",
+            "Text::Unaccent" : "1.08",
+            "Text::Wrap" : "2013.0523",
+            "Text::Xslate" : "2.0009",
+            "TextMate::JumpTo" : "0.07",
+            "Time::HiRes" : "1.9725",
+            "Time::ParseDate" : "2011.0517",
+            "Time::y2038" : "20100403",
+            "Try::Tiny" : "0.16",
+            "Twiggy" : "0.1023",
+            "URI" : "1.60",
+            "URI::Escape" : "3.31",
+            "URI::Find" : "20111103",
+            "Unicode::String" : "2.09",
+            "Unicode::Stringprep" : "1.104",
+            "Unicode::Tussle" : "1.03",
+            "Web::Scraper" : "0.37",
+            "XML::Feed" : "0.52",
+            "XML::LibXML" : "2.0019",
+            "XML::Parser" : "2.41",
+            "XML::Parser::Expat" : "2.41",
+            "XS::Assert" : "0.002",
+            "YAML" : "0.84",
+            "YAML::XS" : "0.41",
+            "ZMQ::LibZMQ3" : "1.03",
+            "aliased" : "0.31",
+            "autodie" : "2.20",
+            "lib::tiny" : "0.7",
+            "lib::tiny::findbin" : "0.1",
+            "lib::xi" : "1.00",
+            "namespace::autoclean" : "0.13",
+            "namespace::clean" : "0.24"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Task-BeLike-Melo/",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/melo/task-belike-melo.git",
+         "web" : "http://github.com/melo/task-belike-melo"
+      }
+   },
+   "version" : "0.011",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.014002"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@Basic/GatherDir",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Basic/PruneCruft",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Basic/ManifestSkip",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Basic/MetaYAML",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Basic/License",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@Basic/Readme",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@Basic/ExtraTests",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Basic/ExecDir",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Basic/ShareDir",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@Basic/MakeMaker",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Basic/Manifest",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Basic/TestRelease",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Basic/ConfirmRelease",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Basic/UploadToCPAN",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "name" : "Git::NextVersion",
+            "version" : "2.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "PkgVersion",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "MetaConfig",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "MetaJSON",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "NextRelease",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "RuntimeRequires",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::LatestPrereqs",
+            "name" : "LatestPrereqs",
+            "version" : "0.4"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@Git/Check",
+            "version" : "2.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@Git/Commit",
+            "version" : "2.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@Git/Tag",
+            "version" : "2.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "@Git/Push",
+            "version" : "2.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "name" : "InstallGuide",
+            "version" : "1.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CommitBuild",
+            "name" : "Git::CommitBuild",
+            "version" : "2.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.300035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.300035"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "4.300035"
+      }
+   }
+}
+

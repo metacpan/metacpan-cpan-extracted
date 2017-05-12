@@ -1,0 +1,28 @@
+Task-CPANAuthors-Regional
+
+NAME
+
+   Task::CPANAuthors::Regional - All regional Acme::CPANAuthors modules at once
+
+DESCRIPTION
+
+   This tasks installs all Acme::CPANAuthors modules that list CPAN
+   authors by nationality, language, country or region.
+
+OTHER CPANAUTHORS MODULES
+
+   There are several other modules that are not part of this Task, but
+   that also make use Acme::CPANAuthors. More tasks are in the works.
+
+AUTHOR
+
+   Philippe Bruhat (BooK) <book@cpan.org>
+
+COPYRIGHT
+
+   Copyright 2014 Philippe Bruhat (BooK), All Rights Reserved.
+
+LICENSE
+
+   This program is free software; you can redistribute it and/or modify it
+   under the same terms as Perl itself.

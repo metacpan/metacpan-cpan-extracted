@@ -1,0 +1,52 @@
+Revision history for Test-Dist-VersionSync
+
+v1.2.0  2017-03-22
+        - Relicensed under Perl 5 terms.
+        - Cleaned up dependencies.
+
+v1.1.4  2014-11-15
+        - Handle format changes for the latest Test::Builder alphas (GH-3).
+
+v1.1.3  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - General cleanup.
+
+v1.1.2  2013-07-24
+        - (GH-1) Changed expected output in tests due to Test::Simple
+          v0.98_05 adding a note before subtests.
+        - (GH-2) Changed expected output in tests due to Test::Simple
+          v0.98_04 changing the notes format for isa_ok().
+
+v1.1.1  2013-05-08
+        - Moved release tests to xt/.
+        - Updated Build.PL to handle release tests as part of disttest.
+        - Added new release tests.
+        - Formatted readme with markdown.
+        - Added Test::FailWarnings to all tests.
+        - Added info on how to contribute examples.
+        - Updated links to point to MetaCPAN.
+        - Updated links to point to GitHub's issue tracker.
+
+v1.1.0  2012-09-24
+        - Relicensed as GPLv3 for inclusion in Fedora.
+
+v1.0.4  2012-09-22
+        - Moved repository to GitHub.
+        - Updated build_requires vs requires.
+
+v1.0.3  2012-05-15
+        - Tweaked tests for Test::Builder v1.005000_005.
+        - Restricted PerlCritic tests to core policies.
+        - Added meta information.
+
+v1.0.2  2012-01-21
+        - Fixed issue with how the return value of ok_versions() was calculated.
+        - Added tests.
+
+v1.0.1  2012-01-18
+        - Tweaked tests for the upcoming Test Builder 1.5.
+        - Cleanup to pass PerlCritic 'harsh'.
+
+v1.0.0  2012-01-11
+        - Public release.

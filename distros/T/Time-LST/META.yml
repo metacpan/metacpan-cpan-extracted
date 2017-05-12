@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Time-LST
+version:             0.038
+abstract:            Convert date/time representations to local sidereal time via Astro-Time and other Date/Time modules
+license:             ~
+author:              
+    - R Garton <rgarton@utas_._edu_._au>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    Astro::Time:                   0
+    Date::Parse:                   0
+    DateTime:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,7 @@
+Pobox::Config::Tie - class definitions for tied hashes config file reading
+
+use Pobox::Config::Tie;
+tie %hash, 'Pobox::Config::Tie', ".foo_rc";
+
+Autor: Jan ' Kozo ' Vajda <Jan.Vajda@pobox.sk>
+

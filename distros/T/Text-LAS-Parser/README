@@ -1,0 +1,53 @@
+Module: Text::LAS::Parser
+================
+
+This module is in order to parse Log ASCII Standard (LAS) Version 2.0.
+This module can read `one line per depth step' mode only and does not
+support `multiple lines per depth step' mode. To write this, I read
+the following references.
+
+  LAS Version 2.0 Updated: July 2009
+    A Digital Standard for Logs
+    Canadian Well Logging Society (www.cwls.org)
+    http://www.cwls.org/las_info.php
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Exporter
+  IO::Handle
+  Scalar::Util
+  Carp
+
+VERSION HISTORY
+
+  0.01 2010-02-15 Kyoma Takahashi
+
+COPYRIGHT
+
+Copyright (C) 2010 by Kyoma Takahashi
+
+LICENSE
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

@@ -1,0 +1,46 @@
+Revision history for Tree-RB
+
+0.500005  07 January  2014
+    Changed version format to not be a dev release.
+
+0.500_005  07 January  2014
+    Added nth() method.
+    Fixed issue tracker link.
+
+0.500_004  15 September  2013
+     Documentation fixes:
+       http://rt.cpan.org/Public/Bug/Display.html?id=56453
+       http://rt.cpan.org/Public/Bug/Display.html?id=86636
+
+0.500_003  22 November  2009
+     Fixed http://rt.cpan.org/Public/Bug/Display.html?id=49078
+
+0.500_002  15 July  2009
+     Fixed http://rt.cpan.org/Public/Bug/Display.html?id=47894
+     Moved to Module::Install
+
+0.500_001  10 June  2009
+     Changes in distribution packaging to include repository URL
+     No code changes.
+
+0.5  15 November  2008 16:43
+     Allow false values to be stored (thanks to Anton Petrusevich for pointing out the problem).
+     Skip test of tied hash SCALAR method if we're not running at least 5.8.3
+
+0.4  13 August  2008 10:15
+     No code changes, just fixed Build.PL to include dependency on enum.
+     Happy birthday Jyothi!
+
+0.3  09 August  2008 19:47
+     Tree iteration is now seekable.
+     Hash iteration is now seekable and reversible.
+     Use enum as it leads to more natural syntax than constant. 
+
+0.2  02 August  2008 12:57
+     Changes to work with older Perls:
+       * 'use vars' instead of 'our'
+       * Manually pull in &Exporter::import
+       * Added a comment crediting java.util.TreeMap for balancing helper functions.
+
+0.1  01 January 2008 20:05
+     Initial release.

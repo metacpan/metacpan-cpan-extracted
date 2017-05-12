@@ -1,0 +1,29 @@
+---
+abstract: 'Support for running TestML as a script'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: TestML::Script
+name: TestML-Script
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  TestML: 0.22
+  perl: 5.8.3
+resources:
+  homepage: http://github.com/ingydotnet/testml-script-pm/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ingydotnet/testml-script-pm.git
+version: 0.01

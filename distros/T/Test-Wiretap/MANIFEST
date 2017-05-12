@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Test/Wiretap.pm
+t/00-load.t
+t/01-basic.t
+t/02-tap-function-args.t
+t/03-delegators-to-resub.t
+t/04-return-value-capturing.t
+t/10-error-reporting.t
+t/boilerplate.t
+t/lib/IO/Capture.pm
+t/lib/IO/Capture/Tie_STDx.pm
+t/lib/IO/Capture/Overview.pod
+t/lib/IO/Capture/Stdout.pm
+t/lib/IO/Capture/Stderr.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+abstract: Send smoke test results to a server
+author: Zev Benjamin, C<< <zev at cpan.org> >>
+build_requires: 
+  Test::Dependencies: 0
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Test-Chimps-Client
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor: 0
+  LWP::UserAgent: 0
+  Params::Validate: 0
+  Test::TAP::Model::Visual: 0
+  YAML::Syck: 0
+version: 0.05

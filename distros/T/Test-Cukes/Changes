@@ -1,0 +1,33 @@
+# Revision history for Perl extension Test::Cukes
+
+0.10:
+- Fix META.yml and use Try::Tiny FTW.
+
+0.09:
+- Tristan Pratt makes it more compatible when using it with other Test::Bulder::Module-based tools.
+
+0.08:
+- allow step definitions to be defined in all namespaces.
+
+0.07:
+- makes it perl 5.8 compatible. thanks to miyagawa++
+
+0.06:
+- let runtests accept feature text too
+
+0.05:
+- Fix the missing step report of "And" steps.
+
+0.04:
+- report missing steps as TAP note
+
+0.03:
+- if a step died, diag its dying message.
+
+0.02:
+- Count each block as one assertion-based test
+- If pre-condition steps fail, then its successing steps will be skipped.
+
+0.01:
+- initial version
+- basic implementation.

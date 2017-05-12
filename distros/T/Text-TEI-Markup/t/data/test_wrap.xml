@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="tools/tei_ms_crit.rng" type="xml"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Ժամանակագրութիւն</title>
+        <author>Մատթէոս Ուռհայեցի</author>
+        <respStmt xml:id="tla">
+          <resp>Transcription by</resp>
+          <name>Tara L Andrews</name>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>Unpublished manuscript</p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc>
+          <msIdentifier>
+            <settlement>Venice</settlement>
+            <repository>Mekhitarist Library</repository>
+            <idno>917</idno>
+          </msIdentifier>
+          <p>pp. 152-173</p>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <div>
+<!-- began on p. 71 -->
+        <p xmlns="http://www.tei-c.org/ns/1.0">
+<!-- began on p. 144 -->
+          <pb n="152"/>
+          <w>Արդ՛</w>
+          <w>ահայ</w>
+          <w>մինչև</w>
+          <w>ցայս</w>
+          <w>վարս</w>
+          <seg type="word">բազ<lb/>մաջան</seg>
+          <w>և</w>
+          <w>աշխատաւոր</w>
+          <seg type="word">քննութ<ex resp="#tla">եամ</ex>բ</seg>
+          <w>գտեալ</w>
+          <w>գրեցա՛ք</w>
+          <seg type="word">զշա<lb/>րագրական</seg>
+          <w>գրեալս</w>
+          <seg type="word">զ<num value="100">Ճ</num>ից</seg>
+          <w>ամաց,</w>
+          <w>զորս</w>
+          <w>ի</w>
+          <seg type="word">
+            <expan>բազում</expan>
+          </seg>
+          <seg type="word">
+            <expan>ժամանակաց</expan>
+          </seg>
+          <lb/>
+          <w>շունչ</w>
+          <seg type="word"><abbr>կտրածսն</abbr>,</seg>
+          <w>զա՛յս</w>
+          <w>սոսկալի</w>
+          <seg type="word">բարկութի<ex resp="#tla">ւն</ex>ս</seg>
+          <w>զոր</w>
+          <w>կրեաց</w>
+          <lb/>
+          <w>առին</w>
+          <seg type="word">
+            <expan>զամենայն</expan>
+          </seg>
+          <seg type="word">
+            <expan>աշխարհն</expan>
+          </seg>
+          <seg type="word"><subst><del>հայոց</del><add place="overwrite">հոռոմոց</add></subst>,</seg>
+          <seg type="word">
+            <expan>զքաղաքս</expan>
+          </seg>
+          <w>ծովեզերաց</w>
+          <w>և</w>
+          <seg type="word">զկղզի<lb/><pb n="153"/>նք</seg>
+          <seg type="word">զմանկութի<ex resp="#tla">ւն</ex></seg>
+          <seg type="word">յարիութե<ex resp="#tla">ան</ex>ն</seg>
+          <w>ի</w>
+          <w>կու՛րտս</w>
+          <w>փոխարկեցին,</w>
+          <w>և</w>
+          <seg type="word">
+            <expan>փոխանակ</expan>
+          </seg>
+          <lb/>
+          <w>ի</w>
+          <seg type="word">գերութի<ex resp="#tla">ւն</ex></seg>
+          <seg type="word">
+            <expan>աշխարհն</expan>
+          </seg>
+          <w>պարսից։</w>
+        </p>
+        <p xmlns="http://www.tei-c.org/ns/1.0">
+          <seg type="word"><hi><supplied reason="omitted" resp="#tla">Յ</supplied></hi>այ՛սմ</seg>
+          <seg type="word">
+            <expan>ժամանակիս</expan>
+          </seg>
+          <seg type="word">
+            <expan>թագաւորն</expan>
+          </seg>
+          <seg type="word">տուկի<lb/>ծն</seg>
+          <w>խորհեցաւ</w>
+          <seg type="word">
+            <expan>խորհուրդ</expan>
+          </seg>
+          <seg type="word"><expan>չար</expan>,</seg>
+          <w>և</w>
+          <seg type="word">
+            <expan>կամեցաւ</expan>
+          </seg>
+          <w>բառնալ</w>
+          <lb/>
+          <w>նստու՛ցանեն</w>
+          <w>զաթոռ՛</w>
+          <seg type="word">
+            <expan>հայրապետութեան</expan>
+          </seg>
+          <seg type="word">
+            <expan>զտէր</expan>
+          </seg>
+          <w>խաչիկ։</w>
+          <lb/>
+        </p>
+      </div>
+<!-- ends on p. 213 -->
+    </body>
+  </text>
+</TEI>

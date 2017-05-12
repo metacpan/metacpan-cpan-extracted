@@ -1,0 +1,437 @@
+=pod
+
+=head1 Term::ReadLine::Perl5::readline-guide
+
+I<Term::ReadLine::Perl5::readline>, described here, is non-OO package
+similar to GNU's readline. The preferred OO Package is
+L<Term::ReadLine::Perl5>. But that uses this internally. Also see the
+newer but unfinished L<Term::ReadLine::Perl5::OO>.
+
+Some support is available for EUC-encoded Japanese text. But this
+should be rewritten for Perl Unicode.
+
+=head2 Synopsis
+
+    use Term::ReadLine::Perl5::readline;
+    $text = &Term::ReadLine::Perl5::readline::readline('waddyawant? ');
+
+to get a line of input from the user.
+
+Normally, it reads F<~/.inputrc> when loaded. To suppress this, set
+
+        $rl_NoInitFromFile = 1;
+
+before requiring the package.
+
+Call I<rl_bind()> to add your own key bindings, as in:
+
+        &rl_bind('C-L', 'possible-completions');
+
+Call rl_set to set mode variables yourself, as in:
+
+        &rl_set('TcshCompleteMode', 'On');
+
+To change the input mode (emacs or vi) use F<~/.inputrc> or call
+
+        &rl_set('EditingMode', 'vi');
+or:
+        &rl_set('EditingMode', 'emacs');
+
+Call rl_basic_commands to set your own command completion, as in:
+
+       &rl_basic_commands('print', 'list', 'quit', 'run', 'status');
+
+=head2 What's Cool
+
+=over
+
+=item *
+It's in Perl.
+
+=item *
+Pretty full GNU readline-like library...
+
+=item *
+support for F<~/.inputrc>
+
+=item *
+horizontal scrolling
+
+=item *
+command/file completion
+
+=item *
+rebinding
+
+=item *
+history (with search)
+
+=item *
+undo
+
+=item *
+numeric prefixes
+
+=item *
+supports multi-byte characters (at least for the Japanese I use).
+
+=item *
+Has a tcsh-like completion-function mode.call &rl_set('tcsh-complete-mode', 'On') to turn on.
+
+=back
+
+=head2 What's not Cool
+
+=over
+
+=item *
+It is huge
+
+=item *
+Uses lots of global state
+
+=item *
+Written by someone that has never really used readline.
+
+=item *
+History mechanism is slightly different than GNU... may get
+fixed someday, but I like it as it is now...
+
+=item *
+Killbuffer not a ring.. just one level.
+
+=item *
+Not well tested.
+
+=item *
+Written by someone that doesn't have a bell on his terminal, so
+
+=item *
+proper readline use of the bell may not be here.
+
+=back
+
+=head2 Functions and variables
+
+Functions beginning with C<F_ >are functions that are mapped to keys.
+Variables and functions beginning C<rl_> may be accessed/set/called/read
+from outside the package.  Other things are internal.
+
+Some notable internal-only variables of global proportions:
+
+=over
+
+=item  C<$prompt>
+line prompt (passed from user)
+
+=item  C<$line>
+the line being input
+
+=item  C<$D>
+`Dot'' index into $line of the cursor's location.
+
+=item  C<$InsertMode>
+usually true. False means overwrite mode.
+
+=item  C<$InputLocMsg>
+string for error messages, such as "[~/.inputrc line 2]"
+
+=item  C<%emacs_keymap>
+keymap for emacs-mode bindings:
+
+=item C<@emacs_keymap>
+bindings indexed by ASCII ordinal
+
+=item C<$emacs_keymap{'name'}>
+Is "emacs_keymap"
+
+=item  C<$emacs_keymap{'default'}>
+is "SelfInsert"  (default binding)
+
+=item  C<%vi_keymap>
+keymap for vi input mode bindings
+
+=item  C<%vicmd_keymap>
+keymap for vi command mode bindings
+
+=item  C<%vipos_keymap>
+keymap for vi positioning command bindings
+
+=item  C<%visearch_keymap>
+keymap for vi search pattern input mode bindings
+
+=item  C<%KeyMap>
+current keymap in effect.
+
+=item  C<$LastCommandKilledText>
+needed so that subsequent kills accumulate
+
+=item  C<$lastcommand>
+name of command previously run
+
+=item C<$lastredisplay>
+text placed upon screen during previous &redisplay
+
+=item  C$<si>
+screen index; index into $line of leftmost char &redisplay'ed
+
+=item  C<$force_redraw>
+if set to true, causes &redisplay to be verbose.
+
+=item  C<$AcceptLine>
+when set, its value is returned from &readline.
+
+=item  C<$ReturnEOF>
+unless this also set, in which case undef is returned.
+
+=item  C<@Pending>
+characters to be used as input.
+
+=item  C<@undo>
+array holding all states of current line, for undoing.
+
+=item  C<$KillBuffer>
+top of kill ring (well, don't have a kill ring yet)
+
+=item  C<@tcsh_complete_selections>
+For tcsh mode, possible selections.
+
+=back
+
+Some internal variables modified by I<&rl_set()>. See comment at
+I<&rl_set> for info about how these setable variables work.
+
+=over
+
+=item C<$var_EditingMode>
+
+a keymap typeglob like C<%emacs_keymap> or C<%vi_keymap>
+
+=item C<$var_TcshCompleteMode>
+
+If true, the completion function works
+like in tcsh.  That is, the first time you try to complete something,
+the common prefix is completed for you. Subsequent completion tries
+thout other commands in between) cycles the command line through the
+various possibilities.  If/when you get the one you want, just
+continue typing.
+
+=back
+
+Other C<$var_> things not supported yet.
+
+Some variables used internally, but may be accessed from outside...
+
+=over
+
+=item C<$VERSION>
+
+Version of this package. It is used up by C<../Makefile.PL>
+
+=item C<$rl_readline_name>
+
+Name of program, possibly C<$0>. Used in F<.initrc> if/endif stuff.
+
+=item C<$rl_NoInitFromFile>
+If defined when package is require'd, F<~/.inputrc> will not be read.
+
+=item C<@rl_History>
+array of previous lines input.
+n
+=item C<$rl_HistoryIndex>
+
+history pointer (for moving about history array)
+
+=item C<$rl_completion_function>
+
+See L<How Command Completion Works>.
+
+=item C<$rl_basic_word_break_characters>
+
+string of characters that can cause a word break for forward-word, etc.
+
+=item C<$rl_start_default_at_beginning>
+
+Normally, the user's cursor starts at the end of any default text
+passed to readline.  If this variable is true, it starts at the
+beginning.
+
+=item C<$rl_completer_word_break_characters>
+
+like C<$rl_basic_word_break_characters> (and in fact defaults to it),
+but for the completion function.
+
+=item C<$rl_completer_terminator_character>
+
+what to insert to separate a completed token from the rest.  Reset at
+beginning of completion to C<' '> so completion function can change
+it.
+
+=item  C<$rl_special_prefixes>
+
+characters that are part of this string as well
+as of C<$rl_completer_word_break_characters> cause a word break for the
+completer function, but remain part of the word.  An example: consider
+ when the input might be perl code, and one wants to be able to
+complete on variable and function names, yet still have the sigil (C<$>,
+C<&>, C<@'>, C<%>) part of the C<$text> to be completed. Then set this var
+to C<&@$%> and make sure each of these characters is in $rl_completer_word_break_characters as well.
+
+=item C<$rl_MaxHistorySize>
+
+maximum size that the history array may grow.
+
+=item C<$rl_screen_width>
+
+ width readline thinks it can use on the screen.
+
+=item C<$rl_correct_sw>
+
+is substructed from the real width of the terminal
+
+=item C<$rl_margin>
+
+scroll by moving to within this far from a margin.
+
+=item C<$rl_CLEAR>
+
+what to output to clear the screen.
+
+=item C<$rl_max_numeric_arg>
+
+maximum numeric arg allowed.
+
+=item C<$rl_vi_replace_default_on_insert>
+
+Normally, the text you enter is added to any default text passed to
+readline.  If this variable is true, default text will start out
+highlighted (if supported by your terminal) and text entered while the
+default is highlighted (during the _first_ insert mode only) will
+replace the entire default line.  Once you have left insert mode (hit
+escape), everything works as normal.
+
+This behavior similar to many GUI controls' behavior, which select the
+default text so that new text replaces the old.
+
+Use with C<$rl_start_default_at_beginning> for normal-looking behavior
+(though it works just fine without it).
+
+I<Notes/Bugs:>
+
+=over
+
+=item *
+
+Control characters (like C-w) do not actually terminate this replace
+mode, for the same reason it does not work in emacs mode.
+
+=item *
+
+Spine-crawlingly scary subroutine redefinitions
+
+=back
+
+=item C<$rl_mark >
+
+start of the region
+
+=item C<$line_rl_mark>
+
+the line on which $rl_mark is active
+
+=item C<$_rl_japanese_mb>
+
+For character movement suppose Japanese (which?!)
+multi-byte encoding.  (How to make a sane default?)
+
+=back
+
+=head2 How Command Completion Works
+
+When asked to do a completion operation, readline isolates the word
+to the immediate left of the cursor (i.e. what's just been typed).
+This information is then passed to some function (which may be supplied
+by the user of this package) which will return an array of possible
+completions.
+
+If there is just one, that one is used.  Otherwise, they are listed
+in some way depending upon C<$var_TcshCompleteMode>.
+
+The default is to do filename completion.  The function that performs
+this task is I<rl_filename_list()>.
+
+A minimal-trouble way to have command-completion is to call
+I<rl_basic_commands()> with an array of command names, such as
+C<rl_basic_commands('quit', 'run', 'set', 'list')>.
+Those command names will then be used for completion if the word being
+completed begins the line. Otherwise, completion is disallowed.
+
+The way to have the most power is to provide a function to readline
+which will accept information about a partial word that needs completed,
+and will return the appropriate list of possibilities.
+This is done by setting C<$rl_completion_function> to the name of
+the function to run.
+
+That function will be called with three args C<($text, $line,
+$start)>.  C<$text> is the partial word that should be completed.
+C<$line> is the entire input line as it stands, and C<$start> is the
+index of the C<$text> in C$<line>.  That is, zero if C<$text> is at
+the beginning of C<$line>.
+
+A cool completion function will look at C<$line> and C<$start> and
+give context- sensitive completion lists. Consider something that will
+do completion for two commands:
+
+    cat FILENAME
+    finger USERNAME
+    status [this|that|other]
+
+It (untested) might look like:
+
+    $rl_completion_function = "main::complete";
+    sub complete {
+        local($text, $_, $start) = @_;
+        ## return commands which may match if at the beginning....
+        return grep(/^$text/, 'cat', 'finger') if $start == 0;
+        return &rl_filename_list($text) if /^cat\b/;
+        return &my_namelist($text) if /^finger\b/;
+        return grep(/^text/, 'this', 'that','other') if /^status\b/;
+        ();
+        }
+
+A real completion function would be more robust.
+
+=cut
+
+=head1 Author
+
+Originally written by Jeffrey Friedl, Omron Corporation
+(jfriedl@omron.co.jp)
+
+Comments, corrections welcome. Someone please volunteer to rewrite
+this!
+
+=head1 Thanks
+
+Thanks to the people at FSF for readline (and the code referenced
+while writing this), and for Roland Schemers whose line_edit.pl Jefrey
+used as an early basis for this.
+
+=head1 See also
+
+=over
+
+=item *
+
+L<Term::ReadLine::Perl5:readline> documents more of the nitty gritty
+details as this is embedded along with the code
+
+=item *
+
+L<Term::ReadLine::Perl5> is the OO package most programmers should use.
+
+=item *
+
+L<Term::ReadLine::Perl5::OO> is the newer but unfinished fully OO version.
+
+=back

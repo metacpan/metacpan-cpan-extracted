@@ -1,0 +1,167 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use warnings;
+use open ':std', IO => ':utf8'; # all is utf8!
+
+use Getopt::Long;
+use Pod::Usage;
+use Text::Lossy;
+
+my $help = undef;
+my $version = undef;
+my $available_filters = undef;
+my @filters = ();
+
+GetOptions(
+    'help' => \$help,
+    'version' => \$version,
+    'filter=s' => \@filters, 
+    '1' => sub { @filters = qw( lower ); },
+    '2' => sub { @filters = qw( lower whitespace ); },
+    '3' => sub { @filters = qw( lower punctuation_sp whitespace ); },
+    'paragraph' => sub { $/ = ''; }, # global, we're in top scope here
+    '2l' => sub { @filters = qw( lower whitespace_nl ); },
+    '3l' => sub { @filters = qw( lower punctuation_sp whitespace_nl ); },
+    'available-filters' => \$available_filters,
+) or pod2usage(2);
+if ($help) {
+    pod2usage(1) 
+}
+if ($version) {
+    print "text-lossy version $Text::Lossy::VERSION\n";
+    exit(0);
+}
+if ($available_filters) {
+    my @available = Text::Lossy->available_filters();
+    print "Available filters: \n";
+    foreach my $f (@available) {
+        print "  $f\n"
+    }
+    exit(0);
+}
+
+
+# Multiple filters, in-order
+@filters = split(qr{ , }xms, join(',', @filters));
+
+my $lossy = Text::Lossy->new();
+$lossy->add( @filters );
+
+while (my $line = <>) {
+    $line = $lossy->process($line);
+    print $line;
+}
+# No extra newline, nice as it would be: no longer idempotent!
+
+__END__
+
+=head1 NAME
+
+text-lossy - lossy text compression via entropy reduction
+
+=head1 SYNOPSIS
+
+text-lossy [-1|-2|-3|--filter <aa,bb,cc>|--paragraph] [file ...]
+
+ Options:
+   - help                This help
+   - version             Version of text-lossy
+   - filter  aa,bb,cc    Add filters named 'aa', 'bb' and 'cc' to the process
+                         This option can also be given more than once
+   - available-filters   List of available filters
+   - 1                   Preset 1: filter  'lower'
+   - 2                   Preset 2: filters 'lower whitespace'
+   - 3                   Preset 3: filters 'lower punctuation_sp whitespace'
+   - 2l                  Same as preset 2, but uses 'whitespace_nl'
+   - 3l                  Same as preset 3, but uses 'whitespace_nl'
+   - paragraph           Read files in paragraph mode
+
+=head1 OPTIONS
+
+=over 4
+
+=item help
+
+Show this help.
+
+=item version
+
+Show the version of this program.
+
+=item filter
+
+Add one ore more named filters to use for this run. For multiple filters,
+you can either separate the names with commas, or use the C<filter> option
+several times.
+
+=item available-filters
+
+Returns a list of currently available filters. These names can be passed
+to the C<filter> option. See L<Text::Lossy(3pm)|Text::Lossy> or supporting
+modules for information on the filters.
+
+=item 1, 2, 3
+
+Various presets that choose from sensible filter lists. Generally, higher
+numbers will compress better.
+
+=item 2l, 3l
+
+Similar to presets C<2> and C<3>, except that newline characters on the
+end of lines remain newline characters. Most useful if you wish to
+pipe line-oriented data through C<text-lossy> without causing it to
+buffer the entire input. May reduce compression efficiency.
+
+=item paragraph
+
+Reads files, or C<STDIN>, in paragraph oriented mode. In this mode,
+"paragraphs" are separated by one or more blank lines. Most useful
+in conjunction with the C<2l> or C<3l> presets, or the C<whitespace_nl>
+filter: the output will contain one line per paragraph in the input.
+
+=back
+
+=head1 DESCRIPTION
+
+This script is a straight-forward application of the Perl moduleL
+<Text::Lossy(3pm)|Text::Lossy>
+to C<STDIN> or a set of files.
+Leave the list of files empty to read from C<STDIN>.
+The results are printed to C<STDOUT>.
+
+Note that this module does not perform the actual compression itself,
+it merely changes the text so that it may be compressed better.
+You will most likely need to add some form of actual compression at the
+end, e.g.
+
+  text-lossy -3 mytext.txt | gzip > mytext.txt.gz
+
+=head1 BUGS
+
+None known so far.
+
+Please report any bugs or feature requests to C<bug-text-lossy at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Lossy>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SEE ALSO
+
+L<Text::Lossy(3pm)|Text::Lossy>
+
+=head1 AUTHOR
+
+Ben Deutsch, C<< <ben at bendeutsch.de> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Ben Deutsch.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

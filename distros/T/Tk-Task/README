@@ -1,0 +1,25 @@
+NAME
+    Tk::Task - allow multiple "tasks" to proceed at once
+
+DESCRIPTION
+    `Tk::Task' is a module to allow a lengthy operation to be subdivided
+    into smaller pieces, with time to process events between pieces. For
+    example, a program that loaded a large number of records from a database
+    could make the load process a task, allowing the program to remain
+    responsive to events--for example, to handle a Stop button!
+
+    The steps of each task are executed at idle time, one step each time,
+    while "normal" processing (handling the event loop) continues. You might
+    use a task to do simple animations such as turning cards over in a game,
+    or for other purposes. For example, the Tk::TriangleTree widget uses a
+    Tk::Task to animate the disclosure triangle.
+
+    A Task is *not* the same as a thread. It is more like a "poor man's"
+    version of threading. However, this is often quite good enough.
+
+CHANGES
+    Version 1.1 allows a Task to be created from any widget, not just
+    a MainWindow.
+
+AUTHOR
+    Kevin Michael Vail <kevin@vaildc.net>

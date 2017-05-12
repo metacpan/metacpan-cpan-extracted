@@ -1,0 +1,25 @@
+---
+abstract: 'Retrieve information about, and do analysis on, text.'
+author:
+  - 'Tore Aursand <toreau@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  Test::More: '0.98'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Info
+requires:
+  Lingua::Identify::CLD: '0'
+  Module::Load: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Unicode::Normalize: '0'
+  namespace::autoclean: '0'
+version: '0.01'

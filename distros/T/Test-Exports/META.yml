@@ -1,0 +1,29 @@
+---
+abstract: 'Test that modules export the right symbols'
+author:
+  - 'Ben Morrow <ben@morrow.me.uk>'
+build_requires:
+  Test::More: 0.65
+  Test::Most: 0.23
+  Test::Tester: 0.08
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Exports
+provides:
+  Test::Exports:
+    file: lib/Test/Exports.pm
+    version: 1
+requires:
+  B: 0
+  Test::Builder: 0
+  parent: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Exports
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: http://github.com/mauzo/Test-Exports
+version: 1

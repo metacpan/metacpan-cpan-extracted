@@ -1,0 +1,21 @@
+Revision history for Test-Chimps-Client
+
+0.05    Sun Aug 13 14:43:14 EDT 2006
+        * added information about the mailing list
+        * documented chimps-smoker.pl
+
+0.04    Fri Jul 28 14:29:34 EDT 2006
+        * Test::Chimps::Smoker->smoke can now take number of
+          iterations and which projects to smoke as arguments
+        * chimps-smoker.pl made into a more functional binary
+        * enhanced chimps-client.pl example
+
+0.03    Fri Jul 21 16:22:12 EDT 2006
+        * removed accidental use of Test::Chimps
+
+0.02    Wed Jul 12 15:49:42 EDT 2006
+        Split off from main Chimps distribution and first CPAN
+        release.
+
+0.01    Fri Jun 16 13:21:11 EDT 2006
+        First revision.  

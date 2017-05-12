@@ -1,0 +1,77 @@
+0.13     2015-04-22
+
+* Make all delivery tags a Math::UInt64 object to match the latest
+  Net::AMQ::RabbitMQ changes (as of version 0.100000 of that library). (Ran
+  Eilam)
+
+
+0.12     2015-01-19
+
+* Added the redelivered key to messages returned by recv(). This matches a
+  change in Net::AMQP::RabbitMQ 0.007002.
+* The consume() method now returns a consumer tag, either the one you pass or
+  an auto-generated tag.
+* Implemented a cancel() method.
+* Partially implemented exchange_delete() and queue_delete() methods. These
+  aren't very smart and will not throw errors when the real RabbitMQ would,
+  but the methods at least exist and delete any existing mock queue or
+  exchange.
+* Implement "passive => 1" option for queue_declare, primarily to make it
+  possible to get a queue's message count.
+* Calling queue_declare would wipe out the contents of the queue if it already
+  existed.
+
+
+0.10     2014-10-11
+
+* Message properties now default to an empty hash if none are specified. This
+  matches the behavior of Net::AMQP::RabbitMQ. (Dave Rolsky)
+
+
+0.09     2012-06-30
+
+* Add tx_select, tx_commit, and tx_rollback support. (bluefeet)
+
+
+0.08     2012-02-28
+
+* Make queues FIFO, not LIFO. (Thanks Ryan Olson!)
+* Support the tx_select, tx_commit, and tx_rollback methods.
+
+
+0.07     2012-02-24
+
+* Rather than just return the body of the queued message, return all the
+  metainformation that Net::RabbitMQ would have returned. (Thanks Ryan Olson!)
+
+
+0.06     2010-07-02
+
+* Mention the name of the queue get when is called and the queue doesn't exist.
+
+
+0.05     2010-07-01
+
+* Add debug attribute for printing out publishes
+
+
+0.04     2010-06-04
+
+* Default exchange to amq.direct
+* Add support for wildcard bindings (# and *)
+
+
+0.03     2010-05-25
+
+* Fix bug in get implementation
+
+
+0.02     2010-05-25
+
+* Implement get method.
+* POD fixes
+
+    
+0.01     2010-03-05
+
+* First version, released on an unsuspecting world.

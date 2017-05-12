@@ -1,0 +1,10 @@
+0.03 20151113
+  . Distribution cleanup, thanks to CHORNY
+  . Corrected regexp in documentation
+  . No code changes, no need to upgrade
+
+0.02 20120704
+  . Declare proper encoding for POD sections
+
+0.01 20120423
+  . Initial release after discussion on http://perlmonks.org/?node_id=966219

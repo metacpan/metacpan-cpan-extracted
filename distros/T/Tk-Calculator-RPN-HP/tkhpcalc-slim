@@ -1,0 +1,17 @@
+#!/usr/local/bin/perl -w
+#
+# A partial implementation of various Hewlett Packard calculators.
+#
+# sol0@lehigh.EDU, LUCC, 2002/11/24.
+#
+# Copyright (C) 2001 - 2007 Stephen O. Lidie. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+use Tk;
+use Tk::Calculator::RPN::HP;
+
+my $mw = MainWindow->new;
+$mw->Calculator( -type => '21' )->pack; # or '16c'
+MainLoop;

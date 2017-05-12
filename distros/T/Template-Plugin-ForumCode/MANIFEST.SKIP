@@ -1,0 +1,15 @@
+^Makefile$
+^Test-.*gz$
+^Test-.*tar$
+\.par$
+swp$
+swo$
+tmp$
+\.old$
+^blib
+^html
+.*user_file.*
+^dist
+^pm_to_blib
+\.bak$
+.*\.sqlite3

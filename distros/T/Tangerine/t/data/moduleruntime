@@ -1,0 +1,4 @@
+use Module::Runtime;
+require_module 'Alfa';
+use_module('Bravo', '1.23');
+my $obj = use_package_optimistically("Charlie", "4.567")->new;

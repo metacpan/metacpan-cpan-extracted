@@ -1,0 +1,16 @@
+Revision history for Test-PAUSE-ConsistentPermissions
+
+0.003     2016-05-13 13:38:04+01:00 Europe/London
+
+  - Allow dist to not be speicied when using 
+    pause-check-distro-perms
+  - Updated usage on the script to make use of
+    POD.
+
+0.002     2016-04-24 09:08:30+01:00 Europe/London
+
+  - Performed the usual dist fix after release.
+
+0.001     2016-04-24 08:59:52+01:00 Europe/London
+
+  - Initial version.

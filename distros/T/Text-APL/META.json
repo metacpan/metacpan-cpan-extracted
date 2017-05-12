@@ -1,0 +1,96 @@
+{
+   "abstract" : "non-blocking and streaming capable template engine",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-APL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      }
+   },
+   "provides" : {
+      "Text::APL" : {
+         "file" : "lib/Text/APL.pm",
+         "version" : "0.07"
+      },
+      "Text::APL::Base" : {
+         "file" : "lib/Text/APL/Base.pm"
+      },
+      "Text::APL::Compiler" : {
+         "file" : "lib/Text/APL/Compiler.pm"
+      },
+      "Text::APL::Context" : {
+         "file" : "lib/Text/APL/Context.pm"
+      },
+      "Text::APL::Core" : {
+         "file" : "lib/Text/APL/Core.pm",
+         "version" : "0.07"
+      },
+      "Text::APL::Parser" : {
+         "file" : "lib/Text/APL/Parser.pm"
+      },
+      "Text::APL::Reader" : {
+         "file" : "lib/Text/APL/Reader.pm"
+      },
+      "Text::APL::Reader::AIO" : {
+         "file" : "lib/Text/APL/Reader/AIO.pm"
+      },
+      "Text::APL::Translator" : {
+         "file" : "lib/Text/APL/Translator.pm"
+      },
+      "Text::APL::WithCaching" : {
+         "file" : "lib/Text/APL/WithCaching.pm"
+      },
+      "Text::APL::Writer" : {
+         "file" : "lib/Text/APL/Writer.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/text-apl/issues"
+      },
+      "homepage" : "https://github.com/vti/text-apl",
+      "repository" : {
+         "url" : "git://github.com/vti/text-apl",
+         "web" : "https://github.com/vti/text-apl"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "vti <viacheslav.t@gmail.com>"
+   ]
+}

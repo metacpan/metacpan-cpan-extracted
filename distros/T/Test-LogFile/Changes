@@ -1,0 +1,10 @@
+Revision history for Perl extension Test::LogFile
+
+0.04    Mon Mar 11 02:20:13 JST 2013
+        - mod POD for generating author by Module::Build.
+0.03    Mon Mar 11 01:08:13 JST 2013
+        - change build module to using Module::Build.
+0.02    Fri Feb 22 02:17:42 2013
+        - mod document. add eg as showcase.
+0.01    Wed Jan 30 02:15:42 2013
+        - original version

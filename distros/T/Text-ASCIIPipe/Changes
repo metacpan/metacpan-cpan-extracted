@@ -1,0 +1,13 @@
+Revision history for Text-ASCIIPipe
+
+1.001000
+	- support optional handle for hooks (lets you plug in an object, for example)
+	- add prefilter hook
+	- rework hook call logic to ensure begin/end hooks being called, even for empty files
+
+1.000001 (02.10.2012)
+	Small documentation fixes.
+
+1.000000 (01.10.2012)
+	First release under new name (used to be called TextData::Piper in my private realm).
+

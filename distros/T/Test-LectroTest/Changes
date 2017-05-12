@@ -1,0 +1,316 @@
+-*-Outline-*-
+
+LectroTest Change Log
+Tom Moertel (tom@moertel.com)
+
+* 0.5001   (2013-05-14)
+
+- Update Changes file.
+
+
+* 0.5000   (2013-05-15)
+
+- Remove signature test.
+
+- Stop using UNIVERSAL->import (fixes #66114).
+  Thanks Nicholas Bamber (SILASMONK) for the patch.
+
+- Add prototype to silence warning (fixes #85281).
+  Thanks to Petr Pisar for pointing out the problem.
+
+- Minor tweaks to whitespace
+
+
+* 0.3600   (2007-08-30)
+
+** Misc
+
+- Test suite for generators now emits notice that a failure may
+  not indicate a real problem.  (rt.cpan.org #28203; thanks ANDK)
+
+- Minor typo fixes in the documentation.
+
+
+
+* 0.3500   (2006-05-31)
+
+** Improvements
+
+- Added failure recording and playback, which is great for building
+  regression-testing suites and for recording failures in the wild.
+  Both Test::LectroTest and Test::LectroTest::Compat take the
+  following options:
+
+  - playback_failures => file
+  - record_failures => file
+  - regressions => file
+
+  The first tells LT to use the prerecorded failures in the given file
+  for playback during testing, *in addition to* the normal randomly
+  generated cases.  The second tells LT to record any failures that
+  occur during testing.  The failures will be written to the given
+  file.  The third is a shorthand for setting the first two options to
+  the same file.  It is a more readable way to declare your intent to
+  build up and use a persistent regressions file.
+
+  These options are documented more fully in the docs for
+  Test::LectroTest::TestRunner.
+
+** Misc
+
+- I'm now using Module::Signature to sign the Test::LectroTest
+  distribution.
+
+
+
+* 0.3400   (2006-01-18)
+
+** Improvements
+
+- $tcon->dump( val, ... ) now returns val as its result so that
+  the method call can be used to record values in passing.
+
+- Added Pod and Pod-coverage tests.  Tweaked the code to satisfy them.
+
+
+* 0.3300   (2005-07-20)
+
+** Fixes
+
+- Test::LectroTest can now be listed as a dependency in an
+  ExtUtils::MakeMaker Makefile.PL.  (Thanks Steffen Müller)
+
+** Misc
+
+- Minor documentation tweaks for clarity.
+
+- Minor code clean ups.
+
+
+* 0.3200   (2005-03-03)
+
+** Improvements
+
+- You can now attach notes and variable dumps to trials.  In the
+  event the trial fails, the notes will be emitted as part of the
+  counterexample to aid in debugging.
+      See Test::LectroTest::TestRunner::testcontroller for the
+  documentation on the new $tcon->note() and $tcon->dump() methods.
+
+- Strings in counterexamples are now printed in double-quoted form.
+  This makes it easy to see invisibles.
+
+
+* 0.3100   (2005-02-19)
+
+- This release is identical to 0.3000 except that for this release I
+  did not screw up the version numbering in the distribution tarball.
+  (Ouch!)
+
+
+* 0.3000   (2005-02-19)
+
+** Improvements
+
+- Full test coverage!  Devel::Coverage says that the LT unit tests now
+  cover 100% of statements, branches, conditionals, and subroutines.
+
+- Test::LectroTest now follows Test::Simple's exit-code strategy:
+  The number of failures (up to 254) is reported via the exit code.
+
+- (!) Test::LectroTest::TestRunner::run_suite now returns the number
+  of properties that successfully checked.  (Before it reported 0 if
+  any check failed.) !!!NOTE!!! This is an API change.  If you have
+  written code that checks the result of run_suite, you will need to
+  change it.
+
+** Fixes
+
+- An empty suite powered by Test::LectroTest now emits "1..0"
+  as its sole output when previously there was no output.
+
+** Misc
+
+- Added a bunch of new test cases.
+
+- Renamed test files: from t/001.t to t/gens.t, etc.
+
+- Removed superfluous use of Data::Dumper in t/gens.t.
+
+- Relaxed dependencies on external packages need only for building.
+
+
+* 0.2010   (2005-02-16)
+
+** Improvements
+
+- Now you can mix LectroTest and Test::* modules!
+  Test::LectroTest::Compat provides the compatibility magic.
+
+** Fixes
+
+- Updated copyright notices.
+
+- Removed use of List::Util from t/001.t.  (This should be
+  the last use of the module.  Now we can cut the dependency.)
+
+- Renamed the test .t files to something sensible.
+
+** Misc
+
+- Made list of dependencies in Build.PL pedantically complete.
+
+
+
+* 0.2008   (2005-02-05)
+
+** Improvements
+
+- Paste can now be used to join elements of generated lists,
+  which are "flattened" before pasting.  For example, the
+  following are equivalent:
+      Paste( (Bool) x 4 )
+      Paste( List(Bool, length=>4) )
+
+- Removed dependency upon Data::Dumper's Sortkeys method and
+  upon List::Util entirely.  This makes LectroTest compatible with
+  older versions of Perl.  (I tested on v5.6.1 built for i386-linux.)
+  Thanks Alex Kapranoff for the Sortkeys dependency report.
+
+** Fixes
+
+- Minor clarifying edits to documentation.
+
+
+* 0.2007   (2004-09-30)
+
+** Improvements
+
+- You can now specify multiple sets of generator-bindings for a
+  property.  This lets you focus on specific portions of your test
+  space to ensure the desired coverage.  For example, if you wanted
+  to cover all integers but especially focus on the range [-1,1]:
+
+  Property {
+      ##[ x <- Int ], [ x <- Int(range=>[-1,1]) ]##
+      blah($x) != 0
+  }, name => "blah result is non-zero" ;
+
+- Generator now accepts an :all export tag to export everything
+  (which is what I use almost all of the time).
+
+- If a generator throws an exception, it is caught and reported
+  specifically in a special warning counterexample.
+
+- Expanded test suite for TestRunner and Property.
+
+** Fixes
+
+- Some of the new combinators were listed under the :common
+  export tag instead of under :combinators.
+
+
+* 0.2006  New combinators, doc fixes (2004-09-15)
+
+** Improvements
+
+- More new combinators that you can shake a stick at:
+  Each, Apply, Map, Concat, Flatten, ConcatMap, FlattenMap.
+
+- As usual, documentation tweaks:
+  - Better explanation of sizing guidance (Generator)
+  - Added warnings about empty ranges, etc. (Generator)
+  - Documented the new combinators (Generator)
+
+- Additional pre-flight checks for Int and Float generators:
+  If a range is provided that does not contain zero, LectroTest
+  will complain if the generator is also sized (because the
+  run-time intersection of the sizing-guidance range and the
+  generator's range can be empty, making it impossible to
+  generate a valid value).
+
+
+** Fixes
+
+- Fixed an overly-uppity pre-flight check for List(length=>N).
+
+- Fixed TestRunner's modifying of $" in a way that escaped into the
+  behavior-test part of Properties during checks.
+
+
+* 0.2005  Re-release of 0.2004 to make CPAN happy (2004-09-13)
+
+- I once had a version in Test::LectroTest::Generator but removed it
+  because I wanted to version only the entire Test::LectroTest module.
+  But CPAN rejected Generator because its version had "fallen."  Crap.
+  So, back in goes the version number, now bumped.
+
+
+* 0.2004  Documentation improvements, minor code improvements (2004-09-13)
+
+** Fixes
+
+- Some links in documentation were broken.
+
+** Improvements
+
+- Vastly improved docs: All modules now have decent documentation.
+  (Tutorial still needs step-by-steps, tho.)
+
+- More pre-flight checks and better error reporting.
+
+- Cleaned up Test::LectroTest's hack for running property checks and
+  end of load.
+
+
+* 0.2003  Bug fix and doc improvements (2004-09-11)
+
+** Fixes
+
+- !! Important fix: In generator bindings with more than one variable,
+  variables sometimes got each others' values.
+
+** Improvements
+
+- Updated docs.
+
+- LectroTest::Property now pre-flight checks for the use of $tcon in a
+  generator binding and emits and error in that case.  ($tcon is used
+  for the test controller.)
+
+- TestRunner will now catch and report exceptions thrown during
+  property checks:
+
+  - A thrown exception results in test failure.
+
+  - The "details" report will include a "Caught exception" section,
+    if needed.
+
+  - TestRunner::results now has an exception field:
+    - undef if no exception was thrown during testing
+    - the exception otherwise
+
+
+* 0.2002  Documentation improvements (2004-09-09)
+
+- Added README (d'oh!) from Test::LectroTest.
+- Updated docs in Test::LectroTest.
+
+
+* 0.2001  First Pre-CPAN upload release (2004-09-09)
+
+- Major documentation improvements
+
+- Lots of cleanups
+
+- Reorg under Test:
+  LectroTest::*      -> Test::LectroTest::*
+  LectroTest::Simple -> Test::LectroTest
+
+
+* 0.1002  First public release (2004-09-08)
+
+- Clean ups
+
+
+* 0.1001  First cut

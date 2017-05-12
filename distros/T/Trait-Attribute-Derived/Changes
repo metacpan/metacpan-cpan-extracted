@@ -1,0 +1,37 @@
+Trait-Attribute-Derived
+=======================
+
+Created:      2013-01-02
+Home page:    <https://metacpan.org/release/Trait-Attribute-Derived>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Trait-Attribute-Derived>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.004	2013-02-06
+
+ [ Packaging ]
+ - Fix test_requires dependency on self
+   Fixes RT#83157.
+   CHORNY++
+   <https://rt.cpan.org/Ticket/Display.html?id=83157>
+
+0.003	2013-01-07
+
+ [ Documentation ]
+ - Add examples/text-example-from-pod.pl
+ - Fix the example in the SYNOPSIS
+   Fixes RT#82523.
+   SPUDSOUP++
+   <https://rt.cpan.org/Ticket/Display.html?id=82523>
+
+0.002	2013-01-04
+
+ [ Packaging ]
+ - Correctly list dependencies
+   MITHALDU++
+
+0.001	2013-01-04	Initial release

@@ -1,0 +1,9 @@
+Test::CircularDependencies - Check of Circular dependencies
+
+0.02 2015-09-23
+  - Remove requirement for perl 5.10
+
+0.01 2015-09-23
+  - first release
+
+

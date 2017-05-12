@@ -1,0 +1,13 @@
+<%args>
+    $chart_axis_type
+</%args>
+
+%   my @a_chart_axis_types = $c->model('TestrunDB')->resultset('ChartAxisTypes')->search();
+%   for my $or_chart_axis_type ( @a_chart_axis_types ) {
+%       if ( $chart_axis_type && $or_chart_axis_type->chart_axis_type_id() == $chart_axis_type ) {
+            <option selected value="<% $or_chart_axis_type->chart_axis_type_id() %>"><% $or_chart_axis_type->chart_axis_type_name() %></option>
+%       }
+%       else {
+            <option value="<% $or_chart_axis_type->chart_axis_type_id() %>"><% $or_chart_axis_type->chart_axis_type_name() %></option>
+%       }
+% }

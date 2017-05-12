@@ -1,0 +1,114 @@
+#!/usr/local/bin/perl -w
+our $VERSION = "0.5b";
+
+use strict;
+use TapeChanger::MTX;
+
+$0 =~ s%.*/%%;
+my ($command, @args) = @ARGV;
+
+my @problems = TapeChanger::MTX->cannot_run();
+if (scalar @problems) {
+  print "Unable to run program:\n ", join("\n ", @problems), "\n"; 
+  exit 0;
+}
+
+$command ||= "";   $command =~ s/^-//; 	# Leading '-'s aren't required
+if ($command eq 'info') { 
+  my $loaded = TapeChanger::MTX->loadedtape();
+  my $slots  = TapeChanger::MTX->numslots();
+  print "$loaded $slots 1\n"; 	# I don't get the final '1'
+  exit 0;
+} 
+elsif ($command eq 'slot') { 
+  my $tape = TapeChanger::MTX->loadtape(@args);
+  print TapeChanger::MTX->reportstatus, "\n";
+  exit ($tape && $tape =~ /^\d+$/) ? 0 : 1;
+} 
+elsif ($command eq 'eject') { 
+  my $return = TapeChanger::MTX->ejecttape;
+  print TapeChanger::MTX->reportstatus, "\n";
+  exit $return ? 1 : 0;
+} 
+elsif ($command eq 'reset') { 
+  my $return = TapeChanger::MTX->resetchanger;
+  $return ? print TapeChanger::MTX->reportstatus, "\n"
+	  : print "-1 $?\n";
+  exit $return ? 1 : 0;
+}
+elsif ($command eq 'usage') { Usage(); exit 0 }
+else { Usage(); exit 0 }
+
+exit(0);
+
+sub Usage {
+  print <<EOL;
+Usage: $0 <command> [arg...]
+  -info          reports capability and loaded tape
+  -slot <slot>   loads specified tape into drive
+        current  reports current mounted tape
+        next     loads logically next tape (loops to top)
+        prev     loads logically previous tape (loops to bottom)
+        first    loads first tape
+        last     loads last tape
+        1..99    loads tape from specified slot#
+  -eject         unloads current mounted tape
+  -reset         resets changer (and drive); loads first tape
+EOL
+}
+
+=head1 NAME 
+
+tapechanger - a tape changing script, using TapeChanger::MTX
+
+=head1 SYNOPSIS
+
+  tapechanger -slot first
+  tapechanger -eject
+
+=head1 DESCRIPTION
+
+tapechanger is a tape changing program for MTX, using the TapeChanger::MTX
+module.  It can load and unload tapes, as long as you have a tape changer
+to work with.  
+
+Supports the following options:
+
+  -info          reports capability and loaded tape
+  -slot <slot>   loads specified tape into drive
+        current  reports current mounted tape
+        next     loads logically next tape (loops to top)
+        prev     loads logically previous tape (loops to bottom)
+        first    loads first tape
+        last     loads last tape
+        1..99    loads tape from specified slot#
+  -eject         unloads current mounted tape
+  -reset         resets changer (and drive); loads first tape
+
+This should be compatible with AMANDA, the tape backup program.
+
+=head1 REQUIREMENTS
+
+Perl 5.6.0 or better, and TapeChanger::MTX (and everything it requires).
+
+=head1 SEE ALSO
+
+B<mtx>, B<mt>, B<TapeChanger::MTX>.  Inspired by B<stc-changer>, which
+comes with the AMANDA tape backup package (http://www.amanda.org), and
+MTX, available at http://mtx.sourceforge.net.
+
+=head1 AUTHOR
+
+Tim Skirvin <tskirvin@uiuc.edu>
+
+=head1 COPYRIGHT
+
+Copyright 2001 by the University of Illinois Board of Trustees and Tim
+Skirvin <tskirvin@ks.uiuc.edu>.
+
+=cut
+
+##### Version History
+# v0.5    Fri Nov  9 15:39:15 CST 2001
+### Initial version, based off old mtx-changer code (also self-written).
+### Documentation and such are written.

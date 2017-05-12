@@ -1,0 +1,7 @@
+NLP.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/talker.pl
+t/01.t

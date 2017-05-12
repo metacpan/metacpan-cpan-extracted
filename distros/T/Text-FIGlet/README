@@ -1,0 +1,70 @@
+This package includes the module Text::FIGlet, several scripts which use it,
+the FIGlet fonts standard.flf and mini.flf and documentation on creating fonts.
+
+NAME
+    Text::FIGlet - a perl module to provide FIGlet abilities, akin to banner
+
+SYNOPSIS
+     my $font = Text::FIGlet-E<gt>new(-f=>"doh");
+     print scalar $font->figify(-A=>"Hello World");
+
+DESCRIPTION
+
+     But why?
+
+     Because I could.
+
+     But why?
+
+     Because I like FIGlet and Perl.
+
+     But why? In Bob's name WHY?! What purpose could it serve?
+
+     If you want something more substantive imagine:
+       * Run Apache with mod_perl
+       * In F<startup.pl> create a Text::FIGlet object
+         * figify text for the heads of Directory listings,
+           and you look like a warm and fuzzy BBS
+         * create ornate text based counters or timestamps on pages
+         * {shudder} CAPTCHA bots
+           NOTE: Ransom mode--unique to this implementation--may be handy here.
+
+     Or not, I just make the scissors, now run along.
+
+EXAMPLES
+
+% figlet -A Hello World
+ _   _      _ _        __        __         _     _ 
+| | | | ___| | | ___   \ \      / /__  _ __| | __| |
+| |_| |/ _ \ | |/ _ \   \ \ /\ / / _ \| '__| |/ _` |
+|  _  |  __/ | | (_) |   \ V  V / (_) | |  | | (_| |
+|_| |_|\___|_|_|\___/     \_/\_/ \___/|_|  |_|\__,_|
+
+
+% figlet.pl -A Hello World
+ _   _        _  _         __        __              _      _ 
+| | | |  ___ | || |  ___   \ \      / /  ___   _ __ | |  __| |
+| |_| | / _ \| || | / _ \   \ \ /\ / /  / _ \ | '__|| | / _` |
+|  _  ||  __/| || || (_) |   \ V  V /  | (_) || |   | || (_| |
+|_| |_| \___||_||_| \___/     \_/\_/    \___/ |_|   |_| \__,_|
+
+figlet.pl is a young adult and does not yet do sophisticated smushing,
+or other fancy layout like vertical fitting.
+
+minifig.pl is a self-contained version of figlet.pl
+It requires nothing more than a standard Perl distribution.
+For more information about minifig.pl see minifig.pl -help,
+and doc/minifig.HOWTO on customizing it.
+
+% minifig.pl -A Hello World
+
+|_|  _  | |  _    \    /  _  ._ |  _|
+| | (/_ | | (_)    \/\/  (_) |  | (_|
+
+
+INSTALLATION
+
+perl Makefile.PL
+make test
+bin/figlet.pl -d share
+make install

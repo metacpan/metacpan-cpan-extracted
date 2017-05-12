@@ -1,0 +1,59 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Tie::Cache::LRU::LinkedList;
+use Tie::Cache::LRU::Array;
+use FindBin qw($Bin);
+
+my(%LCache, %ACache, %Control);
+tie %LCache, 'Tie::Cache::LRU::LinkedList', 500;
+tie %ACache, 'Tie::Cache::LRU::Array', 500;
+
+# Pull it into memory so I/O isn't an issue.
+open(TEST_DATA, "$Bin/big_test_data") || die "Can't find test data: $!";
+my %Test_Data = map { chomp; $_ } <TEST_DATA>;
+
+printf "Test data size is %d keys.\n\n", scalar keys %Test_Data;
+
+use Benchmark;
+
+timethese(shift || -3, 
+          {
+           LinkedList_Write => sub {
+               while(my($k,$v) = each %Test_Data) {
+                   $LCache{$k} = $v;
+               }
+           },
+           Array_Write => sub {
+               while(my($k,$v) = each %Test_Data) {
+                   $ACache{$k} = $v;
+               }
+           },
+           Control_Write => sub {
+               while(my($k,$v) = each %Test_Data) {
+                   $Control{$k} = $v;
+               }
+           },
+           LinkedList_Read => sub {
+               my $foo;
+               while(my($k,$v) = each %Test_Data) {
+                   $foo = $LCache{$k};
+               }
+           },
+           Array_Read => sub {
+               my $foo;
+               while(my($k,$v) = each %Test_Data) {
+                   $foo = $ACache{$k};
+               }
+           },
+           Control_Read => sub {
+               my $foo;
+               while(my($k,$v) = each %Test_Data) {
+                   $foo = $Control{$k};
+               }
+           },
+          });
+
+
+__END__

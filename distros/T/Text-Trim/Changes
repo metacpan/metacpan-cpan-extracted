@@ -1,0 +1,8 @@
+
+1.01    Mon Feb 27 2006
+        - Added reference to String::Strip in docs
+        - Added docs and tests demonstrating unicode support
+
+1.00	Wed Feb 22 2006
+	- Initial version
+    

@@ -1,0 +1,24 @@
+#! /usr/local/bin/perl -w
+#
+# wave - draw a pretty picture. On broken platforms the 'select'
+#        call may need to be commented out.
+#
+# This file is part of the Tie::Cycle::Sinewave perl extension
+# Copyright (c) 2005 David Landgren. All rights reservered.
+
+use strict;
+use Tie::Cycle::Sinewave;
+
+my $period = shift || 100;
+
+tie my $c, 'Tie::Cycle::Sinewave', {
+    start_min => 1,
+    min       => 2,
+    max       => 76,
+    period    => $period,
+};
+
+while( 1 ) {
+    print +(' ' x $c), "*\n";
+    select undef, undef, undef, 0.05;
+}

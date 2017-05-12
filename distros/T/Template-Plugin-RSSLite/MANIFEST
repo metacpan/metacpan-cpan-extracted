@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+RSSLite.pm
+test.pl
+test/Templates/one
+test/slashdot.rdf

@@ -1,0 +1,44 @@
+{
+   "abstract" : "Module for evaluation of labels of the clusters. ",
+   "author" : [
+      "Ted Pedersen <tpederse at d.umn.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-SenseClusters-LabelEvaluation-Driver",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Munkres" : "0.08",
+            "Test::More" : 0,
+            "Text::Similarity" : "0.09",
+            "WWW::Wikipedia" : "2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.09"
+}

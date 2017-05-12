@@ -1,0 +1,10 @@
+Build.PL
+lib/Test/Mojo/Pg.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/core.t
+t/db1.sql
+t/live.t

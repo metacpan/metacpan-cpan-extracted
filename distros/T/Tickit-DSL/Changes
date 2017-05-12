@@ -1,0 +1,196 @@
+Revision history for Tickit-DSL
+
+0.031     2016-12-31 21:44:23+08:00 Asia/Kuala_Lumpur
+	No new features.
+
+	Dependencies:
+	* Updated ::LogAny to latest version
+
+	Metadata updates:
+	* Minor dist.ini cleanup based on CPANTS complaints
+	* Added github info
+
+0.030     2016-12-31 19:45:54+08:00 Asia/Kuala_Lumpur
+	No new features.
+
+	Dependencies:
+	* Added ::Choice and ::Calendars, although they are not yet supported directly.
+	* Updated ::Table and ::Desktop
+
+0.029     2016-11-06 23:29:02+08:00 Asia/Kuala_Lumpur
+	Features:
+	* term spport (Tickit::Widget::Term)
+
+	Dependencies:
+	* tabbed dep updated, latest version fixes deprecation issues with
+	Tickit 0.50
+
+0.028     2015-02-12 21:29:14+00:00 Europe/London
+	Features:
+	* figlet - render larger text
+	* console added back in by default
+
+	Dependencies:
+	* table, logpanel and desktop updated again
+
+0.027     2015-02-06 18:30:45+00:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Updated table, logpanel and desktop versions for bug fixes
+
+0.026     2015-02-06 14:09:53+00:00 Europe/London
+	Features:
+	* logpanel support (Tickit::Widget::LogAny)
+
+	Dependencies:
+	* Table, Tree updated
+
+0.025     2015-02-04 01:35:30+00:00 Europe/London
+	Dependencies:
+	* Version updates (Tickit 0.50, widget updates)
+
+0.024     2015-01-24 14:10:31+00:00 Europe/London
+	Features:
+	* Panel positioning (for desktop { }) now passes through the
+	top/left/right/bottom attributes unchanged, previously was
+	assigning random position for dimensions that were not assigned
+
+0.023     2015-01-24 09:01:58+00:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Dropped Tickit::Console, since it doesn't install currently.
+
+0.022     2014-08-31 15:07:05+01:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* More version updates
+
+0.021     2014-08-31 03:03:34+01:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* More version updates
+
+0.020     2014-08-31 01:25:41+01:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Updated Tickit::Widget::Layout::Desktop and Menu/Tabbed
+
+0.019     2014-08-31 00:37:46+01:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Updated Tickit::Widget::Table.
+
+0.018     2014-08-30 02:32:34+01:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Updated some module versions
+
+0.017     2014-08-23 02:45:55+01:00 Europe/London
+	Features:
+	* breadcrumb support (Tickit::Widget::Breadcrumb)
+	* tree data parameter now handled by Tickit::Widget::Tree
+
+	Bugs fixed:
+	* Stray debugging line on table widget
+
+0.016     2014-08-20 21:20:28+01:00 Europe/London
+	Features:
+	* tree accepts data parameter
+	* float now gets the $float as first parameter
+	* menu callbacks will be passed the container
+	which holds the menubar, allowing floatbox-and-menu
+	combinations (popup dialogs, for example)
+
+0.015     2014-08-17 16:11:50+01:00 Europe/London
+	Features:
+	* desktop support (Tickit::Widget::Layout::Desktop)
+
+0.014     2014-08-16 22:10:46+01:00 Europe/London
+	Features:
+	* console support (Tickit::Console)
+
+	Documentation:
+	* Fixed email address
+
+0.013     2014-08-16 19:26:52+01:00 Europe/London
+	Features:
+	* table support (Tickit::Widget::Table)
+
+0.012     2014-08-16 04:44:59+01:00 Europe/London
+	Features:
+	* fileviewer support (Tickit::Widget::FileViewer)
+
+0.011     2014-08-06 16:50:56+01:00 Europe/London
+	Features:
+	* scroller_richtext support (Tickit::Widget::Scroller::Item::RichText)
+	* floatbox and float support (Tickit::Widget::FloatBox)
+	* Better support for button coderef - pass the container as the first
+	parameter so that new widgets can be added consistently
+
+0.010     2014-01-26 05:52:44+00:00 Europe/London
+	Features:
+	* Radio button support (Tickit::Widget::RadioButton)
+	* Frame support (Tickit::Widget::Frame)
+	* Dropped ::Table pending updated version on CPAN
+
+0.009     2013-09-28 20:04:55 Europe/London
+	Features:
+	* Added checkbox (Tickit::Widget::CheckButton)
+	* Added button (Tickit::Widget::Button)
+
+	Dependencies:
+	* Cleaned up cpanfile dep list
+
+	Bug fixes:
+	* Updated Dist::Zilla::Plugin::Test::Compile for RT88783
+
+0.008     2013-09-15 19:01:51 Europe/London
+	Features:
+	* Support timers - 'timer { ... } after => 5;'
+
+0.007     2013-09-15 16:40:15 Europe/London
+	Features:
+	* Support the ::Layout::Relative widget
+
+	Bug fixes:
+	* Make sure widget arguments are propagated where appropriate
+
+	Documentation:
+	* Add section headings to divide the widget functions by purpose
+
+0.006     2013-09-14 23:57:33 Europe/London
+	Features:
+	* Support the ::Decoration widget
+
+	Bug fixes:
+	* Pass parameters to ::Placegrid (class, etc.)
+
+0.005     2013-09-14 17:37:08 Europe/London
+	Features:
+	* Allow parent:X notation to avoid having to
+	wrap everything in widget {} blocks.
+
+0.004     2013-09-13 19:41:43 Europe/London
+	Features:
+	* Tickit::Widget::ScrollBox is available via scrollbox { }
+
+0.003     2013-09-10 23:07:19 Europe/London
+	No new features.
+
+	Bug fixes:
+	* gridrow was double-adding widgets. Now fixed.
+
+0.002     2013-09-01 21:40:45 Europe/London
+	Features:
+	* Tickit::Widget::Statusbar is now on CPAN,
+	so it has been added to the deps list
+
+0.001     2013-09-01 03:41:06 Europe/London
+	Initial CPAN release

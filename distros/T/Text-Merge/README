@@ -1,0 +1,80 @@
+-----------------------------------------------------------------------------
+
+Text::Merge
+Version 0.36
+last revised: March 1st, 2004
+ 
+Copyright (c) 1997-2001 by Steven D. Harris. All rights reserved.  This 
+program is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+-----------------------------------------------------------------------------
+
+CONTENTS
+--------
+
+This package contains the following files which should share the same version 
+number:
+
+	Text/Merge.pm        -  basic text/data merge package
+	Text/Merge/Lists.pm  -  extension to support display of list references
+
+There are HTML formatted manuals in the docs/ directory of the archive if
+you want to extract just those to read them.
+
+
+
+DESCRIPTION
+-----------
+ 
+The Text::Merge module provides a set of methods for merging text display
+templates with data sets.  It is extended to include support for
+list of items of various types, displayed individually in context.
+
+The interface is designed to be as easy to use as possible while providing
+extensibility into various contexts and applications on a sophisticated
+level.  You can begin by using the basic template markup and work your
+way to conditionals.  Programmers can master the template processing
+methods in minutes.
+
+This set of functions has been very useful to me in scores of various 
+contexts in my CGI programs and installers.  I am publishing them in 
+the hope that they may benefit others as well, and in the hopes that 
+I can get enough feedback to continue to improve them.
+
+
+
+PREREQUISITES
+-------------
+ 
+Before you can build the Text::Merge:: packages you need to have the following
+installed on your system:
+
+    * Perl 5.005 or better
+
+
+
+BUILDING AND INSTALLING THE MODULES
+-----------------------------------
+ 
+Assuming you have met all the prerequisites, building the modules
+should be relatively straightforward.
+
+The modules can now be built and installed using this sequence of commands:
+ 
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+-----------------------------------------------------------------------------
+
+If you would like to assist in development of this module or wish to contact
+the author, <perl-wiz (is AT the domain) nullspace.org>.
+
+-----------------------------------------------------------------------------
+
+--SDH
+
+

@@ -1,0 +1,278 @@
+2001-10-01 04:41  jmason
+
+	* t/etmailto.t: fixed 1 failing test, ready for release
+
+2001-09-30 06:33  jmason
+
+	* lib/Text/EtText/Lists.pm: blocked BR additions to html-only lines
+
+2001-09-30 04:55  jmason
+
+	* lib/Text/EtText/EtText2HTML.pm, t/ettextmarkup.t, t/menorah.t:
+	headers now have id tags for XHTML conformance
+
+2001-09-20 08:39  jmason
+
+	* doc/documentation.wmk: more fixes
+
+2001-09-20 08:35  jmason
+
+	* doc/documentation.wmk, lib/Text/EtText/HTML2EtText.pm,
+	lib/Text/EtText/Lists.pm: fixed new bug, added doco
+
+2001-09-20 07:24  jmason
+
+	* MANIFEST, Makefile.PL, ettext2html.raw, doc/documentation.wmk,
+	lib/Text/EtText/EtText2HTML.pm, lib/Text/EtText/Lists.pm,
+	t/basiclist.t, t/basicparas.t, t/blockquoteinlist.t, t/etlists.t,
+	t/etmailto.t, t/etmore.t, t/ettextmarkup.t, t/linklist.t, t/mail.t,
+	t/menorah.t, t/oldparastyle.t, t/snakenest.t, t/sublists.t,
+	t/twolists.t, t/txt2htmlsample.t, t/data/basiclist.etx,
+	t/data/basicparas.etx, t/data/blockquoteinlist.etx,
+	t/data/etlists.etx, t/data/linklist.etx, t/data/mail.etx,
+	t/data/menorah.etx, t/data/oldparastyle.etx, t/data/snakenest.etx,
+	t/data/sublists.etx, t/data/twolists.etx,
+	t/data/txt2htmlsample.etx: list-handling code totally rewritten and
+	totally cool
+
+2001-08-27 08:45  jmason
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, ethtml2text,
+	ethtml2text.raw, ettext2html, ettext2html.raw, fixpath.pl: fixed to
+	use 'fixpath.pl' to add /usr/bin/perl line
+
+2001-06-22 00:14  jmason
+
+	* Changes, build/update_devel, build/update_stable,
+	lib/Text/EtText.pm: new version
+
+2001-06-11 13:47  jmason
+
+	* lib/Text/EtText.pm: bumped to 2.1
+
+2001-06-11 13:46  jmason
+
+	* Changes, build/update_devel, build/update_stable: updated build
+	scripts
+
+2001-06-07 13:02  jmason
+
+	* Changes, specfile.raw, build/mkrpm, build/update_devel,
+	build/update_stable, lib/Text/EtText.pm,
+	lib/Text/EtText/EtText2HTML.pm, lib/Text/EtText/HTML2EtText.pm,
+	lib/Text/EtText/LinkGlossary.pm: release of 2.0
+
+2001-05-12 18:00  jmason
+
+	* doc/documentation.wmk, lib/Text/EtText/EtText2HTML.pm,
+	t/etmore.t, t/ettextlinks.t, t/ettextmarkup.t,
+	t/data/ettextlinks.etx: better XML-conformant output
+
+2001-04-23 13:57  jmason
+
+	* Changes, build/get_version: [no log message]
+
+2001-04-23 00:09  jmason
+
+	* Changes, build/mkrpm, lib/Text/EtText/EtText2HTML.pm,
+	lib/Text/EtText/HTML2EtText.pm: oops, conflicts
+
+2001-04-23 00:08  jmason
+
+	* lib/Text/EtText.pm: pod cleanup
+
+2001-04-22 23:59  jmason
+
+	* README: added modules line
+
+2001-04-22 23:51  jmason
+
+	* MANIFEST, Makefile.PL, lib/Text/EtText.pm,
+	lib/Text/EtText/EtText2HTML.pm: added CPAN module
+
+2001-04-06 12:02  jmason
+
+	* lib/Text/EtText/EtText2HTML.pm, t/etlists.t, t/etmore.t,
+	t/ettextlinks.t, t/ettextmarkup.t, t/data/etlists.etx: --- lines
+	now do h1's, === for h2's. Bug fixed: first item of a list now does
+	not have p tags unless there's a blank line after it.
+
+2001-03-21 00:50  jmason
+
+	* Makefile.PL: fixed make install
+
+2001-03-21 00:25  jmason
+
+	* t/ettextmarkup.t: nearly ready for release
+
+2001-03-18 20:49  jmason
+
+	* doc/documentation.wmk: add webmake ref to doco
+
+2001-03-18 20:38  jmason
+
+	* MANIFEST, MANIFEST.SKIP: manifest fixed
+
+2001-03-18 20:35  jmason
+
+	* build/update_devel: doco now built
+
+2001-03-18 20:34  jmason
+
+	* build/update_devel, doc/.cvsignore, doc/DefaultGlossary.pm.html,
+	doc/EtText2HTML.pm.html, doc/HTML2EtText.pm.html,
+	doc/LinkGlossary.pm.html, doc/allinone.html, doc/blurb.html,
+	doc/contributors.html, doc/docmap.html, doc/ethtml2text.html,
+	doc/ettext.html, doc/ettext2html.html, doc/index.html,
+	doc/links.html, doc/similar.html: removed built files from version
+	control
+
+2001-03-18 20:33  jmason
+
+	* doc/allinone.html, doc/blurb.html, doc/contributors.html,
+	lib/Text/EtText/EtText2HTML.pm: bug in etright support fixed
+
+2001-03-18 20:30  jmason
+
+	* doc/DefaultGlossary.pm.html, doc/allinone.html, doc/docmap.html,
+	doc/documentation.wmk, doc/ettext.html, doc/index.html,
+	doc/links.html, doc/similar.html, lib/Text/EtText/EtText2HTML.pm,
+	t/data/etmore.etx: doc changes
+
+2001-03-18 20:02  jmason
+
+	* doc/DefaultGlossary.pm.html, doc/EtText2HTML.pm.html,
+	doc/HTML2EtText.pm.html, doc/LinkGlossary.pm.html,
+	doc/allinone.html, doc/blurb.html, doc/contributors.html,
+	doc/docmap.html, doc/documentation.wmk, doc/ethtml2text.html,
+	doc/ettext.html, doc/ettext2html.html, doc/index.html,
+	doc/links.html, doc/similar.html, doc/images/EtTextTitle.png,
+	images/EtTextTitle.xcf.gz: EtText logo image added
+
+2001-03-16 12:24  jmason
+
+	* doc/.cvsignore: fixing checked-in file set
+
+2001-03-16 12:23  jmason
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	doc/DefaultGlossary.pm.html, doc/EtText2HTML.pm.html,
+	doc/allinone.html, doc/docmap.html, doc/documentation.wmk,
+	doc/index.html, doc/similar.html, doc/images/BuiltWithWebMake.png,
+	lib/Text/EtText/DefaultGlossary.pm, lib/Text/EtText/EtText2HTML.pm,
+	t/.cvsignore, t/EtTest.pm, t/WMTest.pm, t/etautolinks.t,
+	t/etglossary.t, t/etlists.t, t/etmailto.t, t/etmore.t,
+	t/etoptions.t, t/ettextlinks.t, t/ettextmarkup.t,
+	t/data/etautolinks.etx, t/data/etautolinks.wmk,
+	t/data/etglossary.wmk, t/data/etlists.etx, t/data/etlists.wmk,
+	t/data/etmailto.etx, t/data/etmailto.wmk, t/data/etmore.etx,
+	t/data/etmore.wmk, t/data/etoptions.wmk, t/data/ettextlinks.etx,
+	t/data/ettextlinks.wmk, t/data/ettextmarkup.etx,
+	t/data/ettextmarkup.wmk: fixed tests to not require WebMake
+
+2001-03-15 15:55  jmason
+
+	* t/WMTest.pm, MANIFEST, doc/images/BuiltWithWebMake.png,
+	doc/images/WebMakeTitle.png: tidying
+
+2001-03-15 15:49  jmason
+
+	* t/: attrdefault.t, basic.t, breadcrumbs.t, contentsfind.t,
+	deeplinks.t, deferred_refs.t, deftags.t, defwmktags.t,
+	download_tag.t, example_news_site.t, example_sitemap.t,
+	implicitmetas.t, meta.t, metacache.t, metadefault.t,
+	metadefvalues.t, metatable.t, navlinks.t, navlinks_warning.t,
+	navlinks_with_pod.t, perllib.t, perlout.t, pod.t,
+	sitemap_with_metatable.t, sitetree.t, svfile.t, data/basic.wmk,
+	data/breadcrumbs.wmk, data/contentsfind.wmk,
+	data/deferred_refs.wmk, data/deftags.wmk,
+	data/example_news_site.wmk, data/example_sitemap.wmk,
+	data/implicitmetas.wmk, data/lotsofcontents.wmk,
+	data/make_huge_content_set.pl, data/meta.wmk, data/metacache.wmk,
+	data/metadefault.wmk, data/metadefvalues.wmk, data/metatable.wmk,
+	data/navlinks.wmk, data/navlinks_warning.wmk,
+	data/navlinks_with_pod.wmk, data/perllib.wmk, data/perlout.wmk,
+	data/pod.wmk, data/sitemap_with_metatable.wmk, data/sitetree.wmk,
+	data/svfile.wmk, data/test_stories.inc: removing non-EtText tests
+
+2001-03-15 15:34  jmason
+
+	* Changes, MANIFEST, Makefile.PL, README, TODO, ethtml2text,
+	ettext2html, .cvsignore, MANIFEST.SKIP, specfile.raw,
+	windows_install.pl, build/get_version, build/mkrpm,
+	build/nightly_cron, build/update_devel, build/update_stable,
+	doc/index.html, doc/docmap.html, doc/bubba.png,
+	doc/contributors.html, doc/HTML2EtText.pm.html, doc/allinone.html,
+	doc/ettext2html.html, doc/blurb.html, doc/ettext.html,
+	doc/similar.html, doc/documentation.wmk, doc/links.html,
+	doc/EtText2HTML.pm.html, doc/ethtml2text.html, doc/.cvsignore,
+	doc/LinkGlossary.pm.html, doc/documentation.css, doc/sections.tsv,
+	doc/images/BuiltWithWebMake.png, doc/images/WebMakeTitle.png,
+	lib/Text/EtText/EtText2HTML.pm, lib/Text/EtText/HTML2EtText.pm,
+	lib/Text/EtText/LinkGlossary.pm, t/WMTest.pm, t/deferred_refs.t,
+	t/ettextlinks.t, t/ettextmarkup.t, t/test_dir, t/.cvsignore,
+	t/basic.t, t/contentsfind.t, t/etglossary.t, t/etlists.t,
+	t/etmore.t, t/meta.t, t/metacache.t, t/metadefvalues.t,
+	t/metatable.t, t/pod.t, t/svfile.t, t/breadcrumbs.t,
+	t/example_news_site.t, t/metadefault.t, t/navlinks.t, t/deftags.t,
+	t/etautolinks.t, t/etoptions.t, t/example_sitemap.t,
+	t/implicitmetas.t, t/navlinks_with_pod.t, t/perlout.t,
+	t/sitemap_with_metatable.t, t/attrdefault.t, t/deeplinks.t,
+	t/defwmktags.t, t/etmailto.t, t/navlinks_warning.t, t/perllib.t,
+	t/sitetree.t, t/download_tag.t, t/data/basic.wmk,
+	t/data/contentsfind.wmk, t/data/deferred_refs.wmk,
+	t/data/etglossary.wmk, t/data/etlists.wmk, t/data/etmore.wmk,
+	t/data/ettextlinks.wmk, t/data/ettextmarkup.wmk,
+	t/data/example_news_site.wmk, t/data/meta.wmk,
+	t/data/metacache.wmk, t/data/metadefvalues.wmk, t/data/pod.wmk,
+	t/data/svfile.wmk, t/data/example_sitemap.wmk,
+	t/data/metatable.wmk, t/data/sitemap_with_metatable.wmk,
+	t/data/test_stories.inc, t/data/navlinks.wmk,
+	t/data/breadcrumbs.wmk, t/data/metadefault.wmk, t/data/deftags.wmk,
+	t/data/etautolinks.wmk, t/data/etoptions.wmk,
+	t/data/implicitmetas.wmk, t/data/lotsofcontents.wmk,
+	t/data/make_huge_content_set.pl, t/data/navlinks_with_pod.wmk,
+	t/data/perlout.wmk, t/data/etmailto.wmk, t/data/perllib.wmk,
+	t/data/navlinks_warning.wmk, t/data/sitetree.wmk: Initial revision
+
+2001-03-15 15:34  jmason
+
+	* Changes, MANIFEST, Makefile.PL, README, TODO, ethtml2text,
+	ettext2html, .cvsignore, MANIFEST.SKIP, specfile.raw,
+	windows_install.pl, build/get_version, build/mkrpm,
+	build/nightly_cron, build/update_devel, build/update_stable,
+	doc/index.html, doc/docmap.html, doc/bubba.png,
+	doc/contributors.html, doc/HTML2EtText.pm.html, doc/allinone.html,
+	doc/ettext2html.html, doc/blurb.html, doc/ettext.html,
+	doc/similar.html, doc/documentation.wmk, doc/links.html,
+	doc/EtText2HTML.pm.html, doc/ethtml2text.html, doc/.cvsignore,
+	doc/LinkGlossary.pm.html, doc/documentation.css, doc/sections.tsv,
+	doc/images/BuiltWithWebMake.png, doc/images/WebMakeTitle.png,
+	lib/Text/EtText/EtText2HTML.pm, lib/Text/EtText/HTML2EtText.pm,
+	lib/Text/EtText/LinkGlossary.pm, t/WMTest.pm, t/deferred_refs.t,
+	t/ettextlinks.t, t/ettextmarkup.t, t/test_dir, t/.cvsignore,
+	t/basic.t, t/contentsfind.t, t/etglossary.t, t/etlists.t,
+	t/etmore.t, t/meta.t, t/metacache.t, t/metadefvalues.t,
+	t/metatable.t, t/pod.t, t/svfile.t, t/breadcrumbs.t,
+	t/example_news_site.t, t/metadefault.t, t/navlinks.t, t/deftags.t,
+	t/etautolinks.t, t/etoptions.t, t/example_sitemap.t,
+	t/implicitmetas.t, t/navlinks_with_pod.t, t/perlout.t,
+	t/sitemap_with_metatable.t, t/attrdefault.t, t/deeplinks.t,
+	t/defwmktags.t, t/etmailto.t, t/navlinks_warning.t, t/perllib.t,
+	t/sitetree.t, t/download_tag.t, t/data/basic.wmk,
+	t/data/contentsfind.wmk, t/data/deferred_refs.wmk,
+	t/data/etglossary.wmk, t/data/etlists.wmk, t/data/etmore.wmk,
+	t/data/ettextlinks.wmk, t/data/ettextmarkup.wmk,
+	t/data/example_news_site.wmk, t/data/meta.wmk,
+	t/data/metacache.wmk, t/data/metadefvalues.wmk, t/data/pod.wmk,
+	t/data/svfile.wmk, t/data/example_sitemap.wmk,
+	t/data/metatable.wmk, t/data/sitemap_with_metatable.wmk,
+	t/data/test_stories.inc, t/data/navlinks.wmk,
+	t/data/breadcrumbs.wmk, t/data/metadefault.wmk, t/data/deftags.wmk,
+	t/data/etautolinks.wmk, t/data/etoptions.wmk,
+	t/data/implicitmetas.wmk, t/data/lotsofcontents.wmk,
+	t/data/make_huge_content_set.pl, t/data/navlinks_with_pod.wmk,
+	t/data/perlout.wmk, t/data/etmailto.wmk, t/data/perllib.wmk,
+	t/data/navlinks_warning.wmk, t/data/sitetree.wmk: First import of
+	EtText into separate tree 
+

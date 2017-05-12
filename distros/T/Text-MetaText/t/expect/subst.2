@@ -1,0 +1,21 @@
+# this tests complex variable definition and substitution using embedded
+# variables and references to variables.  CASE sensitivity is OFF.
+# Expected text is shown in (parenthesis).
+
+
+
+ foo (Foo Text): Foo Text
+
+
+
+  bar (Foo Text/bar): Foo Text/bar
+  baz (Foo Text/baz): Foo Text/baz
+
+
+
+  qux (Foo Text/bar.Foo Text/baz Foo Text QUX): Foo Text/bar.Foo Text/baz Foo Text QUX
+
+
+
+  qux (Foo TextFoo Text/bar): Foo TextFoo Text/bar
+

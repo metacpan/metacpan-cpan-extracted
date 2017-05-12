@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+#
+# This file is part of Tee
+#
+# This software is Copyright (c) 2006 by David Golden.
+#
+# This is free software, licensed under:
+#
+#   The Apache License, Version 2.0, January 2004
+#
+package
+  ptee;
+# ABSTRACT: emulate the GNU tee program with Perl
+
+use strict;
+use Tee::App qw/run/;
+run;
+
+
+
+=pod
+
+=head1 NAME
+
+ptee - emulate the GNU tee program with Perl
+
+=head1 VERSION
+
+version 0.14
+
+=head1 SYNOPSIS
+
+ ptee [OPTIONS]... [FILENAMES]...
+
+ OPTIONS:
+ 
+    --append or -a
+        append to file(s) rather than overwrite
+
+    --help or -h
+        give usage information
+
+    --version or -V
+        print the version number of this program
+
+=head1 DESCRIPTION
+
+C<ptee> is a pure Perl emulation of the standard GNU tool C<tee> and is
+designed to be a platform independent replacement for operating systems without
+a native C<tee> program.
+
+It passes input received on STDIN through to STDOUT while also writing a copy
+of the input to any files provided as arguments.  By default, files will be
+overwritten, but this behavior may be altered with the C<--append> option.  
+
+Unlike C<tee>, C<ptee> does not support ignoring interrupts, as signal handling
+is not sufficiently portable.
+
+=head1 BUGS
+
+Please report any bugs or feature using the CPAN Request Tracker.  
+Bugs can be submitted through the web interface at 
+L<http://rt.cpan.org/Dist/Display.html?Queue=Tee>
+
+When submitting a bug or request, please include a test-file or a patch to an
+existing test-file that illustrates the bug or desired feature.
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2006 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut
+
+
+__END__
+

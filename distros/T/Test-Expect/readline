@@ -1,0 +1,19 @@
+#!perl
+use strict;
+use warnings;
+use Term::ReadLine;
+
+my $what = (shift @ARGV) || "there";
+print "* Hi $what, to readline\n";
+
+my $term = Term::ReadLine->new('readline');
+
+while (1) {
+  my $command = $term->readline("readline: ");
+
+  if ($command eq 'ping') {
+    print "pong\n";
+  } elsif ($command eq 'quit') {
+    exit;
+  }
+}

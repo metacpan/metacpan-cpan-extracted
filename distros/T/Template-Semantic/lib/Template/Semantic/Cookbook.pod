@@ -1,0 +1,310 @@
+=head1 NAME
+
+Template::Semantic::Cookbook - Template::Semantic Recipes, tricks, hints
+
+=head1 RECIPES
+
+=head2 Zebra tables
+
+Use XPath power.
+
+  print Template::Semantic->process(\*DATA, {
+      'table tbody tr' => [
+          { '//td[1]' => '101', '//td[2]' => '102' },
+          { '//td[1]' => '201', '//td[2]' => '202' },
+          { '//td[1]' => '301', '//td[2]' => '302' },
+          { '//td[1]' => '401', '//td[2]' => '402' },
+      ],
+  })->process({
+      '//table/tbody/tr[position() mod 2 = 0]/@class' => 'even',
+  });
+  
+  __DATA__
+  <table>
+      <thead>
+          <tr>
+              <th>Foo</th>
+              <th>Bar</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr class="">
+              <td>sample</td>
+              <td>sample</td>
+          </tr>
+      </tbody>
+  </table>
+
+Output:
+
+  <table>
+      <thead>
+          <tr>
+              <th>Foo</th>
+              <th>Bar</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr class="">
+              <td>101</td>
+              <td>102</td>
+          </tr>
+          <tr class="even">
+              <td>201</td>
+              <td>202</td>
+          </tr>
+          <tr class="">
+              <td>301</td>
+              <td>302</td>
+          </tr>
+          <tr class="even">
+              <td>401</td>
+              <td>402</td>
+          </tr>
+      </tbody>
+  </table>
+
+If you don't like C<class="">, do this.
+
+  print Template::Semantic->process(\*DATA, {
+      ...
+  )->process({
+      '//table//tr[position() mod 2 = 0]/@class' => 'even',
+      '//table//tr[position() mod 2 = 1]/@class' => undef,
+  });
+
+=head2 For JavaScript vars
+
+If you want to set the value for JavaScript...
+
+  print $ts->process(\*DATA, {
+      'script[src="foo.js"]@src' => 'http://prod-server/foo.js',
+      '//script[2]' => 'var = ' . JSON::to_json($var_to_js),
+  });
+  __DATA__
+  <html>
+  <script type="text/javascript" src="foo.js"></script>
+  <script type="text/javascript"></script>
+  ...
+  </html>
+
+
+=head2 Create attribute
+
+The following example is NOT output as C<< <div class="foo">foo</div> >>
+but instead as C<< <div>foo</div> >>  because LibXML cannot find C<class>
+attribute in C<< <div> >>.
+
+  print Template::Semantic->process(\'<div>foo</div>', {
+      'div@class' => 'foo',
+  });
+
+You can add the attribute with the on-demand.
+
+  print Template::Semantic->process(\'<div>foo</div>', {
+      'div' => sub { shift->setAttribute(class => 'foo'); \$_ },
+  });
+
+But I think that you should prepare place holder.
+
+  print Template::Semantic->process(\'<div class="">foo</div>', {
+      'div@class' => 'foo',
+  });
+
+
+=head2 Dummy items
+
+If template contains dummy items to check design, you may delete them first.
+
+  print Template::Semantic->process(\*DATA, {
+      '.dummy' => undef, # remove dummys first
+  })->process({
+      'ul li' => [
+          { '.' => 'AAA' },
+          { '.' => 'BBB' },
+          { '.' => 'CCC' },
+          { '.' => 'DDD' },
+          { '.' => 'EEE' },
+      ],
+  });
+  
+  __DATA__
+  <ul>
+      <li>sample</li>
+      <li class="dummy">sample</li>
+      <li class="dummy">sample</li>
+      <li class="dummy">sample</li>
+  </ul>
+
+Output:
+
+  <ul>
+      <li>AAA</li>
+      <li>BBB</li>
+      <li>CCC</li>
+      <li>DDD</li>
+      <li>EEE</li>
+  </ul>
+
+
+=head2 Indicator only for Temlate::Semantic
+
+Idea 1 - Original C<data-id> attribute like L<Template::TAL>:
+
+  print Template::Semantic->process(\*DATA, {
+      '//*[@data-id="foo"]' => 'foo',
+      '//*[@data-id="bar"]' => 'bar',
+  })->process({
+      '//@data-id' => undef,
+  });
+  
+  __DATA__
+  <div>
+      <span data-id="foo">xxx</span>
+      <span data-id="bar">xxx</span>
+  </div>
+
+Idea 2 - Original C<x-foobar> class:
+
+  print Template::Semantic->process(\*DATA, {
+      '.x-foo' => 'foo',
+      '.x-bar' => 'bar',
+  })->process({
+      '//span[contains(@class,"x-")]/@class' => sub {
+          join " ", grep { !/^x-/ } split /\s+/;
+      },
+  });
+  
+  __DATA__
+  <div>
+      <span class="x-foo">xxx</span>
+      <span class="x-bar">xxx</span>
+  </div>
+
+
+=head2 Some custom filter ideas...
+
+Output format config in template:
+
+  print Template::Semantic->process(\*DATA, {
+      '.date' => sub {
+          my $date = localtime; # or DateTime->now
+          $date->strftime( shift->getAttribute('data-format') );
+      },
+  })->process({
+      '//@data-format' => undef,
+  });
+  
+  __DATA__
+  <div class="entry">
+      <div class="date" data-format="%Y/%m/%d">2010/99/99</div>
+  </div>
+
+Output:
+
+  <div class="entry">
+      <div class="date">2010/02/08</div>
+  </div>
+
+
+=head2 Email template?
+
+You should use the module like Template-Toolkit ;)
+But if you want to use this module anyway,
+
+  my $res = $ts->process(\*DATA, {
+      'name' => 'Foo & Co.',
+  });
+  
+  my $subj = $res->dom->documentElement->findvalue('//*[@class="subject"]');
+  my $body = $res->dom->documentElement->findvalue('//*[@class="body"]');
+  
+  __DATA__
+  <html>
+  Subject: <b class="subject">Dear <name>name</name></b>
+  <hr />
+  
+  Body:
+  <pre class="body">Dear <name>name</name>,
+  
+  bla bla
+  bla bla
+  </pre>
+  </html>
+
+
+=head2 Include
+
+It is easy to substitute another C<process()>.
+
+  my $ts = Template::Semantic->new;
+  print $ts->process('wrapper.html', {
+      '#container' => $ts->process('include.html'),
+  });
+
+
+=head2 Wrapper/Template inheritance
+
+It is possible though is tricky.
+
+  my $ts = Template::Semantic->new;
+  
+  print $ts->process('foo.html', {
+      '/div' => sub {
+          my $node = shift;
+          
+          # Get wrapper filename from attribute ...
+          my $wrapper = $node->getAttribute('wrapper');
+          
+          # Process wrapper.html ...
+          # embed this innerHTML to wrapper.html's <div id="content">
+          my $res = $ts->process($wrapper, { '#content' => \$_ });
+          
+          # Insert result(as XML::LibXML::Element) after me.
+          $node->addSibling($res->dom->documentElement);
+  
+          # And delete me.
+          return undef;
+      }
+  })->process({
+      'h1' => 'Hello world!',
+  });
+
+foo.html
+
+  <div wrapper="wrapper.html">
+      <h1>foo</h1>
+      <p>bla bla bla</p>
+  </div>
+
+wrapper.html
+
+  <html>
+      <body>
+          <div id="content">
+          </div>
+      </body>
+  </html>
+
+Output:
+
+  <html>
+      <body>
+          <div id="content">
+      <h1>Hello world!</h1>
+      <p>bla bla bla</p>
+          </div>
+      </body>
+  </html>
+
+
+=head2 Do you have another good usage?
+
+Blog it ;)
+
+
+=head1 AUTHOR
+
+Naoki Tomita E<lt>tomita@cpan.orgE<gt>
+
+=cut

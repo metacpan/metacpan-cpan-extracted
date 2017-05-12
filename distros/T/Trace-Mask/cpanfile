@@ -1,0 +1,24 @@
+requires "B" => "0";
+requires "Carp" => "1.03";
+requires "Exporter" => "0";
+requires "List::Util" => "1.10";
+requires "Scalar::Util" => "1.10";
+requires "perl" => "5.008001";
+
+on 'test' => sub {
+  requires "Test2" => "1.302026";
+  requires "Test2::Suite" => "0.000030";
+  requires "Test2::Workflow" => "0.000009";
+};
+
+on 'test' => sub {
+  recommends "Try::Tiny" => "0.03";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::Pod" => "1.41";
+};

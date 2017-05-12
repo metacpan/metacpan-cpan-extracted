@@ -1,0 +1,9 @@
+gv.c: In function `Perl_gv_fetchmethod_autoload':
+gv.c:581: invalid use of non-lvalue array
+gv.c: In function `Perl_gv_fullname4':
+gv.c:1332: invalid use of non-lvalue array
+gv.c: In function `Perl_gv_check':
+gv.c:1411: invalid use of non-lvalue array
+gv.c: In function `Perl_Gv_AMupdate':
+gv.c:1588: invalid use of non-lvalue array
+gv.c:1615: invalid use of non-lvalue array

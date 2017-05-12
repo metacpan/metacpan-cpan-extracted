@@ -1,0 +1,13 @@
+Install this module in the standard way, i.e.
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+This module is a Template plugin, which is called implicitly via 
+[% USE WikiCreole %]
+
+See http://search.cpan.org/~abw/Template-Toolkit/lib/Template/Manual/Directives.pod

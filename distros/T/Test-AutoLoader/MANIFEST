@@ -1,0 +1,17 @@
+AutoLoader.pm
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+t/00basic.t
+tlib/EmptyModule.pm
+tlib/TestBusted1.pm
+tlib/TestBusted2.pm
+tlib/auto/EmptyModule/autosplit.ix
+tlib/auto/TestBusted1/autosplit.ix
+tlib/auto/TestBusted1/ostrich.al
+tlib/auto/TestBusted2/autosplit.ix
+tlib/auto/TestBusted2/empty.al
+tlib/auto/TestBusted2/no_ready.al
+tlib/auto/TestBusted2/no_worky.al

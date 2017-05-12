@@ -1,0 +1,29 @@
+---
+abstract: 'test the environment'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::Builder: '0'
+  Test::Builder::Tester: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Env
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/Test-Env/issues
+  homepage: https://github.com/briandfoy/Test-Env
+  repository: https://github.com/briandfoy/Test-Env.git
+version: '1.082'

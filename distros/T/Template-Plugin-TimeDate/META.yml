@@ -1,0 +1,22 @@
+---
+name: Template-Plugin-TimeDate
+version: 1.02
+author:
+  - Graham TerMarsch (cpan@howlingfrog.com)
+abstract: TT plugin to parse/format dates using TimeDate
+license: perl
+resources:
+  license: ~
+requires:
+  Date::Parse: 0
+  Template: 2
+build_requires:
+  Test::More: 0
+provides:
+  Template::Plugin::TimeDate:
+    file: lib/Template/Plugin/TimeDate.pm
+    version: 1.02
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

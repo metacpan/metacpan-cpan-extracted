@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Tie-Static
+version: 0.04
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Tie::Static:
+    file: lib/Tie/Static.pm
+    version: 0.04
+generated_by: Module::Build version 0.20

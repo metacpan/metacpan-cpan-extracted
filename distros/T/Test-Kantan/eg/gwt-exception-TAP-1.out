@@ -1,0 +1,7 @@
+
+
+# Feature Foo
+# Feature Foo/Scenario bar
+#  Then baz
+Exception: Died at eg/gwt-exception.t line 9.
+1..0

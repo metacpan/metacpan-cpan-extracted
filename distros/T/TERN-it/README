@@ -1,0 +1,30 @@
+TERN/it version 0.01
+====================
+
+a placeholder implementation of the "it" method of
+caching intermediate levels in complex container (aggregate) accesses.
+
+This will be used by other TERN modules.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+nothing
+
+COPYRIGHT AND LICENCE
+
+GPL/artistic
+
+Copyright (C) 2001 David Nicol
+

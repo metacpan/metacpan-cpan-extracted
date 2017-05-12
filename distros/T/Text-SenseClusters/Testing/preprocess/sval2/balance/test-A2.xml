@@ -1,0 +1,15 @@
+<instance id="1"> 
+<answer instance="1" senseid="s1">
+</instance>
+<instance id="2">
+<answer instance="2" senseid="s2">
+</instance>
+<instance id="3">
+<answer instance="3" senseid="s1">
+</instance>
+<instance id="4">
+<answer instance="4" senseid="s2">
+</instance>
+<instance id="5">
+<answer instance="5" senseid="s1">
+</instance>

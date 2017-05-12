@@ -1,0 +1,16 @@
+=head1 Toader Templates
+
+Toader Templates are stored under $toaderDir.'/.toader/templates'.
+
+For a template name to be valid, it must not match any of the regular
+expressions below.
+
+	/^ /
+	/\t/
+	/\n/
+	/ $/
+
+The templating system used is L<Text::Template>. The opening bracket
+used is '[==' and closing bracket is '==]'.
+
+=cut

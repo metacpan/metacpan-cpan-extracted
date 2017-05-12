@@ -1,0 +1,31 @@
+---
+abstract: 'Emoticon filter for TT'
+author:
+  - 'Nick Patch <patch@cpan.org>'
+build_requires:
+  Test::More: 0.41
+  Text::Emoticon::MSN: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Emoticon
+provides:
+  Template::Plugin::Emoticon:
+    file: lib/Template/Plugin/Emoticon.pm
+    version: 0.01
+requires:
+  Template: 2.07
+  Text::Emoticon: 0
+  parent: 0
+  perl: v5.6.0
+resources:
+  bugtracker: https://github.com/patch/template-plugin-emoticon-pm5/issues
+  homepage: https://github.com/patch/template-plugin-emoticon-pm5
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/patch/template-plugin-emoticon-pm5.git
+version: 0.01

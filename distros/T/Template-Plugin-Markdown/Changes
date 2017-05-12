@@ -1,0 +1,9 @@
+Revision history for Perl extension Template::Plugin::Markdown.
+
+0.02  Sat Nov 12  18:43:43 2005
+	- distribute to CPAN
+
+0.01  Tue Nov  8 18:43:43 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A -n Template::Plugin::Markdown
+

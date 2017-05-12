@@ -1,0 +1,58 @@
+NAME
+    "Test::HexString" - test binary strings with hex dump diagnostics
+
+SYNOPSIS
+     use Test::More tests => 1;
+     use Test::HexString;
+
+     my $data = generate_some_output;
+
+     is_hexstr( $data, "\x01\x02\x03\x04", 'Generated output' );
+
+DESCRIPTION
+    This testing module provides a single function, "is_hexstr()", which
+    asserts that the given string matches what was expected. When the
+    strings match (i.e. compare equal using the "eq" operator), the
+    behaviour is identical to the usual "is()" function provided by
+    "Test::More".
+
+    When the strings are different, a hex dump is produced as diagnostic,
+    rather than the string values being printed raw. This may be beneficial
+    if the string contains largely binary data, such as may be produced by
+    binary file or network protocol modules.
+
+    To print the hex dump when it fails, each string is broken into 16 byte
+    chunks. The first pair of chunks that fail to match are then printed, in
+    both hexadecimal and character form, in a message in the following
+    format:
+
+     #   Failed test at -e line 1.
+     #   at bytes 0-0xf (0-15)
+     #   got: | 61 20 6c 6f 6e 67 20 73 74 72 69 6e 67 20 68 65 |a long string he|
+     #   exp: | 61 20 6c 6f 6e 67 20 53 74 72 69 6e 67 20 68 65 |a long String he|
+     # Looks like you failed 1 test of 1.
+
+    Only bytes in the range "0x20-0x7e" are printed as literal characters.
+    Any other byte is rendered as ".":
+
+     #   Failed test at -e line 1.
+     #   at bytes 0-0xf (0-15)
+     #   got: | 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f |................|
+     #   exp: | 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 10 |................|
+     # Looks like you failed 1 test of 1.
+
+    Only the first differing line is printed; because otherwise it may
+    result in a long output because of misaligned bytes.
+
+    If STDOUT is a terminal, then different bytes are printed in bold for
+    visibility.
+
+FUNCTIONS
+  is_hexstr( $got, $expect, $name )
+    Test that the string $got is what was expected by $expect. If the
+    strings are not equal, a hex dump is printed showing the region where
+    they first start to differ.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

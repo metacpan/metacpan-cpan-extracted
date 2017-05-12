@@ -1,0 +1,67 @@
+Revision history for Time-Duration-Concise-Localize
+
+2.60      2017-02-15 07:11:56+00:00 UTC
+        Switch to dzil
+
+2.60    13/03/2016
+        add zh_tw, it and vi locale
+
+2.5     03/02/2015
+        improve localization caching and lookup performance
+
+2.4     06/11/2014
+        utf8 encoding issues fixes
+
+2.2     04/11/2014
+        test failures
+
+2.0     10/10/2014
+        bug fixes
+
+1.9     09/10/2014
+        Use inbuild translation files to localize concise string.
+
+1.6     09/09/2014
+        Ignore test if required Time::Seconds is not available
+
+1.5     20/08/2014
+        Make file and CPAN failed test fixes
+
+1.3     26/07/2014
+        Strange bug in object caching
+
+1.1     24/07/2014
+        Remove Moo uses and go with traditional OO approach along with Tie::Hash::LRU for cache
+
+1.0     17/07/2014
+        More test cases and improvements
+
+0.09    16/07/2014
+        when printing duration as string minues should be symbol not text
+
+0.08    16/07/2014
+        Precision made more percise and more test case to test as_string
+
+0.07    11/07/2014
+        Bug fix "Use of uninitialized value $1"
+
+0.06    06/07/2014
+        Makefile improvement, add repo info, module info
+
+0.05    05/07/2014
+        More test cases, bug fixes
+
+0.04    28/06/2014
+        Various improvements, now if time concise format is just number, we assume it is seconds
+        as_concise_string method will rebuild time concise format
+        normalized_code code is part of consie module, instead of Localize. That's the better place.
+
+0.03    26/06/2014
+        Fix makefile, we need Time::Second 1.27 version
+
+0.02    19/06/2014
+        Fix cpan failed test reports
+
+0.01    18/06/2014
+        First version, released on cpan.
+

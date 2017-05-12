@@ -1,0 +1,27 @@
+Changes for Perl extension Test-NeedsDisplay
+
+1.07 Sun  4 Jan 2009
+	- Fixing a typo bug
+	- More tests thanks to Gabor
+
+1.06 Sun  4 Jan 2009
+	- Don't require xvfb-run if running under wxPerl
+	- Add support for :skip_all
+
+1.05 Wed 29 Oct 2008
+	- Adding support for passing through -d and -Mblib
+
+1.04 Fri 22 Aug 2008
+	- No functional changes
+	- Moving to a production version
+	- Upgrading to Module::Install 0.77
+
+0.03 Thu Feb 15 2007
+	- pod fix: correct link to RT queue [RT#17950]
+
+0.02 Sun Feb  5 2006
+	- Minor bug fix
+	- Upgrading to Module::Install 0.55
+
+0.01 Tue Nov  8 2005
+	- Created the initial version of the module

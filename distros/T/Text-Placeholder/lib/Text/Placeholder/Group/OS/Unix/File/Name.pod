@@ -1,0 +1,50 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Group::OS::Unix::File::Name - access name parts of a file
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder;
+	my $placeholder = Text::Placeholder->new(
+		my $os_unix_file = '::OS::Unix::File::Name');
+	$placeholder->compile('File base name: [=file_name_only=]');
+
+	$os_unix_file->subject('/tmp/test.dat');
+	print ${$placeholder->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+Provides the placeholders file_name_(full|path|only|extension). The file doesn't needs to exists.
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item subject($file_name)
+
+Sets or gets the file name.
+
+=item add_placeholder($placeholder, $code_ref)
+
+Adds the $code_ref under the name of $placeholder. $code_ref is executed and returns the current value to be substituted for $placeholder.
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

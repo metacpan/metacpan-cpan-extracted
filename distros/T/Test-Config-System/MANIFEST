@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+LICENSE
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Test/Config/System.pm
+t/00-load.t
+t/check_file_contents.t
+t/check_package.t
+t/check_link.t
+t/check_path.t
+t/check_any_package.t
+t/warnings.t
+t/failures.t
+t/pod-coverage.t
+t/pod.t

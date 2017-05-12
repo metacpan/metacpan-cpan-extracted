@@ -1,0 +1,85 @@
+0.000013  2017-01-03 21:18:19-08:00 America/Los_Angeles
+
+    - Add event timeout option
+    - Fix filename rendering when a test is done
+    - Fixed handling of a "plan skip_all" issued in the main test (as opposed
+      to a subtest). Partially fixes GitHub
+      #21, reported by rjbs.
+    - When a test file doesn't run any tests but exits successfully, this was
+      treated as a pass. This is now detected and generates different output
+      indicating that the process did not run any tests. Fixes the rest of
+      GitHub #21, reported by rjbs.
+
+0.000012  2016-12-19 11:46:41-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fixed #9, environment now set properly in preload mode
+    - Job listeners now receive the Test2::Harness::Job object as the first
+      argument, rather than just the job id.
+    - Fixed the TAP parser to handle comments with leading
+      whitespace. Previously it would strip all the leading whitespace out,
+      causing both "# foo" and "# foo" to be output the same way.
+    - Add example for using the harness as a preload test file
+    - Document using Test2::Harness as a preload test runner
+    - Rewrote all of the internals so that the harness now handles Test2
+      events directly, rather than converting them into Test2::Harness::Fact
+      objects. The facts were losing some details of the events, and the event
+      system already exists and is usable with the harness simply by adding
+      some new harness-specific events. Implemented by Dave Rolsky. GitHub
+      #20.
+
+0.000011  2016-06-10 14:11:01-07:00 America/Los_Angeles
+
+    - Fix rendering todo subtests...
+
+0.000010  2016-06-10 13:39:27-07:00 America/Los_Angeles
+
+    - More complete todo subtest fix
+
+0.000009  2016-06-10 13:02:11-07:00 America/Los_Angeles
+
+    - Fix TAP parsing bug when buffered subtests are TODO
+
+0.000008  2016-05-31 07:35:46-07:00 America/Los_Angeles
+
+    - Lower the IO::Handle version req
+
+0.000007  2016-05-28 16:31:35-07:00 America/Los_Angeles
+
+    - Try to fix JSON encoding problem
+
+0.000006  2016-05-26 20:28:27-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix Data::Dumper typo >:-|
+
+0.000005  2016-05-26 08:48:12-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add missing JSON prototype in Fact.pm
+    - Add diagnostics when fact->to_json fails
+
+0.000004  2016-05-26 08:35:04-07:00 America/Los_Angeles
+
+    - Handle -I better in the runner
+    - Make IO::Pty tests AUTHOR_TESTING only.
+    - Add IO::Pty to diagnostics output
+    - Diagnostics to show which JSON gets used
+
+0.000003  2016-05-25 11:55:51-07:00 America/Los_Angeles
+
+    - Get path separator from config
+    - Better windows prereq specification
+    - Handle buffered usbtest race condition
+
+0.000002  2016-05-25 09:22:22-07:00 America/Los_Angeles
+
+    - Die if given unknown command line flags. Patch by Dave Rolsky. GitHub
+      #1.
+    - Added -l (--lib) and -b (--blib) flags that work just like prove. Patch
+      by Dave Rolsky. GitHub #2.
+    - Better prereq list
+    - Diagnostic test output
+    - Old version and cross platform support
+
+
+0.000001  2016-05-24 17:04:13-07:00 America/Los_Angeles
+
+    - Initial Release

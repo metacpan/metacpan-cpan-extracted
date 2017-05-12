@@ -1,0 +1,33 @@
+---
+abstract: 'An Object Oriented Binary Tree for Perl'
+author:
+  - 'Stevan Little (stevan@iinteractive.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0.15'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.1'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tree-Binary
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Scalar::Util: '1.1'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Tree-Binary.git
+version: '1.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

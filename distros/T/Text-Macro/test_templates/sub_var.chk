@@ -1,0 +1,4 @@
+arg0=dog.
+arg0=<dog>.
+bar arg0=cat.
+arg0=<cat>.

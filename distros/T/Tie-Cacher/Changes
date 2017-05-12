@@ -1,0 +1,48 @@
+Revision history for Perl extension Tie::Cacher.
+
+Need to add tests for
+  - deleting non-existent elements
+  - Node reuse
+
+0.09  Mon Jun  8 2004
+	- Reusing a freed node is a bug. The user can still have private
+	  references, they can even be in a callback.
+0.08  Sun Jun  7 2004
+	- Move case equal names out of the autoloaded section. Causes problems
+	  on windows.
+	- Moved all really short subs out of the autoload.
+
+0.07  Sat May 15 2004
+	- Moved TC_USER_DATA field to the end (unlikely to be used)
+        - perl 5.6 doesn't yet accept hash ref style constant declaration.
+          Just drop use of "use constant" completely.
+
+0.06  Sat Apr 24 2004
+	- Added tests for user_data method
+	- Delete now faster
+	- Added more tests for delete
+
+0.05  Fri Apr 23 2004
+	- Add dependency on Test::More
+	- Fix dependency of tests on hash order
+	- Stop using "fields"
+	- Drop some assigns, making things a few percent faster
+	- Tie::Cacher::Node doesn't exist anymore
+
+0.04  Tue May  6 2003
+	- Change docs for failing load
+	- failing save causes entry to be deleted
+	  (only did that in the fetch case, now also for store)
+	- Allow the attribute methods to also set values. Use these
+	  even in "new" so subclasses can override them.
+
+0.03  Mon May  5 2003
+	- Last cleanups for CPAN distribution
+
+0.02  Sun May  4 2003
+	- Remove some old interfaces
+
+0.01  Sun May  4 15:31:39 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Tie::Cacher
+	- import existing ad hoc version

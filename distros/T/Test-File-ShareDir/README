@@ -1,0 +1,39 @@
+Test::File::ShareDir
+
+"Test::File::ShareDir" is some low level plumbing to enable a
+distribution to perform tests while consuming its own "share"
+directories in a manner similar to how they will be once installed.
+
+This allows "File::ShareDir" to see the *latest* version of content
+instead of simply whatever is installed on whichever target system you
+happen to be testing on.
+
+Note: This module only has support for creating 'new' style share dirs
+and are NOT compatible with old File::ShareDirs.
+
+For this reason, unless you have File::ShareDir 1.00 or later installed,
+this module will not be usable by you.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,16 @@
+EMatrix.pm
+
+This module requires that Tk::TableMatrix be installed!
+
+A widget derived from Tk::TableMatrix that includes 6 additional methods.
+
+I created this widget mainly to make it more user friendly for use as
+a way to display records (say as part of a SQL interface), rather than 
+a spreadsheet substitute.
+
+The methods are bindRow(), bindCol(), getRow(), getRowHash(), getCol()
+and getColHash().
+
+In the future, I'm going to consider adding some methods that help it
+to directly interface with MS Excel documents.  I may also try to add
+an Excel look & feel.

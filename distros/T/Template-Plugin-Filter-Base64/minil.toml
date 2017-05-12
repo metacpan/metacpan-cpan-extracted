@@ -1,0 +1,6 @@
+name = "Template-Plugin-Filter-Base64"
+# badges = ["travis"]
+authority="cpan:BBON"
+
+module_maker="ModuleBuildTiny"
+

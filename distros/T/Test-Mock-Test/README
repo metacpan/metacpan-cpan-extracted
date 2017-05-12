@@ -1,0 +1,66 @@
+NAME
+    Test::Mock::Test - Mock Test::* code to succeed or do nothing.
+
+ABOUT
+    This module mocks typical test function from modules
+
+      Test::More
+      Test::Most
+      Test::Deep
+
+    to always return ok. In particular this means their test functionality
+    is skipped, so the overhead of the tests is dropped and reduced to only
+    the function call overhead.
+
+    You can use this, for instance, to reuse test scripts as benchmarks
+    where the overhead of the test code stands in the way of measuring the
+    actual code runtime. The ratio of that overhead, however, depends on the
+    test script, e.g. tests around Test::Deep with big data structures bring
+    them in.
+
+SYNOPSIS
+    The module executes mocking during load so you can activate the module
+    from the outside, like this:
+
+      perl -MTest::Mock::Test t/sometest.t
+
+    If you even want to avoid the overhead of the underlying
+    Test::Builder::ok() calls you can skip them this way:
+
+      perl -MTest::Mock::Test=no_test_builder t/sometest.t
+
+AUTHOR
+    Steffen Schwigon, `<ss5 at renormalist.net>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-test-mock-test at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Mock-Test. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::Mock::Test
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Mock-Test
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Mock-Test
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Mock-Test
+
+    * Search CPAN
+        http://search.cpan.org/dist/Test-Mock-Test/
+
+COPYRIGHT & LICENSE
+    Copyright 2010-2011 Steffen Schwigon, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

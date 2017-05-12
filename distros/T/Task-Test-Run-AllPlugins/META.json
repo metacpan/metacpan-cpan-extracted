@@ -1,0 +1,78 @@
+{
+   "abstract" : "Specifications for installing all the Test::Run",
+   "author" : [
+      "Shlomi Fish <shlomif@shlomifish.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "back-end",
+      "harness",
+      "prove",
+      "qa",
+      "QA",
+      "quality assurance",
+      "run",
+      "runprove",
+      "tap",
+      "TAP",
+      "TAP::Harness",
+      "test",
+      "testing"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Test-Run-AllPlugins",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::Run::CmdLine" : "0",
+            "Test::Run::CmdLine::Plugin::AlternateInterpreters" : "0",
+            "Test::Run::CmdLine::Plugin::BreakOnFailure" : "0",
+            "Test::Run::CmdLine::Plugin::ColorFileVerdicts" : "0",
+            "Test::Run::CmdLine::Plugin::ColorSummary" : "0",
+            "Test::Run::CmdLine::Plugin::TrimDisplayedFilenames" : "0",
+            "Test::Run::Core" : "0",
+            "Test::Run::Plugin::AlternateInterpreters" : "0",
+            "Test::Run::Plugin::BreakOnFailure" : "0",
+            "Test::Run::Plugin::ColorFileVerdicts" : "0",
+            "Test::Run::Plugin::ColorSummary" : "0",
+            "Test::Run::Plugin::TrimDisplayedFilenames" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Task::Test::Run::AllPlugins" : {
+         "file" : "lib/Task/Test/Run/AllPlugins.pm",
+         "version" : "0.0105"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.shlomifish.org/modules/Test-Run/",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/shlomif/perl-test-run"
+      }
+   },
+   "version" : "0.0105",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

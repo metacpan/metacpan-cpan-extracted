@@ -1,0 +1,16 @@
+lib/Docs/Site_SVD/Tie_Form.pm
+MANIFEST
+Makefile.PL
+README
+lib/Tie/Form.pm
+t/Tie/Form.d
+t/Tie/Form.pm
+t/Tie/Form.t
+t/Tie/_Form_/lenient0.txt
+t/Tie/_Form_/lenient2.txt
+t/Tie/_Form_/strict0.txt
+t/Tie/File/SmartNL.pm
+t/Tie/File/Package.pm
+t/Tie/Test/Tech.pm
+t/Tie/Data/Secs2.pm
+t/Tie/Data/SecsPack.pm

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TBXXCS SYSTEM "tbxxcsdtd.dtd">
+<TBXXCS name="Small" version="2" lang="en">
+    <header>
+        <title>Example XCS file</title>
+    </header>
+
+    <languages>
+        <langInfo>
+            <langCode>en</langCode>
+            <langName>English</langName>
+        </langInfo>
+    </languages>
+
+    <datCatSet>
+        <descripSpec name="foo" datcatId="">
+            <contents datatype="plainText"/>
+            <levels>term termEntry langSet blubber</levels>
+        </descripSpec>
+
+    </datCatSet>
+
+    <refObjectDefSet>
+        <refObjectDef>
+            <refObjectType>Foo</refObjectType>
+            <itemSpecSet type="validItemType">
+                <itemSpec type="validItemType">data</itemSpec>
+            </itemSpecSet>
+        </refObjectDef>
+    </refObjectDefSet>
+</TBXXCS>

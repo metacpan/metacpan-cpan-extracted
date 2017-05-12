@@ -1,0 +1,86 @@
+NAME
+    Test::Filename - Portable filename comparison
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+      use Test::Filename tests => 2;
+  
+      filename_is  ( "some\path", "some/path", "should pass" );
+      filename_isnt( "some\path", "some/path", "should fail" );
+
+DESCRIPTION
+    Many cross-platform test failures -- particularly on Win32 -- are due to
+    hard-coded file paths being used in comparison tests.
+
+      my $file = get_file();     # returns "foo\bar.t";
+      is( $file, "foo/bar.t" );  # fails on Win32
+
+    This simple module provides some handy functions to convert all those
+    path separators automatically so filename tests will just DWIM.
+
+    The alternative is to write your own utility subroutine and use it
+    everywhere or just keep on littering your test code with calls to
+    File::Spec -- yuck!
+
+      is( $file, File::Spec->canonpath("some/path"), "should pass" );
+
+    Since this module is so simple, you might not think it worth including
+    as a dependency. After all, it's not *that* hard to always remember to
+    use File::Spec, Path::Tiny or some other file utility, right? But odds
+    are that, at some point, you'll be so busy writing tests that you'll
+    forget and hard-code a path in your haste to show what a clever
+    programmer you are.
+
+    So just use this module and stop worrying about it. You'll be happier
+    and so will anyone trying to install your modules on Win32.
+
+USAGE
+    Just like Test::More, you have the option of providing a test plan as
+    arguments when you use this module. The following functions are imported
+    by default.
+
+  filename_is
+=head2 filename_isnt
+        filename_is  ( $got, $expected, $label );
+        filename_isnt( $got, $expected, $label );
+
+    These functions work just like "is()" and "isnt()" from Test::More, but
+    the first two argument will be cleaned up and normalized to Unix-style
+    paths using Path::Tiny. This means that ".\foo.txt" will get normalized
+    to "foo.txt" and so on.
+
+SEE ALSO
+    *   perlport
+
+    *   File::Spec
+
+    *   Path::Tiny
+
+    *   Test::More
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/test-filename/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/test-filename>
+
+      git clone git://github.com/dagolden/test-filename.git
+
+AUTHOR
+    David A. Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2007 by David A. Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

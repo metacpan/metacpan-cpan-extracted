@@ -1,0 +1,21 @@
+Revision history for Perl module Tie::Array::AsHash
+
+0.200	2013-11-05
+    - update toolchain
+    - reformat changes as per CPAN::Changes::Spec
+    - move repository to GitHub
+    - tidy tests and loader part
+    - find better abstract
+
+0.11	2009-01-27
+    - ignore lines without key/value pairs
+    - create regex for each() iteration once during contruction
+
+0.10	2008-11-08
+    - Bump version to 0.10 - 0.09.1 < 0.09
+
+0.09.1	2008-11-08
+    - Fix tests to work on arrays - not on files
+
+0.09	2008-05-14
+    - Functionality to work on array splitted from Tie::File::AsHash

@@ -1,0 +1,4 @@
+- Tie::Redis::Set
+  - Maybe would be nicer to use Set::Object for this?
+- Tie::Redis::Zset
+- Write a Tie::Redis::Util with set() and zset()

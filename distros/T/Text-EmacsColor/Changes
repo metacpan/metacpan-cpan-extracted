@@ -1,0 +1,9 @@
+0.03     Tue Dec  8 23:12:05 CST 2009
+    - handle case with "\n" in Perl string correctly
+      tests + patch by typester++ (Daisuke Murase)
+
+0.02     Tue May 26 23:09:44 MST 2009
+    - add result class with parsed HTML / CSS
+
+0.01     Wed Dec  3 02:17:55 CST 2008
+    - initial release

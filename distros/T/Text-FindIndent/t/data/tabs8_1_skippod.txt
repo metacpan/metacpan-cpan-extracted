@@ -1,0 +1,62 @@
+
+=pod
+
+Blah blah
+
+  my $example = 'code';
+  foreach (@foo) {
+    foreach (@foo) {
+      my $example = 'code';
+      my $example = 'code';
+      my $example = 'code';
+    }
+    my $example = 'code';
+    my $example = 'code';
+    my $example = 'code';
+    foreach (@foo) {
+      my $example = 'code';
+      my $example = 'code';
+      my $example = 'code';
+    }
+  }
+
+Blah
+
+=cut
+    
+
+use vars qw{$VERSION};
+BEGIN {
+  $VERSION = '0.01';
+}
+
+sub parse {
+	my $class = shift;
+	my $text  = shift;
+	foreach my $foo (blah) {
+		foreach my $foo (blah) {
+			foreach my $foo (blah) {
+				foo;
+			}
+		}
+	}
+}
+
+
+=head1 Blurb
+
+blah
+
+  sub parse {
+      my $class = shift;
+      my $text  = shift;
+      foreach my $foo (blah) {
+          foreach my $foo (blah) {
+              foreach my $foo (blah) {
+                  foo;
+              }
+          }
+      }
+  }
+
+=cut

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-Role
+version:      0.12
+version_from: 
+installdirs:  site
+requires:
+    Class::Roles:                  0.2
+    Test::Builder:                 0.17
+    Test::Builder::Tester:         0.09
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

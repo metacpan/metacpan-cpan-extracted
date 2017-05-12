@@ -1,0 +1,9 @@
+# .gitignore for TAP-Harness-Multiple
+/MANIFEST.bak
+/Makefile
+/Makefile.old
+/TAP-Harness-Multiple-*.tar.gz
+/MYMETA.yml
+/blib
+/pm_to_blib
+/cover_db/

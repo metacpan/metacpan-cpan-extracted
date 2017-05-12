@@ -1,0 +1,92 @@
+=head1 NAME
+
+Tie::Nested - multiple levels of nested tied HASHes and ARRAYs
+
+=head1 SYNOPSIS
+
+  tie my(%d), 'Tie::Nested', recurse => 'Hash::Case::Lower';
+  $d{FOO} = 'BAR';
+  print $d{Foo};   # BAR
+  print $d{fOo};   # BAR
+  print keys %$d;  # foo
+
+  $d{FOO}{BAR} = 42;
+  print Data::Dumper::Dumper \%d;   # {foo => {bar => 42}};
+
+  $d{nEw} = {with}{NestEd}{asSIgn => 3}; # works!
+
+  tie my(%e), 'Tie::Nested'
+     , nestings => ['Hash::Case::Lower', 'Hash::Case::Upper'];
+  $e{FOO}{bar}{Tic} = 42;
+  print Data::Dumper::Dumper \%e;   # {foo => {BAR => {Tic => 42}}};
+
+=head1 DESCRIPTION
+
+Tie a data-structure automatically.  On the top level, we specify
+for each of the sub-levels how they have to be tied. But after
+that, we do not need to care.
+
+For instance, we have read/are reading a directory structure
+for a case-insensitive file-system.
+
+=head1 METHODS
+
+=head2 constructors
+
+B<ARRAY>(, 'Tie::Nested', [DATA], OPTIONS)
+
+=over 4
+
+See tie on HASH. You can use ARRAYs as well!  All examples are with
+HASHes, but you are not limited to HASHes!
+
+=back
+
+B<HASH>(, 'Tie::Nested', [DATA], OPTIONS)
+
+=over 4
+
+Tie to a new HASH. The optional DATA contains the initial contents
+for the HASH.
+
+Either the C<recurse> or the C<nesting> option is required. For examples,
+see the SYNOPSIS.
+
+ Option --Default
+ nesting  []
+ recurse  undef
+
+. nesting => ARRAY-of-TIECLASS
+
+=over 4
+
+Each of the TIECLASSes implements a tie. For the first level, the first
+TIECLASS is used. For the second the next, and so forth until you run
+out of classes. Then, we proceed with
+
+=back
+
+. recurse => TIECLASS
+
+=over 4
+
+The TIECLASS implements a tie. Each of the nested structures will tie to
+this same TIECLASS.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Tie-Nested distribution version 0.10,
+built on February 15, 2010. Website: F<http://perl.overmeer.net/tie-nested>
+
+=head1 LICENSE
+
+Copyrights 2010 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,17 @@
+Revision history for Test-Pod-No404s
+
+0.03 0000-00-00T00:00:00Z UTC
+ - Add invalid POD location for errors
+ - Add note about the companion Test::Pod::LinkCheck module
+
+ [STATISTICS]
+ - code churn: 4 files changed, 9 insertions(+), 34 deletions(-)
+
+0.02 0000-00-00T00:00:00Z UTC
+ - Minor code fixes
+ - Fix incorrect Build.PL
+ - Re-jigged the export logic so it's more saner
+
+0.01 0000-00-00T00:00:00Z UTC
+ - initial release
+

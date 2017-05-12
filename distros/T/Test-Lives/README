@@ -1,0 +1,39 @@
+Test::Lives
+
+This module provides only one function, "lives_and", which allows you to
+test things that could (but shouldn't) throw an exception, without
+having to have two separate tests with two separate results (and two
+separate descriptions).
+
+You pass it a block of code to run (which should contain one test
+assertion) and a test description to give the assertion inside the
+block.
+
+The description will be available inside the block in the $_ variable.
+
+If the block ends up throwing an exception, a test failure will be
+logged.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

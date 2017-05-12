@@ -1,0 +1,523 @@
+#!/usr/bin/perl
+#Copyright (c) 2013, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Toader::Directory;
+use Toader;
+use Cwd;
+use Term::CallEditor qw/solicit/;
+use Toader::Render::Directory;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "toader-dir 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"Switches:\n".
+		"-a <action> - The action to perform.\n".
+		"-b <body file> - The file to read for the body.\n".
+		"-F <file> - The file for a part.\n".
+		"-p - Print the returned value for the render check.\n".
+		"-r <render> - The render to use.\n".
+		"-s <summary> - What to set for the summary.\n".
+		"\n".
+		"Environmental Variables:\n".
+		"Toader_outputdir - The output directory to use.\n".
+		"\n".
+		"Actions:\n".
+		"be - Edits the body of the specified directory\n".
+		"bg - Prints the body of the specified directory\n".
+		"bs - Sets the body of the specified directory\n".
+		"pa - Adds a subpart.\n".
+		"pe - Extracts the subpart.\n".
+		"pl - List the subparts.\n".
+		"pr - Removes a subpart.\n".
+		"rp - Prints the raw directory.\n".
+		"ss - Sets the summary.\n".
+		"sg - Gets the summary.\n".
+		"rc - Checks if the content of a entry can be rendered.\n".
+		"rs - Sets the renderer.\n".
+		"rg - Gets the renderer.\n".
+		"render - Renders the directory.\n";
+}
+
+#gets the options
+my %opts=();
+getopts('a:b:f:F:r:s:S:p', \%opts);
+
+# make sure we have an action
+if ( ! defined( $opts{a} ) ){
+	warn("toader-dir: Nothing specified for switch -a\n");
+	exit 254
+}
+
+#get the current directory
+my $dir=getcwd;
+
+#initialize Toader as a bit of a test and it may be used later
+my $toader=Toader->new({ dir=>$dir });
+if ( $toader->error){
+	warn('toader-dir: Failed to initialize Toader. error="'.$toader->error.
+		 '" errorString="'.$toader->errorString.'"');
+	exit $toader->error;
+}
+
+#
+if ( defined( $ENV{'Toader_outputdir'} ) ){
+	$toader->setOutputDir( $ENV{'Toader_outputdir'} );
+	if ( $toader->error ){
+		warn('toader-dir: Failed to set the output directory. error="'.$toader->error.
+			 '" errorString="'.$toader->errorString.'"');
+		exit $toader->error;
+	}
+}
+
+#initializes the toader directory object
+my $td=Toader::Directory->new( $toader );
+if ( $td->error ){
+	warn('toader-dir: new errored for Toader::Directory');
+	exit $td->error;
+}
+$td->dirSet( $dir );
+if ( $td->error ){
+	warn('toader-dir: Failed to set the directory. error="'.$td->error.'" errorString="'
+		 .$td->errorString.'"');
+	exit $toader->error;
+}
+
+#prints the body of a directory
+if ( $opts{a} eq 'bg' ){
+	print $td->bodyGet;
+	exit 0;
+}
+
+#sets the body of a entry
+if ( $opts{a} eq 'bs' ){
+	my $body;
+	if ( defined( $opts{b} ) ){
+		my $fh;
+		if ( ! open( $fh, '<', $opts{b} ) ){
+			warn('toader-dir: Failed to open "'.$opts{b}.'" to read for the body');
+			exit 254;
+		}
+		$body=join( '', <$fh> );
+		close( $fh );
+	}else{
+		warn('toader-dir: Nothing file specified via the -b flag');
+		exit 254;
+	}
+	$td->bodySet($body);
+	$td->write;
+	if ( $td->error ){
+		warn('toader-dir: Failed to writing the directory out. error="'
+			 .$td->error.'" errorString="'.$td->errorString.'"');
+		exit $td->error;
+	}
+	exit 0;
+}
+
+#edits the body of a directory index
+if ( $opts{a} eq 'be' ){
+	my $body=$td->bodyGet;
+	my $fh=solicit($body);
+	$body=join( '', <$fh> );
+	$td->bodySet($body);
+	$td->write;
+    if ( $td->error  ){
+        warn('toader-dir: Failed to write the directory out. error="'.
+             $td->error.'" errorString="'.$td->errorString.'"');
+        exit $td->error;
+    }
+	print $td->bodyGet;
+	exit 0;
+}
+
+#this adds a part
+if ( $opts{a} eq 'pa' ){
+    $td->subpartsAdd( $opts{F} );
+	if ( $td->error ){
+		warn('toader-dir: Failed to add "'.$opts{F}.'"');
+		exit $td->error;
+	}
+    $td->write;
+    if ( $td->error  ){
+        warn('toader-dir: Failed to write the directory out. error="'.
+             $td->error.'" errorString="'.$td->errorString.'"');
+        exit $td->error;
+    }
+    exit 0;
+}
+
+#this extracts the parts
+if ( $opts{a} eq 'pe' ){
+    $td->subpartsExtract( $opts{F} );
+    if ( $td->error ){
+        warn('toader-dir: Failed to extract to "'.$opts{F}.'"');
+        exit $td->error;
+    }
+    $td->write;
+    if ( $td->error  ){
+        warn('toader-dir: Failed to write the directory out. error="'.
+             $td->error.'" errorString="'.$td->errorString.'"');
+        exit $td->error;
+    }
+	exit 0;
+}
+
+#this lists the parts
+if ( $opts{a} eq 'pl' ){
+    my @files=$td->subpartsList;
+    if ( $td->error ){
+        warn('toader-dir: Failed to get a list of subparts');
+        exit $td->error;
+    }
+	print join("\n", @files);
+	if ( defined( $files[0] ) ){
+		print "\n";
+	}
+    exit 0;
+}
+
+#this removes the specified subpart
+if ( $opts{a} eq 'pr' ){
+    $td->subpartsRemove( $opts{F} );
+    if ( $td->error ){
+        warn('toader-dir: Failed to remove subpart "'.$opts{F}.'"');
+        exit $td->error;
+    }
+    $td->write;
+    if ( $td->error  ){
+        warn('toader-dir: Failed to write the directory out. error="'.
+             $td->error.'" errorString="'.$td->errorString.'"');
+        exit $td->error;
+    }
+    exit 0;
+}
+
+#prints the raw data
+if ( $opts{a} eq 'rp' ){
+    my $raw=$td->as_string;
+    if ( $td->error ){
+        warn('toader-dir: Failed to convert the directory index to a raw state');
+        exit $td->error;
+    }
+	print $raw;
+    exit 0;
+}
+
+#gets the summary
+if ( $opts{a} eq 'sg' ){
+    my $summary=$td->summaryGet;
+    if ( $td->error ){
+        warn('toader-dir: Tailed to get the summary');
+        exit $td->error;
+    }
+	print $summary."\n";
+    exit 0;
+}
+
+#sets the summary
+if ( $opts{a} eq 'ss' ){
+	$td->summarySet( $opts{s} );
+    if ( $td->error ){
+        warn('toader-dir: Tailed to set the summary');
+        exit $td->error;
+    }
+    $td->write;
+    if ( $td->error  ){
+        warn('toader-dir: Failed to write the directory out. error="'.
+             $td->error.'" errorString="'.$td->errorString.'"');
+        exit $td->error;
+    }
+    exit 0;
+}
+
+#gets the renderer
+if ( $opts{a} eq 'rg' ){
+    my $renderer=$td->rendererGet;
+    if ( $td->error ){
+        warn('toader-dir: Tailed to get the renderer');
+        exit $td->error;
+    }
+    print $renderer."\n";
+    exit 0;
+}
+
+#sets the renderer
+if ( $opts{a} eq 'rs' ){
+    $td->rendererSet( $opts{r} );
+    if ( $td->error ){
+        warn('toader-dir: Tailed to set the renderer');
+        exit $td->error;
+    }
+    $td->write;
+    if ( $td->error  ){
+        warn('toader-dir: Failed to write the directory out. error="'.
+             $td->error.'" errorString="'.$td->errorString.'"');
+        exit $td->error;
+    }
+    exit 0;
+}
+
+#this checks if it can be rendered
+if ( $opts{a} eq 'rc' ){
+	my $renderer=Toader::Render::Directory->new(
+		{
+			obj=>$td,
+			toader=>$toader,
+		}
+		);
+	if ( $renderer->error ){
+		warn('toader-dir: Failed to initialize the renderer');
+		exit $renderer->error;
+	}
+	my $content=$renderer->content;
+	if ( $opts{p} ){
+		print $content;
+	}
+
+    exit 0;
+}
+
+#this checks if it can be rendered
+if ( $opts{a} eq 'rc' ){
+	my $renderer=Toader::Render::Directory->new(
+		{
+			obj=>$td,
+			toader=>$toader,
+		}
+		);
+	if ( $renderer->error ){
+		warn('toader-dir: Failed to initialize the renderer');
+		exit $renderer->error;
+	}
+	$renderer->render;
+	if ( $renderer->error ){
+		warn('toader-dir: Failed render the directory');
+		exit $renderer->error;
+	}
+
+    exit 0;
+}
+
+=head1 NAME
+
+toader-dir - A tool for manipulating the Toader directory index file.
+
+=head1 SYNOPSIS
+
+toader-dir -a be
+
+toader-dir -a bg
+
+toader-dir -a bs -b <body file>
+
+toader-dir -a pa -F <file>
+
+toader-dir -a pe -F <file>
+
+toader-dir -a pl
+
+toader-dir -a pr -F <file>
+
+toader-dir -a rp
+
+toader-dir -a sg
+
+toader-dir -a ss -s <summary>
+
+toader-dir -a rc [-p]
+
+toader-dir -a render
+
+toader-dir -a rg
+
+toader-dir -a rs -r <renderer>
+
+=head1 SWITCHES
+
+=head2 -a <action>
+
+The specified action to perform.
+
+=head2 -b <body file>
+
+The body file to use.
+
+=head2 -F <file>
+
+The file to use, file part to remove, or
+directory to extract them to.
+
+=head2 -p
+
+Print the rendered content.
+
+=head2 -r <renderer>
+
+The renderer to use.
+
+=head2 -s <summary>
+
+The summary to use.
+
+=head1 ACTIONS
+
+=head2 be
+
+Edits the body of the specified directory
+
+=head2 bg
+
+Prints the body of the specified directory
+
+=head2 bs
+
+Sets the body of the specified directory
+
+Required switches...
+
+    -b <body file>
+
+=head2 pa
+
+Adds a subpart.
+
+Required switches...
+
+    -F <file>
+
+=head2 pe
+
+Extracts the subparts.
+
+Required switches...
+
+    -F <directory>
+
+=head2 pl
+
+List the subparts.
+
+=head2 pr
+
+Removes a subpart.
+
+Required switches...
+
+    -F <file>
+
+=head2 rp
+
+Prints the raw directory.
+
+Required switches...
+
+    -r <renderer>
+
+=head2 sg
+
+Gets the summary
+
+=head2 ss
+
+Sets the summary.
+
+Required switches...
+
+    -s <summary>
+
+=head2 rc
+
+Checks if the content of a entry can be rendered.
+
+Optional switches...
+
+    -p
+
+=head2 render 
+
+Renders the directory.
+
+=head2 rg
+
+Gets the renderer.
+
+=head2 rs
+
+Sets the renderer.
+
+Required switches...
+
+    -r <renderer>
+
+=head1 Environmental Variables:
+
+
+=head2 Toader_outputdir
+
+The output directory to use.
+
+=head1 AUTHOR
+
+Copyright (c) 2013, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+unix
+
+=head1 README
+
+toader-dir - A tool for manipulating the Toader directory index file.
+
+=cut

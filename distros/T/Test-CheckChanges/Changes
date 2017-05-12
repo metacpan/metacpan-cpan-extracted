@@ -1,0 +1,68 @@
+Revision history for Perl extension Test::CheckChanges
+
+0.14 Sat, 06 Mar 2010 17:03:29 -0500
+	- Recognize developer releases / Bug #54856
+	- Recognize v0.0.0 format
+
+0.12 Wed, 06 Jan 2010 21:24:58 -0500
+	- added more tests
+	- will work with done_testing();
+	- added test for done_testing();
+
+0.11 Sun, 23 Dec 2009 19:21:01 -0400
+	- Now works on Windows XP
+
+0.10 Sun, 23 Dec 2009 19:21:01 -0400
+        - Tested on Windows XP
+	- If test8 had been in release 0.09 it would have been removed
+	  in this release
+        - Once again only look for 'Changes' and 'CHANGES' filenames.
+
+0.09 Sun, 23 Dec 2009 11:50:01 -0400
+        - All files in the form of /C[Hh][Aa][Nn][Gg][Ee][Ss]/ will be considered 
+	  for use as the changes file.  The first (in perl order) will be used.
+	- Use glob to fix bug 'caseless' filesystems
+	- The text of the "Multiple Changes files found" message was changed.
+	  It no longer contains paths and has different punctuation.
+        - t/multi.t was update for the previous change.
+	- t/test8.t was added to test for more than 2 Changes files.
+
+0.08 Sun, 02 Aug 2009 09:13:11 -0400
+	- Added "Version N" format
+	- Added Test for "Version N" format
+	- Added Documentation for "Version N" format
+
+0.07 Sat, 13 Jun 2009 23:43:29 -0400
+        - Test not fails if multiple Changes files are found.
+          CHANGES and Changes
+        - Apocal format Change files are now recognized
+          See example/apocal
+        - If no Version is found in the Changes file the test now fails.
+        - Moved 'bad' Changes files out of exaples
+        - improved coverage
+        - removed tests => from documentation and test as it is not needed.
+
+0.06 Tue, 06 May 2008 21:20:53 -0400
+	- test1 and test4 failed if Module::Build was not installed.
+	  Those tests are now skipped if Module::Build is not installed.
+
+0.05 Mon, 05 May 2008 07:46:27 -0400
+	- removed multiple file tests.  Improved error handling.
+	  Tests were failing on Darwin.
+
+0.04 Sun, 04 May 2008 19:23:22 -0400
+	- fix to plan work with SKIP
+
+0.03 Sun, 04 May 2008 08:20:55 -0400
+	- removed the multiple file test
+	  it failed on some operating systems.
+	- if there are a Changes and a CHANGES file they are both tested.
+
+0.02 Fri, 02 May 2008 15:25:27 -0400
+	- coverage is now 98%
+	- added many tests
+
+0.01 Fri, 02 May 2008 09:43:35 -0400
+	- everything
+	- original release
+

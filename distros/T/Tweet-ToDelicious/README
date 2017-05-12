@@ -1,0 +1,38 @@
+Twitter-ToDelicious version 0.08
+================================
+
+INSTALLATION
+
+I recommend you to use carton to install dependencies locally.
+
+    $ git clone git://github.com/ysasaki/p5-tweet-todelicious.git
+    $ cd p5-tweet-todelicious
+    $ cp config.yaml.sample config.yaml
+    $ vim config.yaml 
+    $ carton install --deployment
+    $ carton exec -- perl ./bin/t2delicious.pl
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Config::Any
+    YAML::XS
+    Net::Delicious
+    LWP::Protocol::https
+    Coro
+    Anyevent::Twitter::Stream
+    Net::OAuth
+    Net::SSLeay
+    List::MoreUtils
+    Log::Minimal
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Yoshihiro Sasaki
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

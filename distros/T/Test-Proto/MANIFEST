@@ -1,0 +1,47 @@
+Changes
+lib/Test/Proto.pm
+lib/Test/Proto/Alternation.pm
+lib/Test/Proto/Base.pm
+lib/Test/Proto/Role/Value.pm
+lib/Test/Proto/CodeRef.pm
+lib/Test/Proto/Common.pm
+lib/Test/Proto/Compare.pm
+lib/Test/Proto/Compare/Numeric.pm
+lib/Test/Proto/Formatter.pm
+lib/Test/Proto/Formatter/TestBuilder.pm
+lib/Test/Proto/HashRef.pm
+lib/Test/Proto/Role/HashRef.pm
+lib/Test/Proto/ArrayRef.pm
+lib/Test/Proto/Role/ArrayRef.pm
+lib/Test/Proto/Repeatable.pm
+lib/Test/Proto/Series.pm
+lib/Test/Proto/Role/Tagged.pm
+lib/Test/Proto/Object.pm
+lib/Test/Proto/TestCase.pm
+lib/Test/Proto/TestRunner.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t			Do all the modules load?
+t/kwalitee.t			Author test: fail if it will cause problems for CPAN
+t/manifest.t			Author test: does the manifest work?
+t/pod-coverage.t			Author test: is the documentation complete?
+t/pod.t			Author test: is the documentation valid?
+t/Extras-DPath.t			Optional: If Data::DPath installed, test the integration
+t/Test-Proto.t			Do the constructors work?
+t/Test-Proto-ArrayRef.t
+t/Test-Proto-Base.t
+t/Test-Proto-CodeRef.t
+t/Test-Proto-Common.t
+t/Test-Proto-Compare.t
+t/Test-Proto-HashRef.t
+t/Test-Proto-Formatter.t
+t/Test-Proto-Formatter-TestBuilder.t
+t/Test-Proto-Object.t
+t/Test-Proto-TestRunner.t
+t/Test-Proto-TestCase.t
+t/Test-Proto-Role-Tagged.t
+t/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

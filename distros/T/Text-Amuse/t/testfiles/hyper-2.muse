@@ -1,0 +1,127 @@
+#title Internal anchors
+#notes #invalid0
+This is the note.
+#subtitle #invalid1
+
+** Start
+#valid2
+
+** Start with invalid anchor #invalid2
+
+#invalid3 because the text continue
+
+This is valid,
+#valid3
+Anchor is on a line by itself (valid3)
+
+*** Section valid4
+#valid4
+
+*** Section 2 #invalid4
+
+***** #valid5
+Section 3 with valid5 anchor (but weird).
+
+*** #invalid5 <br> In title
+
+  #invalid6 in quote
+
+  #valid6
+  valid 6 in quote
+
+
+          #invalid7 in center
+        
+          #valid7
+          valid 7
+          in center
+
+                                    #invalid8 in right
+                                    #valid8
+                                    valid8
+                                    in right
+
+ DL :: #invalid9 in dl
+ DL :: #valid9
+       valid 9 in dl
+
+ 1. #invalid10 in list
+ 2. #valid10
+    valid10 at list beginning list
+    #invalid11 in list par
+    #valid11
+    valid 11 in list par
+
+Try the footnote [1]
+#valid12
+valid12 near the footnote
+
+[1] #invalid12
+    in footnote
+
+<verse>
+#invalid13 in verse
+
+#valid13
+valid13 in verse
+</verse>
+
+> #invalid14 in verse
+> 
+> #valid14
+> valid14 in verse
+
+{{{
+#invalid15
+
+In example is not valid.
+}}}
+
+<example>
+#invalid16
+In example is not valid.
+</example>
+
+<verbatim>#invalid17</verbatim>
+In =verbatim= is always neutralized.
+
+ #invalid18 :: As Dt
+
+** Summary
+
+*** Valid
+
+ - [[#valid2][valid2]]
+ - [[#valid3][valid3]]
+ - [[#valid4][valid4]]
+ - [[#valid5][valid5]]
+ - [[#valid6][valid6]]
+ - [[#valid7][valid7]]
+ - [[#valid8][valid8]]
+ - [[#valid9][valid9]]
+ - [[#valid10][valid10]]
+ - [[#valid11][valid11]]
+ - [[#valid12][valid12]]
+ - [[#valid13][valid13]]
+ - [[#valid14][valid14]]
+
+*** Invalid
+
+ - [[#invalid1][invalid1]]
+ - [[#invalid2][invalid2]]
+ - [[#invalid3][invalid3]]
+ - [[#invalid4][invalid4]]
+ - [[#invalid5][invalid5]]
+ - [[#invalid6][invalid6]]
+ - [[#invalid7][invalid7]]
+ - [[#invalid8][invalid8]]
+ - [[#invalid9][invalid9]]
+ - [[#invalid10][invalid10]]
+ - [[#invalid11][invalid11]]
+ - [[#invalid12][invalid12]]
+ - [[#invalid13][invalid13]]
+ - [[#invalid14][invalid14]]
+ - [[#invalid15][invalid15]]
+ - [[#invalid16][invalid16]]
+ - [[#invalid17][invalid17]]
+ - [[#invalid18][invalid18]]

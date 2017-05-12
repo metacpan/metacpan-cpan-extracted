@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name: Template-Plugin-XML-LibXML
+version: 1.07
+author:
+  - Written by Mark Fowler <mark@twoshortplanks.com>
+  - Copyright Mark Fowler 2002-3, all rights reserved.
+  - |-
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+  - |-
+    This module wouldn't have been possible without the wonderful work
+    that has been put into the libxml library by the gnome team or the
+    equally wonderful work put in by Matt Sergeant and Christian Glahn in
+    creating XML::LibXML.
+abstract: XML::LibXML Template Toolkit Plugin
+license: perl
+requires:
+  Template: 2.06
+  XML::LibXML: 1.52
+recommends:
+  Scalar::Util: 1.07
+provides:
+  Template::Plugin::XML::LibXML:
+    file: lib/Template/Plugin/XML/LibXML.pm
+    version: 1.07
+  XML::LibXML::Document:
+    file: lib/Template/Plugin/XML/LibXML.pm
+    version: 1.07
+  XML::LibXML::Node:
+    file: lib/Template/Plugin/XML/LibXML.pm
+    version: 1.07
+  XML::LibXML::NodeList:
+    file: lib/Template/Plugin/XML/LibXML.pm
+    version: 1.07
+  XML::LibXML::Text:
+    file: lib/Template/Plugin/XML/LibXML.pm
+    version: 1.07
+generated_by: Module::Build version 0.25

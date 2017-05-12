@@ -1,0 +1,34 @@
+Changelog.ini
+Changes
+lib/Tree/Persist.pm
+lib/Tree/Persist/Base.pm
+lib/Tree/Persist/DB.pm
+lib/Tree/Persist/DB/SelfReferential.pm
+lib/Tree/Persist/File.pm
+lib/Tree/Persist/File/XML.pm
+lib/Tree/Persist/File/XMLWithSingleQuotes.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/pod2html.sh
+scripts/store.xml
+scripts/xml.demo.pl
+t/add_from_db.t
+t/associate_with_db.t
+t/associate_with_file.t
+t/autocommit.t
+t/datafiles/tree1.xml
+t/datafiles/tree2.xml
+t/interface.t
+t/load_from_db.t
+t/load_from_file.t
+t/save_and_load.t
+t/save_to_db.t
+t/save_to_file.t
+t/tests.pm
+xt/author/pod.t
+xt/author/pod_coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

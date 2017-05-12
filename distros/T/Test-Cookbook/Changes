@@ -1,0 +1,11 @@
+commit 2a2afc9ecc0902dfce5d9d9f0bbaac2f23b62a1c (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:25:45 2009 +0100
+
+    FIXED: dependencies
+
+commit 9ce18ba681a23f20c9806743e804bf0f6d3bf268
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 23:51:33 2008 +0100
+
+    ADDED: Initial commit

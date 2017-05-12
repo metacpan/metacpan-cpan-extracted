@@ -1,0 +1,174 @@
+Tie/Scalar/Transactional version 0.01
+=====================================
+
+This module implements scalars with transactional capabilities. The 
+functionality is similar to the ones found in most Relation Database 
+Management Systems (RDBMS). 
+
+This modules was inspired by "Perl6 RFC 161: Everything in Perl becomes 
+an Object", that talks about the possibility of implementing transaction 
+support in Perl scalars.  
+
+NAME
+
+  Tie::Scalar::Transactional - Implementation of Transactional Scalars
+
+SYNOPSIS
+
+  use Tie::Scalar::Transactional;
+
+  my $foo = 10;
+  new Tie::Scalar::Transactional($foo);
+
+  $foo = $baz * 10;
+  #... Transactions here ...#
+
+  if ($error) {
+    Tie::Scalar::Transactional->rollback($foo);  ## or
+    tied($foo)->rollback();                      
+  }
+  else {
+    Tie::Scalar::Transactional->commit($foo);  ## or
+    tied($foo)->commit();                      
+  }
+
+  ### ----------------------------------------- ###
+  ### Or use the following Procedural Interface ###
+  ### ----------------------------------------- ###
+
+  use Tie::Scalar::Transactional qw(:commit);
+  tie my $bar, 'Tie::Scalar::Transactional', 10;
+
+  $bar = $baz * 10;
+  #... Transactions here ...#
+
+  if ($error) { rollback $bar; }
+  else        { commit $bar; }
+
+DESCRIPTION
+
+    This module implements scalars with transactional capabilities. The
+    functionality is similar to the ones found in most Relation Database
+    Management Systems (RDBMS).
+
+    A transaction begins under any one of the following conditions:
+
+    * A new transactional variable is created
+    * When an existing scalar is converted into a transactional scalar
+    * When an existing transaction is committed, a new one begins
+      automatically.
+
+    All the changes/updates to the scalar after the transaction has begun
+    can be rolled back, if neccessary. Once committed a change cannot be
+    rolledback.
+
+INVOCATION
+
+    The module can be invoked in two ways:
+
+      * use Tie::Scalar::Transactional;
+      * use Tie::Scalar::Transactional qw(:commit);
+
+    If you are strong believer (like me) in the fact that an Object Oriented
+    module should never export methods, then you should use the first
+    method.
+
+    On the other hand if you are constantly annoyed by the line noise
+    created by the "commit()" / "rollback()" calls, when using a pure OO
+    interface. And would prefer the less terse procedural interface, then
+    the 2nd method is for you. This will import the "commit()" and
+    "rollback()" methods the current package's namespace.
+
+CREATING A TRANSACTIONAL SCALAR
+
+    There are two modes in which you can create a Transactional scalar i.e.
+
+      * Call the module's constructor with the scalar as the first argument
+      * Call the builtin "tie()" function and pass the Scalar and Class name
+        as arguments
+
+    The two modes are illustrated below:
+
+        my $foo = 10;
+        new Tie::Scalar::Transactional($foo);
+                  (or)
+        tie my $foo, 'Tie::Scalar::Transactional', 10;
+
+METHODS
+
+    commit()
+        The "commit()" method, sets the state of the scalar to the last
+        update/change done to the scalar since the start of the transaction.
+        The subsequent "rollback()" method call (if any) will revert back
+        the scalar to this state.
+
+        The "commit()" method can be invoked in one of the following ways:
+
+            Tie::Scalar::Transactional->commit($foo);  ## or
+            tied($foo)->commit();                      ## or
+            commit $foo;  ## When you have 'use T::S::T qw(:commit)'
+
+    rollback()
+        The "rollback()" method, reverts back the state of the scalar to
+        what it was at the beginning of the transaction. The calling
+        conventions are similar to the "commit()" method, as discussed
+        above.
+
+LIMITATIONS
+
+    Since this is a pure Perl module, it may not be fully optimized in terms
+    of performance. Also the module *might not* be thread safe [But who
+    cares ;) ... ]
+
+KNOWN BUGS
+
+    May be lot of them :-), but hopefully none. Bug reports, fixes,
+    suggestions or feature requests are most welcome.
+
+INSPIRATION
+
+    This modules was inspired by "Perl6 RFC 161: Everything in Perl becomes
+    an Object", that talks about the possibility of implementing transaction
+    support in Perl scalars.
+
+COPYRIGHT
+    Copyright (c) 2002-03 Arun Kumar U <u_arunkumar@yahoo.com> All rights
+    reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Arun Kumar U <u_arunkumar@yahoo.com>, <uarun@cpan.org>
+
+SEE ALSO
+    perl(1), perltie(1)
+
+                            ---------------------
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002-03 Arun Kumar U <u_arunkumar@yahoo.com>
+All rights reserved.
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Share and Enjoy !!
+
+Arun Kumar U
+<u_arunkumar@yahoo.com>, <uarun@cpan.org>
+
+-------------------------------------------------------------------------------
+           I dunno, I dream in Perl sometimes ...   -- Larry Wall
+-------------------------------------------------------------------------------
+

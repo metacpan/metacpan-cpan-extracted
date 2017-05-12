@@ -1,0 +1,12 @@
+Revision history for Test-Pod-Coverage-Permissive
+
+0.05    Sat  6 Feb 2010 17:39:38 MSK
+        fixed some copy&paste issue :-)
+0.04    Thu  4 Feb 2010 22:15:38 MSK
+        added correct copyright
+0.03    Thu  4 Feb 2010 18:52:08 MSK
+        added thanks to author of Test::Pod::Coverage
+        started to log changes in this file :-)
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

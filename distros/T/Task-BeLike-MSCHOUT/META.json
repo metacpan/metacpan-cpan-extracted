@@ -1,0 +1,101 @@
+{
+   "abstract" : "be more like MSCHOUT -- use the modules he does!",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Task-BeLike-MSCHOUT",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Ack" : "1.82",
+            "App::Nopaste" : "0.28",
+            "App::cpanminus" : "0",
+            "App::cpanoutdated" : "0",
+            "Archive::Zip" : "0",
+            "BackPAN::Index" : "0",
+            "CSS::Minifier" : "0",
+            "CSS::Minifier::XS" : "0",
+            "Config::Auto" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Devel::NYTProf" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::GitHub" : "0",
+            "Dist::Zilla::Plugin::Twitter" : "0",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "File::Find::Rule" : "0",
+            "Git::CPAN::Patch" : "0",
+            "Gravatar::URL" : "0",
+            "IO::Socket::SSL" : "0",
+            "IPC::System::Simple" : "0",
+            "JavaScript::Minifier" : "0",
+            "JavaScript::Minifier::XS" : "0",
+            "LWP" : "0",
+            "LWP::Protocol::https" : "0",
+            "List::MoreUtils" : "0",
+            "Method::Signatures" : "0",
+            "Modern::Perl" : "0",
+            "Moo" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "MooseX::App" : "0",
+            "MooseX::Method::Signatures" : "0",
+            "Mouse" : "0",
+            "Perl6::Junction" : "0",
+            "Perl::Tidy" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "SQL::Beautify" : "0",
+            "String::Truncate" : "0",
+            "Template::Test" : "0",
+            "Test::Pod::Coverage" : "0",
+            "TryCatch" : "0",
+            "URI" : "0",
+            "Vimana" : "0",
+            "WWW::Shorten" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-task-belike-mschout at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-MSCHOUT"
+      },
+      "homepage" : "http://search.cpan.org/dist/Task-BeLike-MSCHOUT/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/task-belike-mschout.git",
+         "web" : "https://github.com/mschout/task-belike-mschout"
+      }
+   },
+   "version" : "1.162770"
+}
+

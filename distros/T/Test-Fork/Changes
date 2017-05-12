@@ -1,0 +1,17 @@
+0.02  Wed Oct 15 00:45:46 EDT 2008
+    Features
+    - fork_ok() now returns the PID of the forked process just like fork().
+    * Added some better diagnostics about what fork_ok() is doing.
+
+    Bug Fixes
+    * Fixed a race condition causing the reaper to wait for kids which have already
+      been reaped.
+
+    Tests
+    - Add a test for the case when fork() fails.
+    - Improve the test to ensure test numbers get turned back on after the
+      children are all done.
+
+
+0.01_01  Nov 30 20:02:00 PST 2007
+    First working release

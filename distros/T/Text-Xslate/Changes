@@ -1,0 +1,1313 @@
+Revision history for Perl extension Text::Xslate
+
+3.4.0 2017-01-20 15:00:00+0900
+    - Fix tied hash issue(#173)
+    - Fix encoding issue(#160)
+    - Fix segmentation fault issue by accessing uninitialized array element(#159)
+
+3.3.9 2015-12-18 22:15:00+0900
+    - Fix test for Windows
+      3.3.8 change breaks Windows
+
+3.3.8 2015-12-18 16:20:00+0900
+    - Fix test for DragonflyBSD
+    - Update document
+
+3.3.7 2015-08-28 13:45:00+0900
+    - Fix for older Perl 5.8.8 or lower(#145)
+    - Enable 5.8 tests again
+
+3.3.6 2015-08-25 13:50:00+0900
+    - Fix issue 'include' makes stack pointer incorrect(#130)
+
+3.3.5 2015-08-05 18:50:00+0900
+    - Update Mouse version for Perl 5.22 or higher
+
+3.3.4 2015-03-24 23:21:57+0900
+    - Fix typos in document
+    - Introduce $Text::Xslate::DEFAULT_CACHE_DIR
+
+3.3.3 2014-08-04 15:50:00+0900
+    - No code changes from 3.3.2, just re-packaging.
+
+3.3.2 2014-08-04 12:40:00+0900
+   [IMPROVEMENT]
+    - #127 Improve generating temporary file name
+
+3.3.1 2014-08-03 11:45:40+0900
+    [ANNOUNCE]
+    - Now Xslate has new co-maintainers (those who can maintain and release
+      Xslate): lestrrat, syohex, and tokuhirom
+
+    [BUG FIXES]
+    - #126 Fix a typo in naming tempfiles (Hugmeir)
+
+    [DOCMENT]
+    - #125 Update document on Text::Xslate->bridge() and Builtin.pod
+      (Mike Raynham)
+
+3.3.0 2014-08-03 11:54:02+0900
+    (mis-packaging release)
+
+3.2.5 2014-07-15 08:18:31+0900
+    [TEST FIXES]
+        - No CGI.pm, which is no longer a standard module
+
+3.2.4 2014-04-27 17:18:15+0900
+    [TEST FIXES]
+        - Fix #122, #120 testing issue on windows (syohex)
+    [FEATURES]
+        - Add $array.first() and $array.last() methods (#116, #118 / shyohex)
+
+3.2.3 2014-04-23 07:32:39+0900
+    - Made a mistake in the release engineering, re-packaged on the correct
+      status.
+
+3.2.2 2014-04-23 07:29:42+0900
+    [BUG FIXES]
+    - Fix #105 SEGV on blead (reported by tokuhirom, fixed by syohex in #117)
+
+3.2.1 2014-04-17 07:55:38+0900
+    [BUG FIXES]
+    - Fix #111 (by syohex in #113) inputting "0" made a wrong result
+
+3.2.0 2014-04-04 07:39:59+0900
+    [BUG FIXES]
+    - Fix #107, #109 HashWithDefault should use "exists" (yappo, tokuhirom)
+
+3.1.2 2014-02-20 21:09:47+0900
+    [TEST]
+    - Add a test for github issue #105, which will fail on Perl 5.19.x
+
+3.1.1 2014-01-24 07:50:52+0900
+    [DOCUMENTS]
+    - Fix some typos (#102)
+    - Add an explanation of `validate()` (#101)
+
+    [BUG FIXES]
+    - Fix a race condition on making cache dirs (#103)
+
+3.1.0 2013-11-16 16:46:35+0900
+    [BUG FIXES]
+    - Close #96; $/ affected the parse() method
+    
+    [FEATURES]
+    - Add $xslate->validate($file) method to check template syntax
+
+3.0.2 2013-11-15 21:56:53+0900
+    [BUG FIXES]
+    - Fix a mojibake issue where utf8::upgrade() was always called when
+      loading caches (hanabukuro++)
+
+3.0.1 2013-11-04 12:27:51+0900
+    [TEST FIXES]
+    - Fix a test that might fail on a slow machine like Raspberry Pi
+      (Getty++)
+
+3.0.0 2013-10-18 08:59:22+0900
+    - No code changes from 2.1.0, just re-packaging for package managers
+
+2.1.0 2013-10-17 22:18:21+0900
+    [BUG FIXES]
+    - Fix an issue that multi-bytes string literals used for a hash key
+      was not dealt as a text string (@Niratama++)
+      WARNING: this change could break your code if you use multi-byte
+               text string as a hash key.
+
+2.0010 2013-10-07 21:56:12+0900
+    [BUG FIXES]
+    - Fix an issue that vpath with text-strings raised errors
+      on newer perls due to specification changes in PerlIO::scalar (#90)
+    - Documentation tweaks (#84, #86)
+
+2.0009 2013-07-08 10:49:47-0700
+    [BUG FIXES]
+    - Fix a tied hash issue on string concat, thanks to zxchris (#81)
+
+2.0008 2013-07-06 00:09:43-0700
+    [BUG FIXES]
+    - Fix a chache issue that UTF8 flags were not turned on
+      as expected (#82)
+    - Fix Metakolon doc (#83)
+
+2.0007 2013-06-21 13:16:16-0700
+    [DOCUMENTS]
+    - Add doc about chomping newlines (<:- ... -:>)
+
+    [NEW FEATURES]
+    - Add pre_process_handler to pre-process template content (bluescreen)
+
+2.0006 2013-06-02 22:58:27
+    [BUG FIXES]
+    - Fix an issue that the state of VM broke on exception
+      reported by nihen
+
+2.0005 2013-06-02 12:23:15
+    [BUG FIXES]
+    - Fix a Multiplexed WRAPPER issue reportedy by @kawamuray (#79)
+      Those who use WRAPPER, template cascading, or anonymous functions
+      (lambdas) are strongly recommended to upgrade Xslate.
+
+2.0004 2013-05-29 20:27:07
+    [TEST FIXES]
+    - Template string must be bytes (#78)
+
+2.0003 2013-05-10 12:59:11
+    [BUG FIXES]
+    - Fix a crash on compiling templates (#77)
+
+2.0002 2013-04-26 12:51:47
+    [BUG FIXES]
+    - Support perl-blead (5.17.11)
+
+2.0001 2013-04-24 16:24:22
+    [FEATURES]
+    - Support PUREPERL_ONLY build
+      See the Lancaster Consensu:
+      https://github.com/sjn/toolchain-site/blob/219db464af9b2f19b04fec05547ac10180a469f3/lancaster-consensus.md#specifying-pure-perl-builds
+
+2.0000 2013-02-20 09:21:08
+    - No code change from 1.9999_01
+
+1.9999_01 2013-02-16 15:44:31
+    [CHANGES]
+    - Migrate from Any::Moose to Mouse because Any::Moose is deprecated
+
+1.6002 2012-12-19 22:54:55
+    [BUG FIXES]
+    - Fix a bug where TTerse created no variable scopes (thanks to Yappo)
+
+1.6001 2012-12-05 10:03:13
+    [BUG FIXES]
+    - Resolve issue #71: SV leaks in VM frames
+
+1.6000_01 2012-11-04 09:56:45
+    - The bytecode version is now 1.6. So all the cache will be discarded.
+
+    [FEATURES]
+    - Add opcodes: find_file, suffix, is_code_ref, merge_file in
+      order to enhance template syntaxes (doy)
+
+1.5025 2012-10-20 21:45:27
+    [BUG FIXES]
+    - Fix a bug that constants with unary operators might result in
+      wrong values (thanks to @doy)
+
+1.5024 2012-10-15 18:02:29
+    [BUG FIXES]
+    - Fix false assertion failure
+      (This change affects only to -DDEBUGGING enabled perl)
+
+1.5023 2012-10-15 08:22:14
+    [TEST]
+    - Apply issue #66 again
+    - 1.5022 was identical to 1.5021 (thanks to @doy)
+
+1.5022 2012-10-15 00:15:18
+    [TEST]
+    - Do not depend on extra modules in tests (issue #66, @nihen).
+
+1.5021 2012-10-15 00:07:54
+    [BUG FIXES]
+    - Fix an issue that recursive call of render() may cause SEGV
+      thanks to doy for reporting this issue (isseu #65).
+
+1.5020 2012-10-14 23:06:49
+    [BUG FIXES]
+    - Fix deploying issues reported at 1.5017, again.
+      thanks to @woremacx for reporting it.
+    - Fix a bug that calling macro which encloses outer variables,
+      may clobber other variables, thanks to @ktat for reporting it.
+
+1.5019 2012-10-03 12:28:20
+    [BUG FIXES]
+    - Revert 1.5016's bugfix which introduced a more serious problem.
+      The complete bufix will be applied to 1.5020.
+
+1.5018 2012-09-30 13:41:13
+    [FEATURES]
+    - "html_builder_module" option to import HTML builders;
+      functions imported with this option are wrapped by html_builder()
+
+1.5017 2012-08-04 19:31:59
+    [BUG FIXES]
+    - Fix a problem on Win32
+
+1.5016 2012-08-04 19:19:15
+    [BUG FIXES]
+    - Fix a bug that reloading templates could fail on deploying
+    - Fix a problem on 5.17
+
+1.5015 2012-07-13 19:31:53
+    [IMPROVEMENT]
+    - Enhance extensibility for custom parsers (shmorimo)
+
+1.5014 2012-06-26 19:41:20
+    [IMPROVEMENT]
+    - Add scalar::split() to Bridge::Star (tokuhirom)
+
+1.5013 2012-06-12 23:46:44
+    [IMPROVEMENT]
+    - Add "macro" option to Text::Xslate->new() (gunyoki)
+
+1.5012 2012-05-21 15:52:59
+    [IMPROVEMENT]
+    - imporve error messages when the parser reaches EOF
+
+1.5011 2012-05-21 15:45:00
+    [BUG FIXES]
+    - add warning about https://github.com/xslate/p5-Text-Xslate/issues/55
+      For backword compatibility, we don't change its behavior, but
+      it is likely to a problem so we warnn about it.
+
+1.5010 2012-05-04 01:04:47
+    [TEST FIXES]
+    - Make `HANRESS_OPTIONS=j9 make test` work (@punytan)
+
+1.5009 2012-03-30 09:19:18
+    [IMPROVEMENT]
+    - Documentation improvement
+
+1.5008 2012-03-28 09:39:45
+    [BUG FIXES]
+    - Fix a typo in an error messages (issues/53, thanks to wchristian)
+    - Fix an undefined behavior that giving utf8-encoded *bytes* as
+      params made mojibake in use of caches
+
+1.5007 2011-11-17 19:43:10
+    [BUG FIXES]
+    * SWITCH without an END made infinate loops (reorted by ryochin)
+    * "01" was parsed as 1, not "01" (reported by ryochin)
+
+1.5006 2011-11-12 12:54:39
+    [META]
+    - Move the repository from github.com/gfx/* to github.com/xslate/
+
+    [FEATURES]
+    - Add Text::Xslate::Bridge::Star, utilities for templates
+
+1.5005 2011-10-27 13:36:03
+    [IMPROVEMENT]
+    - Update documentations
+
+1.5004 2011-10-13 10:24:38
+    [BUG FIXES]
+    - Small doc changes regarding escaping of HTML metacharacters (oalders)
+    - Fix a missing current_vars() method in PP
+    - Fix an error handling in Bridge.pm
+
+1.5003 2011-10-05 11:23:56
+    [BUG FIXES]
+    - Fix typos in docs
+    - Resolve issue/45: nested macro modifiers caused errors
+      (thanks to tokuhirom)
+
+1.5002 2011-08-30 21:48:49
+    [FEATURES]
+    * Add Text::Xslate->current_vars to get the parameters of render()
+      (requested by cho45 and others)
+
+1.5001 2011-08-30 19:37:24
+    [BUG FIXES]
+    * Calling macros could break lexical vars;
+      Thanks to tomyhero and tokuhirom.
+
+1.5000 2011-08-29 17:37:10
+    [BUG FIXES]
+    * Purge caches when input_layer has chagned. This fix
+      forces to purge all the caches, so the version is
+      now 1.5000, not 1.4003.
+
+1.4002 2011-08-29 16:24:13
+    [FEATURES]
+    * Support FOR-ELSE syntax in TTerse
+    * Support file input hook by overriding slurp_template()
+      (See the cookbook)
+
+1.4001 2011-07-29 09:13:00
+    [CHANGES]
+    * Forbid blessed HASH references as template parameters,
+      which could break encapsulation
+
+1.4000 2011-07-24 19:26:31
+    * No code changes from 1.3999_04
+    * Note that all the cache created before 1.4 will be purged
+
+1.3999_04 2011-07-24 13:07:28
+    [BUG FIXES]
+    * render() for %vpath did compile template sources at the first time
+      of the running process, but it was not required
+
+1.3999_03 2011-07-23 17:51:28
+    [BUG FIXES]
+    * [% FOR x IN ... %] no longer throws errors
+      Using reserved words as variables is allowed if it's not ambiguous
+
+    [OTHER]
+    * Files and directories have been cleaned up
+
+1.3999_02 2011-07-23 13:31:09
+    [DOCUMENT]
+    * Improve FAQ and Cookbook
+    * Mention to Text::Xslate::Syntax::HTMLTemplate and
+      HTML::Template::Parser (thnaks to @shmorimo)
+
+1.3999_01 2011-07-13 23:14:05
+    The bytecode version is now 1.5.
+
+    [NEW FEATURES]
+    * New keyword: __ROOT__ for the root parameter
+      (the parameter of render())
+    * New methods: $array.merge(...) and $hash.merge(...)
+      which return a merged array / hash respectively
+
+1.3001 2011-07-11 00:41:48
+    [BUG FIXES]
+    * Constants (and my pseudo-vars) didn't work in foreach-loops
+      (thanks to @toritori0318)
+
+1.3000 2011-06-11 18:20:02
+    [CHANGES]
+    * html_builder(\&f) passes @_ as-is to &f
+
+    [BUG FIXES]
+    * Comments broke line numers (thanks to ktat)
+    * <: "10" x 100 :> was broken (thanks to ktat)
+
+1.2004 2011-06-06 08:54:50
+    [BUG FIXES]
+    * Overriding builtins (introduced in 1.1005) didn't work
+
+1.2003 2011-06-03 00:41:03
+    [BUG FIXES]
+    * Fix a miss-format in docs
+    * Suppress a compiler warnings
+
+1.2002 2011-05-18 23:53:31
+    [BUG FIXES]
+    * Fix the overriding of the default escaping routine (rep. by @shmorimo)
+
+1.2001 2011-05-16 23:39:16
+    * No code chages
+    * Just updated Module::Install::XSUtil for PERL_ONLY configuration support
+
+1.2000 2011-05-14 14:32:46
+    See the changes for 1.1005_01
+
+1.1005_01 2011-05-12 00:13:48
+    [CHANGES]
+    * The bytecode version is 1.4
+
+    [FEATURES]
+    * Allow the default escaping function html_escape() overridden
+    * Allow all the builtin functions overridden
+    * Add html_escape() and uri_escape() builtin functions,
+      which are the same as html() and uri() respectively
+
+1.1005 2011-04-30 11:56:35
+    [BUG FIXES]
+    * Fix a bug which caused the performance to suffer severly under large
+      template files
+
+1.1004 2011-04-11 22:55:59
+    [BUG FIXES]
+    * Fix a test which failed on Windows
+
+1.1003 2011-04-08 09:51:47
+    [BUG FIXES]
+    * render_string(), to which you must pass a text string, died when wide
+      characters were passed (reported by @kazeburo)
+
+1.1002 2011-04-05 00:41:09
+    [CHANGES]
+    * Remove the dependency on MX::Getopt
+
+1.1001 2011-04-02 00:00:16
+    [BUG FIXES]
+    * A quote in comments caused parse errors (reported by @lestrrat)
+
+1.1000 2011-03-17 22:18:07
+    This is a major update with the bytecode version 1.3
+    See the 1.0099_* for details
+
+    [NEW FEATURES]
+    * Loop control statements (next and last)
+    * for-else syntax in Kolon
+
+1.0099_03 2011-03-13 13:22:21
+    [BUG FIXES]
+    * Fix tests
+
+    [CHANGES]
+    * Remove PP::Booster stuff
+
+1.0099_02 2011-03-10 16:21:18
+    [NEW FEATURES]
+    * Add loop control statements (last and next) in both Kolon and TTerse
+
+1.0099_01 2011-03-10 12:42:28
+    [CHANGES]
+    * The bytecode version is now 1.3, which means all the compiled codes
+      will be purged on render()
+    * Remove PP::Booster because of its high maintainance cost
+    * <: for nil -> $i { } :> no longer produces warnings
+
+    [NEW FEATURES]
+    * Add for-else syntax in Kolon
+
+1.0012 2011-03-04 12:18:19
+    [BUG FIXES]
+    * Fix a bug that <: include foo() :> and <: my $var = ...; include $var :>
+      were wrongly parsed in Kolon (thanks to @shmorimo)
+
+1.0011 2011-03-01 18:08:16
+    [CHANGES]
+    * Internet Explorer (<= 8) doesn't support &apos; in title, so
+      we must escape ' (apostrophe) into &#39;, not &apos;
+      (thanks to @tokuhirom)
+
+1.0010 2011-02-28 18:09:28
+    [BUG FIXES]
+    * Fix a bug in import_from(), which failed to import optimized constant
+      introduced in 5.10 (thanks to @kane46taka)
+
+1.0009 2011-02-28 13:00:50
+    [BUG FIXES]
+    * Lock cache file operations with flock(2)
+    * Fix doc issues
+
+    [CHANGES]
+    * Switch PP backend from PP::Booster to PP::Opcode.
+      PP::Booster will be removed from the core because
+      its maintainance cost is too high.
+
+1.0008 2011-02-14 12:46:45
+    [BUG FIXES]
+    * Fix docs
+
+1.0007 2011-02-13 23:10:03
+    [BUG FIXES]
+    * Suppress irrational uuv warnings in relational operators
+      (github issue/28, reported by @tokuhirom)
+
+1.0006 2011-02-11 16:23:32
+    [BUG FIXES]
+    * Complex templates which include too many string literals (e.g. large
+      JSON) could cause fatal errors on 5.10+, or SEGV on 5.8
+      (github issue/27; thanks to @cho45 for reporting it)
+
+    [NEW FEATURES]
+    * You can inject customized messages into the output with
+      the 'warn_handler' option and Text::Xslate->print() method.
+      See the Cookbook for details.
+
+1.0005 2011-02-09 14:33:57
+    ANNOUNCE: If you are interested in xslate, join #xslate @ irc.perl.org!
+
+    [BUG FIXES]
+    * The INCLUDE recursion bug (see the NOTE at 1.0004) has been fixed.
+      (thanks to @kane46taka for reporting it)
+
+1.0004 2011-02-08 12:36:21
+    NOTE: All the versions including this version has a bug that INCLUDE
+          recursion doesn't work. It will be fixed in the next release.
+    [BUG FIXES]
+    * Fix a critical bug that warnings in templates could break the Perl stack
+      (thanks to @tokuhirom for reporting it)
+    * Fix a bug that method calls didn't work in PP version
+      (thanks to @tokuhirom for reporting it)
+
+1.0003 2011-02-05 11:54:45
+    [NEW FEATURES]
+    * For-loops allow overloaded objects. i.e. you can use Scalar::Defer
+      to defer to create large arrays.
+
+1.0002 2011-02-02 12:02:40
+    [BUG FIXES]
+    * A tiny doc fix
+
+1.0001 2011-02-02 11:50:43
+    [BUG FIXES]
+    * Template caches was not purged correctly when functions were added
+      (thanks to @tokuhirom for reporting it)
+    * The 'super' keyword didn't work in template components
+      (thanks to @shiba_yu36 for reporting it)
+
+1.0000 2011-01-07 16:08:44
+    This is the version 1.0, which means "very stable". Although some features are planned
+    to impement in the near future, the basic features are unlikely to be changed.
+
+    [BUG FIXES]
+    * Resolve github issue/23: html_builder() doesn't work with functions which accepts
+      multiple arguments
+
+    [DOCUMENTS]
+    * Add an entry about I18N to the cookbook (c9s)
+
+0.3002 2010-12-16 16:17:48
+    [BUG FIXES]
+    * hash_with_default() didn't work with `include with vars` syntax
+      (thanks to hirose31 for reporting this issue)
+
+0.3001 2010-12-09 17:18:14
+    [BUG FIXES]
+    * Fix `module => \@bridges` that importing of bridge modules
+      incorrectly cleared the function mapping (reported by lestrrat)
+
+0.3000 2010-11-23 15:19:04
+    [CHANGES]
+    * `option => undef` passes the option as is, which allows
+      Text::Xslate->new( line_start => undef ) (issue/21, reported by @tomita).
+      Note that this is an IMCOMPATIBLE CHANGE.
+
+    [DOCUMENTS]
+    * Update Cookbook and FAQ
+
+0.2015 2010-11-17 22:27:34
+    [NEW FEATURES]
+    * The 'include' command allows barewords as 'cascade' does
+
+0.2014 2010-11-06 09:24:00
+    [BUF FIXES]
+    * Error messages did not respect input_layer
+
+0.2013 2010-10-30 15:17:40
+    [BUG FIXES]
+    * Magic handlings for 'print' opcode
+
+    [NEW FEATURES]
+    * hash_with_default(\%vars, $default) in Text::Xslate::Util
+      see Text::Xslate::Manual::Debugging
+
+    [OTHERS]
+    * Switch from M::I::ExtendsMakeTest to M::I::TestTarget
+
+0.2012 Mon Oct 18 23:25:38 2010
+    * No code changes
+    * Update Module::Install::ExtendsMakeTest (to HEAD of the repo)
+      to avoid problems with non-author environments
+
+0.2011 Sun Oct 17 18:38:01 2010
+    [CHANGES]
+    * The bytecode version is now 1.2
+    * Remove builtin ref(); Add is_array_ref() and is_hash_ref() instead.
+      I'm sorry to change APIs, but use of ref() would confuse people.
+
+0.2010 Sat Oct 16 10:00:00 2010
+    This is the commemorative release for YAPC::Asia Tokyo 2010!
+
+    [CHANGES]
+    * The bytecode version is now 1.1
+
+    [NEW FEATURES]
+    * Add a builtin function ref(), which is the same as Perl's ref()
+
+    [BUG FIXES]
+    * Resolve RT #62028 (Kaare Rasmussen): Test failed on old URI::Find
+
+0.2009 Wed Oct  6 18:50:45 2010
+    [BUG FIXES]
+    * Large template files could cause SEGV (reported by id:peppon)
+
+    [ENHANCEMENT]
+    * The first call of render() has been significantly faster than 0.2008
+
+0.2008_02 Tue Sep 28 16:42:21 2010
+    [BUG FIXES]
+    * Cache mechanism was affected by the special variables $/ and $\
+    * Developpers' releases might produced warnings about versions
+
+    [CHANGES]
+    * Upgrading Text::Xslate no longer forces to purge cached templates.
+      Instead, the internal bytecode version (1.0, currentl) is used.
+
+0.2008_01 Wed Sep 22 17:18:53 2010
+    [CHANGES]
+    * Use Data::MessagePack as the bytecode serializer, which make
+      the first call of render() much faster
+
+0.2008 Sun Sep 19 18:17:51 2010
+    [CHANGES]
+    * The obsolete feature that render(undef) is the same as render('<string>')
+      has been removed. render(undef) always throws the error.
+
+    [FEATURES]
+    * Range operator (e.g. <: for [1 .. 10] -> $i {  } :>)
+
+0.2007 Fri Sep 17 12:12:50 2010
+    [BUG FIXES]
+    * Resolve RT #61359 (Sam Graham): Taint flag broke templates
+
+0.2006 Tue Sep 14 11:46:33 2010
+    [BUF FIXES]
+    * Single-quote literals parsed wrong, when contain paired double q (Mons Anderson)
+    * Infinite recursion during _fold_constants in case of warnings (Mons Anderson)
+
+0.2005 Mon Sep 13 14:44:22 2010
+    [BUG FIXES]
+    * Workaround a new deprecated warnings for qw(...)
+      (See perl.git/master/ea25a9b2cf73948b1e8c5675de027e0ad13277bd)
+
+0.2004 Fri Sep 10 13:50:08 2010
+    [BUG FIXES]
+    * Workaround test failure about 'too long arguments for exec()'
+
+0.2003 Thu Sep  9 19:25:08 2010
+    [BUG FIXES]
+    * Fix a misuse of test functions. This problem is revealed
+      by Test::Builder2.
+    * Workaround MAGIC problems with html_escape($1)
+
+0.2002 Tue Sep  7 15:23:49 2010
+    [FEATURES]
+    * Performance improvement (thanks to @kazuho)
+      This version is 10% faster than the previous version!
+    * Update meta spec.
+
+0.2001 Tue Aug 31 13:48:29 2010
+    [BUG FIXES]
+    * Resolve github issue/16: header/footer was applied recursively, which
+      caused deep recursions (reported by egor)
+    * Dies in macros could make inconsistent data
+    * Optimization of if statements could make wrong results
+
+    [FEATURES]
+    * Statement modifiers (a.k.a. post-if statements) for Kolon and TTerse
+
+0.2000 Fri Aug 27 11:44:26 2010
+    Version 0.2000 is stable but has some incompatible changes.
+    Please check the [CHANGES] section of this file before upgrading.
+
+    [CHANGES]
+    * Remove deprecated .defined() method. Use defined(expr) instead.
+
+0.1999_06 Thu Aug 26 14:50:46 2010
+    [BUG FIXES]
+    * Fix a test. IPC::Cmd seems broken.
+
+0.1999_05 Wed Aug 25 18:35:15 2010
+    [BUG FIXES]
+    * Fix another build problem on Win32
+
+0.1999_04 Wed Aug 25 11:34:09 2010
+    [BUG FIXES]
+    * Fix a build problem on Win32
+
+0.1999_03 Tue Aug 24 17:20:16 2010
+    [BUG FIXES]
+    * t/300_examples/100_eg_pl.t could hung up on Win32 (@turugina)
+
+0.1999_02 Tue Aug 24 12:08:03 2010
+    [CHANGES]
+    * For Text::Xslate::Runner, remove --input_layer option, and
+      add --input_encoding and --output_encoding
+
+    [BUG FIXES]
+    * uri_escape() in PP didn't work for UTF-8-flagged string
+
+0.1999_01 Sun Aug 22 17:45:17 2010
+    [CHANGES]
+    * The "escape" option is changed to "type", which accepts "html", "xml",
+      and "text"
+    * The default pure Perl backend is now PP::Booster, which is about
+      2 times faster than PP::Opcode (according to benchmark/x-poor-env.pl)
+
+    [BUG FIXES]
+    * Modulus zero ($foo % 0) could throw uncatchable errors
+
+    [FEATURES]
+    * Repeat operator (infix:<x>) is added (so "x" is now an invalid
+      variable name in TTerse)
+    * Now html_builder() can be applied to dynamic filters (e.g.
+      to the HTML::FillInForm::fillinform() function)
+
+0.1058 Tue Aug 17 17:59:53 2010
+    [CHANGES]
+    - Deprecate defined() method, which is provided only for compatibility
+      with TT, but the behaviour might not be exceptable. That is,
+      $object.defined() returns false unless the $object has its own
+      defined() method. Use defined(expr) function instead, which return
+      false if and only if the expr is undef (nil).
+
+    [FEATURES]
+    - Add html_builder() to make it easy to import HTML builders.
+      See Text::Xslate::Cookbook for example.
+
+0.1057 Sun Aug 15 18:28:32 2010
+    [BUG FIXES]
+    - Subroutines that localize $SIG{__WARN__} or $SIG{__DIE__} could make
+      Perl interpreter panic (reported by tokuhirom)
+    - Invalid expressions could produce insane errors including infinite loop
+      (issue/13, reported by y)
+    - A Win32 problem in tests might be fixed
+
+    [FEATURES]
+    - Experimental support for PP::Compiler which make PP::Booster faster
+      (makamaka)
+
+0.1056 Tue Aug 10 14:28:55 2010
+    [BUG FIXES]
+    - The rendering methods ignored signals
+    - 'path' option could not deal with overloaded strings (e.g.
+      Path::Class::Dir) correctly (chiba)
+    - Die in macros/blocks caused segfaults (reported by chiba)
+
+    [OTHERS]
+    - Benchmarks to compare other template engines have been refactored
+      and improved (lestrrat, tokuhirom).
+      See http://xslate.org/benchmark.html for details.
+
+0.1055 Sat Aug  7 17:33:56 2010
+    [BUG FIXES]
+    - Make xslate(1) print the result to stdout when both --suffix and
+      --dest are omitted
+    - Add HTML escaping in benchmarks correctly, updating the result of
+      benchmarks in documents
+
+0.1054 Mon Aug  2 17:26:21 2010
+    [BUG FIXES]
+    - The print routine for raw stirings was significantly slower than
+      that with automatic HTML escaping
+
+0.1053 Sun Aug  1 18:14:52 2010
+    [BUG FIXES]
+    - Fix incorrect titles of manuals
+
+0.1052 Sun Aug  1 15:42:16 2010
+    http://xslate.org is out!
+    Thanks to Shibuya.pm, esp. @tokuhirom and @lestrrat.
+
+    [BUG FIXES]
+    - Forbid '..' in file names
+    - "<: $foo :>:<: $bar :>" caused parse errors
+
+    [CHANGES]
+    - The algorithm of building cache paths has been changed, which requires
+      to re-compile templates.
+
+    [NEW FEATURES]
+    - Documents: Text::Xslate::Manual for table of contents,
+                 Text::Xslate::Builtin for builtin methods and filters
+    - Exportable functions: uri_escape()
+    - Builtin filters: uri
+
+0.1051 Thu Jul 29 17:41:43 2010
+    [BUG FIXES]
+    - Fix cache issues enbugged in 0.1049
+
+0.1050 Tue Jul 27 19:36:39 2010
+    [BUG FIXES]
+    - Fix another keyword problem
+
+0.1049 Tue Jul 27 19:03:04 2010
+    [BUG FIXES]
+    - Compliant with Moose 1.09 (warns about coerce => 1 without coercion)
+    - Lower cased keywords were incorrectly parsed as an upper cased keyword
+      in TTerse (thanks to chiba)
+    - Complex expression problems in PP::Booster, again (@maka2_donzoko)
+
+    [CHANGES]
+    - Now chache file names include tha path they are
+
+0.1048 Mon Jul 26 16:17:43 2010
+    [BUG FIXES]
+    - Virtual paths were not cached when cache => 1
+    - The explanation of 'tag_end' were incorrect
+    - AUTOLOAD were ignored in methodcall
+    - Complex expression problems in PP::Booster (@maka2_donzoko)
+
+    [CHANGES]
+    - Internal refactoring to make parsers more robust
+    - Rename Text::Xslate::Cookbook to Text::Xslate::Manual::Cookbook
+    - Now string concatination (infix:<~>) respects raw strings
+
+    [NEW FEATURES]
+   - Add GET statement to TTerse
+   - Add prefix:<NOT>, infix:<AND> and infix:<OR> to TTerse (@clouder)
+
+    [NEW DOCUMENTS]
+    - Text::Xslate::Manual::FAQ to answer a few questions
+
+0.1047 Mon Jul 19 17:04:51 2010
+    [BUG FIXES]
+    - $foo.nil did not work.
+    - "+10" was wongly converted into "10"
+
+    [CHANGES]
+    - Rename Text::Xslate->engine to Text::Xslate->current_engine
+    - Remove deprecated Text::Xslate::EscapedString->new
+
+    [NEW FEATURES]
+    - New methods: Text::Xslate->current_file and current_line
+
+0.1046 Sat Jul 17 18:48:14 2010
+    [NEW FEATURES]
+    - Add Perl6-like bitwise operators:
+        infix:<+|> for bitwise or
+        infix:<+&> for bitwise and
+        infix:<+^> for bitwise xor
+        prefix:<+^> for bitwise negate
+
+0.1045 Tue Jul 13 20:05:10 2010
+    [BUG FIXES]
+    - prechomp/postchomp ([%- ... -%]) was not completly comptible with TT2
+    - Line numbers were wrong if templates used prechomp/postchomp
+    - TTerse could not parse dynamic filters with FILTER blocks correctly
+
+    [NEW FEATURES]
+    - Text::Xslate::Runner as the guts of xslate(1)
+    - The __FILE__ and __LINE__ keywords for testing and debugging
+    - Now parsers can has its own identity pattern
+
+0.1044 Mon Jul 12 17:50:35 2010
+    [BUG FIXES]
+    - Underscores in bare words (i.e. left-hand side of the operator '=>')
+      were accidentally removed.
+    - There were several issues on path => \%vpath
+
+    [NEW FESTURES]
+    - $array.reduce(-> $x, $y { ... }) method
+
+0.1043 Sat Jul 10 14:26:57 2010
+    [BUG FIXES]
+    - What Makefile.PL wrote for additional tests did not work on Win32
+      (thanks to Taro, Nishino)
+
+    [DOC FIXES]
+    - Fix typos for Changes: s/ware/were/g (thanks to @ryochin)
+
+    [NEW FEATURES]
+    - Extend 'path' option for in-memory file mapping, inspired by
+      Text::MicorTemplate::DataSection (@typester++), requested by @kazeburo
+
+0.1042 Tue Jul  6 13:28:43 2010
+    [BUG FIXES]
+    - Makefile.PL did not work on some environments
+    - block -> {} and FILTER BLOCK were not consistent with normal macros
+
+    [CHANGES]
+    - Internal refactoring
+
+0.1041 Sat Jul  3 14:52:00 2010
+    [BUG FIXES]
+    - Tests for filenames did not work on Win32
+
+    [CHANGES]
+    - Refactor internal function registration APIs
+
+    [NEW FEATURES]
+    - For App::xslate
+        + New option --version to show versions
+        + New option --engine (or -E) to change the engine class
+
+0.1040 Thu Jul  1 15:33:14 2010
+    [BUG FIXES]
+    - UTF8 flags was not respected in some cases
+
+    [CHANGES]
+    - Error messages contain source lines
+
+0.1039 Mon Jun 28 20:31:54 2010
+    [DOCUMENTS]
+    - Applying the raw filter in templates is considered harmful. Remove
+      the use of it from the cookbook. Thanks to @typester.
+
+0.1038 Mon Jun 28 17:44:52 2010
+    [BUG FIXES]
+    - Extra white spaces caused syntax errors in given blocks
+    - Original error handlers (i.e. $SIG{__WARN__} and $SIG{__DIE__})
+      were ignored. This problem affected PSGI applications with the
+      StackTrace middlewere.
+
+    [NEW FEATURES]
+    - New document Text::Xslate::Cookbook
+    - Block filter syntax in Kolon. See Text::Xslate::Cookbook.
+    - SWITCH-CASE directives in TTerse
+
+0.1037 Sun Jun 27 17:37:57 2010
+    [BUG FIXES]
+    - Template cascading broke the file name of error messages
+
+    [OTHERS]
+    - Internal refactoring
+
+0.1036 Wed Jun 23 20:05:44 2010
+    [CHANGES]
+    - Change line_start, tag_start and tag_end to take string tokens,
+      not regexps
+
+    [NEW FEATURES]
+    - Improve performance (about 10%+) by direct threaded code, although it's
+      enabled only on gcc
+    - Text::Xslate->engine() method to access the executing engine
+      from functions and methods
+
+0.1035 Sun Jun 20 15:03:12 2010
+    [BUG FIXES]
+    - Macros with args could not refer to outer variables
+
+    [NEW FEATURES]
+    - "while defined expr -> $item" as a syntactic sugar to
+      "while defined(my $item = expr)"
+    - New iterator element: $~iter.cycle(...)
+
+0.1034 Wed Jun 16 17:27:44 2010
+    [CHANGES]
+    - Rename $~iter.max to $~iter.max_index in Kolon
+
+    [BUG FIXES]
+    - The cache reloader was broken from 0.1032 (thanks to @fujiwara)
+
+    [NEW FEATURES]
+    - For TTerse
+        + Support header/footer options
+          curresponding to TT's PRE_PROCESS/POST_PROCESS
+        + Support DEFAULT and FILTER syntax
+
+0.1033 Sun Jun 13 17:14:36 2010
+    [BUG FIXES]
+    - Workaround a Win32 filesystem issue
+
+    [NEW FEATURES]
+    - Anonymous macro: <: -> $x, $y { $x + $y }(10, 20) # => 30 :>
+    - The sort method accepts an anonymous macro
+    - New methods: map
+    - New options for Text::Xslate: line_start, tag_start and tag_end
+
+0.1032 Thu Jun 10 18:00:25 2010
+    [CHANGES]
+    - Rename the term "escaped string" to "raw string":
+      escaped_string() -> mark_raw()
+      Text::Xslate::EscapedString -> Text::Xslate::Type::Raw
+      (old names remain for compatibility)
+
+    [BUG FIXES]
+    - App::Xslate created result files even if render() dies
+
+    [NEW FEATURES]
+    - New builtin filters:
+        + mark_raw as an alias to 'raw'
+        + unmark_raw as the opposite of 'mark_raw'
+
+0.1031 Wed Jun  9 21:55:57 2010
+    [BUG FIXES]
+    - Issues on older perls
+
+    [NEW FEATURES]
+    - New defined() named operator/builtin method:
+      expr.defined() and defined(expr) is the same.
+
+0.1030 Wed Jun  9 15:33:43 2010
+    [CHANGES]
+    - Unknown options to new() will produce warnings
+
+    [BUG FIXES]
+    - Resolve issue #10: utf8 flags break macros (reported by nihen)
+    - The auto semicolon insertion was broken
+    - Loops could waste memory
+
+    [NEW FEATURES]
+    - The interface of bridge mecahnism has been improved;
+      now you can do "module => ['Text::Xslate::Bridge::TT2']"
+
+0.1029 Tue Jun  8 16:30:46 2010
+    Macros and autoboxing have been refactored.
+
+    [CHANGES]
+    - A few undecoumented features have been removed
+
+    [BUG FIXES]
+    - Tied array/hash could cause segv by builtin methods
+
+    [NEW FEATURES]
+    - User-defined autoboxing methods; see Text::Xslate::Bridge::TT2 on CPAN
+    - Macros become first objects;
+      i.e. <: macro foo -> { ... }; my $foo = [foo]; $foo[0]() :> works.
+
+0.1028 Sun Jun  6 17:21:18 2010
+    This release introduces variable definition and mutation, which might be
+    unstable. Please report any bugs you'd run into.
+
+    [CHANGES]
+    - Make Kolon's while statement the same as Perl's
+
+    [BUG FIXES]
+    - Resolve various issues
+
+    [NEW FEATURES]
+    - Improve App::Xslate
+    - Implement constant folding
+    - For Kolon
+        + constant statement (e.g. constant FOO = 42)
+    - For TTerse
+        + CALL statement not to print expressions
+        + WHILE statement
+        + SET statement and the "=" operator to assign values
+
+0.1027 Fri Jun  4 15:09:47 2010
+    [CHANGES]
+    - s/peep/peek/, which is really what I want
+
+    [BUG FIXES]
+    - Ternary operators could cause problems in PP::Booster, again (makamaka)
+    - "or" and "and" operators could cause problems in given-when
+
+0.1026 Thu Jun  3 22:04:02 2010
+    [CHANGES]
+    - Metakolon's line code has been changed to %% like TT3 and TTerse
+    - The default cache_dir is chaned to "$HOME/.xslate_cache"
+    - Error messages are improved
+
+    [BUG FIXES]
+    - Empty hash/array literals were not allowed
+    - There were several edge-case issues in string literals
+    - The precedence of the ternary operator was wrong
+    - Resolve issue #5: [% "foo' %] was silently accepted
+    - Ternary operators could cause problems in PP::Booster (makamaka)
+
+    [NEW FEATURES]
+    - Macros can be called with the filter operator (e.g. expr | my_macro)
+    - For Kolon
+        + Loop iterators as "$~LOOP_VAR" (e.g. $~item)
+        + Loop iterator elements: index, count, size, max, body,
+          is_first, is_last, peep_next, and peep_prev
+    - For TTerse
+        + Loop iterators as "loop"
+        + Loop iterator elements: index, count, size, max, body
+          is_first/first, is_last/last, peep_next/next, and peep_prev/prev.
+        + MACRO foo(...) BLOCK ... END syntax
+        + WRAPPER "foo.tt" ... END syntax
+
+0.1025 Mon May 31 20:29:50 2010
+    - Support 5.8.1
+
+0.1024 Sun May 30 19:00:56 2010
+    [BUG FIXES]
+    - 'module' option wiped away builtin functions
+    - Array/hash literals were invalid in TTerse
+    - Calling undefined functions produced unreadable messages in TTerse
+    - The parser could not parse <: f({ not => 42 }) :>
+
+    [NEW FEATURES]
+    - For TTerse
+        + Support TT3-like single line code with '%%'
+        + Support INCLUDE-WITH syntax
+    - New PP engine: Text::Xslate::PP::Booster (makamaka)
+      Now PP is much faster than Template-Toolkit 2.22
+
+0.1023 Fri May 28 15:00:38 2010
+    [BUG FIXES]
+    - Fix variable localization for include command
+    - Correct warning location from render_string()
+    - More robust cache checking
+
+    [NEW FEATURES]
+    - For General
+        + Array literal syntax: [ "foo", "bar", "baz" ]
+        + Hash literal syntax: { foo => 1, baz => 2 }
+    - For TTerse
+        + TT2 like comment tag [%# ... %]
+        + "FOR" and "for" for "FOREACH"
+        + The _ operator for concatination
+    - For App::xslate
+        + --cache accepts an integer, not a bool
+
+0.1022 Wed May 26 17:29:09 2010
+    [BUG FIXES]
+    - Fix variable localization (used for cascade-with-vars syntax)
+
+    [CHANGES]
+    - Use {} in cascade-with-vars syntax, instead of ()
+
+    [NEW FEATURES]
+    - Support include-with-vars syntax:
+        : include "foo.tx" { var => 42 }
+    - Support --escape and --verbose options in xslate(1)
+    - Support --eval (like perl's -e) option in xslate(1)
+
+0.1021 Tue May 25 18:18:06 2010
+    [BUG FIXES]
+    - Fix a bug about for-loops on PP (makamaka)
+
+    [CHANGES]
+    - "'" will be escaped into "&apos;", not "&#39;"
+
+    [NEW FEATURES]
+    - Resolve issue#2: Improve cascade statement:
+        : cascade base ( foo => 42, bar => "baz" )
+    - Add html() and dump() builtins:
+        <: $var | html # explicit html-espace :>
+        <: $var | dump # print $var using Data::Dumper :>
+
+0.1020 Fri May 21 17:21:03 2010
+    [NEW FEATURES]
+    - Resolve issue#1: make semicolon/{} block unnecessary in
+      block foo -> { ; }
+    - New "raw" builtin filter: <: $value | raw :>
+
+0.1019 Wed May 19 15:48:53 2010
+    [BUG FIXES]
+    - Workaround Win32 CRLF issues on tests
+
+0.1018 Wed May 19 15:34:47 2010
+    [CHANGES]
+    - Use Any::Moose (lestrrat)
+
+    [BUG FIXES]
+    - There was several issues on Mouse::PurePerl
+
+0.1017 Tue May 18 14:35:30 2010
+    [NEW FEATURES]
+    - Support hex/oct/binary literals (e.g. 0xCAFE)
+    - Support lower-cased keywords in TTerse
+
+    [CHANGES]
+    - Rename 'import' option to 'module' because of the confliction with
+      Perl's import() method in App::Xslate
+
+0.1016 Sun May 16 13:59:08 2010
+    [NEW FEATURES]
+    - Support --pp (and --xs) option in Makefile.PL
+    - Support autoboxing; currently supported methods are:
+        For array: size(), join(), reverse()
+        For hash:  keys(), values(), kv() (and all the array methods)
+
+0.1015 Fri May 14 14:52:52 2010
+    [BUG FIXES]
+    - Fix literal_to_value(), which could break values (reported by xaicron)
+    - Missing prerequisites: MouseX::Getopt (reported by xaicron)
+
+0.1014 Fri May 14 13:05:17 2010
+    [NEW FEATURES]
+    - Now Xslate works without XS (makamaka)
+    - New xlsate(1) utility, which is like ttree(1) (lestrrat)
+
+0.1013 Thu May 13 15:00:41 2010
+    [CHANGES]
+    - The warning policy has been changed. See the document for details.
+    - Allow calling render without any variables (lestrrat)
+
+0.1012 Mon May 10 13:56:28 2010
+    [BUG FIXES]
+    - Cascaded templates were not reloaded correctly (thanks to tokuhirom)
+
+0.1011 Fri May  7 12:29:45 2010
+    [NEW FEATURES]
+    - New escape => 'none' mode for non-HTML templates
+
+0.1010 Thu May  6 13:25:47 2010
+    [BUG FIXES]
+    - There were various parsing issues
+
+    [NEW FEATURES]
+    - Switch statement like Perl6
+    - Arrows in pointy blocks can be omitted if not necessary
+
+0.1009 Wed May  5 13:59:13 2010
+    [NEW FEATURES]
+    - Extend cascade statement:
+        cascade myapp::base with component1, component2
+        cascade with component1, component2
+    - Function import mechanism, which needs no plugin modules:
+        Text::Xslate->new(import => [qw(Data::Dumper)])
+    - Support "elsif" in Kolon for compatibility with Perl
+    - Support "UNLESS" in TTerse for compatibility with TT
+    - Support function and method call in TTerse
+
+    [CHANGES]
+    - Internal APIs and tests have been refactored
+
+0.1008 Mon May  3 18:36:52 2010
+    [CHANGES]
+    - Deprecate "string" option for new() and render(\%vars).
+      Use render_string() instead.
+
+    [NEW FEATURES]
+    - render_string($str, \%vars), which is provided mainly for testing
+
+0.1007 Sun May  2 22:26:09 2010
+    [BUG FIXES]
+    - Nested function call could cause problems.
+    - Blessed references were not printable.
+    - The "file" option to new() was confusing. Now it has been removed.
+
+    [NEW FEATURES]
+    - New operators: "and", "or", "not", "min", "max"
+    - New method call syntax:
+        $obj.method(...)
+    - New while statement:
+        while $obj.fetch() -> $row {
+            print $row;
+        }
+    - New "cache_dir" option to new()
+    - INCLUDE command in TTerse
+
+0.1006 Sat May  1 13:36:06 2010
+    - Workaround MSVC problems
+
+0.1005 Sat May  1 13:21:24 2010
+    - Introduce TTerse syntax, a Template-Toolkit-like template parser
+    - Introduce Metakolon syntax to produce Xslate templates by itself
+    - Change print command (<:= ... :>) to be implicitly enabled
+      i.e. you need not to put =; <: $foo :> is enough
+    - Add TT-like chomp command ("<:-" for prechomp, "-:>" for postchomp)
+
+0.1004 Fri Apr 30 14:32:47 2010
+    - Fix an over-optimizing issue (revealed by Template::Benchmark)
+
+0.1003 Fri Apr 30 12:30:21 2010
+    - Disable leaktrace testing temporarily
+
+0.1002 Fri Apr 30 11:17:15 2010
+    - Fix template reloading issues
+
+0.1001 Thu Apr 29 17:58:33 2010
+    - Fix macrocall issues, again
+    - Allow a literal string for cascade()
+    - Allow underbars in literal numbers
+    - Macros now returns a value, not output it directly
+
+0.1000 Wed Apr 28 21:50:29 2010
+    - First non-dev release!
+    - Change the default path to ["."]
+    - Fix a macrocall issue
+
+0.001_09 Wed Apr 28 18:01:42 2010
+    - New keywords: cascade, macro, block, before, around and after
+    - Add template cascading
+    - Add macro statement
+    - Add "cache => 2" mode (or release mode)
+
+0.001_08 Fri Apr 23 13:33:14 2010
+    - Add escaped_string() to tell the engine that strings are escaped
+
+0.001_07 Thu Apr 22 12:59:03 2010
+    - Fix a bug that for-loops for an empty array did not work
+
+0.001_06 Wed Apr 21 13:39:50 2010
+    - Workaround multi-thread related problems
+
+0.001_05 Tue Apr 20 18:27:33 2010
+    - Add "include" command
+
+0.001_04 Tue Apr 20 17:08:49 2010
+    - The "file => [...]" option is no longer required
+    - Fix file auto reloading
+
+0.001_03 Tue Apr 20 15:28:13 2010
+    [IMCOMPATIBLE CHANGE]
+    - Template tags are now <: ... :>, not <? ... ?>. This is because
+      <? $var ?> looks too like Text::MicroTemplate
+    - render() requires a file name:
+        my $tx = Text::Xslate->new( file => [qw(foo.tx bar.tx)] );
+        print $tx->render('foo.tx', \%vars);
+        print $tx->render('bar.tx', \%vars);
+
+0.001_02 Mon Apr 19 15:07:43 2010
+    - Fix a bug that program branches could be broken by the optimizer
+
+0.001_01 Mon Apr  5 18:52:06 2010
+    - The first preview release for OSDC.TW 2010 (5/24-25)
+
+0.001 Mon Apr  5 18:52:06 2010
+    - original version; created by Module::Setup

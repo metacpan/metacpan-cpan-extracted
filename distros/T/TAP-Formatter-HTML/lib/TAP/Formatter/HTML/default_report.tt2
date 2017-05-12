@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+[%#
+TAP-Formatter-HTML: TT2 Template
+Copyright (c) 2008-2010 Steve Purkis.  All rights reserved.
+Released under the same terms as Perl itself.
+
+Developer Notes:
+ * These files can get *BIG*.  Try to keep html weight down to a minimum.
+ * Note that the 'minify' TAP::Formatter::HTML option will remove all the tabs
+   at the start of a line, so remember to use tabs not spaces.
+ * Try to use short (1-2 char) css class names in test result loops.  More
+   readable class names are fine elsewhere.
+ * The default stylesheets that goes with this are 'default_report.css' & 'default_page.css'
+ * The default javascript files are 'jquery-1.2.3-min.js' & 'default_report.js'
+-%]
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>[% report.title || 'Test Report' %]</title>
+		[% FOREACH uri IN css_uris %]<link rel="stylesheet" type="text/css" href="[% uri %]" />[% END %]
+		[% FOREACH uri IN js_uris %]<script type="text/javascript" src="[% uri %]"></script>[% END %]
+		[%- IF inline_css %]
+		<style type="text/css">
+[% inline_css %]
+		</style>
+		[%- END -%]
+		[%- IF inline_js %]
+		<script type="text/javascript">
+//<![CDATA[
+[% inline_js %]
+//]]>
+		</script>
+		[%- END %]
+	</head>
+	<body>
+		[% IF report.has_errors %][% SET status = 'failed' %][% ELSE %][% SET status = 'passed' %][% END -%]
+		<div id="summary" class="[% status %]">
+			<a href="#" title="Test Summary ([% report.percent_passed %]% ok)
+[% IF report.severity %]	severity: [% report.severity %]
+[% END -%]
+	passed [% report.passed %]/[% report.total %] tests in [% report.num_files %] files
+	total time: [% report.total_time | format('%.2fs') %]
+	[% report.elapsed_time | trim %]">[% status FILTER upper %]</a>
+		</div>
+
+		<div id="menu">
+          <ul>
+			<li>
+				<span id="show-all"><a href="#" title="show all tests">show all</a></span>
+		    <span id="show-failed"><a href="#" title="show failed tests only">show failed</a></span>
+			</li>
+          </ul>
+		</div>
+
+		<div id="detail">
+			<table class="detail">
+				<thead>
+					<tr>
+						<th class="file">Test file</th>
+						<th class="results">Test results</th>
+						<th class="time">Time</th>
+						<th class="percent">%</th>
+					</tr>
+				</thead>
+				<tfoot>[%# tfoot must come before tbody %]
+					<tr>
+						<td class="file">[% report.num_files %] files</td>
+						<td class="results">
+							[% report.total %] tests,
+							[% report.passed %] ok,
+							[% report.failed %] failed,
+							[% report.todo %] todo,
+							[% report.skipped %] skipped,
+							[% report.parse_errors %] parse errors<br/>
+							exit status: [% report.exit %],
+							wait status: [% report.wait %]<br/>
+							elapsed time: [% report.elapsed_time | trim %]</td>
+						<td class="time">[% report.total_time | format('%.2fs') %]</td>
+						<td class="percent [% report.test_status -%]
+											 [%- IF report.severity %][% ' severity-' _ report.severity %][% END -%]
+											 [%- IF report.todo_passed %] todo-passed[% END %]">[% report.percent_passed %]%</td>
+					</tr>
+				</tfoot>
+				<tbody>
+					[%- FOREACH test IN report.tests %]
+					<tr class="test-run [% test.test_status -%]
+										 [%- IF test.severity %][% ' severity-' _ test.severity %][% END -%]
+										 [%- IF test.todo_passed %] todo-passed[% END %]"
+										 [%- IF test.html_id %] id="[% test.html_id %]"[% END %]>
+						<td class="file c">
+							<a class="file" href="#" title="Test [% IF test.has_problems %]failed![% ELSE %]ok.[% END %]
+[% IF test.num_parse_errors %]	[% test.num_parse_errors %] parse error(s)!
+[% END -%]
+[% IF test.exit || test.wait %]	did not exit cleanly!
+[% END -%]
+[% IF test.skip_all %]	skipped all
+[% ELSE -%]
+[% IF test.todo_passed %]	some todo tests unexpectedly passed!
+[% END -%]
+  [% test.tests_planned || 0 %] planned, [% test.tests_run || 0 %] run
+  [% test.passed || 0 %] ok, [% test.failed || 0 %] failed
+  [% test.todo || 0 %] todo, [% test.skipped || 0 %] skipped
+[% END -%]
+	exit status: [% test.exit %]
+	wait status: [% test.wait %]">[% test.test %]</a>
+						</td>
+						<td class="results">
+							[%- SET max_tests = 0 -%]
+							[%- SET max_tests = test.tests_planned IF test.tests_planned AND test.tests_planned > max_tests -%]
+							[%- SET max_tests = test.tests_run IF test.tests_run AND test.tests_run > max_tests %]
+							<table class="TS">[%# TS=Test Summary. Note: use a table to caulculate widths automatically %]
+								<tr>
+									[% IF test.tests_run AND test.tests_run > 0 -%]
+										[%- SET current_test = 0 -%]
+									  [%- FOREACH result IN test.results -%]
+									  	[%- IF result.is_test %]
+												[%#-
+													Note: break up the tests at 100 so as to preserve sanity.
+													This may leave some tests looking silly (if there's only 101)
+													but in the case of 1000s of tests, it makes this more readable.
+													We do this before incrementing the counter to avoid the first
+													row being off by 1.
+												-%]
+												[%- IF current_test > 0 && (current_test % 100) == 0 %]
+								</tr><tr>[%- END %]
+												[%- current_test = current_test + 1 -%]
+									<td class="[% result.short_test_status _ ' ' %][% IF result.is_ok %]p[% ELSE %]f[% END %]"><a class="TS" href="#[% result.html_id %]"> </a></td>
+								    	[%- END -%]
+										[%- END -%]
+									[%- ELSIF test.skip_all -%][%# below: class 's' = skip-ok -%]
+									<td class="s" width="100%"><a class="TS" href="#" title="[% test.results.first.raw | html %]">&nbsp;</a></td>
+									[%- ELSE -%][%# below: class 'n' = not-ok -%]
+									<td class="stub n" width="100%"><a class="TS" href="#" title="No tests run!">&nbsp;</a></td>
+									[%- END %]
+								</tr>
+							</table>
+							<div class="test-detail">
+								[%- IF test.parse_errors.size > 0 %]
+								<ul class="parse-errors">
+									[%- FOREACH e IN test.parse_errors %]
+									<li>Parse error: [% e %]</li>
+									[%- END %]
+								</ul>
+								[%- END %]
+								<ul class="test-out">
+									[%- FOREACH result IN test.results %]
+									<li [% IF result.is_test %]id="[% result.html_id %]" [% END -%]class="[% result.css_type -%]
+														 [%- IF result.is_test %][% ' ' _ result.short_test_status -%][%- END -%]
+														 [%- IF result.is_unplanned %] unp[% END -%]">[% result.raw | html -%]&nbsp;
+										[%- IF result.is_unplanned %]<em> (unplanned!)</em>[% END -%]
+										[%- IF result.todo_passed %]<em> (unexpectedly succeeded!)</em>[% END %]</li>
+									[%- END -%]
+									[%- IF test.exit OR test.wait -%]
+									<li class="stat">exit status: [% test.exit %], wait status: [% test.wait %]</li>
+									[%- END %]
+								</ul>
+							</div>
+						</td>
+						<td class="time">[% test.elapsed_time | format('%.2fs') %]</td>
+						<td class="percent c cb">[% test.percent_passed ? test.percent_passed _ '%' : 'n/a' %]</td>
+					</tr>
+					[%- END %]
+				</tbody>
+			</table>
+		</div>
+
+		<div id="footer">Generated by [% formatter.class %] v[% formatter.version %] @ [% USE date %][% date.format %]</div>
+
+	</body>
+</html>

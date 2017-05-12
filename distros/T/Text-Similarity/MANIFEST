@@ -1,0 +1,29 @@
+bin/text_similarity.pl
+CHANGES
+doc/CHANGES.pod
+doc/INSTALL.pod
+doc/README.pod
+doc/update-pod.sh
+FDL.txt
+GPL.txt
+INSTALL
+lib/Text/OverlapFinder.pm
+lib/Text/Similarity.pm
+lib/Text/Similarity/Overlaps.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+samples/stoplist-nsp.regex
+samples/stoplist.txt
+t/file1.txt
+t/file11.txt
+t/file2.txt
+t/file22.txt
+t/getsimilaritystrings.t
+t/no-normalize.t
+t/normalize.t
+t/overlaps.t
+t/text_similarity.t
+t/text_similarity_string.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+Text::FormatTable
+=================
+
+DESCRIPTION
+
+  Text::FormatTable renders simple tables as text. You pass to the constructor
+  a table format specification similar to LaTeX (e.g. "r|l|l") and you call
+  methods to fill the table data and insert rules. After the data is filled,
+  you render the table as text.
+
+INSTALLATION
+
+  To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DOCUMENTATION
+
+  The documentation is embedded in the module itself. Type 'perldoc
+  lib/Text/FormatTable.pm' (or 'man Text::FormatTable' if the
+  man-page was installed) to see it.
+
+COPYRIGHT AND LICENCE
+
+  Copyright (c) 2001, Swiss Federal Institute of Technology, Zurich.
+            (c) 2009 Trey Harris
+  All Rights Reserved.
+  
+  This module is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.

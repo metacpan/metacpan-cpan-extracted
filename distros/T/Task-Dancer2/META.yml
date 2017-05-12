@@ -1,0 +1,23 @@
+---
+abstract: 'Dancer2... in a box!'
+author:
+  - 'Jason A. Crome <cromedome@cpan.org>'
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Alberto Simoes <ambs@cpan.org>'
+build_requires:
+  Test::More: 0
+generated_by: 'Dancer'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Dancer2
+provides:
+  Task::Dancer2:
+    file: lib/Task/Dancer2.pm
+    version: 0.06
+requires:
+  perl: 5.00
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

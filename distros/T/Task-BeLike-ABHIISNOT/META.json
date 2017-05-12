@@ -1,0 +1,66 @@
+{
+   "abstract" : "Be like ABHIISNOT",
+   "author" : [
+      "Abhishek Shende <abhishekisnot@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-ABHIISNOT",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.024"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Log::Contextual" : "0",
+            "Log::Log4perl" : "0",
+            "perl" : "5.014002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/abhishekisnot/Task-BeLike-ABHIISNOT/issues"
+      },
+      "homepage" : "https://github.com/abhishekisnot/Task-BeLike-ABHIISNOT",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abhishekisnot/Task-BeLike-ABHIISNOT.git",
+         "web" : "https://github.com/abhishekisnot/Task-BeLike-ABHIISNOT"
+      }
+   },
+   "version" : "0.01"
+}
+

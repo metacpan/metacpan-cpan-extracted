@@ -1,0 +1,182 @@
+-------------------------------------------------------------------
+Mon Nov 24 17:19:31 CET 2014 - dave@dave.org.uk
+
+- Renamed README.xml to README.
+- commit 72d3882
+
+-------------------------------------------------------------------
+Sun Feb 22 00:01:03 CET 2009 - dave@dave.org.uk
+
+- Changed versioning system.
+- commit bfb37a4
+
+-------------------------------------------------------------------
+Sat Mar  8 13:04:36 CET 2008 - dave@dave.org.uk
+
+- Added http://code.mag-sol.com/ to README
+- commit d50104a
+
+-------------------------------------------------------------------
+Sat Mar  8 13:01:49 CET 2008 - dave@dave.org.uk
+
+- Switched some details from dave.org.uk to mag-sol.com
+- commit 37f31db
+
+-------------------------------------------------------------------
+Sat Mar  8 12:58:13 CET 2008 - dave@dave.org.uk
+
+- Increment release number
+- commit f04fe41
+
+-------------------------------------------------------------------
+Sat Mar  8 12:51:57 CET 2008 - dave@dave.org.uk
+
+- Add 'use warnings' (as we're already forcing 5.6)
+- commit 48483e2
+
+-------------------------------------------------------------------
+Sat Mar  8 12:50:40 CET 2008 - dave@dave.org.uk
+
+- Fix prerequisites
+- commit f4904fb
+
+-------------------------------------------------------------------
+Sat Mar  8 12:48:24 CET 2008 - dave@dave.org.uk
+
+- Switch to using Test::More.
+- commit 301f305
+
+-------------------------------------------------------------------
+Sat Mar  8 12:44:16 CET 2008 - dave@dave.org.uk
+
+- Added LICENCE (sic!) section.
+  Switched to svn revision number.
+  Removed old CVS change log.
+- commit 733e400
+
+-------------------------------------------------------------------
+Sun Aug 14 13:35:57 CEST 2005 - dave@dave.org.uk
+
+- Added details of where to get updates.
+- commit 2951d6a
+
+-------------------------------------------------------------------
+Sun Aug 14 13:35:09 CEST 2005 - dave@dave.org.uk
+
+- Cleaned up some tests. Added pod coverage tests.
+- commit 2e2f5bd
+
+-------------------------------------------------------------------
+Sun Aug 14 13:34:25 CEST 2005 - dave@dave.org.uk
+
+- Added Build.PL
+- commit 3f19596
+
+-------------------------------------------------------------------
+Sun Aug 14 13:33:50 CEST 2005 - dave@dave.org.uk
+
+- Replaced Makefile.PL with Build.PL.
+- commit 4ad06d8
+
+-------------------------------------------------------------------
+Sun Aug 14 13:31:31 CEST 2005 - dave@dave.org.uk
+
+- Moved Cannabinol.pm. Added pod-coverage.t.
+- commit 5600133
+
+-------------------------------------------------------------------
+Sun Aug 14 13:20:35 CEST 2005 - dave@dave.org.uk
+
+- *** empty log message ***
+- commit d7146b3
+
+-------------------------------------------------------------------
+Sat Oct 23 11:47:21 CEST 2004 - dave@dave.org.uk
+
+- Fixed problems caused by moving POD around in the last version.
+- commit 597120e
+
+-------------------------------------------------------------------
+Sat Oct 23 11:40:28 CEST 2004 - dave@dave.org.uk
+
+- Added README.xml
+- commit fa593b4
+
+-------------------------------------------------------------------
+Sat Oct 23 11:36:50 CEST 2004 - dave@dave.org.uk
+
+- Improved test coverage.
+- commit a4aa167
+
+-------------------------------------------------------------------
+Sat Oct 23 11:26:22 CEST 2004 - dave@dave.org.uk
+
+- Added Schwern's most excellent tests.
+- commit 3a22271
+
+-------------------------------------------------------------------
+Sat May 22 23:59:20 CEST 2004 - dave@dave.org.uk
+
+- Fiddled with tests a bit
+- commit f919bd4
+
+-------------------------------------------------------------------
+Thu May 13 00:59:05 CEST 2004 - dave@dave.org.uk
+
+- Added Makefile.PL to cvs
+- commit 28e50c4
+
+-------------------------------------------------------------------
+Thu May 13 00:57:02 CEST 2004 - dave@dave.org.uk
+
+- Added COPYING and MANIFEST to cvs
+- commit 824c6a1
+
+-------------------------------------------------------------------
+Wed May 12 21:26:36 CEST 2004 - dave@dave.org.uk
+
+- Added test files.
+- commit 6d9143b
+
+-------------------------------------------------------------------
+Mon Sep 23 21:02:28 CEST 2002 - dave@dave.org.uk
+
+- Fixed to work with Perl 5.8.0.
+- commit 944b25e
+
+-------------------------------------------------------------------
+Fri Jul 12 20:32:21 CEST 2002 - dave@dave.org.uk
+
+- Corrected Attribute::Handlers dependency.
+- commit 19ccadd
+
+-------------------------------------------------------------------
+Sun Dec  9 20:12:54 CET 2001 - dave@dave.org.uk
+
+- Added Attribute::Handlers interface.
+- commit 2a7a1ad
+
+-------------------------------------------------------------------
+Wed Sep  5 21:48:15 CEST 2001 - dave@dave.org.uk
+
+- fixed a very serious bug where instead of returning a random value from the hash we were, in fact, almost always returning C<undef>.
+- commit 87e4864
+
+-------------------------------------------------------------------
+Mon Sep  3 21:58:08 CEST 2001 - dave@dave.org.uk
+
+- Minor fixes
+- commit 20fe69a
+
+-------------------------------------------------------------------
+Sun Sep  2 19:06:18 CEST 2001 - dave@dave.org.uk
+
+- Initial revision
+- commit 3c41995
+
+-------------------------------------------------------------------
+Sun Sep  2 19:06:18 CEST 2001 - (no author)
+
+- New repository initialized by cvs2svn.
+- commit b0f8277
+

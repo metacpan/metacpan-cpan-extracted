@@ -1,0 +1,80 @@
+Revision history for Template-Plugin-TwoStage
+
+0.08      2014-08-22 11:45:06CEST+0200 Europe/Berlin
+ - no changes since 0.07 - production release
+
+0.07      2014-08-21 11:39:34CEST+0200 Europe/Berlin (TRIAL RELEASE)
+ - doc improvements
+ - in dev mode force - in cases of nested TwoStage processed templates -
+   a refresh also for modified inner templates
+ - module is now ready for releases with Dist::Zilla version 5.x
+ - use temporary TT caching directories for tests in order 
+   to avoid directory permission problems when installing - 
+   respectively testing - this module with different 
+   user accounts on same box
+ - exclude module Template::Plugin::TwoStage::Test from
+   PAUSE indexing
+
+0.06      2010-08-09 10:43:50 Europe/Berlin
+ - set DEBUG constant via environment variable
+ - debugging; support for extend_keys callback
+   method got mangled when introducing plugin 
+   configuration via TT configuration hash
+ - moved repository to git and let Dist::Zilla
+   plugin bundle @Git and plugin BumpVersionFromGit
+   do the version bumping for us
+
+0.05       2010-07-05
+* dzil'ed the distribution
+* reorganization and expansion of documentation
+* introduced plugin configuration via TT configuration 
+  hash
+* satisfied Perl::Critic a bit more
+
+0.04       2010-06-08
+* unicode support - decoded/encoded templates stay 
+  decoded/encoded in their precompiled version
+* the plugin now owns a specific provider object for
+  the retrieval of precompiled versions of templates -
+  this should make it compatible with any type
+  of provider class used in the TT object
+* based sample code on an imaginary Catalyst application
+* cleaned up docs a bit
+* refactoring test definitions for Template::Test : 
+  made use of -- name: xx -- mark up for labeling 
+  test cases
+
+0.03       2010-06-06
+* precompiled versions are stored in binary mode now
+  bypassing any io layers, and making tests pass also on
+  win platforms (CRLF io layer issues)
+* added missing LICENSE command to Makefile.PL
+* consideration of undefined values when storing  
+  precompilation keys together with precompiled 
+  templates
+* fixing minor typos in docs
+
+0.02       2009-04-02
+* extended and clarified documentation
+* prefer to rethrow template exceptions 
+* don't let TT stash variable 'TwoStage.precompile_mode'
+  - used to indicate precompilation stage in the stash -
+  interfere with default variable name for plugin object
+  'TwoStage' when instantiating the TwoStage plugin 
+  without assigning it to a variable at the same time
+  ("USE TwoStage;" vs. "USE cache = TwoStage;");
+  moved to variable name 'TwoStage_precompile_mode'
+* give 1st stage caching files the file extension '.tt'
+
+0.01       2008-10-01
+bumped up version to first non-developer release
+
+0.01_02    2008-09-25 - developer release
+* added dependency on constant.pm
+* made constants declarations compatible with version 
+  1.02 of constants.pm included in perl version 5.62
+  ( we were moving away from declaration of multiple 
+  constants in a single statement )
+
+0.01_01    2008-09-20 - developer release
+initial upload to cpan

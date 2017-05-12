@@ -1,0 +1,14 @@
+^(build|make-pod)\.pl$
+^xt/.*\.t$
+^Makefile$
+^lib/Table/Readable\.pod\.tmpl$
+^\.git/.*$
+\.gitignore
+blib/.*
+Table-Readable-[0-9\.]+/.*
+^pm_to_blib$
+^MYMETA\..*$
+^doc/bugs$
+^PRIVATE$
+^t/write-test\.txt$
+^examples/.*-out\.txt$

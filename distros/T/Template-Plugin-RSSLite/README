@@ -1,0 +1,40 @@
+Template/Plugin/RSSLite version 0.01
+====================================
+
+NAME
+	Template::Plugin::RSSLite
+
+DESCRIPTION
+	Module to use XML::RSSLite as a Template::Toolkit plugin.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Template-tookit
+	XML::RSSLite
+	
+
+COPYRIGHT AND LICENCE
+
+	Copyright (C) 2003 Kenneth Ekdahl. All Rights Reserved.
+
+	This module is free software; you can redistribute it
+	and/or modify it under the same terms as Perl itself.
+
+AUTHOR
+    Kenneth Ekdahl <sensei@sensei.nu>
+
+SEE ALSO
+    the perl manpage, the XML::RSSLite manpage, the Template manpage.
+
+

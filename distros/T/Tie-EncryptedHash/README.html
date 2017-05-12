@@ -1,0 +1,295 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Tie::EncryptedHash - Hashes with encrypting fields.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#motivation">MOTIVATION</a></li>
+	<li><a href="#construction">CONSTRUCTION</a></li>
+	<ul>
+
+		<li><a href="#tied_hash">Tied Hash</a></li>
+		<li><a href="#blessed_object">Blessed Object</a></li>
+	</ul>
+
+	<li><a href="#reserved_attributes">RESERVED ATTRIBUTES</a></li>
+	<ul>
+
+		<li><a href="#__password">__password</a></li>
+		<li><a href="#__cipher">__cipher</a></li>
+		<li><a href="#__hide">__hide</a></li>
+	</ul>
+
+	<li><a href="#behavior">BEHAVIOR</a></li>
+	<ul>
+
+		<li><a href="#references">References</a></li>
+		<li><a href="#opaque_mode">Opaque Mode</a></li>
+		<li><a href="#multiple_passwords_and_ciphers">Multiple Passwords and Ciphers</a></li>
+		<li><a href="#error_handling">Error Handling</a></li>
+	</ul>
+
+	<li><a href="#quirks">QUIRKS</a></li>
+	<ul>
+
+		<li><a href="#autovivification">Autovivification</a></li>
+		<li><a href="#data__dumper">Data::Dumper</a></li>
+		<li><a href="#speed">Speed</a></li>
+	</ul>
+
+	<li><a href="#standard_usage">STANDARD USAGE</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE </a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Tie::EncryptedHash - Hashes (and objects based on hashes) with encrypting fields.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Tie::EncryptedHash;</pre>
+<pre>
+    my %s = ();
+    tie %s, Tie::EncryptedHash, 'passwd';</pre>
+<pre>
+    $s{foo}  = &quot;plaintext&quot;;     # Normal field, stored in plaintext.
+    print $s{foo};              # (plaintext)
+                                
+    $s{_bar} = &quot;signature&quot;;     # Fieldnames that begin in single
+                                # underscore are encrypted.
+    print $s{_bar};             # (signature)  Though, while the password 
+                                # is set, they behave like normal fields.
+    delete $s{__password};      # Delete password to disable access 
+                                # to encrypting fields.
+    print $s{_bar};             # (Blowfish NuRVFIr8UCAJu5AWY0w...)</pre>
+<pre>
+    $s{__password} = 'passwd';  # Restore password to gain access.
+    print $s{_bar};             # (signature)
+                                
+    $s{_baz}{a}{b} = 42;        # Refs are fine, we encrypt them too.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Tie::EncryptedHash augments Perl hash semantics to build secure, encrypting
+containers of data.  Tie::EncryptedHash introduces special hash fields that
+are coupled with encrypt/decrypt routines to encrypt assignments at <code>STORE()</code>
+and decrypt retrievals at FETCH().  By design, <em>encrypting fields</em> are
+associated with keys that begin in single underscore.  The remaining
+keyspace is used for accessing normal hash fields, which are retained
+without modification.</p>
+<p>While the password is set, a Tie::EncryptedHash behaves exactly like a
+standard Perl hash.  This is its <em>transparent mode</em> of access.  Encrypting
+and normal fields are identical in this mode.  When password is deleted,
+encrypting fields are accessible only as ciphertext.  This is
+Tie::EncryptedHash's <em>opaque mode</em> of access, optimized for serialization.</p>
+<p>Encryption is done with Crypt::CBC(3) which encrypts in the cipher block
+chaining mode with Blowfish, DES or IDEA.  Tie::EncryptedHash uses Blowfish
+by default, but can be instructed to employ any cipher supported by
+Crypt::CBC(3).</p>
+<p>
+</p>
+<hr />
+<h1><a name="motivation">MOTIVATION</a></h1>
+<p>Tie::EncryptedHash was designed for storage and communication of key
+material used in public key cryptography algorithms.  I abstracted out the
+mechanism for encrypting selected fields of a structured data record because
+of the sheer convenience of this data security method.</p>
+<p>Quite often, applications that require data confidentiality eschew strong
+cryptography in favor of OS-based access control mechanisms because of the
+additional costs of cryptography integration.  Besides cipher
+implementations, which are available as ready-to-deploy perl modules, use of
+cryptography in an application requires code to aid conversion and
+representation of encrypted data.  This code is usually encapsulated in a
+data access layer that manages encryption, decryption, access control and
+re-structuring of flat plaintext according to a data model.
+Tie::EncryptedHash provides these functions under the disguise of a Perl
+hash so perl applications can use strong cryptography without the cost of
+implementing a complex data access layer.</p>
+<p>
+</p>
+<hr />
+<h1><a name="construction">CONSTRUCTION</a></h1>
+<p>
+</p>
+<h2><a name="tied_hash">Tied Hash</a></h2>
+<p><code>tie %h, Tie::EncryptedHash, 'Password', 'Cipher';</code></p>
+<p>Ties %h to Tie::EncryptedHash and sets the value of password and cipher to
+'Password' and 'Cipher'.  Both arguments are optional.</p>
+<p>
+</p>
+<h2><a name="blessed_object">Blessed Object</a></h2>
+<p><code>$h = new Tie::EncryptedHash __password =</code> 'Password', 
+                         __cipher =&gt; 'Cipher';&gt;</p>
+<p>The <code>new()</code> constructor returns an object that is both tied and blessed into
+Tie::EncryptedHash.  Both arguments are optional.  When used in this manner,
+Tie::EncryptedHash behaves like a class with encrypting data members.</p>
+<p>
+</p>
+<hr />
+<h1><a name="reserved_attributes">RESERVED ATTRIBUTES</a></h1>
+<p>The attributes __password, __cipher and __hide are reserved for
+communication with object methods.  They are ``write-only'' from everywhere
+except the class to which the hash is tied.  __scaffolding is inaccessible.
+Tie::EncryptedHash stores the current encryption password and some transient
+data structures in these fields and restricts access to them on need-to-know
+basis.</p>
+<p>
+</p>
+<h2><a name="__password">__password</a></h2>
+<p><code>$h{__password} = &quot;new password&quot;;
+delete $h{__password};</code></p>
+<p>The password is stored under the attribute <code>__password</code>.  In addition to
+specifying a password at construction, assigning to the __password attribute
+sets the current encryption password to the assigned value.  Deleting the
+__password unsets it and switches the hash into opaque mode.</p>
+<p>
+</p>
+<h2><a name="__cipher">__cipher</a></h2>
+<p><code>$h{__cipher} = 'DES'; $h{__cipher} = 'Blowfish';</code></p>
+<p>The cipher used for encryption/decryption is stored under the attribute
+__cipher.  The value defaults to 'Blowfish'.</p>
+<p>
+</p>
+<h2><a name="__hide">__hide</a></h2>
+<p><code>$h{__hide} = 1;</code></p>
+<p>Setting this attribute <em>hides</em> encrypting fields in opaque mode.  'undef'
+is returned at <code>FETCH()</code> and EXISTS().</p>
+<p>
+</p>
+<hr />
+<h1><a name="behavior">BEHAVIOR</a></h1>
+<p>
+</p>
+<h2><a name="references">References</a></h2>
+<p>A reference stored in an encrypting field is serialized before encryption.
+The data structure represented by the reference is folded into a single line
+of ciphertext which is stored under the first level key.  In the opaque
+mode, therefore, only the first level of keys of the hash will be visible.</p>
+<p>
+</p>
+<h2><a name="opaque_mode">Opaque Mode</a></h2>
+<p>The opaque mode introduces several other constraints on access of encrypting
+fields.  Encrypting fields return ciphertext on <code>FETCH()</code> unless __hide
+attribute is set, which forces Tie::EncryptedHash to behave as if encrypting
+fields don't exist.  Irrespective of __hide, however, <code>DELETE()</code> and <code>CLEAR()</code>
+fail in opaque mode.  So does <code>STORE()</code> on an existing encrypting field.
+Plaintext assignments to encrypting fields are silently ignored, but
+ciphertext assignments are fine.  Ciphertext assignments can be used to move
+data between different EncryptedHashes.</p>
+<p>
+</p>
+<h2><a name="multiple_passwords_and_ciphers">Multiple Passwords and Ciphers</a></h2>
+<p>Modality of Tie::EncryptedHash's access system breaks down when more than
+one password is used to with different encrypting fields.  This is a
+feature.  Tie::EncryptedHash lets you mix passwords and ciphers in the same
+hash.  Assign new values to __password and __cipher and create a new
+encrypting field.  Transparent mode will be restricted to fields encrypted
+with the current password.</p>
+<p>
+</p>
+<h2><a name="error_handling">Error Handling</a></h2>
+<p>Tie::Encrypted silently ignores access errors.  It doesn't carp/croak when
+you perform an illegal operation (like assign plaintext to an encrypting
+field in opaque mode).  This is to prevent data lossage, the kind that
+results from abnormal termination of applications.</p>
+<p>
+</p>
+<hr />
+<h1><a name="quirks">QUIRKS</a></h1>
+<p>
+</p>
+<h2><a name="autovivification">Autovivification</a></h2>
+<p>Due to the nature of autovivified references (which spring into existence
+when an undefined reference is dereferenced), references are stored as
+plaintext in transparent mode.  Analogous ciphertext representations are
+maintained in parallel and restored to encrypting fields when password is
+deleted.  This process is completely transparent to the user, though it's
+advisable to delete the password after the final assignment to a
+Tie::EncryptedHash.  This ensures plaintext representations and scaffolding
+data structures are duly flushed.</p>
+<p>
+</p>
+<h2><a name="data__dumper">Data::Dumper</a></h2>
+<p>Serialization of references is done with Data::Dumper, therefore the nature
+of data that can be assigned to encrypting fields is limited by what
+Data::Dumper can grok.  We set $Data::Dumper::Purity = 1, so
+self-referential and recursive structures should be OK.</p>
+<p>
+</p>
+<h2><a name="speed">Speed</a></h2>
+<p>Tie::EncryptedHash'es keep their contents encrypted as much as possible, so
+there's a rather severe speed penalty.  With Blowfish, <code>STORE()</code> on
+EncryptedHash can be upto 70 times slower than a standard perl hash.
+Reference STORE()'es will be quicker, but speed gain will be adjusted at
+FETCH().  <code>FETCH()</code> is about 35 times slower than a standard perl hash.  DES
+affords speed improvements of upto 2x, but is not considered secure for
+long-term storage of data.  These values were computed on a DELL PIII-300
+Mhz notebook with 128 Mb RAM running perl 5.003 on Linux 2.2.16.  Variations
+in speed might be different on your machine.</p>
+<p>
+</p>
+<hr />
+<h1><a name="standard_usage">STANDARD USAGE</a></h1>
+<p>The standard usage for this module would be something along the lines of:
+populate Tie::EncryptedHash with sensitive data, delete the password,
+serialize the encrypted hash with Data::Dumper, store the result on disk or
+send it over the wire to another machine.  Later, when the sensitive data is
+required, procure the EncryptedHash, set the password and accesses the
+encrypted data fields.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Data::Dumper(3),
+Crypt::CBC(3),
+Crypt::DES(3),
+Crypt::Blowfish(3),
+Tie::SecureHash(3)</p>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>The framework of Tie::EncryptedHash derives heavily from Damian Conway's
+Tie::SecureHash.  Objects that are blessed as well as tied are just one of
+the pleasant side-effects of stealing Damian's code.  Thanks to Damian for
+this brilliant module.</p>
+<p>PacificNet (http://www.pacificnet.net) loaned me the aforementioned notebook
+to hack from the comfort of my bed.  Thanks folks!</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Vipul Ved Prakash &lt;<a href="mailto:mail@vipul.net">mail@vipul.net</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This module is distributed under the same license as Perl itself.
+
+</p>
+
+</body>
+
+</html>

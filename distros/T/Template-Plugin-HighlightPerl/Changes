@@ -1,0 +1,15 @@
+Revision history for Perl extension Template::Plugin::HighlightPerl.
+
+0.04  Sat Nov 15 03:57:00 2008
+	- added nobr tags for no line breaks
+        
+0.03  Wed Apr 23 02:43:00 2008
+	- fix bug where line break where not added if filtered text did not contain code tags
+        
+0.02  Sat Apr 19 05:30:00 2008
+	- fix bug where perl and non-perl did not work in same body
+                
+0.01  Wed Apr 16 18:28:09 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Template::Plugin::HighlightPerl
+

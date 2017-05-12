@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Tcl
+version:            1.05
+abstract:           Tcl extension module for Perl
+author:  []
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:  5.006
+resources:
+    MailingList:  mailto:tcltk@perl.org
+    repository:   http://github.com/gisle/tcl.pm
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

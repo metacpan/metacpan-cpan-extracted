@@ -1,0 +1,4 @@
+* Add a plugin to stop after the first failing test.
+
+* Implement a plugin system for the helper objects.
+

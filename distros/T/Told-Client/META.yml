@@ -1,0 +1,25 @@
+---
+abstract: "A client to log messages into a told log recorder.\nSee https://github.com/petershaw/told-LogRecorder to lern more about told."
+author:
+  - 'Peter Shaw <unthoughted@googlemail.com>'
+build_requires:
+  Data::Dumper: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Told-Client
+requires:
+  Exporter: 0
+  JSON: 0
+  LWP: 0
+  perl: 5.016002
+  strict: 0
+  warnings: 0
+version: 0.001

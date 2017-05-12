@@ -1,0 +1,31 @@
+
+Changes from NSP version 0.59 to 0.61
+-------------------------------------
+
+Bridget T McInnes, bthomson@umn.edu
+University of Minnesota, Duluth
+October 20, 2003
+
+Measures
+--------
+
+(1)    	repaired the measures rightFisher.pm and leftFisher.pm. The
+	measure had become reversed some where down the line and then
+	there were a few errors in the rightFisher module. I revised
+	the rightFisher so as it sums the hypergeometric probabitilies
+	where n11 is greater than or equal to the observed value. And 
+	similiarly with leftFisher only where n11 is less than or equal 
+	to the observed value.  
+	
+Testing
+-------	
+
+(1)     Revised the test scripts for the leftFisher test:
+		test-1.sub-4.reqd
+
+(2)     Tested both rightFisher and leftFisher with the cooresponding
+	test scripts
+
+[Bridget - 10/20/2003]
+
+

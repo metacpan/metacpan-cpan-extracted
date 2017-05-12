@@ -1,0 +1,17 @@
+
+o Convert Firebutton it to a library so one could use
+
+   use Tk::Lib::Fire;
+   ...
+   @ISA = qw(... Tk::Lib::Fire ... )
+   ...
+   $widget->bindFire(startEvent, cancalEvent);
+
+ so one could use it with button press/release, entry up/down, ...
+
+o When repeaddelay of keyboard is smaller than that of firebutton
+  using pending <Space> events should be canceled by <Space-Release>
+
+o make the examples script into real demonstration programs
+
+__END__

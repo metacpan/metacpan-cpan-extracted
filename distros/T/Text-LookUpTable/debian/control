@@ -1,0 +1,19 @@
+Source: libtext-lookuptable-perl
+Section: perl
+Priority: optional
+Maintainer: TBD
+Uploaders: TBD
+Build-Depends: debhelper (>= 6)
+Build-Depends-Indep: perl
+Standards-Version: 3.7.3
+Homepage:
+
+Package: libtext-lookuptable-perl
+Architecture: all
+Depends: ${perl:Depends}, libtext-aligner-perl (>= 0.01), libfile-slurp-perl (>= 9999.13-1)
+Description: Perl5 module for text based look up table operations
+ Text::LookUpTable provides operations for creating, storing, displaying,
+ plotting, loading, and querying a look up table structure.  The format
+ of the stored structure is designed to be visually easy to understand
+ so that it can be easily edited using a text editor.
+

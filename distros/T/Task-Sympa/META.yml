@@ -1,0 +1,47 @@
+---
+abstract: 'Sympa dependencies'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Sympa
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: '1.05'
+  CGI: '3.51'
+  DBI: '1.48'
+  DB_File: '1.75'
+  Digest::MD5: '2.00'
+  Encode: '0'
+  File::Copy::Recursive: '0.36'
+  HTML::FormatText: '0'
+  HTML::StripScripts::Parser: '1.03'
+  HTML::TreeBuilder: '0'
+  IO::Scalar: '0'
+  Locale::Messages: '0'
+  MHonArc::UTF8: v2.6.18
+  MIME::Base64: '3.03'
+  MIME::Charset: '1.010'
+  MIME::EncWords: '1.014'
+  MIME::Lite::HTML: '1.23'
+  MIME::Tools: '5.423'
+  Mail::Address: '1.70'
+  Mail::DKIM: '0.36'
+  Template: '0'
+  Term::ProgressBar: '2.09'
+  Text::LineFold: '2011.05'
+  Time::HiRes: '1.29'
+  URI::Escape: '1.35'
+  XML::LibXML: '0'
+version: '1.01'

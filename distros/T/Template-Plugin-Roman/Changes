@@ -1,0 +1,10 @@
+Revision history for Template-Plugin-Roman
+
+1.0     2013-08-01
+        - It works. It has a test. Simple filter like this one
+          doesn't need much more than that to be marked stable.
+
+0.01    2013-07-31
+        - First version. Basic functionality, hardly deviated
+          from M::B default skeleton.
+

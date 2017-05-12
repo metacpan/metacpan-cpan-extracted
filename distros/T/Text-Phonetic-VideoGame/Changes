@@ -1,0 +1,26 @@
+Revision history for Text-Phonetic-VideoGame
+
+0.05    Mon Nov 14 17:20:21 UTC 2011
+        Ignore "3D" in titles
+        Ignore "Hasbro" publisher prefix
+        Better handling for "Raving Rabbids" games
+
+0.04    Wed Oct 19 20:11:09 UTC 2011
+        Add more dictionary words
+        Add more abbreviations
+        Distinguish hard drive sizes
+
+0.03    Tue Jul 20 18:10:13 UTC 2010
+        Add more dictionary words
+        Add more abbreviations
+        Handle more redundant phrases
+        Remove useless publisher names
+        Handle commas properly
+        Ignore words that look like Roman numerals but aren't
+
+0.02    Wed Sep 23 19:43:40 UTC 2009
+        Add dragon, donkey, fly and kong to the dictionary
+        KOTR is an abbreviation for Knights of the Old Republic
+
+0.01    Fri Sep 18 20:08:08 UTC 2009
+        First version

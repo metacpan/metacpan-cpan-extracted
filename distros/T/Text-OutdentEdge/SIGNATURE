@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.53.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b99e4c2241410ade1a95b71d386dc74d4dc73984 Changes
+SHA1 0bb7a70dc45dd5b3fcfff9c57fb8c279800a2f1c MANIFEST
+SHA1 9fa5dc501ac4fe67158debbe4f8505a92eb6fdf2 META.yml
+SHA1 72b42fcf9e653abb35d57ac629663ab129c205f4 Makefile.PL
+SHA1 95d3d056a8b93b9fc3d9400b0e3fc0618720a2da README
+SHA1 eccb10cb476cbd84dbe0af970240e15febac59a0 example/outdent.pl
+SHA1 284280a7131d1a45f3f5b6ea0c400c96c20f1224 example/sample-a.txt
+SHA1 cfe83f7baf2be5494fe680dfa905870458a71fdb example/sample-b.txt
+SHA1 3931b90134fa9c8869d6a48b41f6f25bc6ceabec example/sample-c.txt
+SHA1 3aca1cdbbdc13088fd636531f0d885560b64cd61 inc/ExtUtils/MY_Metafile.pm
+SHA1 f312ac3b7cad450ce74484a2ac6e29568f30566d lib/Text/OutdentEdge.mlpod
+SHA1 e60b7d780c4f3e36f179a2301e296a93b37da9d3 lib/Text/OutdentEdge.pm
+SHA1 bb949be4a4fd7d0e7047b64275ff1359d7d62814 lib/Text/OutdentEdge_ja.pod
+SHA1 71096f039dafa77bf7e9c819a825fc163fface20 t/00-load.t
+SHA1 f733545d156a412caaa38e2790ca19fbc0fde142 t/01-basic.t
+SHA1 e7b51e67e044fb731d959707d3ab80fcfa18f6b4 t/boilerplate.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iD8DBQFFaA6VewjCT38k4dkRAveBAKCPD8EGpVfH8CAOdW6Aemg5tqzg+ACdH3d7
+1knIlgtOjMzqtr+jUgGo0kc=
+=cX91
+-----END PGP SIGNATURE-----

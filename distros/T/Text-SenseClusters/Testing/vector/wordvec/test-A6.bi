@@ -1,0 +1,14 @@
+number of<>fine arts<>1 0.9105 10 50 100
+number of<>fine particles<>1 0.9105 20 50 500
+fine wines<>more than<>2 0.8823 15 70 446
+of course<>fine collection<>2 0.8823 12 45 654
+of course<>fine wines<>3 0.75 67 671 736
+fine weather<>of course<>4 0.6897 23 877 2023
+at least<>fine weather<>5 0.6125 8 898 5577
+at least<>fine particles<>6 0.5867 5 898 9889
+lot of<>fine particles<>6 0.5867 8 898 8988
+fine collection<>lot of<>7 0.53 5 200 565
+centre of<>fine collection<>8 0.489 5 576 542 
+centre of<>fine arts<>8 0.489 5 788 788
+examples of<>fine collection<>8 0.489 5 989 767
+examples of<>fine arts<>8 0.489 5 454 989

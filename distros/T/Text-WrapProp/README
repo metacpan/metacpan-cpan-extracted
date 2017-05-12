@@ -1,0 +1,36 @@
+Text-WrapProp version 0.05
+==========================
+
+Text::WrapProp - proportional line wrapping to form simple paragraphs
+
+Text::WrapProp::wrap_prop() is a very simple paragraph formatter for proportional
+text. It formats a single paragraph at a time by breaking lines at word boundaries.
+You must supply the column width in floating point units which should be set to
+the full width of your output device. A reference to a character width table
+must also be supplied. The width units can be any metric you choose, as long as
+the column width and the width table use the same metric.
+
+Proportional wrapping is most commonly used in the publishing industry.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 1998, James Briggs
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

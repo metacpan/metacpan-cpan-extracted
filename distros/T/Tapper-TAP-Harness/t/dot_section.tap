@@ -1,0 +1,55 @@
+TAP Version 13
+1..1
+# Tapper-section: .
+# Tapper-Suite-Name: hw_info
+# Tapper-Machine-Name: .
+# Tapper-Reportgroup-Testrun: 2014021001
+# Tapper-moreinfo-url: http://www.google.de
+ok - get memcount data
+  ---
+  BenchmarkAnythingData:
+  -
+    NAME: hw_info.memcount
+    VALUE: 2438400
+  ...
+1..1
+# Tapper-section: some.section
+# Tapper-Suite-Name: test
+# Tapper-Machine-Name: some.machine
+# Tapper-Reportgroup-Testrun: 2014021001
+# Tapper-moreinfo-url: http://tapper-testing.org
+ok - get memcount data
+  ---
+  BenchmarkAnythingData:
+  -
+    NAME: hw_info.memcount
+    VALUE: 2438400
+  ...
+1..1
+# Tapper-section:
+# Tapper-Suite-Name: test_empty_section_name
+# Tapper-Machine-Name: some.machine
+# Tapper-Reportgroup-Testrun: 2014021001
+# Tapper-moreinfo-url: http://tapper-testing.org
+ok - get memcount data
+  ---
+  BenchmarkAnythingData:
+  -
+    NAME: hw_info.memcount
+    VALUE: 2438400
+  ...
+1..1
+# trailing black in next line is intentional
+# Tapper-section: 
+# Tapper-Suite-Name: test_with_space_section_name
+# Tapper-Machine-Name: some.machine
+# Tapper-Reportgroup-Testrun: 2014021001
+# Tapper-moreinfo-url: http://tapper-testing.org
+ok - get memcount data
+  ---
+  BenchmarkAnythingData:
+  -
+    NAME: hw_info.memcount
+    VALUE: 2438400
+  ...
+

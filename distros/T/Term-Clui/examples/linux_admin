@@ -1,0 +1,443 @@
+#! /usr/bin/perl
+#
+#########################################################################
+#        This Perl script is Copyright (c) 2003, Peter J Billam         #
+#               c/o P J B Computing, www.pjb.com.au                     #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+
+use Term::Clui;
+use Term::Clui::FileSelect;
+$debug = 0;
+$hostname = `hostname`; $hostname =~ s/[\r\n]*//;
+@PATH = split (":", $ENV{PATH});
+my $daemon_d;
+my @system_configs;
+my $crond = &first_existing('/var/spool/cron/crontabs','/var/spool/cron');
+my $squidlogd  = &first_existing('/usr/local/squid/logs','/var/squid/logs');
+my $squidconfd = &first_existing('/usr/local/squid/etc','/etc/squid');
+my $squid = &first_existing('/usr/local/squid/sbin/squid','/usr/sbin/squid');
+my $sambalogd  = &first_existing('/usr/local/samba/var','/var/log/samba');
+my $sambaconfd = &first_existing('/usr/local/samba/lib','/etc/samba');
+my $tracd = &first_existing('/var/www/trac');
+my $svnd = &first_existing('/usr/local/svn');
+my $lshw = &first_existing('/usr/local/bin/lshw','/usr/bin/lshw');
+my $apacheconfd = &first_existing( '/usr/local/apache/conf',
+ '/usr/local/apache2/conf','/etc/apache2','/etc/apache');
+my $dirvishconf = &first_existing('/etc/dirvish.conf',
+ '/usr/local/dirvish/etc/master.conf','/etc/dirvish/master.conf');
+my $lsmod = &which('lsmod');
+my $modinfo = &which('modinfo');
+@tasks = &tasks();
+if (! @tasks) { die "Sorry, no administration tasks are available\n"; }
+while () {
+   $task = &choose("Administrating $hostname", @tasks);
+   if (! $task) { exit;
+   } elsif ($task eq "Become superuser") { exec "su - -c $0";
+   } elsif ($task eq "adduser")       { &adduser();
+   } elsif ($task eq "aptitude")      { system "aptitude";
+   } elsif ($task eq "base-config")   { system "base-config";
+   } elsif ($task eq "chpass")        { system "chpass";
+   } elsif ($task eq "chkconfig")     { &chkconfig();
+   } elsif ($task eq "lshw")          { system "lshw | less";
+   } elsif ($task eq "mii-tool")      { system "mii-tool";
+   } elsif ($task eq "system-config") { &system_config();
+   } elsif ($task eq "trac-admin")    { &trac_admin();
+   } elsif ($task eq "update-rc.d")   { &update_rcd();
+   } elsif ($task eq "vipw")          { system "vipw"; system "vipw -s";
+   } elsif ($task eq "visudo")        { system "visudo";
+   } elsif ($task eq "Apache")        { &apache();
+   } elsif ($task eq "Crontab")       { &crontab();
+   } elsif ($task eq "Daemons")       { &daemons();
+   } elsif ($task eq "Dirvish")       { &dirvish();
+   } elsif ($task eq "Modules")       { &modules();
+   } elsif ($task eq "Network ports") { &ports();
+   } elsif ($task eq "Samba")         { &samba();
+   } elsif ($task eq "Squid")         { &squid();
+   } elsif (-f $task) { &edit ($task);
+   } elsif (-d $task) {
+		$file = &select_file(-TextFile=>1, -TopDir=>$task);
+		if ($file) { &edit ($file) };
+   }
+}
+sub tasks {
+	my @tasks;
+	if (! $>) {   # root stuff
+   	foreach $f (
+			qw(adduser aptitude base-config chkconfig chpass lshw mii-tool
+			sax sax2 trac-admin update-rc.d vipw visudo yast yast2)) {
+			if (&which($f)) { push @tasks, $f; }
+		}
+		if (opendir D, '/usr/bin') {
+			@system_configs = sort grep /^system-config-/,readdir D; closedir D;
+			if (@system_configs) { push @tasks, 'system-config'; }
+			foreach (@system_configs) { s/^system-config-//; }
+		}
+	} else { push @tasks, 'Become superuser';
+	}
+	foreach (
+		'/etc/inittab',
+		'/etc/sysconfig',
+		'/etc/xinetd.d',
+		'/etc/resolv.conf',
+		'/etc/iptables.up.rules',
+		'/etc',
+	) { if (-d $_ || -f $_) { push @tasks, $_; } }
+	if (-d $apacheconfd) { push @tasks, 'Apache'; }
+	if (-d $crond) { push @tasks, 'Crontab'; }
+	if (! $>) {
+		foreach ('/etc/rc.d/init.d','/etc/init.d') {
+			if (-d $_) {$daemon_d = $_; push @tasks, 'Daemons'; last}
+		}
+	}
+	if (-e $dirvishconf) { push @tasks, 'Dirvish'; }
+	if ($lsmod && $modinfo) { push @tasks, 'Modules'; }
+	push @tasks, 'Network ports';
+	if (-d $squidlogd)   { push @tasks, 'Squid'; }
+	if (-d $sambaconfd)  { push @tasks, 'Samba'; }
+	return @tasks;
+}
+sub squid {
+	my @tasks = ( 'tail -f access.log', 'tail -f access.log | grep',
+	'tail -f cache.log');
+	if ($squid && !$>) { push @tasks, 'Reconfigure'; }
+	my $task = &choose('Squid ?', @tasks);
+	return unless $task;
+	if ($task =~ /(\w+\.log)$/) { system "tail -f $squidlogd/$1";
+	} elsif ($task =~ /grep$/) {
+		my $s = &ask ('look for what regexp ?');
+		next unless $s;
+		system "tail -f $squidlogd/access.log | grep '$s'";
+	} elsif ($task eq 'Reconfigure') {
+		if (! chdir $squidconfd) {
+			&sorry("can't chdir $squidconfd: $!"); return;
+		}
+		&edit ('squid.conf');
+		if (&confirm ('OK to "squid -k reconfigure" ?')) {
+			system "$squid -k reconfigure";
+		}
+	} 
+}
+sub samba {
+	my $sambabind = "/usr/bin";
+	if (-d "/usr/local/samba/bin") { $sambabind = "/usr/local/samba/bin"; }
+
+	my @tasks = ('log.smbd','log.winbindd');
+	if (!$>) { push @tasks, 'smb.conf'; }
+	if (-w "$sambaconfd/username.map") { push @tasks, 'username.map'; }
+	my $task = &choose('Samba ?', @tasks);
+	return unless $task;
+	if ($task =~ /log/) { system "tail -f $sambalogd/$task";
+	} elsif ($task =~ /grep$/) {
+		my $s = &ask ('look for what regexp ?');
+		next unless $s;
+		system "tail -f $sambalogd/log | grep '$s'";
+	} elsif ($task eq 'smb.conf' || $task eq 'username.map') {
+		if (! chdir $sambaconfd) {
+			&sorry("can't chdir sambaconfd: $!"); return;
+		}
+		while (1) {
+			&edit ($task);
+			my $retval = system "$sambabind/testparm";
+			if ($? == -1) {
+			 	&sorry("can't run testparm: $!\n"); return;
+			} elsif ($? & 127) {
+				&sorry (sprintf "testparm died with signal %d, %s coredump\n",
+				($? & 127),  ($? & 128)?'with':'without'); return;
+			} else {
+				# $retval >> 8;
+				if (! $retval) {
+					if (&confirm ('OK to Reload Config ?')) {
+						system "$sambabind/smbcontrol smbd reload-config";
+						system "$sambabind/smbcontrol nmbd reload-config";
+					}
+					last;
+				} else {
+					warn "That didn't work, you'll need to re-edit smb.conf ...\n";
+				}
+			}
+		}
+	} 
+}
+sub apache {
+	my $d = $apacheconfd;
+	my $file; my $apachectl;
+	my @tasks = ();
+	my $enabled = &first_existing("$d/sites-enabled","$d/vhosts.d","$d/conf.d");
+	if ($enabled) { push @tasks, "Edit a site"; }
+	my $a2ensite = &which('a2ensite');
+	if ($a2ensite)   { push @tasks, 'Enable a site'; }
+	my $a2dissite = &which('a2dissite');
+	if ($a2dissite)   { push @tasks, 'Disable a site'; }
+	my $a2enmod = &which('a2enmod');
+	if ($a2enmod)   { push @tasks, 'Enable a module'; }
+	my $a2dismod = &which('a2dismod');
+	if ($a2dismod)   { push @tasks, 'Disable a module'; }
+	my $conff = &first_existing("$d/apache2.conf","$d/httpd.conf");
+	if ($conff) { push @tasks, "Edit main config file"; }
+	if (! @tasks) { return; }
+	my $task = &choose("which apache task ?", @tasks);
+	return unless $task;
+	if ($task eq 'Edit a site') {
+		my $site = &select_file
+			(-Title=>'which site ?', -TextFile=>1, -TopDir=>$enabled, -Chdir=>0);
+		return unless $site;
+		&edit ($site);
+	} elsif ($task eq 'Enable a site') {
+		my $site = &select_file (-Title=>'which site ?', -TextFile=>1,
+		 -TopDir=>"$d/sites-available", -Chdir=>0);
+		$site =~ s/^.*\///;
+		return unless $site;
+		system "$a2ensite $site";
+	} elsif ($task eq 'Disable a site') {
+		my $site = &select_file (-Title=>'which site ?', -TextFile=>1,
+		 -TopDir=>"$enabled", -Chdir=>0);
+		$site =~ s/^.*\///;
+		return unless $site;
+		system "$a2dissite $site";
+	} elsif ($task eq 'Enable a module') {
+		my $module = &select_file (-Title=>'which module ?', -FPat=>'*.load',
+		 -TopDir=>"$d/mods-available", -Chdir=>0);
+		$module =~ s/^.*\///;
+		return unless $module;
+		system "$a2enmod $module";
+	} elsif ($task eq 'Disable a module') {
+		my $module = &select_file (-Title=>'which module ?', -FPat=>'*.load',
+		 -TopDir=>"$d/mods-enabled", -Chdir=>0);
+		$module =~ s/^.*\///;
+		return unless $module;
+		system "$a2dismod $module";
+	} elsif ($task eq 'Edit main config file') {
+		&edit ($conff);
+	}
+	my $apachectl = &which('apache2ctl') || &which('apachectl')
+	 || '/usr/local/apache/bin/apachectl';
+	if (&confirm ('OK to Restart Apache ?')) { system "$apachectl restart"; }
+}
+sub dirvish {
+	if (!open(F,$dirvishconf)) { die "can't open $dirvishconf: $!\n"; }
+	my $ary; my $Banks; my @Vaults;
+	while (<F>) {
+    	if (/^#/)        { next;
+    	} elsif (/^bank:/i)   { $ary = \@Banks;
+    	} elsif (/^Runall:/i) { $ary = \@Vaults;
+    	} elsif (/^\w/)       { $ary = 0;
+    	} elsif (/^\s+(\S+)/ && ref $ary) { push @$ary, $1;
+    	}
+	}
+	close F;
+	my @tasks = ();
+	push @tasks, $dirvishconf;
+	foreach my $vault (sort @Vaults) {
+    	my $bank;
+    	foreach (@Banks) { if (-d "$_/$vault") { $bank = $_; last; } }
+    	if (!$bank) { warn "can't find vault $vault in banks @Banks\n"; next;}
+	
+    	my $backupd  = "$bank/$vault";
+    	$BackupDirs{$vault} = $backupd;
+    	if (!-d "$backupd/dirvish") {warn "$backupd/dirvish not found\n";next;}
+		if (!-f "$backupd/dirvish/default.conf") {
+			open (F, ">$backupd/dirvish/default.conf"); close F;
+		}
+		push @tasks, "$backupd/dirvish/default.conf";
+	}
+	if (@Vaults) {
+		push @tasks, "Re-run last night's backup";
+	}
+	if (1 < @Vaults) {
+		push @tasks, "Re-run a particular vault";
+	}
+
+	my $task = &choose('which dirvish task ?', @tasks);
+	if ($task eq "Re-run last night's backup") {
+		system "dirvish-runall";
+	} elsif ($task eq "Re-run a particular vault") {
+		my $vault = &choose('which vault ?', sort @Vaults);
+		next unless $vault;
+		system "dirvish --vault $vault --image-time 21:00 &";
+	} elsif (-f $task) {
+		&edit($task);
+	}
+}
+sub modules {
+	if (! open (P, "$lsmod |")) { &sorry("can't run $lsmod: $!"); return 0; }
+	my %mod2lsmod = ();
+	my $title = '';
+	while (<P>) {
+		if (/^([a-z]\w+)\s/) { $mod2lsmod{$1}=$_;
+		} elsif (/^[A-Z]/) { $title = $_;
+		}
+	}
+	close P;
+	my $mod = &choose('Which module ?', sort keys %mod2lsmod);
+	return(0) unless $mod;
+	print $title, $mod2lsmod{$mod}, "\n";
+	system "$modinfo $mod";
+}
+sub ports {
+	if (! open (P, "netstat -a |")) {
+		&sorry("can't run netstat -a: $!"); return 0;
+	}
+	my @lines; while (<P>) { if (/LISTEN|ESTABLISH/) { push @lines, $_; } }
+	close P;
+	if (! open (P, "iptables -L |")) {
+		&sorry("can't run iptables -L: $!");
+	} else {
+		push @lines, "\n", "Iptables:\n";
+		while (<P>) { s/         state/state/ ; push @lines, $_; }
+		close P;
+	}
+	&view ("Ports", join('', @lines));
+}
+sub daemons {
+	my $task = &choose('Task ?','start','restart','stop');
+	return unless $task;
+	my $daemon = &select_file
+		(-Title=>'which daemon ?', -TextFile=>1, -TopDir=>$daemon_d, -Chdir=>0);
+	return unless $daemon;
+	system "sh $daemon $task";
+}
+sub crontab {
+	if ($>) { system "crontab -e"; return 0; }
+	if (! opendir(D,$crond)) { warn "can't opendir $crond: \n"; return 0; }
+	my @users = sort grep { !/^\./ } readdir(D);
+	closedir D;
+	if (! @users) { warn "no crontabs found in $crond\n"; return 0; }
+	my $task = &choose('crontab task ?', 'View', 'Edit', 'Manual');
+	return unless $task;
+	if ($task eq 'Manual') { system 'man 5 crontab'; return; }
+	my $user = &choose ("$task which user ?", @users);
+	return unless $user;
+	my $useropt = '-u '; if ($^O =~ /solaris/) { $useropt = ''; }
+	if ($task eq 'Edit') { system "crontab -e $useropt $user";
+	} else { system "crontab -l $useropt $user";
+	}
+}
+sub chkconfig {
+	if (! open (P, "chkconfig --list |")) {
+		&sorry("can't run chkconfig --list: $!"); return 0;
+	}
+	my @l; my @xinetdl; while (<P>) {
+		chop;
+		if (/^\s/ || /based services/) { push @xinetdl, $_;
+		} else { push @l, $_;
+		}
+	}
+	if (open (F, '/etc/inittab')) {
+		while (<F>) {
+			if (/^\w+:(\d):initdefault:/) {warn "  default run-level $1\n"; last;}
+		}
+		close F;
+	}
+	my $r = `who -r 2>/dev/null`; $r =~ s/^\s*(\S+\s+\d+).*$/$1/;
+	if ($r) { warn("currently $r"); }
+	my $task = &choose('chkconfig task ?', 'View', 'Edit');
+	return unless $task;
+	if ($task eq 'Edit') {
+		my %services;
+		foreach (@l) { /^(\S+)\s+(.*)$/; $services{$1}=$2; }
+		my $service = &choose('Edit which service ?', sort keys %services);
+		return unless $service;
+		&inform ($services{$service});
+		my @runlevels = &choose('at which runlevels ?','1','2','3','4','5');
+		return unless @runlevels;
+		my $onoff =
+		&choose("$service at runlevels ".join(",",@runlevels),'on','off');
+		return unless $onoff;
+		system "chkconfig --level ".join('',@runlevels)." $service $onoff";
+	} else {
+		&view('chkconfig --list', join("\n", (sort @l ),@xinetdl));
+	}
+	&view ('Daemon configuration', $s);
+}
+sub trac_admin {
+	if (! opendir(D, $tracd)) { warn "can't opendir $tracd: $!\n"; return; }
+	@dirs = grep { !/^\./ && -d "$tracd/$_" } readdir(D);
+	closedir D;
+	if (! @dirs) { warn "no projects found in $tracd\n"; return; }
+	my $dir = &choose("which project ?", @dirs);
+	return unless $dir;
+	system "trac-admin $tracd/$dir";
+	if ($svnd && -f "$svnd/conf/svnpolicy") { &edit("$svnd/conf/svnpolicy"); }
+}
+sub update_rcd {
+	my $r = `who -r`; $r =~ s/^\s*(\S+\s+\d+).*$/$1/; warn("currently $r");
+	my $task = &choose('update-rc.d task ?', 'View', 'Edit');
+	return unless $task;
+	if ($task eq 'Edit') {
+		if (! opendir(D, '/etc/init.d')) {
+			&sorry("can't opendir /etc/init.d: $!"); return 0;
+		}
+		my @l = sort grep
+		{ !/^\.|^README|\.sh$|S$|^single$|^halt$|^reboot$/ } readdir(D);
+		closedir D;
+		my $service = &choose('Edit which service ?', @l);
+		return unless $service;
+		system "cd /etc ; ls rc[12345].d/S*$service*";
+		my $onoff = &choose("$service at runlevels 2,3,4,5",'on','off');
+		return unless $onoff;
+		if ($onoff eq 'on') {
+			my $startnumber = &choose("start-order number ?", 20 .. 99);
+			system "update-rc.d $service defaults $startnumber";
+		} elsif ($onoff eq 'off') {
+			system "update-rc.d -f $service remove";
+		}
+	} else {
+		local $/;
+		&view('ls /etc/rc[2345].d', `ls -C --tabsize=75 /etc/rc[2345].d`);
+	}
+}
+sub system_config {
+	my $task = &choose('which system-config ?', @system_configs);
+   return unless $task;
+	system "/usr/bin/system-config-$task";
+}
+sub adduser {
+	my $name =     &ask('new username  ?');
+	if (getpwnam($name)) { &sorry("user $name already exists"); return 0; }
+	my @groups = &choose('groups        ?', &groups());
+	my $group; my @secondary_groups=();
+	if (1 < scalar @groups) {
+		$group = &choose('primary group ?', @groups);
+		foreach (@groups) { if ($_ ne $group) { push @secondary_groups, $_; } }
+	} else {
+		$group = $groups[0];
+	}
+	return unless $group;
+	my $fullname = &ask('full name     ?');
+	my $shell = &choose('login shell   ?', &shells());
+	my $cmd = &which("adduser") . " -g $group";
+	if (@secondary_groups) { $cmd .= " -G " . join(",",@secondary_groups) ; }
+	if ($fullname) { $cmd .= " -c '$fullname'"; }
+	if ($shell) { $cmd .= " -s $shell"; }
+	$cmd .= " $name";
+	&confirm("OK to $cmd ?") && system $cmd;
+}
+# ------------------------- infrastructure ----------------------
+sub groups {
+	my @groups=(); my $n;
+	setgrent; while ($n = getgrent()) { push @groups, $n; } endgrent;
+	sort @groups;
+}
+sub shells {
+	my @shells; my $d; my $x;
+	foreach $d ('/bin','/usr/bin') {
+		if (! opendir(D,$d)) { &sorry("can't opendir $d: $!\n"); return ; }
+		while ($_ = readdir D) {
+			if (/sh$/ && !/ssh$/ && !/\.sh$/ && !/splash$/ && !/flash$/) {
+				push @shells, "$d/$_";
+			}
+		}
+		closedir D;
+	}
+	sort @shells;
+}
+sub first_existing {
+	my $f = ''; foreach (@_) { if (-e $_) { $f = $_; last; } }
+	return $f;
+}
+sub which { my $f;
+	foreach $d (@PATH) { $f="$d/$_[0]";  return $f if -x $f; }
+}

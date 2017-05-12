@@ -1,0 +1,13 @@
+abstract: Detect encoding of the current terminal
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: Term-Encoding
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  I18N::Langinfo: 0
+version: 0.02

@@ -1,0 +1,57 @@
+=head1 NAME
+
+Teamspeak::Telnet::Channel - Teamspeak::Server have multiple Channels.
+
+=head1 SEE ALSO
+
+L<"Teamspeak::Telnet">
+
+=head1 CLASS METHODS
+
+=head2 parameter()
+
+Returns a list with possible channel parameters.
+
+=head2 new( id => $id, parent => $cl ... )
+
+Creates a channel object.
+id, parent, order, maxusers, name, flags, password and topic will be set.
+
+=head2 id()
+
+Returns the identifier of the channel.
+
+=head2 codec()
+
+Returns the currently used Audio-Codec.
+
+=head2 parent()
+
+Returns the parent channel.
+
+=head2 order()
+
+Returns the priority value for the sorting order.
+
+=head2 maxusers()
+
+Returns the maximum allowed users at this channel.
+
+=head2 name()
+
+Returns the visible name of the channel.
+
+=head2 flags()
+
+Returns L<"Teamspeak::Flags">.
+
+=head2 password()
+
+Returns the channel password.
+
+=head2 topic()
+
+Returns the channel topic.
+
+=cut
+

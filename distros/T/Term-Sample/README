@@ -1,0 +1,55 @@
+Greetings Perlfolk,
+
+** What is this?
+
+Term::Sample (version 0.25) - Finger printing of your keyboard typing
+
+** Huh?
+
+Term::Sample implements simple typing analysis to find the "personality" 
+in your typing. It uses Timer::HiRes and Win32::Console for best results.
+If it is not run on a Win32 system, it defaults to Term::ReadKey instead 
+of Win32::Console. I'm not sure how well it works with ReadKey, as I have
+not had a chance to test it out yet. 
+
+In this module we deal with three basic items: samples, analysis', and 
+sets. Samples are what you get from the sample() function and are raw 
+keyboard data. Samples can be averaged together to produce master 
+samples, or analyzed to produce unique sample analysis'. Analysis' are 
+produced by alanlyze()-ing samples from sample() or samples averaged 
+together(). You can store samples (averaged or analyzed) and analysis' 
+in sets according to unique, user-defined keys. You can then match new 
+samples against the samples in the set and find out which key it matched 
+in the set, as well as the percentage of error.
+
+This module uses Timer::HiRes to time both the key-press time (time 
+between the key-down signal and the key-up signal) and the key-interveal 
+(time between key-up of previous key and key-down of next key). This 
+creates what I call a keyboard sample, or just a "sample." This is created 
+by a custom prompt function, sample() which returns an array ref. This is 
+the raw keyboard sample data. It can be averaged together with multiple 
+sample to create a master sample to be used as a signiture, or it can be 
+individually saved with save(). 
+
+This creates a unique 'print', or analysis from a sample, or samples 
+averaged together with analyze(). analyze() uses several factors to 
+make the unique analysis. First, it calculates average ASCII key codes, 
+as well as the average total key-press and inter-key times. Then it loops 
+through the sample and picks out the fastest key-press times and inter-key
+times, and taking a three-key average around that high-point to create a 
+sample highlight. It creats highlights from every key in the sample, 
+fastest to slowest, and then sorts the hightlights by key-press times 
+and inter-key times, storing both lists in a final "analysis" object, along 
+with the averaged times created at the start. This gives a final, 
+hopefully unique, sample analysis.
+
+As always, included is a cleaned, CSS-ed, HTML-format of the POD docs.
+
+Regards,
+
+        ~ Josiah Bryan, <jdb@wcoil.com>
+
+Latest Version:
+
+        http://www.josiah.countystart.com/modules/get.pl?term-sample:README
+

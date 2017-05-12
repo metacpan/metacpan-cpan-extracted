@@ -1,0 +1,60 @@
+0.10    2012-08-03
+
+- Fix missing prereq on MooseX::Types::Path::Class.
+
+
+0.09    2012-08-02
+
+- Added a Text::TOC::HTML->body_for_document() method. This returns the
+  contents of the HTML body without the surrounding <body> and <html> tags.
+
+- There was a bug when a document's body was retrieved before the TOC
+  document. The document would not be marked up with the anchor targets needed
+  for the TOC.
+
+
+0.08    2012-02-19
+
+- Require namespace::autoclean 0.12. Fixes RT #73640.
+
+
+0.07    2010-11-30
+
+- Fix a load order issue with the latest version of MooseX::Types.
+
+
+0.06    2010-09-04
+
+- If a document contained lower-level elements before higher-level, for
+  example an HTML doc where the first <h3> precedes the first <h2>, then the
+  TOC generation code blew up.
+
+
+0.05    2010-05-29
+
+- I explicitly removed HTML::Tidy from the list of prereqs, since as of right
+  now this module almost never seems to install cleanly, and it's just an
+  optional testing module anyway.
+
+
+0.04    2010-05-26
+
+- Previous releases were missing some prereqs. Hopefully this one fixes that.
+
+
+0.03    2010-05-25
+
+- Anchors cannot contain anything but letters, numbers, and a few punctuation
+  characters. An anchor must start with a letter. This module now generates
+  spec-compliant anchors.
+
+
+0.02    2010-05-25
+
+- Added a compilation test, because if all tests are skipped cpan testers
+  report it as a failure (which is its own wtf).
+
+
+0.01    2010-05-24
+
+- First release upon an unsuspecting world.

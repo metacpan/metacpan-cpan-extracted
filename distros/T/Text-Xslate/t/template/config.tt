@@ -1,0 +1,4 @@
+[% DEFAULT lang = 'TTerse' -%]
+[% MACRO em(s) BLOCK -%]
+<em>[% s %]</em>
+[%- END -%]

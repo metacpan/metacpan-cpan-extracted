@@ -1,0 +1,20 @@
+Revision history for Perl extension Tkx::TclTk::Bind::ImageLibrary.
+================================================================================
+
+1.0.00  Mon 17.Dez.2012 - 14:31
+        - original version; created by h2xs 1.23 with options
+        -XA -n Tkx::TclTk::Bind::ImageLibrary
+
+1.0.01  Mon 18.Dez.2012 - 15:35
+        - Revised documentation
+        - 'package_require' for all packages
+
+1.2.00  Sam 15.Jun.2013 - 21:30
+        - Revised erase routine
+
+1.300   Mon 21.Dez.2015 - 11:00
+        - Revised documentation
+        - Added Build.PL
+
+1.400   Son. 14.Feb.2016 - 16:20
+        - Module 'Perl::Modern::Perl' replace by 'Modern::PBP::Perl'

@@ -1,0 +1,26 @@
+---
+name: Text-Capitalize
+version: 1.3
+author:
+  - 'Joseph Brenner <doom@kzsu.stanford.edu>'
+abstract: capitalize strings ("to WORK AS titles" becomes "To Work as Titles")
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Data::Dumper: 0
+  Env: 1
+  FindBin: 1.04
+  PerlIO::locale: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Text::Capitalize:
+    file: lib/Text/Capitalize.pm
+    version: 1.3
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

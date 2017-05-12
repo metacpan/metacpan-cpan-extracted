@@ -1,0 +1,26 @@
+# ! /usr/local/bin/perl -w
+#
+# cmd - Another of a Tie::Cycle::Sinewave object, for which a
+#       number of parameters can be set from the command line
+#
+# This file is part of the Tie::Cycle::Sinewave perl extension
+# Copyright (c) 2005 David Landgren. All rights reservered.
+
+use strict;
+use Tie::Cycle::Sinewave;
+
+my $min = shift || 0;
+my $max = shift || 100;
+my $period = shift || 20;
+
+tie my $c, 'Tie::Cycle::Sinewave', {
+    start_max => 1,
+    min       => $min,
+    max       => $max,
+    period    => $period,
+};
+
+while( 1 ) {
+    printf "%10.2f\n";
+    select undef, undef, undef, 0.2;
+}

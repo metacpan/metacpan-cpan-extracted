@@ -1,0 +1,26 @@
+*RESOURCES
+IPCKEY          <IPCKEY>
+MODEL           SHM
+MASTER          <HOSTNAME>
+
+*MACHINES
+"<HOSTNAME>"
+                LMID="<HOSTNAME>"
+                TUXDIR="<TUXDIR>"
+                APPDIR="<APPDIR>"
+                TUXCONFIG="<TUXCONFIG>"
+                MAXWSCLIENTS=10
+
+*GROUPS
+TUXGRP          LMID=<HOSTNAME> GRPNO=1
+APPGRP          LMID=<HOSTNAME> GRPNO=2
+
+*SERVERS
+#WSL             SRVID=1 SRVGRP=TUXGRP
+#                CLOPT="-A -- -n <WSNADDR>"
+
+PERLSVR         SRVID=1 SRVGRP=APPGRP
+                CLOPT="-A --"
+
+*SERVICES
+

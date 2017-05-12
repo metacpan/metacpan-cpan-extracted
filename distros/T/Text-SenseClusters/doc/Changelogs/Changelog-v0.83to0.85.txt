@@ -1,0 +1,23 @@
+
+Changes made in Sense-Clusters version 0.83 during version 0.85
+
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+
+1. Added fourth cluster stopping measure in 
+   Toolkit/clusterstop/clusterstopping.pl - Adapted Gap Statistic.			     -Anagha
+
+2. Added test cases for clusterstopping.pl to accomodate fourth measure.		 -Anagha
+
+2. Modified discriminate.pl to handle the fourth cluster stopping measure.	     -Anagha
+
+3. Modified discriminate.pl to create output files with name filename.$CLUSTSTOP -Anagha 
+
+4. Modified web-interface to support fourth cluster stopping measure.            -Anagha
+
+5. Modified web-interface to handle newer output file names.					 -Anagha
+
+6. Updated documentation: README.SC.pod, README.Toolkit.pod, discriminate.html,
+clusterstopping.html															 -Anagha	
+
+(Changelog-v0.83to0.85 Last Updated on 04/29/2006 by Anagha)

@@ -1,0 +1,11 @@
+#! perl
+use strict;
+use warnings;
+use Test::More tests => 1;
+use Test::Synchronized;
+
+for (1...3) {
+    unlink('t/hello.txt');
+    sleep(1);
+}
+ok(1);

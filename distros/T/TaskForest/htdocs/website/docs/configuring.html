@@ -1,0 +1,35 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Configuring TaskForest</div>
+  <p>
+    There are two main parts to configuring TaskForest: configuring the
+    Family files that specify job dependencies, and setting the options
+    that determine TaskForest's behavior.  
+  </p>
+
+  <div class="new_section_header">Precedence of Different Options Sources</div>
+  <p>
+    All settings (required and optional) may be specified in a variety of
+    ways: command line, environment variable and config file. The order of
+    preferences is this: Most options have default values. Settings
+    specified in the config file override those defaults. Settings
+    specified in environment variables take override those specified in
+    the config file and the default values. Setting specified on the
+    command line override those specified in envrionment variables, and
+    those specified in the config files and the default values.
+  </p>
+
+  <p>
+    The names of the environment variable are the same as the names of the
+    settings on the command line (or in the config file), but they should
+    be in UPPER CASE, with ``TF_'' prepended. For example, the environment
+    variable name for the '<a href="/docs/configuring/options.html#run_wrapper">run_wrapper</a>' setting is 'TF_RUN_WRAPPER'.
+  </p>
+  
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

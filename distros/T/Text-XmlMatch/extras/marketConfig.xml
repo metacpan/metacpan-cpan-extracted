@@ -1,0 +1,18 @@
+<config>
+  <pattern name="MARKET-$1">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(\w+)\.</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-\w\.(aas|asd|csc|msc|mso|npa|pas|cdc|fdc|ldc|ndc|odc|pdc|sdc|clo|sun)\.</exclusion>
+    <tag>market</tag>
+  </pattern>
+
+  <pattern name="SERVICE-$1">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(aas|asd|csc|msc|mso|npa|pas)\.</inclusion>
+    <tag>market</tag>
+  </pattern>
+
+  <pattern name="RDC-$1">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(cdc|fdc|ldc|ndc|odc|pdc|sdc|clo|sun)\.</inclusion>
+    <tag>market</tag>
+  </pattern>
+
+</config>

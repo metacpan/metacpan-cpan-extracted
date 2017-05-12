@@ -1,0 +1,9 @@
+%% DEFINE copyright="(C) Copyright 1998 Andy Wardley"
+   unless=copyright
+%%
+# ======================================================================== 
+# This is the file lib/footer
+# 
+# %% copyright %%
+# ========================================================================
+

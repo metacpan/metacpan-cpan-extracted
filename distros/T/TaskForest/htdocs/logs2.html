@@ -1,0 +1,65 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<div class="title" style="display:inline;">Logs for $date</div>
+<span style="padding-left:10px;">
+    <a href="/logs.html?date=$prev_date">&lt; previous day</a>
+    &nbsp;
+    <a href="/logs.html?date=$next_date">next day &gt;</a>
+</span>
+
+<table cellspacing=0 class=status>
+  <tr>
+    <th>Family</th>
+    <th>Job</th>
+    <th>Status</th>
+    <th>Return Code</th>
+    <th>Time Zone</th>
+    <th>Start Time</th>
+    <th>Stop Time</th>
+    <th>Rerun/Mark</th>
+  </tr><aohj a=status>
+  <tr>
+    <td class="oe_$oe"><a href="/families.html/$family_name">$family_name</a></td>
+    <td class="oe_$oe"><a href="/jobs.html/$base_name">$name</a></td>
+    <td class="oe_$oe"><ifo c=has_output_file><a href="/logFile.html/$log_date/$output_file">$status</a></ifo><elseo>$status</elseo></td>
+    <td class="oe_$oe">$rc</td>
+    <td class="oe_$oe">$tz</td>
+    <td class="oe_$oe">$actual_start_dt</td>
+    <td class="oe_$oe">$stop_dt</td>
+    <td class="oe_$oe">
+      <ifs c=has_stop>
+        <form class="inline" id="rerun" method="POST" action="/request.html">
+          <input type="hidden" name="family"   value="$family_name">
+          <input type="hidden" name="job"      value="$name">
+          <input type="hidden" name="log_date" value="$log_date">
+          <select name="options">
+            <option value="">&nbsp;</option>
+            <option value="cascade">Cascade</option>
+            <option value="dependents_only">Dependents Only</option>
+          </select>
+          <input type=submit name=submit  value="Rerun">
+          <ifis c=is_success><input type=submit name=submit  value="Mark Failure"></ifis><elseis><input type=submit name=submit value="Mark Success"></elseis>
+        </form>
+      </ifs><elses></elses>
+      <ifs c=is_waiting>
+        <form class="inline" id="rerun" method="POST" action="/request.html">
+          <input type="hidden" name="family" value="$family_name">
+          <input type="hidden" name="job" value="$name">
+          <input type="hidden" name="log_date" value="$log_date">
+          <input type=submit name=submit  value="Release">
+          <input type=submit name=submit  value="Hold">
+        </form>
+      </ifs><elses></elses>
+      <ifs c=is_hold>
+        <form class="inline" id="rerun" method="POST" action="/request.html">
+          <input type="hidden" name="family" value="$family_name">
+          <input type="hidden" name="job" value="$name">
+          <input type="hidden" name="log_date" value="$log_date">
+          <input type=submit name=submit  value="Release">
+        </form>
+      </ifs><elses></elses>
+    </td>
+  </tr></aohj>
+</table>
+
+<include TaskForest::REST::PassThrough /foot.html />

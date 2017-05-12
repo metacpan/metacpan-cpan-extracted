@@ -1,0 +1,13 @@
+<%args>
+
+$testrun
+</%args>
+
+<h3>Not implemented</h3>
+If yo want to show preconditions of testrun <% $testrun->id %> use
+<a href="/tapper/testruns/<% $testrun->id %>/preconditions/yaml">this link</a>.
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+

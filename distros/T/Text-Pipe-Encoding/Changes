@@ -1,0 +1,29 @@
+Revision history for Perl extension Text-Pipe-Encoding
+
+1.101700  2010-06-19 11:06:00 Europe/Vienna
+    - converted tabs to spaces
+
+1.100950  2010-04-05 00:21:30 Europe/Vienna
+    - require MIME-Base64 3.09 since I adapted the tests from there
+
+1.100880  2010-03-29 23:32:52 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.03  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.02  Thu, 29 May 2008 12:08:48 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.02
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install()
+    - updated MANIFEST
+    - t/02_quoted_print.t: removed commented-out code
+    - updated t/perlcriticrc
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+
+0.01  Sun, 11 Nov 2007 22:18:52 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

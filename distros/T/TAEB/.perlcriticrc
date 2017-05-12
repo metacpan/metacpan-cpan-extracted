@@ -1,0 +1,3 @@
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized
+

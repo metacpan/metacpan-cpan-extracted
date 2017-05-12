@@ -1,0 +1,19 @@
+.X set epub-uuid very-unique-identifier
+.X set document-title Title
+.Pt Part1
+.Ch Chap1
+Text.
+.Ch Chap2
+Text.
+.Sh Section1
+Text.
+.Sh Section2
+Text.
+.Ss Subsection1
+Text.
+.Pt Part2
+.Ch Chap3
+Text.
+.Sx Section2
+.Sx Chap1
+.Sx Part2

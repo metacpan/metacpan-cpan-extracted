@@ -1,0 +1,40 @@
+Revision history for Test-Leaner
+
+0.05    2013-08-24 19:25 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.04 can skip this update.
+        + Doc : POD headings are now properly linkable.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+
+
+0.04    2011-08-24 13:50 UTC
+        + Fix : Correct the copyright for the fallback implementation of
+                _reftype().
+
+0.03    2011-07-18 13:20 UTC
+        + Chg : The fallback interface will croak if you try to import a symbol
+                of Test::More that is not implemented in Test::Leaner.
+        + Fix : The fallback interface should now handle the 'import' parameter
+                properly.
+        + Doc : Document that is_deeply() returns the result of the test, that
+                isnt() honors 'ne' overloading, and that isn't() is not aliased
+                to isnt().
+
+0.02    2010-12-29 17:00 UTC
+        + Add : You can fall back to use Test::More by setting the
+                PERL_TEST_LEANER_USES_TEST_MORE environment variable.
+        + Doc : Document the restrictions on the regexp argument of like() and
+                unlike().
+                Thanks Sébastien Aperghis-Tramoni for spotting this.
+        + Doc : Document that is_deeply() doesn't check for memory cycles.
+        + Fix : The plan will now correctly be printed at the end when
+                'no_plan' was specified and some tests were failing.
+        + Fix : Only print an ending plan once when the process is forked.
+        + Opt : is_deeply() was optimized for large datastructures.
+        + Rem : Scalar::Util is no longer an hard dependency. It will be used
+                if it is present, but a fallback implementation is bundled.
+
+0.01    2010-12-28 17:00 UTC
+        First version, released on an unsuspecting world.
+

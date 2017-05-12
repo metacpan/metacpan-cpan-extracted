@@ -1,0 +1,49 @@
+Tk-Image-Cut version 0.04
+=========================
+
+ Perl extension for a graphic user interface to cut pictures.
+ The module is a mixed widget from Buttons, Labels, BrowseEntry, Entrys and Canvas widgets.
+ I hope the graphic user interface is simple enough to be understood without great declarations.
+ It can be used as an independent application or just like how any other widget. 
+ Try out the test.pl program.You can select between three cutting forms.
+ "Rectangle", "Oval" or "Circle"
+ In order to cut out pictures in circular form or ovally click
+ with the mouse onto the upper left corner and hold the
+ Button pressed while the mouse is moved.
+
+ You can use all standard widget options.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Tk
+ Tk::Frame
+ Tk::JPEG
+ Tk::PNG
+ Tk::FileSelect
+ Tk::Image::Calculation
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Torsten Knorr
+create-soft@tiscali.de
+http://www.planet-interkom.de/t.knorr/index.html
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.9.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+
+

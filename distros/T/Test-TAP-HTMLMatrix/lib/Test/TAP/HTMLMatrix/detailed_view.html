@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" lang = "en" xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title petal:content="page/title">TAP Matrix</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link petal:omit-tag="page/has_inline_css" rel="stylesheet" petal:attr="href page/css_uri" type="text/css" />
+		<style petal:condition="true:page/has_inline_css" petal:content="structure page/inline_css" type="text/css" />
+		<script petal:condition="true:page/has_javascript" type="text/javascript">
+<!--
+
+var DOM = {};
+
+
+DOM.Display = function () {
+    this.register = {};
+}
+
+DOM.Display.prototype = {
+    register: {},
+
+    hideElement: function (id) {
+        this.registerElement(id);
+        var elem = document.getElementById(id);
+        if (elem == undefined) return null;
+        if (elem.style.display == "none") return null;
+        elem.style.display = "none";
+    },
+
+    showElement: function (id) {
+        this.registerElement(id);
+        var elem = document.getElementById(id);
+        if (elem == undefined) return null;
+        if (elem == undefined) return null;
+        if (elem.style.display == "table-row-group") return null;
+        elem.style.display = "table-row-group";
+    },
+
+    showOnlyElement: function (id) {
+        this.registerElement(id);
+        for (element in this.register)
+            if (element != id)
+              this.hideElement(element);
+        this.showElement(id);
+    },
+
+    registerElement: function (id) {
+        this.register[id] = 1;
+	}
+};
+
+var toggles;
+
+function initToggle (id) {
+	if (!toggles) {
+		toggles = new Array;
+	}
+
+	if (!toggles[id]) {
+		var toggle = toggles[id] = new DOM.Display()
+		toggle.registerElement('collapsed_' + id);
+		toggle.registerElement('expanded_' + id);
+	}
+}
+
+function collapse (id) {
+	initToggle(id);
+	toggles[id].showOnlyElement('collapsed_' + id)
+}
+
+function expand (id) {
+	initToggle(id);
+	toggles[id].showOnlyElement('expanded_' + id)
+}
+
+// -->
+		</script>
+	</head>
+	<body>
+
+		<pre petal:content="page/title" />
+
+		<pre petal:condition="page/extra" petal:content="page/extra" />
+		
+		<table id="matrix" petal:attr="summary page/model/summary">
+			<thead>
+				<tr>
+					<th class="r" petal:attr="colspan if: true:page/has_javascript then: string:3 else: string:2">Test file</th>
+					<th class="r">Test cases</th>
+					<th class="r">%</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<td class="r" petal:attr="colspan if: true:page/has_javascript then: string:2 else: string:1">TOTAL</td>
+					<td class="r">
+						<span petal:replace="page/model/test_files">f</span> files
+					</td>
+					<td class="r" petal:contents="page/model/summary" />
+					<td class="x sum" petal:attr="style page/model/color_css" petal:content="page/model/total_percentage">100%</td>
+				</tr>
+			</tfoot>
+			<div petal:omit-tag="string:1" petal:repeat="ctest page/tests">
+				<tbody petal:condition="or: true:ctest/consistent true:page/has_javascript" petal:attr="class if: ctest/consistent then: string:collapsed_normal else: string:collapsed_diff; id string:collapsed_$repeat/index">
+					<tr petal:define="test ctest/first_file">
+						<td class="min" petal:condition="true:page/has_javascript"><a petal:condition="true:ctest/multiple_files" petal:attr="href string:javascript:expand(${repeat/index})">[+]</a></td>
+						<td><a petal:attr="href test/link" petal:content="test/name">foo</a></td>
+						<td class="ok" petal:content="test/str_status">OK</td>
+						<td>
+							<table petal:repeat="case_row test/case_rows" width="100%" summary="subtests">
+								<tr>
+									<td petal:repeat="case case_row/cases" petal:attr="class case/css_class">
+										<a petal:attr="href case/link; title case/popup" petal:content="structure string:&amp;#160\;" />
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td class="x sum" petal:attr="style ctest/color_css" petal:content="ctest/percentage">100%</td>
+					</tr>
+				</tbody>
+				<tbody petal:condition="or: false:ctest/consistent and: true:page/has_javascript true:ctest/multiple_files" petal:attr="class if: ctest/consistent then: string:expanded_normal else: string:expanded_diff; ; id string:expanded_$repeat/index">
+					<tr petal:define="test ctest/first_file">
+						<td class="min" petal:condition="true:page/has_javascript" petal:attr="rowspan ctest/subfile_count_plus_one"><a petal:attr="href string:javascript:collapse(${repeat/index})">[-]</a></td>
+						<td><a petal:attr="href test/link" petal:content="test/name">foo</a></td>
+						<td />
+							<td class="misc_text"><table><tr><td><span class="exp" petal:content="structure string:&amp;#160\;" /></td><td>... expanded view:</td></tr></table></td>
+						<td class="x sum" petal:attr="style ctest/color_css" petal:content="ctest/percentage">100%</td>
+					</tr>
+					<tr petal:repeat="test ctest/subfiles_ref">
+						<td class="model_desc" petal:content="test/desc_string" />
+						<td class="ok" petal:content="test/str_status">OK</td>
+						<td>
+							<table petal:repeat="case_row test/case_rows" width="100%" summary="subtests">
+								<tr>
+									<td petal:repeat="case case_row/cases" petal:attr="class case/css_class">
+										<a petal:attr="href case/link; title case/popup" petal:content="structure string:&amp;#160\;" />
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td class="x sum" petal:attr="style test/color_css" petal:content="test/percentage">100%</td>
+					</tr>
+				</tbody>
+			</div>
+		</table>
+		
+	</body>
+</html>

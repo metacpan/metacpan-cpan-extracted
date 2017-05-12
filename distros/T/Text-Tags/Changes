@@ -1,0 +1,12 @@
+Revision history for Text-Tags
+
+0.02   Thu Aug 18 21:55:34 EDT 2005
+
+* Allow commas as separators.
+
+* Disallow any tag containing both double and single quotes -- the old rule
+  was far too complex.
+
+0.01  Tue Jun 21 18:07:54 2005
+       Initial release.
+

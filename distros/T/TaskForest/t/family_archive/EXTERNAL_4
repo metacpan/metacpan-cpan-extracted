@@ -1,0 +1,12 @@
+start => '00:00', tz => 'Europe/London', calendar => 'Daily'
+
+J2()
+J3() J4()
+---
+
+J4()
+J5() J6()
+J1()
+
+
+ 

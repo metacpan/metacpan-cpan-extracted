@@ -1,0 +1,155 @@
+#!/usr/bin/env perl
+
+use Text::NumericData::App::txdfromtcad;
+
+my $app = Text::NumericData::App::txdfromtcad->new();
+exit $app->run();
+
+__END__
+
+=head1 NAME
+
+txdfromtcad - Hacky tool to convert DF-ISE xyplot data to usual text data. Filters STDIN to STDOUT. The parser is not very smart, it is modelled exactly after the format that TCAD produces.
+
+=head1 PARAMETERS
+
+These are the general rules for specifying parameters to this program:
+
+	txdfromtcad -s -xyz -s=value --long --long=value [--] [files/stuff]
+
+You mention the parameters/switches you want to change in any order or even multiple times (they are processed in the oder given, later operations overriding/extending earlier settings.
+An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
+Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
+
+There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation:
+	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
+
+
+The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
+
+=over 2
+
+=item B<black> (scalar)
+
+	0
+
+ignore whitespace at beginning and end of line (disables strict mode) (from Text::NumericData)
+
+=item B<comchar> (scalar)
+
+	undef
+
+comment character (if not set, deduce from data or use #) (from Text::NumericData)
+
+=item B<comregex> (scalar)
+
+	'[#%]*[^\\S\\015\\012]*'
+
+regex for matching comments (from Text::NumericData)
+
+=item B<config>, B<I> (array)
+
+	[]
+
+Which configfile(s) to use (overriding automatic search in likely paths);
+special: just -I or --config causes printing a current config file to STDOUT
+
+=item B<empty> (scalar)
+
+	0
+
+treat empty lines as empty data sets, preserving them in output (from Text::NumericData)
+
+=item B<fill> (scalar)
+
+	undef
+
+fill value for undefined data (from Text::NumericData)
+
+=item B<help>, B<h> (scalar)
+
+	0
+
+show the help message; 1: normal help, >1: more help; "par": help for paramter "par" only
+
+
+Additional fun with negative values, optionally followed by comma-separated list of parameter names:
+-1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
+
+=item B<lineend> (scalar)
+
+	undef
+
+line ending to use: (DOS, MAC, UNIX or be explicit if you can, taken from data if undefined, finally resorting to UNIX) (from Text::NumericData)
+
+=item B<numformat>, B<N> (array)
+
+	[]
+
+printf formats to use (if there is no "%" present at all, one will be prepended) (from Text::NumericData)
+
+=item B<numregex> (scalar)
+
+	'[\\+\\-]?\\d*\\.?\\d*[eE]?\\+?\\-?\\d*'
+
+regex for matching numbers (from Text::NumericData)
+
+=item B<outsep> (scalar)
+
+	undef
+
+use this separator for output (leave undefined to use input separator, fallback to TAB) (from Text::NumericData)
+
+=item B<quote> (scalar)
+
+	undef
+
+quote titles (from Text::NumericData)
+
+=item B<quotechar> (scalar)
+
+	undef
+
+quote character to use (derived from input or ") (from Text::NumericData)
+
+=item B<separator> (scalar)
+
+	undef
+
+use this separator for input (otherwise deduce from data; TAB is another way to say "tabulator", fallback is	) (from Text::NumericData)
+
+=item B<strict>, B<S> (scalar)
+
+	0
+
+strictly split data lines at configured separator (otherwise more fuzzy logic is involved) (from Text::NumericData)
+
+=item B<text>, B<T> (scalar)
+
+	1
+
+allow text as data (not first column) (from Text::NumericData)
+
+=item B<title>, B<t> (scalar)
+
+	'some TCAD data'
+
+Provide a title for the data set.
+
+=item B<version> (scalar)
+
+	0
+
+print out the program version
+
+=back
+
+=head1 AUTHOR
+
+Thomas Orgis <thomas@orgis.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2005-2016 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+
+=cut

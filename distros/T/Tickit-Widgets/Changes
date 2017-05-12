@@ -1,0 +1,180 @@
+Revision history for Tickit-Widgets
+
+0.27    2017/03/17 18:50:40
+        [BUGFIXES]
+         * Ensure ContainerWidget can handle windowless children
+         * Remember to actually close child windows from empty-sized children
+           in LinearBoxes
+         * Avoid complaints about mouse wheel direction names not being
+           numeric in linear Split (RT119857)
+
+0.26    2017/02/15 15:03:58
+        [BUGFIXES]
+         * ContainerWidget should ->close dropped child windows when it loses
+           its own (WINDOW_XS branch)
+
+0.25    2017/02/04 14:54:12
+        [CHANGES]
+         * Minor edits to unit tests to pass on Tickit post-0.61
+           (WINDOW_XS branch)
+
+0.24    2016/08/08 13:43:01
+        [CHANGES]
+         * Tickit 0.57 deprecations:
+            + Use $win->bind_event instead of $win->set_on_*
+
+        [BUGFIXES]
+         * Ensure that Tickit::Widget::Box can cope with removing its child or
+           window
+         * Ensure that construction-time child proportion works on
+           Tickit::Widget::Box
+
+0.23    2016/05/10 17:51:02
+        [CHANGES]
+         * Prepare for Tickit 0.56 deprecations:
+            + No more pen observers
+            + Have Tickit::Widget->pen return an immutable pen
+
+0.22    2016/02/09 23:40:28
+        [CHANGES]
+         * Ensure that a GridBox can be incrementally built both row- and
+           column-wise
+         * Since Tickit 0.39 it's not been necessary to set
+           $win->expose_after_scroll
+
+0.21    2015/07/14 13:43:29
+        [CHANGES]
+         * Avoid dependency on List::MoreUtils
+         * Imported remaining Widget-related demos and examples from Tickit
+           dist
+         * Tickit 0.54 deprecations:
+            + Kill WIDGET_PEN_FROM_STYLE
+            + Warn on mutation of Widget pen
+
+0.20    2015/03/27 19:21:10
+        [CHANGES]
+         * Imported the entire Tickit::Widget base class and related modules
+           from the Tickit distribution
+         * Document the $button->click mtehod
+         * Added examples for HBox / VBox
+
+0.19    2014/08/26 18:12:01
+        [CHANGES]
+         * Added Tickit::Widget::Fill
+
+0.18    2014/08/16 21:17:51
+        [BUGFIXES]
+         * Cope with differing Tickit::Widget::Frame linestyles per border
+           when passed at construction time
+
+0.17    2014/08/14 18:12:50
+        [CHANGES]
+         * Capture Tickit::Widget::HBox and ::VBox from main Tickit dist
+         * Added editing methods to Tickit::Widget::GridBox:
+            + insert/append/delete row/column
+            + get cell/row/column
+
+0.16    2014/04/12 04:10:47
+        [CHANGES]
+         * Update Tickit::Widget::Entry to avoid direct Window drawing
+           operations; use ->expose calls to request re-rendering
+         * Prepare for Tickit 0.45's removal of INSERTCH/DELETECH from
+           is_termlog() logging
+
+        [BUGFIXES]
+         * Correct display of Entry widget's posttext marker when deleting
+           text before it
+
+0.15    2014/04/01 20:37:30
+        [BUGFIXES]
+         * Remove child widget from GridBox before exposing cleared area
+
+0.14    2013/11/09 13:53:58
+        [CHANGES]
+         * Use the new child widget "requested size" API from Tickit 0.40 in
+           containers
+
+        [BUGFIXES]
+         * Remember to re-expose window area of a removed GridBox child
+
+0.13    2013/09/28 15:01:32
+        [CHANGES]
+         * Added 'on_toggle' to CheckButton (RT88954)
+         * Added 'on_activate' to RadioButton and 'on_changed' to
+           RadioButton::Group (RT88954)
+         * Added 'linetype' style to Button, and allow borderless
+           Buttons (RT88953)
+
+        [BUGFIXES]
+         * Don't try to create zero-sized rows or columns in GridBox
+         * Ensure that VSplit/HSplit correctly obeys the ContainerWidget
+           interface - call ->add and ->remove
+
+0.12    CHANGES:
+         * Initial attempt at Tickit::Widget::Spinner
+         * Fix SYNOPSIS in CheckButton (RT88294)
+
+0.11    CHANGES:
+         * Use Tickit dragging events to better handle mouse click/release on
+           Button
+         * Use Tickit::RenderBuffer to render Frame
+         * Allow differing or absent line styles per Frame edge
+         * Allow GridBox to be initialised by child widgets given in a 2D
+           array
+
+        BUGFIXES:
+         * Bugfix for scrollrect ICH/DCH fix
+
+0.10    CHANGES:
+         * Implement key actions in Button, CheckButton, RadioButton
+         * Neater visual style for Button; indicate focus vs. active
+         * Visually flash Button on activation by keypress
+         * Update to use Tickit 0.35's ->render_to_rb
+
+        BUGFIXES
+         * Ensure that Entry doesn't consume keypresses unless it is focused
+
+0.09    CHANGES:
+         * Added optional title to Placegrid
+         * Avoid infinite CPU spin in Entry
+         * Handle Tickit 0.34 focus behaviours
+         * Improved Button behaviour and style information
+         * Updated all to use RenderBuffer instead of RenderContext
+
+0.08    CHANGES:
+         * Added Tickit::Widget::Placegrid
+         * Fix floating-point rounding bug in HSplit/VSplit
+         * Better HSplit/VSplit behavior on resize
+
+0.07    CHANGES:
+         * Added Tickit::Widget::HSplit and Tickit::Widget::VSplit
+         * Use new style_reshape_keys from Tickit::Style 0.32
+         * Take GridBox's spacing from style
+         * Use Tickit::RenderContext in most widgets
+
+0.06    CHANGES:
+         * Use new WIDGET_PEN_FROM_STYLE from Tickit 0.30
+         * Update widgets to use more Tickit::Style behaviour
+         * Renamed Tickit::Widget::Frame's "style" attribute to "linetype"
+
+0.05    CHANGES:
+         * Added Tickit::Widget::RadioButton
+         * Added Tickit::Widget::CheckButton
+         * Neater SYNOPSIS examples
+         * Set dist_abstract to more accurately reflect the distribution as a
+           whole
+
+0.04    CHANGES:
+         * Added Tickit::Widget::GridBox
+
+0.03    CHANGES:
+         * Added Tickit::Widget::Frame (copy from Tickit dist)
+         * Added Tickit::Widget::Border (copy of Tickit::Widget::Box in
+           Tickit dist)
+
+0.02    CHANGES:
+         * Added Tickit::Widget::Button
+         * Document Tickit::Widget::Entry constructor arguments
+
+0.01    First version, released on an unsuspecting world.
+

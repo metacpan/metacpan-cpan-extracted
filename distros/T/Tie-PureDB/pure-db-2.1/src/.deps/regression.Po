@@ -1,0 +1,232 @@
+regression.o: regression.c ../config.h puredb_p.h /usr/include/stdio.h \
+  /usr/include/_ansi.h /usr/include/newlib.h /usr/include/sys/config.h \
+  /usr/include/machine/ieeefp.h \
+  /usr/lib/gcc-lib/i686-pc-cygwin/3.2/include/stddef.h \
+  /usr/lib/gcc-lib/i686-pc-cygwin/3.2/include/stdarg.h \
+  /usr/include/sys/reent.h /usr/include/sys/_types.h \
+  /usr/include/sys/types.h /usr/include/machine/types.h \
+  /usr/include/sys/features.h /usr/include/cygwin/types.h \
+  /usr/include/sys/sysmacros.h /usr/include/sys/stdio.h \
+  /usr/include/stdlib.h /usr/include/machine/stdlib.h \
+  /usr/include/alloca.h /usr/include/string.h \
+  /usr/lib/gcc-lib/i686-pc-cygwin/3.2/include/limits.h \
+  /usr/lib/gcc-lib/i686-pc-cygwin/3.2/include/syslimits.h \
+  /usr/include/limits.h /usr/include/errno.h /usr/include/sys/errno.h \
+  /usr/include/unistd.h /usr/include/sys/unistd.h /usr/include/getopt.h \
+  /usr/include/sys/stat.h /usr/include/time.h /usr/include/machine/time.h \
+  /usr/include/cygwin/stat.h /usr/include/fcntl.h \
+  /usr/include/sys/fcntl.h /usr/include/sys/ioctl.h \
+  /usr/include/sys/cdefs.h /usr/include/netinet/in_systm.h \
+  /usr/include/cygwin/in_systm.h /usr/include/netinet/in.h \
+  /usr/include/cygwin/in.h /usr/include/asm/byteorder.h \
+  /usr/include/w32api/windows.h /usr/include/w32api/windef.h \
+  /usr/include/w32api/winnt.h /usr/include/w32api/winerror.h \
+  /usr/include/w32api/basetsd.h /usr/include/w32api/wincon.h \
+  /usr/include/w32api/winbase.h /usr/include/w32api/wingdi.h \
+  /usr/include/w32api/winuser.h /usr/include/w32api/winnls.h \
+  /usr/include/w32api/winver.h /usr/include/w32api/winnetwk.h \
+  /usr/include/w32api/winreg.h /usr/include/w32api/winsvc.h \
+  /usr/include/w32api/cderr.h /usr/include/w32api/dde.h \
+  /usr/include/w32api/ddeml.h /usr/include/w32api/dlgs.h \
+  /usr/include/w32api/imm.h /usr/include/w32api/lzexpand.h \
+  /usr/include/w32api/mmsystem.h /usr/include/w32api/nb30.h \
+  /usr/include/w32api/rpc.h /usr/include/w32api/rpcdce.h \
+  /usr/include/w32api/basetyps.h /usr/include/w32api/rpcdcep.h \
+  /usr/include/w32api/rpcnsi.h /usr/include/w32api/rpcnterr.h \
+  /usr/include/w32api/shellapi.h /usr/include/w32api/pshpack2.h \
+  /usr/include/w32api/poppack.h /usr/include/w32api/winperf.h \
+  /usr/include/w32api/commdlg.h /usr/include/w32api/winspool.h \
+  /usr/include/w32api/ole2.h /usr/include/w32api/objbase.h \
+  /usr/include/w32api/rpcndr.h /usr/include/w32api/rpcnsip.h \
+  /usr/include/w32api/objfwd.h /usr/include/w32api/wtypes.h \
+  /usr/include/w32api/unknwn.h /usr/include/w32api/objidl.h \
+  /usr/include/w32api/cguid.h /usr/include/w32api/olectlid.h \
+  /usr/include/w32api/oleauto.h /usr/include/w32api/oaidl.h \
+  /usr/include/w32api/oleidl.h /usr/include/io.h /usr/include/sys/param.h \
+  puredb_read.h puredb_write.h
+
+../config.h:
+
+puredb_p.h:
+
+/usr/include/stdio.h:
+
+/usr/include/_ansi.h:
+
+/usr/include/newlib.h:
+
+/usr/include/sys/config.h:
+
+/usr/include/machine/ieeefp.h:
+
+/usr/lib/gcc-lib/i686-pc-cygwin/3.2/include/stddef.h:
+
+/usr/lib/gcc-lib/i686-pc-cygwin/3.2/include/stdarg.h:
+
+/usr/include/sys/reent.h:
+
+/usr/include/sys/_types.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/machine/types.h:
+
+/usr/include/sys/features.h:
+
+/usr/include/cygwin/types.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/sys/stdio.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/machine/stdlib.h:
+
+/usr/include/alloca.h:
+
+/usr/include/string.h:
+
+/usr/lib/gcc-lib/i686-pc-cygwin/3.2/include/limits.h:
+
+/usr/lib/gcc-lib/i686-pc-cygwin/3.2/include/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/errno.h:
+
+/usr/include/sys/errno.h:
+
+/usr/include/unistd.h:
+
+/usr/include/sys/unistd.h:
+
+/usr/include/getopt.h:
+
+/usr/include/sys/stat.h:
+
+/usr/include/time.h:
+
+/usr/include/machine/time.h:
+
+/usr/include/cygwin/stat.h:
+
+/usr/include/fcntl.h:
+
+/usr/include/sys/fcntl.h:
+
+/usr/include/sys/ioctl.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/netinet/in_systm.h:
+
+/usr/include/cygwin/in_systm.h:
+
+/usr/include/netinet/in.h:
+
+/usr/include/cygwin/in.h:
+
+/usr/include/asm/byteorder.h:
+
+/usr/include/w32api/windows.h:
+
+/usr/include/w32api/windef.h:
+
+/usr/include/w32api/winnt.h:
+
+/usr/include/w32api/winerror.h:
+
+/usr/include/w32api/basetsd.h:
+
+/usr/include/w32api/wincon.h:
+
+/usr/include/w32api/winbase.h:
+
+/usr/include/w32api/wingdi.h:
+
+/usr/include/w32api/winuser.h:
+
+/usr/include/w32api/winnls.h:
+
+/usr/include/w32api/winver.h:
+
+/usr/include/w32api/winnetwk.h:
+
+/usr/include/w32api/winreg.h:
+
+/usr/include/w32api/winsvc.h:
+
+/usr/include/w32api/cderr.h:
+
+/usr/include/w32api/dde.h:
+
+/usr/include/w32api/ddeml.h:
+
+/usr/include/w32api/dlgs.h:
+
+/usr/include/w32api/imm.h:
+
+/usr/include/w32api/lzexpand.h:
+
+/usr/include/w32api/mmsystem.h:
+
+/usr/include/w32api/nb30.h:
+
+/usr/include/w32api/rpc.h:
+
+/usr/include/w32api/rpcdce.h:
+
+/usr/include/w32api/basetyps.h:
+
+/usr/include/w32api/rpcdcep.h:
+
+/usr/include/w32api/rpcnsi.h:
+
+/usr/include/w32api/rpcnterr.h:
+
+/usr/include/w32api/shellapi.h:
+
+/usr/include/w32api/pshpack2.h:
+
+/usr/include/w32api/poppack.h:
+
+/usr/include/w32api/winperf.h:
+
+/usr/include/w32api/commdlg.h:
+
+/usr/include/w32api/winspool.h:
+
+/usr/include/w32api/ole2.h:
+
+/usr/include/w32api/objbase.h:
+
+/usr/include/w32api/rpcndr.h:
+
+/usr/include/w32api/rpcnsip.h:
+
+/usr/include/w32api/objfwd.h:
+
+/usr/include/w32api/wtypes.h:
+
+/usr/include/w32api/unknwn.h:
+
+/usr/include/w32api/objidl.h:
+
+/usr/include/w32api/cguid.h:
+
+/usr/include/w32api/olectlid.h:
+
+/usr/include/w32api/oleauto.h:
+
+/usr/include/w32api/oaidl.h:
+
+/usr/include/w32api/oleidl.h:
+
+/usr/include/io.h:
+
+/usr/include/sys/param.h:
+
+puredb_read.h:
+
+puredb_write.h:

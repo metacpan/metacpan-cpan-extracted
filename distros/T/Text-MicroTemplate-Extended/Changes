@@ -1,0 +1,83 @@
+Revision history for Perl extension Text::MicroTemplate::Extended
+
+0.17 2012-08-16T18:31:31+09:00
+     - fix line number in error again (cho45++)
+
+0.16 2012-06-30T10:37:37+09:00
+     - remove unused module use line from new test case added previous version.
+
+0.15 2012-06-29T10:34:16+09:00
+     - fix runtime error handling
+
+0.14 2012-06-28T11:23:17+09:00
+     - fix line number in warnings too
+
+0.13 2012-06-28T01:12:10+09:00
+     - fix line number in error
+     - fix error handling on blocks
+
+0.12 2010-09-27T17:29:24+09:00
+     - depends latest Text::MicroTemplate (tokuhirom++)
+     - use 'use_test_base' function instead of depending it (tokuhirom++)
+
+0.11 2010-07-01T12:26:35+09:00
+     - fixed a bug render_context doen't clear when template processtime error occured.
+       (Reported by shin1rosei)
+
+0.10 2010-06-02T16:17:21+09:00
+     - fix wrong template syntax at examples in docs (gfx++)
+     - added executable example for template inheritance (gfx++)
+     - depends latest Text::MicroTemplate (kazuho++)
+
+0.09 2009-12-08T11:00:11+09:00
+     - support <?= super() ?> variable for get parent block content
+
+0.08 2009-12-06T12:46:59+09:00
+     - provide _MTEREF variable for filter method. (tokuhirom++)
+
+0.07 2009-12-03T14:35:59+09:00
+     - fix pod syntax (Reported by tokuhirom, and RT #51858)
+
+0.06 2009-11-06T11:29:30+09:00
+     - fix a bug that it's impossible to override file extension to ''
+
+0.05 2009-08-13T00:55:23+09:00
+     - added include method and macro.
+
+0.04 2009-08-03T12:29:02+09:00
+     - depends Text::MicroTemplate 0.07
+       now 'render' method returns Text::MicroTemplate::EncodedString object.
+
+0.03002 2009-07-25T15:23:59+09:00
+     - fixed wrong line number at template error messages
+
+0.03001 2009-07-24T19:16:11+09:00
+     - fixed a bug cause an error when block is empty string like:
+       <? block content => '' ?>
+
+0.03 2009-07-24T19:05:00+09:00
+     - added multiple block definition support
+
+0.02002 2009-07-18T11:37:23+09:00
+     - several document fixes
+
+0.02001 2009-07-16T18:50:24+09:00
+     - hide redefine warnings
+     - fixes pod syntaxs
+
+0.02 2009-07-13T18:11:31+09:00
+     - added macro feature
+     - re-implement template inheritance eval-less
+
+0.01003 2009-07-10T16:04:53+09:00
+     - fixed missing cache tests from previous version
+
+0.01002 2009-07-09T21:04:18+09:00
+     - fixed a bug multi-time execution block code in template inheritence (Taiyoh Tanaka)
+     - fixed blocks bug connot use multi ? syntax without newline between these ? line.
+
+0.01001 2009-06-29T16:12:13+09:00
+     - added coderef support to template_args
+
+0.01 2009-06-29T15:31:52+09:00
+     - original version

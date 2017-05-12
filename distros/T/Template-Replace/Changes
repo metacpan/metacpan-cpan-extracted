@@ -1,0 +1,6 @@
+Revision history for Template-Replace
+
+0.04    2012-01-08, caugustin.de
+	First useful and mostly feature complete version for the CPAN.
+        A long way to go from here (mostly documentation and tests,
+        but some problems and 'nice to have' remaining) ...

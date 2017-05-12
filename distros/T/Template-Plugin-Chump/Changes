@@ -1,0 +1,32 @@
+Revision history for Perl extension Template::Plugin::Chump.
+
+2008-03-25 Fix Makefile
+    Bring up to date
+
+2003-10-07 Some minor fixing
+	To fix a minor snafu with Template::Plugin::ShellQuote
+	
+
+2003-06-25 More docs, a new option
+
+	Improved the docs. Added something so that you can
+	pass in an already formed Text::Chump object.
+
+
+2003-03-10 Added install and type handlers
+
+	Fixed that pesky, not being able to install handlers
+	thing. Stupid me. needed to pass a code ref that 
+	returned a coderef. Doh.		
+
+
+
+2003-03-09 Initial Release
+
+	A lo, there was rejoicing.
+
+	Does pretty much all the functionality from Text::Chump 
+	except for allowing you to install new handlers or types.
+
+
+	

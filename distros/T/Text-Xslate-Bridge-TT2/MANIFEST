@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Text/Xslate/Bridge/TT2.pm
+t/000_load.t
+t/001_methods.t
+t/002_filters.t
+xt/02_pod.t
+xt/03_pod-coverage.t
+xt/04_synopsis.t
+META.yml
+MANIFEST

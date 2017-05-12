@@ -1,0 +1,110 @@
+t/00-tapper-meta.t ...................
+1..1
+ok 1 - tapper-test-meta
+# Tapper-reportgroup-arbitrary:   29365
+# Tapper-reportgroup-testrun:     478
+# Tapper-Suite-Name:              Tapper
+# Tapper-Suite-Version:           2.010004
+# Tapper-Suite-Type:              software
+# Tapper-Machine-Name:            bascha
+# Tapper-Language-Description:    Perl 5.010000, /2home/ss5/perl510/bin/perl
+# Tapper-uname:                   Linux bascha 2.6.24-18-generic #1 SMP Wed May 28 19:28:38 UTC 2008 x86_64 GNU/Linux
+# Tapper-osname:                  Ubuntu 8.04
+# Tapper-cpuinfo:                 2 cores [AMD Athlon(tm) 64 X2 Dual Core Processor 6000+]
+# Tapper-ram:                     1887MB
+# Tapper-starttime-test-program:  Fri Jun 13 11:16:35 CEST 2008
+ok
+t/00-load.t ...........................
+1..12
+ok 1 - use Tapper;
+ok 2 - use Tapper::Db::Handling;
+ok 3 - use Tapper::Installer::Client;
+ok 4 - use Tapper::Installer::Server;
+ok 5 - use Tapper::MCP;
+ok 6 - use Tapper::MCP::Builder;
+ok 7 - use Tapper::MCP::RunloopDaemon;
+ok 8 - use Tapper::MCP::Runtest;
+ok 9 - use Tapper::MCP::XMLRPC;
+ok 10 - use Tapper::PRC::PRC;
+ok 11 - use Tapper::Schema;
+Subroutine initialize redefined at /2home/ss5/perl510/lib/site_perl/5.10.0/Class/C3.pm line 70.
+Subroutine uninitialize redefined at /2home/ss5/perl510/lib/site_perl/5.10.0/Class/C3.pm line 88.
+Subroutine reinitialize redefined at /2home/ss5/perl510/lib/site_perl/5.10.0/Class/C3.pm line 101.
+ok 12 - use Tapper::Schema::TestsDB;
+# Testing Tapper 2.010004, Perl 5.010000, /2home/ss5/perl510/bin/perl
+ok
+t/tapper_logging_netlogappender.t ....
+1..5
+ok 1 - use Tapper::Logging::NetLogAppender;
+ok 2 # SKIP Please fix me!
+ok 3 # SKIP Please fix me!
+ok 4 # SKIP Please fix me!
+ok 5 # SKIP Please fix me!
+ok
+t/tapper_mcp_builder.t ...............
+1..1
+ok 1 - use Tapper::MCP::Builder;
+ok
+t/tapper_mcp_runtest.t ...............
+1..1
+ok 1 - use Tapper::MCP::Runtest;
+ok
+t/tapper_model.t .....................
+1..1
+ok 1 - version count
+ok
+t/tapper_systeminstaller.t ...........
+1..9
+ok 1 - use Tapper::Installer::Client;
+ok 2 - gethostname by host
+ok 3 # SKIP mocking still failes
+ok 4 # SKIP mocking still failes
+ok 5 # SKIP mocking still failes
+ok 6 - Detected ISO correctly.
+ok 7 - Detected tar.gz correctly.
+ok 8 - Detected tgz correctly.
+ok 9 - Detected tar correctly.
+ok
+t/tapper.t ...........................
+1..7
+ok 1 - Subconfig during tests
+not ok 2 - mcp host # TODO original config values need to be transferred here
+
+#   Failed (TODO) test 'mcp host'
+#   at t/tapper.t line 15.
+#          got: undef
+#     expected: '165.204.85.37'
+not ok 3 - mcp host during live # TODO original config values need to be transferred here
+
+#   Failed (TODO) test 'mcp host during live'
+#   at t/tapper.t line 19.
+#          got: undef
+#     expected: '165.204.85.71'
+ok 4 - Subconfig during live environment
+ok 5 - TAPPER_LIVE set back
+ok 6 - Subconfig during development
+ok 7 - HARNESS_ACTIVE set back
+ok
+t/boilerplate.t .......................
+1..3
+ok 1 - README contains no boilerplate text
+ok 2 - Changes contains no boilerplate text
+ok 3 - lib/Tapper.pm contains no boilerplate text
+ok
+t/experiments.t .......................
+1..2
+ok 1
+ok 2
+Bummer 1
+Bummer 2
+Bummer 3
+satz: Ein affe$1 kommt selten allein.
+Bummer 1
+Bummer 2
+Bummer 3
+satz: Ein affe$1 kommt selten allein.
+satz2: Ein affeer kommt selten allein.
+ok
+All tests successful.
+Files=10, Tests=42,  2 wallclock secs ( 0.06 usr  0.01 sys +  1.78 cusr  0.16 csys =  2.01 CPU)
+Result: PASS

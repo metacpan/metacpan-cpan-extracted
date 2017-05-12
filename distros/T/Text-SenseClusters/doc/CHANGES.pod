@@ -1,0 +1,297 @@
+=head1 NAME
+
+CHANGES - Revision history of SenseClusters
+
+=head1 DESCRIPTION
+
+=over
+
+=item 1.05
+
+Released October 3, 2015 (changes by TDP)
+
+=over
+
+=item
+
+removed defined (@array) since now deprecated by Perl
+
+=back
+
+=item 1.03
+
+Released June 29, 2013 (changes by TDP and AMJ)
+
+=over 
+
+=item 
+
+Modify install.sh to default to Linux-x86_64 for Cluto installation (TDP)
+
+=item
+
+Removed various instances of if (defined %hash) in preprocess/sval2 in favor of if (%hash) - defined %hash is now deprecated - however left that in keyconvert.pl as removed caused syntax issue that should be checked out further (TDP)
+
+=item
+
+Fixed Testing/ALL-TESTS.sh to run all test cases by enumerating in for loop - previous method of using wild card did not seem to be running all cases (TDP)
+
+=item
+
+Fixed some test cases for clusterstopping in Testing - note that we still have Sun test cases included although no Sun platform to test on. Should keep those though as cluto still comes with a Sun version (TDP)
+
+=item
+  
+Added the flag "ngram" for clusterlabeling.pl. It will allow user to provide the value for ngram. The features selection while creating the labels of cluster will be based on this parameter. (AMJ)
+	 
+=item	    	
+
+Added --label_ngram option to discriminate.pl to support new --ngram option in clusterlabeling.pl (AMJ)
+		    	
+=item	    			    	
+
+Added test cases testA6 and testA7 to test changes in clusterlabeling. (AMJ)
+
+=item 
+
+Updated INSTALL to mention depencies on csh and using bash as the system shell (TDP)
+
+=back 
+
+=item 1.01 
+
+Released April 6, 2008 (All changes by TDP)
+
+=over
+
+=item 
+
+Relaxed test conditions for svdpackout and install.sh to simply check if 
+SVDPACKC is producing results.
+
+=item
+
+Removed diagnostic warning from mat2harbo.pl that gave guidelines on 
+setting las2.h parameters. A version of las2.h is now being provided in 
+/External with fairly large values pre-set, thus making these warnings 
+somewhat less necessary.
+
+=item
+
+Changed the interpretation of the --negatives option below to mean that 
+if this option is on, then any negative values in svdpackout.pl output 
+will be set to zero. By default then, square root values are not taken, 
+and negatives are not smoothed.
+
+=item
+
+Introduced --sqrt option for svdpackout.pl to request that values in S 
+matrix have their square root taken before recombination. This was 
+previously the default, but will not be any longer.
+
+=item 
+
+Updated svdpackout.pl to include the following changes, provided by 
+Richard Wicentowski in November 2006 (via senseclusters-developers list)
+
+=over 2
+
+=item * Added feature to output the component U, S, and V' matrices.
+
+=item * Added a new command-line option "--output" with three options:
+
+=over 4
+
+=item * reconstruct - reconstructs the rank-k matrix (default)
+
+=item * rowonly - same as --rowonly
+
+=item * components - output U, S, V' matrices to U.txt, S.txt, VT.txt
+
+=back
+
+=item * Added a new command-line option "--negatives": Allows negative 
+values; otherwise all negative values are set to 0 (except in component output).
+
+=item * New options maintain backward compatibility
+
+=item * Updated the documentation.
+
+=item * Passes all tests (testA1-A4,B1-B2)
+
+=back
+
+=back
+
+=item 1.00
+
+Released March 29, 2008 (All changes by TDP)
+This is a development release, meaning that "regular" users should 
+still use 0.95, our last stable release
+
+=over
+
+=item 
+
+Updated SYNOPSIS examples in many of the Toolkit programs to make their 
+stand alone use more clear
+
+=item
+
+Removed dependency on Math::BigInt, Math::BigFloat, as that has
+been added to Algorithm::RandomMatrixGeneration as of 0.06 (which
+is required).
+
+=item 
+
+Raised Text-NSP version requirement to 1.09, since there are a
+few bugs in the test cases for 1.07 and below for 64 bit architectures.
+
+=item 
+
+Changed CPAN module prereqs to require modules that only require Perl 
+5.6 or better. This relaxes SenseClusters from requiring Perl 5.8.5 to 
+5.6. 
+
+=back
+
+=item 0.98
+
+Released March 25, 2008 (All changes by TDP) 
+This is a development release, meaning that "regular" users should 
+still use 0.95, our last stable release
+
+=over
+
+=item 
+
+Inserted a /t directory for 'make test'. This is just a stub to be built 
+upon.
+
+=item
+
+Modified README.Toolkit to (hopefully) include links to source code 
+documentation while displaying all the programs in a single page. This 
+is intended to be our replacement for the HTML pages we no longer 
+generate.
+
+=item
+
+Modified Makefile.PL to create man pages only of core SenseClusters
+programs. Reduced the number of programs put into /bin as well, only
+including core SenseClusters programs and those needed for testing.
+
+=item
+
+Modified /Testing script completely. Removed alltests.sh subtests.sh and 
+the many normal-op.sh and error-op.sh scripts and replaced with a single 
+script called ALL-TESTS.sh (using same name as NSP). Historically we've 
+had some trouble with the test scripts not running due to file 
+permissions and path issues, so I hope this fixes that once and for all. 
+The test*.sh files in the subdirectories of /Testing are called directly 
+via ALL-TESTS.sh using 'csh ./testA*.sh' after the script has changed to 
+the current directory of the test script. This does not require that the 
+scripts be executable and path issues are minimized. This also allows us 
+to not install altests.sh and subtests.sh in /bin (which was our 
+solution to path problems, but that seemed a bit extreme). 
+
+=item
+
+Added copyright information to .pl files in Web directory, also minimal 
+perldoc.  
+
+=item 
+
+Added short labels to each of the programs in Toolkit, so that these 
+descriptions appear in CPAN listing
+
+=item
+
+Removed HTML directory and support from /Docs, since we'll get nicely 
+formatted documentation from CPAN. Removed /Docs, which has been 
+replaced with /doc
+
+=item 
+
+Removed samples from /Docs for regex, stoplist, and token files, since 
+those also exist in Demos
+
+=item 
+
+Added a directory /External that includes a modified form of the 
+SVDPACKC program las2 that we use for SVD. This can be installed via a 
+script External/install.sh that will also attempt to retrieve and 
+install the Cluto programs scluster and vcluster.
+
+=item 
+
+Moved Docs/Flows to doc/Flowcharts, depricated flowchart.fig and .pdf in 
+favor of more recent versions
+
+=item
+
+Moved INSTALL from top level to /doc and converted into pod.
+
+=item 
+
+Created doc directory which will be home of pod that is stored in top 
+level in plain text form. /doc/update-pod.sh will be used to convert pod 
+to plain text which should be considered read only. 
+
+=item
+
+Added stubs to /lib and /t to provide basic modular framework should we 
+decided to develop modules in future
+
+=item 
+
+Moved current contents of Changes to /doc/Changelogs and then began a 
+new file CHANGES.pod that will be used in future
+
+=back
+
+=item 0.96 
+
+Released March 22, 2008 (All modifications by TDP)
+This is a development release, meaning that "regular" users should 
+still use 0.95, our last stable release
+
+=over
+
+=item 
+
+version 0.95 uploaded to CPAN to see how indexing looked. not released 
+on sourceforge or announced since strictly a development view.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+ L<TODO.pod>
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+This document last modified by :
+$Id: CHANGES.pod,v 1.29 2015/10/03 14:05:57 tpederse Exp $
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004-2013 Ted Pedersen
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut
+

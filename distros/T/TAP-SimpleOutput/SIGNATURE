@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 3726cbf3cceddde99527d62b3557cc144200ce3c Changes
+SHA1 bf2d713ceca5b8ad3d680ed15baba1b89df7e149 LICENSE
+SHA1 c88b91d9c13f4cf8578e0ea05145c472cca8829c MANIFEST
+SHA1 2ba3730e5ffae51b21c6472d41a51ea8f64aff50 META.json
+SHA1 bb3d61053fb9b8b112e1a9690ba7ead3f14d4bf7 META.yml
+SHA1 e52de92313bc28524c97779eff7ed8f75014738f Makefile.PL
+SHA1 5a1f185025751ef0bc2671ee1ced858a3356d92a README
+SHA1 7f01755f108a2d5ae00199abc84f3ea1ad9a9193 cpanfile
+SHA1 c425cd3f7694b0585049effbb570bcb42770622a dist.ini
+SHA1 7b01af2dac16d583a6ea6b937068afbc0512c1ce lib/TAP/SimpleOutput.pm
+SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
+SHA1 419323572b1090abb7ba140a5a5f6ebfa1601cd3 t/00-compile.t
+SHA1 a7c4d30d4d82380b94cbaf2ae46744f2108f221e t/00-report-prereqs.dd
+SHA1 5023faafa74a70135408db3c2eccdf8f40318cf6 t/00-report-prereqs.t
+SHA1 f0a2c16d2b3a925e8414c285b958eb5e1c30b0f4 t/basic.t
+SHA1 1a6f6a71d9ca7976483354c3f79eda49701ab8e4 xt/author/eol.t
+SHA1 35c21813a33a491adb66346cdab1da7cb1ae0d4b xt/author/no-tabs.t
+SHA1 d94890d121e38b8db47acbc1d7ce401fa2c581c4 xt/author/pod-coverage.t
+SHA1 af0d82f158762f556e52e9e1442b414485a2513f xt/author/pod-spell.t
+SHA1 874c7d11d28f7cd46858650b3f21f098363ce99e xt/author/pod-syntax.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 9d7df8fdb9cb4ccc2893afc53bf3beedfbfcfdd3 xt/release/has-version.t
+SHA1 5fed4d5d7d3be557a7d2172afd0a9f4e72732e1c xt/release/minimum-version.t
+SHA1 76507129c2fddbc50151ff3930a2d00cfe49f60c xt/release/no-smart-comments.t
+SHA1 6e11276f21e5699b4d9ad9f2dfb29081e629791d xt/release/pod-linkcheck.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJYoyBzAAoJEJP6zjPp4XX42fIIAKJVcSisFPr4c0NywMke8Lm+
+pSuVJ04uUDJ3MGUFIjJb4I4ccAfK9avTCngNvg+OF0cgUfGZaNaKG3RMm2qUCA8o
+A/BBl8urHx1mnzA5GRe1p3u7R1RG72wi3D/tcEJ/46OHW76GgF90gb3C8PB1vs2T
+HXxLQUPkdHXcI9/Tqxy9d4xGKCCEULT8aV1A1GPlrD7UMFxeKCJjkkiQphD3MIkH
+SQbOefqiix0sK/Dx+1tm1Jxx9nQy59eRHPopKL12f+1KW81+KFXL8MQ908SzzSi4
+nqzY3GZdqWoESjeX+XVgy8uSC9kMDrC5MP/oI2r3CS0gvQKGSK6Q7jUNEuGfpsQ=
+=Ey//
+-----END PGP SIGNATURE-----

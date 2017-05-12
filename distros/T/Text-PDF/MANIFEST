@@ -1,0 +1,42 @@
+Changes
+examples/boon_graph.pdf
+examples/call_conf.txt
+examples/CD.CFG
+examples/graph.pl
+examples/hello.pl
+examples/pdfaddobj.pl
+examples/pdfaddpg.pl
+examples/pdfcrop.pl
+examples/pdfgetobj.pl
+examples/pdflines.pl
+examples/squ.pdf
+examples/squares.pdf
+examples/test.pdf
+lib/Text/PDF.pm
+lib/Text/PDF/Array.pm
+lib/Text/PDF/Bool.pm
+lib/Text/PDF/Dict.pm
+lib/Text/PDF/File.pm
+lib/Text/PDF/Filter.pm
+lib/Text/PDF/Name.pm
+lib/Text/PDF/Null.pm
+lib/Text/PDF/Number.pm
+lib/Text/PDF/Objind.pm
+lib/Text/PDF/Page.pm
+lib/Text/PDF/Pages.pm
+lib/Text/PDF/SFont.pm
+lib/Text/PDF/String.pm
+lib/Text/PDF/TTFont.pm
+lib/Text/PDF/TTFont0.pm
+lib/Text/PDF/Utils.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+readme.txt
+scripts/pdfbklt
+scripts/pdfrevert
+scripts/pdfstamp
+t/hello.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

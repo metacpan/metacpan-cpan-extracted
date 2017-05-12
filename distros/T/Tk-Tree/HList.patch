@@ -1,0 +1,87 @@
+--- HList.pm	Thu Dec  4 16:25:07 1997
++++ HList.pm.patched	Thu Dec  4 16:18:00 1997
+@@ -1,11 +1,14 @@
+ package Tk::HList; 
+ 
++# Patched version of HList.pm 2.013 to support Tree.pm.
++
+ use vars qw($VERSION);
+-$VERSION = '2.013'; # $Id: //depot/Tk/HList/HList.pm#13$
++$VERSION = '2.013ctd'; # $Id: //depot/Tk/HList/HList.pm#13$
+ 
+ use Tk qw(Ev);
++use Tk::TixWidget;
+ 
+-@ISA = qw(Tk::Widget);
++@ISA = qw(Tk::Widget Tk::TixWidget);
+ 
+ Construct Tk::Widget 'HList';
+ sub Tk::Widget::ScrlHList { shift->Scrolled('HList'=>@_) }
+@@ -52,6 +55,7 @@
+ 		 {
+ 		  my $w = shift;
+ 		  my $Ev = $w->XEvent;
++
+ 		  $w->CancelRepeat
+ 		      if($w->cget('-selectmode') ne "dragdrop");
+ 		  $w->ButtonRelease1($Ev);
+@@ -99,6 +103,7 @@
+  my $Ev = $w->XEvent;
+ 
+  delete $w->{'shiftanchor'}; 
++ delete $w->{tixindicator}; 
+ 
+  $w->focus()
+     if($w->cget("-takefocus"));
+@@ -127,6 +132,8 @@
+ 
+  if (defined($info[1]) && $info[1] eq 'indicator')
+   {
++   $w->{tixindicator} = $ent;
++   $w->tixEventType( "<Arm>" );
+    $w->Callback(-indicatorcmd => $ent);
+   }
+  else
+@@ -174,6 +181,7 @@
+  my $to = $w->GetNearest($Ev->y);
+ 
+  delete $w->{'shiftanchor'}; 
++ delete $w->{tixindicator}; 
+ 
+  return unless (defined($to) and length($to));
+ 
+@@ -227,6 +235,18 @@
+ 
+  return unless (defined($ent) and length($ent));
+ 
++ if($w->{tixindicator})
++  {
++   return unless delete($w->{tixindicator}) eq $ent;
++   my @info = $w->info('item',$Ev->x, $Ev->y);
++   if(defined($info[1]) && $info[1] eq 'indicator')
++    {
++     $w->tixEventType( "<Activate>" );
++     $w->Callback(-indicatorcmd => $ent);
++    }
++   return;
++  }
++
+  if($x < 0 || $y < 0 || $x > $w->width || $y > $w->height)
+   {
+    $w->select('clear');
+@@ -272,8 +292,14 @@
+   }
+ 
+  my $ent = $w->GetNearest($Ev->y);
+-
+  return unless (defined($ent) and length($ent));
++
++ if($w->{tixindicator})
++  {
++   $w->tixEventType( $w->{tixindicator} eq $ent ? "<Arm>" : "<Disarm>" );
++   $w->Callback(-indicatorcmd => $w->{tixindicator});
++   return;
++  }
+ 
+  if ($mode eq "single")
+   {

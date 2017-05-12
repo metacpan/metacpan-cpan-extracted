@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/TeX/DVI.pm
+lib/TeX/DVI/Parse.pm
+t/cmr10.tfm
+t/dvi.t
+t/dvi_font.t
+t/parse.dvi
+t/parse.t
+t/parse.txt
+t/texput1.dvi
+t/texput2.dvi
+META.yml                                 Module meta-data (added by MakeMaker)

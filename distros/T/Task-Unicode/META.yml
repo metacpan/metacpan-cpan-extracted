@@ -1,0 +1,40 @@
+---
+abstract: 'Everything needed to work with Unicode data'
+author:
+  - 'Nick Patch <patch@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Unicode
+provides:
+  Task::Unicode:
+    file: lib/Task/Unicode.pm
+    version: '0.06'
+requires:
+  App::Uni: '0'
+  Encode::DoubleEncodedUTF8: '0'
+  String::Dump: '0'
+  Unicode::CaseFold: '0'
+  Unicode::Casing: '0'
+  Unicode::Collate::Locale: '0'
+  Unicode::GCString: '0'
+  Unicode::LineBreak: '0'
+  Unicode::Regex::Set: '0'
+  Unicode::Stringprep: '0'
+  Unicode::Tussle: '0'
+  Unicode::UTF8: '0'
+  Unicode::Util: '0'
+  perl: v5.10.0
+  utf8::all: '0'
+resources:
+  bugtracker: https://github.com/patch/task-unicode-pm5/issues
+  homepage: https://github.com/patch/task-unicode-pm5
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/patch/task-unicode-pm5.git
+version: '0.06'

@@ -1,0 +1,11 @@
+Setting up a Unix-type testing platform
+
+- Install perlbrew and related requirements:
+    cpanm App::perlbrew
+    perlbrew install-patchperl
+    perlbrew install-cpanm
+
+- Install and switch to your base perl instance, and install C<Test::BrewBuild>:
+    perlbrew install 5.22.1
+    perlbrew switch 5.22.1
+    cpanm Test::BrewBuild

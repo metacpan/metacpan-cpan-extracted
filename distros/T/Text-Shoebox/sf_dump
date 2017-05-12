@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+use strict;
+use Text::Shoebox qw(read_sf);
+$Text::Shoebox::Debug = 1;
+foreach my $x (@ARGV) {
+  print "File: $x\n";
+  my $lex = read_sf(from_file => $x);
+  print("Nothing read.\n\n"), next unless $lex;
+  Text::Shoebox::_dump($lex);
+}
+exit;

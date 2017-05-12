@@ -1,0 +1,156 @@
+TODO list for Perl module Text::Editor::Vip
+===========================================
+
+replace all die with carp/onfess
+
+add tests for GetLineTextWithNewline
+
+action to create sub stub and test stub
+
+ERROR RunSubOnSelection
+	this worked!
+	$buffer->SetSelectionBoundaries(-10, 0, 1, 0) ;
+	$buffer->CopySelectionToClipboard('string') ;
+	
+	same with boudary over text limit
+	
+	=> blank lines are returned
+	
+
+RunSubOnSelection: avoid unecessary modification if the text is the same
+
+add sub: $buffer->GetSelectedText([$selection_line_index])
+
+LoadAndExpandWith shouldn' load a module more than once
+
+
+ERROR! extend selection seems to select from the begining of the buffer
+
+ERROR! modification position change doesn't remove the selection
+
+ERROR! SelectWord with string "\npackage main ;", when modificatino pos is on the first work selects next word
+
+#keep a time stamp on when the buffer was modified
+
+keep a time stamp on when a line was modified
+
+CopySelectionToClipboard
+
+set the buffer name and information
+
+all Display:: functions should take a tab and be generic
+
+test document GetTabifiedText
+
+possibility for a buffer user to set data in the buffer, perl line
+
+FileInsert should, optionaly, mark the buffer as unedited
+	=> or should it be FileReadNew ?
+
+a treedumper filter generator
+
+do/undo flushing functions
+
+#* add Replace where replacement regex is a user sub
+
+* shouldn't replaceOccurence leave the modification position unchanged?
+
+* should we consider perl replacement warnings as errors?
+
+#* why aren't we using the same "namespace"?
+	$buffer->{'Text::Editor::Vip::Buffer::Plugins::FindReplace::SEARCH_REPLACE_REGEX'} = $search_regex ;
+	$buffer->{REPLACEMENT_REGEX} = $replacement_regex ;
+
+#* die when expanding fails
+	=> ExpandWith("UnexistingFunction") ;
+	=> ExpandWith("UnexistingFunction", undef or not ref to code) ;
+	
+#* Log somewhere what is added and overriden in the object
+	=> within the object
+
+#* Generate documentation a la cpan
+	pod2projdocs
+
+* make Undo/Redo more memory effective
+
+* what do we do with the redo stack when adding something to the do stack?
+	=> erase? keep in synch with the previous do?
+
+* View base class and its pluggins
+	keyboard handlers
+
+* Application and setup
+	Adding tools to application
+
+* lexers
+	is an editor component not a buffer component
+	multiple lexers can act on the same buffer, ie perl and html in the same buffer
+
+* folding
+	is a view component
+	
+
+* find the align equal sign written in Simrishamn
+
+#* Get The copy and comment script from work.
+
+* Ex and other emulators
+	http://www.sandia.gov/ASCI/Red/usage/paragon/man/man1/ex.1.html
+	http://resin.csoft.net/cgi-bin/man.cgi?section=1&topic=ex
+	
+#* document plugins
+
+* Should we have a mecanism to always save the buffer in case of an exception?
+	
+* Backspace with argument > 1 not handled efficiently (at all!)
+
+* use Log4Perl to log stuff
+	=> use diag or print	
+
+* I haven't decided yet how to handle erroneous arguments. Croak, Call a user 
+	defined function, ignore and log, return error codes !!!
+	=> log the call stack when dying
+
+* oops, what about override mode?
+
+#* Test setting attributed into lines
+
+#* Add a Set command, in a plugin, that handles the undo stack properly
+
+#* Should SetSelection handle the do/undo stack?
+
+#* Shouldn't we "inherit" in the opposit order? 
+
+#* Find doesn't set selection anymore, add example somewhere
+	#~ $buffer->SetModificationPosition($match_line, $match_position + length($match_word)) ;
+	#~ $buffer->{SELECTION}->Set($match_line, $match_position,$match_line, $match_position + length($match_word)) ;
+
+# more tests, some are listed as comments
+	#test plugins
+
+# Put the different types of indenters in a module
+	=> Text::Editor::Vip::Plugins::Indenters
+
+# Change all so script to OO style
+
+#ClearLine doesn't handle modificaton position properly
+	=> well it did
+	
+#GetText() should return an array when called in array context
+
+# should it be possible to handle the selection directly
+	Yes
+	
+# When an error occures, PrintError is called. That sub doesn't exist and must 
+	be set by the buffer creator.
+
+# return an object in a unique package
+
+# move tab related functinos in a plugin
+
+# Remove reset sub ?
+	=> Keep
+	
+# Should we undo if Do dies?
+	=> No, let view writter decide
+	

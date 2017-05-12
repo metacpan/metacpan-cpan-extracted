@@ -1,0 +1,47 @@
+1..1
+# Artemis-section: artemis-meta-information
+# Artemis-suite-name: tbd
+# Artemis-suite-type: tbd
+# Artemis-suite-version: 0.01
+# Artemis-machine-name: mendozza.osrc.amd.com
+# Artemis-machine-description: ASUSTeK Computer INC., M2A-MX, Rev 1.xx
+# Artemis-bios: American Megatrends Inc., 0201, 10/15/2007
+# Artemis-uname: 2.6.27.35-170.2.94.fc10.x86_64 x86_64
+# Artemis-osname: Fedora release 10 (Cambridge)
+# Artemis-cpuinfo: 3x Family: 16, Model: 2, Stepping: 0
+# Artemis-ram: 1883 MB
+# Artemis-uptime: 219 hrs
+# Artemis-reportcomment: KVM Building Done Right!
+ok 1 - artemis-meta-data
+1..11
+# Artemis-section: kvm-userspace
+# Artemis-description: some rpm-userspace
+ok 1 - lock_build_system
+ok 2 - setup_build_root
+ok 3 - update_scm_repo
+ok 4 - extract_version_info
+ok 5 - check_build_required
+# A build for today already exists, skipping.
+not ok 6 - create_source_archive # SKIP
+not ok 7 - install_spec # SKIP
+not ok 8 - build_packages # SKIP
+not ok 9 - upload_packages # SKIP
+not ok 10 - update_repodata # SKIP
+ok 11 - release_build_system
+
+1..11
+# Artemis-section: kvm-kernel
+# Artemis-description: some rpm-kernel
+ok 1 - lock_build_system
+ok 2 - setup_build_root
+ok 3 - update_scm_repo
+ok 4 - extract_version_info
+ok 5 - check_build_required
+# Last build has the same git hash, skipping.
+not ok 6 - create_source_archive # SKIP
+not ok 7 - install_spec # SKIP
+not ok 8 - build_packages # SKIP
+not ok 9 - upload_packages # SKIP
+not ok 10 - update_repodata # SKIP
+ok 11 - release_build_system
+

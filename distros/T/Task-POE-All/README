@@ -1,0 +1,925 @@
+NAME
+
+    Task::POE::All - All of POE on CPAN
+
+VERSION
+
+      This document describes v1.102 of Task::POE::All - released November 09, 2014 as part of Task-POE-All.
+
+SYNOPSIS
+
+            # apoc@box:~$ cpanp install Task::POE::All
+
+DESCRIPTION
+
+    This task contains all distributions under the POE namespace.
+
+TASK CONTENTS
+
+ Servers
+
+  POE::Component::Server::AsyncEndpoint 0.10
+
+  POE::Component::Server::Bayeux 0.04
+
+  POE::Component::Server::BigBrother 0.08
+
+  POE::Component::Server::Chargen 1.14
+
+  POE::Component::Server::DNS 0.30
+
+  POE::Component::Server::Daytime 1.14
+
+  POE::Component::Server::Discard 1.14
+
+  POE::Component::Server::Echo 1.64
+
+  POE::Component::Server::FTP 0.08
+
+  POE::Component::Server::HTTP 0.09
+
+  POE::Component::Server::HTTP::KeepAlive 0.0307
+
+  POE::Component::Server::HTTPServer 0.009002
+
+  POE::Component::Server::IRC 1.54
+
+  POE::Component::Server::Ident 1.16
+
+  POE::Component::Server::Inet 0.06
+
+  POE::Component::Server::JSONRPC 0.05
+
+  POE::Component::Server::MySQL 0.02
+
+  POE::Component::Server::NNTP 1.04
+
+  POE::Component::Server::NRPE 0.18
+
+  POE::Component::Server::NSCA 0.08
+
+  POE::Component::Server::POP3 0.10
+
+  POE::Component::Server::PSGI 0.6
+
+  POE::Component::Server::Postfix 0.001
+
+  POE::Component::Server::PreforkTCP 0.11
+
+  POE::Component::Server::Qotd 1.14
+
+  POE::Component::Server::RADIUS 1.08
+
+  POE::Component::Server::SMTP 1.6
+
+  POE::Component::Server::SOAP 1.14
+
+  POE::Component::Server::SimpleContent 1.14
+
+  POE::Component::Server::SimpleHTTP 2.18
+
+  POE::Component::Server::SimpleHTTP::PreFork 2.10
+
+  POE::Component::Server::SimpleSMTP 1.50
+
+  POE::Component::Server::SimpleXMLRPC 0.02
+
+  POE::Component::Server::Syslog 1.20
+
+  POE::Component::Server::TCP 1.365
+
+  POE::Component::Server::TacacsPlus 1.11
+
+  POE::Component::Server::Time 1.14
+
+  POE::Component::Server::Twirc 0.17
+
+  POE::Component::Server::XMLRPC 0.05
+
+  POE::Component::Server::eris 1.8
+
+ Clients
+
+  POE::Component::Client::AMQP 0.03
+
+  POE::Component::Client::AirTunes 0.01
+
+  POE::Component::Client::Asterisk::Manager 0.08
+
+  POE::Component::Client::BigBrother 1.00
+
+  POE::Component::Client::CouchDB 0.05
+
+  POE::Component::Client::DNS 1.053
+
+  POE::Component::Client::DNS::Recursive 1.08
+
+  POE::Component::Client::DNSBL 1.08
+
+  POE::Component::Client::FTP 0.22
+
+  POE::Component::Client::Feed 0.901
+
+  POE::Component::Client::HTTP 0.949
+
+  POE::Component::Client::HTTPDeferred 0.02
+
+  POE::Component::Client::Halo 0.2
+
+  POE::Component::Client::Icecast 0.6
+
+  POE::Component::Client::Ident 1.16
+
+  POE::Component::Client::Keepalive 0.272
+
+  POE::Component::Client::LDAP 0.04
+
+  POE::Component::Client::Lingr 0.04
+
+  POE::Component::Client::MPD 2.000
+
+  POE::Component::Client::MSN 0.03
+
+  POE::Component::Client::MogileFS 0.02
+
+  POE::Component::Client::NNTP 2.22
+
+  POE::Component::Client::NNTP::Tail 0.03
+
+  POE::Component::Client::NRPE 0.20
+
+  POE::Component::Client::NSCA 0.16
+
+  POE::Component::Client::NTP 0.10
+
+  POE::Component::Client::POP3 0.02
+
+  POE::Component::Client::Pastebot 1.16
+
+  POE::Component::Client::Ping 1.174
+
+  POE::Component::Client::RADIUS 1.04
+
+  POE::Component::Client::Rcon 0.23
+
+  POE::Component::Client::SMTP 0.22
+
+  POE::Component::Client::SOCKS 1.00
+
+  POE::Component::Client::SimpleFTP 0.003
+
+  POE::Component::Client::Stomp 0.12
+
+  POE::Component::Client::Stomp::Utils 0.02
+
+  POE::Component::Client::TCPMulti 0.0524
+
+  POE::Component::Client::Telnet 0.06
+
+  POE::Component::Client::Traceroute 0.21
+
+  POE::Component::Client::Twitter 0.01
+
+  POE::Component::Client::UserAgent 0.08
+
+  POE::Component::Client::Whois 1.30
+
+  POE::Component::Client::Whois::Smart 0.187
+
+  POE::Component::Client::eris 1.4
+
+  POE::Component::Client::opentick 0.21
+
+ Generic Components
+
+  POE::Component::AI::MegaHAL 1.18
+
+  POE::Component::AIO 1.00
+
+  POE::Component::Algorithm::Evolutionary 0.002001
+
+  POE::Component::Amazon::S3 0.01
+
+  POE::Component::Archive::Any 0.002
+
+  POE::Component::AssaultCube::ServerQuery::Server 0.04
+
+  POE::Component::AtomAggregator 1.0
+
+  POE::Component::Basement 0.01
+
+  POE::Component::BlogCloud 0.01
+
+  POE::Component::Bundle::WebDevelopment 1.001004
+
+  POE::Component::CD::Detect 1.1
+
+  POE::Component::CD::Rip 1.2
+
+  POE::Component::CPAN::Mirror::Multiplexer 0.04
+
+  POE::Component::CPAN::Reporter 0.06
+
+  POE::Component::CPAN::SQLite::Info 0.11
+
+  POE::Component::CPAN::YACSmoke 1.36
+
+  POE::Component::CPANIDX 0.10
+
+  POE::Component::CPANPLUS::YACSmoke 1.62
+
+  POE::Component::Cache 0.001001
+
+  POE::Component::Captcha::reCAPTCHA 0.02
+
+  POE::Component::Child 1.39
+
+  POE::Component::ControlPort 1.0266
+
+  POE::Component::Cron 0.021
+
+  POE::Component::Curl::Multi 0.10
+
+  POE::Component::Curses 0.211
+
+  POE::Component::DBIAgent 0.26
+
+  POE::Component::DHCP::Monitor 1.04
+
+  POE::Component::Daemon 0.1400
+
+  POE::Component::Daemon::Win32 0.01
+
+  POE::Component::DebugShell 1.412
+
+  POE::Component::DebugShell::Jabber 0.04
+
+  POE::Component::DirWatch 0.300001
+
+  POE::Component::DirWatch::Object 0.10
+
+  POE::Component::EasyDBI 1.24
+
+  POE::Component::Enc::Flac 1.01
+
+  POE::Component::Enc::Mp3 1.2
+
+  POE::Component::Enc::Ogg 1.05
+
+  POE::Component::FastCGI 0.19
+
+  POE::Component::FeedAggregator 0.902
+
+  POE::Component::Fuse 0.05
+
+  POE::Component::Gearman::Client 0.03
+
+  POE::Component::Generic 0.1403
+
+  POE::Component::Github 0.08
+
+  POE::Component::Growl 1.00
+
+  POE::Component::Hailo 0.10
+
+  POE::Component::ICal 0.130020
+
+  POE::Component::IKC 0.2402
+
+  POE::Component::IRC 6.88
+
+  POE::Component::IRC::Object 0.02
+
+  POE::Component::IRC::Plugin::BaseWrap 1.001001
+
+  POE::Component::IRC::Plugin::Blowfish 0.01
+
+  POE::Component::IRC::Plugin::Bollocks 1.00
+
+  POE::Component::IRC::Plugin::CPAN::Info 1.001002
+
+  POE::Component::IRC::Plugin::CoreList 1.02
+
+  POE::Component::IRC::Plugin::Donuts 0.07
+
+  POE::Component::IRC::Plugin::Eval 0.07
+
+  POE::Component::IRC::Plugin::FTP::EasyUpload 0.002
+
+  POE::Component::IRC::Plugin::Google::Calculator 0.04
+
+  POE::Component::IRC::Plugin::Hailo 0.18
+
+  POE::Component::IRC::Plugin::Hello 0.001002
+
+  POE::Component::IRC::Plugin::IRCDHelp 0.01
+
+  POE::Component::IRC::Plugin::ImageMirror 0.15
+
+  POE::Component::IRC::Plugin::Infobot 0.001002
+
+  POE::Component::IRC::Plugin::Karma 0.003
+
+  POE::Component::IRC::Plugin::Logger::Irssi 0.001002
+
+  POE::Component::IRC::Plugin::MegaHAL 0.46
+
+  POE::Component::IRC::Plugin::MultiProxy 0.01
+
+  POE::Component::IRC::Plugin::OutputToPastebin 0.002
+
+  POE::Component::IRC::Plugin::POE::Knee 1.08
+
+  POE::Component::IRC::Plugin::QueryDNS 1.04
+
+  POE::Component::IRC::Plugin::QueryDNSBL 1.04
+
+  POE::Component::IRC::Plugin::RSS::Headlines 1.08
+
+  POE::Component::IRC::Plugin::RTorrentStatus 0.17
+
+  POE::Component::IRC::Plugin::Role 0.06
+
+  POE::Component::IRC::Plugin::Seen 0.001001
+
+  POE::Component::IRC::Plugin::Trac::RSS 0.11
+
+  POE::Component::IRC::Plugin::URI::Find 1.10
+
+  POE::Component::IRC::Plugin::Unicode::UCD 0.004
+
+  POE::Component::IRC::Plugin::WWW::CPANRatings::RSS 0.0106
+
+  POE::Component::IRC::Plugin::WWW::Google::Time 0.0102
+
+  POE::Component::IRC::Plugin::WWW::KrispyKreme::HotLight 0.06
+
+  POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search 0.002
+
+  POE::Component::IRC::Plugin::WWW::Reddit::TIL 0.07
+
+  POE::Component::IRC::Plugin::WWW::Vim::Tips 0.14
+
+  POE::Component::IRC::Plugin::WWW::Weather::US 0.04
+
+  POE::Component::IRC::Plugin::WWW::XKCD::AsText 0.003
+
+  POE::Component::IRC::Plugin::WubWubWub 0.1
+
+  POE::Component::IRC::PluginBundle::Toys 1.001001
+
+  POE::Component::IRC::PluginBundle::WebDevelopment 2.001003
+
+  POE::Component::IRC::Service 0.996
+
+  POE::Component::Jabber 3.00
+
+  POE::Component::JobQueue 0.571
+
+  POE::Component::LaDBI 1.002001
+
+  POE::Component::Lightspeed 0.05
+
+  POE::Component::Lingua::Translate 0.06
+
+  POE::Component::Log4perl 0.03
+
+  POE::Component::Logger 1.10
+
+  POE::Component::MXML 0.03
+
+  POE::Component::MessageQueue 0.3001
+
+  POE::Component::Metabase::Client::Submit 0.12
+
+  POE::Component::Metabase::Relay::Server 0.34
+
+  POE::Component::Net::FTP 0.001
+
+  POE::Component::Net::LastFM::Submission 0.24
+
+  POE::Component::NetSNMP::agent 0.500
+
+  POE::Component::NomadJukebox 0.02
+
+  POE::Component::NonBlockingWrapper::Base 0.002
+
+  POE::Component::OSCAR 0.05
+
+  POE::Component::Omegle 0.02
+
+  POE::Component::OpenSSH 0.10
+
+  POE::Component::Pastebin::Create 0.0
+
+  POE::Component::Pcap 0.04
+
+  POE::Component::Player::Mpg123 1.2
+
+  POE::Component::Player::Musicus 1.32
+
+  POE::Component::Player::Slideshow 1.4
+
+  POE::Component::Player::Xmms 0.04
+
+  POE::Component::Pluggable 1.26
+
+  POE::Component::PluginManager 0.67
+
+  POE::Component::Pool::DBI 0.014
+
+  POE::Component::Pool::Thread 0.015
+
+  POE::Component::PreforkDispatch 0.101
+
+  POE::Component::ProcTerminator 0.03
+
+  POE::Component::Proxy::MySQL 0.04
+
+  POE::Component::Proxy::SOCKS 1.02
+
+  POE::Component::Proxy::TCP 1.2
+
+  POE::Component::RSS 3.01
+
+  POE::Component::RSSAggregator 1.11
+
+  POE::Component::RemoteTail 0.01011
+
+  POE::Component::Rendezvous::Publish 0.01
+
+  POE::Component::Resolver 0.921
+
+  POE::Component::ResourcePool 0.04
+
+  POE::Component::ResourcePool::Resource::TokenBucket 0.01
+
+  POE::Component::SASLAuthd 0.03
+
+  POE::Component::SNMP 1.1006
+
+  POE::Component::SNMP::Session 0.1202
+
+  POE::Component::SSLify 1.008
+
+  POE::Component::SSLify::NonBlock 0.41
+
+  POE::Component::Schedule 0.95
+
+  POE::Component::Sequence 0.02
+
+  POE::Component::SimpleDBI 1.30
+
+  POE::Component::SimpleLog 1.05
+
+  POE::Component::SmokeBox 0.48
+
+  POE::Component::SmokeBox::Backend::Test::SmokeBox::Mini 0.58
+
+  POE::Component::SmokeBox::Dists 1.08
+
+  POE::Component::SmokeBox::Recent 1.46
+
+  POE::Component::SmokeBox::Uploads::CPAN::Mini 1.00
+
+  POE::Component::SmokeBox::Uploads::NNTP 1.00
+
+  POE::Component::SmokeBox::Uploads::RSS 1.00
+
+  POE::Component::SmokeBox::Uploads::Rsync 1.000
+
+  POE::Component::Spread 0.02
+
+  POE::Component::SpreadClient 1.002
+
+  POE::Component::SubWrapper 2.01
+
+  POE::Component::Supervisor 0.08
+
+  POE::Component::Syndicator 0.06
+
+  POE::Component::TFTPd 0.0302
+
+  POE::Component::TSTP 0.02
+
+  POE::Component::Telephony::CTPort 0.03
+
+  POE::Component::UserBase 0.09
+
+  POE::Component::WWW::CPANRatings::RSS 0.0101
+
+  POE::Component::WWW::DoingItWrongCom::RandImage 0.03
+
+  POE::Component::WWW::Google::Calculator 0.03
+
+  POE::Component::WWW::Google::Time 0.0102
+
+  POE::Component::WWW::OhNoRobotCom::Search 0.002
+
+  POE::Component::WWW::Pastebin::Bot::Pastebot::Create 0.003
+
+  POE::Component::WWW::Pastebin::Many::Retrieve 0.001
+
+  POE::Component::WWW::Shorten 1.20
+
+  POE::Component::WWW::XKCD::AsText 0.002
+
+  POE::Component::WakeOnLAN 1.04
+
+  POE::Component::Win32::ChangeNotify 1.22
+
+  POE::Component::Win32::EventLog 1.24
+
+  POE::Component::Win32::Service 1.24
+
+  POE::Component::XUL 0.02
+
+  POE::Component::YahooMessenger 0.05
+
+  POE::Component::YubiAuth 0.07
+
+ Data Parsers and Wheels
+
+  POE::Filter::BigBrother 0.13
+
+  POE::Filter::Bzip2 1.58
+
+  POE::Filter::CSV 1.16
+
+  POE::Filter::CSV_XS 1.16
+
+  POE::Filter::DHCPd::Lease 0.0703
+
+  POE::Filter::DNS::TCP 0.06
+
+  POE::Filter::ErrorProof 0.01
+
+  POE::Filter::FSSocket 0.07
+
+  POE::Filter::Finger 0.08
+
+  POE::Filter::HTTP::Parser 1.06
+
+  POE::Filter::HTTPD::Chunked 0.9
+
+  POE::Filter::Hessian 1.00
+
+  POE::Filter::IASLog 1.08
+
+  POE::Filter::IRCD 2.44
+
+  POE::Filter::IRCv3 1.001001
+
+  POE::Filter::JSON 0.04
+
+  POE::Filter::JSON::Incr 0.03
+
+  POE::Filter::KennySpeak 1.02
+
+  POE::Filter::LOLCAT 1.10
+
+  POE::Filter::LZF 1.70
+
+  POE::Filter::LZO 1.70
+
+  POE::Filter::LZW 1.72
+
+  POE::Filter::LZW::Progressive 0.1
+
+  POE::Filter::Log::IPTables 0.02
+
+  POE::Filter::Log::Procmail 0.03
+
+  POE::Filter::Ls 0.01
+
+  POE::Filter::PPPHDLC 0.01
+
+  POE::Filter::ParseWords 1.06
+
+  POE::Filter::Postfix 0.003
+
+  POE::Filter::RecDescent 0.02
+
+  POE::Filter::Redis 0.02
+
+  POE::Filter::Regexp 1.0
+
+  POE::Filter::SSL 0.28
+
+  POE::Filter::SimpleHTTP 0.091710
+
+  POE::Filter::Slim::CLI 0.02
+
+  POE::Filter::Snort 0.031
+
+  POE::Filter::Stomp 0.04
+
+  POE::Filter::Transparent::SMTP 0.2
+
+  POE::Filter::XML 1.140700
+
+  POE::Filter::XML::RPC 0.04
+
+  POE::Filter::Zlib 2.02
+
+  POE::Wheel::Audio::Mad 0.3
+
+  POE::Wheel::GnuPG 0.01
+
+  POE::Wheel::MyCurses 1.2102
+
+  POE::Wheel::Null 0.01
+
+  POE::Wheel::Run::Win32 0.18
+
+  POE::Wheel::Sendfile 0.0200
+
+  POE::Wheel::TermKey 0.02
+
+  POE::Wheel::UDP 0.02
+
+  POE::Wheel::VimColor 0.0
+
+ Event Loops
+
+  POE::Loop::AnyEvent 0.004
+
+  POE::Loop::EV 0.06
+
+  POE::Loop::Event 1.305
+
+  POE::Loop::Glib 0.038
+
+  POE::Loop::Gtk 1.306
+
+  POE::Loop::IO_Async 0.004
+
+  POE::Loop::Kqueue 0.02
+
+  POE::Loop::Prima 1.02
+
+  POE::Loop::Tk 1.305
+
+  POE::Loop::Wx 0.04
+
+ Session Types
+
+  POE::Session::Attribute 0.80
+
+  POE::Session::AttributeBased 0.10
+
+  POE::Session::GladeXML2 0.40
+
+  POE::Session::Irssi 0.50
+
+  POE::Session::MessageBased 0.111
+
+  POE::Session::MultiDispatch 1.3
+
+  POE::Session::Multiplex 0.0600
+
+  POE::Session::PlainCall 0.0301
+
+  POE::Session::YieldCC 0.202
+
+ Debugging and Developing POE
+
+  POE::API::Hooks 2.03
+
+  POE::API::Peek 2.20
+
+  POE::Devel::Benchmarker 0.05
+
+  POE::Devel::ProcAlike 0.02
+
+  POE::Devel::Profiler 0.02
+
+  POE::Devel::Top 0.100
+
+  POE::Test::Helpers 1.11
+
+  POE::Test::Loops 1.359
+
+  POE::XS::Loop::EPoll 1.003
+
+  POE::XS::Loop::Poll 1.000
+
+  POE::XS::Queue::Array 0.006
+
+ POE Extensions
+
+  POEx::HTTP::Server 0.0902
+
+  POEx::IRC::Backend 0.024006
+
+  POEx::IRC::Client::Lite 0.002002
+
+  POEx::Inotify 0.0201
+
+  POEx::Role::PSGIServer 1.110670
+
+  POEx::Tickit 0.02
+
+  POEx::URI 0.0301
+
+  POEx::Weather::OpenWeatherMap 0.002001
+
+  POEx::ZMQ 0.005002
+
+ Uncategorized
+
+  POE::Declarative 0.09
+
+  POE::Declare 0.59
+
+  POE::Declare::HTTP::Client 0.05
+
+  POE::Declare::HTTP::Online 0.02
+
+  POE::Declare::HTTP::Server 0.05
+
+  POE::Declare::Log::File 0.01
+
+  POE::Event::Message 0.11
+
+  POE::Framework::MIDI 0.09
+
+  POE::Future 0.03
+
+  POE::Quickie 0.18
+
+  POE::Stage 0.060
+
+  POE::Sugar::Args 1.3
+
+  POE::Sugar::Attributes 0.02
+
+  POE::TIKC 0.02
+
+  POE::XUL::Javascript 0.0
+
+  POE::strict 3.01
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Task::POE::All
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/Task-POE-All
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/Task-POE-All
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-POE-All
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/Task-POE-All
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/Task-POE-All
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/Task-POE-All
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/overview/Task-POE-All
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/T/Task-POE-All
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=Task-POE-All
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=Task::POE::All
+
+ Email
+
+    You can email the author of this module at APOCAL at cpan.org asking
+    for help with any problems you have.
+
+ Internet Relay Chat
+
+    You can get live help by using IRC ( Internet Relay Chat ). If you
+    don't know what IRC is, please read this excellent guide:
+    http://en.wikipedia.org/wiki/Internet_Relay_Chat. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You
+    can join those networks/channels and get help:
+
+      * irc.perl.org
+
+      You can connect to the server at 'irc.perl.org' and join this
+      channel: #perl-help then talk to this person for help: Apocalypse.
+
+      * irc.freenode.net
+
+      You can connect to the server at 'irc.freenode.net' and join this
+      channel: #perl then talk to this person for help: Apocal.
+
+      * irc.efnet.org
+
+      You can connect to the server at 'irc.efnet.org' and join this
+      channel: #perl then talk to this person for help: Ap0cal.
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to bug-task-poe-all
+    at rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-POE-All. You will
+    be automatically notified of any progress on the request by the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/apocalypse/perl-poe-taskall
+
+      git clone https://github.com/apocalypse/perl-poe-taskall.git
+
+AUTHOR
+
+    Apocalypse <APOCAL@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Apocalypse.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this distribution.
+
+DISCLAIMER OF WARRANTY
+
+    THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+    APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+    HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT
+    WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE
+    OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU
+    ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR
+    CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+    INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES
+    ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT
+    NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES
+    SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO
+    OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY
+    HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+

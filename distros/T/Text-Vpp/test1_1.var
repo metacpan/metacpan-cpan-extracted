@@ -1,0 +1,16 @@
+$People = { 'person' => { 'nick' => 'Larry',
+                               'name' => 'Larry Wall',
+                               'address' => {
+                                   'street' => 'nirwana',
+                                   'city' => 'Perl.Org',
+                                   'zip' => '007'
+                               }
+                             },
+            'pumpkin' => { 'nick' => 'Guru',
+                               'name' => 'Sarathy Gurusamy',
+                               'address' => {
+                                   'state' => 'Madison',
+                                   'zip' => '008'
+                               }
+                             }
+          };

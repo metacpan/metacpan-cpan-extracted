@@ -1,0 +1,314 @@
+# line directives
+# block directives
+# field lines
+# comments
+
+{
+    #$::RD_TRACE = 1;
+    my (
+	@sections,     # master data structure
+	$section_head,
+	$section_id,
+	@lines,        # lines in each section
+	%lists,
+	%patterns,
+	%subs,         # validation subs
+	@group,        # current group
+	%groups,       # stored groups of fields
+	$type,
+	@options,
+	$required,
+	$multiple,
+	$list_var,
+	$size,
+	$maxlength,
+	$rows,
+	$cols,
+	@submit,
+    );
+    my $context = 'line';	# start in line context by default
+    my %formspec;
+    
+    # TODO: helper sub?
+    sub alert ($) {
+	warn '[' . (split(/::/, (caller(1))[3]))[-1] . '] ' . shift() . "\n";
+    }
+}
+
+form_spec:
+    {
+	# clear out old data, so we don't end up with old data in new objects
+	@lines    = ();
+	@sections = ();
+	%formspec = ();
+    }
+    (list_def | description_def | group_def | note | fb_params | unknown_block_directive | line)(s)
+    {
+	# grab the last section, if there is any
+	if (@lines) {
+	    push @sections,
+		{
+		    id   => $section_id,
+		    head => $section_head,
+		    lines => [ @lines ],
+		};
+	}
+	
+	# make copies instead of taking references, again so we
+	# don't end up with connections between objects
+	$return = {
+	    fb_params   => $formspec{fb_params},
+	    title       => $formspec{title},
+	    author      => $formspec{author},
+	    description => $formspec{description},
+	    lists       => { %lists },
+	    patterns    => { %patterns },
+	    subs        => { %subs },
+	    groups      => { %groups },
+	    sections    => [ @sections ],
+	    ( @submit ? (submit => @submit == 1 ? $submit[0] : [ @submit ]) : () ),
+	    reset       => $formspec{reset},
+	}
+    }
+
+list_def: '!list' var_name (static_list | dynamic_list)
+    { $lists{$item{var_name}} = [ @options ]; @options = () }
+
+static_list: '{' /\s*/ option(s /\s*,\s*/) /,?/ /\s*/ '}'
+
+dynamic_list: '&' <perl_codeblock>
+    { warn "[Text::FormBuilder] Dynamic lists have been removed from the formspec grammar"; }
+
+description_def: '!description' block
+    {
+	warn "[Text::FormBuilder] Description redefined at input text line $thisline\n" if defined $formspec{description};
+	$formspec{description} = $item{block};
+    }
+
+group_def: '!group' { $context = 'group' } var_name '{' field_line(s) '}' { $context = 'line' }
+    { 
+	#warn "$item{var_name} group; context $context\n"
+	$groups{$item{var_name}} = [ @group ];
+	@group = ();
+    }
+
+note: '!note' block  { push @lines, [ 'note', $item{block} ]; }
+
+
+# curly-brace delimited block, that can contain properly
+# nested curly braces, along with any other characters
+# inner blocks return with the '{...}' so that nested
+# blocks get the braces treated as literals
+block: '{' <skip:''> block_content(s) '}' { join('', @{ $item[3] }) }
+inner_block: '{' <skip:''> block_content(s) '}'  { '{' . join('', @{ $item[3] }) . '}' }
+block_content: /[^\{\}]+?/ | inner_block
+
+# square brace delimited block, that can contain properly
+# nested square brackets, along with any other characters
+# inner bracket blocks return with the '[...]' so that nested
+# blocks get the braces treated as literals
+bracket_block: '[' <skip:''> bracket_block_content(s) ']' { join('', @{ $item[3] }) }
+inner_bracket_block: '[' <skip:''> bracket_block_content(s) ']' { '[' . join('', @{ $item[3] }) . ']'; }
+bracket_block_content: /[^\[\]]+?/ | inner_bracket_block
+
+
+# field lines are the subset of lines that are allowed in a !group directive
+field_line: <skip:'[ \t]*'> ( field | comment | blank ) "\n"
+
+line: <skip:'[ \t]*'> ( title | author | pattern_def | section_head | heading | submit | reset | group_field | field_group | unknown_directive | field | comment | blank ) /\n+/
+
+title: '!title' /.*/
+    {
+	warn "[Text::FormBuilder] Title redefined at input text line $thisline\n" if defined $formspec{title};
+	$formspec{title} = $item[2];
+    }
+
+author: '!author' /.*/
+    {
+	warn "[Text::FormBuilder] Author redefined at input text line $thisline\n" if defined $formspec{author};
+	$formspec{author} = $item[2];
+    }
+
+pattern_def: '!pattern' var_name pattern
+    { $patterns{$item{var_name}} = $item{pattern} }
+
+pattern: /.*/
+
+section_head: '!section' identifier /.*/
+    {
+	#warn "starting section $item{identifier}\n";
+	#warn "  with heading $item[3]\n" if $item[3];
+	
+	if (@lines) {
+	    push @sections,
+		{
+		    id   => $section_id,
+		    head => $section_head,
+		    lines => [ @lines ],
+		};
+	}
+	
+	$section_id = $item{identifier};
+	$section_head = $item[3];
+	@lines = ();
+    }
+
+heading: '!head' /.*/    { push @lines, [ 'head', $item[2] ] }
+
+submit: '!submit' string(s /\s*,\s*/)
+    {
+	#warn scalar(@{ $item[2] }) . ' submit button(s)';
+	push @submit, @{ $item[2] };
+    }
+
+reset: '!reset' string
+    {
+	warn "[Text::FormBuilder] Reset button redefined at input text line $thisline\n" if defined $formspec{reset};
+	$formspec{reset} = $item{string};
+    }
+
+group_field: '!field' group_name name label(?)
+    {
+	warn "WARNING line $thisline: The '!field' directive has been DEPRECATED. Use the 'name:GROUP' style instead.\n";
+	push @lines, [ 'group', { name => $item{name}, label => $item{'label(?)'}[0], group => $item{group_name} } ];
+    }
+
+group_name: /%[A-Z_]+/
+
+# parameters that get passed to the FB constructor; these are serialized in YAML
+fb_params: '!fb' block
+    { $formspec{fb_params} .= $item{block}; }
+
+field_group: name label(?) hint(?) group_type comment(?)
+    {
+	#warn "[$thisline] comment = $item{'hint(?)'}[0]\n" if $item{'hint(?)'}[0];
+	#warn "[$thisline] field $item{name} is $item{group_type}\n";
+	push @lines, [ 'group', {
+	    name    => $item{name},
+	    label   => $item{'label(?)'}[0],
+	    comment => $item{'hint(?)'}[0],
+	    group   => $item{group_type},
+	} ];
+    }
+
+group_type: ':' var_name
+
+# this is the real heart of the thing
+field: name field_size(?) growable(?) label(?) hint(?) type(?) multi(?) other(?) default(?) option_list(?) validate(?) comment(?)
+    {	
+	my $field = {
+	    name     => $item{name},
+	    growable => $item{'growable(?)'}[0],
+	    label    => $item{'label(?)'}[0],
+	    comment  => $item{'hint(?)'}[0],
+	    multiple => $item{'multi(?)'}[0],
+	    type     => $item{'type(?)'}[0],
+	    other    => $item{'other(?)'}[0],
+	    value    => $item{'default(?)'}[0],
+	    list     => $list_var,
+	    validate => $item{'validate(?)'}[0],
+	    required => $required,
+	};
+	
+	$$field{options} = [ @options ] if @options;
+	
+	$$field{rows} = $rows if defined $rows;
+	$$field{cols} = $cols if defined $cols;
+	$$field{size} = $size if defined $size;
+	$$field{maxlength} = $maxlength if defined $maxlength;
+	
+	#warn "[$thisline] field $item{name}; context $context\n";
+	if ($context eq 'group') {
+	    push @group, $field;
+	} else {
+	    push @lines, [ 'field', $field ];
+	}
+	
+	$type = undef;
+	$required = undef;
+	$multiple = undef;
+	$list_var = undef;
+	$size = undef;
+	$rows = undef;
+	$cols = undef;
+	$maxlength = undef;
+	@options = ();
+	
+	#warn "$$field{name}: $field";
+	
+	$field;
+    }
+    
+name: identifier
+
+var_name: /[A-Z_]+/
+
+field_size: '[' ( row_col | size ) ']'
+
+size: /\d+/ bang(?)
+    { $maxlength = $item[1] if $item[2][0]; $size = $item[1] }
+
+bang: '!'
+
+row_col: /\d+/ /,\s*/ /\d+/
+    { $rows = $item[1]; $cols = $item[3] }
+
+growable: '*' limit(?) { $item{'limit(?)'}[0] || 1 }
+
+limit: /\d+/
+
+label: '|' string { $item[2] }
+
+hint: bracket_block
+
+type: ':' builtin_field
+
+builtin_field: /textarea|text|password|file|checkbox|radio|select|hidden|static/
+
+multi: '*' { 1 }
+
+other: '+' 'other' { 1 }
+
+default: '=' string { $item[2] }
+
+string: simple_multiword | quoted_string
+
+# for simple multiword values not involving punctuation
+simple_multiword: /\w/ <skip:''> /[\w\t ]*/ { $item[1] . $item[3] }
+
+# my attempt at a single-quoted, non-interpolating string
+# where the backslash can escape literal single quotes
+quoted_string: "'" <skip:''> /(\\'|[^'])*/ "'"
+    { $item[3] =~ s/\\'/'/g; $item[3] }
+
+option_list: options | list_var
+    
+options: '{' option(s /\s*,\s*/) '}'
+
+list_var: /@[A-Z_]+/ { $list_var = $item[1] }
+
+option: string display_text(?)
+    { push @options, { $item[1] => $item{'display_text(?)'}[0] } }
+
+value: identifier
+
+display_text: bracket_block
+
+
+validate: '//' (optional_pattern | required_pattern)
+
+optional_pattern: var_name '?'	{ $required = 0; $item[1] }
+
+required_pattern: var_name { $required = 1; $item[1] }
+
+comment: '#' /.*/
+blank:
+
+identifier: /\w+/
+
+# skip unknown directives with a warning
+unknown_directive: /\!\S*/ /.*/
+    { warn "[Text::Formbuilder] Skipping unknown directive '$item[1]' at input text line $thisline\n"; }
+
+unknown_block_directive: /\!\S*/ var_name(?) block
+    { warn "[Text::Formbuilder] Skipping unknown block directive '$item[1]' at input text line $thisline\n"; }

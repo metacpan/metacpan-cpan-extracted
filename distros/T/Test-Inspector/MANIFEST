@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/t1.t
+t/test.t
+t/level_one/one.pl
+t/level_one/two.pl
+t/level_one/level_two/test.pl
+lib/Test/Inspector.pm
+lib/Test/Foo.pm
+META.yml                                 Module meta-data (added by MakeMaker)

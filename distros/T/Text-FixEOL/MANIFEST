@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Text/FixEOL.pm
+lib/Text/FixEOL.pod
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/01_Text-FixEOL.t
+t/98_pod_coverage.t
+t/99_pod.t
+Artistic_License.txt
+GPL_License.txt

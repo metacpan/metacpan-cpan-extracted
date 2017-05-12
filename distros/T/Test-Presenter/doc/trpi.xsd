@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.spikesource.com/xsd/2005/04/TRPI">
+
+    <xsd:complexType name="descriptionType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <!-- Top level element expected -->
+    <xsd:element name="component">
+        <xsd:complexType>
+            <xsd:sequence>
+                <!-- description of the component -->
+                <xsd:element name="description" type="descriptionType" minOccurs="1" maxOccurs="1"/>
+
+                <!-- summary -->
+                <xsd:element name="summary"     type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+                <!-- license uri or code -->
+                <xsd:element name="license"     type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+                <!-- vendor -->
+                <xsd:element name="vendor"      type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+                <!-- release number -->
+                <xsd:element name="release"     type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+                <!-- url to the vendor/component -->
+                <xsd:element name="url"         type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+                <!-- platform on which the test/build was run on -->
+                <xsd:element name="platform"    type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+                <!-- kernel on which the test/build was run on -->
+                <xsd:element name="kernel"    type="xsd:string" minOccurs="0" maxOccurs="1"/>
+
+                <!-- root dir/path from which the log files are referenced from -->
+                <xsd:element name="root"        type="xsd:string" minOccurs="0" maxOccurs="1"/>
+
+                <!-- build-results. see buildType for more details -->
+                <xsd:element name="build"       type="buildType"      minOccurs="0" maxOccurs="1"/>
+
+                <!-- test-results. see testType for more details -->
+                <xsd:element name="test"        type="testType"       minOccurs="0" maxOccurs="unbounded"/>
+
+                <!-- coverage-results. see testType for more details -->
+                <xsd:element name="coverage-report"        type="coverageType"   minOccurs="0" maxOccurs="1"/>
+
+                <!-- code-convention-results. see testType for more details -->
+                <xsd:element name="code-convention-report" type="conventionType"   minOccurs="0" maxOccurs="1"/>
+
+            </xsd:sequence>
+
+            <!-- name of the component -->
+            <xsd:attribute name="name"      type="xsd:string" use="required"/>
+
+            <!-- version of the component -->
+            <xsd:attribute name="version"   type="xsd:string" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <!-- build results -->
+    <xsd:complexType name="buildType">
+        <xsd:sequence>
+            <!-- build log file -->
+            <xsd:element name="log-file" type="buildLogType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <!-- build status pass/fail -->
+        <xsd:attribute name="status" use="required">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="pass"/>
+                    <xsd:enumeration value="fail"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- build-log -->
+    <xsd:complexType name="buildLogType">
+        <!-- name of the log file -->
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+
+        <!-- path to the log file, relative to the '/component/root' -->
+        <xsd:attribute name="path" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <!-- test results -->
+    <xsd:complexType name="testType">
+        <xsd:sequence>
+            <!-- result -->
+            <xsd:element name="result"          type="resultType"   minOccurs="1" maxOccurs="1"/>
+
+            <!-- expected-result -->
+            <xsd:element name="expected-result" type="expectedResultType"   minOccurs="1" maxOccurs="unbounded"/>
+
+            <!-- report if any -->
+            <xsd:element name="report"          type="testReportType"       minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+
+        <!-- log file name -->
+        <xsd:attribute name="log-filename"  type="xsd:string" use="required"/>
+
+        <!-- path to log filename, relative to '/component/root' -->
+        <xsd:attribute name="path"       type="xsd:string" use="required"/>
+
+        <!-- type of the test. should be one of the specified values. -->
+        <xsd:attribute name="suite-type" use="optional" default="unit">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="unit"/>
+                    <xsd:enumeration value="regression"/>
+                    <xsd:enumeration value="load"/>
+                    <xsd:enumeration value="integration"/>
+                    <xsd:enumeration value="boundary"/>
+                    <xsd:enumeration value="negative"/>
+                    <xsd:enumeration value="stress"/>
+                    <xsd:enumeration value="demo"/>
+                    <xsd:enumeration value="standards"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+
+        <!-- source of the test. native/spike -->
+        <xsd:attribute name="source" use="optional" default="native">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="native"/>
+                    <xsd:enumeration value="spike"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+    
+    <!-- result - number of exected, passed, failed and skipped tests -->
+    <xsd:complexType name="resultType">
+        <xsd:attribute name="executed"  type="xsd:integer" use="required"/>
+        <xsd:attribute name="passed"    type="xsd:integer" use="required"/>
+        <xsd:attribute name="failed"    type="xsd:integer" use="required"/>
+        <xsd:attribute name="skipped"   type="xsd:integer" use="required"/>
+    </xsd:complexType>
+
+    <!-- expected result - number of exected, passed, failed and skipped expected.-->
+    <xsd:complexType name="expectedResultType">
+        <xsd:attribute name="executed"  type="xsd:integer" use="required"/>
+        <xsd:attribute name="passed"    type="xsd:integer" use="required"/>
+        <xsd:attribute name="failed"    type="xsd:integer" use="required"/>
+        <xsd:attribute name="skipped"   type="xsd:integer" use="required"/>
+
+        <!-- can have different expected results for different platforms -->
+        <xsd:attribute name="platform"  use="optional">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="fedora-1-i386"/>
+                    <xsd:enumeration value="fedora-3-i386"/>
+                    <xsd:enumeration value="redhat-9-i386"/>
+                    <xsd:enumeration value="rhel-3es-i386"/>
+                    <xsd:enumeration value="rhel-4es-i386"/>
+                    <xsd:enumeration value="suse-90-i586"/>
+                    <xsd:enumeration value="suse-91-i586"/>
+                    <xsd:enumeration value="suse-92-i586"/>
+                    <xsd:enumeration value="sles-9-i586"/>
+                    <xsd:enumeration value="windows-server-2000"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- test-report - html/text easily readable results of tests -->
+    <xsd:complexType name="testReportType">
+        <!-- name for the report -->
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+
+        <!-- path to the report. relative to '/component/root'-->
+        <xsd:attribute name="path" type="xsd:string" use="required"/>
+        <xsd:attribute name="report-filename"  type="xsd:string" use="optional"/>
+    </xsd:complexType>
+
+    <!-- code-coverage report -->
+    <xsd:complexType name="coverageType">
+        <!-- coverage percentage -->
+        <xsd:attribute name="percentage" type="xsd:integer" use="required"/>
+
+        <!-- path to the report -->
+        <xsd:attribute name="path"       type="xsd:string"  use="required"/>
+    </xsd:complexType>
+
+    <!-- coding-convention report -->
+    <xsd:complexType name="conventionType">
+        <!-- path to the report. relative to '/component/root' -->
+        <xsd:attribute name="path" type="xsd:string" use="required"/>
+    </xsd:complexType>
+</xsd:schema>

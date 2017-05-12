@@ -1,0 +1,2878 @@
+Using default config file '/testing/packages/linux/config.default'
+make defconfig
+  HOSTCC  scripts/basic/fixdep
+  HOSTCC  scripts/basic/split-include
+  HOSTCC  scripts/basic/docproc
+  SHIPPED scripts/kconfig/zconf.tab.h
+  HOSTCC  scripts/kconfig/conf.o
+  HOSTCC  scripts/kconfig/kxgettext.o
+  HOSTCC  scripts/kconfig/mconf.o
+  SHIPPED scripts/kconfig/zconf.tab.c
+  SHIPPED scripts/kconfig/lex.zconf.c
+  HOSTCC  scripts/kconfig/zconf.tab.o
+  HOSTLD  scripts/kconfig/conf
+COPYING CREDITS Documentation Kbuild MAINTAINERS Makefile README REPORTING-BUGS arch crypto drivers fs include init ipc kernel lib linux-2.6.14.tar.bz2.log mm net scripts security sound usr Default configuration is based on config.default
+arch/i386/configs/config.default:139: trying to assign nonexistent symbol HAVE_DEC_LOCK
+arch/i386/configs/config.default:186: trying to assign nonexistent symbol PCI_NAMES
+arch/i386/configs/config.default:547: trying to assign nonexistent symbol IP_TCPDIAG
+arch/i386/configs/config.default:548: trying to assign nonexistent symbol IP_TCPDIAG_IPV6
+arch/i386/configs/config.default:840: trying to assign nonexistent symbol SERIAL_8250_MULTIPORT
+arch/i386/configs/config.default:1247: trying to assign nonexistent symbol DEVFS_FS
+arch/i386/configs/config.default:1248: trying to assign nonexistent symbol DEVPTS_FS_XATTR
+arch/i386/configs/config.default:1250: trying to assign nonexistent symbol TMPFS_XATTR
+*
+* Linux Kernel Configuration
+*
+*
+* Code maturity level options
+*
+Prompt for development and/or incomplete code/drivers (EXPERIMENTAL) [Y/n/?] y
+  Select only drivers expected to compile cleanly (CLEAN_COMPILE) [Y/n/?] y
+*
+* General setup
+*
+Local version - append to kernel release (LOCALVERSION) [] 
+Automatically append version information to the version string (LOCALVERSION_AUTO) [Y/n/?] (NEW) y
+Support for paging of anonymous memory (swap) (SWAP) [Y/n/?] y
+System V IPC (SYSVIPC) [Y/n/?] y
+POSIX Message Queues (POSIX_MQUEUE) [Y/n/?] y
+BSD Process Accounting (BSD_PROCESS_ACCT) [N/y/?] n
+Sysctl support (SYSCTL) [Y/n/?] y
+Auditing support (AUDIT) [N/y/?] n
+Support for hot-pluggable devices (HOTPLUG) [Y/?] y
+Kernel Userspace Events (KOBJECT_UEVENT) [Y/n/?] y
+Kernel .config support (IKCONFIG) [Y/n/?] y
+  Enable access to .config through /proc/config.gz (IKCONFIG_PROC) [Y/n/?] y
+Cpuset support (CPUSETS) [Y/n/?] y
+Initramfs source file(s) (INITRAMFS_SOURCE) [] 
+*
+* Configure standard kernel features (for small systems)
+*
+Configure standard kernel features (for small systems) (EMBEDDED) [N/y/?] n
+  Load all symbols for debugging/kksymoops (KALLSYMS) [Y/?] (NEW) y
+    Include all symbols in kallsyms (KALLSYMS_ALL) [N/y/?] n
+    Do an extra kallsyms pass (KALLSYMS_EXTRA_PASS) [N/y/?] n
+*
+* Loadable module support
+*
+Enable loadable module support (MODULES) [Y/n/?] y
+  Module unloading (MODULE_UNLOAD) [Y/n/?] y
+    Forced module unloading (MODULE_FORCE_UNLOAD) [N/y/?] n
+  Module versioning support (EXPERIMENTAL) (MODVERSIONS) [N/y/?] n
+  Source checksum for all modules (MODULE_SRCVERSION_ALL) [N/y/?] n
+  Automatic kernel module loading (KMOD) [Y/n/?] y
+*
+* Processor type and features
+*
+Subarchitecture Type
+> 1. PC-compatible (X86_PC)
+  2. AMD Elan (X86_ELAN)
+  3. Voyager (NCR) (X86_VOYAGER)
+  4. NUMAQ (IBM/Sequent) (X86_NUMAQ)
+  5. Summit/EXA (IBM x440) (X86_SUMMIT)
+  6. Support for other sub-arch SMP systems with more than 8 CPUs (X86_BIGSMP)
+  7. SGI 320/540 (Visual Workstation) (X86_VISWS)
+  8. Generic architecture (Summit, bigsmp, ES7000, default) (X86_GENERICARCH)
+  9. Support for Unisys ES7000 IA32 series (X86_ES7000)
+choice[1-9]: 1
+Processor family
+  1. 386 (M386)
+  2. 486 (M486)
+  3. 586/K5/5x86/6x86/6x86MX (M586)
+  4. Pentium-Classic (M586TSC)
+  5. Pentium-MMX (M586MMX)
+  6. Pentium-Pro (M686)
+  7. Pentium-II/Celeron(pre-Coppermine) (MPENTIUMII)
+  8. Pentium-III/Celeron(Coppermine)/Pentium-III Xeon (MPENTIUMIII)
+  9. Pentium M (MPENTIUMM)
+> 10. Pentium-4/Celeron(P4-based)/Pentium-4 M/Xeon (MPENTIUM4)
+  11. K6/K6-II/K6-III (MK6)
+  12. Athlon/Duron/K7 (MK7)
+  13. Opteron/Athlon64/Hammer/K8 (MK8)
+  14. Crusoe (MCRUSOE)
+  15. Efficeon (MEFFICEON)
+  16. Winchip-C6 (MWINCHIPC6)
+  17. Winchip-2 (MWINCHIP2)
+  18. Winchip-2A/Winchip-3 (MWINCHIP3D)
+  19. GeodeGX1 (MGEODEGX1)
+  20. CyrixIII/VIA-C3 (MCYRIXIII)
+  21. VIA C3-2 (Nehemiah) (MVIAC3_2)
+choice[1-21]: 10
+Generic x86 support (X86_GENERIC) [N/y/?] n
+HPET Timer Support (HPET_TIMER) [N/y/?] n
+Symmetric multi-processing support (SMP) [Y/n/?] y
+  Maximum number of CPUs (2-255) (NR_CPUS) [32] 32
+  SMT (Hyperthreading) scheduler support (SCHED_SMT) [Y/n/?] y
+Preemption Model
+  1. No Forced Preemption (Server) (PREEMPT_NONE) (NEW)
+  2. Voluntary Kernel Preemption (Desktop) (PREEMPT_VOLUNTARY) (NEW)
+> 3. Preemptible Kernel (Low-Latency Desktop) (PREEMPT)
+choice[1-3]: 3
+Preempt The Big Kernel Lock (PREEMPT_BKL) [Y/n/?] y
+Machine Check Exception (X86_MCE) [Y/n/?] y
+  Check for non-fatal errors on AMD Athlon/Duron / Intel Pentium 4 (X86_MCE_NONFATAL) [Y/n/m/?] y
+  check for P4 thermal throttling interrupt. (X86_MCE_P4THERMAL) [Y/n/?] y
+Toshiba Laptop support (TOSHIBA) [N/m/y/?] n
+Dell laptop support (I8K) [N/m/y/?] n
+Enable X86 board specific fixups for reboot (X86_REBOOTFIXUPS) [N/y/?] n
+/dev/cpu/microcode - Intel IA32 CPU microcode support (MICROCODE) [N/m/y/?] n
+/dev/cpu/*/msr - Model-specific register support (X86_MSR) [N/m/y/?] n
+/dev/cpu/*/cpuid - CPU information support (X86_CPUID) [N/m/y/?] n
+*
+* Firmware Drivers
+*
+BIOS Enhanced Disk Drive calls determine boot disk (EXPERIMENTAL) (EDD) [N/m/y/?] n
+BIOS update support for DELL systems via sysfs (DELL_RBU) [N/m/y/?] (NEW) n
+Dell Systems Management Base Driver (DCDBAS) [M/n/y/?] (NEW) m
+High Memory Support
+> 1. off (NOHIGHMEM)
+  2. 4GB (HIGHMEM4G)
+  3. 64GB (HIGHMEM64G)
+choice[1-3]: 1
+Memory model
+> 1. Flat Memory (FLATMEM_MANUAL) (NEW)
+choice[1]: 1
+Math emulation (MATH_EMULATION) [N/y/?] n
+MTRR (Memory Type Range Register) support (MTRR) [Y/n/?] y
+Enable kernel irq balancing (IRQBALANCE) [Y/n/?] y
+Use register arguments (EXPERIMENTAL) (REGPARM) [N/y/?] n
+Enable seccomp to safely compute untrusted bytecode (SECCOMP) [Y/n/?] y
+Timer frequency
+  1. 100 HZ (HZ_100) (NEW)
+> 2. 250 HZ (HZ_250) (NEW)
+  3. 1000 HZ (HZ_1000) (NEW)
+choice[1-3?]: 2
+kexec system call (EXPERIMENTAL) (KEXEC) [N/y/?] (NEW) n
+*
+* Power management options (ACPI, APM)
+*
+Power Management support (PM) [Y/n/?] y
+  Power Management Debug Support (PM_DEBUG) [N/y/?] n
+*
+* ACPI (Advanced Configuration and Power Interface) Support
+*
+ACPI Support (ACPI) [N/y/?] n
+*
+* APM (Advanced Power Management) BIOS Support
+*
+APM (Advanced Power Management) BIOS support (APM) [Y/n/m/?] y
+  Ignore USER SUSPEND (APM_IGNORE_USER_SUSPEND) [N/y/?] n
+  Enable PM at boot time (APM_DO_ENABLE) [N/y/?] n
+  Make CPU Idle calls when idle (APM_CPU_IDLE) [Y/n/?] y
+  Enable console blanking using APM (APM_DISPLAY_BLANK) [N/y/?] n
+  RTC stores time in GMT (APM_RTC_IS_GMT) [Y/n/?] y
+  Allow interrupts during APM BIOS calls (APM_ALLOW_INTS) [N/y/?] n
+  Use real mode APM BIOS call to power off (APM_REAL_MODE_POWER_OFF) [N/y/?] n
+*
+* CPU Frequency scaling
+*
+CPU Frequency scaling (CPU_FREQ) [N/y/?] n
+*
+* Bus options (PCI, PCMCIA, EISA, MCA, ISA)
+*
+PCI support (PCI) [Y/n/?] y
+  PCI access mode
+    1. BIOS (PCI_GOBIOS)
+    2. MMConfig (PCI_GOMMCONFIG)
+    3. Direct (PCI_GODIRECT)
+  > 4. Any (PCI_GOANY)
+  choice[1-4?]: 4
+  PCI Express support (PCIEPORTBUS) [N/y/?] n
+  Message Signaled Interrupts (MSI and MSI-X) (PCI_MSI) [N/y/?] n
+  Legacy /proc/pci interface (PCI_LEGACY_PROC) [Y/n/?] y
+  PCI Debugging (PCI_DEBUG) [N/y/?] n
+ISA support (ISA) [Y/n/?] y
+  EISA support (EISA) [N/y/?] n
+MCA support (MCA) [N/y/?] n
+NatSemi SCx200 support (SCx200) [N/m/y/?] n
+Support for hot-pluggable CPUs (EXPERIMENTAL) (HOTPLUG_CPU) [N/y/?] (NEW) n
+*
+* PCCARD (PCMCIA/CardBus) support
+*
+PCCard (PCMCIA/CardBus) support (PCCARD) [N/m/y/?] n
+*
+* PCI Hotplug Support
+*
+Support for PCI Hotplug (EXPERIMENTAL) (HOTPLUG_PCI) [N/m/y/?] n
+*
+* Executable file formats
+*
+Kernel support for ELF binaries (BINFMT_ELF) [Y/n/?] y
+Kernel support for a.out and ECOFF binaries (BINFMT_AOUT) [Y/n/m/?] y
+Kernel support for MISC binaries (BINFMT_MISC) [Y/n/m/?] y
+*
+* Networking
+*
+Networking support (NET) [Y/?] y
+  *
+  * Networking options
+  *
+  Packet socket (PACKET) [Y/n/m/?] y
+    Packet socket: mmapped IO (PACKET_MMAP) [N/y/?] n
+  Unix domain sockets (UNIX) [Y/n/m/?] y
+  PF_KEY sockets (NET_KEY) [N/m/y/?] n
+  TCP/IP networking (INET) [Y/n/?] y
+    IP: multicasting (IP_MULTICAST) [Y/n/?] y
+    IP: advanced router (IP_ADVANCED_ROUTER) [N/y/?] n
+    IP: kernel level autoconfiguration (IP_PNP) [N/y/?] n
+    IP: tunneling (NET_IPIP) [N/m/y/?] n
+    IP: GRE tunnels over IP (NET_IPGRE) [N/m/y/?] n
+    IP: multicast routing (IP_MROUTE) [N/y/?] n
+    IP: ARP daemon support (EXPERIMENTAL) (ARPD) [N/y/?] n
+    IP: TCP syncookie support (disabled per default) (SYN_COOKIES) [N/y/?] n
+    IP: AH transformation (INET_AH) [N/m/y/?] n
+    IP: ESP transformation (INET_ESP) [N/m/y/?] n
+    IP: IPComp transformation (INET_IPCOMP) [N/m/y/?] n
+    IP: tunnel transformation (INET_TUNNEL) [N/m/y/?] n
+    INET: socket monitoring interface (INET_DIAG) [Y/n/m/?] (NEW) y
+    TCP: advanced congestion control (TCP_CONG_ADVANCED) [N/y/?] (NEW) n
+    *
+    * IP: Virtual Server Configuration
+    *
+    IP virtual server support (EXPERIMENTAL) (IP_VS) [N/m/y/?] n
+    The IPv6 protocol (IPV6) [N/m/y/?] n
+  *
+  * Network packet filtering (replaces ipchains)
+  *
+  Network packet filtering (replaces ipchains) (NETFILTER) [Y/n/?] y
+    Network packet filtering debugging (NETFILTER_DEBUG) [N/y/?] n
+    Netfilter netlink interface (NETFILTER_NETLINK) [N/m/y/?] (NEW) n
+    *
+    * IP: Netfilter Configuration
+    *
+    Connection tracking (required for masq/NAT) (IP_NF_CONNTRACK) [Y/n/m/?] y
+      Connection tracking flow accounting (IP_NF_CT_ACCT) [N/y/?] n
+      Connection mark tracking support (IP_NF_CONNTRACK_MARK) [N/y/?] n
+      Connection tracking events (IP_NF_CONNTRACK_EVENTS) [N/y/?] (NEW) n
+      SCTP protocol connection tracking support (EXPERIMENTAL) (IP_NF_CT_PROTO_SCTP) [N/m/y/?] n
+      FTP protocol support (IP_NF_FTP) [N/m/y/?] n
+      IRC protocol support (IP_NF_IRC) [N/m/y/?] n
+      NetBIOS name service protocol support (EXPERIMENTAL) (IP_NF_NETBIOS_NS) [N/m/y/?] (NEW) n
+      TFTP protocol support (IP_NF_TFTP) [N/m/y/?] n
+      Amanda backup protocol support (IP_NF_AMANDA) [N/m/y/?] n
+      PPTP protocol support (IP_NF_PPTP) [N/m/y/?] (NEW) n
+    IP Userspace queueing via NETLINK (OBSOLETE) (IP_NF_QUEUE) [Y/n/m/?] y
+    IP tables support (required for filtering/masq/NAT) (IP_NF_IPTABLES) [Y/n/m/?] y
+      limit match support (IP_NF_MATCH_LIMIT) [Y/n/m/?] y
+      IP range match support (IP_NF_MATCH_IPRANGE) [Y/n/m/?] y
+      MAC address match support (IP_NF_MATCH_MAC) [Y/n/m/?] y
+      Packet type match support (IP_NF_MATCH_PKTTYPE) [Y/n/m/?] y
+      netfilter MARK match support (IP_NF_MATCH_MARK) [Y/n/m/?] y
+      Multiple port match support (IP_NF_MATCH_MULTIPORT) [Y/n/m/?] y
+      TOS match support (IP_NF_MATCH_TOS) [Y/n/m/?] y
+      recent match support (IP_NF_MATCH_RECENT) [Y/n/m/?] y
+      ECN match support (IP_NF_MATCH_ECN) [Y/n/m/?] y
+      DSCP match support (IP_NF_MATCH_DSCP) [Y/n/m/?] y
+      AH/ESP match support (IP_NF_MATCH_AH_ESP) [Y/n/m/?] y
+      LENGTH match support (IP_NF_MATCH_LENGTH) [Y/n/m/?] y
+      TTL match support (IP_NF_MATCH_TTL) [Y/n/m/?] y
+      tcpmss match support (IP_NF_MATCH_TCPMSS) [Y/n/m/?] y
+      Helper match support (IP_NF_MATCH_HELPER) [Y/n/m/?] y
+      Connection state match support (IP_NF_MATCH_STATE) [Y/n/m/?] y
+      Connection tracking match support (IP_NF_MATCH_CONNTRACK) [Y/n/m/?] y
+      Owner match support (IP_NF_MATCH_OWNER) [Y/n/m/?] y
+      address type match support (IP_NF_MATCH_ADDRTYPE) [N/m/y/?] n
+      realm match support (IP_NF_MATCH_REALM) [N/m/y/?] n
+      SCTP protocol match support (IP_NF_MATCH_SCTP) [N/m/y/?] n
+      DCCP protocol match support (IP_NF_MATCH_DCCP) [N/m/y/?] (NEW) n
+      comment match support (IP_NF_MATCH_COMMENT) [N/m/y/?] n
+      hashlimit match support (IP_NF_MATCH_HASHLIMIT) [N/m/y/?] n
+      string match support (IP_NF_MATCH_STRING) [N/m/y/?] (NEW) n
+      Packet filtering (IP_NF_FILTER) [Y/n/m/?] y
+        REJECT target support (IP_NF_TARGET_REJECT) [Y/n/m/?] y
+      LOG target support (IP_NF_TARGET_LOG) [Y/n/m/?] y
+      ULOG target support (OBSOLETE) (IP_NF_TARGET_ULOG) [Y/n/m/?] y
+      TCPMSS target support (IP_NF_TARGET_TCPMSS) [Y/n/m/?] y
+      NFQUEUE Target Support (IP_NF_TARGET_NFQUEUE) [N/m/y/?] (NEW) n
+      Full NAT (IP_NF_NAT) [Y/n/m/?] y
+        MASQUERADE target support (IP_NF_TARGET_MASQUERADE) [Y/n/m/?] y
+        REDIRECT target support (IP_NF_TARGET_REDIRECT) [Y/n/m/?] y
+        NETMAP target support (IP_NF_TARGET_NETMAP) [Y/n/m/?] y
+        SAME target support (IP_NF_TARGET_SAME) [Y/n/m/?] y
+        Basic SNMP-ALG support (EXPERIMENTAL) (IP_NF_NAT_SNMP_BASIC) [N/m/y/?] n
+      Packet mangling (IP_NF_MANGLE) [Y/n/m/?] y
+        TOS target support (IP_NF_TARGET_TOS) [Y/n/m/?] y
+        ECN target support (IP_NF_TARGET_ECN) [Y/n/m/?] y
+        DSCP target support (IP_NF_TARGET_DSCP) [Y/n/m/?] y
+        MARK target support (IP_NF_TARGET_MARK) [Y/n/m/?] y
+        CLASSIFY target support (IP_NF_TARGET_CLASSIFY) [Y/n/m/?] y
+        TTL target support (IP_NF_TARGET_TTL) [N/m/y/?] (NEW) n
+      raw table support (required for NOTRACK/TRACE) (IP_NF_RAW) [M/n/y/?] m
+        NOTRACK target support (IP_NF_TARGET_NOTRACK) [M/n/?] m
+    ARP tables support (IP_NF_ARPTABLES) [Y/n/m/?] y
+      ARP packet filtering (IP_NF_ARPFILTER) [Y/n/m/?] y
+      ARP payload mangling (IP_NF_ARP_MANGLE) [Y/n/m/?] y
+  *
+  * DCCP Configuration (EXPERIMENTAL)
+  *
+  The DCCP Protocol (EXPERIMENTAL) (IP_DCCP) [N/m/y/?] (NEW) n
+  *
+  * SCTP Configuration (EXPERIMENTAL)
+  *
+  The SCTP Protocol (EXPERIMENTAL) (IP_SCTP) [N/m/y/?] n
+  Asynchronous Transfer Mode (ATM) (EXPERIMENTAL) (ATM) [N/m/y/?] n
+  802.1d Ethernet Bridging (BRIDGE) [N/m/y/?] n
+  802.1Q VLAN Support (VLAN_8021Q) [N/m/y/?] n
+  DECnet Support (DECNET) [N/m/y/?] n
+  ANSI/IEEE 802.2 LLC type 2 Support (LLC2) [N/m/y/?] n
+  The IPX protocol (IPX) [N/m/y/?] n
+  Appletalk protocol support (ATALK) [N/m/y/?] n
+  CCITT X.25 Packet Layer (EXPERIMENTAL) (X25) [N/m/y/?] n
+  LAPB Data Link Driver (EXPERIMENTAL) (LAPB) [N/m/y/?] n
+  Frame Diverter (EXPERIMENTAL) (NET_DIVERT) [N/y/?] n
+  Acorn Econet/AUN protocols (EXPERIMENTAL) (ECONET) [N/m/y/?] n
+  WAN router (WAN_ROUTER) [N/m/y/?] n
+  *
+  * QoS and/or fair queueing
+  *
+  QoS and/or fair queueing (NET_SCHED) [N/y/?] n
+  *
+  * Network testing
+  *
+  Packet Generator (USE WITH CAUTION) (NET_PKTGEN) [N/m/y/?] n
+  *
+  * Amateur Radio support
+  *
+  Amateur Radio support (HAMRADIO) [N/y/?] n
+  *
+  * IrDA (infrared) subsystem support
+  *
+  IrDA (infrared) subsystem support (IRDA) [N/m/y/?] n
+  *
+  * Bluetooth subsystem support
+  *
+  Bluetooth subsystem support (BT) [N/m/y/?] n
+  Generic IEEE 802.11 Networking Stack (IEEE80211) [N/m/y/?] (NEW) n
+*
+* Device Drivers
+*
+*
+* Generic Driver Options
+*
+Select only drivers that don't need compile-time external firmware (STANDALONE) [Y/n/?] y
+Prevent firmware from being built (PREVENT_FIRMWARE_BUILD) [Y/n/?] y
+Hotplug firmware loading support (FW_LOADER) [M/y/?] m
+Driver Core verbose debug messages (DEBUG_DRIVER) [N/y/?] n
+*
+* Connector - unified userspace <-> kernelspace linker
+*
+Connector - unified userspace <-> kernelspace linker (CONNECTOR) [N/m/y/?] (NEW) n
+*
+* Memory Technology Devices (MTD)
+*
+Memory Technology Device (MTD) support (MTD) [N/m/y/?] n
+*
+* Parallel port support
+*
+Parallel port support (PARPORT) [Y/n/m/?] y
+  PC-style hardware (PARPORT_PC) [Y/n/m/?] y
+    Multi-IO cards (parallel and serial) (PARPORT_SERIAL) [N/m/y/?] n
+    Use FIFO/DMA if available (EXPERIMENTAL) (PARPORT_PC_FIFO) [N/y/?] n
+    SuperIO chipset support (EXPERIMENTAL) (PARPORT_PC_SUPERIO) [N/y/?] n
+IEEE 1284 transfer modes (PARPORT_1284) [N/y/?] n
+*
+* Plug and Play support
+*
+Plug and Play support (PNP) [Y/n/?] y
+  PnP Debug Messages (PNP_DEBUG) [N/y/?] n
+  *
+  * Protocols
+  *
+  ISA Plug and Play support (ISAPNP) [N/y/?] n
+  Plug and Play BIOS support (EXPERIMENTAL) (PNPBIOS) [N/y/?] n
+*
+* Block devices
+*
+Normal floppy disk support (BLK_DEV_FD) [Y/n/m/?] y
+XT hard disk support (BLK_DEV_XD) [N/m/y/?] n
+Parallel port IDE device support (PARIDE) [N/m/y/?] n
+Compaq SMART2 support (BLK_CPQ_DA) [N/m/y/?] n
+Compaq Smart Array 5xxx support (BLK_CPQ_CISS_DA) [N/m/y/?] n
+Mylex DAC960/DAC1100 PCI RAID Controller support (BLK_DEV_DAC960) [N/m/y/?] n
+Micro Memory MM5415 Battery Backed RAM support (EXPERIMENTAL) (BLK_DEV_UMEM) [N/m/y/?] n
+Loopback device support (BLK_DEV_LOOP) [Y/n/m/?] y
+  Cryptoloop Support (BLK_DEV_CRYPTOLOOP) [N/m/y/?] n
+Network block device support (BLK_DEV_NBD) [N/m/y/?] n
+Promise SATA SX8 support (BLK_DEV_SX8) [N/m/y/?] n
+Low Performance USB Block driver (BLK_DEV_UB) [N/m/y/?] n
+RAM disk support (BLK_DEV_RAM) [N/m/y/?] n
+Support for Large Block Devices (LBD) [Y/n/?] y
+Packet writing on CD/DVD media (CDROM_PKTCDVD) [N/m/y/?] n
+*
+* IO Schedulers
+*
+Anticipatory I/O scheduler (IOSCHED_AS) [Y/n/m/?] y
+Deadline I/O scheduler (IOSCHED_DEADLINE) [Y/n/m/?] y
+CFQ I/O scheduler (IOSCHED_CFQ) [Y/n/m/?] y
+ATA over Ethernet support (ATA_OVER_ETH) [N/m/y/?] n
+*
+* ATA/ATAPI/MFM/RLL support
+*
+ATA/ATAPI/MFM/RLL support (IDE) [Y/n/m/?] y
+  Enhanced IDE/MFM/RLL disk/cdrom/tape/floppy support (BLK_DEV_IDE) [Y/n/m/?] y
+    *
+    * Please see Documentation/ide.txt for help/info on IDE drives
+    *
+    Support for SATA (deprecated; conflicts with libata SATA driver) (BLK_DEV_IDE_SATA) [N/y/?] n
+    Use old disk-only driver on primary interface (BLK_DEV_HD_IDE) [N/y/?] n
+    Include IDE/ATA-2 DISK support (BLK_DEV_IDEDISK) [Y/n/m/?] y
+    Use multi-mode by default (IDEDISK_MULTI_MODE) [Y/n/?] y
+    Include IDE/ATAPI CDROM support (BLK_DEV_IDECD) [Y/n/m/?] y
+    Include IDE/ATAPI TAPE support (EXPERIMENTAL) (BLK_DEV_IDETAPE) [N/m/y/?] n
+    Include IDE/ATAPI FLOPPY support (BLK_DEV_IDEFLOPPY) [N/m/y/?] n
+    SCSI emulation support (BLK_DEV_IDESCSI) [Y/n/m/?] y
+    IDE Taskfile Access (IDE_TASK_IOCTL) [N/y/?] n
+    *
+    * IDE chipset support/bugfixes
+    *
+    generic/default IDE chipset support (IDE_GENERIC) [Y/n/m/?] y
+    CMD640 chipset bugfix/support (BLK_DEV_CMD640) [Y/n/?] y
+      CMD640 enhanced support (BLK_DEV_CMD640_ENHANCED) [N/y/?] n
+    PNP EIDE support (BLK_DEV_IDEPNP) [N/y/?] n
+    PCI IDE chipset support (BLK_DEV_IDEPCI) [Y/n/?] y
+      Sharing PCI IDE interrupts support (IDEPCI_SHARE_IRQ) [Y/n/?] y
+      Boot off-board chipsets first support (BLK_DEV_OFFBOARD) [N/y/?] n
+      Generic PCI IDE Chipset Support (BLK_DEV_GENERIC) [Y/n/m] y
+      OPTi 82C621 chipset enhanced support (EXPERIMENTAL) (BLK_DEV_OPTI621) [N/m/y/?] n
+      RZ1000 chipset bugfix/support (BLK_DEV_RZ1000) [Y/n/m/?] y
+      Generic PCI bus-master DMA support (BLK_DEV_IDEDMA_PCI) [Y/n/?] y
+        Force enable legacy 2.0.X HOSTS to use DMA (BLK_DEV_IDEDMA_FORCED) [N/y/?] n
+        Use PCI DMA by default when available (IDEDMA_PCI_AUTO) [Y/n/?] y
+          Enable DMA only for disks  (IDEDMA_ONLYDISK) [N/y/?] n
+        AEC62XX chipset support (BLK_DEV_AEC62XX) [N/m/y/?] n
+        ALI M15x3 chipset support (BLK_DEV_ALI15X3) [N/m/y/?] n
+        AMD and nVidia IDE support (BLK_DEV_AMD74XX) [N/m/y/?] n
+        ATI IXP chipset IDE support (BLK_DEV_ATIIXP) [N/m/y/?] n
+        CMD64{3|6|8|9} chipset support (BLK_DEV_CMD64X) [N/m/y/?] n
+        Compaq Triflex IDE support (BLK_DEV_TRIFLEX) [N/m/y/?] n
+        CY82C693 chipset support (BLK_DEV_CY82C693) [N/m/y/?] n
+        Cyrix CS5510/20 MediaGX chipset support (VERY EXPERIMENTAL) (BLK_DEV_CS5520) [N/m/y/?] n
+        Cyrix/National Semiconductor CS5530 MediaGX chipset support (BLK_DEV_CS5530) [N/m/y/?] n
+        HPT34X chipset support (BLK_DEV_HPT34X) [N/m/y/?] n
+        HPT36X/37X chipset support (BLK_DEV_HPT366) [N/m/y/?] n
+        National SCx200 chipset support (BLK_DEV_SC1200) [N/m/y/?] n
+        Intel PIIXn chipsets support (BLK_DEV_PIIX) [Y/n/m/?] y
+        IT821X IDE support (BLK_DEV_IT821X) [N/m/y/?] (NEW) n
+        NS87415 chipset support (BLK_DEV_NS87415) [N/m/y/?] n
+        PROMISE PDC202{46|62|65|67} support (BLK_DEV_PDC202XX_OLD) [N/m/y/?] n
+        PROMISE PDC202{68|69|70|71|75|76|77} support (BLK_DEV_PDC202XX_NEW) [N/m/y] n
+        ServerWorks OSB4/CSB5/CSB6 chipsets support (BLK_DEV_SVWKS) [Y/n/m/?] y
+        Silicon Image chipset support (BLK_DEV_SIIMAGE) [N/m/y/?] n
+        SiS5513 chipset support (BLK_DEV_SIS5513) [N/m/y/?] n
+        SLC90E66 chipset support (BLK_DEV_SLC90E66) [N/m/y/?] n
+        Tekram TRM290 chipset support (BLK_DEV_TRM290) [N/m/y/?] n
+        VIA82CXXX chipset support (BLK_DEV_VIA82CXXX) [N/m/y/?] n
+    Other IDE chipset support (IDE_CHIPSETS) [N/y/?] n
+    IGNORE word93 Validation BITS (IDEDMA_IVB) [N/y/?] n
+*
+* SCSI device support
+*
+RAID Transport Class (RAID_ATTRS) [N/m/y/?] (NEW) n
+SCSI device support (SCSI) [Y/?] y
+  legacy /proc/scsi/ support (SCSI_PROC_FS) [Y/n/?] y
+  *
+  * SCSI support type (disk, tape, CD-ROM)
+  *
+  SCSI disk support (BLK_DEV_SD) [Y/n/m/?] y
+  SCSI tape support (CHR_DEV_ST) [N/m/y/?] n
+  SCSI OnStream SC-x0 tape support (CHR_DEV_OSST) [N/m/y/?] n
+  SCSI CDROM support (BLK_DEV_SR) [Y/n/m/?] y
+    Enable vendor-specific extensions (for SCSI CDROM) (BLK_DEV_SR_VENDOR) [N/y/?] n
+  SCSI generic support (CHR_DEV_SG) [Y/n/m/?] y
+  SCSI media changer support (CHR_DEV_SCH) [N/m/y/?] (NEW) n
+  *
+  * Some SCSI devices (e.g. CD jukebox) support multiple LUNs
+  *
+  Probe all LUNs on each SCSI device (SCSI_MULTI_LUN) [Y/n/?] y
+  Verbose SCSI error reporting (kernel size +=12K) (SCSI_CONSTANTS) [Y/n/?] y
+  SCSI logging facility (SCSI_LOGGING) [N/y/?] n
+  *
+  * SCSI Transport Attributes
+  *
+  Parallel SCSI (SPI) Transport Attributes (SCSI_SPI_ATTRS) [M/y/?] m
+  FiberChannel Transport Attributes (SCSI_FC_ATTRS) [N/m/y/?] n
+  iSCSI Transport Attributes (SCSI_ISCSI_ATTRS) [N/m/y/?] n
+  SAS Transport Attributes (SCSI_SAS_ATTRS) [N/m/y/?] (NEW) n
+  *
+  * SCSI low-level drivers
+  *
+  3ware 5/6/7/8xxx ATA-RAID support (BLK_DEV_3W_XXXX_RAID) [N/m/y/?] n
+  3ware 9xxx SATA-RAID support (SCSI_3W_9XXX) [N/m/y/?] n
+  7000FASST SCSI support (SCSI_7000FASST) [N/m/y/?] n
+  ACARD SCSI support (SCSI_ACARD) [N/m/y/?] n
+  Adaptec AHA152X/2825 support (SCSI_AHA152X) [N/m/y/?] n
+  Adaptec AHA1542 support (SCSI_AHA1542) [N/m/y/?] n
+  Adaptec AACRAID support (SCSI_AACRAID) [M/n/y] m
+  Adaptec AIC7xxx Fast -> U160 support (New Driver) (SCSI_AIC7XXX) [M/n/y/?] m
+    Maximum number of TCQ commands per device (AIC7XXX_CMDS_PER_DEVICE) [32] 32
+    Initial bus reset delay in milli-seconds (AIC7XXX_RESET_DELAY_MS) [15000] 15000
+    Compile in Debugging Code (AIC7XXX_DEBUG_ENABLE) [Y/n/?] y
+    Debug code enable mask (2047 for all debugging) (AIC7XXX_DEBUG_MASK) [0] 0
+    Decode registers during diagnostics (AIC7XXX_REG_PRETTY_PRINT) [Y/n/?] y
+  Adaptec AIC7xxx support (old driver) (SCSI_AIC7XXX_OLD) [N/m/y/?] n
+  Adaptec AIC79xx U320 support (SCSI_AIC79XX) [N/m/y/?] n
+  Adaptec I2O RAID support  (SCSI_DPT_I2O) [M/n/y/?] m
+  Always IN2000 SCSI support (SCSI_IN2000) [N/m/y/?] n
+  LSI Logic New Generation RAID Device Drivers (MEGARAID_NEWGEN) [N/y/?] n
+  LSI Logic Legacy MegaRAID Driver (MEGARAID_LEGACY) [M/n/y/?] m
+  LSI Logic MegaRAID SAS RAID Module (MEGARAID_SAS) [N/m/y/?] (NEW) n
+  Serial ATA (SATA) support (SCSI_SATA) [Y/n/m/?] y
+    AHCI SATA support (SCSI_SATA_AHCI) [N/m/y/?] n
+    ServerWorks Frodo / Apple K2 SATA support (SCSI_SATA_SVW) [N/m/y/?] n
+    Intel PIIX/ICH SATA support (SCSI_ATA_PIIX) [Y/n/m/?] y
+    Marvell SATA support (SCSI_SATA_MV) [N/m/y/?] (NEW) n
+    NVIDIA SATA support (SCSI_SATA_NV) [N/m/y/?] n
+    Promise SATA TX2/TX4 support (SCSI_SATA_PROMISE) [N/m/y/?] n
+    Pacific Digital SATA QStor support (SCSI_SATA_QSTOR) [N/m/y/?] n
+    Promise SATA SX4 support (SCSI_SATA_SX4) [M/n/y/?] m
+    Silicon Image SATA support (SCSI_SATA_SIL) [N/m/y/?] n
+    SiS 964/180 SATA support (SCSI_SATA_SIS) [M/n/y/?] m
+    ULi Electronics SATA support (SCSI_SATA_ULI) [N/m/y/?] n
+    VIA SATA support (SCSI_SATA_VIA) [N/m/y/?] n
+    VITESSE VSC-7174 SATA support (SCSI_SATA_VITESSE) [N/m/y/?] n
+  BusLogic SCSI support (SCSI_BUSLOGIC) [N/m/y/?] n
+  DMX3191D SCSI support (SCSI_DMX3191D) [N/m/y/?] n
+  DTC3180/3280 SCSI support (SCSI_DTC3280) [N/m/y/?] n
+  EATA ISA/EISA/PCI (DPT and generic EATA/DMA-compliant boards) support (SCSI_EATA) [N/m/y/?] n
+  Future Domain 16xx SCSI/AHA-2920A support (SCSI_FUTURE_DOMAIN) [N/m/y/?] n
+  Intel/ICP (former GDT SCSI Disk Array) RAID Controller support (SCSI_GDTH) [N/m/y/?] n
+  Generic NCR5380/53c400 SCSI PIO support (SCSI_GENERIC_NCR5380) [N/m/y/?] n
+  Generic NCR5380/53c400 SCSI MMIO support (SCSI_GENERIC_NCR5380_MMIO) [N/m/y/?] n
+  IBM ServeRAID support (SCSI_IPS) [N/m/y/?] n
+  Initio 9100U(W) support (SCSI_INITIO) [N/m/y/?] n
+  Initio INI-A100U2W support (SCSI_INIA100) [N/m/y/?] n
+  IOMEGA parallel port (ppa - older drives) (SCSI_PPA) [N/m/y/?] n
+  IOMEGA parallel port (imm - newer drives) (SCSI_IMM) [N/m/y/?] n
+  NCR53c406a SCSI support (SCSI_NCR53C406A) [N/m/y/?] n
+  SYM53C8XX Version 2 SCSI support (SCSI_SYM53C8XX_2) [M/n/y/?] m
+    DMA addressing mode (SCSI_SYM53C8XX_DMA_ADDRESSING_MODE) [1] 1
+    default tagged command queue depth (SCSI_SYM53C8XX_DEFAULT_TAGS) [16] 16
+    maximum number of queued commands (SCSI_SYM53C8XX_MAX_TAGS) [64] 64
+    use port IO (SCSI_SYM53C8XX_IOMAPPED) [N/y/?] n
+  IBM Power Linux RAID adapter support (SCSI_IPR) [M/n/y/?] m
+    enable driver internal trace (SCSI_IPR_TRACE) [N/y/?] n
+    enable adapter dump support (SCSI_IPR_DUMP) [N/y/?] n
+  PAS16 SCSI support (SCSI_PAS16) [N/m/y/?] n
+  PSI240i support (SCSI_PSI240I) [N/m/y/?] n
+  Qlogic FAS SCSI support (SCSI_QLOGIC_FAS) [N/m/y/?] n
+  Qlogic ISP FC SCSI support (SCSI_QLOGIC_FC) [M/n/y/?] m
+    Include loadable firmware in driver (SCSI_QLOGIC_FC_FIRMWARE) [N/y/?] n
+  Qlogic QLA 1240/1x80/1x160 SCSI support (SCSI_QLOGIC_1280) [N/m/y/?] n
+  QLogic ISP2100 host adapter family support (SCSI_QLA21XX) [N/m/y/?] n
+  QLogic ISP2200 host adapter family support (SCSI_QLA22XX) [N/m/y/?] n
+  QLogic ISP2300 host adapter family support (SCSI_QLA2300) [N/m/y/?] n
+  QLogic ISP2322 host adapter family support (SCSI_QLA2322) [N/m/y/?] n
+  QLogic ISP63xx host adapter family support (SCSI_QLA6312) [N/m/y/?] n
+  QLogic ISP24xx host adapter family support (SCSI_QLA24XX) [N/m/y/?] (NEW) n
+  Emulex LightPulse Fibre Channel Support (SCSI_LPFC) [N/m/y/?] n
+  Symbios 53c416 SCSI support (SCSI_SYM53C416) [N/m/y/?] n
+  Tekram DC395(U/UW/F) and DC315(U) SCSI support (EXPERIMENTAL) (SCSI_DC395x) [N/m/y/?] n
+  Tekram DC390(T) and Am53/79C974 SCSI support (SCSI_DC390T) [N/m/y/?] n
+  Trantor T128/T128F/T228 SCSI support (SCSI_T128) [N/m/y/?] n
+  UltraStor 14F/34F support (SCSI_U14_34F) [N/m/y/?] n
+  UltraStor SCSI support (SCSI_ULTRASTOR) [N/m/y/?] n
+  Workbit NinjaSCSI-32Bi/UDE support (SCSI_NSP32) [N/m/y/?] n
+  SCSI debugging host simulator (SCSI_DEBUG) [N/m/y/?] n
+*
+* Old CD-ROM drivers (not SCSI, not IDE)
+*
+Support non-SCSI/IDE/ATAPI CDROM drives (CD_NO_IDESCSI) [N/y/?] n
+*
+* Multi-device support (RAID and LVM)
+*
+Multiple devices driver support (RAID and LVM) (MD) [Y/n/?] y
+  RAID support (BLK_DEV_MD) [M/n/y/?] m
+    Linear (append) mode (MD_LINEAR) [M/n/?] m
+    RAID-0 (striping) mode (MD_RAID0) [M/n/?] m
+    RAID-1 (mirroring) mode (MD_RAID1) [M/n/?] m
+    RAID-10 (mirrored striping) mode (EXPERIMENTAL) (MD_RAID10) [N/m/?] n
+    RAID-4/RAID-5 mode (MD_RAID5) [M/n/?] m
+    RAID-6 mode (MD_RAID6) [M/n/?] m
+    Multipath I/O support (MD_MULTIPATH) [N/m/?] n
+    Faulty test module for MD (MD_FAULTY) [N/m/?] n
+  Device mapper support (BLK_DEV_DM) [M/n/y/?] m
+    Crypt target support (DM_CRYPT) [N/m/?] n
+    Snapshot target (EXPERIMENTAL) (DM_SNAPSHOT) [N/m/?] n
+    Mirror target (EXPERIMENTAL) (DM_MIRROR) [N/m/?] n
+    Zero target (EXPERIMENTAL) (DM_ZERO) [N/m/?] n
+    Multipath target (EXPERIMENTAL) (DM_MULTIPATH) [N/m/?] n
+*
+* Fusion MPT device support
+*
+Fusion MPT ScsiHost drivers for SPI (FUSION_SPI) [N/m/y/?] (NEW) n
+Fusion MPT ScsiHost drivers for FC (FUSION_FC) [N/m/y/?] (NEW) n
+Fusion MPT ScsiHost drivers for SAS (FUSION_SAS) [N/m/y/?] (NEW) n
+*
+* IEEE 1394 (FireWire) support
+*
+IEEE 1394 (FireWire) support (IEEE1394) [Y/n/m/?] y
+  *
+  * Subsystem Options
+  *
+  Excessive debugging output (IEEE1394_VERBOSEDEBUG) [N/y/?] n
+  OUI Database built-in (IEEE1394_OUI_DB) [N/y/?] n
+  Build in extra config rom entries for certain functionality (IEEE1394_EXTRA_CONFIG_ROMS) [N/y/?] n
+  Export all symbols of ieee1394's API (IEEE1394_EXPORT_FULL_API) [N/y/?] (NEW) n
+  *
+  * Device Drivers
+  *
+  *
+  * Texas Instruments PCILynx requires I2C
+  *
+  OHCI-1394 support (IEEE1394_OHCI1394) [Y/n/m/?] y
+  *
+  * Protocol Drivers
+  *
+  OHCI-1394 Video support (IEEE1394_VIDEO1394) [N/m/y/?] n
+  SBP-2 support (Harddisks etc.) (IEEE1394_SBP2) [N/m/y/?] n
+  Ethernet over 1394 (IEEE1394_ETH1394) [N/m/y/?] n
+  OHCI-DV I/O support (IEEE1394_DV1394) [N/m/y/?] n
+  Raw IEEE1394 I/O support (IEEE1394_RAWIO) [Y/n/m/?] y
+  IEC61883-1 Plug support (IEEE1394_CMP) [N/m/y/?] n
+*
+* I2O device support
+*
+I2O support (I2O) [N/m/y/?] n
+*
+* Network device support
+*
+Network device support (NETDEVICES) [Y/n/?] y
+  Dummy net driver support (DUMMY) [M/n/y/?] m
+  Bonding driver support (BONDING) [M/n/y/?] m
+  EQL (serial line load balancing) support (EQUALIZER) [N/m/y/?] n
+  Universal TUN/TAP device driver support (TUN) [N/m/y/?] n
+  General Instruments Surfboard 1000 (NET_SB1000) [N/m/y/?] n
+  *
+  * ARCnet devices
+  *
+  ARCnet support (ARCNET) [N/m/y/?] n
+  *
+  * PHY device support
+  *
+  PHY Device support and infrastructure (PHYLIB) [N/m/y/?] (NEW) n
+  *
+  * Ethernet (10 or 100Mbit)
+  *
+  Ethernet (10 or 100Mbit) (NET_ETHERNET) [Y/n/?] y
+    Generic Media Independent Interface device support (MII) [Y/?] y
+    Sun Happy Meal 10/100baseT support (HAPPYMEAL) [N/m/y/?] n
+    Sun GEM support (SUNGEM) [N/m/y/?] n
+    Sun Cassini support (CASSINI) [N/m/y/?] (NEW) n
+    3COM cards (NET_VENDOR_3COM) [N/y/?] n
+    AMD LANCE and PCnet (AT1500 and NE2100) support (LANCE) [N/m/y/?] n
+    Western Digital/SMC cards (NET_VENDOR_SMC) [N/y/?] n
+  Racal-Interlan (Micom) NI cards (NET_VENDOR_RACAL) [N/y/?] n
+  *
+  * Tulip family network device support
+  *
+  "Tulip" family network device support (NET_TULIP) [N/y/?] n
+  AT1700/1720 support (EXPERIMENTAL) (AT1700) [N/m/y/?] n
+  DEPCA, DE10x, DE200, DE201, DE202, DE422 support (DEPCA) [N/m/y/?] n
+  HP 10/100VG PCLAN (ISA, EISA, PCI) support (HP100) [N/m/y/?] n
+  Other ISA cards (NET_ISA) [N/y/?] n
+  EISA, VLB, PCI and on board controllers (NET_PCI) [Y/n/?] y
+    AMD PCnet32 PCI support (PCNET32) [M/n/y/?] m
+    AMD 8111 (new PCI lance) support (AMD8111_ETH) [N/m/y/?] n
+    Adaptec Starfire/DuraLAN support (ADAPTEC_STARFIRE) [M/n/y/?] m
+      Use Rx Polling (NAPI) (EXPERIMENTAL) (ADAPTEC_STARFIRE_NAPI) [N/y/?] n
+    Ansel Communications EISA 3200 support (EXPERIMENTAL) (AC3200) [N/m/y/?] n
+    Apricot Xen-II on board Ethernet (APRICOT) [N/m/y/?] n
+    Broadcom 4400 ethernet support (EXPERIMENTAL) (B44) [N/m/y/?] n
+    Reverse Engineered nForce Ethernet support (EXPERIMENTAL) (FORCEDETH) [N/m/y/?] n
+  CS89x0 support (CS89x0) [N/m/y/?] n
+  Digi Intl. RightSwitch SE-X support (DGRS) [N/m/y/?] n
+  EtherExpressPro/100 support (eepro100, original Becker driver) (EEPRO100) [M/n/y/?] m
+  Intel(R) PRO/100+ support (E100) [Y/n/m/?] y
+  Myson MTD-8xx PCI Ethernet support (FEALNX) [N/m/y/?] n
+  National Semiconductor DP8381x series PCI Ethernet support (NATSEMI) [N/m/y/?] n
+  PCI NE2000 and clones support (see help) (NE2K_PCI) [N/m/y/?] n
+  RealTek RTL-8139 C+ PCI Fast Ethernet Adapter support (EXPERIMENTAL) (8139CP) [N/m/y/?] n
+  RealTek RTL-8129/8130/8139 PCI Fast Ethernet Adapter support (8139TOO) [Y/n/m/?] y
+    Use PIO instead of MMIO (8139TOO_PIO) [Y/n/?] y
+    Support for uncommon RTL-8139 rev. K (automatic channel equalization) (8139TOO_TUNE_TWISTER) [N/y/?] n
+    Support for older RTL-8129/8130 boards (8139TOO_8129) [N/y/?] n
+    Use older RX-reset method (8139_OLD_RX_RESET) [N/y/?] n
+  SiS 900/7016 PCI Fast Ethernet Adapter support (SIS900) [N/m/y/?] n
+  SMC EtherPower II (EPIC100) [N/m/y/?] n
+  Sundance Alta support (SUNDANCE) [N/m/y/?] n
+  TI ThunderLAN support (TLAN) [N/m/y/?] n
+  VIA Rhine support (VIA_RHINE) [N/m/y/?] n
+  Pocket and portable adapters (NET_POCKET) [N/y/?] n
+  *
+  * Ethernet (1000 Mbit)
+  *
+  Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit support (ACENIC) [M/n/y/?] m
+    Omit support for old Tigon I based AceNICs (ACENIC_OMIT_TIGON_I) [N/y/?] n
+  D-Link DL2000-based Gigabit Ethernet support (DL2K) [N/m/y/?] n
+  Intel(R) PRO/1000 Gigabit Ethernet support (E1000) [M/n/y/?] m
+    Use Rx Polling (NAPI) (E1000_NAPI) [N/y/?] n
+  National Semiconduct DP83820 support (NS83820) [N/m/y/?] n
+  Packet Engines Hamachi GNIC-II support (HAMACHI) [N/m/y/?] n
+  Packet Engines Yellowfin Gigabit-NIC support (EXPERIMENTAL) (YELLOWFIN) [N/m/y/?] n
+  Realtek 8169 gigabit ethernet support (R8169) [N/m/y/?] n
+  SiS190/SiS191 gigabit ethernet support (SIS190) [N/m/y/?] (NEW) n
+  New SysKonnect GigaEthernet support (EXPERIMENTAL) (SKGE) [N/m/y/?] (NEW) n
+  Marvell Yukon Chipset / SysKonnect SK-98xx Support (SK98LIN) [N/m/y/?] n
+  VIA Velocity support (VIA_VELOCITY) [N/m/y/?] n
+  Broadcom Tigon3 support (TIGON3) [M/n/y/?] m
+  Broadcom NetXtremeII support (BNX2) [N/m/y/?] n
+  *
+  * Ethernet (10000 Mbit)
+  *
+  Chelsio 10Gb Ethernet support (CHELSIO_T1) [N/m/y/?] (NEW) n
+  Intel(R) PRO/10GbE support (IXGB) [M/n/y/?] m
+    Use Rx Polling (NAPI) (EXPERIMENTAL) (IXGB_NAPI) [N/y/?] n
+  S2IO 10Gbe XFrame NIC (S2IO) [M/n/y/?] m
+    Use Rx Polling (NAPI) (EXPERIMENTAL) (S2IO_NAPI) [N/y/?] n
+    Use 2 Buffer Mode on Rx side. (2BUFF_MODE) [N/y/?] n
+  *
+  * Token Ring devices
+  *
+  Token Ring driver support (TR) [N/y/?] n
+  *
+  * Wireless LAN (non-hamradio)
+  *
+  Wireless LAN drivers (non-hamradio) & Wireless Extensions (NET_RADIO) [N/y/?] n
+  *
+  * Wan interfaces
+  *
+  Wan interfaces support (WAN) [N/y/?] n
+  FDDI driver support (FDDI) [N/y/?] n
+  HIPPI driver support (EXPERIMENTAL) (HIPPI) [N/y/?] n
+  PLIP (parallel port) support (PLIP) [N/m/y/?] n
+  PPP (point-to-point protocol) support (PPP) [N/m/y/?] n
+  SLIP (serial line) support (SLIP) [N/m/y/?] n
+  Fibre Channel driver support (NET_FC) [N/y/?] n
+  Traffic Shaper (EXPERIMENTAL) (SHAPER) [N/m/y/?] n
+  Network console logging support (EXPERIMENTAL) (NETCONSOLE) [Y/n/m/?] y
+Netpoll support for trapping incoming packets (NETPOLL_RX) [N/y] n
+Netpoll traffic trapping (NETPOLL_TRAP) [N/y] n
+*
+* ISDN subsystem
+*
+ISDN support (ISDN) [N/m/y/?] n
+*
+* Telephony Support
+*
+Linux telephony support (PHONE) [N/m/y/?] n
+*
+* Input device support
+*
+Generic input layer (needed for keyboard, mouse, ...) (INPUT) [Y/?] (NEW) y
+  *
+  * Userland interfaces
+  *
+  Mouse interface (INPUT_MOUSEDEV) [Y/?] (NEW) y
+    Provide legacy /dev/psaux device (INPUT_MOUSEDEV_PSAUX) [Y/n/?] y
+    Horizontal screen resolution (INPUT_MOUSEDEV_SCREEN_X) [1024] 1024
+    Vertical screen resolution (INPUT_MOUSEDEV_SCREEN_Y) [768] 768
+  Joystick interface (INPUT_JOYDEV) [N/m/y/?] n
+  Touchscreen interface (INPUT_TSDEV) [N/m/y/?] n
+  Event interface (INPUT_EVDEV) [N/m/y/?] n
+  Event debugging (INPUT_EVBUG) [N/m/y/?] n
+  *
+  * Input Device Drivers
+  *
+  *
+  * Keyboards
+  *
+  Keyboards (INPUT_KEYBOARD) [Y/?] (NEW) y
+    Sun Type 4 and Type 5 keyboard (KEYBOARD_SUNKBD) [N/m/y/?] n
+    DECstation/VAXstation LK201/LK401 keyboard (KEYBOARD_LKKBD) [N/m/y/?] n
+    XT keyboard (KEYBOARD_XTKBD) [N/m/y/?] n
+    Newton keyboard (KEYBOARD_NEWTON) [N/m/y/?] n
+  *
+  * Mouse
+  *
+  Mouse (INPUT_MOUSE) [Y/n/?] y
+    PS/2 mouse (MOUSE_PS2) [Y/n/m/?] y
+    Serial mouse (MOUSE_SERIAL) [N/m/y/?] n
+    InPort/MS/ATIXL busmouse (MOUSE_INPORT) [N/m/y/?] n
+    Logitech busmouse (MOUSE_LOGIBM) [N/m/y/?] n
+    IBM PC110 touchpad (MOUSE_PC110PAD) [N/m/y/?] n
+    DEC VSXXX-AA/GA mouse and VSXXX-AB tablet (MOUSE_VSXXXAA) [N/m/y/?] n
+  *
+  * Joysticks
+  *
+  Joysticks (INPUT_JOYSTICK) [N/y/?] n
+  *
+  * Touchscreens
+  *
+  Touchscreens (INPUT_TOUCHSCREEN) [N/y/?] n
+  *
+  * Miscellaneous devices
+  *
+  Miscellaneous devices (INPUT_MISC) [N/y/?] n
+*
+* Hardware I/O ports
+*
+Serial I/O support (SERIO) [Y/?] (NEW) y
+  Serial port line discipline (SERIO_SERPORT) [N/m/y/?] n
+  ct82c710 Aux port controller (SERIO_CT82C710) [N/m/y/?] n
+  Parallel port keyboard adapter (SERIO_PARKBD) [N/m/y/?] n
+  PCI PS/2 keyboard and PS/2 mouse controller (SERIO_PCIPS2) [N/m/y/?] n
+  Raw access to serio ports (SERIO_RAW) [N/m/y/?] n
+Gameport support (GAMEPORT) [N/m/y/?] n
+*
+* Character devices
+*
+Non-standard serial port support (SERIAL_NONSTANDARD) [N/y/?] n
+*
+* Serial drivers
+*
+8250/16550 and compatible serial support (SERIAL_8250) [Y/n/m/?] y
+  Console on 8250/16550 and compatible serial port (SERIAL_8250_CONSOLE) [Y/n/?] y
+  Maximum number of 8250/16550 serial ports (SERIAL_8250_NR_UARTS) [4] 4
+  Extended 8250/16550 serial driver options (SERIAL_8250_EXTENDED) [Y/n/?] y
+    Support more than 4 legacy serial ports (SERIAL_8250_MANY_PORTS) [Y/n/?] y
+    Support for sharing serial interrupts (SERIAL_8250_SHARE_IRQ) [Y/n/?] y
+    Autodetect IRQ on standard ports (unsafe) (SERIAL_8250_DETECT_IRQ) [Y/n/?] y
+    Support RSA serial ports (SERIAL_8250_RSA) [Y/n/?] y
+  Support Fourport cards (SERIAL_8250_FOURPORT) [N/m/y/?] (NEW) n
+  Support Accent cards (SERIAL_8250_ACCENT) [N/m/y/?] (NEW) n
+  Support Boca cards (SERIAL_8250_BOCA) [N/m/y/?] (NEW) n
+  Support Hub6 cards (SERIAL_8250_HUB6) [N/m/y/?] (NEW) n
+*
+* Non-8250 serial port support
+*
+Digi International NEO PCI Support (SERIAL_JSM) [N/m/y/?] n
+Legacy (BSD) PTY support (LEGACY_PTYS) [Y/n/?] y
+  Maximum number of legacy PTY in use (LEGACY_PTY_COUNT) [256] 256
+Parallel printer support (PRINTER) [Y/n/m/?] y
+  Support for console on line printer (LP_CONSOLE) [N/y/?] n
+Support for user-space parallel port device drivers (PPDEV) [N/m/y/?] n
+Texas Instruments parallel link cable support (TIPAR) [N/m/y/?] n
+*
+* IPMI
+*
+IPMI top-level message handler (IPMI_HANDLER) [N/m/y/?] n
+*
+* Watchdog Cards
+*
+Watchdog Timer Support (WATCHDOG) [N/y/?] n
+Intel/AMD/VIA HW Random Number Generator support (HW_RANDOM) [N/m/y/?] n
+/dev/nvram support (NVRAM) [Y/n/m/?] y
+Enhanced Real Time Clock Support (RTC) [Y/n/m/?] y
+Double Talk PC internal speech card support (DTLK) [N/m/y/?] n
+Siemens R3964 line discipline (R3964) [Y/n/m/?] y
+Applicom intelligent fieldbus card support (APPLICOM) [N/m/y/?] n
+Sony Vaio Programmable I/O Control Device support (EXPERIMENTAL) (SONYPI) [N/m/y/?] n
+*
+* Ftape, the floppy tape device driver
+*
+/dev/agpgart (AGP Support) (AGP) [Y/n/m/?] y
+  ALI chipset support (AGP_ALI) [Y/n/m/?] y
+  ATI chipset support (AGP_ATI) [N/m/y/?] n
+  AMD Irongate, 761, and 762 chipset support (AGP_AMD) [N/m/y/?] n
+  AMD Opteron/Athlon64 on-CPU GART support (AGP_AMD64) [N/m/y/?] n
+  Intel 440LX/BX/GX, I8xx and E7x05 chipset support (AGP_INTEL) [Y/n/m/?] y
+  NVIDIA nForce/nForce2 chipset support (AGP_NVIDIA) [N/m/y/?] n
+  SiS chipset support (AGP_SIS) [N/m/y/?] n
+  Serverworks LE/HE chipset support (AGP_SWORKS) [N/m/y/?] n
+  VIA chipset support (AGP_VIA) [N/m/y/?] n
+  Transmeta Efficeon support (AGP_EFFICEON) [N/m/y/?] n
+Direct Rendering Manager (XFree86 4.1.0 and higher DRI support) (DRM) [Y/n/m/?] y
+  3dfx Banshee/Voodoo3+ (DRM_TDFX) [N/m/y/?] n
+  ATI Rage 128 (DRM_R128) [N/m/y/?] n
+  ATI Radeon (DRM_RADEON) [N/m/y/?] n
+  Intel I810 (DRM_I810) [N/m/y/?] n
+  Intel 830M, 845G, 852GM, 855GM, 865G [N/m/y] n
+  Matrox g200/g400 (DRM_MGA) [N/m/y/?] n
+  SiS video cards (DRM_SIS) [N/m/y/?] n
+  Via unichrome video cards (DRM_VIA) [N/m/y/?] (NEW) n
+  Savage video cards (DRM_SAVAGE) [N/m/y/?] (NEW) n
+ACP Modem (Mwave) support (MWAVE) [N/m/y/?] n
+RAW driver (/dev/raw/rawN) (OBSOLETE) (RAW_DRIVER) [M/n/y/?] m
+Maximum number of RAW devices to support (1-8192) (MAX_RAW_DEVS) [256] 256
+Hangcheck timer (HANGCHECK_TIMER) [N/m/y/?] n
+*
+* TPM devices
+*
+TPM Hardware Support (TCG_TPM) [N/m/y/?] n
+*
+* I2C support
+*
+I2C support (I2C) [N/m/y/?] n
+*
+* Dallas's 1-wire bus
+*
+Dallas's 1-wire support (W1) [N/m/y/?] n
+*
+* Hardware Monitoring support
+*
+Hardware Monitoring support (HWMON) [Y/n/m/?] (NEW) y
+IBM Hard Drive Active Protection System (hdaps) (SENSORS_HDAPS) [N/m/y/?] (NEW) n
+Hardware Monitoring Chip debugging messages (HWMON_DEBUG_CHIP) [N/y/?] (NEW) n
+*
+* Misc devices
+*
+Device driver for IBM RSA service processor (IBM_ASM) [N/m/y/?] n
+*
+* Multimedia Capabilities Port drivers
+*
+*
+* Multimedia devices
+*
+Video For Linux (VIDEO_DEV) [N/m/y/?] n
+*
+* Digital Video Broadcasting Devices
+*
+DVB For Linux (DVB) [N/y/?] n
+*
+* Graphics support
+*
+Support for frame buffer devices (FB) [N/m/y/?] n
+*
+* Console display driver support
+*
+VGA text console (VGA_CONSOLE) [Y/?] (NEW) y
+  Video mode selection support (VIDEO_SELECT) [Y/n/?] y
+MDA text console (dual-headed) (EXPERIMENTAL) (MDA_CONSOLE) [N/m/y/?] n
+*
+* Sound
+*
+Sound card support (SOUND) [Y/n/m/?] y
+*
+* Advanced Linux Sound Architecture
+*
+Advanced Linux Sound Architecture (SND) [Y/n/m/?] y
+  Sequencer support (SND_SEQUENCER) [Y/n/m/?] y
+    Sequencer dummy client (SND_SEQ_DUMMY) [N/m/y/?] n
+  OSS Mixer API (SND_MIXER_OSS) [Y/n/m/?] y
+  OSS PCM (digital audio) API (SND_PCM_OSS) [Y/n/m/?] y
+  OSS Sequencer API (SND_SEQUENCER_OSS) [Y/n/?] y
+  RTC Timer support (SND_RTCTIMER) [N/m/y/?] n
+  Verbose printk (SND_VERBOSE_PRINTK) [N/y/?] n
+  Debug (SND_DEBUG) [N/y/?] n
+  *
+  * Generic devices
+  *
+  Dummy (/dev/null) soundcard (SND_DUMMY) [N/m/y/?] n
+  Virtual MIDI soundcard (SND_VIRMIDI) [N/m/y/?] n
+  MOTU MidiTimePiece AV multiport MIDI (SND_MTPAV) [N/m/y/?] n
+  UART16550 serial MIDI driver (SND_SERIAL_U16550) [N/m/y/?] n
+  Generic MPU-401 UART driver (SND_MPU401) [N/m/y/?] n
+  *
+  * ISA devices
+  *
+  Analog Devices SoundPort AD1816A (SND_AD1816A) [N/m/y/?] (NEW) n
+  Generic AD1848/CS4248 driver (SND_AD1848) [N/m/y/?] n
+  Generic Cirrus Logic CS4231 driver (SND_CS4231) [N/m/y/?] n
+  Generic Cirrus Logic CS4232 driver (SND_CS4232) [N/m/y/?] n
+  Generic Cirrus Logic CS4236+ driver (SND_CS4236) [N/m/y/?] n
+  Generic ESS ES968 driver (SND_ES968) [N/m/y/?] (NEW) n
+  Generic ESS ES688/ES1688 driver (SND_ES1688) [N/m/y/?] n
+  Generic ESS ES18xx driver (SND_ES18XX) [N/m/y/?] n
+  Gravis UltraSound Classic (SND_GUSCLASSIC) [N/m/y/?] n
+  Gravis UltraSound Extreme (SND_GUSEXTREME) [N/m/y/?] n
+  Gravis UltraSound MAX (SND_GUSMAX) [N/m/y/?] n
+  AMD InterWave, Gravis UltraSound PnP (SND_INTERWAVE) [N/m/y/?] n
+  AMD InterWave + TEA6330T (UltraSound 32-Pro) (SND_INTERWAVE_STB) [N/m/y/?] n
+  OPTi 82C92x - AD1848 (SND_OPTI92X_AD1848) [N/m/y/?] n
+  OPTi 82C92x - CS4231 (SND_OPTI92X_CS4231) [N/m/y/?] n
+  OPTi 82C93x (SND_OPTI93X) [N/m/y/?] n
+  Sound Blaster 1.0/2.0/Pro (8-bit) (SND_SB8) [N/m/y/?] n
+  Sound Blaster 16 (PnP) (SND_SB16) [N/m/y/?] n
+  Sound Blaster AWE (32,64) (PnP) (SND_SBAWE) [N/m/y/?] n
+  Turtle Beach Maui,Tropez,Tropez+ (Wavefront) (SND_WAVEFRONT) [N/m/y/?] n
+  Avance Logic ALS100/ALS120 (SND_ALS100) [N/m/y/?] (NEW) n
+  Aztech Systems AZT2320 (SND_AZT2320) [N/m/y/?] (NEW) n
+  C-Media CMI8330 (SND_CMI8330) [N/m/y/?] n
+  Diamond Technologies DT-019X, Avance Logic ALS-007 (SND_DT019X) [N/m/y/?] (NEW) n
+  Yamaha OPL3-SA2/SA3 (SND_OPL3SA2) [N/m/y/?] n
+  Aztech Sound Galaxy (SND_SGALAXY) [N/m/y/?] n
+  Ensoniq SoundScape PnP driver (SND_SSCAPE) [N/m/y/?] n
+*
+* PCI devices
+*
+ALi M5451 PCI Audio Controller (SND_ALI5451) [N/m/y/?] n
+ATI IXP AC97 Controller (SND_ATIIXP) [N/m/y/?] n
+ATI IXP Modem (SND_ATIIXP_MODEM) [N/m/y/?] n
+Aureal Advantage (SND_AU8810) [N/m/y/?] n
+Aureal Vortex (SND_AU8820) [N/m/y/?] n
+Aureal Vortex 2 (SND_AU8830) [N/m/y/?] n
+Aztech AZF3328 / PCI168 (EXPERIMENTAL) (SND_AZT3328) [N/m/y/?] n
+Bt87x Audio Capture (SND_BT87X) [N/m/y/?] n
+Cirrus Logic (Sound Fusion) CS4280/CS461x/CS462x/CS463x (SND_CS46XX) [N/m/y/?] n
+Cirrus Logic (Sound Fusion) CS4281 (SND_CS4281) [N/m/y/?] n
+Emu10k1 (SB Live!, Audigy, E-mu APS) (SND_EMU10K1) [N/m/y/?] n
+Emu10k1X (Dell OEM Version) (SND_EMU10K1X) [N/m/y/?] n
+SB Audigy LS / Live 24bit (SND_CA0106) [N/m/y/?] n
+Korg 1212 IO (SND_KORG1212) [N/m/y/?] n
+Digigram miXart (SND_MIXART) [N/m/y/?] n
+NeoMagic NM256AV/ZX (SND_NM256) [N/m/y/?] n
+RME Digi32, 32/8, 32 PRO (SND_RME32) [N/m/y/?] n
+RME Digi96, 96/8, 96/8 PRO (SND_RME96) [N/m/y/?] n
+RME Digi9652 (Hammerfall) (SND_RME9652) [N/m/y/?] n
+RME Hammerfall DSP Audio (SND_HDSP) [N/m/y/?] n
+RME Hammerfall DSP MADI (SND_HDSPM) [N/m/y/?] (NEW) n
+Trident 4D-Wave DX/NX; SiS 7018 (SND_TRIDENT) [N/m/y/?] n
+Yamaha YMF724/740/744/754 (SND_YMFPCI) [N/m/y/?] n
+Analog Devices AD1889 (SND_AD1889) [N/m/y/?] (NEW) n
+Avance Logic ALS4000 (SND_ALS4000) [N/m/y/?] n
+C-Media 8738, 8338 (SND_CMIPCI) [N/m/y/?] n
+(Creative) Ensoniq AudioPCI 1370 (SND_ENS1370) [N/m/y/?] n
+(Creative) Ensoniq AudioPCI 1371/1373 (SND_ENS1371) [N/m/y/?] n
+ESS ES1938/1946/1969 (Solo-1) (SND_ES1938) [N/m/y/?] n
+ESS ES1968/1978 (Maestro-1/2/2E) (SND_ES1968) [N/m/y/?] n
+ESS Allegro/Maestro3 (SND_MAESTRO3) [N/m/y/?] n
+ForteMedia FM801 (SND_FM801) [N/m/y/?] n
+ICEnsemble ICE1712 (Envy24) (SND_ICE1712) [N/m/y/?] n
+ICE/VT1724/1720 (Envy24HT/PT) (SND_ICE1724) [N/m/y/?] n
+Intel/SiS/nVidia/AMD/ALi AC97 Controller (SND_INTEL8X0) [Y/n/m/?] y
+Intel/SiS/nVidia/AMD MC97 Modem (EXPERIMENTAL) (SND_INTEL8X0M) [N/m/y/?] n
+S3 SonicVibes (SND_SONICVIBES) [N/m/y/?] n
+VIA 82C686A/B, 8233/8235 AC97 Controller (SND_VIA82XX) [N/m/y/?] n
+VIA 82C686A/B, 8233 based Modems (SND_VIA82XX_MODEM) [N/m/y/?] n
+Digigram VX222 (SND_VX222) [N/m/y/?] n
+Intel HD Audio (SND_HDA_INTEL) [N/m/y/?] n
+*
+* USB devices
+*
+USB Audio/MIDI driver (SND_USB_AUDIO) [N/m/y/?] n
+Tascam US-122, US-224 and US-428 USB driver (SND_USB_USX2Y) [N/m/y/?] n
+*
+* Open Sound System
+*
+Open Sound System (DEPRECATED) (SOUND_PRIME) [N/m/y/?] n
+*
+* USB support
+*
+Support for Host-side USB (USB) [Y/n/m/?] y
+  USB verbose debug messages (USB_DEBUG) [N/y/?] n
+  *
+  * Miscellaneous USB options
+  *
+  USB device filesystem (USB_DEVICEFS) [Y/n/?] y
+  Enforce USB bandwidth allocation (EXPERIMENTAL) (USB_BANDWIDTH) [N/y/?] n
+  Dynamic USB minor allocation (EXPERIMENTAL) (USB_DYNAMIC_MINORS) [N/y/?] n
+  USB suspend/resume (EXPERIMENTAL) (USB_SUSPEND) [N/y/?] n
+  *
+  * USB Host Controller Drivers
+  *
+  EHCI HCD (USB 2.0) support (USB_EHCI_HCD) [Y/n/m/?] y
+    Full speed ISO transactions (EXPERIMENTAL) (USB_EHCI_SPLIT_ISO) [N/y/?] n
+    Root Hub Transaction Translators (EXPERIMENTAL) (USB_EHCI_ROOT_HUB_TT) [N/y/?] n
+  ISP116X HCD support (USB_ISP116X_HCD) [N/m/y/?] (NEW) n
+  OHCI HCD support (USB_OHCI_HCD) [N/m/y/?] n
+  UHCI HCD (most Intel and VIA) support (USB_UHCI_HCD) [Y/n/m/?] y
+  SL811HS HCD support (USB_SL811_HCD) [N/m/y/?] n
+  *
+  * USB Device Class drivers
+  *
+  Obsolete OSS USB drivers (OBSOLETE_OSS_USB_DRIVER) [N/y/?] (NEW) n
+  USB Bluetooth TTY support (USB_BLUETOOTH_TTY) [N/m/y/?] n
+  USB Modem (CDC ACM) support (USB_ACM) [N/m/y/?] n
+  USB Printer support (USB_PRINTER) [Y/n/m/?] y
+  *
+  * NOTE: USB_STORAGE enables SCSI, and 'SCSI disk support' may also be needed; see USB_STORAGE Help for more information
+  *
+  USB Mass Storage support (USB_STORAGE) [Y/n/m/?] y
+    USB Mass Storage verbose debug (USB_STORAGE_DEBUG) [N/y/?] n
+    Datafab Compact Flash Reader support (EXPERIMENTAL) (USB_STORAGE_DATAFAB) [N/y/?] n
+    Freecom USB/ATAPI Bridge support (USB_STORAGE_FREECOM) [N/y/?] n
+    ISD-200 USB/ATA Bridge support (USB_STORAGE_ISD200) [N/y/?] n
+    Microtech/ZiO! CompactFlash/SmartMedia support (USB_STORAGE_DPCM) [N/y/?] n
+    USBAT/USBAT02-based storage support (EXPERIMENTAL) (USB_STORAGE_USBAT) [N/y/?] n
+    SanDisk SDDR-09 (and other SmartMedia) support (EXPERIMENTAL) (USB_STORAGE_SDDR09) [N/y/?] n
+    SanDisk SDDR-55 SmartMedia support (EXPERIMENTAL) (USB_STORAGE_SDDR55) [N/y/?] n
+    Lexar Jumpshot Compact Flash Reader (EXPERIMENTAL) (USB_STORAGE_JUMPSHOT) [N/y/?] n
+  *
+  * USB Input Devices
+  *
+  USB Human Interface Device (full HID) support (USB_HID) [Y/n/m/?] y
+    HID input layer support (USB_HIDINPUT) [Y/n/?] y
+      Force feedback support (EXPERIMENTAL) (HID_FF) [N/y/?] n
+    /dev/hiddev raw HID device support (USB_HIDDEV) [N/y/?] n
+  Aiptek 6000U/8000U tablet support (USB_AIPTEK) [N/m/y/?] n
+  Wacom Intuos/Graphire tablet support (USB_WACOM) [N/m/y/?] n
+  Acecad Flair tablet support (USB_ACECAD) [N/m/y/?] (NEW) n
+  KB Gear JamStudio tablet support (USB_KBTAB) [N/m/y/?] n
+  Griffin PowerMate and Contour Jog support (USB_POWERMATE) [N/m/y/?] n
+  MicroTouch USB Touchscreen Driver (USB_MTOUCH) [N/m/y/?] n
+  ITM Touch USB Touchscreen Driver (USB_ITMTOUCH) [N/m/y/?] (NEW) n
+  eGalax TouchKit USB Touchscreen Driver (USB_EGALAX) [M/n/y/?] m
+  Yealink usb-p1k voip phone (USB_YEALINK) [N/m/y/?] (NEW) n
+  X-Box gamepad support (USB_XPAD) [N/m/y/?] n
+  ATI / X10 USB RF remote control (USB_ATI_REMOTE) [N/m/y/?] n
+  Keyspan DMR USB remote control (EXPERIMENTAL) (USB_KEYSPAN_REMOTE) [N/m/y/?] (NEW) n
+  Apple USB Touchpad support (USB_APPLETOUCH) [N/m/y/?] (NEW) n
+  *
+  * USB Imaging devices
+  *
+  USB Mustek MDC800 Digital Camera support (EXPERIMENTAL) (USB_MDC800) [N/m/y/?] n
+  Microtek X6USB scanner support (USB_MICROTEK) [N/m/y/?] n
+  *
+  * USB Multimedia devices
+  *
+  DABUSB driver (USB_DABUSB) [N/m/y/?] n
+  *
+  * Video4Linux support is needed for USB Multimedia device support
+  *
+  *
+  * USB Network Adapters
+  *
+  USB CATC NetMate-based Ethernet device support (EXPERIMENTAL) (USB_CATC) [N/m/y/?] n
+  USB KLSI KL5USB101-based ethernet device support (USB_KAWETH) [N/m/y/?] n
+  USB Pegasus/Pegasus-II based ethernet device support (USB_PEGASUS) [N/m/y/?] n
+  USB RTL8150 based ethernet device support (EXPERIMENTAL) (USB_RTL8150) [N/m/y/?] n
+  Multi-purpose USB Networking Framework (USB_USBNET) [N/m/y/?] n
+  USB Monitor (USB_MON) [Y/n/?] y
+  *
+  * USB port drivers
+  *
+  USS720 parport driver (USB_USS720) [N/m/y/?] n
+  *
+  * USB Serial Converter support
+  *
+  USB Serial Converter support (USB_SERIAL) [N/m/y/?] n
+  *
+  * USB Miscellaneous drivers
+  *
+  EMI 6|2m USB Audio interface support (USB_EMI62) [N/m/y/?] n
+  EMI 2|6 USB Audio interface support (USB_EMI26) [N/m/y/?] n
+  USB Auerswald ISDN support (EXPERIMENTAL) (USB_AUERSWALD) [N/m/y/?] n
+  USB Diamond Rio500 support (EXPERIMENTAL) (USB_RIO500) [N/m/y/?] n
+  USB Lego Infrared Tower support (EXPERIMENTAL) (USB_LEGOTOWER) [N/m/y/?] n
+  USB LCD driver support (USB_LCD) [N/m/y/?] n
+  USB LED driver support (USB_LED) [N/m/y/?] n
+  Cypress USB thermometer driver support (USB_CYTHERM) [M/n/y/?] m
+  USB PhidgetKit support (USB_PHIDGETKIT) [N/m/y/?] n
+  USB PhidgetServo support (USB_PHIDGETSERVO) [M/n/y/?] m
+  Siemens ID USB Mouse Fingerprint sensor support (USB_IDMOUSE) [N/m/y/?] n
+  USB 2.0 SVGA dongle support (Net2280/SiS315) (USB_SISUSBVGA) [N/m/y/?] n
+  USB LD driver (USB_LD) [N/m/y/?] (NEW) n
+  USB testing driver (DEVELOPMENT) (USB_TEST) [N/m/y/?] n
+  *
+  * USB DSL modem support
+  *
+*
+* USB Gadget Support
+*
+Support for USB Gadgets (USB_GADGET) [N/m/y/?] n
+*
+* MMC/SD Card support
+*
+MMC support (MMC) [N/m/y/?] n
+*
+* InfiniBand support
+*
+InfiniBand support (INFINIBAND) [N/m/y/?] n
+*
+* SN Devices
+*
+*
+* File systems
+*
+Second extended fs support (EXT2_FS) [Y/n/m/?] y
+  Ext2 extended attributes (EXT2_FS_XATTR) [Y/n/?] y
+    Ext2 POSIX Access Control Lists (EXT2_FS_POSIX_ACL) [Y/n/?] y
+    Ext2 Security Labels (EXT2_FS_SECURITY) [Y/n/?] y
+  Ext2 execute in place support (EXT2_FS_XIP) [N/y/?] (NEW) n
+Ext3 journalling file system support (EXT3_FS) [Y/n/m/?] y
+  Ext3 extended attributes (EXT3_FS_XATTR) [Y/n/?] y
+    Ext3 POSIX Access Control Lists (EXT3_FS_POSIX_ACL) [Y/n/?] y
+    Ext3 Security Labels (EXT3_FS_SECURITY) [Y/n/?] y
+JBD (ext3) debugging support (JBD_DEBUG) [N/y/?] n
+Reiserfs support (REISERFS_FS) [N/m/y/?] n
+JFS filesystem support (JFS_FS) [N/m/y/?] n
+XFS filesystem support (XFS_FS) [N/m/y/?] n
+Minix fs support (MINIX_FS) [N/m/y/?] n
+ROM file system support (ROMFS_FS) [N/m/y/?] n
+Inotify file change notification support (INOTIFY) [Y/n/?] (NEW) y
+Quota support (QUOTA) [N/y/?] n
+Kernel automounter support (AUTOFS_FS) [Y/n/m/?] y
+Kernel automounter version 4 support (also supports v3) (AUTOFS4_FS) [Y/n/m/?] y
+Filesystem in Userspace support (FUSE_FS) [N/m/y/?] (NEW) n
+*
+* CD-ROM/DVD Filesystems
+*
+ISO 9660 CDROM file system support (ISO9660_FS) [Y/n/m/?] y
+  Microsoft Joliet CDROM extensions (JOLIET) [Y/n/?] y
+  Transparent decompression extension (ZISOFS) [N/y/?] n
+UDF file system support (UDF_FS) [Y/n/m/?] y
+*
+* DOS/FAT/NT Filesystems
+*
+MSDOS fs support (MSDOS_FS) [Y/n/m/?] y
+VFAT (Windows-95) fs support (VFAT_FS) [Y/n/m/?] y
+  Default codepage for FAT (FAT_DEFAULT_CODEPAGE) [437] 437
+  Default iocharset for FAT (FAT_DEFAULT_IOCHARSET) [iso8859-1] iso8859-1
+NTFS file system support (NTFS_FS) [N/m/y/?] n
+*
+* Pseudo filesystems
+*
+/proc file system support (PROC_FS) [Y/n/?] y
+  /proc/kcore support (PROC_KCORE) [Y/n] y
+Virtual memory file system support (former shm fs) (TMPFS) [Y/n/?] y
+HugeTLB file system support (HUGETLBFS) [Y/n] y
+Relayfs file system support (RELAYFS_FS) [N/m/y/?] (NEW) n
+*
+* Miscellaneous filesystems
+*
+ADFS file system support (EXPERIMENTAL) (ADFS_FS) [N/m/y/?] n
+Amiga FFS file system support (EXPERIMENTAL) (AFFS_FS) [N/m/y/?] n
+Apple Macintosh file system support (EXPERIMENTAL) (HFS_FS) [N/m/y/?] n
+Apple Extended HFS file system support (HFSPLUS_FS) [N/m/y/?] n
+BeOS file system (BeFS) support (read only) (EXPERIMENTAL) (BEFS_FS) [N/m/y/?] n
+BFS file system support (EXPERIMENTAL) (BFS_FS) [N/m/y/?] n
+EFS file system support (read only) (EXPERIMENTAL) (EFS_FS) [N/m/y/?] n
+Compressed ROM file system support (cramfs) (CRAMFS) [N/m/y/?] n
+FreeVxFS file system support (VERITAS VxFS(TM) compatible) (VXFS_FS) [N/m/y/?] n
+OS/2 HPFS file system support (HPFS_FS) [N/m/y/?] n
+QNX4 file system support (read only) (QNX4FS_FS) [N/m/y/?] n
+System V/Xenix/V7/Coherent file system support (SYSV_FS) [N/m/y/?] n
+UFS file system support (read only) (UFS_FS) [N/m/y/?] n
+*
+* Network File Systems
+*
+NFS file system support (NFS_FS) [Y/n/m/?] y
+  Provide NFSv3 client support (NFS_V3) [Y/n/?] y
+    Provide client support for the NFSv3 ACL protocol extension (NFS_V3_ACL) [Y/n/?] y
+  Provide NFSv4 client support (EXPERIMENTAL) (NFS_V4) [Y/n/?] y
+  Allow direct I/O on NFS files (EXPERIMENTAL) (NFS_DIRECTIO) [Y/n/?] y
+NFS server support (NFSD) [Y/n/m/?] y
+  Provide NFSv3 server support (NFSD_V3) [Y/n/?] y
+    Provide server support for the NFSv3 ACL protocol extension (NFSD_V3_ACL) [Y/n/?] y
+    Provide NFSv4 server support (EXPERIMENTAL) (NFSD_V4) [Y/n/?] y
+  Provide NFS server over TCP support (NFSD_TCP) [Y/?] y
+Secure RPC: Kerberos V mechanism (EXPERIMENTAL) (RPCSEC_GSS_KRB5) [Y/?] y
+Secure RPC: SPKM3 mechanism (EXPERIMENTAL) (RPCSEC_GSS_SPKM3) [M/n/y/?] m
+SMB file system support (to mount Windows shares etc.) (SMB_FS) [N/m/y/?] n
+CIFS support (advanced network filesystem for Samba, Window and other CIFS compliant servers) (CIFS) [N/m/y/?] n
+NCP file system support (to mount NetWare volumes) (NCP_FS) [N/m/y/?] n
+Coda file system support (advanced network fs) (CODA_FS) [N/m/y/?] n
+Andrew File System support (AFS) (Experimental) (AFS_FS) [M/n/y/?] m
+Plan 9 Resource Sharing Support (9P2000) (Experimental) (9P_FS) [N/m/y/?] (NEW) n
+*
+* Partition Types
+*
+Advanced partition selection (PARTITION_ADVANCED) [N/y/?] n
+*
+* Native Language Support
+*
+Base native language support (NLS) [Y/?] y
+  Default NLS Option (NLS_DEFAULT) [iso8859-1] iso8859-1
+  Codepage 437 (United States, Canada) (NLS_CODEPAGE_437) [Y/n/m/?] y
+  Codepage 737 (Greek) (NLS_CODEPAGE_737) [N/m/y/?] n
+  Codepage 775 (Baltic Rim) (NLS_CODEPAGE_775) [N/m/y/?] n
+  Codepage 850 (Europe) (NLS_CODEPAGE_850) [N/m/y/?] n
+  Codepage 852 (Central/Eastern Europe) (NLS_CODEPAGE_852) [N/m/y/?] n
+  Codepage 855 (Cyrillic) (NLS_CODEPAGE_855) [N/m/y/?] n
+  Codepage 857 (Turkish) (NLS_CODEPAGE_857) [N/m/y/?] n
+  Codepage 860 (Portuguese) (NLS_CODEPAGE_860) [N/m/y/?] n
+  Codepage 861 (Icelandic) (NLS_CODEPAGE_861) [N/m/y/?] n
+  Codepage 862 (Hebrew) (NLS_CODEPAGE_862) [N/m/y/?] n
+  Codepage 863 (Canadian French) (NLS_CODEPAGE_863) [N/m/y/?] n
+  Codepage 864 (Arabic) (NLS_CODEPAGE_864) [N/m/y/?] n
+  Codepage 865 (Norwegian, Danish) (NLS_CODEPAGE_865) [N/m/y/?] n
+  Codepage 866 (Cyrillic/Russian) (NLS_CODEPAGE_866) [N/m/y/?] n
+  Codepage 869 (Greek) (NLS_CODEPAGE_869) [N/m/y/?] n
+  Simplified Chinese charset (CP936, GB2312) (NLS_CODEPAGE_936) [N/m/y/?] n
+  Traditional Chinese charset (Big5) (NLS_CODEPAGE_950) [N/m/y/?] n
+  Japanese charsets (Shift-JIS, EUC-JP) (NLS_CODEPAGE_932) [N/m/y/?] n
+  Korean charset (CP949, EUC-KR) (NLS_CODEPAGE_949) [N/m/y/?] n
+  Thai charset (CP874, TIS-620) (NLS_CODEPAGE_874) [N/m/y/?] n
+  Hebrew charsets (ISO-8859-8, CP1255) (NLS_ISO8859_8) [N/m/y/?] n
+  Windows CP1250 (Slavic/Central European Languages) (NLS_CODEPAGE_1250) [N/m/y/?] n
+  Windows CP1251 (Bulgarian, Belarusian) (NLS_CODEPAGE_1251) [N/m/y/?] n
+  ASCII (United States) (NLS_ASCII) [Y/n/m/?] y
+  NLS ISO 8859-1  (Latin 1; Western European Languages) (NLS_ISO8859_1) [Y/n/m/?] y
+  NLS ISO 8859-2  (Latin 2; Slavic/Central European Languages) (NLS_ISO8859_2) [N/m/y/?] n
+  NLS ISO 8859-3  (Latin 3; Esperanto, Galician, Maltese, Turkish) (NLS_ISO8859_3) [N/m/y/?] n
+  NLS ISO 8859-4  (Latin 4; old Baltic charset) (NLS_ISO8859_4) [N/m/y/?] n
+  NLS ISO 8859-5  (Cyrillic) (NLS_ISO8859_5) [N/m/y/?] n
+  NLS ISO 8859-6  (Arabic) (NLS_ISO8859_6) [N/m/y/?] n
+  NLS ISO 8859-7  (Modern Greek) (NLS_ISO8859_7) [N/m/y/?] n
+  NLS ISO 8859-9  (Latin 5; Turkish) (NLS_ISO8859_9) [N/m/y/?] n
+  NLS ISO 8859-13 (Latin 7; Baltic) (NLS_ISO8859_13) [N/m/y/?] n
+  NLS ISO 8859-14 (Latin 8; Celtic) (NLS_ISO8859_14) [N/m/y/?] n
+  NLS ISO 8859-15 (Latin 9; Western European Languages with Euro) (NLS_ISO8859_15) [N/m/y/?] n
+  NLS KOI8-R (Russian) (NLS_KOI8_R) [N/m/y/?] n
+  NLS KOI8-U/RU (Ukrainian, Belarusian) (NLS_KOI8_U) [N/m/y/?] n
+  NLS UTF8 (NLS_UTF8) [N/m/y/?] n
+*
+* Profiling support
+*
+Profiling support (EXPERIMENTAL) (PROFILING) [Y/n/?] y
+  OProfile system profiling (EXPERIMENTAL) (OPROFILE) [Y/n/m/?] y
+*
+* Kernel hacking
+*
+Show timing information on printks (PRINTK_TIME) [N/y/?] n
+Kernel debugging (DEBUG_KERNEL) [Y/n/?] y
+  Magic SysRq key (MAGIC_SYSRQ) [Y/n/?] y
+  Kernel log buffer size (16 => 64KB, 17 => 128KB) (LOG_BUF_SHIFT) [15] 15
+  Detect Soft Lockups (DETECT_SOFTLOCKUP) [Y/n/?] (NEW) y
+  Collect scheduler statistics (SCHEDSTATS) [N/y/?] n
+  Debug memory allocations (DEBUG_SLAB) [Y/n/?] y
+  Debug preemptible kernel (DEBUG_PREEMPT) [Y/n/?] y
+  Spinlock debugging (DEBUG_SPINLOCK) [Y/n/?] y
+  Sleep-inside-spinlock checking (DEBUG_SPINLOCK_SLEEP) [N/y/?] n
+  kobject debugging (DEBUG_KOBJECT) [N/y/?] n
+  Compile the kernel with debug info (DEBUG_INFO) [Y/n/?] y
+  Debug Filesystem (DEBUG_FS) [N/y/?] n
+  Compile the kernel with frame pointers (FRAME_POINTER) [Y/n/?] y
+  Check for stack overflows (DEBUG_STACKOVERFLOW) [Y/n/?] y
+  Kprobes (KPROBES) [N/y/?] n
+  Stack utilization instrumentation (DEBUG_STACK_USAGE) [N/y/?] n
+  Page alloc debugging (DEBUG_PAGEALLOC) [N/y/?] (NEW) n
+  Use 4Kb for kernel stacks instead of 8Kb (4KSTACKS) [Y/n/?] y
+*
+* Security options
+*
+Enable access key retention support (KEYS) [N/y/?] n
+Enable different security models (SECURITY) [N/y/?] n
+*
+* Cryptographic options
+*
+Cryptographic API (CRYPTO) [Y/?] y
+  HMAC support (CRYPTO_HMAC) [N/y/?] n
+  Null algorithms (CRYPTO_NULL) [N/m/y/?] n
+  MD4 digest algorithm (CRYPTO_MD4) [N/m/y/?] n
+  MD5 digest algorithm (CRYPTO_MD5) [Y/?] y
+  SHA1 digest algorithm (CRYPTO_SHA1) [N/m/y/?] n
+  SHA256 digest algorithm (CRYPTO_SHA256) [N/m/y/?] n
+  SHA384 and SHA512 digest algorithms (CRYPTO_SHA512) [N/m/y/?] n
+  Whirlpool digest algorithms (CRYPTO_WP512) [N/m/y/?] n
+  Tiger digest algorithms (CRYPTO_TGR192) [N/m/y/?] n
+  DES and Triple DES EDE cipher algorithms (CRYPTO_DES) [Y/?] y
+  Blowfish cipher algorithm (CRYPTO_BLOWFISH) [N/m/y/?] n
+  Twofish cipher algorithm (CRYPTO_TWOFISH) [N/m/y/?] n
+  Serpent cipher algorithm (CRYPTO_SERPENT) [N/m/y/?] n
+  AES cipher algorithms (i586) (CRYPTO_AES_586) [N/m/y/?] n
+  CAST5 (CAST-128) cipher algorithm (CRYPTO_CAST5) [N/m/y/?] n
+  CAST6 (CAST-256) cipher algorithm (CRYPTO_CAST6) [N/m/y/?] n
+  TEA, XTEA and XETA cipher algorithms (CRYPTO_TEA) [N/m/y/?] n
+  ARC4 cipher algorithm (CRYPTO_ARC4) [N/m/y/?] n
+  Khazad cipher algorithm (CRYPTO_KHAZAD) [N/m/y/?] n
+  Anubis cipher algorithm (CRYPTO_ANUBIS) [N/m/y/?] n
+  Deflate compression algorithm (CRYPTO_DEFLATE) [N/m/y/?] n
+  Michael MIC keyed digest algorithm (CRYPTO_MICHAEL_MIC) [N/m/y/?] n
+  CRC32c CRC algorithm (CRYPTO_CRC32C) [N/m/y/?] n
+  Testing module (CRYPTO_TEST) [N/m/y/?] n
+*
+* Hardware crypto devices
+*
+Support for VIA PadLock ACE (CRYPTO_DEV_PADLOCK) [N/m/y/?] n
+*
+* Library routines
+*
+CRC-CCITT functions (CRC_CCITT) [N/m/y/?] n
+CRC16 functions (CRC16) [N/m/y/?] (NEW) n
+CRC32 functions (CRC32) [Y/?] y
+CRC32c (Castagnoli, et al) Cyclic Redundancy-Check (LIBCRC32C) [M/n/y/?] m
+make -j 3
+  CHK     include/linux/version.h
+  SYMLINK include/asm -> include/asm-i386
+  SPLIT   include/linux/autoconf.h -> include/config/*
+  UPD     include/linux/version.h
+  HOSTCC  scripts/kallsyms
+  CC      arch/i386/kernel/asm-offsets.s
+  CC      scripts/mod/empty.o
+  HOSTCC  scripts/mod/mk_elfconfig
+  MKELF   scripts/mod/elfconfig.h
+  HOSTCC  scripts/mod/file2alias.o
+  HOSTCC  scripts/conmakehash
+  HOSTCC  scripts/bin2c
+  GEN     include/asm-i386/asm-offsets.h
+  HOSTCC  scripts/mod/modpost.o
+  HOSTCC  scripts/mod/sumversion.o
+  HOSTLD  scripts/mod/modpost
+  CC      init/main.o
+  CC      arch/i386/kernel/process.o
+  HOSTCC  usr/gen_init_cpio
+  CHK     usr/initramfs_list
+  UPD     usr/initramfs_list
+  CPIO    usr/initramfs_data.cpio
+  GZIP    usr/initramfs_data.cpio.gz
+  AS      usr/initramfs_data.o
+  LD      usr/built-in.o
+  CHK     include/linux/compile.h
+  UPD     include/linux/compile.h
+  CC      arch/i386/mm/init.o
+  CC      arch/i386/kernel/semaphore.o
+  CC      init/do_mounts.o
+  CC      arch/i386/kernel/signal.o
+  CC      arch/i386/mm/pgtable.o
+  CC      init/initramfs.o
+  AS      arch/i386/kernel/entry.o
+  CC      arch/i386/kernel/traps.o
+  CC      arch/i386/mm/fault.o
+  CC      arch/i386/kernel/irq.o
+  CC      init/calibrate.o
+  CC      arch/i386/mm/ioremap.o
+  CC      init/version.o
+  LD      init/mounts.o
+  CC      arch/i386/kernel/vm86.o
+  LD      init/built-in.o
+  CC      arch/i386/kernel/ptrace.o
+  CC      arch/i386/mm/extable.o
+  CC      arch/i386/mm/pageattr.o
+  CC      arch/i386/mm/mmap.o
+  CC      arch/i386/mach-default/setup.o
+  CC      arch/i386/mm/hugetlbpage.o
+  CC      arch/i386/kernel/time.o
+  CC      arch/i386/mach-default/topology.o
+  LD      arch/i386/mm/built-in.o
+  LD      arch/i386/mach-default/built-in.o
+  LD      arch/i386/crypto/built-in.o
+  CC      kernel/sched.o
+  CC      mm/bootmem.o
+  CC      arch/i386/kernel/ioport.o
+  CC      mm/filemap.o
+  CC      arch/i386/kernel/ldt.o
+  CC      arch/i386/kernel/setup.o
+  CC      kernel/fork.o
+  CC      mm/mempool.o
+  CC      arch/i386/kernel/i8259.o
+  CC      mm/oom_kill.o
+  CC      kernel/exec_domain.o
+  CC      mm/fadvise.o
+  CC      arch/i386/kernel/sys_i386.o
+  CC      kernel/panic.o
+  CC      mm/page_alloc.o
+  CC      arch/i386/kernel/pci-dma.o
+  CC      kernel/printk.o
+  CC      arch/i386/kernel/i386_ksyms.o
+  CC      kernel/profile.o
+  CC      mm/page-writeback.o
+  CC      arch/i386/kernel/i387.o
+  CC      kernel/exit.o
+  CC      arch/i386/kernel/dmi_scan.o
+  CC      arch/i386/kernel/bootflag.o
+  CC      mm/pdflush.o
+  CC      arch/i386/kernel/doublefault.o
+  CC      kernel/itimer.o
+  CC      arch/i386/kernel/quirks.o
+  CC      mm/readahead.o
+  CC      arch/i386/kernel/i8237.o
+  CC      kernel/time.o
+  CC      mm/slab.o
+  CC      arch/i386/kernel/cpu/common.o
+  CC      kernel/softirq.o
+  CC      arch/i386/kernel/cpu/proc.o
+  CC      kernel/resource.o
+  CC      arch/i386/kernel/cpu/amd.o
+  CC      mm/swap.o
+  CC      arch/i386/kernel/cpu/cyrix.o
+  CC      kernel/sysctl.o
+  CC      mm/truncate.o
+  CC      arch/i386/kernel/cpu/centaur.o
+  CC      arch/i386/kernel/cpu/transmeta.o
+  CC      arch/i386/kernel/cpu/intel.o
+  CC      kernel/capability.o
+  CC      mm/vmscan.o
+  CC      arch/i386/kernel/cpu/intel_cacheinfo.o
+  CC      kernel/ptrace.o
+  CC      arch/i386/kernel/cpu/rise.o
+  CC      arch/i386/kernel/cpu/nexgen.o
+  CC      arch/i386/kernel/cpu/umc.o
+  CC      arch/i386/kernel/cpu/mcheck/mce.o
+  CC      mm/prio_tree.o
+  CC      kernel/timer.o
+  CC      arch/i386/kernel/cpu/mcheck/k7.o
+  CC      mm/fremap.o
+  CC      arch/i386/kernel/cpu/mcheck/p4.o
+  CC      kernel/user.o
+  CC      arch/i386/kernel/cpu/mcheck/p5.o
+  CC      kernel/signal.o
+  CC      arch/i386/kernel/cpu/mcheck/p6.o
+  CC      mm/highmem.o
+  CC      mm/madvise.o
+  CC      arch/i386/kernel/cpu/mcheck/winchip.o
+  CC      mm/memory.o
+  CC      arch/i386/kernel/cpu/mcheck/non-fatal.o
+  LD      arch/i386/kernel/cpu/mcheck/built-in.o
+  CC      arch/i386/kernel/cpu/mtrr/main.o
+  CC      kernel/sys.o
+  CC      arch/i386/kernel/cpu/mtrr/if.o
+  CC      mm/mincore.o
+  CC      mm/mlock.o
+  CC      mm/mmap.o
+  CC      arch/i386/kernel/cpu/mtrr/generic.o
+  CC      arch/i386/kernel/cpu/mtrr/state.o
+  CC      kernel/kmod.o
+  CC      kernel/workqueue.o
+  CC      mm/mprotect.o
+  CC      arch/i386/kernel/cpu/mtrr/amd.o
+  CC      arch/i386/kernel/cpu/mtrr/cyrix.o
+  CC      mm/mremap.o
+  CC      kernel/pid.o
+  CC      arch/i386/kernel/cpu/mtrr/centaur.o
+  CC      mm/msync.o
+  CC      kernel/rcupdate.o
+  CC      kernel/intermodule.o
+  LD      arch/i386/kernel/cpu/mtrr/built-in.o
+  LD      arch/i386/kernel/cpu/built-in.o
+  CC      mm/rmap.o
+kernel/intermodule.c:178: warning: `inter_module_register' is deprecated (declared at kernel/intermodule.c:38)
+kernel/intermodule.c:179: warning: `inter_module_unregister' is deprecated (declared at kernel/intermodule.c:78)
+kernel/intermodule.c:181: warning: `inter_module_put' is deprecated (declared at kernel/intermodule.c:159)
+  CC      arch/i386/kernel/timers/timer.o
+  CC      kernel/extable.o
+  CC      arch/i386/kernel/timers/timer_none.o
+  CC      arch/i386/kernel/timers/timer_tsc.o
+  CC      kernel/params.o
+  CC      mm/vmalloc.o
+  CC      arch/i386/kernel/timers/timer_pit.o
+  CC      kernel/posix-timers.o
+  CC      mm/page_io.o
+  CC      arch/i386/kernel/timers/common.o
+  CC      mm/swap_state.o
+  CC      kernel/kthread.o
+  LD      arch/i386/kernel/timers/built-in.o
+  CC      arch/i386/kernel/reboot.o
+  CC      mm/swapfile.o
+  CC      kernel/wait.o
+  CC      kernel/kfifo.o
+  CC      arch/i386/kernel/apm.o
+  CC      kernel/sys_ni.o
+  CC      kernel/posix-cpu-timers.o
+  CC      mm/thrash.o
+arch/i386/kernel/apm.c: In function `suspend':
+arch/i386/kernel/apm.c:1183: warning: `pm_send_all' is deprecated (declared at include/linux/pm.h:122)
+arch/i386/kernel/apm.c:1237: warning: `pm_send_all' is deprecated (declared at include/linux/pm.h:122)
+arch/i386/kernel/apm.c: In function `check_events':
+arch/i386/kernel/apm.c:1358: warning: `pm_send_all' is deprecated (declared at include/linux/pm.h:122)
+  CC      mm/hugetlb.o
+  CC      arch/i386/kernel/smp.o
+  CC      kernel/futex.o
+  CC      mm/shmem.o
+  CC      arch/i386/kernel/smpboot.o
+  CC      kernel/dma.o
+  AS      arch/i386/kernel/trampoline.o
+  CC      arch/i386/kernel/mpparse.o
+  CC      kernel/cpu.o
+  CC      arch/i386/kernel/apic.o
+  CC      kernel/spinlock.o
+  LD      mm/built-in.o
+  CC      arch/i386/kernel/nmi.o
+  CC      kernel/uid16.o
+  CC      fs/open.o
+  CC      arch/i386/kernel/io_apic.o
+  CC      kernel/module.o
+  CC      fs/read_write.o
+  CC      arch/i386/kernel/module.o
+  CC      kernel/kallsyms.o
+  CC      arch/i386/kernel/sysenter.o
+  CC      fs/file_table.o
+  CC      kernel/irq/handle.o
+  LDS     arch/i386/kernel/vsyscall.lds
+  CC      kernel/irq/manage.o
+  AS      arch/i386/kernel/vsyscall-int80.o
+  AS      arch/i386/kernel/vsyscall-note.o
+  CC      fs/buffer.o
+  AS      arch/i386/kernel/vsyscall-sysenter.o
+  CC      arch/i386/kernel/early_printk.o
+  CC      kernel/irq/spurious.o
+  SYSCALL arch/i386/kernel/vsyscall-syms.o
+  AS      arch/i386/kernel/head.o
+  CC      arch/i386/kernel/init_task.o
+  CC      kernel/irq/autoprobe.o
+  LDS     arch/i386/kernel/vmlinux.lds
+  SYSCALL arch/i386/kernel/vsyscall-int80.so
+  SYSCALL arch/i386/kernel/vsyscall-sysenter.so
+  AS      arch/i386/kernel/vsyscall.o
+  CC      kernel/irq/proc.o
+  LD      arch/i386/kernel/built-in.o
+  CC      kernel/power/main.o
+  LD      kernel/irq/built-in.o
+  CC      kernel/power/process.o
+  CC      fs/bio.o
+  CC      ipc/util.o
+  CC      kernel/power/console.o
+  CC      fs/super.o
+  CC      kernel/power/pm.o
+  CC      ipc/msgutil.o
+kernel/power/pm.c:258: warning: `pm_register' is deprecated (declared at kernel/power/pm.c:62)
+kernel/power/pm.c:259: warning: `pm_unregister' is deprecated (declared at kernel/power/pm.c:85)
+kernel/power/pm.c:260: warning: `pm_unregister_all' is deprecated (declared at kernel/power/pm.c:114)
+kernel/power/pm.c:261: warning: `pm_send_all' is deprecated (declared at kernel/power/pm.c:233)
+  CC      ipc/msg.o
+  CC      kernel/power/poweroff.o
+  CC      fs/block_dev.o
+  LD      kernel/power/built-in.o
+  CC      kernel/cpuset.o
+  CC      ipc/sem.o
+  CC      fs/char_dev.o
+  CC      ipc/shm.o
+  GZIP    kernel/config_data.gz
+  CC      kernel/stop_machine.o
+  CC      fs/stat.o
+  CC      kernel/ksysfs.o
+  CC      ipc/mqueue.o
+  CC      kernel/softlockup.o
+  CC      kernel/seccomp.o
+  CC      fs/exec.o
+  IKCFG   kernel/config_data.h
+  CC      kernel/configs.o
+  LD      ipc/built-in.o
+  CC      security/commoncap.o
+  LD      kernel/built-in.o
+  CC      crypto/api.o
+  CC      fs/pipe.o
+  LD      security/built-in.o
+  CC      drivers/base/core.o
+  CC      crypto/scatterwalk.o
+  CC      drivers/base/sys.o
+  CC      fs/namei.o
+  CC      crypto/cipher.o
+  CC      drivers/base/bus.o
+  CC      drivers/base/dd.o
+  CC      crypto/digest.o
+  CC      drivers/base/driver.o
+  CC      fs/fcntl.o
+  CC      drivers/base/class.o
+  CC      crypto/compress.o
+  CC      drivers/base/platform.o
+  CC      crypto/proc.o
+  CC      fs/ioctl.o
+  CC      drivers/base/cpu.o
+  CC      drivers/base/firmware.o
+  CC      drivers/base/init.o
+  CC      crypto/md5.o
+  CC      fs/readdir.o
+  CC      drivers/base/map.o
+  CC      crypto/des.o
+  CC      drivers/base/dmapool.o
+  CC      fs/select.o
+  CC      drivers/base/attribute_container.o
+  CC      fs/fifo.o
+  LD      crypto/built-in.o
+  CC      drivers/base/transport_class.o
+  CC      sound/sound_core.o
+  CC      fs/locks.o
+  CC      drivers/base/power/shutdown.o
+  CC      sound/sound_firmware.o
+  CC      drivers/base/power/main.o
+  CC      drivers/base/power/suspend.o
+  LD      sound/arm/built-in.o
+  CC      sound/core/memalloc.o
+  CC      drivers/base/power/resume.o
+  CC      fs/dcache.o
+  CC      drivers/base/power/runtime.o
+  CC      drivers/base/power/sysfs.o
+  CC      sound/core/sgbuf.o
+  LD      drivers/base/power/built-in.o
+  CC [M]  drivers/base/firmware_class.o
+  CC      fs/inode.o
+  CC      sound/core/pcm.o
+  LD      drivers/base/built-in.o
+  CC      drivers/block/elevator.o
+  CC      fs/attr.o
+  CC      drivers/block/ll_rw_blk.o
+  CC      sound/core/pcm_native.o
+  CC      fs/bad_inode.o
+  CC      fs/file.o
+  CC      fs/filesystems.o
+  CC      drivers/block/ioctl.o
+  CC      fs/namespace.o
+  CC      sound/core/pcm_lib.o
+  CC      drivers/block/genhd.o
+  CC      drivers/block/scsi_ioctl.o
+  CC      fs/aio.o
+  CC      drivers/block/noop-iosched.o
+  CC      fs/seq_file.o
+  CC      sound/core/pcm_timer.o
+  CC      drivers/block/as-iosched.o
+  CC      sound/core/pcm_misc.o
+  CC      fs/xattr.o
+  CC      sound/core/pcm_memory.o
+  CC      fs/libfs.o
+  CC      sound/core/timer.o
+  CC      drivers/block/deadline-iosched.o
+  CC      fs/fs-writeback.o
+  CC      drivers/block/cfq-iosched.o
+  CC      sound/core/sound.o
+  CC      fs/mpage.o
+  CC      sound/core/init.o
+  CC      drivers/block/floppy.o
+  CC      fs/direct-io.o
+  CC      sound/core/memory.o
+  CC      fs/ioprio.o
+  CC      sound/core/info.o
+  CC      fs/inotify.o
+  CC      sound/core/control.o
+  CC      fs/eventpoll.o
+  CC      drivers/block/loop.o
+  LD      drivers/block/built-in.o
+  CC      sound/core/misc.o
+  CC      drivers/cdrom/cdrom.o
+  CC      fs/nfsctl.o
+  CC      sound/core/device.o
+  CC      sound/core/wrappers.o
+  CC      fs/binfmt_aout.o
+  CC      sound/core/isadma.o
+  CC      fs/binfmt_misc.o
+  CC      sound/core/sound_oss.o
+  LD      drivers/cdrom/built-in.o
+  CC      drivers/char/mem.o
+  CC      fs/binfmt_script.o
+  CC      sound/core/info_oss.o
+  CC      drivers/char/random.o
+  CC      fs/binfmt_elf.o
+  CC      sound/core/oss/mixer_oss.o
+  CC      fs/mbcache.o
+  CC      drivers/char/tty_io.o
+  CC      sound/core/oss/pcm_oss.o
+  CC      fs/posix_acl.o
+  CC      drivers/char/n_tty.o
+  CC      fs/xattr_acl.o
+  CC      sound/core/oss/pcm_plugin.o
+  LD      fs/afs/built-in.o
+  CC      drivers/char/tty_ioctl.o
+  CC [M]  fs/afs/callback.o
+  CC      sound/core/oss/io.o
+  CC [M]  fs/afs/cell.o
+  CC      drivers/char/pty.o
+  CC      sound/core/oss/copy.o
+  CC [M]  fs/afs/cmservice.o
+  CC      drivers/char/misc.o
+  CC      sound/core/oss/linear.o
+  CC [M]  fs/afs/dir.o
+  CC      drivers/char/vt_ioctl.o
+  CC      sound/core/oss/mulaw.o
+  CC [M]  fs/afs/file.o
+  CC [M]  fs/afs/fsclient.o
+  CC      sound/core/oss/route.o
+  CC [M]  fs/afs/inode.o
+  CC      drivers/char/vc_screen.o
+  CC      sound/core/oss/rate.o
+  CC [M]  fs/afs/kafsasyncd.o
+  CC      drivers/char/consolemap.o
+  LD      sound/core/oss/snd-mixer-oss.o
+  LD      sound/core/oss/snd-pcm-oss.o
+  LD      sound/core/oss/built-in.o
+  LD      sound/core/seq/instr/built-in.o
+  CC [M]  fs/afs/kafstimod.o
+  CC      sound/core/seq/oss/seq_oss.o
+  CC [M]  fs/afs/main.o
+  CONMK   drivers/char/consolemap_deftbl.c
+  CC      drivers/char/selection.o
+  CC      sound/core/seq/oss/seq_oss_init.o
+  CC [M]  fs/afs/misc.o
+  CC [M]  fs/afs/mntpt.o
+  CC      drivers/char/keyboard.o
+  CC [M]  fs/afs/proc.o
+  CC      sound/core/seq/oss/seq_oss_timer.o
+  CC      drivers/char/vt.o
+  CC [M]  fs/afs/server.o
+  CC      sound/core/seq/oss/seq_oss_ioctl.o
+  CC      sound/core/seq/oss/seq_oss_event.o
+  CC [M]  fs/afs/super.o
+  SHIPPED drivers/char/defkeymap.c
+  CC      drivers/char/sysrq.o
+  CC [M]  fs/afs/vlclient.o
+  CC      sound/core/seq/oss/seq_oss_rw.o
+  CC      drivers/char/lp.o
+  CC [M]  fs/afs/vlocation.o
+  CC      sound/core/seq/oss/seq_oss_synth.o
+  CC      drivers/char/n_r3964.o
+  CC [M]  fs/afs/vnode.o
+  CC [M]  fs/afs/volume.o
+  CC      drivers/char/rtc.o
+  LD [M]  fs/afs/kafs.o
+  CC      sound/core/seq/oss/seq_oss_midi.o
+  CC      fs/autofs/dirhash.o
+  CC      drivers/char/nvram.o
+  CC      fs/autofs/init.o
+  CC      sound/core/seq/oss/seq_oss_readq.o
+  CC      sound/core/seq/oss/seq_oss_writeq.o
+  CC      fs/autofs/inode.o
+  CC      drivers/char/agp/backend.o
+  LD      sound/core/seq/oss/snd-seq-oss.o
+  LD      sound/core/seq/oss/built-in.o
+  CC      sound/core/seq/seq_device.o
+  CC      drivers/char/agp/frontend.o
+  CC      fs/autofs/root.o
+  CC      sound/core/seq/seq_midi_event.o
+  CC      fs/autofs/symlink.o
+  CC      sound/core/seq/seq.o
+  CC      drivers/char/agp/generic.o
+  CC      fs/autofs/waitq.o
+  LD      fs/autofs/autofs.o
+  LD      fs/autofs/built-in.o
+  CC      drivers/char/agp/isoch.o
+  CC      sound/core/seq/seq_lock.o
+  CC      fs/autofs4/init.o
+  CC      sound/core/seq/seq_clientmgr.o
+  CC      drivers/char/agp/ali-agp.o
+  CC      fs/autofs4/inode.o
+  CC      drivers/char/agp/intel-agp.o
+  CC      fs/autofs4/root.o
+  CC      sound/core/seq/seq_memory.o
+  CC      fs/autofs4/symlink.o
+  CC      fs/autofs4/waitq.o
+  CC      sound/core/seq/seq_queue.o
+  CC      fs/autofs4/expire.o
+  LD      drivers/char/agp/agpgart.o
+  LD      drivers/char/agp/built-in.o
+  CC      drivers/char/drm/drm_auth.o
+  CC      sound/core/seq/seq_fifo.o
+  LD      fs/autofs4/autofs4.o
+  LD      fs/autofs4/built-in.o
+  CC      fs/devpts/inode.o
+  CC      drivers/char/drm/drm_bufs.o
+  LD      fs/devpts/devpts.o
+  LD      fs/devpts/built-in.o
+  CC      fs/exportfs/expfs.o
+  CC      sound/core/seq/seq_prioq.o
+  LD      fs/exportfs/exportfs.o
+  LD      fs/exportfs/built-in.o
+  CC      fs/ext2/balloc.o
+  CC      drivers/char/drm/drm_context.o
+  CC      sound/core/seq/seq_timer.o
+  CC      fs/ext2/bitmap.o
+  CC      drivers/char/drm/drm_dma.o
+  CC      drivers/char/drm/drm_drawable.o
+  CC      sound/core/seq/seq_system.o
+  CC      fs/ext2/dir.o
+  CC      fs/ext2/file.o
+  CC      drivers/char/drm/drm_drv.o
+  CC      sound/core/seq/seq_ports.o
+  CC      fs/ext2/fsync.o
+  CC      sound/core/seq/seq_info.o
+  CC      drivers/char/drm/drm_fops.o
+  CC      fs/ext2/ialloc.o
+  LD      sound/core/seq/snd-seq.o
+  LD      sound/core/seq/snd-seq-device.o
+  LD      sound/core/seq/snd-seq-midi-event.o
+  LD      sound/core/seq/built-in.o
+  LD      sound/core/snd.o
+  LD      sound/core/snd-timer.o
+  LD      sound/core/snd-pcm.o
+  CC      fs/ext2/inode.o
+  LD      sound/core/snd-page-alloc.o
+  LD      sound/core/built-in.o
+  CC      drivers/char/drm/drm_init.o
+  LD      sound/drivers/mpu401/built-in.o
+  LD      sound/drivers/opl3/built-in.o
+  LD      sound/drivers/opl4/built-in.o
+  LD      sound/drivers/vx/built-in.o
+  LD      sound/drivers/built-in.o
+  LD      sound/i2c/other/built-in.o
+  LD      sound/i2c/built-in.o
+  LD      sound/isa/ad1816a/built-in.o
+  LD      sound/isa/ad1848/built-in.o
+  LD      sound/isa/cs423x/built-in.o
+  CC      drivers/char/drm/drm_ioctl.o
+  LD      sound/isa/es1688/built-in.o
+  LD      sound/isa/gus/built-in.o
+  CC      fs/ext2/ioctl.o
+  LD      sound/isa/opti9xx/built-in.o
+  LD      sound/isa/sb/built-in.o
+  LD      sound/isa/wavefront/built-in.o
+  LD      sound/isa/built-in.o
+  LD      sound/mips/built-in.o
+  LD      sound/parisc/built-in.o
+  CC      sound/pci/intel8x0.o
+  CC      fs/ext2/namei.o
+  CC      drivers/char/drm/drm_irq.o
+  CC      fs/ext2/super.o
+  CC      drivers/char/drm/drm_lock.o
+  CC      sound/pci/ac97/ac97_bus.o
+  CC      drivers/char/drm/drm_memory.o
+  CC      sound/pci/ac97/ac97_codec.o
+  CC      fs/ext2/symlink.o
+  CC      fs/ext2/xattr.o
+  CC      drivers/char/drm/drm_proc.o
+  CC      sound/pci/ac97/ac97_pcm.o
+  CC      fs/ext2/xattr_user.o
+  CC      drivers/char/drm/drm_stub.o
+  CC      drivers/char/drm/drm_vm.o
+  CC      fs/ext2/xattr_trusted.o
+  CC      sound/pci/ac97/ac97_patch.o
+  CC      fs/ext2/acl.o
+  CC      drivers/char/drm/drm_agpsupport.o
+  CC      fs/ext2/xattr_security.o
+  LD      fs/ext2/ext2.o
+  LD      fs/ext2/built-in.o
+  CC      sound/pci/ac97/ac97_proc.o
+  CC      fs/ext3/balloc.o
+  CC      drivers/char/drm/drm_scatter.o
+  CC      drivers/char/drm/ati_pcigart.o
+  LD      sound/pci/ac97/snd-ac97-codec.o
+  LD      sound/pci/ac97/snd-ac97-bus.o
+  LD      sound/pci/ac97/built-in.o
+  LD      sound/pci/ali5451/built-in.o
+  LD      sound/pci/au88x0/built-in.o
+  CC      fs/ext3/bitmap.o
+  LD      sound/pci/ca0106/built-in.o
+  LD      sound/pci/cs46xx/built-in.o
+  LD      sound/pci/emu10k1/built-in.o
+  CC      drivers/char/drm/drm_pci.o
+  LD      sound/pci/hda/built-in.o
+  LD      sound/pci/ice1712/built-in.o
+  LD      sound/pci/korg1212/built-in.o
+  LD      sound/pci/mixart/built-in.o
+  CC      fs/ext3/dir.o
+6/built-in.o
+  LD      sound/pci/rme9652/built-in.o
+  LD      sound/pci/trident/built-in.o
+  LD      sound/pci/vx222/built-in.o
+  CC      drivers/char/drm/drm_sysfs.o
+  LD      sound/pci/ymfpci/built-in.o
+  LD      sound/pci/snd-intel8x0.o
+  LD      sound/pci/built-in.o
+  LD      sound/pcmcia/pdaudiocf/built-in.o
+  LD      sound/pcmcia/vx/built-in.o
+  LD      sound/pcmcia/built-in.o
+  LD      sound/ppc/built-in.o
+  CC      fs/ext3/file.o
+  LD      sound/sparc/built-in.o
+  LD      sound/synth/emux/built-in.o
+  LD      sound/synth/built-in.o
+  LD      sound/usb/usx2y/built-in.o
+  LD      sound/usb/built-in.o
+  CC      sound/last.o
+  LD      drivers/char/drm/drm.o
+  LD      drivers/char/drm/built-in.o
+  CC [M]  drivers/char/raw.o
+  CC      fs/ext3/fsync.o
+  LD      sound/soundcore.o
+  LD      sound/built-in.o
+  CC      fs/ext3/ialloc.o
+  CC      drivers/char/consolemap_deftbl.o
+  CC      drivers/char/defkeymap.o
+  CC      arch/i386/pci/i386.o
+  LD      drivers/char/built-in.o
+  LD      drivers/crypto/built-in.o
+  CC      fs/ext3/inode.o
+  LD      drivers/firmware/built-in.o
+  CC [M]  drivers/firmware/dcdbas.o
+  CC      arch/i386/pci/pcbios.o
+  CC      drivers/hwmon/hwmon.o
+  LD      drivers/hwmon/built-in.o
+  LD      drivers/ide/arm/built-in.o
+  CC      arch/i386/pci/direct.o
+  LD      drivers/ide/legacy/built-in.o
+  CC      drivers/ide/pci/piix.o
+  CC      fs/ext3/ioctl.o
+  CC      arch/i386/pci/fixup.o
+  CC      drivers/ide/pci/rz1000.o
+  CC      fs/ext3/namei.o
+  CC      arch/i386/pci/legacy.o
+  CC      drivers/ide/pci/serverworks.o
+  CC      arch/i386/pci/irq.o
+  CC      drivers/ide/pci/generic.o
+  LD      drivers/ide/pci/built-in.o
+  CC      drivers/ide/ide.o
+  CC      fs/ext3/super.o
+  CC      arch/i386/pci/common.o
+fs/ext3/super.c: In function `ext3_show_options':
+fs/ext3/super.c:516: warning: unused variable `sbi'
+  LD      arch/i386/pci/built-in.o
+  CC      drivers/ide/ide-io.o
+  CC      fs/ext3/symlink.o
+  CC      fs/ext3/hash.o
+  CC      fs/ext3/resize.o
+  CC      fs/ext3/xattr.o
+  CC      drivers/ide/ide-iops.o
+  CC      fs/ext3/xattr_user.o
+  CC      fs/ext3/xattr_trusted.o
+  CC      fs/ext3/acl.o
+  CC      arch/i386/oprofile/../../../drivers/oprofile/oprof.o
+  CC      drivers/ide/ide-lib.o
+  CC      arch/i386/oprofile/../../../drivers/oprofile/cpu_buffer.o
+  CC      fs/ext3/xattr_security.o
+  LD      fs/ext3/ext3.o
+  LD      fs/ext3/built-in.o
+  CC      arch/i386/oprofile/../../../drivers/oprofile/buffer_sync.o
+  CC      fs/fat/cache.o
+  CC      drivers/ide/ide-probe.o
+  CC      arch/i386/oprofile/../../../drivers/oprofile/event_buffer.o
+  CC      fs/fat/dir.o
+  CC      arch/i386/oprofile/../../../drivers/oprofile/oprofile_files.o
+  CC      arch/i386/oprofile/../../../drivers/oprofile/oprofilefs.o
+  CC      drivers/ide/ide-taskfile.o
+  CC      fs/fat/fatent.o
+  CC      arch/i386/oprofile/../../../drivers/oprofile/oprofile_stats.o
+  CC      drivers/ide/pci/cmd640.o
+  CC      arch/i386/oprofile/../../../drivers/oprofile/timer_int.o
+  CC      arch/i386/oprofile/init.o
+  CC      fs/fat/file.o
+  CC      arch/i386/oprofile/backtrace.o
+  CC      drivers/ide/setup-pci.o
+  CC      fs/fat/inode.o
+  CC      arch/i386/oprofile/nmi_int.o
+  CC      drivers/ide/ide-dma.o
+  CC      arch/i386/oprofile/op_model_athlon.o
+  CC      arch/i386/oprofile/op_model_ppro.o
+  CC      arch/i386/oprofile/op_model_p4.o
+  CC      fs/fat/misc.o
+  CC      drivers/ide/ide-proc.o
+  CC      arch/i386/oprofile/nmi_timer_int.o
+  LD      arch/i386/oprofile/oprofile.o
+  LD      arch/i386/oprofile/built-in.o
+  CC      arch/i386/power/cpu.o
+  LD      fs/fat/fat.o
+  LD      fs/fat/built-in.o
+  CC      fs/hugetlbfs/inode.o
+  LD      arch/i386/power/built-in.o
+  CC      net/socket.o
+  CC      drivers/ide/ide-generic.o
+  LD      fs/hugetlbfs/hugetlbfs.o
+  LD      fs/hugetlbfs/built-in.o
+  CC      fs/isofs/namei.o
+  CC      drivers/ide/ide-disk.o
+  CC      fs/isofs/inode.o
+  CC      net/802/p8023.o
+  CC      drivers/ide/ide-cd.o
+  CC      net/802/sysctl_net_802.o
+  CC      fs/isofs/dir.o
+  LD      net/802/built-in.o
+  CC      net/core/sock.o
+  CC      fs/isofs/util.o
+  LD      drivers/ide/ide-core.o
+  LD      drivers/ide/built-in.o
+  CC      drivers/ieee1394/ieee1394_core.o
+  CC      fs/isofs/rock.o
+  CC      net/core/request_sock.o
+  CC      drivers/ieee1394/ieee1394_transactions.o
+  CC      fs/isofs/export.o
+  CC      net/core/skbuff.o
+  CC      fs/isofs/joliet.o
+  CC      drivers/ieee1394/hosts.o
+  LD      fs/isofs/isofs.o
+  LD      fs/isofs/built-in.o
+  CC      fs/jbd/transaction.o
+  CC      drivers/ieee1394/highlevel.o
+  CC      net/core/iovec.o
+  CC      drivers/ieee1394/csr.o
+  CC      fs/jbd/commit.o
+  CC      net/core/datagram.o
+  CC      drivers/ieee1394/nodemgr.o
+  CC      fs/jbd/recovery.o
+  CC      net/core/stream.o
+  CC      fs/jbd/checkpoint.o
+  CC      fs/jbd/revoke.o
+  OUI2C   drivers/ieee1394/oui.c
+  CC      fs/jbd/journal.o
+  CC      drivers/ieee1394/dma.o
+  CC      net/core/scm.o
+  CC      drivers/ieee1394/iso.o
+  CC      net/core/gen_stats.o
+  LD      fs/jbd/jbd.o
+  LD      fs/jbd/built-in.o
+  CC      fs/lockd/clntlock.o
+  CC      drivers/ieee1394/csr1212.o
+  CC      net/core/gen_estimator.o
+  CC      fs/lockd/clntproc.o
+  CC      drivers/ieee1394/config_roms.o
+  CC      net/core/sysctl_net_core.o
+  CC      drivers/ieee1394/ohci1394.o
+  CC      fs/lockd/host.o
+  CC      fs/lockd/svc.o
+  CC      net/core/dev.o
+  CC      fs/lockd/svclock.o
+  CC      drivers/ieee1394/raw1394.o
+  CC      fs/lockd/svcshare.o
+  CC      net/core/ethtool.o
+  CC      fs/lockd/svcproc.o
+  CC      drivers/ieee1394/oui.o
+  LD      drivers/ieee1394/ieee1394.o
+  LD      drivers/ieee1394/built-in.o
+  CC      net/core/dev_mcast.o
+  CC      drivers/input/input.o
+  CC      fs/lockd/svcsubs.o
+  CC      net/core/dst.o
+  CC      drivers/input/mousedev.o
+  CC      fs/lockd/mon.o
+  CC      drivers/input/keyboard/atkbd.o
+  CC      net/core/neighbour.o
+  CC      fs/lockd/xdr.o
+  LD      drivers/input/keyboard/built-in.o
+  CC      drivers/input/mouse/psmouse-base.o
+  CC      net/core/rtnetlink.o
+  CC      fs/lockd/xdr4.o
+  CC      drivers/input/mouse/alps.o
+  CC      fs/lockd/svc4proc.o
+  CC      drivers/input/mouse/logips2pp.o
+  CC      net/core/utils.o
+  CC      drivers/input/mouse/synaptics.o
+  LD      fs/lockd/lockd.o
+  LD      fs/lockd/built-in.o
+  CC      fs/msdos/namei.o
+  CC      net/core/link_watch.o
+  CC      drivers/input/mouse/lifebook.o
+  LD      fs/msdos/msdos.o
+  LD      fs/msdos/built-in.o
+  CC      fs/nfs/dir.o
+  CC      drivers/input/mouse/trackpoint.o
+  CC      net/core/filter.o
+  CC      net/core/net-sysfs.o
+  LD      drivers/input/mouse/psmouse.o
+  LD      drivers/input/mouse/built-in.o
+  LD      drivers/input/built-in.o
+  CC      drivers/input/serio/serio.o
+  CC      fs/nfs/file.o
+  CC      net/core/netpoll.o
+  CC      drivers/input/serio/i8042.o
+  CC      fs/nfs/inode.o
+  CC      drivers/input/serio/libps2.o
+  LD      net/core/built-in.o
+  LD      drivers/input/serio/built-in.o
+  LD      drivers/md/built-in.o
+  CC      net/ethernet/eth.o
+  CC [M]  drivers/md/linear.o
+  CC      net/ethernet/sysctl_net_ether.o
+  CC      fs/nfs/nfs2xdr.o
+  CC [M]  drivers/md/raid0.o
+  LD      net/ethernet/built-in.o
+  CC      net/ipv4/route.o
+  CC [M]  drivers/md/raid1.o
+  CC      fs/nfs/pagelist.o
+  CC      fs/nfs/proc.o
+  CC [M]  drivers/md/raid5.o
+  CC      fs/nfs/read.o
+  CC      fs/nfs/symlink.o
+  CC      net/ipv4/inetpeer.o
+  CC      fs/nfs/unlink.o
+  CC      fs/nfs/write.o
+  CC [M]  drivers/md/xor.o
+  CC      net/ipv4/protocol.o
+  CC      fs/nfs/nfs3proc.o
+  CC      net/ipv4/ip_input.o
+  CC [M]  drivers/md/dm.o
+  CC      fs/nfs/nfs3xdr.o
+  CC [M]  drivers/md/dm-table.o
+  CC      net/ipv4/ip_fragment.o
+  CC      fs/nfs/nfs3acl.o
+  CC [M]  drivers/md/dm-target.o
+  CC      fs/nfs/nfs4proc.o
+  CC [M]  drivers/md/dm-linear.o
+  CC      net/ipv4/ip_forward.o
+  CC [M]  drivers/md/dm-stripe.o
+  CC      fs/nfs/nfs4xdr.o
+  CC      net/ipv4/ip_options.o
+  CC [M]  drivers/md/dm-ioctl.o
+  CC      net/ipv4/ip_output.o
+  CC [M]  drivers/md/dm-io.o
+  CC      fs/nfs/nfs4state.o
+  CC [M]  drivers/md/kcopyd.o
+  CC      net/ipv4/ip_sockglue.o
+  CC      fs/nfs/nfs4renewd.o
+  CC [M]  drivers/md/md.o
+  CC      fs/nfs/delegation.o
+  CC      net/ipv4/inet_hashtables.o
+  CC      fs/nfs/idmap.o
+  CC      net/ipv4/inet_timewait_sock.o
+  CC      fs/nfs/callback.o
+  CC [M]  drivers/md/bitmap.o
+  CC      fs/nfs/callback_xdr.o
+  CC      net/ipv4/inet_connection_sock.o
+  CC [M]  drivers/md/raid6main.o
+  CC      fs/nfs/callback_proc.o
+  CC      net/ipv4/tcp.o
+  CC      fs/nfs/direct.o
+  CC [M]  drivers/md/raid6algos.o
+  LD      fs/nfs/nfs.o
+  LD      fs/nfs/built-in.o
+  CC      fs/nfs_common/nfsacl.o
+  CC [M]  drivers/md/raid6recov.o
+  LD      fs/nfs_common/nfs_acl.o
+  LD      fs/nfs_common/built-in.o
+  CC      net/ipv4/tcp_input.o
+  CC      fs/nfsd/nfssvc.o
+  CC      fs/nfsd/nfsctl.o
+  HOSTCC  drivers/md/mktables
+  UNROLL  drivers/md/raid6int1.c
+  CC      fs/nfsd/nfsproc.o
+  UNROLL  drivers/md/raid6int2.c
+  UNROLL  drivers/md/raid6int4.c
+  UNROLL  drivers/md/raid6int8.c
+  UNROLL  drivers/md/raid6int16.c
+  UNROLL  drivers/md/raid6int32.c
+  UNROLL  drivers/md/raid6altivec1.c
+  UNROLL  drivers/md/raid6altivec2.c
+  UNROLL  drivers/md/raid6altivec4.c
+  UNROLL  drivers/md/raid6altivec8.c
+  CC [M]  drivers/md/raid6mmx.o
+  CC      fs/nfsd/nfsfh.o
+  CC      net/ipv4/tcp_output.o
+  CC [M]  drivers/md/raid6sse1.o
+  CC      fs/nfsd/vfs.o
+  CC [M]  drivers/md/raid6sse2.o
+  TABLE   drivers/md/raid6tables.c
+  CC [M]  drivers/md/raid6int1.o
+  CC [M]  drivers/md/raid6int2.o
+  CC [M]  drivers/md/raid6int4.o
+  CC [M]  drivers/md/raid6int8.o
+  CC      fs/nfsd/export.o
+  CC [M]  drivers/md/raid6int16.o
+  CC      net/ipv4/tcp_timer.o
+  CC      fs/nfsd/auth.o
+  CC [M]  drivers/md/raid6int32.o
+  CC      fs/nfsd/lockd.o
+  CC      net/ipv4/tcp_ipv4.o
+  CC [M]  drivers/md/raid6altivec1.o
+  CC      fs/nfsd/nfscache.o
+  CC [M]  drivers/md/raid6altivec2.o
+  CC [M]  drivers/md/raid6altivec4.o
+  CC      fs/nfsd/nfsxdr.o
+  CC [M]  drivers/md/raid6altivec8.o
+  CC      net/ipv4/tcp_minisocks.o
+  CC      fs/nfsd/stats.o
+  CC [M]  drivers/md/raid6tables.o
+  CC      fs/nfsd/nfs2acl.o
+  CC      net/ipv4/tcp_cong.o
+  LD [M]  drivers/md/raid6.o
+  LD [M]  drivers/md/md-mod.o
+  LD [M]  drivers/md/dm-mod.o
+  LD      drivers/media/common/built-in.o
+  CC      fs/nfsd/nfs3proc.o
+  LD      drivers/media/built-in.o
+  LD      drivers/mfd/built-in.o
+  LD      drivers/misc/built-in.o
+  CC      drivers/net/e100.o
+  CC      fs/nfsd/nfs3xdr.o
+  CC      net/ipv4/datagram.o
+  CC      fs/nfsd/nfs3acl.o
+  CC      net/ipv4/raw.o
+  CC      drivers/net/mii.o
+  CC      fs/nfsd/nfs4proc.o
+  CC      drivers/net/Space.o
+  CC      net/ipv4/udp.o
+  CC      drivers/net/loopback.o
+  CC      fs/nfsd/nfs4xdr.o
+  CC      drivers/net/8139too.o
+  CC      net/ipv4/arp.o
+  CC      fs/nfsd/nfs4state.o
+  CC      drivers/net/netconsole.o
+  CC      net/ipv4/icmp.o
+  CC [M]  drivers/net/pcnet32.o
+  CC      net/ipv4/devinet.o
+  CC      fs/nfsd/nfs4idmap.o
+  CC      net/ipv4/af_inet.o
+  CC      fs/nfsd/nfs4acl.o
+  CC [M]  drivers/net/eepro100.o
+  CC      fs/nfsd/nfs4callback.o
+  CC      net/ipv4/igmp.o
+  CC      fs/nfsd/nfs4recover.o
+  CC [M]  drivers/net/acenic.o
+  LD      fs/nfsd/nfsd.o
+  LD      fs/nfsd/built-in.o
+  CC      fs/nls/nls_base.o
+  CC      fs/nls/nls_cp437.o
+  CC      fs/nls/nls_ascii.o
+  CC      net/ipv4/sysctl_net_ipv4.o
+  CC      fs/nls/nls_iso8859-1.o
+  CC      net/ipv4/fib_frontend.o
+  LD      fs/nls/built-in.o
+  CC      fs/partitions/check.o
+  CC [M]  drivers/net/tg3.o
+  CC      fs/partitions/msdos.o
+  CC      net/ipv4/fib_semantics.o
+  LD      fs/partitions/built-in.o
+  CC      fs/proc/mmu.o
+  CC      fs/proc/task_mmu.o
+  CC      fs/proc/inode.o
+  CC      net/ipv4/netfilter.o
+  CC      fs/proc/root.o
+  CC      net/ipv4/fib_hash.o
+  CC      fs/proc/base.o
+  CC [M]  drivers/net/starfire.o
+  CC      net/ipv4/proc.o
+  CC      fs/proc/generic.o
+  CC [M]  drivers/net/dummy.o
+  CC      fs/proc/array.o
+  CC      net/ipv4/netfilter/ip_conntrack_standalone.o
+  CC [M]  drivers/net/s2io.o
+  CC      fs/proc/kmsg.o
+  CC      fs/proc/proc_tty.o
+  CC      net/ipv4/netfilter/ip_conntrack_core.o
+  CC      fs/proc/proc_misc.o
+  CC      fs/proc/kcore.o
+  LD      fs/proc/proc.o
+  LD      fs/proc/built-in.o
+  CC      fs/ramfs/inode.o
+  CC      net/ipv4/netfilter/ip_conntrack_proto_generic.o
+  LD      fs/ramfs/ramfs.o
+  LD      fs/ramfs/built-in.o
+  CC      fs/sysfs/inode.o
+  LD      drivers/net/bonding/built-in.o
+  CC [M]  drivers/net/bonding/bond_main.o
+  CC      net/ipv4/netfilter/ip_conntrack_proto_tcp.o
+  CC      fs/sysfs/file.o
+  CC      net/ipv4/netfilter/ip_conntrack_proto_udp.o
+  CC      fs/sysfs/dir.o
+  CC      net/ipv4/netfilter/ip_conntrack_proto_icmp.o
+  CC      fs/sysfs/symlink.o
+  CC      fs/sysfs/mount.o
+  CC [M]  drivers/net/bonding/bond_3ad.o
+  CC      fs/sysfs/bin.o
+  CC      net/ipv4/netfilter/ip_nat_core.o
+  CC      fs/sysfs/group.o
+  LD      fs/sysfs/built-in.o
+  CC      fs/udf/balloc.o
+  CC [M]  drivers/net/bonding/bond_alb.o
+  CC      net/ipv4/netfilter/ip_nat_helper.o
+  CC      fs/udf/dir.o
+  CC      fs/udf/file.o
+  CC      fs/udf/ialloc.o
+  CC      net/ipv4/netfilter/ip_nat_proto_unknown.o
+  LD [M]  drivers/net/bonding/bonding.o
+  LD      drivers/net/e1000/built-in.o
+  CC [M]  drivers/net/e1000/e1000_main.o
+  CC      fs/udf/inode.o
+  CC      net/ipv4/netfilter/ip_nat_proto_tcp.o
+  CC      net/ipv4/netfilter/ip_nat_proto_udp.o
+  CC      fs/udf/lowlevel.o
+  CC      net/ipv4/netfilter/ip_nat_proto_icmp.o
+  CC      fs/udf/namei.o
+  CC [M]  drivers/net/e1000/e1000_hw.o
+  CC      net/ipv4/netfilter/ip_nat_rule.o
+  CC      net/ipv4/netfilter/ip_nat_standalone.o
+  CC      net/ipv4/netfilter/ip_tables.o
+  CC      fs/udf/partition.o
+  CC [M]  drivers/net/e1000/e1000_ethtool.o
+  CC      fs/udf/super.o
+  CC      net/ipv4/netfilter/iptable_filter.o
+  CC      fs/udf/truncate.o
+  CC      net/ipv4/netfilter/iptable_mangle.o
+  LD      net/ipv4/netfilter/iptable_nat.o
+  CC [M]  drivers/net/e1000/e1000_param.o
+  LD      net/ipv4/netfilter/ip_nat.o
+  CC      net/ipv4/netfilter/ipt_helper.o
+  CC      fs/udf/symlink.o
+  CC      fs/udf/fsync.o
+  CC      fs/udf/crc.o
+  LD [M]  drivers/net/e1000/e1000.o
+  CC      net/ipv4/netfilter/ipt_limit.o
+  CC      fs/udf/directory.o
+  LD      drivers/net/ixgb/built-in.o
+  CC [M]  drivers/net/ixgb/ixgb_main.o
+  CC      fs/udf/misc.o
+  CC      net/ipv4/netfilter/ipt_mark.o
+  CC      fs/udf/udftime.o
+  CC      net/ipv4/netfilter/ipt_mac.o
+  CC      fs/udf/unicode.o
+  LD      fs/udf/udf.o
+  CC      net/ipv4/netfilter/ipt_iprange.o
+  LD      fs/udf/built-in.o
+  CC [M]  drivers/net/ixgb/ixgb_hw.o
+  CC      fs/vfat/namei.o
+  CC [M]  drivers/net/ixgb/ixgb_ee.o
+  CC [M]  drivers/net/ixgb/ixgb_ethtool.o
+  CC      net/ipv4/netfilter/ipt_pkttype.o
+  LD      fs/vfat/vfat.o
+  LD      fs/vfat/built-in.o
+  CC      fs/dnotify.o
+  CC      fs/dcookies.o
+  CC      net/ipv4/netfilter/ipt_multiport.o
+  CC [M]  drivers/net/ixgb/ixgb_param.o
+  CC      net/ipv4/netfilter/ipt_owner.o
+  LD      fs/built-in.o
+  LD [M]  drivers/net/ixgb/ixgb.o
+  LD      drivers/net/built-in.o
+  CC      drivers/parport/share.o
+  CC      net/ipv4/netfilter/ipt_tos.o
+  CC      lib/sort.o
+  CC      net/ipv4/netfilter/ipt_recent.o
+  CC      drivers/parport/ieee1284.o
+  CC      lib/parser.o
+  CC      net/ipv4/netfilter/ipt_ecn.o
+  CC      drivers/parport/ieee1284_ops.o
+  CC      lib/halfmd4.o
+  CC      lib/spinlock_debug.o
+  CC      drivers/parport/procfs.o
+  CC      net/ipv4/netfilter/ipt_dscp.o
+  CC      drivers/parport/parport_pc.o
+  CC      lib/kernel_lock.o
+  CC      lib/smp_processor_id.o
+  CC      net/ipv4/netfilter/ipt_ah.o
+  HOSTCC  lib/gen_crc32table
+  LD      drivers/parport/parport.o
+  LD      drivers/parport/built-in.o
+  CC      lib/iomap.o
+  CC      drivers/pci/access.o
+  CC      net/ipv4/netfilter/ipt_esp.o
+  CC      drivers/pci/bus.o
+  CC      drivers/pci/probe.o
+  CC      lib/bitmap.o
+  CC      net/ipv4/netfilter/ipt_length.o
+  CC      lib/bust_spinlocks.o
+  CC      lib/cmdline.o
+  CC      drivers/pci/remove.o
+  CC      net/ipv4/netfilter/ipt_ttl.o
+  CC      lib/ctype.o
+  CC      lib/dec_and_lock.o
+  CC      drivers/pci/pci.o
+  CC      lib/div64.o
+  CC      lib/dump_stack.o
+  CC      net/ipv4/netfilter/ipt_state.o
+  CC      lib/errno.o
+  CC      lib/extable.o
+  CC      drivers/pci/quirks.o
+  CC      net/ipv4/netfilter/ipt_conntrack.o
+  CC      lib/idr.o
+  CC      lib/int_sqrt.o
+  CC      net/ipv4/netfilter/ipt_tcpmss.o
+  CC      lib/klist.o
+  CC      drivers/pci/pci-driver.o
+  CC      lib/kobject.o
+  CC      net/ipv4/netfilter/ipt_REJECT.o
+  CC      drivers/pci/search.o
+  CC      lib/kobject_uevent.o
+  CC      drivers/pci/pci-sysfs.o
+  CC      drivers/pci/rom.o
+  CC      net/ipv4/netfilter/ipt_TOS.o
+  CC      lib/kref.o
+  CC      drivers/pci/setup-res.o
+  CC      lib/prio_tree.o
+  CC      drivers/pci/proc.o
+  CC      net/ipv4/netfilter/ipt_ECN.o
+  CC      lib/radix-tree.o
+  CC      drivers/pci/hotplug.o
+  CC      lib/rbtree.o
+  CC      net/ipv4/netfilter/ipt_DSCP.o
+  CC      drivers/pci/setup-bus.o
+  LD      drivers/pci/built-in.o
+  CC      lib/rwsem.o
+  CC      drivers/pnp/core.o
+  CC      net/ipv4/netfilter/ipt_MARK.o
+  CC      lib/semaphore-sleepers.o
+  CC      drivers/pnp/card.o
+  CC      drivers/pnp/driver.o
+  CC      lib/sha1.o
+  CC      net/ipv4/netfilter/ipt_MASQUERADE.o
+  CC      lib/string.o
+  CC      drivers/pnp/resource.o
+  CC      lib/vsprintf.o
+  CC      net/ipv4/netfilter/ipt_REDIRECT.o
+  CC      drivers/pnp/manager.o
+  CC      net/ipv4/netfilter/ipt_NETMAP.o
+  CC [M]  lib/libcrc32c.o
+  CC      drivers/pnp/support.o
+  GEN     lib/crc32table.h
+  CC      net/ipv4/netfilter/ipt_SAME.o
+  AR      lib/lib.a
+  CC      drivers/pnp/interface.o
+  CC      lib/crc32.o
+  CC      drivers/pnp/quirks.o
+  LD      lib/built-in.o
+  CC      drivers/scsi/libata-core.o
+  CC      net/ipv4/netfilter/ipt_CLASSIFY.o
+  CC      drivers/pnp/system.o
+  LD      drivers/pnp/built-in.o
+  CC      drivers/scsi/libata-scsi.o
+  CC      drivers/serial/serial_core.o
+  CC      net/ipv4/netfilter/ipt_LOG.o
+  CC      drivers/scsi/scsi.o
+  CC      drivers/serial/8250.o
+  CC      net/ipv4/netfilter/ipt_ULOG.o
+  CC      drivers/scsi/hosts.o
+  CC      net/ipv4/netfilter/ipt_TCPMSS.o
+  CC      drivers/scsi/scsi_ioctl.o
+  CC      drivers/serial/8250_pnp.o
+  CC      drivers/scsi/constants.o
+  CC      drivers/serial/8250_pci.o
+  CC      net/ipv4/netfilter/arp_tables.o
+  CC      drivers/scsi/scsicam.o
+  CC      drivers/serial/8250_early.o
+  CC      net/ipv4/netfilter/arpt_mangle.o
+  LD      drivers/serial/built-in.o
+  CC      drivers/scsi/scsi_error.o
+  CC      drivers/usb/class/usblp.o
+  CC      net/ipv4/netfilter/arptable_filter.o
+  CC      drivers/scsi/scsi_lib.o
+  CC      net/ipv4/netfilter/ip_queue.o
+  LD      drivers/usb/class/built-in.o
+  CC      drivers/usb/core/usb.o
+  CC      drivers/scsi/scsi_scan.o
+  CC [M]  net/ipv4/netfilter/iptable_raw.o
+  CC      drivers/usb/core/hub.o
+  CC [M]  net/ipv4/netfilter/ipt_NOTRACK.o
+  CC      drivers/scsi/scsi_sysfs.o
+  CC      drivers/usb/core/hcd.o
+  LD      net/ipv4/netfilter/ip_conntrack.o
+  LD      net/ipv4/netfilter/built-in.o
+  CC      net/ipv4/inet_diag.o
+  CC      drivers/usb/core/urb.o
+  CC      drivers/scsi/scsi_devinfo.o
+  CC      drivers/usb/core/message.o
+  CC      drivers/scsi/scsi_sysctl.o
+  CC      drivers/scsi/scsi_proc.o
+  CC      net/ipv4/tcp_diag.o
+  CC      drivers/usb/core/config.o
+  CC      drivers/scsi/sd.o
+  CC      net/ipv4/tcp_bic.o
+  CC      drivers/usb/core/file.o
+  LD      net/ipv4/built-in.o
+  CC      drivers/usb/core/buffer.o
+  CC      net/netfilter/core.o
+  CC      drivers/scsi/sr.o
+  CC      drivers/usb/core/sysfs.o
+  CC      drivers/usb/core/devio.o
+  CC      drivers/scsi/sr_ioctl.o
+  CC      net/netfilter/nf_log.o
+  CC      net/netfilter/nf_queue.o
+  CC      drivers/usb/core/hcd-pci.o
+  CC      drivers/scsi/sr_vendor.o
+  CC      net/netfilter/nf_sockopt.o
+  CC      drivers/usb/core/inode.o
+  LD      drivers/scsi/aacraid/built-in.o
+  CC [M]  drivers/scsi/aacraid/linit.o
+  LD      net/netfilter/netfilter.o
+  LD      net/netfilter/built-in.o
+  CC      net/netlink/af_netlink.o
+  CC      drivers/usb/core/devices.o
+  CC [M]  drivers/scsi/aacraid/aachba.o
+  LD      drivers/usb/core/usbcore.o
+  LD      drivers/usb/core/built-in.o
+  LD      net/netlink/built-in.o
+  CC      net/packet/af_packet.o
+  CC      drivers/usb/host/ehci-hcd.o
+  CC [M]  drivers/scsi/aacraid/commctrl.o
+  LD      net/packet/built-in.o
+  LD      net/rxrpc/built-in.o
+  CC [M]  net/rxrpc/call.o
+  CC [M]  drivers/scsi/aacraid/comminit.o
+  CC      drivers/usb/host/uhci-hcd.o
+  CC [M]  drivers/scsi/aacraid/commsup.o
+  CC [M]  drivers/scsi/aacraid/dpcsup.o
+  CC [M]  net/rxrpc/connection.o
+  LD      drivers/usb/host/built-in.o
+  CC      drivers/usb/input/hid-core.o
+  CC [M]  drivers/scsi/aacraid/rx.o
+  CC [M]  net/rxrpc/krxiod.o
+  CC      drivers/usb/input/hid-input.o
+  CC [M]  drivers/scsi/aacraid/sa.o
+  CC [M]  net/rxrpc/krxsecd.o
+  CC [M]  drivers/usb/input/touchkitusb.o
+  CC [M]  drivers/scsi/aacraid/rkt.o
+  CC [M]  net/rxrpc/krxtimod.o
+  LD      drivers/usb/input/usbhid.o
+  LD      drivers/usb/input/built-in.o
+  LD      drivers/usb/misc/built-in.o
+  CC [M]  drivers/usb/misc/cytherm.o
+  CC [M]  net/rxrpc/main.o
+  LD [M]  drivers/scsi/aacraid/aacraid.o
+  CC [M]  drivers/usb/misc/phidgetservo.o
+  LD      drivers/scsi/aic7xxx/built-in.o
+  SHIPPED drivers/scsi/aic7xxx/aic7xxx_seq.h
+  SHIPPED drivers/scsi/aic7xxx/aic7xxx_reg.h
+  SHIPPED drivers/scsi/aic7xxx/aic7xxx_reg_print.c
+  CC [M]  drivers/scsi/aic7xxx/aic7xxx_osm.o
+  CC [M]  net/rxrpc/peer.o
+  CC      drivers/usb/mon/mon_main.o
+  CC      drivers/usb/mon/mon_stat.o
+  CC [M]  net/rxrpc/rxrpc_syms.o
+  CC      drivers/usb/mon/mon_text.o
+  CC [M]  drivers/scsi/aic7xxx/aic7xxx_proc.o
+  CC [M]  net/rxrpc/transport.o
+  CC      drivers/usb/mon/mon_dma.o
+  LD      drivers/usb/mon/usbmon.o
+  LD      drivers/usb/mon/built-in.o
+  CC [M]  drivers/scsi/aic7xxx/aic7xxx_osm_pci.o
+  CC      drivers/usb/storage/scsiglue.o
+  CC [M]  net/rxrpc/proc.o
+  CC [M]  drivers/scsi/aic7xxx/aic7xxx_core.o
+  CC      drivers/usb/storage/protocol.o
+  CC [M]  net/rxrpc/sysctl.o
+  LD [M]  net/rxrpc/rxrpc.o
+  CC      drivers/usb/storage/transport.o
+  CC      net/sched/sch_generic.o
+  CC      drivers/usb/storage/usb.o
+  LD      net/sched/built-in.o
+  CC      net/sunrpc/clnt.o
+  CC      drivers/usb/storage/initializers.o
+  CC      net/sunrpc/xprt.o
+  LD      drivers/usb/storage/usb-storage.o
+  LD      drivers/usb/storage/built-in.o
+  LD      drivers/usb/built-in.o
+  CC [M]  drivers/scsi/aic7xxx/aic7xxx_93cx6.o
+  CC      net/sunrpc/sched.o
+  LD      arch/i386/lib/built-in.o
+  CC      arch/i386/lib/bitops.o
+  CC [M]  drivers/scsi/aic7xxx/aic7xxx_pci.o
+  AS      arch/i386/lib/checksum.o
+  CC      arch/i386/lib/delay.o
+  AS      arch/i386/lib/getuser.o
+  CC      arch/i386/lib/memcpy.o
+  CC      net/sunrpc/auth.o
+  AS      arch/i386/lib/putuser.o
+  CC      arch/i386/lib/strstr.o
+  CC      arch/i386/lib/usercopy.o
+  CC      net/sunrpc/auth_null.o
+  AR      arch/i386/lib/lib.a
+  CC [M]  drivers/scsi/aic7xxx/aic7xxx_reg_print.o
+  CC      net/sunrpc/auth_unix.o
+  CC      net/unix/af_unix.o
+  CC      net/sunrpc/svc.o
+  LD [M]  drivers/scsi/aic7xxx/aic7xxx.o
+  LD      drivers/scsi/qla2xxx/built-in.o
+  LD      drivers/scsi/sym53c8xx_2/built-in.o
+  CC [M]  drivers/scsi/sym53c8xx_2/sym_fw.o
+  CC      net/sunrpc/svcsock.o
+  CC      net/unix/garbage.o
+  CC [M]  drivers/scsi/sym53c8xx_2/sym_glue.o
+  CC      net/unix/sysctl_net_unix.o
+  CC      net/sunrpc/svcauth.o
+  LD      net/unix/unix.o
+  LD      net/unix/built-in.o
+  LD      drivers/video/backlight/built-in.o
+  CC      drivers/video/console/dummycon.o
+  CC      net/sunrpc/svcauth_unix.o
+  CC [M]  drivers/scsi/sym53c8xx_2/sym_hipd.o
+  CC      drivers/video/console/vgacon.o
+  CC      net/sunrpc/pmap_clnt.o
+  CC      net/sunrpc/timer.o
+  CC      net/sunrpc/xdr.o
+  LD      drivers/video/console/built-in.o
+  LD      drivers/video/built-in.o
+  CC [M]  drivers/scsi/sym53c8xx_2/sym_malloc.o
+  CC      net/sysctl_net.o
+  CC [M]  drivers/scsi/sym53c8xx_2/sym_nvram.o
+  CC      net/sunrpc/sunrpc_syms.o
+  CC      net/sunrpc/cache.o
+  CC      net/sunrpc/rpc_pipe.o
+  LD [M]  drivers/scsi/sym53c8xx_2/sym53c8xx.o
+  CC      drivers/scsi/ide-scsi.o
+  CC      net/sunrpc/stats.o
+  CC      net/sunrpc/sysctl.o
+  CC      net/sunrpc/auth_gss/auth_gss.o
+  LD      drivers/scsi/libata.o
+  CC      drivers/scsi/ata_piix.o
+  LD      net/sunrpc/sunrpc.o
+  CC      net/sunrpc/auth_gss/gss_generic_token.o
+  LD      drivers/scsi/sd_mod.o
+  LD      drivers/scsi/sr_mod.o
+  CC      drivers/scsi/sg.o
+  CC      net/sunrpc/auth_gss/gss_mech_switch.o
+  CC      net/sunrpc/auth_gss/svcauth_gss.o
+  CC      net/sunrpc/auth_gss/gss_krb5_crypto.o
+  CC      net/sunrpc/auth_gss/gss_krb5_mech.o
+  CC      net/sunrpc/auth_gss/gss_krb5_seal.o
+  CC [M]  drivers/scsi/scsi_transport_spi.o
+  CC      net/sunrpc/auth_gss/gss_krb5_unseal.o
+  CC      net/sunrpc/auth_gss/gss_krb5_seqnum.o
+  CC [M]  net/sunrpc/auth_gss/gss_spkm3_mech.o
+  CC [M]  drivers/scsi/dpt_i2o.o
+  CC [M]  drivers/scsi/qlogicfc.o
+  CC [M]  net/sunrpc/auth_gss/gss_spkm3_seal.o
+  CC [M]  drivers/scsi/megaraid.o
+  CC [M]  net/sunrpc/auth_gss/gss_spkm3_unseal.o
+  CC [M]  net/sunrpc/auth_gss/gss_spkm3_token.o
+drivers/scsi/megaraid.c: In function `issue_scb':
+drivers/scsi/megaraid.c:1148: warning: passing arg 2 of `writel' makes pointer from integer without a cast
+drivers/scsi/megaraid.c: In function `issue_scb_block':
+drivers/scsi/megaraid.c:1211: warning: passing arg 2 of `writel' makes pointer from integer without a cast
+drivers/scsi/megaraid.c:1224: warning: passing arg 2 of `writel' makes pointer from integer without a cast
+drivers/scsi/megaraid.c:1226: warning: passing arg 1 of `readl' makes pointer from integer without a cast
+drivers/scsi/megaraid.c: In function `megaraid_isr_memmapped':
+drivers/scsi/megaraid.c:1356: warning: passing arg 1 of `readl' makes pointer from integer without a cast
+drivers/scsi/megaraid.c:1363: warning: passing arg 2 of `writel' makes pointer from integer without a cast
+drivers/scsi/megaraid.c:1382: warning: passing arg 2 of `writel' makes pointer from integer without a cast
+drivers/scsi/megaraid.c:1386: warning: passing arg 1 of `readl' makes pointer from integer without a cast
+  LD      net/sunrpc/auth_gss/auth_rpcgss.o
+  LD      net/sunrpc/auth_gss/rpcsec_gss_krb5.o
+  LD [M]  net/sunrpc/auth_gss/rpcsec_gss_spkm3.o
+  CC [M]  drivers/scsi/ipr.o
+  LD      net/sunrpc/auth_gss/built-in.o
+  LD      net/sunrpc/built-in.o
+  LD      net/built-in.o
+  CC [M]  drivers/scsi/sata_sis.o
+  CC [M]  drivers/scsi/sata_sx4.o
+  LD      drivers/scsi/scsi_mod.o
+  LD      drivers/scsi/built-in.o
+  LD      drivers/built-in.o
+  GEN     .version
+  CHK     include/linux/compile.h
+  UPD     include/linux/compile.h
+  CC      init/version.o
+  LD      init/built-in.o
+  LD      .tmp_vmlinux1
+  KSYM    .tmp_kallsyms1.S
+  AS      .tmp_kallsyms1.o
+  LD      .tmp_vmlinux2
+  KSYM    .tmp_kallsyms2.S
+  AS      .tmp_kallsyms2.o
+  LD      vmlinux
+  SYSMAP  System.map
+  SYSMAP  .tmp_System.map
+  Building modules, stage 2.
+  AS      arch/i386/boot/bootsect.o
+  AS      arch/i386/boot/setup.o
+  MODPOST
+  AS      arch/i386/boot/compressed/head.o
+  CC      arch/i386/boot/compressed/misc.o
+  HOSTCC  arch/i386/boot/tools/build
+  LD      arch/i386/boot/bootsect
+  LD      arch/i386/boot/setup
+  OBJCOPY arch/i386/boot/compressed/vmlinux.bin
+  GZIP    arch/i386/boot/compressed/vmlinux.bin.gz
+  CC      drivers/base/firmware_class.mod.o
+  CC      drivers/char/raw.mod.o
+  CC      drivers/firmware/dcdbas.mod.o
+  CC      drivers/md/dm-mod.mod.o
+  CC      drivers/md/linear.mod.o
+  CC      drivers/md/md-mod.mod.o
+  CC      drivers/md/raid0.mod.o
+  CC      drivers/md/raid1.mod.o
+  LD      arch/i386/boot/compressed/piggy.o
+  CC      drivers/md/raid5.mod.o
+  LD      arch/i386/boot/compressed/vmlinux
+  OBJCOPY arch/i386/boot/vmlinux.bin
+  BUILD   arch/i386/boot/bzImage
+Root device is (3, 3)
+Boot sector 512 bytes.
+Setup is 7000 bytes.
+System is 2080 kB
+  CC      drivers/md/raid6.mod.o
+Kernel: arch/i386/boot/bzImage is ready  (#1)
+  CC      drivers/md/xor.mod.o
+  CC      drivers/net/acenic.mod.o
+  CC      drivers/net/bonding/bonding.mod.o
+  CC      drivers/net/dummy.mod.o
+  CC      drivers/net/e1000/e1000.mod.o
+  CC      drivers/net/eepro100.mod.o
+  CC      drivers/net/ixgb/ixgb.mod.o
+  CC      drivers/net/pcnet32.mod.o
+  CC      drivers/net/s2io.mod.o
+  CC      drivers/net/starfire.mod.o
+  CC      drivers/net/tg3.mod.o
+  CC      drivers/scsi/aacraid/aacraid.mod.o
+  CC      drivers/scsi/aic7xxx/aic7xxx.mod.o
+  CC      drivers/scsi/dpt_i2o.mod.o
+  CC      drivers/scsi/ipr.mod.o
+  CC      drivers/scsi/megaraid.mod.o
+  CC      drivers/scsi/qlogicfc.mod.o
+  CC      drivers/scsi/sata_sis.mod.o
+  CC      drivers/scsi/sata_sx4.mod.o
+  CC      drivers/scsi/scsi_transport_spi.mod.o
+  CC      drivers/scsi/sym53c8xx_2/sym53c8xx.mod.o
+  CC      drivers/usb/input/touchkitusb.mod.o
+  CC      drivers/usb/misc/cytherm.mod.o
+  CC      drivers/usb/misc/phidgetservo.mod.o
+  CC      lib/libcrc32c.mod.o
+  CC      fs/afs/kafs.mod.o
+  CC      net/ipv4/netfilter/ipt_NOTRACK.mod.o
+  CC      net/ipv4/netfilter/iptable_raw.mod.o
+  CC      net/rxrpc/rxrpc.mod.o
+  CC      net/sunrpc/auth_gss/rpcsec_gss_spkm3.mod.o
+  LD [M]  drivers/base/firmware_class.ko
+  LD [M]  drivers/char/raw.ko
+  LD [M]  drivers/firmware/dcdbas.ko
+  LD [M]  drivers/md/dm-mod.ko
+  LD [M]  drivers/md/linear.ko
+  LD [M]  drivers/md/md-mod.ko
+  LD [M]  drivers/md/raid0.ko
+  LD [M]  drivers/md/raid1.ko
+  LD [M]  drivers/md/raid5.ko
+  LD [M]  drivers/md/raid6.ko
+  LD [M]  drivers/md/xor.ko
+  LD [M]  drivers/net/acenic.ko
+  LD [M]  drivers/net/bonding/bonding.ko
+  LD [M]  drivers/net/dummy.ko
+  LD [M]  drivers/net/e1000/e1000.ko
+  LD [M]  drivers/net/eepro100.ko
+  LD [M]  drivers/net/ixgb/ixgb.ko
+  LD [M]  drivers/net/pcnet32.ko
+  LD [M]  drivers/net/s2io.ko
+  LD [M]  drivers/net/starfire.ko
+  LD [M]  drivers/net/tg3.ko
+  LD [M]  drivers/scsi/aacraid/aacraid.ko
+  LD [M]  drivers/scsi/aic7xxx/aic7xxx.ko
+  LD [M]  drivers/scsi/dpt_i2o.ko
+  LD [M]  drivers/scsi/ipr.ko
+  LD [M]  drivers/scsi/megaraid.ko
+  LD [M]  drivers/scsi/qlogicfc.ko
+  LD [M]  drivers/scsi/sata_sis.ko
+  LD [M]  drivers/scsi/sata_sx4.ko
+  LD [M]  drivers/scsi/scsi_transport_spi.ko
+  LD [M]  drivers/scsi/sym53c8xx_2/sym53c8xx.ko
+  LD [M]  drivers/usb/input/touchkitusb.ko
+  LD [M]  drivers/usb/misc/cytherm.ko
+  LD [M]  drivers/usb/misc/phidgetservo.ko
+  LD [M]  fs/afs/kafs.ko
+  LD [M]  lib/libcrc32c.ko
+  LD [M]  net/ipv4/netfilter/ipt_NOTRACK.ko
+  LD [M]  net/ipv4/netfilter/iptable_raw.ko
+  LD [M]  net/rxrpc/rxrpc.ko
+  LD [M]  net/sunrpc/auth_gss/rpcsec_gss_spkm3.ko
+make modules modules_install
+  CHK     include/linux/version.h
+  CHK     include/linux/compile.h
+  CHK     usr/initramfs_list
+  Building modules, stage 2.
+  MODPOST
+  INSTALL drivers/base/firmware_class.ko
+  INSTALL drivers/char/raw.ko
+  INSTALL drivers/firmware/dcdbas.ko
+  INSTALL drivers/md/dm-mod.ko
+  INSTALL drivers/md/linear.ko
+  INSTALL drivers/md/md-mod.ko
+  INSTALL drivers/md/raid0.ko
+  INSTALL drivers/md/raid1.ko
+  INSTALL drivers/md/raid5.ko
+  INSTALL drivers/md/raid6.ko
+  INSTALL drivers/md/xor.ko
+  INSTALL drivers/net/acenic.ko
+  INSTALL drivers/net/bonding/bonding.ko
+  INSTALL drivers/net/dummy.ko
+  INSTALL drivers/net/e1000/e1000.ko
+  INSTALL drivers/net/eepro100.ko
+  INSTALL drivers/net/ixgb/ixgb.ko
+  INSTALL drivers/net/pcnet32.ko
+  INSTALL drivers/net/s2io.ko
+  INSTALL drivers/net/starfire.ko
+  INSTALL drivers/net/tg3.ko
+  INSTALL drivers/scsi/aacraid/aacraid.ko
+  INSTALL drivers/scsi/aic7xxx/aic7xxx.ko
+  INSTALL drivers/scsi/dpt_i2o.ko
+  INSTALL drivers/scsi/ipr.ko
+  INSTALL drivers/scsi/megaraid.ko
+  INSTALL drivers/scsi/qlogicfc.ko
+  INSTALL drivers/scsi/sata_sis.ko
+  INSTALL drivers/scsi/sata_sx4.ko
+  INSTALL drivers/scsi/scsi_transport_spi.ko
+  INSTALL drivers/scsi/sym53c8xx_2/sym53c8xx.ko
+  INSTALL drivers/usb/input/touchkitusb.ko
+  INSTALL drivers/usb/misc/cytherm.ko
+  INSTALL drivers/usb/misc/phidgetservo.ko
+  INSTALL fs/afs/kafs.ko
+  INSTALL lib/libcrc32c.ko
+  INSTALL net/ipv4/netfilter/ipt_NOTRACK.ko
+  INSTALL net/ipv4/netfilter/iptable_raw.ko
+  INSTALL net/rxrpc/rxrpc.ko
+  INSTALL net/sunrpc/auth_gss/rpcsec_gss_spkm3.ko
+if [ -r System.map -a -x /sbin/depmod ]; then /sbin/depmod -ae -F System.map  2.6.14; fi
+make bzImage
+  CHK     include/linux/version.h
+  CHK     include/linux/compile.h
+  CHK     usr/initramfs_list
+Kernel: arch/i386/boot/bzImage is ready  (#1)
+cp arch/i386/boot/bzImage /boot/kernel-2.6.14
+cp System.map /boot/System.map-2.6.14
+cp .config /boot/config-2.6.14
+echo '
+image=/boot/kernel-2.6.14
+        label=linux-2.6.14
+        read-only
+        root=/dev/hda3
+        initrd=/boot/initrd-2.6.14
+' >> /etc/lilo.conf
+/sbin/lilo
+Added linux
+Added 2.6.11-NFS4-3
+Added 2.6.12-rc2-CIT1
+Added 2.6.12-rc3
+Added 2.6.12-rc3-C1
+Added 2.6.12-rc3-C3
+Added 2.6.12-rc3-C4
+Added 2.6.12-rc4-C1
+Added 2.6.12-rc4-C2
+Added 2.6.12-rc6-C3
+Added 2.6.12-C2
+Added 2.6.13-rc1-mhp1
+Added 2.6.12-C3
+Added 2.6.12-rc6-C4
+Added 2.6.13-C1
+Added 2.6.14-rc1-C1
+Added 2.6.14r1-C2
+Added 2.6.14r4-C1
+Added 2.6.14r5-C1
+Added 2.6.14-C1 *
+Added linux-2.6.14

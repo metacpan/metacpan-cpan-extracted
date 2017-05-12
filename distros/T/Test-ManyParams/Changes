@@ -1,0 +1,43 @@
+Revision history for Perl extension Test::ManyParams.
+
+0.10  Thu May 13, 2003
+        - enabled more convinience as it is now possible also to use e.g.
+          all_ok {$_ eq 10} [1 .. 10],  "....";
+          instead of
+          all_ok {$_[0] eq 10} [1 .. 10], "...";
+          => also putting in $_ the argument if there is only one
+        
+0.09  Tue Mar 27, 2003
+        - removed use of Readonly module for the seed variable,
+          as it is not so important but made problems for multiple imports of T::MP
+
+0.08  Tue Sep 03, 2003
+        - implemented access to the seeding value used of Test::ManyParams
+        * $Test::ManyParams::seed
+        - added Readonly to the requirements
+
+0.07  Thu Aug 29, 2003
+        - implemented (global) seed option
+          * use Test::ManyParams seed => '....';
+
+0.06  Mon Aug 26, 2003
+        - implemented rudimentary most_ok method
+          * most_ok CODE PARAMETERS => NR [,TEST_NAME]
+
+0.05  Tue Aug 20, 2003
+        - implemented any_is, any_isnt method
+
+0.04  Mon Aug 19, 2003
+        - fixed MANIFEST, test routine for any_ok was forgotten in 0.03
+        - fixed README as the 0.03 actualisations wasn't included
+
+0.03  Mon Aug 19, 2003
+        - implemented any_ok method
+
+0.02  Tue Aug 13, 2003
+        - implemented all_are and all_arent methods
+
+0.01  Fri Aug 09 , 2003
+        - implemented all_ok method
+	    - original version; created by h2xs 1.22 with options
+		-XA -b5.6.0 Test::ManyParams

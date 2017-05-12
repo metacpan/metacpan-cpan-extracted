@@ -1,0 +1,147 @@
+# NAME
+
+Test::DBIx::Class::Schema - DBIx::Class schema sanity checking tests
+
+# VERSION
+
+version 1.0.10
+
+# SYNOPSIS
+
+Create a test script that looks like this:
+
+    #!/usr/bin/perl
+    # vim: ts=8 sts=4 et sw=4 sr sta
+    use strict;
+    use warnings;
+
+    # load the module that provides all of the common test functionality
+    use Test::DBIx::Class::Schema;
+
+    # create a new test object
+    my $schematest = Test::DBIx::Class::Schema->new(
+        {
+            # required
+            dsn       => 'dbi:Pg:dbname=mydb', # or use schema option
+            namespace => 'MyDB::Schema',
+            moniker   => 'SomeTable',
+            # optional
+            username  => 'some_user',
+            password  => 'opensesame',
+            glue      => 'Result',             # fix class name if needed
+            # rather than calling diag will test that all columns/relationships
+            # are accounted for in your test and fail the test if not
+            test_missing => 1,
+        }
+    );
+
+    # tell it what to test
+    $schematest->methods(
+        {
+            columns => [
+                qw[
+                    id
+                    column1
+                    column2
+                    columnX
+                    foo_id
+                ]
+            ],
+
+            relations => [
+                qw[
+                    foo
+                ]
+            ],
+
+            custom => [
+                qw[
+                    some_method
+                ]
+            ],
+
+            resultsets => [
+                qw[
+                ]
+            ],
+        }
+    );
+
+    # run the tests
+    $schematest->run_tests();
+
+Run the test script:
+
+    prove -l t/schematest/xx.mydb.t
+
+## Options
+
+Either `dsn` (eg `dbi:Pg:dbname=mydb`) or `schema` (an already
+created schema object) must be set.
+
+If the database requires credentials, set `username` and `password`.
+
+`namespace`, `glue` and `moniker` define the class being tested.
+For example, if your class is `MyDB::Schema::Result::SomeTable` then use:
+
+    namespace => 'MyDB::Schema',
+    glue      => 'Result,
+    moniker   => 'SomeTable',
+
+`glue` is not required if the combination of `namespace` and `moniker`
+is enough to define the class, e.g. `MyDB::Schema::SomeTable`.
+
+## done\_testing
+
+Under normal circumstances there is no need to add `done_testing` to your
+test script; it's automatically called at the end of `run_tests()` _unless_
+you are running tests under [Test::Aggregate](https://metacpan.org/pod/Test::Aggregate).
+
+If you are running aggregated tests you will need to add
+
+    done_testing;
+
+to your top-level script.
+
+# DESCRIPTION
+
+It's really useful to be able to test and confirm that DBIC classes have and
+support a known set of methods.
+
+Testing these one-by-one is more than tedious and likely to discourage you
+from writing the relevant test scripts.
+
+As a lazy person myself I don't want to write numerous near-identical scripts.
+
+Test::DBIx::Class::Schema takes the copy-and-paste out of DBIC schema class testing.
+
+# SEE ALSO
+
+[DBIx::Class](https://metacpan.org/pod/DBIx::Class),
+[Test::More](https://metacpan.org/pod/Test::More),
+[Test::Aggregate](https://metacpan.org/pod/Test::Aggregate)
+
+## BUILD STATUS
+
+### master
+
+[![Build status](https://badge.buildkite.com/c8793ab59e31d982dd759cadfb66a308d5278f21cb707d8822.svg?branch=master)](https://buildkite.com/chizography/test-dbix-class-schema)
+
+# AUTHOR
+
+Chisel Wright <chisel@chizography.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Chisel Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+# CONTRIBUTORS
+
+- Chisel Wright <chisel@cleavag.es>
+- Darius Jokilehto <darius.jokilehto@net-a-porter.com>
+- Dave Cross <davidc@broadbean.com>
+- Jason Tang <tang.jason.ch@gmail.com>
+- Rupert Lane <rupert@rupert-lane.org>

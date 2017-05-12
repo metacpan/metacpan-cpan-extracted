@@ -1,0 +1,686 @@
+<!--<?
+## This example is from a web-page.
+## This part is stored in starfish.conf
+if ($Star->{CurrentLoop}==1) {
+  $Star->{Loops} = 2;  # There are two loops so that the table of contents
+                       # is collected in the first loop.
+
+  @PubFiles1 = qw(index.html dalthesis.cls styles.css
+    example-simple/simple.tex example-simple/simple.pdf example-simple/Makefile
+    example-simple/dalthesis.cls
+  );
+
+sub section {
+  my $tag = shift; my $title = shift;
+  my $r = "<a name=$tag><h2>$title</h2></a>";
+  if ($Star->{CurrentLoop}==1) {
+    $ToC.= "<a href=\"#$tag\">$title</a><br/>\n";  # collecting table of contents
+  }
+  return $r;
+}
+sub subsection {
+  my $t1 = shift; my $t = shift;
+  my $r = "<a name=\"$t1\"><h3>$t</h3></a>";
+  return $r;
+}
+
+} # end of loop 1
+
+## End of starfish.conf
+!>--><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd ">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>dalthesis.cls -- LaTeX Template for Theses at the Dalhousie University</title>
+<link rel=StyleSheet href="styles.css" type="text/css" media=all />
+</head>
+<body bgcolor="white">
+
+<center>
+<h1>dalthesis.cls<br/>
+    LaTeX Template for Theses at the Dalhousie University</h1>
+
+<i>Version 1.0, 2012-Nov-13 (Documentation Version 1.0.1, 2012-Nov-13)</i>
+</center>
+
+<p><em>Maintainer: Dr. Vlado Keselj<br>
+To send questions or comments please contact:
+<a href="http://web.cs.dal.ca/~vlado">Dr. Vlado Keselj</a>
+<br>Main URL of this site: <a href="http://projects.cs.dal.ca/dalthesis"
+                                   >http://projects.cs.dal.ca/dalthesis</a>
+</em></p>
+
+<!--<?
+
+if ($Star->{CurrentLoop}==1) {
+$Star->add_hook('regex', qr/^\.section:(\S+)\s+(.*)/m, sub { $_= &section($_[2],$_[3])});
+$Star->add_hook('regex', qr/^\.subsection:(\S+)\s+(.*)/m, sub { $_= &subsection($_[2],$_[3])});
+}
+
+!>-->
+
+.section:download Download Files
+
+All files are included in the following zip file: <a href="dalthesis.zip">dalthesis.zip</a><br>
+The thesis class file is: <a href="dalthesis.cls">dalthesis.cls</a>
+<br>If you want to take a quick look, these files may be also useful: <ul>
+<li> <a href="example-simple/simple.pdf">simple.pdf</a> -- PDF of a simple example
+#<li> <a href="example-big/thesis.pdf">thesis.pdf</a> -- PDF of a complex example
+#<li> <a href="example-phd/phd-example.pdf">phd-example.pdf</a> -- PDF of a PhD thesis sample
+</ul>
+All files included in the above zip file are:
+<blockquote>
+<!--<?
+echo join('', map "<a href=\"$_\">$_</a>, ", @PubFiles1)
+!>-->
+and <a href="index.html">index.html</a>.
+</blockquote>
+
+<p>For more files and explanations, please read further.
+
+
+.section:toc Table of Contents
+
+<p>
+<!--<?
+
+## Producing Table of Contents:
+if ($Star->{CurrentLoop}==2) { echo $ToC }
+
+!>-->
+
+.section:introduction 1. Introduction
+
+.subsection:introduction-d 1.1 FGS Regulations
+
+<p>
+The final thesis format is approved by the Faculty of Graduate Studies office.
+Although this format is regularely maintained in effort to keep it up to date with the
+prescribed FGS guidelines, it is possible that additional corrections will be required.
+The students are responsible for ensuring that their final thesis conforms to the
+FGS regulations, especially since LaTeX allows the author to override many aspects
+of the template within their own text.
+Hence, make sure that you have your thesis format checked by FGS
+before trying to submit the final copy of your thesis.
+<b>This evaluation takes two business days.</b>
+</p>
+
+<p>The FGS thesis regulations can be found at
+<a href="http://www.dalgrad.dal.ca/regulations/ix/">
+         http://www.dalgrad.dal.ca/regulations/ix/</a>.
+Further thesis format guidelines, including sample theses documents in
+Word format, are provided at:
+<a href="http://dalgrad.dal.ca/currentstudents/thesesanddefences/forms/#regs">
+http://dalgrad.dal.ca/currentstudents/thesesanddefences/forms/#regs</a>.
+
+<p>
+This template is provided as an example of something that FGS will
+accept.  Students are welcome to make their thesis look as they want,
+whether by using their own template or by modifying this one, but always
+<b>have your thesis format checked by FGS before trying to submit the final
+copy of your thesis.</b>
+</p>
+
+.subsection:introduction-2 1.2 Other LaTeX Templates
+
+<p>
+At an ad-hoc committee meeting on Jun 14, 2012, it was decided that a
+common Dalhousie LaTeX thesis template to be created.  As a first
+step, here is the list of current LaTeX thesis templates being used at
+the Dalhousie University (if you would like to add any more, please
+email Vlado Keselj at vlado@cs.dal.ca):
+<ul>
+<li> Computer Science: <a href="http://web.cs.dal.ca/~vlado/dalcsthesis/">http://web.cs.dal.ca/~vlado/dalcsthesis/</a>
+<li> Math and Stats: <a href="http://www.mathstat.dal.ca/~clyde/dalthesis/index.html">http://www.mathstat.dal.ca/~clyde/dalthesis/index.html</a>
+<li> Oceanography: <a href="https://github.com/dankelley/dal-oce-thesis">https://github.com/dankelley/dal-oce-thesis</a>
+</ul>
+
+
+.subsection:introduction-o 1.3 Overview of Main Commands
+
+<p>
+The LaTeX template for CS thesis of the Dalhousie Univerisity is based
+on version 2.2 of the thesis template for theses in Mathematics.
+The math template was developed by Clyde
+Clements and Steven Matheson.  The basic usage of the CS template is the
+same as for the math one.  See instructions at 
+<a href="http://www.mscs.dal.ca/~clyde/dalthesis">www.mscs.dal.ca/~clyde/dalthesis</a>
+or the basic <a href="examples/simple.tex">simple.tex</a> starter file
+to get started and for the regular bells and whistles. 
+</p>
+
+<p>
+Declare your supervisor with a \supervisor{} statement and each reader with
+a \reader{} statement.  If you have co-supervisors, declare each of them with
+a separate \supervisor{} statement and the template will designate them as
+co-supervisors.
+</p>
+
+<p>
+The basic template allows you to not print out the front pages if you
+include a \nofront command in your file.
+You can omit specific parts with the following commands:
+\notitlepage, \nosignaturepage, \nopermissionpage \nodedicationpage, 
+\notableofcontents, \nolistoftables, \nolistoffigures, or \nobib.
+You can also declare a "draft" version of the thesis with the \draft command.
+</p>
+
+<p>
+You can browse the file dalcsthesis.cls to find all degree tags.
+The following ones are relevant to the Faculty of Computer Science:
+</p>
+<ul>
+<li> \bcshon &mdash; Bachelor of Computer Science Honours thesis</li>
+<li> \bcshoncoop &mdash; Bachelor of Computer Science Honours thesis (with co-op) </li>
+<li> \macs &mdash; Master of Applied Computer Science project report</li>
+<li> \mcs &mdash; Master of Computer Science thesis</li>
+<li> \mec &mdash; Master of Electronic Commerce thesis</li>
+<li> \mhi &mdash; Master of Health Informatics thesis</li>
+<li> \phd &mdash; Doctor of Philosophy (Ph.D.)</li>
+</ul>
+<p>
+Use one of these designations before your \frontmatter call and it will
+define the appropriate abbreviations for your thesis.
+</p>
+
+<p>
+The CS thesis file relies on some additional style files.  All of them
+should be available on the CS systems.  If a required style file is
+not available, you can place their copies in the directory with your
+thesis.
+</p>
+
+<p>
+Basic files needed are:
+</p>
+<ul>
+<li> <a href="dalcsthesis.cls">dalcsthesis.cls</a> (may be installed on the UNIX systems)</li>
+<li> <a href="afterpage.sty">afterpage.sty</a> (installed on the UNIX systems, you will need it for local systems)</li>
+<li> <a href="glossary.sty">glossary.sty</a> (installed on the UNIX systems, you will need it for local systems)</li>
+</ul>
+<p>
+<a href="examples/simple.tex">Simple.tex</a>
+(<a href="examples/simple.pdf">pdf</a>,
+<a href="examples/simple.ps">ps</a>) 
+is a sample basic thesis (you also need its bibliography file 
+<a href="examples/simple.bib">simple.bib</a>).  
+</p>
+
+<p>
+The rest of this page provides information on including different
+features in your thesis like a glossary, tables, or figures.  They are
+all presented as changes to simple.tex.  Taking a UNIX "diff" between
+simple.tex and the example will show you the items that change to use
+the given feature.
+</p>
+
+.subsection:introduction-c 1.4 Caveats
+
+<h4>Page Margins</h4>
+
+<p>
+FGS guidelines specify that the left-side margin should be around 1.5
+inches and other three margins approximately 1 inch.  The thesis style
+file is designed to satisfy this requirement but, as Clyde Clements
+mentions in the math version of the thesis template, you
+may print the thesis generated by this template and get incorrect
+margins.
+Known reasons are
+<ul>
+<li> You selected the wrong paper size when you converted the dvi file
+     to postscript (use the correct option for dvips).</li> 
+<li> You generated a PDF file and then, as you printed from Adobe
+     Acrobat, you had the "fit to page" option selected, which
+     decreases the printed text by 93%.  (unselect the "fit to page"
+     option before printing)</li>
+</ul>
+Once the DVI file is generated, this template is no longer in control.
+The version that was approved by graduate studies was generated to a
+postscript file and then printed directly to a printer with the lpr
+command.
+</p>
+
+<p>
+The easiest way to tell if your margins are correct after printing is to 
+measure where the page number appears at the bottom of a page.  The template
+is designed to print it between 0.5 inches and 0.75 inches from the bottom 
+of the page.  If the margin is bigger than that then your method of printing
+the dvi file has shrunk the margins.
+</p>
+
+
+.subsection:introduction-b 1.5 Current Issues
+
+<p>
+Although an effort is made to keep the template in accordance with the
+latest FGS regulations, it happens that a thesis using the template
+does not conform to some requirements.  We greatly appreciate any
+reports about the corrections, and our first step is to list such
+issues in this subsection.  Additionally, we report here any other reported problems.
+</p>
+
+
+<ul>
+<li> PDF/A format<br>
+     Since the required electronic submission, the FGS regulations
+     require that the PDF file is in PDF/A format, which is not
+     produced by default by pdflatex and most other programs.
+     Some conversion suggestions are offered at:
+     <a href="http://dalgrad.dal.ca/currentstudents/thesesanddefences/etheses/"
+             >http://dalgrad.dal.ca/currentstudents/thesesanddefences/etheses/"</a>
+
+<li> issue with using the package: <code>\usepackage{listings}</code><br>
+     When an appendix chapter consists entierly of a long, multi-page code segment, the page
+     immediatelly after the first chapter page is blank.
+
+     A quick solution is to redefine the \dal@chapter command in the following way:
+<pre>
+\makeatletter
+\def\dal@chapter[#1]#2{%
+\ifnum \c@secnumdepth >\m@ne\refstepcounter{chapter}%
+\typeout{\@chapapp\space\thechapter.}%
+\addcontentsline{toc}{chapter}%
+{\protect\numberline{\@chapapp\space\thechapter}#1}%
+\else\addcontentsline{toc}{chapter}{#1}%
+\fi\chaptermark{#1}%
+\addtocontents{lof}{\protect\addvspace{10\p@}}%
+\addtocontents{lot}{\protect\addvspace{10\p@}}%
+\if@twocolumn\@topnewpage[\@makechapterhead{#2}]%
+\else\@makechapterhead{#2}%
+\@afterheading\fi%
+%\ifdal@in@preface\else\afterpage{\dal@add@textheight{\footskip}}\fi%
+}
+\makeatother
+</pre>
+
+This should be done just before the first code appendix chapter.
+Thanks to Mike Lawrence for reporting this problem.
+
+<li> When using dotted leaders to separate entries from page number,
+     ensure that at least three dots can fit between the end of your
+     entry and the page number (list of tables, list of figures, table
+     of contents).
+
+<p> One solution can be illustrated as follows:
+<pre>
+\section[This Section Title is Very Close to the Length of Two Lines
+ in the Table of Contents---There Should be Two Dots at the End of
+ ToC Line~.~.]
+{This Section Title is Very Close to the Length of Two Lines
+ in the Table of Contents---There Should be Two Dots at the End of
+ ToC Line}
+</pre>
+This is a trick to repeat the title for the short and long version, but we add ~.~. in the "short" version.
+This makes the title in the Table of Contents longer, and makes sure that there are at least
+two dots in the dotted line, as required.
+
+
+<li> In table and figure captions, we can use the following style:
+<pre>
+\caption[caption title]{actual caption text}
+</pre>
+instead of
+<pre>
+\caption{caption text}
+</pre>
+In the first case only the caption title will appear in the table of
+contents.  The first usage is encouraged if the caption text takes
+more than one line.
+<li>
+    There is a new command, \mixedCaseTitle, which should be
+    documented.  The command negates the
+    code to capitalize the title.  If you absolutely need mixed
+    case in the title (like a chemistry person who might need NaCl
+    in the title with that casing) then invoke the no-parameter
+    \mixedCaseTitle command and you now control the case title.
+</ul>
+
+.subsection:introduction-q 1.6 Questions and Comments
+
+<p>
+The thesis format is currently maintained by Mike McAllister and Vlado Keselj.
+If you have any questions and comments please send e-mail to Vlado
+Keselj (vlado@cs.dal.ca), or talk to him directly.
+</p>
+
+
+<!--<? echo &section('examples', '2. Examples of Parts to a Thesis'); !>-->
+
+[ <a href="#front">Front Pages</a>
+| <a href="#figure">Figures</a>
+| <a href="#table">Tables</a>
+| <a href="#algorithm">Algorithms</a>
+| <a href="#theorem">Theorems</a>
+| <a href="#glossary">Glossary</a>
+]
+
+<!--<? $sectionnumber = 2; $subsectionnumber = 1;
+echo &subsection('front', "$sectionnumber.$subsectionnumber Front Pages");
+!>-->
+
+<p>
+According to current regulations, an abstract should occupy a single
+page.
+It may be typeset in the single space mode, if necessary.  To obtain
+the single-space mode you need to specify the beginning tag as:
+<pre>
+\begin{abstract}[s]
+</pre>
+instead of the usual
+<pre>
+\begin{abstract}
+</pre>
+The abstract should have no illustrations or footnotes, and it should
+be no longer than 150 words for a Master's thesis, and not longer than
+350 words for a PhD thesis.  This is not a strict requirement, but it
+is required by the catalogues: the AMICUS Web on-line catalogue and
+Dissertations Abstracts International database.
+
+<!--<?
+++$subsectionnumber;
+echo &subsection('figure', "$sectionnumber.$subsectionnumber Figures");
+!>-->
+
+<p>
+The example included here uses two LaTeX subpackages: graphicx and subfigure.
+The graphicx package is quite common and useful to include external images.
+The current FGS requirements (2011-04) require that a thesis is
+submitted in the PDF format, for the electronic submission, and
+it should be PDF/A compliant.  This requires that all fonts are
+embedded, among other requirements.  To obtain such format, it is
+recommended that you use pdflatex, instead of producing a DVI file and
+then a PS file.  All EPS figures need to be converted to PDF as well.
+You can use epstopdf command (in Linux environment) to convert an EPS
+figure to PDF.  For example, to convert a f.eps file to pdf, type
+"epstopdf f.eps", and it will produce "f.pdf" file, usable as a figure
+by pdflatex.
+
+<p>
+This example uses two sub-packages:  graphicx and subfigure.
+graphicx is a standard package that gives you everything you need for
+figures.  The subfigure package is used here to place more than one
+picture (each with their own caption) within one figure.
+</p>
+
+<ul>
+<li> <a href="examples/figures.tex">figures.tex</a> (<a
+href="examples/figures.pdf">pdf</a>)&mdash; latex file that uses
+figures</li>
+<li> <a href="examples/samplefig.eps">samplefig.eps</a> &mdash; EPS figure to include in the example</li>
+<li> <a href="examples/samplefig.pdf">samplefig.pdf</a> &mdash; PDF figure to include in the example</li>
+<li> <a href="examples/graphicx.sty">graphicx.sty</a> &mdash; style file for graphics (you shouldn't need to install this on any system)</li>
+<li> <a href="examples/subfigure.sty">subfigure.sty</a> &mdash; style file for
+subfigures (Installed on the UNIX system, you may need it for your own
+system)</li>
+</ul>
+
+<p>
+Diff with "simple.tex" (&lt; means a line was removed, &gt; means that a  line was added):
+</p>
+<pre>
+% diff simple.tex figures.tex
+</pre>
+
+<!--<?
+++$subsectionnumber;
+echo &subsection('table', "$sectionnumber.$subsectionnumber Tables");
+!>-->
+
+<p>
+Tables have native support in LaTeX.  This one uses a tabular inner
+environment to give a pretty layout to the data.
+</p>
+
+<ul>
+<li> <a href="examples/tables.tex">tables.tex</a> 
+(<a href="examples/tables.pdf">pdf</a>)&mdash; latex file that uses 
+tables</li>
+</ul>
+
+<p>
+Diff with "simple.tex" (&lt; means a line was removed, &gt; means that a 
+line was added):
+</p>
+<pre>
+% diff simple.tex tables.tex
+</pre>
+
+<!--<?
+++$subsectionnumber;
+echo &subsection('algorithm', "$sectionnumber.$subsectionnumber Algorithms");
+!>-->
+
+<p>
+This example uses two sub-packages: algorithm and algorithmic.  There
+are other algorithm packages that exist that you might consider too.
+The algorithms don't appear in any table of contents unless you enclose
+them in a figure environment.
+</p>
+
+<ul>
+<li> <a href="examples/algorithm.tex">algorithm.tex</a> (<a
+href="examples/algorithm.pdf">pdf</a>) &mdash; latex file with an
+algorithm</li>
+<li> <a href="examples/algorithm.sty">algorithm.sty</a> &mdash; May need to
+install on your own system or the UNIX system.</li>
+<li> <a href="examples/algorithmic.sty">algorithmic.sty</a> &mdash; May need to
+install on your own system or the UNIX system.</li>
+</ul>
+
+<p>
+Diff with "simple.tex" (&lt; means a line was removed, &gt; means that a 
+line was added):
+</p>
+<pre>
+% diff simple.tex tables.tex
+</pre>
+
+<!--<?
+++$subsectionnumber;
+echo &subsection('theorem', "$sectionnumber.$subsectionnumber Theorems");
+!>-->
+
+<p>
+The example <a href="examples/theorems.tex">theorems.tex</a> 
+(<a href="examples/theorems.pdf">pdf</a>) illustrates how we can write
+definitions, theorems, proofs, and other similar parts in LaTeX.
+</p>
+
+<ul>
+<li> <a href="examples/theorems.tex">theorems.tex</a> (<a
+href="examples/theorems.pdf">pdf</a>) &mdash; latex file with a theorem</li>
+</ul>
+
+<p>
+Diff with "simple.tex" (&lt; means a line was removed, &gt; means that a 
+line was added):
+</p>
+<pre>
+% diff simple.tex theorems.tex
+</pre>
+
+<p>
+For proofs and proof sketches you can also use the style package
+written by Norbert Zeh, <a href="examples/nzproof.sty">nzproof.sty</a>.
+The package requires the following other style files: amsmath.sty,
+amssymb.sty, amsfonts.sty, and ifthen.sty, which are likely already
+installed on the system.
+This example shows how nzproof style file can be used.
+Thanks to Norbert Zeh for providing the style file and the sample
+LaTeX source.
+</p>
+
+<ul>
+<li> <a href="examples/nzproof.sty">nzproof.sty</a> &mdash; the style
+file
+<li> <a href="examples/nzproof.tex">nzproof.tex</a>
+(<a href="examples/nzproof.pdf">pdf</a>) &mdash; sample LaTeX file</li>
+</ul>
+
+<p>
+Diff with "simple.tex" (&lt; means a line was removed, &gt; means that a 
+line was added):
+</p>
+<pre>
+% diff simple.tex nzproof.tex
+</pre>
+
+<!--<?
+++$subsectionnumber;
+echo &subsection('glossary', "$sectionnumber.$subsectionnumber Glossary");
+!>-->
+
+<p>
+This example creates a glossary.  The example uses the file
+<a href="glossary.sty">glossary.sty</a>, which may be installed on
+your system, or you can download it
+from <a href="glossary.sty">here</a>.
+To create a glossary, you first LaTeX the file, then issue the command:
+<pre>
+makeindex -s glossary.ist -o glossary.gls glossary.glo
+</pre>
+and finally LaTeX the file once more.
+</p>
+
+<p>
+In a thesis, as well as in this example, the location of the glossary
+is dictated by the Faculty of Graduate Studies:
+it must be between the abstract and the acknowledgements.
+</p>
+
+<ul>
+<li> <a href="example-glossary/glossary.tex">glossary.tex</a> (<a
+href="example-glossary/glossary.pdf">pdf</a>) &mdash; LaTeX file with a
+glossary</li>
+<li> <a href="glossary.sty">glossary.sty</a> &mdash; May need to
+install on your own system or the UNIX system.</li>
+</ul>
+
+<p>
+Diff with "simple.tex" (&lt; means a line was removed, &gt; means that 
+a line was added):
+</p>
+<pre>
+% diff simple.tex glossary.tex
+</pre>
+
+.section:admin 3. Administrative Notes
+
+<!-- <h3>Related links</h3>
+
+<ul>
+<li> <a href="http://users.cs.dal.ca/~mcallist/latex/theses/">Previous
+     site in the Mike McAllister's web space</a>
+</ul>
+
+-->
+
+.subsection:history-a 3.1 Acknowledgements
+
+<p>
+The CS template arose out of the efforts of many people.  Particular
+thanks go to the following contributors:
+</p>
+<ul>
+<li> Clyde Clements and Steven Matheson for providing the base
+     template from which the CS template arose,</li>
+<li> Mike McAllister for the <b>main</b> work on adaptation of the template,
+     integration of the updates below, and producing this web page, and
+     examples.
+<li> Todd Eavis, Andrew Rau-Chaplin, Billy Biggs, Srini Sampalli, 
+and Stuart MacAskill for providing examples of how they adjusted 
+the math template to adapt to the FGS regulations as they were getting 
+their theses approved.  In particular, Todd provided the foundation, 
+algorithm, and figures of the bigger thesisExample sample thesis.  </li>
+<li>Norbert Zeh for looking over the finishing touches of the template and for
+providing a proof environment.  </li>
+<li> Vlado Keselj for some <strong>major</strong> latex hacking to address 
+the FGS requirements that will go unnoticed by most 
+non-FGS people but that are some of the trickier details to integrate 
+simply and seamlessly in the class file.</li>
+<li> Mike Smit for providing additional corrections from FGS.
+<li> Li Lei for providing corrections.
+<li> Sajjad Hussain for providing corrections.
+</ul>
+
+<!--<? echo &subsection('history-u', '3.2 Update History'); !>-->
+
+<ul>
+<li> Feb, 2005 -- Created by Mike McAllister, and changes below are
+     done by Mike unless marked otherwise.
+<li> Feb. 23, 2005 -- new thesis class file uploaded
+  with some margin and font size fixes.  The index was also removed
+  from examples since grad studies doesn't want an index.</li>
+<li> Feb. 24, 2005 -- new thesis class file again and glossary example.  
+Vlado made the glossary into an option of the thesis class so that we
+can modify its line spaceing to what FGS wants.  Way to go Vlado!</li>
+<li> Feb. 25, 2005 -- Added in a disclaimer and indicated that students
+are welcome to submit whatever thesis format FGS will accept; this template
+is just a suggestion.  Reformatted the acknowledgements section.</li>
+<li> Feb. 25, 2005 --  Made the distinction between \submitdate{} (title
+page) and \defencedate{} (signature pages) since the latter requires a
+full date while the former only asks for the month and year.  If you
+have a thesis that uses a prior version of the template, you will need
+to add a \defencedate{} clause with the new thesis template!</li>
+<li> Mar. 17, 2005 -- Indicate that the template passes the requirements
+of FGS.  Updated the list of files required by nzproof.sty too.</li>
+<li> Mar. 22, 2005 -- Added a note about how to have co-supervisors.</li>
+<li> Mar. 29, 2005 -- Added information about paper margins and on not
+printing some parts of the text. </li>
+<li> Apr. 6, 2005 -- Added the "random information" section to document
+that the thesis must still be reviewed by FGS and that the abstract has 
+a limited size.</li>
+<li> Apr. 21, 2005 -- Graduate committee approved the template.
+<li> Apr. 28, 2005 -- Maintainer: Vlado Keselj
+<li> Aug. 31, 2006 -- Maintainers: Mike McAllister and Vlado Keselj
+<li> Nov. 18, 2006 -- Mike Mcallister adapted version 2.6 from version 2.5 as
+       required by FGS:
+       <ul>
+       <li> Title must be capitalized everywhere.  Added command
+            \mixedCaseTitle to in case the title needs mixed case, at
+	    which point the author of the dissertation takes on the
+	    responsibility of getting the case right.
+       <li> Even spacing on title bage between title, "by" and author name
+       <li> Put lower part of title page in single space
+       <li> Capitalized words on author signature page as required
+       </ul>
+<li> Dec. 1, 2006 -- Vlado Keselj updated the examples and the
+       documentation.
+<li> Dec. 4, 2006 -- Vlado Keselj updated the examples and the
+       documentation.
+<li> Dec. 5, 2006 -- Vlado Keselj: Version 2.7, Bachelor of Computer Science,
+    Honours is submitted to FCS instead of FGS.  Updates of examples
+    and documentation.
+<li> Jan 4, 2007 -- Vlado Keselj: - minor documentation updates
+<li> Mar 8, 2007 -- Vlado Keselj: - minor documentation updates
+<li> Aug 30, 2007 -- Vlado Keselj: - minor documentation updates
+<li> Sep 18, 2007 -- Vlado Keselj: Version 2.8
+       <ul><li> fixed bug with PhD thesis: Previously, signatures appeared on the next (wrong)
+                page because there are five of them;
+       <li> minor documentation and "big example" updates,
+       <li> added phd-example
+       </ul>
+<li> Jun 14, 2008 -- Vlado Keselj: - minor documentation and examples updates (glossary)
+<li> Sep 5, 2008 -- Vlado Keselj: - issue with the package listings (empty page)
+<li> Jan 5, 2010 -- Vlado Keselj: - minor documentation updates
+<li> Jan 21, 2011 -- Vlado Keselj: - front page updates, fixing spacing
+<li> Apr 5, 2011 -- Vlado Keselj: - documentation improvements (figures)
+<li> Jun 1, 2012 -- Vlado Keselj: - documentation improvements
+<li> Jun 14, 2012 -- Vlado Keselj: - documentation improvements
+</ul>
+
+<!--<? echo &subsection('history-p', '3.3 Previous Saved Versions'); !>-->
+
+<ul>
+<li> <a href="2006-12-04/">Version 2.6, stored on 04-Dec-2006</a>
+<li> <a href="2006-11-17/">Version 2.5, stored on 17-Nov-2006</a>
+<li> <a href="2006-08-30/">Version 2.4, stored on 30-Aug-2006</a>
+<li> <a href="2005-12-21/">Version 21-Dec-2005</a>
+</ul>
+
+<!--<? echo &section('lastupdate', 'Last update information and the end'); !>-->
+<p>Last update: 14-Jun-2012. <center><i>The end.</i></center>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+NAME
+    Text::Overflow -
+
+SYNOPSIS
+      use Text::Overflow qw(ellipsis clip);
+
+      clip('1234567890', 6);
+      #=> '123456';
+
+      clip('１２３４５６７８９０', 6);
+      #=> '１２３';
+
+      ellipsis('1234567890', 6);
+      #=> '12345…';
+
+      ellipsis('１２３４５６７８９０', 6);
+      #=> '１２…';
+
+DESCRIPTION
+    Text::Overflow is for clipping text for a width
+
+    Text::Overflow::vlength($string)
+        Return visual width of $string.
+
+    Text::Overflow::vtrim($string, $length, $delim)
+        Trim $string to visual width specified $length including $delim
+
+    Text::Overflow::clip($string, $length)
+        Clip $string. This is same as vtrim($string, $length, "")
+
+    Text::Overflow::ellipsis($string, $length);
+        Clip and append ellipsis character. This is same as vtrim($string,
+        $length, "…")
+
+AUTHOR
+    cho45 <cho45@lowreal.net>
+
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

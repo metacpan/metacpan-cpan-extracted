@@ -1,0 +1,36 @@
+INSTALL
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install (as root to install system-wide)
+
+To install to a different directory (if you're not root, for example),
+use the
+
+    --install_path lib=~/lib/perl
+
+and/or
+
+    --install_path libdoc=~/man/man3
+
+options to the install step.  The above paths are just examples.
+See the Module::Build documentation for more information.
+
+INSTALLATION USING MAKEFILE
+
+You may also install via the usual make incantation:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+To install to a different directory (if you're not root, for example),
+use the
+
+    PREFIX=~/lib/perl
+
+option to the install step.  The above path is just an example.
+
+

@@ -1,0 +1,9 @@
+blank<>lines<>2 5 7 
+blank<>space<>4 2 6
+lines<>text<>3 4 6
+text<>paragraph<>2 5 6 
+print<>text<>3 5 7 
+current<>lines<>4 7 9 
+circuit<>current<>2 2 8 
+circuit<>board<>3 1 4
+space<>ship<>5 2 8

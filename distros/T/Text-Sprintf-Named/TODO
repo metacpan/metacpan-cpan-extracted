@@ -1,0 +1,4 @@
+* Add size modifiers ("l", "h", "ll", etc.) - (?)
+
+* Add an exported named_sprintf() function that will perform the formatting
+in one step (?).

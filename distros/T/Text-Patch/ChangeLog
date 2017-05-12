@@ -1,0 +1,27 @@
+
+20101004 v1.8
+
+- t/*.t temporary removed all tests, see t/test.t for details
+
+20101002 v1.7
+
+- t/*.t fixed to use native diff(1) if available.
+  (Text::Diff 1.37 seems broken)
+
+20100930 v1.6
+
+- fixed empty t dir
+
+20100908 v1.5
+
+- moved tests to 't' (note by Alexandr Ciornii)
+
+20070407 v1.3
+
+Patches by Andrew <sobakasu@gmail.com>
+- add support for patching with 'OldStyle' & 'Context' patches
+- recognises and supports "\ No newline at end of file" markers.
+- updated the unit test to test patches with newline endings.
+- dies when a hunk can't be successfully applied
+
+Previous history lost...

@@ -1,0 +1,97 @@
+NAME
+    TAP::Runner - Running tests with options
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+
+        use TAP::Runner;
+        use TAP::Formatter::HTML;
+
+        TAP::Runner->new(
+            {
+                # harness_class => 'TAP::Harness::JUnit',
+                harness_formatter => TAP::Formatter::HTML->new,
+                tests => [
+                    {
+                        file    => 't/examples/test.t',
+                        alias   => 'Test alias',
+                        args    => [
+                            '--option', 'option_value_1'
+                        ],
+                        options => [
+                            {
+                                name   => '--website',
+                                values => [
+                                    'first.local',
+                                    'second.local',
+                                ],
+                                multiple => 0,
+                            },
+                            {
+                                name   => '--browser',
+                                values => [
+                                    'firefox',
+                                    'chrome',
+                                ],
+                                multiple => 1,
+                                parallel => 1,
+                            },
+                        ],
+                    },
+                    {
+                        file    => 't/examples/test.t',
+                        alias   => 'Test alias 2',
+                        args    => [
+                            '--option', 'option_value_1'
+                        ],
+                    },
+                ],
+            }
+        )->run;
+
+DESCRIPTION
+    This module allows to run tests more flexible. Allows to use
+    TAP::Harness, not just for unit tests.
+
+ATTRIBUTES
+  harness_class
+    Harness class to run the tests ( default TAP::Harness )
+
+  harness_formatter
+    Custom formatter for Harness.
+
+  harness_args HashRef
+    Default args that will pass to Harness object
+
+  tests ArrayRef[TAP::Runner::Test]
+    Tests configs that should run. See TAP::Runner::Test
+
+METHODS
+  new
+    Create a new TAP::Runner object. tests atribute required
+
+        # Tests to run with runner
+        my @tests  = ( { file => 't/test.t' } );
+
+        # Tests auto coerce to L<TAP::Runner::Test>
+        my $runner = TAP::Runner->new(
+            tests => \@tests,
+        );
+
+  run
+    Run the tests
+
+AUTHOR
+    Pavel R3VoLuT1OneR Zhytomirsky <r3volut1oner@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Pavel R3VoLuT1OneR Zhytomirsky.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,1253 @@
+2015-06-19  Rocky Bernstein <rocky@cpan.org>
+
+	* t/01test-OO-compile.t: Add IN and OUT methods as part of the
+	Term::ReadLine spec, and that Term::ShellUI uses.
+
+2015-06-18  Rocky Bernstein <rocky@cpan.org>
+
+	* Changes, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Get ready for release 1.42
+
+2015-06-18  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/History.pm,
+	lib/Term/ReadLine/Perl5/OO/History.pm: Remove prototype on
+	add_line_to_history to make Term::ShellUI happy
+
+2015-02-05  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 5a1b94d8e33a4b9f00014ed29d6449d3acb56050 Author: Sergey
+	Romanov <sromanov-dev@yandex.ru> Date:   Wed Dec 3 21:59:31 2014
+	+0300
+
+2014-12-03  Sergey Romanov <sromanov-dev@yandex.ru>
+
+	* Changes: Update Changes to comply with CPAN::Changes::Spec some BackPAN archeology was involved; apparently some parts of this
+	distribution are older then CPAN itself, thus I had a touch of
+	history today (a nerdy one, of course)
+
+2014-12-03  R. Bernstein <rocky@users.noreply.github.com>
+
+	* : Merge pull request #6 from sergeyromanov/patch-1 Many thanks.
+
+2014-12-03  Sergey Romanov <sromanov-dev@yandex.ru>
+
+	* Changes: Update Changes to comply with CPAN::Changes::Spec some BackPAN archeology was involved; apparently some parts of this
+	distribution are older then CPAN itself, thus I had a touch of
+	history today (a nerdy one, of course)
+
+2014-09-14  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO.pm: Small changes
+
+2014-09-13  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/OO.pm, lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: More small doc changes. Bump
+	release.
+
+2014-09-13  Rocky Bernstein <rocky@cpan.org>
+
+	* test.pl: Don't use rlib even in the tests
+
+2014-09-13  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml, META.yml: Don't use rlib in travis.
+
+2014-09-13  Rocky Bernstein <rocky@cpan.org>
+
+	* Changes: Get ready for release 1.41
+
+2014-09-13  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/OO.pm, lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline-guide.pod,
+	lib/Term/ReadLine/Perl5/readline.pm: I said, make rlib an optional
+	dependency.
+
+2014-09-12  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit d940634bc0dc5da08593f06ce250891a5a6c80f4 Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Fri Sep 12 20:52:52 2014 -0400
+
+2014-09-12  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, META.yml, lib/Term/ReadLine/Perl5/OO.pm: Fix POD error
+
+2014-09-12  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, Changes, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Common.pm, lib/Term/ReadLine/Perl5/Dumb.pm,
+	lib/Term/ReadLine/Perl5/History.pm, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/Keymap.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline-guide.pod,
+	lib/Term/ReadLine/Perl5/readline.pm, t/01test-OO-compile.t,
+	t/02test-OO-history-max-len.t, t/10test-basic.t,
+	t/10test-changecase.t, t/10test-common.t, t/10test-filelist.t,
+	t/10test-history.t, t/10test-motion.t, t/10test-readline.t,
+	t/15test-unescape.t, t/20test-read-input-file.t: Get ready for
+	release 1.40
+
+2014-08-14  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Common.pm,
+	lib/Term/ReadLine/Perl5/OO/State.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Small doc changes. Out of
+	release 0.39 now
+
+2014-08-13  Rocky Bernstein <rocky@cpan.org>
+
+	* Changes, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Get ready for release 1.40
+
+2014-08-13  Rocky Bernstein <rocky@cpan.org>
+
+	* t/20test-read-input-file.t: On older Perls *Keymap does not get
+	back into emacs_keymap. And possibly this is more what we want
+	anyway.
+
+2014-08-13  Rocky Bernstein <rocky@cpan.org>
+
+	* : Merge in OO branch
+
+2014-06-22  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Pull out what's needed from
+	preinit to make terminal attributes work on prmopt and user input.
+	Move towards adding that to OO.
+
+2014-06-22  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/Keymap.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Just a little closer to getting
+	nested keymaps working on OO version
+
+2014-06-10  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO/Keymap.pm: Add keymap name and default
+	value to keymap
+
+2014-06-10  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/Keymap.pm: A couple more small changes
+
+2014-06-10  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/Keymap.pm, test.pl: Finish converting
+	single-key Emacs keymap bindings to readline F_ functions
+
+2014-06-10  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/Keymap.pm, test.pl: Start to handle OO
+	Keymaps
+
+2014-06-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/Keymap.pm, test.pl: Work on Emacs keymap,
+	keymaps and command functions. Almost ready for hooking that into
+	OO.pm
+
+2014-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO/Keymap.pm: Start a keymap print routine
+
+2014-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/Term/ReadLine/Perl5/Common.pm,
+	lib/Term/ReadLine/Perl5/OO/Keymap.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/10test-common.t: More work on
+	OO keymaps
+
+2014-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/Common.pm, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Start working on OO Keybindings
+
+2014-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO.pm: Start to separate key functions and
+	use the same terminology as in Term::ReadLine::Perl
+
+2014-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO.pm: Remove debug stuff
+
+2014-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/History.pm,
+	lib/Term/ReadLine/Perl5/OO/History.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/01test-OO-compile.t,
+	t/10test-history.t, test.pl: Rework history,
+	Term::ReadLine::Perl5::Hisotry for the default non-OO version of
+	readline (Term::ReadLine::Perl5). It does this by faking it to use
+	the OO history Term::ReadLine::Perl5::OO::History.  This way both OO and non-OO use the same history routines.
+
+2014-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Common.pm,
+	lib/Term/ReadLine/Perl5/History.pm, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/History.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/01test-OO-compile.t,
+	t/10test-basic.t, t/10test-changecase.t, t/10test-filelist.t,
+	t/10test-history.t, t/10test-motion.t, t/10test-readline.t,
+	t/15test-unescape.t, test.pl: Get down to 5 history tests failing.
+
+2014-06-06  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, t/10test-basic.t,
+	t/10test-changecase.t, t/10test-filelist.t, t/10test-history.t,
+	t/10test-motion.t, t/10test-readline.t, t/15test-unescape.t,
+	test.pl: Try fallback to Caroline module reamed
+	Term::ReadLine::Perl5::OO
+
+2014-06-06  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/State.pm, t/00test-pod.t,
+	t/01test-OO-compile.t, t/02test-OO-history-max-len.t,
+	t/10test-basic.t: A minimally working OO history
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml, MANIFEST: Travis 3rd try
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO/State.pm: Package pplit off from OO.
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Travis 2nd try
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml, Build.PL: Add Caroline's dependencies. Try to get
+	this working on Travis
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/History.pm: More baby steps to bring
+	Caroline into the fold
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: I said, $past->$paste
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: $past->$paste
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm, test.pl: Use Test::More in
+	test.pl
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/OO/History.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/10test-history.t: Remove some
+	bugs, reduce global-namespace filehandles
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/History.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/10test-history.t: Back port
+	some of the newer OO History code here - doc read/write_history.
+
+2014-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/History.pm, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/OO/History.pm, t/10test-history.t, test.pl: 
+	A branch to attempt to make OO and merge in Caroline. Here we start
+	with the recently-added history mechanism.
+
+2014-06-02  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/readline-guide.pod,
+	lib/Term/ReadLine/Perl5/readline.pm: Improve sectioning. POD typo.
+
+2014-06-02  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, Changes, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Dumb.pm, lib/Term/ReadLine/Perl5/Keymap.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Go over POD text. Get ready for
+	release 1.38
+
+2014-06-01  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/Term/ReadLine/Perl5/Dumb.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Split out Dumb to it's own
+	module.
+
+2014-06-01  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, Changes, MANIFEST, lib/Term/ReadLine/Perl5/Keymap.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Add rl_parse_and_bind
+
+2014-06-01  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod: Revise.
+
+2014-06-01  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod: Link typo.
+
+2014-06-01  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/Term/ReadLine/Perl5/Keymap.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Move Keymap initialization to
+	its own file.
+
+2014-06-01  Rocky Bernstein <rocky@cpan.org>
+
+	* t/20test-read-input-file.t: read_an_init_file -> rl_read_init_file
+
+2014-06-01  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: Guard against illegal
+	function bindings
+
+2014-06-01  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	T:R:P5:new - extra call to preinit to set some sort of tty settings
+
+2014-05-31  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: Change a typeglob into an
+	array reference. This is no longer Perl4
+
+2014-05-31  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, README.pod, demo/Cmd.pm, demo/Cmd/Features.pm,
+	demo/Cmd/ResetTTY.pm, demo/Cmd/SetTTY.pm, demo/Cmd/help.pm,
+	demo/Cmd/preinit.pm, demo/Cmd/rl_bind_keyseq.pm,
+	demo/Cmd/rl_filename_list.pm, demo/Cmd/rl_read_init_file.pm,
+	demo/Cmd/rl_redisplay.pm, demo/Cmd/rl_set.pm,
+	demo/Cmd/tilde_complete.pm, demo/CmdProc.pm, demo/Load.pm,
+	demo/shell.pl: Remove demo. It's now in its own repo/module
+
+2014-05-29  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: Another typo
+
+2014-05-29  Rocky Bernstein <rocky@cpan.org>
+
+	* demo/Cmd/SetTTY.pm: One more POD typo
+
+2014-05-29  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, demo/Cmd/help.pm, demo/Cmd/redisplay.pm,
+	demo/Cmd/rl_bind.pm, demo/Cmd/rl_bind_keyseq.pm,
+	demo/Cmd/rl_read_init_file.pm, demo/Cmd/rl_redisplay.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Better GNU ReadLine compliance
+	in rl_ functions. Add read_init_file.
+
+2014-05-28  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, README.pod, demo/Cmd.pm, demo/Cmd/help.pm,
+	demo/CmdProc.pm, demo/Load.pm, demo/shell.pl,
+	lib/Term/ReadLine/Perl5.pm: Remove Enbugger
+
+2014-05-28  Rocky Bernstein <rocky@cpan.org>
+
+	* demo/Cmd/Features.pm, demo/Cmd/redisplay.pm, demo/Cmd/rl_bind.pm,
+	demo/Cmd/tilde_complete.pm: Add rl_bind Features, redisplay, ad
+	tilde_complete functions.
+
+2014-05-28  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL: stable->testing
+
+2014-05-28  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod, lib/Term/ReadLine/Perl5.pm: Promote the demo program
+	more
+
+2014-05-28  Rocky Bernstein <rocky@cpan.org>
+
+	* demo/Cmd.pm, demo/Cmd/ResetTTY.pm, demo/Cmd/SetTTY.pm,
+	demo/Cmd/help.pm, demo/Cmd/preinit.pm,
+	demo/Cmd/rl_filename_list.pm, demo/Cmd/rl_set.pm, demo/CmdProc.pm,
+	demo/Load.pm, demo/shell.pl: Demo command structure with now the way
+	it should be: one command per file, dynamically looked up at runtime
+
+2014-05-26  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, demo/Cmd.pm, demo/DemoHelper.pm, demo/shell.pl: Work
+	on demo program to pull out commands into its own module
+
+2014-05-25  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST.SKIP, META.yml, demo/DemoHelper.pm, demo/shell.pl,
+	lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Start to DRY and clean up demo/shell.pl. More POD work.
+
+2014-05-25  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, demo/shell.pl: Get ready for release 1.37
+
+2014-05-25  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Get ready for release 1.37
+
+2014-05-25  Rocky Bernstein <rocky@cpan.org>
+
+	* demo/shell.pl, lib/Term/ReadLine/Perl5/History.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Work on demo code. Fix broken rl_get. Improve pod
+
+2014-05-25  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/History.pm,
+	lib/Term/ReadLine/Perl5/readline-guide.pod,
+	lib/Term/ReadLine/Perl5/readline.pm: More documentation hacking
+
+2014-05-25  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Get ready for release 1.36
+
+2014-05-25  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: Attempt to organize along the
+	lines of the GNU ReadLine manaual. Add verbatim doc from that
+
+2014-05-24  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, demo/shell.pl, lib/Term/ReadLine/Perl5/readline.pm: 
+	Reorganize code. Start demo program
+
+2014-05-23  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: Add function TildeExpand -
+	untested right now
+
+2014-05-23  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, MANIFEST, MANIFEST.SKIP,
+	lib/Term/ReadLine/Perl5/.gitignore,
+	lib/Term/ReadLine/Perl5/TermCap.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Remove cyclic depedency between
+	Term::ReadLine and Term::ReadLine::Perl5 by adding
+	Term::ReadLine::Perl5::TermCap and removing the dependency on
+	Term::ReadLine::readline on Term::ReadLine.
+
+2014-05-22  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit b15351b2a3adc720270805931f801db155061562 Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Thu May 22 05:50:19 2014 -0400
+
+2014-05-21  me <rocky@muffin-92.(none)>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/10test-filelist.t: Get ready
+	for release 1.35
+
+2014-05-21  me <rocky@muffin-92.(none)>
+
+	* lib/Term/ReadLine/Perl5/readline.pm, t/10test-filelist.t: Fix up
+	tilde expansion on FreeBSD
+
+2014-05-20  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm, t/10test-filelist.t: Remove a
+	getwuid warning
+
+2014-05-20  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/10test-filelist.t: Get ready
+	for release 1.34
+
+2014-05-19  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Get ready for release 1.33
+
+2014-05-14  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Term/ReadLine/Perl5/readline.pm: Fix up ~ expansion
+	somewhat. More POD in readline.pm
+
+2014-05-14  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/10test-filelist.t: Start
+	tilde completion
+
+2014-05-14  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline-guide.pod,
+	lib/Term/ReadLine/Perl5/readline.pm, t/10test-filelist.t: Get ready
+	for release 1.32
+
+2014-05-13  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST: Fix up MANIFEST for readline-guide.pod
+
+2014-05-13  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Get ready for release 1.31
+
+2014-05-13  Rocky Bernstein <rocky@cpan.org>
+
+	* t/10test-filelist.t: Skip some tests if we don't have getpwuid,
+	e.g. Strawberry Perl on Windows
+
+2014-05-13  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline-guide.pod,
+	lib/Term/ReadLine/Perl5/readline.pm,
+	lib/Term/ReadLine/Perl5/readline.pod: readline.pod ->
+	readline-guide.pod and go over it
+
+2014-05-13  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pod, t/10test-filelist.t: In ~ vs
+	~name test, make sure expansion doesn't have trailing / and is not a
+	symbolic link
+
+2014-05-11  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: travis 2nd try
+
+2014-05-11  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml, META.yml: Get travis working again by adding
+	Module::Build dependecy for it
+
+2014-05-11  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, CHANGES, MANIFEST, MANIFEST.SKIP,
+	lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, perlcritic.rc,
+	t/10test-filelist.t, t/10test-readline.t: rl_filename_list no longer
+	adds classifier '*', @', '=' suffixes, but does include '/' for
+	directories. Term::ReadLine::GNU and GNU Readline do not add these
+	either. rl_filename_list handles some full tilde expansions, e.g. ~
+	and ~root, but not partial ones like ~ro, like GNU Readline does.  This is incompatible change, but T:R:P was incompatible to begin
+	with. Use rl_filename_list_deprecated for the old behavior.  Also, get ready for 1.30 release.
+
+2014-03-24  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Don't smash SIG{WINCH}. Fewer
+	critics please - we know this is ugly.
+
+2013-11-30  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 9c7b8ef9810da22ed7b6c974c1e81b660ab09965 Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Sat Nov 30 12:50:57 2013 -0500
+
+2013-11-30  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: One more get_window_size doc
+	change.
+
+2013-11-30  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, lib/Term/ReadLine/Perl5/readline.pm: Document and
+	deprecate get_window_size(). Also, if it can't get the window size,
+	don't die.
+
+2013-11-30  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Get ready for release 1.28
+
+2013-11-29  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Get ready for release 1.27
+
+2013-11-29  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, README.pod, lib/Term/ReadLine/Perl5.pm: More stuff to
+	make eff'ing smokers not error out.
+
+2013-11-28  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Get ready for release 1.26
+
+2013-11-28  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod, lib/Term/ReadLine/Perl5.pm: More pod changes
+
+2013-11-28  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL: Make rlib a dependency in configure.
+
+2013-11-27  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod, lib/Term/ReadLine/Perl5.pm: More pod hacking for
+	variables
+
+2013-11-27  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, README.pod: Add variables section from Perl5.pm to
+	README.pod
+
+2013-11-27  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/History.pm, lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, t/10test-history.t: Get ready
+	for relase 1.25
+
+2013-11-27  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, META.yml, lib/Term/ReadLine/Perl5/readline.pm: More
+	boilerplate stuff to coax smokers to not fail
+
+2013-11-25  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, LICENSE, MANIFEST, META.yml,
+	lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Administrivia. Get ready for
+	release 1.24
+
+2013-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: Get ready for release 1.23
+
+2013-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod, lib/Term/ReadLine/Perl5.pm: Set encoding UTF-8.
+
+2013-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, t/30test-interactive.t, test.pl: Interactive test needs
+	to not be in directory t/
+
+2013-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod, lib/Term/ReadLine/Perl5.pm: Update Perl pod, 2nd try
+
+2013-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, README.pod, lib/Term/ReadLine/Perl5.pm: Update Perl pod
+
+2013-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, LICENSE, MANIFEST, README.pod,
+	lib/Term/ReadLine/Perl5.pm, t/30test-interactive.t, test.pl: Add
+	reasonable CPANTS suggestions: revise license; move test.pl to t/;
+	add minimum perl version to Build.PL
+
+2013-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, t/10test-history.t: Add test for issue
+	#3 - addhistory.
+
+2013-11-23  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm: Typo add_History ->
+	add_history. issue #3. Thanks to Lester Highthower
+
+2013-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, lib/Term/ReadLine/Perl5/Tie.pm: Another try at getting
+	Term::ReadLine::Perl5::Tie version in correctly.
+
+2013-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Get ready for release 1.22
+
+2013-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/Tie.pm: Broke build.
+
+2013-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm: Past release now... bump version
+	into testing.
+
+2013-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Get ready for release 1.21
+
+2013-11-04  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/History.pm: Export add_line_to_history
+
+2013-11-03  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES: Get ready for release 1.20
+
+2013-11-03  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod: See above
+
+2013-11-03  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod: Include link to github tracker page.
+
+2013-11-03  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/readline.pm,
+	t/10test-readline.t, test.pl: Miscellaneous warning and bug fixes
+	caught by stricter checking.
+
+2013-11-03  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/readline.pm,
+	t/10test-changecase.t, t/10test-motion.t: Perl5.pm get rid of bogus
+	initialization and need for preinit in tests.  Initialize some
+	things that should be initialized in readline.pm
+
+2013-11-03  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, MANIFEST, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/History.pm, lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Move more code into History.pm.
+	Create Tie.pm as its own file.
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/History.pm: Start to doc history better
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/History.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Break out history variables
+	form readline into its own module.
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod: Update README.pod
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm, t/10test-changecase.t,
+	t/10test-motion.t, t/15test-unescape.t: More administrivia for
+	moving readline.pm to Term::ReadLine:Perl5::readline.
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* t/10test-basic.t: readline -> Term::ReadLine::Perl5::readline
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: mend
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5/readline.pm: Use "my" more although we are
+	still not ready for strict vars
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/readline.pm, lib/Term/ReadLine/readline.pm,
+	t/10test-history.t, t/11test-history.t, t/20test-read-input-file.t: 
+	Move readline.pm proper place for its namespace. This really should
+	have been done a long time ago.  Revise history test to use
+	Test::More which simplifies and DRYs code. Nowadays we assume
+	Test::More is pervasive, at least for testing, and we don't care
+	about 5.0005 anymore either.
+
+2013-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* t/10test-history.t, t/10test-motion.t, t/11test-history.t: Revise
+	history test from Term::ReadLine::GNU to use Test::More
+
+2013-11-01  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/readline.pm: Get ready for release 1.13
+
+2013-10-31  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, CHANGES, META.yml, README.pod,
+	lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/readline.pm,
+	t/10test-history.t: Get ready for release 1.12: - Specify min Module::Build version that uses "test_requires".  - Small doc changes.  - Revise history test - try again with tests where we don't get a
+	tty.
+
+2013-10-30  Rocky Bernstein <rocky@cpan.org>
+
+	* t/10test-history.t, t/10test-readline.t: Skip some tests if we
+	don't have access to a tty
+
+2013-10-29  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL: Maybe this isn't so "pure". It definitely is Perl5.
+
+2013-10-29  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/readline.pm: bump version. Include 5.18 and
+	require Term::ReadKey in travis
+
+2013-10-29  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/readline.pm: I said get ready for release 1.10!
+
+2013-10-29  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/readline.pm: I said get ready for release 1.10!
+
+2013-10-29  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm: Get ready for release 1.10
+
+2013-10-27  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, META.yml, lib/Term/ReadLine/readline.pm: Require
+	Term::ReadKey. This simplifies at the expense of generality for some
+	obscure systems. For those, use Term::ReadLine.
+
+2013-10-26  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL: For now, at least recommend Term::ReadKey
+
+2013-10-24  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/readline.pm: Regularize more indentation
+
+2013-10-24  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL: Test::More moved to test_requires; add rlib on
+	test_requires
+
+2013-09-09  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, lib/Term/ReadLine/Perl5.pm: Perl5.pm: redo %features
+	yet one more time. More .gitignore
+
+2013-09-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm: In synopsys use Newer OO form of
+	"new".
+
+2013-09-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm: We now "use strict".
+
+2013-09-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm: Add "use warnings". "strict" will have
+	wait for another time.
+
+2013-09-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm: require Term::ReadLine delayed until
+	"new" to remove cyclic require dependency.
+
+2013-09-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm: Eliminate compile-time cyclic
+	dependency between Term:::ReadLine::Perl5 and Term::ReadLine. See
+	ussue 4 in Term::ReadLine
+	https://github.com/rafl/term-readline/pull/4
+
+2013-06-16  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod: Link on travis image
+
+2013-06-16  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Stripped down travis file
+
+2013-06-16  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL: Simpler way of dealing with release/test versions
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Travis doesn't seem to be picking up dependencies
+	from Build.PL
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL: Messed up on github URLs
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/readline.pm: Out of release 1.0901
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 85e1ccd7b80a6814dfff4614c4bd8fbabaedf37a Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Sat Jun 15 11:49:06 2013 -0400
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, META.yml, README.pod: Better README.pod formatting
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 34cabf6fad216bcfed4bfe5560a13e46cdb09274 Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Sat Jun 15 11:15:30 2013 -0400
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, MANIFEST, README, README.pod,
+	lib/Term/ReadLine/Perl5/CHANGES,
+	lib/Term/ReadLine/Perl5/readline.pod,
+	lib/Term/ReadLine/p5Commentary.pod,
+	lib/Term/ReadLine/readline.CHANGES, lib/Term/ReadLine/readline.pm,
+	test.pl: test.pl: use string and warnings. reduce duplicate README
+	documentation and segregate old docs.
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, GNUmakefile, MANIFEST, MANIFEST.SKIP,
+	lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/readline.pm: Use
+	File::HomeDir
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, Build.PL, MANIFEST, Makefile.PL,
+	lib/Term/ReadLine/Perl5.pm, t/Makefile, test.pl: Use Module::Build
+	and specify github repo and issue tracker
+
+2013-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, Makefile.PL, README.pod: LICENSE has moved to a more
+	conventional location
+
+2013-06-14  Rocky Bernstein <rocky@cpan.org>
+
+	* LICENSE, MANIFEST, README: Put license in its own file following
+	normal conventions
+
+2013-06-13  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: travis doesn't have perl 5.18
+
+2013-06-13  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml, README.pod: Add in travis status tracker
+
+2013-06-13  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Need AUTOMATED_TESTING=1 so we don't run interactive
+	test.pl
+
+2013-06-13  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/readline.pm: We are
+	in 1.08_1 now
+
+2013-06-13  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Try travis
+
+2013-06-13  Rocky Bernstein <rocky@cpan.org>
+
+	* test.pl: Make sure to set Perl5 and use that, not
+	Term::ReadLine::Perl
+
+2013-06-12  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/readline.pm: Relase 1.06
+
+2013-06-12  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit f7c1dae0171131483cd8f63babe55860485e61a7 Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Wed Jun 12 03:05:44 2013 -0400
+
+2013-06-12  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/readline.pm, t/10test-basic.t,
+	t/10test-changecase.t, t/10test-history.t, t/10test-motion.t,
+	t/10test-readline.t, t/15test-unescape.t,
+	t/20test-read-input-file.t: CPANTS reports more errors in
+	non-interactive terminal testing
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/readline.pm, t/10test-basic.t,
+	t/10test-changecase.t, t/10test-motion.t, t/15test-unescape.t,
+	t/20test-read-input-file.t: Botched release 1.05. Try for 1.06
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/readline.pm: Get ready for release 1.05
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST: Remove .history_test from MANIFEST
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST.SKIP: Skip .history_test
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, t/10test-basic.t, t/10test-changecase.t,
+	t/10test-motion.t, t/10test-readline.t, t/15test-unescape.t,
+	t/20test-read-input-file.t, t/Helper.pm: DRY tests using t/Helper.pm
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* t/10test-changecase.t, t/10test-motion.t,
+	t/20test-read-input-file.t, t/Makefile: Add forward/backward
+	word/char tests and changechar tests
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/p5Commentary.pod, lib/Term/ReadLine/readline.pm: 
+	readline.pm: Clive Holloway comments: Remove SelfLoader, use ul an
+	lc instead of toupper and tolower. add warnings which makes us more
+	careful about uninitialized variables. Remove trailing blanks.
+	podify.
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, Makefile.PL, README: Transfer ownership and processes
+	for how to report bugs.
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* CHANGES, README.pod: Start moving away from jadler git repo
+
+2013-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 9721fb3e270b771ef44aedd8b02a637a050e474a Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Wed Mar 20 11:37:12 2013 -0400
+
+2013-03-20  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 7a8b232bba6d3bc0ca0577fefec34f7761dd61b2 Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Wed Mar 20 11:26:22 2013 -0400
+
+2013-03-03  Rocky Bernstein <rocky@cpan.org>
+
+	* t/data/undo.inputrc: Forgot to add data file
+
+2013-03-03  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/Term/ReadLine/readline.pm,
+	t/20test-read-input-file.t: Start commenting and testing
+	read_an_init_file
+
+2013-03-03  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit a540b8054b3c0f1234853b49bd71577ac968f72a Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Sun Mar 3 06:50:52 2013 -0500
+
+2013-03-03  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/readline.pm: Untabify
+
+2013-03-03  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/readline.pm: Untabify
+
+2013-03-03  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/readline.pm: ornaments used here seems to be
+	coming really from Term::ReadLine.
+
+2013-03-03  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/readline.pm: ornaments used here seems to be
+	coming really from Term::ReadLine.
+
+2013-03-03  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, t/15test-eval.t, t/15test-unescape.t: 15test-eval.t
+	15test-unescape.t since that's what it is
+
+2013-03-02  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod, lib/Term/ReadLine/readline.pm, t/15test-eval.t: 
+	README.pod: fix =for comments appearing on metacpan (I hope).
+	readline.pm, test-eval.t: Use list instead of hash. test-eval.t: add
+	(most) descriptions to specific tests
+
+2013-03-02  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/readline.pm: Weakness surfaced via
+	Term::ReadLine::Perl5 rename. Avoid circularity of
+	Term::ReadLine::readline requiring Term::ReadLine::Perl which
+	depends on Term:ReadLine::readline.
+
+2013-03-02  Jordan M. Adler <jmadler@cpan.org>
+
+	* Makefile.PL: Revert "Update Makefile.PL to remove rlib
+	requirement." This reverts commit 4b7e7f27154084ef6899b160bad1f25fdb781280.
+
+2013-03-02  Jordan M. Adler <jmadler@cpan.org>
+
+	* Makefile.PL: Update Makefile.PL to remove rlib requirement.
+
+2013-03-02  Jordan M. Adler <jmadler@cpan.org>
+
+	* MANIFEST, Makefile.PL: Update Makefile.PL and MANIFEST
+
+2013-03-02  Jordan M. Adler <jmadler@cpan.org>
+
+	* META.yml: Update META.yml
+
+2013-03-02  Jordan M. Adler <jmadler@cpan.org>
+
+	* README, README.pod, lib/Term/ReadLine/Perl5.pm: Update authors,
+	fix reference to T::R::Perl
+
+2013-03-02  Jordan M. Adler <jmadler@cpan.org>
+
+	* CHANGES, META.yml, README, README.pod,
+	lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/readline.pm,
+	t/10test-basic.t: Update places where ::Perl is still referenced and
+	add my name here and there.
+
+2013-03-02  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, Makefile.PL, lib/Term/ReadLine/Perl.pm,
+	lib/Term/ReadLine/Perl5.pm, t/10test-basic.t, t/10test-history.t,
+	t/10test-readline.t, t/15test-eval.t: Change Term::ReadLine::Perl to
+	Term::ReadLine::Perl5. Add dependency on rlib for testing.
+
+2013-03-02  R. Bernstein <rockyb@rubyforge.org>
+
+	* : Merge pull request #1 from jmadler/master Thanks Jordan! RT#59194
+
+2013-03-02  Jordan M. Adler <jmadler@cpan.org>
+
+	* t/15test-eval.t: * Modify _unescape() to use a dispatch table.  * Include the change from spoon.reloaded on RT#59194 to use hex()
+	and oct() in unescapes and not eval().  * Include tests for the _unescape() function.
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod: Oops - forgot to add POD
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, README, lib/Term/ReadLine/Perl.pm: Add README.pod
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl.pm, lib/Term/ReadLine/readline.pm,
+	t/10test-basic.t, t/10test-readline.t: More POD, add todo list, more
+	tests.
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, ReadLine/Perl.pm,
+	ReadLine/readline.CHANGES, ReadLine/readline.pm,
+	lib/Term/ReadLine/Perl.pm, t/10test-basic.t, t/10test-readline.t,
+	test.pl: Directory organization is more conventional:
+	lib/Term/ReadLine. Makfile.PL requie Test::More and perl > 5.00808.
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl.pm, lib/Term/ReadLine/readline.CHANGES,
+	lib/Term/ReadLine/readline.pm, t/10test-basic.t: Use more
+	conventional directory structure and use Test::More.
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* ReadLine/Perl.pm, ReadLine/readline.pm: Hack more on
+	Documententation.
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* Makefile.PL: Clean administrivia
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, ReadLine/readline.pm: Start to podify
+	ReadLine/readline.pm
+
+2013-02-09  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, t/10test-history.t, t/10test-readline.t: Add readline
+	miniscule part test from Term::ReadLine::Gnu
+
+2013-02-05  rocky <rocky@cpan.org>
+
+	* .gitignore, Makefile.PL, ReadLine/readline.pm: "make clean" cleans
+	more. Bump version
+
+2013-02-05  rocky <rocky@cpan.org>
+
+	* MANIFEST, t/00test-pod.t, t/10test-history.t, t/history.t,
+	test.pl: Add basic POD test and remove bit or warning.
+
+2013-02-05  rocky <rocky@cpan.org>
+
+	* .gitignore, test.pl: Respect both $ENF{PERL_MM_NONINTERACTIVE} and
+	$ENV{AUTOMATED_TESTING}.
+
+2013-02-05  rocky <rocky@cpan.org>
+
+	* .gitignore, MANIFEST.SKIP: Administrivia
+
+2013-02-05  rocky <rocky@cpan.org>
+
+	* CHANGES: Add dates from CPAN to CHANGES
+
+2013-02-05  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, CHANGES, ReadLine/Perl.pm, ReadLine/readline.CHANGES,
+	ReadLine/readline.pm: CHANGES: put in more conventional form where
+	newest is on top readline.CHANGES readline.pm: split out history
+	from code ReadLine/Perl.pm: Start POD
+
+2012-01-12  Rocky Bernstein <rocky@cpan.org>
+
+	* ReadLine/Perl.pm, t/history.t: Follow Term::ReadLine::Gnu
+	conventions better for read_history and write_history which return 0
+	on success. ReadHistory and WriteHistory return 1 on success.  With
+	this,add one more test passes.
+
+2012-01-10  Rocky Bernstein <rocky@cpan.org>
+
+	* ReadLine/Perl.pm, t/history.t: Add some read/write history tests.
+	Expand code a little bit more to address tests.
+
+2012-01-08  Rocky Bernstein <rocky@cpan.org>
+
+	* ReadLine/Perl.pm: Add ReadHistory and WriteHistory
+
+2012-01-08  Rocky Bernstein <rocky@cpan.org>
+
+	* t/history.t: Add a history test
+
+2012-01-08  Rocky Bernstein <rocky@cpan.org>
+
+	* ReadLine/Perl.pm, t/history.t: Start to add my changes
+
+2012-01-08  Rocky Bernstein <rocky@cpan.org>
+
+	* Initial readline
+

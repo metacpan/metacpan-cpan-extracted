@@ -1,0 +1,53 @@
+Changelog for Task-BeLike-Shantanu
+
+0.10 2013-10-16T07:01:23
+ - Removed some deps not in use anymore [Shantanu Bhadoria]
+
+0.09 2013-10-16T04:57:29
+ - v0.09 [Shantanu Bhadoria]
+
+0.08 2013-10-16T04:30:43
+ - v0.08 [Shantanu Bhadoria]
+ - Added Pod::Simple to pass kwalitee tests properly [Shantanu Bhadoria]
+
+0.07 2013-09-15T04:40:03
+ - v0.07
+   
+    - remove Printer::Thermal [Shantanu]
+    - refactor distro [Shantanu]
+    - Merge branch 'master' of
+      github.com:shantanubhadoria/Task-BeLike-Shantanu [Shantanu]
+    - refactor distro [Shantanu]
+    - Bump Changes [Shantanu Bhadoria] [Shantanu]
+ - remove Printer::Thermal [Shantanu]
+ - refactor distro [Shantanu]
+ - Merge branch 'master' of
+   github.com:shantanubhadoria/Task-BeLike-Shantanu [Shantanu]
+ - refactor distro [Shantanu]
+ - Bump Changes [Shantanu Bhadoria]
+
+0.06 2013-05-23T06:15:51
+ - v0.06
+   
+	   - 2013-05-23 14:14:49 Asia/Singapore [Shantanu Bhadoria]
+ - Added Net::SSLeay to prereqs [Shantanu Bhadoria]
+ - Bump Changes [Shantanu Bhadoria]
+
+0.05 2013-03-05T15:21:07
+ - v0.05
+   
+	   - 2013-03-05 23:20:32 Asia/Singapore [Shantanu Bhadoria]
+ - Removed unused modules [Shantanu Bhadoria]
+
+0.04 2013-03-05T15:02:00
+ - Adding Changes [Shantanu Bhadoria]
+ - Moved to Shantanu Plugin bundle for Dist::Zilla [Shantanu Bhadoria]
+
+0.004 2013-03-05T14:54:40
+ - Moved to Shantanu Plugin bundle for Dist::Zilla [Shantanu Bhadoria]
+ - adding Gitignore [Shantanu Bhadoria]
+ - Added Version Tag [Shantanu Bhadoria]
+ - Adding Basic Files to build dependencies for the Distro [Shantanu
+   Bhadoria]
+ - First Commit [Shantanu Bhadoria]
+

@@ -1,0 +1,44 @@
+Revision history for Perl module Test::WriteVariants
+
+0.012	2015-03-27
+    - fix spelling (and stopwords in author tests)
+    - release 0.011_001
+
+0.011_001	2015-03-19
+    - add test-dependency for Test::Most (RT#101346 - thanks to Phillip
+      Moore for reporting)
+    - fix meta-data and copy'n'paste errors in Makefile.PL
+    - add sections in POD for Author, Copyright, Bug-Address etc.
+    - relax minimum perl to 5.6
+
+0.010	2014-12-26
+    - reflect rt#100805 recommendation in LICENSE
+    - use base instead of parent - because 5.6 comes with base
+
+0.009	2014-12-12
+    - add GPL-1 license text as it's fulfilling basic requirements
+    - fix date of 0.008 release in Changes
+
+0.008	2014-12-08
+    - Polish up the Kwalitee of the distribution
+    - add rough description for public context methods
+    - rewrite Changes according to CPAN::Changes::Spec
+    - deploy correct license texts
+
+0.007	2014-03-23
+    - Add more documentation, including full example.
+
+0.006	2014-03-21
+    - Fix CPAN permissions
+
+0.005	2014-03-19
+    - Removed use of autodie.
+
+0.004	2014-03-16
+    - Treat undef for env var as meaning 'ensure not in %ENV'.
+    - Add control of test_prefix plus assorted fixes.
+    - Restore search_path param to find_input_test_modules().
+    - Require at least one variant plugin to be found.
+
+0.001	2014-03-15
+    - Initial release based on prototype in https://github.com/perl5-dbi/DBI-Test

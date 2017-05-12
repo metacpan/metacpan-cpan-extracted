@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:1.0
+REV:20030714T231336
+FN:Blogs, Joe
+N:Joe;Blogs
+ADR:;;The street;The City;;Postcode;Country
+TEL;HOME:4534345645
+TEL;CELL:2563456456
+EMAIL;INTERNET:joe@domain.com
+URL:http://www.domain.com/
+END:VCARD

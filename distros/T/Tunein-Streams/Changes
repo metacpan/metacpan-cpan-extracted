@@ -1,0 +1,13 @@
+Revision history for Tunein-Streams
+
+1.00    2017-01-27
+        Initial release.
+1.01    2017-01-28
+        Add LWP::Simple to Makefile.PL as prerequesite for test harness.
+        Increase pause between fetch retries in attempt to fix random fetch failures.
+1.02    Remove run-time testing - 1) test fails if radio station has region-restrictions.
+        2) I don't want to have CPAN testers hitting tunein.com all the time since might 
+        convince them to change it up where this wouldn't work anymore.
+1.10    Added parsing of "DirectStreams" (streams listed in the tune-in URL itself.
+1.11    Added four new station information functions:  getStationID(), getStationTitle(), 
+        getIconURL(), and getImageURL().

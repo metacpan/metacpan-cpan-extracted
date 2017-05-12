@@ -1,0 +1,39 @@
+---
+abstract: 'Test::HexDifferences - Test binary as hexadecimal string'
+author:
+  - 'Steffen Winkler <steffenw at cpan.org>'
+build_requires:
+  Test::Differences: '0.60'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  Test::Tester: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-HexDifferences
+provides:
+  Test::HexDifferences:
+    file: lib/Test/HexDifferences.pm
+    version: '1.000'
+  Test::HexDifferences::HexDump:
+    file: lib/Test/HexDifferences/HexDump.pm
+    version: '0.008'
+recommends:
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+requires:
+  Hash::Util: '0'
+  Sub::Exporter: '0'
+  Test::Builder::Module: '0.99'
+  Text::Diff: '0'
+  perl: '5.006'
+  version: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

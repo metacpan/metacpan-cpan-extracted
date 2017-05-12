@@ -1,0 +1,187 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7605668b6cc76d9bdaff4eb2c96a1423f87fb95a .TAEB.state-Local
+SHA1 ddeeb86063436889b596c253b8a332584db7e873 .perlcriticrc
+SHA1 06877624ea5c77efe3b7e39b0f909eda6e25a4ec LICENSE
+SHA1 69123b766d3560acce60552113e98db0ca3bdf43 MANIFEST
+SHA1 6cad6069afa933f2f2cd3fa623c0ce056fc48688 META.yml
+SHA1 c66cc643941f4c0fedf498361e48d6733ecb98c8 Makefile.PL
+SHA1 bb1e446e0df406c9892500f3da586f2c5ab0da03 README
+SHA1 72e42c5be25daf6531d88f18917a04e3af45baef REPOSITORIES
+SHA1 cbf5f5f29b29371d470745e1254ea4165b228292 bin/lc
+SHA1 71bec1a4e1de23425e4ec6c5cb8ae5a8192a7f08 bin/pull-all
+SHA1 a7bd99a37fe7d1628c4316e830057544e66f40c9 bin/svn-log
+SHA1 ba26bf29911d77d422ff9b43caea0ab5740cc0c8 bin/taeb
+SHA1 a7988e76d0a67bff761de4ae245087c244f20284 doc/TODO
+SHA1 58b390a67a49e01995673197784875a2e8af754a doc/TODO.sorear
+SHA1 6e297c68105f0f44a7f9ef726114df3a8f0ed443 doc/debug-commands.txt
+SHA1 7c8dbbb619b16b31d10220d78f769d0567ffac70 etc/TAEB.nethackrc
+SHA1 142507822e726b97d3ee6d49a47006ea47ca4ea7 etc/examples/doy.yml
+SHA1 d851c325d322920cadb7a11f7bf83251e85997fb etc/examples/sartak.yml
+SHA1 c9e956c1e65fffe3084e87c35ae0e6cd71510779 etc/nicks.yml
+SHA1 43a8a8d6a1db128288c4763c9c8d1c60ea9c1433 etc/vim/ftdetect/taeb-log.vim
+SHA1 81ce71de47c2a9f22435306689b9ae971f0c305c etc/vim/syntax/taeb-log.vim
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 ae018c4565c1277089ca8f1b28f888d95430cb7f inc/Module/Install.pm
+SHA1 0a6f29536bedea3bb94744a7d43ffe39da7e4819 inc/Module/Install/AutoInstall.pm
+SHA1 4552acdfca8b78f8015d8449e1325616259095f5 inc/Module/Install/Base.pm
+SHA1 7fb663fff161fb45882b52edd62857bf15359658 inc/Module/Install/Can.pm
+SHA1 8b1d3db746faa6faf2d967a48d3812ec1f44b4c6 inc/Module/Install/Fetch.pm
+SHA1 d7ce736cdd05d5156d379ef39cca93beeeeba828 inc/Module/Install/Include.pm
+SHA1 9f6beaa2f4749ceb5dd0c9b0c647d0f3289c7b46 inc/Module/Install/Makefile.pm
+SHA1 92a3326557c4f557b12eb2c61d704bcdab2a1c70 inc/Module/Install/Metadata.pm
+SHA1 c7a2f62c657b11f737d86227799369b1c4eaf74d inc/Module/Install/Scripts.pm
+SHA1 e9aa83f3e8b16ccfce544a90a57b63b70a497759 inc/Module/Install/Win32.pm
+SHA1 ade2ac0b0246d4d8e28fa46942e53f6925abda46 inc/Module/Install/WriteAll.pm
+SHA1 cde2527c60f5b3edabfa9460e3d675b885309b3c lib/TAEB.pm
+SHA1 01178bc3558396d555b8d9dfd338968a90c26a16 lib/TAEB/AI.pm
+SHA1 9e155d96d166810c30dd345a5add1896a4d8259a lib/TAEB/AI/Ascend.pm
+SHA1 93b699fc76868136c98c61f3586da20782d88c9f lib/TAEB/AI/Demo.pm
+SHA1 cad2bb44693361a40a1829209075c8171008b5c9 lib/TAEB/AI/Human.pm
+SHA1 4d2b6a712fba814bcd009f31391fb659a974d4e1 lib/TAEB/AI/Quit.pm
+SHA1 61a7dd0efb9269a30b2571ca8f2114e09a0c52e4 lib/TAEB/AI/SteadyState.pm
+SHA1 4bf6a418f0e1c6fca69cc594f764e8af504cb6c1 lib/TAEB/Action.pm
+SHA1 cbb4843ff2ec39e91422e60d1d0f44c3eb61323f lib/TAEB/Action/Apply.pm
+SHA1 3e544242276730f56e077db025c108e07277a175 lib/TAEB/Action/Ascend.pm
+SHA1 c917eb4a5e9e457becd710b6935cd515d66fc870 lib/TAEB/Action/Cast.pm
+SHA1 a410b250adb7ebf22b4fabc28669439168bfc4d1 lib/TAEB/Action/Chat.pm
+SHA1 a479a9fa4ed060c9156669d1afe3c77e01e35db7 lib/TAEB/Action/Close.pm
+SHA1 3e21f8b953c4521cd48f759a520b75c69b9aeebe lib/TAEB/Action/Custom.pm
+SHA1 bfbaec394465d9db403ec939543322c831bf5b18 lib/TAEB/Action/Descend.pm
+SHA1 5c87339b194f15710fe5462a6c24926df2dde43a lib/TAEB/Action/Dip.pm
+SHA1 81493da34b29697f26baeeda556994839f382586 lib/TAEB/Action/Drop.pm
+SHA1 5c57c607720347434462996606d62e94b60fd03d lib/TAEB/Action/Eat.pm
+SHA1 cd165e155b66a91bcf5ade8333ac9d55b44afa59 lib/TAEB/Action/Engrave.pm
+SHA1 e62c38609994c88e7c65fe509ac702c6f08d0e6e lib/TAEB/Action/Kick.pm
+SHA1 4b6958fa276befc10cc8ef449ff0b401ffd2d0d7 lib/TAEB/Action/Look.pm
+SHA1 e577d512b2bc72d514f6c671bbc14a0c998af219 lib/TAEB/Action/Melee.pm
+SHA1 840ee048d94ac46c2aef143edda7de520539a3c1 lib/TAEB/Action/Move.pm
+SHA1 df347bb42886d79068d9dd1c7593b430b318c32e lib/TAEB/Action/Name.pm
+SHA1 dcdf7806e6b01887ff063c04f8df04d851eb8484 lib/TAEB/Action/Offer.pm
+SHA1 f53547f413bea0c1be324de62bfd62bf5a815dbf lib/TAEB/Action/Open.pm
+SHA1 5a9a47cd1dde538b49daa35f6fe812caff64582a lib/TAEB/Action/Pay.pm
+SHA1 aba942813b7614bf15db0d18afa0d717c4df4cdf lib/TAEB/Action/Pickup.pm
+SHA1 1a9a8b9782723db27ce75d9dbb42fd33fd8c8e6a lib/TAEB/Action/Pray.pm
+SHA1 4af215cf0003c0e7fb032df9bc7170f6ddcfdf2e lib/TAEB/Action/Quaff.pm
+SHA1 b765ba98debef2d6a9602ee9fdfa9ddced2bd8ba lib/TAEB/Action/Quit.pm
+SHA1 894b6eb3258dea5cf5e1868088531edee855d02f lib/TAEB/Action/Read.pm
+SHA1 edfd5a631ca1073b9187ef1e6b9b99c8a6cf6aea lib/TAEB/Action/Remove.pm
+SHA1 b122a1e3eb7e36487611c312b279c83cd5988c83 lib/TAEB/Action/Role/Direction.pm
+SHA1 f6f6ddbee1efbcc694a5bd9a90b9fbc1ec0d8a4a lib/TAEB/Action/Role/Item.pm
+SHA1 5765a5d37f2193eee39720d9f4ccfd48b01afae4 lib/TAEB/Action/Role/Monster.pm
+SHA1 d3314cce008546c342c9a6765352d2b9d7cf02cd lib/TAEB/Action/Rub.pm
+SHA1 86c3bdf2b91d94ac9bc8f3c7c48f9cde8f469f0a lib/TAEB/Action/Save.pm
+SHA1 bad159b17aaa2581864f1208f3e156a02a1a50ec lib/TAEB/Action/Search.pm
+SHA1 c5b9713e402201e0bfa1a30a333769d9c80c301f lib/TAEB/Action/Swapweapons.pm
+SHA1 84f1661e42273b42f26d48f0c34852d70722485d lib/TAEB/Action/Throw.pm
+SHA1 45d2752ba5f8885ba3a13c71b4807edcf6d24b35 lib/TAEB/Action/Unlock.pm
+SHA1 f719d2f474d4cde22f0426b5b8cb293d3eb1c495 lib/TAEB/Action/Wear.pm
+SHA1 ee372dd3d22a251000aa9a9623de1203a7404261 lib/TAEB/Action/Wield.pm
+SHA1 0713ead566ab6d8ede34be4c74c85c78bee69ee6 lib/TAEB/Action/Zap.pm
+SHA1 6d72e9838fec8f3e4ac7642cedf02cfac431fc47 lib/TAEB/Config.pm
+SHA1 01878f15e039bdfa060d1f549edb5c36d849bbfe lib/TAEB/Debug.pm
+SHA1 9a387d6df402f9b14363cd131e84e1373d3cd35e lib/TAEB/Debug/Bot.pm
+SHA1 6215b999918d9b72f2f0ea42750d8773b9ee7628 lib/TAEB/Debug/Console.pm
+SHA1 642dffc432ec371dcc857ffde9a27bec552ef6fe lib/TAEB/Debug/IRC.pm
+SHA1 f476ae97d44b8d3875b7305a0521a12ec4e46b47 lib/TAEB/Debug/IRC/Bot.pm
+SHA1 4b6d7b1c1193f51d561a5c1b645b437d9cf3b963 lib/TAEB/Debug/Map.pm
+SHA1 7dc3299c56f2d94cd98725dfa93d383269683a88 lib/TAEB/Debug/Sanity.pm
+SHA1 4275356784673ed16983f73072246b7388b0ef47 lib/TAEB/Display.pm
+SHA1 6aaf1413722500745d87a4cc278a67fc24cf6a4b lib/TAEB/Display/Color.pm
+SHA1 0a4a761df51b2b97813c5bac030da9e3801bd1c2 lib/TAEB/Display/Curses.pm
+SHA1 52a5c640819bd9d41506f7b1140366b749c559ac lib/TAEB/Display/Menu.pm
+SHA1 ebdba0f6d7d6634fbfe066a2b36f0bcb2fa8944e lib/TAEB/Display/Null.pm
+SHA1 52762ded0ce526b3df4508882390436896603ae6 lib/TAEB/Interface.pm
+SHA1 3bbd12b8e5ab9207d06dd8eaab6bf0a1f87fc80b lib/TAEB/Interface/Local.pm
+SHA1 f40e2b489663243b0642d5b6fc54e9e831b5feb3 lib/TAEB/Interface/SSH.pm
+SHA1 1458f27a282affdc478d13696efc400ad6858725 lib/TAEB/Interface/Telnet.pm
+SHA1 3cfb3660dad24dd87bc848ca68954de00c9c9973 lib/TAEB/Logger.pm
+SHA1 a2990c3de39c100d1fbe2df274775b122cd1f40a lib/TAEB/Message.pm
+SHA1 16df40833a481a29bb8ca99ec52e54ca12ea7d98 lib/TAEB/Message/Query.pm
+SHA1 81bec95e0315b61617c714e5a6d1f8f2b5953bf8 lib/TAEB/Message/Query/DropItems.pm
+SHA1 9a945f2171016b654ee341f9d9fd5e385b9066b0 lib/TAEB/Message/Query/IdentifyItems.pm
+SHA1 88e2e880461785441192231a82d1a44bb48155ed lib/TAEB/Message/Query/PickupItems.pm
+SHA1 2ed81939b8a805f020f6bfe8c2419af5d3f6a1e4 lib/TAEB/Message/Report.pm
+SHA1 5602f6142d3b35a7a2afd5dad9f9ea7509db7843 lib/TAEB/Message/Report/CouldNotStart.pm
+SHA1 4aadb6480729cf107eb5519c852128b8c5f73ffc lib/TAEB/Message/Report/Death.pm
+SHA1 8c9d66d1bac71668cc0a2a5bf9afbb84abaa4319 lib/TAEB/Message/Report/Saved.pm
+SHA1 b2dd03d1b9edec6f727bd594f8b2dc58fe9f13d1 lib/TAEB/Message/SelectSubset.pm
+SHA1 e5fa81f78799d9acdeda355cf95676f0f54d327d lib/TAEB/Message/Topline.pm
+SHA1 e974f70a3f9260bc5aa26b10002b2812dbbd030c lib/TAEB/Meta/Overload.pm
+SHA1 e0b9ccb19b3b8babfa8a15d2ff345e637183a815 lib/TAEB/Meta/Trait/DontInitialize.pm
+SHA1 a487ec709c5f542041c57c54074bb1ee5f153011 lib/TAEB/Meta/Trait/GoodStatus.pm
+SHA1 6788eb8f7b24c0789f385bcf8edcb4bcd887b0e9 lib/TAEB/Meta/Trait/Persistent.pm
+SHA1 20f8991907f8833559b878ed9f8444f6f295b70b lib/TAEB/Meta/Trait/Provided.pm
+SHA1 dac20fba9933977d971a3b4780aaa9a8a10f5b89 lib/TAEB/Meta/Types.pm
+SHA1 7ff2de8262500b94543868daf547f859f1ed2f3b lib/TAEB/OO.pm
+SHA1 73d366852080277ecc97132a66c1402459b8d707 lib/TAEB/Publisher.pm
+SHA1 a38bc22b6c4ef37dc8a6a3b5160ed7c3867aec13 lib/TAEB/Role/Config.pm
+SHA1 5210602ed51f8fb6578230c08db187cc00c3984c lib/TAEB/Role/Initialize.pm
+SHA1 651a889863cdaca1b189f72eea73e4710e836104 lib/TAEB/Role/Item.pm
+SHA1 e93c932f16e9beb37956c0d269bb09facf777402 lib/TAEB/Role/Item/Food.pm
+SHA1 b135c51b478966416171ff4f0c71213d8c78e467 lib/TAEB/Role/Item/Food/Corpse.pm
+SHA1 f9637e77b24e2cc6ba0ce92811ea035935e9170c lib/TAEB/Role/Persistency.pm
+SHA1 84b4802d1141c0752223610a9272afacd659824c lib/TAEB/Role/Reblessing.pm
+SHA1 64d2969b6dddaaa99bb001b7247699d53dd3c03d lib/TAEB/Role/Subscription.pm
+SHA1 243a6d3f18bb794220550f40d3f4c1b5fd12f388 lib/TAEB/ScreenScraper.pm
+SHA1 d732bfb5420e56a77b0e5c74ff7b27e6c84b4954 lib/TAEB/Senses.pm
+SHA1 e464e1368837c4e870ae9e82e22f1fa465febbd3 lib/TAEB/Spoilers.pm
+SHA1 0f40173a6e21b3ff54d51e743e573885b43d2636 lib/TAEB/Spoilers/Combat.pm
+SHA1 267003ea2cab476f08ed1dfed6b15f3db8872f53 lib/TAEB/Spoilers/Engravings.pm
+SHA1 7a7a9349fc6784bdd6236492e7de2afc0750ae49 lib/TAEB/Spoilers/Monster.pm
+SHA1 425d797ef59e5fa14948c29964f71305affa34f9 lib/TAEB/Spoilers/Room.pm
+SHA1 de65570aa0506719f6eb82f36273e90bac16962d lib/TAEB/Test.pm
+SHA1 b63ee8f177801eb388189f4ca0a6d6d1b730a73d lib/TAEB/Test/Items.pm
+SHA1 3621e9937bbb3aa668c4421ed21e886ab7d19dbe lib/TAEB/Test/Monsters.pm
+SHA1 e9f750075302418cd6ca256b57c88efc0183814f lib/TAEB/Util.pm
+SHA1 3ef1434ff4f072c355ef7a079f16569ebd442192 lib/TAEB/VT.pm
+SHA1 82378d67986e725d1587a2b617430a482a37ea29 lib/TAEB/World.pm
+SHA1 611720b42f33457134322e58b80b2734d1c4ef69 lib/TAEB/World/Cartographer.pm
+SHA1 b70b7be3ef57449acdf4ada9ff862147eab06b16 lib/TAEB/World/Dungeon.pm
+SHA1 f29e9ee42ce24e9a86a2c8fc7ada5cfa4061e648 lib/TAEB/World/Equipment.pm
+SHA1 46e8441b12f8526960ce42669a414463776c86fb lib/TAEB/World/Inventory.pm
+SHA1 59799dbe2e6006f8253142c3da8e767d42a36e5e lib/TAEB/World/ItemPool.pm
+SHA1 e04e7f85dc46c9645d388b94574ab575cddf760b lib/TAEB/World/Level.pm
+SHA1 b7e065bfe09b78c08ba3490031445ba101e3a121 lib/TAEB/World/Level/Bigroom.pm
+SHA1 6890480cfacaddbb03239a74360a83b96d3f73fd lib/TAEB/World/Level/Minetown.pm
+SHA1 52d4f7314cec06c860aa48b151e009654d306dfa lib/TAEB/World/Level/Oracle.pm
+SHA1 6e9303c212feb55634cd61a581ae67bc32f1510f lib/TAEB/World/Level/Rogue.pm
+SHA1 f1ce98426161dbf3395cd8a4730f9de0241a07f5 lib/TAEB/World/Monster.pm
+SHA1 75c9a54a0354c538b59605aab266d1ab88c3cd5f lib/TAEB/World/MonsterTracker.pm
+SHA1 71c36dba1b0943596ebd4d1512ee3afd339b52ed lib/TAEB/World/Path.pm
+SHA1 c8ccbd6f4db4c4ee15bd9022351c4bd74f58d268 lib/TAEB/World/Room.pm
+SHA1 04846c4f63857374a20af7b306320c28f0310b21 lib/TAEB/World/Spell.pm
+SHA1 35eee04540aa3986b916941c346a3bc3fdca9db5 lib/TAEB/World/Spells.pm
+SHA1 b739e226c7f2d3587157fbdd7f1abd7d147cd7de lib/TAEB/World/Tile.pm
+SHA1 c3d85a16060637cfafb49b430b14af4407f3e15e lib/TAEB/World/Tile/Altar.pm
+SHA1 7f86d18de24d6d0594e9afc53dae1d3a17eb2592 lib/TAEB/World/Tile/Closeddoor.pm
+SHA1 ba9c0b03b64499395d7fbe158e1e9c0a35414bc4 lib/TAEB/World/Tile/Door.pm
+SHA1 961986a2f651cdefca30edb09931e2eb0838d41b lib/TAEB/World/Tile/Opendoor.pm
+SHA1 e546a6c09dd3861a1375367c94a56d3ffedb3d59 lib/TAEB/World/Tile/Sink.pm
+SHA1 f745ceedf88ea8a09372d89b469416b1209e5583 lib/TAEB/World/Tile/Stairs.pm
+SHA1 aaa85e6e07e11a98736672f07e1d8b271768d657 lib/TAEB/World/Tile/Stairsdown.pm
+SHA1 25f11767979d8e1188fee2496c5cc4c127564365 lib/TAEB/World/Tile/Stairsup.pm
+SHA1 0ed105aeded7f055397ce1055219d5466fea903d lib/TAEB/World/Tile/Trap.pm
+SHA1 df061412250b3bf127e51a85850a9a710c1281f4 t/000-load.t
+SHA1 7483dc00b8a6d3e6e625c9baea3cb2c697b4aec1 t/800-misc/000-engraving-degrading.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFJu8vXsxfQtHhyRPoRAvWoAJ0bBE4/Ylr8Ec41luhcXAa0VeLWNwCgjZBo
+EXHrVJppTteVvpXgqighh4c=
+=NFMg
+-----END PGP SIGNATURE-----

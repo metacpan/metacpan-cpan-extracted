@@ -1,0 +1,674 @@
+.\" Copyright (c) 2015 Marina <kaoseto@bardinflor.perso.aquilenet.fr>
+.\" Copyright (c) 2015 Yon <anaseto@bardinflor.perso.aquilenet.fr>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.#dv date version du 06/02/2015
+.\" Déclaration de paramètres
+.X set document-author " "
+.X set document-title "FAQ de frundis"
+.X set document-date "\*[date]"
+.X set title-page 1
+.\" paramètres
+.X set -f xhtml,epub nbsp " "
+.X set xhtml-index none
+.\" caractère pour le début d'un dialogue (par défaut c'est un tiret
+.\" long avec un espace insécable pour le français)
+.X set dmark —\~
+.\" .X set latex-preamble preamble-tex-fr.tex
+.X set lang fr
+.\" ========================
+.\" Déclarations des macros
+.\" ========================
+.\" ---> tags pour latex
+.\" mots étrangers
+.X mtag -t fremda -f latex -c emph
+.\" mots en emphase
+.X mtag -t emph -f latex -c emph
+.\" mots de vocabulaire en caractères gras
+.X mtag -t voc -f latex -c textbf
+.X mtag -t program-name -f latex -c texttt
+.X mtag -t frundis-code -f latex -c texttt
+.X mtag -t code -f latex -c texttt
+.
+.\" les dtag sont, en latex, des environnements
+.X dtag -t code -f latex -c verbatim
+.\" ---> tags pour xhtml et epub
+.X mtag -t fremda -f xhtml,epub -c em
+.X mtag -t emph -f xhtml,epub -c em
+.X mtag -t voc -f xhtml,epub -c strong
+.X mtag -t program-name -f xhtml,epub -c span
+.X mtag -t frundis-code -f xhtml,epub -c span
+.X mtag -t code -f xhtml,epub -c code
+.
+.X dtag -t code -f xhtml,epub -c pre
+.
+.\" déclarations utilisés dans les exemples
+.X mtag -f latex -t oeuvre -c emph -b « -e »
+.X mtag -f xhtml,epub -t oeuvre -c em -b « -e »
+.X mtag -f latex -t auteur -c textsc
+.X mtag -f xhtml,epub -t auteur -c b
+.X dtag -f latex -t centrer -c center
+.X dtag -f xhtml,epub -t centrer -c div
+.\" définitions
+.#de frundis
+.Sm -t frundis-code frundis\$1
+.#.
+.#de Note
+.P Note.
+.#.
+.\" FIN du PRÉAMBULE
+.
+.Tc
+.Note
+Ce document est un travail en cours.
+.Ch Débuter avec frundis
+.Sh "Un exemple minimal pour se faire une idée"
+Avec
+.frundis ,
+un fichier minimal ressemble à cela:
+.Bd -t literal
+Ceci est le premier paragraphe de ma petite histoire.
+\&.P
+Et ceci est un nouveau paragraphe. Puis nous allons commencer un
+dialogue\&:
+\&.D
+La musique ne se brise jamais —dit Frundis dans un roulement de tambours.
+.Ed
+.Note
+Les espaces insécables nécessaires sont rajoutés automatiquement si le
+paramètre
+.Sm -t code lang
+est activé pour le français; pour cela on écrira
+.Sm -t code ".X set lang fr" .
+.P
+Après, pour créer le fichier latex, par exemple, il faudra utiliser
+.frundis \&
+en ligne de commande:
+.Bd -t literal
+frundis -s -T latex nom-fichier.frundis > nom-fichier.tex
+.Ed
+Si l'option
+.Sm -t code "\&-s"
+(
+.Sm -ns -t fremda standalone )
+est utilisée, un fichier LaTeX complet avec un préambule par défaut
+assez simple sera généré.
+.P
+Pour exporter vers HTML on écrira:
+.Bd -t literal
+frundis -a -s -T xhtml nom-fichier.frundis > nom-fichier.html
+.Ed
+L'option
+.Sm -t code "\&-a"
+(
+.Sm -ns -t fremda "all in one file" )
+spécifie à
+.frundis \&
+que l'on veut un seul fichier: sans cette option,
+.frundis \&
+divisera le fichier par parties et chapitres s'il y en a (macros
+.Sm -t code Pt
+et
+.Bm -t code
+Ch
+.Em ).
+.Sh "Comment faire plus qu'une simple emphase?"
+Il est possible d'ajouter aux macros
+.Sm -t code Sm ,
+.Sm -t code Bm
+et
+.Sm -t code Bd
+des
+.Sm -t voc tags
+que l'on utilisera pour pouvoir baliser de manière précise le texte pour
+l'export LaTeX, HTML et EPUB. Ces tags se définissent grâce aux
+modifieurs
+.Sm -t code mtag
+et
+.Sm -t code dtag
+de la macro
+.Sm -t code X :
+.Bd -t literal
+\&.X mtag -f latex -t oeuvre -c emph -b « -e »
+\&.X mtag -f xhtml,epub -t oeuvre -c em -b « -e »
+\&.X mtag -f latex -t auteur -c textsc
+\&.X mtag -f xhtml,epub -t auteur -c b
+\&.X dtag -f latex -t centrer -c center
+\&.X dtag -f xhtml,epub -t centrer -c div
+.Ed
+Ces tags vont être retranscrits en LaTeX par des
+commandes/environnements et en HTML et EPUB par des balises HTML
+auxquelles s'ajoutera une classe avec le nom du tag précisé en frundis.
+.P "Les mtag"
+Les définitions avec
+.Sm -t code mtag
+(marquant du texte au sein d'un paragraphe) pourront être utilisées
+grâce à la macro
+.Sm -t code Sm
+ou son analogue multiligne formé des macros
+.Sm -t code Bm
+et
+.Sm -t code Em :
+.Bd -t literal
+Hier, j'ai lu
+\&.Sm -t oeuvre Le Quichotte ,
+de
+\&.Bm -t auteur
+Cervantès
+\&.Em .
+.Ed
+Qui sera rendu: “Hier j'ai lu
+.Sm -t oeuvre Le Quichotte ,
+de
+.Bm -t auteur
+Cervantès
+.Em .”
+.Note
+Si un
+.Sm -t code .P
+apparaît à l'intérieur d'un block délimité par
+.Sm -t code .Bm
+et
+.Sm -t code .Em ,
+en LaTeX et HTML les commandes et éléments de marquage se refermeront avant la
+fin du paragraphe, puis se rouvriront en début du paragraphe suivant.
+.P "Les dtag"
+Les définitions avec
+.Sm -t code dtag
+(pouvant englober plusieurs paragraphes de texte) pourront être
+utilisées grâce aux macros
+.Sm -t code Bd
+et
+.Sm -t code Ed :
+.Bd -t literal
+\&.Bd -t centrer
+Texte centré.
+\&.Ed
+.Ed
+Ce texte sera centré et apparaîtra en LaTeX dans l'environnement
+«center» (entre
+.Sm -t code \ebegin{center}
+et
+.Bm -t code
+\eend{center}
+.Em ).
+.P
+En HTML, on obtiendra un
+.Sm -t code <div class="centrer"> ... </div> :
+il faudra ajouter au style css la class «centrer» du
+.Sm -t code <div>
+créé (par défaut, si l'on ne spécifie pas, ce sera toujours un
+.Bm -t code
+<div>
+.Em ).
+.Sh "Comment inclure du texte frundis pour un format spécifique?"
+Un certain nombre de macros acceptent une option
+.Sm -t code \&-f
+qui permet de préciser que le champ d'action de cette macro ne concerne qu'un
+format spécifique.
+.P
+En particulier, des morceaux de code
+.frundis \&
+peuvent être inclus conditionnellement à l'aide de la macro:
+.Sm -t code #if :
+.Bd -t literal
+\&.\e" par exemple pour n'inclure la table de matières que pour LaTeX:
+\&.#if -f latex
+\&.Tc
+\&.#;
+.Ed
+Un autre cas courant, est celui de la macro
+.Sm -t code If
+(
+.Bm -ns -t fremda
+Include file
+.Em ),
+utilisée pour inclure un fichier:
+.Bd -t literal
+\&.\e" Pour n'inclure un fichier que lors de l'export EPUB:
+\&.If -f epub fichier-a-inclure.frundis
+.Ed
+.Sh Comment inclure du HTML ou du LaTeX tels quels?
+Pour cela, il faut utiliser la macro
+.Sm -t code Ft
+ou son analogue multiligne formé des macros
+.Sm -t code Bf
+et
+.Sm -t code Ef .
+Par exemple:
+.Bd -t literal
+\&.\e" Écrire un <hr> en HTML:
+\&.Ft -f xhtml <hr>
+.Ed
+.P
+Si la quantité de LaTeX ou HTML à inclure tel quel est importante, il peut
+être intéressant de la déplacer vers un autre fichier, puis de l'inclure grâce
+à l'option
+.Sm -t code \&-as-is
+de la macro
+.Sm -t code If :
+.Bd -t literal
+\&.\e" Inclure tel quel un fichier HTML:
+\&.If -as-is -f xhtml fichier.html
+.Ed
+.Sh "Comment faire une page de titre simple?"
+Pour utiliser la page de titre par défaut de
+.frundis ,
+il faut d'abord définir trois paramètres:
+.Bd -t literal
+\&.X set document-title "Mon titre"
+\&.X set document-author "L'auteur"
+\&.X set document-date "2058"
+.Ed
+Il suffira alors de changer la valeur du paramètre:
+.Sm -t code title-page
+.Bd -t literal
+\&.X set title-page 1
+.Ed
+et la page de titre sera créée.
+.Sh "Comment personnaliser les entêtes et métadonnées?"
+Lorsque l'on utilise l'option
+.Sm -t code s
+(standalone),
+.frundis \&
+insère un préambule minimal pour LaTeX, et un fichier HTML complet avec
+entêtes pour HTML.
+.P
+Pour personnaliser encore plus la sortie LaTeX, il est possible
+d'inclure son propre préambule LaTeX, et cela via le paramètre
+.Sm -t code latex-preamble :
+.Bd -t literal
+\&.X set latex-preamble chemin/vers/le/préambule/latex
+.Ed
+.P
+Pour personnaliser la sortie EPUB, il existe également des paramètres:
+.Sm -t code epub-css
+pour le style,
+.Sm -t code epub-cover
+pour introduire la couverture, etc. Il est possible de choisir la version de
+l'EPUB (2 ou 3) grâce au paramètre
+.Sm -t code epub-version .
+On peut, d'autre part, ajouter des métadonnées arbitraires avec
+.Sm -t code epub-metadata .
+.Sh "Les poèmes"
+Les poèmes utilisent la même macro que les listes. Chaque strophe est
+délimitée grâce à la macro de paragraphe
+.Sm -t code P :
+.Bd -t literal
+\&.Bl -t verse "Le Corbeau et le Renard (optionnel)"
+\&.It Maistre Corbeau sur un arbre perché
+\&.It Tenoit en son bec un fromage.
+\&.P
+\&.It Maistre Renard par l'odeur alleché
+\&.It Lui tint à peu près ce language.
+\&.It Et bon jour, Monsieur du Corbeau.
+\&.It Que vous estes joly\&! que vous me semblez beau\&!
+\&.El
+.Ed
+Il est toujours possible, après, d'améliorer l'export LaTeX, par
+exemple, en utilisant des commandes LaTeX à l'intérieur:
+.Bd -t literal
+\&.Bl -t verse "Le Corbeau et le Renard (optionnel)"
+\&.It Maistre Corbeau
+\&.\e" pour introduire une coupure dans le vers par exemple\&:
+\&.Ft -f latex " \eeverselinebreak "
+sur un arbre perché
+\&.It Tenoit en son bec un fromage.
+\&.El
+.Ed
+.Note
+La macro
+.Sm -t code Ft
+introduit tel quel le texte pour le format spécifié, comme
+.Sm -t code Bf
+et
+.Sm -t code Ef ,
+mais sur une seule ligne.
+.Ch Questions diverses
+.Sh "Comment faire des tableaux complexes?"
+Les tableaux utilisent les mêmes macros que les listes, à un détail
+près: on utilise
+.Sm -t code .Ta
+pour séparer les colonnes et
+.Sm -t code .It
+pour séparer les lignes, comme dans l'exemple qui suit:
+.Bd -t literal
+\&.Bl -t table -columns |ll|
+\&.It Pommes
+\&.Ta 1
+\&.It Poires
+\&.Ta 60
+\&.El
+.Ed
+.P "Comment faire des tableaux plus compliqués?"
+Pour les tableaux compliqués, il suffit d'utiliser les macros
+.Sm -t code Bf
+et
+.Sm -t code Ef
+et d'écrire le tableau en LaTeX ou HTML directement, n'oubliant pas
+d'ajouter un "e" après chaque backslash:
+.Bd -t literal
+\&.Bf -f latex
+\eebegin{tabular}{|l|l|}
+  \eehline
+  \eemulticolumn{2}{|c|}{Ma première ligne en deux cellules} \ee\ee
+  \eehline
+  Première cellule & Deuxième cellule \ee\ee
+\eeend{tabular}
+\&.Ef
+.Ed
+Par contre, il ne faut pas oublier, si l'on utilise des paquets LaTeX
+type
+.Sm -t code multirow ,
+par exemple, d'ajouter le package au préambule LaTeX, lequel devra alors
+être
+.Sx -name "inclus à la main" "Comment personnaliser les entêtes et métadonnées?" .
+.P
+Il est également possible d'introduire le tableau HTML ou LaTeX dans
+un bloc
+.Sm -t code ".Bd"
+pour lui donner un style en HTML. On peut également introduire le contenu du
+tableau dans une table invoquée à l'aide d'un
+.Sm -t code ".Bl -t table Titre"
+«vide» pour profiter de la génération automatique de la liste des tables
+et profiter des références.
+.P
+.Bd -t literal
+\&.\e" le tableau en HTML et EPUB
+\&.Bl -t table -columns |l|l| Titre
+\&.Bf -f xhtml,epub
+<tr>
+<td rowspan="2">Cellule 1</td>
+<td>Cellule 2</td>
+</tr>
+<tr>
+<td>Cellule 3</td>
+</tr>
+\&.Ef
+\&.El
+\&.\e" le tableau en LaTeX
+\&.Bl -t table -columns |l|l|
+\&.Bf -f latex
+\emultirow{2}{*}{Cellule 1} & Cellule 2 \e\e
+& Cellule 3 \e\e
+\&.Ef
+\&.El
+.Ed
+.Sh "Quels types de références croisées peut-on faire?"
+Pour les références croisées, on utilisera la macro
+.Sm -t code Sx .
+Pour se réferrer à une partie, à un chapitre, à une section ou une
+sous-section, on reprendra le titre donné à ceux-ci:
+.Bd -t literal
+\&.Ch "Introduction"
+\&.Ch "Mon premier chapitre"
+Comme dit en
+\&.Sx Introduction ,
+…
+.Ed
+L'on pourra changer le texte du lien avec l'option
+.Sm -t code \&-name :
+.Bd -t literal
+Comme dit
+\&.Sx -name "ici" Introduction .
+.Ed
+Pour faire références aux titres des tableaux ou des figures, il suffira
+d'ajouter le type (lot ou lof) grâce à l'option
+.Sm -t code \&-t :
+.Bd -t literal
+\&.Sx -t lof "Titre de ma figure" .
+.Ed
+.P "Comment créer une référence vers un mot hors chapitre/section/…?"
+Il est possible de donner un
+.Sm -t code id
+à un
+.Sm -t code Sm
+ou à ses variantes multilignes, ainsi qu'à un
+.Sm -t code Bd .
+On pourra référencer par la suite ce texte ou bloc de texte, toujours
+grâce à la macro
+.Sm -t code Sx :
+.Bd -t literal
+Les
+\&.Sm -id label-rhinocéros -t animal rhinocéros
+sont des animaux féroces.
+\&.P
+…
+\&.P
+Nous avons parlé des
+\&.Sx -id -name rhinocéros label-rhinocéros .
+.Ed
+.Sh "Quels types de tables de matières peut-on faire?"
+La macro
+.Sm -t code Tc
+permet de créer une table de matière ainsi qu'une liste des figures ou une liste
+des tableaux.
+Avec cette macro, on peut également spécifier que l'on veut une table des
+matières générale de peu de profondeur avec l'option
+.Sm -t code \&-summary .
+L'option
+.Sm -t code mini
+est à utiliser lors d'une invocation en début de chapitre, et crée une table
+des matières qui contiendra les sections et sous-sections du dit chapitre.
+.Bd -t literal
+\&.Tc -summary
+\&.Ch "Mon premier chapitre"
+\&.Tc -mini
+\&.Sh "Ma section"
+.Ed
+.Sh "Comment ne pas se répéter et factoriser?"
+Pour ne pas répéter les même morceaux de textes trop souvent et améliorer la
+maintenabilité de ses documents, il est possible de définir des
+.Sm -id dv -t voc variables
+avec
+.Sm -t code .#dv ,
+ou des
+.Sm -id de -t voc macros ,
+avec
+.Sm -t code .#de .
+.P Variables
+Par exemple, pour ne pas répéter tout le temps le chemin vers les
+images:
+.Bd -t literal
+\&.#dv img /long/chemin/vers/un/dossier/contenant/les/images
+\&.\e" On peut ensuite se contenter d'écrire:
+\&.Im \e*[img]/mon-image.jpg
+\&.\e" La séquence d'échappement \e*[img] est remplacée par la valeur de la
+\&.\e" variable.
+.Ed
+De plus, de cette façon, si l'on choisit de changer le nom du dossier contenant
+les images, il suffira de changer la variable
+.Sm -t code img
+pour changer les chemins dans toutes les invocations de
+.Sm -t code Im .
+.P
+Il peut être également utile d'utiliser des variables pour ne pas répéter tout
+le temps un même bout de texte.
+.Bd -t literal
+\&.#dv chaperon-bleu "«\&Les histoires terribles et incroyables du Chaperon Bleu\&»"
+\&.\e" Et on pourra utiliser la variable de la façon qui suit:
+Aujourd'hui nous allons analyser \e*[chaperon-bleu].
+.Ed
+L'on peut également trouver cela utile lorsque l'on a par exemple deux
+documents partageant une même page de titre personnalisée (c'est-à-dire
+dans le cas où
+.Sx -name "celle par défaut" Comment faire une page de titre simple?
+ne suffit pas). On définit les variables dans les deux documents:
+.Bd -t literal
+\&.\e" dans le premier document
+\&.#dv titre "Titre document 1"
+\&.#dv auteur "Auteur document 1"
+\&.\e" puis on inclut avec un .If (Include file) la page du titre:
+\&.If page-titre.frundis
+.Ed
+.Bd -t literal
+\&.\e" dans le deuxième document
+\&.#dv titre "Titre document 2"
+\&.#dv auteur "Auteur document 2"
+\&.If page-titre.frundis
+.Ed
+On pourra ensuite utiliser ces variables dans un fichier commun.
+.Bd -t literal
+\&.\e" dans le fichier appelé «page-titre.frundis» ...
+\&.Bd -t titlepage
+\&.Bm -t titre
+\&\e*[titre]
+\&.Em
+\&.Bm -t auteur
+\&\e*[auteur]
+\&.Em
+\&.Ed
+.Ed
+.P Macros
+Les macros définies avec
+.Sm -t code #de
+peuvent être utilisées à beaucoup de fins. Un cas d'utilisation simple peut être:
+.Bd -t literal
+\&.#de Note
+\&.P Note.
+\&.#.
+.Ed -t literal
+qui permet ensuite d'écrire:
+.Bd -t literal
+\&.Note
+\&Texte descriptif…
+.Ed
+et ainsi utiliser la même macro pour introduire toutes les «Notes». Si au lieu
+de «Note.» avec un point, on veut plus tard «Note:» avec deux points, il suffit
+de modifier à un seul endroit (cette macro est utilisée pour les notes de cette FAQ).
+.Sh "Comment réutiliser un fichier contenant des déclarations pour plusieurs documents?"
+Il s'agit donc du cas où l'on a des
+.Sm -t code mtags
+et
+.Sm -t code dtags ,
+des définitions de macros et divers paramètres de configuration globaux
+que l'on veut réutiliser pour divers documents distincts.
+.P
+Une première méthode consiste à inclure dans chaque fichier source à l'aide de la macro
+.Sm -t code If
+le fichier contenant les déclarations en précisant le chemin absolu, ou relatif
+au dossier courant.
+.P
+Une méthode plus pratique est d'utiliser la variable d'environnement FRUNDISLIB
+pour dire à
+.frundis \&
+de chercher des fichiers donnés par des chemins relatifs à d'autres dossiers
+que le dossier courant.
+.P
+On pourra, par exemple, écrire dans la configuration du shell (.bashrc,
+\&.kshrc, etc.):
+.Bd -t literal
+export FRUNDISLIB=~/chemin/vers/mes/packages/frundis
+.Ed
+Alors, dans le fichier source du document dans lequel on veut inclure ces
+déclarations, on écrit:
+.Bd -t literal
+\&.If fichier-commun-01.frundis
+.Ed
+.Sh "Comment mettre les mêmes entêtes et pieds de pages dans tous les HTML générés?"
+Pour cela, il existe deux paramètres,
+.Sm -t code xhtml-top
+et
+.Sm -t code xhtml-bottom ,
+qui permettent d'inclure un fichier HTML au début et à la fin de chaque
+page. Il suffira d'écrire dans le fichier frundis:
+.Bd -t literal
+\&.X set xhtml-top "mon-xhtml-top.html"
+\&.X set xhtml-bottom "mon-xhtml-bottom.html"
+.Ed
+.Sh "Comment contrôler avec précision les espacements?"
+.P "Comment éliminer les espaces entre du texte et une macro ou entre macro et macro?"
+Lorsqu'on écrit:
+.Bd -t literal
+Je crois qu'
+\&.Sm -t latin "a priori" ,
+c'est ça.
+.Ed
+il y a un espace entre l'apostrophe et le texte en latin de la macro.
+Pour l'enlever il est possible d'utiliser l'option
+.Sm -t code ns
+(no space) dans la macro pour enlever cet espace. L'option est
+valable pour
+.Sm -t code Sm
+(et ses variantes multilignes),
+.Sm -t code Lk ,
+.Sm -t code Sx
+et, en général, toute macro ayant pour but de marquer du texte à l'intérieur
+d'un paragraphe.
+.P
+Si l'on veut éliminer totalement les espaces ajoutés entre les macros,
+il est possible de modifier la valeur du flag
+.Sm -t code ns
+(mode no space) de la macro
+.Sm -t code #fl ,
+et de la fixer à 1:
+.Bd -t literal
+\&.#fl ns 1
+.Ed
+Il ne faudra pas oublier de refixer la valeur à zéro lorsque nécessaire.
+.P "Comment insérer à la main un espace en fin de ligne?"
+.frundis \&
+donne toujours un warning lorsqu'il y a des espaces en fin de ligne (en général
+ils ne servent à rien, car un retour à la ligne est inséré automatiquement).
+Pour éviter ce warning il suffit d'ajouter le caractère spécial
+.Sm -t code \e&
+en fin de ligne, après l'espace ajouté.
+.P "Comment éviter l'ajout d'espaces insécables automatique en français?"
+Lorsque le paramètre
+.Sm -t code lang
+est fixé à “fr”,
+.frundis \&
+ajoute automatiquement des espaces devant toute la ponctuation où ils
+sont, généralement, nécessaires. Pour enlever cet espace on pourra tout
+simplement ajouter le caractère spécial
+.Sm -t code \e&
+devant cette ponctuation:
+.Bd -t literal
+\&.D
+Comment ça?\e&\&? —s'exclama la vieille sorcière.
+.Ed
+Le premier point d'interrogation sera traité tandis que le second sera
+collé au premier.
+.P
+S'il s'agit d'un gros bloc que l'on veut ne pas être traité par l'ajout
+automatique d'espaces insécables, il est possible d'utiliser la macro
+.Sm -t code #fl
+qui peut modifier le statut du drapeau (
+.Sm -t fremda -ns flag )
+.Sm -t code fr-nbsp-auto :
+.Bd -t literal
+\&.#fl fr-nbsp-auto 0
+Mon gros bloc que je ne veux pas échapper.
+\&.\e" puis je refixe à 1 le paramètre:
+\&.#fl fr-nbsp-auto 1
+.Ed
+.Ch "Erreurs typiques"
+.Sh mtags ou dtags mal choisis
+Il faut vérifier que tous les tags définis pour LaTeX avec la macro
+.Sm -t code X
+sont corrects:
+.frundis \&
+ne vérifie pas que les commandes LaTeX choisies sont raisonnables.
+.Sh La table des matières apparaît en double en HTML!
+Cela est sûrement lié au fait que, en exportant vers XHTML vers plus d'un
+fichier,
+.frundis \&
+génère déjà automatiquement une table de matière. Il est possible de
+l'enlever en le spécifiant au paramètre
+.Sm -t code xhtml-index :
+.Bd -t literal
+\&.X set xhtml-index none
+\&.\e" On pourra après librement utiliser
+\&.Tc
+\&.\e" pour tous les formats.
+.Ed

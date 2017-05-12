@@ -1,0 +1,60 @@
+---
+abstract: "FELLIOTT's preferred modules"
+author:
+  - 'Fitz Elliott <felliott@fiskur.org>'
+build_requires:
+  Test::EOL: '0'
+  Test::More: '0.98'
+  Test::NoTabs: '0'
+  Test::Pod: '1.41'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-FELLIOTT
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Task::BeLike::FELLIOTT:
+    file: lib/Task/BeLike/FELLIOTT.pm
+    version: '0.02'
+requires:
+  App::Ack: '0'
+  App::cpanlistchanges: '0'
+  App::cpanminus: '0'
+  App::cpanoutdated: '0'
+  App::ph: '0'
+  B::Keywords: '0'
+  Carp::Always: '0'
+  Carp::Always::Color: '0'
+  Devel::Confess: '0'
+  Devel::Cover: '0'
+  Devel::CoverX::Covered: '0'
+  Devel::REPL: '0'
+  Devel::REPL::Plugin::DataPrinter: '0'
+  Git::CPAN::Patch: '0'
+  Lexical::Persistence: '0'
+  Module::Refresh: '0'
+  PPI::HTML: '0'
+  Perl::Tidy: '0'
+  Pod::Coverage: '0'
+  Pod::Coverage::CountParents: '0'
+  Test::Pretty: '0.23'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/felliott/Task-BeLike-FELLIOTT/issues
+  homepage: https://github.com/felliott/Task-BeLike-FELLIOTT
+  repository: git://github.com/felliott/Task-BeLike-FELLIOTT.git
+version: '0.02'

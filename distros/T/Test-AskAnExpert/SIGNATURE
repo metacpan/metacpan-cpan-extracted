@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0735472e8b7366bef112931bed9be9bfde1e538d Build.PL
+SHA1 0a0c64a124dd789841e96e38bb88641345b0bfe1 Changes
+SHA1 ef16b8ce75d1bde039d49dffcdac0fc9d3cd0cb2 LICENSE
+SHA1 9a7a276ecf26d8995fd252d9ed7e1efb1e85ed46 MANIFEST
+SHA1 c25287b225b656051a78ebeae863776a95014421 META.yml
+SHA1 04ce64155c19fc494df9705e7cfe918c6f8c81ad Makefile.PL
+SHA1 228ba6dc758d5545b5089cf8fbeecebbaa152652 README
+SHA1 48af47da7c6fa416590d791a2bec156537d1051d lib/Test/AskAnExpert.pm
+SHA1 f3bde9d470695835b7672f64d34ff7cfca040876 lib/Test/AskAnExpert/Interface.pm
+SHA1 ddf1f78c5f6ffb19cff72eeb5cfba4eded67a7e4 lib/Test/AskAnExpert/Interface/File.pm
+SHA1 d425f23748187e4604bf008d2cbc4716f9bb30bf lib/Test/AskAnExpert/Interface/Mock.pm
+SHA1 7dbdaa65b2fed7ecfc6eb1502a32e69c1eea3c22 lib/Test/AskAnExpert/Question.pm
+SHA1 29dec1d6f9a188294690b9aead37568bef60f0a3 t/Test-AskAnExpert-Interface-File.t
+SHA1 a5efdccd0ed754ceff98d1bb371f87f99800de2c t/Test-AskAnExpert-Interface-Mock.t
+SHA1 720042c2c0ef3e251e74123b7fd6c1a04a2c0d34 t/Test-AskAnExpert-Interface.t
+SHA1 88a9b6e84469d0cd92fd784ab3326647c52d5121 t/Test-AskAnExpert-Question.t
+SHA1 0bab80d8db25402f4fbf412f630bc283b9ead67c t/Test-AskAnExpert.t
+SHA1 03204c6655abd92fafc57530858aad016e27e635 t/kwalitee.t
+SHA1 e83ff1b336ccd319eb8866b3b1fe46ad41073129 t/pod-coverage.t
+SHA1 06e35279ce2b44a6a4a7aa97cf2682d6deaa92cc t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (GNU/Linux)
+
+iD8DBQFGqWyikLQjBkKoN/QRAq/KAKDaR5EM4jSiZcB24jwGergf2hVnPgCgjHu8
+NgYQMOkOKo3akRrtyWicnOI=
+=aaCd
+-----END PGP SIGNATURE-----

@@ -1,0 +1,31 @@
+---
+abstract: 'Perlish port of pure.js <http://beebole.com/pure/>'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  DateTime: '0'
+  Mojo::DOM58: '1.001'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Pure
+requires:
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Mojo::DOM58: '1.001'
+  Scalar::Util: '0'
+  Storable: '0'
+  URI: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/jjn1056/Template-Pure/issues
+  homepage: https://github.com/jjn1056/Template-Pure
+  repository: https://github.com/jjn1056/Template-Pure.git
+version: '0.033'
+x_serialization_backend: 'YAML::Tiny version 1.69'

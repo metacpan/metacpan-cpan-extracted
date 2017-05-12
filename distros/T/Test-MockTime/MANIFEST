@@ -1,0 +1,12 @@
+MANIFEST
+README
+Makefile.PL
+Changes
+t/export.t
+t/test.t
+t/pod.t
+t/string-time.t
+t/prototypes.t
+lib/Test/MockTime.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

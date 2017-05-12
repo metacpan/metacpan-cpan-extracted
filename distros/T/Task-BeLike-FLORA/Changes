@@ -1,0 +1,21 @@
+0.06  Tue, 05 Oct 2010 01:23:29 +0200
+  * Add Perl::Version 1.010 for the perl-reversion script.
+  * Add Devel::bt.
+
+0.05  Sat, 05 Jun 2010 20:32:56 +0200
+  * Add Acme::MetaSyntactic.
+  * Add Term::ReadLine::Gnu.
+  * Add Test::Aggregate.
+
+0.04  Tue, 18 May 2010 19:16:00 +0200
+  * Add Test::Without::Module.
+
+0.03  Mon, 17 May 2010 13:44:55 +0200
+  * Add Task::SDK::Moose.
+  * Add Module::CPANTS::Analyse.
+
+0.02  Mon, 10 May 2010 02:07:37 +0200
+  * Add V.pm.
+
+0.01  Fri, 07 May 2010 21:24:43 +0200
+  * Initial release.

@@ -1,0 +1,26 @@
+--- 
+abstract: Simpler parsing of CSV files [PP version]
+author: 
+  - Kota Sakoda  C<< <cohtan@cpan.org> >>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Text-CSV_PP-Simple
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Text::CSV_PP: 0
+version: !!perl/hash:version 
+  original: 0.0.5
+  qv: 1
+  version: 
+    - 0
+    - 0
+    - 5

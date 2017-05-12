@@ -1,0 +1,185 @@
+Revision history for Perl extension Teng
+
+0.28 2015-02-26T06:49:27Z
+        - FIX: Dependency (thanks lestrrat, eserte, zakame)
+
+0.27 2015-01-27T04:45:44Z
+        - FIX: PostgreSQL tests (thanks songmu)
+        - FIX: Dependency (thanks songmu)
+        - FIX: Documentations (thanks songmu)
+        - ADD: Teng::Schema::Declare#default_row_class_prefix (thanks aereal)
+
+0.26 2014-12-16T06:10:34Z
+        - FIX: Teng::Plugin::Lookup quotes table name correctly (thanks tokuhirom).
+        - ADD: Teng#bulk_insert can take more option for last argument.
+        - MODIFY: Inside-out Teng instance from Teng::Row instance (for Data::Dumper friendly)
+        - MODIFY: Update document. (thanks kawamuraway)
+        - MODIFY: Teng#insert called in void context does not create row instance.
+
+0.25 2014-07-14T08:53:28Z
+        - FIX: Error on Teng#insert when using strict option for default sql_builder_class. (thanks nobuoka and kazuho)
+
+0.24 2014-07-02T09:37:57Z
+
+        - ADD: Teng#new takes `sql_builder_class` and `sql_builder_args`
+
+0.23 2014-06-17T06:06:16Z
+        - MODIFY: Teng::Row#refetch accepts `opt` optionally (thanks Songmu)
+        - MODIFY: Teng::Row#update accepts `where` cond optionally mainly for optimistic lock (thanks Songumu)
+        - MODIFY: Changed behavior of comment under TENG_SQL_COMMENT=1. See https://github.com/nekokak/p5-Teng/pull/130/files (thanks Songumu)
+
+0.22 2014-04-04T05:22:48Z
+        - FIXED: Allow calling `row_class` before `name` for Teng::Schema::Declare (thanks GeJ)
+        - MODIFY: Allow specify `txn_manager_class` parameter for Teng (thanks GeJ)
+
+0.21 2014-02-14T02:59:46Z
+        - ADD:: Implemented new_row_from_hash which just creates new Teng::Row instance with column data. (thanks karupanerura)
+        - MODIFY: Fixed around multiple primary key. (thanks Songmu)
+
+
+0.20 2013-08-21T07:39:25Z
+        - Re-release for override UNAUTHORIZED flag (same as 0.19)
+
+0.19 2013-07-26T07:23:44Z
+        - ADD: Implemented set and get methods which always inflate/deflate values to Teng::Row.
+        - ADD: Implemented is_changed method to Teng::Row, which is useful for determining to update actually (thanks kazeburo).
+        - MODIFY: Refactored Teng::Row and defined behavior of some methods specifically.
+
+0.18
+        - FIXED: Strict argument validation for Teng::Plugin::Count. (thanks tokuhirom)
+        - FIXED: [BUG FIX]Throw exception if the table has no primary keys. (thanks s2)
+
+0.17
+        - ADD: Teng::Plugin::SQLPager. (thanks tokuhirom)
+        - FIXED: reconnect bug. (thanks nihen)
+        - FIXED: fixed pod nesting level. (thanks tokuhirom)
+        - MODIFY: Teng#_execute is promoted to the public method. (thanks karupanerura)
+        - MODIFY: _execute method the caller. and added $SQL_COMMENT. (thanks karupanerura)
+        - MODIFY: Pull up _insert to public api. (thanks tokuhirom)
+        - MODIFY: Rename `_update` to `do_update`. Since some user want to hook _update method. (thanks tokuhirom)
+        - MODIFY: Do not fail test case when loader.db did not remove cleanly. (thanks tokuhirom)
+        - MODIFY: adde 'use strict' and 'use warnings' for dumped schema. (thanks tokuhirom)
+        - MODIFY: Teng#single should be return scalar value. (thanks tokuhirom)
+        - MODIFY: dump with specify base_row_class. (thanks tokuhirom)
+        - MODIFY: Limit the dumper max depth in exception stack trace. (thanks tokuhirom)
+        - DEPRECATED: mode option. use no_ping instead. (thanks nihen)
+
+0.16
+        - DEPRECATED: SingleBySQL plugin, move to Teng core. (thansk nihen)
+        - FIXED: AUTOLOAD row column method's uncached bug. (thaks yappo)
+        - FIXED: Teng::Schema::Loader document. (thanks ktat)
+        - FIXED: improve checking variable in _execute: not only check ref but check array ref. (thanks ktat)
+        - MODIFY: row column method accept setter values. (thaks yappo)
+        - MODIFY: rename Row class method _lazy_get_data to generate_column_accessor. (thaks yappo)
+        - ADD: single_named method (thanks nihen)
+
+0.15
+        - stop mode:fixup support. (thanks nihen)
+        - refactoring load_plugin. (thanks ktat)
+        - fixed some document. (thanks issm, bokutin, ktat)
+        - pass hash ref as option to plugin init method. (thaks ktat)
+
+0.14_05
+        - FIXED: plugin global export bug. (tahnks takuji31)
+        - FIXED: set_column(s) un deflate bug. (thanks tsucchi)
+        - add 'dump' parameter for Dumper->dump. (thanks zentooo)
+        - lookup method allow $where as arrayre. (thanks nihen)
+        - add db connection check mode. ex)ping (thanks nihen)
+        - quote identifier cache. and some performance tuning. (thanks nihen)
+        - support FetchHashKeyName. (thanks tsucchi)
+
+0.14_04
+        - support '+columns' for single, search, lookup and search_with_pager. (thanks nihen)
+        - changed calling way of sql_builder in Teng::Plugin::Count. (thanks makamaka)
+        - sort lookup keys, because anytime make same SQL. (thanks nihen)
+        - FIXED: fail at reconnect twice. (thanks nihen)
+        - FIXED: Lookup Plugin fail at multiple key. (thanks nihen)
+
+0.14_03
+        - bsd tar sucks! use gnu tar for packaging.
+
+0.14_02
+        - Schema::Loader auto create teng class.
+
+0.14_01
+        - [IMPORTANT] bulk_insert include core feature. do not use Plugin::BulkInsert.
+        - add Plugin::Lookup.
+        - fixed fork safe connection. (thanks nihen)
+        - support auto reconnect dbh. (thanks nihen)
+        - can specific column for single or search method.
+        - support bulk_insert for postgresql 8.2.0 over. (thanks makamaka)
+        - support bind_param. (thanks makamaka)
+        - add Plugin::SingleBySQL. (thanks nihen)
+
+0.14
+        - fixed deflate bug. (thanks kentaro)
+
+0.13
+        - fixed inflate bug. (thanks kentaro)
+        - fixed DBD::SQLite test case. (thanks charsbar)
+        - tuning single method.
+
+0.12
+        - fixed some documents.(thanks hiratara)
+
+0.11
+    2011-05-15
+        - following SQL::Maker 0.14.
+
+0.10
+        - Add has_deflators()/has_inflators on Schema::Table (lestrrat)
+
+0.09
+        - There was a critical bug when disconnect() (or reconnect())
+          was used while transaction operations were performed. Also, this
+          very likely affects long-running processes that use transactions
+          as well. If you use transactions at all, upgrade is strongly
+          recommended (lestrrat)
+        - Fixed Plugin::BulkInsert to work with mysql (Yappo)
+
+
+0.08
+    2011-02-24
+        - fixed can't guess tablename by quote_char. (thanks hatyuki)
+        - fixed Schema::Loader (in|de)flate settings. (thanks yibe)
+        - fixed Row#update bind value's bug by pk.(thanks libkenta)
+
+0.07
+    2011-02-08
+        - Create better diagnostics for transactions guards that were not
+          properly dismissed
+        - Depend on DBIx::TransactionManager 1.06
+        - adjustment inflate
+        - change setters to add_* and remove getters for Teng::Schema::Table
+        - fixed docs.
+        - fixed Loader's sort bug.
+        - refetch row after insert.
+
+0.06
+    2011-01-26
+        - add query comment at execute point.
+        - fixed dbh deep recursion by reconnect (thanks cho45)
+
+0.05
+    2011-01-24
+        - fixed documents.
+        - fixed Teng::Plugin::Pager::Page->entries_on_this_page(reported by yibe++)
+        - few refactoring.
+
+0.04
+    2011-01-19
+        - fixed Makefile.PL
+        - fixed error ocurred in a middle of a transaction.
+
+0.03
+    2011-01-19
+        - more docs.
+        - fixed on_connect_do's bug.
+
+0.02
+    2011-01-18
+        - more docs. and fixed POD. no code change.
+
+0.01
+    2011-01-18
+        - forked from DBIx::Skinny.

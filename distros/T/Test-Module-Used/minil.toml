@@ -1,0 +1,5 @@
+name = "Test-Module-Used"
+badges = ["travis", "coveralls"]
+
+[no_index]
+directory = ['testdata', 't', 'xt', 'inc', 'share', 'eg', 'examples', 'author', 'builder']

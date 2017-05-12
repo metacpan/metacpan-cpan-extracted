@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - TAP
+  - test
+  - harness
+  - prove
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Harness
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Pod::Usage: '1.12'
+requires: {}
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Harness
+  homepage: http://testanything.org/
+  repository: http://github.com/Perl-Toolchain-Gang/Test-Harness/tree/master
+version: '3.39'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

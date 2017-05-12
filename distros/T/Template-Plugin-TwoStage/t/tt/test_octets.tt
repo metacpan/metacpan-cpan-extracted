@@ -1,0 +1,8 @@
+[% USE TwoStage = TwoStage;
+   TwoStage.purge;
+   BLOCK test_unicode; %]Hällo Germany!
+[% END;
+   void = TwoStage.process( 'template' => 'test_unicode' );
+   TwoStage.process( 'template' => 'test_unicode' ); # we want the precompiled version from disk
+   TwoStage.purge;
+%]

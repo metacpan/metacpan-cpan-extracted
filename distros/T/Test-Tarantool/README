@@ -1,0 +1,189 @@
+NAME
+       Test::Tarantool - The Swiss army knife for tests of Tarantool related
+       Perl and lua code.
+
+VERSION
+       Version 0.03
+
+SYNOPSIS
+           use Test::Tarantool;
+           use AnyEvent;
+
+           # Clear data and exit on Ctrl+C.
+           my $w = AnyEvent->signal (signal => "INT", cb => sub { exit 0 });
+
+           my @shards = map {
+               my $n = $_;
+               Test::Tarantool->new(
+                   host => '127.17.3.0',
+                   spaces => 'space[0] = {
+                                  enabled = 1,
+                                  index = [ {
+                                      type = HASH,
+                                      unique = 1,
+                                      key_field = [ { fieldno = 0, type = STR }, ],
+                                  }, ],
+                              }',
+                   initlua => do {
+                                 open my $f, '<', 'init.lua';
+                                 local $/ = undef;
+                                 <$f> or "";
+                              },
+                   on_die => sub { warn "Shard #$n unexpectedly terminated\n"; exit; },
+               );
+           } 1..4;
+
+           my @cluster = map { [ $_->{host}, $_->{p_port} ] } @shards;
+
+           {
+               my $cv = AE::cv();
+               $cv->begin for (@shards);
+               $_->start($cv) for (@shards);
+               $cv->recv;
+           }
+
+           {
+               $_->sync_start() for (@shards);
+           }
+
+           {
+               my ($status, $reason) = $shards[0]->sync_ro();
+               die $reason unless $status;
+               print (($shards[0]->sync_admin_cmd("show info"))[1]);
+           }
+
+           # Some test case here
+
+           $shards[1]->pause();
+
+           # Some test case here
+
+           $shards[1]->resume();
+
+           {
+               my ($status, $reason) = $shards[0]->sync_rw();
+               die $reason unless $status;
+               print (($shards[0]->sync_admin_cmd("show info"))[1]);
+           }
+
+           # stop tarantools and clear work directoies
+           @shards = ();
+
+SUBROUTINES/METHODS
+   new option => value,...
+       Create new Tarantool instance. Every call of new method increase counter,
+       below called as tarantool number or tn.
+
+       root => $path
+           The tarantool work directory, created if not exists. Default is
+           ./tnt_<10_random_lowercase_letters>
+
+       arena => $size
+           The maximal size of tarantool arena in Gb. Default is 0.1
+
+       cleanup => $bool
+           Remove the tarantool work directory after the garbage collection.
+           Default is 1
+
+       spaces => $string
+           Tarantool spaces description. This is only one required argument.
+
+       initlua => $content
+           Content of init.lua file. Be default an empty file created.
+
+       host => $address
+           Address bind to. Default: 127.0.0.1
+
+       port => $port
+           Primary port number, base for s_port, a_port and r_port.
+           Default is 6603+<tn>*4
+
+       s_port => $port
+           Read-only (secondary) port. Default is port+1
+
+       a_port => $port
+           Admin port. Default is port+2
+
+       r_port => $port
+           Replication port. Default is port+3
+
+       title => $title
+           Part of process name (custom_proc_title) Default is "yat<tn<"
+
+       wal_mode => $mode
+           The WAL write mode. See the desctiption of wal_mode tarantool
+           variable. Default is none. Look more about wal_mode in tarantool
+           documentation.
+
+       log_level => $number
+           Tarantool log level. Default is 5
+
+       snapshot => $path
+           Path to some snapshot. If given the symbolic link to it will been
+           created in tarantool work directory.
+
+       replication_source => $string
+           If given the server is considered to be a Tarantool replica.
+
+       logger => $sub
+           An subroutine called at every time, when tarantool write some thing
+           in a log.  The writed text passed as the first argument. Default is
+           warn.
+
+       on_die => $sub
+           An subroutine called on a unexpected tarantool termination.
+
+   start option => $value, $cb->($status, $reason)
+       Run tarantool instance.
+
+       timeout => $timeout
+           If not After $timeout seconds tarantool will been kelled by the KILL
+           signal if not started.
+
+   stop option => $value, $cb->($status, $reason)
+       stop tarantool instance
+
+       timeout => $timeout
+           After $timeout seconds tarantool will been kelled by the KILL signal
+
+   pause
+       Send STOP signal to instance
+
+   resume
+       Send CONT signal to instance
+
+   ro $cb->($status, $reason)
+       Switch tarantool instance to read only mode.
+
+   rw $cb->($status, $reason)
+       Switch tarantool instance to write mode.
+
+   admin_cmd $cmd, $cb->($status, $response_or_reason)
+       Exec a command via the amind port.
+
+   times
+       Return values of utime and stime from /proc/[pid]/stat, converted to
+       seconds
+
+   sync_start sync_stop sync_ro sync_rw sync_admin_cmd
+       Aliases for start, stop, ro, rw, admin_cmd respectively, arguments a
+       similar, but cb not passed.
+
+AUTHOR
+       Anton Reznikov, "<anton.n.reznikov at gmail.com>"
+
+BUGS
+       Please report any bugs or feature requests to "<a.reznikov at corp.mail.ru>"
+
+SUPPORT
+       You can find documentation for this module with the perldoc command.
+
+           perldoc Test::Tarantool
+
+ACKNOWLEDGEMENTS
+           Mons Anderson    - The original idia of the module.
+
+LICENSE AND COPYRIGHT
+       Copyright 2014 Anton Reznikov.
+
+       This program is released under the following license: GPL

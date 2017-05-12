@@ -1,0 +1,93 @@
+Revision history for Perl extension Tokenizer.
+
+0.4.6 Wed Jan 25 18:47:35 CET 2012
+	- compile on windows again (use stdint.h instead of inttypes.h)
+
+0.4.5 Thu Nov 10 22:50:13 CET 2011
+	- Make test work in strict mode
+	- Various cleanups
+	- License goes to GPLv3
+
+0.4.4 Thu Nov 10 22:50:13 CET 2011
+	- Fix CPAN #72326 bug, changed unique tokenizer identification,
+		to fix compilation warnings in XS module.
+		This seems to happen only on for some version of Perl
+		on some versions of BSD-like OSes - no idea why.
+
+0.4.3 Sun Nov  6 22:56:46 CET 2011
+	- POD docu fix (thanks to Alex Mestiashvili)
+
+0.4.2 Wed Mar 11 11:17:38 CET 2009
+	- 64bit arch compilation fix
+
+0.4.1 Mon Mar  9 22:14:44 CET 2009
+	- update to flex version 2.5.35
+	- fixed example in man page
+
+0.4.0 Tue Mar 28 13:54:45 CEST 2006
+	- update to flex version 2.5.33 (fixing some input bugs in scanner)
+	- v0.4.0 rc1 releasing as stable (after long testing period)
+
+0.4.0-rc1 Mon Jan 16 01:12:00 CET 2006
+	- AS OF HERE, I PROMISE NOT TO ADD ANY OTHER ADDITIONAL FUNCTIONALITY,
+		AND WILL DO ONLY PERFORMANCE IMPROVEMENTS & BUG FIXES ;)
+	- v0.3.6 releasing as version 0.4.0 release candidate 1
+
+0.3.6 Mon Jan 16 00:07:34 CET 2006
+	- some optimalisations
+	- improve performance by using flex full scanner table
+	- continue testing for 0.4.0
+
+0.3.5 Sun Jan 15 23:54:04 CET 2006
+	- added unclosed C comment handling
+
+0.3.4 Sun Jan 15 23:31:44 CET 2006
+	- reworked comments handling regexp
+	- fully optional C/C++ style comments
+	- BASH style comments can be disabled
+	- comments are from now passed without identificator 
+		=> little backward incompatibility (bash comments is passed without starting '#')
+
+0.3.1 Sun Jan 15 20:15:23 CET 2006 (DEVEL BRANCH)
+	- added C/C++ style comments (changes needed for my new project codetracer)
+
+0.2.7 Sun Sep 11 21:24:49 CEST 2005
+	- updated flex makefile, to automaticaly remove unistd.h
+	
+0.2.6 Fri Jan  7 09:54:12 CET 2005
+	- realy removed 'unistd.h' :)
+	- fixes for older perl versions
+
+0.2.5 Fri Jan  7 09:54:12 CET 2005
+	- removed 'unistd.h' because cpan testers reports error when compiling
+		this on win32 platform
+
+0.2.4 Thu Jan 6 02:05:09 CET 2005
+	- fixed SEGFAULT when perl build without PERL_IMPLICIT_CONTEXT (my mdk
+			package is shipped this way)
+		-- perl omites pTHX params, but my functions requires them,
+			so we get 2 params on the stack but unfortunately
+			functions use only one
+
+0.2.3 Fri Apr 16 08:39:52 CET 2004
+	- fixed incorect regexp in comment matching (thanks pwinkler for 
+		reporting bug)
+
+0.2.2 Fri Mar 26 15:46:00 CET 2004
+	- trying fix compilation problems reported on Sun4 from CPAN
+	   (hopefully they got fixed, i've no Sun to test it :(
+	- now working with PERL_NO_GET_CONTEXT
+        - C module code updated to pass user context parameter
+		for generic callback functions
+
+0.2.1 Wed 24 Mar 2004 02:13:11 PM CET
+	- fixed some compiler portability problematic code
+	- upgraded flex generated code
+
+0.2   Fri Feb  6 16:35:21 EST 2004
+	- renamed to Text::Tokenizer and published
+
+0.01  Sat Jan  3 00:29:13 2004
+	- original version; created by h2xs 1.22 with options
+		src/tokenizer.h
+

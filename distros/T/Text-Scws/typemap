@@ -1,0 +1,2 @@
+TYPEMAP
+Text::Scws * T_PTROBJ

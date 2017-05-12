@@ -1,0 +1,541 @@
+=head1 NAME 
+
+Tk::MListbox - Multicolumn Listbox.
+
+=head1 SYNOPSIS
+
+  use Tk::MListbox;
+  $ml = $parent->MListbox (<options>);
+
+=head1 DESCRIPTION
+
+Tk::MListbox is a multicolumn Listbox widget with builtin capabilites for
+sorting, resizing and repositioning of the columns.
+
+Sorting is done by clicking on one of the column headings in the 
+widget. The first click will sort the data with the selected column
+as key, a new click will reverse the sort order.
+
+The columns may be resized by dragging a separator line which
+is drawn between each column.
+
+A column's position in the widget might be changed by dragging 
+it's heading left or right.
+
+Tk::MListbox is used in a way similar to the standard Listbox, but in 
+stead of scalar values MListbox operates on lists of data. In addition
+to methods for accessing the data in the MListbox, the widget offer 
+methods for manipulation of the individual columns.
+
+
+=head1 AUTHOR
+
+Hans Jorgen Helgesen, hans_helgesen@hotmail.com (from March 2000: hans.helgesen@novit.no)
+
+=head1 SEE ALSO
+
+L<Tk::Listbox>
+
+=head1 STANDARD OPTIONS
+
+B<-background> B<-foreground> B<-relief> B<-takefocus>
+B<-borderwidth>	B<-heigh> B<-selectbackground>	B<-cursor>
+B<-highlightbackground> B<-selectborderwidth> B<-xscrollcommand>
+B<-exportselection> B<-highlightcolor> B<-selectforeground>
+B<-yscrollcommand> B<-font> B<-highlightthickness> B<-setgrid>
+
+See L<Tk::options> for details of the standard options.
+
+=head1 REQUIREMENTS
+
+Tk::MListbox requires Tk::Pane.
+(and basic Perl/Tk of course....)
+
+=head1 WIDGET SPECIFIC OPTIONS
+
+=over 4
+
+=item -columns => I<list>
+
+Defines the columns in the widget. Each element in the list 
+describes a column. See the B<COLUMNS> section below.
+
+=item -configurecommand => I<callback>
+
+The -configurecommand callback will be called whenever the layout of the
+widget has changed due to user interaction. That is, the user changes the
+width of a column by dragging the separator, or moves a column by dragging
+the column header. 
+
+This option is useful if the application wants to store the widget layout 
+for later retrieval. The widget layout can be obtained by the callback
+by calling the method columnPackInfo().
+
+=item -moveable => I<boolean>
+
+A value of B<1> indicates that it is okay for the user to move
+the columns by dragging the column headers. B<0> disables this
+function.
+
+Default: B<1>
+
+=item -resizeable => I<boolean>
+
+A value of B<1> indicates that it is okay for the user to resize
+the columns by dragging the column separators. B<0> disables 
+this function.
+
+Default: B<1>
+
+Note that you can also specify -resizeable on a column
+by column basis. See the B<COLUMNS> section below.
+
+=item -selectmode => I<string>
+
+Should be "single", "browse", "multiple", or "extended".
+
+Default is "browse". See L<Tk::Listbox>.
+
+=item -separatorcolor => I<string>
+
+Specifies the color of the separator lines 
+(the vertical lines that separates the columns). 
+
+Default: B<black>
+
+Note that you can also specify -separatorcolor on a column
+by column basis. See the B<COLUMNS> section below.
+
+=item -separatorwidth => I<integer>
+
+Specifies the width in pixels of the separator lines 
+(the vertical lines that separates the columns). 
+
+Default: B<1>
+
+Note that you can also specify -separatorwidth on a column
+by column basis. See the B<COLUMNS> section below.
+
+=item -sortable => I<boolean>
+
+A value of B<1> indicates that it is okay for the user to sort
+the data by clicking column headings. B<0> disables this function.
+
+Default: B<1>
+
+Note that you can also specify -sortable on a column
+by column basis. See I<COLUMNS> below.
+
+=head1 COLUMNS
+
+The MListbox widget is a collection of I<MLColumn> widgets. 
+Each MLColumn contains a Listbox, a heading and the separator bar.
+The columns are created and maintained through the -columns 
+option or the column methods of the widget. The columns are indexed
+from 0 and up. Initially, column 0 is the leftmost column of the
+widget. The column indices B<are not changed> when the columns
+are moved or hidden. The only ways to change the column indices 
+are to call columnInsert(), columnDelete() or configure(-column).
+
+Each column has its own set of options which might be passed to 
+MListbox::configure(-columns), MListbox::insert(),
+MListbox::columnConfigure() or MLColumn::configure().
+
+The following code snippets are all equal:
+
+1.  $ml=$mw->MListbox(-columns=>[[-text=>'Heading1',
+                                  -sortable=>0],
+                                 [-text=>'Heading2']]);
+
+2.  $ml=$mw->MListbox;
+    $ml->columnInsert(0,-text=>'Heading1', -sortable=>0);
+    $ml->columnInsert(0,-text=>'Heading2');
+
+3.  $ml=$mw->MListbox;
+    $c=$ml->columnInsert(0,-text=>'Heading1');
+    $ml->columnInsert(0,-text=>'Heading2');
+    $c->configure(-sortable=>0);
+
+4.  $ml=$mw->MListbox;
+    $ml->columnInsert(0,-text=>'Heading1');
+    $ml->columnInsert(0,-text=>'Heading2');
+    $ml->columnConfigure(0,-sortable=>0);
+
+(See the columnConfigure() method below for details on column options).
+
+All column methods expects one or two column indices as arguments.
+The column indices might be an integer (between 0 and the number
+of columns minus one), 'end' for the last column, or a reference
+to the MLColumn widget (obtained by calling MListbox->columnGet() 
+or by storing the return value from MListbox->columnInsert()).
+
+=head1 WIDGET METHODS
+
+=over 4
+
+=item $ml->bindColumns(I<sequence>,I<callback>)
+
+Adds the binding to all column headers in the widget. See the section
+BINDING EVENTS TO MLISTBOX below.
+
+=item $ml->bindRows(I<sequence>,I<callback>)
+
+Adds the binding to all listboxes in the widget. See the section
+BINDING EVENTS TO MLISTBOX below.
+
+=item $ml->bindSeparators(I<sequence>,I<callback>)
+
+Adds the binding to all separators in the widget. See the section
+BINDING EVENTS TO MLISTBOX below.
+
+=back
+
+=head2 COLUMN METHODS
+
+(Methods for accessing and manipulating individual columns
+in the MListbox widget)
+
+=item $ml->columnConfigure(I<index>,I<option>=>I<value>...)
+
+Set option values for a specific column.
+Equal to $ml->columnGet(I<index>)->configure(...).
+
+The following column options are supported:
+
+=over 4
+
+=item
+
+-comparecommand => I<callback>
+
+Specifies a callback to use when sorting the MListbox with this
+column as key. The callback will be called with two scalar arguments,
+each a value from this particular column. The callback should 
+return an integer less than, equal to, or greater than 0, depending
+on how the tow arguments are ordered. If for example the column
+should be sorted by numerical value:
+
+    -comparecommand => sub { $_[0] <=> $_[1]}
+
+The default is to sort the columns alphabetically.
+
+=item
+
+-text => I<string>
+
+Specifies the text to be used in the heading button of the column.
+
+=item
+
+-resizeable => I<boolean>
+
+A value of B<1> indicates that it is okay for the user to resize
+this column by dragging the separator. B<0> disables this function.
+
+Default: B<1>
+
+=item
+
+-separatorcolor => I<string>
+
+Specifies the color of the separator line, default is B<black>.
+
+=item
+
+-separatorwidth => I<integer>
+
+Specifies the width of the separator line in pixels. Default is B<1>.
+
+=item
+
+-sortable => I<boolean>
+
+A value of B<1> indicates that it is okay for the user to sort
+the data by clicking this column's heading. B<0> disables this 
+function.
+
+Default: B<1>
+
+=back
+
+=item $ml->columnDelete(I<first>,I<last>)
+
+If I<last> is omitted, deletes column I<first>. If I<last> is
+specified, deletes all columns from I<first> to I<last>, inclusive.
+
+All previous column indices greater than I<last> (or I<first> if
+I<last> is omitted) are decremented by the number of columns 
+deleted.
+
+=item $ml->columnGet(I<first>,I<last>)
+
+If I<last> is not specified, returns the MLColumn widget specified by I<first>.
+If both I<first> and I<last> are specified, returns an array containing all
+columns from I<first> to I<last>.
+
+=item $ml->columnHide(I<first>,I<last>)
+
+If I<last> is omitted, hides column I<first>. If I<last> is
+specified, hides all columns from I<first> to I<last>, inclusive.
+
+Hiding a column is equal to calling $ml->columnGet(I<index>)->packForget. 
+The column is B<not> deleted, all data are still available, 
+and the column indices remain the same.
+
+See also the columnShow() method below.
+
+=item $ml->columnIndex(I<index>)
+
+Returns an integer index for the column specifed by I<index>.
+
+=item $ml->columnInsert(I<index>,I<option>=>I<value>...)
+
+Creates a new column in the MListbox widget. The column will 
+get the index specified by I<index>. If I<index> is 'end', the
+new column's index will be one more than the previous highest
+column index.
+
+If column I<index> exists, the new column will be placed
+to the B<left> of this column. All previous column indices 
+equal to or greater than I<index> will be incremented by one.
+
+Returns the newly created MLColumn widget.
+
+(See the columnConfigure() method above for details on column options).
+
+=item $ml->columnPack(I<array>)
+
+Repacks all columns in the MListbox widget according to the 
+specification in I<array>. Each element in I<array> is a string
+on the format B<index:width>. I<index> is a column index, I<width> 
+defines the columns width in pixels (may be omitted). The columns 
+are packed left to right in the order specified by by I<array>.
+Columns not specified in I<array> will be hidden.
+
+This method is most useful if used together with the 
+columnPackInfo() method.
+
+=item $ml->columnPackInfo
+
+Returns an array describing the current layout of the MListbox
+widget. Each element of the array is a string on the format
+B<index:width> (see columnPack() above). Only indices of columns that 
+are currently shown (not hidden) will be returned. The first element
+in the returned array represents the leftmost column.
+
+This method may be used in conjunction with columnPack() to save
+and restore the column configuration. 
+
+=item $ml->columnShow(I<index>,I<option>=>I<value>)
+
+Shows a hidden column (see the columnHide() method above). 
+The column to show is specified by I<index>.
+
+By default, the column is pack'ed at the rigthmost end of the
+MListbox widget. This might be overridden by specifying one of
+the following options:
+
+=over 4
+
+=item 
+
+-after => I<index>
+
+Place the column B<after> (to the right of) the column specified
+by I<index>.
+
+=item 
+
+-before => I<index>
+
+Place the column B<before> (to the left of) the column specified
+by I<index>.
+
+=back
+
+=head2 ROW METHODS
+
+(Methods for accessing and manipulating rows of data)
+
+Many of the methods for MListbox take one or more indices as 
+arguments. See L<Tk::Listbox> for a description of row indices.
+
+=item $ml->delete(I<first>,I<last>)
+
+Deletes one or more row elements of the MListbox. I<First> and I<last>
+are indices specifying the first and last elements in the range to 
+delete. If I<last> isn't specified it defaults to I<first>, 
+i.e. a single element is deleted. 
+
+=item $ml->get(I<first>,I<last>)
+
+If I<last> is omitted, returns the content of the MListbox row
+indicated by I<first>. If I<last> is specified, the command returns
+a list whose elements are all of the listbox rows between 
+I<first> and I<last>.
+
+The returned elements are all array references. The referenced
+arrays contains one element for each column of the MListbox.
+
+=item $ml->getRow(I<index>)
+
+In scalar context, returns the value of column 0 in the MListbox
+row specified by I<index>. In list context, returns the content
+of all columns in the row as an array.
+
+This method is provided for convenience, since retrieving a single
+row with the get() method might produce some ugly code.
+
+The following two code snippets are equal:
+
+   1. @row=$ml->getRow(0);
+
+   2. @row=@{($ml->get(0))[0]};
+
+
+=item $ml->sort(I<descending>, I<columnindex>...)
+
+Sorts the content of the MListbox. If I<descending> is a B<true> 
+value, the sort order will be descending. The default is ascending
+sort.
+
+If I<columnindex> is specified, the sort will be done with the 
+specified column as key. You can specify as many I<columnindex>
+arguments as you wish. Sorting is done on the first column, then
+on the second, etc...
+
+The default is to sort the data on all columns of the listbox, 
+with column 0 as the first sort key, column 1 as the second, etc.
+
+=head1 OTHER LISTBOX METHODS
+
+Most other Tk::Listbox methods works for the MListbox widget.
+This includes the methods activate, cget, curselection, index,
+nearest, see, selectionXXX, size, xview, yview.
+
+See L<Tk::Listbox>.
+
+=head1 ADVERTISED SUBWIDGETS
+
+=item pane
+
+All MListbox columns are packed inside a Tk::Pane (this is done
+to enable horizontal scrolling).
+
+=back 
+
+Apart from "pane", the MListbox widget has no subwidgets, 
+except for the variable number of MLColumns, which obviously 
+cannot be advertised. The MLColumn widgets might be obtained 
+by calling the columnGet() or columnInsert() methods.
+
+The MLColumn widget (which represents a single column in the
+MListbox) advertises the following subwidgets:
+
+=over 4
+
+=item listbox
+
+The individual Listbox. Note that this is B<not> the standard
+Tk::Listbox, but a derived version (CListbox). Several of the
+widget's methods will not work as expected.
+
+=item separator
+
+The column separator line. This is a Canvas.
+
+=item heading
+
+The column heading. This is a "HButton" (a Button with an additional
+-pixelwidth option).
+
+=item frame
+
+A Frame which contains the "listbox" and the "heading"
+subwidgets (but not the "separator").
+
+=back
+
+Example: If you want to change the background color of the
+heading of column 4:
+
+    $ml->columnGet(4)->Subwidget("heading")
+        ->configure(-background=>'blue');
+
+=head1 BINDING EVENTS TO MLISTBOX
+
+Calling $ml->bind(...) probably makes little sense, since the call does not
+specify whether the binding should apply to the listbox, the header button 
+or the separator line between each column.
+
+In stead of the ordinary bind, the following methods should be used:
+
+=over 4
+
+=item $ml->bind(I<sequence>,I<callback>)
+
+Synonym for $ml->bindRows(I<sequence>,I<callback>).
+
+=item $ml->bindRows(I<sequence>,I<callback>)
+
+Synonym for $ml->bindSubwidgets('listbox',I<sequence>,I<callback>)
+
+=item $ml->bindColumns(I<sequence>,I<callback>)
+
+Synonym for $ml->bindSubwidgets('heading',I<sequence>,I<callback>)
+
+=item $ml->bindSeparators(I<sequence>,I<callback>)
+
+Synonym for $ml->bindSubwidgets('separator',I<sequence>,I<callback>)
+
+=item $ml->bindSubwidgets(I<subwidget>,I<sequence>,I<callback>)
+
+Adds the binding specified by I<sequence> and I<callback> to all subwidgets
+of the given type (should be 'listbox', 'heading' or 'separator'). 
+
+The binding is stored in the widget, and if you create a new column 
+by calling $ml->columnInsert(), all bindings created by $ml->bindSubwidgets()
+are automatically copied to the new column.
+
+The callback is called with the MListbox widget as first argument, and
+the index of the column where the event occured as the second argument.
+
+NOTE that $ml->bindSubwidgets() does not support all of Tk's callback formats.
+The following are supported:
+
+     \&subname
+     sub { code }
+     [ \&subname, arguments...]
+     [ sub { code }, arguments...]
+
+If I<sequence> is undefined, then the return value is a list whose elements 
+are all the sequences for which there exist bindings for I<subwidget>.
+
+If I<sequence> is specified without I<callback>, then the callback currently 
+bound to sequence is returned, or an empty string is returned if there is no
+binding for sequence.
+
+If I<sequence> is specified, and I<callback> is an empty string, then the
+current binding for sequence is destroyed, leaving sequence unbound. 
+An empty string is returned.
+
+An empty string is returned in all other cases.
+
+=back
+
+=cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

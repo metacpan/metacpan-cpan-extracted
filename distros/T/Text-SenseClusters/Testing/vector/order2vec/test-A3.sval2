@@ -1,0 +1,58 @@
+<corpus lang="english">
+<lexelt item="LEXELT">
+<instance id="line-n.w8_036:2056:">
+<answer instance="line-n.w8_036:2056:" senseid="phone"/>
+<context>
+modems connect computers worldwide communication network 
+</context>
+</instance>
+<instance id="line-n.art} aphb 08800556:">
+<answer instance="line-n.art} aphb 08800556:" senseid="phone"/>
+<context>
+phone service pay charges reliable communication
+</context>
+</instance>
+<instance id="line-n.w9_40:5727:">
+<answer instance="line-n.w9_40:5727:" senseid="text"/>
+<context>
+words page divide paragraphs align
+</context>
+</instance>
+<instance id="line-n.w8_032:6138:">
+<answer instance="line-n.w8_032:6138:" senseid="text"/>
+<context>
+read file quit if blank 
+</context>
+</instance>
+<instance id="line-n.w9_35:11120:">
+<answer instance="line-n.w9_35:11120:" senseid="product"/>
+<context>
+market profit tax economy product
+</context>
+</instance>
+<instance id="line-n.w8_120:14831:">
+<answer instance="line-n.w8_120:14831:" senseid="phone"/>
+<context>
+computers firm develop communication customers
+</context>
+</instance>
+<instance id="line-n.w8_066:17112:">
+<answer instance="line-n.w8_066:17112:" senseid="phone"/>
+<context>
+public phone service charge reliable connect network
+</context>
+</instance>
+<instance id="line-n.w7_092:15481:">
+<answer instance="line-n.w7_092:15481:" senseid="text"/>
+<context>
+print unicode encoded file in big font 
+</context>
+</instance>
+<instance id="line-n.art7} aphb 54100155:">
+<answer instance="line-n.art7} aphb 54100155:" senseid="text"/>
+<context>
+hindi fonts display unicode read blank 
+</context>
+</instance>
+</lexelt>
+</corpus>

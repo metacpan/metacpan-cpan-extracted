@@ -1,0 +1,106 @@
+
+Changes made in Sense-Clusters version 0.55 during version 0.57
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+
+1. removed the following programs from SenseClusters: 
+	Toolkit/cluster/agglom.pl		      --Ted
+	Toolkit/preprocess/plain/shuffle.pl	      --Ted
+	Toolkit/preprocess/plain/token.pl	      --Ted
+	Toolkit/evaluate/prelabel.pl		      --Ted
+	Toolkit/evaluate/tagger.pl		      --Anagha
+
+2. removed all test cases found in /Testing for 1.    --Ted and Anagha
+
+3. Added pod-template.pl to Docs.		      --Amruta
+
+4. Added script format_clusters.pl to 
+   Toolkit/evaluate to format Cluto's 
+   clustering solution file			      --Amruta
+
+   Added following functionality to 
+   Toolkit/evaluate/format_clusters.pl :	      --Anagha
+	
+	1. Displays contexts along with the 
+	instance tags grouped by cluster id
+	2. Displays Senseval2 format input file
+	with cluster id assigned to each instance
+	in the answer tag.
+
+5. Added test cases for format_clusters.pl at	      --Anagha
+   Testing/evaluate/format_clusters/ 
+
+6. Updated discriminate.pl to create 
+   prefix.clusters file that contains 
+   the formatted clusters			      --Amruta
+
+7. Updated Makefile.PL to reflect new and deleted programs. -- Ted
+
+8. Updated discriminate.pl to support a --format option, to
+   allow for adjustment of format when using larger amounts 
+   of data.                                             -- Ted
+
+9. Updated mat2harbo.pl to display message indicating minimum
+   size needed for las2.h parameter LMNTW.  -- Ted
+
+10. Removed status check in discriminate.pl for las2, vcluster,
+    and scluster. Return values don't appear reliable. --Ted
+
+11. Updated discriminate.pl to have format_clusters.pl use
+    --senseval2 option by default. --Ted
+
+12. Removed Toolkit.(dia|pdf|fig) - plan to incorporate info into
+    Flows/flowchart when those are updated. --Ted
+
+13. Removed /Docs/Toolkit from CVS. This is automatically 
+    generated and doesn't need to be a part of CVS. -- Ted
+
+14. Moved Todo.pod to /Docs/Todo.SC.pod, renamed REAMDE.Intro.pod 
+    as README.SC.pod. --Ted
+
+15. Tried to clarify and simplify INSTALL instructions. -- Ted
+
+16. Modified label.pl to use CPAN module Algorithm::Munkres
+    for solving the Assignment problem.	               --Anagha
+
+17. Added a test case for label.pl which checks for 25x25 
+    Sense X Cluster matrix.                            --Anagha
+
+18. Modified Toolkit/evaluate/report.pl to make output 
+    formatting more spacious.                          --Anagha
+
+19. Renamed various README's to README.foldername.pod and 
+    changed few from plain to pod documents.          
+    Added Acknowledgement to all README's             --Anagha
+
+21. Changed README.Toolkit.pod's format               --Anagha
+
+22. Moved create_doc.sh and traverse.sh from Scripts
+    folder to a new folder HTML under Docs folder.
+    Added README.HTML.pod for this folder.              --Anagha
+
+23. Modified create_doc.sh to create .html files for SC's 
+    root level .pl files in Docs/HTML directory and those
+    for Toolkit folder in Toolkit_Docs folder under 
+    Docs/HTML directory                                --Anagha
+    
+24. Renamed GPL and FDL as GPL.txt and FDL.txt         --Anagha
+
+25. Update Makefile.PL to include new and renamed
+    pod files and to reflect change of location for
+    create_doc.sh and traverse.sh                       --Anagha
+
+26. Changed test scripts that check erroneous conditions
+    for mat2harbo.pl. The modified test scripts check for 
+    particular error message in the output file.        --Anagha
+
+27. Changed test-A3f.sh test-A1g.reqd, test-A1h.reqd
+    and test-A2.reqd to handle cross-platform compatibility
+    of test scripts.                                    --Anagha
+
+28. Renamed Changelogs as Changes
+						        --Ted        
+
+(Changelog-v0.55to0.57 Last Updated on 12/11/2004 by Ted)

@@ -1,0 +1,67 @@
+NAME
+    TV::Anytime - Parse TV-AnyTime bundles of TV and Radio listings
+
+SYNOPSIS
+      use TV::Anytime;
+      my $tv = TV::Anytime->new("data/20050701/");
+
+      # Find out what services are available
+      my @services = $tv->services;
+      my @radio_services = $tv->services_radio;
+      my @tv_services = $tv->services_television;
+
+DESCRIPTION
+    The TV::Anytime module parses TV-Anytime bundles. TV-Anytime is a format
+    organised by the TV-Anytime Forum (<http://www.tv-anytime.org/>). These
+    are open standards (see ETSI TS102822) for the rich description of
+    Radio, Television and other types of media. The metadata specification
+    includes a comprehensive genre scheme, methods of linking and grouping
+    programmes, listing credits and lots of other data fields.
+
+    This module is concerned with parsing TV-Anytime files that are shipped
+    by the British Broadcasting Corporation from
+    <http://backstage.bbc.co.uk/feeds/tvradio/doc.html>. It is assumed that
+    you have downloaded a .tar.gz from this site and have unpacked it.
+
+METHODS
+  new()
+    The new() method is the constructor. It takes the directory into which
+    you have unpacked the TV-Anytime files:
+
+      my $tv = TV::Anytime->new("data/20050701/");
+
+  services
+    The services() method returns a list of all the available services as a
+    list of TV::Anytime::Service objects:
+
+      my @services = $tv->services;
+  
+  services_radio
+    The services_radio() method returns a list of the available radio
+    services as a list of TV::Anytime::Service objects:
+
+      my @radio_services = $tv->services_radio;
+
+  services_television
+    The serviices_television() method returns a list of all the available
+    television services as a list of TV::Anytime::Service objects:
+
+      my @tv_services = $tv->services_television;
+
+SEE ALSO
+    TV::Anytime::Service
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-TV-Anytime@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Leon Brocard "acme@astray.com"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2005, Leon Brocard "acme@astray.com". All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

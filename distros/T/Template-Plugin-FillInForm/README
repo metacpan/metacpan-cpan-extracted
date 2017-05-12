@@ -1,0 +1,37 @@
+NAME
+    Template::Plugin::FillInForm - TT plugin for HTML::FillInForm
+
+SYNOPSIS
+      use Template;
+      use Apache;
+      use Apache::Request;
+
+      my $apr      = Apache::Request->new(Apache->request); # or CGI.pm will do
+      my $template = Template->new( ... );
+      $template->process($filename, { apr => $apr });
+
+      # in your template
+      [% USE FillInForm %]
+      [% FILTER fillinform fobject => apr %]
+      <!-- this form becomes sticky -->
+      <form action="foo" method="POST">
+      <input type="text" name="foo">
+      <input type="hidden" name="bar">
+      <input type="radio" name="baz" value="foo">
+      <input type="radio" name="baz" value="bar">
+      </form>
+      [% END %]
+
+DESCRIPTION
+    Template::Plugin::FillInForm is a plugin for TT, which allows you to
+    make your HTML form sticky using HTML::FillInForm.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Template manpage, the HTML::FillInForm manpage
+

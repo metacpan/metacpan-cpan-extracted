@@ -1,0 +1,15 @@
+---
+abstract: "Create a scalar that always returns the number \nof non-leap seconds since whatever time the system considers to be the epoch."
+author:
+  - 'Victor Houston <vichou@cpan.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Scalar-Epoch
+version: 0.003

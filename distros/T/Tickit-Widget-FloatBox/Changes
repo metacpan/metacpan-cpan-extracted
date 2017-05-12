@@ -1,0 +1,18 @@
+Revision history for Tickit-Widget-FloatBox
+
+0.03    2015/04/08 16:30:39
+        [CHANGES]
+         * Added $float->is_visible
+         * Set WIDGET_PEN_FROM_STYLE to quiet Tickit 0.51 deprecation warning
+
+0.02    2014/08/05 19:57:59
+        [CHANGES]
+         * Allow floats to be made hidden
+
+        [BUGFIXES]
+         * Use the ContainerWidget ->add/->remove API properly, ensuring the
+           ->parent is properly set on child widgets
+
+0.01    2014/08/04 23:57:31
+        First version, released on an unsuspecting world.
+

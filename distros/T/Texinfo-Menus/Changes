@@ -1,0 +1,17 @@
+Revision history for Texinfo::Menus
+
+1.03   2013-09-28
+	- use 'our' instead of 'use vars'
+
+1.02   2010-12-07
+	- Handle @documentencoding (so menus line up properly in UTF-8)
+	- Require Perl 5.8.0
+
+1.01   2007-06-09
+	- added Pod coverage test
+	- updated my email address
+	- cleaned up documentation & build process
+	- no functional changes
+
+1.00   2007-02-03
+	- Initial public release

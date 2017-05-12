@@ -1,0 +1,377 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<div class="width2"><div class="primary_header">Release Notes</div></div>
+
+<div class="width10 last">
+
+  <!-- -------------------------------------------------------------------------------- -->
+  
+  <div class="section_header"><a name="1.37"></a>1.37 Wed Mar 23 2010</div>
+
+  <div class="width4">
+      <p class="front_news">
+        There are two main enhancements in this release.  The first is
+        that now you can configure TaskForest to <a href="/docs/configuring/retry.html">automatically retry</a>
+        running a job if it fails.  The number of times it retries, as
+        well as the amount of time between retries is configurable on a
+        per-job basis.
+      </p>
+      <p class="front_news">
+        TaskForest now also features a very powerful email system.  You
+        can configure TaskForest to <a href="/docs/configuring/email.html">email you when a job fails</a>, when a job
+        is retried, and when a job suceeds after failing and being
+        retried.  Each kind of email can be sent to a different email
+        address, and these email addresses can be configured system-wide,
+        or for each job, or for anything in the middle.
+      </p>
+      <p>
+        If you have developed your own run wrapper, please be advised that
+        the interface to the run wrappers has changed.  Instead of being
+        passed parameters as command line arguments, the wrappers now look
+        for environment variables.  
+      </p>
+  </div>
+  <div class="width6 last">
+
+  </div>
+  <div class="clear_both"></div>
+
+  <!-- -------------------------------------------------------------------------------- -->
+  
+  <div class="new_section_header"><a name="1.36"></a>1.36 Tue Feb 23 2010</div>
+
+  <div class="width4">
+      <p class="front_news">
+        We've added a button to the logs form on the website that pops up
+        a calendar window to help you select a date.  Many thanks to Steve Hulet
+        for providing the patch.
+      </p>
+      <p class="front_news">
+        The logs display page on the website now has links to navigate to the
+        previous and next days.  Many thanks to Steve Hulet for providing the
+        patch.
+      </p>
+      <p>
+        This version fixes a few more test cases that wouldn't run properly
+        during certain times of the day.
+      </p>
+  </div>
+  <div class="width6 last">
+        <img alt="screenshot" width="464" height="364" src="/images/calendar.gif">
+  </div>
+  <div class="clear_both"></div>
+
+  <!-- -------------------------------------------------------------------------------- -->
+  
+  <div class="new_section_header"><a name="1.35"></a>1.35 Thu Feb 11 2010</div>
+
+  <div class="width4">
+      <p class="front_news">
+        Starting in this release, you can now place a Waiting
+        job <a href="/docs/hold.html">on hold</a>. If a job is placed on
+        hold, it will not run during the current day even if all its
+        dependencies are met.  The only way to make it run as normal is if
+        you first release the hold off the job.
+      </p>
+      <p class="front_news">
+        The taskforestd web server now supports
+        the <a href="/docs/configuring/options.html#default_time_zone">default_time_zone</a>
+        option.  This new configuration option will control how times are
+        displayed in the 'logs' page, when the time zone in which the job
+        ran is not known.
+      </p>
+      <p>
+        This version now gracefully handles the case where a job is marked
+        for rerun and then removed from the Family file before it has the
+        chance to rerun.
+      </p>
+      <p>
+        If a job fails, its status line on the web page is now colored.
+      </p>
+      <p>
+        The web site now prunes out carriage returns from job files. This would cause
+        interpreted scripts to fail because the '#!' line contained a \r.
+      </p>
+      <p>
+        This version fixes a few test cases that wouldn't run properly
+        during certain times of the day.
+      </p>
+  </div>
+  <div class="width6 last">
+  </div>
+  <div class="clear_both"></div>
+
+  <!-- -------------------------------------------------------------------------------- -->
+  
+  <div class="new_section_header"><a name="1.33"></a>1.33 Mon Jun 1 2009</div>
+
+  <div class="width4">
+    <p class="front_news">
+      You can now have a job in one Family depend on the completion of a job in
+      another Family.  This allows you to have one Family depend on
+      another.
+    </p>
+    <p class="front_news">
+      For example, job
+      J2 in Family F2 can wait on Job J1 in Family F1 by specifying the
+      dependency like this:
+    </p>
+
+  <div class="code"><pre><code><span class=comments># This is in the F2 Family file</span>
+ J1::F1()
+
+   J2()
+ </code></pre></div>
+  
+    <p class="front_news">
+      For more information, check out
+      the <a href="/docs/configuring/families.html">jobs and families
+      configuration documentation</a>.
+    </p>
+  </div>
+  <div class="width6 last">
+  </div>
+  <div class="clear_both"></div>
+
+  <!-- -------------------------------------------------------------------------------- -->
+  
+
+  <div class="new_section_header"><a name="1.26"></a>1.26 Mon May 19 2009</div>
+
+  <div class="width4">
+    <p class="front_news">
+      There was an unnecessary call to 'use Date::Calc' in Calendar.pm.  I
+      didn't notice it, because I have it installed. It is not being used. It
+      may cause tests to fail.  I have removed the line.
+    </p>
+  </div>
+  <div class="width6 last">
+  </div>
+  <div class="clear_both"></div>
+
+  <!-- -------------------------------------------------------------------------------- -->
+  
+
+  <div class="new_section_header"><a name="1.25"></a>1.25 Mon May 18 2009</div>
+
+  <div class="width4">
+    <p class="front_news">
+        TaskForest now
+        supports <a href="/docs/configuring/calendars.html">calendars</a>.
+        A calendar is a set of rules that defines on what days a job may
+        run.  Each rule can may or may not conclusively determine whether
+        or not a Family should run today.  The rules are evaluated in the
+        order in which they are specified.  The last rule that
+        conclusively determines whether of not a Family should run wins,
+        in the case of conflicting rules.  If none of the rules is
+        conclusive, then the Family will not run today.  You can set rules
+        to specify certain dates or ranges of dates, or specific days,
+        like "third friday of every month."
+    </p>
+    <p>
+        For more information, check out
+        the <a href="/docs/configuring/calendars.html">calendars
+        documentation</a>.
+    </p>
+    <p>
+      We've also added a new <a href="/docs/faq.html">FAQ page</a>.
+    </p>
+  </div>
+  <div class="width6 last">
+      <object type="application/x-shockwave-flash" data="/movies/TaskForest_New_1_25.swf" width="480" height="342" id="movie2">
+      
+      <param name="movie" value="/movies/TaskForest_New_1_25.swf">
+      <p>You need the Flash plugin.</p>
+      <p><a href="http://www.macromedia.com/go/getflashplayer/">Download Macromedia Flash Player</a></p>
+    </object>
+  </div>
+  <div class="clear_both"></div>
+
+  <!-- -------------------------------------------------------------------------------- -->
+
+  
+
+  
+  <div class="new_section_header"><a name="1.24"></a>1.24 Sun Apr 26 2009</div>
+
+  <div class="width4">
+    <p class="front_news">
+      This release introduces the concept of tokens.  A token is a new
+      kind of dependency.  If a job depends on a token, it must acquire
+      a free token before it can run, or wait for another job to release
+      a token after completion.  Since there is a finite set of tokens,
+      you can use tokens to prevent too many jobs from running at the
+      same time.
+    </p>
+    <p>
+      For example, if there are 20 jobs that rely on token T, but only 5
+      instances of the token, only a maximum of 5 of those jobs may run
+      at the same time.
+    </p>
+    <p>
+      This release also formalizes the way Families with foreign time
+      zones are handled.  This allows you to 'time shift' your family,
+      essentially allowing your family to run for 24 hours in a later
+      timezone.  This shifts the end of day towads the end of the
+      family's running time.
+    </p>
+  </div>
+  <div class="width6 last">
+    <object type="application/x-shockwave-flash" data="/movies/TaskForest_New_1_24.swf" width="480" height="246" id="movie2">
+      
+      <param name="movie" value="/movies/TaskForest_New_1_24.swf">
+      <p>You need the Flash plugin.</p>
+      <p><a href="http://www.macromedia.com/go/getflashplayer/">Download Macromedia Flash Player</a></p>
+    </object>
+  </div>
+  <div class="clear_both"></div>
+
+  <!-- -------------------------------------------------------------------------------- -->
+
+
+  <div class="new_section_header"><a name="1.23"></a>1.23 Thu Mar 24 2009</div>
+
+  <div class="width4">
+    <p class="front_news">
+      This release fixes a nasty bug where Family files were not being
+      parsed properly if the files were in DOS format (with CRLF endings,
+      instead of just LF).  Unfortunately, most web browsers save textarea
+      text with CRLF, so a Family file that was originally in Unix format
+      (LF) could wind up being in DOS (CRLF) format if you edited it via
+      the website.
+    </p>
+  </div>
+  <div class="width6 last">
+  </div>
+  <div class="clear_both"></div>
+
+
+  <!-- -------------------------------------------------------------------------------- -->
+  <div class="new_section_header"><a name="1.22"></a>1.22 Mon Mar 23 2009</div>
+
+  <div class="width4">
+    <div class="section_header">New Features in Version 1.22</div>
+    <p class="front_news">
+      New in this version is the ability to release all dependencies from
+      a job.  This makes the job available to run immediately, regardless
+      of how many jobs it is supposed to wait for, or what time dependency
+      it has.  Releasing a job effectively changes its status from
+      'Waiting' to 'Ready.'  This option is only available to jobs that
+      are currently in the 'Waiting' state.
+    </p>
+  </div>
+  <div class="width6 last">
+    <object type="application/x-shockwave-flash" data="/movies/TaskForest_New_1_22.swf" width="482" height="370" id="movie2">
+      
+      <param name="movie" value="/movies/TaskForest_New_1_22.swf">
+      <p>You need the Flash plugin.</p>
+      <p><a href="http://www.macromedia.com/go/getflashplayer/">Download Macromedia Flash Player</a></p>
+    </object>
+  </div>
+  <div class="clear_both"></div>
+
+<!-- -------------------------------------------------------------------------------- -->
+  
+  <div class="new_section_header"><a name="1.21"></a>1.21 Thu Mar 12 2009</div>
+
+  <div class="width4">
+    <p class="front_news">
+      Fixed a bug in rerun and mark, when used with --cascade or --dependents_only. 
+    </p>
+    <p class="front_news">
+      For details, please see the <a href="/changes.html">Change log.</a>
+    </p>
+  </div>
+  <div class="width6 last">
+  </div>
+  <div class="clear_both"></div>
+
+
+  <!-- -------------------------------------------------------------------------------- -->
+  
+
+  <div class="new_section_header"><a name="1.20"></a>1.20 Tue Mar 10 2009</div>
+
+  <div class="width4">
+    <p class="front_news">
+      Minor bug fixes and documentation changes
+    </p>
+    <p class="front_news">
+      For a full list of changes, please see the <a href="/changes.html">Change log.</a>
+    </p>
+  </div>
+  <div class="width6 last">
+  </div>
+  <div class="clear_both"></div>
+
+  
+  <!-- -------------------------------------------------------------------------------- -->
+
+  
+  
+  <div class="new_section_header"><a name="1.19"></a><a name="1.18"></a>1.18 Fri Mar 06 2009</div>
+  <div class="section_header">1.19 Sat Mar 07 2009</div>
+
+  <div class="width4">
+    <div class="section_header">New Features in Versions 1.18 &amp; 1.19</div>
+    <p class="front_news">
+      All of the changes in these releases are related to the website.
+      The layout has been changed so that wide tables are more easily
+      displayed.  Online documentation has been added.  Jobs can now be
+      rerun and marked directly from the status and log directories.
+    </p>
+    <p class="front_news">
+      The 'Cache-Control: Public' HTTP response header was added to allow Firefox 3 to
+      cache SSL pages which it does not do by default. This greatly improves
+      website performance if you're using Firefox 3.  Firefox 2 does not
+      support the Cache-Control response header, so the website will be slower
+      if you're using SSL and Firefox 2 or earlier.
+    </p>
+    <p class="front_news">
+      For a full list of changes, please see the <a href="/changes.html">Change log.</a>
+    </p>
+  </div>
+  <div class="width6 last">
+    <img width="482" height="243" alt="Screenshot of Status Page showing new layout" title="Screenshot of Status Page showing new layout" src="/images/v1.18.gif">
+  </div>
+  <div class="clear_both"></div>
+
+
+
+  <div class="new_section_header"><a name="1.17"></a>1.17 Sat Mar 05 2009</div>
+
+  <div class="width4">
+    <p class=front_news>
+      The major change in this release is the addition of an alternative run
+      wrapper script called run_with_log.  It performs the same functions as
+      the original wrapper, and also creates a log file that captures both
+      STDOUT and STDERR of the job being run.
+    </p>
+    <p class="front_news">
+      On the website you can now display the log file of any running or
+      completed job, by clicking on the displayed status of the job.
+      The RESTful web service also supports this.  A couple of entries
+      have also been added to the HOWTO section of the documentation.
+    </p>
+    
+    <p class="front_news">
+      To see an example of this, click the 'Play' button on the video to
+      the right. (Flash support required)
+    </p>
+    <p class="front_news">
+      You can download the latest release <a href="/download.html">here</a>.
+    </p>
+  </div>
+  <div class="width6 last">
+    <object type="application/x-shockwave-flash" data="/movies/TaskForest_New_1_17.swf" width="482" height="380" id="movie1">
+      
+      <param name="movie" value="/movies/TaskForest_New_1_17.swf">
+      <p>You need the Flash plugin.</p>
+      <p><a href="http://www.macromedia.com/go/getflashplayer/">Download Macromedia Flash Player</a></p>
+    </object>
+    <!--embed src="/movies/TaskForest_New_1_17.swf" HEIGHT="380" WIDTH="482" -->
+  </div>
+  <div class="clear_both"></div>
+</div>
+
+<include TaskForest::REST::PassThrough /foot.html />

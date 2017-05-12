@@ -1,0 +1,22 @@
+---
+name: Template-Plugin-ByDate
+version: 0.04
+author:
+  - 'Darin McBride <dmcbride@cpan.org>'
+abstract: Keeps/removes included text based on whether the current date is within range.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Date::Parse: 2.27
+  List::MoreUtils: 0.19
+  Template::Plugin: 0
+  Test::More: 0
+provides:
+  Template::Plugin::ByDate:
+    file: lib/Template/Plugin/ByDate.pm
+    version: 0.04
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

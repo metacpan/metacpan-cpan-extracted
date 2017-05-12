@@ -1,0 +1,19 @@
+---
+name: Tie-Log4perl
+version: 0.1
+author:
+  - 'Paul Driver E<lt>frodwith@cpan.orgE<gt>'
+abstract: Tie a filehandle to log via Log4perl
+license: perl
+resources:
+  license: ~
+requires:
+  Log::Log4perl: 0
+provides:
+  Tie::Log4perl:
+    file: lib/Tie/Log4perl.pm
+    version: 0.1
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Test;
+use Tk;
+use Tk::Playlist;
+
+my $mw = MainWindow->new(-title => "Playlist Test");
+my $f1 = $mw->Frame;
+my $pl = $f1->Playlist();
+my $sb = $f1->Scrollbar(-command => [ yview => $pl ]);
+
+$pl->configure( -yscrollcommand => [ set => $sb ] );
+$pl->pack(-fill => 'both', -expand => 1, -side => 'left');
+$sb->pack(-fill => 'y', -side => 'right');
+$f1->pack(-fill => 'both', -expand => 1);
+$pl->callback_change([ \&callback_change ]);
+
+my(@fg) = ('#0000FF', '#FF0000', '#00FF00');
+my(@bg) = ('#000000', '#FFFFFF');
+
+foreach my $item (1 .. 100) {
+	my($fg, $bg) = (shift(@fg), shift(@bg));
+	my $st = $mw->ItemStyle('text',
+	    -foreground => $fg, -activeforeground => $fg, -selectforeground => $fg,
+		-background => $bg
+	);
+	
+	push(@fg, $fg);
+	push(@bg, $bg);
+	
+	$pl->add($item, -text => "Item #$item", -style => $st);
+}
+
+MainLoop();
+
+sub callback_change {
+	warn "callback_change called with @_";
+}

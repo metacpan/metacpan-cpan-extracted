@@ -1,0 +1,83 @@
+NAME
+
+    TeX::Encode - Encode/decode Perl utf-8 strings into TeX
+
+SYNOPSIS
+
+      use TeX::Encode;
+      use Encode;
+    
+      $tex = encode('latex', "This will encode an e-acute (".chr(0xe9).") as \'e");
+      $str = decode('latex', $tex); # Will decode the \'e too!
+
+DESCRIPTION
+
+    This module provides encoding to LaTeX escapes from utf8 using mapping
+    tables in Pod::LaTeX and HTML::Entities. This covers only a subset of
+    the Unicode character table (undef warnings will occur for non-mapped
+    chars). This module is intentionally vague about what it will handle,
+    see Caveats below.
+
+    Mileage will vary when decoding (converting TeX to utf8), as TeX is in
+    essence a programming language, and this module does not implement TeX.
+
+    I use this module to encode author names in BibTeX and to do a rough
+    job at presenting LaTeX abstracts in HTML. Using decode rather than
+    seeing $\sqrt{\Omega^2\zeta_n}$ you get something that looks like the
+    formula.
+
+    The next logical step for this module is to integrate some level of TeX
+    grammar to improve the decoding, in particular to handle fractions and
+    font changes (which should probably be dropped).
+
+METHODS
+
+    TeX::Encode::encode STRING [, CHECK]
+
+      Encodes a utf8 string into TeX. CHECK isn't implemented.
+
+    TeX::Encode::decode STRING [, CHECK]
+
+      Decodes a TeX string into utf8. CHECK isn't implemented.
+
+    TeX::Encode::perlio_ok
+
+      Returns 0. PerlIO isn't implemented.
+
+CAVEATS
+
+    Proper Encode checking is not implemented.
+
+    LaTeX comments (% ...) are ignored because chopping a lot of text may
+    not be what you actually want.
+
+ encode()
+
+    Converts non-ASCII Unicode characters to their equivalent TeX symbols
+    (unTeXable characters will result in undef warnings).
+
+ decode()
+
+    Attempts to convert TeX symbols (e.g. \ae) to Unicode characters. As an
+    experimental feature this also handles Math-mode TeX by inserting HTML
+    into the resulting string (so you end up with an HTML approximation of
+    the maths - NOT MathML).
+
+SEE ALSO
+
+    Encode::Encoding, Pod::LaTeX, Encode
+
+AUTHOR
+
+      * Timothy D Brody, <tdb01r@ecs.soton.ac.uk>
+
+      * Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2005-2007 by Timothy D Brody
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

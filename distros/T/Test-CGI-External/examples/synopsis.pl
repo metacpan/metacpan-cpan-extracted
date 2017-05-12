@@ -1,0 +1,26 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use Test::More;
+use Test::CGI::External;
+my $tester = Test::CGI::External->new ();
+$tester->set_cgi_executable ("$Bin/x.cgi");
+my %options;
+note ("Automatically tests");
+$tester->run (\%options);
+note ("Test with a query");
+$options{REQUEST_METHOD} = 'GET';
+$options{QUERY_STRING} = 'text="alcohol"';
+$tester->run (\%options);
+note ("Test compression of output");
+$tester->do_compression_test (1);
+note ("Test that you're getting the right kind of character output.");
+$tester->expect_charset ('UTF-8');
+note ("Test the mime type");
+$tester->expect_mime_type ('text/html');
+$tester->run (\%options);
+note ("Run your own tests on the results");
+like ($options{body}, qr/私/, "IT'S ALRIGHT!");
+done_testing ();

@@ -1,0 +1,70 @@
+Term-Emit version 0.0.4
+
+The Term::Emit package is used to print balanced and nested messages
+with a completion status.  These messages indent within eachother,
+autocomplete on scope exit, are easily parsed, may be bulleted,
+can be filtered, and even can show status in color.
+
+This behaviour works across process boundaries.  For example,
+if you have two scripts, one that calls the other (via qx(),
+system(), etc.), the script's output will appear seamless as
+the inner's messages will match the style and indentation
+of the outer.
+
+For example, you write code like this:
+
+    use Term::Emit qw/:all/;
+    emit "Reconfiguring the grappolator";
+    do_whatchamacallit();
+    do_something_else();
+
+It begins by printing:
+
+    Reconfiguring the grappolator...
+
+Then it does "whatchamacallit" and "something else".  When these are complete
+it adds the rest of the line: a bunch of dots and the [DONE].
+
+    Reconfiguring the grappolator...................................... [DONE]
+
+The do_whatchamacallit() and do_something_else() subroutines may also 'emit'
+what they're doing, and indicate success or failure or whatever, so you
+can get nice output like this:
+
+    Reconfiguring the grappolator...
+      Processing whatchamacallit....................................... [WARN]
+      Fibulating something else...
+        Fibulation phase one........................................... [OK]
+        Fibulation phase two........................................... [ERROR]
+        Wrapup of fibulation........................................... [OK]
+    Reconfiguring the grappolator...................................... [DONE]
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+This pure-Perl module depends upon Scope::Upper 0.06.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Steve Roscio
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

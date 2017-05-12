@@ -1,0 +1,84 @@
+README for the Perl Module Time::Avail
+
+Copyright (c) 1998 Peter Santoro.  All rights reserved.  This program is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself; however, you must leave this copyright statement intact.
+
+-----------------
+Document Contents
+-----------------
+
+  - Document Contents
+  - Overview
+  - Getting the Distribution
+  - Installation of the Module
+  - Using the Module
+  - Contacting the Author
+  - Removing the Module
+
+--------
+Overview
+--------
+
+Avail.pm is a Perl module that contains code to calculate the time remaining
+within a given time interval.  The only exported function is timeAvailable.
+
+timeAvailable() compares the current day and time with the specified time
+interval and returns the number of minutes remaining or 0 if no time remains.
+The time interval used by timeAvailable() is passed in as three parameters: starting time, ending time, and a day mask.
+
+------------------------
+Getting the Distribution
+------------------------
+
+This distribution can be retrieved at
+<URL=http://www.connix.com/~psantoro/> or from CPAN at
+<URL=http://www.perl.com/CPAN/modules/by-module/Time/>.
+
+--------------------------
+Installation of the Module
+--------------------------
+
+Make sure the user executing this has sufficient permissions to add and
+modify files in the global perl installation.  The user should use this
+sequence to install this module.
+
+  perl Makefile.PL
+  make
+  make install
+  make realclean
+
+----------------
+Using the Module
+----------------
+
+The module is simple to use.  It is fully documented with pod
+documentation.  To read it, execute
+
+  perldoc Time::Avail
+
+after the module is installed.
+
+An HTML version of the pod documentation is included in the distribution.
+It was created with pod2html, which comes with Perl.
+
+---------------------
+Contacting the Author
+---------------------
+
+I welcome any feedback on this module.  If you have comments, questions,
+bug reports, or ideas, feel free to send them to me, Peter Santoro,
+peter@pscomp.com.
+
+-------------------
+Removing the Module
+-------------------
+
+Under a user with sufficient permissions and from the Avail distribution 
+directory, execute
+
+  perl Makefile.PL
+
+if there isn't a file called Makefile.  Then execute
+
+  make uninstall

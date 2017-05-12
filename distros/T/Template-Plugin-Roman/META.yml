@@ -1,0 +1,25 @@
+---
+abstract: 'Filter for converting Arabic numerals to Roman'
+author:
+  - 'Jon Sime <jonsime@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Roman
+provides:
+  Template::Plugin::Roman:
+    file: lib/Template/Plugin/Roman.pm
+    version: 1.0
+requires:
+  Math::Roman: 1.07
+  Template: 2.07
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.0

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Tool Bench is a generic framework for running benchmarks.",
+   "author" : [
+      "Ben Hengst <notbenh@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tool-Bench",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.53",
+            "List::Util" : "1.25",
+            "Mouse" : "1.02",
+            "Time::HiRes" : "1.9725"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Most" : "0.25"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.003"
+}
+

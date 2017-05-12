@@ -1,0 +1,22 @@
+--- ./x_exec/gplt_x11.c-pre	Tue Sep 17 15:41:06 2002
++++ ./x_exec/gplt_x11.c	Thu Oct 10 23:49:56 2002
+@@ -1488,7 +1488,6 @@ DrawRotated(Display *dpy, Drawable d, GC
+ {
+     int x, y;
+     double src_x, src_y;
+-    double dest_x, dest_y;
+     int width = XTextWidth(font, str, len);
+     int height = vchar;
+     double src_cen_x = (double)width * 0.5;
+@@ -1550,8 +1549,9 @@ DrawRotated(Display *dpy, Drawable d, GC
+     for (y = 0, src_y = -src_cen_y; y < height; y++, src_y++) {
+ 	for (x = 0, src_x = -src_cen_x; x < width; x++, src_x++) {
+ 	    /* TODO: move some operations outside the inner loop (joze) */
+-	    dest_x = (int)rint(RotateX(src_x, src_y));
+-	    dest_y = (int)rint(RotateY(src_x, src_y));
++	    int dest_x = rint(RotateX(src_x, src_y));
++	    int dest_y = rint(RotateY(src_x, src_y));
++
+ 	    if (dest_x >= 0 && dest_x < dest_width && dest_y >= 0 && dest_y < dest_height)
+ 		XPutPixel(image_dest, dest_x, dest_y, XGetPixel(image_src, x, y));
+ 	}

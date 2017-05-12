@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Tk-TextVi
+version:             0.015
+abstract:            Tk::Text widget with Vi-like commands
+license:             perl
+author:              
+    - Joseph Strom <j-strom@verizon.net>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    Test::More:                    0
+    Tk:                            804.027
+    Tk::TextUndo:                  4.013
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

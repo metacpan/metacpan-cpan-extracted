@@ -1,0 +1,489 @@
+=head1 NAME
+
+FAQ - Test::Smoke frequently asked questions
+
+=head1 DESCRIPTION
+
+=head2 What is Test::Smoke?
+
+B<Test::Smoke> is the symbolic name for a set of scripts and modules that
+try to run the perl core tests on as many configurations as possible and
+combine the results into an easy to read report.
+
+The basic cycle looks like:
+
+    fetch_sourcetree
+    foreach $config ( @configurations ) {
+        make distclean
+        ./Configure $config
+        make
+        make test (and log failures)
+    }
+    create_report()
+    mail_report()
+
+=head2 Why is Test::Smoke?
+
+The reports from B<Test::Smoke> give a good picture of the current state
+of Perl development. We try to get as many of the supported platforms
+as possible.
+
+=head2 Where is Test::Smoke?
+
+On CPAN and L<http://search.cpan.org/dist/Test-Smoke>
+
+=head2 What are these configuration files about?
+
+B<Test::Smoke> uses two types of configuration files:
+
+=over 4
+
+=item B<smoke-configuration-file>
+
+This is a file that uses a B<_config> suffix and contains settings for
+the F<smokeperl.pl> program and is created by F<configsmoke.pl>.
+
+This is basically a Data::Dumper::Dump() of a hash.
+
+=item B<build-configurations-file>
+
+This file contains the information needed to assemble the list of
+perl configurations that will be used to build and test perl.
+
+The file is devided into sections separated by a line that starts with
+an equals-sign (B<=>). Each line in a section is combined with all
+lines from all the other sections. The default build-configurations
+file F<perlcurrent.cfg> constist of four (4) sections:
+
+=over 4
+
+=item B<section 1> one (1) (blank) line
+
+=item B<section 2> two (2) lines
+
+=item B<section 3> seven (7) lines
+
+=item B<section 4> two (2) lines (and a policy indicator line)
+
+=back
+
+This file wil yield 1 * 2 * 7 * 2 = 28 configurations. B<Test::Smoke>
+will build perl in all of these 28 configurations and run the core
+test suite one (1), two (2) or three (3) times for each of those
+perls:
+
+=over 4
+
+=item * with C<< $ENV{PERLIO}=stdio >> (allways)
+
+=item * with C<< $ENV{PERLIO}=perlio >> (unless -Uuseperlio)
+
+=item * with C<< $ENV{PERL_UNICODE}="", $ENV{LC_ALL}=xx_YY.utf8 >> (if
+specified and !-Uuseperlio) 
+
+=back
+
+If a section consists of only one single line, like I<section 1> in
+the example, the options on this line are used in B<every>
+configuration. This can be useful to set an alternate compiler
+(-Dcc=gcc) or to disable features that would fail anyway
+(-Uusefaststdio). [Thank you Merijn for contributing that insight!]
+
+=back
+
+=head2 How do I create different smoke-configurations?
+
+By specifying a diffent prefix to F<configsmoke.pl>:
+
+    $ perl configsmoke.pl -p mysmoke
+
+This will create the smokeconfiguration F<mysmoke_config> and a small
+shellscript F<mysmoke.sh> (or F<mysmoke.cmd> if you are on Windows).
+
+There are three (3) special prefixes: B<smoke55x>, B<smoke562> and
+B<smoke58x>. These will set the default answers for F<configsmoke.pl>
+to be appropriate for smoking the maintenance branches for these
+versions of perl.
+
+=head2 How do I include I<copy-on-write> testing in my smokes?
+
+TIMTOWTDO :-)
+
+Most of this works for flags that need to be added to C<ccflags> in
+general.
+
+=over 4
+
+=item B<-Accflags='-DPERLL_COPY_ON_WRITE'>
+
+The fastest way to do it, is to add a new section to your
+buildconfiguration file, like this:
+
+    =
+    # Add a new two line section for -DPERL_COPY_ON_WRITE
+
+    -Accflags='-DPERL_COPY_ON_WRITE'
+    =
+
+That will always work, but IMO looks a bit "loud" in the reports.
+
+B<NOTE>: This is the only way to smoke COW on MSWin32!
+
+=item B<< Default F<Policy.sh> >>
+
+Since maintenence version 1.18.10, the default F<Policy.sh> is
+generated from the policy-target sections in the buildconfigurations
+file. It is now possible to just add this three line section to your
+buildconfiguration file:
+
+    =
+    /-DPERL_COPY_ON_WRITE/
+
+    -DPERL_COPY_ON_WRITE
+    =
+
+=item B<< Your own F<Policy.sh> >>
+
+Some people use the posibility to handle site specific build
+environments from F<< <builddir>/../Policy.sh >>. This excludes the
+use of the default F<Policy.sh>. You will need to add the
+B<-DPERL_COPY_ON_WRITE> flag to the C<ccflags=''> line in your
+F<Policy.sh>. After that you must add the policy-target section, as
+above, to your buildconfiguration file.
+
+=back
+
+=head2 What are all the scripts in the smoke suite for?
+
+=over 4
+
+=item B<smokeperl.pl>
+
+This is a wrapper script that goes through all the steps in the smoke
+process.
+
+=item B<synctree.pl>
+
+Small wrapper around B<Test::Smoke::Syncer> that can use the settings
+from the smoke-configuration file. It will bring the source-tree in
+sync.
+
+=item B<patchtree.pl>
+
+Small wrapper around B<Test::Smoke::Patcher> that can use the settings
+from the smoke-configuration file. It will apply the patches that are
+specified in the patches-to-be-applied file.
+
+=item B<runsmoke.pl>
+
+Small wrapper around B<Test::Smoke::run_smoke()> that can use the
+settings from the smoke-configuration file. It runs the smoke cycle
+for all configurations and is a replacement for the now removed
+B<mktest.pl>.
+
+=item B<mailrpt.pl>
+
+Small wrapper around B<Test::Smoke::Mailer> that can use the settings
+from the smoke-configuration file. It will check if the report is
+already generated and do so if not. This is the replacement for the
+now removed B<mkovz.pl>.
+
+=item B<archiverpt.pl>
+
+This script copies the report and the logfile to a configurable place.
+
+=item B<smokestatus.pl>
+
+This script prints a little status report for a smoke confifuration:
+
+    $ ./smokestatus.pl -c smoke58x
+    Checking status for configuration 'smoke58x' (5.8.x)
+      Change number 21537 started on Sun Oct 26 06:30:39 2003.
+        4 out of 10 configurations finished in 3 hours 6 minutes.
+        1 configuration showed failures (F).
+        0 failures in the running configuration.
+        6 configurations to finish, estimated completion in 4 hours 40 minutes
+        Average smoke duration: 46 minutes 42 seconds.
+
+=item B<W32Configure.bat>
+
+Small wrapper around B<Test::Smoke::Util::Configure_win32()> that can
+use some of the settings from the smoke-configuration file.
+
+This helps users on Windows to create the F<<
+<builddir>/win32/smoke.mk >> makefile for a specific configuration in
+a unixy way.
+
+=back
+
+=head2 How can I skip a step in smokeperl.pl?
+
+F<smokeperl.pl> takes arguments to skip some of the steps it takes:
+
+=over 4
+
+=item B<--nofetch> Do not sync the source-tree before smoking
+
+=item B<--nopatch> Do not patch the source-tree (if applicable)
+
+=item B<--nomail> Do not send the report out by mail
+
+=item B<--noarchive> Do not archive the report and logfile
+
+=back
+
+F<smokeperl.pl> will always do the equivalent of F<runsmoke.pl> and
+generate the report.
+
+After running F<configsmoke.pl> you should have a small
+wrapper-script, that sets up the environment and calls
+F<smokeperl.pl>. All arguments passed to this script will be passed to
+F<smokeperl.pl>! Please see L<smokeperl.pl> for details.
+
+=head2 How do I smoke my patch?
+
+When preparing a patch for admission to perl5-porters it is always a
+good idea to test it. B<Test::Smoke> has a mechanism to smoke-test the
+effects of that patch. Here is a way to set it up:
+
+=over 4
+
+=item Set up Test::Smoke
+
+Install Test::Smoke and create a separate directory to keep all your
+configurations in.
+
+=item Create a build-configurations file
+
+In this configs directory you then create a build-configurations
+file. This is usually done from one of default F<*.cfg> files in the
+Test::Smoke distribution.
+
+=item Configure Test::Smoke with F<configsmoke.pl>
+
+Now you need to configure Test::Smoke by running F<configsmoke.pl> in
+your configs directory (optionally specifying a prefix).
+
+    $ ../smoke/configsmoke.pl -p testpatch
+
+You should be careful with the e-mail options and make sure you
+do not send the results to either <smokers-reports@perl.org> or
+<perl5-porters@perl.org>.
+
+=item Create a patches-to-apply-file
+
+The patches-to-apply-file has a simple format. It has each patch to
+apply on a single line and each line is semicolon separated with the
+full path to the patchfile in the first column and optionally the
+options to pass to L<patch(1)> in the second column. By default B<-p1>
+is passed if no B<-pN> option was specified.
+
+    $ cat mypatch.inc
+    ~/p5p/patches/mypatch.diff;-p0
+
+=item Start the smoke with the --pfile option
+
+    $ ./testpatch.sh --pfile mypatch.inc
+ 
+You can also configure Test::Smoke to always use a
+patches-to-apply-file during F<configsmoke.pl>.
+
+=back
+
+=head2 Can I interrupt a smoke run?
+
+Yes, you can kill all the smoke related processes. Each stage is
+directly logged in F<< <builddir>/mktest.out >>.
+
+As of version 1.17.02 you can specify a timeout (if you have alarm())
+
+=head2 Can I still generate a report after an interrupted smoke?
+
+Yes, but some information might be missing (the compiler info).
+
+    $ perl mailrpt.pl -c [configname]
+
+=head2 How can I run continues smokes?
+
+On a unixy system you can try this shellscript if you adjust the
+C<basedir> variable (thank you Johan Vromans for helping with this).
+
+    #! /bin/sh
+    
+    basedir=$HOME/Test-Smoke/smoke
+    cd "$basedir"
+    pidfile=`pwd`/smokeloop.pid
+    stpfile=`pwd`/.stopsmoking
+    versions="58x current"
+
+    if test -f "$pidfile" ; then
+        echo "We seem to be running as: `cat $pidfile`"
+        exit
+    fi
+
+    trap 'trap "" 0 ; rm -f "$pidfile" ; echo "exiting now" ; exit' 0 1 2 3 15
+
+    checkstop() {
+        if test -f "$stpfile" ; then
+            echo "`date`: Stopping on user request"
+            rm -f "$stpfile"
+            exit
+        fi
+    }
+
+    echo $$ > "$pidfile"
+    while test 1 ; do
+        checkstop
+        touch "$pidfile"
+
+        for smokever in $versions ; do
+            nice $basedir/smoke$smokever.sh
+            checkstop
+        done
+
+        perl -e 'sleep 3600 if (1+2*rand)*(time-(stat(shift))[9])<600' \
+            "$pidfile"
+    done
+
+This script assumes it is located in the directory where the
+Test::Smoke suite is installed. You can stop execution between smokes
+for different versions by putting the file F<.stopsmoking> in that
+same directory.
+
+=head2 Where do the reports go?
+
+To the address configured in F<configsmoke.pl>. The default is
+<smokers-reports@perl.org>.
+
+There are several ways to monitor the reports send in:
+
+=over 4
+
+=item Subscribe to the mailinglist
+
+You can subscribe to that list by sending an empty message to
+<daily-build-reports-subscribe@perl.org>.
+You do B<not> have to be subscribed to send reports!
+
+=item The usenet mirror
+
+The mailinglist also has a mirror on usenet:
+<news:nntp.perl.org/perl.daily-build.reports>
+
+Posts to the newsgroup will also be mirrored on the mailinglist.
+
+=item Google groups
+
+The newsgroup is mirrored on Google groups:
+L<http://groups.google.com/group/perl.daily-build.reports>
+
+=item The usenet WWW archive
+
+The usenet mirror also has an archive on the web:
+L<http://www.nntp.perl.org/group/perl.daily-build.reports>
+
+=back
+
+=head2 How do I investigate failures?
+
+When investigating a testfailure you need to make sure you have
+I<Configure>d and build perl with the same options as the one with the
+failures.
+
+    $ cd <builddir>
+    $ make distclean
+    $ sh Configure -des -Dusedevel [other build options]
+    $ make
+    $ make test-prep
+    $ cd t
+
+Now you can start with a manual run of the failing test:
+
+    $ ./perl harness -v <pathto/failingtest>
+
+=over 4
+
+=item B<Note for Win32>
+
+As Windows lacks a Configure to create the Makefile, Test::Smoke
+supplies the helper script F<W32Configure.bat> that will create a new
+Makefile with the right options: F<< <builddir>\win32\smoke.mk >>.
+
+After that you can:
+
+    S:\perl-current\win32>nmake -f smoke.mk
+    S:\perl-current\win32>nmake -f smoke.mk test-prep
+    S:\perl-current\win32>cd ..\t
+
+=back
+
+For -Duseperlio builds (per default) failures can occur in different
+environments, and you will also need to set these up:
+
+=over 4
+
+=item B<PERLIO=stdio>
+
+    $ PERLIO=stdio ./perl harness -v <pathto/failingtest>
+
+Note that Windows builds (MSVC, Borland or MinGW) also need the "crlf"
+layer:
+
+    S:>(set PERLIO=stdio :crlf) && .\perl harness -v <pathto\failingtest>
+
+Be careful with the environment variables on Windows, they are sticky.
+
+=item B<PERLIO=perlio>
+
+    $ PERLIO=perlio ./perl harness -v <pathto/failingtest>
+
+Note that Windows builds (MSVC, Borland or MinGW) also need the "crlf"
+layer:
+
+    S:>(set PERLIO=perlio :crlf) && .\perl harness -v <pathto\failingtest>
+
+Be careful with the environment variables on Windows, they are sticky.
+
+=item B<UTF-8 locale>
+
+If the failure occurs in the UTF-8 locale test-run the environment
+setup is a bit different (assuming "en_US.utf8"):
+
+    $ PERL_UNICODE= LC_ALL=en_US.utf8 ./perl harness -v <pathto/failingtest>
+
+=back
+
+=head2 What's with the "daily-build" and "smokers" names?
+
+There has been enough discussion on the subject, so lets agree to
+disagree (it was all before my time).
+
+The case is now that the official name for the mailinglist is
+B<daily-build-reports> and there is an alias to B<smokers-reports>.
+
+=head1 REVISION
+
+$Id$
+
+=head1 COPYRIGHT
+
+Copyright 2002-2003, Abe Timmerman <abeltje@cpan.org> All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See:
+
+=over 4
+
+=item * L<http://www.perl.com/perl/misc/Artistic.html>
+
+=item * L<http://www.gnu.org/copyleft/gpl.html>
+
+=back
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

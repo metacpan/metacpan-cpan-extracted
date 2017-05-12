@@ -1,0 +1,39 @@
+=head1 Toader VCS Integration Documentration
+
+Toader can integrate with VCS. It requires the variables below to be present
+in the Toader config under the "VCS" section of the ini file.
+
+    addExec
+    deleteExec
+    underVCSexec
+
+=head1 Toader Config Values
+
+In each config value, %%%item%%% is replaced with the file in questions.
+
+A exit value of zero is expected for success and a non-zero is expected for failure.
+
+=head2 addExec
+
+This is the what should be executed with for adding a file or directory. The
+command should work recursively.
+
+=head2 deleteExec
+
+This is the what should be executed with for removing a file or directory.
+
+=head2 underVCSexec
+
+This command is used to check if currectly in the version control system or not.
+
+=head1 Integrating With Subversion
+
+To integrate it with Subversion, the commands below should be used.
+
+    vcs=1
+    [VCS]
+    addExec=svn add --parents %%%item%%% > /dev/null
+    deleteExec=svn del %%%item%%% > /dev/null
+    underVCSexec=svn info %%%info%%% > /dev/null
+
+=cut

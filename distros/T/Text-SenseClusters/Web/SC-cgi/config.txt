@@ -1,0 +1,9 @@
+PATH=/bin:/usr/local/bin:/usr/bin:/home/cs/kulka020/tools/SVDPACKC_Linux:/home/cs/kulka020/tools/NSP/bin:/home/cs/kulka020/tools/NSP/lib/perl5/site_perl/5.8.5:/home/cs/kulka020/tools/SC_0.89/bin:/home/cs/kulka020/tools/SC_0.89/Testing:/home/cs/kulka020/tools/CLUTO/Linux
+
+PERL5LIB=/home/cs/kulka020/tools/SPARSE/lib/perl5/site_perl/5.8.5:/home/cs/kulka020/tools/BITVECTOR/lib/perl5/site_perl/5.8.5/x86_64-linux:/home/cs/kulka020/tools/BITVECTOR/lib/perl5/site_perl/5.8.5:/home/cs/kulka020/tools/SETSCALAR/lib/perl5/site_perl/5.8.5:/home/cs/kulka020/tools/MUNKRES/lib/perl5/site_perl/5.8.5:/home/cs/kulka020/tools/lib/perl5/site_perl/5.8.5:/usr/local/lib/perl5/5.8.5/x86_64-linux:/usr/local/lib/perl5/5.8.5:/usr/local/lib/perl5/site_perl/5.8.5/x86_64-linux:/usr/local/lib/perl5/site_perl/5.8.5:/usr/local/lib/perl5/site_perl:/home/cs/kulka020/tools/Statistics-Gap-0.10/lib/perl5/site_perl/5.8.5
+
+SC-cgi=/usr/local/apache2/cgi-bin/SC-cgi
+
+SC-htdocs=/usr/local/apache2/htdocs/SC-htdocs
+
+cgi=cgi-bin

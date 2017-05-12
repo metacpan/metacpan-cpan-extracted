@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: Timestamp-Simple
+version: 1.01
+author:
+  - Steve Shoopak <shoop@cpan.org>
+abstract: Simple methods for timestamping
+license: perl
+requires:
+provides:
+  Timestamp::Simple:
+    file: lib/Timestamp/Simple.pm
+    version: 1.01

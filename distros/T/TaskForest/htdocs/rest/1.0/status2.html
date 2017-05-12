@@ -1,0 +1,24 @@
+<include TaskForest::REST::PassThrough /rest/1.0/head.html />
+
+<div class=status><aohj a=status>
+    <dl class=job>
+      <dt>Family Name</dt>
+      <dd><a href="/rest/1.0/families.html/$family_name">$family_name</a></dd>
+      <dt>Job Name</dt>
+      <dd><a href="/rest/1.0/jobs.html/$base_name">$name</a></dd>
+      <dt>Status</dt>
+      <dd><ifo c=has_output_file><a href="/rest/1.0/logFile.html/$log_date/$output_file">$status</a></ifo><elseo>$status</elseo></dd>
+      <dt>Return Code</dt>
+      <dd>$rc</dd>
+      <dt>Time Zone</dt>
+      <dd>$tz</dd>
+      <dt>Scheduled Start Time</dt>
+      <dd>$start</dd>
+      <dt>Actual Start Time</dt>
+      <dd>$actual_start</dd>
+      <dt>Stop Time</dt>
+      <dd>$stop</dd>
+    </dl></aohj>
+</div>
+
+<include TaskForest::REST::PassThrough /rest/1.0/foot.html />

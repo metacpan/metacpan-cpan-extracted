@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 893aa2038b35266055d32e4906a6e5227df41327 .perlcriticrc
+SHA1 b1792a796e85dfbf8a74b4d1ad41ad32ddea48bb .perltidyrc
+SHA1 6379222814137885e5d60e755c2d8e30a8622620 Build.PL
+SHA1 b5b85becfdcb2dd9294a5edca8c1d6e776b5ace3 Changes
+SHA1 689fcca99aa9bc088b979ef36eddc0af4f28bbdf LICENSE
+SHA1 8ce4802236aa60d27b65e103b119a175f29a1b13 MANIFEST
+SHA1 aa2e90822864fd0d30c93f66b4cd9b5a0fca4596 MANIFEST.SKIP
+SHA1 aec13901a1aedecc743747eb190516ed8e8ab69b META.json
+SHA1 6df119888c06543e3dbf90a86856f9d001fcc511 META.yml
+SHA1 12c0cec99a4d4a6251470911d46f65e825ae8cc4 README
+SHA1 e7f2cf54f060bc19602fb76f4fb4b00141d03b14 inc/MyBuild.pm
+SHA1 0368bed692e754e301d696b77b2380d2716fb6f9 lib/Test/Random.pm
+SHA1 3ffabb7608a6abaf039d8299dace55d5f9ea0281 t/control_rand.t
+SHA1 7877662a231380e266f3777ae028a1f55d20fe31 t/diag_seed_on_fail.t
+SHA1 b549d844cea1e0dfb9062a72d09acc04362451a1 t/diag_seed_on_plan_but_no_tests.t
+SHA1 8d96e78a021ecf01792dbaa32040a6ee158d9c49 t/no_plan_but_tests.t
+SHA1 fa9438d61f892c855af9e1b1381004ec6fe63772 t/no_tests_no_seed.t
+SHA1 8a17f2e6b1475dbc5c2974f5002d36dd38a6c545 t/note_seed_on_pass.t
+SHA1 601641b4760c02455a1a52bf5bdfc5e0e726c211 t/rand_check.plx
+SHA1 5cf476e936cf267efe12e5bf32f16f9b2d8fcf85 t/seed_format.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.18 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iQEcBAEBAgAGBQJRfI8UAAoJEJxzdbWzfct3m6IIALBHULO/xFnNcRNMM1iXDvkA
+RjVEG3Op75abQI7U9IlCDM71vXKzPzrFQUMUsxjfqSnmA+i7U36DvNmpVGPoXnTX
+25WXKP8zWhd2ktX92/EAlXA2bkF2erFg6OnqllYfQZkQxarcXkwybGATnH5dvsyE
+P7Vzh/WnF4rNimPwMYeWFu/T9jaDzOiSCGd2HOulDTB1Af/4UUbwxeD9p1E+gx4w
+v+d4S4i3nolAcnPXr5pmaah+sxwcYGSaI8zOIH38srEl2hdKQGmHuYVwEgjNauVt
+LQAtAU4+QU099fF0NneoiLHADQwkmuASRBax4EX7w0IAXe6BfIPv9kcRCBWWTDQ=
+=jAbO
+-----END PGP SIGNATURE-----

@@ -1,0 +1,31 @@
+Template-Plugin-DBM-Deep
+========================
+
+A thin Template Plugin around DBM::Deep objects, for easy access to
+multi-level persistent sharable datastructures.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBM::Deep
+  Template
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Randal L. Schwartz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

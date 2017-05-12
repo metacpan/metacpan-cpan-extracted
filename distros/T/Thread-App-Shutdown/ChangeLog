@@ -1,0 +1,40 @@
+2003-12-25 15:35  james
+
+	* MANIFEST (1.2):
+
+	Add ChangeLog to MANIFEST
+
+2003-12-25 15:35  james
+
+	* ChangeLog (1.1), ChangeLog.xml (1.1), ChangeLog (1.2, v0_10),
+	ChangeLog.xml (1.2, v0_10):
+
+	[no log message]
+
+2003-12-25 15:32  james
+
+	* MANIFEST (1.1), META.yml (1.1), Makefile.PL (1.1), README (1.1),
+	lib/Thread/App/Shutdown.pm (1.4), t/01_inline.t (1.3) (utags:
+	v0_10):
+
+	Release v0.10_01 to CPAN
+
+2003-12-25 14:17  james
+
+	* lib/Thread/App/Shutdown.pm (1.3), t/01_inline.t (1.2):
+
+	Complete functionality and create test suite
+
+2003-12-25 13:07  james
+
+	* lib/Thread/App/Shutdown.pm (1.2):
+
+	[no log message]
+
+2003-12-24 07:04  james
+
+	* Build.PL (1.1, v0_10), lib/Thread/App/Shutdown.pm (1.1),
+	t/01_inline.t (1.1), t/02_pod.t (1.1, v0_10):
+
+	Initial stab at Thread::App::Shutdown
+

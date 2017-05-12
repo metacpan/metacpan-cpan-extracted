@@ -1,0 +1,20 @@
+[main]
+logdir=[% tempdir %]/log
+vardir=[% tempdir %]/var
+ssldir=[% tempdir %]/ssl
+rundir=[% tempdir %]/run
+factpath=$vardir/lib/facter
+templatedir=$confdir/templates
+prerun_command=/etc/puppet/etckeeper-commit-pre
+postrun_command=/etc/puppet/etckeeper-commit-post
+
+[master]
+  environment  = dummy
+  manifest     = [% manifest %]
+  modulepath   = [% modulepath %]
+  hiera_config = [% hieraconfig %]
+[% IF use_enc %]
+  node_terminus = exec
+  external_nodes = [% enc %]
+[% END %]
+

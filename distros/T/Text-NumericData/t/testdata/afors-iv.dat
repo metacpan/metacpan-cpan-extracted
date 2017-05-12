@@ -1,0 +1,535 @@
+v [V]	j [A/cm^2]	p [W/cm^2]
+v	current	power
+voltage	current density	power density
+0	-9,54889009501674E-17	0
+0,01	-2,78465128711552E-10	-2,78465128711552E-12
+0,02	-6,25532657461285E-10	-1,25106531492257E-11
+0,03	-1,05998466410581E-9	-3,17995399231742E-11
+0,04	-1,60495843857003E-9	-6,4198337542801E-11
+0,05	-2,28873384406791E-9	-1,14436692203395E-10
+0,06	-3,14569785095725E-9	-1,88741871057435E-10
+0,07	-4,21757809076626E-9	-2,95230466353638E-10
+0,08	-5,5548949447129E-9	-4,44391595577032E-10
+0,09	-7,2188599487633E-9	-6,49697395388697E-10
+0,1	-9,28379193746173E-9	-9,28379193746173E-10
+0,11	-1,18401217721419E-8	-1,30241339493561E-9
+0,12	-1,49982702764116E-8	-1,79979243316939E-9
+0,13	-1,88933442173951E-8	-2,45613474826137E-9
+0,14	-2,3690997141081E-8	-3,31673959975134E-9
+0,15	-2,95946666927997E-8	-4,43920000391995E-9
+0,16	-3,68544302287821E-8	-5,89670883660513E-9
+0,17	-4,57779332047305E-8	-7,78224864480419E-9
+0,18	-5,67438734722587E-8	-1,02138972250066E-8
+0,19	-7,02186544150621E-8	-1,33415443388618E-8
+0,2	-8,67769928782298E-8	-1,7355398575646E-8
+0,21	-1,07127512514612E-7	-2,24967776280686E-8
+0,22	-1,32144521740878E-7	-2,90717947829931E-8
+0,23	-1,62907630626898E-7	-3,74687550441865E-8
+0,24	-2,00751071596578E-7	-4,81802571831788E-8
+0,25	-2,47325503706708E-7	-6,1831375926677E-8
+0,26	-3,04675323978875E-7	-7,92155842345076E-8
+0,27	-3,75335941282621E-7	-1,01340704146308E-7
+0,28	-4,62456239636967E-7	-1,29487747098351E-7
+0,29	-5,69953426651745E-7	-1,65286493729006E-7
+0,3	-7,02709501445525E-7	-2,10812850433658E-7
+0,31	-8,66821484746173E-7	-2,68714660271314E-7
+0,32	-1,06992144612537E-6	-3,42374862760119E-7
+0,33	-1,32158773307277E-6	-4,36123951914015E-7
+0,34	-1,63387616205179E-6	-5,5551789509761E-7
+0,35	-2,02200957705829E-6	-7,077033519704E-7
+0,36	-2,50527832890209E-6	-9,01900198404753E-7
+0,37	-3,10822307456072E-6	-1,15004253758747E-6
+0,38	-3,86219788387383E-6	-1,46763519587205E-6
+0,39	-4,80744912885083E-6	-1,87490516025182E-6
+0,4	-5,99589793425782E-6	-2,39835917370313E-6
+0,41	-7,49488803048202E-6	-3,07290409249763E-6
+0,42	-9,39226595937391E-6	-3,94475170293704E-6
+0,43	-1,18033096602084E-5	-5,0754231538896E-6
+0,44	-1,48802342524937E-5	-6,54730307109721E-6
+0,45	-1,88253073505157E-5	-8,47138830773206E-6
+0,46	-2,39090414616021E-5	-1,0998159072337E-5
+0,47	-3,04955539781731E-5	-1,43329103697414E-5
+0,48	-3,90780805856928E-5	-1,87574786811326E-5
+0,49	-5,03289138063782E-5	-2,46611677651253E-5
+0,5	-6,51698879870378E-5	-3,25849439935189E-5
+0,51	-8,48721915557375E-5	-4,32848176934261E-5
+0,52	-0,000111198112555905	-5,78230185290706E-5
+0,53	-0,000146602818435661	-7,76994937709003E-5
+0,54	-0,000194522155366351	-0,00010504196389783
+0,55	-0,000259783736034353	-0,000142881054818894
+0,56	-0,000349194676376727	-0,000195549018770967
+0,57	-0,000472382167496106	-0,00026925783547278
+0,58	-0,000642995199396162	-0,000372937215649774
+0,59	-0,000880420479866527	-0,000519448083121251
+0,6	-0,00121222684847485	-0,00072733610908491
+0,61	-0,0016776343749015	-0,00102335696868992
+0,62	-0,00233240981840043	-0,00144609408740827
+0,63	-0,00325571813022601	-0,00205110242204239
+0,64	-0,00455959946636986	-0,00291814365847671
+0,65	-0,00640186303158995	-0,00416121097053347
+0,66	-0,00900323226783089	-0,00594213329676839
+0,67	-0,0126694422513422	-0,00848852630839928
+0,68	-0,0178185702663348	-0,0121166277811077
+0,69	-0,0250131726152103	-0,0172590891044951
+0,7	-0,0349962057034466	-0,0244973439924126
+0,71	-0,0487305005129725	-0,0345986553642105
+0,72	-0,0674461493593037	-0,0485612275386987
+0,73	-0,0927111211754524	-0,0676791184580802
+0,74	-0,126557118990166	-0,0936522680527225
+0,75	-0,171707110924394	-0,128780333193296
+0,76	-0,231950037168066	-0,17628202824773
+0,77	-0,312691526881064	-0,240772475698419
+0,78	-0,421709168705905	-0,328933151590606
+0,79	-0,570134924329893	-0,450406590220615
+0,8	-0,773436130843352	-0,618748904674681
+0,81	-1,05195797319152	-0,852085958285127
+0,82	-1,43103859289446	-1,17345164617346
+0,83	-1,94092038924719	-1,61096392307517
+0,84	-2,6165184961526	-2,19787553676818
+0,85	-3,49713878605742	-2,9725679681488
+0,86	-4,62632691134433	-3,97864114375612
+0,87	-6,05199587473401	-5,26523641101859
+0,88	-7,82684583442643	-6,88762433429525
+0,89	-10,0089563007322	-8,90797110765162
+0,9	-12,6623682171323	-11,3961313954191
+0,91	-15,8574850428555	-14,4303113889985
+0,92	-19,671170713966	-18,0974770568487
+0,93	-24,1864736223728	-22,4934204688067
+0,94	-29,4919464029571	-27,7224296187796
+0,95	-35,6805642363027	-33,8965360244876
+0,96	-42,8482763531653	-41,1343452990387
+0,97	-51,0922597294206	-49,559491937538
+0,98	-60,5089785441066	-59,2987989732245
+0,99	-71,1921818967764	-70,4802600778087
+1	-83,2309883153596	-83,2309883153596
+1,01	-96,7082030070314	-97,6752850371017
+1,02	-111,698990649557	-113,932970462548
+1,03	-128,269985666462	-132,118085236456
+1,04	-146,478870590695	-152,338025414323
+1,05	-166,374400905167	-174,693120950425
+1,06	-187,99681098111	-199,276619639976
+1,07	-211,378507051306	-226,175002544897
+1,08	-236,544942158511	-255,468537531191
+1,09	-263,515573301955	-287,23197489913
+1,1	-292,304818261351	-321,535300087487
+1,11	-322,922953218438	-358,444478072466
+1,12	-355,376916956979	-398,022146991816
+1,13	-389,671008986703	-440,328240154974
+1,14	-425,807484960289	-485,420532854729
+1,15	-463,787062395558	-533,355121754892
+1,16	-503,60935338195	-584,186849923062
+1,17	-545,273239829737	-637,969690600793
+1,18	-588,777202461415	-694,75709890447
+1,19	-634,119608736909	-754,602334396922
+1,2	-681,298958674133	-817,558750408959
+1,21	-730,314082229989	-883,680039498287
+1,22	-781,164278386735	-953,020419631817
+1,23	-833,849384864756	-1025,63474338365
+1,24	-888,369768655387	-1101,57851313268
+1,25	-944,726231222904	-1180,90778902863
+1,26	-1002,91982784735	-1263,67898308766
+1,27	-1062,95160748091	-1349,94854150076
+1,28	-1124,82228676978	-1439,77252706532
+1,29	-1188,53187854027	-1533,20612331694
+1,3	-1254,07930008412	-1630,30309010936
+1,31	-1321,46198921384	-1731,11520587012
+1,32	-1390,6755558433	-1835,69173371316
+1,33	-1461,71349375943	-1944,07894670004
+1,34	-1534,56697170634	-2056,31974208649
+1,35	-1609,22471568583	-2172,45336617588
+1,36	-1685,67298647539	-2292,51526160653
+1,37	-1763,89564878538	-2416,53703883597
+1,38	-1843,87432207223	-2544,54656445967
+1,39	-1925,58859836364	-2676,56815172546
+1,4	-2009,01630977776	-2812,62283368887
+1,41	-2094,13382766279	-2952,72869700454
+1,42	-2180,9163761492	-3096,90125413187
+1,43	-2269,33834496078	-3245,15383329392
+1,44	-2359,37358910406	-3397,49796830985
+1,45	-2450,99570611779	-3553,9437738708
+1,46	-2544,17828457041	-3714,5002954728
+1,47	-2638,89512020252	-3879,17582669771
+1,48	-2735,12039838485	-4047,97818960958
+1,49	-2832,82884334499	-4220,91497658403
+1,5	-2931,99583591708	-4397,99375387562
+
+results:
+Jsc=-9,549E-14 mA/cm^2
+
+working conditions:
+
+calculation mode:	dc
+T:	300 K	temperature
+illumination:	off
+fix potential at:	front
+v_ext:	0 V	boundary external voltage
+j_ext:	0 A/cm^2	external current
+/end of working conditions
+
+cell parameter:
+
+/general parameters
+initialvaluesfromfile:	false
+/end of general parameters
+
+/layer
+name:	vacuum/air
+width:	1E-6 cm	layer thickness
+incoherent:	false	incoherent calculation
+n:	1 	optical coefficient n
+k:	0 	optical coefficient k
+/end of layer
+
+/frontcontact
+BandBending:	Flat-band
+sn:	10000000 cm/s	electron surface recombination velocity
+sp:	10000000 cm/s	hole surface recombination velocity
+ref:	0,02 	constant reflection
+abs:	0,03 	constant absorption
+phiBi:	0 eV	built in potential
+/end of frontcontact
+
+/interface
+interfacename:	Interface 0
+numeric-model:	0	No Interface (MS-Schottky-Contact)
+Ae:	9,56186 As/cm^2sK^2	richardson constant for electrons
+Ah:	9,56186 As/cm^2sK^2	richardson constant for holes
+Qif:	0 cm^-3	Interface Charge
+
+no defects
+/end of interface
+
+/layer
+name:	n-ZnO
+width:	2E-5 cm	layer thickness
+numeric-model:	0	standard
+gradient:	no
+dk:	9 	dielectric constant
+chi:	4,3 eV	electron affinity
+Eg:	3,3 eV	bandgap
+Egopt:	3,3 eV	optical bandgap
+Nc:	4E18 cm^-3	effective conduction band density
+Nv:	9E18 cm^-3	effective valence band density
+me:	20 cm^2/Vs	effective electron mobility
+mh:	20 cm^2/Vs	effective hole mobility
+Na:	0 cm^-3	doping concentration acceptors
+Nd:	1E18 cm^-3	doping concentration donators
+ve:	10000000 cm/s	electron thermal velocity
+vh:	10000000 cm/s	hole thermal velocity
+rho:	2,328 g*cm^-3	layer density
+rae:	0 cm^6/s	auger electron recombination coefficient
+rah:	0 cm^6/s	auger hole recombination coefficient
+rbb:	0 cm^3/s	band to band recombination coefficient
+nk-file:	ZnOAl_Orgassa.nk	lambda[nm],n[-],k[-]
+incoherent:	false	incoherent calculation
+
+/defect
+name:	Defect_1
+text:	Defect_1
+type:	single
+charge:	acceptor
+cn:	1E-15 cm^2	electron thermal cross section
+cno:	0 cm^2	electron optical cross section
+cp:	1E-12 cm^2	hole thermal cross section
+cpo:	0 cm^2	hole optical cross section
+Ntr:	1E16 cm^-3	trap density
+E:	1,7 eV	characteristic energy
+Ntr specific:	1E16 cm^-3/eV	specific trap density
+Taun:	1E-8 s	mean electron lifetime
+Taup:	1E-11 s	mean hole lifetime
+Ln:	7,1887829289804E-5 cm	mean electron diffusion length
+Lp:	2,27329276601145E-6 cm	mean hole diffusion length
+/end of defect
+/end of layer
+
+/interface
+interfacename:	Interface 1
+numeric-model:	0	No Interface
+Ae:	9,56186 As/cm^2sK^2	richardson constant for electrons
+Ah:	9,56186 As/cm^2sK^2	richardson constant for holes
+Qif:	0 cm^-3	Interface Charge
+
+no defects
+/end of interface
+
+/layer
+name:	i-ZnO
+width:	5E-6 cm	layer thickness
+numeric-model:	0	standard
+gradient:	no
+dk:	9 	dielectric constant
+chi:	4,3 eV	electron affinity
+Eg:	3,3 eV	bandgap
+Egopt:	3,3 eV	optical bandgap
+Nc:	4E18 cm^-3	effective conduction band density
+Nv:	9E18 cm^-3	effective valence band density
+me:	20 cm^2/Vs	effective electron mobility
+mh:	20 cm^2/Vs	effective hole mobility
+Na:	0 cm^-3	doping concentration acceptors
+Nd:	1,01E18 cm^-3	doping concentration donators
+ve:	10000000 cm/s	electron thermal velocity
+vh:	10000000 cm/s	hole thermal velocity
+rho:	2,328 g*cm^-3	layer density
+rae:	0 cm^6/s	auger electron recombination coefficient
+rah:	0 cm^6/s	auger hole recombination coefficient
+rbb:	0 cm^3/s	band to band recombination coefficient
+nk-file:	ZnO_Orgassa.nk	lambda[nm],n[-],k[-]
+incoherent:	false	incoherent calculation
+/end of layer
+
+/interface
+interfacename:	Interface 2
+numeric-model:	2	Interface (thermionic emission)
+Ae:	9,56186 As/cm^2sK^2	richardson constant for electrons
+Ah:	9,56186 As/cm^2sK^2	richardson constant for holes
+Qif:	0 cm^-3	Interface Charge
+
+no defects
+/end of interface
+
+/layer
+name:	CdS
+width:	5E-6 cm	layer thickness
+numeric-model:	0	standard
+gradient:	no
+dk:	10 	dielectric constant
+chi:	4,2 eV	electron affinity
+Eg:	2,4 eV	bandgap
+Egopt:	2,4 eV	optical bandgap
+Nc:	4E18 cm^-3	effective conduction band density
+Nv:	9E18 cm^-3	effective valence band density
+me:	20 cm^2/Vs	effective electron mobility
+mh:	20 cm^2/Vs	effective hole mobility
+Na:	0 cm^-3	doping concentration acceptors
+Nd:	4E15 cm^-3	doping concentration donators
+ve:	10000000 cm/s	electron thermal velocity
+vh:	10000000 cm/s	hole thermal velocity
+rho:	2,328 g*cm^-3	layer density
+rae:	0 cm^6/s	auger electron recombination coefficient
+rah:	0 cm^6/s	auger hole recombination coefficient
+rbb:	0 cm^3/s	band to band recombination coefficient
+nk-file:	CdS_Orgassa.nk	lambda[nm],n[-],k[-]
+incoherent:	false	incoherent calculation
+
+/defect
+name:	Defect_1
+text:	Defect_1
+type:	single
+charge:	acceptor
+cn:	1E-15 cm^2	electron thermal cross section
+cno:	0 cm^2	electron optical cross section
+cp:	1E-12 cm^2	hole thermal cross section
+cpo:	0 cm^2	hole optical cross section
+Ntr:	3E15 cm^-3	trap density
+E:	1,2 eV	characteristic energy
+Ntr specific:	3E15 cm^-3/eV	specific trap density
+Taun:	3,33333333333333E-8 s	mean electron lifetime
+Taup:	3,33333333333333E-11 s	mean hole lifetime
+Ln:	0,000131248619040354 cm	mean electron diffusion length
+Lp:	4,15044575919262E-6 cm	mean hole diffusion length
+/end of defect
+/end of layer
+
+/interface
+interfacename:	Interface 4
+numeric-model:	2	Interface (thermionic emission)
+Ae:	9,56186 As/cm^2sK^2	richardson constant for electrons
+Ah:	9,56186 As/cm^2sK^2	richardson constant for holes
+Qif:	0 cm^-3	Interface Charge
+
+no defects
+/end of interface
+
+/layer
+name:	OVC
+width:	3E-6 cm	layer thickness
+numeric-model:	0	standard
+gradient:	no
+dk:	13,6 	dielectric constant
+chi:	4,3 eV	electron affinity
+Eg:	1,35 eV	bandgap
+Egopt:	1,35 eV	optical bandgap
+Nc:	7E17 cm^-3	effective conduction band density
+Nv:	1,5E19 cm^-3	effective valence band density
+me:	20 cm^2/Vs	effective electron mobility
+mh:	20 cm^2/Vs	effective hole mobility
+Na:	1,1E16 cm^-3	doping concentration acceptors
+Nd:	0 cm^-3	doping concentration donators
+ve:	10000000 cm/s	electron thermal velocity
+vh:	10000000 cm/s	hole thermal velocity
+rho:	2,328 g*cm^-3	layer density
+rae:	0 cm^6/s	auger electron recombination coefficient
+rah:	0 cm^6/s	auger hole recombination coefficient
+rbb:	0 cm^3/s	band to band recombination coefficient
+nk-file:	CuIn0.75Ga0.25Se2.nk	lambda[nm],n[-],k[-]
+incoherent:	false	incoherent calculation
+
+/defect
+name:	Defect_1
+text:	Defect_1
+type:	single
+charge:	donor
+cn:	1E-12 cm^2	electron thermal cross section
+cno:	0 cm^2	electron optical cross section
+cp:	1E-15 cm^2	hole thermal cross section
+cpo:	0 cm^2	hole optical cross section
+Ntr:	1E16 cm^-3	trap density
+E:	0,6 eV	characteristic energy
+Ntr specific:	1E16 cm^-3/eV	specific trap density
+Taun:	1E-11 s	mean electron lifetime
+Taup:	1E-8 s	mean hole lifetime
+Ln:	2,27329276601145E-6 cm	mean electron diffusion length
+Lp:	7,1887829289804E-5 cm	mean hole diffusion length
+/end of defect
+/end of layer
+
+/interface
+interfacename:	Interface 5
+numeric-model:	0	No Interface
+Ae:	9,56186 As/cm^2sK^2	richardson constant for electrons
+Ah:	9,56186 As/cm^2sK^2	richardson constant for holes
+Qif:	0 cm^-3	Interface Charge
+
+no defects
+/end of interface
+
+/layer
+name:	CuIn0.75Ga0.25Se2
+width:	0,0001 cm	layer thickness
+numeric-model:	0	standard
+gradient:	no
+dk:	13,6 	dielectric constant
+chi:	4,3 eV	electron affinity
+Eg:	1,15 eV	bandgap
+Egopt:	1,15 eV	optical bandgap
+Nc:	7E17 cm^-3	effective conduction band density
+Nv:	1,5E19 cm^-3	effective valence band density
+me:	20 cm^2/Vs	effective electron mobility
+mh:	20 cm^2/Vs	effective hole mobility
+Na:	1E16 cm^-3	doping concentration acceptors
+Nd:	0 cm^-3	doping concentration donators
+ve:	10000000 cm/s	electron thermal velocity
+vh:	10000000 cm/s	hole thermal velocity
+rho:	2,328 g*cm^-3	layer density
+rae:	0 cm^6/s	auger electron recombination coefficient
+rah:	0 cm^6/s	auger hole recombination coefficient
+rbb:	0 cm^3/s	band to band recombination coefficient
+nk-file:	CuIn0.75Ga0.25Se2.nk	lambda[nm],n[-],k[-]
+incoherent:	false	incoherent calculation
+
+/defect
+name:	Defect_1
+text:	Defect_1
+type:	single
+charge:	donor
+cn:	1E-13 cm^2	electron thermal cross section
+cno:	0 cm^2	electron optical cross section
+cp:	1E-15 cm^2	hole thermal cross section
+cpo:	0 cm^2	hole optical cross section
+Ntr:	100000000000000 cm^-3	trap density
+E:	0,6 eV	characteristic energy
+Ntr specific:	100000000000000 cm^-3/eV	specific trap density
+Taun:	1E-8 s	mean electron lifetime
+Taup:	1E-6 s	mean hole lifetime
+Ln:	7,1887829289804E-5 cm	mean electron diffusion length
+Lp:	0,00071887829289804 cm	mean hole diffusion length
+/end of defect
+/end of layer
+
+/interface
+interfacename:	Interface 6
+numeric-model:	0	No Interface
+Ae:	9,56186 As/cm^2sK^2	richardson constant for electrons
+Ah:	9,56186 As/cm^2sK^2	richardson constant for holes
+Qif:	0 cm^-3	Interface Charge
+
+no defects
+/end of interface
+
+/layer
+name:	Gradient
+width:	0,0002 cm	layer thickness
+numeric-model:	0	standard
+gradient:	yes
+dks:	13,6 	dielectric constant at layer start
+dkf:	13,6 	dielectric constant at end of layer
+chis:	4,3 eV	electron affinity at layer start
+chif:	4,3 eV	electron affinity at end of layer
+Egs:	1,15 eV	bandgap at layer start
+Egf:	1,05 eV	bandgap at end of layer
+Egopts:	1,15 eV	optical bandgap at layer start
+Egoptf:	1,05 eV	optical bandgap at end of layer
+Ncs:	7E17 cm^-3	effective conduction band density at layer start
+Ncf:	7E17 cm^-3	effective conduction band density at end of layer
+Nvs:	1,5E19 cm^-3	effective valence band density at layer start
+Nvf:	1,5E19 cm^-3	effective valence band density at end of layer
+mes:	20 cm^2/Vs	effective electron mobility at layer start
+mef:	20 cm^2/Vs	effective electron mobility at end of layer
+mhs:	20 cm^2/Vs	effective hole mobility at layer start
+mhf:	20 cm^2/Vs	effective hole mobility at end of layer
+Nas:	1E16 cm^-3	doping concentration acceptors at layer start
+Naf:	1E16 cm^-3	doping concentration acceptors at end of layer
+Nds:	0 cm^-3	doping concentration donators at layer start
+Ndf:	0 cm^-3	doping concentration donators at end of layer
+ves:	10000000 cm/s	electron thermal velocity at layer start
+vef:	10000000 cm/s	electron thermal velocity at end of layer
+vhs:	10000000 cm/s	hole thermal velocity at layer start
+vhf:	10000000 cm/s	hole thermal velocity at end of layer
+rhos:	2,328 g*cm^-3	layer density at layer start
+rhof:	2,328 g*cm^-3	layer density at end of layer
+raes:	0 cm^6/s	auger electron recombination coefficient at layer start
+raef:	0 cm^6/s	auger electron recombination coefficient at end of layer
+rahs:	0 cm^6/s	auger hole recombination coefficient at layer start
+rahf:	0 cm^6/s	auger hole recombination coefficient at end of layer
+rbbs:	0 cm^3/s	band to band recombination coefficient at layer start
+rbbf:	0 cm^3/s	band to band recombination coefficient at end of layer
+nk-file:	CuIn0.75Ga0.25Se2.nk	lambda[nm],n[-],k[-]
+incoherent:	false	incoherent calculation
+
+/defect
+name:	Defect_1
+text:	Defect_1
+type:	single
+charge:	donor
+cn:	1E-13 cm^2	electron thermal cross section
+cno:	0 cm^2	electron optical cross section
+cp:	1E-15 cm^2	hole thermal cross section
+cpo:	0 cm^2	hole optical cross section
+Ntr:	100000000000000 cm^-3	trap density
+E:	0,6 eV	characteristic energy
+Ntr specific:	100000000000000 cm^-3/eV	specific trap density
+Taun:	1E-8 s	mean electron lifetime
+Taup:	1E-6 s	mean hole lifetime
+Ln:	7,1887829289804E-5 cm	mean electron diffusion length
+Lp:	0,00071887829289804 cm	mean hole diffusion length
+/end of defect
+/end of layer
+
+/interface
+interfacename:	Interface 6
+numeric-model:	0	No Interface (MS-Schottky-Contact)
+Ae:	9,56186 As/cm^2sK^2	richardson constant for electrons
+Ah:	9,56186 As/cm^2sK^2	richardson constant for holes
+Qif:	0 cm^-3	Interface Charge
+
+no defects
+/end of interface
+
+/backcontact
+BandBending:	Flat-band
+sn:	3000 cm/s	electron surface recombination velocity
+sp:	10000000 cm/s	hole surface recombination velocity
+ref:	0,6 	constant reflection
+abs:	0,007 	constant absorption
+phiBi:	0 eV	built in potential
+/end of backcontact
+
+/layer
+name:	vacuum/air
+width:	1E-6 cm	layer thickness
+incoherent:	false	incoherent calculation
+n:	1 	optical coefficient n
+k:	0 	optical coefficient k
+/end of layer
+
+/end of all layers

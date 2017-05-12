@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TBXXCS SYSTEM "tbxxcsdtd.dtd">
+<TBXXCS name="Small" version="2" lang="en">
+    <header>
+        <title>Example XCS file</title>
+    </header>
+
+    <languages>
+        <langInfo>
+            <langCode>en</langCode>
+            <langName>English</langName>
+        </langInfo>
+        <langInfo>
+            <langCode>fr</langCode>
+            <langName>French</langName>
+        </langInfo>
+        <langInfo>
+            <langCode>de</langCode>
+            <langName>German</langName>
+        </langInfo>
+    </languages>
+
+    <datCatSet>
+        <termCompListSpec name="termElement" datcatId="ISO12620A-020802">
+            <contents forTermComp="yes"/>
+        </termCompListSpec>
+        <descripSpec name="context" datcatId="ISO12620A-0503">
+            <contents/>
+            <levels>term</levels>
+        </descripSpec>
+        <descripSpec name="descripFoo" datcatId="">
+            <contents/>
+            <levels/>
+        </descripSpec>
+        <termNoteSpec name="animacy" datcatId="ISO12620A-020204">
+            <contents datatype="picklist" forTermComp="yes">animate inanimate
+            otherAnimacy</contents>
+        </termNoteSpec>
+        <xrefSpec name="xrefFoo" datcatId="">
+            <contents targetType="external"/>
+        </xrefSpec>
+
+    </datCatSet>
+
+    <refObjectDefSet>
+        <refObjectDef>
+            <refObjectType>Foo</refObjectType>
+            <itemSpecSet type="validItemType">
+                <itemSpec type="validItemType">data</itemSpec>
+            </itemSpecSet>
+        </refObjectDef>
+    </refObjectDefSet>
+</TBXXCS>

@@ -1,0 +1,112 @@
+Revision history for Tickit-Widget-Tabbed
+
+0.021     2017-02-15 15:14:05
+          [CHANGES]
+           * Use Style-directed keybindings
+           * Also bind <C-n> and <C-p> for tab switching
+
+          [BUGFIXES]
+           * Remember to ->close old ribbon window when removing it
+
+0.020     2016-08-08 14:21:33
+          [CHANGES]
+           * Updated for Tickit 0.57:
+              + Use $win->bind_event instead of $win->set_on_*
+
+0.019     2015-06-11 23:23:15
+          [CHANGES]
+           * Avoid using pen observers and instead provide a $tab->set_pen
+             method to set a pen for a tab. This is a short-term temporary
+             measure until a better solution is found, likely involving the
+             style system.
+
+0.018     2015-03-23 23:23:16
+          [CHANGES]
+           * Use ->set_style instead of ->set_pen and declare
+             WIDGET_PEN_FROM_STYLE to keep Tickit 0.50 deprecations happy
+
+0.017     2015-02-04 00:35:56
+          [BUGFIXES]
+           * Remember to declare that sum0 needs List::Util 1.26
+           * Avoid ->window->clear now it's dead; implement a render_to_rb
+             method that just does ->eraserect instead
+           * Fix off-by-one error that causes Alt+{digit} shortcut to crash
+
+0.016     2014-08-06 16:10:44
+          [BUGFIXES]
+           * Use List::Util::sum0 instead of sum so as not to print undef
+             warnings when there are no tabs defined
+
+0.015     2014-04-15 02:41:29
+          [CHANGES]
+           * Prepare unit tests for Tickit 0.45's optimisation away of
+             ->expose on invisible windows
+
+0.014     2014-04-07 19:08:55
+          [CHANGES]
+           * Rename ->tab to ->active_tab_widget
+           * Subclass from ContainerWidget properly
+           * Provide accurate ->lines and ->cols methods
+
+0.013     2014-04-03 23:45:05 UTC
+          [CHANGES]
+           * Use Tickit 0.32-style structures for key/mouse events
+           * Prepare for Tickit 0.44's whole-tree RB rendering order
+
+0.012     2014-04-01 22:53:51 UTC
+          [CHANGES]
+           * Use new Window expose with_rb and mouse with_ev events from
+             Tickit 0.42
+           * Use new associative is_termlog() to avoid rendering order
+             upsetting unit tests
+
+0.011     2013-11-06 17:21:12 UTC
+          [CHANGES]
+           * Support horizontal ribbons taller than 1 line (RT88081)
+           * Updated demos to use Tickit::RenderBuffer
+
+          [BUGFIXES]
+           * Remember to pass constructor arguments to SUPER::new (RT89104)
+           * Updated demos to use new Tickit::Style-based API (RT90082)
+           * Need to use 'read_handle' for IO::Async::FileStream, not just
+             'handle'
+
+0.010     2013-07-15 03:11:21 Europe/London
+Use Tickit::Style for configuration
+Updated to use Tickit 0.36's ->render_to_rb
+
+0.009     2013-03-15 21:48:11 Europe/London
+Make sure to ->close windows of removed tabs
+
+0.008     2012-12-16 18:33:39 Europe/London
+Allow Tab on_{de,}activated to be a method name or a coderef
+Set minimal perl version correctly in Makefile.PL (RT81862)
+
+0.007     2012-11-11 14:33:26 Europe/London
+Disable the deprecated CLEAR_BEFORE_RENDER behaviour
+Don't create two sets of child windows for widgets
+Use Tickit 0.23's make_hidden_sub Window method
+
+0.006     2012-11-09 19:02:50 Europe/London
+Have ->activate_index croak on out-of-bounds tab indexes.
+
+0.005     2012-09-11 06:00:23 Europe/London
+New ribbon model - allow custom subclasses
+Indicate selected tab with [] brackets
+Allow mouse click on tab labels
+Scroll tab ribbon if there's too many labels for the window width
+Various small bugfixes relating to tab move and removal
+
+0.004     2012-06-12 09:50:32 Europe/London
+Use Tickit 0.17's hidden windows to give every child a window with all but one
+  hidden, rather than only one child having a window.
+
+0.003     2011-12-31 01:34:18 Europe/London
+Added ability to build subclasses of tab objects
+
+0.002     2011-11-26 13:48:42 Europe/London
+Bugfix: remember to activate the initial tab immediately if we already have a
+  window.
+
+0.001     2011-10-21 22:03:32 Europe/London
+Initial CPAN release

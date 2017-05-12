@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+
+use strict ;
+use warnings ;
+use Carp ;
+
+=head1 NAME 
+
+ $> generate_perl_completion_script - Generates a perl script to do bash command completion.
+
+=head1 USAGE
+
+ $> generate_perl_completion_script command_name switch switch ...
+
+The resulting script is output on STDOUT. The script will also output the B<complete>
+command on STDERR.
+
+The first argument is taken as the command name, the rest of the arguments as switches to create
+completion for.  The arguments are taken from the command line and STDIN; this lets you create
+completion script like this
+
+  $> generate_perl_completion_script command option < options_file > my_script.pl
+
+B<options_file> contains an option perl line, without dashes.
+
+or 
+
+  $> generate_perl_completion_script command < command_and_options_file > my_scritp.pl
+
+B<command_and_options_file> first line is the command the rest is options, one perl line, without dashes.
+
+=head1 OPTIONS
+
+None.
+
+=head1 EXIT STATUS
+
+An error message is displayed and  a non zero status is returned if the completion script can't be created.
+
+=head1 AUTHOR
+
+	Khemir Nadim ibn Hamouda
+	CPAN ID: NKH
+	mailto:nkh@cpan.org
+
+=cut
+
+#------------------------------------------------------------------------------------------------------------------------
+
+use Term::Bash::Completion::Generator ;
+use IO::Select ;
+
+our $VERSION = '0.01' ;
+
+#------------------------------------------------------------------------------------------------------------------------
+
+my @extra_options ;
+my $io_select = IO::Select->new(\*STDIN) ;
+
+if($io_select->can_read(0))
+	{
+	@extra_options = <STDIN> ; ## no critic (InputOutput::ProhibitExplicitStdin)
+	chomp @extra_options ;
+	}
+	
+for(@ARGV)
+	{
+	display_help() if $_ eq '--help' ;
+	}
+	
+my @command_and_options = (@ARGV, @extra_options) ;
+
+display_help() unless @command_and_options ;
+
+my $command = shift @command_and_options ;
+
+my ($bash_completion_command, $perl_completion_script) = 
+	Term::Bash::Completion::Generator::generate_perl_completion_script
+		(
+		$command,
+		\@command_and_options,
+		) ;
+
+print $perl_completion_script . "\n" or croak 'Can\'t output script!' ;
+
+print {STDERR} "Completion command: $bash_completion_command\n" or croak 'Can\'t output warning!';
+
+#------------------------------------------------------------------------------------------------------------------------
+
+sub display_help
+{ 
+print {STDERR} `perldoc $0`  or croak 'Can\'t display help!' ; ## no critic (InputOutput::ProhibitBacktickOperators)
+exit(1) ;
+}

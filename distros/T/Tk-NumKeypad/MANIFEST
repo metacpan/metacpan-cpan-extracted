@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+NumKeypad.pm
+test.pl
+numkeypadtest.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

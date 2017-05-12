@@ -1,0 +1,13 @@
+#==================================================================
+# Author    : Djibril Ousmanou
+# Copyright : 2010
+# Update    : 20/06/2010 00:24:19
+# AIM       : Tk::ForDummies::Graph TODO
+#==================================================================
+
+Allow to get Q1 and Q3 quartile using one of the nine quantile algorithms in boxplot. 
+For the moment, the quantile is calculated with the same algorithm as Excel and type 7 quantile R package. 
+
+Create Tk::ForDummies::Graph::HBars
+
+Add an -cumulate_area option for area graph.

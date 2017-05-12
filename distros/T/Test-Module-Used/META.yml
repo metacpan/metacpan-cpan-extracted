@@ -1,0 +1,47 @@
+---
+abstract: 'Test required module is really used and vice versa between lib/t and META.yml'
+author:
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::Builder::Tester: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Module-Used
+no_index:
+  directory:
+    - testdata
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Module::Used:
+    file: lib/Test/Module/Used.pm
+    version: v0.2.6
+requires:
+  CPAN::Meta: '0'
+  List::MoreUtils: '0'
+  Module::CoreList: '0'
+  Module::Used: '0'
+  PPI::Document: '0'
+  perl: '5.008001'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/tsucchi/Test-Module-Used/issues
+  homepage: https://github.com/tsucchi/Test-Module-Used
+  repository: git://github.com/tsucchi/Test-Module-Used.git
+version: 0.2.6
+x_contributors:
+  - 'CPAN Service <cpanservice@chorny.net>'

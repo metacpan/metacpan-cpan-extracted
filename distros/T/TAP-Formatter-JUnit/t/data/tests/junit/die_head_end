@@ -1,0 +1,19 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="1"
+             tests="4"
+             name="data_tests_die_head_end">
+    <testcase name="1"></testcase>
+    <testcase name="2"></testcase>
+    <testcase name="3"></testcase>
+    <testcase name="4"></testcase>
+    <system-out><![CDATA[ok 1
+ok 2
+ok 3
+ok 4
+]]></system-out>
+    <system-err><![CDATA[Dubious, test returned 1 (wstat 256, 0x100)
+]]></system-err>
+    <error message="Dubious, test returned 1 (wstat 256, 0x100)" />
+  </testsuite>
+</testsuites>

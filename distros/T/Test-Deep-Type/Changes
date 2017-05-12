@@ -1,0 +1,33 @@
+Revision history for Test-Deep-Type
+
+0.008     2016-09-27 00:56:53Z
+          - fix test that dies badly when optional prereq is not available
+
+0.007     2016-09-24 00:07:43Z
+          - some refactoring, and elimination of some prerequisites
+          - fix tests to not rely on . in @INC (Graham Knop)
+
+0.006     2014-08-23 23:31:03Z
+          - fix pod error
+
+0.005     2014-08-23 20:49:37Z
+          - updated metadata, generated tests, etc
+
+0.004     2013-04-21 21:27:13Z
+          - added references to a few other test and type libraries in
+            SEE ALSO
+
+0.003     2013-03-06 20:33:50Z
+          - fixed bad link in 'SEE ALSO'
+          - fixed test failure due to bad plan when MooseX::Types is not
+            available
+          - fixed test failure when Devel::PartialDump is not installed
+
+0.002     2013-03-04 18:43:05Z
+          - fix extraction of type name from MooseX::Types types
+          - make use of string overload to extract the type name
+          - fix use of unescaped literal { in regexp (warns in 5.17.*)
+
+0.001     2013-03-02 19:42:45Z
+          - initial release
+

@@ -1,0 +1,8 @@
+CHANGES			
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/Tree/Nary.pm	* Tree::Nary Perl module
+t/allocation.t
+t/general.t

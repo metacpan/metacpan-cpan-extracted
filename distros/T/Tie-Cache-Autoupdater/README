@@ -1,0 +1,25 @@
+Tie::Cache::Autoupdater
+--------------
+Sometimes I need show in web rarely changes data. You may save it in memory, 
+but you never don't know how long script will be work. For example, fcgi scripts
+may work few days or weeks, but counters of database tables or site settings may 
+changed more frequent in the day, each hour or each 10 minutes. I wrote package,
+that help you cached data on fixed time.
+
+COPYRIGHT
+---------
+Copyright 2011 by the Anton Morozov (antonfin)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+HOW TO BUILD
+------------
+perl Makefile.PL
+make
+make test
+
+HOW TO INSTALL
+--------------
+make install
+

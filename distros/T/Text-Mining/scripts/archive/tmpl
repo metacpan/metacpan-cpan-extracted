@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use Getopt::Long;
+use strict;
+use warnings;
+
+our ( $function, $verbose );
+our $corpus_name = '';
+
+our $features = { create => \&create_corpus,
+                  show   => \&show_corpus,
+                  delete => \&delete_corpus,
+		};
+
+get_options();
+
+$features->{ $function }->();
+
+exit;
+
+
+sub create_corpus {
+	print "create_corpus $corpus_name \n";
+}
+
+sub delete_corpus {
+	print "delete_corpus $corpus_name \n";
+}
+
+sub show_corpus {
+	print "show_corpus $corpus_name \n";
+}
+
+sub get_options {
+	my ( $help, $create, $show, $delete, $name );
+	my $opts = GetOptions ( "verbose"  => \$verbose,
+				"help"     => \$help, 
+				"show"     => \$show, 
+				"create"   => \$create, 
+				"delete"   => \$delete, 
+				"name=s"   => \$name,
+			      );
+
+	# Handle "immediate" switches
+	usage()  if $help;
+
+	# Handle assigned switches
+	if    ( $show )   { $function = 'show';   $corpus_name = $name; }
+	elsif ( $create ) { $function = 'create'; $corpus_name = $name; }
+	elsif ( $delete ) { $function = 'delete'; $corpus_name = $name; }
+	else              { usage(); exit; }
+
+	if ( $verbose ) { print STDERR "  Function '$function' called.\n"; }
+}
+
+sub usage {
+	print STDERR << "EOF";
+
+usage: corpus [-vh] -[c|s|d] -n corpus_name
+
+ -c               : Create a new corpus
+ -s               : Show an existing corpus
+ -d               : Delete an existing corpus
+ -n corpus_name   : The short name of your corpus
+ -v               : verbose output (when available)
+ -h               : this (help) message
+
+example: corpus -n Dev
+         corpus -c Dev
+         corpus -d Dev
+         corpus -v -n EnglishMedical
+         corpus -h
+
+EOF
+    exit;
+}
+
+

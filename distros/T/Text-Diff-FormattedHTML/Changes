@@ -1,0 +1,30 @@
+Revision history for Text-Diff-FormattedHTML
+
+0.08	Tue Jan 31 12:45:07 WET 2017
+	- add option 'limit_onesided' (thanks to Carl Eklof)
+
+0.07    Sun Sep 11 14:14:30 WEST 2011
+        - fix 0.05 change, that tried to fix 0.04 change. Great!
+
+0.06    Sun Sep 11 13:27:30 WEST 2011
+        - It was dark, I was tired, and forgot to run 'make test'
+
+0.05    Sat Sep 10 21:09:25 WEST 2011
+        - fix the change added in the latest version;
+
+0.04    Fri Aug 26 21:05:20 WEST 2011
+        - support different colors in vertical mode for "before" and "after";
+
+0.03    Thu Jul 28 15:08:34 WEST 2011
+        - removing -T from 00_load :-/
+
+0.02    Sat Jul 23 18:44:08 WEST 2011
+        - support vertical mode      
+        - better CSS support by row type;
+        - use that CSS support for changed lines;
+        - make background green/red more noticiing;
+
+0.01    Sat Jul 23 16:25:50 WEST 2011
+        First version, released on an unsuspecting world.
+        - basic functionality. patches <welcome.
+

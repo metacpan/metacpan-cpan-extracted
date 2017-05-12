@@ -1,0 +1,132 @@
+
+
+
+Time::SoFar(3) User Contributed Perl Documentation Time::SoFar(3)
+
+
+NNNNAAAAMMMMEEEE
+       Time::SoFar - Perl module to calculate run time
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+           use Time::SoFar qw( runtime runinterval figuretimes );
+
+           # [...] denotes optional arguments
+           $times = runtime( [$no_optimize] );
+           @times = runtime( [$no_optimize] );
+
+           $times = runinterval( [$no_optimize] );
+           @times = runinterval( [$no_optimize] );
+
+           $times = figuretimes( $seconds [, $no_optimize] );
+           @times = figuretimes( $seconds [, $no_optimize] );
+
+
+SSSSAAAAMMMMPPPPLLLLEEEESSSS
+           my $elasped = runtime();
+           print "Elapsed time $elapsed\n";
+           # prints, eg, "Elapsed time 17:34\n"
+
+           my $sincethen = runinterval(1);
+           print "Time since then $sincethen\n";
+           # prints, eg, "Time since then 0:00:00:51\n"
+
+           ($day, $hour, $min, $sec) = figuretimes(86400 + 2*3600 + 3*60 + 4, 1);
+           # $day = 1; $hour = 2; $min = 3; $sec = 4;
+
+           @times = figuretimes(2*3600 + 3*60 + 4);
+           # @times = (2, 3, 4)
+
+           @times = figuretimes(17,1);
+           # @times = (0, 0, 0, 17)
+
+           $times = figuretimes(2*3600 + 3*60 + 4, 1);
+           # $times = '0:02:03:04';
+
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+       TTTTiiiimmmmeeee::::::::SSSSooooFFFFaaaarrrr has two functions for calculating how long a
+       script has been running. `runtime()' always works from the
+       time the script was started (using _$_^_T). `runinterval()'
+       works from the last time `runtime()' or `runinterval()'
+       was called (or since the start of the script).
+
+       Both `runtime()' and `runinterval()' use `figuretimes()'
+       to render a raw number of seconds into component time
+       units. Both take an optional boolean argument that gets
+       passed to `figuretimes()' to influence its output.
+
+       In an array context `figuretimes()' returns the
+       timecomponents as an array, in a scalar context it returns
+       those components as a :::: delimited string. The default
+
+
+
+2000-12-13                 perl v5.6.0                          1
+
+
+
+
+
+Time::SoFar(3) User Contributed Perl Documentation Time::SoFar(3)
+
+
+       behaviour is to optimize away 0 output from the longer
+       period end of the output, leaving a minimum of
+       minutes:seconds. This is good for arrays that will be
+       passed to `join()', but not so good for a list of
+       variables, so this behaviour can be disabled by using a
+       true value for _$_n_o___o_p_t_i_m_i_z_e.
+
+IIIINNNNHHHHEEEERRRRIIIITTTTAAAANNNNCCCCEEEE
+       Time::SoFar inherits only from Exporter.
+
+CCCCAAAAVVVVEEEEAAAATTTTSSSS
+       Time::SoFar has a granularity of seconds, and is therefore
+       not so useful for small elapsed times.
+
+PPPPRRRREEEERRRREEEEQQQQUUUUIIIISSSSIIIITTTTEEEESSSS
+       Only stock perl modules are used.
+
+OOOOSSSSNNNNAAAAMMMMEEEESSSS
+       So long as _$_^_T and `time()' are calculated using the same
+       epoch there should be no operating system dependence.
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+       _$_^_T in the perlvar manpage.
+
+CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
+       Copyright 2000 by Eli the Bearded / Benjamin Elijah
+       Griffin.  Released under the same _l_i_c_e_n_s_e(s) as Perl.
+
+AAAAUUUUTTTTHHHHOOOORRRR
+       Eli the Bearded wrote this to do away with all the _$_^_T one
+       liners at the end of his batch processing scripts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2000-12-13                 perl v5.6.0                          2
+
+

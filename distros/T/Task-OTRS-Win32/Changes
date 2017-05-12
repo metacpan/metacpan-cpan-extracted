@@ -1,0 +1,19 @@
+1.12      2013-03-13
+- Added Module::Build 0.39 as a dependency because Date::Manip requires 0.38 but somehow 
+  this is not added automatically.
+
+1.11      2013-02-27
+- Fixed source links.
+
+1.10      2013-02-04
+- Added Win32::Console::ANSI for ANSI colors in the console.
+
+1.04      2012-09-02
+- Added Sys::Syslog which logs to the Event Log if installed on Windows.
+
+1.03      2012-08-28
+- Fixed version number
+
+1.02      2012-08-15
+1.01      2012-08-15
+- Initial version.

@@ -1,0 +1,257 @@
+NAME
+    Test::XT - Generate best practice release-only tests
+
+SYNOPSIS
+      use Test::XT 'WriteXT';
+      
+  # Write some specific tests:
+      WriteXT(
+          # Generally safe and recommended for most distributions
+          'Test::Pod'            => 'xt/pod.t',
+          'Test::CPAN::Meta'     => 'xt/meta.t',
+          'Test::MinimumVersion' => 'xt/minimumversion.t',
+          'Test::HasVersion'     => 'xt/hasversion.t',
+          
+      # Controversial history and methodology, does not install reliably.
+          # Forced use leads to cargo cult of worse-than-nothing empty method stubs.
+          'Test::Pod::Coverage'  => 'xt/podcoverage.t',
+          
+      # May become unreliable over time as PPI and Perl::Critic change.
+          # Safe when BOTH distribution and policy file are active and maintained.
+          'Test::Perl::Critic'   => 'xt/critic.t',
+          
+      # Should only be used if you hand-maintain your MANIFEST file.
+          # Can be presumptive about MANIFEST.SKIP in some situations.
+          'Test::DistManifest'   => 'xt/distmanifest.t',
+          
+      # Does not install reliably, does not install AT ALL on Windows.
+          'Test::CheckChanges'   => 'xt/changes.t',
+      );
+
+DESCRIPTION
+    A number of Test modules have been written over the years to support
+    authors. Typically, these modules have standard short test scripts
+    documented in them that you can cut and paste into your distribution.
+
+    Unfortunately almost all of these cut-and-paste test scripts are wrong.
+
+    Either the test script runs during install time, or it runs with an
+    out-of-date version of the test module, or the author adds the test
+    modules as an (unnecesary) dependency at install time, or for automated
+    testing.
+
+    Test::XT is a module intended for use in code generators, release
+    automation and other ancillary systems. It generates an appropriate test
+    script for various testing modules that runs in the appropriate mode for
+    each type of execution environment.
+
+    1. End User Install
+
+    At installation time, test scripts should never ever run, even if the
+    test modules are installed and available.
+
+    2. Automated Testing
+
+      # Enable automated testing
+      $ENV{AUTOMATED_TESTING} = 1
+
+    During automated testing we should run the tests, but only if the
+    testing module are already installed and at the current/latest version.
+
+    However, we should not install dependencies during automated testing,
+    because failing to install a testing dependency means less runs on your
+    code when the entire point of the author tests is to improve the
+    standard of testing, not reduce it.
+
+    3. Release/Author Testing
+
+      # Enable author tests
+      $ENV{RELEASE_TESTING} = 1;
+
+    All tests should be run at release time by the author. Despite this, the
+    dependencies should NEVER be added to your Makefile.PL or Build.PL,
+    because it is far too easy to accidentally have these extra dependencies
+    bleed through into your published META.yml.
+
+    This would cause inaccuracies in tools that track dependencies across
+    the entire repository via the META.yml files.
+
+SUPPORTED TEST MODULES
+    *   Test::Pod
+
+    *   Test::CPAN::Meta
+
+    *   Test::HasVersion
+
+    *   Test::MinimumVersion
+
+    *   Test::Perl::Critic
+
+    *   Test::DistManifest
+
+    *   Test::CheckChanges
+
+    *   Test::Pod::Coverage
+
+    To programmatically extract a list of the relevant module files, or to
+    get informtion about supported modules, you may directly access the
+    underlying hash:
+
+      %Test::XT::STANDARD
+
+    Please note that this interface is experimental and subject to change.
+
+FUNCTIONS
+  WriteTest
+      WriteTest(
+        'xt/something.t',
+        test    => 'ok_changes',
+        release => 0,
+        comment => 'Test that Changes has an entry for current version',
+        modules => {
+          'Test::CheckChanges' => '0.08',
+        },
+      );
+
+    This function provides a simple way to write a single test to a file,
+    following the usual template. The test data is a hash (Note: it's NOT a
+    hash reference).
+
+    The example above writes a test to xt/somefile.t that loads
+    Test::CheckChanges if available, calling the "ok_changes()" function if
+    it is. A few knobs control how this works:
+
+    *   test is the name of the subroutine to run, which has to be exported
+        from the test module.
+
+    *   release determines whether this is a release-only test, which means
+        it is not executed during automated testing, even if the needed
+        prerequisites are available.
+
+    *   comment is the default comment which briefly describes the test.
+
+    *   modules is a hash reference containing pairs of modules and their
+        required versions. If no particular version is required, use 0.
+
+  WriteXT
+      WriteXT(
+          'Test::Pod'            => 'xt/pod.t',
+          'Test::CPAN::Meta'     => 'xt/meta.t',
+          'Test::MinimumVersion' => 'xt/minimumversion.t',
+          'Test::Perl::Critic'   => 'xt/critic.t',
+      );
+
+    This provides a convenient way to write multiple test files using the
+    default profile settings (such as which modules to require, what
+    subroutine to call, whether this is a release-only test, and so on).
+
+    Example code:
+
+OBJECT ORIENTED INTERFACE
+  new
+      my $test = Test::XT->new(
+        test    => 'all_pod_files_ok',
+        release => 0, # is this a RELEASE test only?
+        comment => 'Test that the syntax of our POD documentation is valid',
+        modules => {
+          'Pod::Simple' => '3.07',
+          'Test::Pod'   => '1.26',
+        },
+        default => 'pod.t',
+      );
+
+    This produces a new object that stores information about a given test
+    module. It can then be transformed into output suitable for use in a
+    stream (via "write_string", which returns the test script as a string)
+    or for writing directly to a file (using "write").
+
+    For details on the available options, see WriteTest
+
+  module
+      $test->module( 'Foo::Bar' => '1.23' );
+
+    Add a module dependency for the test script.
+
+  test
+      $test->test( $command );
+
+    Change the name of the subroutine which is called to actually run the
+    test.
+
+    Code example:
+
+      $test->test('all_pod_coverage_ok');
+
+  write
+      $test->write( $path )
+
+    This method writes the test file to the provided path.
+
+    Note that this method throws an exception upon failure to open the file.
+
+    Code example:
+
+      eval {
+        $test->write('t/file.t');
+      };
+      print "Failure writing file" if $@;
+
+  write_string
+      $test->write_string()
+
+    This method writes the test script as a chunk of text and returns it.
+    Note that this is the exact script written out to file via "write".
+
+    Code example:
+
+      print "Test script:\n";
+      print $test->write_string;
+
+LIMITATIONS
+    This module is still missing support for lots of other author tests.
+
+SUPPORT
+    This module is stored in an Open Repository at the following address:
+
+    <http://svn.ali.as/cpan/trunk/Test-XT>
+
+    Write access to the repository is made available automatically to any
+    published CPAN author, and to most other volunteers on request.
+
+    If you are able to submit your bug report in the form of new (failing)
+    unit tests, or can apply your fix directly instead of submitting a
+    patch, you are strongly encouraged to do so. The author currently
+    maintains over 100 modules and it may take some time to deal with
+    non-critical bug reports or patches.
+
+    This will guarantee that your issue will be addressed in the next
+    release of the module.
+
+    If you cannot provide a direct test or fix, or don't have time to do so,
+    then regular bug reports are still accepted and appreciated via the CPAN
+    bug tracker.
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-XT>
+
+    For other issues, for commercial enhancement and support, or to have
+    your write access enabled for the repository, contact the author at the
+    email address above.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+    Jonathan Yu <jawnsy@cpan.org>
+
+SEE ALSO
+    <http://use.perl.org/~Alias/journal/38822>, which explains why this
+    style of testing is beneficial to you and the CPAN-at-large.
+
+COPYRIGHT
+    Copyright 2009-2011 Adam Kennedy
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,33 @@
+---
+abstract: 'Install all Git::Repository plugins at once'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  File::Path: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Git-Repository
+requires:
+  Git::Repository: '1.309'
+  Git::Repository::Plugin::AUTOLOAD: '1.000'
+  Git::Repository::Plugin::Blame: '0'
+  Git::Repository::Plugin::FileHistory: '0'
+  Git::Repository::Plugin::Gerrit: '0'
+  Git::Repository::Plugin::Hooks: '0'
+  Git::Repository::Plugin::Info: '0'
+  Git::Repository::Plugin::Log: '1.309'
+  Git::Repository::Plugin::Status: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Git-Repository
+  repository: http://github.com/book/Task-Git-Repository.git
+version: '1.001'

@@ -1,0 +1,72 @@
+---
+abstract: 'A mock library which is usable easily.'
+author:
+  - 'keita iseki C<< <keita.iseki+cpan at gmail.com> >>'
+build_requires:
+  List::MoreUtils: 0
+  Test::Deep: 0
+  Test::More: 0
+  Test::Tester: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.6, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-EasyMock
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Test::EasyMock:
+    file: lib/Test/EasyMock.pm
+    version: 0.10
+  Test::EasyMock::ArgumentsMatcher:
+    file: lib/Test/EasyMock/ArgumentsMatcher.pm
+    version: 0
+  Test::EasyMock::Class:
+    file: lib/Test/EasyMock/Class.pm
+    version: 0
+  Test::EasyMock::Expectation:
+    file: lib/Test/EasyMock/Expectation.pm
+    version: 0
+  Test::EasyMock::ExpectationSetters:
+    file: lib/Test/EasyMock/ExpectationSetters.pm
+    version: 0
+  Test::EasyMock::MockControl:
+    file: lib/Test/EasyMock/MockControl.pm
+    version: 0
+  Test::EasyMock::MockControl::Class:
+    file: lib/Test/EasyMock/MockControl/Class.pm
+    version: 0
+  Test::EasyMock::MockObject:
+    file: lib/Test/EasyMock/MockObject.pm
+    version: 0
+requires:
+  Data::Dump: 0
+  Data::Util: 0
+  List::Util: 0
+  Scalar::Util: 0
+  Test::Builder: 0
+  Test::Deep::NoTest: 0
+  Test::MockModule: 0
+  parent: 0
+  version: 0
+resources:
+  bugtracker: https://github.com/NetPenguin/perl-test-easymock/issues
+  homepage: https://github.com/NetPenguin/perl-test-easymock
+  repository: https://github.com/NetPenguin/perl-test-easymock.git
+version: 0.10
+x_contributors:
+  - 'NetPenguin <keita.iseki@gmail.com>'

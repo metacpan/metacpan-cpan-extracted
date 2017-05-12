@@ -1,0 +1,15 @@
+language: perl
+perl:
+  - "5.20"
+  - "5.18"
+  - "5.10"
+  - "5.8"
+
+env:
+  global:
+    - COVERAGE=1
+
+before_install:
+  - eval $(curl https://travis-perl.github.io/init) --auto
+
+sudo: false

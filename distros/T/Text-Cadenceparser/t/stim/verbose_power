@@ -1,0 +1,12 @@
+============================================================
+Header goes here, verbose tool mode
+============================================================
+
+                                                                                                              Library         Leakage   Internal    Net        Dynamic          Total       
+                                                                                                                                                           (Internal+Net) (Leakage+Dynamic) 
+                                                   Instance                                                    Domain  Cells Power(mW) Power(mW) Power(mW)    Power(mW)       Power(mW)     
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+blox_matrix                                                                                                    lib_tc 103442     6.546    26.729    18.396         45.125            51.671 
+  inst_alu_vect_arith                                                                                          lib_tc  45973     3.256    15.063     7.391         22.454            25.710 
+  inst_reg_VR                                                                                                  lib_tc  23170     1.120     1.470     1.794          3.263             4.383 
+  inst_lut_vect_arith                                                                                          lib_tc  14997     1.066     5.727     4.815         10.543            11.608 

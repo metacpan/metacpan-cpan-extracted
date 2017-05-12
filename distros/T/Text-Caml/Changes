@@ -1,0 +1,52 @@
+Revision history for perl module Text::Caml
+
+0.16 2017-05-03T10:42:27Z
+
+ - Escape "{" and "}" (Shoichi Kaji)
+
+0.15 2017-04-21T23:19:09Z
+
+ - Not parsed partials
+
+0.14 2016-04-18T22:07:12Z
+
+ - Implement array indexing (Fernando Oliveira)
+
+0.13 2015-09-03T06:55:41Z
+
+ - Fixed the way we parse the blocks to ensure we provide correct error messages in case there is a syntax error and no
+   closing block tag is present (Ovidiu Stateina)
+ - Add more relevant error messages, improve block parsing. Work in progress (Ovidiu Stateina)
+ - Added support for nested templates (Ovidiu Stateina)
+
+0.12 2015-06-22T17:20:50Z
+
+ - Added default_partial_extension option
+
+0.11 2015-06-22T17:11:54Z
+
+ - Added template generation possibility
+ - Fix a hashref "pollution" issue (Andrew Rodland)
+ - Add regression test to check that $context arg handling is correct (Alex Balhatchet)
+ - Remove unnecessary check on $context in _parse() (Alex Balhatchet)
+ - Fix typo in render_file() use of @_ (Alex Balhatchet)
+
+0.10 2012-03-29
+
+ - Fixed hash contexts merging
+
+0.00905 2011-10-04
+
+ - Fixed 'with' behaviour
+ - Implemented smth like Pascal's with
+ - Context checks for available method too
+
+0.00904 2011-09-25
+
+ - Allow objects passing
+ - Render template before passing to lambda
+ - Fixed inverted section bug (Sergey Zasenko)
+
+0.00903 2011-08-22
+
+ - Fixed absolute template path rendering

@@ -1,0 +1,47 @@
+<html>
+<head>
+	<title>Wiki: Network Example</title>
+<head>
+<body bgcolor=#FFFFFF link=#d06040 vlink=#806040>
+	<h1>Network Example</h1>
+	<wiki><em>We will be experimenting with acceptance testing technique using radio network routing algorithms as a sufficiently complicated example. Our testbed will be a recently reincarnated simulation which we have described briefly elsewhere. <a href="//c2.com/~ward/morse/SimNet/SimView.html">http://c2.com/~ward/mors ... Net/SimView.html</a>. -- WardCunningham</em>
+<p>The simulator starts with no nodes. The <em>new city</em> button pops up a dialog for city information.  Try <a href="run.cgi">http:run.cgi</a>.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=3>fit.ActionFixture</td></tr>
+<tr><td>start</td><td>eg.net.Simulator</td><td>&nbsp;</td></tr>
+<tr><td>check</td><td>nodes</td><td>0</td></tr>
+<tr><td>press</td><td>new city</td><td>&nbsp;</td></tr>
+<tr><td>enter</td><td>name</td><td>Portland</td></tr>
+<tr><td>enter</td><td>zip</td><td>1,1,1</td></tr>
+<tr><td>enter</td><td>population</td><td>1.5e6</td></tr>
+<tr><td>enter</td><td>coord</td><td>45 30.0 n 122 45.0 w</td></tr>
+<tr><td>check</td><td>coord</td><td>N45.5 W122.75</td></tr>
+<tr><td>press</td><td>ok</td><td>&nbsp;</td></tr>
+<tr><td>check</td><td>nodes</td><td>1</td></tr>
+<tr><td>press</td><td>new city</td><td>&nbsp;</td></tr>
+<tr><td>enter</td><td>name</td><td>Salem</td></tr>
+<tr><td>enter</td><td>population</td><td>.6e6</td></tr>
+<tr><td>enter</td><td>zip</td><td>1,1,2</td></tr>
+<tr><td>enter</td><td>coord</td><td>44 59' 22" n 122 28' 59" w</td></tr>
+<tr><td>press</td><td>ok</td><td>&nbsp;</td></tr>
+<tr><td>check</td><td>nodes</td><td>2</td></tr>
+<tr><td>press</td><td>new city</td><td>&nbsp;</td></tr>
+<tr><td>enter</td><td>name</td><td>Seattle</td></tr>
+<tr><td>press</td><td>cancel</td><td>&nbsp;</td></tr>
+<tr><td>check</td><td>nodes</td><td>2</td></tr>
+</table>
+<p><p><hr>
+<p>An ActionFixture delegates much of its work to other fixtures (actors). See the source for the actor(s) in use here.
+<p><UL>
+<li> <a href="Release/Source/eg/net/Simulator.java">http:Release/Source/eg/net/Simulator.java</a>
+<p></UL>
+This fixture employs a domain specific ValueObject called a GeoCoordinate. The framework goes to some lenght to make sure such objects can be parsed and printed within the framework. Actual parsing and printing are easily delegated to the domain object, as they are here by GeoCoordinate, which accepts a wide variety of coordinate notations.
+<p><UL>
+<li> <a href="Release/Source/eg/net/GeoCoordinate.java">http:Release/Source/eg/n ... oCoordinate.java</a>
+<p></UL>
+</wiki>
+<hr>
+	Last edited September 10, 2002
+</body>
+</html>
+

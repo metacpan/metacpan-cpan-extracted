@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 88b38456a181aeb429135fba2f3b48a0ede2676b Changes
+SHA1 4765da8d6dcb9e8847321db30bff1c01ef5cb3e5 Dicom.pm
+SHA1 ecec73beff956fc76e8b8199687ac9bb85103e96 LICENSE
+SHA1 1e1436dc04bc88318e596d6a4a90bd0e14b7a3ca MANIFEST
+SHA1 45c8e5d06719231d178fb33e17f936d92fc2b0d6 META.yml
+SHA1 63f7b67b27821a40dfb80f625ba9a5469b5a9247 Makefile.PL
+SHA1 575ef823908774bf9db035809607c7f464954062 README
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 ec58b0d59769879816b405ee3fbd7fba7b9cbdae t/Task-Dicom/01-use.t
+SHA1 bcd01ef106c90eb1d4658a827e1bb3832973bc1d t/Task-Dicom/02-version.t
+SHA1 f165138d13a5e0d77a07ebe6c17edb0a02323af9 xt/Task-Dicom/01-pod_coverage.t
+SHA1 bbb515232f0fa7532cce830fc321fb845ab548df xt/Task-Dicom/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXvrq5AAoJEJe+XXKaIuTlQ34IALP4lgKRH94TjMkJ7ACqFgg2
+ouqKqCS3cYewDAIa1P3uO1Tc11Y0o4AgceGEtl0t1Fd8X8deZlmTF80tUhaWA4Fm
+hnHUmooueuEFndhkHaO78U9nodNoP8DJ0yKEq+uU0zOSbSdwCsCggdzI11n3xKvA
+UACAPOtSa6bh5SRKF3SijSqCveFcdUmKBsmOX0o3aWy/WFA1CB2cgQ7/PQ56rD0U
+guHuqioR6NvaBTotE7ntfLsd78qi3Hne/fPjeT+8U5iV4elPq7GSdpBnwfisRdgc
+/4mlMzv4GBpkik6ZvSl3NRqpk+6sqDtJ5O19kmmaq/mPoNppr0PYskIHPSs9H6Q=
+=HY6c
+-----END PGP SIGNATURE-----

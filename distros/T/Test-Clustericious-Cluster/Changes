@@ -1,0 +1,175 @@
+Revision history for Test-Clustericious-Cluster
+
+0.35      2017-04-27 08:37:00 -0400
+  - Bump Clustericious tests to requrie 1.24 for Mojolicious 7.31 compat
+
+0.34      2017-03-14 10:59:52 -0400
+  - Migrate to using Test2 + Test2::Suite
+
+0.33      2016-05-29 10:27:38 +0200
+  - You can now explicitly add .psgi extension to PSGI apps.
+
+0.32      2016-05-12 19:24:50 -0400
+  - Also search for .psgi files in the "lite_path"
+  - Always create the "cluster" config helper if
+    Clustericious is installed.
+  - Fixed bug where constructor was ignoring Test::Mojo passed to it
+
+0.31      2016-04-22 13:36:21 -0400
+  - Mojolicious 6.58 compatability
+
+0.30      2016-03-14 12:21:55 -0400
+  - Clustericious 1.17 compatability
+
+0.29      2016-01-03 10:35:00 -0500
+  - Can now test a ::Client without creating a .conf file
+  - Can now get a client object for each app
+
+0.28      2015-12-04 11:34:38 -0500
+  - Fix skip logic in test t/clustericious_config_with_colon.t
+
+0.27      2015-12-04 09:41:10 -0500
+  - Fix bug where an app name with colons was looking for
+    config in with the wrong name.  Note the config filename
+    for app Foo::Bar is actually etc/Foo-Bar.conf.  This is
+    because : is not legal in filenames on some platforms.
+
+0.26      2015-12-04 08:03:53 -0500
+  - Add support for testing PSGI apps
+    this requires Mojolicious::Plugin::MountPSGI
+  - extract_data_section can take a plain string for
+    an exact match of one file.
+  - extract_data_section can be called as a class method
+    (this was already the case, but it is documented/supported now)
+  - Auto extract lib/* from data section during create_cluster_ok
+    (we may auto extract lib/... and script/... files in the future
+     as necessary)
+  - Default to the last service for $cluster->t testing
+    (ie $cluster->t->get_ok('/foo') should work instead of needing
+        $cluster->t->get_ok("$url/foo") for single service clusters)
+    This Feature should be considered experimental
+
+0.25      2015-12-01 06:56:07 -0500
+  - Fixed bug where create_cluster_ok not always catching failure on
+    start of Clustericious App.
+
+0.24      2015-11-30 08:27:20 -0500
+  - Added extract_data_section method
+
+0.23      2015-11-02 13:00:57 -0500
+  - Fixed test skip logic
+
+0.22      2015-11-02 08:40:32 -0500
+  - Hook into Clustericious::Client if app is a Clustericious service
+    on Clustericious 1.01 or better
+
+0.21      2015-07-07 11:27:22 -0400
+  - Track stops / starts
+    This fixes a bug when you use create_ua after a service has been stopped
+  - Fix long standing incompatability wiht recent Mojolicious and PlugAuth::Lite
+    tests
+  - added tests is_stopped and isnt_stopped
+
+0.20      2015-02-28 10:54:59 -0500
+  - Mojo 6.x compat
+
+0.19      2015-01-22 11:17:21 -0500
+  - fixed borked tests if recent Clustericious is already installed.
+
+0.18      2014-12-30 00:02:32 -0500
+  - Clustericious test cases run only with 0.9941 or better
+    this is the new combined Clustericious coming out tomorrow.
+
+0.17      2014-12-19 12:45:10 -0500
+  - merge former optional dependency PlugAuth::Lite into this distribution
+  - Do not use Mojo::JSON deprecated OO interface
+
+0.16      2014-05-30 09:39:01 -0400
+  - Mojolicious 5.x compatability
+
+0.15      2014-05-02 19:26:51 -0400
+  - promote to production
+
+0.14_01   2014-04-18 08:34:05 -0400
+  - Experimental: better detection in t/stop.t
+
+0.14      2014-04-17 03:26:32 -0400
+  - remove experimental dep on Carp::Always / Carp::Always::Dump
+  - remove some experimental diagnostics
+  - promote the rest to production
+
+0.12_07   2014-04-16 18:22:31 -0400
+  - Experimental: turn off IPv6 and TLS support in t/stop.t
+
+0.12_06   2014-04-16 14:11:20 -0400
+  - Experimental: additional diagnostics
+
+0.12_05   2014-04-10 13:25:54 -0400
+  - Experimental: fixed additional diagnostics
+  - Use Module::Build instead of MakeMaker
+
+0.12_04   2014-04-10 05:44:00 -0400
+  - Experimental: additional diagnostics
+
+0.12_03   2014-04-09 06:38:41 -0400
+  - Experimental: explicitly stop server before undefing in stop_ok
+
+0.12_02   2014-04-08 19:55:32 -0400
+  - Experimental: temp use Carp::Always for additional diagnostic
+
+0.12_01   2014-04-08 12:09:19 -0400
+  - Experimental: catch error in stop and report as stop_ok failure
+
+0.12      2013-10-27 04:15:58 -0400
+  - Mojolicious 4.50 compatability
+
+0.11      2013-10-17 22:00:17 -0400
+  - rm undocumented and never used private _builder attribute
+
+0.10      2013-09-03 18:14:15 -0400
+  - Clustericious specific tests require Clustericious 0.9930
+    (they are skipped if not installed)
+
+0.09      2013-07-22 06:30:30 America/New_York
+  - make it work with a mojo lite app that returns app->start
+
+0.08      2013-07-19 22:50:51 America/New_York
+  - promote to production
+
+0.07_01   2013-07-19 22:46:59 America/New_York
+  - work around the limitations of case insensative filesystems
+    by trying YourApp before lite app yourapp
+
+0.07      2013-07-19 16:17:12 America/New_York
+  - promote to production
+
+0.06_01   2013-07-18 13:45:53 America/New_York
+  - MSWin32 compatability fixes
+
+0.06      2013-07-18 09:09:06 America/New_York
+  - promote to production
+
+0.05_01   2013-07-17 16:36:31 America/New_York
+  - documentation
+  - inline perl code gets put in front of @INC
+
+0.05      2013-07-14 22:33:34 America/New_York
+  - support for non-inlined lite apps
+  - deprecate passing Test::Mojo instance into new
+
+0.04      2013-07-07 00:39:12 America/New_York
+  - patch %INC to make Mojo::Home happy
+  - create_plugauth_lite_ok requires Clustericious 0.9925
+    this was always true, but this version:
+  - document dep on Clustericious 0.9925
+  - croak if you try to use create_plugauth_lite_ok with
+    an earlier version
+
+0.03      2013-07-05 22:27:24 America/New_York
+  - add create_ua method
+
+0.02      2013-07-05 17:07:42 America/New_York
+  - add start_ok and stop_ok methods
+
+0.01      2013-07-03 15:50:30 America/New_York
+  - initial version

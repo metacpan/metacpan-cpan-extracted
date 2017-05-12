@@ -1,0 +1,4 @@
+Tk::Preferences
+===============
+A perl module for setting configuration preferences in all subwidgets of 
+a given toplevel or mainwindow Tk widget.

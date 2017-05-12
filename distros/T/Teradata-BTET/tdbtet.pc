@@ -1,0 +1,632 @@
+/*--------------------------------------------------------------------
+** Teradata::BTET
+** C routines with embedded SQL
+** These routines, like many Perl routines, return 1 for success
+** and 0 for failure.
+**------------------------------------------------------------------*/
+#include "tdbtet.h"
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+VARCHAR  LOGON_STRING[100];
+VARCHAR  STMT000[65400];
+VARCHAR  STMT001[65400];
+VARCHAR  STMT002[65400];
+
+ /* SQLDA's for Host Variables (input to Teradata) */
+extern struct sqlda sqldahv[3];
+ /* SQLDA's for Results */
+extern struct sqlda sqldares[3];
+
+struct sqlda * hv_ptr;
+struct sqlda * res_ptr;
+
+VARCHAR  Error_Msg[255];
+short    Error_Msg_Len = 255;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA;
+
+EXEC SQL DECLARE CUR000 CURSOR FOR STMT000;
+EXEC SQL DECLARE CUR001 CURSOR FOR STMT001;
+EXEC SQL DECLARE CUR002 CURSOR FOR STMT002;
+
+/*--------------------------------------------------------------------
+** Global variables from BTET.xs
+**------------------------------------------------------------------*/
+
+extern int g_msglevel;
+extern int g_activcount;
+extern int g_errorcode;
+extern char g_errormsg[260];
+
+/*--------------------------------------------------------------------
+** Data areas for results, host variables, indicators
+**------------------------------------------------------------------*/
+
+uchar res_data[3][MAX_RDA_LEN];
+uchar hv_data[3][MAX_RDA_LEN];
+short res_ind[3][MAX_FIELDS];
+short hv_ind[3][MAX_FIELDS];
+
+/*--------------------------------------------------------------------
+** Powers of 10
+**------------------------------------------------------------------*/
+
+double powers10[19] = {
+  1.0, 10.0, 100.0, 1000.0, 10000.0,
+  1.0E5,  1.0E6,  1.0E7,  1.0E8,  1.0E9,  1.0E10, 1.0E11,
+  1.0E12, 1.0E13, 1.0E14, 1.0E15, 1.0E16, 1.0E17, 1.0E18 };
+
+
+/*--------------------------------------------------------------------
+** Error checking routine for SQL commands. Return 0 if there
+** was an error or if we are at end-of-cursor, 1 otherwise.
+**------------------------------------------------------------------*/
+
+int error_check (
+  const char * sql_command )
+{
+ g_activcount = SQLCA.sqlerrd[2];
+ g_errorcode = SQLCA.sqlerrd[0];
+
+ if (SQLCA.sqlcode == 0) {
+    strcpy(g_errormsg, "");
+    return 1;
+ } else {
+    PPRTEXT(&SQL_RDTRTCON, SQLCA.sqlerrd, &Error_Msg,
+      &Error_Msg_Len);
+
+    memcpy(g_errormsg, Error_Msg.arr, Error_Msg.len);
+    g_errormsg[Error_Msg.len] = '\0';
+
+    if (g_msglevel >= 1 && SQLCA.sqlcode != 100) {
+       fprintf(stderr, "Error/warning detected in %s\n", sql_command);
+       fprintf(stderr, "   Error code: %d\n", SQLCA.sqlerrd[0]);
+       fprintf(stderr, "   SQL code:   %d\n", SQLCA.sqlcode);
+       fprintf(stderr, "%s\n", g_errormsg);
+    }
+    return 0;
+ }
+}
+
+/*--------------------------------------------------------------------
+**  Return the maximum length in bytes of a field. Input: the
+**  sqltype and sqllen from SQLDA. If the field is unsupported,
+**  we return -1.
+**------------------------------------------------------------------*/
+
+int field_len (
+  short dtype,
+  unsigned short dlen )
+{
+ unsigned short dec_p;
+
+ switch (dtype) {
+   case SMALLINT_NN:
+   case SMALLINT_N:
+      return sizeof(short);
+   case VARBYTE_NN:
+   case VARBYTE_N:
+   case VARGRAPHIC_NN:
+   case VARGRAPHIC_N:
+   case BYTE_NN:
+   case BYTE_N:
+   case GRAPHIC_NN:
+   case GRAPHIC_N:
+   case VARCHAR_NN:
+   case VARCHAR_N:
+   case CHAR_NN:
+   case CHAR_N:
+      return (int) dlen;
+   case DATE_NN:
+   case DATE_N:
+   case INTEGER_NN:
+   case INTEGER_N:
+      return sizeof(int);
+    /* NOTE: The determination of size etc. for DECIMAL varies
+       by OS. The following code is for Solaris. */
+   case DECIMAL_NN:
+   case DECIMAL_N:
+      dec_p = dlen / 256;
+      if (dec_p >= 10)
+         return 8;
+      else if (dec_p >= 5)
+         return 4;
+      else  /* Could be 2 or 1, but we'll just use 2. */
+         return 2;
+   case BLOB:
+   case BLOB_DEFERRED:
+   case BLOB_LOCATOR:
+   case CLOB:
+   case CLOB_DEFERRED:
+   case CLOB_LOCATOR:
+      return -1;
+   case BYTEINT_NN:
+   case BYTEINT_N:
+      return 1;
+   case FLOAT_NN:
+   case FLOAT_N:
+      return sizeof(double);
+   case LONG_VARCHAR_NN:
+   case LONG_VARCHAR_N:
+      return 64000;
+   default:
+      return -1;
+ }
+}
+
+/*--------------------------------------------------------------------
+**  Convert data types from an SQLDA to simplified types.
+**------------------------------------------------------------------*/
+void simplify_sqlda (
+  struct datadescr * desc_ptr,
+  struct sqlda * da_ptr )
+{
+ int   i;
+
+ for (i = 0; i < da_ptr->sqld; i++) {
+    switch (da_ptr->sqlvar[i].sqltype) {
+     case SMALLINT_NN:
+     case SMALLINT_N:
+        desc_ptr->sqlvar[i].sqltype = SMALLINT_N;
+        break;
+     case VARCHAR_NN:
+     case VARCHAR_N:
+     case VARBYTE_NN:
+     case VARBYTE_N:
+     case VARGRAPHIC_NN:
+     case VARGRAPHIC_N:
+     case LONG_VARCHAR_NN:
+     case LONG_VARCHAR_N:
+     case LONG_VARBYTE_NN:
+     case LONG_VARBYTE_N:
+     case LONG_VARGRAPHIC_NN:
+     case LONG_VARGRAPHIC_N:
+        desc_ptr->sqlvar[i].sqltype = VARCHAR_N;
+        desc_ptr->sqlvar[i].datalen = da_ptr->sqlvar[i].sqllen;
+        break;
+     case CHAR_NN:
+     case CHAR_N:
+     case BYTE_NN:
+     case BYTE_N:
+     case GRAPHIC_NN:
+     case GRAPHIC_N:
+        desc_ptr->sqlvar[i].sqltype = CHAR_N;
+        desc_ptr->sqlvar[i].datalen = da_ptr->sqlvar[i].sqllen;
+        break;
+     case DATE_NN:
+     case DATE_N:
+     case INTEGER_NN:
+     case INTEGER_N:
+        desc_ptr->sqlvar[i].sqltype = INTEGER_N;
+        break;
+     case DECIMAL_NN:
+     case DECIMAL_N:
+        desc_ptr->sqlvar[i].sqltype = DECIMAL_N;
+        desc_ptr->sqlvar[i].datalen  = da_ptr->sqlvar[i].sqllen / 256;
+        desc_ptr->sqlvar[i].decscale = da_ptr->sqlvar[i].sqllen % 256;
+        break;
+     case BLOB:
+     case BLOB_DEFERRED:
+     case BLOB_LOCATOR:
+     case CLOB:
+     case CLOB_DEFERRED:
+     case CLOB_LOCATOR:
+        desc_ptr->sqlvar[i].sqltype = BLOB;
+        desc_ptr->sqlvar[i].datalen = da_ptr->sqlvar[i].sqllen;
+        break;
+     case BYTEINT_NN:
+     case BYTEINT_N:
+        desc_ptr->sqlvar[i].sqltype = BYTEINT_N;
+        break;
+     case FLOAT_NN:
+     case FLOAT_N:
+        desc_ptr->sqlvar[i].sqltype = FLOAT_N;
+        break;
+     default:
+        desc_ptr->sqlvar[i].sqltype = -1;
+        desc_ptr->sqlvar[i].datalen = 0;
+    }
+ }
+}
+
+/*--------------------------------------------------------------------
+ *  Insert a decimal point into a "decimal" field.
+ *------------------------------------------------------------------*/
+void _insert_dp (
+ char *   target,
+ char *   source,
+ int      ndec )
+{
+ int   i, j, workstart;
+ char  work[25];
+
+ if (ndec <= 0) {
+    strcpy(target, source);
+    return;
+ }
+
+ work[24] = '\0';  /* End of string */
+
+  /* Build the string in the work area from right to left. */
+
+ i = strlen(source) - 1;
+ for (j = 23; j > 23 - ndec; j--) {
+    if (i < 0 || source[i] == '-' ) {
+       work[j] = '0';
+       continue;
+    }
+    /* Otherwise, it should be a digit. */
+    work[j] = source[i];
+    i--;
+ }
+
+ work[j] = '.';
+ j--;
+
+ for (; j >= 0; j--) {
+    if (i < 0) {
+       workstart = j+1;
+       break;
+    }
+    if ( source[i] == '-' ) {
+       work[j] = '-';
+       workstart = j;
+       break;
+    }
+    /* Otherwise, it should be a digit. */
+    work[j] = source[i];
+    i--;
+ }
+
+ strcpy(target, work+workstart);
+ return;
+}
+
+
+/*--------------------------------------------------------------------
+**  Convert a decimal field to a double.  This works only on
+**  fields of 9 digits or less.
+**------------------------------------------------------------------*/
+double _dec_to_double (
+  uchar * dec_data,
+  int     decp,
+  int     decs )
+{
+ long    wlong;
+ double  wdouble;
+
+ if (decp >= 5) {
+    wlong = *((long *) dec_data);
+ } else if (decp >= 3) {
+    wlong = *((short *) dec_data) + 0;
+ } else {		/* Precision is less than 3. */
+    wlong = *((char *) dec_data) + 0;
+ }
+
+ wdouble = (double) wlong;
+ if (decs > 0)
+    wdouble /= powers10[decs];
+ return wdouble;
+}
+
+/*--------------------------------------------------------------------
+**  Convert a decimal field (10 or more digits) to a string.
+**------------------------------------------------------------------*/
+void _dec_to_string (
+  char *  res_string,
+  uchar * dec_data,
+  int     decs )
+{
+ long long int  wlonglong;
+ char   wstring[24];
+
+ wlonglong = *((long long *) dec_data);
+ sprintf(wstring, "%lld", wlonglong);
+ _insert_dp(res_string, wstring, decs);
+}
+
+
+/*--------------------------------------------------------------------
+**  CONNECT
+**------------------------------------------------------------------*/
+int Zconnect (
+  char * logonstring )
+{
+ LOGON_STRING.len = strlen(logonstring);
+ strcpy(LOGON_STRING.arr, logonstring);
+
+ EXEC SQL LOGON :LOGON_STRING;
+ return error_check("CONNECT");
+}
+
+/*--------------------------------------------------------------------
+**  PREPARE
+**  Prepare the request into the proper SQLDA for Results; allocate
+**  space in the Returned Data Area for the actual data.
+**  Also initialize the SQLDA for input variables.
+**------------------------------------------------------------------*/
+int Zprepare ( char * sql_stmt,
+  int    da )
+{
+ int   i, fl;
+ uchar * rda_ptr;
+ short * ind_ptr;
+ uchar * rda_max;
+
+ res_ptr = &(sqldares[da]);
+ ind_ptr = res_ind[da];
+
+ strncpy(res_ptr->sqldaid, "SQLDA   ", 8);
+ res_ptr->sqldabc = 16 + (MAX_FIELDS * sizeof(struct sqlvar));
+ res_ptr->sqln = MAX_FIELDS;
+
+ strncpy(sqldahv[da].sqldaid, "SQLDA   ", 8);
+ sqldahv[da].sqldabc = 16 + (MAX_FIELDS * sizeof(struct sqlvar));
+ sqldahv[da].sqln = MAX_FIELDS;
+
+ if (da == 0) {
+    strcpy(STMT000.arr, sql_stmt);
+    STMT000.len = strlen(sql_stmt);
+    EXEC SQL PREPARE STMT000 INTO :*res_ptr
+     USING NAMES FROM :STMT000;
+ } else if (da == 1) {
+    strcpy(STMT001.arr, sql_stmt);
+    STMT001.len = strlen(sql_stmt);
+    EXEC SQL PREPARE STMT001 INTO :*res_ptr
+     USING NAMES FROM :STMT001;
+ } else {
+    strcpy(STMT002.arr, sql_stmt);
+    STMT002.len = strlen(sql_stmt);
+    EXEC SQL PREPARE STMT002 INTO :*res_ptr
+     USING NAMES FROM :STMT002;
+ }
+
+ if (error_check("PREPARE") == 0)
+    return 0;
+
+  /* Point the SQLDA to space for the result data. */
+ rda_ptr = res_data[da];
+ rda_max = rda_ptr + MAX_RDA_LEN;
+
+ for (i = 0; i < res_ptr->sqld; i++) {
+    res_ptr->sqlvar[i].sqlind = &(res_ind[da][i]);
+    res_ptr->sqlvar[i].sqldata = rda_ptr;
+    fl = field_len(res_ptr->sqlvar[i].sqltype, res_ptr->sqlvar[i].sqllen);
+    if (fl < 1) {
+       fprintf(stderr,
+         "Warning: field %d has an unsupported data type (%d) and will be ignored\n",
+         i+1, res_ptr->sqlvar[i].sqltype);
+    } else {
+       rda_ptr += fl;
+       if (is_vartype(res_ptr->sqlvar[i].sqltype))
+          rda_ptr += 2;  /* for length (short) */
+    }
+
+    if (rda_ptr > rda_max) {
+       fprintf(stderr, "Data to be returned exceeds maximum length.\n");
+       exit(2);
+    }
+ }
+
+ return error_check("PREPARE");
+}
+
+ /* EXECUTE with no arguments */
+int Zexecute (
+  int    da )
+{
+ if (da == 0) {
+    EXEC SQL EXECUTE STMT000;
+ } else if (da == 1) {
+    EXEC SQL EXECUTE STMT001;
+ } else {
+    EXEC SQL EXECUTE STMT002;
+ }
+
+ return error_check("EXECUTE");
+}
+
+ /* EXECUTE with arguments */
+int Zexecute_args (
+  int    da )
+{
+ struct sqlda * hv_ptr;
+
+ hv_ptr = &sqldahv[da];
+
+ if (da == 0) {
+    EXEC SQL EXECUTE STMT000   USING DESCRIPTOR :*hv_ptr;
+ } else if (da == 1) {
+    EXEC SQL EXECUTE STMT001   USING DESCRIPTOR :*hv_ptr;
+ } else {
+    EXEC SQL EXECUTE STMT002   USING DESCRIPTOR :*hv_ptr;
+ }
+
+ return error_check("EXECUTE");
+}
+
+
+/*--------------------------------------------------------------------
+**  Macro to bind a variable to an entry in sqldahv
+**------------------------------------------------------------------*/
+
+#define bindvar(da,type,len,nullind) \
+ hv_ptr = &sqldahv[da]; \
+ hvind_ptr = hv_ind[da]; \
+\
+ hv_ptr->sqld = ind+1; \
+ hv_ptr->sqlvar[ind].sqltype = type; \
+ hv_ptr->sqlvar[ind].sqllen = len; \
+ hv_ptr->sqlvar[ind].sqldata = (uchar *) data_ptr; \
+ hvind_ptr[ind] = nullind; \
+ hv_ptr->sqlvar[ind].sqlind = hvind_ptr + ind;
+
+
+ /*--- Bind an integer input variable to the SQLDA. */
+void Zbind_int (
+  int  da,
+  int  ind,
+  uchar * data_ptr )
+{
+ struct sqlda * hv_ptr;
+ short * hvind_ptr;
+
+ bindvar(da, INTEGER_N, 4, 0);
+}
+
+ /*--- Bind a floating-point input variable to the SQLDA. */
+void Zbind_double (
+  int  da,
+  int  ind,
+  uchar * data_ptr )
+{
+ struct sqlda * hv_ptr;
+ short * hvind_ptr;
+
+ bindvar(da, FLOAT_N, 8, 0);
+}
+
+ /*--- Bind a string input variable to the SQLDA. */
+void Zbind_string (
+  int  da,
+  int  ind,
+  char * data_ptr,
+  int  strlen )
+{
+ struct sqlda * hv_ptr;
+ short * hvind_ptr;
+
+ bindvar(da, CHAR_N, strlen, 0);
+}
+
+ /*--- Bind a null to the SQLDA. Since Perl has only one kind of null
+   (undef), we will just treat this as an integer. */
+void Zbind_null (
+  int  da,
+  int  ind,
+  uchar * data_ptr )
+{
+ struct sqlda * hv_ptr;
+ short * hvind_ptr;
+
+ bindvar(da, INTEGER_N, 4, -1);
+}
+
+/*--------------------------------------------------------------------
+**  OPEN with no arguments
+**------------------------------------------------------------------*/
+int Zopen (
+  int  da )
+{
+ if (da == 0) {
+    EXEC SQL OPEN CUR000;
+ } else if (da == 1) {
+    EXEC SQL OPEN CUR001;
+ } else {
+    EXEC SQL OPEN CUR002;
+ }
+
+ return error_check("OPEN");
+}
+
+/*--------------------------------------------------------------------
+**  OPEN with arguments
+**------------------------------------------------------------------*/
+int Zopen_args (
+  int  da )
+{
+ struct sqlda * hv_ptr;
+
+ hv_ptr = &sqldahv[da];
+
+ if (da == 0) {
+    EXEC SQL OPEN CUR000   USING DESCRIPTOR :*hv_ptr;
+ } else if (da == 1) {
+    EXEC SQL OPEN CUR001   USING DESCRIPTOR :*hv_ptr;
+ } else {
+    EXEC SQL OPEN CUR002   USING DESCRIPTOR :*hv_ptr;
+ }
+
+ return error_check("OPEN");
+}
+
+/*--------------------------------------------------------------------
+**  FETCH
+**------------------------------------------------------------------*/
+int Zfetch (
+  int  da )
+{
+ res_ptr = &sqldares[da];
+ res_ptr->sqln = MAX_FIELDS;
+
+ if (da == 0) {
+    EXEC SQL FETCH CUR000   USING DESCRIPTOR :*res_ptr;
+ } else if (da == 1) {
+    EXEC SQL FETCH CUR001   USING DESCRIPTOR :*res_ptr;
+ } else {
+    EXEC SQL FETCH CUR002   USING DESCRIPTOR :*res_ptr;
+ }
+
+ return error_check("FETCH");
+}
+
+/*--------------------------------------------------------------------
+**  CLOSE
+**------------------------------------------------------------------*/
+int Zclose (
+  int  da )
+{
+ if (da == 0) {
+    EXEC SQL CLOSE CUR000;
+ } else if (da == 1) {
+    EXEC SQL CLOSE CUR001;
+ } else {
+    EXEC SQL CLOSE CUR002;
+ }
+
+ return error_check("CLOSE");
+}
+
+/*--------------------------------------------------------------------
+**  DISCONNECT (LOGOFF)
+**------------------------------------------------------------------*/
+int Zdisconnect (
+  void )
+{
+ EXEC SQL LOGOFF;
+ return error_check("LOGOFF");
+}
+
+/*--------------------------------------------------------------------
+**  BEGIN TRANSACTION
+**------------------------------------------------------------------*/
+int Zbegin_tran (
+  void )
+{
+ EXEC SQL BEGIN TRANSACTION;
+ return error_check("BEGIN TRANSACTION");
+}
+
+/*--------------------------------------------------------------------
+**  END TRANSACTION
+**------------------------------------------------------------------*/
+int Zend_tran (
+  void )
+{
+ EXEC SQL END TRANSACTION;
+ return error_check("END TRANSACTION");
+}
+
+/*--------------------------------------------------------------------
+**  ABORT
+**------------------------------------------------------------------*/
+int Zabort (
+  void )
+{
+ EXEC SQL ABORT;
+ return error_check("ABORT");
+}

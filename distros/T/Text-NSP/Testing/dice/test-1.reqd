@@ -1,0 +1,20 @@
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value of ngram 'n11' must not exceed the marginal totals.
+Skipping ngram one<>two<>13 7 5
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value of ngram 'n11' must not exceed the marginal totals.
+Skipping ngram one<>three<>13 5 5
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value of ngram 'n11' must not exceed the marginal totals.
+Skipping ngram one<>four<>13 5 3
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value of ngram 'n11' must not exceed the marginal totals.
+Skipping ngram two<>two<>3 7 2
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value of ngram 'n11' must not exceed the marginal totals.
+Skipping ngram two<>four<>3 5 1

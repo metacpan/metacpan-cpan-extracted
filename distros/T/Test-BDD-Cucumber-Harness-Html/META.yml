@@ -1,0 +1,32 @@
+---
+abstract: 'html output for Test::BDD::Cucumber'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires:
+  File::Find: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-BDD-Cucumber-Harness-Html
+requires:
+  IO::File: '0'
+  IO::Handle: '0'
+  Moose: '0'
+  Sys::Hostname: '0'
+  Template: '0'
+  Test::BDD::Cucumber::Harness::Data: '0'
+  Time::HiRes: '0'
+  Time::Piece: '0'
+  perl: v5.8.5
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-BDD-Cucumber-Harness-Html
+  repository: https://github.com/benningm/Test-BDD-Cucumber-Harness-Html
+version: '1.006'

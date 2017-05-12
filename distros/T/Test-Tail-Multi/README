@@ -1,0 +1,32 @@
+Test-Tail-Multi version 0.01
+============================
+
+This module is a generic means of executing arbitrary code and then watching
+the dynamic contents of associated files. It uses a callback-based structure
+to allow othe modules using it to set up whatever relationships are required
+between code and files being monitored.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  File::Tail for file contents monitoring
+  Test::Builder for the TAP infrastructure
+  Test::Tester for testing the module
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Joe McMahon and Yahoo!
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

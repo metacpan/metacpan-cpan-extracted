@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<annotation xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head>
+    <schema>
+      <s:pml_schema xmlns:s="http://ufal.mff.cuni.cz/pdt/pml/schema/" version="1.1">
+	<s:import schema="example7_schema.xml"/>
+	<s:derive type="node.type">
+	  <s:structure>
+	    <s:member name="w"><s:list ordered="0" type="w.type"/></s:member>
+	    <s:delete>w.rf</s:delete>
+	  </s:structure>
+	</s:derive>
+      </s:pml_schema>
+    </schema>
+    <references>
+      <reffile name="tokenization" id="t" href="example6.xml"/>
+    </references>
+  </head>
+  <S sentence.rf="s1">
+    <LM label="NP"><w id="s1w1">John</w></LM>
+    <LM label="VP">
+      <w id="s1w2">loves</w>
+      <constituents label="NP">
+        <w id="s1w3">Mary</w>
+      </constituents>
+    </LM>
+  </S>
+  <S sentence.rf="s2">
+    <LM label="NP"><w id="s2w1">He</w></LM>
+    <LM label="VP">
+      <w id="s2w2">told</w>
+      <constituents>
+        <LM label="NP"><w id="s2w3">her</w></LM>
+        <LM label="ADVP">
+          <w>
+            <LM id="s2w4">this</LM>
+            <LM id="s2w5">Friday</LM>
+          </w>
+        </LM>
+      </constituents>
+    </LM>
+  </S>
+</annotation>

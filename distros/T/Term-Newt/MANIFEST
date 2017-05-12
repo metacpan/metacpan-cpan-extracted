@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+Newt.pm
+Newt.xs
+README
+test.pl
+typemap
+examples/README
+examples/basic
+examples/buttons
+examples/hello
+examples/labels
+examples/radio_buttons
+examples/test
+examples/textbox

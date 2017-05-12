@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Test-Bitcoin-Daemon.t
+lib/Test/Bitcoin/Daemon.pm
+META.yml                                 Module meta-data (added by MakeMaker)

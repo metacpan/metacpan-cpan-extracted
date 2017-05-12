@@ -1,0 +1,30 @@
+---
+abstract: 'Tie hashes to DBI relational databases'
+author:
+  - 'Lincoln D. Stein <lds@cpan.org>'
+build_requires:
+  DBD::SQLite: 0
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-DBI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::SQLite: 0
+  DBI: 0
+  Test::More: 0
+resources:
+  homepage: http://wiki.github.com/toddr/Tie-DBI/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/toddr/Tie-DBI
+version: 1.06

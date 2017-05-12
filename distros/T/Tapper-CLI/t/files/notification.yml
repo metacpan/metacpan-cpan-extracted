@@ -1,0 +1,5 @@
+owner_id: 1 # anton
+persist: 1
+event: testrun_finished
+filter: testrun('id') == 42
+comment: Testrun id 42 finished

@@ -1,0 +1,28 @@
+${#} Store Purchase Orders.
+${#} SCCS: @(#)Header 1.1 03/27/03 09:11:28
+${#}
+${Opt StartPage } 
+${#}
+${Opt StartPageTag Header } This is the default page header
+${Opt Locale en_GB.ISO8859-1}
+${#} Reset the page totals of units:
+${Calc PageTotal := 0 }
+${Calc PageTotalLastPage := 0 }
+${#}
+${#}
+                                                 ACME Ltd                                       PAGE ${PageNo}
+                                              PURCHASE ORDER
+
+       Destination Store: ${country}${branch%5.5d}                                  Supplier Code: ${vendor_number%10.10d}
+                                                                   Supplier Name: ${vendor_name}
+                                                           Purchase Order Number: ${purchase_order_no}
+                                                                      Order Date: ${orderdate@time<%Y %B %d>}
+                                                                   Delivery Date: ${shipdate@time<%Y %B %d>}
+
+
+                                                           Quantity        Current
+   Department     SKU       Description               Ordered  Received     Price        Value
+   ==========     ===       ===========               =======  ========     =====        =====
+
+                                                               ________
+${#} end of paragraph

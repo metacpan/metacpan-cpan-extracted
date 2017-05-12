@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+cpanfile
+dist.ini
+lib/TAP/Parser/SourceHandler/Validator/W3C/HTML.pm
+t/00-compile.t
+t/release-eol.t
+t/release-pod-syntax.t

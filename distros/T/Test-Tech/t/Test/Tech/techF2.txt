@@ -1,0 +1,39 @@
+1..7
+# Running under perl version 5.006001 for MSWin32
+# Win32::BuildNumber 635
+# Current time local: Tue May 11 19:59:46 2004
+# Current time GMT:   Tue May 11 23:59:46 2004
+# Using Test.pm version 1.24
+# Test::Tech     : 1.24
+# Data::Secs2    : 1.22
+# Data::SecsPack : 0.07
+# Data::Startup  : 0.06
+# Number of tests: 7
+# =cut 
+ok 1 - Test version 
+ok 2 - ok tolerance subroutine 
+not ok 3 - not ok tolerance subroutine 
+# Test 3 got: '0' (techF0.t at line 55)
+#   Expected: '1' (tolerance(x)
+# got: 80
+# expected: U1[1] 80
+# N[2] 100 10
+# 
+#)
+ok 4 - no skip - ok tolerance subroutine 
+not ok 5 - no skip - not ok tolerance subroutine 
+# Test 5 got: '0' (techF0.t at line 70)
+#   Expected: '1' (tolerance(x)
+# got: 80
+# expected: U1[1] 80
+# N[2] 100 10
+# 
+#)
+ok 6 - skip tolerance subroutine  # skip
+not ok 7 Not Performed # missing 
+# Test 7 got: (Missing)
+# Expected: (Missing)
+# Missing: 7
+# Skipped: 6
+# Failed : 3 5 7
+# Passed : 3/6 50%

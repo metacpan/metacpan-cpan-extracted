@@ -1,0 +1,124 @@
+NAME
+    Text::BoxPlot - Render ASCII box and whisker charts
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        use Text::BoxPlot;
+
+        my $tbp = Text::BoxPlot->new( with_scale => 1 );
+
+        say for $tbp->render(
+            ["series A", -2.5, -1, 0, 1, 2.5],
+            ["series B", -1, 0, 1, 2, 3.5],
+            ["series C", 0, 1.5, 2, 2.5, 5.5],
+        );
+
+        # produces this output:
+
+                |-2.70968                                               4.17742|
+        series A   --------------========O========--------------
+        series B                 --------========O=========--------------
+        series C                         -------------====O=====--------------->
+
+DESCRIPTION
+    This module generates ASCII box-and-whisker charts.
+
+ATTRIBUTES
+  width
+    Defines the maximum total width of a rendered box-plot, including the
+    series label. Defaults to 72.
+
+  label_width
+    Defines the width of the space reserved for the series names. Defaults
+    to 10.
+
+  box_weight
+    Defines the output scale in terms of how much of the chart width should
+    be used for inter-quartile range boxes (the smallest 1st quartile to the
+    largest 3rd quartile). The default is 1, which means half the width is
+    allocated to boxes and the other half allocated to whiskers outside the
+    box range (split between the left and right sides).
+
+    Must be a positive number. As it gets bigger, more whiskers may get cut
+    off. As it gets smaller, there is more room for extremely large
+    whiskers, but the box proportions may be obscured.
+
+  with_scale
+    If true, the first line returned by "render" will be show the minimum
+    and maximum values displayed on the chart.
+
+    Defaults to false.
+
+CONSTRUCTORS
+  new
+        $tbp = Text::BoxPlot->new( %attributes );
+        $tbp = Text::BoxPlot->new( \%attributes );
+
+    Constructs a new object. Attributes may be passed as key-value pairs or
+    as a hash reference;
+
+METHODS
+  render
+        @lines = $tbp->render( @dataset );
+
+    Given a list of datasets, generates lines of output to render a
+    box-and-whisker chart in ASCII.
+
+    Each dataset must be an array reference with the following fields:
+
+    *   name of the dataset
+
+    *   minimum value
+
+    *   1st quartile value
+
+    *   2nd quartile (median) value
+
+    *   3rd quartile value
+
+    *   maximum value
+
+    For example, this code:
+
+        my $tbp = Text::BoxPlot->new( with_scale => 1 );
+        say for $tbp->render( [ 'test data', -2.5, -1, 0, 1, 2.5 ] );
+
+    Produces this output:
+
+                  |-2                                                         2|
+        test data <--------------===============O===============-------------->
+
+    The greater-than and less-than signs at the edge indicate that the
+    whisker has been cut off at this scale.
+
+    If the "box_weight" were set to 0.5, "render" would produce this output:
+
+                  |-3                                                         3|
+        test data      ---------------==========O==========---------------
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/text-boxplot/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/text-boxplot>
+
+      git clone git://github.com/dagolden/text-boxplot.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

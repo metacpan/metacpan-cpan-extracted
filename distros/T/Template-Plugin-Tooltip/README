@@ -1,0 +1,104 @@
+NAME
+    Template::Plugin::Tooltip - Template Toolkit plugin for
+    HTML::Tooltip::JavaScript
+
+SYNOPSIS
+      Load the tooltip generator.
+      Params are passed straight to to HTML::Tooltip::JavaScript->new
+      [% USE Tooltip( 'javascript_dir', '../../../static/js/', 'options',
+            bordercolor => "#000000",
+            title       => '',
+            ) %]
+  
+      Add a tooltip to a link
+      <a href="foo" [% Tooltip(
+          html_tooltip_content,
+          param, value,
+          param, value,
+          %]>Link content</a>
+
+DESCRIPTION
+    Template::Plugin::Tooltip is a Template Toolkit hook to the marvelous
+    HTML::Tooltip::Javascript module.
+
+    The first version was written in 30 minutes following the talk on
+    HTML::Tooltip::Javascript at the Open Source Developers Conference, just
+    after its initial release.
+
+  API Overview
+    This module is very much just a thin layer over the top of the
+    HTML::Tooltip::JavaScript API, and you should probably go read and
+    understand its API before using this module.
+
+    To summarise VERY briefly, when you load in the plugin, the params go as
+    params to the H::T::Javascript "new" constructor, with the new Tooltip
+    object stored internally. When you create a tooltip, the HTML content
+    and parameters are passed directly to H::T::Javascript "tooltip" method.
+
+  Loading the Tooltip Generator
+    To load the tooltip generator with the default options, you can simple
+    do the following.
+
+      [% USE Tooltip %]
+
+    In the same way you pass params to the HTML::Tooltip::Javascript
+    constructor, you can also pass params when loading in the Tooltip
+    plugin.
+
+      [% USE Tooltip('param', 'value') %]
+
+  Using the Tooltip Generator
+    HTML::Tooltip::Javascript provides one simple method through which you
+    generate all the different tooltips.
+
+    In Template::Plugin::Tooltip, you just use the loaded plugin directly.
+
+      [% Tooltip( 'This is my plain tooltip' ) %]
+
+    This only generates the Javascript tag properties, so this needs to be
+    used within a tag, like an anchor tag.
+
+      <a href="#item" [% Tooltip('A tooltip') %]>item</a>
+
+    The first param is literal HTML content, and you can provide any
+    additional parameters you want for the tooltip, as you would do create
+    the tooltip directly.
+
+      <a href="#item" [% Tooltip('A tooltip', 'bgcolor', 'pink') %]>item</a>
+
+  Initialising the Tooltip Library
+    The one additional step you will need to do is load in the tooltip
+    JavaScript library that drives the whole thing.
+
+    To do this, simple add the following to the end of the page, or to the
+    <head> section of your HTML document.
+
+      [% Tooltip() %]
+
+  Use as a Filter
+    TO BE COMPLETED
+
+SUPPORT
+    Bugs should be submitted via the CPAN bug tracker, located at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-Tooltip>
+
+    For other issues, or commercial enhancement or support, contact the
+    author..
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+ACKOWLEDGEMENTS
+    Thank you to Phase N Australia for permitting the open sourcing and
+    release of this distribution as a spin-off from a commercial project.
+
+COPYRIGHT
+    Copyright 2004 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

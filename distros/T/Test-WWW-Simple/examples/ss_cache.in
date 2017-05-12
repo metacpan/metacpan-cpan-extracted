@@ -1,0 +1,29 @@
+# The local webserver is set up to return a new value every time. 
+# we can test the cache code by turning caching on and off and checking
+# whether we get a new value or not.
+
+# Begin in uncached state. Accesing the local webserver gets two different
+# values.
+http://localhost:3000/	/aaaaa/	Y	initial value OK
+http://localhost:3000/	/bbbbb/	Y	reaccessed as expected
+
+# turn on cache. Even with an interbvening pagefetch, the last value
+# fetched from the local webserver is remembered.
+%%cache
+http://perl.org/	/perl/i	Y	intervening page
+http://localhost:3000/	/bbbbb/	Y	cached from last get
+http://localhost:3000/	/bbbbb/	Y	still cached
+
+# Turning the cache off again allows us to get a new value.
+%%nocache
+http://localhost:3000/	/ccccc/	Y	reaccessed as expected
+http://perl.org/	/perl/i	Y	intervening page
+
+# Verifying that turning the cache on again still gets us the last
+# version of the local webserver's page.
+%%cache
+http://localhost:3000/	/ccccc/	Y	return to last cached value
+
+# turn it off again, new page again.
+%%nocache
+http://localhost:3000/	/ddddd/	Y	now a new value

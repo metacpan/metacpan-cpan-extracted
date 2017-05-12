@@ -1,0 +1,78 @@
+Revision history for Tk-ForDummies-Graph
+
+1.14 22/10/2010 00:12:09
+  DEPRECATED - now use Tk::Chart
+   
+1.13 19/06/2010 22:22:23
+  Tk-ForDummies-Graph is now an extension of Tk::Canvas::GradientColor which allow you to 
+  to set a gradient background color in your graph. Then, you can use all methods of this module.
+  Bugs has been fixed : 
+    -Resizing the widget does not remove the items that have been added on the graph.
+    -The bug binding keys has been fixed.
+  -highlightthickness sets to 0 by default to remove border focus rectangle.
+
+1.12 22/05/2010 19:19:14
+  Bugs has been fixed in Tk::ForDummies::Graph::Mixed.
+  Bugs has been fixed in points marker legend.
+  -outlinearea and -outlinebar options has been added in Tk::ForDummies::Graph::Mixed, Tk::ForDummies::Graph::Areas and Tk::ForDummies::Graph::Bars.
+  Documentation updated.
+
+1.11 21/05/2010 23:01:43
+  really removed -smoothline option from Tk::ForDummies::Graph::Lines.
+  Tk::ForDummies::Graph::Mixed added.
+  New display_values method added for Tk::ForDummies::Graph::Lines, Points, Splines, Areas and Mixed.
+  New enabled_automatic_redraw and disabled_automatic_redraw methods added for all Tk::ForDummies::Graph modules.
+  -dash option added to Tk::ForDummies::Graph::Lines. 
+  Modules code updated.
+  POD documentation updated.
+  Tk::ForDummies::Graph::FAQ updated : question about Scrolled and Tk::ForDummies::Graph added.
+  Screenshots added in examples.
+   
+1.10 18/07/2009 00:22:43
+  Tk::ForDummies::Graph::Boxplots 
+    The same algorithm as Excel and type 7 R package is used for the quantile Q1 et Q3 calculation. 
+    new boxplot_information method added.
+   
+  Warning fixed in all add_data method (Tk::ForDummies::Graph::*) when legend is not defined.
+  CPAN documentation updated.
+
+1.09 16/07/2009 20:26:56
+  The calcul of quantile (Q1, Q3) was wrong for impair numbers of data values
+  in Tk::ForDummies::Graph::Boxplots. The bug is now fixed and the calcul 
+  is the same as in Excel, and in R language it is the equivalent of quantile type 7.
+
+
+1.08 07/07/2009 21:45:08
+  New options in Tk::ForDummies::Graph::Lines module to create lines chart as Bezier curve :
+    -bezier replaces -smoothline (deprecated) and allows to create lines chart as Bezier curve.
+  New option -spline, the curve crosses by all points.
+
+1.07 13/05/2009
+  New options -titleposition, -xvalueview and -yvalueview.
+  
+1.06 13/04/2009 16:54:30
+  fix bugs in Tk-ForDummies-Graph modules (legend, ...).
+  Tk::ForDummies::Graph::Boxplots updated.
+  
+1.05    11/04/2009 01:00:22 
+  Tk::ForDummies::Graph::Splines added.
+  Tk::ForDummies::Graph::FAQ added.
+  Tk::ForDummies::Graph::Boxplots added.
+  Tk::ForDummies::Graph::Points added.
+  
+  New option -smoothline in Tk::ForDummies::Graph::Lines
+  
+  fix bug :
+    - If you don't have a value for a point in a dataset, you can use undef, and the point will be really skipped.
+    
+1.04    01/04/2009 Fix bug installation, pod documentations and script bugs.
+
+1.03    31/03/2009 Tk::ForDummies::Graph::Areas added.
+
+1.02    30/03/2009 Tk::ForDummies::Graph::Pie updated.
+  option -startangle have been added
+  
+1.01    30/03/2009 Change Read me.
+
+1.00    24/03/2009 First version for CPAN.
+

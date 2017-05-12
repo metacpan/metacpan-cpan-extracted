@@ -1,0 +1,26 @@
+TkGenerator version 0.01
+========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Tk 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Robin Bank
+
+Do whatever you want with it, but I'm not gonna be sued if your disk drive expands into a parallel universe or your computer breaks, or anything like that. 
+
+
+

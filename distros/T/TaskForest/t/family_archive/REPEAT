@@ -1,0 +1,9 @@
+start => '00:00', tz => 'GMT', days => 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
+
+
+ J9()
+ J10(start=>'00:01', tz=>'GMT', every=>60, until=>'14:30')
+ J11()
+
+
+ 

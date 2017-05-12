@@ -1,0 +1,137 @@
+=head1 NAME
+
+Text::TreeFile::details - precise usage specifications
+
+=head1 SYNOPSIS
+
+  use Text::TreeFile;
+
+  my $filename='demodata/treetest.tre';
+
+  # read in single-tree mode
+  my $tf=Text::TreeFile->new($filename);
+
+  my $treeref=$$tf{top};
+
+  print "The string content of the top-level tree node is:\n\n";
+  print "    $$treeref[0]\n\n";
+  print "It has ",scalar @{$$treeref[1]}," second-level child nodes\n";
+
+=head1 DESCRIPTION
+
+First, each public function is described.  Then, a test script.
+After that, a few more details.
+
+=head1 CONSTRUCTOR: B<new> [ I<filename>, [ I<endq> ] ]
+
+The constructor (function B<new()>) for module B<Text::TreeFile>
+can be invoked with zero, one or two parameters.  The first is a
+filename to be read into an internal tree structure of strings;
+the second, a single/multiple tree flag.  If no parameters are
+specified, an object (a blessed reference to a hash) will be
+returned with only the prototype entries present.  In this case,
+one might create a tree by other external means and put it into
+the hash.
+
+=head2 Parameter: I<filename>
+
+If at least one parameter is specified, the first will be taken
+to be the name of the tree file to be read.  If it contains a slash
+("/") character, the leading path up to the final file name will be
+remembered (under key, "I<idir>") and used as a prefix for all include
+files named in the course of reading the tree(s).  The filename is
+remembered under key, "I<iname>" in the blessed hash created.
+
+=head2 Parameter: I<endq>
+
+If two parameters are specified in the call to B<new()>, the second
+will be interpreted as an indicator whether reading the file should
+stop at the end of the first full top-level tree.  If present, the
+string specified in this parameter is copied into the blessed hash
+under the key, "I<endq>".  This will indicate multiple-tree mode, in
+which case the entire file will be read and interpreted as a tree
+of text strings.  If unspecified, or specified as undef, the default
+of single-tree mode will be used for reading the file.
+
+=head2 Single-tree Reading Mode
+
+In the default file reading mode, only a single (the first, if
+there are more than one) top-level tree will be read from the file.
+The element of the module's blessed hash with key, "I<top>", will have
+as value a reference to this tree (node).  (To access file data
+following the first tree in the file, refer to the L<internals>
+documentation file.)
+
+=head2 Multiple-tree Reading Mode
+
+If the I<endq> parameter is specified to B<new()>, the entire file
+must conform to proper tree file syntax, and will be read into a
+data structure consisting of an array of top-level trees (tree
+nodes).  In this case the element of the blessed hash with key,
+"I<top>", will have as its value a reference to this array instead of
+a reference to just a single top-level tree (node).
+
+=head1 FUNCTION: B<showlines>
+
+B<showlines()> is called with a reference to a tree data structure
+as its first parameter and, optionally, an initial (integer) level
+number as its second parameter.  It recursively prints the contents
+of the tree.
+
+=head1 FUNCTION: B<showglobals>
+
+B<showglobals()> is called with no parameters, and shows the
+contents of the blessed hash which is taken to contain global variables.,
+
+=head1 TEST SCRIPT: B<test.pl>
+
+The B<test.pl> script conducts some tests of the module.
+
+=head1 EXPORTS
+
+Nothing is exported by default.  Functions B<showlines()> and
+B<showglobals()> may be imported on request.  The module's B<new()>
+function returns a blessed reference to a hash containing a number
+of data items, notably one with key, "I<top>" which is the (top node
+of) the resulting tree of text strings read from the file.
+
+=head2 Key: "I<top>"
+
+The tree structure of text strings returned by this module is
+remembered under the key, "I<top>", in the object hash whose blessed
+reference is returned by B<new()>.
+
+=head2 Nodes
+
+Each node of the tree of text strings created by this module is an
+array of two elements, the first being a text string which is the
+content of this node, and the second being a reference to an array
+of references to the child nodes of the current node.
+
+=head1 EXCEPTIONS
+
+The B<new()> function will return the I<undef> value if B<_loadtree()>
+returns false.
+
+The B<_loadtree()> function prints a warning to I<STDOUT> and returns the
+I<undef> value if an internal error allows it to be called with no input
+filename specified at the top file nesting level.  The module should
+not allow this to occur.
+
+As a separate case, the prior paragraph's description applies, with
+a slightly different warning message, below the top file nesting level.
+
+If a filename is specified, but B<_loadtree()> is unsuccessful in
+opening the file, a warning is printed to I<STDOUT> and the I<undef> value
+is returned.
+
+If B<_readspec()> finds a line without an indent of an exact multiple
+of two space characters, it issues a B<die()> call with a warning message.
+
+=head1 BUGS
+
+The module doesn't use the B<Carp(3pm)> module for warnings,
+calls B<die()> in some exceptional cases, uses "C<print STDOUT>" for
+warnings, and returns special values in most exceptional cases.  It
+should use B<Carp(3pm)> to issue warnings and then return
+special values, for all exceptions.

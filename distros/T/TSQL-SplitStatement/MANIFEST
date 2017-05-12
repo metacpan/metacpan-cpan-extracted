@@ -1,0 +1,16 @@
+Changes
+lib/TSQL/SplitStatement.pm
+samples/parseSQL.sql
+samples/parsetsql.pl
+Makefile.PL
+grepTSQL.pl
+LICENSE
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/split_statements.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

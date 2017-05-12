@@ -1,0 +1,11 @@
+TODO			To do list
+INSTALL			Installation instructions
+Changes			History file
+MANIFEST		This file
+Makefile.PL		Produces the Makefile
+README			Guess what?
+Taint.pm		The module proper
+t/0-basic.t		The basic tainting tests
+t/u-untaint.t		The untainting tests
+t/no-taint.t		Tests when taint checks are off
+t/tied.t		Tests of tainting tied vars

@@ -1,0 +1,33 @@
+---
+abstract: 'helper module to automate the use of Text::CSV'
+author:
+  - 'Sébastien Millet <milletseb@laposte.net>'
+build_requires:
+  POSIX: '0'
+  Time::Local: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-AutoCSV
+requires:
+  Carp: '0'
+  Class::Struct: '0'
+  DateTime: '0'
+  DateTime::Format::Strptime: '1.71'
+  Exporter: '0'
+  Fcntl: '0'
+  File::BOM: '0'
+  Hash::Util: '0'
+  List::MoreUtils: '0'
+  Params::Validate: '0'
+  Text::CSV: '0'
+  Unicode::Normalize: '0'
+  strict: '0'
+  warnings: '0'
+version: 1.1.7
+x_serialization_backend: 'YAML::Tiny version 1.69'

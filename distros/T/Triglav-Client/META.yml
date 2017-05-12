@@ -1,0 +1,33 @@
+---
+abstract: 'A Perl Interface to Triglav API'
+author:
+  - 'Kentaro Kuribayashi E<lt>kentarok@gmail.comE<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+  Test::Should: 0
+  Test::Stub: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Triglav-Client
+no_index:
+  directory:
+    - inc
+provides:
+  Triglav::Client:
+    file: lib/Triglav/Client.pm
+    version: 0.03
+requires:
+  JSON: 0
+  LWP::UserAgent: 0
+  parent: 0
+  perl: 5.008008
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

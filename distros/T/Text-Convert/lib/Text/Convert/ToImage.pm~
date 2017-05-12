@@ -1,0 +1,243 @@
+package Text::Convert::ToImage;
+use 5.008003;
+use strict;
+use warnings;
+#use baseImage::Magick;
+use base qw( Image::Magick );
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
+
+# This allows declaration	use Text::Convert::ToImage ':all';
+# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
+# will save memory.
+use vars qw( $VERSION $LEGAL_ATTRIBUTES );
+our $VERSION = sprintf("%d.%02d", q$Revision: 0.00 $ =~ /(\d+)\.(\d+)/);
+
+our $LEGAL_ATTRIBUTES = {
+    LINE_HEIGHT => 18,
+    LINE_LENGTH => 100,
+    OUTPUT_FILE => 'www.hjackson.org',
+    IMAGE_EXT   => 'png',
+    POINT_SIZE  => 12,
+    TEXT        => 'http://www.hjackson.org',
+    BG_COLOR    => 'white',
+    TEXT_COLOR  => 'blue',
+    FONT        => 'Generic.ttf',
+    INPUT_FILE  => 'xc:white',
+    MAGICK      => undef, 
+};
+
+my $magick_setup = {
+    size => undef,
+    pointsize => undef,
+};
+
+
+=cut
+sub new {
+    my $class  = shift;
+    my $setup = {};
+    my $config = defined $_[0] && UNIVERSAL::isa($_[0], 'HASH') ? shift : { @_ }; 
+    my $self = sub { 
+        my $field = shift;
+        if(@_) { $config->{$field} = shift } 
+        return $config->{$field};
+    };
+    bless ($self, $class);
+    $self->_init($config) || die "Unable to initialise ". ref $self . "\n"; 
+    return $self;
+}
+=cut
+
+#---------------------------------------------------------
+#
+#
+#
+#---------------------------------------------------------
+sub _init {
+    my ($self, $config) = @_;
+    for my $field ( keys %{ $LEGAL_ATTRIBUTES } ) {
+        my $lc_field = lc $field; 
+        no strict "refs"; 
+        *$lc_field = sub { 
+            my $self = shift;
+            return $self->(uc $field, @_);
+        };      
+    }
+    while ( my ($key, $val) = each %{ $config }) {
+        $key = lc($key);
+        $self->$key($val);
+    }
+    # This allows a Develpoer to pass in his own pre-createed object
+    my $magick = Image::Magick->new() || die "Unable to create Image::Magick Object$!";
+    $self->magick( $magick ) unless ($self->magick());
+    
+}
+
+#----------------------------------------------------------
+#
+#
+#
+#----------------------------------------------------------
+sub calculate {
+    my $self = shift;
+    my $config = shift;
+    my $text = $config->{TEXT};
+    my @lines = split (/\n/, $text);
+    #print "$text\n";
+    my $measure;
+    foreach (@lines) {
+         my $len = length($_);
+         $measure->{LENGTH} = $len unless ($measure->{LENGTH} &&  $measure->{LENGTH} > $len); 
+    }
+    
+    # Need to handle referneces to scalars Filhandles and all other sorts of
+    # text that peopl emy want converted.
+    my $point_size = $config->{POINTSIZE};
+    my $length = $measure->{LENGTH} || length($text);
+    my $border = ($point_size / 5);
+    #print $#lines;
+    #my $size = "size=>'". int($length * ($point_size / 2.1)) . "x" . ($point_size * ($#lines + 2)) ."'";
+#my $size = "size=>'". int($length * (($point_size * 0.5514598) + 9 )) . "x" . ($point_size * ($#lines )) ."'";
+my $size = "size=>'". int($length * (($point_size * 0.5514598) + 10 )) . "x" . ($point_size * ($#lines + 4 )) ."'";
+    print "$size\n";
+    $self->Set(eval $size);
+    my($x_size, $y_size) = $self->Get('width', 'height');
+    $self->Read('xc:white');
+    $self->Set(background=>'gray');
+    
+    $self->Annotate( text  => $text,
+                     font  =>'Generic.ttf', 
+                     fill  =>'black',
+                     align =>'Left' ,
+                     pointsize=>$point_size,
+                     x => $point_size,
+                     y => $point_size 
+                     );
+    my ($x_ppem, $y_ppem, $ascender, $descender, $width, $height, $max_advance) =
+ $self->QueryFontMetrics();
+    print "X_PPEM = $x_ppem\n";
+    print "Y_PPEM = $y_ppem\n";
+    print "ASC = $ascender\n";
+    print "DESC = $descender\n";
+    print "width = $width\n";
+    print "width = $height\n";
+    
+
+
+    $self->Set(compression=>'None');
+    return $self;
+}
+
+sub calculate_lines {
+    my $self = shift;
+
+}
+
+sub obfuscate {
+    my $self = shift;
+}
+
+__END__
+my $point_size = 18;
+my $length = length ($text);
+#my $size = "size=>'". int($length * 5.5) . "x10'";
+my $size = "size=>'". int($length * ($point_size / 2)) . "x" . ($point_size + 1) ."'";
+print $size . "\n";
+$q=Image::Magick->new();
+#$q->Set(size=>'100x10');
+$q->Set(eval $size);
+#$q->Read('gradient:#00f685-#0083f8');
+$q->Read('xc:white');
+$q->Set(fill=>'green',background=>'gray',matte=>0);
+#$q->Rotate(-90);
+#$q->Raise('2x2');
+#$q->Wave(5);
+
+$q->Annotate(text=>$text,font=>'Generic.ttf', fill=>'black', gravity=>'Center',pointsize=>$point_size);
+$q->Set(compression=>'None');
+$q->Write('button.png');
+#$q->Write('button.png');
+
+#open (FH, '<button.png') || die;
+#open (OUT, '>button2.png') || die;
+#local $/;
+#my $file = <FH>;
+#
+#print OUT $file;
+
+#$q->Write('win:');
+
+
+__END__
+
+#!/usr/bin/perl
+use Image::Magick;
+
+my($image, $p, $q);
+$image = Image::Magick->new || die;
+$image->Set(size=>'100x100');
+$image->ReadImage('xc:white');
+$image->Set('pixel[49,49]'=>'red');
+$text = 'Works like magick!';
+my $x = $image->Annotate(font=>'Generic.ttf', pointsize=>5, fill=>'black', text=>'$text');
+print $x if $x;
+$image->Write(filename=>'image.png', compression=>'None');
+
+
+
+
+
+1;
+__END__
+# Below is stub documentation for your module. You'd better edit it!
+
+=head1 NAME
+
+Text::Convert::ToImage - Perl extension for blah blah blah
+
+=head1 SYNOPSIS
+
+  use Text::Convert::ToImage;
+  blah blah blah
+
+=head1 DESCRIPTION
+
+Stub documentation for Text::Convert::ToImage, created by h2xs. It looks like the
+author of the extension was negligent enough to leave the stub
+unedited.
+
+Blah blah blah.
+
+=head2 EXPORT
+
+None by default.
+
+
+
+=head1 SEE ALSO
+
+Mention other useful documentation such as the documentation of
+related modules or operating system documentation (such as man pages
+in UNIX), or any relevant external documentation such as RFCs or
+standards.
+
+If you have a mailing list set up for your module, mention it here.
+
+If you have a web site set up for your module, mention it here.
+
+=head1 AUTHOR
+
+Debian User, E<lt>harry@E<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 by Debian User
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

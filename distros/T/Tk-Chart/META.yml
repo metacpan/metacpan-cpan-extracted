@@ -1,0 +1,48 @@
+---
+abstract: 'Extension of Canvas widget to create a graph like GDGraph.'
+author:
+  - 'Djibril Ousmanou <djibel@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-Chart
+provides:
+  Tk::Chart:
+    file: lib/Tk/Chart.pm
+    version: '1.21'
+  Tk::Chart::Areas:
+    file: lib/Tk/Chart/Areas.pm
+    version: '1.05'
+  Tk::Chart::Bars:
+    file: lib/Tk/Chart/Bars.pm
+    version: '1.06'
+  Tk::Chart::Boxplots:
+    file: lib/Tk/Chart/Boxplots.pm
+    version: '1.05'
+  Tk::Chart::Lines:
+    file: lib/Tk/Chart/Lines.pm
+    version: '1.05'
+  Tk::Chart::Mixed:
+    file: lib/Tk/Chart/Mixed.pm
+    version: '1.05'
+  Tk::Chart::Pie:
+    file: lib/Tk/Chart/Pie.pm
+    version: '1.05'
+  Tk::Chart::Utils:
+    file: lib/Tk/Chart/Utils.pm
+    version: '1.04'
+requires:
+  POSIX: '0'
+  Tk: '800'
+  Tk::Canvas::GradientColor: '1.04'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

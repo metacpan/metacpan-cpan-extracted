@@ -1,0 +1,11 @@
+\bRCS\b
+^MANIFEST\.[Bb]
+^Makefile$
+~$
+\.html$
+\.old$
+\.tar.gz$
+\.mikeonly$
+^blib/
+^MakeMaker-\d
+^pm_to_blib$

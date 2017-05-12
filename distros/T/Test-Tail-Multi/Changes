@@ -1,0 +1,22 @@
+Revision history for Perl extension Test::Tail::Multi.
+0.06  Tue Jul 12 21:39:02 PDT 2011
+	- simplified error check in 03add.t for localized error messages
+
+0.05  Mon Jul 11 12:41:39 PDT 2011
+	- simplified the no-arguments use test; passes more dependably now.
+
+0.04  Fri Jul  8 23:35:57 PDT 2011
+	- Fixed 04add_missing to work under newer revs of Test::Simple.
+	- Added prereq for newer version of Test::Simple so the test would
+	  work.
+
+0.03  ...
+	- missed this one...
+
+0.02  Fri Apr  8 15:21:01 2005 
+	- got the test names backwards in the POD (oops!)
+
+0.01  Thu Apr  7 07:55:33 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n Test::Tail::Multi
+

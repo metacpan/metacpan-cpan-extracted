@@ -1,0 +1,45 @@
+---
+abstract: 'Compare two html structures and show differences if it is not same'
+author:
+  - 'cho45 <cho45@lowreal.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::Base: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-HTML-Differences
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::HTML::Differences:
+    file: lib/Test/HTML/Differences.pm
+    version: '0.05'
+requires:
+  Filter::Util::Call: '0'
+  HTML::Entities: '0'
+  HTML::Parser: '0'
+  Test::Differences: '0.5'
+  Text::Diff: '0'
+  Text::Diff::Table: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/cho45/Test-HTML-Differences/issues
+  homepage: https://github.com/cho45/Test-HTML-Differences
+  repository: git://github.com/cho45/Test-HTML-Differences.git
+version: '0.05'
+x_authority: cpan:SATOH

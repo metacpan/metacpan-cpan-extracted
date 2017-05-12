@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 981d5547c49c14b2037d8cd9226637e2453deb3e AUTHOR_PLEDGE
+SHA1 023f00f4f09c6d707f9f2c855ccae3a38f1ebaf8 Build.PL
+SHA1 a84d6f052c36df6cc8fd9747b1c315c6d2d14d4f Changes
+SHA1 e66c5b38ac762b2e5ed9c6c92a950fc95e1b3662 CommitLog
+SHA1 4254f71d8e3f73d4eddc1c25cd48f620acf87bd9 INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 c22ae80788c0fee46297ab1ad96d69499acf22fe MANIFEST
+SHA1 e4ac9ab7a18e5f4fd84cb27d5a1876b805727c8b MANIFEST.SKIP
+SHA1 34ace9f8e0cbb466f7c655aac44a9e0a5f465b80 META.json
+SHA1 7380dc0012b6c50436a875a205d7a5591ba3f975 META.yml
+SHA1 78b3121256b3ac0f0171a36fc4da76c37bd7277f Makefile.PL
+SHA1 dd2af2e8afdc82a9da9cb4ba72924e792b0a4bda README
+SHA1 dd499cbbb6a181d2d58d142278265571d3d02f28 cpanfile
+SHA1 b1faae10e16c736f698f6a89c3e5db990b3a1341 dist.ini
+SHA1 125e4e2999e9920434be37a0ecc6fe01e9172326 doap.xml
+SHA1 26a2dc2bfc245aee89ceed61d0cbc89c604967c4 examples/linkcheck.t
+SHA1 109028272721cf30fefdca804ab28b0d1a63a050 lib/Test/Pod/LinkCheck.pm
+SHA1 ea564840ea71ea1414e1182638d003a6af47de7b t/00-compile.t
+SHA1 1054a40c96f527ee497b1fe78bab816b83e54ca5 t/000-report-versions-tiny.t
+SHA1 ae37e751dba8b45c37613047b0098fdfbbc18c64 t/apocalypse.t
+SHA1 6a81631d005137386abb51626e0d063e65d71db6 t/cpan_backend.t
+SHA1 bb83cf038d5ed61473773020279be01d1839cd00 t/functions.t
+SHA1 5634fc846a86bbbbf38b55201917fe3e5870769f t/simple.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRVfQYACgkQGfr7vsGKgxwhbwCfaHSr0VJ4srug6gQAlTqHIX7K
+uF4An0NkVAJJXQ/Zng71iH8yYT4YEOxG
+=PRRa
+-----END PGP SIGNATURE-----

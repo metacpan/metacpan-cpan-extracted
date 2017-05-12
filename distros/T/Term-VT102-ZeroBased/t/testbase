@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+#
+# Basic functions used by most of the test scripts.
+#
+
+sub run_tests {
+	my ($testref) = @_;
+	my @tests = @$testref;
+	my ($nt, $i);
+
+	$nt = scalar @tests;		# number of sub-tests
+
+	foreach $i (1 .. $nt) {
+		my $testref = shift @tests;
+		my ($cols, $rows, $text, @output) = @$testref;
+		my ($ncols, $nrows, $row, $col, $settings);
+		my ($line, $aline, $alineref, $galine, $passed);
+
+		$settings = undef;
+		if (ref $cols) {
+			($settings, $cols, $rows, $text, @output) = @$testref;
+		}
+
+		print "$i..$nt\n";
+	
+		my $vt = Term::VT102::ZeroBased->new ('cols' => $cols, 'rows' => $rows);
+	
+		($ncols, $nrows) = $vt->size ();
+	
+		if (($cols != $ncols) or ($rows != $nrows)) {
+			print "not ok $i\n";
+			warn "returned size: $ncols x $nrows, wanted $cols x $rows\n";
+			next;
+		}
+
+		if (defined $settings) {
+			foreach (keys %$settings) {
+				if (
+				  !defined $vt->option_set ($_,$settings->{$_})
+				) {
+					print "not ok $i\n";
+					warn "failed to set option: $_";
+				}
+			}
+		}
+
+		$vt->process ($text);
+	
+		$row = 0;
+		$passed = 1;
+	
+		while ($#output > 0) {
+			$line = shift @output;
+			if (ref $output[0]) {
+				$alineref = shift @output;
+				$aline = "";
+				foreach (@$alineref) {
+					$aline .= $vt->attr_pack (@$_);
+				}
+			} else {
+				$alineref = undef;
+			}
+			$row ++;
+			if ($vt->row_text ($row-1) ne $line) {
+				$passed = 0;
+				print STDERR "test $i: row $row incorrect, got '" .
+				  show_text ($vt->row_text ($row-1)) . "', expected '" .
+				  show_text ($line) . "'\n";
+				next;
+			}
+			next if (not defined $alineref);
+			$galine = $vt->row_attr ($row-1);
+			for ($col = 0; $col < $cols; $col ++) {
+				if (substr ($aline, 2 * $col, 2) ne substr ($galine, 2 * $col, 2)) {
+					$passed = 0;
+					print STDERR "test $i: row $row col " . ($col + 1) .
+					  " attributes incorrect, got '" .
+					  show_attr ($vt, substr ($galine, 2 * $col, 2)) .
+					  "', expected '" .
+					  show_attr ($vt, substr ($aline, 2 * $col, 2)) . "'\n";
+					next;
+				}
+			}
+		}
+	
+		if ($passed == 0) {
+			print "not ok $i\n";
+		} else {
+			print "ok $i\n";
+		}
+	}
+}
+
+
+sub show_text {
+	my ($text) = @_;
+	return "" if (not defined $text);
+	$text =~ s/([^\040-\176])/sprintf ("\\%o", ord ($1))/ge;
+	return $text;
+}
+
+
+sub show_attr {
+	my ($vt, $attr) = @_;
+	my ($fg,$bg,$bo,$fa,$st,$ul,$bl,$rv) = $vt->attr_unpack ($attr);
+	my $str = "$fg-$bg";
+	$str .= "b" if ($bo != 0);
+	$str .= "f" if ($fa != 0);
+	$str .= "s" if ($st != 0);
+	$str .= "u" if ($ul != 0);
+	$str .= "F" if ($bl != 0);
+	$str .= "r" if ($rv != 0);
+	return $str . "-" . sprintf ("%04X", unpack ('S', $attr));
+}
+
+1;
+# EOF

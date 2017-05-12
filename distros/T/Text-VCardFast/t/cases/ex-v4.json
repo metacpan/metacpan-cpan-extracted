@@ -1,0 +1,126 @@
+{
+   "objects" : [
+      {
+         "type" : "vcard",
+         "properties" : {
+            "n" : [
+               {
+                  "name" : "n",
+                  "values" : [
+                     "Bloggs",
+                     "Joe",
+                     "",
+                     "",
+                     ""
+                  ]
+               }
+            ],
+            "impp" : [
+               {
+                  "params" : {
+                     "pref" : [
+                        "1"
+                     ],
+                     "type" : [
+                        "home"
+                     ]
+                  },
+                  "value" : "skype:joe.bloggs",
+                  "name" : "impp"
+               }
+            ],
+            "version" : [
+               {
+                  "value" : "4.0",
+                  "name" : "version"
+               }
+            ],
+            "x-socialprofile" : [
+               {
+                  "params" : {
+                     "pref" : [
+                        "1"
+                     ],
+                     "type" : [
+                        "home"
+                     ]
+                  },
+                  "value" : "twitter:http://twitter.com/joebloggs",
+                  "name" : "x-socialprofile"
+               }
+            ],
+            "email" : [
+               {
+                  "params" : {
+                     "pref" : [
+                        "1"
+                     ],
+                     "type" : [
+                        "home"
+                     ]
+                  },
+                  "value" : "me@joebloggs.com",
+                  "name" : "email"
+               }
+            ],
+            "tel" : [
+               {
+                  "params" : {
+                     "pref" : [
+                        "1"
+                     ],
+                     "type" : [
+                        "cell",
+                        "home"
+                     ]
+                  },
+                  "value" : "tel:+44 20 1234 5678",
+                  "name" : "tel"
+               }
+            ],
+            "url" : [
+               {
+                  "params" : {
+                     "pref" : [
+                        "1"
+                     ],
+                     "type" : [
+                        "home"
+                     ]
+                  },
+                  "value" : "http://joebloggs.com",
+                  "name" : "url"
+               }
+            ],
+            "adr" : [
+               {
+                  "params" : {
+                     "pref" : [
+                        "1"
+                     ],
+                     "type" : [
+                        "home"
+                     ]
+                  },
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "1 Trafalgar Square",
+                     "London",
+                     "",
+                     "WC2N",
+                     "United Kingdom"
+                  ]
+               }
+            ],
+            "fn" : [
+               {
+                  "value" : "Joe Bloggs",
+                  "name" : "fn"
+               }
+            ]
+         }
+      }
+   ]
+}

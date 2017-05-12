@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-todo_misparse_test" errors="0" failures="1" tests="1" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/todo_misparse.test">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Explanation:
+    failed tests (1)
+Test output:
+    not ok - t/internal_tests/todo_misparse.test
+]]>
+    </failure>
+  </testcase>
+  <testcase name="Hamlette # TODOORNOTTODO">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Test output:
+    not ok 1 Hamlette # TODOORNOTTODO
+]]>
+    </failure>
+  </testcase>
+</testsuite>

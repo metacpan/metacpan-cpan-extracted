@@ -1,0 +1,21 @@
+Revision history for Tkx-Scrolled
+
+0.06  (2010-05-24)
+    - Update tests to be more robust.
+    - Explicitly dual-license as Artistic and GPL.
+
+0.05  (2009-08-28)
+    - Don't try to use ttk scrollbars if tile isn't available.
+
+0.04  (2009-08-25)
+    - Kludge to prevent optional scrollbars from flickering in corner case.
+
+0.03  (2009-08-24)
+    - Added support for optional scrollbars
+
+0.02  (2009-08-23)
+    - Added -scrollbars option to control placement of scrollbars relative to
+      the scrolled widget.
+
+0.01  (2009-08-21)
+    - First version, released on an unsuspecting world.

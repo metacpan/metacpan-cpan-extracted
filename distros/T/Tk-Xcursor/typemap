@@ -1,0 +1,17 @@
+TYPEMAP
+Cursor	T_IVOBJ
+
+INPUT
+T_IVOBJ
+	if (sv_isa($arg, \"Tk::Xcursor\")) {
+	    $var = INT2PTR($type, SvIV(SvRV($arg)));
+	}
+	else {
+	    $var = ($type) NULL;
+	    croak(\"$var is not of type Tk::Xcursor\");
+	}
+
+OUTPUT
+T_IVOBJ
+	sv_setref_iv($arg, \"Tk::Xcursor\", PTR2IV($var));
+

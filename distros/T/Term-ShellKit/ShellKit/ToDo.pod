@@ -1,0 +1,73 @@
+=head1 NAME
+
+Term::ShellKit::ToDo - Bugs, tasks, and ideas
+
+
+=head1 TO DO
+
+It would be nice to confirm that we can cleanly separate out CPAN::Shell in a way that does not substantially alter its features.
+
+
+=head2 Terminal I/O Niceties
+
+Save command history.
+
+Perhaps improve the tab-ahead function.
+
+It would be good to support batches of multiple shell commands separated by semicolons.
+
+
+=head2 Input Modes
+
+=over 4
+
+=item *
+
+Finish restoring LineBuffer code to support trailing-\ and << formats.
+
+=item *
+
+Add support for batch-buffered input, like DBI shell. Keep appending until /go; also allow /clear, /quit, /edit.
+
+=item *
+
+mode command
+
+Term::ShellKit> mode eval
+eval> 23 + 41
+54
+eval> $x += 1
+1
+eval>
+
+=back
+
+
+=head2 Command Kits
+
+System kit:
+
+  execute
+  alias ! execute
+  
+  alias pwd ! pwd
+  alias ls ! ls
+  alias more ! more
+  alias grep ! grep
+  sub cd ($) { chdir( shift ) }
+  
+  Also add a direct-to-system pass-through mode... ?
+
+Textfile kit:
+
+  show_file
+  find_text
+  replace_text
+
+
+=head1 BUGS
+
+If there's a syntax error in a module when you re-read it with the "reload" command, it's often not re-read the next time you run reload. Running reload one more time should fix this problem.
+
+
+=cut

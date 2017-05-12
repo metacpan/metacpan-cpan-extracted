@@ -1,0 +1,14 @@
+# example correct .test-database.rc file
+
+# mysql
+dsn      = dbi:mysql:database=mydb;host=localhost;port=1234
+username = user
+password = s3k r3t
+
+# another
+dsn      = dbi:mysql:database=mydb;host=remotehost;port=5678
+username = otheruser
+
+# sqlite
+dsn      = dbi:SQLite:db.sqlite
+

@@ -1,0 +1,25 @@
+---
+abstract: 'Skip test in a declarative way, following the Lancaster Consensus'
+author:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Is
+requires:
+  Test::More: '0.88'
+  perl: '5'
+resources:
+  homepage: https://github.com/dolmen/p5-Test-Is
+  repository: https://github.com/dolmen/p5-Test-Is.git
+version: '20140823.1'

@@ -1,0 +1,14 @@
+
+-- A --
+
+   This is sample 
+text A for Text-OutdentEdge.
+
+   First lines  of each paragraphs  are
+indented  by 2 spaces,  but other lines
+have no indent.
+
+   Text-OutdentEdge keeps these indents.
+
+   Outdanting this file gives no changes
+to this file.

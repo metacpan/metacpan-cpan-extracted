@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Template-PopupTreeSelect
+version:      0.9
+version_from: PopupTreeSelect.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    HTML::PopupTreeSelect:         1.4
+    Template:                      2.08
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,25 @@
+---
+abstract: 'Button widget with background gradient color.'
+author:
+  - 'Djibril Ousmanou <djibel@cpan.org>'
+build_requires:
+  English: 0
+  Test::More: 0
+  Tk: 800
+  Tk::Canvas::GradientColor: 1.04
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-ColoredButton
+provides:
+  Tk::ColoredButton:
+    file: lib/Tk/ColoredButton.pm
+    version: 1.05
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.05

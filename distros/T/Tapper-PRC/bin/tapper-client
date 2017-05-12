@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+# PODNAME: tapper-client
+# ABSTRACT: cmdline frontend to Testcontrol.ssh
+
+use strict;
+use warnings;
+
+use Sys::Hostname;
+use Tapper::PRC::Testcontrol;
+use Tapper::Installer::Base;
+
+# when we run from /etc/init.d tapper might be called at shutdown again
+# make sure it's not executed at this point
+if ( @ARGV and $ARGV[0] eq 'stop' ) {
+    exit 0;
+}
+
+my $pid = fork();
+if ( $pid == 0 ) {
+
+    open ( STDOUT, '>>', "/tmp/tapper-client.stdout" )
+        or die "Can't open output file /tmp/tapper-client.stdout: $!"
+    ;
+    open ( STDERR, '>>', "/tmp/tapper-client.stderr" )
+        or die "Can't open output file /tmp/tapper-client.stderr: $!"
+    ;
+
+    # bearable since it never really changes
+    my $logconf =
+        "log4perl.rootlogger                               = DEBUG, root\n" .
+        "log4perl.appender.root                            = Log::Log4perl::Appender::File\n" .
+        "log4perl.appender.root.layout                     = PatternLayout\n" .
+        "log4Perl.appender.root.mode                       = clobber\n" .
+        "log4Perl.appender.root.filename                   = /tmp/tapper-client.log\n" .
+        "log4perl.appender.Screen.layout.ConversionPattern = %d %p %c - %m in %F{2} (%L)%n\n"
+    ;
+
+    Log::Log4perl::init(\$logconf);
+
+    if ( $ENV{TAPPER_TEST_TYPE} and $ENV{TAPPER_TEST_TYPE} eq 'ssh' ) {
+        my $client = Tapper::Installer::Base->new;
+           $client->system_install("ssh");
+    }
+
+    my $prc = Tapper::PRC::Testcontrol->new;
+       $prc->run();
+
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-client - cmdline frontend to Testcontrol.ssh
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=item *
+
+Tapper Team <tapper-ops@amazon.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

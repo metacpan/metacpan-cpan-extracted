@@ -1,0 +1,42 @@
+---
+abstract: 'Compare JSON with Test::Deep'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Deep-JSON
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Deep::JSON:
+    file: lib/Test/Deep/JSON.pm
+    version: 0.03
+requires:
+  Exporter::Lite: 0
+  JSON: 0
+  Test::Deep: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/motemen/Test-Deep-JSON/issues
+  homepage: https://github.com/motemen/Test-Deep-JSON
+  repository: git://github.com/motemen/Test-Deep-JSON
+version: 0.03

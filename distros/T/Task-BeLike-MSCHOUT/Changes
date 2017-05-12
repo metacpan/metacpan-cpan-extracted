@@ -1,0 +1,12 @@
+Revision history for Task-BeLike-MSCHOUT
+
+1.162770  2016-10-03
+    - add deps:
+        - Dist::Zilla::Plugin::CopyFilesFromBuild
+        - WWW::Shorten, Config::Auto (needed for shorten app config file)
+
+1.130940  2013-04-04
+    - update deps
+
+1.111500  2011-05-30
+    -

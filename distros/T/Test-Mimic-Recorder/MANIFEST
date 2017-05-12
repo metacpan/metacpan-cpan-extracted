@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Test/Mimic/Recorder.pm
+t/01.t
+t/RecordMe.pm
+t/Dad.pm
+t/Mom.pm
+t/Grandma.pm
+t/Grandpa.pm
+META.yml                                 Module meta-data (added by MakeMaker)

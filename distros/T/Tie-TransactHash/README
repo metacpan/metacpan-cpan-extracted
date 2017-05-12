@@ -1,0 +1,32 @@
+			Tie::TransactHash README
+
+Tie::TransactHash is a package which provides facilities for easy
+editing of any hash.  It allows changes to be made without affecting
+the sequence of the hash, neither losing the current position, nor
+changing the order of the elements.
+
+Included is a program which allows direct editing of any of the
+standard Berkley DB file types.  This is especially useful for
+debugging programs which write to DB files.
+
+It does this by acting as an overlay (It doesn't use Tie::Overlay) for
+the other hash, storing its data in a Tie::IxHash.  It then commits
+when told to or at destruction time, copying its data straight over
+into the IxHash.
+
+This software is BETA.  I will accept bug reports mailed to me.
+Please put TransactHash in the subject (Michael De La Rue
+<miked@ed.ac.uk>).  Reports with fixes (diff -ur) will get fixed, but
+please explain what you are fixing and give an example.  Problems
+without fixes will have to wait till I have time.
+
+The module is distributed under the same terms as perl.
+
+The program is distributed under the GNU public license, version 2 or
+(at your choice) later.
+
+If you use this stuff for something interesting a note would be nice.
+Code contributions to the perl or free software community would be
+even nicer.
+
+	Michael De La Rue

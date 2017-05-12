@@ -1,0 +1,10 @@
+lib/Tie/Filter.pm			Tie a facade around a scalar, array, or hash
+lib/Tie/Filter/Array.pm		Tie a facade around an array
+lib/Tie/Filter/Hash.pm		Tie a facade around a hash
+lib/Tie/Filter/Scalar.pm	Tie a facade around a scalar
+Makefile.PL					Build script
+MANIFEST					This list of files
+t/array.t					Tests Tie::Filter::Array
+t/hash.t					Tests Tie::Filter::Hash
+t/scalar.t					Tests Tie::Filter::Scalar
+META.yml                                 Module meta-data (added by MakeMaker)

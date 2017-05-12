@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA1 836cb5e326f3d9cfc0008dfce009e674c0d27cf7 .perlcriticrc
+SHA1 1fd4fb63b053b942ec4dabfcdda1bb5a415efae1 Dynamic.pm
+SHA1 9ed5023f28b8dcf924b62dbf8d815dfbc95e0054 Dynamic.pm.html
+SHA1 d47a687df814febf8ed84b16c6d78cd50a200067 LICENSE
+SHA1 59bef90118e4a1007fadc4d42cc0b5847163a15d MANIFEST
+SHA1 2bcf50dd78724c5aad133408a779bbc4e8f5b7a2 MANIFEST.SKIP
+SHA1 6ab674276551a8756fc41de94443b1ef9ef01a76 META.yml
+SHA1 747b79fc1df4a2a6259f491d2cdc07007404b198 Makefile.PL
+SHA1 a273cce18d6cfb68ca414d4e869f8093eb1a26d8 README
+SHA1 55bb288d260e882ea1e8aa9fc23ca95ebadba35d t/01dynamic.t
+SHA1 47b8e8d9d6f4cbaa8420798ac24cdf0dd5c3baa1 t/02perlcritic.t
+SHA1 17ae7dc8b3192b5d3df6cbbeab8705e9b257fe1f t/03testfile.t
+SHA1 a1fce23b7794c82f0e1d10954dbf8626d1beabc0 t/bucardo.testfile
+SHA1 b487d306c9905f6e2653a8160abfeceb0d5a49d5 t/bucardo.testfile.2
+SHA1 a1fce23b7794c82f0e1d10954dbf8626d1beabc0 t/bucardo.testfile.3
+-----BEGIN PGP SIGNATURE-----
+
+iD8DBQFHE7/uvJuQZxSWSsgRAyOSAKCntznJ5ywzLW8IQsVv9s7lNHiO1gCZAXng
+uqGCiXvZCmC4fk0H9jfNrGQ=
+=8/k1
+-----END PGP SIGNATURE-----

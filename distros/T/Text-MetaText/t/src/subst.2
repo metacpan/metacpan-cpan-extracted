@@ -1,0 +1,28 @@
+# this tests complex variable definition and substitution using embedded
+# variables and references to variables.  CASE sensitivity is OFF.
+# Expected text is shown in (parenthesis).
+
+%% DEFINE foo="Foo Text" %%
+
+ foo (Foo Text): %%  foo %%
+
+%% DEFINE 
+   bar = $foo/bar
+   baz = $foo/baz
+%%
+
+  bar (Foo Text/bar): %% bar %%
+  baz (Foo Text/baz): %% baz %%
+
+%% DEFINE 
+qux="${bar}.${baz} $foo QUX"
+%%
+
+  qux (Foo Text/bar.Foo Text/baz Foo Text QUX): %% qux %%
+
+%% DEFINE 
+qux=${foo}${bar}
+%%
+
+  qux (Foo TextFoo Text/bar): %% qux %%
+

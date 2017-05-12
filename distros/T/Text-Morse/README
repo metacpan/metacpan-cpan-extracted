@@ -1,0 +1,75 @@
+
+		Text::Morse - Encoding and decoding Morse code - v0.07
+
+================================================================================
+SYNOPSIS:
+================================================================================
+
+  use Text::Morse;
+
+  my $morse = new Text::Morse;
+  print scalar($morse->Decode("... --- ..."));
+  print scalar($morse->Encode("Adam Bertil"));
+
+================================================================================
+INSTALLATION:
+================================================================================
+
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+================================================================================
+USAGE:
+================================================================================
+
+	Useless but fun.
+
+================================================================================
+SEE ALSO:
+================================================================================
+
+	/usr/games/morse
+
+================================================================================
+BUGS AND SOURCE:
+================================================================================
+
+	Bug tracking for this module: https://rt.cpan.org/Dist/Display.html?Name=Text-Morse
+
+	Source hosting: http://www.github.com/bennie/perl-VMware-vCloud
+
+================================================================================
+VERSION:
+================================================================================
+
+	Text::Morse v0.07 (2015/06/09)
+
+================================================================================
+COPYRIGHT:
+================================================================================
+
+	(c) 2014-2015, Phillip Pollard <bennie@cpan.org>
+	(c) 2001, Ariel Brosh
+
+================================================================================
+LICENSE:
+================================================================================
+
+This source code is released under the "Perl Artistic License 2.0," the text of
+which is included in the LICENSE file of this distribution. It may also be
+reviewed here: http://opensource.org/licenses/artistic-license-2.0
+
+================================================================================
+AUTHORSHIP:
+================================================================================
+
+This module was originally authored in 2001 by Ariel Brosh. (schop@cpan.org) 
+
+It was adopted (via the CPAN "adoptme" account) by Phillip Pollard in 2014.
+
+Additional Contributions:
+- Bulgarian and Russian language support by svetoslav.chingov@gmail.com

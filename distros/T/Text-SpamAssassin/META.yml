@@ -1,0 +1,25 @@
+---
+abstract: 'Detects spamminess of arbitrary text, suitable for wiki and blog defense'
+author:
+  - 'Robert Norris <rob@eatenbyagrue.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102343, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-SpamAssassin
+requires:
+  Data::Random: 0
+  Mail::Address: 0
+  Mail::Header: 0
+  Mail::Internet: 0
+  Mail::SpamAssassin: 2
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-SpamAssassin
+  repository: git://github.com/robn/Text-SpamAssassin.git
+version: 2.001

@@ -1,0 +1,49 @@
+---
+abstract: 'the Tactical Amulet Extraction Bot (for NetHack)'
+author:
+  - 'The primary authors of TAEB are:'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAEB
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  App::Nopaste: 0
+  Bot::BasicBot: 0
+  Carp::REPL: 0
+  IO::Compress::Gzip: 0
+  IO::Pty::Easy: 0.05
+  IO::Socket::Telnet: 0
+  Log::Dispatch::Twitter: 0
+requires:
+  Curses: 0
+  Data::Page: 0
+  File::HomeDir: 0
+  Hash::Merge: 0
+  Heap::Simple: 0
+  Heap::Simple::XS: 0
+  List::MoreUtils: 0
+  Log::Dispatch::Channels: 0
+  Module::Pluggable: 0
+  Moose: 0.71
+  MooseX::AttributeHelpers: 0.09
+  MooseX::ClassAttribute: 0.07
+  MooseX::Role::Matcher: 0.03
+  MooseX::Role::Parameterized: 0.04
+  NetHack::FOV: 0.01
+  NetHack::Item: 0.08
+  NetHack::Menu: 0.06
+  Sub::Exporter: 0
+  Term::VT102::ZeroBased: 0
+  Time::HiRes: 0
+  YAML: 0
+  perl: 5.8.1
+version: 0.03

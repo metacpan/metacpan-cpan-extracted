@@ -1,0 +1,33 @@
+Revision history for Perl extension Text::CSV::Auto.
+
+0.06      2011-03-08
+ - Support a "data_type" key in the analyze() results.  Needed for
+   ExportTo::MySQL to create the table definition.
+
+0.05      2011-03-07
+ - Build out framework for exporters.
+ - Created CSV exporter as a proof-of-concept.
+ - Support plugins in Text::CSV::Auto::Plugin.
+
+0.04      2011-03-07
+ - More documentation cleanup.
+ - Rearrange the headers behavior so that when headers are pulled from the
+   CSV they can be gotten at via the headers attribute.
+
+0.03      2011-03-06
+ - Provide an OO interface, with a lightweight functional interface on top
+   of it.
+ - Documented some of the TODOs.
+ - Fix testing prerequisites.
+ - Made documentation in analyze a little more presentable.
+ - Rename the "undef" data type to "empty".  Yes, not backwards
+   compatible, but I doubt anyone is using this module yet.
+
+0.02      2011-02-19
+ - Tests.
+ - Fix row count when the header is being pulled from the first row.
+ - Many typo fixes in the documentation.
+
+0.01      2011-02-19
+ - First release.
+

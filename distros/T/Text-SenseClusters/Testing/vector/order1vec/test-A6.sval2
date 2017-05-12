@@ -1,0 +1,40 @@
+<corpus lang="en" tagged="YES">
+<lexelt item="line-n">
+<instance id="line-n.w8_020:7099:">
+<answer instance="line-n.w8_020:7099:" senseid="phone"/>
+<context>
+ if you can buy and sell with a personal computer you can't be put on hold says william coppel a quick reilly marketing executive but michael gianturco author of the stock market investor's computer guide notes that computers use telephone <head>lines</head> to communicate with the brokers electronic systems and when the telephone lines are jammed he says a computerized trader won't be able to get through any better than anyone else trying desperately to call a broker he says
+</context>
+</instance>
+<instance id="line-n.w8_132:15431:">
+<answer instance="line-n.w8_132:15431:" senseid="phone"/>
+<context>
+ instead of hiring tellers and account officers to take deposits in the office they advertise deposit rates in regional newspapers customers call on toll free telephone <head>lines</head> and conduct transactions by mail by wire or through an automated teller network shared with other banks
+</context>
+</instance>
+<instance id="line-n.w8_027:13762:">
+<answer instance="line-n.w8_027:13762:" senseid="phone"/>
+<context>
+ by comparison it is usually pretty easy to track down white house and administration aides top staffers have direct toll free telephone <head>lines</head> to the white house installed in their homes
+</context>
+</instance>
+<instance id="line-n.w7_114:8965:">
+<answer instance="line-n.w7_114:8965:" senseid="text"/>
+<context>
+ proponents of this view were abetted by nhl administrations including the current one that held that fighting is part of the game if you had a dollar for every time a league or team official mouthed that silly <head>line</head> you could restore all of the money lost in the recent stock market decline
+</context>
+</instance>
+<instance id="line-n.w7_065:1553:">
+<answer instance="line-n.w7_065:1553:" senseid="product"/>
+<context>
+ according to those familiar with the machine it will be able to run application programs that use the unix operating system developed by at t concurrently with software running on ms dos the microsoft corp operating system popularized by international business machines corp the new system will also run software based on the new os operating standard for ibm's new <head>line</head> of personal computer
+</context>
+</instance>
+<instance id="line-n.w9_4:9437:">
+<answer instance="line-n.w9_4:9437:" senseid="product"/>
+<context>
+ in addition to commercial market digital's new <head>line</head> targets the low end of the engineering and scientific supercomputer market when it's packaged with an optional supercharger known as a vector processor digital's push into mainframes comes at a time when its mainstay minicomputer line is under growing pressure from smaller personal computer and workstations that operate on standard operating system rather than on the proprietary systems that older minicomputers use
+</context>
+</instance>
+</lexelt>
+</corpora>

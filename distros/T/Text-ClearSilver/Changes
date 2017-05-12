@@ -1,0 +1,25 @@
+Revision history for Perl extension Text::ClearSilver
+
+0.10.5.4 Wed Apr 28 04:11:56 2010
+    - Fix a caching problem (gfx)
+    - Fix a cyclic ref problem (gfx)
+
+0.10.5.3 Mon Apr  5 16:56:45 2010
+    - Fix a typo in the docs (gfx)
+
+0.10.5.2 Sun Apr  4 13:02:02 2010
+    - Support "encoding => 'utf8'" (gfx)
+    - Support "functions => [qw(string html)]" (gfx)
+    - Remove gettext (_ function); use register_function() if needed (gfx)
+    - Remove sprintf functio; use functions => 'string' instead (gfx)
+    - More compatibility with ClearSilver.pm (gfx)
+
+0.10.5.1 Tue Mar 30 16:26:31 2010
+    - Fix a packaging issue (gfx)
+    - Fix a pre-5.10 issue (gfx)
+
+0.10.5.0 Tue Mar 30 12:40:09 2010
+    - The first CPAN release!
+
+0.001 Wed Mar 24 22:09:10 2010
+    - original version; created by Module::Setup

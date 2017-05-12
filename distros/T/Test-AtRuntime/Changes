@@ -1,0 +1,9 @@
+0.02 Fri Aug  1 18:11:16 PDT 2003
+  * Changed TEST: { .. } syntax to simpler TEST { ... }.  Leaves us open
+    for a filterless version of the module, too.
+  * Filter::Simple was causing the segfaults.  Worked around.  Now
+    works in 5.6.0.
+
+0.01 Fri Aug  1 15:13:07 PDT 2003
+  - Prototype version, seems to work
+  * Only works with 5.8.1.  Segfaults with anything eariler. :(

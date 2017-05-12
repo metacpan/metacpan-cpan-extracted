@@ -1,0 +1,638 @@
+Revision history for Changes
+
+0.62    2017/02/23 18:54:35
+        [CHANGES]
+         * Complete reïmplementation of Tickit::Window using libtickit
+         * No other deprecations - they have all been deferred a release
+
+0.61    2016/12/05 00:28:00
+        [CHANGES]
+         * Documentation updates:
+            + Better description of EVENTS
+            + Update module synopses to use current APIs
+         * Perform Tickit 0.61 deprecations:
+            + Die in $win->set_on_*
+            + Die in $term->bind_event_with_flags
+            + Make $win->clear* methods die since they've actually been broken
+              for ages anyway and nobody noticed
+
+0.60    2016/11/05 13:28:12
+        [CHANGES]
+         * Strict type checking when constructing key or mouse event
+           structures
+         * Perform Tickit 0.60 deprecations:
+            + Add warnings to HASHification overloads on Tickit::Event::*
+            + Add warning to $term->bind_event_default
+            + No longer guarantee $win->term object identity
+            + Delete $term->set_on_* methods
+
+0.59    2016/10/22 21:15:57
+        [CHANGES]
+         * Define new layer-neutral Tickit::Event::* classes
+         * Perform Tickit 0.59 deprecations:
+            + Warn in calls to $win->set_on_*
+            + Warn in calls to $term->bind_event_with_flags()
+         * Bundled libtickit changes:
+            + Add refcounting to all object types
+            + Deprecate the _destroy() functions in favour of _unref()
+
+0.58    2016/09/30 20:08:32
+        [CHANGES]
+         * Added new Tickit::Event instances for Tickit::Term event info
+         * Perform Tickit 0.58 deprecations:
+            + Die on attempt to set Tickit::Term ->set_on_* event handlers
+            + Perl-level IO handles no longer preserved by term instances
+            + Announce deprecation of term event info as HASH references
+
+        [BUGFIXES]
+         * Back-compat for perl 5.10.0 lacking mPUSHs - (RT98983)
+
+0.57    2016/08/07 17:05:21
+        [CHANGES]
+         * Add $win->bind_event; announce the legacy $win->set_on_* as
+           deprecated
+         * Define new flags-taking ->bind_event methods that check argument
+           types; avoid needing $term->bind_event_with_flags
+
+0.56    2016/05/10 18:02:02
+        [CHANGES]
+         * Perform Tickit 0.56 deprecations:
+            + Remove pen observers
+            + Remove guarantee that perl-level IO handles are preserved by
+              Tickit::Term
+            + Add deprecations warnings to Tickit::Term ->set_on_* event
+              handlers
+          * Removed Tickit::Term->find_for_term
+          * Bundled libtickit changes:
+            + Added TICKIT_EV_DESTROY
+            + Give EOF-style signal to term output function
+
+0.55    2016/02/09 23:32:13
+        [CHANGES]
+         * Wrap tickit_term_emit_{key,mouse}
+         * Perform Tickit 0.55 deprecations:
+            + window set_expose_after_scroll immediately dies
+         * Actually honour return values of term event handlers
+         * Added $term->bind_event_with_flags and BIND_FIRST
+         * Updated documentation to barename =head2 function style
+
+        [BUGFIXES]
+         * Older perls need 'use IO::Handle' before we can ->binmode things
+
+0.54    2015/09/14 10:36:50
+        [CHANGES]
+         * Allow $window->raise immediately after construction (RT105582)
+         * Added more Window unit-test cases
+         * Removed remaining Tickit::Widget-based examples and demos
+         * Renamed TICKIT_CURSORSHAPE_* constants
+         * Tickit::Debug is now backed by libtickit
+
+        [BUGFIXES]
+         * Make destroyed child windows reëxpose their client area in the
+           parent
+         * Fix for rb_get_cell_active() returning -1 on failure (RT101716)
+
+0.53    2015/06/28 12:39:41
+        [BUGFIXES]
+         * Don't "use_ok" Tickit::Widget or subclasses in unit tests
+
+0.52    2015/06/27 00:28:49
+        [CHANGES]
+         * Split out Tickit::Widget and friends into the Tickit-Widgets
+           distribution
+         * Perform 0.52 deprecations:
+            + Warn on attempt to disable window expose_after_scroll
+
+        [BUGFIXES]
+         * Remember to add 'return 0' in int-returning event handler function
+
+
+0.51    2015/03/27 14:01:43
+        [CHANGES]
+         * Perform 0.51 deprecations:
+            + Die on Widgets that don't have WIDGET_PEN_FROM_STYLE
+            + Warn on Pen observers
+         * Allow #-style comments in style files
+         * Added Tickit::Style->load_style_from_DATA shortcut
+         * Configuration to not use ALTSCREEN
+
+        [BUGFIXES]
+         * Ensure that raw bte writes to testing pipe don't break under
+           PERL_UNICODE (RT102028)
+         * Remember to SvGETMAGIC() before looking at SvCUR()
+
+0.50    2015/02/03 23:34:49
+        [CHANGES]
+         * Perform 0.50 deprecations:
+            + Die on Window direct-drawing methods and flushing RenderBuffer
+              to a Window
+         * Use textn() functions in RenderBuffer instead of text()
+         * Use new tickit_term_scrollrect() API
+         * Delete various bits of dead code
+
+0.49    2014/12/16 21:11:15
+        [CHANGES]
+         * Perform 0.49 deprecations:
+            + Announce deprecation of Tickit::Pen observers
+            + Warn on Widgets that don't have WIDGET_PEN_FROM_STYLE set
+            + Die on attempts to disable CHILD_WINDOWS_LATER
+         * Allow chaining return of ContainerWidget->{add,remove}
+
+0.48    2014/09/18 20:55:38
+        [CHANGES]
+         * Perform 0.48 removal deprecations
+         * Added Tickit::Test::clear_term
+         * Print deprecation warnings from Tickit::Window direct draw methods
+
+        [BUGFIXES]
+         * Test for presence of T:W:HBox at BEGIN time during unit test, to
+           avoid error
+         * Fix for Tickit::Utils::distribute() with fixed=0 when in
+           overallocation mode
+         * Ensure that child window on_expose handler is run before containing
+           parent, to ensure RB holes are set correctly for underprint
+         * Hidden child windows should not count during $win->scroll*
+         * Ensure child window key handler propagation doesn't continue after
+           a key event has been handled
+
+0.47    2014/09/05 23:22:29
+        [CHANGES]
+         * Moved Tickit::Widget::HBox/VBox to the Tickit-Widgets dist
+         * Remove Tickit::WidgetRole::Penable
+         * Support the new 'blink' Pen attribute
+
+        [BUGFIXES]
+         * Bundled libtickit bugfixes:
+            + Improved handling of some missing terminfo attributes
+            + Respect renderbuffer offset and limits in get_* functions
+
+0.46    2014/05/02 20:16:37
+        [CHANGES]
+         * Move RenderBuffer and MockTerm entirely into libtickit C library
+         * Added $rb->char
+         * Add Tickit::Debug support to RenderBuffer
+
+        [BUGFIXES]
+         * Ensure that $rb->skip/skip_at obey masking regions
+
+0.45    2014/04/15 02:47:45
+        [CHANGES]
+         * Move RenderBuffer's linemask-to-character conversion code into XS/C
+           to prepare for RB-in-C
+         * Implement most of Tickit::Test::MockTerm logic in C
+         * Don't emit INSERTCH or DELETECH events from MockTerm
+         * Announce $rb->flush_to_window as deprecated
+         * Announce Window direct drawing methods as deprecated
+         * Emit deprecation warnings from $term->mode_* and $win->*penattrs
+           methods
+         * Remove the Tickit::WidgetRole::Penable code; replace with a simple
+           die message
+
+0.44    2014/04/07 02:03:37
+        [CHANGES]
+         * Deprecation warnings for pre-0.42-style Window expose/key/mouse
+           event handlers
+         * Provide $ev->mod_is_{shift,ctrl,alt} shortcut tests
+         * Added $rb->linebox_at()
+         * Allow ContainerWidgets to provide a method to return only those
+           children it wants to focus search on
+         * Added Tickit::Debug logging
+         * Added focus_child_notify Window ability and :focus-child
+           ContainerWidget style tag
+         * Use a single RenderBuffer for the entire window/widget tree
+           rendering
+         * Added $rb->get_cell accessor for inspecting cell state
+        
+        [BUGFIXES]
+         * Ensure that focus searching ability only considers children with
+           visible windows
+         * Ensure that $rb->mask won't crash with over-sized or negative-
+           offset mask rects
+         * Clip $win->scroll rect to the actual window bounds
+         * Correct explanation of tagged vs. untagges style in docs
+         * Fix $win->scrollrect when moving chunks a distance larger than
+           their own size
+         * Fix $rb->DESTROY with content to not print warnings of unreferenced
+           scalars
+
+0.43    2014/04/01 16:29:58
+        [CHANGES]
+         * Default TICKIT_CHILD_WINDOWS_LATER on; with env. var to disable it
+         * Allow optional $pen argument to $term->{print,clear,erasech}
+         * Support flushing of RenderBuffer directly to a Tickit::Term
+         * Store pending 'later' geometry changes separately from expose logic
+           to ensure correct output
+         * Rewrite of Window rendering logic:
+            + accumulate damage and run expose logic only on root window
+         * Provide a more robust associative version of is_termlog() to avoid
+           test logic that depends on exact rendering order
+        
+        [BUGFIXES]
+         * Ensure that $win->subwindows works on windows with no subs
+         * $win->restore should remember to flush the actual terminal buffer
+         * Ensure that RB masks are correctly interpreted during translations
+
+0.42    2014/01/12 13:40:39
+        [CHANGES]
+         * Added Window on_expose callback type with RenderBuffer
+         * Added legacy-detecting $win->set_on_* methods to set new-style
+           Window callbacks
+         * Perform Widget rendering onto Window using new with_rb expose event
+         * Deprecate legacy versions of Window on_expose, on_key, on_mouse
+         * Removed CLEAR_BEFORE_RENDER
+
+0.41    2013/12/19 19:17:07
+        [CHANGES]
+         * Allow cursors to be entirely hidden on a Window
+         * Return $text width in columns from $rb->text and $rb->text_at
+         * Document that Tickit::Style->load_style* are methods, not functions
+           (RT89235)
+
+        [BUGFIXES]
+         * Fix for T:W:Box - set 'dir' of T:WR:Alignable, not 'style'
+         * Fix double-nested container focus management
+
+0.40    2013/09/29 19:08:09
+        [CHANGES]
+         * New size model; ->requested_{size,lines,cols} which cache
+         * Lazy $parent->resize only when required
+         * Updated all examples/docs for new ->render_to_rb
+         * Print a legacy deprecation warning when constructing a
+           ->render-based widget
+         * Allow Styled widgets to copy their base class
+         * Allow HBox/VBox to take a 'children' ARRAY to constructor
+
+        [BUGFIXES]
+         * Specify minimum required version of Alien::libtermkey to get
+           libtermkey >= 0.16
+         * Need to force TERM=xterm during sequence testing
+
+0.39    CHANGES:
+         * Default expose_after_scroll true
+         * Don't ->resize a ::Static if its size hasn't actually changed
+         * Allow $win->scrollrect to take a Tickit::Rect instead of 4 ints
+         * Added $win->scroll_with_children
+
+        BUGFIXES:
+         * Fix for libtickit ICH/DCH
+         * Bundled libtickit bugfixes:
+            + Implement tickit_term_scrollrect ICH/DCH correctly
+
+        **NOTE**: These changes will break Tickit::Widget::Entry prior to
+        Tickit-Widgets version 0.11, and so will need updating.
+
+0.38    CHANGES:
+         * Added 'drag_stop' and 'drag_outside' mouse events
+         * More helpful error message if Tickit::Term constructor fails
+         * Support multiple mouse tracking modes in latest libtickit
+         * Bundled libtickit updates:
+
+        BUGFIXES:
+         * Disable experimental smartmatch warnings on recent perls
+         * Fixed examples/demo-dragndrop.pl for recent API changes
+         * Avoid GNU C99 anonymous unions in RenderBuffer cell struct
+           (RT87724)
+         * Bugfix to MockTerm's ICH/DCH emulation of horisontal scrollrect
+
+0.37    CHANGES:
+         * Allow Style files to use :: in widget type names
+         * Added an experiment to test making child window list changes
+           asynchronously "later"
+
+        BUGFIXES:
+         * API fixes in demos
+         * Recognise (and truncate) non-integer cursor positions to
+           RenderBuffer
+         * Ensure that RenderBuffer->setpen can alter already-set attributes
+
+0.36    CHANGES:
+         * Added bounds arguments to $rect->linerange
+         * Added $rb->eraserect
+         * Updated *Box container widgets to use ->render_to_rb
+
+        BUGFIXES:
+         * Avoid calling $win->clear when using ->render_to_rb
+         * Handle $rb->text entirely outside of clipping region
+
+0.35    CHANGES:
+         * Give the terminal up to 100msec to initialise before running
+         * Added ContainerWidget->find_child and ->focus_next
+         * Implement Tab/Shift-Tab as focus movement keys
+         * Added style_redraw_keys
+         * Keybindings from Style
+         * Added ->render_to_rb alternative to ->render method
+
+        BUGFIXES:
+         * Clean up focus chain when removing a child window that has focus
+         * Make sure that RenderBuffer stores UTF-8 text bytes
+
+0.34    CHANGES:
+         * Added timeout to Term->input_wait
+         * Added Tickit->timer
+         * Many internal updates to Window focus code
+         * Added Window->cursor_at, ->cursor_shape and ->take_focus
+         * Added Widget focus integration, including automatic ':focus' style
+           tag
+         * Added Window->subwindows
+
+0.33    CHANGES:
+         * Added Tickit::RenderBuffer; a renamed copy of Tickit::RenderContext
+           from CPAN. Re-implemented more in XS/C code
+         * Removed Tickit::WidgetRole::Borderable
+         * Added 'bool' override for pens, rects and windows, because they are
+           all always true
+
+0.32    CHANGES:
+         * Allow widgets to declare style keys to cause ->reshape calls
+         * Allow Windows to be re-ordered within their parent, better document
+           the behaviour of Window ordering
+         * Handle mouse drag/drop events at the rootwin level
+         * Pass key/mouse event arguments as a structure as well as positional
+           arguments
+         * Implement HBox/VBox spacing as style keys
+         * Wrap tickit_term_getctl_int()
+         * Bundled libtickit updates:
+            + Down-convert colours to 8 or 16 colour palettes when on non-
+              256color-aware terminals
+
+0.31    CHANGES:
+         * Define the behaviour of Tickit::Style on subclasses, allowing for
+           transparent or independent subclass types
+         * Declare the particular version of Alien::unibilium required
+         * Split pens into mutable and immutable forms; deprecate ->clone
+           method
+         * Added $pen->equiv and ->equiv_attr comparison methods
+
+0.30    CHANGES:
+         * Allow modification of widget direct-applied style
+         * Split Tickit::Pen into mutable and immutable subclasses
+         * Return immutable pens from Tickit::Widget style
+         * Cache style pens
+         * Added opt-in optional feature to set widget pen from default
+           style pen
+         * Use default style pen as widget pen in built-in widget classes
+         * Pass keyboard modifier state through to key/mouse event handlers
+         * Avoid floating-point in Tickit::Utils::distribute()
+         * Avoid a memory leak bug in Tickit::Pen and Tickit::Term XS code
+         * Set TERM=xterm for whole-system unit testing so we get reliable
+           terminal initialisation sequence
+         * Bundled libtickit updates:
+            + Split implementation of real xterm and other terminfo-driven
+              terminal drivers
+            + Now requires unibilium for the terminfo-driven driver
+
+         * Currently requires unibilium version v1.1.0, which can be found at
+              https://github.com/mauke/unibilium
+
+0.29    CHANGES:
+         * Added Tickit::Style, and the ability to set state-sensitive style
+           information on widgets
+         * Added on_click event to Tickit::Widget::Static
+         * Redraw a widget after pen change
+         * Added Tickit::Utils::distribute()
+         * Improvements and modifications to the way ContainerWidget works
+           + can ->set_child directly
+           + more abstract container logic that doesn't enforce an ordering
+           + just stores per-child options
+         * Return a Tickit::StringPos from $win->erasech
+         * Abort if $win->print is given non-Unicode text
+         * Warn if CLEAR_BEFORE_RENDER is still set
+
+0.28    CHANGES:
+         * Added $window->close method
+         * Make FLOAT_ALL_THE_WINDOWS behaviour default
+
+        BUGFIXES:
+         * Ensure HBox can handle out-of-space
+         * Correctly convert mouse wheel direction in args hash
+
+0.27    BUGFIXES:
+         * Important bugfix to bundled libtickit:
+            + Fix resize logic in tickit_rectset_add() so it doesn't grow
+              the object arbitrarily until it fails
+
+VERSION 0.26 IS CRITICALLY BROKEN. DO NOT USE IT.
+0.26    CHANGES:
+         * Re-implement Tickit::RectSet as a libtickit-backed object
+         * Expose Tickit::Term->setctl_{int,str} methods
+         * New Tickit::Term->bind_event API
+
+0.25    CHANGES:
+         * Removed Tickit::Widget::Frame and Tickit::Widget::Box, now they
+           have been moved to Tickit-Widgets dist.
+         * Added a new, better idea for Tickit::Widget::Box
+         * Allow Tickit->new( root => ... )
+         * Re-implement Tickit::Rect as a libtickit-backed structure object
+
+0.24    CHANGES:
+         * Many improvements to Window scroll logic; allow scroll with
+           terminal scrollrect even with obscuring floats
+         * Added Rect->add and ->subtract methods
+         * Added RectSet->subtract method
+
+        BUGFIXES:
+         * Correctly adjust pending window damage after ->scrollrect
+
+0.23    CHANGES:
+         * Many improvements to Window float logic; beginning of merging float
+           and non-float implementations
+         * Added $win->bottom and $win->right
+
+0.22    CHANGES:
+         * Window focus in/out events, $win->is_focused accessor
+         * Added Tickit::RectSet object class
+         * Allow Window to store a set of expose regions rather than just a
+           boolean flag
+         * Added Window expose-after-scroll behaviour
+
+0.21    CHANGES:
+         * Wrap tickit_string_count and tickit_string_countmore; provide a
+           Tickit::StringPos counter object
+         * Have $win->print return a Tickit::StringPos
+
+        BUGFIXES:
+         * Don't use_ok Tickit::Widget::Entry
+
+0.20    CHANGES:
+         * Allow $win->goto outside of its edges, apply clipping
+         * Removed Tickit::Widget::Entry; now found in the Tickit-Widgets
+           distribution
+         * Updated for latest libtickit
+
+        BUGFIXES:
+         * Ensure that Static widgets with empty text still behave correctly
+         * Fix test skip counts in t/02utils.t
+
+0.19    CHANGES:
+         * Allow multi-line Static text
+         * Added a stringification overload to Pen to make unit testing easier
+
+        BUGFIXES:
+         * Better terminal flushing
+         * Force TERM=xterm during t/0term-output.t
+
+0.18    CHANGES:
+         * Re-implement Term and Pen in XS/C using libtickit (bundled source
+           pkg-config driven build)
+         * Defined a new Tickit::WidgetRole::Penable
+         * Added $rect->linerange
+         * Added $win->clearrect
+         * Added $win->make_popup to create on-top floating input-stealing
+           Windows
+
+        BUGFIXES:
+         * Disallow $win->scrollrect if there are any floating windows in the
+           way
+         * Perform $win->erasech with the entire pen in case 'rv' is set
+
+0.17    CHANGES:
+         * $win->hide, $win->show and the concept of hidden windows
+         * $win->make_float and the concept of floating windows
+         * A better clipping model to handle the above
+         * $pen->hasattr
+         * Tickit::Test::drain_termlog()
+         * Set the CANON_DELBS termkey flag in case of misconfigured terminals
+         * Make $tickit->stop a user-visible method
+
+        BUGFIXES:
+         * Ensure Tickit::Widget::Entry keybindings consume key press events
+         * Ensure Tickit::Widget::Static->set_text actually calls ->redraw
+         * Pass UTF8 => 1 to unit tests that test Unicode functionality
+
+0.16    CHANGES:
+         * Represent mouse wheel events as 'wheel'/'up' or 'wheel'/'down'
+         * Fix argument order for Tickit::Rect->translate
+         * Allow $term->chpen/->setpen to take a Tickit::Pen object
+         * Added Pen->clone, ->copy_from and ->default_from methods
+         * Deprecated the pen attribute list returning methods of
+           Tickit::Window
+
+        BUGFIXES:
+         * Account for inter-child spacing when calculating minimum size
+           requirements for Tickit::Widget::{H,V}Box
+
+0.15    CHANGES:
+         * $term->eraseline is now removed
+         * Provide a $tickit->tick method to finer-grained event handling
+         * Removed Tickit::RootWindow; the root window is now a regular
+           Tickit::Window
+
+        BUGFIXES:
+         * Force terminal size in t/80tickit.t so it doesn't cause failures on
+           oddly-sized terminals
+
+0.14    CHANGES:
+         * $term->insertch and ->deletech are now removed
+         * Move key input behaviours into Tickit::Term; many other
+           refactorings between Tickit and Tickit::Term
+         * Renamed $tickit->start / ->stop to ->setup_term / ->teardown_term
+
+0.13    CHANGES:
+         * Allow Widget subclasses to disable the clear-before-render
+           behaviour
+         * Avoid harmless warning about undef during global destruction
+
+        BUGFIXES:
+         * Skip Unicode-requiring tests unless we know we have a Unicode-aware
+           locale
+
+0.12    CHANGES:
+         * Pass an opaque 'id' value through Pen->add_on_changed into
+           $observer->on_pen_changed
+         * Extend is_display() unit testing function to allow asserting pen
+           attributes as well as text-on-display
+         * Rewrote many unit tests to use only is_display() and not
+           is_termlog()
+         * Deleted now-deprecated Window methods of ->penprint, ->insertch and
+           ->deletech
+
+0.11    CHANGES:
+         * Allow Windows to be created overlapping their parent boundaries;
+           clip output - Work In Progress, so far only handles ->print and
+           ->erasech, not the scrolling operations
+         * Represent on-screen rectangles as first-class Tickit::Rect object,
+           pass a 'rect' argument to Window on_expose event
+         * More diagnostic output from Tickit::Test::is_termlog failures
+         * Support (rarely-used) strikethrough pen attribute
+         * No longer depends on Term::TermKey::Async unnecessarily
+
+0.10    CHANGES:
+         * Use Perl's ${^UTF8LOCALE} to detect UTF-8ness rather than relying
+           on libtermkey's flags. Avoids fragile dependency
+         * Use Term::TermKey 0.09's EINTR ability to simplify the main run
+           loop
+         * Split Tickit::Async out into its own distribution
+
+0.09    CHANGES:
+         * Move IO::Async-based code out of Tickit into Tickit::Async,
+           reimplement a simple IO framework in Tickit itself.
+         * Added Window on_expose event that cascades down the Window tree
+         * Implement Widget drawing using Window on_expose events rather than
+           cascading logic down th Widget tree
+         * Print proper deprecation warnings from deprecated Window methods
+           penprint, insertch, deletech
+
+0.08    CHANGES:
+         * More efficient XS implementation of low-level string length
+           handling utilities in Tickit::Util
+         * Allow forcing size of child widgets in Tickit::Widget::VBox and
+           ::HBox
+         * Pass region information into Widget->render methods; even if
+           currently it is a fixed 0/0/$lines/$cols
+         * Accept a pen argmuent to Window->print; deprecate ->penprint
+         * Implement Window->scrollrect; deprecate ->insertch and ->deletech
+         * Print a deprecation warning if a plain Tickit object is used as an
+           IO::Async::Notifier
+
+0.07    CHANGES:
+         * Provide (trivial) Tickit::Async subclass for users to prepare for
+           IO::Async split
+         * Try to find $TERM-specific subclass of Tickit::Term for terminal-
+           specific optimisations or abilities
+         * Support 256 colour xterm
+         * Unit test in more generic SCROLLRECT operation
+
+        BUGFIXES:
+         * Ensure Tickit::Test and Tickit::Test::MockTerm have a $VERSION
+
+0.06    CHANGES:
+         * Shut down terminal state before $SIG{__DIE__}'ing
+         * Cope correctly with zero-sized children in {V,H,}Box and Frame
+         * Broadcast unhandled keypresses out to sibling windows around the
+           widget tree
+         * Neater unit testing functions
+         * Rearranged code to prepare for abstract/IO::Async split
+
+0.05    CHANGES:
+         * Added mouse support
+         * Switchable insert/overwrite mode in Entry
+         * Markers at beginning/end of Entry to indicate scrolling
+         * Reduced API dependency on IO::Async; lazily construct a containing
+           Loop in ->run
+         * Reduced test-time dependency on IO::Async
+         * Export Tickit::Test as real code for out-of-distribution tests
+         * Miscellaneous bugfixes and improvements
+
+0.04    CHANGES:
+         * Added Tickit::Widget::Frame and ::Box
+         * Support text scrolling in Entry
+         * Support renderable containers
+         * Updated Pen model; first-class objects, observers for updates
+         * Support high-intensity colours
+         * Entry->text_delete/_splice return the deleted text
+
+0.03    CHANGES:
+         * Added Tickit::Widget::Entry
+         * Tickit::Pen as first-class object
+         * Support more pen attributes - reverse video, alternate font
+
+0.02    CHANGES:
+         * Bind Ctrl-C to $loop->loop_stop by default
+         * Neater root widget and run API
+         * Added SYNOPSIS examples to most widget types; added examples/
+           directory
+         * Window 'on_key' event handling
+         * Keep cursor hidden unless it's on a focused window
+
+0.01    First version, released on an unsuspecting world.
+

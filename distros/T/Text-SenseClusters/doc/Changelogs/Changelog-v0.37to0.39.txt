@@ -1,0 +1,29 @@
+0.39 was mainly developed with an intention to support SVDPack for SVD 
+computations.
+
+Changes made in Sense-Clusters version 0.37 during version 0.39
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Separated PDL's svd call from wordvec to new program pdlsvd.pl
+
+2.	Modified wordvec to create formatted matrix, removed precision
+	option and instead added a format option 
+
+3.	Added SVDPack support with 2 new programs -
+	mat2harbo - converts a full dense matrix as created by wordvec to
+	Harwell-Boeing format as required by SVDPack
+	svdpackout.pl - reconstructs a matrix from its S-values and S-vectors
+	created by SVDPack
+
+5.	Modified contextvec to accept new format of wordvec
+
+6.	Updated vector.pl wrapper to include 2 options for computing SVD -
+	PDL and SVDPack [default]
+
+7.	Updated pseudosh, demos, UMLs for SVDPack support
+
+(Changelog-v0.37to0.39 Last Updated on 09/23/2003 by Amruta)

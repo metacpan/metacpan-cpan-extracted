@@ -1,0 +1,16 @@
+Revision history for Tie-AliashHash
+
+1.02    2016-03-11
+        Moved to github, using Build.PL instead of Makefile.PL, added
+        license
+
+1.01    2003-06-26
+        Fixed a bug in the EXISTS sub, now works as documented (thanks
+        wk)
+
+1.00    2001-03-07
+        First released version
+
+0.01    2001-02-20
+        Original version; created by h2xs 1.20 with options
+            -CAXn Tie::AliasHash

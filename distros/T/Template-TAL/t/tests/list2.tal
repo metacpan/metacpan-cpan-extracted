@@ -1,0 +1,15 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <div tal:repeat="colour1 path:colours">
+      <div tal:repeat="colour2 path:colours">
+        #<span tal:replace="repeat/colour1/index" />
+        .<span tal:replace="repeat/colour2/index" />
+        <span tal:replace="colour1">Colour of the rainbow</span>
+        <span tal:replace="colour2">Colour of the rainbow</span>
+      </div>
+    </div>
+    <div tal:repeat="colour1 path:colours" tal:omit-tag="string:1">
+      <span tal:content="colour1" />
+    </div>
+  </body>
+</html>

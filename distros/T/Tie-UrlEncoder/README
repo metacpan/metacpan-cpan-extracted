@@ -1,0 +1,29 @@
+Tie/UrlEncoder version 0.01
+===========================
+
+Syntactic sugar for URL-Encoding strings. Tie::UrlEncoder imports
+a tied hash C<%encode> into your package, which delivers a RFC 1730
+URL Encoded string of whatever is given to it, for easy embedding
+of URL-Encoded strings into doublequoted templates.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  the perl 5 TIEHASH interface
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 david nicol davidnico@cpan.org
+released under your choice of the GNU Public or Artistic licenses
+

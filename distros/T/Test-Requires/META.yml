@@ -1,0 +1,44 @@
+---
+abstract: 'Checks to see if the module can be loaded'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom @*(#RJKLFHFSDLJF gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.2, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Requires
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Requires:
+    file: lib/Test/Requires.pm
+    version: '0.10'
+requires:
+  Test::Builder::Module: '0'
+  Test::More: '0.47'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/tokuhirom/Test-Requires/issues
+  homepage: https://github.com/tokuhirom/Test-Requires
+  repository: git://github.com/tokuhirom/Test-Requires.git
+version: '0.10'
+x_contributors:
+  - 'gfx <gfuji@cpan.org>'
+  - 'Toby Inkster <mail@tobyinkster.co.uk>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

@@ -1,0 +1,55 @@
+NAME
+    Text::Clip - Clip and extract text in clipboard-like way
+
+VERSION
+    version 0.0014
+
+SYNOPSIS
+        $data = <<_END_
+        # Xyzzy
+        #   --- START 
+            qwerty
+
+                1 2 3 4 5 6
+        8 9 10 The end
+
+        # abcdefghi
+                jklmnop
+        _END_
+
+        $mark = Text::Clip->new( data => ... )->find( qr/#\s*--- START/ )
+        ( $mark, $content ) = $mark->find( qr/ The end/, slurp => '[]' )
+
+    $content =
+
+        #   --- START 
+            qwerty
+
+                1 2 3 4 5 6
+        8 9 10 The end
+
+    Alternatively, with
+
+        ( $mark, $content ) = $mark->find( qr/ The end/, slurp => '()' )
+
+    $content =
+
+            qwerty
+
+                1 2 3 4 5 6
+
+DESCRIPTION
+    Text::Clip allows you to mark/slice up a piece of text. String matching
+    (by regular expression, etc.) is used to place marks. The first mark
+    lets you access the text preceding and following the mark. Subsequent
+    marks allow you to slurp up the text "clipped" between the marks.
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

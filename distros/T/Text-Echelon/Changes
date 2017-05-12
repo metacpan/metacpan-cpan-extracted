@@ -1,0 +1,11 @@
+Revision history for Perl extension Text::Echelon.
+0.02  Wed Dec 19 20:04:31 2001
+    Included tests written by Andrew Wilson.
+	Fixed broken constructor.
+	Added TODO section.
+	Updated documentation slightly as suggested by acme.
+	Added enhancements suggested by Belfast.PM.
+
+0.01  Mon Dec 10 11:53:50 2001
+	- original version; created by h2xs 1.19
+

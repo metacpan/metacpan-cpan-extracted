@@ -1,0 +1,12 @@
+
+  -- C --
+
+  This is sample text C for Text-OutdentEdge.
+
+  First lines of pragraphs are indented.
+
+  But all paragraphs contain just one line.
+
+  Then, these indents are lost.
+
+  If you want to keep it, pass qr/ {2}/ to function.

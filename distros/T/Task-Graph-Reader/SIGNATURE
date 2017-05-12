@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5e6b8a402f5d0b4019198c2919bca657b433572c Changes
+SHA1 fda23a0b314432c4a81e8d7beb5290e9f0219c73 LICENSE
+SHA1 d338ff57b6197d2af4cb1a2f97a5d621bcfc948a MANIFEST
+SHA1 979884f9d337ee9b9b8f146226626d2bb8ce54bd META.yml
+SHA1 a5612edce6fe2764fbdd4767b697fbc163f11016 Makefile.PL
+SHA1 941e11acfb1efacb52d45102d1dd8a29d8b4895a README
+SHA1 292a059a69758c7a3c6a331259725e48b6bcc4f0 Reader.pm
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 17f02c6fbaee2383172b0e1768535c707e3ebf58 t/Task-Graph-Reader/01-use.t
+SHA1 9679d4a83786091e4ce1af2f2012c47b3fa32720 t/Task-Graph-Reader/02-version.t
+SHA1 47834f1eb134f6cb0ef986147b52dcf96a4744ea xt/Task-Graph-Reader/01-pod_coverage.t
+SHA1 a0bf84cf927365b3cf3a1b15d8f5209dc2be1224 xt/Task-Graph-Reader/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWOTA1AAoJEJe+XXKaIuTlHLEH/2A1G5LlkCr1RCAgJTXutOLK
+SrZDALiz/JdArSNMYRPMkAA/O9gqkUXibG+iqFcmWpfpouQMPvHF3BbScBdEQWBq
+HTgtDSG7k9HVWm0uKlqm0woLZSHZCdefoyuSDgapSsccgFBN6qLcwMXlB0Plla5o
+Yg8Sa71Alxc1CpXsYJVFo7aYPuRTm9FFHPCvnFYYS4HZJrzwiOeV3JSvMawaEvoS
+LCvKtmDjzpbvbidY0o2T676KqvrSnMvhNx32ThpsJR2FAFeGfBY2uugvM26DiEKn
+/MMDOEA7IpvN4/LH4qYTeICv+/3n/meQ/syjiH1U/hFBcsJI366695L+c1aXu7o=
+=sxRS
+-----END PGP SIGNATURE-----

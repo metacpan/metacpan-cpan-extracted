@@ -1,0 +1,11 @@
+Revision history for Perl module Text::CSV::Simple
+
+1.00 Tue Sep 20 22:31:07 UTC 2005
+	- Note that we don't cope with multi-line fields
+
+0.20 Thu Sep 30 2004
+	- Add trigger points
+
+0.10 Thu Sep 30 2004
+	- First release to CPAN
+

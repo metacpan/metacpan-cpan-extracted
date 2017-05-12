@@ -1,0 +1,28 @@
+Tk::CanvasFig
+-------------
+
+This module adds a new method fig() to the Tk::Canvas namespace. The
+method saves the contents of a canvas as a xfig compatible file.
+
+Example:
+
+    $canvas = $mw->Canvas->pack;
+    # Do a lot of drawings
+    $canvas->fig(-file     => "test.fig",
+                 -imagedir => "test.fig-images");
+    # Save the canvas as a xfig file. If there are images, they will
+    # be written as XPM files in the -imagedir. Please note that
+    # you have to compile XPM support into xfig to actually see the
+    # images (by default it is not).
+
+Installation:
+
+    perl Makefile.PL
+    make all test install
+
+Note that xfig may fail to load and save files if locale-related
+environment variables like LC_ALL are set.
+
+Comments and bug reports to Slaven Rezic (slaven@rezic.de).
+
+

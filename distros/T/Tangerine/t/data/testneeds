@@ -1,0 +1,8 @@
+use Test::Needs 'Alfa';
+use Test::Needs 'Bravo', 'Charlie';
+use Test::Needs {
+	Delta => '1.00',
+	Echo => '2.00',
+};
+test_needs 'Foxtrot';
+test_needs('Golf', "3.00");

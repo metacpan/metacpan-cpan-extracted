@@ -1,0 +1,13 @@
+These are the author's notes to himself.  Ignore them.
+
+There are version strings in each of these files:
+2014-08-03 11:30:23         454 f 644  1000  1 Changes
+2014-08-03 11:40:19       25046 f 644  1000  1 lib/Time/TAI/Simple.pm
+2014-08-03 11:40:50         360 f 644  1000  1 dist.ini
+2014-08-03 12:45:03        4642 f 644  1000  1 README.md
+
+dzil test
+dzil build
+dzil release
+
+Note:  ether says an all-lowercase package name is bad.  Rename project to Time-Tai-Simple for next release.  qv 2015-06-22 11:36:50 in .irclog.freenode-perl

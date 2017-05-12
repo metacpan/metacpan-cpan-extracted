@@ -1,0 +1,12 @@
+Revision history for Perl extension Telephony::CTPort.
+
+0.01  Thu Nov  1 21:31:57 2001
+	- original version; created by h2xs 1.20 with options
+		-AX -n Telephony::CTPort
+0.3 6/11/01 DR
+	- completed conversion from library to OO Perl module
+	- added pod documentation
+	- caller id support
+	- inter digit time out
+
+

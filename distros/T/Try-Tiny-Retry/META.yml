@@ -1,0 +1,48 @@
+---
+abstract: 'Extends Try::Tiny to allow retries'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  Test::More: '0.96'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Try-Tiny-Retry
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Try::Tiny::Retry:
+    file: lib/Try/Tiny/Retry.pm
+    version: '0.004'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Try-Tiny-Retry/issues
+  homepage: https://github.com/dagolden/Try-Tiny-Retry
+  repository: https://github.com/dagolden/Try-Tiny-Retry.git
+version: '0.004'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'

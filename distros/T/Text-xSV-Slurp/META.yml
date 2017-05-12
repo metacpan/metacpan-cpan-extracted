@@ -1,0 +1,25 @@
+---
+abstract: 'Convert xSV data to common data shapes.'
+author:
+  - 'Dan Boorstein <dan@boorstein.net>'
+build_requires:
+  IO::String: 0
+  Test::More: 0
+  Text::CSV: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-xSV-Slurp
+provides:
+  Text::xSV::Slurp:
+    file: lib/Text/xSV/Slurp.pm
+    version: 0.22
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/danboo/perl-text-xsv-slurp/
+version: 0.22

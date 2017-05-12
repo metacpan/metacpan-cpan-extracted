@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<pml_schema version="1.1" xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/">
+  <description>An oriented graph</description>
+  <root name="graph">
+    <structure>
+      <member name="verteces">
+        <list ordered="0">
+          <structure>
+            <member name="id" as_attribute="1" required="1" role="#ID">
+              <cdata format="ID"/>
+            </member>
+            <member name="label" required="1">
+              <cdata format="any"/>
+            </member>
+          </structure>
+        </list>
+      </member>
+      <member name="edges">
+        <list ordered="0">
+          <structure>
+            <member name="from.rf" required="1" as_attribute="1">
+              <cdata format="PMLREF"/>
+            </member>
+            <member name="to.rf" required="1" as_attribute="1">
+              <cdata format="PMLREF"/>
+            </member>
+          </structure>
+        </list>
+      </member>
+    </structure>    
+  </root>
+</pml_schema>

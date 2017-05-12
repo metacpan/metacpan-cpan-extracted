@@ -1,0 +1,1644 @@
+.\" Copyright (c) 2014, 2015 Yon <anaseto@bardinflor.perso.aquilenet.fr>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd April 03, 2016
+.Dt FRUNDIS_SYNTAX 5
+.Os
+.Sh NAME
+.Nm frundis
+.Nd semantic markup language for formatting documents
+.Sh DESCRIPTION
+The
+.Nm frundis
+language intends to be a semantic markup language with a roff-like syntax for
+supporting authoring of a variety of light to medium weight documents, from
+novels to technical tutorials.
+It relies on the exporting capabilities of the tool
+.Xr frundis 1
+to LaTeX, XHTML and EPUB.
+.Pp
+The manual is organized as follows.
+Language syntax is described in the
+.Sx LANGUAGE SYNTAX AND SEMANTICS
+section.
+The
+.Sx MACRO OVERVIEW
+and
+.Sx MACRO REFERENCE
+sections describe built-in macros.
+Section
+.Sx FORMATS
+concerns target format specific questions.
+The
+.Sx PARAMETERS
+section describes some global configuration parameters.
+Section
+.Sx EXAMPLES
+contains examples of
+.Nm
+source.
+.Sh LANGUAGE SYNTAX AND SEMANTICS
+There are two sorts of lines: lines beginning with the control character
+.Sq \&. ,
+called
+.Dq macro lines ,
+and lines
+formed of free-form text, called
+.Dq text lines .
+Apart from specific rules explained in subsection
+.Sx Macro lines ,
+text processing follows the rules explained in subsections
+.Sx Comments
+and
+.Sx Escape Sequences .
+The
+.Sx Processing
+subsection explains how
+.Nm
+source files are processed.
+.Pp
+In this document, the term
+.Dq whitespace
+refers to any space character in the Unicode range.
+.Ss Macro lines
+Macro lines begin with the control character
+.Sq \&. ,
+followed by a macro name, with optional horizontal whitespace between the two.
+Macro lines can be continued in several lines by using a
+.Sq \&\e
+at the end of the line.
+Whitespace is used to delimit arguments, unless it appears
+inside a pair of quotes characters
+.Sq \&" .
+A literal character
+.Sq \&"
+can be rendered inside a quoted string by doubling it.
+If an argument begins with a
+.Sq \&"
+without a corresponding closing
+.Sq \&"
+then all text following the
+.Sq \&"
+to the end of the line forms a single argument.
+.Ss Comments
+In any type of line, text beginning by a
+.Sq \&\e\(dq
+is ignored to the end of the line.
+Lines with only a control character
+.Sq \&.
+and optional trailing horizontal whitespace are ignored, also.
+.Ss Escape Sequences
+Escape sequences start with a backslash character
+.Sq \e ,
+which is the only character that needs to be escaped.
+The accepted sequences are described in the following table:
+.Pp
+.Bl -column "Input Escape" "Description" -offset indent -compact
+.It Em Input Ta Em Description
+.It \ee Ta a literal backslash
+.Sq \e
+character
+.It \e& Ta a non-printing zero-width character
+.It \e~ Ta a non-breaking space
+.El
+.Pp
+The character
+.Sq \e&
+can be in particular used to allow printing of a period
+.Sq \&.
+at the beginning of a line.
+.Ss Processing
+.Nm
+files are processed in two phases: a first pass is used to collect information
+(such as TOC information), and a second pass does the actual processing.
+.Sh MACRO OVERVIEW
+This section is an overview of the macros with short descriptions, and some
+common options.
+Detailed descriptions can be found in the
+.Sx MACRO REFERENCE
+section.
+.Ss Structure
+.Bl -column "Brq, Bro, Brc" description
+.It Sx \&Pt Ta declare a new part
+.It Sx \&Ch Ta declare a new chapter
+.It Sx \&Sh Ta declare a new section
+.It Sx \&Ss Ta declare a new subsection
+.It Sx \&Tc Ta print table of contents:
+.Op Fl mini
+.Op Fl summary
+.Op Fl Ar type
+.It Sx \&P Ta break a paragraph
+.It Sx \&D Ta start a text dialogue paragraph
+.El
+.Ss Displays and lists
+.Bl -column "Brq, Bro, Brc" description
+.It Sx \&Bd , \&Ed Ta display block:
+.Op Fl id Ar label
+.Op Fl t Ar tag
+.It Sx \&Bl , \&El Ta list block:
+.Op Fl t Ar type
+.It Sx \&It Ta list item
+.It Sx \&Ta Ta table cell separator
+.El
+.Ss Miscellaneous phrasing markup
+.Bl -column "Brq, Bro, Brc" description
+.It Sx \&Lk Ta format a hyperlink:
+.Op Fl ns
+.Ar url
+.Op Ar link-text
+.It Sx \&Sm , \&Bm , \&Em Ta arbitrary phrasing text markup:
+.Op Fl id Ar label
+.Op Fl ns
+.Op Fl t Ar tag
+.It Sx \&Sx Ta make a cross-reference:
+.Op Fl id
+.Op Fl name Ar link-text
+.Op Fl ns
+.Op Fl t Ar type
+.El
+.Ss Include external files
+.Bl -column "Brq, Bro, Brc" description
+.It Sx \&If Ta include a
+.Nm
+source file:
+.Op Fl as-is Op Fl filter Ar cmd | Fl t Ar tag
+.Op Fl f Ar formats
+.Ar path
+.It Sx \&Im Ta include an image:
+.Op Fl link Ar url
+.Ar src
+.Op Ar caption
+.El
+.Ss Format specific markup
+.Bl -column "Brq, Bro, Brc" description
+.It Sx \&Ft , \&Bf , \&Ef Ta as-is text for specific target format:
+.Fl f Ar formats
+.Op Fl filter Ar cmd
+.El
+.Ss Tags and global parameters
+.Bl -column "Brq, Bro, Brc" description
+.It Sx \&X Ta
+define exporting parameters and tags:
+.Cm set | mtag | dtag | ftag
+.El
+.Ss Macros, variables and state control
+.Bl -column "Brq, Bro, Brc" description
+.It Sx \&#de ,
+\&#.
+.Ta define a macro:
+.Op Fl f Ar formats
+.Op Fl perl
+.Ar name
+.It Sx \&#dv Ta define a variable:
+.Op Fl f Ar formats
+.Ar name
+.Ar args ...
+.It Sx \&#if ,
+\&#;
+.Ta conditional:
+.Op Fl f Ar formats
+.Op Ar string
+.It Sx \&#fl Ta modify state flags:
+.Ar flag
+.Op Ar value
+.El
+.Sh FORMATS
+Currently three target formats are supported: LaTeX, XHTML and EPUB.
+Some parameters apply only to a specific target format, see the
+.Sx PARAMETERS
+section.
+In particular, the parameters
+.Cm epub-version
+and
+.Cm xhtml5
+allow to choose which version of EPUB and XHTML to produce.
+When a macro accepts a
+.Ar formats
+argument, the
+.Cm xhtml
+value concerns XHTML, the
+.Cm epub
+value concerns EPUB, and the
+.Cm latex
+value concerns LaTeX.
+Several formats can be specified at once by separating them by commas.
+.Sh MACRO REFERENCE
+This section is a reference of all macros, in alphabetic order.
+.Ss \&Bd
+Begin a display block.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Bd
+.Op Fl id Ar label
+.Op Fl t Ar tag
+.Ed
+.Pp
+The optional
+.Ar tag
+argument can be
+.Cm div ,
+.Cm literal ,
+or a new tag created by a previous
+.Sx X
+macro declaration.
+The value
+.Cm div
+is the default tag.
+.Pp
+The
+.Sx \&Bd
+macro terminates any eventual opened paragraph.
+.Pp
+The optional
+.Ar label
+option argument can be used to provide an identifier for use in a further
+.Sx \&Sx
+.Fl id
+invocation.
+The
+.Ar label
+should be both a valid
+.Dq id
+html attribute and a valid LaTeX label.
+.Pp
+A
+.Cm literal
+block will be rendered as a
+.Dq pre
+element in html, or a
+.Dq verbatim
+environment in LaTeX.
+A
+.Cm div
+block actually does nothing in LaTeX apart from terminating any previous paragraph, and is rendered as a
+.Dq div
+element in html.
+.Pp
+The
+.Cm verbatim
+package is necessary for LaTeX with
+.Sx \&Bd Fl t Cm literal
+blocks.
+.Ss \&Bf
+Begin as-is block for a specific target format.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Bf
+.Fl f Ar formats
+.Op Fl filter Ar cmd
+.Op Fl ns
+.Op Fl t Ar tag
+.Ed
+.Pp
+This is a multi-line version of the
+.Sx \&Ft
+macro, with the exception of the
+.Fl t
+option that allows to use tags that use some custom filters defined
+with a
+.Sx X
+.Cm ftag
+invocation.
+In the case in that the
+.Fl t
+option is specified, the
+.Fl f
+option is no more mandatory.
+.Ss \&Bl
+Begin a list.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Bl
+.Op Fl columns Pq Ar number | Ar string
+.Op Fl t Ar type
+.Op Ar args ...
+.Ed
+.Pp
+The optional
+.Ar type
+argument can be
+.Cm item
+for a simple list (this is the default),
+.Cm enum
+for an enumerated list,
+.Cm desc
+for a description list,
+.Cm table
+for a table, or
+.Cm verse
+for writting a verse poem.
+The optional
+.Ar args
+arguments are used in
+.Cm verse
+and
+.Cm table
+lists to provide a title; arguments are joined with spaces interleaved.
+When a title is provided,
+.Cm table
+lists are added to the list of tables generated by
+.Sx \&Tc Fl Cm lot .
+.Pp
+Lists of type
+.Cm item
+or
+.Cm enum
+can be nested.
+The
+.Sx \&P
+macro is only allowed in lists of type
+.Cm verse ,
+where it is used to start a new stanza.
+.Pp
+In html,
+.Sx \&Bl Fl t Cm verse
+lists are rendered within a
+.Dq div
+element with class
+.Dq verse .
+.Pp
+The option
+.Fl columns
+is used and required, when exporting to LaTeX, for lists of type
+.Cm table ,
+and can use as argument either the number of columns in the table, or a literal
+LaTeX columns specification such as
+.Qq |l|l| .
+The
+.Cm verse
+package is necessary for LaTeX with
+.Sx \&Bl Fl t Cm verse
+lists.
+.Ss \&Bm
+Begin semantic markup block.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Bm
+.Op Fl id Ar label
+.Op Fl ns
+.Op Fl t Ar tag
+.Ed
+.Pp
+This macro is a multi-line version of the
+.Sx \&Sm
+macro.
+The markup spans through paragraphs until a corresponding
+.Sx \&Em
+macro is encountered.
+The optional
+.Fl ns
+flag follows the same semantics as in
+.Sx \&Sm .
+.Ss \&Ch
+Declare a new chapter.
+The syntax is the same as with the
+.Sx \&Sh
+macro.
+.Ss \&D
+Start a new dialogue.
+This macro breaks a paragraph as the
+.Sx \&P
+macro, but then a new paragraph is started with a delimiter marking the start
+of a dialogue.
+The default delimiter can be changed by setting the
+.Ar dmark
+parameter.
+See the
+.Sx PARAMETERS
+section.
+.Ss \&Ed
+End a display block.
+.Ss \&Ef
+End a target format specific block.
+.Ss \&El
+End a list.
+.Ss \&Em
+End markup started by a corresponding
+.Sx \&Bm
+macro.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Em
+.Op Ar delimiter
+.Ed
+.Pp
+The optional closing
+.Ar delimiter
+follows the same semantics as described in the
+.Sx \&Sm
+macro below, except that it can be any string.
+.Ss \&Ft
+One line target format specific entry.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Ft
+.Fl f Ar formats
+.Op Fl filter Ar cmd
+.Op Fl ns
+.Ar args ...
+.Ed
+.Pp
+The
+.Ar formats
+argument specifies that the macro should apply only when exporting to some
+specific target formats.
+See the
+.Sx FORMATS
+section for a list of possible values for the
+.Ar formats
+argument.
+When it applies, the
+.Ar args
+arguments are joined with spaces interleaved and rendered as-is.
+Specific
+.Nm
+language escape rules still apply, but format specific ones don't.
+The
+.Fl filter Ar cmd
+optional argument pipes text through shell command
+.Ar cmd
+before rendering.
+The optional
+.Fl ns
+flag follows the same semantics as in the
+.Sx \&Sm
+macro.
+.Ss \&If
+Include a file.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&If
+.Op Fl as-is Op Fl filter Ar cmd | Fl t Ar tag
+.Op Fl f Ar formats
+.Ar path
+.Ed
+.Pp
+The
+.Ar path
+argument specifies the path to the file that should be included.
+The optional
+.Ar formats
+argument specifies that the file should be included only for a particular
+target format, see the
+.Sx FORMATS
+section for details.
+.Pp
+The optional
+.Fl as-is
+flag specifies that the file should be included
+.Qq as-is ,
+without interpreting it as a
+.Nm
+file. The optional
+.Fl filter Ar cmd
+is used to pass the text of the file through shell command
+.Ar cmd
+before rendering.
+The optional
+.Fl t
+option specifies that a filter defined with a
+.Sx X
+.Cm ftag
+invocation for tag
+.Ar tag
+should be used.
+.Pp
+In the case of including a
+.Nm
+file, the
+.Ar path
+can be specified using a double colon
+.Cm ::
+to separate directories, in which case the suffix
+.Sq .frundis
+is appended, and
+.Ar path
+should not contain periods.
+Relative
+.Ar path
+arguments search for files in the current directory, and then for files specified
+in the
+.Ev FRUNDISLIB
+environment variable, as specified in the
+.Xr frundis 1
+manpage.
+.Ss \&Im
+Include an image.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Im
+.Op Fl link Ar url
+.Ar src
+.Op Ar caption
+.Op Ar delimiter
+.Ed
+.Pp
+The
+.Ar src
+argument is the path or url to the image.
+If a
+.Ar caption
+is provided, the image is rendered as a figure with caption, and an entry is
+added in the list of figures generated by
+.Sx \&Tc Fl lof .
+Otherwise, the image is rendered in-line, and a
+.Ar delimiter
+can be specified as in the
+.Sx \&Sm
+macro.
+.Pp
+When exporting to XHTML, the optional
+.Fl link Ar url
+embeds the image in a hyperlink given by
+.Ar url.
+.Pp
+For html, the
+.Dq alt
+attribute is set to
+.Ar caption
+if specified,
+or
+.Ar src
+otherwise.
+If a caption is provided, in html
+the macro renders as a
+.Dq div
+element with
+.Dq class
+attribute
+.Dq figure ,
+and in LaTeX it is rendered as a centered figure with caption.
+.Pp
+The
+.Cm graphicx
+package is necessary for LaTeX.
+.Ss \&It
+A list item.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&It
+.Op Ar args ...
+.Ed
+.Pp
+The
+.Ar args
+arguments are joined, with spaces interleaved, and used as text for the item in
+case of an
+.Cm item
+or
+.Cm verse
+list, as the text to be described in the case of a
+.Cm desc
+list, and as the text of the first cell in a row in a
+.Cm table
+list.
+.Ss \&Lk
+Format a hyperlink.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Lk
+.Op Fl ns
+.Ar url
+.Op Ar link-text
+.Op Ar delimiter
+.Ed
+.Pp
+The optional
+.Ar delimiter
+argument follows the same semantics as in the
+.Sx \&Sm
+macro.
+The optional
+.Fl ns
+flag follows the same semantics as in the
+.Sx \&Sm
+macro.
+.Pp
+The
+.Cm hyperref
+package is necessary for LaTeX.
+.Ss \&P
+Break a paragraph. The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&P
+.Op Ar args ...
+.Ed
+.Pp
+The
+.Sx \&P
+macro is optional just after or before a header macro.
+If
+.Ar args
+arguments are provided, a new paragraph is started, the
+.Ar args
+are joined with spaces interleaved and used as a header for
+the new paragraph.
+.Pp
+If no
+.Ar args
+are provided, the macro has no effect before and after display blocks or lists
+for XHTML and EPUB outputs, but in LaTeX a newline will be inserted in these
+cases.
+The new paragraph has class
+.Dq paragraph
+in XHTML and EPUB.
+The header appears as argument to a
+.Dq paragraph
+command in LaTeX, and within a
+.Dq strong
+element with class
+.Dq paragraph
+in XHTML and EPUB.
+.Ss \&Pt
+Declare a new part.
+The syntax is the same as with the
+.Sx \&Sh
+macro.
+.Ss \&Sh
+Declare a new section.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Sh
+.Op Fl nonum
+.Ar args ...
+.Ed
+.Pp
+The
+.Ar args
+arguments are joined with spaces interleaved to form the name of the section.
+The optional
+.Fl nonum
+flag specifies that the section should not be numbered.
+.Pp
+In XHTML and EPUB, a header is rendered as an
+.Dq h Ns Ar N
+element, with class the name of the macro,
+and where
+.Ar N
+is such that the hierarchical order between header macros
+.Sx \&Pt ,
+.Sx \&Ch ,
+.Sx \&Sh ,
+and
+.Sx \&Ss
+is satisfied.
+.Ss \&Sm
+Semantic Markup.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Sm
+.Op Fl id Ar label
+.Op Fl ns
+.Op Fl t Ar tag
+.Ar args ...
+.Op Ar delimiter
+.Ed
+.Pp
+The optional
+.Ar tag
+argument attachs some special semantic to the text, according to the rules
+defined in a prior
+.Sx \&X
+macro line declaration.
+The
+.Ar args
+arguments are joined with spaces interleaved to form the text to markup.
+If the last argument is a punctuation closing
+.Ar delimiter ,
+it is excluded from the markup, but no space is interleaved between it and the
+text.
+This is to allow avoiding unwanted space before punctuation, such as it
+would occur when putting punctuation in the next text or macro line.
+Currently, a Unicode punctuation character,
+eventually preceded by a non-breaking space
+.Sq \e~ ,
+is considered a punctuation delimiter.
+.Pp
+The optional
+.Fl ns
+flag specifies that no newline should be inserted after eventual preceding
+paragraph text. See the
+.Sx \&#fl
+macro for more fine-grained control over spacing.
+.Pp
+The optional
+.Ar label
+option argument can be used to provide an identifier for use in a further
+.Sx \&Sx
+.Fl id
+invocation.
+The
+.Ar label
+should be both a valid
+.Dq id
+html attribute and a valid LaTeX label.
+.Pp
+The
+.Sx \&Sm
+macro can also be used inline as an argument to a header macro,
+.Sx \&Sx
+macro,
+.Sx \&P
+macro, or an item macro of a description list, allowing for more semantic
+control in these special cases.
+Fine-grained control over the words to mark can be obtained by the use of the
+.Sx \&Bm
+and
+.Sx \&Em
+macros.
+As a result of this special treatment, these macro names need to be escaped in
+order to appear as-is.
+For example:
+.Bd -literal -offset indent
+\&.\e" Emphasis of the word "Frundis". Note the "\e&" after "Em".
+\&.Ch The Bm Frundis Em \e& Manual
+\&.\e" To get "Sm" as-is:
+\&.Ch All About the \e&Sm Macro
+.Ed
+.Ss \&Ss
+Declare a new subsection.
+The syntax is the same as with the
+.Sx \&Sh
+macro.
+.Ss \&Sx
+Make a cross-reference.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Sx
+.Op Fl id
+.Op Fl name Ar link-text
+.Op Fl ns
+.Op Fl t Ar type
+.Ar args ...
+.Op Ar delimiter
+.Ed
+.Pp
+The
+.Ar args
+arguments are joined with spaces interleaved.
+If
+.Fl id
+is not present,
+they should form a valid header
+title, or figure caption if
+.Ar type
+is
+.Cm lof ,
+or table title if
+.Ar type
+is
+.Cm lot .
+If
+.Fl id
+is present, the arguments are used as an identifier specified manually.
+The optional
+.Ar delimiter
+argument and the optional
+.Fl ns
+flag follow the same semantics as in the
+.Sx \&Sm
+macro.
+The link text for the cross-reference is derived from
+.Ar args ,
+or
+.Ar link-text
+if the optional
+.Fl name Ar link-text
+is provided.
+.Pp
+The
+.Cm hyperref
+package is necessary for LaTeX.
+.Ss \&Ta
+Table cell separator in
+.Sx \&Bl
+.Fl t Cm table
+lists.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Ta
+.Op Ar args ...
+.Ed
+.Pp
+The
+.Ar args
+arguments are joined with spaces interleaved, and used as text for the new
+cell.
+.Ss \&Tc
+Print a table of contents.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&Tc
+.Op Fl mini
+.Op Fl nonum
+.Op Fl summary
+.Op Fl title Ar text
+.Op Fl Ar type
+.Ed
+.Pp
+The
+.Ar type
+can be
+.Cm toc
+for a table of contents,
+.Cm lof
+for a list of figures and
+.Cm lot
+for a list of tables.
+The default is
+.Cm toc .
+The
+.Fl summary
+flag specifies that only a summary without sections and subsections should be
+printed.
+The
+.Fl mini
+flag specifies that a local table of contents should be printed, that is a
+list of sections within chapter, or a list of chapters after a part
+declaration.
+If
+.Fl summary
+and
+.Fl mini
+are combined, only sections will be printed for chapter local table of
+contents.
+.Pp
+The
+.Fl nonum
+flag specifies, for XHTML and EPUB, that entries should not be numbered.
+The
+.Fl title Ar text
+can be used to specify a title for XHTML and EPUB.
+When
+.Fl mini
+is not specified in table of contents, the default is to use the title of the
+document, as specified by the
+.Cm document-title
+parameter.
+If an empty title is provided, no title will be print.
+In html, the index is rendered as an unordered list in a
+.Dq div
+element with
+.Dq class
+attribute
+.Dq lof ,
+.Dq lot
+or
+.Dq toc
+according to the
+.Fl Ar type
+flag.
+.Pp
+The
+.Cm minitoc
+package is necessary for LaTeX if the
+.Fl Cm mini
+flag is used.
+.Ss \&X
+Declare exporting parameters.
+The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf \. Sx \&X
+.Cm set
+.Op Fl f Ar formats
+.Ar parameter
+.Ar value
+.br
+.Pf \. Sx \&X
+.Cm mtag
+.Fl t Ar tag
+.Fl f Ar formats
+.Op Fl c Ar cmd
+.Op Fl b Ar opening
+.Op Fl e Ar closing
+.br
+.Pf \. Sx \&X
+.Cm dtag
+.Fl t Ar tag
+.Fl f Ar formats
+.Op Fl c Ar cmd
+.br
+.Pf \. Sx \&X
+.Cm ftag
+.Fl t Ar tag
+.Op Fl f Ar formats
+.Pq Fl shell Ar shell-cmd | Fl code Ar perl-code
+.Ed
+.Pp
+The
+.Pf \. Sx \&X
+.Cm set
+form allows to assign a
+.Ar value
+to a
+.Ar parameter .
+See the
+.Sx PARAMETERS
+section for a description of available parameters.
+.Pp
+The
+.Pf \. Sx \&X
+.Cm mtag
+form creates a new
+.Ar tag
+for use in a posterior
+.Sx \&Bm
+or
+.Sx \&Sm
+macro declaration, with special semantic attached.
+The name of the tag is used as
+.Dq class
+attribute for XHTML or EPUB.
+The optional
+.Ar cmd
+specifies the name of the LaTeX command or HTML element that will be used while
+exporting, and defaults to
+.Cm emph
+and
+.Cm em
+respectively.
+Note that
+.Cm cmd
+should be the name of a phrasing html element or LaTeX command that can be
+found inside a paragraph, such as a
+.Dq span
+element for html, and which follows normal escaping rules of the target format
+in this context.
+Finally, the
+.Ar opening
+and
+.Ar closing
+arguments specify optional enclosing text within the scope of
+.Ar cmd .
+.Pp
+The
+.Pf \. Sx \&X
+.Cm dtag
+form creates a new
+.Ar tag
+for use in a posterior
+.Sx \&Bd
+display block macro declaration, with special semantic attached.
+As with the
+.Pf \. Sx \&X
+.Cm mtag
+form, the name of the tag is used as
+.Dq class
+attribute for XHTML or EPUB.
+The optional
+.Ar cmd
+follows the same semantics as in the
+.Pf \. Sx \&X
+.Cm mtag
+form, except that in LaTeX it will be used as an environment name.
+If no
+.Ar cmd
+is specified, the block will be rendered without environment in LaTeX (just a blank
+line before and after the block), and as a
+.Dq div
+element in html.
+.Pp
+The
+.Pf \. Sx \&X
+.Cm ftag
+form creates a new
+.Ar tag
+for use in a posterior
+.Sx \&Bf
+.Fl t
+or
+.Sx \&If
+.Fl as-is
+invocation.
+The
+.Fl shell
+option accepts a command to which to pipe text.
+The
+.Fl code
+option accepts as argument perl code that compiles to a subroutine in the same
+way as with the
+.Sx \&#de
+macro.
+The text to filter is accessible through the text() method.
+.Pp
+In all cases, the
+.Ar formats
+argument specifies that the macro should apply only when exporting to some
+specific target formats.
+See the
+.Sx FORMATS
+section for a description of possible values for the
+.Ar formats
+argument.
+.Pp
+The
+.Sx \&X
+macros are executed in the information gathering pass, before any macro prints
+text, see
+.Sx Processing .
+If a parameter is defined more than once, the last definition prevails.
+.Ss \&#de
+Define a macro.
+The syntax is as follows:
+.Bd -literal -offset indent
+.Pf . Sx \&#de Oo Fl f Ar formats Oc Oo Fl perl Oc Ar name
+.Ar macro definition
+\&.#.
+.Ed
+.Pp
+The
+.Ar macro definition
+can consist of any number of
+.Nm
+text and macro lines.
+The defined macro can be invoked later as follows:
+.Pp
+.D1 Pf . Ar name
+.Pp
+The invocation of the macro will be replaced by the
+.Ar macro definition .
+Any occurrence of
+.No \e$ Ns Ar N
+in the
+.Ar macro definition ,
+where
+.Ar N
+is a decimal number, will be replaced by the
+.Ar N Ns th Ar argument
+passed to the invoked macro.
+Interpolation in a macro is done in a single argument, quotes are not needed.
+.Pp
+The
+.Ar formats
+optional argument specifies that the macro definition concerns only some
+specific target formats,
+see the
+.Sx FORMATS
+section for a description of available values for
+.Ar formats.
+.Pp
+The
+.Sx \&#de
+macros cannot be nested.
+.Pp
+If a syntax error is encountered in the defined macro, the reported line number
+will be the line number of the user macro invocation.
+.Pp
+.Em Note :
+macros are evaluated dynamically.
+In particular, interpolation is done on use.
+.Pp
+If the
+.Fl perl
+flag is used, the macro definition is treated as Perl code.
+Note that
+.Sq \e
+needs to be escaped as in normal
+.Nm
+source.
+When writing a macro with perl code, it should be remembered that
+.Nm frundis
+uses an information collecting pass, and then a processing pass, as explained
+in the
+.Sx Processing
+subsection.
+.Pp
+The macro definition is compiled to a subroutine and accepts an object
+argument with the following methods, in alphabetic order:
+.Pp
+.Bl -tag -width 13n -offset indent -compact
+.It args Ns Pq \&
+Returns a reference to the list of unescaped (apart from variable interpolation)
+arguments passed to the macro.
+Alternatively, the global variable
+.Va @Arg
+can be used directly.
+.Pp
+.It call Ns Pq Ar $macro , @arg
+Call the macro named
+.Ar $macro
+with arguments
+.Ar @arg .
+.Pp
+.It diag_error Ns Pq Ar $msg
+.It diag_fatal Ns Pq Ar $msg
+.It diag_warning Ns Pq Ar $msg
+Report respectively a syntax error, fatal error or warning with message
+.Ar $msg .
+It will be automatically prefixed with location information.
+.Pp
+.It escape Ns Pq Ar $text
+Escape
+.Nm
+source text but don't apply escape rules specific to the target language.
+Suitable for text that is not going to be printed or needs special
+preprocessing.
+.Pp
+.It escape_text Ns Pq Ar $text
+Escape regular text according to rules of the target language.
+Suitable for immediate printing.
+.Pp
+.It file Ns Pq \&
+Returns the current source file name.
+.Pp
+.It flag Ns Pq Ar $flag , Bo Ar $value Bc
+Get or set boolean flags. If
+.Ar $value
+is provided, the flag
+.Ar $flag
+is set to it, otherwise the current value corresponding to key
+.Ar $flag
+is returned.
+New or modified flags can be used in posterior
+.Sx \&#fl
+invocations.
+Flags starting by an underscore are reserved for internal use and should not be
+used.
+.Pp
+.It format Ns Pq \&
+Returns the current exporting format. Can be
+.Cm epub ,
+.Cm latex
+or
+.Cm xhtml .
+.Pp
+.It get_close_delim Ns Pq \&
+Get closing delimiter in a phrasing macro.
+Updates arguments array.
+.Pp
+.It ivars Ns Pq \&
+Returns a reference to a hash map from information variables to values.
+The difference with the vars method is that the hash is not reinitialized after
+information collecting pass, and that these variables cannot be interpolated.
+It can be used to collect informations for posterior use in the processing
+phase.
+.Pp
+.It lnum Ns Pq \&
+Returns the current line number.
+.Pp
+.It loX_entry_infos Ns Pq Ar $opts
+Collect information to use later with the xhtml_loX method or in a
+.Sx \&Sx
+macro invocation.
+The
+.Ar $opts
+argument should be a hash reference with keys:
+.Cm title
+for the title of the element to be referenced;
+.Cm count
+for the position in the list;
+.Cm class
+for the class that corresponds to the argument of the corresponding
+.Pf xhtml_loX Pq Ar $class
+call and the
+.Ar type
+in
+.Sx \&Sx
+macro invocation;
+.Cm href_prefix
+for the prefix that is used between the
+.Dq #
+and the value of
+.Cm count
+in the href.
+.Pp
+.It macro Ns Pq \&
+Returns the name of the invoked macro.
+.Pp
+.It new_id Ns Pq Ar $id
+Declare an identifier for future use in a
+.Sx \&Sx
+.Fl id
+invocation.
+It should be used in the same chapter (or beginning of part)
+as the one of the element whose identifier is
+.Ar $id .
+.Pp
+.It param Ns Pq Ar $param , Bo Ar $value Bc
+Get or set parameters. If
+.Ar $value
+is provided, the parameter
+.Ar $param
+is set to it, otherwise the current value corresponding to key
+.Ar $param
+is returned.
+New or modified parameters can be redefined in posterior
+.Sx \&#X
+.Cm set
+invocations.
+Parameters starting by an underscore are reserved for internal use and should
+not be used.
+Parameters are only set during information collecting phase.
+.Pp
+.It parse_options Ns Pq Ar $spec
+Parse options from option specification
+.Ar $spec
+and returns a hash map from options to values.
+The
+.Ar $spec
+variable should be a hash reference. Keys are options names, and values
+can be
+.Dq b
+for a boolean flag, or
+.Dq s
+for an option that requires a string argument.
+Updates arguments array.
+.Pp
+.It phrasing_macro_begin Ns Pq Ar $no_space
+Handle accumulated text lines for phrasing macro.
+If
+.Ar $no_space
+is true, then a chomp of the text will be done.
+.Pp
+.It phrasing_macro_end Ns Pq \&
+Handle accumulated text lines for end phrasing macro (such as
+.Sx \&Em ) .
+.Pp
+.It process Ns Pq \&
+Whether in information collecting pass, or in processing pass, see
+.Sx Processing .
+.Pp
+.It text Ns Pq Bo Ar $text Bc
+Return or set accumulated text from text lines.
+.Pp
+.It vars Ns Pq \&
+Returns a reference to the hash map from variables to values of variables
+defined with the
+.Sx \&#dv
+macro.
+The hash is reinitialized between information collecting phase and processing
+phase.
+If being portable matters, you should prefix yourself variable names
+with a
+.Dq package
+name such as
+.Dq package::varname
+or use only one key and a hash reference value, for example, as
+.Nm
+doesn't support namespaces.
+.Pp
+.It xhtml_gen_href Ns Pq Ar $prefix , Ar $count
+Get an href for use in an
+.Dq href
+html attribute.
+Suitable to create custom index generation and cross-reference macros.
+The variable
+.Ar $prefix
+is appended after the
+.Dq #
+character, to allow for multiple classes of identifiers.
+The variable
+.Ar $count
+is appended after the prefix.
+.Pp
+.It xhtml_loX Ns Pq Ar $class
+Generate a list of cross-references to specific elements.
+The
+.Ar $class
+argument should correspond to a valid class defined by
+the loX_entry_infos method described above, or
+one of the predefined classes
+.Cm lot ,
+.Cm lof
+and
+.Cm lop
+(list of poems).
+.El
+.Ss \&#dv
+Define a variable. The syntax is as follows:
+.Bd -ragged -offset indent
+.Pf . Sx \&#dv
+.Op Fl f Ar formats
+.Ar name
+.Ar args ...
+.Ed
+.Pp
+The
+.Ar args
+are are joined with space interleaved, and used as a new value for the variable
+with name
+.Ar name .
+If
+.Fl f Ar formats
+is provided, the macro invocation applies only for specific target formats, see
+the
+.Sx FORMATS
+section.
+.Pp
+A defined variable can then be interpolated in text lines and macro lines
+arguments with
+.No \e* Ns Bq Ar name .
+.Ss \&#fl
+Modify state flags.
+The syntax is as follows:
+.Bd -literal -offset indent
+.Pf . Sx \&#fl Ar flag Op Ar value
+.Ed
+.Pp
+If
+.Ar value
+is provided, state corresponding to
+.Ar flag
+is set to
+.Ar value ,
+otherwise current value associated with
+.Ar flag
+is negated.
+.Pp
+The list of supported state flags is as follows:
+.Pp
+.Bl -tag -width 12n -offset indent -compact
+.It Cm fr-nbsp-auto
+Add necessary non-breaking spaces automatically. Used only when
+.Cm lang
+parameter is set to
+.Cm fr .
+Defaults to 1.
+.It Cm ns
+No-space mode.
+Defaults to 0.
+If set to a non-zero value, whitespace won't be inserted between
+macro arguments, and before or after phrasing macro invocations.
+.El
+.Ss \&#if
+Begin a conditional. The syntax is as follows:
+.Bd -literal -offset indent
+.Pf . Sx \&#if Oo Fl f Ar formats Oc Oo Ar string Oc
+.Ar body of conditional
+\&.#;
+.Ed
+.Pp
+The
+.Ar body of conditional
+can consist of any number of
+.Nm
+text and macro lines.
+The optional
+.Fl f Ar formats
+argument specifies that the conditional should be executed only for specific
+target formats, see
+.Sx FORMATS
+for a description of possible values for
+.Ar formats .
+The optional
+.Ar string
+argument specifies that the conditional should be executed only if
+.Ar string
+is non-zero and non-null.
+.Pp
+The
+.Sx \&#if
+macros can be nested.
+.Sh PARAMETERS
+This section is a list of the parameters that can be set with the
+.Sx \&X
+macro, along with their descriptions, in alphabetic order.
+.Bl -tag -width 13n
+.It Cm dmark
+The mark that starts a dialogue.
+.It Cm document-author
+The author of the document.
+.It Cm document-date
+The date of the document.
+.It Cm document-title
+The title of the document.
+.It Cm epub-cover
+The path to the cover.
+.It Cm epub-css
+The path to the css file to use when exporting to EPUB.
+.It Cm epub-metadata
+The path to a file containing epub metadata entries.
+.It Cm epub-subject
+Subject description for epub.
+.It Cm epub-version
+The epub version to produce. Can be 2 or 3.
+.It Cm epub-uuid
+The text to use as unique identifier for epub. Useful mainly for deterministic
+tests.
+.It Cm lang
+The language in which the source is written.
+It is
+.Cm en
+by default.
+If set to
+.Cm fr
+necessary non-breaking spaces to satisfy french typographic rules will be added
+automatically, unless a zero-width
+.Sq \e&
+character is used between punctuation and text, or the state value of key
+.Cm fr-nbsp-auto
+is set to a zero value, see the
+.Sx \&#fl
+macro.
+.It Cm latex-preamble
+Path to a custom LaTeX preamble file (text before the
+.Sm
+.Qq \ebegin{document}
+).
+.Sm
+Without this option, a simple preamble with just the necessary, using metadata
+from the
+.Cm document-author ,
+.Cm document-date
+and
+.Cm document-title
+parameters, will be used.
+.It Cm nbsp
+Character to use for rendering non-breaking spaces.
+It defaults to
+.Sq ~
+for LaTeX, and to the no-break space
+.Sq 0x0a
+unicode character for XHTML and EPUB.
+.It Cm title-page
+If set to a non-zero value, a title page will be created using metadata from the
+.Cm document-author ,
+.Cm document-date
+and
+.Cm document-title
+parameters.
+.It Cm xhtml-bottom
+Path to xhtml file providing additional bottom content just before terminating
+body in each file, after the navigation bar.
+.It Cm xhtml-css
+Path to the css file when exporting to XHTML.
+It will appear as-is in
+the XHTML file.
+.It Cm xhtml-index
+Automatic index generation in multi-file XHTML documents.
+The value can be
+.Cm full
+for a full table of contents,
+.Cm summary
+for a summary, and
+.Cm none
+to not print any automatic table of contents. The value
+.Cm full
+is the default.
+.It Cm xhtml-top
+Path to XHTML file providing additional top content just after body in
+each file, before the navigation bar.
+.It Cm xhtml5
+If set to a non-zero value, html5 will be produced.
+.El
+.Sh EXAMPLES
+A novel will mostly look like this:
+.Bd -literal -offset indent
+\&.Ch The Name of The Chapter
+\&Some interesting introductory text.
+\&.P
+\&Second paragraph where serious things start. Some character says:
+\&.D
+\&This is the start of an
+\&.\e\(dq Some emphasis
+\&.Sm interesting
+\&novel.
+\&.P
+\&And etc.
+.Ed
+.Pp
+Defining tags and macros:
+.Bd -literal -offset indent
+\&.\e" Define a tag "book-title" for html and epub rendered as an "<em>" element
+\&.X mtag -t book-title -f xhtml,epub -c em
+\&.\e" Define a tag "book-title" for latex rendered as an "\eemph{...}" command
+\&.X mtag -t book-title -f latex -c emph
+\&.\e" now we can write:
+\&The book title is
+\&.Sm -t book-title The Title Of The Book .
+\&.\e" Define a macro to produce an <hr> within a <div> in html
+\&.#de hr
+\&.Bd
+\&.Ft -f xhtml <hr>
+\&.Ed
+\&.#.
+\&.\e" And now we can call it this way:
+\&.hr
+.Ed
+.Pp
+Links and images:
+.Bd -literal -offset indent
+\&.\e" Define a hyperlink with label "Frundis Homepage"
+\&.Lk http://bardinflor.perso.aquilenet.fr/frundis/intro-en "Frundis Homepage"
+\&.\e" Include an image
+\&.Im /path/to/image.png
+\&.\e" Include an image with caption "Image" and a link to a bigger image
+\&.Im -link /url/to/image-big.png /path/to/image.png Image
+.Ed
+.Pp
+Table of contents and cross-references:
+.Bd -literal -offset indent
+\&.\e" Print Table of Contents
+\&.Tc
+\&.Sh Section Title
+\&.\e" Include contents of another file
+\&.If section-content.frundis
+\&.Sh Another Section
+\&.\e" Cross-reference to the first section
+\&As we saw in section
+\&.Sx Section Title
+\&.\e" ...
+\&.\e" Cross-reference to the first section with link text "first section"
+\&See the
+\&.Sx -name "first section" Section Title .
+.Ed
+.Pp
+Syntax highlighting through external command:
+.Bd -literal -offset indent
+\&.\e" Source code highlight with the GNU source-highlight program
+\&.\e" (see https://www.gnu.org/software/src-highlite/)
+\&.Bf -f xhtml -filter "source-highlight -s perl"
+\&print "Hello, World!\een";
+\&.Ef
+\&.\e" Or with the highlight program
+\&.\e" (see http://www.andre-simon.de/doku/highlight/en/highlight.php)
+\&.Bf -f xhtml -filter "highlight --syntax perl"
+\&print "Hello, World!\een";
+\&.Ef
+.Ed
+.Pp
+Defining a macro with perl code:
+.Bd -literal -offset indent
+\&.\e" This macro can be used to index particular words
+\&.#de -f xhtml -perl keyword
+    my $self = shift;
+    my $close_delim = $self->get_close_delim();
+    my $vars = $self->vars;
+    $vars->{index_count}++;
+    my $id   = "kwd$vars->{index_count}";
+    my $text = $self->escape_text(join(" ", @Arg));
+    unless ($self->process) {
+        $self->new_id($id);
+        $self->loX_entry_infos(
+           {
+               title       => $text,
+               count       => $vars->{index_count},
+               class       => "lok",
+               href_prefix => "kwd",
+           }
+        );
+        return;
+    }
+    $self->phrasing_macro_begin();
+    my $space = $self->flag("ns") ? "" : "\een";
+    print qq|<span class="keyword" id="$id">|,
+      $text, "</span>", $close_delim, $space;
+\&.#.
+Now
+\&.keyword special-word
+and
+\&.keyword another-special-word .
+\&.\e" Define a macro that prints a "list of keywords"
+\&.#de -f xhtml -perl print-lok
+    my $self = shift;
+    return unless $self->process;
+    # enclose within a <div> and terminate any paragraph
+    $self->call("Bd");
+    $self->xhtml_loX("lok");  # print the list
+    $self->call("Ed");
+\&.#.
+\&.\e" Print an index of links to special words introduced
+\&.\e" with a ".keyword" invocation.
+\&.print-lok
+.Ed
+.Pp
+More examples can be found by looking at the tests files in the
+.Pa t/data
+and
+.Pa t/data-dirs
+directories, or at the sources of the Shaedra fantasy saga, see
+.Sx HISTORY .
+.Sh SEE ALSO
+.Xr frundis 1
+.Xr Text::Frundis
+.Sh HISTORY
+The
+.Nm
+language was created originally for supporting the development of the fantasy
+saga
+.Rs
+.%B "El Ciclo de Shaedra"
+.%U http://bardinflor.perso.aquilenet.fr/shaedra/
+.Re
+Incidentally,
+.Nm
+is also the name of a character of the saga.
+.Pp
+Macro names are inspired from the language
+.Xr mdoc 7
+for formatting manual pages.
+.Sh CAVEATS
+A quoted argument isn't interpreted literally.
+For this purpose the
+.Sq \e&
+zero-width character should be used.

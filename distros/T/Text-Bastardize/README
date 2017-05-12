@@ -1,0 +1,12 @@
+        Text::Bastardize 0.08  -  7 Oct 2006
+        by Julian Fondren (ayrnieu@gmail.com), or ayrnieu of rhizomatic IRC.
+
+To install, type:
+        perl Makefile.PL
+        make install
+
+NOTE FOR 0.07
+- I revived this module on request, but please understand that it
+  remains little-used and cobwebbed in parts.  I promise to look
+  harder at it and make another release soon.  I'm /very/ reachable
+  at the email above, also, and can accept any patches sent.

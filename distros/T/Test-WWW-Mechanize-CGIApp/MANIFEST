@@ -1,0 +1,16 @@
+CHANGES
+lib/Test/WWW/Mechanize/CGIApp.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/autorunmode.t
+t/cgiapp.t
+t/dispatch.t
+t/instance.t
+t/lib/MyDispatch.pm
+t/lib/TestApp.pm
+t/lib/TestApp_autorunmode.pm
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

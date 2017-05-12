@@ -1,0 +1,13 @@
+Changelog for Text::Tree
+========================
+
+2002/11/18, Ron Isaacson <isaacson@cpan.org>
+
+  - Initial code written for Perl Quiz of the Week #5
+    (http://perl.plover.com/qotw)
+  - Bug reports and critique from Mark Jason Dominus
+
+1.0, 2004/05/23, Ed Halley <ed@halley.cc>
+
+  - Fixed bugs, added formatting options, wrote POD documentation and
+    packaged for distribution

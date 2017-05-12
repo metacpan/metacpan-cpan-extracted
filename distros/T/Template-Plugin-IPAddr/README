@@ -1,0 +1,192 @@
+NAME
+
+    Template::Plugin::IPAddr - Template::Toolkit plugin handling
+    IP-addresses
+
+VERSION
+
+    version 0.03
+
+SYNOPSIS
+
+      # Create IPAddr object via USE directive...
+      [% USE IPAddr %]
+      [% USE IPAddr(prefix) %]
+    
+      # ...or via new
+      [% ip = IPAddr.new(prefix) %]
+    
+      # Methods that return the different parts of the prefix
+      [% IPAddr.addr %]
+      [% IPAddr.addr_cidr %]
+      [% IPAddr.cidr %]
+      [% IPAddr.network %]
+      [% IPAddr.netmask %]
+      [% IPAddr.wildcard %]
+    
+      # Methods for retrieving usable IP-adresses from a prefix
+      [% IPAddr.first %]
+      [% IPAddr.last %]
+
+DESCRIPTION
+
+    This module implements an IPAddr class for handling IPv4 and
+    IPv6-address in an object-orientated way. The module is based on
+    NetAddr::IP and works on IPv4 as well as IPv6-addresses.
+
+    You can create a IPAddr object via the USE directive, adding any
+    initial prefix as an argument.
+
+      [% USE IPAddr %]
+      [% USE IPAddr(prefix) %]
+
+    Once you've got a IPAddr object, you can use it as a prototype to
+    create other IPAddr objects with the new() method.
+
+      [% USE IPAddr %]
+      [% ip = IPAddr.new(prefix) %]
+
+    After creating an IPaddr object, you can use the supplied methods for
+    retrieving properties of the prefix.
+
+      [% USE IPAddr('10.0.0.0/24') %]
+      [% IPAddr.netmask %]   # 255.255.255.0
+      [% IPAddr.first %]     # 10.0.0.1
+      [% IPAddr.last %]      # 10.0.0.254
+
+METHODS
+
+ new
+
+    Creates a new IPAddr object using an initial value passed as a
+    positional parameter. Any string which is accepted by NetAddr::IP->new
+    can be used as a parameter.
+
+      [% USE IPAddr %]
+      [% USE IPAddr(prefix) %]
+      [% ip = IPAddr.new(prefix) %]
+
+    Examples of (recommended) formats of initial parameters that can be
+    used:
+
+      # IPv4
+      n.n.n.n             # Host address
+      n.n.n.n/m           # CIDR notation
+      n.n.n.n/m.m.m.m     # address + netmask
+    
+      # IPv6
+      x:x:x:x:x:x:x:x     # Host address
+      x:x:x:x:x:x:x:x/m   # CIDR notation
+      ::n.n.n.n           # IPv4-compatible IPv6 address
+
+    When used as [% USE IPAddr %] the prefix assigned internally is
+    0.0.0.0/0
+
+ addr
+
+    Returns the address part of the prefix as written in the initial value.
+
+      [% USE IPAddr('10.1.1.1/24') %]
+      [% IPAddr.addr %]  # 10.1.1.1
+    
+      [% USE IPAddr('2001:DB8::DEAD:BEEF') %]
+      [% IPAddr.addr %]  # 2001:db8::dead:beef
+
+ addr_cidr
+
+    Returns the address in CIDR notation, i.e. as address/prefixlen.
+
+      [% USE IPAddr('10.1.1.1/255.255.255.0') %]
+      [% IPAddr.addr_cidr %]   # 10.1.1.1/24
+    
+      [% USE IPAddr('2001:db8:a:b:c:d:e:f/48') %]
+      [% IPAddr.addr_cidr %]  # 2001:db8:a:b:c:d:e:f/48
+
+ cidr
+
+    Returns the prefix in CIDR notation, i.e. as network/prefixlen.
+
+      [% USE IPAddr('10.1.1.1/255.255.255.0') %]
+      [% IPAddr.cidr %]   # 10.1.1.0/24
+    
+      [% USE IPAddr('2001:db8:a:b:c:d:e:f/48') %]
+      [% IPAddr.cidr %]  # 2001:db8:a::/48
+
+    Note that differs from the cidr method in NetAddr::IP (which returns
+    address/prefixlen). You can retrieve an address on that format by using
+    the "addr_cidr" method.
+
+ first
+
+    Returns the first usable IP-address within the prefix.
+
+      [% USE IPAddr('10.0.0.0/16') %]
+      [% IPAddr.first %]   # 10.0.0.1
+
+ last
+
+    Returns the last usable IP-address within the prefix.
+
+      [% USE IPAddr('10.0.0.0/16') %]
+      [% IPAddr.last %]   # 10.0.255.254
+
+ network
+
+    Returns the network part of the prefix.
+
+      [% USE IPAddr('10.1.1.1/24') %]
+      [% IPAddr.network %]   # 10.1.1.0
+    
+      [% USE IPAddr('2001:db8:a:b:c:d:e:f/48') %]
+      [% IPAddr.network %]  # 2001:db8:a::
+
+ netmask
+
+    Returns the netmask part of the prefix.
+
+      [% USE IPAddr('10.1.1.1/24') %]
+      [% IPAddr.netmask %]   # 255.255.255.0
+
+ wildcard
+
+    Returns the netmask of the prefix in wildcard format (the netmask with
+    all bits inverted).
+
+      [% USE IPAddr('10.1.1.1/24') %]
+      [% IPAddr.wildcard %]   # 0.0.0.255
+
+NOTES
+
+    Please note the subtle, but important, difference between addr_cidr and
+    cidr (see "cidr" for an explanation).
+
+    Not all methods are applicable in a IPv6 context. For example there are
+    no notation of netmask or wildcard in IPv6, and the first and last
+    returns values of no use.
+
+    When using IPv6 mapped IPv4 addresses, the "dot notation" is lost in
+    the process. For example:
+
+      [% USE IPAddr('::192.0.2.1') %]
+
+    then
+
+      [% IPAddr.addr %]
+
+    will print ::c000:201.
+
+SEE ALSO
+
+    Template, "PLUGINS" in Template::Manual::Config, NetAddr::IP
+
+AUTHOR
+
+    Per Carlson <pelle@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Per Carlson.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,24 @@
+Revision history for Tk-Tree-JSON
+
+0.04    2015-06-11
+        - Fixed issue 104846: Pod test fails (encoding problem)
+
+0.03    2015-06-01
+        - Fixed issue 73839: added module dependencies to PREREQ_PM in 
+          Makefile.PL
+        - Specified the minimum required Perl version in Makefile.PL
+
+0.02    2015-05-31
+        [Method get_value()]
+        - Returns undef for a tree node referring to JSON null or to a 
+          name/value pair where the value is JSON null (it returned scalar 
+          'null')
+        [Tree node rendering]
+        - JSON value true is rendered as 'true' (it was rendered as '1')
+        - JSON value false is rendered as 'false' (it was rendered as '0')
+        [Other]
+        - Improved documentation
+        - Improved sample application and added a sample JSON file
+
+0.01    2008-12-30
+        First version.

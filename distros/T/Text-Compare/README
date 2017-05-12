@@ -1,0 +1,104 @@
+NAME
+    Text::Compare - Language sensitive text comparison
+
+SYNOPSIS
+        use Text::Compare;
+        # the instant way:
+        my $tc = new Text::Compare( memoize => 1, strip_html => 0 );
+
+        my $sim = $tc->similarity($text_a, $text_b);
+        #$sim will be between 0 and 1
+
+        # second way (cache lists):
+        my $tc2 = new Text::Compare( strip_html => 1 );
+
+        # make a language sensitive word hash:
+        my %wordhash = $tc2->get_words($some_text);
+
+        $tc2->first_list(\%wordhash);
+
+        foreach my $list (@wordlists) {
+           #list is a hashref
+           $tc2->second_list($list);
+
+           print $tc2->similarity();
+        }
+
+        # third way (cache texts) 
+        my $tc3 = new Text::Compare();
+
+        $tc3->first($some_text);
+        $tc3->second($some_other_text);
+
+        print $tc3->similarity;
+
+DESCRIPTION
+    Text::Compare is an attempt to write a high speed text compare tool
+    based on Vector comparision which uses language dependend stopwords.
+    Text::Compare uses Lingua::Identify to find the language of the given
+    texts, then uses Lingua::StopWords to get the stopwords for the given
+    language and finally uses Linuga::Stem to find word stems.
+
+METHODS
+    new( memoize => <boolean>, strip_html => <boolean> )
+        Creates a new Text::Compare object. Per default, Text::Compare usese
+        memoize to cache some of the calls. See Memoize for details. If you
+        don't want that to happen, initialize it with memoize => 0.
+        Furthermore, Text::Compare uses HTML::Strip to stip off the HTML
+        found in the text. If you are sure that you don't have any HTML in
+        your data or simply want to use it, deactivate it with strip_html =>
+        0.
+
+    similarity($text_a, $text_b)
+        Compares both texts and returns a similarity value between 0 and 1.
+        Text::Compare does all this language magic, therefore two texts
+        which address the same topic but are in different languages might
+        get relatively high values.
+
+    first
+    first_list
+    second
+    second_list
+    cosine
+    make_vector
+    make_word_list
+    get_words
+
+LANGUAGES
+    Text::Compare uses the set of languages which is common to
+    Lingua::Identify, Lingua::Stem and Lingua::StopWords, namely:
+
+    da
+    de
+    en
+    fr
+    it
+    no
+    pt
+    sv
+
+AUTHORS
+    Marcus Thiesen, "<marcus@thiesen.org>"
+
+    Serguei Trouchelle "<stro@railways.dp.ua>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-text-compare@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Compare>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    The actual code is heavilly based on Search::VectorSpace by Maciej
+    Ceglowski.
+
+COPYRIGHT
+    Copyright 2005 Marcus Thiesen, All Rights Reserved.
+
+    Copyright 2007 Serguei Trouchelle
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

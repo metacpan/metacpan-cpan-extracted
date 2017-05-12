@@ -1,0 +1,40 @@
+Revision history for Perl extension Test::HexDifferences.
+
+1.000  Sun Jul  5 15:43:06 2015
+- use Test::Diff directly
+- added prototypes
+- test output has changed
+
+0.009  Sat Jul  4 14:56:30 2015
+- fixed https://rt.cpan.org/Public/Bug/Display.html?id=100489
+  by checking version of Test::Differences
+
+0.008  Sat Mar 22 08:46:13 2014
+- Sub::Exporter instead of Perl6::Export::Attrs
+
+0.007  Wed Aug 28 08:17:34 2013
+- removed Build.PL from distribution
+
+0.006  Tue Mar 20 07:50:41 2012
+- changed dependence of Test::Differences
+  because problems with undef before 0.60
+
+0.005  Fri Mar 16 07:15:22 2012
+- Makefile.PL repaired
+
+0.004  Sun Jan 29 09:29:11 2012
+- Tests run now on a little-endian machine correctly.
+  Some more Pod.
+
+0.003  Wed Jan 25 22:39:08 2012
+- https://rt.cpan.org/Public/Bug/Display.html?id=74230
+  Some formats needed Perl 5.10 others a 64 bit machine
+  to unpack the data.
+  Moved this dependencies from unpack to module code.
+
+0.002  Sun Jan 15 20:15:45 2012
+- renamed submodule and subroutines incompatible
+- new test subroutine dumped_eq_dump_or_diff
+
+0.001  Sat Jan 14 09:17:58 2012
+- first release

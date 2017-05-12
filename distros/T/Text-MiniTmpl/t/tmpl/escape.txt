@@ -1,0 +1,7 @@
+Start.
+http://google.com/search?client=^~$_{client}~^&q=^~$_{query}~^
+<p>@~ $_{text} ~@</p>
+<div>#~ $_{html} ~#</div>
+&~ no warnings; $_{text}; # comment ~&
+<!--& $_{html}; # comment -->
+End.

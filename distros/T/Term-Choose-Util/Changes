@@ -1,0 +1,159 @@
+Revision history for Term::Choose::Util
+
+
+0.051   2016-03-21
+        - "choose_dirs": cd back to the parent dir after adding a dir.
+
+0.050   2016-02-21
+        - "choose_a_dir": "confirm" is now " = " instead of " . ".
+        - Renamed "change_config" to "settings_menu".
+        - "Term::Choose": minimum version "1.500".
+
+0.030_01   2016-02-14
+        - Renamed "choose_multi" to "change_config".
+        - Requires "Term::Choose::LineFold".
+        - "Term::Choose": minimum version is "1.209_01".
+        - Bugfix in "choose_a_number".
+        - Code refactoring.
+        - Update documentation.
+
+0.030   2016-02-07
+        - New function "term_width".
+        - Code refactoring.
+        - Code cleanup.
+        - Update copyright year.
+
+0.029   2015-12-21
+        - Fixed link to Encode::Locale.  [github #1 - Mohammad S Anwar (Manwar)].
+
+0.028   2015-12-21
+        - Bugfix documentation.
+
+0.027   2015-12-08
+        - New function "choose_a_file".
+        - Code refactoring.
+        - Update documentation.
+
+0.026   2015-04-14
+        - "choose_a_dir" and "choose_dirs": handle not existing starting directories.
+        - Bugfix documentation: remove "choose_a_directory".
+
+0.025   2015-03-20
+        - "choose_a_subset": new option "prompt".
+
+0.024   2015-02-22
+        - "choose_multi": current index is 0 if not defined.
+
+0.023   2015-02-05
+        - Use constant.
+
+0.022   2015-01-17
+        - "print_hash": print-support for array references as hash values.
+
+0.021   2015-01-14
+        - "choose_multi": new option "prompt".
+        - Update copyright year.
+        - Update documentation.
+
+0.020   2014-12-19
+        - New option "index" for "choose_a_subset".
+        - Update documentation.
+
+0.019   2014-12-08
+        - Perl minimum version: to "5.8.3".
+        - Replaced "\v" ("\v" not yet available in Perl 5.8.3).
+        - "Term::Choose": minimum version "1.118".
+
+0.018   2014-12-05
+        - Replaced "\R" ("\R" not yet available in Perl 5.8.0).
+        - "Term::Choose": minimum version "1.117".
+
+0.017   2014-11-28
+        - Stringify variables passed to "Unicode::GCString".
+
+0.016   2014-09-06
+        - Perl minimum version from "5.10.0" to "5.8.0".
+        - Update documentation.
+
+0.015   2014-08-28
+        - Removed deprecated function "util_readline".
+        - Update documentation.
+
+0.014   2014-08-16
+        - Perl minimum version from "5.10.1" to "5.10.0".
+        - Update documentation.
+
+0.013   2014-08-16
+        - Modified encoding/decoding in "choose_a_dir" and "choose_dirs".
+
+0.012   2014-08-16
+        - "util_readline" deprecated.
+        - Removed deprecated function "choose_a_directory".
+        - Code refactoring.
+        - Update documentation.
+
+0.011   2014-07-10
+        - Update function "util_readline".
+        - Update documentation.
+
+0.010   2014-07-09
+        - Update function "util_readline".
+        - New option for "choose_a_subset".
+        - Update documentation.
+
+0.009   2014-07-03
+        - New option "default" for the "util_readline" function.
+        - Update documentation.
+
+0.008   2014-06-29
+        - "choose_a_subset" returns an empty list, if the chosen list is empty and "confirm" is pressed.
+        - "choose_a_dir" replaces "choose_a_directory".
+        - New function "choose_dirs".
+        - Update "unicode_sprintf".
+        - Update documentation.
+
+0.007   2014-06-15
+        - Simplified the context sensitive behavior of "print_hash".
+        - Update documentation.
+
+0.006   2014-06-14
+        - Added the option "preface" to the function "print_hash".
+        - The behavior of "print_hash" is now context sensitive.
+        - Undefined hash values are replaced with an empty string.
+        - Update documentation.
+
+0.005   2014-04-15
+        - Update "choose_a_directory".
+        - Update documentation.
+
+0.004   2014-04-09
+        - Update options.
+        - Update function "insert_sep".
+        - Update documentation.
+        - Update Makefile.PL.
+
+0.003   2014-03-20
+        - Bugfix in term_size.
+        - Update documentation.
+
+0.002   2014-03-19
+        - Added spelling test.
+        - Fixed some spelling errors.
+
+0.001   2014-03-19
+        - Update options.
+        - Improved documentation.
+
+0.000_04   2014-03-18
+        - Pod test.
+
+0.000_03   2014-03-16
+        - Improved documentation.
+
+0.000_02   2014-03-16
+        - New functions: "print_hash" and "length_longest".
+        - Code refactoring.
+        - Improved documentation.
+
+0.000_01   2014-03-13
+        - First developer release on CPAN.

@@ -1,0 +1,40 @@
+---
+abstract: 'Provides all of Task::Kensho bundles including ones considered optional.'
+author:
+  - 'cPanel <cpanel@cpan.org>'
+build_requires:
+  FindBin: 0
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Cpanel-Kensho
+requires:
+  Task::Kensho::Async: 0
+  Task::Kensho::CLI: 0
+  Task::Kensho::Config: 0
+  Task::Kensho::DBDev: 0
+  Task::Kensho::Dates: 0
+  Task::Kensho::Email: 0
+  Task::Kensho::ExcelCSV: 0
+  Task::Kensho::Exceptions: 0
+  Task::Kensho::Hackery: 0
+  Task::Kensho::Logging: 0
+  Task::Kensho::ModuleDev: 0
+  Task::Kensho::OOP: 0
+  Task::Kensho::Scalability: 0
+  Task::Kensho::Testing: 0
+  Task::Kensho::Toolchain: 0
+  Task::Kensho::WebCrawling: 0
+  Task::Kensho::WebDev: 0
+  Task::Kensho::XML: 0
+  strict: 0
+resources:
+  repository: https://github.com/CpanelInc/Task-Cpanel-Kensho
+version: 11.36.001

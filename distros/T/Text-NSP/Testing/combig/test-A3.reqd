@@ -1,0 +1,7 @@
+23
+file<>line<>6 13 11
+text<>print<>5 10 12
+print<>file<>4 12 13
+file<>text<>3 13 10
+print<>line<>3 12 11
+text<>line<>2 10 11

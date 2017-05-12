@@ -1,0 +1,39 @@
+Tuxedo/Admin version 0.08
+=========================
+
+This module aims to make runtime administration of a Tuxedo environment
+simpler and less error-prone than the usual method of navigating the tmadmin,
+dmadmin and qmadmin menus or writing multiple adhoc ud32 scripts to make TMIB
+calls.
+
+It provides a simple object-oriented Perl interface to the Tuxedo MIBs
+allowing the caller to query, add or update the various components of the
+Tuxedo environment, such as servers, groups, access points etc.
+
+See the "Changes" file for details of what has changed in this version.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Carp
+Class::MethodMaker
+Data::Dumper
+IPC::Open2
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Keith Burdis
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

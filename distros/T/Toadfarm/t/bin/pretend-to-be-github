@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+#BEGIN { $ENV{MOJO_USERAGENT_DEBUG} //= 1 }
+use strict;
+use warnings;
+use Mojo::JSON;
+use Mojo::UserAgent;
+
+my $url = shift or do { local $/; die readline DATA };
+my $ua = Mojo::UserAgent->new;
+my($tx, $payload);
+
+$payload->{head_commit}{id} = ask('head_commit.id') || 'abcdefghijklmopqrstuvwz';
+$payload->{repository}{name} = ask('repository.name') || 'toadfarm';
+$payload->{ref} = ask('branch') || 'master';
+$payload->{ref} = "refs/heads/$payload->{ref}";
+
+warn "...\n";
+$tx = $ua->post(
+        $url,
+        {},
+        form => { payload => Mojo::JSON->new->encode($payload) },
+      );
+
+die $tx->error, "\n" if $tx->error;
+print $tx->res->body;
+
+sub ask {
+  print "$_[0]: ";
+  local $| = 1;
+  my $value = <STDIN>;
+  chomp $value;
+  $value;
+}
+
+__DATA__
+Usage:
+
+$ mkdir log
+$ MOJO_MODE=development ./script/toadfarm t/reload.conf
+$ tail -f log/development.log
+$ ./t/bin/pretend-to-be-github http://localhost:8080/bad-path
+
+

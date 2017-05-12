@@ -1,0 +1,61 @@
+Text::Filter 1.10
+=================
+
+ * Eliminate deprecation warnings in newer Perls.
+
+Text::Filter 1.9
+================
+
+ * Removed 'use Encode' from Text::Filter::Cooked.
+
+Text::Filter 1.8
+================
+
+ * Requires Perl 5.6.
+
+ * Default for input is now <> .
+
+ * Default for output is now STDOUT.
+
+ * Input may come from a scalar (by passing its ref to input).
+
+ * A basic filter may be specified to filter the input.
+
+ * Add a class and instance method run to run the filter loop.
+ 
+ * Attribute setters like set_input will be called to set up the
+   defaults as well.
+
+ * Text::Filter::Cooked for smarter input processing.
+
+ * Use IO::File instead of IO.
+
+ * Tests use Test::More.
+ 
+Text::Filter 1.7
+================
+
+ * (Makefile.PL) Tell user that T::F may work on older versions.
+
+Text::Filter 1.6
+================
+
+ * Fix appending newlines when prewrite is chomp and $/ is "".
+
+ * New output type: scalar.
+
+ * 'pushback' now returns its argument for convenience.
+ 
+ * The pushback buffer is now of unlimited (Perl-wise) capacity.
+
+ * New function: peek. 
+   Short for pushback(readline()).
+
+ * Enhance documentation.
+
+ * New files (kit only): INSTALL, AVAILABILITY, CHANGES.
+
+Text::Filter 1.5
+================
+
+ * First public release.

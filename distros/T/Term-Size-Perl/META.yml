@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Term-Size-Perl
+version:             0.029
+abstract:            Perl extension for retrieving terminal size (Perl version)
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Exporter:                      0
+    ExtUtils::CBuilder:            0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Adriano R. Ferreira <ferreira@cpan.org>

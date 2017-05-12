@@ -1,0 +1,7 @@
+Revision history for Perl extension Template::Plugin::TruncateByWord.
+
+0.11  Mon Apr 2 22:24:40 2012
+    - Remove "use_standard_tests" from the Makefile.PL. Library was not change.
+
+0.1  Tue Jun 17 14:55:31 2008
+    - First release.

@@ -1,0 +1,6 @@
+##teamcity[testSuiteStarted flowId='t/test-data/basic/use-error-before-test-more/input.st' name='t/test-data/basic/use-error-before-test-more/input.st']
+##teamcity[testStarted captureStandardOutput='true' flowId='t/test-data/basic/use-error-before-test-more/input.st' name='Test died']
+##teamcity[testFailed details='Can|'t locate SomeNoneExistingModule.pm in @INC (you may need to install the SomeNoneExistingModule module) (@INC contains: XXX) at t/test-data/basic/use-error-before-test-more/input.st line 4.BEGIN failed--compilation aborted at t/test-data/basic/use-error-before-test-more/input.st line 4.' flowId='t/test-data/basic/use-error-before-test-more/input.st' message='not ok' name='Test died']
+##teamcity[testFinished flowId='t/test-data/basic/use-error-before-test-more/input.st' name='Test died']
+##teamcity[testSuiteFinished flowId='t/test-data/basic/use-error-before-test-more/input.st' name='t/test-data/basic/use-error-before-test-more/input.st']
+

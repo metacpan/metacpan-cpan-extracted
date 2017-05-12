@@ -1,0 +1,20 @@
+---
+abstract: 'Test::More-style wrapper around Template'
+author:
+  - 'BjE<oslash>rn-Olav Strand <bo@startsiden.no>'
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-TT
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Template: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

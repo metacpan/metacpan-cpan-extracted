@@ -1,0 +1,27 @@
+Text-Amuse is a module to parse the Emacs Muse wiki syntax and to
+produce HTML and LaTeX code, with some minor differences with the
+original implementation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::Amuse
+
+LICENSE
+
+This module is free software and is published under the same terms as
+Perl itself.
+
+
+

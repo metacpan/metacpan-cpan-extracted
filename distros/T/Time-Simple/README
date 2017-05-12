@@ -1,0 +1,191 @@
+Time-Simple version 0.055
+=========================
+
+NAME
+    Time::Simple - A simple, light-weight ISO 8601 time object.
+
+SYNOPSIS
+            use Time::Simple;
+            my $time   = Time::Simple->new('23:24:59');
+            my $hour   = $time->hours;
+            my $minute = $time->minutes;
+            my $second = $time->seconds;
+
+            my $time2  = Time::Simple->new($hour, $minute, $second);
+
+            my $now = Time::Simple->new;
+            my $nexthour = $now + (60*60);
+            print "An hour from now is $nexthour.\n";
+
+            if ($nexthour->hour > 23) {
+                    print "It'll be tomorrow within the next hour!\n";
+            }
+
+            # You can also do this:
+            ($time cmp "23:24:25")
+            # ...and this:
+            ($time <=> [23, 24, 25])
+
+            $time++; # Add a second
+            $time--; # Subtract a second
+
+            # Seconds of difference:
+            $seconds = Time::Simple->new("00:00:02")
+                     - Time::Simple->new("00:00:01");
+
+            my $now  = Time::Simple->new;
+            # A minute from now:
+            my $then = Time::Simple->new( $now + 60 );
+            # Or:
+            my $soon = Time::Simple->new( '00:01:00' );
+
+DESCRIPTION
+    A simple, light-weight time object.
+
+    This version should be considered an alpha developer release.
+
+    How do you think this moudle should handle return values of
+    multiplacation, where the return value would be greater than 23:59:59?
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+FATAL ERRORS
+    Attempting to create an invalid time with this module will return
+    "undef" rather than an object.
+
+    Some operations can produce fatal errors: these can be replaced by
+    warnings and the return of "undef" by switching the value of $FATALS:
+
+            $Time::Simple::FATALS = undef;
+
+    You will then only get warnings to "STDERR", and even then only if you
+    asked perl for warnings with "use warnings" or by setting $^W either
+    directly or with the "-w" command-line switch.
+
+  EXPORT
+    None by default.
+
+  CONSTRUCTOR (new)
+        $_ = Time::Simple->new('21:10:09');
+        $_ = Time::Simple->new( 11,10, 9 );
+        Time::Simple->new() == Time::Simple->new( time() );
+
+    The constructor "new" returns a "Time::Simple" object if the supplied
+    values specify a valid time, otherwise returns "undef".
+
+    Valid times are either as supplied by the time, or in ISO 8601 format.
+    In the latter case, the values may be supplied as a colon-delimited
+    scalar, as a list, or as an anonymous array.
+
+    If nothing is supplied to the constructor, the current local time will
+    be used.
+
+INSTANCE METHODS
+  METHOD next
+        my $will_be_by_one_second = $now->next;
+
+    Returns the next time by incrementing the caller's time by one second.
+
+  METHOD prev
+        my $was_by_one_second = $now->prev;
+
+    Returns the last time by decrementing the caller's time by one second.
+
+  METHOD hour
+        my $hr = $time->hour;
+
+    The hour. Alias: "hours".
+
+  METHOD minute
+        my $min = $time->minute;
+
+    The minutes. Alias: "minutes".
+
+  METHOD second
+        my $sec = $time->second;
+
+    The seconds. Alias: "seconds".
+
+  format
+    Returns a string representing the time, in the format specified. If you
+    don't pass a parameter, an ISO 8601 formatted time is returned.
+
+        $date->format;
+        $date->format("%H hours, %M minutes, and %S seconds");
+        $date->format("%H-%M-%S");
+
+    The formatting parameter is as you would pass to strftime(3): "strftime"
+    in POSIX.
+
+OPERATORS
+    Some operators can be used with "Time::Simple" objects:
+
+    += -=
+        You can increment or decrement a time by a number of seconds using
+        the "+=" and "-=" operators
+
+    + - You can construct new times offset by a number of seconds using the
+        "+" and "-" operators.
+
+    -   You can subtract two times ("$t1 - $t2") to find the number of
+        seconds between them.
+
+    comparison
+        You can compare two times using the arithmetic and/or string
+        comparison operators: "lt le ge gt < <= >= >".
+
+    ""  You can interpolate a time instance directly into a string, in the
+        format specified by ISO 8601 (eg: 23:24:25).
+
+    *   You can multiply a time by a number: "00:00:30 * 2 = 00:01:00".
+
+    /   You can divide a time by a number: "00:02:00 * 2 = 00:01:00".
+
+  DIAGNOSTICS
+    "Illegal octal digit ...."
+    You probably used an anonymous array and prefixed a number with a
+    leading zero, as you would if you supplied a scalar string:
+    "[11,10,09]".
+
+TODO
+    Suggestions welcome. How should operators not mentioend behave? Can one
+    "verbar" times?
+
+SEE ALSO
+    Time::HiRes, Date::Time, Date::Simple, "localtime" in perlfunc, "time"
+    in perlfunc. "strftime" in POSIX, "mktime" in POSIX.
+
+LATEST CHANGES
+    Version 0.05 Sun 02 July 16:52 2006 - Added multiply and division
+
+CREDITS
+    This module is a rewrite of Marty Pauley's excellent and very useful
+    "Date::Simple" object. If you're reading, Marty: many thanks. For
+    support, though, please contact Lee Goddard (lgoddard -at- cpan -dot-
+    org) or use rt.cpan.org.
+
+    Thanks to Zsolt for testing, and 'Agent' for the patch.
+
+AUTHOR
+    Lee Goddard (lgoddard -at- cpan -dot- org) after Marty Pauley.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 Lee Goddard. Parts Copyright (C) 2001, *Kasei*.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: a) the GNU General Public License; either
+    version 2 of the License, or (at your option) any later version. b) the
+    Perl Artistic License.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+

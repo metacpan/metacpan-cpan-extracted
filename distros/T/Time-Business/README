@@ -1,0 +1,59 @@
+NAME
+    Time::Business - Business Time Between Two Times
+
+SYNOPSIS
+      use Time::Business;
+  
+      my $btime = Time::Business->new({
+                    WORKDAYS=>[1,2,3,4,5],
+                    STARTIME=>900,
+                    ENDTIME=>1700,
+            })
+
+      $start=time();
+      $end=time()+86400;
+      $seconds = $btime->calctime($start,$end);
+
+DESCRIPTION
+    Calculates the number of business seconds between two dates (specified
+    in epoch seconds) given a list of working days and start and end times.
+
+METHODS
+  new({....})
+    Setup a Time::Business object, passing the working time parameters. eg.
+
+     my $btime = Time::Business->new({
+                    WORKDAYS=>[1,2,3,4,5],
+                    STARTIME=>'9:00',
+                    STOPTIME=>'17:00',
+            })
+
+    where WORKDAYS is specified as a list of 0..6 where Sun is 0 and Sat is
+    6.
+
+  duration($start,$end) - Return number of business seconds.
+    Returns the number of business seconds between $start and $end (seconds
+    since epoch) given the parameters specified in the Time::Business->new.
+
+  workTimeString($seconds) - Convert seconds to human readable work time.
+    Converts the $seconds given to a string of the form "n days n hours n
+    minutes". NOTE: This conversion is based on business hours so one day is
+    one working day, not one 24 hour day. Useful for reports etc.
+
+SUPPORT
+AUTHOR
+        David Peters
+        CPAN ID: DAVIDP
+        davidp@electronf.com
+        http://www.electronf.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

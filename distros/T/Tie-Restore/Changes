@@ -1,0 +1,7 @@
+Revision history for Perl extension Tie::Restore.
+
+0.1   Sat Nov  3 16:05:46 2001
+	- documented
+	- original version; created by h2xs 1.21 with options
+		-X -n Tie::Restore
+

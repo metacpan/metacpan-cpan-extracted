@@ -1,0 +1,10 @@
+Revision history for Perl extension Template-Plugin-Dumpvar
+
+1.03 Sat 14 Apr 2008
+	- Cleaning up Makefile.PL
+
+0.02 Tue 15 Feb 2005
+	- Removing braindead Build.PL
+
+0.01 Thu  8 Oct 2004
+	- Created the initial version of the file

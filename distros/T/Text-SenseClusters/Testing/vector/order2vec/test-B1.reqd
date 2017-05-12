@@ -1,0 +1,5 @@
+ERROR(order2vec.pl):
+		Unequal number of feature vectors and features provided in 
+		input files. WORDVEC file <test-B1.wordvec> 
+		specifies 19 vectors whereas FEATURE_REGEX 
+		file <test-B1.regex> contains 21 features.

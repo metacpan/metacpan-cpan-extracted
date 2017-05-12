@@ -1,0 +1,58 @@
+{
+   "abstract" : "TAP (Test Anything Protocol) parser which supported the subtest",
+   "author" : [
+      "magnolia <magnolia.k@me.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9902, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TAP-Tree",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.98"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/magnolia-k/p5-TAP-Tree/issues"
+      },
+      "homepage" : "https://github.com/magnolia-k/p5-TAP-Tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/magnolia-k/p5-TAP-Tree.git",
+         "web" : "https://github.com/magnolia-k/p5-TAP-Tree"
+      }
+   },
+   "version" : "v0.0.5"
+}

@@ -1,0 +1,93 @@
+NAME
+    Tie::CHI - Tied hash to persistent CHI cache
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        use Tie::CHI;
+
+        my %cache;
+
+        # Pass CHI options to tie
+        #
+        tie %cache, 'Tie::CHI', { driver => 'File', root_dir => '/path/to/root' };
+        tie %cache, 'Tie::CHI',
+          {
+            driver             => 'Memcached::libmemcached',
+            namespace          => 'homepage',
+            servers            => [ "10.0.0.15:11211", "10.0.0.15:11212" ],
+            default_expires_in => '10 min'
+          } );
+
+        # or pass an existing CHI object
+        #
+        my $chi_object = CHI->new(...);
+        tie %cache, 'Tie::CHI', $chi_object;
+
+        # Perform cache operations
+        #
+        my $customer = $cache{$name};
+        if ( !defined $customer ) {
+              $customer = get_customer_from_db($name);
+              $cache{$name} = $customer;
+        }
+        delete( $cache{$name} );
+
+        # Break the binding
+        #
+        untie(%cache);
+
+DESCRIPTION
+    Tie::CHI implements a tied hash connected to a CHI cache. It can be used
+    with any of CHI's backends (File, Memcached, DBI, etc.)
+
+    Usage is one of the following:
+
+        tie %cache, 'Tie::CHI', $hash_of_chi_options;
+        tie %cache, 'Tie::CHI', $existing_chi_cache;
+
+    A read/write/delete on the tied hash will result in a
+    `get'/`set'/`remove' on the underlying cache. `keys' and `each' will be
+    supported if the underlying CHI driver supports `get_keys'.
+
+    There is no way to specify expiration for an individual `set', but you
+    can pass `expires_in', `expires_at' and/or `expires_variance' to the tie
+    to specify default expiration. e.g.
+
+        tie %cache, 'Tie::CHI', { 
+            namespace => 'products',
+            driver => 'DBI',
+            dbh => DBIx::Connector->new(...),
+            expires_in => '4 hours',
+            expires_variance => '0.2'
+        };
+
+SUPPORT AND DOCUMENTATION
+    Questions and feedback are welcome, and should be directed to the
+    perl-cache mailing list:
+
+        http://groups.google.com/group/perl-cache-discuss
+
+    Bugs and feature requests will be tracked at RT:
+
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-CHI
+        bug-tie-chi@rt.cpan.org
+
+    The latest source code can be browsed and fetched at:
+
+        http://github.com/jonswar/perl-tie-chi/tree/master
+        git clone git://github.com/jonswar/perl-tie-chi.git
+
+SEE ALSO
+    CHI
+
+AUTHOR
+    Jonathan Swartz <swartz@pobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Swartz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,19 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Tie/Hash/Array.pm
+lib/Tie/Hash/Abbrev.pm
+lib/Tie/Hash/Abbrev/Smart.pm
+t/0_boilerplate.t
+t/1_standard.t
+t/2_objects_as_keys.t
+t/3_random_data.t
+t/4_abbrev.t
+t/5_abbrev_smart.t
+t/6_iterate_and_delete.t
+t/9_pod.t
+t/9_pod-coverage.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

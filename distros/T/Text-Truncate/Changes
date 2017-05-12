@@ -1,0 +1,45 @@
+Revision history for Perl extension Text::Truncate.
+
+1.06  2014-02-24
+  - Added SEE ALSO in pod 
+
+1.05  2014-02-09
+  - ILV has taken over maintenance
+  - Added github repo to metadata and pod
+  - Reformatted Changes according to CPAN::Changes::Spec
+  - Added LICENSE file
+  - Specified 'unrestricted' license in pod
+  - Added 'use warnings'
+
+1.04  2009-11-02
+  - re-added to CPAN after accidental removal
+
+1.03  2005-06-26
+	- README generated from Pod::Readme
+	- minor updates to POD
+	- uses Test::Pod::Coverage instead
+          (thanks to Richard Clamp for pointing this out)
+
+1.02  2005-04-04
+	- fixed bug in Pod::Coverage tests
+	- minor updates to POD and README
+
+1.01  2005-03-29
+	- added Test::Prereq to tests
+	- added Test::Pod tests
+	- added Pod::Coverage tests
+	- minor cleanup of tests
+	- uses Test::More
+	- added SIGNATURE
+
+1.00  2004-08-03
+	- changes to handle undefined values
+	- fixed tests
+	- added Build.PL and META.yml to distribution
+	- changed minimum version to 5.004
+	- minor changes to POD
+
+0.01  2002-11-22
+	- original version; created by h2xs 1.21 with options
+		-X -A -v 0.01 -n Text::Truncate -b 5.5.0
+

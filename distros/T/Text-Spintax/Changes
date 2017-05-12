@@ -1,0 +1,13 @@
+Revision history for Text-Spintax
+
+0.05    2015-02-23 10:39
+        Removing Mo-inline, adding kwalitee, tidying
+0.04    2015-02-22 21:29
+        Fixing documentation test due to Ingy dot Net having non-ASCII characters in his name
+0.03    2015-02-22 19:49
+        Resolving some namespace conflicts relating to YAPP generated code
+0.02    2015-02-22 19:12
+        Forgot to include Text::Spintax::Mo in the distribution
+0.01    2015-02-21 00:00:00
+        First version, released on an unsuspecting world.
+

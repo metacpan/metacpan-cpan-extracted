@@ -1,0 +1,151 @@
+NAME
+    `Tickit::Widget::ScrollBox' - allow a single child widget to be scrolled
+
+SYNOPSIS
+     use Tickit;
+     use Tickit::Widget::ScrollBox;
+     use Tickit::Widget::Static;
+
+     my $scrollbox = Tickit::Widget::ScrollBox->new(
+        child => Tickit::Widget::Static->new(
+           text => join( "\n", map { "The content for line $_" } 1 .. 100 ),
+        ),
+     );
+
+     Tickit->new( root => $scrollbox )->run;
+
+DESCRIPTION
+    This container widget draws a scrollbar beside a single child widget and
+    allows a portion of it to be displayed by scrolling.
+
+STYLE
+    Th following style pen prefixes are used:
+
+    scrollbar => PEN
+        The pen used to render the background of the scroll bar
+
+    scrollmark => PEN
+        The pen used to render the active scroll position in the scroll bar
+
+    arrow => PEN
+        The pen used to render the scrolling arrow buttons
+
+    The following style keys are used:
+
+    arrow_up => STRING
+    arrow_down => STRING
+    arrow_left => STRING
+    arrow_right => STRING
+        Each should be a single character to use for the scroll arrow
+        buttons.
+
+    The following style actions are used:
+
+    up_1 (<Up>)
+    down_1 (<Down>)
+    left_1 (<Left>)
+    right_1 (<Right>)
+        Scroll by 1 line
+
+    up_half (<PageUp>)
+    down_half (<PageDown>)
+    left_half (<C-Left>)
+    right_half (<C-Right>)
+        Scroll by half of the viewport
+
+    to_top (<C-Home>)
+    to_bottom (<C-End>)
+    to_leftmost (<Home>)
+    to_rightmost (<End>)
+        Scroll to the edge of the area
+
+CONSTRUCTOR
+  new
+       $scrollbox = Tickit::Widget::ScrollBox->new( %args )
+
+    Constructs a new `Tickit::Widget::ScrollBox' object.
+
+    Takes the following named arguments in addition to those taken by the
+    base Tickit::SingleChildWidget constructor:
+
+    vertical => BOOL or "on_demand"
+    horizontal => BOOL or "on_demand"
+            Whether to apply a scrollbar in the vertical or horizontal
+            directions. If not given, these default to vertical only.
+
+            If given as the string `on_demand' then the scrollbar will be
+            optionally be displayed only if needed; if the space given to
+            the widget is smaller than the child content necessary to
+            display.
+
+ACCESSORS
+  vextent
+       $vextent = $scrollbox->vextent
+
+    Returns the Tickit::Widget::ScrollBox::Extent object representing the
+    box's vertical scrolling extent.
+
+  hextent
+       $hextent = $scrollbox->hextent
+
+    Returns the Tickit::Widget::ScrollBox::Extent object representing the
+    box's horizontal scrolling extent.
+
+METHODS
+  scroll
+       $scrollbox->scroll( $downward, $rightward )
+
+    Requests the content be scrolled downward a number of lines and
+    rightward a number of columns (either of which which may be negative).
+
+  scroll_to
+       $scrollbox->scroll_to( $top, $left )
+
+    Requests the content be scrolled such that the given line and column
+    number of the child's content is the topmost visible in the container.
+
+SMART SCROLLING
+    If the child widget declares it supports smart scrolling, then the
+    ScrollBox will not implement content scrolling on its behalf. Extra
+    methods are used to co-ordinate the scroll position between the
+    scrolling-aware child widget and the containing ScrollBox. This is
+    handled by the following methods on the child widget.
+
+    If smart scrolling is enabled for the child, then its window will be set
+    to the viewport directly, and the child widget must offset its content
+    within the window as appropriate. The child must indicate the range of
+    its scrolling ability by using the `set_total' method on the extent
+    object it is given.
+
+  $smart = $child->CAN_SCROLL
+    If this method exists and returns a true value, the ScrollBox will use
+    smart scrolling. This method must return a true value for this to work,
+    allowing the method to itself be a proxy, for example, to proxy
+    scrolling information through a single child widget container.
+
+  $child->set_scrolling_extents( $vextent, $hextent )
+    Gives the child widget the vertical and horizontal scrolling extents.
+    The child widget should save thes values, and inspect the `start' value
+    of them any time it needs these to implement content offset position
+    when rendering.
+
+  $child->scrolled( $downward, $rightward, $h_or_v )
+    Informs the child widget that one of the scroll positions has changed.
+    It passes the delta (which may be negative) of each position, and a
+    string which will be either `"h"' or `"v"' to indicate whether it was an
+    adjustment of the horizontal or vertical scrollbar. The extent objects
+    will already have been updated by this point, so the child may also
+    inspect the `start' value of them to obtain the new absolute offsets.
+
+TODO
+    *   Choice of left/right and top/bottom bar positions.
+
+    *   Click-and-hold on arrow buttons for auto-repeat
+
+    *   Allow smarter cooperation with a scrolling-aware child widget;
+        likely by setting extent objects on the child if it declares to be
+        supported, and use that instead of an offset child window.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

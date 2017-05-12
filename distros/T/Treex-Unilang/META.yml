@@ -1,0 +1,51 @@
+---
+abstract: 'collection of blocks parametrized by language and language independent'
+author:
+  - 'Treex team <treex@ufal.mff.cuni.cz>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Output: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.026, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Treex-Unilang
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Slurp: '0'
+  IO::Handle: '0'
+  IPC::Open2: '0'
+  IPC::Open3: '0'
+  List::MoreUtils: '0'
+  Moose: '0'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  Treex::Block::Read::BaseTextReader: '0'
+  Treex::Block::Write::BaseTextWriter: '0'
+  Treex::Core: '0'
+  Treex::Core::Block: '0'
+  Treex::Core::Common: '0'
+  Treex::Core::Config: '0'
+  Treex::Core::Document: '0'
+  Treex::Core::DocumentReader: '0'
+  Treex::Core::Log: '0'
+  Treex::Core::Resource: '0'
+  Treex::Tool::Parser::MSTperl::Config: '0'
+  Treex::Tool::Parser::MSTperl::Node: '0'
+  Treex::Tool::Parser::MSTperl::Parser: '0'
+  Treex::Tool::Parser::MSTperl::Sentence: '0'
+  URI::Find::Schemeless: '0'
+  autodie: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '2.20151102'

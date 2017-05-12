@@ -1,0 +1,16 @@
+NAME
+
+Tie::IntegerArray - provides a tied array of packed integers of any bit length
+
+DESCRIPTION
+
+This module provides an array interface to packed array of integers.
+A packed array of integers is useful in situations where you need to
+store a large set of integers in as small a space as possible.  Access
+to the packed array will be significantly slower than access to a
+normal array but for many applications the reduction in memory usage
+makes this a good trade-off.
+
+AUTHOR
+
+Sam Tregar, sam@tregar.com

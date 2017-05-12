@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+    <start>
+        <choice>
+            <ref name="container.elem" />
+            <ref name="data.elem" />
+        </choice>
+    </start>
+    <define name="data.elem">
+        <element>
+            <name ns="">data</name>
+            <text />
+        </element>
+    </define>
+    <define name="container.elem">
+        <element>
+            <name ns="">container</name>
+            <oneOrMore>
+                <ref name="data.elem" />
+            </oneOrMore>
+        </element>
+    </define>
+</grammar>

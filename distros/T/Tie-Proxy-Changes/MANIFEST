@@ -1,0 +1,12 @@
+lib/Tie/Proxy/Changes.pm
+MANIFEST
+Makefile.PL
+Changes
+LICENSE
+META.yml
+README
+t/test.t
+xt/meta.t
+xt/pod.t
+xt/pod_coverage.t
+examples/TieDump.pm

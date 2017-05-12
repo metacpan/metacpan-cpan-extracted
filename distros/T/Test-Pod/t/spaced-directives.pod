@@ -1,0 +1,20 @@
+=head1 NAME
+
+Test::Pod test pod -- a valid pod file
+
+=head1 DESCRIPTION
+
+This is a pod file where there are invisible
+spaces on either side of directives.  One row
+of spaces is just before the AUTHOR directive,
+and one is right after the COPYRIGHT.
+      
+=head1 AUTHOR
+
+Andy Lester, garbage-address@aol.com
+
+=head1 COPYRIGHT
+      
+Copyright 2004, Andy Lester
+
+=cut

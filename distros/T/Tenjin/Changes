@@ -1,0 +1,79 @@
+Revision history for Perl extension Tenjin
+
+1.000001  2016-05-17 22:54:00+03:00 Asia/Jerusalem
+    - Small typo fix in Tenjin::Template
+
+1.000000  2016-05-14 20:18:01+03:00 Asia/Jerusalem
+    - Avoid using $& since it leads to performance penalty for all regexp
+      matches in code using this library (Mark Hindess)
+    - Fixes for performance bug and off-by-one error in delete newline
+      syntax (Mark Hindess)
+    - Small documentation fixes
+    - Move bug tracker to GitHub
+    - Bump version to 1.0.0
+
+0.070001  2011-03-29 21:38:04 Asia/Jerusalem
+	- Added version numbers to all modules (not just Tenjin.pm) as the CPAN
+	  indexer failed.
+
+0.070     2011-03-29 21:31:14 Asia/Jerusalem
+	- Tenjin now properly decodes template input and encodes template output
+	  according to the user's selected encoding
+	- Default encoding now spelled UTF-8 instead of utf8
+	- Added t/encoding.t to test template encoding
+
+0.062     2010-08-06 20:49:28 Asia/Jerusalem
+	- Tenjin now croaks instead of dies, and only inside the context
+	  class (the evaluate and to_func methods).
+	- The _render internal method was removed as it's not needed anymore
+	- Every template object now has the template's name, not just the
+	  file name. This is good for non-file templates and allows croaking
+	  with a message that gives more info about the location of the error.
+	- Added a new test that simply attempts to catch a croak in an
+	  intentionally "faulty" template.
+	- Removed the Encode dependency from Tenjin::Util as it wasn't
+	  even used.
+	- Migrated distribution to use Dist::Zilla
+
+0.061	2010-02-24 17:00:00
+	- Restored the ability to nest layout templates
+	- Restored the layou templates precedence to the same used in plTenjin
+	- Renamed the context variable back to $_context
+	- Added some real CPAN tests to the distro
+	- Moved from Module::Install to ExtUtils::MakeMaker for the Makefile
+
+0.06	2010-02-24 12:30:00
+	- Restored the layout template feature which went MIA on 0.05
+	- Broadened the documentation for the layout template feature
+	  and macro functions
+	- Made the utility functions available in templates natively again
+	- Added documentation for all modules and methods
+	- Fixed bug when preprocessing templates
+	- Made a test script (not yet an actual CPAN test)
+	- Cleaned distro files
+
+0.052	2010-02-19 01:06:00
+	- Pointless update to remove git files from the release
+
+0.051	2010-02-18 18:51:00
+	- Fixed 'use of uninitialized value' warnings caused by $lspace and $rspace
+	- Removed references to pltenjin which caused the Makefile to fail
+
+0.05	2010-02-18 12:35:00
+	- Revised code structure, Tenjin::Engine is now just Tenjin
+	- Much faster template compilation
+	- Not backwards compatible with previous versions!
+
+0.04	2009-08-01 18:00:00
+	- Fixed some typos in the documentation
+	- Added the ability to set the encoding of templates
+	- USE_STRICT can now also be set by Tenjin::Engine->new()
+	- Added a little more documentation
+
+0.031	2009-07-27 23:30:00
+	- Fixed bad links in all the modules.
+	- Added the command line application to the distribution.
+	- Added the MIT license file to the distribution.
+
+0.03    2009-07-26 20:20:00
+    - Initial release adapted from plTenjin's original 0.0.2 source.

@@ -1,0 +1,19 @@
+top=reg:[% top_var %],meta:{% top_meta_var %}
+
+null={% content_var %}
+
+== wrapper reg ==
+
+[% WRAPPER wrapper.tt %][% content_var %][% END %]
+
+
+
+== wrapper meta reg body ==
+
+{% WRAPPER wrapper.tt %}[% content_meta_reg_var %]{% END %}
+
+
+
+== wrapper meta ==
+
+{% WRAPPER wrapper.tt %}{% content_meta_var %}{% END %}

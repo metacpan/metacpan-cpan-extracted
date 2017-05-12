@@ -1,0 +1,104 @@
+This is an Overview Document showing how to properly use the
+Test::Presenter module that accompanies the Crucible project.
+
+Section 0: Index
+    Section 1: Minimum Requirements
+    Section 2: Installing Test::Presenter
+    Section 3: Configuration Files
+    Section 4: Common Usage
+    Section 5: Capabilities
+    Section 6: Known Bugs
+    Section 7: Questions and Comments
+
+
+Section 1: Minimum Requirements
+
+    See the INSTALL file for more information about Minimum Requirements.
+
+
+Section 2: Installing Test::Presenter
+
+    See the INSTALL file for more information about Installation.
+    
+
+Section 3: Configuration Files
+
+    Test::Presenter uses a few configuration files that are necessary to
+    produce practical results.  These configuration files are installed,
+    by default, into the /usr/share/Test-Presenter/templates folder.
+    Each template file was designed for a specific kind of results
+    analysis.  For example, the xyplot.tmpl file is best suited for
+    3-dimensional graphing, while the histogram.tmpl is great for
+    comparisons over time.  Each template file contains documentation on
+    how the file can be used, and how to properly create a configuration
+    file to utilize the given template. 
+
+
+Section 4: Common Usage
+
+    While configuration files are necessary, the following text can be
+    used to create a script capable of utilizing the most common
+    features available through Test::Presenter.
+
+    #!/usr/bin/perl -w
+
+    use strict;
+    use warnings;
+    use Test::Presenter;
+
+    my $report = new Test::Presenter;
+
+    my $opt_debug = 0;
+
+    $re->set_debug($opt_debug);
+
+    $re->open_db("/results", "test-Presenter.dbxml");
+
+    $re->add_doc("/results", "result_log_1.trpi", "500");
+    $re->open_template("/usr/share/Test-Presenter/templates", "table.tmpl");
+    $re->open_config("/results", "test.config");
+    $re->process();
+    $re->query_with_template("500");
+
+    $re->save_query("/home/username", "query.test");
+
+    $re->close();
+    
+
+Section 5: Capabilities
+
+    The follow is a (non-exhaustive) list of what Test::Presenter is currently
+    capable of.  These features will probably be the most commonly used.
+    
+	- Query by file (this bypasses the configuration scripts and templates) to
+	  allow querying the DBXml object directly while still allowing the use of
+	  other Test::Presenter methods
+	  
+	- Plaintext definitions in Configuration files override 'replacement'
+	  definitions which are specified in Template files.  This allows a given
+	  configuration file to "hard code" certain values to be used in the final
+	  results output.
+	  
+	- Queries can be executed on individual documents instead of the whole DB.
+	  Allowing specific documents to be queried makes the DBXml file more
+	  robust.  For example, a DBXml file may contain all results from one kind
+	  of test.  Querying the whole DB might not be desired if results are only
+	  needed for the last 5 tests, for example.
+	  
+
+Section 6: Known Bugs
+
+    At this time, the following bugs are known to exist in Test::Presenter:
+
+     - query configuration files must be well formed, otherwise queries will
+       not be executed correctly and results will not be returned as desired.
+
+     - DbXml can be a challenge to install.  Possibly use of Xindice or
+       another XML db should be investigated.
+
+
+Section 7: Questions and Comments
+
+    Any questions and/or comments can be directed to the crucible-devel
+    mailing list: crucible-devel@lists.sourceforge.net
+

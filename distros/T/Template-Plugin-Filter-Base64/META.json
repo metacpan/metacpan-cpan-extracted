@@ -1,0 +1,81 @@
+{
+   "abstract" : "encoding b64 filter for Template Toolkit",
+   "author" : [
+      "bbon <bbon@mail.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.8",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Plugin-Filter-Base64",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "HTML::Entities" : "0",
+            "MIME::Base64" : "0",
+            "Template" : "0",
+            "Template::Plugin::Filter" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Plugin::Filter::Base64" : {
+         "file" : "lib/Template/Plugin/Filter/Base64.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bbon/Template-Plugin-Filter-Base64/issues"
+      },
+      "homepage" : "https://github.com/bbon/Template-Plugin-Filter-Base64",
+      "repository" : {
+         "url" : "git://github.com/bbon/Template-Plugin-Filter-Base64.git",
+         "web" : "https://github.com/bbon/Template-Plugin-Filter-Base64"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:BBON",
+   "x_contributors" : [
+      "mr.bbon <nu@nu-nu.ru>"
+   ]
+}

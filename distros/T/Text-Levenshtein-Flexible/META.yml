@@ -1,0 +1,24 @@
+---
+abstract: 'XS Levenshtein distance calculation with bounds and costs'
+author:
+  - 'Matthias Bethke <matthias@towiski.de>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::Exception: 0
+  Test::LeakTrace: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Levenshtein-Flexible
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.008008
+version: 0.09

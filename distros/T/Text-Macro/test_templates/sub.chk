@@ -1,0 +1,17 @@
+pre subs
+
+before call sub1
+inside sub1
+more
+
+between sub1, sub2
+
+inside sub2
+even more
+
+between sub2, sub1
+
+inside sub1
+more
+
+done

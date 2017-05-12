@@ -1,0 +1,30 @@
+
+Changes from NSP version 0.71 to 0.73
+-------------------------------------
+
+Mahesh Joshi, joshi031@d.umn.edu
+University of Minnesota, Duluth
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+
+August 9, 2005
+
+
+Programs
+--------
+	Made file references platform independent through the use of the 
+	File and Config modules, rather than hard-coding paths with Unix 
+	style names. Affects all files in /Meassures and statistic.pl. 
+	Note that we may need to change this yet again, if we decide to 
+	have modules found in a more standard way (using PERL5LIB). Right
+	now modules are looked for in the PATH, which is somewhat 
+	non-standard. 						(Mahesh)
+
+Documentation
+-------------
+	
+	Expanded documentation for log-likelihood ratio to provide a
+	definition, and clarified phi documentation to point out that
+	in fact it is phi^2. Also clarified documentation for Pearson's
+	test. 							(Ted)

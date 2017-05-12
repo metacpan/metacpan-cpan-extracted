@@ -1,0 +1,433 @@
+NAME
+    Text::ASCIITable - Create a nice formatted table using ASCII characters.
+
+SHORT DESCRIPTION
+    Pretty nifty if you want to output dynamic text to your console or other
+    fixed-size-font displays, and at the same time it will display it in a
+    nice human-readable, or "cool" way.
+
+SYNOPSIS
+      use Text::ASCIITable;
+      $t = Text::ASCIITable->new({ headingText => 'Basket' });
+  
+      $t->setCols('Id','Name','Price');
+      $t->addRow(1,'Dummy product 1',24.4);
+      $t->addRow(2,'Dummy product 2',21.2);
+      $t->addRow(3,'Dummy product 3',12.3);
+      $t->addRowLine();
+      $t->addRow('','Total',57.9);
+      print $t;
+  
+      # Result:
+      .------------------------------.
+      |            Basket            |
+      +----+-----------------+-------+
+      | Id | Name            | Price |
+      +----+-----------------+-------+
+      |  1 | Dummy product 1 |  24.4 |
+      |  2 | Dummy product 2 |  21.2 |
+      |  3 | Dummy product 3 |  12.3 |
+      +----+-----------------+-------+
+      |    | Total           |  57.9 |
+      '----+-----------------+-------'
+
+FUNCTIONS
+  new(options)
+    Initialize a new table. You can specify output-options. For more
+    options, check out the usage for setOptions()
+
+      Usage:
+      $t = Text::ASCIITable->new();
+
+      Or with options:
+      $t = Text::ASCIITable->new({ hide_Lastline => 1, reportErrors => 0});
+
+  setCols(@cols)
+    Define the columns for the table(compare with <TH> in HTML). For example
+    "setCols(['Id','Nick','Name'])". Note that you cannot add Cols after you
+    have added a row. Multiline columnnames are allowed.
+
+  addRow(@collist)
+    Adds one row to the table. This must be an array of strings. If you
+    defined 3 columns. This array must have 3 items in it. And so on. Should
+    be self explanatory. The strings can contain newlines.
+
+      Note: It does not require argument to be an array, thus;
+      $t->addRow(['id','name']) and $t->addRow('id','name') does the same thing.
+
+    This module is also overloaded to accept push. To construct a table with
+    the use of overloading you might do the following:
+
+      $t = Text::ASCIITable->new();
+      $t->setCols('one','two','three','four');
+      push @$t, ( "one\ntwo" ) x 4; # Replaces $t->addrow();
+      print $t;                     # Replaces print $t->draw();
+  
+      Which would construct:
+       .-----+-----+-------+------.
+       | one | two | three | four |
+       |=----+-----+-------+-----=|
+       | one | one | one   | one  |  # Note that theese two lines
+       | two | two | two   | two  |  # with text are one singe row.
+       '-----+-----+-------+------'
+
+    There is also possible to give this function an array of arrayrefs and
+    hence support the output from DBI::selectall_arrayref($sql) without
+    changes.
+
+      Example of multiple-rows pushing:
+      $t->addRow([
+        [ 1, 2, 3 ],
+        [ 4, 5, 6 ],
+        [ 7, 8, 9 ],
+      ]);
+
+  addRowLine([$row])
+    Will add a line after the current row. As an argument, you may specify
+    after which row you want a line (first row is 1) or an array of row
+    numbers. (HINT: If you want a line after every row, read about the
+    drawRowLine option in setOptions())
+
+    Example without arguments: $t->addRow('one','two','three');
+    $t->addRowLine(); $t->addRow('one','two','three');
+
+    Example with argument: $t->addRow('one','two','three');
+    $t->addRow('one','two','three'); $t->addRow('one','two','three');
+    $t->addRow('one','two','three'); $t->addRowLine(1); # or multiple:
+    $t->addRowLine([2,3]);
+
+  alignCol($col,$direction) or alignCol({col1 => direction1, col2 => direction2, ... })
+    Given a columnname, it aligns all data to the given direction in the
+    table. This looks nice on numerical displays in a column. The column
+    names in the table will be unaffected by the alignment. Possible
+    directions is: left, center, right, justify, auto or your own
+    subroutine. (Hint: Using auto(default), aligns numbers right and text
+    left)
+
+  alignColName($col,$direction)
+    Given a columnname, it aligns the columnname in the row explaining
+    columnnames, to the given direction. (auto,left,right,center,justify or
+    a subroutine) (Hint: Overrides the 'alignHeadRow' option for the
+    specified column.)
+
+  setColWidth($col,$width,$strict)
+    Wordwrapping/strict size. Set a max-width(in chars) for a column. If
+    last parameter is 1, the column will be set to the specified width, even
+    if no text is that long.
+
+     Usage:
+      $t->setColWidth('Description',30);
+
+  getTableWidth()
+    If you need to know how wide your table will be before you draw it. Use
+    this function.
+
+  setOptions(name,value) or setOptions({ option1 => value1, option2 => value2, ... })
+    Use this to set options like: hide_FirstLine,reportErrors, etc.
+
+      Usage:
+      $t->setOptions('hide_HeadLine',1);
+  
+      Or set more than one option on the fly:
+      $t->setOptions({ hide_HeadLine => 1, hide_HeadRow => 1 });
+
+    Possible Options
+
+    hide_HeadRow
+        Hides output of the columnlisting. Together with hide_HeadLine, this
+        makes a table only show the rows. (However, even though the
+        column-names will not be shown, they will affect the output if they
+        have for example ridiculoustly long names, and the rows contains
+        small amount of info. You would end up with a lot of whitespace)
+
+    reportErrors
+        Set to 0 to disable error reporting. Though if a function encounters
+        an error, it will still return the value 1, to tell you that things
+        didn't go exactly as they should.
+
+    allowHTML
+        If you are going to use Text::ASCIITable to be shown on HTML pages,
+        you should set this option to 1 when you are going to use HTML tags
+        to for example color the text inside the rows, and you want the
+        browser to handle the table correct.
+
+    allowANSI
+        If you use ANSI codes like <ESC>[1mHi this is bold<ESC>[m or
+        similar. This option will make the table to be displayed correct
+        when showed in a ANSI compliant terminal. Set this to 1 to enable.
+        There is an example of ANSI support in this package, named
+        ansi-example.pl.
+
+    alignHeadRow
+        Set wich direction the Column-names(in the headrow) are supposed to
+        point. Must be left, right, center, justify, auto or a user-defined
+        subroutine.
+
+    hide_FirstLine, hide_HeadLine, hide_LastLine
+        Speaks for it self?
+
+    drawRowLine
+        Set this to 1 to print a line between each row. You can also define
+        the outputstyle of this line in the draw() function.
+
+    headingText
+        Add a heading above the columnnames/rows wich uses the whole width
+        of the table to output a heading/title to the table. The
+        heading-part of the table is automatically shown when the
+        headingText option contains text. Note: If this text is so long that
+        it makes the table wider, it will not hesitate to change width of
+        columns that have "strict width".
+
+        It supports multiline, and with Text::ASCIITable::Wrap you may wrap
+        your text before entering it, to prevent the title from expanding
+        the table. Internal wrapping-support for headingText might come in
+        the future.
+
+    headingAlign
+        Align the heading(as mentioned above) to left, right, center, auto
+        or using a subroutine.
+
+    headingStartChar, headingStopChar
+        Choose the startingchar and endingchar of the row where the title
+        is. The default is '|' on both. If you didn't understand this, try
+        reading about the draw() function.
+
+    cb_count
+        Set the callback subroutine to use when counting characters inside
+        the table. This is useful to make support for having characters or
+        codes inside the table that are not shown on the screen to the user,
+        so the table should not count these characters. This could be for
+        example HTML tags, or ANSI codes. Though those two examples are
+        alredy supported internally with the allowHTML and allowANSI,
+        options. This option expects a CODE reference. (\&callback_function)
+
+    undef_as
+        Sets the replacing string that replaces an undef value sent to
+        addRow() (or even the overloaded push version of addRow()). The
+        default value is an empty string ''. An example of use would be to
+        set it to '(undef)', to show that the input really was undefined.
+
+    chaining
+        Set this to 1 to support chainging of methods. The default is 0,
+        where the methods return 1 if they come upon an error as mentioned
+        in the reportErrors option description.
+
+          Usage example:
+          print Text::ASCIITable->new({ chaining => 1 })
+            ->setCols('One','Two','Three')
+            ->addRow([
+              [ 1, 2, 3 ],
+              [ 4, 5, 6 ],
+              [ 7, 8, 9 ],
+              ])
+            ->draw();
+
+        Note that ->draw() can be omitted, since Text::ASCIITable is
+        overloaded to print the table by default.
+
+  draw([@topdesign,@toprow,@middle,@middlerow,@bottom,@rowline])
+    All the arrays containing the layout is optional. If you want to make
+    your own "design" to the table, you can do that by giving this method
+    these arrays containing information about which characters to use where.
+
+    Custom tables
+
+    The draw method takes 6 arrays of strings to define the layout. The
+    first, third, fifth and sixth is LINE layout and the second and fourth
+    is ROW layout. The "fourth" parameter is repeated for each row in the
+    table. The sixth parameter is only used if drawRowLine is enabled.
+
+     $t->draw(<LINE>,<ROW>,<LINE>,<ROW>,<LINE>,[<ROWLINE>])
+
+    LINE
+        Takes an array of 4 strings. For example "['|','|','-','+']"
+
+        *   LEFT - Defines the left chars. May be more than one char.
+
+        *   RIGHT - Defines the right chars. May be more then one char.
+
+        *   LINE - Defines the char used for the line. Must be only one
+            char.
+
+        *   DELIMETER - Defines the char used for the delimeters. Must be
+            only one char.
+
+    ROW Takes an array of 3 strings. You should not give more than one char
+        to any of these parameters, if you do.. it will probably destroy the
+        output.. Unless you do it with the knowledge of how it will end up.
+        An example: "['|','|','+']"
+
+        *   LEFT - Define the char used for the left side of the table.
+
+        *   RIGHT - Define the char used for the right side of the table.
+
+        *   DELIMETER - Defines the char used for the delimeters.
+
+    Examples:
+
+    The easiest way:
+
+     print $t;
+
+    Explanatory example:
+
+     print $t->draw( ['L','R','l','D'],  # LllllllDllllllR
+                     ['L','R','D'],      # L info D info R
+                     ['L','R','l','D'],  # LllllllDllllllR
+                     ['L','R','D'],      # L info D info R
+                     ['L','R','l','D']   # LllllllDllllllR
+                    );
+
+    Nice example:
+
+     print $t->draw( ['.','.','-','-'],   # .-------------.
+                     ['|','|','|'],       # | info | info |
+                     ['|','|','-','-'],   # |-------------|
+                     ['|','|','|'],       # | info | info |
+                     [' \\','/ ','_','|'] #  \_____|_____/
+                    );
+
+    Nice example2:
+
+     print $t->draw( ['.=','=.','-','-'],   # .=-----------=.
+                     ['|','|','|'],         # | info | info |
+                     ['|=','=|','-','+'],   # |=-----+-----=|
+                     ['|','|','|'],         # | info | info |
+                     ["'=","='",'-','-']    # '=-----------='
+                    );
+
+    With Options:
+
+     $t->setOptions('drawRowLine',1);
+     print $t->draw( ['.=','=.','-','-'],   # .=-----------=.
+                     ['|','|','|'],         # | info | info |
+                     ['|-','-|','=','='],   # |-===========-|
+                     ['|','|','|'],         # | info | info |
+                     ["'=","='",'-','-'],   # '=-----------='
+                     ['|=','=|','-','+']    # rowseperator
+                    );
+     Which makes this output:
+       .=-----------=.
+       | col1 | col2 |
+       |-===========-|
+       | info | info |
+       |=-----+-----=| <-- rowseperator between each row
+       | info | info |
+       '=-----------='
+
+    A tips is to enable allowANSI, and use the extra charset in your
+    terminal to create a beautiful table. But don't expect to get good
+    results if you use ANSI-formatted table with $t->drawPage.
+
+    User-defined subroutines for aligning
+
+    If you want to format your text more throughoutly than "auto", or think
+    you have a better way of aligning text; you can make your own
+    subroutine.
+
+      Here's a exampleroutine that aligns the text to the right.
+  
+      sub myownalign_cb {
+        my ($text,$length,$count,$strict) = @_;
+        $text = (" " x ($length - $count)) . $text;
+        return substr($text,0,$length) if ($strict);
+        return $text;
+      }
+
+      $t->alignCol('Info',\&myownalign_cb);
+
+    User-defined subroutines for counting
+
+    This is a feature to use if you are not happy with the internal
+    allowHTML or allowANSI support. Given is an example of how you make a
+    count-callback that makes ASCIITable support ANSI codes inside the
+    table. (would make the same result as setting allowANSI to 1)
+
+      $t->setOptions('cb_count',\&myallowansi_cb);
+      sub myallowansi_cb {
+        $_=shift;
+        s/\33\[(\d+(;\d+)?)?[musfwhojBCDHRJK]//g;
+        return length($_);
+      }
+
+  drawPage($page,@topdesign,@toprow,@middle,@middlerow,@bottom,@rowline)
+    If you don't want your table to be wider than your screen you can use
+    this with $t->setOptions('outputWidth',40) to set the max size of the
+    output.
+
+    Example:
+
+      $t->setOptions('outputWidth',80);
+      for my $page (1..$t->pageCount()) {
+        print $t->drawPage($page)."\n";
+        print "continued..\n\n";
+      }
+
+FEATURES
+    In case you need to know if this module has what you need, I have made
+    this list of features included in Text::ASCIITable.
+
+    Configurable layout
+        You can easily alter how the table should look, in many ways. There
+        are a few examples in the draw() section of this documentation. And
+        you can remove parts of the layout or even add a heading-part to the
+        table.
+
+    Text Aligning
+        Align the text in a column auto(matically), left, right, center or
+        justify. Usually you want to align text to right if you only have
+        numbers in that row. The 'auto' direction aligns text to left, and
+        numbers to the right. The 'justify' alignment evens out your text on
+        each line, so the first and the last word always are at the
+        beginning and the end of the current line. This gives you the
+        newspaper paragraph look. You can also use your own subroutine as a
+        callback-function to align your text.
+
+    Multiline support in rows
+        With the \n(ewline) character you can have rows use more than just
+        one line on the output. (This looks nice with the drawRowLine option
+        enabled)
+
+    Wordwrap support
+        You can set a column to not be wider than a set amount of
+        characters. If a line exceedes for example 30 characters, the line
+        will be broken up in several lines.
+
+    HTML support
+        If you put in <HTML> tags inside the rows, the output would usually
+        be broken when viewed in a browser, since the browser "execute" the
+        tags instead of displaying it. But if you enable allowHTML. You are
+        able to write html tags inside the rows without the output being
+        broken if you display it in a browser. But you should not mix this
+        with wordwrap, since this could make undesirable results.
+
+    ANSI support
+        Allows you to decorate your tables with colors or bold/underline
+        when you display your tables to a terminal window.
+
+    Page-flipping support
+        If you don't want the table to get wider than your terminal-width.
+
+    Errorreporting
+        If you write a script in perl, and don't want users to be notified
+        of the errormessages from Text::ASCIITable. You can easily turn of
+        error reporting by setting reportErrors to 0. You will still get an
+        1 instead of undef returned from the function.
+
+REQUIRES
+    Exporter, Carp
+
+AUTHOR
+    Håkon Nessjøen, <lunatic@cpan.org>
+
+VERSION
+    Current version is 0.22.
+
+COPYRIGHT
+    Copyright 2002-2011 by Håkon Nessjøen. All rights reserved. This module
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+SEE ALSO
+    Text::FormatTable, Text::Table, Text::SimpleTable
+

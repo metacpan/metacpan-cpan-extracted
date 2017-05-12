@@ -1,0 +1,42 @@
+Text::Tree version 1.0
+======================
+
+The Text::Tree module allows the caller to develop a tree structure,
+using nested arrays of strings and references.  Once developed, the whole
+tree can be printed as a diagram in text characters, with the root of the
+tree at the top, and child nodes formatted horizontally below them.
+ 
+        +----+
+        |root|
+        +----+
+      .---^---.
+    +----+ +-----+
+    |left| |right|
+    |node| +-----+
+    +----+  .-^-.
+           +-+ +-+
+           |1| |2|
+           +-+ +-+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only stock modules such as warnings and strict.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003-2004 by Ron Isaacson
+Portions Copyright 2003 by Mark Jason Dominus
+Portions Copyright 2004 by Ed Halley
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

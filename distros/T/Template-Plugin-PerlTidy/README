@@ -1,0 +1,61 @@
+NAME
+    Template::Plugin::PerlTidy - Perl::Tidy filter for Template Toolkit
+
+SYNOPSIS
+     # HTML Syntax Coloring, no reformatting
+
+     [% USE PerlTidy 'html' 'nnn' 'pre' %]
+     [% FILTER $PerlTidy %]
+       #!/usr/bin/perl -w
+       use strict;
+       my@foo=(1,2,'a',4);
+       for(1,3,5){print" $_\n"}my     %hash =( 1=>'foo',foo=>'bar',);
+     [% END %]
+
+     # Chained filter, code reformatting and syntax coloring
+
+     [%- USE PerlTidy -%]
+     [%- FILTER $PerlTidy 'html' 'nnn' -%]
+        [%- FILTER $PerlTidy i=10 -%]
+           ... perl code goes here ... 
+        [%- END -%]
+     [%- END -%]
+
+DESCRIPTION
+    This modules is a Template Toolkit Filter for Perl::Tidy. It can be used
+    to automatically display coloured and formatted perl code in web pages.
+
+OPTIONS
+    All the options available in perltidy should be also available in this
+    plugin.
+
+    The options defined in Perl::Tidy::perltidy() are also supported
+    ("stderr", "perltidyrc", "logfile", "errorfile"). The "source" and
+    <destination> options are handled by the filter.
+
+    By default, the "quiet" option is turned on, but you can disable it
+    using the "verbose" option.
+
+    Note that options which does not take any arguments (like -html or -pre)
+    should be enclosed in quotes (i.e. "[% USE PerlTidy 'html' %]"), and
+    options which take an argument are not enclosed in quotes (i.e. "[% USE
+    PerlTidy i=8 %]").
+
+BUGS
+    Please report any bugs or comments using the Request Tracker interface:
+    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template%3A%3APlugin%3A
+    %3APerlTidy>
+
+AUTHOR
+    Briac Pilpré <briac@cpan.org>
+
+    Thanks to Steve Hancock for PerlTidy
+
+    Thanks to BooK and echo for their help.
+
+COPYRIGHT
+    This module is distributed under the same terms as perl itself.
+
+SEE ALSO
+    Template::Plugin::Filter, Perl::Tidy
+

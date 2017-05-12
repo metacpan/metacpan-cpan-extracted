@@ -1,0 +1,15 @@
+[% USE IO.All %]
+[% f = IO.All.new( 't/data') %]
+
+File name	[% f.name %]
+File name only	[% f.filename %]
+UID		[% f.uid %]
+Size		[% f.size %]
+Absolute Path	[% f.absolute %]
+Line		[% f.1 %]
+Content		[% f.all %]
+
+[% d = IO.All.new( 't/') %]
+[% FOREACH entry = d.all %]
+[%- entry %]
+[% END %]

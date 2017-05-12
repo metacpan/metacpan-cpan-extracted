@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Tk-PerlInheritanceTree
+version:             0.05
+abstract:            Display a graphical representation of the inheritance tree for a given class-name.
+license:             perl
+author:              
+    - Christoph Lamprecht <lamprecht@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.38
+distribution_type:   module
+requires:     
+    Class::Inspector:              1.17
+    Tk:                            804.027
+    Tk::GraphItems::Connector:     0.01
+    Tk::GraphItems::TextBox:       0.01
+    Tk::NumEntry:                  2.06
+    Tk::PerlMethodList:            0.01
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

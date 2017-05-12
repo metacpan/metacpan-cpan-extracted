@@ -1,0 +1,111 @@
+2010-04-03  Russ Allbery  <rra@stanford.edu>
+
+	* ShadowHash.pm: Tie::ShadowHash 1.0 released.
+
+	* Makefile.PL: Change the dist name to Tie-ShadowHash.  Use angle
+	brackets for my e-mail address.  Set the LICENSE parameter for
+	Perl 5.10 or later.
+
+	* t/pod.t: Test syntactic validity of POD documentation.
+	* t/pod-spelling.t: Test spelling in POD documentation, but only
+	for maintainers.
+	* ShadowHash.pm: Add stopwords for spelling checks.
+
+	* ShadowHash.pm (FETCH): Correctly return undef if undef was
+	explicitly stored in the hash.
+	* t/basic.t: Test handling of explicit stores of undef values.
+
+	* t/basic.t: Add some tests for the scalar value of the hash.
+
+	* ShadowHash.pm: Add explicit documentation for the add() method.
+	Mention that AnyDBM_File doesn't support EXISTS since some of its
+	underlying modules don't.
+
+	* ShadowHash.pm (NEXTKEY): When traversing the hash, adjust for
+	keys that are shadowed by earlier hashes or by the override hash.
+	Previously, keys that occurred in multiple sources or in the
+	override hash would be returned multiple times by each.
+
+	* t/basic.t: Test correct override handling on each.
+
+	* test.pl: Moved to...
+	* t/basic.t: ...here and rewritten to use Test::More.  Moved all
+	test data from test to t/data.
+
+	* ShadowHash.pm: Require Perl 5.006 or later.  Use the three
+	argument form of open and declare iterator variables in for
+	statements.  Clean up coding style for explicit return and
+	dereferencing.
+
+2002-07-27  Russ Allbery  <rra@stanford.edu>
+
+	* README: Tie::ShadowHash 0.7 released.
+
+	* ShadowHash.pm: Add SEE ALSO and COPYRIGHT AND LICENSE sections
+	to the documentation.  Reformat for current formatting style.
+
+1999-06-02  Russ Allbery  <rra@stanford.edu>
+
+	* README: Tie::ShadowHash 0.6 released.
+
+	* ShadowHash.pm: Added documentation of tagged data sources and of
+	the "text" tagged data source in particular, as well as some
+	examples, now that this has been verified as already working.
+
+	* test.pl: Added tests for special text data sources that take a
+	filename and a sub that returns a list of key and one or more
+	values.
+
+	* test/pairs.txt: New file.
+	* test/triples.txt: New file.
+
+1999-04-03  Russ Allbery  <rra@stanford.edu>
+
+	* README: Tie::ShadowHash 0.5 released.
+
+	* ShadowHash.pm: Fixed NEXTKEY again; it was skipping over too
+	much of the source when it hit a deleted key.
+
+	* test.pl: Added a test to ensure that deleted keys don't show up
+	in the keys of the shadow hash.
+
+	* ShadowHash.pm: Added some comments to the tied hash section of
+	the code, fixed a bug in NEXTKEY where it didn't skip past entries
+	that had been deleted.
+
+	* test.pl: Switched from using SDBM_File to using AnyDBM_File
+	since for some reason SDBM isn't built on the Mac port.  Also
+	switched to building the DBM on the fly before running any tests,
+	since a lot of DBMs, including SDBM, are byte-order-dependent.
+
+	* test/first.txt: New file.
+	* test/first.dir: Removed.
+	* test/first.pag: Removed.
+
+1999-03-22  Russ Allbery  <rra@stanford.edu>
+
+	* README: Tie::ShadowHash 0.3 released.
+
+	* TODO: New file.
+
+	* ShadowHash.pm: [Revision 0.3] Added documentation.
+
+	* test/first.dir: New file.
+	* test/first.pag: New file.
+	* test/full: New file.
+	* test/second.txt: New file.
+
+	* test.pl: New file.
+
+	* Makefile.PL: New file.
+
+	* ShadowHash.pm: [Revision 0.2] Don't use exists when finding a
+	key in the databases, since some tied databases can't handle it
+	such as ODBM, NDBM, and SDBM without my patch.  This means that
+	keys with undefined values don't correctly override later
+	identical keys with defined values.  *sigh*  Also, make add()
+	return true.
+
+1999-03-21  Russ Allbery  <rra@stanford.edu>
+
+	* ShadowHash.pm: [Revision 0.1] New file.

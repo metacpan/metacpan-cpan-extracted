@@ -1,0 +1,103 @@
+\documentclass[a4paper,11pt]{book}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{verse} % .Bl -t verse
+\usepackage{graphicx} % .Im
+\usepackage{verbatim} % .Bd -t literal
+\usepackage[linkcolor=blue]{hyperref} % .Lk and .Im
+\usepackage{minitoc} % .Tc -mini
+
+% metadata for title page
+\title{title}
+\author{author}
+\date{date}
+\begin{document}
+\maketitle
+\setcounter{tocdepth}{0}
+\tableofcontents
+\includegraphics{t/data-dirs/img/image.png}
+
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+\label{s:1}
+Text.
+\hypertarget{label1}{\emph{Emphasized text with a label}}.
+
+\part{Part1}
+\label{s:2}
+\setcounter{tocdepth}{0}
+\minitoc
+\chapter{Chap1}
+\label{s:3}
+Text.
+
+\chapter{Chap2}
+\label{s:4}
+\setcounter{tocdepth}{3}
+\minitoc
+Text.
+
+\paragraph{Title of paragraph}
+Text.
+\begin{table}[htbp]
+\begin{tabular}{ll}
+a
+ & b
+ \\
+\end{tabular}
+\caption{Table1}
+\label{tbl:1}
+\end{table}
+
+Normal paragraph.
+
+\section{Section1}
+\label{s:5}
+Text.
+
+\subsection{Subsection1}
+\label{s:6}
+Text.
+
+\section{Section2}
+\label{s:7}
+Text.
+\begin{table}[htbp]
+\begin{tabular}{ll}
+c
+ & d
+ \\
+e
+ & f
+ \\
+\end{tabular}
+\caption{Table2}
+\label{tbl:2}
+\end{table}
+\subsection{Subsection2}
+\label{s:8}
+Text.
+
+\part{Part2}
+\label{s:9}
+\chapter{Chap3}
+\label{s:10}
+\setcounter{tocdepth}{3}
+\minitoc
+Text. Some cross-references:
+\hyperref[s:7]{Section2}
+\hyperref[s:3]{Chap1}
+\hyperref[s:9]{Part2}
+\hyperref[s:1]{Abstract}
+\hyperref[tbl:2]{Table2}
+\hyperlink{label1}{Link to emphasized text}
+
+\section{Section3}
+\label{s:11}
+Text.
+
+\setcounter{tocdepth}{3}
+\listoftables
+
+\end{document}

@@ -1,0 +1,76 @@
+Text::Tmpl - Fast templating library.
+
+Copyright
+=========
+
+Copyright (c) 1999 Web Juice, L.L.C.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself. 
+
+
+Description
+===========
+
+Text::Tmpl is a module for very fast templating. There are dozens of
+templating modules on CPAN, each only a tiny bit different from the
+others. This one is no different - what sets it aside is speed. The
+entire module is implemented as a C library, with only a thin XS/Perl
+layer to make the calls available from Perl. The same templates, then,
+can be used from either Perl or C/C++ programs.
+
+This was originally designed to completely isolate HTML programmers
+from module/CGI programmers, or at least completely separate logic
+from content in dynamic web applications. It is syntactically based on
+a similar system written by a friend of mine, Neil Mix, which was
+proprietary and exclusively written in Perl. It shares no code in
+common with this system, or any other.
+
+
+Prerequisites
+=============
+
+A C compiler and Perl 5.  Unix (and derivative) and Win32 systems are supported
+as of 0.24.
+
+
+Building
+========
+
+  # perl Makefile.PL
+  # make
+
+
+Installing
+==========
+
+  # make test
+  # make install
+
+The C library version is not built or installed by default.  If you want to
+use it, you can build install it by hand.  Something like this ought to work:
+
+  # ar cr libtmpl.a context.o default_tags.o nclist.o parser.o staglist.o \
+          tagplist.o template.o varlist.o tokens.o
+  # ranlib libtmpl.a
+  # cp libtmpl.a /usr/local/lib
+  # cp *.h /usr/local/include
+
+This is only intended as a guide; it may very well require modification for
+use on your system.
+
+
+Additional Information
+======================
+
+If you're using this module, let me know!  It's always fascinating to hear
+what uses people have found for it.
+
+There's a lot of example perl code in the t/ (test scripts) directory in
+this distribution.  There's also a little bit of example C and C++ code in
+the examples/ directory of the distribution.
+
+You can contact me directly at dlowe@saturn5.com.  I'm happy to answer any
+questions you might have.
+
+If there's enough demand, I will create a mailing list for discussion/support.
+Let me know if this interests you.

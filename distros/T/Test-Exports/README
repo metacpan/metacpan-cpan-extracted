@@ -1,0 +1,27 @@
+NAME
+
+    Test::Exports
+
+    A Perl module for testing modules' exports.
+
+INSTALLATION
+
+    While it is possible to install this module manually, by running
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+    the recommended procedure is to use CPAN.pm or one of the other
+    automated interfaces to the CPAN.
+
+DOCUMENTATION
+
+    Full documentation in POD form is available in the .pm files in the
+    distribution. After installation they can be read with perldoc in
+    the usual way.
+
+AUTHOR
+
+    Ben Morrow <ben@morrow.me.uk>

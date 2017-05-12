@@ -1,0 +1,10 @@
+Revision history for Perl extension Test::XML::Count.
+
+0.02  Thu Mar 13 13:57:27 2008
+	- Fixed perldocs. There were many typos :-/
+
+0.01  Thu Mar 13 13:57:27 2008
+	- original version; created by h2xs 1.23 with options
+		-XA -n Test::XML::Count
+	- A module to test element occurances at a given depth in an xml document
+

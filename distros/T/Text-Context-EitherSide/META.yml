@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Text-Context-EitherSide
+version:             1.4
+abstract:            Get n words either side of search keywords
+license:             ~
+author:              
+    - Tony Bowden <TMTM@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

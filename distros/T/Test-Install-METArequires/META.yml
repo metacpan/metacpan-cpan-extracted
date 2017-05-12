@@ -1,0 +1,36 @@
+---
+name: Test-Install-METArequires
+version: 0.03
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+abstract: TAP output of installing requires listed in META.yml
+license: perl
+resources:
+  bugtracker: http://github.com/jozef/Test-Install-METArequires/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jozef/Test-Install-METArequires.git
+build_requires:
+  Test::More: 0.82
+requires:
+  File::Basename: 0
+  IPC::Run: 0
+  Test::Builder: 0.82
+  YAML::Syck: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Test::Install::METArequires:
+    file: lib/Test/Install/METArequires.pm
+    version: 0.03
+  Test::iMETAr:
+    file: lib/Test/iMETAr.pm
+    version: 0.03
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keywords:
+  - test
+  - install
+  - META.yml
+  - requires

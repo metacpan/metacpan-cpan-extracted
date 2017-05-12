@@ -1,0 +1,22 @@
+NAME
+    Template::Plugin::Shuffle - TT Vmethods for shuffling lists
+
+SYNOPSIS
+      [% USE Shuffle %]
+      [% FOREACH item = items.shuffle %]
+      Name: [% item.name %]
+      [% END %]
+
+DESCRIPTION
+    Template::Plugin::Shuffle is a TT plugin to define Virtual Methods to
+    shuffle a list variable.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Algorithm::Numerical::Shuffle manpage, the Template manpage
+

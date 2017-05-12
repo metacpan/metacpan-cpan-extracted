@@ -1,0 +1,35 @@
+Test-Mimic-Generator
+=================================
+
+Test::Mimic::Generator converts recorded program behavior into executable Perl.
+It is part of the Test::Mimic suite.
+
+This should be considered an ALPHA release.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::Mimic::Library
+    Cwd
+    File::Copy
+    Data::Dumper
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Brendan Roof
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,25 @@
+Revision history for Test-PAUSE-Permissions
+
+0.06 2016/04/22
+  - added strict mode to prevent accidental addition of an indexable
+    module (for a large team)
+  - added an option not to ignore modules with an underscored version
+
+0.05 2014/04/11
+  - diagnosis if $AUTHORITY matches x_authority (if exists)
+  - requires Parse::LocalDistribution 0.08 to respect MANIFEST.SKIP
+    correctly
+
+0.04 2014/04/08
+  - changed to test permissions only for the author/releaser
+    (miyagawa++)
+
+0.03 2014/04/07
+  - make sure to compare pause ids in a case-insensitive way
+
+0.02 2014/04/07
+  - bumped up PAUSE::Permissions requirement to 0.09
+  - improved pod
+
+0.01 2014/04/07
+  - initial release

@@ -1,0 +1,76 @@
+{
+   "abstract" : "split text file to some parts(from one line start to another/same line end)",
+   "author" : [
+      "Ktat, C<< <ktat at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.4",
+   "license" : "gpl_1",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Parts",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "ExtUtils::MakeMaker" : "6.42",
+            "Test::More" : "0",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Parts" : {
+         "file" : "lib/Text/Parts.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ktat/Text-Parts/issues"
+      },
+      "homepage" : "https://github.com/ktat/Text-Parts",
+      "repository" : {
+         "url" : "git://github.com/ktat/Text-Parts.git",
+         "web" : "https://github.com/ktat/Text-Parts"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "ktat <ktat.is@gmail.com>"
+   ]
+}

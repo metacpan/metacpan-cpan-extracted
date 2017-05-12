@@ -1,0 +1,28 @@
+Build.PL
+Changes
+lib/Test/Dirs.pm
+MANIFEST			This list of files
+META.yml
+README
+t/01_Test-Dirs.t
+t/02_Test-Dirs-dir_cleanup_ok.t
+t/99_Synopsis.t
+t/fixme.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+t/tdirs/res3.1/exists
+t/tdirs/res3.1/f1/f2x/.exists
+t/tdirs/res3.2/exists
+t/tdirs/src1/123
+t/tdirs/src1/abc/zyx
+t/tdirs/src1/cba
+t/tdirs/src1/xxx
+t/tdirs/src2/abc/999
+t/tdirs/src2/abc/zyx
+t/tdirs/src2/cba/123
+t/tdirs/src2/xxx
+t/tdirs/src3/exists
+t/tdirs/src3/f1/f2/some-file
+t/tdirs/src3/f1/f2x/.exists
+SIGNATURE    Added here by Module::Build

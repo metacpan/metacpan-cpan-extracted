@@ -1,0 +1,52 @@
+{
+   "abstract" : "Wrap text into chunks of similar length",
+   "author" : [
+      "Steven Schubiger <schubiger@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Wrap-Smart",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::BigFloat" : "0",
+            "Params::Validate" : "0",
+            "boolean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Wrap::Smart" : {
+         "file" : "lib/Text/Wrap/Smart.pm",
+         "version" : "0.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/stsc/Text-Wrap-Smart"
+      }
+   },
+   "version" : "0.7",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

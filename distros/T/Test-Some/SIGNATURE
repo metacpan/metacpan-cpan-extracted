@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 479d69e8f38c623dc0f43d6152f43c1469df101d AUTHOR_PLEDGE
+SHA1 998a0267c97e2e353e4006f428293b7e5ad6aa07 Changes
+SHA1 414022aed92070111bafd527e0c0bde5a15d21a1 INSTALL
+SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
+SHA1 5e9500bc1ec9bef29244deea36849bcb0a3b3a2c MANIFEST
+SHA1 6cab3eb3e4d10667cc3877a3a6e366f14ab4e7b1 META.json
+SHA1 cd0a92a871077a031a93e951e41427f91491b85e META.yml
+SHA1 5f96a4ed82be1fcc4561a3596d9fd67905f84fb3 Makefile.PL
+SHA1 72dac2c9c960d570302351dc018deece2fecd862 README.mkdn
+SHA1 dbb351fb1b2a7b4f8fe86f581686fed7cbd3a0de cpanfile
+SHA1 4fb4068621233f8b6fbccbed417d107b9bdc8445 doap.xml
+SHA1 835792853c953e53731162e480a1d2db99f54ee6 lib/Test/Some.pm
+SHA1 0c37f9e2a3e18103f024e20d4117fe98f0f4fc65 t/00-compile.t
+SHA1 91bb3c9d92c6e83f4331b8a9ae68896d5be41d25 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 c34b1c64b5480f8b019b0f040e09d9f1e5e8472f t/basic.t
+SHA1 90282390900e18cffbc1d6d6be4cc78af41eea12 t/bypass.t
+SHA1 ae25f53c88d98180026b65633954fec6a32d0e4f t/env-variable.t
+SHA1 b24727302ba7f3e9475e581d1a5dbda849294acb t/mix.t
+SHA1 191eaa8e4bff757704afa28400b80c56ae4a9eff t/negation.t
+SHA1 b860dbda97f594019c5e0d83e939b40f2e570f68 t/no-monkeypatch.t
+SHA1 cc5e4065bdabcf1237baaffebea90eab28762dd9 t/regex.t
+SHA1 e7fbbe571a14f030de3f90ac67d7eff350b24e68 t/sub.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAliuVfEACgkQ34Hwf+GwC4wY5gCff7w6Rb0vdx+TOGuW9Ou+CqeZ
+1F8AoOWNszU270DUc/fwKkd4/lcZtneP
+=0LfE
+-----END PGP SIGNATURE-----

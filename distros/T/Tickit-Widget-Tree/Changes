@@ -1,0 +1,149 @@
+Revision history for Tickit-Widget-Tree
+
+0.114     2015-02-06 19:37:36+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Ensure we always report our keypress events as handled, to avoid focus leakage
+
+0.113     2015-02-04 01:39:21+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Remove some stray warnings
+
+0.112     2015-01-25 18:08:12+00:00 Europe/London
+	Features:
+	* ->add_node_under_parent to allow adding complex data structures - this is an extension
+	of the handling that we already had in place for ->new(data => ...)
+
+	Bug fixes:
+	* Scalar::Util wasn't being loaded, needed for blessed()
+	* Supports 0 or '' as the single item to add in ->new(data => 0)
+
+	Dependencies:
+	* Log::Any, used for flagging exceptions that weren't previously being reported (eventually
+	this will be used for tracing when debug/verbose flags are enabled, since Tickit::Debug hooks
+	are better suited to Tickit core features)
+
+0.111     2015-01-25 15:45:07+00:00 Europe/London
+	Features:
+	* Support Adapter::Async::OrderedList instances in initial data structure
+
+0.110     2015-01-25 15:05:27+00:00 Europe/London
+	Features:
+	* Ability to attach Adapter::Async::OrderedList instances to nodes, for live updates
+
+0.109     2015-01-24 14:05:05+00:00 Europe/London
+	Features:
+	* Cursor is now hidden by default
+	* Rendering changes - root node has a vertical line off the top
+	of the window, and nodes with no children have a half-width
+	joining line.
+
+0.108     2014-08-30 02:15:42+01:00 Europe/London
+	Features:
+	* Provides ->position_adapter for monitoring current tree position
+
+	Dependencies:
+	* Dropped Term::Termkey dependency which was previously used for
+	the "control" modifier key (now available directly from Tickit).
+
+0.107     2014-08-23 02:34:40+01:00 Europe/London
+	Features:
+	* Support data => [ ... ] option for constructing
+	initial tree layout
+
+0.106     2014-08-23 01:44:55+01:00 Europe/London
+	No new features.
+
+	Dependency fixes:
+	* Add Term::TermKey and Tickit::Widget.
+
+0.105     2014-08-20 21:14:52+01:00 Europe/London
+	No new features.
+
+	Bug fixes:
+	* Dropped a stray 'warn' line.
+
+0.103     2013-09-28 20:07:44 Europe/London
+	No new features.
+
+	Bug fixes:
+	* Enter key wasn't activating the highlighted node
+	* Updated Dist::Zilla::Plugin::Test::Compile for RT88783
+
+0.102     2013-09-15 18:48:14 Europe/London
+	New features:
+	* Provide a default Tree::DAG_Node object if not specified in the
+	constructor.
+	* Allow separate label and toggle button (+/-) styles
+
+	Bug fixes:
+	* Fixed some rendering glitches
+	* Don't allow root highlight, since it's never visible
+
+0.101     2013-09-14 01:28:37 Europe/London
+	New features:
+	* Cursor is in a slightly less confusing location
+	* CAN_SCROLL support (for embedding in Tickit::Widget::ScrollBox)
+
+	Examples:
+	* Scrolling example added, requires Tickit::Widget::ScrollBox
+
+	Bug fixes:
+	* Sizing was incorrect in the last version - the cols value was
+	stored as lines as well :(
+
+0.100     2013-09-13 22:47:38 Europe/London
+	Version bump for non-DEV release.
+
+	New features:
+	* highlight_node event invoked when the currently-selected node is changed.
+	Currently undocumented since the API may change slightly after some more
+	testing.
+
+0.090_002 2013-09-13 22:41:34 Europe/London
+	New features:
+	* Navigate to parent node via <Left>, first child via <Right> for quicker
+	keyboard-only access
+	* Calculate real size rather than using placeholder values of 1 line, 1 col,
+	allowing widgets such as ScrollBox to work correctly.
+
+	Bug fixes:
+	* 'next row' logic would wrap to top of tree rather than stopping at the
+	end of the tree
+	* "Avoid" (as opposed to "fix") flood of warnings from Tickit::Window->restore
+
+0.090_001 2013-09-11 01:30:30 Europe/London
+	NOTE: This is a complete rewrite, and now uses Tree::DAG_Node for most of the
+	important parts. Most old methods for navigating the tree have been removed as
+	a consequence.
+
+	New features:
+	* Tickit::Style support
+	* Render lines using Tickit::RenderBuffer
+	* Mouse support
+
+0.003     2012-01-24 00:20:31 Europe/London
+	New features:
+	 * Support widget for label rather than plain text
+	 * Support different pens for highlight and regular label
+	 * Adjust style handling so we have all strings in one place
+
+	Bug fixes:
+	 * Resolved some rendering artifacts when opening/closing tree nodes
+	 * Fixed some undef warnings
+
+	Backwards compatibility:
+	 * Removed the following methods which were used for internal housekeeping:
+	   * is_valid_tree_node
+
+0.002     2012-01-21 23:10:42 Europe/London
+	Inherit open/closed state from parent if not otherwise specified.
+	Clean up styling for single line layout.
+	Call insert_after when adding widgets.
+	Drop old rebuild logic in favour of a dynamic next/prev implementation.
+
+0.001     2011-11-28 00:00:15 Europe/London
+	Initial CPAN release

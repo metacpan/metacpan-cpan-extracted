@@ -1,0 +1,12 @@
+[% USE date -%]
+[% summary = json.decode("summary.json") -%]
+[% ids = [ title ] -%]
+[% summary_text = INCLUDE 'test-feed-summary.tt2' -%]
+[% entries = [{
+	'title'   => "${summary.get_status.0} ${title}",
+	'link'    => link,
+	'id'      => title,
+	'updated' => date.format(summary.meta.stop_time, '%Y-%m-%dT%H:%M:%S'),
+	'summary' => summary_text,
+}] -%]
+[% INCLUDE atom.tt2 -%]

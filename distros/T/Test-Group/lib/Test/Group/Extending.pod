@@ -1,0 +1,179 @@
+=pod
+
+=head1 NAME
+
+Test::Group::Extending - writing extensions to Test::Group
+
+=head1 WRAPPERS
+
+It's possible to extend L<Test::Group> by writing subroutines that
+call Test::Group::test().  For example, a replacement for test() that 
+uses the L<Test::Group> function skip_next_test() to skip the test
+group unless its name appears in an environment variable:
+
+=for tests "maybe_test" begin
+
+  use Test::Group;
+
+  sub maybe_test ($&) {
+      my ($name, $code) = @_;
+
+      my $only = $ENV{ONLY_TEST};
+      if ($only and $only !~ /(^|,)\Q$name\E(,|$)/) {
+          skip_next_test("$name not enabled");
+      }
+      goto &test;
+  }
+
+=for tests "maybe_test" end
+
+In a test script, you can now use maybe_test() anywhere you would use
+test():
+
+  maybe_test foo => sub {
+      ok ...
+  };
+
+Note the use of C<goto &test> to pass control to Test::Group::test(),
+see L<perlfunc/goto>. This is good practice when wrapping
+Test::Group::test(), because it avoids creating a new subroutine call
+frame and messing up the line numbers in failed test diagnostics.
+
+Sometimes you can't use C<goto &test>, because you want to add some
+code after the test() call.  In this situation you can adjust the
+line numbers in failed test diagnostics by incrementing
+C<$Test::Builder::Level>, see L<Test::Builder>.
+
+The following example outputs a timestamp diagnostic before and after
+running the test group:
+
+=for tests "timed_test" begin
+
+  use Test::Builder;
+  use Test::Group;
+  use Test::More;
+  use Time::HiRes;
+
+  sub timed_test ($&) {
+      my ($name, $code) = @_;
+
+      diag("$name start: ".Time::HiRes::time());
+
+      local $Test::Builder::Level = $Test::Builder::Level + 1;
+      &test($name, $code);
+
+      diag("$name done:  ".Time::HiRes::time());
+  };
+
+=for tests "timed_test" end
+
+Note the use of the ampersand in the call to Test::Group::test().
+This bypasses Test::Group::test()'s function prototype, which would
+otherwise reject C<$code> as the second parameter because it is not a
+literal code block.
+
+=head1 PLUGINS
+
+From version 0.16 onwards, L<Test::Group> provides the function
+next_test_plugin() (not exported by default) to install a plugin for
+the next test group.  A plugin is a subroutine that sits in between
+Test::Group::test() and the subroutine reference passed to it.
+
+The next_test_plugin() function takes a single parameter, which must
+be a subroutine reference. That subroutine will be called with a
+single parameter: another subroutine reference which will run the
+test group.
+
+For example, a plugin to check that a test group does not modify
+the PATH environment variable could be implemented like this:
+
+=for tests "next_test_nopathchange" begin
+
+  use Test::Group qw(:DEFAULT next_test_plugin);
+  use Test::More;
+
+  sub next_test_nopathchange {
+      next_test_plugin {
+          my $next = shift;
+
+          my $old = $ENV{PATH};
+          $next->();
+          is $ENV{PATH}, $old, "path not modified";
+      };
+  }
+
+=for tests "next_test_nopathchange" end
+
+To use this plugin from a test script:
+
+  next_test_nopathchange();
+
+  test foo => sub {
+      do_my_tests('foo');
+  };
+
+Another example - the following plugin runs the test group twice, with
+and without a DEBUG environment variable set:
+
+=for tests "next_test_with_and_without_debug" begin
+
+  use Test::Group qw(:DEFAULT next_test_plugin);
+
+  sub next_test_with_and_without_debug {
+      next_test_plugin {
+          my $next = shift;
+
+          $next->();
+          local $ENV{DEBUG} = 1;
+          $next->();
+      };
+  }
+
+=for tests "next_test_with_and_without_debug" end
+
+In a test script, you might apply both plugins to the same test group:
+
+  next_test_with_and_without_debug();
+  next_test_nopathchange();
+
+  test foo => sub {
+      do_my_tests('foo');
+  };
+
+When multiple plugins have been set, the one that was set first gets
+control first.  In the example above, the DEBUG plugin will be called
+first, and each time it calls C<< $next->() >> control passes to the
+PATH plugin.  When the PATH plugin calls C<< $next->() >>, control gets
+down to do_my_tests().
+
+If you want to apply the same set of plugins to several groups in your
+test script, then you can write a Test::Group::test() wrapper to set
+them up:
+
+=for tests "mytest" begin
+
+  sub mytest ($&) {
+      next_test_with_and_without_debug();
+      next_test_nopathchange();
+
+      goto &test;
+  }
+
+  mytest foo => sub {
+      do_my_tests('foo');
+  };
+
+  mytest bar => sub {
+      do_my_tests('bar');
+  };
+
+=for tests "mytest" end
+
+=head1 SEE ALSO
+
+L<Test::Group>
+
+L<Test::Group::Tester> helps you to write tests for L<Test::Group>
+extensions.
+
+=cut

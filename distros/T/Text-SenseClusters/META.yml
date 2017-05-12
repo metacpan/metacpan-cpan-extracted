@@ -1,0 +1,29 @@
+---
+abstract: 'SenseClusters - Clustering similar written contexts'
+author:
+  - 'Ted Pedersen <tpederse at d.umn.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-SenseClusters
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Munkres: 0.07
+  Algorithm::RandomMatrixGeneration: 0.06
+  Bit::Vector: 6.3
+  Math::SparseMatrix: 0.02
+  Math::SparseVector: 0.03
+  PDL: 2.006
+  Set::Scalar: 1.19
+  Text::NSP: 1.09
+version: 1.05

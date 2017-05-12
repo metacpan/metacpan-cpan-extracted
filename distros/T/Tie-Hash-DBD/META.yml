@@ -1,0 +1,38 @@
+--- 
+abstract: Tie plain hashes to DBI interface
+author: 
+  - H.Merijn Brand <h.m.brand@xs4all.nl>
+configure_requires: 
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: Author, CPAN::Meta::Converter version 2.150005
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Hash-DBD
+provides: 
+  Tie::Array::DBD: 
+    file: lib/Tie/Array/DBD.pm
+    version: '0.16'
+  Tie::Hash::DBD: 
+    file: lib/Tie/Hash/DBD.pm
+    version: '0.16'
+recommends: 
+  DBD::CSV: '0.48'
+  DBD::Pg: v3.5.3
+  DBD::SQLite: '1.48'
+  DBI: '1.634'
+  Test::More: '1.001014'
+requires: 
+  Carp: 0
+  DBI: '1.613'
+  Storable: 0
+  Test::Harness: 0
+  Test::More: '0.90'
+  Time::HiRes: 0
+  perl: '5.008003'
+resources: 
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Tux/Tie-Hash-DBD
+version: '0.16'

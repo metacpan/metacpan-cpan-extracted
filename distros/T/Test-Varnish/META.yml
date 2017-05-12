@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Test-Varnish
+version:            0.03
+abstract:           Put your Varnish server to the test!
+author:
+    - Cosimo Streppone <cosimo@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Getopt::Long:    0
+    HTTP::Cookies:   0
+    HTTP::Request:   0
+    HTTP::Response:  0
+    LWP::UserAgent:  0
+    Test::More:      0
+    URI:             0
+resources:
+    bugtracker:  mailto:bug-test-varnish@rt.cpan.org
+    license:     http://dev.perl.org/licenses/
+    repository:  git://github.com/cosimo/perl5-test-varnish.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

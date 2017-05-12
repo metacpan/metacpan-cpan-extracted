@@ -1,0 +1,4 @@
+1.00 (2006-04-25)
+
+        - first release, finally packaged (so LJ and Vox don't accidentally diverge,
+          having it in both our svn repos)

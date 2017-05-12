@@ -1,0 +1,48 @@
+{
+   "abstract" : "Create CGI::FormBuilder objects from simple text descriptions",
+   "author" : [
+      "Peter Eichman <peichman@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-FormBuilder",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::FormBuilder" : "3",
+            "Class::Base" : "0.03",
+            "Parse::RecDescent" : "1.94",
+            "Text::Template" : "1.44"
+         }
+      }
+   },
+   "provides" : {
+      "Class::ParseText::Base" : {
+         "file" : "lib/Class/ParseText/Base.pm",
+         "version" : "0.01"
+      },
+      "Text::FormBuilder" : {
+         "file" : "lib/Text/FormBuilder.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.14"
+}

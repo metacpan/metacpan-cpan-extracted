@@ -1,0 +1,85 @@
+Revision history for Perl extension Tree::DAG_Node::Persist.
+
+1.12  2016-05-04T08;15:00
+	- Move DBD::SQLite from PREREQ_PM to TEST_REQUIRES.
+	- Correct physical address of Free Software Foundation in LICENSE file. See RT#114149.
+		Thanx to Petr Pisar.
+
+1.11  2016-04-27T17:35:00
+	- Adopt workflow techniques suggested by Kent Fredric. This means a cleaner workdir and a
+		much more reliable dist. The latter now has auto-generated MANIFEST and META.* files.
+
+1.10  2016-04-26T13:44:00
+	- No code changes.
+	- Update pre-reqs in Makefile.PL to add Types::Standard and remove Hash::FieldHash.
+
+1.09  2016-04-25T09:26:00
+	- No code changes.
+	- Reformat the dates in this file.
+	- Remove Build.PL.
+	- Update LICENSE, MANIFEST, MANIFEST.SKIP and README files.
+	- Fix my licence (sic) mess so all references are to Perl. This involves edits to Makefile.PL
+		and LICENSE. See RT#113949. Thanx Kent Fredric.
+	- Fix Makefile.PL so modules only used for testing are in TEST_REQUIRES and not PREREQ_PM.
+		See RT#113948. Thanx Kent Fredric.
+	- Fix README so it more-or-less conforms to the Perl Foundation's guidelines at
+		http://www.perlfoundation.org/cpan_licensing_guidelines.
+
+1.08  2015-02-18T11:11:00
+	- Add repository: https://github.com/ronsavage/Tree-DAG_Node-Persist.
+
+1.07  2015-02-17T13:40:00
+	- Update pre-reqs.
+	- Rename CHANGES to Changes as per CPAN::Changes::Spec.
+	- Shrink line widths in this file, and in the docs, to 100 chars max.
+	- Move t/pod.t to xt/author/.
+
+1.06  2012-11-08T12:38:00
+	- No code changes.
+	- For pre-reqs such as strict, warnings, etc, which ship with Perl, set the version # to 0.
+		Reported as RT#80663 by Father Chrysostomos for Tree::DAG_Node.
+
+1.05  2011-03-16T11:52:00
+	- No code changes. No need to upgrade.
+	- Add scripts/create.table.pl, to make it easy to create the 'trees' table.
+	- Run with -h to get help, especially regarding $DBI_DSN, $DBI_USER, $DBI_PASS.
+	- Run with -dsn, -extra_columns, -password, -table_name and -username to use another options.
+	- Add Tree::DAG_Node::Persist::Create for use by scripts/create.table.pl and t/test.t.
+	- Note: Both these programs default to using the same 3 env vars. However, for t/test.t, if
+		$DBI_DSN is empty, it uses File::Temp and a DSN of dbi:SQLite:dbname=$temp_file_name.
+
+1.04  2011-02-15T15:07:00
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+1.03  2010-10-25T11:14:00
+	  - Extend write() method to accept an optional arrayref of extra fields to be written to the
+		db. The field names are in the call to write(), and the field values are taken from the
+		attributes of the node.
+	  - Note: The field 'id' is automatically written to the db, when write() is called, so
+	  	there is no need to include it in the arrayref.
+	  - Extend read() method likewise to recover this extra data.
+	  - Note: The field 'id' is automatically put in the node's attributes, when read() is called,
+		so there is no need to include it in the arrayref.
+	  - Enhance t/test.t to match. See usage of $extra, and where $target = 1011.
+	  - Add README to MANIFEST.
+
+1.02  2010-10-07T10:01:00
+	  - Add README file.
+	  - Change attrs for DBI -> connect in t/test.t, to {RaiseError => 1, PrintError => 1,
+			AutoCommit => 1}.
+
+1.01  Thu Oct  7  8:57:00 2010
+	  - Add EXLOCK => 0 to the options used by File::Temp in t/test.t. Thanx to Slaven Rezic for
+		help with this.
+	  - Clarify discussion of id field in attributes hash. Detail: Mention that nodes have ids only
+		after being written to the database and read back in, so that people don't think the module
+		generates ids.
+	  - Add a new section to the POD: Machine-Readable Change Log, as part of my new policy to
+		promote Module::Metadata::Changes.
+	  - Add print statements to Build.PL and Makefile.PL explaining the usage of env vars to
+		influence t/test.t, if you don't want the default behaviour of using DBD::SQLite. This is
+		already noted in the FAQ.
+
+1.00  2010-10-05T11:00:00
+	  - Original version.

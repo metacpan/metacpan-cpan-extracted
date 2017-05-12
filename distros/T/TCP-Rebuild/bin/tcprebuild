@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use TCP::Rebuild::App;
+TCP::Rebuild::App->run;
+
+__END__
+
+=head1 NAME
+
+tcprebuild - uses TCP::Rebuild to reconstruct TCP streams to files on disk
+
+=head1 SYNOPSIS
+
+ tcprebuild [options]
+
+ Options
+   -i --infile     - input pcap file (required)
+   -f --filter     - pcap capture filter (see tcpdump manpage)
+   -s --separator  - print a separator between packets
+   -h              - print help and exit
+   -v              - print version and exit
+
+=head1 DESCRIPTION
+
+This utility takes data from pcap files and rebuilds it using libnids (via. Net::LibNIDS) 
+before saving to disk.
+
+=head1 TO DO
+
+=over 4
+
+=item * Implement --files-from (including - for STDIN) to rebuild multiple files at once
+
+=back
+
+=head1 SEE ALSO 
+
+The programs tcpick and tcpflow, which do a similar thing to this Perl utility
+
+=head1 AUTHORS
+
+David Cannings, <F<david@edeca.net>>
+
+This code was copyrighted in 2010, and is released under the same terms as Perl
+itself.
+
+=cut

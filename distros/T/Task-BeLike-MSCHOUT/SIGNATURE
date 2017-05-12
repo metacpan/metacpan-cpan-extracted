@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 93db2623160ab070d901740a4d3eb16d5c9b04b3 Changes
+SHA1 0b0d3fe360f7a445c3a3a21feb6ea278db155ba3 LICENSE
+SHA1 3cd8b36154e4dfbdffa76700d2d03386e77a89ab MANIFEST
+SHA1 3ecafffd7630faf38d5c0bffcbac495b4b8e8f26 META.json
+SHA1 6df053d3c26ae47c99a077a2f44f156d61076859 META.yml
+SHA1 804d59cd149e99e10728e27861c89786dc2e2c39 Makefile.PL
+SHA1 3ff9d19b18a99868ddbaeb63d7ab93f99225e9d5 README
+SHA1 617c550dd66a76c90afbfc88cb7aa59f48922148 dist.ini
+SHA1 82f01d865460208223d64aed269ca09230004b72 lib/Task/BeLike/MSCHOUT.pm
+SHA1 d361ce075754a8cc9307cfdd64e2729986714579 t/author-pod-coverage.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 666cf5f8c47108d4c31a6b3e3cd37ae4d0bdca16 t/placeholder.t
+SHA1 dc5577d84d6015589321fed7ab730d17a80d4410 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iD8DBQFX8mZ++CqvSzp9LOwRAn34AJ0VbuiIoijRnmPzkZKKnoTUrjtQ3ACgtGRW
+ql7WMmdSFhZ+4G/oxyfweqo=
+=NfGY
+-----END PGP SIGNATURE-----

@@ -1,0 +1,12 @@
+Revision history for Perl extension Text::Scraper
+
+0.02 19:26 28 August 2005
+
+    - Added DESTROY hook and $subclass->on_destroy() 
+    - Improved and clarified documentation
+
+0.01  20:37 07 August 2005
+	- original version; created by h2xs 1.23 with options
+		-AXO -b 5.6.0 -n Text::Scraper
+
+

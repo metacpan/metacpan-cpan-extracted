@@ -1,0 +1,8 @@
+Revision history for Perl extension Text::Emoticon::Yahoo
+
+0.02  Wed Jan 11 10:24:42 UTC 2006
+        - Now it requires Text::Emoticon 0.03 framework
+        - Use Yahoo! US site as imgbase default
+
+0.01  Sat Mar 26 14:25:00 2005
+	- original version

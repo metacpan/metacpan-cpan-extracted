@@ -1,0 +1,8 @@
+use Test::Requires qw/Alfa Beta Charlie/;
+use Test::Requires ('Delta', "Echo", q!Foxtrot!);
+use Test::Requires {
+	Golf => '1.00',
+	Hotel => '2.00',
+};
+test_requires 'India';
+test_requires('Juliett', "3.00");

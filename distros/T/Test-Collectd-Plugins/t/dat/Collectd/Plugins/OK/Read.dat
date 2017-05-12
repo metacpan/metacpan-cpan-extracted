@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+my $expected = [
+	[
+		{
+      interval => 10,
+      host => "localhost.localdomain",
+      plugin => "OK::Read",
+      type => "gauge",
+      type_instance => "ti",
+      plugin_instance => "pi",
+      values => [ 42 ],
+    }
+	]
+];
+

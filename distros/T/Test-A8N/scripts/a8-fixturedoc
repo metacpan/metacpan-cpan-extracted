@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+use YAML::Syck;
+use File::Find;
+use Getopt::Long;
+use Pod::Select;
+use lib qw(t/lib blib lib);
+
+my $verbose = 0;
+my $filename = undef;
+my $line = 0;
+GetOptions(
+    "verbose" => \$verbose,
+    "filename=s" => \$filename,
+    "line=i" => \$line,
+);
+my $HELP_NAME = shift @ARGV;
+
+if (defined($filename)) {
+    die "You need to supply a line number when specifying a file\n"
+        if ($line < 1);
+    open my $fh, $filename or die "Can't open search file\n";
+    my $idx = 0;
+    LINELOOP: while (<$fh>) {
+        if (++$idx == $line) {
+            close $fh;
+            ($HELP_NAME) = $_ =~ /\-\s*([^:]+)(?::.*|)?$/;
+            chomp $HELP_NAME;
+            last LINELOOP;
+        }
+    }
+}
+
+our $config = {};
+my $home = $ENV{HOME};
+if (-f "$home/.a8rc") {
+    $config = LoadFile("$home/.a8rc");
+}
+
+my $fixture_base = $config->{fixture_base};
+die "Must provide fixture_base in ~/.a8rc!\n" unless $fixture_base;
+my $fixture_base_path = $fixture_base;
+$fixture_base_path =~ s#::#/#g;
+
+my @INC_DIRECTORIES = grep { -d $_ } @INC;
+my %PROCESSED_PACKAGES = ();
+my @FILES = ();
+my @PACKAGES = ($fixture_base);
+
+my $want_child_classes = sub {
+    my $filename = $File::Find::name;
+    if ($filename =~ /\/$fixture_base_path\/.*\.pm$/) {
+        my ($class_file) = $filename =~ /($fixture_base_path\/.*)\.pm$/;
+        $class_file =~ s#/#::#g;
+        return if (exists($PROCESSED_PACKAGES{$class_file}) or grep(/^$class_file$/, @PACKAGES));
+        push @PACKAGES, $class_file;
+    }
+};
+find($want_child_classes, @INC_DIRECTORIES);
+
+while (my $package = shift @PACKAGES) {
+    next if (exists($PROCESSED_PACKAGES{$package}));
+    my $package_file = join("/", split(/::/, $package)) . ".pm";
+    DIR: foreach my $directory (@INC_DIRECTORIES) {
+        my $filename = "$directory/$package_file";
+        $PROCESSED_PACKAGES{$package}++;
+        if (-f $filename) {
+            process_module($package, $filename);
+            last DIR;
+        }
+    }
+}
+
+warn "Files: \n" . join("\n", @FILES) . "\n"
+    if ($verbose);
+
+die "Can't find fixture documentation for \"$HELP_NAME\"\n" if ($#FILES < 0);
+
+podselect({ -sections => ["/$HELP_NAME"]}, @FILES);
+
+sub process_module {
+    my ($package, $path) = @_;
+    no strict 'refs';
+    push @FILES, $path;
+    warn "Processing $package\n" if ($verbose);
+    eval "use $package;";
+
+    return if ($package eq 'Test::A8N::Fixture');
+    my @isa = @{$package . "::ISA"};
+    foreach my $base (@isa) {
+        next if (exists($PROCESSED_PACKAGES{$base}));
+        warn "Following inheritance tree to $base\n" if ($verbose);
+        push @PACKAGES, $base;
+    }
+}
+

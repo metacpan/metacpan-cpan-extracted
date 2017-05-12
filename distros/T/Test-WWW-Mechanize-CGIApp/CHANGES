@@ -1,0 +1,23 @@
+Revision history for Perl module Test::WWW::Mechanize::CGIApp:
+
+0.05 Wed Jul 11 08:47:21 PDT 2007
+     - incorporate more comments from Mark Stosberg
+       - refer to the app as "app", not instance.
+     - get rid of the autorunmode_hack, it isn't needed (my
+       misunderstanding).
+     - cleanup docs and examples.
+
+0.03 Sun Mar 11 22:03:58 PDT 2007
+     - incorporate feedback from Mark Stosberg
+     - pare down to two new methods, "instance", which describes the 
+       way the test harness should fire up the run_mode, and "autorunmode_hack",
+       which enables special handling for CGI::Application::Plugin::AutoRunmode.
+     - fleshed out the pod docs.
+     - finished the test suite (for now).
+
+0.02 Wed Feb 28 11:43:35 PST 2007
+     - make sure url's have a scheme, etc... before we muck around with
+       cookies.  Otherwise code called by WWW::Mechanize throws a warning.
+
+0.01 Wed Feb 28 09:26:35 PST 2007
+     - initial version

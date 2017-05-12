@@ -1,0 +1,57 @@
+{
+   "abstract" : "Encoding aware Text::CSV.",
+   "author" : [
+      "Makamaka Hannyaharamitu, <makamaka[at]cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-CSV-Encoded",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Handle" : "0",
+            "Test::Harness" : "0",
+            "Test::More" : "0",
+            "Text::CSV" : "1.31",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/singingfish/Text-CSV-Encoded/issues"
+      },
+      "homepage" : "https://github.com/singingfish/Text-CSV-Encoded",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/singingfish/Text-CSV-Encoded.git",
+         "web" : "https://github.com/singingfish/Text-CSV-Encoded"
+      }
+   },
+   "version" : "0.25"
+}
+

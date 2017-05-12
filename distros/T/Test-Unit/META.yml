@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-Unit
+version:      0.25
+version_from: lib/Test/Unit.pm
+installdirs:  site
+requires:
+    base:                          1
+    Class::Inner:                  0
+    Devel::Symdump:                0
+    Error:                         0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

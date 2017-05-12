@@ -1,0 +1,171 @@
+=head1 NAME 
+
+README.Toolkit - SenseClusters Toolkit directory structure with links to 
+all program documentation  
+
+=head1 DIRECTORY STRUCTURE
+
+This briefly describes the structure of the Toolkit 
+directory, and gives a brief idea of what each program 
+does. Directories are indicated with a / at the end of their name 
+(preprocess/) while programs end with the .pl suffix. All of this is
+contained in the Toolkits/ directory.  Note that these are organized 
+roughly in the order in which they will be used by SenseClusters.
+
+Please review the flowcharts found in doc/Flowcharts for additional 
+information. 
+
+=head2 preprocess/ (text preprocessing programs)
+
+=over 
+
+=item * plain/ (processes input in plain text format) 
+
+=over
+
+=item * L<text2sval.pl> - Convert simple plain text into Senseval2 format
+
+=back
+
+=item * sval2/ (processes input in Senseval-2 format)
+
+=over 
+
+=item * L<balance.pl> - Balances sense distribution in a Senseval-2 
+input file by removing some instances
+
+=item * L<filter.pl> - Removes instances associated with low frequency 
+sense tags from Senseval-2 input 
+
+=item * L<frequency.pl> - Displays frequency distribution of senses 
+
+=item * L<keyconvert.pl> - Convert KEY file from Senseval-2 format to 
+SenseCluster's format
+
+=item * L<maketarget.pl> - Create a Perl regex for the target word by 
+spotting all <head> tags in the given file
+
+=item * L<prepare_sval2.pl> - Prepare Senseval-2 data for experiments 
+
+=item * L<preprocess.pl> - Tokenize and optionally split Senseval-2 
+input into training and test portions
+
+=item * L<sval2plain.pl> - Convert a Senseval-2 input file to plain text 
+format 
+
+=item * L<windower.pl> - Cut a window of context W words big around a 
+target word in a given Senseval-2 input file
+
+=back
+
+=back
+
+=head2 count/ (Modify count.pl output from Text-NSP)
+
+=over
+
+=item * L<reduce-count.pl> - Reduce the size of the Text-NSP output 
+created with huge training data
+
+=back
+
+=head2 matrix/ - (Similarity matrix constructors)
+
+=over 4 
+
+=item * L<bitsimat.pl> - Create a similarity matrix for given bit 
+vectors
+
+=item * L<simat.pl> - Create a similarity matrix for given non-binary 
+(integer or real) vectors
+
+=back
+
+=head2 vector/ (Represent contexts as vectors to be clustered)
+
+=over
+
+=item * L<nsp2regex.pl> - Creates regular expressions from Text-NSP 
+output to represent features
+
+=item * L<order1vec.pl> - Creates first order context vectors 
+
+=item * L<order2vec.pl> - Creates second order context vectors
+
+=item * L<wordvec.pl> - Creates word vectors from Text-NSP output 
+
+=back
+
+=head2 svd/ (SVDPACKC interface)
+
+=over
+
+=item * L<mat2harbo.pl> - Convert matrices from SenseClusters format to 
+Harwell-Boeing format
+
+=item * L<svdpackout.pl> - Reconstruct a matrix from its singular 
+vectors as found by by SVDPACKC
+
+=back
+
+=head2 clusterstopping/ (Cluster Stopping program)
+
+=over
+
+=item * L<clusterstopping.pl> - Predicts the number of clusters that a 
+given data should be divided into. Provides three such cluster stopping 
+measures.
+
+=back
+
+
+=head2 evaluate/ (Evaluate the results of SenseClusters by comparing to gold standard data)
+
+=over
+
+=item * L<cluto2label.pl> - Convert clustering output of Cluto to a 
+cluster
+by sense confusion matrix for evaluation
+
+=item * L<format_clusters.pl> - Display contexts that were clustered 
+with 
+assigned sense id, or display senseval-2 format with assigned sense id 
+
+=item * L<label.pl> - Assign sense tags to the discovered clusters for 
+evaluation 
+
+=item * L<report.pl> - Report performance in terms of the precision, 
+recall, and F-Measure, and show a confusion matrix
+
+=back
+
+=head2 clusterlabel/ (Cluster Labeling programs)
+
+=over
+
+=item * L<clusterlabeling.pl> - Selects significant word-pairs from the 
+contents/instances of the clusters and assigns them as the labels to 
+the clusters. Also creates separate file for each cluster.
+
+=back
+
+=head1 AUTHOR
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003-2008, Ted Pedersen
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 
+or any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+Note: a copy of the GNU Free Documentation License is available on 
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in 
+this distribution as FDL.txt.
+
+=cut
+

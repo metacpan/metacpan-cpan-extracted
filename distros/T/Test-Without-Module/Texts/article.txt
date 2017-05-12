@@ -1,0 +1,269 @@
+Title: Preventing a module from loading
+
+<p>I like modules that provide a dynamic fallback and degrade gracefully
+if some prerequisites are not available instead of requiring modules
+when they can do well without them.</p>
+
+<p>But there is a problem - on my development machine, I have all these
+optional modules installed, but I want to test the behaviour of my
+code without the optional modules. So I want to set up tests where
+the optional modules seem not available. My preferred syntax for this is
+a pragma-like syntax :</p>
+
+<code>
+use Test::Without::Module qw( HTML::Template );
+use Test::Without::Module qr/^POE::/;
+</code>
+
+<p>So, most of the magic will have to be installed in a sub called "import()"
+within my (to be written) module.</p>
+
+<p>When you want to muck around with module loading, the only way in Perl
+seems to be to add a code reference into @INC. That code reference
+either returns a filehandle, from which the text will be loaded,
+or undef, which means that the next entry in @INC will be tried.</p>
+<p>
+Things that didn't work :</p>
+
+<code>
+BEGIN { @SAVED_INC = @INC; };
+sub import {
+  @INC = sub {
+    # return undef if it's a blocked module
+    # Look if the module is in @SAVED_INC
+    # Return a filehandle to it
+  };
+};
+</code>
+
+<p>This first variant worked quite well, until I came up to [cpan://Digest::MD5],
+which wants to load XS code. And the XS code loader looks through @INC, 
+it dosen't respect coderefs in @INC, and thus, the loading of Digest::MD5 fails.
+Or rather, Digest::MD5 has a fallback to [cpan://Digest::Perl::MD5], which
+I didn't have installed. So this way will not work as soon as we use any
+module which uses XS code.</p>
+
+<p>So I had to keep all existing directories in @INC, but there was no way to prevent
+Perl to look through the rest of @INC if my handler returned undef for a blocked module :
+</p>
+<code>
+BEGIN { @SAVED_INC = @INC; };
+sub import {
+  @INC = sub {
+    # return undef if it's a blocked module
+  };
+};
+</code>
+
+<p>[demerphq] then suggested that I forget about a handler in @INC and muck instead with
+%INC and a custom import method, that would die whenever that module was imported
+into a new namespace.</p>
+
+<code>
+sub import {
+  $INC{$module} = 1;
+  *{$module."::import"} = sub {
+    die 'ugh';
+  };
+};
+</code>
+
+<p>But this version didn't work, because one could still require the module, and most
+checks whether a module is available rely on the meme </p>
+<code>
+  eval { require Optional::Module };
+  if ($@) {
+    # module is not available
+  };
+</code>
+<p>
+But this put me on the right track, I would simply create a faked module on the fly,
+and return this faked module whenever I want to prevent a module from loading. I don't
+need to handle the case that a module is allowed, as the rest of @INC will take care
+of that.</p>
+<code>
+sub import {
+  unshift @INC, sub {
+    # return dummy module filehandle if it's a blocked module
+  };
+};
+</code>
+<p>There are now some technical pitfalls. First, [cpan://IO::String] does not work in 
+an @INC-handler, seemingly Perl wants a real filehandle (or at least, [cpan://Acme::Intraweb]
+and [cpan://PAR] do it that way as well), so I have to create a tempfile for every faked module.
+That's not a real concern as my module is intended for testing anyway - efficiency is 
+of no importance.</p>
+<p>Second, what if a module has already been loaded? Then Perl won't go through @INC at all.
+So we have to scrub %INC as well and clean it of the unwanted modules, in case they
+have already been loaded.</p>
+<p>After these tries, the algorithm to prevent a module from loading now looks like the following :</p>
+<code>
+use vars qw( %forbidden );
+sub import {
+  my ($self,@forbidden_modules) = @_;
+  scrub $module
+    for @forbidden_modules;
+  unshift @INC, sub {
+    my (undef,$filename,undef) = @_;
+    if (exists $forbidden{$filename}) {
+      # return faked, failing module
+    };
+  };
+};
+</code>
+<p>The complete module is appended below. If you have suggestions about the naming convention
+or the usage interface, I'd like to hear about them. If you have any hint on how to make my
+module into a lexical pragma (<tt>warnings.pm</tt> and <tt>strict.pm</tt> didn't offer a
+hint to me), I'll be even more interested.</p>
+<code>
+package Test::Without::Module;
+use strict;
+use File::Temp;
+use Carp qw( croak );
+
+use vars qw( %forbidden $VERSION );
+$VERSION = 0.01;
+
+sub import {
+  my ($self,@forbidden_modules) = @_;
+
+  $forbidden{$_} = $_
+    for @forbidden_modules;
+
+  # Scrub %INC, so that loaded modules disappear
+  my ($module);
+  for $module (@forbidden_modules) {
+    scrub $module;
+  };
+
+  # Move our handler to the front of the list
+  @INC = grep { $_ ne \&fake_module } @INC;
+  unshift @INC, \&fake_module;
+};
+
+sub fake_module {
+    my ($self,$module_file,$member_only) = @_;
+    warn $@ if $@;
+
+    my $modulename = file2module($module_file);
+
+    # Deliver a faked, nonworking module
+    if (grep { $modulename =~ $_ } keys %forbidden) {
+
+      my $fh = File::Temp::tmpfile();
+      print $fh <<MODULE;
+package $modulename;
+
+=head1 NAME
+
+$modulename
+
+=head1 SYNOPSIS
+
+!!! THIS IS A FAKED VERSION OF $modulename !!!
+!!! IT WAS CREATED BY Test::Without::Module          !!!
+!!! IT SHOULD NEVER END UP IN YOUR lib/ OR site/lib/ !!!
+
+=cut
+
+sub import { undef };
+0;
+MODULE
+      seek $fh, 0,0;
+      return $fh;
+    };
+};
+
+sub unimport {
+  my ($self,@list) = @_;
+  my $module;
+  for $module (@list) {
+    if (exists $forbidden{$module}) {
+      delete $forbidden{$module};
+      scrub $module;
+    } else {
+      croak "Can't allow non-forbidden module $module";
+    };
+  };
+};
+
+sub file2module {
+  my ($mod) = @_;
+  $mod =~ s!/!::!g;
+  $mod =~ s!\.pm$!!;
+  $mod;
+};
+
+sub scrub($) {
+  my ($module) = @_;
+  my $key;
+  for $key (keys %INC) {
+    delete $INC{$key}
+      if (file2module($key) =~ $module);
+  };
+};
+
+1;
+__END__
+
+=head1 NAME
+
+Test::Without::Module - Test fallback behaviour in absence of modules
+
+=head1 SYNOPSIS
+
+=for example begin
+  use Test::Without::Module qw( File::Temp );
+
+  # Now, loading of File::Temp fails :
+  eval { require File::Temp; };
+  warn $@ if $@;
+
+  # Now it works again
+  eval q{ no Test::Without::Module qw( File::Temp ) };
+  eval { require File::Temp; };
+  print "Found File::Temp" unless $@;
+
+=for example end
+
+=head1 DESCRIPTION
+
+This module allows you to deliberately hide modules from a program
+even though they are installed. This is mostly useful for testing modules
+that have a fallback when a certain dependency module is not installed.
+
+=head2 EXPORT
+
+None. All magic is done via C<use Test::Without::Module> and
+C<no Test::Without::Module>.
+
+=begin testing
+  no warnings 'once';
+
+  eval 'use Test::Without::Module qw( File::Temp )';
+  eval 'no Test::Without::Module qw( File::Temp )';
+
+  is_deeply( [keys %Test::Without::Module::forbidden],[],"Module list" );
+  eval { require File::Temp; };
+  is( $@, '', "unimport" );
+
+=end testing
+
+=head1 BUGS
+
+=over 4
+
+=item * There is no lexicalic scoping (yet)
+
+=back
+
+=head1 AUTHOR
+
+Max Maischein, E<lt>corion@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<Acme::Intraweb>, L<PAR>, L<perlfunc>
+
+=cut
+</code>

@@ -1,0 +1,51 @@
+Revision history for Perl extension Term::Menu.
+
+0.10  Tue Jun 03 13:05:00 2014
+	- When tries == 0, allow the user to try giving an answer infinitely
+	  as per documentation.
+	- Improve code style a bit.
+	- Improve documentation on option ordering.
+
+0.09  Sun Jan 27 13:21:00 2007
+	- Added a table print option. May be going to rename this module, since printing a menu is no longer
+	  the only thing it does.
+	- Also removed the goto's. menu() is still really ugly, but it's just a bit less ugly now. I
+	  wrote it when I just knew Perl, so it contains a few things I really have to laugh about, now.
+	- Removed sleep statements from Expect.pl.
+	- Split the tests from t/Term_Menu.t into just loading Term::Menu and actually checking the menu with
+	  Test::Expect in t/menu.t.
+
+0.08  Sat Apr  7 18:06:00 2007
+	- The module now no more uses shift, so if you call ->menu() in a loop, it won't modify your references.
+
+0.07  Tue Mar 27 17:33:00 2007
+	- Changed and updated some documentation
+	- Added some tests to check order
+	- Stephen Davies reported he saw a warning when they were enabled, I think I fixed this.
+
+0.06  Tue Mar 27 09:23:00 2007
+	- Moved the directory name Term-Menu to Term-Menu-0.05
+	- Term::Menu now holds an array instead of a hash to preserve the order
+	- Both of the changes were thanks to a hint from Kevin Montuori, thanks!
+
+0.05  Thu Jun 08 18:57:00 2006
+	- Removed dependancy for Test::Expect
+	- Added check for Test::Expect to tests, if not found, all other tests are skipped.
+
+0.04  Sun May 21 17:52:00 2006
+	- The "too many tries" message now also outputs a newline at the end
+	- The spaces aren't changed if hidekeys is 1 now.
+	- Made a lot of new documentation.
+	- Wrote the Licence section, I was too lazy to pick a licence before
+	
+0.03  Sun May 21 10:30:00 2006
+	- Renamed module to Term::Menu, because Term::Prompt already exists
+
+0.02  Sat May 20 20:56:00 2006
+	- Much fixes
+	- Made a nice test case
+
+0.01  Tue May 16 20:05:22 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Term::Prompt
+

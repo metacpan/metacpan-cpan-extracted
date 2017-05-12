@@ -1,0 +1,26 @@
+Revision history for Test-Deep=UnorderedPairs
+
+0.006     2016-12-17 02:21:46Z
+          - keep secondary cookoo packages out of the PAUSE index
+          - main package is split into two packages, so we do not have a
+            package that both inherits and is an exporter
+
+0.005     2015-06-07 01:21:53Z
+          - fix PAUSE indexing issue due to missing $VERSIONs in supplementary
+            packages
+
+0.004     2015-06-07 00:40:12Z
+          - diagnostic messages are fixed so they include the name of the sub
+            used, rather than always using "tuples"
+
+0.003     2013-05-21 06:06:32Z
+          - properly handle testing of lists where tuple keys are repeated
+            (RT#85470)
+
+0.002     2013-05-20 15:54:13Z
+          - fix tests that would not run on perls pre-5.9.5 because
+            re::is_regexp was not available
+
+0.001     2013-05-19 03:37:48Z
+          - Initial release.
+

@@ -1,0 +1,8 @@
+#$Header: /var/cvs/sources/Funlog/MANIFEST,v 1.8 2005/02/17 11:24:25 gab Exp $
+MANIFEST
+lib/Text/Phonex.pm
+Makefile.PL
+t/1-go.t
+Copying
+README
+META.yml                                 Module meta-data (added by MakeMaker)

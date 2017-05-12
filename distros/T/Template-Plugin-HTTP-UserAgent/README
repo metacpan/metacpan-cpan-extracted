@@ -1,0 +1,6 @@
+
+    Template::Plugin::HTTP::UserAgent
+
+This module is a plugin for use with the Template Toolkit.
+It is used to extract information from an HTTP User-Agent string. 
+

@@ -1,0 +1,25 @@
+# this tests simple variable definition and substitution, in particular
+# testing the DEFINE directive.
+# Expected text is shown in (parenthesis).
+
+
+# single value definition
+
+MetaText
+--
+MetaText
+--
+MetaText
+--
+pre-directive MetaText
+--
+MetaText post-directive
+--
+pre-directive MetaText post-directive 
+--
+pre MetaText mid MetaText post
+--
+MetaText
+--
+MetaText
+==

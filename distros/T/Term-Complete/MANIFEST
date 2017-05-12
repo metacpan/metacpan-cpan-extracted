@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Term/Complete.pm
+t/Complete.t
+t/release-pod-syntax.t

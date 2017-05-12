@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+#META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Tie/File/AnyData/MultiRecord_CSV.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/CSV.t
+t/Data/apsid.gff
+t/Data/f4.csv
+META.yml                                 Module meta-data (added by MakeMaker)

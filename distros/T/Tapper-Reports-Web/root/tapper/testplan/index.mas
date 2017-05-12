@@ -1,0 +1,74 @@
+<%args>
+        $testplan_days => []
+</%args>
+
+% my $days = $c->stash->{days} || ('unknown');
+<h3>Testplans of last <% $days %> days</h3>
+
+This list shows <b>testplans</b>. Note: For this testplan listing finished testruns are considered "FAIL"
+unless its success state is exactly 100%.
+
+% if ($c->flash->{error_msg}) {
+<pre>
+
+<strong>Error:</strong> <% $c->flash->{error_msg} %>
+</pre>
+% }
+
+% if (not @$testplan_days) {
+<h4>No Testplan Instances found in the requested time frame</h4>
+% }
+
+
+% foreach my $day (@$testplan_days) {
+% my $date = $day->{date};
+<h4><a href="/tapper/testplan/date/<% $date->ymd('-') %>">
+<% $date->day_abbr %> <% $date->month_abbr %> <% $date->day %>, <% $date->year %></a></h4>
+    <table class="reportlist">
+        <thead>
+                <tr>
+                         <th>ID</th>
+                         <th>Created At (GMT)</th>
+                         <th>Name</th>
+                         <th>Path</th>
+                         <th>Success</th>
+                         <th>Testruns<br>(success/pending/fail)</th>
+                </tr>
+        </thead>
+        <tbody>
+%    foreach my $instance (@{$day->{testplan_instances} || [] }) {
+%    no warnings 'uninitialized';
+%    my $sum              = $instance->{count_pass} + $instance->{count_fail} + $instance->{count_unfinished};
+%    my $width_pass       = $sum ? $instance->{count_pass} / $sum : 0;
+%    my $width_fail       = $sum ? $instance->{count_fail} / $sum : 0;
+%    my $width_unfinished = $sum ? $instance->{count_unfinished} / $sum : 0;
+%    my $path_link        = $instance->{path}; $path_link =~ s|/|\.|g;
+                  <tr>
+                        <td><a href="/tapper/testplan/id/<% $instance->{id} %>">tp<% $instance->{id} %></a></td>
+                        <td><% $instance->{updated_at} || $instance->{created_at}  %></td>
+                        <td><a title="Add <% $instance->{name} %> to filter" href="/<% $c->req->path %>/name/<% $instance->{name} %>">
+                                <img src="/tapper/static/images/plus.png" size="16">
+                            </a>
+                            <a href="/tapper/testplan/name/<% $instance->{name} %>">
+                                <% $instance->{name} %>
+                            </a>
+                        </td>
+                        <td><a title="Add <% $instance->{path} %> to filter" href="/<% $c->req->path %>/path/<% $path_link %>">
+                                <img src="/tapper/static/images/plus.png" size="16">
+                            </a>
+                            <a href="/tapper/testplan/path/<% $path_link %>">
+                                <% $instance->{path} %>
+                            </a>
+                        </td>
+                        <td>
+                          <a href="/tapper/testplan/id/<% $instance->{id} %>" title="Click to show details">
+                            <img src="/tapper/static/images/green_bar.png" height="16" width="<% $width_pass * 100 %>"><img src="/tapper/static/images/yellow_bar.png" height="16" width="<% $width_unfinished * 100 %>"><img src="/tapper/static/images/red_bar.png" height="16" width="<% $width_fail * 100 %>">
+                          </a>
+                        </td>
+                        <td>(<% $instance->{count_pass} || 0 %>/<% $instance->{count_unfinished} || 0 %>/<% $instance->{count_fail} || 0 %>)</td>
+                </tr>
+%    }
+        </tbody>
+    </table>
+
+% }

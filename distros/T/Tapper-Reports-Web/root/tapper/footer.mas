@@ -1,0 +1,8 @@
+<div id="footer" class="fluid">
+% my $footer = $c->stash->{footer};
+% if ($footer) {
+        <% $footer | n %>
+% } else {
+	Copyright &copy; 2008-2011 AMD <a href="http://amd64.org">Operating System Research Center</a>.
+%}
+</div>

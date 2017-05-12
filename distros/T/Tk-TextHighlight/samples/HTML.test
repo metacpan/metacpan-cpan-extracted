@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Tk::TextHighlight - a TextUndo widget with syntax highlighting capabilities</title>
+<link rev="made" href="mailto:feedback@suse.de" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#syntax_highlighting">SYNTAX HIGHLIGHTING</a></li>
+	<li><a href="#writing_plugins">WRITING PLUGINS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#todo">TODO</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Tk::TextHighlight - a TextUndo widget with syntax highlighting capabilities</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ use Tk;
+ require Tk::TextHighlight;</pre>
+<pre>
+ my $m = new MainWindow;</pre>
+<pre>
+ my $e = $m-&gt;Scrolled('TextHighlight',
+        -disablemenu =&gt; 1,
+        -syntax =&gt; 'Perl',
+        -scrollbars =&gt; 'se',
+ )-&gt;pack(-expand =&gt; 1, -fill =&gt; 'both');</pre>
+<pre>
+ $m-&gt;configure(-menu =&gt; $e-&gt;menu);
+ $m-&gt;MainLoop;</pre>
+<p>
+</p>
+</body>
+
+</html>

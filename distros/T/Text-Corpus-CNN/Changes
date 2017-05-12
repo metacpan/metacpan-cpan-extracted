@@ -1,0 +1,10 @@
+Revision history for Perl module Text::Corpus::CNN
+
+1.00 Dec  8 2009
+    - First release to CPAN.
+
+1.02 Aug 20 2010
+    - Removed defined on hash.
+    - Minor improvements to the documentation.
+    - Fixed encoding and parsing errors.
+	- Use HTML::Encoding to find encoding.

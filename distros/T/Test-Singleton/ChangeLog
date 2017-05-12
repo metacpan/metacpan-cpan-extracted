@@ -1,0 +1,13 @@
+2006-02-15  toni <toni@irational.org> (1.02)
+
+	* package didn't contain files necessary (inc/Module/) for use of
+	Module::Install for installation
+
+2006-02-14  toni  <toni@irational.org>	(1.01)
+
+	* README file format fixed
+
+2006-02-14  toni  <toni@irational.org> (1.0)
+
+	* first release
+

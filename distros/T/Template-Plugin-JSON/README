@@ -1,0 +1,21 @@
+
+    README for Perl module Template::Plugin::JSON
+
+This module provides a plugin for use with the Template Toolkit.
+It provides a .json vmethod to all value types when loaded.
+You can also decode a json string back to a data structure.
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/Template::Plugin::JSON
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+This module was written by Yuval Kogman <nothingmuch@woobling.org>
+
+Copyright (c) 2006, 2008 Infinity Interactive, Yuval Kogman
+

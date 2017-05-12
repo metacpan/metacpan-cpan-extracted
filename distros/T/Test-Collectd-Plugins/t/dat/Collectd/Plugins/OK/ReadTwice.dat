@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+[
+	[
+		{
+      interval => 10,
+      host => "localhost.localdomain",
+      plugin => "OK::ReadTwice",
+      type => "gauge",
+      type_instance => "ti",
+      plugin_instance => "pi",
+      values => [ 42 ],
+    },
+	],
+	[
+		{
+      interval => 10,
+      host => "localhost.localdomain",
+      plugin => "OK::ReadTwice",
+      type => "gauge",
+      type_instance => "ti2",
+      plugin_instance => "pi2",
+      values => [ 0 ],
+    },
+	],
+];
+

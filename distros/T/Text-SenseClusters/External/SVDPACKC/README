@@ -1,0 +1,179 @@
+Please note that the version of SVDPACKC contained here in the 
+SenseClusters package is a partial and slightly modified version of
+the original SVDPACKC. We have removed everything from SVDPACKC
+except las2.c, las2.h, timersun.c, lap2, belladit, and this README. 
+
+Note that matrix is a copy of belladit and is provided for ease of
+testing las2 (which assumes an input file named matrix is available,
+as well as a paramter file named lap2). Note that the values in lap2 
+have been set using the svdrun script provided in the original SVDPACK 
+distribution, but not included here. 
+
+las2.c has been modified in accordance with suggestions in the 
+SenseClusters installation documentation.
+
+You can find the original SVDPACK distribution at :
+
+http://netlib.org/svdpack
+
+What follows is the original README. 
+
+Ted Pedersen
+tpederse at d.umn.edu
+March 23, 2008
+
+=========================================================================
+
+                         SVDPACKC (Version 1.0)
+/*************************************************************************
+                           (c) Copyright 1993
+                        University of Tennessee
+                          All Rights Reserved
+ *************************************************************************/
+
+This directory contains instrumented SVDPACKC Version 1.0 (ANSI-C)
+programs for compiling within the "svdrun" script.  The "svdsum"
+script can be run after all output files of the form <dataset>.outN,
+where N=1,2,...  have been produced by svdrun.  A sample input file
+"svdin" is provided for use with both scripts, i.e., you invoke
+the scripts via
+
+                  % svdrun svdin
+                  % svdsum svdin
+
+where "%" is your UNIX C-Shell prompt.  Please note that you must
+be using the UNIX C-Shell for these scripts to work correctly.  The
+intent of this new version of SVDPACKC (ANSI-C) is to allow
+automatic compilation and summarization of output with little or no
+user intervention.  Without dynamic memory allocation, however, every
+change to parameters in your input file (e.g., "svdin") will necessitate
+a new compilation so you must be patient in using the "svdrun" script.
+The "svdsum" script will produce tabular output files with a maximum
+of 5 experiments (or runs) summarized per file.  As described in the
+prologue of the svdrun script, you can summarize any combination of output
+files produced by svdrun that you like.  The intent here is to facilitate
+algorithm and dataset comparisons.  Instructions for testing programs
+individually are at the end of this file.
+
+---------------------------------------------------------------------------
+The files (and their contents) enclosed in this directory are listed below:
+---------------------------------------------------------------------------
+
+              Approx.       
+Filename      K-Bytes     Contents
+--------      -------     --------
+svdin              2     sample input file for svdrun, svdsum
+svdin.bench       18     benchmark parameters for Macintosh II/fx
+svdrun            16     c-shell script for running SVDPACKC
+svdrun.mac        10     MPW script for running SVDPACKC on Macintosh II/fx
+svdsum            37     c-shell script to generate summary files
+svdsum.mac        32     MPW script to generate summary files on Mac. II/fx
+svdin.sum1         4     sample summary file for svdin runs
+svdin.sum2         3     sample summary file for svdin runs
+guide.ps.Z       619     compressed postscript user's guide (Tech. Report
+                         CS-93-194, Dept. of Computer Science, Univ. TN)
+--------------------------------------------------------------------
+las1.c             72    source code (single-vector Lanczos; cyclic)
+las2.c             74    source code (single-vector Lanczos; A'A   )
+bls1.c             84    source code (block Lanczos        ; cyclic)
+bls2.c             77    source code (block Lanczos        ; A'A   )
+sis1.c             47    source code (subspace iteration   ; cyclic)
+sis2.c             48    source code (subspace iteration   ; A'A   )
+tms1.c             77    source code (trace minimization   ; cyclic)
+tms2.c             90    source code (trace minimization   ; A'A   )
+timermac.c          1    timer for Macintosh II/fx
+timersun.c          1    timer for UNIX workstations
+--------------------------------------------------------------------
+las1.h              3    las1 include file
+las2.h              3    las2 include file
+bls1.h              3    bls1 include file
+bls2.h              3    bls2 include file
+sisc.h              1    sis1,2 include file (constants)
+sisg.h              1    sis1,2 include file (globals)
+tmsc.h              1    tms1,2 include file (constants)
+tmsg.h              2    tms1,2 include file (globals)
+--------------------------------------------------------------------
+lap1                3    las1 parameter file
+lap2                3    las2 parameter file
+blp1                3    bls1 parameter file
+blp2                3    bls2 parameter file
+sip1                1    sis1 parameter file 
+sip2                1    sis2 parameter file
+tmp1                1    tms1 parameter file
+tmp2                2    tms2 parameter file
+--------------------------------------------------------------------
+lad1                9    las1 documentation file
+lad2                9    las2 documentation file
+bld1               11    bls1 documentation file
+bld2               12    bls2 documentation file
+sid1               12    sis1 documentation file 
+sid2               12    sis2 documentation file
+tmd1               13    tms1 documentation file
+tmd2               13    tms2 documentation file
+--------------------------------------------------------------------
+belladit.Z          4    compressed sparse test matrix
+belladit.out1       4    sample output file from las1.c
+belladit.out2       4    sample output file from las2.c
+belladit.out3       2    sample output file from bls1.c
+belladit.out4       2    sample output file from bls2.c
+belladit.out5       2    sample output file from sis1.c
+belladit.out6       2    sample output file from sis2.c
+belladit.out7       2    sample output file from tms1.c
+belladit.out8       2    sample output file from tms2.c
+-------------------------------------------------------------------
+makefile            2    sample makefile for UNIX workstations
+las1.make           1    sample makefile for las1 on Macintosh II/fx
+las2.make           1    sample makefile for las2 on Macintosh II/fx
+bls1.make           1    sample makefile for bls1 on Macintosh II/fx
+bls2.make           1    sample makefile for bls2 on Macintosh II/fx
+sis1.make           1    sample makefile for sis1 on Macintosh II/fx
+sis2.make           1    sample makefile for sis2 on Macintosh II/fx
+tms1.make           1    sample makefile for tms1 on Macintosh II/fx
+tms2.make           1    sample makefile for tms2 on Macintosh II/fx
+README              7    this file
+--------------------------------------------------------------------
+                 2070  <- Approximate Total K-Bytes required
+
+------------------------
+Cray Compatible Software:
+------------------------
+Equivalent source and support files for the Cray Y-MP (running UNICOS)
+are located within the CRAY/ subdirectory.  You should keep these
+files separate since they are only suitable for execution on the Cray Y-MP.
+
+-----------------------------
+Testing Programs Individually:
+-----------------------------
+To test each of the SVDPACKC programs individually, you must first uncompress
+the belladit.Z file and call it "matrix".  If you plan to run the programs on
+a UNIX-based workstation, you should uncomment the line
+
+                 /*   #define  UNIX_CREAT */
+
+       in the declarations prior to main() in <rtn>.c,
+
+where <rtn> is one of the SVDPACKC programs (las1, las2, bls1, bls2,
+sis1, sis2, tms1, or tms2).  You can then issue (% = system prompt)
+
+                         % make <rtn>
+
+to create the executable <rtn>.  Please read the documentation file for
+the program and then provide the appropriate parameter file changes for
+your run.  For example, you must provide a valid "lap2" file before 
+executing "las2".  You can execute <rtn> by simply issuing
+
+                         % <rtn>
+
+---------------------
+For more information:
+---------------------
+
+        Please address all questions, comments, or corrections to:
+
+        M. W. Berry
+        Department of Computer Science
+        University of Tennessee
+        107 Ayres Hall
+        Knoxville, TN  37996-1301
+        email: berry@cs.utk.edu
+        phone: (423) 974-5067

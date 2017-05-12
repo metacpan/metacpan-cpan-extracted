@@ -1,0 +1,16 @@
+Revision history for Tapper-Fake
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        - provide a fake MCP
+          (quite a special thingie, ask someone before use)
+        - more elaborate init for more elaborate test
+        - big Dist::Zilla roundhouse kick
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

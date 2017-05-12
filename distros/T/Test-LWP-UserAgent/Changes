@@ -1,0 +1,164 @@
+Revision history for Test-LWP-UserAgent
+
+0.032     2017-05-03 22:57:18Z
+          - convert network tests to using httpbin.org, to not rely on
+            iana.org not changing their content
+
+0.031     2016-11-02 04:15:38Z
+          - warnings are only checked for in tests under AUTHOR_TESTING, so as
+            to not prevent installation when warnings occur in prerequisites.
+
+0.030     2015-08-17 00:07:37Z
+          - change network tests from hitting example.com to cpan.org, in the
+            hopes of getting past more testers' firewalls
+          - factor a few bits of HTTP::Response-specific code out into private
+            methods, to ease future refactoring
+          - some clarification and expansion to documentation
+
+0.029     2015-05-23 03:43:46Z
+          - add use of Test::RequiresInternet to avoid failing tests on
+            smokers that are failing to set NO_NETWORK_TESTING when running
+            behind a firewall
+
+0.028     2015-04-10 22:38:29Z
+          - report on the versions of more networking modules, to try to track
+            down mysterious failed network connections during testing
+
+0.027     2015-02-26 04:57:32Z
+          - register_psgi, unregister_psgi, map_response, map_network_response
+            and unmap_all all return their invocant, to allow for method
+            chaining (Tom Hukins, github #2)
+
+0.026     2014-11-12 03:46:16Z
+          - resolve test failure when a prereq is too old
+
+0.025     2014-07-15 02:42:54Z
+          - fix examples test that behaves badly on older perls
+
+0.024     2014-07-14 01:32:46Z
+          - tests that use the network now respect NO_NETWORK_TESTING as well
+            as EXTENDED_TESTING
+          - switch from using JSON to JSON::MaybeXS
+          - add conditional prereq on latest version of URI, when perl version
+            is at 5.21.2 or higher, to get a fix for deprecated \C in regexes
+
+0.023     2014-02-17 01:42:41Z
+          - uses of Test::TempDir switched to Path::Tiny
+          - removed unneeded use of Class::Load
+
+0.022     2013-11-01 04:01:19Z
+          - prevent optional test from failing on perls < 5.10
+
+0.021     2013-10-31 02:24:49Z
+          - skip testing examples/ code when optional/undeclared prereqs are
+            not available
+
+0.020     2013-10-26 16:31:48Z
+          - fixed tests from using example.com to iana.org, to ensure we get a
+            302 response when needed
+          - converted all uses of Test::NoWarnings to Test::Warnings
+          - warnings tests bypassed during installation
+
+0.019     2013-07-22 05:21:27Z
+          - switched examples to using object-based syntax, to make it more
+            clear that there is no monkey-patching (RT#86830), and other
+            documentation/example cleanup
+
+0.018     2013-03-22 18:08:50Z
+          - fix test failures under newer perls by ensuring that serialized
+            comparisons are always performed canonically
+
+0.017     2013-03-22 17:48:34Z
+          - really fix RT#84094 this time
+
+0.016     2013-03-21 06:01:47Z
+          - fixed handling of methods such as mirror() (RT#84094) - thanks for
+            the report, Tom Hukins!
+
+0.015     2013-02-10 00:55:18Z
+          - can now create a mapping on a class name or an object where that
+            class or object implements the 'request' method (from a suggestion
+            by mst)
+
+0.014     2012-12-12 18:29:39Z
+          - fix advent link in pod
+
+0.013     2012-12-12 18:24:49Z
+          - silly mistake in examples/application_client_test.pl fixed
+          - link to today's Perl Advent Calendar entry, about this module :)
+
+0.012     2012-12-02 06:57:01Z
+          - examples/ directory added, containing fleshed-out code snippets
+            used in the article for the 2012 Perl Advent Calendar, and a
+            detailed example of some unit tests for a client library
+
+0.011     2012-10-16 18:37:48Z
+          - remove additional options in constructor before passing to
+            LWP::UserAgent (was causing a carp when $^W was set) - thanks for
+            the report and patch, Nigel Gregoire and Michael Schulthess!
+          - all remaining uses of eval eliminated, by using better heuristics
+            for "can be used as a coderef" logic
+
+0.010     2012-10-06 23:47:33Z
+          - documentation on integration with XML::Compile::SOAP
+          - questionable uses of eval { $foo->isa } converted to Safe::Isa
+          - imported symbols are no longer available as methods
+
+0.009     2012-08-29 16:54:34Z
+          - fix test to work with older (pre-6.00) LWP::UserAgent, when
+            _new_response did not take a content argument
+
+0.008     2012-08-21 19:48:35Z
+          - better handling when the response implementation dies, either
+            with an error message or an HTTP::Response object
+          - network_fallback and map_network_response features added, for
+            sending any or all requests through to the real LWP::UserAgent
+          - new feature: "last_useragent", for getting the last useragent
+            object used globally
+          - allow exact string matching against domains to work even for
+            domains specified via a string-overloaded object
+          - bug fix: properly mask existing mappings in
+            $ua->map_response(..., undef) (v0.007)
+
+0.007     2012-08-14 20:56:50Z
+          - cleanup of domain->PSGI app functionality for stable release:
+            - string mappings in map_response now match against the URI host,
+              not the full URI string
+            - register_domain is now called register_psgi; unregister_domain
+              is now unregister_psgi; unregister_all is removed, as unmap_all
+              will do the right thing
+            - domain mappings no longer take priority over other mapped
+              responses; all mappings are now tested in the order they were
+              added (with instance mappings matched first over global
+              mappings, as before)
+
+0.006-TRIAL     2012-07-28 23:03:24Z
+          - new domain->PSGI app functionality, and methods register_domain,
+            unregister_domain, unregister_all
+
+0.005     2012-07-21 00:37:26Z
+          - additional error checking and tests
+          - also support objects with &{} overloading, in place of subrefs
+          - now doing the same end-of-response cleanup handling that the real LWPUA does:
+            - saving the request on the response
+            - adding Client-Date header
+            - respect show_progress settings
+            - runs handlers
+
+0.004     2012-06-27 22:41:02Z
+          - map_response now accepts a coderef in place of the HTTP::Response
+            object to return, to allow basing the response data on what was in
+            the request
+
+0.003     2012-06-24 05:11:53Z
+          - fix compile error on perls earlier than 5.9.5 (which did not have
+            re::is_regexp)
+
+0.002     2012-06-23 16:36:51Z
+          - minor documentation fixes
+          - renamed from Test::Mock::LWP::UserAgent to Test::LWP::UserAgent
+            (thanks, mst!)
+
+0.001     2012-06-23 00:11:20Z
+          - Initial release, in all its questionable glory.
+

@@ -1,0 +1,46 @@
+<%args>
+        $report
+</%args>
+
+% my $files = $report->files;
+
+% if (scalar $files->all) {
+      <h4>Attachments</h4>
+      <table class="reportfile">
+%     my @files;
+%     # while-loop to not load all complete filecontents into ram
+%     while (my $file = $files->next) {
+%         push @files, {
+%                       id                 => $file->id,
+%                       filename           => $file->filename,
+%#                       length_filecontent => length($file->filecontent),
+%                       length_filecontent => 0, #length($file->filecontent),
+%                       contenttype        => $file->contenttype,
+%                       created_at         => $file->created_at,
+%                      };
+%     }
+%     @files = sort { $a->{filename} cmp $b->{filename} } @files;
+%     foreach my $file (@files) {
+
+	  <tr>
+            <th align="right"><a href="/tapper/reportfile/id/<% $file->{id}%>#reports/id/<% $report->id %>"><% $file->{filename} %></a></th>          <!--"-->
+<!--
+            <td align="right"><% $file->{length_filecontent} %> Bytes (compressed)</td>
+-->
+            <th>
+% if ($file->{contenttype} =~ /plain/) {
+              view
+              <a title="Optimized for inline viewing with ansi2txt." href="/tapper/reportfile/id/<% $file->{id} %>/ansi2txt#reports/id/<% $report->id %>">inline</a> |
+              <a title="Optimized for inline viewing with ansi2html." href="/tapper/reportfile/id/<% $file->{id} %>/ansi2html#reports/id/<% $report->id %>">ansi-colored</a>
+% }
+            </th>
+            <th><% $file->{contenttype} %></th>
+            <td><% $file->{created_at}->ymd %> <% $file->{created_at}->hms %> GMT</td>
+          </tr>
+%     }
+      </table>
+% }
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

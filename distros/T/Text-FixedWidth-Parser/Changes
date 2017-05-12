@@ -1,0 +1,10 @@
+Revision history for perl module Text::FixedWidth::Parser
+
+0.3
+	* POD changes
+	* Bug fixes
+	* Convert the timestamp fields values to epoch, which ever given in TimestampToEpochFields attribute 
+	
+0.2
+    POD changes
+

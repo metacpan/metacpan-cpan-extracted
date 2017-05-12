@@ -1,0 +1,62 @@
+Revision history for Perl extension Tie::Array::Packed.
+
+0.13  Dec 8, 2013
+        - sorting methods were broken for type IV on 64 bit machines
+        - add bsearch, bsearch_ge and bsearch_le methods
+
+0.12_02  Jul 18, 2012
+        - use latest version of Math::Int128 C API support files  
+
+0.12_01  Jul 17, 2012
+        - add support for int64 and int128 numbers via Math::Int64 and
+          Math::Int128 modules
+
+0.11  Feb 14, 2012
+        - add shuffle method
+        - add usage sample
+
+0.10  Jun 25, 2008
+        - compilation bug "arg 1 of `Perl_sv_setuv' makes pointer from
+          integer" affecting 64 bits platforms corrected.
+        - some other minor 64 bit improvements
+
+0.09  Jun 24, 2008
+        - 64 bit clean up for indexes
+        - really support quad types
+        - sort, grep, reverse and rotate utility methods added
+
+0.08  Mar 16, 2007
+        - skip tests using unsupported packers under older perls
+
+0.07  Mar 14, 2007
+        - backward incompatible change: use j and J as the
+          template for IVs and UVs; and i and I for ints and unsigned
+          ints respectively.
+        - make it work in 64bit systems
+
+0.06  Mar 11, 2007
+        - correct bug on machines with shorts bigger than 16bits
+          failing compilation
+        - make it work under perl 5.6.x
+
+0.05  Mar 11, 2007
+        - eliminate bug in test script failing in 64bits systems
+        - pod errors corrected
+        - pod check added
+
+0.04  Apr 27 2006
+        - optimization: eliminate copy of string on TIEARRAY
+        - optimization: preallocate more memory than required at the
+          end of the string.
+
+0.03  Apr 26 2006
+        - optimization: allocate more memory than required in front of
+          PV on unshift and split operations.
+
+0.02  Apr 16 2006
+        - correct bugs on handling of n, N, v and V types
+
+0.01  Fri Apr 14 00:06:14 2006
+        - original version; created by h2xs 1.23 with options
+		-An Tie::Array::Packed
+

@@ -1,0 +1,20 @@
+---
+name: Thread-CriticalSection
+version: 0.02
+author:
+  - 'Pedro Melo <melo@cpan.org>'
+abstract: Run a coderef inside a critical section
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+  Thread::Semaphore: 0
+provides:
+  Thread::CriticalSection:
+    file: lib/Thread/CriticalSection.pm
+    version: 0.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

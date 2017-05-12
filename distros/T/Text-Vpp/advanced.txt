@@ -1,0 +1,35 @@
+@IF ($Complex)
+  @FOREACH $Col (7,scalar(print (">>>false foreach-evaluation,,,"),11) )
+generated line:  \Col  <<<
+    @IF ($Col != 11)
+---------------------
+    @ENDIF
+  @ENDFOR
+  @IF (scalar(print (">>>false if-evaluation,,,"),1))
+true IF in false context
+  @ENDIF
+@ENDIF
+
+@EVAL $Msg= "hello world";  \
+      $ForList=[1,2];
+@IF ($Real) # true
+>@@$Msg@@: here is Pi: @@4*atan2(1,1)@@     EOL
+  @FOREACH $Col (@{[]})
+Error: empty loop expansion
+  @ENDFOR
+  @FOREACH $Col (@{$ForList})
+>> expanded Forlist \{Col}@@$Col==1? 'st' : $Col==2? 'nd' : $Col==3? 'rd' : 'th'@@ time
+    @FOREACH $Row (1..3)
+  ----- inner loop at \Col / \Row
+      @FOREACH $M (1..2)
+    +++ level 3 : \Col / \Row / \M
+      @ENDFOR
+      @IF (0)
+        @FOREACH $MI (1..2)
+      +++ don't show level 3 : \Col / \Row / \MI
+        @ENDFOR
+      @ENDIF
+    @ENDFOR
+<<<<<<<<<<
+  @ENDFOR
+@ENDIF

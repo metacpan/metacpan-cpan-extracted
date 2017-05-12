@@ -1,0 +1,28 @@
+Revision history for Text-WordGrams
+
+0.07    Mon Nov 19 17:10:23 WET 2012
+        - from_files now support utf8 flag
+
+0.06    2012, June 24 - 13:29
+        - fix POD to declare encoding;
+        - use base Exporter instead of require;
+
+0.05    2012, Apr 11 - 18:15
+        - support one-grams;
+        - use DB_File for supporting big files;
+
+0.04    2009, Oct 16 - 19:58
+        - added option not to tokenize the document
+
+0.03	2009, Oct 16 - 19:07
+	- fixed typo on perldoc
+
+0.02    2005, Nov 04 - 23:43
+	- support for processing a list of files instead of a string.
+
+0.01    2005, Nov 04 - 20:30
+        First version, released on an unsuspecting world including:
+	- a simple word_grams function to process a string
+
+	Release soon! Release often!
+

@@ -1,0 +1,23 @@
+---
+abstract: 'generate events from TAP::Formatter methods'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300017, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAP-Formatter-Event
+requires:
+  Mixin::Event::Dispatch: 0.004
+  TAP::Harness: 0
+  parent: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=TAP-Formatter-Event
+  homepage: http://search.cpan.org/dist/TAP-Formatter-Event/
+version: 0.001

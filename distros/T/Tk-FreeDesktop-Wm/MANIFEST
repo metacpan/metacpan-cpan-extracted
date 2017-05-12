@@ -1,0 +1,18 @@
+Changes
+lib/Tk/FreeDesktop/Wm.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/10basic.desktop
+t/10basic.t
+t/20experiments.t
+t/30wmicon.t
+t/srtbike16.gif
+t/srtbike16a.png
+t/srtbike32.xpm
+t/srtbike32a.png
+t/srtbike48.png
+t/TestUtil.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

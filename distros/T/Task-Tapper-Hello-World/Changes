@@ -1,0 +1,14 @@
+Revision history for Task-Tapper-Hello-World
+
+0.003     2016-04-24
+        - + Tapper::Reports::Receiver::Level2::BenchmarkAnything
+
+0.002     2012-11-22
+        - dzil pluginbundle TAPPER
+
+0.001     2012-11-19
+        - add client test suites
+        - fix wrong namespace
+
+0.001     2012-11-14
+        - Tapper - dependencies for an easy "hello world"-style start

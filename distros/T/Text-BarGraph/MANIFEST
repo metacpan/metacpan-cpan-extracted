@@ -1,0 +1,8 @@
+lib/Text/BarGraph.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/use.t
+examples/graphtest.pl
+META.yml

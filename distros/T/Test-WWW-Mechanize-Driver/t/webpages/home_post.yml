@@ -1,0 +1,44 @@
+---
+uri: http://test/home.html?method=POST
+
+# different content from home.yml so we detect bad happenings
+request: 'http://serenevy.net/'
+--- |
+HTTP/1.1 200 OK
+Connection: close
+Date: Sat, 20 Jun 2009 16:45:49 GMT
+Accept-Ranges: bytes
+ETag: "4686e9-3c7-41f793f7552c0"
+Server: Apache/2
+Vary: Accept-Encoding
+Content-Length: 967
+Content-Type: text/html
+Content-Type: text/html; charset=ISO-8859-1
+Last-Modified: Tue, 10 Oct 2006 18:38:43 GMT
+Client-Date: Sat, 20 Jun 2009 16:45:49 GMT
+Client-Peer: 206.212.243.242:80
+Client-Response-Num: 1
+Link: <S.png>; /="/"; rel="icon"; type="image/png"
+Title: Serenevy: Home
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+ <title>Serenevy: Home</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+ <link rel="icon" href="S.png" type="image/png" />
+ <style><!-- body{margin:3em;background-color:#fffff0;color:#330033;} --></style>
+</head><body>
+<h1>Welcome to the Serenevy family homepage!</h1>
+
+<ul>
+<li>The <a href="http://riverbendmath.org">Riverbend Community Math Center</a></li>
+<li><a href="http://amanda.serenevy.net">Amanda</a>'s Page</li>
+<li><a href="http://bob.serenevy.net">Bob</a>'s Page</li>
+<li><a href="http://hysterical-fiction.net">Bonnie</a>'s Page</li>
+<li><a href="http://dean.serenevy.net">Dean</a>'s Page</li>
+<li>Our <a href="http://pictures.serenevy.net">Pictures</a></li>
+<li><a href="http://debian.serenevy.net">Our debian archives</a></li>
+</ul>
+
+</body></html>

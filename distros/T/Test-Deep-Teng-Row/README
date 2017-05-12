@@ -1,0 +1,39 @@
+This is Perl module Test::Deep::Teng::Row.
+
+INSTALLATION
+
+Type the following command:
+
+    $ curl -L http://cpanmin.us | perl - Test::Deep::Teng::Row
+
+Or install cpanm and then run the following command to install
+Test::Deep::Teng::Row:
+
+    $ cpanm Test::Deep::Teng::Row
+
+If you get an archive of this distribution, unpack it and build it
+as per the usual:
+
+    $ tar xzf Test-Deep-Teng-Row-$version.tar.gz
+    $ cd Test-Deep-Teng-Row-$version
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+Test::Deep::Teng::Row documentation is available as in POD. So you can do:
+
+    $ perldoc Test::Deep::Teng::Row
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2012, Soh Kitahara. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

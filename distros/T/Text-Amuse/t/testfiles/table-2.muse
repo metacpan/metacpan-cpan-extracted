@@ -1,0 +1,14 @@
+#title table 2
+
+                                || Establishments || Employees  || Average per establishment
+ Artisans working single-handed   |   994,743 |  994,743*   |     --
+ From 1 to 5 employees    	 | 875,518   | 2,205,539   |  	2.5
+ From 6 to 10 employees    	 | 96,849    | 717,282     |  	7
+ From 11 to 50 employees   	 | 90,225    | 1,996,906   |   	22
+ From 51 to 100 employees  	 | 15,783    | 1,103,949   |   	70
+ From 101 to 500 employees 	 | 11,827    | 2,295,401   |  	194
+ Over 500 employees         	 | 1,423     | 1,538,577   | 	1,081
+ Total                  		 ||| 1,091,625 ||| 9,858,120   |||    	9
+ with artisans        		 ||| 2,086,368 ||| 10,852,863  |||     	5
+ |+ 1907. <br> * In reality there are **no** employees. I ***give*** this figure only for the totals. +|
+

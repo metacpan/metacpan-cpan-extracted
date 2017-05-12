@@ -1,0 +1,36 @@
+Revision history for Perl extension Text-Sprintf-Zenkaku
+
+0.09 2016-10-14T11:14:15Z
+
+    - Fix tests for perl version < 5.8.9
+
+0.08 2016-10-05T11:53:45Z
+
+    - Support perl 5.8
+
+0.07 2016-10-04T15:04:34Z
+
+    - Support 'complex width pattern'
+    - Fix encoding issue when run 'prove' cmd
+
+0.06 2016-09-29T10:53:09Z
+
+    - Fix failed tests
+    - Change support perl version to greater than or equal to 5.10
+
+0.05 2016-09-28T16:20:27Z
+
+    - CPAN it
+
+0.04 2016-09-28T16:10:44Z
+
+    - Support complex patterns
+
+0.03 2016-09-22T04:14:36Z
+
+    - Rename module name to Text::Sprintf::Zenkaku
+
+0.02 2016-09-22T03:17:48Z
+
+    - original version
+

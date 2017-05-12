@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+
+BEGIN {
+    if (-f '/etc/crucible.cfg') {
+        eval '. /etc/crucible.cfg && exec /usr/bin/perl  -S $0 ${1+"$@"}';
+    } elsif (-d "/testing") {
+        $ENV{BASE_DIR} = "/testing";
+    }
+}
+use lib "$ENV{BASE_DIR}/usr/lib/perl5/site_perl/5.8.8";
+
+#use strict;
+use Getopt::Long;
+
+my $testname="empty";
+my $datafile;
+my $overrides;
+my $format;
+my $debug;
+
+my $result = GetOptions ("datafile=s" => \$datafile,    # string
+    "testname=s"   => \$testname,       # string
+    "debug=i"      => \$debug,          # flag
+    "overrides=s"  => \$overrides,      # string, comma seperated list of key=value pairs
+    "format=s"     => \$format);        # string
+    my $module='';
+    if($testname eq "empty"){
+        usage();
+        die("\nError: Need name of test module.\n");
+    }
+    else{
+        $module='Test::Parser::'.$testname;
+        $testname="\u$testname";
+        eval "require $module;";
+        if($@){
+            print $@;
+        }
+    }
+    my $result=new $module();
+    if($debug){
+        $result->set_debug($debug);
+    }
+    if($datafile){
+        $result->parse($datafile);
+    }
+    if(defined $overrides){
+       (@values) = split ',', $overrides;
+       foreach my $val (@values){
+           my ( $a, $b ) = $val =~ m/^\s*(.*?)\s*=\s*(.*?)\s*$/;
+           $b =~ s/^[\"\']*(.*?)[\"\']*$/$1/;
+           $result->{$a} = $b or die "Is $a an attribute?";
+       }
+    }
+    if($format){
+        my $printfunction="to_" . $format;
+        if(exists &{$result->$printfunction()}){     
+            print $result->$printfunction();
+        }
+        else{
+            print $result->to_xml();
+        }
+    }
+exit;
+
+sub usage {
+
+    print ("parse_test --testname=<string> --format=<string> --datafile=<string> --debug=<integer>\n");
+
+}
+
+
+__END__
+
+
+=head1 NAME
+
+boottool - tool for modifying bootloader configuration
+
+=head1 DESCRIPTION
+
+parse_test is a general script for parsing test output.
+
+=head1 OPTIONS
+
+    --testname=<String>    Test to run script on
+
+    --format=<String>      Format to turn to 
+
+    --datafile=<String>    File to find data for test
+
+    --overrides=<String>   Comma seperated list of key=value pairs
+
+    --debug-flag Debug
+
+=cut

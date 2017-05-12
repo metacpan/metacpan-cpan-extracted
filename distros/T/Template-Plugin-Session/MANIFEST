@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Session.pm
+t/00base.t
+t/01real.t

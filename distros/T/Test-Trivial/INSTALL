@@ -1,0 +1,6 @@
+On Debian/Ubuntu the dependencies can be installed with:
+$ sudo apt-get install \
+       libregexp-common-perl \
+       libtext-diff-perl \
+       libio-stringy-perl \
+       libio-tee-perl

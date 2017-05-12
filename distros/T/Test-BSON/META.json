@@ -1,0 +1,57 @@
+{
+   "abstract" : "Test BSON documents",
+   "author" : [
+      "Nick Patch <patch@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-BSON",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.82",
+            "Test::Tester" : "0.107"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BSON" : 0,
+            "Test::Differences" : "0.47",
+            "parent" : 0,
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::BSON" : {
+         "file" : "lib/Test/BSON.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/patch/test-bson-pm5/issues"
+      },
+      "homepage" : "http://github.com/patch/test-bson-pm5",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/patch/test-bson-pm5.git"
+      }
+   },
+   "version" : "0.01"
+}

@@ -1,0 +1,29 @@
+=head1 NAME
+
+Tangram::Remote - represent persistent objects in client space
+
+=head1 SYNOPSIS
+
+   use Tangram;
+
+   $remote = $storage->remote( $class );
+   @remotes = $storage->remote( @classes );
+
+   ... $remote->{$field} ...
+
+=head1 DESCRIPTION
+
+A Remote object is a client-side representation of an object that
+resides in a database.  It has the same fields as a normal object of
+the same class - as declared in the Schema associated to the database
+the Remote was obtained from.  The values of the fields are not normal
+Perl values, but L<Tangram::Expr>s that will be evaluated on the
+database server side.
+
+Remote objects are somewhat similar to SQL table aliases.
+
+Note that there are no objects which are actually C<Tangram::Remote>
+instances; the objects will be called L<Tangram::Expr::QueryObject> et
+al.
+
+=cut

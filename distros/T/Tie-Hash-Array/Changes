@@ -1,0 +1,15 @@
+Revision history for Perl module Tie::Hash::Array
+
+0.01 Mon Dec 02 14:30:00 2002
+	- original version; created with kind assistance from
+	  ExtUtils::ModuleMaker 0.31229
+
+0.02 Thu Aug 05 12:00:00 2004
+	- added t/9_pod.t
+
+0.10 Tue Jan 02 16:24:00 2008
+	- fixed README
+	- fixed t/3_random_data.t
+	- made it possible to safely delete keys while iterating over them
+	- added ->split_at() method
+        - added tests for POD coverage

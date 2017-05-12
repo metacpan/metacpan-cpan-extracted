@@ -1,0 +1,71 @@
+Revision history for Test-Group
+
+0.20    2015-05-07
+      - Fix test failures induced by Test::More now putting
+        comments in the TAP stream (fixes RT #95779)
+
+0.19    2013-04-09
+      - Fix TODO tests
+
+0.18    2010-01-11
+      - Add an option to use Test::Builder's subtest() as the
+        underlying test grouping mechanism.
+      
+0.17    2009-11-30
+      - Add Test::Group::Tester, use it in Test::Group's tests
+      - Add Test::Group::Plan and Test::Group::NoWarnings extensions
+
+0.16    2009-11-12
+      - Fix failing test line numbers in predicates and wrappers
+      - Allow verbose level to be set via an environment variable
+      - Some test suite improvements
+      - Added a plugin interface
+      - POD clarification
+
+0.15    2009-10-22 (Nick Cleaton)
+      - Fix a failing test on some platforms
+      - Add support for verbose >= 2
+
+0.14    2008-09-12
+      - Allows to nest test skipping commands
+      - Fixes for the upcoming Test::Builder 0.81
+
+0.12    2008-02-12
+      - Compatibility with Perl 5.4
+
+0.11    2007-11-15
+      - Some quick fix that I can't remember...
+
+0.09    2007-11-14
+      - "require 5.006;", again to placate CPAN-testers
+
+0.08    2007-11-13
+      - Win32 test suite fixes, with thanks to Mr Muskrat, David
+        Golden and Christopher H. Laco (in no particular order)
+
+0.07    2007-03-21
+      - Exceptions are now dumped with diag() instead of
+        abusing the test name
+      - Now works with Perl 5.6.2, with thanks to David Cantrell
+
+0.06    2007-02-04
+      - Minor tweaks to the pretty-printing of exceptions
+      - Some code and test cleanups
+
+0.05    2007-02-04
+      - Major overhaul of the internals; turned into an object class
+      - Fixed support for TODO sub-tests; added support for skipping
+        sub-groups
+
+0.04    2007-01-23
+      - Support for exception objects thrown from inside tests
+
+0.03    2006-05-19
+      - Support for TODO sub-tests
+
+0.02    2006-05-05
+      - First release to CPAN
+
+0.01    2004-06-11
+      - First version by Nicolas Thie'ry, unreleased.
+

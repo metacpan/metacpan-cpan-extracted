@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 56fc4c0a74a0266c261b2d9092567645d14666b5 Changes
+SHA1 75f75f4e0b4a3cc1a09534c78de97110696debe5 LICENSE
+SHA1 9d637dbcdff0be5b38cd63eae8212bffd5aa8309 MANIFEST
+SHA1 7473199954338e97c84388628e07ee4d09b89367 META.yml
+SHA1 0d8a4ae280dd5d2e9656d80b9f78e849d0fa59d4 Makefile.PL
+SHA1 7753d520be665f7ea6f0234f597223ceda4c699f README
+SHA1 4133148b8c60785d1628c81de65b8d336877560f dist.ini
+SHA1 a83273ee3bec4a1c19009af293d88f203a0339d4 lib/Template/Plugin/Filter/Minify/CSS/XS.pm
+SHA1 ea144be196e5c80222d9fbd8a16242499d76d014 t/compile.t
+SHA1 1a9a59e024999761c5903746eb667568789dc244 t/minify.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 61cea839dd94aaaeb301ccac9b83cde4c5c91b42 t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlM7AnoACgkQ+CqvSzp9LOx4UACgnimJ0kKyEbXanIeLzuXmBAcO
+XmoAoJq4RoQJR3Nundp/vctM4T9f9zal
+=UkuG
+-----END PGP SIGNATURE-----

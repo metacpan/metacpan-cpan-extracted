@@ -1,0 +1,20 @@
+Revision history for Perl extension Tk::StatusBar.
+
+0.01  Tue Jan 20 17:55:35 2004
+	- original version; created by h2xs 1.23 with options
+		-X -n Tk::StatusBar
+
+0.02  Mon Feb 02 18:30:45 2004
+	- added a window resize button
+	- improved documentation
+	
+0.03  Tue Feb 03 20:37:00 2004
+	- improved look of the window-resize button's diag lines
+	- fixed bug associated with adding a progressbar with no
+	    -length specified
+	- created a valid test script
+	
+0.04  Wed Feb 04 20:21:22 2004
+	- customized mouse cursor based on OS (Win32 or other)
+	- improved window resize performance
+

@@ -1,0 +1,35 @@
+----------------------------
+revision : 1.02
+date : 2009/12/21 11:44:18
+correct code for SPLICE
+add SLICE code ( to allow use of $t->SLICE() to easilly get all the elements from the object
+----------------------------
+revision : 1.01
+date : 2009/12/18 15:18:33
+use the expiration value in EXPIRE and not a absolute ticks
+remove FETCHTIME and PUSHTIME ( and use extra parameter to put of fetch at a specific offset)
+ FETCH, LAST, FISRT, POP, and SHIFT return the value in scalar context, in array context return ( key, value ) 
+----------------------------
+revision : 0.55
+date : 2008/9/24 13:22:05
+add serialize feature
+----------------------------
+revision : 0.50
+date : 2008/6/19 16:06:20
+add delete_on_error and exit_on_error parameter 
+----------------------------
+revision : 0.48
+date : 2008/6/16 15:00:42
+add UNSHIFT feature
+----------------------------
+revision : 0.38
+date : 2008/4/11 13:05:33
+add MODE creation for the DB file when tying
+----------------------------
+revision : 0.37
+date : 2008/4/11 10:28:15
+add SPLICE feature
+----------------------------revision : 0.36
+date : 2008/4/10 18:56:37
+first full functional version
+----------------------------

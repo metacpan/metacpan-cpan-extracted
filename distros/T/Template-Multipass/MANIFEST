@@ -1,0 +1,21 @@
+Changes
+lib/Template/Multipass.pm
+lib/Template/Multipass/Provider.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_use.t
+t/01_basic.t
+t/02_perf.t
+t/03_misc.t
+t/04_errors.t
+t/templates/bar.tt
+t/templates/bar_meta.tt
+t/templates/foo.tt
+t/templates/include.tt
+t/templates/process.tt
+t/templates/wrapper.tt
+t/templates/wrapper2.tt
+t/templates/wrapper_test.tt
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

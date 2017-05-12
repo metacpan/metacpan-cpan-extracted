@@ -1,0 +1,7 @@
+Revision history for Perl extension Text::TabTable.
+
+1.01  Mon Nov 17 15:33:01 2003
+	- original version
+
+1.02  Mon Nov 24 10:22:25 PST 2003
+        - forgot to manifest Makefile.PL :-(.  No code changes.

@@ -1,0 +1,44 @@
+digraph Stemma {
+    "α" [ class=hypothetical ];
+    "γ" [ class=hypothetical ];
+    "δ" [ class=hypothetical ];
+    2 [ class=hypothetical,label="*" ];
+    3 [ class=hypothetical,label="*" ];
+    4 [ class=hypothetical,label="*" ];
+    5 [ class=hypothetical,label="*" ];
+    7 [ class=hypothetical,label="*" ];
+    A [ class=extant ];
+    B [ class=extant ];
+    C [ class=extant ];
+    D [ class=extant ];
+    E [ class=extant ];
+    F [ class=extant ];
+    G [ class=extant ];
+    H [ class=extant ];
+    K [ class=extant ];
+    P [ class=extant ];
+    Q [ class=extant ];
+    S [ class=extant ];
+    T [ class=extant ];
+    "α" -> A;
+    "α" -> T;
+    "α" -> "δ";
+    "δ" -> 2;
+    2 -> C;
+    2 -> B;
+    B -> P;
+    B -> S;
+    "δ" -> "γ";
+    "γ" -> 3;
+    3 -> F;
+    3 -> H;
+    "γ" -> 4;
+    4 -> D;
+    4 -> 5;
+    5 -> Q;
+    5 -> K;
+    5 -> 7;
+    7 -> E;
+    7 -> G;
+}
+    

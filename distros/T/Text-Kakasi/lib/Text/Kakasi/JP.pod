@@ -1,0 +1,172 @@
+#
+# $Id: JP.pod,v 2.3 2003/05/26 10:42:01 dankogai Exp $
+#
+
+=head1 NAME
+
+Text::Kakasi::JP - Text::Kakasi 日本語ドキュメント
+
+=head1 SYNOPSIS
+
+  use Text::Kakasi;
+  # functional
+  $res = Text::Kakasi::getopt_argv('kakasi', '-ieuc', '-w');
+  $str = Text::Kakasi::do_kakasi($japanese_text);
+  # object-oriented
+  $obj = Text::Kakasi->new('-ieuc','-w');
+  $str = $obj->get($japanese_text);
+
+=head1 DESCRIPTION
+
+本モジュールはkakasi (kanji kana simple inverter)へのインターフェース
+を提供します。kakasiが提供するのは、input methodと逆、すなわちかな漢字
+まじり文をひらがな、カタカナ、ローマ字などに逆変換する機能です。kakasi 
+はまた文書の分かち書きにも利用することができます。詳しくは
+L<http://kakasi.namazu.org/> を御覧下さい。
+
+Text::Kakasi は、伝統的な関数ベースおよびオブジェクト指向の双方のイン
+ターフェイスを提供します。関数ベースの方は ver. 1.05 と 100% 互換です
+が、Perl 5.8 以降の新機能を使うにはオブジェクト指向インターフェイスを
+使う必要があります。 
+
+=head1 Functional APIs
+
+注意:以下の説明では C<Text::Kakasi::> は省略しています。デフォルトでは
+Text::Kakasi は何も export しません。以下の関数を import するには、例
+えば以下のようにします。
+
+  use Text::Kakasi qw/getopt_argv do_kakasi/;
+
+=over 4
+
+=item $err = getopt_argv($arg1, $arg2, ...)
+
+kakasiを初期化します。引数はkakasiのオプションと同等です。以下は
+kakasi 2.3.4 におけるオプションの概要です。
+
+  -a[jE] -j[aE] -g[ajE] -k[ajKH]
+  -E[aj] -K[ajkH] -H[ajkK] -J[ajkKH]
+  -i{oldjis,newjis,dec,euc,sjis}
+   -o{oldjis,newjis,dec,euc,sjis}
+  -r{hepburn,kunrei} -p -s -f -c"chars" 
+   [jisyo1, jisyo2,,,]
+
+  Character Sets:
+       a: ascii  j: jisroman  g: graphic  k: kana 
+       (j,k     defined in jisx0201)
+       E: kigou  K: katakana  H: hiragana J: kanji
+       (E,K,H,J defined in jisx0208)
+
+  Options:
+    -i: input coding system    -o: output coding system
+    -r: romaji conversion system
+    -p: list all readings (with -J option)
+    -s: insert separate characters (with -J option)
+    -f: furigana mode (with -J option)
+    -c: skip chars within jukugo
+        (with -J option: default TAB CR LF BLANK)
+    -C: romaji Capitalize (with -Ja or -Jj option)
+    -U: romaji Upcase     (with -Ja or -Jj option)
+    -u: call fflush() after 1 character output
+    -w: wakatigaki mode
+
+本関数は、成功時に0を、失敗時にはそれ以外の値を返します。
+
+=item $processed_str = do_kakasi($str)
+
+C<$str>に対してkakasiを実行し、結果を返します。何らかの問題が発生した
+場合、C<undef>を返します。
+
+Ver. 1.x と異なり、引数の最初にC<kakasi>をつける必要はありません。もち
+ろん今までどおりつけても構いません。
+
+=item close_kanwadic()
+
+暗示的にopenされた辞書ファイルをcloseします。本関数は過去の互換性のみ
+のために存在し、現在では利用する必要はまずないでしょう。
+
+=back
+
+=head1 Object-Oriented APIs
+
+Version 2.0 より、本モジュールはオブジェクト指向(OOP)のAPIも提供します。
+
+=over 4
+
+=item $k = Text::Kakasi->new($args ...)
+
+オブジェクトを生成します。引数が存在する場合は、 
+C<< Text::Kakasi->new->set($args ...) >>
+したのと同じ結果となります。
+
+=item $k->set($args ...)
+
+C<getopt_argv> へのOOPインターフェイス。
+
+  my $k = Text::Kakasi->new;
+  $k->set('-w'); # Text::Kakasi::getopt_argv('-w');
+
+ステータスを返す C<getopt_argv()> とは異なり、 C<set> は常にオブジェク
+ト自身を返すので、以下のような表記が可能です。
+
+  my $tokenized = $k->set('-w')->get($raw_japanese);
+
+ステータスが欲しい場合には、 C<< $k->error >> を使います。
+
+=item $k->error
+
+最後に呼ばれたメソッドのステータスを返します。
+
+=item $processed = $k->get($raw_japanese);
+
+C<do_kakasi> へのOOPインターフェイス。以下の二つのコードは等価です。
+
+  # Functional
+  getopt_argv('-w'); $processed = do_kakasi($raw_japanese);
+  # OOP
+  $k->set('-w')->get($raw_japanese);
+
+=back
+
+=head1 Perl 5.8 Features
+
+Perl 5.8 で、文字コード変換の標準的な枠組みがL<Encode>モジュールによっ
+て提供されました。本モジュールは perl 5.8 以降にてこの機能を利用するよ
+うになっています。
+
+C<< $k->set($args ...) >>への引数に、C<< -iI<encoding> >> および C<<
+-oI<encoding> >>　が含まれる場合、文字コード変換はL<Encode>が行います。
+引数にはkakasiがサポートしているもの以外にも、L<Encode>がサポートして
+いるものは全て使えます。
+例えば、
+
+  $result = $k->set(qw/-iutf8 -outf8 -w/)->get($utf8);
+
+は以下とほぼ同義です。
+
+  $euc = encode('eucjp' => $utf8);
+  getopt_argv('-w');
+  $tmp = do_kakasi($euc);
+  $result = decode('eucjp' => $tmp);
+
+C<-outf8>,が含まれている場合は、 C<< $k->get >> はutf8フラグ付きの文字
+列を返します。
+
+これらの機能は、 C<$Text::Kakasi::HAS_ENCODE>に0を設定することで利用し
+ないようにすることも可能です。通常変数は、本モジュールをuseした際に自
+動的に設定されます。
+
+=head1 SEE ALSO
+
+L<kakasi(1)>, L<http://kakasi.namazu.org/>,L<Encode>,L<perlunicode>
+
+=head1 COPYRIGHT
+
+  (C) 1998, 1999, 2000 NOKUBI Takatsugu <knok@daionet.gr.jp>
+  (C) 2003 Dan Kogai <dankogai@dan.co.jp>
+
+There is no warranty for this free software. Anyone can modify and/or
+redistribute this module under GNU GENERAL PUBLIC LICENSE. See COPYING
+file that is included in the archive for more details.
+
+=cut

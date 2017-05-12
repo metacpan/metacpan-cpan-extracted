@@ -1,0 +1,56 @@
+{
+   "abstract" : "framework for more readable interactive test scripts",
+   "author" : [
+      "Sullivan Beck <sbeck@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Inter",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.21"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.21"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "IO::File" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Inter" : {
+         "file" : "lib/Test/Inter.pm",
+         "version" : "1.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/SBECK-github/Test-Inter"
+      }
+   },
+   "version" : "1.06"
+}

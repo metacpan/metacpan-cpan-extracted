@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://www.apnic.net/" />
+<title>htmltest3</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">htmltest3</td></tr>
+</thead><tbody>
+<tr>
+	<td>openWindow</td>
+	<td>simple.html</td>
+	<td></td>
+</tr>
+<tr>
+        <td>waitForCondition</td>
+        <td>1 == 1</td>
+        <td></td>
+</tr>
+<tr>
+        <td>waitForCondition</td>
+        <td>1 == 1</td>
+        <td>5000</td>
+</tr>
+<tr>
+        <td>assertNotElementHeight</td>
+        <td>id=mydiv</td>
+        <td>100</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>q</td>
+	<td>value1</td>
+</tr>
+<tr>
+	<td>storeValue</td>
+	<td>q</td>
+	<td>myvar</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>q</td>
+	<td>${myvar} ${myvar} ${myundefvar}</td>
+</tr>
+<tr>
+        <td>assertValue</td>
+        <td>q</td>
+        <td>exact:value1 value1 ${myundefvar}</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>sa</td>
+	<td></td>
+</tr>
+<tr>
+        <td>goBack</td>
+        <td></td>
+        <td></td>
+</tr>
+<tr>
+        <td>setTimeout</td>
+        <td>10000</td>
+        <td></td>
+</tr>
+<tr>
+        <td>clickAndWait</td>
+        <td>sa</td>
+        <td></td>
+</tr>
+<tr>
+        <td>assertElementHeight</td>
+        <td>id=mydiv</td>
+        <td>100</td>
+</tr>
+<tr>
+    <td>goBack</td>
+    <td></td>
+    <td></td>
+</tr>
+<tr>
+    <td>type</td>
+    <td>b</td>
+    <td>multi<br/>line <a>text</a></td>
+</tr>
+<tr>
+    <td>assertValue</td>
+    <td>b</td>
+    <td>multi\nline text</td>
+</tr>
+</tbody></table>
+</body>
+</html>

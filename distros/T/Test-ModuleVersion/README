@@ -1,0 +1,45 @@
+NAME
+
+  Test::ModuleVersion - Module Version Test Generator
+
+CAUTION
+
+  Sorry. This module is DEPRECATED because L<cpanm> and L<cpanfile> is much better.
+  If you want to install moudles, use L<cpanm> and L<cpanfile> instead.
+  See L<https://github.com/kraih/mojo/wiki/Installation-of-cpan-modules-by-cpanm-and-cpanfile>
+  If you want to test module version, you write test by yourself.
+
+    is($DBIx::Custom::VERSION, '0.2108');
+
+  This module will be removed from CPAN on 2018/3/1
+    
+INSTALLATION
+
+  cpan Test::ModuleVersion
+
+SYNOPSYS
+
+  my $tm = Test::ModuleVersion->new;
+  print $tm->test_script;
+
+DESCRIPTION
+
+  Test::ModuleVersion is test script creater to check module version.
+  Many people think that it is difficult to check module version
+  between development environment and  production environment.
+  
+  Test::ModuleVersion help you.
+  
+  1. create test script to check module version in development environment.
+  2. move the test script to production environment.
+  3. run test in production environment to know module difference.
+
+LICENSE AND COPYRIGHT
+
+  Copyright (C) 2012 Yuki Kimoto
+
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of either: the GNU General Public License as published
+  by the Free Software Foundation; or the Artistic License.
+
+  See http://dev.perl.org/licenses/ for more information.

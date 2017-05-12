@@ -1,0 +1,80 @@
+[%# $Id: site.css,v 1.2 2005/01/16 16:09:40 jv Exp $ -%]
+[% META type = 'text' # no wrapping -%]
+[%  font = {
+        text = 'Verdana, Arial, Helvetica, sans-serif'
+        mono = '"Courier New", Courier, monospace'
+    }
+-%]
+
+body {
+    font-family: [% font.text %];
+    font-size: 12px;
+}
+
+.info {
+    font-family: [% font.text %];
+    font-size: 10px;
+}
+
+.title {
+    font-family: [% font.text %];
+    font-size: 24px;
+    line-height: 30px;
+    font-weight: bold;
+    color: [% site.col.text %];
+    margin-top: 0px;
+    margin-bottom: 2px;
+}
+
+[% BLOCK menustyle -%]
+    font-family: [% font.text %];
+    font-size: 12px;
+    line-height: 14px;
+    text-decoration: none;
+    color: [% site.col.link %];
+    white-space:nowrap;
+[% END -%]
+
+a.menu {
+    [% PROCESS menustyle -%]
+}
+
+a {
+    font-family: [% font.text %];
+    text-decoration: none;
+    color: [% site.col.link %];
+}
+
+a:hover {
+    color: [% site.col.alink %];
+}
+
+a.menu {
+}
+
+.menutitle {
+    color: [% site.col.mlink %];
+    font-family: [% font.text %];
+    font-weight: bold;
+    white-space:nowrap;
+}
+
+a.menu:hover {
+    color: [% site.col.alink %];
+}
+
+a.menuselect {
+    [% PROCESS menustyle -%]
+    color: [% site.col.alink %];
+    font-weight: bold;
+}
+
+a.menuselect:hover {
+    font-weight: bold;
+    color: [% site.col.alink %];
+}
+
+/* Indentation for the left side menu */
+div.sidemenu {
+    margin-left: 0.2in;
+}

@@ -1,0 +1,100 @@
+Revision history for Perl module Task::Biodiverse::NoGUI
+
+1.990074 20170214
+    - Add Statistics::Sampler::Multinomial
+
+1.990073 20170214
+    - Add Test::TempDir::Tiny
+
+1.990072 20170214
+    - Add Data::Compare, Text::Levenshtein and Data::Structure::Util
+
+1.990071 2017-01-29
+    - Change log release only - neglected to update them for 1.99007
+    - Add Ref::Util, Scalar::Util::Numeric,
+      Text::Fuzzy, Getopt::Long::Descriptive,
+      Cpanel::JSON::XS and JSON::MaybeXS
+    - Bump min version for Geo::Converter::dms2dd to 0.05
+    
+1.99006 2016-09-22
+    - Add Sort::Naturally
+
+1.990041 2016-08-30
+    - Add JSON::MaybeXS and Cpanel::JSON::XS
+    - Set minimum Perl version to 5.16
+
+1.99004 2016-08-30
+    - Add Sereal
+
+1.99003 2016-08-05
+    - Remove Spreadsheet::XLSX
+    - Bump required version for autovivification to 0.16
+      (might as well have the latest)
+
+1.10002 2016-07-18
+    - Added Getopt::Long::Descriptive
+
+1.10001 2015-10-23
+    - Add Data::Alias
+
+1.1 2015-10-09
+    - Depend on Test::Lib in addition to rlib
+
+1.00011 2015-06-11
+    - Fix a copy-paste error in the makefile which resulted in neither of
+      Spreadsheet::ParseXLSX and Spreadsheet::XLSX being installed.
+
+1.0001 2015-06-08
+    - Update for 1.0001 dev release, but don't use a dev version for the task file.
+    - Add Spreadsheet::Read, Spreadsheet::ReadSXC, Spreadsheet::ParseExcel,
+      Spreadsheet::ParseXLSX and Spreadsheet::XLSX
+
+1.0 2015-04-19
+    - Update for version 1.0 release.
+    - Set minimum versions
+        - List::Util => 1.41
+        - YAML:Syck  => 1.29  
+        - List::MoreUtils    => 0.410
+        - autovivification   => 0.14
+        - List::BinarySearch => 0.25
+        - List::BinarySearch::XS  => 0.09
+        - Statistics::Descriptive => 3.0608
+
+0.99002 2014-08-12
+    - Update for Biodiverse 0.99_002 development release.  Don't use a dev version number for the Task distro, though. 
+    - Add List::BinarySearch
+    - Add List::BinarySearch::XS
+    - Set minimum version for List::Util to 1.39
+    - Set minimum version for Text::CSV_XS to 1.04
+
+0.191 2014-03-06
+    - Add minimum version for Geo::ShapeFile (2.58)
+    - Set minimum version for List::Util to 1.38
+    - Add Geo::Shapefile::Writer
+
+0.19 2012-10-28
+    - Statistics::Descriptive, List::Util and Clone now specify minimum versions.
+    - Added several new dependencies (rlib, Class::Inspector, List::MoreUtils)
+    - Removed redundant dependencies (Pad::Walker, MRO::Compat, Devel::SymDump)
+    - Min version is now 5.010
+
+0.17001 2012-07-28
+    - Set Math::Random::MT::Auto minimum version to 6.19 to handle crashes
+      when initialised with state vectors from different architectures
+
+0.17 2012-07-05
+    - Add Geo::ShapeFile, Tree:R and Path::Class
+
+0.16001 2012-01-23
+    - Move from Bundle to Task namespace
+    - Subdivide second part of name (was BiodiverseNoGUI)
+
+0.16 2011-01-15
+    - Update module list for 0.16 release of Biodiverse
+
+0.15001  2010-11-25
+    - Fix Statistics::Descriptive version in makefile
+
+0.15  2010-11-06
+    - Get ready for CPAN
+

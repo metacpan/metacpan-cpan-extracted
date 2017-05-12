@@ -1,0 +1,45 @@
+{
+   "abstract" : "a TextUndo/SuperText widget with syntax highlighting capabilities, can also use Kate languages.",
+   "author" : [
+      "Jim Turner <turnerjw784@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-TextHighlight",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Syntax::Highlight::Perl::Improved" : "0",
+            "Tk" : "800.024",
+            "Tk::HList" : "0",
+            "Tk::ROText" : "0",
+            "Tk::TextUndo" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.1.1"
+}

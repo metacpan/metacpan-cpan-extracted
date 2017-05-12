@@ -1,0 +1,30 @@
+<HEAD>
+<BODY>
+<!--<? $O="This code should be replaced by this."; !>-->
+
+Ignore example
+<!--<? $Star->addHook("#ignore", "\n", 'ignore'); !>-->
+
+#ignore this
+
+<!--<? $Star->addHook(qr{(?<=\n)#sd!/},qr{/(?=\n)}, '$_="teststart>>.$_.<<testend"') !>-->
+
+line
+#sd!/arg*/
+#sd!/arg*1/
+#sd!/arg*2/
+
+<!--<? $Star->addHook(qr{(?<=\n)#sd1!/},qr{/(?=\n)}, sub { $_="t1start>>.$_.<<t1end" }) !>-->
+
+#sd1!/new arg/
+#sd1!/new arg2/
+#sd1!/new arg3/
+
+<!--<? $Star->add_hook('regex', qr/^.section:(\w+)\s+(.*)/m,
+  sub { $_="<a name\"$_[2]\"><h3>$_[3]</h3</a>" }) !>-->
+
+line before
+.section:overview Document Overview
+line after
+
+</BODY>

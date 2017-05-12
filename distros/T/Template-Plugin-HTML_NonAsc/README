@@ -1,0 +1,46 @@
+Template-Plugin-HTML_NonAsc
+
+Template::Plugin::HTML_NonAsc is a filter fot the Template Toolkit.
+
+It resembles the builtin 'html' filter but it only processes non-ASCII
+characters. In particular, it leaves characters like < > & and " alone.
+
+Its purpose is to make it possible to write HTML templates using
+non-ASCII characters, and still produce HTML with &entities; to avoid
+portability problems.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Template::Plugin::HTML_NonAsc
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Plugin-HTML_NonAsc
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Template-Plugin-HTML_NonAsc
+
+    Search CPAN
+        http://search.cpan.org/dist/Template-Plugin-HTML_NonAsc
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

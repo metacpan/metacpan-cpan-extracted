@@ -1,0 +1,85 @@
+NAME
+
+    Text::CleanFragment - clean up text to use as URL fragment or filename
+
+SYNOPSIS
+
+      my $title = "Do p\x{00FC}t <this> into URL's?";
+      my $id = 42;
+      my $url = join "/",
+                  $id,
+                  clean_fragment( $title );
+      # 42/Do_put_this_into_URLs
+
+    This module downgrades strings of text to match
+
+      /^[-._A-Za-z0-9]*$/
+
+    or, to be more exact
+
+      /^([A-Za-z0-9]([-._A-Za-z0-9]*[A-Za-z0-9])?$/
+
+    This makes the return values safe to be used as URL fragments or as
+    file names on many file systems where whitespace and characters outside
+    of the Latin alphabet are undesired or problematic.
+
+FUNCTIONS
+
+ clean_fragment( @fragments )
+
+        my $url_title = join("_", clean_fragment("Ümloud vs. ß",'by',"Grégory"));
+        # Umloud_vs._ss_by_Gregory
+
+    Returns a cleaned up list of elements. The input elements are expected
+    to be encoded as Unicode strings. Decode them using Encode if you read
+    the fragments as file names from the filesystem.
+
+    The operations performed are:
+
+      * Use Text::Unidecode to downgrade the text from Unicode to 7-bit
+      ASCII.
+
+      * Eliminate single and double quotes, apostrophes.
+
+      * Replace all non-letters, non-digits by underscores, including
+      whitespace and control characters.
+
+      * Squash dashes to a single dash
+
+      * Squash _-_ and _-_(-_)+ to -
+
+      * Eliminate leading underscores
+
+      * Eliminate trailing underscores
+
+      * Eliminate underscores before - or .
+
+    In scalar context, returns the first element of the cleaned up list.
+
+REPOSITORY
+
+    The public repository of this module is
+    http://github.com/Corion/text-cleanfragment.
+
+SUPPORT
+
+    The public support forum of this module is http://perlmonks.org/.
+
+BUG TRACKER
+
+    Please report bugs in this module via the RT CPAN bug queue at
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Text-CleanFragment or
+    via mail to text-cleanfragment-Bugs@rt.cpan.org.
+
+AUTHOR
+
+    Max Maischein corion@cpan.org
+
+COPYRIGHT (c)
+
+    Copyright 2012 by Max Maischein corion@cpan.org.
+
+LICENSE
+
+    This module is released under the same terms as Perl itself.
+

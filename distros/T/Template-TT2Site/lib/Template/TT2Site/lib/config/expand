@@ -1,0 +1,51 @@
+[% # $Id: expand,v 1.3 2005/01/11 22:25:23 jv Exp $ -%]
+[%
+
+# page.trail tracks path to the current page.
+DEFAULT page.trail = [ ];
+
+# List of menu items we're constructing.
+map.items = [ ];
+
+# Walk through item names in map.menu.
+FOREACH id IN map.menu;
+    # Fetch page from map.page.
+    THROW map "Invalid menu item in $map.name: $id"
+	UNLESS (item = map.page.$id);
+
+    # Add location data.
+    item.id   = id;
+    item.path = path ? "$path/$id" : id;
+    UNLESS item.file;
+    item.file = item.page
+	      ? "${item.path}/index.html"
+	      : "${item.path}.html";
+    END;
+    item.url  = "$site.url.root$item.file";
+
+    # Is this item on the path to the current page?
+    item.hot  = page.file.match("^(../)?$item.path");
+    item.subs = item.hot and item.menu;
+    item.here = (item.file == page.file);
+
+    # Set next/last if this is the actual page.
+    IF item.here;
+	page.prev = map.page.${loop.prev};
+	page.next = map.page.${loop.next};
+    END;
+
+    # Add item to map items list.
+    map.items.push(item);
+
+    # Also to the trail if the page is hot.
+    page.trail.push(item) IF item.hot;
+
+    # Expand any submenu for this item.
+    IF item.subs;
+	INCLUDE config/expand
+	    map  = item
+	    path = item.path;
+    END;
+END;
+
+-%]

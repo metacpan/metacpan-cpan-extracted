@@ -1,0 +1,9 @@
+0.03   2014-10-31
+
+  - switch to Text::Wrapper for text wrapping
+  - allow custom wrapper via callback
+  - option wrap_predefined_lines
+
+0.02   2014-10-31
+
+  - first public release

@@ -1,0 +1,70 @@
+0.010
+------
+
+POD now has sections FUNCTIONS and INTERNAL FUNCTIONS.
+Corrected heading levels in POD.
+Module now returns true ;)
+Rewrite of has_greater_version() and
+has_greater_version_than_cpan(). POD updated.
+New tests for the internal functions.
+
+
+0.009
+-----
+
+Man, this is weird! Some tests (tests 4 in both test script
+02-...t and 03-...t break if the user has turned on colourized
+output in his CPAN shell. Basically this output is seen when
+running 'make test':
+
+ok 4 - name of non-existent module
+# Getting version from installed module failed
+ok 5 - name of module not in lib
+FAILED test 4
+
+That really is weird...
+
+Thanks to Andreas König and Slaven Rezic for testing!
+
+0.008
+-----
+Updated documentation.
+_get_installed_version() doesn't call CPAN::Shell::inst_version()
+anymore (which I thought I had removed in 0.007 anyway).
+
+0.007
+-----
+Added Cwd as a prerequisite to Makefile.PL.
+The description in the module list on CPAN, the abstract
+in the Makefile.PL and the one-line description in the POD
+are now the same.
+
+0.006
+-----
+Added CPAN::Version as a prerequisite to Makefile.PL
+Now uses CPAN::Version::vgt() for version number comparison.
+
+0.005
+-----
+Version is now compared with the help of CPAN::Version.
+Version information is now always looked up with the help
+of CPAN or MakeMaker.
+Added test for POD to raise my kwalitee-rating ;)
+
+0.004
+-----
+Updated documentation.
+
+0.003
+-----
+Added more documentation, README and this file. Module
+should work on all OSs by the magic of Cwd and File::Spec.
+
+0.002
+-----
+Now compares against the CPAN version as well. Looked at
+CPAN.pm and gone blind ;)
+
+0.001
+-----
+First version. Compares development with installed version.

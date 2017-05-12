@@ -1,0 +1,28 @@
+---
+abstract: 'A data structure optimized for prefix lookup.'
+author:
+  - 'Copyright 2011 Avi Finkel <F<avi@finkel.org>>'
+build_requires:
+  ExtUtils::MakeMaker: 6.62
+  Pod::Coverage: 0.18
+  Test::Pod: 1.26
+  Test::Pod::Coverage: 1.08
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tree-Trie
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.9

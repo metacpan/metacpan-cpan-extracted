@@ -1,0 +1,1038 @@
+Revision history for Template::Flute
+
+0.025  Fri Mar 24 11:32:33 2017 CET
+
+    [ENHANCEMENTS]
+
+    * Replace all matches of a pattern instead of the first one (Stefan Hornburg/Racke).
+    * Add keep operator (Stefan Hornburg/Racke).
+
+0.024  Mon Oct 24 12:25:25 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for multiple select in forms (Marco Pessotto, GH #163).
+
+0.023  Sat Oct 22 14:58:31 2016 CEST
+
+    [BUG FIXES]
+
+    * Add missing files for Markdown filter to MANIFEST.
+
+0.022  Fri Oct 21 16:09:20 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Add markdown filter (Pattawan Kaewduangdee, GH #162).
+
+0.021  Wed Oct  5 12:33:21 2016 CEST
+
+    [BUG FIXES]
+
+    * Fix crash on mailto hrefs when uri argument is provided
+      (Marco Pessotto, GH #159, #160).
+    * Apply uri adjustments to form actions (Marco Pessotto).
+    * Bump up Type::Tiny prerequisite to minimum version which supports
+      InstanceOf (Stefan Hornburg/Racke).
+
+    [ENHANCEMENTS]
+
+    * Fix indirect call on Template::Flute::Increment (Marco Pessotto).
+
+    [TESTS]
+
+    * Add (successful) test for GH #11 (Stefan Hornburg/Racke).
+    * Add test case for GH #131 (Stefan Hornburg/Racke).
+    * Add reverse tests for dotted container values (Stefan Hornburg/Racke).
+
+0.020  Mon Aug  1 12:24:45 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Add prepend operator (Stefan Hornburg/Racke).
+    * Use instance of Data::Page as default iterator for Pager class
+      (Stefan Hornburg/Racke).
+    * Migrate Flute.pm to Moo (Peter Mottram).
+
+    [BUG FIXES]
+
+    * Prevent bogus entry in email_cids hashref caused by parsing HTML twice
+      (Stefan Hornburg/Racke).
+
+    [TESTS]
+
+    * Use Travis helpers and coverage testing (Stefan Hornburg/Racke).
+    * Add test on replacing HTML src attribute for images if target isn't
+      specified (Stefan Hornburg/Racke).
+    * Add test for the list method of the template object (Stefan Hornburg/Racke).
+    * Add test for container object to basic container test script
+      (Stefan Hornburg/Racke).
+
+0.0192 Tue Feb  2 19:00:14 2016 CET
+
+    [BUG FIXES]
+
+    * Fix deprecation warnings "Unescaped left brace in regex is deprecated"
+      (Nitish Bezzala, GH #157).
+
+    * Fix broken link in the POD for Template::Flute
+      (Mohammad S Anwar, GH #156).
+
+    [TESTS]
+
+    * Add Perl 5.22 to Travis CI configuration (Stefan Hornburg/Racke).
+
+
+0.0191 Mon Dec 21 14:29:26 2015 CET
+
+    [BUG FIXES]
+
+    * Add prerequisite on Class::Load (Stefan Hornburg/Racke, GH #155).
+
+0.0190 Sat Oct 31 09:58:54 2015 CET
+
+    [CLEANUP]
+
+    * Replace MooX::Types::MooseLike with Type::Tiny
+      (Stefan Hornburg, GH #136).
+    * Remove Flute::Form->finalize (Paul Cochrane, GH #134).
+    * Localise loop variable's scope to the loop's scope
+      (Paul Cochrane, GH #128).
+    * Use two argument form of bless (Paul Cochrane, GH #127).
+    * Remove superfluous arg shift onto $class variable
+      (Paul Cochrane, GH #126).
+    * Convert plain 'utf8' to 'encoding(utf-8)' (Paul Cochrane, GH #122).
+    * Use Class::Load instead of eval { use Class::Name }
+      (Paul Cochrane, GH #120).
+    * Add missing email address to copyright statements (Paul Cochrane).
+    * Update copyright year to 2015 (Paul Cochrane).
+    * Add missing strictures to Template::Flute::Filter::JsonVar
+      (Paul Cochrane, GH #114).
+    * Fix typo and remove superfluous trailing whitespace from
+      Template::Flute (Paul Cochrane, GH #110).
+    * Add installation instructions (Paul Cochrane, GH #109).
+
+    [DOCUMENTATION]
+
+    * Fix Pager class docs (Paul Cochrane, GH #132).
+    * Fix two typos in module POD (Paul Cochrane, GH #129).
+
+    [TESTS]
+
+    * Add diagnosis to form name test in case of failure (Stefan Hornburg).
+    * Add more iterator tests (Paul Cochrane, GH #116, #133).
+    * Add strict and warnings where missing in tests (Paul Cochrane, GH #125).
+    * Use Travis containers when running CI jobs (Paul Cochrane, GH #124).
+    * Use full package name for test functions not imported into test script
+      (Paul Cochrane, GH #123).
+    * Use diag in currency filter tests (Stefan Hornburg).
+    * Check utf8 JSON input in Iterator::JSON (Paul Cochrane, GH #118, #119).
+    * Check $flute->process call in "Hello world" test for an exception
+      (Stefan Hornburg).
+
+0.0184 Thu Jul 16 09:33:23 2015 CEST
+
+    [BUG FIXES]
+
+    * Remove BOM when processing files (Marco Pessotto, GH #102, #103).
+    * Fix lost newlines for textarea values (Marco Pessotto, GH #105, #106).
+
+0.0183 Sun Jul  5 19:06:50 2015 CEST
+
+    [BUG FIXES]
+
+    * Fix crash caused by patterns with non-empty but "false" content
+      (Stefan Hornburg).
+
+0.0182 Thu Jul  2 18:08:53 2015 CEST
+
+    [BUG FIXES]
+
+    * Fix stray joiner which showed up while appending empty value to text
+      (Stefan Hornburg).
+
+    [DOCUMENTATION]
+
+    * Add joiner attribute (Stefan Hornburg).
+
+0.0181 Sun Jun 28 13:52:46 2015 CEST
+
+    [ENHANCEMENTS]
+
+    * Add date_text option to Date filter (Stefan Hornburg)
+
+0.0180 Wed Apr 29 09:33:14 2015 CEST
+
+    [BUG FIXES]
+
+    * Apply fix for <script> vanishes when inserted with op="hook"
+      (Stefan Hornburg, GH #99).
+
+    [ENHANCEMENTS]
+
+    * Add lower_dash filter (William Carr, GH #86).
+    * Allow usage of method in container's value attribute (William Carr, GH #95).
+
+0.0171 Wed Apr 22 12:12:25 2015 CEST
+
+    [BUG FIXES]
+
+    * Clear out HTML element in case an empty value is passed for op=hook
+      (Stefan Hornburg).
+    * Prevent reparsing of DateTime objects in the date filter
+      (Stefan Hornburg).
+
+0.0170 Tue Mar 31 22:08:11 2015 CEST
+
+    [ENHANCEMENTS]
+
+    * Add configuration option for attributes which can be translated
+      (Marco Pessotto, GH #89).
+    * Cache expressions (Peter Mottram, Stefan Hornburg, GH #81).
+    * Add limit support to <list> (William Carr, GH #86).
+
+    [BUG FIXES]
+
+    * Stringify objects as final value of a dotted value specification
+      (Sam Batschelet, Stefan Hornburg, GH #93).
+    * Skip caching of iterators which belong to child lists
+      (Peter Mottram, Stefan Hornburg, GH #87).
+
+    [TESTS]
+
+    * Add test to demonstrate failure of subsequent calls to process
+      (William Carr, Stefan Hornburg)
+
+0.0162 Tue Mar  3 10:06:04 2015 CET
+
+    [ENHANCEMENTS]
+
+    * Collapse whitespace inside strings before translation
+      (GH #83, #84, Marco Pessotto).
+
+0.0161 Tue Feb 17 13:07:14 2015 CET
+
+    [BUG FIXES]
+
+    * Prevent Perl warning caused by undefined value in $original_attribute
+      (Stefan Hornburg).
+
+    [DOCUMENTATION]
+
+    * Fix typo and missing parenthesis in main POD (Stefan Hornburg).
+
+0.0160 Sat Dec 27 12:46:00 2014 CET
+
+    [BUG FIXES]
+
+    * Add Cache iterator subclass to fix problems with multiple lists
+      sharing the same iterator (Stefan Hornburg).
+    * Force currency options to fix test failures (Marco Pessotto, GH #76, 77).
+
+    [TESTS]
+
+    * Add simple test for value replacement inside HTML input element
+      (Stefan Hornburg).
+
+0.0151 Fri Dec 12 17:23:20 2014 CET
+
+    [BUG FIXES]
+
+    * Fix wrong behaviour with skip and filters (Marco Pessotto,
+      Stefan Hornburg, Jeff Boes, GH #73, #74).
+
+    [DOCUMENTATION]
+
+    * Add link to "INCLUDE FILES" section which points to description of include
+      attribute for value elements (Stefan Hornburg).
+
+0.0150 Sat Nov 29 09:33:18 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add implementation of containers within list (Stefan Hornburg, GH #61, #67).
+    * Add support for dotted values in field attribute of param element
+      (Stefan Hornburg, GH #71).
+    * Add workaround for the case that you pass the <option> elements for a dropdown
+      (Stefan Hornburg).
+    * Display string representation of element in case of stash leftovers
+      (Stefan Hornburg).
+
+    [DOCUMENTATION]
+
+    * Add section about common specification attributes to main POD (Stefan Hornburg).
+    * Rename conditionals section in main POD to containers
+      and add short introduction (Stefan Hornburg).
+    * Adjust example for "Display link in a list only if present"
+      to use container inside the list (Stefan Hornburg).
+
+0.0140 Thu Oct  2 09:40:59 2014 CEST
+
+    [API CHANGES]
+
+    * Overhaul support for email CIDs (GH #66, Marco Pessotto).
+
+0.0132 Thu Sep 25 14:10:27 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Translate placeholder and value attribute of HTML input elements
+      (GH #65, Marco Pessotto).
+
+0.0131 Fri Sep 19 08:42:03 2014 CEST
+
+    [BUG FIXES]
+
+    * Support joiner with simple value (GH #63, #64, Marco Pessotto).
+    * Fix pager check in _paging method (Stefan Hornburg).
+    * Fix next and count calls in Template::Flute::Pager class (Stefan Hornburg).
+    * Add reset method to Template::Flute::Pager class (Stefan Hornburg).
+    * Suppress warnings for patterns (GH #60, Marco Pessotto).
+
+    [DOCUMENTATION]
+
+    * Fix typo in Template::Flute::Filter::JsonVar's POD (Jeff Boes).
+    * Fix name of pager module in Template::Flute::Pager's POD (Stefan Hornburg)
+    * Fix POD example on accepting empty dates in the date filter.
+
+0.0130 Tue Aug  5 10:37:52 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Implement the wildcard matching of attributes (GH #57, Marco Pessotto).
+
+0.0123 Mon Aug  4 20:28:36 2014 CEST
+
+    [BUG FIXES]
+
+    * Fix pattern interpolation in attributes (GH #56, Marco Pessotto).
+
+0.0122 Fri Aug  1 15:19:49 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add iterator_default attribute for dropdowns.
+
+    [BUG FIXES]
+
+    * Save and restore main specification object to prevent overwrites when
+      processing lists (GH #54, Stefan Hornburg).
+
+    [TESTS]
+
+    * Update available Perl versions for Travis (Stefan Hornburg).
+
+0.0121 Wed Jul 23 10:13:00 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add skip attribute for value and param elements
+      (GH #53, Marco Pessotto).
+
+    [DOCUMENTATION]
+
+    * Fix typo in acknowledgements (GH #52, Marco Pessotto).
+
+0.0120 Tue Jul 22 11:47:22 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add "pattern" element (GH #51, Marco Pessotto)
+
+    [BUG FIXES]
+
+    * Replace broken File::Slurp with Path::Tiny (GH #49, Stefan Hornburg)
+
+0.0119 Fri May  9 09:13:14 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add "every" attribute to separator elements (GH #47, Marco Pessotto).
+
+0.0118 Tue May  6 15:47:37 2014 CEST
+
+    [BUG FIXES]
+
+    * Restore paging and add proper tests (GH #46, Marco Pessotto).
+
+0.0117 Wed Apr 30 15:58:18 2014 CEST
+
+    [BUG FIXES]
+
+    * Use iterator from specification instead of looking it up from template
+      values.
+
+0.0116 Wed Apr 30 09:57:19 2014 CEST
+
+    [BUG FIXES]
+
+    * Consider undefined values as empty strings (GH #45, Marco Pessotto).
+
+0.0115 Wed Apr 23 15:33:08 2014 CEST
+
+    [BUG FIXES]
+
+    * Skip URI adjust for link elements without target attribute (<a href, <img src, ...).
+
+0.0114 Wed Apr 16 09:21:36 2014 CEST
+
+    [TESTS]
+
+    * Require XML::Twig 3.48 and adjust tests accordingly
+      (GH #44, Marco Pessotto).
+
+    * Remove -T switch from regular tests
+      (GH #44, Marco Pessotto).
+
+0.0113 Tue Apr 15 17:37:41 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for embedding images in emails (GH #43, Marco Pessotto).
+
+    [DOCUMENTATION]
+
+    * Fix documentation bug for op="toggle" (GH #42, Marco Pessotto).
+    * Add POD documentation on attributes for Pager class.
+
+    [TESTS]
+
+    * Add tests for op="toggle" (GH #42, Marco Pessotto).
+
+0.0112 Wed Apr  2 06:57:38 2014 CEST
+
+    [BUG FIXES]
+
+    * Fix empty dropdown produced by value element with scalar iterator.
+
+0.0111 Tue Apr  1 11:28:25 2014 CEST
+
+    [BUG FIXES]
+
+    * Skip processing of paging elements which aren't specified.
+
+    [TESTS]
+
+    * Enable twig test for XML::Twig 3.47 and newer as the bug is fixed now.
+
+0.0110 Sat Mar 29 12:22:15 2014 CET
+
+    [BUG FIXES]
+
+    * Add missing prerequisite on Data::Transpose.
+
+    [TESTS]
+
+    * Enable entities test for XML::Twig 3.47 and newer as the bug is fixed now.
+
+0.0109 Sat Mar 22 18:55:08 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add experimental support for paging.
+    * Split prerequisites into build and runtime prerequisites.
+
+    [BUG FIXES]
+
+    * Fix missing POD escape in Template::Flute::Specification's dangling method documentation.
+
+    [TESTS]
+
+    *  Show resulting HTML in case of an error in entities test.
+
+0.0108 Thu Mar 13 18:41:15 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Use list values as an iterator if they are an appropriate object.
+
+    [BUG FIXES]
+
+    * Fix another case where a param is processed outside of its list.
+    * Bumped up minimum version of Moo (Marco Pessotto, GH #38).
+
+0.0107 Sun Mar  9 15:30:50 2014 CET
+
+    [BUG FIXES]
+
+    * Add missing files for URI adjust feature to MANIFEST.
+
+    [DOCUMENTATION]
+
+    * Add documentaton to UriAdjust module.
+
+0.0106 Sun Mar  9 13:36:42 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add URI adjust feature.
+
+    [BUG FIXES]
+
+    * Call is_filled form method only on an existing form object.
+
+0.0105 Sat Mar  8 14:28:22 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Use hash reference instead of string concatenation for dump key produced by dangling method.
+    * Install flute script.
+
+    [BUG FIXES]
+
+    * Use Test::Deep for checking output of dangling method to avoid hash randomization problem (GH #35).
+
+    [DOCUMENTATION]
+
+    * Add section "OBJECTS AND STRUCTURES" to main POD (Marco Pessotto).
+    * Fix bugtracker location.
+    * Improve documentation of dangling method.
+
+    [TESTS]
+
+    * Add objects and structures test (Marco Pessotto).
+
+0.0104 Fri Mar  7 13:00:12 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add check for dangling specification elements (GH #30, Marco Pessotto).
+    * Add blacklist for object autodetection (GH #33, Marco Pessotto).
+
+    [BUG FIXES]
+
+    * Skip processing params for empty lists at the end of the _sub_process method (GH #25).
+
+0.0103 Thu Mar  6 18:08:44 2014 CET
+
+    [BUG FIXES]
+
+    * Let top level containers affect lists too (GH #32, Marco Pessotto)
+
+0.0102 Wed Mar  5 16:26:44 2014 CET
+
+    [SPECIAL]
+
+    * First airborne CPAN release.
+
+    [BUG FIXES]
+
+    * Fix duplicates in dropdowns (GH #31, Marco Pessotto)
+    * Prevent Perl warning caused by HTML checkboxes without value attribute.
+
+    [TESTS]
+
+    * Add test for &nbsp; (GH #28, Marco Pessotto)
+
+0.0101 Thu Feb 27 11:20:36 2014 CET
+
+    [BUG FIXES]
+
+    * Fix bad escaping inside <script> tags (GH #6, GH #10, GH #27).
+
+0.0099 Mon Feb 10 20:17:42 2014 CET
+
+    [BUG FIXES]
+
+    * Pass through i18n parameter to included templates.
+
+0.0098 Sun Feb  9 10:46:39 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add method method to Template::Flute::Form and retrieve HTML form attributes.
+
+    [BUG FIXES]
+
+    * Fix bug causing duplicate fields in form object (GH #24).
+
+0.0097 Mon Jan 27 19:10:16 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Implement toggle operation with target for params.
+
+    [BUG FIXES]
+
+    * Improve error handling in _parse_template method.
+
+0.0096 Wed Jan 22 20:00:18 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add two level dotted values for containers.
+
+0.0095 Tue Jan 21 10:06:12 2014 CET
+
+    [BUG FIXES]
+
+    * Fix problem with vanished form (GH #23).
+
+0.0094 Tue Jan  7 13:19:12 2014 CET
+
+    [BUG FIXES]
+
+    * Fix processing of lists and params on the wrong nesting level.
+    * Fix t/values/select-objects.t to work with Perl <= 5.12.
+
+    [TESTS]
+
+    * Add tests for nested lists.
+
+0.0093 Fri Dec 20 16:13:45 2013 CET
+
+    [BUG FIXES]
+
+    * Fix iterators for value elements when using auto iterators.
+
+0.0092 Thu Dec 19 13:51:47 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Add new specification attributes iterator_value_key and
+      iterator_name_key to select fields used in populating dropdowns.
+    * Add object detection to iterators used in value and field
+      specification elements.
+
+0.0091 Sun Dec  8 11:35:13 2013 CET
+
+    [BUG FIXES]
+
+    * Fix bug in iterator resolution.
+
+0.0090 Sat Dec  7 21:11:17 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Check for object in values hash with dotted values for field attribute.
+    * Get iterator from dotted value and use methods of objects.
+
+0.0082 Fri Dec  6 09:52:29 2013 CET
+
+    [BUG FIXES]
+
+    * Delete HTML attributes with undefined value to prevent Perl warnings
+      and improper HTML (Grega Pompe, GH #16 #17)
+
+    * Fix problem with HTML doctype (Grega Pompe)
+
+    * Fix problem with append operation (Grega Pompe)
+
+    * Lists before values, preventing same name value leak (Grega Pompe)
+
+0.0081 Tue Nov 26 10:29:41 2013 CET
+
+    [BUG FIXES]
+
+    * Use XML:Twig's parse_html method only for root templates and 
+      parse for inner snippets (Grega Pompe, GH #15).
+    * Fix parsing method for templates passed as a scalar reference.
+    * Prevent warning from uninitialized iterator attribute.
+
+0.0080 Wed Nov 20 13:40:31 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Support for nested lists (Grega Pompe).
+
+    [TESTS]
+
+    * Remove tests based on Config::Scoped from list separator tests.
+
+0.0066 Tue Sep 17 09:35:22 2013 CEST
+
+    [BUG FIXES]
+
+    * Fix append operation on element text within lists.
+
+    [DOCUMENTATION]
+
+    * Add section about "Simple operators" to the documentation.
+
+    [TESTS]
+
+    * Add test for append operation on element text within lists.
+
+0.0065 Thu Sep 12 21:44:47 2013 CEST 
+
+    [BUG FIXES]
+
+    * Reset iterator after using it for a dropdown to allow multiple elements sharing the same iterator.
+      
+    [DOCUMENTATION]
+
+    * Fix wrong specification in first example of the description 
+      (GH #12, Grega Pompe). 
+
+0.0064 Fri Aug 16 12:31:54 2013 CEST
+
+    [BUG FIXES]
+
+    * Fix spurious joiner added regardless whether append value is empty or not.
+    * Add support for auto_iterators to values.
+
+    [TESTS]
+
+    * Add tests for checkboxes.
+    * Add tests for HTML entities and XML::Twig version (Marco Pessotto).
+    * Add test with nested <span> as param in a list.
+    * Add tests for append operations on value elements using joiner.
+
+0.0063 Wed Jun 12 14:57:48 2013 CEST
+
+    [BUG FIXES]
+
+    * Pass through filters setting to included templates.
+
+    [DOCUMENTATION]
+
+    * Add documentation about dropdowns.
+    * Add section about inserting html to the documentation.
+
+    [TESTS]
+
+    * Add dropdown (select) tests for values.
+
+0.0062 Sat May 25 19:56:51 2013 CEST
+
+    [BUG FIXES]
+
+    * Fix bug causing problems with container values sharing HTML element
+      through ID with container.
+    * Execute POD tests only for release testing (GH #3).
+
+    [DOCUMENTATION]
+
+    * Add example for "Display image only if present" to documentation.
+    * Add example for "Display link in a list only if present" to documentation.
+    * Fix example in Template::Flute::Filters::JsonVar module.
+
+    [TESTS]
+
+    * Add test for UTF-8 string in values hash.
+
+0.0061 Sun Jan 27 11:25:30 2013 CET
+
+    [BUG FIXES]
+
+    * Fix json_var filter by using JSON module.
+    
+0.0060 Thu Jan 24 14:30:26 2013 CET
+
+    [BUG FIXES]
+
+    * Ensure that a formerly cut element is pasted back only when a
+      parent element is present for the previous sibling.
+    * Fix toggle operation on value elements.
+    * Fix crash "Unexpected element left on stash: field" caused by sort element.
+
+    [ENHANCEMENTS]
+
+    * Add support for chained filters.
+    * Add json_var filter.
+    * Add strip filter.
+    * Add strict option to date filter.
+    * Apply toggle operation to params without target as well.
+    * Add paging elements.
+    * Allow deeper lookups into values hash with dotted values for field attribute.
+
+0.0052 Tue Sep  4 20:08:34 2012 CEST
+
+    [BUG FIXES]
+
+    * Fix append operation without target on value elements.
+
+0.0051 Thu Jul 19 15:28:09 2012 CEST
+
+    [BUG FIXES]
+
+    * Exclude Moo method BUILDARGS from POD coverage test.
+
+0.0050 Tue Jul 17 19:10:39 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Add paginator class.
+    * Skip translation of HTML script elements.
+    * Remove surrounding whitespace from text before passing to translation.
+    * Add country name filter.
+
+    [DOCUMENTATION]
+
+    * Add example for using increments.
+    * Expand name and description section for currency filter.
+
+    [TESTS]
+
+    * Add basic test for list increments.
+    * Add basic tests for values and list params.
+
+0.0040 Wed Jun  6 18:25:28 2012 CEST
+
+    [ENHANCEMENTS]
+ 
+    * Add language name filter.
+    * Add support for flat trees.
+
+    [BUG FIXES]
+
+    * Prevent Perl warning on undefined values for append operation.
+    * Fix design flaw in filtering where twig method isn't called on second
+      usage of a filter.
+    * Reset twig handler variable to prevent filtering of unrelated elements.
+
+    [DOCUMENTATION]
+
+    * Add documentation of format option to POD for date filter class.
+
+0.0030 Thu May 10 08:48:01 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Add toggle tree suboperation.
+    * Add support for sorting to Template::Flute::Iterator.
+    * Add asterisk selector to JSON iterator.
+
+    [BUG FIXES]
+
+    * Fix sharing elements between container and value when using class and id.
+
+    [DOCUMENTATION]
+
+    * Add documentation for param elements and filter attribute.
+
+0.0025 Wed Mar 14 14:39:21 2012 CET
+
+    [BUG FIXES]
+
+    * Remove static class from first list element.
+
+    [DOCUMENTATION]
+
+    * Add documentation for param elements and filter attribute.
+    * Add append operation for values.
+    * Fix documentation of Template::Flute::HTML's values method.
+
+    [TESTS]
+
+    * Add test for European style of price display.
+
+0.0024 Mon Dec 19 11:53:16 2011 CET
+
+    [ENHANCEMENTS]
+
+    * Add link attribute to form specification element.
+
+0.0023 Fri Dec 16 16:40:26 2011 CET
+
+    [ENHANCEMENTS]
+
+    * Recognize containers through id attribute.
+    * Allow container values to share the same HTML element with the
+      container.
+    * Use subtree of JSON as iterator through selector and children
+      parameters.
+    * Add joiner attribute to param element.
+
+    [BUG FIXES]
+
+    * Fix alternate classes to append rather than replace list class.
+
+0.0022 Mon Nov 14 08:35:40 2011 CET
+
+    [BUG FIXES]
+
+    * Use standard locale for currency filter test.
+
+0.0021 Thu Nov 10 18:36:22 2011 CET
+
+    [BUG FIXES]
+
+    * Add check for DateTime::Format::ISO8601 module to date filter test.
+
+    [DOCUMENTATION]
+
+    * Add documentation on filter prerequisites.
+
+0.0020 Thu Nov  3 23:32:33 2011 CET
+
+    [ENHANCEMENTS]
+
+    * Allow filter options to be passed in the constructor.
+    * Add filter base class and loader for filter classes.
+    * Add currency, date, eol, nobreak_single and upper filter.
+    * Add foo|!bar and foo&!bar to the possible expressions for container visibility.
+    * Add separator element for lists.
+
+    [BUG FIXES]
+
+    * Fix replacement for value elements with op append.
+    * Pass through auto_iterators setting to included templates.
+    * Prevent Perl warning on undefined values for value elements.
+    * Add output_html_doctype to XML::Twig constructor for upcoming XML::Twig release.
+
+    [TESTS]
+
+    * Add form name test.
+
+    [DOCUMENTATION]
+
+    * Expand Template::Flute's POD on specification, template, forms and lists.
+
+0.0011 Thu Aug 25 10:33:21 2011 CEST
+
+    [BUG FIXES]
+
+    * Remove all of multiple invisible containers from the HTML output.
+
+0.0010 Fri Jul  1 15:33:01 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Add include feature.
+    * Add expression feature for containers which offers a better control
+      on their visibility (e.g. container value="warnings|errors" for
+      message areas)
+
+    [BUG FIXES]
+
+    * Fix crash on i18n elements with key attribute.
+    * Prevent warning on i18n elements without name attribute.
+    * Clean up added i18n-key HTML attributes after translation has
+      been finished.
+
+    [TESTS]
+
+    * Add test for i18n elements with key attribute.
+
+0.0009 Tue Jun 21 14:24:57 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Add lookup into object attributes for list iterators in case
+      specification is passed as object.
+    * Add support for checkboxes to Template::Flute::Form's fill method.
+
+    [BUG FIXES]
+
+    * Let HTML templates handled by File::Slurp and the encoding 
+      determined by the specification.
+    * Turn second bless in Template::Flute's constructor into a 
+      simple return.
+
+    [DOCUMENTATION]
+
+    * Add documentation about iterators parameter for Template::Flute's 
+      constructor.
+
+0.0008 Tue May 31 21:56:38 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Add keep attribute to field element with possible value "empty_value"
+      to preserve HTML option tags with empty value.
+    * Add support for auto_iterators to forms.
+    * Add iterators method to Template::Flute::Form class.
+
+    [BUG FIXES]
+
+    * Prevent warning caused by undefined value in Template::Flute::Form's
+      fill method.
+    * Accept 0 as value for list inputs.
+    * Prevent crashes from parsing empty strings for the hook operator.
+    * Prevent warning caused by undefined $value in Template::Flute::HTML's
+      set_selected method.
+    * Prevent warning caused by undefined $rep_str in Template::Flute's 
+      _replace_within_elts method.
+
+    [TESTS]
+
+    * Add test for select tags inside forms.
+
+0.0007 Fri Apr 22 10:47:36 2011 CEST
+
+    [API CHANGES]
+
+    * Renamed Template::Flute::Specification method element_by_class 
+      to elements_by_class to match the changed return value.
+ 
+    [ENHANCEMENTS]
+
+    * Allows two elements like params or values to tie to the same class.
+    * Enable passing specification and/or template as string to the 
+      Template::Flute constructor.
+    * Add support for field attribute to value element.
+
+    [TESTS]
+
+    * Add tests for HTML attribute targets and Template::Flute::I18N class.
+    * Add test for textarea in forms.
+
+    [DOCUMENTATION]
+
+    * Add "SYNOPSIS" section to POD for Template::Flute::I18N class.
+
+0.0006  Sun Apr  3 07:09:34 2011 CEST
+
+    [BUG FIXES]
+
+    * Declare dependency on HTML::TreeBuilder.
+
+0.0005  Fri Apr  1 17:35:30 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Accept full parameter in Template::Flute::Utils::derive_filename function.
+      This is useful to resolve relative paths, e.g for images in a HTML document.
+      Also add test for this function.
+
+    [BUG FIXES]
+
+    * Fix tests to handle missing Config::Scoped module gracefully.
+
+0.0004  Thu Mar 31 21:21:59 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Resolve iterator name to object for lists.
+    * Add process_template method to Template::Flute class.
+    * Add Template::Flute::Iterator::JSON class.
+	* Apply replacement to src attribute instead of tag body for HTML <img> tags.
+    * Add iterators method to Template::Flute::HTML class.
+
+    [BUG FIXES]
+
+    * Fix MANIFEST and remove unused dist.ini file.
+
+    [DOCUMENTATION]
+
+    * Add "See also", fix Synopsis and constructor documentation
+      for Template::Flute::Iterator class.
+
+0.0003  Tue Mar 29 15:52:11 2011 CEST
+
+    [ENHANCEMENTS]
+    
+    * Add auto_iterators parameter to Template::Flute class.
+    * Add seed method to Template::Flute::Iterator class.
+    * Add hook operation to value elements.
+    * Add specification method to Template::Flute class.
+
+    [DOCUMENTATION]
+
+    * Add documentation about value elements to Template::Flute's POD.
+    * Fix wrong POD headers for some methods in Template::Flute::List class.
+    * Fixed wrong module name Template::Zoom in Workflow POD section.
+      Thanks to Terrence Brannon for the report.
+    * Fix duplicate "METHODS" POD header in Template::Flute::List class.
+
+0.0002  Mon Mar 14 08:39:23 2011 CET
+
+    [BUG FIXES]
+	
+	* Add missing modules Template::Flute::Utils and 
+      Template::Flute::Container to MANIFEST.
+
+0.0001  Sun Mar 13 15:40:50 2011 CET
+
+    * Initial release.

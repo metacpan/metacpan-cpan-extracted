@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+open (IN, "< lib/Text/EtText.pm")
+	or die "cannot open lib/Text/EtText.pm\n";
+while (<IN>) {
+  /^\s*\$VERSION\s*=\s*\"(\S+)\"\;/ or next;
+  print "$1\n";
+}
+close IN;

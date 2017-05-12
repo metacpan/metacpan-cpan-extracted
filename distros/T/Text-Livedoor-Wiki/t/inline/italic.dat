@@ -1,0 +1,10 @@
+=== basic
+--- wiki
+'''italic'''
+--- html
+<i>italic</i>
+=== escale 
+--- wiki
+'''ita<script>lic'''
+--- html
+<i>ita&lt;script&gt;lic</i>

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Time/Piece/DayOfWeek.pm
+t/00-load.t
+t/01-methods.t
+t/release-pod-syntax.t

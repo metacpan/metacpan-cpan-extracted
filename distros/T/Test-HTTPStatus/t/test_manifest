@@ -1,0 +1,5 @@
+load.t
+pod.t
+pod_coverage.t
+get_status.t
+status.t

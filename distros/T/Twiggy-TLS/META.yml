@@ -1,0 +1,35 @@
+---
+abstract: 'Twiggy server with TLS support.'
+author:
+  - 'Sergey Zasenko'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  FindBin: 0
+  LWP::Protocol::https: 6.02
+  LWP::UserAgent: 6.00
+  Test::More: 0.88
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Twiggy-TLS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  IO::Socket::SSL: 1.62
+  Plack: 0.99
+  Twiggy: 0.1010
+  perl: 5.8.1
+resources:
+  bugtracker: https://github.com/und3f/Twiggy-TLS/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/und3f/Twiggy-TLS
+version: 0.0019

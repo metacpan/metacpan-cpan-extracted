@@ -1,0 +1,32 @@
+Revision history for Perl extension Text::DoubleMetaphone.
+
+0.07 Fri Mar 26 08:44:17 PST 2004
+        - Reverted 0.06 change.
+
+0.06 Thu Mar 25 15:06:01 PST 2004
+        - Fixed zero/O typo thanks to Mark Westenberger
+          <mjw@igs.net>
+
+0.05 Wed Jun 27 21:11:03 PDT 2001
+        - Added META_USE_PERL_MALLOC #define to use
+          Perl's memory management functions; this fixed
+          some core dumps with ActivePerl related to
+          sv_usepvn().  Thanks to Yin Aphinyanaphongs
+          <yin_12180@yahoo.com>.
+        - Tested under cygwin with perl 5.6.
+        - Updated URLs in POD
+
+0.04 Tue Sep  5 01:59:27 PDT 2000
+        - Documentation fixes; add reference to 
+          Kevin Atkinson's work
+
+0.03 Tue Jul 25 15:18:40 PDT 2000 
+        - remove C++ style comments
+
+0.02 Sat Jul 15 19:53:49 PDT 2000
+        - fixed list context under solaris thanks to
+          <schinder@pobox.com> 
+        - documentation fixes
+       
+0.01 Fri Jul 14 19:29:36 PDT 2000
+        - initial public release 

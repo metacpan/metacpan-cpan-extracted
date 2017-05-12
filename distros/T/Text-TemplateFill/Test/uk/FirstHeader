@@ -1,0 +1,34 @@
+${#} Store Purchase Orders.
+${#} SCCS: @(#)FirstHeader 1.1 03/27/03 09:11:28
+${#} This header is used for the first page only - the point is that there is a special 'index' line
+${#}
+${Opt StartPage } 
+${#}
+${#} Reset the page totals of units:
+${Calc PageTotal := 0 }
+${Calc PageTotalLastPage := 0 }
+${#}
+${#} This (non printing) line is used in generating an index, keep it to at most 50 characters
+PO: ${purchase_order_no} Vendor: ${vendor_number%10.10d} Date: ${orderdate@time<%Y %B %d>}
+${#}
+${#} The line below is a hack to prevent the PO: line from counting to the total # lines on the page:
+${Calc PageLineNo := 0 }
+${Calc v42 := 42 }
+${#}
+${#}
+                                                 ACME Ltd                                       PAGE ${PageNo}
+                                              PURCHASE ORDER
+
+       Destination Store: ${country}${branch%5.5d}                                  Supplier Code: ${vendor_number%10.10d}
+                                                                   Supplier Name: ${vendor_name}
+                                                           Purchase Order Number: ${purchase_order_no}
+                                                                      Order Date: ${orderdate@time<%Y %B %d>}
+                                                                   Delivery Date: ${shipdate@time<%Y %B %d>}
+
+
+                                                           Quantity        Current
+   Department     SKU       Description               Ordered  Received     Price        Value
+   ==========     ===       ===========               =======  ========     =====        =====
+
+                                                               ________
+${#} end of paragraph

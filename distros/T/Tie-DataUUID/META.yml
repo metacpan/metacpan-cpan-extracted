@@ -1,0 +1,31 @@
+---
+abstract: 'tie interface to Data::UUID;'
+author:
+  - 'Written by Mark Fowler <mark@twoshortplanks.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-DataUUID
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::UUID: 0
+resources:
+  homepage: https://github.com/2shortplanks/tie-datauuid/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/2shortplanks/tie-datauuid.git
+    web: https://github.com/2shortplanks/tie-datauuid/tree
+version: 1.02

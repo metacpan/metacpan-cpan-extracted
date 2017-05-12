@@ -1,0 +1,15 @@
+use strict;
+use Test::Kantan;
+use Test::MockTime qw(set_absolute_time);
+set_absolute_time(1394852288);
+use Log::Minimal;
+
+local $Log::Minimal::PRINT = sub {
+    my ( $time, $type, $message, $trace,$raw_message) = @_;
+    local $Test::Kantan::Level = $Test::Kantan::Level + 3;
+    Test::Kantan::diag("$time [$type] $message at $trace", 1024);
+};
+infof("Hey");
+
+ok { 0 };
+done_testing;

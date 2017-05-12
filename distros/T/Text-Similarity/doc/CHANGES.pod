@@ -1,0 +1,326 @@
+=head1 NAME
+
+CHANGES - Revision history for Text::Similarity
+
+=head1 DESCRIPTION
+
+=over
+
+=item 0.13
+
+Released October 7, 2015 (all changes by TDP) 
+
+=over
+
+=item * 
+
+Misc pod fixes, primarily those reported by Alex Becker to bug list.
+
+=back
+
+=back
+
+=over
+
+=item 0.11
+
+Released October 6, 2015 (all changes by TDP)
+
+=over
+
+=item *
+
+Contributed enhancement by Tani Hosokawa :
+Not a bug, but an optimization. Original version
+does inefficient repeated linear search over text
+that can't possibly match. Instead, precaches
+locations of keywords. Comparing 100 semi-randomly
+generated fairly similar documents of about 500
+words each results in approx 90% speed increase,
+the efficiency increases as the documents get larger.
+https://rt.cpan.org/Public/Ticket/Attachment/999948/520850
+
+=item *
+
+Make various documentation/typo fixes as suggested by
+Alex Becker. Found in CPAN bug list.
+
+=back
+
+=back
+
+=over
+
+=item 0.10
+
+Released June 26, 2013 
+
+=over 
+
+=item *
+
+Version 0.09 did not fix the windows testing error that we thought was fixed in 0.09.
+We think it has been fixed now. :) 
+
+=back 
+
+=back 
+
+=over
+
+=item 0.09
+
+Released January 22, 2013 
+
+=over
+
+=item *
+
+This release includes changes contributed by Myroslava Dzikovska that provide
+the full set of similarity scores programmatically. She modified the interface 
+so that the getSimilarity function returns a pair  ($score, %allScores) where 
+%allScores is a hash of all possible scores that it computes. She made it so 
+that in scalar context it will only return $score, so it is fully backwards 
+compatible with the older versions. She also changed the printing to 
+STDERR, to make it easier to use the code in filter scripts that depend 
+on STDIN/STDOUT.
+
+=item *
+
+This release also inludes changes ontributed by Nathan Glen to allow test
+cases to pass on Windows. The single quote used previously caused arguments
+to the script not to be passed corrected, leading to test failures. The single
+quotes have been changed to double quotes. 
+
+=back
+
+=back
+
+=over
+
+=item 0.08
+
+Released June 11, 2010 (all changes by YL)
+
+=over 
+
+=item *
+
+Changed the stoplist option. stoplist file can be one word per line or one word 
+in the regular expression format per line, or the mix of these two formats.  
+
+=back 
+
+=item 0.07
+
+Released November 14, 2008 (all changes by TDP)
+
+=over 
+
+=item *
+
+Changed test case that was tripping up Windows. In Linux these are 
+treated as being the same (when order doesn't matter) but this is not 
+the case in Windows. 
+
+	'sir winston churchill' 'winston churchill SIR!!!' 
+
+The case has been changed to :
+
+	'sir winston churchill' 'winston churchill sir' 
+
+=back
+
+=item 0.06
+
+Released April 5, 2008 (all changes by TDP)
+
+=over
+
+=item *
+
+Added Dice coefficient to Overlaps.pm output. Dice is equivalent to 
+F-measure, but formulated slightly differently so could be useful to 
+catch errors. 
+
+=item *
+
+Modified Overlaps method to provide lesk text matching score, that is 
+the sum of the squared lengths of all phrasal matches 
+(optionally normalized by the product of the lengths of the strings). It 
+provides both Raw lesk and lesk (the normalized form) when run in 
+verbose mode. 
+
+=item *
+
+Reogranized some documentation to make it more clear that Overlaps is
+just one possible way of measuring similarity, and that other methods can
+and should be added.
+
+=item *
+
+Renamed text_compare.pl as the more natural and fitting text_similarity.pl
+
+=back
+
+=item 0.05
+
+Released April 4, 2008 (all changes by TDP)
+
+=over
+
+=item *
+
+Made it possible for users to input strings directly via text_compare.pl and
+getSimilarityStrings. Previously it was only possible to directly measure the 
+similarity of files, but now strings can be measured. 
+
+=back
+
+=item 0.04
+
+Released March 21, 2008 (all changes by TDP)
+
+=over
+
+=item *
+
+Introduced tests for text_compare.pl (t/text_compare.t) - added support 
+for os neutral file reads via FILE::SPEC in this and other .t files.
+
+=item *
+
+Introduced tests for getOverlaps (t/overlaps.t)
+
+=item *
+
+Improved synopsis examples to show how to pass options via arguments in 
+hashes
+
+=item *
+
+Clarified that stemming and compounding are not currently supported
+disabled compfile option in text_compare.pl
+
+=item *
+
+Made file handling in text_compare more robust so that when a file does 
+not exist an error message is given and failure is immediate
+
+=item *
+
+Changed method of passing constants in test cases from (eg.)
+"Text::Similarity::NORMALIZE" to "normalize" in order to support 
+backwards compatability with perl 5.6.
+
+=item *
+
+Introduce normalize and no-normalize tests for getSimilarity
+
+=item *
+
+Fix Similarity.pm Synopsis example not to use files in /t that are no 
+longer available
+
+=back
+
+=item 0.03 
+
+Released March 20, 2008 (all changes by TDP)
+
+=over
+
+=item *
+
+fix divide by zero errors reported on cpan by cernst at esoft.com, who also provided fix
+
+=item *
+
+update test cases to improve coverage of partial matches and no matches
+
+=item *
+
+update synopsis examples so they can be run via cut and paste
+
+=item *
+
+improve README content to make it more descriptive
+
+=item *
+
+introduce /doc directory for pod of INSTALL README and CHANGES
+
+=item *
+
+introduce 'use constant' to support perl 5.6
+
+=back
+
+=item 0.02 
+
+Released October 16, 2004, all changes by JM
+
+=over 
+
+=item *
+
+fixed overlap finding & added new module Text::OverlapFinder
+
+=item *
+
+improved command-line interface
+
+=item *
+
+improved documentation and help messages
+
+=item *
+
+added support for a stoplist
+
+=back
+
+=item 0.01 
+
+Released September 23, 2004, all changes by JM
+
+=over
+
+=item *
+
+original version; created by h2xs 1.23 with options -b 5.6.0 -A -X Text::Similarity
+
+=back
+
+=back
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+ Ying Liu, University of Minnesota, Twin Cities
+ liux0395 at umn.edu
+
+This document last modified by :
+$Id: CHANGES.pod,v 1.4 2015/10/08 13:11:44 tpederse Exp $
+
+=head1 SEE ALSO
+
+<L http://text-similarity.sourceforge.net> 
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2004-2010 Ted Pedersen
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut

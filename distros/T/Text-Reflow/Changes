@@ -1,0 +1,42 @@
+Revision history for Perl extension Text::Reflow.
+
+0.01  Fri Apr  7 11:03:39 2000
+	- original version
+0.02  Fri Apr  7 17:32:01 2000
+	- Free the malloc-ed memory!
+0.03  Fri Apr  7 17:32:01 2000
+	- Implemented an improved module interface.
+1.00  Sun Sep 24 10:40:16 2000
+	- CPAN Release
+1.03  Thu Mar 15 11:53:45 2001
+	- Fix bug with endian differences.
+1.04  Mon Sep 10 12:09:47 2001
+	- Don't clobber @optimum array passed as an array ref.
+	- Fixed bug with duplicate output for noreflow lines
+1.05  Thu Oct 23 16:59:39 2003
+	- Added "no warnings" in two places (*glob{FILEHANDLE} is deprecated)
+1.06  Sat Feb  7 14:18:17 2009
+	- Fixed a bug which caused looping on 64 bit machines.
+1.07  Thu May 21 14:21:22 BST 2009
+	- Added GPL license notice to Reflow.pm
+1.08  Wed Jul  8 12:39:32 BST 2009
+	- Added 'LICENCE' => 'Perl' to Makefile.PL
+1.09  Mon Jul 13 09:40:46 BST 2009
+	- Fixed a typo: LICENCE -> LICENSE!
+1.10  Thu Jul 16 13:42:30 BST 2015
+	- Fixed bugs reported by CPAN users
+1.11  Sat Aug 15 10:15:27 BST 2015
+	- Fixed error in pod file
+1.12  Mon Nov 21 12:14:55 GMT 2016
+        - Replaced \377 placeholder by \x9F to allow UTF-8 to work.
+1.13  Mon Nov 28 14:50:10 GMT 2016
+        - Fixed FSF address
+        - Added man page for reflow script
+1.14  Mon Nov 28 14:52:20 GMT 2016
+        - Fix typos in man page
+1.15  Mon Nov 28 18:57:16 GMT 2016
+        - Fix spelling typos in POD
+1.16  Mon Dec  5 10:58:14 GMT 2016
+        - Added META.json and META.yml to distribution
+1.17  Thu Dec  8 11:18:24 GMT 2016
+        - Fix warning when calling reflow() with empty string

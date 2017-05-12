@@ -1,0 +1,20 @@
+Revision history for Text-NLP-Stanford-EntityExtract
+
+0.06  Thu 25th Nov 2008
+        - added debug flag to make identifying problems with server easier.
+
+0.05   Wed 25th Nov 2008
+         - Workaround server unicode issues with Text::Unidecode
+
+0.04   Wed 25th Nov 2008
+          - Fixed pod coverage failures
+
+0.03   Wed 25th Nov 2008
+         - README file and source control info added to docs
+
+0.02    Wed 25th November 2008
+          - Add some functions to make entity extraction a bit more useful.     
+
+0.01    Tue 24th November 2008
+        First version, released on an unsuspecting world.
+

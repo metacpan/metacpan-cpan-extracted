@@ -1,0 +1,17 @@
+Text::Number - Overloaded class for printing numbers
+
+Provides a facility for transparently configuring numbers
+to print the way you want them to.  Calculations are
+always executed using the full precision of the number,
+but printing is rounded to the number of places of your
+choosing.
+
+Extended printing operations (using Number::Format) are 
+configurable via the format method.
+
+
+-------
+CHANGES
+-------
+
+0.80 September 1999 - First public release.

@@ -1,0 +1,15 @@
+.releaserc
+Build.PL
+Changes
+examples/test.pl
+lib/Text/ASCIITable/TW.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

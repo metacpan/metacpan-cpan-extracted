@@ -1,0 +1,57 @@
+if #if
+
+#if 1
+good1
+#endif
+
+ #if 1
+good2
+ #endif
+
+#if 1
+ skip3 #endif
+#endif
+
+#if 1
+ good4
+#endif ignore
+
+#if 1 == 1
+ good5
+#endif
+
+#if 1 == 0
+ bad6
+#endif
+
+#if ##true_var##
+ good7
+#else
+ bad8
+#endif
+
+#if ##false_var##
+ bad9
+#endif
+
+#if ##false_var##
+ bad10
+#else
+ good11
+#endif
+
+#if ##true_var##
+ good12
+#elsif ##false_var##
+ bad13
+#else
+ bad14
+#endif
+
+#if ##undef_var##
+ bad15
+#elsif ##false_var##
+ bad16
+#else
+ good17
+#endif

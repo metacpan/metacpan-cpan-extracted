@@ -1,0 +1,37 @@
+Tk::HMListbox Module 3.00
+
+Tk::HMListbox is a derivitive of Tk::SMListbox that adds the 
+ability to include images, as well as text, as supported by the 
+underlying HList widget.  The main physical difference between 
+Tk::HMListbox and Tk::SMListbox is that it is derived from HList.  However, 
+the purpose of this widget is to provide a drop-in Tk::HList-based 
+replacement for Tk::SMListbox and Tk::MListbox, hence the interface is 
+designed to match that of Tk::SMListbox while providing most of the 
+features of Tk::HList.
+
+Tk::HMListbox supportsall the options provided by Tk::SMListbox, but 
+adds the "-itemtype" column-configuration option.
+Tk::HListbox lets the user create multi-column Listboxes with images 
+(icons) either in lieu of or along with text strings as selectable 
+options.  One can also mix columns containing text, images, or both 
+in the same HMListbox.
+
+Tk::HListbox is scrollable and supports the Scrolled() method.
+
+I created Tk::HMListbox (a replacement for Tk::SMListbox and Tk::MListbox) 
+in order to add a column of tiny icons in my "jfm4" file manager application.  
+I also felt that such a widget would be useful to others, seeing that 
+nothing other than Tk::HList currently exists for creating a list of 
+selectable images, but which could be used in an existing application 
+that uses Tk::SMListbox or Tk::MListbox.
+
+test.pl is a very simple file browser for unix/windows.
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make install
+
+Tk::HMListbox.pm contains pod documentation.

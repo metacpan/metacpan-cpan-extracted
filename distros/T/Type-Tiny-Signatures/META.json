@@ -1,0 +1,52 @@
+{
+   "abstract" : "Method/Function Signatures w/Type::Tiny Constraints",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Type-Tiny-Signatures",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Function::Parameters" : "1.0605",
+            "Type::Tiny" : "1.000005",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Function::Parameters" : "1.0605",
+            "Type::Tiny" : "1.000005",
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/Type-Tiny-Signatures/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Type-Tiny-Signatures/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/Type-Tiny-Signatures.git",
+         "web" : "https://github.com/alnewkirk/Type-Tiny-Signatures"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:AWNCORP"
+}
+

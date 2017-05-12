@@ -1,0 +1,78 @@
+{
+   "abstract" : "Prefixes and suffixes analysis of text",
+   "author" : [
+      "Jose Castro, C<< <cog@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Affixes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Affixes" : {
+         "file" : "lib/Text/Affixes.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kappa/Text-Affixes/issues"
+      },
+      "homepage" : "https://github.com/kappa/Text-Affixes",
+      "repository" : {
+         "url" : "git://github.com/kappa/Text-Affixes.git",
+         "web" : "https://github.com/kappa/Text-Affixes"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "José Alves de Castro <cog@cpan.org>",
+      "Alex Kapranoff <alex@kapranoff.ru>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

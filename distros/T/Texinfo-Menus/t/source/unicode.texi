@@ -1,0 +1,78 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@c unicode.texi
+@setfilename simple.info
+@settitle Simple Test
+@documentencoding UTF-8
+@c %**end of header
+
+@ifinfo
+@node Top
+@top Unicode Tést
+
+This document tests Unicode handling in Texinfo::Menus.
+
+@menu
+@end menu
+@end ifinfo
+
+@node Naïve Overview
+@chapter Naïve Overview
+@c DESC: This is the naïve overview
+
+Overview goes here.
+
+@node Data Structures
+@chapter Data Structures
+@c DESC: This is the data structures chapter
+
+This part comes before the menu.
+
+@menu
+@end menu
+
+This part comes after the menu.
+
+@node Vâriable names
+@section Vâriable names
+@c DESC: The vâriable names section
+
+Variable names defined here.
+
+@node Context
+@section Context
+@c DESC: The Context section
+
+Context goes here.
+
+@node Scalar values
+@section Scalar values
+@c DESC: The scalar values section
+
+Scalar values go here.
+
+@node Syntax
+@chapter Syntax
+@c DESC: This is the syntax chapter
+
+Syntax goes here.  This comes before the menu.
+
+@node Syntax Overview
+@section Syntax Overview
+@c DESC: The syntax overview section
+
+Syntax Overview goes here.
+
+@node Declarations
+@section Declarations
+@c DESC: The declarations section
+
+Declarations come here.
+
+@node Comments
+@section Comments
+@c DESC: The comments section
+
+Comments here.
+
+@bye

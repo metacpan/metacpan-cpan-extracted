@@ -1,0 +1,25 @@
+[% INCLUDE _header.tt2 %]
+
+<table>
+<tr>
+<th>Build name</th>
+<th>Total</th>
+<th>Passed</th>
+<th>Failed</th>
+<th>Skipped</th>
+</tr>
+
+[% FOREACH folder IN folders.sort %]
+[% summary = json.decode([ folder, 'summary.json' ]) %]
+<tr>
+<td><a href="[% folder %]/">[% folder %]/</a></td>
+<td>[% summary.total.0 %]</td>
+<td>[% summary.passed.size %]</td>
+<td>[% summary.failed.size %]</td>
+<td>[% summary.skipped.size %]</td>
+</tr>
+[% END %]
+
+</table>
+
+[% INCLUDE _footer.tt2 %]

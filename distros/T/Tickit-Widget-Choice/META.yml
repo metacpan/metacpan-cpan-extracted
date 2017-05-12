@@ -1,0 +1,26 @@
+---
+abstract: 'a widget giving a choice from a list'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tickit-Widget-Choice
+provides:
+  Tickit::Widget::Choice:
+    file: lib/Tickit/Widget/Choice.pm
+    version: '0.02'
+requires:
+  Tickit::RenderBuffer: '0'
+  Tickit::Style: '0'
+  Tickit::Widget: '0'
+  Tickit::Widget::Menu: '0.09'
+resources:
+  IRC: irc://irc.freenode.net/#tickit
+  license: http://dev.perl.org/licenses/
+version: '0.02'

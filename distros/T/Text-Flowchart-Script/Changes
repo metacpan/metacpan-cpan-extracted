@@ -1,0 +1,8 @@
+Revision history for Perl extension Text::Flowchart::Script.
+
+0.01  Sun Mar 30 10:20:12 2003
+	- original version; created by h2xs 1.21 with options
+		-XA Text::Flowchart::Script
+
+0.02  Sun, 30 Mar 2003 20:06:56 +0800
+	- typos in documentation fixed

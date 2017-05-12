@@ -1,0 +1,57 @@
+{
+   "abstract" : "date and time succinctly",
+   "author" : [
+      "Eric Wilhelm @ <ewilhelm at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-dt",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.34",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::Piece" : "1.20"
+         }
+      }
+   },
+   "provides" : {
+      "Time::Piece::Tidy" : {
+         "file" : "lib/Time/dt.pm"
+      },
+      "Time::dt" : {
+         "file" : "lib/Time/dt.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Time-dt"
+      },
+      "homepage" : "http://enobacon.com/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://git.enobacon.com/Time-dt.pm.git"
+      }
+   },
+   "version" : "v0.0.1"
+}

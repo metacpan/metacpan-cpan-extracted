@@ -1,0 +1,38 @@
+Test::XML version
+=================
+
+This module provides tools for testing code which deals with XML.  These
+tools are compatible with the Test::More and Test::Simple modules.  At
+present, there is generic XML comparison support, as well as modules for
+dealing with XML::SAX, XML::Twig and XML::XPath handlers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  XML::SemanticDiff
+
+These modules are not required, but will provide more functionality.
+
+  XML::SAX
+  XML::Twig
+  XML::XPath
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 semantico <cpan@semantico.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+# @(#) $Id$

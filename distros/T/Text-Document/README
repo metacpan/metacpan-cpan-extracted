@@ -1,0 +1,29 @@
+
+Text::Document is a collection of modules which allow to operate
+on text documents from the perspective of Information Retrieval.
+
+Text::Document scans documents, extracts terms, compares pairs
+of documents using the Jaccard and Cosine similarity measures.
+
+Text::Bloom allows to compute  Bloom filters which compactly
+store information about term presence in documents, thereby
+allowing for efficient storage of document 'signatures'.
+
+Text::DocumentCollection is a collection of documents, allowing
+for persistency and for such calculations as the Inverse Document
+Frequency (IDF).
+
+Version 1.04 of the package Text::Document is
+Copyright (C) 2001 Andrea Spinelli  and Walter Vannini
+
+All documents in this package can be  used with the same limitations
+as Perl itself.
+
+Anyway, we are eager to know about your experiences with this thing, at
+spinellia@acm.org and/or walter@humans.net.
+
+Version 1.05 eliminates the binary checksum of Text::Document
+and introduces a textual one which is sexier, e.g. in XML.
+
+Version 1.06 corrects a quirk in the tests and changes the size of
+a prime, p, used in Text::Bloom, which caused errors on my linux box.

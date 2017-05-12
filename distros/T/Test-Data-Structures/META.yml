@@ -1,0 +1,28 @@
+---
+abstract: 'Class to add additional helper methods to find out data within data structures'
+author:
+  - 'Andy Brown <setitesuk@gmail.com>'
+build_requires:
+  Test::Builder: 0
+  Test::Exception: 0
+  Test::More: 0.8
+configure_requires:
+  Module::Build: 0.3603
+generated_by: 'Module::Build version 0.3603'
+license: lgpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Data-Structures
+provides:
+  Test::Structures::Data:
+    file: lib/Test/Structures/Data.pm
+    version: 0.025
+requires:
+  Carp: 1.04
+  English: 1.02
+  Readonly: 1.03
+  Test::Builder: 0
+resources:
+  license: http://opensource.org/licenses/lgpl-3.0.html
+version: 0.025

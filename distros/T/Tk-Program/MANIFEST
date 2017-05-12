@@ -1,0 +1,8 @@
+MANIFEST			This list of files
+Makefile.PL
+Program.pm
+README
+demos/icon.gif
+demos/logo.gif
+demos/test.pl
+t/00_test.t

@@ -1,0 +1,39 @@
+---
+abstract: 'test a subset of tests'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Some
+provides:
+  Test::Some:
+    file: lib/Test/Some.pm
+    version: v0.2.1
+requires:
+  List::MoreUtils: '0'
+  Package::Stash: '0'
+  Test::More: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Test-Some/issues
+  homepage: https://github.com/yanick/Test-Some
+  repository: https://github.com/yanick/Test-Some.git
+version: 0.2.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK

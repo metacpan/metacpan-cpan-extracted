@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Tk-Autoscroll
+version:             1.14
+abstract:            space invaders-like scrolling 
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Tk:                            400
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Slaven Rezic (srezic@cpan.org)

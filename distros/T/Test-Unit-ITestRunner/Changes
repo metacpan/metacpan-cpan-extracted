@@ -1,0 +1,11 @@
+0.05
+    perl 5.18 compatibility
+
+0.04
+    Warnings counter added
+
+0.03
+    Slow tests toplist added
+
+0.02
+    Makefile.PL fixed (Time::HiRes in PREREQ_PM)

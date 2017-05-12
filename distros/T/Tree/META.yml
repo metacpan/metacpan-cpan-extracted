@@ -1,0 +1,42 @@
+---
+abstract: 'Persist multiple trees in a single db table, preserving child order'
+author:
+  - 'Rob Kinyin (rkinyon@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Deep: '1.123'
+  Test::Exception: '0.43'
+  Test::More: '1.302056'
+  Test::Pod: '1.51'
+  Test::Pod::Coverage: '1.1'
+  Test::Warn: '0.3'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tree
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '2.161'
+  Exporter: '5.71'
+  Scalar::Util: '1.45'
+  base: '0'
+  constant: '0'
+  lib: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tree
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Tree.git
+version: '1.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

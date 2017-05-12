@@ -1,0 +1,15 @@
+t/00-tapper-meta..........
+1..1
+ok 1 - tapper-suite-meta
+# Tapper-reportgroup-arbitrary:   1822
+# Tapper-suite-name:              Tapper-Reports-DPath-2.010005
+# Tapper-suite-version:           2.010005
+t/tapper_reports_dpath....
+TAP Version 13
+1..2
+ok 1 - count ALL plans including sections - empty braces
+  ---
+  foo: bar
+  affe: zomtec
+  ...
+ok 2 - allow easier report.id column 1

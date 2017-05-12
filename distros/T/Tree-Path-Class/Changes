@@ -1,0 +1,23 @@
+Revision history for Tree-Path-Class
+
+0.007     2014-12-15 03:06:25+00:00 UTC
+    #1: Use UTF-8 POD encoding (SROMANOV++)
+0.006     2014-12-11 22:02:14+00:00 UTC
+    #1: Use Pod::Weaver::Plugin::SingleEncoding instead of
+        PWP::Encoding (SROMANOV++)
+    #2: Remove MooseX::MarkAsMethods dependency in favor of
+        namespace::autoclean (ETHER++)
+0.005     2012-02-26 16:05:23 America/New_York
+    Clean up dependencies, tests
+0.004     2012-02-24 13:33:11 America/New_York
+    Refactored types and coercions into a separate
+    Tree::Path::Class::Types library
+0.003     2012-02-21 12:27:31 America/New_York
+    First official release
+    Note difference in metadata handling with Tree superclass
+    Improve readability of code
+0.002     2012-02-19 21:48:00 America/New_York
+    Throw exception if a value can't be coerced
+    Recursively convert Tree children
+0.001     2012-02-19 13:51:52 America/New_York
+    initial release

@@ -1,0 +1,34 @@
+<corpus lang="en" tagged="YES">
+<lexelt item="line-n">
+<instance id="line-n.w8_036:2056:">
+<answer instance="line-n.w8_036:2056:" senseid="phone"/>
+<context>
+bursts on the <head>line</head> in the middle of phone 
+</context>
+</instance>
+<instance id="line-n.art} aphb 08800556:">
+<answer instance="line-n.art} aphb 08800556:" senseid="cord"/>
+<context>
+third we let down with <head>lines</head>
+</context>
+</instance>
+<instance id="line-n.w9_40:5727:">
+<answer instance="line-n.w9_40:5727:" senseid="product"/>
+<context>
+momentum for the top sales <head>line</head>
+</context>
+</instance>
+<instance id="line-n.w8_032:6138:">
+<answer instance="line-n.w8_032:6138:" senseid="division"/>
+<context>
+pull pakistan apart along ethnic <head>lines</head>
+</context>
+</instance>
+<instance id="line-n.w8_120:14831:">
+<answer instance="line-n.w8_120:14831:" senseid="product"/>
+<context>
+debut of gm's saturn car <head>line</head> another new nameplate that unlike 
+</context>
+</instance>
+</lexelt>
+</corpus>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE ecollateral SYSTEM "test.dtd">
+<book title="test">
+        <!-- a silly displayed comment -->
+	<chapter id="01">
+		<language>DE</language>
+		<title>Design</title>
+			<paragraph> fhjer gheruiog hegrh greh hergh
+			ueirhg erhg hguer hgeru ghueirg huehru hueih
+			ehu heuig hue h</paragraph>
+			<paragraph> This contains german umlauts:
+		        &#xe4;&#xf6;&#xfc;&#xc4;&#xd6;&#xdc;&#xdf;
+                        </paragraph>
+			<paragraph> And these are non-latin-1 characters:
+		        &#x20AC; Slaven Rezi&#x107;
+                        </paragraph>
+	</chapter>
+</book>

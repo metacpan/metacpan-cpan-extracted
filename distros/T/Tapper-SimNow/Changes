@@ -1,0 +1,19 @@
+Revision history for Tapper-SimNow
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        - whitespace fixes
+
+4.0.1     2012-05-16
+        - added metainfo handling
+        - daemonize simnow starter
+        - kill simnow instance before creating console
+        - big Dist::Zilla roundhouse kick
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

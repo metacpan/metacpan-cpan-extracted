@@ -1,0 +1,10 @@
+Format: format_html_table: 
+
+<table style="color: blue">
+<tbody>
+<tr><td>http://savage.net.au/</td><td>Australia</td><td>Ron Savage</td><td>undef</td></tr>
+<tr><td>https://duckduckgo.com/</td><td>Earth</td><td>Mr. S. Engine</td><td>empty</td></tr>
+</tbody>
+</table>
+
+

@@ -1,0 +1,3 @@
+#!/usr/bin/perl
+
+use Test::More skip_all => "rope";

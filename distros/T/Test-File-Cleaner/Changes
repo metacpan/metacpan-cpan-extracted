@@ -1,0 +1,11 @@
+Revision history for Perl extension Test::File::Cleaner
+
+0.03 Mon Feb 12 2007
+	- No functional changes
+	- Moving from old CVS to new SVN repository
+
+0.02 Tue Feb 15 2005
+	- Removing braindead Build.PL
+
+0.01 Fri Oct  9 2004
+	- Created the initial version of the module

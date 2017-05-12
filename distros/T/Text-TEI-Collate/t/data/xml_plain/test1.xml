@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="tools/tei_ms_crit.rng" type="xml"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Ժամանակագրութիւն</title>
+        <author>Մատթէոս Ուռհայեցի</author>
+        <respStmt xml:id="tla">
+          <resp>Transcription by</resp>
+          <name> Tara L Andrews</name>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>Unpublished manuscript</p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc xml:id="Bz449">
+          <msIdentifier>
+            <settlement>Bzommar</settlement>
+            <repository>Bibliothek des Klosters</repository>
+            <idno>449</idno>
+          </msIdentifier>
+          <p>pp. 163r-174r</p>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <p><!-- began on page 162r --><pb n="163ա"/>
+Արդ մինչև ցայս վայրս, բազմաջան և աշխատ<ex resp="#tla">ա</ex>ւոր <lb/>
+քննութ<ex resp="#tla">եամ</ex>բ գտեալ գրեցաք, ի ժամանակական գրեալս. <lb/>
+հարիւրից ամացն։ զորս բազում ժամանակաց հետա<lb/>քննեալ հասու եղաք, ընդ այնքանեաց տեսողացն <lb/>
+և լսօղացն՝ որք էին ի հին ամաց ծնեալք, և ընթերցողք <lb/>
+առաջին պատմագրացն։ որք ականատեսք էին լեալք <lb/><expan>ամենայն</expan> եղելոցն։ և նեղութե<ex resp="#tla">ան</ex>ս այսոցիկ՝ զոր <expan>վասն</expan> մեղաց կր<lb/>եաց տունն հայոց։ և է ահաւոր քան զայս՝ դառնա<lb/>շունչ կատարած յետին ժամանակիս, որ զմտաւ ու<lb/>
+նիմ գրել և թողուլ իմացումն յապագայից եղբարց։ <lb/></p>
+      <pb n="163բ"/>
+      <p><hi>Իսկ</hi> ի լինել թվականութե<ex resp="#tla">ան</ex>ս հայոց <num value="502">ՇԲ</num> ամ։ եղև ահաւ<lb/>որ նշան և սոսկալի, և կատարած մեծի բարկութե<ex resp="#tla">ան</ex> <lb/>
+երևեալ ի մեծ քաղաքն անտիոք, զոր ի ներքոյ արեգա<lb/>կանն գործեցաւ այս սքանչելիս, որ էր տեսօղացն ա<lb/>հաւոր և հրաշալի։ Եւ եղև այս նշանս՝ ահ և դ<ex resp="#tla">ո</ex>ղումն <lb/><expan>ամենայն</expan> հաւատացելոց <expan>քրիստոսի</expan>։ զորս այժմ մեծասաստ սպառ<lb/>նալեօք յայտնեաց <expan>աստուած</expan> զդատաստանս իւր զահ<ex resp="#tla">ա</ex>ւոր։ <lb/>
+Եւ իշխանն յետ հաւատին թողլոյ, եղև հակառակ <lb/>
+մեծ ազգին ասորոց։ և յայնժամ մատնեցան ասորիքն <lb/>
+ի մեծ նեղութե<ex resp="#tla">ան</ex>։ <expan>վասն</expan> զի սկսան հաւատոյ քննութի<ex resp="#tla">ւն</ex> առ<lb/>նել հանապազօր։ և եղեն լերբ ազգն հոռոմոց, որ <lb/>
+զգործեցեալն ո՜չ գիտէին։ <expan>վասն</expan> զի <expan>քրիստոսական</expan> աւետա<lb/><pb n="164բ"/>րանն հրով այրել հրամայեաց պատրիարգն։ և եղև <lb/>
+յորժամ ի հուրն դրին զաւետարանն աստուծոյ, ձայն ելանէր <lb/>
+աւետարանէն՝ և բարձրացեալ ի կրակէն ի դուս ե<lb/>լանէր։ <lb/></p>
+    </body>
+  </text>
+</TEI>

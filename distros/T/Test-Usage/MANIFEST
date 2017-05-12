@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+t/Foo.pm
+t/Foo_T.pm
+t/M1_T.pm
+t/M2_T.pm
+t/SubDir/M1_T.pm
+t/t1.t
+t/t2.t
+t/t3.t
+t/t4.t
+test
+lib/Test/Usage.pm
+lib/Test/Usage/Manual.pm
+META.yml                                 Module meta-data (added by MakeMaker)

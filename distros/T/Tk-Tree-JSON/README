@@ -1,0 +1,56 @@
+Tk-Tree-JSON
+
+DESCRIPTION
+
+Tk::Tree::JSON graphically displays and allows for interaction with the tree of a JSON document.
+
+A JSON document may be loaded from either a JSON file or a JSON string.
+
+Target applications may include JSON viewers, editors and the like. 
+
+VERSION
+
+Tk::Tree::JSON version 0.04.
+
+USER VISIBLE CHANGES SINCE LAST RELEASE
+
+N/A
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tk::Tree::JSON
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-Tree-JSON
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tk-Tree-JSON
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tk-Tree-JSON
+
+    Search CPAN
+        http://search.cpan.org/dist/Tk-Tree-JSON
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2008-2015 José Santos. All rights reserved.
+
+This program is free software. It can redistributed and/or modified under the 
+same terms as Perl itself.
+

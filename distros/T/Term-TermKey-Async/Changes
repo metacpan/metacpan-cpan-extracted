@@ -1,0 +1,37 @@
+Revision history for Term-TermKey-Async
+
+0.08    CHANGES:
+         * Updated for IO::Async 0.48 - use new watch_time method
+         * Use ->pipepair from IO::Async::OS, not $loop (RT87726)
+
+0.07    CHANGES:
+         * Updated for Term::TermKey 0.10 / libtermkey 0.10
+         * Use an IO::Async::Timer::Countdown object rather than low-level
+           $loop manipulation
+
+0.06    CHANGES:
+         * Updated for Term::TermKey 0.08 / libtermkey 0.7
+         * Added unit test for timeout behaviour
+         * Docs and implementation updates for consistency with other
+           IO::Async code
+
+0.05    CHANGES:
+         * Updated for Term::TermKey 0.06
+
+0.04    CHANGES:
+         * Added a simple example script
+         * Various small updates to keep CPANTS happy
+
+0.03    CHANGES:
+         * Updated for IO::Async 0.21:
+            IO::Async::Handle; ->configure method
+
+0.02    CHANGES:
+         * Wrap keyname2sym() method.
+
+        BUGFIXES:
+         * Avoid (harmless) warning of uninitialised value when constructor
+           is called with no flags.
+
+0.01    First version, released on an unsuspecting world.
+

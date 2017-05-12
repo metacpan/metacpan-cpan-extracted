@@ -1,0 +1,17 @@
+<li class="[% result.status %]">
+  [% IF result.log %]
+    <a href="logs/stages/[% context %].log" title="[% result.label | html%]">[% result.name %]</a>
+  [% ELSE %]
+    <span title="[% result.label | html%]">[% result.name %]</span>
+  [% END %]
+  <span>: [% result.status %] [% IF result.duration %]([% result.duration %] seconds)[%END%]</span>
+  [% IF result.has_results %]
+    <ol>
+    [% FOREACH result = result.results %]
+      [% INCLUDE "status-stage.tt" 
+          context = context _ "-" _ result.name
+       %]
+    [% END %]
+    </ol>
+  [% END %]
+</li>

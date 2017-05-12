@@ -1,0 +1,51 @@
+Revision history for Perl extension Term::Completion.
+
+1.00 Mon Feb 24 2013
+Wow - 4 years of silence... sorry for that...
+
+Slight change in the API: the "validate" callback is now supposed to return
+undef (the undefined value) in case the validation failed; this was required 
+to allow "false" values (in the sense of Perl, like 0, '') as correct
+return values (defined) of the validation callback.
+
+A couple of minor bug fixes and improvements, tested with on a bunch of
+platforms, in an attempt to increase portability:
+- Windows / ActivePerl
+- Windows / Cygwin
+- Windows / SUA
+- Linux
+- Solaris
+
+Fixed a few POD errors and added POD for T:C:Multi and :Path.
+
+CPAN #83424: Bug in Term::Completion
+- fixed deprecated goto (with Perl 5.12 and higher)
+
+CPAN #77772: [wish] on-demand alternative to (automatic) help
+- implemented propsal, thanks for the patch!
+
+CPAN #77697: Warning 'Use of uninitialized value' when scrolling if input
+             text is not matched
+- applied patch, thanks a lot!
+
+
+0.91  Fri Feb 27 15:37:32 CET 2009
+        - first release to CPAN with already good test coverage:
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+blib/lib/Term/Completion.pm    99.6   96.3   77.8  100.0  100.0   97.2   97.1
+.../Term/Completion/Multi.pm   93.8   80.0    n/a   90.0  100.0    0.1   91.8
+...b/Term/Completion/Path.pm   87.5   50.0    n/a   87.5  100.0    0.2   84.6
+...Term/Completion/_POSIX.pm   96.1   50.0   33.3   83.3  100.0    0.1   89.6
+...rm/Completion/_readkey.pm  100.0   66.7   44.4  100.0   75.0    0.2   82.6
+.../Term/Completion/_stty.pm   80.8   41.7   33.3   83.3  100.0    2.3   70.0
+...m/Completion/_termsize.pm   88.9   50.0    n/a  100.0  100.0    0.0   77.8
+Total                          96.7   87.1   66.7   92.6   96.2  100.0   92.2
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+
+0.90  Wed Aug 13 08:22:17 2008
+	- original version; created by h2xs 1.23 with options
+		--omit-XS --name Term::Completion --use-new-tests --skip-autoloader --version 0.90
+

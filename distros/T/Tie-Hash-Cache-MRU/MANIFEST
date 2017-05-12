@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Tie-Hash-Cache-MRU.t
+lib/Tie/Hash/Cache/MRU.pm
+META.yml                                 Module meta-data (added by MakeMaker)

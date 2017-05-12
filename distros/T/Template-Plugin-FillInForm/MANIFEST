@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Template/Plugin/FillInForm.pm
+t/00_compile.t
+t/01_fillin.t

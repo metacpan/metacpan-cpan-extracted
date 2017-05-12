@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Test::Skeleton::Generator;
+use Getopt::Long;
+use Pod::Usage;
+
+my ( $t, $p, $s, $d );
+
+if ( ! GetOptions(
+        'test-file=s'           => \$t,
+        'package=s'             => \$p,
+        'skip-private-methods!' => \$s,
+        'debug!'                => \$d,
+) ) {
+    pod2usage( 1 );
+}
+
+unless ( $t && $p ) {
+    pod2usage( 'Please provide the name of the package and the path to the test file.' );
+}
+
+my $gen = Test::Skeleton::Generator->new( {
+        test_file            => $t,
+        package_file         => $p,
+        skip_private_methods => $s,
+        debug                => $d,
+    }
+);
+my $test = $gen->get_test;
+$gen->write_test_file( $test );
+
+__END__
+
+=head1 NAME
+
+generate_perl_test_skeleton - Do what the name says
+
+=head1 USAGE
+
+ generate_perl_test_skeleton -p Foo::Bar -t t/Foo/Bar.t [-s]
+
+=head1 EXAMPLE
+
+ # generate the test file ./t/Foo/Bar.t that tests module Foo::Bar:
+ generate_perl_test_skeleton -p Foo::Bar -t t/Foo/Bar.t
+
+ # same thing, but use the path to the package instead of its name:
+ generate_perl_test_skeleton -p ./lib/Foo/Bar.pm -t t/Foo/Bar.t
+
+=head1 DESCRIPTION
+
+This script will generate a skeleton test file for a perl module. You have to provide
+a command line paramter -t whose values designates the file name of the test file you
+want to create or update and a parameter -p whose value takes either a perl package name
+or the path to a perl module.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item B<--test-file>
+
+Path to the test file to be generated/updated.
+
+=item B<--package>
+
+Path or name of the module you want to test.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<--debug> 
+
+Enable debugging.
+
+=item B<--skip-private-methods>
+
+Ignore methods/functions in your perl package that start with an underscore.
+
+=back
+
+=head1 SEE ALSO
+
+L<Test::Skeleton::Generator> - the perl module that powers this script
+
+L<https://github.com/mannih/vim-perl-testing> is a vim plugin that was created
+to be used with something like generate_perl_test_skeleton.
+
+=head1 LICENSE
+
+Copyright (C) Manni Heumann.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Manni Heumann E<lt>github@lxxi.orgE<gt>
+
+=cut
+

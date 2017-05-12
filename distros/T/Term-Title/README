@@ -1,0 +1,96 @@
+NAME
+    Term::Title - Portable API to set the terminal titlebar
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+        use Term::Title 'set_titlebar', 'set_tab_title';
+
+        set_titlebar("This goes into the title");
+
+        set_titlebar("Title", "And also print this to the terminal");
+
+        set_tab_title("This goes into the tab title");
+
+        set_tab_title("Tab Title", "And also print this to the terminal");
+
+DESCRIPTION
+    Term::Title provides an abstraction for setting the titlebar or the tab
+    title across different types of terminals. For *nix terminals, it prints
+    the appropriate escape sequences to set the terminal or tab title based
+    on the value of $ENV{TERM}. On Windows, it uses Win32::Console to set
+    the title directly.
+
+    Currently, changing the titlebar is supported in these terminals:
+
+    *   xterm
+
+    *   rxvt
+
+    *   screen
+
+    *   iTerm2.app
+
+    *   Win32 console
+
+    The terminals that support changing the tab title include:
+
+    *   iTerm2.app
+
+USAGE
+  set_titlebar
+        set_titlebar( $title, @optional_text );
+
+    Sets the titlebar to $title or clears the titlebar if $title is
+    undefined.
+
+    On terminals that require printing escape codes to the terminal, a
+    newline character is also printed to the terminal. If @optional_text is
+    given, it will be printed to the terminal prior to the newline. Thus, to
+    keep terminal output cleaner, use "set_titlebar()" in place of a
+    "print()" statement to set the titlebar and print at the same time.
+
+    If the terminal is not supported, set_titlebar silently continues,
+    printing @optional_text if any.
+
+  set_tab_title
+        set_tab_title( $title, @optional_text );
+
+    Has the exact same semantics as the "set_titlebar" but changes the tab
+    title.
+
+SEE ALSO
+    *   Win32::Console
+
+    *   <http://www.ibiblio.org/pub/Linux/docs/HOWTO/Xterm-Title>
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Term-Title/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Term-Title>
+
+      git clone https://github.com/dagolden/Term-Title.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Alexandr Ciornii <alexchorny@gmail.com>
+
+    *   Pedro Melo <melo@simplicidade.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2008 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

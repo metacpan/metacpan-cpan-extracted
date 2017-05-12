@@ -1,0 +1,5 @@
+1.01  Sat, 14 May 2011 17:37:13 +0200
+  - Change distribution name to something CPAN::DistnameInfo can understand.
+
+1.00  Fri, 25 Feb 2011 18:16:30 +0100
+  - Initial release.

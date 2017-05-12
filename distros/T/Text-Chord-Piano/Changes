@@ -1,0 +1,31 @@
+Revision history for Text-Chord-Piano
+
+0.061   Sat Feb  9 09:55:02 JST 2013
+    [NO CODE CHANGE]
+        - fixed test
+        - fixed version of dependent module
+
+0.06    Wed Feb  6 23:14:31 JST 2013
+        - added `piano_chord` command
+
+0.05    Sun Oct 28 00:17:00 JST 2012
+        - no use version.pm
+        - fix format of module's version
+        - support travis-ci(on github)
+        - fix README
+
+0.0.5  Sat Mar 14 20:20:20 2009
+       removed code. it was no need.
+
+0.0.4  Tue Mar 10 22:10:00 2009
+       get chord from Music::Chord::Note
+
+0.0.3  Fri Dec 12 15:55:55 2008
+       fixed chord list and added tests
+
+0.0.2  Fri Nov  6 12:55:55 2008
+       fixed pod(changed Email address)
+
+0.0.1  Tue Nov  4 09:30:00 2008
+       Initial release.
+

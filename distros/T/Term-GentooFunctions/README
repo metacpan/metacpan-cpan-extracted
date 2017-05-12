@@ -1,0 +1,29 @@
+
+Term::GentooFunctions
+=============
+
+Provides gentoo's einfo, ewarn, eerror, ebegin and eend.
+
+This is not something that's in use in any Gentoo packages that
+I'm aware of.  It's simply a port of Gentoo's /sbin/functions.sh
+(used mainly for startup messages) to Perl for the purposes of
+decorating command line apps.
+
+
+use Term::GentooFunctions qw(:all)
+
+einfo "this is kinda neat...";
+
+ebegin "I hope this works...";
+
+This module also provides a handy way to go do something with a
+message:
+
+my $return = edo "doing something" => sub {
+    $x = 17;
+};
+
+....
+
+eend $truefalse; # the result is backwards of gentoo; ie, 0 is bad, 1 is good.
+

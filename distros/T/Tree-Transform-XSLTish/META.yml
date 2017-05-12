@@ -1,0 +1,33 @@
+---
+abstract: 'transform tree data, like XSLT but in Perl'
+author:
+  - 'Gianni Ceccarelli <dakkar@thenautilus.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Most: 0
+  Tree::DAG_Node::XPath: 0.10
+  Tree::XPathEngine: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tree-Transform-XSLTish
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp::Clan: 0
+  Class::MOP: 0
+  Moose: 0.90
+  Params::Validate: 0
+  Sub::Exporter: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.3

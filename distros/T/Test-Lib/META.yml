@@ -1,0 +1,26 @@
+---
+abstract: 'Use libraries from a t/lib directory'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Lib
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: '0'
+  File::Spec: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Test-Lib
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/haarg/Test-Lib.git
+version: '0.002'

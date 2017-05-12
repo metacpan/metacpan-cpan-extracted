@@ -1,0 +1,5 @@
+=== not found function escape test
+--- wiki
+&hoge(<script)
+--- html
+&amp;hoge(&lt;script)

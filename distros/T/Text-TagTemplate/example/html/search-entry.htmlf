@@ -1,0 +1,8 @@
+<!-- $Id: search-entry.htmlf,v 1.1.1.1 2002/05/29 00:38:37 matisse Exp $ -->
+
+<P>Store:  <#STORE></P>
+<P>City:   <#CITY></P>
+<P>State:  <#STATE></P>
+<P>Zip:    <#ZIP></P>
+
+<!-- $Id: search-entry.htmlf,v 1.1.1.1 2002/05/29 00:38:37 matisse Exp $ -->

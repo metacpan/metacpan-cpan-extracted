@@ -1,0 +1,19 @@
+Time::Interval
+==============
+
+This package installs the Time::Interval perl module.
+Time::Interval's primary purpose is to take a given number
+of seconds and return the number of days, hours, minutes,
+and seconds are represented. This is handier than you 
+think, and of course, I'm fairly certain that I'm not the
+the first/best/only one to have done this with perl.
+However, this is my attempt, and I think at the very least
+the name makes the intent of the module clear.
+
+NOTE: this module does NOT handle resolutions < 1 second.
+For that have a look at Time::HiRes. This module will 
+quantize fractional second values to whole numbers.
+
+thank you and enjoy,
+
+-Andrew ;-)

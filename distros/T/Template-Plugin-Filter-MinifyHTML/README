@@ -1,0 +1,46 @@
+NAME
+       Template::Plugin::Filter::MinifyHTML - HTML minification filter for Template Toolkit
+
+VERSION
+       version 0.01
+
+SYNOPSIS
+         [% USE Filter.MinifyHTML( comments => 1, html5 => 1 ) %]
+
+         [% FILTER minify_html %]
+         <html>...Your html content here...</html>
+         [% END %]
+
+DESCRIPTION
+       This is a Template Toolkit filter which uses a few quick and nasty regexes to minify HTML source code. It’s built upon the idea/workings
+       of the default ’collapse’ filter, but adds a little spice of its own into the mix, removing HTML comments and a few other bits and
+       pieces.
+
+USAGE
+       Be sure to [% USE Filter.MinifyHTML %] in your template, then you're able to wrap [% FILTER minify_html %][% END %] around blocks that you would like to minify.
+
+       Filter.MinyfyHTML can currently take two arguments - comments and html5.
+       
+       If comments is set to a truesy value it will remove any HTML comments it finds (<!-- ... -->). It shouldn't affect any conditional comments in your markup (ie. <!--[if lt IE 9]><link href="/static/css/custom-ie.css" rel="stylesheet"><![endif]-->).
+
+      If html5 is truesy, then it will remove the trailing slash on self-closing elements (<br />, <input />, etc).
+
+BUYER BEWARE
+       This filter does not check for or acknowledge the existence or importance of tags such as <pre> or <textarea>. As such, any whitespace
+       within these tags *WILL* be royally messed up by this module in its current state.
+
+SEE ALSO
+       Template::Filters, Template::Plugin::Filter, Template
+
+AUTHOR
+       Jarrod Linahan <jarrod@texh.net>
+
+COPYRIGHT AND LICENSE
+       Template::Plugin::Filter::MinifyHTML is copyright (c) 2013 by Jarrod Linahan.
+
+       This module is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For more details, see the
+       full text of the licenses in the directory LICENSES.
+
+       This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of
+       merchantability or fitness for a particular purpose.
+

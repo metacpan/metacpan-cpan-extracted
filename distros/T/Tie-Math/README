@@ -1,0 +1,79 @@
+NAME
+    Tie::Math - Hashes which represent mathematical functions.
+
+SYNOPSIS
+      use Tie::Math;
+      tie %fibo, 'Tie::Math', sub { f(n) = f(n-1) + f(n-2) },
+                              sub { f(0) = 0;  f(1) = 1 };
+
+      # Calculate and print the fifth fibonacci number
+      print $fibo{5};
+
+DESCRIPTION
+    Defines hashes which represent mathematical functions, such as
+    the fibonacci sequence, factorials, etc... Functions can be
+    expressed in a manner which a math or physics student might find
+    a bit more familiar. It also automatically employs memoization.
+
+    Multi-variable functions are supported. f() is simply passed two
+    variables (f(X,Y) for instance) and the hash is accessed in the
+    same way ($func{3,-4}).
+
+    tie tie %func, 'Tie::Math', \&function; tie %func, 'Tie::Math',
+        \&function, \&initialization;
+
+        &function contains the definition of the mathematical
+        function. Use the f() subroutine and N index provided. So to
+        do a simple exponential function represented by "f(N) =
+        N**2":
+
+            tie %exp, 'Tie::Math', sub { f(N) = N**2 };
+
+        &initialization contains any special cases of the function
+        you need to define. In the fibonacci example in the SYNOPSIS
+        you have to define f(0) = 1 and f(1) = 1;
+
+            tie %fibo, 'Tie::Math', sub { f(N) = f(N-1) + f(N-2) },
+                                    sub { f(0) = 1;  f(1) = 1; };
+
+        The &initializaion routine is optional.
+
+        Each calculation is "memoized" so that for each element of
+        the array the calculation is only done once.
+
+        While the variable N is given by default, A through Z are
+        all available. Simply import them explicitly:
+
+            # Don't forget to import f()
+            use Tie::Math qw(f X);
+
+        There's no real difference which variable you use, its just
+        there for your preference. (NOTE: I had to use captial
+        letters to avoid clashing with the y// operator)
+
+AUTHOR
+        Michael G Schwern <schwern@pobox.com>
+
+WHAT IS THIS?
+
+        This is Tie::Math, a perl module.
+
+HOW DO I INSTALL IT?
+
+        To install this module, cd to the directory that contains
+        this README file and type the following:
+
+           perl Makefile.PL
+           make
+           make test
+           make install
+
+        To install this module into a specific directory, do: perl
+        Makefile.PL PREFIX=/name/of/the/directory ...the rest is the
+        same...
+
+        Please also read the perlmodinstall man page, if available.
+
+WHAT ELSE DO I NEED?
+
+        Perl            5.6.0 and up

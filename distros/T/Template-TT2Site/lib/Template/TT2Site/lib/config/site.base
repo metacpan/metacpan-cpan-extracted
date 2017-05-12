@@ -1,0 +1,16 @@
+[% # $Id: site.base,v 1.1 2004/12/05 11:57:58 jv Exp $ -%]
+[%
+
+# Site.base data. Please DO NOT override.
+
+# Supply API version, if not present.
+SET tt2site.api_version = 1 UNLESS tt2site.api_version;
+
+# Save in site hash.
+SET site.tt2site = tt2site;
+
+# Default title / about
+SET page.title = site.title UNLESS page.title;
+SET page.about = site.about UNLESS page.about;
+
+-%]

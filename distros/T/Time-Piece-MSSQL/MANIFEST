@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Time/Piece/MSSQL.pm
+t/000-report-versions-tiny.t
+t/from_mssql.t
+t/to_mssql.t
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

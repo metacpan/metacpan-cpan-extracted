@@ -1,0 +1,9 @@
+Revision history for Term-Emit-Format-HTML
+
+0.0.2  2009-02-13 17:47:21Z
+        Removed perlcritic.t from the manifest; I only use it for my builds,
+          it's too persnicikity for general use.
+        Removed dependency on 'version'.
+
+0.0.1  2009-01-27 16:42:35Z
+        Initial release.

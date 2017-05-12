@@ -1,0 +1,6 @@
+t/01load.t
+README
+MANIFEST
+Makefile.PL
+lib/Template/Plugin/DataRandom.pm
+Changes

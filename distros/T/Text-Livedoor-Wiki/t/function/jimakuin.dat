@@ -1,0 +1,99 @@
+=== basic
+--- wiki
+&jimakuin(http://jimaku.in/w/kdtdRNTdNb8/oTkZXUNFw_B)
+--- html
+<div class="link_jimakuin">
+<object width="425" height="380">
+<param name="movie" value="http://swf.jimaku.in/v/kdtdRNTdNb8/oTkZXUNFw_B">
+</param>
+<param name="wmode" value="transparent"></param>
+<embed src="http://swf.jimaku.in/v/kdtdRNTdNb8/oTkZXUNFw_B" 
+type="application/x-shockwave-flash" wmode="transparent" 
+width="425" height="380"></embed></object>
+</div>
+=== no args
+--- wiki
+&jimakuin()
+--- html
+&amp;jimakuin()
+=== url is not invalid
+--- wiki
+&jimakuin(http://wiki.livedoor.com)
+--- html
+&amp;jimakuin(http://wiki.livedoor.com)
+=== properties
+--- wiki
+&jimakuin(http://jimaku.in/w/kdtdRNTdNb8/oTkZXUNFw_B){100,200}
+&jimakuin(http://jimaku.in/w/kdtdRNTdNb8/oTkZXUNFw_B){100}
+&jimakuin(http://jimaku.in/w/kdtdRNTdNb8/oTkZXUNFw_B){,200}
+--- html
+<div class="link_jimakuin">
+<object width="100" height="200">
+<param name="movie" value="http://swf.jimaku.in/v/kdtdRNTdNb8/oTkZXUNFw_B">
+</param>
+<param name="wmode" value="transparent"></param>
+<embed src="http://swf.jimaku.in/v/kdtdRNTdNb8/oTkZXUNFw_B" 
+type="application/x-shockwave-flash" wmode="transparent" 
+width="100" height="200"></embed></object>
+</div>
+<div class="link_jimakuin">
+<object width="100" height="380">
+<param name="movie" value="http://swf.jimaku.in/v/kdtdRNTdNb8/oTkZXUNFw_B">
+</param>
+<param name="wmode" value="transparent"></param>
+<embed src="http://swf.jimaku.in/v/kdtdRNTdNb8/oTkZXUNFw_B" 
+type="application/x-shockwave-flash" wmode="transparent" 
+width="100" height="380"></embed></object>
+</div>
+<div class="link_jimakuin">
+<object width="425" height="200">
+<param name="movie" value="http://swf.jimaku.in/v/kdtdRNTdNb8/oTkZXUNFw_B">
+</param>
+<param name="wmode" value="transparent"></param>
+<embed src="http://swf.jimaku.in/v/kdtdRNTdNb8/oTkZXUNFw_B" 
+type="application/x-shockwave-flash" wmode="transparent" 
+width="425" height="200"></embed></object>
+</div>
+=== synopsis
+--- wiki
+&jimakuin(http://jimaku.in/w/WhZ8QHyafZ8jmk/dyljA0X_rz1)
+&jimakuin(http://jimaku.in/w/WhZ8QHyafZ8jmk/dyljA0X_rz1){100,200}
+&jimakuin(http://jimaku.in/w/WhZ8QHyafZ8jmk/dyljA0X_rz1){100}
+&jimakuin(http://jimaku.in/w/WhZ8QHyafZ8jmk/dyljA0X_rz1){,200}
+--- html
+<div class="link_jimakuin">
+<object width="425" height="380">
+<param name="movie" value="http://swf.jimaku.in/v/WhZ8QHyafZ8jmk/dyljA0X_rz1">
+</param>
+<param name="wmode" value="transparent"></param>
+<embed src="http://swf.jimaku.in/v/WhZ8QHyafZ8jmk/dyljA0X_rz1" 
+type="application/x-shockwave-flash" wmode="transparent" 
+width="425" height="380"></embed></object>
+</div>
+<div class="link_jimakuin">
+<object width="100" height="200">
+<param name="movie" value="http://swf.jimaku.in/v/WhZ8QHyafZ8jmk/dyljA0X_rz1">
+</param>
+<param name="wmode" value="transparent"></param>
+<embed src="http://swf.jimaku.in/v/WhZ8QHyafZ8jmk/dyljA0X_rz1" 
+type="application/x-shockwave-flash" wmode="transparent" 
+width="100" height="200"></embed></object>
+</div>
+<div class="link_jimakuin">
+<object width="100" height="380">
+<param name="movie" value="http://swf.jimaku.in/v/WhZ8QHyafZ8jmk/dyljA0X_rz1">
+</param>
+<param name="wmode" value="transparent"></param>
+<embed src="http://swf.jimaku.in/v/WhZ8QHyafZ8jmk/dyljA0X_rz1" 
+type="application/x-shockwave-flash" wmode="transparent" 
+width="100" height="380"></embed></object>
+</div>
+<div class="link_jimakuin">
+<object width="425" height="200">
+<param name="movie" value="http://swf.jimaku.in/v/WhZ8QHyafZ8jmk/dyljA0X_rz1">
+</param>
+<param name="wmode" value="transparent"></param>
+<embed src="http://swf.jimaku.in/v/WhZ8QHyafZ8jmk/dyljA0X_rz1" 
+type="application/x-shockwave-flash" wmode="transparent" 
+width="425" height="200"></embed></object>
+</div>

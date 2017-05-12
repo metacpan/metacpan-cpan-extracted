@@ -1,0 +1,149 @@
+
+[![Build Status](https://travis-ci.org/Corion/www-mechanize-phantomjs.svg?branch=master)](https://github.com/Corion/www-mechanize-phantomjs)
+
+# NAME
+
+Test::HTTP::LocalServer - spawn a local HTTP server for testing
+
+# SYNOPSIS
+
+    use LWP::Simple qw(get);
+    my $server = Test::HTTP::LocalServer->spawn;
+
+    get $server->url, "Retrieve " . $server->url;
+
+    $server->stop;
+
+# DESCRIPTION
+
+This module implements a tiny web server suitable for running "live" tests
+of HTTP clients against it. It also takes care of cleaning `%ENV` from settings
+that influence the use of a local proxy etc.
+
+Use this web server if you write an HTTP client and want to exercise its
+behaviour in your test suite without talking to the outside world.
+
+# METHODS
+
+## `Test::HTTP::LocalServer->spawn %ARGS`
+
+    my $server = Test::HTTP::LocalServer->spawn;
+
+This spawns a new HTTP server. The server will stay running until
+  $server->stop
+is called.
+
+Valid arguments are :
+
+- `html =>` scalar containing the page to be served
+- `file =>` filename containing the page to be served
+- `debug => 1` to make the spawned server output debug information
+- `eval =>` string that will get evaluated per request in the server
+
+    Try to avoid characters that are special to the shell, especially quotes.
+    A good idea for a slow server would be
+
+        eval => sleep+10
+
+All served HTML will have the first %s replaced by the current location.
+
+The following entries will be removed from `%ENV`:
+
+    HTTP_PROXY
+    http_proxy
+    CGI_HTTP_PROXY
+
+## `$server->port`
+
+This returns the port of the current server. As new instances
+will most likely run under a different port, this is convenient
+if you need to compare results from two runs.
+
+## `$server->url`
+
+This returns the url where you can contact the server. This url
+is valid until the `$server` goes out of scope or you call
+  $server->stop;
+
+## `$server->stop`
+
+This stops the server process by requesting a special
+url.
+
+## `$server->kill`
+
+This kills the server process via `kill`. The log
+cannot be retrieved then.
+
+## `$server->get_log`
+
+This returns the
+output of the server process. This output will be a list of
+all requests made to the server concatenated together
+as a string.
+
+## `$server->local`
+
+    my $url = $server->local('foo.html');
+    # file:///.../foo.html
+
+Returns an URL for a local file which will be read and served
+by the webserver. The filename must
+be a relative filename relative to the location of the current
+program.
+
+# URLs implemented by the server
+
+## 302 redirect `$server->redirect($target)`
+
+This URL will issue a redirect to `$target`. No special care is taken
+towards URL-decoding `$target` as not to complicate the server code.
+You need to be wary about issuing requests with escaped URL parameters.
+
+## 404 error `$server->error_notfound($target)`
+
+This URL will response with status code 404.
+
+## Timeout `$server->error_timeout($seconds)`
+
+This URL will send a 599 error after `$seconds` seconds.
+
+## Timeout+close `$server->error_close($seconds)`
+
+This URL will send nothing and close the connection after `$seconds` seconds.
+
+## Error in response content `$server->error_after_headers`
+
+This URL will send headers for a successful response but will close the
+socket with an error after 2 blocks of 16 spaces have been sent.
+
+## Chunked response `$server->chunked`
+
+This URL will return 5 blocks of 16 spaces at a rate of one block per second
+in a chunked response.
+
+## Other URLs
+
+All other URLs will echo back the cookies and query parameters.
+
+# EXPORT
+
+None by default.
+
+# COPYRIGHT AND LICENSE
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+Copyright (C) 2003-2017 Max Maischein
+
+# AUTHOR
+
+Max Maischein, <corion@cpan.org>
+
+Please contact me if you find bugs or otherwise improve the module. More tests
+are also very welcome !
+
+# SEE ALSO
+
+[WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize),[WWW::Mechanize::Shell](https://metacpan.org/pod/WWW::Mechanize::Shell),[WWW::Mechanize::Firefox](https://metacpan.org/pod/WWW::Mechanize::Firefox)

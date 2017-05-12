@@ -1,0 +1,3 @@
+prc_number:0,error-testprogram:tried to execute /opt/tapper/testsuite/system/bin/tapper_testsuite_system.sh which is not an execuable or does not exist at all,prc_count:2
+prc_number:1,start-testprogram,prc_count:2
+prc_number:1,end-testprogram,prc_count:2

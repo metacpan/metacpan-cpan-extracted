@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Test/Dir.pm
+lib/Test/Dir/Base.pm
+lib/Test/Folder.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/dir.t
+t/folder.t
+t/full_dir/testfile.txt
+t/full_folder/testfile.txt
+t/pod-coverage.t
+t/pod.t
+t/test_dir/exists
+t/test_folder/exists

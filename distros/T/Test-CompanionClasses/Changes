@@ -1,0 +1,40 @@
+Revision history for Perl extension Test-CompanionClasses
+
+1.101370  2010-05-17 17:44:41 Europe/Vienna
+    - remove manually set versions
+    - show example command to run companion tests individually
+
+1.100870  2010-03-28 12:14:51 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.06  Mon 2009.11.02 19:38:28 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - subtest() requires Test::More 0.94 (thanks ANDK)
+
+0.05  Mon 2009.11.02 19:38:28 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+    - Use Test::More's subtest feature - this greatly simplified the engine.
+
+0.04  Thu, 29 May 2008 12:08:27 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.04
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+
+0.03  Wed, 21 Nov 2007 18:23:41 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - Test::CompanionClasses::Base: make_real_object() now passes args to the
+      real object's constructor
+    - updated t/perlcriticrc
+    - tags: NEWFEATURE
+
+0.02  Thu, 25 Oct 2007 22:23:31 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - Makefile.PL now requires Data::Inherited
+
+0.01  Thu, 25 Oct 2007 15:34:05 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

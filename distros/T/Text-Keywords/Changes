@@ -1,0 +1,17 @@
+Revision history for Text-Keywords
+
+0.900     2011-02-15 19:05:55 Europe/Berlin
+	- Modified behaviour for being strict (dont allow chars behind keyword)
+
+0.004     2011-02-03 05:35:24 Europe/Berlin
+	- Fixed regexp for matching (again..)
+
+0.003     2011-01-22 04:26:37 Europe/Berlin
+	- Changed regexp again to be more consistent
+
+0.002     2011-01-22 04:02:32 Europe/Berlin
+	- Added params to container
+	- Fixed regexp for matching
+
+0.001     2011-01-10 06:12:42 Europe/Berlin
+	- Initial official release

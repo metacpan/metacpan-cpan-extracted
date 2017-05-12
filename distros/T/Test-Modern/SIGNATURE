@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 728d10337e0d062c97234b9ed5f2fb43364e2e03 COPYRIGHT
+SHA1 30f135cee22a2ea09c954010878cdb8a14b37f6a CREDITS
+SHA1 d1305715ccdaa662de6f5c7ea9f18c8c2b6b0da3 Changes
+SHA1 d4299865e550b45b34d84ecb54890b954fb2b17f INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 bbbdb92b7a71d56058f201de47423bdd0520bad7 MANIFEST
+SHA1 983594bc4dfd1df5eeb5aab500a5c46a33109ca6 META.json
+SHA1 8ac3efce47aa49d30bab623be5ed3e3f79397f67 META.yml
+SHA1 ae7e67ec2d0472db686cfdadf6ea6bd52e51882c Makefile.PL
+SHA1 284c6f70735fa8075d5319860df2d2ea71d9fc37 README
+SHA1 ad423a5a6844ebd93aab03b47f4f178a559128ac dist.ini
+SHA1 74c762b1b7dc4af92a60496e8608ff630c088f4a doap.ttl
+SHA1 0ed094d3bf29001984cec0ef51d8c9f51388087c lib/Test/Modern.pm
+SHA1 70835456d741a13339c0cc7b9ab79fa5083308ac t/01basic.t
+SHA1 13281122d697dbb3c2b9b3c3ff00605b2f466d05 t/02exporting.t
+SHA1 69065d7899ae0fa85b44f539abefb20bc3d3721c t/03extended.t
+SHA1 ad1613a9399c8b6dd2ef8f38e070d38fed07ab15 t/04requires.t
+SHA1 c522863a10c9299821c169e7afd9a948c228ba6e t/05warnings.t
+SHA1 cc7771ca38ac16715c7c414cfeed10dd33084edf t/06class-api-ok.t
+SHA1 536c54c6500b3a5fb36650775ee3f9d7326d1287 t/07deep.t
+SHA1 e1ef4b81a4845291abb83a4a5dd7e7369afc44f5 t/08object-ok.t
+SHA1 74804dde1189a39af63080e134de392cf5b89c9d t/09requires-perl.t
+SHA1 7ce2974f913b0d68ba10dfbd5c61e219b55557ec t/10namespaces-clean.t
+SHA1 353c2c0a630df77b278e8ff76d8836f5e0745981 t/11without.t
+SHA1 5432ad34d118897e1d001875cd4ef63961aceda5 t/12pod.t
+SHA1 83d00cce325bcf1bbdd50b01c12ca3524f9c4c37 t/13versions.t
+SHA1 2a3615242d850b0555bf61da5377022124523952 t/14shouldntwarn.t
+SHA1 c7982555c6061515249ff4f8b00e44ef7eb0a1ea t/15tlib.t
+SHA1 a6959c96cf96ed1e9adbf391c226ae98a606d7dc t/16bench.t
+SHA1 8bda20158d26ee9ab2ba4aaa3ff84cfe0a9aede5 t/lib/Local/Foo.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQxjioACgkQzr+BKGoqfTmHzgCeM8VnTyT0Yyez9+Gzy6TTYxmu
+rcwAoLYDzgyxCa9O3I2F1jVehOBUkVK8
+=Kkvo
+-----END PGP SIGNATURE-----

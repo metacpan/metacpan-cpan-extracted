@@ -1,0 +1,21 @@
+NAME
+    Task::Amon2 - All you need to start with Amon2
+
+SYNOPSIS
+        % cpanm Task::Amon2
+
+DESCRIPTION
+    Task::Amon2 is a module bundle for Amon2.
+
+    If you want to look the module list, please look at Build.PL
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

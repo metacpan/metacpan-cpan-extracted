@@ -1,0 +1,55 @@
+---
+abstract: 'a fake HTTP server'
+author:
+  - 'NAKAGAWA Masaki <masaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  LWP::UserAgent: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::TCP: '0'
+  Test::UseAllModules: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Fake-HTTPD
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Fake::HTTPD:
+    file: lib/Test/Fake/HTTPD.pm
+    version: '0.08'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  HTTP::Daemon: '0'
+  HTTP::Message::PSGI: '0'
+  Scalar::Util: '1.14'
+  Test::SharedFork: '0.29'
+  Test::TCP: '0'
+  Time::HiRes: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/masaki/Test-Fake-HTTPD/issues
+  homepage: https://github.com/masaki/Test-Fake-HTTPD
+  repository: git://github.com/masaki/Test-Fake-HTTPD.git
+version: '0.08'
+x_authority: cpan:MASAKI
+x_contributors:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'ikasam_a <masaki.nakagawa@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

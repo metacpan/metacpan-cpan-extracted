@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Tie/Array/CSV.pm
+lib/Tie/Array/CSV/HoldRow.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/20-basic.t
+t/30-construction.t
+t/35-csv_obj.t
+t/40-empty_row.t
+t/65-holdrow_singletons.t
+t/70-holdrow_basic.t

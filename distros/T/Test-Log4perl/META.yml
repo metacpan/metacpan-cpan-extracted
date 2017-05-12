@@ -1,0 +1,28 @@
+---
+name: Test-Log4perl
+version: 0.1001
+author: ~
+abstract: test log4perl
+license: perl
+requires:
+  Carp: 0
+  Class::Accessor::Chained: 0
+  Lingua::EN::Numbers::Ordinate: 0
+  Log::Log4perl: 0
+  Scalar::Util: 0
+  Test::Builder: 0
+build_requires:
+  Test::Builder::Tester: 0.9
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  Log::Log4perl::Logger::IgnoreAll:
+    file: lib/Test/Log4perl.pm
+    version: 0.1001
+  Log::Log4perl::Logger::Interception:
+    file: lib/Test/Log4perl.pm
+    version: 0.1001
+  Test::Log4perl:
+    file: lib/Test/Log4perl.pm
+    version: 0.1001
+generated_by: Module::Build version 0.2609

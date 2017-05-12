@@ -1,0 +1,4 @@
+package #
+  TestUseAllModulesTestFoo;
+
+1;

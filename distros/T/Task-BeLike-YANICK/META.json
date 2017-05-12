@@ -1,0 +1,71 @@
+{
+   "abstract" : "like Yanick? Be like Yanick!",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-YANICK",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Task::BeLike::YANICK" : {
+         "file" : "lib/Task/BeLike/YANICK.pm",
+         "version" : "v0.8.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-task-belike-yanick at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-YANICK"
+      },
+      "homepage" : "http://search.cpan.org/dist/Task-BeLike-YANICK/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Task-BeLike-YANICK.git",
+         "web" : "https://github.com/yanick/Task-BeLike-YANICK"
+      }
+   },
+   "version" : "0.8.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK"
+}
+

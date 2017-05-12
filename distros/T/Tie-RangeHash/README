@@ -1,0 +1,98 @@
+NAME
+    Tie::RangeHash - Allows hashes to associate values with a range of keys
+
+REQUIREMENTS
+    Perl 5.6.1 is required.
+
+    Algorithm::SkipList is required.  Otherwise it uses standard modules.
+
+  Installation
+    Installation can be done using the traditional Makefile.PL or the
+    newer Build.PL methods.
+
+    Using Makefile.PL:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    (On Windows platforms you should use nmake instead.)
+
+    Using Build.PL (if you have Module::Build installed):
+
+      perl Build.PL
+      perl Build
+      perl Build test
+      perl Build install    
+
+SYNOPSIS
+      use Tie::RangeHash;
+
+      tie %hash, 'Tie::RangeHash';
+
+      $hash{'A,C'} = 1;
+      $hash{'D,F'} = 2;
+      $hash{'G,K'} = 3;
+
+      $hash{'E'};           # returns '2'
+      $hash{'BB'};          # returns '1'
+
+      $hash{'KL'};          # returns nothing ('undef')
+
+    There is also an object-oriented interface:
+
+      $hash = new Tie::RangeHash;
+
+      $hash->add('A,C', 1);
+      $hash->add('G,I', 2);
+
+      $hash->fetch('H');    # returns '2'
+
+DESCRIPTION
+    This module allows hashes to associate a value with a *range* of keys
+    rather than a single key.
+
+    A more detailed description can be found in the module's POD docu-
+    mentation.
+
+REVISION HISTORY
+    Changes since Tie::RangeHash 1.02
+
+    1.05   Fri Mar 26 1010
+	- re-uploaded version accidentally deleted from CPAN
+
+    1.04   Fri Jan  4 2008
+	- re-uploaded version accidentally deleted from CPAN
+	- minor changes to Build.PL
+
+    1.03   Wed Jan  4 2005
+	- added fetch_range to fetch overlapping ranges
+
+    A detailed revision history is in the Changes file included with
+    this distribution.    
+
+KNOWN ISSUES
+    The is a new version of the module and has behaves differently compared
+    to older versions. This is due to using the List::SkipList module for
+    maintaining the underlying data rather than re-implementing it.  While
+    this improves the maintainability with the code, it increases incom-
+    patability with previous versions.
+
+    See the the Changes file for a more complete list of changes and
+    incompatabilities.
+
+SEE ALSO
+    A module with similar functionality for numerical values is
+    Array::IntSpan.
+
+    Algorithm::SkipList for more information on skip lists.
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+LICENSE
+    Copyright (C) 2000-2005 Robert Rothenberg. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

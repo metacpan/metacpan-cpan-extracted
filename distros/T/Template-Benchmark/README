@@ -1,0 +1,58 @@
+Template-Benchmark
+
+Template::Benchmark and the associated script benchmark_template_engines
+are a pluggable framework for benchmarking the numerous template engines
+available on CPAN.
+
+With a range of plugins for different template engines, a number of
+different template features that can be chosen from, and a number of
+common runtime environments, it allows you to mix-and-match all these
+options and automatically figures out which template engines provide
+those features and gives you a like-for-like benchmark.
+
+You can generate human-readable reports, or you can save the reports
+in JSON format for archiving and machine-readable parsing.
+
+You can also generate a feature-matrix if you're unsure what template
+engines support what features.
+
+For template engine authors, it's easy to write a Template::Benchmark
+plugin and to bundle it with your distribution.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Template::Benchmark
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Benchmark
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Template-Benchmark
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Template-Benchmark
+
+    Search CPAN
+        http://search.cpan.org/dist/Template-Benchmark/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Sam Graham
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

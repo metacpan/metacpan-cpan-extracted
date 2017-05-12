@@ -1,0 +1,2 @@
+[% USE dumper %]
+[% dumper.dump(ast) %]

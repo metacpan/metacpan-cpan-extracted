@@ -1,0 +1,61 @@
+{
+   "abstract" : "Umbrella for test classes that target schema-based data",
+   "author" : [
+      "Randy J. Ray <rjray@blackperl.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-AgainstSchema",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.80"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "File::Spec" : "0.8",
+            "Try::Tiny" : "0.11",
+            "XML::LibXML" : "1.60",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Test::AgainstSchema" : {
+         "file" : "lib/Test/AgainstSchema.pm",
+         "version" : "0.100"
+      },
+      "Test::AgainstSchema::XML" : {
+         "file" : "lib/Test/AgainstSchema/XML.pm",
+         "version" : "0.100"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Test-AgainstSchema"
+      },
+      "homepage" : "http://search.cpan.org/dist/Test-AgainstSchema",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rjray/test-againstschema"
+      }
+   },
+   "version" : "0.100"
+}

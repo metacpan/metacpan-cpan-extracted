@@ -1,0 +1,12 @@
+Revision history for Perl extension TM::Easy.
+
+0.03  Sun Jun 13 21:05:05 CEST 2010
+        - fix: strange problems with subject identifiers workaround-ed (rho)
+
+0.02  ?????????????????????????????
+	- added .ctm and .xtm extensions to be detected at new()
+
+0.01  Thu Apr 10 17:32:42 CEST 2008
+	- initial release
+
+

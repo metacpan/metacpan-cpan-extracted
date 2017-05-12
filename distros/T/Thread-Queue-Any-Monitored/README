@@ -1,0 +1,56 @@
+README for Thread::Queue::Any::Monitored
+
+Sub-class of Thread::Queue::Any that creates a special queue and a monitoring
+thread that monitors the values that are sent to the queue.  Can be used
+for simple logging or warning for specific events or whatever you want
+to monitor that is able to send information to the monitored queue.
+
+                         *** A note of CAUTION ***
+
+This module only functions if threading has been enabled when building
+Perl, or if the "forks" module has been installed on an unthreaded Perl.
+
+                         *************************
+
+Copyright (c) 2002, 2003, 2007, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.
+All rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Version:
+ 1.03
+
+Required Modules:
+ Test::More (0.88)
+ Thread::Queue::Any (1.13)
+ Thread::Queue::Monitored (1.04)
+
+Installation:
+This distribution contains two versions of the code: one maintenance version
+for versions of perl < 5.014 (known as 'maint'), and the version currently in
+development (known as 'blead').  The standard build for your perl version is:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+This will try to test and install the "blead" version of the code.  If the
+Perl version does not support the "blead" version, then the running of the
+Makefile.PL will *fail*.  In such a case, one can force the installing of
+the "maint" version of the code by doing:
+
+ perl Makefile.PL maint
+
+Alternately, if you want automatic selection behavior, you can set the
+AUTO_SELECT_MAINT_OR_BLEAD environment variable to a true value.  On Unix-like
+systems like so:
+
+ AUTO_SELECT_MAINT_OR_BLEAD=1 perl Makefile.PL
+
+If your perl does not support the "blead" version of the code, then it will
+automatically install the "maint" version of the code.
+
+Please note that any additional parameters will simply be passed on to the
+underlying Makefile.PL processing.
+
+

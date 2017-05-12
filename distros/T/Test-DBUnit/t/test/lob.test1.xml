@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset load_strategy="INSERT_LOAD_STRATEGY">
+    <emp empno="1" ename="scott" deptno="10" job="project manager" />
+    <emp empno="2" ename="john"  deptno="10" job="engineer" />
+    <emp empno="3" ename="mark"  deptno="10" job="sales assistant" />
+    <bonus ename="scott" job="project manager" sal="20" />
+    <lob_test id="1" name="name 1">
+            <blob_content file="t/bin/data1.bin" size_column="doc_size" />
+    </lob_test>
+</dataset>

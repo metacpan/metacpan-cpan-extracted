@@ -1,0 +1,200 @@
+[% WRAPPER page.tt %]
+
+[% FOREACH modules %]
+  [% IF name == module %]
+  <h2>Module: [% label | html %]</h2>
+
+  <table id="summary" class="data">
+    <tr class="odd">
+      <th>SCM checkout status:</th>
+      <td class="status_[%checkout_status%] big">[%checkout_status%]</td>
+    </tr>
+    <tr class="even">
+      <th>Build status:</th>
+      <td class="status_[%build_status%]">[%build_status%]</td>
+    </tr>
+    [% IF logs.size() > 0 %]
+    [% FOREACH logs %]
+    <tr class="odd">
+      [% IF loop.index() == 0 %]
+      <th>Logs:</th>
+      [% ELSE %]
+      <th></th>
+      [% END %]
+      <td class="filename">
+         [% SWITCH type %]
+           [% CASE 'checkout' %]
+           <a href="logs/modules/[% file %]">SCM checkout</a> ([% size %])
+           [% CASE 'build_output' %]
+           <a href="logs/modules/[% file %]">Build output</a> ([% size %])
+           [% CASE 'build_result' %]
+           <a href="logs/modules/[% file %]">Test results</a> ([% size %])
+           [% CASE %]
+           <a href="logs/modules/[% file %]">Output</a> ([% size %])
+         [% END %]
+      </td>
+    </tr>
+    [% END %]
+    [% END %]
+    <tr class="even">
+      <th>SCM checkout time:</th>
+      <td>[% checkout_duration %]</td>
+    </tr>
+    <tr class="odd">
+      <th>Build time:</th>
+      <td>[% build_duration %]</td>
+    </tr>
+    [% IF links.size > 0 %]
+      [% FOREACH links %]
+      <tr class="[% IF loop.index() % 2 != 0 %]odd[%ELSE%]even[%END%]">
+        <th>[%IF loop.index() == 0 %]Links:[%END%]</th>
+        <td><a href="[% href | html %]">[% label | html %]</a></td>
+      </tr>
+      [% END %]
+    [% END %]
+
+    [% IF build_status == 'success' or build_status == 'cached' %]
+      [% IF artifacts.size > 0 %]
+        [% FOREACH artifacts %]
+        <tr class="[% IF (links.size + loop.index()) % 2 != 0 %]odd[%ELSE%]even[%END%]">
+          <th>[%IF loop.index() == 0 %]Artifacts:[%END%]</th>
+          <td><a href="artifacts/[%name%]/[% path | html %]">[% label | html %]</a></td>
+        </tr>
+        [% END %]
+      [% END %]
+    [% END %]
+  </table>
+
+  [% IF checkout_status == 'failed' and checkout_lines.size() > 0 %]
+  <h3>Checkout log files</h3>
+
+  <pre>
+...
+[% FOREACH l IN checkout_lines -%]
+[%- l | html -%]
+    [%- END -%]
+  </pre>
+  [% END %]
+
+  [% IF build_status == 'failed' and build_lines.size() > 0 %]
+  <h3>Build log files</h3>
+
+  <pre>
+...
+[% FOREACH l IN build_lines -%]
+[%- l | html -%]
+    [%- END -%]
+  </pre>
+  [% END %]
+
+  [% IF tests.size > 0 %]
+    <h3>Test results</h3>
+         
+    <table id="tests" class="data">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Duration</th>
+          <th>Logs</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      [% FOREACH tests %]
+        <tr class="[% IF loop.index() % 2 != 0 %]odd[%ELSE%]even[%END%]">
+          <td>[% name %]</td>
+          <td>[% duration %]</td>
+          <td>
+            [% IF output_log_file %]<a class="filename" href="logs/modules/[% output_log_file %]">Test output</a> ([% output_log_size %])<br>[% END %]
+            [% IF result_log_file %]<a class="filename" href="logs/modules/[% result_log_file %]">Test results</a> ([% result_log_size %])<br>[% END %]
+          </td>
+          <td class="status_[%status%]">[% status %]</td>
+        </tr>
+      [% END %]
+      </tbody>
+    </table>
+  [% END %]
+
+  <h3>Generated packages</h3>
+  [% IF build_status == 'success' or build_status == 'cached' %]
+    [% IF packages.size > 0 %]
+      [% FOREACH platforms %]
+        <h4>Packages: [% label %]</h4>
+
+        <table id="packages" class="data">
+          <thead>
+            <tr>
+              <th>Filename</th>
+              <th>Size</th>
+              <th>MD5 Sum</th>
+            </tr>
+          </thead>
+          <tbody>
+            [% FOREACH packages %]
+              <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+                <td class="filename"><a href="dist/[%type%]/[% filename | html %]">[% filename | html %]</a></td>
+                <td class="size">[% prettysize %]</td>
+                <td class="md5sum">[% md5sum %]</td>
+              </tr>
+            [% END %]
+          </tbody>
+        </table>
+      [% END %]
+    [% ELSE %]
+      <p>No packages were built/found for this module</p>
+    [% END %]
+  [% ELSE %]
+    [% IF build_status == 'failed' %]
+      <p class="status_failed">Build failed on this module</p>
+    [% ELSIF checkout_status == 'failed' %]
+      <p class="status_skipped">Module skipped because SCM checkout failed</p>
+    [% ELSIF build_status == 'skipped' %]
+      <p class="status_skipped">Module skipped because dependency failed during build</p>
+    [% ELSE %]
+      <p>Module not built. Status: [% build_status %]</p>
+    [% END %]
+  [% END %]
+
+  [% IF changes.size > 0 %]
+    <h3>Changes since last build</h3>
+
+    <table id="changes" class="data">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Changelist</th>
+          <th>User</th>
+          <th>Date</th>
+        </tr>
+      <tbody>
+        [% FOREACH changes %]
+          <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+            <td></td>
+            <td>[% key %]</td>
+            <td>[% user | html %]</td>
+            <td>[% date %]</td>
+          </tr>
+          [% IF description %]
+          <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+            <th>Description:</th>
+            <td colspan="3"><span class="description">[% description | html %]</td>
+          </tr>
+          [% END %]
+          [% IF files && files.size > 0 %]
+          <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+            <th>Files:</th>
+            <td colspan="3">
+            [% FOREACH file = files %]
+              <span class="filename">[% file | html %]</span><br>
+            [% END %]
+            </td>
+          </tr>
+          [% END %]
+        [% END %]
+      </tbody>
+    </table>
+  [% END %]
+
+  [% END %]
+  [% END %]
+[% END %]

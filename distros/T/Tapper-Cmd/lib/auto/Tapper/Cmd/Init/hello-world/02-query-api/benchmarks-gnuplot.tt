@@ -1,0 +1,24 @@
+#! tt debug=1 <<EOTEMPLATE
+#! /usr/bin/env gnuplot
+TITLE = "Example bogomips"
+set title TITLE offset char 0, char -1
+set style data linespoints
+set xtics rotate by 45
+set xtics out offset 0,-2.0
+set yrange [0:*]
+set term png size 1200, 800
+set output "example-03-benchmarks.png"
+#set yrange [0:2000]
+
+plot '-' using 1:2 with linespoints lt 3 lw 1 title "ratio"
+
+[%- time = reportdata('{ "suite_name" => "example-03-benchmarks" } :: /report/id') %]
+[%- value = reportdata('{ "suite_name" => "example-03-benchmarks" } :: //tap//benchmarks/bogomips') %]
+[%- FOREACH x IN [ 0..time.max ] %]
+[%-   t = time.$x %]
+[%-   v = value.$x %]
+[%-   IF (t && v) %]
+         [% t %] [% v  %]
+[%-   END %]
+[%- END %]
+EOTEMPLATE

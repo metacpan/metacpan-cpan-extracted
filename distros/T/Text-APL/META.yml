@@ -1,0 +1,56 @@
+---
+abstract: 'non-blocking and streaming capable template engine'
+author:
+  - 'Viacheslav Tykhanovskyi, C<vti@cpan.org>.'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-APL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::APL:
+    file: lib/Text/APL.pm
+    version: '0.07'
+  Text::APL::Base:
+    file: lib/Text/APL/Base.pm
+  Text::APL::Compiler:
+    file: lib/Text/APL/Compiler.pm
+  Text::APL::Context:
+    file: lib/Text/APL/Context.pm
+  Text::APL::Core:
+    file: lib/Text/APL/Core.pm
+    version: '0.07'
+  Text::APL::Parser:
+    file: lib/Text/APL/Parser.pm
+  Text::APL::Reader:
+    file: lib/Text/APL/Reader.pm
+  Text::APL::Reader::AIO:
+    file: lib/Text/APL/Reader/AIO.pm
+  Text::APL::Translator:
+    file: lib/Text/APL/Translator.pm
+  Text::APL::WithCaching:
+    file: lib/Text/APL/WithCaching.pm
+  Text::APL::Writer:
+    file: lib/Text/APL/Writer.pm
+resources:
+  bugtracker: https://github.com/vti/text-apl/issues
+  homepage: https://github.com/vti/text-apl
+  repository: git://github.com/vti/text-apl
+version: '0.07'
+x_contributors:
+  - 'vti <viacheslav.t@gmail.com>'

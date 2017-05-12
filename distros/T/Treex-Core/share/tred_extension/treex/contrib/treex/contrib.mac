@@ -1,0 +1,16 @@
+# -*- cperl -*-
+
+#ifinclude <contrib/pml/PML.mak>
+#ifinclude <contrib/eng-vallex/contrib.mac>
+#ifinclude <contrib/vallex/contrib.mac>
+
+package Treex_mode;
+#binding-context Treex_mode
+
+print STDERR "Initializing Treex extension\n";
+
+BEGIN { import TredMacro; }
+
+#include Treex_mode.inc
+
+1;

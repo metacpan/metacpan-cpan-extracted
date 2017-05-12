@@ -1,0 +1,57 @@
+% use 5.010;
+<%args>
+$platforms => []
+</%args>
+
+% my %colors = ('red'    => '#FF6E0E',
+%               'yellow' => '#FFFF8E',
+%               'green'  => '#63FF8D');
+% if (ref $platforms eq 'ARRAY') {
+
+%   foreach my $platform(@$platforms){
+      <h3 class="testplan"><% ucfirst($platform->{"name"}) %> Feature Test Plan</h3>
+      <h5 class="testplan"><% $platform->{testplan}{all} %> tests,
+                           <span class="pass"><% $platform->{testplan}{pass} %> pass</span>,
+		           <span class="fail"><% $platform->{testplan}{fail} %> fail</span>,
+		           <span class="unknown"><% $platform->{testplan}{waiting} %> waiting</span>
+	</h5>
+
+   <table class="reportlist">
+      <tr>
+             <th>Task Name</th>
+%      foreach my $vendor ( @{$platform->{vendors}} ) {
+             <th><% $vendor %></th>
+%      }
+      </tr>
+%      my $even=0;
+%      foreach my $task ( @{$platform->{tasks}} ) {
+%           $even = $even ^ 1;
+            <tr class="<% $even ? 'highlightgrey': '' %>">
+             <td><% $task->{name} %></td>
+%          foreach my $vendor ( @{$platform->{vendors}} ) {
+%              if (not ref $task->{$vendor} eq 'HASH' ) {
+                    <td></td>
+%                  next;
+%              }
+%              given($task->{$vendor}{color}){
+%                   when('none') {
+             <td></td>
+%                   }
+%                   when('black') {
+             <td align="center" ><a href="/tapper/testplan/add/<% $task->{$vendor}{name} %>" title="Add testplan for task <% $task->{$vendor}{name} %>"><img src="/tapper/static/images/achtung.png"></a></td>
+%                   }
+%                   default {
+             <td align="center" style="background-color:<% $colors{$task->{$vendor}{color}} %>"><a href="/tapper/testplan/id/<% $task->{$vendor}{id} %>" title="Show testplan <% $task->{$vendor}{id} %>">Show </a></td>
+%                   }
+%             }
+
+%          }
+%      }
+       </table>
+   </table>
+<br/>
+<br/>
+%   }
+% } else { # $platforms is a string
+<h3>Error: <% $platforms %></h3>
+% }

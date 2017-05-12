@@ -1,0 +1,40 @@
+0.07	25 January 2005
+	Eric Garland found that a race condition existed with the marking
+	whether a thread is running.  Fixed by marking the thread as running
+	in the parent thread, rather than in the thread itself.
+
+0.06    29 March 2004
+        Goto &sub considered evil with regards to performance and memory
+        leaking.  Therefore removed goto's where appropriate.
+
+0.05	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.04	30 August 2003
+	Raised dependency on Thread::Exit to 0.06 because of bug fix there.
+	Changed test-suite to test for fixed problem in Thread::Exit.
+
+0.03	23 August 2003
+	Now uses load.pm to reduce the number of subroutines loaded at compile
+	time.  The status hash is now also available externally, which may or
+	may not be a good thing.  Added dependency to load.pm.
+
+	Changed some package lexicals in to closures.
+
+	Oops, t/Running03.t wasn't included in the manifest and therefore
+	not included in the distribution.  Now it is.
+
+	Fixed some documentation errors.
+
+	Removed non-existing "listall" from the default export list.
+
+0.02	16 August 2003
+	Now allows running, tojoin and exited to be used as instance methods.
+	Added internal subroutines _listall() and _tid2object.
+
+	Fixed test-suite: it would fail sometimes when it shouldn't.
+
+	Fixed some documentation errors.
+
+0.01	15 August 2003
+	First version of Thread::Running.

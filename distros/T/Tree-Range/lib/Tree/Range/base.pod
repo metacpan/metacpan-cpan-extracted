@@ -1,0 +1,327 @@
+### base.pod --- Document Tree::Range::base  -*- POD -*-
+
+### Copyright (C) 2013 Ivan Shmakov
+
+## Permission to copy this software, to modify it, to redistribute it,
+## to distribute modified versions, and to use it for any purpose is
+## granted, subject to the following restrictions and understandings.
+
+## 1.  Any copy made of this software must include this copyright notice
+## in full.
+
+## 2.  I have made no warranty or representation that the operation of
+## this software will be error-free, and I am under no obligation to
+## provide any services, by way of maintenance, update, or otherwise.
+
+## 3.  In conjunction with products arising from the use of this
+## material, there shall be no use of my name in any advertising,
+## promotional, or sales literature without prior written consent in
+## each case.
+
+### Code:
+
+=head1 NAME
+
+Tree::Range::base E<ndash> base class for range tree
+implementations
+
+=head1 SYNOPSIS
+
+  package Tree::Range::Foo;
+
+  require Tree::Foo;
+  require Tree::Range::base;
+
+  push (our @ISA, qw (Tree::Range::base));
+
+  ## Define cmp_fn, value_equal_p_fn, leftmost_value,
+  ## lookup_leq, lookup_geq, min_node, max_node,
+  ## put, and delete here
+
+=head1 DESCRIPTION
+
+This class is intended to allow for easy creation of
+I<range tree> classes on top of arbitrary trees.
+
+A range tree is defined here as an object, which maps values
+(I<keys>) lying within a finite number of continuous,
+non-overlapping subsets (I<ranges>) of an ordered (as defined by
+the I<comparison> function) set, to arbitrary values.
+
+Specifically, this class provides implementations of the
+C<get_range>, C<range_free_p>, C<range_iter_closure>,
+and C<range_set> methods
+on top of the
+C<cmp_fn>, C<value_equal_p_fn>, C<leftmost_value>,
+C<lookup_leq>, C<lookup_geq>, C<min_node>, C<max_node>,
+C<put>, and C<delete> ones.
+
+In the terms of the underlying tree object, the value is
+associated with the range extending from the lower (leftmost)
+I<inclusive> bound,
+serving as the tree nodeZ<>E<rsquo>s own key,
+to the upper (rightmost) I<exclusive> bound, which is the
+I<successorZ<>E<rsquo>s> node key.
+
+In particular, this means that the range tree maps the keys of
+the underlying tree to the same values as the underlying tree
+itself.
+
+=head1 INTERFACE
+
+B<Note> that the methods below are I<used,> and not
+I<implemented> by this base class.
+
+=over 4
+
+=item C<< my $cmp_fn      = $rat->cmp_fn (); >>
+
+Return the I<comparison> function for the range tree.
+
+Possible values include
+C<< sub { $_[0] cmp $_[1]; } >>
+and C<< sub { $_[0] <=> $_[1]; } >>.
+
+=item C<< my $equal_p_fn  = $rat->value_equal_p_fn (); >>
+
+Return the I<value equality predicate.>
+
+A possible value is
+C<< sub { $_[0] eq $_[1]; } >>,
+assuming that the values dealt with will all be either simple
+strings, references (including objects), or C<undef>.
+
+See the C<range_set> method description for more information.
+
+=item C<< my $leftmost    = $rat->leftmost_value (); >>
+
+Return the value the keys lower than the lowest bound are
+mapped to.
+
+See the C<range_set> method description for more information.
+
+=item C<< my $node = $rat->lookup_leq ($key) >>
+
+=item C<< my $node = $rat->lookup_geq ($key) >>
+
+Return the tree I<node object> associated with the key
+specified.
+
+If the tree has no such node, the one that would immediately
+preceed (C<lookup_leq>) or succeed (C<lookup_geq>) it is
+returned instead.  Should no such node be available, either,
+return C<undef>.
+
+The node object is assumed to implement the following methods:
+
+=over 4
+
+=item C<< my $key = $node->key (); >>
+
+=item C<< my $val = $node->val (); >>
+
+Return the nodeZ<>E<rsquo>s key and value, respectively.
+
+=item C<< my $node = $node->predecessor (); >>
+
+=item C<< my $node = $node->successor (); >>
+
+Return the immediately preceeding and succeeding nodes,
+respectively, or C<undef>.
+
+=back
+
+=item C<< my $node = $rat->min_node ($key) >>
+
+=item C<< my $node = $rat->max_node ($key) >>
+
+Return the tree node objects associated with the minimum and
+maximum keys currently in the tree.
+
+This base class uses these methods solely in the
+C<range_iter_closure> methodE<rsquo>s implementation,
+when no explicit key to start iteration from is given.
+
+=item C<< $rat->put ($key, $value) >>
+
+=item C<< my $okay = $put->delete ($key) >>
+
+Associate a (key, value) pair with the value of C<$key>,
+or remove such association, respectively.
+
+The C<delete> method is assumed to return a true value upon
+successful completion.
+
+=back
+
+The following methods are the only actually implemented by
+this base class.
+
+=over 4
+
+=item C<< my $v = $rat->get_range ($key) >>
+
+=item C<< my ($v, $lower, $upper) = $rat->get_range ($key) >>
+
+Return the value associated with the range C<$key> lies within.
+
+In the list context, return also the rangeZ<>E<rsquo>s lower and
+upper bounds.
+
+The current implementation will omit the upper bound from the
+resulting list if such a range extends rightwards indefinitely.
+The lower bound will also be omitted if the key is less than any
+currently known lower bound.  (In which case the I<leftmost>
+value will be returned.)
+
+The caller should accept the values to be either omitted or
+C<undef> under the conditions stated above.
+
+=item C<< my $free_p = $rat->range_free_p ($lower, $upper) >>
+
+Return a true value if the range specified is either
+unassociated, or associated with the I<leftmost> value
+(as determined by the I<value equality predicate.>)
+Return a false value otherwise.
+
+=item C<< $rat->range_set ($lower, $upper, $value); >>
+
+Associate the keys lying between C<$lower> (inclusive) and
+C<$upper> (exclusive) with C<$value>.
+
+Raise an exception (S<i. e.>, I<die>) unless the upper bound is
+greater than the lower one, as determined by the I<comparison>
+function.
+
+All the overlapping range associations, if any, are overwritten.
+(But see also
+the C<range_set_over> method description below, and also
+the L<Tree::Range::conflict> documentation.)
+Consider, S<e. g.:>
+
+    ## assuming numeric (<=>) comparison function
+    $rat->range_set (100, 200, "foo");
+    $rat->range_set (200, 300, "bar");
+    $rat->range_set (150, 250, "baz");
+
+Assuming an initially empty range tree, this sequence will
+divide the 100E<ndash>300 range into three subranges, namely:
+100E<ndash>150 (C<foo>),
+150E<ndash>250 (C<bar>),
+250E<ndash>300 (C<baz>).
+
+Thus:
+
+    my @r = $rat->get_range (200);
+    ## now @r is ("baz", 150, 250)
+
+Associating the I<leftmost> value with a range can be thought of
+as E<ldquo>deletingZ<>E<rdquo> such a range.
+
+In addition to the ranges being automatically split as
+necessary, the adjacent ones will also be merged,
+should it be possible to prove that the overall key to value
+mapping
+(taking the I<value equality predicate> used into account)
+is preserved by the change.
+Consider, S<e. g.:>
+
+    ## assuming numeric (<=>) comparison function
+    my @a = ("foo");
+    $rat->range_set (100, 150, \@a);
+    $rat->range_set (250, 300, \@a);
+    $rat->range_set (125, 275, \@a);
+    my @r = $rat->get_range (200);
+    ## now @r is (\@a, 100, 300)
+
+Such optimization is performed whenever the values of the
+adjacent ranges satisfy either of the following conditions:
+
+=over 4
+
+=item E<bull>
+
+both are C<undef>;
+
+=item E<bull>
+
+both are references, sharing the same C<refaddr>;
+
+=item E<bull>
+
+the userZ<>E<rsquo>s I<value equality predicate>
+returns true for the pair.
+
+=back
+
+=item C<< $rat->range_set_over ($lower, $upper, $value); >>
+
+This class defines the C<range_set_over> method as an alias to
+C<range_set>.  The latter, however, is overridden by the
+L<Tree::Range::conflict> class, so that it fails instead of
+writing over the ranges associated with a value other than the
+I<leftmost> one (as determined by the C<range_free_p> method),
+while this method remains unaltered and available.
+
+See L<Tree::Range::conflict> for more information.
+
+=item C<< my $ic = $rat->range_iter_closure (); >>
+
+=item C<< my $ic = $rat->range_iter_closure ($key); >>
+
+=item C<< my $ic = $rat->range_iter_closure ($key, $descending_p); >>
+
+=item C<< while ((my ($v, $lower, $upper) = $ic->())) { E<hellip> } >>
+
+=item C<< while ((my $v = $ic->())) { E<hellip> } >>
+
+Return a I<range iterator closure.>
+
+If C<$descending_p> is given and true, the closure will return
+ranges so that the respective keys are in descending order
+(as defined by the I<comparison> function.)
+The ascending order will be used otherwise.
+
+The first range returned by the closure will be the one
+containing the key specified, if any,
+or the first range of the tree for the order chosen.
+
+Either way, the first range will be determined at the time of
+the first call to the iterator closure.
+
+B<Note> that the behavior of the closure is undefined if the
+tree is modified while the iteration is in progress.
+It is safe, however, to modify the tree before the closure is
+called for the first time.
+
+Also to note is that the closure returns only the associated
+value in scalar context, thus matching the behavior of
+the C<get_range> method.
+
+=back
+
+=head1 SEE ALSO
+
+L<Tree::Range::conflict>,
+L<Tree::Range::RB>
+
+L<Scalar::Util>
+
+=head1 AUTHOR
+
+Ivan Shmakov <oneingray@gmail.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the 3-clause BSD license, as
+included within the code.
+
+=cut
+
+### Emacs trailer
+## Local variables:
+## coding: us-ascii
+## fill-column: 64
+## indent-tabs-mode: nil
+## ispell-local-dictionary: "american"
+## End:
+### base.pod ends here

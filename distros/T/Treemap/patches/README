@@ -1,0 +1,5 @@
+Imager.pm.patch:
+
+   Greatly enhances the performance of Imager's box() method, which is used
+   heavily by Treemap::Output::Imager
+

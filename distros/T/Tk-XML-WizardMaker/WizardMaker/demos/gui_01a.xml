@@ -1,0 +1,170 @@
+<demo_assistent
+  name="demo"
+  title="Demo WizardMaker demo 01a setting of initial values in opt.xml file"
+  left_image="left_image.gif"
+  top_image="top_image.gif"
+
+  background="#f6f6f6"
+  foreground="black"
+
+  header_background="#f6f6f6"
+  header_foreground="blue"
+
+  header_background1="lightgrey"
+  header_foreground1="black"
+
+  button_background="lightgrey"
+  button_select_background="#e9e9e9"
+  button_select_foreground="#767676"
+  button_foreground="black"
+  button_frame_background="gray"
+  buttons_relief="groove"
+
+  button_help="HELP"
+  button_next="NEXT &gt;"
+  button_back="&lt; BACK"
+  button_finish="FINISH"
+  button_cancel="CANCEL"
+  button_log="Show Log"
+
+  title_font="-family Courier -size 24 -weight bold"
+  subtitle_font="-family Courier -size 18 -weight bold"
+  default_font="-family Arial -size 16"
+  small_font="-family Courier -size 12"
+
+  relief="ridge"
+
+  >
+
+  <page name="FirstText"
+        status="normal"
+        type="TextPage"
+        title="The generic Text Page"
+        subtitle="The generic Text Page Subtitle"
+        text="The generic Page Text"
+        width="12"
+        height="12"
+        file="first.txt"
+        code="print qq/\nBuild $p->{name}/;"
+        pre_next_button_code="print qq/\npre_next_button_code  - /, $self->current_node() ;"
+        pre_back_button_code="print qq/\npre_back_button_code  - /, $self->current_node() ;"
+        help_text="Press NEXT to install or CANCEL to abort!"
+    />
+
+  <page name="SecondLabaledEntries"
+        status="normal"
+        type="LabeledEntriesPage"
+        title="Labeled Entries Page"
+        subtitle="Yuo can enter some data here"
+        text="Somewhat..."
+        width="12"
+        height="12"
+        code="print qq/\nBuild $p->{name}/;"
+        pre_next_button_code="print qq/\npre_next_button_code  - /, $self->current_node() ;"
+        pre_back_button_code="print qq/\npre_back_button_code  - /, $self->current_node() ;"
+   >
+
+      <LabeledEntry name="Name"     title="Name"    status="normal" evaluate="0"/>
+      <LabeledEntry name="Company"  title="Company" status="normal" evaluate="0" />
+      <LabeledEntry name="Host"     title="Host"    status="normal" evaluate="0" />
+      <LabeledEntry name="FindDir"  title="Choose Directory" status="normal" evaluate="0" button = "dir_select"/>
+      <LabeledEntry name="FindFile" title="Open File" status="normal" evaluate="0" button = "file_open"/>
+
+  </page>
+
+  <page name="SetupType"
+        status="valid"
+        type="RadioButtonPage"
+        title="Radio Button Page"
+        subtitle="Please select the setup type."
+        text="Please select the setup type."
+        width="12"
+        height="12"
+        file=""
+        variable="SetupType"
+        code="print qq/\nBuild $p->{name}/;"
+        pre_next_button_code="print qq/\npre_next_button_code  - /, $self->current_node() ;"
+        pre_back_button_code="print qq/\npre_back_button_code  - /, $self->current_node() ;"
+        help_text="Click on one of RADIO BUTTONS depending of what you want to do.\n\nThen click the NEXT button!"
+  >
+      <RadioButton name="install" evaluate="1" title="qq(New Installation XXX.XX)" status="normal"  />
+      <RadioButton name="update"  evaluate="1" title="qq(Update from version YYY.YY to XXX.XXX)" status="normal"   />
+      <RadioButton name="patch"   evaluate="1" title="qq(Patch Version YYY.Y.YYY)"  status="normal" />
+    </page>
+
+  <page name="SelectComponents"
+        status="normal"
+        type="CheckButtonPage"
+        title="Check Button Page"
+        subtitle="List of available sotfware components."
+        text="Please select components you want to install or update."
+        width="12"
+        height="12"
+        code="print qq/\nBuild $p->{name}/;"
+        pre_next_button_code="print qq/\npre_next_button_code  - /, $self->current_node() ;"
+        pre_back_button_code="print qq/\npre_back_button_code  - /, $self->current_node() ;"
+        file=""
+  >
+
+      <CheckButton name="InstallJava"    title="qq(Java JRE/SDK)"    status="normal" evaluate="1" />
+      <CheckButton name="InstallPerl"    title="qq(Perl)"            status="normal" evaluate="1" />
+      <CheckButton name="InstallOffice"  title="qq(Office Suite)"    status="normal" evaluate="1" />
+      <CheckButton name="InstallDings"   title="qq(Dings da Application Service)"  status="normal" evaluate="1" />
+      <CheckButton name="InstallDB"      title="qq(Oracle Database)" status="normal" evaluate="1" />
+      <CheckButton name="InstallSpecial" title="qq(Special Options)" status="normal" evaluate="1" />
+
+  </page>
+
+  <page name="StartInstallation"
+        status="normal"
+        type="TextPage"
+        title="Start Installation"
+        font="small_font"
+        subtitle="Subtitle 2"
+        background="#FFEEAA"
+        foreground="red"
+        text="Start Installation. Don't worry, it is only test"
+        width="12"
+        height="12"
+        summary="This Text comes not from an external text file. It could be a installation summary ..."
+        code="print qq/\nBuild $p->{name}/;1;"
+
+        pre_next_button_code="
+          print qq/\npre_next_button_code  - /, $self->current_node() ;
+
+          my $percent_done = 0;
+          while ($percent_done &lt; 100){
+            $percent_done += 10;
+            sleep 1;
+            print qq/\n/, $percent_done , qq/ % done/;
+          }
+
+          print qq/\nInstallation complete! /;
+          return 1;
+        "
+        pre_back_button_code="print qq/\npre_back_button_code  - /, $self->current_node();"
+        help_text="Press Start button to process the Installation!"
+    />
+
+  <page name="Finish"
+        status="normal"
+        type="TextPage"
+        title="Finish"
+        subtitle="Installation is complete."
+        text="Press FINISH to end Wizard."
+        width="12"
+        height="12"
+        background="#AABBCC"
+        foreground="blue"
+        file="last.txt"
+        code="print qq/\nBuild $p->{name}/;"
+        pre_next_button_code="print qq/\npre_next_button_code  - /, $self->current_node();
+          return 1;
+        "
+        help_button_code="
+          print qq/\nhelp_button_code  - /, $self->current_node() ;
+          print qq/\n/, Dumper($self->{opt}->{gui});
+          return 0;
+        "
+  />
+</demo_assistent>

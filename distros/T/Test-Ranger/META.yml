@@ -1,0 +1,54 @@
+---
+abstract: 'Test with data tables, capturing, templates'
+author:
+  - 'Xiong Changnian <xiong@cpan.org>'
+build_requires:
+  Acme::Teddy: 1.002003
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+keywords:
+  - test
+  - testing
+  - debug
+  - debugging
+  - devel
+  - development
+  - frame
+  - framework
+  - table
+  - tablular
+  - table-driven
+  - procedural
+  - capture
+  - capturing
+  - template
+  - templating
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Ranger
+provides:
+  Test::Ranger:
+    file: lib/Test/Ranger.pm
+    version: v0.0.4
+  Test::Ranger::List:
+    file: lib/Test/Ranger/List.pm
+    version: v0.0.4
+recommends:
+  Devel::Comments: v1.1.2
+requires:
+  Capture::Tiny: 0
+  Data::Lock: 0
+  Scalar::Util: 0
+  Scalar::Util::Reftype: 0
+  Test::Deep: 0
+  Test::More: 0.94
+  Try::Tiny: 0
+  perl: 5.010001
+  version: 0.77
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: http://github.com/Xiong/test-ranger
+version: v0.0.4

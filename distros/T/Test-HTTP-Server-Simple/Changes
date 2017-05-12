@@ -1,0 +1,40 @@
+Revision history for Test-HTTP-Server-Simple
+
+0.11 Tue Nov 10 14:14:17 EST 2009
+    No code changes; add Win32::Event dep for windows platforms
+
+0.10 Thu Feb 19 22:51:02 EST 2009
+    Remove StashWarnings and move into its own dist (removes Storable dep)
+    Fix long-standing bug where, when under 'prove', servers didn't get killed
+    Deal better with having multiple child PIDs
+
+0.09 Tue May  6 18:05:17 EDT 2008
+    Better bulletproofing for reaping kids
+
+0.08 Tue May  6 14:14:13 EDT 2008
+    Releng fixups
+
+0.07 Tue May  6 14:00:50 EST 2008
+    Be more insistent about sending signals on END
+    Also don't assume all children processes are ours
+
+0.06 Tue Nov 13 16:38:40 EST 2007
+    META.yml SHA1 SUM issue
+
+0.05 Tue May  8 12:30:09 EDT 2007
+    No functionality changes. Just some releng cleanups
+
+0.04
+    Patch from SMUELLER to add Win32 Support - http://rt.cpan.org/Public/Bug/Display.html?id=19564
+
+0.03  Wed Jul  5 22:55:39 2006
+    Kill "waiting for child to start up" message.
+
+0.02  Tue Aug 02 18:16:00 2005
+    Change API to make it a mixin.
+    Make child signal parent when it's ready, and make the parent-killing-child
+    be much nicer than a -9.
+
+0.01  Thu Jun 16 18:16:56 2005
+    Initial release.
+

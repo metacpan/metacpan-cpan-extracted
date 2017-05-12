@@ -1,0 +1,43 @@
+---
+abstract: 'Install the most common Test toolchain modules'
+author:
+  - "Curtis \"Ovid\" Poe <ovid@cpan.org>"
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Toolchain-Test
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Test::Builder::Tester: 1.01
+  Test::Class: 0.34
+  Test::Class::Most: 0.05
+  Test::Deep: 0.106
+  Test::Differences: 0.500
+  Test::Distribution: 2.00
+  Test::Exception: 0.29
+  Test::Harness: 3.21
+  Test::Kwalitee: 1.01
+  Test::MockObject: 1.09
+  Test::Most: 0.21
+  Test::NoWarnings: 1.01
+  Test::Pod: 1.42
+  Test::Pod::Coverage: 1.08
+  Test::Simple: 0.94
+  Test::Spelling: 0.11
+  Test::UseAllModules: 0.12
+  Test::Warn: 0.21
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/Ovid/Task-Toolchain-Test
+version: 0.01

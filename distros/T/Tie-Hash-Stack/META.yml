@@ -1,0 +1,24 @@
+---
+abstract: 'Maintains an array of hashes like a stack.'
+author:
+  - 'Michael K. Neylon <mneylon@masemware.com>'
+build_requires:
+  Test::More: 0.9
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Hash-Stack
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.100

@@ -1,0 +1,21 @@
+Revision history for Perl extension Test-Docker-Image
+
+0.05 2014-10-03T07:00:39Z
+
+    - fix a bug on destroy
+
+0.04 2014-09-06T08:50:47Z
+
+    - refactor Test::Docker::Image::Boot interface
+
+0.03 2014-08-26T02:30:25Z
+
+    - add Test::Deep to cpanfile for CPAN Testers
+
+0.02 2014-08-24T11:29:47Z
+
+    - add URI::Split for CPAN Testers
+0.01 2014-08-22T21:16:05Z
+
+    - original version
+

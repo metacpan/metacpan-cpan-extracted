@@ -1,0 +1,42 @@
+Revision history for Test-ConsistentVersion
+
+0.3.0  Wed Nov 12 2014
+       Don't fail on version numbers that have 'v'
+            prepended (eg this changelog entry could
+            be 'v0.3.0')
+
+0.2.3  Tue Oct 19 2010
+       Fixed test that was broken by change to regex
+            in Perl v5.13.5
+
+0.2.2  Fri Sep 18 2009
+       Fixed test that had a hardcoded assumption
+            of where Test::Pod::Content lives
+
+0.2.1  Thu Sep 17 2009
+       Fixed tests when Test::Pod::Content is
+            not available
+
+0.2.0  Thu Sep 17 2009
+       Improved tests
+       No longer trying to plan tests if a plan has
+            already been made
+
+0.1.0  Tue Sep 15 2009
+       Now checking README for version consistency
+
+0.0.4  Mon Sep  7 2009
+       Requiring minimum of 0.94 of Test-Simple
+            for the subtest functionality
+
+0.0.3  Sun Sep  6 2009
+       Updated MANIFEST to actually include the
+            test developed for 0.0.2
+
+0.0.2  Sun Sep  6 2009
+       Added a test, repository and
+            recommended modules metadata
+
+0.0.1  Sun Aug 30 2009
+       Initial release.
+

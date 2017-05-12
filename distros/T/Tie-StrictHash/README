@@ -1,0 +1,6 @@
+Tie::StrictHash implements a hash with 'strict'-like restrictions on
+adding or deleting members.  It was written primarily for classes that
+use hash members as instance variables.
+
+It can be set to treat an access to a non-existent hash member as
+a fatal error (the default) or just issue a warning.

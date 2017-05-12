@@ -1,0 +1,17 @@
+Revision history for Perl extension Thread::Queue::MaxSize.
+
+1.00 Sun Mar  16 18:19:34 UTC 2014
+	- Initial release.
+
+1.01 Sun Mar  16 19:01:18 UTC 2014
+	- Updating docs.
+	- Don't allow default values because the queue size is not being enforced on
+	creation.
+
+1.02 Sun Mar  16 19:1058 UTC 2014
+	- Fixing version numbering scheme.
+
+1.03 Mon Dec  8 01:44:55 UTC 2014
+	- Fixing version numbers everywhere
+	- Cleaning up docs
+

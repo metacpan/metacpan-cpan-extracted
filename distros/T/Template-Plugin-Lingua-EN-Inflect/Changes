@@ -1,0 +1,20 @@
+Revision history for Template-Plugin-Lingua-EN-Inflect
+======================================================
+
+0.04    2015-01-02
+        - fixed license fields in META.json to be lists.
+        - extended functional test suite.
+
+0.03    2014-06-23
+        - new maintainer: BARBIE.
+        - change file dates changed to meet W3CDTF standards.
+        - added LICENSE file.
+        - updated META.yml, added META.json.
+        - reworked Makefile.PL for clarity.
+        - extended test suite.
+
+0.02    2005-10-21T08:04:19Z
+	    - expanded documentation a bit
+
+0.01    2005-09-01T15:38:02Z
+	    - original version

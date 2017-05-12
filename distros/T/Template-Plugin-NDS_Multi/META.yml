@@ -1,0 +1,28 @@
+---
+name: Template-Plugin-NDS_Multi
+version: 3.00
+author:
+  - 'Sullivan Beck <sbeck@cpan.org>'
+abstract: Interface to Data::NDS::Multi* modules
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Template: 0
+  Template::Plugin: 0
+  perl: 5.6.0
+build_requires:
+  Data::NDS::Multiele: 0
+  Data::NDS::Multifile: 0
+  Data::NDS::Multisource: 0
+  IO::File: 0
+  Template::Constants: 0
+  Test::More: 0
+provides:
+  Template::Plugin::NDS_Multi:
+    file: lib/Template/Plugin/NDS_Multi.pm
+    version: 3.00
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

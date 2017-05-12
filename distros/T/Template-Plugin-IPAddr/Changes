@@ -1,0 +1,10 @@
+0.03	2014-04-25
+	- Added method addr_cidr
+	- Use Dist::Zilla for packaging
+
+0.02	2013-09-10
+	- Added Changes
+	- Updated Makefile.PL
+
+0.01	2013-09-07
+	- First release

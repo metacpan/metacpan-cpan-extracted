@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<pml_schema version="1.1" xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/">
+  <description>
+    Example of very compact constituency tree annotation
+  </description>
+  <root name="annotation">
+    <sequence role="#TREES">
+      <element name="S" type="nonterminal.type"/>
+    </sequence>
+  </root>
+  <type name="nonterminal.type">
+    <container role="#NODE">
+      <attribute name="form"><cdata format="any"/></attribute>
+      <sequence role="#CHILDNODES">
+	<element name="VP" role="#NODE" type="nonterminal.type"/>
+	<element name="NP" role="#NODE" type="nonterminal.type"/>
+	<element name="PP" role="#NODE" type="nonterminal.type"/>
+	<element name="ADVP" role="#NODE" type="nonterminal.type"/>
+	<!-- etc. -->
+      </sequence>
+    </container>
+  </type>
+</pml_schema>

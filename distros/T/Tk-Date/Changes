@@ -1,0 +1,111 @@
+Revision history for Perl extension Tk::Date.
+
+0.44
+	- fix for some now deprecated DateTime::Locale methods
+
+0.43
+	- take care of encodings in localized weekdays and monthnames
+	- new demonstration showing localized dates
+	- better -readonly documentation
+	- -state also affects chooser menubutton
+	- fix for "make demo" under Debian
+	- fixed Bundle package name
+
+0.42
+	- missing use
+
+0.41
+	- bugfix in _Destroyed (needed for Tk804.023)
+
+0.40
+	- warning fix (thanks to Jack Dunnigan for reporting the problem)
+
+0.39
+	- fixed a bug causing an endless loop if non-valid dates are
+	  entered
+
+0.38
+	- new -state option
+
+0.37
+	- new -readonly option
+
+0.36
+	- just another -allarrows bugfix
+	- checks for valid mdays while inc/decrementing
+
+0.35
+	- workaround bug in POSIX::strftime
+
+0.34
+	- corrected problems with -(pre)command and -allarrows
+
+0.33
+	- new predefined choices tokens: beginning_of_month and end_of_month
+	- new options: -monthnames, -weekdays, -monthmenu, -allarrows
+	- bug and pod fixes
+	- new NOTES section in pod
+
+0.30
+	- pod additions for -datefmt and -timefmt
+
+0.29
+	- fixed two tests (+% is not standard part of POSIX)
+
+0.28
+	- fixed test no. 6 (mktime needs -1 for is_dst field)
+
+0.27
+	- compatibility changes for Tk800.013
+	- more -choices: (yesterday|today|tomorrow)_midnight
+	- new private function _begin_of_day
+
+0.26
+	- Bug fixes: datehash and unixtime ties
+        - new tests
+
+0.25
+	- Bug fixes for -fields => 'time'/'date' and get()
+
+0.24
+	- Bug fix (-fields => 'time' did not work)
+
+0.23
+	- Using Time::Local::timelocal instead of POSIX::mktime. For the
+          strftime function, Date::Format is used as a fallback if POSIX is
+          not available.
+        - renamed test.pl to t/date.t
+        - Bug fixes: fixed the installation location of the demo program
+
+0.22
+	- new options: -check and -selectlabel
+	- Tk::NumEntryPlain and Tk::FireButton are optional now
+	- better datehash support for tie
+	- pod additions (example...)
+	- bug fixes
+	- minor keyboard focus corrections
+
+0.21
+	- new options: -editable (replaces -output_only),
+	  -fields (replaces -date_only and -time_only),
+	  -choices (replaces -today_button), -variable, -value,
+	  -varfmt, -command (replaces -callback), -precommand, -orient,
+	  -decbitmap, -incbitmap
+	- using ConfigSpecs
+	- Tk::Date::DateHash
+	- demo moved from test.pl to demos/date.pl
+	- Bundle::Tk-Date
+
+0.20
+	- using Tk::NumEntryPlain and Tk::FireButton
+
+0.10
+	- Tk::LenEntry integrated
+	- Tk::Date::UnixDate
+	- weekday
+	- new -callback, -empty and -today_button options
+	- ...
+
+0.01  Thu Sep 11 15:34:22 1997
+	- original version
+

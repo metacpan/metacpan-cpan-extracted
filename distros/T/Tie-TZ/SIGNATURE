@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 66861e620ea364e5795ec603913fe64a269c9c3a Changes
+SHA1 567aefc4a6b17d5e8767429ac0099f23da6ae157 MANIFEST
+SHA1 6c771cc4b0718f7bc9c9af01889700d7bce0a8e6 MANIFEST.SKIP
+SHA1 8ebeb3acb275024a16053bb153c9a56937ab4ee8 META.yml
+SHA1 b60146013690aea7a2cdd7f1181b3d162ad7a03b Makefile.PL
+SHA1 953e2d39e2afce2f592014ed492a88fa857ca22e debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 08bbb79a4085d9acf23998d2c929b5bc1dacd4ef debian/control
+SHA1 7eeb53d395a2000b702d5a6955e5be33e2cb8bbd debian/copyright
+SHA1 9610f819db0c0da9289e3de1ef8789c5f7032919 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 1df45257e917f273bbc2abfb974e97036609d9b3 debian/watch
+SHA1 fbe346221f0c2837328dbd4c3cba018c43caba04 devel/Z-tz.c
+SHA1 cd1e7113bbf2fff02aa640f346e91b8032b1a016 devel/byname.pl
+SHA1 881c5b81de81ddaa863f1758dc247e48a7812e66 devel/datecalc.pl
+SHA1 3f7303b450b053a101eecfbd9104dd782f01bb9e devel/ithreads.pl
+SHA1 4d4c5fb36162466316961ad90434043d55a57efc devel/leak.pl
+SHA1 59fd9cad6ed6379553f2884af1c0517afbd82182 devel/lib/Test/POSIX/TzsetNotImplemented.pm
+SHA1 53d7e6ed0d972c84e324ee794e3ce96f6ad8ce8e devel/run.pl
+SHA1 5d6d173ea49430534755a9fa5e343ae183067ad6 devel/speed-timezone.pl
+SHA1 2892f91c22acc5d1b861860f9e13f14ba7886e47 devel/speed.pl
+SHA1 4d73cdfbf8de40ce8dbe7241de765b349c426bad devel/strace.pl
+SHA1 73e6fd0fe36b1eec98d9fc23fa6ad10bb7f1ac1a devel/tzname.pl
+SHA1 2b0fd7c657bfabf054472f139fa0b74757d8af40 devel/tzset.pl
+SHA1 9e361430ad9b9743ec01e13efa28230b887e9ae8 devel/undef.pl
+SHA1 d8fddfcf93f689f616057731926127f87605e516 examples/tie-tz.pl
+SHA1 37c77cce9ef0a502c10cbaf3c6974073c5acfede examples/time-tz.pl
+SHA1 cf647ee28a7aaad9896d0063f8a2529919ccfcd3 inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 05e6f1a4b8592fd9251097eb8e739aaae563d772 junk/SelectTZ.pm
+SHA1 0da3ed8af0bcd2ac64ac85593af47a41ae71aa57 lib/Tie/TZ.pm
+SHA1 eed5eb3fa64e7b8231e49146dc0a35d8822d70b6 lib/Time/TZ.pm
+SHA1 36b8eba56c87d62b1b41959187c717577dc16fa5 t/MyTestHelpers.pm
+SHA1 25a0638917a19e4c90700cd80cd212fa2a2488be t/TieTZ.t
+SHA1 4a76c7dead17bb835bb16523effa47b42c2e0a55 t/TieTZimport-all.t
+SHA1 ab10a77928aa37e488598ffd2504340ba45f970e t/TieTZimport.t
+SHA1 314f85c2113207cfed407bb4e47b75bd788ebfdd t/TimeTZ.t
+SHA1 43c113cacb3e48b53a683fcc975c250ff81bddfe t/tzset-calls.t
+SHA1 312b4613b9a0a8f0835546cb3a4f73c52fe6e098 t/tzset-not-implemented.t
+SHA1 d7fa249dd751c11fe03187340042f47d4c37aa0f t/tzset-other-error.t
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
+SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
+SHA1 c84fa2f39a57885c647ebb69a456f3129de706c1 xt/0-exe-shebang.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFNUJOULFMCIV9q3ToRAn/1AJ9OIy0Y4P9/IDdVPUQMyLpeD61c3wCgpQ8B
+cFbO+/E1Zl1/kS5Dxv/uIkk=
+=UXfo
+-----END PGP SIGNATURE-----

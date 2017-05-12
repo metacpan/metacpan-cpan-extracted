@@ -1,0 +1,315 @@
+NAME
+
+Test::Plan - add some intelligence to your test plan
+
+SYNOPSIS
+
+  use Test::More;
+  use Test::Plan;
+
+  plan tests => 2, need_module('Foo::Bar');
+
+  # ... do something that requires Foo::Bar in your test environment...
+
+  ok($foo, 'this is Test::More::ok()');
+
+DESCRIPTION
+
+Test::Plan provides a convenient way of scheduling tests (or not)
+when the test environment has complex needs.  it includes an
+alternate plan() function that is Test::Builder compliant,
+which means Test::Plan can be used alongside Test::More and
+other popular Test:: modules.  it also includes a few helper 
+functions specifically designed to be used with plan() to make
+test planning that much easier.
+
+in reality, there is nothing you can't do with this module that cannot
+be accomplished via the traditional skip_all.  however, the syntax
+and convenient helper functions may appeal to some folks.  in fact,
+if you are familiar with Apache-Test then you should
+feel right at home - the plan() syntax and associated helper
+functions are idential in almost all respects to what Apache::Test
+provides.
+
+so yes, there is lots of code duplication between this module and
+Apache::Test.  but I like this syntax so much I wanted to share
+it with the non-Apache inspired world.
+
+PLAN
+
+the following functions are identical in almost all respects to those
+found in the Apache::Test package, so reading the Apache::Test
+manpage is highly encouraged.
+
+plan()
+
+for all practical purposes, Test::Plan::plan() is a drop-in
+replacement for the other plan() functions you have been using
+already.  in other words you can just 
+
+  use Test::Plan;
+
+  plan tests => 3;
+
+and be on your way.  where Test::Plan::plan() is different is that
+it takes an optional final argument that is used to decide whether
+the plan should occur or not.  that is
+
+  use Test::Plan;
+                                                                                                                             
+  plan tests => 3, sub { $^O ne 'MSWin32' };
+                                                                                                                             
+has the same results as
+                                                                                                                             
+  use Test::More;
+                                                                                                                             
+  if ( $^O ne 'MSWin32' ) {
+    plan tests => 3;
+  }
+  else {
+    plan 'skip_all';
+  }
+
+much better, eh?  here is what you need to know...
+
+first, the final argument to plan() can be in any of the following
+formats.  if the result evaluates to true the test is planned, otherwise
+the entire test is skipped a la skip_all.
+
+* a boolean
+
+the boolean option is typically the result from a subroutine that
+has already been evaluated.  here is an example
+
+  plan tests => 3, foo();
+
+at runtime, foo() will be evaluated and the results passed as the
+final argument to plan().  if the results are true then plan()
+will plan your tests, otherwise the entire test file is skipped.
+
+while you can write your own subroutines, as in the above example,
+you may be interested in using some of the helper functions
+Test::Plan provides.
+
+* a reference to a subroutine
+
+if the final argument to plan() is a reference to a subroutine
+that subroutine will be evaluated and the results used to decide
+whether to plan your tests.
+
+  plan tests => 3, sub { 1 };
+
+or
+
+  plan tests => 3, \&foo;
+
+if the subroutine evaluates to true then plan() will plan your
+tests, otherwise the entire test file is skipped.
+
+* a reference to an array
+
+this is a shortcut to calling need_module() for each element in
+the array.  for example
+
+  plan tests => 3, [ qw(CGI LWP::UserAgent) ];
+
+is exactly equivalent to
+
+  plan tests => 3, need_module(qw(CGI LWP::UserAgent));
+
+see the below explanation of need_module() for more details.
+
+in general, Test::Plan::plan() functions identically to 
+Apache::Test::plan(), so reading the Apache::Test manpage
+is highly encouraged.
+
+HELPER FUNCTIONS
+
+you might be wondering where the skip message comes from when you use
+Test::Plan::plan() as described above.  the answer is that it comes
+from using one or more of the following helper functions.
+
+need()
+
+need() is a special function that is best described via an
+illustration.
+
+  plan tests => 3, need need_module('Foo::Bar'),
+                        need_min_module_version(CGI => 3.0),
+                        need_min_perl_version(5.6);
+
+what happens here is that need() is dispatching to each
+decision-making function and aggregating the results.  the result
+is that the skip message contains all the conditions that failed,
+not merely the first one.  contrast the above to this
+
+  plan tests => 3, need_module('Foo::Bar')              &&
+                   need_min_module_version(CGI => 3.0)  &&
+                   need_min_perl_version(5.6);
+
+in this example if Foo::Bar is not present the list of preconditions
+is short-circuited and the others not even tried, which means that if
+you fix the Foo::Bar problem and run the test again you might be
+hit with other precondition failures.  need() is a function of
+convenience, showing you all your failed preconditions at once.
+
+need() can accept arguments in the following forms:
+
+* another helper function
+
+this corresponds to the need() examples shown to this point.  note
+that this is not the same as a boolean - need() looks specifically
+for 0 or 1 to be returned from its functions.  for the reasons why see
+the next entry or read that Apache::Test manpage.
+
+* a scalar
+
+a simple scalar will be passed to need_module()
+
+  plan tests => 3, need qw(Foo::Bar CGI);
+
+see the below entry for need_module() for the specifics.
+
+* a reference to a hash
+
+the key to the hash should be the skip message and the value the thing
+to be evaluated, either a boolean or a reference to a subroutine.
+
+  plan tests => 3, need { 'not Win32' => sub { $^O eq 'MSWin32' },
+                          'no Foo'    => need_module('Foo::Bar'),
+                        };
+
+if the value evaluates to true then key is used as the skip message.
+
+this is all rather complex, so if you are confused please see the 
+Apache::Test manpage.  remember, I didn't write this stuff :)
+
+need_module()
+
+determines whether a Perl module can be successfully required.
+
+  plan tests => 3, need_module('Foo::Bar');
+
+will plan the tests only if Foo::Bar is present.  the skip
+message will show that the module could not be found.
+
+need_module() accepts either a list or a reference to an
+array.  in both cases all modules must be present for plan()
+to plan tests.
+
+  plan tests => 3, need_module [ 'CGI', 'Foo::Bar', 'File::Spec' ];
+
+need_min_module_version()
+
+this first calls need_module().  if that succeeds then the module
+version is checked using UNIVERSAL::VERSION.  if the version
+is greater than or equal to the specified version tests are planned.
+
+  plan tests => 3, need_min_module_version(CGI => 3.01);
+
+if no version is specified then a version check is not performed.
+this is a difference between Test::Plan and Apache::Test.
+
+need_min_perl_version()
+
+similar to need_min_module_version(), checks to make sure that the
+version of perl currently running is greater than or equal to the
+version specified.
+
+  plan tests => 3, need_min_perl_version(5.6);
+
+need_perl()
+
+need_perl() queries Config for various properties.  for example
+
+  plan tests => 3, need_perl('ithreads');
+
+is equivalent to 
+
+  plan tests => 3, sub { $Config{useithreads} eq 'define' };
+
+in general, the argument to need_perl() is prepended with the string
+'use' and the value within %Config checked.  a special case is
+'iolayers' which is dispatched to need_perl_iolayers().
+
+need_threads()
+
+a shortcut to need_perl('ithreads').
+
+need_perl_iolayers()
+
+returns true if perl contains PerlIO extensions.
+
+skip_reason()
+
+this is a direct interface into the skip reason mechanism Test::Plan
+uses behind the scenes.
+
+  plan tests => 3, skip_reason('I haven't implemented this feature yet');
+
+while it is useful for one liners, you can also use it from your own
+custom subroutine
+
+  plan tests => 3, \&foo;
+
+  sub foo {
+    ...
+    return 1 if $foo;  # success
+    return skip_reason('condition foo not met');
+  }
+
+under_construction()
+
+skips the test with a generic 'under construction' skip message
+
+  plan tests => 3, under_construction;
+
+CAVEATS
+
+this module jumps through some hoops so that you can use both
+Test::Plan and Test::More in the same script without a lot
+of trouble.  the main issue is that both modules want to export
+plan() into your namespace, which results in warnings and
+collisions.
+
+if you want to keep things simple, load Test::More before
+Test::Plan and everything should work out ok.
+
+  use Test::More;
+  use Test::Plan;
+
+  plan tests => 3, need_min_perl_version(5.6);
+
+  # nary a warning to be found.
+
+otherwise you would need to be explicit in what you import
+from each module
+
+  use Test::Plan qw(plan need_module);
+  use Test::More import => [qw(!plan)];
+
+  plan tests => 3, need_module('Foo::Bar');
+
+yucko.
+
+FEATURES/BUGS
+
+since the vast majority of the code here has been lifted from
+Apache::Test it is very well tested.  the only novel thing
+is the Test::More workarounds mentioned in CAVEATS.
+
+SEE ALSO
+
+Apache::Test, Test::More
+
+AUTHOR
+
+Geoffrey Young <geoff@modperlcookbook.org>
+
+COPYRIGHT
+
+Copyright (c) 2005, Geoffrey Young
+All rights reserved.
+
+This module is free software.  It may be used, redistributed
+and/or modified under the same terms as Perl itself.

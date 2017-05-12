@@ -1,0 +1,23 @@
+BEGIN:VCARD
+VERSION:2.1
+N:Person;Test,Given;;;
+FN:Test Person
+NICKNAME:Wibble,Wobble
+ORG:Company;
+TITLE:Job Title
+EMAIL;HOME:email\@domain.com
+TEL;CELL:+7112345 23456
+TEL;HOME:02085123123
+TEL;WORK:02073441234
+TEL;WORK,PREF:02071231234
+ADR;HOME,PREF:;;Two line street address\nSecond line;London;County;Post CodeW1H;United Kingdom
+ADR;WORK:;;First work address - street;Work city;London;Work PostCode;CountryName
+ADR;HOME:;;Parents address;City;Country;PostCode;Country
+ADR;WORK:;;Second work address - street;2City;2Country;2PostCode;2Country
+NOTE:A note\nwith return
+GEO:51;23
+URL:leo.cuckoo.org
+BDAY;value=date:1975-04-19
+X-AIM;type=pref:123123
+X-ICQ;type=WORK;type=pref:12341234
+END:VCARD

@@ -1,0 +1,189 @@
+NAME
+    Text::Repository - A simple way to manage text without mixing it with
+    Perl
+
+ABSTRACT
+    Text::Repository attempts to simplify storing shared text between
+    multple Perl modules, scripts, templating systems, etc. It does this by
+    allowing chunks of text to be stored with symbolic names.
+    Text::Repository was originally designed to store SQL queries, but can
+    of course be used with any kind of text that needs to be shared.
+
+SYNOPSIS
+      use Text::Repository;
+
+      my @paths = ("/www/library", "$ENV{'HOME'}/text");
+      my $rep = Text::Repository->new(@paths);
+
+    (See EXAMPLES for more.)
+
+DESCRIPTION
+    Text::Repository provides the capability to store, use, and manage text
+    without having to mix them with Perl scripts and modules. These pieces
+    of text can then be shared by multiple modules, scripts, or templating
+    systems with a minimum of fuss.
+
+    Text::Repository uses a series of one or more directories (specified
+    either when the class is instantiated or when needed) as a search path;
+    when a piece of text is requested using the instance's fetch method,
+    Text::Repository looks in each of the directories in turn until it finds
+    a file with that name. If the file is found, it is opened and read, and
+    the contents are returned to the caller as a string. Furthermore, the
+    contents of the file are cached. Successive calls to fetch to retrieve
+    the same piece of text return this cached copy, provided the copy on
+    disk has not changed more recently than the copy in the cache.
+
+    Text::Repository was originally written to share complex SQL queries
+    among multiple modules; when the usage grew to include printf formats, I
+    realized it could be generalized to store any kind of text. Because no
+    processing is done on the text before it is returned, the text in the
+    file can have any kind of markup. In fact, the contents of the file
+    don't even have to be text; the caller decides how to use the results
+    returned from the fetch.
+
+CONSTRUCTOR
+    The constructor is called new, and can be optionally passed a list of
+    directories to be added to the search path (directories can also be
+    added using the add_path object method).
+
+INSTANCE METHODS
+  add_path
+
+    Adds a search path or paths to the instance. The search path defines
+    where the instance looks for text snippets. This can be called multiple
+    times, and this module imposes no limits on the number of search paths.
+
+    add_paths is an alias for add_path, and should be used wherever it makes
+    the intent clearer. For example, use add_path to add a single path, but
+    add_paths when assigning more than one:
+
+        $rep->add_paths($new_path);
+
+        $rep->add_paths(@new_paths);
+
+    Some steps are taken to ensure that a path only appears in the search
+    path once; any subsequent additions of an existing path are ignored.
+
+  paths
+
+    The paths method returns a list of the paths in the object (or a
+    reference to a list of the paths if called in scalar context).
+
+  remove_path
+
+    remove_path deletes a path from the instance's search path.
+
+  replace_paths
+
+    replace_paths provides a shortcut to reset the list of paths to a new
+    value. It is equivalent to:
+
+        for my $p ($rep->paths()) {
+            $rep->remove_path($p);
+        }
+        $rep->clear_cache();
+        $rep->add_paths(@new_paths);
+
+    replace_paths returns the Text::Repository instance.
+
+  reset
+
+    The reset method returns the instance to the state it had when it was
+    created. reset returns the Text::Repository instance.
+
+  fetch(NAME)
+
+    The fetch method does the actual fetching of the text.
+
+    fetch is designed to be called with a keyword; this keyword is turned
+    into a filename that gets appended to each directory in paths (as
+    defined by $self->paths) in order until it finds a match.
+
+    Once fetch finds a match, the contents of the file is returned as a
+    single string.
+
+    If the file is not found, fetch returns undef.
+
+  clear_cache
+
+    The clear_cache method clears out the internal cache. The only times
+    this becomes necessary to call is when the internal paths are changed to
+    the point where cached files will never be found again (they become
+    orphaned, in this case). Note that replace_paths calls this method for
+    you.
+
+    This method returns the Text::Repository instance, for chaining.
+
+CREATING TEXT FOR A REPOSITORY
+    The files that can be retrieved using Text::Repository can be stored
+    anywhere. Creating files in a path referenced by a Text::Repository
+    instance can be done using any of the standard file creation or editing
+    methods:
+
+      $ echo 'Hello, %s!' > /tmp/Greeting
+      $ perl -MText::Repository
+      my $rep = Text::Repository->new("/tmp");
+      print $rep->fetch("Greeting");
+      printf $rep->fetch("Greeting"), "world";
+      ^D
+      Hello, %s!
+      Hello, world!
+
+    There are no methods for writing files using Text::Repository.
+
+EXAMPLES
+    Using Text::Repository to separate SQL statements from code:
+
+      use DBI;
+      use Text::Repository;
+
+      my $rep = Text::Repository->new("$ENV{'HOME'}/sql", "/www/sql");
+      my $dbh = DBI->connect(@DSN);
+
+      my $search = $rep->fetch("search");
+      my $sth = $dbh->prepare($search);
+      # and so on
+
+    Using Text::Repository to "skin" the output of a CGI script:
+
+      use CGI;
+      use Text::Repository;
+
+      my $q = CGI->new;
+      my $rep = Text::Repository->new("/www/repository");
+
+      my $skin = $q->param("skin");
+      my %components = (
+        HEADER  => $rep->fetch("skins/$skin/header"),
+        LINKBOX => $rep->fetch("linkbox"),
+        FOOTER  => $rep->fetch("skins/$skin/footer"),
+      );
+
+      print $q->header("My Skinned Page"),
+            $components{ HEADER },
+            get_content($components{ LINKBOX }),
+            $components{ FOOTER };
+
+      sub get_content ($) {
+      # and so on
+
+    Using Text::Repository to feed into Template Toolkit
+
+      use Template;
+      use Text::Repository;
+
+      my @rep_dirs = qw(/www/templates /usr/local/apache/htdocs);
+      my $rep = Text::Repository->new(@rep_dirs);
+      my $t = Template->new;
+
+      my $login = $rep->fetch("login");
+      $t->process(\$login);
+
+TODO
+SEE ALSO
+    the Perl manpage, the Carp manpage, the IO::File manpage, the File::Spec
+    manpage
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+

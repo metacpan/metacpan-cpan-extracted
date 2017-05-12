@@ -1,0 +1,25 @@
+=== basic
+--- wiki
+-hoge
+--hoge
+---hogehoge
+-hoge
+--hoge
+--- html
+<ul id="content_block_1" class="list-1">
+<li>hoge
+<ul class="list-2">
+<li>hoge
+<ul class="list-3">
+<li>hogehoge</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>hoge
+<ul class="list-2">
+<li>hoge</li>
+</ul>
+</li>
+</ul>
+

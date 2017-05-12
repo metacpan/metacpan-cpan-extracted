@@ -1,0 +1,77 @@
+NAME
+    Task::Tiny - install a lightweight development environment
+
+DESCRIPTION
+    Task::Tiny may be used to install a selection of tiny Pel extensions from
+    the CPAN.
+
+  Utilities
+    General utilities.
+
+    *   Exporter::Tiny
+
+    *   Try::Tiny
+
+    *   Config::Tiny
+
+  Objects
+    Framework for OO programming.
+
+    *   Class::Tiny
+
+    *   Class::Tiny::Antlers
+
+    *   Role::Tiny
+
+    *   Class::Method::Modifiers
+
+  Types
+    Type constraint framework.
+
+    *   Type::Tiny
+
+    *   Types::Path::Tiny
+
+  Filesys
+    File system manipulation.
+
+    *   Path::Tiny
+
+    *   Types::Path::Tiny
+
+  HTTP
+    Web stuff.
+
+    *   HTTP::Tiny
+
+  JSON
+    JSON stuff.
+
+    *   JSON::Tiny
+
+  YAML
+    YAML stuff.
+
+    *   YAML::Tiny
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Task-Tiny>.
+
+SEE ALSO
+    Task.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

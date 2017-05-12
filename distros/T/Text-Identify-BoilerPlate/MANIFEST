@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+COPYING
+TODO
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+bin/rem-boilerplate-text
+lib/Text/Identify/BoilerPlate.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

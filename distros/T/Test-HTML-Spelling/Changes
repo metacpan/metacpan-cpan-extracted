@@ -1,0 +1,110 @@
+Revision history for Test-HTML-Spelling
+
+v0.3.7   2014-08-16
+
+       - Fixed license in Makefile.PL to make CPANTS happy.
+
+v0.3.6   2004-06-18
+
+       - Clean namespace.
+
+v0.3.5   2014-06-04
+
+       - Fixed bug in distribution that required the missing xt
+         directory.
+
+v0.3.4   2014-06-04
+
+       - Tweaked MANIFEST.SKIP rules.
+
+       - Updated bugtracker URL in metadata.
+
+       - Removed QA tests from the distribution.
+
+       - Removed unnecessary dependency from Makefile.PL.
+
+v0.3.3   2014-02-18
+
+       - Updated README.
+
+       - Minor POD markup tweaks.
+
+v0.3.2   2014-02-18
+
+       - Made Moose attributes lazy [Rusty Conover].
+
+       - Ignore numbers separated by digits, e.g. "2013-2014"
+         [Rusty Conover and Robert Rothenberg].
+
+v0.3.1  2014-02-03
+
+       - Updated POD formatting.
+
+       - Fixed outdated POD that referred to self as a requirement.
+
+       - Changed dependency from Readonly to Const::Fast and updated
+         POD accordingly (GitHub#4).
+
+       - Cleaned up Changes file formatting (GitHub#3).
+
+v0.3.0  2013-12-30
+
+       - Removed dependency on the "self" module (GitHub#2)
+
+       - Tweaks to the POD spelling test
+
+       - Reformatted Changes file (GitHub#3)
+
+       - Updated README accordignly.
+
+v0.2.2  2013-12-30
+
+       - Removed MYMETA files from distribution (RT#89125)
+
+       - Added SEE ALSO section to POD (GitHub#1)
+
+v0.2.1  2012-12-16
+
+	- Removed example tests that were causing problems for some
+          users. (These tests were meant for developers anyway.)
+
+v0.2.0  2012-12-15
+
+       - Added tests.
+
+       - Added REQUIREMENTS section to POD for Pod::Readme and marked
+	 sections to be skipped for Pod::Readme.
+
+       - Added support for multiple spellers paramaterized by
+         language.
+
+       - Added checks for the lang attribute to use the appropriate
+         speller for the language.
+
+       - Updated POD appropriately.
+
+v0.1.1  2012-11-29
+
+       - Added test for POD spelling.
+
+       - Moved QA tests into 'xt' directory.
+
+       - QA tests all require RELEASE_TESTING variable to be set.
+
+       - Developer tests require DEVELOPER_TESTING variable to be set.
+
+       - Reformatted Changes.
+
+       - Changed module to use Test::Builder::Module as a base
+	 as is recommended in Test::Builder.
+	 Updated Makefile.PL requirements accordingly. (Thanks to
+	 Murray Walker for noticing this.)
+
+       - Added check_spelling method.
+
+       - Updated POD.
+
+v0.1.0  2012-11-24
+
+       - First prototype released on GitHub.
+

@@ -1,0 +1,30 @@
+Revision history for Types-SQL
+
+v0.0.3    2016-01-14 13:40:05+00:00 Europe/London
+  [Enhancements]
+  - Added support for datetime data types [GitHub #1].
+
+  [Bug Fixes]
+  - Fixed testing module version prerequisites.
+
+  - Set minimum version of Type::Tiny to v0.44.
+
+  [Other Changes]
+  - Added more QA tests for developers.
+
+  - Added META.json to the distribution.
+
+  - Fixed type in test descriptions.
+
+v0.0.2    2016-01-13 14:35:01+00:00 Europe/London
+  [Enhancements]
+  - Column information will be extracted from parent types when it is
+    unavailable from the current type [GitHub #2].
+
+    This allows one to declare a type based on existing types.
+
+  [Other Changes]
+  - Show the name of the type when returning an error for unsupported types.
+
+v0.0.1    2016-01-13 10:59:10+00:00 Europe/London
+  - First prototype published on GitHub.

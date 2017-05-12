@@ -1,0 +1,29 @@
+---
+abstract: 'A modern soundex.  Phonetic encoding of words.'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Metaphone
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0.47'
+  perl: v5.6.0
+resources:
+  bugtracker: https://github.com/schwern/Text-Metaphone/issues
+  homepage: https://metacpan.org/release/Text-Metaphone
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/schwern/Text-Metaphone/
+version: '20160805'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,235 @@
+NAME
+    Text::Todo - Perl interface to todotxt files
+
+VERSION
+    Since the $VERSION can't be automatically included, here is the RCS Id
+    instead, you'll have to look up $VERSION.
+
+        $Id: Todo.pm,v 1.27 2010/02/16 01:13:12 andrew Exp $
+
+SYNOPSIS
+        use Text::Todo;
+    
+        my $todo = Text::Todo->new('todo/todo.txt');
+
+        foreach my $e (sort { lc($_->text) cmp lc($e->text)} $todo->list) {
+            print $e->text, "\n";
+        }
+
+DESCRIPTION
+    This module is a basic interface to the todo.txt files as described by
+    Lifehacker and extended by members of their community.
+
+    For more information see <http://todotxt.com>
+
+    This module supports the 3 axes of an effective todo list. Priority,
+    Project and Context.
+
+    It does not support other notations or many of the more advanced
+    features of the todo.sh like plugins.
+
+    It should be extensible, but and hopefully will be before a 1.0 release.
+
+INTERFACE
+  new
+        new({ 
+            [ todo_dir    => 'directory', ]
+            [ todo_file   => 'filename in todo_dir', ]
+            [ done_file   => 'filename in todo_dir', ]
+            [ report_file => 'filename in todo_dir', ]
+            });
+
+    Allows you to set each item individually. todo_file defaults to
+    todo.txt.
+
+        new('path/to/todo.txt');
+
+    Automatically sets todo_dir to 'path/to', todo_file to 'todo.txt'
+
+        new('path/to')
+
+    If you pass an existing directory to new, it will set todo_dir.
+
+    If you what you set matches (.*)todo(.*).txt it will automatically set
+    done_file to $1done$2.txt and report_file to $1report$2.txt.
+
+    For example, new('todo/todo.shopping.txt') will set todo_dir to 'todo',
+    todo_file to 'todo.shopping.txt', done_file to 'done.shopping.txt', and
+    report_file to 'report.shopping.txt'.
+
+  file
+    Allows you to read the paths to the files in use. If as in the SYNOPSIS
+    above you used $todo = new('todo/todo.txt').
+
+        $todo_file = $todo->file('todo_file');
+
+    then, $todo_file eq 'todo/todo.txt'
+
+  load
+- Reads a list from a file into the current object.
+    Allows you to load a different file into the object.
+
+        $todo->load('done_file');
+
+    This effects the other functions that act on the list.
+
+  save
+- Writes the list to disk.
+        $todo->save(['new/path/to/todo']);
+
+    Either writes the current working file or the passed in argument that
+    can be recognized by file().
+
+    If you specify a filename it will save to that file and update the
+    paths. Additional changes to the object work on that file.
+
+  list
+- get the curently loaded list
+        my @todo_list = $todo->list;
+
+    In list context returns a list, it scalar context returns an array
+    reference to the list.
+
+  listpri
+- get the list items that are marked priority
+    Like list, but only returns entries that have priority set.
+
+        my @priority_list = $todo->listpri;
+
+    Since this is so easy to write as:
+
+        my @priority_list = grep { $_->priority } $todo->list;
+
+    I think it may become depreciated unless there is demand.
+
+  known_tags
+    Returns a reference to a hash of the tags known to the list.
+
+  learn_tag($tag, $sigal)
+    Let the entire list learn a new tag. If you are working with a list you
+    should use this instead of $entry->learn_tag because it will update all
+    entries.
+
+  listtag($tag)
+    Returns tags found in the list sorted by name.
+
+    If there were projects +GarageSale and +Shopping then
+
+        my @projects = $todo->listtag('project');
+
+    is the same as
+
+        @projects = ( 'GarageSale', 'Shopping' );
+
+  listcon
+- Shortcut to listtag('context')
+  listproj
+- Shortcut to listtag('project')
+  add
+    Adds a new entry to the list. Can either be a Text::Todo::Entry object
+    or plain text.
+
+        $todo->add('new todo entry');
+
+    It then becomes $todo->list->[-1];
+
+  del
+    Remove an entry from the list, either the reference or by number.
+
+        $removed_entry = $todo->del($entry);
+
+    $entry can either be an Text::Todo::Entry in the list or the index of
+    the entry to delete.
+
+    Note that entries are 0 indexed (as expected in perl) not starting at
+    line 1.
+
+  move
+        $todo->move($entry, $new_pos);
+
+    $entry can either be the number of the entry or the actual entry.
+    $new_pos is the new position to put it.
+
+    Note that entries are 0 indexed (as expected in perl) not starting at
+    line 1.
+
+  archive
+        $todo->archive
+
+    Iterates over the list and for each done entry, addto('done_file') and
+    del($entry). If any were archived it will then save() and load().
+
+  addto
+        $todo->addto($file, $entry);
+
+    Appends text to the file. $file can be anyting recognized by file().
+    $entry can either be a Text::Todo::Entry or plain text.
+
+  listfile
+        @list = $todo->listfile($file);
+
+    Read a file and returns a list like $todo->list but does not update the
+    internal list that is being worked with. $file can be anyting recognized
+    by file().
+
+DIAGNOSTICS
+    Most methods return undef on failure.
+
+    Some more important methods are fatal.
+
+CONFIGURATION AND ENVIRONMENT
+    Text::Todo requires no configuration files or environment variables.
+
+    Someday it should be able to read and use the todo.sh config file. This
+    may possibly be better done in a client that would use this module.
+
+DEPENDENCIES
+    Class::Std::Utils File::Spec version
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Limitations:
+
+    Currently there isn't an easy way to print out line numbers with the
+    entry.
+
+    Please report any bugs or feature requests to
+    "bug-text-todo@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Andrew Fresh "<andrew@cpan.org>"
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2009, Andrew Fresh "<andrew@cpan.org>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

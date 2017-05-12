@@ -1,0 +1,130 @@
+NAME
+
+    Task::BeLike::DRAKO - be more like DRAKO -- use what he uses
+
+VERSION
+
+    version 0.001
+
+TASK CONTENTS
+
+ Archiving / Compression
+
+  Archive::Zip
+
+    For working with .zip archives
+
+  Compress::LZ4Frame 0.011001
+
+    Version 0.011001 required because: For fast compression and
+    decompression of data
+
+ Code Quality
+
+  Perl::Critic
+
+    The standard
+
+  Perl::Critic::Lax
+
+    ot so strict rules for Perl::Critic
+
+  Perl::Tidy
+
+    The other standard
+
+  Devel::Cover
+
+    Check code coverage
+
+  Const::Fast
+
+    For named constants
+
+  Try::Tiny::Retry
+
+    This one is based on Try::Tiny, so it comes with try, catch and
+    finally. It also comes with retry and some more functions allowing to
+    try multiple times before failing.
+
+ Performance
+
+  Devel::NYTProf
+
+    Great profiler for finding bottlenecks
+
+  Inline::C
+
+    For quick testing XS algorithms
+
+ Web-Development
+
+  Dancer2
+
+    A nice and easy to use web framework
+
+ Package management
+
+  App::cpanminus
+
+    My favorite cpan client
+
+  App::cpm
+
+    Maybe my new favorite cpan client
+
+ Tools for building CPAN distributions
+
+  Dist::Zilla 5
+
+    Version 5 required because: You don't want to make dists without it
+
+  Dist::Zilla::PluginBundle::Starter
+
+    Better than the old Basic
+
+  Dist::Zilla::PluginBundle::Git
+
+    Because everybody should use Git
+
+  Dist::Zilla::Plugin::GithubMeta
+
+    Useful for projects hosted on Github
+
+  Pod::Weaver 4
+
+    Version 4 required because: For POD generation
+
+  Pod::Elemental::Transformer::List
+
+    So PodWeaver can make list cool
+
+ Other libraries
+
+  Moose
+
+    The standard OO library
+
+  Data::Dumper
+
+    For all your variable dumping needs
+
+  Log::Log4perl
+
+    For logging
+
+  Devel::PPPort
+
+    For a better XS development experience
+
+AUTHOR
+
+    Felix Bytow <drako@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Felix Bytow.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

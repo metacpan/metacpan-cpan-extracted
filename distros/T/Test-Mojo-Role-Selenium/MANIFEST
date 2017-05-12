@@ -1,0 +1,19 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/Test/Mojo/Role/Selenium.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/attrs.t
+t/driver-args-from-env.t
+t/external.t
+t/live.t
+t/skip.t
+t/wait-for.t
+t/wait-until.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

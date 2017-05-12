@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::Serializer - 値の直列化</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::Serializer - 値の直列化
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+<li><a href="#FORMAT">
+<span class="pod_lang">FORMAT
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::Serializer - 値の直列化
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>    my $ser = $TL-&gt;newSerializer();
+    $ser-&gt;setCryptoKey($key); # must be 32 octets long
+
+    my $bin = $ser-&gt;serialize([100, 'foo', {bar =&gt; 'baz'}]);
+    my $val = $ser-&gt;deserialize($bin);
+    # $val equals to [100, 'foo', {bar =&gt; 'baz'}]</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Perl の各種の値をオクテット列に直列化する。
+そのフォーマットは直列化結果が可能な限り小さくなるように設計されており、
+また ZLIB 形式による圧縮や AES アルゴリズムによる暗号化、Adler-32
+チェックサムによる誤り検出をサポートしている。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->newSerializer"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;newSerializer</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>    my $ser = $TL-&gt;newSerializer();</code></pre>
+
+<p>
+<span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::Serializer">Tripletail::Serializer</a> のインスタンスを生成する。引数は取らない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getCryptoKey"><span class="pod_lang"><code class="pod_iseq_C">getCryptoKey</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>    my $key = $ser-&gt;getCryptoKey();</code></pre>
+
+<p>
+<span class="pod_lang">オクテット列表現の暗号化および復号に使用する AES 共通鍵を返す。
+もし鍵が設定されていなければ <code class="pod_iseq_C">undef</code> を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setCryptoKey"><span class="pod_lang"><code class="pod_iseq_C">setCryptoKey</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>    $ser-&gt;setCryptoKey($key);</code></pre>
+
+<p>
+<span class="pod_lang">オクテット列表現の暗号化および復号に使用する AES 共通鍵を設定する。
+鍵長は 256 ビット、32 バイトでなければならず、それ以外の長さの鍵を設定しようとした場合には <code class="pod_iseq_C">die</code> する。
+<code class="pod_iseq_C">undef</code> を指定した場合には鍵が設定されていない状態になる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="serialize"><span class="pod_lang"><code class="pod_iseq_C">serialize</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>    my $val = [100, 'foo', {bar =&gt; 'baz'}];
+    my $bin = $ser-&gt;serialize($val);</code></pre>
+
+<p>
+<span class="pod_lang">第一引数に与えられた任意の値を直列化する。
+もしその中に <code class="pod_iseq_C">bless</code> されたリファレンスが存在した場合には die する。
+AES 共通鍵が設定されていれば暗号化を行い、されていなければ行わない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="deserialize"><span class="pod_lang"><code class="pod_iseq_C">deserialize</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>    my $val = $ser-&gt;deserialize($bin);</code></pre>
+
+<p>
+<span class="pod_lang">第一引数に与えられた、直列化されたデータを元に戻す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">もしデータが暗号化されているならば設定されている AES 共通鍵を用いて復号を行う。
+その際に鍵が設定されていなければ die する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">AES 共通鍵が設定されているにもかかわらずデータが暗号化されていない場合にも die する。
+この動作はセキュリティ上の理由による。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="FORMAT">
+<span class="pod_lang">FORMAT
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">本クラスで用いる直列化のフォーマットを以下に述べる。それには主として
+RFC 4234 (<a href="http://tools.ietf.org/html/rfc4234">http://tools.ietf.org/html/rfc4234</a>)
+を用いるが、ビット表現については EBML RFC Draft
+(<a href="http://matroska.org/technical/specs/rfc/index.html">http://matroska.org/technical/specs/rfc/index.html</a>)
+のものを使用する。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>    document = header payload</code></pre>
+
+<p>
+<span class="pod_lang">直列化結果（以下ドキュメント）はヘッダとペイロードから成る。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>    header        = 5%b0 is-encrypted is-compressed has-checksum
+    is-encrypted  = BIT
+    is-compressed = BIT
+    has-checksum  = BIT</code></pre>
+
+<p>
+<span class="pod_lang">ヘッダ長は 1 オクテットであり、その上位 5 ビットは常にゼロである。
+<code class="pod_iseq_C">is-encrypted</code> ビットは後述の暗号化が行われているかどうかを、
+<code class="pod_iseq_C">is-compressed</code> ビットは圧縮されているかどうかを、
+<code class="pod_iseq_C">has-checksum</code> ビットは Adler-32 チェックサムが存在するかどうかを示す。
+ただし <code class="pod_iseq_C">is-compressed</code> と <code class="pod_iseq_C">has-checksum</code> は排他である。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>    payload              = encrypted-payload / plain-payload
+
+    encrypted-payload    = iv AES-CBC(plain-payload)
+    iv                   = 16OCTET
+
+    plain-payload        = compressed-payload / uncompressed-payload
+    compressed-payload   = ZLIB(value)
+    uncompressed-payload = value-with-checksum / value
+    value-with-checksum  = value ADLER32(value)</code></pre>
+
+<p>
+<span class="pod_lang">ペイロードには次の 6 種類がある。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X81X95Xe3X82X8cXe3X80X81Xe5X9cXa7Xe7Xb8XaeXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X84Xe3X82X8b"><span class="pod_lang">暗号化され、圧縮されている
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">暗号化には AES アルゴリズムの CBC モードを使用する。鍵長は 256 ビット、ブロック長は 128 ビットである。
+IV はランダムな 16 オクテットであり、パディングには PKCS#7
+(<a href="http://tools.ietf.org/html/rfc5652#section-6.3">http://tools.ietf.org/html/rfc5652#section-6.3</a>) 形式を用いる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X81X95Xe3X82X8cXe3X80X81Xe5X9cXa7Xe7Xb8XaeXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe3X83X81Xe3X82Xa7Xe3X83X83Xe3X82XafXe3X82Xb5Xe3X83Xa0Xe3X81X8cXe5XadX98Xe5X9cXa8Xe3X81X99Xe3X82X8b"><span class="pod_lang">暗号化され、圧縮されておらず、チェックサムが存在する
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">チェックサムには Adler-32 (<a href="http://tools.ietf.org/html/rfc1950#section-8">http://tools.ietf.org/html/rfc1950#section-8</a>)
+アルゴリズムを用いる。これは network byte order の 4 オクテットで記録される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X81X95Xe3X82X8cXe3X80X81Xe5X9cXa7Xe7Xb8XaeXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe3X83X81Xe3X82Xa7Xe3X83X83Xe3X82XafXe3X82Xb5Xe3X83Xa0Xe3X82X82Xe5XadX98Xe5X9cXa8Xe3X81X97Xe3X81XaaXe3X81X84"><span class="pod_lang">暗号化され、圧縮されておらず、チェックサムも存在しない
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">この形式では誤った鍵を用いてペイロードを復号した場合にエラーになる事を保証できないため推奨されない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe5X9cXa7Xe7Xb8XaeXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X84Xe3X82X8b"><span class="pod_lang">暗号化されておらず、圧縮されている
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">圧縮には RFC 1950 (<a href="http://tools.ietf.org/html/rfc1950">http://tools.ietf.org/html/rfc1950</a>) ZLIB 形式を用いる。
+この場合 ZLIB 形式の定義により必ずその内部に Adler-32 チェックサムが存在する。
+従って圧縮されている場合には独立のチェックサムが付けられる事は無い。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X82X82Xe5X9cXa7Xe7Xb8XaeXe3X82X82Xe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe3X83X81Xe3X82Xa7Xe3X83X83Xe3X82XafXe3X82Xb5Xe3X83Xa0Xe3X81X8cXe5XadX98Xe5X9cXa8Xe3X81X99Xe3X82X8b"><span class="pod_lang">暗号化も圧縮もされておらず、チェックサムが存在する
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">この形式は ZLIB 圧縮すると却って結果が肥大化する場合に限って用いられる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X82X82Xe5X9cXa7Xe7Xb8XaeXe3X82X82Xe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe3X83X81Xe3X82Xa7Xe3X83X83Xe3X82XafXe3X82Xb5Xe3X83Xa0Xe3X82X82Xe5XadX98Xe5X9cXa8Xe3X81X97Xe3X81XaaXe3X81X84"><span class="pod_lang">暗号化も圧縮もされておらず、チェックサムも存在しない
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">この形式では不正なペイロードを <a href="#deserialize">&quot;deserialize&quot;</a> した場合にエラーになる事を保証できないため推奨されない。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<pre class="pod_verbatim"><code>    value = %x00                     ; undef
+          / %x01 vint                ; non-negative integer
+          / %x02 vint                ; negative integer
+          / %x03 size *OCTET         ; IEEE 754 floating point number
+          / %x04 size *OCTET         ; octet string
+          / %x05 size *OCTET         ; UTF-8 string
+          / %x06 size *value         ; array
+          / %x07 size *(value value) ; hash</code></pre>
+
+<p>
+<span class="pod_lang">整数および浮動小数点数は、それを表現するために必要な最小のオクテット数を用いて network byte order で格納される。
+整数の幅は任意だが、浮動小数点数の幅は 0, 4, 8 オクテットのいずれかでなければならない。
+幅ゼロの整数は 0 を、幅ゼロの浮動小数点数は 0.0 をそれぞれ表す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">負の整数はその絶対値で表現する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">ハッシュテーブルは複数個のキーと値のペアで表現されるが、そのキーには整数、オクテット列、UTF-8 文字列のみが使用可能である。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>    size = vint
+    vint = ( %b0 vint 7BIT ) / ( %b1 7BIT )</code></pre>
+
+<p>
+<span class="pod_lang">整数およびデータ長は可変長整数で表現される。その形式は EBML RFC Draft
+&quot;2.1. Variable size integer&quot;
+(<a href="http://matroska.org/technical/specs/rfc/index.html">http://matroska.org/technical/specs/rfc/index.html</a>)
+に定義されたものと同一である。例:
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>    Width  Size  Representation
+      1    2^7   1xxx xxxx
+      2    2^14  01xx xxxx  xxxx xxxx
+      3    2^21  001x xxxx  xxxx xxxx  xxxx xxxx
+      4    2^28  0001 xxxx  xxxx xxxx  xxxx xxxx  xxxx xxxx</code></pre>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Copyright 2006-2012 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Web site: http://tripletail.jp/
+
+</span>
+</p>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::Serializer - 値の直列化
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->newSerializer">$TL-&gt;newSerializer</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#FORMAT">FORMAT</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#deserialize">deserialize</a></li>
+<li><a href="#getCryptoKey">getCryptoKey</a></li>
+<li><a href="#serialize">serialize</a></li>
+<li><a href="#setCryptoKey">setCryptoKey</a></li>
+<li><a href="#Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X81X95Xe3X82X8cXe3X80X81Xe5X9cXa7Xe7Xb8XaeXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X84Xe3X82X8b">暗号化され、圧縮されている</a></li>
+<li><a href="#Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X81X95Xe3X82X8cXe3X80X81Xe5X9cXa7Xe7Xb8XaeXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe3X83X81Xe3X82Xa7Xe3X83X83Xe3X82XafXe3X82Xb5Xe3X83Xa0Xe3X81X8cXe5XadX98Xe5X9cXa8Xe3X81X99Xe3X82X8b">暗号化され、圧縮されておらず、チェックサムが存在する</a></li>
+<li><a href="#Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X81X95Xe3X82X8cXe3X80X81Xe5X9cXa7Xe7Xb8XaeXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe3X83X81Xe3X82Xa7Xe3X83X83Xe3X82XafXe3X82Xb5Xe3X83Xa0Xe3X82X82Xe5XadX98Xe5X9cXa8Xe3X81X97Xe3X81XaaXe3X81X84">暗号化され、圧縮されておらず、チェックサムも存在しない</a></li>
+<li><a href="#Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe5X9cXa7Xe7Xb8XaeXe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X84Xe3X82X8b">暗号化されておらず、圧縮されている</a></li>
+<li><a href="#Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X82X82Xe5X9cXa7Xe7Xb8XaeXe3X82X82Xe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe3X83X81Xe3X82Xa7Xe3X83X83Xe3X82XafXe3X82Xb5Xe3X83Xa0Xe3X81X8cXe5XadX98Xe5X9cXa8Xe3X81X99Xe3X82X8b">暗号化も圧縮もされておらず、チェックサムが存在する</a></li>
+<li><a href="#Xe6X9aX97Xe5X8fXb7Xe5X8cX96Xe3X82X82Xe5X9cXa7Xe7Xb8XaeXe3X82X82Xe3X81X95Xe3X82X8cXe3X81Xa6Xe3X81X8aXe3X82X89Xe3X81X9aXe3X80X81Xe3X83X81Xe3X82Xa7Xe3X83X83Xe3X82XafXe3X82Xb5Xe3X83Xa0Xe3X82X82Xe5XadX98Xe5X9cXa8Xe3X81X97Xe3X81XaaXe3X81X84">暗号化も圧縮もされておらず、チェックサムも存在しない</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::Serializer - 値の直列化
+
+
+</div>
+
+</body>
+</html>

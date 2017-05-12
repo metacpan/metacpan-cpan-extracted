@@ -1,0 +1,36 @@
+Revision history for Tkx-FindBar
+
+0.09 (2009-01-23)
+    - Set megawidget class to 'Tkx_FindBar' in order to support
+      class-specific options and bindings.
+
+0.08 (2009-01-19)
+    - Added 'm_*' aliases for public methods to support delgation from
+      other megawidgets. (Requires Tkx v1.06+)
+
+0.07 (2009-01-06)
+    - Added add_bindings() method.
+    - Use Module::Build for installation. ExtUtils::MakeMaker can still be used 
+      as well.
+
+0.06 (2008-08-06)
+    - Minor changes to improve test behavior.
+
+0.05 (2008-08-04)
+    - Don't use INIT block to initialize the class. (This makes it possible to
+      load the module at runtime.)
+
+0.04 (2008-08-03)
+    - Reset search (i.e. call first()) when case or regex setting is changed.
+    - Test suite no longer bails out if tile isn't available.
+    - Tile *really* isn't required anymore.
+
+0.03 (2008-08-03)
+    - Degrade gracefully to use standard widgets if tile is not available.
+
+0.02 (2008-08-02)
+    - Add support for grid()
+    - Make test suite BAIL_OUT if dependencies (tile) not met.
+
+0.01 (2008-07-23)
+    - Baseline release to CPAN.

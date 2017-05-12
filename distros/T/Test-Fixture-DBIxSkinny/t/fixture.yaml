@@ -1,0 +1,18 @@
+---
+- data:
+    id: 1
+    name: nekokak
+  name: foo1
+  table: foo
+- data:
+    id: 2
+    name: tokuhirom
+  name: foo2
+  table: foo
+- data:
+    id: 1
+    name: kan
+  name: bar1
+  table: bar
+
+

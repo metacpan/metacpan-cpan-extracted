@@ -1,0 +1,10 @@
+Revision history for Template-Provider-DBIC
+
+0.02	2007-03-28:
+		Tidied up distribution:
+			* Improved documentation and moved it inline
+			* Tidied up testing
+			* Fixed problems with build system
+
+0.01	2007-03-02:
+		Initial release.

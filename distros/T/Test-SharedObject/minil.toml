@@ -1,0 +1,6 @@
+name = "Test-SharedObject"
+badges = ["travis", "coveralls"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+

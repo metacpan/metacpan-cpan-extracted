@@ -1,0 +1,34 @@
+this is <b>boldword</b> or <b>bold text</b>;<br/>
+this is <i>emphasis</i> or <i>emphasis text</i><br/>
+this is tag <img src="w3schools.jpg" width="104" height="142">text text</img><br/>
+this is an empty tag <img src="w3schools.jpg" width="104" height="142"/><br/>
+this is <strike>strike</strike> or <strike>striked out</strike><br/>
+this is <u>under lined</u><br/>
+<br/>
+<pre><code>
+
+  # outer { } implies &lt;pre&gt;&lt;code&gt;&lt;/pre&gt;&lt;/code&gt;
+    sub test {
+        if ( $_[0] &gt; $_[1] ) {
+        }
+        elsif ( $_[2] eq &quot;firm&quot; ) {
+            print &quot;bye&quot;;
+        }
+    }
+
+</pre></code>
+<br/>
+<br/>
+this is a list <ul>
+  <li>1</li>
+  <li>2</li>
+<li>
+<ul>
+  <li>3</li>
+  <li>5</li>
+</ul>
+</li>
+</ul>
+<br/>
+<br/>
+this is <h3>heading</h3><br/>

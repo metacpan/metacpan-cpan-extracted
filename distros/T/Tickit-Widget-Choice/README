@@ -1,0 +1,69 @@
+NAME
+    `Tickit::Widget::Choice' - a widget giving a choice from a list
+
+CONSTRUCTOR
+  new
+       $choice = Tickit::Widget::Choice->new( %args )
+
+    Constructs a new `Tickit::Widget::Choice' object.
+
+    Takes the following named arguments
+
+    choices => ARRAY
+            Optional. If supplied, should be an ARRAY reference containing
+            two-element ARRAY references. Each will be added to the list of
+            choices as if by a call to `push_choice' for each element in the
+            array.
+
+    on_changed => CODE
+            Optional. If supplied, used to set the initial value of the
+            `on_changed' event handler.
+
+ACCESSORS
+  on_changed
+       $on_changed = $self->on_changed
+
+  set_on_changed
+       $self->set_on_changed( $on_changed )
+
+    Return or set the CODE reference to be called when the chosen selection
+    is changed.
+
+     $on_changed->( $choice, $value )
+
+METHODS
+  push_choice
+       $choice->push_choice( $value, $caption )
+
+    Appends another choice to the list of choices, with the given value and
+    display caption.
+
+  chosen_value
+       $value = $choice->chosen_value
+
+    Returns the value of the currently-chosen choice.
+
+  choose_by_idx
+       $choice->choose_by_idx( $idx )
+
+    Moves the chosen choice to the one at the given index. If this wasn't
+    the previously-chosen one, invokes the `on_changed' event.
+
+  choose_by_value
+       $choice->choose_by_value( $value )
+
+    Moves the chosen choise to the one having the given value, if such a
+    choice exists. If this wasn't the previously-chosen one, invokes the
+    `on_changed' event.
+
+  popup_menu
+       $choice->popup_menu
+
+    Display the popup menu in a modal float until a choice is made.
+
+TODO
+    *   Render a full border around the widget if height is at least 3.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

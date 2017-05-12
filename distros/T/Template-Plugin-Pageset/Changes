@@ -1,0 +1,8 @@
+Revision history for Template-Plugin-Pageset
+
+1.02  Wed Jun 27 10:50:00 2005
+	- for Catalyst 5.30 application, the $context could be Template::Timer
+	  so change the relate line to be /^Template::/
+
+1.01  Sat Dec 25 14:11:00 2004
+	- original version; created by manual

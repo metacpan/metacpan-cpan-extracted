@@ -1,0 +1,42 @@
+.X dtag -f xhtml -t mytag
+.X dtag -f latex -t mytag -c center
+.X dtag -f xhtml -t tag2 -c footer
+.X dtag -f latex -t tag2
+.X dtag -t center -f latex -c center
+.X dtag -t center -f xhtml -c nav
+.Bd -t literal
+sub mysub {
+    my @args = @_;
+    return \e@args;
+}
+.Ed
+.Bd
+This is a default
+.P
+display block
+.Ed
+.Bd -t mytag
+Some centered text
+.Ed
+.P
+Some text that is outside blocks
+.Bd
+And now in a block.
+.Ed
+And now no more in a block.
+.Bd -t footer
+The footer.
+.Ed
+.\" nested blocks
+.Bd
+things and
+.Bd -t center
+more centered things
+.Ed
+.Ed
+.Bd
+.Bd -t center
+more centered things
+.Ed
+Text.
+.Ed

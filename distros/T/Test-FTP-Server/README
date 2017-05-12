@@ -1,0 +1,134 @@
+NAME
+    Test::FTP::Server - ftpd runner for tests
+
+SYNOPSIS
+      use Test::TCP;
+      use Test::FTP::Server;
+
+      my $user = 'testuser';
+      my $pass = 'testpass';
+      my $root_directory = '/path/to/root_directory';
+
+      my $server = Test::FTP::Server->new(
+        'users' => [{
+          'user' => $user,
+          'pass' => $pass,
+          'root' => $root_directory,
+        }],
+        'ftpd_conf' => {
+          'port' => $port,
+          'daemon mode' => 1,
+          'run in background' => 0,
+        },
+      );
+      $server->run;
+
+    or
+
+      use Test::TCP;
+      use Test::FTP::Server;
+
+      my $user = 'testuser';
+      my $pass = 'testpass';
+      my $sandbox_base = '/path/to/sandbox_base';
+
+      my $server = Test::FTP::Server->new(
+        'users' => [{
+          'user' => $user,
+          'pass' => $pass,
+          'sandbox' => $sandbox_base,
+        }],
+        'ftpd_conf' => {
+          'port' => $port,
+          'daemon mode' => 1,
+          'run in background' => 0,
+        },
+      );
+      $server->run;
+
+DESCRIPTION
+    "Test::FTP::Server" run "Net::FTPServer" internally. The server's
+    settings can be specified as a parameter, therefore it is not necessary
+    to prepare the configuration file.
+
+FUNCTIONS
+  new
+    Create a ftpd instance.
+
+    %options
+
+    "users"
+       Definition of users.
+
+       "user" and "pass" are used for login.
+
+       If "root" is specified, ftpd behaves as if the specified directory is
+       the root directory.
+
+       If "sandbox" is specified, The content of sandbox is copied into the
+       temporary directory, and ftpd behaves as if the temporary directory
+       is the root directory. The content of sandbox never changes by the
+       user's operation.
+
+       It is necessary to specify "root" or "sandbox".
+
+    "ftpd_conf"
+       The settings that is usually specified in "/etc/ftpd.conf" when using
+       Net::FTPServer.
+
+       Specified by the hash reference.
+
+  run
+    Run a ftpd instance.
+
+EXAMPLE
+      use Test::FTP::Server;
+      use Test::TCP;
+      use Net::FTP;
+
+      my $user = 'testid';
+      my $pass = 'testpass';
+      my $sandbox_base = '/path/to/sandbox_base';
+
+      test_tcp(
+        server => sub {
+          my $port = shift;
+
+          Test::FTP::Server->new(
+            'users' => [{
+              'user' => $user,
+              'pass' => $pass,
+              'sandbox' => $sandbox_base,
+            }],
+            'ftpd_conf' => {
+              'port' => $port,
+              'daemon mode' => 1,
+              'run in background' => 0,
+            },
+          )->run;
+        },
+        client => sub {
+          my $port = shift;
+
+          my $ftp = Net::FTP->new('localhost', Port => $port);
+          ok($ftp);
+          ok($ftp->login($user, $pass));
+          ok($ftp->quit);
+        },
+      );
+
+NOTES
+    *   Test::FTP::Server is for test use only. "root" and "sandbox" is not
+        using chroot to keep available for any user. Therefore, there is a
+        security risk when a server opened to the public.
+
+AUTHOR
+    Taku Amano <taku@toi-planning.net>
+
+SEE ALSO
+    Net::FTPServer
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

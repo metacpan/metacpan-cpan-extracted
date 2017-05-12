@@ -1,0 +1,18 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="1"
+             tests="4"
+             name="data_tap_die_head_end">
+    <testcase name="1"></testcase>
+    <testcase name="2"></testcase>
+    <testcase name="3"></testcase>
+    <testcase name="4"></testcase>
+    <system-out><![CDATA[ok 1
+ok 2
+ok 3
+ok 4
+]]></system-out>
+    <system-err></system-err>
+    <error message="No plan in TAP output" />
+  </testsuite>
+</testsuites>

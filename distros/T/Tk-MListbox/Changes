@@ -1,0 +1,82 @@
+Revision history for Perl extension Tk::MListbox.
+
+1.06
+----
+The sort() method in 1.05 worked fine on Solaris, but it crashed
+on Linux. The 1.05 version included a hack to make sorting faster. 
+This release is back to the non-optimized version, with the optimizing 
+code commented out. If someone can explain to me why it didn't work on Linux, 
+and perhaps suggest another solution, I'd be grateful. Find the sort() 
+method, and look for a few codelines containing references to the array 
+@cmp_subs.
+
+1.07
+----
+In previous versions, resized columns would expand to at least one or two
+characters width when the mouse cursor moved over the heading. This has now
+been fixed.
+
+Dragging of column headers did not work with Tk 800.018 because of some 
+new cget() beaviour. This release avoids this problem.
+
+When sorting, Busy(-recurse=>1) is now called (if you have a Tk that is
+new enough to support it).
+
+Renamed the test program from filemgr.pl to test.pl.
+
+1.08
+----
+The author discovered h2xs....
+
+Added option -configurecommand.
+Added methods bindRows, bindColumns, bindSeparators.
+Changed test.pl
+
+1.09
+----
+The selectionSet() method didn't work (actually, it didn't exist...)
+Fixed the -selectmode and the -height configoptions.
+The widget now keeps the same rows selected after a sort.
+
+
+1.10 
+---- 
+
+- fixed deprecated use of defined
+- fixed color option problems (-background/-foreground/-selectbackground, etc)
+- Adding some keyboard bindings 
+- deprecated bind() -- it was aliasing bindRows()
+- In previous versions, the canvas widget was used for each separater - I replaced 
+  this with  Frame widgets.
+- made changes to bindColumns/bindRows/bindSeparators 
+  the second argument is no longer a column index. It is
+  now a hash reference containing {-subwidget => $sw, -columns => index}.
+  for bindRows there is also -row => index.
+- fixed columnPack and columnPackInfo methods, which weren't working
+  correctly. They now are fine.
+- played with the width option. Now, if it is set to 0, widget should
+  be created large enough to hold all columns. -textwidth applies to
+  each column. So a setting of 0 will make each Column wide enough to
+  display their contents. 
+- all options set to MListbox act as default settings for each column,
+  these settings can be overridden by setting the options within the
+  -columns option, or by using columnConfigure or columnInsert. However,
+  once widget is created. If the higher level MListbox options are 
+  reconfigured they will override all columns. (This seemed logical).
+
+1.11
+
+- when bindRows is used it returns a hash reference containing the subwidget
+  being bound, and the column and row indices underneath the mouse pointer.
+  The row index used to be the nearest entry to the pointer. This was fine 
+  except for cases where there was space for more rows within the MListbox.
+  The index returned would still be for the last element, even though it was not
+  directly underneath the pointer. In sitations such as these, it now returns -1.
+
+ -Corrected some typos in docs, updated to reflect lasted change to bindRows(),
+  and added more info to existing docs.
+
+Rob
+
+
+

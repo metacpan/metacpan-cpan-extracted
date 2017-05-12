@@ -1,0 +1,7 @@
+Changes
+lib/Test/Stochastic.pm
+Makefile.PL
+MANIFEST
+README
+t/Test-Stochastic.t
+META.yml                                 Module meta-data (added by MakeMaker)

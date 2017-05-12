@@ -1,0 +1,39 @@
+---
+abstract: 'an alternative to Test::Deep::ArrayEach'
+author:
+  - 'Mihyaeru <mihyaeru21@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Tester: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Deep-ArrayEachNotEmpty
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Deep::ArrayEachNotEmpty:
+    file: lib/Test/Deep/ArrayEachNotEmpty.pm
+    version: '0.01'
+requires:
+  Test::Deep: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/mihyaeru21/p5-Test-Deep-ArrayEachNotEmpty/issues
+  homepage: https://github.com/mihyaeru21/p5-Test-Deep-ArrayEachNotEmpty
+  repository: git://github.com/mihyaeru21/p5-Test-Deep-ArrayEachNotEmpty.git
+version: '0.01'
+x_authority: cpan:MIHYAERU

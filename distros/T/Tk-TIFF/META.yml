@@ -1,0 +1,27 @@
+---
+abstract: 'Tk::Photo loader for TIFF files'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  Devel::CheckLib: 0
+  ExtUtils::MakeMaker: 0
+  Tk: 0
+  Tk::MMutil: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-TIFF
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Tk: 800.014
+resources:
+  repository: git://github.com/eserte/tk-tiff.git
+version: 0.11

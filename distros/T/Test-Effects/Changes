@@ -1,0 +1,42 @@
+Revision history for Test-Effects
+
+0.000001  Wed Mar 14 06:32:40 2012
+       Initial release.
+
+
+
+0.000005  Thu May 10 12:32:17 2012
+
+    - Added TIME => 1  and  timing => $SPEC
+    - Included missing file (sorry Swen!)
+
+
+0.000007  Thu May 10 14:40:10 2012
+          No changes logged
+
+
+0.001000  Wed Jul 18 14:00:00 2012
+
+    First public release
+
+
+0.001002  Thu Feb 21 13:21:42 2013
+
+    - Fixed minor bug in checking string return values
+
+
+0.001003  Fri Jul 26 13:09:23 2013
+
+    - Fixed 5.18 madness
+
+
+0.001004  Sat May  3 10:03:21 2014
+
+    - Patched to avoid experimental warnings under 5.19+
+
+
+0.001005  Mon Sep 15 12:41:28 2014
+
+    - Doc patch to overcome stupid limitations on module
+      descriptions under =head1 NAME
+      (thanks Gordon)

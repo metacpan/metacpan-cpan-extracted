@@ -1,0 +1,28 @@
+---
+abstract: 'False and true, alternately, ad infinitum.'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Toggle
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Tie::Cycle: '1.05'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/Tie-Toggle/issues
+  homepage: https://github.com/briandfoy/Tie-Toggle
+  repository: https://github.com/briandfoy/Tie-Toggle.git
+version: 1.081

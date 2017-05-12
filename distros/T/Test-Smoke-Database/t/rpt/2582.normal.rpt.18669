@@ -1,0 +1,55 @@
+Newsgroups: perl.daily-build.reports
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:2582
+Return-Path: <abe@ztreet.demon.nl>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 22199 invoked by uid 1005); 8 Feb 2003 11:48:35 -0000
+Delivered-To: perlmail-smokers-reports@onion.perl.org
+Received: (qmail 22189 invoked by uid 76); 8 Feb 2003 11:48:33 -0000
+Received: from qmailr@one.develooper.com (HELO ran-out.mx.develooper.com) (64.81.84.115) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-02-08 11:48:33Z
+Received: (qmail 24284 invoked by uid 225); 8 Feb 2003 11:48:19 -0000
+Delivered-To: smokers-reports@perl.org
+Received: (qmail 24279 invoked by uid 507); 8 Feb 2003 11:48:18 -0000
+Received: from smtpzilla1.xs4all.nl (HELO smtpzilla1.xs4all.nl) (194.109.127.137) by one.develooper.com (qpsmtpd/0.21-dev) with SMTP; 2003-02-08 11:48:18Z
+Received: from fikkie (ztreet.xs4all.nl [213.84.162.223])	by smtpzilla1.xs4all.nl (8.12.0/8.12.0) with ESMTP id h18BmDQv009214	for <smokers-reports@perl.org>; Sat, 8 Feb 2003 12:48:13 +0100 (CET)
+Content-Type: text/plain;  charset="iso-8859-1"
+Subject: Smoke [5.9.0] 18669 PASS linux 2.4.18-4gb (i686/1 cpu)
+Date: Sat, 8 Feb 2003 12:46:47 +0100
+User-Agent: KMail/1.4.3
+To: smokers-reports@perl.org
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Message-ID: <200302081246.47859.abe@ztreet.demon.nl>
+X-SMTPD: qpsmtpd/0.21-dev, http://develooper.com/code/qpsmtpd/
+X-Spam-Check-By: one.develooper.com
+X-Spam-Status: No, hits=-2.3 required=7.0 tests=CARRIAGE_RETURNS,GAPPY_TEXT,SPAM_PHRASE_00_01,USER_AGENT,USER_AGENT_KMAIL version=2.43
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Approved: news@nntp.perl.org
+
+Automated smoke report for 5.9.0 patch 18669 on linux - 2.4.18-4gb (i686/=
+1 cpu)
+          v1.16_19      using cc version 2.95.3 20010315 (SuSE)
+O =3D OK
+F =3D Failure(s), extended report at the bottom
+? =3D still running or test results not (yet) available
+Build failures during:       - =3D unknown
+    c =3D Configure, m =3D make, t =3D make test-prep
+
+   18669     Configuration (common) none
+------------ ------------------------------------------------------------=
+----
+O - - O - -  -Uuseperlio
+O O O O O O
+O O O O O O  -Duse64bitint
+O O O O O O  -Duseithreads
+O O O O O O  -Duseithreads -Duse64bitint
+| | | | | +- LC_ALL =3D nl_NL.utf8 -DDEBUGGING
+| | | | +--- PERLIO =3D perlio -DDEBUGGING
+| | | +----- PERLIO =3D stdio  -DDEBUGGING
+| | +------- LC_ALL =3D nl_NL.utf8
+| +--------- PERLIO =3D perlio
++----------- PERLIO =3D stdio
+
+Summary: PASS
+

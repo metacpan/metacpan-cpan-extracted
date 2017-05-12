@@ -1,0 +1,46 @@
+Tie-FlatFile-Array version 0.05
+===============================
+
+Tie::FlatFile::Array allows the programmer to treat a
+binary, packed flatfile database as an array of arrays.
+For example, see this:
+
+    use Tie::FlatFile::Array;
+    use Fcntl;
+
+    tie @flat, 'Tie::FlatFile::Array', 'data.file',
+	    O_RDWR | O_CREAT, 0644, { packformat => 'A30L' };
+    
+    @flat = (
+	    [www.yahoo.com => 3601],
+	    [www.google.com => 5214]
+	    );
+
+    untie @flat;
+
+"A30L" is the "pack" format that is used to convert array
+references to binary strings. These strings are then written
+into the appropriate locations in "data.file."
+
+See the POD for more details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  None beyond Perl 5.8.4
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Mumia Wotse <mumia.w.18.spam+nospam [at] earthlink.net>
+
+This library is under the GPL.
+
+

@@ -1,0 +1,22 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Test/Depends.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+t/00-load.t
+t/02-test-budget-rentaharness.t
+t/SecondClass.pm
+t/someclass-import.pl
+t/someclass-version.pl
+t/someclass.pl
+t/SomeClass.pm
+t/twoclasses.pl
+SIGNATURE                                Public-key signature (added by MakeMaker)

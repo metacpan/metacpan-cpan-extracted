@@ -1,0 +1,13 @@
+$ast = {
+         'date' => '2005-07',
+         'version' => '0.05',
+         'author' => undef,
+         'alu' => {
+                    'sels' => [
+                                'ADD',
+                                'SUB'
+                              ],
+                    'delay' => 1,
+                    'capacity' => 1024
+                  }
+       };

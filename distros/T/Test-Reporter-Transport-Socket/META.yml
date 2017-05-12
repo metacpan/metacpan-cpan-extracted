@@ -1,0 +1,26 @@
+---
+abstract: 'Simple socket transport for Test::Reporter'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '6.42'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '6.42'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Reporter-Transport-Socket
+requires:
+  IO::Socket::INET: '0'
+  Storable: '0'
+  Test::Reporter: '1.57'
+  Test::Reporter::Transport: '1.57'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/test-reporter-transport-socket
+  repository: https://github.com/bingos/test-reporter-transport-socket.git
+version: '0.32'

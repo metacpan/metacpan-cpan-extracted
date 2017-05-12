@@ -1,0 +1,40 @@
+---
+abstract: 'Deterministic time & timers for event loop tests'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mock-Time
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Test::Mock::Time:
+    file: lib/Test/Mock/Time.pm
+    version: v0.1.6
+requires:
+  Export::Attrs: '0'
+  List::Util: '1.33'
+  Scalar::Util: '0'
+  Test::MockModule: '0'
+  bignum: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/powerman/perl-Test-Mock-Time/issues
+  homepage: https://github.com/powerman/perl-Test-Mock-Time
+  repository: https://github.com/powerman/perl-Test-Mock-Time.git
+version: v0.1.6

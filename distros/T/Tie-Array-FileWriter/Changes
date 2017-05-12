@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Array::FileWriter.
+
+0.1  Fri Nov  9 15:11:29 2001
+	- original version; created by h2xs 1.21 with options
+		-c -v 0.1 Tie::Array::FileWriter
+

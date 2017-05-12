@@ -1,0 +1,28 @@
+---
+abstract: 'Template::Toolkit plugin handling IP-addresses'
+author:
+  - 'Per Carlson <pelle@cpan.org>'
+build_requires:
+  Template::Test: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-IPAddr
+requires:
+  NetAddr::IP: 0
+  Scalar::Util: 0
+  Template::Plugin: 0
+  base: 0
+  overload: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/hemmop/template-plugin-ipaddr/issues
+  homepage: https://github.com/hemmop/template-plugin-ipaddr
+  repository: https://github.com/hemmop/template-plugin-ipaddr.git
+version: 0.03

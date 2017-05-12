@@ -1,0 +1,7 @@
+.Ch Chapter name
+Some introductory text.
+.Sh section name
+Some section text.
+.Ss subsection name
+Some subsection text.
+.Tc

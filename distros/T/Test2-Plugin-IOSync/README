@@ -1,0 +1,44 @@
+NAME
+
+    Test2::Plugin::IOSync - Load IOEvents and IOMuxer so that they work
+    together.
+
+DESCRIPTION
+
+    This will load Test2::Plugin::IOMuxer and Test2::Plugin::IOEvents so
+    that all writes to STDOUT and STDERR are turned into events. When
+    formatters finally write their events the output will be duplicated
+    into a muxed file so that it is possible to order the combined output.
+    See Test2::Plugin::IOMuxer and Test2::Plugin::IOEvents for more
+    details.
+
+SYNOPSIS
+
+        use Test2::Plugin::IOSync 'path/to/mux/file.txt';
+
+    OR
+
+        perl -MTest2::Plugin::IOSync=path/to/mux/file.txt test.t
+
+SOURCE
+
+    The source code repository for Test2-Plugin-IOSync can be found at
+    http://github.com/Test-More/Test2-Plugin-IOSync/.
+
+MAINTAINERS
+
+    Chad Granum <exodist@cpan.org>
+
+AUTHORS
+
+    Chad Granum <exodist@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2017 Chad Granum <exodist@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Term-Visual
+version:             0.08
+abstract:            Curses split-terminal interface for applications.
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Curses:                        
+    POE:                           0.19
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Charles Ayres <lunartear@cpan.org>

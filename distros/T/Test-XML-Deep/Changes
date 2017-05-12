@@ -1,0 +1,22 @@
+Revision history for Test-XML-Deep
+
+0.01    Thu Feb 19 07:55:23 PST 2009
+        First version, released on an unsuspecting CPAN.
+
+0.02    Thu Feb 19 18:02:32 PST 2009
+        Add prereqs 
+
+0.03    Sat Feb 21 13:45:41 PST 2009
+        Use XML::Parser for initial XML parsing
+
+0.04    Thu Feb 26 20:52:55 PST 2009
+        Accept filenames in addition to XML strings
+
+0.05    Fri Feb 27 16:30:33 PST 2009
+        Oops - we don't need Sub::Uplevel
+
+0.06    Mon Mar  2 20:09:19 PST 2009
+        Don't use Test::NoWarnings in all the tests - XML::Parser throws warnings in CPAN Smokers
+
+0.07    Fri Mar 20 18:40:47 PDT 2009
+        Use new Test::Deep that exports cmp_details

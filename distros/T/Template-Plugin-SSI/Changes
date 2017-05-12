@@ -1,0 +1,17 @@
+Revision history for Perl extension Template::Plugin::SSI.
+
+0.11  Wed Feb 16 16:01:40 2005
+      updated documentation
+
+0.10  Tue Feb 15 16:07:10 2005
+	- original version; created by h2xs 1.22 with options
+		-X -n Template::Plugin::SSI
+      support for the following SSI directives:
+      include
+      exec
+      config
+      echo
+      set
+      flastmod
+      fsize
+

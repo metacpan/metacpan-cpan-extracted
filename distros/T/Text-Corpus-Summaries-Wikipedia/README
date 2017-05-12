@@ -1,0 +1,250 @@
+NAME
+    "Text::Corpus::Summaries::Wikipedia" - Creates corpora for summarization
+    testing.
+
+SYNOPSIS
+      use Text::Corpus::Summaries::Wikipedia;
+      use Data::Dump qw(dump);
+      my $corpus = Text::Corpus::Summaries::Wikipedia->new;
+      $corpus->create;
+      dump $corpus->getListOfXmlFiles;
+
+DESCRIPTION
+    "Text::Corpus::Summaries::Wikipedia" creates corpora for single document
+    summarization testing using the featured articles of various Wikipedias.
+
+    A criterion for an article in a Wikipedia to be *featured* is that it
+    have a well written lead section, or introduction. So the featured
+    articles of a Wikipedia can make an excellent corpus for testing single
+    document summarization methods. This module creates a corpus from the
+    featured articles of a Wikipedia by fetching and saving their content as
+    HTML, text, and XML, with the appropriate sections labeled as either
+    "summary" or "body".
+
+CONSTRUCTOR
+  "new"
+    The constructor "new" creates an instance of the
+    "Text::Corpus::Summaries::Wikipedia" class with the following
+    parameters:
+
+    "languageCode"
+         languageCode => 'en'
+
+        "languageCode" is the language code of the Wikipedia from which the
+        corpus of featured articles are to be created. The supported
+        language codes are "af":Afrikaans, "ar":Arabic, "az":Azerbaijani,
+        "bg":Bulgarian, "bs":Bosnian, "ca":Catalan, "cs":Czech, "de":German,
+        "el":Greek, "en":English, "eo":Esperanto, "es":Spanish, "eu":Basque,
+        "fa":Persian, "fi":Finnish, "fr":French, "he":Hebrew, "hr":Croatian,
+        "hu":Hungarian, "id":Indonesian, "it":Italian, "ja":Japanese,
+        "jv":Javanese, "ka":Georgian, "kk":Kazakh, "km":Khmer, "ko":Korean,
+        "li":Limburgish, "lv":Latvian, "ml":Malayalam, "mr":Marathi,
+        "ms":Malay, "mzn":Mazandarani, "nl":Dutch, "nn":Norwegian (Nynorsk),
+        "no":Norwegian (Bokm?l), "pl":Polish, "pt":Portuguese,
+        "ro":Romanian, "ru":Russian, "sh":Serbo-Croatian, "simple":Simple
+        English, "sk":Slovak, "sl":Slovenian, "sr":Serbian, "sv":Swedish,
+        "sw":Swahili, "ta":Tamil, "th":Thai, "tl":Tagalog, "tr":Turkish,
+        "tt":Tatar, "uk":Ukrainian, "ur":Urdu, "vi":Vietnamese,
+        "vo":Volap?k, and "zh":Chinese. If the language code is "all", then
+        the corpus for each supported language is created (which takes a
+        long time). The default is "en".
+
+    "corpusDirectory"
+         corpusDirectory => 'cwd'
+
+        "corpusDirectory" is the corpus directory that the summaries and
+        articles will be stored in; the directory is created if it does not
+        exist. The default is the "cwd".
+
+        A language subdirectory is created at "corpusDirectory/languageCode"
+        that will contain the directories "log", "html", "unparsable",
+        "text", and "xml". The directory "log" will contain the file
+        "log.txt" that all errors, warnings, and informational messages are
+        logged to using Log::Log4perl. The directory "html" will contain
+        copies of the HTML versions of the featured article pages fetched
+        using LWP. The directory "text" will contain two files for each
+        article; one file will end with "_body.txt" and contain the body
+        text of the article, the other will end with "_summary.txt" and will
+        contain the summary. The directory "unparsable" will contain the
+        HTML files that could not be parsed into *body* and *summary*
+        sections. All files are UTF-8 encoded.
+
+METHODS
+  "create"
+    The method "create" fetches the featured articles and creates the text
+    and XML versions of the files.
+
+      use Text::Corpus::Summaries::Wikipedia;
+      use Data::Dump qw(dump);
+      my $corpus = Text::Corpus::Summaries::Wikipedia->new;
+      $corpus->create;
+      dump $corpus->getListOfXmlFiles;
+      dump $corpus->getListOfTextFiles;
+
+    "maxProcesses"
+         maxProcesses => 1
+
+        "maxProcesses" is the maximum number of processes that can be
+        running simultaneously to parse the files. Parsing the files for the
+        summary and body sections may be computational intensive so the
+        module Forks::Super is used for parallelization. The default is one.
+
+    "test"
+         test => 0
+
+        If "test" is a positive integer than it will be treated as the
+        maximum number of pages that may be fetched and parsed. The default
+        is zero, meaning all possible pages are fetched and parsed.
+
+  "recreate"
+    The method "recreate" recreates the text and XML versions of the files
+    from the list of previously fetched HTML files in the "html" directory.
+
+      use Text::Corpus::Summaries::Wikipedia;
+      use Data::Dump qw(dump);
+      my $corpus = Text::Corpus::Summaries::Wikipedia->new;
+      $corpus->recreate;
+      dump $corpus->getListOfXmlFiles;
+      dump $corpus->getListOfTextFiles;
+
+    "maxProcesses"
+         maxProcesses => 1
+
+        "maxProcesses" is the maximum number of processes that can be
+        running simultaneously to parse the files. Parsing the files for the
+        summary and body sections may be computational intensive so the
+        module Forks::Super is used for parallelization. The default is one.
+
+    "test"
+         test => 0
+
+        If "test" is a positive integer than it will be treated as the
+        maximum number of pages that may be parsed. The default is zero,
+        meaning all possible pages are parsed.
+
+  "getListOfTextFiles"
+    The method "getListOfTextFiles" returns an array reference with each
+    item in the list having the form "{body => 'path_to_body_file', summary
+    => 'path_to_summary_file'}".
+
+      use Text::Corpus::Summaries::Wikipedia;
+      use Data::Dump qw(dump);
+      my $corpus = Text::Corpus::Summaries::Wikipedia->new;
+      $corpus->create;
+      dump $corpus->getListOfTextFiles;
+
+  "getListOfXmlFiles"
+    The method "getListOfXmlFiles" returns an array reference containing the
+    path to each XML file.
+
+      use Text::Corpus::Summaries::Wikipedia;
+      use XML::Simple;
+      use Data::Dump qw(dump);
+      my $corpus = Text::Corpus::Summaries::Wikipedia->new;
+      foreach my $xmlFile (@{$corpus->getListOfXmlFiles})
+      {
+        my $article;
+        eval { $article = XMLin ($xmlFile) };
+        if ($@) { dump \$@; } else { dump $article; }
+      }
+
+XML FORMAT
+    The XML files are created using XML::Code with the simple structure
+    outlined below:
+
+      <document>
+        <title>The Article Title</title>
+        <summary>
+          <p>This is the first paragraph of the summary.</p>
+          <p>This is the second paragraph of the summary.</p>
+        </summary>
+        <body>
+          <section>
+            <header>Head of first section</header>
+            <p>First paragraph of this section.</p>
+            <p>Second paragraph of this section.</p>
+          </section>
+          <section>
+            <p>First paragraph of this section.</p>
+            <p>Second paragraph of this section.</p>
+            <section>
+              <header>Head of  sub-section</header>
+              <p>First paragraph of this sub-section.</p>
+              <p>Second paragraph of this sub-section.</p>
+            </section>
+          </section>
+        </body>
+      </document>
+
+EXAMPLE
+    The following example computes and prints the median, mean, and standard
+    deviation of the fraction of words (ignoring repeats) in a summary that
+    also occur in the body of the text for all the articles in the corpora.
+
+      use Text::Corpus::Summaries::Wikipedia;
+      use Statistics::Descriptive;
+      use File::Slurp;
+      use Encode;
+
+      my $corpus = Text::Corpus::Summaries::Wikipedia->new;
+      my $statistics = Statistics::Descriptive::Full->new;
+      foreach my $textFilePair (@{$corpus->getListOfTextFiles})
+      {
+        my $summary = lc decode ('utf8', read_file ($textFilePair->{summary}, binmode => ':raw'));
+        my %summaryWords = map {($_, 1)} split (/\P{Letter}/, $summary);
+        my $totalUniqueSummaryWords = keys %summaryWords;
+        next unless $totalUniqueSummaryWords;
+
+        my $body = lc decode ('utf8', read_file ($textFilePair->{body}, binmode => ':raw'));
+        map {delete $summaryWords{$_}} split (/\P{Letter}/, $body);
+        my $totalUniqueSummaryWordsNotInBody = keys %summaryWords;
+
+        $statistics->add_data (1 - $totalUniqueSummaryWordsNotInBody / $totalUniqueSummaryWords);
+      }
+
+      print 'count: ', $statistics->count(), "\n";
+      print 'median: ', $statistics->median(), "\n";
+      print 'mean: ', $statistics->mean(), "\n";
+      print 'standard deviation: ', $statistics->standard_deviation(), "\n";
+
+SCRIPTS
+    The script create_summary_corpus.pl makes a corpus for summarization
+    testing using this module.
+
+INSTALLATION
+    Use CPAN to install the module and all its prerequisites:
+
+      perl -MCPAN -e shell
+      >install Text::Corpus::Summaries::Wikipedia
+
+BUGS
+    This module creates corpora by parsing Wikipedia pages, the xpath
+    expressions used to extract links and text will become invalid as the
+    format of the various pages changes, causing some corpora not to be
+    created.
+
+    Please email bugs reports or feature requests to
+    "bug-text-corpus-summaries-wikipedia@rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Corpus-Summaries-Wi
+    kipedia>. The author will be notified and you can be automatically
+    notified of progress on the bug fix or feature request.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2010 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    corpus, information processing, summaries, summarization, wikipedia
+
+SEE ALSO
+    create_summary_corpus.pl, Encode, Forks::Super,
+    HTML::TreeBuilder::XPath, Log::Log4perl, LWP::UserAgent, XML::Code
+

@@ -1,0 +1,15 @@
+1.24 (Tue Jul 15 14:35:35 EDT 2008)
+
+- Remove references to Artistic License from README. 
+
+1.23 (Tue Jul 15 05:18:37 EDT 2008)
+
+- Applied patch from ANDK@cpan.org to avoid failures in reforgy.t
+  [http://rt.cpan.org/Ticket/Display.html?id=27585]
+
+- Turned off warnings in the test suite.  It is supposed to generate 
+  warnings but it freaks out people.
+
+- License changed to Artistic 2.0 | GPL for Fedora folks.
+
+

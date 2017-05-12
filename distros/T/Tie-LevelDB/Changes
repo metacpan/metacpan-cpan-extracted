@@ -1,0 +1,30 @@
+Revision history for Perl extension Tie::LevelDB.
+
+0.01  Fri Jul 29 23:08:09 2011
+	- original version; created by h2xs 1.23 with options
+         --use-new-tests -A Tie::LevelDB
+    - limited functionality: just Open, Put, Get and Delete
+
+0.02  Sat Jul 30 09:21:19 2011
+    - DB, Iterator, WriteBatch API covered
+    - Perl tie (TIEHASH) support
+
+0.03  Sat Jul 30 10:21:19 2011
+    - Instructions for Snappy support
+    - Warning about missing "port/" and "port/win/" suppressed
+    - Storing undef values deletes the key automatically
+
+0.04  Sat Jul 31 07:21:19 2011
+    - Rewritted to support binary keys and values
+    - Module passes stress-testing
+
+0.05  Mon Sep 18 14:33:19 2011
+    - Mac OS X Snow Leopard support thanks to Svetoslav Agafonkin
+
+0.06  Mon Oct 01 10:33:19 2011
+    - Avoids segfaulting on attempting to open a locked DB, 
+    - thanks to David Leadbeater
+
+0.07  Mon Nov 14 02:33:19 2011
+    - MS Windows support thanks to Julian Lishev <julian.lishev@imperia.net>
+

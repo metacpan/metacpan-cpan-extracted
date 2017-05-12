@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+        content="text/html; charset=ISO-8859-1">
+  <title>Linux CPU Hotplug Test Results</title>
+  <meta name="author" content="Bryce Harrington">
+</head>
+
+[%- MACRO format_result(result) BLOCK %]
+  [% IF (result.state = "OK") %]
+    <td style="background-color: #33cc33">
+      <a href="[% result.url %]">[% result.type %] OK</a>
+      [%- result.detail -%]
+    </td>
+  [% ELSIF (result.state = "FAIL") %]
+    <td style="background-color: #cc0033">
+      <a href="[% result.url %]">[% result.type %] FAIL</a>
+      [%- result.detail -%]
+    </td>
+  [% ELSIF (result.state = "N/A") %]
+    <td style="background-color: #c8c8c8">[% result.type %] NA</td>
+  [% ELSE %]
+    <td>&nbsp;</td>
+  [% END %]
+[% END -%]
+
+<body>
+
+<h1>LHCS Test Results</h1>
+
+<table cellpadding="2" cellspacing="0" border="1" style="text-align: center"> 
+ <thead>
+    <tr>
+      <td style="background-color: %c8c8c8" width="200"><b>Build</b></td>
+      <td style="background-color: %c8c8c8">[% run.version %] <a href="[% run.package_retriever_log_url %]">log</a></td>
+      <td colspan="3"><b>Test Run Date:</b> [% run.date %]</td>
+    </tr>
+    <tr>
+      <td><b>Kernel</b><br></td>
+      <td><b>Case 1</b><br>IRQ Affinity</td>
+      <td><b>Case 2</b><br>CPU Offlining</td>
+      <td><b>Case 3</b><br>Task Scheduling</td>
+      <td><b>Case 4</b><br>Offline last CPU</td>
+      <td><b>Case 5</b><br>Stress tests</td>
+      <td><b>Case 6</b><br>User tools</td>
+      <td><b>Explanation</b></td>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOR run in runs %]
+    <tr>
+      <td>[% run.kernel %]</td>
+      [% format_result(run.test.case1) or '<td>&nbsp;</td>' %]
+      [% format_result(run.test.case2) or '<td>&nbsp;</td>' %]
+      [% format_result(run.test.case3) or '<td>&nbsp;</td>' %]
+      [% format_result(run.test.case4) or '<td>&nbsp;</td>' %]
+      [% format_result(run.test.case5) or '<td>&nbsp;</td>' %]
+      [% format_result(run.test.case6) or '<td>&nbsp;</td>' %]
+      <td>[% test.explanation or '&nbsp;' %]</td>
+    </tr>
+    [% END %]
+</table>

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Template-Parser-CET
+version:             0.05
+abstract:            Template::Alloy based parser for the TT2 engine
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Template:                      2.00
+    Template::Alloy:               1.008
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Paul Seamons

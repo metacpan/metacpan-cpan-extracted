@@ -1,0 +1,11 @@
+Changes
+CHM.xs
+contrib/test.pl
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Text-CHM.t
+lib/Text/CHM.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+typemap

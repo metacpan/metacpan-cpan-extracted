@@ -1,0 +1,17 @@
+Colorizer
+=========
+
+'Generate formated text in HTML, ANSI, ASCII for a text and color description'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

@@ -1,0 +1,75 @@
+# caching_dir is supposed to be ignored
+-- test --
+-- use base --
+-- name: are options from TT configuration acknowledged in a base plugin? --
+[% 
+   USE TwoStage;
+   TwoStage.dump_options;
+%]
+ -- expect --
+-- process --
+caching_dir: [% USE TwoStage; TwoStage.compiled_options( 'caching_dir' ); "\n" %]
+dev_mode: 0
+dir_keys: 
+namespace: foo
+precompile_tag_style: default
+runtime_tag_style: star
+tt_cache_size: 
+ttl: 0
+
+-- test --
+-- use derived --
+-- name: are options from TT configuration ignored in a subclassed plugin? --
+[% 
+   USE TwoStage;
+   TwoStage.dump_options;
+%]
+ -- expect --
+-- process --
+caching_dir: [% USE TwoStage; TwoStage.compiled_options( 'caching_dir' ); "\n" %]
+dev_mode: 0
+dir_keys: 
+namespace: 
+precompile_tag_style: default
+runtime_tag_style: star
+tt_cache_size: 
+ttl: 0
+
+-- test --
+-- name: can we override options from class data on instantiation of the plugin? --
+[% USE TwoStage = TwoStage( dev_mode => 1, namespace => 'blub', caching_dir => '/hano/', runtime_tag_style => 'html', ttl => 1, dir_keys => 1 );
+   TwoStage.purge;
+   TwoStage.dump_options;
+%]
+-- expect --
+-- process --
+caching_dir: [% USE TwoStage; TwoStage.compiled_options( 'caching_dir' ); "\n" %]
+dev_mode: 1
+dir_keys: 1
+namespace: blub
+precompile_tag_style: default
+runtime_tag_style: html
+tt_cache_size: 
+ttl: 1
+
+-- test --
+-- name: can we override options local to one call to the plugins process() method? --
+[% USE TwoStage = TwoStage;
+   blub = "bla\n";
+   BLOCK test %]
+<!-- blub -->
+[% END;
+   TwoStage.process( template => 'test', runtime_tag_style => 'html' );
+   TwoStage.dump_options;
+%]
+-- expect --
+-- process --
+bla
+caching_dir: [% USE TwoStage; TwoStage.compiled_options( 'caching_dir' ); "\n" %]
+dev_mode: 0
+dir_keys: 
+namespace: 
+precompile_tag_style: default
+runtime_tag_style: star
+tt_cache_size: 
+ttl: 0

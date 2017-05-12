@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Tree-Authz
+version: 0.03
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: inheritance-based authorization scheme
+license: perl
+requires:
+  Test::More: 0
+provides:
+  Tree::Authz:
+    file: lib/Tree/Authz.pm
+    version: 0.03
+  Tree::Authz::Role:
+    file: lib/Tree/Authz/Role.pm
+generated_by: Module::Build version 0.2609

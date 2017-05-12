@@ -1,0 +1,186 @@
+use strict;
+use warnings;
+use utf8;
+use Test::More;
+
+use Text::Mecabist;
+
+my $parser = Text::Mecabist->new();
+note('mecab internal encoding is:', $parser->encoding->name);
+
+my $doc = $parser->parse('庭には二羽鶏がいる');
+
+is($doc->count, 9);
+
+my @expected = (
+    {
+        extra => undef,
+        feature => '名詞,一般,*,*,*,*,庭,ニワ,ニワ',
+        format => '',
+        index => '0',
+        inflection_form => '*',
+        inflection_type => '*',
+        lemma => '庭',
+        pos => '名詞',
+        pos1 => '一般',
+        pos2 => '*',
+        pos3 => '*',
+        pronunciation => 'ニワ',
+        reading => 'ニワ',
+        surface => '庭',
+    },
+    {
+        extra => undef,
+        feature => '助詞,格助詞,一般,*,*,*,に,ニ,ニ',
+        format => '',
+        index => '1',
+        inflection_form => '*',
+        inflection_type => '*',
+        lemma => 'に',
+        pos => '助詞',
+        pos1 => '格助詞',
+        pos2 => '一般',
+        pos3 => '*',
+        pronunciation => 'ニ',
+        reading => 'ニ',
+        surface => 'に',
+    },
+    {
+        extra => undef,
+        feature => '助詞,係助詞,*,*,*,*,は,ハ,ワ',
+        format => '',
+        index => '2',
+        inflection_form => '*',
+        inflection_type => '*',
+        lemma => 'は',
+        pos => '助詞',
+        pos1 => '係助詞',
+        pos2 => '*',
+        pos3 => '*',
+        pronunciation => 'ワ',
+        reading => 'ハ',
+        surface => 'は',
+    },
+    {
+        extra => undef,
+        feature => '名詞,数,*,*,*,*,二,ニ,ニ',
+        format => '',
+        index => '3',
+        inflection_form => '*',
+        inflection_type => '*',
+        lemma => '二',
+        pos => '名詞',
+        pos1 => '数',
+        pos2 => '*',
+        pos3 => '*',
+        pronunciation => 'ニ',
+        reading => 'ニ',
+        surface => '二',
+    },
+    {
+        extra => undef,
+        feature => '名詞,接尾,助数詞,*,*,*,羽,ワ,ワ',
+        format => '',
+        index => '4',
+        inflection_form => '*',
+        inflection_type => '*',
+        lemma => '羽',
+        pos => '名詞',
+        pos1 => '接尾',
+        pos2 => '助数詞',
+        pos3 => '*',
+        pronunciation => 'ワ',
+        reading => 'ワ',
+        surface => '羽',
+    },
+    {
+        extra => undef,
+        feature => '名詞,一般,*,*,*,*,鶏,ニワトリ,ニワトリ',
+        format => '',
+        index => '5',
+        inflection_form => '*',
+        inflection_type => '*',
+        lemma => '鶏',
+        pos => '名詞',
+        pos1 => '一般',
+        pos2 => '*',
+        pos3 => '*',
+        pronunciation => 'ニワトリ',
+        reading => 'ニワトリ',
+        surface => '鶏',
+    },
+    {
+        extra => undef,
+        feature => '助詞,格助詞,一般,*,*,*,が,ガ,ガ',
+        format => '',
+        index => '6',
+        inflection_form => '*',
+        inflection_type => '*',
+        lemma => 'が',
+        pos => '助詞',
+        pos1 => '格助詞',
+        pos2 => '一般',
+        pos3 => '*',
+        pronunciation => 'ガ',
+        reading => 'ガ',
+        surface => 'が',
+    },
+    {
+        extra => undef,
+        feature => '動詞,自立,*,*,一段,基本形,いる,イル,イル',
+        format => '',
+        index => '7',
+        inflection_form => '基本形',
+        inflection_type => '一段',
+        lemma => 'いる',
+        pos => '動詞',
+        pos1 => '自立',
+        pos2 => '*',
+        pos3 => '*',
+        pronunciation => 'イル',
+        reading => 'イル',
+        surface => 'いる',
+    },
+    {
+        extra => undef,
+        feature => 'BOS/EOS,*,*,*,*,*,*,*,*',
+        format => '',
+        index => '8',
+        inflection_form => '*',
+        inflection_type => '*',
+        lemma => '*',
+        pos => 'BOS/EOS',
+        pos1 => '*',
+        pos2 => '*',
+        pos3 => '*',
+        pronunciation => '*',
+        reading => '*',
+        surface => '',
+    },
+);
+
+for (my $i = 0; $i < $doc->count; $i++) {
+    my $node = $doc->nodes->[$i];
+    is($node->index, $i);
+    is_deeply(
+        {
+            extra =>           $node->extra,
+            feature =>         $node->feature,
+            format =>          $node->format,
+            index =>           $node->index,
+            inflection_form => $node->inflection_form,
+            inflection_type => $node->inflection_type,
+            lemma =>           $node->lemma,
+            pos =>             $node->pos,
+            pos1 =>            $node->pos1,
+            pos2 =>            $node->pos2,
+            pos3 =>            $node->pos3,
+            pronunciation =>   $node->pronunciation,
+            reading =>         $node->reading,
+            surface =>         $node->surface,
+        },
+        $expected[$i]
+    );
+}
+
+done_testing();

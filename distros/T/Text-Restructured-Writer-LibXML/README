@@ -1,0 +1,6 @@
+This module implements a "Writer" for Text::Restructured, that instead
+of returning a string, returns a LibXML DOM.
+
+The DOM will have non-namespaced elements according to the docutils
+vocabulary, and namespcaed elements according to the MathML
+vocabulary.

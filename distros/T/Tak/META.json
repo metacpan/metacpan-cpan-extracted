@@ -1,0 +1,63 @@
+{
+   "abstract" : "Multi host remote control over ssh (then I wrote Object::Remote)",
+   "author" : [
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tak",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : [
+         "lib/Tak/STDIONode.pm"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.11",
+            "Config::Settings" : "0.02",
+            "Data::Dumper::Concise" : "2.020",
+            "Eval::WithLexicals" : "1.001000",
+            "IO::All" : "0.44",
+            "IPC::System::Simple" : "1.21",
+            "JSON::PP" : "2.27104",
+            "Log::Contextual" : "0.004",
+            "Moo" : "0.009012",
+            "Net::OpenSSH" : "0.52",
+            "perl" : "5.006",
+            "warnings::illegalproto" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://git.shadowcat.co.uk/scpubgit/Tak.git"
+      }
+   },
+   "version" : "0.001004"
+}

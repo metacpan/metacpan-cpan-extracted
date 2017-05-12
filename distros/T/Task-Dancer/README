@@ -1,0 +1,152 @@
+NAME
+    Task::Dancer - Dancer in a box
+
+VERSION
+    Version 0.39
+
+DESCRIPTION
+    This Task installs Dancer, optional engines, templates and assorted
+    modules that are not included in the Dancer core distribution.
+
+    If you've written anything relating to Dancer, please let us know.
+
+    We try to maintain a list of modules that are maintained and install
+    properly. If any of the modules "Task::Dancer" tried to install failing,
+    warn us, so we can temporarily disable it. Also, tell us if any module
+    temporarily disabled is working again.
+
+INCLUDES MODULES
+  Template Engines
+    Dancer::Template::Alloy
+    Dancer::Template::Haml
+    Dancer::Template::HtmlTemplate
+    Dancer::Template::Mason
+    Dancer::Template::Mason2
+    Dancer::Template::MicroTemplate
+    Dancer::Template::MojoTemplate
+    Dancer::Template::TemplateFlute
+    Dancer::Template::TemplateSandbox
+    Dancer::Template::Tenjin
+    Dancer::Template::Tiny
+    Dancer::Template::Xslate
+
+  Logging Engines
+    Dancer::Logger::ColorConsole
+    Dancer::Logger::ConsoleSpinner
+    Dancer::Logger::Log4perl
+    Dancer::Logger::Pipe
+    Dancer::Logger::PSGI
+    Dancer::Logger::Syslog
+
+  Serialization
+    Dancer::Serializer::UUEncode
+
+  Session Engines
+    Dancer::Session::CHI
+    Dancer::Session::Cookie
+    Dancer::Session::KiokuDB
+    Dancer::Session::Memcached
+    Dancer::Session::MongoDB
+    Dancer::Session::PSGI
+    Dancer::Session::Storable
+
+  Plugins
+    Dancer::Plugin::Async
+    Dancer::Plugin::Auth::Basic
+    Dancer::Plugin::Auth::Htpasswd
+    Dancer::Plugin::Auth::Extensible
+    Dancer::Plugin::Auth::Twitter
+    Dancer::Plugin::Bcrypt
+    Dancer::Plugin::Browser
+    Dancer::Plugin::Cache::CHI
+    Dancer::Plugin::Captcha::SecurityImage
+    Dancer::Plugin::Database
+    Dancer::Plugin::DBIC
+    Dancer::Plugin::DebugDump
+    Dancer::Plugin::DebugToolbar
+    Dancer::Plugin::DirectoryView
+    Dancer::Plugin::Email
+    Dancer::Plugin::EncodeID
+    Dancer::Plugin::EscapeHTML
+    Dancer::Plugin::Feed
+    Dancer::Plugin::FlashMessage
+    Dancer::Plugin::FlashNote
+    Dancer::Plugin::FormattedOutput
+    Dancer::Plugin::FormValidator
+    Dancer::Plugin::Hosts
+    Dancer::Plugin::LibraryThing
+    Dancer::Plugin::Memcached
+    Dancer::Plugin::MemcachedFast
+    Dancer::Plugin::MobileDevice
+    Dancer::Plugin::Mongo
+    Dancer::Plugin::Nitesi
+    Dancer::Plugin::NYTProf
+    Dancer::Plugin::Params::Normalization
+    Dancer::Plugin::Passphrase
+    Dancer::Plugin::Preprocess::Sass
+    Dancer::Plugin::Progress
+    Dancer::Plugin::ProxyPath
+    Dancer::Plugin::Redis
+    Dancer::Plugin::REST
+    Dancer::Plugin::Scoped (temporarily disabled)
+    Dancer::Plugin::SimpleCRUD
+    Dancer::Plugin::SiteMap
+    Dancer::Plugin::SMS
+    Dancer::Plugin::SporeDefinitionControl (disabled)
+    Dancer::Plugin::Stomp
+    Dancer::Plugin::TimeRequest
+    Dancer::Plugin::Thumbnail
+    Dancer::Plugin::ValidateTiny
+    Dancer::Plugin::XML::RSS
+
+More Plack middlewares
+    Dancer::Middleware::Rebase
+    Dancer::Debug
+
+AUTHOR
+    Sawyer X, "xsawyerx AT cpan DOT org"
+
+    Alberto Simoes, "ambs AT cpan DOT org"
+
+BUGS
+    Please report any bugs or feature requests to "bug-task-dancer at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-Dancer>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Task::Dancer
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Dancer>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Task-Dancer>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Task-Dancer>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Task-Dancer/>
+
+ACKNOWLEDGEMENTS
+    Dancer team.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2012 Sawyer X.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

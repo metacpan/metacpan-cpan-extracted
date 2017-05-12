@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use Text::Identify::BoilerPlate qw( rem_boilerplate );
+use Getopt::Mixed qw( nextOption );
+
+our ($opt_min_dupl, $opt_suffix, $opt_ignore_digits, $opt_only_headers_and_footers, $opt_digets, $opt_log);
+
+Getopt::Mixed::init('min_dupl=s m>min_dupl suffix=s s>suffix ignore_digits i>ignore_digits only_headers_and_footers o>only_headers_and_footers digest d>digest log=s l>log verbose v>verbose help h>help');
+
+
+my %opts;
+
+while (my ($option,$value)= nextOption()) {
+    unless ($value) { $value=1 }
+    $opts{$option}=$value;
+}
+
+if ($opts{'help'} or !($ARGV[0])) { 
+    die(`perldoc $0`);
+}
+
+rem_boilerplate( \@ARGV, \%opts);
+
+
+__END__
+
+
+=head1 NAME
+
+rem-boilerplate-text
+
+=head1 VERSION
+
+Version 0.2
+
+=head1 SYNOPSIS
+
+        > rem-boilerplate-text [options] <list of files>
+
+E.g.
+
+        > rem-boilerplate-text --min_dupl=6 intranet/txt/*.txt 
+
+=head1 DESCRIPTION
+
+Removes repeated text from a set of files.
+
+Note that the system only works when more than one file is specified, 
+since boilerplate text is detected based on repetition across files.
+
+New files are written, with a suffix appended to the original filenames.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-m>,    B<--min_dupl>
+
+The minimum number of thimes a line has to occur to
+be considered boilerplate (default: 3). Can be 
+either an integer or a percentage ('50 %') of the number
+of files processed. Minimum value: 2.
+
+=item B<-i>,    B<--ignore_digits>
+
+Lines only seperated by differences in digits
+will be considered duplicates (default: yes).
+
+=item B<-s>,    B<--suffix>
+
+Added to the new files (default: 'content').
+
+=item B<-o>,    B<--only_headers_and_footers>
+
+Only sets consecutive lines of duplicates at the start
+and end of documents are considered boilerplate 
+(default: yes).
+
+=item B<-d>,    B<digest>
+
+Lines will be replaced by a MD5 digest during duplicate
+compilation, saving memory (default: no).
+
+=item B<-l>,    B<log>
+
+Name of the log file, where deleted lines are recorded; 
+if set to false, no log will be created (default: 
+'./text-identify-boilerplate.log').
+
+=item B<-h>,    B<--help>
+
+Display usage information.
+
+=item B<-v>,    B<--verbose>
+
+Be verbose.
+
+=back
+
+=head1 AUTHOR
+
+Lars Nygaard, C<< <lars.nygaard@inl.uio.no> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 Lars Nygaard, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+
+

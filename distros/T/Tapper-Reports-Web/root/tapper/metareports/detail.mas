@@ -1,0 +1,99 @@
+<%args>
+    $chart
+    $tiny_url_count => 0
+</%args>
+
+<a href="/tapper/metareports?chart_tag=<% $c->req->params->{chart_tag} %>">&laquo; back to overview</a>
+
+<br />
+<br />
+
+<input type="hidden" id="idx_chart_tag" value="<% $c->req->params->{chart_tag} || q## %>" />
+<input type="hidden" id="hd_pager_direction_idx" value="<% $c->req->params->{pager_direction} || "" %>" />
+<input type="hidden" id="hd_offset_idx" value="<% $c->req->params->{offset} || 0 %>" />
+<input type="hidden" id="hd_chart_tiny_url_idx" value="<% $c->req->params->{chart_tiny_url} || "" %>" />
+
+<div class="chart_boxs" chart="<% $chart ? $chart->chart_id() : 0 %>" chart_version="<% $chart ? $chart->chart_version() : 0 %>">
+    <div class="chart_headers">
+        <div class="text">
+            <font class="title"><% $chart ? $chart->chart_name() : 'non-existent' %> - Version: </font>
+            <select id="idx_chart_version">
+%               for my $or_version ( $chart ? $chart->chart->chart_versions : () ) {
+%                   my $i_version  = $or_version->chart_version();
+%                   my $dt_created = $or_version->created_at()->strftime('%F %H:%m');
+%                   if ( $chart and $i_version == $chart->chart_version() ) {
+                        <option value="<% $i_version %>" selected="selected"><% $i_version . ' (' . $dt_created . ')' %></option>
+%                   }
+%                   else {
+                        <option value="<% $i_version %>"><% $i_version . ' (' . $dt_created . ')' %></option>
+%                   }
+%               }
+            </select>
+        </div>
+        <div class="search">
+%           if ( $c->req->params->{chart_tiny_url} ) {
+                &nbsp;<font>Static Url <% $c->req->params->{chart_tiny_url} %> called</font>&nbsp;
+%           }
+%           else {
+                <div id="dv_searchleft_idx" class="invisible">&laquo;</div>
+                &nbsp;<input id="bt_create_static_url_idx" type="button" value="Create static Url" />&nbsp;
+                <div id="dv_searchright_idx" class="invisible">&raquo;</div>
+%           }
+        </div>
+        <div class="icons">
+            <img src="/tapper/static/images/json.png" title="json" class="imgjson" />
+            <img src="/tapper/static/images/edit.small.png" title="edit" class="imgedit" />
+            <img src="/tapper/static/images/clone.small.png" title="edit as new" class="imgeditasnew" />
+            <img src="/tapper/static/images/delete.small.png" title="delete" class="imgdel" />
+        </div>
+    </div>
+    <div class="charts" id="mainchart_<% $chart ? $chart->chart_id() : 0 %>">
+        <img src="/tapper/static/images_red/loader.gif" />
+    </div>
+    <div class="chartsoverview" id="overviewchart_<% $chart ? $chart->chart_id() : 0 %>">
+        <img src="/tapper/static/images_red/loader.gif" />
+    </div>
+</div>
+<div id="right_box">
+    <fieldset id="choices">
+        <legend>chart lines</legend>
+    </fieldset>
+    <fieldset id="idx_marking_area">
+        <legend>markings</legend>
+    </fieldset>
+    <fieldset id="idx_tags_area">
+        <legend>tags</legend>
+%       for my $or_tag ( $chart ? $chart->chart->chart_tag_relations : () ) {
+            <a href="/tapper/metareports?chart_tag=<% $or_tag->chart_tag_id %>"><% $or_tag->chart_tag->chart_tag %></a>
+%       }
+    </fieldset>
+    <div id="idx_clear"></div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+
+        var chart_options = { detail : true };
+%       if ( my $hr_values = $c->stash->{parameter_restriction_values} ) {
+            chart_options.parameter = {};
+%           for my $s_value_name ( keys %{$hr_values} ) {
+                chart_options.parameter.<% $s_value_name %> = '<% $hr_values->{$s_value_name} %>';
+%           }
+%       }
+        get_chart_points( $("div.charts"), chart_options );
+
+        $('#idx_chart_version').change(function(){
+            location.href =
+                  '/tapper/metareports/detail?chart_version='
+                + $(this).val()
+                + '&amp;chart_tag='
+                + $('#idx_chart_tag').val()
+                + '&amp;chart_id='
+                + $(this).closest('div.chart_boxs').attr('chart')
+            ;
+        });
+
+    });
+
+</script>

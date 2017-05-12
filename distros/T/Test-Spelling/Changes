@@ -1,0 +1,73 @@
+Revision history for Test-Spelling
+
+0.20  2014-10-07
+        - Add a sorted list of your most commonly misspelled words to
+          the end of all_pod_files_spelling_ok to aid stopword list creation
+          and bulk correction. (Kent Fredric)
+
+0.19  2013-05-05
+        - for more consistent results avoid using the user's local aspell
+          dictionary [rt.cpan.org #84869] (Karen Etheridge)
+
+0.18  2013-04-26
+        - Work around Pod::Spell limitations (David Golden)
+        - Improve case handling (David Golden)
+        - Improve test failure reporting (Karen Etheridge)
+        - Include more useful info in Test-Spelling's own test
+            suite (Shawn Moore)
+
+0.17  2012-01-27
+        - Use IPC::Run3 instead of IPC::Open3
+            Quoth IPC::Open3:
+                If you try to read from the child's stdout writer
+                and their stderr writer, you'll have problems with
+                blocking ... This is very dangerous, as you may
+                block forever.
+            Also the code is nicely shorter. (Randy Stauner)
+
+0.16  2012-12-20
+        - Allow use of a custom POD parser rather than Pod::Spell
+          using set_pod_parser (Thomas Sibley)
+
+0.15  2011-08-22
+        - Begin adding actual tests
+          (Hilariously, adding the suggested t/pod-spell.t to this
+          dist to test itself found a typo: "stopwards")
+
+0.14  2011-05-27
+        - Fix an error when using add_stopwords("constant", "strings")
+          [rt.cpan.org #68471] (reported by Nicholas Bamber)
+
+0.13  2011-04-27
+        - Make alternatives checking more robust by reading the spellchecker's
+          STDERR
+
+0.12  2011-04-25
+        - Best Practical has taken over maintainership of this module
+        - Try various spellcheck programs instead of hardcoding the ancient
+          `spell` [rt.cpan.org #56483] (reported by Lars Dɪᴇᴄᴋᴏᴡ, et al)
+        - Remove temporary files more aggressively [rt.cpan.org #41586]
+          (reported by Tokuhiro Matsuno)
+          - fixed by not creating them at all :) instead we now use IPC::Open3
+        - Remove suggestion to use broken `aspell -l` [rt.cpan.org #28967]
+          (reported by David Hand)
+        - Add set_pod_file_filter for skipping translations, etc.
+          [rt.cpan.org #63755] (reported by me :))
+        - Skip tests in all_pod_files_spelling_ok if there is no working
+          spellchecker
+        - Provide a has_working_spellchecker so you can skip your own tests if
+          there's no working spellchecker
+        - Switch to Module::Install
+        - Rewrite and modernize a lot of the documentation
+        - Decruftify code, such as by using Exporter and lexical filehandles
+        - Support .plx files (you're welcome Schwern)
+
+0.11  2005-11-15
+        - Some documentation fixes.
+        - Added note about per-file stopwords by Chris Dolan.
+        - Use a temporary file instead of open2() to solve win32 portability
+          issues. (Thanks to Chris Laco!)
+
+0.10  2005-08-02
+        - First version
+

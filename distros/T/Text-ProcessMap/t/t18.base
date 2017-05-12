@@ -1,0 +1,63 @@
+----------------------------------------------------------------
+                             Lorem                              
+                          Lorem Ipsum                           
+                       Diagram Number 18                        
+----------------------------------------------------------------
+   Lorem Ipsum dolor sit amet, consectetuer adipiscing elit.    
+----------------------------------------------------------------
+      Column 1      ||      Column 2      ||      Column 3      
+----------------------------------------------------------------
+
+                                                                
++------------------.                        +------------------.
+|      HEADER      |    This is an arrow    |      [I04]       |
+|------------------|    with description    |      Title       |
+|      [I01]       |         text.          |   Lorem Ipsum    |
+|      Title       |  ------------------->  | dolor sit amet,  |
+|   Lorem Ipsum    |                        |   consectetuer   |
+| dolor sit amet,  |                        | adipiscing elit. |
+|   consectetuer   |                        `------------------'
+| adipiscing elit. |                                 |          
+|The final element.|                                 |          
+`------------------'                                 |          
+                                                     |          
++------------------.                                 |          
+|      [I02]       |                                 |          
+|      Title       |                                 |          
+|   Lorem Ipsum    |                                 |          
+| dolor sit amet,  |                                 |          
+|   consectetuer   |                                 |          
+| adipiscing elit. |                                 |          
+|------------------|                                 |          
+|      FOOTER      |                                 |          
+`------------------'                                 |          
+                                                     |          
+                      +------------------.           |          
+                      | This is a header |           |          
+                      |showing word wrap.|           |          
+                      |------------------|           |          
+                      |      [I03]       |           |          
+                      |      Title       |           |          
+                      |   Lorem Ipsum    |           |          
+                      | dolor sit amet,  |           |          
+                      |   consectetuer   |           |          
+                      | adipiscing elit. |           |          
+                      |------------------|           |          
+                      | This is a footer |           |          
+                      |showing word wrap.|           |          
+                      `------------------'           |          
+                                                     |          
+                                            +------------------.
+                                            |      [I05]       |
+                                            |      Title       |
+                                            |   Lorem Ipsum    |
+                                            | dolor sit amet,  |
+                                            |   consectetuer   |
+                                            | adipiscing elit. |
+                                            `------------------'
+
+   Lorem Ipsum dolor sit amet, consectetuer adipiscing elit.    
+
+----------------------------------------------------------------
+lorem_ipsum                                           00/00/0000
+----------------------------------------------------------------

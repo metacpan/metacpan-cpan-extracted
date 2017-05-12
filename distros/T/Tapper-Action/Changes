@@ -1,0 +1,26 @@
+Revision history for Tapper-Action
+
+5.0.0     2016-02-15
+        - cleanup
+        - use MooseX::Daemonize for daemon
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        * PostgreSQL support
+        - rename USER into OWNER
+        - [FIX] exceptions
+
+4.0.1     2012-05-16
+        - [FEAT] understand new action 'updategrub'
+        - [FEAT] allow configurable plugins for each action type
+        - [FEAT] action 'resume' now respects param 'after'
+        - [FEAT] scripts that use Tapper::Action
+        - big Dist::Zilla roundhouse kick
+
+2011-06-10  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* 3.000011
+
+	* initial release

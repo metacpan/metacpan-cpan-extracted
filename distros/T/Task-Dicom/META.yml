@@ -1,0 +1,37 @@
+---
+abstract: 'Install the Dicom modules.'
+author:
+  - 'Michal Spacek <skim@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Dicom
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Dicom::DCMTK::DCMDump::Get: 0.03
+  Dicom::DCMTK::DCMQRSCP::Config: 0.03
+  Dicom::File::Detect: 0.03
+  Dicom::UID::Generator: 0.01
+  DicomPack::IO::DicomWriter: 0.95
+  File::Find::Rule::Dicom: 0.04
+  perl: 5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Dicom
+  homepage: https://github.com/tupinek/Task-Dicom
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/tupinek/Task-Dicom
+version: '0.07'

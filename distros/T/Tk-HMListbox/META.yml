@@ -1,0 +1,24 @@
+---
+abstract: 'Sortable Multicolumn HListbox (allowing icons, along with text) with arrows in headers indicating sort order.'
+author:
+  - 'Jim Turner'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-HMListbox
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+  Tk: '0'
+  Tk::HListbox: '0'
+version: '3.00'

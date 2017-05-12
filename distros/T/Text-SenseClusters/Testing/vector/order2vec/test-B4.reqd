@@ -1,0 +1,3 @@
+ERROR(order2vec.pl):
+        1st line of WORDVEC file <test-B4.wordvec> shows #nnz = 142 while
+        the actual #nnz found in the file = 102.

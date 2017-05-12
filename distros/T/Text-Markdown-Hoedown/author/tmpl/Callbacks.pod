@@ -1,0 +1,47 @@
+? my @callbacks = @_;
+
+=head1 NAME
+
+Text::Markdown::Hoedown::Callbacks - Callbacks
+
+=head1 DESCRIPTION
+
+Note. Any API will change without notice.
+
+=head1 PRESETS
+
+There is 2 presets.
+
+=over 4
+
+=item C<< my $cb = Text::Markdown::Hoedown::Callbacks->html_renderer($render_flags:UV, $toc_nesting_lvl:IV); >>
+
+Create a callback object from HTML presets. Arguments are  documented on L<Text::Markdown::Hoedown>.
+
+=item C<< my $cb = Text::Markdown::Hoedown::Callbacks->html_toc_renderer($nesting_level); >>
+
+Create a callback object from HTML TOC presets. Arguments are  documented on L<Text::Markdown::Hoedown>.
+
+=back
+
+=head1 CUSTOM CALLBACKS
+
+=over 4
+
+=item C<< my $cb = Text::Markdown::Hoedown::Callbacks->new(); >>
+
+Create new instance.
+
+? for my $cb (@callbacks) {
+
+=item C<< $cb-><?= $cb->{name} ?>($code: CodeRef) >>
+
+Added handler for C< <?= $cb->{name} ?> >.
+
+Callback function's signature is following:
+
+    $code->(<?= join(', ', @{$cb->{pp_args}}) ?>)
+
+? }
+
+=back

@@ -1,0 +1,8 @@
+Revision history for Template-Plugin-Text-Filter-URI
+
+0.02    2008-12-16
+        renamed filter to "filter_uri" (name clash with "uri")
+
+0.01    2008-12-16
+        First version, released on an unsuspecting world.
+

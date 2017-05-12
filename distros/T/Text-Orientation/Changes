@@ -1,0 +1,12 @@
+Revision history for Perl extension Text::Orientation.
+
+0.01  Mon Dec 23 02:17:09 2002
+	- original version; created by h2xs 1.21 with options
+		-XA -n Text::Orientation
+
+0.03 Sat,  8 Feb 2003 18:52:05 +0800
+	- new({}) => new()
+	- anti_transpose() added
+
+0.04 Sun,  9 Feb 2003 22:23:57 +0800
+	- PerlIO layer added

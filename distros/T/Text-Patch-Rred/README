@@ -1,0 +1,42 @@
+Text::Patch::Rred version 0.06
+==============================
+
+This module and program safely and securely applies one or more
+ed-style patches as produced by the command diff --ed oldfile
+newfile.  It does exactly what you tell it to and no more, even with
+wildly bad or evil input.
+
+Unlike the traditional programs patch, ed, red and sed, rred does
+not allow the data in the patch to run arbitrary commands, read or
+write files or otherwise cause havoc.  Only the handful of safe
+"commands" actually used by diff are recognized and processed.
+
+Unlike the patch program and the perl modules Text::Patch,
+PatchReader and Meta::Development::Patch, this module does NOT try to
+doubleguess what kind of data it is given or which file to process.
+
+(Note that the other perl modules just mentioned cannot actually
+apply an ed-style patch, though some can parse it).
+
+The name rred is short for "Really Restricted ED" (as compared to red(1)). 
+This is the name given to a similar utility used inside the Debian projects
+apt facility.
+
+
+INSTALLATION and DEPENDENCIES
+
+See the file INSTALL
+
+BUG REPORTING
+
+Please send bug reports to Jakob Bohm <ehekikkeptiehewdur@jbohm.dk>,
+Always include the full module name (with double colons and all)
+in the subject line to get past my "spam" filters.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2009 by Jakob Bohm.  All Rights Reserved.
+
+This library and program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.

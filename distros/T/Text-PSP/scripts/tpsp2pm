@@ -1,0 +1,78 @@
+#!/usr/bin/perl -w
+use strict;
+use Text::PSP;
+use Getopt::Long;
+use Pod::Usage;
+use File::Find;
+use Cwd;
+
+my $verbose = 0;
+my $indir   = cwd; 
+my $match = '\.psp$';
+my $recurse = 0;
+
+GetOptions(
+	'verbose!' => \$verbose,
+	'indir=s'  => \$indir,
+	'match=s' => \$match,
+	'recurse!' => \$recurse,
+);
+
+my $outdir = shift @ARGV;
+
+$outdir || die "no outdir specified!\n";
+
+my $psp = Text::PSP->new(
+	workdir => $outdir,
+	templatedir => '',
+);
+
+for (@ARGV) {
+	die "You cannot use '..' in the input paths\n" if /\.\./;
+	$_ = "$indir/$_" unless /^\./;
+	if ($recurse) {
+		rec_dir();
+	}
+	else {
+		for (<$_>) {
+			process();
+		}
+	}
+}
+
+sub rec_dir {
+	find({ wanted => \&process, no_chdir => 1} , $_ ),
+}
+
+
+sub process {
+	if (-d $_) {
+		warn "dir: $_\n" if $verbose;
+		return;
+	}
+	return unless /$match/;
+	warn "not readable: $_\n",return if !-r _;
+	print "processing $_\n" if $verbose;
+	my ($pmfile,$classname,$template_path) = $psp->translate_filename($_);
+	$psp->write_pmfile($template_path,$pmfile,$classname);
+}
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+tpsp2pm - a command line tool to convert Text::PSP template files to their equivalent Perl modules.
+
+=head1 SYNOPSIS
+
+tpsp2pm OPTIONS outdir [infiles/indirs]
+
+=head1 SEE ALSO
+
+L<Text::PSP>
+

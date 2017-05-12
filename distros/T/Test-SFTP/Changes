@@ -1,0 +1,65 @@
+Revision history for Test::SFTP
+
+1.10        25.10.11
+            - Fix a lot of failed tests by checking for available modules.
+
+1.09        23.10.11
+            - Fixed RT #71873 (thanks to Montgomery Conner).
+            - Moved to Dist::Zilla, finally.
+
+1.08        07.06.10
+            - If anything, last version made it even more confusing! It is now
+              fixed
+
+1.07        07.06.10
+            - RT #58199 - Sorry Salvador! :)
+
+1.06        07.06.10
+            - Adding port option
+            - Updating POD
+
+1.05        06.06.10
+            - Productionizing it!
+
+1.04_01     04.06.10
+            - Switched from Net::SFTP to Net::SFTP::Foreign
+            - Switched from Test::More to Test::Builder
+            - Some API breakage (status, ssh_args -> more, etc.)
+            - A lot of code and POD cleanups
+            - Test adjustments, cleanups, fixes, changing some deps for them
+            - Adding namespace::autoclean and other deps
+            - Cleaning up Build.PL, adding LICENSE, META, examples, etc.
+
+0.04        08.02.09
+            - in t/02-failure.t:    initialized $ENV{'HOME'} as empty (windows)
+            - in t/03-successful.t: skipping if getpwuid doesn't work (windows)
+
+0.03        20.01.08
+            - in t/01-timeout.t:    finally fixed eval for Test::Timer
+            - in t/03-successful.t: finally fixed eval for File::Util
+            - in t/03-successful.t: changed no. of skipped tests in first SKIP
+              to 14
+            - in t/03-successful.t: removed File::Util from the top "use" group
+            - added "use warnings" (even though we're already using Moose) to
+              gain more Kwalitee.
+            - added to dist_abstract to Build.PL
+
+0.02        18.01.08
+            - Rewrote large parts of the POD.
+            - Uses better types with Moose ('Bool', 'Object')
+            - Added timeout attribute.
+            - Added timeout option for Net::SFTP connection.
+            - Added testing for timeout attribute using Test::Timer
+            - Checking attributes in connect() to avoid uninitialized variables
+            - Put timeout attribute as optionally tested if Test::Timer exists
+            - Time::Timer marked as recommended in Build.PL
+            - The tests that use File::Util are now optionally skipped if it
+              doesn't exist
+            - Added File::Util to recommends
+            - Separated all the dangerous tests from the the others, changed the
+              ENV
+            - Some tested were improved, using eval{}
+
+0.01        07.01.08
+            First version. I couldn't be prouder.
+

@@ -1,0 +1,13 @@
+*.tmp
+Makefile
+META.yml
+blib
+pm_to_blib
+inc
+Makefile.old
+MANIFEST.bak
+nytprof*
+xt/99_bruteforce.t
+sketch/sketch.pl
+MYMETA*
+

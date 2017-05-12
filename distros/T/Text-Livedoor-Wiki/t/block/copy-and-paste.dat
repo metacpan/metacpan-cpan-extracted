@@ -1,0 +1,112 @@
+=== basic
+--- wiki
+=||
+hogehoge
+hogehoge
+||=
+--- html
+<pre id="content_block_1" class="PLAIN-BOX">
+hogehoge
+hogehoge
+</pre>
+=== multiple
+--- wiki
+=||
+hogehoge
+hogehoge
+||=
+=||
+foo foo
+foo foo
+||=
+--- html
+<pre id="content_block_1" class="PLAIN-BOX">
+hogehoge
+hogehoge
+</pre>
+<pre id="content_block_2" class="PLAIN-BOX">
+foo foo
+foo foo
+</pre>
+=== header escape
+--- wiki
+=||
+* hogehgoe
+hogehoge
+**hogehoge
+hogehoge
+***hogehoge
+||=
+--- html
+<pre id="content_block_1" class="PLAIN-BOX">
+* hogehgoe
+hogehoge
+**hogehoge
+hogehoge
+***hogehoge
+</pre>
+=== start from end tag 
+--- wiki
+||=
+end
+--- html
+||=<br />
+end
+=== double start tag
+--- wiki
+=||
+hoge
+=||
+hogehoge
+||=
+--- html
+<pre id="content_block_1" class="PLAIN-BOX">
+hoge
+=||
+hogehoge
+</pre>
+=== perl
+--- wiki
+=|PERL|
+perl perl perl
+||=
+--- html
+<pre id="content_block_1" class="prettyprint PERL">
+perl perl perl
+</pre>
+=== box
+--- wiki
+=|(box=div)|
+hoge
+hoge
+||=
+=|(box=pre)|
+hoge
+hoge
+||=
+=|(box=textarea)|
+hoge
+hoge
+||=
+--- html
+<div id="content_block_1" class="PLAIN-BOX">
+hoge
+hoge
+</div>
+<pre id="content_block_2" class="PLAIN-BOX">
+hoge
+hoge
+</pre>
+<textarea id="content_block_3" class="PLAIN-BOX">
+hoge
+hoge
+</textarea>
+=== unknow args
+--- wiki
+=|(hoge=hoge)|
+hoge
+||=
+--- html
+<pre id="content_block_1" class="PLAIN-BOX">
+hoge
+</pre>

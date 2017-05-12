@@ -1,0 +1,7 @@
+0.03  Mon Nov 26 16:30:04 PST 2007
+    Tests
+    - Update tests from ad-hoc to Test::More.
+    
+    Portability
+    - 5.10 eliminates pseudo-hashes so we change to using a plain array ref
+      for our object.

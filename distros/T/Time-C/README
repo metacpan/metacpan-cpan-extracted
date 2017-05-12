@@ -1,0 +1,727 @@
+NAME
+
+    Time::C - Convenient time manipulation.
+
+VERSION
+
+    version 0.024
+
+SYNOPSIS
+
+      use Time::C;
+    
+      my $t = Time::C->from_string('2016-09-23T04:28:30Z');
+    
+      # 2016-01-01T04:28:30Z
+      $t->month = $t->day = 1;
+    
+      # 2016-01-01T00:00:00Z
+      $t->hour = $t->minute = $t->second = 0;
+    
+      # 2016-02-04T00:00:00Z
+      $t->month += 1; $t->day += 3;
+    
+      # 2016-03-03T00:00:00Z
+      $t->day += 28;
+    
+      # print all days of the week (2016-02-29T00:00:00Z to 2016-03-06T00:00:00Z)
+      $t->day_of_week = 1;
+      do { say $t } while ($t->day_of_week++ < 7);
+
+DESCRIPTION
+
+    Makes manipulating time structures more convenient. Internally uses
+    Time::Moment, and Time::Zone::Olson.
+
+CONSTRUCTORS
+
+ new
+
+      my $t = Time::C->new();
+      my $t = Time::C->new($year);
+      my $t = Time::C->new($year, $month);
+      my $t = Time::C->new($year, $month, $day);
+      my $t = Time::C->new($year, $month, $day, $hour);
+      my $t = Time::C->new($year, $month, $day, $hour, $minute);
+      my $t = Time::C->new($year, $month, $day, $hour, $minute, $second);
+      my $t = Time::C->new($year, $month, $day, $hour, $minute, $second, $tz);
+
+    Creates a Time::C object for the specified time, or the current time if
+    no $year is specified.
+
+    $year
+
+      This is the year. If not specified, new() will call now_utc(). The
+      year is 1-based and starts with year 1 corresponding to 1 AD. Legal
+      values are in the range 1-9999.
+
+    $month
+
+      This is the month. If not specified it defaults to 1. The month is
+      1-based and starts with month 1 corresponding to January. Legal
+      values are in the range 1-12.
+
+    $day
+
+      This is the day of the month. If not specified it defaults to 1. The
+      day is 1-based and starts with day 1 being the first day of the
+      month. Legal values are in the range 1-31.
+
+    $hour
+
+      This is the hour. If not specified it defaults to 0. The hour is
+      0-based and starts with hour 0 corresponding to midnight. Legal
+      values are in the range 0-23.
+
+    $minute
+
+      This is the minute. If not specified it defaults to 0. The minute is
+      0-based and starts with minute 0 being the first minute of the hour.
+      Legal values are in the range 0-59.
+
+    $second
+
+      This is the second. If not specified it defaults to 0. The second is
+      0-based and starts with second 0 being the first second of the
+      minute. Legal values are in the range 0-59.
+
+    $tz
+
+      This is the timezone specification such as Europe/Stockholm or UTC.
+      If not specified it defaults to UTC.
+
+ mktime
+
+      my $t = Time::C->mktime(
+        epoch => $epoch,
+        second => $second,
+        minute => $minute,
+        hour => $hour,
+        mday => $mday,
+        month => $month,
+        wday => $wday,
+        week => $week,
+        yday => $yday,
+        year => $year,
+        tz => $tz,
+        offset => $offset,
+      );
+
+    Creates a Time::C object for the specified arguments. All the arguments
+    are optional, as long as there is at least one way to specify some kind
+    of time with them.
+
+    If there is no date specified, it will default to today's date. If
+    there is no timezone or offset specified, it will default to UTC. If
+    there is a date, but no time specified, it will default to midnight.
+
+    epoch => $epoch
+
+      If the $epoch is specified, it overrides all the other options but
+      $tz and $offset, and this basically becomes a call to
+      Time::C->gmtime($epoch);, applying the $tz or $offset afterwards.
+
+    second => $second
+
+      $second sets the second of the day/hour/minute, depending on what
+      other options were specified.
+
+    minute => $minute
+
+      $minute sets the minute of the day/hour, depending on what other
+      options were specified.
+
+    hour => $hour
+
+      $hour sets the hour of the day.
+
+    mday => $mday
+
+      $mday sets the day of the month, if a $month was specified.
+
+    month => $month
+
+      $month sets the month of the year. If no $mday is specified, it will
+      default to the 1st day of the month.
+
+    wday => $wday
+
+      $wday sets the day of the week, if a $week was specified and no
+      $month was specified.
+
+    week => $week
+
+      $week sets the week of the year if no $month was specified. If no
+      $wday was specified, it will default to the 1st day of the week, i.e.
+      Monday.
+
+    yday => $yday
+
+      $yday sets the day of the year if neither $month or $week was
+      specified.
+
+    year => $year
+
+      $year specifies the year, and if no $month, $week, or $yday is
+      specified, the day will default to January 1st.
+
+    tz => $tz
+
+      $tz specifies the timezone, and will default to UTC if neither $tz or
+      $offset is given.
+
+    offset => $offset
+
+      $offset specifies the offset from UTC in minutes, and will default to
+      0 if neither $tz nor $offset are given.
+
+ localtime
+
+      my $t = Time::C->localtime($epoch);
+      my $t = Time::C->localtime($epoch, $tz);
+
+    Creates a Time::C object for the specified $epoch and optional $tz.
+
+    $epoch
+
+      This is the time in seconds since the system epoch, usually
+      1970-01-01T00:00:00Z.
+
+    $tz
+
+      This is the timezone specification, such as Europe/Stockholm or UTC.
+      If not specified defaults to the timezone specified in $ENV{TZ}, or
+      UTC if that is unspecified.
+
+ gmtime
+
+      my $t = Time::C->gmtime($epoch);
+
+    Creates a Time::C object for the specified $epoch. The timezone will be
+    UTC.
+
+    $epoch
+
+      This is the time in seconds since the system epoch, usually
+      1970-01-01T00:00:00Z.
+
+ now
+
+      my $t = Time::C->now();
+      my $t = Time::C->now($tz);
+
+    Creates a Time::C object for the current epoch in the timezone
+    specified in $tz or $ENV{TZ} or UTC if the first two are unspecified.
+
+    $tz
+
+      This is the timezone specification, such as Europe/Stockholm or UTC.
+      If not specified defaults to the timezone specified in $ENV{TZ}, or
+      UTC if that is unspecified.
+
+ now_utc
+
+      my $t = Time::C->now_utc();
+
+    Creates a Time::C object for the current epoch in UTC.
+
+ from_string
+
+      my $t = Time::C->from_string($str);
+      my $t = Time::C->from_string($str, format => $format);
+      my $t = Time::C->from_string($str, format => $format, locale => $locale);
+      my $t = Time::C->from_string($str, format => $format, locale => $locale, strict => $strict);
+      my $t = Time::C->from_string($str, format => $format, locale => $locale, strict => $strict, tz => $tz);
+
+    Creates a Time::C object for the specified $str, using the optional
+    $format to parse it, and the optional $tz to set an unambigous
+    timezone, if it matches the offset the parsing operation gave.
+
+    $str
+
+      This is the string that will be parsed by either "strptime" in
+      Time::P or "from_string" in Time::Moment.
+
+    format => $format
+
+      If specified, will be passed to "strptime" in Time::P for parsing.
+      Otherwise, "from_string" in Time::Moment will be used.
+
+    locale => $locale
+
+      If strptime is used for parsing, it will be given the specified
+      $locale. Defaults to C.
+
+    strict => $strict
+
+      If strptime is used for parsing, it will be given the specified
+      $strict. Defaults to 1.
+
+    tz => $tz
+
+      If there is no valid timezone specified in the format, but $tz is
+      given and matches the offset, then $tz will be set as the timezone.
+      If it doesn't match, and there was no valid timezone specified in the
+      format, a generic timezone matching the offset will be set, such as
+      UTC for an offset of 0. This variable will also default to UTC.
+
+ strptime
+
+      my $t = Time::C->strptime($str, $format);
+      my $t = Time::C->strptime($str, $format, locale => $locale);
+      my $t = Time::C->strptime($str, $format, locale => $locale, strict => $strict);
+    
+      $t = $t->strptime($str, $format);
+      $t = $t->strptime($str, $format, locale => $locale);
+      $t = $t->strptime($str, $format, locale => $locale, strict => $strict);
+
+    Creates a Time::C object for the specified $str using the $format to
+    parse it with "strptime" in Time::P.
+
+    This doesn't need to be used solely as a constructor; if it's called on
+    an already existing Time::C object, the values parsed from the $str
+    will be updated in the object, following the same rules as
+    Time::C->mktime for precedence (i.e. if an epoch is supplied, none of
+    the other values matter, and if a month is supplied, the weeks and
+    weekdays won't be considered, and so on).
+
+    $str
+
+      This is the string that will be parsed by "strptime" in Time::P.
+
+    $format
+
+      This is the format that "strptime" in Time::P will be given.
+
+    locale => $locale
+
+      Gives the $locale parameter to "strptime" in Time::P. Defaults to C.
+
+    strict => $strict
+
+      Gives the $strict parameter to "strptime" in Time::P. Defaults to 1.
+
+ACCESSORS
+
+    These accessors will work as LVALUEs, meaning you can assign to them to
+    change the time being represented.
+
+    Note that an assignment expression will return the computed value
+    rather than the assigned value. This means that in the expression my
+    $wday = $t->day_of_week = 8; the value assigned to $wday will be 1
+    because the value returned from the day_of_week assignment wraps around
+    after 7, and in fact starts the subsequent week. Similarly in the
+    expression my $mday = $t->month(2)->day_of_month = 30; the value
+    assigned to $mday will be either 1 or 2 depending on if it's a leap
+    year or not, and the month will have changed to 3.
+
+ epoch
+
+      my $epoch = $t->epoch;
+      $t->epoch = $epoch;
+      $t->epoch += 3600;
+      $t->epoch++;
+      $t->epoch--;
+    
+      $t = $t->epoch($new_epoch);
+
+    Returns or sets the epoch, i.e. the number of seconds since
+    1970-01-01T00:00:00Z.
+
+    If the form $t->epoch($new_epoch) is used, it likewise changes the
+    epoch but returns the entire object.
+
+ tz
+
+      my $tz = $t->tz;
+      $t->tz = $tz;
+    
+      $t = $t->tz($new_tz);
+      $t = $t->tz($new_tz, $override);
+
+    Returns or sets the timezone. If the timezone can't be recognised it
+    dies.
+
+    If the form $t->tz($new_tz) is used, it likewise changes the timezone
+    but returns the entire object.
+
+    If $override is a true value, it changes the $t->epoch as well, so that
+    the date/time remains the same, but in a new timezone.
+
+ offset
+
+      my $offset = $t->offset;
+      $t->offset = $offset;
+      $t->offset += 60;
+    
+      $t = $t->offset($new_offset);
+
+    Returns or sets the current offset in minutes. If the offset is set, it
+    tries to find a generic Etc/GMT+X or +XX:XX timezone that matches the
+    offset and updates the tz to this. If it fails, it dies with an error.
+
+    If the form $t->offset($new_offset) is used, it likewise sets the
+    timezone from $new_offset but returns the entire object.
+
+ tm
+
+      my $tm = $t->tm;
+      $t->tm = $tm;
+    
+      $t = $t->tm($new_tm);
+
+    Returns a Time::Moment object for the current epoch and offset. On
+    setting, it changes the current epoch.
+
+    If the form $t->tm($new_tm) is used, it likewise changes the current
+    epoch but returns the entire object.
+
+ string
+
+      my $str = $t->string;
+      my $str = $t->string(format => $format);
+      my $str = $t->string(format => $format, locale => $locale);
+      $t->string = $str;
+      $t->string(format => $format) = $str;
+      $t->string(format => $format, locale => $locale) = $str;
+      $t->string(format => $format, strict => $strict) = $str;
+      $t->string(format => $format, locale => $locale, strict => $strict) = $str;
+    
+      $t = $t->string($new_str, format => $format);
+      $t = $t->string($new_str, format => $format, locale => $locale);
+      $t = $t->string($new_str, format => $format, strict => $strict);
+      $t = $t->string($new_str, format => $format, locale => $locale, strict => $strict);
+
+    Renders the current time to a string using the optional strftime
+    $format and $locale. If the $format is not given it defaults to undef.
+    When setting this value, it tries to parse the string using "strptime"
+    in Time::P with the $format, $locale, and $strict settings, or
+    "from_string" in Time::Moment if no $format was given.
+
+    If the format specifies a timezone, it will be updated if it is valid.
+    If not, it checks if the detected offset matches the current tz, and if
+    so, the tz is kept, otherwise it will get changed to a generic tz in
+    the form of Etc/GMT+X or +XX:XX.
+
+    If the form $t->string($new_str) is used, it likewise updates the epoch
+    and timezone but returns the entire object.
+
+    $new_str
+
+      If specified, it will update the object by parsing the $new_str with
+      "strptime" in Time::P if a $format was passed, or "from_string" in
+      Time::Moment otherwise.
+
+    format => $format
+
+      If specified, will be passed to "strptime" in Time::P for parsing, or
+      "strftime" in Time::F for formatting.
+
+    locale => $locale
+
+      If the $format contains a locale-specific format specifier (see
+      "Format Specifiers" in Time::P), it will get the locale data for
+      $locale. Defaults to C.
+
+    strict => $strict
+
+      If strptime is used for parsing, it will be given the specified
+      $strict. Defaults to 1.
+
+ strftime
+
+    Functions exactly like string.
+
+ year
+
+      my $year = $t->year;
+      $t->year = $year;
+      $t->year += 10;
+      $t->year++;
+      $t->year--;
+    
+      $t = $t->year($new_year);
+
+    Returns or sets the current year, updating the epoch accordingly.
+
+    If the form $t->year($new_year) is used, it likewise sets the current
+    year but returns the entire object.
+
+    The year is 1-based where the year 1 corresponds to 1 AD. Legal values
+    are in the range 1-9999.
+
+ quarter
+
+      my $quarter = $t->quarter;
+      $t->quarter = $quarter;
+      $t->quarter += 4;
+      $t->quarter++;
+      $t->quarter--;
+    
+      $t = $t->quarter($new_quarter);
+
+    Returns or sets the current quarter of the year, updating the epoch
+    accordingly.
+
+    If the form $t->quarter($new_quarter) is used, it likewise sets the
+    current quarter but returns the entire object.
+
+    The quarter is 1-based where quarter 1 is the first three months of the
+    year. Legal values are in the range 1-4.
+
+ month
+
+      my $month = $t->month;
+      $t->month = $month;
+      $t->month += 12;
+      $t->month++;
+      $t->month--;
+    
+      $t = $t->month($new_month);
+
+    Returns or sets the current month of the year, updating the epoch
+    accordingly.
+
+    If the form $t->month($new_month) is used, it likewise sets the month
+    but returns the entire object.
+
+    The month is 1-based where month 1 is January. Legal values are in the
+    range 1-12.
+
+ week
+
+      my $week = $t->week;
+      $t->week = $week;
+      $t->week += 4;
+      $t->week++;
+      $t->week--;
+    
+      $t = $t->week($new_week);
+
+    Returns or sets the current week or the year, updating the epoch
+    accordingly.
+
+    If the form $t->week($new_week) is used, it likewise sets the current
+    week but returns the entire object.
+
+    The week is 1-based where week 1 is the first week of the year
+    according to ISO 8601. The first week may actually have some days in
+    the previous year, and the last week may have some days in the
+    subsequent year. Legal values are in the range 1-53.
+
+ day
+
+      my $day = $t->day;
+      $t->day = $day;
+      $t->day += 31;
+      $t->day++;
+      $t->day--;
+    
+      $t = $t->day($new_day);
+
+    Returns or sets the current day of the month, updating the epoch
+    accordingly.
+
+    If the form $t->day($new_day) is used, it likewise sets the current day
+    of the month but returns the entire object.
+
+    The day is 1-based where day 1 is the first day of the month. Legal
+    values are in the range 1-31.
+
+ day_of_month
+
+    Functions exactly like day.
+
+ day_of_year
+
+      my $yday = $t->day_of_year;
+      $t->day_of_year = $yday;
+      $t->day_of_year += 365;
+      $t->day_of_year++;
+      $t->day_of_year--;
+    
+      $t = $t->day_of_year($new_day);
+
+    Returns or sets the current day of the year, updating the epoch
+    accordingly.
+
+    If the form $t->day_of_year($new_day) is used, it likewise sets the
+    current day of the year but returns the entire object.
+
+    The day is 1-based where day 1 is the first day of the year. Legal
+    values are in the range 1-366.
+
+ day_of_quarter
+
+      my $qday = $t->day_of_quarter;
+      $t->day_of_quarter = $qday;
+      $t->day_of_quarter += 90;
+      $t->day_of_quarter++;
+      $t->day_of_quarter--;
+    
+      $t = $t->day_of_quarter($new_day);
+
+    Returns or sets the current day of the quarter, updating the epoch
+    accordingly.
+
+    If the form $t->day_of_quarter($new_day) is used, it likewise sets the
+    current day of the quarter but returns the entire object.
+
+    The day is 1-based where day 1 is the first day in the first month of
+    the quarter. Legal values are in the range 1-92.
+
+ day_of_week
+
+      my $wday = $t->day_of_week;
+      $t->day_of_week = $wday;
+      $t->day_of_week += 7;
+      $t->day_of_week++;
+      $t->day_of_week--;
+    
+      $t = $t->day_of_week($new_day);
+
+    Returns or sets the current day of the week, updating the epoch
+    accordingly. This module uses Time::Moment which counts days in the
+    week starting from 1 with Monday, and ending on 7 with Sunday.
+
+    If the form $t->day_of_week($new_day) is used, it likewise sets the
+    current day of the week but returns the entire object.
+
+    The day is 1-based where day 1 is Monday. Legal values are in the range
+    1-7.
+
+ hour
+
+      my $hour = $t->hour;
+      $t->hour = $hour;
+      $t->hour += 24;
+      $t->hour++;
+      $t->hour--;
+    
+      $t = $t->hour($new_hour);
+
+    Returns or sets the current hour of the day, updating the epoch
+    accordingly.
+
+    If the form $t->hour($new_hour) is used, it likewise sets the current
+    hour but returns the entire object.
+
+    The hour is 0-based where hour 0 is midnight. Legal values are in the
+    range 0-23.
+
+ minute
+
+      my $minute = $t->minute;
+      $t->minute = $minute;
+      $t->minute += 60;
+      $t->minute++;
+      $t->minute--;
+    
+      $t = $t->minute($new_minute);
+
+    Returns or sets the current minute of the hour, updating the epoch
+    accordingly.
+
+    If the form $t->minute($new_minute) is used, it likewise sets the
+    current minute but returns the entire object.
+
+    The minute is 0-based where minute 0 is the first minute of the hour.
+    Legal values are in the range 0-59.
+
+ second
+
+      my $second = $t->second;
+      $t->second = $second;
+      $t->second += 60;
+      $t->second++;
+      $t->second--;
+    
+      $t = $t->second($new_second);
+
+    Returns or sets the current second of the minute, updating the epoch
+    accordingly.
+
+    If the form $t->second($new_second) is used, it likewise sets the
+    current second but returns the entire object.
+
+    The second is 0-based where second 0 is the first second of the minute.
+    Legal values are in the range 0-59.
+
+ second_of_day
+
+      my $second = $t->second_of_day;
+      $t->second_of_day = $second;
+      $t->second_of_day += 86400;
+      $t->second_of_day++;
+      $t->second_of_day--;
+    
+      $t = $t->second_of_day($new_second);
+
+    Returns or sets the current second of the day, updating the epoch
+    accordingly.
+
+    If the form $t->second_of_day($new_second) is used, it likewise sets
+    the current second but returns the entire object.
+
+    The second is 0-based where second 0 is the first second of the day.
+    Legal values are in the range 0-86399.
+
+METHODS
+
+ diff
+
+      my $d = $t1->diff($t2);
+      my $d = $t1->diff($epoch);
+
+    Creates a Time::D object from $t1 and $t2 or $epoch. It accepts either
+    an arbitrary object that has an ->epoch accessor returning an epoch, or
+    a straight epoch.
+
+ clone
+
+      my $t2 = $t1->clone();
+
+    Returns a copy of $t1.
+
+SEE ALSO
+
+    Time::D
+
+      Like Time::C but for durations.
+
+    Time::R
+
+      If you need Time::C times to recurr at regular intervals.
+
+    Time::F
+
+      For formatting strings using an strftime format.
+
+    Time::P
+
+      For parsing times from strings.
+
+    Time::Moment
+
+      This implements most of the logic of this module.
+
+    Time::Zone::Olson
+
+      Interfaces with the Olson timezone database.
+
+    Time::Piece
+
+      A great time library, which is even in core perl.
+
+AUTHOR
+
+    Andreas Guldstrand <andreas.guldstrand@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Andreas Guldstrand.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

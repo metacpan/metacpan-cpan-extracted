@@ -1,0 +1,82 @@
+
+         Term::Activity - Process Activity Display Module - v1.20
+
+================================================================================
+SYNOPSIS:
+================================================================================
+
+This module is designed to produce informational STDERR output while a 
+process is funinctioning over many iterations or outputs. It is instanced 
+with an optional name and other configurable values and is then called on 
+each iterative loop.
+
+================================================================================
+INSTALLATION:
+================================================================================
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+================================================================================
+DESCRIPTION:
+================================================================================
+
+The information displayed is the current time processed (measured since 
+the instancing of the module), the number of actions second, a text-graphic 
+indicator of activity (skinnable), and the total count of actions thus far.
+
+An example output (on a small terminal) might appear like this:
+
+  03:13:54 1 : [~~~~~~~~~~~~~~~~~\_______________] 9,461
+
+Showing that nearly three hours and 14 minues have occured with a 
+current rate of 1 action per second, for a total of 9,461 total actions.
+(For the curious, the skin shown is the default skin, AKA 'wave')
+
+The display occurs on a single line that is updated regularly. The 
+display automatically calibrates itself so that it appears to update 
+approximately once a second.
+
+When the Term::Activity module passes out of scope it updates the display 
+with the final time, count, and a newline before exiting.
+
+Term::Activity can resize itself to the width of the current window if
+Term::Size is installed. If not, it defaults to an 80-character display.
+Term::Size is thouroughly reccomended.
+
+================================================================================
+USAGE:
+================================================================================
+
+    Refer to the module's POD for detailed usage.
+
+================================================================================
+KNOWN ISSUES:
+================================================================================
+
+Resizing the window during execution may cause the status bar to stop
+refreshing properly.
+
+Is the window is too small to accomodate the time, label, count, and 
+basic spacing (that is, there is less that 0 spaces for the activity to 
+be displayed) the effect, while being preety in a watching-the-car-wreck 
+way, it is not informative. Remember to keep your label strings short.
+
+================================================================================
+AUTHORSHIP:
+================================================================================
+
+    Term::Activity v1.20 2014/04/30
+
+    (c) 2003-2014, Phillip Pollard <bennie@cpan.org>
+    Released under the Perl Artistic License
+
+    Additional contributions by Kristina Davis <krd@menagerie.tf>
+
+    Derived from Util::Status 1.12 2003/09/08
+    With permission granted from Health Market Science, Inc.
+

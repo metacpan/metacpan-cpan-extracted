@@ -1,0 +1,14 @@
+
+
+# Array
+# Array/push
+# Array/push/should push an element
+not ok 1 - ok { join(' ', @a) eq 'a b c d e' };
+# HOGE
+# Hash
+# Hash/fetch
+# Hash/fetch/take the value
+not ok 2 - expect($h->{g})->to_be_true;
+# Hash/fetch/take the value
+not ok 3 - ok { $h->{g} };
+1..3

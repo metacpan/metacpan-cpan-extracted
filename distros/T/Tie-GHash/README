@@ -1,0 +1,42 @@
+NAME
+    Tie::GHash - A smaller hash
+
+SYNOPSIS
+      tie my %words, 'Tie::GHash';
+      my $i;
+      foreach (@words) {
+        $words{$_} = $i++;
+      }
+
+DESCRIPTION
+    This module provides an interface to the Gnome glib library's hashes,
+    which are smaller (although possibly slower) than Perl's internal
+    hashes.
+
+    Typically, Perl sacrifices memory for speed, and this is the case with
+    its built-in hashes. Occasionally, you have a need for a large in-memory
+    hash, where it would be useful to sacrifice speed for low memory usage.
+    This module provides that functionality.
+
+    Using "Tie::GHash" is very simple: just use the hash in exactly the same
+    way as you would use a normal Perl hash, with the exception that you
+    need to "tie" it before use as in the synopsis.
+
+    For example, reading in a typical /usr/share/dict/words using Perl's
+    built in hashes took up 8,672K. Doing the same with Tie::GHash took up
+    7,212K, albeit about six times slower due to the tie interface.
+
+NOTES
+    This module requires a recent version of the Inline library. This module
+    was created during Brian Ingerson's Inline talk at YAPC::NorthAmerica
+    2001 when he asked me to code something fun using Inline, so blame him.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2001, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

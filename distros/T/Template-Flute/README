@@ -1,0 +1,1138 @@
+NAME
+
+    Template::Flute - Modern designer-friendly HTML templating Engine
+
+VERSION
+
+    Version 0.025
+
+SYNOPSIS
+
+        use Template::Flute;
+    
+        my ($cart, $flute, %values);
+    
+        $cart = [{...},{...}];
+        $values{cost} = ...
+    
+        $flute = new Template::Flute(specification_file => 'cart.xml',
+                               template_file => 'cart.html',
+                               iterators => {cart => $cart},
+                               values => \%values,
+                               autodetect => {
+                                              disable => [qw/Foo::Bar/],
+                                             }
+                               );
+    
+        print $flute->process();
+
+DESCRIPTION
+
+    Template::Flute enables you to completely separate web design and
+    programming tasks for dynamic web applications.
+
+    Templates are designed to be designer-friendly; there's no inline code
+    or mini templating language for your designers to learn - instead,
+    standard HTML and CSS classes are used, leading to HTML that can easily
+    be understood and edited by WYSIWYG editors and hand-coding designers
+    alike.
+
+    An example is easier than a wordy description:
+
+    Given the following template snippet:
+
+        <div class="customer_name">Mr A Test</div>
+        <div class="customer_email">someone@example.com</div>
+
+    and the following specification:
+
+       <specification name="example" description="Example">
+            <value name="customer_name" />
+            <value name="email" class="customer_email" />
+        </specification>
+
+    Processing the above as follows:
+
+        $flute = Template::Flute->new(
+            template_file      => 'template.html',
+            specification_file => 'spec.xml',
+        );
+        $flute->set_values({
+            customer_name => 'Bob McTest',
+            email => 'bob@example.com',
+        });;
+        print $flute->process;
+
+    The resulting output would be:
+
+        <div class="customer_name">Bob McTest</div>
+        <div class="email">bob@example.com</div>
+
+    In other words, rather than including a templating language within your
+    templates which your designers must master and which could interfere
+    with previews in WYSIWYG tools, CSS selectors in the template are tied
+    to your data structures or objects by a specification provided by the
+    programmer.
+
+ Workflow
+
+    The easiest way to use Template::Flute is to pass all necessary
+    parameters to the constructor and call the process method to generate
+    the HTML.
+
+    You can also break it down in separate steps:
+
+    1. Parse specification
+
+      Parse specification based on your specification format (e.g with
+      Template::Flute::Specification::XML or
+      Template::Flute::Specification::Scoped.).
+
+          $xml_spec = new Template::Flute::Specification::XML;
+          $spec = $xml_spec->parse(q{<specification name="cart" description="Cart">
+               <list name="cart" class="cartitem" iterator="cart">
+               <param name="name" field="title"/>
+               <param name="quantity"/>
+               <param name="price"/>
+               </list>
+               <value name="cost"/>
+               </specification>});
+
+    2. Parse template
+
+      Parse template with Template::Flute::HTML object.
+
+          $template = new Template::Flute::HTML;
+          $template->parse(q{<html>
+              <head>
+              <title>Cart Example</title>
+              </head>
+              <body>
+              <table class="cart">
+              <tr class="cartheader">
+              <th>Name</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              </tr>
+              <tr class="cartitem">
+              <td class="name">Sample Book</td>
+              <td><input class="quantity" name="quantity" size="3" value="10"></td>
+              <td class="price">$1</td>
+              </tr>
+              <tr class="cartheader"><th colspan="2"></th><th>Total</th>
+              </tr>
+              <tr>
+              <td colspan="2"></td><td class="cost">$10</td>
+              </tr>
+              </table>
+              </body></html>},
+              $spec);
+
+    3. Produce HTML output
+
+          $flute = new Template::Flute(template => $template,
+                                     iterators => {cart => $cart},
+                                     values => {cost => '84.94'});
+          $flute->process();
+
+CONSTRUCTOR
+
+ new
+
+    Create a Template::Flute object with the following parameters:
+
+    specification_file
+
+      Specification file name.
+
+    specification_parser
+
+      Select specification parser. This can be either the full class name
+      like MyApp::Specification::Parser or the last part for classes
+      residing in the Template::Flute::Specification namespace.
+
+    specification
+
+      Specification object or specification as string.
+
+    template_file
+
+      HTML template file.
+
+    template
+
+      Template::Flute::HTML object or template as string.
+
+    filters
+
+      Hash reference of filter functions.
+
+    i18n
+
+      Template::Flute::I18N object.
+
+    translate_attributes
+
+      An arrayref of attribute names to translate. If the name has a dot,
+      it is interpreted as tagname + attribute, so placeholder" will
+      unconditionally translate all the placeholders, while
+      input.placeholder only the placeholder found on the input tag.
+
+      Additional dotted values compose conditions for attributes. E.g.
+      input.value.type.submit means all the value attributes with attribute
+      type set to submit.
+
+      Defaults to ['input.value.type.submit', 'placeholder']
+
+    iterators
+
+      Hash references of iterators.
+
+    values
+
+      Hash reference of values to be used by the process method.
+
+    auto_iterators
+
+      Builds iterators automatically from values.
+
+    autodetect
+
+      A configuration option. It should be an hashref with a key disable
+      and a value with an arrayref with a list of classes for objects which
+      should be considered plain hashrefs instead. Example:
+
+        my $flute = Template::Flute->new(....
+                                         autodetect => { disable => [qw/My::Object/] },
+                                         ....
+                                        );
+
+      Doing so, if you pass a value holding a My::Object object, and you
+      have a specification with something like this:
+
+        <specification>
+         <value name="name" field="object.method"/>
+        </specification>
+
+      The value will be $object-{method}>, not $object-$method>.
+
+      The object is checked with isa.
+
+      Classical example: Dancer::Session::Abstract.
+
+    uri
+
+      Base URI for your template. This adjusts the links in the HTML tags
+      a, base, img, link and script.
+
+    email_cids
+
+      This is meant to be used on HTML emails. When this is set to an hash
+      reference (which should be empty), the hash will be populated with
+      the following values:
+
+        cid1 => { filename => 'foo.png' },
+        cid2 => { filename => 'foo2.gif' },
+
+      and in the body the images src attribute will be replaced with
+      cid:cid1.
+
+      The cid names are arbitrary and assigned by the template. The code
+      should look at the reference values which were modified.
+
+    cids
+
+      Optional hashref with options for the CID replacement behaviour.
+
+      By default, if the source looks like an HTTP/HTTPS URI, the image
+      source is not altered and no CID is assigned.
+
+      If you pass a base_url value in this hashref, the URI matching it
+      will be converted to cids and the rest of the path will be added to
+      the email_cids hashref.
+
+      Example:
+
+          my $cids = {};
+          $flute = Template::Flute->new(template => $template,
+                                        specification => $spec,
+                                        email_cids => $cids,
+                                        cids => {
+                                                 base_url => 'http://example.com/'
+                                                });
+
+      Say the template contains images with source
+      http://example.com/image.png, the email_cids hashref will contain a
+      cid with filename "image.png".
+
+METHODS
+
+ BUILD
+
+    Force creation of template class as soon as object is instantiated.
+
+ process [HASHREF]
+
+    Processes HTML template, manipulates the HTML tree based on the
+    specification, values and iterators.
+
+    Returns HTML output.
+
+ process_template
+
+    Processes HTML template and returns Template::Flute::HTML object.
+
+ filter ELEMENT VALUE
+
+    Runs the filter used by ELEMENT on VALUE and returns the result.
+
+ value NAME
+
+    Returns the value for NAME.
+
+ set_values HASHREF
+
+    Sets hash reference of values to be used by the process method. Same as
+    passing the hash reference as values argument to the constructor.
+
+ template
+
+    Returns HTML template object, see Template::Flute::HTML for details.
+
+ specification
+
+    Returns specification object, see Template::Flute::Specification for
+    details.
+
+ patterns
+
+    Returns all patterns found in the specification.
+
+ scopes
+
+SPECIFICATION
+
+    The specification ties the elements in the HTML template to the data
+    (variables, lists, forms) which is added to the template.
+
+    The default format for the specification is XML implemented by the
+    Template::Flute::Specification::XML module. You can use the
+    Config::Scoped format implemented by
+    Template::Flute::Specification::Scoped module or write your own
+    specification parser class.
+
+ COMMON ATTRIBUTES
+
+    Common attributes for specification elements are:
+
+    name
+
+      Name of element.
+
+          <value name="dancefloor"/>
+
+    class
+
+      Class of corresponding elements in the HTML template.
+
+          <value name="dancefloor" class="dancefloor-link"/>
+
+      If this attribute is omitted, the value of the name attribute is used
+      to relate to the class in the HTML template.
+
+    id
+
+      Id of corresponding element in the HTML template. Overrides the class
+      attribute for the specification element.
+
+         <value name="dancefloor" id="dancefloor-link"/>
+
+    target
+
+      HTML attribute to fill the value instead of replacing the body of the
+      HTML element.
+
+         <value name="dancefloor" class="dancefloor-link" target="href"/>
+
+    joiner
+
+      String placed between the text and the appended value. The joiner
+      isn't added if the value is empty.
+
+ ELEMENTS
+
+    Possible elements in the specification are:
+
+    container
+
+      The first container is only shown in the output if the value
+      billing_address is set:
+
+        <container name="billing" value="billing_address" class="billingWrapper">
+        </container>
+
+      The second container is shown if the value warnings or the value
+      errors is set:
+
+        <container name="account_errors" value="warnings|errors" class="infobox">
+        <value name="warnings"/>
+        <value name="errors"/>
+        </container>
+
+    list
+
+    separator
+
+      Separator elements for list are added after any list item in the
+      output with the exception of the last one.
+
+      Example specification, HTML template and output:
+
+        <specification>
+        <list name="list" iterator="tokens">
+        <param name="key"/>
+        <separator name="sep"/>
+        </list>
+        </specification>
+      
+        <div class="list"><span class="key">KEY</span></div><span class="sep"> | </span>
+      
+        <div class="list"><span class="key">FOO</span></div><span class="sep"> | </span>
+        <div class="list"><span class="key">BAR</span></div>
+
+    param
+
+      Param elements are replaced with the corresponding value from the
+      list iterator.
+
+      The following operations are supported for param elements:
+
+      append
+
+	Appends the param value to the text found in the HTML template.
+
+      prepend
+
+	Prepends the param value to the text found in the HTML template.
+
+      target
+
+	The attribute to operate on. See below target for value for
+	details.
+
+      toggle
+
+	When the args attribute is set to tree, it doesn't interpolate
+	anything and just shows corresponding HTML element if param value
+	is set.
+
+	With target attribute, it simply toggles the target attribute.
+
+	Otherwise, if value is true, shows the HTML element and set its
+	content to the value. If value is false, removes the HTML element.
+
+	So, if your element has children elements, you probably want to use
+	the args="tree" attribute (see below for an example).
+
+      Other attributes for param elements are:
+
+      filter
+
+	Applies filter to param value.
+
+      increment
+
+	Uses value from increment instead of a value from the iterator.
+
+            <param name="pos" increment="1">
+
+    value
+
+      Value elements are replaced with a single value present in the values
+      hash passed to the constructor of this class or later set with the
+      set_values method.
+
+      The following operations are supported for value elements:
+
+      append
+
+	Appends the value to the text found in the HTML template.
+
+      prepend
+
+	Prepends the value to the text found in the HTML template.
+
+      hook
+
+	Insert HTML residing in value as subtree of the corresponding HTML
+	element. HTML will be parsed with XML::Twig. See "INSERT HTML" for
+	an example.
+
+      keep
+
+	Preserves the text inside of the HTML element if value is false in
+	the Perl sense.
+
+      toggle
+
+	Only shows corresponding HTML element if value is set.
+
+      Other attributes for value elements are:
+
+      target
+
+	Specify the attribute to operate on instead of the tag content. It
+	can be a named attribute (e.g., href), the wildcard character(*,
+	meaning all the attributes found in the HTML template), or a comma
+	separated list (e.g., alt,title).
+
+      filter
+
+	Applies filter to value.
+
+      include
+
+	Processes the template file named in this attribute. This implies
+	the hook operation. See "INCLUDE FILES" for more information.
+
+    form
+
+      Form elements are tied through specification to HTML forms.
+      Attributes for form elements in addition to class and id are:
+
+      link
+
+	The link attribute can only have the value name and allows to base
+	the relationship between form specification elements and HTML form
+	tags on the name HTML attribute instead of class, which is usually
+	more convenient.
+
+    input
+
+    filter
+
+    sort
+
+    i18n
+
+    skip
+
+      This attribute (which can be provided to param or value specification
+      elements) supports the following values:
+
+      empty
+
+	Do not replace the template string if the value or parameter is
+	undefined, empty or just whitespace.
+
+	E.g.
+
+         <value name="cartline" skip="empty"/>
+         <list name="items" iterator="items">
+           <param name="category" skip="empty"/>
+         </list>
+
+    pattern
+
+      You can define patterns in your specification to interpolate the
+      strings instead of replacing them.
+
+      A pattern is defined by the attributes name and type and its content.
+      type can be only string or regexp.
+
+      The interpolation happens if the value and param elements of the
+      specification have an attribute pattern set with the pattern's name.
+
+      Given this HTML:
+
+       <p class="cartline">There are 123 items in your shopping cart.</p>
+       <ul>
+         <li class="items">
+           <span class="number">1</span>
+           <span class="category">in category 123</span>
+         </li>
+       </ul>
+
+      And this specification:
+
+       <specification>
+       <pattern name="pxt" type="string">123</pattern>
+       <list name="items" iterator="items">
+         <param name="number"/>
+         <param name="category" pattern="pxt"/>
+       </list>
+       <value name="cartline" pattern="pxt"/>
+       </specification>
+
+      In this example, in the cartline and category classes' text, only the
+      template text "123" will be replaced by the value, not the whole
+      element content, yielding such output:
+
+       <p class="cartline">There are 42 items in your shopping cart.</p>
+       <ul>
+        <li class="items">
+         <span class="number">1</span>
+         <span class="category">in category tofu</span>
+        </li>
+        <li class="items">
+         <span class="number">2</span>
+         <span class="category">in category pizza</span>
+        </li>
+       </ul>
+
+      Note: All matches of the pattern are subject to replacement, starting
+      with version 0.025.
+
+SIMPLE OPERATORS
+
+ append
+
+    Appends the value to the text inside a HTML element or to an attribute
+    if target has been specified. This can be used in value and param
+    specification elements.
+
+    The example shows how to add a HTML class to elements in a list:
+
+    HTML:
+
+        <ul class="nav-sub">
+            <li class="category"><a href="" class="catname">Medicine</a></li>
+        </ul>
+
+    XML:
+
+        <specification>
+            <list name="category" iterator="categories">
+                <param name="name" class="catname"/>
+                <param name="catname" field="uri" target="href"/>
+                <param name="css" class="catname" target="class" op="append" joiner=" "/>
+            </list>
+        </specification>
+
+CONTAINERS
+
+    Conditional processing like IF or ELSE is done with the help of
+    containers.
+
+ Display image only if present
+
+    In this example we want to show an image only on a certain condition:
+
+    HTML:
+
+        <span class="banner-box">
+            <img class="banner" src=""/>
+        </span>
+
+    XML:
+
+        <container name="banner-box" value="banner">
+            <value name="banner" target="src"/>
+        </container>
+
+    Source code:
+
+        if ($organization eq 'Big One') {
+            $values{banner} = 'banners/big_one.png';
+        }
+
+ Display link in a list only if present
+
+    In this example we want so show a link only if an URL is available:
+
+    HTML:
+
+        <div class="linklist">
+            <span class="name">Name</span>
+            <div class="link">
+                <a href="#" class="url">Goto ...</a>
+            </div>
+        </div>
+
+    XML:
+
+        <specification name="link">
+            <list name="links" class="linklist" iterator="links">
+                <param name="name"/>
+                <param name="url" target="href"/>
+                <container name="link" class="link" value="url"/>
+            </list>
+        </specification>
+
+    Source code:
+
+       @records = ({name => 'Link', url => 'http://localhost/'},
+                   {name => 'No Link'},
+                   {name => 'Another Link', url => 'http://localhost/'},
+                  );
+    
+       $flute = Template::Flute->new(specification => $spec_xml,
+                                     template => $template,
+                                     iterators => {links => \@records});
+    
+       $output = $flute->process();
+
+ITERATORS
+
+    Template::Flute uses iterators to retrieve list elements and insert
+    them into the document tree. This abstraction relieves us from worrying
+    about where the data actually comes from. We basically just need an
+    array of hash references and an iterator class with a next and a count
+    method. For your convenience you can create an iterator from
+    Template::Flute::Iterator class very easily.
+
+ DROPDOWNS
+
+    Iterators can be used for dropdowns (HTML <select> elements) as well.
+
+    Template:
+
+        <select class="color"></select>
+
+    Specification:
+
+        <value name="color" iterator="colors"/>
+
+    Code:
+
+        @colors = ({value => 'red', label => 'Red'},
+                   {value => 'black', label => 'Black'});
+    
+        $flute = Template::Flute->new(template => $html,
+                                  specification => $spec,
+                                  iterators => {colors => \@colors},
+                                  values => {color => 'black'},
+                                 );
+
+    HTML output:
+
+          <select class="color">
+          <option value="red">Red</option>
+          <option value="black" selected="selected">Black</option>
+          </select>
+
+  Default value for dropdowns
+
+    You can specify the dropdown item which is selected by default with the
+    iterator_default) attribute.
+
+    Template:
+
+        <select class="color"></select>
+
+    Specification:
+
+        <value name="color" iterator="colors" iterator_default="black"/>
+
+    Code:
+
+        @colors = ({value => 'red', label => 'Red'},
+                   {value => 'black', label => 'Black'});
+    
+        $flute = Template::Flute->new(template => $html,
+                                  specification => $spec,
+                                  iterators => {colors => \@colors},
+                                 );
+
+    HTML output:
+
+          <select class="color">
+          <option value="red">Red</option>
+          <option value="black" selected="selected">Black</option>
+          </select>
+
+  Custom iterators for dropdowns
+
+    By default, the iterator for a dropdown is an arrayref of hashrefs with
+    two hardcoded keys: value and (optionally) label. You can override this
+    behaviour in the specification with iterator_value_key and
+    iterator_name_key to use your own hashref's keys from the iterator,
+    instead of value and label.
+
+    Specification:
+
+      <specification>
+        <value name="color" iterator="colors"
+               iterator_value_key="code" iterator_name_key="name"/>
+      </specification>
+
+    Template:
+
+      <html>
+       <select class="color">
+       <option value="example">Example</option>
+       </select>
+      </html>
+
+    Code:
+
+      @colors = ({code => 'red', name => 'Red'},
+                 {code => 'black', name => 'Black'},
+                );
+    
+      $flute = Template::Flute->new(template => $html,
+                                    specification => $spec,
+                                    iterators => {colors => \@colors},
+                                    values => { color => 'black' },
+                                   );
+    
+      $out = $flute->process();
+
+    Output:
+
+      <html>
+       <head></head>
+       <body>
+        <select class="color">
+         <option value="red">Red</option>
+         <option selected="selected" value="black">Black</option>
+        </select>
+       </body>
+      </html>
+
+  Limit lists
+
+    Sometimes you may wish to limit the number or iterations through you
+    list.
+
+    Specification:
+
+        <specification>
+            <list name="images" iterator="images" limit="1">
+                <param name="image" target="src" field="image_url" />
+            </list>
+        </specification>
+
+    Template:
+
+        <div class="images">
+            <img class="image" src="/images/bottle.jpg" />
+        </div>
+
+    Code:
+
+        $images = [
+            { image_url => '/images/bottle1.jpg' },
+            { image_url => '/images/bottle2.jpg' },
+            { image_url => '/images/bottle3.jpg' },
+        ];
+    
+        $flute = Template::Flute->new(
+            template      => $html,
+            specification => $spec,
+            values        => { images => $images },
+        );
+    
+        $out = $flute->process;
+
+    Output:
+
+        <html><head></head><body>
+            <div class="images">
+                <img class="image" src="/images/bottle1.jpg" />
+            </div>
+        </body></html>
+
+LISTS
+
+    Lists can be accessed after parsing the specification and the HTML
+    template through the HTML template object:
+
+        $flute->template->lists();
+    
+        $flute->template->list('cart');
+
+    Only lists present in the specification and the HTML template can be
+    addressed in this way.
+
+    See Template::Flute::List for details about lists.
+
+OBJECTS AND STRUCTURES
+
+    You can pass objects and hashrefs as values. To access a key or an
+    accessor, you have to use a dotted notation with field. An example for
+    both hashrefs and objects follows.
+
+    Specification:
+
+      <specification>
+       <value name="object" field="myobject.method" />
+       <value name="struct" field="mystruct.key" />
+      </specification>
+
+    HTML:
+
+      <html>
+        <body>
+          <span class="object">Welcome back!</span>
+          <span class="struct">Another one</span>
+        </body>
+      </html>
+
+    Code:
+
+      package My::Object;
+      sub new {
+          my $class = shift;
+          bless {}, $class;
+      }
+      sub method {
+          return "Hello from the method";
+      }
+      package main;
+      my $flute = Template::Flute->new(
+          specification => $spec,
+          template => $html,
+          values => {
+              myobject => My::Object->new,
+              mystruct => { key => "Hello from hash" },
+             }
+         );
+
+    process will return:
+
+      <html>
+        <head></head>
+        <body>
+          <span class="object">Hello from the method</span>
+          <span class="struct">Hello from hash</span>
+        </body>
+      </html>
+
+    Sometimes you need to treat an object like an hashref. How to do that
+    is explained under the autodetect option for the constructor.
+
+FORMS
+
+    Forms can be accessed after parsing the specification and the HTML
+    template through the HTML template object:
+
+        $flute->template->forms();
+    
+        $flute->template->form('edit_content');
+
+    Only forms present in the specification and the HTML template can be
+    addressed in this way.
+
+    See Template::Flute::Form for details about forms.
+
+FILTERS
+
+    Filters are used to change the display of value and param elements in
+    the resulting HTML output:
+
+        <value name="billing_address" filter="eol"/>
+    
+        <param name="price" filter="currency"/>
+
+    The following filters are included:
+
+    upper
+
+      Uppercase filter, see Template::Flute::Filter::Upper.
+
+    strip
+
+      Strips whitespace at the beginning at the end, see
+      Template::Flute::Filter::Strip.
+
+    eol
+
+      Filter preserving line breaks, see Template::Flute::Filter::Eol.
+
+    nobreak_single
+
+      Filter replacing missing text with no-break space, see
+      Template::Flute::Filter::NobreakSingle.
+
+    currency
+
+      Currency filter, see Template::Flute::Filter::Currency. Requires
+      Number::Format module.
+
+    date
+
+      Date filter, see Template::Flute::Filter::Date. Requires DateTime and
+      DateTime::Format::ISO8601 modules.
+
+    country_name
+
+      Country name filter, see Template::Flute::Filter::CountryName.
+      Requires Locales module.
+
+    language_name
+
+      Language name filter, see Template::Flute::Filter::LanguageName.
+      Requires Locales module.
+
+    json_var
+
+      JSON to Javascript variable filter, see
+      Template::Flute::Filter::JsonVar. Requires JSON module.
+
+    lower_dash
+
+      Replaces spaces with dashes (-) and makes lowercase. see
+      Template::Flute::Filter::LowerDash.
+
+    markdown
+
+      Turns text in Markdown format into HTML. see
+      Template::Flute::Filter::Markdown.
+
+    Filter classes are loaded at runtime for efficiency and to keep the
+    number of dependencies for Template::Flute as small as possible.
+
+    See above for prerequisites needed by the included filter classes.
+
+ Chained Filters
+
+    Filters can also be chained:
+
+        <value name="note" filter="upper eol"/>
+
+    Example template:
+
+        <div class="note">
+            This is a note.
+        </div>
+
+    With the following value:
+
+        Update now!
+        Avoid security hazards!
+
+    The HTML output would look like:
+
+        <div class="note">
+        UPDATE NOW!<br />
+        AVOID SECURITY HAZARDS!
+        </div>
+
+INSERT HTML AND INCLUDE FILES
+
+ INSERT HTML
+
+    HTML can be generated in the code or retrieved from a database and
+    inserted into the template through the hook operation:
+
+        <value name="description" op="hook"/>
+
+    The result replaces the inner HTML of the following div tag:
+
+        <div class="description">
+            Sample content
+        </div>
+
+ INCLUDE FILES
+
+    Files, especially components for web pages can be processed and
+    included through value elements with the include attribute:
+
+        <value name="sidebar" include="component.html"/>
+
+    The result replaces the inner HTML of the following div tag:
+
+        <div class="sidebar">
+            Sample content
+        </div>
+
+INSTALLATION
+
+    Template::Flute can be installed from the latest release on CPAN, or if
+    you wish for the very latest version, you can also install from the
+    sources on GitHub.
+
+ FROM CPAN
+
+    To install from CPAN, simply use the cpanm utility:
+
+        $ cpanm Template::Flute
+
+ FROM SOURCE
+
+    To install from source, first clone the repository, install the
+    required dependencies, and build:
+
+        $ git clone https://github.com/racke/Template-Flute
+        $ cd Template-Flute
+        $ cpanm --installdeps .
+        $ perl Makefile.PL
+        $ make
+        $ make test     # optional, but still a good idea
+        $ make install
+
+AUTHOR
+
+    Stefan Hornburg (Racke), <racke@linuxia.de>
+
+BUGS
+
+    Please report any bugs or feature requests at
+    https://github.com/racke/Template-Flute/issues.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Template::Flute
+
+    You can also look for information at:
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Template-Flute
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Template-Flute
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Template-Flute/
+
+ACKNOWLEDGEMENTS
+
+    Thanks to Nitish Bezzala (GH #157).
+
+    Thanks to Mohammad S Anwar (GH #156).
+
+    Thanks to Paul Cochrane for his tremendous amount of pull requests
+    issued during the GitHub challenge.
+
+    Thanks to Peter Mottram (GH #81, #87).
+
+    Thanks to William Carr (GH #86, #91).
+
+    Thanks to David Precious (bigpresh) for writing a much clearer
+    introduction for Template::Flute.
+
+    Thanks to Grega Pompe for proper implementation of nested lists and a
+    documentation fix.
+
+    Thanks to Jeff Boes for spotting a typo in the documentation of the
+    Template::Flute::Filter::JsonVar class.
+
+    Thanks to Ton Verhagen for being a big supporter of my projects in all
+    aspects.
+
+    Thanks to Sam Batschelet (GH #14, #93).
+
+    Thanks to Terrence Brannon for spotting a documentation mix-up.
+
+HISTORY
+
+    Template::Flute was initially named Template::Zoom. I renamed the
+    module because of a request from Matt S. Trout, author of the
+    HTML::Zoom module.
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2010-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

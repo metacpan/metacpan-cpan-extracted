@@ -1,0 +1,24 @@
+NAME
+    Template::Plugin::Capture - TT Plugin to capture FILTER block
+
+SYNOPSIS
+        [% USE Capture %]
+        [% FILTER capture('block1') %]
+        blah, blah, blah
+        [% END %] # nothings output
+        [% block1 %]
+        # output "blah, blah, blah"
+
+DESCRIPTION
+    Template::Plugin::Capture is a plugin for TT, which allows you to
+    capture FILTER block in templates.
+
+AUTHOR
+    Jiro Nishiguchi <jiro@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Template
+

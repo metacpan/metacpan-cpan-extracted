@@ -1,0 +1,39 @@
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+
+# This file is part of Time-Duration-Locale.
+#
+# Time-Duration-Locale is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Time-Duration-Locale is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Time-Duration-Locale.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libtime-duration-locale-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.8
+Homepage: http://user42.tuxfamily.org/time-duration-locale/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libtime-duration-locale-perl
+Architecture: all
+Depends: perl (>= 5.005), libclass-singleton-perl, libi18n-langtags-perl (>= 0.30) | perl (>= 5.10), libi18n-langtags-detect-perl | perl (>= 5.8.5), libtime-duration-perl, libmodule-load-perl | perl (>= 5.10), ${perl:Depends}, ${misc:Depends}
+Suggests: libtime-duration-fr-perl, libtime-duration-ja-perl, libtime-duration-pt-perl, libtime-duration-sv-perl
+Description: Time::Duration from locale settings
+ Time::Duration::Locale selects a language-specific sub-module of
+ Time::Duration according to the user's locale settings or a
+ programmatic language selection.

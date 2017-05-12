@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+SIGNATURE
+eg/solicit
+lib/Term/CallEditor.pm
+t/1.t
+t/interactive.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,22 @@
+=encoding UTF-8
+
+=head1 Title
+
+This is a Pod document
+
+=head1 Description
+
+This is where we have a précis describing stuff, you know?
+
+And now, for some Japanese.
+
+萎衣謂違遺医井亥域育郁磯一壱溢逸稲茨芋鰯允印咽員因姻引飲淫胤蔭
+
+Now some verbatim text:
+
+  -- Provide a comment
+  SELECT *
+    FROM users
+   WHERE nickname = 'theory';
+
+The end.

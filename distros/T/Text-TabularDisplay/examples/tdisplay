@@ -1,0 +1,56 @@
+#!/usr/bin/perl -l
+
+use strict;
+use vars qw($VERSION);
+use vars qw($t $data @data $re);
+use vars qw(@f $help $separator);
+
+$VERSION = "1.00";
+
+use Getopt::Long;
+use Text::TabularDisplay;
+
+GetOptions("f=s" => \@f,
+           "h!" => \$help,
+           "s=s" => \$separator);
+
+if (defined $help) {
+    print usage();
+    exit 0;
+}
+
+$separator = '\s' unless defined $separator;
+$re = qr($separator);
+
+$t = Text::TabularDisplay->new;
+
+chomp($data = <STDIN>);
+
+@data = split $re, $data;
+
+@f = split /,/, $f[0] if (@f == 1);
+@f = (0 .. $#data) unless (@f);
+
+$t->columns(@data[@f]);
+
+while (defined($data = <STDIN>)) {
+    chomp $data;
+    @data = split $re, $data;
+    $t->add(@data[@f]) 
+}
+
+print $t->render;
+
+sub usage {
+    require File::Basename;
+    my $prog = File::Basename::basename($0);
+    return <<"USAGE";
+$prog v.$VERSION
+$prog [-s \$separator] [-f fields] < data
+
+data should be a series of \$separator-delimited lines,
+which will be displayed in a table, of which the fields
+defined by -f will be displayed (defaults to all fields).
+
+USAGE
+}

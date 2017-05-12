@@ -1,0 +1,49 @@
+---
+abstract: 'A Test::Reporter::HTTPGateway using the power of POE'
+author:
+  - 'Apocalypse <APOCAL@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Reporter-POEGateway
+provides:
+  Test::Reporter::POEGateway:
+    file: lib/Test/Reporter/POEGateway.pm
+    version: 0.04
+  Test::Reporter::POEGateway::Mailer:
+    file: lib/Test/Reporter/POEGateway/Mailer.pm
+    version: 0.04
+  Test::Reporter::POEGateway::Mailer::SMTP:
+    file: lib/Test/Reporter/POEGateway/Mailer/SMTP.pm
+    version: 0.04
+recommends:
+  Authen::SASL: 0
+  Net::SMTP::SSL: 0
+requires:
+  Digest::SHA1: 0
+  Email::MessageID: 0
+  Email::Simple: 0
+  File::Copy: 0
+  File::Spec: 0
+  HTTP::Request::Params: 0
+  Net::SMTP: 0
+  POE: 0
+  POE::Component::DirWatch: 0
+  POE::Component::Server::SimpleHTTP: 0
+  POE::Filter::Line: 0
+  POE::Filter::Reference: 0
+  POE::Session::AttributeBased: 0.09
+  POE::Wheel::Run: 0
+  YAML::Tiny: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Reporter-POEGateway
+  homepage: http://search.cpan.org/dist/Test-Reporter-POEGateway
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/apocalypse/perl-test-reporter-poegateway
+version: 0.04

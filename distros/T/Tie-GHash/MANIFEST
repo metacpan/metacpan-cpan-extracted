@@ -1,0 +1,9 @@
+Changes
+GHash.pm
+MANIFEST
+Makefile.PL
+README
+examples/bench.pl
+examples/ghash.pl
+examples/perl.pl
+t/simple.t

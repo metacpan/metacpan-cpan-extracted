@@ -1,0 +1,54 @@
+<html>
+<head>
+  <title>TLフレームワークサンプル</title>
+</head>
+<body>
+TLフレームワークのサンプルです．<br>
+<br>
+SEO クラスを使って，フォームの送信内容を URL に変換して表示します．<br>
+内容の表示の下には，同じ内容を表示する URL を，Form クラスの toLink メソッドと SEO 対策機能を使って表示しています．<br>
+リンクとリンクの表示は同じにしていますが，SEO機能によってリンク先のURLが自動的に書き換えられます．<br>
+<br>
+また，書き換えられたURLでも，フォームをデコードできるようにします．<br>
+<br>
+<dl>
+<!begin:formitem>
+<dt><&KEY>
+<dd><&VALUE>
+<!end:formitem>
+</dl>
+<hr>
+<!begin:formlink>
+普通にリンクを表示した場合，以下のように変化はありません．<br>
+<a href="<&FORMLINK>"><&FORMLINK></a><br>
+<br>
+SEO=1を含むリンクを表示した場合，以下のように文字列中のURLはSEO対策がされていないものになりますが，Aタグの中のリンク先はSEO対策が施されます．<br>
+<a href="<&SEOFORMLINK>"><&SEOFORMLINK></a><br>
+<br>
+SEO対策を行ったリンクを表示したい場合，SEOフィルタの機能でリンクを生成することで，書き換えられるリンクと同じ文字列を得られます．<br>
+<a href="<&SEOFORMLINK>"><&SEOFORMLINKSTR></a><br>
+<br>
+<!end:formlink>
+<hr>
+<form action="" method="get">
+TEXT: <input type="text" name="text" value=""><br>
+PASSWORD: <input type="password" name="password" value=""><br>
+RADIO: <input type="radio" name="radio" value="1">1
+  <input type="radio" name="radio" value="2">2
+  <input type="radio" name="radio" value="3">3<br>
+CHECKBOX: <input type="checkbox" name="checkbox" value="1">1
+  <input type="checkbox" name="checkbox" value="2">2
+  <input type="checkbox" name="checkbox" value="3">3<br>
+SELECT: <select name="select">
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+</select><br>
+TEXTAREA: <br>
+  <textarea name="textarea" rows=3 cols=40></textarea><br>
+<input type="submit" name="submit" value="submit"><br>
+</form>
+
+</body>
+</html>
+

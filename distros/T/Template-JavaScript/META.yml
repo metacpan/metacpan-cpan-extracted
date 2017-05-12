@@ -1,0 +1,37 @@
+---
+abstract: 'A templating engine using the L<JavaScript::V8> module'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Slurp: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  FindBin: 0
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-JavaScript
+no_index:
+  directory:
+    - t
+requires:
+  Any::Moose: 0
+  JavaScript::V8: 0
+  JavaScript::Value::Escape: 0
+  Template: 0
+  perl: v5.010.1
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Template-JavaScript
+  homepage: http://search.cpan.org/dist/Template-JavaScript/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/avar/template-javascript.git
+version: 0.01
+x_authority: cpan:AVAR

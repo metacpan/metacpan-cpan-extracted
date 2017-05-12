@@ -1,0 +1,475 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "perfmon", "lmbench"
+
+- schema: Testrun
+  name: perfmon
+  data:
+    id: 23
+    owner_id: 12
+    shortname: perfmon
+    notes: perfmon
+    topic_name: Software
+
+- schema: TestrunScheduling
+  name: Xen-aaa3
+  data:
+    id: 100
+    testrun_id: 23
+    host_id: 7
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: tapper-tools
+  data:
+    id: 1
+    shortname: test_double
+    precondition: |
+        guests: 
+          - 
+            config: 
+              exec: /virt/guest-start-1.sh
+            preconditions: 
+              - 
+                dest: /
+                name: /data/tapper/autoreport/*
+                precondition_type: copyfile
+                protocol: local
+              - precondition_type: testprogram
+                program: /opt/tapper/bin/tapper_testsuite/py_edac
+                timeout: 900
+            root: 
+              arch: linux64
+              dest: /virt/guest-1.img
+              mountfile: /virt/guest-1-auxiliary.img
+              mounttype: raw
+              name: osko:/export/image_files/official_testing/redhat_rhel6u2_rc_64b_raw.img
+              precondition_type: copyfile
+              protocol: nfs
+            testprogram_list: 
+              - 
+                chdir: AUTO
+                program: /mnt/tapper/xen-osvw.sh
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - ctcs
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - lmbench
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - aoistress
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - hackbench
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+          - 
+            config: 
+              exec: /virt/guest-start-2.sh
+            preconditions: 
+              - 
+                dest: /
+                name: /data/tapper/autoreport/*
+                precondition_type: copyfile
+                protocol: local
+            root: 
+              arch: linux64
+              dest: /virt/guest-2.img
+              mountfile: /virt/guest-2-auxiliary.img
+              mounttype: raw
+              name: osko:/export/image_files/official_testing/suse_sles11_sp2_b9_64b_raw.img
+              precondition_type: copyfile
+              protocol: nfs
+            testprogram_list: 
+              - 
+                chdir: AUTO
+                program: /mnt/tapper/xen-osvw.sh
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - ctcs
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - lmbench
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - aoistress
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - hackbench
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+          - 
+            config: 
+              exec: /virt/guest-start-3.sh
+            preconditions: 
+              - 
+                dest: /
+                name: /data/tapper/autoreport/*
+                precondition_type: copyfile
+                protocol: local
+            root: 
+              arch: linux64
+              dest: /virt/guest-3.img
+              mountfile: /virt/guest-3-auxiliary.img
+              mounttype: raw
+              name: osko:/export/image_files/official_testing/redhat_rhel6u2_rc_64b_raw.img
+              precondition_type: copyfile
+              protocol: nfs
+            testprogram_list: 
+              - 
+                chdir: AUTO
+                program: /mnt/tapper/xen-osvw.sh
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - ctcs
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - lmbench
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - aoistress
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+              - 
+                environment: 
+                  http_proxy: http://gwo:3128
+                  https_proxy: http://gwo:3128
+                parameters: 
+                  - --source_url
+                  - file:///data/tapper/live/repository/packages/autotest/renormalist-autotest-039effb.tar.gz
+                  - --test
+                  - hackbench
+                program: /opt/tapper/bin/tapper-testsuite-autotest
+                timeout: 10800
+        host: 
+          preconditions: 
+            - 
+              filename: xen/sles11/x86_64/xen-unstable-pvops/xen-unstable-pvops.2012-03-01.24859_a88ba599add1.x86_64.tgz
+              precondition_type: package
+            - 
+              filename: tapperutils/sles10/xen_installer_suse.tar.gz
+              precondition_type: package
+            - 
+              filename: /bin/xen_install.sh
+              options: 
+                - pvops
+              precondition_type: exec
+            - 
+              dest: /
+              name: /data/tapper/live/repository/testprograms/utilities/*
+              precondition_type: copyfile
+              protocol: local
+            - 
+              dest: /virt/
+              name: /data/tapper/autoreport/tapper-autoreport
+              precondition_type: copyfile
+              protocol: local
+            - 
+              dest: /virt/guest-start-1.sh
+              name: /data/tapper/live/testplan/topic/xen/generic/guest-start-template.sh
+              precondition_type: copyfile
+              protocol: local
+            - 
+              dest: /virt/guest-1.svm
+              name: /data/tapper/live/testplan/topic/xen/generic/guest-template.svm
+              precondition_type: copyfile
+              protocol: local
+            - 
+              filename: /usr/bin/perl
+              options: 
+                - -pni
+                - -e
+                - "'s{__DISKTEMPLATE1__}{/virt/guest-__GUESTNR__.img,raw,hda,w}g; s{__DISKTEMPLATE2__}{/virt/guest-__GUESTNR__-auxiliary.img,raw,hdb,w}g; s/__GUESTNR__/1/g; s/__GUESTNAME__/redhat_rhel6u2_rc_64b_raw.img/g; s/__GUESTMEMORY__/1024/g; s/__GUESTVCPUS__/2/g'"
+                - /virt/guest-start-1.sh
+                - /virt/guest-1.svm
+              precondition_type: exec
+            - 
+              dest: /virt/
+              name: /data/tapper/autoreport/tapper-autoreport
+              precondition_type: copyfile
+              protocol: local
+            - 
+              dest: /virt/guest-start-2.sh
+              name: /data/tapper/live/testplan/topic/xen/generic/guest-start-template.sh
+              precondition_type: copyfile
+              protocol: local
+            - 
+              dest: /virt/guest-2.svm
+              name: /data/tapper/live/testplan/topic/xen/generic/guest-template.svm
+              precondition_type: copyfile
+              protocol: local
+            - 
+              filename: /usr/bin/perl
+              options: 
+                - -pni
+                - -e
+                - "'s{__DISKTEMPLATE1__}{/virt/guest-__GUESTNR__.img,raw,hda,w}g; s{__DISKTEMPLATE2__}{/virt/guest-__GUESTNR__-auxiliary.img,raw,hdb,w}g; s/__GUESTNR__/2/g; s/__GUESTNAME__/suse_sles11_sp2_b9_64b_raw.img/g; s/__GUESTMEMORY__/1024/g; s/__GUESTVCPUS__/2/g'"
+                - /virt/guest-start-2.sh
+                - /virt/guest-2.svm
+              precondition_type: exec
+            - 
+              dest: /virt/
+              name: /data/tapper/autoreport/tapper-autoreport
+              precondition_type: copyfile
+              protocol: local
+            - 
+              dest: /virt/guest-start-3.sh
+              name: /data/tapper/live/testplan/topic/xen/generic/guest-start-template.sh
+              precondition_type: copyfile
+              protocol: local
+            - 
+              dest: /virt/guest-3.svm
+              name: /data/tapper/live/testplan/topic/xen/generic/guest-template.svm
+              precondition_type: copyfile
+              protocol: local
+            - 
+              filename: /usr/bin/perl
+              options: 
+                - -pni
+                - -e
+                - "'s{__DISKTEMPLATE1__}{/virt/guest-__GUESTNR__.img,raw,hda,w}g; s{__DISKTEMPLATE2__}{/virt/guest-__GUESTNR__-auxiliary.img,raw,hdb,w}g; s/__GUESTNR__/3/g; s/__GUESTNAME__/redhat_rhel6u2_rc_64b_raw.img/g; s/__GUESTMEMORY__/1024/g; s/__GUESTVCPUS__/2/g'"
+                - /virt/guest-start-3.sh
+                - /virt/guest-3.svm
+              precondition_type: exec
+            - 
+              dest: /
+              name: /data/tapper/autoreport/*
+              precondition_type: copyfile
+              protocol: local
+            - 
+              dest: /
+              name: /data/tapper/autoreport/*
+              precondition_type: copyfile
+              protocol: local
+          root: 
+            arch: linux64
+            image: suse/sles11_sp1_x86-64_baseimage.new_3.tgz
+            mount: /
+            partition: /dev/sda2
+            precondition_type: image
+          testprogram_list: 
+            - 
+              chdir: AUTO
+              program: /data/tapper/autoreport/metainfo.sh
+            - 
+              program: /power_msr_test.sh
+            - 
+              program: /xen-core-pair-check.sh
+        name: xen_host:MULTI_guest:MULTI
+        precondition_type: virt
+
+
+- schema: TestrunPrecondition
+  name: 1st precondition for lmbench
+  data:
+    testrun_id: 23
+    precondition_id: 1
+    succession: 1
+
+
+
+
+- schema: Host
+  name: iring
+  data:
+    id: 5
+    name: iring
+    free: 1
+    active: 1
+
+- schema: Host
+  name: bullock
+  data:
+    id: 6
+    name: bullock
+    free: 1
+    active: 1
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 7
+    name: dickstone
+    free: 1
+    active: 1
+
+- schema: Host
+  name: nosuchhost
+  data:
+    id: 8
+    name: nosuchhost
+    free: 0
+    active: 0
+
+
+# ---------------- HostFeature ------------
+
+- schema: HostFeature
+  name: dickstone_ram
+  data:
+    id: 1
+    host_id: 7
+    entry: mem
+    value: 4096
+
+- schema: HostFeature
+  name: dickstone_vendor
+  data:
+    id: 2
+    host_id: 7
+    entry: vendor
+    value: AMD
+
+- schema: HostFeature
+  name: dickstone_cores
+  data:
+    id: 3
+    host_id: 7
+    entry: cores
+    value: 2
+
+- schema: HostFeature
+  name: dickstone_ram
+  data:
+    id: 4
+    host_id: 7
+    entry: keyword
+    value: server
+
+- schema: HostFeature
+  name: iring_ram
+  data:
+    id: 5
+    host_id: 5
+    entry: mem
+    value: 8192
+
+- schema: HostFeature
+  name: iring_vendor
+  data:
+    id: 6
+    host_id: 5
+    entry: vendor
+    value: Intel
+
+- schema: HostFeature
+  name: iring_cores
+  data:
+    id: 7
+    host_id: 5
+    entry: cores
+    value: 1
+
+- schema: HostFeature
+  name: iring_ram
+  data:
+    id: 8
+    host_id: 5
+    entry: keyword
+    value: testmachine
+

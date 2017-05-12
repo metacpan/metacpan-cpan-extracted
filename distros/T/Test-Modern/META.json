@@ -1,0 +1,99 @@
+{
+   "abstract" : "precision testing for modern perl",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Modern",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "recommends" : {
+            "CPAN::Meta::Requirements" : "2.000"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "suggests" : {
+            "Dist::Inkt::Profile::TOBYINK" : "0.023"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::LongString" : "0.15"
+         },
+         "requires" : {
+            "Exporter::Tiny" : "0.030",
+            "Import::Into" : "1.002000",
+            "Module::Runtime" : "0.012",
+            "Test::API" : "0.004",
+            "Test::Deep" : "0.111",
+            "Test::Fatal" : "0.007",
+            "Test::More" : "0.96",
+            "Test::Warnings" : "0.009",
+            "Try::Tiny" : "0.15",
+            "perl" : "5.006001"
+         },
+         "suggests" : {
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Version" : "0"
+         }
+      },
+      "test" : {
+         "conflicts" : {
+            "Local::I::Doubt::This::Exists::Either" : "0",
+            "Local::This::Probably::Does::Not::Exist" : "0",
+            "Moose::This::Should::Not::Be::A::Real::Package" : "0"
+         },
+         "recommends" : {
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Modern" : {
+         "file" : "lib/Test/Modern.pm",
+         "version" : "0.013"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Test-Modern"
+      },
+      "homepage" : "https://metacpan.org/release/Test-Modern",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-test-modern.git",
+         "web" : "https://github.com/tobyink/p5-test-modern"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Test-Modern/project"
+   },
+   "version" : "0.013"
+}

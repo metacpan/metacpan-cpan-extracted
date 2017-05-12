@@ -1,0 +1,236 @@
+NAME
+    Tk::WorldCanvas - Autoscaling Canvas widget with zoom, viewAll, viewArea, viewFit, and center.
+
+SYNOPSIS
+        $worldcanvas = $parent->WorldCanvas(?options?);
+
+DESCRIPTION
+    This module is a wrapper around the Canvas widget that maps the user's coordinate system to the now mostly hidden coordinate system
+    of the Canvas widget. In world coordinates the y-axis increases in the upward direction.
+
+    *WorldCanvas* is meant to be a replacement for Canvas. It's not quite a "drop in" replacement though because the y-axis is inverted
+    compared to Canvas. Usually to convert you will have to invert all y-coordinates used to create objects. Typically, you should call
+    $worldcanvas->viewAll (or $worldcanvas->viewArea(@box)) before calling MainLoop.
+
+    Most of the *WorldCanvas* methods are the same as the *Canvas* methods except that they accept and return world coordinates instead
+    of widget coordinates.
+
+INSTALLATION
+        Standard method:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+        The last step requires proper permissions.
+
+        Or you can copy the WorldCanvas.pm file to a local directory and
+        skip the formalities.
+
+NEW METHODS
+    *$worldcanvas*->zoom(*zoom factor*)
+        Zooms the display by the specified amount. Example:
+
+            $worldcanvas->CanvasBind('<i>' => sub {$worldcanvas->zoom(1.25)});
+            $worldcanvas->CanvasBind('<o>' => sub {$worldcanvas->zoom(0.8)});
+
+            # If you are using the 'Scrolled' constructor as in:
+            my $worldcanvas = $main->Scrolled('WorldCanvas', -scrollbars => 'nw', ... )
+            # you want to bind the key-presses to the 'worldcanvas' Subwidget of Scrolled.
+            my $scrolled_canvas = $worldcanvas->Subwidget('worldcanvas'); # note the lower case 'worldcanvas'
+            $scrolled_canvas->CanvasBind('<i>' => sub {$scrolled_canvas->zoom(1.25)});
+            $scrolled_canvas->CanvasBind('<o>' => sub {$scrolled_canvas->zoom(0.8)});
+
+            # I don't like the scrollbars taking the focus when I
+            # <ctrl>-tab through the windows, so I:
+            $worldcanvas->Subwidget('xscrollbar')->configure(-takefocus => 0);
+            $worldcanvas->Subwidget('yscrollbar')->configure(-takefocus => 0);
+
+    *$worldcanvas*->center(*x, y*)
+        Centers the display around world coordinates x, y. Example:
+
+            $worldcanvas->CanvasBind('<2>' =>
+                sub {
+                    $worldcanvas->CanvasFocus;
+                    $worldcanvas->center($worldcanvas->eventLocation);
+                }
+            );
+
+    *$worldcanvas*->centerTags([-exact => {0 | 1}], *TagOrID, [TagOrID, ...]*)
+        Centers the display around the center of the bounding box containing the specified TagOrID's without changing the current
+        magnification of the display.
+
+        '-exact => 1' will cause the canvas to be scaled twice to get an accurate bounding box. This will be expensive if the canvas
+        contains a large number of objects.
+
+    *$worldcanvas*->eventLocation()
+        Returns the world coordinates (x, y) of the last Xevent.
+
+    *$worldcanvas*->panWorld(*dx, dy*)
+        Pans the display by the specified world distances. panWorld is not meant to replace the xview/yview panning methods. Most user
+        interfaces will want the arrow keys tied to the xview/yview panning methods (the default bindings), which pan in widget
+        coordinates.
+
+        If you do want to change the arrow key-bindings to pan in world coordinates using panWorld you must disable the default arrow
+        key-bindings.
+
+            Example:
+
+            $mainwindow->bind('WorldCanvas',    '<Up>' => "");
+            $mainwindow->bind('WorldCanvas',  '<Down>' => "");
+            $mainwindow->bind('WorldCanvas',  '<Left>' => "");
+            $mainwindow->bind('WorldCanvas', '<Right>' => "");
+
+            $worldcanvas->CanvasBind(   '<Up>' => sub {$worldcanvas->panWorld(0,  100);});
+            $worldcanvas->CanvasBind( '<Down>' => sub {$worldcanvas->panWorld(0, -100);});
+            $worldcanvas->CanvasBind( '<Left>' => sub {$worldcanvas->panWorld(-100, 0);});
+            $worldcanvas->CanvasBind('<Right>' => sub {$worldcanvas->panWorld( 100, 0);});
+
+        This is not usually desired, as the percentage of the display that is shifted will be dependent on the current display
+        magnification.
+
+    *$worldcanvas*->pixelSize()
+        Returns the width (in world coordinates) of a pixel (at the current magnification).
+
+    *$worldcanvas*->rubberBand(*{0|1|2}*)
+        Creates a rubber banding box that allows the user to graphically select a region. rubberBand is called with a step parameter '0',
+        '1', or '2'. '0' to start a new box, '1' to stretch the box, and '2' to finish the box. When called with '2', the specified box
+        is returned (x1, y1, x2, y2)
+
+        The band color is set with the *WorldCanvas* option '-bandColor'. The default color is 'red'
+
+        Example, specify a region to delete:
+
+            $worldcanvas->configure(-bandColor => 'purple');
+            $worldcanvas->CanvasBind('<3>'               => sub {$worldcanvas->CanvasFocus;
+                                                                 $worldcanvas->rubberBand(0)
+                                                                });
+            $worldcanvas->CanvasBind('<B3-Motion>'       => sub {$worldcanvas->rubberBand(1)});
+            $worldcanvas->CanvasBind('<ButtonRelease-3>' => sub {my @box = $worldcanvas->rubberBand(2);
+                                                                 my @ids = $worldcanvas->find('enclosed', @box);
+                                                                 foreach my $id (@ids) {$worldcanvas->delete($id)}
+                                                                });
+            # Note: '<B3-ButtonRelease>' will be called for any ButtonRelease!
+            # You should use '<ButtonRelease-3>' instead.
+
+            # If you want the rubber band to look smooth during panning and
+            # zooming, add rubberBand(1) update calls to the appropriate key-bindings:
+
+            $worldcanvas->CanvasBind(   '<Up>' => sub {$worldcanvas->rubberBand(1);});
+            $worldcanvas->CanvasBind( '<Down>' => sub {$worldcanvas->rubberBand(1);});
+            $worldcanvas->CanvasBind( '<Left>' => sub {$worldcanvas->rubberBand(1);});
+            $worldcanvas->CanvasBind('<Right>' => sub {$worldcanvas->rubberBand(1);});
+            $worldcanvas->CanvasBind('<i>' => sub {$worldcanvas->zoom(1.25); $worldcanvas->rubberBand(1);});
+            $worldcanvas->CanvasBind('<o>' => sub {$worldcanvas->zoom(0.8);  $worldcanvas->rubberBand(1);});
+
+        This box avoids the overhead of bounding box calculations that can occur if you create your own rubberBand outside of
+        *WorldCanvas*.
+
+    *$worldcanvas*->viewAll([-border => number])
+        Displays at maximum possible zoom all objects centered in the *WorldCanvas*. The switch '-border' specifies, as a percentage of
+        the screen, the minimum amount of white space to be left on the edges of the display. Default '-border' is 0.02.
+
+    *$worldcanvas*->viewArea(x1, y1, x2, y2, [-border => number]))
+        Displays at maximum possible zoom the specified region centered in the *WorldCanvas*.
+
+    *$worldcanvas*->viewFit([-border => number], *TagOrID*, [*TagOrID*, ...])
+        Adjusts the worldcanvas to display all of the specified tags. The '-border' switch specifies (as a percentage) how much extra
+        surrounding space should be shown.
+
+    *$worldcanvas*->getView()
+        Returns the rectangle of the current view (x1, y1, x2, y2)
+
+    *$worldcanvas*->widgetx(*x*)
+    *$worldcanvas*->widgety(*y*)
+    *$worldcanvas*->widgetxy(*x, y*)
+        Convert world coordinates to widget coordinates.
+
+    *$worldcanvas*->worldx(*x*)
+    *$worldcanvas*->worldy(*y*)
+    *$worldcanvas*->worldxy(*x, y*)
+        Convert widget coordinates to world coordinates.
+
+CHANGED METHODS
+        World coordinates are supplied and returned to WorldCanvas methods instead of widget coordinates unless otherwise specified. (ie.
+        These methods take and return world coordinates: center, panWorld, viewArea, find, coords, scale, move, bbox, rubberBand,
+        eventLocation, pixelSize, and create*)
+
+    *$worldcanvas*->bbox([-exact => {0 | 1}], *TagOrID*, [*TagOrID*, ...])
+        '-exact => 1' is only needed if the TagOrID is not 'all'. It will cause the canvas to be scaled twice to get an accurate bounding
+        box. This will be expensive if the canvas contains a large number of objects.
+
+        Neither setting of exact will produce exact results because the underlying canvas bbox method returns a slightly larger box to
+        insure that everything is contained. It appears that a number close to '2' is added or subtracted. The '-exact => 1' zooms in to
+        reduce this error.
+
+        If the underlying canvas bbox method returns a bounding box that is small (high error percentage) then '-exact => 1' is done
+        automatically.
+
+    *$worldcanvas*->scale(*'all', xOrigin, yOrigin, xScale, yScale*)
+        Scale should not be used to 'zoom' the display in and out as it will change the world coordinates of the scaled objects. Methods
+        zoom, viewArea, and viewAll should be used to change the scale of the display without affecting the dimensions of the objects.
+
+VIEW AREA CHANGE CALLBACK
+    *Tk::WorldCanvas* option '-changeView' can be used to specify a callback for a change of the view area. This is useful for updating a
+    second worldcanvas which is displaying the view region of the first worldcanvas.
+
+    The callback subroutine will be passed the coordinates of the displayed box (x1, y1, x2, y2). These arguments are added after any
+    extra arguments specified by the user calling 'configure'.
+
+        Example:
+
+        $worldcanvas->configure(-changeView => [\&changeView, $worldcanvas2]);
+        # viewAll if worldcanvas2 widget is resized.
+        $worldcanvas2->CanvasBind('<Configure>' => sub {$worldcanvas2->viewAll});
+
+        {
+            my $viewBox;
+            sub changeView {
+                my ($canvas2, @coords) = @_;
+
+                $canvas2->delete($viewBox) if $viewBox;
+                $viewBox = $canvas2->createRectangle(@coords, -outline => 'orange');
+            }
+        }
+
+SCROLL REGION NOTES
+    (1) The underlying *Tk::Canvas* has a '-confine' option which is set to '1' by default. With '-confine => 1' the canvas will not
+    allow the display to go outside of the scroll region causing some methods to not work accurately. For example, the 'center' method
+    will not be able to center on coordinates near to the edge of the scroll region; 'zoom out' near the edge will zoom out and pan
+    towards the center.
+
+    *Tk::WorldCanvas* sets '-confine => 0' by default to avoid these problems. You can change it back with:
+
+        $worldcanvas->configure(-confine => 1);
+
+    (2) '-scrollregion' is maintained by *WorldCanvas* to include all objects on the canvas. '-scrollregion' will be adjusted
+    automatically as objects are added, deleted, scaled, moved, etc. (You can create a static scrollregion by adding a border rectangle
+    to the canvas.)
+
+    (3) The bounding box of all objects is required to set the scroll region. Calculating this bounding box is expensive if the canvas
+    has a large number of objects. So for performance reasons these operations will not immediately change the bounding box if they
+    potentially shrink it:
+
+        coords
+        delete
+        move
+        scale
+
+    Instead they will mark the bounding box as invalid, and it will be updated at the next zoom or pan operation. The only downside to
+    this is that the scrollbars will be incorrect until the update.
+
+    If these operations increase the size of the box, changing the box is trivial and the update is immediate.
+
+AUTHOR
+    Joseph Skrovan (*joseph@skrovan.com*)
+
+    Note: based on an earlier implementation by Rudy Albachten (*rudy@albachten.com*)
+
+    If you use and enjoy *WorldCanvas* please let me know.
+
+COPYRIGHTS
+        Copyright (c) 2002 Joseph Skrovan. All rights reserved.
+        This program is free software; you can redistribute it and/or modify it
+        under the same terms as Perl itself. 
+

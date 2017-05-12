@@ -1,0 +1,35 @@
+---
+abstract: 'Task for Biodiverse dependencies'
+author:
+  - 'Shawn Laffan (shawn.laffan@unsw.edu.au)'
+build_requires:
+  ExtUtils::Depends: '0'
+  ExtUtils::PkgConfig: '0'
+  Glib: '0'
+  Gtk2: '0'
+  Pango: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Biodiverse
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Browser::Open: '0'
+  Data::DumpXML: '0'
+  Gnome2::Canvas: '0'
+  HTTP::Tiny: '0'
+  LWP::Simple: '0'
+  Task::Biodiverse::NoGUI: '1.0001'
+resources:
+  bugtracker: https://github.com/shawnlaffan/biodiverse/issues/
+  repository: https://github.com/shawnlaffan/biodiverse.git
+version: '1.99007'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

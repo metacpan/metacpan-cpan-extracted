@@ -1,0 +1,16 @@
+Testing hooks:
+
+%<?
+% sub somef { my $a = shift; return "f($a, $a, $a)" }
+% $Star->addHook(qr/^.somecommand (\S*)\n/m,sub{
+%                my $self=shift; my $all=shift;
+%                my $arg=shift; return &somef($arg)."\n"; });
+%!>
+
+Some text in between...
+
+.somecommand test
+but not this .somecommand
+.somecommand again
+
+the end

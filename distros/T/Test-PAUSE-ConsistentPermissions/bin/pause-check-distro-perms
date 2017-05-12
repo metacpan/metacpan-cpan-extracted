@@ -1,0 +1,106 @@
+#!perl
+
+# PODNAME: pause-check-distro-perms
+
+use strictures 2;
+use PAUSE::Packages;
+use Test::PAUSE::ConsistentPermissions::Check;
+use Pod::Usage;
+
+
+my $dist = shift;
+my $module = shift;
+
+unless($module)
+{
+    if($dist)
+    {
+        if($dist =~ /::/)
+        {
+            $module = $dist;
+            $dist =~ s/::/-/g;
+        }
+        else
+        {
+            $module = $dist;
+            $module =~ s/[-+]+/::/g;
+        }
+    }
+}
+
+my $verbose = 1;
+my $quiet = 0;
+
+# FIXME: use proper command line parsing.
+# then we can have verbose/quiet etc.
+
+unless($dist && $module)
+{
+    pod2usage(-verbose => 0, existval => 2);
+}
+
+my $pp = PAUSE::Packages->new;
+my $perms_test = Test::PAUSE::ConsistentPermissions::Check->new;
+
+my $release_info = $pp->release($dist);
+unless($release_info)
+{
+    print "Unable to find distro $dist\n";
+    exit(2);
+}
+my @modules = map { $_->name } @{$release_info->modules};
+my $report = $perms_test->report_problems(\@modules, $module);
+
+my $problems = @{$report->{problems}};
+if(!$quiet && ($verbose || $problems))
+{
+    # display module info.
+    print "Distribution: $dist\n";
+    $perms_test->module_info_to_fh($report, \*STDOUT);
+}
+
+if($problems && !$quiet)
+{
+    $perms_test->problems_to_fh($report, \*STDOUT);
+}
+
+exit($problems > 0);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pause-check-distro-perms
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    pause-check-distro-perms Module
+    pause-check-distro-perms Dist-Name [Module]
+
+This script will check that the permissions are consistent for a distribution.
+If only a module name is specified it is assumed that a distribution exists
+with the same name (but - instead of ::).
+
+Note this downloads a couple of large files from cpan so it may be slow.
+
+=head1 AUTHOR
+
+Colin Newell <colin.newell@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Colin Newell.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

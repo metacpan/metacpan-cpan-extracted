@@ -1,0 +1,162 @@
+Revision history for Perl extension Tk-MK.
+
+0.01  Wed Oct  9 01:05:05 2002
+            - original version; created by h2xs 1.21
+			  with options -Afn Tk-MK
+
+      Initial release (local use only)
+
+      o modules are running, initial pod is done
+	
+		
+0.02  Tue Dec 10 15:41:33 MET 2002
+
+      new release (local use only)
+
+      o some bugfixes, added a new class 'ExtHList'
+	    as a more powerful listbox than even 'ExtListbox',
+		featuring a item/data list with images, etc. , ...
+
+
+0.03  Fri Jan 16 11:35:13 MET 2004
+
+      new release
+	  
+	  o added the HListplus class (HList with column resizing)
+
+	  o renamed ExtHList -> DHList, ExtTree DTree for
+	    making the names more self-explanatory
+
+
+0.04 Mon Jan 17 21:34:53 MET 2005
+
+      new release (local use only)
+
+	  o 1 new module added Tk::Buttonplus - Button with Text AND Image
+
+
+0.05 Mon May 02 22:01:28 MET 2005
+
+      new release (local use only)
+
+	  o enhanced Tk::Checkbox to support user-customizable size
+
+
+0.06 Mon Jun 13 23:52:14 MET 2005
+
+      new release (local use only)
+
+	  o enhanced Tk::Optionbox - added second hierarchy for the options
+
+
+0.07 Thu Jul 14 10:15:35 MEST 2005
+
+     bug fix release
+
+	 o enhanced Hlistplus for Tk804.xxx
+
+	 o cleaned install-kit, demo programs
+
+
+0.08 Thu Jul 14 18:53:58 MEST 2005
+
+	 update release
+
+	 o updated the pod docs
+
+
+0.09 Fri Oct  7 21:36:06 MEST 2005
+
+	 update release
+
+	 o enhanced Tk::Optionbox - added TRUE multilevel hierarchies for the options and validating of selection
+
+
+0.10 Fri Oct 13 19:55:25 CEST 2006
+
+	 update release
+
+	o enhanced Tk::Optionbox - added loop invocation detection to avoid segviolations	
+	o enhanced Tk::HListplus - based on feedback from Rob Seegel (Thx a lot!) added 'auto-blank last column'
+	o changed  Tk::BootSplash - Added the ProgressBarPlus Widget to make 'BootSplash' work for users not using a patched Tk 804 ProgressBar
+
+
+0.11 Thu Mar  8 18:56:54 CET 2007
+
+	 update release
+	 
+	o resolved some CPAN issues
+
+	o enhanced Tk::Buttonplus - added side default based on option-database	
+
+
+0.12 Tue Oct 14 13:29:07 CEST 2008
+
+	 update release
+
+	o enhanced Tk::Optionbox - added quick-popup for non-changed options
+
+	o 1 new module added Tk::PopUpSelectBox - A scrolled pop-up selection-widget (with MULTI-level selections)
+		useful where a Tk::Optionbox would have too many entries
+
+0.13 Thu Oct 23 17:48:07 CEST 2008
+
+	 update release
+
+	o Renamed DataHList and DataTree to DHList and DHTree to avoid name-space conflicts in CPAN
+
+	o Bugfix for Tk::DHList - Deleting the FIRST entry in a DHList messed up the reverse function.
+
+0.14 Fri Oct 24 13:50:23 CEST 2008
+	 
+	o resolved some CPAN checker issues
+
+
+0.15 Mon Apr  6 20:19:01 CEST 2009
+	 
+	o resolved issue on ListHeader-Bttn: Double-Click for column resizing should NOT invoke Single-Click-CB
+
+
+0.16 Mon Apr  6 20:53:44 CEST 2009
+
+	o replacement release for 0.15 (which was incomplete)
+
+0.17 Tue Apr  7 12:26:14 CEST 2009
+
+	o update release - added configuration option for ClosedColumnWidth and ResizerAreaWidth
+
+0.18 Fri Sep 11 21:58:55 CEST 2009
+
+	o Rewritten DHList megawidget to support mutiple columns and auto-generated headers
+
+0.20 Sun Nov  8 16:15:12 CET 2009
+
+	o Completely rewritten Tk::Buttonplus Widget and renamed it to Tk::CompoundButton to honor the fact that it
+	  is based on the Tk::Compound methods
+	  This rewrite resolves some minor graphical flaws happening at Buttonplus under certain circumstances
+	  
+	o Fixed a problem in DHList: '-bg'/'-background' did not automatically influence the "data-field-area background"
+	  ( A problem for list that change their background dynamically during operation )
+	  As a work-around solution '-bg' now will set the main background AND the data-field background, while
+	  '-background' changes only the main area BG.
+	  
+0.21 Thu Nov 12 19:17:42 CET 2009
+
+	o Modified t/* tests to comply with new Tk w/o X11 env behavior (see http://wiki.cpantesters.org/wiki/CPANAuthorNotes)
+
+
+0.22 Thu Apr 02 18:09:37 CET 2013
+
+	o New created widget Tk::Treeplus Widget
+		Treeplus is a Tree (and/or HList) replacement that supports Sorting,
+        Filtering and Resizing of columns and other gimmicks (e.g. selection history, ...)
+
+0.23 Thu Feb 06 19:09:21 CET 2014
+
+	o Improved widget Tk::Optionbox - Widget now supports a automatically created 'dummy' entry at the top
+		of the selection list, that will 'clear the value of the attached variable.
+		(Usable to clear also an attached label in case of emulating a combobox...
+
+---------------------------------------------------------------
+
+TODO: Still some more work needed on the tests ...

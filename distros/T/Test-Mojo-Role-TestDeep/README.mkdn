@@ -1,0 +1,206 @@
+# NAME
+
+Test::Mojo::Role::TestDeep - Add Test::Deep methods to Test::Mojo::WithRoles
+
+# VERSION
+
+version 0.007
+
+# STATUS
+
+<a href="https://travis-ci.org/preaction/Test-Mojo-Role-TestDeep"><img src="https://travis-ci.org/preaction/Test-Mojo-Role-TestDeep.svg?branch=master"></a><a href="https://coveralls.io/r/preaction/Test-Mojo-Role-TestDeep"><img src="https://coveralls.io/repos/preaction/Test-Mojo-Role-TestDeep/badge.png" alt="Coverage Status" /></a>
+
+# SYNOPSIS
+
+    use Test::Mojo::WithRoles 'TestDeep';
+    use Test::Deep; # Get Test::Deep comparison functions
+
+    my $t = Test::Mojo::WithRoles->new( 'MyApp' );
+
+    # Test JSON responses with Test::Deep
+    $t->get_ok( '/data.json' )
+      ->json_deeply(
+        superhashof( { foo => 'bar' } ),
+        'has at least a foo key with "bar" value',
+      );
+
+    # Test HTML with Test::Deep
+    $t->get_ok( '/index.html' )
+      ->text_deeply(
+        'nav a',
+        [qw( Home Blog Projects About Contact )],
+        'nav link text matches site section titles',
+      )
+      ->attr_deeply(
+        'nav a',
+        href => [qw( / /blog /projects /about /contact )],
+        'nav link href matches site section URLs',
+      );
+
+# DESCRIPTION
+
+This module adds some [Test::Deep](https://metacpan.org/pod/Test::Deep) functionality to [Test::Mojo](https://metacpan.org/pod/Test::Mojo).
+`Test::Deep` allows for extremely-customizable testing of data
+structures. This module adds some helper methods to `Test::Mojo` (using
+[Test::Mojo::WithRoles](https://metacpan.org/pod/Test::Mojo::WithRoles)) to test your web app's responses using
+`Test::Deep`.
+
+# METHODS
+
+## json\_deeply
+
+    $t->json_deeply( $expect, $desc )
+    $t->json_deeply( $ptr, $expect, $desc )
+
+Test that the current response (parsed as a JSON object) matches the given
+tests. `$expect` is a data structure containing [Test::Deep
+comparisons](https://metacpan.org/pod/Test::Deep#SPECIAL-COMPARISONS-PROVIDED) to run. `$desc` is an
+optional description of the test.
+
+If given, `$ptr` is a JSON pointer string to pick out a single part of the
+data structure. This is more convenient than using Test::Deep's comparison
+routines to do the same thing. See [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo::JSON::Pointer).
+
+Corresponds to [cmp\_deeply in Test::Deep](https://metacpan.org/pod/Test::Deep#COMPARISON-FUNCTIONS).
+
+## text\_deeply
+
+    $t->text_deeply( $selector => $expect, $desc );
+
+Test the text of the elements matched by the given `$selector` against
+the given test. `$expect` is a data structure containing [Test::Deep
+comparisons](https://metacpan.org/pod/Test::Deep#SPECIAL-COMPARISONS-PROVIDED) to run. `$desc` is
+an optional description of the test.
+
+The elements will always be an arrayref, even if only one
+element matches.
+
+For example:
+
+    # test.html
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/projects">Projects</a></li>
+        </ul>
+    </nav>
+
+    # test.t
+    $t->get_ok( 'test.html' )
+      ->text_deeply(
+        'nav a' => bag( qw( Home Blog Projects ) ),
+        'nav element text is correct',
+      );
+
+This is equivalent to:
+
+    $t->get_ok( 'test.html' );
+    my $dom = $t->tx->res->dom;
+    cmp_deeply
+        [ $dom->find( 'nav a' )->map( 'text' )->each ],
+        bag( qw( Home Blog Projects ) ),
+        'nav element text is correct';
+
+## all\_text\_deeply
+
+    $t->all_text_deeply( $selector => $expect, $desc );
+
+Test the complete text of the elements and all child elements matched by
+the given `$selector` against the given test. `$expect` is a data
+structure containing [Test::Deep comparisons](https://metacpan.org/pod/Test::Deep#SPECIAL-COMPARISONS-PROVIDED) to run. `$desc` is an optional description of the
+test.
+
+The elements will always be an arrayref, even if only one
+element matches.
+
+For example:
+
+    # test.html
+    <nav>
+        <ul>
+            <li><a href="/"><em>Home</em></a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/projects"><strong>Projects</strong></a></li>
+        </ul>
+    </nav>
+
+    # test.t
+    $t->get_ok( 'test.html' )
+      ->all_text_deeply(
+        'nav a' => bag( qw( Home Blog Projects ) ),
+        'nav element text is correct',
+      );
+
+This is equivalent to:
+
+    $t->get_ok( 'test.html' );
+    my $dom = $t->tx->res->dom;
+    cmp_deeply
+        [ $dom->find( 'nav a' )->map( 'all_text' )->each ],
+        bag( qw( Home Blog Projects ) ),
+        'nav element text is correct';
+
+## attr\_deeply
+
+    $t->attr_deeply( $selector, $attr => $expect, ..., $desc );
+
+Test the given attributes of the elements matched by the given selector
+against the given test. `$expect` is a data structure containing
+[Test::Deep comparisons](https://metacpan.org/pod/Test::Deep#SPECIAL-COMPARISONS-PROVIDED) to
+run. `$desc` is an optional description of the test.
+
+The element attributes will always be an arrayref, even if only one
+element matches.
+
+For example:
+
+    # test.html
+    <form action="/search" method="GET">
+        ...
+    </form>
+
+    # test.t
+    $t->get_ok( 'test.html' )
+      ->attr_deeply(
+        'form',
+        action => [qw( /search )],
+        method => [re( qr( get )i )],
+        'form element is correct',
+      );
+
+This is equivalent to:
+
+    $t->get_ok( 'test.html' );
+    my $dom = $t->tx->res->dom;
+    cmp_deeply
+        [ $dom->find( 'form' )->map( attr => 'action' )->each ],
+        [ qw( /search ) ],
+        'form element action is correct',
+        ;
+    cmp_deeply
+        [ $dom->find( 'form' )->map( attr => 'method' )->each ],
+        [ re( qr( get )i ) ],
+        'form element method is correct',
+        ;
+
+# SEE ALSO
+
+- [Test::Deep](https://metacpan.org/pod/Test::Deep)
+- [Test::Mojo](https://metacpan.org/pod/Test::Mojo)
+- [Test::Mojo::WithRoles](https://metacpan.org/pod/Test::Mojo::WithRoles)
+
+# AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+# CONTRIBUTOR
+
+Doug Bell <madcityzen@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

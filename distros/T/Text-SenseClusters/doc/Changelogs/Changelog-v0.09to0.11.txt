@@ -1,0 +1,17 @@
+Changes made in Sense-Clusters version 0.09 during version 0.11
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota at Duluth
+
+(1)	Added --percent --number to prelabel
+(2)	changed input format of prelabel and output format of mcquitty.pl 
+	to show n m on 2nd line n=#clusters m=#instances
+(3)	used regex while checking measure in matrix programs	
+(4)	changed regex in arff2feat for feature list matching
+(5)	frequency path of report dir, 
+(6)	filter options --select to --rank & --frequency to --percent
+(7)	--rank in case of ties
+(8)		
+(Changelog-v0.07to0.09 Last Updated on 04/08/2003 by Amruta)

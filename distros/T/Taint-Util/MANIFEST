@@ -1,0 +1,14 @@
+ChangeLog
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+Util.pm
+Util.xs
+dist.ini
+t/00-compile.t
+t/export.t
+t/prototype.t
+t/taint-non-T.t
+t/usage.t

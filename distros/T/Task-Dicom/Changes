@@ -1,0 +1,19 @@
+0.07 2016-08-25T11:30:29+02:00
+ - Add Dicom::UID::Generator in 0.01 version.
+ - Add LICENSE file.
+ - Fix REPOSITORY section in doc.
+ - Update Dicom::File::Detect to 0.03 version.
+ - Update copyright years.
+
+0.06 2015-10-08T22:14:29+02:00
+ - Fix NAME section in doc.
+ - Update Dicom::DCMTK::DCMDump::Get to 0.03 version.
+ - Update Dicom::DCMTK::DCMQRSCP::Config to 0.03 version.
+
+0.05 2015-10-01T15:02:30+02:00
+ - Add Dicom::DCMTK::DCMDump::Get in 0.02 version.
+ - Add Dicom::DCMTK::DCMQRSCP::Config in 0.02 version.
+ - Fix version in Task.pm.
+
+0.01 2015-10-01T14:09:05+02:00
+ - First version

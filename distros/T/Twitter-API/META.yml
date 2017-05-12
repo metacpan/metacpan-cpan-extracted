@@ -1,0 +1,64 @@
+---
+abstract: 'A Twitter REST API library for Perl'
+author:
+  - 'Marc Mims <marc@questright.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Spec: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Twitter-API
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  HTML::Entities: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Thin: '0'
+  IO::Socket::SSL: '0'
+  JSON::MaybeXS: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Aliases: '0'
+  MooX::Traits: '0'
+  Ref::Util: '0'
+  Scalar::Util: '0'
+  StackTrace::Auto: '0'
+  Sub::Exporter::Progressive: '0'
+  Throwable: '0'
+  Time::HiRes: '0'
+  Time::Local: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  URL::Encode: '0'
+  WWW::OAuth: '0.006'
+  namespace::clean: '0'
+  perl: v5.14.1
+resources:
+  IRC: irc://irc.perl.org/#net-twitter
+  bugtracker: https://github.com/semifor/Twitter-API/issues
+  homepage: https://github.com/semifor/Twitter-API
+  repository: https://github.com/semifor/Twitter-API.git
+version: '0.0112'
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Marc Mims <marc@moz.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

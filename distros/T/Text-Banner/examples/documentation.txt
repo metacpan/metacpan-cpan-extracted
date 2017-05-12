@@ -1,0 +1,142 @@
+NAME
+    Text::Banner - create text resembling Unix 'banner' command
+
+SYNOPSIS
+       use Text::Banner;
+       $a = Text::Banner->new;
+       $a->set('MYTEXT');
+       $a->size(3);
+       $a->fill('*');
+       $a->rotate('h');
+       print $a->get;
+
+DESCRIPTION
+    The Text::Banner creates a large ascii-representation of a
+    defined string, like the 'banner' command available in Unix. A
+    string is passed to the module and the equivalent banner string
+    is generated and returned for use. The string can be scaled
+    (blown up) from 100 to 500% of the base size. The characters
+    used to generate the banner image can be any character defined
+    by the user (within a limited range) or they can be the made up
+    from whatever the current character being generated happens to
+    be. The banner can be created either vertically or horizontally.
+
+    An object reference is created with the new method. The
+    reference is then used to define the string to create and for
+    manipulation of the object. No specific order is required for
+    object manipulation, with the exception of the 'get' operation
+    which will return the string based upon the current object
+    definitions.
+
+    The 'set' operation allows the user to specify the string to be
+    generated. There is no limit on the length of the string,
+    however, generated strings that are longer than the display
+    output will continue onto the next line and interlace with the
+    first character that was generated - resulting in a messy,
+    difficult-to-read output. Some experimentation may be required
+    to find the ideal maximum length depending upon the environment
+    you are using.
+
+    The 'size' operation provides functionality for blowing up the
+    size of the generated string from 100 to 500 percent of normal
+    size. '1' is 100%, '2' is 200% and so on. The larger the defined
+    size, the more grainier the output string becomes. When an
+    object is first created the size defaults to '1'. Calling the
+    'size' method without any parameters will return the current
+    size definition.
+
+    The 'rotate' method allows switching between horizontal and
+    vertical output. Objects are created by default in horizontal
+    mode. Calling the method without any arguments will return the
+    current output mode - otherwise specify either 'h' for
+    horizontal or 'v' for vertical output.
+
+    The 'fill' operation defines how the returned string should be
+    created. By default, newly created objects will use the current
+    ascii character of the character being generated. For example,
+    creating the string 'Hello' without changing the fill character
+    will cause a string to be created where the 'H' is made up of
+    the letter 'H', the 'e' from the letter 'e', 'l' from 'l' and so
+    on. This can be changed if desired by calling the 'fill'
+    operation with the ASCII character you wish all characters of
+    the string to be created from. Once defined, the fill character
+    remains constant until changed again. Calling the fill operation
+    with no parameters will return the currently defined fill
+    character. Calling the fill operation with the command 'reset'
+    will remove the fill character, and default back to the original
+    behaviour as outlined above.
+
+    The 'get' operation is what causes the string to be generated
+    based upon the current object definitions. The object is
+    generated and passed directly back from the method, therefore it
+    can either be printed directly or saved to a variable for later
+    use.
+
+EXAMPLES
+       # Example 1:
+
+       use Text:Banner;
+       $h=Text::Banner->new;
+       $h->set('MYTEXT');
+       $h->fill('*');
+       foreach $num (1..5) {
+          $h->size($num);
+          print $h->get;
+          $h->rotate;
+          print $h->get;
+       }
+       exit 0;
+            
+            
+       # Example 2:
+
+       use Text:Banner;
+       $a=Text::Banner->new;
+       $a->set('MYtext');
+       print $a->get;
+       $a->fill('/');
+       print $a->get;
+       exit 0;
+
+    Example 2 would generate the following output:
+
+M     M Y     Y                                 
+MM   MM  Y   Y    ttttt  eeeeee  x    x   ttttt 
+M M M M   Y Y       t    e        x  x      t   
+M  M  M    Y        t    eeeee     xx       t   
+M     M    Y        t    e         xx       t   
+M     M    Y        t    e        x  x      t   
+M     M    Y        t    eeeeee  x    x     t   
+      
+/     / /     /                                 
+//   //  /   /    /////  //////  /    /   ///// 
+/ / / /   / /       /    /        /  /      /   
+/  /  /    /        /    /////     //       /   
+/     /    /        /    /         //       /   
+/     /    /        /    /        /  /      /   
+/     /    /        /    //////  /    /     /   
+
+    Consult the horizontal.txt and vertical.txt files that come with
+    the module for examples of what different sizes look like.
+
+NOTES
+    Multiple objects can of course be generated, however, it should
+    be kept in mind that the object is not static and changing the
+    defined string output could be used as an alternative to
+    multiple object creation as each created object chews up about
+    4k of memory.
+
+    Generated ASCII characters are restricted to those between 32
+    (space) and 126 (~). Those outside of these values are removed
+    and the resulting generated string will not include them. The
+    same restriction applies to the fill character used for defining
+    character generation.
+
+AUTHOR
+    Text::Banner was written November, 1999 by Stuart Lory
+    (stuart@onyx.ch). The module has been tested in both a Unix and
+    PC environment without any known problems. If you find a bug,
+    please advise.
+
+    The version of this module is '$Revision: 1.1.1.1 $'.
+

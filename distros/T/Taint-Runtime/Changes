@@ -1,0 +1,9 @@
+Revision history for Perl extension Taint::Runtime.
+
+0.03  Thu Jun 14 11:54:00 2007
+        - Fix untaint failure on multiline strings found by Alexey A. Kiritchun.
+
+0.01  Fri Feb 25 09:38:30 2005
+	- original version; created by h2xs 1.23 with options
+		-A -n Taint::Runtime
+

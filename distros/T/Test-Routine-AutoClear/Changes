@@ -1,0 +1,20 @@
+Revision history for Test-Routine-AutoClear
+
+0.004     2013-04-13
+
+ - you can initialize an attribute with `builder { [] }` say and the coderef
+   you pass in will be treated as a Moose builder when the attribute is
+   reset. 
+
+0.003     2013-04-13
+
+ - clearing an autocleared variable goes back to the value used at test object
+   creation if one was supplied, otherwise it uses the normal Moose clearer
+   semantics.
+
+0.002     2012-07-19
+
+ - Improved the docs slightly
+
+0.001     2012-07-18
+

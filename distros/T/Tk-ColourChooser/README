@@ -1,0 +1,132 @@
+NAME
+    ColourChooser - Perl/Tk module providing a Colour selection dialogue
+    box.
+
+SYNOPSIS
+        use Tk::ColourChooser ; 
+
+        my $col_dialog = $Window->ColourChooser ;
+        my $colour     = $col_dialog->Show ;
+        if( $colour ) {
+            # They pressed OK and the colour chosen is in $colour - could be
+            # transparent which is 'None' unless -transparent is set.
+        }
+        else {
+            # They cancelled.
+        }
+
+        # May optionally have the colour initialised.
+        my $col_dialog = $Window->ColourChooser( -colour => 'green' ) ;
+        my $col_dialog = $Window->ColourChooser( -colour => '#0A057C' ) ;
+
+        # The title may also be overridden; and we can insist that only hex values
+        # are returned rather than colour names. We can disallow transparent.
+        my $col_dialog = $Window->ColourChooser( 
+                            -language    => 'en', # Or 'de' or 'fr'.
+                            -title       => 'Select a colour',
+                            -colour      => '0A057C',
+                            -transparent => 0,
+                            -hexonly     => 1,
+                            -showhex     => 1,
+                            ) ;
+
+DESCRIPTION
+    ColourChooser is a dialogue box which allows the user to pick a colour
+    from the list in rgb.txt (supplied with X Windows), or to create a
+    colour by setting RGB (red, green, blue) values with slider controls.
+
+    You can scroll through all the named colours by using the <Down> and
+    <Up> arrow keys on the keyboard or by clicking the mouse on the
+    scrollbar and then clicking the colour list.
+
+  Options
+    "-language" This is optional. Default is `en'. This option allows you to
+    set the language for the title and labels. Valid values are "en"
+    (english), "de" (german), "fr" (french) and "english" (for backward
+    compatibility) which is also the default. Translations are by Babelfish.
+    Other languages will be added if people provide translations.
+    "-title" This is optional and allows you to set the title. Default is
+    'Colour Chooser' in the "-language" specified.
+    "-colour" This is optional and allows you to specify the colour that is
+    shown when the dialogue is invoked. It may be specified as a colour name
+    from rgb.txt or as a six digit hex number with an optional leading hash,
+    i.e. as 'HHHHHH' or '#HHHHHH'. Default is 'black'.
+    "-hexonly" This is optional. If set to 1 it forces the ColourChooser to
+    only return colours as hex numbers in Tk format ('#HHHHHH'); if set to 0
+    it returns colours as names if they are named in rgb.txt, and as hex
+    numbers if they have no name. Transparent is always returned as 'None'
+    however. Default is 0.
+    "-transparent" This is optional. If set to 0 it stops ColourChooser
+    offering the Transparent button so that only valid colours may be chosen
+    - or cancel. Default is 1.
+    "-showhex" This is optional. If set to 1 it shows the hex value of the
+    colour in the title bar. Default is 0.
+
+    The user has three options:
+
+  OK
+    Pressing OK will return the selected colour, as a name if it has one or
+    as an RGB value if it doesn't. (Colours which do not have names are
+    listed as 'Unnamed' in the colour list box.) If the "-hexonly" option
+    has been specified the colour is always returned as a Tk colour hex
+    value, i.e. in the form '#HHHHHH' except if Transparent is chosen in
+    which case 'None' is returned.
+
+    OK is pressed by a mouse click or <Return> or <o> or <Control-o> or
+    <Alt-o>.
+
+  Transparent
+    Pressing Transparent will return the string 'None' which is xpm's name
+    for transparent.
+
+    Transparent is pressed by a mouse click or <t> or <Control-t> or
+    <Alt-t>.
+
+  Cancel
+    Pressing Cancel will return an empty string.
+
+    Cancel is pressed by a mouse click or <Escape> or <c> or <Control-c> or
+    <Alt-c>. (Note that if the language is not english then the letter to
+    press will be the first letter of the translation of the word 'Cancel'.
+
+INSTALLATION
+    ColourChooser.pm should be placed in any Tk directory in any lib
+    directory in Perl's %INC path, for example, '/usr/lib/perl5/Tk'.
+
+    ColourChooser looks for the file rgb.txt on your system - if it can't
+    find it you will only be able to specify colours by RGB value. Or you
+    can set the environment variable RGB_TEXT to the filename.
+
+METHODS
+    Populate
+        Inherited from Tk::Toplevel
+
+    Show
+        Inherited from Tk::Toplevel
+
+BUGS
+    Does almost no error checking.
+
+    Can be slow to load because rgb.txt is large; however we now load a
+    single instance of the colour names when the module is first used and
+    these names are then shared.
+
+    If you scroll the list by keyboard or use the mouse to move the colour
+    sliders the colour updates as you go; but if you use the mouse on the
+    scrollbar you must click the colour name box for the colour to update. I
+    don't know why this is and any advice on how to fix it would be welcome.
+
+AUTHOR
+    Tina Mueller
+
+ORIGINAL AUTHOR
+    This module was developed by Mark Summerfield <summer@perlpress.com>
+    until version 1.50.
+
+    The code draws from Stephen O. Lidie's work.
+
+COPYRIGHT
+    Copyright (c) Mark Summerfield 1999-2000. All Rights Reserved.
+
+    This module may be used/distributed/modified under the LGPL.
+

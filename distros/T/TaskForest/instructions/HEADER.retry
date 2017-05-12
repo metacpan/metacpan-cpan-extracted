@@ -1,0 +1,7 @@
+The following job failed and will be rerun automatically.
+
+Family:         $TASKFOREST_FAMILY_NAME
+Job:            $TASKFOREST_JOB_NAME
+Exit Code:      $TASKFOREST_RC
+Retry After:    $TASKFOREST_RETRY_SLEEP seconds
+No. of Retries: $TASKFOREST_RETRY of $TASKFOREST_NUM_RETRIES 

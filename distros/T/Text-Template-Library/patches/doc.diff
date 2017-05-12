@@ -1,0 +1,222 @@
+--- lib/Text/Template.pm~	2008-07-06 13:10:55.000000000 +0200
++++ lib/Text/Template.pm	2008-07-06 17:01:41.000000000 +0200
+@@ -760,6 +760,45 @@
+ you can't use a variable named C<$OUT> in your template without
+ invoking the special behavior.
+ 
++=head2 The C<OUT> function
++
++The C<OUT> function serves a similar purpose as C<$OUT>. It is
++automatically installed in the package the template is evaluated in.
++Hence the template above can look like this:
++
++	Here is a list of the things I have got for you since 1907:
++	{ foreach $i (@items) {
++            OUT "  * $i\n";
++          }
++        }
++
++The advantage of the function over C<$OUT> is that it wastes less memory.
++Suppose you have a very long list of items. Using C<$OUT> it is first
++accumulated in that variable and then appended to the resulting string.
++That means it uses twice the memory (for a short time). With the C<OUT>
++function each piece of generated text is immediately appended to the
++resulting string.
++
++But the main advantage lies in using the C<OUT> function in combination
++with the C<OUTPUT> option to C<fill_in>. Now a piece of output is directly
++put out and nothing at all accumulated.
++
++There is also a drawback. C<$OUT> is an ordinary variable and can be used
++as such. This template cannot be easily converted to using C<OUT>:
++
++	Here is a list of the things I have got for you since 1907:
++	{ foreach $i (@items) {
++            $OUT .= "  * $i\n";
++            if( some_error ) {
++              # forget the output so far
++              $OUT = "An error has occurred";
++              last;
++            }
++          }
++        }
++
++Also, the C<OUT> function doesn't by now work with the L<C<SAFE>> option.
++
+ =head2 General Remarks
+ 
+ All C<Text::Template> functions return C<undef> on failure, and set the
+@@ -870,6 +909,17 @@
+ This option is passed along to the C<fill_in> call unless it is
+ overridden in the arguments to C<fill_in>.  See L<C<BROKEN>> below.
+ 
++=item C<FILENAME>
++
++This option is passed along to the C<fill_in> call unless it is
++overridden in the arguments to C<fill_in> and C<TYPE> is not C<FILE>.
++See L<C<FILENAME>> below.
++
++=item C<EVALCACHE>
++
++This option is passed along to the C<fill_in> call unless it is
++overridden in the arguments to C<fill_in>. See L<C<EVALCACHE>> below.
++
+ =back
+ 
+ =head2 C<compile>
+@@ -909,8 +959,9 @@
+ 
+ so you might like to avoid them and use the capitalized versions.
+ 
+-At present, there are eight legal options:  C<PACKAGE>, C<BROKEN>,
+-C<BROKEN_ARG>, C<SAFE>, C<HASH>, C<OUTPUT>, and C<DELIMITERS>.
++At present, there are ten legal options:  C<PACKAGE>, C<BROKEN>,
++C<BROKEN_ARG>, C<SAFE>, C<HASH>, C<OUTPUT>, C<DELIMITERS>,
++C<FILENAME> and C<EVALCACHE>.
+ 
+ =over 4
+ 
+@@ -1218,9 +1269,11 @@
+ going to print out again anyway,  you can save memory by having
+ C<Text::Template> print out the text as it is generated instead of
+ making it into a big string and returning the string.  If you supply
+-the C<OUTPUT> option to C<fill_in>, the value should be a filehandle.
+-The generated text will be printed to this filehandle as it is
+-constructed.  For example:
++the C<OUTPUT> option to C<fill_in>, the value should be either a
++filehandle or a code reference.
++
++In the first case the generated text will be printed to this filehandle
++as it is constructed.  For example:
+ 
+ 	$template->fill_in(OUTPUT => \*STDOUT, ...);
+ 
+@@ -1228,6 +1281,14 @@
+ printed to STDOUT.  This may result in the output appearing more
+ quickly than it would have otherwise.
+ 
++If the supplied value is a code reference it is called each time a
++piece of output is ready with that piece passed as the only parameter.
++For example:
++
++	$template->fill_in(OUTPUT => sub { print $_[0] }, ...);
++
++The return value is ignored.
++
+ If you use C<OUTPUT>, the return value from C<fill_in> is still true on
+ success and false on failure, but the complete text is not returned to
+ the caller.
+@@ -1250,6 +1311,77 @@
+ any delimiters you set when you created the template object with
+ C<new>. 
+ 
++=item C<FILENAME>
++
++If present this option sets the file name used in error messages.
++C<Text::Template> prepends each piece of code with a Perl C<#line>
++directive to let the perl interpreter know which file and which
++line number to report in error messages. If a template of type C<FILE>
++is used its file name is used in these directives. Otherwise there
++is the default string C<template>.
++
++With this option you can help C<Text::Template> to generate correct
++messages.
++
++=item C<EVALCACHE>
++
++If present the value of this option is a (possibly tied) HASH
++reference.
++
++Normally C<Text::Template> calls C<eval> each time to evaluate a piece
++of Perl code. This can be a performance killer if the same piece is
++evaluated over and over again.
++
++One solution could be to wrap the piece of code into a subroutine, have
++Perl compile that routine only once and use it many times.
++
++If C<EVALCACHE> is given C<Text::Template> does exactly that. A piece of
++perl code is wrapped as a subroutine, compiled and the resulting code
++references are saved in the C<EVALCACHE> with the actual perl text as key.
++
++C<EVALCACHE> does not currently work if the C<SAFE> option is used.
++
++There are a few pitfalls with that method that have to be looked out by the
++template programmer. Suppose you have that piece of code in a template:
++
++	my $inner = $outer;
++	sub function {
++	  return $inner++;
++	}
++	$OUT.=function() for( 1..3 );
++
++Assuming C<$outer == 1> that piece will producess the string C<123> in
++C<$OUT> each time it is evaluated. But if it is wrapped into a subroutine
++it looks like:
++
++	sub {
++	  my $inner = $outer;
++	  sub function {
++	    return $inner++;
++	  }
++	  $OUT.=function() for( 1..3 );
++	};
++
++If that anonymous function is called several times it produces C<012>,
++C<345> and so on. The problem is that named functions (like C<function>)
++are created at compile time while anonymous functions (like the outer sub)
++at run time. Hence, the C<$inner> my-variable is not available in
++C<function>.
++
++But the code fragment can be converted to make it work:
++
++	sub {
++	  my $inner = $outer;
++	  my $function = sub {
++	    return $inner++;
++	  };
++	  $OUT.=$function->() for( 1..3 );
++	};
++
++Now both the inner and the outer functions are anomymous.
++
++For more information see L<http://perl.apache.org/docs/general/perl_reference/perl_reference.html#my____Scoped_Variable_in_Nested_Subroutines>
++
+ =back
+ 
+ =head1 Convenience Functions
+@@ -1591,6 +1723,35 @@
+ prepended at C<fill_in> time.  Your derived class can override this
+ method to get an arbitrary effect.
+ 
++=head2 Line numbers
++
++Correct line numbers are crucial for debugging. If a template is fetched
++from a larger file and passed to C<Text::Template> as string
++C<Text::Template> doesn't know at which line of the larger file the
++template starts. Hence, it cannot produce correct error messages.
++
++The solution is to prepend the template string (assuming default
++delimiters are used) with
++
++	{#line NUMBER}
++
++where C<NUMBER> is the actual line number where the template starts.
++
++If custom delimiters are used replace the braces by them. Assuming C<[%>
++and C<%]> as delimiters that directive should look:
++
++	[%#line NUMBER%]
++
++Note that there must not be any other character between the opening
++delimiter and the C<#line> and between the C<NUMBER> and the closing
++delimiter not even spaces. Also, there must be only one space between
++C<#line> and C<NUMBER>.
++
++The C<#line> directive works not only at the beginning of a template.
++Suppose you have a larger template and have cut out some parts prior
++to passing it to C<Text::Template> as a string. Replace these parts with
++correct C<#line> directives and your error messages are correct.
++
+ =head2 JavaScript
+ 
+ Jennifer D. St Clair asks:

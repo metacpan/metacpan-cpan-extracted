@@ -1,0 +1,774 @@
+#!/usr/bin/env perl
+## Copyright © 2009-2015 by Daniel Friesel <derf@finalrewind.org>
+## License: WTFPL <http://sam.zoy.org/wtfpl>
+##   0. You just DO WHAT THE FUCK YOU WANT TO.
+use strict;
+use warnings;
+use 5.010;
+
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+use utf8;
+
+use Encode qw(decode);
+use Travel::Routing::DE::EFA;
+use Exception::Class;
+use Getopt::Long qw/:config no_ignore_case/;
+use List::Util qw(first);
+
+our $VERSION = '2.15';
+my $ignore_info;
+my $efa;
+my $efa_url = 'http://efa.vrr.de/vrr/XSLT_TRIP_REQUEST2';
+my ( @from, @to, @via, $from_type, $to_type, $via_type );
+my $opt = {
+	'efa-url'     => \$efa_url,
+	'help'        => sub { show_help(0) },
+	'ignore-info' => \$ignore_info,
+	'from'        => \@from,
+	'to'          => \@to,
+	'version'     => sub { say "efa version $VERSION"; exit 0 },
+	'via'         => \@via,
+};
+
+binmode( STDOUT, ':encoding(utf-8)' );
+binmode( STDERR, ':encoding(utf-8)' );
+
+sub show_help {
+	my ($exit_status) = @_;
+
+	say 'Usage: efa [options] <from-city> <from-stop> <to-city> <to-stop>';
+	say 'See also: man efa';
+
+	exit $exit_status;
+}
+
+sub new_efa_by_url {
+	my ($url) = @_;
+	my $res = eval {
+		Travel::Routing::DE::EFA->new(
+			efa_url => $url,
+
+			origin      => [ @from, $from_type ],
+			destination => [ @to,   $to_type ],
+			via => ( @via ? [ @via, $via_type ] : undef ),
+
+			arrival_time   => $opt->{arrive},
+			departure_time => $opt->{depart},
+			date           => $opt->{date},
+			exclude        => $opt->{exclude},
+			train_type     => $opt->{include},
+			with_bike      => $opt->{bike},
+
+			select_interchange_by => $opt->{prefer},
+			use_near_stops        => $opt->{proximity},
+			walk_speed            => $opt->{'walk-speed'},
+			max_interchanges      => $opt->{'max-change'},
+			num_results           => $opt->{'num-connections'},
+
+			without_solid_stairs => $opt->{without_solid_stairs},
+			without_escalators   => $opt->{without_escalators},
+			without_elevators    => $opt->{without_elevators},
+			with_low_platform    => $opt->{with_low_platform},
+			with_wheelchair      => $opt->{with_wheelchair},
+
+			developer_mode => $opt->{devmode},
+			lwp_options    => { timeout => $opt->{timeout} },
+		);
+	};
+	return $res;
+}
+
+sub handle_efa_exception {
+	my ($e) = @_;
+
+	if ( $e->isa('Travel::Routing::DE::EFA::Exception::Setup') ) {
+		if ( $e->message ) {
+			printf STDERR (
+				"User error: %s (option '%s'): %s\n",
+				$e->description, $e->option, $e->message
+			);
+		}
+		else {
+			printf STDERR (
+				"User error: %s (option '%s', got '%s', want '%s')\n",
+				$e->description, $e->option, $e->have, $e->want
+			);
+		}
+
+		exit 1;
+	}
+	if ( $e->isa('Travel::Routing::DE::EFA::Exception::Net') ) {
+		printf STDERR (
+			"Network error: %s: %s\n",
+			$e->description, $e->http_response->as_string
+		);
+		exit 2;
+	}
+	if ( $e->isa('Travel::Routing::DE::EFA::Exception::NoData') ) {
+		printf STDERR ( "Backend error: %s\n", $e->description );
+		exit 3;
+	}
+	if ( $e->isa('Travel::Routing::DE::EFA::Exception::Ambiguous') ) {
+		printf STDERR (
+			"Backend error: The %s '%s' is ambiguous. Try one of %s\n",
+			$e->post_key, $e->post_value,, $e->possibilities
+		);
+		exit 4;
+	}
+	if ( $e->isa('Travel::Routing::DE::EFA::Exception::Other') ) {
+		printf STDERR ( "Backend error: %s: %s\n", $e->description,
+			$e->message );
+		exit 5;
+	}
+
+	printf STDERR ( "Unknown error: %s\n%s", ref($e), $e->trace );
+	exit 10;
+}
+
+sub check_for_error {
+	my ($eval_error) = @_;
+
+	if ( not defined $efa ) {
+		if (    $eval_error
+			and ref($eval_error)
+			and $eval_error->isa('Travel::Routing::DE::EFA::Exception') )
+		{
+			handle_efa_exception($eval_error);
+		}
+		elsif ($eval_error) {
+			printf STDERR
+			  "Unknown Travel::Routing::DE::EFA error:\n${eval_error}";
+			exit 10;
+		}
+		else {
+			say STDERR 'Travel::Routing::DE::EFA failed to return an object';
+			exit 10;
+		}
+	}
+
+	return;
+}
+
+sub format_footpath {
+	my @parts = @_;
+	my $str   = q{};
+
+	for my $path_elem (@parts) {
+		my ( $type, $level ) = @{$path_elem};
+		if ( $level eq 'UP' ) {
+			$str .= ' ↗';
+		}
+		elsif ( $level eq 'DOWN' ) {
+			$str .= ' ↘';
+		}
+		elsif ( $level eq 'LEVEL' ) {
+			$str .= ' →';
+		}
+		else {
+			$str .= " [unhandled level, please report a bug : $level]";
+		}
+	}
+
+	return $str;
+}
+
+sub display_routes {
+	my (@routes) = @_;
+
+	for my $i ( 0 .. $#routes ) {
+
+		my $route = $routes[$i];
+
+		if ( $opt->{'extended-info'} ) {
+			print '# ' . $route->duration;
+			if ( $route->ticket_type ) {
+				printf( ", Preisstufe %s (%s€ / %s€)\n\n",
+					$route->ticket_type, $route->fare_adult,
+					$route->fare_child, );
+			}
+			else {
+				print "\n\n";
+			}
+		}
+
+		for my $c ( $route->parts ) {
+			display_connection($c);
+		}
+
+		# last one needs to be shown separately
+		if ( $opt->{maps} ) {
+			my $c = ( $route->parts )[-1];
+			for my $m ( $c->arrival_routemaps, $c->arrival_stationmaps ) {
+				say "# $m";
+			}
+		}
+
+		if ( $i != $#routes ) {
+			print "---------\n\n";
+		}
+	}
+	return;
+}
+
+sub display_connection {
+	my ($c) = @_;
+
+	if ( $c->delay ) {
+		printf( "# +%d,  Plan: %s -> %s\n",
+			$c->delay, $c->departure_stime, $c->arrival_stime );
+	}
+
+	for my $note ( $c->regular_notes ) {
+		my $text = $note->summary;
+		if ( not( length $ignore_info and $text =~ /$ignore_info/i ) ) {
+			say "# $text";
+		}
+	}
+
+	for my $notice ( $c->current_notes ) {
+		if ( $notice->subtitle ne $notice->subject ) {
+			printf( "# %s - %s\n", $notice->subtitle, $notice->subject );
+		}
+		else {
+			printf( "# %s\n", $notice->subtitle );
+		}
+	}
+
+	if ( $opt->{maps} ) {
+		for my $m ( $c->departure_routemaps, $c->departure_stationmaps ) {
+			say "# $m";
+		}
+	}
+
+	printf(
+		"%-5s ab  %-30s %-20s %s\n",
+		$c->departure_time,
+		$c->departure_stop_and_platform,
+		$c->train_line || $c->train_product,
+		$c->train_destination,
+	);
+
+	if ( $opt->{'full-route'} ) {
+		for my $via_stop ( $c->via ) {
+			printf( "%-5s     %-30s %s\n",
+				$via_stop->[1], $via_stop->[2], $via_stop->[3] );
+		}
+	}
+
+	printf( "%-5s an  %s\n", $c->arrival_time, $c->arrival_stop_and_platform, );
+	print "\n";
+
+	if (    $opt->{'extended-info'}
+		and $c->footpath_duration
+		and $c->footpath_type ne 'IDEST' )
+	{
+		printf( "%5d min umsteigen: %s\n\n",
+			$c->footpath_duration, format_footpath( $c->footpath_parts ) );
+	}
+
+	return;
+}
+
+@ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
+
+#<<<
+GetOptions(
+	$opt,
+	qw{
+		accessibility|x=s@
+		arrive|a=s
+		auto-url|discover-and-print|A
+		bike|b
+		bike-info|B
+		date|d=s
+		depart|time|t=s
+		devmode
+		discover|D
+		efa-url|u=s
+		exclude|e=s@
+		extended-info|E
+		from=s@{2}
+		full-route|f
+		help|h
+		ignore-info|I:s
+		include|i=s
+		list|l
+		maps|M
+		max-change|m=i
+		num-connections|n=i
+		prefer|P=s
+		proximity|p:10
+		service|s=s
+		timeout=i
+		to=s@{2}
+		version|v
+		via=s@{2}
+		walk-speed|w=s
+	},
+) or show_help(1);
+#>>>
+
+if ( $opt->{accessibility} ) {
+	@{ $opt->{accessibility} }
+	  = split( qr{,}, join( q{,}, @{ $opt->{accessibility} } ) );
+}
+else {
+	# GetOptions seems to implicitly initialize $opt->{accessibility} to an
+	# empty arrayref, but it's best not to rely on that.
+	$opt->{accessibility} = [];
+}
+
+if ( $opt->{exclude} ) {
+	@{ $opt->{exclude} } = split( qr{,}, join( q{,}, @{ $opt->{exclude} } ) );
+}
+
+for my $field ( @{ $opt->{accessibility} } ) {
+	given ($field) {
+		when ( [qw[s no-stairs]] )       { $opt->{without_solid_stairs} = 1 }
+		when ( [qw[e no-escalators]] )   { $opt->{without_escalators}   = 1 }
+		when ( [qw[E no-elevators]] )    { $opt->{without_elevators}    = 1 }
+		when ( [qw[l nf low-platform]] ) { $opt->{with_low_platform}    = 1 }
+		when ( [qw[w wheelchair]] )      { $opt->{with_wheelchair}      = 1 }
+		when ( [qw[i info]] ) { }    # used for ignore_info default
+	}
+}
+
+if ( $opt->{list} ) {
+	printf( "%-40s %-14s %s\n\n", 'service', 'abbr. (-s)', 'url (-u)' );
+	for my $service ( Travel::Routing::DE::EFA::get_efa_urls() ) {
+		printf( "%-40s %-14s %s\n", @{$service}{qw(name shortname url)} );
+	}
+	exit 0;
+}
+
+if ( $opt->{arrive} and $opt->{depart} ) {
+	print STDERR 'Note: The options -a/--arrive and -t/--time/--depart are'
+	  . " mutually exclusive\n"
+	  . "      Discarding the --arrive option\n\n";
+	delete $opt->{arrive};
+}
+
+if ( not defined $ignore_info ) {
+	$ignore_info = join(
+		q{|},
+		grep { defined } (
+			@{ $opt->{accessibility} } ? undef : 'Einstiegshilfe',
+			(
+				     $opt->{bike}
+				  or $opt->{'bike-info'}
+			) ? undef : 'Fahrradmitnahme',
+		)
+	);
+}
+elsif ( defined $ignore_info and length($ignore_info) == 0 ) {
+	$ignore_info = undef;
+}
+
+if ( not( @from and @to ) ) {
+	if ( @ARGV == 4 ) {
+		( @from[ 0, 1 ], @to[ 0, 1 ] ) = @ARGV;
+	}
+	elsif ( @ARGV == 6 ) {
+		( @from[ 0, 1 ], @via[ 0, 1 ], @to[ 0, 1 ] ) = @ARGV;
+	}
+	else {
+		show_help(1);
+	}
+}
+
+for my $pair ( [ \@from, \$from_type ], [ \@via, \$via_type ],
+	[ \@to, \$to_type ], )
+{
+
+	next if ( not defined $pair->[0]->[1] );
+
+	if (
+		$pair->[0]->[1] =~ s{ ^ (?<type> [^:]+ ) : \s* (?<target> .+ ) $ }
+		{$+{target}}x
+	  )
+	{
+		given ( $+{type} ) {
+			when ('addr') { ${ $pair->[1] } = 'address' }
+			default       { ${ $pair->[1] } = $+{type} }
+		}
+	}
+}
+
+if ( $opt->{service} ) {
+	my $service = first { lc( $_->{shortname} ) eq lc( $opt->{service} ) }
+	Travel::Routing::DE::EFA::get_efa_urls();
+	if ( not $service ) {
+		printf STDERR (
+			"Error: Unknown service '%s'. See 'efa -l' for a "
+			  . "list of supported service names\n",
+			$opt->{service}
+		);
+		exit 1;
+	}
+	$efa_url = $service->{url};
+}
+
+if ( $opt->{discover} or $opt->{'auto-url'} ) {
+	for my $service ( Travel::Routing::DE::EFA::get_efa_urls() ) {
+		$efa = new_efa_by_url( $service->{url} );
+		if ($efa) {
+			if ( $opt->{'auto-url'} ) {
+				last;
+			}
+			printf(
+				"%s / %s (%s)\n   ->  efa -s %s %s\n\n",
+				@{$service}{qw(name shortname url shortname)},
+				join( q{ }, map { "'$_'" } @ARGV ),
+			);
+		}
+	}
+	if ( $opt->{'discover'} ) {
+		exit 0;
+	}
+}
+else {
+	$efa = new_efa_by_url($efa_url);
+}
+
+check_for_error($@);
+
+my @routes = $efa->routes;
+
+display_routes( $efa->routes );
+
+__END__
+
+=head1 NAME
+
+efa - Command line client for EFA-based public transit routing services
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<efa> B<--from> I<city> I<stop> B<--to> I<city> I<stop> [ I<additional options> ]
+
+=item B<efa> [ I<options> ] I<from-city> I<from-stop> [ I<via-city> I<via-stop> ] I<to-city> I<to-stop>
+
+=back
+
+=head1 VERSION
+
+version 2.15
+
+=head1 DESCRIPTION
+
+B<efa> is a command line client for EFA-based public transit routing
+interfaces, e.g. L<http://efa.vrr.de>.  B<efa> requests connections between two
+points and displays the results.
+
+By default, the EFA service at L<http://efa.vrr.de> (operated by
+Verkehrsverbund Rhein-Ruhr) is used, which supports most places in Germany.
+A list of all supported EFA instances can be retrieved with B<-l> and a custom
+instance can be selected using B<-s> I<service> or B<-u> I<url>. It is also
+possible to probe all known EFA services for a specific connection using the
+B<-A> and B<-D> options.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--from> I<city> I<stop>
+
+Departure place
+
+=item B<--to> I<city> I<stop>
+
+Arrival place
+
+=item B<--via> I<city> I<stop>
+
+Travel via this place
+
+In all cases, if you want I<stop> to be an address or "point of interest", you
+can set it to 'addr:something' or 'poi:something'.
+
+=item B<-a>|B<--arrive> I<hh>:I<mm>
+
+Journey end time (overrides --time/--depart)
+
+=item B<-A>|B<--auto-url>|B<--discover-and-print>
+
+Probe all known EFA entry points for the specified connection. Print the first
+result which was not an error.
+
+Note that this may take a while and will not necessarily return the best
+result.  Also, using this option by default is not recommended, as it puts
+EFA services under considerable additional load.
+
+=item B<-b>|B<--bike>
+
+Request connections allowing the passenger to take a bike with them.
+Note that this may cause B<efa> to display no routes at all -- In that case,
+the backend was unable to find such connections or didn't know about
+their bike-support.
+
+=item B<-B>|B<--bike-info>
+
+Show information about bike support, but do not select routes based on it.
+In essence, this option simply changes the B<--ignore-info> default. It is
+useful when B<--bike> did not return any routes even though most of the
+route has bike support.
+
+=item B<-d>|B<--date> I<dd>.I<mm>.[I<yyyy>]
+
+Journey date
+
+=item B<-D>|B<--discover>
+
+Probe all known EFA entry points for the specified connection. No routes are
+returned in this case. Instead, B<efa> will print the URLs and names of all
+entry points which did not return an error.
+
+=item B<-u>|B<--efa-url> I<url>
+
+URL to the EFA entry point, defaults to
+L<http://efa.vrr.de/vrr/XSLT_TRIP_REQUEST2>.  Depending on your location, some
+I<url>s may contain more specific data than others. See
+Travel::Routing::DE::EFA(3pm) and the B<-l> option for alternatives.
+
+=item B<-e>|B<--exclude> I<transports>
+
+Exclude I<transports> (comma separated list).
+
+Possible transports: zug, s-bahn, u-bahn, stadtbahn, tram, stadtbus, regionalbus,
+schnellbus, seilbahn, schiff, ast, sonstige
+
+=item B<-E>|B<--extended-info>
+
+Display more than just the basic route information. At the moment, the
+following is displayed (if available):
+
+=over
+
+=item * Route duration
+
+=item * Ticket fare
+
+=item * transfer duration and elevation changes (via stairs / escalators)
+at each stop
+
+=back
+
+=item B<-f>|B<--full-route>
+
+Display intermediate stops (with time and platform) of each train.  Note that
+these are not always available.
+
+=item B<-I>|B<--ignore-info> [ I<regex> ]
+
+Ignore additional information matching I<regex>
+(default: /Fahrradmitnahme|Einstiegshilfe/)
+
+If I<regex> is not supplied, removes the default regex (-E<gt> nothing will be ignored)
+
+=item B<-i>|B<--include> I<type>
+
+Include connections using trains of type I<type>, where I<type> may be:
+
+=over
+
+=item * local (default)
+
+only take local trains ("Verbund-/Nahverkehrslinien"). Slow, but the cheapest
+method if you're not traveling long distance
+
+=item * ic
+
+Local trains + IC
+
+=item * ice
+
+All trains (local + IC + ICE)
+
+=back
+
+=item B<-l>|B<--list>
+
+List supported EFA services wit their URLs (see B<-u>) and abbreviations
+(see B<-s>).
+
+=item B<-M>|B<--maps>
+
+Output links to maps of transfer paths and transfer stations where
+available.
+
+=item B<-m>|B<--max-change> I<number>
+
+Print connections with at most I<number> interchanges
+
+=item B<-n>|B<--num-connections> I<number>
+
+Return up to I<number> connections.  If unset, the default of the respective
+EFA server is used (usually 4 or 5).
+
+=item B<-P>|B<--prefer> I<type>
+
+Prefer connections of I<type>:
+
+=over
+
+=item * speed (default)
+
+The faster, the better
+
+=item * nowait
+
+Prefer connections with less interchanges
+
+=item * nowalk
+
+Prefer connections with less walking (at interchanges)
+
+=back
+
+=item B<-p>|B<--proximity> [I<minutes>]
+
+Take stops close to the stop/start into account.  By default, up to 10 minutes
+of walking to/from the route's first/last stop is considered acceptable. You
+can specify I<minutes> to use a custom value.
+
+=item B<-s>|B<--service> I<name>
+
+Shortname of the EFA entry point. See Travel::Routing::DE::EFA(3pm) and
+the B<-l> option for a list of services.
+
+=item B<-t>|B<--time>|B<--depart> I<hh>:I<mm>
+
+Journey start time
+
+=item B<--timeout> I<seconds>
+
+Set timeout for HTTP requests. Default: 60 seconds.
+
+=item B<-v>|B<--version>
+
+Print version information
+
+=item B<-w>|B<--walk-speed> I<speed>
+
+Set your walking speed to I<speed>.
+Accepted values: normal (default), fast, slow
+
+=item B<-x>|B<--accessibility> I<types>
+
+Request connections satisfying all of the specified accessibility I<types>
+(comma-separated list, option may be repeated). Please note that this may cause
+the backend to return no results at all, either because no such connection
+exists or because the required lines do not have the correct accessibility
+attributes set.
+
+The following I<types> are supported:
+
+=over
+
+=item e / no-escalators
+
+Transfers must be possible without taking an escalator.
+
+=item E / no-elevators
+
+Transfers must be possible without using an elevator.
+
+=item i / info
+
+Does not restrict the requested connections. However, this option causes
+B<efa> to display additional accessibility information for each route part
+(where available). When B<-x w> or B<-x l> do not return any connections,
+using B<-x i> might be more helpful (though it cannot guarantee that any of
+the results satisfy the respective type).
+
+=item l / nf / low-platform
+
+All vehicles must be low-platform ("Niederflur").
+
+=item s / no-stairs
+
+Transfers must be possible without stairs (e.g. via escalators/elevators or
+ramps).
+
+=item w / wheelchair
+
+All vehicles must be wheelchair accessible.
+
+=back
+
+=back
+
+=head1 EXIT STATUS
+
+    0    Everything went well
+    1    Invalid arguments, see error message
+    2    Network error, unable to send request
+    3    efa.vrr.de did not return any parsable data
+    4    efa.vrr.de error: ambiguous input
+    5    efa.vrr.de error: no connections found
+    10   Unknown Travel::Routing::DE::EFA error
+    255  Other internal error
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 EXAMPLES
+
+=over
+
+=item efa Do Hbf MH Hbf
+
+Look up a connection from Dortmund (Do) Hbf to ME<uuml>lheim (MH) Hbf
+
+=item efa --include ice Essen Hbf Hamburg Dammtor
+
+Look up a connection with long-distance trains
+
+=item efa --arrive 18:00 -e zug,s-bahn -M E Wickenburgstr D Oststr
+
+Look up a connection from Essen Wickenburgstr to DE<uuml>sseldorf Oststr.
+Do not use any trains, make sure to arrive around 18:00 and print links to
+maps of all interchange stations.
+
+=item efa -s vvs Stuttgart Hbf Stuttgart Marienplatz
+
+Use the VVS (Verkehrsverbund Stuttgart) EFA service to look up a connection.
+
+=back
+
+=head1 DEPENDENCIES
+
+This script requires perl 5.10 (or higher) with the following modules:
+
+=over
+
+=item * Class::Accessor
+
+=item * Exception::Class
+
+=item * LWP::UserAgent
+
+=item * XML::LibXML
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+The EFA backend is not able to calculate "two-way" routes, i.e. from -> via ->
+to routes with from == to. If from and to are the same stop, it doesn't even
+try to calculate a route ("we recommend walking instead"), if they are close to
+each other it may or may not work.  Workaround: Request from -> via using the
+normal four-argument efa invocation, read the time, use efa -t time via via to
+to to request via -> to.
+
+=head1 AUTHOR
+
+Copyright (C) 2009-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.

@@ -1,0 +1,37 @@
+---
+abstract: 'Produce HTML suitable for the Bootstrap pagination component'
+author:
+  - 'Manfred Stock <mstock@cpan.org>'
+build_requires:
+  Data::Page: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Template: 0
+  Test::Exception: 0
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Bootstrap-Pagination
+no_index:
+  file:
+    - perlcritic.rc
+requires:
+  Carp: 0
+  HTML::Entities: 0
+  MRO::Compat: 0
+  Scalar::Util: 0
+  Template::Exception: 0
+  Template::Plugin: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/mstock/Template-Plugin-Bootstrap-Pagination.git
+version: 0.002000

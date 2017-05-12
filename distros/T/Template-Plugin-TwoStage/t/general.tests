@@ -1,0 +1,226 @@
+-- test --
+-- name: include() with stash localization? --
+[% USE TwoStage = TwoStage;
+   TwoStage.purge; # we start with an empty cache
+%]
+[% SET change_me = 'before' %]
+[% BLOCK test_localization %]
+Hello
+[* SET change_me = 'after' *]
+[% END %]
+[% TwoStage.include( 'template' => 'test_localization' ) %]
+[% change_me %]
+-- expect --
+Hello
+before
+
+-- test --
+-- name: process() with stash localization? --
+[% USE TwoStage = TwoStage %]
+[% SET change_me = 'before' %]
+[% BLOCK test_localization %]
+Hello
+[* SET change_me = 'after' *]
+[% END %]
+[% TwoStage.process( 'template' => 'test_localization' ); %]
+[% change_me %]
+-- expect --
+Hello
+after
+
+-- test --
+-- name: disk caching ok? --
+[% USE TwoStage = TwoStage %]
+[% BLOCK test_localization %]
+Disk caching not active.
+[% END %]
+[% TwoStage.process( 'template' => 'test_localization' ); %]
+-- expect --
+Hello
+
+-- test --
+-- name: alternate file scoped tag style? --
+[% TAGS html %]
+<!-- USE TwoStage = TwoStage;
+     TwoStage.purge;
+-->
+<!-- BLOCK test_prec_tag_style -->
+<!-- 'Hello ' -->
+[* 'world!' *]
+<!-- END;
+     TwoStage.process( 'template' => 'test_prec_tag_style' ); -->
+-- expect --
+Hello world!
+
+-- test --
+-- name: test ttl option --
+[% USE TwoStage = TwoStage;
+   PERL
+%]
+sleep(2);
+[% END;
+   BLOCK test_prec_tag_style %]
+ttl ok
+[% END %]
+[% TwoStage.process( 'template' => 'test_prec_tag_style', ttl => 1 ); %]
+-- expect --
+ttl ok
+
+-- test --
+-- name: test keys option --
+[% USE TwoStage = TwoStage; 
+   BLOCK test_keys;
+	IF loggedIn; %]
+You are logged in.
+[%	ELSE %]
+You are NOT logged in.
+[%	END;
+   END;
+   loggedIn = 1;
+   TwoStage.process( 'template' => 'test_keys', keys => { 'loggedIn' => 1 } ); 
+   loggedIn = 0;
+   TwoStage.process( 'template' => 'test_keys', keys => { 'loggedIn' => 0 } ); 
+   loggedIn = 1;
+   TwoStage.process( 'template' => 'test_keys', keys => { 'loggedIn' => 1 } ); 
+   loggedIn = 0;
+   TwoStage.process( 'template' => 'test_keys', keys => { 'loggedIn' => 0 } ); 
+%]
+-- expect --
+You are logged in.
+You are NOT logged in.
+You are logged in.
+You are NOT logged in.
+
+-- test --
+-- name: test namespace option --
+[% USE TwoStage = TwoStage; 
+   BLOCK test_namespace; %]
+Namespace: preload
+[% END;
+   TwoStage.process( 'template' => 'test_namespace', namespace => 'preload' ); 
+   TwoStage.process( 'template' => 'test_namespace', namespace => 'preload' ); 
+%]
+-- expect --
+Namespace: preload
+Namespace: preload
+
+-- test --
+-- name: test namespace option --
+[% USE TwoStage = TwoStage; 
+   BLOCK test_namespace; %]
+Namespace: no preload
+[% END;
+   TwoStage.process( 'template' => 'test_namespace', namespace => 'no preload' ); 
+   TwoStage.process( 'template' => 'test_namespace', namespace => 'no preload' ); 
+%]
+-- expect --
+Namespace: no preload
+Namespace: no preload
+
+-- test --
+-- name: test runtime_tag_style option --
+[% USE TwoStage = TwoStage; 
+   BLOCK test_runtime_tag_style %]
+<!-- foo -->
+[% END;
+
+   foo = BLOCK %]
+blub
+[% END;
+   TwoStage.process( 'template' => 'test_runtime_tag_style', runtime_tag_style => 'html' ); 
+   foo = BLOCK %]
+bla
+[% END;
+   TwoStage.process( 'template' => 'test_runtime_tag_style', runtime_tag_style => 'html' ); 
+%]
+-- expect --
+blub
+bla
+
+-- test --
+-- name: test dev_mode option --
+[% USE TwoStage = TwoStage; 
+   BLOCK test_runtime_tag_style %]
+<!-- foo; foo; -->
+[% END;
+
+   foo = BLOCK %]
+blub
+[% END;
+   TwoStage.process( 'template' => 'test_runtime_tag_style', runtime_tag_style => 'html', dev_mode => 1 ); 
+   TwoStage.process( 'template' => 'test_runtime_tag_style', runtime_tag_style => 'html', dev_mode => 1 ); 
+%]
+-- expect --
+blub
+blub
+blub
+blub
+
+-- test --
+-- name: test 'template' method parameter in signature? --
+[% USE TwoStage = TwoStage; 
+   BLOCK test_template_a %]
+blub
+[% END;
+   BLOCK test_template_b %]
+bla
+[% END;
+   TwoStage.process( 'template' => 'test_template_a' ); 
+   TwoStage.process( 'template' => 'test_template_b' ); 
+   TwoStage.process( 'template' => 'test_template_a' ); 
+   TwoStage.process( 'template' => 'test_template_b' ); 
+%]
+-- expect --
+blub
+bla
+blub
+bla
+
+-- test --
+-- name: test 'component.name' in signature. Is it making 'template' parameter having file scope only? --
+[% USE TwoStage = TwoStage; 
+   BLOCK test_template_a %]
+blub
+[% END;
+   BLOCK test_template_b %]
+bla
+[% END;
+   # to this point component.name is something like 'input_text'
+   TwoStage.process( 'template' => 'test_template_a' ); 
+   TwoStage.process( 'template' => 'test_template_b' );
+%]
+-- expect --
+blub
+bla
+
+-- test --
+-- name: test file scope --
+[% PROCESS test_file_scope.tt %]
+-- expect --
+bla
+blub
+
+-- test --
+-- name: test 'dir_keys' in path (but none of those not being present in the 'keys' option)? --
+[% USE TwoStage = TwoStage( dev_mode => 1, dir_keys => [ 'bla', 'blub', 'foo' ] ); 
+   BLOCK test_dir_keys;
+	void;	
+   END;
+   TwoStage.process( 'template' => 'test_dir_keys', keys => { blub => 'blub', bla => 'bla' } );
+   IF TwoStage.prec_template.rel_file_dir.match( 'bla' ) 
+      && 
+      TwoStage.prec_template.rel_file_dir.match( 'blub' ) 
+      &&
+      !TwoStage.prec_template.rel_file_dir.match( 'foo' ); 
+   	'ok'; 
+   END;
+%]
+-- expect --
+ok
+
+-- test --
+-- name: clean up with TwoStage::purge --
+[% USE TwoStage = TwoStage;
+   TwoStage.purge;
+%]
+-- expect --

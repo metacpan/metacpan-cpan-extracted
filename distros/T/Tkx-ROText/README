@@ -1,0 +1,48 @@
+Tkx-ROText
+
+This module defines a read-only text widget for Tkx.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+If you don't have Module::Build installed you can fall back to the old 
+makefile interface:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tkx::ROText
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tkx-ROText
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tkx-ROText
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tkx-ROText
+
+    Search CPAN
+        http://search.cpan.org/dist/Tkx-ROText
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 Michael J. Carman
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

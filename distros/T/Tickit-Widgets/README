@@ -1,0 +1,29 @@
+NAME
+
+    Tickit::Widgets - load several Tickit::Widget classes at once
+
+SYNOPSIS
+
+     use Tickit::Widgets qw( Static VBox HBox );
+
+    Equivalent to
+
+     use Tickit::Widget::Static;
+     use Tickit::Widget::VBox;
+     use Tickit::Widget::HBox;
+
+DESCRIPTION
+
+    This module provides an import utility to simplify code that uses many
+    different Tickit::Widget subclasses. Instead of a use line per module,
+    you can simply use this module and pass it the base name of each class.
+    It will require each of the modules.
+
+    Note that because each Widget module should be a pure object class with
+    no exports, this utility does not run the import method of the used
+    classes.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

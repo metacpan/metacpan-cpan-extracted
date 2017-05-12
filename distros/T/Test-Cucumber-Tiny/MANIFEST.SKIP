@@ -1,0 +1,12 @@
+.+\.swp
+\*\~
+\.prove/
+perltidy.LOG
+local/
+build/
+cover_db/
+\.build/
+Test-Cucumber-Tiny-.+
+cpanfile.snapshot
+dist\.ini
+.DS_Store

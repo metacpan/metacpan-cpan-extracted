@@ -1,0 +1,78 @@
+NAME
+    Test::Install::METArequires - TAP output of installing requires listed
+    in META.yml
+
+SYNOPSIS
+        use Test::Install::METArequires;
+        Test::Install::METArequires->t();
+
+        prove -Ilib `perl -MTest::iMETAr -le 'print Test::iMETAr->t_file'` t/
+
+DESCRIPTION
+    Reads META.yml in current folder and tries to install any of the
+    `configure_requires', `build_requires', `requires' modules listed there.
+    Output is TAP - one test line (OK/FAIL) per module with note output.
+
+METHODS
+  t
+    Install requires listed in META.yml and output results as TAP.
+
+  install($module, $version)
+    Do `cpan -i $module' if the required `$version' is not jet installed.
+
+    If dbedia::Debian is loaded. It will install modules from Debian
+    packages if available. Or at least module dependencies if higher version
+    is required than it is available in Debian.
+
+    Set `$ENV{IMETAR_SUDO}' to true if `sudo` has to be executed before each
+    `cpan' or `apt-get' commands.
+
+  cpan_i_timeout
+    Set/get timeout for one `cpan -i ...` execution. Default is 1h.
+
+  t_file
+    Return the location of METArequires.t file.
+
+  t_debian_file
+    Return the location of METArequires-Debian.t file.
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-test-install-metarequires at rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Install-METArequires
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::Install::METArequires
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Install-METArequires
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Install-METArequires
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Install-METArequires
+
+    * Search CPAN
+        http://search.cpan.org/dist/Test-Install-METArequires/
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

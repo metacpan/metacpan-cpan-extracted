@@ -1,0 +1,29 @@
+0.1.0
+    - fix: keys which set by set_keys() are insufficientlly deleted when clear() called.
+0.0.9
+	- successfully data are deleted even if test aborted.
+0.0.8
+    - implement DeleteBeforeInsert option in new()
+    - implement set_keys()
+    - refactoring tests
+0.0.7
+    - implement load_direct()
+    - test will success if MySQL is not installed.
+    - croak if keynames_aref is empty or undefined in load()
+	- refactorings
+0.0.6
+    - fix: data is not cleared when multi-column primary key is used
+0.0.5
+    - fix: load() with hashref option is not work.
+0.0.4
+	- Test::mysqld 0.11 is added to recommends.(older version sometimes causes build error)
+	and tests are skipped if this version is not installed.
+0.0.3
+	-  some tests are moved to xt and make it author_tests(xt isnt bundled in module package.)
+0.0.2
+	- move t/998_perlcritic.t to MANIFEST.SKIP(test only my environment)
+	- fix POD typo in do_select
+
+0.0.1
+	- initial release
+

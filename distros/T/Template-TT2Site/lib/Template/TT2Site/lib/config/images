@@ -1,0 +1,31 @@
+[%# $Id: images,v 1.4 2004/12/05 11:57:46 jv Exp $ -%]
+[%
+
+# Images used by this site. Please override and complete.
+
+site.image = {
+  logo = {
+      src    = "$site.url.logo/tt2site.png"
+      alt    = "TT2Site Builder"
+      width  = 141
+      height = 69
+  }
+  name = {
+      src    = "$site.url.logo/tt2toolkit.png"
+      alt    = "Template::Toolkit"
+      width  = 152
+      height = 20
+  }
+  credits = {
+      src    = "$site.url.images/tt2power.png"
+      alt    = "Powered by Template Toolkit"
+      width  = 78
+      height = 47
+      url    = "http://www.tt2.org/"
+  }
+  background = {
+      src    = "$site.url.images/bg.gif"
+  }
+}
+
+-%]

@@ -1,0 +1,92 @@
+This tests Multisource operations:
+[% USE Multisource -%]
+
+Sources                                :
+[%- FOREACH source = Multisource.sources(ms) -%]
+ [% source -%]
+[% END %]
+
+Eles                                   :
+[%- FOREACH ele = Multisource.eles(ms) -%]
+ [% ele -%]
+[% END %]
+
+Eles_in_source (source1)               :
+[%- FOREACH ele = Multisource.eles_in_source(ms,'source1') -%]
+ [% ele -%]
+[% END %]
+Eles_in_source (source2)               :
+[%- FOREACH ele = Multisource.eles_in_source(ms,'source2') -%]
+ [% ele -%]
+[% END %]
+
+Ele_in_sources (one)                   :
+[%- FOREACH source = Multisource.ele_in_sources(ms,'one') -%]
+ [% source -%]
+[% END %]
+Ele_in_sources (two)                   :
+[%- FOREACH source = Multisource.ele_in_sources(ms,'two') -%]
+ [% source -%]
+[% END %]
+Ele_in_sources (three)                 :
+[%- FOREACH source = Multisource.ele_in_sources(ms,'three') -%]
+ [% source -%]
+[% END %]
+Ele_in_sources (zero)                  :
+[%- FOREACH source = Multisource.ele_in_sources(ms,'zero') -%]
+ [% source -%]
+[% END %]
+
+Ele_in_source (source1,one)            : [% Multisource.ele_in_source(ms,'source1','one') %]
+Ele_in_source (source1,two)            : [% Multisource.ele_in_source(ms,'source1','two') %]
+
+Ele (one)                              : [% Multisource.ele(ms,'one') %]
+Ele (zero)                             : [% Multisource.ele(ms,'zero') %]
+
+Access (three,/a)                      : [% Multisource.access_val(ms,'three','/a') %]
+Access (three,/b)                      : [% Multisource.access_val(ms,'three','/b') %]
+Access (three,/c)                      : [% Multisource.access_val(ms,'three','/c') %]
+Access (four,/l)                       : [% Multisource.access_val(ms,'four','/l') %]
+
+Access (one,/l)                        :
+[%- FOREACH ele = Multisource.access_list(ms,'one','/l') -%]
+ [% ele -%]
+[% END %]
+Access (one,/)                         :
+[%- FOREACH ele = Multisource.access_list(ms,'one','/') -%]
+ [% ele -%]
+[% END %]
+
+Which (/b bb)                          :
+[%- FOREACH ele = Multisource.which(ms,'/b','bb') -%]
+ [% ele -%]
+[% END %]
+Which (/c cc)                          :
+[%- FOREACH ele = Multisource.which(ms,'/c','cc') -%]
+ [% ele -%]
+[% END %]
+
+Which_sources (zero /a all)            :
+[%- FOREACH source = Multisource.which_sources(ms,'zero','/a','all') -%]
+ [% source -%]
+[% END %]
+Which_sources (one /xxx all)           :
+[%- FOREACH source = Multisource.which_sources(ms,'one','/xxx','all') -%]
+ [% source -%]
+[% END %]
+Which_sources (eight /c all)           :
+[%- FOREACH source = Multisource.which_sources(ms,'eight','/c','all') -%]
+ [% source -%]
+[% END %]
+Which_sources (eight /c all-val)       :
+[%- FOREACH source = Multisource.which_sources(ms,'eight','/c','all-val') -%]
+ [% source -%]
+[% END %]
+Which_sources (eight /c readonly)      :
+[%- FOREACH source = Multisource.which_sources(ms,'eight','/c','readonly') -%]
+ [% source -%]
+[% END %]
+Which_sources (eight /c readonly-val)  :
+[%- FOREACH source = Multisource.which_sources(ms,'eight','/c','readonly-val') -%]
+ [% source -%]
+[% END %]

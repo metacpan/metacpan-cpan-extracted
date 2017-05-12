@@ -1,0 +1,78 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1f0b415f6b44828a6ea726a3f1d560199d385a86 AUTHOR_PLEDGE
+SHA1 8221742aa1edd4700f2c3c77a98b9ee8bc251e3b Build.PL
+SHA1 df781cbdae752559c234aab9db702f7f763681e5 Changes
+SHA1 d65e0a05a3de1081768c46c2b09492ec150cf6dc CommitLog
+SHA1 f840192e738ae9346d390cd84135809fdeba6121 INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 7d9782f688afa9dd9e3d0a9d8a1a8d141d5bc5b7 MANIFEST
+SHA1 741d911a61846ad41df3210bb876f74bd99a51c3 MANIFEST.SKIP
+SHA1 44d1dc3b9cb1fbd640adf940bf6d638f0913a420 META.json
+SHA1 fb5386ad284c598a4569d656140ca6c4bfd6b85d META.yml
+SHA1 6e4b7f939eb81d62c234a300a5fe2c3a3550307a Makefile.PL
+SHA1 366acc8ae08ea8bcfa6bb65f5c515de7c33cf9a6 README
+SHA1 b8213bf2666cae39dc9e4a678e2c6a4b4d5c6587 cpanfile
+SHA1 41279f39e264a013f1cd6fd8076a68c2d27548a8 dist.ini
+SHA1 ae554f24765b4f92da191a64ab3483cb12316c3c doap.xml
+SHA1 a8cf85a8845779bc3c6bf45eac95dd857d47bd54 examples/simple.pl
+SHA1 52ddc4edb45f5608646fa7713c2a03e662af4ac9 lib/Test/Apocalypse.pm
+SHA1 e74b7c63703dfdf46f726b8279b4c6807f60aa27 lib/Test/Apocalypse/AutoLoader.pm
+SHA1 860e09786d4d1bdd025e63a89b33d3b447a0b30b lib/Test/Apocalypse/CPANChanges.pm
+SHA1 d7b97b790c0ec7abbc9d20f7520b712df66d7685 lib/Test/Apocalypse/CPANMeta.pm
+SHA1 88ae7189f92226b7f547353491b1fa88da96fad7 lib/Test/Apocalypse/CPANMeta_JSON.pm
+SHA1 2df131e4750e208f7808e39eb5caff07edfbe930 lib/Test/Apocalypse/CPANMeta_YAML.pm
+SHA1 e652e1d78a67294d64b12ee5beaa549be882e5a5 lib/Test/Apocalypse/Compile.pm
+SHA1 ce6acf45becdb5ff89a8c54f81fcb5152b980180 lib/Test/Apocalypse/ConsistentVersion.pm
+SHA1 374746246cf691ae7dad4bf9c29015729ad7afe9 lib/Test/Apocalypse/DOSnewline.pm
+SHA1 cad919adc1101d85fbd11cbe7a55479d6148899c lib/Test/Apocalypse/Dependencies.pm
+SHA1 c649fc518aa657c3aeb529c36d14d4f5b11d5423 lib/Test/Apocalypse/DirChecks.pm
+SHA1 ca6c02313366291840bea19fd5c672cf0fd0d6ad lib/Test/Apocalypse/DistManifest.pm
+SHA1 5637ab6637b6296931039281615ef94263721b8d lib/Test/Apocalypse/EOL.pm
+SHA1 ca1e0ca16f764e174bc9cf5ce7134cb8fa24e02a lib/Test/Apocalypse/FileChecks.pm
+SHA1 e84d8784613495d3273608f4215d734e3d9ef04c lib/Test/Apocalypse/FilePortability.pm
+SHA1 27e2c4a41c6cc02f5cdb95b70eeef20b977ab4d7 lib/Test/Apocalypse/Fixme.pm
+SHA1 661968924192d2c5308e36d19b731805745667c2 lib/Test/Apocalypse/HasVersion.pm
+SHA1 f52a5b659688116b8987dd7992f3a64469adace2 lib/Test/Apocalypse/Kwalitee.pm
+SHA1 5a2b0b717774d27c237479e4785cdf83dd9f1dc8 lib/Test/Apocalypse/MinimumVersion.pm
+SHA1 716fa536af7c66aa98caaf1117064268bd4f5867 lib/Test/Apocalypse/Mojibake.pm
+SHA1 a87ce537e675dcb4c39903813f7986acec91cca5 lib/Test/Apocalypse/NoBreakpoints.pm
+SHA1 ad235d6d86b325ff7fbe38a8f2d5d2433adb116a lib/Test/Apocalypse/NoPlan.pm
+SHA1 56b58d29e5ee4dc985e79c4f654797389e644110 lib/Test/Apocalypse/PPPort.pm
+SHA1 6b15cd0c3cd8a18918100ebc2be6cb686bdbeaee lib/Test/Apocalypse/PerlCritic.pm
+SHA1 4f4794aea8506e3720cd4d69795f2da51f0b07cd lib/Test/Apocalypse/PerlMetrics.pm
+SHA1 fe9c587d02530f07358e253457a83718936399f9 lib/Test/Apocalypse/Pod.pm
+SHA1 1ea613d1c83add392044da220bb1eac38765bd7d lib/Test/Apocalypse/Pod_CommonMistakes.pm
+SHA1 d75d42055381116118f1df19a7b371e06efde108 lib/Test/Apocalypse/Pod_Coverage.pm
+SHA1 fd2bdbb7f8a23a88c09129c706bc3bd8a7572d29 lib/Test/Apocalypse/Pod_LinkCheck.pm
+SHA1 ed4830a071c68925296479ceb1d1557a99edb953 lib/Test/Apocalypse/Pod_No404s.pm
+SHA1 417ee84269fc38eb312f5ad588eda6d7f5fc2035 lib/Test/Apocalypse/Pod_Spelling.pm
+SHA1 7bddfa085e1b7497571978a118ebad1b600c3146 lib/Test/Apocalypse/Script.pm
+SHA1 86e6f1dbe28c9113bed56ba69b7428aef3c8ed91 lib/Test/Apocalypse/Signature.pm
+SHA1 93bc829bed7654e58165e27938eb7b610520dae6 lib/Test/Apocalypse/Strict.pm
+SHA1 e3ef41e48e4599fb47bef4dc24f08b038efddfb3 lib/Test/Apocalypse/Synopsis.pm
+SHA1 3587378f76c975ee2f5ec0d9268a23ca097462d6 lib/Test/Apocalypse/UnusedVars.pm
+SHA1 66daa1e2608328a6ef37594932ab4f28d958edbe t/00-compile.t
+SHA1 7b290fbec182e479fc06904d571c5994f4acbe36 t/000-report-versions-tiny.t
+SHA1 0bd8e90a0f48c90a764683ebc89c352fe92536b1 t/apocalypse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRMA64ACgkQGfr7vsGKgxwGQQCg5/8Q8Wfck6LBdEJiCsc35QWE
+SVIAoMCHKGeljRNaZ3SYCi6ctTLRjLwj
+=UbQq
+-----END PGP SIGNATURE-----

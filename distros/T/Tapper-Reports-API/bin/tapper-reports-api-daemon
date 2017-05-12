@@ -1,0 +1,53 @@
+#! /usr/bin/perl
+
+# PODNAME: tapper-reports-api-daemon
+# ABSTRACT: cmdline frontend to Tapper::Reports::API::Daemon
+
+use strict;
+use warnings;
+
+use Cwd;
+use Tapper::Reports::API::Daemon;
+
+$ENV{MX_DAEMON_STDOUT} ||= '/tmp/tapper_reports_api_daemon_devel_stdout.log';
+$ENV{MX_DAEMON_STDERR} ||= '/tmp/tapper_reports_api_daemon_devel_stderr.log';
+
+my $api = Tapper::Reports::API::Daemon->new(
+    basedir => getcwd,
+    pidfile => '/tmp/tapper/tapper-reports-api-daemon.pid',
+);
+$api->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-reports-api-daemon - cmdline frontend to Tapper::Reports::API::Daemon
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=item *
+
+Tapper Team <tapper-ops@amazon.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

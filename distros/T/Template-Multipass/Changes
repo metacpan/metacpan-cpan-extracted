@@ -1,0 +1,10 @@
+Revision history for Perl extension Template-Multipass
+
+0.03
+    - Fixed a bug reported by Robert Lemmen regarding the WRAPPER configuration parameter
+
+0.02
+    - Modify the 03_misc.t test to use IO::Scalar if available so that it passes on 5.6    
+
+0.01
+    - Lilu, multi-pass

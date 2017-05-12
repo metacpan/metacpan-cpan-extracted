@@ -1,0 +1,20 @@
+[% # Generic opening page for a multi-lingual site.
+
+FOREACH lang IN site.languages;
+
+    IF site.image.flags.$lang;
+
+      other = lang _ "/" _ template.name;
+      "<p><a href=\"$other\">";
+      PROCESS util/image image = site.image.flags.$lang;
+      site.image.flags.$lang.descr | html;
+      "</a></p>\n";
+    END;
+
+END;
+
+# Suppress the menu and site flags on this page.
+page.suppress_menu = 1;
+
+-%]
+

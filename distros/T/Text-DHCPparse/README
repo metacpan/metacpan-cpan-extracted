@@ -1,0 +1,77 @@
+Text::DHCPparse - README
+
+The basic premise of the Text::DHCPparse module is to
+parse the lease file from an ISC DHCPd server.  This is
+useful for quick reporting on active leases or for
+tracking purposes.  The resulting hash reference is a
+fixed length record with the key being the IP address for
+the lease, and the value being the lease info in the
+following format:
+
+   Characters       Field
+   ----------  --------------------
+     1 - 17    IP Address
+    18 - 38    Last Lease Timestamp
+    39 - 57    Hardware Address
+    58 - 74    Client Hostname
+
+WARNING:  Always use a copy of your 'dhcpd.leases' file -
+never use an original from a live server!
+
+To Install:
+
+tar -xzvf Text-DHCPparse-X.XX.tar.gz
+(change to newly created directory)
+perl Makefile.pl
+make
+make install
+
+Author:  John D. Shearer <dhcpparse@netguy.org>
+
+Copyright (c) 2001-2002 John D. Shearer.  All rights reverved.
+This program is free software; you may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+18/Jun/2001            perl 5.005, patch 03                     2
+
+

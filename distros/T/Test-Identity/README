@@ -1,0 +1,54 @@
+NAME
+    "Test::Identity" - assert the referential identity of a reference
+
+SYNOPSIS
+     use Test::More tests => 2;
+     use Test::Identity;
+
+     use Thingy;
+
+     {
+        my $thingy;
+
+        sub get_thingy { return $thingy }
+        sub set_thingy { $thingy = shift; }
+     }
+
+     identical( get_thingy, undef, 'get_thingy is undef' );
+
+     my $test_thingy = Thingy->new;
+     set_thingy $test_thingy;
+
+     identical( get_thingy, $thingy, 'get_thingy is now $test_thingy' );
+
+DESCRIPTION
+    This module provides a single testing function, "identical". It asserts
+    that a given reference is as expected; that is, it either refers to the
+    same object or is "undef". It is similar to "Test::More::is" except that
+    it uses "refaddr", ensuring that it behaves correctly even if the
+    references under test are objects that overload stringification or
+    numification.
+
+    It also provides better diagnostics if the test fails:
+
+     $ perl -MTest::More=tests,1 -MTest::Identity -e'identical [], {}'
+     1..1
+     not ok 1
+     #   Failed test at -e line 1.
+     # Expected an anonymous HASH ref, got an anonymous ARRAY ref
+     # Looks like you failed 1 test of 1.
+
+     $ perl -MTest::More=tests,1 -MTest::Identity -e'identical [], []'
+     1..1
+     not ok 1
+     #   Failed test at -e line 1.
+     # Expected an anonymous ARRAY ref to the correct object
+     # Looks like you failed 1 test of 1.
+
+FUNCTIONS
+  identical( $got, $expected, $name )
+    Asserts that $got refers to the same object as $expected.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

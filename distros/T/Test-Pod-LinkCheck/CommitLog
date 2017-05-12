@@ -1,0 +1,113 @@
+==================================================
+Changes from 2013-11-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.008 at 2014-11-02 00:38:26 +0000
+------------------------------------------
+
+  Change: ea77aa8bcc585a8e58b6a8b274dc1173618926e8
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 17:31:51 +0000
+
+    remove another test diag output 
+
+  Change: 00a2f9bea0e98aef20e14d6a19343db90b14a2c3
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 17:17:37 +0000
+
+    fix some bugs in CPANIDX code 
+
+  Change: a9477f3d30a53641c48e4c0f040c8758d42826eb
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 15:13:21 +0000
+
+    add HTTP::Tiny to CPANIDX 
+
+  Change: 22fd35b849da4eda56affa4b577fbefc0fb976c6
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 14:48:41 +0000
+
+    fix code more :( 
+
+  Change: d2ed03aa04bcc420d5c1b30bdb8d98adb8bab6cf
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 14:47:00 +0000
+
+    Add CPANIDX backend 
+
+  Change: aa5d4f32ebcae976da9803b1d186f09d7ae9c068
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 14:35:29 +0000
+
+    silence more debugging 
+
+  Change: b6c848ddd14379964ef24a6b967c9e84ca714b96
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 14:23:38 +0000
+
+    add MetaCPAN backend 
+
+  Change: 7c7106966c46ec14419eb9d3efb04fa5e3c0b030
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 13:47:30 +0000
+
+    add notes to Changes 
+
+  Change: e9beb43dcdf1d6216622de8ed04a85cb1b912942
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 13:33:57 +0000
+
+    remove unused vars 
+
+  Change: 7f56d3438d3de3f06c6a910247793f452390189c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 13:21:03 +0000
+
+    tweak more tests and verbosity 
+
+  Change: 6f0b0ec2caf8548b3e33a1c2ff73d2bb7491eab5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 13:03:06 +0000
+
+    add MetaDB to backend test 
+
+  Change: 112b5f7353a4f39c3567eaf20af5379f01a7829c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 12:55:31 +0000
+
+    enable verbose if ENV{TEST_VERBOSE} 
+
+  Change: 3f5b108c5cffaf9f31cded4785bf66a66f938ae6
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 12:53:16 +0000
+
+    move MetaDB to last in ordering 
+
+  Change: 389da8e8cb11e55c645025d8a61dcd2f27d2c89b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 12:46:14 +0000
+
+    add use of MetaDB 
+
+  Change: 914d3570a256e41f3b0dbebd2b35c973a113bd53
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 10:51:22 +0000
+
+    add eval to guard against parse_file failures 
+
+  Change: e2c44f18ead33b85d00e130f6464207d314bde41
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 10:41:21 +0000
+
+    add debugging 
+
+  Change: 2e615291867a114367dfa583f13b4d8a216178bd
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 10:08:17 +0000
+
+    toolchain updates 
+
+================================================
+Plus 7 releases after 2013-11-02 00:00:00 +0000.
+================================================

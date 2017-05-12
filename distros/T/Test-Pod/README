@@ -1,0 +1,33 @@
+Test/Pod version 1.51
+=====================
+
+This library's module, Test::Pod, provides an interface for validating POD in
+module files.
+
+INSTALLATION
+
+To install this module, type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Dependencies
+------------
+
+Test::Pod requires the following modules:
+
+* Pod::Simple 3.05
+* Test::More 0.62
+* Test::Builder::Tester 1.02
+* File::Spec
+
+Copyright and Licence
+---------------------
+
+Copyright 2006-2010, Andy Lester; 2010-2015 David E. Wheeler. Some Rights
+Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

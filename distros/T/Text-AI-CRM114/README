@@ -1,0 +1,31 @@
+Text-AI-CRM114 version 0.06
+===========================
+
+This is a Perl interface for the libcrm114 classification library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires libcrm114 (http://crm114.sourceforge.net/wiki/doku.php?id=download),
+which in turn depends on libtre (http://laurikari.net/tre/download/).
+
+MATURITY
+
+Please consider this whole library an abandoned proof of concept.
+
+COPYRIGHT AND LICENCE
+
+Perl module: Copyright (C) 2012 by Martin Schuette
+
+libcrm114: Copyright (C) 2009-2010 by William S. Yerazunis
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License version 3.

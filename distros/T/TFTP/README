@@ -1,0 +1,42 @@
+			 TFTP, version 1.0b1
+
+	Copyright (c) 1998 G. S. Marzot. All rights reserved.  This program
+	is free software; you can use, redistribute and/or modify it under 
+	the same terms as Perl itself.
+
+Description:
+	This is a perl module (completely implemented in perl) to
+provide the client functionality of the TFTP protocol as described in
+rfc783. A class, TFTP, is available which encapsulates the persistent
+aspects of a TFTP connection and from which the basic TFTP operations
+(get,put) can be initiated.
+
+Availability:
+
+ftp://ftp.corpeast.baynetworks.com/netman/perl5/tftp/TFTP-1.0b1.tar.gz
+or your local CPAN site
+
+Installation:
+	perl Makefile.PL
+	make
+	make test (* not implemented yet *)
+	make install
+
+Notes:
+
+This the first release of this module. It has been tested on Linux and
+Solaris (no Win32 yet but it should work). Please let me know of any
+problems or success.
+
+The module name is provisional at this point as Net::TFTP is already reserved.
+
+Bugs/Limitations:
+
+Although this package does a pretty good job of adhering to the
+standard it may not be as robust as possible with erroneous servers
+(bad NetAscii encoding will not be detected, an infinite looping
+server can cause this client to loop as well (this would require an
+alarm based timeout I beleieve))
+
+please mail all problems/bugs/success/praise to
+gmarzot@baynetworks.com

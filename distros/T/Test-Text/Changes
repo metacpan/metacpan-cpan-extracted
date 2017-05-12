@@ -1,0 +1,49 @@
+2016-04-20  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Test/Text.pm: Strips code from markdown to avoid getting
+	bogged down by it. 
+
+2015-12-20  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Test/Text.pm (check): Strips URL to avoid oh so many
+	non-dict words to creep up in the text. 
+
+2014-08-16  JJ Merelo  <jmerelo@amy>
+
+	* lib/Test/Text.pm: Many patches from Gabor Szabo and eliminated File::Slurp dependency. Also suppressed legacy "uses"
+
+2014-08-13  JJ Merelo  <jmerelo@amy>
+
+	* t/02.just_check.t: Added this since it's got an independent done_testing
+
+	* lib/Test/Text.pm (just_check): Finished tests and changed encoding for test script.
+
+2014-08-12  JJ Merelo  <jmerelo@amy>
+
+	* lib/Test/Text.pm (check): Adds more strict extraction of words
+	to avoid some Spanish sigils; changes tests to account for that.
+	(check): getting rid of old regexes and using proper Unicode for version 0.1.5
+
+2014-08-11  JJ Merelo  <jmerelo@amy>
+
+	* lib/Test/Text.pm: Adds a few Spanish symbols to avoid UTF8 errors and corrects the Spanish affix file to avoid warnings. 
+
+2014-08-10  JJ Merelo  <jmerelo@amy>
+
+	* lib/Test/Text.pm (done_testing): Managed to make it work with
+	UTF8 dictionaries, passing now tests. Will try to use it in actual
+	CI for my latest book
+
+2014-08-08  JJ Merelo  <jmerelo@amy>
+
+	* lib/Test/Text.pm: Added text and data for Spanish. 
+
+2014-05-01  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* MANIFEST: Changing manifest for the new version
+
+Revision history for Text-Hoborg
+
+0.0.1  Mon May 27 07:59:10 2013
+       Initial release.
+

@@ -1,0 +1,8 @@
+Changes
+lib/Task/Munin.pm
+Makefile.PL
+MANIFEST
+META.yml
+META.json
+README
+t/self.t

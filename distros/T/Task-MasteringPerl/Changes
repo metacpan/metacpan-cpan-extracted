@@ -1,0 +1,7 @@
+1.01 - Sat Feb 22 22:28:30 2014
+	* First release of a Task for all modules mentioned in
+	Mastering Perl, 2nd Edition
+
+1.02 - Sun Feb 23 15:35:00 2014
+	* Remove non-CPAN modules
+

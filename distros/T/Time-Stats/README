@@ -1,0 +1,37 @@
+This module is designed to make it very easy to get timing info for your code, ala Time::HiRes, without needing to remember tv_interval and [gettimeofday], or writing your own methods for processing data.  This is mainly useful if DProf doesn't give you useful info on what's slowing you down, and you need to inspect larger sections of code.
+
+It's pretty smart about loops and being used in persistent environments such as mod_perl.
+
+Sample usage:
+
+use Time::Stats;
+
+sub has_slow {
+    mark;
+    my_method1();
+    mark;
+    for (1 .. 10) {
+        mark;
+        my_method2();
+        mark;
+    }
+    stats;
+}
+
+If you don't want to import clear, mark and stats into your namespace, you can do this:
+
+use Time::Stats ();
+
+sub has_slow {
+    Time::Stats::mark;
+    my_method1();
+    Time::Stats::mark;
+    for (1 .. 10) {
+        Time::Stats::mark;
+        my_method2();
+        Time::Stats::mark;
+    }
+    Time::Stats::stats;
+}
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

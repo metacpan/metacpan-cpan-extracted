@@ -1,0 +1,38 @@
+Revision history for Perl extension Time::Normalize
+
+0.01  2005 November 11
+        - First version
+
+0.02  2005 December 2
+        - Fixed a bug in the test suite, which caused doc.t to fail in
+          non-English locales.  No changes to the module code.
+
+0.03  2005 December 5
+        - Added the utility functions and tests.
+
+0.04  2006 November 15
+        - Fixed a bug in the day-of-week abbreviations.
+        - Added normalize_year, normalize_month, normalize_ym
+
+0.05  2006 November 15
+        - Fixed a mistake in the documentation.
+          Apparently a longstanding problem; I just noticed it.
+
+0.06  2008 May 25
+        - Made normalize_ymd3 and normalize_ym3 public
+        - Add normalize_rct function
+        - Fix a couple test cases.
+
+0.07  2008 May 26
+        - Fix normalize_rct test cases (thanks, CPAN testers!)
+        - Bug fix: normalize_rct 'mail' format was using
+          locale-months, not English-only.
+        - normalize_rct was missing from the SYNOPSIS.
+
+0.08  2008 May 27
+        - Fix a bug in normalize_rct('mail').  Was not always using
+          English month abbreviations.
+
+0.09  2014 April 23
+        - Fix usage that generated a warning:
+          "Use of qw(...) as parentheses is deprecated"

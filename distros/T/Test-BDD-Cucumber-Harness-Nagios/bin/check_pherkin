@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use App::check_pherkin;
+
+# ABSTRACT: nagios wrapper for pherkin (Test::BDD::Cucumber)
+our $VERSION = '1.002'; # VERSION
+# PODNAME: check_pherkin
+
+
+my $result = App::check_pherkin->new()->run( @ARGV );
+
+print $result->output;
+exit( $result->nagios_code );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+check_pherkin - nagios wrapper for pherkin (Test::BDD::Cucumber)
+
+=head1 VERSION
+
+version 1.002
+
+=head1 Synopsis
+
+Short output in case of success:
+
+  $ check_pherkin examples/
+  OK - all 5 scenarios passed
+  $ echo $?
+  0
+
+Or in case of failure:
+
+  $ check_pherkin examples/http.feature 
+  line 10: And the http response status code must be 302 failed
+    ok 1 - Starting to execute step: the http response status code must be 302
+    not ok 2 - the status code must be 302
+    #   Failed test 'the status code must be 302'
+    #   at lib/Test/BDD/Infrastructure/HTTP.pm line 125.
+    #          got: 500
+    #     expected: 302
+    1..2
+  CRITICAL - 1 (critical) / 0 (warn) out of 1 scenarios failed
+  $ echo $?
+  2
+
+=head1 Description
+
+check_pherkin is nagios command wrapper for pherkin.
+
+The program behaves like pherkin but the output is always Nagios
+and the return status is a nagios return code. (0=OK,1=WARN,2=CRITICAL)
+
+=head1 Special tags
+
+Scenarios tagged with @warn will be reported with WARN level in nagios.
+
+=head1 See also
+
+The pherkin / Test-BDD-Cucumber documentation:
+
+L<pherkin>, L<Test::BDD::Cucumber>
+
+A collection of generic step definitions for infrastructure tests:
+
+L<Test::BDD::Infrastructure>
+
+=head1 AUTHOR
+
+Markus Benning <ich@markusbenning.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Markus Benning.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

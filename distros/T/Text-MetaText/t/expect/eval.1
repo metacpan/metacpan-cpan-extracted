@@ -1,0 +1,69 @@
+# this tests evaluations in INCLUDE directives
+
+# test of simple evaluations
+Testing: 1 && 0
+
+Testing: 1 and 0
+
+Testing: 0 && 1
+
+Testing: 0 and 1
+
+Testing: 0 and 0
+
+Testing: 1 and 1
+<<< block pass=6 >>>
+
+# test simple variable values 
+
+Age defined: 30
+Testing: age > 20 
+<<< block pass=10 >>>
+Testing: age > 30 
+
+Testing: age > 40 
+
+Testing: age < 40 
+<<< block pass=13 >>>
+Testing: age >= 30 
+<<< block pass=14 >>>
+Testing: age <= 30 
+<<< block pass=15 >>>
+Testing: age >= 29 
+<<< block pass=16 >>>
+Testing: age >= 31 
+
+ 
+Testing: age != 30 
+
+Testing: age != 31 
+<<< block pass=22 >>>
+Testing: age == 30 
+<<< block pass=23 >>>
+Testing: age == 31 
+
+Testing: age = 30 
+<<< block pass=25 >>>
+Testing: age = 31 
+
+
+# test variable interpolation
+
+
+
+Testing: doit 
+<<< block pass=31 >>>
+Testing: dont 
+
+Testing: doit == 0
+
+Testing: dont == 0
+<<< block pass=34 >>>
+
+Testing 0
+
+
+Testing 1
+<<< block pass=37 >>>
+<<< block pass=38 >>>
+

@@ -1,0 +1,14 @@
+2011-07-06 22:27:17 +0200
+- added a change log
+
+2011-07-06 22:21:38 +0200
+- updated version id
+
+2011-07-06 22:20:08 +0200
+- decode response from UTF-8
+- added support for API keys
+- accept useISO8601 as parameters to new()
+- updated supported methods to API doc version 1.8.0
+
+2010-11-18 12:37:01 +0100
+Initial Git commit

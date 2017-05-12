@@ -1,0 +1,17 @@
+Revision history for Perl module Template::Plugin::Date::FriendlyDelta
+
+0.02 2015-10-21 ACORN
+	- Transferred ownership to https://github.com/G3S/
+
+0.02 2014-12-?? ACORN
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Specified min perl version in code to 5.8.1, and changed MIN_PERL_VERSION
+      from 5.10.1 to 5.8.1, since that's what's actually required
+      (due to DateTime).
+    - Added "use warnings"
+    - If you "use base 'Template::Plugin::Filter'",
+      then you don't need to "use Template::Plugin::Filter" as well.
+
+0.01 2014-09-12 ACORN
+	- original version; created by h2xs 1.23 with options
+		-AX Template::Plugin::Date::FriendlyDelta

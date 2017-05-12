@@ -1,0 +1,9 @@
+Revision history for Perl extension Term-Size-Any.
+
+0.002 Fri Apr 20 2012
+        - fix typos in POD - CPAN RT#74220 [thanks Florian]
+
+0.001 Mon Jan 28 2008
+        - first release to CPAN
+        - not using Term::Size and Term::Size::ReadKey
+          because they are so borken

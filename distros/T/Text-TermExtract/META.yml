@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Text-TermExtract
+version:             0.02
+abstract:            Extract terms from text
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Lingua::StopWords:             0.08
+    Log::Log4perl:                 1
+    Text::Language::Guess:         0.02
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <cpan@perlmeister.com>

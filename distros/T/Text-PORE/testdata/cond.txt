@@ -1,0 +1,25 @@
+Testing: +, -, *, /, <, >, <=, >=, =, !=
+    Age: 50
+=============================
+Younger than 60
+10 years later not old than 60
+10 years ago younger or same as 40
+Twice the age is older or same as 100
+Half the age equals to 25
+Not equals to 51
+
+Testing: eq, eqs
+    Name: Joe Smith
+===============================
+Name is Joe Smith.
+Name is not joe smith.
+If case insensitive, name is same as joe smith.
+
+Testing: and, or, not, (, )
+    Age: 50
+    Name: Joe Smith
+===============================
+Name is Joe Smith and younger than 60.
+Name is Joe Smith or older than 60.
+Name is Johe Doe or younger than 60.
+Name is not Johe Doe and not older than 60.

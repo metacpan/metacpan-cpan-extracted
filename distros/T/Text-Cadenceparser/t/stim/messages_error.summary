@@ -1,0 +1,9 @@
+
+  =================
+   Message Summary
+  =================
+
+Num   Sev      Id                      Message Text                    
+-----------------------------------------------------------------------
+  2 Error ERR-6     Oops, a test error to see if we actually catch the
+                    error. 

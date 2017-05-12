@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <h1 tal:content="javascript:1+2"></h1>
+  </body>
+</html>

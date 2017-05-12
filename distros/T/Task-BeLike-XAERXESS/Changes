@@ -1,0 +1,21 @@
+Revision history for Task-BeLike-XAERXESS
+
+0.004  2014-03-19 17:39:54 CET
+
+ - Fixed typo in libssl-dev package name
+ - changed List::MoreUtils to List::AllUtils
+ - added JSON and YAML (recommend XS backends)
+ - added Moo
+
+0.003  2014-02-21 19:22:01 CET
+
+ - Added new '5.14' feature in cpanfile which installs Moops
+ - Improved documentation
+
+0.002  2014-02-21 16:16:35 CET
+
+ - Used warnings (as per http://cpants.cpanauthors.org/kwalitee/use_warnings)
+
+0.001  2014-01-31 20:24:12 CET
+
+ - Initial release - first module bundle I like and use

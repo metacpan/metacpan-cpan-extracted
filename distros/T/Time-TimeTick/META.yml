@@ -1,0 +1,17 @@
+---
+name: Time-TimeTick
+version: 0.06
+author:
+  - 'Peter Scott, E<lt>Peter@PSDT.comE<gt>'
+abstract: Keep a tally of times at different places in your program
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  Time::TimeTick:
+    file: lib/Time/TimeTick.pm
+    version: 0.06
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

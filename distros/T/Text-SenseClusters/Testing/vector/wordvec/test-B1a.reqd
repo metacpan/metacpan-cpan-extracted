@@ -1,0 +1,5 @@
+9 11
+ 351   0   0   0   0   0   0   0
+ERROR(wordvec.pl):
+        Floating point overflow.
+        Value <9070> can't be represented with format %4d.

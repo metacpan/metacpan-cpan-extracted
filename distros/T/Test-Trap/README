@@ -1,0 +1,34 @@
+Test-Trap
+
+Primarily (but not exclusively) for use in test scripts: A block eval
+on steroids, configurable and extensible, but by default trapping
+(Perl) STDOUT, STDERR, warnings, exceptions, would-be exit codes, and
+return values from boxed blocks of test code.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  sudo make install
+
+(If you are running as root, you may drop "sudo", and just run "make install".)
+
+Alternatively, for those without a proper make, the Module::Build approach:
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  sudo perl Build install
+
+(Again, if you are running as root, you may run "make install" without "sudo".)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2014 Eirik Berg Hanssen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

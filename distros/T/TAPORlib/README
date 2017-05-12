@@ -1,0 +1,435 @@
+NAME
+    `TAPORlib' - TAPORlib is a Perl module that contains some useful
+    functions.
+
+DESCRIPTION
+    This library used by some great modules as WWW::Promotion, etc. It is
+    provided by TAPOR, Inc.
+
+IMPORTED FUNCTIONS/VARS
+
+  $eol
+
+     Description:
+
+     $eol        = "\x0D\x0A";
+
+  @rndletters
+
+     Description:
+
+     @rndletters = qw(q w e r t y u i o p a s d f g h j k l z x c v b n m);
+
+  %countrycodes / %countrycodesbyname
+
+     Description:
+
+     %countrycodes = (
+        'ca' => 'Canada',
+        'af' => 'Afghanistan',
+        'al' => 'Albania',
+        'dz' => 'Algeria',
+        ...
+        );
+
+     %countrycodesbyname = reverse %countrycodes;
+
+  %operation_systems
+
+     Description:
+
+     %operation_systems = (
+        'Windows 98'     => 'Windows 98',
+        'Win98'          => 'Windows 98',
+        'Windows 95'     => 'Windows 95',
+        'Win95'          => 'Windows 95',
+        'Mozilla/3.01 (compatible;)' => 'Windows 95',
+
+  %monthbynumber / %monthbyname
+
+     Description:
+
+     %monthbynumber = (
+        '1'  => "January",
+        '2'  => "February",
+        '3'  => "March",
+        '4'  => "April",
+        ...);
+    
+     %monthbyname = reverse %monthbynumber;
+
+  %color
+
+     Description:
+
+     %color =(
+        'normal'     => "[0;37m",
+        'black'      => "[0;30m",
+        'red'        => "[0;31m" ,
+        'ligthred'   => "[1;31m",
+        ...
+        );
+    
+  $string = &Delete_CRLF_from_End_Of_String($string);
+
+     Description:
+
+     Function removes trailing "r" and "\n" from end of $string.
+
+  &add_string_to_file("filename",$string);
+
+     Description:
+
+     This function adds $string to the end of file "filename".
+
+  &add_string_to_file_spec_output("filename",$who,$string,$end);
+
+     Description:
+
+     This function makes special output to "filename".
+     String shows like this:
+ 
+     --- $who ---------------- $string --------------------$end
+
+  @allfiles = &GetAllFilesInDir($dirname);
+
+     Description:
+
+     This function returns massive that contains filenames with 
+     path in directory $dirname and filenames with path in subdirs also.
+
+  @allfilescontents = &GetAllFilesContaningInDir($dirname);
+
+     Description:
+
+     This function returns massive that contains content of all
+     files in directory $dirname (subdirs also).
+
+  %out = &GetPageNow_4(%pagenow);
+
+     Description:
+ 
+     Use this function to get page from website. 
+
+     Usage:
+
+     $pagenow{'url'}     = "http://www.any.com/anyware";
+     $pagenow{'method'}  = "POST|GET";
+     $pagenow{'referer'} = "http://www.any.com/anyware/ref";
+     $pagenow{'content'} = "user=blah\&info=blah-blah";
+
+     # If defined this agent string will be used insted Netscape
+     $pagenow{'agent'}  = "My AGENT";
+
+     # If specified Print some useful information to this logfile;
+     $pagenow{'logfile'} = "logfile.log";
+
+     # If proxy not specified then Get Page without usage of proxy.
+     $pagenow{'proxy'} = "proxy.online.ru:8080";
+
+     # If specified then send to page this cookies:
+     $pagenow{'cookies'} = "C=12345; F=1";
+
+     # TimeOut to Connect To Proxy/Host. Default: 60
+     $pagenow{'timeoutconnect'} = 60;
+
+     # TimeOut to Request Page. Default: 300
+     $pagenow{'timeoutrequest'} = 180;
+
+     # No Request. GetPageNow_4() returns simple 'FAST MODE' page.
+     $pagenow{'norequest'} = 1;
+
+     # Show Error Page If Error Detected
+     $pagenow{'showerrors'} = 1;
+
+     %out = &GetPageNow_4(%pagenow);
+
+     Output:
+ 
+     $out{'error'} == 0 - No errors
+     $out{'error'} == 1 - Some Error.
+     $out{'errortxt'}   - Error description if $out{'error'} == 1
+     $out{'status'}  - Status of downloaded page
+     $out{'headers'} - Header of downloaded page
+     $out{'body'}    - Body of downloaded page
+     $out{'cookies'} - Cookies If page returns some cookies
+
+  $text = &uri_escape($text,$pattern);
+
+     Description:
+
+     This function escapes url, commonly used to changes 
+     special symbols in url.
+
+     Usage:
+
+     $text    = "sss"
+     $pattern = "\x00-\xFF";
+     $text = &uri_escape($text,$pattern);
+ 
+     Output:
+ 
+     $text = "%73%73%73";
+
+  &HTMLdie($text);
+
+     Description:
+
+     Send HTML page with $text to STDOUT and exit program.
+
+  &isrunninglocaly()
+
+     Description:
+
+     Function returns TRUE if script executed in console, FALSE 
+     otherwise, e.g. when running under Apache.
+
+  $cookies = &getcookies($headers)
+
+     Example:
+  
+     $headers = "Server: Netscape-Enterprise/2.01
+    Date: Thu, 29 Nov 2001 08:28:33 GMT
+    Set-Cookie: registered=no; path=/; domain=.excite.com; expires=Wednesday, 31-Dec-2010 12:00:00 GMT
+    Set-Cookie: UID=35813BB13C05F10C; path=/; domain=.excite.com; expires=Wednesday, 31-Dec-2010 12:00:00 GMT
+    Location: http://www.excite.com/info/add_url/thanks/?url=&email=&country=&brand=excite
+    X-Cache: MISS from ns.ahxk.ru
+    Proxy-Connection: close";
+ 
+       $cookies = &getcookies($headers);
+       print "$cookies\n";
+
+       Output:
+
+       UID=35813BB13C05F10C; registered=no
+
+  $cookies = &joincookies($cookies,$newcookies)
+
+       Example:
+
+       $cookies = joincookies("C=1; D=2","D=3; F=2");
+       print "$cookies\n";
+
+       Output:
+
+       C=1; D=3; F=2
+
+  $cookies = &joincookiesinhash(%cookies)
+
+       Example:
+
+       %cookies = (D => 1,
+                   F => 2);
+  
+       $cookies = &joincookiesinhash(%cookies);
+       print "$cookies\n";
+
+       Output:
+
+       D=1; F=2
+
+  $rndstring = &GenerateRandomString($number);
+
+     Description:
+
+     This function returns string with $number random chars.
+ 
+  $rndstring = &SelectRandomStringFromFile($file);
+
+     Description:
+
+     This function returns random string selected from text file $text.
+     Returns undef if no selection available.
+ 
+  &CreateAndSendOutHtmlPage($a,$type);
+
+     Description:
+
+     This function will create HTML page, print it to stdout and exit.
+     $type may be:
+     1 - CreateAndSendOutHtmlPage() will execute script in
+         $a path, print it output to stdout and exit.
+     2 - CreateAndSendOutHtmlPage() will read file $a,
+         print it contents to stdout and exit.
+     3 - CreateAndSendOutHtmlPage() will print string
+         "Location: $a\n\n" to stdout and exit.
+
+     Examples:
+     CreateAndSendOutHtmlPage("/path/index.cgi",1);
+     CreateAndSendOutHtmlPage("/path/index.html",2);
+     CreateAndSendOutHtmlPage("http://www.tapor.com",3);
+ 
+  &CheckForDomain($domain);
+
+     Description:
+ 
+     This function does very simple task, it compare $domain with $ENV{'HTTP_HOST'}.
+     If equal function returns TRUE otherwise it returns FALSE.
+
+  &SendToDomainIfNotThisDomain($domain);
+
+     Description:
+
+     This function resend Web user to new location if domain not $domain.
+     See previous function description.
+
+  $string = &MassiveToString(@massive);
+
+     Description:
+ 
+     This function does very simple task, it convert massive @massive to string
+     $string.
+
+  %out = &newsocketto(*S,$host,$port,$timeoutconnect);
+
+     Description:
+
+     This function returns connected socket to $host:$port if no error.
+     $timeoutconnect is timeout to connect to $host:$port.
+ 
+     Usage:
+
+     %out = &newsocketto(*S,$host,$port,$timeoutconnect);
+ 
+     Output:
+
+     $out{'error'} == 0 - No errors
+     $out{'error'} == 1 - Some Error.
+     $out{'errortxt'}   - Error description if $out{'error'} == 1
+     S - connected socket to $host:$port.
+
+  &CheckProxy($proxy);
+
+     Description:
+
+     This function checks for proxy server.
+     $proxy server must be passed in the following format:
+     129.168.1.1:80
+ 
+     Output:
+ 
+     TRUE if proxy server is valid.
+     FALSE if proxy server is invalid.
+
+  $text_t=&win2koi($text) and $text_t=&koi2win($text)
+
+     Description:
+ 
+     Functions does Win -> Koi and Koi -> Win translation.
+
+  $scriptname = &GetScriptName();
+
+     Description:
+ 
+     Function returns current script name.
+
+  &SetScriptDirAsCurrent();
+
+     Description:
+ 
+     Function sets current directory to script directory.
+
+  &send_null_image();
+
+     Description:
+ 
+     Sends NULL GIF image to client browser and exit.
+
+  &IsDateValid($day,$month,$year);
+
+     Description:
+
+     If date invalid function returns FALSE, otherwise TRUE.
+
+  %Config = &parse_form_2();
+
+     Description:
+
+     Parse forms content and returns it as hash %Config.
+
+  $date = &GetDate_2();
+
+     Description:
+
+     Returns $date in string format.
+     For Russian users also GetDateRus_2() function available.
+
+  $flag = &SendEmailMsg($from,$email,$msg);
+
+     Example:
+ 
+     $flag = &SendEmailMsg("from@tapor.com","to@tapor.com","test message");
+     if(!$flag)
+        {
+        print "Can't e-mail to to@tapor.com :(\n";
+        }
+
+  $flag = &SendEmailMultiMsg($from,$email,@msg);
+
+     Example:
+ 
+     $flag = &SendEmailMultiMsg("from@tapor.com","to@tapor.com",("test message","2 line"));
+     if(!$flag)
+        {
+        print "Can't e-mail to to@tapor.com :(\n";
+        }
+
+  @cuttedmsv = &LimitMassive(10,@msv);
+
+     Description:
+
+     Function will cut massive @msv to size 10. 
+
+  @tops = &GetTops(@msv);
+
+     Example:
+ 
+     @msv = qw(test
+               test
+               test
+               test2
+               test2
+               );
+     @tops = &GetTops(@msv); 
+
+     Output:
+ 
+     @tops = ("test - 3","test2 - 2"); 
+
+  &IsSearchEngine("./robots");
+
+     Description:
+ 
+     Function will test visitor of your page. 
+     It will return Search Engine Name if visitor is Serch Engine.
+     It will return FALSE if visitor is surfer.
+     The "./robots" is directory. See "./txt/robots" in the package.
+ 
+  $os = &DetectOperationSystem($ENV{'HTTP_USER_AGENT'});
+
+     Description:
+ 
+     Function returns operation system which visitor is uses.
+ 
+  &IsAllreadyRunning($numstarts); / &IsAllreadyRunning_2($numstarts);
+
+     Description:
+
+     Functions checks if script allready executed.
+     If script allready executed functions returns TRUE, otherwise FALSE.
+     $numstarts defines what maximum executions are allowed.
+     We recomend you to use IsAllreadyRunning_2() function.
+ 
+  ($proxyaddr,$proxyport) = &SelectRandomProxyServerFromFile($proxy);
+
+     Description:
+
+     This function returns random proxy server selected from file $proxy.
+ 
+COPYRIGHT
+    Copyright (c) 2000-2001 TAPOR, Inc. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    http://www.tapor.com/TAPORlib/
+

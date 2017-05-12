@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Text/CommonParts.pm
+MANIFEST			This list of files
+README
+t/01use.t
+t/02longest.t
+t/03shortest.t
+t/pod-coverage.t
+META.yml
+Makefile.PL

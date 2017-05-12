@@ -1,0 +1,14 @@
+Types-Interface
+===============
+
+Created:      2014-04-09
+Home page:    <https://metacpan.org/release/Types-Interface>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-Interface>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-04-10
+
+ [ Test Suite ]
+ - Load UNIVERSAL::DOES in test cases for Perl < 5.010.
+
+0.001	2014-04-09	Initial release

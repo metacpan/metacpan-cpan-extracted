@@ -1,0 +1,21 @@
+.perlcriticrc
+.perltidyrc
+Build.PL
+Changes
+inc/MyBuild.pm
+lib/Test/Random.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/control_rand.t
+t/diag_seed_on_fail.t
+t/diag_seed_on_plan_but_no_tests.t
+t/no_plan_but_tests.t
+t/no_tests_no_seed.t
+t/note_seed_on_pass.t
+t/rand_check.plx
+t/seed_format.t
+SIGNATURE    Added here by Module::Build

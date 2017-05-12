@@ -1,0 +1,247 @@
+? sin
+<math title="sin">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>sin</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\sin$$
+
+? cos
+<math title="cos">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>cos</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\cos$$
+
+? tan
+<math title="tan">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>tan</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\tan$$
+
+? csc
+<math title="csc">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>csc</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\csc$$
+
+? sec
+<math title="sec">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>sec</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\sec$$
+
+? cot
+<math title="cot">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>cot</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\cot$$
+
+? sinh
+<math title="sinh">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>sinh</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\sinh$$
+
+? cosh
+<math title="cosh">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>cosh</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\cosh$$
+
+? tanh
+<math title="tanh">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>tanh</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\tanh$$
+
+? log
+<math title="log">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>log</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\log$$
+
+? ln
+<math title="ln">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>ln</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\ln$$
+
+? det
+<math title="det">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>det</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\det$$
+
+? dim
+<math title="dim">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>dim</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\dim$$
+
+? lim
+<math title="lim">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>lim</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\lim$$
+
+? mod
+<math title="mod">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>mod</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\bmod$$
+
+? gcd(m,n) = a mod b
+<math title="gcd(m,n) = a mod b">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>gcd</mo>
+      <mrow>
+        <mo>(</mo>
+        <mi>m</mi>
+        <mo>,</mo>
+        <mi>n</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>=</mo>
+    <mi>a</mi>
+    <mo>mod</mo>
+    <mi>b</mi>
+  </mstyle>
+</math>
+$$\gcd ( m , n ) = a \bmod b$$
+
+? x -= y (mod a + b)
+<math title="x -= y (mod a + b)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>x</mi>
+    <mo>&#x2261;</mo>
+    <mi>y</mi>
+    <mrow>
+      <mo>(</mo>
+      <mo>mod</mo>
+      <mi>a</mi>
+      <mo>+</mo>
+      <mi>b</mi>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$x \equiv y \pmod{a + b}$$
+
+? gcd
+<math title="gcd">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>gcd</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\gcd$$
+
+? lcm
+<math title="lcm">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>lcm</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\mbox{lcm}$$
+
+? min
+<math title="min">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>min</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\min$$
+
+? max
+<math title="max">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mo>max</mo>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$\max$$

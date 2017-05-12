@@ -1,0 +1,7 @@
+Revision history for Perl module Text::Categorize::Textrank
+
+0.50  8 Jan 2012
+  - released to CPAN.
+  
+0.51  12 Mar 2012
+  - fixed documentation.

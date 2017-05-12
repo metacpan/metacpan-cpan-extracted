@@ -1,0 +1,28 @@
+---
+name: Thesaurus
+version: 0.23
+author:
+  - 'Dave Rolsky, <autarch@urth.org>'
+abstract: Maintains lists of associated items
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Params::Validate: 0.24
+build_requires:
+  Test::More: 0.46
+recommends:
+  BerkeleyDB: 0.19
+  Text::CSV_XS: 0
+provides:
+  Thesaurus:
+    file: lib/Thesaurus.pm
+    version: 0.23
+  Thesaurus::BerkeleyDB:
+    file: lib/Thesaurus/BerkeleyDB.pm
+  Thesaurus::CSV:
+    file: lib/Thesaurus/CSV.pm
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

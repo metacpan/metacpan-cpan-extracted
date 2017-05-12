@@ -1,0 +1,19 @@
+Build.PL
+Changes
+ex/BeerDB.pm
+ex/OtherBeerDB.pm
+lib/Test/WWW/Mechanize/Maypole.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.setup_beerdb.t
+t/01.load.t
+t/02.beer.t
+t/03.other_beer.t
+t/pod-coverage.t
+t/pod.t
+t/templates/custom/classdata
+t/templates/custom/frontpage
+t/templates/custom/list
+t/templates/custom/view
+Makefile.PL

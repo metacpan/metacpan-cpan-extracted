@@ -1,0 +1,16 @@
+Text::Ligature Installation
+
+# install via cpanminus
+cpanm Text::Ligature
+
+# install via CPAN shell
+cpan Text::Ligature
+
+# install via ActivePerl
+ppm install Text::Ligature
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

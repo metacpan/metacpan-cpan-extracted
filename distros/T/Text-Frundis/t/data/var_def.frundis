@@ -1,0 +1,17 @@
+.#dv date 42
+The date:\*[date].
+.P
+.#de testmacro
+Some text. The date:\*[date]
+.#.
+.P
+.testmacro
+.#dv date today
+.P
+.testmacro
+.Ch \*[date]
+.#dv link http://bardinflor.perso.aquilenet.fr
+.Lk \*[link]/frundis/intro-en
+.Im \*[link]/images/frundis-mini.jpg
+.#dv backslash «\e»
+\*[backslash]

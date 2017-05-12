@@ -1,0 +1,5 @@
+.P
+This is a new paragraph.
+.P
+.X mtag -f latex -t dm -b « -e »
+.X mtag -f xhtml -t dm -b « -e »

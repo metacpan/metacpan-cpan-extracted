@@ -1,0 +1,35 @@
+{
+   "abstract" : "Extract text from Word files\r",
+   "author" : [
+      "Stuart Watt <stuart@morungos.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Extract-Word",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "IO::File" : "0",
+            "OLE::Storage_Lite" : "0",
+            "POSIX" : "0",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}
+

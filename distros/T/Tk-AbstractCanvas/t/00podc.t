@@ -1,0 +1,1 @@
+use Test::Pod::Coverage 'tests' => '1'; pod_coverage_ok('Tk::AbstractCanvas', { 'also_private' => [ qr/^(ClassInit|InitObject|coords|create(Arc|Bitmap|Image|Line|Oval|Polygon|Rectangle|Text|Window)?|delete|find|move|[xy]view)$/ ], }, 'POD Covered');

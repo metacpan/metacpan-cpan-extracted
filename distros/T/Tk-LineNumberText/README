@@ -1,0 +1,27 @@
+Tk/LineNumberText version 0.5
+=============================
+
+Add line numbers to your favourite Text-derived widget.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jack Dunnigan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

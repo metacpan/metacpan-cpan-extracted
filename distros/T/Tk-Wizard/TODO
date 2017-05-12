@@ -1,0 +1,36 @@
+Tk::Wizard TODO
+===============
+
+* unlink uninstaller.db.* files
+
+* Default sizes are now off: see the test suite
+
+* TaskList background when coloured
+
+* Images broken in 5.8.8 ? Who uses 5.8.8?
+
+* t/210_Images.t - Tk::JPEG errors on non-Vista machines.
+  Who uses Windows?
+  Now changed to:
+
+  D:\src\Tk-Wizard-2.141>prove t\210_images.t
+  t\210_images....Use of uninitialized value $imports[0] in pattern match (m//) at
+   C:/dev/perl510/lib/Test/More.pm line 664.
+  t\210_images....ok 1/11Fail to create pixmap with Tk_GetPixmap in ImgPhotoInstan
+  ceSetSize.
+
+
+  This application has requested the Runtime to terminate it in an unusual way.
+  Please contact the application's support team for more information.
+  t\210_images....dubious
+          Test returned status 3 (wstat 768, 0x300)
+  DIED. FAILED tests 10-11
+          Failed 2/11 tests, 81.82% okay
+  Failed Test    Stat Wstat Total Fail  List of Failed
+  -------------------------------------------------------------------------------
+  t\210_images.t    3   768    11    4  10-11
+  Failed 1/1 test scripts. 2/11 subtests failed.
+  Files=1, Tests=11,  1 wallclock secs ( 0.00 cusr +  0.00 csys =  0.00 CPU)
+  Failed 1/1 test programs. 2/11 subtests failed.
+
+

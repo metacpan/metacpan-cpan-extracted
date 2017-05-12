@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Text/Password/Pronounceable/Harden.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00-basic.t
+t/01-basic.t
+t/02-defaults.t
+Makefile.PL
+README
+META.yml

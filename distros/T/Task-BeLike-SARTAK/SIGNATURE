@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3a77e7ba57f46784aed2db5c0e54d52c690b34b9 LICENSE
+SHA1 79b5e8573f8e1f143f057860c442f6f518915329 MANIFEST
+SHA1 a61e69a1626d0151885a21db71648ca9664478fd META.json
+SHA1 0589a3559dec0a8ef5f78744937b1b0f8a85170f META.yml
+SHA1 a087bfe55f0ca6e2295b87fcc910a09d5eca703c Makefile.PL
+SHA1 5a56ef7500d93029427484dc09c7d83fdaad517d README
+SHA1 012c0faa18d91fafcbc628fc0a228a5fab0520e2 dist.ini
+SHA1 0acc19dea146bdd9b6920bc9d9565d02d6566f2f lib/Task/BeLike/SARTAK.pm
+SHA1 a066d1715ac94362dd3559d4dce7a7d0e8e1bd82 t/00-compile.t
+SHA1 666cf5f8c47108d4c31a6b3e3cd37ae4d0bdca16 t/placeholder.t
+SHA1 f96ca8b72d098a28dc1a2af5cba8a9cfe7610a80 xt/author/eol.t
+SHA1 df31a5b5d6b9f08c10eefe8f25c03107e2866ff3 xt/author/no-tabs.t
+SHA1 a6d8370909ec0e0755d4bd691eb81d722cf94430 xt/release/pod-coverage.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJVfd7gAAoJEDdW4lQxRAUgvkwQAJZFf8+4b5pn868pNX6EVuG2
+tsCtSrEGRKzQuZ4tObUIRb4zt1/iAVhLn0KSETVSWtNDu2S9Xzo1/gb9CSxLYz9r
+TbDxiwXRwYoIhsOBJDe7FYRVDjeo9pORgVg4KTm+wKUKDJrUpux1abLmila8XGYo
+l5maeo0aQyos0W2Y5+pGDbiaFT0T39MuO/IuHbzjB4DYqi1xuFCEY6GmMBQt/pvt
+2qQp+Nsvi45pByxYuCueAUeUYQdxqzl3UhKDrJRgadfXVGvVaaECaUcepMSVfIKt
+LbYSSeA9/UivKYOLvC2sGC+CbAH2Zn1DsLpZsqFb1CMoPgR4j+YUwsTqXIB6/YE+
+AhkuT6R5qRbNSI4ep3tsddKyqlFs9G0UWMOG9Ruz+SLdEj4R0yXNWwiFbBNMEJpf
+r5RodRXBHdQHdOaLcQq3RoDN/I1O07dvmBpVfY3umECZ7rdUVgETnDEqZA47AN6F
+dCZlyR464cWYRhotcgvMb6cTv/MXA3j69KzbKinEJ1UHmscMLNLJ/+q30jTR0+1y
+B8gYoa8xe098VoI9DJxazEFZTWNVijDepc8Cxdoc/n17jiB39lD92426g1e26e/n
+EMDa1D3GkZmW0lIG0G2k4SQkZoqHyZmIaVPDiMYJBFqQ8lmc78+6hUpQJkFtJDHZ
+oEgzeYCfqbEIXxnvPav5
+=rddM
+-----END PGP SIGNATURE-----

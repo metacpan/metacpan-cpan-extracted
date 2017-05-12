@@ -1,0 +1,22 @@
+Revision history for Perl extension Text::Yats.
+
+0.03 Tue Jan  8 10:29:33 WET 2002
+	- Fixed more doc errors
+
+	- Added MANIFEST file
+
+	- Added more examples and test files.
+
+0.02 Mon Jan  7 12:14:24 WET 2002
+	- Fixed some doc errors
+
+	- Documentation update
+
+	- Fixed a bug in replace method which reduce the size of arrays.
+	  Thanks to David C. Franklin <drcfrank@umich.edu>
+
+	- Added support for array ref when hash reference is defined.
+
+0.01  Thu Dec 20 10:28:29 WET 2001
+	- original version; created by h2xs 1.19 with options
+		-A -X -n Text::Yats

@@ -1,0 +1,5 @@
+Check out whether Data::Dumper as an alternate way to safely serialize data
+(including code refs) between threads, as per suggestion of Brent Dax.
+
+Maybe make 'cpu' optimization default for 5.8.2 and higher?  As shared arrays
+are not leaking anymore?

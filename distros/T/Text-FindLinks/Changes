@@ -1,0 +1,14 @@
+0.04    9/27/2009
+        - Returned the POD tests into the distribution.
+        - Added Module::Install to the distribution.
+
+0.03    9/26/2009
+        - Attempted to fix the encoding problems in POD.
+        - Argument validation using Params::Validate.
+
+0.02    9/24/2009, minutes later
+        Removed the Devel::REPL dependency I forgot in
+        the previous release.
+
+0.01    9/24/2009
+        First version, released on an unsuspecting world.

@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+OutputFilter.pm
+README
+CONTRIBUTING.md
+t/00_pod.t
+t/01_pod.t
+t/20_margin.t
+t/40_comma.t
+t/50_sub.t
+t/60_filter.t
+t/70_misc.t
+t/80_error.t
+examples/box.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

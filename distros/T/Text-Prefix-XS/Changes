@@ -1,0 +1,22 @@
+Revision history for Text-Prefix-XS
+0.15    Dec 27 2011
+        Enhanced overall performance by using custom hash impl.
+        This also means no more nasty thread warnings, as there's 
+        no need to keep an HV* around.
+
+0.11    Dec 25 2011
+        Free memory for extra hash
+        Fixed indentation for XS code
+
+0.10    Dec 24 2011
+        Enhanced performance for many prefixex
+
+0.08    Dec 23 2011
+        Stabler and quicker algo, used PERL_NO_GET_CONTEXT.
+        Posted some nice performance numbers
+
+0.02-TRIAL  Dec 21 2011
+        Fixed documentation bug, also included XS.xs in MANIFEST
+
+0.01    Date/time
+        First version, released on an unsuspecting world.

@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" lang = "en" xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title petal:content="page/title">TAP Matrix</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link petal:omit-tag="page/has_inline_css" rel="stylesheet" petal:attr="href page/css_uri" type="text/css" />
+		<style petal:condition="true:page/has_inline_css" petal:content="structure page/inline_css" type="text/css" />
+	</head>
+	<body>
+		<pre petal:condition="page/extra" petal:content="page/extra" />
+		<table id="matrix" petal:attr="summary page/model/summary">
+			<thead>
+				<tr>
+					<th class="r">Test file</th>
+					<th petal:repeat="submodel page/model/submodels_ref" petal:content="submodel/desc_string" />
+					<th>%</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<td class="r" rowspan="2">TOTAL</td>
+					<td class="x sum" petal:repeat="submodel page/model/submodels_ref" petal:attr="style submodel/color_css" petal:content="submodel/total_percentage">100%</td>
+					<td class="x sum" petal:attr="style page/model/color_css" petal:content="page/model/total_percentage">100%</td>
+				</tr>
+				<tr>
+					<td class="x sum" petal:attr="colspan page/model/submodel_count_plus_one">
+						<span petal:replace="page/model/test_files">f</span> files 
+						<span petal:contents="page/model/summary" />
+					</td>
+				</tr>
+			</tfoot>
+			<tr petal:repeat="ctest page/tests">
+				<td><a petal:attr="href ctest/first_file/link" petal:content="ctest/first_file/name">foo</a></td>
+				<td class="x sum" petal:repeat="test ctest/subfiles_ref" petal:attr="style test/color_css" petal:content="test/percentage">100%</td>
+				<td class="x sum" petal:attr="style ctest/first_file/color_css" petal:content="ctest/percentage">100%</td>
+			</tr>
+		</table>
+	</body>
+</html>

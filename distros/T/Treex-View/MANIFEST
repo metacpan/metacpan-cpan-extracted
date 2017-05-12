@@ -1,0 +1,17 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+README.mkdn
+lib/Treex/View.pm
+lib/Treex/View/Node.pm
+lib/Treex/View/TreeLayout.pm
+script/view-treex
+share/static/index.html
+share/static/index.js
+share/static/index.js.map
+t/00-compile.t

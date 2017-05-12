@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Time/Fuzzy.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-pod.t
+t/02-pod-coverage.t
+t/10-fuzzy.t
+t/11-object.t

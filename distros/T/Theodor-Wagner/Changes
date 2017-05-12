@@ -1,0 +1,6 @@
+Revision history for Perl extension Theodor::Wagner.
+
+0.01  Sun Feb 29 20:28:53 2004
+	- original version; created by h2xs 1.21 with options
+		-XA -n Theodor::Wagner
+

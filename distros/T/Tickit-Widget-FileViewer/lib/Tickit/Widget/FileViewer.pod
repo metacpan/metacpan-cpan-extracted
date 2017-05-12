@@ -1,0 +1,133 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::Widget::FileViewer
+at lib/Tickit/Widget/FileViewer.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Tickit::Widget::FileViewer - support for viewing files in L<Tickit>.
+
+=head1 VERSION
+
+Version 0.004
+
+=head1 SYNOPSIS
+
+ use Tickit::Async;
+ use Tickit::Widget::FileViewer;
+ my $tickit = Tickit::Async->new;
+ my $viewer = Tickit::Widget::FileViewer->new(
+   file => 'somefile.txt',
+ );
+ $tickit->set_root_widget($viewer);
+ my $loop = IO::Async::Loop->new;
+ $loop->add($tickit);
+ $tickit->run;
+
+=head1 METHODS
+
+=head2 new
+
+Instantiate a new fileviewer widget. Passes any given
+named parameters to L</configure>.
+
+=head2 configure
+
+Takes the following named parameters:
+
+=over 4
+
+=item * file - the file to load
+
+=item * line - which line to jump to
+
+=back
+
+=head2 load_file
+
+Loads the given file into memory.
+
+=head2 line_attributes
+
+Given a zero-based line number and line text, returns the attributes
+to apply for this line.
+
+This method is intended for line-level highlights such as current cursor
+position or selected text - For syntax highlighting, overriding the
+L</render_line_data> method may be more appropriate.
+
+=head2 render_to_rb
+
+Render this widget. Will call L</render_line_data> and L</render_line_number>
+to do the actual drawing.
+
+=head2 render_line_number
+
+Renders the given (zero-based) line number at the current
+cursor position.
+
+Subclasses should override this to provide styling as required.
+
+=head2 render_line_data
+
+Renders the given line text at the current cursor position.
+
+Subclasses should override this to provide styling as required.
+
+=head2 on_key
+
+Handle a keypress event. Passes the event on to L</handle_key> or
+L</handle_text> as appropriate.
+
+=head2 cursor_line
+
+Accessor for the current cursor line. Will trigger a redraw if
+we have a window and the cursor line has changed.
+
+=head2 handle_key
+
+Handle a keypress event. Currently hard-coded to accept
+up, down, pageup and pagedown events.
+
+=head2 handle_text
+
+Stub method for dealing with text events.
+
+=head2 top_line
+
+First line shown in the window.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Tickit::Widget::Scroller> - support for scrollable list of widgets, generally much cleaner and
+flexible than this implementation, and could easily provide similar functionality if the line number and
+code for each line are wrapped in another widget
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<on_pen_changed|Tickit::Widget/on_pen_changed>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<reshape|Tickit::Widget/reshape>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_pen|Tickit::Widget/set_pen>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>, L<window_lost|Tickit::Widget/window_lost>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2014. Licensed under the same terms as Perl itself.

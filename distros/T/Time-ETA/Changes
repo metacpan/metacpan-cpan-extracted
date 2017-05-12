@@ -1,0 +1,59 @@
+Revision history for Time::ETA
+
+0.01    2013-03-07
+        * First public release
+        * Internal serialization api version 1
+
+0.02    2013-03-15
+        * Fixed get_remaining_seconds()
+        * Fixed get_elapsed_seconds()
+        * Changed internal serialization api to version 2
+        * New method is_completed()
+        * New example script with run visualization
+        * Added README
+        * Additions in POD
+        * Additions in tests
+
+0.03    2013-03-25
+        * New method get_remaining_time()
+        * New method can_cpawn()
+        * More frienly error message when it is not possible to spawn
+        * Small fix in pod
+        * Added .travis.yml
+        * Dist::Zilla will not allow releasing with dirty git
+
+1.0.0   2013-09-01
+        [Major]
+        * Using SemVer for version numbers
+
+        [Patch]
+        * Added Perl 5.8 to be checked by Travis CI
+        * Fixing travis
+        * Removed test that checked that I have written Changes
+        * Using BESSARABV Dist::Zilla plugin bundle
+        * Fixing misspell in README
+
+1.0.1   2013-12-26
+        [Patch]
+        * Using mocked time in tests
+        * Fixing xt tests in Travis CI
+        * Test refactoring
+        * Fixed warnings in tests
+        * Added one more test
+        * renamed: README -> README.md
+        * Added link to stackoverflow discussions to README.md
+
+1.1.0   2014-01-12
+        [Minor]
+        * Added methods to pause task execution progress
+
+1.1.1   2014-02-19
+        [Patch]
+        * Fix bug in start time calculation at the resuming
+        * Move the gettimeofday redefinition to the MockTime package
+        * Author tests need Test::Differences
+        * Added WTERTIUS cpan name to CONTRIBUTORS section
+
+1.2.0   2015-09-30
+        [Minor]
+        * New method get_elapsed_time()

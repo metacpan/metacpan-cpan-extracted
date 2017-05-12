@@ -1,0 +1,51 @@
+
+Changes made in Sense-Clusters version 0.91 during version 0.93
+
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+Mahesh Joshi	 joshi031@d.umn.edu
+
+1. Added --lsa option to discriminate.pl to support feature clustering using
+Latent Semantic Analysis (LSA).
+								- Mahesh
+
+2. Changed discriminate.pl to remove blank contexts when doing LSA style
+feature clustering.
+
+3. Removed dependency on Sparse module, instead replaced with use of
+Math::SparseVector module.
+								- Mahesh
+
+4. Added dependency on Math::SparseMatrix module for sparse transpose
+functionality to create feature-by-context LSA representation out of order 1 
+context-by-feature representation.
+								- Mahesh
+
+5. Added new documentation files in web directory Web/SC-htdocs:
+feature_clust.html, headless_clust.html, headword_clust.html, lsa.html,
+sc_methodology.html and word_clust.html.
+								- Ted
+
+6. Updated create_gp.pl in the Web/SC-cgi directory to use gnuplot commands
+in the Gnuplot version 4.0 syntax.
+								- Mahesh
+
+7. Updated web interface to support the LSA style feature clustering option
+								- Mahesh
+
+8. Changed Makefile.PL to require Math::SparseVector v0.03, Math::SparseMatrix
+v0.01 and Text::NSP v1.01 and made related INSTALL file changes.
+								- Mahesh
+
+9. Changed INSTALL file to simplify setup of package, especially when 
+doing a local installation. Also updated required package list to include
+Math::BigInt/BigFloat. 
+								- Ted
+
+10. Now require Perl 5.8.5, since Text-NSP requires that. Also upgraded
+requirement for PDL to 2.4.1, since it has been out for quite a long time
+now (several years) and it seems reasonable to expect users to have 
+migrated. 
+								- Ted
+
+(Changelog-v0.91to0.93 Last Updated on July 7, 2006 by Ted)

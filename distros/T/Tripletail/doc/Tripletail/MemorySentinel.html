@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::MemorySentinel - メモリ使用状況の監視</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::MemorySentinel - メモリ使用状況の監視
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#BUGS">
+<span class="pod_lang">BUGS
+
+</span></a>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::MemorySentinel - メモリ使用状況の監視
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  my $msenti = $TL-&gt;getMemorySentinel;
+  $msenti-&gt;setPermissibleSize(db_cache =&gt; 10 * 1024);
+
+  my $usage = $msenti-&gt;getMemorySize;</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">FCGI モードの際に、メモリリークが発生しているかどうかを調べて、
+リークを検出した場合にプロセスを再起動する。このモジュールは
+FCGI モードで自動的に使用され、FCGI モードでない時には使用されない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このモジュールは、最初に <a href=".././Tripletail.html#MainXe9X96Xa2Xe6X95Xb0">&quot;Main関数&quot; in Tripletail</a> を抜けた時の仮想メモリサイズを
+保存する。そして次回以降に <a href=".././Tripletail.html#MainXe9X96Xa2Xe6X95Xb0">&quot;Main関数&quot; in Tripletail</a> を抜けた際、最初の時点に対する仮想
+メモリサイズの増加が設定値を越えていれば、メモリリークが発生したと判断する。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->getMemorySentinel"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;getMemorySentinel</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $msenti = $TL-&gt;getMemorySentinel;</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::MemorySentinel オブジェクトを取得。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getMemorySize"><span class="pod_lang"><code class="pod_iseq_C">getMemorySize</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $usage = $TL-&gt;getMemorySize;</code></pre>
+
+<p>
+<span class="pod_lang">現在のメモリ使用量を取得する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setPermissibleSize"><span class="pod_lang"><code class="pod_iseq_C">setPermissibleSize</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $msenti-&gt;setPermissibleSize(db_cache =&gt; 10 * 1024);</code></pre>
+
+<p>
+<span class="pod_lang">許容メモリ使用量を設定する。
+第一引数にはその設定に対するキーを渡し、第二引数にはサイズを KiB 単位で渡す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">デフォルトでは次の設定がされている。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  $msenti-&gt;setPermissibleSize(_HEAP =&gt; 10 * 1024);</code></pre>
+
+</dd>
+<dt><a id="getTotalPermissibleSize"><span class="pod_lang"><code class="pod_iseq_C">getTotalPermissibleSize</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $total = $msenti-&gt;getTotalPermissibleSize;</code></pre>
+
+<p>
+<span class="pod_lang">全てのキーに対する許容メモリ使用量の合計値を返す。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="BUGS">
+<span class="pod_lang">BUGS
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">現在の所、このモジュールは次の OS からのみメモリ使用量を取得する事が出来る。
+これ以外の OS ではメモリリークの検出は行なわれない。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="X*_Linux_2.x"><span class="pod_lang">* Linux 2.x
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::FileSentinel">Tripletail::FileSentinel</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::MemorySentinel - メモリ使用状況の監視
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->getMemorySentinel">$TL-&gt;getMemorySentinel</a></li>
+<li><a href="#X*_Linux_2.x">* Linux 2.x</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#BUGS">BUGS</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#X_">Tripletail</a></li>
+<li><a href="#X__00">Tripletail::FileSentinel</a></li>
+<li><a href="#getMemorySize">getMemorySize</a></li>
+<li><a href="#getTotalPermissibleSize">getTotalPermissibleSize</a></li>
+<li><a href="#setPermissibleSize">setPermissibleSize</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::MemorySentinel - メモリ使用状況の監視
+
+
+</div>
+
+</body>
+</html>

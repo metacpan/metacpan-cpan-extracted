@@ -1,0 +1,18 @@
+#
+# This is the maintainer's Makefile - it is used only to assemble new
+# versions of this module for upload to CPAN.
+#
+
+dist: clean
+	perl Build.PL
+	./Build
+	./Build manifest
+	./Build dist
+	./Build test
+	./Build test --test_files=xt/*.t
+
+
+clean:
+	rm -rf Build _build blib META.yml Makefile Makefile.PL MANIFEST \
+		Debian_CPANTS*.txt
+

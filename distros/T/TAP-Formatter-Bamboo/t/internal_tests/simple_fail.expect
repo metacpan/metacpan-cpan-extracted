@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testsuites>
+  <testsuite name="t/internal_tests/simple_fail.test" errors="0" failures="2" tests="5">
+    <system-out/>
+    <testcase name="t/internal_tests/simple_fail.test" time="TEST_TIME">
+      <failure><![CDATA[Fail reason(s):
+    failed tests (2, 5)
+Test output:
+1..5
+ok 1
+not ok 2
+ok 3
+ok 4
+not ok 5
+
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

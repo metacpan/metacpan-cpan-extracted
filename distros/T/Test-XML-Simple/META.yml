@@ -1,0 +1,26 @@
+---
+abstract: 'easy testing for XML'
+author:
+  - 'Joe McMahon <mcmahon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.142690'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-XML-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::Builder: '0'
+  Test::Builder::Tester: '0'
+  Test::LongString: '0'
+  Test::More: '0'
+  XML::LibXML: '1.99'
+version: '1.05'

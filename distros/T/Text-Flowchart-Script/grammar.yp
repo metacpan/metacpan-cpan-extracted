@@ -1,0 +1,153 @@
+%{
+
+my $symbol = {};
+my $reserved = { map {$_,1} qw/init box relate width height top left bottom right debug pad directed string x_coord y_coord x_pad y_pad reason/ };
+
+my (@ae, @ael, $ae, @expst, $funcstr);
+my $pname = 'Text::Flowchart::Script::';
+
+my $result;
+sub cat { $result .= join q//,@_ }
+
+%}
+
+%token IDENTIFIER CONSTANT STRING_LITERAL ASSIGN
+%token COLON COMMA EOS
+
+%start starting_unit
+%%
+
+primary_expression
+	: IDENTIFIER
+	| CONSTANT { $_[1]=~s/'(.+)'/$1/go; $_[1] }
+	| STRING_LITERAL
+	;
+
+
+attribute_list
+	: primary_expression
+	{
+	push @ae, $symbol->{$_[1]} ? '$'.$pname.'_'.$_[1] : $reserved->{$_[1]} ? "'$_[1]'" : "$_[1]";
+	}
+	| attribute_list COMMA primary_expression 
+	{
+	push @ae, $symbol->{$_[3]} ? '$'.$pname.'_'.$_[3] : $reserved->{$_[3]} ? "'$_[3]'" : "$_[3]";
+	}
+	;
+
+attribute_expression
+	: COLON attribute_list
+	{
+	undef $ae;
+	$ae = join q/,/, @ae;
+	undef @ae;
+	}
+	;
+
+attribute_expression_list
+	: attribute_expression
+	{
+	push @ael, $ae if $ae;
+	}
+	| attribute_expression_list attribute_expression
+	{
+	push @ael, $ae if $ae;
+	}
+	;
+
+funcall_preexpression
+	: primary_expression
+	{ undef $ae; undef @ae; undef @ael; $_[1] }
+	;
+
+funcall_expression
+	: funcall_preexpression attribute_expression_list
+	{
+	if( $symbol->{$_[1]} ){
+
+	$funcstr = join q//, '$'.$pname.'_'.$_[1], ' = $'.$pname.'chart->box(', join(q//,
+	  (@ael  >= 2 ?
+	  map{"[$_]"}@ael :
+	  @ael
+	 )), ");$/";
+
+	return;
+
+	}
+
+	elsif($_[1] eq 'init'){
+
+	cat '$'.$pname.'chart = Text::Flowchart->new('.join( q//, @ael).");$/";
+	return;
+
+	}
+	elsif($_[1] eq 'box'){
+
+	push @expst, join q//, .'$'.$pname.'chart->box(', join(q//,
+	  (@ael  >= 2 ?
+	  map{"[$_]"}@ael :
+	  @ael
+	 )), ");$/";
+	return;
+
+	}
+	elsif($_[1] eq 'relate'){
+
+	$funcstr = join q//, '$'.$pname.'chart->relate(', join(q/,/,
+	  (@ael  >= 2 ? (join q/,/, "[$ael[0]]", "[$ael[1]]", "$ael[2]") :
+	  @ael
+	 )), ");$/";
+
+	return;
+
+	}
+	else{
+
+	cat join q//, '$'.$_[1], ' = $chart->box(', join(q//,
+	  (@ael  >= 2 ?
+	  map{"[$_]"}@ael :
+	  @ael
+	 )), ");$/";
+	return;
+	}
+
+	}
+	;
+
+
+expression
+	: funcall_expression
+	{
+	cat $funcstr;
+	}
+	| primary_expression ASSIGN funcall_expression
+	{
+	  $symbol->{$_[1]} = 1;
+	  cat(  '$'.$pname.'_'.$_[1], @expst ? ' = '.(join q//,@expst) : ";$/");
+	  @expst = ();
+	}
+	;
+
+statement
+	: EOS
+	| expression EOS
+	;
+
+statement_list
+	: statement
+	| statement_list statement
+	;
+
+
+starting_unit
+	: statement_list
+	{
+	 join $/,
+	 "use Text::Flowchart; use IO::Scalar; \n",
+	 'my $_output; tie *OUT, \'IO::Scalar\', \$_output;',
+	 $result, '$Text::Flowchart::Script::chart->draw(*OUT); $output = $_output';
+	}
+	;
+
+%%
+

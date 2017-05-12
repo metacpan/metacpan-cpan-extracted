@@ -1,0 +1,77 @@
+NAME
+    Test::Expect - Automated driving and testing of terminal-based programs
+
+SYNOPSIS
+      # in a t/*.t file:
+      use Test::Expect;
+      use Test::More tests => 13;
+      expect_run(
+        command => "perl testme.pl",
+        prompt  => 'testme: ',
+        quit    => 'quit',
+      );
+      expect("ping", "pong", "expect");
+      expect_send("ping", "expect_send");
+      expect_is("* Hi there, to testme", "expect_is");
+      expect_like(qr/Hi there, to testme/, "expect_like");
+
+DESCRIPTION
+    Test::Expect is a module for automated driving and testing of
+    terminal-based programs. It is handy for testing interactive programs
+    which have a prompt, and is based on the same concepts as the Tcl Expect
+    tool. As in Expect::Simple, the Expect object is made available for
+    tweaking.
+
+    Test::Expect is intended for use in a test script.
+
+SUBROUTINES
+  expect_run
+    The expect_run subroutine sets up Test::Expect. You must pass in the
+    interactive program to run, what the prompt of the program is, and which
+    command quits the program:
+
+      expect_run(
+        command => "perl testme.pl",
+        prompt  => 'testme: ',
+        quit    => 'quit',
+      );
+
+  expect
+    The expect subroutine is the catch all subroutine. You pass in the
+    command, the expected output of the subroutine and an optional comment.
+
+      expect("ping", "pong", "expect");
+
+  expect_send
+    The expect_send subroutine sends a command to the program. You pass in
+    the command and an optional comment.
+
+      expect_send("ping", "expect_send");
+
+  expect_is
+    The expect_is subroutine tests the output of the program like
+    Test::More's is. It has an optional comment:
+
+      expect_is("* Hi there, to testme", "expect_is");
+
+  expect_like
+    The expect_like subroutine tests the output of the program like
+    Test::More's like. It has an optional comment:
+
+      expect_like(qr/Hi there, to testme/, "expect_like");
+
+  expect_handle
+    This returns the Expect object.
+
+SEE ALSO
+    Expect, Expect::Simple.
+
+AUTHOR
+    Leon Brocard, "<acme@astray.com>"
+
+COPYRIGHT
+    Copyright (C) 2005, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

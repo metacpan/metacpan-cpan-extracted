@@ -1,0 +1,86 @@
+#primaryContent_2columns {
+    margin-right: 0;
+}
+#secondaryContent_2columns {
+    display: none;
+}
+#columnA_2columns {
+    position: relative;
+    top     : 0;
+    left    : 0;
+    bottom  : 0;
+    right   : 0;
+}
+#main_inner {
+    width   : 1800px;
+}
+
+div.chart_boxs {
+    width           : 300px;
+    float           : left;
+    margin          :   5px;
+}
+div.charts {
+    width           : 300px;
+    height          : 150px;
+    text-align      : center;
+    border          : 1px solid #E1E1E1;
+    margin-top      :  5px;
+}
+div.charts input.template_values:first-child {
+    margin-top: 5px;
+}
+div.charts input.template_values {
+    width: 100px;
+}
+div.charts input.template_call {
+    margin-top: 5px;
+    width: 150px;
+}
+div.charts img {
+    position        : relative;
+    top             : 60px;
+    border          : none;
+}
+div.charts img.newimage {
+    top             : 30px;
+}
+div.chart_headers {
+    border          : 1px solid #E1E1E1;
+    width           :  300px;
+    height          :  15px;
+}
+div.charts {
+    cursor: pointer;
+}
+div.chart_headers div.text {
+    float: left;
+    width: 228px;
+    padding-left: 4px;
+}
+div.chart_headers div.icons {
+    float: left;
+    width: 67px;
+}
+div.chart_headers div.icons img {
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: -4px;
+    margin-top: -1px;
+}
+#main_inner {
+    margin-left: 15px;
+}
+input.missing_value {
+    border-color: red;
+}
+#idx_chart_version {
+    margin-top  :  -4px;
+    height      :  23px;
+    width       :  50px;
+}
+#bt_create_static_url_idx {
+    height      :  23px;
+    margin-top  :  -1px;
+}

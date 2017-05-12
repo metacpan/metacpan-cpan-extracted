@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d558a962d05f28bbef4c5fd6902d544cc8c40793 Changes
+SHA1 528a6f5a4a70bd41e6fec86b21673cdcb6a664eb MANIFEST
+SHA1 fc5faf6b3e850fe148d15175098e42c348516ae9 MANIFEST.SKIP
+SHA1 623aa389c07dcadb2ff4058d33596d1bcf31a420 META.yml
+SHA1 44522742c753ef121b64696f4a4fc8d7b5db145a Makefile.PL
+SHA1 84ca423675ccd3f754c42ffcd81cb3cbbd49dbff README
+SHA1 ab789e5c62efa520a0fef2b1c91ce71d654e9dc9 author.t/Makefile
+SHA1 da1e92effa45c0b10dbae8ce2a9a95db3c6f1e56 author.t/critic.t
+SHA1 b7c2d03da45c1fcad1aea57c16a2745fe99567dd author.t/critic1
+SHA1 08d8f2d9b526ec7eb22810983560ca9267cc3ac6 author.t/display.t
+SHA1 e09c101f413bcc042ee22de4ad9dedc66a3e57ac author.t/do_tidy.pl
+SHA1 730b38423b2281a33d7f6e2dc1ed28c9af9f0bf1 author.t/perlcriticrc
+SHA1 55e4e8121700f338fd48cfa78345bda56e0481e9 author.t/perltidyrc
+SHA1 bc1b193fd65b0f312428be12a19085c9af890a79 author.t/tidy1
+SHA1 0986c8b3e55c7a51189921e6920067e5aa06507b etc/Makefile
+SHA1 48d46ae2d2d92620c25d429c185d0af3f086d19d etc/change_version.pl
+SHA1 6dc3a35896e37da10ac959ce5994c1811f23f979 etc/check_links.pl
+SHA1 a379ae152a7d3397079e323a9506fc8826326524 etc/last_minute_check.sh
+SHA1 a09d1a358a20c698d3faf67b0f4fac07c7693ce3 etc/not_in_manifest.pl
+SHA1 d0c3c2b98c42649f90aa27b0025b22918e45d047 lib/Test/Weaken.pm
+SHA1 cc7022abdc40c002a170c41abc8827cfc2721a05 sandbox/coderef.pl
+SHA1 0ea90a3a643941a247e7671bf7ec062433829a4d sandbox/dot.pl
+SHA1 167c2646003576cad95c84f250eb40a4240ed060 sandbox/elements.pl
+SHA1 e347e82757c4e05c2924ea39c4d4d22883f0cdfa sandbox/html-tree.pl
+SHA1 c23bbf801b303469d597679e29b1403d1196720b sandbox/ignore.pl
+SHA1 bb3e8d8523b5c283a529ee37cf80bb16e975bd60 sandbox/misc.pl
+SHA1 4af5f4607b388d1e739cdd662a613a689970709e sandbox/reftypes.pl
+SHA1 8ff4a4e10173a2d50de71a37c8eeaad09728db93 sandbox/scalar-util-instance.pl
+SHA1 a423d9158e2112c9afc7867cf83d3fa5bb9ef8e7 sandbox/tied.pl
+SHA1 f0501ee363990216d88240b07c3a568c8d8f6c51 t/00-load.t
+SHA1 3aa15ffe14c82d738f7da154a76204d3cdfbde07 t/Makefile
+SHA1 b3dd13fa656d4b3957d68c2e61532240bf241259 t/array.t
+SHA1 ba4b194184499e72cfa4e063133c05d5dbf32847 t/bug42903.t
+SHA1 daa6c20169d4e81bcd945d21b466d9c0e86fa863 t/circular.t
+SHA1 4b5ab9a6ec507e8cbc2fa3cfcdbd6f27a098ef5f t/contents.t
+SHA1 c36d428aabc808f2e7b43deebf75905c842c67eb t/faux_gtk.t
+SHA1 3235bc4504d0d89ae0b09f8695f201008990458b t/filehandle.t
+SHA1 0090ec05da42abecd5eb0945787a2d643bb2131f t/ignore.t
+SHA1 3bd2344683f026e0c04563bb88ba76a3e148359d t/lib/Test/Weaken/Test.pm
+SHA1 347489572fd329e591750a6a1abd24a7769f7d98 t/overload.t
+SHA1 6d479fdf2c338639187741e82164fe2ca001eeaf t/pod.t
+SHA1 6b531594aa11b1d8eca4851bc5d12e15da72ced4 t/poof.t
+SHA1 e78e6f844276129c25d44a6d05d77bc3cbc2f5db t/snippet.t
+SHA1 1c7261df0d88cb2bc1c0e11a688975613b03f565 t/stein.t
+SHA1 5c6ffacdcc558c3b9e70dcb35ecac2c9a4a4e344 t/synopsis.t
+SHA1 5bf1f3df40f7e04be3960623c08b8b7b6df726fc t/tied.t
+SHA1 776f2d8977e33cf5f67f4e6b8ab83ab4da2a0ba8 t/unfilled-array.t
+SHA1 97926e8ba169a8b91320e7071381224a5283ba9b t/various.t
+SHA1 abcb92c871d6c87cc4b890dc5df65aed4f28ca0a t/weaken.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iD8DBQFQuUj5LFMCIV9q3ToRAsckAJsE5Gn3ctLlvvmcUvwzUR8BCOUqcACeIoRn
+yl1bd0afnTUIlcba67IXNfc=
+=ukZY
+-----END PGP SIGNATURE-----

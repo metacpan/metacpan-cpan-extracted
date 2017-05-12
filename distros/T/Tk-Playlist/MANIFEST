@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-Playlist.t
+lib/Tk/Playlist.pm
+t/playlist.t.disabled
+META.yml                                 Module meta-data (added by MakeMaker)

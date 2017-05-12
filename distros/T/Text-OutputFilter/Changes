@@ -1,0 +1,55 @@
+0.20	- 12 May 2016, H.Merijn Brand
+    * Add CONTRIBUTING.md
+    * Do not print undefined lines on close
+    * It's 2016
+    * Tested with pperl 5.24.0
+
+0.19	- 11 Feb 2015, H.Merijn Brand
+    * Upped copyright to 2015
+    * Move repo to github
+    * Remove perl recommendation from META as it breaks cpan clients
+
+0.18	- 07 Feb 2014, H.Merijn Brand
+    * Upped copyright to 2012
+    * Upped copyright to 2013
+    * Upped copyright to 2014
+    * Updated META specs to Lancaster consensus (administrative release)
+
+0.17	- 07 Sep 2011, H.Merijn Brand
+    * NAME / DISTNAME in Makefile.PL
+
+0.16	- 07 Sep 2011, H.Merijn Brand
+    * Spell checks
+    * More cross-checks for META data
+    * Upped copyright to 2011
+
+0.15	- 16 Mar 2010, H.Merijn Brand
+    * Added Test::NoWarnings
+    * Dropped YAML spec to 1.0
+    * Upped copyright to 2010
+
+0.14	- 07 Jan 2009, H.Merijn Brand
+    * Copyright 2009
+    * Made the license as in perl. Was still accidentally restricted
+    * Corrected e-mail
+    * Generated and checked META.yml
+
+0.13	- 02 Jan 2008, H.Merijn Brand
+    * Spellchecks
+    * Removed prototypes
+    * Now under git
+    * Added simplistic example
+    * Added prereq's to Makefile.PL
+    * Upped copyright year
+
+0.12	- 02 May 2007, H.Merijn Brand
+    * Pod checks were wrong (yank/put problem)
+    * Added test_cover make target
+    * Added Text::Filter to SEE ALSO
+    * Added tests for printf and binmode
+    * Fixed binmode
+    * Added tests for tell, eof, and fileno
+    * Added tests for input (forbidden) and NYI functionality
+
+0.11	- 21 Mar 2007, H.Merijn Brand
+    * Initial release to CPAN

@@ -1,0 +1,73 @@
+---
+abstract: 'parsing and writing of textual numeric data files'
+author:
+  - 'Thomas Orgis <thomas@orgis.org>'
+build_requires:
+  File::Compare: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-NumericData
+provides:
+  Text::NumericData:
+    file: lib/Text/NumericData.pm
+    version: '2.002000'
+  Text::NumericData::App:
+    file: lib/Text/NumericData/App.pm
+  Text::NumericData::App::txdbaseline:
+    file: lib/Text/NumericData/App/txdbaseline.pm
+  Text::NumericData::App::txdcalc:
+    file: lib/Text/NumericData/App/txdcalc.pm
+  Text::NumericData::App::txdcolumns:
+    file: lib/Text/NumericData/App/txdcolumns.pm
+  Text::NumericData::App::txdconstruct:
+    file: lib/Text/NumericData/App/txdconstruct.pm
+  Text::NumericData::App::txdcontract:
+    file: lib/Text/NumericData/App/txdcontract.pm
+  Text::NumericData::App::txdderiv:
+    file: lib/Text/NumericData/App/txdderiv.pm
+  Text::NumericData::App::txdextrema:
+    file: lib/Text/NumericData/App/txdextrema.pm
+  Text::NumericData::App::txdfilter:
+    file: lib/Text/NumericData/App/txdfilter.pm
+  Text::NumericData::App::txdfromafors:
+    file: lib/Text/NumericData/App/txdfromafors.pm
+  Text::NumericData::App::txdfromtcad:
+    file: lib/Text/NumericData/App/txdfromtcad.pm
+  Text::NumericData::App::txdhistogram:
+    file: lib/Text/NumericData/App/txdhistogram.pm
+  Text::NumericData::App::txdmean:
+    file: lib/Text/NumericData/App/txdmean.pm
+  Text::NumericData::App::txdnorm:
+    file: lib/Text/NumericData/App/txdnorm.pm
+  Text::NumericData::App::txdrecycle:
+    file: lib/Text/NumericData/App/txdrecycle.pm
+  Text::NumericData::App::txdrows:
+    file: lib/Text/NumericData/App/txdrows.pm
+  Text::NumericData::App::txdsort:
+    file: lib/Text/NumericData/App/txdsort.pm
+  Text::NumericData::App::txdstatistics:
+    file: lib/Text/NumericData/App/txdstatistics.pm
+  Text::NumericData::Calc:
+    file: lib/Text/NumericData/Calc.pm
+  Text::NumericData::File:
+    file: lib/Text/NumericData/File.pm
+  Text::NumericData::FileCalc:
+    file: lib/Text/NumericData/FileCalc.pm
+  Text::NumericData::Stat:
+    file: lib/Text/NumericData/Stat.pm
+requires:
+  Config::Param: '3'
+  Math::Spline: '0'
+  Storable: '0'
+  Text::ASCIIPipe: '1.001'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '2.002000'

@@ -1,0 +1,125 @@
+{
+   "abstract" : "Utilities for TV program genre of ARIB",
+   "author" : [
+      "moznion <moznion@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TV-ARIB-ProgramGenre",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::Synopsis::Expectation" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "TV::ARIB::ProgramGenre" : {
+         "file" : "lib/TV/ARIB/ProgramGenre.pm",
+         "version" : "0.01"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Anime" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Anime.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Documentary" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Documentary.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Drama" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Drama.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Expansion" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Expansion.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Hobby" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Hobby.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Info" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Info.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Movie" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Movie.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Music" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Music.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::News" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/News.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Other" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Other.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Reserve" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Reserve.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Sport" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Sport.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Theater" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Theater.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Variety" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Variety.pm"
+      },
+      "TV::ARIB::ProgramGenre::ChildGenre::Welfare" : {
+         "file" : "lib/TV/ARIB/ProgramGenre/ChildGenre/Welfare.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/TV-ARIB-ProgramGenre/issues"
+      },
+      "homepage" : "https://github.com/moznion/TV-ARIB-ProgramGenre",
+      "repository" : {
+         "url" : "git://github.com/moznion/TV-ARIB-ProgramGenre.git",
+         "web" : "https://github.com/moznion/TV-ARIB-ProgramGenre"
+      }
+   },
+   "version" : "0.01"
+}

@@ -1,0 +1,53 @@
+---
+global:
+  name: Class-Factory-Enhanced
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - set the version to 0.07
+      - 'Changes: fixed global.name'
+    date: 2007-11-29T16:29:04Z
+    tags: []
+    version: 0.07
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - Added requirement for Class::Accessor::Installer
+      - '.shipit: added Twitter step'
+      - 'Makefile.PL: added auto_install() and process_templates()'
+      - 'lib/*: converted to template'
+      - updated MANIFEST
+      - updated t/perlcriticrc
+    date: 2007-11-21T18:21:11Z
+    tags:
+      - BUGFIX
+    version: 0.06
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - Makefile.PL now requires Class::Factory 1.06 or better specifically.
+    date: 2007-11-07T14:40:43+01:00
+    tags: []
+    version: 0.05
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - 'removed Class::Factory::Patched, since Fred Moyers accepted my patches to Class::Factory. Class::Factory::Enhanced now subclasses Class::Factory.'
+    date: 2007-11-07T08:03:33+01:00
+    tags: []
+    version: 0.04
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - added get_factory_type_for()
+    date: 2007-11-07T01:07:39+01:00
+    tags: []
+    version: 0.03
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - build_requires 'Class::Accessor::Complex'
+    date: 2007-10-21T21:50:03+02:00
+    tags: []
+    version: 0.02
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - original version
+    date: 2007-10-21T20:03:24+02:00
+    tags: []
+    version: 0.01

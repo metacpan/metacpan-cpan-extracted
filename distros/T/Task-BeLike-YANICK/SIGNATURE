@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e0a2730549998d792ce08401c51b3bf21ec3517a AUTHOR_PLEDGE
+SHA1 84190c29a4d87d86739fb4148a9f92519225a603 Build.PL
+SHA1 e45d5b6c4495f4214a251b5e342c9254a5a73159 Changes
+SHA1 a124f7a76d045d61b16c7d6e7be6a92aa20bc8ea INSTALL
+SHA1 cf5dc9c929415cfa7133eed863def866ade9774d LICENSE
+SHA1 03e75ce39d4f1dca04e1f4926f433d9660c352d0 MANIFEST
+SHA1 008bd8e69c576efb4a6fa88bb7f80869a4ec1fbd META.json
+SHA1 88456ffeab43b8fe1aff8d068e8b33c624fe6c0e META.yml
+SHA1 bbf91d658b10c38d3483b7d9a4323e438dcf29d9 README
+SHA1 8bbc01d2c94438200196088d6edf8cd4afbe4ece README.mkdn
+SHA1 3889cae02ad5a7391937d425d3fb9de085ab1e2e inc/MyBuild.pm
+SHA1 828f8881d1448e8367e1581b0d484f19e481e543 lib/Task/BeLike/YANICK.pm
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 3e245c11c2b26a4fc730768d0527042a6f5e7b23 t/00-load.t
+SHA1 ab46e9d0b74f41492e9381ac19036aeeb4adb1c7 t/000-report-versions-tiny.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlDjfXMACgkQ34Hwf+GwC4y7igCgzBM+K6yCPPS60bJMzyaPVZ88
+keEAoI4Vua9wVO0u0SSF6nPfpU26xu9v
+=aPy2
+-----END PGP SIGNATURE-----

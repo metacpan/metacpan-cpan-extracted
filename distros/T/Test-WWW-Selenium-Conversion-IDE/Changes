@@ -1,0 +1,21 @@
+LIST OF CHANGES
+---------------
+
+release 0.5
+ - support for select
+ - support for random_alert. this isn't selenese, but done so that if some alert appears at random (likely a bug in Selenium) then you can put this in to bypass
+
+release 0.4
+ - bug fix where failed request on Selenium object still causes test suite to croak
+ - all currently supported requests except typing into a text field generate a test
+ - Limit number of times to send request whilst waiting for something '_ide_to_TWS_waitForText'
+
+release 0.3
+ - bug fix some broken tests
+
+release 0.2
+ - addition of further tests - first version to CPAN
+
+release 0.1
+ - set up
+ - first alpha release of Test::WWW::Selenium::ide_to_TWS

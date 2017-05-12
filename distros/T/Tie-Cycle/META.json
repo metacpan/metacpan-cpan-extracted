@@ -1,0 +1,58 @@
+{
+   "abstract" : "Cycle through a list of values via a scalar.",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-Cycle",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.95"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/tie-cycle/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/tie-cycle",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/tie-cycle.git",
+         "web" : "https://github.com/briandfoy/tie-cycle"
+      }
+   },
+   "version" : "1.224",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

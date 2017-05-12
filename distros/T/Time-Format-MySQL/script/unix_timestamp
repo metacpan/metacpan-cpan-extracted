@@ -1,0 +1,24 @@
+#!perl
+use strict;
+use warnings;
+use Pod::Usage;
+use Time::Format::MySQL qw(unix_timestamp);
+
+eval {
+    print unix_timestamp(@ARGV), "\n";
+};
+
+if ($@) {
+    warn $@;
+    pod2usage;
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 SYNOPSIS
+
+  unix_timestamp '%Y-%m-%d %H:%M:%S'
+
+=cut

@@ -1,0 +1,30 @@
+Revision history for Test-Magpie
+
+0.11    2013-08-16
+        Reverted changes from last release because of backwards
+        incompatibility - project is being forked instead.
+
+0.10    2013-08-12
+        Changed when->then_return to stub->returns.
+        Changed stubbing behaviour to match Mockito.
+         - The last stubbed response persists.
+         - New stubs take precedence over oldder stubs.
+
+0.09    2013-08-03
+        Export main functions by default
+        Add optional parameter $test_name to verify()
+
+0.08    2013-07-22
+        Fixed use of smartmatching and removed warnings
+        Improved verify() print messages
+        Added Mock::can() method
+
+0.07    2013-07-15
+        Deprecated at_least() and at_most() functions
+        Added verify() options: at_least, at_most and between
+        Added argument checks for public functions
+        Added more comprehensive tests
+
+0.06    2013-07-03
+        Enable calling ref() on mock object to return a specified type
+

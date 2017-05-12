@@ -1,0 +1,1799 @@
+<html>
+	<head>
+		<title>Test Report</title>
+		<script type="text/javascript" src="jquery-1.2.3.pack.js"></script>
+		<style type="text/css">
+/******************************************************************************
+ * TAP-Formatter-HTML: default report stylesheet
+ * Copyright (c) 2008 Steve Purkis.  All rights reserved.
+ * Released under the same terms as Perl itself.
+ *****************************************************************************/
+
+html {
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	font-family: Helvetica, Verdana, Arial, Tahoma;
+	font-size: small;
+	background-color: #efefef;
+}
+
+
+/******************************************************************************
+/* The summary bar
+ */
+#summary {
+	position: relative;
+	padding: 2px 0 2 0;
+	width: 90%;
+	font-size: x-large;
+	text-align: center;
+}
+
+#summary.passed {
+	background-color: #99ff66;
+	border: 1px solid #00ff00;
+}
+
+#summary.failed {
+	background-color: #ff6450;
+	border: 1px solid #ff0000;
+}
+
+#summary a {
+	width: 100%;
+	display: block;
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+	color: #000000;
+}
+
+#summary a:hover {
+	text-decoration: none;
+	color: #6666aa;
+}
+
+
+
+/******************************************************************************
+ * The report detail section
+ */
+#detail {
+	margin-top: 5px;
+	width: 90%;
+}
+
+table.detail {
+	width: 100%;
+	border: 1px solid #3333ee;
+	padding: 2px;
+	border-spacing: 0px;
+
+}
+
+table.detail th {
+	border-bottom: 2px solid #3333ee;
+	padding-top: 2px;
+}
+
+table.detail tfoot tr td {
+	border-top: 2px solid #3333ee;
+	padding-top: 2px;
+}
+
+table.detail td {
+	position: relative;
+	top: 0px;
+	left: 0px;
+	border-top: 1px solid #aaaaaa;
+	margin: 0;
+	padding: 2px 0 2 0;
+	vertical-align: top;
+}
+
+/******************************************************************************
+ * The file column
+ */
+table.detail td.file {
+	width: 10%;
+	padding-left: 2px;
+	padding-right: 4px;
+}
+
+a.file {
+	display: block;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	text-decoration: none;
+	color: #3333cc;
+}
+
+a.file:hover {
+	text-decoration: none;
+	color: #6666ee;
+}
+
+a.file:visited {
+	text-decoration: none;
+	color: #3333cc;
+}
+
+/******************************************************************************
+ * The time column
+ */
+table.detail td.time {
+	width: 2%;
+	border-left: 1px solid #ddddff;
+	text-align: center;
+	font-size: small;
+}
+
+/******************************************************************************
+ * The percentage column
+ */
+table.detail td.percent {
+	padding-left: 2px;
+	padding-right: 2px;
+	width: 2%;
+	text-align: center;
+	font-size: small;
+	vertical-align: middle;
+}
+
+table.detail td.passed {
+	border: 1px solid #99cc99;
+	background-color: #99ff66;
+}
+
+table.detail td.todo-passed {
+	border: 1px solid #99cc99;
+	background-color: #ddffbb;
+}
+
+table.detail td.severity-very-low {
+	border: 1px solid #ffee33;
+	background-color: #ffffaa;
+}
+
+table.detail td.severity-low {
+	border: 1px solid #eecc33;
+	background-color: #ffdd99;
+}
+
+table.detail td.severity-med {
+	border: 1px solid #dd6633;
+	background-color: #ffaa77;
+}
+
+table.detail td.severity-high {
+	border: 1px solid #ff3333;
+	background-color: #ff8866;
+}
+
+table.detail td.severity-very-high {
+	border: 1px solid #ff0000;
+	background-color: #ff6450;
+}
+
+/******************************************************************************
+ * The test run column
+ */
+
+/******************************************************************************
+ * Test summaries
+ */
+
+table.test-summary {
+	clear: both;
+	width: 100%;
+	height: 10px;
+	font-size: 8px; /* safari wants this less than 10px */
+	margin: 0px;
+	margin-bottom: 4px;
+	padding: 0;
+	border-spacing: 1px;
+}
+
+table.test-summary td {
+	margin: 0;
+	padding: 0;
+	height: 10px;
+}
+
+table.test-summary td a {
+	display: block;
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+	width: 100%;
+	height: 100%;
+}
+
+/* base for passed/failed (should always be lower precedent in class list!) */
+table.test-summary td.passed {
+	border: 1px solid #66cc33;
+	background-color: #99ff66;
+}
+
+table.test-summary td.failed {
+	border: 1px solid #ff0000;
+	background-color: #ff6450;
+}
+
+/* overrides for specific outcomes */
+table.test-summary td.ok {
+	border: 1px solid #66cc33;
+}
+
+table.test-summary td.not-ok {
+	border: 1px solid #ff0000;
+}
+
+table.test-summary td.todo-ok {
+	border: 1px solid #eeaa00;
+	background-color: #ffcc00;
+}
+
+table.test-summary td.skip-ok {
+	border: 1px solid #99d999;
+	background-color: #99cc66;
+}
+
+table.test-summary td.todo-not-ok {
+	border: 1px solid #99cc99;
+	background-color: #ddffbb;
+}
+
+/******************************************************************************
+ * Test detail
+ */
+div.test-detail {
+	margin: 0;
+	padding: 0;
+/*	display: none; /* let JS handle this... */
+}
+
+/******************************************************************************
+ * Test parse errors
+ */
+ul.parse-errors {
+	margin: 0;
+	padding: 0;
+	clear: left;
+}
+
+ul.parse-errors li {
+	margin-left: 4px;
+	list-style: none;
+	color: red;
+}
+
+/******************************************************************************
+ * Test output
+ */
+ul.test-out {
+	margin: 0;
+	padding: 0;
+	clear: left;
+}
+
+ul.test-out li {
+	margin-left: 4;
+	border-left: none;
+	list-style: none;
+}
+
+ul.test-out li.test {
+	;
+}
+
+ul.test-out li.comment {
+	color: #666666;
+	font-family: monospace;
+}
+
+ul.test-out li.plan {
+	color: blue;
+}
+
+ul.test-out li.ok {
+	;
+}
+
+ul.test-out li.todo-ok {
+	color: #cc3333;
+}
+
+ul.test-out li.todo-not-ok {
+	color: #773322;
+}
+
+ul.test-out li.not-ok {
+	color: #ff0000;
+}
+
+ul.test-out li.unplanned {
+	color: #ff0000;
+}
+
+ul.test-out li.skip {
+	color: #001111;
+}
+
+ul.test-out li.unknown {
+	color: #996600;
+	font-family: monospace;
+}
+
+ul.test-out li.exit-status {
+	color: #ff0000;
+}
+
+		</style>
+
+		<script type="text/javascript">
+// temporary hack, move external
+jQuery.fn.extend({
+  scrollTo : function(speed, easing) {
+    return this.each(function() {
+      var targetOffset = $(this).offset().top;
+      $('html,body').animate({scrollTop: targetOffset}, speed, easing);
+    });
+  }
+});
+
+$(document).ready(function(){
+	$("div.test-detail").hide();
+	$("div.summary").find("a").click(function(){return false;});
+
+	// expand test detail when user clicks on a test file
+	$("a.file").click(function(){
+		// go all the way to the tr incase table structure changes:
+		$(this).parents("tr:first").find("div.test-detail").slideToggle();
+		return false;
+	});
+
+	// expand test detail when user clicks on an individual test
+	$("a.test-summary").click(function(){
+		var testId = $(this).attr("href")
+		// go all the way to the tr incase table structure changes:
+		var $detail = $(this).parents("td.results").parents("tr:first").find("div.test-detail");
+		$detail.filter(":hidden").slideDown();
+		var $testElem = $detail.find(testId);
+		$testElem.show().scrollTo(1000);
+		var bgColor = $testElem.css("background-color");
+		$testElem.css({ backgroundColor: "yellow" });
+		// shame you can't animate bg color w/o a plugin...
+		setTimeout(function(){$testElem.css({ backgroundColor: bgColor })}, 3000);
+		return false;
+	});
+});
+		</script>
+
+	</head>
+	<body>
+				<div id="summary" class="failed">
+			<a href="#" title="Test Summary (99.7% ok)
+	severity: very-low
+	passed 347/348 tests in 24 files
+	total time: 2.52s
+	4 wallclock secs ( 0.31 usr  0.19 sys +  2.32 cusr  0.77 csys =  3.59 CPU)">FAILED</a>
+		</div>
+
+		<div id="detail">
+			<table class="detail">
+				<thead>
+					<tr>
+						<th class="file">Test file</th>
+						<th class="results">Test results</th>
+						<th class="time">Time</th>
+						<th class="percent">%</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	1 planned, 1 run
+	1 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/00basic.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-00basic-t-1" title="ok 1">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..1</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:34 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:34 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-00basic-t-1"											class="test ok">ok 1</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.11s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	3 planned, 3 run
+	3 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/01logon.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-01logon-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-01logon-t-2" title="ok 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-01logon-t-3" title="ok 3">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..3</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:34 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:34 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-01logon-t-1"											class="test ok">ok 1</li>
+									<li id="t-01logon-t-2"											class="test ok">ok 2</li>
+									<li id="t-01logon-t-3"											class="test ok">ok 3</li>
+									<li 											class="unknown">sqlite_version=3.4.2, sqlite_encoding=</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.11s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	4 planned, 4 run
+	4 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/02cr_table.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-02cr-table-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-02cr-table-t-2" title="ok 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-02cr-table-t-3" title="ok 3">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-02cr-table-t-4" title="ok 4">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..4</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:34 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:34 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-02cr-table-t-1"											class="test ok">ok 1</li>
+									<li id="t-02cr-table-t-2"											class="test ok">ok 2</li>
+									<li id="t-02cr-table-t-3"											class="test ok">ok 3</li>
+									<li 											class="unknown">f1, f1, f2, f3</li>
+									<li id="t-02cr-table-t-4"											class="test ok">ok 4</li>
+									<li 											class="unknown">closing dbh with active statement handles at t/02cr_table.t line 16.</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.17s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	9 planned, 9 run
+	9 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/03insert.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-2" title="ok 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-3" title="ok 3">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-4" title="ok 4">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-5" title="ok 5">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-6" title="ok 6">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-7" title="ok 7">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-8" title="ok 8">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-03insert-t-9" title="ok 9">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..9</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:34 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:34 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-03insert-t-1"											class="test ok">ok 1</li>
+									<li id="t-03insert-t-2"											class="test ok">ok 2</li>
+									<li id="t-03insert-t-3"											class="test ok">ok 3</li>
+									<li id="t-03insert-t-4"											class="test ok">ok 4</li>
+									<li id="t-03insert-t-5"											class="test ok">ok 5</li>
+									<li id="t-03insert-t-6"											class="test ok">ok 6</li>
+									<li id="t-03insert-t-7"											class="test ok">ok 7</li>
+									<li id="t-03insert-t-8"											class="test ok">ok 8</li>
+									<li id="t-03insert-t-9"											class="test ok">ok 9</li>
+									<li 											class="unknown">DBI::db=HASH(0x180a69c)-&gt;disconnect invalidates 1 active statement handle (either destroy statement handles or call finish on them before disconnecting) at t/03insert.t line 15.</li>
+									<li 											class="unknown">closing dbh with active statement handles at t/03insert.t line 15.</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.13s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	7 planned, 7 run
+	7 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/04select.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-04select-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-04select-t-2" title="ok 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-04select-t-3" title="ok 3">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-04select-t-4" title="ok 4">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-04select-t-5" title="ok 5">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-04select-t-6" title="ok 6">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-04select-t-7" title="ok 7">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..7</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:35 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:35 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-04select-t-1"											class="test ok">ok 1</li>
+									<li id="t-04select-t-2"											class="test ok">ok 2</li>
+									<li id="t-04select-t-3"											class="test ok">ok 3</li>
+									<li id="t-04select-t-4"											class="test ok">ok 4</li>
+									<li id="t-04select-t-5"											class="test ok">ok 5</li>
+									<li 											class="unknown">Fred, Bloggs, fred@bloggs.com</li>
+									<li id="t-04select-t-6"											class="test ok">ok 6</li>
+									<li id="t-04select-t-7"											class="test ok">ok 7</li>
+									<li 											class="unknown">closing dbh with active statement handles at t/04select.t line 17.</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.13s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	2 planned, 2 run
+	2 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/05tran.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-05tran-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-05tran-t-2" title="ok 2">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..2</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:35 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:35 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-05tran-t-1"											class="test ok">ok 1</li>
+									<li id="t-05tran-t-2"											class="test ok">ok 2</li>
+									<li 											class="unknown">ID, TITLE, TOTAL</li>
+									<li 											class="unknown">closing dbh with active statement handles at t/05tran.t line 34.</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.12s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	2 planned, 2 run
+	2 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/06error.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-06error-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-06error-t-2" title="ok 2">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..2</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:35 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:35 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-06error-t-1"											class="test ok">ok 1</li>
+									<li id="t-06error-t-2"											class="test ok">ok 2</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.12s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	18 planned, 18 run
+	18 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/08create_function.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-2" title="ok 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-3" title="ok 3">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-4" title="ok 4">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-5" title="ok 5">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-6" title="ok 6">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-7" title="ok 7">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-8" title="ok 8">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-9" title="ok 9">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-10" title="ok 10">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-11" title="ok 11">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-12" title="ok 12">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-13" title="ok 13">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-14" title="ok 14">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-15" title="ok 15">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-16" title="ok 16">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-17" title="ok 17">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-08create-function-t-18" title="ok 18">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..18</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:35 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:35 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-08create-function-t-1"											class="test ok">ok 1</li>
+									<li id="t-08create-function-t-2"											class="test ok">ok 2</li>
+									<li id="t-08create-function-t-3"											class="test ok">ok 3</li>
+									<li id="t-08create-function-t-4"											class="test ok">ok 4</li>
+									<li id="t-08create-function-t-5"											class="test ok">ok 5</li>
+									<li id="t-08create-function-t-6"											class="test ok">ok 6</li>
+									<li id="t-08create-function-t-7"											class="test ok">ok 7</li>
+									<li id="t-08create-function-t-8"											class="test ok">ok 8</li>
+									<li id="t-08create-function-t-9"											class="test ok">ok 9</li>
+									<li id="t-08create-function-t-10"											class="test ok">ok 10</li>
+									<li id="t-08create-function-t-11"											class="test ok">ok 11</li>
+									<li id="t-08create-function-t-12"											class="test ok">ok 12</li>
+									<li id="t-08create-function-t-13"											class="test ok">ok 13</li>
+									<li id="t-08create-function-t-14"											class="test ok">ok 14</li>
+									<li id="t-08create-function-t-15"											class="test ok">ok 15</li>
+									<li id="t-08create-function-t-16"											class="test ok">ok 16</li>
+									<li id="t-08create-function-t-17"											class="test ok">ok 17</li>
+									<li id="t-08create-function-t-18"											class="test ok">ok 18</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.06s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	15 planned, 15 run
+	15 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/09create_aggregate.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-2" title="ok 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-3" title="ok 3">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-4" title="ok 4">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-5" title="ok 5">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-6" title="ok 6">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-7" title="ok 7">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-8" title="ok 8">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-9" title="ok 9">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-10" title="ok 10">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-11" title="ok 11">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-12" title="ok 12">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-13" title="ok 13">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-14" title="ok 14">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-09create-aggregate-t-15" title="ok 15">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..15</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:35 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:35 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-09create-aggregate-t-1"											class="test ok">ok 1</li>
+									<li id="t-09create-aggregate-t-2"											class="test ok">ok 2</li>
+									<li id="t-09create-aggregate-t-3"											class="test ok">ok 3</li>
+									<li id="t-09create-aggregate-t-4"											class="test ok">ok 4</li>
+									<li id="t-09create-aggregate-t-5"											class="test ok">ok 5</li>
+									<li id="t-09create-aggregate-t-6"											class="test ok">ok 6</li>
+									<li id="t-09create-aggregate-t-7"											class="test ok">ok 7</li>
+									<li id="t-09create-aggregate-t-8"											class="test ok">ok 8</li>
+									<li id="t-09create-aggregate-t-9"											class="test ok">ok 9</li>
+									<li id="t-09create-aggregate-t-10"											class="test ok">ok 10</li>
+									<li id="t-09create-aggregate-t-11"											class="test ok">ok 11</li>
+									<li id="t-09create-aggregate-t-12"											class="test ok">ok 12</li>
+									<li id="t-09create-aggregate-t-13"											class="test ok">ok 13</li>
+									<li id="t-09create-aggregate-t-14"											class="test ok">ok 14</li>
+									<li id="t-09create-aggregate-t-15"											class="test ok">ok 15</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.13s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	3 planned, 3 run
+	3 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/10dsnlist.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-10dsnlist-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-10dsnlist-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-10dsnlist-t-3" title="ok 3 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="unknown">Driver is SQLite</li>
+									<li 											class="plan">1..3</li>
+									<li id="t-10dsnlist-t-1"											class="test ok">ok 1 </li>
+									<li id="t-10dsnlist-t-2"											class="test ok">ok 2 </li>
+									<li 											class="unknown">List of SQLite data sources:</li>
+									<li 											class="unknown">List ends.</li>
+									<li id="t-10dsnlist-t-3"											class="test ok">ok 3 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.04s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	5 planned, 5 run
+	5 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/20createdrop.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-20createdrop-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-20createdrop-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-20createdrop-t-3" title="ok 3 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-20createdrop-t-4" title="ok 4 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-20createdrop-t-5" title="ok 5 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..5</li>
+									<li id="t-20createdrop-t-1"											class="test ok">ok 1 </li>
+									<li id="t-20createdrop-t-2"											class="test ok">ok 2 </li>
+									<li 											class="unknown">Creating table:</li>
+									<li 											class="unknown">CREATE TABLE testaa (id INTEGER NOT NULL, name CHAR (64) NOT NULL)</li>
+									<li id="t-20createdrop-t-3"											class="test ok">ok 3 </li>
+									<li id="t-20createdrop-t-4"											class="test ok">ok 4 </li>
+									<li id="t-20createdrop-t-5"											class="test ok">ok 5 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.01s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	17 planned, 17 run
+	17 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/30insertfetch.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-1" title="ok 1 connect">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-2" title="ok 2 FindNewTable">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-3" title="ok 3 create">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-4" title="ok 4 insert">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-5" title="ok 5 prepare select">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-6" title="ok 6 execute select">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-7" title="ok 7 fetch select">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-8" title="ok 8 compare select">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-9" title="ok 9 finish select">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-10" title="ok 10 undef select">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-11" title="ok 11 delete">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-12" title="ok 12 prepare select deleted">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-13" title="ok 13 execute select deleted">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-14" title="ok 14 fetch select deleted">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-15" title="ok 15 finish select deleted">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-16" title="ok 16 undef select deleted">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-30insertfetch-t-17" title="ok 17 drop">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..17</li>
+									<li id="t-30insertfetch-t-1"											class="test ok">ok 1 connect</li>
+									<li id="t-30insertfetch-t-2"											class="test ok">ok 2 FindNewTable</li>
+									<li 											class="unknown">CREATE TABLE testaa (id INTEGER NOT NULL, name CHAR (64) NOT NULL, val INTEGER NOT NULL, txt CHAR (64) NOT NULL)</li>
+									<li id="t-30insertfetch-t-3"											class="test ok">ok 3 create</li>
+									<li id="t-30insertfetch-t-4"											class="test ok">ok 4 insert</li>
+									<li id="t-30insertfetch-t-5"											class="test ok">ok 5 prepare select</li>
+									<li id="t-30insertfetch-t-6"											class="test ok">ok 6 execute select</li>
+									<li id="t-30insertfetch-t-7"											class="test ok">ok 7 fetch select</li>
+									<li id="t-30insertfetch-t-8"											class="test ok">ok 8 compare select</li>
+									<li id="t-30insertfetch-t-9"											class="test ok">ok 9 finish select</li>
+									<li id="t-30insertfetch-t-10"											class="test ok">ok 10 undef select</li>
+									<li id="t-30insertfetch-t-11"											class="test ok">ok 11 delete</li>
+									<li id="t-30insertfetch-t-12"											class="test ok">ok 12 prepare select deleted</li>
+									<li id="t-30insertfetch-t-13"											class="test ok">ok 13 execute select deleted</li>
+									<li id="t-30insertfetch-t-14"											class="test ok">ok 14 fetch select deleted</li>
+									<li id="t-30insertfetch-t-15"											class="test ok">ok 15 finish select deleted</li>
+									<li id="t-30insertfetch-t-16"											class="test ok">ok 16 undef select deleted</li>
+									<li id="t-30insertfetch-t-17"											class="test ok">ok 17 drop</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.15s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	28 planned, 28 run
+	28 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/40bindparam.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-1" title="ok 1 connect">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-2" title="ok 2 FindNewTable">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-3" title="ok 3 create">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-4" title="ok 4 prepare">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-5" title="ok 5 execute insert 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-6" title="ok 6 execute insert num as string">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-7" title="ok 7 execute insert 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-8" title="ok 8 bind 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-9" title="ok 9 bind 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-10" title="ok 10 execute binds">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-11" title="ok 11 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-12" title="ok 12 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-13" title="ok 13 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-14" title="ok 14 finish">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-15" title="ok 15 undef cursor">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-16" title="ok 16 disconnect">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-17" title="ok 17 undef dbh">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-18" title="ok 18 connect for read">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-19" title="ok 19 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-20" title="ok 20 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-21" title="ok 21 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-22" title="ok 22 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-23" title="ok 23 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-24" title="ok 24 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-25" title="ok 25 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-26" title="ok 26 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-27" title="ok 27 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40bindparam-t-28" title="ok 28 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..28</li>
+									<li id="t-40bindparam-t-1"											class="test ok">ok 1 connect</li>
+									<li id="t-40bindparam-t-2"											class="test ok">ok 2 FindNewTable</li>
+									<li 											class="unknown">CREATE TABLE testaa (id INTEGER NOT NULL, name CHAR (64))</li>
+									<li id="t-40bindparam-t-3"											class="test ok">ok 3 create</li>
+									<li id="t-40bindparam-t-4"											class="test ok">ok 4 prepare</li>
+									<li id="t-40bindparam-t-5"											class="test ok">ok 5 execute insert 1</li>
+									<li id="t-40bindparam-t-6"											class="test ok">ok 6 execute insert num as string</li>
+									<li id="t-40bindparam-t-7"											class="test ok">ok 7 execute insert 2</li>
+									<li id="t-40bindparam-t-8"											class="test ok">ok 8 bind 1</li>
+									<li id="t-40bindparam-t-9"											class="test ok">ok 9 bind 2</li>
+									<li id="t-40bindparam-t-10"											class="test ok">ok 10 execute binds</li>
+									<li id="t-40bindparam-t-11"											class="test ok">ok 11 </li>
+									<li id="t-40bindparam-t-12"											class="test ok">ok 12 </li>
+									<li id="t-40bindparam-t-13"											class="test ok">ok 13 </li>
+									<li id="t-40bindparam-t-14"											class="test ok">ok 14 finish</li>
+									<li id="t-40bindparam-t-15"											class="test ok">ok 15 undef cursor</li>
+									<li id="t-40bindparam-t-16"											class="test ok">ok 16 disconnect</li>
+									<li id="t-40bindparam-t-17"											class="test ok">ok 17 undef dbh</li>
+									<li id="t-40bindparam-t-18"											class="test ok">ok 18 connect for read</li>
+									<li id="t-40bindparam-t-19"											class="test ok">ok 19 </li>
+									<li id="t-40bindparam-t-20"											class="test ok">ok 20 </li>
+									<li id="t-40bindparam-t-21"											class="test ok">ok 21 </li>
+									<li id="t-40bindparam-t-22"											class="test ok">ok 22 </li>
+									<li id="t-40bindparam-t-23"											class="test ok">ok 23 </li>
+									<li id="t-40bindparam-t-24"											class="test ok">ok 24 </li>
+									<li id="t-40bindparam-t-25"											class="test ok">ok 25 </li>
+									<li id="t-40bindparam-t-26"											class="test ok">ok 26 </li>
+									<li id="t-40bindparam-t-27"											class="test ok">ok 27 </li>
+									<li id="t-40bindparam-t-28"											class="test ok">ok 28 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.13s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	11 planned, 11 run
+	11 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/40blobs.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-3" title="ok 3 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-4" title="ok 4 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-5" title="ok 5 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-6" title="ok 6 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-7" title="ok 7 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-8" title="ok 8 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-9" title="ok 9 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-10" title="ok 10 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40blobs-t-11" title="ok 11 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..11</li>
+									<li id="t-40blobs-t-1"											class="test ok">ok 1 </li>
+									<li id="t-40blobs-t-2"											class="test ok">ok 2 </li>
+									<li 											class="unknown">Creating table:</li>
+									<li 											class="unknown">CREATE TABLE testaa (id INTEGER NOT NULL, name BLOB NOT NULL)</li>
+									<li id="t-40blobs-t-3"											class="test ok">ok 3 </li>
+									<li id="t-40blobs-t-4"											class="test ok">ok 4 </li>
+									<li id="t-40blobs-t-5"											class="test ok">ok 5 </li>
+									<li id="t-40blobs-t-6"											class="test ok">ok 6 </li>
+									<li id="t-40blobs-t-7"											class="test ok">ok 7 </li>
+									<li id="t-40blobs-t-8"											class="test ok">ok 8 </li>
+									<li id="t-40blobs-t-9"											class="test ok">ok 9 </li>
+									<li id="t-40blobs-t-10"											class="test ok">ok 10 </li>
+									<li id="t-40blobs-t-11"											class="test ok">ok 11 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.11s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	13 planned, 13 run
+	13 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/40listfields.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-3" title="ok 3 0E0">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-4" title="ok 4 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-5" title="ok 5 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-6" title="ok 6 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-7" title="ok 7 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-8" title="ok 8 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-9" title="ok 9 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-10" title="ok 10 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-11" title="ok 11 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-12" title="ok 12 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40listfields-t-13" title="ok 13 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..13</li>
+									<li id="t-40listfields-t-1"											class="test ok">ok 1 </li>
+									<li id="t-40listfields-t-2"											class="test ok">ok 2 </li>
+									<li id="t-40listfields-t-3"											class="test ok">ok 3 0E0</li>
+									<li id="t-40listfields-t-4"											class="test ok">ok 4 </li>
+									<li id="t-40listfields-t-5"											class="test ok">ok 5 </li>
+									<li id="t-40listfields-t-6"											class="test ok">ok 6 </li>
+									<li id="t-40listfields-t-7"											class="test ok">ok 7 </li>
+									<li id="t-40listfields-t-8"											class="test ok">ok 8 </li>
+									<li id="t-40listfields-t-9"											class="test ok">ok 9 </li>
+									<li id="t-40listfields-t-10"											class="test ok">ok 10 </li>
+									<li id="t-40listfields-t-11"											class="test ok">ok 11 </li>
+									<li id="t-40listfields-t-12"											class="test ok">ok 12 </li>
+									<li id="t-40listfields-t-13"											class="test ok">ok 13 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.11s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	11 planned, 11 run
+	11 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/40nulls.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-3" title="ok 3 0E0">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-4" title="ok 4 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-5" title="ok 5 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-6" title="ok 6 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-7" title="ok 7 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-8" title="ok 8 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-9" title="ok 9 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-10" title="ok 10 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40nulls-t-11" title="ok 11 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..11</li>
+									<li id="t-40nulls-t-1"											class="test ok">ok 1 </li>
+									<li id="t-40nulls-t-2"											class="test ok">ok 2 </li>
+									<li id="t-40nulls-t-3"											class="test ok">ok 3 0E0</li>
+									<li id="t-40nulls-t-4"											class="test ok">ok 4 </li>
+									<li id="t-40nulls-t-5"											class="test ok">ok 5 </li>
+									<li id="t-40nulls-t-6"											class="test ok">ok 6 </li>
+									<li id="t-40nulls-t-7"											class="test ok">ok 7 </li>
+									<li id="t-40nulls-t-8"											class="test ok">ok 8 </li>
+									<li id="t-40nulls-t-9"											class="test ok">ok 9 </li>
+									<li id="t-40nulls-t-10"											class="test ok">ok 10 </li>
+									<li id="t-40nulls-t-11"											class="test ok">ok 11 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.05s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	22 planned, 22 run
+	22 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/40numrows.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-3" title="ok 3 0E0">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-4" title="ok 4 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-5" title="ok 5 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-6" title="ok 6 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-7" title="ok 7 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-8" title="ok 8 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-9" title="ok 9 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-10" title="ok 10 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-11" title="ok 11 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-12" title="ok 12 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-13" title="ok 13 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-14" title="ok 14 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-15" title="ok 15 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-16" title="ok 16 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-17" title="ok 17 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-18" title="ok 18 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-19" title="ok 19 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-20" title="ok 20 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-21" title="ok 21 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-40numrows-t-22" title="ok 22 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..22</li>
+									<li id="t-40numrows-t-1"											class="test ok">ok 1 </li>
+									<li id="t-40numrows-t-2"											class="test ok">ok 2 </li>
+									<li id="t-40numrows-t-3"											class="test ok">ok 3 0E0</li>
+									<li id="t-40numrows-t-4"											class="test ok">ok 4 </li>
+									<li id="t-40numrows-t-5"											class="test ok">ok 5 </li>
+									<li id="t-40numrows-t-6"											class="test ok">ok 6 </li>
+									<li id="t-40numrows-t-7"											class="test ok">ok 7 </li>
+									<li id="t-40numrows-t-8"											class="test ok">ok 8 </li>
+									<li id="t-40numrows-t-9"											class="test ok">ok 9 </li>
+									<li id="t-40numrows-t-10"											class="test ok">ok 10 </li>
+									<li id="t-40numrows-t-11"											class="test ok">ok 11 </li>
+									<li id="t-40numrows-t-12"											class="test ok">ok 12 </li>
+									<li id="t-40numrows-t-13"											class="test ok">ok 13 </li>
+									<li id="t-40numrows-t-14"											class="test ok">ok 14 </li>
+									<li id="t-40numrows-t-15"											class="test ok">ok 15 </li>
+									<li id="t-40numrows-t-16"											class="test ok">ok 16 </li>
+									<li id="t-40numrows-t-17"											class="test ok">ok 17 </li>
+									<li id="t-40numrows-t-18"											class="test ok">ok 18 </li>
+									<li id="t-40numrows-t-19"											class="test ok">ok 19 </li>
+									<li id="t-40numrows-t-20"											class="test ok">ok 20 </li>
+									<li id="t-40numrows-t-21"											class="test ok">ok 21 </li>
+									<li id="t-40numrows-t-22"											class="test ok">ok 22 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.13s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	35 planned, 35 run
+	35 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/50chopblanks.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-3" title="ok 3 0E0">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-4" title="ok 4 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-5" title="ok 5 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-6" title="ok 6 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-7" title="ok 7 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-8" title="ok 8 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-9" title="ok 9 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-10" title="ok 10 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-11" title="ok 11 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-12" title="ok 12 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-13" title="ok 13 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-14" title="ok 14 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-15" title="ok 15 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-16" title="ok 16 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-17" title="ok 17 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-18" title="ok 18 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-19" title="ok 19 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-20" title="ok 20 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-21" title="ok 21 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-22" title="ok 22 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-23" title="ok 23 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-24" title="ok 24 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-25" title="ok 25 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-26" title="ok 26 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-27" title="ok 27 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-28" title="ok 28 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-29" title="ok 29 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-30" title="ok 30 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-31" title="ok 31 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-32" title="ok 32 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-33" title="ok 33 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-34" title="ok 34 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50chopblanks-t-35" title="ok 35 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..35</li>
+									<li id="t-50chopblanks-t-1"											class="test ok">ok 1 </li>
+									<li id="t-50chopblanks-t-2"											class="test ok">ok 2 </li>
+									<li id="t-50chopblanks-t-3"											class="test ok">ok 3 0E0</li>
+									<li id="t-50chopblanks-t-4"											class="test ok">ok 4 </li>
+									<li id="t-50chopblanks-t-5"											class="test ok">ok 5 </li>
+									<li id="t-50chopblanks-t-6"											class="test ok">ok 6 </li>
+									<li id="t-50chopblanks-t-7"											class="test ok">ok 7 </li>
+									<li id="t-50chopblanks-t-8"											class="test ok">ok 8 </li>
+									<li id="t-50chopblanks-t-9"											class="test ok">ok 9 </li>
+									<li id="t-50chopblanks-t-10"											class="test ok">ok 10 </li>
+									<li id="t-50chopblanks-t-11"											class="test ok">ok 11 </li>
+									<li id="t-50chopblanks-t-12"											class="test ok">ok 12 </li>
+									<li id="t-50chopblanks-t-13"											class="test ok">ok 13 </li>
+									<li id="t-50chopblanks-t-14"											class="test ok">ok 14 </li>
+									<li id="t-50chopblanks-t-15"											class="test ok">ok 15 </li>
+									<li id="t-50chopblanks-t-16"											class="test ok">ok 16 </li>
+									<li id="t-50chopblanks-t-17"											class="test ok">ok 17 </li>
+									<li id="t-50chopblanks-t-18"											class="test ok">ok 18 </li>
+									<li id="t-50chopblanks-t-19"											class="test ok">ok 19 </li>
+									<li id="t-50chopblanks-t-20"											class="test ok">ok 20 </li>
+									<li id="t-50chopblanks-t-21"											class="test ok">ok 21 </li>
+									<li id="t-50chopblanks-t-22"											class="test ok">ok 22 </li>
+									<li id="t-50chopblanks-t-23"											class="test ok">ok 23 </li>
+									<li id="t-50chopblanks-t-24"											class="test ok">ok 24 </li>
+									<li id="t-50chopblanks-t-25"											class="test ok">ok 25 </li>
+									<li id="t-50chopblanks-t-26"											class="test ok">ok 26 </li>
+									<li id="t-50chopblanks-t-27"											class="test ok">ok 27 </li>
+									<li id="t-50chopblanks-t-28"											class="test ok">ok 28 </li>
+									<li id="t-50chopblanks-t-29"											class="test ok">ok 29 </li>
+									<li id="t-50chopblanks-t-30"											class="test ok">ok 30 </li>
+									<li id="t-50chopblanks-t-31"											class="test ok">ok 31 </li>
+									<li id="t-50chopblanks-t-32"											class="test ok">ok 32 </li>
+									<li id="t-50chopblanks-t-33"											class="test ok">ok 33 </li>
+									<li id="t-50chopblanks-t-34"											class="test ok">ok 34 </li>
+									<li 											class="unknown">closing dbh with active statement handles at t/50chopblanks.t line 144.</li>
+									<li id="t-50chopblanks-t-35"											class="test ok">ok 35 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.13s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	30 planned, 30 run
+	30 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/50commit.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-1" title="ok 1 connect">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-3" title="ok 3 0E0">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-4" title="ok 4 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-5" title="ok 5 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-6" title="ok 6 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-7" title="ok 7 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-8" title="ok 8 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-9" title="ok 9 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-10" title="ok 10 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-11" title="ok 11 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-12" title="ok 12 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-13" title="ok 13 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-14" title="ok 14 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-15" title="ok 15 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-16" title="ok 16 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-17" title="ok 17 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-18" title="ok 18 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-19" title="ok 19 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-20" title="ok 20 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-21" title="ok 21 NumRows">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-22" title="ok 22 disconnect">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-23" title="ok 23 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-24" title="ok 24 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-25" title="ok 25 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-26" title="ok 26 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-27" title="ok 27 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-28" title="ok 28 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-29" title="ok 29 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-50commit-t-30" title="ok 30 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..30</li>
+									<li 											class="unknown">Attempting to connect.</li>
+									<li id="t-50commit-t-1"											class="test ok">ok 1 connect</li>
+									<li id="t-50commit-t-2"											class="test ok">ok 2 </li>
+									<li id="t-50commit-t-3"											class="test ok">ok 3 0E0</li>
+									<li id="t-50commit-t-4"											class="test ok">ok 4 </li>
+									<li id="t-50commit-t-5"											class="test ok">ok 5 </li>
+									<li id="t-50commit-t-6"											class="test ok">ok 6 </li>
+									<li id="t-50commit-t-7"											class="test ok">ok 7 </li>
+									<li id="t-50commit-t-8"											class="test ok">ok 8 </li>
+									<li id="t-50commit-t-9"											class="test ok">ok 9 </li>
+									<li id="t-50commit-t-10"											class="test ok">ok 10 </li>
+									<li id="t-50commit-t-11"											class="test ok">ok 11 </li>
+									<li id="t-50commit-t-12"											class="test ok">ok 12 </li>
+									<li id="t-50commit-t-13"											class="test ok">ok 13 </li>
+									<li id="t-50commit-t-14"											class="test ok">ok 14 </li>
+									<li id="t-50commit-t-15"											class="test ok">ok 15 </li>
+									<li id="t-50commit-t-16"											class="test ok">ok 16 </li>
+									<li id="t-50commit-t-17"											class="test ok">ok 17 </li>
+									<li id="t-50commit-t-18"											class="test ok">ok 18 </li>
+									<li id="t-50commit-t-19"											class="test ok">ok 19 </li>
+									<li id="t-50commit-t-20"											class="test ok">ok 20 </li>
+									<li id="t-50commit-t-21"											class="test ok">ok 21 NumRows</li>
+									<li id="t-50commit-t-22"											class="test ok">ok 22 disconnect</li>
+									<li id="t-50commit-t-23"											class="test ok">ok 23 </li>
+									<li id="t-50commit-t-24"											class="test ok">ok 24 </li>
+									<li id="t-50commit-t-25"											class="test ok">ok 25 </li>
+									<li id="t-50commit-t-26"											class="test ok">ok 26 </li>
+									<li id="t-50commit-t-27"											class="test ok">ok 27 </li>
+									<li id="t-50commit-t-28"											class="test ok">ok 28 </li>
+									<li id="t-50commit-t-29"											class="test ok">ok 29 </li>
+									<li id="t-50commit-t-30"											class="test ok">ok 30 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.01s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	24 planned, 24 run
+	24 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/60metadata.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-2" title="ok 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-3" title="ok 3">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-4" title="ok 4">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-5" title="ok 5">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-6" title="ok 6">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-7" title="ok 7">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-8" title="ok 8">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-9" title="ok 9">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-10" title="ok 10">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-11" title="ok 11">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-12" title="ok 12">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-13" title="ok 13">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-14" title="ok 14">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-15" title="ok 15">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-16" title="ok 16">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-17" title="ok 17">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-18" title="ok 18">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-19" title="ok 19">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-20" title="ok 20">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-21" title="ok 21">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-22" title="ok 22">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-23" title="ok 23">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-60metadata-t-24" title="ok 24">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..24</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:37 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:37 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-60metadata-t-1"											class="test ok">ok 1</li>
+									<li id="t-60metadata-t-2"											class="test ok">ok 2</li>
+									<li id="t-60metadata-t-3"											class="test ok">ok 3</li>
+									<li id="t-60metadata-t-4"											class="test ok">ok 4</li>
+									<li id="t-60metadata-t-5"											class="test ok">ok 5</li>
+									<li id="t-60metadata-t-6"											class="test ok">ok 6</li>
+									<li id="t-60metadata-t-7"											class="test ok">ok 7</li>
+									<li id="t-60metadata-t-8"											class="test ok">ok 8</li>
+									<li id="t-60metadata-t-9"											class="test ok">ok 9</li>
+									<li id="t-60metadata-t-10"											class="test ok">ok 10</li>
+									<li id="t-60metadata-t-11"											class="test ok">ok 11</li>
+									<li id="t-60metadata-t-12"											class="test ok">ok 12</li>
+									<li id="t-60metadata-t-13"											class="test ok">ok 13</li>
+									<li id="t-60metadata-t-14"											class="test ok">ok 14</li>
+									<li id="t-60metadata-t-15"											class="test ok">ok 15</li>
+									<li id="t-60metadata-t-16"											class="test ok">ok 16</li>
+									<li id="t-60metadata-t-17"											class="test ok">ok 17</li>
+									<li id="t-60metadata-t-18"											class="test ok">ok 18</li>
+									<li id="t-60metadata-t-19"											class="test ok">ok 19</li>
+									<li id="t-60metadata-t-20"											class="test ok">ok 20</li>
+									<li id="t-60metadata-t-21"											class="test ok">ok 21</li>
+									<li id="t-60metadata-t-22"											class="test ok">ok 22</li>
+									<li 											class="comment"># Types: varchar(2) char(1)</li>
+									<li 											class="comment"># Names: f1 f2</li>
+									<li id="t-60metadata-t-23"											class="test ok">ok 23</li>
+									<li id="t-60metadata-t-24"											class="test ok">ok 24</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.14s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	33 planned, 33 run
+	33 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/90cppcomments.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-2" title="ok 2">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-3" title="ok 3">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-4" title="ok 4">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-5" title="ok 5">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-6" title="ok 6">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-7" title="ok 7">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-8" title="ok 8">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-9" title="ok 9">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-10" title="ok 10">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-11" title="ok 11">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-12" title="ok 12">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-13" title="ok 13">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-14" title="ok 14">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-15" title="ok 15">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-16" title="ok 16">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-17" title="ok 17">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-18" title="ok 18">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-19" title="ok 19">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-20" title="ok 20">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-21" title="ok 21">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-22" title="ok 22">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-23" title="ok 23">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-24" title="ok 24">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-25" title="ok 25">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-26" title="ok 26">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-27" title="ok 27">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-28" title="ok 28">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-29" title="ok 29">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-30" title="ok 30">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-31" title="ok 31">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-32" title="ok 32">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-90cppcomments-t-33" title="ok 33">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..33</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:37 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:37 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-90cppcomments-t-1"											class="test ok">ok 1</li>
+									<li id="t-90cppcomments-t-2"											class="test ok">ok 2</li>
+									<li id="t-90cppcomments-t-3"											class="test ok">ok 3</li>
+									<li id="t-90cppcomments-t-4"											class="test ok">ok 4</li>
+									<li id="t-90cppcomments-t-5"											class="test ok">ok 5</li>
+									<li id="t-90cppcomments-t-6"											class="test ok">ok 6</li>
+									<li id="t-90cppcomments-t-7"											class="test ok">ok 7</li>
+									<li id="t-90cppcomments-t-8"											class="test ok">ok 8</li>
+									<li id="t-90cppcomments-t-9"											class="test ok">ok 9</li>
+									<li id="t-90cppcomments-t-10"											class="test ok">ok 10</li>
+									<li id="t-90cppcomments-t-11"											class="test ok">ok 11</li>
+									<li id="t-90cppcomments-t-12"											class="test ok">ok 12</li>
+									<li id="t-90cppcomments-t-13"											class="test ok">ok 13</li>
+									<li id="t-90cppcomments-t-14"											class="test ok">ok 14</li>
+									<li id="t-90cppcomments-t-15"											class="test ok">ok 15</li>
+									<li id="t-90cppcomments-t-16"											class="test ok">ok 16</li>
+									<li id="t-90cppcomments-t-17"											class="test ok">ok 17</li>
+									<li id="t-90cppcomments-t-18"											class="test ok">ok 18</li>
+									<li id="t-90cppcomments-t-19"											class="test ok">ok 19</li>
+									<li id="t-90cppcomments-t-20"											class="test ok">ok 20</li>
+									<li id="t-90cppcomments-t-21"											class="test ok">ok 21</li>
+									<li id="t-90cppcomments-t-22"											class="test ok">ok 22</li>
+									<li id="t-90cppcomments-t-23"											class="test ok">ok 23</li>
+									<li id="t-90cppcomments-t-24"											class="test ok">ok 24</li>
+									<li id="t-90cppcomments-t-25"											class="test ok">ok 25</li>
+									<li id="t-90cppcomments-t-26"											class="test ok">ok 26</li>
+									<li id="t-90cppcomments-t-27"											class="test ok">ok 27</li>
+									<li id="t-90cppcomments-t-28"											class="test ok">ok 28</li>
+									<li id="t-90cppcomments-t-29"											class="test ok">ok 29</li>
+									<li id="t-90cppcomments-t-30"											class="test ok">ok 30</li>
+									<li id="t-90cppcomments-t-31"											class="test ok">ok 31</li>
+									<li id="t-90cppcomments-t-32"											class="test ok">ok 32</li>
+									<li id="t-90cppcomments-t-33"											class="test ok">ok 33</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.13s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	2 planned, 2 run
+	2 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/99cleanup.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-99cleanup-t-1" title="ok 1">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-99cleanup-t-2" title="ok 2">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..2</li>
+									<li 											class="comment"># Running under perl version 5.008004 for darwin</li>
+									<li 											class="comment"># Current time local: Sun May 18 15:26:37 2008</li>
+									<li 											class="comment"># Current time GMT:   Sun May 18 14:26:37 2008</li>
+									<li 											class="comment"># Using Test.pm version 1.24</li>
+									<li id="t-99cleanup-t-1"											class="test ok">ok 1</li>
+									<li id="t-99cleanup-t-2"											class="test ok">ok 2</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.01s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run failed">
+						<td class="file">
+							<a class="file" href="#" title="Test failed!
+	49 planned, 49 run
+	48 ok, 1 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/ak-dbd.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-3" title="ok 3 0E0">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-4" title="ok 4 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-5" title="ok 5 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-6" title="ok 6 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-7" title="ok 7 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-8" title="ok 8 0E0">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-9" title="ok 9 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-10" title="ok 10 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-11" title="ok 11 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-12" title="ok 12 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-13" title="ok 13 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-14" title="ok 14 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-15" title="ok 15 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-16" title="ok 16 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-17" title="ok 17 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-18" title="ok 18 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-19" title="ok 19 ">&nbsp;</a></td>
+									  <td class="test not-ok failed"><a class="test-summary" href="#t-ak-dbd-t-20" title="not ok 20 - ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-21" title="ok 21 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-22" title="ok 22 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-23" title="ok 23 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-24" title="ok 24 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-25" title="ok 25 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-26" title="ok 26 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-27" title="ok 27 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-28" title="ok 28 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-29" title="ok 29 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-30" title="ok 30 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-31" title="ok 31 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-32" title="ok 32 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-33" title="ok 33 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-34" title="ok 34 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-35" title="ok 35 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-36" title="ok 36 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-37" title="ok 37 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-38" title="ok 38 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-39" title="ok 39 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-40" title="ok 40 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-41" title="ok 41 execute 284">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-42" title="ok 42 Alligator Descartes">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-43" title="ok 43 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-44" title="ok 44 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-45" title="ok 45 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-46" title="ok 46 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-47" title="ok 47 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-48" title="ok 48 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-ak-dbd-t-49" title="ok 49 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="unknown">Inserting a row...</li>
+									<li 											class="unknown">Deleting a row...</li>
+									<li 											class="plan">1..49</li>
+									<li id="t-ak-dbd-t-1"											class="test ok">ok 1 </li>
+									<li id="t-ak-dbd-t-2"											class="test ok">ok 2 </li>
+									<li id="t-ak-dbd-t-3"											class="test ok">ok 3 0E0</li>
+									<li id="t-ak-dbd-t-4"											class="test ok">ok 4 </li>
+									<li id="t-ak-dbd-t-5"											class="test ok">ok 5 </li>
+									<li id="t-ak-dbd-t-6"											class="test ok">ok 6 </li>
+									<li id="t-ak-dbd-t-7"											class="test ok">ok 7 </li>
+									<li id="t-ak-dbd-t-8"											class="test ok">ok 8 0E0</li>
+									<li 											class="unknown">Inserting a row...</li>
+									<li id="t-ak-dbd-t-9"											class="test ok">ok 9 </li>
+									<li 											class="unknown">Deleting a row...</li>
+									<li id="t-ak-dbd-t-10"											class="test ok">ok 10 </li>
+									<li id="t-ak-dbd-t-11"											class="test ok">ok 11 </li>
+									<li id="t-ak-dbd-t-12"											class="test ok">ok 12 </li>
+									<li id="t-ak-dbd-t-13"											class="test ok">ok 13 </li>
+									<li id="t-ak-dbd-t-14"											class="test ok">ok 14 </li>
+									<li id="t-ak-dbd-t-15"											class="test ok">ok 15 </li>
+									<li id="t-ak-dbd-t-16"											class="test ok">ok 16 </li>
+									<li id="t-ak-dbd-t-17"											class="test ok">ok 17 </li>
+									<li id="t-ak-dbd-t-18"											class="test ok">ok 18 </li>
+									<li 											class="unknown">Test 19: Setting $debug_me to TRUE</li>
+									<li id="t-ak-dbd-t-19"											class="test ok">ok 19 </li>
+									<li id="t-ak-dbd-t-20"											class="test not-ok">not ok 20 - </li>
+									<li 											class="unknown">FAILED Test 20 - </li>
+									<li 											class="unknown">sth-&gt;rows returned wrong result 0 after 'execute'.</li>
+									<li id="t-ak-dbd-t-21"											class="test ok">ok 21 </li>
+									<li id="t-ak-dbd-t-22"											class="test ok">ok 22 </li>
+									<li id="t-ak-dbd-t-23"											class="test ok">ok 23 </li>
+									<li id="t-ak-dbd-t-24"											class="test ok">ok 24 </li>
+									<li 											class="unknown">Test 25: Setting $debug_me to TRUE</li>
+									<li id="t-ak-dbd-t-25"											class="test ok">ok 25 </li>
+									<li id="t-ak-dbd-t-26"											class="test ok">ok 26 </li>
+									<li id="t-ak-dbd-t-27"											class="test ok">ok 27 </li>
+									<li id="t-ak-dbd-t-28"											class="test ok">ok 28 </li>
+									<li id="t-ak-dbd-t-29"											class="test ok">ok 29 </li>
+									<li id="t-ak-dbd-t-30"											class="test ok">ok 30 </li>
+									<li id="t-ak-dbd-t-31"											class="test ok">ok 31 </li>
+									<li id="t-ak-dbd-t-32"											class="test ok">ok 32 </li>
+									<li id="t-ak-dbd-t-33"											class="test ok">ok 33 </li>
+									<li id="t-ak-dbd-t-34"											class="test ok">ok 34 </li>
+									<li id="t-ak-dbd-t-35"											class="test ok">ok 35 </li>
+									<li id="t-ak-dbd-t-36"											class="test ok">ok 36 </li>
+									<li id="t-ak-dbd-t-37"											class="test ok">ok 37 </li>
+									<li id="t-ak-dbd-t-38"											class="test ok">ok 38 </li>
+									<li id="t-ak-dbd-t-39"											class="test ok">ok 39 </li>
+									<li id="t-ak-dbd-t-40"											class="test ok">ok 40 </li>
+									<li id="t-ak-dbd-t-41"											class="test ok">ok 41 execute 284</li>
+									<li 											class="unknown">fetchrow 286</li>
+									<li id="t-ak-dbd-t-42"											class="test ok">ok 42 Alligator Descartes</li>
+									<li id="t-ak-dbd-t-43"											class="test ok">ok 43 </li>
+									<li id="t-ak-dbd-t-44"											class="test ok">ok 44 </li>
+									<li id="t-ak-dbd-t-45"											class="test ok">ok 45 </li>
+									<li id="t-ak-dbd-t-46"											class="test ok">ok 46 </li>
+									<li id="t-ak-dbd-t-47"											class="test ok">ok 47 </li>
+									<li id="t-ak-dbd-t-48"											class="test ok">ok 48 </li>
+									<li id="t-ak-dbd-t-49"											class="test ok">ok 49 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.16s</td>
+						<td class="percent failed severity-very-low">98.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	4 planned, 4 run
+	4 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/dbdadmin.t</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-dbdadmin-t-1" title="ok 1 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-dbdadmin-t-2" title="ok 2 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-dbdadmin-t-3" title="ok 3 ">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-dbdadmin-t-4" title="ok 4 ">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..4</li>
+									<li id="t-dbdadmin-t-1"											class="test ok">ok 1 </li>
+									<li id="t-dbdadmin-t-2"											class="test ok">ok 2 </li>
+									<li id="t-dbdadmin-t-3"											class="test ok">ok 3 </li>
+									<li id="t-dbdadmin-t-4"											class="test ok">ok 4 </li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.10s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+				</tbody>
+	
+				<tfoot>
+					<tr>
+						<td class="file">24 files</td>
+						<td class="results">
+							348 tests,
+							347 ok,
+							1 failed,
+							0 todo,
+							0 skipped,
+							0 parse errors<br/>
+							exit status: 0,
+							wait status: 0<br/>
+							elapsed time: 4 wallclock secs ( 0.31 usr  0.19 sys +  2.32 cusr  0.77 csys =  3.59 CPU)</td>
+						<td class="time">2.52s</td>
+						<td class="percent  severity-very-low">99.7%</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+
+		<div id="footer">Generated by TAP::Formatter::HTML v0.01 @ 15:26:38 18-May-2008</div>
+
+	</body>
+</html>

@@ -1,0 +1,56 @@
+=head1 Toader Config
+
+Toader uses L<Config::INI> for storing some commonly
+used stuff variables that will be passed around/used
+which is then passed to any template stuff being rendered.
+
+The file that it is stored in is $toaderRoot.'/.toader/config.ini' .
+
+Below are the default values, in the main, '_', section, are
+filled out if not specified
+
+    site=hostname
+    owner=getlogin.'@'.hostname
+    last='25'
+    vcs='0'
+
+=head1 Variables
+
+=head2 Main Section
+
+=head3 last
+
+This is the number of last entries to show.
+
+=head3 owner
+
+This is the owner's name that will be used for Copyright purposes.
+
+If not specified, it will degault to getlogin.'@'.hostname .
+
+=head3 site
+
+This is the name of the Toader site in question. If not specified,
+it will default to the hostnamem.
+
+=head3 showCopyright
+
+This determines if copyright should be shown at the bottom or not. If not specified
+it is assumed to be true by L<Toader::Render::General>->copyright. If set
+to '0' it will not be shown.
+
+=head3 vcs
+
+Enable VCS integration. This takes a Perl boolean value.
+
+=head3 url
+
+This is the base URL that for the site. This should be the URL that the
+base output directory is available at. In most situation, will will want
+to make sure this ends in a "/", for the purpose of rendering.
+
+=head2 VCS Integration
+
+The section "VCS" in "VCS Integration.pod".
+
+=cut

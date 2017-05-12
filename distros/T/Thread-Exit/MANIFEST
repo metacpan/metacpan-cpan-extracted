@@ -1,0 +1,10 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/Thread/Exit.pm
+t/Exit01.t
+t/Exit02.t
+META.yml                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,119 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
+                                      },
+                        'suggests' => {
+                                        'ExtUtils::MakeMaker' => '7.00'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes' => '0.004002',
+                                      'Dist::Zilla::Plugin::Author::KENTNL::TravisCI' => '0.001002',
+                                      'Dist::Zilla::Plugin::Authority' => '1.006',
+                                      'Dist::Zilla::Plugin::AutoPrereqs' => '0',
+                                      'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
+                                      'Dist::Zilla::Plugin::ConfirmRelease' => '0',
+                                      'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0',
+                                      'Dist::Zilla::Plugin::Git::Check' => '0',
+                                      'Dist::Zilla::Plugin::Git::Commit' => '0',
+                                      'Dist::Zilla::Plugin::Git::CommitBuild' => '0',
+                                      'Dist::Zilla::Plugin::Git::Contributors' => '0.006',
+                                      'Dist::Zilla::Plugin::Git::GatherDir' => '0',
+                                      'Dist::Zilla::Plugin::Git::NextRelease' => '0.004000',
+                                      'Dist::Zilla::Plugin::Git::Tag' => '0',
+                                      'Dist::Zilla::Plugin::GithubMeta' => '0',
+                                      'Dist::Zilla::Plugin::License' => '0',
+                                      'Dist::Zilla::Plugin::MakeMaker' => '0',
+                                      'Dist::Zilla::Plugin::Manifest' => '0',
+                                      'Dist::Zilla::Plugin::ManifestSkip' => '0',
+                                      'Dist::Zilla::Plugin::MetaConfig' => '0',
+                                      'Dist::Zilla::Plugin::MetaData::BuiltWith' => '1.004000',
+                                      'Dist::Zilla::Plugin::MetaJSON' => '0',
+                                      'Dist::Zilla::Plugin::MetaNoIndex' => '0',
+                                      'Dist::Zilla::Plugin::MetaProvides::Package' => '1.14000001',
+                                      'Dist::Zilla::Plugin::MetaTests' => '0',
+                                      'Dist::Zilla::Plugin::MetaYAML' => '0',
+                                      'Dist::Zilla::Plugin::MinimumPerl' => '0',
+                                      'Dist::Zilla::Plugin::PodCoverageTests' => '0',
+                                      'Dist::Zilla::Plugin::PodSyntaxTests' => '0',
+                                      'Dist::Zilla::Plugin::PodWeaver' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs::AuthorDeps' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs::Upgrade' => '0',
+                                      'Dist::Zilla::Plugin::Readme::Brief' => '0',
+                                      'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0',
+                                      'Dist::Zilla::Plugin::RewriteVersion::Sanitized' => '0',
+                                      'Dist::Zilla::Plugin::RunExtraTests' => '0',
+                                      'Dist::Zilla::Plugin::Test::CPAN::Changes' => '0',
+                                      'Dist::Zilla::Plugin::Test::Compile::PerFile' => '0.003902',
+                                      'Dist::Zilla::Plugin::Test::EOL' => '0',
+                                      'Dist::Zilla::Plugin::Test::Kwalitee' => '0',
+                                      'Dist::Zilla::Plugin::Test::MinimumVersion' => '0',
+                                      'Dist::Zilla::Plugin::Test::Perl::Critic' => '0',
+                                      'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
+                                      'Dist::Zilla::Plugin::TestRelease' => '0',
+                                      'Dist::Zilla::Plugin::Twitter' => '0',
+                                      'Dist::Zilla::Plugin::UploadToCPAN' => '0',
+                                      'English' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Software::License::Perl_5' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08'
+                                    },
+                      'suggests' => {
+                                      'Dist::Zilla::App::Command::bakeini' => '0.002005',
+                                      'Dist::Zilla::PluginBundle::Author::KENTNL' => '2.025020',
+                                      'Test::More' => '0.99'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Class::Tiny' => '0',
+                                      'Exporter' => '5.57',
+                                      'File::Copy::Recursive' => '0',
+                                      'File::ShareDir' => '1.00',
+                                      'Path::Tiny' => '0.018',
+                                      'Scope::Guard' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Path::Tiny' => '0.058'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Cwd' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'FindBin' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0.96',
+                                   'lib' => '0',
+                                   'perl' => '5.006'
+                                 },
+                   'suggests' => {
+                                   'ExtUtils::MakeMaker' => '7.00',
+                                   'Test::More' => '0.99'
+                                 }
+                 }
+     };
+  $x;
+ }

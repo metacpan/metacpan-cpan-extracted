@@ -1,0 +1,18 @@
+Revision history for Perl extension Tie::Hash::LRU
+
+0.05  Sun Nov 27 20:40:29 EET 2011
+	- just a refresh to have nicer METAs;
+
+0.04  Fri Aug  5 00:20:49 EEST 2011
+	- again more documentation;
+	- benchmark;
+
+0.03  Thu Aug  4 20:30:35 EEST 2011
+	- little more documentation;
+
+0.02  Tue Aug  2 15:41:30 EEST 2011
+	- forgot to rebuild manifest;
+
+0.01  Mon Aug  1 23:09:20 EEST 2011
+	- original version;
+

@@ -1,0 +1,363 @@
+<p>
+  You can configure TaskForest to send you an email in any of these three situations:
+  <ul>
+    <li>When a job fails</li>
+    <li>When a job fails but will be <a href="/docs/configuring/retry.html">automatically retried</a></li>
+    <li>When a job that failed and was <a href="/docs/configuring/retry.html">automatically retried</a> finally succeeds</li>
+  </ul>
+</p>
+
+<p>
+  You can configure this feature system-wide via the configuration file,
+  and you can also override it for individual jobs in the Family files
+  (the same way retries are configured).  You can also completely
+  configure the emails going out in each of the three cases, from the
+  SMTP envelope information to MIME headers to body text.  Again, this
+  can be configured across the entire system and overridden for
+  individual jobs and families.  It really is a very powerful system
+  that, with the proper email filters, can make managing your job
+  workflow very easy.  Let's see how it works.
+</p>
+
+<p>
+  In order to be able to send emails, you need to provide TaskForest some
+  information in the configuration file:
+</p>
+
+<div class="code"><pre><code><span class="comments"><span class="comments"># This is the SMTP server that will be used to send </span>
+<span class="comments"># emails out when a job fails, for example</span>
+<a class="config_file" href="/docs/configuring/options.html#smtp_server">smtp_server</a>              = "localhost"
+
+<span class="comments"># The default SMTP port is 25.</span>
+<a class="config_file" href="/docs/configuring/options.html#smtp_port">smtp_port</a>                = 25
+
+<span class="comments"># In a production environment this should be 60 or 120</span>
+<a class="config_file" href="/docs/configuring/options.html#smtp_timeout">smtp_timeout</a>             = 60
+
+<span class="comments"># This is the SMTP envelope sender </span>
+<span class="comments"># (the text after "MAIL FROM:")</span>
+<a class="config_file" href="/docs/configuring/options.html#smtp_sender">smtp_sender</a>                = "user1@example.com"
+
+<span class="comments"># This is the email address that appears in the From: </span>
+<span class="comments"># mail header</span>
+<a class="config_file" href="/docs/configuring/options.html#mail_from">mail_from</a>                = "user1@example.com"
+
+<span class="comments"># If a user replies to a received email, the reply</span>
+<span class="comments"># will go to this address instead of the From: address. </span>
+<span class="comments"># This address is set in the Reply-To mail header.</span>
+<a class="config_file" href="/docs/configuring/options.html#mail_reply_to">mail_reply_to</a>            = "user2@example.com"
+
+<span class="comments"># This is the address to which bounces will be sent if </span>
+<span class="comments"># they occur at the SMTP server (as opposed to the </span>
+<span class="comments"># receiving Mail Transfer Agent).</span>
+<a class="config_file" href="/docs/configuring/options.html#mail_return_path">mail_return_path</a>         = "user3@example.com"
+
+<span class="comments"># This is the directory that stores the contents of</span>
+<span class="comments"># the emails that are sent by the system. </span>
+<a class="config_file" href="/docs/configuring/options.html#instructions_dir">instructions_dir</a>         = "instructions"</code></pre></div>
+
+<p>
+  Then there are the following three settings that control who receives
+  the emails.  They can be set system-wide in the configuration file:
+</p>
+
+<div class="code"><pre><code><span class="comments"># When a job fails, emails are sent to this address</span>
+<a class="config_file" href="/docs/configuring/options.html#email">email</a>                    = "test@example.com"
+
+<span class="comments"># When a job fails, but is being automatically retried,</span>
+<span class="comments"># emails are sent to this address, as opposed to the </span>
+<span class="comments"># one stored in the 'email' setting.  If no_retry_mail </span>
+<span class="comments"># is set, then no email will be sent in this case</span>
+<a class="config_file" href="/docs/configuring/options.html#retry_email">retry_email</a>              = "test2@example.com"
+
+<span class="comments"># When a job fails, is automatically retried one or more </span>
+<span class="comments"># times and then suceededs, emails are sent to this </span>
+<span class="comments"># address, as opposed to any of the others.  If </span>
+<span class="comments"># no_retry_success_email is set, then no email will be sent</span>
+<span class="comments"># in this case.</span>
+<a class="config_file" href="/docs/configuring/options.html#retry_success_email">retry_success_email</a>      = "test3@example.com"</code></pre></div>
+
+<p>
+  Given the setup shown above, the email generated when a job is being
+  retried is shown below.  What you see below is a transcript of a SMTP
+  session between TaskForest and a fake SMTP server used for testing.
+  Lines that start with '<code><em>S: &gt;</em></code>' denote text sent
+  from the SMTP server to the client (TaskForest).  Lines that start with
+  '<code>C: &lt;</code>' denote text sent from the SMTP client
+  (TaskForest) to the SMTP server.
+</p>
+
+<div class="code"><pre><code><em>S: &gt; 200 OK TaskForest Fake SMTP Server</em>
+<span class="comments">C: &lt; EHLO user1@example.com</span>
+<em>S: &gt; 200 OK</em>
+<span class="comments">C: &lt; MAIL FROM:&lt;user1@example.com&gt;</span>
+<em>S: &gt; 200 OK</em>
+<span class="comments">C: &lt; RCPT TO:&lt;test2@example.com&gt;</span>
+<em>S: &gt; 200 OK</em>
+<span class="comments">C: &lt; DATA</span>
+<em>S: &gt; 200 OK</em>
+<span class="comments">C: &lt; From: user1@example.com</span>
+<span class="comments">C: &lt; Return-Path: user3@example.com</span>
+<span class="comments">C: &lt; Reply-To: user2@example.com</span>
+<span class="comments">C: &lt; To: test2@example.com</span>
+<span class="comments">C: &lt; Subject: RETRY RETRY::J_Retry</span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; This is the TaskForest system at your_machine_name</span>
+<span class="comments">C: &lt; ------------------------------------------------------</span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; The following job failed and will be rerun automatically.</span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; Family:         RETRY</span>
+<span class="comments">C: &lt; Job:            J_Retry</span>
+<span class="comments">C: &lt; Exit Code:      256</span>
+<span class="comments">C: &lt; Retry After:    2 seconds</span>
+<span class="comments">C: &lt; No. of Retries: 1 of 1 </span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; Instructions that apply to all jobs in the Family named RETRY.</span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; Instructions that apply to the jobs named J_Retry.</span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; </span>
+<span class="comments">C: &lt; ------------------------------------------------------------</span>
+<span class="comments">C: &lt; For help, please see http://www.taskforest.com/</span>
+<span class="comments">C: &lt; .</span>
+<em>S: &gt; 200 OK</em>
+<span class="comments">C: &lt; QUIT</span>
+</code></pre></div>
+
+<p>
+  What's left to be explained is how TaskForest chose the email's subject
+  and the body of the email.  The subject of the email will contain the
+  Family name and Job name preceded by 'RETRY', 'FAIL' or 'RETRY_SUCCESS',
+  depending on whether the job failed and is about to
+  be <a href="/docs/configuring/retry.html">retried</a> (after
+  the <a href="/docs/configuring/options.html#retry_sleep">sleep
+  time</a>), or failed for the final time, or succeeded after failing and
+  being retried one or more times.
+</p>
+
+
+<p>
+  As for the body, TaskForest concatenates the contents of several files
+  found
+  in <a href="/docs/configuring/options.html#instructions_dir">instructions_dir</a>.
+  If the appropriate file does not exist, it will ignore it and move on to
+  the next one.  As it retrieves the contents of each file, TaskForest
+  does some simple substitutions to replace placeholders found within the
+  file's contents with the the value of that variable in the run_wrapper's
+  environment.  TaskForest makes all of the environment variables
+  available to the <code>taskforest</code> program available to the run
+  wrapper (run_with_log) and also adds the following variables to the
+  environment:
+</p>
+
+<div class=code>
+  <dl>
+    <dt>TASKFOREST_FAMILY_NAME</dt>
+    <dd>This is the name of the family in which this job was run.</dd>
+    
+    <dt>TASKFOREST_JOB_NAME</dt>
+    <dd>This is the name of the job that was run.</dd>
+    
+    <dt>TASKFOREST_LOG_DIR</dt>
+    <dd>This is the full path of the TaskForest log directory</dd>
+    
+    <dt>TASKFOREST_JOB_DIR</dt>
+    <dd>This is the full path of the TaskForest job directory</dd>
+    
+    <dt>TASKFOREST_PID_FILE</dt>
+    <dd>This is the name of the pid file that's used internally by TaskForest</dd>
+    
+    <dt>TASKFOREST_SUCCESS_FILE</dt>
+    <dd>This is the name of the file that's created if the job succeeded.</dd>
+
+    <dt>TASKFOREST_FAILURE_FILE</dt>
+    <dd>This is the name of the file that's created if the job failed.</dd>
+    
+    <dt>TASKFOREST_UNIQUE_ID</dt>
+    <dd>This is an internal identifier used by TaskForest to refer to the job.</dd>
+    
+    <dt>TASKFOREST_NUM_RETRIES</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#num_retries">num_retries</a>
+      configuration variable.
+    </dd>
+    
+    <dt>TASKFOREST_RETRY_SLEEP</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#retry_sleep">retry_sleep</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_EMAIL</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#email">email</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_RETRY_EMAIL</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#retry_email">retry_email</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_NO_RETRY_EMAIL</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#no_retry_email">no_retry_email</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_INSTRUCTIONS_DIR</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#instructions_dir">instructions_dir</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_SMTP_SERVER</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#smtp_server">smtp_server</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_SMTP_PORT</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#smtp_server">smtp_port</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_SMTP_SENDER</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#smtp_sender">smtp_sender</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_MAIL_FROM</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#mail_from">mail_from</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_MAIL_REPLY_TO</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#mail_reply_to">mail_reply_to</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_MAIL_RETURN_PATH</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#mail_return_path">mail_return_path</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_SMTP_TIMEOUT</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#smtp_timeout">smtp_timeout</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_RETRY_SUCCESS_EMAIL</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#retry_success_email">retry_success_email</a>
+      configuration variable.
+    </dd>
+
+    <dt>TASKFOREST_NO_RETRY_SUCCESS_EMAIL</dt>
+    <dd>
+      This is the value of
+      the <a href="/docs/configuring/options.html#no_retry_success_email">no_retry_success_email</a>
+      configuration variable.
+    </dd>
+
+  </dl>
+</div>
+  
+      
+
+<p>
+  Let <code>&#36;instructions_dir</code> refer to the value of
+  the <code><a href="/docs/configuring/options.html#instructions_dir">instructions_dir</a></code>
+  option.  Let's call the reason for the email <code>&#36;reason</code>.
+  It's value is one of 'RETRY', 'FAIL', or 'RETRY_SUCCESS' (as described
+  above).  Let's also refer to the job name as <code>&#36;job_name</code>,
+  and the family name as <code>&#36;family_name</code>.  TaskForest will
+  look for the following files in the following order, inserting their
+  contents into the email body.
+</p>
+
+<div class=code>
+  <dl>
+    <dt><code>&#36;instructions_dir/HEADER</code></dt>
+    <dd>
+      This is a header that will show up in every email.  In the example
+      that generated the above email, the contents of this file were:
+      <div class="codecode"><pre><code>This is the TaskForest system at &#36;HOSTNAME
+------------------------------------------------------</code></pre></div>
+    </dd>
+    
+    <dt><code>&#36;instructions_dir/HEADER.&#36;reason</code></dt>
+    <dd>
+      This is a header that will be displayed just for that reason.  In
+      other words, it will be one of three files: HEADER.RETRY, HEADER.FAIL,
+      and HEADER.RETRY_SUCCESS.  In the example that generated the above
+      email, the name of this file was HEADER.RETRY and it's contents were:
+      <div class="codecode"><pre><code>The following job failed and will be rerun automatically.
+
+Family:         &#36;TASKFOREST_FAMILY_NAME
+Job:            &#36;TASKFOREST_JOB_NAME
+Exit Code:      &#36;TASKFOREST_RC
+Retry After:    &#36;TASKFOREST_RETRY_SLEEP seconds
+No. of Retries: &#36;TASKFOREST_RETRY of &#36;TASKFOREST_NUM_RETRIES</code></pre></div>
+    </dd>
+    
+    <dt><code>&#36;instructions_dir/FAMILY.&#36;family_name.&#36;reason</code></dt>
+    <dd>
+      This is file that can contain specific instructions for that family
+      and reason.  In the example that generated the above email, the name
+      of this file was FAMILY.RETRY.retry and its contents were:
+      <div class="codecode"><pre><code>Instructions that apply to all jobs in the Family named RETRY.</code></pre></div>
+    </dd>
+
+    <dt><code>&#36;instructions_dir/JOB.&#36;job_name.&#36;reason</code></dt>
+    <dd>
+      This is file that can contain specific instructions for that job
+      and reason.  In the example that generated the above email, the name
+      of this file was JOB.J_Retry.retry and its contents were:
+      <div class="codecode"><pre><code>Instructions that apply to the jobs named J_Retry.</code></pre></div>
+    </dd>
+
+    <dt><code>&#36;instructions_dir/FOOTER.&#36;reason</code></dt>
+    <dd>
+      This is a footer that will be displayed just for that reason.  In
+      other words, it will be one of three files: FOOTER.RETRY,
+      FOOTER.FAIL, and FOOTER.RETRY_SUCCESS.  In the example that
+      generated the above email, the name of this file would have been
+      FOOTER.RETRY, but that file did not exist, so TaskForest skipped
+      over it.
+    </dd>
+    
+    <dt><code>&#36;instructions_dir/FOOTER</code></dt>
+    <dd>
+      This is a footer that will show up in every email.  In the example
+      that generated the above email, the contents of this file were:
+      <div class="codecode"><pre><code>------------------------------------------------------------
+For help, please see http://www.taskforest.com/</code></pre></div>
+    </dd>
+    
+  </dl>  
+</div>

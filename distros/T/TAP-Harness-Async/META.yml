@@ -1,0 +1,20 @@
+---
+abstract: 'Asynchronous subclass for TAP::Harness'
+author:
+  - 'Tom Molesworth <tom@entitymodel.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAP-Harness-Async
+requires:
+  IO::Async: 0.43
+  TAP::Harness: 3.18
+  parent: 0
+version: 0.001

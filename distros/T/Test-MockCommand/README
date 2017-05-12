@@ -1,0 +1,25 @@
+Test-MockCommand version 0.03
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Test::MockCommand depends on core modules, but mocking backticks and
+  qx// requires Perl v5.9.5 or later.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2012 by Stuart Caie
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

@@ -1,0 +1,91 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: user
+  data:
+    id: 13
+    name: Tapper User
+    login: user
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "perfmon", "lmbench"
+
+- schema: Testrun
+  name: Local
+  data:
+    id: 13
+    owner_id: 13
+    shortname: Local
+    notes: Local
+    topic_name: Software
+
+
+- schema: TestrunScheduling
+  name: Autoinstall-Job
+  data:
+    id: 101
+    testrun_id: 13            # aaa
+    queue_id: 1              # Xen
+    status: schedule
+    host_id: 1
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: testprogram
+  data:
+    id: 1
+    shortname: testprogram
+    precondition: |
+       precondition_type: testprogram
+       program: t/bin/sleep.sh
+       parameters:
+         - 10
+       timeout: 20
+       capture: tap
+
+- schema: Precondition
+  name: hint_local
+  data:
+    id: 2
+    shortname: hint_local
+    precondition: |
+       precondition_type: hint
+       local: 1
+       skip_install: 1
+
+# --------------------
+
+- schema: TestrunPrecondition
+  name: 1st local
+  data:
+    testrun_id: 13
+    precondition_id: 1
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd local
+  data:
+    testrun_id: 13
+    precondition_id: 2
+    succession: 2
+
+# ------------------ Hosts
+- schema: Host
+  name: iring
+  data:
+    id: 1
+    name: iring
+    free: 1
+    active: 1

@@ -1,0 +1,40 @@
+NAME
+
+    Tickit::Async - use Tickit with IO::Async
+
+SYNOPSIS
+
+     use IO::Async;
+     use Tickit::Async;
+    
+     my $tickit = Tickit::Async->new;
+    
+     # Create some widgets
+     # ...
+    
+     $tickit->set_root_widget( $rootwidget );
+    
+     my $loop = IO::Async::Loop->new;
+     $loop->add( $tickit );
+    
+     $tickit->run;
+
+DESCRIPTION
+
+    This class allows a Tickit user interface to run alongside other
+    IO::Async-driven code, using IO::Async as a source of IO events.
+
+    As a shortcut convenience, a containing IO::Async::Loop will be
+    constructed using the default magic constructor the first time it is
+    needed, if the object is not already a member of a loop. This will
+    allow a Tickit::Async object to be used without being aware it is not a
+    simple Tickit object.
+
+    To avoid accidentally creating multiple loops, callers should be
+    careful to add the Tickit::Async object to the main application's loop
+    if one already exists as soon as possible after construction.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

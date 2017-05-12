@@ -1,0 +1,15 @@
+#  file:  treetst.tre
+
+# this tree will be read in any case
+I. Top node in first (or only) tree
+  A. first child of top node in first tree
+    1. first child of first child of top node in first tree
+  B. second child of top node in first tree
+
+# the first tree has ended, because this next line has zero indentation
+II. Top node in second tree, if in "mult" mode
+  A. first child of top node in second tree
+  B. second child of top node in second tree
+    1. first child of second child of top node in second tree
+    2. second child of second child of top node in second tree
+  C. third child of top node in second tree

@@ -1,0 +1,23 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+CONTRIBUTING.md
+Clock.pm
+examples/24hour.pl
+examples/cdclock.pl
+examples/countdown.pl
+examples/random.pl
+examples/simple.pl
+examples/station.pl
+examples/world.pl
+t/00_pod.t
+t/01_pod.t
+t/10_base.t
+t/20_resize.t
+t/30_dual.t
+t/40_backdrop.t
+t/eye.png
+t/eye2.png
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

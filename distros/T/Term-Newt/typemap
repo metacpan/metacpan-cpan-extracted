@@ -1,0 +1,62 @@
+# $Id: typemap,v 1.1 1998/11/06 05:55:39 daniel Exp daniel $
+
+# Some of this stuff probably should be here. I'll clean it up later.
+
+TYPEMAP
+
+const char *		T_PV
+const void *		T_PV
+int *			T_PV
+void **			T_PACKED
+
+SV **			T_SV
+
+# Enums
+enum newtFlagsSense	T_IV
+enum newtGridElement	T_IV
+
+long long		T_IV
+unsigned long long	T_IV
+
+va_list			T_OBJECT
+
+newtGrid		T_OBJECT
+callbackInfo		T_OBJECT
+
+newtExitStruct		T_OBJECT
+newtWinEntry *		T_OBJECT
+
+newtColors		T_OBJECT
+
+newtEntryFilter		T_OBJECT
+newtCallback		T_OBJECT
+newtComponent		T_OBJECT
+newtComponent *		T_OBJECT
+
+########################################
+OUTPUT
+
+O_OBJECT
+        sv_setref_pv( $arg, CLASS, (void*)$var );
+
+T_OBJECT
+        sv_setref_pv( $arg, Nullch, (void*)$var );
+
+
+INPUT
+
+O_OBJECT
+        if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG)) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+        }
+
+T_OBJECT
+	if (SvROK($arg)) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not an SV reference\" );
+		XSRETURN_UNDEF;
+        }

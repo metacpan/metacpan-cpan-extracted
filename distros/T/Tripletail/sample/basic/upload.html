@@ -1,0 +1,27 @@
+<html>
+<head>
+  <title>TLフレームワークサンプル</title>
+</head>
+<body>
+TLフレームワークのサンプルです．<br>
+Hello, world.<br>
+ファイルを指定してアップロードすると，ファイルの内容を表示します．<br>
+ここではアップロードされたデータをそのまま表示している，
+UTF-8 以外のコードのファイルがアップロードされた場合は文字化けします．<br>
+<hr>
+<!-- form タグ中の action="" に空の値を指定すると，出力の際に自動的に CGI の名称が補完されます．-->
+<form action="" method="post" enctype="multipart/form-data">
+<input type="file" name="file"><br>
+<input type="submit" name="upload" value="upload"><br>
+</form>
+
+<!begin:file>
+<hr>
+ファイル名：<&FILENAME><br>
+ファイル内容<br>
+<&FILEDATA>
+<!end:file>
+
+</body>
+</html>
+

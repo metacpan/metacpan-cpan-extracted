@@ -1,0 +1,5 @@
+[% SET a = BLOCK %]
+Hello.
+[% END %]
+
+[% a %]

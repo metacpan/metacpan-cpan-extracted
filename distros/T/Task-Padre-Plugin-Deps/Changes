@@ -1,0 +1,39 @@
+Revision history for Task-Padre-Plugin-Deps
+
+0.12    2009.4.2
+        Catalyst Plugin
+        DataWalker plugin
+
+0.11    2009.4.1
+        Padre::Plugin::Nopaste
+        Padre::Plugin::PSI
+
+0.10    2009.3.14
+        Autoformat plugin
+
+0.09    2009.3.5
+        SVK plugin
+
+0.07    2009.1.23
+        remove CPAN plugin stuff
+
+0.06    2008.12.29
+        Syntax::Highlight::Perl6 required version is now 0.02961
+        
+0.05    2008.12.22
+        from Module::Build to Module::Install
+
+0.04    2008.12.20
+        add Plugin Perl6 Deps
+
+0.03    2008.12.19
+        fix wrong uploaded version
+
+0.02    2008.12.19
+        add Padre::Plugin::HTML::Export
+        add Padre::Plugin::Alarm
+        etc.
+
+0.01    2008.11.12
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,18 @@
+Revision history for Text::XmlMatch
+
+0.0001    02/16/07 First version.
+
+0.0002    02/06/07 Correct POD section.  No tag means hash value = '0'
+
+0.0003    02/07/07 Corrected bug where config file with a single
+                   pattern caused the module to fail.
+
+0.0004    02/12/07 Minor POD cleanup, added 'use warnings'
+
+0.0005    06/06/07 Corrected bug where a single pattern name causes
+		   listGroups() to misbehave.  Also, the following
+		   keywords are now reserved and must not be used as
+		   pattern names:  'name', 'tag', and 'inclusion'.
+
+0.0006    06/06/07 listGroups() bug was not truly stomped.  Should be
+                   dead for good now.

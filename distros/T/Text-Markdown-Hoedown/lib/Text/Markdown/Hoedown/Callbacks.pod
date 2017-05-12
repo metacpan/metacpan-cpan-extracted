@@ -1,0 +1,323 @@
+
+=head1 NAME
+
+Text::Markdown::Hoedown::Callbacks - Callbacks
+
+=head1 DESCRIPTION
+
+Note. Any API will change without notice.
+
+=head1 PRESETS
+
+There is 2 presets.
+
+=over 4
+
+=item C<< my $cb = Text::Markdown::Hoedown::Callbacks->html_renderer($render_flags:UV, $toc_nesting_lvl:IV); >>
+
+Create a callback object from HTML presets. Arguments are  documented on L<Text::Markdown::Hoedown>.
+
+=item C<< my $cb = Text::Markdown::Hoedown::Callbacks->html_toc_renderer($nesting_level); >>
+
+Create a callback object from HTML TOC presets. Arguments are  documented on L<Text::Markdown::Hoedown>.
+
+=back
+
+=head1 CUSTOM CALLBACKS
+
+=over 4
+
+=item C<< my $cb = Text::Markdown::Hoedown::Callbacks->new(); >>
+
+Create new instance.
+
+
+=item C<< $cb->blockcode($code: CodeRef) >>
+
+Added handler for C< blockcode >.
+
+Callback function's signature is following:
+
+    $code->($text:Str, $lang:Str)
+
+
+=item C<< $cb->blockquote($code: CodeRef) >>
+
+Added handler for C< blockquote >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->blockhtml($code: CodeRef) >>
+
+Added handler for C< blockhtml >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->header($code: CodeRef) >>
+
+Added handler for C< header >.
+
+Callback function's signature is following:
+
+    $code->($text:Str, $level:Int)
+
+
+=item C<< $cb->hrule($code: CodeRef) >>
+
+Added handler for C< hrule >.
+
+Callback function's signature is following:
+
+    $code->()
+
+
+=item C<< $cb->list($code: CodeRef) >>
+
+Added handler for C< list >.
+
+Callback function's signature is following:
+
+    $code->($text:Str, $flags:Int)
+
+
+=item C<< $cb->listitem($code: CodeRef) >>
+
+Added handler for C< listitem >.
+
+Callback function's signature is following:
+
+    $code->($text:Str, $flags:Int)
+
+
+=item C<< $cb->paragraph($code: CodeRef) >>
+
+Added handler for C< paragraph >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->table($code: CodeRef) >>
+
+Added handler for C< table >.
+
+Callback function's signature is following:
+
+    $code->($header:Str, $body:Str)
+
+
+=item C<< $cb->table_row($code: CodeRef) >>
+
+Added handler for C< table_row >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->table_cell($code: CodeRef) >>
+
+Added handler for C< table_cell >.
+
+Callback function's signature is following:
+
+    $code->($text:Str, $flags:Int)
+
+
+=item C<< $cb->footnotes($code: CodeRef) >>
+
+Added handler for C< footnotes >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->footnote_def($code: CodeRef) >>
+
+Added handler for C< footnote_def >.
+
+Callback function's signature is following:
+
+    $code->($text:Str, $num:UInt)
+
+
+=item C<< $cb->autolink($code: CodeRef) >>
+
+Added handler for C< autolink >.
+
+Callback function's signature is following:
+
+    $code->($link:Str, $type:Int)
+
+
+=item C<< $cb->codespan($code: CodeRef) >>
+
+Added handler for C< codespan >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->double_emphasis($code: CodeRef) >>
+
+Added handler for C< double_emphasis >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->emphasis($code: CodeRef) >>
+
+Added handler for C< emphasis >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->underline($code: CodeRef) >>
+
+Added handler for C< underline >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->highlight($code: CodeRef) >>
+
+Added handler for C< highlight >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->quote($code: CodeRef) >>
+
+Added handler for C< quote >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->image($code: CodeRef) >>
+
+Added handler for C< image >.
+
+Callback function's signature is following:
+
+    $code->($link:Str, $title:Str, $alt:Str)
+
+
+=item C<< $cb->linebreak($code: CodeRef) >>
+
+Added handler for C< linebreak >.
+
+Callback function's signature is following:
+
+    $code->()
+
+
+=item C<< $cb->link($code: CodeRef) >>
+
+Added handler for C< link >.
+
+Callback function's signature is following:
+
+    $code->($link:Str, $title:Str, $content:Str)
+
+
+=item C<< $cb->raw_html_tag($code: CodeRef) >>
+
+Added handler for C< raw_html_tag >.
+
+Callback function's signature is following:
+
+    $code->($tag:Str)
+
+
+=item C<< $cb->triple_emphasis($code: CodeRef) >>
+
+Added handler for C< triple_emphasis >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->strikethrough($code: CodeRef) >>
+
+Added handler for C< strikethrough >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->superscript($code: CodeRef) >>
+
+Added handler for C< superscript >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->footnote_ref($code: CodeRef) >>
+
+Added handler for C< footnote_ref >.
+
+Callback function's signature is following:
+
+    $code->($num:UInt)
+
+
+=item C<< $cb->entity($code: CodeRef) >>
+
+Added handler for C< entity >.
+
+Callback function's signature is following:
+
+    $code->($entity:Str)
+
+
+=item C<< $cb->normal_text($code: CodeRef) >>
+
+Added handler for C< normal_text >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
+=item C<< $cb->doc_header($code: CodeRef) >>
+
+Added handler for C< doc_header >.
+
+Callback function's signature is following:
+
+    $code->()
+
+
+=item C<< $cb->doc_footer($code: CodeRef) >>
+
+Added handler for C< doc_footer >.
+
+Callback function's signature is following:
+
+    $code->()
+
+
+=back

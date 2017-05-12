@@ -1,0 +1,18 @@
+These are potential changes to Text::Match::FastAlternatives.  If you need any
+of them, let me know; T::M::FA currently meets my needs, so I'm unlikely to
+change it if there seems to be no other interest in it.
+
+- Provide a way of finding which key was found, and its start position in the
+  string
+
+- Case-insensitive matching, if it can be done without killing performance
+
+- Record the minimum length of all the keys, and reject a string early if it
+  doesn't have enough characters.  For the case I currently care about, doing
+  that would save me only two calls to trie_match() per failed match, so I
+  haven't bothered doing it.  But for some data sets, it could be a bigger win.
+
+- Add and remove keys post-construction
+
+- Tests for keys and target strings that have magic; I suspect that the current
+  code doesn't handle magical or tied SVs at all

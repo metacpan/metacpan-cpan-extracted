@@ -1,0 +1,22 @@
+Root. Attributes: {}
+    |--- Â. Attributes: {# => "ÂÂ"}
+    |    |--- â. Attributes: {# => "ââ"}
+    |    |    |--- É. Attributes: {# => "ÉÉ"}
+    |    |--- ä. Attributes: {# => "ää"}
+    |    |--- é. Attributes: {# => "éé"}
+    |         |--- Ñ. Attributes: {# => "ÑÑ"}
+    |              |--- ñ. Attributes: {# => "ññ"}
+    |                   |--- Ô. Attributes: {# => "ÔÔ"}
+    |                        |--- ô. Attributes: {# => "ôô"}
+    |                        |--- ô. Attributes: {# => "ôô"}
+    |--- ß. Attributes: {# => "ßß"}
+         |--- ®. Attributes: {# => "®®"}
+         |    |--- ©. Attributes: {# => "©©"}
+         |--- £. Attributes: {# => "££"}
+         |--- €. Attributes: {# => "€€"}
+         |--- √. Attributes: {# => "√√"}
+         |--- ×xX. Attributes: {# => "×xX×xX"}
+              |--- í. Attributes: {# => "íí"}
+              |--- ú. Attributes: {# => "úú"}
+              |--- «. Attributes: {# => "««"}
+              |--- ». Attributes: {# => "»»"}

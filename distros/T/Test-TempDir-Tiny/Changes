@@ -1,0 +1,98 @@
+Revision history for Test-TempDir-Tiny
+
+0.016     2016-04-10 13:47:33-04:00 America/New_York
+
+    - No changes from 0.015
+
+0.015     2016-04-03 13:53:49-04:00 America/New_York (TRIAL RELEASE)
+
+    [Additions]
+
+    - Adds experimental support for Perl 5.6
+
+0.013     2016-03-10 15:31:15-05:00 America/New_York (TRIAL RELEASE)
+
+    [Tests]
+
+    - Fixed bad test plan when there are spaces in the perl or library path
+
+0.012     2016-02-24 17:51:58-05:00 America/New_York
+
+    - No changes from 0.011
+
+0.011     2016-02-20 17:12:02-05:00 America/New_York (TRIAL RELEASE)
+
+    [Fixes]
+
+    - Quotes metacharacters in test regexes.
+
+0.010     2015-12-11 11:58:50-05:00 America/New_York
+
+    - No changes from 0.009
+
+0.009     2015-12-09 15:40:36-05:00 America/New_York (TRIAL RELEASE)
+
+    [Fixes]
+
+    - More tainting fixes
+
+0.007     2015-12-09 11:03:38-05:00 America/New_York (TRIAL RELEASE)
+
+    [Fixes]
+
+    - Cleanup fixed to work in taint mode
+
+    [Changes]
+
+    - Raised minimum Perl prerequisite to 5.8.1 again, as 5.6 doesn't
+      have necessary features in "B"
+
+0.005     2015-07-17 16:13:55-04:00 America/New_York (TRIAL RELEASE)
+
+    [Added]
+
+    - Added 'in_tempdir' function to run code reference in a temporary
+      directory
+
+    - Setting $ENV{PERL_TEST_TEMPDIR_TINY_NOCLEANUP} to a true value
+      will prevent any directories from being cleaned up
+
+    [Changes]
+
+    - Lowered minimum Perl prerequisite to 5.6 
+
+0.004     2015-03-04 16:53:21-05:00 America/New_York
+
+    [Changes]
+
+    - Temporary directories are returned with platform-native separators
+
+    - Drop Time::HiRes in favor of built-in select to implement a small sleep
+
+    [Fixes]
+
+    - Fixes tests on Windows
+
+0.003     2015-01-04 06:30:28-05:00 America/New_York
+
+    [Fixes]
+
+    - Changed temp directory creation to avoid race conditions under
+      parallel testing
+
+0.002     2014-11-05 06:09:24-05:00 America/New_York
+
+    [Tests]
+
+    - Added tests for non-word characters
+
+    [Documentation]
+
+    - Noted that test-file-specific dirs are cleaned when reused
+
+    - Improved synopsis examples
+
+0.001     2014-11-04 17:07:17-05:00 America/New_York
+
+    - First release
+

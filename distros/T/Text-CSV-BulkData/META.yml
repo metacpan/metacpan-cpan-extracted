@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Text-CSV-BulkData
+version:             0.06
+abstract:            generate csv file with bulk data
+license:             perl
+author:              
+    - Kazuhiro Sera <webmaster@seratch.ath.cx>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

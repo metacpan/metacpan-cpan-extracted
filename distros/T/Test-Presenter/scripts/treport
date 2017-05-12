@@ -1,0 +1,297 @@
+#!/usr/bin/perl -w
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+#========================================================================
+#
+# treport
+#
+# DESCRIPTION
+#                                                                       
+# Script to generate a report using key=value data provided on STDIN and
+# applying it to a set of template files in a given directory, to produce
+# a corresponding set of files to an output directory.  This is designed
+# specifically for generating web results from software testing runs, but
+# is general enough that it should be useful for other sorts of things as
+# well.
+#
+# AUTHOR
+#   Bryce W. Harrington <bryce@bryceharrington.org>
+#
+# COPYRIGHT
+#   Copyright (C) 2005 Bryce W. Harrington  
+#   All Rights Reserved.
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#========================================================================
+
+use strict;                             # Forces variable decl's
+use Carp;                               # Improved error/warning prints
+use Pod::Usage;                         # To report program usage
+use Getopt::Long qw(:config no_ignore_case bundling); # Cmdline arg handling
+use File::Basename;                     # fileparse(), basename(), dirname()
+use File::Copy;                         # copy(), move()
+use File::Find;                         # find(), finddepth()
+use File::Path;                         # mkpath(), rmtree()
+use File::Spec::Functions  qw(:ALL);
+use Template;
+
+#------------------------------------------------------------------------
+# Global variables
+#------------------------------------------------------------------------
+
+use vars qw($VERSION $NAME $TT @EXCLUDES $PARAMS $ROOTDIR);
+$VERSION              = '1.00';
+$NAME                 = 'treport';
+@EXCLUDES             = ('CVS', 'SCCS', '^\.');  # TODO:  Add --exclude option
+$PARAMS               = undef;
+$ROOTDIR              = undef;
+
+#------------------------------------------------------------------------
+# User config area
+#------------------------------------------------------------------------
+
+our $opt_version      = 0;   # Prints the version and exits
+our $opt_help         = 0;   # Prints a brief help message
+our $opt_helplong     = 0;   # Prints a long help message
+our $opt_man          = 0;   # Prints a manual page (detailed help)
+our $opt_debug        = 1;   # Prints debug messages
+our $opt_force        = 0;   # Forces overwriting of existing report files
+our $opt_templates    = '.'; # Location of template files
+our $opt_dryrun       = 0;
+our $opt_info         = undef;
+
+#------------------------------------------------------------------------
+# Commandline option processing
+#------------------------------------------------------------------------
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");  
+GetOptions(
+           "version|V",        # Prints the version and exits
+           "help|h",           # Prints a brief help message
+           "helplong|H",       # Prints a long help message
+           "man|",             # Prints a manual page (detailed help)
+           "debug|D=i",        # Prints debug messages
+           "force|f",          # Forces overwriting of existing report files
+	   "templates|T",      # Templates directory
+           "info=s",           # Where to load report-specific info from
+            ) or pod2usage(-verbose => 0, -exitstatus => 0);
+
+version_and_exit() if $opt_version;
+pod2usage(-verbose => 0, -exitstatus => 0) if $opt_help;
+pod2usage(-verbose => 1, -exitstatus => 0) if $opt_helplong;
+
+#========================================================================
+# Subroutines
+#------------------------------------------------------------------------
+
+=head2 version_and_exit()
+
+Displays text describing the version of the script
+
+=cut
+
+sub version_and_exit
+{
+    print "$NAME version $VERSION\n";
+    print "Copyright (C) 2005 Bryce W. Harrington <bryce\@bryceharrington.org>\n";
+    print "This program is free software; you can redistribute it and/or\n";
+    print "modify it under the same terms as Perl itself.\n";
+    exit(0);
+}
+
+=head2 msg($text, $level)
+
+Issues a debug warning message if the global $opt_debug parameter is
+greater than the indicated $level.
+
+=cut
+sub msg {
+    my $text = shift || return;
+    my $level = shift || 0;
+
+    if ($opt_debug>$level) {
+        warn $text if $opt_debug>$level;
+    }
+}
+
+sub process_file {
+    my $infile = $_;
+    next if (-d $infile);
+
+    for my $pat (@EXCLUDES) {
+        next if $infile =~ /$pat/;
+    }
+
+    my ($name, $dir) = fileparse( $infile);
+    $dir             = abs2rel(   $dir,      $opt_templates);
+    my $dest_dir     = catdir(    $ROOTDIR,  $dir);
+    my $outfile      = catfile(   $dest_dir, $name);
+
+    msg("$infile -> $outfile\n");
+    return if ($opt_dryrun);
+
+    # Create the destination directory if needed
+    if (! -d $dest_dir) {
+        eval { mkpath($dest_dir,0,0711) };
+        die "Couldn't create $dir: $@" if $@;
+    }
+
+    # Generate the output file, using the template
+    if (! open(OUTFILE, ">$outfile")) {
+        msg("Error:  Could not open '$outfile' for writing: $!\n");
+        next;
+    }
+    $TT->process($infile, $PARAMS, \*OUTFILE)
+        || msg("Error: Template process failed: ".$TT->error()."\n");
+    
+    return close(OUTFILE);
+    
+}
+
+#========================================================================
+# Main program
+#------------------------------------------------------------------------
+sub main() {
+
+    msg("Starting main program\n", 1);
+
+    # Parse STDIN for our list of defined values
+    while (<>) {
+        if ($_ =~ /^(.*?)=(.*)/) {
+            $PARAMS->{$1} = $2;
+        }
+    }
+
+    my $tt_config = {
+        INCLUDE_PATH => $opt_templates,
+        ABSOLUTE     => 1,
+    };
+    $TT = Template->new($tt_config);
+
+    for my $dir (@ARGV) {
+        $ROOTDIR = $dir;
+        find({ wanted => \&process_file, no_chdir => 1}, ($dir));
+    }
+
+    msg("Ending main program\n\n", 1);
+    return 0;
+}
+
+exit(main());
+
+#########################################################################
+
+__END__
+
+
+=head1 NAME
+
+B<treport> - Generates reports from test results
+
+
+=head1 SYNOPSIS
+
+treport [options] [ [ options ] ]
+
+ Options:
+   -V, --version=boolean         Prints the version and exits
+   -h, --help=boolean            Prints a brief help message
+   -H, --helplong=boolean        Prints a long help message
+       --man=boolean             Prints a manual page (detailed help)
+   -D, --debug=integer           Prints debug messages
+   -f, --force=boolean           Forces overwriting of existing report files
+
+=head1 DESCRIPTION
+
+treport - Generates reports from test results
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Prints the version and exits
+
+=item B<-h>, B<--help>
+
+Prints a brief help message
+
+=item B<-H>, B<--helplong>
+
+Prints a long help message
+
+=item B<--man>
+
+Prints a manual page (detailed help)
+
+=item B<-D> I<D>, B<--debug>=I<D>
+
+Prints debug messages
+
+=item B<-f>, B<--force>
+
+Forces overwriting of existing report files
+
+=back
+
+See B<treport> -h for a summary of options.
+
+
+=head1 PREREQUISITES
+
+L<Pod::Usage>,
+L<Getopt::Long>,
+L<Config::Simple>,
+L<File::Basename>,
+L<File::Copy>,
+L<File::Find>,
+L<File::Path>,
+L<File::Spec>,
+L<Carp>
+
+=head1 COREQUISITES
+
+Template-Toolkit
+
+=head1 SCRIPT CATEGORIES
+
+Web
+
+=head1 BUGS
+
+None known.
+
+=head1 VERSION
+
+1.00
+
+=head1 SEE ALSO
+
+L<perl(1)>
+
+
+=head1 AUTHOR
+
+Bryce W. Harrington E<lt>bryce@bryceharrington.orgE<gt>
+
+L<http://www.bryceharrington.org|http://www.bryceharrington.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005 Bryce W. Harrington.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.1.1.1 $
+
+=cut
+
+
+

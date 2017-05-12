@@ -1,0 +1,72 @@
+NAME
+    Tk::CheckbuttonGroup - widget displays and manages a group of related
+    checkbuttons
+
+SYNOPSIS
+            use Tk::CheckbuttonGroup;
+
+            my($top) = MainWindow->new();
+            my @selected = qw(two four);
+            my $checkbuttongroup = $top->CheckbuttonGroup (
+                    -list => [qw( one two three four five )],
+                    -orientation => 'vertical',
+                    -variable => \@selected,
+                    -command => sub {
+                            print @selected, "\n";
+                    }
+            );
+
+WIDGET-SPECIFIC OPTIONS
+    Name: list
+    Class: List
+    Switch: -list
+        The names for the checkbuttons to be contained in this widget. If
+        given as a list reference, the same value is used for the
+        checkbutton's label and its value. If given as a hash reference, the
+        keys are used as each checkbutton's label, and the values as their
+        values. If given a list reference whose first element is a list
+        reference, the sublist will be treated as a set of ordered key value
+        pairs which is then treated as an ordered hash.
+
+    Name: orientation
+    Class: Orientation
+    Switch: -orientation
+        May be 'vertical' or 'horizontal'. Specifies how the checkboxes are
+        stacked.
+
+    Name: variable
+    Class: Variable
+    Switch: -variable
+        A reference to an array, whose elements contain the values of all
+        checked checkbuttons, and is updated as the user interacts with the
+        widget. May also be a comma delimited string scalar. This variable
+        is not watched, and so state of the widget is only updated by
+        changing the -variable option.
+
+    Name: command
+    Class: Command
+    Switch: -command
+        Specifies a perl/Tk callback to associate with all of the
+        checkbuttons.
+
+DESCRIPTION
+    Displays a set of related checkboxes with a frame in vertical or
+    horizontal orientation.
+
+    All checkboxes are advertised with the names given in the -list option.
+
+    Any additional options which are given to this widget are applied to all
+    of the checkbuttons it manages.
+
+BUGS
+    The reference passed in the -variable option is not watched, and so the
+    checkbuttons will not automatically update themselves if the list given
+    in that reference changes.
+
+AUTHOR
+    Joseph Annino <jannino@jannino.com> http://www.jannino.com
+
+    Copyright (c) 2002 American Museum of Natural History. All rights
+    reserved. This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

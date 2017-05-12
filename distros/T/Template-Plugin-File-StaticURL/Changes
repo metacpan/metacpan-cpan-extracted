@@ -1,0 +1,5 @@
+0.02	2009-09-16
+- Changed to use Module::Install and fixed some POD bugs.
+
+0.01	2009-09-15
+- Initial version

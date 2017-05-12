@@ -1,0 +1,9 @@
+menu "Installation" index
+menu "Getting started" new
+menu "Menu creation" menu
+menu "Multi-language sites" lang
+menu "Example sites" example
+menu "Site structure" struct
+menu "'config' files" config
+menu "'page' files" page
+menu "'util' files" util

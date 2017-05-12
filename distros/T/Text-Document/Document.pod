@@ -1,0 +1,251 @@
+=head1 NAME
+
+  Text::Document - a text document subject to statistical analysis
+
+=head1 SYNOPSIS
+
+  my $t = Text::Document->new();
+  $t->AddContent( 'foo bar baz' );
+  $t->AddContent( 'foo barbaz; ' );
+
+  my @freqList = $t->KeywordFrequency();
+  my $u = Text::Document->new();
+  ...
+  my $sj = $t->JaccardSimilarity( $u );
+  my $sc = $t->CosineSimilarity( $u );
+  my $wsc = $t->WeightedCosineSimilarity( $u, \&MyWeight, $rock );
+
+
+=head1 DESCRIPTION
+
+C<Text::Document> allows to perform simple
+Information-Retrieval-oriented statistics on pure-text documents.
+
+Text can be added in chunks, so that the document may be
+incrementally built, for instance by a class like
+C<HTML::Parser>.
+
+A simple algorithm splits the text into terms; the algorithm
+may be redefined by subclassing and redefining C<ScanV>.
+
+The C<KeywordFrequency> function computes term frequency
+over the whole document.
+
+=head1 FORESEEN REUSE
+
+The package may be {re}used either by simple instantiation,
+or by subclassing (defining a descendant package).  In the
+latter case the methods which are foreseen to be redefined are
+those ending with a C<V> suffix.  Redefining other methods
+will require greater attention.
+
+=head1 CLASS METHODS
+
+=head2 new
+
+The creator method.  The optional arguments are in the
+I<(key,value)> form and allow to specify whether
+all keywords are trasformed to lowercase (default) and
+whether the string representation (C<WriteToString>)
+will be compressed (default).
+
+  my $d = Text::Document->new();
+  my $dNotCompressed = Text::Document( compressed => 0 );
+  my $dPreserveCase = Text::Document( lowercase => 0 );
+
+=head2 NewFromString
+
+Take a string written by C<WriteToString> (see below)
+and create a new C<Text::Document> with the same contents;
+call C<die> whenever the restore is impossible or ill-advised,
+for instance when the current version of the package is different
+from the original one, or the compression library in unavailable.
+
+  my $b = Text::Document::NewFromString( $str );
+
+The return value is a blessed reference; put in another way,
+this is an alternative contructor.
+
+The string should have been written by C<WriteToString>; 
+you may of course tweak the string contents, but
+at this point you're entirely on you own.
+
+=head1 INSTANCE METHODS
+
+=head2 AddContent
+
+Used as
+
+  $d->AddContent( 'foo bar baz foo9' );
+  $d->AddContent( 'mary had a little lamb' );
+
+Successive calls accumulate content; there is currently no way
+of resetting the content to zero.
+
+=head2 Terms
+
+Returns a list of all distinct terms in the document, in no
+particular order.
+
+=head2 Occurrences
+
+Returns the number of occurrences of a given term.
+
+  $d->AddContent( 'foo baz bar foo foo');
+  my $n = $d->Occurrences( 'foo' ); # now $n is 3
+
+=head2 ScanV
+
+Scan a string and return a list of terms.
+
+Called internally as:
+
+  my @terms = $self->ScanV( $text );
+
+=head2 KeywordFrequency
+
+Returns a reference list of pairs I<[term,frequency]>, sorted by
+ascending frequency.
+
+  my $listRef = $d->KeywordFrequency();
+  foreach my $pair (@{$listRef}){
+  	my ($term,$frequency) = @{$pair};
+	...
+  }
+
+Terms in the document are sampled and their frequencies of occurrency
+are sorted in ascending order;
+finally, the list is returned to the user.
+
+=head2 WriteToString
+
+Convert the document (actually, some parameters
+and the term counters) into a string which can be saved and
+later restored with C<NewFromString>.
+
+  my $str = $d->WriteToString();
+
+The string begins with a header which encodes the
+originating package, its version, the parameters
+of the current instance.
+
+Whenever possible, C<Compress::Zlib> is used in order to
+compress the bit vector in the most efficient way.
+On systems without C<Compress::Zlib>, the bit string is
+saved uncompressed.
+
+=head2 JaccardSimilarity
+
+Compute the Jaccard measure of document similarity, which is defined
+as follows: given two documents I<D> and I<E>, let I<Ds> and I<Es> be the set
+of terms occurring in I<D> and  I<E>, respectively. Define I<S> as the
+intersection of I<Ds> and I<Es>, and I<T> as their union. Then
+the Jaccerd  similarity is the the number of  elements
+of I<S> divided by the number of elements of I<T>.
+
+It is called as follows:
+
+  my $sim = $d->JaccardSimilarity( $e );
+
+If neither document has any terms the result is undef (a rare evenience).
+Otherwise the similarity is a real number between 0.0 (no terms in common)
+and 1.0 (all terms in common).
+
+=head2 CosineSimilarity
+
+Compute the cosine similarity between two documents I<D> and
+I<E>.
+
+Let I<Ds> and I<Es> be the set
+of terms occurring in I<D> and  I<E>, respectively. Define I<T> as the
+union of I<Ds> and I<Es>, and let I<ti> be the I<i>-th element of I<T>.
+
+Then the term vectors of I<D> and  I<E> are
+
+  Dv = (nD(t1), nD(t2), ..., nD(tN))
+  Ev = (nE(t1), nE(t2), ..., nE(tN))
+
+where nD(ti) is the  number of occurrences of term ti in I<D>,
+and nE(ti) the same for I<E>.
+
+Now we are at last ready to define the cosine similarity I<CS>:
+
+  CS = (Dv,Ev) / (Norm(Dv)*Norm(Ev))
+
+Here (... , ...) is the scalar product and Norm is the Euclidean
+norm (square root of the sum of squares).
+
+C<CosineSimilarity> is called as
+
+   $sim = $d->CosineSimilarity( $e );
+
+It is C<undef> if either I<D> or I<E> have no occurrence of any term.
+Otherwise, it is a number between 0.0 and 1.0. Since term occurrences
+are always non-negative, the cosine is obviously always non-negative.
+
+=head2 WeightedCosineSimilarity
+
+Compute the weighted cosine similarity between two documents I<D> and
+I<E>.
+
+In the setting of C<CosineSimilarity>, the 
+term vectors of I<D> and  I<E> are
+
+  Dv = (nD(t1)*w1, nD(t2)*w2, ..., nD(tN)*wN)
+  Ev = (nE(t1)*w1, nE(t2)*w2, ..., nE(tN)*wN)
+
+The weights are nonnegative real values; each term has associated
+a weight. To achieve generality, weights may be defined
+using a function, like:
+
+  my $wcs = $d->WeightedCosineSimilarity(
+  	$e,
+	\&function,
+	$rock
+  );
+
+The C<function> will be called as follows:
+
+  my $weight = function( $rock, 'foo' );
+
+C<$rock> is a 'constant' object used for passing a I<context>
+to the function.
+
+For instance, a common way of defining weights is the IDF (inverse
+document frequency), which is defined in L<Text::DocumentCollection>.
+In this context, you can weigh terms with their IDF as
+follows:
+
+  $sim = $c->WeightedCosineSimilarity(
+  	$d,
+	\&Text::DocumentCollection::IDF,
+	$collection
+  );
+
+C<WeightedCosineSimilarity> will call
+
+  $collection->IDF( 'foo' );
+
+which is what we expect.
+
+Actually, we should return the square root of IDF, but this
+detail is not necessary here.
+
+=head1 AUTHORS
+
+  spinellia@acm.org (Andrea Spinelli)
+  walter@humans.net (Walter Vannini)
+
+=head1 HISTORY
+
+  2001-11-02 - initial revision
+
+  2001-11-20 - added WeightedCosineSimilarity, suggested by JP Mc Gowan <jp.mcgowan@ucd.ie>
+
+=head DISCARDED CHOICES
+
+We did not use C<Storable>, because we wanted to fine-tune
+compression and version compatibility.  However, this
+choice may be easily reversed redefining WriteToString and
+NewFromString.
+

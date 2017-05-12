@@ -1,0 +1,24 @@
+---
+abstract: 'Ties an hash with an ispell dictionary'
+author:
+  - 'Alberto Simoes <ambs@cpan.org>'
+build_requires: {}
+configure_requires:
+  Config::AutoConf: 0.16
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Ispell
+provides:
+  Tie::Ispell:
+    file: lib/Tie/Ispell.pm
+    version: 0.08
+requires:
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

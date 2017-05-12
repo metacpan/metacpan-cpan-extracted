@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Text/Brew.pm
+t/00-load.t
+t/basic.t
+#t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

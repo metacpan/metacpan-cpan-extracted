@@ -1,0 +1,67 @@
+NAME
+    Test::POE::Stopping - Test if a POE process has nothing left to do
+
+DESCRIPTION
+    POE is a curious beast, as most asynchronous environments are.
+
+    But in regards to testing, one of the more interesting (and when it's
+    not working properly, annoying) situations is how to tell if the
+    POE-controlled process will, or has, stopped.
+
+    The obvious solution is to just say something like
+
+      POE::Kernel->run;
+      pass( "POE stopped" );
+
+    But this isn't really useful to us, because this test never fails, it
+    just deadlocks forever if some event generator is left around.
+
+    Test::POE::Stopped takes an introspective method in determining this.
+
+    In your test script, a top level controlling session should be set up.
+
+    In this session, you should set a delayed alarm, that SHOULD fire after
+    everything is finished, and POE should have naturally stopped.
+
+    The delayed alarm will keep POE from returning, but it should make the
+    alarm the very last event called.
+
+    In this event you call the "poe_stopping" function, which will examine
+    the running POE::Kernel to see if it displays the characteristics of one
+    with the last event in progress (no other sessions, empty queue, no
+    event generators, etc).
+
+    If POE is not stopping, then the "poe_stopping" function will emit a
+    fail result and then do a hard-stop of the POE kernel so that at least
+    your test script ends.
+
+  poe_stopping
+      poe_stopping();
+
+    The "poe_stopping" test checks the kernel to see if, after the current
+    event, the POE kernel will have nothing else left to do and so will
+    stop.
+
+SUPPORT
+    All bugs should be filed via the bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-POE-Stopping>
+
+    For other issues, or commercial enhancement and support, contact the
+    author
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    POE, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2006 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,56 @@
+Revision history for Perl extension Test::Taint
+
+1.06    Fri Oct 19 11:30:31 CDT 2012
+        [ENHANCEMENTS]
+        tainted() now localizes $SIG{__DIE__} before performing the
+        taint check.  If the calling program has its own $SIG{__DIE__},
+        we don't want to use it.  Thanks, Pete Krawczyk.
+        https://rt.cpan.org/Ticket/Display.html?id=23507
+
+        [FIXES]
+        Checks for undef before opening files when trying to create
+        some taint. Thanks Frédéric Buclin.
+        https://rt.cpan.org/Ticket/Display.html?id=51246
+
+
+1.04    Mon Aug  9 22:06:10 CDT 2004
+        No differences from 1.03_01.
+
+        More goodness from Dan Kubb.
+
+        [ENHANCEMENTS]
+        New functions:
+        * tainted_ok_deeply()
+        * untainted_ok_deeply()
+
+        [INTERNALS]
+        * Added Build.PL for those who prefer Module::Build.
+
+        * Added tests to improve coverage.  It's at 99% coverage now,
+          up from around 80%.
+
+        * Refactored the traversal code so that tainted_deeply and
+          taint_deeply share almost the exact same code to walk the data
+          structure.
+
+
+1.02    April 22nd, 2004
+        This is the "Thanks, Dan Kubb" release.
+
+        [ENHANCEMENTS]
+        * Added taint_deeply() to taint all elements in a structure.
+
+
+1.00    March 14th, 2004
+        This is the "Thanks, Dave Rolsky" release.
+
+        [FIXES]
+        * taint() could corrupt a string and set it to 0.
+        * Removed requirement on Test::Builder::Tester.
+
+        [ENHANCEMENTS]
+        * The taint() function now goes thru XS, instead of Perl magic.
+
+
+0.01    Tue Feb  3 23:56:25 CST 2004
+        Brand new, and ready to go.

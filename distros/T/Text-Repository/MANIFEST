@@ -1,0 +1,9 @@
+MANIFEST
+MANIFEST.skip
+Makefile.PL
+README
+Repository.pm
+t/01load.t
+t/02instantiate.t
+t/03paths.t
+t/04fetch.t

@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8f7f3e486dc7ed9a124f1eeff007fe67fe860171 Changes
+SHA1 c41696b23d877b87ab8616cf8dc7e9a24a824771 MANIFEST
+SHA1 b5afb6cef3219dc58923aff037201ed45c2996d2 META.yml
+SHA1 1e086388fd95fbb78785472e4f1c6ab5af681cfa Makefile.PL
+SHA1 71f34d2e8b9d99b59f393814a26372217e961c44 example.pl
+SHA1 efe1e7e90451adf9baf102836fa6a5d82bbd47e3 lib/Test/TAP/Model.pm
+SHA1 442be97cdb5e0dc4f2fcd5abea656fa83a37dd56 lib/Test/TAP/Model/Consolidated.pm
+SHA1 b9a41ae3c9d942a98a5b54c62da41adae96c4efd lib/Test/TAP/Model/File.pm
+SHA1 6b1c7072e575bbfc6087b14c345dbf59ae487cf2 lib/Test/TAP/Model/File/Consolidated.pm
+SHA1 6fab02a357fa700e236449e0fe314845a23b6968 lib/Test/TAP/Model/Subtest.pm
+SHA1 b2de97c6c7e94cfb7288605e14886d6d1797c83c t/basic.t
+SHA1 ae8f1c14b14764483e9bb61c663486ae7349d3e4 t/comprehensive.t
+SHA1 d7ba14c7859bc764ed4469641a4b3db37c7106d1 t/consolidate.t
+SHA1 8ecf24ad548b85970fd5dc7fb4c3712a3af75fa6 t/lib/StringHarness.pm
+SHA1 ae0b778b055f1a8e6ed164839d80e91f3b196839 t/oop_file.t
+SHA1 4eb74f2a087f15e1c7f07f93d3c689be55ee740e t/oop_subtest.t
+SHA1 ce77d86a7165627e8b9dec182f3a7f8cc65fc06b t/pos_guessing.t
+SHA1 2120d63b75de8443f81b01d737daaed32db882ea t/serializable.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFIXc3XVCwRwOvSdBgRAsHdAKC2398poZ8mzL2YvclIymaR4Qek0gCeNoJJ
+0XUiS24V4Ef+jJ13YXzPst8=
+=chVN
+-----END PGP SIGNATURE-----

@@ -1,0 +1,153 @@
+NAME
+    Template::Directive::XSSAudit - TT2 output filtering lint testing
+
+SYNOPSIS
+      use Template;
+      use Template::Directive::XSSAudit;
+
+      my $tt = Template->new({
+          FACTORY => "Template::Directive::XSSAudit"
+      });
+
+      my $input = <<'END';
+      Hello [% exploitable.goodness %] World!
+      How would you like to [% play.it.safe | html %] today?
+      END
+
+      my $out  = '';
+      $tt->process(\$input, {}, \$out) || die $tt->error();
+
+      # output on STDOUT... via default on_error handler
+      # see the documentation of on_error for explanation of the
+      # output format of the default error handler
+      #input file   NO_FILTERS  line:1    exploitable.goodness
+
+DESCRIPTION
+    This module will help you perform basic lint tests of your template
+    toolkit files.
+
+    It is intended to parse through all GET items, and make sure that at
+    least one "good" filter is used to escape it.
+
+    A callback may be provided so that the errors may be handled in a way
+    that makes sense for the project at hand. See "on_error" for more
+    details.
+
+    There is another callback which can be provided named "on_filtered".
+    This is triggered when a variable is successfully filtered. By default
+    there is no implementation. See "on_filtered" for more details.
+
+    Additionally, a list of filter names may be provided, instructing the
+    module to require that certain filters be used for output escaping in
+    the tests.
+
+    Have a look at the t/*.t files that come with the distribution as they
+    leverage the "on_error()" callback routine.
+
+IMPORTANT NOTES ON SECURITY
+    This tool is NOT a substitude for code and security reviews as it is NOT
+    context aware. This means if you use a html filter in javascript context
+    or css context or html attribute context, you would not be escaping
+    things properly and this tool would not catch that.
+
+    You also need to make sure that your "good" filters are actually doing
+    their job and escaping things properly.
+
+    All of this to say, don't let this give you a false sense of security.
+
+EXPORTS
+    None.
+
+METHODS
+    Template::Directive::XSSAudit->on_error ( [ coderef ] )
+        This method is called on every variable involved in a template
+        toolkit 'GET' which was not filtered properly.
+
+        The callback will be executed in one of two cases:
+
+         - The variable in question has NO output filtering
+         - The variable is filtered but none of the filters 
+           were found in the C<good_filter> list.
+
+        A default implementation is provided which will simply "warn" any
+        problems which are found with the following information (tab
+        delimited):
+
+          <file_name> <error_type> line:<line_no> <filters used csv>
+
+        If you call this method without a subroutine reference, it will
+        simply return you the current implementation.
+
+        If you provide your own callback, it will be passed one parameter
+        which is a hash reference containing the following keys.
+
+        variable_name
+            This is a string represending the variable name which was found
+            to be incorrectly escaped.
+
+        filtered_by
+            This will contain an array reference containing the names of the
+            filters which were applied to the variable name.
+
+            If there are entries in this list, it means that no filter in
+            the good filter list was found to apply to the variable. See
+            "good_filter" for more information.
+
+            In the case of variables with no filters, this will be an empty
+            array reference.
+
+        file_name
+            The line number in the template file where the problem occurred.
+
+            This is parsed out as best as can be done but it may come back
+            as an empty string in many cases. It is a convenience item and
+            should not be relied on for any sort of automation.
+
+        file_line
+            The line number in the template file where the problem occurred.
+
+            This is parsed out as best as can be done but it may come back
+            as an empty string in many cases. It is a convenience item and
+            should not be relied on for any sort of automation.
+
+    Template::Directive::XSSAudit->on_filtered ( [ coderef ] )
+        This method is called on every variable involved in a template
+        toolkit 'GET' which was filtered satisfactorily.
+
+        By default, no implementation is given so if you want this to do
+        anything, you'll have to provide a coderef yourself.
+
+        The callback and function works just like "on_error" so see the
+        documentation for that method for more details.
+
+    Template::Directive::XSSAudit->good_filters ( [ arrayref ] )
+        This method will return the current list of "good" filters to you as
+        an array reference. eg.
+
+          [ 'html', 'uri' ]
+
+        If you pass an array reference of strings, it will also set the list
+        of good filters. The defaults are simply 'html' and 'uri' but I will
+        be adding more int the future.
+
+SEE ALSO
+    Template <http://github.com/captin411/template-directive-xssaudit/>
+    <http://www.owasp.org/index.php/Category:OWASP_Encoding_Project/>
+    <http://ha.ckers.org/xss.html>
+
+BUGS
+    Please report bugs using the CPAN Request Tracker at
+    <http://rt.cpan.org/>
+
+AUTHOR
+    David Bartle <dbartle@mediatemple.net>
+
+    This work was sponsored by my employer, (mt) Media Temple, Inc.
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

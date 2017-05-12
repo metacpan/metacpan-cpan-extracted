@@ -1,0 +1,15 @@
+abstract: Template plugin for HTML::ResolveLink
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Template-Plugin-ResolveLink
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  HTML::ResolveLink: 0
+version: 0.01

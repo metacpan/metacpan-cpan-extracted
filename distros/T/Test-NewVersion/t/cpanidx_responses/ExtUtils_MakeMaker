@@ -1,0 +1,10 @@
+[
+   {
+      "dist_file" : "B/BI/BINGOS/ExtUtils-MakeMaker-7.04.tar.gz",
+      "mod_vers" : "7.04",
+      "cpan_id" : "BINGOS",
+      "dist_name" : "ExtUtils-MakeMaker",
+      "mod_name" : "ExtUtils::MakeMaker",
+      "dist_vers" : "7.04"
+   }
+]

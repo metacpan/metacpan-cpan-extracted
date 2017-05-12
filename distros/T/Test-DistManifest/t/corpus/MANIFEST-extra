@@ -1,0 +1,15 @@
+Build.PL
+CHANGES
+FILE.MISSING
+examples/checkmanifest.t
+lib/Test/DistManifest.pm
+LICENSE
+NOT.FOUND
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+SOME.INVALID.FILE
+t/02manifest.t
+t/03core.t

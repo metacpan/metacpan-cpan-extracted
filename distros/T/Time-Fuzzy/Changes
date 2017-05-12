@@ -1,0 +1,64 @@
+Revision history for Time-Fuzzy
+
+High-level changelog
+====================
+
+0.3x  oop-style implementation
+0.2x  fuzziness factor: multiple implementations
+0.1x  actual fuzzy implementation
+0.0x  initial releases
+
+
+Low-level changelog
+===================
+
+0.36 Mon Nov 26 12:43:44 CET 2007
+ - kwalitee/cpants release
+
+0.35 Mon Nov  5 19:27:12 CET 2007
+ - really enforcing $ENV{TZ} before any module loading
+
+0.34 Mon Aug 13 10:59:27 CEST 2007
+ - forcing $ENV{TZ} in the tests since some cpan testers have a weird
+   env with no local timezone
+
+0.33 Sun Aug 12 21:57:36 CEST 2007
+ - added missing prereq class::accessor
+
+0.32 Sun Aug 12 15:23:43 CEST 2007
+ - fixed bug in time::fuzzy constructor
+ - added overload for string output
+
+0.31 Sun Aug 12 15:01:50 CEST 2007
+ - using class-accessor-fast before inheriting from it (should quiet
+   fail reports)
+
+0.30 Sat Aug 11 18:01:01 CEST 2007
+ - oop style available
+
+0.22 Sat Aug 11 17:41:41 CEST 2007
+ - new fuzziness factor: high
+
+0.21 Sat Aug 11 10:07:00 CEST 2007
+ - reintroduced true logic to deal with midnight/noon, instead of a hack
+ - should void fail reports about qw[] x 2 needing to declare x (cf
+   http://www.nntp.perl.org/group/perl.cpan.testers/2007/08/msg564525.html)
+
+0.20 Fri Aug 10 18:10:32 CEST 2007
+ - fuzzy() defaults to current time, but now in the local timezone
+ - new sub _fuzzy_low() returning time without too much fuzzyness
+ - old fuzzy() moved to _fuzzy_medium()
+ - fuzzy() now acts depending on the $FUZZINESS factor
+
+**
+
+0.11 Fri Aug 10 16:24:15 CEST 2007
+ - fuzzy() now accepts a DateTime param
+ - added tests for fuzzy()
+
+0.10 Fri Aug 10 14:07:06 CEST 2007
+ - fuzzy() now return an actual fuzzy time depending on current time
+
+0.01 Fri Aug 10 12:29:26 CEST 2007
+ - initial release
+

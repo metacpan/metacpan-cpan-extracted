@@ -1,0 +1,21 @@
+Changes
+example/01_eq_or_dump_diff.t
+example/02_dumped_eq_dump_or_diff.t
+lib/Test/HexDifferences.pm
+lib/Test/HexDifferences/HexDump.pm
+MANIFEST			This list of files
+README
+t/01_format_iterator.t
+t/02_hex_dump.t
+t/03_all_formats.t
+t/11_eq_or_dump_diff.t
+t/12_dumped_eq_dump_or_diff.t
+t/21_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

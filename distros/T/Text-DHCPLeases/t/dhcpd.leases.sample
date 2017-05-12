@@ -1,0 +1,260 @@
+lease 192.168.10.87 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.88 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.89 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.90 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.91 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.92 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.93 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.94 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.53 {
+  starts 2 2007/08/14 20:51:50;
+  ends 4 2007/09/13 20:51:50;
+  tstp 4 2007/09/13 20:51:50;
+  cltt 2 2007/08/14 20:51:50;
+  binding state active;
+  next binding state expired;
+  hardware ethernet 08:00:09:7c:c5:9a;
+}
+lease 192.168.10.55 {
+  starts 2 2007/08/14 21:09:19;
+  ends 2 2007/08/14 21:19:19;
+  tstp 2 2007/08/14 21:24:19;
+  tsfp 2 2007/08/14 21:24:19;
+  cltt 2 2007/08/14 21:09:19;
+  binding state expired;
+  next binding state free;
+  hardware ethernet 00:11:85:5d:4e:68;
+  uid "\001\000\021\205]Nh";
+  client-hostname "jdoe";
+}
+lease 192.168.10.56 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.57 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.58 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.59 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.60 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.61 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.62 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.54 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.26 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.27 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.28 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.29 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+lease 192.168.10.30 {
+  starts 2 2007/08/14 20:51:22;
+  tstp 2 2007/08/14 20:51:22;
+  tsfp 2 2007/08/14 20:51:22;
+  atsfp 2 2007/08/14 20:51:22;
+  binding state backup;
+}
+
+failover peer "dhcp-peer" state {
+  my state normal at 2 2007/08/14 20:51:22;
+  partner state normal at 2 2007/08/14 20:51:19;
+}
+
+failover peer "dhcp-peer" state {
+  my state normal at 2 2007/08/14 20:51:22;
+  partner state communications-interrupted at 2 2007/08/14 20:51:19;
+}
+
+failover peer "dhcp-peer" state {
+  my state normal at 2 2007/08/14 20:51:22;
+  partner state communications-interrupted at 2 2007/08/14 20:51:19;
+}
+lease 192.168.10.55 {
+  starts 3 2007/08/15 11:34:58;
+  ends 3 2007/08/15 11:44:58;
+  tstp 2 2007/08/14 21:24:19;
+  tsfp 3 2007/08/15 11:49:58;
+  cltt 3 2007/08/15 11:34:58;
+  binding state expired;
+  next binding state free;
+  hardware ethernet 00:11:85:5d:4e:68;
+  uid "\001\000\021\205]Nh";
+  client-hostname "jdoe";
+}
+lease 192.168.10.55 {
+  starts 3 2007/08/15 11:34:58;
+  ends 3 2007/08/15 11:44:58;
+  tstp 2 2007/08/14 21:24:19;
+  tsfp 3 2007/08/15 11:49:58;
+  cltt 3 2007/08/15 11:34:58;
+  binding state expired;
+  next binding state free;
+  hardware ethernet 00:11:85:5d:4e:68;
+  uid "\001\000\021\205]Nh";
+  client-hostname "jdoe";
+}
+
+failover peer "dhcp-peer" state {
+  my state normal at 2 2007/08/14 20:51:22;
+  partner state normal at 2 2007/08/14 20:51:19;
+}
+lease 192.168.10.53 {
+  starts 2 2007/08/14 20:51:50;
+  ends 4 2007/09/13 20:51:50;
+  tstp 4 2007/09/13 20:51:50;
+  tsfp 4 2007/09/13 20:51:50;
+  atsfp 4 2007/09/13 20:51:50;
+  cltt 2 2007/08/14 20:51:50;
+  binding state active;
+  next binding state expired;
+  hardware ethernet 08:00:09:7c:c5:9a;
+}
+lease 192.168.10.55 {
+  starts 3 2007/08/15 11:34:58;
+  ends 3 2007/08/15 11:44:58;
+  tstp 3 2007/08/15 11:44:58;
+  tsfp 2 2007/08/14 21:24:19;
+  atsfp 2 2007/08/14 21:24:19;
+  cltt 3 2007/08/15 11:34:58;
+  binding state free;
+  hardware ethernet 00:11:85:5d:4e:68;
+  uid "\001\000\021\205]Nh";
+}
+lease 192.168.10.55 {
+  starts 3 2007/08/15 20:31:07;
+  ends 3 2007/08/15 11:44:58;
+  tstp 3 2007/08/15 20:31:07;
+  tsfp 2 2007/08/14 21:24:19;
+  cltt 3 2007/08/15 11:34:58;
+  binding state backup;
+  hardware ethernet 00:11:85:5d:4e:68;
+  uid "\001\000\021\205]Nh";
+}
+host some-host {
+  dynamic;
+  hardware ethernet 00:80:c7:84:b1:94;
+  fixed-address 192.168.4.40;
+}
+lease 192.168.10.55 {
+  starts 3 2007/08/15 20:31:07;
+  ends 3 2007/08/15 11:44:58;
+  tstp 3 2007/08/15 20:31:07;
+  tsfp 3 2007/08/15 20:31:07;
+  atsfp 3 2007/08/15 20:31:07;
+  cltt 3 2007/08/15 11:34:58;
+  binding state backup;
+  hardware ethernet 00:11:85:5d:4e:68;
+  uid "\001\000\021\205]Nh";
+}

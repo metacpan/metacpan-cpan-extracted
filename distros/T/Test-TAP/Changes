@@ -1,0 +1,12 @@
+Revision history for Test-TAP
+
+0.03    2008-04-14
+        - Cleaned up the TAP failure code.  Shaved about 10 lines.
+        - Removed an 'our' declaration which causes a failure pre 5.6.
+
+0.02    2008-04-09
+        - Removed "Test::Most".  Oops.  People shouldn't be dependent on that.
+
+0.01    2008-04-09
+        - Test whether your TAP is passing or failing.
+

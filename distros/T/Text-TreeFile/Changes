@@ -1,0 +1,8 @@
+Revision history for Perl extension Text::TreeFile.
+
+0.39  Fri Jul 21 11:11:11 2000
+        - documentation improvements and minor bug fixes
+
+0.38  Thu Jul 06 02:49:45 2000
+	- original version; created by h2xs 1.19
+

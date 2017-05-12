@@ -1,0 +1,16 @@
+
+Changes made in Sense-Clusters version 0.67 during version 0.69
+
+Anagha Kulkarni  kulka020@d.umn.edu
+Ted Pedersen 	 tpederse@d.umn.edu
+
+1. Updated the README.SC.pod to introduce and highlight the shift from 
+   Word Sense Disambiguation to Word-Clustering, Headless and With Head 
+   Clustering									 						    -Anagha
+
+2. Updated the NSP installation instructions in INSTALL document.			-Anagha
+ 
+3. Updated Makefile.PL and INSTALL in various small ways. 			- Ted
+
+(Changelog-v0.67to0.69 Last Updated on 06/12/2005 by Anagha)
+

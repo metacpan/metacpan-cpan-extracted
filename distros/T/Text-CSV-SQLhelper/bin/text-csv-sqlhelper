@@ -1,0 +1,260 @@
+#!/usr/bin/perl
+
+use Text::CSV;
+use Text::CSV::SQLhelper;
+use strict;
+use warnings;
+use Getopt::Std;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "text-csv-sqlhelper 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+	      "-f <file>\n".
+	      "-e <eol>\n".
+		  "-s <sep_char>\n".
+		  "-q <quote_char>\n".
+		  "-b <blank_is_undef>\n".
+		  "-w <allow_whitespace>\n".
+		  "-l <allow_loose_quotes>\n".
+		  "-E <escape_char>\n".
+		  "-L <allow_loose_escapes>\n".
+		  "-a <always_quote>\n".
+		  "-Q <quote_space>\n".
+		  "-n <quote_null>\n".
+		  "-p <print type>\n";
+}
+
+my %opts=();
+getopts('f:e:s:q:b:w:l:E:L:a:Q:n:p:', \%opts);
+
+#the hash that will be passed to Text::CSV
+my %newValues=(
+			   quote_char          => '"',
+			   escape_char         => '"',
+			   sep_char            => ',',
+			   eol                 => $\,
+			   always_quote        => 0,
+			   quote_space         => 1,
+			   quote_null          => 1,
+			   binary              => 0,
+			   keep_meta_info      => 0,
+			   allow_loose_quotes  => 0,
+			   allow_loose_escapes => 0,
+			   allow_whitespace    => 0,
+			   blank_is_undef      => 0,
+			   empty_is_undef      => 0,
+			   verbatim            => 0,
+			   auto_diag           => 0,
+			   );
+
+#sets the defaults
+if (defined($opts{e})) {
+	$newValues{eol}=$opts{e};
+}
+if (defined($opts{s})) {
+	$newValues{sep_char}=$opts{s};
+}
+if (defined($opts{q})) {
+	$newValues{quote_char}=$opts{q};
+}
+if (defined($opts{b})) {
+	$newValues{blank_is_undef}=$opts{b};
+}
+if (defined($opts{w})) {
+	$newValues{allow_whitespace}=$opts{w};
+}
+if (defined($opts{l})) {
+	$newValues{allow_loose_quotes}=$opts{l};
+}
+if (defined($opts{E})) {
+	$newValues{escape_char}=$opts{E};
+}
+if (defined($opts{L})) {
+	$newValues{allow_loose_escapes}=$opts{L};
+}
+if (defined($opts{a})) {
+	$newValues{always_quote}=$opts{a};
+}
+if (defined($opts{Q})) {
+	$newValues{quote_space}=$opts{Q};
+}
+if (defined($opts{n})) {
+	$newValues{quote_null}=$opts{n};
+}
+
+#sets up Text::CSV
+my $csv=Text::CSV->new(\%newValues);
+
+#setups the helper
+my $helper=Text::CSV::SQLhelper->new({csv=>$csv});
+
+#exit with the error code
+if ($helper->error) {
+	exit $helper->error;
+}
+
+my @columns=$helper->processFile($opts{f});
+
+my $int=0;
+
+#SQL variable type print
+if ((!defined($opts{p})) || ($opts{p} eq 'sql')) {
+	while (defined($columns[$int])) {
+		print $columns[$int]->{sql};
+
+		if (defined($columns[++$int ])) {
+			print ", ";
+		}
+	}
+
+	print "\n";
+
+	exit 0;
+}
+
+#use Dumper to print it
+if ($opts{p} eq 'dump') {
+
+	use Data::Dumper;
+
+	print Dumper(\@columns);
+
+	exit 0;
+}
+
+#generic print
+if ($opts{p} eq 'print') {
+	while (defined($columns[$int])) {
+		print $int.":sql:".$columns[$int]->{sql}."\n".
+		      $int.":allownull:".$columns[$int]->{allownull}."\n".
+		      $int.":max:".$columns[$int]->{max}."\n".
+		      $int.":min:".$columns[$int]->{min}."\n".
+		      $int.":type:".$columns[$int]->{type}."\n";
+
+		$int++;
+	}
+
+	exit 0;
+}
+
+
+=head1 NAME
+
+text-csv-sqlhelper - List tables available for a data sources.
+
+=head1 SYNOPSIS
+
+text-csv-sqlhelper B<-f> <file> [B<-e <eol> [B<-s> <sep_char>] [B<-q> <quote_char>] [B<-b> <blank_is_undef>] [B<-w> <allow_whitespace>] [B<-l> <allow_loose_quotes>] [B<-E> <escape_char>] [B<-L> <allow_loose_escapes>] [B<-a> <always_quote>] [B<-Q> <quote_space>] [B<-n> <quote_null>] [B<-p> <print type>]
+
+=head1 SWTICHES
+
+=head2 -f <file>
+
+The file to read.
+
+=head2 -e <eol>
+
+See the new section for "Text::SQL".
+
+=head2 -s <sep_char>
+
+See the new section for "Text::SQL".
+
+=head2 -q <quote_char>
+
+See the new section for "Text::SQL".
+
+=head2 -b <blank_is_undef>
+
+See the new section for "Text::SQL".
+
+=head2 -w <allow_whitespace>
+
+See the new section for "Text::SQL".
+
+=head2 -l <allow_loose_quotes>
+
+See the new section for "Text::SQL".
+
+=head2 -E <escape_char>
+
+See the new section for "Text::SQL".
+
+=head2 -L <allow_loose_escapes>
+
+See the new section for "Text::SQL".
+
+=head2 -a <always_quote>
+
+See the new section for "Text::SQL".
+
+=head2 -Q <quote_space>
+
+See the new section for "Text::SQL".
+
+=head2 -n <quote_null>
+
+See the new section for "Text::SQL".
+
+=head2 -p <print type>
+
+Print the data using one of the specified print types.
+
+If none is specified, "sql" is used.
+
+=head3 sql
+
+Prints them the SQL variable information on a single line seperated by ", ".
+
+=head3 dump
+
+Prints the returned columns array via Data::Dumper;
+
+=head3 print
+
+Prints each every variable for each column in the form "$column:$variable:$value".
+
+=head1 EXIT CODES
+
+Any non-zero exit codes are the error codes returned by "Text::CSV::SQLhelper".
+
+=head1 AUTHOR
+
+Copyright (c) 2010, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 Changelog
+
+=head2 2010-04-01/07:30 0.0.0
+
+Initial release.
+
+=cut

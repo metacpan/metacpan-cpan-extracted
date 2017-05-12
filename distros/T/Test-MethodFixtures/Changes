@@ -1,0 +1,47 @@
+Revision history for Test-MethodFixtures
+
+0.08  2016-02-26 09:44:10 GMT
+
+ [MAINTENANCE]
+ - correcting test failures with dependencies
+
+0.07  2015-12-12 07:23:12 GMT
+
+ [IMPORTANT - Breaking change]
+ - switching package hierarchy separator from '::' to '-' to support Windows file systems
+ [Bugfix]
+ - works if mocked method alters @_
+
+0.06  2015-12-07 18:32:23 GMT
+
+ [Bugfix]
+ - void context works as expected
+ - version mismatch warnings work as expected
+
+0.05  2015-12-07 17:09:28 GMT
+
+ [Bugfix]
+ - #1 Can't use an undefined value as a HASH reference - broken constructor arguments
+
+0.04  2015-04-13 16:45:58 BST
+
+ [Internal & API change]
+ - refactor to remove is_stored() method. retrieve() now makes empty return if not found (and dies later). 
+
+0.03  2015-04-13 11:21:25 BST
+
+ [API Change]
+ - 'storage' argument no longer can be used to set directory for default File storage
+
+ [Testing]
+ - reduced testing dependencies, dummy test storage object
+
+0.02  2015-04-10 17:31:12 BST
+
+ [Feature]
+ - Adding support for documented TEST_MF_MODE environment variable
+
+0.01  2015-04-10 17:05:06 BST
+
+ - Initial release
+

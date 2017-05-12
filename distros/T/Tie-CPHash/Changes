@@ -1,0 +1,39 @@
+Revision history for Perl extension Tie::CPHash.
+
+2.000  2015-01-17
+	- improved documentation
+
+1.900  2014-10-04 (Trial Release)
+	- new method: add
+	- can now pass an initial list while tying
+	- now requires Perl 5.6.0 or later
+
+1.06   2013-11-09
+	- no functional changes
+	- release tests moved to xt/
+
+1.05   2012-01-20
+	- no functional changes
+	- now built with Dist::Zilla (includes v2 META.json)
+	- repository now publicly available on GitHub
+
+1.04   2008-04-26
+	- no functional changes
+	- fixed conflict with build system and Perl 5.005
+	- minor clean up to documentation
+
+1.03   2007-03-22
+	- no functional changes
+	- converted to Module::Build
+	- added tests
+	- updated my email address
+
+1.02   2006-03-12
+	- added SCALAR method (thanks to Yitzchak Scott-Thoennes)
+	- updated my email address
+
+1.001  1998-10-25
+	- updated my email address
+
+1.000  1998-01-15
+	- first public release; created by h2xs 1.18

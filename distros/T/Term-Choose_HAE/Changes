@@ -1,0 +1,25 @@
+Revision history for Term::Choose_HAE
+
+
+0.051   2016-08-14
+        - "Term::Choose": minimum version "1.505".
+
+0.050   2016-02-21
+        - "Term::Choose": minimum version "1.500".
+
+0.021_02   2016-02-15
+        - Sync "__copy_orig_list" with "Term::Choose".
+
+0.021_01   2016-02-14
+        - Requires "Term::Choose::LineFold".
+        - Code refactoring.
+        - Update year copyright.
+
+0.021   2015-10-05
+        - Fixed: depends on module (Term::Choose::Constants) not on CPAN [RT #107535 - Alexandr Ciornii].
+
+0.020   2015-10-04
+        - Update documentation.
+
+0.019   2015-10-02
+        - First release on cpan.

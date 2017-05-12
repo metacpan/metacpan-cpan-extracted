@@ -1,0 +1,46 @@
+Test-XHTML
+==========
+
+This distribution aims to help web developers keep their web pages valid and
+accessible. While by no means complete, the tests that can be performed
+should go a long way to help clean HTML code.
+
+Using a list of files or URLs, or even a single site path, this distribution
+can be used to point a one or more web pages.
+
+There are three types of tests that can be enabled, DTD Validation, WAI WCAG
+v2.0 compliance and basic Best Practices, so you can try and be as complete as
+you need to be.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor::Fast
+  Data::Dumper
+  File::Basename
+  File::Find::Rule
+  File::Path
+  Getopt::Long
+  HTML::TokeParser
+  IO::File
+  Test::Builder
+  WWW::Mechanize
+  XML::Catalogs::HTML
+  XML::LibXML
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2008-2015 by Barbie <barbie@missbarbell.co.uk>
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

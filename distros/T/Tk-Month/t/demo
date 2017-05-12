@@ -1,0 +1,44 @@
+#! /usr/bin/env perl
+
+# Demo programme.
+# 3 panels, one each containing a exit button, a StrfClock and a
+# calender.
+
+BEGIN { $^W = 1; }
+
+use 5;
+use lib './blib/lib';
+use Tk;
+use Tk::Panel;
+use Tk::StrfClock;
+use Tk::Month;
+use Tk::Year;
+
+$top=MainWindow->new();
+$frame=$top->Frame()->pack(-expand=>1, -fill=>'x');
+
+# Exit button in a panel.
+$f = $frame->Panel(-toggle=>0)->pack(-side=>'right');
+$m = $f->Button(
+	-text		=> 'Exit',
+	-command	=> sub { exit; },
+)->pack();
+
+# Strftime based clock in a panel with title.
+$f = $frame->Panel(-text=>'Tk::StrfClock', -flatheight=>'flat')->pack(-side=>'left');
+$m = $f->StrfClock()->pack();
+
+# Month based calender in a panel with title.
+$f = $top->Panel(-text=>'Tk::Month')->pack(-anchor=>'nw');
+$m = $f->Month()->pack();
+
+# Year based calender in a panel with title.
+$f = $top->Panel(
+	-text=>'Tk::Year',
+	-show	=> 0,
+)->pack(-anchor=>'nw', -expand=>1, -fill=>'both');
+$m = $f->Year()->pack();
+
+# Run.
+MainLoop;
+

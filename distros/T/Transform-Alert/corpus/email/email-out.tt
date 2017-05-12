@@ -1,0 +1,10 @@
+[%- USE env = EnvHash -%]
+To: [% env.TATEST_EMAIL_ADDY %]
+From: [% env.TATEST_EMAIL_ADDY %]
+Subject: Email Alert - [% subject %]
+
+We found a problem on this device:
+
+Name    : [% name %]
+Problem : [% problem %]
+Ticket #: [% ticket %]

@@ -1,0 +1,14 @@
+Build.PL
+CHANGES
+lib/Test/Class/Filter/Tags.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01-basics.t
+t/02-tags_on_fixtures.t
+t/03-tag_inheritance.t
+t/04-overriding_tags.t
+t/05-custom-base.t
+t/06-method_has_tag.t

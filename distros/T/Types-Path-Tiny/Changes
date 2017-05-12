@@ -1,0 +1,26 @@
+Revision history for Types-Path-Tiny
+
+0.005     2013-06-21 15:58:27 America/New_York
+
+    - Removed MooseX::Types::Path::Tiny given pending
+      split into separate dists
+
+0.004     2013-06-21 13:05:55 America/New_York
+
+    - Bumped Type::Tiny prereq to avoid known bugs in it
+
+0.003     2013-06-20 16:01:13 America/New_York
+
+    - Converted to Type::Tiny; works with Moose or Moo now
+
+    - Dropped Perl prereq to v5.8.1
+
+0.002     2013-02-12 09:35:41 America/New_York
+
+    - Bump Moose version prereq to 2, just in case anyone out there still
+      has version 1 installed.
+
+0.001     2013-01-31 10:45:24 America/New_York
+
+    - First release
+

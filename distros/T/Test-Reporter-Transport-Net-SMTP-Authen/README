@@ -1,0 +1,34 @@
+Test-Reporter-Transport-Net-SMTP-Authen version 1.00
+====================================================
+
+Allows use Test::Reporter with Authenticated SMTP GateWay
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Test::Reporter 
+Net::SMTP
+Authen::SASL
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by A.G. Grishaev
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

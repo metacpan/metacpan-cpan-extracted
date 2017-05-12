@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ -e TaskForest_Foo ]; then
+	rm -f TaskForest_Foo
+	exit 0
+else
+	echo "" >  TaskForest_Foo
+	exit 1
+fi

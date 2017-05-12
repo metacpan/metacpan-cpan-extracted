@@ -1,0 +1,6 @@
+Revision history for Perl extension Time::Compare.
+
+0.01  Thu May 27 15:27:11 2004
+	- original version; created by h2xs 1.22 with options
+		-cfn Time::Compare
+

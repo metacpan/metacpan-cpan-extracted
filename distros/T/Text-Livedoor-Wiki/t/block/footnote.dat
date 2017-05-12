@@ -1,0 +1,36 @@
+=== basic 
+--- wiki
+wiki ((wiki is wiki)) hoge
+livedoor ((livedoor is livedoor)) hoge
+--- html
+wiki <a href="#footer-footnote1" name="footnote1">*1</a> hoge<br />
+livedoor <a href="#footer-footnote2" name="footnote2">*2</a> hoge
+<div class="footer-footnote">
+<hr />
+<ul class="list-1">
+<li><a href="#footnote1" name="footer-footnote1">*1 </a> : wiki is wiki</li>
+<li><a href="#footnote2" name="footer-footnote2">*2 </a> : livedoor is livedoor</li>
+<ul>
+</div>
+=== )
+--- wiki
+wiki (( &color(red){hoge} hoge ))
+--- html
+wiki <a href="#footer-footnote1" name="footnote1">*1</a>
+<div class="footer-footnote">
+<hr />
+<ul class="list-1">
+<li><a href="#footnote1" name="footer-footnote1">*1 </a> :  <span style="color:red;">hoge</span> hoge </li>
+<ul>
+</div>
+=== ))
+--- wiki
+hoge (( hoge )) )) hoge
+--- html
+hoge <a href="#footer-footnote1" name="footnote1">*1</a> )) hoge
+<div class="footer-footnote">
+<hr />
+<ul class="list-1">
+<li><a href="#footnote1" name="footer-footnote1">*1 </a> :  hoge </li>
+<ul>
+</div>

@@ -1,0 +1,6 @@
+The following job has succeeded after failing initially.
+
+Family:         $TASKFOREST_FAMILY_NAME
+Job:            $TASKFOREST_JOB_NAME
+Exit Code:      $TASKFOREST_RC
+No. of Retries: $TASKFOREST_RETRY of $TASKFOREST_NUM_RETRIES 

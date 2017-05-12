@@ -1,0 +1,84 @@
+---
+abstract: 'modules I use'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v0.12.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-TOKUHIROM
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Task::BeLike::TOKUHIROM:
+    file: lib/Task/BeLike/TOKUHIROM.pm
+    version: '0.02'
+requires:
+  Amon2: '0'
+  AnyEvent: '0'
+  App::cpanminus: '0'
+  App::scan_prereqs_cpanfile: '0'
+  Carton: '0'
+  Class::Accessor::Lite: '0'
+  Coro: '0'
+  DBD::SQLite: '0'
+  DBD::mysql: '0'
+  DBI: '0'
+  Devel::NYTProf: '0'
+  Email::Send: '0'
+  Email::Sender: '0'
+  File::Find::Rule: '0'
+  File::ShareDir: '0'
+  File::Zglob: '0'
+  File::pushd: '0'
+  Filesys::Notify::Simple: '0'
+  Furl: '0'
+  GDBM_File: '0'
+  HTML::FillInForm: '0'
+  HTML::TreeBuilder::XPath: '0'
+  Imager: '0'
+  JSON::PP: '0'
+  JSON::XS: '0'
+  Linux::Inotify2: '0'
+  MetaCPAN::API: '0'
+  Minilla: '0'
+  Moo: '0'
+  Mouse: '0'
+  POSIX::AtFork: '0'
+  Parallel::Prefork: '0'
+  Perl::Build: '0'
+  Plack: '0'
+  Pod::Simple: '0'
+  Spellunker: '0'
+  Starlet: '0'
+  Teng: '0'
+  Test::More: '0'
+  Text::CSV_XS: '0'
+  Text::MicroTemplate: '0'
+  Text::Xslate: '0'
+  UnQLite: '0'
+  WWW::Mechanize: '0'
+  Web::Query: '0'
+  XML::LibXML: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/Task-BeLike-TOKUHIROM/issues
+  homepage: https://github.com/tokuhirom/Task-BeLike-TOKUHIROM
+  repository: git://github.com/tokuhirom/Task-BeLike-TOKUHIROM.git
+version: '0.02'

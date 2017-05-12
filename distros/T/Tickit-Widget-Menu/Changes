@@ -1,0 +1,59 @@
+Revision history for Tickit-Widget-Menu
+
+0.11    2017/02/15 15:10:17
+        [CHANGES]
+         * No longer need to use ->tickit->later for geometry changes, since
+           Tickit 0.49
+
+        [BUGFIXES]
+         * Clear initial expose event on root window before running termlog
+           unit tests
+
+0.10    2016/08/08 14:01:40
+        [CHANGES]
+         * Updated for Tickit 0.57:
+            + Use $win->bind_event instead of $win->set_on_*
+
+0.09    2014/12/01 01:35:24
+        [CHANGES]
+         * Document ->highlight_idx() method and ensure it works to pre-light
+           an item before the menu is actually displayed
+
+0.08    2014/04/12 14:37:24
+        [CHANGES]
+         * Avoid $rb->flush_to_window in unit tests; perform testing directly
+           to mockterm
+
+0.07    2014/04/01 22:49:12
+        [BUGFIXES]
+         * Remember to flush_tickit after ->dismiss in unit tests
+         * Depend on Tickit >= 0.43 for new rendering order
+         * Declare $VERSION in itembase.pm
+
+0.06    2014/01/13 00:09:59
+        [CHANGES]
+         * Updated for Tickit 0.42:
+            + Use new Window expose with_rb event
+
+0.05    CHANGES:
+         * Allow a separator in MenuBar to right-justify remaining items
+         * Added key event handling logic - F10 to popup menu bar, arrows to
+           navigate, Enter to select, Escape to dismiss
+         * Use Tickit::Style information for keypress events
+         * Neater use of RenderBuffer to allow more flexibility in future
+
+0.04    CHANGES:
+         * Updated to use Tickit::RenderBuffer and ->render_to_rb
+         * Second click on MenuBar should dismiss the menu
+         * Load T:W:Menu::Item automatically
+
+0.03    CHANGES:
+         * Use Tickit::Style for pen configuration
+         * Updated to Tickit::RenderContext 0.07
+
+0.02    CHANGES:
+         * Rewrite rendering logic to use Tickit::RenderContext
+         * Use real linedrawing
+
+0.01    First version, released on an unsuspecting world.
+

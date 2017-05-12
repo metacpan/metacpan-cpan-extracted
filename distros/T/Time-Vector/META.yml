@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Time-Vector
+version:             1.1
+abstract:            A bit for every minute
+license:             GPLv2
+author:              
+    - Alessandro Zummo <a.zummo@towertech.it>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Bit::Vector:                   0
+    Class::Accessor::Fast:         0
+    Time::Seconds:                 0
+    Time::Simple::Range:           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,75 @@
+{
+   "abstract" : "Testing tools for Alien modules",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Alien",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Exporter" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::ParseXS" : "3.21",
+            "File::Which" : "1.10",
+            "Test2" : "1.302015",
+            "Test2::Suite" : "0.000060",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000060",
+            "Test::More" : "0.94",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perl5-Alien/Test-Alien/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Test::Alien",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Perl5-Alien/Test-Alien.git",
+         "web" : "https://github.com/Perl5-Alien/Test-Alien"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.14",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

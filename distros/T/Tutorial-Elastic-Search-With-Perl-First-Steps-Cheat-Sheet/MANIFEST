@@ -1,0 +1,11 @@
+Changes
+lib/Tutorial/Elastic/Search/With/Perl/First/Steps/Cheat/Sheet.pm
+lib/Tutorial/Elastic/Search/With/Perl/First/Steps/Cheat/Sheet/Geo/Point/Distance.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

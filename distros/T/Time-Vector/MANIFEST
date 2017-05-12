@@ -1,0 +1,8 @@
+MANIFEST
+AUTHORS
+TODO
+ChangeLog
+lib/Time/Vector.pm
+Makefile.PL
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

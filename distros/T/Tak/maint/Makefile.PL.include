@@ -1,0 +1,23 @@
+BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+use lib 'Distar/lib';
+use Distar;
+use IO::All;
+
+author 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>';
+
+manifest_include bin => qr/[^.].*/;
+
+# rebuild the fatpacked lib/Tak/STDIONode.pm
+system("maint/mk-fat");
+
+# rip the example Takfile out of the synopsis so I can play with it
+# more easily
+my $tak_pm = io('lib/Tak.pm')->all;
+
+my ($takfile) = $tak_pm =~ /(  package Tak::MyScript.*?  1;\n)/s;
+
+$takfile =~ s/^  //mg;
+
+io('Takfile')->print($takfile);
+
+1;

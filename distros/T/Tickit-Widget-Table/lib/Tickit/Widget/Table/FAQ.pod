@@ -1,0 +1,16 @@
+=encoding utf8
+
+=head1 NAME
+
+Tickit::Widget::Table::FAQ - some suggestions for using L<Tickit::Widget::Table>
+
+=head1 VERSION
+
+version 0.216
+
+=head1 DESCRIPTION
+
+Currently this is empty, aside from a pointer to the examples/ directory in
+the source distribution.
+
+=cut

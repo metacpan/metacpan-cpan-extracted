@@ -1,0 +1,29 @@
+start
+#switch ##value##
+pre
+#case "dog"
+found dog
+#case "cat"
+found cat
+#case "roach"
+found roach
+#default
+found default
+#endswitch
+done
+
+#switch ##value##
+test0
+#endswitch
+
+#switch ##value##
+test1
+#default
+test2
+#endswitch
+
+#switch ##value##
+#case "cat"
+#default
+defaulted to dog
+#endswitch

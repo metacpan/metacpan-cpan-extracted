@@ -1,0 +1,51 @@
+---
+abstract: 'unofficial departure monitor for "Unified Realtime'
+author:
+  - 'Copyright (C) 2013-2016 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>'
+build_requires:
+  File::Slurp: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Travel-Status-DE-URA
+provides:
+  Travel::Status::DE::ASEAG:
+    file: lib/Travel/Status/DE/ASEAG.pm
+    version: '2.01'
+  Travel::Status::DE::MvgMainz:
+    file: lib/Travel/Status/DE/MvgMainz.pm
+    version: '2.01'
+  Travel::Status::DE::URA:
+    file: lib/Travel/Status/DE/URA.pm
+    version: '2.01'
+  Travel::Status::DE::URA::Result:
+    file: lib/Travel/Status/DE/URA/Result.pm
+    version: '2.01'
+  Travel::Status::DE::URA::Stop:
+    file: lib/Travel/Status/DE/URA/Stop.pm
+    version: '2.01'
+  Travel::Status::GB::TFL:
+    file: lib/Travel/Status/GB/TFL.pm
+    version: '2.01'
+requires:
+  Carp: '0'
+  Class::Accessor: '0'
+  DateTime: '0'
+  DateTime::Format::Duration: '0'
+  Getopt::Long: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  Text::CSV: '0'
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: '2.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,12 @@
+Revision history for Task-Latemp:
+
+0.0102  2015-05-30
+    - META.yml: add repository, homepage and keywords.
+
+0.0101  2014-01-31
+    - Minimal version of perl
+    - Convert to Module::Build
+    - Add LICENSE file (CPANTS).
+
+0.0100  2006-06-12
+    - First version, released on an unsuspecting world.

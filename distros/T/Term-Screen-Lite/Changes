@@ -1,0 +1,10 @@
+Revision history for Term::Screen::Lite
+
+0.03  Mon Nov 23 09:50:00 2015
+      - Added key 'provides' to the Makefile.PL script.
+
+0.02  Wed Oct 07 10:20:00 2015
+      - Added LICENSE file.
+
+0.01  Sat May 30 21:00:00 2015
+      - Module Created.

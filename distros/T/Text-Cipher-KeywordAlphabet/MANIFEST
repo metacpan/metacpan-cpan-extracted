@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Text/Cipher/KeywordAlphabet.pm
+t/keyword_alphabet.t
+t/pod.t
+t/pod_coverage.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,22 @@
+Text-RewriteRules
+=================
+
+This module provides a simple way to write rules to rewrite text
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Alberto Simões and José João Almeida
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

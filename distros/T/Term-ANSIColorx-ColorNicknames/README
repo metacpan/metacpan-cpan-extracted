@@ -1,0 +1,12 @@
+I've been using a tool for years that I find so handy that I can't believe
+nobody else has done it.  Or, perhaps they have.
+
+The tool is called 'hi' and it's an optional part of this module, which is
+ostensibly the two Term::ANSIColor extensions:
+
+Term::ANSIColorx::ColorNicknames
+  * some color nicknames, because the regular ANSI color names 
+    don't make sense to me.
+
+Term::ANSIColorx::AutoFilterFH
+  * a special filtered filehandle that colorizes things as they pass

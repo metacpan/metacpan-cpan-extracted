@@ -1,0 +1,46 @@
+---
+abstract: 'type constraints with coercion to load the class'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0.96
+  Test::Requires: 0.06
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Types-LoadableClass
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Types::LoadableClass:
+    file: lib/Types/LoadableClass.pm
+    version: 0.003
+requires:
+  Class::Load: 0
+  Module::Runtime: 0
+  Type::Library: 0.026
+  Type::Utils: 0.026
+  Types::Standard: 0.026
+  perl: 5.006001
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Types-LoadableClass
+  homepage: https://metacpan.org/release/Types-LoadableClass
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-types-loadableclass.git
+version: 0.003
+x_contributors:
+  - 'Dagfinn Ilmari Mannsåker (ILMARI) <ilmari@cpan.org>'

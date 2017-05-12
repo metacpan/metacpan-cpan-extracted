@@ -1,0 +1,134 @@
+#!/usr/bin/perl
+
+# Copyright (c) 1999-2000 Mark Summerfield. All Rights Reserved.
+# May be used/distributed under the GPL.
+
+use strict;
+use warnings;
+
+use Path::Tiny;
+use Getopt::Long ;
+use File::Basename ;
+use File::Find ;
+use File::Path ;
+use Symbol ;
+use Text::MacroScript ;
+
+use vars qw( $VERSION ) ;
+$VERSION = '2.11';
+
+my %Opt ;
+
+&getoptions ;
+
+my $Macro = Text::MacroScript->new( 
+                -embedded => $Opt{'prep'} ? 0 : 1,
+                -file     => [ $Opt{'file'} ],
+                ) ;
+
+find( { preprocess 	=> \&preprocess, 
+		wanted		=> \&wanted, 
+	  },
+	  scalar @ARGV ? @ARGV : '.' ) ;
+
+sub preprocess {
+	return sort(@_);
+}
+
+sub wanted {
+    return unless /\.m$/o ;
+
+    my $file    = $_ ;
+    my $newfile = $file ; 
+    $newfile =~ s/\.m$//o ;
+    my $showdir = "$File::Find::dir/" ;
+    if( $Opt{'dir'} ) {
+        my $targetdir = $showdir ;
+        if( $targetdir =~ m,^\./,o ) {
+            $targetdir =~ s,^\./,$Opt{'dir'},o ; 
+        }
+        else {
+            $targetdir =~ s/^$Opt{'root'}/$Opt{'dir'}/o ; 
+        }
+        $targetdir .= '/' unless $targetdir =~ /\/$/o ;
+        $newfile = $targetdir . $newfile ;
+        $showdir = '' ;
+    }
+    if( $Opt{'force'} or ( not -e $newfile ) or 
+       ( (stat( $newfile ))[9] < (stat( $file ))[9] ) ) { 
+        print STDERR "Expanding macros in $File::Find::name to $showdir$newfile\n" 
+        if $Opt{'verbose'} ;
+        eval {
+            if( not $showdir ) { # Possibly new directory
+                my $path = dirname( $newfile ) ;
+                if( not -e $path ) {
+                    print STDERR "Creating $path\n" if $Opt{'verbose'} ;
+                    mkpath( $path ) ;
+                }
+            }
+            my $fh = gensym ;
+            open  $fh, ">$newfile" or 
+            die "Open '$newfile' failed: $!\n" ;
+            print $fh $Macro->expand_file( $file ) ;
+            close $fh ;
+        } ;
+        warn $@ if $@ ;
+    }
+    elsif( $Opt{'verbose'} ) {
+        print STDERR "$showdir$newfile is up to date\n" 
+    }
+}
+
+
+sub getoptions {
+
+    # Defaults.
+    $Opt{'dir'}     = '' ;
+    $Opt{'force'}   = 0 ;
+    $Opt{'file'}    = 'macro' ;
+    $Opt{'prep'}    = 0 ;
+    $Opt{'root'}    = Path::Tiny->cwd ;
+    $Opt{'verbose'} = 0;
+
+    &help if defined $ARGV[0] and $ARGV[0] =~ /^(-h|--help)$/o ;
+
+    Getopt::Long::config 'no_ignore_case' ;
+    GetOptions( \%Opt,
+        'dir|d=s',
+        'force|f',
+        'file|F=s',
+        'prep|p',
+        'verbose|v',
+        ) or &help ;
+
+    $Opt{'dir'} .= '/' if $Opt{'dir'} and $Opt{'dir'} !~ /\/$/o ;
+}
+
+sub help {
+
+    print STDERR <<__EOT__ ;
+
+macrodir v $VERSION. Copyright (c) Mark Summerfield 1999-2000. 
+All rights reserved. May be used/distributed under the GPL.
+
+usage: macrodir [options] <path>
+
+-d --dir       Put output files in <dir> instead of $Opt{'root'}
+-f --force     Force conversion [$Opt{'force'}]
+-F --file      Take macros from this file [$Opt{'file'}]
+-h --help      Show this screen and exit
+-p --prep      Operate as macro pre-processor instead of an embedded macro
+               expander
+-v --verbose   Verbose [$Opt{'verbose'}]
+
+Loads the macros from file '$Opt{'file'}' in the current directory then expands
+macros embedded in <: and :> in every .m file in the current directory and any
+subdirectories. 
+
+Text::MacroScript now supplies a function relpath which returns the relative
+path. (See html.macro example file for usage and Text::MacroScript.pm and
+macropp documentation.)
+__EOT__
+    exit ;
+}
+

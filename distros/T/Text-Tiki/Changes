@@ -1,0 +1,79 @@
+Text::Tiki - TikiText
+CHANGE LOG
+
+0.73 January 6 2004
+* Fixed bug in macro handler routine and mt-tikitext macro. 
+* Documentation fixes.
+
+0.72 December 21 2003
+* Initial Release in CPAN (finally!)
+* Code clean-up
+* Proper POD documentation added
+* Cleans out false negatives linebreaks to avoid trouble during formatting
+* Fixed bug where typographic processing was being applied were it shouldn't
+* Simplification of experimental macro function calls
+* Added simple spam obfuscation on mailto links
+* Updated Movable Type documentation link in mt-tikitext
+
+0.71 July 17 2003
+* Added omitted stash function
+* Fixed bug in block_format routine where "blank" lines containing only whitespace was not recognized not recognized as a block termination.
+
+0.70 June 23 2003
+* Introduction of Wiki functions
+* Introduction of experimental Macro functions
+* Added MTIncludeModule macros to mt-tikitext. (Experimental)
+
+0.60 June 22 2003
+* Complete refactoring of the code (again) to fix numerous bugs and provide better reliability and optimization.
+
+0.52 April 01 2003
+* Fixed table alignment bug where < & > where encoded instead of interpreted. (Peter Gallagher)
+* Fixed bug where double dashes was being interpreted as <del> tags instead of the emdash typographic symbol (Peter Gallagher & Dale Emery)
+* Cleaned up more 'uninitialized value' warning sloppiness.
+* Fixed bug where blank lines where blank lines where being interpreted as a list item. (Dale Emery)
+* Partially fixed list nesting. More to go. (Robert Hahn)
+* Fixed hyperlink regular expression where puncuations where being captured into the URL of hyperlinks at the end of a line.
+
+0.51 March 12 2003
+* Patched text hyperlink greediness. (Brad Adkins)
+* Cleaned up sloppiness that caused 'uninitialized value' warning when used with MovableType (Graham Walker)
+
+0.50 March 10 2003
+* Extensive rewrite for better functionality and future enhancements.
+* Changed code symbol from | (pipe) to %.
+* Added very basic image insert notation capabilities.
+* Added Wiki-style table support using | (pipe).
+* Blockquotes can be nested.
+* Blockquotes can contain lists and other block formatting.
+* Switched to WikiWord target names as opposed to camel case.
+* One line definitions and terms are not supported.
+* <pre> blocks can included TikiText notation. TikiText is still ignored in <code> blocks.
+
+0.17 February 26 2003
+* fixed bugged where formatting immediately in () and {} was not recognized.
+* fixed improper coding of anchor targets. (Paul Holbrook)
+* refactored inline linking into its own subroutine.
+
+0.16 February 17 2003
+* Minor optimizations.
+* PRE and CODE blocks ignore inline formatting symbols.
+* Better (though not great) documentation.
+* First public release.
+ 
+0.15 February 14 2003 
+* Refactored inline formating code to resolve a number of issues:
+** Puncuation is treated as an ending delimiter along with whitespace.
+** Compound inline formatting (i.e. /*WOW!*/ strong and emphasis) is now supported.
+** Overlapping tags are not supported (i.e. *This is /invalid* formatting/. Strong (*) would be processed and emphasis (/) would be ignored with no complaining.)
+* Developed alpha of MovableType text formatting and container tag plugin.
+
+0.11 February 11 2003
+* Failed attempt to implement issues flagged by Jason Kottke (http://www.kottke.org/).
+** Puncuation must be inside inline formatting markers for Tiki to process the string.
+** Strong inside of Emphasis did not work. (i.e. /well *hello* there/ failed.)
+* Other bug fixes and optimizations.
+
+0.1 February 4 2003
+* Iniitial working release for private beta.
+* Developed alpha trans-tiki.pl command-line translator tool.

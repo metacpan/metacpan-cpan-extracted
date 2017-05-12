@@ -1,0 +1,24 @@
+This is the README file for the PERL module Text::Yats for Version 0.03
+
+Text::Yats - Yet Another Templete System
+
+This is yet another module for template-based text generation. You can
+store a template in a file outside your program. People can modify the
+template without modifying the program.
+
+To install Text::Yats:  
+  
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+You can access the Text::Yats documentation with perldoc Text::Yats
+For examples look at examples directory
+
+Questions, bug reports, useful code bits, and suggestions for Text::Yats
+hould just be sent to to me at hdias@esb.ucp.pt
+
+Copyright (c) 2001 Henrique Dias. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

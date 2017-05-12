@@ -1,0 +1,19 @@
+Revision history for Text-ANSI-WideUtil
+
+0.22    2016-03-11 (PERLANCAR)
+
+        - No functional changes.
+
+        - Update docs (Text::ANSI::NonWideUtil has been removed).
+
+
+0.21    2015-08-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add some description and mention Text::ANSI::NonWideUtil.
+
+
+0.20    2015-08-20 (PERLANCAR)
+
+        - First release, split from Text-ANSI-Util.

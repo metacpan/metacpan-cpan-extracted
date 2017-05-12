@@ -1,0 +1,430 @@
+{
+   "abstract" : "Easier test cases for your DBIx::Class applications",
+   "author" : [
+      "John Napiorkowski C<< <jjnapiork@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-DBIx-Class",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "mysql" : {
+         "description" : "MySql Support",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Test::mysqld" : "0.14"
+               }
+            }
+         }
+      },
+      "postgres" : {
+         "description" : "Postgresql Support",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DateTime::Format::Pg" : "0",
+                  "Test::Postgresql58" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0.19",
+            "DBIx::Class" : "0.08123",
+            "DBIx::Class::Schema::PopulateMore" : "0.16",
+            "DBIx::Class::TimeStamp" : "0.13",
+            "DBIx::Class::UUIDColumns" : "0.02005",
+            "Data::UUID" : "1.215",
+            "Data::Visitor" : "0.27",
+            "Digest::MD5" : "2.39",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Hash::Merge" : "0.11",
+            "List::MoreUtils" : "0.22",
+            "Module::Runtime" : "0.013",
+            "Moose" : "1.10",
+            "MooseX::Attribute::ENV" : "0.01",
+            "MooseX::Types" : "0.23",
+            "Path::Class" : "0.21",
+            "SQL::Translator" : "0.11006",
+            "Scalar::Util" : "1.23",
+            "Sub::Exporter" : "0.982",
+            "Test::Builder" : "0.96",
+            "Test::Deep" : "0.106"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Test::DBIx::Class" : {
+         "file" : "lib/Test/DBIx/Class.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::DefaultRS" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/DefaultRS.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::CD" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/CD.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::CD::Artist" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/CD/Artist.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::CD::Track" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/CD/Track.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::Company" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/Company.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::Company::Employee" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/Company/Employee.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::GermanPhone" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/GermanPhone.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::Job" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/Job.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::Person" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/Person.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::Person::Artist" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/Person/Artist.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::Person::Employee" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/Person/Employee.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::Phone" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/Phone.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::Result::RussianPhone" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/Result/RussianPhone.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Example::Schema::ResultSet" : {
+         "file" : "lib/Test/DBIx/Class/Example/Schema/ResultSet.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::FixtureCommand::Populate" : {
+         "file" : "lib/Test/DBIx/Class/FixtureCommand/Populate.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::FixtureCommand::PopulateMore" : {
+         "file" : "lib/Test/DBIx/Class/FixtureCommand/PopulateMore.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Role::FixtureCommand" : {
+         "file" : "lib/Test/DBIx/Class/Role/FixtureCommand.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::SchemaManager" : {
+         "file" : "lib/Test/DBIx/Class/SchemaManager.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::SchemaManager::Trait::SQLite" : {
+         "file" : "lib/Test/DBIx/Class/SchemaManager/Trait/SQLite.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::SchemaManager::Trait::Testmysqld" : {
+         "file" : "lib/Test/DBIx/Class/SchemaManager/Trait/Testmysqld.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::SchemaManager::Trait::Testpostgresql" : {
+         "file" : "lib/Test/DBIx/Class/SchemaManager/Trait/Testpostgresql.pm",
+         "version" : "0.52"
+      },
+      "Test::DBIx::Class::Types" : {
+         "file" : "lib/Test/DBIx/Class/Types.pm",
+         "version" : "0.52"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/Test-DBIx-Class/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jjn1056/Test-DBIx-Class.git",
+         "web" : "https://github.com/jjn1056/Test-DBIx-Class"
+      }
+   },
+   "version" : "0.52",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.020002"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
+            "name" : "Prereqs::FromCPANfile",
+            "version" : "0.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [],
+                  "exclude_match" : [],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 0,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               }
+            },
+            "name" : "@Starter/GatherDir",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Starter/PruneCruft",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Starter/ManifestSkip",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Starter/MetaConfig",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.007"
+                     }
+                  ]
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.001011",
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
+               }
+            },
+            "name" : "@Starter/MetaProvides::Package",
+            "version" : "2.003002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@Starter/MetaNoIndex",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Starter/MetaYAML",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@Starter/MetaJSON",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Starter/License",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Starter/ExecDir",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Starter/ShareDir",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@Starter/PodSyntaxTests",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
+            "name" : "@Starter/Test::ReportPrereqs",
+            "version" : "0.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Starter/MakeMaker",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Starter/Manifest",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Starter/TestRelease",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RunExtraTests",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Starter/RunExtraTests",
+            "version" : "0.028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Starter/ConfirmRelease",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Starter/UploadToCPAN",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::VersionFromModule",
+            "name" : "VersionFromModule",
+            "version" : "0.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::Meta",
+            "name" : "GitHub::Meta",
+            "version" : "0.42"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "6.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.007"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "6.007"
+      }
+   },
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

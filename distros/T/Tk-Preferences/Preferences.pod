@@ -1,0 +1,174 @@
+=head1  NAME
+
+Tk::Preferences - a perl module for setting font and color preferenes in all children of a perl/Tk
+widget.
+
+=head1  SYNOPSIS
+
+use Tk;
+
+require Tk::Preferences;
+
+$mw->SetPrefs(-prefs => \%preferences);
+
+=head1  How This Works
+
+To start with, let it be known that this is a ridiculously simple module, and that there are other
+(arguably better) ways to accomplish the same end. In particular, you should take a look at Tk::CmdLine, 
+and Tk::ColorEditor. You might also want to take a look at using Xresources files. That being said, 
+I have personally found this to be a preferable method of handling user-defined GUI preferences, because
+it's easy ... at least it seems that way to me. You be the judge ... ;-)
+
+Let it also be known that to get this to work I had to manually insert the SetPrefs method
+into the Tk::* namespace. This is generally frowned upon, but it works, and so I'm not complaining.
+
+This works by using the Tk::Walk method against what ever parent widget you call
+to visit each child widget. The child widget is then configured based on it's type and the data
+you send into SetPrefs.
+
+=head1 Preference Data
+
+preference data is stored in a hash format. Each key in the hash represents a type of Tk widget
+(Label, Menu, Checkbutton, etc.). Each value associated with the key is a hash reference containing 
+configuration data for that type of widget. Be careful not to put invalid configure options for a 
+given type of widget! Here is a brief example of a configuration data hash:
+
+%preferences = (
+
+    'ThemeID'   => "Shady Milkman",
+    
+    'Palette'   => "honeydew4",
+
+    'Label' => {
+        '-foreground    => "LightBlue4",
+        '-background    => "#FFCC18",
+        '-font'         => "-adobe-helvetica-medium-r-normal--10-*-*-*-*-*-*-*"
+    },
+    
+    'Button' => {
+        '-background'   => "#555555",
+        '-foreground'   => "#EEEEEE",
+        '-font'         => "-adobe-helvetica-medium-r-normal--10-*-*-*-*-*-*-*"
+    },
+    
+    'Optionmenu' => {
+        '-background'       => "LightBlue4",
+        '-foreground'       => "#FFCC18",
+        '-activebackground' => "#555555",
+        '-activeforeground' => "#FFCC18",
+        '-font'             => "-adobe-helvetica-medium-r-normal--10-*-*-*-*-*-*-*"
+    },
+    
+    'Heading'   => {
+        '-background'       => "honeydew4",
+        '-foreground'       => "#EEEEEE",
+        '-font'             => "-adobe-courier-medium-r-normal--12-*-*-*-*-*-*-*"
+    }
+);
+
+
+The 'Palette' key sets the palette via the setPalette method.
+
+The 'Headings' key is an example of a user-defined widget group. For example you may have a set of Label
+widgets which serve as headings in your application. You may want, say a larger font of different color
+than the rest of your Label widgets, and you might want to set the background color so that it is the
+same as your palette. You can easily accomplish this by flagging your Label widgets as being 
+a Heading. Here is an example:
+
+
+my $head1 = $mw->Label(-test "heading 2")->pack();
+
+$head1->{'Heading'} = 1;
+
+$mw->SetPrefs(-prefs => \%preferences);
+
+
+When SetPrefs reaches $head1 it will see that it is of type 'Heading' rather than of type 'Label' and
+will configure it with the 'Heading' options rather than the 'Label' options.
+
+The 'ThemeID' key is just an example to show that you can add any data you want to the hash, as long
+as you don't define any widgets to be part of a 'ThemeID' group, and there is no such thing as a
+Tk::ThemeID widget, you're safe to put in whatever you want.
+
+
+=head1  Storing Configuration Data in a File.
+
+yes, yes I know, that's what Xresources files are for. However, if you've taken the time to build an
+interface for your users to tweak their GUI, and you would like for your users to be able to store that
+data in a file, and then maybe come back later and tweak it again, and save it again, well here's one
+really, really easy way to do that. Go take a look at the Data::DumpXML module. You can use that module
+to do something like this:
+
+
+## store your prefs
+
+use Data::DumpXML::dump_xml; 
+
+open (PREFS, ">myAppPrefs.xml");
+
+print PREFS Data::DumpXML::dump_xml(\%preferences);
+
+close (PREFS);
+
+
+
+##restore your prefs
+
+use Data::DumpXML::Parser;
+
+my $parser = Data::DumpXML::Parser->new();
+
+open (PREFS, "myAppPrefs.xml");
+
+$data = join ('', <PREFS>);
+
+close (PREFS);
+
+$preferences = $parser->parsestring($data);
+
+$mw->SetPrefs(-prefs => $preferences);
+
+
+
+=head1  SetPrefs
+
+the SetPrefs method has a couple more things you can do apart from just sending in a hash of
+configuration values
+
+=head2  Setting Callbacks!
+
+heck yeah! You can if you want, assign a callback to execute each time a certain type of widget is 
+encountered, rather than setting configuration data for that widget. Your callback is called with 
+two arguments, first a reference to the widget itself, and second a hash reference containing the 
+arguments you sent to SetPrefs, meaning that you can access all the data in the configuration hash.
+Here's an example that set's off a callback each time a 'Button' widget is encountered:
+
+$mw->SetPrefs(
+    -prefs  => \%preferences,
+    -Button => \&ButtonCallback
+);
+
+sub Button {
+    my ($widget, $options) = @_;
+    print "wow I found a button!\n";
+}
+
+why would you ever want to do this? Maybe you want to do something more complicated than just setting
+configuration options? Or maybe you're just crazy and like to celebrate the unbearable lightness of
+buttons being in your GUI? Who knows ... it's there if you want it though ...
+
+=head2  Other Options
+
+=over
+
+=item   -debug  1|0
+
+off be default, this option will 'warn' your console with debug messsages as they occur.
+
+=back
+
+
+=head1  Author
+
+Andrew N. Hicox <andrew@hicox.com>
+

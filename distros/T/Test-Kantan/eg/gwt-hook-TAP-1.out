@@ -1,0 +1,9 @@
+
+
+# Feature foo
+#  Then pushed
+ok 1 - ok { 1 };
+# Feature bar
+#  Then pushed
+ok 2 - ok { 2 };
+1..2

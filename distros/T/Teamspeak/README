@@ -1,0 +1,70 @@
+==============================================================================
+                 Release of version 0.6 of Teamspeak
+==============================================================================
+
+
+NAME
+
+    Teamspeak - Interface to administrate Teamspeak-Server.
+
+
+DESCRIPTION
+
+    See the file "Teamspeak.pod" for excruciating detail on all of this.
+
+
+LIMITATIONS
+
+    * The Web- and Telnet-Connections are not secure.
+
+    * The MySQL-Interface has no functions at the Moment.
+
+    * The tests are not configurable and will fail without a local
+      Teamspeak Server.
+
+
+PREREQUISITES
+
+    In order to use Teamspeak, you need at least one of the
+    following Modules:
+      1) Net::Telnet to use the Telnet-Interface.
+      2) DBD::mysql to use the MySQL-Interface.
+      3) DBD::SQLite to use the SQLite-Interface.
+      4) WWW::Mechanize to use the HTTP-Interface.
+
+
+INSTALLATION
+
+    It's all pure Perl, so just put the .pm files in their appropriate
+    local Perl subdirectories.
+
+
+CHANGES AND FUTURE DEVELOPMENT
+
+    This readme refers to versions 0.6.
+    For details of changes, refer to the file Changes.
+
+
+AUTHOR
+
+    Martin von Oertzen (maletin@cpan.org)
+
+
+COPYRIGHT
+
+     Copyright (c) 2005-2008, Martin von Oertzen. All Rights
+     Reserved.
+     This module is free software. It may be used, redistributed
+     and/or modified under the terms of the Perl Artistic License
+          (see http://www.perl.com/perl/misc/Artistic.html)
+
+
+==============================================================================
+
+AVAILABILITY
+
+Teamspeak will be uploaded to the CPAN.
+
+$Id: README 36 2008-03-08 23:20:08Z maletin $
+
+==============================================================================

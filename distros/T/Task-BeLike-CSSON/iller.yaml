@@ -1,0 +1,27 @@
+---
+doctype: dist
+
+header:
+  name: Task-BeLike-CSSON
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.014000
+
+plugins:
+ - +config: Author::CSSON
+   is_task: 1
+   travis_perl_min: 14
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+  - +replace_plugin: Badges
+    formats: html, markdown
+    badge:
+     - perl
+     - travis

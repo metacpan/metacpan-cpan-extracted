@@ -1,0 +1,151 @@
+Revision history for Tail-Tool
+
+0.4.7   2017-04-10
+        Updating for release of version 0.4.7
+        Improving on file specification documentation (Ivan Wills)
+        Added supporting vim style scp urls for remote files (Ivan Wills)
+
+0.4.6   2017-01-22
+        Updating for release of version 0.4.6
+        Updated date (Ivan Wills)
+        Adding links for the different plugins (Ivan Wills)
+        Better description (Ivan Wills)
+
+0.4.5   2016-12-04
+        Updating for release of version 0.4.5
+        Added Config to boilerplate test (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Added config to manifest (Ivan Wills)
+        Adding info on how to get back saved config (Ivan Wills)
+        Adding comments to example YAML (Ivan Wills)
+        Adding example config and some more description (Ivan Wills)
+        Fixed name (Ivan Wills)
+        Working on docs (Ivan Wills)
+        updated config (Ivan Wills)
+        Starting on config documentation (Ivan Wills)
+        Adding more details about plugin arguments (Ivan Wills)
+        Switched file order (Ivan Wills)
+        Adding spacing documentation (Ivan Wills)
+        Fixed name (Ivan Wills)
+        Fixed up file loading (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Added missing recommended package (Ivan Wills)
+
+0.4.4   2016-05-01
+        Updating for release of version 0.4.4
+        Removed reference to removed file (Ivan Wills)
+        Updated license date (Ivan Wills)
+        Updated config to build/test (Ivan Wills)
+        Removed perl 5.8 from travis (Ivan Wills)
+        Cleaned up boilerplate (Ivan Wills)
+        VTide and editor configs (Ivan Wills)
+
+0.4.3   2015-09-13
+        Updating for release of version 0.4.3
+        Removed Makefile (Ivan Wills)
+        Cleaned up documentation (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.4.2   2015-06-03
+        Updating for release of version 0.4.2
+        Year updated (Ivan Wills)
+        Future default event comment (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+
+0.4.1   2014-12-17
+        Updating for release of version 0.4.1
+        Fixed typo (Ivan Wills)
+        Updated license (Ivan Wills)
+        More moving to late loading of modules (Ivan Wills)
+        Minor performance tweeks (Ivan Wills)
+        Changed to use File::HomeDir to get home directory (Ivan Wills)
+
+0.4.0   2014-11-22
+        Updating for release of version 0.4.0 (Ivan Wills)
+        Added missing modules to boilerplate test (Ivan Wills)
+        Cleaned up manifest (Ivan Wills)
+        Removed unused "use"es (Ivan Wills)
+        Changed from using Path::Class to use Path::Tiny (Ivan Wills)
+        Fixed test (Ivan Wills)
+        Removed test counts infavour of done_testing (Ivan Wills)
+        Changed from Test::NoWarnings to Test:Warnings (Ivan Wills)
+        Fixed boilerplate test (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Tail-Tool (Ivan Wills)
+        Converted to POD syntax (Ivan Wills)
+        Moved to pod (Ivan Wills)
+        Auto updated (Ivan Wills)
+
+0.3.6   2014-08-20
+        Fixed travis-ci config (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Fixed abstracts to match spec per http://neilb.org/2014/02/19/compliant-abstract.html (Ivan Wills)
+        Fixed end cleanup (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Added skipping trying to find "restart" plugin (Ivan Wills)
+        Finally fixed non-restart mode, probably need to move to follow mode (Ivan Wills)
+
+0.3.5   2013-07-15
+        Added missing module to test
+        Upgraded to using latest Getopt::Alt
+        Fixed code so that if all files have finished being read tailt will exit
+
+0.3.4   2013-05-13
+        Fixed bad build of 0.0.3
+        Added missing dependency from Build.PL
+
+0.3.3   2013-05-04
+        Added sanity check that Perl read something in we can process
+        Fixed not editing the correct file
+        Added sorting file names
+        Added colouring menus
+        Added allowing ssh expansion
+        Added the ability to start tailt with some files disabled
+        Fixed version log
+
+0.3.2   2012-07-19
+        Updated with new version
+        Upped version
+        Added TODO markers for serialised regexes
+        Added log to files to be skipped
+        Fixed missing comma
+        Added recommends for author test modules
+        Added "use warnings"
+        Changed globbing of files to also pseudo glob servers (from code mssh) for sshed files
+        Fixed doing replacements
+        Fixed warnings
+        Defaulting size to zero if no size set
+
+0.3.1   2012-02-06
+        Removed accidentally added junk
+        Added more tests
+
+0.3.0   2012-02-03
+        Licence date updated
+        Fixed spelling errors
+        Fixed blocking file reads correctly
+        Fixed issues with reading remote files
+        Changed tailt to glob input files before passing on to Tail::Tool module
+        Added all log files to be ignored by default
+        More documentation of code function
+        Updated license text
+        Removed generated files from git, updated to current standards
+
+0.2.0   2011-08-05
+        Removed EV dependency
+        Fixed issue when Test::Kwalitee not installed
+        Added the ability to process plugins when no lines have been read if they flag allow_lines attribute
+        Added closing and reopening the file handle incase the log file was deleted
+        Changed from EV events to AnyEvent::Impl::Perl which fixes ^C handling
+        Fixed issue when a file has been truncated and the file size is undefined
+        Trying to get group lines to not freeze the operation of tailing
+        Added reinstalling interrupt handler after it's called to try and fix ^C handling
+        Fixed missing renamed method parent to tailer
+        Fixed parent -> tailer change
+        Fixed missing option
+        Added a clear screen option
+
+0.1.0   2011-06-26
+        First version, released on an unsuspecting world.
+

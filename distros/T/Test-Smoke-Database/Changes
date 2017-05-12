@@ -1,0 +1,77 @@
+Revision history for Perl extension Test::Smoke::Database.
+
+1.14  2003/08/19 10:37:24  alian
+ - FORMAT OF DATABASE UPDATED ! (two cols added, one moved).
+ - Add a 'version' field to filter/parser (Eg: All perl-5.8.1 report)
+ - Use the field 'date' into filter/parser (Eg: All report after 07/2003)
+ - Add an author field to parser, and a smoker HTML page about recent
+   smokers and their available config.
+ - Change how nbte (number of failed tests) is calculate
+ - Graph are done by month, no longuer with patchlevel
+ - Only rewrite cc if gcc. Else we lost solaris info
+ - Remove ccache info for have less distinct compiler
+ - Add another report to tests
+ - Update FAQ.pod for last Test::Smoke version
+ - Save only wanted headers for each nntp articles (and save From: field).
+ - Move away last varchar field from builds to data
+
+1.13  2003/08/15 15:55:07  alian
+ - Add a test of report with 't' and '-' on the same line. Now these line
+   are no longer registred
+ - Update HTML for be able to browse DB with Lynx
+ - Add an update_ref method that adjust buggy report
+ - Remove SQL request for update archi in admin_smokedb, now done 
+   by update_ref
+ - Add a link for 'X' status for failed test
+ - Add Test::More to prereqs
+
+1.12  2003/08/08 14:27:59  alian
+ - Update POD documentation
+ - Add proto to methods
+ - New interfaces with DB.pm & Display.pm
+ - Use only dbi method like selectrow_arrayref
+ - Speed up display method
+ - Fix some SQL request in update_db
+ - Use eval for GD::Graph
+
+1.8  2003/07/30 22:07:34  alian
+ - Split code for parsing
+ - Increase code average from 20% to 85%. Tks to Devel::Cover
+ - Correct bugs found with new tests
+ - Update output for admin_smokedb
+
+1.6  2003/02/16 18:47:04  alian
+ - FORMAT OF DATABASE UPDATED !
+ - Update summary table: add number of configure failed, number of make failed.
+ - Add legend after summary table
+ - Add parsing/display of matrice, as Test::Smoke 1.16_15+ can report more than
+ 4 columns
+ - Correct a bug that add a 'Failure:' in HM Brand Report
+ - Add stats about CPAN testers
+ - Change default limit for CGI: 18600.
+ - Update test files, add some reports.
+
+1.5  2003/02/10 00:58:05  alian
+ - Add feature of graph
+ - Correct Irix report parsing (no os version)
+ - Correct number of failed test
+ - Read archi from 1.16 report
+ - Update parsing of error of HM Brand reports
+ - Update display for cgi
+ - Remove --update-archi option. Done after every import
+
+1.4  2003/01/05 21:45:55  alian
+ - Fix for parsing hm. brand reports with 5.6
+ - Fix test with 5.6
+
+1.3  2003/01/05 01:15:55  alian
+ - Add a special parser for HM Brand's reports
+ - Remove --rename option
+ - Rewrite code for better daily use with no --clear option
+ - Add tests for report parsing
+ - Update POD
+
+1.2  Mon Dec 30 11:10:48 2002
+ - original version; created by h2xs 1.22 with options
+   -X Test/Smoke/Database
+

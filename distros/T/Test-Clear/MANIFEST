@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/Clear.pm
+minil.toml
+t/00_compile.t
+t/case.t
+t/todo_note.t
+t/todo_scope.t
+META.yml
+MANIFEST

@@ -1,0 +1,25 @@
+This is the Test::Group::Foreach perl module.  For details run the command:
+
+    perldoc lib/Test/Group/Foreach.pm
+
+from within this directory, or see:
+
+    http://search.cpan.org/dist/Test::Group::Foreach
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009 Nick Cleaton, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -1,0 +1,510 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Text::PORE - Perl Object Rendering Engine</title>
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#step_1:_create_a_perl_object_using_pore::object">Step 1: Create a Perl object using PORE::Object</a></li>
+		<li><a href="#step_2:_create_a_template,_a_pore::template_object">Step 2: Create a template, a PORE::Template object</a></li>
+		<li><a href="#step_3:_render_the_object_using_the_template">Step 3: Render the object using the template</a></li>
+	</ul>
+
+	<li><a href="#creating_perl_objects__pore::object">CREATING PERL OBJECTS - PORE::Object</a></li>
+	<li><a href="#creating_templates__pore::template">CREATING TEMPLATES - PORE::Template</a></li>
+	<li><a href="#template_directives">TEMPLATE DIRECTIVES</a></li>
+	<ul>
+
+		<li><a href="#render_directive">Render Directive</a></li>
+		<li><a href="#context_directive">Context Directive</a></li>
+		<li><a href="#list_directive">List Directive</a></li>
+		<li><a href="#condition_directive">Condition Directive</a></li>
+		<ul>
+
+			<li><a href="#operands">Operands</a></li>
+			<li><a href="#operators">Operators</a></li>
+			<li><a href="#examples">Examples</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#the_parser">THE PARSER</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#history_and_credits">HISTORY and CREDITS</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Text::PORE - Perl Object Rendering Engine</p>
+<dl>
+<dt><strong><a name="item_pore">pore</a></strong><br />
+</dt>
+<dd>
+intr.v.
+</dd>
+<dd>
+<p>1. To read or study carefully and attentively</p>
+</dd>
+<dd>
+<p>The American Heritage® Dictionary of the English Language, Fourth Edition</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>How to use PORE to render Perl objects.</p>
+<pre>
+        use Text::PORE::Template;
+        use Text::PORE::Object;</pre>
+<p>The Perl object to be rendered:</p>
+<pre>
+        $obj = new Text::PORE::Object('name'=&gt;'Joe Smith');
+        @chilren = (
+                new Text::PORE::Object('name'=&gt;'John Smith', 'age'=&gt;10, 'gender'=&gt;'M'),
+                new Text::PORE::Object('name'=&gt;'Jack Smith', 'age'=&gt;15, 'gender'=&gt;'M'),
+                new Text::PORE::Object('name'=&gt;'Joan Smith', 'age'=&gt;20, 'gender'=&gt;'F'),
+                new Text::PORE::Object('name'=&gt;'Jim Smith', 'age'=&gt;25, 'gender'=&gt;'M'),
+        );
+        $obj-&gt;{'children'} = \@chilren;</pre>
+<p>The template file (demo.tpl):</p>
+<pre>
+        Name: &lt;PORE.render attr=name&gt;
+        Children:
+        &lt;PORE.list attr=children&gt;
+                &lt;PORE.render attr=name&gt;, &lt;PORE.render attr=age&gt;, &lt;PORE.if 
+                cond=&quot;gender EQ 'M'&quot;&gt;Male&lt;PORE.else&gt;Female&lt;/PORE.if&gt;
+        &lt;/PORE.list&gt;</pre>
+<p>The code that renders the object using this template:</p>
+<pre>
+        #
+        # create a template
+        #
+        $tpl = new Text::PORE::Template('file'=&gt;'demo.tpl');
+        
+        #
+        # render the object using the template
+        # the result is printed to STDOUT
+        #
+        my $fh = new FileHandle();
+        $fh-&gt;open('&gt;&amp; STDOUT');
+        Text::PORE::render($obj, $tpl, $fh);
+        $fh-&gt;close();</pre>
+<p>The rendering result:</p>
+<pre>
+        Name: Joe Smith
+        Children:
+        
+                John Smith, 10, Male
+        
+                Jack Smith, 15, Male
+        
+                Joan Smith, 20, Female
+        
+                Jim Smith, 25, Male</pre>
+<p></p>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<p>PORE is a general-purpose template-based object rendering engine. It is intended for producing dynamic
+content by rending Perl objects with templates. The template language consists a set of XML tags. The 
+template parser is built using byacc. PORE is light and fast.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Parallel to the idea of JSP and PHP, PORE was designed to separate data from presentation. 
+The data is encapsulated in Perl objects, like Java Beans. The presentation is represented by 
+PORE::Template, like JSP files. PORE consists of a templating language that is a set of XML tags 
+and a rendering engine that parses templates and generates output using specified Perl objects. 
+PORE is suitable for any environment where dynamic content needs to be produced based on Perl objects. 
+For instance, it can be used for developing CGI programs, where Perl developers can concentrate on 
+writing business logics and data retrieval, while content developers can focus on producing presentation 
+layout.</p>
+<p>The process of rendering a Perl object involves three steps.</p>
+<p>
+</p>
+<h2><a name="step_1:_create_a_perl_object_using_pore::object">Step 1: Create a Perl object using PORE::Object</a></h2>
+<p>PORE::Object is essentially a collection of attribute name and value pairs. An attribute value can contain
+other PORE::Objects. The example below shows how to create a PORE::Object with three attributes:
+username, password and email_address.</p>
+<pre>
+        $obj = new Text::PORE::Object(
+        'username'=&gt;'ztang', 
+        'password'=&gt;'123abc', 
+        'email_address'=&gt;'ztang@cpan.org');</pre>
+<p>Detail information about how to use PORE::Object can be accessed in POD of Text::PORE::Object.</p>
+<p>
+</p>
+<h2><a name="step_2:_create_a_template,_a_pore::template_object">Step 2: Create a template, a PORE::Template object</a></h2>
+<p>To instantiate a PORE::Template object, a filename or a file id must be given.  
+This file is text file that contains a set XML tags that can direct the rendering engine to access
+attributes of PORE::Objects and to process attributes in certain logical ways. 
+There are four basic template directives: 
+a render directive (<code>&lt;PORE.render</code>&gt; tag), a list directive (<code>&lt;PORE.list</code>&gt; tag), 
+a context directive (<code>&lt;PORE.context</code>&gt; tag), and a condition directive (<code>&lt;PORE.cond</code>&gt; tag).</p>
+<p>The example below is a template file called show_user.tpl.</p>
+<pre>
+        Username: &lt;PORE.render attr=&quot;username&quot;&gt;
+        Password: &lt;PORE.render attr=&quot;password&quot;&gt;
+        Email Address: &lt;PORE.render attr=&quot;email_address&quot;&gt;</pre>
+<p>Here is how to create a PORE::Template object using the template file above.</p>
+<pre>
+        $tpl = new Text::PORE::Template('file'=&gt;'show_user.tpl');</pre>
+<p>For detail information about template directives, please see ``TEMPLATE DIRECTIVES'' section.</p>
+<p>
+</p>
+<h2><a name="step_3:_render_the_object_using_the_template">Step 3: Render the object using the template</a></h2>
+<p>PORE has a template parser (or a render engine) that parses the template and replaces template directives
+with attribute values of the given PORE::Object. The parser is generated using byacc (Berkeley Yacc),
+which is an <code>LALR(1)</code> parser generator.</p>
+<p>To render an object using a template, simply call <a href="#item_render"><code>PORE::render($object, $template, $file_handle)</code></a>.
+The render function takes three arguments: the object to be rendered, a template, and a FileHandle.
+The following example shows how to render the object created in step 1 by using the template created
+in step 2. The output is <code>STDOUT</code>.</p>
+<pre>
+        my $fh = new FileHandle();
+        $fh-&gt;open('&gt;&amp; STDOUT');
+        Text::PORE::render($obj, $tpl, $fh);
+        $fh-&gt;close();</pre>
+<p>
+</p>
+<hr />
+<h1><a name="creating_perl_objects__pore::object">CREATING PERL OBJECTS -- PORE::Object</a></h1>
+<p>PORE::Object is the superclass of all renderable objects. That is, if you want to render an object, the
+object must be an instance of PORE::Object or an instance of its subclass.</p>
+<p>The purpose of this class is to provide methods to create and access attributes. Commonly used methods
+are <code>new</code> and <code>setAttributes()</code>.</p>
+<p>Here are some examples.</p>
+<pre>
+        $age = 50;</pre>
+<pre>
+        $obj = new Text::PORE::Object();
+        $obj-&gt;setAttribute('name'=&gt;'Joe Smith');
+        $obj-&gt;setAttribute('age'=&gt;$age);</pre>
+<pre>
+        $obj = new Text::PORE::Object();
+        $obj-&gt;setAttributes('name'=&gt;'Joe Smith', 'age'=&gt;$age);</pre>
+<pre>
+        $obj = new Text::PORE::Object('name'=&gt;'Joe Smith', 'age'=&gt;$age);</pre>
+<pre>
+        $employer = new Text::PORE::Object('name'=&gt;'Perl.com');
+        $obj-&gt;setAttribute('employer'=&gt;$employer);</pre>
+<p>For details of how to use PORE::Object, please see its POD.</p>
+<p>
+</p>
+<hr />
+<h1><a name="creating_templates__pore::template">CREATING TEMPLATES -- PORE::Template</a></h1>
+<p>PORE::Template represents the handle for PORE templates. To instantiate a PORE::Template object,
+either a filename of the template or the a template id is required. The instance is then passed to
+<a href="#item_render"><code>PORE::render()</code></a> during the rendering process.</p>
+<p>Here are some examples.</p>
+<pre>
+        $tpl = new Text::PORE::Template('file'=&gt;'demo.tpl');</pre>
+<pre>
+        $tpl = new Text::PORE::Template('id'=&gt;'demo');</pre>
+<p>For details of how to use PORE::Template, please see its POD.</p>
+<p>
+</p>
+<hr />
+<h1><a name="template_directives">TEMPLATE DIRECTIVES</a></h1>
+<p>PORE template directives add the ability to display objects in various ways in a template. 
+PORE directives always operate on the current context object. The context object is initially the object 
+that the template is applied to, but it can be changed by certain directives. PORE directives have the 
+functionality to</p>
+<pre>
+        1) display an attribute of the context object,
+        2) set the new context object to an attribute of the current context object,
+        3) for an attribute of the context object that is a list, loop over all the elements in the list, 
+        4) evaluate conditions and base output on the value of a condition.</pre>
+<p>The following sections will describe these directives individually and give examples.</p>
+<p>
+</p>
+<h2><a name="render_directive">Render Directive</a></h2>
+<p>The syntax of the render directive is: <code>&lt;PORE.render attr=&quot;ATTBRIBUTE_NAME&quot;</code>&gt;</p>
+<p>The RENDER tag retrieves the attribute ATTRIBUTE_NAME of the context object and renders it. 
+The RENDER tag is replaced by the value of the attribute ATTRIBUTE_NAME.</p>
+<p>For example, let us say we are applying a template to a Person object whose name is Joe Smith.</p>
+<p>Our template contains the following:</p>
+<pre>
+        Name: &lt;PORE.render attr=name&gt;</pre>
+<p>The template parser would parse this line and output:</p>
+<pre>
+        Name: Joe Smith</pre>
+<p>
+</p>
+<h2><a name="context_directive">Context Directive</a></h2>
+<p>The syntax of the render directive is: <code>&lt;PORE.context attr=&quot;ATTRIBUTE_NAME&quot;</code>&gt; ... <code>&lt;/PORE.CONTEXT</code>&gt;</p>
+<p>The CONTEXT tag switches the context object from the current context object to the attribute of the 
+current context object given in ATTRIBUTE_NAME. The changed context is in effect for the scope of 
+the text enclosed between the open and close tags. 
+All attributes referred to in this body refer to the new context object. 
+After the CONTEXT tag is closed, the original context object is restored. For example, Joe Smith's age
+is 50 and his employer is Perl.com.</p>
+<p>Our template contains the following:</p>
+<pre>
+        Name: &lt;PORE.render attr=name&gt;
+        &lt;PORE.context attr=employer&gt;
+        Employer Name: &lt;PORE.render attr=name&gt;
+        Employer URL: &lt;PORE.render attr=url&gt;
+        &lt;/PORE.context&gt;
+        Age: &lt;PORE.render attr=age&gt;</pre>
+<p>The first render tag refers to the name attribute of the Joe Smith object. 
+The context tag then switches the context object to the object referenced by the employer attribute. 
+Since the second render tag is enclosed within the context tag body, the name attribute now refers 
+to the employer object. After the context tag is closed, the context object is restored to 
+the Joe Smith object.</p>
+<p>The following is the output:</p>
+<pre>
+        Name: Joe Smith
+        
+        Employer Name: Perl.com
+        Employer URL: <a href="http://www.perl.com">http://www.perl.com</a></pre>
+<pre>
+        Age: 50</pre>
+<p>Because a new context object must always be an attribute of the previous context object, 
+the template system can only access the object to which it is originally applied and 
+objects somehow related to that original object. If one wishes to render more than one disparate objects 
+using the template system, one can create an object whose purpose is to unify these objects.</p>
+<p>
+</p>
+<h2><a name="list_directive">List Directive</a></h2>
+<p>The syntax of the list directive is: <code>&lt;PORE.LIST ATTR=&quot;ATTRIBUTE_NAME&quot;</code>&gt; ... <code>&lt;/PORE.LIST</code>&gt;</p>
+<p>The LIST tag retrieves from the object the attribute ATTRIBUTE_NAME, which is a list of objects. 
+It loops through the objects in the list, and for each it sets the object to be the context object 
+and then operates on the text within that context. So, the text is processed by the template parser 
+n times, where n is the length of the list of objects. If ATTRIBUTE_NAME is not a list, 
+the template parser returns an error. For example, Joe Smith has four children.</p>
+<p>Our template contains the following:</p>
+<pre>
+        Name: &lt;PORE.render attr=name&gt;
+        Children:
+        &lt;PORE.list attr=children&gt;
+                &lt;PORE.render attr=name&gt;, &lt;PORE.render attr=age&gt;
+        &lt;/PORE.list&gt;</pre>
+<p>Here is the output:</p>
+<pre>
+        Name: Joe Smith
+        Children:
+        
+                John Smith, 10, Male
+        
+                Jack Smith, 15, Male
+        
+                Joan Smith, 20, Female
+        
+                Jim Smith, 25, Male</pre>
+<p>
+</p>
+<h2><a name="condition_directive">Condition Directive</a></h2>
+<p>The syntax of the condition directive is:</p>
+<pre>
+        &lt;PORE.IF COND=expr&gt; ...true text... &lt;/PORE.IF&gt;
+        &lt;PORE.IF COND=expr&gt; ...true text... &lt;PORE.ElSE&gt; ...false text... &lt;/PORE.IF&gt;</pre>
+<p>The IF tag allows the template to output different text depending on the boolean value of 
+the expression expr. If expr evaluates to a true value, only true text is output, otherwise false text 
+is output.</p>
+<p>Expressions have their own special syntax similar to that of the C language. 
+The only place expressions occur is in the IF COND parameter. 
+An expression is a quote-delimited string consisting of operators and operands.</p>
+<p>
+</p>
+<h3><a name="operands">Operands</a></h3>
+<p>There are two types of operands, attributes and literals. Attributes refer to the attributes of the 
+context object, and are used as we have been using them in our previous examples. 
+Literals are constant values are always delimited by quotes. All literals are treated as strings, 
+whether they consist of numbers, letters, or any other type of character.</p>
+<p>Here are some attributes:</p>
+<pre>
+        name
+        age</pre>
+<p>Here are some literals:</p>
+<pre>
+        &quot;Joe Smith&quot;
+        '50'
+        &quot;&quot;</pre>
+<p>The last literal, the empty string, has a boolean value of FALSE. Every other string has a TRUE value.</p>
+<p>In HTML, parameter values need to be surrounded by quotes if they contain non-alphabetic characters, 
+which is certainly a characteristic of expressions. However, we also need to use quotes within the 
+expression to distinguish literals. This gives us the problem of nested quotes. 
+The solution is to use a different style of quotes for the entire expression and for literals. 
+Which style is used for which is not important.</p>
+<p>
+</p>
+<h3><a name="operators">Operators</a></h3>
+<p>The PORE expression syntax contains most of the standard operators:</p>
+<pre>
+        + - * /:         Arithmetic operators
+        = != &gt; &lt; &gt;= &lt;=:  Numeric comparison operators
+        EQ EQS:          String comparison operators
+        AND OR NOT:      Boolean operators
+        ( ):             Grouping operators</pre>
+<p>Since the expression language has no way of distinguishing type, 
+(values of attributes and literals are strings), it is the operators themselves that determine 
+how they will be treated. Arithmetic operators and numeric comparison operators convert their operands to 
+numbers and then act on them. The <code>!=</code> is the inequality operator. The <code>=</code> is the equality operator, 
+not the assignment operator. Otherwise, numeric operators behave exactly as they do in C. 
+Here are a few examples:</p>
+<pre>
+        gross - net &gt; &quot;3000&quot;
+        percent * &quot;100&quot; != &quot;50&quot;</pre>
+<p>The string operators <code>EQ</code> and <code>EQS</code> treat their operands as strings. <code>EQ</code> tests if two strings are equal 
+disregarding case whereas <code>EQS</code> tests if two strings are exactly equal (the S stands for ``sensitive''). 
+<code>EQS</code> is distinct from <code>=</code> in that <code>=</code> only evaluates whether its operands are equal numerically, 
+whether or not the actual string values differ; thus ``10'' and ``10.00'' are <code>=</code> but not <code>EQ</code>.</p>
+<p><code>AND</code>, <code>OR</code>, and <code>NOT</code> behave like the standard boolean operators. Parentheses group expressions as they do in C.</p>
+<p>
+</p>
+<h3><a name="examples">Examples</a></h3>
+<p>Using the Joe Smith object, our template contains:</p>
+<pre>
+        Testing: +, -, *, /, &lt;, &gt;, &lt;=, &gt;=, =, !=
+            Age: &lt;PORE.render attr=&quot;age&quot;&gt;
+        =============================
+        &lt;PORE.if cond=&quot;age &lt; '60'&quot;&gt;Younger than 60&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;age + '10' &gt; '60'&quot;&gt;Older than 50&lt;PORE.else&gt;10 years later not old than 60&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;age - '10' &lt;= '40'&quot;&gt;10 years ago younger or same as 40&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;age * '2' &gt;= '100'&quot;&gt;Twice the age is older or same as 100&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;age / '2' = '25'&quot;&gt;Half the age equals to 25&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;age != '51'&quot;&gt;Not equals to 51&lt;/PORE.if&gt;
+        
+        Testing: eq, eqs
+            Name: &lt;PORE.render attr=&quot;name&quot;&gt;
+        ===============================
+        &lt;PORE.if cond=&quot;name eqs 'Joe Smith'&quot;&gt;Name is Joe Smith.&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;name eqs 'joe smith'&quot;&gt;Name is joe smith.&lt;PORE.else&gt;Name is not joe smith.&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;name eq 'joe smith'&quot;&gt;If case insensitive, name is same as joe smith.&lt;/PORE.if&gt;
+        
+        Testing: and, or, not, (, )
+            Age: &lt;PORE.render attr=&quot;age&quot;&gt;
+            Name: &lt;PORE.render attr=&quot;name&quot;&gt;
+        ===============================
+        &lt;PORE.if cond=&quot;(name eqs 'Joe Smith') and (age &lt; '60')&quot;&gt;Name is Joe Smith and younger than 60.&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;(name eqs 'Joe Smith') or (age &gt; '60')&quot;&gt;Name is Joe Smith or older than 60.&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;(name eqs 'John Doe') or (age &lt; '60')&quot;&gt;Name is Johe Doe or younger than 60.&lt;/PORE.if&gt;
+        &lt;PORE.if cond=&quot;NOT(name eqs 'John Doe') and  NOT(age &gt; '60')&quot;&gt;Name is not Johe Doe and not older than 60.&lt;/PORE.if&gt;</pre>
+<p>The output:</p>
+<pre>
+        Testing: +, -, *, /, &lt;, &gt;, &lt;=, &gt;=, =, !=
+            Age: 50
+        =============================
+        Younger than 60
+        10 years later not old than 60
+        10 years ago younger or same as 40
+        Twice the age is older or same as 100
+        Half the age equals to 25
+        Not equals to 51
+        
+        Testing: eq, eqs
+            Name: Joe Smith
+        ===============================
+        Name is Joe Smith.
+        Name is not joe smith.
+        If case insensitive, name is same as joe smith.
+        
+        Testing: and, or, not, (, )
+            Age: 50
+            Name: Joe Smith
+        ===============================
+        Name is Joe Smith and younger than 60.
+        Name is Joe Smith or older than 60.
+        Name is Johe Doe or younger than 60.
+        Name is not Johe Doe and not older than 60.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_render"><code>render()</code></a></strong><br />
+</dt>
+<dd>
+Usage:
+</dd>
+<dd>
+<pre>
+        Text::PORE::render($object, $template, $file_handle);</pre>
+</dd>
+<dd>
+<p>This method takes three arguments. The first one must be a PORE::Object. 
+The second one must be a PORE::Template. And the third one must be a FileHandle.
+The method renders the object using the template. The output is specified by the file handle.</p>
+</dd>
+<dd>
+<p>The following example renders <code>$obj</code> using <code>$tpl</code>. The output is <code>STDOUT</code>.</p>
+</dd>
+<dd>
+<pre>
+        my $fh = new FileHandle();
+        $fh-&gt;open('&gt;&amp; STDOUT');
+        Text::PORE::render($obj, $tpl, $fh);
+        $fh-&gt;close();</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_settemplaterootdir"><code>setTemplateRootDir()</code></a></strong><br />
+</dt>
+<dd>
+Usage:
+</dd>
+<dd>
+<pre>
+        Text::PORE::setTemplateRootDir($templateRootDir);</pre>
+</dd>
+<dd>
+<p>This method sets the template root directory. This directory is needed when 
+<code>new Text::PORE::Template('id'=</code>&gt;<code>$template_id)</code> is called.</p>
+</dd>
+<dd>
+<p>For details of how to create PORE::Template, please see POD of PORE::Template.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="the_parser">THE PARSER</a></h1>
+<p>The parser of PORE (PORE::Parser) is generated using byacc (Berkeley Yacc), version 1.8.2.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>perl(1), perlre(1), <code>byacc(1)</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Zhengrong Tang, <a href="mailto:ztang@cpan.org">ztang@cpan.org</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="history_and_credits">HISTORY and CREDITS</a></h1>
+<p>PORE was original developed in early 1997 by Zhengrong Tang, Keith Arner and Serene Taleb-Agha.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright 2004 by Zhengrong Tang</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

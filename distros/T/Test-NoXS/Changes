@@ -1,0 +1,26 @@
+Revision history for Perl module Test::NoXS
+
+1.03      2014-02-05 18:34:37-05:00 America/New_York
+    
+    [INCOMPATIBLE CHANGES]
+
+    - Dropped support for Perls before v5.6
+
+    [ADDED]
+
+    - Added :xs_core_only and :xs_core_or_dual options
+      (Sam Kaufman and David Golden)
+
+1.02      2013-03-10 00:00:27 America/New_York
+
+    [FIXED]
+
+    - fix tests that broke when Scalar::Util stopped offering
+      XS or PP; using Class::Load instead
+
+1.01 Sun Jun  7 10:42:31 EDT 2009
+    - added ':all' import argument to disable all XS loading
+      (requested by Michael Schwern)
+
+1.00 Fri Mar 10 13:40:50 EST 2006
+    - initial release

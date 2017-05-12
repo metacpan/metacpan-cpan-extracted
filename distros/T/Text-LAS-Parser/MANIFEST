@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+t/Text-LAS-Parser.t
+t/ok_2.0_nowrap.las
+lib/Text/LAS/Parser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

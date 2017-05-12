@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/tla.pl
+INSTALL
+MANIFEST
+lib/TextLinkAds.pm
+t/00.load.t
+t/01.functionality.t
+t/02.perlcritic.t
+t/03.pod.t
+t/04.pod-coverage.t
+Makefile.PL
+README
+META.yml

@@ -1,0 +1,92 @@
+NAME
+    Task::Devel::Cover::Recommended - Install Devel::Cover and its
+    recommended dependencies.
+
+VERSION
+    Version v1.200.0
+
+SYNOPSIS
+        $ cpan Task::Devel::Cover::Recommended
+        $ cpanp -i Task::Devel::Cover::Recommended
+        $ cpanm Task::Devel::Cover::Recommended
+
+DESCRIPTION
+    This task module lets you easily install Devel::Cover 1.20 and all its
+    recommended dependencies.
+
+DEPENDENCIES
+  Configure-time dependencies
+    *   ExtUtils::MakeMaker
+
+  Build-time and test-time dependencies
+    *   ExtUtils::MakeMaker
+
+    *   Test::More
+
+  Run-time dependencies
+    *   Devel::Cover 1.20
+
+    *   "perl" 5.008002
+
+    *   Browser::Open
+
+    *   Capture::Tiny
+
+    *   Class::XSAccessor
+
+    *   Digest::MD5
+
+    *   JSON::PP
+
+    *   Moo
+
+    *   PPI::HTML 1.07
+
+        Devel::Cover lets you optionally pick between PPI::HTML and
+        Perl::Tidy, but it will only use the former if both are installed.
+
+    *   Parallel::Iterator
+
+    *   Pod::Coverage 0.06
+
+    *   Pod::Coverage::CountParents
+
+    *   Storable
+
+    *   Template 2.00
+
+    *   namespace::clean
+
+CAVEATS
+    Note that run-time dependencies that are only recommended by
+    Devel::Cover may not yet be installed at the time Devel::Cover is
+    tested, as there is no explicit dependency link between them and in that
+    case most CPAN clients default to install prerequisites in alphabetic
+    order. However, they will be installed when
+    Task::Devel::Cover::Recommended is, thus will be available when you
+    actually use Devel::Cover.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-task-devel-cover-recommended at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-Devel-Cover-Recomme
+    nded>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Task::Devel::Cover::Recommended
+
+COPYRIGHT & LICENSE
+    Copyright 2012,2013,2014,2015 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

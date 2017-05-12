@@ -1,0 +1,83 @@
+#title list
+
+Normal text.
+
+ - Level 1, bullet item one, this is the first paragraph. I can break
+   the line, keeping the same amount of indentation
+
+   Here I have the same amount of indentation, and it continues the
+   item above.
+
+   1. Level 2, enum item one. i can break the line, keeping the same
+      amount of indentation
+
+      Here I have the same amount of indentation, and it continues the
+      item above.
+
+   2. Level 2, enum item two
+      which continues
+
+      Here I have the same amount of indentation, and it continues the
+      item above.
+
+ - Level 1, bullet item two
+   which continues
+
+   Here I have the same amount of indentation, and it continues the
+   item above.
+
+   1. Level 2, enum item one
+      which continues
+
+      Here I have the same amount of indentation, and it continues the
+      item above.
+
+   2. Level 2, enum item two
+      which continues
+
+      Here I have the same amount of indentation, and it continues the
+      item above.
+
+      i.  Level 3, enum item i
+
+          Here I have the same amount of indentation, and it continues
+          the item above.
+
+      ii. Level 3, enum item ii
+
+          Here I have the same amount of indentation, and it continues
+          the item above.
+
+   3. Level 2, enum item three
+      which continues
+
+      Here I have the same amount of indentation, and it continues the
+      item above.
+
+ - Back to Level 1, third bullet
+
+   Here I have the same amount of indentation, and it continues the
+   item above.
+
+   a. Level 2, enum item “a”
+      which continues
+
+      Here I have the same amount of indentation, and it continues the
+      item above.
+
+   b. Level 2, enum item “b”
+      which continues
+
+      Here I have the same amount of indentation, and it continues the
+      item above.
+
+         I. Level 3, enum item “I”
+
+            Here I have the same amount of indentation, and it continues the
+            item above.
+
+ - Back to the bullets
+
+   Here I have the same amount of indentation, and it continues the
+   item above.
+

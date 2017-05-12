@@ -1,0 +1,11 @@
+Build.PL
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+lib/Tie/RangeHash.pm
+README
+SIGNATURE
+t/01-tie.t
+t/02-object.t
+SIGNATURE    Added here by Module::Build

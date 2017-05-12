@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Template/Plugin/EnvHash.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_distribution.t
+t/02_isa.t
+t/03_env.t
+t/test.tt2

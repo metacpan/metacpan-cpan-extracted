@@ -1,0 +1,13 @@
+<%args>
+    $queue
+</%args>
+
+%   my @a_queue = $c->model('TestrunDB')->resultset('Queue')->search();
+%   for my $or_queue ( @a_queue ) {
+%       if ( $queue && $or_queue->id() == $queue ) {
+            <option selected value="<% $or_queue->id() %>"><% $or_queue->name() || $or_queue->login() %></option>
+%       }
+%       else {
+            <option value="<% $or_queue->id() %>"><% $or_queue->name() || $or_queue->login() %></option>
+%       }
+% }

@@ -1,0 +1,144 @@
+---
+- Tool::Bench : an attempt at an easy benchmarking framework
+- benchmark framework? : Well think of this as a bunch of candy around the idea of unix 'time'.
+- Goals :
+   - be able to benchmark anything
+   - easy to play with
+   - easy to extend
+- How did we get here? :
+   - euler_bench 
+   - Tool::Bench
+- Features :
+   - Tool::Bench is a clock engine
+   - OO (based on Mouse)
+   - can time many items
+   - can run each item many times
+   - shuffled order of runs
+   - end up with reports
+- Example 1 : |
+   use Tool::Bench;
+   my $bench = Tool::Bench->new();
+   $bench->add_items( true => sub{1} );
+   $bench->run;
+   print $bench->report;
+- Example 1 : |
+   min   max  total  avg   count name
+   0.000 0.000 0.000 0.000     1 true 
+- Example 1, build the object: |
+   my $bench = Tool::Bench->new();
+- Example 1, add an item to time : |
+   $bench->add_items( true => sub{1} );
+- Example 1, run it : | 
+   $bench->run;
+- Example 1, print our report : | 
+   print $bench->report;
+- Example 2 : |
+   use Tool::Bench;
+   my $bench = Tool::Bench->new();
+   $bench->add_items( true   => sub{1}, 
+                      false  => sub{0},
+                      more   => { code => sub{sleep(1)},
+                                  note => 'taking a nap',
+                                },
+                    );
+   $bench->run(3);
+   print $bench->report;
+- Example 2 : |
+   min   max  total  avg   count name
+   0.000 0.000 0.000 0.000     3 true 
+   0.000 0.000 0.000 0.000     3 false 
+   1.000 1.000 3.000 1.000     3 more [taking a nap]
+- Example 2, added many items : |
+   $bench->add_items( true   => sub{1}, 
+                      false  => sub{0},
+                      more   => { code => sub{sleep(1)},
+                                  note => 'taking a nap',
+                                },
+                    );
+- Example 2, ran each item 3 times : |
+   $bench->run(3);
+- Example 3 : |
+   use Tool::Bench;
+   my $bench = Tool::Bench->new();
+   my $naptime;
+   $bench->add_items( true   => sub{1}, 
+                      false  => sub{0},
+                      more   => { code     => sub{sleep($naptime)},
+                                  note     => 'taking a nap',
+                                  buildup  => sub{$naptime = rand(10)},
+                                  teardown => sub{$naptime = 1},
+                                },
+                    );
+   $bench->run(3);
+   print $bench->report(format => 'JSON');
+- Example 3 : |
+   [{ 'max_time' => '5.00679016113281e-06',
+      'min_time' => '3.09944152832031e-06',
+      'avg_time' => '4.05311584472656e-06',
+      'name' => 'false',
+      'note' => '',
+      'total_runs' => 3,
+      'interp' => undef,
+      'total_time' => '1.21593475341797e-05',
+      'times' => [ '4.05311584472656e-06',
+                   '5.00679016113281e-06',
+                   '3.09944152832031e-06'
+                 ]
+    },
+    { 'max_time' => '5.00679016113281e-06',
+      'min_time' => '3.09944152832031e-06',
+      'avg_time' => '4.05311584472656e-06',
+      'name' => 'true',
+      'note' => '',
+      'total_runs' => 3,
+      'interp' => undef,
+      'total_time' => '1.21593475341797e-05',
+      'times' => [ '5.00679016113281e-06',
+                   '3.09944152832031e-06',
+                   '4.05311584472656e-06'
+                 ]
+    },
+    { 'max_time' => '7.00007820129395',
+      'min_time' => '4.00008010864258',
+      'avg_time' => '5.00008010864258',
+      'name' => 'more',
+      'note' => 'taking a nap',
+      'total_runs' => 3,
+      'interp' => undef,
+      'total_time' => '15.0002403259277',
+      'times' => [ '4.00008201599121',
+                   '7.00007820129395',
+                   '4.00008010864258'
+                 ]
+    }
+   ];
+- Example 3, events : | 
+   $bench->add_items( true   => sub{1}, 
+                      false  => sub{0},
+                      more   => { code     => sub{sleep($naptime)},
+                                  note     => 'taking a nap',
+                                  buildup  => sub{$naptime = rand(10)},
+                                  teardown => sub{$naptime = 1},
+                                },
+                    );
+- Example 3, report formats : |
+   print $bench->report(format => 'JSON');
+- Parrot Team :
+   - a[href=http://isparrotfastyet.com/]{isparrotfastyet.com}
+   - a[href=http://github.com/atrodo/itfy]{itfy} Code behind isparrotfastyet
+- Help! :
+   - Needs more tests
+   - varify results not built yet
+   - other events would be nice
+   - I wrote the docs (eep!)
+   - a[href=http://search.cpan.org/dist/Tool-Bench/]{Tool::Bench} on CPAN
+   - a[href=http://github.com/notbenh/tool_bench]{Tool::Bench} on github
+- Questions :
+   - well?
+- Thanks :
+   - a[href=http://scratchcomputing.com/]{ewilhelm} for the first poke and for a[href=http://search.cpan.org/dist/Text-Slidez/]{Text::Slidez}
+   - a[href=http://www.leto.net/]{Leto} for putting up with me and the constant poking
+
+
+
+

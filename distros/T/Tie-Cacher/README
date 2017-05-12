@@ -1,0 +1,114 @@
+Tie/Cacher version
+==================
+
+Tie::Cacher - Cache a (sub)set of key/value pairs. Tie and OO interface.
+
+DESCRIPTION
+
+This module implements a least recently used (LRU) cache in memory through
+a tie and a OO interface.  Any time a key/value pair is fetched or stored,
+an entry time is associated with it, and as the cache fills up, those members
+of the cache that are the oldest are removed to make room for new entries.
+
+So, the cache only "remembers" the last written entries, up to the
+size of the cache.  This can be especially useful if you access
+great amounts of data, but only access a minority of the data a
+majority of the time.
+
+The implementation is a hash, for quick lookups, overlaying a doubly linked
+list for quick insertion and deletion. Notice that the OO interface will
+be faster than the tie interface.
+
+SYNOPSIS
+
+  # The Object Oriented interface:
+  use Tie::Cacher;
+  $cache   = Tie::Cacher->new(%options);
+  $cache   = Tie::Cacher->new(\%options);
+
+  $cache->store($key, $value);
+  $value   = $cache->fetch($key);
+  $node    = $cache->fetch_node($key);
+
+  $nr_keys = $cache->keys;
+  @keys    = $cache->keys;
+  @keys    = $cache->recent_keys;
+  @keys    = $cache->old_keys;
+  $key     = $cache->most_recent_key;
+  $key     = $cache->oldest_key;
+
+  $key      = $cache->first_key;
+  ($key, $value) = $cache->first_key;
+  $key      = $cache->next_key;
+  ($key, $value) = $cache->next_key;
+
+  $exists   = $cache->exists($key);
+
+  $cache->delete(@keys);
+  $value    = $cache->delete(@keys);
+  @values   = $cache->delete(@keys);
+  $cache->clear;
+
+  $nr_keys = $cache->count;
+  $hit = $cache->hit;
+  $missed = $cache->missed;
+
+  $max_count = $cache->max_count;
+  $validate  = $cache->validate;
+  $load      = $cache->load;
+  $save      = $cache->save;
+  $user_data = $cache->user_data;
+
+  # The Tie interface:
+  use Tie::Cacher;
+  $tied = tie %cache, 'Tie::Cache', %options;
+  $tied = tie %cache, 'Tie::Cache', {%options};
+
+  # cache supports normal tied hash functions
+  $cache{1} = 2;       # STORE
+  print "$cache{1}\n"; # FETCH
+
+  print "Yes\n" if exists $cache{1};	# EXISTS
+  @keys = keys %cache;	# KEYS
+
+  # FIRSTKEY, NEXTKEY
+  while(($k, $v) = each %cache) { print "$k: $v\n"; }
+
+  delete $cache{1};    # DELETE
+  %cache = ();         # CLEAR
+
+  # Or use the OO methods on the underlying tied object:
+  print $tied->max_count, "\n";
+
+INSTALLATION
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More, but only in order to run the tests
+
+AUTHOR
+
+Ton Hospel, E<lt>Tie::Cacher@ton.iguana.beE<gt>
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003 by Ton Hospel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

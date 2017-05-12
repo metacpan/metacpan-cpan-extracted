@@ -1,0 +1,19 @@
+#!perl
+use strict;
+use warnings;
+use Test::Requires::Scanner::CLI;
+Test::Requires::Scanner::CLI->run(@ARGV);
+
+__END__
+
+=head1 SYNOPSIS
+
+    % scan-test-requires
+
+=head1 DESCRIPTION
+
+scan t/ and xt/ files and list the modules specified by Test::Requires.
+
+=head1 AUTHORS
+
+Masayuki Matsuki

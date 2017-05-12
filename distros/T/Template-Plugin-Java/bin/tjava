@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use Template::Plugin::Java;
+new Template::Plugin::Java();
+
+__END__
+
+=head1 NAME
+
+tjava	- Generate Java Classes from XML description files and templates.
+
+=head1 SYNOPSIS
+
+tjava [options] [file.xml ...]
+
+=head1 DESCRIPTION
+
+This tool is a command wrapper for the Template::Plugin::Java perl module.
+See L<Template::Plugin::Java(1)> for full details.
+
+=head1 SEE ALSO
+
+L<perl(1)>,
+L<Template(3)>,
+L<Template::Plugin::Java(3)>
+L<Template::Plugin::JavaSQL(3)>
+
+=cut

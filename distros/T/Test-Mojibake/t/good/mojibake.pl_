@@ -1,0 +1,10 @@
+#!perl -T
+use open ':locale';
+use strict;
+use warnings;
+
+use utf8;
+print "Ã€ noite, vovÃ´ Kowalsky vÃª o Ã­mÃ£ cair no pÃ© do pingÃ¼im queixoso e vovÃ³ pÃµe aÃ§Ãºcar no chÃ¡ de tÃ¢maras do jabuti feliz.\n";
+
+no utf8;
+print "À noite, vovô Kowalsky vê o ímã cair no pé do pingüim queixoso e vovó põe açúcar no chá de tâmaras do jabuti feliz.\n";

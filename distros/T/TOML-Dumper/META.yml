@@ -1,0 +1,61 @@
+---
+abstract: "It's new $module"
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TOML-Dumper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  TOML::Dumper:
+    file: lib/TOML/Dumper.pm
+    version: '0.01'
+  TOML::Dumper::Context:
+    file: lib/TOML/Dumper/Context.pm
+  TOML::Dumper::Context::Array:
+    file: lib/TOML/Dumper/Context/Array.pm
+  TOML::Dumper::Context::Array::Inline:
+    file: lib/TOML/Dumper/Context/Array/Inline.pm
+  TOML::Dumper::Context::Root:
+    file: lib/TOML/Dumper/Context/Root.pm
+  TOML::Dumper::Context::Table:
+    file: lib/TOML/Dumper/Context/Table.pm
+  TOML::Dumper::Context::Table::Inline:
+    file: lib/TOML/Dumper/Context/Table/Inline.pm
+  TOML::Dumper::Context::Value:
+    file: lib/TOML/Dumper/Context/Value.pm
+  TOML::Dumper::Context::Value::Inline:
+    file: lib/TOML/Dumper/Context/Value/Inline.pm
+  TOML::Dumper::Name:
+    file: lib/TOML/Dumper/Name.pm
+  TOML::Dumper::String:
+    file: lib/TOML/Dumper/String.pm
+requires:
+  Class::Accessor::Lite: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/TOML-Dumper/issues
+  homepage: https://github.com/karupanerura/TOML-Dumper
+  repository: git://github.com/karupanerura/TOML-Dumper.git
+version: '0.01'
+x_authority: cpan:KARUPA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

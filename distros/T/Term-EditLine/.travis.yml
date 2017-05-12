@@ -1,0 +1,33 @@
+language: perl
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - libedit-dev
+
+install:
+  - cpanm -n Alien::Editline
+  - perl Makefile.PL
+  - cpanm --installdeps -n .
+
+perl:
+  - "5.8"
+  - "5.10"
+  - "5.12"
+  - "5.14"
+  - "5.16"
+  - "5.18"
+  - "5.20"
+  - "5.22"
+  - "5.24"
+
+script:
+  - perl Makefile.PL
+  - make
+  - make test
+  - make install
+
+env:
+  - ALIEN_INSTALL_TYPE=share
+  - ALIEN_INSTALL_TYPE=system

@@ -1,0 +1,4052 @@
+<html lang="en">
+<head>
+<title>Tapper User Manual</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Tapper User Manual">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">Tapper User Manual</h1>
+<div class="node">
+<a name="Top"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Synopsis">Synopsis</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+
+</div>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Synopsis">Synopsis</a>
+<li><a accesskey="2" href="#Technical-Infrastructure">Technical Infrastructure</a>
+<li><a accesskey="3" href="#Test-Protocol">Test Protocol</a>
+<li><a accesskey="4" href="#Test-Suite-Wrappers">Test Suite Wrappers</a>
+<li><a accesskey="5" href="#Preconditions">Preconditions</a>
+<li><a accesskey="6" href="#Command-line-interface">Command line interface</a>
+<li><a accesskey="7" href="#Web-User-Interface">Web User Interface</a>
+<li><a accesskey="8" href="#Reports-API">Reports API</a>
+<li><a accesskey="9" href="#Complete-Use-Cases">Complete Use Cases</a>
+</ul>
+
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Synopsis" href="#Synopsis">1 Synopsis</a>
+<ul>
+<li><a href="#Tapper-infrastructure">1.1 Tapper infrastructure</a>
+<li><a href="#Vocabulary">1.2 Vocabulary</a>
+<ul>
+<li><a href="#Vocabulary-_002d-Master-Control-Program-_0028MCP_0029">1.2.1 Master Control Program (MCP)</a>
+<li><a href="#Vocabulary-_002d-Program-Run-Control-_0028PRC_0029">1.2.2 Program Run Control (PRC)</a>
+<li><a href="#Vocabulary-_002d-Reports-Receiver">1.2.3 Reports Receiver</a>
+<li><a href="#Vocabulary-_002d-Reports-API">1.2.4 Reports API</a>
+<li><a href="#Vocabulary-_002d-Web-User-Interface">1.2.5 Web User Interface</a>
+<li><a href="#Vocabulary-_002d-Reports-DB">1.2.6 Reports DB</a>
+<li><a href="#Vocabulary-_002d-Testrun-DB">1.2.7 Testrun DB</a>
+<li><a href="#Vocabulary-_002d-Testrun">1.2.8 Testrun</a>
+<li><a href="#Vocabulary-_002d-Preconditions">1.2.9 Preconditions</a>
+<li><a href="#Vocabulary-_002d-Report">1.2.10 Report</a>
+<li><a href="#Vocabulary-_002d-Test-Anything-Protocol-_0028TAP_0029">1.2.11 Test Anything Protocol (TAP)</a>
+<li><a href="#Vocabulary-_002d-TAP-archive">1.2.12 TAP archives</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Technical-Infrastructure" href="#Technical-Infrastructure">2 Technical Infrastructure</a>
+<ul>
+<li><a href="#Adding-a-new-host-into-automation">2.1 Adding a new host into automation</a>
+<ul>
+<li><a href="#Make-machine-remote-hard-resetable">2.1.1 Make machine remote hard resetable</a>
+<li><a href="#Make-machine-PXE-boot-aware">2.1.2 Make machine PXE boot aware</a>
+<li><a href="#Configure-TFTP-on-central-MCP-machine">2.1.3 Configure TFTP on central MCP machine</a>
+<li><a href="#Make-the-hosts-known-in-the-TestrunDB">2.1.4 Make the hosts known in the TestrunDB</a>
+<li><a href="#Optionally-enable-temare-to-generate-tests-for-this-host">2.1.5 Optionally: enable &lsquo;<samp><span class="samp">temare</span></samp>&rsquo; to generate tests for this host</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Test-Protocol" href="#Test-Protocol">3 Test Protocol</a>
+<ul>
+<li><a href="#Test-Anything-Protocol-_0028TAP_0029">3.1 Test Anything Protocol (TAP)</a>
+<li><a href="#Tutorial">3.2 Tutorial</a>
+<ul>
+<li><a href="#Just-plan-and-success">3.2.1 Just plan and success</a>
+<li><a href="#Succession-numbers">3.2.2 Succession numbers</a>
+<li><a href="#Test-descriptions">3.2.3 Test descriptions</a>
+<li><a href="#Mark-tests-as-TODO">3.2.4 Mark tests as TODO</a>
+<li><a href="#Comment-TODO-tests-with-reason">3.2.5 Comment TODO tests with reason</a>
+<li><a href="#Mark-tests-as-SKIP-_0028with-reason_0029">3.2.6 Mark tests as SKIP (with reason)</a>
+<li><a href="#Diagnostics">3.2.7 Diagnostics</a>
+<li><a href="#YAML-Diagnostics">3.2.8 YAML Diagnostics</a>
+<li><a href="#Meta-information-headers-for-reports">3.2.9 Meta information headers for reports</a>
+<li><a href="#Report-sections">3.2.10 Report sections</a>
+<li><a href="#Meta-information-headers-for-report-sections">3.2.11 Meta information headers for report sections</a>
+<li><a href="#Meta-information-structure-summary">3.2.12 Meta information structure summary</a>
+<li><a href="#Explicit-section-markers-with-lazy-plans">3.2.13 Explicit section markers with lazy plans</a>
+<li><a href="#Developing-with-TAP">3.2.14 Developing with TAP</a>
+<li><a href="#TAP-tips">3.2.15 TAP tips</a>
+</li></ul>
+<li><a href="#Particular-use_002dcases">3.3 Particular use-cases</a>
+<ul>
+<li><a href="#Report-Groups">3.3.1 Report Groups</a>
+<ul>
+<li><a href="#Report-grouping-by-same-testrun">3.3.1.1 Report grouping by same testrun</a>
+<li><a href="#Report-grouping-by-arbitrary-idenitifier">3.3.1.2 Report grouping by arbitrary idenitifier</a>
+</li></ul>
+</li></ul>
+<li><a href="#TAP-Archives">3.4 TAP Archives</a>
+<li><a href="#Reporting-TAP-to-the-reports-receiver">3.5 Reporting TAP to the reports receiver</a>
+<ul>
+<li><a href="#Submitting-raw-TAP">3.5.1 Submitting raw TAP</a>
+<li><a href="#Submitting-TAP-Archives">3.5.2 Submitting TAP Archives</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Test-Suite-Wrappers" href="#Test-Suite-Wrappers">4 Test Suite Wrappers</a>
+<ul>
+<li><a href="#Test-Suite-Wrappers">4.1 Available test suite wrappers</a>
+<ul>
+<li><a href="#Test-Suite-Wrappers">4.1.1 tapper-testsuite-autotest</a>
+</li></ul>
+<li><a href="#Test-Suite-Wrappers">4.2 Environment variables</a>
+</li></ul>
+<li><a name="toc_Preconditions" href="#Preconditions">5 Preconditions</a>
+<ul>
+<li><a href="#Preconditions">5.1 SYNOPSIS</a>
+<li><a href="#Preconditions">5.2 Layers of preconditions</a>
+<ul>
+<li><a href="#Preconditions">5.2.1 Normal preconditions</a>
+<li><a href="#Preconditions">5.2.2 Macro preconditions</a>
+</li></ul>
+<li><a href="#Preconditions">5.3 Precondition repository</a>
+<li><a href="#Preconditions">5.4 Overview: Precondition Types</a>
+<ul>
+<li><a href="#Preconditions">5.4.1 Overview: Action precondition types</a>
+<li><a href="#Preconditions">5.4.2 Overview: Highlevel precondition types</a>
+</li></ul>
+<li><a href="#Preconditions">5.5 Details: Precondition Types</a>
+<ul>
+<li><a href="#Preconditions">5.5.1 installer_stop</a>
+<li><a href="#Preconditions">5.5.2 grub</a>
+<li><a href="#Preconditions">5.5.3 package</a>
+<li><a href="#Preconditions">5.5.4 copyfile</a>
+<li><a href="#Preconditions">5.5.5 fstab</a>
+<li><a href="#Preconditions">5.5.6 image</a>
+<li><a href="#Preconditions">5.5.7 repository</a>
+<li><a href="#Preconditions">5.5.8 type: prc</a>
+<li><a href="#Preconditions">5.5.9 type: exec</a>
+<li><a href="#Preconditions">5.5.10 type: hint</a>
+<li><a href="#Preconditions">5.5.11 quote subtleties</a>
+<li><a href="#Preconditions">5.5.12 type: reboot</a>
+<li><a href="#Preconditions">5.5.13 type: autoinstall</a>
+<li><a href="#Preconditions">5.5.14 type: testprogram</a>
+<li><a href="#Preconditions">5.5.15 type: virt</a>
+<li><a href="#Preconditions">5.5.16 General precondition keys &ldquo;mountfile&rdquo;</a>
+</li></ul>
+<li><a href="#Macro-Preconditions">5.6 Macro Preconditions</a>
+<ul>
+<li><a href="#A-real-live-example-_002d-kernel-boot-test">5.6.1 A real live example - kernel boot test</a>
+</li></ul>
+<li><a href="#A-real-live-example-_002d-kernel-boot-test">5.7 Precondition Producers</a>
+<ul>
+<li><a href="#A-real-live-example-_002d-kernel-boot-test">5.7.1 Lazy precondition</a>
+<li><a href="#A-real-live-example-_002d-kernel-boot-test">5.7.2 Producer API</a>
+<li><a href="#A-real-live-example-_002d-kernel-boot-test">5.7.3 Existing producers</a>
+<li><a href="#A-real-live-example-_002d-kernel-boot-test">5.7.4 Example: &ldquo;Kernel&rdquo; precondition producer</a>
+<ul>
+<li><a href="#A-real-live-example-_002d-kernel-boot-test">5.7.4.1 Lazy precondition</a>
+<li><a href="#A-real-live-example-_002d-kernel-boot-test">5.7.4.2 Resulting preconditions</a>
+</li></ul>
+</li></ul>
+</li></ul>
+<li><a name="toc_Command-line-interface" href="#Command-line-interface">6 Command line interface</a>
+<ul>
+<li><a href="#Commandline-Synopsis">6.1 Commandline Synopsis</a>
+<li><a href="#Scheduling">6.2 Scheduling</a>
+<ul>
+<li><a href="#Create-new-queue-and-new-host-and-bind-both-together">6.2.1 Create new queue and new host and bind both together</a>
+<li><a href="#Change-queue-priority">6.2.2 Change queue priority</a>
+<li><a href="#requested-features">6.2.3 requested features</a>
+<li><a href="#Cancel-current-testrun-on-host">6.2.4 Cancel current testrun on host</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Web-User-Interface" href="#Web-User-Interface">7 Web User Interface</a>
+<ul>
+<li><a href="#Web-User-Interface">7.1 Usage</a>
+<li><a href="#Web-User-Interface">7.2 Understanding Tapper Details</a>
+<ul>
+<li><a href="#Web-User-Interface">7.2.1 Part 1 Overview</a>
+<li><a href="#Web-User-Interface">7.2.2 Part 2 Details</a>
+<li><a href="#Web-User-Interface">7.2.3 Part 3 Testrun</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Reports-API" href="#Reports-API">8 Reports API</a>
+<ul>
+<li><a href="#Overview">8.1 Overview</a>
+<li><a href="#Raw-API-Commands">8.2 Raw API Commands</a>
+<ul>
+<li><a href="#upload-aka_002e-attach-a-file-to-a-report">8.2.1 upload aka. attach a file to a report</a>
+<ul>
+<li><a href="#upload-Synopsis">8.2.1.1 upload Synopsis</a>
+<li><a href="#Parameters">8.2.1.2 Parameters</a>
+<li><a href="#upload-Payload">8.2.1.3 upload Payload</a>
+<li><a href="#upload-Example-usage">8.2.1.4 upload Example usage</a>
+</li></ul>
+<li><a href="#download-_002d-download-a-file-which-is-attached-to-a-report">8.2.2 download - download a file which is attached to a report</a>
+<ul>
+<li><a href="#download-Synopsis">8.2.2.1 download Synopsis</a>
+<li><a href="#download-Parameters">8.2.2.2 download Parameters</a>
+<li><a href="#download-Example-usage">8.2.2.3 download Example usage</a>
+</li></ul>
+<li><a href="#mason-_002d-Render-templates-with-embedded-query-language">8.2.3 mason - Render templates with embedded query language</a>
+<ul>
+<li><a href="#mason-Synopsis">8.2.3.1 mason Synopsis</a>
+<li><a href="#mason-Parameters">8.2.3.2 mason Parameters</a>
+<li><a href="#Payload">8.2.3.3 mason Payload</a>
+<li><a href="#Example-usage">8.2.3.4 Example usage</a>
+</li></ul>
+</li></ul>
+<li><a href="#Query-language-DPath">8.3 Query language DPath</a>
+<ul>
+<li><a href="#Reports-Filter-_0028SQL_002dAbstract_0029">8.3.1 Reports Filter (SQL-Abstract)</a>
+<ul>
+<li><a href="#SQL_002dAbstract-expressions">8.3.1.1 SQL::Abstract expressions</a>
+<li><a href="#The-data-structure">8.3.1.2 The data structure</a>
+</li></ul>
+<li><a href="#Data-Filter">8.3.2 Data Filter</a>
+<ul>
+<li><a href="#Data_002dDPath-expressions">8.3.2.1 Data-DPath expressions</a>
+</li></ul>
+<li><a href="#Optimizations">8.3.3 Optimizations</a>
+</li></ul>
+<li><a href="#Client-Utility-tapper_002dapi">8.4 Client Utility tapper-api</a>
+<ul>
+<li><a href="#help">8.4.1 help</a>
+<li><a href="#upload">8.4.2 upload</a>
+<li><a href="#mason">8.4.3 mason</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Complete-Use-Cases" href="#Complete-Use-Cases">9 Complete Use Cases</a>
+<ul>
+<li><a href="#Complete-Use-Cases">9.1 Automatic Xen testing</a>
+<ul>
+<li><a href="#Complete-Use-Cases">9.1.1 Paths</a>
+<li><a href="#Complete-Use-Cases">9.1.2 Choose an image for Dom0 and images for each guest</a>
+<li><a href="#Complete-Use-Cases">9.1.3 PRC configuration</a>
+<ul>
+<li><a href="#Complete-Use-Cases">9.1.3.1 Guest Start Configuration</a>
+<li><a href="#Complete-Use-Cases">9.1.3.2 Testsuite Configuration</a>
+</li></ul>
+<li><a href="#Complete-Use-Cases">9.1.4 Preconditions</a>
+<li><a href="#Complete-Use-Cases">9.1.5 Resulting YAML config</a>
+<li><a href="#Complete-Use-Cases">9.1.6 Grub</a>
+<li><a href="#Complete-Use-Cases">9.1.7 Order Testrun</a>
+</li></ul>
+</li></ul>
+</li></ul>
+</div>
+
+<div class="node">
+<a name="Synopsis"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Technical-Infrastructure">Technical Infrastructure</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">1 Synopsis</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Tapper-infrastructure">Tapper infrastructure</a>
+<li><a accesskey="2" href="#Vocabulary">Vocabulary</a>
+</ul>
+
+<div class="node">
+<a name="Tapper-infrastructure"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary">Vocabulary</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Synopsis">Synopsis</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Synopsis">Synopsis</a>
+
+</div>
+
+<h3 class="section">1.1 Tapper infrastructure</h3>
+
+<p>Tapper is an infrastructure.
+
+<p>It consists of applications, tools and protocols for testing software
+and evaluating the results. One initial main focus was on testing
+Operating Systems in virtualization environments. It is now a modular
+infrastructure for lots of other, related scenarios, like benchmarking
+or build systems.
+
+<p>There are 3 important layers:
+
+     <ul>
+<li><strong>Reports Framework</strong>
+
+     <li><strong>Test Suites</strong>
+
+     <li><strong>Automation System</strong>
+
+</ul>
+
+<p>The layers can work completely autonomously, though can also be
+connected together and are targeted to be stacked in this order:
+
+     <ul>
+<li>The <strong>Report Framework</strong> is for receiving and evaluating
+test reports sent by any source. The only requirement is that the
+result reports are using TAP, the Test Anything Protocol.
+
+     <li>The <strong>Test Suites</strong> are either directed test suites or
+wrappers around existing test projects doing conversion of their
+results into TAP. These are the TAP producers that create reports and
+send them to the Reports Framework.
+
+     <li>The <strong>Automation System</strong> is taking care of setting up
+machines, installing dependencies and test suites and running the
+latter. It can set up virtualized environments.
+
+</ul>
+
+<p>To fully exploit the system you need to learn:
+
+     <ul>
+<li><strong>Connect and prepare a new machine into the infrastructure</strong>
+
+     <li><strong>Write tests using the Test Anything Protocol (TAP)</strong>
+
+     <li><strong>Write preconditions to describe automation tasks</strong>
+
+     <li><strong>Review results via Web interface</strong>
+
+     <li><strong>Evaluate results via Report Query interface</strong>
+
+</ul>
+
+<div class="node">
+<a name="Vocabulary"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Tapper-infrastructure">Tapper infrastructure</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Synopsis">Synopsis</a>
+
+</div>
+
+<h3 class="section">1.2 Vocabulary</h3>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Vocabulary-_002d-Master-Control-Program-_0028MCP_0029">Vocabulary - Master Control Program (MCP)</a>
+<li><a accesskey="2" href="#Vocabulary-_002d-Program-Run-Control-_0028PRC_0029">Vocabulary - Program Run Control (PRC)</a>
+<li><a accesskey="3" href="#Vocabulary-_002d-Reports-Receiver">Vocabulary - Reports Receiver</a>
+<li><a accesskey="4" href="#Vocabulary-_002d-Reports-API">Vocabulary - Reports API</a>
+<li><a accesskey="5" href="#Vocabulary-_002d-Web-User-Interface">Vocabulary - Web User Interface</a>
+<li><a accesskey="6" href="#Vocabulary-_002d-Reports-DB">Vocabulary - Reports DB</a>
+<li><a accesskey="7" href="#Vocabulary-_002d-Testrun-DB">Vocabulary - Testrun DB</a>
+<li><a accesskey="8" href="#Vocabulary-_002d-Testrun">Vocabulary - Testrun</a>
+<li><a accesskey="9" href="#Vocabulary-_002d-Preconditions">Vocabulary - Preconditions</a>
+<li><a href="#Vocabulary-_002d-Report">Vocabulary - Report</a>
+<li><a href="#Vocabulary-_002d-Test-Anything-Protocol-_0028TAP_0029">Vocabulary - Test Anything Protocol (TAP)</a>
+<li><a href="#Vocabulary-_002d-TAP-archive">Vocabulary - TAP archive</a>
+</ul>
+
+<div class="node">
+<a name="Vocabulary---Master-Control-Program-(MCP)"></a>
+<a name="Vocabulary-_002d-Master-Control-Program-_0028MCP_0029"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Program-Run-Control-_0028PRC_0029">Vocabulary - Program Run Control (PRC)</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary">Vocabulary</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.1 Master Control Program (MCP)</h4>
+
+<p>There is a central server controlling the automation by running the
+<strong>Master Control Program</strong>, aka. <strong>MCP</strong>. Usually it also
+centralizes several other services: it is the TFTP server for network
+booting, runs the daemons of the reports framework (reports receiver,
+remote api) and the web application, including the mysql databases,
+and also serves the file repository via NFS.
+
+<div class="node">
+<a name="Vocabulary---Program-Run-Control-(PRC)"></a>
+<a name="Vocabulary-_002d-Program-Run-Control-_0028PRC_0029"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Reports-Receiver">Vocabulary - Reports Receiver</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Master-Control-Program-_0028MCP_0029">Vocabulary - Master Control Program (MCP)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.2 Program Run Control (PRC)</h4>
+
+<p>When machines run automated tests, these test program runs are
+controlled by a <strong>Program Run Control</strong>, aka. <strong>PRC</strong>. In
+virtualization scenarios, each host and guest has its own PRC,
+numbered PRC0 (for the host), PRC1 (1st guest), PRC2 (2nd guest), etc.
+
+<div class="node">
+<a name="Vocabulary---Reports-Receiver"></a>
+<a name="Vocabulary-_002d-Reports-Receiver"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Reports-API">Vocabulary - Reports API</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Program-Run-Control-_0028PRC_0029">Vocabulary - Program Run Control (PRC)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.3 Reports Receiver</h4>
+
+<p>The <strong>Reports Receiver</strong> means the daemons that accept
+reports. We often run them on the same machine as the MCP and the Web
+framework, but that's not neccessary.
+
+<div class="node">
+<a name="Vocabulary---Reports-API"></a>
+<a name="Vocabulary-_002d-Reports-API"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Web-User-Interface">Vocabulary - Web User Interface</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Reports-Receiver">Vocabulary - Reports Receiver</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.4 Reports API</h4>
+
+<p>Similar to the reports receiver is the <strong>Reports API</strong> which is
+the daemon for all more complex interfaces, like uploading files,
+downloading files, querying the reports. Similar to reports API we
+often run them on the same machine as the MCP and the Web application,
+but that's not neccessary.
+
+<div class="node">
+<a name="Vocabulary---Web-User-Interface"></a>
+<a name="Vocabulary-_002d-Web-User-Interface"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Reports-DB">Vocabulary - Reports DB</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Reports-API">Vocabulary - Reports API</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.5 Web User Interface</h4>
+
+<p>The <strong>Web User Interface</strong> is an independent web
+application. Similar to the reports receiver and the reports API it
+can run anywhere, either standalone or in Apache, via mod_perl, FCGI,
+etc.. The only common thing for all those central applications (MCP,
+reports receiver, reports api, web application) is the config to use
+the same databases.
+
+<div class="node">
+<a name="Vocabulary---Reports-DB"></a>
+<a name="Vocabulary-_002d-Reports-DB"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Testrun-DB">Vocabulary - Testrun DB</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Web-User-Interface">Vocabulary - Web User Interface</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.6 Reports DB</h4>
+
+<p>The <strong>Reports DB</strong> contains all data that are reported. It's the
+base for the reports receiver, the reports API, the web application.
+
+<div class="node">
+<a name="Vocabulary---Testrun-DB"></a>
+<a name="Vocabulary-_002d-Testrun-DB"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Testrun">Vocabulary - Testrun</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Reports-DB">Vocabulary - Reports DB</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.7 Testrun DB</h4>
+
+<p>The <strong>Testrun DB</strong> is the DB for the automation layer. It
+contains hosts, testrun specifications and scheduling information.
+
+<div class="node">
+<a name="Vocabulary---Testrun"></a>
+<a name="Vocabulary-_002d-Testrun"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Preconditions">Vocabulary - Preconditions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Testrun-DB">Vocabulary - Testrun DB</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.8 Testrun</h4>
+
+<p>A <strong>Testrun</strong> is a request to the automation layer to set up a
+host machine and run a workload on it. It consists of
+&ldquo;preconditions&rdquo; and scheduling information (host name, wanted host
+features, scheduling queue).
+
+<div class="node">
+<a name="Vocabulary---Preconditions"></a>
+<a name="Vocabulary-_002d-Preconditions"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Report">Vocabulary - Report</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Testrun">Vocabulary - Testrun</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.9 Preconditions</h4>
+
+<p><strong>Preconditions</strong> are specifications that describe how to set up
+a host. They are the essential part of a testrun.
+
+<div class="node">
+<a name="Vocabulary---Report"></a>
+<a name="Vocabulary-_002d-Report"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-Test-Anything-Protocol-_0028TAP_0029">Vocabulary - Test Anything Protocol (TAP)</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Preconditions">Vocabulary - Preconditions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.10 Report</h4>
+
+<p>A <strong>Report</strong> is the reported result of any workload, regardless
+of how it was produced (automatically, by a tes suite, manually via
+echo and netcat). Its only requirement is to be formatted in TAP (the
+Test Anything Protocol), or as TAP archive.
+
+<div class="node">
+<a name="Vocabulary---Test-Anything-Protocol-(TAP)"></a>
+<a name="Vocabulary-_002d-Test-Anything-Protocol-_0028TAP_0029"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Vocabulary-_002d-TAP-archive">Vocabulary - TAP archive</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Report">Vocabulary - Report</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.11 Test Anything Protocol (TAP)</h4>
+
+<p>The <strong>Test Anything Protocol</strong> aka. <strong>TAP</strong> is the syntax to
+describe test results.
+
+<div class="node">
+<a name="Vocabulary---TAP-archive"></a>
+<a name="Vocabulary-_002d-TAP-archive"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Vocabulary-_002d-Test-Anything-Protocol-_0028TAP_0029">Vocabulary - Test Anything Protocol (TAP)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Vocabulary">Vocabulary</a>
+
+</div>
+
+<h4 class="subsection">1.2.12 TAP archives</h4>
+
+<p>A <strong>TAP archive</strong> is a .tar.gz file that contains files of
+TAP. It's the result of a test suite that can consist of many parts
+compressed into a single file.
+
+<div class="node">
+<a name="Technical-Infrastructure"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Test-Protocol">Test Protocol</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Synopsis">Synopsis</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">2 Technical Infrastructure</h2>
+
+<p>See also the &ldquo;Getting Started Guide&rdquo; for more complete step-by-step
+instructions how to install the infrastructure from scratch up to a
+first example test run.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Adding-a-new-host-into-automation">Adding a new host into automation</a>
+</ul>
+
+<div class="node">
+<a name="Adding-a-new-host-into-automation"></a>
+<p><hr>
+Up:&nbsp;<a rel="up" accesskey="u" href="#Technical-Infrastructure">Technical Infrastructure</a>
+
+</div>
+
+<h3 class="section">2.1 Adding a new host into automation</h3>
+
+<p>This chapter describes what you need to do in order to get a new
+machine into the Tapper test scheduling rotation.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Make-machine-remote-hard-resetable">Make machine remote hard resetable</a>
+<li><a accesskey="2" href="#Make-machine-PXE-boot-aware">Make machine PXE boot aware</a>
+<li><a accesskey="3" href="#Configure-TFTP-on-central-MCP-machine">Configure TFTP on central MCP machine</a>
+<li><a accesskey="4" href="#Make-the-hosts-known-in-the-TestrunDB">Make the hosts known in the TestrunDB</a>
+<li><a accesskey="5" href="#Optionally-enable-temare-to-generate-tests-for-this-host">Optionally enable temare to generate tests for this host</a>
+</ul>
+
+<div class="node">
+<a name="Make-machine-remote-hard-resetable"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Make-machine-PXE-boot-aware">Make machine PXE boot aware</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Adding-a-new-host-into-automation">Adding a new host into automation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Adding-a-new-host-into-automation">Adding a new host into automation</a>
+
+</div>
+
+<h4 class="subsection">2.1.1 Make machine remote hard resetable</h4>
+
+<p>Connect the machine physically to some facility to programmatically
+switch it completely off.
+
+<p>This can be the Reset cable wires connected to a dedicated reset box
+which can be programmed usually with an external tool. It can also be
+a TCP/IP controllable Power Control.
+
+<p>As an example Tapper comes with a plugin for the &ldquo;Infratec PM211
+MIP&rdquo; ethernet controllable multi socket outlet. To use it write this
+in the configuration file:
+
+<pre class="verbatim">reset_plugin: PM211MIP
+reset_plugin_options:
+  ip: 192.168.1.39
+  user: admin
+  passwd: secret
+  outletnr:
+    johnconnor: 1
+    sarahconnor: 2
+</pre>
+
+<p>This configures to use the PM211MIP plugin for reset and gives it the
+configuration that the host &ldquo;johnconnor&rdquo; is connected on port 0 and
+the host &ldquo;sarahconnor&rdquo; on port 1, together with IP address, username
+and password of the multi-socket outlet.
+
+<p>If you have other hardware then write your own reset plugin
+<code>FooBar</code> in a Perl module
+<code>Tapper::MCP::Net::Reset::FooBar</code>. Look into the code of
+<code>Tapper::MCP::Net::Reset::PM211MIP</code> to get inspiration.
+
+<div class="node">
+<a name="Make-machine-PXE-boot-aware"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Configure-TFTP-on-central-MCP-machine">Configure TFTP on central MCP machine</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Make-machine-remote-hard-resetable">Make machine remote hard resetable</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Adding-a-new-host-into-automation">Adding a new host into automation</a>
+
+</div>
+
+<h4 class="subsection">2.1.2 Make machine PXE boot aware</h4>
+
+     <ul>
+<li>Set booting order in BIOS to network first
+
+     <li>Configure DHCP for each connected machine
+
+     <p>The following example configures two hosts &lsquo;<samp><span class="samp">sarahconnor</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">johnconnor</span></samp>&rsquo; to use the respective files
+&lsquo;<samp><span class="samp">/tftpboot/sarahconnor.lst</span></samp>&rsquo; and &lsquo;<samp><span class="samp">/tftpboot/johnconnor.lst</span></samp>&rsquo;
+as grub config.
+
+     <pre class="verbatim">     # example dhcp config with invalid ethernet addresses
+     subnet 192.168.1.0 netmask 255.255.255.0 {
+     group
+     {
+      filename '/tftpboot/pxegrub';
+      # offer the host the here given name as host name
+      option host-name = host-decl-name;
+      option dhcp-parameter-request-list = concat(option dhcp-parameter-request-list,96);
+      host sarahconnor
+      {
+        hardware ethernet 00:09:11:11:11:11;
+        fixed-address 192.168.1.2;
+        option configfile "/tftpboot/sarahconnor.lst";
+      }
+      host johnconnor
+      {
+       hardware ethernet 00:09:22:22:22:22;
+       fixed-address 192.168.1.3;
+       option configfile "/tftpboot/johnconnor.lst";
+      }
+     }
+</pre>
+
+     <p>These grub config files are later dynamically overwritten for each
+boot by your application server's &ldquo;Master Control Program&rdquo; (MCP).
+
+     <p>The example above assumes the DHCP also running on the central Master
+Control Program (MCP) server. To use a DHCP server running on another
+host configure it with some grub/tftp redirection chains to in the end
+lead to the same files &lsquo;<samp><span class="samp">/tftpboot/sarahconnor.lst</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">/tftpboot/johnconnor.lst</span></samp>&rsquo; loaded from the MCP server.
+
+     <li>Force DHCP server to reread its configuration
+
+     <pre class="verbatim">      $ kill -HUP $pid_of_dhcpd
+</pre>
+
+</ul>
+
+<div class="node">
+<a name="Configure-TFTP-on-central-MCP-machine"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Make-the-hosts-known-in-the-TestrunDB">Make the hosts known in the TestrunDB</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Make-machine-PXE-boot-aware">Make machine PXE boot aware</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Adding-a-new-host-into-automation">Adding a new host into automation</a>
+
+</div>
+
+<h4 class="subsection">2.1.3 Configure TFTP on central MCP machine</h4>
+
+<p>The MCP server is also acting as a TFTP server, so it has to be
+configured as such:
+
+     <ul>
+<li>Install a TFTP server
+
+     <pre class="verbatim">      $ sudo apt-get install inetutils-inetd
+      $ sudo apt-get install atftpd
+      $ sudo chmod 777 /var/lib/tftpboot/
+      $ sudo ln -s /var/lib/tftpboot /tftpboot
+</pre>
+
+     <li>Create symlinks to point TFTP dir into Tapper working dir
+
+     <p>The TFTP daemon only serves files from &lsquo;<samp><span class="samp">/tftpboot</span></samp>&rsquo;, as seen above
+in the DHCP config. To supply files from the Tapper working dir make
+the &lsquo;<samp><span class="samp">/tftpboot</span></samp>&rsquo; a symlink to the Tapper working dir.
+
+     <pre class="verbatim">      $ ln -s /data/tapper/live/configs/tftpboot /tftpboot
+</pre>
+
+     <p>When Tapper creates tftp files it works with absolute path
+names. Because the TFTP daemon interprets all absolute pathnames
+relative to its root dir we supply a &lsquo;<samp><span class="samp">tftpboot</span></samp>&rsquo; symlink inside
+the tftp root (which is also our Tapper working dir), so we can use
+the same absolute path name in both contexts (Tapper and TFTP):
+
+     <pre class="verbatim">      $ ln -s /data/tapper/live/configs/tftpboot \
+              /data/tapper/live/configs/tftpboot/tftpboot
+</pre>
+
+</ul>
+
+<div class="node">
+<a name="Make-the-hosts-known-in-the-TestrunDB"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Optionally-enable-temare-to-generate-tests-for-this-host">Optionally enable temare to generate tests for this host</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Configure-TFTP-on-central-MCP-machine">Configure TFTP on central MCP machine</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Adding-a-new-host-into-automation">Adding a new host into automation</a>
+
+</div>
+
+<h4 class="subsection">2.1.4 Make the hosts known in the TestrunDB</h4>
+
+<pre class="verbatim"> $ tapper-testrun newhost --name=sarahconnor --active=1
+ $ tapper-testrun newhost --name=johnconnor  --active=1
+</pre>
+
+<p>This makes the hosts generally available (active) for scheduling
+testruns by machine name. For scheduling hosts by more detailed
+machine features (cpu, memory, family, etc.)  you need to add
+according key/value pairs in the &lsquo;<samp><span class="samp">HostFeature</span></samp>&rsquo; table.
+
+<div class="node">
+<a name="Optionally-enable-temare-to-generate-tests-for-this-host"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Make-the-hosts-known-in-the-TestrunDB">Make the hosts known in the TestrunDB</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Adding-a-new-host-into-automation">Adding a new host into automation</a>
+
+</div>
+
+<h4 class="subsection">2.1.5 Optionally: enable &lsquo;<samp><span class="samp">temare</span></samp>&rsquo; to generate tests for this host</h4>
+
+<p>&lsquo;<samp><span class="samp">Temare</span></samp>&rsquo; is an utility that generates preconditions according to
+a test matrix of host/guest virtualization scenarios (but not yet
+shipped publicly).
+
+<p>For generating preconditions for a host, you can register the host in
+&lsquo;<samp><span class="samp">temare</span></samp>&rsquo;.
+
+<p>If you want tests scheduled for the new machine then follow these
+steps:
+
+     <ul>
+<li>Login as root on MCP server
+
+     <li>Set the <code>PYTHONPATH</code> to include the <em>temare</em> src directory
+
+     <pre class="verbatim">     export PYTHONPATH=$PYTHONPATH:/opt/tapper/python/temare/src
+</pre>
+
+     <li>Add the host to temare hostlist
+
+     <pre class="verbatim">      $ /opt/tapper/python/temare/temare hostadd $hostname \
+                                                  $memory \
+                                                  $cores \
+                                                  $bitness
+</pre>
+
+     <li>Add the Tapper ssh key to your image.
+
+     <pre class="verbatim">     cat /home/tapper/.ssh/id_dsa.pub >> /root/.ssh/authorized_keys
+</pre>
+
+     <p>(FIXME) Actually this does not belong into the host preparation but
+into a separate image preparation chapter which does not yet exist.
+
+</ul>
+
+<p><a name="index-Index-entry-for-First-Chapter-1"></a>
+
+<div class="node">
+<a name="Test-Protocol"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Test-Suite-Wrappers">Test Suite Wrappers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Technical-Infrastructure">Technical Infrastructure</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">3 Test Protocol</h2>
+
+<p>In order to write test suites you need to understand the output
+protocol, which is &lsquo;<samp><span class="samp">TAP</span></samp>&rsquo;, the &lsquo;<samp><span class="samp">Test Anything Protocol</span></samp>&rsquo;.
+
+<p>The protocol is trivially to produce, you can do it with simple Shell
+&lsquo;<samp><span class="samp">echo</span></samp>&rsquo;s or you can use TAP emitting toolchains, like practically
+all &lsquo;<samp><span class="samp">Test::*</span></samp>&rsquo; modules from the Perl world.
+
+<p>This chapter explains the protocol and the Tapper specific
+extensions, which are usually headers that can be transported inside
+TAP comments.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Test-Anything-Protocol-_0028TAP_0029">Test Anything Protocol (TAP)</a>
+<li><a accesskey="2" href="#Tutorial">Tutorial</a>
+<li><a accesskey="3" href="#Particular-use_002dcases">Particular use-cases</a>
+<li><a accesskey="4" href="#TAP-Archives">TAP Archives</a>
+<li><a accesskey="5" href="#Reporting-TAP-to-the-reports-receiver">Reporting TAP to the reports receiver</a>
+</ul>
+
+<div class="node">
+<a name="Test-Anything-Protocol-(TAP)"></a>
+<a name="Test-Anything-Protocol-_0028TAP_0029"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Tutorial">Tutorial</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Test-Protocol">Test Protocol</a>
+
+</div>
+
+<h3 class="section">3.1 Test Anything Protocol (TAP)</h3>
+
+<div class="node">
+<a name="Tutorial"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Particular-use_002dcases">Particular use-cases</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Test-Anything-Protocol-_0028TAP_0029">Test Anything Protocol (TAP)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Test-Protocol">Test Protocol</a>
+
+</div>
+
+<h3 class="section">3.2 Tutorial</h3>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Just-plan-and-success">Just plan and success</a>
+<li><a accesskey="2" href="#Succession-numbers">Succession numbers</a>
+<li><a accesskey="3" href="#Test-descriptions">Test descriptions</a>
+<li><a accesskey="4" href="#Mark-tests-as-TODO">Mark tests as TODO</a>
+<li><a accesskey="5" href="#Comment-TODO-tests-with-reason">Comment TODO tests with reason</a>
+<li><a accesskey="6" href="#Mark-tests-as-SKIP-_0028with-reason_0029">Mark tests as SKIP (with reason)</a>
+<li><a accesskey="7" href="#Diagnostics">Diagnostics</a>
+<li><a accesskey="8" href="#YAML-Diagnostics">YAML Diagnostics</a>
+<li><a accesskey="9" href="#Meta-information-headers-for-reports">Meta information headers for reports</a>
+<li><a href="#Report-sections">Report sections</a>
+<li><a href="#Meta-information-headers-for-report-sections">Meta information headers for report sections</a>
+<li><a href="#Meta-information-structure-summary">Meta information structure summary</a>
+<li><a href="#Explicit-section-markers-with-lazy-plans">Explicit section markers with lazy plans</a>
+<li><a href="#Developing-with-TAP">Developing with TAP</a>
+<li><a href="#TAP-tips">TAP tips</a>
+</ul>
+
+<div class="node">
+<a name="Just-plan-and-success"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Succession-numbers">Succession numbers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Tutorial">Tutorial</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.1 Just plan and success</h4>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ ok
+ ok
+ not ok
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>3 single tests planned
+<li>the two first went good
+<li>the last went wrong
+</ul>
+
+<div class="node">
+<a name="Succession-numbers"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Test-descriptions">Test descriptions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Just-plan-and-success">Just plan and success</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.2 Succession numbers</h4>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ ok 1
+ ok 2
+ not ok 3
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>Missing test lines (eg. due to internal bummers) can be detected. 
+</ul>
+
+<p><strong>Example with missing test:</strong>
+
+<pre class="verbatim"> 1..3
+ ok 1
+ not ok 3
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>Parsing will later say &ldquo; test 2 expected but got 3&rdquo;
+</ul>
+
+<div class="node">
+<a name="Test-descriptions"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Mark-tests-as-TODO">Mark tests as TODO</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Succession-numbers">Succession numbers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.3 Test descriptions</h4>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ ok 1 - input file opened
+ ok 2 - file content
+ not ok 3 - last line
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>Readability. 
+</ul>
+
+<div class="node">
+<a name="Mark-tests-as-TODO"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Comment-TODO-tests-with-reason">Comment TODO tests with reason</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Test-descriptions">Test descriptions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.4 Mark tests as TODO</h4>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ ok 1 - input file opened
+ ok 2 - file content
+ not ok 3 - last line # TODO
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>mark not yet working tests as "TODO"
+<li>allows test-first development
+<li>"ok" TODOs are recognized later
+ ("unexpectedly succeeded")
+<li>We also use it to ignore known issues with still being able to find
+them later. 
+</ul>
+
+<div class="node">
+<a name="Comment-TODO-tests-with-reason"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Mark-tests-as-SKIP-_0028with-reason_0029">Mark tests as SKIP (with reason)</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Mark-tests-as-TODO">Mark tests as TODO</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.5 Comment TODO tests with reason</h4>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ ok 1 - input file opened
+ ok 2 - file content
+ not ok 3 - last line # TODO just specced
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>comment the TODO reason
+</ul>
+
+<div class="node">
+<a name="Mark-tests-as-SKIP-(with-reason)"></a>
+<a name="Mark-tests-as-SKIP-_0028with-reason_0029"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Diagnostics">Diagnostics</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Comment-TODO-tests-with-reason">Comment TODO tests with reason</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.6 Mark tests as SKIP (with reason)</h4>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ ok 1 - input file opened
+ ok 2 - file content
+ ok 3 - last line # SKIP missing prerequisites
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>mark tests when not really run (note it's set to &ldquo;ok&rdquo; anyway)
+<li>keeps succession numbers in sync
+</ul>
+
+<div class="node">
+<a name="Diagnostics"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#YAML-Diagnostics">YAML Diagnostics</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Mark-tests-as-SKIP-_0028with-reason_0029">Mark tests as SKIP (with reason)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.7 Diagnostics</h4>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ ok 1 - input file opened
+ ok 2 - file content
+ not ok 3 - last line # TODO just specced
+ # Failed test 'last line'
+ # at t/data_dpath.t line 410.
+ # got: 'foo'
+ # expected: 'bar'
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>Unstructured details
+</ul>
+
+<div class="node">
+<a name="YAML-Diagnostics"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Meta-information-headers-for-reports">Meta information headers for reports</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Diagnostics">Diagnostics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.8 YAML Diagnostics</h4>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ ok 1 - input file opened
+ ok 2 - file content
+ not ok 3 - last line # TODO just specced
+   ---
+   message: Failed test 'last line' at t/data_dpath.t line 410.
+   severity: fail
+   data:
+     got: 'foo'
+     expect: 'bar'
+   ...
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>Structured details
+<li>allows parsable diagnostics
+<li>we use that to track values inside TAP
+<li>have a leading test line with number+description
+<li>track complete data structures according to it
+          <ul>
+<li>e.g., benchmark results
+</ul>
+     </ul>
+
+<div class="node">
+<a name="Meta-information-headers-for-reports"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Report-sections">Report sections</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#YAML-Diagnostics">YAML Diagnostics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.9 Meta information headers for reports</h4>
+
+<p>TAP allows comment lines, starting with &lsquo;<samp><span class="samp">#</span></samp>&rsquo;. We allow meta
+information transported inside those comment lines when declared with
+Tapper specific headers.
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..3
+ # Tapper-Suite-Name: Foo-Bar
+ # Tapper-Suite-Version: 2.010013
+ ok 1 - input file opened
+ ok 2 - file content
+ not ok 3 - last line # TODO just specced
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>we use diagnostics lines (&ldquo;hot comments&rdquo;)
+<li>semantics only to our TAP applications
+</ul>
+
+<p>These are the headers that apply to the whole report:
+
+<pre class="verbatim"> # Tapper-suite-name:                 -- suite name
+ # Tapper-suite-version:              -- suite version
+ # Tapper-machine-name:               -- machine/host name
+ # Tapper-machine-description:        -- more details to machine
+ # Tapper-reportername:               -- user name of the reporter
+ # Tapper-starttime-test-program:     -- start time for complete test
+                                          (including guests)
+ # Tapper-endtime-test-program:       -- end time for complete test
+                                          (including guests)
+ # Tapper-reportgroup-testrun:        -- associate this report with other 
+                                          reports of same testrun_id
+ # Tapper-reportgroup-arbitrary:      -- associate this report with other 
+                                          reports of same arbitrary id
+                                          (can be any string, but should be
+                                          unique between all groups of the db,
+                                          eg., an md5-hash of common 
+                                          characteristics of all test of one 
+                                          group)
+
+</pre>
+
+<p>There are more headers that apply to single sections of a report.
+
+<div class="node">
+<a name="Report-sections"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Meta-information-headers-for-report-sections">Meta information headers for report sections</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Meta-information-headers-for-reports">Meta information headers for reports</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.10 Report sections</h4>
+
+<p>Standard TAP contains of exactly one block with one plan (eg., 1..5)
+and some TAP lines. In Tapper you can concatenate several such blocks
+at once. They are interpreted like different files, and are named
+<em>sections</em> in Tapper jargon.
+
+<p>The delimiter between such sections is the plan line. This requires
+the plan to come first for each section. See chapters &ldquo;Explicit
+section markers with lazy plans&rdquo; and &ldquo;TAP archives&rdquo; below for
+explicitely providing other TAP section delimiters.
+
+<p>Please remember: <strong>Concatenating several sections into one big
+block of TAP is an Tapper extension. To interact with other TAP
+toolchains you should try to use &ldquo;TAP archives&rdquo; when submitting
+sections into Tapper.</strong>
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> 1..2
+ # Tapper-section: arithmetics
+ ok 1 add
+ ok 2 multiply
+ 1..1
+ # Tapper-section: string handling
+ ok 1 concat
+ 1..3
+ # Tapper-section: benchmarks
+ ok 1
+ ok 2
+ ok 3
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>we recognize &ldquo;sections&rdquo;, each with its own plan
+<li>allows structuring of results,
+<li>better readability later in web interface
+</ul>
+
+<div class="node">
+<a name="Meta-information-headers-for-report-sections"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Meta-information-structure-summary">Meta information structure summary</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Report-sections">Report sections</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.11 Meta information headers for report sections</h4>
+
+<p>These are the headers that apply to single sections:
+
+<pre class="verbatim">
+ # Tapper-explicit-section-start:   -- explicitely start a section now
+                                        instead of autorecognition
+ # Tapper-ram:                      -- memory
+ # Tapper-cpuinfo:                  -- what CPU
+ # Tapper-uname:                    -- kernel information
+ # Tapper-osname:                   -- OS information
+ # Tapper-bios:                     -- BIOS information
+ # Tapper-flags:                    -- flags, usually linux kernel
+ # Tapper-changeset:                -- exact changeset of the currently 
+                                        tested software or kernel
+ # Tapper-description:              -- more description of the currently
+                                        tested software or kernel, 
+                                        e.g., if changeset is not enough
+ # Tapper-uptime:                   -- uptime, maybe the test run time
+ # Tapper-language-description:     -- for Software tests, 
+                                        like "Perl 5.10", "Python 2.5"
+ # Tapper-reportcomment:            -- Freestyle comment
+
+ # Tapper-xen-version:              -- Xen version
+ # Tapper-xen-changeset:            -- particular Xen changeset
+ # Tapper-xen-dom0-kernel:          -- the kernel version of the dom0
+ # Tapper-xen-base-os-description:  -- more verbose OS information
+ # Tapper-xen-guest-description:    -- description of a guest
+ # Tapper-xen-guest-test:           -- the started test program
+ # Tapper-xen-guest-start:          -- start time of test
+ # Tapper-xen-guest-flags:          -- flags used for starting the guest
+
+ # Tapper-kvm-module-version:       -- version of KVM kernel module
+ # Tapper-kvm-userspace-version:    -- version of KVM userland tools
+ # Tapper-kvm-kernel:               -- version of kernel
+ # Tapper-kvm-base-os-description:  -- more verbose OS information
+ # Tapper-kvm-guest-description:    -- description of a guest
+ # Tapper-kvm-guest-test:           -- the started test program
+ # Tapper-kvm-guest-start:          -- start time of test
+ # Tapper-kvm-guest-flags:          -- flags used for starting the guest
+
+ # Tapper-simnow-version:           -- version of simnow
+ # Tapper-simnow-svn-version:       -- svn commit id of simnow
+ # Tapper-simnow-svn-repository:    -- used svn repository
+ # Tapper-simnow-device-interface-version: -- internal simnow device 
+                                               interface version
+ # Tapper-simnow-bsd-file:          -- used BSD file (machine model)
+ # Tapper-simnow-image-file:        -- used OS image botted in simnow
+                                        (usually similar to
+                                        Tapper-osname or
+                                        Tapper-xen-base-os-description or
+                                        Tapper-kvm-base-os-description)
+
+</pre>
+
+<div class="node">
+<a name="Meta-information-structure-summary"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Explicit-section-markers-with-lazy-plans">Explicit section markers with lazy plans</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Meta-information-headers-for-report-sections">Meta information headers for report sections</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.12 Meta information structure summary</h4>
+
+<p>There are groups of reports (e.g. for virtualization scenarios),
+optionally identified by a testrun ID or by an arbitrary ID. Every
+report has an ID and a set of meta information. A report consists of
+sections, which can each have section specific set of meta
+information.
+
+<p>The resulting meta information hierarchy looks like this.
+
+     <ul>
+<li>Reportgroup
+
+     <pre class="verbatim">     - testrun reportgroup ID
+     - arbitrary reportgroup ID
+</pre>
+
+          <ul>
+<li>Report
+
+          <pre class="verbatim">          - report ID
+          - Tapper-suite-name
+          - Tapper-suite-version
+          - Tapper-machine-name
+          - Tapper-machine-description
+          - Tapper-reportername
+          - Tapper-starttime-test-program
+          - Tapper-endtime-test-program
+          - Tapper-reportgroup-testrun
+          - Tapper-reportgroup-arbitrary
+     </pre>
+
+               <ul>
+<li>Section
+
+               <pre class="verbatim">               - Tapper-explicit-section-start
+               - Tapper-ram
+               - Tapper-cpuinfo
+               - Tapper-uname
+               - Tapper-osname
+               - Tapper-bios
+               - Tapper-flags
+               - Tapper-changeset
+               - Tapper-description
+               - Tapper-uptime
+               - Tapper-language-description
+               - Tapper-reportcomment
+               - Tapper-xen-version
+               - Tapper-xen-changeset
+               - Tapper-xen-dom0-kernel
+               - Tapper-xen-base-os-description
+               - Tapper-xen-guest-description
+               - Tapper-xen-guest-test
+               - Tapper-xen-guest-start
+               - Tapper-xen-guest-flags
+               - Tapper-kvm-module-version
+               - Tapper-kvm-userspace-version
+               - Tapper-kvm-kernel
+               - Tapper-kvm-base-os-description
+               - Tapper-kvm-guest-description
+               - Tapper-kvm-guest-test
+               - Tapper-kvm-guest-start
+               - Tapper-kvm-guest-flags
+               - Tapper-simnow-version
+               - Tapper-simnow-svn-version
+               - Tapper-simnow-svn-repository
+               - Tapper-simnow-device-interface-version
+               - Tapper-simnow-bsd-file
+               - Tapper-simnow-image-file
+          </pre>
+
+          </ul>
+
+     </ul>
+
+</ul>
+
+<div class="node">
+<a name="Explicit-section-markers-with-lazy-plans"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Developing-with-TAP">Developing with TAP</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Meta-information-structure-summary">Meta information structure summary</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.13 Explicit section markers with lazy plans</h4>
+
+<p>In TAP it is allowed to print the plan (1..n) after the test lines (a
+&ldquo;lazy plan&rdquo;).  In our Tapper environment with concatenated sections
+this would break the default section splitting which uses the plan to
+recognize a section start.
+
+<p>If you want to use such a &ldquo;lazy plan&rdquo; in your report you can print
+an Tapper header <code>Tapper-explicit-section-start</code> to explictely
+start a section. Everything until the next header
+<code>Tapper-explicit-section-start</code> is building one section. This
+also means that if you used this header <strong>once</strong> in a report you
+need to use it for <strong>all</strong> sections in this report.
+
+<p>The <code>Tapper-explicit-section-start</code> typically ignores its value
+but it is designed anyway to allow any garbage after the value that
+can help you visually structure your reports because explicit sections
+with &ldquo;lazy plans&rdquo; make a report hard to read.
+
+<p><strong>Example:</strong>
+
+<pre class="verbatim"> # Tapper-explicit-section-start: 1 ------ arithmetics -------
+ # Tapper-section: arithmetics
+ ok 1 add
+ ok 2 multiply
+ 1..2
+ # Tapper-explicit-section-start: 1 ------ string handling -------
+ # Tapper-section: string handling
+ ok 1 concat
+ 1..1
+ # Tapper-explicit-section-start: 1 ------ benchmarks -------
+ # Tapper-section: benchmarks
+ ok 1
+ ok 2
+ ok 3
+ 1..3
+</pre>
+
+<p>Please note again: <strong>The sectioning in general and this
+auxiliary header for marking sections is an Tapper extension, not
+standard TAP. An alternative way better than fiddling with this
+sectioning is to produce TAP archives and submit them instead. See
+chapter &ldquo;TAP Archives&rdquo;.</strong>
+
+<div class="node">
+<a name="Developing-with-TAP"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#TAP-tips">TAP tips</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Explicit-section-markers-with-lazy-plans">Explicit section markers with lazy plans</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.14 Developing with TAP</h4>
+
+<p>TAP consuming is provided via the <code>Test::Harness</code>
+aka. <code>TAP::Parser</code> Perl toolchain. The frontend utility to
+execute TAP emitting tests and evaluate statistics is <code>prove</code>.
+
+<pre class="verbatim"> $ prove t/*.t
+ t/00-load.........ok
+ t/boilerplate.....ok
+ t/pod-coverage....ok
+ All tests successful.
+ Files=4, Tests=6, 0 wallclock secs
+ ( 0.05 usr 0.00 sys + 0.28 cusr 0.05 csys = 0.38 CPU)
+ Result: PASS
+</pre>
+
+<p><strong>Remarks:</strong>
+     <ul>
+<li>TAP::Parser
+          <ul>
+<li><code>prove</code> tool
+<li>overall success and statistics
+<li>allows &lsquo;<samp><span class="samp">formatters</span></samp>&rsquo;
+<li>used to produce web reports
+</ul>
+     </ul>
+
+<p>It helps to not rely on Tapper extensions (like report sections) when
+using the <code>prove</code> command.
+
+<div class="node">
+<a name="TAP-tips"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Developing-with-TAP">Developing with TAP</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Tutorial">Tutorial</a>
+
+</div>
+
+<h4 class="subsection">3.2.15 TAP tips</h4>
+
+     <ul>
+<li>TAP is easy to produce but using it <strong>usefully</strong> can be a challenge. 
+<li>Use <strong>invariable</strong> test descriptions. 
+<li>Put meta information in diagnostics lines, <strong>not</strong> into test descriptions. 
+<li>Use the description after <code># TODO/SKIP</code>. 
+<li>Cheat visible (or: don't cheat invisible). 
+<li>Really use <code># TODO/SKIP</code>. 
+</ul>
+
+<p>These tips keep later TAP evaluation consistent.
+
+<div class="node">
+<a name="Particular-use-cases"></a>
+<a name="Particular-use_002dcases"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#TAP-Archives">TAP Archives</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Tutorial">Tutorial</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Test-Protocol">Test Protocol</a>
+
+</div>
+
+<h3 class="section">3.3 Particular use-cases</h3>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Report-Groups">Report Groups</a>
+</ul>
+
+<div class="node">
+<a name="Report-Groups"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Particular-use_002dcases">Particular use-cases</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Particular-use_002dcases">Particular use-cases</a>
+
+</div>
+
+<h4 class="subsection">3.3.1 Report Groups</h4>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Report-grouping-by-same-testrun">Report grouping by same testrun</a>
+<li><a accesskey="2" href="#Report-grouping-by-arbitrary-idenitifier">Report grouping by arbitrary idenitifier</a>
+</ul>
+
+<div class="node">
+<a name="Report-grouping-by-same-testrun"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Report-grouping-by-arbitrary-idenitifier">Report grouping by arbitrary idenitifier</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Report-Groups">Report Groups</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Report-Groups">Report Groups</a>
+
+</div>
+
+<h5 class="subsubsection">3.3.1.1 Report grouping by same testrun</h5>
+
+<p>If we have a Xen environment then there are many guests each running
+some test suites but they don't know of each other.
+
+<p>The only thing that combines them is a common testrun-id. If each
+suite just reports this testrun-id as the group id, then the receiving
+side can combine all those autonomously reporting suites back together
+by that id.
+
+<p>So simply each suite should output
+
+<pre class="verbatim"> # Tapper-reportgroup-testrun: 1234
+</pre>
+
+<p>with 1234 being a testrun ID that is available via the environment
+variable <code>$TAPPER_TESTRUN</code>. This variable is provided by the
+automation layer.
+
+<div class="node">
+<a name="Report-grouping-by-arbitrary-idenitifier"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Report-grouping-by-same-testrun">Report grouping by same testrun</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Report-Groups">Report Groups</a>
+
+</div>
+
+<h5 class="subsubsection">3.3.1.2 Report grouping by arbitrary idenitifier</h5>
+
+<p>If the grouping id is not a testrun id, e.g., because you have set up
+a Xen environment without the Tapper automation layer, then generate
+one random value once in dom0 by yourself and use that same value
+inside all guests with the following header:
+
+     <ul>
+<li>get the value:
+
+     <pre class="verbatim">      TAPPER_REPORT_GROUP=`date|md5sum|awk '{print $1}'`
+</pre>
+
+     <li>use the value:
+
+     <pre class="verbatim">      # Tapper-reportgroup-arbitrary: $TAPPER_REPORT_GROUP
+</pre>
+
+</ul>
+
+<p>How that value gets from <em>dom0</em> into the guests is left as an
+exercise, e.g. via preparing the init scripts in the guest images
+before starting them. That's not the problem of the test suite
+wrappers, they should only evaluate the environment variable
+<code>TAPPER_REPORT_GROUP</code>.
+
+<div class="node">
+<a name="TAP-Archives"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Reporting-TAP-to-the-reports-receiver">Reporting TAP to the reports receiver</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Particular-use_002dcases">Particular use-cases</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Test-Protocol">Test Protocol</a>
+
+</div>
+
+<h3 class="section">3.4 TAP Archives</h3>
+
+<p>Some TAP emitting toolchains allow the generation of .tar.gz files
+containing TAP, so called <em>TAP archives</em>. E.g., via &lsquo;<samp><span class="samp">prove</span></samp>&rsquo;:
+
+<pre class="verbatim"> $ prove -a /tmp/myresults.tgz t/
+</pre>
+
+<p>You can later submit such TAP archive files to the Tapper reports
+receiver tha same way as you report raw TAP.
+
+<div class="node">
+<a name="Reporting-TAP-to-the-reports-receiver"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#TAP-Archives">TAP Archives</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Test-Protocol">Test Protocol</a>
+
+</div>
+
+<h3 class="section">3.5 Reporting TAP to the reports receiver</h3>
+
+<p>The Tapper reports receiver is a daemon that listens on a port and
+slurps in everything between the open and close of a connection to
+it. Therefore you can use &lsquo;<samp><span class="samp">netcat</span></samp>&rsquo; to report TAP.
+
+<p>Remember that using &lsquo;<samp><span class="samp">netcat</span></samp>&rsquo; in turn can be a mess, the are
+several flavours with different options which are also changing their
+behaviour over time. So to be sure, you better do your own socket
+communication with Perl or Python: open socket, print to socket, close
+socket, done. We just keep with &lsquo;<samp><span class="samp">netcat</span></samp>&rsquo; for illustrating the
+examples.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Submitting-raw-TAP">Submitting raw TAP</a>
+<li><a accesskey="2" href="#Submitting-TAP-Archives">Submitting TAP Archives</a>
+</ul>
+
+<div class="node">
+<a name="Submitting-raw-TAP"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Submitting-TAP-Archives">Submitting TAP Archives</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reporting-TAP-to-the-reports-receiver">Reporting TAP to the reports receiver</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Reporting-TAP-to-the-reports-receiver">Reporting TAP to the reports receiver</a>
+
+</div>
+
+<h4 class="subsection">3.5.1 Submitting raw TAP</h4>
+
+<p>Simply submit all TAP directly into the socket of the reports
+receiver:
+
+<pre class="verbatim"> $ ./my_tap_emitting_test_suite | netcat tapper_server 7357
+</pre>
+
+<div class="node">
+<a name="Submitting-TAP-Archives"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Submitting-raw-TAP">Submitting raw TAP</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Reporting-TAP-to-the-reports-receiver">Reporting TAP to the reports receiver</a>
+
+</div>
+
+<h4 class="subsection">3.5.2 Submitting TAP Archives</h4>
+
+<p>You submit the content of a .tar.gz file in the same way you submit
+raw TAP, via the same API. The receiver recognizes the .tar.gz
+contenttype by itself.
+
+<pre class="verbatim"> $ prove -a /tmp/myresults.tgz t/
+ $ cat /tmp/myresults.tgz | netcat tapper_server 7357
+</pre>
+
+<div class="node">
+<a name="Test-Suite-Wrappers"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Preconditions">Preconditions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Test-Protocol">Test Protocol</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">4 Test Suite Wrappers</h2>
+
+<p>This section is about the test suites and wrappers around existing
+suites. These wrappers are part of our overall test infrastructure.
+
+<p>It's basically about the middle part in the following picture:
+
+<div class="block-image"><img src="tapper_architecture_overview.png" alt="tapper_architecture_overview.png"></div>
+
+<p>We have wrappers for existing test and benchmark suites.
+
+<p>Wrappers just run the suites as a user would manually run them but
+additionally extract results and produce TAP (Test Anything Protocol).
+
+<p>We have some specialized, small test suites that complement the
+general suites, e.g. for extracting meta information or parsing logs
+for common problems.
+
+<p>If the environment variables
+
+<pre class="verbatim">TAPPER_REPORT_SERVER
+TAPPER_REPORT_PORT
+</pre>
+
+<p>are set the wrappers report their results by piping their TAP output
+there, else they print to STDOUT.
+
+<h3 class="section">4.1 Available test suite wrappers</h3>
+
+<p>Originally we have a lot of direct wrappers available but haven't them
+all published as open source. For OS testing the most important
+wrapper which is also publicly available is
+<em>tapper-testsuite-autotest</em>
+aka. <em>Tapper-Testsuite-AutoTest</em>. You should look at that.
+
+<h4 class="subsection">4.1.1 tapper-testsuite-autotest</h4>
+
+<p>A suite that wraps the <em>autotest</em> client with the export of TAP
+and sends the resulting TAP archives to Tapper server.
+
+<p>That is the primary testsuite wrapper for OS testing.
+
+<h3 class="section">4.2 Environment variables</h3>
+
+<p>The TAPPER automation layer provides some environment variables that
+the wrappers can use:
+
+     <dl>
+<dt><b>TAPPER_TESTRUN</b><dd>Currently active Testrun ID.
+
+     <br><dt><b>TAPPER_SERVER</b><dd>The controlling automation Server that initiated this testrun.
+
+     <br><dt><b>TAPPER_REPORT_SERVER</b><dd>The target server to which the tests should report their results in
+TAP.
+
+     <br><dt><b>TAPPER_REPORT_PORT</b><dd>The target port to which the tests should report their results in
+TAP. Complements <code>TAPPER_REPORT_SERVER</code>.
+
+     <br><dt><b>TAPPER_REPORT_API_PORT</b><dd>The port on which the more sophisticated Remote Reports API is
+available. It's running on the same host as
+<code>TAPPER_REPORT_SERVER</code>.
+
+     <br><dt><b>TAPPER_TS_RUNTIME</b><dd>Maximum runtime after which the testprogram will not be restarted when
+it runs in a loop. (This is a more passive variant than a timeout.)
+
+     <br><dt><b>TAPPER_GUEST_NUMBER</b><dd>Virtualisation guests are ordered, this is the guest number or 0 if
+not a guest.
+
+     <br><dt><b>TAPPER_NTP_SERVER</b><dd>The server where to request NTP dates from.
+
+</dl>
+
+<p>These variables should be used in the TAP of the suite as
+<em>Tapper</em> headers. Important use-case is "report groups", see next
+chapter.
+
+<div class="node">
+<a name="Preconditions"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Command-line-interface">Command line interface</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Test-Suite-Wrappers">Test Suite Wrappers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">5 Preconditions</h2>
+
+<p>The central thing that is needed before a test is run is a so called
+<dfn>precondition</dfn>. Creating those preconditions is the main task
+needed to do when using the automation framework.
+
+<p>Most of the <em>preconditions</em> describe packages that need to be
+installed. Other preconditions describe how subdirs should be copied
+or scripts be executed.
+
+<p>A <em>precondition</em> can depend on other preconditions, leading to a
+tree of preconditions that will be installed from the leaves to the
+top.
+
+<h3 class="section">5.1 SYNOPSIS</h3>
+
+     <ul>
+<li>Create a (maybe temporary) file
+
+     <li>Define conditions for a testrun: the <dfn>preconditions</dfn>
+
+     <li>Put the precondition into the database, maybe referring to other preconditions
+
+     <li>Create a testrun in the database, referring to the precondition
+
+     <li>Wait until the testrun is executed and results are reported
+
+</ul>
+
+<h3 class="section">5.2 Layers of preconditions</h3>
+
+<p>There are &ldquo;normal preconditions&rdquo; and &ldquo;macro preconditions&rdquo;.
+
+<h4 class="subsection">5.2.1 Normal preconditions</h4>
+
+<p>We store preconditions in the database and assign <em>testruns</em> to
+them (also in the database).
+
+<p>Usually the preconditions were developed in a (temporary) file and
+then entered into the database with a tool. After that the temporary
+file can be deleted. Note that such a precondition file can contain
+multiple precondition as long as they are formated as valid YAML.
+
+<p><em>Preconditions</em> can be kept in files to re-use them when creating
+testruns but that's not needed for archiving purposes, only for
+creation purposes.
+
+<p>Please note: <strong>Normal preconditions are usually not what you
+want.</strong> It's the low level mechanism. Its advantage is in reusing the
+preconditions by referring to IDs and creating trees of
+preconditions. This reuse is usually too complex. <strong>What you
+typically want are Macro Preconditions</strong>.
+
+<h4 class="subsection">5.2.2 Macro preconditions</h4>
+
+<p>There is another mechanism on top of normal preconditions: <dfn>Macro
+Preconditions</dfn>. These allow to bundle <strong>multiple</strong> preconditions
+at once into a common use-case.
+
+<p>A <em>macro precondition</em> is evaluated when the testrun is added via
+the cmdline utils (or the web app, both use the same underlying
+layer). The result are &ldquo;normal preconditions&rdquo; which are inserted
+into the DB everytime together with the testrun, so there is no reuse
+of preconditions and preconditions are always a list, no tree. Anyhow,
+they are much easier to handle.
+
+<p><em>Macro preconditions</em> are template files which should be archived
+in the precondition repository, as only the finally resulting
+preconditions are stored in the database.
+
+<h3 class="section">5.3 Precondition repository</h3>
+
+<p>Macro preconditions can be stored in
+
+<pre class="verbatim">/data/tapper/live/repository/macropreconditions/
+</pre>
+
+<h3 class="section">5.4 Overview: Precondition Types</h3>
+
+<p>There are two variants of preconditions: <em>Action preconditions</em>
+and <em>Highlevel preconditions</em>. Action preconditions describe
+single actions, like &ldquo;copy a file&rdquo; or &ldquo;execute a
+program&rdquo;. Highlevel preconditions can contain other (action)
+preconditions and are used for instance for virtualization install
+scenarios where hosts and guests are described.
+
+<p><strong>Please note the wording</strong>: A precondition is the particular
+YAML block with all the details (think of an object instance). Such a
+block is of a &ldquo;precondition type&rdquo; which defines its allowed
+structure (think of a class).
+
+<h4 class="subsection">5.4.1 Overview: Action precondition types</h4>
+
+<p>The following <dfn>action</dfn> precondition types are allowed:
+
+     <dl>
+<dt><b>package</b><dd>
+A package (kernel, library, etc.), of type <em>.tar</em>, <em>.tar.gz</em> or <em>.tar.bz2</em>
+
+     <br><dt><b>image</b><dd>
+A complete OS image of type <em>.iso</em>, <em>.tar.gz</em>, <em>.tgz</em>,
+<em>.tar</em>, <em>.tar.bz2</em>
+
+     <br><dt><b>prc</b><dd>
+Create a config for the <dfn>PRC</dfn> module of the automation layer.
+
+     <br><dt><b>copyfile</b><dd>
+One file that can just be copied/rsync'd
+
+     <br><dt><b>installer_stop</b><dd>
+Don't reboot machine after system installer finished
+
+     <br><dt><b>grub</b><dd>
+Overwrite automatically generated grub config with one provided by the tester
+
+     <br><dt><b>fstab</b><dd>
+Append a line to /etc/fstab
+
+     <br><dt><b>repository</b><dd>
+Fetch data from a git, hg or svn repository
+
+     <br><dt><b>exec</b><dd>
+Execute a script during installation phase
+
+     <br><dt><b>reboot</b><dd>
+Requests a reboot test and states how often to reboot.
+
+</dl>
+
+<h4 class="subsection">5.4.2 Overview: Highlevel precondition types</h4>
+
+<p>Currently only the following <dfn>high level</dfn> precondition type is
+allowed:
+
+     <dl>
+<dt><b>virt</b><dd>
+Generic description for Xen or KVM
+
+</dl>
+
+<p><em>High level preconditions</em> both define stuff and can also contain
+other preconditions.
+
+<p>They are handled with some effort to <em>Do The Right Thing</em>, i.e.,
+a defined root image in the high level precondition is always
+installed first. All other preconditions are installed in the order
+defined by its tree structure (depth-first).
+
+<h3 class="section">5.5 Details: Precondition Types</h3>
+
+<p>We describe preconditions in YAML files (<a href="http://www.yaml.org/">http://www.yaml.org/</a>).
+
+<p>All preconditions have at least a key
+
+<pre class="example"><pre class="verbatim">     precondition_type: TYPE
+</pre>
+</pre>
+<p>and optionally
+
+<pre class="example"><pre class="verbatim">     name: VERBOSE DESCRIPTION
+     shortname: SHORT DESCRIPTION
+</pre>
+</pre>
+<p>then the remaining keys depend on the TYPE.
+
+<h4 class="subsection">5.5.1 installer_stop</h4>
+
+<p>stop run after system installer
+
+<pre class="example"><pre class="verbatim">     ---
+     precondition_type: installer_stop
+</pre>
+</pre>
+<h4 class="subsection">5.5.2 grub</h4>
+
+<p>overwrite automatically generated grub config
+
+<pre class="example"><pre class="verbatim">     ---
+     precondition_type: grub
+     config: |
+       title Linux
+         root $grubroot
+         kernel /boot/vmlinuz root=$root"
+</pre>
+</pre>
+     <ul>
+<li>Note: multiple lines in the grub file have to be given as one
+line separated by &ldquo;\n&rdquo; (literally a backslash and the letter n) in
+YAML
+
+     <li>the variables $grubroot and $root are substituted with grub and /dev/* notation of the root partition respectively
+
+     <li>$root substitution uses the notation of the installer kernel. This may cause issues when the installer detects /dev/sd? and the kernel under test detects /dev/hd? or vice versa
+
+     <li>since grub always expects parentheses around the device, they are part of the substitution string for $grubroot
+
+     <li>note the syntax, to get multiline strings in YAML you need to
+start them with |, a newline and some indentation
+
+</ul>
+
+<h4 class="subsection">5.5.3 package</h4>
+
+<pre class="example"><pre class="verbatim">     ---
+     precondition_type: package
+     filename: /data/tapper/live/repository/packages/linux/linux-2.6.27.7.tar.bz2
+</pre>
+</pre>
+     <ul>
+<li>path names can be absolut or relative to
+ /data/tapper/development/repository/packages/
+
+     <li>supported packages types are rpm, deb, tar, tar.gz and tar.bz2
+
+     <li>package type is detected automatically
+
+     <li>absolute path: usually /data/tapper/...
+
+     <li>relative path: relative to /data/tapper/(live|development)/
+
+</ul>
+
+<h4 class="subsection">5.5.4 copyfile</h4>
+
+<p>a file that just needs to be scp or copied:
+
+<pre class="example"><pre class="verbatim">     ---
+     precondition_type: copyfile
+     protocol: nfs
+     source: osko:/export/image_files/official_testing/README
+     dest: /usr/local/share/tapper/
+</pre>
+</pre>
+     <ul>
+<li>supported protocols are &ldquo;scp&rdquo;, &ldquo;nfs&rdquo; and &ldquo;local&rdquo;
+
+     <li>the part before the first colon in the unique name is used as server name
+
+     <li>the server name part is ignored for local
+
+     <li>if dest ends in a slash, the file is copied with its basename preserved into the denoted directory
+
+     <li>whether the &ldquo;dest&rdquo; is interpreted as a directory or a file is decided by the underlying &ldquo;scp&rdquo; or &ldquo;cp&rdquo; semantics, i.e., it depends on whether a directory already exists.
+
+</ul>
+
+<h4 class="subsection">5.5.5 fstab</h4>
+
+<p>a line to add to /etc/fstab, e.g., to enable mounts once the system boots
+
+<pre class="example"><pre class="verbatim">     ---
+     precondition_type: fstab
+     line: "165.204.85.14:/vol/osrc_vol0 /home nfs auto,defaults 0 0"
+</pre>
+</pre>
+<h4 class="subsection">5.5.6 image</h4>
+
+<p>usually the root image that is unpacked to a partition
+(this is in contrast to a guest file that's just there)
+
+<pre class="example"><pre class="verbatim">     ---
+     precondition_type: image
+     mount: /
+     partition: testing
+     image: /data/tapper/live/repository/images/rhel-5.2-rc2-32bit.tgz
+</pre>
+</pre>
+     <ul>
+<li>partition and mount are required, all other options are optional
+
+     <li>mount points are interpreted as seen inside the future installed system
+
+     <li>if no image is given, the already installed one is reused, i.e., only the mountpoint is mounted; make sure this is possible or your test will fail!
+
+     <li>can be either an iso file which is copied with dd or a tar, tar.gz or
+ tar.bz2 package which is unpacked into the partition
+
+     <li>partitions are formated ext3 (only when image is given)
+and mounted to mount afterwards
+
+     <p>(this is why image exists at all, copyfile does not provide this)
+
+     <li>&ldquo;image&rdquo;: absolute or relative path (relative to /data/tapper/live/repository/images/)
+
+     <p>If not given, then it re-uses the partition without formatting/unpacking it.
+
+     <li>partition: Can be /dev/XXX or LABEL or UUID.
+
+</ul>
+
+<h4 class="subsection">5.5.7 repository</h4>
+
+<pre class="example"><pre class="verbatim">     ---
+     precondition_type: repository
+     type: git
+     url: git://git.kernel.org/pub/scm/linux/kernel/git/avi/kvm.git
+     target: kvm
+     revision: c192a1e274b71daea4e6dd327d8a33e8539ed937
+</pre>
+</pre>
+     <ul>
+<li>git and hg are supported
+
+     <li>type and url are mandatory, target and revision are optional
+
+     <li>target denotes the directory where the source is placed in,
+the leading slash can be left out (i.e., paths can be given relative
+to root directory &lsquo;<samp><span class="samp">/</span></samp>&rsquo;).
+
+</ul>
+
+<h4 class="subsection">5.5.8 type: prc</h4>
+
+<p>Is typically contained implicitely with the abstract precondition
+<em>virt</em>. But can also be defined explicitely, e.g., for kernel
+tests.
+
+<p>Creates config for PRC. This config controls what is to be run and
+started when the machine boots.
+
+<pre class="example"><pre class="verbatim">     precondition_type: prc
+     config:
+          runtime: 30
+          test_program: /bin/uname_tap.sh
+          timeout_after_testprogram: 90
+          guests:
+           - svm:  /xen/images/..../foo.svm
+           - svm:  /xen/images/..../bar.svm
+           - exec: /xen/images/..../start_a_kvm_guest.sh
+</pre>
+</pre>
+     <ul>
+<li>guest number
+
+     <p>If it is a guest, for host system use 0.
+
+     <li>test_program
+
+     <p>started after boot by the PRC
+
+     <li>runtime
+
+     <p>The wanted time, how long it runs, in seconds, this value will be used
+to set an environment variable <code>TAPPER_TS_RUNTIME</code>, which is
+used by the test suite wrappers.
+
+     <li>timeout_testprogram
+
+     <p>Time that the testprogram is given to run, at most, after that it is
+killed (SIGINT, SIGKILL).
+
+     <li>guests
+
+     <p>Only used for virtualization tests. Contains an array, one entry per
+guest which defines how a guest is started. Can be a SVM file for Xen
+or an executable for KVM.
+
+<h4 class="subsection">5.5.9 type: exec</h4>
+
+     <p>Defines which program to run at the installation phase.
+
+     <pre class="example">     <pre class="verbatim">          precondition_type: exec
+          filename: /bin/some_script.sh
+          options:
+            - -v
+            - --foo
+            - --bar="hot stuff"
+     </pre>
+</pre>
+     <p>The quotes in this example are actually wrong but left in so you learn
+the following lesson:
+
+<h4 class="subsection">5.5.10 type: hint</h4>
+
+     <p>Such a precondition provides hints where normal behaviour needs to be
+changed. It contains any hash keys needed for the special handling. The
+special handling itself is done in the MCP and needs to be prepared
+for what you specify here.
+
+     <p>We currently use it to handle SimNow testing.
+
+     <pre class="example">
+          <pre class="example">          <pre class="verbatim">               precondition_type: hint
+               simnow: 1
+               script: family10_sles10_xen.simnow
+          </pre>
+</pre>
+     </pre>
+     <h4 class="subsection">5.5.11 quote subtleties</h4>
+
+     <p>Please note some subtlety about quotes.
+
+          <ul>
+<li>This is YAML. And YAML provides its own way of quoting.
+
+          <p>So this
+
+          <pre class="example">
+               <pre class="example">               <pre class="verbatim">                    precondition_type: exec
+                    filename: /bin/some_script.sh
+                    options:
+                      - --foo
+               </pre>
+</pre>
+          </pre>
+          <p>and this
+
+          <pre class="example">
+               <pre class="example">               <pre class="verbatim">                    precondition_type: exec
+                    filename: /bin/some_script.sh
+                    options:
+                      - "--foo"
+               </pre>
+</pre>
+          </pre>
+          <p>are actually the same (the value is always: <code>--foo</code>) because
+quotes at the beginning and end of a YAML line are used by YAML. When
+you use quotes at other places like in
+
+          <pre class="example">
+               <pre class="example">               <pre class="verbatim">                    precondition_type: exec
+                    filename: /bin/some_script.sh
+                    options:
+                      - --bar="hot stuff"
+               </pre>
+</pre>
+          </pre>
+          <p>then they are not part of the YAML line but part of the value, so this
+time the value is: <code>--bar="hot stuff"</code>.
+
+          <li>Quotes are not shell quotes.
+
+          <p>So if you used quotes and they are not YAML quotes but part of the
+value then you should know that they are <strong>not</strong> evaluated by a
+shell when <code>some_script.sh</code> is called, because we use
+<code>system()</code> without a shell layer to start it.
+
+          <p>That's why in above example the quoted value <code>"hot stuff"</code> (with
+quotes!) is given as parameter <code>--bar</code> to the program. This
+usually <strong>not</strong> what you want.
+
+          <li>Summary: You nearly never need quotes.
+
+          <p>This is good enough:
+
+          <pre class="example">          <pre class="verbatim">               precondition_type: exec
+               filename: /bin/some_script.sh
+               options:
+                 - -v
+                 - --foo
+                 - --bar=hot stuff
+          </pre>
+</pre>
+          </ul>
+
+<h4 class="subsection">5.5.12 type: reboot</h4>
+
+     <p>Requests a reboot test and states how often to reboot.
+
+     <p><strong>Note:</strong> Reboot count of 1 actually means boot two times since
+the first boot is always counted as number 0.
+
+     <pre class="example">     <pre class="verbatim">          precondition_type: reboot
+          count: 2
+     </pre>
+</pre>
+     <h4 class="subsection">5.5.13 type: autoinstall</h4>
+
+     <p>Install a system using autoinstall scripts. The filename denotes the
+grub config to be used. It is mandatory and can be given as absolut
+path or relative to /data/tapper/.../repository/install_grub/. The
+optional timeout is measured in second. If its absent a default value
+is used.
+
+     <pre class="example">     <pre class="verbatim">          precondition_type: autoinstall
+          filename: suse/SLES10SP3_x86_64.lst
+          timeout: 1800
+     </pre>
+</pre>
+     <h4 class="subsection">5.5.14 type: testprogram</h4>
+
+     <p>Define which test program to run. This way of defining a test program
+should be prefered to using the <strong>PRC</strong> type precondition. Only the
+<strong>testprogram</strong> precondition guarantees parsing that sets all
+internal Tapper variables correctly.
+
+     <pre class="example">     <pre class="verbatim">          precondition_type: testprogram
+          runtime: 30
+          program: /bin/uname_tap.sh
+          timeout: 90
+          parameters:
+          - --verbose
+     </pre>
+</pre>
+     <h4 class="subsection">5.5.15 type: virt</h4>
+
+     <p>A virtualization environment.
+
+     <p>(The linebreaks with \ are not part of the actual file, but only for
+this document.)
+
+     <pre class="example">     <pre class="verbatim">          precondition_type: virt
+          name: automatically generated Xen test
+          host:
+            preconditions:
+            - precondition_type: package
+              filename: /data/tapper/live/repository/packages/xen/builds/\
+                        x86_64/xen-3.3-testing/\
+                        xen-3.3-testing.2009-03-20.18614_f54cf790ffc7.x86_64.tgz
+            - precondition_type: package
+              filename: /data/tapper/live/repository/packages/tapperutils/\
+                        sles10/xen_installer_suse.tar.gz
+            - precondition_type: exec
+              filename: /bin/xen_installer_suse.pl
+            root:
+              precondition_type: image
+              partition: testing
+              image: suse/suse_sles10_64b_smp_raw.tar.gz
+              mount: /
+              arch: linux64
+            testprogram:
+              execname: /opt/tapper/bin/tapper_testsuite_dom0_meta.sh
+              timeout_testprogram: 10800
+          guests:
+          - config:
+              precondition_type: copyfile
+              protocol: nfs
+              name: tapper:/data/tapper/live/repository/configs/\
+                           xen/001-sandschaki-1237993266.svm
+              dest: /xen/images/
+              svm: /xen/images/001-sandschaki-1237993266.svm
+            root:
+              precondition_type: copyfile
+              protocol: nfs
+              arch: linux64
+              name: osko:/export/image_files/official_testing/\
+                    redhat_rhel4u7_64b_up_qcow.img
+              dest: /xen/images/
+              mountfile: /xen/images/001-sandschaki-1237993266.img
+              mounttype: raw
+            testprogram:
+              execname: /opt/tapper/bin/py_ltp
+              timeout_after_testprogram: 10800
+     </pre>
+</pre>
+          <ul>
+<li>guest root always needs to name the file to mount since
+its not easy or even impossible to get this name for some ways to install
+the root image (like tar.gz packages or subdir)
+
+          <li>guest root and guest config are installed inside the host,
+guest preconditions are installed inside the guest image
+
+          <li>guests can be started with xm create $xenconf, evaluation of
+$kvmconf or executing the $execconf script, thus only one of these
+three must be provided
+
+     </ul>
+
+     <li>&rdquo;'Note&rdquo;': virt instead of virtualisation is used to reduce
+confusion for users whether British English (virtualisation) or
+American English (virtualization) is expected
+
+     <li>key &ldquo;arch&rdquo;
+ arch: linux64 | linux32             (needed for for tapper toolchain)
+
+</ul>
+
+<h4 class="subsection">5.5.16 General precondition keys &ldquo;mountfile&rdquo;</h4>
+
+<p>These 2 options are possible in each precondition. With that you can
+execute the precondition inside guest images:
+
+<pre class="example"><pre class="verbatim">     mountfile: ...
+     mountpartition: ...
+     mounttype: @TODO{is this the same as mountfile, mountpartition?}
+</pre>
+</pre>
+     <ul>
+<li>1. only mountfile: eg. rawimage, file loop-mounted
+
+     <li>2. only mountpartition: then mount that partition
+
+     <li>3. image file with partitions: mount the imagefile and from that
+only the given partition
+
+</ul>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Macro-Preconditions">Macro Preconditions</a>
+</ul>
+
+<div class="node">
+<a name="Macro-Preconditions"></a>
+<p><hr>
+Up:&nbsp;<a rel="up" accesskey="u" href="#Preconditions">Preconditions</a>
+
+</div>
+
+<h3 class="section">5.6 Macro Preconditions</h3>
+
+<p>This section describes macro precondition files as they are stored in
+<code>/data/tapper/live/repository/macropreconditions/</code>.
+
+<p>A macro precondition denotes a file containing one or multiple
+preconditions and additional TemplateToolkit code.
+
+<p>In most cases &ldquo;normal preconditions&rdquo; for similar tests will only
+differ in one or very few keys. Thus precondition files could easily
+be reused by only changing these few keys. This is made easier with
+using &ldquo;macro preconditions&rdquo;.
+
+<p>The macro precondition file should contain all &ldquo;normal
+preconditions&rdquo; to be reused. All variable keys should be substituted
+by appropriate TemplateToolkit variables. When creating the new
+testrun actual values for these TemplateToolkit variables have to
+provided.
+
+<p>Macro preconditions are <strong>not</strong> stored in the database. They are
+only a tool to ease the creation of preconditions. Only the
+<strong>resulting</strong> preconditions are stored in database.
+
+<p>To make parsing macro preconditions easier required and optional
+fields can be named after a comment field in the first lines of the
+file after the keys <code>tapper-mandatory-fields</code> and
+<code>tapper-optional-fields</code> respectively as in the following example:
+
+<pre class="example"><pre class="verbatim">     # tapper-mandatory-fields: id
+     # tapper-optional-fields: kernel
+</pre>
+</pre>
+<p>These <code># tapper-*</code> headers are also used in web frontend to
+render forms out of it and submit testruns from there.
+
+<p>The values for the placeholders can be filled via such a command line:
+
+<pre class="example"><pre class="verbatim">     $ tapper-testrun new [all usual options] \
+          --macroprecond=FILENAME \
+           -Did=value1 \
+           -Dkernel=2.6.37
+</pre>
+</pre>
+<p>The FILENAME is a complete filename with absolute path.
+
+<p>There is no restriction on TemplateToolkit code for variable
+substitution. The following example could be used to generate a
+default value for the precondition key id.
+
+<pre class="example"><pre class="verbatim">     [%id = BLOCK%][%IF id%][%id%][%ELSE%]2009-06-29-perfmon[%END%][%END%]
+</pre>
+</pre>
+<ul class="menu">
+<li><a accesskey="1" href="#A-real-live-example-_002d-kernel-boot-test">A real live example - kernel boot test</a>
+</ul>
+
+<div class="node">
+<a name="A-real-live-example---kernel-boot-test"></a>
+<a name="A-real-live-example-_002d-kernel-boot-test"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Macro-Preconditions">Macro Preconditions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Macro-Preconditions">Macro Preconditions</a>
+
+</div>
+
+<h4 class="subsection">5.6.1 A real live example - kernel boot test</h4>
+
+     <ul>
+<li>Macroprecondition
+
+     <pre class="example">     <pre class="verbatim">          # tapper-mandatory-fields: kernel_version
+          # tapper-optional-fields: kernelpkg
+          ---
+          precondition_type: image
+          arch: linux64
+          image: suse/suse_sles10_64b_smp_raw.tar.gz
+          mount: /
+          partition: testing
+          ---
+          precondition_type: copyfile
+          name: /data/tapper/live/repository/testprograms/uname_tap/uname_tap.sh
+          dest: /bin/
+          protocol: local
+          ---
+          precondition_type: copyfile
+          name: /data/tapper/live/repository/packages/tapperutils/kernel/gen_initrd.sh
+          dest: /bin/
+          protocol: local
+          ---
+          [% kernelpkg = BLOCK %]\
+          [% IF kernelpkg %]\
+          [% kernelpkg %]\
+          [%ELSE%]kernel/linux-[% kernel_version %].tar.gz[% END %]\
+          [% END %]
+          precondition_type: package
+          filename: [% kernelpkg %]
+          ---
+          precondition_type: exec
+          filename: /bin/gen_initrd.sh
+          options:
+            - [% kernel_version %]
+          ---
+          precondition_type: prc
+          config:
+                runtime: 30
+                test_program: /bin/uname_tap.sh
+                timeout_testprogram: 90
+     </pre>
+</pre>
+     <li>The test script
+
+     <p>The test script <code>uname_tap.sh</code> to which the macro precondition
+refers is just a shell script that examines uname output:
+
+     <pre class="example">     <pre class="verbatim">          #! /bin/sh
+          echo "1..2"
+          echo "# Tapper-Suite-Name: Kernel-Boot"
+          echo "# Tapper-Suite-Version: 1.00"
+          echo "# Tapper-Machine-Name: " `hostname`
+          
+          if [ x`uname` != xLinux ] ; then echo -n "not " ; fi
+          echo "ok - We run on Linux"
+          
+          if uname -a | grep -vq x86_64 ; then echo -n "not " ; fi
+          echo "ok - Looks like x86_64"
+     </pre>
+</pre>
+     <li>Command line
+
+     <p>Once you wrote the macro precondition and the test script all you need
+is this command line:
+
+     <pre class="example">     <pre class="verbatim">          tapper-testrun new \
+            --hostname=dickstone \
+            --macroprecond \
+              /data/tapper/live/repository/macropreconditions/kernel/kernel_boot.mpc \
+             -Dkernelpkg=perfmon-682-x86_64.tar.gz \
+             -Dkernel_version=2.6.28-rc3
+     </pre>
+</pre>
+     <p>or with some more information (owner, topic):
+
+     <pre class="example">     <pre class="verbatim">          tapper-testrun new \
+            --owner=mhentsc3 \
+            --topic=Kernel \
+            --hostname=dickstone \
+            --macroprecond \
+              /data/tapper/live/repository/macropreconditions/kernel/kernel_boot.mpc \
+             -Dkernelpkg=perfmon-682-x86_64.tar.gz \
+             -Dkernel_version=2.6.28-rc3
+     </pre>
+</pre>
+     </ul>
+
+<h3 class="section">5.7 Precondition Producers</h3>
+
+<p>Sometimes, parameters for preconditions shall be defined when the
+testrun, this precondition is assigned to, is choosen for
+execution. This might apply for example when you want to test the
+newest build of a certain package. Also in combination with autorerun
+testruns dynamic assignment of preconditions is useful. These testruns
+are reinserted into the database automatically as soon as the
+scheduler chooses them for execution. In this case dynamic
+precondition assignment allows these rerun tests to differ
+slightly. Preconditions with dynamically assigned parameters are
+called <dfn>Lazy Precondition</dfn>.
+
+<p>Dynamic precondition assignment is implemented using <dfn>Precondition
+Producers</dfn>. A producer is a modul that is called by the scheduler for
+handling of lazy preconditions. To use a lazy precondition the user has
+to assign a precondition of type &lsquo;<samp><span class="samp">producer</span></samp>&rsquo; to the testrun. This
+precondition has to contain the basename of an existing producer
+module and may contain additional parameters. The producer will
+substitute the &lsquo;<samp><span class="samp">producer</span></samp>&rsquo; precondition with a normal precondition
+that has values assigned to all parameters.
+
+<h4 class="subsection">5.7.1 Lazy precondition</h4>
+
+<p>Lets assume for example that you want to include the newest kernel
+package into your test. This can be achieved with the existing
+&ldquo;Kernel&rdquo; producer. Instead of a precondition of type &lsquo;<samp><span class="samp">package</span></samp>&rsquo;
+with a certain filename you should assign the following precondition
+to your testrun.
+
+<pre class="example"><pre class="verbatim">     precondition_type: producer
+     producer: Kernel
+</pre>
+</pre>
+<p>This precondition will be substituted with a package precondition that
+has the latest Sysint kernel build set as filename.
+
+<h4 class="subsection">5.7.2 Producer API</h4>
+
+<p>Producer are modules loaded into the scheduler. Thus they need to be
+written in Perl and reside inside the
+<code>Tapper::MCP::Scheduler::PreconditionProducer::</code> namespace. A
+producer has to implement a method &lsquo;<samp><span class="samp">produce</span></samp>&rsquo;. This function gets
+a job object as first parameter and a hash containing all additional
+options from the precondition as second parameter. It suggested that
+each producer inherits from
+<code>Tapper::MCP::Scheduler::PreconditionProducer</code>. Producers shall
+return a hash that has the produced preconditions as YAML text
+assigned to the hash key <code>precondition_yaml</code>. An optional key
+<code>topic</code> allows the producer to set the topic for the test. If the
+hash key <code>error</code> is set, the associated error string is reported
+and the testrun is cancled. In this case the other hash keys are not
+evaluated.
+
+<h4 class="subsection">5.7.3 Existing producers</h4>
+
+<p>Currently the following producers exist:
+
+     <ul>
+<li>DummyProducer.pm
+
+     <p>Dummy producer for testing.
+
+     <li>Kernel.pm
+
+     <p>Produces preconditions for kernel tests.
+
+     <li>NewestPackage.pm
+
+     <p>Produces a package precondition that installs the newest package from
+a given directory.
+
+     <li>SimnowKernel.pm
+
+     <p>Produces preconditions for simnow kernel tests.
+
+     <li>Temare.pm
+
+     <p>Wraps the existing temare producer utility.
+
+</ul>
+
+<h4 class="subsection">5.7.4 Example: &ldquo;Kernel&rdquo; precondition producer</h4>
+
+<p>The kernel producer returns a package precondition that contains the
+latest kernel package from the kernel package path. Furthermore, it
+returns an exec precondition that triggers the creation of an initrd
+file for the kernel.
+
+<p>Valid options:
+     <ul>
+<li>arch
+
+     <p>May be x86_64 or i686. The latest kernel package from the associated
+path are used.
+
+     <li>version
+
+     <p>Only use kernel packages that contain the given version string
+
+     <li>stable
+
+     <p>Use stable kernels when true
+
+</ul>
+
+<h5 class="subsubsection">5.7.4.1 Lazy precondition</h5>
+
+<p>The lazy precondition, pointing to the &ldquo;Kernel&rdquo; precondition
+producer:
+
+<pre class="example"><pre class="verbatim">     precondition_type: produce
+     producer: Kernel
+     arch: i686
+     version: 2.6.32
+     stable: 1
+</pre>
+</pre>
+<h5 class="subsubsection">5.7.4.2 Resulting preconditions</h5>
+
+<p>The resulting preconditions may look like this:
+
+<pre class="example"><pre class="verbatim">     ---
+     precondition_type: package
+     filename: kernel/stable/i686/kernel-2.6.32-rc1.tar.gz
+     ---
+     precondition_type: exec
+     filename: /bin/gen_initrd.sh
+     options:
+       - 2.6.32-rc1
+</pre>
+</pre>
+<div class="node">
+<a name="Command-line-interface"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Web-User-Interface">Web User Interface</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Preconditions">Preconditions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">6 Command line interface</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Commandline-Synopsis">Commandline Synopsis</a>
+<li><a accesskey="2" href="#Scheduling">Scheduling</a>
+</ul>
+
+<div class="node">
+<a name="Commandline-Synopsis"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Scheduling">Scheduling</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Command-line-interface">Command line interface</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Command-line-interface">Command line interface</a>
+
+</div>
+
+<h3 class="section">6.1 Commandline Synopsis</h3>
+
+     <ul>
+<li>Get host usage/scheduling overview
+
+     <li>Create hosts
+
+     <li>Create queues
+
+     <li>Create hosts/queue bindings
+
+</ul>
+
+<div class="node">
+<a name="Scheduling"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Commandline-Synopsis">Commandline Synopsis</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Command-line-interface">Command line interface</a>
+
+</div>
+
+<h3 class="section">6.2 Scheduling</h3>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Create-new-queue-and-new-host-and-bind-both-together">Create new queue and new host and bind both together</a>
+<li><a accesskey="2" href="#Change-queue-priority">Change queue priority</a>
+<li><a accesskey="3" href="#requested-features">requested features</a>
+<li><a accesskey="4" href="#Cancel-current-testrun-on-host">Cancel current testrun on host</a>
+</ul>
+
+<div class="node">
+<a name="Create-new-queue-and-new-host-and-bind-both-together"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Change-queue-priority">Change queue priority</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Scheduling">Scheduling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Scheduling">Scheduling</a>
+
+</div>
+
+<h4 class="subsection">6.2.1 Create new queue and new host and bind both together</h4>
+
+     <ul>
+<li>Show existing queues with priorities
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun listqueue -v
+                  10 |              AdHoc |  1000
+                  11 |      kernel_reboot |   100
+                   4 | xen-3.3-testing-32 |   100
+                   5 | xen-3.3-testing-64 |   100
+                   7 | xen-3.4-testing-32 |   100
+                   6 | xen-3.4-testing-64 |   100
+                   9 |    xen-unstable-32 |   100
+                   8 |    xen-unstable-64 |   100
+     </pre>
+</pre>
+     <li>Create new queue <em>oprofile</em>
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun newqueue --name=oprofile \
+                                    --priority=200
+          12
+     </pre>
+</pre>
+     <li>Create new host <em>bullock</em> and bind it to queue <em>oprofile</em>
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun newhost --name=bullock \
+                                   --queue=oprofile
+          10
+     </pre>
+</pre>
+     <li>Show existing hosts
+
+     <p>Note that the new host <em>bullock</em> is initially deactivated.
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun listhost -v
+                   8 |  amarok | deactivated |   free
+                   1 |  athene |      active | in use
+                   9 |   azael | deactivated |   free
+                  10 | bullock | deactivated |   free | oprofile
+                   4 |    cook | deactivated |   free
+                   6 | incubus | deactivated |   free
+                   2 |  kobold |      active | in use
+                   5 |  lemure |      active | in use
+                   3 |   satyr |      active | in use
+                   7 |    uruk | deactivated |   free
+     </pre>
+</pre>
+     <li>Activate host <em>bullock</em>
+
+     <p>Note that this command is ID based (bullock has id 10) because you
+can rename hosts.
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun updatehost --id=10 --active
+          10 | bullock | active | free | oprofile
+     </pre>
+</pre>
+     <li>Again, show existing hosts
+
+     <p>Host <em>bullock</em> is now activated.
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun listhost -v
+                   8 |  amarok | deactivated |   free
+                   1 |  athene |      active | in use
+                   9 |   azael | deactivated |   free
+                  10 | bullock |      active |   free | oprofile
+                   4 |    cook | deactivated |   free
+                   6 | incubus | deactivated |   free
+                   2 |  kobold |      active | in use
+                   5 |  lemure |      active | in use
+                   3 |   satyr |      active | in use
+                   7 |    uruk | deactivated |   free
+     </pre>
+</pre>
+     </ul>
+
+<p>Done.
+
+<div class="node">
+<a name="Change-queue-priority"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#requested-features">requested features</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Create-new-queue-and-new-host-and-bind-both-together">Create new queue and new host and bind both together</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Scheduling">Scheduling</a>
+
+</div>
+
+<h4 class="subsection">6.2.2 Change queue priority</h4>
+
+     <ul>
+<li>List existing queues
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun listqueue -v
+                  10 |              AdHoc |  1000
+                  11 |      kernel_reboot |   100
+                  12 |           oprofile |   200 | bullock
+                   4 | xen-3.3-testing-32 |   100
+                   5 | xen-3.3-testing-64 |   100
+                   7 | xen-3.4-testing-32 |   100
+                   6 | xen-3.4-testing-64 |   100
+                   9 |    xen-unstable-32 |   100
+                   8 |    xen-unstable-64 |   100
+     </pre>
+</pre>
+     <li>Update queue
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun updatequeue --name=oprofile \
+                                       --priority=1000
+          12
+     </pre>
+</pre>
+     <li>Again, list existing queues
+
+     <pre class="example">     <pre class="verbatim">          $ tapper-testrun listqueue -v
+                  10 |              AdHoc |  1000
+                  11 |      kernel_reboot |   100
+                  12 |           oprofile |  1000 | bullock
+                   4 | xen-3.3-testing-32 |   100
+                   5 | xen-3.3-testing-64 |   100
+                   7 | xen-3.4-testing-32 |   100
+                   6 | xen-3.4-testing-64 |   100
+                   9 |    xen-unstable-32 |   100
+                   8 |    xen-unstable-64 |   100
+     </pre>
+</pre>
+     <p>Done.
+
+</ul>
+
+<div class="node">
+<a name="requested-features"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Cancel-current-testrun-on-host">Cancel current testrun on host</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Change-queue-priority">Change queue priority</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Scheduling">Scheduling</a>
+
+</div>
+
+<h4 class="subsection">6.2.3 requested features</h4>
+
+<p>Hosts for testruns can be choosen based on requested
+features. Supported features are:
+
+     <ul>
+<li>hostname
+
+     <li>mem
+
+     <li>vendor
+
+     <li>family
+
+     <li>model
+
+     <li>stepping
+
+     <li>revision
+
+     <li>socket
+
+     <li>cores
+
+     <li>clock
+
+     <li>l2cache
+
+     <li>l3cache
+
+</ul>
+
+<div class="node">
+<a name="Cancel-current-testrun-on-host"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#requested-features">requested features</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Scheduling">Scheduling</a>
+
+</div>
+
+<h4 class="subsection">6.2.4 Cancel current testrun on host</h4>
+
+<p>Freeing a host need the config for the currently running
+testrun. Thus, the command is only tested on bancroft and may not work
+on other machines.
+
+<pre class="example"><pre class="verbatim">     $ tapper-testrun freehost \
+                      --name=bullock\
+                      --desc='I need this host right now'
+</pre>
+</pre>
+<div class="node">
+<a name="Web-User-Interface"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Reports-API">Reports API</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Command-line-interface">Command line interface</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">7 Web User Interface</h2>
+
+<p>The Web User Interface is a frontend to the Reports database. It
+allows to overview reports that came in from several machines, in
+several test suites.
+
+<p>It can filter the results by dates, machines or test suite, gives
+colorful (RED/YELLOW/GREEN) overview about success/failure ratios,
+allows to zoom into details of single reports.
+
+<p>To evaluate reported test results in a more programmatic way, have a
+look into the <em>DPath Query Language</em> that is part of the
+<a href="#Reports-API">Reports API</a>.
+
+<h3 class="section">7.1 Usage</h3>
+
+<p>The main URL is typically somerthing like
+
+<pre class="example">     <a href="http://tapper/tapper">http://tapper/tapper</a>
+</pre>
+<h3 class="section">7.2 Understanding Tapper Details</h3>
+
+<h4 class="subsection">7.2.1 Part 1 Overview</h4>
+
+     <ul>
+<li>Go to <a href="https://tapper/tapper/reports">https://tapper/tapper/reports</a>
+
+     <li>Click &ldquo;Last weeks test reports&rdquo;,
+  aka. <a href="https://tapper/tapper/reports/date/7">https://tapper/tapper/reports/date/7</a>
+
+     <li>Below day &ldquo;Wed Oct 7, 2009&rdquo; find the line
+
+     <pre class="verbatim">         20856  2009-10-07  Topic-xen-unstable  satyr  PASS testrun 9617
+</pre>
+
+     <p>To find this report you probably need to go more back into the past
+  than just 7 days, or you use the direct link below.
+
+     <li>Note that there are other reports in this group that are greyed-out,
+  i.e. all report ids of this testrun are:
+
+     <pre class="verbatim">         20856    Topic-xen-unstable
+         20855    LMBench
+         20854    CTCS
+         20852    Host-Overview
+         20851    Hardwaredb Overview
+</pre>
+
+     <li>Note that something FAILed in the CTCS run (20854).
+
+     <li>What we know until here:
+
+          <ul>
+<li>It is a test for Xen-unstable (Topic-xen-unstable)
+
+          <li>The running of the guests+suites itself worked well (20856 PASS)
+
+          <li>There were 2 guest runs:
+
+          <pre class="verbatim">                  LMBench      satyr:celegorm                  PASS
+                  CTCS         satyr:eriador                   FAIL
+     </pre>
+
+     </ul>
+
+     <li>Click on the ID link &ldquo;20856&rdquo;
+  aka. <a href="https://tapper/tapper/reports/id/20856">https://tapper/tapper/reports/id/20856</a>
+
+</ul>
+
+<h4 class="subsection">7.2.2 Part 2 Details</h4>
+
+     <ul>
+<li>Here you see the details of this report 20856.
+
+     <p>You see:
+
+          <ul>
+<li>green PASSED results for the &ldquo;MCP overview&rdquo;. 
+      This means the starting and finishing of the guests worked.
+
+          <li>attachments of console logs.
+
+          <li>some links to more information (raw TAP report, preconditions)
+
+     </ul>
+
+     <li>Note below the group of all the other reports, again it's the group
+  of those IDs:
+
+     <pre class="verbatim">         20856    Topic-xen-unstable
+         20855    LMBench
+         20854    CTCS
+         20852    Host-Overview
+         20851    Hardwaredb Overview
+</pre>
+
+     <li>The most meta information is in &ldquo;20852 Host-Overview&rdquo;.
+
+     <li>Click on the ID link &ldquo;20852&rdquo;
+  aka. <a href="https://tapper/tapper/reports/id/20852">https://tapper/tapper/reports/id/20852</a>
+
+     <li>Now you see the details of &ldquo;20852 Host-Overview&rdquo; with
+lots of meta information as &ldquo;Context&rdquo;.
+
+     <p>You see:
+
+     <pre class="verbatim">       Metainfo
+           cpuinfo: 	1x Family: 15, Model: 67, Stepping: 2
+           ram: 	3950 MB
+           uptime: 	0 hrs
+     
+       XEN-Metainfo
+           xen_dom0_kernel: 	2.6.18.8-xen x86_64
+           xen_base_os_description: 	SUSE Linux Enterprise Server 10 SP2 (x86_64)
+           xen_changeset: 	20273:10cfcbef68ee
+           xen_version: 	3.5-unstable
+     
+       guest_1_redhat_rhel5u4_32bpae_qcow
+           xen_guest_description: 	001-lmbench
+           xen_guest_flags: 	…
+           xen_guest_start: 	…
+     
+       guest_2_suse_sles10_sp3_gmc_32b_up_qcow
+           xen_guest_description: 	002-ctcs
+           xen_guest_flags: 	…
+           xen_guest_start: 	…
+</pre>
+
+     <li>If you are interested in what went wrong in the CTCS run,
+  click on ID link &ldquo;20854&rdquo;
+  aka. <a href="https://tapper/tapper/reports/id/20854">https://tapper/tapper/reports/id/20854</a>
+
+     <li>Here you see
+
+          <ul>
+<li>one RED bar in CTCS-results
+
+          <li>several RED bars in var_log_messages
+
+     </ul>
+
+     <p>You can click on them to unfold the details.
+
+</ul>
+
+<h4 class="subsection">7.2.3 Part 3 Testrun</h4>
+
+     <ul>
+<li>Imagine that the testrun completely failed and no usable reports
+  arrived in, except that primary one from the MCP, then you can use the
+  link at the end of the line
+
+     <pre class="verbatim">         20856  2009-10-07  Topic-xen-unstable  satyr  PASS testrun 9617
+                                                            ------------ 
+</pre>
+
+     <li>Click on that link &ldquo;testrun 9617&rdquo;
+  aka. <a href="https://tapper/tapper/testruns/id/9617">https://tapper/tapper/testruns/id/9617</a>
+
+     <li>That contains the description what was <strong>planned</strong>
+in this testrun, regardless of whether it succeeded.
+
+     <p>(That's the main difference between the two complementary concepts
+&ldquo;Testrun&rdquo; vs. &ldquo;Reports&rdquo;. The &ldquo;Testrun&rdquo; contains the
+specification, the &ldquo;Reports&rdquo; contain the results.)
+
+     <p>You see:
+
+     <pre class="verbatim">       Name                  Automatically generated Xen test
+       Host
+           Architecture      linux64
+           Root image        …/suse_sles10_sp2_64b_smp_raw.tar.gz
+           Test              metainfo
+       Guest number 1
+           Architecture      linux32
+           Root image        …/redhat_rhel5u4_32bpae_qcow.img
+           Test              py_lmbench
+       Guest number 2
+           Architecture 	linux32
+           Root image 	…/suse_sles10_sp3_gmc_32b_up_qcow.img
+           Test              py_ctcs
+</pre>
+
+     <li>That's it, basically.
+
+</ul>
+
+<div class="node">
+<a name="Reports-API"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Complete-Use-Cases">Complete Use Cases</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Web-User-Interface">Web User Interface</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">8 Reports API</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Overview">Overview</a>
+<li><a accesskey="2" href="#Raw-API-Commands">Raw API Commands</a>
+<li><a accesskey="3" href="#Query-language-DPath">Query language DPath</a>
+<li><a accesskey="4" href="#Client-Utility-tapper_002dapi">Client Utility tapper-api</a>
+</ul>
+
+<!-- ====================================================================== -->
+<div class="node">
+<a name="Overview"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Raw-API-Commands">Raw API Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reports-API">Reports API</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Reports-API">Reports API</a>
+
+</div>
+
+<h3 class="section">8.1 Overview</h3>
+
+<p>There runs yet another daemon, the so called
+<code>Tapper::Reports::API</code>, on the same host where already the
+<code>TAP Receiver</code> runs. This &lsquo;<samp><span class="samp">Reports API</span></samp>&rsquo; is meant for
+everything that needs more than just dropping TAP reports to a port,
+e.g., some interactive dialog or parameters.
+
+<p>This <code>Tapper::Reports::API</code> listens on Port <code>7358</code>. Its API
+is modeled after classic unix script look&amp;feel with a first line
+containing a description how to interpret the rest of the lines.
+
+<p>The first line consists of a shebang (<code>#!</code>), a <dfn>api command</dfn>
+and <dfn>command parameters</dfn>. The rest of the file is the
+<dfn>payload</dfn> for the <dfn>api command</dfn>.
+
+<p>The syntax of the &lsquo;<samp><span class="samp">command params</span></samp>&rsquo; varies depending on the
+&lsquo;<samp><span class="samp">api command</span></samp>&rsquo; to make each command intuitively useable. Sometimes
+they are just positional parameters, sometimes they look like the
+start of a HERE document (i.e., they are prefixed with <code>&lt;&lt;</code> as
+you can see below).
+
+<!-- ====================================================================== -->
+<div class="node">
+<a name="Raw-API-Commands"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Query-language-DPath">Query language DPath</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Reports-API">Reports API</a>
+
+</div>
+
+<h3 class="section">8.2 Raw API Commands</h3>
+
+<p>In this section the raw API is described. That's the way you can use
+without any dependencies except for the minimum ability to talk to a
+port, e.g., via <code>netcat</code>.
+
+<p>See section <a href="#tapper_002dapi">tapper-api</a> for how to use a dedicated command line
+utility that makes talking to the reports API easier, but is a
+dependency that might not be available in your personal test
+environment.
+
+<!--  -->
+<ul class="menu">
+<li><a accesskey="1" href="#upload-aka_002e-attach-a-file-to-a-report">upload aka. attach a file to a report</a>
+<li><a accesskey="2" href="#download-_002d-download-a-file-which-is-attached-to-a-report">download - download a file which is attached to a report</a>
+<li><a accesskey="3" href="#mason-_002d-Render-templates-with-embedded-query-language">mason - Render templates with embedded query language </a>
+</ul>
+
+<div class="node">
+<a name="upload-aka.-attach-a-file-to-a-report"></a>
+<a name="upload-aka_002e-attach-a-file-to-a-report"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#download-_002d-download-a-file-which-is-attached-to-a-report">download - download a file which is attached to a report</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Raw-API-Commands">Raw API Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Raw-API-Commands">Raw API Commands</a>
+
+</div>
+
+<h4 class="subsection">8.2.1 upload aka. attach a file to a report</h4>
+
+<p>This api command lets you upload files, aka. attachments, to
+reports. These files are available later through the web
+interface. Use this to attach log files, config files or console
+output.
+
+<ul class="menu">
+<li><a accesskey="1" href="#upload-Synopsis">upload Synopsis</a>
+<li><a accesskey="2" href="#Parameters">Parameters</a>
+<li><a accesskey="3" href="#upload-Payload">upload Payload</a>
+<li><a accesskey="4" href="#upload-Example-usage">upload Example usage</a>
+</ul>
+
+<div class="node">
+<a name="upload-Synopsis"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Parameters">Parameters</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#upload-aka_002e-attach-a-file-to-a-report">upload aka. attach a file to a report</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#upload-aka_002e-attach-a-file-to-a-report">upload aka. attach a file to a report</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.1.1 upload Synopsis</h5>
+
+<pre class="verbatim">#! upload REPORTID FILENAME [ CONTENTTYPE ]
+payload
+</pre>
+
+<div class="node">
+<a name="Parameters"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#upload-Payload">upload Payload</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#upload-Synopsis">upload Synopsis</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#upload-aka_002e-attach-a-file-to-a-report">upload aka. attach a file to a report</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.1.2 Parameters</h5>
+
+     <ul>
+<li>REPORTID
+
+     <p>The id of the report to which the file is assigned
+
+     <li>FILENAME
+
+     <p>The name of the file
+
+     <li>CONTENTTYPE
+
+     <p>Optional MIME type; defaults to <code>plain</code>; use
+<code>application/octet-stream</code> to make it downloadable later in
+browser.
+
+</ul>
+
+<div class="node">
+<a name="upload-Payload"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#upload-Example-usage">upload Example usage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Parameters">Parameters</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#upload-aka_002e-attach-a-file-to-a-report">upload aka. attach a file to a report</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.1.3 upload Payload</h5>
+
+<p>The raw content of the file to upload.
+
+<div class="node">
+<a name="upload-Example-usage"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#upload-Payload">upload Payload</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#upload-aka_002e-attach-a-file-to-a-report">upload aka. attach a file to a report</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.1.4 upload Example usage</h5>
+
+<p>Just <code>echo</code> the first api-command line and then immediately
+<code>cat</code> the file content:
+
+<pre class="verbatim">$ ( echo "#! upload 552 xyz.tmp" ; cat xyz.tmp ) | netcat -w1 bascha 7358
+</pre>
+
+<!--  -->
+<div class="node">
+<a name="download---download-a-file-which-is-attached-to-a-report"></a>
+<a name="download-_002d-download-a-file-which-is-attached-to-a-report"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#mason-_002d-Render-templates-with-embedded-query-language">mason - Render templates with embedded query language</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#upload-aka_002e-attach-a-file-to-a-report">upload aka. attach a file to a report</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Raw-API-Commands">Raw API Commands</a>
+
+</div>
+
+<h4 class="subsection">8.2.2 download - download a file which is attached to a report</h4>
+
+<p>This api command lets you download files, aka. attachments, from
+reports.
+
+<ul class="menu">
+<li><a accesskey="1" href="#download-Synopsis">download Synopsis</a>
+<li><a accesskey="2" href="#download-Parameters">download Parameters</a>
+<li><a accesskey="3" href="#download-Example-usage">download Example usage</a>
+</ul>
+
+<div class="node">
+<a name="download-Synopsis"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#download-Parameters">download Parameters</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#download-_002d-download-a-file-which-is-attached-to-a-report">download - download a file which is attached to a report</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#download-_002d-download-a-file-which-is-attached-to-a-report">download - download a file which is attached to a report</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.2.1 download Synopsis</h5>
+
+<pre class="verbatim">#! upload REPORTID FILENAME
+</pre>
+
+<p>There is no other payload neccessary here, just this single line.
+
+<div class="node">
+<a name="download-Parameters"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#download-Example-usage">download Example usage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#download-Synopsis">download Synopsis</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#download-_002d-download-a-file-which-is-attached-to-a-report">download - download a file which is attached to a report</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.2.2 download Parameters</h5>
+
+     <ul>
+<li>REPORTID
+
+     <p>The id of the report to which the file is assigned
+
+     <li>FILENAME
+
+     <p>The name of the file as it was specified on upload
+
+</ul>
+
+<div class="node">
+<a name="download-Example-usage"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#download-Parameters">download Parameters</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#download-_002d-download-a-file-which-is-attached-to-a-report">download - download a file which is attached to a report</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.2.3 download Example usage</h5>
+
+<p>Just <code>echo</code> the first api-command line and redirect the answer
+into a file.
+
+<pre class="verbatim">$ ( echo "#! download 552 xyz.tmp" ) | netcat -w1 bascha 7358 > xyz.tmp
+</pre>
+
+<!--  -->
+<div class="node">
+<a name="mason---Render-templates-with-embedded-query-language"></a>
+<a name="mason-_002d-Render-templates-with-embedded-query-language"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#download-_002d-download-a-file-which-is-attached-to-a-report">download - download a file which is attached to a report</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Raw-API-Commands">Raw API Commands</a>
+
+</div>
+
+<h4 class="subsection">8.2.3 mason - Render templates with embedded query language</h4>
+
+<p>To query report results we provide sending templates to the API in
+which you can use a query language to get report details: This
+api-command is called like the template engine so that we can provide
+other template engines as well.
+
+<ul class="menu">
+<li><a accesskey="1" href="#mason-Synopsis">mason Synopsis</a>
+<li><a accesskey="2" href="#mason-Parameters">mason Parameters</a>
+<li><a accesskey="3" href="#Payload">Payload</a>
+<li><a accesskey="4" href="#Example-usage">Example usage</a>
+</ul>
+
+<div class="node">
+<a name="mason-Synopsis"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#mason-Parameters">mason Parameters</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#mason-_002d-Render-templates-with-embedded-query-language">mason - Render templates with embedded query language</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#mason-_002d-Render-templates-with-embedded-query-language">mason - Render templates with embedded query language</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.3.1 mason Synopsis</h5>
+
+<pre class="verbatim">#! mason debug=0 &lt;&lt;ENDMARKER
+payload
+ENDMARKER
+</pre>
+
+<div class="node">
+<a name="mason-Parameters"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Payload">Payload</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#mason-Synopsis">mason Synopsis</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#mason-_002d-Render-templates-with-embedded-query-language">mason - Render templates with embedded query language</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.3.2 mason Parameters</h5>
+
+     <ul>
+<li>debug=1
+
+     <p>If &lsquo;<samp><span class="samp">debug</span></samp>&rsquo; is specified and value set to 1 then any error message
+that might occur is reported as result content. If debug is omitted or
+false and an error occurs then the result is just empty.
+
+     <li>&lt;&lt;ENDMARKER
+
+     <p>You can choose any word instead of ENDMARKER which should mark the end
+of input, like in HERE documents, usually some word that is not
+contained in the template payload.
+
+</ul>
+
+<div class="node">
+<a name="Payload"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Example-usage">Example usage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#mason-Parameters">mason Parameters</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#mason-_002d-Render-templates-with-embedded-query-language">mason - Render templates with embedded query language</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.3.3 mason Payload</h5>
+
+<p>A mason template.
+
+<p><dfn>Mason</dfn> is a template language, see
+<a href="http://masonhq.com">http://masonhq.com</a>. Inside the template we provide a function
+<code>reportdata</code> to access report data via a query language. See
+section <a href="#Query-language">Query language</a> for details about this.
+
+<div class="node">
+<a name="Example-usage"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Payload">Payload</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#mason-_002d-Render-templates-with-embedded-query-language">mason - Render templates with embedded query language</a>
+
+</div>
+
+<h5 class="subsubsection">8.2.3.4 Example usage</h5>
+
+<p>This is a raw Mason template:
+
+<pre class="verbatim"> % my $world = "Mason World";
+ Hello &lt;% $world %>!
+ % my @res = reportdata '{ "suite.name" => "perfmon" } :: //tap/tests_planned';
+ Planned perfmon tests:
+ % foreach (@res) {
+    &lt;% $_ %>
+ % }
+</pre>
+
+<p>If you want to submit such a Mason template you can add the
+api-command line and the EOF marker like this:
+
+<pre class="verbatim">$ EOFMARKER="MASONTEMPLATE".$$
+$ payload_file="perfmon_tests_planned.mas"
+$ ( echo "#! mason &lt;&lt;$EOFMARKER" ; cat $payload_file ; echo "$EOFMARKER" ) \
+    | netcat -w1 bascha 7358
+</pre>
+
+<p>The output of this is the rendered template. You can extend the line
+to save the rendered result into a file:
+
+<pre class="verbatim">$ ( echo "#! mason &lt;&lt;$EOFMARKER" ; cat $payload_file ; echo "$EOFMARKER" ) \
+    | netcat -w1 bascha 7358 > result.txt
+</pre>
+
+<p>The answer for this looks like this:
+
+<pre class="verbatim">Hello Mason World!
+Planned perfmon tests:
+   3
+   4
+   17
+</pre>
+
+<p><a name="Query-language"></a><div class="node">
+<a name="Query-language-DPath"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Client-Utility-tapper_002dapi">Client Utility tapper-api</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Raw-API-Commands">Raw API Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Reports-API">Reports API</a>
+
+</div>
+
+<h3 class="section">8.3 Query language DPath</h3>
+
+<p>The query language, which is the argument to the <code>reportdata</code> as
+used embedded in the &lsquo;<samp><span class="samp">mason</span></samp>&rsquo; examples above:
+
+<pre class="verbatim"> reportdata '{ "suite.name" => "perfmon" } :: //tap/tests_planned'
+</pre>
+
+<p>consists of 2 parts, divided by the &lsquo;<samp><span class="samp">::</span></samp>&rsquo;.
+
+<p>We call the first part in braces <em>reports filter</em> and the second
+part <em>data filter</em>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Reports-Filter-_0028SQL_002dAbstract_0029">Reports Filter (SQL-Abstract)</a>
+<li><a accesskey="2" href="#Data-Filter">Data Filter</a>
+<li><a accesskey="3" href="#Optimizations">Optimizations</a>
+</ul>
+
+<div class="node">
+<a name="Reports-Filter-(SQL-Abstract)"></a>
+<a name="Reports-Filter-_0028SQL_002dAbstract_0029"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Data-Filter">Data Filter</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Query-language-DPath">Query language DPath</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Query-language-DPath">Query language DPath</a>
+
+</div>
+
+<h4 class="subsection">8.3.1 Reports Filter (SQL-Abstract)</h4>
+
+<p>The <em>reports filter</em> selects which reports to look at. The
+expression inside the braces is actually a complete
+<code>SQL::Abstract</code> expression
+(<a href="http://search.cpan.org/~mstrout/SQL-Abstract/">http://search.cpan.org/~mstrout/SQL-Abstract/</a>) working
+internally as a <code>select</code> in the context of the object relational
+mapper, which targets the table <code>Report</code> with an active JOIN to
+the table <code>Suite</code>.
+
+<p>All the matching reports are then taken to build a data structure for
+each one, consisting of the table data and the parsed TAP part which
+is turned into a data structure via <code>TAP::DOM</code>
+(<a href="http://search.cpan.org/~schwigon/TAP-DOM/">http://search.cpan.org/~schwigon/TAP-DOM/</a>).
+
+<p>The <em>data filter</em> works then on that data structure for each
+report.
+
+<ul class="menu">
+<li><a accesskey="1" href="#SQL_002dAbstract-expressions">SQL-Abstract expressions</a>
+<li><a accesskey="2" href="#The-data-structure">The data structure</a>
+</ul>
+
+<div class="node">
+<a name="SQL-Abstract-expressions"></a>
+<a name="SQL_002dAbstract-expressions"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#The-data-structure">The data structure</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reports-Filter-_0028SQL_002dAbstract_0029">Reports Filter (SQL-Abstract)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Reports-Filter-_0028SQL_002dAbstract_0029">Reports Filter (SQL-Abstract)</a>
+
+</div>
+
+<h5 class="subsubsection">8.3.1.1 SQL::Abstract expressions</h5>
+
+<p>The filter expressions are best described by example:
+
+     <ul>
+<li>Select a report by ID
+<pre class="verbatim">     { 'id' => 1234 }
+</pre>
+
+     <li>Select a report by suite name
+<pre class="verbatim">     { 'suite_name' => 'oprofile' }
+</pre>
+
+     <li>Select a report by machine name
+<pre class="verbatim">     { 'machine_name' => 'bascha' }
+</pre>
+
+     <li>Select a report by date
+
+     <p>Here the value that you want to select is a structure by itself,
+consisting of the comparison operator and a time string:
+
+     <pre class="verbatim">     { 'created_at' => { '&lt;', '2009-04-09 10:00' }  }
+</pre>
+
+</ul>
+
+<div class="node">
+<a name="The-data-structure"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#SQL_002dAbstract-expressions">SQL-Abstract expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Reports-Filter-_0028SQL_002dAbstract_0029">Reports Filter (SQL-Abstract)</a>
+
+</div>
+
+<h5 class="subsubsection">8.3.1.2 The data structure</h5>
+
+<div class="node">
+<a name="Data-Filter"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Optimizations">Optimizations</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reports-Filter-_0028SQL_002dAbstract_0029">Reports Filter (SQL-Abstract)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Query-language-DPath">Query language DPath</a>
+
+</div>
+
+<h4 class="subsection">8.3.2 Data Filter</h4>
+
+<p>The data structure that is created for each report can be evaluated
+using the <em>data filter</em> part of the query language, i.e.,
+everything after the <code>::</code>. This part is passed through to
+<code>Data::DPath</code>
+(<a href="http://search.cpan.org/~schwigon/Data-DPath/">http://search.cpan.org/~schwigon/Data-DPath/</a>).
+
+<ul class="menu">
+<li><a accesskey="1" href="#Data_002dDPath-expressions">Data-DPath expressions</a>
+</ul>
+
+<div class="node">
+<a name="Data-DPath-expressions"></a>
+<a name="Data_002dDPath-expressions"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Data-Filter">Data Filter</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Data-Filter">Data Filter</a>
+
+</div>
+
+<h5 class="subsubsection">8.3.2.1 Data-DPath expressions</h5>
+
+<div class="node">
+<a name="Optimizations"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Data-Filter">Data Filter</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Query-language-DPath">Query language DPath</a>
+
+</div>
+
+<h4 class="subsection">8.3.3 Optimizations</h4>
+
+<p>Using the query language can be slow. The biggest slowdown occurs with
+the &lsquo;<samp><span class="samp">ANYWHERE</span></samp>&rsquo; element <code>//</code>, again with several of them,
+because they span up a big search tree.
+
+<p>Therefore, if you know the depth of your path, try to replace the
+<code>//</code> with some <code>*</code> because that only spans up on the current
+step not every possible step, like this:
+
+<pre class="verbatim">  { ... } :: //section/stats-proc-interrupts-before//tap//data/TLB";
+</pre>
+
+<pre class="verbatim">  { ... } :: /results/*/section/stats-proc-interrupts-before/tap/lines/*/_children/*/data/TLB";
+</pre>
+
+<!-- ====================================================================== -->
+<p><a name="tapper_002dapi"></a><div class="node">
+<a name="Client-Utility-tapper-api"></a>
+<a name="Client-Utility-tapper_002dapi"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Query-language-DPath">Query language DPath</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Reports-API">Reports API</a>
+
+</div>
+
+<h3 class="section">8.4 Client Utility tapper-api</h3>
+
+<p>There is a command line utility <code>tapper-api</code> that helps with
+using the API without the need to talk the protocol and fiddle with
+<code>netcat</code> by yourself.
+
+<ul class="menu">
+<li><a accesskey="1" href="#help">help</a>
+<li><a accesskey="2" href="#upload">upload</a>
+<li><a accesskey="3" href="#mason">mason</a>
+</ul>
+
+<div class="node">
+<a name="help"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#upload">upload</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Client-Utility-tapper_002dapi">Client Utility tapper-api</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Client-Utility-tapper_002dapi">Client Utility tapper-api</a>
+
+</div>
+
+<h4 class="subsection">8.4.1 help</h4>
+
+<p>You can aquire a help page to each sub command:
+
+<pre class="verbatim">$ /opt/tapper/perl/bin/tapper-api help upload
+</pre>
+
+<p>prints
+
+<pre class="verbatim">tapper-api upload --reportid=s --file=s [ --contenttype=s ]
+   --verbose          some more informational output
+   --reportid         INT; the testrun id to change
+   --file             STRING; the file to upload, use '-' for STDIN
+   --contenttype      STRING; content-type, default 'plain', 
+                      use 'application/octet-stream' for binaries
+</pre>
+
+<div class="node">
+<a name="upload"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#mason">mason</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#help">help</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Client-Utility-tapper_002dapi">Client Utility tapper-api</a>
+
+</div>
+
+<h4 class="subsection">8.4.2 upload</h4>
+
+<p>Use it from the Tapper path, like:
+
+<pre class="verbatim">$ /opt/tapper/perl/bin/tapper-api upload \
+  --file /var/log/messages \
+  --reportid=301
+</pre>
+
+<p>You can also use the special filename <samp><span class="file">-</span></samp> to read from STDIN,
+e.g., if you need to pipe the output of tools like <code>dmesg</code>:
+
+<pre class="verbatim">$ dmesg | /opt/tapper/perl/bin/tapper-api upload \
+  --file=- \
+  --filename dmesg \
+  --reportid=301
+</pre>
+
+<div class="node">
+<a name="mason"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#upload">upload</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Client-Utility-tapper_002dapi">Client Utility tapper-api</a>
+
+</div>
+
+<h4 class="subsection">8.4.3 mason</h4>
+
+<p>TODO
+
+<div class="node">
+<a name="Complete-Use-Cases"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reports-API">Reports API</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">9 Complete Use Cases</h2>
+
+<p>In this chapter we describe how the single features are put together
+into whole use-cases.
+
+<h3 class="section">9.1 Automatic Xen testing</h3>
+
+<p>This is a description on how to run Xen tests with Tapper using
+<code>SLES10</code> with one <code>RHEL5.2</code> guest (64 bit) as an example.
+
+<p>The following mainly applies to <b>manually</b> assigning Xen tests. In
+the OSRC we use <em>temare</em> (not yet published) to automatically
+create the here described steps.
+
+<h4 class="subsection">9.1.1 Paths</h4>
+
+     <ul>
+<li>Host <strong>tapper</strong>: /data/tapper/live/
+
+     <li>Host <strong>osko</strong>: /export/image_files/official_testing/
+
+</ul>
+
+<h4 class="subsection">9.1.2 Choose an image for Dom0 and images for each guest</h4>
+
+<p>We use suse/suse_sles10_64b_smp_raw.tar.gz as Dom0 and
+
+<pre class="verbatim">
+ osko:/export/images/testing/raw/redhat_rhel5u2_64b_smp_up_small_raw.img
+
+</pre>
+
+<p>as the only guest.
+
+<p>The SuSE image is of precondition type image. Thus its path is
+relative to <code>/mnt/images</code> which has
+<code>tapper:/data/tapper/live/repository/images/</code> mounted.
+
+<p>The root partition is named in the section &lsquo;<samp><span class="samp">root</span></samp>&rsquo; of the Xen
+precondition. Furthermore, you need to define the destination
+partition to be Dom0 root. We use <code>/dev/sda2</code> as an example. The
+partition could also be named using its UUID or partition label. Thus
+you need to add the following to the dom0 part of the Xen
+precondition:
+
+<pre class="verbatim">
+  root: 
+    precondition_type: image
+    mount: / 
+    image: suse/suse_sles10_64b_smp_raw.tar.gz 
+    partition: /dev/sda2
+
+</pre>
+
+<p>The RedHat image is of type &lsquo;<samp><span class="samp">copyfile</span></samp>&rsquo;.
+
+<p>It is copied from
+<code>osko:/export/image_files/official_testing/raw_img/</code> which is
+mounted to <code>/mnt/nfs</code> before.
+
+<p>This mounting is done automatically because the protocol type nfs is
+given. The image file is copied to the destination named as dest in
+the &lsquo;<samp><span class="samp">copyfile</span></samp>&rsquo; precondition. We use <code>/xen/images/</code> as an
+example. To allow the System Installer to install preconditions into
+the guest image, the file to mount and the partition to mount need to
+be named. Note that even though in some cases, the mountfile can be
+determined automatically, in other cases this is not possible
+(e.g. when you get it from a tar.gz package). The resulting root
+secition for this guest is:
+
+<pre class="verbatim"> 
+   root:
+     precondition_type: copyfile
+     name: osko:/export/images/testing/raw/redhat_rhel5u2_64b_smp_up_small_raw.img
+     protocol: nfs
+     dest: /xen/images/
+     mountfile: /xen/images/redhat_rhel5u2_64b_smp_up_small_raw.img
+     mountpartition: p1
+
+</pre>
+
+<h4 class="subsection">9.1.3 PRC configuration</h4>
+
+<p>PRC (Program Run Control) is responsible for starting guests and test
+suites.
+
+<h5 class="subsubsection">9.1.3.1 Guest Start Configuration</h5>
+
+<p>Making PRC able to start Xen guests is very simple. Every guest entry
+needs to have a section named "config". In this section, a
+precondition describing how the config file is installed and a
+filename have to be given. As for guest images the file name is needed
+because it can't be determined in some cases. We use 001.svm installed
+via copyfile to /xen/images/001.svm. The resulting config section is:
+
+<pre class="verbatim"> 
+     config:
+       precondition_type: copyfile
+       name: /usr/share/tapper/packages/mhentsc3/001.svm
+       protocol: local
+       dest: /xen/images/
+       filename: /xen/images/001.svm
+
+</pre>
+
+<h5 class="subsubsection">9.1.3.2 Testsuite Configuration</h5>
+
+<p>You need to define, where you want which test suite to run. This can
+be done in every guest and the Dom0. In this example, the Dom0 and the
+single guest will run different testsuites. this chapter only
+describes the Dom0 test program. See the summary at the end for
+details on the guest test program.
+
+<p>The section testprogram consists of a precondition definition
+describing how the test suite is installed. In our example we use a
+precondition type package with a relative path name. This path is
+relative to
+&rdquo;'/data/tapper/live/repository/packages/&rdquo;'. Since
+&rdquo;'tapper:/data/tapper/&rdquo;' is mounted to &rdquo;'/data/tapper/&rdquo;' in
+the install system, this directory can be accessed at
+&rdquo;'tapper:/data/tapper/live/repository/packages/&rdquo;'.
+
+<p>Beside the precondition you need to define an execname which is the
+full path name of the file to be executed (remember, it can't be
+determined). This file is called in the root directory (&rdquo;'/&rdquo;') in
+the test system thus in case you need to use relative paths inside
+your test suite they need to be relative to this. The program may take
+parameters which are named in the optional array &rdquo;'parameters&rdquo;' and
+taken as is. The parameter is &rdquo;'timeout_after_testprogram&rdquo;' which
+allows you to define that your test suite shall be killed (and an
+error shall be reported) after that many seconds. Even though this
+parameter is optional, leaving it out will result in Tapper waiting
+forever if your test doesn't send finish messages. The resulting
+testprogram section looks like this:
+
+<pre class="verbatim"> 
+   testprogram:
+     precondition_type: package
+     filename: tapper-testsuite-system.tar.gz
+     path: mhentsc3/
+     timeout_after_testprogram: ~
+     execname: /opt/system/bin/tapper_testsuite_system.sh 
+     parameters: 
+       - --report
+
+</pre>
+
+<h4 class="subsection">9.1.4 Preconditions</h4>
+
+<p>Usually your images will not have every software needed for your tests
+installed. In fact the example images now do but for the purpose of
+better explanation we assume that we need to install dhcp, python-xml
+and bridge-utils in Dom0. Furthermore we need a script to enable
+network and console. At last we install the Xen package and a Xen
+installer package. These two are still needed on our test
+images. Package preconditions may have a &rdquo;'scripts&rdquo;' array attached
+that name a number of programs to be executed after the package was
+installed. This is used in our example to call the Xen installer
+script after the Xen package and the Xen installer package were
+installed. See the summary at the end for the resulting precondition
+section.  The guest image only needs a DHCP client. Since this
+precondition is appended to the precondition list of the appropriate
+guest entry, the System Installer will automatically know that the
+guest image has to be mounted and the precondition needs to be
+installed inside relative to this mount.
+
+<h4 class="subsection">9.1.5 Resulting YAML config</h4>
+
+<p>After all these informations are gathered, put the following YAML text
+into a file. We use /tmp/xen.yml as an example.
+
+<pre class="verbatim"> 
+   precondition_type: xen
+   name: SLES 10 Xen with RHEL5.2 guest (64 bit)
+   dom0:
+     root:
+       precondition_type: image
+       mount: /
+       image: suse/suse_sles10_64b_smp_raw.tar.gz
+       partition: /dev/sda2
+     testprogram:
+       precondition_type: package
+       filename: tapper-testsuite-system.tar.gz
+       path: mhentsc3/
+       timeout_after_testprogram: 3600
+       execname: /home/tapper/x86_64/bin/tapper_testsuite_ctcs.sh
+       parameters: 
+         - --report
+     preconditions:
+       - precondition_type: package
+         filename: dhcp-3.0.3-23.33.x86_64.rpm
+         path: mhentsc3/sles10/
+       - precondition_type: package
+         filename: dhcp-client-3.0.3-23.33.x86_64.rpm
+         path: mhentsc3/sles10/
+       - precondition_type: package
+         filename: python-xml-2.4.2-18.7.x86_64.rpm
+         path: mhentsc3/sles10/
+       - precondition_type: package
+         filename: bridge-utils-1.0.6-14.3.1.x86_64.rpm
+         path: mhentsc3/sles10/
+   # has to come BEFORE xen because config done in here is needed for xens initrd
+       - precondition_type: package
+         filename: network_enable_sles10.tar.gz
+         path: mhentsc3/sles10/
+         scripts:
+           - /bin/network_enable_sles10.sh
+       - precondition_type: package
+         filename: xen-3.2_20080116_1546_16718_f4a57e0474af__64bit.tar.gz
+         path: mhentsc3/
+         scripts: ~
+       - precondition_type: package
+         filename: xen_installer_suse.tar.gz
+         path: mhentsc3/sles10/
+         scripts:
+           - /bin/xen_installer_suse.pl
+   # only needed for debug purpose
+       - precondition_type: package
+         filename: console_enable.tar.gz
+         path: mhentsc3/
+         scripts:
+           - /bin/console_enable.sh
+   guests:
+     - root:
+         precondition_type: copyfile
+         name: osko:/export/images/testing/raw/redhat_rhel5u2_64b_smp_up_small_raw.img
+         protocol: nfs
+         dest: /xen/images/
+         mountfile: /xen/images/redhat_rhel5u2_64b_smp_up_small_raw.img
+         mountpartition: p1
+         #       mountpartition: /dev/sda3 # or label or uuid
+       config:
+         precondition_type: copyfile
+         name: /usr/share/tapper/packages/mhentsc3/001.svm
+         protocol: local
+         dest: /xen/images/
+         filename: /xen/images/001.svm
+       testprogram:
+         precondition_type: copyfile
+         name: /usr/share/tapper/packages/mhentsc3/testscript.pl
+         protocol: local
+         dest: /bin/
+         timeout_after_testprogram: 100
+         execname: /bin/testscript.pl
+       preconditions:
+         - precondition_type: package
+           filename: dhclient-4.0.0-6.fc9.x86_64.rpm
+           path: mhentsc3/fedora9/
+
+</pre>
+
+<h4 class="subsection">9.1.6 Grub</h4>
+
+<p>For Xen to run correctly, the defaults grub configuration is not
+sufficient. You need to add another precondition to your test. System
+Installer will replace <code>$root</code> with the <code>/dev/*</code> notation of
+the root partition and <code>$grubroot</code> with the grub notation of the
+root partition (including parenthesis). Put the resulting precondition
+into a file. We use <code>/tmp/grub.yml</code> as an example. This file may
+read like this:
+
+<pre class="verbatim"> 
+  precondition_type: grub
+  config: |
+   serial --unit=0 --speed=115200
+   terminal serial
+   timeout 3
+   default 0
+   title XEN-test
+     root $grubroot
+     kernel /boot/xen.gz com1=115200,8n1 console=com1
+     module /boot/vmlinuz-2.6.18.8-xen root=$root showopts console=ttyS0,115200
+     module /boot/initrd-2.6.18.8-xen 
+
+</pre>
+
+<h4 class="subsection">9.1.7 Order Testrun</h4>
+
+<p>To order your test run with the previously defined preconditions you
+need to stuff them into the database. Fortunatelly there are
+commandline tools to help you with this job. They can be found at
+<code>/opt/tapper/perl/perls/current/bin</code>. In our production
+environment the server for Tapper is <code>tapper</code>. Log in to this
+server (as use <code>tapper</code>). Make sure that
+<code>/opt/tapper/perl/perls/current/bin/</code> is at the beginning of your
+<code>$PATH</code> (so the correct perl will always be found). For each
+precondition you want to put into the database you need to define a
+short name. Call <code>tapper-testrun newprecondition</code> with the
+appropriate options, e.g. in our example:
+
+<pre class="verbatim"> 
+ $ tapper-testrun newprecondition --shortname=grub \
+                                  --condition_file=/tmp/grub.yml
+
+ $ tapper-testrun newprecondition --shortname=xen \
+                                  --condition_file=/tmp/xen.yml
+
+</pre>
+
+<p><code>tapper-testrun</code> will return a precondition ID in each case. You
+will need those soon so please keep them in mind. In the example the
+precondition id for grub is 4 and for Xen its 5.
+
+<p>You can now put your test run into the database using
+<code>tapper-testrun new</code>. This expects a hostname, a test program and
+all preconditions. The test program is never evaluated and only there
+for historical reasons. Put in anything you like. Add <code>--owner</code>
+with an appropriate user if you don't want the default
+<code>tapper</code>. The resulting call looks like this:
+
+<pre class="verbatim">
+  tapper-testrun new --hostname=bullock \
+                     --precondition=4 \
+                     --precondition=5 \
+                     --test_program=whatever \
+                     --owner=mhentsc3
+ 
+</pre>
+
+<p>Please note: There is a more central approach to describe all needed
+preconditions at once, see <a href="#Macro-Preconditions">Macro Preconditions</a> and <a href="#A-real-live-example-_002d-kernel-boot-test">A real live example - kernel boot test</a>.
+
+<p>When the requested testrun is scheduled Tapper will setup the system
+you requested and execute your defined testrun. When everything went
+well, you'll see test output soon after. For more information on what
+is going on with Tapper, see <code>/var/log/tapper-debug</code>.
+
+</body></html>
+

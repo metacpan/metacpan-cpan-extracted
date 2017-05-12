@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<tokenization xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head>
+    <schema href="example6_schema.xml"/>
+  </head>
+  <sentences>
+    <LM id="s1">
+      <tokens>
+        <w id="s1w1">John</w>
+        <w id="s1w2">loves</w>
+        <w id="s1w3">Mary</w>
+        <w id="s1w4">.</w>
+      </tokens>
+    </LM>
+    <LM id="s2">
+      <tokens>
+        <w id="s2w1">He</w>
+        <w id="s2w2">told</w>
+        <w id="s2w3">her</w>
+        <w id="s2w4">this</w>
+        <w id="s2w5">Friday</w>
+        <w id="s2w6">.</w>
+      </tokens>
+    </LM>
+  </sentences>
+</tokenization>

@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+t/Text-Perlate.t
+lib/Text/Perlate.pm
+lib/Text/Perlate/Apache.pm
+META.yml                                 Module meta-data (added by MakeMaker)

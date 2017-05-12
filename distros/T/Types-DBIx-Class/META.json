@@ -1,0 +1,58 @@
+{
+   "abstract" : "A Type::Library for DBIx::Class objects",
+   "author" : [
+      "Yary Hluchan <yary@cpan.org>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "App::ModuleBuildTiny version 0.009",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Types-DBIx-Class",
+   "no_index" : {
+      "file" : [
+         ".gitattributes"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.007"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Pod::Coverage::Moose" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         },
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.009"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010",
+            "DBIx::Class" : "0",
+            "Sub::Quote" : "0",
+            "Type::Tiny" : "0.040"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+             "Test::More" : "1.001010",
+	     "SQL::Translator" : "0.11018"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.000006"
+}

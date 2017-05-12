@@ -1,0 +1,28 @@
+# not a real test suite! just an interactive "you give me da
+# name, I show ya how it splits up" driver.
+
+use strict;
+use Term::ReadLine;
+use Text::BibTeX;
+use Text::BibTeX::Name;
+
+sub show_name
+{
+   my $str = shift;
+   my $name = Text::BibTeX::Name->new($str);
+   my $part;
+
+   foreach $part (qw(first last von jr))
+   {
+      my @tokens = $name->part ($part);
+      printf "   %-5s => (%s)\n",
+             $part,
+             join (", ", map (qq["$_"], @tokens));
+   }
+}
+
+my $rl = Term::ReadLine->new('BibTeX name splitter');
+while (defined ($_ = $rl->readline (">> ")))
+{
+   show_name ($_);
+}

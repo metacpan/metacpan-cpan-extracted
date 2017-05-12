@@ -1,0 +1,91 @@
+<HTML>
+<HEAD>
+<TITLE>Tk::ErrorDump - An alternative to Tk::Error or Tk::ErrorDialog</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<center><h1>Tk::ErrorDump</h1><p>
+<table border=0 align=center><tr>
+<td valign=top align=center><img src='errdump1.gif'></td>
+<td valign=top align=center><img src='errdump2.gif'></td></tr></table><p>
+<a href='http://www.presicient.com/errordump/Tk-ErrorDump-0.01.tar.gz'><b>Download it here.</B></a><br>
+<i>Sorry, no tests yet...</i><p></center>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#prerequisites">PREREQUISITES</A></LI>
+	<LI><A HREF="#caveats">CAVEATS</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Tk::ErrorDump - An alternative to Tk::Error or Tk::ErrorDialog</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Tk::ErrorDump;</PRE>
+<PRE>
+        my $errdlg = $mw-&gt;ErrorDump(
+                -icon =&gt; $my_icon,
+                -defaultfile =&gt; '*.tkd',
+                -dumpcode =&gt; \&amp;err_dlg_dump     # dump any current project context
+                [ the usual frame options ]
+        );</PRE>
+<PRE>
+    icon     - an app specific icon for the popup error dialog;
+        default is std. Tk icon</PRE>
+<PRE>
+    defaultfile - the default filename (maybe wildcarded) used in the
+        getSaveFile dialog to create the dump file</PRE>
+<PRE>
+    dumpcode - a CODE reference called after an error is intercepted
+        and the ErrorDump dialog is presented. It is passed a filehandle
+        to which the app can write any app-specific dump information</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>[ NOTE: This module is derived directly from Tk::ErrorDialog...
+tho you probably can't tell it anymore ]</P>
+<P>An error dialog that traps Tk errors, then displays the error and
+stack trace in a ROText widget, and gives the user the opportunity
+to save that information in a file. In addition, the application
+can provide a callback which is invoked after the dialog is
+presented, and to which the dumpfile handle (if any) is passed,
+in order for the application to dump any internal diagnostic
+information, and/or execute cleanup code.</P>
+<P>
+<HR>
+<H1><A NAME="prerequisites">PREREQUISITES</A></H1>
+<P>Tk::ROText</P>
+<P>Tk::getSaveFile</P>
+<P>
+<HR>
+<H1><A NAME="caveats">CAVEATS</A></H1>
+<P>None so far...</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Dean Arnold, <A HREF="mailto:darnold@presicient.com">darnold@presicient.com</A></P>
+<P>Original Tk::ErrorDialog by Stephen O. Lidie,
+Lehigh University Computing Center. <A HREF="mailto:lusol@Lehigh.EDU">lusol@Lehigh.EDU</A></P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>December 29, 2003 : Converted from Tk::ErrorDialog</P>
+
+</BODY>
+
+</HTML>

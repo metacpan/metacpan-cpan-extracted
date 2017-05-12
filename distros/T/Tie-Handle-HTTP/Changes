@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Handle::HTTP.
+
+0.01  Fri Mar 17 15:20:16 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn Tie::Handle::HTTP
+

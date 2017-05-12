@@ -1,0 +1,69 @@
+TYPEMAP
+context_p				T_CONTEXT
+CV *					T_CODEREF
+char *					T_CHARSTAR
+int					T_INT
+
+INPUT
+T_CONTEXT
+	if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+	{
+		MAGIC *mg = mg_find(SvRV($arg), '~');
+		if (mg == NULL)
+		{
+			warn(\"${Package}::$func_name() -- $var not magical\");
+			XSRETURN_UNDEF;
+		}
+		$var = ($type)SvIV(mg->mg_obj);
+		CLASS = HvNAME(SvSTASH(SvRV( $arg )));
+	}
+	else
+	{
+		warn(\"${Package}::$func_name() -- $var is not blessed\");
+		XSRETURN_UNDEF;
+	}
+T_CODEREF
+	if ($arg == &PL_sv_undef)
+	{
+		ST(0) = sv_2mortal(newSViv(0));
+		XSRETURN(1);
+	}
+	if (SvTYPE(SvRV($arg)) == SVt_PVCV)
+		$var = (CV*)SvRV($arg);
+	else
+		croak(\"$var is not a code reference\")
+T_CHARSTAR
+	if ($arg == &PL_sv_undef)
+	{
+		ST(0) = sv_2mortal(newSViv(0));
+		XSRETURN(1);
+	}
+	$var = (char *)SvPV($arg, PL_na);
+T_INT
+	if ($arg == &PL_sv_undef)
+	{
+		ST(0) = sv_2mortal(newSViv(0));
+		XSRETURN(1);
+	}
+	$var = (int)SvIV($arg);
+
+OUTPUT
+T_CONTEXT
+	if ($var == NULL)
+	{
+		XSRETURN_UNDEF;
+	}
+	else
+	{
+		SV *tc = sv_newmortal();
+		sv_magic(tc, sv_2mortal(newSViv((IV)$var)), '~', NULL, 0);
+		$arg = sv_bless(sv_2mortal(newRV(tc)), gv_stashpv((CLASS == NULL)
+		                                      ? TEMPLATE_PACKAGE
+		                                      : CLASS, 0));
+	}
+T_CODEREF
+	$arg = newRV((SV*)$var);
+T_CHARSTAR
+	sv_setpv((SV *)$arg, $var);
+T_INT
+	sv_setiv($arg, (IV)$var);

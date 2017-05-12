@@ -1,0 +1,15 @@
+---
+name: Template-Plugin-Subst
+version: 0.02
+author:
+  - Nik Clayton <nik@FreeBSD.org>
+abstract: s/// functionality for Template Toolkit templates
+license: bsd
+requires:
+  Template: 0
+  Test::More: 0
+provides:
+  Template::Plugin::Subst:
+    file: lib/Template/Plugin/Subst.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

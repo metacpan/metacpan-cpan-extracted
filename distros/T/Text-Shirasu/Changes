@@ -1,0 +1,14 @@
+Revision history for Perl extension Text-Shirasu
+
+0.0.3 2016-12-22T08:21:15Z
+    - fixed filtering issue
+
+0.0.2 2016-12-15T15:18:18Z
+
+	- fixed Text::Shirasu::Node
+	- fixed Text::Shirasu::Node document
+
+0.0.1 2016-12-15T04:55:20Z
+
+    - first release
+

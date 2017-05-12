@@ -1,0 +1,379 @@
+=== row col row
+--- wiki
+|A1|A2|>|>|A3|A4|
+|^|^|B3|B3|B3|^|
+--- html
+<table id="content_block_1">
+<tr>
+<td rowspan="2">A1</td>
+<td rowspan="2">A2</td>
+<td colspan="3">A3</td>
+<td rowspan="2">A4</td>
+</tr>
+<tr>
+<td>B3</td>
+<td>B3</td>
+<td>B3</td>
+</tr>
+</table>
+=== 0
+--- wiki
+|~0|0|
+--- html
+<table id="content_block_1">
+<tr>
+<th>0</th>
+<th>0</th>
+</tr>
+</table>
+=== basic
+--- wiki
+|hoge|hoge|
+|hoge|hoge|
+--- html
+<table id="content_block_1">
+<tr>
+<td>hoge</td>
+<td>hoge</td>
+</tr>
+<tr>
+<td>hoge</td>
+<td>hoge</td>
+</tr>
+</table>
+=== basic
+--- wiki
+,hoge,,
+hoge
+--- html
+<table id="content_block_1">
+<tr>
+<td>hoge</td>
+<td> </td>
+</tr>
+</table>
+hoge
+=== 
+--- wiki
+|hoge|| 
+|hoge|hoge|
+
+hoge
+--- html 
+<table id="content_block_1">
+<tr>
+<td>hoge</td>
+<td> </td>
+</tr>
+<tr>
+<td>hoge</td>
+<td>hoge</td>
+</tr>
+</table>
+<br />
+hoge
+===
+--- wiki
+|hoge|ho>ge|
+|hoge|hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td>hoge</td>
+<td>ho&gt;ge</td>
+</tr>
+<tr>
+<td>hoge</td>
+<td>hoge</td>
+</tr>
+</table>
+===
+--- wiki
+||hoge|||||
+|hoge||||||
+
+hoge||
+|||hoge
+
+hoge|||hoge
+--- html 
+<table id="content_block_1">
+<tr>
+<td> </td>
+<td>hoge</td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>hoge</td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+</tr>
+</table>
+<br />
+hoge||<br />
+|||hoge<br />
+<br />
+hoge|||hoge
+=== hoge
+--- wiki
+*hoge
+|hoge||
+
+,hage,,
+
+hage,,hage
+hoge||hoge
+hoge
+--- html
+<div id="content_block_1" class="wiki-section-1">
+<div class="title-1"><h3 id="content_1">hoge</h3></div>
+<div id="content_block_1-body" class="wiki-section-body-1">
+<table id="content_block_2">
+<tr>
+<td>hoge</td>
+<td> </td>
+</tr>
+</table>
+<table id="content_block_3">
+<tr>
+<td>hage</td>
+<td> </td>
+</tr>
+</table>
+<br />
+hage,,hage<br />
+hoge||hoge<br />
+hoge
+</div>
+</div>
+===
+--- wiki
+|bgcolor(#Fff):color(#000):hgoe|
+--- html 
+<table id="content_block_1">
+<tr>
+<td style="background-color:#Fff;color:#000;">hgoe</td>
+</tr>
+</table>
+===
+--- wiki
+|hoge|hoge|hoge|hoge|hoge|hoge|hoge|
+|^   |>   |hoge|>   |hoge|^   |hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td rowspan="2">hoge</td>
+<td>hoge</td>
+<td>hoge</td>
+<td>hoge</td>
+<td>hoge</td>
+<td rowspan="2">hoge</td>
+<td>hoge</td>
+</tr>
+<tr>
+<td colspan="2">hoge</td>
+<td colspan="2">hoge</td>
+<td>hoge</td>
+</tr>
+</table>
+=== 4
+--- wiki
+|bgcolor(red):color(blue):size(30):left:hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td style="background-color:red;color:blue;font-size:30px;text-align:left;">hoge</td>
+</tr>
+</table>
+=== 3
+--- wiki
+|bgcolor(red):color(blue):size(30):hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td style="background-color:red;color:blue;font-size:30px;">hoge</td>
+</tr>
+</table>
+=== 2
+--- wiki
+|bgcolor(red):color(blue):hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td style="background-color:red;color:blue;">hoge</td>
+</tr>
+</table>
+=== bgcolor
+--- wiki
+|bgcolor(red):hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td style="background-color:red;">hoge</td>
+</tr>
+</table>
+=== color
+--- wiki
+|color(red):hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td style="color:red;">hoge</td>
+</tr>
+</table>
+=== size
+--- wiki
+|size(100):hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td style="font-size:100px;">hoge</td>
+</tr>
+</table>
+=== align
+--- wiki
+|left:hoge|right:hoge|center:hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td style="text-align:left;">hoge</td>
+<td style="text-align:right;">hoge</td>
+<td style="text-align:center;">hoge</td>
+</tr>
+</table>
+=== row & col
+--- wiki
+|hoge|hoge|hoge|
+|>   |hoge|^   |
+--- html 
+<table id="content_block_1">
+<tr>
+<td>hoge</td>
+<td>hoge</td>
+<td rowspan="2">hoge</td>
+</tr>
+<tr>
+<td colspan="2">hoge</td>
+</tr>
+</table>
+=== colspan
+--- wiki
+|hoge|  >  |hgoe|hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td>hoge</td>
+<td colspan="2">hgoe</td>
+<td>hoge</td>
+</tr>
+</table>
+=== rowspan
+--- wiki
+|!hoge|hgoe|hoge|
+|~hoge|hoge|hoge|
+|hoge|!hoge|hgoe|
+|hoge|~hoge|hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<th>hoge</th>
+<td>hgoe</td>
+<td>hoge</td>
+</tr>
+<tr>
+<th>hoge</th>
+<th>hoge</th>
+<th>hoge</th>
+</tr>
+<tr>
+<td>hoge</td>
+<th>hoge</th>
+<td>hgoe</td>
+</tr>
+<tr>
+<td>hoge</td>
+<th>hoge</th>
+<th>hoge</th>
+</tr>
+</table>
+=== blockquote
+--- wiki
+|a|
+|b|c|
+|d|e|f|
+--- html 
+<table id="content_block_1">
+<tr>
+<td>a</td>
+</tr>
+<tr>
+<td>b</td>
+<td>c</td>
+</tr>
+<tr>
+<td>d</td>
+<td>e</td>
+<td>f</td>
+</tr>
+</table>
+=== hoge
+--- wiki
+,a,
+,b,c,
+,d,e,f,
+--- html 
+<table id="content_block_1">
+<tr>
+<td>a</td>
+</tr>
+<tr>
+<td>b</td>
+<td>c</td>
+</tr>
+<tr>
+<td>d</td>
+<td>e</td>
+<td>f</td>
+</tr>
+</table>
+=== rowspan
+--- wiki
+|hoge|hoge|hoge|
+|^   |hoge|hoge|
+|^   |^   |hoge|
+--- html 
+<table id="content_block_1">
+<tr>
+<td rowspan="3">hoge</td>
+<td>hoge</td>
+<td>hoge</td>
+</tr>
+<tr>
+<td rowspan="2">hoge</td>
+<td>hoge</td>
+</tr>
+<tr>
+<td>hoge</td>
+</tr>
+</table>
+=== nothing
+--- wiki
+|||
+|||
+--- html
+<table id="content_block_1">
+<tr>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td> </td>
+<td> </td>
+</tr>
+</table>

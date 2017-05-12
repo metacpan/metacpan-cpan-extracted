@@ -1,0 +1,32 @@
+Revision history for Perl module Text::Names
+
+0.01  2011-02-07
+    - original version; created by h2xs 1.23 with options
+        -AX Text::Names
+0.02  2011-02-08
+    - Fixed dependency issues
+0.03  2011-02-08
+    - Improved doc
+0.19  2012-04-25
+    - Tons of improvements
+0.20  2013-03-11
+    - Removed annoying uninitialized variable warnings
+0.30  2013-08-09
+    - Added guessGender subroutine
+0.31  2013-08-10
+    - Tweaks to guessGender subroutine
+0.32  2013-08-10
+    - Documentation
+0.33  2013-08-10
+    - Fixed Changes file
+0.39  2014-03-09
+   - Fixed issues with reversed names without commas
+0.40  2014-04-05
+   - Fixed issues with O'* names
+0.41  2015-01-05
+   - Added firstnamePrevalence() and surnamePrevalence()
+0.42  2015-04-01
+   - Merged doc fixes from ugexe
+0.43  2015-05-15
+   - Make guessGender work with full names; improved guessGender recall
+ 

@@ -1,0 +1,46 @@
+Revision history for Tie-Hash-Attribute
+
+1.04
+    - makefile now specifies explicit v3.69 for HTML::Entities
+
+1.03
+    - update copyright date
+    - fix bug tracker location
+
+1.02
+    - keys with values of undef are skipped
+
+1.01
+    - removed hard coded sort from _stringify()
+
+1.00
+    - version 1.00
+
+0.08
+    - attributes no are no longer automatically sorted
+
+0.07
+    - faster CLEAR implementation
+
+0.06
+    - removed dependency HTML::Entities
+    - now scrubbing key/vals instead of encoding (faster)
+
+0.05
+    - attribute keys are case-insesitive
+    - encoding for keys and values via HTML::Entities
+
+0.04
+    - prepending space to attribute string
+    - sorting the deepest level hash keys for consistency 
+    - omitting semi-colon in attribute string when possible
+
+0.03
+    - added SCALAR back to interface (like 0.01 + 0.02)
+
+0.02
+    - Changed interface: can now access first level of keys by
+        pre-pending a dash to the key to be emitted as attributes
+
+0.01
+    - First version, released on an unsuspecting world.

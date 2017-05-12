@@ -1,0 +1,55 @@
+{
+   "abstract" : "Quick texts compare, plagiarism and common parts detection",
+   "author" : [
+      "Litres.ru <gu@litres.ru>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Distill",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Carp" : "0",
+            "Digest::JHash" : "0",
+            "Encode" : "0",
+            "Encode::Detect" : "0",
+            "File::Temp" : "0",
+            "HTML::TreeBuilder" : "0",
+            "JSON::XS" : "0",
+            "LWP::UserAgent" : "0",
+            "OLE::Storage_Lite" : "0",
+            "Text::Extract::Word" : "0",
+            "Text::Unidecode" : "1.27",
+            "Unicode::Normalize" : "1.25",
+            "XML::LibXML" : "0",
+            "XML::LibXSLT" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

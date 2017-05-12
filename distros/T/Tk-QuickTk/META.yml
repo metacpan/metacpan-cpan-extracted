@@ -1,0 +1,29 @@
+---
+abstract: 'Simple, declarative syntax for a Perl/Tk GUI'
+author: []
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-QuickTk
+provides:
+  Tk::QuickTk:
+    file: lib/Tk/QuickTk.pm
+    version: 0.92
+  Tk::QuickTk::WebColor:
+    file: lib/Tk/QuickTk/WebColor.pm
+    version: 0.5
+requires:
+  AutoLoader: 0
+  Carp: 0
+  Exporter: 0
+  FileHandle: 0
+  Text::TreeFile: 0.39
+  Tk: 0
+  perl: 5.002
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.92

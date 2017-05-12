@@ -1,0 +1,50 @@
+Revision history for Perl module Text::CSV::Slurp
+
+1.03 Fri 25 Mar 2016
+     - Improve load method to handle different line endings by using IO::Scalar
+
+1.02 Sun 12 Oct 2014
+     - Minor improvements to documentation
+     - Tweaks to dzil and github settings
+
+1.01 Thu 27 Jun 2013
+     - Update link to github (previously Google Code)
+
+1.0 Fri 21 Sep 2012
+    - Use IO::File instead of IO::Handle to resolve
+        https://rt.cpan.org/Ticket/Display.html?id=78278
+    - Convert to Dist::Zilla for distribution
+
+0.9 Thu 03 Feb 2011
+    - Clarify documentation to resolve
+        https://rt.cpan.org/Public/Bug/Display.html?id=65398
+
+0.8 Mon 11 Jan 2010
+    - Add create method
+
+0.7 Tue 29 Sept 2009
+    - Update tests to take regard of non-English error output
+    - Correct Test::Most version in prereq detail
+
+0.6 Wed 9 Sept 2009
+    - More error checking added:
+        - now dies with a intelligible message if:
+            - it can't read an input file
+            - it can't parse the header row successfully
+    - Tests added for the above changes
+    - Update documentation with license and respository information
+
+0.5 Tue 9 Dec 2008
+    - tidy up documentation
+
+0.4 Mon 8 Dec 2008
+    - let's bundle things properly this time
+
+0.3 Mon 8 Dec 2008
+    - update Changes file
+
+0.2 Mon 8 Dec 2008
+    - return a true value
+
+0.1 Mon 8 Dec 2008
+    - first release with incomplete test suite

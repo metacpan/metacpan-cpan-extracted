@@ -1,0 +1,264 @@
+#!/usr/bin/perl
+#Copyright (c) 2013, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Cwd;
+use Toader;
+use Toader::Templates;
+use Term::CallEditor qw/solicit/;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "toader-temp 0.1.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"Switches:\n".
+		"-a <action>   The action to perform.\n".
+		"-f <file>  This is the file in question.\n".
+		"-t <template>  The template to operate on.\n".
+		"\n".
+		"Actions:\n".
+		"edit - Edits the specific template.\n".
+		"del - Deletes the specific template.\n".
+		"get - Prints out the specified template.\n".
+        "getd - Prints out the specified default template.\n".
+		"ls - List the various templates in the current directory.\n".
+		"lsd - List the various default templates.\n";
+}
+
+#gets the options
+my %opts=();
+getopts('a:t:f:', \%opts);
+
+if ( ! defined( $opts{a} ) ){
+	warn('toader-temp: Nothing specified for -a');
+	exit 254;
+}
+
+#get the current directory
+my $dir=getcwd;
+
+#initialize Toader as a bit of a test and it may be used later
+my $toader=Toader->new({ dir=>$dir });
+if ( $toader->error){
+	warn('toader-temp: Failed to initialize Toader. error="'.$toader->error.
+		 '" errorString="'.$toader->errorString.'"');
+	exit $toader->error;
+}
+
+my $tt=Toader::Templates->new( $toader );
+$tt->dirSet( $dir );
+if ( $tt->error ){
+	warn('toader-temp:"'.$tt->error.'" Failed to set the directory for Toader::Template');
+	exit $tt->error;
+}
+
+if ( $opts{a} eq 'ls' ){
+	my @templates=$tt->listTemplates;
+	if ( ! defined( $templates[0] ) ){
+		exit 0;
+	}
+	print join( "\n", sort(@templates))."\n";
+	exit 0;
+}
+
+if ( $opts{a} eq 'lsd' ){
+    my @templates=$tt->listDefaultTemplates;
+    if ( ! defined( $templates[0] ) ){
+        exit 0;
+    }
+    print join( "\n", sort(@templates))."\n";
+    exit 0;
+}
+
+if ( $opts{a} eq 'del' ){
+	if ( ! defined( $opts{t} ) ){
+		warn('toader-temp: Nothing defined for -t');
+		exit 254;
+	}
+
+	$tt->remove( $opts{t} );
+    if ( $tt->error ){
+        warn('toader-temp:'.$tt->error.': Failed to delete template');
+        exit $tt->error;
+    }
+
+	exit 0;
+}
+
+if ( $opts{a} eq 'set' ){
+
+	if ( ! defined( $opts{t} ) ){
+		warn('toader-temp: Nothing defined for -t');
+		exit 254;
+	}
+
+	
+	if ( ! defined( $opts{f} ) ){
+		warn('toader-temp: Nothing defined for -f');
+		exit 254;
+	}
+		 
+	my $fh;
+	if ( ! open( $fh, '<', $opts{f} ) ){
+		warn('toader-temp: Failed to open "'.$opts{f}.'"');
+		exit 254;
+	}
+	my $templateData=join("", <$fh> );
+	close( $fh );
+
+	$tt->add( $opts{t}, $templateData );
+    if ( $tt->error ){
+        warn('toader-temp:'.$tt->error.': Failed set the template');
+        exit $tt->error;
+    }
+
+	exit 0;
+}
+
+
+if ( $opts{a} eq 'edit' ){
+    my $template=$tt->getTemplate( $opts{t} );
+    if ( $tt->error ){
+        warn('toader-temp:'.$tt->error.': Failed to fetch the specified template');
+        exit $tt->error;
+    }
+	my $fh=solicit($template);
+	$template=join( '', <$fh> );
+	$tt->setTemplate($opts{t}, $template);
+}
+
+if ( $opts{a} eq 'get' ){
+	my $template=$tt->getTemplate( $opts{t} );
+	if ( $tt->error ){
+		warn('toader-temp:'.$tt->error.': Failed to fetch the specified template');
+		exit $tt->error;
+	}
+	print $template;
+	exit 0;
+}
+
+if ( $opts{a} eq 'getd' ){
+    my $template=$tt->getTemplateDefault( $opts{t} );
+    if ( $tt->error ){
+        warn('toader-temp:'.$tt->error.': Failed to fetch the specified template');
+        exit $tt->error;
+    }
+    print $template;
+    exit 0;
+}
+
+warn('toader-css: Nothing matched for -a');
+exit 254;
+
+=head1 NAME
+
+toader-temp - A tool for manipulating the Toader templates.
+
+=head1 SYNOPSIS
+
+toader-temp -a edit -t <template>
+
+toader-temp -a get -t <template>
+
+toader-temp -a getd -t <template>
+
+toader-temp -a ls
+
+toader-temp -a lsd
+
+=head1 SWITCHES
+
+=head2 -a <action>
+
+The specified action to perform.
+
+=head2 -t <template>
+
+The template to operate on.
+
+=head1 ACTIONS
+
+=head2 edit
+
+Edits the specified template.
+
+=head2 get
+
+Prints out the specified template.
+
+=head2 getd
+
+Prints out the specified default template.
+
+=head2 ls
+
+List the various templates in the current directory.
+
+=head2 lsd
+
+List the various default templates.
+
+=head1 AUTHOR
+
+Copyright (c) 2013, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+unix
+
+=head1 README
+
+toader-temp - A tool for manipulating the Toader templates.
+
+=cut

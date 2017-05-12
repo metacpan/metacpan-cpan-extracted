@@ -1,0 +1,37 @@
+TYPEMAP
+std::string	T_STD_STRING
+ux::Trie*	T_TEXT_UX
+ux::id_t	T_UV
+
+OUTPUT
+
+T_TEXT_UX
+	if ($var == NULL) {
+		SvOK_off($arg);
+	} else {
+		HV *self = newHV();
+		sv_setsv($arg, sv_2mortal(newRV_noinc((SV*) self)));
+		sv_bless($arg, gv_stashpv(CLASS, 1));
+		MAGIC *mg = sv_magicext((SV*) self, NULL, PERL_MAGIC_ext, NULL, NULL, 0);
+		mg->mg_obj = (SV*) $var;
+		mg->mg_private = 42;
+	}
+
+T_STD_STRING
+	$arg = newSVpvn($var.data(), $var.size());
+
+INPUT
+
+T_TEXT_UX
+	if (sv_isobject($arg) && sv_derived_from($arg, \"Text::Ux\")) {
+		MAGIC* magic = mg_find(SvRV($arg), PERL_MAGIC_ext);
+		if (magic != NULL && magic->mg_private == 42 && magic->mg_obj != NULL) {
+			$var = ($type) magic->mg_obj;
+		} else {
+			Perl_croak(aTHX_ \"$var: invalid object\");
+		}
+	} else {
+		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"Text::Ux\");
+	}

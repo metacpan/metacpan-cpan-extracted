@@ -1,0 +1,7 @@
+ * Doesn't screw up mail-ish things
+ * Spots preformated text sometimes
+
+        This should be blockquoted.  It just needs to have
+	enough whitespace in the line, and have no list marker.
+
+ * Blah blah blah

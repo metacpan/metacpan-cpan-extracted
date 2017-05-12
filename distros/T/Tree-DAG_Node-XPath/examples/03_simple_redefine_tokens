@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+use strict; 
+
+# $Id: 03_simple_redefine_tokens,v 1.2 2004/05/18 22:09:08 mrodrigu Exp $
+
+# This example uses Tree::DAG_Node::XPath directly
+# it creates a simple tree, with a root and 5 daughters
+# here we redefine the tokens that define a name, so they can include spaces
+# Tree::DAG_Node::XPath::define_name
+# This can be tricky: for example using qr/([\w\s]+)/ would prevent us from
+# using numbers like 3, as 3 would become a valid name
+
+use Tree::DAG_Node::XPath;
+
+# create the tree
+my $root = Tree::DAG_Node::XPath->new();
+Tree::DAG_Node::XPath::define_name( qr/([A-Za-z][\w\s]*)/);
+
+$root->name("root node");
+$root->attributes( { "just a number" => 42 });
+
+foreach (1..5)
+  { my $new_daughter = $root->new_daughter;
+    $new_daughter->name( "a daugther");
+    $new_daughter->attributes( { att => $_, "just a number" => "$_" });
+  }
+
+# now use XPath to find nodes
+#my $daughters= $root->find( '/root node');
+#my $daughters= $root->find( '/root node/a daugther');
+#my $daughters= $root->find( '//a daugther');
+#my $daughters= $root->find( '//a daugther[@att<"3"]');
+#my $daughters= $root->find( '//a daugther[@just a number>"3"]');
+my $daughters= $root->find( '/root node/a daugther[@just a number>3]');
+foreach (@$daughters) { print "found ", $_->name, " (att: " . $_->attributes->{'just a number'} .")\n"; }
+ 

@@ -1,0 +1,33 @@
+---
+abstract: 'provide a progress meter on a standard terminal'
+author:
+  - 'Martyn J. Pearce'
+build_requires:
+  Capture::Tiny: '0.13'
+  File::Temp: '0'
+  Test::Exception: '0.31'
+  Test::More: '0.80'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-ProgressBar
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::MethodMaker: '1.02'
+  Fatal: '0'
+  POSIX: '0'
+  Term::ReadKey: '2.14'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Term-ProgressBar
+version: '2.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

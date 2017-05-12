@@ -1,0 +1,6 @@
+line 07, level 2, locallevel 0, xxxxx
+  line 08, level 3, locallevel 1, xxxxx
+  line 09, level 3, locallevel 1, xxxxx
+    line 10, level 4, locallevel 2, xxxxx
+    line 11, level 4, locallevel 2, xxxxx
+  line 12, level 3, locallevel 1, xxxxx

@@ -1,0 +1,90 @@
+Tree-RB version 0.1
+
+NAME
+    Tree::RB - Perl implementation of the Red/Black tree, a type of balanced
+    binary search tree.
+
+SYNOPSIS
+        use Tree::RB;
+
+        my $tree = Tree::RB->new;
+        $tree->put('France'  => 'Paris');
+        $tree->put('England' => 'London');
+        $tree->put('Hungary' => 'Budapest');
+        $tree->put('Ireland' => 'Dublin');
+        $tree->put('Egypt'   => 'Cairo');
+        $tree->put('Germany' => 'Berlin');
+
+        $tree->put('Alaska' => 'Anchorage'); # D'oh!
+        $tree->delete('Alaska');
+
+        print $tree->get('Ireland'); # 'Dublin'
+
+        print $tree->min->key; # 'Egypt' 
+        print $tree->max->key; # 'Ireland' 
+        print $tree->size; # 6
+
+        # print items, ordered by key
+        my $it = $tree->iter;
+
+        while(my $node = $it->next) {
+            sprintf "key = %s, value = %s\n", $node->key, $node->val;
+        }
+
+        # print items in reverse order
+        $it = $tree->rev_iter;
+
+        while(my $node = $it->next) {
+            sprintf "key = %s, value = %s\n", $node->key, $node->val;
+        }
+
+        # Hash interface
+        tie my %capital, 'Tree::RB';
+
+        # or do this to store items in descending order 
+        tie my %capital, 'Tree::RB', sub { $_[1] cmp $_[0] };
+
+        $capital{'France'}  = 'Paris';
+        $capital{'England'} = 'London';
+        $capital{'Hungary'} = 'Budapest';
+        $capital{'Ireland'} = 'Dublin';
+        $capital{'Egypt'}   = 'Cairo';
+        $capital{'Germany'} = 'Berlin';
+
+        # print items in order
+        while(my ($key, $val) = each %capital) {
+            printf "key = $key, value = $val\n";
+        }
+
+DESCRIPTION
+    This is a Perl implementation of the Red/Black tree, a type of balanced
+    binary search tree.
+
+    A tied hash interface is also provided to allow ordered hashes to be
+    used.
+
+    See the Wikipedia article at
+    <http://en.wikipedia.org/wiki/Red-black_tree> for more on Red/Black
+    trees.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Arun Prasad
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

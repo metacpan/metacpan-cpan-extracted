@@ -1,0 +1,47 @@
+Revision history for <DISTRO>
+
+1.0  2012/12/07
+     - Match 'never' in addition to $DATE in more places (Ski Kacoroski)
+     - Fix to regex for next binding state (Simon Elsbrock)
+     - Use /o for slightly faster regex processing
+
+0.9  2009/08/10 
+        - Added License text in all files
+        - Removed requirement for version.pm
+
+0.8  2008/12/07
+        - Added support for ddns-rev-name, ddns-txt and ddns-fwd-name statements, based on patch
+          by Franck Joncourt.
+
+0.7  2008/11/06
+	- Changed regex to deal with 'ends never' statement
+ 	- Warn instead of die when statement not recognized
+
+0.6  2008/07/03
+	- Deal with incomplete hardware address line
+
+0.5  2008/06/05
+	- Fixed inconsistent licensing
+
+0.4  2008/03/26
+	- Fixed bug in Iterator.pm which caused it to miss first object in list.
+
+0.3  2008/03/13
+	- Fixed regular expression in Text::DHCPLeases::Object::parse that failed when hardware-type value included non-word characters
+          (i.e "token-ring").
+        - Added version.pm to list of requisites in Build.PL
+
+0.2  2007/12/20
+	**** API CHANGED ****
+	- Renamed Leases.pm to Object.pm.  This reflects changes in the code that allows it to deal with all possible kinds of declarations
+	  in the leases file (was missing objects created by OMAPI).
+	- Fixed bugs in parsing reported by John Lloyd.
+
+0.1  2007/08/21
+       Initial release.
+
+
+Copyright (c) 2007-2010, Carlos Vicente <cvicente@cpan.org>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

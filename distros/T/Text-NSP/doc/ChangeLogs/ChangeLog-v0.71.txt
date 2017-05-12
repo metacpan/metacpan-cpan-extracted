@@ -1,0 +1,37 @@
+
+Changes from NSP version 0.69 to 0.71
+-------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+June 16, 2004
+
+Makefile.PL
+------------
+
+	Updated Makefile.PL with correct version number (Ted)
+
+	Makefile.PL now creates /man/man3 directory - in previous
+	versions this was not created, sometimes causing an error
+	during "make install" when that directory is not found (Ted)
+
+Programs
+---------
+	statistic.pl and sort-bigrams.pl were modified by changing
+	the internal N-gram separating marker # to sequence <||>.
+	As some users pointed out, use of # as a separator between
+	the N-grams causes problems when N-gram tokens include #.
+	In 0.71, we used a more rare sequence <||> to separate
+	N-grams in the internal hash structure. (Amruta)
+	
+Testing
+-------
+
+	Added test cases to catch an error when internal delimiter <||> 
+	is detected within N-gram tokens.
+	(Amruta)
+
+	Fixed test cases for huge-count, that were relying on the mistaken
+	idea that count.pl produces output in sorted form. Now an actual
+	sort is done of count.pl output before comparison with gold 
+	standard results. (Amruta)

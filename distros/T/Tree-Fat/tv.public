@@ -1,0 +1,90 @@
+/***** switch to -*-C-*- mode please */
+
+#ifndef _tv_public_
+#define _tv_public_
+
+#include "tvcommon.h"
+
+#ifndef TV_ARG
+# define TV_ARG
+# define TV_ARG_
+# define TV_THIS
+# define TV_THIS_
+#else
+# define TV_ARG_  TV_ARG,
+# define TV_THIS_  TV_THIS,
+#endif
+
+#ifndef TnSTOREDATA_T
+# define TnSTOREDATA_T TnDATA_T*
+#endif
+#ifndef TnFETCHDATA_T
+# define TnFETCHDATA_T TnDATA_T**
+#endif
+
+#if defined(TV_TEST) && defined(TV_XTEST)
+# define dGUARD(xx)	U32 guard##xx;
+#else
+# define dGUARD(xx)
+#endif
+
+
+/*
+  STRUCTURE DECLARATIONS
+
+  Since I'm storing trees in ObjectStore it is a major hassel to
+  change size, type, ordering, or field names.
+*/
+
+struct tnslot {
+#ifdef TV_KEYD
+  TnKEY_T	slot_key;
+#endif
+  TnDATA_T	slot_dat;
+};
+#define TV_SLOTSIZE sizeof(struct tnslot)
+
+struct tn {
+  dTYPESPEC( TN )
+  struct tn0	n0;
+#if defined(TV_TEST) && defined(TV_XTEST)
+  U32		tn_scanid;
+#endif
+  dGUARD(1)
+  struct tnslot tn_slots[TnWIDTH];
+  dGUARD(2)
+#ifdef TV_KEYCACHE
+  TV_KEYCACHE
+#endif
+};
+
+typedef struct tn TN;
+
+#ifndef TnKEY_T
+# define TnKEY_T		I32
+#endif
+
+/*TREE VALUE METHODS*/
+void free_tv(XPVTV *tv);
+void tv_clear(XPVTV *tv);
+
+/*TV-REMOTE METHODS*/
+TnKEY_T tc_fetch(XPVTC *tc, TnFETCHDATA_T out);
+void tc_store(TV_ARG_ XPVTC *tc, TnSTOREDATA_T data);
+#ifdef TV_KEYD
+int tc_seek(XPVTC *tc, TnKEY_T key, int unique);
+void tc_insert(TV_ARG_ XPVTC *tc, TnKEY_T key, TnSTOREDATA_T data);
+#else
+void tc_insert(TV_ARG_ XPVTC *tc, TnSTOREDATA_T data);
+#endif
+void tc_delete(TV_ARG_ XPVTC *tc);
+
+void tv_treestats(XPVTC *tc, double *depth, double *center);
+void tc_dump(XPVTC *tc);
+void tv_dump(XPVTV *tv);
+
+#ifdef TV_ESEEK_FDECL
+TV_ESEEK_FDECL;
+#endif
+
+#endif

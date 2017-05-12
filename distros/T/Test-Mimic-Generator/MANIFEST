@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01.t
+lib/Test/Mimic/Generator.pm
+.test_mimic_recorder_data/additional_info.rec
+.test_mimic_recorder_data/history_from_recorder.rec
+META.yml                                 Module meta-data (added by MakeMaker)

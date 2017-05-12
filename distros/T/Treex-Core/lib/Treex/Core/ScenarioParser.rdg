@@ -1,0 +1,95 @@
+{
+use File::Slurp;
+use File::Basename;
+use Treex::Core::Log;
+## no critic (Miscellanea::ProhibitUnrestrictedNoCritic)
+## no critic Generated code follows
+no warnings;
+}
+startrule:  SCEN EOF                            {$return = $item{SCEN}}
+SCEN:       LINE SCEN                           {$return = [@{$item{LINE}},@{$item{SCEN}}]}
+SCEN:       LINE                                {$return = [@{$item{LINE}}]}
+LINE:       BLOCK COMMENT                       {$return = [@{$item{BLOCK}}]}
+LINE:       BLOCK                               {$return = [@{$item{BLOCK}}]}
+LINE:       COMMENT                             {$return = []}
+EOF:        /^\Z/
+BLOCK:      INCLUDE                             {
+                                                    my $included = read_file( $item{INCLUDE}, binmode => ':utf8' );
+                                                    my $result = $thisparser->startrule( $included, 1, $item{INCLUDE} );
+                                                    if (defined $result and ref $result eq 'ARRAY') {
+                                                        $return = [@$result];
+                                                    } else {
+                                                        $return = undef;
+                                                    }
+                                                }
+BLOCK:      SCENMODULE PARAMS                   {
+                                                    my $modulename = $item{SCENMODULE};
+                                                    eval "use $modulename; 1;" or die "Can't use $modulename !\n$@\n";
+                                                    my %params = map {my ($name,$value) = split /=/, $_, 2; ($name, $value)} @{$item{PARAMS}};
+                                                    my $scenmod = $modulename->new(\%params);
+                                                    my $string = $scenmod->get_scenario_string();
+                                                    my $result = $thisparser->startrule( $string, 0, '' );
+                                                    if (defined $result and ref $result eq 'ARRAY') {
+                                                        $return = [@$result];
+                                                    } else {
+                                                        log_fatal "Syntax error in '$modulename' scenario:\n<BEGIN SCENARIO>\n$string\n<END SCENARIO>";
+                                                    }
+                                                }
+BLOCK:      SCENMODULE                          {
+                                                    my $modulename = $item{SCENMODULE};
+                                                    eval "use $modulename; 1;" or die "Can't use $modulename !\n$@\n";
+                                                    my $scenmod = $modulename->new();
+                                                    my $string = $scenmod->get_scenario_string();
+                                                    my $result = $thisparser->startrule( $string, 0, '' );
+                                                    if (defined $result and ref $result eq 'ARRAY') {
+                                                        $return = [@$result];
+                                                    } else {
+                                                        log_fatal "Syntax error in '$modulename' scenario:\n<BEGIN SCENARIO>\n$string\n<END SCENARIO>";
+                                                    }
+                                                }
+BLOCK:      TBNAME PARAMS                       {$return = [{
+                                                        block_name=>$item{TBNAME},
+                                                        block_parameters=>$item{PARAMS},
+                                                    }]
+                                                }
+BLOCK:      TBNAME                              {$return = [{
+                                                        block_name=>$item{TBNAME},
+                                                        block_parameters=>[],
+                                                    }]
+                                                }
+SCENMODULE: /Scen::/ BNAME                      { $return = "Treex::Scen::$item{BNAME}"}
+INCLUDE:    /\/\S+\.scen/                       {$return = $item[1]}
+INCLUDE:    /[^\/#]\S+\.scen/                   {   my $from_file = $arg[0];
+                                                    if (length $from_file) {
+                                                        $return = dirname($from_file) . "/$item[1]";
+                                                    } else {
+                                                        $return = "./$item[1]";
+                                                    }
+                                                }
+TBNAME:     /::/ BNAME                          {$return = $item{BNAME}}                    #absolute block path starts with '::' eg. ::Lingua::EN::ExampleTreexBlock will be resolved as Lingua::EN::ExampleTreexBlock
+TBNAME:     BNAME                               {$return = "Treex::Block::$item{BNAME}"}    #relative block path starts directly  eg. W2A::Example                    will be resolved as Treex::Block::W2A::Example
+BNAME:      /[A-Z]\w*::/ BNAME                  {$return = $item[1].$item[2]}
+BNAME:      /[A-Z]\w*/                          {$return = $item[1]}
+PARAMS:     PARAM PARAMS                        {$return = [$item{PARAM}, @{$item{PARAMS}}]}
+PARAMS:     PARAM                               {$return = [$item{PARAM}]}
+PARAM:      PNAME '=' <skip: qr//> PVALUE       {$return = $item{PNAME}.'='.$item{PVALUE}}
+PNAME:      /\w+/                               {$return = $item[1]}
+PVALUE:     /'/ PSQUOTE /'/                     {$return = $item{PSQUOTE}}
+PVALUE:     /"/ PDQUOTE /"/                     {$return = $item{PDQUOTE}}
+PVALUE:     /`/ PTICKED /`/                     {$return = $item[1].$item[2].$item[3]}
+PVALUE:     PNOTQUOTED                          {$return = $item{PNOTQUOTED}}
+PSQUOTE:    NOTSQUOTE SLASHEDSQUOTE PSQUOTE     {$return = $item{NOTSQUOTE}.$item{SLASHEDSQUOTE}.$item{PSQUOTE}}
+PSQUOTE:    NOTSQUOTE
+NOTSQUOTE:  /[^']*[^'\\]/
+SLASHEDSQUOTE: /\\'/                            {$return = "'"}
+PDQUOTE:    NOTDQUOTE SLASHEDDQUOTE PDQUOTE     {$return = $item{NOTDQUOTE}.$item{SLASHEDDQUOTE}.$item{PDQUOTE}}
+PDQUOTE:    NOTDQUOTE
+NOTDQUOTE:  /[^"]*[^"\\]/
+SLASHEDDQUOTE: /\\"/                            {$return = '"'}
+
+PNOTQUOTED: /\S+/                               {$return = $item[1]}
+PNOTQUOTED: EMPTY                               {$return = ''}
+PTICKED:    /[^`]+/                             {$return = $item[1]}
+COMMENT:    /#[^\n]*/                           {$return = ''}
+SPACE:      /\s+/                               {$return = $item[1]}
+EMPTY:      //                                 

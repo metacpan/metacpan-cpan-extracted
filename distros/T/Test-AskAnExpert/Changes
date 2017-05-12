@@ -1,0 +1,28 @@
+Revision history for Perl extension Test::AskAnExpert.
+
+0.03  Wed Jul 25 16:03:17 2007
+	- name chaned to Test::AskAnExpert, the old one sucked
+	- Timeouts are here
+	- get_yes/get_no are now is_yes/is_no, names are more natural
+	- The mock interface can now never have an answer for testing
+	  timeout functionality
+	- File interface now has more docs than a stub
+	- changed to Artistic 2.0 license
+	- added a signature file
+
+0.02_02 Wed Jul 26 20:35:11 2007
+	- Fixed failing tests
+
+0.02_01 Wed Jul 26 18:53:22 2007
+	- 0.03 pre-release sent for comments
+
+0.02  Wed Jul 25 15:58:27 2007
+	- last Test::Smart version, name is changing
+	- no feature modifications
+	- you want Test::AskAnExpert now
+
+0.01  Mon Jul 24 16:08:34 2007
+	- original version
+	- proof of concept
+	- features stabilizing but I make no gurantees
+	- at least it has Kwalitee

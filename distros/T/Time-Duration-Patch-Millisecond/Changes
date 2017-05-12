@@ -1,0 +1,17 @@
+Revision history for Time-Duration-Patch-Millisecond
+
+0.03     2013-04-17 (SHARYANTO)
+
+         No functional changes. Mark deprecated as Time::Duration 1.1 is now
+         released with millisecond support.
+
+
+0.02     2012-12-14 (SHARYANTO)
+
+         No functional changes. POD wording.
+
+
+0.01     2012-12-14 (SHARYANTO)
+
+         First release.
+

@@ -1,0 +1,77 @@
+{
+   "abstract" : "Aggregate C<*.t> tests to make them run faster.",
+   "author" : [
+      "Curtis \"Ovid\" Poe <ovid@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Aggregate",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Most" : "0.21",
+            "Test::Simple" : "0.94",
+            "Test::Trap" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::Dump::Streamer" : "1.11",
+            "Perl::Tidy" : "20060614",
+            "Test::More" : "0.94"
+         },
+         "requires" : {
+            "FindBin" : "1.47",
+            "Test::Harness" : "3.09",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Aggregate" : {
+         "file" : "lib/Test/Aggregate.pm",
+         "version" : "0.375"
+      },
+      "Test::Aggregate::Base" : {
+         "file" : "lib/Test/Aggregate/Base.pm",
+         "version" : "0.375"
+      },
+      "Test::Aggregate::Builder" : {
+         "file" : "lib/Test/Aggregate/Builder.pm",
+         "version" : "0.375"
+      },
+      "Test::Aggregate::Nested" : {
+         "file" : "lib/Test/Aggregate/Nested.pm",
+         "version" : "0.375"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rwstauner/test-aggregate"
+      }
+   },
+   "version" : "0.375",
+   "x_contributors" : [
+      "Curtis \"Ovid\" Poe <ovid@cpan.org>",
+      "Florian Ragwitz <flora@cpan.org>",
+      "Shlomi Fish <shlomif@cpan.org>",
+      "Randy Stauner <rwstauner@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

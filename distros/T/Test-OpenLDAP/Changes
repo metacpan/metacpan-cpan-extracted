@@ -1,0 +1,18 @@
+Revision history for Test-OpenLDAP
+
+0.5  Wed Mar 13 21:00:58 2013
+       Added /usr/lib/openldap to PATH for OpenSUSE
+
+0.4  Fri Mar 08 21:21:03 2013
+       Added Net::LDAP to dependencies in Makefile.PL
+       Included t/slapd.t
+
+0.3  Fri Mar 01 19:12:27 2013
+       Added the suffix parameter to new
+
+0.2  Tue Feb 28 21:45:43 2013
+       Code cleanup to respond to first round of CPAN tests
+
+0.1  Tue Feb 26 22:04:49 2013
+       Initial release.
+

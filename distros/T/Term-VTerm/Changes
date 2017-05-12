@@ -1,0 +1,11 @@
+Revision history for Term-VTerm
+
+0.02    2015/06/18 22:44:12
+        [CHANGES]
+         * Wrap VTermScreen as Term::VTerm::Screen
+         * Give public constructors to Pos, Rect and Color structs
+         * Provide $state->set_default_colors()
+
+0.01    2015/03/10 21:44:47
+        First version, released on an unsuspecting world.
+

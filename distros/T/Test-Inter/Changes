@@ -1,0 +1,30 @@
+Written by:
+   Sullivan Beck (sbeck@cpan.org)
+Any suggestions, bug reports, or donations :-) should be sent to me.
+
+1.00  2010-04-29
+  - Initial release.
+
+1.01  2010-04-29
+  - Use File::Basename and IO::File to get rid of two unix dependencies.
+
+1.02  2011-06-23
+  - Added 'width' method.
+  - Updated some tests which did not run correctly with perl 5.015.  Renee Baecker
+
+1.03  2011-06-28
+  - Missed one of the tests that fail with perl 5.015.
+
+1.04  2013-03-18
+  - The __nl__ substitution wasn't happening.
+
+1.05  2013-03-20
+  - Fixed the Build.PL/Makefile.PL scripts to not install the example scripts.
+    RT 84091
+
+1.06  2015-02-11
+  - Fixed some typos.  RT 88523.
+  - Changed ChangeLog file to new Changes specification.
+  - Documentation improvments
+  - Put distro on GitHub.  Gabor Szabo
+  - Fixed Module::Build requirement.  RT 102059.

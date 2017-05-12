@@ -1,0 +1,60 @@
+{
+   "abstract" : "mock SMTP server for use in tests",
+   "author" : [
+      "Markus Benning <ich@markusbenning.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mock-Net-Server-Mail",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::INET" : "0",
+            "Moose" : "0",
+            "Net::Server::Mail::ESMTP" : "0",
+            "Test::Exception" : "0",
+            "perl" : "v5.8.5"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::More" : "0",
+            "Test::SMTP" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-smtp-verify@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Mock-Net-Server-Mail"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/Test-Mock-Net-Server-Mail",
+         "web" : "https://github.com/benningm/Test-Mock-Net-Server-Mail.git"
+      }
+   },
+   "version" : "1.00"
+}
+

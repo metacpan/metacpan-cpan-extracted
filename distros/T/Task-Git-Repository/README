@@ -1,0 +1,23 @@
+NAME
+
+    Task::Git::Repository - Install all Git::Repository plugins at once
+
+DESCRIPTION
+
+    Git::Repository is a Git wrapper for Perl with a deliberately very
+    simple interface of only two main methods. The details of the Git
+    commands to be run are defined in the parameters to these methods.
+
+    Being so simple, Git::Repository lacks a lot of methods that of its
+    users might find desirable. This is where Git::Repository::Plugin comes
+    into play. It allows one to consume plugins (some would say Roles) to
+    extend its capabilities.
+
+COPYRIGHT
+
+    This software is copyright (c) 2014 by Philippe Bruhat (BooK).
+
+LICENSE
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.

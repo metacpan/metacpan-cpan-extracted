@@ -1,0 +1,9 @@
+Markdown Test File
+==================
+
+This file tests the [MultiMarkdown](http://fletcherpenney.net/multimarkdown/)
+parser — which is powered by
+[Text::MultiMarkdown](http://p3rl/Text::MultiMarkdown). Öy.[^1]
+
+[^1]: Yes, you heard right.
+

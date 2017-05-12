@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-Abbreviate.t
+lib/Text/Abbreviate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

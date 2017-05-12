@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                TheSchwartz-Worker-PubSubHubbubPublish
+version:             1.00
+abstract:            ping pubsubhubbub hub servers
+license:             ~
+author:              
+    - Brad Fitzpatrick <brad@danga.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Net::PubSubHubbub::Publisher:  0.91
+    TheSchwartz::Worker:           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

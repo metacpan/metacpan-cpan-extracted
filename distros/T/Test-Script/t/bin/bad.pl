@@ -1,0 +1,5 @@
+#!perl
+
+BEGIN {
+  die "Bad";
+}

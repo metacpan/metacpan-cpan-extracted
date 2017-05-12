@@ -1,0 +1,36 @@
+1.07  Made the tests more tollerant to cope with modern versions
+      of libxml2.
+
+      html no longer quotes '"', so altered tests to cope with
+      both versions.
+
+      Bah, testing xml with string comparison is hard!
+
+1.06  stoped Makefile.PL creating a makefile that runs Build.PL
+      by mistake
+
+      Actually fixed the bug from 1.02.
+
+1.05  Added Build.PL and META.yml
+
+      Added how to use Build.PL to README
+
+      Updated documentation to reflect Christian Glahn's work
+      on XML::LibXML
+
+      Updated some of the code examples to use the html filter
+      module where they should
+
+1.04  Element tag name -> VIEW block mapping changed to use only
+      A-Za-z0-9.  This is bad, but will have to do.  Weird non
+      ASCII chars should be changed to '_'
+
+1.03  Debug code commented out
+
+1.02  Patches from Tatsuhiko Miyagawa to account for a stray
+      use warnings, and removal of {} in Makefile.PL that caused
+      it to always claim not to have a modern Scalar::Util.
+
+      CHANGES added.
+
+1.01  Inital Release

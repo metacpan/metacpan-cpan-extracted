@@ -1,0 +1,30 @@
+                    Perl Module Test::Without Change History                
+
+		A Perl module to run unit tests while hiding    
+		modules and/or directories from the block of    
+		code being tested.                              
+
+0.100	Saturday September 19, 2009, 08:15:00 PM -0700
+
+	* lib/Test/Without.pm (added)
+	* t/01_pod.t (added)
+	* t/02_pod_coverage.t (added)
+	* t/03_meta.t (added)
+	* t/04_minimumversion.t (added)
+	* t/05_critic.t (added)
+	Initial commit.                                                 
+
+	* t/01_pod.t
+	* t/02_pod_coverage.t
+	* t/03_meta.t
+	* t/04_minimumversion.t
+	* t/05_critic.t
+	Changed the checked-for environment var for author tests.       
+
+# Generated on Saturday September 19, 2009, 08:11:13 PM -0700
+# Using changelog2x/0.11, App::Changelog2x/0.11, XML::LibXML/1.69,             
+# XML::LibXSLT/1.68, libxml/2.6.32, libxslt/1.1.24 (with exslt)                
+# XSLT sources:
+#     $Id: changelog2text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common-text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common.xslt 4 2009-01-07 13:02:06Z rjray $

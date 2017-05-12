@@ -1,0 +1,15 @@
+=== basic
+--- wiki
+%%del%%
+--- html
+<del>del</del>
+=== escape 
+--- wiki
+%%de<script>l%%
+--- html
+<del>de&lt;script&gt;l</del>
+=== nested escape 
+--- wiki
+__%%de<script>l%%__
+--- html
+<sub><del>de&lt;script&gt;l</del></sub>

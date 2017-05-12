@@ -1,0 +1,18 @@
+0.15 Sat Aug 16 16:15:04 PDT 2014
+ - Fix strict/warnings
+
+0.14 Sat Aug 16 12:28:30 PDT 2014
+ - Meta 0.0.2
+
+0.13 Fri Aug 15 21:30:44 PDT 2014
+ - Remove t/use_ok.t
+
+0.12 Fri Aug 15 20:46:14 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.11 Mon Aug  4 23:34:00 PDT 2014
+ - Switch to Zilla::Dist
+
+0.10 Wed Jun  8 08:02:17 EST 2011
+ - First Release
+

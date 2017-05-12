@@ -1,0 +1,9 @@
+Changes
+lib/Text/Playlist.pm
+lib/Text/Playlist/M3U.pm
+lib/Text/Playlist/PLS.pm
+t/m3u.t
+t/pls.t
+Makefile.PL
+MANIFEST
+META.yml

@@ -1,0 +1,32 @@
+Revision history for Task-BeLike-PHIPS
+
+0.1.2  Thu Jan 16 15:40:00 2014
+       App::FatPacker
+
+0.1.1  Thu Nov 21 17:40:00 2013
+       PDL, Time::Duration
+
+0.1.0  Sun Nov  3 22:00:00 2013
+       EV AnyEvent
+
+0.0.9  Mon Oct 28 10:58:14 2013
+       DBIx::Connector
+
+0.0.8  Sun Sep 1 14:04:52 2013
+       Proc::Daemon
+
+0.0.7  Wed Aug 14 23:23:00 2013
+       WebService::Amazon::Route53
+
+0.0.6  Sun Aug  4 18:13:00 2013
+       LWP::Protocol::https
+
+0.0.5  Sun Jun 23 13:47:00 2013
+       App::Ack
+
+0.0.4  Mon Jun 17 18:06:00 2013
+       Module::Starter:PBP
+
+0.0.1  Wed Jun  5 21:45:06 2013
+       Initial release.
+

@@ -1,0 +1,63 @@
+NAME
+    Test::DataDirs - manage t/data and t/temp directories for your tests
+
+VERSION
+    version 0.1.2
+
+SYNOPSIS
+    This class is a convenience which provides data directories from which
+    to source information for your tests, and temp directories you can write
+    data.
+
+    Declare some temp and data directories you need in your test script as
+    below. These are implicitly relative to "t/temp/<yourscriptname>" and
+    "t/data/<yourscriptname>". Then you may refer to them using the
+    appropriate entry in the returned hash and assume the dirs exist and
+    that the temp dirs have been (re-)created.
+
+        # File: t/test-01.t
+        use Test::DataDirs;
+
+        my %D = Test::DataDirs->new(
+            temp => [temp_stuff => 'actual-dir',
+                     more_temp  => 'another-dir'],
+            data => [data_stuff => 'actual-dir'],
+        )->hash;
+
+        print "My test data is checked into $D{data_stuff}\n"
+        print "below $D{data_dir}\n"
+        # Prints (except with absolute paths):
+        # My test data is checked into t/data/test-01/actual-dir
+        # below t/data/test-01
+
+        print "I can write temp data into $D{temp_stuff}\n"
+        print "and $D{more_temp}, "below $D{temp_dir}\n"
+        # Prints (except with absolute paths):
+        # I can write temp data into t/temp/test-01/actual-dir
+        # and t/temp/test-01/another-dir below t/data/test-01
+
+    This module defines an OO interface. See also Test::DataDirs::Exporter
+    for a module with similar usage but which imports vars into your
+    namespace.
+
+DESCRIPTION
+  "$obj = $class->new(%params)"
+    Given parameters including:
+
+      base => $base_dir,
+
+      data => [ddir1 => relpath3, ddir2 => relpath4 ...]
+
+      temp => [tdir1 => relpath1, tdir2 => relpath2 ...]
+
+    Uses "base" as a base dir in which to find data dirs "relpathN" (which
+    are checked to exist), and in which to re-create fresh test dirs
+    "relpathM".
+
+    If "base" is not given, uses the name of the invoking script, with any
+    leading digits or periods stripped, and any trailing ".t" stripped.
+
+    Retuns a hash-based object which keys the names "ddirN" and "tdirN" to
+    the appropriate paths constructed from $base_dir and the appropriate
+    "relpath".
+

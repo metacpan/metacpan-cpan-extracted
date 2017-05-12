@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+example/gettysburg.pl
+lib/Text/Wrapper.pm
+t/00-all_prereqs.t
+t/00-load.t
+t/10-wrapper.t
+t/20-unicode.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

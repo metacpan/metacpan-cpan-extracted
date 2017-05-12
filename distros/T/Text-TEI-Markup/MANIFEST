@@ -1,0 +1,23 @@
+CHANGES
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Text/TEI/Markup.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01dependencies.t
+t/02markup.t
+t/99-pod-coverage.t
+t/99-pod.t
+t/data/test.txt
+t/data/test2.txt
+t/data/test_nest.xml
+t/data/test_nowrap.xml
+t/data/test_wrap.xml

@@ -1,0 +1,6 @@
+use Module::Load;
+load Alfa;
+autoload Bravo;
+load_remote "Charlie";
+autoload_remote q{Delta};
+load 'POE', qw/Driver Filter Wheel/;

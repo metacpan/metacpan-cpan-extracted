@@ -1,0 +1,39 @@
+# Tree structure and possible other fields, separated by space (or tab, or whatever \s).
+# Use quotes if field values contain spaces.
+# Use at least one space (or tab) for each indentation level.
+# Lines starting with a # are interpreted as comments and are ignored, so are blank lines.
+# There are no column names in this example.
+# The column names are reflected in the Tree::Numbered->getValue<N> methods, in this example getValue, getValue2, getValue3, getValue4, and getValue4.
+
+# You are encouraged to use column names.
+# See 'readFile.pl' and 'tree.txt' for an example using column names.
+
+
+# Value			Value2			Value3		  Value4		Value5
+
+ File			file.pl			#000000		  admin,joe,alice	1
+     New		file-new.pl		#000000		  admin
+         Window		file-window.pl		#000033		  admin			0
+         Document	file-document.pl	#000033		  admin			0	
+         Template	file-new-template.pl	#000033		  admin,joe,alice	1	
+             HTML	file-new-template-html.pl	#336699	  admin,joe,alice	1
+     Open		file-open.pl		#000000		  admin			1
+     Save		file-save.pl		#000000		  admin			1		
+     Close		file-close.pl		#000000
+     Exit		file-exit.pl		#000000
+
+ Edit			edit.pl			#000000
+     Undo		edit-undo.pl		#000000
+     Cut		edit-cut.pl		#000000
+     Copy		edit-copy.pl		#000000
+     Paste		edit-paste.pl		#000000
+     Find		edit-find.pl		#000000
+         RegExp		edit-find-regexp.pl	#000033
+
+ View			view.pl			#000000
+     Toolbars		view-tb.pl		#000000
+         Navigation	view-tb-navigation.pl	#000033
+         Location	view-tb-location.pl	#000033
+         Personal	view-tb-personal.pl	#000033
+     Reload		view-reload.pl		#000000
+     Source		view-source.pl		#000000

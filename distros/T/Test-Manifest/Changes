@@ -1,0 +1,92 @@
+Changes for Test::Manifest
+
+2.02 - Tue Aug 26 13:01:43 2014
+	Fix rt.cpan.org #98288: fix a spelling mistake
+
+2.00_001 - Thu Jul 11 20:22:40 2013
+	* Switch back to Makefile.PL—so much simpler
+
+2.00_01 - Wed Jul 20 01:02:11 2011
+	* Work with Module::Build by supplying a subclass.
+
+1.23 - Fri Jul 17 03:04:38 2009
+	* Move everything to git and finally make a release
+
+1.22_03 - Tue Jul 29 21:14:49 2008
+	* Fixed bug for missing file: previously the missing file
+	name was passed through to run_t_files, although without
+	the t/ added to its path. Test::Manifest should only
+	warn about and skip missing files.
+
+1.22_02 - Thu Jan 24 06:13:13 2008
+	* File path and unlink fixes for VMS (RT #32061). Let's see if this works.
+
+1.22_01 - Sun Jan  6 14:18:46 2008
+	* Changed test file names to only have one dot in them so they
+	work on VMS and ODS-2 file systems: RT #32061
+	* This is a test release.
+
+1.22 - Sat Oct 27 21:24:10 2007
+	* distro cleanups after moving from CVS to SVN
+
+1.21 - Wed Sep 19 19:45:27 2007
+	* [BUGFIX] getting rid of Test::More
+
+1.17 - Thu Feb 22 13:20:23 2007
+	* Updated to Sourceforge's SVN repository
+	* Dist conforms to META 1.2 spec
+	* No feature changes, so no big hurry to upgrade
+
+1.16 - Tue Aug 29 17:43:16 2006
+	* Added an experimental feature to grab file names from additional
+	files. Just specify which other files to grab file names from:
+
+	;include names_in_this_file.txt
+
+	See the docs for get_t_files().
+
+	* This is an experimental feature. This feature is experimental.
+
+1.14 - Sat Mar 26 20:55:45 2005
+	* put paths together with File::Spec (so this should work on
+	Windows
+	* You can now define levels of testing with TEST_LEVEL (e.g.
+	make test TEST_LEVEL=2)
+
+1.13 - Sat Mar 19 12:36:04 2005
+	* Added POD Coverage tests
+	* No more fooling with ExtUtils::* ---> put things in MY::* to
+	change behavior.
+	* If you are using Test::Manifest, you should upgrade and adjust
+	your Makefile.PL: the magic happens when Test::Manifest loads, so
+	you only need to load it.  Ensure you require the right version:
+		eval "use Test::Manifest 1.13";
+
+1.11 - Sat Sep 25 18:43:38 2004
+	* This is a release version.  It's the same code as 0.95
+	* Some doc updates
+
+0.95 - Thu Sep  2 15:59:26 2004
+* Test::Manifest is now more tolerant of sloppiness.  It strips leading
+and trailing whitespace as it reads lines from test_manifest, and it
+skips comment lines.  
+* If you already have Test::Manifest, you don't need to rush to get this
+new version unless you have a problem with whitespace issues.
+
+0.93 - Fri Feb 20 15:18:23 2004
+	* some minor tweaks for warnings, clarity
+	* docs show way to make Test::Manifest optional (should have thought 
+	of it sooner)
+
+0.92 - Wed Jul 30 14:10:00 2003
+        * Made tests run clean under warnings.
+	* Closed a file that failed when trying to delete it under
+	  Windows.  (Thanks Mike O'Regan)
+	* Added POD tests.
+
+0.91 - Wed Dec 11 00:48:55 2002
+	* require ExtUtils::MakeMaker 6.x so the right run_tests is 
+	available
+
+0.9 - Thu Oct 10 00:27:13 EDT 2002
+	+ removed as many dependencies as possible

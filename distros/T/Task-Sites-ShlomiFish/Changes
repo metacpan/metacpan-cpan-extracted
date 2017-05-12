@@ -1,0 +1,60 @@
+Revision history for Task-Sites-ShlomiFish:
+
+0.0211  2015-05-30
+        - META.yml: Add repository, homepage and keywords.
+
+0.0210  2015-04-06
+        - Add some missing deps.
+
+0.0209  2014-01-31
+        - Add separate LICENSE file (CPANTS).
+        - Explicit 'mit' license in Build.PL / META.yml.
+        - Minimal perl version (CPANTS).
+        - Add t/cpan-changes.t , t/pod-coverage.t , t/pod.t
+        and t/style-trailing-space.t .
+
+0.0208  2013-05-11
+        - Add more dependencies.
+        - Convert to Build.PL / Module-Build to handle three version
+        digits properly.
+
+0.0207  2012-03-24
+        - Add DBD::SQLite (it is needed).
+        - Add JSON.
+
+0.0206  2011-06-09
+        - Add HTML::TreeBuilder::LibXML .
+        - Add XML::Amazon .
+        - Add Imager .
+
+0.0205  2011-06-07
+        - Made the XML::Grammar::Fiction and XML::Grammar::Screenplay versions
+        0.7.0.
+        - Add many more explicit and implicit used or required modules.
+
+0.0204  2010-12-15
+        - Add Term::ReadPassword.
+
+0.0203  2010-10-16
+        - Add Spork::Shlomify , Text::VimColor and XML::Grammar::Fiction
+        that are now needed to build the site.
+        - Remove WWW::Google::SiteMap - no longer needed.
+        - Add the tag-release.pl file to tag a release using Subversion.
+
+0.0202  2009-03-04
+        - Added more dependencies: App::XML::DocBook::Builder ,
+        String::ShellQuote, and the XML::Grammar's.
+            - These are now required by the module.
+        - Revised the POD in lib/Task/Sites/ShlomiFish.pm to make the
+        intentions that this is a task for publically-available source
+        code clearer.
+        - Added the NOTE about the motivation to the POD.
+
+0.0201  2006-09-10
+        - Added XML::Grammar::ProductsSyndication that is required for
+        the music syndication (and future syndications).
+        - Added XML::LibXML::XPathContext.
+
+0.0100  2006-06-15
+        First version, released on an unsuspecting world.
+

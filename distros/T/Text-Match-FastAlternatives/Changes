@@ -1,0 +1,53 @@
+Revision history for Perl extension Text::Match::FastAlternatives
+
+0.01  Sun Dec 17 15:45:18 2006
+	- original version
+
+0.02  Sat Dec 23 14:05:27 2006
+	- fixed incorrect README file
+
+0.03  Sat Dec 23 14:22:36 2006
+	- support Perl 5.8.4 (which has no Newxz() macro)
+
+0.04  Sat Jan  6 13:24:45 2007
+	- support older C compilers (C89 rather than C99)
+
+0.05  Thu Nov  1 11:39:17 2007
+	- new match_at and exact_match methods
+
+1.00  Mon May  5 12:14:45 2008
+	- declare dependency on Perl 5.6
+	- update documentation for Perl 5.10
+	- label this release as 1.00; the code has been stable for ages
+	- if you're already using 0.04 or 0.05, there's no need to upgrade
+
+1.01  Sun Aug 31 16:05:05 2008
+	- more flexible: now fully supports Unicode
+	- uses less memory: many nodes 376 bytes smaller on 32-bit systems
+	- fractionally slower in some cases, but hard to measure the difference
+
+1.02  Mon Sep  1 10:16:22 2008
+	- fix test suite to work in Perl 5.10
+	- an aside: on 64-bit CPUs, 1.01/1.02 are probably faster than 1.00
+	- no code changes; if 1.01 works for you, there's no need to upgrade
+
+1.03  Tue Sep  2 10:48:16 2008
+	- fix test suite to work in Perl 5.6
+	- no code changes; if 1.02 works for you, there's no need to upgrade
+
+1.04  Sun Sep 28 13:10:48 2008
+	- fix bug in match_at on Unicode strings
+	- use XSLoader instead of DynaLoader; lower overhead
+	- fix test suite Unicode bugs under Perl 5.6
+
+1.05  Fri Dec 28 15:24:08 2012
+	- new Aho-Corasick matching algorithm; asymptotic time complexity now
+	  O(n) rather than O(nm)
+	- several subtle speed enhancements
+	- adaptive memory reduction, to help performance even further;
+	  memory use for cases small enough to be processed by a 32-bit CPU
+	  is no bigger when you use a 64-bit Perl, and can now be 4 bytes
+	  per key character (or lower) in some cases
+	- performance and memory-usage improvements during trie construction
+	- bug fix: magical values now correctly supported
+	- Perl 5.6 no longer supported

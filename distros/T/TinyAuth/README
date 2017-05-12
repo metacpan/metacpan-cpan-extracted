@@ -1,0 +1,106 @@
+NAME
+    TinyAuth - Extremely light-weight web-based authentication manager
+
+STATUS
+    TinyAuth is currently currently feature-complete and undergoing
+    polishing and testing. Part of this process focuses on naming
+    ("TinyAuth" is just a working codename), reduction of dependencies,
+    improvements to the installer, and other similar tasks.
+
+    Releases are provided "as is" for the curious, and installation is not
+    recommended for production purposes at this time.
+
+DESCRIPTION
+    TinyAuth is a light-weight authentication management web application
+    with a focus on usability.
+
+    It was initially created to assist in managing a subversion repository
+    but also usable for anything where authentication can be run from a
+    .htpasswd file.
+
+    It provides the basic functionality needed for adding and removing
+    users, and handling password maintenance with as little code and fuss as
+    possible, while still applying robust and correct security practices.
+
+    It is intended to be extremely easy to install and set up, even on
+    shared hosting accounts. The interface is so simple and pages are so
+    small (most under 1k) that it can be used on most limited-functionality
+    browsers such as the text-mode browsers, and the strange micro-browsers
+    found inside video games and mobile phones.
+
+    The goal is to allow users and be added, removed and fixed from
+    anywhere, even without a computer or "regular" internet connection.
+
+  Installing TinyAuth
+    TinyAuth uses an installation module called Module::CGI::Install.
+
+    The process involves firstly installing the TinyAuth distribution to
+    your (Unix, CGI-capable) system via the normal CPAN client, and then
+    running a "CGI Installer" program, which will install a working instance
+    of the application to a specific CGI path.
+
+    As well ensuring that the CGI setup is correct, this also means that
+    TinyAuth can be installed multiple times on a single host, any each copy
+    can be tweaked or modded as much as you like, without impacting any
+    other users.
+
+    At the present time, you will need the ability to install modules from
+    CPAN (which generally means root access) but once the application itself
+    is finished, additional improvements are planned to the installer to
+    allow for various alternative installation methods.
+
+    Step 1
+
+    Install TinyAuth with your CPAN client
+
+      adam@svn:~/svn.ali.as$ sudo cpan -i TinyAuth
+
+    Step 2
+
+    Run the CGI installation, following the prompts
+
+      adam@svn:~/svn.ali.as$ cgi_install TinyAuth
+      CGI Directory: [default /home/adam/svn.ali.as] cgi-bin
+      CGI URI: http://svn.ali.as/cgi-bin
+      adam@svn:~/svn.ali.as$
+
+    The installation is currently extremely crude, so once installed, you
+    currently need to open the tinyauth.conf file created by the installer
+    and edit it by hand (this will be fixed in a forthcoming release).
+
+    The config file is YAML and should look something like this:
+
+      adam@svn:~/svn.ali.as$ cat cgi-bin/tinyauth.conf
+      ---
+      email_from: adamk@cpan.org
+      email_driver: SMTP
+      htpasswd: /home/adam/svn.ali.as/cgi-bin/.htpasswd
+  
+      adam@svn:~/svn.ali.as$
+
+    (For the security concious amoungst you, yes I know that putting the
+    .htpasswd there is a bad idea. No, no real service is actually using
+    that file)
+
+    The "email_driver" value is linked to Email::Send. Use either "Sendmail"
+    to send via local sendmail, or "SMTP" to send via an SMTP server on
+    localhost.
+
+SUPPORT
+    For all issues, contact the author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    <http://ali.as/>, CGI::Capture
+
+COPYRIGHT
+    Copyright 2007 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

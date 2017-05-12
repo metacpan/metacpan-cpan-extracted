@@ -1,0 +1,29 @@
+# Note: The first line and the word Root are not case-sensitive.
+
+Parent	Place	Node
+root	above	Archaeopterix lithographica
+root	below	1
+1		above	Apsaravis ukhaana
+1		below	2
+2		above	Gansus yumemensis
+2		below	3
+3		above	Ichthyornis dispar
+3		below	4
+4		above	5
+4		below	6
+5		above	Gallus gallus
+5		below	Anas clypeata
+6		above	Pasquiaornis
+6		below	7
+7		above	Enaliornis
+7		below	8
+8		above	Baptornis advenus
+8		below	9
+9		above	10
+9		below	11
+10		above	Brodavis varnei
+10		below	Brodavis baileyi
+11		above	Fumicollis hoffmani
+11		below	12
+12		above	Parahesperornis alexi
+12		below	Hesperornis regalis

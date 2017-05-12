@@ -1,0 +1,134 @@
+---
+abstract: 'Pluggable benchmarker to cross-compare template systems.'
+author:
+  - 'Sam Graham <libtemplate-benchmark-perl@illusori.co.uk>'
+build_requires:
+  Config: 0
+  Cwd: 0
+  File::Spec: 0
+  FindBin: 0
+  Test::Command: 0.08
+  Test::Exception: 0
+  Test::MockObject: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.23
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Benchmark
+provides:
+  Template::Benchmark:
+    file: lib/Template/Benchmark.pm
+    version: 1.09
+  Template::Benchmark::Engine:
+    file: lib/Template/Benchmark/Engine.pm
+    version: 1.09
+  Template::Benchmark::Engines::HTMLMacro:
+    file: lib/Template/Benchmark/Engines/HTMLMacro.pm
+    version: 1.09
+  Template::Benchmark::Engines::HTMLMason:
+    file: lib/Template/Benchmark/Engines/HTMLMason.pm
+    version: 1.09
+  Template::Benchmark::Engines::HTMLTemplate:
+    file: lib/Template/Benchmark/Engines/HTMLTemplate.pm
+    version: 1.09
+  Template::Benchmark::Engines::HTMLTemplateCompiled:
+    file: lib/Template/Benchmark/Engines/HTMLTemplateCompiled.pm
+    version: 1.09
+  Template::Benchmark::Engines::HTMLTemplateExpr:
+    file: lib/Template/Benchmark/Engines/HTMLTemplateExpr.pm
+    version: 1.09
+  Template::Benchmark::Engines::HTMLTemplateJIT:
+    file: lib/Template/Benchmark/Engines/HTMLTemplateJIT.pm
+    version: 1.09
+  Template::Benchmark::Engines::HTMLTemplatePro:
+    file: lib/Template/Benchmark/Engines/HTMLTemplatePro.pm
+    version: 1.09
+  Template::Benchmark::Engines::MojoTemplate:
+    file: lib/Template/Benchmark/Engines/MojoTemplate.pm
+    version: 1.09
+  Template::Benchmark::Engines::NTSTemplate:
+    file: lib/Template/Benchmark/Engines/NTSTemplate.pm
+    version: 1.09
+  Template::Benchmark::Engines::ParseTemplate:
+    file: lib/Template/Benchmark/Engines/ParseTemplate.pm
+    version: 1.09
+  Template::Benchmark::Engines::Solution:
+    file: lib/Template/Benchmark/Engines/Solution.pm
+    version: 1.09
+  Template::Benchmark::Engines::TemplateAlloyHT:
+    file: lib/Template/Benchmark/Engines/TemplateAlloyHT.pm
+    version: 1.09
+  Template::Benchmark::Engines::TemplateAlloyTT:
+    file: lib/Template/Benchmark/Engines/TemplateAlloyTT.pm
+    version: 1.09
+  Template::Benchmark::Engines::TemplateSandbox:
+    file: lib/Template/Benchmark/Engines/TemplateSandbox.pm
+    version: 1.09
+  Template::Benchmark::Engines::TemplateTiny:
+    file: lib/Template/Benchmark/Engines/TemplateTiny.pm
+    version: 1.09
+  Template::Benchmark::Engines::TemplateToolkit:
+    file: lib/Template/Benchmark/Engines/TemplateToolkit.pm
+    version: 1.09
+  Template::Benchmark::Engines::Tenjin:
+    file: lib/Template/Benchmark/Engines/Tenjin.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextClearSilver:
+    file: lib/Template/Benchmark/Engines/TextClearSilver.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextClevery:
+    file: lib/Template/Benchmark/Engines/TextClevery.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextMicroMasonHM:
+    file: lib/Template/Benchmark/Engines/TextMicroMasonHM.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextMicroMasonTeTe:
+    file: lib/Template/Benchmark/Engines/TextMicroMasonTeTe.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextMicroTemplate:
+    file: lib/Template/Benchmark/Engines/TextMicroTemplate.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextMicroTemplateExtended:
+    file: lib/Template/Benchmark/Engines/TextMicroTemplateExtended.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextTemplate:
+    file: lib/Template/Benchmark/Engines/TextTemplate.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextTemplateSimple:
+    file: lib/Template/Benchmark/Engines/TextTemplateSimple.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextTemplet:
+    file: lib/Template/Benchmark/Engines/TextTemplet.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextTmpl:
+    file: lib/Template/Benchmark/Engines/TextTmpl.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextXslate:
+    file: lib/Template/Benchmark/Engines/TextXslate.pm
+    version: 1.09
+  Template::Benchmark::Engines::TextXslateTT:
+    file: lib/Template/Benchmark/Engines/TextXslateTT.pm
+    version: 1.09
+requires:
+  Benchmark: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0.18
+  FindBin: 0
+  Getopt::Long: 0
+  IO::File: 0
+  Module::Pluggable: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  Text::Matrix: 0
+  Text::Wrap: 0
+  perl: v5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/illusori/Perl-Template-Benchmark
+version: 1.09

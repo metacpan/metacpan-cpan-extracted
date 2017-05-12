@@ -1,0 +1,309 @@
+=encoding utf-8
+
+=head1 NAME
+
+Text::MicroTemplate::Extended::ja - Japanese document
+
+=head1 SYNOPSIS
+
+    use Text::MicroTemplate::Extended;
+    
+    my $mt = Text::MicroTemplate::Extended->new(
+        include_path  => ['/path/to/document_root'],
+        template_args => { c => $c, stash => $c->stash, },
+    );
+    
+    $mt->render('content'); # render file: /path/to/document_root/content.mt
+
+=head1 DESCRIPTION
+
+Text::MicroTemplate::Extended は L<Text::MicroTemplate::File> にをベースにいくつかの機能を追加した拡張モジュールです。
+基本的な機能については L<Text::MicroTemplate::File> のドキュメントを参照ください。
+
+=head1 拡張された機能
+
+=head2 テンプレートの継承
+
+テンプレートの継承は Django テンプレートなどで採用されているテンプレート再利用の仕組みです。
+Text::MicroTemplate::Extended ではこのテンプレート継承の仕組みをほぼそのまま使うことが可能です。
+
+テンプレート継承はテンプレートのひな形となる親テンプレートの中でいくつか再定義可能なブロックを定義しておくと、それを子テンプレートで自由に再定義することができるという機能です。
+
+テンプレートの継承を理解するには、まず例を挙げるのが一番でしょう:
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <link rel="stylesheet" href="style.css" />
+        <title><? block title => sub { ?>My amazing site<? } ?></title>
+    </head>
+    
+    <body>
+        <div id="sidebar">
+            <? block sidebar => sub { ?>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+            </ul>
+            <? } ?>
+        </div>
+    
+        <div id="content">
+            <? block content => sub {} ?>
+        </div>
+    </body>
+    </html>
+
+このテンプレートは、単純な 2 カラム形式のページで使うような HTML のスケルトンドキュメントです。これを base.mt と呼びましょう。空のブロックをコンテンツで埋めるのは「子 (child)」のテンプレートの仕事です。
+
+この例では、 C<<? block ?>> タグを使って 3 つのブロックを定義し、子テンプレートが値を埋められるようにしています。 block タグの役割は、テンプレート中のタグで囲まれた部分を子テンプレートでオーバライドできることをテンプレートエンジンに知らせることにあります。
+
+子テンプレートは以下のようになります:
+
+    ? extends 'base'
+    
+    <? block title => sub { ?>My amazing blog<? } ?>
+    
+    ? block content => sub {
+    ? for my $entry (@$blog_entries) {
+        <h2><?= $entry->title ?></h2>
+        <p><?= $entry->body ?></p>
+    ? } # endfor
+    ? } # endblock
+
+C<<? extends 'base' ?>> タグ（または C<? extends 'base'>）が継承のカギです。このタグはテンプレートエンジンに対して、自分自身が他のテンプレートを拡張 (extend) していることを教えます。テンプレートシステムがこのテンプレートを処理する際、システムはまず親となるテンプレート -- ここでは "base.mt" を探します。
+
+さて、この時点で、テンプレートエンジンは base.mt 内に三箇所の C<<? block ?>> が定義されていることに気づき、これらのブロックを子テンプレートの該当するブロックで置き換えます。 blog_entries の値に応じて、出力は以下のようになります:
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <link rel="stylesheet" href="style.css" />
+        <title>My amazing blog</title>
+    </head>
+    
+    <body>
+        <div id="sidebar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+            </ul>
+        </div>
+    
+        <div id="content">
+            <h2>Entry one</h2>
+            <p>This is my first entry.</p>
+    
+            <h2>Entry two</h2>
+            <p>This is my second entry.</p>
+        </div>
+    </body>
+    </html>
+
+子テンプレートには sidebar ブロックが定義されていないので、親テンプレートの値がそのまま使われます。親テンプレートの C<<? block ?>> タグの内容は、常にフォールバックの値として使われます。
+
+テンプレートの継承は必要に応じて何段階にもできます。継承を使うよくある場合の一つに、以下のような三段階のアプローチがあります:
+
+=over 4
+
+=item 1.
+
+サイトの主なルック＆フィールを決める base.mt テンプレートを作成します。
+
+=item 2.
+
+サイトの各「セクション」ごとに base_SECTIONNAME.mt テンプレートを作成します。たとえば、 base_news.mt, base_sports.mt といった具合です。これらのテンプレートでは base.mt を拡張して、セクション固有のスタイルやデザインを取り込んでおきます。
+
+=item 3.
+
+ニュース記事やブログエントリといった各種ページ用の個々のテンプレートを作成します。これらのテンプレートでは適切なセクションテンプレートを拡張します。
+
+=back
+
+このようなアプローチを取れば、コードの最利用性を最大限に高め、セクション毎のナビゲーションのような項目を簡単に共通のコンテンツ領域に追加できます。
+
+継承を扱うときの小技をいくつか挙げておきます:
+
+=over 4
+
+=item *
+
+テンプレートで C<<? extends ?>> を使う場合、1テンプレート中にこの命令は一度しか使用できないことに注意してください。複数この命令があった場合は、後ろのものが優先されます。
+
+=item *
+
+ベースのテンプレートで C<<? block ?>> を多用すればするほど、よりよいテンプレートになります。子テンプレートは親テンプレートのブロックを必ずしも全て定義しなくてもよいことを思い出して下さい。ブロックをたくさん用意しておき、適切なデフォルト値を入れておいて、子テンプレートで必要な値だけを再定義すればよいのです。フックは少ないよりも沢山ある方がよいのです。
+
+=item *
+
+同じような内容を含むテンプレートをいくつも作っていることに気づいたら、それはすなわちその内容を親テンプレートの C<<? block ?>> に入れるべきだということです。
+
+=item *
+
+親テンプレートのブロックに入っているコンテンツを取り出す必要がある場合、 C<< <?= super() ?> >> とするとうまくいきます。親テンプレートのブロックをオーバライドするのではなく、内容を追加したい場合に便利です。 C<< <?= super() ?> >> で挿入されたデータは、通常、親テンプレートで既にエスケープされているので、自動的にエスケープされません
+
+=item *
+
+可読性を高めるために、例えば以下のように、 C<<? } # endblock ?>> にブロックの 名前 を指定できます:
+
+    <? block content => sub { ?>
+    ...
+    <? } # endblock content ?>
+
+ 大きなテンプレートの編集で、どこで C<<? block ?>> タグが閉じているか探すのに便利です。
+
+=back
+
+最後に、同じテンプレート中に同じ名前の C<<? block ?>> を複数定義できないことに注意して下さい。この制限は、ブロックタグが「双方向」に作用するため、すなわち、あるブロックタグは何らかの値を埋めるための穴であるだけでなく、穴を埋める 親テンプレートの コンテンツも定義しているために存在しています。同じ名前の C<<? block ?>> が一つのテンプレート内に複数あると、そのテンプレートの親テンプレートは、該当するブロックの内容を子テンプレートのどの C<<? block ?>> 設定で置き換えればよいのか分からなくなってしまいます。
+
+=head2 名前付き引数
+
+Text::MicroTemplate::Extended オブジェクトの初期化時に C<template_args> 引数でテンプレートに渡したい変数をハッシュリファレンスとして登録しておくと、テンプレート展開時にその引数に名前付き変数としてアクセスすることができます。
+
+    my $mf = Text::MicroTemplate::Extended->new(
+        template_args => { foo => 'bar', },
+        ...
+    );
+
+としておくと
+
+    <?= $foo ?>
+
+で C<bar> という出力が得られます。
+
+また、以下のようにコードリファレンスを渡すとテンプレート実行時に実行されたものが引数として展開されます。
+
+    my $mf = Text::MicroTemplate::Extended->new(
+        template_args => { foo => sub { $self->get_foo() } },
+        ...
+    );
+
+上記のように引数を設定すると C<<?= $foo ?>> で C<< $self->get_foo >> の結果を表示することができます。
+この機能はテンプレートオブジェクト初期化時には引数に与えたいものが存在しない場合など、引数をあとから渡す場合に有効です。
+
+=head2 マクロ機能
+
+マクロ機能は名前付き引数に似ていますが、こちらは引数をつくるかわりに関数をテンプレートに渡します。
+
+    my $mh = Text::MicroTemplate::Extended->new(
+        macro => {
+            hello => sub { return 'Hello World!' },
+        },
+        ...
+    );
+
+このコードはテンプレート内で hello と言う関数を使用できるようにします。
+
+    <?= hello() ?>  # => 'Hello World!'
+
+この機能は C<< $key => $coderef >> のような構造のハッシュリファレンスを渡すことを想定していますが、value部分に通常のコードリファレンス以外の変数を渡すとそれを自動的にコードリファレンスでくくって使用します。
+上記の C<hello> マクロはこのように書き換えても同じ意味になります。
+
+    my $mh = Text::MicroTemplate::Extended->new(
+        macro => {
+            hello => 'Hello World!',
+        },
+        ...
+    );
+
+=head2 拡張子の省略
+
+オリジナルの L<Text::MicroTemplate::File> ではテンプレートファイルをレンダリングする際に
+
+    $mf->render_file('template_name.mt');
+
+とファイル名をフルネームで指定する必要がありました。
+
+しかし、実用上は C<.mt> などのようにテンプレート用の拡張子をつけて使用する場合がほとんどです。そのため、L<Text::MicroTemplate::Extended> では C<extension> というオプションを用意していて、
+
+    my $mf = Text::MicroTemplate::Extended->new(
+        extension => '.mt',
+        ...
+    );
+
+などのように初期化すると
+
+    $mf->render_file('template_name');
+
+というコードで C<template_name.mt> を読み込むようにすることができます。また、上記の「テンプレートの継承」でもこのオプションが使用され、C<< extension => '.mt' >> の場合は C<<? extends 'base' ?>> というコードは C<base.mt> をロードします。
+
+このオプションはデフォルトでは C<.mt> に設定されています。
+
+=head2 renderメソッドの置き換え
+
+L<Text::MicroTemplate::File> では C<render_file> メソッドでテンプレートファイルをレンダリング、C<render> メソッドでスカラー変数などに定義されたテンプレートをレンダリングというような使い分けが可能だったのですが、L<Text::MicroTemplate::Extended> では、テンプレートの継承をサポートするという目的のためテンプレートファイルのレンダリングのみに機能を絞りました。
+
+そのため、L<Text::MicroTemplate::Extended> では C<render> メソッドは C<render_file> メソッドへのショートカットとして動作するようになっています。
+
+    $mf->render('template_name');
+    $mf->render_file('template_name');
+
+は同等の処理を行います。
+
+=head1 METHODS
+
+=head2 new (%options)
+
+    my $mf = Text::MicroTemplate::Extended->new(
+        extension     => '.mt',
+        template_args => { c => $c, stash => $c->stash },
+    );
+
+L<Text::MicroTemplate::Extended> オブジェクトを初期化します。
+
+使用可能なオプションは以下の通りです：
+
+=over 4
+
+=item extension
+
+テンプレートファイルの拡張子を設定します。（デフォルトは .mt です)
+
+=item template_args
+
+テンプレートに渡す引数をハッシュリファレンスで指定します。
+
+=item macro
+
+テンプレート内で使用するmacroをハッシュリファレンスで指定します。
+
+=back
+
+これ以外のオプションは L<Text::MicroTemplate::File> を参照してください。
+
+=head2 render ($template_name, @args)
+
+=head2 render_file ($template_name, @args)
+
+C<$template_name> で渡されてテンプレートをレンダリングし、結果を返します。
+
+=head1 INTERNAL METHODS
+
+=head2 build
+
+=head2 eval_builder
+
+=head2 template_args
+
+=head2 extension
+
+=head2 render_context
+
+=head1 AUTHOR
+
+Daisuke Murase <typester@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2009 by KAYAC Inc.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut
+

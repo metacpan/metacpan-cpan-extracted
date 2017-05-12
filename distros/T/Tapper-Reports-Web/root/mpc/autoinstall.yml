@@ -1,0 +1,17 @@
+---
+elements:
+  - type: Checkboxgroup
+    name: Tests
+    label: 'Test suites to be used'
+    options:
+      - [ 'CTCS', 'CTCS testuite' ]
+      - [ 'LMBench', 'LMBench' ]
+      - [ 'LTP', 'LTP' ]
+      - [ 'Kernbench', 'Kernbench' ]
+      - [ 'Aim', 'Aim' ]
+      - [ 'ReAim', 'ReAim' ]
+      - [ 'HTS', 'HTS' ]
+      - [ 'LLC', 'LLC' ]
+      - [ 'Parselog', 'Parse logfiles']
+      - [ 'RHv7', 'RHv7' ]
+      - [ 'Phoronix', 'Phoronix' ]

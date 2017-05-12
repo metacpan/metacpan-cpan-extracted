@@ -1,0 +1,85 @@
+#========================================================================
+# This is a sample .metapagerc file.  Copy this file (as ".metapagerc")
+# to your home directory and edit accordingly.
+#========================================================================
+
+#------------------------------------------------------------------------
+# The [file] section is used to tell metapage where to copy files to 
+# and from:
+# 
+#   src    => source directory for documents to be processed
+#   dest   => destination directory for processed documents
+#   lib    => directory (or directories separated by ':') where files 
+#             referenced by an "%% INCLUDE file %%" directive can be found
+#   accept => one or more lines specifying a perl-like regex which files
+#             must match to be considered
+#   ignore => like accept, but matching files are ignores
+#------------------------------------------------------------------------
+
+[file]
+src         = ~/websrc/docs
+lib         = ~/websrc/lib
+dest        = ~/web
+accept      = ^public\/
+ignore      = \b(CVS|RCS)\b
+ignore      = \.gif$
+
+
+#------------------------------------------------------------------------
+# The [profile] section is used to define multiple configurations.  
+# Create any number of different config files (exactly like this one)
+# and set "dir" to be the directory in which they reside.  Calling 
+# "metapage @profile" will cause the appropriate "profile" file to 
+# be read and parsed immediately after the .metapagerc.   The "default"
+# option specifies a default profile which is read after the .metapagerc
+# and before any "@profile" specified as a metapage parameter.
+#
+#   dir     => location of configuration profiles
+#   default => default profile to use.
+#------------------------------------------------------------------------
+
+[profile]
+dir         = ~/etc/metapage
+default     = abw
+
+
+#------------------------------------------------------------------------
+# The [config] section defines variables that are passed to MetaText to 
+# determine how the object should process files.  See the MetaText 
+# documentation for further details about the variables and their 
+# effect.  Note that not all MetaText config variables can be specified.
+# Those that require code/hash/array references cannot be represented in
+# a config file such as this.
+#------------------------------------------------------------------------
+
+[config]
+delimiter   = ,
+#debuglevel  = info,process,data
+
+
+#------------------------------------------------------------------------
+# The [define] section is used to define any MetaText variables that should
+# always be available when processing files.  The "images" value, for example,
+# allows the "%% SUBST images %%" (or more concisely, "%% images %%")
+# directive to be specified.  This will be expanded into the images value
+# ("/images").  
+#------------------------------------------------------------------------
+
+[define]
+
+# define some URL stems to allow references like:
+#   <img src="%%images%%/foo.gif">
+#
+images      = /images
+cgibin      = /cgi-bin
+home        = /index.html
+server      = www.kfs.org
+
+# miscellaneous URLs (note the embedded '$email' variable)
+email       = abw@kfs.org
+maillink    = mailto:$email
+
+# note explicit use of ${ } to disambiguate variables
+homepage    = http://${server}${home}
+
+

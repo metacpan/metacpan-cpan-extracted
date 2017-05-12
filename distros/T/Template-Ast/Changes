@@ -1,0 +1,9 @@
+Revision history for Perl extension Template::Ast.
+
+0.01  Fri Jul 15 15:22:32 2005
+	- original version; created by h2xs 1.23 with options
+		-X Template::Ast
+
+0.02  2005-07-19
+        - strip CR from my DOS-format files
+        - modify the POD doc a bit

@@ -1,0 +1,71 @@
+#title My *slides*
+#lang it
+#slides yes
+#test
+
+This material is just ignored
+
+* Part
+
+** Chapter
+
+*** Section
+
+**** Subsection
+
+***** Subsubsection
+
+ - This
+ - is
+ - the
+ - list
+
+**** Another
+
+ - This 1
+ - is 1 
+ - the 1
+ - list 1
+
+*** Section
+
+ - Very
+ - Important
+
+** Chapter
+
+*** Subchapter
+
+ - Hello there
+
+**** subsubchapter
+
+ 1. ciao
+ 2. bella
+
+*** This is ignored
+
+;  noslide
+
+This thing should be ignored
+
+** And back
+
+*** Another section
+
+ - This another part
+
+ - Hello world
+
+*** Another ignore
+
+balblabla
+
+; no SlIdeS
+
+blab labla ignored chunck
+
+
+*** Test
+
+

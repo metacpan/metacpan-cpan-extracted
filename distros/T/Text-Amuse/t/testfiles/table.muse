@@ -1,0 +1,24 @@
+#title *table*
+
+     Triple bars ||| Separate footer fields
+     Double bars  || Separate header fields
+     Single bars   | Separate body fields
+     Here are <em>more</em> 1 | body fields 1 
+     Here are <script>"more"'</script> 2 | body *fields* 2
+     Here are more 3 |  body **fields** 3
+     Here are =more= 4 | body ***fields*** 4
+     |+ This is the caption +|
+
+
+ || hello || htere || cioa ||
+ | table | table | table | 
+ | table1 | table2 [1] aksdfla askl djlaksdj lakjsdfl kjasdlk fjalsdk jflaksjd lkjasld kjfal skdjlkasjd fljasdlkfjalksdjflasdlkjfalskdflaskd fljasldkfj | table3 | 
+ | table4 | *table5* | table6 | 
+ ||| foot ||| **foot** [2] ||| ***foot*** |||
+ |+ caption [3] +|
+
+[1] footnotes
+
+[2] second note
+
+[3] third not

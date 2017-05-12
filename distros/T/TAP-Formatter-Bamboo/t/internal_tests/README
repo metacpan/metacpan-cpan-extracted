@@ -1,0 +1,2 @@
+Those files are named *.test not *.t, as these are internal tests used to test formatter.
+They should not be called by the prove or Build script.

@@ -1,0 +1,39 @@
+use strict;
+use warnings;
+use Tie::PureDB;
+
+
+my $file = 'test.puredb';
+
+my $p = Tie::PureDB::Write->new($file.1, $file.2, $file) or die "crap $!";
+print ' # add abe 66  ',  $p->add('abe',66), $/;
+undef $p;
+
+$p = Tie::PureDB::Read->new($file) or die "crap $!";
+print ' # find  ', join '  ', $p->find('abe'), $/;
+print ' # $! ', $!, $/;
+print ' # fetch  ', $p->FETCH('abe'), $/;
+print ' # $! ', $!, $/;
+print ' # find(read(  ', $p->read( $p->find('abe') ) , $/;
+print ' # $! ', $!, $/;
+
+__END__
+
+
+cp /home/crazyinsomniac/www/perl/files/Tie-PureDB-0.03.tar.gz ./Tie-PureDB-0.03.tar.gz
+
+tar -zxvf Tie-PureDB-0.03.tar.gz
+
+cd Tie-PureDB-0.03
+
+perl Makefile.PL --build
+
+perl Makefile.PL LIB=/home/crazyinsomniac/perlmodlib DEFINE=-DPureDEBUG
+
+make
+
+make test
+
+perl -Mblib t/simple
+
+

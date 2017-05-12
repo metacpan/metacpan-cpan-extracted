@@ -1,0 +1,40 @@
+---
+abstract: 'Perl wrapper for KyTea'
+author:
+  - 'pawa <pawapawa@cpan.org>'
+build_requires:
+  Devel::CheckLib: 0.4
+  Devel::PPPort: 3.2
+  ExtUtils::MakeMaker: 6.59
+  Test::Base: 0
+  Test::Fatal: 0
+  Test::More: 0.98
+  Test::Warn: 0
+configure_requires:
+  Devel::CheckLib: 0.4
+  Devel::PPPort: 3.2
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 2.21
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Text::KyTea
+name: Text-KyTea
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  XSLoader: 0.02
+  perl: 5.8.1
+resources:
+  bugtracker: https://github.com/pawa-/Text-KyTea/issues
+  license: http://dev.perl.org/licenses
+  repository: https://github.com/pawa-/Text-KyTea
+version: 0.44

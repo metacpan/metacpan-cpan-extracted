@@ -1,0 +1,27 @@
+---
+name: Text-Flow
+version: 0.01
+author:
+  - 'Stevan Little E<lt>stevan@iinteractive.comE<gt>'
+abstract: Flexible text flowing and word wrapping for not just ASCII output.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Moose: 0.21
+build_requires:
+  List::Util: 0
+  Test::Exception: 0.21
+  Test::LongString: 0
+  Test::More: 0.62
+provides:
+  Text::Flow:
+    file: lib/Text/Flow.pm
+    version: 0.01
+  Text::Flow::Wrap:
+    file: lib/Text/Flow/Wrap.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

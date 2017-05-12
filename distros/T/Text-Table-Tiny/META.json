@@ -1,0 +1,50 @@
+{
+   "abstract" : "makes simple tables from two-dimensional arrays, with limited templating options",
+   "author" : [
+      "Creighton Higgins <chiggins@chiggins.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-Table-Tiny",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "List::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/Text-Table-Tiny",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/Text-Table-Tiny.git",
+         "web" : "https://github.com/neilbowers/Text-Table-Tiny"
+      }
+   },
+   "version" : "0.04"
+}
+

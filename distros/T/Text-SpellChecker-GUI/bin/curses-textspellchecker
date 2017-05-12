@@ -1,0 +1,346 @@
+#!/usr/bin/perl
+#Copyright (c) 2009, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use warnings;
+use strict;
+use Text::SpellChecker;
+use Curses::UI;
+use Getopt::Std;
+
+sub populateSuggestions{
+	my $checker=$_[0];
+	my $suggestions=$_[1];
+
+	my $suggested=$checker->suggestions;
+	$suggestions->values($suggested);
+	my %suggestedH;
+	my $int=0;
+	while (defined($suggested->[$int])) {
+		$suggestedH{$suggested->[$int]}=$suggested->[$int];
+		
+		$int++;
+	}
+	$suggestions->labels(\%suggestedH);
+
+	my @first;
+	$first[0]=$suggested->[0];
+
+	$suggestions->set_selection(@first);
+	
+	return 1;
+}
+
+sub nextword{
+	my $checker=$_[0];
+	my $suggestions=$_[1];
+	my $preview=$_[2];
+	my $wrongword=$_[3];
+	my $custom=$_[4];
+
+	my $word=$checker->next_word;
+
+	if (!defined($checker->current_word)) {
+		$word='(( Finished ))';
+		$wrongword->text($word);
+		my %suggestedH;
+		my @suggestedA;
+		$suggestions->labels(\%suggestedH);
+		$suggestions->values(\@suggestedA);
+		$suggestions->focus;
+		$custom->text('');
+		$preview->focus;
+		return 1;
+	}
+
+	$wrongword->text($word);
+	$preview->text($checker->highlighted_text);
+
+	populateSuggestions($checker, $suggestions);
+	#if this is not done, it will
+	$suggestions->focus;
+	$preview->focus;
+
+	$custom->text($word);
+
+	return 1;
+}
+
+sub save{
+	my $checker=$_[0];
+	my $file=$_[1];
+	my $output=$_[2];
+
+	#
+	if (!defined($output)) {
+		$output=$file;
+	}
+
+	#
+#	if (open(WRITETEXT, '>'. $output)) {
+	open(WRITETEXT, '>'. $output);
+	print WRITETEXT $checker->text;
+	close(WRITETEXT);
+#	}else {
+#		warn('curses-textspellchecker: Failed to open "'.$output.'"');
+#	}
+
+	return 1;
+}
+
+$Getopt::Std::STANDARD_HELP_VERSION=1;
+
+($Text::SpellChecker::pre_hl_word, $Text::SpellChecker::post_hl_word) = (qw([[[ ]]]));
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "curses-textspellchecker 0.0.0\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-f <file>  The file to read and check.\n".
+			  "-o <output file>  The file to write the checked output to.\n".
+			  "\n".
+			  "If -o is not given, when ok is clicked, it will be written to the same one that was read.";
+		exit 1;
+};
+
+#gets the options
+my %opts=();
+getopts('f:o:', \%opts);
+
+#
+if (!defined($opts{f})) {
+	warn('curses-textspellchecker: No file specified.');
+	exit 255;
+}
+
+#
+my $text='';
+if (open(READFH, $opts{f})){
+	my @textA=<READFH>;
+	close(READFH);
+	$text=join('', @textA);
+}else {
+	warn('curses-textspellchecker: Failed to open "'.$opts{f}.'"');
+	exit 254;
+}
+
+#check it all
+my $checker = Text::SpellChecker->new(text => $text);
+
+#gets the new word
+my $work=$checker->current_word;
+
+use Curses::UI;
+my $cui = new Curses::UI;
+my $win = $cui->add('window_id', 'Window');
+
+#this holds the help text
+my $helpLabel=$win->add('helpLabel', 'Label', -text=>'Help:', -y=>21);
+my $help=$win->add( 'help', 'TextViewer',
+					-text=>'Displays help info on the currently selected widget. '.
+					       'Press Tab to change between widgets.',
+						 height=>2, -y=>22);
+
+#the word currently wrong
+#we also call next_word here as current_word won't return any thing yet
+my $wrongword=$win->add( 'wrongword', 'TextViewer', -text=>$checker->next_word, -height=>1,
+						 -y=>0, -x=>19,
+						 -onfocus=>sub{
+									$help->text("The currently mis-spelled word.");
+									}
+						);
+
+#preview
+my $previewLabel=$win->add('previewLabel', 'Label', -text=>'Mis-spelled text:', -y=>0);
+my $preview=$win->add( 'preview', 'TextViewer', -text=>$checker->highlighted_text, -height=>10, -y=>1,
+					   -onfocus=>sub{
+						   $help->text("This shows the text that may contain a mis-spelling. ".
+									   "Any mis-spelled words are included in [[[ ]]]. ".
+									   "Up, Down, Page-Down, and Page-Up scroll through this.");
+					   }
+					  );
+
+#sets up the custom correction entry
+my $customlabel=$win->add('correction', 'Label', -text=>'Correction:', -y=>12);
+my $custom=$win->add('custom', 'TextEntry', -y=>12, -x=>12, -text=>$checker->current_word,
+					 -onfocus=>sub{
+						 $help->text("Replace the mis-spelled word with this one. ".
+									 "Click 'use correction' to make the change.");
+					 }
+					 );
+
+#sets up the suggestion stuff
+my $suggestionslabel=$win->add('suggestionslabel', 'Label', -text=>'Suggestions:', -y=>13);
+my $suggestions = $win->add('suggestions', 'Listbox', -values=>[],
+							-labels=>{}, -radio=>1,  -y=>14, -height=>5,
+							-onfocus=>sub{
+								$help->text("Replace the mis-spelled word with the selected one. ".
+											"Click 'use suggestion' to make the change.");
+							}
+							);
+
+populateSuggestions($checker, $suggestions);
+
+#sets up the buttons
+my $buttons = $win->add(
+						'mybuttons', 'Buttonbox',
+						-y=>20,
+						-buttons   => [
+									   {
+										-label => '[use correction]',
+										-value => 1,
+										-shortcut => 1,
+										-onpress=>sub{
+											my $replacement=$custom->get;
+											if (defined($checker->current_word)) {
+												$checker->replace(new_word=>$replacement);
+											}
+											nextword($checker, $suggestions, $preview, $wrongword, $custom);
+										},
+										},{
+										   -label => '[use suggestion]',
+										   -value => 2,
+										   -shortcut => 2,
+										   -onpress=>sub{
+											   my $replacement=$suggestions->get;
+											   if (defined($checker->current_word)) {
+												   $checker->replace(new_word=>$replacement);
+											   }
+											   nextword($checker, $suggestions, $preview, $wrongword, $custom);
+										   },
+										   },{
+											  -label => '[next]',
+											  -value => 3,
+											  -shortcut => 3,
+											  -onpress=>sub{
+												  nextword($checker, $suggestions, $preview, $wrongword, $custom);
+											  },
+											  },{
+												 -label => '[ok]',
+												 -value => 4,
+												 -shortcut => 4,
+												 -onpress=>sub{
+													 save($checker, $opts{f}, $opts{o});
+													 exit 0;
+												 },
+												 },{
+													-label => '[cancel all]',
+													-value => 5,
+													-shortcut => 5,
+													-onpress=>sub{
+														#a exit of 230 means nothing changed
+														exit 230;
+													},
+													}
+									   ]
+						);
+
+#exits it
+$cui->set_binding(sub{
+                                          exit 0;
+                                  },
+                                  "\cq");
+
+$cui->mainloop;
+
+=head1 NAME
+
+curses-textspellchecker - The curses backend for textspellchecker.
+
+=head1 SYNOPSIS
+
+curses-textspellchecker B<-f> <file> [B<-o> <output file>]
+
+=head1 SWITCHES
+
+=head2 B<-f> <file>
+
+This is the file to spell check.
+
+=head2 B<-f> <output file>
+
+This is the file to save the results to.
+
+=head1 EXIT CODES
+
+=head2 0
+
+Saved with out issue.
+
+=head2 230
+
+Canceled.
+
+=head2 254
+
+Failed to read the file.
+
+=head2 255
+
+No file specified.
+
+=head1 AUTHOR
+
+Copyright (c) 2009, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+any
+
+=head1 CHANGE LOG
+
+=head1 0.0.0/2009-07-15 13:55
+
+Initial release.
+
+=head1 README
+
+curses-textspellchecker - The curses backend for textspellchecker.
+
+=cut

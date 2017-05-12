@@ -1,0 +1,52 @@
+20150301  Sun Mar  1 12:22:37 PST 2015
+    Misc
+    * Clarified the license link (was pointing at the Artistic License)
+    * Now using Github for bug tracking and repository
+
+
+20110205  Sat, 05 Feb 2011 14:57:08 +1100
+    Misc
+    * Clarified the license
+
+
+20081023.2116  Fri Oct 24 04:21:54 2008 +0000
+    Test Fixes
+    * Verified that each() + delete() works, as promised in "perldoc -f each"
+    * Forgot to ship the new each() test in the last version.
+
+    Doc Fixes
+    * Forgot to update the requirements list in the README in the last version
+
+
+20081023  Thu Oct 23 21:02:04 PDT 2008
+    Bug Fixes
+    * each() no longer goes into an infinite loop
+      [rt.cpan.org 34962]
+
+
+0.21  Wed Apr 10 23:20:39 EDT 2002
+    * mjd found a bug in Tie::Cache::LRU::Array which caused the
+      cache to slowly grow over time.
+
+0.20  Sun Jul 29 02:07:03 PDT 2001
+    * Split into two implementations, Tie::Cache::LRU::Array and
+      Tie::Cache::LRU::LinkedList
+    * Tie::Cache::LRU now using Array implementation.  Much faster.
+    * Now faster than Tie::Cache *smug grin*
+
+0.06  Fri Feb 11 17:21:39 EST 2000
+    * Fixed a MAJOR memory leak.  Basically CLEAR (%cached = ()) leaked
+      the entire cache.
+    * Caches with a max_size of 1 or 0 weren't working properly.
+
+0.05  Thu Oct  7 01:14:34 EST 1999
+    * Name changed to Tie::Cache::LRU for brevity
+    * First release to CPAN.
+    * DESCRIPTION expanded and the tie interface documented.
+    - added max_size() and curr_size()
+
+0.01  Thu May  6 16:08:26 1999
+    * Created as Tie::Cache::InMemory::LastUse
+    - internal release for Arena
+    - original version; created by h2xs 1.19
+

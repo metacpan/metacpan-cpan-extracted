@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="tools/tei_ms_crit.rng" type="xml"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Ժամանակագրութիւն</title>
+        <author>Մատթէոս Ուռհայեցի</author>
+        <respStmt xml:id="tla">
+          <resp>Transcription by</resp>
+          <name>Tara L Andrews</name>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>Unpublished manuscript</p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc xml:id="BL5260">
+          <msIdentifier>
+            <settlement>London</settlement>
+            <repository>British Library</repository>
+            <idno>OR 5260</idno>
+          </msIdentifier>
+          <p>pp. 234r-245r</p>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <div>
+<!-- division begins waaayy back on p. 203b, for Skleros revolt. -->
+<!-- paragraph begins on p. 233a -->
+        <pb n="233բ"/>
+        <p>Ար՝դ ահա՛ <lb/>
+մինչև՛ ցայս վայրս բազմաջան և աշխատաւոր քննու՛թ<ex resp="#tla">եամ</ex>բ <lb/>
+գտեալ գրեցա՛ք զշարա՛գրակա՛ն գրեա՛լս, զ<num value="100">Ճ</num> ամա՛ց զորս ի <lb/>
+<expan>բխազում</expan> ժամանակաց հետա՛քննեալ հասու եղաք ըստ այ՛ս<lb/>
+քանեա՛ցս տեսողացն և լսողացն, որք էին ի հին ամաց <expan>ծնեալք</expan>, <lb/>
+և ընդ ընթերցօ՛ղսն յառաջի՛ն պատմա՛գրա՛ցն որք ակա<lb/>
+նա՛տեսք է՛ին լեալք <expan>ամենայն</expan> եղելո՛ցս և նեղութե<ex resp="#tla">ան</ex>ցս յայսոցիկ <lb/>
+զոր <expan>վասն</expan> մեղաց տա՛նն հայոց, և ահա՛ որ զայս բազու՛մ անգամ <lb/>
+զմտաւ ածեա՛լ իմ, <expan>վասն</expan> այս յետինս ժամա գրել զդառնա՛<lb/>
+<pb n="234ա"/>
+շու՛նչ <abbr>կտրծսն</abbr>։ <lb/></p>
+        <p>Իսկ ի լինելն <expan>թվականութեանս</expan> հայո՝ց յամս <num value="502">ՇԲ</num> եղև ահաւ՛<lb/>
+որ նշան և սոսկալի՛ և կատարածի մեծի բարկութե<ex resp="#tla">ան</ex> երև<lb/>
+եալ ի <expan>քաղաքն</expan> անտիո՛ք, զոր ի ներքոյ արեգա՛կանն գործե<lb/>
+ցաւ այս սքանչելի՝ս, որ էր տեսողա՛ցն ահաւոր և հրաշալի՛. <lb/>
+եղև այս նշա՛նս ահ և դողդումն <expan>ամենայն</expan> հաւատացելո՛ց <expan>քրիստոսի</expan>, <lb/>
+զորս ա՛յժմ մեծա՛սաստ սպառնալեօ՛ք յայտնեա՛ց <expan>աստուած</expan> <lb/>
+զդատաստա՛նն յահաւոր և իշխանն որ հաւատն <lb/>
+եթո՛ղ, եղև հակառակ մեծ ազգին ասորոց. և յայնժամ <lb/>
+մատնեցան ասորիք մեծ նեղութի<ex resp="#tla">ւն</ex>, <expan>վասն</expan> սկսաւ հաւա<lb/>
+տոյ քննութի<ex resp="#tla">ւն</ex> առնե՛լ հանապազօ՛ր. և այնչափ լրբեալ <lb/>
+եղեն ազգն հոռոմոց, որ և զգործսն ո՛չ կարացին գիտել <lb/>
+<expan>վասն</expan> զի <expan>քրիստոսի</expan> աւետարանն հրայմայեաց հրով այրե՛լ պա<lb/>
+տրիարգն. և եղև յորժամ ի հ<gap extent="2" unit="chars" rend="erase"/>ուրն եդին <expan>զաւետարանն</expan> <lb/>
+<expan>աստուծոյ</expan>, ձայն ելանէ՛ր յաւետարանէ անտի՛ և ի հրոյն ի դու<lb/>
+րս ելանէ՞ր. <lb/></p>
+      </div>
+<!-- ends on p. 254ա -->
+    </body>
+  </text>
+</TEI>

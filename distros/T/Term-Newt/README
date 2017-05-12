@@ -1,0 +1,57 @@
+# $Id: README,v 1.1 1998/11/09 02:32:37 daniel Exp daniel $
+
+*** THIS IS ALPHA SOFTWARE, USE AT YOUR OWN RISK.
+*** THERE IS NO DOCUMENTATION YET.
+*** THE INTERFACE MAY CHANGE!
+
+PREREQUISITES
+-------------
+
+Before you can build Term::Newt you need to have the following installed
+on your system:
+
+    * Perl 5.004 or greater.
+
+    * The Newt library, version 0.25
+
+	Available at: ftp://ftp.redhat.com/pub/redhat/code/newt/
+
+    * The Slang library, 1.2.2 or greater.
+
+	Available at: ftp://space.mit.edu/pub/davis/slang/
+
+
+To build, test and install this distribution type:
+
+ perl Makefile.PL
+ make test
+ make install
+
+PATCHES
+-------
+
+Please send me patches!
+
+A word about Style:
+
+I am picky.
+
+Please use diff -ur
+
+Use tabs (8) to indent all blocks.
+
+Use ) {, not ){
+
+Don't use () if you don't have to.
+
+Defaults are good.
+
+Spaces and newlines are good.
+
+Thank you. This has been a public service announcment of the anal-retentive.
+
+--
+Daniel <daniel-cpan-slang@electricrain.com>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

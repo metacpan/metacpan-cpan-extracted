@@ -1,0 +1,26 @@
+---
+abstract: 'Expand template text with embedded Perl'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Template
+requires:
+  Carp: '0'
+  Exporter: '0'
+  perl: '5.004'
+  strict: '0'
+  vars: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Template
+  homepage: http://search.cpan.org/dist/Text-Template/
+  repository: git://github.com/mschout/perl-text-template.git
+version: '1.47'

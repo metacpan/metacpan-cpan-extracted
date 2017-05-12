@@ -1,0 +1,34 @@
+Revision history for Text-SlackEmoji
+
+0.006     2016-03-16 22:55:30-04:00 America/New_York
+        - drop the required version, since what we need a higher version for is
+          building the shared emoji mapping, not using it
+        - simlarly, make it possible to load only emoji for which your perl
+          knows the UCD data
+
+0.005     2015-10-30 07:56:47-04:00 America/New_York
+        - turn that frown… upside down!
+          (:simple_smile: was mapped to 1F641 instead of 1F642)
+
+0.004     2015-10-29 23:38:03-04:00 America/New_York
+        - generate emoji list from https://github.com/iamcal/emoji-data
+          (thanks for the pointer, Rob N.!)
+
+          This gets tons more emoji, but some of them are not known Slack
+          emoji, so it's a bit of a trade off.
+
+0.003     2015-10-17 22:16:12-04:00 America/New_York
+        - update prereq to perl 5.14.0 for new enough Unicode
+        - add a few more emoji, but still missing plenty
+
+0.002     2015-10-16 10:46:55-04:00 America/New_York
+        - there's a new method, ->load_emoji, to reload the emoji mapping
+          without needing to reload the module
+        - add a few emoji, but surely there are ones left to go
+        - you know what would be great?  a patch that started by getting the
+          full list of emoji from the Slack API
+
+0.001     2015-10-11 18:48:40-04:00 America/New_York
+        - first release!
+        - thanks to all contributors, especially Jakes Goldsborough, who
+          provided more mappings than my first meagre listing

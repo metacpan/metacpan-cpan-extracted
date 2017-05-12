@@ -1,0 +1,158 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #f8f8f8;
+    border-color: #aaaaaa;
+    border-width: 10px;
+    border-style: solid;
+}
+
+.pod_title_block {
+    background-color: #eeeeee;
+    font-size: 85%;
+    
+    border-style: solid;
+    border-width: 1px 0 1px 0;
+    border-color: #aaaaaa;
+    
+    padding: 3px;
+}
+
+.pod_toc {
+    margin: 10px 30px 10px 5px;
+    font-size: 85%;
+}
+.pod_toc p {
+    margin: 0;
+}
+
+.pod_idx_outer {
+    margin-left: 5px;
+    margin-bottom: 10px;
+    font-size: 85%;
+}
+
+li {
+    margin: 2px 0 0 20px;
+}
+
+.pod_toc strong {
+    font-style: italic;
+}
+
+hr {
+    border-color: #aaaaaa;
+    border-width: 1px;
+    border-style: dashed;
+}
+
+h1 {
+    background-color: #aaaaaa;
+    color: white;
+    font-size: 200%;
+
+    padding: 3px 0 3px 15px;
+    margin-bottom: 15px;
+}
+h1:first-letter {
+    color: #ffcccc;
+}
+
+h2 {
+    background-color: #f0eeee;
+    font-size: 140%;
+
+    color: #666666;
+
+    border-color: #cccccc;
+    border-width: 0 0 1px 0;
+    border-style: solid;
+    
+    padding: 3px 0 3px 15px;
+    margin-bottom: 15px;
+}
+
+h3 {
+    background-color: #efefef;
+    font-size: 120%;
+    
+    color: #666666;
+
+    border-bottom-color: #ccbbbb;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    
+    padding: 3px 0 3px 15px;
+    margin-bottom: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+h4 {
+    background-color: #f7f0f0;
+    font-size: 100%;
+
+    border-color: #ccbfbf;
+    border-width: 0 0 1px 0;
+    border-style: solid;
+    
+    padding: 3px 0 3px 15px;
+    margin-bottom: 15px;
+}
+
+p {
+    margin: 0 30px 15px 30px;
+}
+
+pre {
+    background-color: #eeeeee;
+    border-color: #aaaaaa;
+    border-width: 1px;
+    border-style: inset;
+
+    font-size: 90%;
+    color: #333333;
+    
+    padding: 3px;
+    margin: 0 30px 15px 30px;
+}
+
+dl {
+    margin: 0 30px 15px 30px;
+}
+dt {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+dd {
+    margin-top: 5px;
+}
+
+a {
+    text-decoration: none;
+}
+a:link {
+    color: #bb4444;
+}
+a:visited {
+    color: #770000;
+}
+a:active {
+    text-decoration: underline;
+}
+
+
+p{
+	line-height: 120%;
+}
+.pod_iseq_C
+{
+	/* background-color: #eee; */
+	color: #118;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+

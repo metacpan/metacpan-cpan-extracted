@@ -1,0 +1,27 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl test.pl'
+
+#########################
+
+# change 'tests => 1' to 'tests => last_test_to_print';
+
+use Test;
+BEGIN { plan tests => 4 };
+use Text::Shortcuts;
+ok(1); # If we made it this far, we're ok.
+use strict;
+
+#########################
+
+# Insert your test code below, the Test module is use()ed here so read
+# its man page ( perldoc Test ) for help writing this test script.
+
+my($of, $sf) = ('out', 'sc');
+
+my $sc = Text::Shortcuts->new($sf, $of);
+ok(1);
+$sc->set_shortcut("a", "apple");
+ok(1);
+$sc->get_doc;
+ok(1);
+

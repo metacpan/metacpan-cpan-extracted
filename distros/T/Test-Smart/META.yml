@@ -1,0 +1,27 @@
+---
+name: Test-Smart
+version: 0.02
+author:
+  - 'Edgar A. Bering, E<lt>trizor@gmail.comE<gt>'
+abstract: Test things that require Human Intelligence automatically. (By asking someone)
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.6.2
+provides:
+  Test::Smart:
+    file: lib/Test/Smart.pm
+    version: 0.02
+  Test::Smart::Interface:
+    file: lib/Test/Smart/Interface.pm
+  Test::Smart::Interface::File:
+    file: lib/Test/Smart/Interface/File.pm
+  Test::Smart::Interface::Mock:
+    file: lib/Test/Smart/Interface/Mock.pm
+  Test::Smart::Question:
+    file: lib/Test/Smart/Question.pm
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

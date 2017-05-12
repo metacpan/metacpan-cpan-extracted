@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Time/WorkHours.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-Time-WorkHours.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

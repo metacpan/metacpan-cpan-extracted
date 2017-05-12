@@ -1,0 +1,19 @@
+=pod
+
+=encoding ISO8851-1
+
+=head1 ASCII
+
+A noite, vovo Kowalsky ve o ima cair no pe do pinguim queixoso e vovo poe acucar no cha de tamaras do jabuti feliz.
+
+=head1 LATIN-1
+
+À noite, vovô Kowalsky vê o ímã cair no pé do pingüim queixoso e vovó põe açúcar no chá de tâmaras do jabuti feliz.
+
+=encoding utf8
+
+=head1 UTF-8
+
+Ã€ noite, vovÃ´ Kowalsky vÃª o Ã­mÃ£ cair no pÃ© do pingÃ¼im queixoso e vovÃ³ pÃµe aÃ§Ãºcar no chÃ¡ de tÃ¢maras do jabuti feliz.
+
+=cut

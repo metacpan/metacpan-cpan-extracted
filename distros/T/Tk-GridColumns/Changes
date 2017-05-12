@@ -1,0 +1,92 @@
+Revision history for Perl extension Tk::GridColumns.
+
+0.05  Wed Jan 30 14:11 2008
+	- original version; created by h2xs 1.23 with options
+		. -b 5.8.8
+		. -XA
+		. -n Tk::GridColumns
+0.07  Mon Feb 04 12:44 2008
+	- added 4 methods:
+		. generate_header_cmd()
+		. generate_item_draw_cmd()
+		. get_item()
+		. get_head()
+	- added 2 options
+		. -header_cmd
+		. -item_draw_cmd
+	- expanded tests ( a little )
+	- expanded documentation ( a little )
+	
+0.11  Sun Aug 16 16:28 2009
+    - completely new code
+    - options:
+        . -selectmode => 'single/multiple row/item'
+        . -data => [ [1,'A'], ... ]
+        . -columns => [ { -text => ... }, ... ]
+        . -colattr => { -background => ... }
+        . -itemattr => { -font => ... }
+        . -item_draw_cmd => \&Tk::GridColumns::_item_draw_cmd
+        . -select_cmd => \&Tk::GridColumns::_select_cmd
+        . -deselect_cmd => \&Tk::GridColumns::_deselect_cmd
+        . -item_bindings => { '<Double-ButtonPress-1>' => \&some_sub, ... }
+    - accessors:
+        . OLD = OBJ->selectmode() ; OBJ = OBJ->selectmode(NEW)
+        . OLD = OBJ->data() ; OBJ = OBJ->data(NEW)
+        . OLD = OBJ->columns() ; OBJ = OBJ->columns(NEW)
+        . OLD = OBJ->colattr() ; OBJ = OBJ->col_attr(NEW)
+        . OLD = OBJ->itemattr() ; OBJ = OBJ->item_attr(NEW)
+        . OLD = OBJ->item_draw_cmd() ; OBJ = OBJ->item_draw_cmd(NEW)
+        . OLD = OBJ->select_cmd() ; OBJ = OBJ->select_cmd(NEW)
+        . OLD = OBJ->deselect_cmd() ; OBJ = OBJ->deselect_cmd(NEW)
+        . OLD = OBJ->item_bindings() ; OBJ = OBJ->item_bindings(NEW)
+        . OLD = OBJ->selected() ; OBJ = OBJ->selected(NEW) # use ->curselection to get the selected items
+    - other methods:
+        . OBJ->select( X, Y ) -- marks the item at X,Y as selected and calls the -select_cmd
+        . OBJ->deselect( X, Y ) -- marks the item at X,Y as not selected and calls the -deselect_cmd
+        . OBJ->curselection() -- returns an array reference that holds the position of the selected items: [ [X,Y], ... ]
+        . OBJ->clear_selection() -- calls the -deselect_cmd for every item that is marked as selected
+        . OBJ->refresh_selection() -- calls the -select_cmd for every item that is marked as selected
+        . OBJ->add_column( opt => val ) -- adds a new column to the GridColumns
+        . OBJ->add_row( bla, bla ) -- adds a new row to the data
+        . OBJ->sort_col( X, SORT, REVERSE ) -- sorts data and selection by using the SORT subroutine on column X's data
+                                               reverses the sort if REVERSE is set; does not refresh anything
+        . OBJ->sort_cmd( X, SORT ) -- creates a -command that can be used in a column
+        . OBJ->draw_header() -- draws the header ; use ->refresh_header to make changes in the -columns visible
+        . OBJ->draw_items() -- draws the items ; use ->refresh_items to make changes in the -data visible
+        . OBJ->set_filler() -- configures the grid so that the widgets stick to the top
+                               ->refresh and ->refresh_items call this one automatically
+        . OBJ->refresh() -- makes changes to -columns or -data visible
+        . OBJ->refresh_header() -- makes changes to -columns visible
+        . OBJ->refresh_items() -- makes changes to -data visible
+    TODO:
+        1. make the options accessible by ->configure() and ->cget()
+        2. more examples
+        3. more tests
+        4. more documentation
+        5. make it faster
+
+0.13  Mon Aug 17 17:59 2009
+    - added ->configure and ->cget support
+    - added examples: simple.pl, editable.pl, scrolled.pl, appearance.pl
+    - wrote some documentation
+    - fixed: -itemattr and -colattr did not get applied in all situations
+    TODO:
+        1. more documentation
+        2. add tests
+        3. add the ability to set additional grid options (-minsize, -pad, ...)
+        4. add the ability to scroll via mouse wheel (or show how to do it in an example)
+        5. make it faster
+
+0.15 Fr Sep 04 19:12 2009
+    ! refresh_items() did not destroy all items if the data was reduced
+    ! curselection() now removes inexistent selections
+    + OBJ->remove_filler() -- sets -weight => 0 for the row under the last data row
+    + tests
+    ~ the default ButtonPress events now give the clicked widget the focus
+    ~ added an application example: addressbook.pl
+    TODO:
+        1. more documentation
+        2. add tests
+        3. add features of the TODO section (POD) - this will also make it faster in a way
+        4. add the ability to set additional grid options (-minsize, -pad, ...)
+        note: won't bother with mouse wheel

@@ -1,0 +1,18 @@
+2017-04-01  Kingpin  <martin@martin-M17x>
+
+	* Makefile.PL: fixed for newest perls
+
+2008-09-19  Kingpin  <Martin@BLUEMAX>
+
+	* lib/Test/Folder.pm: new module
+
+	* t/folder.t: new file
+
+2007-11-23    <Daddy@C-3PO>
+
+	* lib/Test/Dir.pm: do not use 'our' (friendly to older perl)
+
+2007-11-22    <Daddy@C-3PO>
+
+	* lib/Test/Dir.pm: first release
+

@@ -1,0 +1,15 @@
+Changes
+lib/Test/CircularDependencies.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+script/find-circular-dependencies.pl
+t/00-test.t
+t/01-test-loop.t
+t/circular_dependency/my_exe.pl
+t/circular_dependency/MyA.pm
+t/circular_dependency/MyB.pm
+t/circular_dependency/MyC.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

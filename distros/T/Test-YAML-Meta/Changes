@@ -1,0 +1,114 @@
+Changes log for Test-YAML-Meta
+==============================
+
+0.22    2015-01-31
+        - META marked distribution as deprecated.
+
+0.21    2015-01-17
+        - consistent abstract.
+        - INSTALL documentation update.
+        - extended META test suite.
+        - fixed license fields in META.json to be lists.
+        - added WARNING notice.
+
+0.20    2013-04-07
+        - change file dates changed to meet W3CDTF standards.
+        - reworked Makefile.PL for clarity.
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - added meta.JSON.
+        - updated test suite.
+        - added repositories to Meta files.
+
+0.19    2011-02-15
+        - added missing prerequisite.
+
+0.18    2011-02-14
+        - removed tests which are no longer applicable.
+
+0.17    2011-02-13
+        - Distribution name change: Test-YAML-Meta => Test-CPAN-Meta-YAML.
+        - This distribution now a wrapper around Test-CPAN-Meta-YAML.
+
+0.16    2010-04-12
+        - fixed qr// delimiters due to issues with the NOT SIGN symbol 
+          (suggested by Ricardo Signes & David Golden).
+
+0.15    2009-12-18
+        - renamed word() to keyword().
+        - added identifier() validation.
+        - changed optional_features key from a keyword to an identifier type,
+          thus further clarifying RT#52685 (thanks Kevin).
+
+0.14    2009-12-12
+        - clarified spec defined and user defined keys, as promoted by Kevin
+          Ryde in RT#52685 (thanks Kevin).
+
+0.13    2009-12-07
+        - RT#46473: license url with fragment part (Kevin Ryde)
+        - RT#47393: "optional_features" as map rather than list (Kevin Ryde)
+        - above applied to 1.4, 1.3 and 1.2 version of the meta-spec.
+
+0.12    2009-05-24
+        - added version checking to standard 94metatest.t
+        - added changes file checking, 95changedate.t
+        - added support for v-strings (RT#43566, thanks to David Golden)
+        - relaxed resource keys names, as per spec (RT#41605, thanks to 
+          Jonathan Yu)
+
+0.11    2008-06-27
+        - added spec version 1.4
+        - added further check to ensure we have a known spec version
+
+0.10    2008-06-02
+        - added 'git' as an accepted url protocol (Mischa Poslawsky).
+
+0.09    2008-03-28
+        - purely a cosmetic release to render the Makefile.PL time issues, that
+          have generated bogus FAIL reports in previous releases, null
+          and void.
+
+0.08    2008-03-17
+        - it helps when you fix all the versioning too!
+
+0.07    2008-03-17
+        - fixed licensing list (adding Artistic2). (Bernhard Schmalhofer)
+        - value for license is mandatory, but the actual value could be any
+              string. Therefore the license() function now returns 1 if the given
+          value is a known license type, returns 2 if a value is given, or 0
+          if no value is given.
+        - hashref returned of the parsed META.yml file, by both meta_spec_ok()
+          and meta_yaml_ok(), in the event the user wishes to perform addition
+          checks on the values of the hash keys. (Adam Kennedy)
+        - added t/05metaspec.t test file.
+
+0.06    2007-11-05
+        - fixed RT#29457: distribution_type is not mandatory in spec 1.2 (domm)
+
+0.05    2007-11-02
+        - a curious error report fails validating META.yml the first time, but
+          is okay the second time. As such I'm removing the 93metavalid.t as 
+          the test is redundant now.
+
+0.04    2007-05-15
+        - provided better error reporting (spec chain and validating version)
+        - added a new test file, supplied by Jochen Stenzel, which highlights
+          an error in the way the author line was created.
+        - bumped the Test::More version required, due to a bugfix in 
+          Test::Builder:Tester.
+        - provided a cleaner way to report undef values as errors
+        - added lots more tests for edge cases
+        - finally sorted the Test::Builder::Tester tests in 04metatester.t
+        - Devel::Cover = 95.6%
+
+0.03    2007-02-27
+        - POD & comment updates
+        - removed 92distribution.t test as it can't detect that YAML::Syck is 
+          optional
+        - fixed a misunderstanding of mine from the META.yml specification.
+
+0.02    2007-02-27
+        - Fixed a bug in detecting module name
+
+0.01    2007-02-27
+        - Initial release.
+        - Devel::Cover = 91.7%

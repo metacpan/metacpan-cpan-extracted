@@ -1,0 +1,23 @@
+---
+abstract: "a translation of `tk_dialog' from Tcl/Tk to TkPerl (based on John Stoffel's idea)."
+author:
+  - 'Jim Turner <turnerjw784@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-JDialog
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Tk: '0'
+  perl: '5.006'
+version: '1.11'

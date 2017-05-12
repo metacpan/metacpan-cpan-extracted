@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+keywords:
+  - Tk
+  - Tcl
+  - Tix
+  - GUI
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tcl-pTk
+no_index:
+  directory:
+    - t
+    - inc
+    - benchmarks
+    - TableMatrixDemos
+    - lib/Tcl/pTk/demos
+requires:
+  Class::ISA: 0.36
+  Tcl: 0.9
+version: 0.92

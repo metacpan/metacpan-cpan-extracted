@@ -1,0 +1,66 @@
+-- GETTING TAEB
+
+The preferred method for obtaining the TAEB source is from the darcs repo:
+    darcs get --partial http://sartak.org/code/TAEB/
+
+Alternatively, you can download "http://sartak.org/dist/TAEB.tar.gz" and
+extract to the directory of your choice.
+
+You can also download TAEB from the CPAN: cpan -i TAEB
+
+Downloading the tarball or installing from CPAN means less work up front (no
+need to install darcs), but it'll be more work every time you want to update.
+
+
+-- INSTALLING FROM TARBALL
+
+If you're on Ubuntu, you'll first need to install the "build-essential" (for
+make) and "libncurses5-dev" (for the Curses library) packages. If you are on OS
+X, you will need Xcode and probably a few packages from MacPorts.
+
+
+$ perl Makefile.PL
+
+Answer the defaults to any dependencies it asks about. You may have to
+set up CPAN. The defaults are usually fine. Be sure to set a mirror though.
+
+$ make && sudo make install
+
+This will install the modules from CPAN. TAEB's dependencies themselves
+usually have a few dependencies. All in all you're probably looking at
+about 60 modules.
+
+
+-- AI
+
+Though TAEB ships with a demo AI, you should still install a robust AI. The
+most actively developed AI is Behavioral. The preferred method to get it is
+still through darcs:
+    darcs get --partial http://sartak.org/code/TAEB-AI-Behavioral
+
+Or you can get a tarball from
+"http://sartak.org/dist/TAEB-AI-Behavioral.tar.gz" or the CPAN.
+
+
+-- CONFIGURATION
+
+TAEB itself has a lot of configuration. It sets up some sensible defaults for
+you (such as playing nethack locally with the Demo AI and communicating with
+you via Curses). You aren't required to set up config, but if you want to
+change how TAEB operates, such as by making him play on a NetHack server, you
+can. Specify configuration in ~/.taeb/config.yml, which is written in YAML
+(http://en.wikipedia.org/wiki/Yaml). Read the sample configuration in
+TAEB::Config for more details.
+
+TAEB requires certain NetHack options to be set in order to recognize
+dungeon features, and to not get confused by extra output. These options
+can be displayed by running "taeb --rc". For the Local interface, these will
+automatically be copied into $TAEBDIR/nethackrc for use by TAEB. To
+play on a DGameLaunch server such as nethack.alt.org, use the Telnet
+interface, and copy the nethackrc into the configuration editor.
+
+
+-- RUNNING TAEB
+
+You should now be ready to run TAEB! Type "taeb" and cross your fingers.
+

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml # Will be created by "make dist"
+README
+lib/Task/Sites/ShlomiFish.pm
+scripts/tag-release.pl
+t/00-load.t
+t/cpan-changes.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t

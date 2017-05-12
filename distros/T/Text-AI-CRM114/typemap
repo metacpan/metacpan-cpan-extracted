@@ -1,0 +1,38 @@
+CRM114_CONTROLBLOCK				T_OPAQUE_STRUCT
+CRM114_CONTROLBLOCK *				T_PTROBJ
+CRM114_DATABLOCK				T_OPAQUE_STRUCT
+CRM114_DATABLOCK *				T_PTROBJ
+CRM114_DATABLOCK **				T_PTROBJ
+CRM114_ERR					T_IV
+CRM114_MATCHRESULT				T_OPAQUE_STRUCT
+CRM114_MATCHRESULT *				T_PTROBJ
+__off_t						T_PTROBJ
+__va_list					T_PTROBJ
+fpos_t ( * ) ( void *, fpos_t, int )		T_PTROBJ
+fpos_t *					T_PTROBJ
+int ( * ) ( void * )				T_PTROBJ
+int ( * ) ( void *, char *, int )		T_PTROBJ
+int ( * ) ( void *, const char *, int )		T_PTROBJ
+int *						T_PTROBJ
+long *						T_PTROBJ
+size_t *					T_PTROBJ
+unsigned long long				T_NV
+const char *				T_PV
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd /home/jm/ftp/ettext
+
+(
+  ./build/update_devel 
+  $HOME/lib/ettext_put.rsync
+) > cron.log 2>&1

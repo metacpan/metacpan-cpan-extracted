@@ -1,0 +1,68 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@c simple.texi
+@setfilename simple.info
+@settitle Simple Test
+@c %**end of header
+
+@ifinfo
+@node Top
+@top Simple Test
+
+This document is a simple test of Texinfo::Menus.
+
+@menu
+@end menu
+@end ifinfo
+
+@node Overview
+@chapter Overview
+
+Overview goes here.
+
+@node Data Structures
+@chapter Data Structures
+
+This part comes before the menu.
+
+@menu
+@end menu
+
+This part comes after the menu.
+
+@node Variable names
+@section Variable names
+
+Variable names defined here.
+
+@node Context
+@section Context
+
+Context goes here.
+
+@node Scalar values
+@section Scalar values
+
+Scalar values go here.
+
+@node Syntax
+@chapter Syntax
+
+Syntax goes here.  This comes before the menu.
+
+@node Syntax Overview
+@section Syntax Overview
+
+Syntax Overview goes here.
+
+@node Declarations
+@section Declarations
+
+Declarations come here.
+
+@node Comments
+@section Comments
+
+Comments here.
+
+@bye

@@ -1,0 +1,6 @@
+Revision history for Perl extension Template::Plugin::Session.
+
+0.01  Fry Jun 20 22:06:55 2003
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Template::Plugin::Session
+

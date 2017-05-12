@@ -1,0 +1,4 @@
+name = "Test-WWW-Mechanize-Catalyst-WithContext"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

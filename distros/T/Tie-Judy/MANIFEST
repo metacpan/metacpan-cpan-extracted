@@ -1,0 +1,11 @@
+Changes
+Judy.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Tie-Judy.t
+lib/Tie/Judy.pm
+typemap
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,60 @@
+Time/Elapse version 1.23
+========================
+
+Time::Elapse is a very simple class with one method: lapse.
+
+
+Basically, the lapse method 'eats the brains' of the variable,
+squirrels away whatever value it may have held internally,
+(much like space aliens are known to do in the movies), and also stores 
+the current time within it. Then, whenever you access the value of 
+the variable, the 'alien' within formats the time differential 
+between when you initialized the variable, and when you printed it, 
+and returns that (along with any value the variable may hold, as well). :-) 
+Every time you print it, you get the updated differential, returned by 
+the method hidden inside the variable itself. The output will be formatted 
+as HH:MM:SS.000000 [in Microseconds].
+
+
+Frankly it doesn't do much more than time(), but then again the simplest 
+things rarely do. :-)
+
+
+All it really does is hides the calculations that anyone else would have had 
+to set up manually in a clever way and then produce a reasonably formatted 
+output which lends itself equally well to single-line output or inlining with
+other text.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Time::HiRes
+
+
+BUGS
+
+localtime and gmtime seem to be reversed on some systems, and a temporary 
+hack until the problem can be resolved was to set 
+
+	local $ENV{TZ} = 'UTC';
+
+within each of the subroutines within the module.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2001 Scott R. Godin. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.

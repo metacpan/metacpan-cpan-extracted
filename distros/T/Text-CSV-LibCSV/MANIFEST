@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+eg/benchmark.pl
+lib/Text/CSV/LibCSV.pm
+lib/Text/CSV/LibCSV.xs
+src/ppport.h
+t/00_compile.t
+t/01_parse.t
+t/test.csv

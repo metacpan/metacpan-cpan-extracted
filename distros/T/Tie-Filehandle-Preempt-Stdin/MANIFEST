@@ -1,0 +1,10 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Tie/Filehandle/Preempt/Stdin.pm
+t/01_load.t
+Makefile.PL
+
+META.yml                                 Module meta-data (added by MakeMaker)

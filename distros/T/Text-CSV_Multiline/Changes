@@ -1,0 +1,12 @@
+Revision history for Perl extension Text::CSV_Multiline.
+
+Version 0.02, released 2011-07-08
+ * add description to README and main man page
+
+Version 0.01, released 2009-07-15
+ * published to CPAN as an unregistered module so that I could easily
+   access it on other servers
+
+Version 0.01, created 2007-07-13
+ * original version, developed for internal use for a project that
+   needed to handle CSV files that had "multiple lines" in some fields

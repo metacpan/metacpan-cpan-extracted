@@ -1,0 +1,65 @@
+Tie::Hash::KeysMask                                           version   0.01
+
+- Control key aliasing by mask function, e.g. omit case of character
+- distinction
+============================================================================
+
+SYNOPSIS
+        use Tie::Hash::KeysMask;
+
+        my $mask = sub {...};
+        tie %argH, 'Tie::Hash::KeyMask',$mask, more arguments;
+
+         Yield that the key mask function &$mask translates any key
+         when applied to %argH like ..
+
+                $k   =>   $mask->($k, more arguments)
+
+         that is
+
+                 $argH{$k}  expands to  $argH{$mask->($k, more arguments)}
+            $argH{$k} = $v  expands to  $argH{$mask->($k, more arguments)} = $v
+
+DESCRIPTION
+    If e.g. choose key mask "sub {uc $_[0]}" one can access an element
+    without care of case of the key. In place of "sub { }" particular items
+    can be used which will be translated into a CODE. The translation is
+
+                'lc' => sub { lc $_[0] }
+                'uc' => sub { uc $_[0] }
+                \%M  => sub { exists $M{$_[0]} ? $M{$_[0]} : $_[0]}
+
+    A class-method "codemap" manage this translation. If it is pleased one
+    could override it and add ones own translations.
+
+    This class inherits from "Tie::Hash::Create" by which the tied hash can
+    be obtained anonymously as reference with the command
+
+                'Tie::Hash::KeyMask'->newHASH (sub {...}, more arguments)
+
+    which overrides the tie syntax calling tie from body of newHash.
+
+SEE ALSO
+    Tie::Hash::Create, Sub::ParamFrame.
+
+CAVEATS
+    The mask function must satisfy this rule: Each of different keys which
+    are considered as equal must be mapped to one and the same value only.
+    Hence, if \&mask is given as agument of the construtor, no triple of
+    different keys $a,$b,$c such that $b = mask($a) and $c = mask($b) are
+    admitted. It's ease to receive counter examples which break this rule
+    using certain hashs for mask in order to observe funny results.
+
+PREREQUISITES
+    This module requires these other modules and libraries:
+    "Tie::Hash::Create"
+
+AUTHOR
+    Josef Schönbrunner <j.schoenbrunner@onemail.at>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2005 by Josef Schönbrunner This library is free software;
+    you can redistribute it and/or modify it under the same terms as Perl
+    itself, either Perl version 5.8.7 or, at your option, any later version
+    of Perl 5 you may have available.
+

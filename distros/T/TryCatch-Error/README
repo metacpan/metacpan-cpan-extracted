@@ -1,0 +1,42 @@
+TryCatch-Error
+
+This module provides a very basic set of error objects, that can be extended and used with TryCatch (or other similar packages).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc TryCatch::Error
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=TryCatch-Error
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/TryCatch-Error
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/TryCatch-Error
+
+    Search CPAN
+        http://search.cpan.org/dist/TryCatch-Error/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Pedro Figueiredo
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

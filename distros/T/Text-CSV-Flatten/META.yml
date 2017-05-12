@@ -1,0 +1,23 @@
+---
+abstract: 'Perl extension for transforming hierarchical data (nested arrays/hashes) to comma-separated value (csv) output according to a compact, readable, user-specified pattern.'
+author:
+  - 'Timo Kluck <tkluck@infty.nl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-CSV-Flatten
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: '2.19'
+  Text::CSV: '1.32'
+version: '0.04'

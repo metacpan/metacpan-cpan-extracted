@@ -1,0 +1,96 @@
+2004-10-11  Dominique Dumont  <domi@komarr.grenoble.hp.com> (v 1.006)
+
+	* Multi/*.pm : adapted for Tk804.027 
+
+2002-09-30  Dominique Dumont  <domi@komarr.grenoble.hp.com> (v 1.005)
+
+	* Multi/Frame.pm : minor doc fix
+	* Multi/Toplevel.pm: doc fix in synopsis
+
+2002-09-02  Dominique Dumont  <domi@komarr.grenoble.hp.com> (v 1.004)
+
+	* Multi/Frame.pm : modified doc to remove reference of scrolled
+	frames. They are not scrollable.
+
+1999-05-31  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	v 1.003
+	* Makefile.PL: added dependancy on Tk::ObjScanner
+	* Toplevel.pm: ObjScanner must be destroyed by Multi menu.
+	
+1999-04-06  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	v 1.002
+	* added depandancy on Tk::TFrame in Makefile.PL
+	* Multi/Frame.pm (printableDump): corrected doc
+
+	v 1.001
+	* Added Tk::MultiFrame widget
+	* Uses Tk::Adjuster from Tk 800.013
+	* various bug fixes
+
+v0.80 1998-12-18  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	* added Tk::Multi::Toplevel widget
+	* put back Tk::Multi::Any for print stuff.
+	
+v0.73 1998-12-15  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	* Some reference to the late Tk::Multi::Any was left
+
+v0.72: 1998-11-23  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	* Multi/Text.pm : fix bind pb
+
+	* Multi/Manager.pm: Unpacks Adjuster instead of destroying them
+
+v0.71: 1998-08-18  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	* All (except Any): Changed version string so that CPAN does not
+	get confused
+
+v0.7: 1998-08-13  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	* Multi::Any is deprecated (was a bad idea :-( )
+	* All : simplified Populate method, expand does work, removed 
+	resize buttons, removed setSize methods, added help support
+	* test: split test.pl in t/*.t files
+
+v0.6: 1998-06-24  Dominique Dumont  <domi@barrayar.grenoble.hp.com> 
+
+	* test.pl: cleanup traces
+
+	* Makefile.PL: added dependency on Tk::Pane
+
+0.5 98/6/19
+        - Fixed weird bug involving multiple main windows
+
+0.4 
+        - Added MultiCanvas.
+        - Added Any to create new Multi slaves
+        - Popup menus
+
+0.3 11/2/98
+        Added changes kindly suggested by Achim Bonnet
+        - Autoload was not a good idea. Removed
+        - removed print left from debug days
+        - better start-up time
+
+0.2  6/2/98
+        - Clean up usage of Autoloader. Added stub functions
+
+0.1  28/11/97
+        - Use Autoload
+
+0.04 Vendre 14/11/97
+        - better print management
+
+0.03 Jeudi 13.11.97
+        - now it can compile with Tk402.003
+
+0.02 Vendredi 31 octobre 1997 14:08:09
+	- added hide and show methods in Manager.pm
+
+0.01  Wed Jul 23 17:02:08 1997
+	- original version; created by h2xs 1.18
+

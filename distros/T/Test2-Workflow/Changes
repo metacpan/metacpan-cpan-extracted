@@ -1,0 +1,78 @@
+0.000018  2017-01-31 21:33:34-08:00 America/Los_Angeles
+
+    - Use Sub::Info to silence a warning
+
+0.000017  2016-07-31 21:24:00-07:00 America/Los_Angeles
+
+    - Fix acceptance5.t to not assume fork is used.
+
+0.000016  2016-07-29 12:37:29-07:00 America/Los_Angeles
+
+    - Require newer Importer.pm for :ALL tag
+
+0.000015  2016-07-28 07:07:37-07:00 America/Los_Angeles
+
+    - Run blocks when done_testing is missing (#3)
+    - Add spec_defaults()
+
+0.000014  2016-07-02 22:11:29-07:00 America/Los_Angeles
+
+    - No Changes from last trial
+
+0.000013  2016-07-01 17:33:24-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Do not apply mock defined on root action.
+
+0.000012  2016-06-24 06:01:16-07:00 America/Los_Angeles
+
+    - No changes since last trial
+
+0.000011  2016-06-22 11:32:58-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Require newer Test2::AsyncSubtest for bugfixes
+
+0.000010  2016-06-22 09:16:07-07:00 America/Los_Angeles
+
+    - Fix for (and require) Test2-Suite 0.000032 (#2)
+    - Better TODO handling
+
+0.000009  2016-05-31 07:18:50-07:00 America/Los_Angeles
+
+    - Require perl 5.10
+
+0.000008  2016-05-30 07:38:55-07:00 America/Los_Angeles
+
+    - Require newer Test2::AsyncSubtest
+
+0.000007  2016-05-30 06:58:17-07:00 America/Los_Angeles
+
+    - Complete rewrite
+
+0.000006  2016-02-05 15:45:57-08:00 America/Los_Angeles
+
+    - Prep for a new Trace::Mask version
+
+0.000005  2016-02-05 11:56:11-08:00 America/Los_Angeles
+
+    - Bump minimum Test2::Suite version (fixes issue found in windows tests)
+
+0.000004  2016-02-04 21:48:07-08:00 America/Los_Angeles
+
+    - Add Spec bundle
+
+0.000003  2016-02-04 10:46:41-08:00 America/Los_Angeles
+
+    - Fix test that needs to be conditional
+    - Fix constant in NoIso
+
+0.000002  2016-02-03 08:12:34-08:00 America/Los_Angeles
+
+    - Major overhaul
+    - Add isolation runners
+    - Lots of fixes
+    - Masking traces properly
+    - Better filtering
+
+0.000001  2016-01-18 10:54:17-08:00 America/Los_Angeles
+
+    - Initial conversion from Test::Stream

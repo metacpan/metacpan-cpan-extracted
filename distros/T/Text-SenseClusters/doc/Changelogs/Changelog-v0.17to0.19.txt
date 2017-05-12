@@ -1,0 +1,12 @@
+Changes made in Sense-Clusters version 0.17 during version 0.19
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota at Duluth
+
+1.	Added agglom.pl in working form
+
+2.	Modified perldoc pages of setup.pl and cluster.pl
+
+(Changelog-v0.17to0.19 Last Updated on 05/19/2003 by Amruta)

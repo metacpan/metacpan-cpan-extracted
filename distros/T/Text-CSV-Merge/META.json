@@ -1,0 +1,66 @@
+{
+   "abstract" : "Fill in gaps in a CSV file from another CSV file\r",
+   "author" : [
+      "Michael Gatto <mgatto@lisantra.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-CSV-Merge",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::CSV" : "0",
+            "DBI" : "0",
+            "Getopt::Long" : "0",
+            "IO::File" : "0",
+            "Log::Dispatch" : "0",
+            "Modern::Perl" : "0",
+            "Moo" : "1.001000",
+            "Text::CSV_XS" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::CSV::Merge" : {
+         "file" : "lib/Text/CSV/Merge.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mgatto/Text--CSV--Merge.git",
+         "web" : "https://github.com/mgatto/Text--CSV--Merge"
+      }
+   },
+   "version" : "0.05"
+}
+

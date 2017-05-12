@@ -1,0 +1,98 @@
+Changes file for Test::Differences
+
+0.64 Sun November 22, 2015
+    - Bump dependency version for Text::Diff to avoid a buggy release
+    - Make tests pass with relocation perl (see
+      https://rt.cpan.org/Ticket/Display.html?id=103133)
+
+0.63 Thu November 20, 2014
+    - Minor doco-fixes
+    - Remove use of flatten, always use Data::Dumper for saner, more readable
+      output, fixes RT #95446 (David Precious (bigpresh))
+
+0.62 Wed June 25, 2014
+    - Production release
+
+0.61_01 Thu June 19, 2014
+    - Document the Text::Diff unicode fix.
+    - Add ability to customise 'Got' and 'Expected' column headers
+
+0.61 Sat April 16, 2011
+    - Allow an option to override Sortkeys in C<eq_or_diff>. Thanks to Mark
+      Zealey for the suggestion.
+    - Unnumbered tests. There's no point to them.
+
+0.60 Sat April 16, 2011
+    - Make '' and undef not equal. Thanks to Pavel Shaydo for the patch.
+    - Made Data::Dumper minimum version 2.126 to resolve
+      https://rt.cpan.org/Ticket/Display.html?id=60798. Thanks to
+      jjnapiork@cpan.org  for the report and fix.
+
+0.50 Sat Oct 17 15:18:03 2009
+    - Production release.
+
+0.49_02 Sat Aug  2 13:00:21 GMT 2008
+    - Added support for all diff styles supplied by Text::Diff.  Requested by
+      Kevin Jones (http://rt.cpan.org/Public/Bug/Display.html?id=23579)
+    - Add Build.PL.
+    - Convert to universally use Test::More instead of Test.
+
+0.49_01 Fri Aug  1 09:04:58 GMT 2008
+    - Convert to modern Perl distribution.
+    - Applied doc suggestion from Slaven Rezic
+      (http://rt.cpan.org/Ticket/Display.html?id=24297)
+    - Bumped up version number higher than normal because I forgot to quote
+      the "developer release" number last time.
+    - Applied Mark Stosberg's  patch which fixed the { a => 1 } versus 
+      { a => '1' } bug (http://rt.cpan.org/Ticket/Display.html?id=3029)
+
+0.48_01 Wed Jul 30 10:42:52 GMT 2008
+    - Fixed bug when comparing AoH with non-scalar values.  Reported (with
+      fix) by Mark Zealey
+      (http://rt.cpan.org/Public/Bug/Display.html?id=29732)
+
+0.47 Tue Jun 17 08:54:59 EDT 2003
+    - Add context option (reworked patch from fetko@slaysys.com)
+    - Improve options handling for eq_or_diff(), $name is no longer
+      required before \%options
+    - Use **, not ^, for exponentiation
+      ("Blake D. Mills IV" <blakem@blakem.com>)
+
+0.46 Tue Aug 27 13:45:51 EDT 2002
+    - Minor doc tweaks
+
+0.45 Sun Jul 14 06:58:48 EDT 2002
+    - Fix $Data::Dumper::FooBar to be ...::Foobar, patch by
+      Ilya Martynov <ilya@martynov.org>
+    - Correct the "use Test::Differences" example.
+    - Require Text::Diff 0.34 in to get escaping fixes.
+
+0.44 Mon Jul  8 17:02:11 EDT 2002
+    - Document Data::Dumper shortcomings reported by Yves Orton
+    <demerphq@hotmail.com> and Ilya Martynov <ilya@martynov.org>.
+
+0.43 Mon May 13 09:49:50 EDT 2002
+    - Dump "unknown" structures instead of treating them like
+      arrays of scalars.  Reported by Yves Orton <demerphq@hotmail.com>.
+
+0.42 Wed Jan  2 21:31:32 EST 2002
+    - T.J. Mather spotted a bug where two identical results would compare
+    as different, causing false negatives.
+
+0.41
+    - forgot to log this change.
+
+0.4 Fri Dec 21 08:55:13 EST 2001
+    - Moved table style diffs and escaping in to Test::Diff
+    - Improve docs
+    - Add a few more tests
+
+0.3 Sat Dec 15 02:06:26 EST 2001
+    - Only use Data::Dumper on both args or neither arg.
+    - Improve escaping (Michael G Schwern <schwern@pobox.com>,
+    - remove leftover debugging code (Tatsuhiko Miyagawa <miyagawa@edge.co.jp>)
+    - add t/00escape.t
+    - PREREQ_PM => 'Text::Diff' (Michael G Schwern <schwern@pobox.com>)
+
+0.2
+    - Initial public release

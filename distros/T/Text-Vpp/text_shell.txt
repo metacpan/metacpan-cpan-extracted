@@ -1,0 +1,13 @@
+test shell stuff on unix only
+1rst test
+@SHELL << EOFSHELL
+ls test.pl
+ls text_shell.txt
+EOFSHELL
+
+2nd test
+@SHELL   ls Vpp.pm
+
+3rd test
+@SHELL ls Vpp.pm; \
+ls text_shell.txt

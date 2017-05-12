@@ -1,0 +1,90 @@
+Type-Tiny-XS
+============
+
+Created:      2014-07-10
+Home page:    <https://metacpan.org/release/Type-Tiny-XS>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.012	2014-09-17
+
+ [ Packaging ]
+ - Repackage with newer Dist::Inkt to fix META.json error.
+
+0.011	2014-09-07
+
+ [ Bug Fixes ]
+ - Fix for PositiveInt/PositiveOrZeroInt.
+   Fixes RT#98631.
+   Steven Lee++
+   <https://rt.cpan.org/Ticket/Display.html?id=98631>
+
+0.010	2014-07-22
+
+ [ Bug Fixes ]
+ - Type constraint subs can now be called with no parameters and will
+   pretend that you passed them undef. This makes them behave more like
+   Type::Tiny's PP implementation, where there are no argument count
+   checks.
+   Jed Lund++
+   <https://github.com/tobyink/p5-type-tiny-xs/issues/1>
+
+0.009	2014-07-22
+
+ [ Bug Fixes ]
+ - Move variable declarations to the beginning of blocks, for better C90
+   compliance. Should compile now in MSVC.
+   Jason R Mash++
+   <https://gist.github.com/jrmash/42e9e36606fb6e61597a>
+   <https://github.com/tobyink/p5-type-tiny-xs/issues/2>
+
+0.008	2014-07-21
+
+ - Added: AllOf (which will be used by a future release of
+   Type::Tiny::Intersection).
+ - Added: AnyOf (which will be used by a future release of
+   Type::Tiny::Union).
+
+0.007	2014-07-20
+
+ - Added: Enum (which will be used by a future release of Types::Standard).
+
+0.006	2014-07-20
+
+ - Added: Map (which will be used by a future release of Types::Standard).
+ - Added: Tuple (which will be used by a future release of
+   Types::Standard).
+ - Attempt to load Type::Parser to handle the occasional complex type name
+   parsing task.
+
+0.005	2014-07-19
+
+ [ Documentation ]
+ - Document that Type::Tiny::XS is now being used by Type::Tiny.
+
+ [ Other ]
+ - Added: NonEmptyStr (which will be used by a future release of
+   Types::Common::String).
+ - Added: PositiveInt (which will be used by a future release of
+   Types::Common::Numeric).
+ - Added: PositiveOrZeroInt (which will be used by a future release of
+   Types::Common::Numeric).
+
+0.004	2014-07-11
+
+ [ Documentation ]
+ - Clarify extent of supported API.
+ - Mention that get_*_for functions return undef if they cannot provide a
+   suitable sub.
+
+0.003	2014-07-11
+
+ - Further improvements to the Int check.
+
+0.002	2014-07-10
+
+ - Added: Provide Type::Tiny::XS::is_known() function.
+ - Make Int check act more like Type::Tiny.
+ - Make Object check act more like Type::Tiny.
+
+0.001	2014-07-10	Initial release

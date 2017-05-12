@@ -1,0 +1,101 @@
+  <p>
+    TaskForest can be configured so that when a job fails, it will
+    automatically retry running the job.  There is a system-wide option called
+    <a href="/docs/configuring/options.html#num_retries">num_retries</a>
+    that specifies how many times the job will be retried.
+    The <a href="/docs/configuring/options.html#retry_sleep">retry_sleep</a>
+    option specifies how many seconds the system will wait before trying
+    to rerun the job.
+  </p>
+
+  <p>
+    The <a href="/docs/configuring/options.html#num_retries">num_retries</a> and
+    <a href="/docs/configuring/options.html#retry_sleep">retry_sleep</a> options may optionally be specified for each job as well.  For example, if the configuration file contains this...
+  </p>
+
+  <div class="code"><pre><code><span class="comments"># This is the number of times to automatically</span>
+<span class="comments"># retry running a job that fails </span>
+<a class="config_file" href="/docs/configuring/options.html#num_retries">num_retries</a>              = 1
+
+<span class="comments"># Wait these many seconds before automatically</span>
+<span class="comments"># retrying running a job that fails </span>
+<a class="config_file" href="/docs/configuring/options.html#retry_sleep">retry_sleep</a>              = 300
+</code></pre></div>
+
+<p>
+  ...then if any job fails, the run wrapper will sleep for 300 seconds and
+  then retry the job once.  If the retry fails as well, then the job will
+  be considered to have failed.  If the retry succeeds, then job will have
+  considered to have run successfully.  During 300 second sleep period,
+  and during the retries, the official status of the job will still be
+  'Running.'
+<p>
+
+<p>
+  The responsibility of implementing the auto-retries falls on the run
+  wrapper.  Even though TaskForest ships with two run wrappers, you really
+  should use <code>run_with_log</code> and not <code>run</code>.  When a
+  job is being retried, <code>run_with_log</code> will note it the log
+  file like this:
+</p>
+
+  <div class="code"><pre><code><span class="comments">*****************************************************************
+Start Time:   Mon Mar 22 17:57:21 2010
+Family:       RETRY
+Job:          J_Retry
+Job File:     J_Retry
+Log Dir:      logs/20090503
+Script Dir:   jobs
+Pid File:     logs/20090503/RETRY.J_Retry.pid
+Success File: logs/20090503/RETRY.J_Retry.0
+Failure File: logs/20090503/RETRY.J_Retry.1
+Out/Err File: logs/20090503/RETRY.J_Retry.19258.1269298641.stdout
+
+*****************************************************************
+
+</span>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! Current Time: Mon Mar 22 17:57:21 2010
+!! Exit Code:    256
+!! 
+!! Job failed.  Sleeping 2 seconds and then retrying (retry 1 of 1).
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<span class="comments">
+
+*****************************************************************
+Start Time: Mon Mar 22 17:57:21 2010
+End Time:   Mon Mar 22 17:57:23 2010
+Duration:   2 seconds
+Exit Code:  0
+*****************************************************************</span>
+</code></pre></div>
+
+<p>
+  You can see that in this case, TaskForest had been instructed to sleep
+  for 2 seconds before retrying, and that there was to be only one retry.
+</p>  
+
+<p>
+  You can also override these configuration settings for individual jobs.
+  Let's say you have your configuration file set up as shown above, with
+  one retry after 300 seconds.  Now suppose you want
+  job <code>J_Retry</code> to be retried 10 times, with a two-minute sleep
+  between retries. You could specify the overrides directly in the family
+  file as follows:
+</p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 | ...
+02 |
+03 | J_Retry (num_retries => 10, retry_sleep => 120)
+04 |
+05 | ...
+   +-------------------------------------------------------
+  </code></pre></div>
+
+<p>
+  This local specification of ten retries spaced two minutes apart will
+  override what you have specified in the configuration file.  You can
+  override these configuration options on as many jobs as you wish.
+</p>
+  
+  

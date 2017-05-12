@@ -1,0 +1,2 @@
+feature_id	feature_name	feature_class	census_code	census_class_code	gsa_code	opm_code	state_numeric	state_alpha	county_sequence	county_numeric	county_name	primary_latitude	primary_longitude	date_created	date_edited
+479	Adamana	"Populated Place"	00170	U6			04	AZ	1	001	Apache	34.9766921	-109.8223383	02/08/1980	

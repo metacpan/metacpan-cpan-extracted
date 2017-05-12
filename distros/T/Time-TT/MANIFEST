@@ -1,0 +1,18 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Time/TT.pm
+lib/Time/TT/Agencies.pod
+lib/Time/TT/InterpolatingRealisation.pm
+lib/Time/TT/OffsetKnot.pm
+lib/Time/TT/Realisation.pm
+t/jepoch.t
+t/mjd.t
+t/pod_cvg.t
+t/pod_syn.t
+SIGNATURE    Added here by Module::Build

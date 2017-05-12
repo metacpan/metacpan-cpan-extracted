@@ -1,0 +1,17 @@
+0.010  Justin Hawkins <justin@eatmorecode.com>
+
+    * improve documentation and metadata
+
+0.009  Justin Hawkins <justin@eatmorecode.com>
+
+    * allow the criteria to be specified with a simple regex
+
+0.008  Justin Hawkins <justin@eatmorecode.com>
+
+    * return response from send_message_to_chat_id and send_to_chat_id
+      for capturing things like the message_id
+
+0.007  Justin Hawkins <justin@eatmorecode.com>
+
+    * added Changelog :-)
+    * added support for constructing and sending images

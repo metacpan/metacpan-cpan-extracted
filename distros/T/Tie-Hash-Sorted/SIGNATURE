@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1f4180838c00a9d5fecccff09f5bdbd24ccb642d Changes
+SHA1 8f232490dd4381b4940a5dd3bb87aa0a50dc5f28 LICENSE
+SHA1 a8a8a5400ce5a5c6954e769f059047c8159333b0 MANIFEST
+SHA1 898b390e2f64a8953f5c703a0710dcc7ed5a1bfa MANIFEST.SKIP
+SHA1 068be6f337e72c9e8e5f9fb441849acee07d7001 META.yml
+SHA1 4ca848f823995138df21c7087c14ed67ad93de92 Makefile.PL
+SHA1 9b34e1053fd150751d84b9059ca331ee755f02c6 README
+SHA1 deed3e22f1d829e80d5ea49830e4413c4e3d976b Sorted.pm
+SHA1 a620ce6cab5920bbc0ee2ab522c7785580146923 test.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (MingW32)
+
+iD8DBQE/YNfe6xgUnxcgPy8RAnxSAKCDB+FtO/cZ1dy1TvQPcodLr7l/0ACgmqoM
+how+pef/fzVpoLrcb8kvdY8=
+=aEFA
+-----END PGP SIGNATURE-----

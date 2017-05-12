@@ -1,0 +1,257 @@
+NAME
+    Text::Template::Library - a derived class of Text::Template
+
+SYNOPSIS
+      use Text::Template::Library;
+      my $tmpl=Text::Template::Library->new(...);
+      $tmpl->fill_in(...);
+
+      in the template:
+
+      { define macro1 }
+        macro text
+      { /define }
+      ...
+      { define macro2 }
+        macro text
+      { /define }
+      ...
+      { fill_in_module('macro2') }
+
+INSTALLATION
+    Before you install this module apply the necessary patches to the
+    Text::Template distribution, see ""Text::Template" patches" below.
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DESCRIPTION
+    I have used "Text::Template" for several years in different projects.
+    Allways I have missed the possibility to create macros. For example
+    suppose this template:
+
+      <table>
+        [%
+          for (@rows) {
+            $OUT.="<<EOR";
+      <tr>...</tr>
+      EOR
+          }
+        %]
+      </table>
+
+    This works perfectly well but all my HTML editors get confused by the
+    "<<EOR" construct. One solution would be to create a new template for
+    the table row and use it:
+
+      <table>
+        [%
+          for (@rows) {
+            $OUT.=fill_in_file('/path/to/row.tmpl');
+          }
+        %]
+      </table>
+
+    But that would mean to have hundreds of small files laying about.
+
+    "Text::Template::Library" allows you to include these subtemplates in
+    the main template:
+
+      [% define row %]
+        <tr>...</tr>
+      [% /define %]
+      <table>
+        [%
+          for (@rows) {
+            $OUT.=fill_in_module('row');
+          }
+        %]
+      </table>
+
+  Details
+    To make this module work with "Text::Template" as base class I had to
+    enhance it a bit. I have tried to contact the author M-J. Dominus
+    several times to get my patches into "Text::Template" but never got a
+    reply. In the end I decided to include a renamed and patched version of
+    "Text::Template" 1.45 with this distribution. It is named
+    Text::Template::Base. For more information about the changes see
+    ""Text::Template" patches" below.
+
+    So, strictly speaking "Text::Template::Library" is not anymore a derived
+    class of "Text::Template" but of "Text::Template::Base".
+
+    Other than with "Text::Template::Base" custom delimiters must be passed
+    to the "new()" method. Passing them to "fill_in()" is not supported.
+    Further, "SAFE" compartments are not (yet) supported.
+
+    The "Text::Template::Library" module inherits from
+    "Text::Template::Base". It overrides 2 methods, "_acquire_data" and
+    "fill_in". The first one reads the template and converts it to type
+    "STRING". After that is done our own "_acquire_data" greps out all parts
+    of the template that are included in a "DEFINE.../DEFINE" sequence.
+
+    The "DEFINE" statement consists of the current opening delimiter
+    followed by literally one space (except newline), the string "define",
+    again one space (except newline), the name of the macro that must match
+    "^\w+$", another space (except newline) and the closing delimiter. For
+    example:
+
+      { define name }   # assuming default delimiters
+
+    or
+
+      [% define name %]   # assuming DELIMITERS=>[qw/[% %]/]
+
+    The "/DEFINE" statement accordingly consists of the opening delimiter
+    followed by one space, the string "/define", another space and the
+    closing delimiter.
+
+    White spaces including newlines following the closing "/DEFINE"
+    statement are cut out of the template. So subsequent definitions like
+    these:
+
+      { define m1 }
+      ...
+      { /define }
+      { define m2 }
+      ...
+      { /define }
+
+    do not create additional white spaces (newlines) in the main template.
+    Otherwise you would have to write that this way:
+
+      { define m1 }
+      ...
+      { /define }{ define m2 }
+      ...
+      { /define }
+
+    Also, white spaces up to the first newline (including) following the
+    opening "DEFINE" statement are cut out. Hence, you can write
+
+      { define m1 }
+      ...
+      { /define }
+
+    instead of
+
+      { define m1 }...
+      { /define }
+
+    The subtemplates are created as "Text::Template::Base" objects not
+    "Text::Template::Library" objects. This made the parsing process a lot
+    simpler. But it denies nesting of "DEFINE" statements.
+
+    Subtemplates are evaluated in the same package as the parent template.
+    "OUTPUT", "EVALCACHE", "BROKEN", "BROKEN_ARG", "PREPEND" and "FILENAME"
+    settings are also passed from the parent template to subtemplates.
+
+  Methods
+    new creates a "Text::Template::Library" object.
+
+    fill_in
+        evaluates the template. Almost all parameters for
+        "Text::Template::Base::fill_in" are supported except "DELIMITERS"
+        (which must be passed to "new()") and "SAFE".
+
+        Prior to calling "Text::Template::Base::fill_in" this method
+        localizes $Text::Template::Library::T and stores there the current
+        template.
+
+        This variable can be used in subtemplates directly or indirectly via
+        "fill_in_module()".
+
+    module($name)
+        returns the compiled subtemplate named $name. The subtemplate is a
+        "Text::Template::Base" object, not "Text::Template::Library".
+
+    library($name, @params)
+        evaluates the subtemplate $name. @params are passed to
+        "Text::Template::Base::fill_in".
+
+        Unlike "Text::Template::Base::fill_in" this method throws an
+        exception if there was an error. So, it can be used in combination
+        with "OUTPUT", see Text::Template::Base.
+
+        If the "OUTPUT" option was given to the parent template "library"
+        returns an empty string on success, otherwise the computed string.
+
+        In templates you can use it this way:
+
+          $Text::Template::Library::T->library($name, @params);
+
+    fill_in_module($name, @params)
+        Shortcut for
+
+          $Text::Template::Library::T->library($name, @params);
+
+        to be used in templates.
+
+        But calling
+
+          Text::Template::Library::fill_in_module(...)
+
+        is not much of a shortcut. To make it work normally you can import
+        it into the package in which the template is evaluated:
+
+          { package Q; use Text::Template::Library qw/fill_in_module/; }
+          $tmpl->fill_in(PACKAGE=>'Q', ...);
+
+        or even simpler:
+
+          local *Q::call_module=\&Text::Template::Library;
+          $tmpl->fill_in(PACKAGE=>'Q', ...);
+
+        This way you can use "call_module()" like "fill_in_module()" in your
+        templates.
+
+  EXPORT
+    "fill_in_module" on demand.
+
+"Text::Template" patches
+    While working on the module I have dicovered a few bugs in
+    "Text::Template" 1.45. Further, some improvements were made. You'll find
+    all patches in the "patches" directory. For more information see the
+    doc.diff patch.
+
+    I have sent these patches to the author of "Text::Template", Mark Jason
+    Dominus but haven't yet received an answer.
+
+    None of my changes should break existing code working with
+    "Text::Template" 1.45.
+
+    Please apply all the patches to the "Text::Template" distribution prior
+    to running "make test" with this distribution.
+
+    The patches are applied in this order:
+
+      cd Text-Template-1.45
+      cp /path/to/Text-Template-Library-0.01/patches/*.diff .
+      patch -p0 <fi_ofn.diff
+      patch -p0 <evalcache.diff
+      patch -p0 <set_lineno.diff
+      patch -p0 <filename.diff
+      patch -p0 <newline_in_delimiter.diff
+      patch -p0 <doc.diff
+      patch -p0 <local_underscore.diff
+      make test
+      make install
+
+SEE ALSO
+    Text::Template::Base
+
+    Normally you won't want to use this module directly. See TX for a more
+    convenient way.
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008-2009 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,42 @@
+---
+abstract: 'check if Makefile.PL has the right pre-requisites'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::Builder::Tester: '0'
+  Test::More: '0.95'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Prereq
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Find: '0'
+  Module::Build: '0'
+  Module::Extract::Use: '0'
+  Test::Builder::Module: '0'
+  feature: '0'
+  lib: '0'
+  parent: '0'
+  perl: '5.022'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/briandfoy/test-prereq/issues
+  homepage: https://github.com/briandfoy/test-prereq
+  repository: https://github.com/briandfoy/test-prereq.git
+version: '2.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.37.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b4735ff1f9cd858ad2a1f20901094337262a7468 Changes
+SHA1 5a0229e9feccdcfdd95708d590b13829ce5f4614 Elapse.pm
+SHA1 a29427fb364e275bb22722f7adc4b3886db09581 MANIFEST
+SHA1 9f57aeafc540532b2f0a2ebfd69c1baeb6cb46b4 MANIFEST.SKIP
+SHA1 1ca7bf1f52da603768543bfd925b5f404fad7424 META.yml
+SHA1 c8d1541ea143b4c3ad27a7e4f212a1cf47e6f452 Makefile.PL
+SHA1 8b43d37d9929d47448e87116f99e896bdd57a83c README
+SHA1 215c6c2eef41f471467e7069c931394f238f1609 othertest/lapsetest.pl
+SHA1 30f5aa986fec6ec1061778ecac444d8fa4628740 t/0-signature.t
+SHA1 41dbd04f266658a99f31f4e96f58e7b05ec80b45 t/1-basics.t
+SHA1 3d7ddf6cb9a2c1984e29bf63078f10b61742e8b9 t/2-UTC.t
+SHA1 8407244dc827ce0fa65b16978a8217078e0f94f0 t/3-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (GNU/Linux)
+
+iD8DBQE/2jBglfQeTCNIWLARAhrnAJ9BkVDqJryHkPLrRBp+QE8ToVO/PQCfTqVW
+ggj+lETYMB84uI80aj51G7U=
+=a9yY
+-----END PGP SIGNATURE-----

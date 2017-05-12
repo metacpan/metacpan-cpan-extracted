@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Treex-PML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::ShareDir: '1.00'
+  File::Which: '0'
+  IO::Zlib: '0'
+  LWP::UserAgent: '0'
+  Test::More: '0'
+  UNIVERSAL::DOES: '0.004'
+  URI: '1.35'
+  XML::CompactTree: '0.03'
+  XML::LibXML: '1.69'
+  XML::Writer: '0.606'
+version: '2.22'

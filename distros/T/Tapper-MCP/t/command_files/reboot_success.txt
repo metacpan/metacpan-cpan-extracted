@@ -1,0 +1,22 @@
+---
+state: start-testing
+prc_number: 0
+---
+prc_number: 0
+state: reboot
+count: 0
+max_reboot: 2
+---
+prc_number: 0
+state: reboot
+count: 1
+max_reboot: 2
+---
+prc_number: 0
+state: reboot
+count: 2
+max_reboot: 2
+---
+prc_number: 0
+state: end-testing
+---

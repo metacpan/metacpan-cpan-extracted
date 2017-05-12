@@ -1,0 +1,5 @@
+#title No sections
+#author pippo no section
+#subtitle This is the subtitle but no section
+
+Here the body goes

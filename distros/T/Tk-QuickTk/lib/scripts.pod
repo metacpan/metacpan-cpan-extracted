@@ -1,0 +1,521 @@
+=head1 NAME
+
+Tk::QuickTk::scripts - exhaustive description of the syntax
+
+=head1 SYNOPSIS
+
+(example script, actually)
+
+  exec /usr/bin/perl -M'Tk::QuickTk=app' -e app $0;exit
+  m MainWindow         title:'QuickTk Minimal Demo'
+    mb Frame           side:top fill:x :
+      f Menubutton     side:left       : text:File
+        o command      label:Open sub:my($wid)=@_;
+                         ...my $out=$$w{mts};my $tf=$$w{mtf};
+                         ...$$gl{efile}=$tf->Show;$$gl{eww}=0;
+                         ...my $fh=new FileHandle "<$$gl{efile}";
+                         ...while(<$fh>) { $out->insert('end',$_); }
+                         ...close $fh;$out->yview('1.0');print "ok 2\n";
+        q command      label:Quit sub:print "ok 8\n";exit;
+      t Menubutton     side:left       : text:Tool
+        d command      label:'Directory Listing'
+                         ... sub:$$gl{widgets}{mts}->insert('end',
+                         ...  `pwd`);$$gl{widgets}{mts}->insert('end',
+                         ...  `ls -alF`);print "ok 3\n";
+        s command      label:Satisfaction sub:print "ok 4\n";
+      h Menubutton     side:right      : text:Help
+        a command      label:About sub:$$gl{widgets}{mts}->insert('end',
+                         ... 'this is a demo of perl module Tk::QuickTk');
+                         ... print "ok 5\n";
+    tb Frame           side:top fill:x :
+      d Button         side:left       : text:Dir
+                       ... sub:$$w{mts}->insert('end',`ls -alF`);
+                       ... print "ok 6\n";
+      q Button         side:left       : text:Geom sub:$$w{mts}->insert('end',
+                       ... "geom: ".$$w{m}->geometry."\n");
+                       ... print "ok 7\n";
+    ts Scrolled        side:top fill:both expand:1 : Text: scrollbars:osoe
+    tf FileSelect      nopack                      : directory:.
+
+A nearly identical version of this script is delivered in ready-to-execute
+form as a file called "test.pl" for testing the install of the current
+module.  Before "make install" is performed this script should be runnable
+with "make test". After "make install" it should work as "perl test.pl".
+
+  The differences are that the executable form lacks the first line, above,
+and is embedded as an explicitly-coded data structure -- and when it is
+executed, it displays instructions for a series of actions to take to
+test a few of its behaviors.  Several of these actions add information to
+the main (bottom) text window, that you'd need to scroll-down to view.
+
+  Executing that script, as described, works if your current directory is
+the one in which the module build occurred.  Try executing the command,
+"locate Tk::QuicTk" to find where the build occurred (which would depend
+on your having the "locate" command installed as well).
+
+
+=head1 DESCRIPTION
+
+This document attempts to completely specify the B<QuickTk> mini-language.
+Everything you need to know to write GUI applications with this module
+should appear here, assuming you are familiar with the B<perl-tk> (the
+F<Tk.pm> module, and friends) library to which B<QuickTk> provides simpler
+access.
+
+B<Note 1:> The best way to get acquainted with how to write scripts is,
+of course, to look at examples.  Several of them are provided, chosen
+to be representative of a wide range of features exercised.  A plan is
+afoot to reference them directly in documentation, where features are
+described and, perhaps, vice-versa.
+
+B<Note 2:> Current documentation describes a number of unix-specific
+features and ways of operating, without identifying them as non-portable.
+(witness the next couple of paragraphs, for instance) B<QuickTk> works
+well in other contexts, but we've been slow about properly flagging the
+caveats.  The plan is to correct the documentation soon.
+
+The most common way to use B<QuickTk> is to make a script in a file whose
+first line is the following (Make sure the absolute path reference to
+your perl binary executable is correct, though.):
+
+  exec /usr/bin/perl -M'Tk::QuickTk=app' -e app $0;exit
+
+When the script is executed by your shell, this should cause perl to
+be started (without creating a new process), bringing in the B<QuickTk>
+module and asking it to import the B<app()> function into the B<main::>
+namespace.  Then it executes B<app()> and makes the name of your script
+(F<$0>, above) the first (the only) command-line argument to the executing
+perl program.  The B<app()> function will request module B<Text::TreeFile>
+to come back and read your script into a tree-of-text-strings data structure
+(respecting comments, continuation lines, include-file requests, and strict
+two-space-per-level indentation to indicate parent-child nesting of tree
+nodes) which will then be interpreted and executed by B<QuickTk> as a GUI
+application specification, where each text string is taken to specify a
+widget or event binding.  See L<Text::TreeFile(3pm)> for more details of
+that format, and L<Tk(3pm)> and manpages for the other F<Tk::*(3pm)>
+modules, for information about the functionality available to your
+application.
+
+=head1 APPLICATION VARIABLES
+
+B<QuickTk> provides a hash, returned by the B<new()> constructor, which
+is blessed into the B<Tk::QuickTk> class as a namespace for variables
+which are "global" to the application.  Perl code included in the script
+will be evaluated in a context which provides both a reference to this
+hash (as variable, F<$gl>), and a reference to another hash within it
+(as variable, F<$w>, which is short for, and synonymous with,
+F<$$gl{widgets}>) for convenience.
+
+The upshot of this is that the following conventions are enabled, for
+referring to variables (objects) in B<QuickTk>.  First, to use a global
+variable named "var", you specify the syntax, F<"$$gl{var}">.  Second, to
+indicate a variable by reference (used in "-textvariable" options, for
+instance) you specify the syntax, F<"\$$gl{var}">, for the example variable
+mentioned above.  Third, to refer to a widget previously created, you
+use the name you specified as the very first field in the spec for that
+widget ("m", in the first example line, below) as the key to either the
+F<"$gl-E<gt>{widgets}"> hash (e.g. F<$$gl{widgets}{m}>,
+or F<$gl-E<gt>{widgets}-E<gt>{m}>) or for short, to the F<"$w"> hash (e.g.
+F<$$w{m}>, or F<$w-E<gt>{m}>), for the B<MainWindow> widget specified in the
+first example line, below.  This is commonly done for the purpose of
+accessing object methods of a widget.
+
+Here are several examples of using application variables:
+
+=head2 Example of referencing an already-created widget
+
+First, a B<QuickTk> spec makes a main window, with a title:
+
+  m MainWindow title:'QuickTk Demonstration Application'
+
+then, later, some code (in a callback, perhaps) gets executed:
+
+  $$w{m}->configure(-title=>'QuickTk (updated) Demo App');
+  print "The MainWindow title is now: ",
+        $$gl{widgets}{m}->cget(-title),"\n";
+
+Note that, above, the "m" in F<$$w{m}> and in F<$$gl{widgets}{m}>
+is a direct reference to the "m" which is the first field in the
+B<QuickTk> widget spec shown just previously.
+
+Also note that the B<MainWindow> is referred-to both via the
+short F<$$w{m}> form and the longer, more explicit,
+F<$$gl{widgets}{m}> form, in different places.
+
+The name by which you refer to a widget in your code ("m", in the
+example above) will be the concatenation of all the ancestors' names,
+and the one for the current widget, as specified in the name field of
+your script's widget spec.  Thus, note in the example in L<"SYNOPSIS">,
+a widget is accessed using the name, I<"mts">, as: F<"$$gl{widgets}{mts}">
+while the widget is identified with only I<"ts"> in the script.  This
+is because the I<"ts"> widget is a child of parent I<"m">, yielding
+I<"mts"> as the fully qualified, complete name.
+
+=head2 Example of keeping a label updated, directly from an entry field
+
+These two B<QuickTk> widget specs may occur in widely separated parts
+of the user interface for an application:
+
+  mce Entry pack:left : textvariable:\$$gl{inp}
+  mcp Label pack:left : textvariable:\$$gl{inp}
+
+As text is typed into the B<Entry> widget, it will show immediately
+(simultaneously) in the B<Label> widget.
+
+=head2 Example of updating a label on demand, from an entry field
+
+Text entered into the B<Entry> widget will be kept in the variable
+named "input", and the B<Label> widget will show text from the variable
+named "display".  Only when the B<Button> is pressed will the text in the
+variable named "input" get copied into the variable named "display" and,
+thus, be displayed by the B<Label>.
+
+  mce Entry pack:left : textvariable:\$$gl{input}
+  mcp Label pack:left : textvariable:\$$gl{display}
+  mcb Button pack:left : text:Update sub:$$gl{display}=$$gl{input};
+
+=head1 SCRIPT SYNTAX
+
+The remainder of this document is devoted to enumerating and describing
+use of the (mostly syntactic) features that the B<QuickTk> language provides.
+We will call each node of the tree representing your GUI specification
+either a "node", a "widget spec", or a "spec" (for short).  There are some
+commonalities among all specs, but differences are important among the
+formats of the four basic spec types:
+
+=head2 (1) the 'toplevel' spec type
+
+Either a B<MainWindow> or a B<TopLevel> widget spec.
+
+=head2 (2) the 'menu item' spec type
+
+This type refers to widgets that are children of a B<Menubutton>
+or B<Menu> widget.  The B<Tk> library provides five of these,
+as described subsequently in this document.
+
+=head2 (3) the 'event binding' spec type
+
+This is sometimes referred to as an I<event> or I<binding>, for short.
+This type is a spec that's not a widget but, rather, a binding of an action
+to a particular event that may occur in the parent widget's window.
+
+=head2 (4) the 'generic widget' spec type
+
+This type of spec is sometimes called just I<widget>, for short.
+This is the most common spec, referring to any other widget in the
+B<Tk> library's repertoire not mentioned in the first three categories.
+
+=head2 Spec Forms
+
+All specs are of the form:
+
+    <ID section> <arguments section>
+
+and the arguments section can have either or both of:
+
+                 <packing options> : <configuration options>
+
+although the composition of each (ID or arguments) section will be
+somewhat different among the four main spec types.  Options are all
+specified as:
+
+                 <option name>:<option value>
+
+but note that the colon (":") character, above, B<must not> have any
+surrounding spaces while the one separating the configuration options
+from the packing options (shown previously) B<must> be surrounded by
+spaces.
+
+Looking at the examples provided will give the best introduction to
+writing specifications, but this document offers precise definition of
+the conventions for reference use.  Of course, the module code is
+relatively brief, so reading that can be a practical arbiter in case
+of failure to communicate on the part of this document.
+
+We'll describe the differences among the four main spec types first
+for the ID section, and next for the arguments section.  Then, we will
+enumerate the details (held in common among all the spec types) of
+specifying option arguments.
+
+=head1 ID SECTION
+
+The ID section always follows the indentation and is delimited from
+any following arguments by spaces.  The differences, for each main spec
+type are as follows:
+
+=head2 Toplevel and Generic Widget Specs
+
+The ID section for these specs has two parts, delimited by spaces.
+The first part is a name that will be used as a hash key to allow the
+application to refer directly to the widget subsequently to its
+creation.  The second part is the name of the widget type (chosen from
+the B<perl-tk> library documentation) for the widget to be created.  e.g.
+B<Button>, B<Menubutton>, B<MainWindow>, or B<TopLevel>.
+
+=head2 Menu Item Widget Specs
+
+The ID section for these specs has two parts, delimited by spaces.
+The first part is a name that will be used to construct a hash key to
+allow the application to refer directly to the widget subsequently to
+its creation.  The second part can be either a single character indicating
+one of the five widget types provided by B<Tk>, or the name that B<Tk>
+uses, itself, as shown in the chart below.  The widget types allowed are:
+
+ letter  Tk name         description of effect when menu item is chosen
+ ------  -----------     -----------------------------------------------
+     c   command      -- an action to perform
+
+     m   cascade      -- a submenu to post
+
+     -   separator    -- no action (separates groups of menu items)
+
+     k   checkbutton  -- sets values of any of several boolean variables
+
+     r   radiobutton  -- sets one of several values for a variable
+
+=head2 Event Binding Specs
+
+The ID section for these specs has only a single part, recognized by
+surrounding angle brackets ("E<lt>" and "E<gt>").  This part identifies
+the event (which may occur in the parent widget's window) that is to be
+bound to the action specified in the arguments section.  Examples of
+events are:  "E<lt>TabE<gt>", "E<lt>CRE<gt>", "E<lt>ButtonE<gt>",
+"E<lt>Double-ClickE<gt>", "E<lt>Right-ClickE<gt>", "E<lt>AE<gt>"
+and "E<lt>Ctrl-AE<gt>".
+
+=head1 ARGUMENTS SECTION
+
+The ID section always follows the indentation and is delimited from
+any following arguments by spaces.  The differences, for each main spec
+type are as follows:
+
+=head2 Generic Widget Specs
+
+There are three formats, depending on whether you have options in
+both, or just one category:
+
+       <packing options> : <configuration options>
+       : <configuration options>
+       <packing options>
+
+=head2 Toplevel and Menu Item Widget Specs
+
+These widget types take no E<lt>packing optionsE<gt>, so the format
+is simple:
+
+       <configuration options>
+
+=head2 Event Binding Specs
+
+This kind of spec only needs the action to be bound to the event:
+
+       <action bound to event>
+
+=head1 OPTION SPECS
+
+There are six variations of the form of a single item in the list of
+E<lt>packing optionsE<gt> or E<lt>configuration optionsE<gt> in the
+E<lt>arguments sectionE<gt>, as follows.  The E<lt>option nameE<gt>
+and E<lt>option valueE<gt>, except where noted as otherwise, are
+always chosen from available possibilities documented in the B<perl-tk>
+documentation.  The six syntax variations are:
+
+=head2 (1) The generic case, for an option spec
+
+The most generic case, if none of the other cases applies, has
+an E<lt>option nameE<gt> and an E<lt>option valueE<gt>, neither
+of which contains embedded space characters.  These are separated
+by a colon (":") character which has no space characters adjacent
+to it.  The format is:
+
+       <option name>:<option value>
+
+=head2 (2) The option value contains embedded spaces
+
+The E<lt>option valueE<gt> may be single-quoted, to allow embedded
+space characters within it.  The format is:
+
+       <option name>:'<option value>'
+
+<option value> may be null or not.  This is handled differently,
+depending on whether it occurs as a packing or configuration option.
+
+=head2 (3) The option value is absent, but the colon is specified
+
+The E<lt>option valueE<gt> may be absent.  This is used for lone (not
+of the E<lt>nameE<gt>=E<gt>E<lt>valueE<gt> form) leading arguments to
+the configuration or geometry manager functions in B<perl-tk>.  The
+format is:
+
+       <option name>:
+
+This is handled differently, depending on whether it occurs as a
+packing or configuration option.
+
+=head2 (4) The option value is absent, and the colon is omitted
+
+The E<lt>option valueE<gt> may be absent, and the colon delimiter
+omitted, in certain cases (for the ones not specially introduced by
+B<QuickTk>).  The format for these option items is, simply:
+
+       <option name>
+
+This applies to any option name that's not a <special option>
+
+=head2 (5) Special options; there is no colon, nor an option value
+
+B<QuickTk> introduces some special-function E<lt>option nameE<gt>
+choices, to enable a way for a script to invoke functionality the
+generic form of the syntax doesn't provide.  These occur only in
+a list of E<lt>packing optionsE<gt>.  The format for these option
+items is, simply:
+
+       <special option>
+
+There are five of these special-function <option name> choices.
+Their names and meanings are:
+
+=over 4
+
+=item (1) 'nocreate'
+
+This widget spec should be remembered for use later, but should
+not be created on startup.  A callback specified as the action for
+some widget or event may call the I<createwidget> function to
+create instances of this widget when it is needed.
+
+=item (2) 'nopack'
+
+This widget should be created, but not mapped to the screen to
+become visible on startup.  It may be made visible on demand, later.
+
+=item (3) 'pack'
+
+This is the default case, and is usually omitted.  The possibility
+for specifying it explicitly is included only for consistency.
+
+=item (4) 'place'
+
+The B<place()> geometry management function should be used instead
+of B<pack()>.  The other E<lt>packing optionsE<gt> are passed to
+the placer, rather than the packer.
+
+=item (5) 'grid'
+
+The B<grid()> geometry management function should be used instead
+of B<pack()>.  The other E<lt>packing optionsE<gt> are passed to
+the gridder, rather than the packer.
+
+=back
+
+=head2 (6) Special 'last' options; simplify syntax for longer values
+
+B<QuickTk> introduces a some additional special-function
+E<lt>option nameE<gt> choices, that may occur B<only> as the
+very last option in a spec node.  These, thus, allow embedded
+spaces, and are processed specially for extra convenience.  As it
+turns out, these occur only in the E<lt>configuration optionsE<gt>
+list of the E<lt>arguments sectionE<gt>.  The format is:
+
+       <last option>:<everything to the end of the spec>
+
+There are four of these special <option name> choices, each of which
+  applies only to certain widget types, as indicated:
+
+=over 4
+
+=item 'ini' (MainWindow widget)
+
+The entire string after the colon will be executed as perl code,
+immediately.  This allows a script to initialize variables, etc.
+
+=item 'ttl' (MainWindow or TopLevel widget)
+
+The entire string after the colon will become the "-title"
+configuration option for the widget.  This allows long titles to
+contain embedded space characters, without having to be explicitly
+quoted.
+
+=item 'cmd' (generic or menuitem widget)
+
+The entire string after the colon will be parsed as of either of
+the following forms:
+
+        <function> ( <args> )
+  or:   <function>
+
+where E<lt>functionE<gt> must not contain embedded space or
+parenthesis ("(") characters and may be followed by space
+characters, and a character string surrounded by parentheses
+("(" and ")") may optionally be present.  This will be reformatted
+to become a "-command" configuration option to the widget which
+specifies a callback in the form:
+
+        "-command"=>[main::<function>,$gl,<args>]
+
+This makes the callback refer to a function defined in the
+B<main::> namespace, which is called with an implicit reference
+to the B<QuickTk> blessed hash as its first argument (somewhat like
+an object method), to allow the function code to access effectively
+"global" variables for the application.  (See L<"APPLICATION VARIABLES">,
+above.)
+
+=item 'sub' (generic or menuitem widget)
+
+The entire string after the colon will be surrounded with "sub { "
+and " }", and thus evaluated as an anonymous function callback as the
+value of a "-command=E<gt>" configuration option to the widget.
+
+=back
+
+=head1 GENERATED CODE
+
+The generated B<perl-tk> code, for arguments to the widget configuration
+function or the geometry management function will be as:
+
+=head2 option name usually gets initial hyphen, and is quoted
+
+E<lt>option nameE<gt> becomes "-E<lt>option nameE<gt>"=E<gt> if it has
+a value specified.
+Otherwise, it (a stand-alone option) is simply surrounded by double-quote
+characters.
+
+=head2 packing option values are quoted
+
+All values specified for packing options are surrounded with double-quote
+characters.
+
+=head2 most configuration option values get quoted
+
+Generally, values for configuration options will be surrounded with
+double-quote characters.  The exceptions are:
+
+=over 4
+
+=item values starting with a dollar-sign character
+
+A value which has "$" as its first character is taken to
+indicate a variable in B<QuickTk>'s hash whose key is what follows
+the "$", so it is modified to: $$gl{<option value without "$">}.
+
+=item values starting with the back-slant character
+
+A value which has "\" as its first character is taken to
+indicate a variable in B<QuickTk>'s hash whose key is what follows
+the "\", so it is modified to: \$$gl{<option value without "\">}.
+
+=item values surrounded with square brackets
+
+A value which is surrounded with "[" and "]" is taken to be
+a reference to an anonymous array specifying a callback and its
+arguments, and is used as-is.
+
+=item a null string value specified with single-quotes
+
+A value which is a null string specified as "''" will be used as-is.
+This is a way of making sure the option name is not interpreted
+specially as a lone option even when the value should be empty.
+
+=back
+
+=cut

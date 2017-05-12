@@ -1,0 +1,103 @@
+When setting up a web site as described in chapter 11 of the <i>Badger
+Book</i>, you use a work area where three directories are particulary
+important.
+
+<p>Directory <code>src</code> is where you put the templates that will
+produce the actual HTML pages for the site. In general, each template
+in this directory will produce exactly one HTML document.
+
+<br>When these templates are processed, they make use of library
+templates and other tools that reside in the <code>lib</code>
+directory.
+
+<br>Finally, the resultant HTML documents will be put in directory
+<code>html</code>.
+
+<p><b>Template::TT2Site</b> supports this process in the following
+ways:</p>
+
+<ul>
+  <li>It sets up the basic
+      structure of the work area: the <code>src</code>
+      and <code>lib</code>
+      directories, and populates them with start data. The <code>html</code>
+      directory will be created automatically later. </li>
+  <li>It will configure the
+      information so that library materials can come from <i>two</i>
+      sources: from your <code>lib</code>
+      directory, or from a library that <b>Template::TT2Site</b>
+      provides for you. Since in normal cases you will use many library
+      templates 'as is', you need only provide the templates that differ from
+      the standard version. </li>
+  <li>It will perform the
+      necessary steps to process your templates into HTML files in the <code>html</code>
+      using one simple command: <b>tt2site</b>. </li>
+</ul>
+
+<p>By default, <b>tt2site setup</b> creates the following
+subdirectiories in <code>src</code>:</p>
+
+<pre>    src/images
+    src/css<br></pre>
+
+<p><code>css</code> contains the style sheet for the site. As you
+might guess, you can edit <code>css/site.css</code> to change a number
+of aspects of the look of your website.
+
+<p>You will also notice that an <code>etc</code> directory has been
+created, with a single file in it:</p>
+
+<pre>    etc/ttree.cfg
+</pre>
+
+This file is the configuration for the <code>ttree</code> processor
+that is used internally by <code>tt2site</code>. You shouldn't need to
+modify this.
+
+<b>Note:</b> If you moved your TT2Site installation, it is possible
+that you get the following errors:
+<pre>   ! file error - config/main: not found
+</pre>
+This may indicate that the location registered in
+<code>etc/ttree.cfg</code> is no longer valid. If this case, you need
+to vidually inspect its contents, and correct any invalid locations.
+
+<p>What you do need to modify are the files in the <code>lib</code>
+directory: </p>
+<pre>    lib/config/site
+    lib/config/images<br></pre>
+
+The standard library resides under the <code>lib</code> directory of
+the <b>Template::TT2Site</b> installation. Its major subdirectories
+are <code>config</code> (configuration data), <code>page</code> (page
+formatting), and <code>util</code> (utility functions).
+
+<p>For the time being, the contents of the files need to be taken as a
+guide how to write your own. Here is a short description of some
+files:</p>
+
+<dl>
+  <dt><code>config/main</code></dt>
+  <dd>This file controls which
+      other files from the site directory are taken into account.</dd>
+  <dt><code>config/site</code></dt>
+  <dd>The site data like title and
+      subject. This file must be overridden with actual data.</dd>
+  <dt><code>config/images</code></dt>
+  <dd>The definition of images to
+      be used with the util/image template function.</dd>
+  <dt><code>config/lang</code></dt>
+  <dd>The definition of the
+      languages to be used by this site.</dd>
+  <dt><code>page/wrapper</code></dt>
+  <dd>This file controls what
+      templates are applied when processing user files.</dd>
+  <dt><code>page/html</code></dt>
+  <dd>This template provides the
+      general HTML structure of the generated pages.</dd>
+  <dt><code>page/layout</code></dt>
+  <dd>This template defines the
+      structure of the generated pages. It uses the familiar table approach
+      with cells containing the logo, header, menu, contents, footer, and so
+      on.</dd>
+</dl>

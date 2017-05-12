@@ -1,0 +1,66 @@
+Text-Statistics-Arabic version 0.04
+==========================================
+
+ABSTRACT
+
+This module performs corpora(1) statatistical analysis.
+
+DESCRIPTION
+
+Text::Statistics::Arabic creates a seven column CSV file output, with one line
+each token per text, given as input a latin-utf8 coded corpus that files
+names follows:
+    1 (1). txt', '1 (2). txt', ..., '1 (n).txt'  or
+    1 \(([1-9]|[1-9][0-9]+)\)\.txt
+Columns stores statistical information:
+(1) number of word forms in document d;
+(2) number of tokens in d;
+(3) Id number of d, ie., n;
+(4) frequency of term t in d;
+(5) corpus frequency(2) of t ;
+(6) document frequency of t (number of documents where t occurs at least once);
+(7) t, UTF8 latin-coded token-string
+
+Main output file name is '1 (n + 5).txt' and it is stored in the same directory as
+the corpus itself, together with residual files on each input file with .txu and .txv ad hoc extensions.
+
+Example:
+
+    use Text::Statistics::Arabic;
+    &arabic("4"); #3, i.e (4-1) texts will be analysed.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	utf8
+	Text::ParseWords
+
+SEE ALSO
+
+	http://search.cpan.org/~ambs/
+	http://search.cpan.org/~tpederse/
+	
+
+REFERENCES
+
+(1) BERBER-SARDINHA, Tony. Linguistica de Corpus. Manole, 2004
+(2) http://www-csli.stanford.edu/~schuetze/information-retrieval-book.html
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Rodrigo Panchiniak Fernandes
+This code was written under CAPES BEX-09323-5
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

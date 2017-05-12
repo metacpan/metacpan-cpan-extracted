@@ -1,0 +1,36 @@
+---
+abstract: 'Verify dependencies in META.yml or cpanfile'
+author:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+build_requires:
+  Test::More: '1.30'
+  Test::Needs: '0'
+configure_requires:
+  CPAN::Meta::Requirements: '2.120620'
+  ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Dependencies
+optional_features:
+  Heavy:
+    description: '"Heavy" dependency search policy'
+    requires:
+      B::PerlReq: '0'
+      PerlReq::Utils: '0'
+  Legacy:
+    description: 'Legacy (no-arguments) ok_dependencies() invocation'
+    requires:
+      CPAN::Meta: '0'
+      File::Find::Rule::Perl: '0'
+requires:
+  Pod::Strip: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/ehuelsmann/perl-Test-Dependencies/issues
+  repository: https://github.com/ehuelsmann/perl-Test-Dependencies.git
+version: '0.23'

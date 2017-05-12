@@ -1,0 +1,59 @@
+{
+   "abstract" : "Test2 plugin to test with the encoding of the terminal",
+   "author" : [
+      "magnolia <magnolia.k@icloud.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test2-Plugin-TermEncoding",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.66"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.66"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::Encoding" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000070"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/magnolia-k/Test2-Plugin-TermEncoding/issues"
+      },
+      "homepage" : "https://github.com/magnolia-k/Test2-Plugin-TermEncoding",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/magnolia-k/Test2-Plugin-TermEncoding.git",
+         "web" : "https://github.com/magnolia-k/Test2-Plugin-TermEncoding"
+      }
+   },
+   "version" : "0.000002",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl  -T
+
+################################################################################
+#
+# $Id$
+#
+# Print the status of all jobs that are scheduled to run today.                 
+#
+################################################################################
+
+use strict;
+use warnings;
+use TaskForest;
+
+
+my $task_forest = TaskForest->new(TF_JOB_DIR => "unnecessary", TF_RUN_WRAPPER=>"unnecessary");
+
+
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+
+my $today = sprintf("%d%02d%02d", $year + 1900, $mon + 1, $mday);
+
+
+if ($task_forest->{options}->{date}) {
+    if ($task_forest->{options}->{date} eq $today) {
+        $task_forest->status();
+    }
+    else {
+        $task_forest->hist_status($task_forest->{options}->{date});
+    }
+}
+else {
+        $task_forest->status();
+}    
+    
+
+
+
+

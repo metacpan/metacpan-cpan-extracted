@@ -1,0 +1,41 @@
+.gitignore
+Changes
+docs/metadata/blurb
+docs/metadata/description
+docs/metadata/metadata.json
+docs/metadata/notices
+docs/metadata/quote
+docs/metadata/README
+docs/metadata/requirements
+examples/generate-colors
+lib/Term/ANSIColor.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/data/perl.conf
+t/data/perlcriticrc
+t/data/perltidyrc
+t/docs/pod-coverage.t
+t/docs/pod-spelling.t
+t/docs/pod.t
+t/docs/synopsis.t
+t/docs/urls.t
+t/lib/Test/RRA.pm
+t/lib/Test/RRA/Config.pm
+t/module/aliases-env.t
+t/module/aliases-func.t
+t/module/basic.t
+t/module/basic256.t
+t/module/eval.t
+t/module/stringify.t
+t/style/coverage.t
+t/style/critic.t
+t/style/minimum-version.t
+t/style/strict.t
+t/taint/basic.t
+THANKS
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

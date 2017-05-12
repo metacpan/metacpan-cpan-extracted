@@ -1,0 +1,116 @@
+Revision history for Perl extension Test-Script
+
+1.18      2017-04-12 07:01:14 -0400
+  - Production release identical to 1.17_02 release.
+
+1.17_02   2017-04-10 08:39:46 -0400
+  - Use three argument open
+
+1.17_01   2017-04-10 06:51:38 -0400
+  - Handle scripts with -T taint mode (gh#13)
+
+1.16      2017-03-04 12:16:10 -0500
+  - Stricter useage of plans.
+
+1.15      2017-02-14 07:08:51 +1100
+  - Fix bug where list reference arguments to script_compiles
+    and script_runs are modified (gh#9)
+
+1.14      2016-10-13 11:04:48 -0400
+  - Fix a regex in a test that fails on recent versions of
+    Test2 on Windows (possibly others) (gh#8)
+  - One of the tests was unreasonably slow, so it does
+    not get run for users, but will be used for development
+    only
+  - Remove warning condition that happens with at least some
+    older versions of Perl when using quotemeta without
+    parentheses (gh#7 Thanks Brendan Byrd)
+
+1.12      2016-05-02 11:18:01 -0400
+  - Production release identical to 1.11_03 release.
+
+1.11_03   2016-04-28 06:45:52 -0400
+  - Check for IO errors on temporary .pm file
+
+1.11_02   2016-04-27 13:15:35 -0400
+  - One possible fix for gh#5 
+    (see https://github.com/plicease/Test-Script/issues/5)
+
+1.11_01   2016-04-27 12:28:33 -0400
+  - Including some optional Test2 based tests that should 
+    only be run with a merged Test2 / Test::Builder
+    (currently a dev release as Test::Simple on CPAN)
+
+1.10      2015-05-12 05:15:41 -0400
+  - Work around for buggy IPC::Run3 0.048 on MSWin32
+    On Windows we probe for and mitigate a bug in IPC::Run3
+    (see https://github.com/plicease/Test-Script/issues/1 for details)
+    with the intention of removing the workaround if/when IPC::Run3
+    is fixed.
+
+1.09      2015-05-07 16:44:26 -0400
+  - If IPC::Run3::run3 throws an exception it will now fail the test
+    (with a helpful diagnostic) rather than crashing the test script.
+  - A script that is killed with a singnal is now considered a failure
+    as well.
+  - Use alternate expected exit and signal values with options as the
+    second argument to script_runs.
+  - Ability to pass input via stdin to the script with script_runs.
+  - Ability to capture stdout and stderr from script with script_runs.
+  - Functions to test stdout and stderr:
+      script_stdout_is
+      script_stdout_isnt
+      script_stdout_like
+      script_stdout_unlike
+      script_stderr_is
+      script_stderr_isnt
+      script_stderr_like
+      script_stderr_unlike
+
+1.08      2015-05-06 05:09:13 -0400
+  - Now works with or without blib (rt81222, rt102743)
+  - Compatability with older versions of Test::Builder::Tester (rt81335)
+  - Requires Perl 5.6.0
+  - Migrate to Dist::Zilla
+
+1.07 Tue 24 Nov 2009
+  - Second attempt at fixing the "Using" bug
+
+1.06 Wed 16 Sep 2009
+  - Update test to allow different die() return values
+  - Move Test::More to runtime dependency
+
+1.05 Mon 14 Sep 2009
+  - Changed script_compiles_ok to script_compiles
+  - Added script_runs
+
+1.04_03 Thu 18 Dec 2008
+  - Another attempt to support 5.6 properly
+
+1.04_02 Wed 17 Dec 2008
+  - Test tweak to support 5.6 properly
+
+1.04_01 Tue 16 Dec 2008
+  - Updated to Module::Install 0.77
+  - Adding dependency on Probe::Perl
+  - Full fidelity failure testing
+
+1.03 Fri 29 Feb 2008
+  - Updated to Module::Install 0.68
+  - Incremental release to get updated author tests
+
+1.02 Sun 15 Oct 2006
+  - Adding diagnostics to failing cases
+  - Add -Mblib to the call to perl
+
+1.01 Sun  1 Oct 2006
+  - Making the Makefile.PL NOT executable
+
+1.00 Sun  3 Sep 2006
+  - Converted the test scripts to full blown Test::Builder::Tester tests
+  - Made the tests more comprehensive
+  - The 0.01 version was returning false positive test results
+  - Force warnings on in test scripts
+
+0.01 Tue 18 Jul 2006
+  - Created the initial implementation

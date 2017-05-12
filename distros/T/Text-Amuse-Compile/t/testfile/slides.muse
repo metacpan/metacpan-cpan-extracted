@@ -1,0 +1,65 @@
+#title test
+#slides 1
+#author Marco
+#subtitle Another test
+#date 2015
+#source now
+
+** Chapter
+
+*** Section
+
+ desc~ :: $%&][}{_^#
+ $%&][}{_^#~ :: def~
+
+   АБВГДЃЕЖЗЅИЈКЛЉМНЊ    абвгдѓежзѕијклљмнњ
+
+   **ОПРСТЌУФХЦЧЏШ ЁЀЍЙ**    *абвгдѓежзѕијклљмнњ*  **абвгдѓежзѕијклљмнњ**
+
+   ***АБВГДЃЕЖЗЅИЈКЛЉМНЊ   абвгдѓежзѕијклљмнњ***
+
+*** Section 2
+
+ desc3 :: def 3
+
+   *АБВГДЃЕЖЗЅИЈКЛЉМНЊ*
+
+   ОПРСТЌУФХЦЧЏШ ЁЀЍЙ
+
+ 1. test
+
+ desc4 :: def 4
+
+** Chapter 2
+
+*** Code
+
+=test= me *emph* **bold** ***emph bold***
+
+<example>
+cpanm --install-deps č ì Đ ~.
+find . -iname * {} \;
+АБВГДЃЕЖЗЅИЈКЛЉМНЊ
+ОПРСТЌУФХЦЧЏШ ЁЀЍЙ
+$%&][}{_^#
+</example>
+
+*** Lists
+
+ 1. first
+ 2. second
+ 3. third
+
+*** Ignored
+
+; noslide
+
+This section is ignored
+
+
+*** Another list
+
+ - one
+ - two
+ - three
+

@@ -1,0 +1,17 @@
+Revision history for Thread-SigMask
+
+0.004     2014-03-06 23:33:16CET+0100 Europe/Amsterdam
+          Switched back to Exporter
+
+0.003     2011-09-15 01:24:38 Europe/Amsterdam
+          Converted to Dist::Zilla
+          Allow subclasses of POSIX::SigSet
+          Handle 5.15.3's new POSIX::SigSet representation
+          Fixed documentation
+
+0.002   2010-09-07
+        Made sigmask's return value like sigprocmask's
+
+0.001   2010-09-06
+        First version, released on an unsuspecting world.
+

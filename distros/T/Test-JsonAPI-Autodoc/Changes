@@ -1,0 +1,38 @@
+Revision history for Perl extension Test-JsonAPI-Autodoc
+
+0.22 2015-05-30T03:53:42Z
+
+    - Fix bug about multi-byte characters (@satetsu888++)
+
+0.21 2015-02-27T04:32:13Z
+
+    - Force to sort order of a response parameters of generated API documentations (@meru-akimbo).
+
+0.20 2014-01-12T15:34:11Z
+
+    - Change to return the response by test methods
+    - Result of the test became pretty! (@y-uuki++)
+    - Add some types into description of request parameters (@y-uuki++)
+    - Change to describable request parameters (EXPERIMENTAL!)
+
+0.11 2013-11-04T13:50:46Z
+
+    - Update default markdown template
+    - Add some samples
+    - Change inner structure of module
+
+0.10 2013-11-03T14:53:37Z
+
+    - Support `Plack::Test`
+    - Fix tiny bugs
+    - Improve markdown template
+
+0.06 2013-11-02T17:32:20Z
+
+    - Add documents.
+    - Fix some bugs.
+
+0.01 2013-11-01T20:10:07Z
+
+    - original version
+

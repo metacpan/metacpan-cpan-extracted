@@ -1,0 +1,9 @@
+0.02 2015-10-29T22:56:13+01:00
+ - Add LICENSE file.
+ - Add Test::NoWarnings to tests.
+ - Fix DEPENDENCIES section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+
+0.01 2015-08-24T12:49:41+02:00
+ - First version.

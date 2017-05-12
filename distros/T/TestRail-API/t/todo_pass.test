@@ -1,0 +1,6 @@
+use Test::More 'tests' => 2;
+pass("yay!");
+TODO: {
+    local $TODO = 'Ez duz it';
+    ok(1,'ruh roh');
+}

@@ -1,0 +1,5 @@
+name = "Test-Docker-Image"
+badges = ["travis", "coveralls"]
+readme_from="lib/Test/Docker/Image.pm"
+module_maker="ModuleBuildTiny"
+

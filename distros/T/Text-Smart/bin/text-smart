@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+# -*- perl -*-
+# Text::Smart by Daniel Berrange <dan@berrange.com>
+#
+# Copyright (C) 2000-2008 Daniel P. Berrange <dan@berrange.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+
+use strict;
+use warnings;
+
+use Text::Smart;
+use Text::Smart::HTML;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $format = "html";
+my $help = 0;
+
+unless (GetOptions("format=s" => \$format,
+	'help|?' => \$help)) {
+    pod2usage(1);
+    return;
+}
+pod2usage(-exitstatus => 0, -verbose => 2) if $help;
+
+if ($format ne "html") {
+    print STDERR "Unsupported output format: $format\n";
+    exit 2;
+}
+
+$/ = undef;
+
+my $p = Text::Smart::HTML->new();
+
+my $data = <>;
+
+print $p->process($data);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+text-smart - process data in smart text format
+
+=head1 SYNOPSIS
+
+text-smart [OPTIONS] [file...]
+
+=head1 OPTIONS
+
+=over 4
+
+=item -help
+
+Show command line documentation
+
+=item -format TYPE
+
+Set output format (default: 'html')
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will read the given input file(s), process them
+with the smart text engine and send the result to stdout.
+
+=head1 BUGS
+
+Possibly...
+
+=head1 SEE ALSO
+
+C<Text::Smart> for details of the accepted syntax.
+
+=head1 AUTHORS
+
+Daniel P. Berrange <dan@berrange.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000-2008 Daniel P. Berrange
+
+=head1 LICENSE
+
+This program is distributed under the terms of the GNU GPL v2+
+
+=cut

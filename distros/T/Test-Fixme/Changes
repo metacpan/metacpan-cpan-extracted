@@ -1,0 +1,63 @@
+Revision history for Test-Fixme
+
+0.16      2016-05-06 07:26:50 -0400
+  - Add support for MSYS2
+
+0.15      2015-07-19 21:33:34 -0400
+  - Production release identical to 0.14_03
+
+0.14_03   2015-07-15 13:10:21 -0400
+  - Fixed typo: second at should have been line
+
+0.14_02   2015-07-11 16:42:24 -0400
+  - documentation fixes
+
+0.14_01   2015-07-09 12:43:16 -0400
+  - add format option and TEST_FIXME_FORMAT environment variable
+
+0.14      2014-10-08 07:59:57 -0400
+  - fixed missing merge from 0.12
+
+0.12      2014-10-08 07:57:04 -0400
+  - add warn option
+
+0.11      2014-07-30 03:58:49 -0400
+  - make perl 5.6.2 a minimum requirement
+  - simplify prereqs
+
+0.10      2013-08-11T07:52:08-0400
+          - Documentation tweaks
+          - Updated Changes to match spec
+
+0.09      2013-03-21 11:15:08 America/New_York
+          - Add proper resource links to META.json,yml
+
+0.08      2013-01-15 12:19:43 America/New_York
+          - Converted distribution to Dist::Zilla
+
+0.07      Unknown
+          - Allow specifying files in addition to directories.
+
+0.06      Unknown
+          - Remove dep on File::Slurp
+          - Added manifest option
+
+0.05      Unknown
+          - Use File::Find instead of File::Finder
+          - skip .git directory, like .svn and CSV
+
+0.04      2008-03-12T22:51:51
+          - Added copyright info
+
+0.03      2008-06-11T19:24:59+0100
+          - version bump to release to CPAN§
+
+0.02_01   2008-06-10T15:11:01-0400 dmo
+	  - allow list of directory names to be specified in 'where' argument
+          - add 'filename_match' argument to filter for desired filenames
+
+0.02      Unknown
+          - switched to makemaker
+          - changed tests to give better errors
+          - filter out CVS and Subversion files from those tested
+

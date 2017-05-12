@@ -1,0 +1,17 @@
+<p>To create a multi-language site, specify the supported languages in
+the <tt>site.lang</tt> variable (file <tt>config/lang</tt>) using
+standard ISO codes for the languages, e.g.,
+
+<pre>  site.languages = [ 'en', 'nl' ]
+</pre>
+
+<p>Consult the supplied <tt>config/lang</tt> for details.
+
+<p>A multi-language site contains one top-level <tt>index.html</tt>,
+and sub-trees of information in directories named after the language
+code. When set up this way, each page, e.g.,
+<tt>en/product/desc.html</tt> will be automatically linked to
+<tt>nl/product/desc.html</tt>, and vice versa.
+
+<p>The <b>Template::TT2Site</b> kit contains a multi-language example
+site in directory <code>examples/site1</code>.

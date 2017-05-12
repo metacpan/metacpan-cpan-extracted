@@ -1,0 +1,136 @@
+Revision history for Test-Ping
+
+0.203     2016-03-13 22:18:34+01:00 Europe/Amsterdam
+        - Ugh. $VERSION wasn't added and the indexing failed.
+        - Fix the LICENSING.
+        - Fix the versioning.
+        - Update the PODs automatically via dzil.
+
+0.202   13.03.16
+        - Previous release had no Changes entry. Bah.
+
+0.201   13.03.16
+        - Dzilify.
+
+0.200   13.03.16
+        - fixed typo in is_admin_user() definition which was breaking tests
+          on Windows (Undefined subroutine &main::is_admin_user called at
+          t\03-icmp.t line 2)
+        - fixes RT #108683; ftp.geocities.com unavailable broke t/08-ping_tcp.t
+          and added more current/reliable domains to test against
+        - Net::Ping, in v2.40, changed to using HiRes by default, fixed
+          t/09-ping_hires.t to conform to said change. Bumped prereq ver of
+          Net::Ping to 2.41, to ensure future test compatibility
+        - fixed issue in create_ping_object_not_ok(), where it didn't appear
+          that it could possibly do the right thing
+        - fixed issue in create_ping_object_ok() where the else() statement
+          would never have been triggered
+        - skip test "Failed test 'IP should still be reachable' at
+          t\13-service.t line 133." until the issue can be found/rectified
+          (problem only exists in Windows)
+        - fixed RELEASE_TESTING test files so they simply skip if the required
+          modules aren't installed (critic.t, meta.t and pod.t)
+        - removed t/minimumversion.t, it wasn't being used anyhow
+        - added configure_requires directive in Build.PL
+        - added t/16-ties.t, tests all Ties
+        - added t/17-ping_obj_not_ok.t
+        - added t/18-ping_obj_ok.t
+        - major updates to MAKEFILE.SKIP
+        - added t/18-ping_obj_ok.t
+        - test coverage now 96.6% from 86.16%
+
+0.17    06.06.10
+        fixing Build.PL executability (turned it off)
+        add examples
+        wrapped POD lines
+
+0.16    15.02.10
+        requiring environment variable for test that keeps failing
+
+0.15    12.02.10
+        removed boilerplate test
+        as god is my non-existent witness, i will pass the tests!
+
+0.14    11.02.10
+        minor changes to pass tests
+
+0.13    10.02.10
+        repository in META.yml using Module::Build (cpanservice)
+        allowng a longer time gap for a test
+        correcting Changelog
+
+0.12    13.08.09
+        repository in META.yml using Module::Build (cpanservice)
+        allowng a longer time gap for a test
+
+0.11    02.08.09
+        added author tests using Test::XT (thanks Adam Kennedy)
+        added Makefile.PL and META.yml instead of leaving it to ./Build dist
+
+0.10    02.08.09
+        added explicit terms as GPLv2 or later, or artistic
+        (thanks Andy Lester, Perlbuzz.com)
+
+0.09    29.04.09
+        ported 300_ping_stream.t to t/10-ping_stream.t
+        ported 400_ping_syn.t to t/11-ping_syn.t
+        ported 410_syn_host.t to t/12-syn_host.t
+        ported 450_service.t to t/13-service.t
+        ported 500_ping_icmp.t to t/14-ping_icmp.t
+        ported 510_ping_udp.t to t/15-ping_udp.t
+        (finished porting all tests from Net::Ping)
+        added SERVICE_CHECK, SOURCE_VERIFY, BIND
+        corrected POD _ping_object() example
+        cleaned up all Ties
+        added Carp to Build.PL requires
+
+0.08    28.04.09
+        fixed t/03-icmp.t test that prevented installation when admin tests
+        added method (and POD for) create_ping_object_ok()
+        fixed t/05-udp_tcp_stream_syn_inst.t to use create_ping_object_ok()
+        ping_ok() now returns return value and duration like Net::Ping's ping()
+        added HIRES support even though I thought I wouldn't
+        ported HIRES test from Net::Ping (t/09-ping_hires.t)
+
+0.07    27.04.09
+        rewrote t/06-alarm.t
+        rewrote Test::Ping::Ties::TIMEOUT, Test::Ping::Ties::TIMEOUT
+        added Test::Timer as possible skip for testing of t/06-alarm.t
+        added Test::Ping::Ties::PORT
+        added t/08-ping_tcp.t
+        fixed no. of tests in POD synopsis of Ping.pm
+        added a lot to the POD
+
+0.06    26.04.09
+        moved t/05-udp_tcp_inst.t to t/05-udp_tcp_stream_syn_inst.t
+        adding test for stream inst and syn inst
+        added t/06-alarm.t
+        added ping_not_ok()
+
+0.05    26.04.09
+        some POD changes and subroutine returns to keep up with perlcritic
+        added -T to tests
+        added 03-icmp.t
+        added 04-object.t and _ping_object()
+        introducing Tie::Scalar to replace _update_variables()
+        added Test::Ping::Ties::PROTO.pm
+        removed t/02-variables.t
+        updated POD
+        removed pos_bug_net_ping.t - it's not a bug
+
+0.04    24.04.09
+        added test for possible bug in Net::Ping
+        got it stable
+        removed BIND and PORT support for now
+
+0.03    22.04.09
+        separated variable tests to a different file
+        added TIMEOUT, PORT, BIND, SOURCE_VERIFY, SERVICE_CHECK,
+            TCP_SERVICE_CHECK
+
+0.02    22.04.09
+        ping_ok() now works
+
+0.01    22.04.09
+        Basic skeleton
+

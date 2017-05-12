@@ -1,0 +1,28 @@
+---
+abstract: 'framework for more readable interactive test scripts'
+author:
+  - 'Sullivan Beck <sbeck@cpan.org>'
+build_requires:
+  Module::Build: '0.21'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.21'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Inter
+provides:
+  Test::Inter:
+    file: lib/Test/Inter.pm
+    version: '1.06'
+requires:
+  File::Basename: '0'
+  IO::File: '0'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/SBECK-github/Test-Inter
+version: '1.06'

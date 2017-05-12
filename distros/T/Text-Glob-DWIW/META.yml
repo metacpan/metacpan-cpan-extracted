@@ -1,0 +1,54 @@
+---
+abstract: 'Yet another Text::Glob{::Expand,}'
+author:
+  - 'Josef <josef@cpan.org>'
+build_requires:
+  Config: 0
+  Test::Exception: 0
+  Test::More: 0.92
+  Test::NoWarnings: 0
+  Test::Pod: 1.41
+  if: 0.05
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830'
+keywords:
+  - glob
+  - globbing
+  - global-replacement
+  - wildcard
+  - expansion
+  - expand
+  - text
+  - string
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Glob-DWIW
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+  namespace:
+    - 'Text::Glob::DWIW::'
+  package:
+    - _19TGD_tiefun
+    - Text::Glob::DWIW::Result
+provides:
+  Text::Glob::DWIW:
+    file: lib/Text/Glob/DWIW.pm
+    version: 0.01
+requires:
+  Carp: 0
+  Exporter: 5.57
+  Hash::Util: 0
+  List::Util: 0
+  Scalar::Util: 0
+  overload: 0
+  overloading: 0
+  parent: 0.221
+  perl: 5.010
+  re: 0
+  warnings: 0
+version: 0.01

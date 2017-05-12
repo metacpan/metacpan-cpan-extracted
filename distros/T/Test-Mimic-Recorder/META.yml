@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Test-Mimic-Recorder
+version:             0.012005
+abstract:            Perl extension for recording the behavior of perl packages. Typically used in
+license:             ~
+author:              
+    - Brendan Roof <broof@>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Cwd:                           0
+    Devel::EvalError:              0
+    Scalar::Util:                  0
+    Test::Mimic::Library:          0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

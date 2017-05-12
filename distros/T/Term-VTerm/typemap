@@ -1,0 +1,9 @@
+Term::VTerm               T_PTROBJ
+Term::VTerm::Color        T_PTROBJ
+Term::VTerm::GlyphInfo    T_PTROBJ
+Term::VTerm::LineInfo     T_PTROBJ
+Term::VTerm::Pos          T_PTROBJ
+Term::VTerm::Rect         T_PTROBJ
+Term::VTerm::Screen       T_PTROBJ
+Term::VTerm::Screen::Cell T_PTROBJ
+Term::VTerm::State        T_PTROBJ

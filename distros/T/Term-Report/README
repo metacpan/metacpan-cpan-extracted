@@ -1,0 +1,155 @@
+SYNOPSIS
+       use Term::Report;
+       use Time::HiRes qw(usleep);
+
+       my $items = 100;
+       my $report = Term::Report->new(
+                startRow => 4,
+                numFormat => 1,
+                statusBar => [
+                   label => 'Widget Analysis: ',
+                   subText => 'Locating widgets',
+                   subTextAlign => 'center',
+                   showTime=>1
+                ],
+       );
+
+       my $status = $report->{statusBar};
+       $status->setItems($items);
+       $status->start;
+
+       $report->savePoint('total', "Total widgets: ", 1);
+       $report->savePoint('discarded', "\n  Widgets discarded: ", 1);
+
+       for (1..$items){
+          $report->finePrint('total', 0, $_);
+
+          if (!($_%int((rand(10)+rand(10)+1)))){
+             $report->finePrint('discarded', 0, ++$discard);
+             $status->subText("Discarding bad widget");
+          }
+          else{
+             $status->subText("Locating widgets");
+          }
+
+          usleep(75000);
+          $status->update;
+       }
+
+       $status->reset({reverse=>1, subText=>'Processing widgets', setItems=>($items-$discard), start=>1});
+       $report->savePoint('inventory', "\n\nInventorying widgets... ", 1);
+
+       for (1..($items-$discard)){
+          $report->finePrint('inventory', 0, $_);
+          $status->update;
+       }
+
+       $report->printBarReport(
+          "\n\n\n\n    Summary for widgets: \n\n",
+          {
+                "       Total:        " => $items,
+                "       Good Widgets: " => $items-$discard,
+                "       Bad Widgets:  " => $discard,
+          }
+       );
+
+DESCRIPTION
+    Term::Report can be used to generate nicely formatted dynamic output. It
+    can also use Term::StatusBar to show progress and Number::Format so
+    numbers show up more readable. All output is sent to STDOUT by default.
+
+    The current release may not be compatible with previous code. Many
+    changes were made with regards to how output could be formatted.
+
+METHODS
+  new(parameters)
+       cls       - This clears the screen. Default is 1.
+       startRow  - This indicates which row to start at. Default is 1.
+       startCol  - This indicates which column to start at. Default is 1.
+       numFormat - This indicates if you want to use Number::Format. Default is undef.
+       statusBar - This indicates if you want to use Term::StatusBar. Default is undef.
+       fh        - User-defined file handle. This is passed on to Term::StatusBar. Default is STDOUT.
+
+    numFormat and statusBar can be passed in 2 different ways.
+
+    The first way is as a simple flag: numFormat => 1
+
+    Or as an array reference with parameters for a Number::Format object:
+    numFormat => [-MON_DECIMAL_POINT => ',', -INT_CURR_SYMBOL => '']
+
+    statusBar behaves the same way except takes parameters appropriate for
+    Term::StatusBar.
+
+  finePrint($row, $col, @text)
+    This gives more control over where to place text. With the introduction
+    of 'save points', $row may be either a number, indicating a row, or a
+    savepoint label, which may not be all numbers or it will be interpreted
+    as a row.
+
+  printLine(@text)
+    This places text after the last known text has been placed. It tries
+    very hard to "Do The Right Thing", but I am certain there are more
+    'bugs' in it.
+
+  lineLength('m')
+    Returns length($obj->{m}). This function shouldn't really be called as
+    it has little purpose outside the module.
+
+  _adjustCurRow($text)
+    Internal function printLine() uses to try and place text properly.
+
+  printBarReport($header, $config)
+    Works in conjunction with Term::StatusBar to print a summary of data it
+    processed.
+
+  savePoint($label, $text, $print)
+    Allows the referencing of a screen position with a text label. This
+    calls printLine() and remembers the position it was placed in, along
+    with the text it represents. $print is a flag indicating whether to
+    immediately print the $text, or to delay it.
+
+  clear()
+    Clears the screen and resets currentRow to startRow. This is mostly for
+    re-using the report object within the same script. The actual cursor is
+    set to (0,0).
+
+  finished()
+    Accurately places the cursor at the last line of the 'report'.
+
+CHANGES
+       2003-06-13
+          + When clearing screen, set cursor at (0,0).
+          + Changed escape sequence to \033.
+
+       2003-06-11
+          + Caught bad savepoint names being passed to finePrint().
+             - These will now die().
+          + Fixed bug with finePrint() not correctly tracking currentRow.
+          + Don't exit() in DESTROY blocks any more. Just reset terminal.
+          + Changed 2nd parameter to printBarReport() from {} to [] to keep ordering correct.
+             - The old hash ref will still work, but ordering is not guaranteed.
+          + Added clear() method to clear the screen.
+             - Allows report object to be re-used. This must be called before StatusBar::reset().
+
+       2003-05-06
+          + Added "no warnings 'portable'" so Perl 5.8 would be happy.
+          + Added ability to send in a file handle to print to.
+
+       2003-01-27
+          + Removed the dependency for Term::ANSIScreen.
+          + Added savePoint() method for easy referencing of screen locations.
+          + Adjusted finePrint() to work with savePoint().
+          + Added 'cls' flag to constructor to clear the screen.
+          + Cleaned up code a bit with minor optimizations.
+          + Reduced screen flicker by quite a bit.
+
+AUTHOR
+    Shay Harding <sharding@ccbill.com>
+
+COPYRIGHT
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Term::StatusBar, Number::Format
+

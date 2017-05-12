@@ -1,0 +1,22 @@
+Revision history for Perl extension Tkx::SplashScreen.
+
+0.16 2010-09-19
+    - Fixed POD typo.
+
+0.15 Thu Apr 06 11:15 2010
+    - Fixed Makefile.PL
+
+0.14 Wed Apr 05 22:18 2010
+    - Updated documentation
+
+0.13 Wed Mar 10 22:57 2010
+    - Fixed Makefile.PL
+	- Updated documentation
+
+0.11 Wed Mar 10 21:44 2010
+    - Updated
+
+0.1	Wed Mar 10 20:29 2010
+	- original version; created by h2xs 1.23 with options
+		-AX -n Tkx::SplashScreen -v 0.1
+

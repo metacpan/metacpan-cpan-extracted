@@ -1,0 +1,128 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.73 [en] (X11; U; Linux 2.2.16 i686) [Netscape]">
+   <title>Tk-EMatrix-0.01 - Perl widget derived from Tk::TableMatrix.</title>
+<link REV="made" HREF="mailto:root@zap.slackware.lan">
+</head>
+<body>
+<a NAME="__index__"></a><!-- INDEX BEGIN -->
+<ul>
+<li>
+<a href="#synopsis">SYNOPSIS</a></li>
+
+<li>
+<a href="#description">DESCRIPTION</a></li>
+
+<li>
+<a href="#methods">METHODS</a></li>
+
+<li>
+<a href="#future releases">FUTURE RELEASES</a></li>
+
+<li>
+<a href="#author">AUTHOR</a></li>
+
+<li>
+<a href="#see also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+<hr>
+<h1>
+<a NAME="synopsis"></a>SYNOPSIS</h1>
+use EMatrix;
+<br>my $titleHash = { ``0,0'' => ``Header1'', ``0,1'' => ``Header2'', ``0,2''
+=> ``Header3'', ``0,3'' => ``Header4'', ``0,4'' => ``Header5'', };
+<p>my $table; $table = $mw->Scrolled('EMatrix',
+<br>&nbsp;&nbsp;&nbsp; -cols => 5,
+<br>&nbsp;&nbsp;&nbsp; -bd => 2,
+<br>&nbsp;&nbsp;&nbsp; -bg => 'white',
+<br>&nbsp;&nbsp;&nbsp; -titlerows => 1,
+<br>&nbsp;&nbsp;&nbsp; -variable => $titleHash,
+<br>);
+<p>$table->tagConfigure('title', -bg => 'tan', -fg => 'black', -relief
+=> 'raised' );
+<p>$table->pack(-expand => 1, -fill => 'both');
+<p>
+<hr>
+<h1>
+<a NAME="description"></a>DESCRIPTION</h1>
+The EMatrix widget is a derived widget that provides 6 additional methods
+above and beyond the traditional Tk::TableMatrix widget.
+<p>
+<hr>
+<h1>
+<a NAME="methods"></a>METHODS</h1>
+<b>bindRow(-index => int, -sequence => string, -command => sub ref);</b>
+<p>The bindRow() method binds a particular sequence to the subroutine at
+the row specified by the ``-index'' option. Note that binding row 0 will
+bind the column headers, which may not be what you want.
+<p>You cannot currently bind a range of rows (i.e. -index=>2-5) for now,
+though that is an enhancement I may add in the future.
+<p>e.g. $em->bindRow(-index => 2, -sequence => '&lt;Control-g>', -command
+=> sub{ print ``Hello World!'' } );
+<p><b>bindCol(-index => int, -sequence => string, -command => sub ref);</b>
+<p>This method is identical to 'bindRow()' above, except that it binds
+a column instead of a row (duh).
+<p><b>getRow(index, ?range?);</b>
+<p>Returns the row at specified index as an array in list context, or an
+array reference in scalar context.
+<p>If the range is omitted (or 'end' is used), it will return the contents
+of all cells in that row (including empty cells). Otherwise, it will only
+return the contents of the cells up to the specified range, starting at
+index 0.
+<p><b>getRowHash(index, ?range?, ?tie?);</b>
+<p>Returns the row at the specified index as a hash in list context, or
+a hash reference in scalar context.&nbsp; The key is the cell value ('0,1'
+for example), the value is the content of the cell.
+<p>If a second index is omitted (or 'end' is used), it will return the
+contents of all cells in that row (including empty cells). Otherwise, it
+will only return the contents of the cells up to the specified range starting
+at index 0.
+<p>If the string 'tie' is included as an argument, the hash will be returned
+in cell order (left to right). To use this option you must have the Tie::IxHash
+module installed.
+<p><b>getCol(index, ?range?);</b>
+<p>Returns the column at the specified index as an array in list context,
+or an array reference in scalar context. See 'getRow()' for more details.
+<p><b>getColHash(index, ?range?, ?tie?);</b>
+<p>Returns the column at the specified index as a hash in list context,
+or a hash reference in scalar context. See 'getRowHash()' above for more
+details.
+<p>If the string 'tie' is included as an argument, the hash will be returned
+in cell order (top to bottom). This requires the Tie::IxHash module.
+<p>
+<hr>
+<h1>
+<a NAME="future releases"></a>FUTURE RELEASES</h1>
+
+<ol>
+<li>
+<a NAME="item_Cell_ranges_%2D_allow_a_range_of_cells_to_be_selec"></a><b>Cell
+ranges - </b>allow a range of cells to be selected at a particular index<b>.</b></li>
+
+<br>e.g. $dw->getRow(0, 3-5); # Would return the contents of cells 3, 4
+and 5 at row 0.
+<li>
+<a NAME="item_A_row_of_buttons_on_the_left_side_to_mimic_MS_Exce"></a><b>A
+row of buttons</b> on the left side to mimic MS Excel behavior.</li>
+
+<li>
+<a NAME="item_snap"></a><b>Methods </b>to make importing Excel spreadsheets
+a snap (via the ParseExcel module perhaps).</li>
+</ol>
+
+<hr>
+<h1>
+<a NAME="author"></a>AUTHOR</h1>
+Daniel Berger, <a href="mailto:djberg96@hotmail.com">djberg96@hotmail.com</a>
+<p>Many thanks go out to John Cerney for providing help with this module
+(especially the bind methods).
+<p>
+<hr>
+<h1>
+<a NAME="see also"></a>SEE ALSO</h1>
+Tk::TableMatrix, Tie::IxHash.
+</body>
+</html>

@@ -1,0 +1,123 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Type::Tiny 0.022"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Types-ReadOnly>;
+	doap:created         "2013-08-02"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Types-ReadOnly>;
+	doap:homepage        <https://metacpan.org/release/Types-ReadOnly>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Types-ReadOnly";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-types-readonly>;
+	];
+	doap:shortdesc       "type constraints and coercions for read-only data structures and locked hashes".
+
+<http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Developer preview";
+	dc:identifier        "Types-ReadOnly-0.000_01"^^xsd:string;
+	dc:issued            "2013-08-06"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-ReadOnly-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Types-ReadOnly-0.000_02"^^xsd:string;
+	dc:issued            "2013-08-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "The version of Hash::Util bundled with pre-5.18 Perls is crap; workarounds aplenty!";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-ReadOnly-0.000_02.tar.gz>;
+	doap:revision        "0.000_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Types-ReadOnly-0.000_03"^^xsd:string;
+	dc:issued            "2013-08-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Include test using Types::ReadOnly with Moo.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Include test using Types::ReadOnly with Moose.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Include test using Types::ReadOnly with Mouse.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Include test using Types::ReadOnly with Type::Params.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-ReadOnly-0.000_03.tar.gz>;
+	doap:revision        "0.000_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_04>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Types-ReadOnly-0.000_04"^^xsd:string;
+	dc:issued            "2013-08-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Tests for some more complex combinations of types.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-ReadOnly-0.000_04.tar.gz>;
+	doap:revision        "0.000_04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial public release";
+	dc:identifier        "Types-ReadOnly-0.001"^^xsd:string;
+	dc:issued            "2013-08-27"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-ReadOnly-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Types-ReadOnly-0.002"^^xsd:string;
+	dc:issued            "2013-11-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Cope with upcoming changes to Dict in Types::Standard.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-ReadOnly-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

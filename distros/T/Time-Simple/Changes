@@ -1,0 +1,43 @@
+Revision history for Perl extension Time::Simple.
+
+0.06	April 2011
+	- Removed hard-coded referenes to class,
+	  https://rt.cpan.org/Ticket/Display.html?id=67558&results=ecfdaeab7ba9d18e6f207609f426f7dd
+
+0.055 - 0.0552 February 2011
+	- Tests updated for CPAN Testers
+
+0.054 Wed 09 Apr 10:22:00 2008 
+	- Removed a hidden 'confess' and allowed new from time()
+	- _mktime_hms now access localtime just once, in case
+	  the time changes between accesses (spotted by Slaven)
+	- ($localtime[8]? 1 : 0) instead of assuming that 'true' 
+	  is 1 (cf. perlfunc/localtime)
+	
+0.053 ?
+
+0.052 Thu 03 Aug 12:26:00 2006 
+	- Subtraction returned negative values: no longer.
+	- Updated POD and test
+
+0.05 Sun 02 Jul 16:52:00 2006
+	- Added multiply and division 
+
+0.04  Thu 24 May 21:00:00 2006 
+	- overloaded the = copy operator
+	- POD correction, removed reference to dates
+ 	- addition/substraction properly implimented (kuszi zsolt)
+ 	- ++ and -- added, more tests
+	- allow add/subtract times
+	- construct from return value of built-in "time" function
+
+0.03  Tue 22 May 21:10:00 2006 
+ 	- daylight saving time accounted for, reported by Reg�ly Zsolt
+
+0.02  Sun Mar 19 18:36:00 2006
+	- allow same defaulting for construction by array as for by string & updated tests
+
+0.01  Sat Mar 18 14:06:04 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Time::Simple
+

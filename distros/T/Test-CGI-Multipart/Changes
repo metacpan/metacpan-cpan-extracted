@@ -1,0 +1,14 @@
+Revision history for Test-CGI-Multipart
+
+v0.0.3  Mon Sep 13 2010
+       CGI >= 3.41 dependency due to file handle promotion.
+       Refreshed README
+
+v0.0.2  Sun Sep 12 2010
+       Updating dependencies. Made perlcritic.t an author only test.
+       Fixed layout of description sections in documentation and
+       mentioned restting of global variables.
+
+v0.0.1  Sun Jun 27 00:06:07 2010
+       Initial release.
+

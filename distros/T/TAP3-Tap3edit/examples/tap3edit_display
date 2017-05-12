@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+#
+# Copyright (c) 2004 Javier Gutierrez <jgutierrez@tap3edit.com>.
+# All rights reserved. This program is free software; you can redistribute
+# it and/or modify it under the same terms as Perl itself.
+# http://www.tap3edit.com
+#  
+#  Routine to display the tree of a TAP/RAP file.
+#  
+#  Note: The hexadecimal values may be displayed with unreadable charachters.
+
+use TAP3::Tap3edit;
+
+use Data::Dumper;
+$Data::Dumper::Indent=1;
+$Data::Dumper::Quotekeys=1;
+$Data::Dumper::Useqq=1;
+
+$filename=shift;
+
+if ( ! $filename ) {
+	die "Usage: $0 filename\n";
+}
+
+
+$tap3 = TAP3::Tap3edit->new();
+$tap3->decode($filename) || die $tap3->error;
+
+print Dumper ($tap3->structure);
+

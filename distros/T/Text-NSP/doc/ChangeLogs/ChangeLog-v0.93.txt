@@ -1,0 +1,88 @@
+Changes from NSP version 0.91 to 0.93
+--------------------------------------
+
+Saiyam Kohli, kohli003@d.umn.edu
+University of Minnesota, Duluth
+
+June 11, 2006
+
+Measures
+--------
+
+A couple of new measures have been added. These are
+
+A couple of new measures have been added. These are
+
+  1) Jaccard Coefficient
+
+    The Jaccard Coefficient is the ratio of number of times the words
+    occur together to the number of times atleast any one of the words
+    occur. It is defined as:
+
+          n11
+    ---------------
+    n11 + n12 + n21
+
+    The Jaccard coefficient can also be computed by applying a
+    transformation to the dice coefficient. The transformation is:
+
+      $jaccard = $dice/(2-($dice)
+
+    We use this computation instead of the one mentioned earlier. We have
+    grouped dice and jaccard under one family.
+
+
+    This measure is only available for bigrams.
+
+  2) Poisson Stirling Measure
+
+    The poisson stirling measure is a negative lograthimic approximation
+    of the poisson-likelihood measure. It uses the stirlings firmula to
+    approximate the factorial in poisson-likelihood measure. The measure
+    is computed as follows.
+
+    Posson-Stirling = n11 * ( log(n11) - log(m11) - 1)
+
+    which is same as
+
+    Posson-Stirling = n11 * ( log(n11/m11) - 1)
+
+    This measure is available for bigrams as well as trigrams.
+
+
+Apart from this Pointwise Mutual Information has been modified so that it
+takes in a parameter named pmi_exp. This parameter is used to increase the
+weight of the observed frequency count. This is useful because PMI tends to
+overestimate the bigrams with lower observed frequency counts. Now the PMI
+measure is computed as:
+
+ PMI = log((n11^$exp)/m11)
+
+The $exp is 1 by default, so the measure will compute the
+Pointwise Mutual Information for the given bigram. To use a variation
+of the measure, users can pass the $exp parameter using the --pmi_exp
+command line option in statistic.pl. To modify the $exp from within a
+program users can call the initializeStatistic method, otherwise $exp
+will be taken to be 1 by default. Usage:
+
+ $pmi->initializeStatistic(2)
+
+The pmi measure has also been extented for trigrams.
+
+
+Programs
+--------
+
+statistic.pl has been modified to take in a new command line parameter
+for the PMI measure, this parameter is used to initialize the $exp
+variable in PMI. If this option is not specified $exp is initialized
+to 1. The option is discarded with a warning message if it is specified
+for any other measure.
+
+ The usage for statistic.pl is
+
+ statistic.pl pmi out_pmi.stt out.cnt    - for Point Wise Mutual Information
+                                           $exp is 1 in this case.
+
+ statistic.pl --pmi_exp 2 pmi out_pmi2.stt out.cnt   - for the variant with
+                                                       $exp set to 2.

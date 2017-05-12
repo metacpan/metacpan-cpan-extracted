@@ -1,0 +1,50 @@
+NAME
+    Term::TtyRec - handles ttyrec data
+
+SYNOPSIS
+      use Term::TtyRec;
+      use FileHandle;
+
+      # $handle is any IO::* object
+      my $handle = FileHandle->new('file.tty');
+      my $ttyrec = Term::TtyRec->new($handle);
+
+      # iterates through datafile
+      while (my($sec, $text) = $ttyrec->read_next) {
+          do_some_stuff();
+      }
+
+DESCRIPTION
+    What is ttyrec? Here is an excerpt.
+
+      ttyrec is a tty recorder. Recorded data can be played back with the
+      included ttyplay command. ttyrec is just a derivative of script
+      command for recording timing information with microsecond accuracy
+      as well. It can record emacs -nw, vi, lynx, or any programs running
+      on tty.
+
+    See http://www.namazu.org/~satoru/ttyrec/ for details.
+
+    Term::TtyRec is a simple class for ttyrec recorded data. This module
+    provides a way to itertate through recorded from any IO. See
+    Term::TtyRec::Player for playing recorded data.
+
+METHODS
+    read_next
+          ($sec, $text) = $ttyrec->read_next;
+
+        iterates data inside and returns number of second, textdata. Returns
+        empty list when it reaches end of data.
+
+ACKNOWLEDGEMENT
+    Almost all of its code are stolen from ruby-ttyplay.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Term::TtyRec::Player manpage, http://namazu.org/~satoru/ttyrec/
+

@@ -1,0 +1,40 @@
+---
+abstract: 'Show timezone offset strings like +0900'
+author:
+  - '-2014 Piotr Roszatycki <dexter@cpan.org>.'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-TZOffset
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Time::TZOffset:
+    file: lib/Time/TZOffset.pm
+    version: '0.04'
+requires:
+  perl: '5.008004'
+resources:
+  bugtracker: https://github.com/kazeburo/Time-TZOffset/issues
+  homepage: https://github.com/kazeburo/Time-TZOffset
+  repository: git://github.com/kazeburo/Time-TZOffset.git
+version: '0.04'
+x_contributors:
+  - 'Jacques Germishuys <jacquesg@striata.com>'
+  - 'karupanerura <karupa@cpan.org>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'

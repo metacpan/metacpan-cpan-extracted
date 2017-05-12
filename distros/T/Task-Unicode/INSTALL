@@ -1,0 +1,16 @@
+Task::Unicode Installation
+
+# install via cpanminus
+cpanm Task::Unicode
+
+# install via CPAN shell
+cpan Task::Unicode
+
+# install via ActivePerl
+ppm install Task::Unicode
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

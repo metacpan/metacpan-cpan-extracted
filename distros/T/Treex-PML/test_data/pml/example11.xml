@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head>
+    <schema href="example11_schema.xml"/>
+  </head>
+  <S>
+    <NP>
+      John
+    </NP>
+    <VP>
+      loves
+      <NP>Mary</NP>
+    </VP>
+    !
+  </S>
+</doc>

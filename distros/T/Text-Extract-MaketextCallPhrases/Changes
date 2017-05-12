@@ -1,0 +1,66 @@
+Revision history for Text-Extract-MaketextCallPhrases
+
+0.94  2017-02-16 22:42:56
+    - PR #6: Optimize by simplifying regular expression. (thanks FGasper!)
+    - Issue #8: Add qr/Cpanel::LocaleString->new\(\s*/ to cpanel_mode (for CPANEL-11303)
+
+0.93  2014-11-17 19:15:31
+    - Allow for C::E subclasses
+    - Add support for optional matches
+    - bump req ver of M::W to latest
+    - Add support for getting matches in arguments besides the first
+    - Add Cpanel::Exception.* ::create(NS,OPTIONAL-PHRASE) token
+    - Add Cpanel::Exception.* ->create(OPTIONAL-PHRASE) token
+    - Add dot notation support to translatable() token (thanks tomgreen98)
+    - only compile while() loop regex once
+    - Add word boundary support to translatable()
+
+0.92  2013-10-22 12:09:33
+    - add more RELEASE_TESTING tests
+    - add Cpanel::Exception->new top cpanel_mode parser
+
+0.91  2013-03-21 07:40:45
+    - account for tokens w/ trailing WS
+    - add support for EOL '## no extract maketext' notation
+
+0.9  2012-11-26 13:38:52
+    - remove loop bottleneck in cpanel mode
+
+0.8  2012-11-21 21:53:37
+    - address uninit warnings
+
+0.7  2012 11-21 20:12:42
+    - rt 81205 - POD typo
+    - rt 81206 - Added quote_before, quote_after
+
+0.6  2012-11-08 14:14:39
+    - add offset_seen internal check
+    - add RELEASE_TESTING check above eval in perlcritic test
+
+0.5  2012-11-07 20:56:10
+    - rt 80661: POD
+    - add 'original_text' key to result hash
+    - add 'cpanel_mode' to hashref of args
+
+0.4  2012-11-05 23:06:35
+    - rt 80488: bump version in POD
+    - rt 80642: POD: type' os 'no_arg' =~ s/os/of/
+    - rt 80641: POD: 'no_' should be 'no_default_regex'
+    - rt 80643: needs to require bytes when it uses bytes::length
+    - rt 80653: if double quoted context interpolate \n and friends (not \x)
+    - rt 80648	add file key to result hash
+    - treat mt("$var") et. al. like a perlish type
+    - added 'heredoc' key to result hash
+
+0.3  2012-20-28 17:48:23
+    - rt 76699 Add “=encoding utf-8” to top of POD
+    - rt 76700: Add test for “foo(<<HEAR_DOC, @args);” style heredocs
+    - rt 77538: add helper methods to default regex
+    - move Critic and POD tests to RELEASE_TESTING mode
+
+0.2  2011-08-31 17:51:04
+    - rt 70652 items
+
+0.1  2011-01-05W 21:18:02
+       Initial release.
+

@@ -1,0 +1,45 @@
+---
+abstract: 'DBIx::Class schema sanity checking tests'
+author:
+  - 'Chisel Wright <chisel@chizography.net>'
+build_requires:
+  Carp: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::ResultSet: '0'
+  DBIx::Class::Schema: '0'
+  Moose: '0'
+  MooseX::NonMoose: '0'
+  Test::Builder::Tester: '0'
+  Test::Exception: '0'
+  Test::More: '1.302015'
+  Test::NoTabs: '0'
+  Test::Pod: '0'
+  base: '0'
+  lib: '0'
+  namespace::autoclean: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-DBIx-Class-Schema
+requires:
+  DBIx::Class: '0.08'
+  FindBin: '0'
+  Test::More: '1.302015'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/chiselwright/Test-DBIx-Class-Schema/issues
+  repository: git://github.com/chiselwright/test-dbix-class-schema.git
+version: 1.0.10
+x_contributors:
+  - 'Chisel Wright <chisel@cleavag.es>'
+  - 'Darius Jokilehto <darius.jokilehto@net-a-porter.com>'
+  - 'Dave Cross <davidc@broadbean.com>'
+  - 'Jason Tang <tang.jason.ch@gmail.com>'
+  - 'Rupert Lane <rupert@rupert-lane.org>'

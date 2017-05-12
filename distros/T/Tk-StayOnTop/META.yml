@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tk-StayOnTop
+version:      0.12
+version_from: lib/Tk/StayOnTop.pm
+installdirs:  site
+requires:
+    Switch:                        2.07
+    Tk:                            800.022
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

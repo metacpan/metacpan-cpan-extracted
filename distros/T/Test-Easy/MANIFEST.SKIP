@@ -1,0 +1,10 @@
+.rock.yml
+local/
+Makefile
+pm_to_blib
+.git
+blib/
+MYMETA.json
+MYMETA.yml
+prove.perl*
+eg/pod.pl

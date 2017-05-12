@@ -1,0 +1,28 @@
+Revision history for Perl extension Text::Context.
+
+3.7  Thu Jul 23 11:08:38 EEST 2009
+    - Add dependency on HTML::Entities (Jonathan Yu)
+
+3.6  Tue Sep  6 21:51:11 UTC 2005
+    - Doc changes
+
+3.5  Fri Oct 22 16:34:16 UTC 2004
+    - Tony Bowden is now maintainer
+    - split Text::Context::Para to its own file
+    - auto-require the Paragraph class
+
+3.4  Sat May  1 11:57:17 2004
+    - Add dependency
+
+3.3  Mon Oct 20 16:38:26 2003
+    - fixed a bug where terms would be marked-up overzealously.
+
+3.2  Mon Oct 20 15:31:43 2003
+    - scoretable should not barf when there are no scores!
+
+3.1  Mon Oct 20 15:01:22 2003
+    - Handle entity translation during to_html
+
+3.0  Tue Apr  1 16:06:46 2003
+	- This is a complete rewrite, although the interface is mainly
+      the same.

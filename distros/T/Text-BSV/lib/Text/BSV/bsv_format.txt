@@ -1,0 +1,74 @@
+
+Bar-Separated Values Format
+===========================
+
+Bar-Separated Values (BSV) format is a delimited-text format with
+the following simple and precise rules:
+
+ *  The character encoding must be either UTF-8 or lower-ASCII (which
+    is a subset of UTF-8).
+
+ *  A line-break sequence comprising a newline character plus an
+    optional preceding carriage-return character terminates a row and
+    is not part of the last field name or value in that row.  A BSV
+    writer must provide a final newline character (plus an optional
+    preceding carriage-return character) at the end of the last row.
+    A BSV reader may respond to the lack of a final newline character
+    by generating a warning but must otherwise process the last row as
+    if it were properly terminated.
+
+ *  The first row in a BSV file or data set (collection of rows) must
+    contain field names (column headings).  Every record (the rows
+    subsequent to the header row) must have the same number of fields,
+    which must match the number of field names.
+
+    Each field name must be unique.  Field names are case-sensitive.
+
+    There must be at least two fields.
+
+ *  When the vertical bar is the field delimiter, a backslash-escaped
+    vertical bar (\|) represents a literal vertical bar in a field
+    name or value, a backslash-escaped backslash (\\) represents a
+    literal backslash, and a backslash-escaped lowercase 'n' (\n)
+    represents a newline character (plus an optional preceding
+    carriage-return character, depending on the system).  Any other
+    occurrence of a backslash in data where the vertical bar is the
+    field delimiter is an error, and a BSV reader must abort
+    processing upon encountering such an error.
+
+ *  The vertical bar (|) is the default field delimiter; however, a
+    BSV reader must also correctly parse simple comma-separated,
+    semicolon-separated, or tab-delimited data if the data meets the
+    following criteria:
+
+     -  The data contains no double quotation marks, no occurrences of
+        the field delimiter within field names (column headings) or
+        field values, and no carriage-return or newline characters
+        within field names or values.
+
+     -  The field delimiter can be unambiguously determined by
+        examination of the header row and the first record.  That is,
+        there must be no vertical bars in the header row (regardless
+        of any backslashes), and if the header row contains multiple
+        potential field delimiters (where the potential delimiters are
+        the comma, the semicolon, and the horizontal tab), the
+        ambiguity must be resolvable by comparing the number of field
+        names that each potential field delimiter would produce in the
+        first row with the number of field values that the delimiter
+        would produce in the first record (which is the second row).
+
+    When the field delimiter is not a vertical bar, a BSV reader must
+    parse the data in "simple" mode, without recognizing any
+    character-escape mechanisms (such as "\n").
+
+      NOTE:  "BSV" can be said to stand for "Bar-Separated or simple
+      comma-, semicolon-, or tab-separated Values".
+
+ *  A BSV reader must not trim or "normalize" whitespace.  (Of course,
+    a client application may do so after receiving the parsed data
+    from the reader.)
+
+ *  When not in "simple" mode (that is, when the field delimiter is
+    the vertical bar), a BSV reader must translate backslash-escape
+    sequences into the corresponding literal text when returning or
+    storing a parsed BSV-format field name or value.

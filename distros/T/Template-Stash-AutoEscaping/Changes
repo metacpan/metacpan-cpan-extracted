@@ -1,0 +1,32 @@
+Revision history for Perl extension Template::Stash::AutoEscaping
+
+0.0303  2014-01-31
+        - Minimal version of perl (CPANTS).
+        - Add LICENSE file (CPANTS).
+        - Add t/cpan-changes.t .
+
+0.0302  2013-01-14
+        - Fix the POD validation problems ( t/pod.t ).
+        - Add t/pod-coverage.t and fix POD coverage.
+        - Add t/style-trailing-space.t to get rid of trailing whitespace.
+
+0.0301  2011-01-06
+        - Add missing dependencies to the Makefile.PL, especially a
+        build_requires on 'URI'.
+
+0.03    2011-01-05
+
+        - forked from Template-Stash-AutoEscape after some bug fixes and
+        enhancements.
+
+Revision history for Perl extension Template::Stash::AutoEscape
+
+0.01    2009-06-08
+        - original version
+
+0.02    2010-06-08
+        - fix requires
+        - now [% hash.item(key) %] works as [% hash.item(key.raw) %] by default.
+
+        - Add the 'die_on_unescaped' and 'method_for_escape' options.
+        - Fix the name of the "Template::Exception" class.

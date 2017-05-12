@@ -1,0 +1,41 @@
+---
+abstract: 'determine positions for hyphens inside words'
+author:
+  - 'Alex Kapranoff, C<< <kappa at cpan.org> >>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Hyphen
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Hyphen:
+    file: lib/Text/Hyphen.pm
+    version: '0.2'
+requires:
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/kappa/Text-Hyphen/issues
+  homepage: https://github.com/kappa/Text-Hyphen
+  repository: git://github.com/kappa/Text-Hyphen.git
+version: '0.2'
+x_contributors:
+  - 'Alex Kapranoff <kappa@rambler-co.ru>'
+  - 'Alex Kapranoff <alex@kapranoff.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

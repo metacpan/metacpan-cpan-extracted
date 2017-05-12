@@ -1,0 +1,66 @@
+Revision history for Task-BeLike-LESPEA
+
+2.005000  2014-03-12 09:47:36-05:00 America/Chicago
+
+2.004000  2013-01-24 00:54:13 America/Chicago
+    *   Remove Spreadsheet::Read as it's breaking installs
+
+
+2.003000  2012-09-05 01:17:20 America/Chicago
+    *   Include a few more modules
+    *   Use the newest version of my dzil module
+    *   Remove a lot of the datetime format modules that cause havoc
+
+
+2.002000  2012-08-30 00:24:01 America/Chicago
+    [Bugfix]
+    *   Include the modules pod heading
+    *   Add gen_module to MANIFEST.SKIP
+
+
+2.002000  2012-08-29 21:58:41 America/Chicago
+    [Enhancement]
+    *   Add tons of new modules
+    *   Add more error checking to the module generator
+
+
+2.001000  2011-06-21 00:42:06 America/Chicago
+    [Bugfix]
+    *   Corrected POD spelling]
+
+    [Enhancement]
+    *   Remove all dzil modules that my dzil plugin now specifies
+    *   Allow specifing a version of a module that is needed
+    *   Reportversions::Tiny now skips Devel::NYTProf to stop it from messing up everything
+
+
+2.000000  2011-02-19 19:32:59 America/Chicago
+    *   Switch over to new Dist::Zilla
+    *   Standardize Changes layout
+
+
+1.200001  2010-12-03 03:09:22 America/Chicago
+    *   Switch pod to definitions instead of head3's
+
+
+1.200000  2010-12-02 21:29:28 America/Chicago
+    *   Use Prereqs instead of relying on Autoprereqs
+    *   Autoprereqs instead of Autoprereq
+    *   Switch layout around a bit
+    *   Add homepage & more repo info
+
+
+1.11      2010-08-21 18:20:58 America/Chicago
+    *   Add xt tests
+    *   Add light-weight examples folder
+    *   Don't include Dist::Zilla info in META files
+
+
+1.10      2010-08-21 16:24:21 America/Chicago
+    *   Add some Module::Install modules
+    *   Add some Math modules
+    *   Add a DateTime module
+
+
+1.00      2010-08-21 15:24:29 America/Chicago
+    *   First release of the module

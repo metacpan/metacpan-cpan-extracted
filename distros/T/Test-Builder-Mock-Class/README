@@ -1,0 +1,52 @@
+NAME
+    Test::Builder::Mock::Class - Simulating other classes for Test::Builder
+
+SYNOPSIS
+      use Test::Builder::Mock::Class ':all';
+      use Test::More 'no_plan';
+
+      # concrete mock class
+      mock_class 'Net::FTP' => 'Net::FTP::Mock';
+      my $mock_object1 = Net::FTP::Mock->new;
+      $mock_object1->mock_tally;
+
+      # anonymous mocked class
+      my $metamock2 = mock_anon_class 'Net::FTP';
+      my $mock_object2 = $metamock2->new_object;
+      $mock_object2->mock_tally;
+
+      # anonymous class with role applied
+      my $metamock3 = Test::Builder::Mock::Class->create_mock_anon_class(
+          class => 'Net::FTP',
+          roles => [ 'My::Handler::Role' ],
+      );
+      my $mock_object3 = $metamock3->new_object;
+      $mock_object3->mock_tally;
+
+DESCRIPTION
+    This module adds support for standard Test::Builder framework
+    (Test::Simple or Test::More) to Test::Mock::Class.
+
+    Mock class can be used to create mock objects which can simulate the
+    behavior of complex, real (non-mock) objects and are therefore useful
+    when a real object is impractical or impossible to incorporate into a
+    unit test.
+
+    See Test::Mock::Class for more detailed documentation.
+
+BUGS
+    The API is not stable yet and can be changed in future.
+
+AUTHOR
+    Piotr Roszatycki <dexter@cpan.org>
+
+LICENSE
+    Based on SimpleTest, an open source unit test framework for the PHP
+    programming language, created by Marcus Baker, Jason Sweat, Travis
+    Swicegood, Perrick Penet and Edward Z. Yang.
+
+    Copyright (c) 2009, 2010 Piotr Roszatycki <dexter@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under GNU Lesser General Public License.
+

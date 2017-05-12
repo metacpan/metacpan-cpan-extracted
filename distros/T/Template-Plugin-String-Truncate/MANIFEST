@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Template/Plugin/String/Truncate.pm
+t/release-pod-syntax.t
+t/release-synopsis.t
+t/simple.t
+weaver.ini

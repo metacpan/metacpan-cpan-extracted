@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Test/Harness/FileFilter.pm
+t/00-load.t
+t/01-ignore.t
+t/02-accept.t
+t/pod-coverage.t
+t/pod.t
+t/suite/00-load.t
+t/suite/01-one.t
+t/suite/02-two.t
+t/suite/onlyalpha.t
+t/suite/1234.t

@@ -1,0 +1,33 @@
+---
+abstract: 'Drive Test::WWW::Mechanize Object Using YAML Configuration Files'
+author:
+  - 'The original version of this code written by Dean Serenevy while under'
+build_requires:
+  DateTime: 0
+  Template: 0
+  Test::More: 0
+  YAML: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: 'Public Domain'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-WWW-Mechanize-Driver
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  DateTime: 0
+  Template: 0
+  YAML: 0
+requires:
+  Scalar::Util: 0
+  Storable: 0
+  Test::Builder: 0
+  Test::WWW::Mechanize: 0
+  URI: 0
+  URI::QueryParam: 0
+  perl: 5.005
+version: 0.6

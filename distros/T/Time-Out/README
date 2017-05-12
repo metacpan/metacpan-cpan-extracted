@@ -1,0 +1,33 @@
+Time::Out - Easy timeouts
+=========================
+
+  use Time::Out qw(timeout);
+
+  # Time out the following code block after 5 seconds
+  timeout 5 => sub {
+    # do something that might take a long time...
+  } ;
+  if ($@){
+    # timeout occured...
+  }
+
+
+INSTALLATION
+
+Note: Your system must support alarm(2).
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2008 Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

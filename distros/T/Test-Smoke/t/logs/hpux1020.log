@@ -1,0 +1,163 @@
+Skipping synctree
+Setup alarm: Thu May 18 22:51:13 2006
+Reading build configurations from /pro/3gl/CPAN/smoke/p59.cfg
+Reading 'Policy.sh' from ../Policy.sh(1)
+make distclean ...Smoking patch 28219
+
+Configuration: -Dusedevel
+------------------------------------------------------------------------------
+make distclean ...
+Copy Policy.sh ...
+Configure ...5.0094 <=> 5.008
+===== PROCURA Policy for hpux/cc ========================
+cpp: "try.c", line 3185: warning 2006: Parameter holes filled with a null string.
+cpp: "try.c", line 4829: warning 2006: Parameter holes filled with a null string.
+cpp: "try.c", line 4841: warning 2006: Parameter holes filled with a null string.
+
+make ...	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -DARG_ZERO_IS_SCRIPT +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+cc: "util.c", line 4301: warning 527: Integral value implicitly converted to pointer in assignment.
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+cpp: "values.h", line 27: warning 2001: Redefinition of macro MAXINT.
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -DPERL_CORE -c -DPERL_PATCHNUM=28219  -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  +O2 +Onolimit 
+	  CCCMD =  cc -c -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +O2 +Onolimit
+	  CCCMD =  cc -c -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +O2 +Onolimit
+	  CCCMD =  cc -c -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +O2 +Onolimit
+	  CCCMD =  cc -c -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +O2 +Onolimit
+	  CCCMD =  cc -c -Ae +DAportable +Z -z -D_HPUX_SOURCE -Wl,+vnocompatwarnings -I/pro/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +O2 +Onolimit
+Writing compiled form
+14272 bytes in string tables
+4545 bytes (24.2%) saved spotting duplicates
+10 bytes (0.07%) saved using substrings
+Writing compiled form
+34800 bytes in string tables
+2786 bytes (7.41%) saved spotting duplicates
+Writing compiled form
+34638 bytes in string tables
+2566 bytes (6.9%) saved spotting duplicates
+Writing compiled form
+120296 bytes in string tables
+138 bytes (0.115%) saved spotting duplicates
+Writing compiled form
+38113 bytes in string tables
+2548 bytes (6.27%) saved spotting duplicates
+Writing compiled form
+34801 bytes in string tables
+2601 bytes (6.95%) saved spotting duplicates
+Writing compiled form
+34764 bytes in string tables
+2312 bytes (6.24%) saved spotting duplicates
+Writing compiled form
+2174 bytes in string tables
+367 bytes (14.4%) saved spotting duplicates
+1 bytes (0.046%) saved using substrings
+Writing compiled form
+479 bytes in string tables
+Writing compiled form
+31800 bytes in string tables
+2470 bytes (7.21%) saved spotting duplicates
+Writing compiled form
+78376 bytes in string tables
+5448 bytes (6.5%) saved spotting duplicates
+Writing compiled form
+45234 bytes in string tables
+2360 bytes (4.96%) saved spotting duplicates
+Writing compiled form
+27241 bytes in string tables
+2829 bytes (9.41%) saved spotting duplicates
+Writing compiled form
+32924 bytes in string tables
+1726 bytes (4.98%) saved spotting duplicates
+Writing compiled form
+34511 bytes in string tables
+1922 bytes (5.28%) saved spotting duplicates
+Writing compiled form
+43458 bytes in string tables
+4417 bytes (9.23%) saved spotting duplicates
+Writing compiled form
+36921 bytes in string tables
+4038 bytes (9.86%) saved spotting duplicates
+Writing compiled form
+83424 bytes in string tables
+1772 bytes (2.08%) saved spotting duplicates
+Writing compiled form
+36763 bytes in string tables
+4318 bytes (10.5%) saved spotting duplicates
+Writing compiled form
+83711 bytes in string tables
+3158 bytes (3.64%) saved spotting duplicates
+Writing compiled form
+1859 bytes in string tables
+305 bytes (14.1%) saved spotting duplicates
+Writing compiled form
+91321 bytes in string tables
+3227 bytes (3.41%) saved spotting duplicates
+Writing compiled form
+66317 bytes in string tables
+1102 bytes (1.63%) saved spotting duplicates
+Writing compiled form
+98212 bytes in string tables
+1314 bytes (1.32%) saved spotting duplicates
+Writing compiled form
+68325 bytes in string tables
+1191 bytes (1.71%) saved spotting duplicates
+Writing compiled form
+512 bytes in string tables
+32 bytes (5.88%) saved spotting duplicates
+Please specify prototyping behavior for FastCalc.xs (see perlxs manual)
+Processing hints file hints/hpux.pl
+Note (probably harmless): No library found for -lucb
+Note (probably harmless): No library found for -lposix
+Note (probably harmless): No library found for -lcposix
+Can't locate auto/POSIX/autosplit.ix in @INC (@INC contains: ../../lib ../../lib /pro/lib/perl5/5.9.4/PA-RISC2.0 /pro/lib/perl5/5.9.4 /pro/lib/perl5/site_perl/5.9.4/PA-RISC2.0 /pro/lib/perl5/site_perl/5.9.4 .) at ../../lib/AutoLoader.pm line 160.
+ at POSIX.pm line 7
+Making header files for XS...
+Warning: prerequisite threads::shared 0 not found.
+
+ Tests start here:
+TSTENV = stdio	This smoke is aborted (+23:30)
+Reading smokeresult from /pro/3gl/CPAN/perl-current/mktest.out
+Processing []
+Processing [-DDEBUGGING]
+Writing report to '/pro/3gl/CPAN/perl-current/mktest.rpt':Locally applied patches from '/pro/3gl/CPAN/perl-current/patchlevel.h': open ok
+Patches: 'SMOKE28219'
+Looking for cc messages: 'hpux'
+Reading logfile '/pro/3gl/CPAN/smoke/p59.log'
+Pattern(hpux): /(^cc: ".+?", line \d+: (?:warning|error) \d+: .+?$)/
+ OK
+Sending report to smokers-reports@perl.org OK

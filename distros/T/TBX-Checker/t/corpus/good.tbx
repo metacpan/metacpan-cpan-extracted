@@ -1,0 +1,37 @@
+<?xml version='1.0'?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<!-- xml:lang on martif shouldn't matter -->
+<martif type="TBX-Basic" xml:lang="lut">
+	<martifHeader>
+		<fileDesc>
+			<titleStmt>
+				<title>Minimal TBX File</title>
+			</titleStmt>
+			<sourceDesc>
+				<p>Paired down from TBX-Basic Package sample</p>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<p type="XCSURI">small.xcs
+			</p>
+		</encodingDesc>
+	</martifHeader>
+	<text>
+		<body>
+			<termEntry id="c1">
+				<langSet xml:lang="en">
+					<tig>
+						<term>foo</term>
+					</tig>
+				</langSet>
+			</termEntry>
+			<termEntry id="c2">
+				<langSet xml:lang="fr">
+					<tig>
+						<term>bar</term>
+					</tig>
+				</langSet>
+			</termEntry>
+		</body>
+	</text>
+</martif>

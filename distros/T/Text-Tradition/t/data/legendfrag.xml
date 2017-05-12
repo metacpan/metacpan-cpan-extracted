@@ -1,0 +1,1504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key attr.name="ac_label" attr.type="string" for="graph" id="dg0"/>
+  <key attr.name="baselabel" attr.type="string" for="graph" id="dg1"/>
+  <key attr.name="language" attr.type="string" for="graph" id="dg2"/>
+  <key attr.name="linear" attr.type="boolean" for="graph" id="dg3"/>
+  <key attr.name="name" attr.type="string" for="graph" id="dg4"/>
+  <key attr.name="version" attr.type="string" for="graph" id="dg5"/>
+  <key attr.name="wit_list_separator" attr.type="string" for="graph" id="dg6"/>
+  <key attr.name="wordsep" attr.type="string" for="graph" id="dg7"/>
+  <key attr.name="id" attr.type="string" for="node" id="dn0"/>
+  <key attr.name="is_common" attr.type="boolean" for="node" id="dn1"/>
+  <key attr.name="is_end" attr.type="boolean" for="node" id="dn2"/>
+  <key attr.name="is_lacuna" attr.type="boolean" for="node" id="dn3"/>
+  <key attr.name="is_ph" attr.type="boolean" for="node" id="dn4"/>
+  <key attr.name="is_start" attr.type="boolean" for="node" id="dn5"/>
+  <key attr.name="join_next" attr.type="boolean" for="node" id="dn6"/>
+  <key attr.name="join_prior" attr.type="boolean" for="node" id="dn7"/>
+  <key attr.name="language" attr.type="string" for="node" id="dn8"/>
+  <key attr.name="lemma" attr.type="string" for="node" id="dn9"/>
+  <key attr.name="normal_form" attr.type="string" for="node" id="dn10"/>
+  <key attr.name="rank" attr.type="int" for="node" id="dn11"/>
+  <key attr.name="text" attr.type="string" for="node" id="dn12"/>
+  <key attr.name="annotation" attr.type="string" for="edge" id="de0"/>
+  <key attr.name="displayform" attr.type="string" for="edge" id="de1"/>
+  <key attr.name="extra" attr.type="boolean" for="edge" id="de2"/>
+  <key attr.name="non_correctable" attr.type="boolean" for="edge" id="de3"/>
+  <key attr.name="non_independent" attr.type="boolean" for="edge" id="de4"/>
+  <key attr.name="reading_a" attr.type="string" for="edge" id="de5"/>
+  <key attr.name="reading_b" attr.type="string" for="edge" id="de6"/>
+  <key attr.name="scope" attr.type="string" for="edge" id="de7"/>
+  <key attr.name="type" attr.type="string" for="edge" id="de8"/>
+  <key attr.name="witness" attr.type="string" for="edge" id="de9"/>
+  <graph edgedefault="directed" id="Legend_of_Bishop_Henry" parse.edgeids="canonical" parse.edges="357" parse.nodeids="canonical" parse.nodes="30" parse.order="nodesfirst">
+    <data key="dg0"> (a.c.)</data>
+    <data key="dg1">base text</data>
+    <data key="dg2">Latin</data>
+    <data key="dg3">1</data>
+    <data key="dg5">3.1</data>
+    <data key="dg6">, </data>
+    <data key="dg4">Legend of Bishop Henry</data>
+    <data key="dg7"> </data>
+    <node id="n0">
+      <data key="dn8">Default</data>
+      <data key="dn12">#END#</data>
+      <data key="dn2">1</data>
+      <data key="dn0">#END#</data>
+      <data key="dn11">10</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n1">
+      <data key="dn8">Default</data>
+      <data key="dn12">#START#</data>
+      <data key="dn5">1</data>
+      <data key="dn0">#START#</data>
+      <data key="dn11">0</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n2">
+      <data key="dn8">Default</data>
+      <data key="dn12">beatus</data>
+      <data key="dn0">10,2</data>
+      <data key="dn11">5</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n3">
+      <data key="dn8">Default</data>
+      <data key="dn12">venerabilis</data>
+      <data key="dn0">10,3</data>
+      <data key="dn11">5</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n4">
+      <data key="dn8">Default</data>
+      <data key="dn12">sanctus</data>
+      <data key="dn0">10,4</data>
+      <data key="dn11">5</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n5">
+      <data key="dn8">Default</data>
+      <data key="dn12">henricus</data>
+      <data key="dn0">11,2</data>
+      <data key="dn11">6</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n6">
+      <data key="dn8">Default</data>
+      <data key="dn12">heinricus</data>
+      <data key="dn0">11,3</data>
+      <data key="dn11">6</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n7">
+      <data key="dn8">Default</data>
+      <data key="dn12">Henricus</data>
+      <data key="dn0">11,4</data>
+      <data key="dn11">6</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n8">
+      <data key="dn8">Default</data>
+      <data key="dn12">pontifex</data>
+      <data key="dn0">11,5</data>
+      <data key="dn11">6</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n9">
+      <data key="dn8">Default</data>
+      <data key="dn12">de</data>
+      <data key="dn0">12,2</data>
+      <data key="dn11">7</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n10">
+      <data key="dn8">Default</data>
+      <data key="dn12">in</data>
+      <data key="dn0">12,3</data>
+      <data key="dn11">7</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n11">
+      <data key="dn8">Default</data>
+      <data key="dn12">ex</data>
+      <data key="dn0">12,4</data>
+      <data key="dn11">7</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n12">
+      <data key="dn8">Default</data>
+      <data key="dn12">anglia</data>
+      <data key="dn0">13,2</data>
+      <data key="dn11">8</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n13">
+      <data key="dn8">Default</data>
+      <data key="dn12">Anglia</data>
+      <data key="dn0">13,3</data>
+      <data key="dn11">8</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n14">
+      <data key="dn8">Default</data>
+      <data key="dn12">oriundus</data>
+      <data key="dn0">14,2</data>
+      <data key="dn11">9</data>
+      <data key="dn1">1</data>
+    </node>
+    <node id="n15">
+      <data key="dn8">Default</data>
+      <data key="dn12">in</data>
+      <data key="dn0">6,2</data>
+      <data key="dn11">1</data>
+      <data key="dn1">1</data>
+    </node>
+    <node id="n16">
+      <data key="dn8">Default</data>
+      <data key="dn12">svecia</data>
+      <data key="dn0">7,1</data>
+      <data key="dn11">2</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n17">
+      <data key="dn8">Default</data>
+      <data key="dn12">suetia</data>
+      <data key="dn0">7,3</data>
+      <data key="dn11">2</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n18">
+      <data key="dn8">Default</data>
+      <data key="dn12">swetia</data>
+      <data key="dn0">7,4</data>
+      <data key="dn11">2</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n19">
+      <data key="dn8">Default</data>
+      <data key="dn12">swecia</data>
+      <data key="dn0">7,5</data>
+      <data key="dn11">2</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n20">
+      <data key="dn8">Default</data>
+      <data key="dn12">suecia</data>
+      <data key="dn0">7,6</data>
+      <data key="dn11">2</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n21">
+      <data key="dn8">Default</data>
+      <data key="dn12">Swecia</data>
+      <data key="dn0">7,7</data>
+      <data key="dn11">2</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n22">
+      <data key="dn8">Default</data>
+      <data key="dn12">#LACUNA#</data>
+      <data key="dn0">8,1</data>
+      <data key="dn11">9</data>
+      <data key="dn1">0</data>
+      <data key="dn3">1</data>
+    </node>
+    <node id="n23">
+      <data key="dn8">Default</data>
+      <data key="dn12">Venerabilis</data>
+      <data key="dn0">8,2</data>
+      <data key="dn11">3</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n24">
+      <data key="dn8">Default</data>
+      <data key="dn12">beatus</data>
+      <data key="dn0">8,3</data>
+      <data key="dn11">3</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n25">
+      <data key="dn8">Default</data>
+      <data key="dn12">sanctus</data>
+      <data key="dn0">8,4</data>
+      <data key="dn11">3</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n26">
+      <data key="dn8">Default</data>
+      <data key="dn12">uenerabilis</data>
+      <data key="dn0">8,5</data>
+      <data key="dn11">3</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n27">
+      <data key="dn8">Default</data>
+      <data key="dn12">venerabilis</data>
+      <data key="dn0">8,6</data>
+      <data key="dn11">3</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n28">
+      <data key="dn8">Default</data>
+      <data key="dn12">henricus</data>
+      <data key="dn0">9,2</data>
+      <data key="dn11">4</data>
+      <data key="dn1">0</data>
+    </node>
+    <node id="n29">
+      <data key="dn8">Default</data>
+      <data key="dn12">pontifex</data>
+      <data key="dn0">9,3</data>
+      <data key="dn11">4</data>
+      <data key="dn1">0</data>
+    </node>
+    <edge source="n1" target="n15" id="e0">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n1" target="n15" id="e1">
+      <data key="de9">Ab</data>
+    </edge>
+    <edge source="n1" target="n15" id="e2">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n1" target="n15" id="e3">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n1" target="n15" id="e4">
+      <data key="de9">BL</data>
+    </edge>
+    <edge source="n1" target="n15" id="e5">
+      <data key="de9">BLu</data>
+    </edge>
+    <edge source="n1" target="n15" id="e6">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n1" target="n15" id="e7">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n1" target="n15" id="e8">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n1" target="n15" id="e9">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n1" target="n15" id="e10">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n1" target="n15" id="e11">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n1" target="n15" id="e12">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n1" target="n15" id="e13">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n1" target="n15" id="e14">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n1" target="n15" id="e15">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n1" target="n15" id="e16">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n1" target="n15" id="e17">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n1" target="n15" id="e18">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n1" target="n15" id="e19">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n1" target="n15" id="e20">
+      <data key="de9">L</data>
+    </edge>
+    <edge source="n1" target="n15" id="e21">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n1" target="n15" id="e22">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n1" target="n15" id="e23">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n1" target="n15" id="e24">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n1" target="n15" id="e25">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n1" target="n15" id="e26">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n1" target="n15" id="e27">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n1" target="n15" id="e28">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n1" target="n15" id="e29">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n1" target="n15" id="e30">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n1" target="n15" id="e31">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n1" target="n15" id="e32">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n1" target="n15" id="e33">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n1" target="n15" id="e34">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n1" target="n15" id="e35">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n1" target="n15" id="e36">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n2" target="n9" id="e37">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n2" target="n7" id="e38">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n2" target="n5" id="e39">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n2" target="n5" id="e40">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n2" target="n5" id="e41">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n2" target="n5" id="e42">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n2" target="n5" id="e43">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n2" target="n5" id="e44">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n2" target="n5" id="e45">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n2" target="n5" id="e46">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n2" target="n5" id="e47">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n2" target="n5" id="e48">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n2" target="n5" id="e49">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n2" target="n5" id="e50">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n2" target="n5" id="e51">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n2" target="n5" id="e52">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n2" target="n5" id="e53">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n2" target="n5" id="e54">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n2" target="n5" id="e55">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n2" target="n5" id="e56">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n2" target="n5" id="e57">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n2" target="n5" id="e58">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n2" target="n5" id="e59">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n2" target="n5" id="e60">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n2" target="n5" id="e61">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n2" target="n5" id="e62">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n2" target="n5" id="e63">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n2" target="n6" id="e64">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n3" target="n8" id="e65">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n4" target="n7" id="e66">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n4" target="n5" id="e67">
+      <data key="de9">BL</data>
+    </edge>
+    <edge source="n4" target="n5" id="e68">
+      <data key="de9">BLu</data>
+    </edge>
+    <edge source="n4" target="n5" id="e69">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n4" target="n5" id="e70">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n5" target="n9" id="e71">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n5" target="n9" id="e72">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n5" target="n9" id="e73">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n5" target="n9" id="e74">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n5" target="n9" id="e75">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n5" target="n9" id="e76">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n5" target="n9" id="e77">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n5" target="n9" id="e78">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n5" target="n9" id="e79">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n5" target="n9" id="e80">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n5" target="n9" id="e81">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n5" target="n9" id="e82">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n5" target="n11" id="e83">
+      <data key="de9">BLu</data>
+    </edge>
+    <edge source="n5" target="n10" id="e84">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n5" target="n10" id="e85">
+      <data key="de9">BL</data>
+    </edge>
+    <edge source="n5" target="n10" id="e86">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n5" target="n10" id="e87">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n5" target="n10" id="e88">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n5" target="n10" id="e89">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n5" target="n10" id="e90">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n5" target="n10" id="e91">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n5" target="n10" id="e92">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n5" target="n10" id="e93">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n5" target="n10" id="e94">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n5" target="n10" id="e95">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n5" target="n10" id="e96">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n5" target="n10" id="e97">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n5" target="n10" id="e98">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n5" target="n10" id="e99">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n5" target="n10" id="e100">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n6" target="n9" id="e101">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n7" target="n10" id="e102">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n7" target="n10" id="e103">
+      <data key="de9">L</data>
+    </edge>
+    <edge source="n7" target="n10" id="e104">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n8" target="n9" id="e105">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n9" target="n13" id="e106">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n9" target="n13" id="e107">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n9" target="n12" id="e108">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n9" target="n12" id="e109">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n9" target="n12" id="e110">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n9" target="n12" id="e111">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n9" target="n12" id="e112">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n9" target="n12" id="e113">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n9" target="n12" id="e114">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n9" target="n12" id="e115">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n9" target="n12" id="e116">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n9" target="n12" id="e117">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n9" target="n12" id="e118">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n9" target="n12" id="e119">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n9" target="n12" id="e120">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n10" target="n13" id="e121">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n10" target="n12" id="e122">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n10" target="n12" id="e123">
+      <data key="de9">BL</data>
+    </edge>
+    <edge source="n10" target="n12" id="e124">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n10" target="n12" id="e125">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n10" target="n12" id="e126">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n10" target="n12" id="e127">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n10" target="n12" id="e128">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n10" target="n12" id="e129">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n10" target="n12" id="e130">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n10" target="n12" id="e131">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n10" target="n12" id="e132">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n10" target="n12" id="e133">
+      <data key="de9">L</data>
+    </edge>
+    <edge source="n10" target="n12" id="e134">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n10" target="n12" id="e135">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n10" target="n12" id="e136">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n10" target="n12" id="e137">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n10" target="n12" id="e138">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n10" target="n12" id="e139">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n10" target="n12" id="e140">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n11" target="n12" id="e141">
+      <data key="de9">BLu</data>
+    </edge>
+    <edge source="n12" target="n14" id="e142">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n12" target="n14" id="e143">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n12" target="n14" id="e144">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n12" target="n14" id="e145">
+      <data key="de9">BL</data>
+    </edge>
+    <edge source="n12" target="n14" id="e146">
+      <data key="de9">BLu</data>
+    </edge>
+    <edge source="n12" target="n14" id="e147">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n12" target="n14" id="e148">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n12" target="n14" id="e149">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n12" target="n14" id="e150">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n12" target="n14" id="e151">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n12" target="n14" id="e152">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n12" target="n14" id="e153">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n12" target="n14" id="e154">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n12" target="n14" id="e155">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n12" target="n14" id="e156">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n12" target="n14" id="e157">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n12" target="n14" id="e158">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n12" target="n14" id="e159">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n12" target="n14" id="e160">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n12" target="n14" id="e161">
+      <data key="de9">L</data>
+    </edge>
+    <edge source="n12" target="n14" id="e162">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n12" target="n14" id="e163">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n12" target="n14" id="e164">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n12" target="n14" id="e165">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n12" target="n14" id="e166">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n12" target="n14" id="e167">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n12" target="n14" id="e168">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n12" target="n14" id="e169">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n12" target="n14" id="e170">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n12" target="n14" id="e171">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n12" target="n14" id="e172">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n12" target="n14" id="e173">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n12" target="n14" id="e174">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n13" target="n14" id="e175">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n13" target="n14" id="e176">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n13" target="n14" id="e177">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n14" target="n0" id="e178">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n14" target="n0" id="e179">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n14" target="n0" id="e180">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n14" target="n0" id="e181">
+      <data key="de9">BL</data>
+    </edge>
+    <edge source="n14" target="n0" id="e182">
+      <data key="de9">BLu</data>
+    </edge>
+    <edge source="n14" target="n0" id="e183">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n14" target="n0" id="e184">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n14" target="n0" id="e185">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n14" target="n0" id="e186">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n14" target="n0" id="e187">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n14" target="n0" id="e188">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n14" target="n0" id="e189">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n14" target="n0" id="e190">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n14" target="n0" id="e191">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n14" target="n0" id="e192">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n14" target="n0" id="e193">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n14" target="n0" id="e194">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n14" target="n0" id="e195">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n14" target="n0" id="e196">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n14" target="n0" id="e197">
+      <data key="de9">L</data>
+    </edge>
+    <edge source="n14" target="n0" id="e198">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n14" target="n0" id="e199">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n14" target="n0" id="e200">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n14" target="n0" id="e201">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n14" target="n0" id="e202">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n14" target="n0" id="e203">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n14" target="n0" id="e204">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n14" target="n0" id="e205">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n14" target="n0" id="e206">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n14" target="n0" id="e207">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n14" target="n0" id="e208">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n14" target="n0" id="e209">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n14" target="n0" id="e210">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n14" target="n0" id="e211">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n14" target="n0" id="e212">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n14" target="n0" id="e213">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n15" target="n19" id="e214">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n15" target="n19" id="e215">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n15" target="n19" id="e216">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n15" target="n19" id="e217">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n15" target="n19" id="e218">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n15" target="n19" id="e219">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n15" target="n19" id="e220">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n15" target="n19" id="e221">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n15" target="n19" id="e222">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n15" target="n19" id="e223">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n15" target="n19" id="e224">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n15" target="n19" id="e225">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n15" target="n20" id="e226">
+      <data key="de9">Ab</data>
+    </edge>
+    <edge source="n15" target="n20" id="e227">
+      <data key="de9">BL</data>
+    </edge>
+    <edge source="n15" target="n20" id="e228">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n15" target="n20" id="e229">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n15" target="n20" id="e230">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n15" target="n20" id="e231">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n15" target="n20" id="e232">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n15" target="n20" id="e233">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n15" target="n20" id="e234">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n15" target="n20" id="e235">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n15" target="n20" id="e236">
+      <data key="de9">L</data>
+    </edge>
+    <edge source="n15" target="n20" id="e237">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n15" target="n20" id="e238">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n15" target="n20" id="e239">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n15" target="n20" id="e240">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n15" target="n20" id="e241">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n15" target="n20" id="e242">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n15" target="n17" id="e243">
+      <data key="de9">BLu</data>
+    </edge>
+    <edge source="n15" target="n17" id="e244">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n15" target="n17" id="e245">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n15" target="n17" id="e246">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n15" target="n16" id="e247">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n15" target="n21" id="e248">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n15" target="n18" id="e249">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n15" target="n18" id="e250">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n16" target="n27" id="e251">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n17" target="n4" id="e252">
+      <data key="de9">BLu</data>
+    </edge>
+    <edge source="n17" target="n26" id="e253">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n17" target="n26" id="e254">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n17" target="n27" id="e255">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n18" target="n27" id="e256">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n18" target="n27" id="e257">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n19" target="n23" id="e258">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n19" target="n27" id="e259">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n19" target="n27" id="e260">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n19" target="n27" id="e261">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n19" target="n27" id="e262">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n19" target="n27" id="e263">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n19" target="n27" id="e264">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n19" target="n27" id="e265">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n19" target="n27" id="e266">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n19" target="n27" id="e267">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n19" target="n27" id="e268">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n19" target="n26" id="e269">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n20" target="n27" id="e270">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n20" target="n27" id="e271">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n20" target="n27" id="e272">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n20" target="n27" id="e273">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n20" target="n27" id="e274">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n20" target="n27" id="e275">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n20" target="n27" id="e276">
+      <data key="de9">L</data>
+    </edge>
+    <edge source="n20" target="n27" id="e277">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n20" target="n27" id="e278">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n20" target="n27" id="e279">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n20" target="n27" id="e280">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n20" target="n25" id="e281">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n20" target="n26" id="e282">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n20" target="n26" id="e283">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n20" target="n4" id="e284">
+      <data key="de9">BL</data>
+    </edge>
+    <edge source="n20" target="n24" id="e285">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n20" target="n22" id="e286">
+      <data key="de9">Ab</data>
+    </edge>
+    <edge source="n21" target="n23" id="e287">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n22" target="n0" id="e288">
+      <data key="de9">Ab</data>
+    </edge>
+    <edge source="n23" target="n29" id="e289">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n23" target="n29" id="e290">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n24" target="n28" id="e291">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n25" target="n29" id="e292">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n26" target="n29" id="e293">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n26" target="n29" id="e294">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n26" target="n29" id="e295">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n26" target="n29" id="e296">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n26" target="n29" id="e297">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n27" target="n29" id="e298">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n27" target="n29" id="e299">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n27" target="n29" id="e300">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n27" target="n29" id="e301">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n27" target="n29" id="e302">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n27" target="n29" id="e303">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n27" target="n29" id="e304">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n27" target="n29" id="e305">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n27" target="n29" id="e306">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n27" target="n29" id="e307">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n27" target="n29" id="e308">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n27" target="n29" id="e309">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n27" target="n29" id="e310">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n27" target="n29" id="e311">
+      <data key="de9">L</data>
+    </edge>
+    <edge source="n27" target="n29" id="e312">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n27" target="n29" id="e313">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n27" target="n29" id="e314">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n27" target="n29" id="e315">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n27" target="n29" id="e316">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n27" target="n29" id="e317">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n27" target="n29" id="e318">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n27" target="n29" id="e319">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n27" target="n29" id="e320">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n27" target="n29" id="e321">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n27" target="n29" id="e322">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n28" target="n3" id="e323">
+      <data key="de9">N</data>
+    </edge>
+    <edge source="n29" target="n4" id="e324">
+      <data key="de9">BS</data>
+    </edge>
+    <edge source="n29" target="n4" id="e325">
+      <data key="de9">G</data>
+    </edge>
+    <edge source="n29" target="n4" id="e326">
+      <data key="de9">Q</data>
+    </edge>
+    <edge source="n29" target="n2" id="e327">
+      <data key="de9">A</data>
+    </edge>
+    <edge source="n29" target="n2" id="e328">
+      <data key="de9">B</data>
+    </edge>
+    <edge source="n29" target="n2" id="e329">
+      <data key="de9">BA</data>
+    </edge>
+    <edge source="n29" target="n2" id="e330">
+      <data key="de9">BSt</data>
+    </edge>
+    <edge source="n29" target="n2" id="e331">
+      <data key="de9">BU</data>
+    </edge>
+    <edge source="n29" target="n2" id="e332">
+      <data key="de9">Bc</data>
+    </edge>
+    <edge source="n29" target="n2" id="e333">
+      <data key="de9">C</data>
+    </edge>
+    <edge source="n29" target="n2" id="e334">
+      <data key="de9">Dr</data>
+    </edge>
+    <edge source="n29" target="n2" id="e335">
+      <data key="de9">Ef</data>
+    </edge>
+    <edge source="n29" target="n2" id="e336">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n29" target="n2" id="e337">
+      <data key="de9">Gh</data>
+    </edge>
+    <edge source="n29" target="n2" id="e338">
+      <data key="de9">H</data>
+    </edge>
+    <edge source="n29" target="n2" id="e339">
+      <data key="de9">Ho</data>
+    </edge>
+    <edge source="n29" target="n2" id="e340">
+      <data key="de9">JG</data>
+    </edge>
+    <edge source="n29" target="n2" id="e341">
+      <data key="de9">K</data>
+    </edge>
+    <edge source="n29" target="n2" id="e342">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n29" target="n2" id="e343">
+      <data key="de9">MN</data>
+    </edge>
+    <edge source="n29" target="n2" id="e344">
+      <data key="de9">O</data>
+    </edge>
+    <edge source="n29" target="n2" id="e345">
+      <data key="de9">P</data>
+    </edge>
+    <edge source="n29" target="n2" id="e346">
+      <data key="de9">S</data>
+    </edge>
+    <edge source="n29" target="n2" id="e347">
+      <data key="de9">Sk</data>
+    </edge>
+    <edge source="n29" target="n2" id="e348">
+      <data key="de9">St</data>
+    </edge>
+    <edge source="n29" target="n2" id="e349">
+      <data key="de9">T</data>
+    </edge>
+    <edge source="n29" target="n2" id="e350">
+      <data key="de9">U</data>
+    </edge>
+    <edge source="n29" target="n2" id="e351">
+      <data key="de9">V</data>
+    </edge>
+    <edge source="n29" target="n2" id="e352">
+      <data key="de9">Vg</data>
+    </edge>
+    <edge source="n29" target="n2" id="e353">
+      <data key="de9">X</data>
+    </edge>
+    <edge source="n29" target="n2" id="e354">
+      <data key="de9">Y</data>
+    </edge>
+    <edge source="n29" target="n5" id="e355">
+      <data key="de9">Li</data>
+    </edge>
+    <edge source="n29" target="n7" id="e356">
+      <data key="de9">L</data>
+    </edge>
+  </graph>
+  <graph edgedefault="directed" id="relationships" parse.edgeids="canonical" parse.edges="14" parse.nodeids="canonical" parse.nodes="30" parse.order="nodesfirst">
+    <node id="n0">
+      <data key="dn0">#END#</data>
+    </node>
+    <node id="n1">
+      <data key="dn0">#START#</data>
+    </node>
+    <node id="n10">
+      <data key="dn0">12,3</data>
+    </node>
+    <node id="n11">
+      <data key="dn0">12,4</data>
+    </node>
+    <node id="n12">
+      <data key="dn0">13,2</data>
+    </node>
+    <node id="n13">
+      <data key="dn0">13,3</data>
+    </node>
+    <node id="n14">
+      <data key="dn0">14,2</data>
+    </node>
+    <node id="n15">
+      <data key="dn0">6,2</data>
+    </node>
+    <node id="n16">
+      <data key="dn0">7,1</data>
+    </node>
+    <node id="n17">
+      <data key="dn0">7,3</data>
+    </node>
+    <node id="n18">
+      <data key="dn0">7,4</data>
+    </node>
+    <node id="n19">
+      <data key="dn0">7,5</data>
+    </node>
+    <node id="n2">
+      <data key="dn0">10,2</data>
+    </node>
+    <node id="n20">
+      <data key="dn0">7,6</data>
+    </node>
+    <node id="n21">
+      <data key="dn0">7,7</data>
+    </node>
+    <node id="n22">
+      <data key="dn0">8,1</data>
+    </node>
+    <node id="n23">
+      <data key="dn0">8,2</data>
+    </node>
+    <node id="n24">
+      <data key="dn0">8,3</data>
+    </node>
+    <node id="n25">
+      <data key="dn0">8,4</data>
+    </node>
+    <node id="n26">
+      <data key="dn0">8,5</data>
+    </node>
+    <node id="n27">
+      <data key="dn0">8,6</data>
+    </node>
+    <node id="n28">
+      <data key="dn0">9,2</data>
+    </node>
+    <node id="n29">
+      <data key="dn0">9,3</data>
+    </node>
+    <node id="n3">
+      <data key="dn0">10,3</data>
+    </node>
+    <node id="n4">
+      <data key="dn0">10,4</data>
+    </node>
+    <node id="n5">
+      <data key="dn0">11,2</data>
+    </node>
+    <node id="n6">
+      <data key="dn0">11,3</data>
+    </node>
+    <node id="n7">
+      <data key="dn0">11,4</data>
+    </node>
+    <node id="n8">
+      <data key="dn0">11,5</data>
+    </node>
+    <node id="n9">
+      <data key="dn0">12,2</data>
+    </node>
+    <edge source="n5" target="n6" id="e0">
+      <data key="de5">henricus</data>
+      <data key="de6">heinricus</data>
+      <data key="de8">spelling</data>
+      <data key="de0">Same word. One reading has a capital H, the other hasn't.</data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n5" target="n7" id="e1">
+      <data key="de5">henricus</data>
+      <data key="de6">Henricus</data>
+      <data key="de8">orthographic</data>
+      <data key="de0">Same word. One reading has a capital H, the other hasn't.</data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n12" target="n13" id="e2">
+      <data key="de5">anglia</data>
+      <data key="de6">Anglia</data>
+      <data key="de8">orthographic</data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n14" target="n22" id="e3">
+      <data key="de5">oriundus</data>
+      <data key="de6">#LACUNA#</data>
+      <data key="de8">collated</data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n16" target="n17" id="e4">
+      <data key="de5">svecia</data>
+      <data key="de6">suetia</data>
+      <data key="de8">orthographic</data>
+      <data key="de0">Same word. </data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n16" target="n18" id="e5">
+      <data key="de5">svecia</data>
+      <data key="de6">swetia</data>
+      <data key="de8">orthographic</data>
+      <data key="de0">Same word. </data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n18" target="n19" id="e6">
+      <data key="de5">swetia</data>
+      <data key="de6">swecia</data>
+      <data key="de8">orthographic</data>
+      <data key="de0">Same word. </data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n19" target="n21" id="e7">
+      <data key="de5">swecia</data>
+      <data key="de6">Swecia</data>
+      <data key="de8">orthographic</data>
+      <data key="de0">Same word. </data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n20" target="n21" id="e8">
+      <data key="de5">suecia</data>
+      <data key="de6">Swecia</data>
+      <data key="de8">orthographic</data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n23" target="n26" id="e9">
+      <data key="de5">Venerabilis</data>
+      <data key="de6">uenerabilis</data>
+      <data key="de8">orthographic</data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n23" target="n27" id="e10">
+      <data key="de5">Venerabilis</data>
+      <data key="de6">venerabilis</data>
+      <data key="de8">orthographic</data>
+      <data key="de7">global</data>
+    </edge>
+    <edge source="n26" target="n27" id="e11">
+      <data key="de5">uenerabilis</data>
+      <data key="de6">venerabilis</data>
+      <data key="de8">orthographic</data>
+      <data key="de7">local</data>
+    </edge>
+    <edge source="n28" target="n29" id="e12">
+      <data key="de5">pontifex</data>
+      <data key="de6">henricus</data>
+      <data key="de8">collated</data>
+      <data key="de7">local</data>
+    </edge>
+  </graph>
+</graphml>

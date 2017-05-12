@@ -1,0 +1,22 @@
+Build.PL
+Changes
+eg/agent.pl
+eg/shrc
+eg/t/agent.t
+lib/Test/LogFile.pm
+MANIFEST			This list of files
+META.json
+README
+t/00_compile.t
+t/01_log_file.t
+t/02_count_ok.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/podcoverage.t
+xt/podspell.t
+xt/podsynopsis.t
+META.yml

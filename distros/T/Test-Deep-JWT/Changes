@@ -1,0 +1,10 @@
+Revision history for Perl extension Test-Deep-JWT
+
+0.02 2015-06-07T02:30:00Z
+
+    - Add dependency MIME::Base64 >= v3.11
+
+0.01 2015-06-06T15:21:09Z
+
+    - original version
+

@@ -1,0 +1,50 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Appliance::SQL::Retrieval_n_Display - SQL table listing
+
+=head1 SYNOPSIS
+
+	use Data::Dumper;
+	use Text::Placeholder::Appliance::SQL::Retrieval_n_Display;
+
+	my %values = (
+		'cond_some_value' => '99'
+	);
+
+	my $rnd = Text::Placeholder::Appliance::SQL::Retrieval_n_Display->new;
+	$rnd->html_parameter(
+		'<td>[=fld_some_name=]</td>
+		<td>[=fld_other_name=]</td>');
+	my ($statement, $value_names) = $rnd->sql_parameter(
+		'SELECT [=field_list=]
+		FROM some_table
+		WHERE some_field = [=cond_some_value=]');
+	my @values = map($values{$_}, @{$value_names});
+	#my $rows = $dbh->selectall_arrayref($statement, {}, @values);
+	my $rows = [[4..6], [qw(A B C)]];
+	$rnd->format($rows);
+
+	print Dumper($statement, \@values, $rows);
+
+=head1 DESCRIPTION
+
+Text::Placeholder::Appliance::SQL::Retrieval_n_Display takes a HTML format and a SQL statement format and produces a table listing from it. It's an example how to build an appliance from placeholder groups.
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

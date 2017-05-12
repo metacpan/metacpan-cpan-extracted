@@ -1,0 +1,12 @@
+Revision history for Test-Install-METArequires
+
+0.03   10 Dec 2009
+    * use dbedia::Debian if available
+    * removed hardcoded evil sudo. optional now using $ENV{IMETAR_SUDO}
+
+0.02    4 Dec 2009
+    * 1h cpan install timeout and can be set
+
+0.01    2 Oct 2009
+    First version, released on an unsuspecting world.
+

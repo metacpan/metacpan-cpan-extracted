@@ -1,0 +1,22 @@
+MANIFEST			This list of files
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Test/PostgreSQL.pm
+Makefile.PL
+META.yml
+META.json
+README.md
+t/00-base.t
+t/01-raii.t
+t/02-multi.t
+t/04-multiprocess.t
+t/05-recycle-base-dir.t
+t/deadlock.t
+t/pod.t

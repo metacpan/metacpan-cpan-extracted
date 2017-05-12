@@ -1,0 +1,128 @@
+#! /usr/bin/perl
+# PODNAME: tapper-mcp-messagereceiver
+# ABSTRACT: cmdline frontend Tapper::MCP::MessageReceiver
+
+# Using Mojolicious::Lite will enable "strict" and "warnings"
+use Mojolicious::Lite;
+use File::Spec::Functions 'tmpdir';
+use Tapper::Model 'model';
+use Tapper::Config;
+use Log::Log4perl;
+use 5.010;
+
+# initialize logging
+Log::Log4perl->init(Tapper::Config->subconfig->{files}{log4perl_cfg});
+
+
+sub get_params
+{
+        my ($mojo) = @_;
+        my %params    = @{$mojo->tx->req->url->path->parts || []};
+        my $headers   = $mojo->req->headers->to_hash;
+        foreach my $key (keys %{$headers || []}) {
+                if ($key =~ /X-Tapper-(.+)/) {
+                        $params{$1} = $headers->{$key};
+                }
+        }
+        return %params;
+
+}
+
+get '/state/:state/(*optional)' => sub {
+        my $self      = shift;
+        my %params    = get_params($self);
+        my $db = model('TestrunDB')->resultset('Message')->new({testrun_id => $params{testrun_id},
+                                                                type       => 'state',
+                                                                message    => \%params});
+        my $log = Log::Log4perl->get_logger('Tapper.MCP.MessageReceiver.state');
+        $log->debug("Message: ".$self->tx->req->url->path );
+        $db->insert;
+        $self->render(text => '');
+};
+
+get '/action/(*optional)' => sub {
+        my $self      = shift;
+        my %params    = get_params($self);
+        my $db = model('TestrunDB')->resultset('Message')->new({type       => 'action',
+                                                                message    => \%params});
+        my $log = Log::Log4perl->get_logger('Tapper.MCP.MessageReceiver.action');
+        $log->debug("Message: ".$self->tx->req->url->path );
+        $db->insert;
+        $self->render(text => '');
+};
+
+
+get '/getstate/:testrun_id/' => sub {
+        my $self      = shift;
+        my $log = Log::Log4perl->get_logger('Tapper.MCP.MessageReceiver.getstate');
+        $log->debug("Message: ".$self->tx->req->url->path );
+        my $db = model('TestrunDB')->resultset('State')->find({testrun_id => $self->param('testrun_id')});
+        if ($db) {
+                $self->render(text => ($db->get_column('state') // ''));
+        } else {
+                $self->render(text => '');
+        }
+};
+
+my $port          = Tapper::Config::subconfig->{mcp_port} || 7359;
+my $tapperbasedir = $ENV{HARNESS_ACTIVE} ? "." : (Tapper::Config::subconfig->{paths}{tapperbasedir} || tmpdir());
+my $conffile      = "$tapperbasedir/tapper-mcp-messagereceiver.conf";
+plugin Config => {
+                  file => $conffile,
+                  # default entry makes external configfile optional
+                  default => {
+                              hypnotoad => {
+                                            listen => ["http://*:1337"],
+                                           },
+                             },
+                 };
+
+# start the Mojolicious command system
+app->secrets(['Tapper::MCP::MessageReceiver']);
+if (@ARGV) {
+        app->start;
+} else {
+        app->start("daemon", "--listen", "http://*:$port");
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-mcp-messagereceiver - cmdline frontend Tapper::MCP::MessageReceiver
+
+=head2 get_params
+
+Analyze params from url and Tapper headers.
+
+@param Mojolicious::Controller object
+
+@return hash - parameters
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=item *
+
+Tapper Team <tapper-ops@amazon.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

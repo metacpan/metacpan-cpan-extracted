@@ -1,0 +1,6 @@
+print<>text<>
+print<>line<>
+line<>doc<>
+line<>text<>
+text<>doc<>
+print<>doc<>

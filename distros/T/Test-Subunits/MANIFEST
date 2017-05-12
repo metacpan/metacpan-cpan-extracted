@@ -1,0 +1,30 @@
+Changes
+lib/Test/Subunits.pm
+Makefile.PL
+MANIFEST
+README
+t/pod-coverage.t
+t/pod.t
+t/basic.t
+t/error_bad_wrapper.t
+t/error_load_no_arg.t
+t/error_prevent_subunits.t
+t/error_unmatched_delims.t
+t/exact_path.t
+t/filepath.t
+t/full_wrappers.t
+t/half_wrappers.t
+t/inline.t
+t/namespace.t
+tlib/BadWrapperBlock.pm
+tlib/BadWrapperPara.pm
+tlib/NoSubunitsLoud.pm
+tlib/NoSubunitsQuiet.pm
+tlib/UnclosedOpeningDelim.pm
+tlib/UnopenedClosingDelim.pm
+tlib/Test/Module/Basic.pm
+tlib/Test/Module/FullWrappers.pm
+tlib/Test/Module/HalfWrappers.pm
+tlib/Test/Module/Inline.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

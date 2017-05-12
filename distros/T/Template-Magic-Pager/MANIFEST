@@ -1,0 +1,16 @@
+Changes
+examples/pager_eg/page_index.tm
+examples/pager_eg/pager.pl
+examples/pager_eg/readme
+examples/pager_eg/record_hdr.tm
+examples/pager_eg/results.html
+lib/Template/Magic/Pager.pm
+lib/Template/Magic/Slicer.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_base.t
+t/02_tm.t
+t/test_pod.t
+t/test_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

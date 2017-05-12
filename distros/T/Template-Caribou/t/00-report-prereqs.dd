@@ -1,0 +1,55 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Class::Load' => '0',
+                                      'Exporter::Tiny' => '0',
+                                      'List::AllUtils' => '0',
+                                      'Module::Runtime' => '0',
+                                      'Moose::Exporter' => '0',
+                                      'Moose::Role' => '0',
+                                      'Moose::Util' => '0',
+                                      'MooseX::Role::Parameterized' => '0',
+                                      'Path::Tiny' => '0',
+                                      'Ref::Util' => '0',
+                                      'Text::MultiMarkdown' => '0',
+                                      'Tie::Handle' => '0',
+                                      'Try::Tiny' => '0',
+                                      'XML::Writer' => '0',
+                                      'experimental' => '0',
+                                      'overload' => '0',
+                                      'parent' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Moose' => '0',
+                                   'Test::Exception' => '0',
+                                   'Test::More' => '0',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

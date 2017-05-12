@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+	<title>Custom Title!</title>
+{% endblock %}
+
+{% block content %}
+	custom content too!
+  {% if locale %}
+    {{ locale }}
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,37 @@
+---
+abstract: 'Test RFC3339 timestamps are within a certain tolerance'
+author:
+  - 'Thomas Sibley <trsibley@uw.edu>'
+build_requires:
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Deep-DateTime-RFC3339
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  DateTime: 0
+  DateTime::Duration: 0
+  DateTime::Format::Duration::DurationString: 0
+  DateTime::Format::Human::Duration: 0
+  DateTime::Format::RFC3339: 0
+  Safe::Isa: 0
+  Test::Deep: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Test-Deep-DateTime-RFC3339
+  homepage: https://metacpan.org/pod/Test::Deep::DateTime::RFC3339
+  repository: https://github.com/tsibley/Test-Deep-DateTime-RFC3339.git
+version: 0.04

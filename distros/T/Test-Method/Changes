@@ -1,0 +1,10 @@
+Revision history for Test-Method
+
+0.001002  2013-12-22
+	- update for Compile Tests hangin on windows
+
+0.001001  2013-03-05
+	- remove unused dependencies
+
+0.001000  2013-03-01
+	- initial release

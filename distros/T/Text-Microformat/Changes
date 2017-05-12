@@ -1,0 +1,13 @@
+Revision history for Text-Microformat
+
+0.01    2007-04-19 18:06:27
+        First version, released on an unsuspecting world.
+
+0.02	2007-04-21 16:06:39
+	Removed 'File::Slurp' dependency from test suite.
+
+0.03    2007-07-06 17:42:35
+        Added Franck Cuny's patch for hCal support
+
+0.04    2007-0706 18:24:19
+        Fixed a silly CPAN bug

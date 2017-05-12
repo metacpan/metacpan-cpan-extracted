@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tk-JComboBox
+version:      1.14
+version_from: lib/Tk/JComboBox.pm
+installdirs:  site
+requires:
+    Tie::Watch:                    0
+    Tk:                            800.024
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

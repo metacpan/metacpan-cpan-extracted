@@ -1,0 +1,28 @@
+---
+abstract: 'Apache2 runner for tests'
+author:
+  - 'Cybozu Labs, Inc.  Written by Kazuho Oku.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  LWP::Simple: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Httpd-Apache2
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Lite: 0
+  Test::TCP: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.09

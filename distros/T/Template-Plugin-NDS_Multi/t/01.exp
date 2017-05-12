@@ -1,0 +1,25 @@
+This tests Multiele operations:
+
+Eles                                   : eight five four one seven six three two
+
+Ele (one)                              : 1
+Ele (zero)                             : 0
+
+Value  (three,/a)                      : 3a
+Value  (three,/l)                      : 
+Value  (three,/z1)                     : 
+
+Values (three,/a)                      :
+Values (three,/l)                      : l3
+Values (three,/z1)                     :
+Values (five,/l)                       : l5a l5b
+Values (four,/d)                       : 4e 4f
+
+Keys (four,/d)                         : e f
+Keys (four,/l)                         : 1
+Keys (six,/l)                          : 0 1
+Keys (four,/z1)                        :
+
+Which (/b bb)                          : one two
+Which (/c cc)                          : four one
+

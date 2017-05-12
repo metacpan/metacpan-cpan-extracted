@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/TipJar-sparse-array-perl-hashbased.t
+lib/TipJar/sparse/array/perl/hashbased.pm
+META.yml                                 Module meta-data (added by MakeMaker)

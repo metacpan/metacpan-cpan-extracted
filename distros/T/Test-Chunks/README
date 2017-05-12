@@ -1,0 +1,666 @@
+NAME
+    Test::Chunks - A Data Driven Testing Framework
+
+DEPRECATED
+    NOTE - This module has been deprecated and replaced by Test::Base. This
+    is basically just a renaming of the module. Test::Chunks was not the
+    best name for this module. Please discontinue using Test::Chunks and
+    switch to Test::Base.
+
+    Helpful Hint: change all occurences of "chunk" to "block" in your test
+    code, and everything should work exactly the same.
+
+SYNOPSIS
+        use Test::Chunks;
+        use Pod::Simple;
+
+        delimiters qw(=== +++);
+        plan tests => 1 * chunks;
+    
+        for my $chunk (chunks) {
+            # Note that this code is conceptual only. Pod::Simple is not so
+            # simple as to provide a simple pod_to_html function.
+            is(
+                Pod::Simple::pod_to_html($chunk->pod),
+                $chunk->text,
+                $chunk->name, 
+            );
+        }
+
+        __END__
+
+        === Header 1 Test
+    
+        This is an optional description
+        of this particular test.
+
+        +++ pod
+        =head1 The Main Event
+        +++ html
+        <h1>The Main Event</h1>
+
+        === List Test
+        +++ pod
+        =over
+        =item * one
+        =item * two
+        =back
+
+        +++ html
+        <ul>
+        <li>one</li>
+        <li>two</li>
+        </ul>
+
+DESCRIPTION
+    There are many testing situations where you have a set of inputs and a
+    set of expected outputs and you want to make sure your process turns
+    each input chunk into the corresponding output chunk. Test::Chunks
+    allows you do this with a minimal amount of code.
+
+EXPORTED FUNCTIONS
+    Test::Chunks extends Test::More and exports all of its functions. So you
+    can basically write your tests the same as Test::More. Test::Chunks
+    exports a few more functions though:
+
+  chunks( [data-section-name] )
+    The most important function is "chunks". In list context it returns a
+    list of "Test::Chunks::Chunk" objects that are generated from the test
+    specification in the "DATA" section of your test file. In scalar context
+    it returns the number of objects. This is useful to calculate your
+    Test::More plan.
+
+    Each Test::Chunks::Chunk object has methods that correspond to the names
+    of that object's data sections. There is also a "name" and a
+    "description" method for accessing those parts of the chunk if they were
+    specified.
+
+    "chunks" can take an optional single argument, that indicates to only
+    return the chunks that contain a particular named data section.
+    Otherwise "chunks" returns all chunks.
+
+        my @all_of_my_chunks = chunks;
+
+        my @just_the_foo_chunks = chunks('foo');
+
+  next_chunk()
+    You can use the next_chunk function to iterate over all the chunks.
+
+        while (my $chunk = next_chunk) {
+            ...
+        }
+
+    It returns undef after all chunks have been iterated over. It can then
+    be called again to reiterate.
+
+  run(&subroutine)
+    There are many ways to write your tests. You can reference each chunk
+    individually or you can loop over all the chunks and perform a common
+    operation. The "run" function does the looping for you, so all you need
+    to do is pass it a code block to execute for each chunk.
+
+    The "run" function takes a subroutine as an argument, and calls the sub
+    one time for each chunk in the specification. It passes the current
+    chunk object to the subroutine.
+
+        run {
+            my $chunk = shift;
+            is(process($chunk->foo), $chunk->bar, $chunk->name);
+        };
+
+  run_is(data_name1, data_name2)
+    Many times you simply want to see if two data sections are equivalent in
+    every chunk, probably after having been run through one or more filters.
+    With the "run_is" function, you can just pass the names of any two data
+    sections that exist in every chunk, and it will loop over every chunk
+    comparing the two sections.
+
+        run_is 'foo', 'bar';
+
+    NOTE: Test::Chunks will silently ignore any chunks that don't contain
+    both sections.
+
+  run_is_deeply(data_name1, data_name2)
+    Like "run_is" but uses "is_deeply" for complex data structure
+    comparison.
+
+  run_like(data_name, regexp | data_name);
+    The "run_like" function is similar to "run_is" except the second
+    argument is a regular expression. The regexp can either be a "qr{}"
+    object or a data section that has been filtered into a regular
+    expression.
+
+        run_like 'foo', qr{<html.*};
+        run_like 'foo', 'match';
+
+  run_unlike(data_name, regexp | data_name);
+    The "run_unlike" function is similar to "run_like", except the opposite.
+
+        run_unlike 'foo', qr{<html.*};
+        run_unlike 'foo', 'no_match';
+
+  delimiters($chunk_delimiter, $data_delimiter)
+    Override the default delimiters of "===" and "---".
+
+  spec_file($file_name)
+    By default, Test::Chunks reads its input from the DATA section. This
+    function tells it to get the spec from a file instead.
+
+  spec_string($test_data)
+    By default, Test::Chunks reads its input from the DATA section. This
+    function tells it to get the spec from a string that has been prepared
+    somehow.
+
+  filters( @filters_list or $filters_hashref )
+    Specify a list of additional filters to be applied to all chunks. See
+    "FILTERS" below.
+
+    You can also specify a hash ref that maps data section names to an array
+    ref of filters for that data type.
+
+        filters {
+            xxx => [qw(chomp lines)],
+            yyy => ['yaml'],
+            zzz => 'eval',
+        };
+
+    If a filters list has only one element, the array ref is optional.
+
+  filters_delay( [1 | 0] );
+    By default Test::Chunks::Chunk objects are have all their filters run
+    ahead of time. There are testing situations in which it is advantageous
+    to delay the filtering. Calling this function with no arguments or a
+    true value, causes the filtering to be delayed.
+
+        use Test::Chunks;
+        filters_delay;
+        plan tests => 1 * chunks;
+        for my $chunk (@chunks) {
+            ...
+            $chunk->run_filters;
+            ok($chunk->is_filtered);
+            ...
+        }
+
+    In the code above, the filters are called manually, using the
+    "run_filters" method of Test::Chunks::Chunk. In functions like "run_is",
+    where the tests are run automatically, filtering is delayed until right
+    before the test.
+
+  filter_arguments()
+    Return the arguments after the equals sign on a filter.
+
+        sub my_filter {
+            my $args = filter_arguments;
+            # is($args, 'whazzup');
+            ...
+        }
+
+        __DATA__
+        === A test
+        --- data my_filter=whazzup
+
+  tie_output()
+    You can capture STDOUT and STDERR for operations with this function:
+
+        my $out = '';
+        tie_output(*STDOUT, $buffer);
+        print "Hey!\n";
+        print "Che!\n";
+        untie *STDOUT;
+        is($out, "Hey!\nChe!\n");
+
+  default_object()
+    Returns the default Test::Chunks object. This is useful if you feel the
+    need to do an OO operation in otherwise functional test code. See OO
+    below.
+
+  WWW() XXX() YYY() ZZZ()
+    These debugging functions are exported from the Spiffy.pm module. See
+    Spiffy for more info.
+
+TEST SPECIFICATION
+    Test::Chunks allows you to specify your test data in an external file,
+    the DATA section of your program or from a scalar variable containing
+    all the text input.
+
+    A *test specification* is a series of text lines. Each test (or chunk)
+    is separated by a line containing the chunk delimiter and an optional
+    test "name". Each chunk is further subdivided into named sections with a
+    line containing the data delimiter and the data section name. A
+    "description" of the test can go on lines after the chunk delimiter but
+    before the first data section.
+
+    Here is the basic layout of a specification:
+
+        === <chunk name 1>
+        <optional chunk description lines>
+        --- <data section name 1> <filter-1> <filter-2> <filter-n>
+        <test data lines>
+        --- <data section name 2> <filter-1> <filter-2> <filter-n>
+        <test data lines>
+        --- <data section name n> <filter-1> <filter-2> <filter-n>
+        <test data lines>
+
+        === <chunk name 2>
+        <optional chunk description lines>
+        --- <data section name 1> <filter-1> <filter-2> <filter-n>
+        <test data lines>
+        --- <data section name 2> <filter-1> <filter-2> <filter-n>
+        <test data lines>
+        --- <data section name n> <filter-1> <filter-2> <filter-n>
+        <test data lines>
+
+    Here is a code example:
+
+        use Test::Chunks;
+    
+        delimiters qw(### :::);
+
+        # test code here
+
+        __END__
+    
+        ### Test One
+        We want to see if foo and bar
+        are really the same... 
+        ::: foo
+        a foo line
+        another foo line
+
+        ::: bar
+        a bar line
+        another bar line
+
+        ### Test Two
+    
+        ::: foo
+        some foo line
+        some other foo line
+    
+        ::: bar
+        some bar line
+        some other bar line
+
+        ::: baz
+        some baz line
+        some other baz line
+
+    This example specifies two chunks. They both have foo and bar data
+    sections. The second chunk has a baz component. The chunk delimiter is
+    "###" and the data delimiter is ":::".
+
+    The default chunk delimiter is "===" and the default data delimiter is
+    "---".
+
+    There are some special data section names used for control purposes:
+
+        --- SKIP
+        --- ONLY
+        --- LAST
+
+    A chunk with a SKIP section causes that test to be ignored. This is
+    useful to disable a test temporarily.
+
+    A chunk with an ONLY section causes only that chunk to be used. This is
+    useful when you are concentrating on getting a single test to pass. If
+    there is more than one chunk with ONLY, the first one will be chosen.
+
+    A chunk with a LAST section makes that chunk the last one in the
+    specification. All following chunks will be ignored.
+
+FILTERS
+    The real power in writing tests with Test::Chunks comes from its
+    filtering capabilities. Test::Chunks comes with an ever growing set of
+    useful generic filters than you can sequence and apply to various test
+    chunks. That means you can specify the chunk serialization in the most
+    readable format you can find, and let the filters translate it into what
+    you really need for a test. It is easy to write your own filters as
+    well.
+
+    Test::Chunks allows you to specify a list of filters. The default
+    filters are "norm" and "trim". These filters will be applied (in order)
+    to the data after it has been parsed from the specification and before
+    it is set into its Test::Chunks::Chunk object.
+
+    You can add to the the default filter list with the "filters" function.
+    You can specify additional filters to a specific chunk by listing them
+    after the section name on a data section delimiter line.
+
+    Example:
+
+        use Test::Chunks;
+
+        filters qw(foo bar);
+        filters { perl => 'strict' };
+
+        sub upper { uc(shift) }
+
+        __END__
+
+        === Test one
+        --- foo trim chomp upper
+        ...
+
+        --- bar -norm
+        ...
+
+        --- perl eval dumper
+        my @foo = map {
+            - $_;
+        } 1..10;
+        \ @foo;
+
+    Putting a "-" before a filter on a delimiter line, disables that filter.
+
+  Scalar vs List
+    Each filter can take either a scalar or a list as input, and will return
+    either a scalar or a list. Since filters are chained together, it is
+    important to learn which filters expect which kind of input and return
+    which kind of output.
+
+    For example, consider the following filter list:
+
+        norm trim lines chomp array dumper eval
+
+    The data always starts out as a single scalar string. "norm" takes a
+    scalar and returns a scalar. "trim" takes a list and returns a list, but
+    a scalar is a valid list. "lines" takes a scalar and returns a list.
+    "chomp" takes a list and returns a list. "array" takes a list and
+    returns a scalar (an anonymous array reference containing the list
+    elements). "dumper" takes a list and returns a scalar. "eval" takes a
+    scalar and creates a list.
+
+    A list of exactly one element works fine as input to a filter requiring
+    a scalar, but any other list will cause an exception. A scalar in list
+    context is considered a list of one element.
+
+    Data accessor methods for chunks will return a list of values when used
+    in list context, and the first element of the list in scalar context.
+    This usually does the right thing, but be aware.
+
+  norm
+    scalar => scalar
+
+    Normalize the data. Change non-Unix line endings to Unix line endings.
+
+  trim
+    list => list
+
+    Remove extra blank lines from the beginning and end of the data. This
+    allows you to visually separate your test data with blank lines.
+
+  chomp
+    list => list
+
+    Remove the final newline from each string value in a list.
+
+  unchomp
+    list => list
+
+    Add a newline to each string value in a list.
+
+  chop
+    list => list
+
+    Remove the final char from each string value in a list.
+
+  append
+    list => list
+
+    Append a string to each element of a list.
+
+        --- numbers lines chomp append=-#\n join
+        one
+        two
+        three
+
+  lines
+    scalar => list
+
+    Break the data into an anonymous array of lines. Each line (except
+    possibly the last one if the "chomp" filter came first) will have a
+    newline at the end.
+
+  array
+    list => scalar
+
+    Turn a list of values into an anonymous array reference.
+
+  join
+    list => scalar
+
+    Join a list of strings into a scalar.
+
+  eval
+    scalar => list
+
+    Run Perl's "eval" command against the data and use the returned value as
+    the data.
+
+  eval_stdout
+    scalar => scalar
+
+    Run Perl's "eval" command against the data and return the captured
+    STDOUT.
+
+  eval_stderr
+    scalar => scalar
+
+    Run Perl's "eval" command against the data and return the captured
+    STDERR.
+
+  eval_all
+    scalar => list
+
+    Run Perl's "eval" command against the data and return a list of 4
+    values:
+
+        1) The return value
+        2) The error in $@
+        3) Captured STDOUT
+        4) Captured STDERR
+
+  regexp[=xism]
+    scalar => scalar
+
+    The "regexp" filter will turn your data section into a regular
+    expression object. You can pass in extra flags after an equals sign.
+
+    If the text contains more than one line and no flags are specified, then
+    the 'xism' flags are assumed.
+
+  get_url
+    scalar => scalar
+
+    The text is chomped and considered to be a url. Then LWP::Simple::get is
+    used to fetch the contents of the url.
+
+  exec_perl_stdout
+    list => scalar
+
+    Input Perl code is written to a temp file and run. STDOUT is captured
+    and returned.
+
+  yaml
+    scalar => list
+
+    Apply the YAML::Load function to the data chunk and use the resultant
+    structure. Requires YAML.pm.
+
+  dumper
+    scalar => list
+
+    Take a data structure (presumably from another filter like eval) and use
+    Data::Dumper to dump it in a canonical fashion.
+
+  strict
+    scalar => scalar
+
+    Prepend the string:
+
+        use strict; 
+        use warnings;
+
+    to the chunk's text.
+
+  base64_decode
+    scalar => scalar
+
+    Decode base64 data. Useful for binary tests.
+
+  base64_encode
+    scalar => scalar
+
+    Encode base64 data. Useful for binary tests.
+
+  escape
+    scalar => scalar
+
+    Unescape all backslash escaped chars.
+
+  Rolling Your Own Filters
+    Creating filter extensions is very simple. You can either write a
+    *function* in the "main" namespace, or a *method* in the
+    "Test::Chunks::Filter" namespace. In either case the text and any extra
+    arguments are passed in and you return whatever you want the new value
+    to be.
+
+    Here is a self explanatory example:
+
+        use Test::Chunks;
+
+        filters 'foo', 'bar=xyz';
+
+        sub foo {
+            transform(shift);
+        }
+        
+        sub Test::Chunks::Filter::bar {
+            my $self = shift;
+            my $data = shift;
+            my $args = $self->arguments;
+            my $current_chunk_object = $self->chunk;
+            # transform $data in a barish manner
+            return $data;
+        }
+
+    If you use the method interface for a filter, you can access the chunk
+    internals by calling the "chunk" method on the filter object.
+
+    Normally you'll probably just use the functional interface, although all
+    the builtin filters are methods.
+
+OO
+    Test::Chunks has a nice functional interface for simple usage. Under the
+    hood everything is object oriented. A default Test::Chunks object is
+    created and all the functions are really just method calls on it.
+
+    This means if you need to get fancy, you can use all the object oriented
+    stuff too. Just create new Test::Chunks objects and use the functions as
+    methods.
+
+        use Test::Chunks;
+        my $chunks1 = Test::Chunks->new;
+        my $chunks2 = Test::Chunks->new;
+
+        $chunks1->delimiters(qw(!!! @@@))->spec_file('test1.txt');
+        $chunks2->delimiters(qw(### $$$))->spec_string($test_data);
+
+        plan tests => $chunks1->chunks + $chunks2->chunks;
+
+        # ... etc
+
+THE "Test::Chunks::Chunk" CLASS
+    In Test::Chunks, chunks are exposed as Test::Chunks::Chunk objects. This
+    section lists the methods that can be called on a Test::Chunks::Chunk
+    object. Of course, each data section name is also available as a method.
+
+  name()
+    This is the optional short description of a chunk, that is specified on
+    the chunk separator line.
+
+  description()
+    This is an optional long description of the chunk. It is the text taken
+    from between the chunk separator and the first data section.
+
+  seq_num()
+    Returns a sequence number for this chunk. Sequence numbers begin with 1.
+
+  chunks_object()
+    Returns the Test::Chunks object that owns this chunk.
+
+  run_filters()
+    Run the filters on the data sections of the chunks. You don't need to
+    use this method unless you also used the "filters_delay" function.
+
+  is_filtered()
+    Returns true if filters have already been run for this chunk.
+
+  original_values()
+    Returns a hash of the original, unfiltered values of each data section.
+
+SUBCLASSING
+    One of the nicest things about Test::Chunks is that it is easy to
+    subclass. This is very important, because in your personal project, you
+    will likely want to extend Test::Chunks with your own filters and other
+    reusable pieces of your test framework.
+
+    Here is an example of a subclass:
+
+        package MyTestStuff;
+        use Test::Chunks -Base;
+
+        our @EXPORT = qw(some_func);
+
+        # const chunk_class => 'MyTestStuff::Chunk';
+        # const filter_class => 'MyTestStuff::Filter';
+
+        sub some_func {
+            (my ($self), @_) = find_my_self(@_);
+            ...
+        }
+
+        package MyTestStuff::Chunk;
+        use base 'Test::Chunks::Chunk';
+
+        sub desc {
+            $self->description(@_);
+        }
+
+        package MyTestStuff::Filter;
+        use base 'Test::Chunks::Filter';
+
+        sub upper {
+            $self->assert_scalar(@_);
+            uc(shift);
+        }
+
+    Note that you don't have to re-Export all the functions from
+    Test::Chunks. That happens automatically, due to the powers of Spiffy.
+
+    You can set the "chunk_class" and "filter_class" to anything but they
+    will nicely default as above.
+
+    The first line in "some_func" allows it to be called as either a
+    function or a method in the test code.
+
+OTHER COOL FEATURES
+    Test::Chunks automatically adds
+
+        use strict;
+        use warnings;
+
+    to all of your test scripts. A Spiffy feature indeed.
+
+AUTHOR
+    Brian Ingerson <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2005. Brian Ingerson. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

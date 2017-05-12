@@ -1,0 +1,24 @@
+Revision history for Term-ReadLine-Event
+
+0.05    2015-11-23
+
+0.04    2012-12-30
+        * Some testers' :0 don't seem to work, so detect that and skip
+          instead of fail Tk tests.
+        * RT#81344 - Cygwin/TRL::Gnu doesn't return an object that responds
+          to 'fileno' method, breaking ex/select.pl (Chris Marshall)
+        + Add AUTOLOAD to automatically map all unknown calls directly
+          to the underlying T::RL object.
+        * Some testing with Coro::AnyEvent failed, but I don't know what
+          version, so start diag'ing versions of everything we load.
+
+0.03    April 5, 2012
+        + Add Tk example in the hopes T::RL eventually deprecates its Tk
+          interface in favour of this interface.
+        + Add with_Tk method for much the same reason.
+
+0.02    March 26, 2012
+        * CPAN didn't like the ex directory, hopefully this fixes it.
+
+0.01    March 26, 2012
+        * From initial concept to first release.

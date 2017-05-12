@@ -1,0 +1,149 @@
+Revision history for Tie-FieldVals
+==================================
+
+0.6202 Sun 30 November 2008
+---------------------------
+
+  * (2008-11-30) * fixed problem with TODO file
+
+0.6201 Sun 30 November 2008
+---------------------------
+
+  * (2008-11-30) * a few more tweaks
+  * (2008-11-17) * Corrected tests that were calling perl
+    * Tweaked Build.PL
+  * (2007-12-16) revamped depot
+
+0.62 Tue 16 August 2005
+-----------------------
+
+  * (16 Aug 2005) added script
+
+0.61 Mon 08 November 2004
+-------------------------
+
+  * (8 Nov 2004) oh dear, forgot another one
+
+  * (8 Nov 2004) oops, needed to change support files
+
+
+0.60 Mon 08 November 2004
+-------------------------
+
+  * (7 Nov 2004) added hash2fv script
+  	The script does a naieve conversion of an AutomatedArchive
+  hash database file; it just copies the data Field by Field, which
+  makes the most sense, but something I will have to keep in mind for
+  later, when using such converted databases.
+  	Also, as part of this, added set_from_hash in Tie::FieldVals::Row.
+
+  * (7 Nov 2004) made sort_records (in Tie::FieldVals::Select) more efficient
+
+
+0.50 Sun 07 November 2004
+-------------------------
+
+  * (7 Nov 2004) proper sub-classing
+  	Now Tie::FieldVals::Select is a proper sub-class of Tie::FieldVals.
+  Also renamed Tie::FieldVals::Join::Row to be Tie::FieldVals::Row::Join
+  and made it a proper sub-class of Tie::FieldVals::Row.
+
+
+0.40 Fri 05 November 2004
+-------------------------
+
+  * (5 Nov 2004) changed accessing of row hashes
+  	I realized that, when I was using them, there were really
+  only two ways I wanted to access the Tie::FieldVals::Row hashes:
+  either as a reference to an array, because I wanted to go through
+  every multi-valued item one at a time; or as a single scalar value
+  (such as when printing out or comparing values).  Also because the
+  $hash{$key=>$something} method of accessing things was annoying,
+  because Perl kept on saying it was a syntax error, I simplified
+  both FETCH and STORE operations for Tie::FieldVals::Row (and
+  Tie::FieldVals::Join::Row).
+  	Now there are three modes of FETCHing and two ways of
+  STOREing.
+  	The FETCH operation accepts:
+    - a simple key, which gives a simple (possibly joined) value
+    - a reference to a simple key, which gives a reference to an array
+    - a reference to a hash or array of two values, one of which is the key,
+    the other of which is the string with which to join multi-values.
+  	The STORE operation only allows simple scalar keys, and accepts
+  either a scalar or a reference to an array for the stored value.
+
+
+0.31 Fri 05 November 2004
+-------------------------
+
+  * (5 Nov 2004) tweaking documentation
+
+
+0.30 Thu 04 November 2004
+-------------------------
+
+  * (4 Nov 2004) improved sort is Nicer
+  	Added two more sort types, "title" and "lastword".  This now
+  eliminates the need to "nice-ify" fields because they'd been reversed
+  for sort-order considerations, such as authors with Lastname,Firstname
+  (can now be sorted with a "lastword" sort) or titles starting with "The"
+  or "A" can now be sorted with "title" sort (which ignores the initial
+  "The" or "A").
+
+  * (4 Nov 2004) just tweaks
+
+  * (3 Nov 2004) added ability to create file if it doesn't exist
+  	One needs to set the mode to O_RDWR|O_CREAT and to give
+  the field names, if one is creating the file; the default setup
+  is still for a file which already exists.
+
+
+0.20 Tue 02 November 2004
+-------------------------
+
+  * (2 Nov 2004) removed development support files from MANIFEST
+
+  * (2 Nov 2004) added file locking
+  	Basically uses the file locking of Tie::File.
+
+  * (2 Nov 2004) improved documentation tweaks
+
+
+0.10 Sun 31 October 2004
+------------------------
+
+  * (31 Oct 2004) added xml2fv script
+
+  * (31 Oct 2004) added fv2xml script
+  	Not just the script but the tests for it.
+
+  * (31 Oct 2004) improving description
+  	Added some more stuff to the DESCRIPTION comparing this to
+  other kinds of data files.
+
+
+0.01 Sun 31 October 2004
+------------------------
+
+  * (31 Oct 2004) added Join test
+
+  * (31 Oct 2004) updated boringfile
+  	Set a separate boringfile so that it considers the perl build
+  files to be boring.
+
+  * (30 Oct 2004) tweaking auto-build stuff
+  	Setting the pre-build stuff, and auto-generating TODO and README.
+
+  * (30 Oct 2004) improved documentation
+
+  * (30 Oct 2004) tweaking tests
+  	Removing some warnings and making safer.
+
+  * (29 Oct 2004) more tests and fix
+  	Fixed Row so that numeric compares of empty strings are done
+  as a zero.  Added tests of simple functionality and selection.
+
+  * (29 Oct 2004) initial checkin
+  	This is stuff extracted out of the GenRepAr suite, and made into
+  independent modules.
+

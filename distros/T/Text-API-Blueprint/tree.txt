@@ -1,0 +1,45 @@
+### Level 0 ###
+# Section:
+# Meta:
+# Intro:
+# Concat:
+# Code:
+# Schema:
+# Attributes:
+# Reference:
+# Headers:
+# Body:
+# Relation:
+
+### Level 1 ###
+# Text: Concat
+# Body_CODE: Code
+# Request_Ref: Reference
+# Response_Ref: Reference
+# Parameter: Concat
+
+### Level 2 ###
+# Parameters: Parameter
+# Body_YAML: Body_CODE
+# Body_JSON: Body_CODE
+# Group: Concat Resource
+
+### Level 3 ###
+# Payload: Headers Body Body_CODE Body_YAML Body_JSON Schema Concat
+
+### Level 4 ###
+# Model: Payload
+# Asset: Payload
+
+### Level 5 ###
+# Request: Asset
+# Response: Asset
+
+### Level 6 ###
+# Action: Section Relation Parameters Reference Asset Request_Ref Request Response_Ref Response Concat
+
+### Level 7 ###
+# Resource: Section Parameters Model Action
+
+### Level 8 ###
+# Compile: Meta Intro Resource Group Concat

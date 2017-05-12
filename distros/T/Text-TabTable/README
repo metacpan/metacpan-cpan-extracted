@@ -1,0 +1,41 @@
+This module performs fast, database-like (SELECT with JOIN) operations on
+tab-delimited files, using the standard unix text processing utilities
+sort(1), join(1), cut(1), and others.  It is often faster to dump out
+tables as tab-delimited files and manipulate them with this module than
+to do the manipulations inside a database.  It is almost always faster
+and simpler than doing similar operations in raw perl using hash tables
+or the like.  Especially significant is that it mostly relies on disk
+space for temporary files rather than large amounts of memory.
+
+This module was heavily used inside mp3.com for manipulating large chunks of 
+relational data.
+
+Given time constraints, the code is lacking much of the polish I would 
+normally put on a CPAN module.
+
+In particular, there's no pod documentation or test suite.  However,
+the comments at the top of the file and on the major method definitions
+have been sufficient in the past for other engineers to get started.
+
+If you find this module useful, please let me know.  If you want to
+help, a good project would be to reformat the comments as POD inline
+documentation.
+
+Matt DiMeo 
+mdimeo@cpan.org
+
+***NOTE*** If you email, please include the word TabTable in the
+subject.  This will act as a magic password to move your email from the
+probably-spam bucket to the probably-not-spam bucket, resulting in a
+much quicker response.
+
+
+
+License
+=======
+
+Except where otherwise specified, the software contained in this archive is
+Copyright (c) 2002-2003 Vivendi Universal Net USA.
+
+This software may be copied and redistributed under the same terms as Perl
+itself.

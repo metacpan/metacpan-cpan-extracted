@@ -1,0 +1,83 @@
+Revision history for Task-Padre-Plugins
+
+0.26    2009.11.22
+        PHP, Filter, Template, XS and Swarm
+
+0.25    2009.08.29
+        Acme::Padre::PlayCode
+
+0.24    2009.08.02
+        ClassSniff plugin
+        Kate plugin
+
+0.23    2009.07.03
+        REPL plugin
+
+0.22    2009.06.09
+        Add links to plugin modules to ease navigation on search.cpan.org
+
+0.21    2009.05.30
+		Ecliptic plugin
+
+0.20    2009.05.23
+        Debugger, Mojolicious Plugins
+
+0.19    2009.4.2
+        Catalyst Plugin
+        DataWalker plugin
+
+0.18    2009.4.1
+        Nopaste plugin
+        PSI plugin
+
+0.17    2009.3.14
+        Git and Autoformat plugin
+
+0.16    2009.3.11
+        SVN plugin
+
+0.15    2009.3.5
+        SVK plugin
+
+0.13    2009.2.13
+        typo fix
+
+0.12    2009.2.11
+        updated for recent changes
+
+0.11    2009.1.23
+        remove CPAN plugin since it's merged into the core
+
+0.10    2009.1.7
+        fix a broken upload version
+
+0.09    2009.1.7
+        add Padre::Plugin::Encode
+        updated to newer Padre plugin versions
+
+0.08    2008.12.29
+        updated to newer Padre plugin versions 
+
+0.07    2008.12.22
+        typo fix
+
+0.06    2008.12.22
+        from Module::Build to Module::Install
+
+0.05    2008.12.20
+        add Perl6 Plugin
+
+0.04    2008.12.19
+        add Padre::Plugin::HTMLExport
+        add Padre::Plugin::Alarm
+        etc.
+
+0.03    2008.11.12
+
+0.02	2008.11.08
+        add Padre::Plugin::Encrypt
+        remove Padre::Plugin::WordStats/TabAndSpace since it's in core
+
+0.01    2008.11.07
+        First version, released on an unsuspecting world.
+

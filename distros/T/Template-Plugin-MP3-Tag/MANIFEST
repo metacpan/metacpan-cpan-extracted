@@ -1,0 +1,22 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Template/Plugin/MP3/Tag.pm
+script/sample.pl
+t/00-load.t
+t/01-artist.t
+t/02-album.t
+t/03-title.t
+t/04-comment.t
+t/05-genre.t
+t/06-year.t
+t/test.mp3
+t/template/artist.tt
+t/template/album.tt
+t/template/title.tt
+t/template/comment.tt
+t/template/genre.tt
+t/template/year.tt
+template/sample.tt
+META.yml                                 Module meta-data (added by MakeMaker)

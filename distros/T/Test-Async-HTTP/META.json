@@ -1,0 +1,48 @@
+{
+   "abstract" : "unit test code that uses C<Net::Async::HTTP>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Async-HTTP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "Test::Identity" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Async::HTTP" : {
+         "file" : "lib/Test/Async/HTTP.pm",
+         "version" : "0.02"
+      },
+      "Test::Async::HTTP::Pending" : {
+         "file" : "lib/Test/Async/HTTP.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.perl.org/#io-async"
+   },
+   "version" : "0.02"
+}

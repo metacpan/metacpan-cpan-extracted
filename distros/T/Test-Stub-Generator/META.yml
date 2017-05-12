@@ -1,0 +1,45 @@
+---
+abstract: 'be able to generate stub (submodule and method) having check argument and control return value.'
+author:
+  - 'Hiroyoshi Houchi <hixi@cpan.org>'
+build_requires:
+  Test::Deep::Matcher: 0
+  Test::Tester: 0.109
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.2, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Stub-Generator
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Test::Stub::Generator:
+    file: lib/Test/Stub/Generator.pm
+    version: 0.02
+requires:
+  Carp: 0
+  Class::Monadic: 0
+  Exporter: 0
+  Test::Deep: 0
+  Test::More: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/hixi-hyi/p5-Test-Stub-Generator/issues
+  homepage: https://github.com/hixi-hyi/p5-Test-Stub-Generator
+  repository: git://github.com/hixi-hyi/p5-Test-Stub-Generator.git
+version: 0.02
+x_contributors:
+  - 'Hiroyoshi Houchi <git@hixi-hyi.com>'

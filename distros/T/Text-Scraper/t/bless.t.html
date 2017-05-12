@@ -1,0 +1,1281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- Took this out for IE6ites "http://www.w3.org/TR/REC-html40/loose.dtd" -->
+<html lang="en">
+  <head>
+    <title>
+      Perl Monks - The Monastery Gates
+    </title>
+    
+    <link rel="stylesheet" href="?node_id=234493" type="text/css" />
+    <link rel="stylesheet" href="?node_id=404267" type="text/css" />
+    <!-- No CSS Link in User Settings -->
+    <!-- No CSS Data in User Settings -->
+    <link rel="icon" href="/favicon.ico" />
+
+    <meta name    = "description"
+          content = "A community committed to sharing Perl
+                     knowledge and coding tips.  The site
+                     contains questions and answers, useful
+                     snippets, and a library of code."
+    />
+    <meta name    = "keywords"
+          content = "perl, mod_perl, regular expressions,
+                     regexp, xp whoring, CGI, programming,
+                     learning, tutorials, questions, answers,
+                     examples, vroom, tim, node, experience,
+                     votes, code"
+    />
+  </head>
+
+  <body id="id-131">
+<!-- monktainer -->
+<!-- monkbar2001 -->
+
+    <table id="monkbar" width="100%" border="0"
+        cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="left" width="100%">
+        <a href="http://pair.com">
+ <img src="http://promote.pair.com/i/pair-banner-current.gif"
+  height = "60"
+  width  = "468"
+  alt    = "Beefy Boxes and Bandwidth Generously Provided by pair Networks"
+ />
+</a>
+        </td>
+        <td rowspan="2" align="right" valign="bottom">
+          <img src="./images/clearpixel.gif" width="0"
+                height="75" alt="" class="spacer" />
+          <!-- Monk Pic Turned Off In User Settings -->
+        </td>
+      </tr>
+      <tr class="monkquip">
+        <td class="monkquip" height="10"
+            valign="bottom" width="100%" >
+          <!-- Monk Quip Turned Off In User Settings -->
+        </td>
+      </tr>
+      <tr class="titlebar">
+        <td class="titlebar">
+
+          <form method="get" action="index.pl"
+              enctype="application/x-www-form-urlencoded" >
+            <img src="./images/clearpixel.gif" width="5"
+                height="1" alt="" class="spacer" />
+            <input type="text" name="node"
+                size="20" maxlength="80" />
+            <input class="titlebar" type="submit"
+                value="Search" name="go_button" />
+          </form>
+        </td>
+        <td class="titlebar" id="mb2001titlebar" align="right" >
+          <a class="titlebar" href="index.pl" >
+            Perl&nbsp;Monks
+          </a>
+        </td>
+      </tr>
+    </table>
+
+<!-- /monkbar2001 -->
+<!-- Begin title bar -->
+<table width="98%" align="center" id="titlebar-top">
+  <tbody>
+    <tr>
+      <td valign="middle" class="titlechooser">
+        <!-- superdoc title chooser(1) -->
+        <h3 class="superdoc">The Monastery Gates</h3>
+        <!-- /superdoc title chooser(1) -->
+      </td>
+      <td valign="top" align="right" class="monktitlebar">
+        <!-- monktitlebar -->
+        <font size="2" class="topnavmenu"><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-000'><a HREF="?op=logout;node_id=109">log&nbsp;Ctrl-z&nbsp;out</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-001'><a HREF="?node_id=210078">Ctrl-z</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-002'><a HREF="?node_id=131">The&nbsp;Monastery&nbsp;Gates</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-003'><a href="?node=Super%20Search">Super&nbsp;Search</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><br />
+<span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-004'><a href="?node=Seekers%20of%20Perl%20Wisdom">Seekers&nbsp;of&nbsp;Perl&nbsp;Wisdom</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-005'><a href="?node=Meditations">Meditations</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-006'><a href="?node=Perl%20Monks%20Discussion">PerlMonks&nbsp;Discussion</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-007'><a href="?node=Snippets%20Section">Snippets</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><br />
+<span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-008'><a href="?node=Obfuscated%20Code">Obfuscation</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-009'><a href="?node=Reviews">Reviews</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-010'><a href="?node=Cool%20Uses%20for%20Perl">Cool&nbsp;Uses&nbsp;For&nbsp;Perl</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-011'><a href="?node=Perl%20News">Perl&nbsp;News</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-012'><a href="?node=Categorized%20Questions%20and%20Answers">Q&amp;A</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-013'><a href="?node=Tutorials">Tutorials</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><br />
+<span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-014'><a href="?node=Code%20Catacombs">Code</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-015'><a href="?node=Perl%20Poetry">Poetry</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-016'><a href="?node=Recently%20Active%20Threads">Recently&nbsp;Active&nbsp;Threads</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-017'><a href="?node=Newest%20Nodes">Newest&nbsp;Nodes</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span><span id='titlebar-link-018'><a href="?node=Offering%20Plate">Offering&nbsp;Plate</a></span><span class="link-sep"><span class="navmenu-link-sep">&nbsp;|&nbsp;</span></span></font><br />
+
+        <!-- /monktitlebar -->
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table width="98%" align="center" id="titlebar-bottom">
+  <tbody>
+    <tr>
+      <td valign="middle" class="titlechooser">
+        <!-- superdoc title chooser(2) -->
+         <span class="addlinks">(&nbsp;#<a HREF="?node_id=131">131</a>=superdoc:&nbsp;<a HREF="?displaytype=print;node_id=131">print</a>&nbsp;<a HREF="?replies=1;displaytype=print;node_id=131">w/&nbsp;replies</a>, <a HREF="?displaytype=xml;node_id=131">xml</a>&nbsp;)</span>
+        <!-- superdoc title chooser(2) -->
+      </td>
+      <td valign="middle" align="right" class="monktitlebar">
+        <a href="?node=PerlMonks%20FAQ">Need Help??</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- End title bar -->
+<!-- Begin main -->
+<center>
+  <table width="98%">
+    <tr>
+      <td width="80%" valign="top" class="main_content">
+        <!--contained stuff-->
+        
+<center><b><a href="?node=Offering%20Plate">Donations gladly accepted</a></b></center>
+<!--
+<table width="100%" cellpadding="0" cellspacing="0" align="left">
+  <tr align="left">
+     <td valign="top">
+-->
+     <form method="post" action="?" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="node_id" value=""><input type="hidden" name="vc" value="amrP5QT7QnEANECwu5Q8BA"><input type="hidden" name="op" value="vote">
+
+     <p align="left">Want Mega XP? Prepare to have your hopes dashed, join in on the: <font size=2> <B><a HREF="?node_id=68307">poll ideas quest</a></B>&nbsp;&nbsp;(11840 days remain)</font></p><table width = 100% cellpadding = "0" cellspacing = "0">
+
+  <tr class = "section_title" width = "100%" border = "1">
+    <td class = "section_title" width = "100%">
+      New Questions
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table width = "100%" border = "0" cellpadding = "2" cellspacing = "0" >
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479735" 
+       name="post-head-id479735" 
+       href="?node_id=479735"
+    >store/retrieve data structure in MySQL</a><br /> 
+    on Jul 31, 2005 at 16:25
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479735">2 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=70009">BarMeister</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479735" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479735" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>I was wondering if what I am attempting is even possible...I have seen a few references to it while searching but haven't found a definitive answer yet.
+<p>
+I am trying to insert/update/retrieve a data structure in MySQL.  My question is what do I pass in as the value when using bind_param?  I am inserting it into a BLOB data type.  The data structure is an array of objects (hash refs).
+<p>
+So is it possible to do this or do I have to serialize/deserialze the structure first?
+<p>
+Thanks,<br />
+Kenny</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479735;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479677" 
+       name="post-head-id479677" 
+       href="?node_id=479677"
+    >Differences between &quot; &quot; and ' '?</a><br /> 
+    on Jul 30, 2005 at 22:55
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479677">4 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=463569">Ace128</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479677" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479677" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Hey Monks,<br />
+<br />
+This time I have a more easier question. Now, doing alot of string comparisons:
+<pre><tt class="code">my $text = &quot;pomperipossa&quot;;
+if ($text eq &quot;pomperipossa&quot;) { .. }
+</tt></pre>
+
+I was wondering if there is _any_ speed difference between doing:
+<pre><tt class="code">if ($text eq &quot;pomperipossa&quot;) { .. }
+</tt></pre>
+
+and:
+<pre><tt class="code">if ($text eq 'pomperipossa') { .. }
+</tt></pre>
+
+?<br />
+Would also be nice if you experts could elaborate more on this. If some cases are better with "" than with ''... (yea, I know about the difference when it comes to $variables! so it seems that ' ' would be faster! Here all is just outputed as it is, compared to " "! But is that the same for eq, ne etc?)<br />
+<br />
+Thanks,<br />
+Ace</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479677;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479607" 
+       name="post-head-id479607" 
+       href="?node_id=479607"
+    >choosing a CPAN namespace</a><br /> 
+    on Jul 30, 2005 at 10:18
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479607">3 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=326696">rvosa</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479607" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479607" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Dear fellow monks,
+<br /><br />
+I am planning to submit a new module to CPAN. The intended audience consists of evolutionary biologists, who may find the module useful
+for parsing, analyzing and manipulating phylogenetic trees. The working title / temporary namespace has been Phylo::, but I gather there is some resistance to introducing new top-level namespaces. I have been trying to find out whether I can use Bio::Phylo, but I'm not sure whether the Bio:: namespace is reserved for BioPerl (which I'm not a part of). I have posted on the BioPerl mailing list trying to find out  if that's the case, but I didn't get a response. Perhaps someone here knows whether I can use Bio:: without being a contributor to the open bioinformatics foundation?
+<br /><br />
+Thanks,
+<br /><br />
+Rutger
+</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479607;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479601" 
+       name="post-head-id479601" 
+       href="?node_id=479601"
+    >Fixing suspect characters in HTML</a><br /> 
+    on Jul 30, 2005 at 08:02
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479601">1 reply</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=368189">wfsp</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479601" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479601" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Due to carelessness on my part I had a shed load of html containing suspect characters. The difficulty was having a possible combination of x80-x9F (frowned on by w3c), unicode and html entities (including numeric entities).<br />
+The strategy I arrived at was to:<br />
+<ol>
+<li>decode any entities present</li>
+<li>convert x80-x9F to unicode equivalents</li>
+<li>encode 'unsafe' characters</li>
+</ol>
+<p>
+This will ensure, hopefully, consistant html and prevent problems during any future processing.
+<p>
+What do you reckon?
+<div class='readmore-link'><a href="?node_id=479601">Read more...</a><span class='readmore-size'> (1363 Bytes)</span></div></ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479601;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479596" 
+       name="post-head-id479596" 
+       href="?node_id=479596"
+    >Reading a MySQL table into an array</a><br /> 
+    on Jul 30, 2005 at 07:22
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479596">1 reply</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=436161">davies</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479596" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479596" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Dearly beloved brethren,<br />
+<br />
+In my personal pilgrimage to enlightenment, I am trying to convert a VB6 programme to Perl. This programme reads Excel files, writes them to MySQL, hacks the database around and produces more Excel files. Because Excel and VB6 use different connections to MySQL, I cannot make the final output tables (that are to be passed from MySQL to Excel) temporary files, because the Excel connection would be unable to see them. However, MessWare crashes far more often than I like. When it does this, it may leave tables on the database that are no use to monk or beast. I therefore want some code available that reads all the database tables, compares them to a list, and deletes them if they are not in the list.<br />
+<br />
+Now, I know how to read data from a MySQL table and put it into a Tk listbox. This was taken from one of the man pages or docs, and works perfectly in a variety of situations. My plan, therefore, was thus:<br />
+    1) Create a table listing the tables that should exist (including itself!).<br />
+    2) Read the list of tables that actually exist into an array.<br />
+    3) Run through the array, comparing each table to the table of table names, deleting the table if it isn’t in the table of tables.<br />
+(1) is easy and complete. But (2) has got me stumped. I get either one table name only, or the right number of tables, but all called 1. I have created a module called SQL, which gets called from any number of other modules. Strict, warnings and diagnostics are in every file. The relevant parts of the SQL module are:
+<p><div class='readmore-link'><a href="?node_id=479596">Read more...</a><span class='readmore-size'> (2 kB)</span></div></ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479596;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479570" 
+       name="post-head-id479570" 
+       href="?node_id=479570"
+    >What is the problem of subroutine &quot;make_file&quot; in my code?</a><br /> 
+    on Jul 29, 2005 at 23:04
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479570">2 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=479569">everwood</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479570" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479570" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Dear all,
+<p>
+Sorry to bother you. I need some help on my code. I have an input file named "origin8.txt" which holds 200 short sequences of width 8. My code is to use each short sequence from "origin8.txt" as a template to
+generate 100 short sequences of the same width and store them in a txt file A (A stands for <tt>short_sequences8_&#91;$y&#93;.txt</tt> in my code).
+<p>
+Then the code will read 100 short sequences from the txt file A and 100 long sequences of width 200 from a txt file B , and then replaced a substring of each long sequence using each short sequence. This code will lead to two txt files C and D. File C will hold 100 replaced long sequences.
+<p>
+In other words, I want to input "origin8.txt" to get 200 File C (C stands for <tt>output8_&#91;$y&#93;2.txt</tt> in my code).
+<p>
+My code can generates 200 File D but each of them holds nothing. So I guess the problem is caused by a failure of passing the data to a subroutine named "make_file".
+<p>
+Can anybody suggest me how to modify that? Thank you very much in advance!
+<p>
+Sincerely,
+<p>
+Alex
+<p>
+My code:
+<p><div class='readmore-link'><a href="?node_id=479570">Read more...</a><span class='readmore-size'> (5 kB)</span></div>
+<p><small>Edit by <a href="?node=castaway">castaway</a> - added code tags</small></p></ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479570;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479541" 
+       name="post-head-id479541" 
+       href="?node_id=479541"
+    >Table::Extract unblessed reference</a><br /> 
+    on Jul 29, 2005 at 18:49
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479541">3 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=394037">thekestrel</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479541" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479541" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Hi Monks,
+<br />    I'm trying to parse some table content out of a HTML page and was having some trouble so I've whipped up a dummy table and script and I'm getting an error stating that I '<i>Can't call method "rows" on unblessed reference at ./s.pl line 25</i>'.
+
+Here is the dummy html file...
+
+<pre><tt class="code">&lt;html&gt;
+&lt;body&gt;
+
+&lt;table align=&quot;center&quot;&gt;
+&lt;tr&gt;&lt;td&gt;Name&lt;/td&gt;&lt;td&gt;Blah&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;bill&lt;/td&gt;&lt;td&gt;fdagdfg&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;ted&lt;/td&gt;&lt;td&gt;sdfsdf&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</tt></pre>
+
+<br />
+and the script....
+<br />
+<pre><tt class="code">#!/usr/bin/perl
+
+use warnings;
+use strict;
+use HTML::TableExtract;
+
+#my $te = HTML::TableExtract-&gt;new ( depth =&gt; 1, count =&gt; 2 );
+my $te = HTML::TableExtract-&gt;new ( attribs =&gt; { align =&gt; 'center' } );
+
+print &quot;Start\n&quot;;
+
+my $data;
+{
+local( $/, *FILE);
+open FILE, &quot;blah.html&quot; or die &quot;Could not open file , $!\n&quot;;
+$data = &lt;FILE&gt;;
+close (FILE);
+}
+print $data;
+
+$te-&gt;parse($data);
+print &quot;table stuff:\n&quot;;
+foreach my $ts ( $te-&gt;tables ) {
+        print &quot;Table\n&quot;;
+        foreach my $row ( $ts-&gt;rows ) {
+                print &quot;R        &quot;, join(',', @$row), &quot;\n&quot;;
+        }
+}
+</tt></pre>
+
+<br /> I'm sure this is probably quite simple, but at this hour its eluding me so I was hoping someone might be able to explain what is going on.
+
+<br /><br />Regards Paul
+
+</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479541;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479539" 
+       name="post-head-id479539" 
+       href="?node_id=479539"
+    >handlecount of win32 process</a><br /> 
+    on Jul 29, 2005 at 18:07
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479539">1 reply</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=161216">slloyd</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479539" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479539" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Does anyone know how to get the handlecount of a win32 process using Perl..  I cannot seem to find a Win32 API for it..
+
+
+<div class="pmsig"><div class="pmsig-161216">
+<br />
+<a href="http://www.basgetti.com" target="_new">http://www.basgetti.com</a>
+</div></div></ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479539;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479519" 
+       name="post-head-id479519" 
+       href="?node_id=479519"
+    >How much can a function know about the context in which it is called?</a><br /> 
+    on Jul 29, 2005 at 16:01
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479519">6 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=223311">jacques</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479519" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479519" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>I have a bunch of calls to the same function. The function ultimately prints to STDOUT. I want to change the function to return a string rather than print it. So that I can say:
+<pre><tt class="code">print function(); # prints the string that function returns.
+</tt></pre>
+
+Easy enough. But instead of putting the print before the funtion call, I would like to simply say:
+<pre><tt class="code">funtion(); # prints string since not assigned 
+
+$value = funtion(); # Does not print. $value holds the return string.
+</tt></pre>
+
+In other words, I want function() to know the context in which it is called, so that it knows whether to print a string or to return one. And I don't want to use IO::Scalar. 
+<p>
+Is this possible?  
+</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479519;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479500" 
+       name="post-head-id479500" 
+       href="?node_id=479500"
+    >Re-Interpolating a Scalar (a string)</a><br /> 
+    on Jul 29, 2005 at 14:22
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479500">3 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=479494">Nichodemus</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479500" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479500" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>I am relatively new to Perl -- I figure there must already be a way to do this without writing my own custom subroutine.  Here's my question:<br /><br />
+
+How can I force a scalar variable to be re-interpolated?<br /><br />
+
+For example, lets say that this line of code:<br /><br />
+
+<tt>print $raw;</tt><br /><br />
+
+returns:<br /><br />
+
+<tt>fred has $color eyes</tt><br /><br />
+
+What I want to be able to do is later set $color to equal "blue."  And then have:<br /><br />
+
+<tt>$parsed = # ??? something to re-interpolate $raw</tt><br /><br />
+
+<tt>print $parsed; &nbsp;# I get the text &quot;fred has blue eyes&quot;</tt><br /><br />
+
+
+Anyone have any ideas?<br /><br />
+
+-Nich</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479500;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479402" 
+       name="post-head-id479402" 
+       href="?node_id=479402"
+    >problems using SQL::Statement</a><br /> 
+    on Jul 29, 2005 at 09:25
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479402">2 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=332253">reneeb</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479402" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479402" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Hi monks!<br />
+<br />
+I want to parse a CREATE-Statement, but that doesn't work. I've tried the following code:<br />
+<pre><tt class="code">#!/usr/bin/perl
+
+use strict;
+use warnings;
+use SQL::Statement;
+
+my $statement = qq~CREATE TABLE test(
+  ID int not null,
+  Spalte1 varchar(255),
+  Spalte2 int,
+  Spalte3 int,
+  Spalte4 int,
+  Spalte5 blob,
+  Spalte6 varchar(33),
+  primary key(ID),
+)~;
+
+my $parser = SQL::Parser-&gt;new();
+my $stmt = SQL::Statement-&gt;new($statement,$parser);
+</tt></pre>
+
+<br />
+But I've got the following error-message:<br />
+<tt>SQL ERROR: 'BLOB' is not a recognized data type!</tt><br /><br />
+So I've changed for testing the module this data type, then I got an other error-message:<br />
+<tt>SQL ERROR: Bad table or column name 'primary' is a SQL reserved word!</tt><br /><br />
+I'm working with perl5.8.6 and module's version 1.14<br /><br />
+
+So, how can I use the module for SQL92-standard-statements? Would you use an other module?<br /><br />
+
+Thank you,<br />
+Renee</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479402;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479400" 
+       name="post-head-id479400" 
+       href="?node_id=479400"
+    >Match number &gt;= 0 and &lt;1</a><br /> 
+    on Jul 29, 2005 at 09:19
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479400">7 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=453721">lupey</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479400" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479400" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Hello,
+<p>
+I'm looking for criticism of my regular expression that looks for a number to be >= 0 and &lt; 1 (i.e. 0, 0.00001, and .99999 are OK but 1, -0.00001, and -1 are NOT OK). I'm using the RE to untaint a number from a CGI form. The regex seems to work and is based on a regex in PerlFaq4 that matches decimal numbers. Here is the code in my CGI script that handles the untainting.
+<p>
+<tt>my ($num) = $_num =~ &nbsp;/^(0(\.\d+)?|\.\d+)$/;</tt>
+<p>
+Please comment on the accuracy and if there is a better way to do it.
+<p>
+Thank you,
+<p>
+lupey
+
+<p>
+&lt;bold>Update&lt;/bold> Thank you everybody for your suggestions. I seem to like tlm's answer the best. I didn't realize that I could separate tainting from checking the numerical properties of a scalar.</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479400;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+
+      </table>
+    </td>
+  </tr>
+</table>
+<table width = 100% cellpadding = "0" cellspacing = "0">
+
+  <tr class = "section_title" width = "100%" border = "1">
+    <td class = "section_title" width = "100%">
+      New Meditations
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table width = "100%" border = "0" cellpadding = "2" cellspacing = "0" >
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479511" 
+       name="post-head-id479511" 
+       href="?node_id=479511"
+    >(OT) Pushing inductive systems to their limit</a><br /> 
+    on Jul 29, 2005 at 15:13
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479511">6 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=17000">Ovid</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479511" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479511" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul><p>This is an expansion of something in my use.perl journal where I explained <a href="http://use.perl.org/~Ovid/journal/25935">how logic programming works</a>.  What follows is a brief and over-simplified overview of what lies at the core of automated deduction and logical inference systems the world over.  In short, it's at the heart of many AI projects.  Even though it's one programming paradigm that's not natively supported by Perl, it's surprisingly simple.</p>
+
+<p>If the following interests you, check out <a href="http://search.cpan.org/dist/AI-Prolog">AI::Prolog</a>, <a href="http://search.cpan.org/dist/Logic">Logic</a> or <a href="http://search.cpan.org/dist/Language-Prolog-Yaswi">Language::Prolog::Yaswi</a>.  If you'll be at OSCON, <a href="http://conferences.oreillynet.com/cs/os2005/view/e_sess/6769">I'll be talking about the first module</a>.</p>
+
+<p>I was looking at Luke Palmer's <a href="http://search.cpan.org/dist/Logic/">Logic</a> module on the CPAN and it got me to thinking a bit about logic programming in general, as opposed to the specific implementation of Prolog I've been focusing on.  To implement logic programming, you basically have to implement two things, backtracking and unification.</p>
+
+<p>You already understand backtracking from regular expressions.  If you fail to find a match (in our case, if we fail to unify two data structures), back up to the last point in the string (stack) where we can make a different decision and try again.  It's pretty straightforward.</p>
+
+<p>Unification is also fairly simple.  You know it from makefiles or SQL, but we'll look at logic programming in particular.  Imagine that you have two five element lists:</p>
+
+<pre><tt class="code">( 1, 2, undef, undef,     5 )
+( 1, 2,     3,     4, undef )
+</tt></pre>
+
+
+<p>Imagine that <tt>undef</tt> means "unknown".  We can unify those two lists because every element that <em>is</em> known corresponds in the two lists.  This leaves us with a list of the integers one through five.</p>
+
+<tt>( 1, 2, 3, 4, 5 )</tt> 
+
+<p>However, what happens if the last element of the first list is unknown?</p>
+
+<pre><tt class="code">( 1, 2, undef, undef, undef )
+( 1, 2,     3,     4, undef )
+</tt></pre>
+
+
+<p>We can still unify the two lists.  In this case, we get the same five element list, but the last item is unknown.</p>
+
+<tt>( 1, 2, 3, 4, unknown )</tt> 
+
+<p>Logic programming works by pushing these lists onto a stack and walking through the stack and seeing if you can unify everything (sort of).  But how to unify from one item to the next?  We assign names to the unknown variables and see if we can unify them.  When we get to the next item in the stack, we check to see if any named variables have been unified.  If so, we unify the individual variables prior to trying to unify items with their counterparts in our lists.</p>
+
+<p>Thats a bad explanation, so here's how it works.  Imagine the following "knowledge base" of lists:</p>
+
+<div class='readmore-link'><a href="?node_id=479511">Read more...</a><span class='readmore-size'> (5 kB)</span></div></ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479511;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479418" 
+       name="post-head-id479418" 
+       href="?node_id=479418"
+    >Properties, metadata and Perl celebrities</a><br /> 
+    on Jul 29, 2005 at 10:18
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479418">3 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=176576">eyepopslikeamosquito</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479418" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479418" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul><p>
+A famous Portuguese Perl hacker, author of the recent mad
+<a href="http://search.cpan.org/dist/Acme-AsciiArt2HtmlTable/">Acme::AsciiArt2HtmlTable</a>
+module and I have been pondering the best way to classify the shapes
+in (the also mad)
+<a href="http://search.cpan.org/dist/Acme-EyeDrops/">Acme::EyeDrops</a>
+module to make them more amenable to searching and selecting.
+</p>
+
+<p>
+You see, he wants, for example, to select from the many shapes
+available, only the faces of Perl celebrities.
+</p>
+
+<p>
+I'm struggling a bit, not having much experience in this field.
+My first instinct was to look at
+<a href="http://www.astray.com/photos/">the web site of a famous British Perl hacker</a>
+to learn how to search his magnificent photo collection.
+<a href="?node=acme">acme</a> seems to use some sort of keyword search, but when I typed
+in "perl celebrity" I was told to "Please come back later"
+in eight different languages.
+</p>
+
+<p>
+My next instinct was to steal an idea I remember from Subversion,
+that of allowing arbitrary "properties" (key-value pairs), aka
+metadata, to be associated with a file.
+</p>
+
+<div class='readmore-link'><a href="?node_id=479418">Read more...</a><span class='readmore-size'> (2 kB)</span></div>
+</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479418;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479416" 
+       name="post-head-id479416" 
+       href="?node_id=479416"
+    >OSCON - sessions in other tracks</a><br /> 
+    on Jul 29, 2005 at 10:06
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479416">4 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=416569">jimX11</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479416" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479416" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul><p>Recently I realized that I was only considering attending sessions in the <a href="http://conferences.oreillynet.com/os2005/grid/Perl.html">
+Perl track</a> for OSCON.</p><p>  What sessions, outside the Perl track, interest you?</p>
+</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479416;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479087" 
+       name="post-head-id479087" 
+       href="?node_id=479087"
+    >Autovivification for dummies (using Test::More)</a><br /> 
+    on Jul 28, 2005 at 14:51
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479087">1 reply</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=396583">tphyahoo</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479087" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479087" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Here's a little snip I put together messing around with autovivification. Perhaps some monks that feel queasy about this topic may find it useful.
+<p>
+For a more in depth tutorial on the topic <a href="?node_id=445927">The Bad, the Ugly, and the Good of autovivification</a> may be of interest. Cheers :)
+<pre><tt class="code">use strict;
+use warnings;
+use Test::More qw(no_plan);
+use Data::Dumper;
+
+my %hash = (a =&gt; 'a', b =&gt; 'b');
+
+ok( ! exists($hash{c}), &quot;hash -- c doesn't exist&quot;);
+ok( ! exists($hash{c}), &quot;hash -- c still doesn't exist&quot;);
+ok( ! defined($hash{c}), &quot;hash -- c not defined either&quot;);
+
+
+my $hashref = { %hash };
+
+ok( ! exists($hashref-&gt;{c}), &quot;hashref -- c doesn't exist&quot;);
+ok( ! exists($hashref-&gt;{c}), &quot;hashref -- c still doesn't exist&quot;);
+
+
+ok( ! exists( $hashref-&gt;{c}-&gt;{d} ), &quot;hashref, deeper -- c-&gt;{d} doesn't exist&quot;);
+ok( ! exists( $hashref-&gt;{c}-&gt;{d} ), &quot;hashref -- c-&gt;{d} still doesn't exist&quot;);
+ok( ! exists($hashref-&gt;{c}), &quot;hashref -- c still doesn't exist&quot;); #fails. c does
+<font color="red">+</font> exist.
+ok( ! defined($hashref-&gt;{c}), &quot;hashref -- c still doesn't exist&quot;); #fails. c is 
+<font color="red">+</font>an empty hashfref, which is something other than undef.
+</tt></pre>
+</ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479087;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+
+      </table>
+    </td>
+  </tr>
+</table>
+<table width = 100% cellpadding = "0" cellspacing = "0">
+
+  <tr class = "section_title" width = "100%" border = "1">
+    <td class = "section_title" width = "100%">
+      New Cool Uses for Perl
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table width = "100%" border = "0" cellpadding = "2" cellspacing = "0" >
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id479213" 
+       name="post-head-id479213" 
+       href="?node_id=479213"
+    >Utility to capture parameters and perform a task</a><br /> 
+    on Jul 28, 2005 at 22:24
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=479213">1 reply</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=461912">GrandFather</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__479213" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__479213" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul><p>This code is a part way point in the development of a tool to perform some directory and file management. At this stage it captures information required for the management from the user. The information gathered to controlled by a configuration file. This seems a generally usefull task so the code is offered here for other monks to make what use they wish of it.</p>
+<p>The configuration files is comprised of lines containing a parameter name, and optional default value, and a label. For example:</p>
+<tt>_version_ &quot;1_0&quot; Version as it should appear in the project path (e.g. 1_0)</tt>
+<p>If the default string contains names of other parameters, the default value for the parameter will be generated at run time as the other parameters are updated.</p>
+<p>The work of the task goes in <tt>sub CreateProject</tt> (which is an appropriate name for my initial task :).</p>
+<div class='readmore-link'><a href="?node_id=479213">Read more...</a><span class='readmore-title'> the code</span><span class='readmore-size'> (3 kB)</span></div>
+<div class='readmore-link'><a href="?node_id=479213">Read more...</a><span class='readmore-title'> sample template file and output</span><span class='readmore-size'> (924 Bytes)</span></div>
+<div class="pmsig"><div class="pmsig-461912">
+<hr />Perl is Huffman encoded by design.
+</div></div></ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=479213;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class   = "post_head">
+  <td>
+    <a id  ="post-head-id477933" 
+       name="post-head-id477933" 
+       href="?node_id=477933"
+    >iTunes and Windows and Perl == Bliss</a><br /> 
+    on Jul 25, 2005 at 14:21
+  </td>
+  <td valign = "top">
+    <a HREF="?node_id=477933">3 replies</a>
+  </td>
+  <td valign = "top">
+    by <a HREF="?node_id=38208">mdog</a>
+  </td>
+</tr>
+<tr>
+  <td colspan = "3">
+  <div class="vote"><center><label><input type="radio" name="vote__477933" value="1" /><tt>++</tt></label> &nbsp; &nbsp; <label><input type="radio" name="vote__477933" value="-1" /><tt>--</tt></label></center></div>
+  </td>
+</tr>
+<tr class = "post_body">
+  <td colspan = "2">
+<ul>Brethern --
+<p>
+I have been waiting for quite some time for an API into iTunes so that I could control it from my keyboard or X10 remote controls and they released an <a href="http://developer.apple.com/sdk/itunescomsdk.html">SDK</a> awhile back that I just discovered.
+<p>
+I know that you Mac users have <a href="http://search.cpan.org/~bdfoy/Mac-iTunes-0.85/lib/iTunes.pm">Mac::iTunes</a> but Windows users can now control iTunes natively.
+<p>
+<a href="http://www.jamescraig.co.uk/SlimServer/">James Craig</a> has done some excellent work with the SDK and I borrowed the "SearchiTunesWinForSong" routine from him.
+<p>
+I am going to come up with a more complete library of functions as time allows but wanted to get this out so folks know that they can start hacking away at iTunes.  
+<p>
+Enjoy,<br />
+mdog
+<p>
+<div class='readmore-link'><a href="?node_id=477933">Read more...</a><span class='readmore-size'> (6 kB)</span></div>
+<p><small><b><a href="?node_id=17558">READMORE</a></b> tags added by <a href="?node=Arunbear">Arunbear</a></small></p></ul>
+
+  </td>
+  <td><br />
+    <a href= "?parent=477933;node=Comment%20on"><font size = "2">&#091;Offer your reply&#093;</font></a>
+  </td>
+</tr>
+
+<!--  End Post  -->
+
+      </table>
+    </td>
+  </tr>
+</table>
+<center><input type="submit" name="sexisgreat" value="vote!" /><input type="hidden" name=".cgifields" value="vote__479596"><input type="hidden" name=".cgifields" value="vote__479677"><input type="hidden" name=".cgifields" value="vote__479213"><input type="hidden" name=".cgifields" value="vote__479400"><input type="hidden" name=".cgifields" value="vote__479402"><input type="hidden" name=".cgifields" value="vote__479500"><input type="hidden" name=".cgifields" value="vote__479511"><input type="hidden" name=".cgifields" value="vote__479601"><input type="hidden" name=".cgifields" value="vote__479416"><input type="hidden" name=".cgifields" value="vote__479418"><input type="hidden" name=".cgifields" value="vote__479087"><input type="hidden" name=".cgifields" value="vote__479541"><input type="hidden" name=".cgifields" value="vote__479607"><input type="hidden" name=".cgifields" value="vote__479519"><input type="hidden" name=".cgifields" value="vote__477933"><input type="hidden" name=".cgifields" value="vote__479570"><input type="hidden" name=".cgifields" value="vote__479539"><input type="hidden" name=".cgifields" value="vote__479735">
+</form></center>
+<!--
+    </td>
+    </tr>
+</table>
+-->
+
+
+        <!--/contained stuff-->
+      </td>
+      <!--nodelet handling code (monktainer)-->
+      
+      <td width="20%" valign="top" align="right" class="nodelets"><!-- Begin nodelets --><table class       = "nodelet_container">
+<!-- Nodelet Break -->
+    <tbody class = "nodelet" id = "XP_Nodelet">                                      
+      <tr class="nodelet_head_row" id = "nodelet_head_row_XP_Nodelet">
+        <th class="nodehead">
+          XP Nodelet
+        </th>                                                                  
+      </tr>
+      <tr class="nodelet_body_row" id = "nodelet_body_row_XP_Nodelet">
+        <td class="nodebody">
+
+You have <b>20</b> votes left today.
+
+        </td>
+      </tr>
+
+    </tbody>
+<!-- Nodelet Break -->
+    <tbody class = "nodelet" id = "Personal_Nodelet">                                      
+      <tr class="nodelet_head_row" id = "nodelet_head_row_Personal_Nodelet">
+        <th class="nodehead">
+          Personal Nodelet
+        </th>                                                                  
+      </tr>
+      <tr class="nodelet_body_row" id = "nodelet_body_row_Personal_Nodelet">
+        <td class="nodebody">
+
+<!--begin:personalnodelethandler-->
+<div class="pn_links">
+<a HREF="?node_id=28877">Nodes to consider</a>
+<br />
+<a HREF="?node_id=460658">Windows Threaded Proxy Server</a>
+<br />
+<a HREF="?node_id=17553">Push HTTP server</a>
+<br />
+<a HREF="?node_id=133389">UDP sniffer</a>
+<br />
+<a HREF="?node_id=129521">Simple UDP example anyone?</a>
+<br />
+<a HREF="?node_id=164939">Re: Sending Rich/HTML email</a>
+<br />
+<a HREF="?node_id=466802">Re: Help from the very start.</a>
+<br />
+<a HREF="?node_id=468868">CGI.pm vs Apache::Request</a>
+<br />
+<a HREF="?node_id=463825">CGI::Application + Net::HTTPServer</a>
+<br />
+<a HREF="?node_id=470791">Advice on HTTPServer problem please</a>
+<br />
+<a HREF="?node_id=224666">Pack/Unpack Tutorial (aka How the System Stores Data)</a>
+</div>
+<div class="pn_addlnks" align="right">
+<a HREF="?node_id=366609">Manage</a>
+ or <b>Add</b> to 
+<a HREF="?node_id=131;addtoscratchpad=doctext">pub</a>
+ / 
+<a HREF="?node_id=131;addtoscratchpad=privatetext">priv</a> pad
+ or&nbsp;
+<a HREF="?append_to_personal_nodelet=%5Bid%3A%2F%2F131%5D;node_id=131">nodelet</a>
+</div>
+<!--end:personalnodelethandler-->
+        </td>
+      </tr>
+
+    </tbody>
+<!-- Nodelet Break -->
+    <tbody class = "nodelet" id = "Chatterbox">                                      
+      <tr class="nodelet_head_row" id = "nodelet_head_row_Chatterbox">
+        <th class="nodehead">
+          Chatterbox
+        </th>                                                                  
+      </tr>
+      <tr class="nodelet_body_row" id = "nodelet_body_row_Chatterbox">
+        <td class="nodebody">
+
+<form method="post" action="?" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="node_id" value="">
+
+
+<i>&nbsp;&nbsp;&#8226; Plus </i><a href="?node=Message+Inbox"><b>44</b><i> archived</i></a><br />
+
+<hr />
+<span class="chat"><span class="chatfrom_22609"><b>&lt;</b><a href="?node_id=22609" title="Posted :46:28 (6:11 before next)">tye</a><b>&gt;</b> Drat! DBD::AnyData doesn't suppport 'left join x on'<!-- --></b></i></u></tt></em></strong></span></span><br />
+<span class="chat"><span class="chatfrom_277846"><b>&lt;</b><a href="?node_id=277846" title="Posted :52:39 (1:14 ago)">Moriarty</a><b>&gt;</b> My machine is on a go slow. Time to reboot. biab. (@!$#! Windoze).<!-- --></b></i></u></tt></em></strong></span></span><br />
+  <input type="hidden" name="op" value="message" />
+  <!-- No private message sent -->
+  <input type="text" name="message" size="15" maxlength="255" />
+  <input type="submit" name="message_send" value="talk" />
+
+
+</form>
+<i><br /> <a href="?node=Chatterbox%20FAQ">How do I use this?</a>  |  <a href="?node_id=20842">Other CB clients</a></i>
+        </td>
+      </tr>
+
+    </tbody>
+<!-- Nodelet Break -->
+    <tbody class = "nodelet" id = "Other_Users">                                      
+      <tr class="nodelet_head_row" id = "nodelet_head_row_Other_Users">
+        <th class="nodehead">
+          Other Users
+        </th>                                                                  
+      </tr>
+      <tr class="nodelet_body_row" id = "nodelet_body_row_Other_Users">
+        <td class="nodebody">
+
+<span class="other-users-text">Others <span class="other-users-blurb">scrutinizing</span> the monastery:</span> (21)<br /><span class='even-row'><span class='item-000'><span class='user-82147'><a title="Zaxo's home node" href="?node_id=82147">Zaxo</a><br /></span></span></span>
+<span class='odd-row'><span class='item-001'><span class='user-155876'><a title="Mr. Muskrat's home node" href="?node_id=155876">Mr. Muskrat</a><br /></span></span></span>
+<span class='even-row'><span class='item-002'><span class='user-439528'><a title="tlm's home node" href="?node_id=439528">tlm</a><br /></span></span></span>
+<span class='odd-row'><span class='item-003'><span class='user-70929'><a title="atcroft's home node" href="?node_id=70929">atcroft</a><br /></span></span></span>
+<span class='even-row'><span class='item-004'><span class='user-221638'><a title="castaway's home node" href="?node_id=221638">castaway</a><br /></span></span></span>
+<span class='odd-row'><span class='item-005'><span class='user-241598'><a title="holli's home node" href="?node_id=241598">holli</a><br /></span></span></span>
+<span class='even-row'><span class='item-006'><span class='user-273627'><a title="bradcathey's home node" href="?node_id=273627">bradcathey</a><br /></span></span></span>
+<span class='odd-row'><span class='item-007'><span class='user-277846'><a title="Moriarty's home node" href="?node_id=277846">Moriarty</a><br /></span></span></span>
+<span class='even-row'><span class='item-008'><span class='user-180035'><a title="esskar's home node" href="?node_id=180035">esskar</a><br /></span></span></span>
+<span class='odd-row'><span class='item-009'><span class='user-155209'><a title="hackdaddy's home node" href="?node_id=155209">hackdaddy</a><br /></span></span></span>
+<span class='even-row'><span class='item-010'><span class='user-311184'><a title="TilRMan's home node" href="?node_id=311184">TilRMan</a><br /></span></span></span>
+<span class='odd-row'><span class='item-011'><span class='user-387277'><a title="bpphillips's home node" href="?node_id=387277">bpphillips</a><br /></span></span></span>
+<span class='even-row'><span class='item-012'><span class='user-300584'><a title="cazz's home node" href="?node_id=300584">cazz</a><br /></span></span></span>
+<span class='odd-row'><span class='item-013'><span class='user-384537'><a title="jbullock35's home node" href="?node_id=384537">jbullock35</a><br /></span></span></span>
+<span class='even-row'><span class='item-014'><span class='user-456192'><a title="BaldPenguin's home node" href="?node_id=456192">BaldPenguin</a><br /></span></span></span>
+<span class='odd-row'><span class='item-015'><span class='user-281888'><a title="GaijinPunch's home node" href="?node_id=281888">GaijinPunch</a><br /></span></span></span>
+<span class='even-row'><span class='item-016'><span class='user-311016'><a title="cyclist38's home node" href="?node_id=311016">cyclist38</a><br /></span></span></span>
+<span class='odd-row'><span class='item-017'><span class='user-451993'><a title="siracusa's home node" href="?node_id=451993">siracusa</a><br /></span></span></span>
+<span class='even-row'><span class='item-018'><span class='user-463329'><a title="izut's home node" href="?node_id=463329">izut</a><br /></span></span></span>
+<span class='odd-row'><span class='item-019'><span class='user-432722'><a title="prlmnks.org's home node" href="?node_id=432722">prlmnks.org</a><br /></span></span></span>
+<span class='even-row'><span class='item-020'><span class='user-414875'><a title="snoopy's home node" href="?node_id=414875">snoopy</a><br /></span></span></span>
+<span class='update-time'><small>As of 2005-07-31 23:52 GMT</small></span>
+
+        </td>
+      </tr>
+
+    </tbody>
+
+</table>
+
+        <!-- End nodelets -->
+      </td>
+      <!--/nodelet handling code (monktainer)-->
+    </tr>
+  </table>
+</center>
+<!-- End main (monktainer)-->
+<br />
+<br />
+
+<div id="footer">
+  <center>
+    <font size="2">
+          This page brought to you by the crazy folks at
+      <a href="http://everydevel.com">
+      The Everything Development Company</a> and maintained by
+      <a href="mailto:vroom@blockstackers.com">Tim Vroom</a>.<br />
+      Perl Monks is a proud member of the
+      <a href="http://www.perlfoundation.org">The Perl Foundation</a>.<br />
+      Marvelous Managed Hosting and Bandwidth Generously Provided by
+      <a href="http://promote.pair.com/direct.pl?perlmonks.org">
+      pair Networks</a>
+
+    </font>
+  </center>
+</div>
+<!-- /monktainer -->
+  </body>
+</html>

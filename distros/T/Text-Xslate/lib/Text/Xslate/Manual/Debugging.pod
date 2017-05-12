@@ -1,0 +1,88 @@
+
+=head1 NAME
+
+Text::Xslate::Manual::Debugging - Debugging techniques for Xslate templates
+
+=head1 DESCRIPTION
+
+This document describes techniques for debugging templates.
+
+=head2 Setting C<< verbose => 2 >>
+
+Try C<< verbose => 2 >> in the first step. This option enables full warnings, especially warnings related to C<undef>.
+
+=head2 File names and line numbers
+
+Xslate messages include file names, line numbers, and, if possible, source
+code lines which seems problems.
+
+You can also access the file name and the line number in templates by
+C<__FILE__> and C<__LINE__> tokens just like as Perl.
+
+If you want reports files and lines from your registered functions,
+C<< Text::Xslate->current_file >> and C<< Text::Xslate->current_line >>
+in callbacks are the same as C<__FILE__> and C<__LINE__> in templates
+respectively.
+
+    sub my_sqrt {
+        my($n) = @_;
+
+        if($n < 1) {
+            # return a message instead of warnings
+            return sprintf "!!! Can't take sqrt of $n at %s line %d !!!",
+                Text::Xslate->current_file, Text::Xslate->current_line;
+        }
+        return sqrt($n);
+    }
+
+    my $tx = Text::Xslate->new(
+        function => { sqrt => \&my_sqrt },
+    );
+
+=head2 To dump values
+
+You can use any dumping modules via the C<function> option, but
+Xslate has a builtin C<dump> filter to dump template values.
+
+    <: $value | dump # Dump $value with Data::Dumper :>
+
+=head2 Detection of missing variables (or typos or variable names)
+
+Xslate itself has warning system for use of uninitialized values, but sometimes
+it is not enough.
+
+If you want fill in some string, e.g. B<FILL ME>, for missing variables,
+you can use the C<hash_with_default()> utility. For example:
+
+    use Text::Xslate::Util qw(hash_with_default);
+    $tx->render($name, hash_with_default(\%vars, sub { "FILL ME '@_' " }) );
+
+Note that this is really B<slow> because it is a tied-hash wrapper.
+
+=head2 Customization of error messages
+
+You can customize error handlers by C<warn_handler> and C<die_handler>.
+In these handlers, you can call C<< Text::Xslate->print() >> method in order to add your custom messages to the output buffer, which makes debugging easier.
+
+    #!perl -w
+    use strict;
+    use Text::Xslate;
+    my %vpath = (
+        hello => 'Hello, <: $lang :> world!' . "\n",
+    );
+    my $tx = Text::Xslate->new(
+        path         => \%vpath,
+        verbose      => 2,
+        warn_handler => sub { Text::Xslate->print('[[', @_, ']]') },
+    );
+
+    print $tx->render('hello', { });
+    # => Hello, [[use nil to print at ...]] world!
+
+=head1 SEE ALSO
+
+L<Text::Xslate>
+
+L<Text::Xslate::Manual>
+
+=cut

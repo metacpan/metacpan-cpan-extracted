@@ -1,0 +1,26 @@
+Revision history for Perl extension Text::AsciiTeX.
+
+0.05  Tue May 22 2012
+	- simplfied the XS logic a little bit
+
+0.04  Tue Jan 24 2012
+	- added ppport.h
+	- fixed portability bug [XS redefines free()!]
+
+0.03  Tue Jan 24 2012  
+	- not back compatible to 0.02! 
+	- render is now context aware
+		- List: returns art row list
+		- Scalar: returns string concat each row ended with newline
+		- Void: prints Scalar result to selected handle
+
+0.02  Mon Jan 23 2012
+	- render now warns on errors from AsciiTeX
+	- render now accepts second arg (ll in AsciiTeX)
+		specifying columns (defaults to 80)
+	- render is now a Perl function, which calls c_render in XS
+
+0.01  Mon Jan 23 2012 
+	- original version
+	- provides render function
+

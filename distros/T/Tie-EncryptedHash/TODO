@@ -1,0 +1,10 @@
+[done] test list ref assignments.
+[done] test scalar ref assignments.
+[done] undef Tie::Secret::VARn after decrypt_hex in decrypt. 
+[done] delete $self->{__automatic}{$key} after first access at encrypt at FETCH.
+[done] should not croak when plaintext is assigned in opaque mode.  should ignore.
+[done] write an empty subclass test.
+[done] merge __automatic under __scaffolding.
+[done] ciphertext assignments to an encryting fields in opaque mode should be possible.
+       (check to see if the input contains a MD5 digest).
+add salt (random data) to value before encrypting and taking MD5.

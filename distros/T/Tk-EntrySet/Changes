@@ -1,0 +1,42 @@
+Revision history for Perl extension Tk::EntrySet.
+
+
+0.01  Fri Jul 25 00:25:00 2008
+	
+	first version
+
+0.04  Fri Sep 12 09:09:00 2008
+
+        added -changed_command option
+        fixed issue with -valuelist option set at creation time
+        added untie for -valuelist_variable OnDestroy
+        more tests
+
+0.05  added various methods to MatchingBE to make it suitable
+      for stand alone usage.
+      more tests
+
+0.06  Sep 16 2008
+      added test and fixed set_selected_value(undef) in MatchingBE
+      undef is a valid state
+      <Return> pops down the list and does a Tk::break afterwards now
+      (MatchingBE).
+
+0.07  Sep 18 2008
+      examples/*.pl added
+      fixed issue with ChoicesSet -labels_and_values triggering Frames
+      -label.*  option handling
+     
+0.08  Feb 17 2009
+      fixed example in EntrySet.pm
+
+0.09  Feb 18 2009 
+      fixed issue with creation when -valuelist option has not been set
+      forcing -valuelist => [] in an afterIdle call
+
+0.10  Jun 26 2010
+      setting -choices or -labels_and_values clears selected value
+      configuring -value_variable with an undefined variable clears entry
+
+0.11  May 27 2011
+      pack entry widgets using (-fill x -expand 1)

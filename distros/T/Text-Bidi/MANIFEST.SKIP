@@ -1,0 +1,6 @@
+t/boilerplate.t
+t/text/fullpara.txt
+t/text/fullpara.txt.out
+t/text/oneline.txt
+t/text/oneline.txt.out
+

@@ -1,0 +1,59 @@
+#-----------------------------------------------------------------
+# Changes for Template::Plugin::KwikiFormat
+# $Rev: 97 $
+# $Date: 2006-03-06 16:55:38 +0000 (Mon, 06 Mar 2006) $ 
+#-----------------------------------------------------------------
+
+
+2006-03-07		Template-Plugin-KwikiFormat-1.04
+----------
+* supported Kwiki 0.38
+* Satoshi Tanimoto now takes over the module from Thomas Klausner.
+
+
+2004-11-04		Template-Plugin-KwikiFormat-1.03
+----------
+* documented ForcedLink
+
+
+2004-10-28
+----------
+* figured out how to change the const pattern_start regex
+  relative links in ForcedLink work now! yay!
+
+
+2004-10-27		Template-Plugin-KwikiFormat-1.02
+----------
+* rewrote Template::Plugin::KwikiFormat to redefine some subs directly
+  in Kwiki::Formatter
+  everything works but my custom linking stuff (eg [/relative/link.html see here])
+* removed Template::Plugin::KwikiFormat::FakeKwiki as it doesn't work
+  with mod_perl, because something inside Kwiki uses CGI.pm in some
+  strange way...
+
+
+----------		Template-Plugin-KwikiFormat-1.01 (not released)
+
+* added Template::Plugin::KwikiFormat::FakeKwiki
+  to override various link-generating methods that do not work
+  outside of a kwiki installation.
+  additionally, change the behaviour of TitledHyperLink to allow for
+  relative links.
+  Thanks to Ian Langworth for pointing me into the right direction.
+
+* added t/30_links.t to test feature implemented by
+  Template::Plugin::KwikiFormat::FakeKwiki
+
+* added Test::NoWarnings to requires (thanks to Dave Cash for reporting this)
+
+
+2004-10-22		Template-Plugin-KwikiFormat-1.00 (first CPAN release)
+----------
+* improved docs a bit
+* bumped $VERSION to 1.00
+* added t/20_table.t test to test table generation
+
+
+2004-10-21
+----------
+* initial version.

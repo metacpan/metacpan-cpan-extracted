@@ -1,0 +1,25 @@
+Test::LongString v0.17
+======================
+
+A library to test long strings.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+Needs Test::More, Test::Builder, and, to run the tests, Test::Builder::Tester.
+Test::Pod and Test::Pod::Coverage are optional.
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (c) 2002 - 2014 Rafael Garcia-Suarez

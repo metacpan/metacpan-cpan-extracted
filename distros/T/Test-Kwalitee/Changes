@@ -1,0 +1,136 @@
+Revision history for Test-Kwalitee
+
+1.25      2017-02-28 03:21:28Z
+    - fix test to not rely on . in @INC
+
+1.24      2016-10-14 01:22:27Z (TRIAL RELEASE)
+    - new test for compatibility in taint mode
+
+1.23      2016-10-14 01:17:11Z
+    - update the list of metrics to the latest Module::CPANTS::Analyse
+
+1.22      2014-08-16 03:25:59Z
+    - do not stop running tests at the first failure (broken since 1.20)
+
+1.21      2014-08-16 00:12:37Z
+    - document metrics added in Module::CPANTS::Analyse 0.93_03
+
+1.20      2014-08-10 02:57:00Z (TRIAL RELEASE)
+    - running the tests via the import method directly has been deprecated;
+      the new kwalitee_ok() function is added to provide a more sane and
+      logical layout to your tests.
+
+1.19      2014-07-19 17:01:08Z
+    - kwalitee-metrics script now includes the module version as well as the
+      name, for each metric provided
+    - remove test that is rendered invalid with upcoming changes to
+      Test::Builder (1.005+)
+    - document new metrics added in Module::CPANTS::Analyse 0.93_01
+
+1.18      2014-01-22 04:47:40Z
+    - updated list of available metrics
+
+1.17      2013-10-20 21:49:31Z
+    - oops, fixed tests that break when AUTHOR_TESTING is not set
+
+1.16      2013-10-20 21:44:53Z
+    - now printing even more diagnostics on error (as much as we have
+      available)
+
+1.15      2013-09-25 03:12:20Z
+    - re-release with fixed compile test
+
+1.14      2013-09-04 01:38:29Z
+    - updated inaccurate test prereq
+
+1.13      2013-08-21 20:03:31Z
+    - added missing abstract for kwalitee-metrics script
+    - no longer issuing a warning if the test is running from xt/ (see v1.10)
+
+1.12      2013-08-01 23:09:47Z
+    - adjusted tests to compensate for changes made in Module::CPANTS::Analyse
+      0.88/0.90_01
+
+1.11      2013-07-30 00:27:36Z
+    - added missing kwalitee-metrics executable to the distribution
+
+1.10      2013-07-29 00:18:31Z
+    - we now issue a warning if running when neither AUTHOR_TESTING or
+      RELEASE_TESTING environment variables or set
+    - test level adjusted, so location of failing test is correct
+    - include a script to dump all metrics ("kwalitee-metrics")
+
+1.09      2013-07-18 17:34:33Z
+    - the has_test_pod, has_test_pod_coverage tests have been removed - they
+      are classified as 'extra', and have been largely considered to be a bad
+      idea anyway (these are often shipped as, and ought to be, in xt/)
+    - the extractable test has been removed, as it does nothing in dists
+      before there is a tarball present
+    - new tests have been added: all standard kwalitee tests that can be run
+      on a bare distribution without a tarball
+
+1.08      2013-07-16 00:59:47Z
+    - documentation fixed to reflect what indicators are actually available
+    - metric names are no longer hardcoded, so Module::CPANTS::Analyse has
+      more freedom to add and remove metrics
+
+1.07      2013-06-28 19:22:00Z
+    - now the indicators are run in the exact order they are returned
+      from Module::CPANTS::Kwalitee::*, as some tests depend on the results of
+      earlier tests (charsbar)
+    - synopsis updated to recommend a better way to run this module, ensuring
+      that it is not run by cpantesters or at installation time
+    - we no longer create a function in our namespace for every metric we are
+      going to test -- this should not break anyone, as these subs were never
+      documented as part of the public API
+
+1.06      2013-05-13 21:15:33Z
+    - restore previous behaviour of plan()ing in import, to unbreak some
+      dists that didn't follow the docs (which in this case is ok since it's a
+      horrible idea for a Test module to plan itself anyway) (v1.05)
+    - more diagnostic data is printed when a test fails (RT#85107)
+
+1.05      2013-05-13 00:17:32Z
+    - more rigorous testing of output; (in order to make this possible) now we
+      do END { done_testing } instead of planning a test count
+
+1.04      2013-04-28 15:55:17Z
+    - re-release with bumped developer prereqs to depend on a higher version
+      of Test::More for t/00-compile.t and t/00-check-deps.t (RT#84900)
+
+1.03      2013-04-27 12:49:31Z
+    - fixed documentation to refer to the proper names of Kwalitee tests
+      (RT#24506) (thanks, Gavin Sherlock!)
+    - cleaned up partially-botched distribution metadata and README
+
+1.02      2013-03-31 21:58:52Z
+    - no operational changes - re-releasing under new management via github
+      and Dist::Zilla
+
+1.01      2008-08-14
+    - no entry made
+
+1.00      2008-08-14 05:03:02Z
+    - fixed code to work with modern Module::CPANTS::Analyse (Elliot Shank,
+        Xavier Caron, Heiko Eißfeldt, and probably others)
+    - removed old code I don't want to support (Makefile.PL)
+
+0.30      2006-03-03 19:01:56Z
+    - fix test plan count for including and excluding tests (Chris Dolan)
+    - improve test coverage to check for that, too
+    - added signature and signature test
+
+0.20      2006-03-03 07:40:06Z
+    - added documentation
+    - fixed include and exclude tests (thanks to Chris Dolan)
+    - suppress weird CPANTS warnings (they didn't think I would do it this way)
+
+0.10      2006-02-15 05:06:25Z
+    - hey, this version actually works
+    - releasing to my web site, not the CPAN
+    - still needs docs and, ironically, more tests
+
+0.01      2004-04-07 05:57:17Z
+    - proof of concept
+    - initial release
+    - either know what you're doing or don't use this

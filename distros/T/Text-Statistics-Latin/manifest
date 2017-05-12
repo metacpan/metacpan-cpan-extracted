@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-Statistics-Latin.t
+t/pod.t
+ex/examples.tar.gz
+lib/Text/Statistics/Latin.pm
+META.yml                                 Module meta-data (added by MakeMaker)

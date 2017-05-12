@@ -1,0 +1,483 @@
+#! /usr/local/bin/perl
+#
+#	$Id: perlsh 475 2014-12-13 03:20:00Z hayashi $	
+#
+#	Copyright (c) 1996 Hiroo Hayashi. All Rights Reserved.
+#
+#	This program is free software; you can redistribute it and/or
+#	modify it under the same terms as Perl itself.
+
+=head1 NAME
+
+perlsh - one-line perl evaluator with line editing function and
+	 variable name completion function
+
+=head1 SYNOPSIS
+
+  perlsh
+
+=head1 DESCRIPTION
+
+This program reads input a line, and evaluates it by perl interpreter,
+and prints the result.  If the result is a list value then each value
+of the list is printed line by line.  This program can be used as a
+very strong calculator which has whole perl functions.
+
+This is a sample program Term::ReadLine::Gnu module.  When you input a
+line, the line editing function of GNU Readline Library is available.
+Perl symbol name completion function is also available.
+
+=cut
+
+package PerlSh;
+
+use strict;
+use warnings;
+use Term::ReadLine;
+use POSIX;			#  for sigaction below
+
+use vars qw($PS1 $PS2 $HISTFILE $HISTSIZE $INPUTRC $STRICT
+	    $HOSTNAME $LOGNAME $CWP);
+
+#$PS1 = '$ ';
+$PS1='\w[\!]$ ';
+$PS2 = '> ';
+$HISTFILE = ($ENV{HOME} || ((getpwuid($<))[7])) . "/.perlsh_history";
+$HISTSIZE = 256;
+$INPUTRC = ($ENV{HOME} || ((getpwuid($<))[7])) . "/.perlshrc";
+$STRICT = 0;
+
+$HOSTNAME = $ENV{HOSTNAME};
+$LOGNAME = $ENV{LOGNAME};
+$CWP = 'main';			# current working package
+
+package main;
+if (-f $PerlSh::INPUTRC) {
+    do $PerlSh::INPUTRC;
+}
+
+package PerlSh;
+
+use vars qw($term $attribs);	# to access as `$PerlSh::term' from prompt
+$term = new Term::ReadLine 'PerlSh';
+$attribs = $term->Attribs;
+
+$term->bind_key(ord "^", 'history-expand-line', 'emacs-meta');
+$term->bind_key(ord "\cv", 'display-readline-version', 'emacs-ctlx');
+$term->bind_key(ord "\cc", 'abort'); # not works yet FIXME!!!
+
+if (defined &main::afterinit) {
+    package main;
+    &afterinit;
+    package PerlSh;
+}
+
+&toplevel;			# never returns
+
+########################################################################
+sub toplevel {
+    # disable implicit add_history() call
+    $term->MinLine(undef);
+
+    $term->stifle_history($HISTSIZE);
+    if (-f $HISTFILE) {
+	$term->ReadHistory($HISTFILE)
+	    or warn "perlsh: cannot read history file: $!\n";
+    }
+    $attribs->{attempted_completion_function} = \&attempt_perl_completion;
+    $attribs->{special_prefixes} = '$@%&';
+    $attribs->{completion_display_matches_hook}
+	= \&perl_symbol_display_match_list;
+
+    # See http://perldoc.perl.org/perlipc.html#Deferred-Signals-%28Safe-Signals%29
+    # was '$SIG{INT} = sub { ...'
+    sigaction SIGINT, new POSIX::SigAction sub {
+	$term->modifying;
+	$term->delete_text;
+	$attribs->{point} = $attribs->{end} = 0;
+	$term->redisplay;
+    } or die "Error setting SIGINT handler: $!\n";
+
+    my ($strict, $command, @result);
+    $strict = $STRICT ? '' : 'no strict;';
+    while (defined($command = &reader)) {
+	@result = eval ("$strict package $CWP; $command");
+	use strict;
+	if ($@) { print "Error: $@\n"; next; }
+	printer (@result);
+	$CWP = $1 if ($command =~ /^\s*package\s+([\w:]+)/);
+    }
+    &quit;
+}
+
+sub sigint {
+    $term->modifying;
+    $term->delete_text;
+    $attribs->{point} = $attribs->{end} = 0;
+    $term->redisplay;
+}
+
+sub quit {
+    $term->WriteHistory($HISTFILE)
+	or warn "perlsh: cannot write history file: $!\n";
+    exit (0);
+}
+
+sub reader {
+    my ($line, $command);
+    $command = '';
+    while (1) {
+	$line = $term->readline($command ? $PS2 : prompt($PS1));
+	return undef unless (defined $line);
+	
+	if ($line =~ /\\$/) {
+	    chop $line;
+	    $command = $command ? $command . " $line" : $line;
+	} else {
+	    $command = $command ? $command . " $line" : $line;
+	    $term->addhistory($command) if (length($command) > 0);
+	    return $command;
+	}
+    }
+}
+
+sub printer {
+    my (@res) = @_;
+    my ($i);
+    foreach $i (@res) { print "$i\n"; }
+}
+
+sub prompt {
+    local($_) = @_;
+    # if reference to a subroutine return the return value of it
+    return &$_ if (ref($_) eq 'CODE');
+
+    # \h: hostname, \u: username, \w: package name, \!: history number
+    s/\\h/$HOSTNAME/g;
+    s/\\u/$LOGNAME/g;
+    s/\\w/$CWP/g;
+    s/\\!/$attribs->{history_base} + $attribs->{history_length}/eg;
+    $_;
+}
+
+#
+#	custom completion for Perl
+#
+
+sub perl_symbol_display_match_list ($$$) {
+    my($matches, $num_matches, $max_length) = @_;
+    map { $_ =~ s/^((\$#|[\@\$%&])?).*::(.+)/$3/; }(@{$matches});
+    $term->display_match_list($matches);
+    $term->forced_update_display;
+}
+
+sub attempt_perl_completion ($$$$) {
+    my ($text, $line, $start, $end) = @_;
+    
+    no strict qw(refs);
+    if (substr($line, 0, $start) =~ m/\$([\w:]+)\s*(->)?\s*{\s*['"]?$/) {
+	# $foo{key, $foo->{key
+	$attribs->{completion_append_character} = '}';
+	return $term->completion_matches($text,
+					 \&perl_hash_key_completion_function);
+    } elsif (substr($line, 0, $start) =~ m/\$([\w:]+)\s*->\s*['"]?$/) {
+	# $foo->method
+	$attribs->{completion_append_character} = ' ';
+	return $term->completion_matches($text,
+					 \&perl_method_completion_function);
+    } else { # Perl symbol completion
+	$attribs->{completion_append_character} = '';
+	return  $term->completion_matches($text,
+					  \&perl_symbol_completion_function);
+    }
+}
+
+# static global variables for completion functions
+use vars qw($i @matches);
+
+sub perl_hash_key_completion_function ($$) {
+    my($text, $state) = @_;
+    
+    if ($state) {
+	$i++;
+    } else {
+	# the first call
+	$i = 0;			# clear index
+	my ($var,$arrow) = (substr($attribs->{line_buffer},
+				   0, $attribs->{point} - length($text))
+			    =~ m/\$([\w:]+)\s*(->)?\s*{\s*['"]?$/); # });
+	no strict qw(refs);
+	$var = "${CWP}::$var" unless ($var =~ m/::/);
+	if ($arrow) {
+	    my $hashref = eval "\$$var";
+	    @matches = keys %$hashref;
+	} else {
+	    @matches = keys %$var;
+	}
+	
+    }
+    for (; $i <= $#matches; $i++) {
+	return $matches[$i] if ($matches[$i] =~ /^\Q$text/);
+    }
+    return undef;
+}
+
+sub _search_ISA ($) {
+    my ($mypkg) = @_;
+    no strict 'refs';
+    no warnings 'prototype';
+    my $isa = "${mypkg}::ISA";
+    return $mypkg, map _search_ISA($_), @$isa;
+}
+
+sub perl_method_completion_function ($$) {
+    my($text, $state) = @_;
+    
+    if ($state) {
+	$i++;
+    } else {
+	# the first call
+	my ($var, $pkg, $sym, $pk);
+	$i = 0;			# clear index
+	$var = (substr($attribs->{line_buffer},
+		       0, $attribs->{point} - length($text))
+		=~ m/\$([\w:]+)\s*->\s*$/)[0];
+	$pkg = ref eval (($var =~ m/::/) ? "\$$var" : "\$${CWP}::$var");
+	no strict qw(refs);
+	@matches = map { $pk = $_ . '::';
+			 grep (/^\w+$/
+			       && ($sym = "${pk}$_", defined *$sym{CODE}),
+			       keys %$pk);
+		     } _search_ISA($pkg);
+    }
+    for (; $i <= $#matches; $i++) {
+	return $matches[$i] if ($matches[$i] =~ /^\Q$text/);
+    }
+    return undef;
+}
+
+#
+#	Perl symbol name completion
+#
+{
+    my ($prefix, %type, @keyword);
+
+    sub perl_symbol_completion_function ($$) {
+	my($text, $state) = @_;
+
+	if ($state) {
+	    $i++;
+	} else {
+	    # the first call
+	    my ($pre, $pkg, $sym);
+	    $i = 0;		# clear index
+
+	    no strict qw(refs);
+	    ($prefix, $pre, $pkg) = ($text =~ m/^((\$#|[\@\$%&])?(.*::)?)/);
+	    @matches = grep /::$/, $pkg ? keys %$pkg : keys %::;
+	    $pkg = ($CWP eq 'main' ? '::' : $CWP . '::') unless $pkg;
+
+	    if ($pre) {		# $foo, @foo, $#foo, %foo, &foo
+		@matches = (@matches,
+			    grep (/^\w+$/
+				  && ($sym = $pkg . $_,
+				      defined *$sym{$type{$pre}}),
+				  keys %$pkg));
+	    } else {		# foo
+		@matches = (@matches,
+			    !$prefix && @keyword,
+			    grep (/^\w+$/
+				  && ($sym = $pkg . $_,
+				      defined *$sym{CODE} || defined *$sym{IO}
+				     ),
+				  keys %$pkg));
+	    }
+	}
+	my $entry;
+	for (; $i <= $#matches; $i++) {
+	    $entry = $prefix . $matches[$i];
+	    return $entry if ($entry =~ /^\Q$text/);
+	}
+	return undef;
+    }
+
+    BEGIN {
+	%type = ('$' => 'SCALAR', '*' => 'SCALAR',
+		 '@' => 'ARRAY', '$#' => 'ARRAY',
+		 '%' => 'HASH',
+		 '&' => 'CODE'); # '
+
+	# from perl5.004_02 perlfunc
+	@keyword = qw(
+		    chomp chop chr crypt hex index lc lcfirst
+		    length oct ord pack q qq
+		    reverse rindex sprintf substr tr uc ucfirst
+		    y
+		    
+		    m pos quotemeta s split study qr
+
+		    abs atan2 cos exp hex int log oct rand sin
+		    sqrt srand
+
+		    pop push shift splice unshift
+
+		    grep join map qw reverse sort unpack
+		    
+		    delete each exists keys values
+		    
+		    binmode close closedir dbmclose dbmopen die
+		    eof fileno flock format getc print printf
+		    read readdir rewinddir seek seekdir select
+		    syscall sysread sysseek syswrite tell telldir
+		    truncate warn write
+		    
+		    pack read syscall sysread syswrite unpack vec
+		    
+		    chdir chmod chown chroot fcntl glob ioctl
+		    link lstat mkdir open opendir readlink rename
+		    rmdir stat symlink umask unlink utime
+		    
+		    caller continue die do dump eval exit goto
+		    last next redo return sub wantarray
+		    
+		    caller import local my package use
+		    
+		    defined dump eval formline local my reset
+		    scalar undef wantarray
+		    
+		    alarm exec fork getpgrp getppid getpriority
+		    kill pipe qx setpgrp setpriority sleep
+		    system times wait waitpid
+		    
+		    do import no package require use
+		    
+		    bless dbmclose dbmopen package ref tie tied
+		    untie use
+		    
+		    accept bind connect getpeername getsockname
+		    getsockopt listen recv send setsockopt shutdown
+		    socket socketpair
+		    
+		    msgctl msgget msgrcv msgsnd semctl semget
+		    semop shmctl shmget shmread shmwrite
+		    
+		    endgrent endhostent endnetent endpwent getgrent
+		    getgrgid getgrnam getlogin getpwent getpwnam
+		    getpwuid setgrent setpwent
+		    
+		    endprotoent endservent gethostbyaddr
+		    gethostbyname gethostent getnetbyaddr
+		    getnetbyname getnetent getprotobyname
+		    getprotobynumber getprotoent getservbyname
+		    getservbyport getservent sethostent setnetent
+		    setprotoent setservent
+		    
+		    gmtime localtime time times
+		    
+		    abs bless chomp chr exists formline glob
+		    import lc lcfirst map my no prototype qx qw
+		    readline readpipe ref sub sysopen tie tied
+		    uc ucfirst untie use
+		    
+		    dbmclose dbmopen
+		   );
+    }
+}
+
+__END__
+
+=pod
+
+Before invoking, this program reads F<~/.perlshrc> and evaluates the
+content of the file.
+
+When this program is terminated, the content of the history buffer is
+saved in a file F<~/.perlsh_history>, and it is read at next
+invoking.
+
+=head1 VARIABLES
+
+You can customize the behavior of C<perlsh> by setting following
+variables in F<~/.perlshrc>;
+
+=over 4
+
+=item C<$PerlSh::PS1>
+
+The primary prompt string.  The following backslash-escaped special
+characters can be used.
+
+	\h: host name
+	\u: user name
+	\w: package name
+	\!: history number
+
+The default value is `C<\w[\!]$ >'.
+
+=item C<$PerlSh::PS2>
+
+The secondary prompt string.  The default value is `C<E<gt> >'.
+
+=item C<$PerlSh::HISTFILE>
+
+The name of the file to which the command history is saved.  The
+default value is C<~/.perlsh_history>.
+
+=item C<$PerlSh::HISTSIZE>
+
+If not C<undef>, this is the maximum number of commands to remember in
+the history.  The default value is 256.
+
+=item C<$PerlSh::STRICT>
+
+If true, restrict unsafe constructs.  See C<use strict> in perl man
+page.  The default value is 0;
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.perlshrc>
+
+This file is eval-ed at initialization.  If a subroutine C<afterinit>
+is defined in this file, it will be eval-ed after initialization.
+Here is a sample.
+
+	# -*- mode: perl -*-
+	# decimal to hexa
+	sub h { map { sprintf("0x%x", $_ ) } @_;}
+
+	sub tk {
+	    $t->tkRunning(1);
+	    use Tk;
+	    $mw = MainWindow->new();
+	}
+
+	# for debugging Term::ReadLine::Gnu
+	sub afterinit {
+	    *t = \$PerlSh::term;
+	    *a = \$PerlSh::attribs;
+	}
+
+=item F<~/.perlsh_history>
+
+=item F<~/.inputrc>
+
+A initialization file for the GNU Readline Library.  Refer its manual
+for details.
+
+=back
+
+=head1 SEE ALSO
+
+L<Term::ReadLine::Gnu|http://search.cpan.org/dist/Term-ReadLine-Gnu/>
+
+L<GNU Readline Library|http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html>
+
+=head1 AUTHOR
+
+Hiroo Hayashi <hiroo.hayashi@computer.org>
+
+=cut

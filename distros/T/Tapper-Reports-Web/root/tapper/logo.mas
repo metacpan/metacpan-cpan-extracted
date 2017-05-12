@@ -1,0 +1,9 @@
+		<div id="logo">
+% my $logo = $c->stash->{logo};
+% if ($logo) {
+                        <h1><% $logo | n %></h1>
+                        <% $c->stash->{head_overview} ? '<h2> - ' . $c->stash->{head_overview} . '</h2>' : q## | n %>
+% } else {
+			<h1><span>Tapper</span></h1>
+%}
+		</div>

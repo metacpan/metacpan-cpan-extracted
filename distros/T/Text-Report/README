@@ -1,0 +1,96 @@
+Text-Report
+
+Monday, 09 July, 2007 11:24
+------------------------------
+
+Text::Report is a module that will allow you to create neatly
+formatted, text based reports that contain any number of tables of
+various dimensions replete with configurable & optional titles, column
+headings, decorations, sorting, column alignment and more.
+
+Output can be a formatted report suitable for formal presentation
+and/or you can produce comma delimited data either by individual
+tables or the entire report.
+
+I've tried to keep the interface simple and flexible. There are three
+components to configure.
+
+The 'report' component includes the width of the report itself, the
+way that the 'blocks' of data are ordered within the report (either
+automatically or by explicit indexing) and the way that table titles
+are printed for each 'block' or data set.
+
+The 'block' component is manipulated by its name and can contain
+either free-form string data, a decorative separator, or columnar data
+as a table or footer. Columns in each block created can be
+automatically sized or the size (width) and alignment can be defined
+by the user either globally or per column.
+
+The 'column' component is manipulated by the block name that contains
+it and the column position in the table. Columns can be addressed
+individually to tweak the alignment, width and the column header.
+
+The output is currently available in formatted text or comma delimited
+text. Plans are being made to add html and xml output as well.
+
+I've also incorporated a feature that allows you to save the defined
+report as a template (using Storable store() & retrieve()) for reuse.
+
+More detailed information, sample code and the most current builds 
+can be found at http://www.full-duplex.com/svcs04.html under 
+"Perl Libraries", "Text::Report".
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+I would be interested in hearing about how you have used this module,
+maybe by supplying an example or two or if you have any suggestions, 
+comments (yes, even bad) or questions.
+
+You may reach me/us at davidius (AT) cpan (DOT) org or via the contact
+page at http://www.full-duplex.com/contact.html
+
+Polite correspondence will be given a higher response priority.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+The use of 'Storable' is optional and necessary only if you want to 
+create report templates. 
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the 
+perldoc command.
+
+    perldoc Text::Report
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-Report
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Report
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Text-Report
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Text-Report
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 David Huggins
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

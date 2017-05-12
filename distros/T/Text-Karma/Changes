@@ -1,0 +1,17 @@
+Revision history for Text-Karma
+
+0.05  Mon Nov 7 19:36:30 UTC 2011
+    - Removed bare "use DBI;" from storage test
+
+0.04  Sun Oct 16 18:29:38 GMT 2011
+    - Don't use exclusive file locking in tests (fails on *BSD)
+
+0.03  Sun Oct 16 07:35:11 GMT 2011
+    - Modify and document the return value of process_karma()
+
+0.02  Fri Oct 14 21:08:23 GMT 2011
+    - Skip storage test when DBI and DBD::SQLite are not present
+
+0.01  Fri Oct 14 19:52:25 GMT 2011
+    - Initial release, forked from Apocalype's pocoirc-plugin-karma
+

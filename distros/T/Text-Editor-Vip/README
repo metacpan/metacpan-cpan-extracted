@@ -1,0 +1,36 @@
+The goal of the VIP project is to produce a first class Perl editor.
+
+The editor will consist of the core engine and have (at first) 
+three interfaces, a module interface, a text based (curses)
+and a graphic (gtk-perl).
+
+Apart from the usual features, such as syntax coloring and
+templates/wizards, we plan to include innovative features, like support
+for Pair Programming, and to make it extremely configurable and
+pluggable.
+
+This  project as two member, so far, Nadim Khemir and Kaare Rasmussen but we'd
+like to see more.
+
+We can always use help. To test it out, find bugs, propose features and
+write documentation, plugins and code.
+
+Nadim has been using a perl text editor for years but never bothered to
+make it 'right' for distribution. The first version we will release will
+be a refactoring of Nadim's editor.
+
+** Update **
+
+There's already quite a lot in Vip. Building a simple editor should now be trivial
+
+************
+
+As this project is just starting, you can influence it by giving us input
+on what you like in you current text editor and what you would have like
+to see in a perl text editor. Telling us what you don't like in text 
+editors will help us to not make the same mistakes.
+
+
+The discussion forum is at http://www.cpanforum.com/ (prefered) or mail the
+authors.
+

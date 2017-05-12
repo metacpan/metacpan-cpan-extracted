@@ -1,0 +1,306 @@
+=head1 Toader Gallery Documentation
+
+L<Toader::Gallery> handles image galleries for Toader.
+
+Each Toader directory can have one gallery.
+
+Below are the common variables used for in this POD.
+
+    $srcPath - The base source image path from the config.
+    $srcURL - The base URL for the source image from the config.
+    $outputPath - The base output path from the config.
+    $outputURL - The base URL for the output from the config.
+    $gdir - The gallery directory formed as below.
+    $image - The filename of a image, with the path part removed.
+
+The gallery directory part is formed as below.
+
+    $srcPath/$gdir/$image
+
+It is just the gallery directory is the the path between the srcPath
+and a image.
+
+The following are recognized image extensions currently.
+
+    jpg
+    jpeg
+    gif
+    png
+
+=head1 Configuration Storage
+
+The config for a Toader::Gallery is $toaderDir.'/gallery.ini' .
+
+=head2 Gallery INI Variables
+
+=head3 outputPath
+
+This is the output path to use for where output to.
+
+This is required.
+
+=head3 outputURL
+
+This is the output URL to use for when creating the required
+non-relative URLs.
+
+None of the methods will append a '/', so if one is needed, it should
+be provided here.
+
+This is required.
+
+=head3 srcPath
+
+This is the path to find images under.
+
+This is required.
+
+=head3 srcURL
+
+This is the URL that source images can be found under.
+
+None of the methods will append a '/', so if one is needed, it should
+be provided here.
+
+This is required.
+
+=head3 renderUpdateDetails
+
+If image details should be updated upon render being called.
+
+This defaults to '0'.
+
+This is optional.
+
+=head3 renderUpdateIndexes
+
+If image gallery directory index should be updated upon render being called.
+
+This defaults to '0'.
+
+This is optional.
+
+=head3 renderUpdateScaled
+
+If the scaled images should be updated upon render being called.
+
+This defaults to '0'.
+
+This is optional.
+
+=head3 resolutionSmall
+
+The resolution to default to for the small image.
+
+This is a integer that represents what the largest resolution for either
+X or Y a scalled image may have.
+
+The default is '200'.
+
+This is optional.
+
+=head3 resolutionLarge
+
+The resolution to default to for the large image.
+
+This is a integer that represents what the largest resolution for either
+X or Y a scalled image may have.
+
+The default is '1024'.
+
+This is optional.
+
+=head1 Page Template
+
+L<Toader::Gallery> uses a different page template than other modules. The
+template used is 'pageGallery' and the default is as below.
+
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    <html>
+    
+      <head>
+        <title> [== $c->{_}->{siteTitle} ==] </title>
+        <LINK href="[== $g->cssLocation ==]" rel="stylesheet" type="text/css">
+      </head>
+    
+      <body>
+    
+        <div id="header" >
+          [== $g->top ==]
+        </div>
+    
+        <div id="location" >
+          [== $g->locationbar( $locationID ) ==]
+          [== $g->locationSub ==]
+        </div>
+    
+        <div>
+    
+        <div id="content" >
+          [== $content ==]
+        </div>
+    	
+        <br><br><br>
+    	
+        <div id="copyright">
+          [==
+            my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+            $year=$year+1900;
+            return "Copyright ".$year." ".$c->{_}->{owner};
+           ==]
+        </div>
+    
+      </body>
+    </html>
+
+
+Below is what is passed to it, for both updateIndex and updateDetails.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> holding the Toader config.
+    dir - The R2R path for the Toader directory the gallery is for.
+    gdir - The current gallery directory.
+    content - The content for the page.
+
+For updateDetails, the one below is also passed to it.
+
+    image - The name of the image for this page.
+
+=head1 Rendering
+
+Rendering is handled by L<Toader::Render::Gallery>.
+
+Upon Toader::Render::Gallery->render being called, it checks if it should
+render any thing.
+
+    renderUpdateDetails
+    renderUpdateIndexes
+    renderUpdateScaled
+
+The above gallery config settings are used to check for if it should render
+any thing. If any of those are set to 1, it calls the related methods.
+
+=head2 updateDetails
+
+This method updates the detailed images page.
+
+The detail pages are writen out to
+$outputPath.'/.toader-gallery/html/'.$gdir.'/'.$image.'.html' .
+
+The content of the page is pulled from Toader::Render::General->galleryImageLarge .
+
+=head2 updateIndexes
+
+This method updates indexes of a directory.
+
+The index pages are writen out to
+$outputPath.'/.toader/html/'.$gdir.'/index.html' .
+
+When joining the list of sub directories and images, directories
+always come first.
+
+=head3 templates
+
+=head4 gallerySmallImageBegin
+
+This begins the list.
+
+The default template is blank.
+
+The arguments passed to it are as below.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> holding the Toader config.
+    dir - The R2R path for the Toader directory the gallery is for.
+    gdir - The current gallery directory.
+
+=head4 galleryDir
+
+This links to a gallery directory.
+
+The default template is as below.
+
+    <div id="imageDiv" > [== $link ==] </div>
+
+The arguments passed to it are as below.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> holding the Toader config.
+    dir - The R2R path for the Toader directory the gallery is for.
+    gdir - The gallery directory being linked to.
+    link - This is the HTML for the gdir being linked to.
+
+=head4 gallerySmallImage
+
+This links to a gallery directory.
+
+The default template is as below.
+
+    [== $g->galleryImageSmall( $dir, $gdir, $image ); ==]
+
+The arguments passed to it are as below.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> holding the Toader config.
+    dir - The R2R path for the Toader directory the gallery is for.
+    gdir - The current gallery directory.
+    image - The current image in the current gdir.
+
+=head4 gallerySmallJoin
+
+This joins the dir divs and image divs together.
+
+The default template is as below.
+
+    
+    
+
+The arguments passed to it are as below.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> holding the Toader config.
+    dir - The R2R path for the Toader directory the gallery is for.
+    gdir - The current gallery directory.
+
+=head4 gallerySmallImageBegin
+
+This ends the list.
+
+The default template is blank.
+
+The arguments passed to it are as below.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> holding the Toader config.
+    dir - The R2R path for the Toader directory the gallery is for.
+    gdir - The current gallery directory.
+
+=head1 updateScaled
+
+This updates the scaled images.
+
+The small images are written out to
+$outputPath.'/.toader-gallery/small/'.$gdir.'/'.$image .
+
+The large images are written out to
+$outputPath.'/.toader-gallery/small/'.$gdir.'/'.$image .
+
+=cut

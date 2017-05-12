@@ -1,0 +1,94 @@
+body {
+	font-family: Verdana, Arial, Helvetica, Tahoma;
+	font-size: small;
+	background-color: #EFEFEF;
+}
+
+a { color: #000066; text-decoration: none; }
+
+/* has to do with div style tooltips: div { display: none; } */
+
+/* FIXME - make the spacing of the little cells prettier. This is a start:
+table.m td { padding: 0; margin: 2px; }
+table.m { margin: 0; margin-bottom: 2px; border-spacing: 2px 0; empty-cells: hide }
+*/
+
+#matrix {
+	border-collapse: collapse;
+	border: 1px solid #444444;
+	background-color: #dddddd;
+}
+
+th, tfoot td {
+	border: 1px solid #444444;
+	font-weight: bold;
+	font-size: 1em;
+	color: black;
+   	text-align: center;
+	vertical-align: baseline;
+	background-color: #efefef;
+}
+
+.td {
+	padding: 0.2em;
+}
+
+.exp {
+	display: block;
+}
+
+.x {
+	display: table-cell;
+	/* width: 4000em; */
+	white-space: nowrap;
+	overflow: hidden;
+	border: 1px solid #444444;
+}
+
+.x a { display: block; text-decoration: none;}
+/* again, div style tooltips: .x a div { display: none; font-weight: bold; color: #336699; font-style: none;}
+.x a:visited div { display: none }
+.x a:hover div { display: block; position: absolute; background-color: #BBBBBB; border: 1px solid #444444; left: 2em; padding: 5px; } */
+
+.r, .x { color: black; border: 1px solid #505050; }
+.sum { width: 1em;  text-align: right; }
+.sum, .r {
+	border: 1px solid #505050;
+	padding: 0px;
+}
+.sum, .r, .ok {
+	text-align: center;
+	font-weight: bold;
+	font-size: 0.85em;
+	padding: 0.1em;
+}
+
+.f { background-color: #ff3020; }
+.p { background-color: #00ff00; }
+.sk { background-color: #ddffdd; }
+.u { background-color: #ffdd20; color: white; }
+.t { background-color: #007f00; color: white; }
+.nottest { background-color: #7f7f7f; color: white ; }
+
+.min {
+	font-size: 70%;
+	vertical-align: top;
+	padding-top: .9em;
+	color: #333;
+}
+
+.min a:hover {
+	text-decoration: none;
+	color: #e33;
+}
+
+tbody, tr { border: none }
+
+.collapsed_diff, .expanded_diff { background-color: #888; border: 1px solid #444444 }
+
+.expanded_normal, .collapsed_diff { display: none }
+.collapsed_normal, .expanded_diff { display: table-row-group }
+
+.model_desc { font-size: 85%; padding-left: 1.2em }
+
+.misc_text { font-size: 80%; }

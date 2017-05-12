@@ -1,0 +1,80 @@
+47  2160
+De Rudder, Anne
+Rutherford Appleton Laboratory, Chilton OX11 0QX, UK - Tel.: +44 (0) 1235 445837
+Chemiluminescence NOX analyser. UV absorption API 400 ozone analyser.
+NERC Data Grid (NDG) project
+10  13
+2002 10 10  2002 10 31
+10
+13
+Time (minutes)
+Site name
+2
+1  1
+100  100
+NOX volume mixing ratio (ppbv)
+Ozone volume mixing ratio (ppbv)
+5
+2
+1  1  1
+100  1000  1000
+10  7
+zzzzzzzzzz
+zzzzzzz
+Number of measurements
+Longitude (degrees from Greenwich meridian)
+Latitude (degrees North)
+Date
+Local time at t = 0
+7
+Example of FFI 2160.
+This example illustrating NASA Ames file format index 2160 is entirely fictitious. Data
+have been made up for the purpose of illustrating the use of the format. They consist in
+imaginary simultaneous measurements of tropospheric NOX and ozone mixing ratios at three
+sites. A time series is provided for each site and each species. Measurements are
+supposed to have taken place every 10 minutes. The 4th and 5th auxiliary variables give
+the time of the first measurement of the series.
+10
+The files included in this data set illustrate each of the 9 NASA Ames file format
+indices (FFI). A detailed description of the NASA Ames format can be found on the Web
+site of the British Atmospheric Data Centre (BADC) at
+http://www.badc.rl.ac.uk/help/formats/NASA-Ames/
+E-mail contact: badc@rl.ac.uk
+Reference: S. E. Gaines and R. S. Hipskind, Format Specification for Data Exchange,
+Version 1.3, 1998. This work can be found at
+http://cloud1.arc.nasa.gov/solve/archiv/archive.tutorial.html and a copy of it at
+http://www.badc.rl.ac.uk/help/formats/NASA-Ames/G-and-H-June-1998.html
+
+Belbroughton
+       7  -2.148  52.398
+22-10-2002
+12 h 15
+       0     2.2    35.0
+      10     2.3    35.0
+      20     4.5    35.9
+      30     4.8   100.0
+      40     4.3    36.0
+      50     4.2    35.9
+      60     4.0    35.9
+Coventry
+       4  -1.517    52.4
+10-10-2002
+04 h 20
+       0   100.0    34.0
+      10     1.9    34.1
+      20     2.2    35.0
+      30     2.8    35.0
+Kidderminster
+      10  -2.258  52.364
+15-10-2002
+16 h 35
+       0     3.9    35.0
+      10     3.8    35.1
+      20     5.4    36.0
+      30     5.9    36.2
+      40   100.0    36.8
+      50     6.4    37.0
+      60     6.4    36.9
+      70       6    37.0
+      80     5.5    36.8
+      90     5.3    36.5

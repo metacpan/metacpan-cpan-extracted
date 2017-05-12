@@ -1,0 +1,14 @@
+ChangeLog
+lib/Text/Shoebox.pm
+lib/Text/Shoebox/Entry.pm
+lib/Text/Shoebox/Lexicon.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+sf_dump
+t/00_about.t
+t/10_basic.t
+t/20_oo_entry.t
+t/30_oo_lex.t
+META.yml                                 Module meta-data (added by MakeMaker)

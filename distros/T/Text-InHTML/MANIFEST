@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-InHTML.t
+lib/Text/InHTML.pm
+META.yml   

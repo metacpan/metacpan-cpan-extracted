@@ -1,0 +1,93 @@
+NAME
+    Text::UnicodeBox - Text box drawing using the Unicode box symbols
+
+SYNOPSIS
+      use Text::UnicodeBox;
+      use Text::UnicodeBox::Control qw(:all);
+  
+      my $box = Text::UnicodeBox->new();
+      $box->add_line(
+        BOX_START( style => 'double', top => 'double', bottom => 'double' ), '   ', BOX_END(),
+        '    ',
+        BOX_START( style => 'heavy', top => 'heavy', bottom => 'heavy' ), '   ', BOX_END()
+      );
+      print $box->render();
+
+      # Renders:
+      # ╔═══╗    ┏━━━┓
+      # ║   ║    ┃   ┃
+      # ╚═══╝    ┗━━━┛
+
+DESCRIPTION
+    Text::UnicodeBox is a low level box drawing interface. You'll most
+    likely want to use one of the higher level modules such as
+    Text::UnicodeBox::Table.
+
+    The unicode box symbol table
+    (<http://en.wikipedia.org/wiki/Box-drawing_character>) is a fairly
+    robust set of symbols that allow you to draw lines and boxes with
+    monospaced fonts. This module allows you to focus on the content of the
+    boxes you need to draw and mostly ignore how to draw a good looking box
+    with proper connections between all the lines.
+
+    The low level approach is line-based. A box object is created,
+    "add_line" is called for each line of content you'd like to render, and
+    "render" is called to complete the box.
+
+    Output is built up over time, which allows you to stream the output
+    rather then buffering it and printing it in one go.
+
+METHODS
+  new (%params)
+    Create a new instance. Provide arguments as a list. Valid arguments are:
+
+    whitespace_character (default: ' ')
+        When the box renderer needs to pad the output of the interstitial
+        lines of output, this character will be used. Defaults to a simple
+        space.
+
+    fetch_box_character
+        Provide a subroutine which will be used instead of the
+        "fetch_box_character" in Text::UnicodeBox::Utility. This allows the
+        user granular control over what symbols will be used for box
+        drawing. The subroutine will be called with a hash with any or all
+        of the following keys: 'left', 'right', up', 'down', 'vertical' or
+        'horizontal'. The value of each will be either '1' (default style),
+        'light', 'heavy', 'single' or 'double'.
+
+        Return a single width character or return undefined and a '?' will
+        be used for rendering.
+
+  buffer
+    Return the current buffer of rendered text.
+
+  add_line (@parts)
+    Pass a list of parts for a rendered line of output. You may pass either
+    a string, a Text::UnicodeBox::Control or a Text::UnicodeBox::Text
+    object. Strings will be transformed into the latter. The line will be
+    rendered to the buffer.
+
+  render
+    Complete the rendering of the box, drawing any final lines needed to
+    close up the drawing.
+
+    Returns the buffer
+
+DEVELOPMENT
+    This module is being developed via a git repository publicly avaiable at
+    http://github.com/ewaters/Text-UnicodeBox. I encourage anyone who is
+    interested to fork my code and contribute bug fixes or new features, or
+    just have fun and be creative.
+
+COPYRIGHT
+    Copyright (c) 2012 Eric Waters and Shutterstock Images
+    (http://shutterstock.com). All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+AUTHOR
+    Eric Waters <ewaters@gmail.com>
+

@@ -1,0 +1,10 @@
+nonexistent simple tag: 
+mismatched quotes:      asdf
+                        value1
+                        $var1
+                        asdf"
+last char is a slash:   
+                        \
+no spacing:             value2value1
+                        value2pootvalue1
+                        pootpoot

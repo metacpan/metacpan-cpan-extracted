@@ -1,0 +1,17 @@
+abstract: run mech tests by making
+author: Hans Dieter Pearcey <hdp@cpan.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Test-WWW-Mechanize-Object
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Test::WWW::Mechanize: 1.12
+  URI: 0
+  perl: 5.6.1
+version: 0.020

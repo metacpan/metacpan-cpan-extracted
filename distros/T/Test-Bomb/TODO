@@ -1,0 +1,7 @@
+
+find a way to use RELEASE_TESTING to cause failure; need to blank it for
+self release...
+
+how about a single line bomb...
+use Test::Bomb -after => 'Feb 17, 2011';
+

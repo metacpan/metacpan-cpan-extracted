@@ -1,0 +1,24 @@
+Task::BeLike::RJRAY - My frequently-used and favorite modules
+=============================================================
+
+Version: 0.009 (See CHANGES below)
+
+
+WHAT IS IT
+----------
+
+This is my entry in the "simplify my new Perl bootstrap process" bandwagon. I
+don't actually think anyone wants to BE like me, but if this proves to be
+helpful or inspirational to someone else, I can live with that.
+
+
+CHANGES
+-------
+
+  * lib/Task/BeLike/RJRAY.pm
+
+Comment-out Bundle::CPAN due to issues.
+
+  * lib/Task/BeLike/RJRAY.pm
+
+New additions.

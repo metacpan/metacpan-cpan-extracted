@@ -1,0 +1,8 @@
+Revision history for Perl extension Tk::WaitBoxFixed.
+
+1.4  Mon Jul  8 11:56:49 2013
+	- Added some bugfixes
+
+1.5  Mon Jul 15 14:00:00 2013
+	- Allow older versions of perl in Makefile.PL
+

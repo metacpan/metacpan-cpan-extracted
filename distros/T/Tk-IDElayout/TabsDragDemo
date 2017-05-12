@@ -1,0 +1,226 @@
+####### Script to prototype a dialog with multiple instrument interfaces #####
+
+
+use strict;
+
+use TestSW::PwrMeterE4416;
+
+use TestSW::Vna8510c;
+
+use Tk;
+use Tk::IDEtabFrame;
+use Tk::Text;
+use Tk::Photo;
+use Tk::Font;
+
+use Tk::InstMeas;
+
+
+
+############## Instrument Setting Stuff #######################
+
+my $SimMode = 1;
+# Create power meter and setup
+my $pwrMeter = TestSW::PwrMeterE4416->new(name => 'PwrMeter', SimMode => $SimMode);
+$pwrMeter->set(qw/ SensorCalTable HP8487A Freq 36 Resolution 1/);
+
+my $pwrMeter2 = TestSW::PwrMeterE4416->new(name => 'PwrMeter2', SimMode => $SimMode);
+$pwrMeter2->set(qw/ SensorCalTable HP8487A Freq 36 Resolution 1/);
+
+my $device = TestSW::Vna8510c->new(name => "VNAinst", SimMode => $SimMode);
+
+## Setup for a measurement
+$device->set(
+    FormatMode      => 'DBAng',
+    FreqMode        => 'StartStopNum',
+    SourceSweepMode => 'Step',
+    StartFreq       => 8,
+    StopFreq        => 12,
+    NumFreqs        => 101,
+    Correction      => 'Off',
+);
+
+my $device2 = TestSW::Vna8510c->new(name => "VNAinst2", SimMode => $SimMode);
+
+## Setup for a measurement
+$device2->set(
+    FormatMode      => 'DBAng',
+    FreqMode        => 'StartStopNum',
+    SourceSweepMode => 'Step',
+    StartFreq       => 8,
+    StopFreq        => 12,
+    NumFreqs        => 101,
+    Correction      => 'Off',
+);
+
+#########################################################
+
+########################### Window 1 ############################################
+my $Xfont;  # Font used to display the "X"
+my $normFont;
+my $mw = MainWindow->new();
+$mw->geometry('600x500');
+$mw->update;
+#
+#	create an image
+#
+
+
+my $dtf = $mw->IDEtabFrame(
+	#-font => 'System 8', 
+	-tabclose => 1,
+	-tabcolor => 'white',
+#	-raisecolor => 'darkseagreen2',
+	-raisecolor => 'grey90',
+#	-tabcurve => 2,
+	-tabpady => 1,
+	-tabpadx => 1,
+	-padx => 0,
+	-pady => 0,
+	-bg => 'white',
+
+	# Additional Options added by IDEtabFrame
+	-raisedfg => 'black',
+	
+	-raisedCloseButtonfg => 'black',
+	-raisedCloseButtonbg => 'lightgrey',
+	-raisedCloseButtonActivefg => 'red',
+	
+	-noraisedfg => 'grey60',
+	-noraisedActivefg => 'black',
+	
+	-noraisedCloseButtonfg => 'lightgrey',
+	-noraisedCloseButtonbg => 'white',
+	-noraisedCloseButtonActivefg => 'red',
+
+	)
+	->pack (-side => 'top', -expand => 1, -fill => 'both');
+
+	
+	#$dtf->configure( -raisecmd => sub{ raise_cmd($dtf, shift);});
+
+
+######### Create and insert Instrument GUIs ###############	
+#
+
+my $instGUI;
+#
+my $pwrMeterFrame = $dtf->add(
+	-caption => 'PwrMeter',
+	-label => 'PwrMeter',
+);
+
+$instGUI = Tk::InstMeas->createGUI($mw, $pwrMeter);
+$instGUI->pack( -anchor => 'w', -in => $pwrMeterFrame);
+
+print "Pwr Meter frame = $pwrMeterFrame\n";
+
+
+#	add a text tab
+my $mtsFrame = $dtf->add(
+	-caption => 'VNAinst',
+	-label => 'VNAinst'
+);
+
+$instGUI = Tk::InstMeas->createGUI($mw, $device);
+$instGUI->pack( -anchor => 'w', -in => $mtsFrame);
+
+print "VNAinst frame = $mtsFrame\n";
+
+
+##############################################################################################
+########################### Window 2 ############################################
+
+
+my $dtf2 = $mw->IDEtabFrame(
+	#-font => 'System 8', 
+	-tabclose => 1,
+	-tabcolor => 'white',
+#	-raisecolor => 'darkseagreen2',
+	-raisecolor => 'grey90',
+#	-tabcurve => 2,
+	-tabpady => 1,
+	-tabpadx => 1,
+	-padx => 0,
+	-pady => 0,
+	-bg => 'white',
+
+	# Additional Options added by IDEtabFrame
+	-raisedfg => 'black',
+	
+	-raisedCloseButtonfg => 'black',
+	-raisedCloseButtonbg => 'lightgrey',
+	-raisedCloseButtonActivefg => 'red',
+	
+	-noraisedfg => 'grey60',
+	-noraisedActivefg => 'black',
+	
+	-noraisedCloseButtonfg => 'lightgrey',
+	-noraisedCloseButtonbg => 'white',
+	-noraisedCloseButtonActivefg => 'red',
+
+	)
+	->pack (-side => 'top', -expand => 1, -fill => 'both');
+
+	
+	#$dtf->configure( -raisecmd => sub{ raise_cmd($dtf, shift);});
+
+
+######### Create and insert Instrument GUIs ###############	
+#
+#	add a text tab
+my $mtsFrame2 = $dtf2->add(
+	-caption => 'VNAinst2',
+	-label => 'VNAinst2'
+);
+
+
+my $instGUI2 = Tk::InstMeas->createGUI($mw, $device2)->pack(-in => $mtsFrame2, -anchor => 'w');
+
+#
+my $pwrMeterFrame2 = $dtf2->add(
+	-caption => 'PwrMeter2',
+	-label => 'PwrMeter2',
+);
+
+
+$instGUI = Tk::InstMeas->createGUI($mw, $pwrMeter2)->pack(-in => $pwrMeterFrame2, -anchor => 'w');
+
+##############################################################################################
+
+######## These bindings make all windows (including toolwindow) close/open when the main IDE 
+########   window is closed/opened.
+
+$mw->bind('<Unmap>', sub{ 
+
+	my $widget = shift;
+	return unless($widget->isa("Tk::MainWindow")); # Only response to mainwindow unmaps
+	my @childs = $mw->children();
+	#print "Childs = ".join(", ", @childs)."\n";
+	# Minimize all of our toplevels
+	foreach my $child(@childs){
+		eval{ $child->MainWindow::attributes() }; # This will only work for toplevels
+		unless( $@ ){
+			print "Child can attrib\n";
+			$child->MainWindow::withdraw;
+		}
+	}
+});
+
+$mw->bind('<Map>', sub{ 
+	# restore all of our toplevels
+	my $widget = shift;
+	return unless($widget->isa("Tk::MainWindow")); # Only response to mainwindow unmaps
+
+	my @childs = $mw->children();
+	foreach my $child(@childs){
+		eval{ $child->MainWindow::attributes() }; # This will only work for toplevels
+		unless( $@ ){
+			$child->MainWindow::deiconify;
+		}
+	}});
+
+Tk::MainLoop();
+
+
+

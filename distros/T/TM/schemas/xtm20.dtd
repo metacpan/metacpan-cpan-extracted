@@ -1,0 +1,172 @@
+<!-- ............................................................. -->
+<!-- XML Topic Map DTD  .......................................... -->
+
+<!-- XML Topic Map (XTM) DTD, Version 2.0
+
+     This is XTM 2.0, an XML interchange syntax for ISO 13250 Topic
+     Maps, defined by ISO 13250-3.
+
+     Use this URI to identify the XTM namespace:
+
+         "http://www.topicmaps.org/xtm/"
+
+     The formal public identifier for this DTD is:
+         
+         "ISO/IEC 13250-3:2005//DTD XML Topic Maps (XTM) 2.0//EN"
+
+     See http://www.isotopicmaps.org/sam/sam-xtm/
+
+-->
+
+<!-- topicMap .................................................... -->
+
+<!ELEMENT topicMap
+   ( itemIdentity*, mergeMap*, ( topic | association )* )
+>
+<!ATTLIST topicMap
+   version         CDATA     #FIXED '2.0'
+   xmlns           CDATA     #FIXED 'http://www.topicmaps.org/xtm/'
+   reifier         CDATA     #IMPLIED
+>
+
+<!-- topic ....................................................... -->
+
+<!ELEMENT topic
+   ( ( itemIdentity | subjectLocator | subjectIdentifier )*,
+     instanceOf?, ( name | occurrence )* )
+>
+<!ATTLIST topic
+   id              ID        #REQUIRED
+>
+
+<!-- itemIdentity ................................................ -->
+
+<!ELEMENT itemIdentity
+   EMPTY
+>
+<!ATTLIST itemIdentity
+   href            CDATA     #REQUIRED
+>
+
+<!-- subjectLocator............................................... -->
+
+<!ELEMENT subjectLocator
+   EMPTY
+>
+<!ATTLIST subjectLocator
+   href            CDATA     #REQUIRED
+>
+
+<!-- subjectIdentifier............................................ -->
+
+<!ELEMENT subjectIdentifier
+   EMPTY
+>
+<!ATTLIST subjectIdentifier
+   href            CDATA     #REQUIRED
+>
+
+<!-- name ........................................................ -->
+
+<!ELEMENT name  
+   ( itemIdentity*, type?, scope?, value, variant* ) 
+>
+<!ATTLIST name
+   reifier         CDATA     #IMPLIED
+>
+
+<!-- value ....................................................... -->
+
+<!ELEMENT value  ( #PCDATA ) >
+
+<!-- variant ..................................................... -->
+
+<!ELEMENT variant  
+   ( itemIdentity*, scope, ( resourceRef | resourceData ) ) 
+>
+<!ATTLIST variant
+   reifier         CDATA     #IMPLIED
+>
+
+<!-- scope ....................................................... -->
+
+<!ELEMENT scope  
+   ( topicRef )+ 
+>
+
+<!-- instanceOf .................................................. -->
+
+<!ELEMENT instanceOf  
+   ( topicRef )+
+>
+
+<!-- type .................................................. -->
+
+<!ELEMENT type  
+   ( topicRef )
+>
+
+<!-- occurrence .................................................. -->
+
+<!ELEMENT occurrence
+   ( itemIdentity*, type, scope?, ( resourceRef | resourceData ) )
+>
+<!ATTLIST occurrence
+   reifier         CDATA     #IMPLIED
+>
+
+<!-- resourceData ................................................ -->
+
+<!ELEMENT resourceData  
+   ANY 
+>
+<!ATTLIST resourceData
+   datatype        CDATA     #IMPLIED
+>
+
+<!-- resourceRef ................................................. -->
+
+<!ELEMENT resourceRef  
+   EMPTY 
+>
+<!ATTLIST resourceRef
+   href            CDATA     #REQUIRED
+>
+
+<!-- association ................................................. -->
+
+<!ELEMENT association
+   ( itemIdentity*, type, scope?, role+ )
+>
+<!ATTLIST association
+   reifier         CDATA     #IMPLIED
+>
+
+<!-- role ........................................................ -->
+
+<!ELEMENT role
+   ( itemIdentity*, type, topicRef )
+>
+<!ATTLIST role
+   reifier         CDATA     #IMPLIED
+>
+
+<!-- topicRef .................................................... -->
+
+<!ELEMENT topicRef  
+   EMPTY 
+>
+<!ATTLIST topicRef
+   href            CDATA     #REQUIRED
+>
+
+<!-- mergeMap .................................................... -->
+
+<!ELEMENT mergeMap  
+   EMPTY
+>
+<!ATTLIST mergeMap
+   href            CDATA     #REQUIRED
+>
+
+<!-- end of XML Topic Map (XTM) 2.0 DTD .......................... -->

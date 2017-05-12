@@ -1,0 +1,45 @@
+Revision history for Perl extension Text::Diff::Parser.
+
+0.1001 Sep 11 2009
+    - AUGH!  Forget to put t/mysql.diff in MANIFEST
+
+0.1000 Sep 10 2009
+    - Added check for -- at begining of line.  
+        Thank you Jay
+        
+
+0.0900 Apr 12 2009
+    - Kwalitee tweaks
+
+0.08 Nov 28 2007 
+    - CPAN upload
+
+0.07 Wed Aug 5 2007
+    - Patch for multi-file diffs that don't have diff file1 file2 lines
+        Thank you Max Kanat-Alexander
+
+0.06 Mon Jan 15 2007
+    - Forgot t/kernel-sub.diff in MANIFEST
+        Thank you Nik Clayton
+
+0.05 Tue Dec 19 2006
+    - Added support for timestampless diffs and function names in @@ lines
+      as used by kernel.org
+        Thank you Nelson Elhage
+
+0.04 Thu Nov 09 2006
+    - Spelling correction!
+
+0.03 Thu Nov 09 2006
+    - Can now handle diffs that contain 0 length files.  
+        Thank you Nik Clayton
+    - Added scripts/cover-diff
+
+0.02 Thu Apr 13 2006
+    - First CPAN release
+
+0.01 Wed Apr 12 12:57:50 2006
+	- original version
+
+
+# $Id: Changes 533 2009-09-11 11:27:06Z fil $

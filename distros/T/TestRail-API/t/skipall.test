@@ -1,0 +1,2 @@
+use Test::More 'skip_all' => 'cause I can', 'tests' => 1;
+pass('whee');

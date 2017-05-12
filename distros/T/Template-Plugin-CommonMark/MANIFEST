@@ -1,0 +1,11 @@
+Changes
+lib/Template/Plugin/CommonMark.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-load.t
+t/01-cmark.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

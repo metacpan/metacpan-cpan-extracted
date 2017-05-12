@@ -1,0 +1,54 @@
+Revision history for Tapper-Model
+
+5.0.2     2016-07-29
+        - version bump only to fix dependency errors
+
+5.0.1     2016-02-16
+        - synchronize with opensource Tapper::Schema
+
+5.0.0     2016-02-15
+        - merged ReportsDB/TestrunDB
+        - no memoization anymore
+        - refactoring
+        - bugfixes
+        - performance tweaks
+        - better fork connection awareness
+
+4.1.2     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.1     2012-10-21
+        - force dependencies
+
+4.1.0     2012-10-19
+        * PostgreSQL support
+        - [FIX] slow first() usage
+        - rename USER into OWNER
+
+        * Misc
+        - Moved free_host_with_features to scheduler
+        - do not generate schema functions
+
+4.0.1     2012-05-16
+        - cleanup and bugfixes
+        - get_or_create_user
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* distro maintenance
+	* release version++ roundhouse kick
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

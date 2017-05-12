@@ -1,0 +1,18 @@
+Task-CPANAuthors
+
+DESCRIPTION
+
+This Task installs all the Acme::CPANAuthors distributions.
+
+AUTHOR
+
+Philippe Bruhat (BooK), <book@cpan.org>
+
+COPYRIGHT
+
+Copyright 2014 Philippe Bruhat (BooK), All Rights Reserved.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

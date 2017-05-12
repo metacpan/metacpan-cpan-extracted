@@ -1,0 +1,68 @@
+% -*- compile-command: "make 01s 01"; -*-
+%<? ##read_starfish_conf();
+% $LectureNumber = '1';
+% $LectureDate   = '10-Jan-2017'; # some comment
+% $LectureTitle  = 'Course Introduction';
+% $LectureRoom   = 'ShiftKey Labs, Computer Science';
+% $LectureTime   = '10:05 -- 11:25';
+% $Instructor    = 'Vlado Keselj';
+%
+% if ($Star->{OUTFILE} =~ /-lecture.tex$/) {
+%     $TexTarget = 'lecturenotes';
+%     sfish_add_tag('sl,l', 'echo');
+%     sfish_add_tag('slide', 'ignore');
+%  } elsif ($Star->{OUTFILE} =~ /-slides\.tex$/) {
+%     $TexTarget = 'slides';
+%     sfish_add_tag('sl,l', 'echo');
+%     sfish_add_tag('slide', 'echo');
+%     sfish_ignore_outer;
+%  }
+% !>
+
+\section{Course Introduction}
+
+\subsection{About Course}
+
+\subsubsection{Logistics and Administrivia}
+
+%slide:\foilhead{CSCI 2133: Rapid Programming Techniques for Innovation}
+%slide:\setslidesLarge
+
+\par\vspace{4mm}\hrule\vspace{3mm}
+%slide:\par\vspace{1cm}\hrule
+%slide:\vspace{0cm}\normalsize%
+%<sl,l>
+\begin{center}
+\begin{tabbing}
+xxxxxxxxxxx\=\kill
+\>  Time:\' Tuesdays and Thursdays 10:05 -- 11:25 \nltabbing
+\> Location:\' ... \nltabbing
+\end{tabbing}
+\end{center}
+%</sl,l>
+\hrule\vspace{0cm}
+\newpageforslides
+
+%<sl,l>
+\setslidesLarge
+\bsl{Course Description}
+\item Introducing principles of practice of programming
+\esl
+%</sl,l>
+
+Other stuff...
+
+%<slide>
+These lines are slides only...
+and this
+and this
+done.
+%</slide>
+
+%sl,l:both
+%sl,l:both
+
+only notes
+etc.
+
+%slide:\end{document}

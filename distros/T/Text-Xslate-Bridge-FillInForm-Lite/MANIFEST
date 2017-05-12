@@ -1,0 +1,10 @@
+.shipit
+Changes
+lib/Text/Xslate/Bridge/FillInForm/Lite.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/000_compile.t
+t/001_template.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

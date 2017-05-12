@@ -1,0 +1,37 @@
+app:
+  app_class: [% app_class || "''" +%]
+
+server:
+  host: localhost
+  port: 7777
+
+site:
+  title: Tinker with YAML
+
+pane:
+- name: yaml-input-pane
+  type: input
+  auto: false
+  call: multi_loader
+- name: pm-output-pane
+  type: output
+- name: tiny-output-pane
+  type: output
+- name: xs-output-pane
+  type: output
+- name: syck-output-pane
+  type: output
+
+plugin:
+- ace-editor
+- sunshine-theme.yaml
+
+layout:
+  name: 3col
+  pane:
+    input: yaml-input-pane
+    output:
+    - pm-output-pane
+    - tiny-output-pane
+    - xs-output-pane
+    - syck-output-pane

@@ -1,0 +1,40 @@
+---
+abstract: 'Count the number of method calling'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.0.49, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-CallCounter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Test::CallCounter:
+    file: lib/Test/CallCounter.pm
+    version: 0.04
+requires:
+  Class::Method::Modifiers: 0
+  Scalar::Util: 1.24
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/tokuhirom/Test-CallCounter/issues
+  homepage: https://github.com/tokuhirom/Test-CallCounter
+  repository: git://github.com/tokuhirom/Test-CallCounter.git
+version: 0.04
+x_contributors:
+  - 'soh335 <sugarbabe335@gmail.com>'

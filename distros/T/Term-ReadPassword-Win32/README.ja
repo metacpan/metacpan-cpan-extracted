@@ -1,0 +1,70 @@
+名前
+    Term::ReadPassword::Win32 - ユーザーにパスワードを尋ねる (Win32 用)
+
+概要
+      use Term::ReadPassword::Win32;
+      while (1) {
+        my $password = read_password('password: ');
+        redo unless defined $password;
+        if ($password eq 'flubber') {
+          print "Access granted.\n";
+          last;
+        } else {
+          print "Access denied.\n";
+          redo;
+        }
+      }
+
+説明
+    このモジュールは、Term::ReadPassword と同じように、ユーザーに対して
+    パスワードを尋ねます。
+
+    ユーザーに対してパスワードの入力を求めるには、Term::ReadPassword を
+    使うのがよい方法ですが、Term::ReadPassword は Windows 用の ActivePerl
+    では動かないという問題があるため、それを解決するためにこのモジュールを
+    書きました。
+
+    このモジュールは、Windows と Unix のどちらでも使えます。 Windows
+    で使うには、Win32::* のモジュールが必要です。 Unix で使うときは、
+    このモジュールは Term::ReadPassword に対するラッパーとして動作します。
+
+    Term::ReadPassword::Win32::read_password 関数は、
+    Term::ReadPassword::read_password 関数とほとんど同じように動作します。
+
+    最初と２番目のパラメータは、全く同じです。最初のパラメータは、プロンプト
+    として表示する文字列を指定し、２番目のパラメータは、タイムアウト値を秒単
+    位 で指定します。
+
+    ３番目のパラメータは、少々異なっています。
+
+    ３番目のパラメータが 0 のときは、Ctrl+C は他の文字と全く同じように、
+    入力バッファに格納されます。これは Term::ReadPassword::read_password の
+    ３番目のパラメータに false を指定したときの動作と同じです。
+
+    ３番目のパラメータが 1 のときは、Ctrl+C または Esc が入力されると
+    パスワードの入力を終了します。Term::ReadPassword::read_password の
+    ３番目のパラメータに true を指定したときの動作と似ていますが、Esc でも
+    入力を終了できる点が異なっています。
+
+    ３番目のパラメータが 2 のときは、Esc が入力されるとパスワードの入力を
+    終了します。Ctrl+C が入力された場合は、おそらくプログラムが中断
+    されます。
+
+    Ctrl+U が入力されると、入力バッファはクリアされます。
+
+バグ
+    マルチバイト文字は正しく扱われません。（マルチバイト文字を１文字削除する
+    場合に BackSpace を複数回入力する必要があります。）
+
+参考
+    Term::ReadPassword, Term::Getch
+
+著作権
+    Copyright (C) 2005 Ken Takata <kentkt@anet.ne.jp>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+ダウンロード
+    最新版は、 http://webs.to/ken/ から入手できます。
+

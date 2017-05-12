@@ -1,0 +1,13 @@
+Index: oxi_room_counts.sql
+===================================================================
+--- oxi_room_counts.sql (revision 5904)
++++ oxi_room_counts.sql (working copy)
+@@ -2,7 +2,7 @@
+--
+-- Host: localhost Database: omnihub
+-- ------------------------------------------------------
+--- Server version 5.1.23-rc
++-- Server version 5.1.23-rc-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;

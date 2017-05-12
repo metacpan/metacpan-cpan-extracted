@@ -1,0 +1,19 @@
+--- Trace.pm~	Fri Sep 26 14:51:57 2003
++++ Trace.pm	Thu May  6 13:43:32 2004
+@@ -178,10 +178,12 @@
+ 
+     my ( $parent, $vref, $op_not_honored, $callabck_not_honored ) = @_;
+ 
+-    if ( defined $TRACE{$vref}->[0] ) {
+-        $$vref = $TRACE{$vref}->[0]->Fetch;
+-        $TRACE{$vref}->[0]->Unwatch;
+-        delete $TRACE{$vref};
++    if ( defined $TRACE{$vref} ) {
++	if ( defined $TRACE{$vref}->[0] ) {
++	    $$vref = $TRACE{$vref}->[0]->Fetch;
++	    $TRACE{$vref}->[0]->Unwatch;
++	    delete $TRACE{$vref};
++	}
+     }
+ 
+ } # end traceVdelete

@@ -1,0 +1,30 @@
+---
+abstract: 'String::Dump filter for TT'
+author:
+  - 'Nick Patch <patch@cpan.org>'
+build_requires:
+  Test::More: 0.41
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-StringDump
+provides:
+  Template::Plugin::StringDump:
+    file: lib/Template/Plugin/StringDump.pm
+    version: 0.05
+requires:
+  String::Dump: 0.08
+  Template: 2.07
+  parent: 0
+  perl: v5.6.0
+resources:
+  bugtracker: https://github.com/patch/template-plugin-stringdump-pm5/issues
+  homepage: https://github.com/patch/template-plugin-stringdump-pm5
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/patch/template-plugin-stringdump-pm5.git
+version: 0.05

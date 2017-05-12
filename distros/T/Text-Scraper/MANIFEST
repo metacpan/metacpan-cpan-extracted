@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+t/bless.t
+t/bless.t.html
+t/cpan.t
+t/cpan.t.html
+t/filter.t
+t/filter.t.html
+t/perlmonks.t
+t/perlmonks.t.html
+misc/Benchmark.pl
+misc/synopsis.pl
+lib/Text/Scraper.pm

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tie-Scalar-Timestamp.t
+lib/Tie/Scalar/Timestamp.pm
+META.yml                                 Module meta-data (added by MakeMaker)

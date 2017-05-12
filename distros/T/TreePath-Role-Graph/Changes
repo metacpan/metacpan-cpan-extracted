@@ -1,0 +1,22 @@
+Revision history for TreePath-Role-Graph
+
+0.07   2015-05-01 19::34::43
+       the key 'parent' is configurable
+
+0.06   2015-04-29 20:08:26
+       use lastest version of treepath
+
+0.05   2015-04-19 23:24:21
+       use the lastet version of TreePath (0.19)
+
+0.04   2015-04-08 19:03:10
+       uses a more realistic example
+
+0.03   2015-04-06 19:19:52
+       use version 0.15 TreePath
+
+0.02   2015-01-28 13:20:52
+       colorize node
+
+0.01   2015-01-27 00:01:20
+       First version

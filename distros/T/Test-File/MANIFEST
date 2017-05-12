@@ -1,0 +1,33 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/Test/File.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/dm_skeleton.t
+t/file_contains.t
+t/file_contains_encoded.t
+t/file_contains_utf8.t
+t/file_mtime.t
+t/file_sizes.t
+t/line_counters.t
+t/link_counts.t
+t/links.t
+t/load.t
+t/normalize.t
+t/obviously_non_multi_user.t
+t/owner.t
+t/pod.t
+t/pod_coverage.t
+t/rt/30346.t
+t/setup_common
+t/test_dirs.t
+t/test_files.t
+t/test_manifest
+t/win32.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

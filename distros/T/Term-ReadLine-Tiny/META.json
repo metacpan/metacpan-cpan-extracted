@@ -1,0 +1,59 @@
+{
+   "abstract" : "Tiny implementation of ReadLine",
+   "author" : [
+      "Orkun Karaduman <orkunkaraduman@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-ReadLine-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::ReadKey" : "2.33",
+            "Term::ReadLine" : "1.07",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Term-ReadLine-Tiny@rt.cpan.org",
+         "web" : "https://github.com/orkunkaraduman/p5-Term-ReadLine-Tiny/issues"
+      },
+      "homepage" : "https://github.com/orkunkaraduman/p5-Term-ReadLine-Tiny/tree/master",
+      "license" : [
+         "https://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git@github.com:orkunkaraduman/p5-Term-ReadLine-Tiny.git",
+         "web" : "https://github.com/orkunkaraduman/p5-Term-ReadLine-Tiny"
+      }
+   },
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

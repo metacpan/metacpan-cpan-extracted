@@ -1,0 +1,28 @@
+Revision history for Test::A8N
+
+0.01 - Sat Mar 29 14:39:00 PDT 2008
+    - First release to CPAN
+
+0.02 - Mon Apr  7 15:37:02 PDT 2008
+    - Updated to make CPANTS happier
+    - Changed configuration handling to pass a hash around
+    - Added unit tests
+    - Fixed tag handling when running tests
+
+0.03 - Thu Apr 10 09:58:00 PDT 2008
+    - Fixed broken test cases
+    - Added testcase filename to the verbose output
+
+0.04 - Wed May 14 13:49:28 PDT 2008
+    - Made Makefile.PL work on perl versions prior to 5.8
+    - Address issues with YAML::Syck die'ing when it loads an invalid testcase
+    - Fix issue with a8n unit test failing when run with a perl other than the default environment's perl
+
+0.05 - Fri Jun  6 20:58:12 PDT 2008
+    - Added include- and exclude-tags support
+    - Added !tag option support on command-line script
+    - Added --list option to only list which cases will be run
+    - Added unit tests
+
+0.06 - Thu Sep  4 11:58:41 PDT 2008
+    - Made exclude-tags OR tags together, instead of ANDing them

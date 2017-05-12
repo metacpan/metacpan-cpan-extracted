@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name:                Term-ProgressBar-Simple
+version:             0.03
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Term::ProgressBar::Quiet:      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

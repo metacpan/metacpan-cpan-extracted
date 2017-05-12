@@ -1,0 +1,66 @@
+=head1 NAME
+
+Tie::Cache::LRU - A Least-Recently Used cache
+
+
+=head1 SYNOPSIS
+
+    tie %cache, 'Tie::Cache::LRU', 500;
+    tie %cache, 'Tie::Cache::LRU', '400k'; #UNIMPLEMENTED
+
+    # Use like a normal hash.
+    
+    $cache_obj = tied %cache;
+    $current_size = $cache_obj->curr_size;
+    
+    $max_size = $cache_obj->max_size;
+    $cache_obj->max_size($new_size);
+
+
+=head1 DESCRIPTION
+
+This is an implementation of a least-recently used (LRU) cache keeping
+the cache in RAM.
+
+A LRU cache is similar to the kind of cache used by a web browser.
+New items are placed into the top of the cache.  When the cache grows
+past its size limit, it throws away items off the bottom.  The trick
+is that whenever an item is -accessed-, it is pulled back to the top.
+The end result of all this is that items which are frequently accessed
+tend to stay in the cache.
+
+
+
+=head1 AUTHOR
+
+Michael G Schwern <schwern@pobox.com> for Arena Networks
+
+
+WHAT IS THIS?
+
+This is Tie::Cache::LRU, a perl module.  Please see the README that comes with
+this distribution.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+WHAT MODULES DO I NEED?
+
+    Carp::Assert
+    enum
+    Class::Virtual
+    Class::Data::Inheritable
+    Test::More

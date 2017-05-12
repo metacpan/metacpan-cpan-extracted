@@ -1,0 +1,49 @@
+NAME
+    Tie::InsertOrderHash - insert-order-preserving tied hash
+
+SYNOPSIS
+      tie my %hash => 'Tie::InsertOrderHash',
+        one_two => 'buckle my shoe',
+        3_4 => 'shut the door',
+        V_VI => 'pick up sticks';
+      %hash{7_of_9} => 'not bad';
+
+      print "@{[keys %hash]}\n"; # prints keys in order inserted
+
+DESCRIPTION
+    Tie::InsertOrderHash is a tied hash which preserves the order of
+    inserted keys. Regular perl hashes regurgitate keys in an unspecified
+    order, but at times one wishes to have the properties of both a hash and
+    an array.
+
+    As an extention, one may list *key*/*value* pairs as additional
+    arguments to "tie", as in the example above.
+
+  EXPORT
+    None.
+
+AUTHOR
+    B. K. Oxley (binkley) <binkley@bigfoot.com>
+
+SEE ALSO
+    Tie::Hash
+        Tie::Hash provides a skeletal implementation for a tied hash.
+
+    perldata
+        perldata explains more about hashes and arrays.
+
+    perltie
+        perltie explains more about tying hashes, and describes the internal
+        "sub"s used to implement them.
+
+    "tie" in perlfunc
+        "tie" explains more about how user code tie hashes and the implicit
+        "use" of this module.
+
+COPYRIGHT
+    The DBI module is Copyright (c) 2002 B. K. Oxley (binkley). All rights
+    reserved.
+
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the Perl README file.
+

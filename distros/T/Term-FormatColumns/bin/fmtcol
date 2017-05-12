@@ -1,0 +1,119 @@
+#!/usr/bin/env perl
+package fmtcol;
+# ABSTRACT: Format lines of text as columns
+$fmtcol::VERSION = '0.007';
+use Pod::Usage qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use Term::FormatColumns qw( format_columns format_columns_for_width );
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'width|w=i',
+        'help|h',
+        'version',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "fmtcol version $Term::FormatColumns::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    my @files = @argv;
+    push @files, '-' if !@argv;
+
+    my @lines;
+    for my $file ( @files ) {
+        my $fh;
+        if ( $file eq '-' ) {
+            $fh = \*STDIN;
+        }
+        else {
+            open $fh, '<', $file or die "Could not open file '$file' for reading: $!\n";
+        }
+
+        while ( my $line = <$fh> ) {
+            chomp $line;
+            push @lines, $line;
+        }
+    }
+
+    if ( $opt{width} ) {
+        print format_columns_for_width( $opt{width}, @lines );
+    }
+    else {
+        print format_columns( @lines );
+    }
+
+    return 0;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fmtcol - Format lines of text as columns
+
+=head1 VERSION
+
+version 0.007
+
+=head1 SYNOPSIS
+
+    fmtcol [-w <width>] [<file>...]
+
+    fmtcol -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program reads lines from C<STDIN> or a file and formats them as columns on
+C<STDOUT>, much like C<ls(1)> does.
+
+This differs from C<fmt(1)> that the columns are read top-bottom not left-right.
+
+This changes:
+
+    tar tzf my_tarball.tar.gz | tr '\n' ' ' | fmt
+
+Into:
+
+    tar tzf my_tarball.tar.gz | fmtcol
+
+=head1 ARGUMENTS
+
+=head2 file
+
+Format the lines in the given file. If not given, or if C<file> is "-", will read
+from C<STDIN>.
+
+=head1 OPTIONS
+
+=head2 -w <width>
+
+Format the columns for the given width. Defaults to the width of the current terminal.
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current fmtcol and Perl versions.
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

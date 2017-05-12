@@ -1,0 +1,37 @@
+Revision history for Time-Zone-Olson
+
+0.12    Wed Sep 21 22:48:00 2016
+       Coping with TZ rules such as <GMT+10>+10 for 'Etc/GMT+10'.  Thanks to COFFEE for the bug report. RT#118011
+
+0.11    Sat Apr 16 13:42:00 2016
+       Trying to cope with unexpected system 'date' behaviour from njh tests on CPAN testers.
+
+0.10    Wed Apr 13 20:39:00 2016
+       Coping with a new TZ rule of '<+07>-7' for 'Asia/Barnaul'.  Thanks to SREZIC for the bug report. RT#113732
+
+0.09    Thu Apr 02 20:23:00 2015
+       Catching Time::Local exceptions in test suite, added the equiv method
+
+0.08    Fri Mar 27 21:18:00 2015
+       Corrected dst -> std time bug, added Time::Local testing
+
+0.07    Fri Mar 06 17:45:00 2015
+       Added the offset calculation and override methods
+
+0.06    Wed Mar 04 19:57:00 2015
+       Added a class level cache and the reset_cache method 
+
+0.05    Tue Mar 03 20:47:00 2015
+       Removed un-used code.  Tests now attempt to detect local timezones from /etc/localtime
+
+0.04    Mon Mar 02 21:28:00 2015
+       Corrected timezone parsing bug
+
+0.03    Sun Mar 01 20:25:00 2015
+       Adjustments/extra debugging for BSD installations
+
+0.02    Sat Feb 28 17:53:00 2015
+       Namespace correction.  Test suite fixes for locale and missing gnu date.  Thanks to DROLSKY and SREZIC.
+
+0.01    Fri Feb 27 16:56:00 2015
+       Initial release.

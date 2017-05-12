@@ -1,0 +1,39 @@
+Revision history for Text::Graph.
+
+0.83  2014-12-24
+  - Fixed a really old documentation error, thanks to RSAVAGE for reporting.
+0.82  2014-09-04T23:30-0600
+  - Fixed another missing dependency
+0.81  2014-09-04T10:25-0600
+  - Fixed missing dependency
+  - Added missing synopsis.
+0.80  2014-09-03T20:20-0600
+  - Add perl version check to the author tests.
+  - Update Makefile.PL to have minimum Perl version
+0.75  2014-05-05T15:10-0500
+  - Convert Text::Graph::DataSet to Moo.
+  - Convert Text::Graph to Moo.
+0.50  2014-04-28T18:40-0500
+  - Modernize the layout of the module.
+  - Modernize the code.
+  - Remove unused get_line method.
+  - Fix missing dependency on Text::Graph::DataSet, with test.
+  - Code printed the data ignoring the minimum value, but calculated
+    the length including it. I had intended the inclusion, but making the
+    length calculation match the print was easier.
+  - Thanks to Jerry D. Hedden for pointing out the previous 3 errors.
+0.23  2005-06-05T00:43-0500
+  - Corrected Change log. (Shouldn't do updates at this time of night.)
+0.22  2005-06-05T00:40-0500
+  - Added testing for POD docs.
+0.21  2005-02-16T18:25-0600
+  - Corrected the creation of the distribution file.
+0.2   2005-02-14T22:47-0600
+  - Achieved full coverage on tests.
+  - Added messages to all tests.
+  - Removed some 'can't happen' cases in the code
+0.1   2004-06-06T11:09-0500
+  - First version released on CPAN
+0.01  2004-06-05T10:17-0500
+  - original version; created by h2xs 1.19
+

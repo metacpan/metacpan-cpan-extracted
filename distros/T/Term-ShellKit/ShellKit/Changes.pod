@@ -1,0 +1,35 @@
+=head1 NAME
+
+Term::ShellKit::Changes - Revision History for Term::ShellKit
+
+
+=head1 CHANGES
+
+2002-01-21 Simon: Finished cleaning up from rewrite.
+
+2001-12-02 Simon: Rewrite with function-oriented modularity.
+
+2001-06-30 Simon: Experimental rewrite for OO-style modularity.
+
+2001-06-27 Simon: Remove trailing semicolon from "require x;" package names.
+
+2001-02-07 Simon: Display undef results from eval as "(undef)".
+
+2001-01-31 Simon: Added examples section to documentation.
+
+2001-01-31 Simon: Copied in subs from String::Escape to reduce dependencies.
+
+2001-01-24 Simon: Removed strict vars from expr evals. Added documentation.
+
+2000-12-04 Simon: Separation of abstract Shell superclass.
+
+2000-11-29 Simon: Created
+
+
+=head1 SEE ALSO
+
+See L<Term::ShellKit::ReadMe> for distribution and version information.
+
+See L<Term::ShellKit>.
+
+=cut

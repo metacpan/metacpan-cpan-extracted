@@ -1,0 +1,102 @@
+NAME
+
+    thrall - a simple PSGI/Plack HTTP server which uses threads
+
+SYNOPSIS
+
+      $ thrall --workers=20 --max-reqs-per-child=100 app.psgi
+    
+      $ thrall --port=80 --ipv6=1 app.psgi
+    
+      $ thrall --port=443 --ssl=1 --ssl-key-file=file.key --ssl-cert-file=file.crt app.psgi
+    
+      $ thrall --socket=/tmp/thrall.sock app.psgi
+
+DESCRIPTION
+
+    Thrall is a standalone HTTP/1.1 server with keep-alive support. It uses
+    threads instead pre-forking, so it works correctly on Windows. It is
+    pure-Perl implementation which doesn't require any XS package.
+
+    Thrall was started as a fork of Starlet server. It has almost the same
+    code as Starlet and it was adapted to use threads instead fork().
+
+SEE ALSO
+
+    Starlight, Starlet, Starman
+
+LIMITATIONS
+
+    See "BUGS AND LIMITATIONS" in threads and "Thread-Safety of System
+    Libraries" in perlthrtut to read about limitations for PSGI
+    applications started with Thrall and check if you encountered a known
+    problem.
+
+    Especially, PSGI applications should avoid: changing current working
+    directory, catching signals, starting new processes. Environment
+    variables might (Linux, Unix) or might not (Windows) be shared between
+    threads.
+
+    Thrall is very slow on first request for each thread. It is because
+    spawning new thread is slow in Perl itself. Thrall is very fast on
+    another requests and generally is faster than any implementation which
+    uses fork.
+
+BUGS
+
+    There is a problem with Perl threads implementation which occurs on
+    Windows. Some requests can fail with message:
+
+      failed to set socket to nonblocking mode:An operation was attempted on
+      something that is not a socket.
+
+    or
+
+      Bad file descriptor at (eval 24) line 4.
+
+    Cygwin version seems to be correct.
+
+    This problem was introduced in Perl 5.16 and fixed in Perl 5.19.5.
+
+    See https://rt.perl.org/rt3/Public/Bug/Display.html?id=119003 and
+    https://github.com/dex4er/Thrall/issues/5 for more information about
+    this issue.
+
+ Reporting
+
+    If you find the bug or want to implement new features, please report it
+    at https://github.com/dex4er/Starlight/issues
+
+    The code repository is available at http://github.com/dex4er/Starlight
+
+AUTHORS
+
+    Piotr Roszatycki <dexter@cpan.org>
+
+    Based on Starlet by:
+
+    Kazuho Oku
+
+    miyagawa
+
+    kazeburo
+
+    Some code based on Plack:
+
+    Tatsuhiko Miyagawa
+
+    Some code based on Net::Server::Daemonize:
+
+    Jeremy Howard <j+daemonize@howard.fm>
+
+    Paul Seamons <paul@seamons.com>
+
+LICENSE
+
+    Copyright (c) 2013-2017 Piotr Roszatycki <dexter@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as perl itself.
+
+    See http://dev.perl.org/licenses/artistic.html
+

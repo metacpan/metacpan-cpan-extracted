@@ -1,0 +1,12 @@
+Revision history for Test-NewVersion
+
+0.003     2015-03-13 02:55:21Z
+          - fix some bad cpantesters reports by avoiding the use of the
+            network in tests
+
+0.002     2015-03-01 08:16:42Z
+          - fix idiotic self-test that cannot possibly pass after the
+            self-referenced version enters the index
+
+0.001     2015-02-28 07:32:50Z
+          - Initial release.

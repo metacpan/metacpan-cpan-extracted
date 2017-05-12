@@ -1,0 +1,76 @@
+Test::Formats - Perform unit tests that examine structured/formatted text
+
+Version: 0.12
+
+WHAT IS IT
+
+The Test::Formats package provides Test::More-style test routines for
+examining text that adheres to specific structure or formats. XML content,
+for example, is not just tested to see that a document is well-formed, it is
+tested against a DTD, XML Schema or RelaxNG schema to determine if the
+content is actually valid.
+
+*** NOTE ***
+
+This is still early-alpha, and some conventions are still in flux. Between
+0.11 and 0.12, the order of arguments in all the test functions provided by
+Test::Formats::XML changed. Read the documentation to make sure you have the
+correct order.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Formats
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Formats
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Formats
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Formats
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Formats
+
+
+CHANGES
+
+lib/Test/Formats/XML.pm:
+t/10_xml/10_sgmldtd.t:
+t/10_xml/20_xmlschema.t:
+t/10_xml/30_relaxng.t:
+t/90_integration/10_with_xml.t:
+t/90_integration/90_empty_subclass.t:
+Per suggestions from Schwern, added <type>_ok aliases for the
+tests, and also swapped the order of the $document and $schema
+arguments to all the tests. While at it, added tests for each of the
+three schema-types to test the aliases directly.
+
+lib/Test/Formats/XML.pm:
+Follow-up the previous with carrying over the argument-ordering change
+to the is_valid_against() subroutine. Also fleshed out some overlooked
+(i.e., forgotten) documentation for is_well_formed_xml().

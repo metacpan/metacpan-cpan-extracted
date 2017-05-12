@@ -1,0 +1,35 @@
+Term-VT102-ZeroBased 1.02
+
+Term::VT102, a module for terminal emulation, uses 1-based indices for
+screen positions. I find this annoying. So this is a simple wrapper around
+Term::VT102 that converts 1-based indices to 0-based indices.
+
+Why, in particular, would you want this? Escape sequences use one-based
+indices, so it makes perfect sense for Term::VT102 to use one-based
+indices. But Curses uses zero-based indices. And so do most other modules.
+
+See Term::VT102 for the documentation on using these modules.
+
+MAJOR CHANGES
+    1.02: 
+    1.01: startcol, endcol fixes
+    1.00: should be completely finished
+    0.82: bug fixes
+    0.01: first version
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 Shawn M Moore
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

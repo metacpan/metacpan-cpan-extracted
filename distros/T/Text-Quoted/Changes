@@ -1,0 +1,59 @@
+Revision history for Perl extension Text::Quoted.
+
+2.08 2013-05-21
+ - add a combine_hunks function to recombine hunks (RJBS)
+ - implicitly private methods are now underscore private: organize,
+   find_below, classify, expand_tabs (RJBS)
+
+2.07 2013-05-16
+ - Add set_quote_characters() function to control what additional
+   characters are treated as quoting chars (above and beyond ">")
+
+2.06 2010-03-15
+ - make extracting more effective
+ - line with only '=' characters is not treated as quoter anymore, but
+   separator
+ - mark separating lines with "separator => 1" hash entry
+ - don't return "empty => ''" hash key
+ - update tests
+
+2.05 2008-01-24
+ - fix tests failure under perl 5.6.x, thanks to David Cantrell for cpan
+   testing it
+
+2.04 2008-01-23
+ - use own expand_tabs instead of Text::Tabs
+ - avoid segfaults when pos() is used inside of regexp
+
+2.03 2007-11-07
+ - delete a lot of unused code
+ - many micro optimisations
+ - performance improvements, up to 1.5x in total
+ - clanups of Makefile, README
+
+2.02 2007-02-20
+ - fix a missing test in MANIFEST
+
+2.01 2007-02-20
+ - fix a problem with $VERSION
+
+1.10 2007-02-13
+ - fix a bug where lines are hidden when the quote character changes
+   midstream.  Reported by Dirk Pape and Sven Sternberger
+
+1.9 2005-06-24
+ - Manifest cleanup. From Mike Castle
+
+1.8 2004-07-01
+ - Fix handling for the case where we we're quoting a false but defined
+   string. From Stephen Quinney.
+
+1.7 2004-06-16
+ - New maintainer learns to remove his debugging output
+
+1.6 2004-06-16
+ - New maintainer
+ - Better handle attempts to quote an empty or undef string
+
+1.0 2002-12-03
+ - original version; created by h2xs 1.22 with options -AX -n Text::Quoted

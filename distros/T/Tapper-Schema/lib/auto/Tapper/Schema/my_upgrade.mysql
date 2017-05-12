@@ -1,0 +1,23 @@
+SET foreign_key_checks=0;
+
+DROP TABLE IF EXISTS `tap`;
+
+CREATE TABLE `tap` (
+ `id` int(11) NOT NULL auto_increment,
+ `report_id` integer(11) NOT NULL,
+ `tap` LONGBLOB NOT NULL DEFAULT '',
+ `tapdom` LONGBLOB DEFAULT '',
+ `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ `updated_at` DATETIME,
+  INDEX reporttap_idx_report_id (`report_id`),
+  PRIMARY KEY (id)
+  -- CONSTRAINT `reporttap_fk_report_id` FOREIGN KEY (`report_id`) REFERENCES `report` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+ ) ENGINE=InnoDB;
+
+
+SET foreign_key_checks=1;
+
+INSERT INTO tap(report_id, tap, tapdom) SELECT id, tap, tapdom FROM report where not isnull(tap) or not isnull(tapdom);
+
+alter table report drop column tapdom;
+alter table report drop column tap;

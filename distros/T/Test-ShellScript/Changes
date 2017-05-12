@@ -1,0 +1,29 @@
+Revision history for Perl extension Test::ShellScript.
+
+0.04  Tue Apr 27 01:57:40 ART 2010
+        - Adding support for MSWin32
+          (https://rt.cpan.org/Ticket/Display.html?id=56896)
+
+0.03  Sat Apr 24 10:15:41 ART 2010
+        - allowed to run on Perl 5.8. Thanks Luis Agustin Nieto.
+          Also seen at http://www.cpantesters.org/cpan/report/07155104-b19f-3f77-b713-d32bba55d77f
+        - Fixes Version number
+        - Added some more interesting ideas (TODO)
+        - Contributors added to POD
+        - Using Test::More for testing (and even can use it on external test without
+          confilcts ... groovy !!)
+        - test for undefined variable name and values 
+          (report http://www.cpantesters.org/cpan/report/7153699)
+
+0.02  Wed Apr 21 10:14:39 ART 2010
+        - use Bourne Shell (sh) instead of Bourne Again Shell (bash) to
+          let it pass the tests in machines bash is not installed
+        - added command validation in run_ok
+        - documentation typos fixed
+        - Perl 5.10 or better needed to install and use the module 
+        - Added TODO list
+
+0.01  Sun Apr 18 19:29:01 2010
+	- original version; created by h2xs 1.23 with options
+		-AX Test::ShellScript
+

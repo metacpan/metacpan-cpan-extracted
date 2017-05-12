@@ -1,0 +1,16 @@
+Changes
+const-c.inc
+const-xs.inc
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Template/Alloy/XS.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+samples/bench_template.pl
+t/00_base.t
+t/01_includes.t
+t/0_template.t
+XS.xs
+META.yml                                 Module meta-data (added by MakeMaker)

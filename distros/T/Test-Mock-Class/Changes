@@ -1,0 +1,79 @@
+0.0303 | Piotr Roszatycki <dexter@cpan.org> | 2010-05-01
+
+Fixes:
+
+* Class::MOP requires IO::* modules explicitly.  Implicit load does not work
+  correctly.
+
+------------------------------------------------------------------------
+0.0302 | Piotr Roszatycki <dexter@cpan.org> | 2009-11-17
+
+Fixes:
+
+* Requires Class::MOP => 0.93, Moose >= 0.90.
+
+------------------------------------------------------------------------
+0.0301 | Piotr Roszatycki <dexter@cpan.org> | 2009-10-27
+
+Fixes:
+
+* Compatibility with Moose >= 0.81.
+
+Changes:
+
+* Test::Mock::Class::Role::Meta::Class:
+  - Method "_mock_reinitialize" is not necessary anymore.
+
+------------------------------------------------------------------------
+0.03 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-21
+
+Fixes:
+
+* Build requires Class::Inspector.
+
+Changes:
+
+* Requires Exception::Base and Exception::Fatal.
+
+* Count all matched expectations:
+
+  $m->mock_expect_once('method', args => [1, 2, 3]);
+  $m->mock_expect_call_count('method', 2);
+  $m->method(1, 2, 3);  # matches first expectation
+  $m->method();
+  $m->mock_tally();     # matches second expectation 
+
+* Test::Assert's assertions are used to check if arguments matches.      
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-18
+
+Changes:
+
+* Method "create_mock_anon_class" accepts "role" argument.
+* Function "mock_anon_class" has optional argument.
+* Mock class reapplies roles of original class.
+* Mock class has original class and Moose::Object as superclasses.
+* Class::Inspector is not required anymore.
+
+------------------------------------------------------------------------
+0.0102 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-16
+
+Fixes:
+
+* Requires Class::Inspector.
+* This module is under LGPL only.
+
+------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-15
+
+Fixes:
+
+* Requires namespace::clean and Test::Assert 0.05.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-14
+
+* First CPAN release.
+
+------------------------------------------------------------------------

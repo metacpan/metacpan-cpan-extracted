@@ -1,0 +1,102 @@
+Release Notes:
+v1.00 - Initial Release (2012-11-07)
+
+v0.99_21 - Release Candidate 1 ()
+    Changes
+        Added support for live debugging and turning it off via "no"
+    Known Issues
+        Hidden command settings is not inherited
+        There is no built in methods for changing passwords or creating users, not yet
+        You can only use one user database right now
+        RADIUS support is not yet working
+        Per user command logs do not work yet
+          
+v0.99_16 - Beta 6 Release (2011-09-15)
+    Changes
+        Setup an actual configuration object for Running and Startup Configs
+        Removed the need to pass the config object in to other classes
+        Cleaned up some of the need to pass the parent object around
+        Fixed some of the debug statements
+    
+v0.99_15 - Beta 5 Release (2011-09-14)
+    Changes
+        Implemented Log::Log4perl
+        Various bug fixes
+
+v0.99_14 - Beta 4 Release (Non released version)
+    Changes
+        Minor fixes and tweaks
+
+v0.99_13 - Beta 3 Release (2011-07-26)
+    Changes
+        Renamed project from Term::CiscoCLI to Term::RouterCLI
+
+v0.99_12 - Beta 2 Release (2011-07-25)
+    Changes
+        Fixed issues when prompting for things like a password or username
+        Added support for multi-user authentication 
+        Cleaned up support for authentication of commands or command trees in general
+        Added support to the audit log to track users and TTYs
+        Change requirement of perl 5.10.1 to 5.8.8 and documented what is needed for 5.8.8 to work
+    Known Issues
+        Hidden command settings is not inherited
+        There is no built in methods for changing passwords or creating users, not yet
+        You can only use one user database right now
+        RADIUS support is not yet working
+        
+v0.99_11 - Beta 1 Release (2011-07-12)
+    Changes
+        Lots and lots of fixes and enhancements
+        Added a hardware class layer
+        Added support for authenticating commands
+        Got "config t" mode working in the examples
+        Added support for showing interface stats
+        Built config support for MOTDs
+        Added vendor specific parts to the Config file
+        Modified the interaction with the language object
+        Added encrypted password support
+        
+v0.99_04 - Alpha 4 Release (2011-04-27)
+    Changes
+        Created a new Log class
+        Rewrote the history and auditlog classes
+        Fixed the default command
+        Added more public convenience functions to improve generalization
+        Rewrote the language classes
+
+v0.99_03 - Alpha 3 Release (2011-04-23)
+    Changes
+        Enhanced unit tests
+        Reduced "args" directive down to just code execution 
+        Removed unused methods
+        Added show subcommands to help
+        More bug fixes
+    Known Issues
+        Max and Min args still do not work right during completion
+        The default command is still untested
+        Hidden command settings is not inherited
+        The code needs to be generalized so that you can set history, audit log files, and other options
+
+v0.99_02 - Alpha 2 Release (2011-04-20)
+    Changes
+        Added module requirements to the Makefile.PL
+        Lots of cleanup and bug fixes
+
+v0.99_01 - Initial Alpha Release (2011-04-18)
+    Differences from v0.98 of Term::ShellUI
+        There is currently no file or directory completion
+        There is currently no code based prompts
+        There is currently no array based "args" directive option
+        The "proc" directive has been deprecated
+        The "method" directive has been renamed to "code"
+    New Features
+        Abbreviated commands work such as "sh int eth" for "show interface eth0"
+        Configuration file support for storing changes between sessions
+        Basic internationalization support for help menu and command summaries
+        Hidden command trees
+        Authenticated command trees
+        Audit log support
+        Support for Syslog logging 
+        Objectized large parts of the code
+    Known Issues
+        Far to many to list

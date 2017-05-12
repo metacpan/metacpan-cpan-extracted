@@ -1,0 +1,32 @@
+---
+abstract: 'Parsing tab delimited files'
+author:
+  - 'Phil Pollard <bennie@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.140630'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-TabFile
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+provides:
+  Text::TabFile:
+    file: lib/Text/TabFile.pm
+    version: '1.14'
+requires:
+  Test: '0'
+  Text::Delimited: '2.00'
+  perl: '5.006001'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Text-TabFile
+  repository: git://github.com/bennie/perl-Text-TabFile.git
+version: '1.14'

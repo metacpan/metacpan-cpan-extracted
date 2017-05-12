@@ -1,0 +1,29 @@
+<%args>
+@preconditions => ()
+</%args>
+
+% use YAML::Syck;
+
+
+<h3>Preconditions</h3>
+<h4>Overview</h4>
+% foreach my $precondition(@preconditions){
+<h5><a href = "/tapper/preconditions/id/<% $precondition->{id} %>">Precondition ID <% $precondition->{id} %></a></h5>
+<pre>
+  type: <% $precondition->{precondition_type} %>
+% if ($precondition->{name}){
+  name: <% $precondition->{name} %>
+% } elsif ($precondition->{shortname}){
+  shortname: <% $precondition->{shortname} %>
+% }
+</pre>
+<br/>
+% }
+
+<br/>
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+
+
+

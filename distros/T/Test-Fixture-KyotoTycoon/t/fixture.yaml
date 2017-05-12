@@ -1,0 +1,25 @@
+---
+-
+  key: foo
+  value: bar
+-
+  key: array
+  value:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+-
+  key: hash
+  value:
+    apple: red
+    banana: yellow
+-
+  namespace: "app:"
+  key: nirvana
+  value: smells like teen split
+-
+  key: xt
+  value: bar
+  xt: 3 

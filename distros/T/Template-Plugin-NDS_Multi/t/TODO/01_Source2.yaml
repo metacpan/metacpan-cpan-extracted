@@ -1,0 +1,30 @@
+#
+
+_default:
+
+two:
+  a : 2a
+  b : bb
+
+three:
+  c : 3c
+
+four:
+  b : 4b
+  d :
+    f : 4f
+  c : cc
+
+five:
+  l : [ l5b ]
+
+six:
+  z1 : [ c, d ]
+  z3 : two
+
+seven:
+  z2 : b
+
+eight:
+  c  : 8b
+  x0 : foo

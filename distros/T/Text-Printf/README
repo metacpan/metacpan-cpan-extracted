@@ -1,0 +1,92 @@
+Text::Printf version 1.03
+=========================
+
+This module provides a simple, lightweight templating mechanism. This
+is in contrast to most (or all?) other CPAN templating modules, which
+try to be as full-featured as possible.  Text::Printf does not require
+you to buy into any complex syntax, or filesystem layout, or anything
+like that.
+
+Text::Printf can be used in two ways.  The simpler way is via tsprintf,
+a templated version of sprintf:
+
+    $str = tsprintf '2 {{fruit}} + 3 {{fruit}} = 5 {{fruit}}',
+                     {fruit => 'apples'};
+    # Result: "2 apples + 3 apples = 5 apples"
+
+The other way is to create a Text::Printf object with a string of
+boilerplate text.  Then later, you pass the object a hash of
+substitution keywords and values, and it returns the filled-in result
+string.
+
+EXAMPLES
+
+    $template = Text::Printf->new(<<END_TEMPLATE);
+    Dear {{to}},
+        Have a {{day_type}} day.
+    Your {{relation}},
+    {{from}}
+    END_TEMPLATE
+
+    $letter1 = $template->fill (
+         {to       => 'Professor Dumbledore',
+          relation => 'friend',
+          day_type => 'swell',
+          from     => 'Harry',
+        });
+
+    $letter2 = $template->fill (
+         {to       => 'Lord Voldemort',
+          relation => 'sworn enemy',
+          day_type => 'rotten',
+          from     => 'Harry',
+        });
+
+
+That's it.  No control flow, no executable content, no filesystem
+access.  Never had it, never will.
+
+
+INSTALLATION
+
+To install this module, use the following four commands:
+
+   perl Build.PL       or    perl Build.PL --install_path lib=...
+   ./Build
+   ./Build test
+   ./Build install   or   ./Build install --options
+
+If you do not have Module::Build, use the old-style installation:
+
+   perl Makefile.PL    or    perl Makefile.PL LIB='my/install/path'
+   make
+   make test
+   make install
+
+On Windows, you will need to use 'nmake' instead of 'make'.
+http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Readonly
+  Exception::Class
+  Test::More      (used by the test suite only)
+
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode, roode @ cpan . org
+
+Copyright (c) 2005-2008 by Eric J. Roode. All Rights Reserved.  This
+module is free software; you can use it and/or redistribute it freely.
+See copyright statement in the module documentation.
+
+To avoid my spam filter, please include "Perl", "module", or this
+module's name in the message's subject line, and/or GPG-sign your
+message.
+
+If you find any bugs, or if any behavior of Text::Printf surprises
+you, I would be grateful if you could send me an email message about
+it.  Thanks.

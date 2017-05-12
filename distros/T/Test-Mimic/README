@@ -1,0 +1,253 @@
+Test-Mimic
+=======================
+
+Test::Mimic provides automatic object and package mocking via recorded data.
+See perldoc Test::Mimic after installation and below for usage information.
+
+This should be considered an ALPHA release.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::Mimic::Library
+    Test::Mimic::Generator
+    Test::Mimic::Recorder
+
+DETAILS
+
+Why?
+
+You are making unit tests for code that has dependencies which are unpredictable,
+unreliable or error prone. By using Test::Mimic to mock out these dependencies
+you can focus on testing your code and not somebody else's.
+
+Using Test::Mimic
+
+High Level
+
+You insert a small amount of Test::Mimic code into your testing code. Then you
+insure that the unreliable dependency is temporarily in a good state. Next you
+simply run your tests. Test::Mimic will record the behavior of the dependency.
+Every future run of your tests will use the recorded information instead of the
+actual dependency. The dependency has been mimicked!
+
+The Details
+
+Of course, it's not really that simple. Let's break this down a little more.
+Test::Mimic works at the package level, so first determine which packages you
+would like to mimic. Then insert the following into your testing code, perhaps a .t file,
+before the packages to mimic could possibly be loaded (even indirectly).
+
+   use Test::Mimic {
+       'packages' => {
+           'Package::A' => {},
+           'Package::B' => {},
+           'Package::C' => {},
+       },
+   };
+
+Now run your tests. If they behave differently than without Test::Mimic or
+break entirely consider:
+
+    Could there be any strange compile time interactions between the packages?
+
+        Note: Test::Mimic will require each package in no particular order.
+        import will not be called.
+
+    Do other packages need to be loaded before any of the packages to
+    mimic are loaded?
+
+Try to place the use Test::Mimic statement so that the above issues are minimized.
+Mimic only what is absolutely necessary for the same reason. Also, this may not
+be your fault. Test::Mimic does some (a lot of) behind the scenes magic to enable
+the recording. There could be bugs that interfere with your code. It is also
+possible that you need features that don't yet exist such as the ability to have
+multiple use Test::Mimic statements, a package load order and imports in addition
+to requires via Test::Mimic. Keep me (Brendan Roof) posted on these issues. I can't
+debug your code, but if you can determine why Test::Mimic doesn't work I would be
+interested in expanding it's abilities. Patches are great too.
+
+Check to make sure that the .test_mimic_data directory was created in your current
+working directory. If it wasn't you probably didn't use Test::Mimic before someone
+loaded one of the packages you were trying to mimic. Also, check to make sure that
+.test_mimic_data/lib contains the packages you were mimicking in the proper layout.
+Don't open them for now. Run your tests again. If they work stop, you're done. If
+they don't work, don't be worried -- this is fairly normal. Test::Mimic often needs
+specialized options in order to handle certain packages.
+
+Making It Work
+
+First run rm -r .test_mimic_data (or equivalent) to remove your old records.
+
+Changing Some Options
+
+There are a fair number of possible customizations to the standard Test::Mimic
+behavior. Some changes may be needed for your code. Here is a template for using
+Test::Mimic with every possible customization:
+
+   use Test::Mimic {
+       'save'      => '.test_mimic_data',
+       'string'    => sub {}, # The sub {} construction simply represents a subroutine reference.
+       'destring'  => sub {}, # See below for appropriate contracts.
+
+       'key'           => sub {},
+       'monitor_args'  => sub {},
+       'play_args'     => sub {},
+
+       'packages'  => {
+           'Foo::Bar'  => {
+               'scalars'   => [ qw< x y z > ],
+
+               'key'           => sub {},
+               'monitor_args'  => sub {},
+               'play_args'     => sub {},
+
+               'subs' => {
+                   'foo' => {
+                       'key'           => sub {},
+                       'monitor_args'  => sub {},
+                       'play_args'     => sub {},
+                   },
+               },
+           },
+       },
+   };
+
+Ugh, that's a big hash. Let's tackle the easy parts first. Below, when I say foo,
+I really mean the element in the hash with key foo.
+
+    Customizing save simply allows you to choose where recordings are
+    written to and read from.
+
+    string must be a a reference to a subroutine that accepts a single
+    argument and returns it in a stringified form. It should minimally
+    handle non-reference scalars, array references, hash references and
+    references to scalars.
+
+    destring must be a reference to a subroutine that is the inverse of
+    the 'string' subroutine.
+
+        These subroutines will be used whenever Test::Mimic needs to store
+        data in a stable form. The default behavior is to use
+        Data::Dump::Streamer if possible and Data::Dumper otherwise.
+
+    scalars is a reference to a list of scalars in the containing package
+    that should be mimicked. By default we do not keep track of scalars,
+    but we do keep track of arrays and (most) hashes. You only need to
+    list a scalar here if code from a non-mimicked package interacts with
+    it.
+
+Now for the tough stuff: key, monitor_args and play_args.
+
+    key is a map (in the form of a subroutine reference) from subroutine
+    arguments to hash keys. It will be used to determine how a mimicked
+    subroutine should behave given certain arguments. Read the POD in
+    Test::Mimic and Test::Mimic::Library for more information. Seriously,
+    read it. It's more complex than it sounds. If the key generated is not
+    specific enough Test::Mimic falls back to relying on call order to
+    determine behavior. This could break things if the call order is not
+    exactly the same from the recording phase to the playback phase.
+
+Now suppose that we have a subroutine, which, instead of returning a
+result, stores a result in a passed reference. How can Test::Mimic
+handle this?
+
+    It just so happens that Test::Mimic::Library contains a
+    monitor subroutine. Monitor takes a single argument and hijacks (ties)
+    it if it is a reference and merely notes its value if it is a simple
+    scalar. After tying it modifications to the dereferenced value are
+    recorded as long as the value exists. monitor returns a scalar that
+    allows Test::Mimic::Library::play to reconstitute the argument to
+    monitor. This will also be tied and it will play back its recorded
+    history. This process is recursive. There is, however, one problem.
+    play generates an entirely new reference. In the playback stage you
+    probably want to hijack an incoming argument. The defaults should
+    handle this, but at the moment it is difficult for the user to do
+    this. Look for a Test::Mimic::Library::hijack subroutine shortly.
+
+    Anyways, monitor_args is reference to a subroutine that accepts a
+    reference to an array of arguments, monitors them, and returns a
+    scalar that allows play_args to reconstitute all of them. Typically it
+    employs Test::Mimic::Library::monitor.
+
+    play_args is a reference to a subroutine that is the inverse of
+    monitor_args '. It takes a reference to an array of arguments to
+    hijack and the scalar returned by the monitor_args subroutine. It
+    should employ the upcoming Test::Mimic::Library::hijack subroutine.
+    play_args and monitor_args give you the ability to select which
+    arguments are actually important enough to record.
+
+    key, monitor_args and play_args can be given at different portions of
+    the options hash. The most specific one possible will be used in each
+    case.
+
+After you have made all your changes run your tests again to record
+and once more to play.
+
+Other Issues
+
+Test::Mimic can not mimic modifications to global state that the
+original package did behind the scenes. You need to be aware as to the
+extent that your package does this. If it does all hope is not yet lost.
+Test::Mimic generates actual replacement .pm files for each package.
+You can edit these to simulate, or actually make, the modifications to
+global state. This can be quite complex, but also crucial. You should make
+the modifications after the recording phase, but before the playback phase.
+One common case of modification of global state is requiring/using other
+packages. We will attempt to handle this automatically in a future release,
+but for now you may be able to bypass this by adding in the appropriate
+require/use statements. You will also probably want to delete the mimicked
+subroutines for anything that is imported. You can also edit the code files
+if you need to slightly change the behavior of a subroutine. You probably
+will not want to edit the behavior hashes that are embedded in the code, but
+the subroutines themselves are good candidates.
+
+KNOWN ISSUES
+
+Test::Mimic uses Data::Dump::Streamer if available. If you have it installed the
+tests may not pass. The recorded data needed for the tests can currently only be
+in one format and I have chosen to have Data::Dumper be the default. This will
+likely not cause any problems in actually running Test::Mimic. Either way, look
+for this to be fixed in the next release. (If you are really concerned, run the
+tests for Test::Mimic::Recorder and use the recorded data in Test::Mimic::Generator's
+tests. Next use the generated code in Test::Mimic's tests.)
+
+Test::Mimic takes up a lot of space. Some ways to ameliorate this issue...
+The string and destring subroutines are used for almost all stringification purposes.
+Switch from the defaults to a more compact representation. Change key, monitor_args 
+and play_args wherever possible so that they store less information.
+
+Test::Mimic is slow and tends to pause at the end of program execution.
+Remember, this is for testing not production use! As with a debugger extra overhead
+is introduced. The pause at the end of program execution is due to Test::Mimic cleaning
+up, writing data and generating code.
+
+fork breaks playback. For now, avoid using Test::Mimic on programs where fork is used.
+A fix is in the works.
+
+THANKS
+
+Made possible by WhitePages Inc.
+
+Concept by Tye McQueen.
+And thanks to many more at WhitePages. You know who you are!
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Brendan Roof
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

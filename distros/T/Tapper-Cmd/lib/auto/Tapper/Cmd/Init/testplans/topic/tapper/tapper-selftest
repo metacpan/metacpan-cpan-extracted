@@ -1,0 +1,6 @@
+[%#- -*- mode: tt -*- %]
+[% USE env = EnvHash %]
+[%- IF tests_host  == '' %][% tests_host     = "$env.HOME/.tapper/testprogram/tapper-selftest.sh" %][% END -%]
+[%- IF machines    == '' %][% machines       = 'ss5tp' %][% END -%]
+[%- IF queue       == '' %][% queue          = 'tapper' %][% END -%]
+[%- PROCESS 'topic/any/generic/local' -%]

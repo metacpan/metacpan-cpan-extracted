@@ -1,0 +1,24 @@
+---
+abstract: 'fetch a randomly selected assigned value'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Scalar-Random
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  homepage: http://github.com/sartak/Tie-Scalar-Random/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/Tie-Scalar-Random.git
+version: 0.02

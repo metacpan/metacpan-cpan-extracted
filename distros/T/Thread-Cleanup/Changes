@@ -1,0 +1,38 @@
+Revision history for Thread-Cleanup
+
+0.07    2014-10-01 17:50 UTC
+        + Fix : Make sure the hooks are executed after all END blocks
+                (including the global ones) at the end of a pseudo-fork.
+
+0.06    2014-09-28 15:40 UTC
+        + Doc : Updates and clarifications.
+        + Fix : The hooks registered by this module will now be reliably
+                triggered when pseudo-forks (e.g. processes spawn on Windows
+                for the fork() emulation) terminate.
+
+0.05    2013-09-01 16:50 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.04 can skip this update.
+        + Doc : C++ compilers are officially NOT supported.
+        + Doc : POD headings are now properly linkable.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+        + Tst : Threads tests will not fail anymore if resources constraints
+                prevent the system from creating all the required threads.
+
+0.04    2010-05-31 22:55 UTC
+        + Fix : Compatibility with perl 5.13.1.
+
+0.03    2010-01-06 23:30 UTC
+        + Fix : Named scopes with debugging blead.
+        + Fix : Work around Kwalitee test misfailures.
+
+0.02    2009-06-04 21:35 UTC
+        + Doc : Typos and nits.
+        + Fix : Dieing inside a Thread::Cleanup callback no longer causes the
+                whole process to exit.
+        + Tst : Test that detached threads destructors don't fire before END.
+
+0.01    2009-03-16 00:30 UTC
+        First version, released on an unsuspecting world.
+

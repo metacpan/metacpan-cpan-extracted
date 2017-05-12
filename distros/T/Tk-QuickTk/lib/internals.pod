@@ -1,0 +1,293 @@
+=head1 NAME
+
+Tk::QuickTk::internals - implementation details
+
+=head1 DESCRIPTION
+
+  This document describes the internal workings of the B<TK::QuickTk> module, by detailing
+the primary input data structure the module expects and, then, the private subroutines the
+module uses to accomplish its work.
+
+=head1 SYNOPSIS
+
+  use Tk::QuickTk;
+
+  sub _loadwidget;
+  _loadwidget($gl,$spec,$level,$momname); (The last two items are optional)
+
+  sub _getargs;
+  _getargs($gl,$pakq,$inp,$cmds);
+
+  sub _docode;
+  _docode($gl,$level,$code);
+
+  sub _bindevent;
+  _bindevent($gl,$spec,$level,$momname);
+
+  sub _loadmenitm;
+  _loadmenitm($gl,$spec,$level,$momname,$momidx);
+
+  sub _getttl;
+  _getttl;
+
+  sub _getcmd;
+  _getcmd;
+
+  sub _getsub;
+  _getsub;
+
+  sub _getini;
+  _getini;
+
+
+=head1 SPECIFICATION DATA STRUCTURE
+
+Module I<TK::QuickTk> takes as input a specification for a GUI application, and implements
+the application by translating the specification into method calls for the Tk module and
+executing them.  That input specification is a very simple data structure and is generated,
+by default, by the companion module, I<Text::TreeFile>.
+
+The data structure consists of a strict hierarchy, or tree, of nodes.  It starts, at the
+top or root of the tree, with a single node (corresponding to the MainWindow widget for
+the application) which consists of a two-element array.
+
+ The first element of the array is a text string containing the specification for the
+MainWindow widget, in the QuickTk language -- as documented in B<Tk::QuickTk::details>
+and summarized in other QuickTk documents.  The second element of the node array is a
+reference to another array of pointers to similar nodes, which are the widgets to be
+immediately nested within the MainWindow widget.
+
+The tree structure fans out in this way, until terminal nodes in which the second element
+of the node has no sub-node references (i.e. is an empty array).
+
+
+=head1 PRIVATE FUNCTIONS
+
+
+=head2 _loadwidget()
+
+Purpose          : Recursively implements a widget hierarchy
+                     from a specification data structure
+Arguments        : $gl,$spec,$level,$momname (the last two are optional)
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is the two-element node array
+                     specifying a widget and its sub-widgets
+                   The third is the level of nesting of this widget
+                     (default is zero, being for the MainWindow)
+                   The fourth is the (accumulated) name
+                     of the parent of this widget (default is no parent)
+Called From      : new(),createwidget(),_loadwidget()--recursively
+Calls            : _getargs(),_docode(),_bindevent(),_loadmenitm(),
+                   _loadwidget()--recursively
+Return Value(s)  : none
+Throws, Exits... : 1. Croaks if level zero widget isn't MainWindow
+                        (but fixes it, instead, if it's a TopLevel or Frame)
+                   2. Carps and ignores if MainWindow is specified "nocreate"
+                   3. Carps and ignores packing options for MainWindow,
+                        other than "nopack"
+                   4. Croaks
+                        if _docode() for creating MainWindow returns failure
+                   5. Croaks
+                        if _docode() for configuring MainWindow returns failure
+                   6. Substitutes TopLevel
+                        if MainWindow is specified below level zero
+                   7. Croaks if level nonzero widget creation _docode()
+                        returns failure
+                   8. Croaks if _docode() creating MenuButton returns failure
+                   9. Croaks if _docode() packing menu item returns failure
+"Side" Effects   : Loads and optionally configures and packs a widget
+                   from its specification and hierarchy level
+                   and recursively does the same for widgets nested within it,
+                   and creates an entry in $$gl{widgets}
+                   for any widget for which 'nocreate' was specified
+                   so that it may be created, on the fly, later,
+                   during execution via createwidget()
+
+
+=head2 _getargs()
+
+Purpose          : Parses the options for the widget,
+                   from the input specification string,
+                   using four helpers for different parts of a specification
+Arguments        : $gl,$pakq,$inp,$cmds
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is boolean,
+                     indicating whether current widget allows packing
+                   The third is the text string input
+                     from which arguments should be parsed
+                   The fourth is a hash of subroutines potentially to be called
+Called From      : loadwidget(), loadmenitm()
+Calls            : _getttl,_getini,_getsub,_getcmd,
+                   chosen from fourth argument (hash) passed-in,
+                   depending on options parsed from $inp
+Return Value(s)  : A three-item list of text strings:
+                   The first item is 'create' or 'nocreate'
+                   The second is a comma-delimited list
+                     of configuration options
+                   The third is either 'nopack'
+                     or a comma-delimited list of packing options
+Throws, Exits... : none
+"Side" Effects   : none
+
+
+=head2 _docode()
+
+Purpose          : Passes-on to the Tk library the code generated,
+                   logging it if requested to
+Arguments        : $gl,$level,$code,
+                     and uses $$gl{lfh} as a file handle for logging
+                     if it exists
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is the hierarchical nesting level
+                     for the current widget
+                   The third is the code to execute in a protected environment
+Called From      : new(),createwidget(),_loadwidget,_bindevent(),_loadmenitm()
+Calls            : eval() to avoid and report potential exceptions
+Return Value(s)  : Returns the eval() return,
+                   or undef if $$gl{genonly} so no eval() done
+Throws, Exits... : Carps if the eval of the code passed-in fails
+"Side" Effects   : None
+
+
+=head2 _bindevent()
+
+Purpose          : Binds an action to take
+                   when the specified event happens on the parent widget
+Arguments        : $gl,$spec,$level,$momname
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is the text string specification
+                     of the bind request
+                   The third is the hierarchical nesting level for this event
+                   The fourth is the (accumulated) name
+                     of the parent of this event
+Called From      : createwidget(),_loadwidget()
+Calls            : _docode()
+Return Value(s)  : None
+Throws, Exits... : Croaks if _docode() on the bind command fails
+                   for the widget, event and action
+"Side" Effects   : The action is bound to the event,
+                     when it should occur on the parent widget
+
+
+=head2 _loadmenitm()
+
+Purpose          : Loads an widget which is an item of a menu
+Arguments        : $gl,$spec,$level,$momname,$momidx
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is the text string specification
+                     of the bind request
+                   The third is the hierarchical nesting level for this event
+                   The fourth is the (accumulated) name
+                     of the parent of this event
+                   The fifth is the sequential index
+                     of this menuitem in the parent menu                    
+Called From      : createwidget(),_loadwidget(),_loadmenitm()--recursively
+Calls            : _getargs(),_docode(),_loadmenitm()--recursively
+Return Value(s)  : None
+Throws, Exits... : Croaks if the menu item:
+                     1. type is unrecognizable
+                     2. has no label
+                     3. can't be created
+                     4. can't be configured
+                     5. has sub-menu items,
+                          but their menu widget can't be created
+                     6. can't have its sub-menu-holding item created
+"Side" Effects   : Puts a non-created-widget entry in $$gl{widgets}
+                   under the parent name and index
+                   for creation via createwidget() later during execution, and
+                   creates a menu item widget, and
+                     if it has sub-menu items, creates a sub-menu widget, and
+                     creates the sub-menu items,
+                     via recursive calls to _loadmenitm()
+
+
+=head2 _getttl()
+
+Purpose          : Extracts the title from the input specification fragment,
+                   and adds quotes to the value
+Arguments        : $gl,$opt,$inp
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is the option, 'ttl'
+                   The third is the text string to be set as the title
+Called From      : _getargs() indirectly, as requested by _loadwidget()
+Calls            : None
+Return Value(s)  : A two-item list of text strings:
+                   The first is 'title'
+                   The second is the value of $inp,
+                     surrounded by double quote characters
+Throws, Exits... : None
+"Side" Effects   : None
+
+
+=head2 _getcmd()
+
+Purpose          : Extracts the function call to be executed as a callback,
+                   from the input specification fragment,
+                   and formats it for output to a Tk call
+Arguments        : $gl,$opt,$inp
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is the option, 'cmd'
+                   The third is the text string
+                     containing a function name followed by arguments,
+                     to be executed as a callback
+Called From      : _getargs() indirectly,
+                   as requested by _loadwidget() and _loadmenitm()
+Calls            : None
+Return Value(s)  : A two-item list of text strings:
+                   The first is 'command'
+                   The second is the name of the function
+                     to be executed as a callback,
+                     preceded by '[\&main::' and followed by ',$gl,' and
+                     followed by the arguments to the callback function,
+                     followed by ']'.
+Throws, Exits... : None
+"Side" Effects   : None
+
+
+=head2 _getsub()
+
+Purpose          : Extracts the code to be executed as a callback
+                   from the input specification fragment,
+                   and formats it for output to a Tk call
+Arguments        : $gl,$opt,$inp
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is the option, 'sub'
+                   The third is a text string
+                     comprising code to be executed as a callback
+Called From      : _getargs() indirectly,
+                   as requested by _loadwidget() and _loadmenitm()
+Calls            : None
+Return Value(s)  : A two-item list of text strings:
+                   The first is 'command'
+                   The second is the value of $inp,
+                   preceded by 'sub { ' and succeeded by '}'
+Throws, Exits... : None
+"Side" Effects   : None
+
+
+=head2 _getini()
+
+Purpose          : Saves the application initialization in $gl code
+                   for later execution, after MainWindow is created
+Arguments        : $gl,$opt,$inp
+                   The first is the hash of "global" variables
+                     made available to all code.
+                   The second is the option, 'ini'
+                   The third is the text string comprising code to be executed
+                     to initialize the application
+Called From      : _getargs() indirectly, as requested by _loadwidget()
+Calls            : None
+Return Value(s)  : A two-item list of undef,undef
+Throws, Exits... : None
+"Side" Effects   : Sets $$gl{inicode} to initialization code from the input specification
+
+
+=cut

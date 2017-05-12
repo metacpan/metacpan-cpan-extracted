@@ -1,0 +1,75 @@
+Revision history for Tapper-TAP-Harness
+
+5.0.7     2016-07-29
+        - version bump only to fix dependency errors
+
+5.0.6     2016-03-03
+        - added 'codereview-url' metainfo
+        - drop 'exit' and 'wait' due to keyword conflicts in db
+
+5.0.5     2016-02-18
+        - assert OS type Unix (for using `find` behind the scenes)
+
+5.0.4     2016-02-16
+        - try more platform agnostic 'find'
+
+5.0.3     2016-02-09
+        - skip tests that actually suffer from the linux-specific behaviour
+
+5.0.2     2016-02-08
+        - less intrusive section name canonicalization on dots and
+          slashes
+        - search for more typical prove paths
+
+5.0.1     2015-12-21
+        - RT#110450: derive prove's name following found perl's name
+          [reported by Slaven Rezić]
+
+5.0.0     2015-12-18
+        - distro maintenance
+
+4.1.2     2015-12-18
+        - allow # Test-*: headers in TAP
+        - distro maintenance
+
+4.1.1     2012-11-19
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        - recognize TAP version case-insensitive
+
+4.0.2     2012-06-07
+        - require TAP::Parser >= 3.22
+
+4.0.1     2012-05-16
+        - handle TAP::Archive sloppyness
+        - tests'n'fixes for prove ok cutting
+        - added 'moreinfo-url' metainfo
+        - added 'owner' metainfo
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* require TAP::Parser >=3.22
+	* require IO::Zlib
+	* release version++ roundhouse kick
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.2
+
+	* fix missing dependency
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

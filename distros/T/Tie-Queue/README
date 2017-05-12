@@ -1,0 +1,218 @@
+Tie::Queue - Introduction
+      Tie::Queue - Tie an ARRAY over a TokyTyrant  DB ( see http://tokyocabinet.sourceforge.net )
+
+SYNOPSIS
+      use Tie::Queue;
+      use Data::Dumper;
+
+      ## Queue creation
+      # This queue is not re-initialised at each execution of the script
+      # the default namespace is 'Tie-Queue'
+      # and each item are non serialized 
+      tie my @a, 'Tie::Queue', '127.0.0.1', 1978, 0;
+
+      # This queue is NOT re-initialised at each execution of the script
+      # and each item are non serialized 
+      # the namespace is 'second_queue'
+      tie my @b, 'Tie::Queue', '127.0.0.1', 1978, 1 , 0 , 'second_queue';
+
+      ## put some data in the queue
+      for ( 101 .. 110 )
+      {
+          push @a, $_;
+      }
+
+      for ( 1001 .. 1005 )
+      {
+          push @ab, $_;
+      }
+
+      push @b, 'some text';
+      push 
+      ## show the content of the queue
+      print Dumper( \@a );
+      ## print the size of the queue
+      print "size of array=". scalar @a. "\n";
+      ## remove the latest pushed element from the queue ( the newest)
+      $res1 = pop @a;
+      print  "latest element $res1\n";
+      print "size of array=". scalar @a. "\n";
+      print Dumper( \@a );
+      $res2 = $a[3];
+      print  "element 3 = $res2\n";
+      ## remove the first element from the queue ( the oldest )
+      $res3 = shift @a;
+      print  "first element $res3\n";
+      print "size of array=". scalar @a. "\n";
+      print Dumper( \@a );
+      if ( exists $a[4] )
+      {
+          print "elem 4 exists\n";
+      }
+      else
+      {
+          print "elem 4 NOT exists\n";
+      }
+
+      if ( exists $a[40] )
+      {
+          print "elem 40 exists\n";
+      }
+      else
+      {
+          print "elem 40 is NOT existing\n";
+      }
+
+
+      (tied @a)->CLEAR;
+      print "size of array=". scalar @a. "\n";
+
+      ########################
+      # this queue is re-initialised at each execution of the script
+      # and each item are serialized 
+      # and the name space is 'third_queue_serialized'
+      tie my @c, 'Tie::Queue', '127.0.0.1', 1978, 1 , 1 , 'third_queue_serialized';
+      my %test = ( a => 'key_a', b => 'key_B' , c => 3 );
+      print Dumper(\%test);
+      push @d , \%test;
+      my $r = pop @d;
+      print Dumper($r)
+      #######################
+
+DESCRIPTION
+      Tie an ARRAY over a TokyTyrant DB and allow to push, pop shift  data;
+  
+      This module require TokyoTyrant (database and perl module.)
+      If the serialisation is required, the module Data::Serilizer is also required
+  
+      The normal ARRAY function present are
+  
+      push
+      pop
+      shift
+      exists
+      scalar
+      storesize ( to allow undef @a)
+  
+      Specific function
+  
+      CLEAR
+      SYNC
+      REPAIR
+  
+      The following function are not implemented.
+  
+      EXTEND
+      STORE
+      DELETE
+      SPLICE
+
+Basic functions
+    * only the queue relevant functions are present *
+
+  tie
+            Tie an array over a DB
+            my $t = tie( my @myarray, "Tie::Queue", '127.0.0.1', 1978, 1 , 1 , 'first_name' ,  1 , 0 );
+        
+            Six optional parameter are allowed
+                1) the IP where the TokyoTyrant is running ( default 127.0.0.1 )
+                2) the port on which the TokyoTyrant is listenning ( default 1978 )
+                3) a flag to delete at start the DB ( default 0 )
+                4) a flag to serialize/deserialize on the fly the data stored in the DB
+                5) a namespace to allow more than one queue on the same DB ( default Tie-Queue )
+                6) a flag to activate or deactivate auto_sync ( default 1 )
+                7) a flag to prevent undef value to be pushed ( default 0 )
+                8) a flag to use self-healing feature or reset a queue if the data queue is corrupted ( default 0 )
+                9) a flag to add some debug info on correctable error ( default 0 )
+               10) a flag to prevent insertion of duplicate value ( default 0 )
+
+  PUSH
+            Add an element at the end of the array
+            push @myarray , 45646;
+
+  POP
+            Extract the latest element from the array ( the newest )
+            my $data = pop @myarray;
+
+  SHIFT
+            Extract the first element from the array  ( the oldest )
+            my $data = shift @myarray;
+
+  EXISTS
+            Test if an element in the array exist
+            print "element exists\n" if (exists $myarray[5]);
+
+  FETCH
+            Retrieve a specific element from the array
+            my $data = $myarray[6];
+
+  FETCHSIZE
+            Get the size of the array
+            my $data = scalar(@myarray);
+
+  SYNC
+            Force a sync of the DB ( not usefull is auto_sync is on)
+            $t->SYNC;
+
+  CLEAR
+            Delete all element in the array
+            $t->CLEAR;
+
+  DESTROY
+            Normal destructor call when untied the array
+            Normaly never called by user
+
+  REPAIR
+            Force a rescan of all elements in the queue and recreate the right indexes
+
+Functions not Implemented
+    * Most of then are not related to a QUEUE *
+
+  UNSHIFT
+            Not implemented
+
+  EXTEND
+            Not implemented
+
+  STORE
+            Not implemented
+
+  STORESIZE
+            to  resize the array ( this allow a re-initialisation of the array by undef @a )
+
+  DELETE
+            Not implemented
+
+AUTHOR
+            Fabrice Dulaunoy <fabrice_at_dulaunoy_dot_com>
+
+SEE ALSO
+            - TokyoTyrant from Mikio Hirabayashi <mikio_at_users_dot_sourceforge_dot_net>
+
+TODO
+            - make test
+
+LICENSE
+            Under the GNU GPL2
+
+            This program is free software; you can redistribute it and/or modify it 
+            under the terms of the GNU General Public 
+            License as published by the Free Software Foundation; either version 2 
+            of the License, or (at your option) any later version.
+
+            This program is distributed in the hope that it will be useful, 
+            but WITHOUT ANY WARRANTY;  without even the implied warranty of
+            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+            See the GNU General Public License for more details.
+
+            You should have received a copy of the GNU General Public License 
+            along with this program; if not, write to the 
+            Free Software Foundation, Inc., 59 Temple Place, 
+            Suite 330, Boston, MA 02111-1307 USA
+
+            Tie::Queue  Copyright (C) 2009 DULAUNOY Fabrice  
+            Tie::Queue comes with ABSOLUTELY NO WARRANTY; 
+            for details See: L<http://www.gnu.org/licenses/gpl.html> 
+            This is free software, and you are welcome to redistribute 
+            it under certain conditions;
+

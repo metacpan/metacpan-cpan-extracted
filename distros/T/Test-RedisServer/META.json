@@ -1,0 +1,85 @@
+{
+   "abstract" : "redis-server runner for tests.",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-RedisServer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Mouse" : "0",
+            "Time::HiRes" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Redis" : "0",
+            "Test::More" : "0.98",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::RedisServer" : {
+         "file" : "lib/Test/RedisServer.pm",
+         "version" : "0.20"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/typester/Test-RedisServer/issues"
+      },
+      "homepage" : "https://github.com/typester/Test-RedisServer",
+      "repository" : {
+         "url" : "git://github.com/typester/Test-RedisServer.git",
+         "web" : "https://github.com/typester/Test-RedisServer"
+      }
+   },
+   "version" : "0.20",
+   "x_authority" : "cpan:TYPESTER",
+   "x_contributors" : [
+      "Jeremy Zawodny <jzawodn@craigslist.org>",
+      "Ivan Baidakou <dmol@gmx.com>",
+      "Daisuke Murase <typester@gmail.com>",
+      "Sean Smith <ssmith@localhost.localdomain>",
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

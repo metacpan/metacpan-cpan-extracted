@@ -1,0 +1,15 @@
+$VAR1 = {
+          'report' => {
+                        'item0' => {
+                                     'type' => 'xyplot'
+                                     'graph-label' => 'write vs reclen'
+                                     'y-label' => 'write'
+                                     'y-units' => 'KB/sec'
+                                     'x-label' => 'reclen'
+                                     'y-data1' => '18850 19375 19452 19388 19530' ,
+                                     'x-data1' => '4 8 16 32 64',
+                                     'y-data2' => '18865 15 192 19389 130' ,
+                                     'x-data2' => '4 8 16 32 64',
+                                   },
+                      }
+        };

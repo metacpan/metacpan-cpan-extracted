@@ -1,0 +1,22 @@
+
+Changes made in Sense-Clusters version 0.47 during version 0.49
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+* Added sparse vector/matrix support. 
+  Changed programs -
+	wordvec.pl
+	mat2harbo.pl
+	order1vec.pl
+	order2vec.pl
+	simat.pl
+	bitsimat.pl
+	order1.pl
+	order2.pl
+   by adding sparse format support.
+   Dense is made optional while sparse is the default i/p, o/p format.
+	
+(Changelog-v0.47to0.49 Last Updated on 03/18/2004 by Amruta)

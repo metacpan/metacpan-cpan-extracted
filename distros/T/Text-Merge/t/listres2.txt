@@ -1,0 +1,34 @@
+
+Test of complete list: 
+
+======================
+    FRUIT BASKET
+======================
+
+The pumpkin is a large, round, orange fruit that grows on a vine.
+
+---------------------- 
+
+The pear is a medium, oblong, green fruit that grows on a tree.
+
+---------------------- 
+
+The grape is a small, round, purple fruit that grows on a vine.
+
+---------------------- 
+
+The apple is a medium, round, red fruit that grows on a tree.
+
+======================
+
+
+
+Test of empty list:
+
+This list is empty.
+
+
+
+Test of null list:
+
+

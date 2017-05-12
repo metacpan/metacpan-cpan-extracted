@@ -1,0 +1,30 @@
+---
+abstract: 'Render Text::MicroTemplate from __DATA__.'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-MicroTemplate-DataSection
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Text::MicroTemplate::Extended: 0.11
+requires:
+  Data::Section::Simple: 0
+  Text::MicroTemplate: 0.13
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/typester/Text-MicroTemplate-DataSection.git
+version: 0.01

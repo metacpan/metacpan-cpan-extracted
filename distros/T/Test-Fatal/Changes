@@ -1,0 +1,54 @@
+Revision history for Test-Fatal
+
+0.014     2014-12-09 18:35:59-05:00 America/New_York
+        - avoid assuming that t/todo.t is always called t/todo.t
+
+0.013     2013-09-23 10:31:15 America/New_York
+        - rebuild to get a newer compile test that may work on 5.6.x
+
+0.012     2013-09-17 22:01:45 Asia/Tokyo
+        - go back to auto-detecting the required Test::More, reverting the
+          changes made for [rt.cpan.org #62699]
+
+0.011     2013-09-17 08:48:20 Asia/Tokyo
+        - more clearly (and correctly) document the way NOT to use Test::Fatal
+          (thanks, Karen Etheridge!)
+
+        - try to fix $TODO not working when the user test uses $T::B::Level
+          (thanks, Jesse Luehrs)
+
+0.010     2012-02-16 10:27:54 America/New_York
+        - avoid tickling an overloading bug in perl 5.6 during testing (thanks,
+          Zefram)
+
+0.009     2012-02-09 15:26:11 America/New_York
+        - advise against using isnt(exception{...},undef)
+
+0.008     2011-11-06 21:10:14 America/New_York
+        - no changes since 0.007
+
+0.007     2011-10-31 23:22:47 America/New_York
+        - revert the mistake by which 0.004 allowed blocks after "exception" as
+          well as "success"
+
+0.006     2011-06-01 22:55:10 America/New_York
+        - crank back the Test::More and Exporter requirements
+
+        - add lives_ok and dies_ok emulation (thanks, Paul "LeoNerd" Evans)
+
+0.005     2011-04-26 07:50:48 America/New_York
+        - fix the logic that picks tests for 5.13.1+ (thanks, Zefram)
+
+0.004     2011-04-25 11:57:59 America/New_York
+        - success blocks now allow trailing blocks like finally, catch, etc.
+            (thanks, Joel Bernstein)
+
+0.003     2010-10-28 22:10:59 America/New_York
+        - more tests for false exceptions, especially on 5.13
+
+0.002     2010-10-28 00:11:09 America/New_York
+        - add tests for handling of false exceptions
+        - fix precedence error in documentation (thanks, ether)
+
+0.001     2010-10-24 00:23:24 America/New_York
+        - first release

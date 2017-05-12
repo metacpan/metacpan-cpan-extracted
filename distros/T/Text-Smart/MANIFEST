@@ -1,0 +1,22 @@
+AUTHORS
+autobuild.sh
+bin/text-smart
+CHANGES
+examples/demo.html
+examples/demo.txt
+INSTALL
+lib/Text/Smart.pm
+lib/Text/Smart/HTML.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+META.yml.PL
+README
+t/05-pod.t
+t/10-pod-coverage.t
+t/20-smart.t
+t/30-html.t
+Text-Smart.spec
+Text-Smart.spec.PL

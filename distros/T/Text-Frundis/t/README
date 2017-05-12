@@ -1,0 +1,16 @@
+To test all files in "data/" directory:
+
+	$ perl t/test.t
+
+To test all files in "data-dirs/" directory:
+
+	$ perl t/test_dirs.t
+
+To (re)generate *.html and *.tex files if appropiate:
+
+	$ perl t/test.t update
+	$ perl t/test_dirs.t update
+
+It asks for confirmation for each file or directory, giving a diff if it exists
+already.  Use with caution to not override correct expected results with
+regressions.

@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Test-HTTP-Server-Simple
+version:            0.11
+abstract:           Test::More functions for HTTP::Server::Simple
+author:
+    - David Glasser <glasser@bestpractical.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTTP::Server::Simple:  0
+    NEXT:                 0
+    Test::Builder:        0
+    Test::Builder::Tester:  1.04
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

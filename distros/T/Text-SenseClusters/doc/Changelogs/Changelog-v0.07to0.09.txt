@@ -1,0 +1,19 @@
+Changes made in Sense-Clusters version 0.07 during version 0.09
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota at Duluth
+
+(1)	Added remove_sat option to Sval_preproc.pl to remove ids in <head> and
+	<sat> tags that come with the satellite tags.  
+(2)	Added new utility equi_sense.pl to select exactly N instances from
+	each sense tag that has atleast N instances in a given Senseval file
+	for a single lexelt.
+(3)	Added new utility program split_Sval.pl that splits a Senseval file
+	into training and test file by randomly choosing given percent of 
+	instances for training file and rest for test file 
+(4)	Changed matrix.pl to have a feature_vector data structure similar
+	to the one(hash of hashes) used by sparse_matrix.pl
+
+(Changelog-v0.07to0.09 Last Updated on 04/08/2003 by Amruta)

@@ -1,0 +1,24 @@
+0.007  Tue Aug 10 19:43:07 UTC 2010
+	- Fixing all the meta information
+
+0.006  Mon Jul 12 15:33:10 UTC 2010
+	- Removed Perl version from Makefile.PL
+	- Added Repo Information to Makefile.PL
+
+0.005  Fri Jul  9 18:06:26 UTC 2010
+	- Lowered the perl version requirement
+
+0.004  Fri Jul	9 15:08:19 UTC 2010
+	- Removed the use of 'parent'
+	- Changed a test up to use the ':all' export tag.
+        - Added a test::more requirement in the makefile.
+
+0.003  Thu Jul 	8 10:37:00 CDT 2010
+	- Fixing Documentation from name change
+
+0.002  Thu Jul  8 09:08:10 CDT 2010
+	- Renamed to Time::NT
+ 	- Added nt_time()
+
+0.001  Wed Jul  7 15:39:02 CDT 2010
+	- original version; created by Jason Fried

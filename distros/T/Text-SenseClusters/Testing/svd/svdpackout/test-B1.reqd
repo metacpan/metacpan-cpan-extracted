@@ -1,0 +1,2 @@
+ERROR(svdpackout.pl):
+	lao2 file <test-B1.lao2> doesn't have 7 S-values.

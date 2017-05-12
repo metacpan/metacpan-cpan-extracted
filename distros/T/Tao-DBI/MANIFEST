@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+
+t/001compile.t
+t/002basic.t
+t/005tr_hash.t
+t/006deep.t
+t/007bad.t
+t/008edges.t
+t/009uc_key.t
+t/090pod.t
+
+lib/Tao/DBI.pm
+lib/Tao/DBI/db.pm
+lib/Tao/DBI/st.pm
+lib/Tao/DBI/st_deep.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,2 @@
+Hello, <?cs var:lang ?> world! (raw)
+Hello, <?cs var:html_escape(lang) ?> world! (html_escape)

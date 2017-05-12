@@ -1,0 +1,37 @@
+Warning from statistic library!
+  Warning code: 201
+  Warning message: Frequency value 'n11' must not be negative.
+Skipping ngram one<>two<>-1 13 7
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value 'n11' must not exceed total number of bigrams.
+Skipping ngram one<>three<>18 13 5
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value of ngram 'n11' must not exceed the marginal totals.
+Skipping ngram one<>four<>10 6 12
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value of ngram 'n11' must not exceed the marginal totals.
+Skipping ngram two<>two<>10 12 6
+Warning from statistic library!
+  Warning code: 204
+  Warning message: Marginal total value 'np1' must not be negative.
+Skipping ngram three<>four<>1 -1 5
+Warning from statistic library!
+  Warning code: 203
+  Warning message: Marginal total value 'np1' must not exceed total number of bigrams.
+Skipping ngram three<>one<>1 18 5
+Warning from statistic library!
+  Warning code: 204
+  Warning message: Marginal total value 'n1p' must not be negative.
+Skipping ngram four<>five<>1 1 -1
+Warning from statistic library!
+  Warning code: 203
+  Warning message: Marginal total value 'n1p' must not exceed total number of bigrams.
+Skipping ngram three<>five<>1 1 18
+Warning from statistic library!
+  Warning code: 202
+  Warning message: Frequency value of ngram 'n11' must not exceed the marginal totals.
+Skipping ngram three<>seven<>1 0 0
+test-1.sub-4.cnt does not look like a ngram frequency file. The total ngrams should be greater than the sum of counts of all the ngrams.

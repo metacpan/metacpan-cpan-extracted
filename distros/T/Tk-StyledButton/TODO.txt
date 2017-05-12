@@ -1,0 +1,11 @@
+Tk::StyledButton TO DO:
+
+- fix focus()
+- test on non-Win32 (esp fonts)
+- test wraplength, justify, image shape/style
+- figure out -underline
+- better round gel rendering
+- true aqua rendering
+- figure out why geometry request in DialogBox doesn't work
+- implement StyledNB
+- fix GD rendered button text and image alignment

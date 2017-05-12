@@ -1,0 +1,40 @@
+---
+abstract: 'A Moo based object oriented interface for creating and display a dialog of buttons to be used as a menu using Tk '
+author:
+  - 'Paul Durden <alabamapaul@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-MenuDialog
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  JSON: '0'
+  Moo: '0'
+  Readonly: '0'
+  Tk: '0'
+  Tk::JPEG: '0'
+  Tk::PNG: '0'
+  Tk::Photo: '0'
+  Try::Tiny: '0'
+  perl: '5.010'
+resources:
+  homepage: https://github.com/alabamapaul/perl5-Tk-MenuDialog
+  repository: https://github.com/alabamapaul/perl5-Tk-MenuDialog.git
+version: '0.05'

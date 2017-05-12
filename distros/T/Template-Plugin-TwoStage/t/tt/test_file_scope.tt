@@ -1,0 +1,15 @@
+[% USE TwoStage = TwoStage;
+   # do not purge cache in between!
+   BLOCK test_template_a;
+	"bla\n";	
+   END;
+   BLOCK test_template_b;
+	"blub\n";	
+   END;
+#   USE Dumper;
+#   Dumper.dump( template );
+#   Dumper.dump( component );
+   TwoStage.process( 'template' => 'test_template_a' ); 
+   TwoStage.process( 'template' => 'test_template_b' );
+#   TwoStage.params.item("keys").values.join("\n");
+%]

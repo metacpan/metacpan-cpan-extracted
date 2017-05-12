@@ -1,0 +1,68 @@
+Test::Sims is a Perl module to support the Sims testing technique to generate
+large, complex, interesting, semi-random yet valid data for testing purposes.
+
+Here's the slides outlining the technique:
+http://schwern.org/talks/Generating%20Test%20Data%20With%20The%20Sims.pdf
+
+Install as any normal Module::Build Perl module.
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+Or for your own personal use:
+
+    perl Build.PL --install_base ~
+    ./Build
+    ./Build test
+    ./Build install
+
+Here's an example of making a simple package to generate random dates.
+
+    package Sim::Date;
+
+    use strict;
+    use warnings;
+
+    use DateTime;
+    use Test::Sims;
+
+    # Create rand_year(), rand_month(), etc...
+    # All exportable on demand or with the :rand tag
+    make_rand year  => [1800..2100];
+    make_rand month => [1..12];
+    make_rand day   => [1..31];
+    make_rand hour  => [0..23];
+    make_rand minute=> [0..59];
+    make_rand second=> [0..59];
+
+    sub sim_datetime {
+        my %defaults = (
+            year   => rand_year(),
+            month  => rand_month(),
+            day    => rand_day(),
+            hour   => rand_hour(),
+            minute => rand_minute(),
+            second => rand_second(),
+        );
+
+        return DateTime->new(
+            %defaults, @_
+        );
+    }
+
+    # Export sim_datetime()
+    export_sims();
+
+And then using it.
+
+    use Sim::Date;
+
+    # Random date.
+    my $date = sim_datetime;
+
+    # Random date in the year 2009
+    my $date = sim_datetime(
+        year => 2009
+    );

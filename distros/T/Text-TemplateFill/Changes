@@ -1,0 +1,61 @@
+
+addw: Fri 09 Aug 2002 16:22
+TemplateFill.pm:	Initial Create.
+
+addw: Fri 09 Aug 2002 16:54
+TemplateFill.pm: Fix up ending of POD
+
+addw: Mon 12 Aug 2002 12:55
+TemplateFill.pm: Fix typeo in documentation
+
+addw: Tue 13 Aug 2002 16:57
+TemplateFill.pm: Fix detection of undefined program vars, wrap duplication into a function
+
+addw: Wed 26 Mar 2003 16:36
+TemplateFill.pm: Allow := in Calc, transition to using Math::Expression
+
+addw: Thu 27 Mar 2003 09:08
+BuildDistribution.sh:\tInitial Create.
+
+addw: Thu 27 Mar 2003 09:08
+MANIFEST:\tInitial Create.
+
+addw: Thu 27 Mar 2003 09:08
+test.pl:\tInitial Create.
+
+addw: Thu 27 Mar 2003 09:08
+TODO:\tInitial Create.
+
+addw: Thu 27 Mar 2003 09:08
+Makefile.PL:\tInitial Create.
+
+addw: Thu 27 Mar 2003 10:16
+TODO: Add a note about copyright assignment.
+
+addw: Thu 27 Mar 2003 10:16
+README.in:\tInitial Create.
+
+addw: Thu 27 Mar 2003 10:22
+MANIFEST: This manifest must not include directories, just files within directories.
+
+addw: Thu 27 Mar 2003 10:24
+TemplateFill.pm: Use Math::Expression rather than simple in built arithmetic.
+	Prepare for public release.
+
+addw: Thu 27 Mar 2003 10:27
+TemplateFill.pm: Minor tweak to make it work well with BuildDistribution.sh
+
+addw: Thu 27 Mar 2003 10:28
+BuildDistribution.sh: Cope with low version numbers!
+
+addw: Thu 27 Mar 2003 10:33
+Credits:\tInitial Create.
+
+addw: Thu 27 Mar 2003 10:39
+Credits: Add a note about copyright
+
+addw: Thu 27 Mar 2003 10:40
+README.in: Minor wording change
+
+addw: Thu 27 Mar 2003 10:40
+TODO: Minor word change

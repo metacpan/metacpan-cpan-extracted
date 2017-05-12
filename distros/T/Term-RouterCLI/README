@@ -1,0 +1,106 @@
+Term::RouterCLI is Copyright (C) 2011, Bret Jordan
+==================================================
+HOSTED AT
+    http://ciscocli.sourceforge.net
+
+
+MAJOR FEATURES
+    The major features of Term::RouterCLI are as follows:
+    Extensible tree based parsing engine for a command line interface
+    Modular design
+    TAB and ? mark completion
+    Recursive completion
+    Recursive command interpolation
+    Hidden commands and command trees
+    Authenticated commands and command trees
+    Multi-user authentication
+    Per user command histories
+    Multiple authentication servers
+    Audit log support
+    International support for all command descriptions, help documentation, and argument help
+    Hardware interaction framework as an example 
+    Fully working cli.pl example
+    Apache style configuration file
+    Separate vendor and user parts to the configuration file
+    Uses log4perl for debugging
+
+
+INSTALLATION
+    To install this module type the following:
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+    Mac OSX Lion
+        Mac OSX does not have support natively for GNU's readline libraries.  As such things like
+        perl's Term::ReadLine::Gnu will not install via CPAN or otherwise.  I got this to work by
+        using Homebrew to install readline (https://github.com/mxcl/homebrew/wiki/installation) and
+        then linking to the readline libraries when I built the makefile in Perl.  NOTE: Homebrew
+        installs core libraries and things like readline in a out-of-the-way directory so that other
+        things do not break.  Here are the steps I followed:
+        1) Install Homebrew.  Run the following from a terminal window/shell:
+            /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/gist/323731)"
+        2) Update Homebrew
+            brew update
+        3) Install readline
+            brew install readline
+        4) Download Term::ReadLine::Gnu from CPAN and untar
+        5) Make makefile, make, and install
+            perl Makefile.PL --includedir=/usr/local/Cellar/readline/6.2.1/include --libdir=/usr/local/Cellar/readline/6.2.1/lib
+            make
+            make install
+
+
+DOXYGEN
+    Term::RouterCLI uses Doxygen for documentation.  Here are some notes for getting Doxygen working
+    various platforms.
+    
+    The dot tool is required for dependency graphs and you can get binary builds for OSX Lion at:
+    http://www.graphviz.org/
+    
+    Mac OSX Lion
+        When you install Doxygen it will add the doxywizard application just called "Doxygen" in the
+        Applications directory.  A symlink will need to be created to allow command line (terminal)
+        access to the command line doxygen program.  This can be done with:
+        ln -s /Applications/Doxygen.app/Contents/Resources/doxygen /usr/local/bin/
+
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+    Config::General (2.50)          [License = Perl]
+    Digest::SHA (5.62)              [License = Perl]
+    Env (1.00)                      [License = Perl]
+    FileHandle (2.02)               [License = Perl]
+    Log:Log4perl (1.33)             [License = Perl]
+    parent (0.221)                  [License = Perl]
+    POSIX (1.17)                    [License = Perl]
+    Sys::Syslog (0.29)              [License = Perl]
+    Term::ReadKey (2.30)            [License = Opensource]
+    Term::ReadLine::Gnu (1.20)      [License = Perl]
+    Test::More (0.98)               [License = Perl]
+    Test::Output (1.01)             [License = Perl]
+    Text::Shellwords::Cursor (0.81) [License = MIT]
+    Ethtool (http://www.kernel.org/pub/software/network/ethtool/)
+
+
+NOTES
+    The tarball has a fully working example 
+    
+    I use a modified version of Ethtool so as to get rid of some STDERR messages.
+    
+    To find out what version of a module you have installed run something like the following
+        perl -MDigest::SHA -e 'print "$Digest::SHA::VERSION\n"'
+
+
+LICENCE INFORMATION
+    See the LICENSE file included with this package for license details. 
+
+
+AUTHOR
+    Bret Jordan, jordan at open1x littledot org, jordan2175 at gmail littledot com
+
+
+COPYRIGHT
+    Copyright (C) 2011 by Bret Jordan all rights reserved
+

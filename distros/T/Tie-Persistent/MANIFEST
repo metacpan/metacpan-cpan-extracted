@@ -1,0 +1,6 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+Persistent.pm
+t/test.t

@@ -1,0 +1,21 @@
+---
+abstract: 'Role to vizualise TreePath Graph'
+author:
+  - 'Daniel Brosseau <dab@catapulse.org>'
+build_requires:
+  Test::Most: '0'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TreePath-Role-Graph
+requires:
+  GraphViz2: '2.34'
+  TreePath: '0.19'
+version: '0.07'

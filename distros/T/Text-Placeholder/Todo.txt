@@ -1,0 +1,5 @@
+What needs to be done for future releases:
+
+- improve coverage of tests
+
+(This is not meant to be complete; just a reminder.)

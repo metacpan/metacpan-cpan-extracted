@@ -1,0 +1,4 @@
+name = "Test-MockTime-HiRes"
+authority="cpan:TARAO"
+module_maker="ModuleBuildTiny"
+badges = ['travis']

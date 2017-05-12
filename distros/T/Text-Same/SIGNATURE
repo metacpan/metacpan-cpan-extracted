@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b00b5c815341a4b01ceeada6dd1cd4d921bacfe7 Changes
+SHA1 d61dad310320e8dfffb61f26dedce054eab4ef27 MANIFEST
+SHA1 2ce9b469c300804c9bc59de1b54a406107a58d39 META.yml
+SHA1 6d6d2440199da64f9b6a4accbc381af000a7344e Makefile.PL
+SHA1 8a78360f909de733708c8fb9dfd4baa896b8b8d9 README
+SHA1 89ee67e40d70dbb1613b94d5fa54cb09c78c651c bin/psame
+SHA1 6ebd8c9c34b7dfa8b7745aff7595964c4f3d8e5d etc/increment_mod_version.pl
+SHA1 3ee8846db0c7ab1e2543d70d6b36be48ddec9046 lib/Text/Same.pm
+SHA1 7fdda62d4b9f46896af77c04822fe8bbafa0c227 lib/Text/Same/Cache.pm
+SHA1 927e27ea7326b9143a5fc320cf6687833b4e91f5 lib/Text/Same/ChunkPair.pm
+SHA1 909325c984f0f3c479077228714c575c2ff09d50 lib/Text/Same/ChunkedSource.pm
+SHA1 2a7434cda78fbecae5ed7671a08faf3de7eefb4e lib/Text/Same/FileChunkedSource.pm
+SHA1 b4da357a970f76d2573ba6e5e102dcbeb08d87f0 lib/Text/Same/Match.pm
+SHA1 1f905c18d6b7afbec695d0c27f0cc92990aaca48 lib/Text/Same/MatchMap.pm
+SHA1 302ef9c228e3f9b0eb52b05b1f3c18370a7f285c lib/Text/Same/Range.pm
+SHA1 2a9f80c11d0ffce60533654458aec1b4d56393ae lib/Text/Same/TextUI.pm
+SHA1 cc08d1fbe3b73216df94c7f7dacab6fcb086c0ad lib/Text/Same/Util.pm
+SHA1 7c030e81fdf98fc72896db0d56b1e1dd38404130 t/00-load.t
+SHA1 af89d74757f6f6210d9afa7a22a6ebdcf5bb6f2d t/chunked_source.t
+SHA1 4b88b23584eb7642e62863131276622679d4488a t/data/test1/file1
+SHA1 d89c07b7035b4691b5734f1d1147407df2393804 t/data/test1/file2
+SHA1 dba7673010f19a94af4345453005933fd511bea9 t/data/test10/file1
+SHA1 fc570b2810ce8b60a3d31a7d15e36d8e34656015 t/data/test10/file2
+SHA1 396f5be1e1bbc2b366b3e74854fd8bc4e542f693 t/data/test11/file1
+SHA1 fe908f3fb03e63076876c9278fa1289ac8d15ae2 t/data/test11/file2
+SHA1 c948fe0e69e027206dc44779a339752bbf8ffd68 t/data/test12/file1
+SHA1 27e597c3a71105f16657e3515d97361d1009c1b6 t/data/test12/file2
+SHA1 d89c07b7035b4691b5734f1d1147407df2393804 t/data/test2/file1
+SHA1 d89c07b7035b4691b5734f1d1147407df2393804 t/data/test2/file2
+SHA1 c4610601c6098903b7692258cb51caf559e83942 t/data/test3/file1
+SHA1 c4610601c6098903b7692258cb51caf559e83942 t/data/test3/file2
+SHA1 5affe489c4a01e20827e90fd1dfae78e4b8b6040 t/data/test4/file1
+SHA1 85424eade35eaa1e7ee4718a86e06f1eef315369 t/data/test4/file2
+SHA1 18e2a4266947c2de04c78a23faec7e5391cc2861 t/data/test5/file1
+SHA1 b7789a35792d7df2625e6959359902d7415ae65c t/data/test5/file2
+SHA1 00009fd9cf1bc28e7c6aacbbe0378330f89e20f4 t/data/test6/file1
+SHA1 380a09574dce17f2315e9e12051ab18357134a2d t/data/test6/file2
+SHA1 bf90c9d6c5c2ebc280395e1d4dc3d5de95fe90aa t/data/test7/file1
+SHA1 4ede56bade9d916acd6907b26b8627473e8ee194 t/data/test7/file2
+SHA1 e3414db6fa5dab9b0b856d1736f39dc220bf9d50 t/data/test8/file1
+SHA1 259aa0fe249003a6a0cf6ed16da36c8a907aaeb7 t/data/test8/file2
+SHA1 fb8dbd287ca32909f509d14e5ea78906027b8569 t/data/test9/file1
+SHA1 fb8dbd287ca32909f509d14e5ea78906027b8569 t/data/test9/file2
+SHA1 f88825b60ed2bf423896684b30909c47ad0a322a t/match.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 a1354f333f2da1097adfaa465ac1025ecf5668c4 t/textui.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFH0/5JnmNgKRvzHEMRAraBAKCQTPJZGz/jx/5FXS/KFs10qUD6VgCfd+CI
+37XcG1fPQ0YhrUdh7RsIX8E=
+=S1MP
+-----END PGP SIGNATURE-----

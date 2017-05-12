@@ -1,0 +1,46 @@
+Revision history for Test-Pod-LinkCheck
+
+0.008 2014-11-02T00:38:23Z UTC
+ - Updates to the automatically-generated files ( thanks RT#76821 )
+ - Suppress warnings and deaths in various places ( thanks RT#73280 and
+   RT#83182 and RT#76342 phew! )
+ - Improve the test output to help track down failures
+ - Automatically enable verbose if $ENV{HARNESS_IS_VERBOSE} or
+   $ENV{TEST_VERBOSE} ( thanks RT#76342 )
+ - Add a new backend 'MetaDB' which queries the same online database
+   cpanminus uses as a last resort ( thanks RT#77976 )
+ - Add a new backend 'MetaCPAN' which queries MetaCPAN as a last last
+   resort :)
+ - Add a new backend 'CPANIDX' which queries cpanidx.org as a last last
+   last resort ;)
+
+ [STATISTICS]
+ - code churn: 5 files changed, 219 insertions(+), 76 deletions(-)
+
+0.007 2011-04-22T04:31:32Z UTC
+ - Finally fix a long-standing testsuite FAIL, I hope! ( thanks RT#67126
+   and RT#65752 )
+
+0.006 2011-04-21T17:17:08Z UTC
+ - Add the ability to scan for perlfunc stuff ( thanks RT#67625 )
+
+0.005 2011-02-21T21:56:25Z UTC
+ - Squashed some test failures by skipping them, thanks CPANTesters!
+ - Re-worded the output to make it clearer
+ - Changed the "verbose" attr to false by default
+ - Add the "cpan_backend_auto" attr to control automatic backend selection
+   logic
+ - Clarified a lot of things in the POD
+
+0.004 2010-05-28T04:29:48Z UTC
+ - ready for CPAN
+
+0.003 2010-05-28T04:26:57Z UTC
+ - fixed the SIGNATURE stuff
+
+0.002 2010-05-28T04:20:14Z UTC
+ - fix stopwords for POD spelling test
+
+0.001 2010-05-28T04:16:42Z UTC
+ - initial release
+

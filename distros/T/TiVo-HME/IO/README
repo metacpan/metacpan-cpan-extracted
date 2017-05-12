@@ -1,0 +1,25 @@
+TiVo/HME/IO version 1.x
+========================
+
+This object handles the 'Chunked' encoded binary stream of the HME protocol.
+You most likely don't need to use anything here.
+It's used by Application & Server to send & receive data from a TiVo.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Mark Ethan Trostler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

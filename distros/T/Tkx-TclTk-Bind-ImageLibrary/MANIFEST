@@ -1,0 +1,16 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/pod.t
+xt/boilerplate.t
+lib/Tkx/TclTk/Bind/ImageLibrary.pm
+lib/Tkx/TclTk/Bind/TAR/image.darwin.xx.tar
+lib/Tkx/TclTk/Bind/TAR/image.linux.32.tar
+lib/Tkx/TclTk/Bind/TAR/image.linux.64.tar
+lib/Tkx/TclTk/Bind/TAR/image.mswin.32.tar
+lib/Tkx/TclTk/Bind/TAR/image.mswin.64.tar
+META.yml
+META.json

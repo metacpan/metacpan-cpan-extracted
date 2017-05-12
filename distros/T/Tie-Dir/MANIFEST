@@ -1,0 +1,4 @@
+Dir.pm
+MANIFEST
+Makefile.PL
+t/dir.t

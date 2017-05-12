@@ -1,0 +1,30 @@
+
+
+
+  Heh
+
+
+
+  (Diagnostic message):
+
+    Heh:
+
+      ✓
+      ok { 1 }; # Parent
+         at eg/coordinate_forks.t line 10
+
+      ♨
+      Diagnostic from parent
+         at eg/coordinate_forks.t line 11
+
+      ✖
+      ok { 0 }; # Child
+         at eg/coordinate_forks.t line 15
+
+      ♨
+      Diagnostic from child
+         at eg/coordinate_forks.t line 16
+
+
+not ok
+1..1

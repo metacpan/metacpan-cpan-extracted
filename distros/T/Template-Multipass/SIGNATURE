@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1d2879ab335fc7b1da5cacf3769718176109243f Changes
+SHA1 d2f5a7a814edae82e637071cb96b8b7010c21c9f MANIFEST
+SHA1 832f2dc2663c4e643e8f2443f4d28ec6d58755a8 META.yml
+SHA1 c71c38d9897f6cb42e9219b1a5922f72efc7648f Makefile.PL
+SHA1 55cfa2ba8a07ab2ca72b558c2a14c4ec00825a11 README
+SHA1 54975d5119debbc29a7deba6d508217786ec1318 lib/Template/Multipass.pm
+SHA1 21f0cdd97393dd7674bcd006f403eb874abcb9bd lib/Template/Multipass/Provider.pm
+SHA1 46682b793bc7fd1f32820f1f53c47da6bfd14872 t/00_use.t
+SHA1 9cde2d9aa1a8b9279d51260d653cece67ab0b1f3 t/01_basic.t
+SHA1 8595a120de01ee38000dc3bee519b7077a8f49c8 t/02_perf.t
+SHA1 430bd05c0b14a7473fc426687ed4f8c651aa6c7b t/03_misc.t
+SHA1 a9b12dc1a5e8e033ce6bf9e56d9b4dbb8ece6153 t/04_errors.t
+SHA1 6ab3ed743a2f577282711b466e86debda6831f7b t/templates/bar.tt
+SHA1 9e600399d5c0e93037a89d512c7184faa7e45ce8 t/templates/bar_meta.tt
+SHA1 0e7755c3da49ad34d0d817fb9840e7ad4c1d056c t/templates/foo.tt
+SHA1 994470e41cd030b1221489a03167b0654a943814 t/templates/include.tt
+SHA1 7546752fbcdef7bb77fdd180c2d6bbab993f805a t/templates/process.tt
+SHA1 4ea42b50613acaf7f0867313d4ee51ac27ae844a t/templates/wrapper.tt
+SHA1 7e5263b1d33f229a7ecb8eeed873e573afd6c269 t/templates/wrapper2.tt
+SHA1 8c9a20d2ef51c0b69b54dfa99de9723c8fbfafe2 t/templates/wrapper_test.tt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFH7qtsVCwRwOvSdBgRAj2IAJ0aqWV4ao2JsOtPy5/qLh8wEoe/oACfdn7R
+/qp/v8FBtMWbiLikhaXqbrU=
+=+2DQ
+-----END PGP SIGNATURE-----

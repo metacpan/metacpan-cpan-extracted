@@ -1,0 +1,21 @@
+
+  =================
+   Message Summary
+  =================
+
+Num  Sev    Id                      Message Text                    
+--------------------------------------------------------------------
+  1 Info LBR-109 Set default library domain.                        
+  1 Info LBR-412 Created nominal operating condition.               
+                 The nominal operating condition represents either  
+                 the nominal PVT values if specified in the         
+                 library source, or the default PVT values (1.0,    
+                 1.0, 1.0).                                         
+  2 Info LBR-415 Library Information.                               
+                 The number of unusable cells that is listed        
+                 depends on the setting of the 'information_level'  
+                 root attribute. If set to a value less than 6,     
+                 the list is limited to 10 unusable cells. If set   
+                 to a value equal to or higher than 6, all          
+                 unusable cells are listed.                         
+

@@ -1,0 +1,79 @@
+Revision history for Perl extension Tree::Parser.
+
+0.15 Tues. Oct. 2, 2007
+    - added support for different file encodings
+      when reading .tree files
+
+0.14 Monday, July 9, 2007
+    - forgot to add fixed method name to POD
+
+0.13 Monday, July 9, 2007
+    - fixed infinite loop bug in NestedParensFilters thanks to Eneko Agirre
+        - added test for this
+    - fixed spelling issue in method name useDotSeparatedLevelFilters
+      kept the original mispelled method aliased to preserve backwards 
+      compat. Thanks to Steven Jenkins for this. 
+
+0.12 Monday May 21, 2007
+    - added handling for files which are not named *.tree
+    - Now also accepts objects stringifying to file path's
+      for use with Path::Class
+      - including tests
+
+0.11 Tues May 31, 2005
+    - fixed RT Bug# 13041 thanks to Gerd for the 
+      solution
+
+0.10 Mon Apr 11, 2005
+    - fixed RT Bug# 12244 thanks to Chad Ullman for
+      both the code and test case
+
+0.09 Mon Jan 10, 2004
+    - added the option of returning a Tree::Simple
+      object, instead of just the node value from a
+      parse filter. 
+        - added tests and docs for this
+
+0.08 Thurs Nov 18 2004
+    - now using Scalar::Util::blessed() instead of 
+      the convoluted UNIVERSAL::isa() stuff. 
+      - added Scalar::Util as a dependency
+
+0.07 Tues Aug 31 2004
+    - added the nested parens default filter.
+        - added tests for this 
+        - added documentation for this
+
+0.06 Tues May 18 2004
+    - some interal tweaks to facilitate using Tree::Simple
+      subclasses more easily, and added some documentation
+      to that point.
+
+0.05 Tues May 18th 2004
+    - Forgot to update the dependecies (Array::Iterator
+      and Tree::Simple) to their latest versions, which 
+      is nessecary for the new parse filter.
+
+0.04 Mon May 17th 2004
+    - Added new default filter to parse dot seperated
+      levels, see the documentation for it.
+        - added tests for this, and reworked some other
+          tests to be accomidate
+        - added documenation for it
+
+0.03 Thurs May 6 2004
+    - Forgot to add the dependencies (Array::Iterator and
+      Tree::Simple) to the Makefile.PL, no other updates
+
+0.02 Wed May 5 2004
+    - Added some default filters for parsing tab indented
+      and space indented files. Also added some tests for 
+      these as well. 
+    - Added new test to check parse errors.
+    - Updated the documenation as needed and tweaked the
+      code examples a bit.
+
+0.01  Thu Apr 22 17:52:11 2004
+	- original version; created by h2xs 1.22 with options
+		-X -n Tree::Parser
+

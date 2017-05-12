@@ -1,0 +1,24 @@
+AUTHORS
+BUGS
+ChangeLog
+CHANGES
+contributors.txt
+COPYING
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+lib/Test/Module/Runnable.pm
+LICENCE
+Makefile.PL
+MANIFEST			This list of files
+NEWS
+README
+t/lib/Private/Test/Module/Runnable/unique.pm
+t/tester.t
+t/tester_unique.t
+t/version.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

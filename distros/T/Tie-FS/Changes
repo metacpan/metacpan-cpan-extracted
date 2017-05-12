@@ -1,0 +1,6 @@
+Revision history for Perl module Tie::FS.
+
+0.1.0  Tue Jun 28 02:39:08 EDT 2011
+
+- Initial release.  This module was actually written over a decade ago, but
+  never previously released due to a namespace conflict on CPAN.

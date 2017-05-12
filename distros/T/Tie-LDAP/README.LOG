@@ -1,0 +1,12 @@
+
+* SNAP-19991010a
+
+Initial public version.
+Switched lower-level API to Net::LDAPapi.
+
+* SNAP-20000328a
+
+Now allows port # to be specified.
+Minor change in "always-true" expression, used to fetch all entries.
+More documentation.
+Cleaned up directory/file structure.

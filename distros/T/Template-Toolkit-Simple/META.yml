@@ -1,0 +1,32 @@
+---
+abstract: 'A Simple Interface to Template Toolkit'
+author:
+  - 'Ingy döt net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Toolkit-Simple
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+recommends:
+  JSON::XS: '0'
+  XML::Simple: '0'
+requires:
+  Template: '2.22'
+  YAML::XS: '0.37'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/template-toolkit-simple-pm/issues
+  homepage: https://github.com/ingydotnet/template-toolkit-simple-pm
+  repository: https://github.com/ingydotnet/template-toolkit-simple-pm.git
+version: '0.31'

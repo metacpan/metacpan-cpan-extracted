@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 84ca6c80a3cf9bd7a28b5cd996cf862768dbb901 CONTRIBUTORS
+SHA1 a00bb58697ab3cdc081b4415d5727cf9b0e10181 Changes
+SHA1 21696e04788daf443832163be15c96a621ae5381 LICENSE
+SHA1 cdfcbda21b9869fcd8a3e5f6dead32df5df8fdc9 MANIFEST
+SHA1 51b77af8663726ac44532bd25978d6ff478e1e58 META.yml
+SHA1 1908b1765fa13cbe81c385e5b077b3af77921fcc Makefile.PL
+SHA1 5e84dd67d33710d8d69383e3a9264eb8939a70bc README
+SHA1 088876bf6ec605f1e02b872733114e988add85c0 cpanfile
+SHA1 0b7f5def3694435e4237c4c4b48d16686986b3d7 dist.ini
+SHA1 908ac950d1a0465432c17c66a79678cbd8ef02c9 examples/01.pl
+SHA1 d8b94f8e3891e8ecc845c5de5be8c5cc8b102f2c lib/Text/API/Blueprint.pm
+SHA1 1aa22866215fb8bb0211939910115fb62be8c96b perlcritic.rc
+SHA1 a688f9aaba4f322cfbeb5bb31a7ab87c0639b14b t/00-check-deps.t
+SHA1 23e6ab0f30f4ee7d0ede1da142b8ae57f486f254 t/00-compile.t
+SHA1 4bc71d0b1dc144f5c4b33239f5a7f4215a758306 t/level-0.t
+SHA1 3766fd0842fa3f66aa6ab16433f13469f5997e3d t/level-1.t
+SHA1 cf318365f2b5645193942c3e8313236c7785fcbb t/level-2.t
+SHA1 c76ac9eff2c7c52287a39cf8e2dd9156ae0abecc t/level-3.t
+SHA1 b2c686ca631c737f08ece7b1ab2b040de3f56add t/level-4.t
+SHA1 b0ea51d7ff7e90f674c8bb241adb201a38e64bb5 t/level-5.t
+SHA1 f95f441d896f2181cede99f7f1b421830aeccf21 t/level-6.t
+SHA1 bbc614aee39078e0c91e8838c481fb259724a4b7 t/level-7.t
+SHA1 062c7873b49fcfaf807170502c4008aff710adce t/level-8.t
+SHA1 cadb89fc8348b9e92ab05e6c98c93b4d95e34cb5 t/print.t
+SHA1 d8a40a15485530eb26e34d750aac71b8b54ae91b t/tests.pm
+SHA1 a18fbcd423be6e54550c4960a5b99d2ce6feed67 tree.txt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJWsyCEAAoJEJVzeMw4kNooGQcP/3KjARkRUyAV/TmZvcBi5BbX
+GxA/s6qU1F5HZwY+ISt0XJdE96aPY62k8lzKlcG5GjblQhGQT+bY/azE995G2u5H
+Q2sZUNma9g1s8b6+GlrnRgSVFnB8zOjIGUMlj4X/+UlcDHCF9MeWUqnd7lSbydv4
+iTvTe7NdDZKypYIS/D05yXzrnIa9ls/QHWBO0oiyYuv5pvPrtT02mdMgoxIT12xl
+K2Q8PZljEitNcbCMpV07QvPO67BB1OmaR5djTiVYZ4TsV1u2uWdyNNlVFC8uE+av
+FEDFmADA3tVEh6gX/eIOW9HZmSPLpxBHsi4abTndj9H84kjL+XuNXXu/T7QiBMQL
+1hLgeN+hdVtq2+NpJLnYrGDtAjOW++tDAZRu+T3lGqg4uZ4pHhb0IKznlEoNWRYh
+lM/thSl8ilNnGrkRD4M21ece7iuQyr7p0u76o7PMVnGdSVAzfn8Cx7wil4YJU4G4
+ofD4QneXW7wK4PEBUN588lmQYJ/KkQ9QZhqNJqMxBpvasTevbZLL/Er5btfjU4/i
+vOyHJfDAIXUz3LzuXqnkZaTTrMQzgFzWkv9H4Yyg7H9w0M/66eFFdVLz5lwvZtql
+p1Fe8jdy4ZYusK6QWVEh6XgY63RM1xcsC/BUKfqSi5gu4DQiLmdEhovxrBIigWAH
+55AsCW5hTV8uCw+cEo3S
+=fIWH
+-----END PGP SIGNATURE-----

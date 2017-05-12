@@ -1,0 +1,84 @@
+{
+   "abstract" : "Simple mock test library using RAII.",
+   "author" : [
+      "Toru Yamaguchi <zigorou@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mock-Guard",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0.06",
+            "Exporter" : "5.63",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Mock::Guard" : {
+         "file" : "lib/Test/Mock/Guard.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zigorou/p5-test-mock-guard/issues"
+      },
+      "homepage" : "https://github.com/zigorou/p5-test-mock-guard",
+      "repository" : {
+         "url" : "git://github.com/zigorou/p5-test-mock-guard.git",
+         "web" : "https://github.com/zigorou/p5-test-mock-guard"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "chocolateboy <chocolate@cpan.org>",
+      "NAKAGAWA Masaki <masaki.nakagawa@gmail.com>",
+      "Toru Yamaguchi <yamaguchi.toru@51547-mac.dena.local>",
+      "Belden Lyman <blyman@shutterstock.com>",
+      "hitode909 <hitode909@gmail.com>",
+      "xaicron <xaicron@gmail.com>"
+   ]
+}

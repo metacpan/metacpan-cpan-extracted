@@ -1,0 +1,44 @@
+{
+   "abstract" : "Install everything for CPANPLUS to use Metabase",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102160",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-CPANPLUS-Metabase",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPANPLUS" : "0.9007",
+            "Metabase::Fact" : "0.017",
+            "Module::Load::Conditional" : 0,
+            "Term::UI" : 0,
+            "Test::Reporter" : "1.57",
+            "Test::Reporter::Transport::Metabase" : "1.999008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/bingos/perl-task-modules/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bingos/perl-task-modules.git",
+         "web" : "http://github.com/bingos/perl-task-modules/tree"
+      }
+   },
+   "version" : "0.08"
+}
+

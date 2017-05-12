@@ -1,0 +1,61 @@
+
+Changes made in Sense-Clusters version 0.63 during version 0.65
+
+Amruta Purandare amruta@cs.pitt.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+Ted Pedersen 	 tpederse@d.umn.edu
+
+1. Added the logic for discriminating/unique cluster labels to                    -Anagha
+   Toolkit/clusterlabel/clusterlabeling.pl 
+
+2. Added --format option functionality for sparse representation
+   of matrix in Toolkit/vector/wordvec.pl                                        -Anagha
+
+3. Added the logic for filtering out 0's from the input matrix
+   as well as the ones introduced because of formating to wordvec.pl             -Anagha
+
+4. Re-organized controls and made some visual changes to 
+   Web/SC-cgi/index.cgi
+   Web/SC-cgi/second.cgi
+   Web/SC-cgi/third.cgi
+   Web/SC-cgi/fourth.cgi                                                         -Anagha
+
+5. Added the following validations to discriminate.pl
+   1. test scope option valid only for input data with-head tags.
+   2. train scope option valid only for train data with-head tags.                -Anagha
+
+6. Modified the logic for checking if discriminate.pl executed without
+   errors in Web/SC-cgi/callwrap.pl                                               -Anagha
+
+7. Modified Toolkit/clusterlabel/clusterlabeling.pl to give both the
+   kind of labels - Descriptive and Discriminating 
+   And so removed the --unique option                                             -Anagha
+
+8. Modified Web/SC-cgi/callwrap.pl and /Web/SC-cgi/fourth.cgi for the
+   changes mentioned in point #7 above                                            -Anagha
+
+9. Changed the rank options default value to 10 from none                         -Anagha
+
+10. Augmented the logic for removing the Null columns to 
+    /Toolkit/vector/order1vec.pl, thus now svd can be used with 
+    order 1 context representation.                                               -Anagha                      
+ 
+11. Turned on the Taint mode for the SenseClusters web-interface and
+    implemented the required changes in the *.cgi files.                          -Anagha
+
+12. Added few clustering related option validations to SC web-interface           -Anagha
+
+13. Opened up the option of performing svd with 1st order context 
+    representation for the web-interface                                          -Anagha
+
+14. Added a test-case for the modified order1vec.pl                               -Anagha
+ 
+15. Added the svd branch for order1 representation in the flow diagram:
+    /Docs/Flows/flowchart.fig and /Docs/Flows/flowchart.pdf                       -Anagha
+
+16. Added the lower bound of 10 for svd's dimensonality reduction.                -Anagha
+
+17. Modified the logic of checking if discriminate.pl executed without
+    errors in Web/SC-cgi/callwrap.pl                                              -Anagha
+
+(Changelog-v0.63to0.65 Last Updated on 03/08/2005 by Anagha)

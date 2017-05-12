@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Tree-Family
+version:            0.02
+abstract:           Represent and visualize a family tree.
+author:
+    - Brian Duggan <bduggan@matatu.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Algorithm::Permute:   0
+    Clone:                0
+    Data::Faker:          0
+    File::Temp:           0
+    Lingua::EN::NameParse:  0
+    List::MoreUtils:      0
+    List::Util:           0
+    Sub::Installer:       0
+    Test::More:           0
+    Text::GenderFromName:  0
+    YAML::XS:             0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

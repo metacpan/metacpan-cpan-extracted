@@ -1,0 +1,25 @@
+---
+name: Tree-Easy
+version: 0.01
+author:
+  - 'Justin Davis <jrcd83@gmail.com>'
+abstract: 'An easy, simple & fast N-ary tree datatype'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  List::Util: 0
+  Scalar::Util: 0
+  Text::Wrap: 0
+build_requires:
+  Test::More: 0
+provides:
+  Tree::Easy:
+    file: lib/Tree/Easy.pm
+    version: 0.01
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,6 @@
+#!/usr/local/bin/perl -w
+require 5;
+use Text::EP3;
+my $file = Text::EP3->new;
+$file->ep3_execute;
+1;

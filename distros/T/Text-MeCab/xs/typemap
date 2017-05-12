@@ -1,0 +1,51 @@
+TYPEMAP
+TextMeCab*              T_MECAB
+TextMeCab_Node*         T_MECAB_NODE
+TextMeCab_Node_Cloned * T_MECAB_NODE_CLONE
+
+INPUT
+T_MECAB
+    {
+        MAGIC *mg;
+        $var = NULL;
+        mg = TextMeCab_mg_find(aTHX_ SvRV($arg), &TextMeCab_vtbl);
+        if (mg) {
+            $var = (TextMeCab *) mg->mg_ptr;
+        }
+    }
+
+T_MECAB_NODE
+        $var = XS_STATE(TextMeCab_Node *, $arg);
+
+T_MECAB_NODE_CLONE
+        $var = XS_STATE(TextMeCab_Node_Cloned *, $arg);
+
+OUTPUT
+T_MECAB
+        if (!$var)          /* if null */
+            SvOK_off($arg); /* then return as undef instead of reaf to undef */
+        else {
+            /* setup $arg as a ref to a blessed hash hv */
+            MAGIC *mg;
+            HV *hv = newHV();
+            const char *classname = \"Text::MeCab\";
+            /* take (sub)class name to use from class_sv if appropriate */
+            if (class_sv && SvOK(class_sv) && sv_derived_from(class_sv, classname))
+                classname = (SvROK(class_sv)) ? HvNAME(SvSTASH(class_sv)) : SvPV_nolen(class_sv);
+            sv_setsv($arg, sv_2mortal(newRV_noinc((SV*)hv)));
+            (void)sv_bless($arg, gv_stashpv(classname, TRUE));
+
+            /* now attach $var to the HV */
+            /* done as two steps to avoid sv_magic SvREFCNT_inc and MGf_REFCOUNTED */
+            /* sv_magic((SV*)hv, NULL, '~', NULL, 0);*/
+            /* PKETAMA_STATE_FROM_SV($arg) = (void *) $var; */
+            mg = sv_magicext((SV*)hv, NULL, PERL_MAGIC_ext, &TextMeCab_vtbl, (char*) $var, 0); /* sizeof($var));  */
+            mg->mg_flags |= MGf_DUP;
+        }
+
+T_MECAB_NODE
+        XS_STRUCT2OBJ($arg, "Text::MeCab::Node", $var);
+
+T_MECAB_NODE_CLONE
+        XS_STRUCT2OBJ($arg, "Text::MeCab::Node::Cloned", $var);
+

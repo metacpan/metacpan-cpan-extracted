@@ -1,0 +1,6 @@
+lib/Tk/DBI/DBGrid.pm
+lib/Tk/DBI/DBGrid.pod
+lib/Tk/DBI/DBGrid.ru.pm
+Makefile.PL
+MANIFEST
+README

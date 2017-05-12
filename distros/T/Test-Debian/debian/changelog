@@ -1,0 +1,23 @@
+libtest-debian-perl (0.06-1) unstable; urgency=medium
+
+  * Extends package test syntax.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 18 Oct 2016 17:20:08 +0300
+
+libtest-debian-perl (0.03-1) unstable; urgency=low
+
+  * Fix ok error.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 08 Dec 2012 21:12:42 +0400
+
+libtest-debian-perl (0.02-1) unstable; urgency=low
+
+  * Test for several package names.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 08 Dec 2012 19:55:37 +0400
+
+libtest-debian-perl (0.01-1) unstable; urgency=low
+
+  * Debian first commit, closes: #680178
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 04 Jul 2012 13:54:53 +0400

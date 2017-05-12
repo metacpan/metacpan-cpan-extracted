@@ -1,0 +1,74 @@
+$Header: /cvsroot/TextQuery/Text-Query-SQL/README,v 1.4 2000/03/21 14:10:48 benj2 Exp $
+
+The Text-Query-SQL home page is http://www.senga.org/Text-Query-SQL/
+
+What is it ?
+------------
+
+Text-Query-SQL is derived from the Text-Query module.
+What is Text-Query then ? It is a general purpose query
+parser and resolver. It is able to parse the AltaVista 'simple
+query' and 'advanced query' syntax. The resulting syntax tree
+is then used to build a search query that depends on the 
+database used. 
+
+Text-Query-SQL provides query builders for
+SQL databases. Searching 'foo and bar' will retrieve rows containing
+the words foo and bar. It does it by generating the appropriate SQL
+request.
+
+At present Text-Query-SQL only supports MySQL and Fulcrum's
+SearchServer but one could easily add support for any other database
+(see DATABASE file), the module was architectured to make this easy.
+
+Where is the documentation ?
+----------------------------
+
+See the following manual pages : Text::Query::BuildSQL(3),
+Text::Query::BuildSQLFulcrum(3), Text::Query::BuildSQLMySQL(3),
+Text::Query::BuildSQLPg(3), Text::Query::SolveSQL(3)
+
+How to install it ?
+-------------------
+
+perl -MCPAN -e 'install Bundle::Text::Query::BuildSQL'
+
+And if you want to do it by hand
+
+gtar -zxvf Text-Query-SQL-*.tar.gz
+
+cd Text-Query-SQL-*[0-9]
+
+perl Makefile.PL
+
+make all
+
+make test
+
+If you want to run tests that create a table and exercise search expressions on it
+you should try the following:
+
+For MySQL:
+
+DBI_DSN=dbi:mysql:mysql DBI_USER=user DBI_PASS=passpass make TEST_FILES=t/04mysql.t test
+
+For Fulcrum:
+
+FULCRUM_HOME=/opt/fulcrum FULCREATE=/tmp FULSEARCH=/opt/fulcrum/fultext:/tmp \
+  DBI_DSN=dbi:SearchServer: DBI_USER='' DBI_PASS='' \
+  make TEST_FILES=t/02fulcrum.t test
+
+For PostgreSQL:
+
+DBI_DSN=dbi:Pg:dbname=test DBI_USER=user DBI_PASS=pass make TEST_FILES=t/06Pg.t test
+
+make install
+
+Where can I download it ?
+-------------------------
+
+The Text-Query-SQL home page is http://www.senga.org/Text-Query-SQL/
+
+Loic Dachary
+loic@senga.org
+http://www.senga.org/

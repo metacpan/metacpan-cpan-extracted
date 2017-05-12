@@ -1,0 +1,28 @@
+#! /usr/local/bin/perl -w
+#
+# cb2 - Another simple callback demonstration, showing how
+#       a T::C::S object can interact with the outside
+#
+# This file is part of the Tie::Cycle::Sinewave perl extension
+# Copyright (c) 2005 David Landgren. All rights reservered.
+
+use strict;
+use Tie::Cycle::Sinewave;
+
+my $at_min = 0;
+my $at_max = 0;
+
+tie my $c, 'Tie::Cycle::Sinewave', {
+    start_max => 1,
+    min       => 0,
+    max       => 100,
+    period    => 12,
+    at_max    => sub { ++$at_max },
+    at_min    => sub { ++$at_min },
+};
+
+my $iter = 0;
+while( 1 ) {
+    printf "%3d %10.2f %2d %2d\n", ++$iter, $c, $at_min, $at_max;
+    select undef, undef, undef, 0.2;
+}

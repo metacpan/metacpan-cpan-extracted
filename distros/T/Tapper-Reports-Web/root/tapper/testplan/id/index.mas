@@ -1,0 +1,22 @@
+<%args>
+$instance => {}
+$error    => ''
+</%args>
+
+% if($error) {
+<h3>An error occured</h3>
+<% $error %>
+% }
+<h3>
+        Testplan <strong><% $instance->{id} %></strong>:
+        <strong><% $instance->{name} %></strong>
+</h3>
+<h4>Testruns</h4>
+  <& /tapper/testruns/testrunlist.mas,  testrunlist => $instance &>
+<h4>Testplan specification</h4>
+ <& /tapper/testplan/testplan_overview.mas, path => $instance->{path}, overview => $instance->{overview} &>
+
+<h4>Evaluated Testplan</h4>
+<pre>
+<% $instance->{plan} %>
+</pre>

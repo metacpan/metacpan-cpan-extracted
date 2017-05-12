@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Term-ReadLine-TTYtter
+version:            1.4
+abstract:           A Term::ReadLine driver based on Term::ReadLine::Perl, with special features for microblogging and the TTYtter client (q.v).
+author:
+    - Cameron Kaiser <ckaiser@floodgap.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl: 5.006
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       your-mother
+resources:
+    homepage: http://www.floodgap.com/software/ttytter/
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

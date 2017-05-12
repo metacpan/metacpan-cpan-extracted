@@ -1,0 +1,65 @@
+NAME
+    Tree::BK - Structure for efficient fuzzy matching
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+            use Tree::BK;
+            my $tree = Tree::BK->new();
+            $tree->insert(qw(cuba cubic cube cubby thing foo bar));
+            $tree->find('cube', 1); # cuba, cube
+            $tree->find('cube', 2); # cuba, cubic, cube, cubby
+
+DESCRIPTION
+    The Burkhard-Keller, or BK tree, is a structure for efficiently
+    performing fuzzy matching. By default, this module assumes string input
+    and uses "distance" in Text::Levenshtein::XS to compare items and build
+    the tree. However, a subroutine giving the distance between two tree
+    members may be provided, making this structure more generally usable.
+
+METHODS
+  "new"
+     Tree::BK->new(\&metric);
+
+    Creates a new instance of Tree::BK. A metric may be provided as an
+    argument. It should be a subroutine which takes two tree members as
+    arguments and returns a positive integer indicating the distance between
+    them. If no metric is provided, then the tree members are assumed to be
+    strings, and "distance" in Text::Levenshtein::XS is used as the metric.
+
+  "insert"
+    Inserts an object into the tree. Returns nothing if the object was
+    already in the tree, or the object if it was added to the tree.
+
+  "insert_all"
+    Inserts all of the input objects into the tree. Returns the number of
+    objects that were added to the tree (i.e. the number of objects that
+    weren't already present in the tree).
+
+  "find"
+     $tree->find($target, $distance)
+
+    Returns an array ref containing all of the objects in the tree which are
+    at most $distance distance away from $target.
+
+  "size"
+    Returns the number of objects currently stored in the tree.
+
+SEE ALSO
+    These sites explain the concept of a BK tree pretty well:
+
+    *   <http://nullwords.wordpress.com/2013/03/13/the-bk-tree-a-data-struct
+        ure-for-spell-checking/>
+
+    *   <http://blog.notdot.net/2007/4/Damn-Cool-Algorithms-Part-1-BK-Trees>
+
+AUTHOR
+    Nathan Glenn <nglenn@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Nathan Glenn.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

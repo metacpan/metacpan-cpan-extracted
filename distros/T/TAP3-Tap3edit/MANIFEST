@@ -1,0 +1,38 @@
+ChangeLog			History
+examples/tap3edit_camel_remover
+examples/tap3edit_display
+examples/tap3edit_get_info
+inc/parent.pm
+inc/Test/More.pm
+inc/Test/Builder.pm
+inc/Test/Builder/Module.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install.pm
+inc/PerlIO.pm
+lib/TAP3/Spec/RAP0101.asn	Specification RAP1.1
+lib/TAP3/Spec/RAP0102.asn	Specification RAP1.2
+lib/TAP3/Spec/RAP0103.asn	Specification RAP1.3
+lib/TAP3/Spec/RAP0104.asn	Specification RAP1.4
+lib/TAP3/Spec/RAP0105.asn	Specification RAP1.5
+lib/TAP3/Spec/TAP0301.asn	Specification TAP3.1
+lib/TAP3/Spec/TAP0302.asn	Specification TAP3.2
+lib/TAP3/Spec/TAP0303.asn	Specification TAP3.3
+lib/TAP3/Spec/TAP0304.asn	Specification TAP3.4
+lib/TAP3/Spec/TAP0309.asn	Specification TAP3.9
+lib/TAP3/Spec/TAP0310.asn	Specification TAP3.10
+lib/TAP3/Spec/TAP0311.asn	Specification TAP3.11
+lib/TAP3/Spec/TAP0312.asn	Specification TAP3.12
+lib/TAP3/Spec/NRT0201.asn	Specification NRT2.01
+lib/TAP3/Tap3edit.pm		TAP3::Tap3edit Module
+lib/TAP3/Tap3edit.pod		TAP3::Tap3edit Documentation
+Makefile.PL			Writes the makefile
+MANIFEST			This file
+META.yml
+README				Read this first!
+t/TAP3-Tap3edit.t

@@ -1,0 +1,44 @@
+---
+abstract: 'fuzzy number comparison with Test::Deep'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Deep-Fuzzy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Deep::Fuzzy:
+    file: lib/Test/Deep/Fuzzy.pm
+    version: '0.01'
+  Test::Deep::Fuzzy::Number:
+    file: lib/Test/Deep/Fuzzy/Number.pm
+requires:
+  Exporter: '5.57'
+  Math::Round: '0'
+  Scalar::Util: '0'
+  Test::Deep::Cmp: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/Test-Deep-Fuzzy/issues
+  homepage: https://github.com/karupanerura/Test-Deep-Fuzzy
+  repository: git://github.com/karupanerura/Test-Deep-Fuzzy.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

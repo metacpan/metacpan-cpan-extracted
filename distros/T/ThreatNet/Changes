@@ -1,0 +1,47 @@
+Revision history for Perl extension ThreatNet::Bot::AmmoBot
+
+0.20 Thu 14 Feb 2008
+	- For simplification of maintenance, merged all ThreatNet
+	  modules excluding the original design document into one
+	  big distribution.
+	- Updated test and Makefile.PL to current style
+	- Added a ThreatNet.pm loader
+	- Updated to Module::Install 0.75
+	- Stop the use of auto_install();
+
+0.10 Thu Jun 23 2005
+	- Adding support for turningoff flood protection
+	- Use ::Plugin::Connector to maintain the connection
+
+0.09 Tue Jun 21 2005
+	- Added support for a server password
+
+0.08 Mon Jun 20 2005
+	- Added a proper fix for pipes
+
+0.07 Sun Jun 19 2005
+	- Added more docs on cron-friendlyness
+	- Added a check for when we have a threat, but not
+	  a working IRC object.
+	- Added support for pipes as input
+	- Add the current cache size to the stats
+
+0.06 Wed Jun 15 2005
+	- Speaks some stats now, I hope
+
+0.05 Fri Jun 10 2005
+	- Added some additional tests to make sure ammobot compiles
+
+0.04 Fri Jun 10 2005
+	- Adding a process lock to ammobot to make it more
+	  friendly with cron auto-restart scripts.
+
+0.03 Wed Jun  8 2005
+	- Converted to use a config file
+	- Added multiple file support
+
+0.02 Mon Apr 16 2005
+	- Fixed a variety of small bugs
+
+0.01 Wed Apr 11 2005
+	- Created the initial version of the bot

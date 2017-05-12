@@ -1,0 +1,23 @@
+.X mtag -f xhtml -t enclose -c span -b « -e »
+.X mtag -f latex -t enclose -c emph -b « -e »
+«text»\~«text»
+.Ch «text»
+.#de macro
+«text»\~«text»
+«text» «text»
+«\$1»
+«text» :
+.#.
+.macro macro-text
+«text»\~«text»
+«text» «text»
+«text» :
+.Ft -f xhtml «Ft-text»
+.Sx «text»
+.Sm -t enclose Sm-text
+«
+.Sm -ns some text »
+.#de put
+\$1
+.#.
+.put «»

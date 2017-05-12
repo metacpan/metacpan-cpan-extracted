@@ -1,0 +1,6 @@
+name = "Text-Hyphen-TR"
+# badges = ["travis"]
+authority="cpan:KAPPA"
+
+module_maker="ModuleBuildTiny"
+

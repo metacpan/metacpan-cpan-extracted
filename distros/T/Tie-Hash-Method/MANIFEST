@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Tie/Hash/Method.pm
+t/00-load.t
+t/01-basic.t
+t/git-status.t
+t/pod-coverage.t
+t/pod.t
+.version
+META.yml                                 Module meta-data (added by MakeMaker)

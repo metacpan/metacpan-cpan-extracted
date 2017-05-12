@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+Sinewave.pm
+TODO
+eg/callback
+eg/cb2
+eg/cmd
+eg/simple
+eg/wave
+t/00-load.t
+t/01-basic.t
+t/99-author.t

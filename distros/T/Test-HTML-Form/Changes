@@ -1,0 +1,23 @@
+Revision history for Perl extension Test::HTML::Form.
+
+0.05 Apr 20 2010
+	comments no longer stripped
+        no longer passing undecoded utf to HTML::Parser, so no more complaints about it producing garbage
+	added new 'script_matches' function as HTML::Treebuilder will strip contents of script tags and this provides a workaround
+
+0.04 Jan 13 2009
+	tag_matches handles one or more tags to match
+	link_matches a or link tags
+	removed duplicate tag_matches function (how did that get there?)
+
+0.03 November 26 2009
+	Improvements to POD
+	Fixed cases where matching multiple form elements of same name
+
+0.02  June 16 2009
+        Updated to take http response object as well as filename
+        Changed method names to be clearer
+
+0.01  Mon Jan 19 20:18:40 2009
+	Initial version based on inhouse development
+

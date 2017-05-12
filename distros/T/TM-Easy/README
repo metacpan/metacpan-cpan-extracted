@@ -1,0 +1,34 @@
+What is it?
+-----------
+
+TM::Easy is a layer on top of a TM topic map object. It allows
+access to the underlying topic map as if it were a Perl hash.
+
+See TM on CPAN
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Support
+-------
+
+You can either
+
+  - mail to the author (rho@devc.at), or
+  - discuss this in one of the topicmap mailing lists, or
+  - find me in the freenode #topicmaps IRC channel (clever choice), or
+  - create a bug entry in rt.cpan.org (preferred)
+
+Copyright 200[8] Robert Barta, rho@devc.at
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

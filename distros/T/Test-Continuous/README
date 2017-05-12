@@ -1,0 +1,110 @@
+NAME
+    Test::Continuous - Run your test suite continuously when developing.
+
+SYNOPSIS
+    Very simple usage:
+
+        % cd MyModule/
+        % autoprove
+
+    You may pass prove arguments:
+
+        % autoprove --shuffle
+
+DESCRIPTION
+    *Continuous Testing* is a concept and tool to re-run software tests as
+    soon as the developer saves the source code.
+
+    "Test::Continuous" is a tool based on App::Prove that implements this
+    concept for Perl.
+
+    See <http://groups.csail.mit.edu/pag/continuoustesting/> for the
+    original implementation of Continuous Testing as an Eclipse plugin. See
+    also Zentest <http://www.zenspider.com/ZSS/Products/ZenTest/> for the
+    same concept implemented in Ruby's world.
+
+INTERFACE
+    runtests
+        This function starts monitoring the mtime of all files under current
+        working directory. If there's any update, it runs your module tests
+        under t/ directory with App::Prove.
+
+        You could call it from command line like this:
+
+            perl -MTest::Continuous -e Test::Continuous::runtests
+
+        However, it's recommended to use the autoprove program shipped with
+        this distribution to do this instead.
+
+CONFIGURATION AND ENVIRONMENT
+
+    Test::Continuous requires no configuration files.
+
+    Your ".proverc. is NOT loaded, even though it's based on App::Prove.
+
+    The main "runtests()" routine parses arguments on the command line or
+    passed via the environment variable "AUTOPROVE_OPTS".  All autoprove
+    options are prefixed with "--autoprove-" (in both the command line and
+    the environmental variable).
+
+    Valid options:
+
+    "--autoprove-no-skip-initial" (Default)
+    "--autoprove-skip-initial"
+        These options allow control over whether the initial tests are run
+        when autoprove is first started. By default, "runtests()" will run
+        all tests when executed, and then wait for changes.
+
+        Using "--autoprove-skip-initial" skips the initial tests and goes
+        straight to watching for changes to files.  Generally, you should
+        run all tests, in case something changed while "Test::Continuous"
+        was not running. The "--autoprove-no-skip-initial" is provided so
+        that you can override an environmental variable "AUTOPROVE_OPTS"
+        that includes "--autoprove-skip-initial" via the command line, by
+        passing autoprove the "--autoprove-no-skip-initial" option.
+
+DEPENDENCIES
+    App::Prove, Log::Dispatch, Log::Dispatch::DesktopNotification,
+    Module::ExtractUse
+
+INCOMPATIBILITIES
+    It might not be compatible with all Test::Harness::* classes. Testing
+    with remote harness classes basically works, but has some glitches. Help
+    is appreciated.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-test-continuous@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Kang-min Liu "<gugod@gugod.org>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008 - 2015 Kang-min Liu "<gugod@gugod.org>".
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

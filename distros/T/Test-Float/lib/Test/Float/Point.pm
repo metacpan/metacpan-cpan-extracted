@@ -1,0 +1,169 @@
+package Test::Float::Point;
+
+=head1 NAME
+
+Test::Float::Point - object for tracking a single test point
+
+=head1 SYNOPSIS
+
+One Test::Float::Point object represents a single test point.
+
+=cut
+
+use strict;
+use vars qw($VERSION);
+$VERSION = '0.01';
+
+sub new {
+    my $class = shift;
+    my $self  = bless {}, $class;
+
+    return $self;
+}
+
+my $test_line_regex = qr/
+    ^
+    (not\ )?               # failure?
+    ok\b
+    (?:\s+(\d+))?         # optional test number
+    \s*
+    (.*)                  # and the rest
+/ox;
+
+# sub from_test_line  {
+#     my $class = shift;
+#     my $line = shift or return;
+# 
+#     # We pulverize the line down into pieces in three parts.
+#     my ($not, $number, $extra) = ($line =~ $test_line_regex ) or return;
+# 
+#     my $point = $class->new;
+#     $point->set_number( $number );
+#     $point->set_ok( !$not );
+# 
+#     if ( $extra ) {
+#         my ($description,$directive) = split( /(?:[^\\]|^)#/, $extra, 2 );
+#         $description =~ s/^- //; # Test::More puts it in there
+#         $point->set_description( $description );
+#         if ( $directive ) {
+#             $point->set_directive( $directive );
+#         }
+#     } # if $extra
+# 
+#     return $point;
+# } # from_test_line()
+
+sub from_test_line {
+    my $class = shift;
+    my $line = shift or return;
+
+    # We pulverize the line down into pieces in three parts.
+    my ($not, $number, $extra, $float);
+
+    my $point = $class->new;
+    $point->set_number( $number );
+
+    if( ($not, $number, $extra) = ($line =~ /^(not )?ok\b(?:\s+(\d+))?\s*(.*)/) ) {
+
+        $point->set_ok( ! $not );
+
+    } elsif( ($float, $number, $extra) = ($line =~ /^(\d.\d+)\b(?:\s+(\d+))?\s*(.*)/) ) {
+
+        $point->set_ok( $float );
+
+    } else {
+        return;
+    }
+
+    if ( $extra ) {
+        my ($description, $directive) = split( /(?:[^\\]|^)#/, $extra, 2 );
+        $description =~ s/^- //; # Test::More puts it in there
+        $point->set_description( $description );
+        if ( $directive ) {
+            $point->set_directive( $directive );
+        }
+    } # if $extra
+
+    return $point;
+}
+
+
+sub ok              { my $self = shift; $self->{ok} }
+# sub set_ok          {
+#     my $self = shift;
+#     my $ok = shift;
+#     $self->{ok} = $ok ? 1 : 0;
+# }
+
+sub set_ok {
+    my $self = shift;
+    my $ok = shift;
+    # warn "replacement set_ok:  $ok";
+    $self->{ok} = $ok;
+}
+
+sub pass {
+    my $self = shift;
+
+    return ($self->ok || $self->is_todo || $self->is_skip) ? 1 : 0;
+}
+
+sub number          { my $self = shift; $self->{number} }
+sub set_number      { my $self = shift; $self->{number} = shift }
+
+sub description     { my $self = shift; $self->{description} }
+sub set_description {
+    my $self = shift;
+    $self->{description} = shift;
+    $self->{name} = $self->{description}; # history
+}
+
+sub directive       { my $self = shift; $self->{directive} }
+sub set_directive   {
+    my $self = shift;
+    my $directive = shift;
+
+    $directive =~ s/^\s+//;
+    $directive =~ s/\s+$//;
+    $self->{directive} = $directive;
+
+    my ($type,$reason) = ($directive =~ /^\s*(\S+)(?:\s+(.*))?$/);
+    $self->set_directive_type( $type );
+    $reason = "" unless defined $reason;
+    $self->{directive_reason} = $reason;
+}
+sub set_directive_type {
+    my $self = shift;
+    $self->{directive_type} = lc shift;
+    $self->{type} = $self->{directive_type}; # History
+}
+sub set_directive_reason {
+    my $self = shift;
+    $self->{directive_reason} = shift;
+}
+sub directive_type  { my $self = shift; $self->{directive_type} }
+sub type            { my $self = shift; $self->{directive_type} }
+sub directive_reason{ my $self = shift; $self->{directive_reason} }
+sub reason          { my $self = shift; $self->{directive_reason} }
+sub is_todo {
+    my $self = shift;
+    my $type = $self->directive_type;
+    return $type && ( $type eq 'todo' );
+}
+sub is_skip {
+    my $self = shift;
+    my $type = $self->directive_type;
+    return $type && ( $type eq 'skip' );
+}
+
+sub diagnostics     {
+    my $self = shift;
+    return @{$self->{diagnostics}} if wantarray;
+    return join( "\n", @{$self->{diagnostics}} );
+}
+sub add_diagnostic  { my $self = shift; push @{$self->{diagnostics}}, @_ }
+
+
+
+
+1;

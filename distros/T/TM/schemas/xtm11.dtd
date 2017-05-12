@@ -1,0 +1,175 @@
+<!-- ....................................................................... -->
+<!-- XML Topic Map DTD  .................................................... -->
+
+<!-- XML Topic Map (XTM) DTD, Version 1.1
+
+     This is XTM, an XML interchange syntax for ISO 13250 Topic Maps,
+     defined by ISO 13250-3.
+
+     Use this URI to identify the default XTM namespace:
+
+         "http://www.topicMaps.org/xtm/1.0/"
+
+     Used to identify the XLink namespace:
+
+         "http://www.w3.org/1999/xlink"
+-->
+
+<!-- topicMap: Topic Map document element ........................ -->
+
+<!ELEMENT topicMap
+   ( topic | association | mergeMap )*
+>
+<!ATTLIST topicMap
+   id              ID        #IMPLIED
+   version         CDATA     #FIXED '1.1'
+   xmlns           CDATA     #FIXED 'http://www.topicmaps.org/xtm/1.0/'
+   xmlns:xlink     CDATA     #FIXED 'http://www.w3.org/1999/xlink'
+   xml:base        CDATA     #IMPLIED
+>
+
+<!-- topic: Topic element ....................................... -->
+
+<!ELEMENT topic
+   ( instanceOf*, subjectIdentity?, ( baseName | occurrence )* )
+>
+<!ATTLIST topic
+   id              ID        #REQUIRED
+>
+
+<!-- instanceOf: Points to a Topic representing a class .......... -->
+
+<!ELEMENT instanceOf  ( topicRef | resourceRef | subjectIndicatorRef ) >
+<!ATTLIST instanceOf
+   id              ID        #IMPLIED
+>
+
+<!-- subjectIdentity: Subject reified by Topic ................... -->
+
+<!ELEMENT subjectIdentity
+   ( topicRef | resourceRef | subjectIndicatorRef )*
+>
+<!ATTLIST subjectIdentity
+   id              ID        #IMPLIED
+>
+
+<!-- topicRef: Reference to a Topic element ...................... -->
+
+<!ELEMENT topicRef  EMPTY >
+<!ATTLIST topicRef
+   id              ID        #IMPLIED
+   xlink:type      NMTOKEN   #FIXED 'simple'
+   xlink:href      CDATA     #REQUIRED
+>
+
+<!-- subjectIndicatorRef: Reference to a Subject Indicator ....... -->
+
+<!ELEMENT subjectIndicatorRef  EMPTY >
+<!ATTLIST subjectIndicatorRef
+   id              ID        #IMPLIED
+   xlink:type      NMTOKEN   #FIXED 'simple'
+   xlink:href      CDATA     #REQUIRED
+>
+
+<!-- baseName: Base Name of a Topic .............................. -->
+
+<!ELEMENT baseName  ( instanceOf?, scope?, baseNameString, variant* ) >
+<!ATTLIST baseName
+   id              ID        #IMPLIED
+>
+
+<!-- baseNameString: Base Name String container .................. -->
+
+<!ELEMENT baseNameString  ( #PCDATA ) >
+<!ATTLIST baseNameString
+   id              ID        #IMPLIED
+>
+
+<!-- variant: Alternate forms of Base Name ....................... -->
+
+<!ELEMENT variant  ( parameters, variantName?, variant* ) >
+<!ATTLIST variant
+   id              ID        #IMPLIED
+>
+
+<!-- variantName: Container for Variant Name ..................... -->
+
+<!ELEMENT variantName  ( resourceRef | resourceData ) >
+<!ATTLIST variantName
+   id              ID        #IMPLIED
+>
+
+<!-- parameters: Processing context for Variant .................. -->
+
+<!ELEMENT parameters  ( topicRef | resourceRef | subjectIndicatorRef )+ >
+<!ATTLIST parameters
+   id              ID        #IMPLIED
+>
+
+<!-- occurrence: Resources regarded as an Occurrence ............. -->
+
+<!ELEMENT occurrence
+   ( instanceOf?, scope?, ( resourceRef | resourceData ) )
+>
+<!ATTLIST occurrence
+   id              ID        #IMPLIED
+>
+
+<!-- resourceRef: Reference to a Resource ........................ -->
+
+<!ELEMENT resourceRef  EMPTY >
+<!ATTLIST resourceRef
+   id              ID        #IMPLIED
+   xlink:type      NMTOKEN   #FIXED 'simple'
+   xlink:href      CDATA     #REQUIRED
+>
+
+<!-- resourceData: Container for Resource Data ................... -->
+
+<!ELEMENT resourceData  ( #PCDATA ) >
+<!ATTLIST resourceData
+   id              ID        #IMPLIED
+>
+
+<!-- association: Topic Association  ............................. -->
+
+<!ELEMENT association
+   ( instanceOf?, scope?, member+ )
+>
+<!ATTLIST association
+   id              ID        #IMPLIED
+>
+
+<!-- member: Member in Topic Association ......................... -->
+
+<!ELEMENT member
+   ( roleSpec?, ( topicRef | resourceRef | subjectIndicatorRef )* )
+>
+<!ATTLIST member
+   id              ID        #IMPLIED
+>
+
+<!-- roleSpec: Points to a Topic serving as an Association Role .. -->
+
+<!ELEMENT roleSpec  ( topicRef | resourceRef | subjectIndicatorRef ) >
+<!ATTLIST roleSpec
+   id              ID        #IMPLIED
+>
+
+<!-- scope: Reference to Topic(s) that comprise the Scope ........ -->
+
+<!ELEMENT scope  ( topicRef  | resourceRef | subjectIndicatorRef )+ >
+<!ATTLIST scope
+   id              ID        #IMPLIED
+>
+
+<!-- mergeMap: Merge with another Topic Map ...................... -->
+
+<!ELEMENT mergeMap  ( topicRef | resourceRef | subjectIndicatorRef )* >
+<!ATTLIST mergeMap
+   id              ID        #IMPLIED
+   xlink:type      NMTOKEN   #FIXED 'simple'
+   xlink:href      CDATA     #REQUIRED
+>
+
+<!-- end of XML Topic Map (XTM) 1.1 DTD -->

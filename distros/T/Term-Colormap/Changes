@@ -1,0 +1,21 @@
+Revision history for Term-Colormap
+
+0.06    Mon Aug 20 05:41:55 UTC 2014
+    * Fixed git_blame_summary when git-annotate has extra dates in code.
+
+0.05    Mon Aug 20 03:08:32 UTC 2014
+    * Added scripts hbar and git_blame_summary.
+    * Added screenshots of hbar and git_blame_summary in action.
+
+0.04    Mon Jul 21 03:46:17 UTC 2014
+    * Fixed Build.PL per Kwalitee feedback.
+
+0.03    Fri Jul 18 04:49:48 UTC 2014
+    * Added sanity checking to color2rgb.
+
+0.02    Mon Jul 14 06:30:12 UTC 2014
+    * Added functioning Term::Colormap module.
+
+0.01    Mon Jul 14 06:25:02 UTC 2014
+    * First version, released on an unsuspecting world.
+

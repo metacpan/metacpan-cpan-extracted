@@ -1,0 +1,26 @@
+The documentation on the TUXEDO perl module can be viewed 
+by running perdoc TUXEDO.pm.
+
+To build this, do the following
+
+1/ Edit Makefile.pl.  Change the hardcoded tuxedo paths in LIBS and INC to
+   the correct location of tuxedo on your system.
+
+2/ perl Makefile.pl
+
+3/ make test
+   This is the first release of this module so not everything is automated
+   as well as I would like.  To get the test to work successfully, you 
+   need to have these environment variables set up...
+	TUXCONFIG=<the config of a tuxedo sytem>
+	FLDTBLDIR32=$TUXDIR/udataobj
+	FIELDTBLS32=tpadm
+	The test will attempt to connect to the tuxedo system specified by
+   TUXCONFIG, perform a .TMIB service call and disconnect.
+
+4/ make install
+
+REMEMBER, this is the very first release of this module so if you have
+problems, try to fix it yourself and e-mail me with the modifications.
+
+Anthony Fryer apfryer@hotmail.com

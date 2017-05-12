@@ -1,0 +1,5 @@
+Some included text
+
+@if $var1
+We shoud see this line from included file
+@endif

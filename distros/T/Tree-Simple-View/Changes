@@ -1,0 +1,142 @@
+Revision history for Perl extension Tree-Simple-View.
+
+0.19  2017-04-14:11:13:21
+	- Implement the new Boolean parameter to new, 'html5', to support HTML5 style nested-lists.
+			See https://www.w3.org/wiki/HTML_lists#Nesting_lists.
+			See t/24_Tree_Simple_View_HTML5_test.t for sample code.
+	- This version depends on Tree::Simple V 1.31, and in particular the new methods in that
+		version: getSiblingCount(), isFirstChild() and isLastChild().
+	- Add repository section to the pod of Tree::Simple::View.
+	- Move t/manifest.t, t/pod_coverage.t and t/pod.t to xt/author.
+	- Add Changelog.ini.
+	- Add .gitignore, LICENSE.
+	- Modernize MANIFEST.SKIP.
+	- Switch from 'use base' to 'use parent'.
+	- Add various modules to the pre-reqs in Makefile.PL.
+	- Update SEE ALSO in pod.
+	- Standardize dates in this file.
+	- Add t/24_Tree_Simple_View_HTML5_test.t to test RT#121099.
+	- Replace most double-quotes with single-quotes to reduce visual clutter.
+
+0.180001  2017-02-05T12:00:00
+  * added github repo to Makefile
+  * update Documentations for configurable characters in ASCII view
+
+0.18  2017-02-04T12:00:00
+    * added configurable characters for ASCII view
+
+0.17  2017-02-03T12:00:00
+    * added node_formatter support for ASCII view
+
+0.16  2007-Jul-09T12:00:00
+    * cleaning bad files in the tar.gz
+    * converted to Build.PL
+
+0.15  2007-May-21T12:00:00
+    * added a simple Tree::Simple::View::ASCII
+        - added docs and tests for it
+
+0.14  2004-Nov-28T12:00:00
+    - removing the OS X resource fork files
+    - applied patch (RT #16064) to support XHTML
+      compliant output for Tree::Simple::View::HTML.
+        - thanks to Simon Wilcox for this patch and tests
+
+0.13  2005-Nov-07T12:00:00
+    - fixing typo on the generated HTML (rt.cpan.org Ticket #14963)
+    - cleaned up View.pm as little as well
+
+0.12  2005-Jan-31T12:00:00
+    - converted this to use Class::Throwable for exceptions
+       - altered tests for this
+
+    - added the 'radio_button' and 'checkbox' attributes to
+      the Tree::Simple::View::DHTML class
+        - added tests for this
+        - added documentation for this
+
+0.11  2004-Nov-18T12:00:00
+    - now using Scalar::Util::blessed() instead of
+      the convoluted UNIVERSAL::isa() stuff.
+      - added Scalar::Util as a dependency
+
+0.10  2004-Aug-07T12:00:00
+    - Added the setPathComparisonFunction method
+      so that custom node value's can be compared
+      easily. Thanks to Neyuki for this idea.
+        - documentented and tested this
+
+0.09  2004-Aug-02T12:00:00
+    - I forgot to change the version requirements for
+      Tree::Simple to 1.07 which is the first version
+      that uses the getUID methods.
+
+0.08  2004-Aug-01T12:00:00
+    - Changed the way that the DHTML DIV IDs were being
+      created, you can now use your own UID from the
+      Tree::Simple object instead, thanks to
+      Brett Nuske for that suggestion.
+        - documented and tested it
+
+0.07  2004-Jul-15T12:00:00
+    - added includeTrunk method, and implemented the
+      necessary functionality in ::HTML and ::DHTML.
+      - added tests to check this new functionality
+        as well
+      - added documentation on this new functionality
+
+0.06  2004-Jul-02T12:00:00
+    - Added a number of tests to the suite as well as
+      improved some existing tests.
+
+0.05  2004-Jun-25T12:00:00
+    - changes the HREF part of the DHTML links to be
+      javascript:void(0) rather than just #, it stops
+      a problem in some browsers where clicking a link
+      would scroll you to the top of the page.
+      - updated tests to reflect this change
+    - removed some code which was not nessecary from the
+      Tree::Simple::View::HTML class.
+
+0.04  2004-Jun-25T12:00:00
+    !*!*!*! MAJOR UPDATE !*!*!*!
+    - My orginal vision for Tree::Simple::View was that of
+      a Proxy/Factory/I-Dont-Know-What-I-Was-Thinking class.
+      But the idea really wasn't that good, matter of fact
+      it was pretty bad. So this version marks a major update
+      to the module, the details of which are below.
+      - Tree::Simple::View::Base has been removed, its code
+        has been moved to Tree::Simple::View.
+      - Tree::Simple::View is no longer a "Proxy" class (not
+        that it ever really was) for the Tree::Simple::View::*
+        classes. It now is the abstract base class, taking on
+        the role that Tree::Simple::View::Base once served.
+      - Tree::Simple::View::HTML has been updated to reflect
+        its new base class. (Tree::Simple::View::DHTML is a
+        subclass of Tree::Simple::View::HTML, so it didn't need
+        to be changed).
+      - All documentation has been updated to reflect these changes.
+    - I have added a bunch of tests while I was at it.
+
+0.03  2004-Jun-23T12:00:00
+    - fixed a number of little issues with the DHTML class
+        - fixed problems with combined CSS configurations
+          and the expand-collapse functionality
+        - fixed a bug whereby expandPath did not work
+          properly
+    - added an example file of the DHTML output
+      (examples/DHTML_example.html)
+    - added some documentation here and there
+
+0.02  2004-Jun-22T12:00:00
+    - added simple accessors for the tree and configurations
+      to the Base class
+    - added the 'form_element_formatter' to the DHTML class
+      which allows for form elements to be added to the tree
+      outside of the link tag.
+    - fixed a bug in the DHTML implementation where the DHTML
+      would not work if you had not set a link_css value. Now
+      you it does work :)
+
+0.01  2004-Jun-18T14:38:19
+    - module created

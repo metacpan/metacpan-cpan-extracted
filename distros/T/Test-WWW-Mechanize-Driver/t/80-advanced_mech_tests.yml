@@ -1,0 +1,40 @@
+---
+- uri: home.html
+  title_is: Dean Serenevy
+  contains:
+    - GAP Arrangements
+    - Riverbend Community Math Center
+  actions:
+    - has_tag:
+        h1: Computers
+    - has_tag:
+        h1: Math
+
+- uri: tutors.html
+  title_is: Private Tutors - Riverbend Community Math Center
+  has_tag:
+    td: No tutors available for
+  lacks: No tutors available for Calculus
+  actions:
+    - submit_form_ok:
+        fields:
+          l: calculus
+    - title_is: Private Tutors - Riverbend Community Math Center
+    - has_tag:
+        td: No tutors available for Calculus
+
+- uri: tutors.html
+  title_is: Private Tutors - Riverbend Community Math Center
+  has_tag:
+    td: No tutors available for
+  lacks: No tutors available for Calculus
+  actions:
+    - select:
+        l: calculus
+    - submit_form_ok: {}
+    - title_is: Private Tutors - Riverbend Community Math Center
+    - has_tag:
+        td: No tutors available for Calculus
+
+- uri: map.html
+  page_links_ok: 1

@@ -1,0 +1,78 @@
+==================================================
+Changes from 2015-04-13 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.006 at 2016-04-12 07:24:31 +0000
+------------------------------------------
+
+  Change: 38127454b8cf0c1862229c10934f467591553a17
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-04-12 09:23:19 +0000
+
+    dont include README.pod in dist 
+
+------------------------------------------
+version 1.005 at 2016-02-05 09:43:00 +0000
+------------------------------------------
+
+  Change: 4d7d7db26bb0c4b659c68ae19780bfe047085c36
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 10:43:00 +0000
+
+    update docs 
+
+  Change: 5b809ccef2c50b11adfdcefd34531b170d78e4f1
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 10:42:09 +0000
+
+    fix example urls 
+
+  Change: ffc3a65439c1cccc1529e537047f491cb7a2b4f2
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 10:37:45 +0000
+
+    added example output 
+
+  Change: 1b5eb30ba25fd30419fa72d648281c9080a3c486
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 10:21:08 +0000
+
+    link README to pod docs 
+
+  Change: c522085d20b255c355d394e89f244dd4d362509a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 10:19:17 +0000
+
+    Merge branch 'master' of
+    https://github.com/benningm/Test-BDD-Cucumber-Harness-Html 
+
+  Change: d2894f5b6212c1866eef7f557e745825aafb58ba
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 10:16:53 +0000
+
+    fix indent 
+
+  Change: 3c405d5185d145d451f2dfa45d333582998eabe8
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 10:10:09 +0000
+
+    Improve html template
+
+    This adds:
+
+    * colorize keyword of steps (given,when,then)
+
+    * output feature text as preformatted text
+
+    * do more html entity encoding 
+
+  Change: 729beb9803d032032e83198a8cf866750948c292
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 09:08:16 +0000
+
+    updated build env 
+
+================================================
+Plus 4 releases after 2015-04-13 00:00:00 +0000.
+================================================

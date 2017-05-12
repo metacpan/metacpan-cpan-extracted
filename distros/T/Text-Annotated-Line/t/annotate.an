@@ -1,0 +1,7 @@
+[t/annotate.in#00001]This is a test input file for Text::Annotated
+[t/annotate.in#00002]2nd line
+[t/annotate.in#00003]
+[t/annotate.in#00004]previous line was empty
+[t/annotate.in#00005]*
+[t/annotate.in#00006].
+[t/annotate.in#00007]This is the final line

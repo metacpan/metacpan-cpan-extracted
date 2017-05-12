@@ -1,0 +1,19 @@
+---
+name: Text-FakeXML
+version: 0.02
+author:
+  - 'Johan Vromans <jv@cpan.org>'
+abstract: Creating text with E<lt>thingsE<gt>.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  Text::FakeXML:
+    file: lib/Text/FakeXML.pm
+    version: 0.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

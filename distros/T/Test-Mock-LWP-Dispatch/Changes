@@ -1,0 +1,29 @@
+Revision history for Test-Mock-LWP-Dispatch
+
+0.08    Fri Nov 06, 2015
+        Fix typos: map_passtrough => map_passthrough.
+
+0.07    Wed Oct 28, 2015
+        Added map_passthrough() method, thanks to Slobodan Mišković.
+
+0.06    Tue May 28, 2013
+        $mock_ua can call get(), thanks to Ash Berlin.
+        Mocked requests contain default headers, thanks to Joe Papperello.
+
+0.05    Mon Apr 01, 2013
+        No more Moose in requirements.
+
+0.04    Fri Mar 29, 2013
+        Fixed bug caused by hash keys randomization in bleadperl
+        (see https://rt.cpan.org/Public/Bug/Display.html?id=84280)
+
+0.03    Sat Sep 24, 2011
+        Exported $mock_ua->isa('LWP::UserAgent'), tests refactored (thanks to Mike Doherty).
+        Uses Dist::Zilla instead of Module::Build.
+
+0.02    Wed Jun 09, 2010
+        Mock simple_request() instead of request() (request() calls simple_request())
+        Change VERSION scheme. 
+
+0.0.1   Sun Apr 18, 2010
+        First version.

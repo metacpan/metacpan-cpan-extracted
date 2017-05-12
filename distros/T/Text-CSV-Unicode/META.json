@@ -1,0 +1,51 @@
+{
+   "abstract" : "comma-separated values manipulation routines\n\t\t\twith potentially wide character data",
+   "author" : [
+      "Robin Barker <rmbarker@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-CSV-Unicode",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "charnames" : "1",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Text::CSV::Base" : {
+         "file" : "lib/Text/CSV/Base.pm",
+         "version" : "0.041"
+      },
+      "Text::CSV::Unicode" : {
+         "file" : "lib/Text/CSV/Unicode.pm",
+         "version" : "0.115"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.115"
+}

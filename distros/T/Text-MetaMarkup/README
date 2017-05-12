@@ -1,0 +1,127 @@
+Text::MetaMarkup
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or use CPANPLUS to automate the process.
+
+Module documentation:
+
+NAME
+    Text::MetaMarkup - Simple structured POD/Wiki-ish markup
+
+SYNOPSIS
+        use Text::MetaMarkup::HTML;
+        print Text::MetaMarkup::HTML->new->parse(file => $filename);
+
+DESCRIPTION
+    MetaMarkup was inspired by POD, Wiki and PerlMonks. I created it because
+    I wanted a simple format to write documents for my site quickly.
+
+    A document consists of paragraphs. Paragraphs are separated by blank
+    lines, which may contain whitespace. A paragraph can be prefixed with
+    "tag:", which should correspond to an HTML block level tag like "h1",
+    "p" or "pre".
+
+    Paragraphs cannot be nested. Paragraphs that start with "#" are ignored.
+
+    In a paragraph, inline tags are used with curly braces. That is:
+    "{i:foo}" is "<i>foo</i>" in HTML.
+
+    Inline tags can be nested.
+
+    Characters can be escaped using a backslash character. Never are escaped
+    characters special: "\n" is "n" in the result, not a newline.
+
+    Links are written as "[url|text]". Inline tags can be used in the text
+    part.
+
+SUBCLASSING
+    Do not use Text::MetaMarkup directly. It is intended to be subclassed.
+    Most people will just use Text::MetaMarkup::HTML, but you can create
+    your own.
+
+    Packages in Text::MetaMarkup::AddOn:: are special. They don't subclass
+    Text::MetaMarkup but used by subclasses (using @ISA ("use base")) to
+    provide additional tags.
+
+    Text::MetaMarkup::HTML::JuerdNL is used by my own homepage and is
+    included in the distribution as an example.
+
+METHODS
+  Provided by Text::MetaMarkup
+    "new"
+        Constructor method. Takes a list of key/value pairs which is used to
+        fill the hash that gets blessed. These values are currently not
+        used, but could be used by the subclasses.
+
+    "parse"
+        Takes two arguments. Either "file" and a filename, "fh" and a
+        filehandle or "string" and a string. Returns the converted document.
+
+    "parse_document"
+        Takes one argument: a string of paragraphs. Returns the converted
+        document.
+
+    "parse_paragraph"
+        Takes one argument: a string of text, possibly with inline tags.
+        Returns the converted paragraph.
+
+    "parse_link"
+        Takes one argument: The link (without square brackets). Returns the
+        converted link.
+
+    "text"
+        Takes one argument: Plain text. Unescapes the text and returns it.
+
+  To be provided by a subclass
+    "escape"
+        Takes one argument: text. Should return the escaped version of that
+        text.
+
+    "paragraph"
+        Takes two arguments: tag and text. Should return the converted form.
+
+    "inline"
+        Takes two arguments: tag and text. Should return the converted form.
+
+    "link"
+        Takes two arguments: a hashref and text. The hashref contains
+        "href", "scheme" and "rest". Should return the converted form.
+
+        If the link provided is "[http://juerd.nl/|Juerd's homepage]", then
+        "link" gets in @_: "{ href => 'http://juerd.nl/', scheme => 'http',
+        rest => '//juerd.nl/' }, 'Juerd\'s homepage'".
+
+    Special methods
+        If paragraph tag "foo" is encountered, "paragraph_foo" is tried
+        before "paragraph". If inline tag "foo" is encountered, "inline_foo"
+        is tried before "inline". If link scheme "foo" is encountered,
+        "link_foo" is tried before "link". If the tag or scheme specific
+        method exists, the general one is not called.
+
+        Furthermore, a subclass can implement any of "start_document",
+        "end_document", "start_paragraph" and "end_paragraph". Parapgraph
+        start/end handlers get the tag as their only argument. The value
+        returned by any of these methods is used in the result document.
+
+    A subclass should try to format paragraphs that start with "*" as
+    bulleted lists.
+
+LICENSE
+    There is no license. This software was released into the public domain.
+    Do with it what you want, but on your own risk. The author disclaims any
+    responsibility.
+
+AUTHOR
+    Juerd Waalboer <juerd@cpan.org> <http://juerd.nl/>
+
+SEE ALSO
+    Text::MetaMarkup::HTML
+

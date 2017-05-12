@@ -1,0 +1,20 @@
+<?xml version='1.0' standalone='yes'?>
+<opt>
+  <gui>
+    <SetupType value="qq(install)" evaluate="1" />
+
+    <Name      value="qq(your Name)"  evaluate="1" />
+    <Company   value="qq(your Company Name)"  evaluate="1" />
+
+    <Host      value=" return $ENV{COMPUTERNAME} if ($OSNAME eq q/MSWin32/);
+                       return $ENV{HOSTNAME}     if ($OSNAME eq q/linux/);
+                       return q/localhost/;
+                     "  evaluate="1" />
+
+    <InstallJava    value="qq(0)" evaluate="1" />
+    <InstallPerl    value="qq(1)" evaluate="1" />
+    <InstallDB      value="qq(1)" evaluate="1" />
+    <InstallSpecial value="qq(1)" evaluate="1" />
+
+  </gui>
+</opt>

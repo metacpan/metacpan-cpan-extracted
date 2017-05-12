@@ -1,0 +1,85 @@
+{
+   "abstract" : "just another xt, for Software::License",
+   "author" : [
+      "Kevin Dawson <bowtie@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Software-License",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.038"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.7",
+            "File::Find::Rule" : "0.33",
+            "File::Find::Rule::Perl" : "1.13",
+            "File::Slurp::Tiny" : "0.003",
+            "List::AllUtils" : "0.09",
+            "Parse::CPAN::Meta" : "1.4414",
+            "Software::LicenseUtils" : "0.10301",
+            "Test::Builder" : "1.001006",
+            "Try::Tiny" : "0.22",
+            "constant" : "1.27",
+            "parent" : "0.228",
+            "perl" : "5.008004",
+            "version" : "0.9909"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001006",
+            "Test::Requires" : "0.08"
+         },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "6.82",
+            "File::Spec::Functions" : "3.47",
+            "Test::Pod" : "1.48",
+            "Test::Pod::Coverage" : "1.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kevindawson/Test-Software-License/issues"
+      },
+      "homepage" : "https://github.com/kevindawson/Test-Software-License",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kevindawson/Test-Software-License.git",
+         "web" : "https://github.com/kevindawson/Test-Software-License"
+      }
+   },
+   "version" : "0.004000",
+   "x_contributors" : [
+      "bowtie <bowtie@cpan.org>"
+   ]
+}
+

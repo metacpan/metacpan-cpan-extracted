@@ -1,0 +1,29 @@
+Revision history for Text-xSV-Slurp
+
+0.22    Sun Jan 29 2009
+        - use $csv->getline() to parse headers
+        - added error checking to all $csv->getline() calls
+
+0.21    Sun Nov  1 2009
+        - speed enhancements:
+           - use Text::CSV->getline() for combined readline/parse/array_ref operation
+           - hoh on_store/on_collide handler argument passing is now array based
+             with named constants, saving from unpacking @_ into an option hash
+             in a very tight loop
+
+0.20    Sun Nov  1 2009
+        - added support for predefined on_store/on_collide handlers to the hoh
+          shape, allowing the user to specify how values should be aggregated
+          when the key does result in unique values
+
+0.12    Sun Oct 18 2009
+        - tests do not explicitly import xsv_slurp in order to test that it is
+          exported by default
+
+0.11    Sun Oct 18 2009
+        - export xsv_slurp by default
+        - remove mention of converting data to xSV format from SYNOPSIS
+
+0.10    Sun Oct 18 2009
+        - initial release
+

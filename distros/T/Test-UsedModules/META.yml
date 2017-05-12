@@ -1,0 +1,49 @@
+---
+abstract: 'Detects needless modules which are being used in your module'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Module::Load: 0
+  Test::Builder::Tester: 1.22
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-UsedModules
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Test::UsedModules:
+    file: lib/Test/UsedModules.pm
+    version: 0.03
+  Test::UsedModules::Constants:
+    file: lib/Test/UsedModules/Constants.pm
+  Test::UsedModules::PPIDocument:
+    file: lib/Test/UsedModules/PPIDocument.pm
+  Test::UsedModules::Sandbox:
+    file: lib/Test/UsedModules.pm
+requires:
+  PPI::Document: 1.215
+  PPI::Dumper: 1.215
+  Test::Builder::Module: 0.98
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/moznion/Test-UsedModules/issues
+  homepage: https://github.com/moznion/Test-UsedModules
+  repository: git://github.com/moznion/Test-UsedModules.git
+version: 0.03

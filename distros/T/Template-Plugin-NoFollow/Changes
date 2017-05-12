@@ -1,0 +1,20 @@
+Revision history for Perl extension Template::Plugin::NoFollow
+
+1.02    Fri Apr 23 22:11 PDT 2010
+    - Switch to Git
+
+1.01    Sun Sep 30 15:24 PDT 2007
+    - new "allow" option, which lets you specify regexes for URLs that -are-
+      allowed to be followed; useful when processing large blocks of text that
+      may contain internal links
+    - added POD coverage tests
+    - switched to Module::Build instead of EU::MM
+
+1.000   Wed Sep 20 9:41pm 2006
+    - updated test suites
+    - now allows for filter to be named (e.g. "USE foo=NoFollow")
+    - replaces existing rel="nofollow" attributes instead of creating
+      duplicate attribute
+
+0.01    Fri Mar 17 12:11pm 2006
+    - original version

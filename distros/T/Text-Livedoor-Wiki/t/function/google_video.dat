@@ -1,0 +1,220 @@
+=== basic
+--- wiki
+&googlevideo(http://video.google.co.jp/videoplay?docid=6258091904745885524)
+--- html
+<div class="link_googlevideo">
+<object width="340" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=6258091904745885524">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=6258091904745885524" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+===  ignore the other perameter
+--- wiki
+&googlevideo(http://video.google.com/videoplay?hoge=2342423424&docid=6258091904745885524)
+--- html
+<div class="link_googlevideo">
+<object width="340" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=6258091904745885524">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=6258091904745885524" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== number
+--- wiki
+&googlevideo(6258091904745885524)
+--- html
+<div class="link_googlevideo">
+<object width="340" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=6258091904745885524">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=6258091904745885524" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== trim 
+--- wiki
+&googlevideo(  6258091904745885524   )
+--- html
+<div class="link_googlevideo">
+<object width="340" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=6258091904745885524">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=6258091904745885524" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== size 
+--- wiki
+&googlevideo(6258091904745885524){100,110}
+--- html
+<div class="link_googlevideo">
+<object width="100" height="110">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=6258091904745885524">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=6258091904745885524" 
+type="application/x-shockwave-flash" 
+style="width:100px; height:110dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== size  trim
+--- wiki
+&googlevideo(6258091904745885524){  100  ,  110   }
+--- html
+<div class="link_googlevideo">
+<object width="100" height="110">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=6258091904745885524">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=6258091904745885524" 
+type="application/x-shockwave-flash" 
+style="width:100px; height:110dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== no docid
+--- wiki
+&googlevideo(3asdfopef)
+--- html
+&amp;googlevideo(3asdfopef)
+=== no args 
+--- wiki
+&googlevideo()
+--- html
+&amp;googlevideo()
+=== size  width 
+--- wiki
+&googlevideo(6258091904745885524){  1  }
+--- html
+<div class="link_googlevideo">
+<object width="1" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=6258091904745885524">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=6258091904745885524" 
+type="application/x-shockwave-flash" 
+style="width:1px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== no docid
+--- wiki
+&googlevideo(3asdfopef)
+--- html
+&amp;googlevideo(3asdfopef)
+=== no args 
+--- wiki
+&googlevideo()
+--- html
+&amp;googlevideo()
+=== -
+--- wiki
+&googlevideo(-694264032177935779)
+--- html
+<div class="link_googlevideo">
+<object width="340" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=-694264032177935779">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=-694264032177935779" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== - docid
+--- wiki
+&googlevideo(http://video.google.co.jp/videoplay?docid=-694264032177935779&ei=sh8VSsrpFpTewgP-sb1x&q=livedoor+viedo.google)
+--- html
+<div class="link_googlevideo">
+<object width="340" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=-694264032177935779">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=-694264032177935779" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== synopsis
+--- wiki
+&googlevideo(http://video.google.co.jp/videoplay?docid=-694264032177935779&ei=sh8VSsrpFpTewgP-sb1x&q=livedoor+viedo.google)
+&googlevideo(-694264032177935779)
+&googlevideo(-694264032177935779){99,88}
+&googlevideo(-694264032177935779){,99}
+&googlevideo(-694264032177935779){99}
+&googlevideo(-694264032177935779){99,}
+--- html
+<div class="link_googlevideo">
+<object width="340" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=-694264032177935779">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=-694264032177935779" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+<div class="link_googlevideo">
+<object width="340" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=-694264032177935779">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=-694264032177935779" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+<div class="link_googlevideo">
+<object width="99" height="88">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=-694264032177935779">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=-694264032177935779" 
+type="application/x-shockwave-flash" 
+style="width:99px; height:88dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+<div class="link_googlevideo">
+<object width="340" height="99">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=-694264032177935779">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=-694264032177935779" 
+type="application/x-shockwave-flash" 
+style="width:340px; height:99dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+<div class="link_googlevideo">
+<object width="99" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=-694264032177935779">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=-694264032177935779" 
+type="application/x-shockwave-flash" 
+style="width:99px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+<div class="link_googlevideo">
+<object width="99" height="280">
+<param name="movie" value="http://video.google.com/googleplayer.swf?docId=-694264032177935779">
+</param><param name="wmode" value="transparent"></param>
+<embed src="http://video.google.com/googleplayer.swf?docId=-694264032177935779" 
+type="application/x-shockwave-flash" 
+style="width:99px; height:280dpx;" id="VideoPlayback" flashvars="" wmode="opaque">
+<param name="wmode" value="opaque" />
+</embed></object>
+</div>
+=== ilegal
+--- wiki
+&googlevideo(<script)
+--- html
+&amp;googlevideo(&lt;script)

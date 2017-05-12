@@ -1,0 +1,210 @@
+0.26   2015-11-07
+
+- The previous release only had a partial fix for failures to resolve distro
+  names. This release fixes this more completely.
+
+
+0.25   2015-11-07
+
+- This module would die when it couldn't turn a dependent module name into a
+  distro. Now it outputs a diag() message and continues on.
+
+
+0.24   2015-10-04
+
+- When test_all_dependents() is called, deps are now sorted before testing.
+
+- The prereqs log now tells shows you the "root" distribution when installing
+  prereqs of prereqs. This makes it easier to figure out which dependent is
+  pulling in some uninstallable module.
+
+
+0.23   2015-10-04
+
+- Use diag to print the name of each distribution before it is tested. This is
+  helpful if a particular distro hangs during the build or test phases.
+
+
+0.22   2015-08-21
+
+- The test_all_dependents() sub now lets you pass a filter subroutine instead
+  of an exclude regex. This is a lot simpler to implement in many cases.
+
+
+0.21   2015-07-17
+
+- If PERL_TEST_DM_CPAN_VERBOSE was true and Test::More had not been loaded in
+  the process you would get an error. GH #9.
+
+
+0.20   2014-08-31
+
+- The use of MetaCPAN::Client was a bit broken. Patch by Sawyer X. PR #8.
+
+
+0.19   2014-06-26
+
+- Switched from the now deprecated MetaCPAN::API to the shiny new
+  MetaCPAN::Client. Patch by Mickey. PR #7.
+
+
+0.18   2014-05-04
+
+- A distro which used Module::Build and ran no tests would be marked as
+  failure. Fixed by Graham Knop.
+
+- Under debug mode, the output from the CPAN module's init phase is no longer
+  output via diag() calls. Patch by Graham Knop.
+
+- Better handling of module prereqs which in turn share prereqs with the
+  module we're installing. Patch by Graham Knop.
+
+
+0.17   2013-07-13
+
+- Packaging fixes so CPAN ignores our test corpus modules. Patch by Graham
+  Knopp.
+
+
+0.16   2013-07-13
+
+- Distros where all tests are skipped or where no tests exist are considered
+  as passing. Previously they were a failure. Fixed by Graham Knopp.
+
+- Added some real tests. Written by Graham Knopp.
+
+
+0.15   2013-05-13
+
+- The change in 0.14 broke non-parallel testing in the test_modules()
+  subroutine. This was my fault, not Graham's. Reported by Graham Knopp.
+
+
+0.14   2013-03-13
+
+- Fix a bug where the value of $_ in a loop could be overwritten in
+  test_modules. Patch by Graham Knopp.
+
+
+0.13   2012-04-19
+
+- Use MetaCPAN to look up reverse dependencies instead of CPANDB. Patch by
+  Jesse Luehrs.
+
+- Silence all of the test running and installing. Patch by Jesse Luehrs.
+
+- Avoid dying on avoidable errors (turn them into test fails or skips as
+  appropriate). Patch by Jesse Luehrs.
+
+- Use Test::Builder instead of Test::More so $TODO works properly. Also, mark
+  todo tests in the log files. Patch by Jesse Luehrs.
+
+- The test_module sub now also initializes the log files. Patch by Jesse
+  Luehrs.
+
+- A distro's configure_requires prereqs are now respected. Patch by Jesse
+  Luehrs.
+
+
+0.12   2011-07-20
+
+- Logging was broken when using multiple processes. The prereq log file would
+  end up appearing under multiple names (potentially one per process), and the
+  files were not locked for writing in each process.
+
+- The directory to which prereqs were installed got cleaned out after each
+  process exited when running multiple processes, which often caused false
+  failures for modules being tested.
+
+
+0.11   2011-04-21
+
+- Forcibly reload the CPAN index each time this module runs tests. This gives
+  you the best chance of finding the most reecent version of a dependent
+  module.
+
+
+0.10   2011-04-21
+
+- Test output now includes the distribution id rather than just a module name,
+  meaning you can see the distro version in the ok line.
+
+
+0.09   2011-04-12
+
+- Parallel testing caused bad test output when a test was skipped because a
+  module could not be found on CPAN.
+
+- The output from running a distro's Makefile.PL/Build.PL could stomp on the
+  TAP output when running tests in parallel. We now simply close STDOUT when
+  running this step, which is less than ideal, but fixes the breakage.
+
+
+0.08   2011-04-12
+
+- This module can now run tests in parallel if you have Parallel::ForkManager
+  installed. See the docs for details.
+
+- The test_module() sub has been deprecated in favor a new sub,
+  test_modules(). If you use test_module(), you can't ever run tests in
+  parallel.
+
+- We now defer loading CPAN.pm and related modules until tests are
+  running. This avoids the possibility of CPAN prompting for config if
+  Test::DependentModules is loaded but not actually used.
+
+
+0.07   2010-07-15
+
+- Include author id in status line.
+
+
+0.06   2010-07-14
+
+- Ignore cargo-culted diag() output that's present in many modules, looking
+  like this:
+
+    # Testing Foo::Bar 0.01, Perl 5.00801, /usr/bin/perl
+
+  This was being treated as a warning, but it can safely be ignored.
+
+0.05   2009-12-12
+
+- Renamed the test_all_my_deps function to test_all_dependents.
+
+
+0.04   2009-12-12
+
+- Renamed to Test::DependentModules, since as Jesse Luehrs pointed out, we're
+  not testing our dependencies, we're testing things that depend on us.
+
+- All environment variables names starting with PERL_TEST_MD now start with
+  PERL_TEST_DM.
+
+- In some weird inexplicable case, testing a module seemed to somehow trigger
+  File::Temp's cleanup routine too early, deleting the temp dir containing
+  temporary prereq installations. Test::MyDeps now manages its temp dir
+  manually.
+
+- Changed how logging works. There are now three log files created, and you
+  specify a log _directory_, not a file, via the
+
+
+0.03   2009-12-12
+
+- Added missing prereq on IO::Handle::Util
+
+
+0.02   2009-12-12
+
+- Fixed test_all_my_deps so the exclude parameter actually works.
+
+- The PERL5LIB var did not include the temp dir containing temporarily
+  installed second+ level depenencies.
+
+- Renamed the TEST_PERL_MD_CPAN_VERBOSE env var to PERL_TEST_MD_CPAN_VERBOSE.
+
+
+0.01   2009-12-12
+
+- First version, released on an unsuspecting world.

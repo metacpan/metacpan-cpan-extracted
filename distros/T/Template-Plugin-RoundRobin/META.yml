@@ -1,0 +1,16 @@
+abstract: Server data in a round robin manner.
+author: Kang-min Liu <gugod@gugod.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Template-Plugin-RoundRobin
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Data::RoundRobin: 0
+  Template: 0
+version: 0.02

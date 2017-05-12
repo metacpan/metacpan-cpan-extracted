@@ -1,0 +1,84 @@
+Name              DSLI  Description                                  Info
+----------------  ----  -------------------------------------------- -----
+Tie::DB_FileLock  Rdpr  Locking access to Berkeley DB 1.x.           JMV
+
+# Tie::FileLock.pm		1/10/2000
+# John M Vinopal        jmv@cpan.org
+#
+# Copyright (C) 1998-2000, John M Vinopal, All Rights Reserved.
+# This program is free software.  Permission is granted to copy
+# and modify this program so long as this copyright notice is                  
+# preserved.  This software is distributed without warranty.
+# You can redistribute it and/or modify it under the same terms
+# as Perl itself.
+#
+
+DESCRIPTION
+-----------
+
+	Module DB_File allows perl to tie hashes to on-disk dbm
+	files, but fails to provide any method by which the hashes
+	might be locked, providing exclusive access or preventing
+	page-level collisions.  Tie::DB_FileLock extends DB_File,
+	providing a locking layer using flock().
+
+	Unlike Tie::DB_Lock, Tie::DB_FileLock does not duplicate
+	files to allow concurrent access for readers and writers.
+	Tie::DB_FileLock is therefore suitable for large dbms with
+	relatively short locking periods.
+
+	DB_File::Lock is another option, a lightweight wrapper
+	around DB_File using an external lockfile.
+	See the POD documentation for more information.
+
+
+PREREQUISITES
+-------------
+
+    * Perl 5.004 or greater.
+    * Module DB_File (1.65 through 1.820 should work).
+
+BUILDING THE MODULE
+-------------------
+
+Tie::DB_FileLock is all perl, no compilation.
+
+    perl Makefile.PL
+    make
+    make test
+
+INSTALLATION
+------------
+
+    make install
+
+FEEDBACK
+--------
+
+How to report a problem with Tie::DB_FileLock.
+
+To help me help you, I need of the following information:
+
+ 1. The version of Perl and the operating system name and version you
+    are running.  The command 'perl -V' should provide everything.
+
+ 2. The version of Tie::DB_FileLock you have installed.  If you've installed
+    Tie::DB_FileLock, this one-liner will tell you:
+
+	perl -e 'use Tie::DB_FileLock; print "V: $Tie::DB_FileLock::VERSION\n"'
+
+    Otherwise search DB_FileLock.pm for a line like this:
+
+	$VERSION = 'X.XX';
+
+ 3. The error message(s) generated or a concise description of the problem.
+
+ 4. Finally if this is a bug, a fix or a small example of the bug.
+
+CHANGES
+-------
+
+See the Changes file.
+
+John M Vinopal <jmv@cpan.org>
+

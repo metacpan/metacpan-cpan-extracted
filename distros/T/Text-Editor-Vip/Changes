@@ -1,0 +1,42 @@
+commit c071b7860f3ab74c8c7bb6b1f8ae12d67bb17415 (master)
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Wed Dec 31 16:00:05 2008 +0100
+
+    ADDED: Initial commit
+    
+    Previous Changes:
+    0.05
+    	ADDED: replace takes a sub ref as replacement
+    	ADDED: expansion history
+    	ADDED: color setup module
+    	ADDED: Clipboard module
+    
+    0.04
+    	CHANGED: output style for CompareText (taken from Test:Differences)
+    	ADDED: some missing TODO tests
+    	ADDED: search within boundaries
+    	CHANGED: use more Test:: modules instead for home made tests
+    	ADDED: possibility to set start line and character in replace
+    
+    0.03_1
+    	ADDED: tests for List
+    	ADDED: more plugin documentation
+    	CHANGED: word movement plugin also returns new find position
+    	ADDED: Undo and Redo sub. Those still need optimisation.
+    
+    0.02_1 Sat Sep 8 2005
+    	ADDED: Some documentation
+    	MOVED: Indenter in own plugin and documented how to add indenters
+    	FIXED: problem in selection
+    	ADDED: most buffer functionality from Smed (previous editor)
+    	ADDED: a few hundred tests
+    
+    0.01_2 Sat Aug 13 2005
+    	ADDED: refactored some of my old code into Vip
+    	ADDED: a test suite
+    	ADDED: undo support
+    	Added: plugin functionality
+    	ADDED: documentation to the buffer package
+    
+    0.01_1 Tue Aug  9 19:37:42 2005
+    	- original version; created by ExtUtils::ModuleMaker 0.32

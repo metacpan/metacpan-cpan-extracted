@@ -1,0 +1,9 @@
+1..2
+# Affe
+ok 1 - affe
+  ---
+  BenchmarkAnythingData:
+    - NAME: bogomips
+      VALUE: 9876.50
+  ...
+ok 2 - zomtec

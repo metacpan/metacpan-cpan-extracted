@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Template-Provider-PrefixDBIC,
+version 0.01:
+
+  A template provider that uses DBIC for database access and exhibits fallback functionality
+
+This software is copyright (c) 2011 by INOC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

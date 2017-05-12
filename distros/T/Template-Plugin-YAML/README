@@ -1,0 +1,66 @@
+README for Template::Plugin::YAML
+
+=head1 NAME
+
+Template::Plugin::YAML - Plugin interface to YAML
+
+=head1 SYNOPSIS
+
+    [% USE YAML %]
+
+    [% YAML.dump(variable) %]
+    [% YAML.dump_html(variable) %]
+    [% value = YAML.undump(yaml_string) %]
+    [% YAML.dumpfile(filename, variable) %]
+    [% value = YAML.undumpfile(filename) %]
+
+
+=head1 INSTALLATION
+
+ perl Makefile.PL
+ make test
+
+and if all goes well
+
+ make install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 1.23    15th December, 2008
+
+        Fix the tests so we don't rely on golden output.  Should fix
+        most of the failing smoke cases.
+
+
+=item 1.22	29th August, 2003
+
+	Adds undump, dumpfile, undumpfile as provided by Randal L. Schwartz
+
+
+=item 1.21	30th July, 2003
+
+	Initial CPAN release
+=back
+
+=head1 AUTHORS
+
+Richard Clamp <richardc@unixbeard.net>, with undump, undumpfile, and
+dumpfile implementation by Randal L. Schwartz <merlyn@stonehenge.com>
+
+based on Simon Matthews' L<Template::Plugin::Dumper>
+
+=head1 COPYRIGHT
+
+Copyright 2003, 2008 Richard Clamp All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Template::Plugin::Dumper>
+

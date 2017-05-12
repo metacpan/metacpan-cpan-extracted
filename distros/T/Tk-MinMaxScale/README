@@ -1,0 +1,82 @@
+Tk/MinMaxScale version 0.12
+===========================
+
+Tk::MinMaxScale is a Frame-based widget wrapping two Scale widgets,
+the first acting as a 'minimum' and the second as a 'maximum'.
+Its purpose is to get a range of values narrower than the
+whole range given by the options '-from' and '-to'.
+
+
+SYNOPSIS
+
+$mms = $mw->MinMaxScale(
+    -variablemin => \$vn,
+    -variablemax => \$vx,
+    -labelmin => ...,
+    -labelmax => ...,
+    ...,
+);
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+HISTORY
+
+version 0.12 - 2006/09/15
+	- failure corrected in test twomms.t
+
+version 0.11 - 2004/02/29
+	- some code clean-up
+	- hope tests are improved
+
+version 0.10 - 2004/02/14
+	- configure and cget methods implemented (via ConfigSpecs)
+	- more tests
+
+version 0.09 - 2004/02/04
+	throwed away (http://history.perl.org/backpan/authors/id/J/JP/JPVIDAL/)
+
+version 0.08 - 2004/01/04
+	- compatibility with Tk804.xxx (dash before option).
+
+version 0.07 - 2002/11/21
+	- added tests.
+
+version 0.06 - 2002/11/20
+	- dropped "use warnings" and "use diagnostics".
+	- cleaned up the distribution package.
+
+version 0.05 - 2002/11/05
+	- unlike Scale, '-orient' option defaults now to 'horizontal'.
+	- like Scale, '-from' and '-to' options defaults now to 0 and 100, respectively.
+	- definitely (:() fixed Shift-key binding problems.
+
+version 0.04 - 2002/11/01
+	- enhanced methods minvalue and maxvalue to set and/or get the scale values.
+
+version 0.03 - 2002/11/01
+	- fixed some problems when dragging while depressing shift key
+	- added methods minvalue and maxvalue
+
+version 0.02 - 2002/10/24
+	- new feature added: dragging a slider while pressing a Shift key
+	  drags both sliders, locking their distance (an idea from Mark Lakata).
+
+version 0.01 - 2002/10/17
+	- first release.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2004 Jean-Pierre Vidal
+
+This package is free software and is provided "as is"
+without express or implied warranty. It may be used, modified,
+and redistributed under the same terms as Perl itself.

@@ -1,0 +1,53 @@
+{
+   "dynamic_config" : 1,
+   "provides" : {
+      "Text::OutputFilter" : {
+         "file" : "OutputFilter.pm",
+         "version" : "0.20"
+      }
+   },
+   "version" : "0.20",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008",
+            "Carp" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::NoWarnings" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "meta-spec" : {
+      "version" : "2",
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
+   "name" : "Text-OutputFilter",
+   "abstract" : "Filter and modify output",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+   ],
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Tux/Text-OutputFilter",
+         "web" : "https://github.com/Tux/Text-OutputFilter",
+         "type" : "git"
+      }
+   },
+   "release_status" : "stable",
+   "generated_by" : "Author",
+   "license" : [
+      "perl_5"
+   ]
+}

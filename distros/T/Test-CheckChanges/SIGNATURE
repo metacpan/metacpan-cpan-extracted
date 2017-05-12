@@ -1,0 +1,94 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 badac0e40137c1d34beb5fabea9c6a3e1f9675eb Build.PL
+SHA1 439bd86476628382cafcbe728b6541a89ef97fba Changes
+SHA1 ffa0d7fd471d649d094e4b98c981681f105ea8aa MANIFEST
+SHA1 a0427dd82187bd16a766d5d1237dcf4844e7a118 META.yml
+SHA1 312f7214ac0aede4096967f0c26758229ae8b1dd Makefile.PL
+SHA1 76f30d9becbe3abc7a91769480ddaaa8d3379ac2 README
+SHA1 27f9fc192c38a30171338e66520e43326ea85cb5 examples/apocal/Changes
+SHA1 d099144eb6e8b85b4331e676d3a972b627e4d16b examples/apocal/Makefile
+SHA1 6a677ea6f79a4604e073a4582989f81d997f202d examples/common/Changes
+SHA1 5c084c50fe44844576993233cda1c749fd7a389f examples/common/Makefile
+SHA1 d7effcace6ff246057c12bd159ff293370da6a83 examples/common3/Changes
+SHA1 26c3641562979af892ef014c65ab8e1d4efe9f3a examples/common3/Makefile
+SHA1 a428b40e5f1d28e057ea6da641977f67bc3f1623 examples/mixxed/Changes
+SHA1 5df9d5e6d83b274305c2109a287ac113f87c3e56 examples/mixxed/Makefile
+SHA1 cf9f1185e01f970797669d1dc52f11590063bd7a examples/versionN/Changes
+SHA1 5df9d5e6d83b274305c2109a287ac113f87c3e56 examples/versionN/Makefile
+SHA1 5eede8ff157d5f64920965838cb23090aefd8341 examples/yaml/Changes
+SHA1 9c4243cc82bea6335c6a6cba6de89647ae9c5c36 examples/yaml/Makefile
+SHA1 874f7f2f29b9085cda05ca0331e43f143336611e lib/Test/CheckChanges.pm
+SHA1 90fec68554a470af4004c47cc3e3b406446fc6f4 t/bad/CHANGES
+SHA1 90fec68554a470af4004c47cc3e3b406446fc6f4 t/bad/Changes
+SHA1 be0b30201e33f5b412e981078aeb0b2951ffd9e2 t/bad/Makefile
+SHA1 0c791db5cdce98d392b9f7446f370468b4169af1 t/bad/missing2/README
+SHA1 552de64c0259d5b506cd1c73425e30b442b202b3 t/bad/mixxed/Changes
+SHA1 cc2f87f5e32b9b1ca7fe27e064e1364d15a54139 t/bad/mixxed/Makefile
+SHA1 90fec68554a470af4004c47cc3e3b406446fc6f4 t/bad/multiple/Changes
+SHA1 be0b30201e33f5b412e981078aeb0b2951ffd9e2 t/bad/multiple/Makefile
+SHA1 6a677ea6f79a4604e073a4582989f81d997f202d t/bad/test1a/Changes
+SHA1 c701f2372879ded10a5fa65b336d524b1dd28445 t/bad/test1a/_build/build_params
+SHA1 6a677ea6f79a4604e073a4582989f81d997f202d t/bad/test1b/Changes
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/bad/test1c/CHANGES
+SHA1 a8672d03e2a12ca7318385239c1df49426e2b42a t/bad/test1c/_build/build_params
+SHA1 6a677ea6f79a4604e073a4582989f81d997f202d t/bad/test2/Changes
+SHA1 16d4460487661ddebce960f88d6b83eaa9c19bd2 t/bad/test2/Makefile
+SHA1 5eede8ff157d5f64920965838cb23090aefd8341 t/bad/test3/Changes
+SHA1 23e8a461eb4c178dab735ea4e6f113a1d429b7f0 t/bad/test3/Makefile
+SHA1 9a2b741ade24867025b0b0a94a32caa2ea5338da t/bad/test4/Changes
+SHA1 5c084c50fe44844576993233cda1c749fd7a389f t/bad/test4/Makefile
+SHA1 27f9fc192c38a30171338e66520e43326ea85cb5 t/bad/test5/Changes
+SHA1 d099144eb6e8b85b4331e676d3a972b627e4d16b t/bad/test5/Makefile
+SHA1 669ab0db33db07a257eec2f7ebe1e6b6e8644ff1 t/bad/test6/Changes
+SHA1 5c084c50fe44844576993233cda1c749fd7a389f t/bad/test6/Makefile
+SHA1 669ab0db33db07a257eec2f7ebe1e6b6e8644ff1 t/bad/test7/Changes
+SHA1 0c6a0a4ef629f458bd399dce258d34db8da10b76 t/changes.t
+SHA1 247a4e1643fb969ace18b154953208df8376a71e t/missing.t
+SHA1 bad7d77e1e930283561602b262e6f4e79815fa8f t/mixxed.t
+SHA1 1a0cb2689a2f468c78f96c2a9256129cc010f6e2 t/multi.t
+SHA1 dd833c4f5c4963b763bd00a824354b59ae472177 t/parse_all.t
+SHA1 4bb3da3ec418c5165b33ae17e4077920c16795ca t/parse_apocal.t
+SHA1 05ba809076c57dbb27a368792a88f9c3cbc6cd5e t/parse_common.t
+SHA1 b8fcbed21570daa87eadf33bfb4883728ced37e4 t/parse_common3.t
+SHA1 2468db6554123c5d86c89cf0a1bdfa9156654fe3 t/parse_versionN.t
+SHA1 e188b8247008aa5125f4cc6d36788635426e4c5a t/parse_yaml.t
+SHA1 99327578069feb38cb1ab8ca655f9252bed79567 t/perlcriticrc
+SHA1 0c8758564ab0ef04e073b4df488a330a765f931d t/pod.t
+SHA1 5a01e2195c26c3adf7b7e3793468246e5fd9be0b t/pod_coverage.t
+SHA1 779cd2012bdf108864f4375ec528e17f8d25844f t/test1a.t
+SHA1 8410b336a49f89710a61d6a51e273bbdc6c8f930 t/test1b.t
+SHA1 7d3f644d976f5f8d178d9527f8f305722abc00c4 t/test1c.t
+SHA1 dc9d8f597507cf3497283c1f59998ce282f60005 t/test2.t
+SHA1 76a7ee910966271b2cdfcfce9ea0aa70def351b0 t/test3.t
+SHA1 44879848e31e8be07663bcf22c0481446ac7f030 t/test4.t
+SHA1 bd998eaaa17f8e7c300d679ee5e26058f6cef317 t/test5.t
+SHA1 8067ae24e4abc528e5534fd33c9513fa2bdbaf9d t/test6.t
+SHA1 d512dab4edc22488ae52628ae928b84605efe5bb t/test7.t
+SHA1 1d86ba7f0495b32372abf227c1ac50fb4a4cb96b t/testx.t
+SHA1 b4f39bbaae6e5b6c1be03f6a3ac09d4b56262c52 t/testy.t
+SHA1 2bde8751166233096a970602eedf71b8f79b2088 t/testz.t
+SHA1 aec22bc32799fea1fa31eec0d3f26545f64e581a t/tpcp.t
+SHA1 9b9855c618eb97b9f74c4c8d504e63610ebcdcdc t/unit.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iGcEARECACcFAkuS4qEgGmh0dHA6Ly93d3cuZ2FtMy5uZXQvcG9saWN5Lmh0bWwA
+CgkQliSr/X1H0FwP5ACfddo/l33Tt6dpLlEvqHO/TIX2kCkAn0y5n6zGy2Toazxc
+2hrcqn9wR/SE
+=JKrd
+-----END PGP SIGNATURE-----

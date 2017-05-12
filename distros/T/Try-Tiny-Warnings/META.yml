@@ -1,0 +1,42 @@
+---
+abstract: 'extension to Try::Tiny to also catch warnings'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Try-Tiny-Warnings
+provides:
+  Try::Tiny::Warnings:
+    file: lib/Try/Tiny/Warnings.pm
+    version: v0.1.0
+requires:
+  Exporter: '0'
+  Try::Tiny: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Try-Tiny-Warnings/issues
+  homepage: https://github.com/yanick/Try-Tiny-Warnings
+  repository: https://github.com/yanick/Try-Tiny-Warnings.git
+version: 0.1.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

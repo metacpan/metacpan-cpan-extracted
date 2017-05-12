@@ -1,0 +1,44 @@
+--- #YAML:1.0
+name:               TM
+version:            1.56
+abstract:           Topic Maps, Base Class
+author:
+    - Robert Barta <drrho@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    BerkeleyDB:           0.26
+    Cache::Memcached:     ~
+    Class::Trait:         0.22
+    Config::General:      2.26
+    IO::String:           1.08
+    Log::Log4perl:        0.5
+    LWP::Simple:          1.41
+    MLDBM:                2.01
+    MLDBM::Sync:          0.3
+    Parse::RecDescent:    ~
+    Parse::Yapp::Driver:  1.05
+    Pod::Usage:           1.16
+    Regexp::Common:       ~
+    Term::ReadLine:       1.01
+    Test::Deep:           0.093
+    Test::More:           0.47
+    Test::Pod:            1
+    Text::CSV:            ~
+    URI:                  1.35
+    XML::LibXML:          1.58
+    XML::Simple:          2.13
+    XML::Writer:          0.602
+    YAML::Syck:           ~
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

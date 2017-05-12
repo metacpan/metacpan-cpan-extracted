@@ -1,0 +1,19 @@
+Revision history for Perl extension Try::Chain.
+
+0.005  Thu Apr 20 14:28:09 2017
+- new methods $call_em
+- Pod fixes
+
+0.004  Tue Apr 18 10:32:11 2017
+- fixed dependencies
+- new methods $fetch_ei and $fetch_ek
+
+0.003  Thu Apr 13 16:21:32 2017
+- Pod fixes
+
+0.002  Thu Apr 13 11:55:50 2017
+- fixed dependencies
+- new methods $fetch_i and $fetch_k
+
+0.001  Wed Apr 12 16:54:33 2017
+- first release

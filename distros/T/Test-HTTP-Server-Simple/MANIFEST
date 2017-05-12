@@ -1,0 +1,11 @@
+Changes
+lib/Test/HTTP/Server/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE
+t/00.load.t
+t/01.basic.t
+t/pod-coverage.t
+t/pod.t

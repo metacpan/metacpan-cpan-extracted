@@ -1,0 +1,294 @@
+# German translations for GTestRunner.
+# Copyright (C) 2004-2006 Guido Flohr <guido@imperia.net>
+# This file is distributed under the same license as the 
+# Test-Unit-GtkTestRunner package.
+# Guido Flohr <guido@imperia.net>, 2004-2006
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Test-Unit-GTestRunner\n"
+"Report-Msgid-Bugs-To: Guido Flohr <guido@imperia.net>\n"
+"POT-Creation-Date: 2006-05-12 15:37+0300\n"
+"PO-Revision-Date: 2006-05-12 15:29+0300\n"
+"Last-Translator: Guido Flohr <guido@imperia.net>\n"
+"Language-Team: German <guido@imperia.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../gtestrunner.glade:8
+msgid "GTestRunner"
+msgstr "GTestRunner"
+
+#: ../gtestrunner.glade:37
+msgid "_File"
+msgstr "_Datei"
+
+#: ../gtestrunner.glade:74
+msgid "_Tests"
+msgstr "_Tests"
+
+#: ../gtestrunner.glade:83
+msgid "_Run"
+msgstr "_Start"
+
+#: ../gtestrunner.glade:105
+msgid "Run _Selected"
+msgstr "S_tarte Auswahl"
+
+#: ../gtestrunner.glade:151
+msgid "_Settings"
+msgstr "_Einstellungen"
+
+#: ../gtestrunner.glade:160
+msgid "_Refresh suites before every run"
+msgstr "Testsuites vor jedem Lauf _neu laden"
+
+#: ../gtestrunner.glade:174
+msgid "_Help"
+msgstr "_Hilfe"
+
+#: ../gtestrunner.glade:183
+msgid "_About"
+msgstr "_Info"
+
+#: ../gtestrunner.glade:246
+msgid "Run"
+msgstr "Start"
+
+#: ../gtestrunner.glade:264
+msgid "Selected"
+msgstr "Auswahl"
+
+#: ../gtestrunner.glade:298
+msgid "Refresh the test suite"
+msgstr "Test-Suite neu laden"
+
+#: ../gtestrunner.glade:335
+msgid "Refresh suites before every run"
+msgstr "Testsuites vor jedem Lauf neu laden"
+
+#: ../gtestrunner.glade:368
+msgid "Quit"
+msgstr "Beenden"
+
+#: ../gtestrunner.glade:484
+msgid "Failures"
+msgstr "Fehlschläge"
+
+#: ../gtestrunner.glade:537
+msgid "Test Hierarchy"
+msgstr "Test-Hierarchie"
+
+#: ../lib/Test/Unit/GTestRunner.pm:282
+msgid "Starting GTestRunner."
+msgstr "GTestRunner startet."
+
+#: ../lib/Test/Unit/GTestRunner.pm:317 ../lib/Test/Unit/GTestRunner.pm:365
+msgid "Test"
+msgstr "Test"
+
+#: ../lib/Test/Unit/GTestRunner.pm:329
+msgid "Test Case"
+msgstr "Testfall"
+
+#: ../lib/Test/Unit/GTestRunner.pm:329
+msgid "Source"
+msgstr "Quelle"
+
+#: ../lib/Test/Unit/GTestRunner.pm:480
+#, perl-brace-format
+msgid "Test cannot be started: {cmd}: {err}."
+msgstr "Test kann nicht gestartet werden: {cmd}: {err}."
+
+#: ../lib/Test/Unit/GTestRunner.pm:488
+msgid "Running ..."
+msgstr "Läuft ..."
+
+#: ../lib/Test/Unit/GTestRunner.pm:520
+msgid ""
+"The test suite you want to run has changed.  Please make a new\n"
+"selection, and run again.\n"
+msgstr ""
+"Die aktuelle Auswahl ist ungültig, weil die Test-Suite\n"
+"verändert wurde. Ein erneuter Lauf ist erst nach einer neuen Auswahl\n"
+"möglich.\n"
+
+#: ../lib/Test/Unit/GTestRunner.pm:617
+msgid "Waiting for test to terminate ..."
+msgstr "Warten auf Testende ..."
+
+#: ../lib/Test/Unit/GTestRunner.pm:623
+msgid "Refreshing the test suite."
+msgstr "Die Test-Suite wird neu geladen."
+
+#: ../lib/Test/Unit/GTestRunner.pm:677
+#, perl-brace-format
+msgid "Testsuite cannot be listed: {cmd}: {err}."
+msgstr "Testsuite kann nicht aufgelistet werden: {cmd}: {err}."
+
+#: ../lib/Test/Unit/GTestRunner.pm:700
+#, perl-brace-format
+msgid "Corrupt test listing: {line}\n"
+msgstr "Fehlerhaftes Test-Listing: {line}\n"
+
+#: ../lib/Test/Unit/GTestRunner.pm:712
+#, perl-brace-format
+msgid "Invalid change in test depth ({old} to {new})."
+msgstr "Unmöglicher Wechsel in Testsuite-Tiefe ({old} zu {new})."
+
+#. TRANSLATORS: Replace this string with your
+#. own names and e-mail addresses, one name
+#. per line.
+#: ../lib/Test/Unit/GTestRunner.pm:957
+msgid "translator-credits"
+msgstr "Guido Flohr <guido@imperia.net>"
+
+#: ../lib/Test/Unit/GTestRunner.pm:968 ../lib/Test/Unit/GTestRunner.pm:985
+msgid "Select a test suite or test case to run!"
+msgstr "Test-Suite oder Testfall auswählen!"
+
+#: ../lib/Test/Unit/GTestRunner.pm:1012
+#, perl-brace-format
+msgid "Select on pipe to child process failed: {err}."
+msgstr "Select() auf Pipe zum Kindprozess fehlgeschlagen: {err}."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1020 ../lib/Test/Unit/GTestRunner.pm:1029
+#: ../lib/Test/Unit/GTestRunner.pm:1039
+msgid "Unexpected end of file while reading from child process."
+msgstr "Unerwartetes Dateiende beim Lesen vom Kindprozess."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1023 ../lib/Test/Unit/GTestRunner.pm:1042
+#, perl-brace-format
+msgid "Read from pipe to child process failed: {err}."
+msgstr "Lesen aus Pipe zum Kindprozess fehlgeschlagen: {err}."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1153
+msgid "Test terminated."
+msgstr "Test beendet."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1161
+#, perl-brace-format
+msgid "Running: {test}"
+msgstr "Test »{test}« läuft."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1167 ../lib/Test/Unit/GTestRunner.pm:1202
+#, perl-brace-format
+msgid "one test, "
+msgid_plural "{num_tests} tests, "
+msgstr[0] "Ein Test, "
+msgstr[1] "{num_tests} Tests, "
+
+#: ../lib/Test/Unit/GTestRunner.pm:1169 ../lib/Test/Unit/GTestRunner.pm:1204
+#, perl-brace-format
+msgid "one error, "
+msgid_plural "{num_errors} errors, "
+msgstr[0] "ein Fehler, "
+msgstr[1] "{num_errors} Fehler, "
+
+#: ../lib/Test/Unit/GTestRunner.pm:1171 ../lib/Test/Unit/GTestRunner.pm:1206
+#, perl-brace-format
+msgid "one failure"
+msgid_plural "{num_failures} failures"
+msgstr[0] "ein Fehlschlag"
+msgstr[1] "{num_failures} Fehlschläge"
+
+#: ../lib/Test/Unit/GTestRunner.pm:1224
+#, perl-brace-format
+msgid "Success: {test}"
+msgstr "Erfolg: {test}"
+
+#: ../lib/Test/Unit/GTestRunner.pm:1249
+#, perl-brace-format
+msgid "Failure: {test}"
+msgstr "Fehlgeschlagen: {test}"
+
+#: ../lib/Test/Unit/GTestRunner.pm:1343
+msgid "Test aborted."
+msgstr "Test abgebrochen."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1358
+msgid "Test process terminated."
+msgstr "Testprozess beendet."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1369
+msgid "Child process cannot be terminated."
+msgstr "Kindprozess kann nicht beendet werden."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1376
+#, perl-brace-format
+msgid "Child process signaled with SIG{NAME}."
+msgstr "Kindprozess erhält Signal »{NAME}«."
+
+#: ../lib/Test/Unit/GTestRunner.pm:1395
+#, perl-brace-format
+msgid ""
+"Internal error: Unrecognized error state \"{state}\".  This should\n"
+"not happen.\n"
+msgstr ""
+"Interner Fehler: Unbekannter Zustand »{state}«.  Dies sollte nicht\n"
+"passieren.\n"
+
+#: ../lib/Test/Unit/GTestRunner/Lister.pm:52
+#: ../lib/Test/Unit/GTestRunner/Worker.pm:47
+#, perl-brace-format
+msgid "Standard output cannot be duplicated: {err}."
+msgstr "Die Standardausgabe kann nicht dupliziert werden: {err}."
+
+#: ../lib/Test/Unit/GTestRunner/Lister.pm:59
+#, perl-brace-format
+msgid "Standard output cannot be closed: {err}."
+msgstr "Die Standardausgabe kann nicht geschlossen werden: {err}."
+
+#: ../lib/Test/Unit/GTestRunner/Lister.pm:64
+#, perl-brace-format
+msgid "Standard output cannot be redirected to standard error: {err}."
+msgstr ""
+"Die Standardausgabe kann nicht auf die Standardfehlerausgabe umgeleitet "
+"werden: {err}."
+
+#: ../lib/Test/Unit/GTestRunner/Worker.pm:58
+#, perl-brace-format
+msgid "Standard output cannot be tied: {err}."
+msgstr "Tie() für Standardausgabe ist fehlgeschlagen: {err}."
+
+#: ../lib/Test/Unit/GTestRunner/Worker.pm:64
+#, perl-brace-format
+msgid "Standard error cannot be tied: {err}."
+msgstr "Tie() für Standardfehlerausgabe fehlgeschlagen: {err}."
+
+#~ msgid "Protocol error: Invalid number of bytes in reply from child process."
+#~ msgstr ""
+#~ "Protokollfehler: Ungültige Anzahl von Zeichen in Antwort vom Kindprozess."
+
+#~ msgid "read from pipe to child process failed: {err}."
+#~ msgstr "Lesen aus Pipe zum Kindprozess fehlgeschlagen: {err}."
+
+#~ msgid "Standard output cannot be dup()d: {err}."
+#~ msgstr "Die Standardausgabe kann nicht dupliziert werden: {err}."
+
+#~ msgid "Cannot list test suite: "
+#~ msgstr "Test-Suite kann nicht gelistet werden: "
+
+#~ msgid "Giving up on killing child process."
+#~ msgstr "Kindprozess kann nicht abgeschossen werden."
+
+#~ msgid "Tests: {num_tests}, errors: {num_errors}, failures: {num_failures}"
+#~ msgstr ""
+#~ "Tests: {num_tests}, fehlgeschlagene Testfälle: {num_errors}, "
+#~ "fehlgeschlagene Tests: {num_failures}."
+
+#~ msgid "{num_tests} tests, {num_errors} errors, {num_failures} failures"
+#~ msgstr ""
+#~ "Tests: {num_tests}, fehlgeschlagene Testfälle: {num_errors}, "
+#~ "fehlgeschlagene Tests: {num_failures}."
+
+#~ msgid "_Reload"
+#~ msgstr "_Neu Laden"
+
+#~ msgid "Reload classes every run"
+#~ msgstr "Klassen jedesmal neu laden"
+
+#~ msgid "Reload"
+#~ msgstr "Neu laden"

@@ -1,0 +1,354 @@
+diff -urb DBIx-Abstract-1.005/Abstract.pm dbix-abstract/Abstract.pm
+--- DBIx-Abstract-1.005/Abstract.pm	2003-02-17 22:28:48.000000000 -0500
++++ dbix-abstract/Abstract.pm	2004-04-04 19:31:31.000000000 -0400
+@@ -1,16 +1,25 @@
+-# $Id: dbix-abstract.patch 118 2006-04-13 01:20:06Z fil $
++# $Id: dbix-abstract.patch 118 2006-04-13 01:20:06Z fil $
+ package DBIx::Abstract;
+ 
+ use DBI;
+-use Scalar::Util 'weaken';
+ use strict;
+ use vars qw( $AUTOLOAD $VERSION $LAST_CHANGE );
+ 
++use vars qw($has_weaken);
+ BEGIN {
+-  $DBIx::Abstract::VERSION = '1.005';
+-  ($DBIx::Abstract::CVSVERSION) = q$Revision: 118 $ =~ /(\d+\.[\d.]+)/;
++    eval {
++        require Scalar::Util;
++        Scalar::Util->import('weaken');
++    };
++    $has_weaken=1 unless $@;
++}
++
++
++BEGIN {
++  $DBIx::Abstract::VERSION = '1.006';
++  ($DBIx::Abstract::CVSVERSION) = q$Revision: 118 $ =~ /(\d+\.[\d.]+)/;
+   ($DBIx::Abstract::LAST_CHANGE) =
+-    q$Date: 2006-04-12 21:20:06 -0400 (Wed, 12 Apr 2006) $ =~ /(\d+\/\S+ \d+:\S+)/;
++    q$Date: 2006-04-12 21:20:06 -0400 (Wed, 12 Apr 2006) $ =~ /(\d+\/\S+ \d+:\S+)/;
+ }
+ 
+ sub ___drivers {
+@@ -260,10 +269,11 @@
+   } else {
+     $newself->{'ORIG'} = $self->{'ORIG'};
+   }
+-  weaken($newself->{'ORIG'});
++  weaken($newself->{'ORIG'}) if $has_weaken;
+ 
+   push(@{$newself->{'ORIG'}->{'CLONES'}},$newself);
+-  weaken($newself->{'ORIG'}->{'CLONES'}[$#{$newself->{'ORIG'}->{'CLONES'}}]);
++  weaken($newself->{'ORIG'}->{'CLONES'}[$#{$newself->{'ORIG'}->{'CLONES'}}])
++         if $has_weaken;
+ 
+   $self->__logwrite(5,'Cloned');
+   return $newself;
+@@ -487,7 +497,11 @@
+     if (ref($$where{$_}) eq 'ARRAY') {
+       $self->__logwrite(7,'Value is array',@{$$where{$_}});
+       $ret .= $$where{$_}[0].' ';
+-      if (ref($$where{$_}[1]) eq 'SCALAR') {
++      if(uc($$where{$_}[0]) eq 'IN' and ref($$where{$_}[1]) eq 'ARRAY') {
++        $ret .= "(".join(',', map { $self->quote($_)} 
++                                         @{$$where{$_}[1]}).")";
++      }
++      elsif (ref($$where{$_}[1]) eq 'SCALAR') {
+         $ret .= ${$$where{$_}[1]};
+       } else {
+         $ret .= '?';
+@@ -688,6 +702,16 @@
+ 
+ sub select {
+   my $self = shift;
++  my($sql, @bind_params)=$self->select2query(@_);
++
++  $self->__logwrite_sql(2,$sql,@bind_params);
++  $self->__literal_query($sql,@bind_params);
++  return $self;
++}
++
++sub select2query
++{
++  my $self=shift;
+   my($fields,$table,$where,$order,$extra) = @_;
+   # $fields  == A hash ref with the following values
+   #   OR
+@@ -697,6 +721,7 @@
+   # $where   == One of my handy-dandy standard where's.  See __where.
+   # $order   == The order to output in
+   my $group;#== The key to group by, only available in hash mode
++  my $having;#= where clause for the grouped records, only available in hash mode
+   my($sql,@keys,$i,$join);
+   if (ref($fields) eq 'HASH') {
+     my $field;
+@@ -712,6 +737,7 @@
+     $group = $$fields{'group'};
+     $extra = $$fields{'extra'};
+     $join  = $$fields{'join'};
++    $having  = $$fields{'having'};
+ 
+     $fields = $$fields{'fields'} || $$fields{'field'};
+   }
+@@ -746,15 +772,36 @@
+     } else {
+       $where = [];
+     }
+-    foreach (@{$join}) {
+-      push(@$where,'and') if $#$where>-1;
++    my $todo=$join;
++    if(uc($join->[0]) eq 'LEFT') {
++        $todo=[];
++        my($q, $type, $table, $addsql, @b);
++        for(my $q=0; $q <=$#$join; $q+=3) {
++            $type=uc $join->[$q];
++            unless($type eq 'LEFT' or $type eq 'RIGHT' or 
++                    $type eq 'INNER' or $type eq 'CROSS' or 
++                    $type eq 'NATURAL') {
++                push @$todo, $type, $join->[$q+1];
++                $q--;
++                next;
++            }
++            $table=$join->[$q+1];
++            ($addsql,@b) = $self->__where($join->[$q+2]);
++            $addsql =~ s/WHERE/ON/;
++            $sql .= " $type JOIN $table$addsql";
++            push @bind_params, @b;
++        }
++    }
++    foreach (@{$todo}) {
++        push(@$where,'AND') if $#$where>-1;
+       push(@$where, [$_]);
+     }
+   }
+ 
+   if (defined($where)) {
+-    ($addsql,@bind_params) = $self->__where($where);
++    my($addsql,@b) = $self->__where($where);
+     $sql .= $addsql;
++    push @bind_params, @b;
+   }
+ 
+   if (ref($group) eq 'ARRAY') {
+@@ -765,6 +812,15 @@
+     $sql .= " GROUP BY $group";
+   }
+ 
++  if($having) {
++    my($addsql,@b) = $self->__where($having);
++    if($addsql) {
++        $addsql =~ s/WHERE/HAVING/;
++        $sql .= $addsql;
++        push @bind_params, @b;
++    }
++  }
++
+   if (ref($order) eq 'ARRAY') {
+     if ($#$order>-1) {
+       $sql .= ' ORDER BY '.join(',',@$order);
+@@ -776,10 +832,7 @@
+   if ($extra) {
+     $sql .= ' '.$extra;
+   }
+-
+-  $self->__logwrite_sql(2,$sql,@bind_params);
+-  $self->__literal_query($sql,@bind_params);
+-  return $self;
++  return($sql, @bind_params);
+ }
+ 
+ sub select_one_to_hashref {
+Only in dbix-abstract: Abstract.pm~
+Only in dbix-abstract: CVS
+Only in dbix-abstract: Makefile
+Only in dbix-abstract: Makefile~
+Only in dbix-abstract: blib
+Only in dbix-abstract/lib: CVS
+Only in dbix-abstract/lib/Test: CVS
+Only in dbix-abstract: pm_to_blib
+diff -urb DBIx-Abstract-1.005/t/2-dbix-abstract.t dbix-abstract/t/2-dbix-abstract.t
+--- DBIx-Abstract-1.005/t/2-dbix-abstract.t	2003-03-14 19:30:58.000000000 -0500
++++ dbix-abstract/t/2-dbix-abstract.t	2004-04-04 19:31:31.000000000 -0400
+@@ -5,7 +5,7 @@
+ 
+ #########################
+ 
+-use Test::More tests => 28;
++use Test::More tests => 31;
+ 
+ #########################
+ 
+@@ -89,6 +89,9 @@
+     ok( $dbh, "connect w/dbhandle and destroy: Database handle exists");
+     ok( $dbh->connected(), "connect w/dbhandle and destroy: We are indeed connected." );
+ 
++    SKIP : {
++        skip("No weak reference", 1) unless $DBIx::Abstract::has_weaken;
++
+     is( @{$dbh->{'CLONES'}}, 0, "no clones yet");
+     eval {
+        eval {
+@@ -98,6 +101,7 @@
+        is( @{$dbh->{'CLONES'}}, 0, "clone cleaned up");
+     };
+     ok( ! $@, "clone without error");
++    }
+ 
+     eval {
+         $dbh->query('create table foo (id int null,name char(30) not null,value char(30) null)');
+@@ -158,12 +162,63 @@
+     }; is($@,'','select with join');
+ 
+     eval {
++        $dbh->select({
++            fields=>'count(foo.id)',
++            tables=>'foo',
++            'join'=>[ 'left', 'bar',
++                     'foo.id = bar.foo_id', 
++                     ],
++            where=>{'foo.id'=>['<',10]},
++            extra=>'LIMIT 1000',
++            });
++        if ($dbh->rows) {
++            while(@foo = $dbh->fetchrow_array) { $count2 ++ }
++        }
++    }; is($@,'','select with left join');
++
++    $dbh->query('create table bat (honk int null, zip char(30) not null,value char(30) null)');
++    $dbh->insert('bat',{honk=>2,zip=>'bar',value=>'zip'});
++    $dbh->insert('bat',{honk=>2,zip=>'foo',value=>'honk'});
++    $dbh->insert('bat',{honk=>2,zip=>'adf',value=>'flap'});
++    $dbh->insert('bat',{honk=>2,zip=>'123',value=>'eek'});
++    $dbh->insert('bat',{honk=>2,zip=>'99999',value=>'zipzip'});
++
++    eval {
++        $dbh->select({
++            fields=>'*',
++            tables=>'foo',
++            'join'=>[ 'left', 'bar', 'foo.id = bar.foo_id', 
++                      'left', 'bat', {'foo.id' => \'bat.honk'}
++                     ],
++            where=>{'foo.id'=>['<',2]},
++            });
++        if ($dbh->rows) {
++            while(@foo = $dbh->fetchrow_array) { $count2 ++ }
++        }
++        # warn "count2=$count2";
++    }; is($@,'','select with double left join');
++    
++    eval {
++        $dbh->select({
++               fields=>['count(foo.id) AS zoh'],
++                tables=>'foo',
++                'join'=>[ 'left', 'bat', {'foo.id' => \'bat.honk'} ],
++                group=>['foo.id'],
++                having=>{'zoh'=>['>',1]}
++            });
++        if($dbh->rows) {
++            while(@foo = $dbh->fetchrow_array) { $count2 ++ }
++        }
++    }; is($@,'','select with left join and having');
++
++    eval {
+         $dbh->delete('foo',{id=>['like','%']});
+     }; is((!$@ and $count1==$dbh->rows)?1:0,1,'delete');
+ 
+     eval {
+         $dbh->query('drop table foo');
+         $dbh->query('drop table bar');
++        $dbh->query('drop table bat');
+     }; ok( !$@,'drop');
+ 
+     ok( $dbh->connected, "verified connection" );
+@@ -175,7 +230,9 @@
+     ok( ! $dbh->connected, "verified disconnection" );
+ 
+     if (open(LOG,'test.log')) {
+-        my @log = <LOG>;
++        # 5.004 has a different hash order, so we don't know which
++        # option is set first
++        my @log = grep {!/Option change\tlog/} <LOG>;
+         close(LOG);
+         my @data;
+         my $ignore = 0;
+@@ -184,8 +241,11 @@
+                 $ignore = $1;
+             } elsif ($ignore and /^[^\t]+\t0\t$ignore\tEND\n$/) {
+                 $ignore = 0;
++            } elsif(/Cloned/ and not $DBIx::Abstract::has_weaken) {
++                # If we don't have a weaken function, cloning doesn't work
++                # as well, so it's not checked.
+             } elsif (!$ignore) {
+-                push(@data,$_);
++                push(@data,$_) unless /Option change\tlog/;
+             }
+         }
+         foreach (\@log,\@data) {
+@@ -200,7 +260,6 @@
+ }
+ 
+ __DATA__
+-Mon Feb 17 13:36:46 2003	5	Option change	logfile		test.log
+ Mon Feb 17 13:36:46 2003	5	Connect	driver=>mysqlPP	host=>	port=>
+ Mon Feb 17 13:36:46 2003	5	connected	0
+ Mon Feb 17 13:36:46 2003	5	reconnect	success
+@@ -231,14 +290,33 @@
+ Mon Feb 17 13:36:46 2003	5	rows
+ Mon Feb 17 13:36:46 2003	4	fetchrow_array
+ Mon Feb 17 13:36:46 2003	4	fetchrow_array
+-Mon Feb 17 13:36:46 2003	2	SELECT count(foo.id) FROM foo,bar WHERE (foo.id < '10') and ( foo.id = bar.foo_id ) GROUP BY bar.name
++Mon Feb 17 13:36:46 2003	2	SELECT count(foo.id) FROM foo,bar WHERE (foo.id < '10') AND ( foo.id = bar.foo_id ) GROUP BY bar.name
+ Mon Feb 17 13:36:46 2003	5	rows
+ Mon Feb 17 13:36:46 2003	4	fetchrow_array
+ Mon Feb 17 13:36:46 2003	4	fetchrow_array
+ Mon Feb 17 13:36:46 2003	4	fetchrow_array
++Mon Feb 17 13:36:46 2003	2	SELECT count(foo.id) FROM foo LEFT JOIN bar ON foo.id = bar.foo_id WHERE (foo.id < '10') LIMIT 1000
++Mon Feb 17 13:36:46 2003	5	rows
++Mon Feb 17 13:36:46 2003	4	fetchrow_array
++Mon Feb 17 13:36:46 2003	4	fetchrow_array
++Thu Mar 18 22:12:48 2004	3	create table bat (honk int null, zip char(30) not null,value char(30) null)
++Thu Mar 18 22:12:48 2004	1	INSERT INTO bat ( zip, honk, value) VALUES ('bar', '2', 'zip')
++Thu Mar 18 22:12:48 2004	1	INSERT INTO bat ( zip, honk, value) VALUES ('foo', '2', 'honk')
++Thu Mar 18 22:12:48 2004	1	INSERT INTO bat ( zip, honk, value) VALUES ('adf', '2', 'flap')
++Thu Mar 18 22:12:48 2004	1	INSERT INTO bat ( zip, honk, value) VALUES ('123', '2', 'eek')
++Thu Mar 18 22:12:48 2004	1	INSERT INTO bat ( zip, honk, value) VALUES ('99999', '2', 'zipzip')
++Thu Mar 18 22:12:48 2004	2	SELECT * FROM foo LEFT JOIN bar ON foo.id = bar.foo_id LEFT JOIN bat ON foo.id = bat.honk WHERE (foo.id < '2')
++Thu Mar 18 22:12:48 2004	5	rows
++Thu Mar 18 22:12:48 2004	4	fetchrow_array
++Thu Mar 18 22:12:48 2004	4	fetchrow_array
++Thu Mar 18 22:12:48 2004	2	SELECT count(foo.id) AS zoh FROM foo LEFT JOIN bat ON foo.id = bat.honk GROUP BY foo.id HAVING zoh > '1'
++Thu Mar 18 22:12:48 2004	5	rows
++Thu Mar 18 22:12:48 2004	4	fetchrow_array
++Thu Mar 18 22:12:48 2004	4	fetchrow_array
+ Mon Feb 17 13:36:46 2003	1	DELETE FROM foo WHERE id like '%'
+ Mon Feb 17 13:36:46 2003	5	rows
+ Mon Feb 17 13:36:46 2003	3	drop table foo
+ Mon Feb 17 13:36:46 2003	3	drop table bar
++Mon Feb 17 13:36:46 2003	3	drop table bat
+ Mon Feb 17 13:36:46 2003	5	connected	1
+ Mon Feb 17 13:36:46 2003	5	connected	0
+Only in dbix-abstract/t: 2-dbix-abstract.t~
+Only in dbix-abstract/t: CVS
+diff -urb DBIx-Abstract-1.005/t/dbia.config dbix-abstract/t/dbia.config
+--- DBIx-Abstract-1.005/t/dbia.config	2003-03-15 01:51:21.000000000 -0500
++++ dbix-abstract/t/dbia.config	2004-04-04 19:31:32.000000000 -0400
+@@ -1,11 +1,11 @@
+ { my $opt = {
+-         'testdsn' => '',
+-         'testport' => '',
+          'testpassword' => '',
+-         'testhost' => '',
+-         'testuser' => '',
++         'testport' => '',
++         'testdsn' => '',
+          'testdb' => 'test',
+-         'testdriver' => ''
++         'testdriver' => 'mysql',
++         'testhost' => '',
++         'testuser' => ''
+        };
+   sub load_all { return (
+       driver   => $opt->{'testdriver'},
+Only in dbix-abstract/t: dbia.config~

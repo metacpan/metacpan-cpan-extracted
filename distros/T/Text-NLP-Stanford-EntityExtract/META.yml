@@ -1,0 +1,21 @@
+---
+abstract: 'Talks to a stanford-ner socket server to get named entities back'
+author:
+  - 'Kieren Diment <zarquon@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.770'
+license: GPL
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-NLP-Stanford-EntityExtract
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Mouse: 0
+  Text::Unidecode: 0
+version: 0.06

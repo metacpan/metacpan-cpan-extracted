@@ -1,0 +1,14 @@
+Revision history for Task-Cpanel-Core
+
+11.36.001    Friday July 19, 2012
+    Initial release to CPAN
+
+11.36.002    Monday July 23, 2012
+    Remove Bundle modules and DBD::Pg
+
+11.36.003    Tuesday July 24, 2012
+    Add NetAddr::IP
+
+11.36.004    Monday November 19, 2012
+    Add MySQL::Diff
+

@@ -1,0 +1,21 @@
+- Scenario: Add 2 numbers
+  Given:
+    - first, I entered 50 into the calculator
+    - second, I entered 70 into the calculator
+  When: I press add
+  Then: The result should be 120 on the screen
+
+- Scenario: Add numbers in examples <1st> + <2nd>
+  Given:
+    - first, I entered <1st> into the calculator
+    - second, I entered <2nd> into the calculator
+  When: I press add
+  Then: The result should be <answer> on the screen
+  Examples:
+    - 1st: 5
+      2nd: 6
+      answer: 11
+    - 1st:  100,
+      2nd:  200,
+      answer: 300,
+

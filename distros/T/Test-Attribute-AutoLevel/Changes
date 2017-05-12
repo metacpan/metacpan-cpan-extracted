@@ -1,0 +1,26 @@
+Revision history for Perl extension Test::Attribute::AutoLevel
+
+0.06
+   2012/12/26
+        - added depth option. (thanks xaicron)
+
+0.05
+   2011/12/15
+        - use Capture::Tiny.
+
+0.04
+   2011/12/15
+        - use App::Prove. (pppjam++)
+
+0.03
+   2011/12/02
+        -  fixed SEGV. (xaicron++)
+
+0.02
+   2011/11/24
+        - use Devel::Peek. (xaicron++)
+
+0.01
+   Sat Sep 17 23:39:42 2011
+        - initial release.
+

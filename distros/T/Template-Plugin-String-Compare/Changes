@@ -1,0 +1,6 @@
+Revision history for Perl extension Template::Plugin::String::Compare.
+
+0.01  Tue Mar  1 19:07:59 2005
+	- original version; created by h2xs 1.23 with options
+		-X Template::Plugin::String::Compare
+

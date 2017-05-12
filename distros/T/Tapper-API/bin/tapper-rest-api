@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+# PODNAME: Tapper API
+
+
+use strict;
+use warnings;
+
+BEGIN {
+    use CGI::Carp qw(carpout);
+    open( my $fh_log, '>>', '/var/log/tapper/tapper-rest-api.log')
+        or die "Unable to open log for tapper-rest-api: $!\n"
+    ;
+    carpout( $fh_log );
+}
+
+use Mojolicious::Commands;
+
+Mojolicious::Commands->start_app('Tapper::API');
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Tapper API
+
+=head1 AUTHOR
+
+Tapper Team <tapper-ops@amazon.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Amazon.
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

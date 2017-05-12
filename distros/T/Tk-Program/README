@@ -1,0 +1,25 @@
+Tk::Program
+============================
+
+This  is  a  megawidget to  display  a  program window.  I  was  tyred in  every
+application  to   create a   menu,  prefs  dialog,  about  .... I  search  for a
+standard way and  write this module.  This remember the  font, size and  postion
+from the Mainwindow and use also the function from Tk::Mainwindow.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+All rights reserved (c) 2003 by  Frank (xpix) Herrmann. This program is free software; 
+you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+
+ 

@@ -1,0 +1,51 @@
+=head1 NAME
+
+Test::Deep::This - Test::Deep extension to check predicates on plain scalars
+
+=head1 SYNOPSIS
+
+  use Test::Deep;
+  use Test::Deep::This
+    qw(this); # exported by default actually
+
+  cmp_deeply(
+    [0, 1],
+    [!this, this]
+  ); # passes: 0 is false, 1 is true.
+
+  cmp_deeply(
+    [5, 9],
+    [abs(this - 4) < 2, 10 - sqrt(this) < this * 2],
+  ); # passes: abs(5 - 4) < 2 and 10 - sqrt(9) < 9 * 2.
+
+  cmp_deeply(
+    { a => 1 },
+    { a => 10 - sqrt(this) < this * 2 }
+  ); # fails: 10 - sqrt(1) == 9 > 2 == 1 * 2
+
+  cmp_deeply(
+    ["123"],
+    [re(qr/^\d+(\d)$/, [this < 4]) & this > 100]
+  ); # passes: 3 < 4 while 123 > 100
+
+
+=head1 DESCRIPTION
+
+C<Test::Deep::This> module extends L<Test::Deep> framework with a new C<this> keyword to denote a "current" nested scalar.
+Standard unary and binary perl operators can be applied to C<this> to construct some complex predicate expressions.
+Those predicates are completely interoperable with other Test::Deep comparison operations like C<re>.
+
+Some native C<Test::Deep> comparators may be expressed via C<this> in a somewhat native manner.
+For example C<bool(1)> is just C<this> and C<bool(0)> is C<!this>. C<num(10, 0.01)> might be written as C<< abs(this - 10) < 0.01 >>.
+Any expression of C<this> could be expressed using the C<Test::Deep> C<code> functor, but the later lacks proper diagnostics when the test check fails.
+
+=head1 SEE ALSO
+
+L<Test::Deep>
+
+=head1 MAINTAINER and AUTHOR
+
+  Andrei Mischchenko <me@druxa.ru>
+
+=cut
+

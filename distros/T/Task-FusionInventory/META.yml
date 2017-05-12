@@ -1,0 +1,61 @@
+---
+abstract: 'FusionInventory Agent development dependencies'
+author:
+  - 'Guillaume Rousse <guillomovitch@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  HTTP::Proxy: 0
+  HTTP::Server::Simple: 0
+  HTTP::Server::Simple::Authen: 0
+  IO::Capture::Stderr: 0
+  IPC::Run: 0
+  Test::Compile: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::HTTP::Server::Simple: 0
+  Test::MockModule: 0
+  Test::MockObject: 0
+  Test::More: 0.93
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-FusionInventory
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Extract: 0
+  Compress::Zlib: 0
+  Crypt::DES: 0
+  Digest::MD5: 0
+  Digest::SHA: 0
+  File::Copy::Recursive: 0
+  File::Which: 0
+  HTTP::Daemon: 0
+  IO::Socket::SSL: 0
+  JSON: 0
+  LWP: 5.8
+  LWP::Protocol::https: 0
+  Module::Install: 0
+  Net::CUPS: 0
+  Net::IP: 0
+  Net::NBName: 0
+  Net::SNMP: 0
+  Net::Write::Layer2: 0
+  POE::Component::Client::Ping: 0
+  Parse::EDID: 0
+  Proc::Daemon: 0
+  Proc::PID::File: 0
+  Socket::GetAddrInfo: 0
+  Text::Template: 0
+  UNIVERSAL::require: 0
+  URI::Escape: 0
+  XML::TreePP: 0.26
+version: 1.00

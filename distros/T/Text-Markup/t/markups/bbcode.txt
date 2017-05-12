@@ -1,0 +1,10 @@
+[b]BBcode Test File[/b]
+
+This file tests [i]BBcode[/i].
+
+[list]
+[*] BBcode
+[*] Test
+[*] File
+[/list]
+

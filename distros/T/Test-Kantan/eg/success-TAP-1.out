@@ -1,0 +1,16 @@
+
+
+# Array
+# Array/push
+# Array/push/should push an element
+ok 1 - ok { join( ' ', @a ) eq 'a b c d' };
+# HOGE
+# Hash
+# Hash/fetch
+# Hash/fetch/take the value
+ok 2 - -
+ok 3 - -
+# Foo
+# Foo/bar
+ok 4 - ok { 1 };
+1..4

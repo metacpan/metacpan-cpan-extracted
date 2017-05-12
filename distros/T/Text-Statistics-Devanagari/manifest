@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-Statistics-Devanagari.t
+lib/Text/Statistics/Devanagari.pm
+META.yml                                 Module meta-data (added by MakeMaker)

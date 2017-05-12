@@ -1,0 +1,26 @@
+---
+name: Template-Plugin-HashMerge
+version: 0.01
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+abstract: TT2 plugin to use Hash::Merge
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Hash::Merge: 0.09
+  Template: 2.20
+  Template::Plugin::VMethods: 0.02
+configure_requires:
+  Module::Build: 0.34
+provides:
+  Template::Plugin::HashMerge:
+    file: lib/Template/Plugin/HashMerge.pm
+    version: 0.01
+  Template::Plugin::HashMergeVMethods:
+    file: lib/Template/Plugin/HashMergeVMethods.pm
+    version: 0.01
+generated_by: Module::Build version 0.34
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

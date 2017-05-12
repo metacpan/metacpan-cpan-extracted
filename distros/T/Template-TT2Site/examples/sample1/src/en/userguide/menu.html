@@ -1,0 +1,42 @@
+Most web sites use a menu to navigate. <b>Template::TT2Site</b> can
+automatically create this menu, using <b>.map</b> files placed in the
+directories to navigate. The advantage of <b>.map</b> files is that
+they can easily be maintained with the directory data, and directories
+can be moved to another location taking the map data with them.
+
+<p>This is how it works.
+
+<p>In your main directory (the one with the top level
+<code>index.html</code> in it, create a file <code>.map</code> with
+contents:
+
+<pre>  title "Site Menu"
+</pre>
+
+Now, for each entry you want in this menu, add a line:
+
+<pre>  menu "Title" target
+</pre>
+
+<p>The item will appear in the menu as "Title".
+
+<p>The target for a menu choice is deducted as follows.
+<ul>
+  <li>if a file <i>target</i><tt>.html</tt> exists, the target is
+      this HTML document;</li>
+  <li>if a directory <i>target</i> exists, the target will point to
+      the <code>index.html</code> in this directory. If this
+      directory contains a <code>.map</code> file, the navigation menu will
+      be hierarchically expanded with the items from this directory,
+      introducing a new level of navigation;</li>
+  <li>otherwise, target will be taken to be an arbitrary URL.</li>
+</ul>
+
+<p>Note that the appearance of the actual menus is controlled by the
+layout definition of the web pages (file <code>lib/page/layout</code>)
+and the menu (file <code>lib/page/menu</code>).
+
+<p>The visual appearance can be controlled with the style sheet
+<code>css/site.css</code>. The menu items will belong to the CSS class
+'menu', and the currently active link will be given the class
+'menuselect'.

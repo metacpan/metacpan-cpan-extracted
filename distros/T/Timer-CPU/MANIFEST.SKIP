@@ -1,0 +1,13 @@
+MANIFEST.bak
+Makefile.old
+Makefile$
+README.pod
+.gitignore
+.git/
+blib/
+pm_to_blib
+MYMETA.*
+Timer-CPU.*tar[.]gz$
+CPU.bs
+CPU.c
+CPU.o

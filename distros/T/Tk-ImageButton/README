@@ -1,0 +1,51 @@
+Tk::ImageButton version 1.0
+---------------------------
+
+This provides the programmer a customizable/graphical
+button that gives a user interface a more professional
+look.
+
+INSTALLATION
+
+To install this widget, type the following
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If that doesn't work then just copy the:
+
+  ImageButton.pm
+  ImageButton.pod
+
+files into your site_lib/Tk directory.
+
+DEPENDENCIES
+
+This module requires the following widgets:
+
+  Tk and Tk::Label
+
+EXAMPLES
+
+In the distribution there is a directory called "example", in here you will find
+the files:
+
+  ib_test.pl
+  quit_clicked.bmp
+  quit_disabled.bmp
+  quit_normal.bmp
+  quit_over.bmp
+
+Run the file "ib_test.pl" with Perl for a demonstration of a multi-image button. View the file
+"ib_test.pl" for an example of how to use the widget in your own scripts.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, Dave Hickling  All rights reserved.
+
+This module is free software; you can redistribute and/or modify
+it under the same terms as Perl itself.
+
+Address bug reports and comments to: Dave Hickling <dhickling@eidosnet.co.uk>

@@ -1,0 +1,38 @@
+Revision history for Perl extension Text::Wrapper.
+
+1.05   2014-01-18
+	- no functional changes
+	- additional tests showing all possible breakpoints
+
+1.04   2012-05-25
+	- restore compatibility with Perl 5.8.0 (RT#77386)
+	  patch provided by Thomas Sibley
+
+1.03   2012-03-10
+	- add the wrap_after attribute
+	- now requires Perl 5.10.0 or later
+	- explicitly supports U+2000 - U+200B as breaking spaces
+	- now built with Dist::Zilla (includes v2 META.json)
+	- repository now publicly available on GitHub
+
+1.02   2008-05-10
+	- no functional changes
+	- minor clean up to documentation
+	- use Module::Build::DistVersion for packaging
+
+1.01   2007-03-21
+	- convert to Module::Build
+	- update my email address
+	- add example/gettysburg.pl
+	- add POD tests & fixed POD error
+
+1.000  1998-10-26
+	- update my email address
+
+0.008  1998-10-22
+	- mention that you need Perl 5.004 or later
+	- don't infinite loop on long words (but it still doesn't break them)
+	  (thanks to Ken Williams <ken@forum.swarthmore.edu>)
+
+0.007  1998-05-14
+	- first public release

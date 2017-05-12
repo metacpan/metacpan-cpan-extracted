@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 31010aedeaf1da86eb821636aa13fa82afff2523 Changes
+SHA1 105d9904729d50331601f5ebdd99753e6a93a860 INSTALL
+SHA1 062871100d8097d0f764471ee3465d2cb30dcc11 LICENSE
+SHA1 70a6168c8b1971e78715874d79d3c782b0054add MANIFEST
+SHA1 86c7aadc134a13877b009f878eeb3d1d3c640a49 MANIFEST.SKIP
+SHA1 d89da32c7e84c9ff7396386427274382698b7154 META.json
+SHA1 35b50175cd27225db73c0673ce9608477aa890cb META.yml
+SHA1 65bd9e7bc8b3712b0ff1606a57edacfc3884d1c2 Makefile.PL
+SHA1 aa68495131f1341cb10fbbc45e6d6876a1b020b2 README
+SHA1 dc7c897b322ce848ed65c2aeb5e03d60b1acd354 README.md
+SHA1 391625c64420a446699b03dd2aba42e947b89bcc dist.ini
+SHA1 3961b254d8fe9b78d4e54b351cdb08bed85b8e26 lib/Text/SpanningTable.pm
+SHA1 0fbc9045af135eb173e610f1719c28e70adcd954 t/00-load.t
+SHA1 78967d1c5ea55a578312028dd5e252276e02246f t/01-simple.t
+SHA1 742e7443c4b251193f8ac434f05930a1d47373ba t/02-undercorated.t
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+
+iHUEAREIAB0WIQTYtJGMHsdqxHuiCD1rg4dAAUzXRwUCWJj7CQAKCRBrg4dAAUzX
+R9+9APsGX67eAiDg0KmfrkoceXNSgxVE2+BuKti57sry2W2jigD/S2zc0C4487y/
+8ilcIlflnmbH6kLEPr0QT7rm7BtXews=
+=lhao
+-----END PGP SIGNATURE-----

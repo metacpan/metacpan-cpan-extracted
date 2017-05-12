@@ -1,0 +1,77 @@
+Revision History for Transform-Alert
+====================================
+
+v1.00 2013-04-19
+----------------
+
+commit 54e829b68d08253f716879101d1d59c41cb18b3a
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Fri Apr 19 13:44:48 2013 -0400
+
+    Clean up Variable Passing graphic
+
+commit e1ae968b34085c3d9eb9d844de39691359b412b2
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Fri Apr 19 11:03:19 2013 -0400
+
+    Fix IMAP Folder option
+    Fix a few FATAL crashes, due to Input/IMAP errors
+    Clean up docs a bit
+    Add log line display for successful input template counts
+    Add support for multiple outputs via munger
+    Remove Output/Print.pm, since it didn't work, anyway
+
+commit 5217633e746e8605075a3f8f36258429078200d9
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Fri Feb 8 10:53:17 2013 -0500
+
+    Add Print output
+
+commit 3ef5a229ad0739c5f9b9cace22c5e7138bed5637
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Fri Feb 8 10:05:26 2013 -0500
+
+    Fix syntax bug
+
+commit 5ecf86d7bb4f8e6724e22f2517b5a1c727f977ef
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Wed Jan 23 11:45:35 2013 -0500
+
+    Change some I/O constructors to not fatally crash the daemon on error
+
+v0.95 2012-11-21
+----------------
+
+commit fbda81b23b8c7575b2c7effe0c35156b3c37bd27
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Wed Nov 21 09:37:31 2012 -0500
+
+    TRACE fixes
+
+commit 76e3ea3dfc31ea385012c8ebd2e61160ea7ec451
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Wed Nov 21 08:53:26 2012 -0500
+
+    Add TRACE logging (and -vv option)
+    Add more Munger method testing
+
+v0.94 2012-11-19
+----------------
+
+commit fab2cd6e1bda6033a9b7ae05caf7cb0fb534bb06
+Merge: c0d370f 7301154
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Mon Nov 19 16:27:19 2012 -0500
+
+    Merge branch 'master' of github.com:SineSwiper/Transform-Alert
+
+commit c0d370f58152b3d1404497302047bf7b70052a54
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Mon Nov 19 16:26:24 2012 -0500
+
+    Force recreation of log file on move
+    IMAP: Better error handling
+
+===================================
+End of changes in the last 365 days
+===================================

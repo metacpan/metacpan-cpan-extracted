@@ -1,0 +1,45 @@
+=== basic
+--- wiki
+http://wiki.livedoor.com
+--- html
+<a href="http://wiki.livedoor.com" class="outlink">http://wiki.livedoor.com</a>
+=== image
+--- wiki
+http://image.livedoor.com/img/top/10/logo.gif
+--- html
+<a href="http://image.livedoor.com/img/top/10/logo.gif"><img src="http://image.livedoor.com/img/top/10/logo.gif" border="0"/></a>
+=== long url
+--- wiki
+http://wiki.livedoor.com/testtesteestesetewapdoaipdasfoijafdioaspfjaofjoafdjaspdof
+--- html
+<a href="http://wiki.livedoor.com/testtesteestesetewapdoaipdasfoijafdioaspfjaofjoafdjaspdof" class="outlink">http://wiki.livedoor.com/testtesteestesetewapdoaip...</a>
+=== bad long url
+--- wiki
+http://wiki.livedoor.com/testtesteestesetewapdoaipd"ijafd
+--- html
+<a href="http://wiki.livedoor.com/testtesteestesetewapdoaipd" class="outlink">http://wiki.livedoor.com/testtesteestesetewapdoaip...</a>&quot;ijafd
+=== hyperlink
+--- wiki
+ほげhttp://hogehoge.com/ほげ
+--- html 
+ほげ<a href="http://hogehoge.com/" class="outlink">http://hogehoge.com/</a>ほげ
+=== hyperlink
+--- wiki
+http://hogehoge.com/ほげhttp://hogehoge.com/ほげ
+--- html 
+<a href="http://hogehoge.com/" class="outlink">http://hogehoge.com/</a>ほげ<a href="http://hogehoge.com/" class="outlink">http://hogehoge.com/</a>ほげ
+=== hyperlink
+--- wiki
+http://hogehoge.com/ほげhttp://hogehoge.com/
+--- html 
+<a href="http://hogehoge.com/" class="outlink">http://hogehoge.com/</a>ほげ<a href="http://hogehoge.com/" class="outlink">http://hogehoge.com/</a>
+=== hyperlink
+--- wiki
+http://hogehoge.com/hoge?hoge-_.!~*'();/?:@&=+$,%#
+--- html 
+<a href="http://hogehoge.com/hoge?hoge-_.!~*'();/?:@&=+$,%#" class="outlink">http://hogehoge.com/hoge?hoge-_.!~*'();/?:@&=+$,%#</a>
+=== subscript
+--- wiki
+http://hogehoge.com/__subscript__/
+--- html
+<a href="http://hogehoge.com/__subscript__/" class="outlink">http://hogehoge.com/__subscript__/</a>

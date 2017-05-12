@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d9e7d5f78e8d29f378d1ce7830ad435c3b10a6a6 Build.PL
+SHA1 40711ed6602109805262a84e499d24669e54db57 MANIFEST
+SHA1 d234c4d6b422657ba841d6f9b447e8e72e86f4ba MANIFEST.SKIP
+SHA1 cb148fd270a53b2cea169bc15e0c076041cb816a META.json
+SHA1 9929cbf9582dd911fa56a72b2474427947be4735 META.yml
+SHA1 9fa7916b771b6b22d684acab640dcea37b5e0624 Makefile.PL
+SHA1 95929888fd55d2fbb212f6125c963d040db11c0f README
+SHA1 2bc22d2cca89ef189d2d36bd8d7c1ac63febab59 SEE_ALSO.md
+SHA1 46c7709e7dae44517aee6d1ccee413bee17a7316 lib/Text/UnicodeBox.pm
+SHA1 695e290a2d483fb751d92746569f926f01d45602 lib/Text/UnicodeBox/Control.pm
+SHA1 546aec7763be77f6e775edfaf2777d51bf0c5dec lib/Text/UnicodeBox/Table.pm
+SHA1 c0ce28f3f512bd01ea94e20a8c0eee7d7ee6dd8f lib/Text/UnicodeBox/Text.pm
+SHA1 96ae1eab9916abf1c470360fdcd26cbe8c93178d lib/Text/UnicodeBox/Utility.pm
+SHA1 41f87b3b6791eaee6e714916802a368982ee4d9a t/001_box_drawing_characters.t
+SHA1 da9549d99d901d4803ef3a0fd5850a0b0ae09ffe t/002_control.t
+SHA1 fcb02a7fb0b370e949bff1f6d58d14363ff9308d t/003_text.t
+SHA1 ae9f7a1f2add5f3eaf54cc34cd37eff24a2d1b76 t/010_add_lines.t
+SHA1 f6ba0fdcb17c4268cae8e08d72da19b8a8f750fb t/011_multirow.t
+SHA1 8a2278618983d9428838735060b022bcc9b0595c t/012_unicode_text.t
+SHA1 e8010faf00281212bb183aab0aea6292f06ccb2f t/013_color_text.t
+SHA1 d0a5bda1b45a8d294c2ba138e8d5dd5f3ca96348 t/014_multiple_boxes.t
+SHA1 7ad70b629875335570bd20dd1bbfe9ec825ac30e t/015_non_unicode_characters.t
+SHA1 7cf7ae1cd35aa86067686f5fb2e24c65328f2ee0 t/021_table.t
+SHA1 3d8f2319d100994f1c3ba0eb4a572c2d57eda4d8 t/022_table_wrap.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk+zsxoACgkQHHIpFH/pKkJOPwCcDLIPh68i3+rRAG+2PT0HQx77
+rAcAnjUSu//2DeB0GkmMfgsDSCaaAidU
+=b8fV
+-----END PGP SIGNATURE-----

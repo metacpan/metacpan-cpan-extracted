@@ -1,0 +1,64 @@
+Time-TAI64 version 2.11
+=======================
+
+This Module makes available to the user functions to convert TAI64 strings
+to unix timestamps suitable to make time calculations.
+
+unixtai64     - converts from unix timestamp into TAI64 string
+unixtai64n    - converts from unix timestamp into TAI64N string
+unixtai64na   - converts from unix timestamp into TAI64NA string
+
+tai64unix     - converts TAI64 string to unix timestamp
+tai64nunix    - converts TAI64N string to unix timestamp
+tai64naunix   - converts TAI64NA string to unix timestamp
+
+ta64nlocal    - converts a TAI64N string and returns a string formated with
+                scalar(localtime(&tai64nunix($arg))). This is just helpfull
+                when dealing with multilog files.
+
+tai2unix      - converts any TAI64/TAI64N/TAI64NA string into a unix timestamp
+                returning only an integer with the number of seconds since
+                Jan 1, 1970.
+
+tai2strftime  - converts any TAI64/TAI64N/TAI64NA string into a unix timestamp
+                formatted using POSIX(strftime) with a default format string
+				of "%a %b %d %H:%M:%S %Y"
+
+TAI64 strings require the '@' character preceding the actual string to be
+properly recognized.  This allows easy integration with multilog generated
+files.
+
+The following TAGS have been defined to import only the necesary functions
+into the user namespace:
+
+tai       - tai2unix, tai2strftime
+tai64     - :tai, unixtai64,   tai64unix
+tai64n    - :tai, unixtai64n,  tai64nunix,  tai64nlocal
+tai64na   - :tai, unixtai64na, tai64naunix
+all       - :tai, :tai64, :tai64n, :tai64na
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USEFUL
+
+  Time::HiRes  - to generate precision timestamps.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2006 by Jorge Valdes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+This module was started by AMS, but would not have been completed
+if Iain Truskett hadn't taken over. After his death, Jorge Valdes
+assumed ownership and rewrote it in Perl.
+

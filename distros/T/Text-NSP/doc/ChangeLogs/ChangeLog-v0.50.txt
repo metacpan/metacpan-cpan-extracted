@@ -1,0 +1,93 @@
+
+Change from BSP version 0.3 to version 0.5
+------------------------------------------
+
+Satanjeev Banerjee, bane0025@d.umn.edu
+Ted Pedersen, tpederse@d.umn.edu
+
+University of Minnesota, Duluth
+
+Program count.pl:
+-----------------
+
+1. Salient changes: 
+
+   a. Support for n-grams, as opposed to only bigrams.
+
+   b. Support for user-defined token definitions. 
+
+   c. Output format is different and explicitly demarcates tokens in
+      the ngrams. 'Extended' output is also supported (see below). 
+
+2. New switches in version 0.5: 
+
+   a. --ngram => allows creation of ngrams with more than 2 tokens per
+      ngram. Version 0.3 only allowed bigrams.
+
+   b. --token => allows user definition of what a token should be for
+      creation of ngrams. Version 0.3 had two fixed regular
+      expressions: these are the defaults of version 0.5. 
+
+   c. --set_freq_combo, --get_freq_combo => allows user control on the
+      number of frequency values to show per ngram. Version 0.3 only
+      allowed bigrams, and so there were only 3 values to be printed,
+      and no user control was allowed.  
+
+   d. --remove => allows for the removal of ngrams that fall below a
+      given threshold. Scores dont show the ngrams that are removed. 
+
+   e. --newLine => prevents ngram from spanning across the new line
+      character. Version 0.3 always considers the new line character
+      to be a white space character.  
+
+   f. --extended => creates an 'extended' output where the values of
+      switches used are also output.  
+
+
+Program statistic.pl:
+---------------------
+
+1. Salient changes:
+
+   a. Support for n-grams, as opposed to only bigrams.
+
+   b. Performs error handling for library routines and allows routines
+      to throw errors. 
+
+2. New switches in version 0.5:
+
+   a. --ngram => allows user to specify the size of incoming ngrams.
+
+   b. --set_freq_combo FILE, --get_freq_combo => allows user to
+      specify what frequency values are available for the ngrams in
+      the incoming ngram list file.
+
+   c. --extended => informs statistic.pl that incoming ngram file may
+      have extended data in it and also requests statistic.pl to
+      create its own extended data in the lines of count.pl above. 
+
+
+Program rank.pl:
+----------------
+
+1. Salient changes: 
+
+   a. Changes in inputs: This program no longer takes as input two
+      libraries and one frequency file to compute the rank correlation
+      coefficient. Instead it takes as input two files containing the
+      same ngrams sorted using two different statistical measures, and
+      then computes the rank correlation coefficient for the ngrams
+      that are pressent in both the files. using the two
+      files.
+
+   b. Changes in outputs: As before this program outputs the
+      correlation coefficient. Unlike before however the ngrams and
+      their ranks are not output since these are already available in
+      the input files.
+
+2. Helper script: 
+
+   We provide a helper script rank-script.sh to emulate the rank.pl
+   program of BSP version 0.3. See Readme.txt for more information on
+   this script. 
+

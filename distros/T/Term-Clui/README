@@ -1,0 +1,69 @@
+          The Command-Line User Interface     Term::Clui
+
+                     NEW !  Now with mouse  !
+                     NEW !  Now with speech !
+
+Term::Clui offers a high-level user interface, with subroutines &choose
+&ask &edit &view &confirm and &sorry.  It works at a higher level than
+widgets; it gives command-line applications a consistent "look and feel".
+Its metaphor for the computer is a human-like conversation-partner,
+and as each answer/response is completed it is summarised onto one line,
+and remains on screen, so that the history of the dialogue gradually
+accumulates on the screen and is available for review, or for cut/paste.
+Also included is the file-selector module Term::Clui::FileSelect,
+with its main subroutine &select_file.  Term::Clui doesn't yet work
+under Windows.
+
+To install just:
+   perl Makefile.PL ; make ; make install
+
+For up-to-date source, see http://search.cpan.org/~pjb
+
+
+&edit and &view use the default  EDITOR  and  PAGER  from the user's
+environment,   except that if &view is called with a very short text
+a builtin viewer is used,  allowing the user to choose whether the
+text remains on-screen or is cleared.
+
+&confirm expects Y,y,N or n.  &ask respects left and right arrows
+and backspace, ctrl-B moves to the beginning, ctrl-E to the end,
+and ctrl-D or ctrl-X clear the current string.
+
+&choose maintains a DBM database of what the user chose last time in
+response to the same question, and if it's still in the list this
+time then &choose highlights it as the default. Thus &choose manages
+its own defaults, and menus using Term::Clui autoconfigure themselves
+to the user's preferences.  When &choose is called in an array context,
+it offers the user a multiple choice;  mouse-button3 or the Spacebar
+mark items in a multiple choice.  If the choices won't fit on the
+screen the user is asked for a substring clue.
+
+The programmer can pass &ask a default string, as an optional second
+argument.  &select_file  obeys options modelled after those of
+Tk::FileDialog.pm and Tk::SimpleFileSelect.pm
+
+Term::Clui is fast,  very easy for both programmer and user, and has
+few external dependencies. It doesn't use curses which is a whole-of
+-screen interface;  it uses a portable subset of vt100 sequences (up
+left right normal reverse clrtoeol and mouse-reporting).  It handles
+window size changes, using Term::ReadKey or Term::Size if available;
+if not, it tries `tput`.
+
+For the user, Version 1.50 introduced a significant upgrade: mouse-
+-handling. The user can now select an item in &choose using the mouse
+and left-click, as well as by using the arrowkeys and return as before
+(or q or ctrl-X to quit);  button3 or the spacebar mark items in a
+multiple choice.  Since version 1.62, mouse-handling can be disabled
+by setting CLUI_MOUSE=OFF; by default, it is on.
+
+Since version 1.60, a speaking interface is provided for the visually
+impaired user.  It employs  either eflite or espeak. Speech is turned
+on if the CLUI_SPEAK environment variable is set to a non-empty string;
+by default, it is off.  If speakup is running,  then it is silenced
+while Term::Clui runs, and then restored.  Because Term::Clui's
+metaphor for the computer is a human-like conversation-partner, this
+works very naturally, and the application needs no modification.
+
+A calling-interface-compatible Python3-module is included.
+
+Peter Billam                http://www.pjb.com.au/comp/contact.html

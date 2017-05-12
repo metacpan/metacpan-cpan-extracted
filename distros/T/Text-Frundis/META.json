@@ -1,0 +1,64 @@
+{
+   "abstract" : "object interface for the frundis markup language",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Frundis",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::UUID" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "URI" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::DirCompare" : "0",
+            "File::Path" : "0",
+            "Test::Differences" : "0",
+            "Text::Diff" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Frundis" : {
+         "file" : "lib/Text/Frundis.pm",
+         "version" : "2.16"
+      },
+      "Text::Frundis::Object" : {
+         "file" : "lib/Text/Frundis/Object.pm"
+      },
+      "Text::Frundis::PerlEval" : {
+         "file" : "lib/Text/Frundis/PerlEval.pm"
+      },
+      "Text::Frundis::Processing" : {
+         "file" : "lib/Text/Frundis/Processing.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.16",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

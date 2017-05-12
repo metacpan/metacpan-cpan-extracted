@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Tie/Array/Pack.pm
+t/00-load.t
+t/01-basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

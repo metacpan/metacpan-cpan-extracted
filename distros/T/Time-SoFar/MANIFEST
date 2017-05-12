@@ -1,0 +1,5 @@
+SoFar.pm			Time::SoFar module code
+Makefile.PL			Makefile Maker
+MANIFEST			This file
+README				Formated docs
+t/sogood.t			Test suite

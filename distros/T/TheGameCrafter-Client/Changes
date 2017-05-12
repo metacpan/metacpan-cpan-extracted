@@ -1,0 +1,15 @@
+0.0104 - October 14, 2015
+ * Factor in new variables to the test API.
+
+0.0103 - November 26, 2012
+ * Trying to figure out why CPAN doesn't like the tests.
+
+0.0102 - November 19, 2012
+ * Skip tests when we don't have online access.
+
+0.0101 - October 22, 2012
+ * An extra exception check.
+
+0.0100 - October 20, 2012
+ * Although we've been using something like this internally for over a year, this is the first public release of it.
+

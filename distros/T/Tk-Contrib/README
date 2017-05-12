@@ -1,0 +1,124 @@
+  Files in Tk-Contrib have been contributed by various people at
+  various times.
+
+  Achim Bohnet <ach@mpe.mpg.de> - The Distribution Maintainer
+
+
+INCLUDED WIDGETS
+
+	Tk::Axis - Canvas with Axes
+	Tk::Dial - an alternative to the Scale widget
+	Tk::OlWm - Interface to OpenLook properties of Toplevel widget
+	Tk::TiedListbox - gang together Listboxes
+
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	# try script(s) in demos directory (optional)
+	make install
+
+  Please send question, suggestions, bug reports and patches to
+  the perl/Tk mailing list
+
+	ptk@lists.stanford.edu
+
+
+SUCCESS REPORTS:
+
+  Check the CPAN-testers page for recent report:
+
+	http://www.connect.net/gbarr/cpan-test/
+
+  For v0.03 it was reported that the modules build, test, and
+  install (and the demo worked)
+
+	perl5.004_54/Tk402.003
+		SPARC/Solaris 2.5.1/Sun Compiler
+	perl5.004_04/Tk402.003
+		Digital Unix V4.0b, DEC CC compiler
+
+
+HISTORY:
+
+  Version 0.07 tobe
+
+	o modules are now strict clean
+	o Some tweaks to POD so it's more in Tk800 style
+	o adapted Tks create.t test as 00basic.t
+	o Changed -x/ymax fallback value from undef to 100.
+	  so $parent->Axis() without arguments works without
+	  croaking
+
+	  
+  Version 0.06
+
+	o Axis: new -tickfont option. Patch send by
+          Phiroze Parakh <phiroze@eecs.umich.edu>
+	o Axis: options listed in SYNOPSIS section
+
+  Version 0.0501
+
+	o Dial.pm: Oooops package was Dial not Tk::Dial as it should.
+	  Now CPAN indexer can get it right. Thanks to Andreas Koenig.
+
+  Version 0.05
+
+	o patch of TiedListbox to fix scrolling
+
+		From: Andrew Allen <ada@hpesada.fc.hp.com>
+		Subject: Re: Database -> TiedListbox widget
+		Date: Fri, 12 Dec 1997 09:45:47 -0700
+		Message-id: <199712121645.JAA22936@hpesada.fc.hp.com>
+
+  Version 0.04
+
+	o Typos fixed in README (Larry Virden <lvirden@cas.org>)
+
+	o Many little documentation fixes (Larry Virden <lvirden@cas.org>)
+
+	o (Mis)use Revision keyword of prcs for $VERSION.  '+1' offset
+	  necessary to get a new $VERSION higher than 2.00x that was set
+	  earlier by perforce.	
+
+	o README: Added simple success reports table for this distribution
+
+  Version 0.03
+
+	o now flat subdirectory structure
+
+	o demos/tiedlistbox strict and -w clean
+
+  Version 0.02
+
+	o added trivial tests: may only uncover possible -w warnings
+
+	o Each contribution has it's own dir that a ready CPAN dist
+	  after
+
+		# add README file
+		echo 'Makefile$' > MANIFEST.SKIP
+		mkdir t && 
+		perl Makefile.PL
+		make manifest
+		make dist
+
+	  Blech!  Better remove subdir overhead and write a CPAN HOWTO
+
+	o MM NAME attr set to Tk::Whatever => better perllocal.pod
+	  entry but creates unnecessary auto/Tk/Whatever/.packlist
+
+	
+	o Removed FileDialog and WaitBox. They have their
+	  own CPAN distribution already
+
+	o Removed book-examples and TickerTape. They are not
+	  widgets
+
+  Version 0.01:
+
+	o Contrib tree from Tk402.003
+
+__END__

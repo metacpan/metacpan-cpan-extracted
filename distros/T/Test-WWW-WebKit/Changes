@@ -1,0 +1,21 @@
+0.05 2016-11-16 09:00:00 CET
+    * New method: wait_for_pending_requests_ok
+
+0.04 2016-10-27 09:55:00 CEST
+    * Have is_element_present_ok return false on failure
+    * Replace common::sense in tests to reduce dependencies
+
+0.03 2013-10-01 22:45:00 CEST
+    * New method: wait_for_condition_ok
+    * New method: native_drag_and_drop_to_position_ok
+    * Better diagnostics on wait_for_alert_ok fail
+    * Requires WWW::Webkit version 0.06
+
+0.02 2012-05-30 16:00:00 CEST
+    * New method: wait_for_alert_ok
+    * New method: eval_is
+
+0.01 2012-02-23 17:00:00 CET
+    * first public version
+
+# vim: expandtab shiftwidth=4 sts=4:

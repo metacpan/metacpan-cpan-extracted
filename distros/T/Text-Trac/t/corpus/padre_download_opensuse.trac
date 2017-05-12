@@ -1,0 +1,20 @@
+= openSUSE Installation Instructions =
+
+== Installation using the Package Manager ==
+
+== Installation from CPAN ==
+ 1. [http://opensuse-community.org/Repositories/11.1 Add the packman repository.]
+ 2. Install the package »wxWidgets-devel« and the schema »C/C++ Development«.
+[[Image(yast.png)]]
+ 3. [wiki:DownloadCPAN Install Padre from CPAN.]
+
+Configure [http://search.cpan.org/perldoc?CPAN#Config_Variables make_install_make_command and mbuild_install_build_command] to enable {{{sudo}}} support in CPAN.
+
+== Still Not Working? ==
+Following the instructions on this page did not lead to a successful installation?
+
+[http://padre.perlide.org/contact.html Contact us].
+
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.

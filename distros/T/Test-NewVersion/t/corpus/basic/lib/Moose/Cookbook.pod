@@ -1,0 +1,3 @@
+package Moose::Cookbook;
+# no VERSION here - but indexed version is set by 'provides' metadata
+1;

@@ -1,0 +1,67 @@
+#!/usr/local/bin/perl
+use strict;
+use Text::Xslate::Runner;
+
+my $app = Text::Xslate::Runner->new_from(@ARGV);
+$app->run( $app->targets );
+
+__END__
+
+=head1 NAME
+
+xslate - Process Xslate Templates
+
+=head1 USAGE
+
+    # process paths
+    $ xslate [options...] target
+
+    -a --cache               Cache level
+    -t --type                Output content type (html | xml | text)
+    -E --engine              Template engine
+    -D --define              Define template variables (e.g. foo=bar)
+    -I --path                Include paths
+    --version                Print version information
+    --oe --output_encoding   Output encoding (default: UTF-8)
+    -M --module              Modules templates will use (e.g. name=sub1,sub2)
+    -e --eval                One line of template code
+    -s --syntax              Template syntax (e.g. TTerse)
+    -d --debug               Debugging flags
+    -x --suffix              Output suffix mapping (e.g. tx=html)
+    --ie --input_encoding    Input encoding (default: UTF-8)
+    -i --ignore              Regular expression the process will ignore
+    -c --cache_dir           Directory the cache files will be saved in
+    -o --dest                Destination directory
+    -w --verbose             Warning level (default: 2)
+
+    # one liners, with $ARGV and $ENV
+    xslate -e 'Hello, <: $ARGV[0] :> world!' Xslate
+    # => Hello, Xslate world!
+    xslate -MDigest::MD5=md5_hex -e '<: md5_hex($ARGV[0]) :>' 'foo bar'
+    # => 327b6f07435811239bc47e1544353273
+
+=head1 DESCRIPTION
+
+The C<xslate> script is used to process entire directory trees containing
+template files, or to process one liners.
+
+=head1 ARGUMENTS
+
+=head2 target
+
+Specifies the target to be processed by Xslate.
+
+If the target is a file, the file is processed, and C<xslate> will exit immediately. If the target is a directory, then the directory is traversed and each file found is processed via C<xslate>.
+
+=head1 AUTHOR
+
+Maki, Daisuke (lestrrat)
+
+Fuji, Goro (gfx)
+
+=head1 SEE ALSO
+
+L<Text::Xslate>
+
+=cut
+

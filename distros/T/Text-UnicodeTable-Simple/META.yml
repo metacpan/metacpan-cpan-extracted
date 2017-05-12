@@ -1,0 +1,41 @@
+---
+abstract: 'Create a formatted table using characters.'
+author:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-UnicodeTable-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::UnicodeTable::Simple:
+    file: lib/Text/UnicodeTable/Simple.pm
+    version: '0.10'
+requires:
+  Term::ANSIColor: '2.01'
+  Unicode::EastAsianWidth: '1.30'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/syohex/p5-Text-UnicodeTable-Simple/issues
+  homepage: https://github.com/syohex/p5-Text-UnicodeTable-Simple
+  repository: git://github.com/syohex/p5-Text-UnicodeTable-Simple.git
+version: '0.10'
+x_contributors:
+  - 'trapple <trapplejp@gmail.com>'

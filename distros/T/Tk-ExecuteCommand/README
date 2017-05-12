@@ -1,0 +1,19 @@
+
+DESCRIPTION
+       Tk::ExecuteCommand runs a command yet still allows Tk
+       events to flow.  All command output and errors are dis-
+       played in a window.
+
+       This ExecuteCommand mega widget is composed of an LabEntry
+       widget for command entry, a "Do It" Button that initiates
+       command execution, and a ROText widget that collects com-
+       mand execution output.
+
+       While the command is executing, the "Do It" Button changes
+       to a "Cancel" Button that can prematurely kill the execut-
+       ing command. The kill_command method does the same thing
+       programmatically.
+
+Steve Lidie
+2002/09/14
+sol0@lehigh.edu

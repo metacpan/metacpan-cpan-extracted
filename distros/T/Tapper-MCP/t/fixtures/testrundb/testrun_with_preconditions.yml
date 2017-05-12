@@ -1,0 +1,429 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "perfmon", "lmbench"
+
+- schema: Testrun
+  name: perfmon
+  data:
+    id: 23
+    owner_id: 12
+    shortname: perfmon
+    notes: perfmon
+    topic_name: Software
+
+- schema: TestrunScheduling
+  name: Xen-aaa3
+  data:
+    id: 100
+    testrun_id: 23
+    host_id: 7
+
+
+- schema: Testrun
+  name: lmbench
+  data:
+    id: 24
+    owner_id: 12
+    shortname: lmbench
+    notes: tapper test suite lmbench wrapper
+    topic_name: Distribution
+
+- schema: Testrun
+  name: foobar
+  data:
+    id: 4
+    owner_id: 12
+    shortname: foobar
+    topic_name: Software
+    wait_after_tests: 5
+
+- schema: TestrunScheduling
+  name: Xen-aaa3
+  data:
+    id: 101
+    testrun_id: 4
+    host_id: 6
+
+
+- schema: Testrun
+  name: foobar
+  data:
+    id: 100
+    owner_id: 12
+    shortname: autoinstall
+    notes: this testrun only exists to test autoinstall preconditions
+    topic_name: Software
+    wait_after_tests: ~
+
+- schema: Testrun
+  name: foobar
+  data:
+    id: 112
+    owner_id: 12
+    shortname: hw_report
+    notes: testrun used to test sending hw_report
+    topic_name: Software
+    wait_after_tests: ~
+
+- schema: Testrun
+  name: foobar
+  data:
+    id: 113
+    owner_id: 12
+    shortname: fail_config
+    notes: testrun with a broken precondition, fails to install
+    topic_name: Software
+
+
+
+- schema: Testrun
+  name: perfmon
+  data:
+    id: 114
+    owner_id: 12
+    shortname: ssh_test
+    notes: ssh_test
+    topic_name: Software
+- schema: TestrunScheduling
+  name: Xen-aaa3
+  data:
+    id: 114
+    testrun_id: 114
+    host_id: 8
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: tapper-tools
+  data:
+    id: 7
+    shortname: tapper-tools
+    precondition: some yaml here 1
+
+- schema: Precondition
+  name: perl-5.10
+  data:
+    id: 8
+    shortname: perl-5.10
+    precondition: some yaml here 2
+
+- schema: Precondition
+  name: gcc
+  data:
+    id: 9
+    shortname: gcc-4.2
+    precondition: some yaml here 3
+
+- schema: Precondition
+  name: glibc
+  data:
+    id: 10
+    shortname: glibc-2.1
+    precondition: some yaml here 4
+
+- schema: Precondition
+  name: gcc
+  data:
+    id: 11
+    shortname: gcc-4.2
+    precondition: some yaml here 5
+
+
+- schema: Precondition
+  name: autoinstall
+  data:
+    id: 101
+    shortname: auto_auto
+    precondition: |
+      ---
+      precondition_type: autoinstall
+      timeout: 10800
+      filename: suse/SLES10SP3_x86_64.lst
+
+- schema: Precondition
+  name: Config for autoinstall
+  data:
+    id: 102
+    shortname: auto_prc
+    precondition: |
+      ---
+      precondition_type: testprogram
+      runtime: 30
+      program: /bin/uname_tap.sh
+      timeout: 90
+
+- schema: Precondition
+  name: fail_precond
+  data:
+    id: 113
+    shortname: fail_precond
+    precondition: |
+      ---
+      name: automatically generated Xen test
+      precondition_type: virt
+      host:
+        root:
+          precondition_type: image
+          mount: /
+        preconditions:
+      guests:
+      - config:
+          name: bancroft:/data/bancroft/tapper/live/repository/configs/xen/001-bullock.svm
+          precondition_type: copyfile
+          protocol: nfs
+        root:
+          mountfile: /xen/images/001-bullock.img
+        testprogram:
+          program: none
+
+- schema: Precondition
+  name: ssh_hint_precondition
+  data:
+    id: 1141
+    shortname: ssh-hint
+    precondition: |
+        precondition_type: hint
+        ssh: 1
+        dest_path: /dev/shm/tmp
+        arch: linux64
+
+- schema: Precondition
+  name: ssh_hint_precondition
+  data:
+    id: 1142
+    shortname: ssh-testprogram
+    precondition: |
+      precondition_type: testprogram
+      runtime: 30
+      program: /bin/uname_tap.sh
+      timeout: 90
+
+
+# -------------------- "perfmon" <== "perl", "tapper-tools"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for perfmon
+  data:
+    testrun_id: 23
+    precondition_id: 8
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd preconditions for perfmon
+  data:
+    testrun_id: 23
+    precondition_id: 7
+    succession: 2
+
+# -------------------- "lmbench" <== "perl", "tapper-tools", "gcc", "glibc"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 8
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 7
+    succession: 2
+
+- schema: TestrunPrecondition
+  name: 3rd preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 9
+    succession: 3
+
+- schema: TestrunPrecondition
+  name: 4th preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 10
+    succession: 4
+
+- schema: TestrunPrecondition
+  name: 1st fail_precond
+  data:
+    testrun_id: 113
+    precondition_id: 113
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: ssh_hint_precondition
+  data:
+    testrun_id: 114
+    precondition_id: 1141
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: ssh_hint_precondition
+  data:
+    testrun_id: 114
+    precondition_id: 1142
+    succession: 2
+
+
+
+# -------------------- "perl" <== "gcc(9)", "glibc"
+
+- schema: PrePrecondition
+  name: 1st precondition for perl
+  data:
+    parent_precondition_id: 8
+    child_precondition_id: 9
+    succession: 1
+
+- schema: PrePrecondition
+  name: 2nd precondition for perl
+  data:
+    parent_precondition_id: 8
+    child_precondition_id: 10
+    succession: 2
+
+# -------------------- "tapper-tools" <== "gcc(11)"
+
+- schema: PrePrecondition
+  name: make tapper-tools a parent for another gcc-4.2
+  data:
+    parent_precondition_id: 7
+    child_precondition_id: 11
+    succession: 1
+
+# -------------------- "autoinstall"
+
+- schema: TestrunPrecondition
+  name: First precondition for autoinstall
+  data:
+    testrun_id: 100
+    precondition_id: 101
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: Second precondition for autoinstall
+  data:
+    testrun_id: 100
+    precondition_id: 102
+    succession: 2
+# ------------------- Host --------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 5
+    name: iring
+    free: 1
+    active: 1
+
+- schema: Host
+  name: bullock
+  data:
+    id: 6
+    name: bullock
+    free: 1
+    active: 1
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 7
+    name: dickstone
+    free: 1
+    active: 1
+
+- schema: Host
+  name: nosuchhost
+  data:
+    id: 8
+    name: nosuchhost
+    free: 0
+    active: 0
+
+
+# ---------------- HostFeature ------------
+
+- schema: HostFeature
+  name: dickstone_ram
+  data:
+    id: 1
+    host_id: 7
+    entry: mem
+    value: 4096
+
+- schema: HostFeature
+  name: dickstone_vendor
+  data:
+    id: 2
+    host_id: 7
+    entry: vendor
+    value: AMD
+
+- schema: HostFeature
+  name: dickstone_cores
+  data:
+    id: 3
+    host_id: 7
+    entry: cores
+    value: 2
+
+- schema: HostFeature
+  name: dickstone_ram
+  data:
+    id: 4
+    host_id: 7
+    entry: keyword
+    value: server
+
+- schema: HostFeature
+  name: iring_ram
+  data:
+    id: 5
+    host_id: 5
+    entry: mem
+    value: 8192
+
+- schema: HostFeature
+  name: iring_vendor
+  data:
+    id: 6
+    host_id: 5
+    entry: vendor
+    value: Intel
+
+- schema: HostFeature
+  name: iring_cores
+  data:
+    id: 7
+    host_id: 5
+    entry: cores
+    value: 1
+
+- schema: HostFeature
+  name: iring_ram
+  data:
+    id: 8
+    host_id: 5
+    entry: keyword
+    value: testmachine
+

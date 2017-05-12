@@ -1,0 +1,149 @@
+Revision history for Test-DistManifest
+
+1.014     2015-02-11 01:07:40Z
+          - fix tests that fail when ExtUtils::Manifest's version is not new
+            enough for the build output during installation (RT#102017)
+
+1.013     2015-02-08 22:42:43Z
+          - tests are now made against a small sample dist, rather than
+            ourselves, to avoid errors with newer ExtUtils::MakeMaker, as well
+            as enable running in the raw git repository (RT#78760, RT#101287)
+          - many tooling and metadata updates
+
+1.012     2012-04-22 20:45:02Z
+          - Now taking default MANIFEST.SKIP content directly from installed
+            version of ExtUtils::Manifest, rather than inlining a copy (Karen
+            Etheridge)
+
+1.011     2011-04-24 16:43:21Z (previously released as 1.010-TRIAL)
+          - Migrate package to Dist::Zilla
+          - Drop a bunch of apparently-unnecessary dependencies. Now only
+            support Perl 5.8.0+
+
+1.009     2009-12-28
+          - Fixes tests so that the "default MANIFEST.SKIP" test is not run;
+            this could fail when the default MANIFEST.SKIP provided by
+            ExtUtils::Manifest doesn't cover special directories like debian/
+            (Debian metadata)
+
+1.008     2009-12-28
+          - Updated POD
+
+1.007     2009-12-22
+          - Update skip info in t/circular (hopefully this fixes failures)
+
+1.006     2009-12-21
+          - Update MANIFEST.SKIP according to new defaults provided by
+            ExtUtils::Manifest
+          - Cleaned up some documentation issues
+          - Use the default MANIFEST.SKIP if ours can't be parsed
+          - Updated tests to match new behaviour
+          - Remove pass-through Build.PL
+
+1.005     2009-10-12
+          - Fix the dist (don't overwrite the Changes file)
+
+1.004     2009-10-11
+          - Changed my mail address to jawnsy@cpan.org
+          - Update MANIFEST.SKIP to include MYMETA.yml (prevents test failure)
+
+1.003     2009-08-20
+          - Remove generated files from the repository
+          - Use a simple string version, per David Golden's article:
+            http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
+          - No longer use Perl::Critic to test
+          - Remove modules available in core since Perl 5.6 from requires
+          - Move CIRCULAR.SKIP and MANIFEST.EXTRA into t/
+
+1.2.3     2009-07-25
+          - Added coverage information
+          - Rewrote LICENSE and README slightly
+          - Updated the checkmanifest.t example file and synopsis, it now
+            checks Alias' flags (AUTOMATED_TESTING, RELEASE_TESTING)
+            rather than TEST_AUTHOR
+          - No longer test Perl::Critic during AUTOMATED_TESTING, only
+            only RELEASE_TESTING. Thanks to Elliot Shank for the
+            discussion in a private mail.
+          - No more versioned dependency on version.pm
+          - Use a generic README, no longer produce one
+          - Changed critic.rc to ignore PodSpelling policy (fixes a bug
+            in Debian, BTS#538115 -- when Pod::Spell and other
+            dependencies are installed)
+          - Disable "one dot only" in filenames (portability test). This
+            breaks compatibility with OpenVMS.
+          - Updated perlcriticrc with new preferences, removed "no critic"
+            stuff for those in Test/DistManifest.pm
+          - Added copyleft statements to test files
+          - Minor documentation fix
+          - Small POD fix
+
+1.2.2     2009-05-15
+          - Minor problem forgetting to bump one of the version numbers
+            in META.yml
+          - Adjusted dependencies - changed minimum version dependency
+            to Test::Builder 0.72 and version 0.74, which are core modules
+            in Perl 5.10
+
+1.2.1     2009-05-14
+          - Moved some small changes from MANIFEST.SKIP to CIRCULAR.SKIP
+          - This release is particularly important to get rid of Win32
+            test failures, where `Build.bat' is created instead of `Build'
+
+1.2.0     2009-05-14
+          - Updated t/03warn-only.t test with new semantics (always fail
+            if parsing fails)
+          - Note that circular dependencies and parsing errors will
+            always be considered fatal, regardless of the setting
+            MANIFEST_WARN_ONLY
+          - Suppress refactoring requirement - even though manifest_ok
+            is really complex, it doesn't make sense to exist in separate
+            subs
+          - Added new feature for nonfatal errors (see updated POD)
+
+1.1.4     2009-04-26
+          - Added .tmp to MANIFEST.SKIP
+          - Added Build.bat to MANIFEST.SKIP for Win32 builds...
+
+1.1.3     2009-04-23
+          - Added Win32 compatibility code. Closes the Win32 compatibility
+            bug (RT#44401)
+          - Updated Build.PL
+          - Added META.yml
+          - Changed to a passthrough Makefile instead of a classic one
+          - Updated version dependency for version.pm
+          - Removed use of Test::Prereq, because it needs to use CPAN
+            to do its work
+          - Fix OS detection routines
+          - Modified the module so that it works portably (even with
+            Win32, and other platforms File::Spec supports)
+
+1.1.2     2009-03-14
+          - Updated prerequisite information in Build.PL and META.yml
+          - Add a more thorough description for the POD
+          - Fix dependencies in Build.PL and META.yml
+          - Clarified licensing restrictions
+          - CIRCULAR.SKIP became out of sync with the real MANIFEST.SKIP,
+            and so was causing problems with debian/
+
+1.1.1     2009-03-12
+          - Added "^debian/" as a mask for MANIFEST.SKIP. This is where
+          - Debian package control files go, and so should not be
+          - considered part of the package. Hopefully this won't break
+            anything :-)
+
+1.1.0     2009-03-12
+          - Modified Changelog name to "Changes" (instead of CHANGES)
+          - Updated Makefile.PL
+          - Added a test for circular dependencies (those that exist in
+            both MANIFEST and MANIFEST.SKIP) -- thanks Apocalypse!
+          - Updated the POD and the README to reflect this repository's
+            location
+          - Fixed version number in META.yml -> numeric "1.001000" style
+            version numbering, to get around version.pm bugs
+          - Replaced PerlCritic's POD section to enforce 'LICENSE'
+            instead of 'COPYRIGHT' (which is used by CPANTS/Kwalitee)
+          - Removed Test::NoWarnings from the Signature test, which
+            throws warnings on purpose.
+
+1.0       2008-12-25
+          - Initial release

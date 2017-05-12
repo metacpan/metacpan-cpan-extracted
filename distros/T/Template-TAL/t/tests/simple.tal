@@ -1,0 +1,8 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <h1 tal:content="title">The title</h1>
+    <ul>
+      <li tal:repeat="colour colours" tal:content="colour">Colour of the rainbow</li>
+    </ul>
+  </body>
+</html>

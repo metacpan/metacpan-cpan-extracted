@@ -1,0 +1,77 @@
+{
+   "abstract" : "Show timezone offset strings like +0900",
+   "author" : [
+      "-2014 Piotr Roszatycki <dexter@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-TZOffset",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Time::TZOffset" : {
+         "file" : "lib/Time/TZOffset.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Time-TZOffset/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Time-TZOffset",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Time-TZOffset.git",
+         "web" : "https://github.com/kazeburo/Time-TZOffset"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Jacques Germishuys <jacquesg@striata.com>",
+      "karupanerura <karupa@cpan.org>",
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ]
+}

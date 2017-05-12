@@ -1,0 +1,22 @@
+Template::Plugin::RPM2
+======================
+
+Template::Plugin::RPM2 is a module for extracting information from 
+RPM packages and using that information in templates that are
+processed by the Template Toolkit. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Dave Cross
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

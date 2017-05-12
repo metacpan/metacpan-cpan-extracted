@@ -1,0 +1,1829 @@
+=head1 NAME
+
+Tk::TM - User interface for database applications.
+Tk::TM - Tk Transaction Manager - screen transactions with user.
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 SYNOPSIS
+
+=over
+
+=item Using SQL and Widget Generator:
+
+ use Tk::TM::Lib;
+ Tk::TM::Common::DBILogin('dsn', 'user', '');
+ my $mw  =new Tk::MainWindow;
+ my $mnu =$mw->tmMenu;
+ my $do  =new Tk::TM::DataObject();
+ $do->set(-sqgfd=>[
+      ['cruptb',undef,'id',   undef,  undef,'ID',   'Entry']
+     ,['crub',  undef,'class','    3',['select class from entity where x=?',1],'Class','Entry']
+     ,['crutb', undef,'name', undef,  undef,'Name', 'Entry']
+     ]
+   ,-sqgsf=>'entity'
+   ,-sqgso=>'id'
+   ,-sqgscr=>$mw
+   ,-sqgpt=>[-rowcount=>5]
+   )->form(-t=>$mnu);
+ $mnu->Retrieve;
+ Tk::MainLoop;
+
+
+=item Using SQL Statements:
+
+ use Tk::TM::Lib;
+ Tk::TM::Common::DBILogin('dsn', 'user', '');
+ my $mw =new Tk::MainWindow;
+ my $mnu =$mw->tmMenu;
+ my $tbl =$mw->tmTable(-rowcount=>3, -colspecs=>
+                        [['col1','Entry']
+                        ,['col2','Entry']
+                        ,['col3','Entry']]
+                       )->form(-t=>$mnu);
+ my $bln =$mw->tmBlank(-wgspecs=>
+                        [['col1','Entry']
+                        ,['col2','Entry']
+                        ,['col3','Entry',-width=>30]]
+                       )->form(-t=>$tbl);
+ new Tk::TM::DataObject(-wgtbl=>$tbl, -wgbln=>$bln
+                       ,-sqlsel=>['select...',value...]
+                       ,-sqlins=>['insert...',fieldnumber...]
+                       ,-sqlupd=>['update...',fieldnumber...]
+                       ,-sqldel=>['delete...',fieldnumber...]
+                       ); 
+ $mnu->Retrieve;
+ Tk::MainLoop;
+
+
+=item Low Level:
+
+ use Tk::TM::Lib;
+ Tk::TM::Common::DBILogin('dsn', 'user', '');
+ my $mw =new Tk::MainWindow;
+ my $mnu =$mw->tmMenu;
+ my $tbl =$mw->tmTable(-rowcount=>3, -colspecs=>
+                        [['col1','Entry']
+                        ,['col2','Entry']
+                        ,['col3','Entry']]
+                       )->form(-t=>$mnu);
+ my $bln =$mw->tmBlank(-wgspecs=>
+                        [['col1','Entry']
+                        ,['col2','Entry']
+                        ,['col3','Entry',-width=>30]]
+                       )->form(-t=>$tbl);
+ my $sub =sub{ my $self =shift;
+    if    ($_[0] eq 'dbRead') {$self->DBICmd('select * from table')}
+    elsif ($_[0] eq 'dbIns')  {$self->DBICmd('insert...')}
+    elsif ($_[0] eq 'dbUpd')  {$self->DBICmd('update...')}
+    elsif ($_[0] eq 'dbDel')  {$self->DBICmd('delete from table...')}
+    else                      {$self->doDefault(@_)}
+ };
+ new Tk::TM::DataObject(-cbcmd=>$sub, -wgtbl=>$tbl, -wgbln=>$bln); # or:
+ # $mnu->set(-dos=>[
+ # new Tk::TM::DataObject(-cbcmd=>$sub, -wgtbl=>$tbl, -wgbln=>$bln)
+ # ]);
+ $mnu->Retrieve;
+ Tk::MainLoop;
+
+
+=back
+
+=cut
+***********************************************************************
+=pod
+
+=head1 DESCRIPTION
+
+=over
+
+This module is something like 'Transaction Manager' in JYACC JAM RAD.
+
+It releases user interface for database applications - 
+screen transactions with user.
+
+It contains data manipulation object (C<Tk::TM::DataObject>),
+data widgets (C<tmTable>, C<tmBlank>),
+menu and action bar widgets (C<tmMenu>, C<tmActionBar>, based on C<Tk::TM::DataObjSet>).
+
+
+See also:
+
+Tk::TM::wApp - Tk Transaction Manager Application Window.
+This is level above Tk::TM::Lib.
+
+Tk::TM::Try - Tk Transaction Manager Error processing functions.
+Implements error processing functions may be used (or not be used)
+in application.
+
+
+=back
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 MODULES
+
+=over
+
+B<Tk::TM::Lib> - to import all TM components (modules) into a program, it have not own data or functions.
+
+B<Tk::TM::Common> - common data and functions
+
+B<Tk::TM::Lang> - language localisation
+
+B<Tk::TM::DataObject> - objects to manipulate with tabular data: retrieve, navigate, edit, save...
+C<Tk::TM::DataObject> uses C<Tk> widgets to present data,
+it can also simmultaniosly use one C<tmTable> and one C<tmBlank> widgets, mentioned below.
+C<DBI> can be used to interact with databases in several levels.
+The base level is using defined by programmer function(s) for database and user interactions.
+More developed levels are autogeneration of SQL.
+Next more developed levels may be based on prepared in database metadata.
+Inherited from C<Tk::TM::DataObject> may be developed C<Tk::TM::DataObjTixGrid> that uses C<tixGrid> widget
+and C<Tk::TM::DataObjSeq> that uses sequentialy accessible data files as xBase files.
+
+B<Tk::TM::wgTable> - table widget C<tmTable>, populated with C<Tk> widgets. It may be replaced with C<tixGrid> in future.
+
+B<Tk::TM::wgBlank> - blank widget C<tmBlank>, presents data row-by-row with C<Tk> widgets.
+
+B<Tk::TM::DataObjSet> - base object for menu and action bar widgets, mentioned below.
+It contains several C<Tk::TM::DataObject>s and uses 
+current C<Tk::TM::DataObject>
+or all C<Tk::TM::DataObject>s 
+to achieve required by user operations.
+
+B<Tk::TM::wgActionBar> - the simplest widget C<tmActionBar>
+with user actions as 'retrieve', 'save', 'next', 'previous'...
+
+B<Tk::TM::wgMenu> - more complex widget C<tmMenu>
+with more user actions - menu and toolbar in
+CUA-style.
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 COMMON OBJECT METHODS
+
+=over
+
+C<perlobj> and C<perltoot> recommends common object methods 
+C<new>, C<initialize>, C<DESTROY>. The only C<DESTROY> word is special.
+
+C<Tk> introduces it`s manner of constructing and creating widgets and
+methods 
+C<Populate>, C<configure>, C<cget>, C<destroy>, C<OnDestroy>.
+
+So, it was needed to specify for TM objects sufficient and unified range of
+common object methods: 
+C<new>, C<initialize>, C<set>, C<setpush>, C<destroy>, C<destroybind>, C<DESTROY>.
+And there was a little problem - should first letters of words be capitalised 
+(f.e. 'setpush' or 'SetPush')? Now it is not for better focusing on parameters 
+of such methods as C<new> and C<set>
+and for common manners of perl programming. 
+But in future there may become compatible names as 'New', 'Set', etc..
+
+
+=item new Class (parameters) -> object
+
+Creates and returns a new object with given parameters. This is as in C<perlobj>.
+Derived from C<Tk> objects have not this function.
+
+
+=item initialize
+
+=item $obj->initialize (parameters) -> object
+
+Initializes object as C<initialize> in <perlobj>. 
+Usually C<initialize> is called from C<new>.
+C<initialize> is useful in inherited objects, 
+that can not use ancestor`s function C<new> 
+but need to do ancestor`s initialise code
+
+
+=item set
+
+=item $obj->set () -> @names_of_parameters
+
+=item $obj->set (parameter) -> value
+
+=item $obj->set (list of parameters and values) -> object
+
+Gets or sets parameters of object as C<cget> and C<configure> in C<Tk>.
+C<set> is called from C<initialize> or outside object.
+
+
+=item setpush
+
+=item $obj->setpush (parameter, value) -> object
+
+Pushes given value into given parameter of type 'reference to array' or 'reference to hash'.
+This is useful method when filling list parameters without using interim variables.
+
+
+=item destroy
+
+=item $obj->destroy
+
+Finishing using of object, disposing or destroying it as in C<Tk>.
+It was impossible to use C<DESTROY> because of losing object inside it.
+For C<Tk> widget objects C<destroybind> is used instead of C<destroy>.
+
+
+=item DESTROY
+
+=item $obj->DESTROY
+
+Standard object`s destructor, see C<perlobj>. 
+Due to problem of losing object inside C<DESTROY>, 
+and thankfully to absence of needs,
+it is not used.
+
+
+=item destroybind
+
+=item $obj->destroybind
+
+Destruction method, called from C<Tk> C<OnDestroy> event. 
+Used only for widgets, for other objects C<destroy> is used.
+
+
+=back
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::Lib MODULE
+
+=over
+
+=item Tk::TM::Lib
+
+C<Tk::TM::Lib> module imports all TM components (modules) into a program.
+
+=item use Tk::TM::Lib
+
+Imports all TM components (modules) into a program
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::Common MODULE
+
+=over
+
+=item Tk::TM::Common
+
+C<Tk::TM::Common> module contains common data and functions.
+
+=item use Tk::TM::Common
+
+Imports C<Tk::TM::Common> module into application.
+This does C<Tk::TM::Lib> module.
+
+
+=item $Tk::TM::Common::About
+
+Default 'Help / About' text: reference to list of rows or sub.
+See also C<-about>
+
+
+=item $Tk::TM::Common::DBH
+
+Default database connection handle, undef in default. Example:
+$Tk::TM::Common::DBH =DBI->connect("DBI:XBase:.")
+
+=item $Tk::TM::Common::Debug
+
+Debug level: 0 -none (default), 1 -print actions to STDOUT.
+
+
+=item $Tk::TM::Common::Echo
+
+Echo mode - printing commands to be executed: 0 -none, 1 -print (default).
+
+
+=item $Tk::TM::Common::Edit
+
+Default mode for application: 0 -view only, 1 -allow edit data (default).
+See C<-mdedt>
+
+
+=item $Tk::TM::Common::Help
+
+Default 'Help / Help' text: reference to list of rows or sub.
+See also C<-help>
+
+
+=item Tk::TM::Common::DBILogin (dsn, user, password, ?opt, ?dbopt) -> dbh
+
+=item Tk::TM::Common::DBILogin (screen, dsn, user, password, ?opt, ?dbopt)
+
+Database login dialog, see C<DBI-E<gt>connect>.
+Options (default none): 
+'#dsn' or '#edit' - allow to edit dsn,
+'#return' - instead of modifying C<$Tk::TM::Common::DBH> only return dbh
+and return instead of exit when 'cancel' button pressed,
+'#center' - center login dialog on screen.
+Screen parameter is used for calls from C<Tk::TM::wApp>.
+
+
+=back
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::Lang MODULE
+
+=over
+
+=item Tk::TM::Lang
+
+C<Tk::TM::Lang> module contains language localisation.
+The functions of this module are used par excellence internally by C<Tk::TM>,
+application may only specify required localisation in C<$Tk::TM::Lang::Lang>.
+
+
+
+=item use Tk::TM::Lang
+
+Imports C<Tk::TM::Lang> module into application.
+This does C<Tk::TM::Lib> module.
+
+
+=item $Tk::TM::Lang::Lang
+
+Switch of language localisation: false - international (no localisation),
+other - turn on localisation - language name such as 'ru' may be used.
+
+
+=item Tk::TM::Lang::txtHelp -> \@help_text
+
+Returns reference to array of rows of embedded help text.
+
+
+=item Tk::TM::Lang::txtMenu -> \@menu_items_texts
+
+Returns reference to array of texts of menu items
+
+
+=item Tk::TM::Lang::txtMsg (msg) -> lang_msg
+
+Returns given string translated into used localisation.
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::DataObject MODULE
+
+=over
+
+=item Tk::TM::DataObject
+
+C<Tk::TM::DataObject> module implements object 
+to manipulate with tabular data: retrieve, navigate, edit, save...
+This object contains data store (data system) may be filled with SQL select
+and updated synchronously with SQL inserts, updates, deletes.
+C<Tk::TM::DataObject> may be classified into:
+
+
+Object data: 
+C<-wgtbl>, C<-wgbln>, C<-wgarr>, C<-wgmnu>, C<-wgind>,
+C<-mdedt>,
+C<-dsdtm>,
+C<-cbcmd>, C<-cbXXX>,
+C<-dbh>, C<-dbfnm>, C<-dbfds>, C<-dbfaw>,
+C<-sqlsel>, C<-sqlins>, C<-sqlupd>, C<-sqldel>,
+C<-sqgscr>, C<-sqgfd>, C<-sqgsf>, C<-sqgsj>, C<-sqgsc>, C<-sqgso>, 
+C<-sqgpt>, C<-sqgpb>,
+C<-parm>, C<-parmc>
+
+
+Options of Tk::TM::DataObject operation:
+C<"#end">, C<"#force">, C<"#reread">, C<"#save">, C<"#silent">, C<"#undo">,
+C<"#wgs">, C<"#dta">
+
+
+Common object methods:
+C<new Tk::TM::DataObject>, C<$do-E<gt>initialize>,
+C<$do-E<gt>destroy>, C<$do-E<gt>DESTROY>,
+C<$do-E<gt>set>, C<$do-E<gt>setpush>
+
+
+Data system dependent level methods with prefix 'ds',
+that implementation reflects data storage type - array of rows or C<tixGrid>;
+many of this commands are used internally only, 
+externally used variants (mentioned below) has not prefix 'ds'
+and observes modification flags:
+C<$do-E<gt>dsReset>, C<$do-E<gt>dsDisplay>, C<$do-E<gt>dsDispWg>, C<$do-E<gt>dsFocus>
+C<$do-E<gt>dsRowCount>, C<$do-E<gt>dsRowDta>,
+C<$do-E<gt>dsRowFeed>, C<$do-E<gt>dsRowFeedAll>,
+C<$do-E<gt>dsRowGo>,
+C<$do-E<gt>dsRowNew>, C<$do-E<gt>dsRowDel>, C<$do-E<gt>dsRowUpd>, 
+C<$do-E<gt>dsFldDta>, C<$do-E<gt>dsFldUpd>
+
+
+Abstract level methods without prefix 'ds' 
+does not depends on data system implementation (array of rows or C<tixGrid>)
+and observes modification flags.
+Method with 'ds' prefix should not be used by programmer if there is 
+abstract level method with the same name.
+Function C<$do-E<gt>Stop> plays important role within codes of abstract level
+functions, they often calls it to finish data editing if it is. 
+
+
+Internally used widget level methods with 'wg' prefix:
+C<$do-E<gt>wgFldFocusIn>, C<$do-E<gt>wgFldFocusOut>, 
+C<$do-E<gt>wgFldHelper>,
+C<$do-E<gt>wgIndicate>
+
+
+Commands, used outside data objects to control them: 
+C<$do-E<gt>Display>, 
+C<$do-E<gt>Stop>, C<$do-E<gt>Save>, C<$do-E<gt>Sleep>, 
+C<$do-E<gt>Clear>, C<$do-E<gt>Retrieve>,
+C<$do-E<gt>RowGo>,
+C<$do-E<gt>RowNew>, C<$do-E<gt>RowDel>, C<$do-E<gt>RowUndo>,
+C<$do-E<gt>Export>, C<$do-E<gt>Find>, C<$do-E<gt>FindNxt>, C<$do-E<gt>Import>, C<$do-E<gt>Print>,
+C<$do-E<gt>Action>
+
+
+Implementations of commands above with prefix 'do', used inside data object:
+C<$do-E<gt>doDefault>, C<$do-E<gt>doExport>, C<$do-E<gt>doImport>, C<$do-E<gt>doPrint>
+
+
+Useful methods for programming events (callbacks) used in implementations above:
+C<$do-E<gt>DBICmd>, C<$do-E<gt>DBICnd>, C<$do-E<gt>DBIGen>, C<$do-E<gt>DBIHlp>
+
+
+Events (callbacks) and transaction scheme:
+C<dbRead>, C<dbIns>, C<dbUpd>, C<dbDel>,
+C<rwChg0>, C<rwChg1>,
+C<rwIns0>, C<rwIns1>,
+C<rwUpd0>, C<rwUpd1>,
+C<rwDel0>,
+C<fdChg0>, C<fdChg1>,
+C<fdHelp>,
+C<fdUpd0>, C<fdUpd1>,
+C<doEnd>, C<doExport>, C<doImport>, C<doPrint>,
+C<usAct>
+
+
+
+=item use Tk::TM::DataObject
+
+Imports C<Tk::TM::DataObject> module into application to use data objects.
+This does C<Tk::TM::Lib> module.
+
+
+=item new Tk::TM::DataObject (parameter=>value...)
+
+Creates and returns data object with parameters specified (see C<Parameters of Tk::TM::DataObject>).
+Includes newly created data object into list of all data objects C<@$Tk::TM::DataObject::Available>.
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head2 Parameters of Tk::TM::DataObject
+
+=over
+
+Parameters may be set or get with C<new Tk::TM::DataObject> and C<$do-E<gt>set> 
+methods of data object (see also C<new> and C<set>).
+There may be described only most used parameters.
+
+
+=item -cbcmd
+
+Callback function for all events (see C<Events of Tk::TM::DataObject>).
+Default value is C<$do-E<gt>doDefault>.
+Slots for particular events C<-cbXXX> may be used instead of C<-cbcmd>.
+
+
+=item -cbXXX
+
+Callbacks for particular events. Optional.
+'XXX' means name of event, f.e. C<dbRead>.
+Callbacks C<-cbXXX> are implemented within C<$do-E<gt>doDefault> method 
+of data object, and so programmer should use C<-cbcmd> or C<-cbXXX>, 
+but not both.
+
+
+=item -dbfaw
+
+Widget width adaptation to database fields switch.
+Contains margin of widget width.
+
+
+=item -dbfds
+
+Reference to array of references to hashes with descriptions of fields.
+Filled in C<$do-E<gt>DBICmd>('select...').
+
+
+=item -dbfnm
+
+Reference to hash "fieldName => fieldNumber".
+Filled in C<$do-E<gt>DBICmd>('select...').
+
+
+=item -dbh
+
+Database handle (see C<DBI>) to use with database methods. 
+If not set, C<$Tk::TM::Common::DBH> will be used, 
+or other may be programmed.
+
+
+=item -dsdtm
+
+Data store margin - max number of rows to keep in it.
+
+
+=item -mdedt
+
+Enable edit actions for user (edit mode).
+Values: 0 or '' - disable, digit -enable, 
+'c'reate or 'i'nsert enable,
+'u'pdate enable,
+'d'elete enable.
+Default is C<$Tk::TM::Common::Edit>.
+
+
+=item -parm
+
+Programmer`s parameters, hash reference.
+Does`nt used by C<Tk::TM>, may be used for programmer`s needs.
+
+
+=item -parmc
+
+Common to C<Tk::TM::DataObjSet> object programmer`s parameters, hash reference.
+This is also available via $do->{C<-wgmnu>}->{-parm}.
+
+
+
+=item -sqgxxx - SQL and Widget Generator parameters
+
+=item -sqgscr = screen to generate widgets on, generation trigger
+
+If C<-sqgscr> and C<-sqgsf> specified, widget required will be generated and
+returned by C<$do-E<gt>set>.
+
+=item -sqgfd = [['cruvpktb', table, field, filter value, helper select, ?inccol, label, ?colSpan, ?rowSpan, wgType, ?wgOpt]]
+
+'crupktb' is field usage: 'c'reate or 'i'nsert, 'r'ead or 's'elect, 'u'pdate,
+'v'iew only,
+'p'rimary key, 'k'ey for commands,
+'t'able widget, 'b'lank widget.
+If table name is empty string, it will be automatically filled if possible;
+undefined table name will not be used in 'select' generation.
+Field name may be also expression to select.
+Filter value or sub will be used in 'where' clause and in C<$do-E<gt>RowNew> if defined.
+Helper select is value compliant to C<$do-E<gt>DBIHlp> and C<$do-E<gt>DBIGen> 
+interfaces, it may be 'sql select' string, 
+reference to array with 'sql select' string and numbers of fields or subs,
+reference to array of references to arrays with data strings.
+Values after 'helper select' are used for table or blank widget fields.
+
+=item -sqgsf = 'select from' clause
+
+=item -sqgsj = 'select where/join' subclause
+
+=item -sqgsc = 'select where/condition' subclause with/without parameters
+
+=item -sqgso = 'select order by' clause
+
+All clauses are strings to be placed after keyword mentioned.
+Where/condition parameter C<-sqgsc> may be also reference to array
+with string subclause and values or subs for SQL statement parameters.
+
+=item -sqgpt = parameters for table widget
+
+See C<Tk::TM::wgTable>.
+
+=item -sqgpb = parameters for blank widget
+
+See C<Tk::TM::wgBlank>.
+
+
+
+=item -sqlxxx - SQL templates for simplest SQL generator
+
+=item -sqlsel = SQL 'select' statement and parameters
+
+=item -sqlins = SQL 'insert' statement and parameters
+
+=item -sqlupd = SQL 'update' statement and parameters
+
+=item -sqldel = SQL 'delete' statement and parameters
+
+SQL templates for simplest SQL generator - strings, array refs, refs to arrays of refs.
+
+Simple string is SQL statement.
+'insert', 'update', 'delete' will be automatically supplied 
+with all data values of current row as parameters.
+'update' will be also supplied with old data values.
+
+Reference to array with string as first element is SQL statement with parameters.
+'select' parameters may be values or subs to evaluate.
+'insert', 'update', 'delete' parameters are subs to evaluate or column numbers, 
+negative values are treated like slices 
+(f.e. ['insert into table values (?,?,?)',0,-2] tells use columns 0,1,2).
+'update' old values are discovered as decrease of numbering
+(f.e. ['update table set xxx=?, yyy=? where k=?',0,-1,0]).
+
+Reference to array with reference as first element is treated 
+as sequence of SQL statements to execute within single transaction.
+
+
+
+=item -wgarr
+
+Widgets for row-by-row data performance.
+Alternative or addition to C<-wgbln>.
+There no need of widget for each field, absent widgets should be
+replaced with undefs.
+Optional.
+
+
+=item -wgbln
+
+C<tmBlank> widget for data object use.
+Optional.
+
+
+=item -wgind
+
+Indicator widget for data object use with C<$do-E<gt>wgIndicate>.
+Optional.
+
+
+=item -wgmnu
+
+Navigator widget - ancestor of C<Tk::TM::DataObjSet>.
+This may be used instead of C<-dos> of C<Tk::TM::DataObjSet>,
+but C<-dos> is more recommended.
+
+
+=item -wgscr
+
+Parent screen for data object. Default is parent of widgets used.
+
+
+=item -wgtbl
+
+C<tmTable> widget for data object use.
+Optional.
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head2 Options of Tk::TM::DataObject operation
+
+=over
+
+This describes options of data object operations.
+This options are used as parameters of methods as
+C<$do-E<gt>Retrieve>, C<$do-E<gt>Stop>,
+C<$do-E<gt>doDefault>, C<$do-E<gt>doImport>,
+C<$do-E<gt>DBICmd>...
+There may be several options catenated within one option string, f.e. '#force#end'.
+Some of this options are used internally,
+some may be used by programmer.
+
+
+=item "#dta"
+
+Drop data buffer.
+Used in C<$do-E<gt>Sleep>
+
+
+=item "#end"
+
+End of data object operation. It is no need to redisplay data.
+Used in C<$do-E<gt>Stop>
+
+
+=item "#force"
+
+Cancel of operation is not allowed, answer should be certain - 'yes' or 'no'.
+Used in C<$do-E<gt>Stop>
+
+
+=item "#reread"
+
+Keep current position of data store.
+Used in C<$do-E<gt>Retrieve>
+
+
+=item "#save"
+
+Save modified data without ask of user.
+Used in C<$do-E<gt>Stop>
+
+
+=item "#silent"
+
+Do not display error message box.
+Used in C<$do-E<gt>doImport>, C<$do-E<gt>DBICmd>
+
+
+=item "#undo"
+
+Undo unsaved modification of current record of data.
+Used in C<$do-E<gt>Stop>
+
+
+=item "#wgs"
+
+Destroy linked widgets.
+Used in C<$do-E<gt>Sleep>
+
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head2 Methods of Tk::TM::DataObject
+
+=over
+
+
+=item $do->Action (actionName)
+
+Executes callback C<usAct>. 
+This is used for may be added by programmer menu 'Actions'.
+
+
+=item $do->Clear (?opt) -> success
+
+Clears data inside data object`s data store. 
+Saves modified data if needed via C<$do-E<gt>Stop>($opt .'#end').
+Data object become ready for insertion and editing new records of data.
+
+
+=item $do->DBICmd (?dbh, ?opt, command, arguments) -> result
+
+=item $do->DBICmd (?dbh, ?opt, command, [arguments], command, [arguments]...) ->result
+
+Simplest C<DBI> interface, executes C<dbh> command.
+Database connection handle C<dbh> may be specified as argument, 
+or may be given from data object`s property C<-dbh> or from C<$Tk::TM::Common::DBH>.
+Option '#silent' declines usage of message box to display error occurred.
+Command may be any C<dbh> method (as 'selectrow' or 'do') 
+or string incipient with 'select', 'selectrow', 'insert', 'update', 'delete'.
+Commands 'select' and 'selectrow' retrieves data directly into data object`s data store.
+Several commands may be specified to execute them within one database transaction.
+With one command specified autocommit is assumed.
+
+
+
+=item $do->DBICnd() -> success
+
+Query condition and sort dialog.
+Works with all modes of SQL generation.
+
+
+=item $do->DBIGen(sql, opt, ?command) -> sql command
+
+SQL generator.
+In simplest mode it uses C<-sqlsel>, C<-sqlins>, C<-sqlupd>, C<-sqldel>.
+In complex mode it uses C<-sqgscr>, C<-sqgfd>, C<-sqgsf>, C<-sqgsj>, C<-sqgsc>, C<-sqgso>, C<-sqgpt>, C<-sqgpb>.
+
+
+
+=item $do->DBIHlp (?SQL, \@parameters, ?\@out_fields) -> success
+
+Displays entry helper screen for C<-fdHelp> event, updates fields if chosen.
+Parameters may be for SQL command if it is, or to directly display.
+Output field numbers are relative to current field number.
+If output field numbers omitted, current field is used for output.
+
+
+=item $do->destroy
+
+Destructs data object, see C<destroy>.
+Saves modified data if needed via C<$do-E<gt>Stop>('#force#end').
+Excludes data object from list of all data objects C<@$Tk::TM::DataObject::Available>
+
+
+=item $do->DESTROY
+
+Destructor, see C<DESTROY>. Does nothing.
+
+
+=item $do->Display -> success
+
+Displays current data on screen. 
+This is not very useful method because all high-level methods keep screen actual.
+
+
+
+
+=item $do->doDefault (operation, options, args...) -> success
+
+Implements default actions for all programmable events,
+evaluates appropriate C<piXXX> code if it exists.
+This is default value for C<-cbcmd> data object`s parameter.
+Events and options are described in 
+C<Events of Tk::TM::DataObject> and C<Options of Tk::TM::DataObject operation>
+
+=item $do->doExport (?file, ?format) -> filename
+
+Exports data from data object`s data store to specified file.
+If no file specified, uses C<Tk::FileSelect> to ask user for filename.
+Returns filename on success or empty string on failure.
+See also C<$do-E<gt>Export>
+
+
+=item $do->doImport (?file, ?format) -> filename
+
+Imports data from file into data object.
+If no file specified, uses C<Tk::FileSelect> to ask user for filename.
+Importing each row of data is implemented via insert attempt and update attempt.
+Returns filename on success or empty string on failure.
+See also C<$do-E<gt>Import>
+
+
+=item $do->doPrint (?file, ?format) -> filename
+
+Prints data on printer device or into file specified.
+See also C<$do-E<gt>Print>.
+Not implemented yet.
+
+
+
+
+=item $do->dsDisplay -> success
+
+Displays current data on screen: C<-wgtbl>, C<-wgbln>, C<-wgarr>.
+Calls C<$do-E<gt>dsDispWg>.
+
+
+=item $do->dsDispWg -> success
+
+Displays current data in by-row widgets: C<-wgbln>, C<-wgarr>
+
+
+=item $do->dsFldDta (?field) -> data
+
+Returns data from current or specified widget.
+Parameter may be data widget or field number or field name.
+
+
+=item $do->dsFldUpd (field, data) -> success
+
+Replaces (updates) data in specified field, displays it on screen.
+Field may be identified by number or name.
+
+
+=item $do->dsFocus
+
+Sets focus (focusForce) to current widget.
+
+
+=item $do->dsReset (?) -> success (always)
+
+Resets data store, drops all rows of data.
+Does not displays data on screen, but may this in different releases.
+
+
+=item $do->dsRowCount -> number_of_rows
+
+Returns number of data rows in data store.
+
+=item $do->dsRowDel -> success
+
+Deletes current row of data in data store.
+Displays changes on screen.
+
+
+=item $do->dsRowDta (?row) ->\@data_row
+
+Returns reference to array containing data of current or specified row
+
+
+=item $do->dsRowFeed (\@data_row) -> success
+
+Pushes specified data row into data store.
+Does not displays data on screen.
+
+
+=item $do->dsRowFeedAll (\@data) -> success
+
+Replaces all data in data store with specified.
+Does not displays data on screen.
+
+
+=item $do->dsRowGo (?row) -> success
+
+Make specified row current and display this on screen.
+If no row specified, only redisplays data on screen.
+Row may be specified absolutely or with commands 
+'next', 'prev', 'pgdn', 'pgup', 'top', 'bot'.
+Data on screen will be redisplayed in all cases
+except 'next' and 'prev' optimisations.
+
+
+
+=item $do->dsRowNew -> success
+
+Creates (appends) new row into data store, 
+makes it current,
+displays it on screen,
+sets focus to it.
+
+
+=item $do->dsRowUpd (\@data) -> success
+
+Replaces (updates) data in the current row with data specified,
+displays it on screen.
+
+
+
+=item $do->Export (?file, ?format) -> filename
+
+Exports data from data store into file.
+Saves modified data if needed via C<$do-E<gt>Stop>('').
+If no file specified, uses C<Tk::FileSelect> to ask user for filename.
+Returns filename on success or empty string on failure.
+See involved: C<-cbcmd>, C<doExport>, C<$do-E<gt>doExport>
+
+
+=item $do->Find -> success
+
+Presents Find dialog to user and finds in current column first occurrence.
+See also C<$do-E<gt>FindNxt>
+
+
+=item $do->FindNxt (?offset) -> success
+
+Finds next occurrence of Find string in current column,
+goes to row found.
+Default and usual offset is 1, 0 is used for call from C<$do-E<gt>Find>.
+
+
+=item $do->Import (?file, ?format) -> filename
+
+Imports data from file into data object.
+Saves modified data if needed via C<$do-E<gt>Stop>('').
+If no file specified, uses C<Tk::FileSelect> to ask user for filename.
+Importing each row of data is implemented via insert attempt and update attempt.
+Returns filename on success or empty string on failure.
+See involved: C<-cbcmd>, C<doImport>, C<$do-E<gt>doImport>
+
+
+=item $do->initialize (parameters)
+
+Initialises object, see C<initialize>.
+
+
+=item $do->Print (?file, ?format)
+
+Prints data of data object.
+Saves modified data if needed via C<$do-E<gt>Stop>('').
+See involved: C<-cbcmd>, C<doPrint>, C<$do-E<gt>doPrint>.
+
+
+=item $do->Retrieve (?opt) -> success
+
+Retrieves data into data store.
+Saves modified data if needed via C<$do-E<gt>Stop>('').
+Option string may contain C<$do-E<gt>Stop>('') options
+and '#reread' that keeps current row in data store unchanged.
+Without option '#reread' method C<$do-E<gt>RowGo> ('top') is used.
+See involved: C<-cbcmd>, C<dbRead>, 
+C<$do-E<gt>dsRowFeed>, C<$do-E<gt>dsRowFeedAll>, 
+C<$do-E<gt>DBICmd>.
+
+
+=item $do->RowDel -> success
+
+Deletes current row of data.
+Saves modified data if needed via C<$do-E<gt>Stop>('#save').
+See involved: C<-cbcmd>, C<rwDel0>, C<dbDel>, C<rwChg1> 
+C<$do-E<gt>dsRowDel>,
+C<$do-E<gt>DBICmd>
+
+
+=item $do->RowGo (row) -> success
+
+Goes to specified row of data: 'top', 'bot', 'pgup', 'pgdn', 'prev', 'next',
+directly defined row identifier. 
+Saves modified data if needed via C<$do-E<gt>Stop>('#save').
+See involved: C<-cbcmd>, C<rwChg1>, 
+C<$do-E<gt>dsRowGo>
+
+
+=item $do->RowNew -> success
+
+Creates (appends) new row of data.
+Saves modified data if needed via C<$do-E<gt>Stop>('#save').
+See involved: C<-cbcmd>, C<rwIns0>, C<rwIns1>, C<rwChg1>, 
+C<$do-E<gt>dsRowNew>
+
+
+=item $do->RowUndo -> success
+
+Undoes editing of current row of data via C<$do-E<gt>Stop>('#undo').
+See involved: C<rwChg1>
+
+
+=item $do->Save (?opt) -> success
+
+Saves modified data via C<$do-E<gt>Stop>($opt .'#save'). 
+See involved: C<rwChg1>
+
+
+=item $do->Sleep (?opt) -> success
+
+Makes data object inactive, frees resources engaged by it.
+Saves modified data via C<$do-E<gt>Stop>($opt .'#end').
+Option "#wgs" destroys data widgets. 
+Option "#dta" drops data buffer.
+C<$do-E<gt>Retrieve> (C<#reread>) will awake sleeping data object.
+Sleep procedure may be need application to control resources used.
+
+
+=item $do->set (parameter) -> value
+
+=item $do->set (parameter=>value...) -> data object
+
+Gets or sets parameters of data object. 
+See C<set>, C<Parameters of Tk::TM::DataObject>
+
+
+=item $do->setpush (parameter, value) -> data object
+
+Pushes list parameter into data object.
+See C<setpush>, C<Parameters of Tk::TM::DataObject>
+
+
+=item $do->Stop (?opt) -> success
+
+Stops data editing user transaction if it is.
+Other methods often calls it.
+See involved: C<-cbcmd>, C<rwChg0>, C<dbIns>, C<dbUpd>, C<rwUpd1>, C<doEnd>,
+C<$do-E<gt>wgFldFocusOut>
+
+
+=item $do->wgFldFocusIn (widget, ?fieldNo, ?screenRowNo)
+
+Callback for C<FocusIn> C<Tk> event.
+All used for data object widgets are bind to it.
+
+
+=item $do->wgFldFocusOut (?widget, ?fieldNo, ?screenRowNo)
+
+Callback for C<FocusOut> C<Tk> event.
+All used for data object widgets are bind to it.
+This method is called also by C<$do-E<gt>Stop>
+
+
+=item $do->wgFldHelper (?widget, ?fieldNo, ?screenRowNo)
+
+Callback for '<Key-F4>' C<Tk> event.
+All used for data object widgets are bind to it.
+This method may be called also outside callbacks.
+
+
+=item $do->wgIndicate (?string)
+
+Indicates current state of data object in C<-wgind>
+
+
+=back
+
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head2 Events of Tk::TM::DataObject
+
+=over
+
+This describes programmable events (callbacks) of C<Tk::TM::DataObject>
+and transaction scheme of them.
+This events may be implemented by programmer with C<-cbcmd> or C<-cbXXX>
+routines.
+See also C<$do-E<gt>doDefault>.
+
+Chains of events:
+
+Change current row: C<rwChg0>, C<rwChg1>, C<fdChg1>
+
+Begin to modify row: C<rwUpd0>, C<fdUpd0>, C<fdUpd1>
+
+Begin to insert row: C<rwChg0>, C<rwIns0>, C<rwIns1>, C<rwChg1>, C<fdChg1>
+
+Save modified row: C<dbIns> | C<dbUpd>, C<rwUpd1>, C<rwChg1>
+
+Delete row: C<rwChg0>, C<rwDel0>, C<dbDel>, C<rwChg1>
+
+
+=item dbDel (opt, rowNo, undef, undef, \@old_data)
+
+Delete row of data into database.
+This may be C<$do-E<gt>DBICmd>('delete ...', @old_data)
+
+
+=item dbIns (opt, rowNo, undef, undef, \@old_data, \@new_data)
+
+Insert new row of data into database.
+This may be C<$do-E<gt>DBICmd>($opt, 'insert ...', @new_data)
+
+
+=item dbRead (opt)
+
+Read data from database.
+This may be C<$do-E<gt>DBICmd>($opt, 'select ...')
+
+
+=item dbUpd (opt, rowNo, undef, undef, \@old_data, \@new_data)
+
+Update row of data into database.
+This may be C<$do-E<gt>DBICmd>($opt, 'update ...', @old_data, @new_data)
+
+
+
+=item doEnd (opt, rowNo, undef, undef, \@row_data)
+
+End of using data object, C<-parm> may be modified.
+Invoked from C<$do-E<gt>Stop> (C<"#end">).
+
+
+=item doExport (file, format)
+
+Export data from data store.
+In default this is C<$do-E<gt>doExport>
+
+
+=item doImport (file, format)
+
+Import data into data store.
+In default this is C<$do-E<gt>doImport>
+
+
+=item doPrint (file format)
+
+Print data from data store.
+In default this is C<$do-E<gt>doPrint>
+
+
+
+=item fdChg0 (?)
+
+Before changing current field (should current field be changed?).
+Not implemented.
+
+
+=item fdChg1 (opt, rowNo, fieldNo, widget)
+
+After current field was changed.
+This may occur after C<rwChg1>.
+
+
+=item fdHelp (opt, rowNo, fieldNo, widget)
+
+After key F4 (field fill help) was pressed, 
+this may be entry helper screen displayed.
+Before this is occurred C<rwUpd0>, C<fdUpd0>
+
+
+=item fdUpd0 (opt, rowNo, fieldNo, widget)
+
+Before updating (modifying) current field (should field be updated?).
+In current implementation this occurs after user have been modified data in a widget.
+This may occur after C<rwUpd0>.
+
+
+=item fdUpd1 (opt, rowNo, fieldNo, widget, old_value, new_valie)
+
+After current field was modified (accept changes?).
+In current implementation this occurs after user have been modified data in a widget
+and exited this widget.
+
+
+
+
+=item rwChg0 (opt, rowNo)
+
+Before changing current row in data store (should current row be changed?).
+Detail data objects should be saved in this event with
+C<$do-E<gt>Save>
+
+
+=item rwChg1 (opt, rowNo)
+
+After current row in data store was changed.
+Detail data objects should be retrieved in this event with
+C<$do-E<gt>Retrieve>
+
+
+=item rwDel0 (opt, rowNo)
+
+Before deleting current row (should row be deleted?)
+This occurs after C<rwChg0> and before C<dbDel>.
+
+
+=item rwIns0 (opt)
+
+Before inserting (appending) new row (should new row be inserted?).
+This occurs after C<rwChg0>.
+Master data objects should be saved in this event with
+C<$do-E<gt>Save>.
+
+
+=item rwIns1 (opt, rowNo)
+
+After new row is inserted (appended) into data store.
+New row is current row.
+This occurs before C<dbIns>.
+Default values should be supplied for this row.
+
+
+=item rwUpd0 (opt, rowNo)
+
+Before updating (modifying) current row (should row be modified?).
+This occurs after C<rwChg0> and before C<dbUpd>.
+
+
+=item rwUpd1 (opt, rowNo, undef, undef, \@old_data, \@new_data)
+
+After current data row was updated (modified).
+This occurs after C<dbIns> or C<dbUpd> and before C<rwChg1>.
+Here may be C<$do-E<gt>DBICmd>('selectrow ...', @old_data)
+
+
+=item usAct (actionName, rowNo, fieldNo, widget)
+
+Called by C<$do-E<gt>Action> when user shoosed item from 'Actions' menu.
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::wgTable MODULE
+
+=over
+
+=item Tk::TM::wgTable
+
+Module C<Tk::TM::wgTable> contains table widget C<tmTable>, 
+populated with C<Tk> widgets.
+
+
+=item tmTable
+
+Widget C<tmTable> is implemented by module C<Tk::TM::wgTable>.
+It is inherited from C<Tk::Frame>.
+
+
+=item use Tk::TM::wgTable
+
+Imports C<Tk::TM::wgTable> module into application to use data objects.
+This does C<Tk::TM::Lib> module.
+
+
+=item $mw->tmTable (parameter=>value...)
+
+Creates and returns table widget with parameters specified.
+Parameters may be C<Tk> options (use C<configure>) or
+C<tmTable> (use C<set>).
+
+
+=item -do
+
+Data object to use with this widget
+
+
+=item -colspecs
+
+Specifications of columns: [[header, widgetType, widgetOption,...],...].
+Header may be text for C<Label> widget or reference to array of options for
+C<Label> widget, the first value in this array should be text.
+Other parameters of column are type of widget (f.e.C<Entry>) for data and options
+for this widget creation.
+There no need of widget for each field, absent widgets should be
+replaced with undefs.
+
+
+=item -rowcount
+
+Number of on-screen rows of widgets in table
+
+
+=item $tbl->Display -> success
+
+Displays data from data object C<-do> within this table widget.
+
+
+=item $tbl->Focus -> success
+
+Sets focus (focusForce) to current widget within this table widget.
+
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::wgBlank MODULE
+
+=over
+
+=item Tk::TM::wgBlank
+
+Module C<Tk::TM::wgBlank> contains blank widget C<tmBlank>, 
+that presents data row-by-row with C<Tk> widgets.
+
+=item tmBlank
+
+Widget C<tmBlank> is implemented by module C<Tk::TM::wgBlank>.
+It is inherited from C<Tk::Frame>.
+
+
+=item use Tk::TM::wgBlank
+
+Imports C<Tk::TM::wgBlank> module into application to use data objects.
+This does C<Tk::TM::Lib> module.
+
+
+=item $mw->tmBlank (parameter=>value...)
+
+Creates and returns table widget with parameters specified.
+Parameters may be C<Tk> options (use C<configure>) or
+C<tmBlank> (use C<set>).
+
+
+=item -do
+
+Data object to use with this widget
+
+
+=item -wgspecs
+
+Specifications of widgets: 
+[[?incCol, label, ?colSpan, ?rowSpan, widgetType, widgetOption,...],...].
+
+Label may be text for C<Label> widget or reference to array of options for
+C<Label> widget, the first value in this array should be text.
+
+Parameter 'widgetType' is type of widget (f.e.C<Entry>) for data, followed with
+options for this widget creation.
+
+Optional 'incCol' parameter is digit to add to current column number in grid 
+geometry manager. Default column number is 0 for label and 1 for widget.
+
+Optional 'colSpan' parameter is digit - number of columns for widget in grid 
+geometry manager. Default is 1.
+
+Optional 'rowSpan' parameter is digit - number of rows for widget in grid 
+geometry manager. Default is 1.
+
+There no need of widget for each field, absent widgets should be
+replaced with undefs.
+
+
+=item $bln->Display -> success
+
+Displays data from data object C<-do> within this widget.
+
+
+=item $bln->Focus -> success
+
+Sets focus (focusForce) to current widget within this widget.
+
+
+
+
+=back
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::DataObjSet MODULE
+
+=over
+
+=item Tk::TM::DataObjSet
+
+Module C<Tk::TM::DataObjSet> implements base object for menu and action bar 
+widgets, described below. 
+Descriptions of C<Tk::TM::wgActionBar> and C<Tk::TM::wgMenu> modules does not
+contains parameters and methods, described for C<Tk::TM::DataObjSet>. 
+So read it here.
+
+C<Tk::TM::DataObjSet> object contains several C<Tk::TM::DataObject>s and uses 
+current C<Tk::TM::DataObject>
+or all this C<Tk::TM::DataObject>s (see C<-mdscr>)
+to achieve required by user operations.
+
+C<Tk::TM::DataObjSet> may be classified to:
+
+Parameters:
+C<-dos>, C<-wgind>,
+C<-mdmnu>, C<-mdtbr>,
+C<-mdedt>, C<-mdnav>, C<-mdscr>,
+C<-about>, C<-help>,
+C<-parm>
+
+Common object methods:
+C<new>, C<initialize>
+C<destroybind>, C<DESTROY>,
+C<set>, C<setpush>
+
+Methods of itself:
+C<$dos-E<gt>DataObject>,
+C<$dos-E<gt>doAll>, C<$dos-E<gt>doCurrent>,
+C<$dos-E<gt>Help>
+
+Procedures to transfer to all data objects (see description of data object):
+C<$do-E<gt>Stop>, C<$do-E<gt>Save>,
+C<$do-E<gt>Clear>, 
+C<$do-E<gt>Retrieve>, C<$do-E<gt>Reread>
+
+Procedures to transfer to current data object (see description of data object):
+C<$do-E<gt>Find>, C<$do-E<gt>FindNxt>,
+C<$do-E<gt>FldHelp>,
+C<$do-E<gt>RowGo>, 
+C<$do-E<gt>RowNew>, C<$do-E<gt>RowDel>, C<$do-E<gt>RowUndo>,
+C<$do-E<gt>Export>, C<$do-E<gt>Import>, C<$do-E<gt>Print>,
+C<$do-E<gt>Action>
+
+
+=item use Tk::TM::DataObjSet
+
+Imports C<Tk::TM::wgBlank> module into application to use data objects.
+This does C<Tk::TM::wgActionBar>, C<Tk::TM::wgMenu>, C<Tk::TM::Lib> modules.
+
+
+=item new Tk::TM::DataObjSet (parameter=>value...)
+
+Creates and returns C<Tk::TM::DataObject> widget with parameters specified.
+Parameters may be specified with C<set> also. 
+C<Tk> options for inherited widgets may be specified with C<configure>).
+Do not use this method, use C<$mw-E<gt>tmActionBar> or C<$mw-E<gt>tmMenu>.
+
+
+=item -about
+
+Text or routine to produce about text for 'Help / About' menu.
+
+
+=item -dos
+
+Reference to array of data objects managed by this object.
+Default value is C<@Tk::TM::DataObject::Available> - list of all
+existed data objects in application.
+
+
+=item -help
+
+Text or routine to produce help text for 'Help / Help' menu.
+
+
+=item -mdedt
+
+Enable edit actions for user (edit mode).
+Value is controlled by current data object.
+
+
+=item -mdmnu
+
+Type of menu to use:
+'bar' - menu bar C<Tk::Menu> (default),
+'button' - menu with C<Tk::Menubutton>s,
+'' - no menu.
+
+
+=item -mdnav
+
+Enable only navigation buttons for user (navigation mode).
+Default is disabled (false).
+
+
+=item -mdscr
+
+Restrict operations on all data objects to data objects
+in the same parent widget as current.
+Default is disabled.
+
+
+=item -mdtbr
+
+Type of toolbar (action bar) to use:
+true - use toolbar (default),
+false - no toolbar.
+
+
+=item -parm
+
+Programmer`s parameters, hash reference.
+Does`nt used by C<Tk::TM>, may be used for programmer`s needs.
+Default value is C<$Tk::TM::DataObjSet::Parm>, and so all
+data object sets in application shares the same area of parameters.
+
+
+=item -wgind
+
+Indicator widget for data objects. See C<-wgind> in it`s description.
+
+
+=item $dos->DataObject -> current data object
+
+Returns current data object
+
+
+=item $dos->doAll (sub, args) -> success
+
+Executes given sub for all data objects or restricted with C<-mdscr>
+
+
+=item $dos->doCurrent (sub, args) -> success
+
+Executes given sub for current data object.
+
+
+=item $dos->Help (-about|-help)
+
+Executes help screen.
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::wgActionBar MODULE
+
+=over
+
+=item Tk::TM::wgActionBar
+
+Module C<Tk::TM::wgActionBar> implements the simplest widget C<tmActionBar>
+with user actions as 'retrieve', 'save', 'next', 'previous'...
+It inherits from C<Tk::TM::DataObjSet>, 
+and below are only description of C<Tk::TM::wgActionBar> features.
+
+=item tmActionBar
+
+Widget C<tmActionBar> is implemented by module C<Tk::TM::wgActionBar>.
+
+
+=item use Tk::TM::wgActionBar
+
+Imports C<Tk::TM::wgActionBar> module into application to use action bar objects.
+This does C<Tk::TM::Lib> module.
+
+
+=item $mw->tmActionBar (parameter=>value...)
+
+Creates and returns action bar widget with parameters specified.
+Parameters may be C<Tk> options (use C<configure>) or
+C<Tk::TM::DataObjSet> (use C<set>).
+
+
+=item $mw->setActions (@actions)
+
+Sets 'Actions' menu. 
+Each action may be string with action name to use with C<$do-E<gt>Action> call
+(C<usAct> callback),
+or reference to array of [name, type, options for C<Tk::Menu>].
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 Tk::TM::wgMenu MODULE
+
+=over
+
+=item Tk::TM::wgMenu
+
+Module C<Tk::TM::wgMenu> implements widget C<tmMenu>
+- menu and toolbar in CUA-style,
+more complex then C<tmActionBar>,
+with more user actions.
+It inherits from C<Tk::TM::DataObjSet>, 
+and below are only description of C<Tk::TM::wgMenu> features.
+
+=item tmMenu
+
+Widget C<tmMenu> is implemented by module C<Tk::TM::wgMenu>.
+
+
+=item use Tk::TM::wgMenu
+
+Imports C<Tk::TM::wgMenu> module into application to use menu objects.
+This does C<Tk::TM::Lib> module.
+
+
+=item $mw->tmMenu (parameter=>value...)
+
+Creates and returns menu widget with parameters specified.
+Parameters may be C<Tk> options (use C<configure>) or
+C<Tk::TM::DataObjSet> (use C<set>).
+
+
+=item $mw->setActions (@actions)
+
+Sets 'Actions' menu. 
+Each action may be string with action name to use with C<$do-E<gt>Action> call
+(C<usAct> callback),
+or reference to array of [name, type, options for C<Tk::Menu>].
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 VERSION
+
+=over
+
+
+=item "16-18/11/2000"
+
+Bug 'bad event type or keysym "~"' fixed in 'wgMenu.pm'.
+
+Status Line support implemented, but without comments for fields.
+
+Bug of incorrect 'pgup' within table fixed in 'wgTable.pm'.
+
+Scrollbar in 'wgTable.pm' implemented.
+
+
+=item "22/10-03/11/2000"
+
+C<exit> calls replaced with C<Tk::exit> calls to avoid abnormal program 
+terminations.
+
+C<Key-F4> bindings moved from C<Tk::TM::DataObject>, C<Tk::TM::wgBlank>,
+C<Tk::TM::wgTable> to C<Tk::TM::wgMenu> to avoid conflict with 'Alt-F4'.
+
+C<Tk::TM::Common::DBILogin> unified for C<Tk::TM::wApp> use.
+
+Sleeping DataObject can operate with data in current row:
+C<$do-E<gt>Sleep> and C<$do-E<gt>Retrieve> uses new DataObject`s parameter 
+C<-dsslp> to indicate sleeping and save C<-dsrid>.
+
+C<-parmc> DataObject`s parameter created.
+
+C<-wgnav> DataObject`s parameter renamed to C<-wgmnu> for unification with C<Tk::TM::wApp>.
+
+Error processing for callbacks added.
+
+C<$do-E<gt>DBICmd> corrected - undefined attributes inserted into 'do' arguments.
+
+C<-dsrd0> DataObject`s parameter corrected - now it is filled with copy of C<$do-E<gt>dsRowDta>.
+
+C<-sqlsel>, C<-sqlins>, C<-sqlupd>, C<-sqldel> DataObject`s parameters added
+- simplest sql generator features implemented, see also C<$do-E<gt>DBIGen>.
+
+C<-sqgscr>, C<-sqgfd>, C<-sqgsf>, C<-sqgsj>, C<-sqgsc>, C<-sqgso>, 
+C<-sqgpt>, C<-sqgpb> DataObject`s parameters added
+- SQL and Widget generator created, see also C<$do-E<gt>DBIGen>.
+
+C<-mdedt> may contain 'c'reate or 'i'nsert, 'u'pdate, 'd'elete.
+
+C<$do-E<gt>DBICnd> - Query condition and sort dialog created.
+
+C<-dbfaw> DataObject`s parameter added - widget width adaptation to database fields implemented.
+
+
+=item "12/08/2000" - fixed "bad event type or keysym 'ä'"
+
+
+=item "06/02/2000" - first documented release
+
+TO DO:
+
+- Test and Debug
+
+- tmDialogBox - approve and document?
+
+- Conflict of 'F4' and 'Alt+F4' callbacks
+
+
+
+=item "12/12/1999" - documentation was began
+
+This documentation was began. 
+
+Some reviewing done.
+
+Modules C<Lib>, C<Common>, C<Lang> created.
+
+TO DO:
+
+- Review api and naming
+
+- Approve code
+
+- Debug
+
+- Document realised
+
+- Action interfaces- methods to customise additional actions
+
+- DataObjSet actions for all DataObjects (as reread or query) may involve only
+DataObjects on current screen - window or panel.
+
+
+
+=back
+
+
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 AUTHOR
+
+=over
+
+Andrew V Makarow <makarow@mail.com>, Denis E Medvedyuk <demed@mail.com>
+
+=back
+
+=cut

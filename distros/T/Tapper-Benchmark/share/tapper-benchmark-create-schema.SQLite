@@ -1,0 +1,181 @@
+DROP TABLE IF EXISTS `bench_backup_additional_relations`;
+DROP TABLE IF EXISTS `bench_backup_values`;
+DROP TABLE IF EXISTS `bench_additional_relations`;
+DROP TABLE IF EXISTS `bench_additional_type_relations`;
+DROP TABLE IF EXISTS `bench_additional_values`;
+DROP TABLE IF EXISTS `bench_additional_types`;
+DROP TABLE IF EXISTS `bench_values`;
+DROP TABLE IF EXISTS `benchs`;
+DROP TABLE IF EXISTS `bench_units`;
+DROP TABLE IF EXISTS `bench_subsume_types`;
+DROP TABLE IF EXISTS `raw_bench_bundles`;
+
+CREATE TABLE `bench_subsume_types` (
+  `bench_subsume_type_id` INTEGER PRIMARY KEY NOT NULL  , -- COMMENT 'unique key (PK)',
+  `bench_subsume_type` VARCHAR(32) NOT NULL , -- COMMENT 'unique string identifier',
+  `bench_subsume_type_rank` TINYINT(3)  NOT NULL , -- COMMENT 'subsume type order',
+  `datetime_strftime_pattern` VARCHAR(32) NULL , -- COMMENT 'format pattern for per DateTime->strftime for grouping',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  -- COMMENT 'creation date'
+) ; -- COMMENT 'types of subsume values';
+
+CREATE TABLE `bench_units` (
+  `bench_unit_id` INTEGER PRIMARY KEY NOT NULL  , -- COMMENT 'unique key (PK)',
+  `bench_unit` VARCHAR(767) NOT NULL , -- COMMENT 'unique string identifier',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  -- COMMENT 'creation date',
+) ; -- COMMENT 'units for benchmark data points';
+
+CREATE TABLE `benchs` (
+  `bench_id` INTEGER PRIMARY KEY NOT NULL  , -- COMMENT 'unique key (PK)',
+  `bench_unit_id` TINYINT(3)  NULL,
+  `bench` VARCHAR(767) NOT NULL , -- COMMENT 'unique string identifier',
+  `active` TINYINT(3)  NOT NULL , -- COMMENT 'is entry still active (1=yes,0=no)',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , -- COMMENT 'creation date',
+  CONSTRAINT `fk_benchs_01`
+    FOREIGN KEY (`bench_unit_id`)
+    REFERENCES `bench_units` (`bench_unit_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ; -- COMMENT 'containing benchmark head data';
+
+CREATE TABLE `bench_values` (
+  `bench_value_id` INTEGER PRIMARY KEY NOT NULL  , -- COMMENT 'unique key (PK)',
+  `bench_id` INT(10)  NOT NULL , -- COMMENT 'FK to benchs',
+  `bench_subsume_type_id` TINYINT(3)  NOT NULL , -- COMMENT 'FK to bench_subsume_types',
+  `bench_value` VARCHAR(767) NULL , -- COMMENT 'value for bench data point',
+  `active` tinyint(3) NOT NULL , -- COMMENT 'is entry still active (0=no,1=yes)',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , -- COMMENT 'creation date',
+  CONSTRAINT `fk_bench_values_01`
+    FOREIGN KEY (`bench_id`)
+    REFERENCES `benchs` (`bench_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_bench_values_02`
+    FOREIGN KEY (`bench_subsume_type_id`)
+    REFERENCES `bench_subsume_types` (`bench_subsume_type_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ; -- COMMENT 'containing data points for benchmark';
+
+CREATE TABLE `bench_additional_types` (
+  `bench_additional_type_id` INTEGER PRIMARY KEY NOT NULL  , -- COMMENT 'unique key (PK)',
+  `bench_additional_type` VARCHAR(767) NOT NULL , -- COMMENT 'unique string identifier',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  -- COMMENT 'creation date'
+) ; -- COMMENT 'types of additional values for benchmark data points';
+
+CREATE TABLE `bench_additional_values` (
+  `bench_additional_value_id` INTEGER PRIMARY KEY NOT NULL  , -- COMMENT 'unique key (PK)',
+  `bench_additional_type_id` SMALLINT(5)  NOT NULL , -- COMMENT 'FK to bench_additional_types',
+  `bench_additional_value` VARCHAR(767) NOT NULL , -- COMMENT 'additional value',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , -- COMMENT 'creation date',
+  CONSTRAINT `fk_bench_additional_values_01`
+    FOREIGN KEY (`bench_additional_type_id`)
+    REFERENCES `bench_additional_types` (`bench_additional_type_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ; -- COMMENT 'additional values for benchmark data point';
+
+CREATE TABLE `bench_additional_type_relations` (
+  `bench_id` INT(10)  NOT NULL , -- COMMENT 'FK to benchs (PK)',
+  `bench_additional_type_id` SMALLINT(5)  NOT NULL , -- COMMENT 'FK to bench_additional_types (PK)',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , -- COMMENT 'creation date',
+  PRIMARY KEY (`bench_id`,`bench_additional_type_id`),
+  CONSTRAINT `fk_bench_additional_type_relations_01`
+    FOREIGN KEY (`bench_id`)
+    REFERENCES `benchs` (`bench_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_bench_additional_type_relations_02`
+    FOREIGN KEY (`bench_additional_type_id`)
+    REFERENCES `bench_additional_types` (`bench_additional_type_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ; -- COMMENT 'additional values for benchmark data point';
+
+CREATE TABLE `bench_additional_relations` (
+  `bench_value_id` INT(10)  NOT NULL , -- COMMENT 'FK to bench_values',
+  `bench_additional_value_id` INT(10)  NOT NULL , -- COMMENT 'FK to bench_additional_values',
+  `active` tinyint(3) NOT NULL , -- COMMENT 'is entry still active (0=no,1=yes)',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , -- COMMENT 'creation date',
+  PRIMARY KEY (`bench_value_id`,`bench_additional_value_id`),
+  CONSTRAINT `fk_bench_additional_relations_01`
+    FOREIGN KEY (`bench_value_id`)
+    REFERENCES `bench_values` (`bench_value_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_bench_additional_relations_02`
+    FOREIGN KEY (`bench_additional_value_id`)
+    REFERENCES `bench_additional_values` (`bench_additional_value_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ; -- COMMENT 'add additional values to benchmarks';
+
+CREATE TABLE `bench_backup_values` (
+  `bench_backup_value_id` INTEGER PRIMARY KEY NOT NULL  , -- COMMENT 'unique key (PK)',
+  `bench_value_id` int(10) NOT NULL , -- COMMENT 'FK to bench_values',
+  `bench_id` int(10) NOT NULL , -- COMMENT 'FK to benchs',
+  `bench_subsume_type_id` tinyint(3) NOT NULL , -- COMMENT 'FK to bench_subsume_types',
+  `bench_value` float DEFAULT NULL , -- COMMENT 'value for bench data point',
+  `active` tinyint(3) NOT NULL , -- COMMENT 'is entry still active (0=no,1=yes)',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP , -- COMMENT 'creation date',
+  CONSTRAINT `fk_bench_backup_values_01`
+    FOREIGN KEY (`bench_id`)
+    REFERENCES `benchs` (`bench_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_bench_backup_values_02`
+    FOREIGN KEY (`bench_subsume_type_id`)
+    REFERENCES `bench_subsume_types` (`bench_subsume_type_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_bench_backup_values_03`
+    FOREIGN KEY (`bench_value_id`)
+    REFERENCES `bench_values` (`bench_value_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ; -- COMMENT='backup table for data points for benchmark';
+
+CREATE TABLE `bench_backup_additional_relations` (
+  `bench_backup_value_id` int(10) NOT NULL , -- COMMENT 'FK to bench_backup_values',
+  `bench_additional_value_id` int(10) NOT NULL , -- COMMENT 'FK to bench_additional_values',
+  `active` tinyint(3) NOT NULL , -- COMMENT 'is entry still active (0=no,1=yes)',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP , -- COMMENT 'creation date',
+  PRIMARY KEY (`bench_backup_value_id`,`bench_additional_value_id`),
+  CONSTRAINT `fk_bench_backup_additional_relations_01`
+    FOREIGN KEY (`bench_backup_value_id`)
+    REFERENCES `bench_backup_values` (`bench_backup_value_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_bench_backup_additional_relations_02`
+    FOREIGN KEY (`bench_additional_value_id`)
+    REFERENCES `bench_additional_values` (`bench_additional_value_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ; -- COMMENT='add additional values to benchmarks';
+
+CREATE TABLE `raw_bench_bundles` (
+ `raw_bench_bundle_id` INT(10) PRIMARY KEY NOT NULL,
+ `raw_bench_bundle_serialized` BLOB NOT NULL,
+ `processing` tinyint(3) NOT NULL DEFAULT 0 , -- COMMENT 'is entry processed (0=no,1=yes)',
+ `processed` tinyint(3) NOT NULL DEFAULT 0 , -- COMMENT 'is entry processed (0=no,1=yes)',
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP -- COMMENT 'creation date'
+) ; -- COMMENT='queue raw incoming data for later processing';
+-- Usage:
+-- * create elements:
+--   INSERT INTO raw_bench_bundles (raw_bench_bundle_serialized) VALUES ('hot content');
+-- * get next:
+--   SELECT raw_bench_bundle_id, raw_bench_bundle_serialized FROM raw_bench_bundles WHERE processed=0 ORDER BY raw_bench_bundle_id ASC LIMIT 1;
+-- * mark as done:
+--   UPDATE raw_bench_bundles SET processed=1 WHERE raw_bench_bundle_id=1;
+
+INSERT INTO bench_subsume_types
+    ( bench_subsume_type, bench_subsume_type_rank, datetime_strftime_pattern, created_at )
+VALUES
+    ( 'atomic'  , 1, NULL           , datetime() ),
+    ( 'second'  , 2, '%Y%m%d%H%M%S' , datetime() ),
+    ( 'minute'  , 3, '%Y%m%d%H%M'   , datetime() ),
+    ( 'hour'    , 4, '%Y%m%d%H'     , datetime() ),
+    ( 'day'     , 5, '%Y%m%d'       , datetime() ),
+    ( 'week'    , 6, '%Y%W'         , datetime() ),
+    ( 'month'   , 7, '%Y%m'         , datetime() ),
+    ( 'year'    , 8, '%Y'           , datetime() )
+;

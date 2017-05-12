@@ -1,0 +1,93 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9faab88b9b97e93e15ec99a72ffb0cab3190240d Build.PL
+SHA1 e1f70e2245190c805ca259c373eb4c39734eadf6 COPYING
+SHA1 e19078a7c9e5f5166da5f6a3eba62bcd882e7648 Changes
+SHA1 86e2e906550586be2179ed4a501619a6cd99b6e6 MANIFEST
+SHA1 d0408d4d1501505606201f1e284993d01cb06a8b META.yml
+SHA1 cd9351675c76304eab73b5d3e893fbb879e1e434 Makefile.PL
+SHA1 5b7a1e1e33e1570106f6554ea36c6878bc235562 README
+SHA1 b331963a74166bd1dd53fb1443d939b4b436d83d lib/Template/Sandbox.pm
+SHA1 5ee13d4b216c78cb4766bc8a1a645ef92b03b986 lib/Template/Sandbox/Library.pm
+SHA1 cc23911de768b532d8e58bdee09baae5498e1b88 lib/Template/Sandbox/NumberFunctions.pm
+SHA1 3c56057cb43fdfa8daef29c8b52038e89c72a126 lib/Template/Sandbox/StringFunctions.pm
+SHA1 82d4eabedfe344636dc1023e4070d2f8b3680bca t/00-load.t
+SHA1 f5e793ad737ab7c7b5a59c4a868cc7e453fce3e9 t/05-export.t
+SHA1 d219f7185ad10131e35a6d7b7b0a781890b98e2c t/10-constructor.t
+SHA1 51adc7ab676bfb8baeb7eb7330b72fc5b072dda6 t/11-diagnostics.t
+SHA1 89e2288d3c1d3083b634f44efb886c8f0dccd847 t/12-vars.t
+SHA1 897826e13381cfcd46ab3fd05833cdf695164d24 t/20-compile-syntax.t
+SHA1 e7fe45e3cb79e8023c86992ac080b1bfa571e035 t/21-compile-syntax-errors.t
+SHA1 e9920c97c8f305d2c4e9ceb717cd45ea127cfc42 t/22-compile-defines.t
+SHA1 965bd43e2856e3ee7652cfff3030647612706863 t/26-compile-expr-errors.t
+SHA1 74a5231f84e73e8bed1e19a79cde739bcffe4394 t/30-runtime-expr-constant.t
+SHA1 2b897a270abe5850887ddb756de5a57521be1857 t/31-runtime-expr-var.t
+SHA1 ebf12bd3a53132513d00445a6d748de04a429fc2 t/32-runtime-constant-var.t
+SHA1 0ff518bd50390364e99d5ed849ef6e5ad91ec0cf t/40-runtime-if.t
+SHA1 3bcf140825aee2fb4525aab48b1d664283fb622d t/45-runtime-for.t
+SHA1 b98f36b14e28fdf81ca5c4d745f37f8eed429400 t/47-runtime-zero-width.t
+SHA1 711ba2e95009b8720211a3b53259a3bf0393a07b t/48-runtime-comment.t
+SHA1 3e99bbc02c674b2c6ebb34e2c17ed6d72f1a8286 t/50-runtime-expr-atomic.t
+SHA1 a0d197fd7c621dec1e7d66c8a0f4b9b65c7dda49 t/51-runtime-expr-unary-op.t
+SHA1 c4d5b473531de593cbb443a09420f7c9524323da t/52-runtime-expr-operators.t
+SHA1 74fa62edd274ec662ca6e177eb37fc43263e9581 t/55-runtime-expr-methods.t
+SHA1 047c050404bf67cd30fc3bb36ef58818eab7730f t/60-custom-syntax.t
+SHA1 06c3a69cc22a41be1a0665777cc6fdd4dc344591 t/65-delimiters.t
+SHA1 8fb1125458625673e68a5d624122a6d37790034e t/70-custom-function.t
+SHA1 fefc9e987e503f89d4ff06f3db5ec12b2087bec7 t/75-function-library.t
+SHA1 1148a7a12f3a40d3dedcb054ceab51ea5f55dcbf t/76-string-functions.t
+SHA1 67a0678610caf9785b0829d45f78c2d7bf2b21d2 t/77-number-functions.t
+SHA1 27a5b12852afd1f0564fe534b4bb1503b7f5a1f3 t/80-files.t
+SHA1 0e7b3fdfb461a4f2f30756e69b425e29bc145ce9 t/82-cache.t
+SHA1 d6d98b82252f492d9d967a2686945b581b5e3158 t/85-dump.t
+SHA1 b37275ba9b100ae16b8c022fa4bc5f6704596569 t/86-template-toolkit-compat.t
+SHA1 9d1cd01845155d39107cc3ef3bab9646c5d51623 t/88-misc.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/90-pod.t
+SHA1 28f4bc4b60453739559694421acdd0aa03b2c9f1 t/99-pod-coverage.t
+SHA1 9a53dfa690ad4251aa5d907fc79ed0059e1eda6e t/test_templates/alternating_recursive_include1.txt
+SHA1 96171bd8dde9cce64413c260638b9ddce45771d5 t/test_templates/alternating_recursive_include2.txt
+SHA1 ec76153a510087d1f3c2bbf3e59c70bb1c73dc75 t/test_templates/bad_include_param.txt
+SHA1 e284ebe4eeb0c46597d3a592f740b9eb8d6531aa t/test_templates/cache.txt
+SHA1 4930ebb339097c06f0692d23393cdd00f9e0fd3a t/test_templates/defines.txt
+SHA1 a4f27e8ecc06c6864f5d488c3899897ba641591d t/test_templates/empty_string_include.txt
+SHA1 1b7506ba3118410417a7326d421f93f0b333cc18 t/test_templates/for_include_plain.txt
+SHA1 37d527509bd709142b0a35738adba5d40eb06f8c t/test_templates/for_include_plain_included.txt
+SHA1 83bb92e34d3087600ba1f11a2d6d10c75b881484 t/test_templates/for_include_special_vars.txt
+SHA1 b673e3a713cbce1737804419ea88c23ce030eaeb t/test_templates/for_include_special_vars_context.txt
+SHA1 96a564bf84506cff3c577fea6eca8469a3fa9f6a t/test_templates/for_include_special_vars_context_included.txt
+SHA1 d9c029313028df0e863747a449082233090f65f1 t/test_templates/for_include_special_vars_included.txt
+SHA1 13c61e2ac16551e6a2d1412207503114bd774fbb t/test_templates/if_a_blue_else_red_endif.txt
+SHA1 219a670d852a0cf9e59f02a124e27095710bbb4c t/test_templates/included_defines.txt
+SHA1 ae9f91281975583d9b72fa5a4fdb8f96a31f4778 t/test_templates/included_outer_defines.txt
+SHA1 2db92bf936af543976f6bec0e8a519738afea6a9 t/test_templates/included_scoped_vars.txt
+SHA1 652d525c2c4a15302f801e42b32b10659911c88e t/test_templates/included_simple.txt
+SHA1 3bd5395f8f73361b1867f0e21e9f53667070b2f0 t/test_templates/no_such_include.txt
+SHA1 4113f618ea31846d2d522d793621b4e4635d40e6 t/test_templates/quoted_simple_include.txt
+SHA1 6010f234f2d75beba16b155d4fc1c152a9d48ec8 t/test_templates/recursive_include.txt
+SHA1 40972b81a9468f22ae2436e3983da893451aa2e6 t/test_templates/scoped_vars.txt
+SHA1 4aca5fbef468df9d2741290de3ace0c3cdab54d2 t/test_templates/simple_include.txt
+SHA1 f9baa0ee534b0b26c93d5e19e0249b216c067b61 t/test_templates/subdir_include.txt
+SHA1 e385c14a192127b5bb868276906234717619ea47 t/test_templates/template_subdir/template_in_a_subdir.txt
+SHA1 53bbe5e7b27a0f3b481335742271b18eb3b2ad73 t/test_templates/unreadable.txt
+SHA1 2f92661a5aa5b1bed509a05990dd4a8292852efd t/test_templates/unreadable_include.txt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkvpHdsACgkQk0asf7iG0tT1FACfUaZoIoQW8ZYUtmMNlTXl5TC/
++DkAn1rr9atpu6fo2Uw5ihSo2rHb+NkW
+=nR7Z
+-----END PGP SIGNATURE-----

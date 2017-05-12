@@ -1,0 +1,16 @@
+
+
+
+  Feature Foo
+
+    Scenario Normal
+      Given First
+        And Second
+       When Push one item
+        And Push next item
+       Then the number of array is 2
+        And first item is "a"
+
+
+ok
+1..1

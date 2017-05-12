@@ -1,0 +1,112 @@
+NAME
+    Template::Provider::FromDATA - Load templates from your __DATA__ section
+
+SYNOPSIS
+        use Template;
+        use Template::Provider::FromDATA;
+    
+        # Create the provider
+        my $provider = Template::Provider::FromDATA->new( {
+            CLASSES => __PACKAGE__
+        } );
+    
+        # Add the provider to the config
+        my $template = Template->new( {
+            # ...
+            LOAD_TEMPLATES => [ $provider ]
+        } );
+
+        # Render a template
+        $template->process( 'mytemplate', { bar => 'Bar' } );
+
+        # ...and now the templates
+    
+        __DATA__
+    
+        __mytemplate__
+        Foo [% bar %]
+    
+        __myothertemplate__
+        Baz, [% qux %]?
+
+DESCRIPTION
+    This module allows you to store your templates inline with your code in
+    the "__DATA__" section. It will search any number of classes specified.
+
+CAVEAT
+    If you have two templates with the same name, this module will not
+    understand the difference, it will simply return the first one found. If
+    you wish, you can specify a fully qualified template name by prefixing
+    the template with the module name (using "-" instead of "::" as a
+    namespace separator), adding a "/" to separate the module name from the
+    template name.
+
+        $template->process( 'My-Templates/mytemplate', { bar => 'Bar' } );
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  new( \%OPTIONS )
+    Create a new instance of the provider. You can specify a list of classes
+    to be searched for templates via the "CLASSES" option. By omitting this
+    option it will search "main".
+
+        # defaults to 'main'
+        $provider = Template::Provider::FromDATA->new;
+    
+        # look for templates in 'Foo'
+        $provider = Template::Provider::FromDATA->new( {
+            CLASSES => 'Foo'
+        } );
+
+        # look for templates in 'Foo::Bar' and 'Foo::Baz'
+        $provider = Template::Provider::FromDATA->new( {
+            CLASSES => [ 'Foo::Bar', 'Foo::Baz' ]
+        } );
+
+    By default, template data is lazy-loaded as they it is requested. If you
+    wish to load up all template data upon initializtion, you can use the
+    "PRELOAD" option.
+
+        $provider = Template::Provider::FromDATA->new( {
+            PRELOAD => 1
+        } );
+
+  _init( \%OPTIONS )
+    A subclassed method to handle the options passed to "new()".
+
+  fetch( $name )
+    This is a subclassed method that will load a template via "_fetch()" if
+    a non-reference argument is passed.
+
+  _load( $name )
+    Loads the template via the "get_file()" sub and sets some cache
+    information.
+
+  get_file( $class, $template )
+    This method searches through $class for a template named $template.
+    Returns the contents on success, undef on failure.
+
+    This function was mostly borrowed from Catalyst::Helper's "get_file"
+    function.
+
+ACCESSORS
+  classes
+    An arrayref of the class names containing our templates.
+
+  cache
+    A hashref of file and template data.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005-2012 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

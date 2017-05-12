@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Text-Corpus-Inspec
+version:            1.00
+abstract:           Interface to Inspec abstracts corpus.
+author:
+    - Jeff Kubina (jeff.kubina@gmail.com)
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dump:           1.15
+    File::Slurp:          9999.13
+    Lingua::EN::Sentence:  0.25
+    Log::Log4perl:        1.26
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

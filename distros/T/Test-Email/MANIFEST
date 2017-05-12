@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_login.t
+t/02_wait.t
+t/03_headers.t
+t/04_body.t
+t/05_email.t
+lib/Test/Email.pm
+lib/Test/POP3.pm
+META.yml                                 Module meta-data (added by MakeMaker)

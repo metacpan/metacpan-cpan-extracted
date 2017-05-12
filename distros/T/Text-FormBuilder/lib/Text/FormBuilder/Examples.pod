@@ -1,0 +1,225 @@
+=head1 NAME
+
+Examples - Sample uses of Text::FormBuilder
+
+=head1 EXAMPLES
+
+=head2 Event Form
+
+This is the formspec for an input form for an event calendar. It exercises many
+of the features of the formspec language. This is close to a real world project
+that I have been developing.
+
+    !title Add Event
+    !author Peter Eichman
+    !description {
+        Start and end times are not required, but are recommended. If you leave 
+        both of them blank, the event will be considered an all day event.
+    }
+    
+    !pattern TIME /^\s*\d{1,2}(:\d{2})?(\s*[ap]m)?\s*$/
+    !pattern DAY  /^\s*(([1-3][0-9])|[1-9])\s*$/
+    !pattern YEAR /^\s*\d{4}\s*$/
+    
+    !list MONTHS {
+        1[January],    2[February], 3[March],     4[April],
+        5[May],        6[June],     7[July],      8[August],
+        9[September], 10[October], 11[November], 12[December]
+    }
+    
+    !group DATE {
+        month@MONTHS//VALUE
+        day[2]//DAY
+        year[4]//YEAR
+    }
+    
+    !group TIME {
+        start[8]|' '//TIME?
+        end[8]|'–'[(hh:mm am/pm)]//TIME?
+    }
+    
+    !group SERIES {
+        old|Existing:select
+        new[40]|or New
+    }
+    
+    # input fields start here
+    
+    event_type:select//VALUE
+    
+    title[60]//VALUE
+    
+    !field %DATE date
+    !field %TIME time
+    
+    series_old|Existing series:select
+    series_new[60]|New series
+    
+    description[6,60]:textarea
+    contact[60]
+    email[40]//EMAIL?
+    location[60]
+    url[60]|Website
+
+Both of the fields C<event_type> and C<series_old> get filled in
+from a database in the actual CGI script. The relevant bits of 
+the CGI script which uses this form go something like this:
+
+    # the module containing the FormBuilder-building code
+    use Calendar::Forms::AddEvent;
+    my $form = Calendar::Forms::AddEvent::get_form($q);
+    
+    # now we have a CGI::FormBuilder object in $form
+    
+    # fill in dropdown lists
+    $form->field(name => 'event_type', values => \@event_types);
+    $form->field(name => 'series_old', values => \@existing_series);
+    
+    unless ($form->submitted && $form->validate) {
+        print $q->header;
+        print $form->render;
+    } else {
+        # process the data ...
+    }
+
+=head1 CGI::FormBuilder EXAMPLES
+
+Here are some of L<CGI::FormBuilder>'s examples, translated into
+Text::FormBuilder's terms.
+
+=head2 Ex1: order.cgi
+
+Formspec F<example1>:
+
+    !title Order Info
+    
+    !list STATES {
+        AL, AK, AZ, AR, CA, CO, CT, DE, DC, FL, GE, HI, ID, IL, IN, IA, KS,
+        KY, LA, ME, MD, MA, MI, MN, MS, MO, MT, NE, NV, NH, NJ, NM, NY, NC,
+        ND, OH, OK, OR, PA, RI, SC, SD, TN, TX, UT, VT, VA, WA, WV, WI, WY
+    }
+    
+    first_name
+    last_name
+    email//EMAIL
+    address
+    state@STATES
+    zipcode//ZIPCODE
+    credit_card//CARD
+    details[10,50]:textarea
+
+Parse and create F<Example1.pm>:
+
+    $ perl -MText::FormBuilder \
+        -e'Text::FormBuilder->parse("example1")->build(method => "POST") \
+        ->write_module("MyForms::Example1")'
+
+Script:
+
+    #!/usr/bin/perl -w
+    use strict;
+    
+    use CGI;    # you have to use CGI.pm explicitly
+    use MyForms::Example1;
+    
+    my $q = CGI->new;
+    
+    my $form = MyForms::Example1::get_form($q);
+    
+    # try to validate it first
+    if ($form->submitted && $form->validate) {
+        # ... more code goes here to do stuff ...
+        print $form->confirm;
+    } else {
+        print $form->render;
+    }
+
+=head2 Ex2: order_form.cgi
+
+You can also include the formspec in your script; the only downside to this 
+is that your script has to parse the spec every time it gets called, so this
+method is definitely I<not> recommended for high-traffic forms.
+
+Script F<order_form.cgi>:
+
+    #!/usr/bin/perl -w
+    use strict;
+    
+    use CGI;    # you have to use CGI.pm explicitly
+    use Text::FormBuilder;
+    
+    my $parser = Text::FormBuilder->parse_text(q[
+    first_name
+    last_name
+    email
+    address
+    state@STATE
+    zipcode
+    credit_card
+    details[10,50]:textarea
+    ]);
+    
+    my $q = CGI->new;
+    $parser->build(params => $q, method => 'POST', smartness => 2, debug => 2);
+    
+    my $form = $parser->form;
+    
+    # try to validate it first
+    if ($form->submitted && $form->validate) {
+        # ... more code goes here to do stuff ...
+        print $form->confirm;
+    } else {
+        print $form->render;
+    }
+
+=head2 Ex4: user_info.cgi
+
+    #!/usr/bin/perl -w
+    use strict;
+    
+    use Text::FormBuilder;
+    use CGI;
+    use DBI;
+    
+    my $dbh = DBI->connect('dbi:Oracle:db', 'user', 'pass');
+    
+    my $parser = Text::FormBuilder->parse_text(q[
+    username
+    password
+    confirm_password
+    first_name
+    last_name
+    email
+    ]);
+    
+    
+    my $q = CGI->new;
+    my $form = $parser->build(params => $q)->form;
+    
+    # Now get the value of the username from our app
+    my $user = $form->cgi_param('user');
+    my $sth = $dbh->prepare("select * from user_info where user = '$user'");
+    $sth->execute;
+    my $default_hashref = $sth->fetchrow_hashref;
+    # Render our form with the defaults we got in our hashref
+    print $form->render(values => $default_hashref,
+                        title  => "User information for '$user'",
+    );
+
+=head1 SEE ALSO
+
+L<Text::FormBuilder>,
+L<CGI::FormBuilder>
+
+=head1 AUTHOR
+
+Peter Eichman, C<< <peichman@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright E<copy>2004 by Peter Eichman.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

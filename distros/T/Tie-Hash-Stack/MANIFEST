@@ -1,0 +1,19 @@
+Changes
+lib/Tie/Hash/Stack.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00-load.t
+t/01-new.t
+t/02-push_hash.t
+t/03-pop_hash.t
+t/04-unshift_hash.t
+t/05-shift_hash.t
+t/06-iter.t
+t/07-merge_hash.t
+t/08-flatten_hash.t
+t/09-get_depth.t
+t/10-reverse_hash.t

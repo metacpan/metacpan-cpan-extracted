@@ -1,0 +1,150 @@
+NAME
+
+    Tie::Handle::Filter - [DEPRECATED] filters filehandle output through a
+    coderef
+
+VERSION
+
+    version 0.011
+
+SYNOPSIS
+
+        use Tie::Handle::Filter;
+    
+        # prefix output to STDERR with standard Greenwich time
+        BEGIN {
+            tie *STDERR, 'Tie::Handle::Filter', *STDERR,
+                sub { scalar(gmtime) . ': ', @_ };
+        }
+
+DESCRIPTION
+
+    DEPRECATION NOTICE: This module distribution is deprecated in favor of
+    Text::OutputFilter, which is more robust while being functionally
+    identical, or PerlIO::via::dynamic, which uses a different mechanism
+    that may offer better performance.
+
+    This is a small module for changing output when it is sent to a given
+    file handle. By default it passes everything unchanged, but when
+    provided a code reference, that reference is passed the string being
+    sent to the tied file handle and may return a transformed result.
+
+METHODS
+
+ PRINT
+
+    All arguments to print and say directed at the tied file handle are
+    passed to the user-defined function, and the result is then passed to
+    print.
+
+ PRINTF
+
+    The second and subsequent arguments to printf (i.e., everything but the
+    format string) directed at the tied file handle are passed to the
+    user-defined function, and the result is then passed preceded by the
+    format string to printf.
+
+    Please note that this does not include calls to sprintf.
+
+ WRITE
+
+    The first argument to syswrite (i.e., the buffer scalar variable)
+    directed at the tied file handle is passed to the user-defined
+    function, and the result is then passed along with the optional second
+    and third arguments (i.e., length of data in bytes and offset within
+    the string) to syswrite.
+
+    Note that if you do not provide a length argument to syswrite, it will
+    be computed from the result of the user-defined function. However, if
+    you do provide a length (and possibly offset), they will be relative to
+    the results of the user-defined function, not the input.
+
+EXTENDS
+
+      * Tie::Handle
+
+REQUIRES
+
+      * FileHandle::Fmode
+
+DIAGNOSTICS
+
+    Wherever possible this module attempts to emulate the built-in
+    functions it ties, so it will return values as expected from whatever
+    function is called. Certain operations may also croak (throw a fatal
+    exception) if they fail, such as aliasing the file handle during a tie
+    or attempting to perform an unsupported operation on a tied file
+    handle.
+
+BUGS AND LIMITATIONS
+
+    If your function needs to know what operation was used to call it,
+    consider using (caller 1)[3] to determine the method used to call it,
+    which will return Tie::Handle::Filter::PRINT,
+    Tie::Handle::Filter::PRINTF, or Tie::Handle::Filter::WRITE per "Tying
+    FileHandles" in perltie.
+
+    Currently this module is biased towards write-only file handles, such
+    as STDOUT, STDERR, or ones used for logging. It does not (yet) define
+    the following methods and their associated functions, so don't do them
+    with file handles tied to this class.
+
+ READ
+
+    read
+
+    sysread
+
+ READLINE
+
+    <HANDLE>
+
+    readline
+
+ GETC
+
+    getc
+
+ OPEN
+
+    open (e.g., re-opening the file handle)
+
+ BINMODE
+
+    binmode
+
+ EOF
+
+    eof
+
+ TELL
+
+    tell
+
+ SEEK
+
+    seek
+
+SEE ALSO
+
+    Tie::Handle::Filter::Output::Timestamp
+
+      Prepends filehandle output with a timestamp, optionally formatted via
+      strftime.
+
+    Tie::Handle::Filter::Output::Timestamp::EveryLine
+
+      Prepends every line of filehandle output with a timestamp, optionally
+      formatted via strftime.
+
+AUTHOR
+
+    Mark Gardner <mjgardner@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by cPanel, Inc.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

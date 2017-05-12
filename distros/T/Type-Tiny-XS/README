@@ -1,0 +1,64 @@
+NAME
+    Type::Tiny::XS - provides an XS boost for some of Type::Tiny's built-in
+    type constraints
+
+SYNOPSIS
+       use Types::Standard qw(Int);
+
+DESCRIPTION
+    This module is optionally used by Type::Tiny 0.045_03 and above to provide
+    faster, C-based implementations of some type constraints. (This package
+    has only core dependencies, and does not depend on Type::Tiny, so other
+    data validation frameworks might also consider using it!)
+
+    Only the following two functions should be considered part of the
+    supported API:
+
+    `Type::Tiny::XS::get_coderef_for($type)`
+        Given a supported type constraint name, such as "Int", returns a
+        coderef that can be used to validate a parameter against this
+        constraint.
+
+        Returns undef if this module cannot provide a suitable coderef.
+
+    `Type::Tiny::XS::get_subname_for($type)`
+        Like `get_coderef_for` but returns the name of such a sub as a string.
+
+        Returns undef if this module cannot provide a suitable sub name.
+
+    `Type::Tiny::XS::is_known($coderef)`
+        Returns true if the coderef was provided by Type::Tiny::XS.
+
+    In addition to the above functions, the subs returned by `get_coderef_for`
+    and `get_subname_for` are considered part of the "supported API", but only
+    for the lifetime of the Perl process that returned them.
+
+    To clarify, if you call `get_subname_for("ArrayRef[Int]")` in a script,
+    this will return the name of a sub. That sub (which can be used to
+    validate arrayrefs of integers) is now considered part of the supported
+    API of Type::Tiny::XS until the script finishes running. Next time the
+    script runs, there is no guarantee that the sub will continue to exist, or
+    continue to do the same thing.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS>.
+
+SEE ALSO
+    Type::Tiny, Types::Standard.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org> forked all this from
+    Mouse::Util::TypeConstraints.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

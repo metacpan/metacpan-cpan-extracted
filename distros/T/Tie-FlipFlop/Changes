@@ -1,0 +1,10 @@
+Version 2009110701
++ Modernized Makefile.PL.
++ Added POD and Kwalitee tests
+
+Version 2009040401
++ Moved to git and hithub.
++ Modernize.
+
+Revision 1.1  1999/07/19 22:07:22  abigail
++ Initial revision

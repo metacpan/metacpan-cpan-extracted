@@ -1,0 +1,41 @@
+Changes for Text::FixedLengthMultiline.
+
+0.071   2011-11-14
+	Add tests, just for Kwalitee.
+
+0.07    2010-09-26
+	No code change in the module.
+	Fixed t/03re.t following Perl 5.13.5 changes as reported by
+	  CPAN Testers report e205245e-c765-11df-91b4-8227984c9764
+	  (thanks to Andreas J. König).
+
+0.06	2010-08-20
+	Fixed perl version in Build.PL.
+	Added 'use warnings'.
+	Minor POD fixes.
+
+0.05	2010-08-19
+	Imported old releases on Github from the BackPAN.
+	Removed an other debug print statement.
+	Removed sub prototypes to satisfy Perl::Critic.
+	Use direct object syntax everywhere (have a look to module 'indirect').
+	Moved history from POD to 'Changes'.
+	Improve dist to increase Kwalitee:
+	- fixed POD errors (false positives)
+	- using Test::NoWarnings in tests
+	- added an example in examples/
+	- changed POD to satisfy POD-coverage tests
+
+0.04	2007-03-15
+	Removed debug statement. Thanks to Paulo Edgar Castro for the report.
+
+0.03	2005-09-30
+	Added parse_table() method.
+	Improve documentation.
+	Improve tests.
+
+0.02	2005-09-26
+	Improve documentation.
+
+0.01	2005-09-25
+	Initial CPAN release.

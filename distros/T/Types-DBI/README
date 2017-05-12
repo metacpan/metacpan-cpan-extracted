@@ -1,0 +1,76 @@
+NAME
+    Types::DBI - type constraints for dealing with relational databases
+
+SYNOPSIS
+       package FroobleBase;
+   
+       use Moose;
+       use Types::DBI;
+   
+       has dbh => (
+          is       => 'ro',
+          isa      => Dbh['PostgreSQL'],
+          coerce   => 1,
+          required => 1,
+       );
+
+DESCRIPTION
+    Types::DBI is a type constraint library suitable for use with Moo/Moose
+    attributes, Kavorka sub signatures, and so forth.
+
+  Types
+    This module provides two type constraints, but only `Dbh` is exported by
+    default.
+
+    `Dbh`
+        A class type for DBI database handles (DBI::db objects). Coercions
+        from:
+
+        from `Str`
+            The string will be passed to `DBI->connect` as the DSN. Empty
+            strings will be supplied as the username and password parameters.
+            (Many databases allow the username and password to be specified as
+            part of the DSN. Some databases like SQLite can be usefully used
+            without any authentication details.) The `RaiseError` attribute
+            will be set to true.
+
+        from `ArrayRef`
+            The arrayref will be dereferenced and passed to `DBI->connect`.
+
+    `Dbh[`a]`
+        `Dbh` can be parameterized with one or more database names:
+
+           isa  => Dbh["SQLite"]
+
+           isa  => Dbh[qw/ SQLite PostgreSQL /]
+
+        The database names must be a case-sensitive match for the strings
+        returned by `$dbh->get_info(SQL_DBMS_NAME)`.
+
+        Coercions are inherited from non-parameterized `Dbh`.
+
+    `Sth`
+        A class type for DBI statement handles (DBI::st objects). No
+        coercions.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-DBI>.
+
+SEE ALSO
+    Types::Standard, DBI.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

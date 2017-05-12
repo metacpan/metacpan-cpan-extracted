@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               TAP-Parser-SourceHandler-PHP
+version:            0.01
+abstract:           Runs PHP programs to get their TAP for prove
+author:
+    - Andy Lester <andy@petdance.com>
+license:            artistic2
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::Harness:  3.22
+    Test::More:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

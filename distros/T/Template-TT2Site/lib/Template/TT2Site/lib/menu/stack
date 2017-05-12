@@ -1,0 +1,26 @@
+[% # $Id: stack,v 1.3 2005/02/02 19:34:06 jv Exp $ -%]
+[%
+
+pending = [ menu ];
+
+WHILE pending.size;
+    menu = pending.shift;
+
+    "<p>\n";
+    FOREACH item = menu.items;
+	INCLUDE menu/text
+	  link = {
+	    text     = item.name
+	    url      = site.topdir _ item.url
+	    class    = item.hot ? 'menuselect' : 'menu'
+	  };
+
+	"<br />\n";
+
+	pending.push(item)
+	  IF item.subs;
+    END;
+    "</p>\n";
+END;
+
+-%]

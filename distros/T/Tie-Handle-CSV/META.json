@@ -1,0 +1,53 @@
+{
+   "abstract" : "easy access to CSV files",
+   "author" : [
+      "Daniel B. Boorstein <danboo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-Handle-CSV",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0,
+            "Text::CSV_XS" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::Handle::CSV" : {
+         "file" : "lib/Tie/Handle/CSV.pm",
+         "version" : "0.14"
+      },
+      "Tie::Handle::CSV::Array" : {
+         "file" : "lib/Tie/Handle/CSV/Array.pm",
+         "version" : 0
+      },
+      "Tie::Handle::CSV::Hash" : {
+         "file" : "lib/Tie/Handle/CSV/Hash.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/danboo/perl-tie-handle-csv/"
+      }
+   },
+   "version" : "0.14"
+}

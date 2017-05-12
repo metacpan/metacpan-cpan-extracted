@@ -1,0 +1,488 @@
+---
+# This fixture is currently only used by MCP::Config unit test.
+# Since these tests need to check a lot, its better not to reuse
+# it for other tests to make sure config tests do not interfere.
+# -------------------- owners
+
+- schema: Owner
+  name: mhentsc3
+  data:
+    id: 12
+    name: Maik Hentsche
+    login: mhentsc3
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "perfmon", "lmbench"
+
+- schema: Testrun
+  name: Xen
+  data:
+    id: 1
+    owner_id: 12
+    shortname: Xen
+    notes: Xen test
+    topic_name: Software
+
+# -------------------- preconditions
+
+
+
+# ------------------------------------------------------------
+#
+#    Virtualisation test (i.e. Xen and KVM)
+#
+# ------------------------------------------------------------
+
+- schema: Testrun
+  name: Xen
+  data:
+    id: 2
+    owner_id: 12
+    shortname: KVM
+    notes: KVM test
+    topic_name: Software
+
+
+- schema: Testrun
+  name: Reboot
+  data:
+    id: 3
+    owner_id: 12
+    shortname: reboot
+    topic_name: Misc
+
+- schema: Testrun
+  name: KVM_autoinstall
+  data:
+    id: 4
+    owner_id: 12
+    shortname: KVM_auto
+    notes: Install KVM using autoinstaller
+    topic_name: Software
+
+- schema: Testrun
+  name: KVM_alt_images
+  data:
+    id: 5
+    owner_id: 12
+    shortname: alt_img
+    notes: Tests virt precondition with multiple alternatives for partition name
+    topic_name: KVM
+
+- schema: Testrun
+  name: Xen_Windows
+  data:
+    id: 6
+    owner_id: 12
+    shortname: xen_win
+    notes: Tests virt precondition with windows guest
+    topic_name: Xen
+
+- schema: Testrun
+  name: kernel_no_test
+  data:
+    id: 7
+    owner_id: 12
+    shortname: kernel_no_test
+    notes: kernel test without test program
+    topic_name: kernel
+
+- schema: Testrun
+  name: test_with_single_producer
+  data:
+    id: 8
+    owner_id: 12
+    shortname: test_with_single_producer
+    notes: a test with one single producer precondition
+    topic_name: kernel
+- schema: TestrunScheduling
+  name: virt_job_with_producer
+  data:
+    id: 108
+    testrun_id: 8
+    queue_id: 3
+    auto_rerun: 0
+    status: schedule
+
+
+
+- schema: Testrun
+  name: virt_testrun_with_producers
+  data:
+    id: 9
+    owner_id: 12
+    shortname: virt_testrun_with_producers
+    notes: A testrun with producers in a virt preconditions
+    topic_name: Xen
+- schema: TestrunScheduling
+  name: virt_job_with_producer
+  data:
+    id: 109
+    testrun_id: 9
+    queue_id: 3
+    auto_rerun: 0
+    status: schedule
+
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: KVMtest
+  data:
+    id: 8
+    shortname: KVM
+    precondition: |
+       name: automatically generated KVM test
+       precondition_type: virt
+       host:
+         preconditions:
+         - filename: linux-2.6.23.9.tar.gz
+           path: /data/bancroft/tapper/live/repository/packages/kvm/
+           precondition_type: package
+         - filename: kvm.tar.gz
+           path: /data/bancroft/tapper/live/repository/packages/kvm/
+           precondition_type: package
+         - line: natrium:/vol/osrc_home/ /home nfs auto,defaults 0 0
+           precondition_type: fstab
+         root:
+           image: suse/suse_sles10_64b_smp_raw.tar.gz
+           mount: /
+           partition: testing
+           arch: linux64
+           precondition_type: image
+       guests:
+       - config:
+           dest: /kvm/images
+           name: /bin/true
+           precondition_type: copyfile
+           protocol: local
+           exec: /usr/share/tapper/packages/mhentsc3/startkvm.pl
+         root:
+           dest: /kvm/images
+           mountfile: /kvm/images/raw.img
+           mounttype: raw
+           name: osko:/export/image_files/official_testing/redhat_rhel5u2_64b_smp_up_qcow.img
+           precondition_type: copyfile
+           protocol: nfs
+           arch: linux64
+         testprogram:
+           execname: /home/tapper/x86_64/bin/tapper_testsuite_kernbench.sh
+           timeout_testprogram: 36000
+
+- schema: Precondition
+  name: KVM_autoinstall
+  data:
+    id: 101
+    shortname: KVM-auto
+    precondition: |
+       name: automatically generated KVM test
+       precondition_type: virt
+       host:
+         preconditions:
+         - filename: linux-2.6.23.9.tar.gz
+           path: /data/bancroft/tapper/live/repository/packages/kvm/
+           precondition_type: package
+         - filename: kvm.tar.gz
+           path: /data/bancroft/tapper/live/repository/packages/kvm/
+           precondition_type: package
+         - line: natrium:/vol/osrc_home/ /home nfs auto,defaults 0 0
+           precondition_type: fstab
+         root:
+           precondition_type: autoinstall
+           name: RHEL5
+           timeout: 10000
+           grub_text: |
+             timeout 2
+
+             title RHEL 5
+             kernel /tftpboot/stable/rhel/5/x86_64/vmlinuz  console=ttyS0,115200 ks=http://bancroft/autoinstall/stable/rhel/5/x86_64/tapper-ai.ks ksdevice=eth0 noapic $TAPPER_OPTIONS
+             initrd /tftpboot/stable/rhel/5/x86_64/initrd.img
+       guests:
+       - config:
+           dest: /kvm/images
+           name: /bin/true
+           precondition_type: copyfile
+           protocol: local
+           exec: /usr/share/tapper/packages/mhentsc3/startkvm.pl
+         root:
+           dest: /kvm/images
+           mountfile: /kvm/images/raw.img
+           mounttype: raw
+           name: osko:/export/image_files/official_testing/redhat_rhel5u2_64b_smp_up_qcow.img
+           precondition_type: copyfile
+           protocol: nfs
+           arch: linux64
+         testprogram:
+           execname: /home/tapper/x86_64/bin/tapper_testsuite_kernbench.sh
+           timeout_testprogram: 36000
+
+
+- schema: Precondition
+  name: installer stop
+  data:
+    id: 10
+    precondition: |
+      precondition_type: installer_stop
+
+- schema: Precondition
+  name: reboot
+  data:
+    id: 11
+    precondition: |
+      precondition_type: reboot
+      count: 2
+
+- schema: Precondition
+  name: simple_image
+  data:
+    id: 12
+    precondition: |
+      precondition_type: image
+      arch: linux64
+      mount: /
+      partition: testing
+
+
+- schema: Precondition
+  name: KVMtest
+  data:
+    id: 110
+    shortname: KVM
+    precondition: |
+       name: automatically generated KVM test
+       precondition_type: virt
+       host:
+         preconditions:
+         - filename: linux-2.6.23.9.tar.gz
+           path: /data/bancroft/tapper/live/repository/packages/kvm/
+           precondition_type: package
+         - filename: kvm.tar.gz
+           path: /data/bancroft/tapper/live/repository/packages/kvm/
+           precondition_type: package
+         - line: natrium:/vol/osrc_home/ /home nfs auto,defaults 0 0
+           precondition_type: fstab
+         root:
+           image: suse/suse_sles10_64b_smp_raw.tar.gz
+           mount: /
+           partition:
+             - testing
+             - /dev/sda2
+             - /dev/hda2
+           arch: linux64
+           precondition_type: image
+       guests:
+       - config:
+           dest: /kvm/images
+           name: /bin/true
+           precondition_type: copyfile
+           protocol: local
+           exec: /usr/share/tapper/packages/mhentsc3/startkvm.pl
+         root:
+           dest: /kvm/images
+           mountfile: /kvm/images/raw.img
+           mounttype: raw
+           name: osko:/export/image_files/official_testing/redhat_rhel5u2_64b_smp_up_qcow.img
+           precondition_type: copyfile
+           protocol: nfs
+           arch: linux64
+         testprogram:
+           execname: /home/tapper/x86_64/bin/tapper_testsuite_kernbench.sh
+           timeout_testprogram: 36000
+
+- schema: Precondition
+  name: KVMtest
+  data:
+    id: 111
+    shortname: Xen
+    precondition: |
+      name: automatically generated Xen test
+      precondition_type: virt
+      host:
+        root:
+          arch: linux32
+          image: suse/suse_sles10_sp2_32b_smp_raw.tar.gz
+          mount: /
+          partition: /dev/sda2
+          precondition_type: image
+        testprogram_list:
+          - execname: /opt/tapper/bin/metainfo
+            runtime: 50
+            timeout_testprogram: 300
+            parameters:
+              - --foo=some bar
+          - execname: /opt/tapper/bin/py_kvm_unit
+            runtime: 1200
+            timeout_testprogram: 1800
+      guests:
+        - config:
+            dest: /xen/images/
+            name: bancroft:/data/bancroft/tapper/live/repository/configs/xen/002-uruk-1268101895.svm
+            precondition_type: copyfile
+            protocol: nfs
+            svm: /xen/images//002-uruk-1268101895.svm
+          root:
+            arch: linux32
+            dest: /xen/images/
+            mountfile: /xen/images/002-uruk-1268101895.img
+            mounttype: windows
+            name: osko:/export/image_files/official_testing/redhat_rhel6_alpha3_32b_qcow.img
+            precondition_type: copyfile
+            protocol: nfs
+          testprogram_list:
+            - execname: /opt/tapper/bin/py_reaim
+              runtime: 28800
+              timeout_testprogram: 36000
+
+
+- schema: Precondition
+  name: Dummy producer precondition
+  data:
+    id: 112
+    precondition: |
+      precondition_type: produce
+      producer: DummyProducer
+
+- schema: Precondition
+  name: Additional precondition for producer test
+  data:
+    id: 188
+    precondition: |
+      precondition_type: grub
+      config: whatever
+
+
+- schema: Precondition
+  name: Dummy producer precondition
+  data:
+    id: 113
+    precondition: |
+      name: automatically generated Xen test
+      precondition_type: virt
+      host:
+        root:
+          precondition_type: produce
+          producer: DummyProducer
+          option: ~
+        preconditions:
+        - precondition_type: produce
+          producer: DummyProducer
+          option: ~    
+        - precondition_type: nonproducer
+      guests:
+      - config:
+          precondition_type: produce
+          producer: DummyProducer
+          option: ~    
+        root:
+          precondition_type: produce
+          producer: DummyProducer
+          option: ~
+        testprogram:
+          precondition_type: produce
+          producer: DummyProducer
+
+
+
+# -------------------- "KVM" <== "KVMtest"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for KVM
+  data:
+    testrun_id: 2
+    precondition_id: 8
+    succession: 1
+
+
+- schema: TestrunPrecondition
+  name: 2nd precondition for KVM
+  data:
+    testrun_id: 2
+    precondition_id: 10
+    succession: 2
+
+
+# -------------------- "Reboot" <== "Reboot"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for Reboot
+  data:
+    testrun_id: 3
+    precondition_id: 11
+    succession: 1
+
+
+- schema: TestrunPrecondition
+  name: 2nd precondition for reboot
+  data:
+    testrun_id: 3
+    precondition_id: 12
+    succession: 2
+
+
+# -------------------- Preconditions for KVM_auto
+
+- schema: TestrunPrecondition
+  name: precondition for KVM_auto
+  data:
+    testrun_id: 4
+    precondition_id: 101
+    succession: 1
+
+# -------- image with partition alternatives
+
+- schema: TestrunPrecondition
+  name: precondition for KVM_auto
+  data:
+    testrun_id: 5
+    precondition_id: 110
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: precondition for KVM_auto
+  data:
+    testrun_id: 6
+    precondition_id: 111
+    succession: 1
+
+# --------- precondititions for kernel_no_test
+
+- schema: TestrunPrecondition
+  name: image for kernel_no_test
+  data:
+    testrun_id: 7
+    precondition_id: 12
+    succession: 1
+
+# --------- precondititions for test_with_single_producer
+
+- schema: TestrunPrecondition
+  name: Producer
+  data:
+    testrun_id: 8
+    precondition_id: 112
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: Additional
+  data:
+    testrun_id: 8
+    precondition_id: 188
+    succession: 1
+
+# --------- precondititions for virt_testrun_with_producers
+
+- schema: TestrunPrecondition
+  name: virt_precond_with_producers
+  data:
+    testrun_id: 9
+    precondition_id: 113
+    succession: 1

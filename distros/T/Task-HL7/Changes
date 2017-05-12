@@ -1,0 +1,6 @@
+0.02 2016-04-08T00:40:59+02:00
+ - Add App::HL7::Send 0.01 version.
+ - Update App::HL7::Dump to 0.02 version.
+
+0.01 2016-04-04T22:59:50+02:00
+ - First version.

@@ -1,0 +1,82 @@
+1.01    7 December 2012
+        Upgraded to Devel::MaintBlead 0.08.  This should fix the problem as
+        reported in https://rt.cpan.org/Ticket/Display.html?id=81354 by
+        Justin Traer.  Also upgraded the maint version to 0.14.
+
+1.00    11 June 2012
+        Now uses Devel::ThreadsForks for checking whether running on a thread
+        enabled Perl.
+
+        Now uses Devel::MaintBlead to keep a maint and a blead version going.
+        Blead version now no longer requires the "load" module: I considered
+        it to have been a premature optimization that just caused a lot of
+        grief.
+
+        Raised the "maint" version to 0.13 as to distinguish it from the older,
+        now maint version.
+
+        Upgraded test-suite for blead to use the latest in Test::More's
+        threading capabilities.
+
+0.12    1 April 2012
+        Some cleanup in distro.  Some code cleanup as well, as well as some
+        code esthetics.  Verified it work with 5.14.2.
+
+0.11    20 September 2010
+        Checking the tool chain with perl 5.13.5.
+
+0.10    29 September 2004
+        Added support for $Thread::Serialize::no_external_perl to prevent
+        problems when used in embedded Perls.  Spotted by Philip Monsen.
+        Added documentation and additional tests in the test-suite.
+
+0.09    28 December 2003
+        Added automatic required modules update using Devel::Required.
+
+0.08    18 September 2003
+        Upgraded dependency on load to 0.10, since that has some significant
+        Windows fixes.
+
+0.07    17 September 2003
+        Upgraded dependency on load to 0.09.
+
+        17 August 2003
+        Some documentation fixes: we're not using AutoLoader anymore.
+
+0.06    11 August 2003
+        Fixed some nits in Makefile.PL.  Updated copyright notice.
+
+        Fixed dependency on order of hash keys in test-suite: this caused
+        spurious testing errors in 5.8.1.
+
+0.05    30 September 2002
+        Removed support for AutoLoader and replaced it by support for "load.pm".
+        Added dependency on "load" to Makefile.PL.
+
+        Removed "our" from $VERSION, should shave off some bytes in memory
+        usage, as found from testing with Benchmark::Thread::Size.
+
+0.04    22 September 2002
+        Fixed warnings when running under -w.  Thanks to Chris Rosebrugh for
+        the spot.
+
+0.03    10 September 2002
+        Removed the NOT_ICED environment variable hack and its documentation.
+        Replaced by having an external Perl process calculate the Storable
+        (iced) signature at load time.  This should be compatible with all
+        versions of Storable on all possible OS's and hardware architectures.
+
+0.02    30 August 2002
+        Now uses pre-frozen signature value unless told otherwise.  This saves
+        Storable::freeze to have to be available in all threads.  Can be
+        circumvented by specifying NOT_ICED environment variable.  Added
+        OPTIMIZATIONS and CAVEATS sections to the pod.
+
+        Added support for AutoLoader.  Together with all of the other Thread::
+        modules, this should start saving a lot of memory.
+
+        Removed reference tricks: we should find other ways of saving memory
+        with threads.
+
+0.01    13 August 2002
+        First version of Thread::Serialize.

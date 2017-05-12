@@ -1,0 +1,56 @@
+---
+
+- schema: Topic
+  name: kernel
+  data:
+    name: Kernel
+    description: particlar kernel version or kernel modules
+
+- schema: Topic
+  name: xen
+  data:
+    name: Xen
+    description: Xen features
+
+- schema: Topic
+  name: kvm
+  data:
+    name: KVM
+    description: KVM features
+
+- schema: Topic
+  name: hardware
+  data:
+    name: Hardware
+    description: test focuses on the hardware
+
+- schema: Topic
+  name: distribution
+  data:
+    name: Distribution
+    description: OS distribution (like RHEL, SLES, Debian)
+
+- schema: Topic
+  name: benchmark
+  data:
+    name: Benchmark
+    description: collection of values
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+- schema: Topic
+  name: research
+  data:
+    name: Research
+    description: collection of results, similar to benchmark
+
+- schema: Topic
+  name: misc
+  data:
+    name: Misc
+    description: what doesn't fit into other topics
+

@@ -1,0 +1,90 @@
+Revision history for Perl extension Test::Without::Module.
+
+Todo:
+  - Add way to allow only core modules (suggested by SREZIC)
+
+0.20 20170409
+  - Make tests more resilient against old versions of Carp.pm (Paul Howarth)
+    Also addresses
+    https://rt.cpan.org/Public/Bug/Display.html?id=121002
+  - Typo fixes (Paul Howarth)
+  - Rework test suite, move author tests below xt/
+
+0.19 20170330
+  - Make error message more like the original Perl error message (haarg)
+  - Makefile.PL overhaul (by Abzal Serekov)
+  - Generate README.md
+
+0.18 20140830
+  - Eliminate segfault on Perl 5.8 (by Graham Knop, Karen Etheridge, RT 98207)
+  - Only add the @INC hook once (by Graham Knop, RT #91857)
+  - Updated documentation
+
+0.17 20090118
+  - Made license explicit in the metadata (for those versions
+    of EU:MM that support it)
+  ! Changed module comparison from using a regular expression
+    to string equality. That means that ugly actions at a distance
+    by matching substrings shouldn't happen.
+
+0.16 20081020
+  - Add a test that exhibits the "redefined" warnings upon disallowing
+    and then reallowing a module
+  - Fixed the code so no more warnings get issued. [RT#40065]
+
+0.15 20071021
+  - Now really restored compatibility of the tests with Perl 5.005,
+    using lexical filehandles does not work under 5.005...
+  . No functional changes, no upgrade is necessary
+
+0.14 20071020
+  - Hopefully restored compatibility of the tests with Perl 5.005 this time, reported by SREZIC
+  . No functional changes, no upgrade is necessary
+
+0.13 20071020
+  - Restored compatibility of the tests with Perl 5.005, reported by SREZIC
+  . No functional changes, no upgrade is necessary
+
+0.12 20071020
+  - Fixed RT [rt.cpan.org #24735], reported by Slaven Rezic
+    This seems to have been some really weird interaction or maybe
+    eating of $@.
+
+0.11 20070819
+  - File::Slurp is now no prerequisite anymore - the test
+    requiring it is now optional
+
+0.10 20070804
+  - Added missing File::Slurp prerequisite. Thanks to ANDK and
+    the CPAN smoke testers to alert me to this
+  - No functional changes. No upgrade from 0.09 is necessary.
+
+0.09 20061231
+  - Added more consistency tests
+  - Added Jerrad Pierce to the list of those
+    who mentioned the command line use. I forgot
+    the usage NUFFIN had given, so both were
+    genuinely new to me.
+
+0.08 20061229
+  - Removed superfluous File::Temp usage from module
+
+0.07 20061229
+  - No more inline pod tests
+  - No code changes since 0.06
+
+0.06 20030320
+  - fixed the inline test pod
+  - Now needs Test::Pod 0.95 (or skips the pod test)
+
+0.03 20030217
+  - Released on CPAN
+  - Fixes so the pod for the fake module doesn't appear
+    in the main pod.
+
+0.02 20030216
+  - Released on CPAN
+
+0.01  Sat Feb 15 21:14:45 2003
+  - original version; created by h2xs 1.21 with options
+    -Xn Test::Without::Module

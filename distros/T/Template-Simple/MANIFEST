@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+TODO
+lib/Template/Simple.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/top.t
+t/scalar.t
+t/nested.t
+t/options.t
+t/include.t
+t/error.t
+t/common.pm
+extras/cookbook.pl
+extras/bench_all.pl
+extras/lib/Template/Teeny.pm
+extras/lib/Template/Teeny/Stash.pm

@@ -1,0 +1,22 @@
+/usr/bin/auto-build-secure          -- gen_context(system_u:object_r:abengine_exec_t,s0)
+
+/etc/auto-build\.d(/.*)?               gen_context(system_u:object_r:abconfig_t,s0)
+/etc/auto-build\.d/cron(/.*)?          gen_context(system_u:object_r:system_cron_spool_t,s0)
+/etc/auto-build\.d/httpd(/.*)?         gen_context(system_u:object_r:httpd_config_t,s0)
+
+/var/lib/builder/\.cvspass          -- gen_context(system_u:object_r:abscmtool_conf_t,s0)
+/var/lib/builder/\.subversion          gen_context(system_u:object_r:abscmtool_conf_t,s0)
+
+/var/lib/builder/\.rpmmacros       -- gen_context(system_u:object_r:abrpm_conf_t,s0)
+
+/var/lib/builder(/.*)?                 gen_context(system_u:object_r:abroot_t,s0)
+/var/lib/builder/build-archive(/.*)?   gen_context(system_u:object_r:abarchive_t,s0)
+/var/lib/builder/install-root(/.*)?    gen_context(system_u:object_r:abinstall_t,s0)
+/var/lib/builder/log-root(/.*)?        gen_context(system_u:object_r:ablog_t,s0)
+/var/lib/builder/package-root(/.*)?    gen_context(system_u:object_r:abpackage_t,s0)
+/var/lib/builder/package-root/rpm/BUILD(/.*)?    gen_context(system_u:object_r:absource_t,s0)
+/var/lib/builder/public_html(/.*)?     gen_context(system_u:object_r:abpublish_t,s0)
+/var/lib/builder/public_ftp(/.*)?      gen_context(system_u:object_r:abpublish_t,s0)
+/var/lib/builder/source-root(/.*)?     gen_context(system_u:object_r:absource_t,s0)
+
+

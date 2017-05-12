@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Thread/Resource/RWLock.pm
+t/01hashsubclass_basic.t
+t/02arysubclass_basic.t
+t/03asobject_basic.t
+t/04hashsubclass_threaded.t
+t/05arysubclass_threaded.t
+t/06asobject_threaded.t

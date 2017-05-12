@@ -1,0 +1,221 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 0b184ad51ba2a79e85d2288d5fcf8a1ea0481ea4 COPYING
+SHA1 0a79efef746dc626e90f6b7ab8cd6ae9192917e4 Changes.pod
+SHA1 b209e931adb1886d448c4f8bc6ded3398a3b9889 MANIFEST
+SHA1 c05b04e089b3e44e663e79fe41ddeb6994459911 MANIFEST.SKIP
+SHA1 82c5b74414132068897cc792c18544e1816350f0 MYMETA.json
+SHA1 ef27efb983ad343f2fd14d4ab838b4e36b9270c8 MYMETA.yml
+SHA1 d81490e23ffa1c09da287f8532645cc865f4b71c Makefile.PL
+SHA1 d397504af8c94ae0f4a3bf5e8574d47a6b838857 README
+SHA1 935cd41d9f22b72cb499c90a31ebcf6a75b43bc7 lib/Tangram.pm
+SHA1 27ddaff79e3005a4e8894aa110423bde908b64a5 lib/Tangram.pod
+SHA1 ebfae8ebc3d9727f7e11551d302b6230a261ef22 lib/Tangram/Compat.pm
+SHA1 fe6f6cfb5890b86a67f408ed4686e9660d30ef12 lib/Tangram/Compat/Stub.pm
+SHA1 6cdec3318b1441acf63523122910a78df7f19758 lib/Tangram/Complicity.pm
+SHA1 fd556964f1b818b101cf2744463448d418f06fc2 lib/Tangram/Core.pm
+SHA1 edfd18a8dee276669827b7eea79d77580d57bf68 lib/Tangram/Core.pod
+SHA1 fcd2901d5ac1ee14978c26fffa4cdfd2936216fd lib/Tangram/Cursor.pm
+SHA1 382220930e9a890d145e025d14f4430730341a08 lib/Tangram/Cursor.pod
+SHA1 a8d7f19d636004d0a481c1e358fea610e0d54c1d lib/Tangram/Cursor/Coll.pm
+SHA1 296a53c12e7ce79ae078612bbbf9c93fe28181d8 lib/Tangram/Cursor/Data.pm
+SHA1 fa330d14b0623d7be288518e884b272395f4f7c9 lib/Tangram/Deploy.pm
+SHA1 7bc0ba94a70612204f3cad812d40a193033e68af lib/Tangram/Deploy.pod
+SHA1 fa2f436e7b5fff5ac2588b16efa8485cfcb89581 lib/Tangram/Driver/Oracle.pm
+SHA1 35c58b106e179e904b96c6eb2af720792c62b4c6 lib/Tangram/Driver/Oracle.pod
+SHA1 aa1448c0923a149c06b94ec4658906b2c194e999 lib/Tangram/Driver/Oracle/Storage.pm
+SHA1 e99c4844f46ad6b440ef5ba960cf2b38d15cd59a lib/Tangram/Driver/Pg.pm
+SHA1 d603d23b947fbd982fe6b4e2cadd9c4189fed347 lib/Tangram/Driver/Pg.pod
+SHA1 ee4d8a7a01b79c4b832b75bbc23f40c4a3e417cf lib/Tangram/Driver/Pg/Storage.pm
+SHA1 12c1512961ee02c6a548faa6e6c34dd58b872035 lib/Tangram/Driver/SQLite.pm
+SHA1 736d624e33f370efb823974f55f61ddfd956d7f9 lib/Tangram/Driver/SQLite.pod
+SHA1 2ed88068d48b7d53d0adcb5798a9b251921c5122 lib/Tangram/Driver/SQLite/Storage.pm
+SHA1 0dc35ae1815a0e1909d873550b93c82184f99961 lib/Tangram/Driver/SQLite2.pm
+SHA1 71b2dbc054ea5ff77ef1d9fb4bdafc28176033b8 lib/Tangram/Driver/Sybase.pm
+SHA1 8d057111408836e74b302da64226e1d487aacef7 lib/Tangram/Driver/Sybase.pod
+SHA1 3abe474d3d41d414516128cf631c66eddb5bd67d lib/Tangram/Driver/Sybase/Expr/Date.pm
+SHA1 dce8d26f12a7014d9ccc567cbea5de820b43ace7 lib/Tangram/Driver/Sybase/Statement.pm
+SHA1 75063bceb193daef27720583d0c537725a222fd5 lib/Tangram/Driver/Sybase/Storage.pm
+SHA1 06e385bb05d3b5b818ba2207893758b24ae83432 lib/Tangram/Driver/mysql.pm
+SHA1 c90b4881529296823ee4a8d7ca4b9d5c7b5538f8 lib/Tangram/Driver/mysql.pod
+SHA1 1e69537d308969f2270e55c01a69659c248adff3 lib/Tangram/Driver/mysql/Expr/Date.pm
+SHA1 b22ce1310018902825940101f64efabaf0487fdc lib/Tangram/Driver/mysql/Expr/Integer.pm
+SHA1 321deaeb2e3f8ca4d890ac4f12a0d17380a94ec7 lib/Tangram/Driver/mysql/Storage.pm
+SHA1 2312c621099cf5a626174daf8a6a26a68975076b lib/Tangram/Expr.pm
+SHA1 6527f06e8ec0613edeadb3fee6ba51d77985dd7c lib/Tangram/Expr.pod
+SHA1 9419d3cf7abdb0deb08b390ff459d93402f7758f lib/Tangram/Expr/Coll.pm
+SHA1 85e94bcec3e52cadec66fa05381c912e45174b59 lib/Tangram/Expr/Coll/FromMany.pm
+SHA1 f356aa0fd2e0ea8fdacb09e70ee91c79df6deba0 lib/Tangram/Expr/Coll/FromOne.pm
+SHA1 209e80295fc930b1b642c6ab88c90df5b3a5aa40 lib/Tangram/Expr/CursorObject.pm
+SHA1 647d1719ea0279560e07dd59add488ea19474ea6 lib/Tangram/Expr/Filter.pm
+SHA1 d61936dca4de66fdf83a9d41a451bbdc84b7ffc6 lib/Tangram/Expr/FlatArray.pm
+SHA1 fea5e7609cf7faca185fe7f4eef22b1ebc40f60b lib/Tangram/Expr/FlatHash.pm
+SHA1 a7875f5fd6ee4a274bfb34811d4d3e05a2273dbe lib/Tangram/Expr/LinkTable.pm
+SHA1 281078289e3e0688fba7929617aab192eaa24b6a lib/Tangram/Expr/QueryObject.pm
+SHA1 01375a5715d0c4c509b79d1dcc27ed30c7d1ad4c lib/Tangram/Expr/RDBObject.pm
+SHA1 f3db383349233bb574b6e80a4ad648602686bef2 lib/Tangram/Expr/Select.pm
+SHA1 5005d43d50b91895ea8978ea72b3871c0ed68ac7 lib/Tangram/Expr/Table.pm
+SHA1 7c3cd8409cbf28c967d1f0257302873e4c0d9e94 lib/Tangram/Expr/TableAlias.pm
+SHA1 e987613bcb01651f1e28b0a391cfa6c31ca832ba lib/Tangram/Intro.pod
+SHA1 e3a5a48214943d0a277ad05c7b060d4183bdaa1f lib/Tangram/Lazy/BackRef.pm
+SHA1 0d2ec285233e8a285b1124e04bd3cf130ca0b39e lib/Tangram/Lazy/Coll.pm
+SHA1 3555c041eef8c35613c7a585a4757586bc831c99 lib/Tangram/Lazy/Ref.pm
+SHA1 92b3226ec657c44d88a6957106abcd019e5ce9c1 lib/Tangram/Relational.pm
+SHA1 fc99bdedbbc6b405db2daafe91d8b0726aa0cb82 lib/Tangram/Relational.pod
+SHA1 f71b8ba4f9c6e4b68027aa97b574479a7726b686 lib/Tangram/Relational/Engine.pm
+SHA1 22b89dfcdeb6a5a501ed8e10dce8bd473a62b923 lib/Tangram/Relational/Engine/Class.pm
+SHA1 51e9303bc384f3e65d3832a091a6b3c9938b54bb lib/Tangram/Relational/Mappings.pod
+SHA1 113deeffe0061675c25b9c9fae28e8aa16f74abd lib/Tangram/Relational/PolySelectTemplate.pm
+SHA1 b039e51c031256c5a99fa819efb9343f93a19d76 lib/Tangram/Relational/Schema.pm
+SHA1 55ccc86d76e9c84ea49b87645d2ac95f83a0c353 lib/Tangram/Relational/TableSet.pm
+SHA1 cb03cee0ce4005bd3b579eee7dd03ca8aed85e25 lib/Tangram/Remote.pod
+SHA1 9ecbbdbfd4fa2bb527e0c2715f473597b57787b4 lib/Tangram/Schema.pm
+SHA1 5c3050e038b6e535f159997c3b473e1ff487e996 lib/Tangram/Schema.pod
+SHA1 33e2b9977275300c675366ee11d9b58a9ede1120 lib/Tangram/Schema/Class.pm
+SHA1 c868439512b1641d9049da133f7c7e34a4e88ec5 lib/Tangram/Schema/ClassHash.pm
+SHA1 e7d87640b104e36235b0b028bb092356a3e0d536 lib/Tangram/Schema/Node.pm
+SHA1 a71aba006b12798cd28b5bde6f9c1d18c977e7b6 lib/Tangram/Springfield.pm
+SHA1 45b178dc0fe4f81c587cae77a628a809949b1374 lib/Tangram/Springfield.pod
+SHA1 5a05250d659005ea2704b6941e8722528ea0ea76 lib/Tangram/Storage.pm
+SHA1 37352d1ca2a4526bb3bda9f167454764d3fccb61 lib/Tangram/Storage.pod
+SHA1 0c93c8cba854e790cb9e440f7928e6d2b0b05986 lib/Tangram/Storage/Statement.pm
+SHA1 75fd696198539556c6d6af23bfae1815dc174af7 lib/Tangram/Sucks.pm
+SHA1 672a2065b09ded4d6f96b75ab39ae1616bb63de7 lib/Tangram/Tour.pod
+SHA1 81a9a86e4193b489bd7c1b9b90b09da048b6e5f6 lib/Tangram/Type.pm
+SHA1 69731fbc88dd991f13816e3af83cc2de6178a8f9 lib/Tangram/Type.pod
+SHA1 de4a748d69dd4b692119fbe8d0bbed9692ed33c2 lib/Tangram/Type/Abstract/Array.pm
+SHA1 2308d16a95cb4e8614b67a6ef4eb26035c8c6ac6 lib/Tangram/Type/Abstract/Coll.pm
+SHA1 d714dbc1dfb7e9b022e61429ed640df24b08f16c lib/Tangram/Type/Abstract/Hash.pm
+SHA1 4a90e9cfe3ed9e3d8f96c91acd5486ef884a5dff lib/Tangram/Type/Abstract/Set.pm
+SHA1 1884a2babbb99d300df389938614ca79477d7115 lib/Tangram/Type/Array/FromMany.pm
+SHA1 43531bdae226eec332d590fc3090ff66bcf0b2db lib/Tangram/Type/Array/FromMany.pod
+SHA1 72f5c33dffeb67bd0a34953eabe64c5b55424e7e lib/Tangram/Type/Array/FromOne.pm
+SHA1 2f8bb2506c5b3bcbd45fe2d0c4eb48b84f57471d lib/Tangram/Type/Array/FromOne.pod
+SHA1 b001377949a4ed2079dfefdac97c83dc824325a0 lib/Tangram/Type/Array/Scalar.pm
+SHA1 f5d354a27ffbbf658d292f68533fc5556a34c77c lib/Tangram/Type/Array/Scalar.pod
+SHA1 5a023bc224c40b0ce0c542057e24c38d1e97b2e3 lib/Tangram/Type/BackRef.pm
+SHA1 119499694158d11e5a6e6b9c13a197a45f16bf88 lib/Tangram/Type/Date.pm
+SHA1 f1187f75eb7a5b71ec361e4520bc1fdbfb71b269 lib/Tangram/Type/Date/Cooked.pm
+SHA1 afcc5151d7f25ac6a855f4a202dbdc0276f37d34 lib/Tangram/Type/Date/DateTime.pm
+SHA1 3811fd144caae9d70e6197809ac7a22276305c58 lib/Tangram/Type/Date/Manip.pm
+SHA1 8f0e9c6cc77f91616d97df23cd6e929f302ea1fa lib/Tangram/Type/Date/Raw.pm
+SHA1 e8452041fb79efbee91918420f38471370232bd8 lib/Tangram/Type/Date/TimeHiRes.pm
+SHA1 84ed9302781d1a9fc6e9a87cbea952bebc14d9b6 lib/Tangram/Type/Date/TimePiece.pm
+SHA1 bd4458b5fb661209b069f3c118d1614bbda483f7 lib/Tangram/Type/Dump.pm
+SHA1 1db1a0ebfe1af3573367f29fff72cefc1f72f6be lib/Tangram/Type/Dump/Any.pm
+SHA1 81e2147bf7fb126e09151b66732a6a93f3fdfd9d lib/Tangram/Type/Dump/Perl.pm
+SHA1 a2ea38ff648ab81c3533adc4b123ebe38c80471f lib/Tangram/Type/Dump/Perl.pod
+SHA1 c27211287ea0ad817b2ac0b161ec6eb2ad7d9574 lib/Tangram/Type/Dump/Storable.pm
+SHA1 b08c0c5cfdc9fa565ea890afa4b079094bb7282a lib/Tangram/Type/Dump/Storable.pod
+SHA1 0e8314f157a5dddebfa2015d2152a9f508313d57 lib/Tangram/Type/Dump/YAML.pm
+SHA1 e5423c17d96859dd878e52ab06c465faed5722e8 lib/Tangram/Type/Extending.pod
+SHA1 f2ffc666eda165c7d6b1ccd9879c9d8b857685c7 lib/Tangram/Type/Hash/FromMany.pm
+SHA1 ec74e676234d808a0a1a6eae4214939915009d30 lib/Tangram/Type/Hash/FromOne.pm
+SHA1 4a5ff26ad73f4bf480ff1688d785beb95e162f9c lib/Tangram/Type/Hash/Scalar.pm
+SHA1 dd505bcd55e8ab6d69f7d28bfb33ac77b04f7cf8 lib/Tangram/Type/Hash/Scalar.pod
+SHA1 dddbc36d91a995e520ad64cd1a06f5591d0938e4 lib/Tangram/Type/Integer.pm
+SHA1 4ca1154f220f0f771760adf38c4cf28a4569d2fe lib/Tangram/Type/Interval.pm
+SHA1 c5040743c144836d1b3912d4d4d3f2a7f29dcff9 lib/Tangram/Type/Interval/HiRes.pm
+SHA1 db8de41436436c5ee0faaa120bdee4b3430f44ce lib/Tangram/Type/Number.pm
+SHA1 349b8c7b614b76d5c6d395e4942b49b9f39f20c2 lib/Tangram/Type/Real.pm
+SHA1 6f3bc9d73436e49e7c22886d4e801479c38c3215 lib/Tangram/Type/Ref/FromMany.pm
+SHA1 ffba42a043d516da1aa7de999fdfe4c417fb6f80 lib/Tangram/Type/Ref/FromMany.pod
+SHA1 1db536155e089f36d1917b884e1119832bbbffb7 lib/Tangram/Type/Ref/FromOne.pm
+SHA1 40dbb4808a02d4e41b193bc3789434b581f0836d lib/Tangram/Type/Scalar.pm
+SHA1 888bc7b67476528271c700e91313e58ae356166c lib/Tangram/Type/Scalar.pod
+SHA1 5a8db3a81ffcbaf070c3c6f95acd6a55c5c5a534 lib/Tangram/Type/Set/FromMany.pm
+SHA1 1b6598ee80d93b71fa4b25ee71cbf4b294de81d8 lib/Tangram/Type/Set/FromMany.pod
+SHA1 8e7af252b45c5df3a39d06012ff85f2c12df125c lib/Tangram/Type/Set/FromOne.pm
+SHA1 bac32b33f85bee4ac5b29d7a205c9cce5dd27fc4 lib/Tangram/Type/Set/FromOne.pod
+SHA1 e0f4ddc79564c2ccf8403d1096a0b3c3aa9210cb lib/Tangram/Type/String.pm
+SHA1 ff407ee570fc4136ecc8f2056cd9dcfe5543da9a lib/Tangram/Type/Time.pm
+SHA1 17a3fbcc88788889d8b10415679aba540b29992d lib/Tangram/Type/TimeAndDate.pm
+SHA1 728001c5de65fb66d4446d930f90c18b81590423 lib/Tangram/Type/TimeAndDate.pod
+SHA1 a0b8483721d2c8be58783a71ee49e70d74fa719d lib/Tangram/Util.pm
+SHA1 e5e62fa5098116a921b62e53b9d95e73fd6f02ed t/Capture.pm
+SHA1 d299ef166c39e9ced782a6acd5d10366ad7b319f t/DBConfig.pm
+SHA1 94b7eeac5ff54353724e09ff54c801b422b1fe48 t/Makefile
+SHA1 0ce7f19182eebc87a76cb1930455c372b6032e32 t/README.pod
+SHA1 e3558e2af555f220d6d80a0b385d7a26cd656377 t/TestNeeds.pm
+SHA1 41d8c1ec0931bc2629477a3fa8716ae47d3406e2 t/misc/Fascisto.pm
+SHA1 9eb1e61436447fb7197887f4bb70fe49cf0cf6a0 t/misc/RefImage.pm
+SHA1 fb4b6cac50ee51c738795c777c0951b066e74d31 t/misc/back-inflation.t
+SHA1 f16608ed396bc733fe4709b90a0ca6e3330c2c64 t/misc/bughunt.t
+SHA1 f2e103fbee925d4514b35521569af7b95b9b2136 t/misc/include.t
+SHA1 74d2033f64b415bf7cfc35ad2581be4fcdcef6d1 t/misc/new_opers.t
+SHA1 b615710165a3a4ade04002b24fbc2cebebe2079a t/misc/new_types.t
+SHA1 8184435bab39e1b315a4dc5c1ada0daa5c1ca302 t/moose/CD.pm
+SHA1 050048845454e4452b8b98c76b45352a4515a792 t/musicstore/00-deploy.t
+SHA1 9c859a7fd6cd50d6756b29105f25a005f543768b t/musicstore/01-simple.t
+SHA1 7655beaaf21229023ca4548d59e07e5bf0294bcf t/musicstore/02-reorg.t
+SHA1 aa604e19cee7fbcab4bca38362d5a8562fe80152 t/musicstore/03-reschema.t
+SHA1 425725126ab70d360f1f484dab4764afc227b85d t/musicstore/CD.pm
+SHA1 ac86a8bf6fd5a8f47d1a0458b84ebfbc9e58b938 t/musicstore/MusicStore.pm
+SHA1 8cba79d5b15f449b4703b2af8e997752329fe8e1 t/musicstore/Prerequisites.pm
+SHA1 54d6ec6499840730f703f3f778de1e342598f761 t/musicstore/insert_extra_data.pl
+SHA1 ab6307e89ca5f5e8679ae9d76633b4e048a4f4b9 t/musicstore/zz-retreat.t
+SHA1 497e2f99bae86e9af1e160e2d03564fa4ecd8490 t/no_tests.t
+SHA1 3a3a2a86b5c8f073f5fa3286bfa41fcc50c9703a t/orange/hello-tangram.pl
+SHA1 36ce8c9b8566fc6623a6dd112fbae4a399c9aa22 t/rt/RT.pm
+SHA1 bb92838f5fa03e5c1e756c29db5175ec16ab36a2 t/rt/RT.pod
+SHA1 6781444c855ea1bef88ca20e1fed3770872ec37e t/springfield/00-deploy.t
+SHA1 6abb577b8711acd9a7d34d847649851ae6c00d21 t/springfield/01-mappings.t
+SHA1 a2969ba8af2c51ea79f561f380f40b5a9647190f t/springfield/02-cursor.t
+SHA1 49f47d21a2d7e0875ee37ccdf8d02a4e663b64de t/springfield/03-queries.t
+SHA1 f374ab184fa166652f06f89fa554fa4d38adb757 t/springfield/04-tx.t
+SHA1 4b29eb0db1aa3bd01afc55a5a0e09affb5eb16b4 t/springfield/05-unload.t
+SHA1 06251c98d5f84453f21664a9828085d7525c5336 t/springfield/06-reload.t
+SHA1 d3c7a04706b543307227bd0a0e3ea1464886fc18 t/springfield/07-weakref.t
+SHA1 eaebc42439112b15d834e87f51f05b9ba72c1f5a t/springfield/15-datetime.t
+SHA1 8072665697d4d2120ee2072bda74587f5a4d540f t/springfield/20-perldump.t
+SHA1 cd36d20bbc07e9ae47f7147e6ec79d5b39402d22 t/springfield/21-flatarray.t
+SHA1 6a652c33967f740e101b6a291425a2aee2b981ac t/springfield/22-flathash.t
+SHA1 dae9dc1f8518a16a2387c5af05898ccf413796fe t/springfield/30-ref.t
+SHA1 d4eda4724a0defaa52ca5768a23c43b4c6c4d6bc t/springfield/31-set.t
+SHA1 568a6c56729cabcbfb5aa683f9514e7ffebe22c2 t/springfield/32-iset.t
+SHA1 f34ff476bd819ee57e76e3cc4e1275d101ba527d t/springfield/33-array.t
+SHA1 46b2ce633441b3639a857255d2d397edd0398210 t/springfield/34-iarray.t
+SHA1 19051bb721eff9c661e3433a05667f7ed12cf03f t/springfield/35-hash.t
+SHA1 b1cc7eb4216a1480b9fd0d50f672341d4d6f5a95 t/springfield/36-ihash.t
+SHA1 dc101cbb496cc3795f0354e8ba1671134ce17aca t/springfield/37-prefetch.t
+SHA1 c2d92efa6e1194716751b6df5e4f38b9bceee332 t/springfield/38-stateless.t
+SHA1 c7cf5ab9694bfd116c4a2128848abc3ce9ad2a2f t/springfield/39-save.t
+SHA1 befd05c5cd68949f1a4efb0d359b74a4323a4039 t/springfield/40-dump.t
+SHA1 fa74e33b66c46a81371acf11017005a69203a28d t/springfield/41-storable.t
+SHA1 408726ad0122276340a332040da48940aae34bd8 t/springfield/42-idbif.t
+SHA1 a3d21d3ffbaa3859b0a66d557a3b7216844d4803 t/springfield/70-mysql.t
+SHA1 2c6d3b2e92eb3fbfd5b590d59774da689b764769 t/springfield/80-mi.t
+SHA1 888f3af8c939a45686b5bd902a580cc7d7fdb860 t/springfield/81-poly.t
+SHA1 d930184c7062830b01e78cb01750e84ae47a392b t/springfield/82-aggregate.t
+SHA1 2d5b711cc1e658a1f4a9ca6fb9361909522862c8 t/springfield/Springfield.pm
+SHA1 567db7cfa29d4a8b2c482116de47e088a590ccdc t/springfield/zz-retreat.t
+SHA1 ed20aae040f7bccab88e955045da0d126748aa27 t/test_manifest
+SHA1 7c8c625e17463a4eedc3f61f44adafa84e572d45 t/timeseries/00-schema.t
+SHA1 2a4cccb6ae6c032bdadacc2b0c0f65390332fafe t/timeseries/Prerequisites.pm
+SHA1 929bb10672e6ba99f5188ecf6a5738fa5320e912 t/timeseries/TimeSeries.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 tangram.db
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBCgAGBQJWF97pAAoJEBdtaL3wGtIomDYIAMT7iYQx+ORzXxpmHrKdvxPh
+EA0z/nBemFaHcI4pqhG0Vu7bqEiyQoJVHEqOS5H8jgUj1w2/SIzrwjPPlJFd/NRp
+zV5OF1VJrHaDYd7kvftwvDPmRMVQZfX5+0tO5cZIsbs8pWNR1YAFqFTgUWHKdo8+
+Ni1IBQuh9aUW1nSTs94PnwCwEWex2ZshvfDj3l2SVGqSuESXNiEPGU4tswr0k6Vy
+5kRiIwFNbZj8FLcaPX+6nCAErNNxzhwWLNAdCyYhY3b3yLLU8fwTJHG7PogyuXc6
+NnJ9ImE/+nQZAWQN4n+2DXklqoYsnzPe68rIPaAXlPbz4krNokHJHzYzsluELUI=
+=7BJs
+-----END PGP SIGNATURE-----

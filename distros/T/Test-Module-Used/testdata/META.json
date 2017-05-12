@@ -1,0 +1,47 @@
+{
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ]
+    },
+    "generated_by" : "Module::Build version 0.36",
+    "meta-spec" : {
+        "version" : "2",
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+    },
+    "version" : "0.01",
+    "name" : "Some-Module",
+    "dynamic_config" : 1,
+    "author" : [
+        "Someone"
+    ],
+    "release_status" : "stable",
+    "license" : [
+        "perl_5"
+    ],
+    "description" : "testdata",
+    "keywords" : [
+        "cpan"
+    ],
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "Module::Used" : "0",
+                "PPI::Document" : "0"
+            }
+        },
+        "build" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "6.42",
+                "Test::More" : "0"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "Test::More" : "0.88",
+                "Test::Requires" : "1.2"
+            }
+        }
+    },
+    "abstract" : "test data"
+}

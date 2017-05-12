@@ -1,0 +1,22 @@
+---
+abstract: 'Test mock module for MongoDB class.'
+author:
+  - 'cono <cono@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132510'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Mock-MongoDB
+requires:
+  MongoDB: v0.704.4.0
+  Test::Mock::Signature: 0.02
+resources:
+  bugtracker: https://github.com/cono/p5-test-mock-mongodb/issues
+  homepage: https://github.com/cono/p5-test-mock-mongodb
+  repository: https://github.com/cono/p5-test-mock-mongodb.git
+version: 0.01

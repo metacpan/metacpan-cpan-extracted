@@ -1,0 +1,16 @@
+app/app.pl
+app/lib/DB/Tutorial/DBIx/Class/PT/BR.pm
+app/lib/DB/Tutorial/DBIx/Class/PT/BR/Result/Amigo.pm
+app/lib/DB/Tutorial/DBIx/Class/PT/BR/Result/Filho.pm
+app/lib/DB/Tutorial/DBIx/Class/PT/BR/Result/Namorada.pm
+app/lib/DB/Tutorial/DBIx/Class/PT/BR/Result/Pai.pm
+Changes
+lib/Tutorial/DBIx/Class/Perl/ORM/Conexao/Com/Banco/de/Dados/PT/BR.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

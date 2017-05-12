@@ -1,0 +1,17 @@
+Revision history for Perl extension Test-Clear
+
+0.04 2015-07-02T07:31:17Z
+    - fix version 'Test::Simple'
+
+0.03 2014-11-27T10:33:49Z
+    - add filename and line into description
+    - replace fail to pass
+
+0.02 2014-10-23T13:16:47Z
+
+    - add args (todo_scope)
+
+0.01 2014-10-22T06:52:33Z
+
+    - original version
+

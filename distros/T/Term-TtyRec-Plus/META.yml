@@ -1,0 +1,29 @@
+---
+abstract: 'read a ttyrec'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-TtyRec-Plus
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  IO::Uncompress::Bunzip2: 0
+resources:
+  homepage: http://github.com/sartak/Term-TtyRec-Plus/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/sartak/Term-TtyRec-Plus.git
+    web: http://github.com/sartak/Term-TtyRec-Plus/tree
+version: 0.09

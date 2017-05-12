@@ -1,0 +1,43 @@
+Tree::RedBlack version 0.4
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the Artistic License, a copy of which can be
+    found with perl.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Artistic License for more details.
+------------------------------------------------------------------------
+
+       *** This is beta software -- use at your own risk ***
+
+Introduction
+------------
+
+Tree::RedBlack is a pure perl implementation of the Red/Black balanced tree
+algorithm from the book "Algorithms" by Cormen, Leiserson & Rivest.  It
+supports insertion, searching, finding minima, maxima, predecessors and
+successors, and deletion (deletion definitely has bugs right now).  Each node
+in the tree consists of a key and a value.  Both can be any Perl scalar, even a
+complex structure.  By default, keys in the tree are ordered lexically, but the
+ordering can be overriden by providing the tree with a comparison subroutine.
+
+Installation
+------------
+
+Installation follows the normal module installation procedure:
+
+1. Uncompress and untar the distribution
+2. In the root of the distribution, execute
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+(sorry, no test suite yet)
+
+Feedback
+--------
+
+Please report any bugs or feature requests to Benjamin Holzman at
+<bholzman@earthlink.net>

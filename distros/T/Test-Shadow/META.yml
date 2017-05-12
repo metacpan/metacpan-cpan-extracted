@@ -1,0 +1,29 @@
+---
+abstract: "override a class's methods in a scope, checking input/output"
+author:
+  - 'and LICENSE'
+  - osfameron
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Fatal: 0
+  Test::Tester: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Shadow
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Test::Deep: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.0201'

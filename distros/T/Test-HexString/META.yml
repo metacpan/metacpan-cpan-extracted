@@ -1,0 +1,23 @@
+---
+abstract: 'test binary strings with hex dump diagnostics'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Builder::Tester: 0
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-HexString
+provides:
+  Test::HexString:
+    file: lib/Test/HexString.pm
+    version: 0.03
+requires:
+  Test::Builder: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

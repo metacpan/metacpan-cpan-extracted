@@ -1,0 +1,13 @@
+Revision history for Test-Syntax-Aggregate
+
+0.03 Mon Jul 25 2011 Pavel Shaydo <zwon@cpan.org>
+    * add hide_warnings parameter
+    * fix dependencies
+
+0.02 Thu Jul 21 2011 Pavel Shaydo <zwon@cpan.org>
+    * Change to script directory before compiling
+    * Don't execute END blocks of checked scripts
+
+0.01 Wed Jul 20 2011 Pavel Shaydo <zwon@cpan.org>
+    * First version, released on an unsuspecting world.
+

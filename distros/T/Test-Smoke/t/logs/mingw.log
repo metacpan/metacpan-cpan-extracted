@@ -1,0 +1,78 @@
+win32io.c: In function `PerlIOWin32_tell':
+win32io.c:280: warning: left shift count >= width of type
+ar: creating ..\..\lib\auto\Win32CORE\Win32CORE.a
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0xd):Win32CORE.c: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x18):Win32CORE.c: undefined reference to `_imp__PL_stack_sp'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x27):Win32CORE.c: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x6b):Win32CORE.c: undefined reference to `_imp__PL_stack_sp'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x72):Win32CORE.c: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x7e):Win32CORE.c: undefined reference to `_imp__PL_markstack_max'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x87):Win32CORE.c: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x97):Win32CORE.c: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0xa5):Win32CORE.c: undefined reference to `_imp__PL_op'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x249):Win32CORE.c: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4b0):Win32CORE.c: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4b7):Win32CORE.c: undefined reference to `_imp__PL_sv_yes'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4bf):Win32CORE.c: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4c9):Win32CORE.c: undefined reference to `_imp__PL_stack_sp'
+collect2: ld returned 1 exit status
+dmake:  Error code 129, while making '..\perl59.dll'
+win32io.c: In function `PerlIOWin32_tell':
+win32io.c:280: warning: left shift count >= width of type
+ar: creating ..\..\lib\auto\Win32CORE\Win32CORE.a
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0xd): In function `forward':
+C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:17: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x18):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:17: undefined reference to `_imp__PL_stack_sp'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x27):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:17: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x6b):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:19: undefined reference to `_imp__PL_stack_sp'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x72):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:20: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x7e):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:20: undefined reference to `_imp__PL_markstack_max'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x87):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:20: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x97):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:20: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0xa5):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:21: undefined reference to `_imp__PL_op'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x249): In function `boot_Win32CORE':
+C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:55: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4b0):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:81: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4b7):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:81: undefined reference to `_imp__PL_sv_yes'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4bf):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:81: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4c9):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:81: undefined reference to `_imp__PL_stack_sp'
+collect2: ld returned 1 exit status
+win32io.c: In function `PerlIOWin32_tell':
+win32io.c:280: warning: left shift count >= width of type
+ar: creating ..\..\lib\auto\Win32CORE\Win32CORE.a
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0xd):Win32CORE.c: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x18):Win32CORE.c: undefined reference to `_imp__PL_stack_sp'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x27):Win32CORE.c: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x6b):Win32CORE.c: undefined reference to `_imp__PL_stack_sp'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x72):Win32CORE.c: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x7e):Win32CORE.c: undefined reference to `_imp__PL_markstack_max'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x87):Win32CORE.c: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x97):Win32CORE.c: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0xa5):Win32CORE.c: undefined reference to `_imp__PL_op'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x249):Win32CORE.c: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4b0):Win32CORE.c: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4b7):Win32CORE.c: undefined reference to `_imp__PL_sv_yes'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4bf):Win32CORE.c: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4c9):Win32CORE.c: undefined reference to `_imp__PL_stack_sp'
+collect2: ld returned 1 exit status
+dmake:  Error code 129, while making '..\perl59.dll'
+win32io.c: In function `PerlIOWin32_tell':
+win32io.c:280: warning: left shift count >= width of type
+ar: creating ..\..\lib\auto\Win32CORE\Win32CORE.a
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0xd): In function `forward':
+C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:17: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x18):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:17: undefined reference to `_imp__PL_stack_sp'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x27):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:17: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x6b):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:19: undefined reference to `_imp__PL_stack_sp'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x72):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:20: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x7e):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:20: undefined reference to `_imp__PL_markstack_max'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x87):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:20: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x97):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:20: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0xa5):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:21: undefined reference to `_imp__PL_op'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x249): In function `boot_Win32CORE':
+C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:55: undefined reference to `_imp__PL_markstack_ptr'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4b0):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:81: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4b7):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:81: undefined reference to `_imp__PL_sv_yes'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4bf):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:81: undefined reference to `_imp__PL_stack_base'
+..\lib\auto\Win32CORE\Win32CORE.a(Win32CORE.o)(.text+0x4c9):C:/Smokes/GCC/ts/bleadperl/ext/Win32CORE/Win32CORE.c:81: undefined reference to `_imp__PL_stack_sp'
+collect2: ld returned 1 exit status

@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b378c0c49d4a5a20b1213a7638ed4eb80bc0df11 Build.PL
+SHA1 fb543ea116a7f671aaa7e00d289f76f934263a78 Changes
+SHA1 141a000498ebc972fe094b4debe1c616b4ece0b0 LICENSE
+SHA1 62c2f05fb1b4e37b1c22722508f162f2579f111d MANIFEST
+SHA1 15b99b2596c5d484d751416e062932cf5e7fe555 MANIFEST.SKIP
+SHA1 0418bb6d84eed9dd179d25a569b166c653e3f45b META.json
+SHA1 a8edabedc0fcc7f2129aef485a38f624d4ca9c40 META.yml
+SHA1 693d30fcf5c73638cdfe0d7ef2218e1041103a58 Makefile.PL
+SHA1 95cd3cc050d51b63eec64f7b6ff904d4bad599e7 README
+SHA1 6d694b76b79152c31a1d2a7cf2a251caf6d98748 cpanfile
+SHA1 9e0df834d6d9d50008ee15bd4188c76dc147a2e1 dist.ini
+SHA1 5fb57bd5e3724f1f22b0ea42be045abf7697781a lib/Tree/BK.pm
+SHA1 c2deb84acf08f3f34db14d2cdda46751b25a7d8a t/00-compile.t
+SHA1 eea6c6adfbd326ea21cc8041a5e50f1bdf8eac93 t/000-report-versions-tiny.t
+SHA1 1053e63e0402fc06be834c7717d8f72a9f3638b1 t/01-BK.t
+SHA1 fd6f73b19c082d7405817f174c1961924788b1be t/perlcriticrc
+SHA1 87c20599f72654c18d829bac76d2dcaecb90127d xt/author/critic.t
+SHA1 40d0b7728958f6349caf8ec62fdd795b18f4a534 xt/release/cpan-changes.t
+SHA1 7212d6dba9ba36069c4b870ea3d4f4ca9d9d8976 xt/release/dist-manifest.t
+SHA1 a49fb4cb3867ec2d2b27d1ccb817abbc79d56529 xt/release/distmeta.t
+SHA1 3905457f2f0cde387d2200d19ad5cfddae6ee453 xt/release/kwalitee.t
+SHA1 ea149c81720456464863a99276128dacfddd7459 xt/release/meta-json.t
+SHA1 14748c9e0dba2c54c1a5ede3ba895e68099836ca xt/release/minimum-version.t
+SHA1 07baa1e6938bfb752d6e34affabc1272b21a711c xt/release/mojibake.t
+SHA1 e8028fe39e3b87012346a2de43903413292948e7 xt/release/pod-coverage.t
+SHA1 fe914d9365cd91890db02694322269dbba2dc00f xt/release/pod-linkcheck.t
+SHA1 4d160faffb11f0673882e1de95ef80a1edb16e85 xt/release/pod-syntax.t
+SHA1 b91b08889b989c80c035c8d937f9f9a22eb3c5ae xt/release/portability.t
+SHA1 8e105c8d55f1bc1d746aa66c89a5735fb6f4efcf xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (MingW32)
+
+iQEcBAEBAgAGBQJUOOqIAAoJELgSRexW6zi9HX8H/1cDm8S2QSTbKugipdzWu/0f
+n+oUqc2+1altEJJOvXuJng585jGA26cOxRllnturDpd2lJUxS+cgUPYhE9cd3bu3
+VPKH3XoG3YftToYy3/4vYLpfK/yBdstdqlT8s2slKLk7iSHLat/a/8udHtvpeO6r
+r+hez4VULp0SkjFSI4t9qM2q13ar53owihAD3otpYdYqlw9G7bRe4MT8vuJxCX5n
+FBgNnViw1Uo8D9+E01mV8Q0SlG5kXEYBsc8blVv96MscaAsc2v6I6O+Ua7fskChI
+iQC+ici1oiHqGQqPzn+i2YYIsob8BOaiWUPlbbpqSD+GCNlHAtH3cLbvk/HDxnM=
+=2m7j
+-----END PGP SIGNATURE-----

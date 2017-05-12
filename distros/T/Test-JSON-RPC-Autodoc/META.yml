@@ -1,0 +1,56 @@
+---
+abstract: 'Testing tools for auto generating documents of JSON-RPC applications'
+author:
+  - 'Yusuke Wada <yusuke@kamawada.com>'
+build_requires:
+  Test::Fatal: '0.013'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-JSON-RPC-Autodoc
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::JSON::RPC::Autodoc:
+    file: lib/Test/JSON/RPC/Autodoc.pm
+    version: '0.15'
+  Test::JSON::RPC::Autodoc::Request:
+    file: lib/Test/JSON/RPC/Autodoc/Request.pm
+  Test::JSON::RPC::Autodoc::Response:
+    file: lib/Test/JSON/RPC/Autodoc/Response.pm
+  Test::JSON::RPC::Autodoc::Validator:
+    file: lib/Test/JSON/RPC/Autodoc/Validator.pm
+requires:
+  Clone: '0'
+  Data::Recursive::Encode: '0'
+  Data::Validator: '0'
+  File::ShareDir: '0'
+  HTTP::Message: '0'
+  JSON: '0'
+  Path::Tiny: '0'
+  Plack: '1.0033'
+  Test::Simple: '0'
+  Text::Xslate: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/yusukebe/Test-JSON-RPC-Autodoc/issues
+  homepage: https://github.com/yusukebe/Test-JSON-RPC-Autodoc
+  repository: git://github.com/yusukebe/Test-JSON-RPC-Autodoc.git
+version: '0.15'
+x_authority: cpan:YUSUKEBE
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

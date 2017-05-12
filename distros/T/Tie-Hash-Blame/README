@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Tie-Hash-Blame,
+version 0.01:
+
+  A hash that remembers where its keys were set
+
+This software is copyright (c) 2012 by Rob Hoelz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

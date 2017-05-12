@@ -1,0 +1,160 @@
+=head1 NAME
+
+Test::LectroTest::Tutorial - How to use LectroTest to test your software
+
+=head1 VERSION
+
+version 0.5001
+
+=head1 SYNOPSIS
+
+LectroTest is an automated, specification-based testing system.  To
+use it, declare properties that specify the expected behavior of your
+software.  Then invoke LectroTest to test whether those properties
+hold.
+
+LectroTest does this by running repeated random trials against your
+software.  If LectroTest finds that a property doesn't hold, it emits
+the counterexample that "broke" your software.  You can then plug the
+counterexample into your software to debug the problem.  (It's also a
+good idea to add the counterexample to your list of regression tests.)
+
+=head1 OVERVIEW
+
+Think of your software's behavior as a haystack that you're searching
+for needles.  Each error is a needle.  You want to find the needles
+and remove of them.  LectroTest will search the haystack for you --
+it's nice that way -- but first you must tell it about the shape of
+the haystack and how to recognize a needle when it sees one.
+
+=head2 The Haystack
+
+The shape of the haystack is defined by a set of "generator bindings,"
+in which variables are bound to the output of value generators:
+
+  x <- Int, c <- Char( charset=>"A-Z" )
+
+The above can be read, "For all integers I<x> and all characters I<c>
+in the range A through Z."  The idea is that each unique instance
+of the pair (I<x, c>) specifies a point in the haystack that
+we can search for needles.
+
+=head2 The Needle Recognizer
+
+The "needle recognizer" is defined by a snippet of code that uses the
+bound variables to inspect a given point in the haystack.  It returns
+a "thumbs up" (true) if the point is free of needles or a "thumbs
+down" (false) if it finds a needle:
+
+  the_thing_we_are_testing($x, $c) >= 0;
+
+The above asserts for each point in the haystack that the output
+of the function C<the_thing_we_are_testing> must be non-negative.
+
+=head2 Put them together to make a Property
+
+The generator bindings and needle recognizer are combined to make a
+property:
+
+  Property {
+    ##[ x <- Int, c <- Char( charset=>"A-Z" ) ]##
+    the_thing_we_are_testing($x, $c) >= 0;
+  }, name => "the_thing_we_are_testing(...) is non-negative";
+
+You'll note that we also added a meaningful name.  Although not
+strictly required, it's an excellent practice that makes life easier.
+(You'll also note that we placed the generator bindings inside of the
+magic delimiters C<##[ ]##>.  This tells Perl that our bindings are
+bindings and not regular Perl code.)
+
+We can read the above property like so: "For all integers I<x> and all
+characters I<c> in the range A through Z, we assert that
+C<the_thing_we_are_testing> is non-negative."
+
+=head2 Testing whether your Properties hold
+
+After you define properties for your software, just add them to
+a small Perl program that uses the Test::LectroTest module:
+
+  # MyProperties.l.t
+
+  use MyModule;  # provides the_thing_we_are_testing
+  use Test::LectroTest;
+
+  Property {
+    ##[ x <- Int, c <- Char( charset=>"A-Z" ) ]##
+    the_thing_we_are_testing($x, $c) >= 0;
+  }, name => "the_thing_we_are_testing(...) is non-negative";
+
+Then you can test your properties simply by running the program:
+
+  $ perl MyProperties.l.t
+
+If your properties check out, you'll see something like this:
+
+  1..1
+  ok 1 - 'the_thing_we_are_testing(...) is non-negative' (1000 attempts)
+
+If something goes wrong, however, LectroTest will tell you where
+it happened:
+
+  1..1
+  not ok 1 - 'the_thing_we_are_testing(...) is non-negative' \
+    falsified in 23 attempts
+  # Counterexample:
+  # $x = 4
+  # $c = "R"
+
+What this says is that at the point (I<x>=4, I<c>="R") in the
+haystack, there is a needle (i.e., your property doesn't hold).
+With this information, you can examine your code to determine
+the cause of the error.
+
+=head1 LET'S DO IT!
+
+Now that we have big-picture understanding of "LectroTesting," let's
+try a few examples together.
+
+[TODO: write the step-by-step tutorial examples.  For now,
+take a look at the slides from my LectroTest talk for two
+such examples.  The slides are available at the
+L<LectroTest Home|/"LECTROTEST HOME">.]
+
+
+=head1 SEE ALSO
+
+L<Test::LectroTest> gives a quick overview of automatic,
+specification-based testing with LectroTest.
+
+L<Test::LectroTest::Property> explains in detail what
+you can put inside of your property specifications.
+
+L<Test::LectroTest::Generator> describes the many generators
+and generator combinators that you can use to define the
+shapes of the haystacks you encounter during your testing
+adventures.
+
+L<Test::LectroTest::TestRunner> describes the objects that check your
+properties and tells you how to turn their control knobs.  You'll want
+to look here if you're interested in customizing the testing
+procedure.
+
+
+=head1 AUTHOR
+
+Tom Moertel (tom@moertel.com)
+
+=head1 INSPIRATION
+
+The LectroTest project was inspired by Haskell's
+QuickCheck module by Koen Claessen and John Hughes:
+http://www.cs.chalmers.se/~rjmh/QuickCheck/.
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2004-13 by Thomas G Moertel.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

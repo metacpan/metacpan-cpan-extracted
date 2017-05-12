@@ -1,0 +1,18 @@
+Revision history for Perl extension Template::Alloy::XS.
+
+1.004
+      2014/04/04
+        - Changes to support newer versions of Template::Alloy
+
+1.003
+      2007/12/10
+        - Allow for STREAM configuration.
+
+1.002
+      2007/06/08
+        - Fix initial release blues.
+
+1.001
+      2007/06/07
+        - Rerelease or CGI::Ex::Template::XS after move
+          of CGI::Ex::Template to Template::Alloy

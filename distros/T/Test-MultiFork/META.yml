@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-MultiFork
+version:      0.6
+version_from: MultiFork.pm
+installdirs:  site
+requires:
+    Event:                         0
+    Filter::Util::Call:            0
+    IO::Event:                     0.504
+    IO::Handle:                    0
+    Storable:                      0
+    Time::HiRes:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

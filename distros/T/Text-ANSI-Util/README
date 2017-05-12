@@ -1,0 +1,290 @@
+SYNOPSIS
+
+     use Text::ANSI::Util qw(
+                           ta_add_color_resets
+                           ta_detect
+                           ta_extract_codes
+                           ta_highlight
+                           ta_highlight_all
+                           ta_length
+                           ta_length_height
+                           ta_pad
+                           ta_split_codes
+                           ta_split_codes_single
+                           ta_strip
+                           ta_substr
+                           ta_trunc
+                           ta_wrap
+                          );
+    
+     # detect whether text has ANSI color codes?
+     say ta_detect("red");       # => false
+     say ta_detect("\e[31mred"); # => true
+    
+     # calculate length of text (excluding the ANSI color codes)
+     say ta_length("red");       # => 3
+     say ta_length("\e[31mred"); # => 3
+    
+     # strip ANSI color codes
+     say ta_strip("\e[31mred"); # => "red"
+    
+     # split codes (ANSI color codes are always on the even positions)
+     my @parts = ta_split_codes("\e[31mred"); # => ("", "\e[31m", "red")
+    
+     # wrap text to a certain column width, handle ANSI color codes
+     say ta_wrap("....", 40);
+    
+     # pad (left, right, center) text to a certain width
+     say ta_pad("foo", 10);                          # => "foo       "
+     say ta_pad("foo", 10, "left");                  # => "       foo"
+     say ta_pad("foo\nbarbaz\n", 10, "center", "."); # => "...foo....\n..barbaz..\n"
+    
+     # truncate text to a certain width while still passing ANSI color codes
+     use Term::ANSIColor;
+     my $text = color("red")."red text".color("reset"); # => "\e[31mred text\e[0m"
+     say ta_trunc($text, 5);                            # => "\e[31mred t\e[0m"
+    
+     # highlight the first occurence of some string within text
+     say ta_highlight("some text", "ome", "\e[7m\e[31m");
+    
+     # ditto, but highlight all occurrences
+     say ta_highlight_all(...);
+    
+     # get substring
+     my $substr = ta_substr("...", $pos, $len);
+    
+     # return text but with substring replaced with replacement
+     say ta_substr("...", $pos, $len, $replacement);
+
+DESCRIPTION
+
+    This module provides routines for dealing with text that contains ANSI
+    color codes, e.g. for determining its length/width (excluding the color
+    codes), stripping the color codes, extracting the color codes, and so
+    on.
+
+    For functions that support wide characters, see Text::ANSI::WideUtil.
+
+    Current caveats:
+
+      * Other ANSI codes (non-color codes) are ignored
+
+      These are codes like for altering cursor positions, etc.
+
+      * Single-character CSI (control sequence introducer) currently
+      ignored
+
+      Only ESC+[ (two-character CSI) is currently parsed.
+
+      BTW, in ASCII terminals, single-character CSI is 0x9b. In UTF-8
+      terminals, it is 0xc2, 0x9b (2 bytes).
+
+      * Private-mode- and trailing-intermediate character currently not
+      parsed
+
+      * Only color reset code \e[0m is recognized
+
+      For simplicity, currently multiple SGR parameters inside a single
+      ANSI color code is not parsed. This means that color reset code like
+      \e[1;0m or \e[31;47;0m is not recognized, only \e[0m is. I believe
+      this should not be a problem with most real-world text out there.
+
+FUNCTIONS
+
+ ta_add_color_resets(@text) => LIST
+
+    Make sure that a color reset command (add \e[0m) to the end of each
+    element and a replay of all the color codes from the previous element,
+    from the last color reset) to the start of the next element, and so on.
+    Return the new list.
+
+    This makes each element safe to be combined with other array of text
+    into a single line, e.g. in a multicolumn/tabular layout. An example:
+
+    Without color resets:
+
+     my @col1 = split /\n/, "\e[31mred\nmerah\e[0m";
+     my @col2 = split /\n/, "\e[32mgreen\e[1m\nhijau tebal\e[0m";
+    
+     printf "%s | %s\n", $col1[0], $col2[0];
+     printf "%s | %s\n", $col1[1], $col2[1];
+
+    the printed output:
+
+     \e[31mred | \e[32mgreen
+     merah\e[0m | \e[1mhijau tebal\e[0m
+
+    The merah text on the second line will become green because of the
+    effect of the last color command printed (\e[32m). However, with
+    ta_add_color_resets():
+
+     my @col1 = ta_add_color_resets(split /\n/, "\e[31mred\nmerah\e[0m");
+     my @col2 = ta_add_color_resets(split /\n/, "\e[32mgreen\e[1m\nhijau tebal\e[0m");
+    
+     printf "%s | %s\n", $col1[0], $col2[0];
+     printf "%s | %s\n", $col1[1], $col2[1];
+
+    the printed output (<...>) marks the code added by
+    ta_add_color_resets():
+
+     \e[31mred<\e[0m> | \e[32mgreen\e[1m<\e[0m>
+     <\e[31m>merah\e[0m | <\e[32m\e[1m>hijau tebal\e[0m
+
+    All the cells are printed with the intended colors.
+
+ ta_detect($text) => BOOL
+
+    Return true if $text contains ANSI color codes, false otherwise.
+
+ ta_extract_codes($text) => STR
+
+    This is the opposite of ta_strip(), return only the ANSI codes in
+    $text.
+
+ ta_highlight($text, $needle, $color) => STR
+
+    Highlight the first occurence of $needle in $text with <$color>, taking
+    care not to mess up existing colors.
+
+    $needle can be a string or a Regexp object.
+
+    Implementation note: to not mess up colors, we save up all color codes
+    from the last reset (\e[0m) before inserting the highlight color +
+    highlight text. Then we issue \e[0m and the saved up color code to
+    return back to the color state before the highlight is inserted. This
+    is the same technique as described in ta_add_color_resets().
+
+ ta_highlight_all($text, $needle, $color) => STR
+
+    Like ta_highlight(), but highlight all occurences instead of only the
+    first.
+
+ ta_length($text) => INT
+
+    Count the number of characters in $text, while ignoring ANSI color
+    codes. Equivalent to length(ta_strip($text)). See also: ta_mbswidth()
+    in Text::ANSI::WideUtil.
+
+ ta_length_height($text) => [INT, INT]
+
+    Like ta_length(), but also gives height (number of lines). For example,
+    ta_length_height("foobar\nb\n") gives [6, 3].
+
+    See also: ta_mbswidth_height() in Text::ANSI::WideUtil.
+
+ ta_pad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
+
+    Return $text padded with $padchar to $width columns. $which is either
+    "r" or "right" for padding on the right (the default if not specified),
+    "l" or "left" for padding on the right, or "c" or "center" or "centre"
+    for left+right padding to center the text.
+
+    $padchar is whitespace if not specified. It should be string having the
+    width of 1 column.
+
+    Does *not* handle multiline text; you can split text by /\r?\n/
+    yourself.
+
+    See also: ta_mbpad() in Text::ANSI::WideUtil.
+
+ ta_split_codes($text) => LIST
+
+    Split $text to a list containing alternating ANSI color codes and text.
+    ANSI color codes are always on the second element, fourth, and so on.
+    Example:
+
+     ta_split_codes("");              # => ()
+     ta_split_codes("a");             # => ("a")
+     ta_split_codes("a\e[31m");       # => ("a", "\e[31m")
+     ta_split_codes("\e[31ma");       # => ("", "\e[31m", "a")
+     ta_split_codes("\e[31ma\e[0m");  # => ("", "\e[31m", "a", "\e[0m")
+     ta_split_codes("\e[31ma\e[0mb"); # => ("", "\e[31m", "a", "\e[0m", "b")
+     ta_split_codes("\e[31m\e[0mb");  # => ("", "\e[31m\e[0m", "b")
+
+    so you can do something like:
+
+     my @parts = ta_split_codes($text);
+     while (my ($text, $ansicode) = splice(@parts, 0, 2)) {
+         ...
+     }
+
+ ta_split_codes_single($text) => LIST
+
+    Like ta_split_codes() but each ANSI color code is split separately,
+    instead of grouped together. This routine is currently used internally
+    e.g. for ta_wrap() and ta_highlight() to trace color reset/replay
+    codes.
+
+ ta_strip($text) => STR
+
+    Strip ANSI color codes from $text, returning the stripped text.
+
+ ta_substr($text, $pos, $len[ , $replacement ]) => STR
+
+    A bit like Perl's substr(). If $replacement is not specified, will
+    return the substring. If $replacement is specified, will return $text
+    with the substring replaced by $replacement.
+
+    See also: ta_mbsubstr() in Text::ANSI::WideUtil.
+
+ ta_trunc($text, $width) => STR
+
+    Truncate $text to $width columns while still including all the ANSI
+    color codes. This ensures that truncated text still reset colors, etc.
+
+    Does *not* handle multiline text; you can split text by /\r?\n/
+    yourself.
+
+    See also: ta_mbtrunc() in Text::ANSI::WideUtil.
+
+ ta_wrap($text, $width, \%opts) => STR
+
+    Like Text::WideChar::Util's wrap() except handles ANSI color codes.
+    Perform color reset at the end of each line and a color replay at the
+    start of subsequent line so the text is safe for combining in a
+    multicolumn/tabular layout.
+
+    Options:
+
+      * flindent => STR
+
+      First line indent. See Text::WideChar::Util for more details.
+
+      * slindent => STR
+
+      First line indent. See Text::WideChar::Util for more details.
+
+      * tab_width => INT (default: 8)
+
+      First line indent. See Text::WideChar::Util for more details.
+
+      * pad => BOOL (default: 0)
+
+      If set to true, will pad each line to $width. This is convenient if
+      you need the lines padded, saves calls to ta_pad().
+
+      * return_stats => BOOL (default: 0)
+
+      If set to true, then instead of returning the wrapped string,
+      function will return [$wrapped, $stats] where $stats is a hash
+      containing some information like max_word_width, min_word_width.
+
+    Performance: ~500/s on my Core i5 1.7GHz laptop for a ~1KB of text
+    (with zero to moderate amount of color codes).
+
+    See also: ta_mbwrap() in Text::ANSI::WideUtil.
+
+FAQ
+
+ How do I highlight a string case-insensitively?
+
+    You can currently use a regex for the $needle and use the i modifier.
+    Example:
+
+     use Term::ANSIColor;
+     ta_highlight($text, qr/\b(foo)\b/i, color("bold red"));
+
+SEE ALSO
+
+    Text::ANSI::WideUtil
+

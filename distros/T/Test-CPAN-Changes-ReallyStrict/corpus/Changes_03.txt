@@ -1,0 +1,303 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+
+1.0.6 2011-04-13T13:15:49Z
+ [Dependencies]
+ - Removed Dist::Zilla::Plugin::CPANChangesTests
+ - Added Dist::Zilla::Plugin::Test::CPAN::Changes
+
+ [Features]
+ - Replace CPANChangesTests with Test::CPAN::Changes
+
+1.0.5 2011-04-03T15:21:54Z
+ [Features]
+ - Can now pass 'auto_prereqs_skip' instead of having to filter the bundle
+   and mangle things.
+ - Newly Minted Changes file is more formal and CPAN::Changes-like.
+
+ [Packaging]
+ - Now comes with utils/zuluize.pl to translate Dist::Zilla style
+   datestamps to W3CDTF while retaining accuracy.
+ - Now comes with utils/normalize.pl to run a Changes file through
+   CPAN::Changes and normalize the output.
+ - All code run through Perl::Tidy.
+
+1.0.4 2011-04-03T12:08:53Z
+ [Dependencies]
+ - Moved dependency on CompileTests plugin from 1.101800 to 1.110930 to
+   avoid rt#67183
+
+ [Features]
+ - Removed extra whitespace padding on injected release stamp lines. This
+   results in the generated file being the same as a parsed and
+   re-serialized version of the same file as per how CPAN::Changes sees it.
+
+ [Packaging]
+ - Rebuilt with rt#67183 test annoyance solved.
+
+1.0.3 2011-04-03T01:00:33Z
+ [Dependencies]
+ - Added Dist::Zilla::Plugin::CPANChangesTests
+
+ [Features]
+ - Now generate versions in W3CDTF form for compatibility with CPAN
+   Changes.
+ - Add CPANChangesTests to all generated dists.
+
+ [Packaging]
+ - Reworked Changes file to be closer to CPAN::Changes spec, as well as to
+   be more informative.
+
+1.0.2 2011-02-07T14:53:13Z
+ [Documentation]
+ - Added a rant section on the Author:: scheme.
+ - Cite other authors using the Author:: scheme.
+
+ [Packaging]
+ - Moved to being @Author::KENTNL
+
+1.0.1 2011-01-12T19:03:19Z
+ [Dependencies]
+ - Now suggests @KENTNL 1.0.0 for Devel Suggests.
+
+ [Packaging]
+ - Fix the default version to be unpadded. Its useless with padding anyway.
+
+1.000.000 2011-01-09T10:15:06Z
+ [Features]
+ - Initial version on new dists is now 0.1.0 instead of 0.01000
+
+ [Packaging]
+ - Migrate to Gentoo style version numbers.
+
+0.01023312 2011-01-01T20:01:33Z
+ [Dependencies]
+ - Use Dist::Zilla::Plugin::AutoPrereqs instead of ::AutoPrereq
+ - Add Git::NextVersion 1.102810
+ - Drop portability tests.
+ - Add ::Prereqs
+
+0.01023311 2011-01-01T19:31:37Z
+ [BugFixes]
+ - Ini generation previously produced "Prereq" instead of the now-standard
+   "Prereqs". This is now fixed.
+
+ [Dependencies]
+ - Dropped Dist::Zilla::Plugin::PortabilityTests.
+ - Added Class::Load
+
+ [Features]
+ - Ships now with minting profile 'Author::KENTNL'. New dists can be minted
+   via "dzil new -P Author::KENTNL Some::Dist::Name". This profile is
+   shipped in the ShareDir for this module name.
+ - Consuming dists can now set 'git_versions = 1' as a flag to this plugin
+   to use Git::NextVersion instead of AutoVersion::Relative.
+ - Now ship .perltidyrc files with all dists by adding an exclusion to
+   PruneCruft/GatherDir. Have to drop portability tests as a result.
+
+ [Internals]
+ - Internal Loading code replaced with Class::Load.
+
+0.01017322 2010-11-04T06:56:23Z
+ [Dependencies]
+ - Dist::Zilla::Plugin::MetaData::BuiltWith : 0.01014716 => 0.01005122
+ - Dist::Zilla::Plugin::MetaProvides : 1.11034201 => 1.12044518
+ - Dist::Zilla::Plugin::MetaProvides::Package : 1.11044404 => 1.11034304
+
+0.01017122 2010-11-02T06:00:35Z
+ [Features]
+ - Injects PluginBundle dependencies and suggestions for all modules built
+   with this as "Develop" time requirements.
+
+0.01017119 2010-11-02T03:50:49Z
+ [Internals]
+ - Use AutoPrereqs instead AutoPrereq in the Bundle.
+ - Use Prereqs instead of Prereq in the Bundle.
+
+0.01010423 2010-08-28T07:47:18Z
+ [Dependencies::Development]
+ - Boostrap::lib now required for Development.
+
+ [Features]
+ - Author::KENTNL::DistINI injects "Bootstrap::lib" instead of "=inc::lib".
+
+0.01009310 2010-08-16T18:13:54Z
+ [Dependencies]
+ - Now Depends on Dist::Zilla::Plugin::CriticTests 1.102280
+
+ [Dependencies::Build]
+ - English.pm now needed to Build/Test.
+ - File::Spec no longer needed.
+ - FindBin no longer needed.
+
+ [Packaging]
+ - Now uses Bootstrap::lib during develop time instead of bundling an inc::
+   file in every dist.
+ - inc:: now cleaned out as a result.
+ - perlcriticrc moved to perlcritic.rc as a result of using CriticTests
+   instead of our own shipped tests.
+ - Removed redundant noeol.t which existed purely as a temporary solution.
+
+0.01008321 2010-08-07T05:56:23Z
+ [Dependencies]
+ - Autoversion::Relative moves from 0.01034313 to 0.01035617 to solve Moose
+   Deprecation problems.
+
+ [Features]
+ - Author::KENTNL::DistINI generation now inserts in a default 'hash_tags='
+   for twitter.
+
+0.01007922 2010-08-03T06:25:33Z
+ [Dependencies]
+ - Adds Plugins to dependencies: AutoPrereq, ConfirmRelease, ExtraTests,
+   GatherDir, Git::Check, Git::CommitBuild, Git::Tag, License, Manifest,
+   MetaConfig, MetaJSON, MetaTests, MetaYAML, ModuleBuild, PkgVersion,
+   PodCoverageTests, PodSyntaxTests, PruneCruft, TestRelease, UploadToCPAN.
+ - Depends on AutoVersion::Relative moves from 0.01006104 to 0.01034313
+ - Depends on MetaData::BuiltWith moves from 0.01000022 to 0.01005122 for
+   its new features.
+ - Depends on MetaProvides moves from 1.11 to 1.11034201
+ - Depends on MetaProvides::Package moves from 1.11 to 1.11034304
+ - Depends on MooseX::Has::Sugar moves from 0.05 to 0.05044
+ - Depends on Test::EOL moves from 0.8 to 0.9
+
+ [Features]
+ - Uses new features in MetaData::BuiltWith to display a customised result
+   from uname
+
+0.01007006 2010-07-24T14:40:46Z
+ [Dependencies]
+ - Test::Perl::Critic no longer a mandatory dependency for testing.
+   Author/Release testing only.
+ - Dependency on Dist::Zilla::Plugin::MetaProvides moves from 1.10027518 to
+   1.11 for the new "Split" dependencies.
+ - Adds Dependency on Dist::Zilla::Plugin::MetaProvides::Package 1.11 for
+   new Split dependencies.
+ - Dependency on MooseX::Has::Sugar moves from 0.0405 to 0.05
+
+ [Features]
+ - Consumer can now specify hash tags to append to the tweeted release
+   notice via 'hash_tags'
+
+0.01006912 2010-07-23T20:56:10Z
+ [Dependencies]
+ - CompileTests plugin moves from 1.092870 to 1.101800
+ - Git plugin moves from 1.093410 to 1.102040
+
+ [Documentation]
+ - Various style and formatting fixes.
+ - A Smattering of spelling fixes.
+
+ [Internals]
+ - Now supports [ "Plugin" , "alias" ] for a plugin name to manually
+   specify the aliases name where it was previously autogenerated and
+   derived from the Plugin name itself. ( This proves to be a problem when
+   you want to use the same plugin twice ).
+
+0.01002610 2010-06-11T18:44:05Z
+ [Dependencies]
+ - Removed Repository Plugin.
+ - Added GithubMeta Plugin at version 0.08
+ - Dependency on Dist::Zilla moves from 4.101582 to 4.101612
+ - Added MetaData::BuiltWith 0.01000022
+ - Dropped "Repository" in favour of "GithubMeta"
+ - Test::EOL moves from 0.7 to 0.8
+
+ [Features]
+ - Dists will now ship with MetaData explaining What they were built with.
+ - Metadata plugins that do work with Git repos now only triggered when git
+   is enabled.
+
+0.01002504 2010-06-10T12:10:51Z
+ [Dependencies]
+ - Adds Dist::Zilla::File::FromCode, Dist::Zilla::Role::FileGatherer,
+   String::Formatter
+
+ [Features]
+ - Now ships Dist::Zilla::Plugin::Author::KENTNL::DistINI to make dist
+   minting easier. Now I can just 'dzil new Module-Name' and start hacking
+   =).
+
+0.01002419 2010-06-10T03:38:51Z
+ [Dependencies]
+ - Adds Dist::Zilla::Plugin::EOLTests 0.02
+ - Adds Test::EOL 0.7
+
+ [Dependencies::Build]
+ - Adds File::Spec
+ - Adds FindBin
+
+ [Features]
+ - Adds End of line Tests via EOLTests plugin.
+
+ [Packaging]
+ - Ships a hardcoded temporary replacement for Test::EOL while Test::EOL
+   fixes get done.
+
+0.01002321 2010-06-09T05:13:23Z
+ [Dependencies]
+ - Adds IO::Socket::SSL and Net::SSLeay 1.36. Net::Twitter does not work
+   without these, and they work when force-installed on  win32.
+
+ [Packaging]
+ - This release is also intending to test my patched version of
+   Dist::Zilla.
+
+0.01002309 2010-06-08T17:47:53Z
+ [BugFix]
+ - inc::lib hack fixed to work with Dist::Zilla 4 series.
+
+ [Dependencies]
+ - Dist::Zilla moved to 4.101582 from 2.101310
+ - Added KwaliteeTests plugin version 1.101420
+ - Added PortabilityTests 1.101420 Plugin.
+ - Added ReportVersions::Tiny 1.01 Plugin.
+ - ReademeFromPod plugin moved from 0.04 to 0.12
+ - Added Pod::Coverage::TrustPod
+ - Added Test::CPAN::Meta
+
+ [Dependencies::Build]
+ - Adds File::Temp
+ - Test::More moves to 0.88
+ - Test::Kwalitee removed as its only a release test now.
+
+ [Features]
+ - Twitter can be disabled via notwitter.
+ - Adds MetaTests to the Test cycle.
+ - Adds ReportVersions::Tiny to all distributions to give nice installtime
+   diagnostics.
+ - Adds Kwalitee and Portability release tests for QA purposes.
+
+ [Internals]
+ - Added small system for generating feature set toggles in the bundle.
+
+ [Packaging]
+ - Handwritten kwalitee.t is replaced by generated one from the
+   KwaliteeTests plugin.
+
+0.01001714 2010-06-02T22:11:42Z
+ [Documentation]
+ - Improved Bundle synopsis explaining toggle switches.
+ - Add ENV flags that also toggle things.
+
+ [Features]
+ - Can now specify that we only want to tweet a release with
+   KENTNL_TWITTER_ONLY=1 dzil release and get a dumb no-git no-cpan twitter
+   release.
+
+0.01001713 2010-06-02T21:04:31Z
+ [Packaging]
+ - Re-attempted release of 0.01001712  except with a (hopefully) working
+   .netrc so  the twitter thing Actually Works(TM).
+
+0.01001712 2010-06-02T20:54:05Z
+ [Dependencies]
+ - Added Dist::Zilla::Plugin::Twitter 0.007
+
+ [Features]
+ - Can now tweet releases if your .netrc is set up correctly.
+
+0.01000600 2010-05-22T08:33:14Z
+ - First version.
+

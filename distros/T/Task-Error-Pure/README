@@ -1,0 +1,86 @@
+NAME
+    Task::Error::Pure - Install the Error::Pure modules.
+
+SYNOPSIS
+     cpanm Task::Error::Pure
+
+SEE ALSO
+    Error::Pure
+        Perl module for structured errors.
+
+    Error::Pure::AllError
+        Error::Pure module with full backtrace.
+
+    Error::Pure::Always
+        Perl module for rewrite die by err from Error::Pure module.
+
+    Error::Pure::Die
+        Error::Pure module with classic die.
+
+    Error::Pure::Error
+        Error::Pure module with error on one line with informations.
+
+    Error::Pure::ErrorList
+        Error::Pure module with list of errors in one line with
+        informations.
+
+    Error::Pure::HTTP::AllError
+        Error::Pure module with full backtrace over HTTP.
+
+    Error::Pure::HTTP::Error
+        Error::Pure module with error on one line over HTTP.
+
+    Error::Pure::HTTP::ErrorList
+        Error::Pure module with list of errors in one line with informations
+        over HTTP.
+
+    Error::Pure::HTTP::JSON
+        Error::Pure module for JSON output over HTTP.
+
+    Error::Pure::HTTP::JSON::Advance
+        Error::Pure module for JSON output with additional parameters over
+        HTTP.
+
+    Error::Pure::HTTP::Print
+        Error::Pure module for simple error print over HTTP.
+
+    Error::Pure::JSON
+        Error::Pure module for JSON output.
+
+    Error::Pure::JSON::Advance
+        Error::Pure module for JSON output with additional parameters.
+
+    Error::Pure::NoDie
+        Error::Pure module for simple print instead die.
+
+    Error::Pure::Output::JSON
+        Output JSON subroutines for Error::Pure.
+
+    Error::Pure::Output::Text
+        Output subroutines for Error::Pure.
+
+    Error::Pure::Output::Tags::HTMLCustomPage
+        Error::Pure HTML output helper.
+
+    Error::Pure::Print
+        Error::Pure module for simple error print.
+
+    Error::Pure::PrintVar
+        Error::Pure module for simple error print with all variables.
+
+REPOSITORY
+    <https://github.com/tupinek/Task-Error-Pure>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

@@ -1,0 +1,17 @@
+MANIFEST
+cpan/Test-Harness/lib/Test/Harness.pm
+cpan/t/skip.t
+cpan/t/test.t
+dist/t/skip.t
+dist/t/test.t
+ext/t/skip.t
+ext/t/test.t
+git_version.h
+lib/t/skip.t
+lib/t/test.t
+patchlevel.h
+patchme.txt
+t/op/skip.t
+t/op/test.t
+win32/Makefile
+win32/makefile.mk

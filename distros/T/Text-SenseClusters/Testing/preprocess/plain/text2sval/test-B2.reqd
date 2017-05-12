@@ -1,0 +1,2 @@
+ERROR(text2sval.pl):
+        Number of entries in the KEY file <1000> do not match the number of instances <500> in the TEXT file.

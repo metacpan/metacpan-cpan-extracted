@@ -1,0 +1,10 @@
+=== basic
+--- wiki
+&size(10){hoge}
+--- html
+<font size="10">hoge</font>
+=== parser
+--- wiki
+&size(10){ hoge &size(3){hi} hi }
+--- html
+<font size="10">hoge <font size="3">hi</font> hi</font>

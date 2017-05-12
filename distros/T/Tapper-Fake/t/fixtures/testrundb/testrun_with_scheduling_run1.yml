@@ -1,0 +1,195 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: tapper-tools
+  data:
+    id: 1
+    shortname: Short_precondition
+    precondition: |
+      precondition_type: testprogram
+      timeout: 1
+
+- schema: Precondition
+  name: tapper-tools
+  data:
+    id: 2
+    shortname: Medium_precondition
+    precondition: |
+      precondition_type: testprogram
+      timeout: 5
+
+- schema: Precondition
+  name: tapper-tools
+  data:
+    id: 3
+    shortname: Long_precondition
+    precondition: |
+      precondition_type: testprogram
+      timeout: 25
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+    active: 1
+
+- schema: Queue
+  name: KVM Queue
+  data:
+    id: 2
+    name: KVM
+    priority: 200
+    active: 1
+
+- schema: Queue
+  name: Kernel Queue
+  data:
+    id: 3
+    name: Kernel
+    priority: 10
+    active: 1
+
+
+- schema: Queue
+  name: Kernel Queue
+  data:
+    id: 4
+    name: AdHoc
+    priority: 1000
+    active: 1
+
+
+
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 5
+    name: iring
+    free: 1
+    active: 1
+
+- schema: Host
+  name: bullock
+  data:
+    id: 6
+    name: bullock
+    free: 1
+    active: 1
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 7
+    name: dickstone
+    free: 1
+    active: 1
+
+- schema: Host
+  name: athene
+  data:
+    id: 8
+    name: athene
+    free: 1
+    active: 1
+
+- schema: Host
+  name: bascha
+  data:
+    id: 9
+    name: bascha
+    free: 1
+    active: 1
+
+# ---------------- HostFeature ------------
+
+- schema: HostFeature
+  name: dickstone_ram
+  data:
+    id: 1
+    host_id: 7
+    entry: mem
+    value: 4096
+
+- schema: HostFeature
+  name: dickstone_vendor
+  data:
+    id: 2
+    host_id: 7
+    entry: vendor
+    value: AMD
+
+- schema: HostFeature
+  name: dickstone_cores
+  data:
+    id: 3
+    host_id: 7
+    entry: cores
+    value: 2
+
+- schema: HostFeature
+  name: dickstone_ram
+  data:
+    id: 4
+    host_id: 7
+    entry: keyword
+    value: server
+
+- schema: HostFeature
+  name: iring_ram
+  data:
+    id: 5
+    host_id: 5
+    entry: mem
+    value: 8192
+
+- schema: HostFeature
+  name: iring_vendor
+  data:
+    id: 6
+    host_id: 5
+    entry: vendor
+    value: Intel
+
+- schema: HostFeature
+  name: iring_cores
+  data:
+    id: 7
+    host_id: 5
+    entry: cores
+    value: 1
+
+- schema: HostFeature
+  name: iring_ram
+  data:
+    id: 8
+    host_id: 5
+    entry: keyword
+    value: testmachine

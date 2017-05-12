@@ -1,0 +1,24 @@
+0.004 Wed, Mar 22, 2017
+
+  [FEATURES]
+
+  * Support begin/end callbacks.
+
+0.003 Thu, Jun 13, 2013
+
+  [FEATURES]
+
+  * Allow skipping all but a single test based on the description.
+
+0.002 Sat, Jan 05, 2012
+
+  [OTHER]
+
+  * Corrected licensing terms: from "restrictive" to "perl".  Forgot
+    to change licensing terms when SFR authorized liberation.
+
+0.001 Fri, Jan 04, 2012
+
+  [OTHER]
+
+  * Initial release to Bitbucket and CPAN.

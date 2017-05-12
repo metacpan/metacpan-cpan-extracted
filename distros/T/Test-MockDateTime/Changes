@@ -1,0 +1,9 @@
+Changes for Test::MockDateTime
+
+0.02    2013-10-01
+        * fixed RT#89093 by adding a reason for this distribution to exist
+          and a SEE ALSO section to allow potential users to decide which
+          module best suits their needs. Thanks, Olivier Mengué (DOLMEN)
+
+0.01    2013-09-27
+        * initial release

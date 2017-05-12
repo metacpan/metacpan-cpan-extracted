@@ -1,0 +1,43 @@
+TYPEMAP
+
+SLsmg_Term_Type	*	T_PTROBJ
+
+Scroll_Line_Type	* O_OBJECT
+SLscroll_Window_Type *	T_PTROBJ
+# SLscroll_Type *		T_PTROBJ
+
+SLang_Read_Line_Type  * T_PTROBJ
+SLang_RLine_Info_Type * T_PTROBJ
+
+int *			T_IV
+unsigned short *	T_UV
+
+######################################################################
+OUTPUT
+
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+T_OBJECT
+	sv_setref_pv( $arg, Nullch, (void*)$var );
+
+######################################################################
+INPUT
+
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+T_OBJECT
+	if( SvROK($arg) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not an SV reference\" );
+		XSRETURN_UNDEF;
+	}

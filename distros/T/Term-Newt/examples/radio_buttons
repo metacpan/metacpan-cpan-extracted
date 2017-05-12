@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w
+
+# $Id: radio_buttons,v 1.1 1998/11/09 02:29:51 daniel Exp daniel $
+
+use strict;
+use ExtUtils::testlib;
+use Term::Newt;
+
+my $n = Term::Newt->new;
+
+$n->init;
+$n->cls;
+
+$n->newtSetSuspendCallback(sub {});
+$n->open_window(10, 5, 40, 11, 'Checkboxes and Radio buttons');
+
+my $cb_value = 0;
+my $checkbox = $n->checkbox(1,1,"A checkbox", ' ', " *X",\$cb_value);
+
+my @rb = ();
+my $ref = 0;
+$rb[0] = $n->radiobutton(1, 3, "Choice 1", 1, \$ref);
+$rb[1] = $n->radiobutton(1, 4, "Choice 2", 0, $rb[0]);
+$rb[2] = $n->radiobutton(1, 5, "Choice 3", 0, $rb[1]);
+
+my $form = $n->form(\$ref,'', 0);
+my $button = $n->button(1, 7, "Ok");
+
+$n->form_add_components($form, $checkbox, $button, @rb);
+
+$n->run_form($form);
+$n->finished;
+
+for (my $i = 0; $i < 3; $i++) {
+	if ($n->radio_get_current($rb[0]) == $rb[$i]) {
+		printf "radio button picked: %d\n", $i;
+	}
+}
+
+$n->form_destroy($form);
+
+printf "checkbox value: '%c'\n", $cb_value;

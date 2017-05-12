@@ -1,0 +1,18 @@
+Build.PL
+CHANGES
+lib/Text/Indent.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_use.t
+t/02_pod.t
+t/03_pod_coverage.t
+t/04_breakpoints.t
+t/05_construct.t
+t/06_indent_level_increase.t
+t/07_indent_level_decrease.t
+t/08_indent_level_reset.t
+t/09_indent.t
+t/10_indent_level_reset.t
+t/11_accessors.t

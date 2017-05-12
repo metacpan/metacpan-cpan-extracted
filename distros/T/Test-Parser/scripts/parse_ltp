@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+# This script parses the output of an LTP run
+#
+# Usage:  parse_ltp < my_ltp.log
+
+use strict;
+use warnings;
+use Test::Parser::ltp;
+
+my $parser = new Test::Parser::ltp
+    or die "Couldn't create Test::Parser::ltp object\n";
+
+$parser->parse($ARGV[0] or \*STDIN)
+    or die "Could not parse ltp log.\n";
+
+print "Executed:  ", $parser->num_executed(), "\n";
+print "  Passed:  ", $parser->num_passed(), "\n";
+print "  Failed:  ", $parser->num_failed(), "\n";
+print " Skipped:  ", $parser->num_skipped(), "\n";
+print "\n";
+
+foreach my $test (@{$parser->testcases()}) {
+    printf("%-12s  %s\n", 
+           ($test->{'name'} || '?'), 
+           $test->{'result'} || '?'
+           );
+}

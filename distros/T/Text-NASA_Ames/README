@@ -1,0 +1,32 @@
+Text::NASA_Ames
+==================
+
+The Text::NASA_Ames module implements a reader for the NASA Ames File Formats
+as described by http://cloud1.arc.nasa.gov/solve/archiv/archive.tutorial.html
+The data is read by an iterator, so the memory-consumption is low even on
+large files. For simplicity, variable names are the same as described in the
+tutorial.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+Copyright (C) 2004 Heiko Klein
+

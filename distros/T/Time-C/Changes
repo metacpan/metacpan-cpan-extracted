@@ -1,0 +1,124 @@
+0.024     2017-04-23 15:47:34+02:00 Europe/Stockholm
+  - Fix support for Function::Parameters 2, thanks mauke!
+
+0.023     2016-11-04 09:27:14+01:00 Europe/Stockholm
+  - Add support for %E* and %O* format specifiers to Time::F and Time::P.
+  - Fix bug in argument passing to ->string/->strftime in Time::C.
+
+0.022     2016-11-02 12:52:24+01:00 Europe/Stockholm
+  - Fix bug in Time::C->mktime where it would think things that weren't defined
+    yet were if no date part was given.
+  - Fix bug in Time::C->strptime where it wouldn't do anything if the epoch was
+    already defined and the epoch wasn't parsed from the string.
+
+0.021     2016-11-02 11:54:43+01:00 Europe/Stockholm
+  - Change how strptime in Time::P works; it now returns a list of key-value
+    pairs of the data it was able to parse, suitable for passing to
+    Time::C->mktime.
+    Note: this is a ** BREAKING CHANGE ** ... but that's alright, because we're
+    only at version 0.021.
+
+0.020     2016-11-01 21:53:57+01:00 Europe/Stockholm
+  - Fix bug in Time::D when manipulating values in negative diffs.
+  - Fix synopses with small errors.
+
+0.019     2016-11-01 17:02:09+01:00 Europe/Stockholm
+  - Change ->string and ->strftime in Time::C to use Time::F instead of
+    Time::Piece.
+  - Add support for %-* format specifiers for some formats in Time::F, and
+    Time::P.
+  - Change a couple of release tests not to shell out to 'date'.
+
+0.018     2016-11-01 00:25:12+01:00 Europe/Stockholm
+  - Fix week-bugs in Time::P and Time::F.
+  - Fix AM/PM-bugs in Time::P and Time::F.
+
+0.017     2016-10-31 16:09:24+01:00 Europe/Stockholm
+  - Update Changes for 0.016.
+  - Add release check that Changes file has actually been updated.
+
+0.016     2016-10-31 15:48:18+01:00 Europe/Stockholm
+  - Add Time::F for getting formatted strings from times.
+  - Fix several (including major) bugs in strptime from Time::P.
+  - Fix a week-bug in mktime from Time::C.
+  - Release-tests for formatting and parsing.
+
+0.015     2016-10-30 21:25:53+01:00 Europe/Stockholm
+  - Fix documentation bug in Time::C's mktime function for the hour parameter.
+  - Update ->strftime accessor to conform to the changed ->string accessor.
+
+0.014     2016-10-30 21:03:34+01:00 Europe/Stockholm
+  - Fix documentation bug in Time::P's strptime function for the locale
+    parameter.
+
+0.013     2016-10-30 20:54:40+01:00 Europe/Stockholm
+  - Add Time::P, implementing our own strptime().
+  - Add ->mktime constructor in Time::C.
+  - Change ->from_string, ->strptime, ->string in Time::C to make use of
+    Time::P::strptime.
+
+0.012     2016-10-28 06:00:23+02:00 Europe/Stockholm
+  - Add ->strptime constructor in Time::C.
+  - Add ->strftime method alias for ->string in Time::C.
+  - Add ->second_of_day accessor in Time::C.
+  - When parsing a string with a format, report error.
+  - Add $override parameter to ->tz accessor in Time::C.
+  - Fix Time::R methods so they work according to docs.
+  - Expand Time::C's SEE ALSO section with notes.
+
+0.011     2016-10-27 19:04:45+02:00 Europe/Stockholm
+  - Add Time::R for handling recurrences.
+  - Make Time::C::Sentinel's sentinel() croak if no setter is given.
+  - Add ->clone method to Time::C.
+  - Add Time::R to SEE ALSO section of Time::C.
+  - Small fixup in Time::D's ->sign docs.
+
+0.010     2016-10-02 00:10:55+02:00 Europe/Stockholm
+  - Add Time::Ago to See Also section of Time::D.
+  - Change how Time::D->sign works.
+  - Fix bugs in Time::D->to_array().
+
+0.009     2016-10-01 00:46:04+02:00 Europe/Stockholm
+  - Forgot to add the changes when I released 0.008, so they're now added.
+
+0.008     2016-10-01 00:32:46+02:00 Europe/Stockholm
+  - Improve documentation in Time::D.
+  - Remove ->millisecond, ->microsecond, ->nanosecond from Time::C.
+  - Add ->diff method to Time::C to get a Time::D conveniently.
+
+0.007     2016-09-30 18:47:31+02:00 Europe/Stockholm
+  - Add Time::D for dealing with differences between two epochs.
+  - Add bool overload to Time::C as suggested by Perl::Critic::Freenode.
+  - Fix ->new() constructor when given a timezone outside of UTC/GMT.
+  - Add tests for timezones.
+  - Minor internal improvements.
+
+0.006     2016-09-27 13:24:15+02:00 Europe/Stockholm
+  - Remove ->from_epoch() constructor, as it's the same as ->gmtime().
+  - Rewrite buggy ->localtime() constructor.
+  - Rewrite buggy ->epoch() accessor.
+  - Improve documentation for ->now() constructor slightly.
+
+0.005     2016-09-26 13:49:03+02:00 Europe/Stockholm
+  - Added strict and warnings to Time::C::Sentinel.
+  - Fix bug in ->now() which would give wrong time unless your TZ was UTC.
+  - Allow accessors to be chained.
+  - Let ->now() specify an optional TZ.
+
+0.004     2016-09-25 20:01:03+02:00 Europe/Stockholm
+  - :lvalue subroutines didn't work properly in perl 5.14, so depend on 5.16.
+  - A few minor documentation fixups.
+
+0.003     2016-09-24 23:37:16+02:00 Europe/Stockholm
+  - Oops, wrong example in synopsis - fixed.
+
+0.002     2016-09-24 23:32:43+02:00 Europe/Stockholm
+  - Remade internals completely. Now should have less issues with overloads.
+  - Using Function::Parameters and therefore perl 5.14.
+  - Using Time::Zone::Olson for time zone handling.
+
+0.001     2016-09-19 06:43:18+02:00 Europe/Stockholm
+  - Added tests switched to using Sentinel, and fixed some minor issues.
+
+0.001     2016-09-19 03:32:58+02:00 Europe/Stockholm (TRIAL RELEASE)
+  - Initial version sees the light of day.

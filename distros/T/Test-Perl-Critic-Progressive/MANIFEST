@@ -1,0 +1,16 @@
+Build.PL
+Changes
+INSTALL
+lib/Test/Perl/Critic/Progressive.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00_basic.t
+t/01_api.t
+t/98_pod_syntax.t
+t/99_pod_coverage.t
+TODO
+xt/author/96_perlcritic.t
+xt/author/perlcriticrc
+README

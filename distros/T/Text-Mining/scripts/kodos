@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use Text::Mining;
+
+my $tm = Text::Mining->new();
+$tm->shell();
+
+exit;
+

@@ -1,0 +1,300 @@
+Text::Aspell - Perl interface to the Aspell library
+
+DESCRIPTION
+
+Text::Aspell is an interface to the GNU Aspell library.  GNU Aspell is a Free
+and Open Source spell checker.  The Text::Aspell module is a thin XS wrapper
+around the Aspell C Library.
+
+REQUIREMENTS
+
+Hopefully this is obvious, but you MUST have the Aspell library installed on
+your system before installing this module.  You also MUST have the en_US
+dictionary installed for "make test" to pass.
+
+For example, if you are running Debian you would have done this first:
+
+    # apt-get install aspell-en libaspell-dev
+
+which would install the aspell binary and dictionary, plus also
+the aspell library and header file which are needed to link this module against.
+
+If you installed GNU Aspell from source then you should have the the aspell.h and
+aspell library on your system.
+
+Take a look at the bug reports for Aspell:
+
+    http://cpantesters.perl.org/show/Text-Aspell.html#Text-Aspell-0.05
+
+Note how many either say:
+
+    Aspell.xs:7: aspell.h: No such file or directory
+
+or:
+
+    #     Failed test (t/05-core.t at line 33)
+    #          got: 'en_GB'
+    #     expected: 'en_US'
+    # Really need the en_US dictionary installed!
+
+Makefile.PL does not do any checking of of Aspell before building.  I would welcome
+any help updating the build process to do more checking up front.
+
+
+
+See BUILD NOTES and CURRENT ISSUES below before reporting any bugs.
+
+
+This module has been built and passed all tests on the following platforms:
+
+    perl 5.6.1 on Linux, gcc version 2.95.3 20010315 (release)
+    perl 5.8.0 on Linux gcc version 2.95.4 20011002 (Debian prerelease)
+    perl 5.00503 on FreeBSD 4.6-STABLE gcc version 2.95.4 20020320 [FreeBSD]
+
+    (these require at least aspell-0.50.1)
+    perl 5.00503 on Solaris 5.8 sparc SUNW,Ultra-60 gcc version 2.95.2 19991024 (release)
+    perl 5.00503 on Solaris 2.6, gcc version 2.95.1 19990816 (release)
+
+And on Wed Jul 27 10:36:12 PDT 2005:
+
+    perl 5.8.7, Aspell 0.60.3, gcc 3.3.6 Debian Sid
+    perl 5.8.7  Aspell 0.60.3, gcc 3.4.2 FreeBSD 5.4-STABLE i386
+
+
+And on Fri May 26 18:59:51 UTC 2006 with Text-Aspell-0.06
+
+    perl  5.8.8, Aspell 0.60.4, aspell6-en-6.0.0  Debian Sid gcc 4.0.3 (all from source)
+    perl  5.8.4, Aspell 0.60.4, aspell6-en-6.0-0, Debian GNU/Linux 3.1 gcc  3.3.5 (all from source)
+    perl  5.8.8, Aspell 0.60.4, FreeBSD 6.1-RELEASE #0, gcc 3.4.4 (Aspell from ports)
+
+
+
+
+
+Please read SUPPORT below if you have trouble building Text::Aspell.
+
+
+INSTALLATION
+
+Windows users see below.
+
+1) Install Aspell and a Dictionary
+
+    Make sure you have a current version of GNU Aspell installed.
+    You must install both the Aspell program and a dictionary.
+    They are distributed as separate packages.
+
+    (Look at all the FAILED reports on CPAN from people that don't have Aspell
+    installed!)
+
+    Aspell and the dictionary files can be downloaded from:
+
+    http://aspell.net/
+
+    Note: The Text::Aspell module's test suite ("make test") requires
+    that the English dictionary is installed.
+
+    This module has been tested with the following version of Aspell
+    and dictionary:
+
+        aspell-0.50       Aspell program (ftp://ftp.gnu.org/gnu/aspell/aspell-0.50.tar.gz)
+        aspell-en-0.50-1  English Dictionary (ftp://ftp.gnu.org/gnu/aspell/aspell-en-0.50-1.tar.bz2)
+
+    NOTE: URLs for reference only -- use the most current version of each available.
+
+    Aspell and the dictionary packages contain README files that include
+    installation instructions.  Here's a basic overview:
+
+    Aspell must be installed first, then install the dictionary file and finally
+    install the Text::Aspell module.
+
+    Aspell installation example:
+
+    $ wget ftp://ftp.gnu.org/gnu/aspell/aspell-0.50.tar.gz
+    $ tar zxof aspell-0.50.tar.gz           # or gzip -dc aspell-0.50.tar.gz | tar xof -
+    $ cd aspell-0.50
+    $ ./configure ( ./configure --help for options )
+    $ make
+    # make install
+
+    If you used a --prefix option to install Aspell in a non-standard location you
+    will need to adjust your path to include $PREFIX/bin.  The configure script
+    for the dictionary needs to find programs installed in the previous step.
+
+    Dictionary installation example:
+
+    $ wget ftp://ftp.gnu.org/gnu/aspell/aspell-en-0.50-1.tar.bz2
+    $ tar jxof aspell-en-0.50-1.tar.bz2     # or bunzip2 < aspell-en-0.50-1.tar.bz2 | tar xof -
+    $ cd aspell-en-0.50-1
+    $ ./configure
+    $ make
+    # make install
+
+    At this point you should be able to run Aspell in interactive mode.
+    For example:
+
+    $ aspell -a
+    @(#) International Ispell Version 3.1.20 (but really Aspell 0.50)
+    speler
+    & speler 30 0: speller, speer, spiller, spoiler, ...
+
+
+2) Build and install this Text::Aspell module.
+
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    # make install
+
+
+    If you installed Apsell in a non-standard location (for example, if
+    you don't have root access) then you will need to tell Makefile.PL where to
+    find the library.
+
+    For example, if Apsell was installed in $HOME/local (--prefix=$HOME/local)
+    and the perl module should be installed in the perl library $HOME/perl_lib:
+
+    $ perl Makefile.PL PREFIX=$HOME/perl_lib \
+    CCFLAGS=-I$HOME/local/include \
+    LIBS="-L$HOME/local/lib -laspell"
+
+    $ LD_RUN_PATH=$HOME/local/lib make
+    $ make test
+    $ make install
+
+
+
+WINDOWS USERS
+
+Randy Kobes has provided a PPM and the following instructions for installing
+Text::Aspell on Windows.  Thanks very much Randy.
+
+For installing on Win32, first get and install the "Full installer"
+executable at
+
+   http://aspell.net/win32/
+
+this will install Aspell into a location such as C:\Program Files\Aspell. You
+will also need to fetch and install at least one of the precompiled
+dictionaries found on the same page.
+
+Make sure that the path to the Aspell bin directory (e.g. C:\Program
+Files\Aspell\bin\) is in your PATH environment variable.  For help with
+setting your path see "set environment variables" in the Windows Help
+Utility.  You may need to reboot or open a new shell window after setting
+your path.  The Aspell .dll file must be located in the PATH before using
+Text::Aspell.
+
+Then, to install Text::Aspell, type at a DOS prompt (all on one line)
+
+   C:\> ppm install http://theoryx5.uwinnipeg.ca/ppms/Text-Aspell.ppd
+
+for an ActivePerl 8xx version, or
+
+   C:\> ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Text-Aspell.ppd
+
+for an ActivePerl 6xx version.
+
+If you wish to build Text::Aspell from source:
+
+If you want to build Text::Aspell yourself, you'll need a C compiler, which
+must be the same one that your Perl is built with (for ActivePerl, this means
+VC++ 6). Assuming you have that, in addition to the "Full installer" binary
+package at http://aspell.net/win32/, you'll also need to get and install the
+aspell-dev package (also located at http://aspell.net/win32/), which contains
+the necessary .lib and .h files needed to compile the Perl module.
+
+Like above, make sure the PATH environment variable points to the location of
+the installed Aspell .dll file before building Text::Aspell.
+
+Installation then proceeds as described for the Unix version:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+with the additional requirement of passing to 'perl Makefile.PL' the
+necessary arguments (e.g. INC and LIBS) to specify the locations of the lib
+and header files, if these were installed in a non-standard location. Make
+sure that if a non-standard location was used that this is added to your PATH
+environment variable before running the tests.
+
+
+SUPPORT
+
+Before contacting me with problems building Text::Aspell please try and debug
+as much as possible.
+
+For example, if "make test" fails, then run in verbose mode:
+
+   make test TEST_VERBOSE=1
+
+That may show at what test is failing.  It's easy to run the test
+script manually -- and you can even edit and add a few print statements to
+aid in debugging.
+
+For example:
+
+   perl -Iblib/lib -Iblib/arch t/test.t | less
+
+Use of LD_RUN_PATH, CCFLAGS and LIBS as above may also help if the build
+process fails.
+
+Remember that you *must* have the English dictionary installed for tests to
+pass (sorry, have to check against some dictionary).  Also, you may need to
+set your LANG variable to "en_US" so that the English dictionary is selected.
+
+If all else fails, use the request tracker at:
+
+  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Aspell
+
+
+BUILD NOTES / CURRENT ISSUES
+
+A number of people have reported the
+
+    $speller->store_replacement()
+
+test failing on some platforms.  I don't know why.  Search google to find out
+why I don't know why.  The code (from what I can tell) looks like it should be
+returning an error value, but fails on some platforms.  Until I can get a
+better answer I'm going to assume Aspell is broken and ignore the return value
+in t/test.t.  So don't test the return value in your code, either.
+
+Update May 2006:  Changed from checking return values to calling aspell_*_error
+method to test for errors.
+
+
+Some users of OS X have reported the test failing after calling clear_session().
+The test is suppose to see if a word added to the session is removed after calling
+clear_session().  It's another error I have not been able to reproduce on the machines
+I tested on.
+
+
+"Pax" provided these notes:
+
+    I just got Text::Aspell to build and work under OpenBSD 3.7 and thought you
+    might like a tiny suggestion: in the README, you might note that under this
+    operating system you need to add -lstdc++ to the list of libraries you link
+    against, e.g.:
+
+            $ perl Makefile.PL \
+                   PREFIX=/usr/local INSTALLDIRS=site \
+                   CCFLAGS=-I/usr/local/include \
+                   LIBS="-L/usr/local/lib -laspell -lstdc++"
+
+    If you don't do this, then any attempt to use Text::Aspell will throw
+    thousands of unresolved symbol errors trying to load your shared object.
+    This is against libaspell in /usr/local/lib installed from the aspell
+    port in the OpenBSD 3.7 ports tree, FWIW.
+
+
+A number of Solaris uses have reported the need to set:
+
+    LDFLAGS='-L/usr/local/lib -R/usr/local/lib'
+
+and also having to copy libstdc++* to /usr/lib.  YMMV.
+
+
+

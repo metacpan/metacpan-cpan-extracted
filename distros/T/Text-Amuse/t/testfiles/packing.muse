@@ -1,0 +1,48 @@
+#title packing
+
+* this title
+will merge
+
+** this title
+will merge
+
+*** this title
+will merge
+
+**** this title
+will merge
+
+***** this title
+will merge
+
+<play>
+This will not merge (of course)
+</play>
+we continue without merging (ugly but valid)
+
+<verse>
+Verse will not merge (of course)
+</verse>
+and we continue without merging (ugly but valid) [1]
+
+<example>
+nor the example
+</example>
+will not merge
+
+ the | table
+ will | merge
+       but not with a regular
+
+ - the list
+will merge
+
+   a. the list
+will merge
+
+[1] the footnote
+will merge
+
+; the comment
+will not merge
+

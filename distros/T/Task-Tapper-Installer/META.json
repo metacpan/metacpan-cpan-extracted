@@ -1,0 +1,268 @@
+{
+   "abstract" : "Tapper - dependencies for machine installer",
+   "author" : [
+      "AMD OSRC Tapper Team <tapper@amd64.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Tapper-Installer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tapper::Installer" : "0",
+            "Tapper::Remote" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Task-Tapper-Installer@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Task-Tapper-Installer"
+      },
+      "homepage" : "http://metacpan.org/release/Task-Tapper-Installer",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tapper/Task-Tapper-Installer.git",
+         "web" : "http://github.com/tapper/Task-Tapper-Installer"
+      }
+   },
+   "version" : "0.002",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.016002"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@TAPPER/GatherDir",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@TAPPER/PruneCruft",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@TAPPER/ManifestSkip",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@TAPPER/MetaYAML",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@TAPPER/Readme",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@TAPPER/ExtraTests",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@TAPPER/ExecDir",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@TAPPER/ShareDir",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@TAPPER/MakeMaker",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@TAPPER/Manifest",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@TAPPER/TestRelease",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@TAPPER/ConfirmRelease",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@TAPPER/UploadToCPAN",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@TAPPER/MetaConfig",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@TAPPER/MetaJSON",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@TAPPER/PkgVersion",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@TAPPER/PodSyntaxTests",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@TAPPER/NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@TAPPER/PodCoverageTests",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@TAPPER/MetaResources",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@TAPPER/Authority",
+            "version" : "1.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@TAPPER/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TaskWeaver",
+            "name" : "@TAPPER/TaskWeaver",
+            "version" : "0.101624"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@TAPPER/AutoPrereqs",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Describe",
+            "name" : "@TAPPER/Git::Describe",
+            "version" : "0.002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
+            "name" : "@TAPPER/CheckChangesHasContent",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@TAPPER/NextRelease",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
+            "name" : "@TAPPER/Git::CheckFor::CorrectBranch",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "name" : "@TAPPER/Git::NextVersion",
+            "version" : "2.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@TAPPER/@Git/Check",
+            "version" : "2.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@TAPPER/@Git/Commit",
+            "version" : "2.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@TAPPER/@Git/Tag",
+            "version" : "2.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "@TAPPER/@Git/Push",
+            "version" : "2.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.300028"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "4.300028"
+      }
+   },
+   "x_authority" : "cpan:TAPPER"
+}
+

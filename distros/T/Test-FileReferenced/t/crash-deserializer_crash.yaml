@@ -1,0 +1,6 @@
+---
+x:
+  y: z
+  - z
+This IS trash, that YAML::Any will not be able to load.
+Yes, purposely. It's a crash-test :)

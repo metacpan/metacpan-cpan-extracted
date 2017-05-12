@@ -1,0 +1,76 @@
+<corpus lang="english">
+<lexelt item="LEXELT">
+<instance id="line-n.w8_036:2056:">
+<answer instance="line-n.w8_036:2056:" senseid="text"/>
+<context>
+read line print text file end
+</context>
+</instance>
+<instance id="line-n.art} aphb 08800556:">
+<answer instance="line-n.art} aphb 08800556:" senseid="phone"/>
+<context>
+phone connect modem service charge 
+</context>
+</instance>
+<instance id="line-n.w9_40:5727:">
+<answer instance="line-n.w9_40:5727:" senseid="queue"/>
+<context>
+queue wait line ticket counter
+</context>
+</instance>
+<instance id="line-n.w8_032:6138:">
+<answer instance="line-n.w8_032:6138:" senseid="text"/>
+<context>
+read line print text file end
+</context>
+</instance>
+<instance id="line-n.w9_35:11120:">
+<answer instance="line-n.w9_35:11120:" senseid="phone"/>
+<context>
+phone connect modem service charge
+</context>
+</instance>
+<instance id="line-n.w8_120:14831:">
+<answer instance="line-n.w8_120:14831:" senseid="queue"/>
+<context>
+queue wait line ticket counter
+</context>
+</instance>
+<instance id="line-n.w8_066:17112:">
+<answer instance="line-n.w8_066:17112:" senseid="text"/>
+<context>
+read line print text file end
+</context>
+</instance>
+<instance id="line-n.w7_092:15481:">
+<answer instance="line-n.w7_092:15481:" senseid="phone"/>
+<context>
+phone connect modem service charge
+</context>
+</instance>
+<instance id="line-n.art7} aphb 54100155:">
+<answer instance="line-n.art7} aphb 54100155:" senseid="queue"/>
+<context>
+queue wait line ticket counter
+</context>
+</instance>
+<instance id="line-n.w7_048:8604:">
+<answer instance="line-n.w7_048:8604:" senseid="text"/>
+<context>
+read line print text file end
+</context>
+</instance>
+<instance id="line-n.w7_001:17871:">
+<answer instance="line-n.w7_001:17871:" senseid="phone"/>
+<context>
+phone connect modem service charge
+</context>
+</instance>
+<instance id="line-n.w8_033:6431:">
+<answer instance="line-n.w8_033:6431:" senseid="queue"/>
+<context>
+queue wait line ticket counter
+</context>
+</instance>
+</lexelt>
+</corpus>

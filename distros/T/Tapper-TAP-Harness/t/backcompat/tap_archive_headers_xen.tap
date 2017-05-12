@@ -1,0 +1,39 @@
+1..1
+# Artemis-section: Metainfo
+# Artemis-Suite-Name: Daily-Report
+# Artemis-Suite-version: 0.01
+# Artemis-machine-name: irida
+# Artemis-Hardwaredb-Systems-Id: 4712
+# Artemis-machine-description: PC-Ware
+# Artemis-cpuinfo: 1x Family: 15, Model: 107, Stepping: 1
+# Artemis-ram: 3967 MB
+# Artemis-uptime: 96 hrs
+ok 1 host metadata
+1..1
+# Artemis-section: XEN-Metainfo
+# Artemis-xen-version: 3.2.3
+# Artemis-xen-changeset: 17040:6fc6ca3c393a
+# Artemis-xen-base-os-description: SUSE Linux Enterprise Server 10 SP2 (i586)
+# Artemis-xen-dom0-kernel: 2.6.18.8-xen i686
+ok 1 xen metadata
+1..3
+# Artemis-section: guest_1_redhat_rhel4u8_beta_32b_up_qcow
+# Artemis-xen-guest-description: 001-CTCS
+# Artemis-xen-guest-test: CTCS-1.3.1pre1
+# Artemis-xen-guest-start: 2009-04-06 17:54:57 CEST
+# Artemis-xen-guest-flags: acpi=1; apic=1; memory=2048; pae=1; shadow_memory=20; timer_mode=2; vcpus=1
+ok 1 general
+ok 2 time 
+ok 3 CTCS 1.3.1pre1
+1..3
+# Artemis-section: guest_2_redhat_rhel4u8_beta_32b_smp_qcow
+# Artemis-xen-guest-description: 002-lmbench
+# Artemis-xen-guest-test: LMBENCH-3.0-a9
+# Artemis-xen-guest-start: 2009-04-06 17:55:03 CEST
+# Artemis-xen-guest-flags: acpi=1; apic=1; memory=1024; pae=1; shadow_memory=10; timer_mode=2; vcpus=2
+ok 1 general
+ok 2 time 
+ok 3 LMBENCH 3.0-a9
+1..1
+# Artemis-section: dom0
+ok 1 no test performed 

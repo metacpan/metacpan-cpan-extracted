@@ -1,0 +1,14 @@
+Revision history for Perl extension Tridion::BusinessConnector.
+
+0.01  Sat Apr 17 14:00:00 2004
+	- original version
+
+0.02  Sun Apr 25 21:30:00 2004
+    - Next minor release
+      Changed to use standard make/dist setup
+
+0.03  Friday Aug 6 18:30:00 2004
+    - Add LICENSE to META.yml
+    - Fix incorrect references in documentation to SOAP::Tridion
+      (should be Tridion::BusinessConnector)
+

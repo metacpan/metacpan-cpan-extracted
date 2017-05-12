@@ -1,0 +1,309 @@
+=encoding utf8
+
+=head1 名前
+
+Tie::Trace - tieで簡単printデバッギング
+
+=head1 バージョン
+
+Version 0.12
+
+=head1 概要
+
+use Tie::Trace qw/watch/; # or qw/:all/
+ 
+    my %hash = (key => 'value');
+    watch %hash;
+ 
+    $hash{hoge} = 'hogehoge'; # warn "main:: %hash => {hoge} => hogehgoe at ..."
+ 
+    my @array;
+    tie @array;
+    push @array, "array";    # warn "main:: @array [0] => array at ..."
+ 
+    my $scalar;
+    watch $scalar;
+    $scalar = "scalar";      # warn "main:: $scalar => scalar at ..."
+
+=head1 説明
+
+Tie::Traceはprintでバッキングに有用です。tieを使って、特定の変数に
+入れられた/削除された値を見ることが出来ます。
+
+入れられた値が、スカラ/配列/ハッシュリファレンスであれば、
+Tie::Traceは再帰的にその値をチェックできます。
+
+例;
+
+ watch %hash;
+ 
+ $hash{foo} = {a => 1, b => 2}; # warn "main:: %hash => {foo} => {a => 1, b => 2}"
+ $hash{foo}->{a} = 2            # warn "main:: %hash => {foo}{a} => 2"
+
+ですが、blessされたリファレンスやtieされた値は無視されます。
+
+=head1 関数
+
+このモジュールは、version 0.06 から、C<watch>関数を提供しています。
+この関数のみを使うべきであって、代わりに tie 関数を使ってはいけません。
+
+=over 4
+
+=item watch
+
+ watch $variables;
+
+ watch $scalar, %options;
+ watch @array, %options;
+ watch %hash, %options;
+
+変数をC<watch>し、そこに、値が入ったり、消されたりすると、
+下記のようなメッセージで警告します。
+
+ main:: %hash => {key} => value at ...
+
+C<watch>する前に値が入っていても、問題ありません。Tie::Traceはうまく動きます。
+
+ my %hash = (key => 'value');
+ watch %hash;
+
+=back
+
+=head1 オプション
+
+C<watch>をオプション付きで使うことができます。
+グローバルなオプションが欲しければ、L<グローバル変数> を見てください。
+
+=over 4
+
+=item key => [values/regexs/coderef]
+
+ watch %hash, key => [qw/foo bar/];
+
+これはハッシュのためのものです。チェックするキーの名前か、キーに対する正規表現を指定できます。
+指定された/マッチしたキーでなければ、警告の対象にならず、無視されます。
+コードリファレンスを指定した場合、コードリファレンスの第一引数は、tieされた値で、第二引数以降は値です。
+コードリファレンスが偽を返した場合、無視されます。
+
+例;
+
+ watch %hash, key => [qw/foo bar/, qr/x/];
+ 
+ $hash{foo} = 1 # warn ...
+ $hash{bar} = 1 # warn ...
+ $hash{var} = 1 # *no* warnings
+ $hash{_x_} = 1 # warn ...
+
+=item value => [contents/regexs/coderef]
+
+ watch %hash, value => [qw/foo bar/];
+
+チェックする値の内容か、値に対する正規表現を指定できます。
+指定された/マッチした値でなければ、警告の対象にならず、無視されます。
+コードリファレンスを指定した場合、コードリファレンスの第一引数は、tieされた値で、第二引数以降は値です。
+コードリファレンスが偽を返した場合、無視されます。
+
+例;
+
+ watch %hash, value => [qw/foo bar/, qr/\)/];
+ 
+ $hash{a} = 'foo'  # warn ...
+ $hash{b} = 'foo1' # *no* warnings
+ $hash{c} = 'bar'  # warn ...
+ $hash{d} = ':-)'  # warn ...
+
+=item use => [qw/hash array scalar/]
+
+ watch %hash, use => [qw/array/];
+
+チェックする変数のタイプ(スカラー、配列、ハッシュ)を指定します。
+デフォルトでは、全てのタイプがチェックされます。
+
+例;
+
+ watch %hash, use => [qw/array/];
+ 
+ $hash{foo} = 1         # *no* warnings
+ $hash{bar} = 1         # *no* warnings
+ $hash{var} = []        # *no* warnings
+ push @{$hash{var}} = 1 # warn ...
+
+=item debug => 'dumper'/coderef
+
+ watch %hash, debug => 'dumper'
+ watch %hash, debug => sub{my($self, @v) = @_; return @v }
+
+値の表現を指定できます. デフォルトでは"dumper"がセットされています。
+"dumper"は、値をData::Dumper::Dumperのフォーマットで表現します(::Terse = 0 と ::Indent = 0で)。
+"dumper"の代わりに、コードリファレンスを使うこともできます。
+コードリファレンスを指定した場合、コードリファレンスの第一引数は、tieされた値で、第二引数以降は値です。
+コードリファレンスの実行結果が表示用の値として使われます。
+
+=item debug_value => [contents/regexs/codref]
+
+ watch %hash, debug => sub{my($s,$v) = @_; $v =~tr/op/po/;}, debug_value => [qw/foo boo/];
+
+valueは値に対するものでしたが、debug_valueは、debugにより加工された後の値に対するものです。
+コードリファレンスを指定した場合、コードリファレンスの第一引数は、tieされた値で、第二引数以降は値です。
+コードリファレンスが偽を返した場合、無視されます。
+
+例;
+
+ watch %hash, debug => sub{my($s,$v) = @_; $v =~tr/op/po/;}, debug_value => [qw/foo boo/];
+ 
+ $hash{a} = 'fpp'  # warn ...      because debugged value is foo
+ $hash{b} = 'foo'  # *no* warnings because debugged value is fpp
+ $hash{c} = 'bpp'  # warn ...      because debugged value is boo
+
+=item r => 0/1
+
+ watch %hash, r => 0;
+
+rが0であれば、リファレンスが入ってきた場合に、再帰的にチェックしません。デフォルトは、1です。
+
+=item caller => number/[numbers]
+
+ watch %hash, caller => 2;
+
+これは、警告メッセージに影響します。callerが遡る数を指定します。
+デフォルトは0です。0より大きくすると、その分遡ります。
+
+配列リファレンスを指定することも出来ます。
+
+ watch %hash, caller => [1, 2, 3];
+
+下記のような表示になります。
+
+ main %hash => {key} => 'hoge' at filename line 61.
+ at filename line 383.
+ at filename line 268.
+
+=back
+
+=head1 メソッド
+
+key、 value、 debug_valueなどのオプションに渡されるコードリファレンスで使われます。
+tied 関数の戻り値のメソッドとして使われます。
+
+=over 4
+
+=item storage
+
+ watch %hash, debug =>
+   sub {
+     my($self, $v) = @_;
+     my $storage = $self->storage;
+     return $storage;
+   };
+
+値が蓄えられているリファレンスを返します。
+
+=item parent
+
+ watch %hash, debug =>
+   sub {
+     my($self, $v) = @_;
+     my $parent = $self->parent->storage;
+     return $parent;
+   };
+
+このメソッドは、$selfの親のtieされている値を返します。
+
+例;
+
+ watch my %hash;
+ my %hash2;
+ $hash{1} = \%hash2;
+ my $tied_hash2 = tied %hash2;
+ print tied %hash eq $tied_hash2->parent; # 1
+
+=back
+
+=head1 グローバル変数
+
+=over 4
+
+=item %Tie::Trace::OPTIONS
+
+Tie::Traceのグローバルオプションです。
+何のオプションも指定しなければ、このオプションが使われます。
+このオプションをオーバーライドする場合は、C<watch>をオプション付きで使ってください。
+
+ %Tie::Trace::OPTIONS = (debug => undef, ...);
+
+ # global options will be used
+ watch my %hash;
+
+ # your options will be used
+ watch my %hash2, debug => 'dumper', ...;
+
+=item $Tie::Trace::QUIET
+
+真なら、警告を出さなくなります。
+
+ watch my %hash;
+ 
+ $hash{1} = 1; # warn something
+ 
+ $Tie::Trace::QUIET = 1;
+ 
+ $hash{1} = 2; # no warn
+
+=back
+
+=head1 著者
+
+Ktat, C<< <ktat.is at gmail.com> >>
+
+=head1 バグ
+
+Please report any bugs or feature requests to
+C<bug-tie-debug at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tie-Trace>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 サポート
+
+perldocコマンドでこのモジュールのドキュメントを見つけられます。
+
+    perldoc Tie::Trace
+
+日本語のドキュメント(euc-jp)は下記になります。
+
+    perldoc Tie::Trace_JP
+
+また、下記からも情報を見ることが出来ます:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Tie-Trace>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Tie-Trace>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Trace>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Tie-Trace>
+
+=back
+
+=head1 感謝
+
+JNは新しい警告メッセージ(0.06から)のアイデアをくれました。
+
+=head1 著作権 & ライセンス
+
+Copyright 2006-2009 Ktat, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

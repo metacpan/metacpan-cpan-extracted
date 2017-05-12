@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+cpanfile
+dist.ini
+lib/Text/Glob/Expand.pm
+lib/Text/Glob/Expand/Permutation.pm
+lib/Text/Glob/Expand/Segment.pm
+t/00.load.t
+t/01.basic.t
+xt/01.perlcritic.t
+xt/01.pod-coverage.t
+xt/01.pod.t

@@ -1,0 +1,24 @@
+---
+abstract: 'Sugar syntax for Tk'
+author:
+  - 'Jerome Quelin'
+generated_by: 'Dist::Zilla version 1.093140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-Sugar
+provides:
+  Tk::Sugar:
+    file: lib/Tk/Sugar.pm
+    version: 1.093190
+requires:
+  English: 0
+  File::Find: 0
+  Sub::Exporter: 0
+  Test::More: 0
+  perl: 5.008
+resources:
+  homepage: http://search.cpan.org/dist/Tk-Sugar
+  repository: http://github.com/jquelin/tk-sugar
+version: 1.093190

@@ -1,0 +1,107 @@
+NAME
+
+    Text::ECSV - Extended CSV manipulation routines
+
+SYNOPSIS
+
+        use Text::ECSV;
+        $ecsv    = Text::ECSV->new ();         # create a new object
+        $line    = 'id=3,name=Text::ECSV,shot_desc=Extended CSV manipulation routines';
+        $status  = $ecsv->parse ($line);       # parse a CSV string into fields
+                                               #    and name value pairs
+        %columns = $ecsv->fields_hash ();      # get the parsed field hash
+        $column  = $ecsv->field_named('id');   # get field value for given name
+    
+        $ecsv->combine('b' => 2, 'a' => 1, 'c' => 3, );
+        # ok($ecsv->string eq 'b=2,a=1,c=3');
+
+DESCRIPTION
+
+     use base 'Text::CSV_XS';  => see Text::CSV_XS.
+
+    Roland Giersig had a presentation at YAPC 2007 called 'Techniques for
+    Remote System-Monitoring'. He was explaining his search after a good
+    logging format or how to store continuous flow of data in a most usable
+    form. XML? YAML? CSV? XML is nice but for a machines not for humans,
+    YAML is nice for both but it's hard to grep. CSV is readable and
+    grep-able but not too flexible. So what is the conclusion? ECSV is like
+    a CSV but in each comma separated field the name of the column is set.
+    This gives a flexibility to skip, reorder, add the fields. All the
+    information is stored per line so it's easy to grep. Also it's easy to
+    compare two records by md5ing the lines or doing string eq.
+
+PROPERTIES
+
+ fields_hash
+
+    Holds hash reference to the resulting hash constructed by parse().
+
+ dup_keys_strategy
+
+    If set and a duplicate key names occur in a parsed line, this strategy
+    is called with ->($name, $old_value, $value).
+
+    Can be used for duplicate keys to join values to one string, or push
+    them to an array or to treat them how ever is desired. By default
+    values overwrite each other.
+
+METHODS
+
+ field_named($name)
+
+    Return field with $name.
+
+ parse()
+
+    In additional to the SUPER::parse() functionality it decodes name value
+    pairs to fill in fields_hash.
+
+ combine($key => $value, ...)
+
+    The function joins all $key.'='.$value and then calls SUPER::combine
+    constructing a CSV from the arguments, returning success or failure.
+
+AUTHOR
+
+    Jozef Kutej, <jkutej@cpan.org>, thanks to Roland Giersig
+    <RGiersig@cpan.org> for the idea.
+
+BUGS
+
+    Please report any bugs or feature requests to bug-text-ecsv at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-ECSV. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Text::ECSV
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-ECSV
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Text-ECSV
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Text-ECSV
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Text-ECSV
+
+COPYRIGHT & LICENSE
+
+    Copyright 2008 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

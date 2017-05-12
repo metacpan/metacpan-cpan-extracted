@@ -1,0 +1,29 @@
+---
+abstract: 'Generate colored HTML, ANSI, ASCII text from a text and color description'
+author:
+  - 'Nadim ibn hamouda el Khemir. <nkh@cpan.org>'
+build_requires:
+  Test::Block: '0'
+  Test::Exception: '0'
+  Test::NoWarnings: '0'
+  Test::Warn: '0'
+  Text::Diff: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Colorizer
+provides:
+  Text::Colorizer:
+    file: lib/Text/Colorizer.pm
+    version: '0.03'
+requires:
+  Readonly: '0'
+  Sub::Exporter: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'

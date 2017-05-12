@@ -1,0 +1,53 @@
+Test::Subunits version 0.000003
+
+Unit testing can be expensive because it requires that your code be
+composed from a large number of small independently testable units (i.e.
+short subroutines). 
+
+Which, in turn, may require a large number of internal subroutine calls,
+and a lot of argument passing, either of which can reduce the
+performance of your code to unacceptable levels.
+
+When that happens, the usual solution is to "inline" the original units
+of code: to create a single, larger, more complex subroutine that does
+everything in one place and as fast as possible.
+
+But that kind of subroutine is also much more difficult to test (if it
+can be tested at all).
+
+This module allows you to write fast-but-monolithic subroutines when you
+need to, but still be able to test individual sections of that code
+(known as "subunits") as if they were separate small-but-composable
+subroutines.
+
+To do this, you annotate parts of your monolithic code with special
+comments. This module then uses those annotations to extract individual
+chunks of your code which it compiles into separate subroutines, which
+your test suite can then test independently.
+
+In a sense, it's the exact opposite of inlining small subroutines into
+your code. The module effectively "out-lines" predetermined fragments of
+your code to create small subroutines that you can then test.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

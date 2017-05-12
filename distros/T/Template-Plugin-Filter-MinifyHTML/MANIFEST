@@ -1,0 +1,9 @@
+Build.PL
+lib/Template/Plugin/Filter/MinifyHTML.pm
+LICENSE
+MANIFEST			This list of files
+README
+t/00-common.t
+Makefile.PL
+META.yml
+META.json

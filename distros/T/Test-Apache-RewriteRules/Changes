@@ -1,0 +1,8 @@
+Revision history for Perl extension Test::Apache::RewriteRules.
+
+1.0.1  Thu Dec 30 2010
+      - skip tests if httpd can't be executed in all test
+        (but how should I deal with it actually?)
+
+1.0    Wed Dec 29 2010
+      - initial release

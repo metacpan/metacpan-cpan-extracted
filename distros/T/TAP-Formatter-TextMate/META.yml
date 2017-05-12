@@ -1,0 +1,25 @@
+---
+name: TAP-Formatter-TextMate
+version: 0.1
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Generate TextMate compatible test output
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Tiny: 0
+  Test::Harness: 2.99
+  Test::More: 0
+  Test::More::Diagnostic: 0
+provides:
+  TAP::Formatter::TextMate:
+    file: lib/TAP/Formatter/TextMate.pm
+    version: 0.1
+  TAP::Formatter::TextMate::Session:
+    file: lib/TAP/Formatter/TextMate/Session.pm
+    version: 0.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

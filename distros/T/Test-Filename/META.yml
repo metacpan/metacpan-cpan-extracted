@@ -1,0 +1,42 @@
+---
+abstract: 'Portable filename comparison'
+author:
+  - 'David A. Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  Test::More: 0
+  Test::Tester: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Filename
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Test::Filename:
+    file: lib/Test/Filename.pm
+    version: 0.03
+requires:
+  Path::Tiny: 0
+  Test::Builder::Module: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/test-filename/issues
+  homepage: https://metacpan.org/release/Test-Filename
+  repository: git://github.com/dagolden/test-filename.git
+version: 0.03

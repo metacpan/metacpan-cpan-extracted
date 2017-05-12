@@ -1,0 +1,238 @@
+---
+
+- schema: Report
+  name: dummy 0
+  data:
+    id: 20
+
+- schema: Tap
+  name: tap 0
+  data:
+    id: 10
+    report_id: 20
+    tap: |
+      1..5
+      OK 1 einz
+      OK 2 zvei
+      OK 3 trei
+      OK 4 fier
+      OK 4 fümf
+
+
+- schema: Report
+  name: dummy 1
+  data:
+    id: 21
+
+- schema: Tap
+  name: tap 1
+  data:
+    id: 11
+    report_id: 21
+    tap: |
+      1..4
+      OK 1 foo
+      OK 2 bar
+      OK 3 affe
+      OK 4 zomtec
+
+
+- schema: ReportSection
+  name: rs 0
+  data:
+    id: 1
+    report_id: 21
+    osname: 1
+    uname:
+    kernel:
+    language_description:
+    cpuinfo:
+    ram:
+    lspci:
+    lsusb:
+    flags:
+    xen_changeset:
+    xen_hvbits:
+    xen_dom0_kernel:
+    xen_base_os_description:
+    xen_guest_description:
+    xen_guest_flags:
+    ticket_url:
+    wiki_url:
+    planning_id:
+    tags:
+
+- schema: ReportSection
+  name: rs 1
+  data:
+    id: 2
+    report_id: 21
+    osname:
+    uname:
+    kernel:
+    language_description: 2
+    cpuinfo:
+    ram:
+    lspci:
+    lsusb:
+    flags:
+    xen_changeset:
+    xen_hvbits:
+    xen_dom0_kernel:
+    xen_base_os_description:
+    xen_guest_description:
+    ticket_url:
+    wiki_url:
+    planning_id:
+    tags:
+
+- schema: ReportSection
+  name: rs 2
+  data:
+    id: 3
+    report_id: 21
+    osname:
+    uname:
+    kernel:
+    language_description:
+    cpuinfo:
+    ram:
+    lspci:
+    lsusb:
+    flags:
+    xen_changeset:
+    xen_hvbits: 32
+    xen_dom0_kernel:
+    xen_base_os_description:
+    xen_guest_description:
+    xen_guest_flags:
+    ticket_url:
+    wiki_url:
+    planning_id:
+    tags:
+
+- schema: ReportSection
+  name: rs 3
+  data:
+    id: 4
+    report_id: 21
+    osname:
+    uname:
+    kernel:
+    language_description:
+    cpuinfo:
+    ram:
+    lspci:
+    lsusb:
+    flags:
+    xen_changeset: 0
+    xen_hvbits:
+    xen_dom0_kernel:
+    xen_base_os_description:
+    xen_guest_description:
+    xen_guest_flags:
+    ticket_url:
+    wiki_url:
+    planning_id:
+    tags:
+
+- schema: ReportSection
+  name: rs 4
+  data:
+    id: 5
+    report_id: 21
+    osname:
+    uname:
+    kernel:
+    language_description:
+    cpuinfo:
+    ram:
+    lspci:
+    lsusb:
+    flags:
+    xen_changeset:
+    xen_hvbits: 0
+    xen_dom0_kernel:
+    xen_base_os_description:
+    xen_guest_description:
+    xen_guest_flags:
+    ticket_url:
+    wiki_url:
+    planning_id:
+    tags:
+
+- schema: ReportSection
+  name: rs 5
+  data:
+    id: 6
+    report_id: 21
+    osname:
+    uname:
+    kernel:
+    language_description:
+    cpuinfo:
+    ram:
+    lspci:
+    lsusb:
+    flags:
+    xen_changeset:
+    xen_hvbits:
+    xen_dom0_kernel:
+    xen_base_os_description:
+    xen_guest_description:
+    xen_guest_flags:
+    ticket_url:
+    wiki_url:
+    planning_id:
+    tags:
+
+- schema: ReportSection
+  name: rs 6
+  data:
+    id: 7
+    report_id: 21
+    osname:
+    uname:
+    kernel:
+    language_description:
+    cpuinfo:
+    ram:
+    lspci:
+    lsusb:
+    flags:
+    xen_changeset:
+    xen_hvbits:
+    xen_dom0_kernel:
+    xen_base_os_description:
+    xen_guest_description: 0
+    xen_guest_flags:
+    ticket_url:
+    wiki_url:
+    planning_id:
+    tags:
+
+- schema: ReportSection
+  name: rs 7
+  data:
+    id: 8
+    report_id: 21
+    osname:
+    uname:
+    kernel:
+    language_description:
+    cpuinfo:
+    ram:
+    lspci:
+    lsusb:
+    flags:
+    xen_changeset:
+    xen_hvbits:
+    xen_dom0_kernel:
+    xen_base_os_description:
+    xen_guest_description:
+    xen_guest_flags: 0
+    ticket_url:
+    wiki_url:
+    planning_id:
+    tags:
+

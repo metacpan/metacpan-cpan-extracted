@@ -1,0 +1,358 @@
+=pod
+
+=begin readme text
+
+Test::ExtDirect
+===============
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+Test::ExtDirect - An easy and convenient way to test Ext.Direct code
+
+=head1 SYNOPSIS
+
+With default imports:
+
+    use Test::ExtDirect;
+
+    my $data = call_extdirect_ok(
+        client_class => 'My::ExtDirect::Client',
+        action       => 'Action',
+        method       => 'Method',
+        arg          => { foo => 'bar' },
+        cookies      => { bar => 'baz' }
+    );
+
+    $data = submit_extdirect_ok(
+        action => 'Action',
+        method => 'form_handler',
+        arg    => { field1 => 'value1' }
+    );
+
+    my @events = poll_extdirect_ok();
+
+Or:
+
+    use Test::ExtDirect qw(:all);
+
+    my $data   = call_ok(...);
+    $data      = submit_ok(...);
+    my @events = poll_ok();
+
+=head1 DESCRIPTION
+
+=for readme continue
+
+This module provides a set of utility functions for testing Ext.Direct
+classes. For each test script, an instance of L<RPC::ExtDirect::Server>
+will be created, and requests will be made with L<RPC::ExtDirect::Client>.
+
+This way you can simulate actual Ext JS or Sencha Touch client code making
+calls, submitting forms, uploading files, or polling events - all without
+having to set up a browser testing environment.
+
+This kind of testing provides additional layer of insurance against
+Ext.Direct specific problems and errors that may otherwise creep into the
+codebase over time.
+
+=for readme stop
+
+=head1 PACKAGE INTERFACE
+
+Test::ExtDirect provides the following public subroutines that are imported
+to the caller namespace by default:
+
+=over 4
+
+=item C<start_server>
+
+Starts a new L<RPC::ExtDirect::Server> instance. It is not necessary to
+call this function directly, L</call>/L</submit>/L</poll> will launch
+a new server if it has not been started yet.
+
+This function is an alias to L<RPC::ExtDirect::Server::Util/start_server>.
+
+=item C<stop_server>
+
+Stops the server instance used for testing. Again it's not necessary to
+call this function explicitly, the server will be shut down when all tests
+are finished.
+
+This function is an alias to L<RPC::ExtDirect::Server::Util/stop_server>.
+
+=item C<maybe_start_server>
+
+Process command line options and optionally start a new Server instance.
+
+This function is an alias to L<RPC::ExtDirect::Server::Util/maybe_start_server>.
+
+=item C<get_extdirect_api>
+
+Create a new Client instance, retrieve the
+L<Ext.Direct API|RPC::ExtDirect::Intro/API> published by it and return it
+as an L<RPC::ExtDirect::Client::API> object. Accepts named arguments in a
+hash.
+
+Parameters:
+
+=over 8
+
+=item C<type>
+
+Optional Ext.Direct API type, defaults to C<'remoting'>; another possible
+value is C<'polling'>.
+
+=item C<client_class>
+
+Optional client class to use instead of default L<RPC::ExtDirect::Client>.
+
+=item ...
+
+Any other argument is passed to the L<RPC::ExtDirect::Client> constructor.
+
+=back
+
+=item C<call_extdirect>
+
+Start a Server instance if it has not been already started, then
+call Ext.Direct remoting Method using a new Client instance and
+return the execution
+L<Result|RPC::ExtDirect::Intro/Result> or
+L<Exception|RPC::ExtDirect::Intro/Exception>. Accepts named arguments
+in a hash.
+
+See L<RPC::ExtDirect::Client/call> for more information.
+
+Parameters:
+
+=over 8
+
+=item C<client_class>
+
+Optional client class to use instead of default L<RPC::ExtDirect::Client>.
+
+=item C<action>
+
+L<Ext.Direct Action|RPC::ExtDirect::Intro/Action> (class) name.
+
+=item C<method>
+
+L<Ext.Direct Method|RPC::ExtDirect::Intro/Method> name.
+
+=item C<arg>
+
+Method arguments; either arrayref for Methods that accept ordered
+arguments or hashref for Methods that request named arguments. See
+more in L<RPC::ExtDirect/"METHODS AND CALLING CONVENTIONS">.
+
+=item ...
+
+Any other parameters are passed to the Client constructor. See
+L<RPC::ExtDirect::Client/new> for details.
+
+=back
+
+=item C<call_extdirect_ok>
+
+Wrap L</call_extdirect> in an C<eval> block and pass or fail an
+additional test depending on whether the call was successful or
+not.
+
+=item C<submit_extdirect>
+
+Start a Server instance if it has not been already started, then
+submit an Ext.Direct form request using a new Client instance and
+return the Result or Exception. Accepts named arguments in a hash.
+
+See L<RPC::ExtDirect::Client/submit> for more information.
+
+Parameters:
+
+=over 8
+
+=item C<client_class>, C<action>, C<method>, C<arg>
+
+Same as with L</call_extdirect>, see above.
+
+=item C<upload>
+
+Arrayref of file paths to upload with that request.
+
+=item ...
+
+Any other parameters are passed to the Client constructor. See
+L<RPC::ExtDirect::Client/new> for details.
+
+=back
+
+=item C<submit_extdirect_ok>
+
+Wrap L</submit_extdirect> in an C<eval> block and pass or fail an
+additional test depending on whether the submit was successul or
+not.
+
+=item C<poll_extdirect>
+
+Start a Server instance if it has not been already started, then
+poll it for L<Ext.Direct events|RPC::ExtDirect::Intro/Event>.
+In list context, returns a list of event hashrefs; in scalar
+context, returns either an event hashref if there was only one
+event, or an arrayref with event hashrefs if there was more than
+one event. Accepts named arguments in a hash.
+
+See L<RPC::ExtDirect::Client/poll> for more information.
+
+Parameters:
+
+=over 8
+
+=item C<client_class>
+
+Optional client class to use instead of default L<RPC::ExtDirect::Client>.
+
+=item ...
+
+Any other parameters are passed to the Client constructor. See
+L<RPC::ExtDirect::Client/new> for details.
+
+=back
+
+=item C<poll_extdirect_ok>
+
+Wrap L</poll_extdirect> in an C<eval> block and pass or fail an
+additional test depending on whether the poll request was successful
+or not.
+
+=back
+
+=head1 EXPORTS
+
+By default, the following functions are exported:
+
+=over 4
+
+=item *
+
+L</start_server>
+
+=item *
+
+L</stop_server>
+
+=item *
+
+L</maybe_start_server>
+
+=item *
+
+L</call_extdirect>
+
+=item *
+
+L</call_extdirect_ok>
+
+=item *
+
+L</submit_extdirect>
+
+=item *
+
+L</submit_extdirect_ok>
+
+=item *
+
+L</poll_extdirect>
+
+=item *
+
+L</poll_extdirect_ok>
+
+=back
+
+There are shorter named aliases for these functions that are not
+exported by default to avoid potential collisions with similarly
+named functions from other modules. You can specify the C<:all>
+tag to export these aliases:
+
+    use Test::ExtDirect ':all';
+
+Here is the list of aliases:
+
+=over 4
+
+=item C<call>
+
+Same as L</call_extdirect>.
+
+=item C<call_ok>
+
+Same as L</call_extdirect_ok>.
+
+=item C<submit>
+
+Same as L</submit_extdirect>.
+
+=item C<submit_ok>
+
+Same as L</submit_extdirect_ok>.
+
+=item C<poll>
+
+Same as L</poll_extdirect>.
+
+=item C<poll_ok>
+
+Same as L</poll_extdirect_ok>.
+
+=back
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make && make test
+    make install
+
+=end readme
+
+=for readme stop
+
+=head1 SEE ALSO
+
+This module makes heavy use of L<RPC::ExtDirect::Server> and
+L<RPC::ExtDirect::Client>.
+
+For general information on developing Ext.Direct code in Perl, see
+L<RPC::ExtDirect>.
+
+=head1 ACKNOWLEDGEMENTS
+
+I would like to thank IntelliSurvey, Inc for sponsoring my work
+on this module.
+
+=head1 BUGS AND LIMITATIONS
+
+At this time there are no known bugs in this module. Please
+report problems to the author, patches are always welcome.
+
+Use L<Github tracker|https://github.com/nohuhu/Test-ExtDirect/issues>
+to open bug reports, this is the easiest and quickest way to get your
+issue fixed.
+
+=for readme continue
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2014 by Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

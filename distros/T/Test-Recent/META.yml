@@ -1,0 +1,37 @@
+---
+abstract: 'check a time is recent'
+author:
+  - 'Written by Mark Fowler <mark@twoshortplanks.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Builder::Tester: 0.09
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Recent
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  Scalar::Util: 0
+  Test::Builder: 0
+  Time::Duration::Parse: 0
+  perl: 5.6.0
+resources:
+  homepage: https://github.com/2shortplanks/Test-Recent/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/2shortplanks/Test-Recent.git
+    web: https://github.com/2shortplanks/Test-Recent/tree
+version: 2.50

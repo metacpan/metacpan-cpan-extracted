@@ -1,0 +1,10 @@
+Changes made in Sense-Clusters version 0.15 during version 0.17
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota at Duluth
+
+1.	Added perldoc help for setup.pl
+
+(Changelog-v0.15to0.17 Last Updated on 05/19/2003 by Amruta)

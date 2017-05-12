@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/Template/Plugin/HtmlToText.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t

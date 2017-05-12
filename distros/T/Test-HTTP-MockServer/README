@@ -1,0 +1,125 @@
+NAME
+    Test::HTTP::MockServer - Implement a mock HTTP server for use in tests
+
+SYNOPSIS
+      use Test::HTTP::MockServer;
+  
+      my $server = Test::HTTP::MockServer->new();
+      my $url = $server->url_base();
+      # inject $url as the config for the remote http service.
+  
+      my $handle_request_phase1 = sub {
+          my ($request, $response) = @_;
+          ...
+      };
+      $server->start_mock_server($handle_request_phase1);
+      # run your tests against $handle_request_phase1
+      $server->stop_mock_server();
+  
+      my $handle_request_phase2 = sub {
+          my ($request, $response) = @_;
+          ...
+      };
+      $server->start_mock_server($handle_request_phase2);
+      # run your tests against $handle_request_phase2
+      $server->stop_mock_server();
+
+DESCRIPTION
+    Sometimes, when writing a test, you don't have to oportunity to do
+    dependency injection of the type of transport used in a specific API.
+    Sometimes that code willl unequivocally always use actual HTTP and the
+    only control you have is over the host and port to which it will
+    connect.
+
+    This class offer a simple way to mock the service being called. It does
+    that by binding to a random port on localhost and allowing you to
+    inspect which port that was. Using a random port means that this can be
+    used by tests running in parallel on the same host.
+
+    The socket will be bound and listened on the main test process, such
+    that the lifetime of the connection is defined by the lifetime of the
+    test itself.
+
+    Since the socket will be already bound and listened to, the two conntrol
+    methods (start_mock_server and stop_mock_server) fork only for the
+    accept call, which means that it is safe to call start and stop several
+    times during the test in order to change the expectations of the mocked
+    code.
+
+    That allows you to easily configure the expectations of the mock server
+    across each step of your test case. On the other hand, it also means
+    that no state is shared between the code running in the mock server and
+    the test code.
+
+METHOS
+    new()
+        Creates a new MockServer object.
+
+    bind_mock_server()
+        Finds a random available port, bind and listen to it. This allows to
+        inspect what the mock url of the portal will be before the server
+        forks to start. If the random port is already in use, it will keep
+        trying until it finds one that works.
+
+    host()
+        Returns the host which the mock server is binding to. It will call
+        bind_mock_server if that was not yet initialized. The current
+        version always bind to 127.0.0.1.
+
+    port()
+        Returns the port which the mock server is bound and is listening to.
+        It will call bind_mock_server if that was not yet initialized.
+
+    base_url()
+        Returns the url to be used as the base url for requests into the
+        mock server. It will bind_mock_server if that was not yet
+        initialized.
+
+    start_mock_server($request_processor)
+        This will bind_mock_server if that was not yet initialized, then
+        fork to accept connections.
+
+        In order to make it easier to have state propagate across different
+        requests in the mock implementation, there will only be one
+        connection at a time, and every request in that connection will be
+        handled serially.
+
+    stop_mock_server()
+        This will kill the server running on the background, but it won't
+        unbind the socket, which means that you can just call
+        start_mock_server again with a different request_processor and the
+        same url will be preserved.
+
+THE REQUEST PROCESSOR
+    The request processor is the code reference sent as an argument to the
+    start_mock_server call which will receive all the requests received via
+    the socket.
+
+    Whenever a request is received, the code reference will be called with
+    two arguments:
+
+    $request
+        An HTTP::Request object with the request as it was received.
+
+    $response
+        An HTTP::Response object that will be sent back. It is initialized
+        with "200 OK" and no content
+
+    If your code dies while processing a request, a "500 Internal Server
+    Error" response will be generated.
+
+COPYRIGHT
+    Copyright 2016 Bloomberg Finance L.P.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

@@ -1,0 +1,298 @@
+NAME
+    Tk::JFileDialog - A highly configurable File Dialog widget for Perl/Tk.
+
+DESCRIPTION
+    The widget is composed of a number of sub-widgets, namely, a listbox for
+    files and (optionally) directories, an entry for filename, an (optional)
+    entry for pathname, an entry for a filter pattern, a 'ShowAll' checkbox
+    (for enabling display of .* files and directories), and three buttons,
+    namely OK, Rescan, and Cancel. Note that the labels for all subwidgets
+    (including the text for the buttons and Checkbox) are configurable for
+    foreign language support.
+
+SYNOPSIS
+     my $LoadDialog = $main->JFileDialog(
+            -Title =>'Please select a file:',
+            -Create => 0
+     );
+
+  Usage Description
+    To use FileDialog, simply create your FileDialog objects during
+    initialization (or at least before a Show). When you wish to display the
+    FileDialog, invoke the 'Show' method on the FileDialog object; The
+    method will return either a file name, a path name, or undef. undef is
+    returned only if the user pressed the Cancel button.
+
+  Example Code
+    The following code creates a FileDialog and calls it. Note that
+    perl5.002gamma is required.
+
+    *
+     #!/usr/local/bin/perl -w
+
+     use Tk;
+     use Tk::JFileDialog;
+     use strict;
+
+     my($main) = MainWindow->new;
+     my($Horiz) = 1;
+     my($fname);
+
+     my($LoadDialog) = $main->JFileDialog(-Title =>'This is my title',
+                                        -Create => 0);
+
+     $LoadDialog->configure(-FPat => '*pl',
+                           -ShowAll => 'NO');
+
+     $main->Entry(-textvariable => \$fname)
+            ->pack(-expand => 1,
+                   -fill => 'x');
+
+     $main->Button(-text => 'Kick me!',
+                  -command => sub {
+                      $fname = $LoadDialog->Show(-Horiz => $Horiz);
+                      if (!defined($fname)) {
+                          $fname = "Fine,Cancel, but no Chdir anymore!!!";
+                          $LoadDialog->configure(-Chdir =>'NO');
+                      }
+                  })
+            ->pack(-expand => 1,
+                   -fill => 'x');
+
+     $main->Checkbutton(-text => 'Horizontal',
+                       -variable => \$Horiz)
+            ->pack(-expand => 1,
+                   -fill => 'x');
+
+     $main->Button(-text => 'Exit',
+                  -command => sub {
+                      $main->destroy;
+                  })
+            ->pack(-expand => 1,
+                   -fill => 'x');
+
+     MainLoop;
+
+     print "Exit Stage right!\n";
+
+     exit;
+
+METHODS
+    The following non-standard method may be used with a FileDialog object
+
+  Show
+        Displays the file dialog box for the user to operate. Additional
+        configuration items may be passed in at Show-time In other words,
+        this code snippet:
+
+          $fd->Show(-Title => 'Ooooh, Preeeeeety!');
+
+        is the same as this code snippet:
+
+          $fd->configure(-Title => 'Ooooh, Preeeeeety!');
+          $fd->Show;
+
+CONFIGURATION
+                Any of the following configuration items may be set via the configure (or Show) method,
+        or retrieved via the cget method.
+
+  *Flags*
+        Flags may be configured with either 1,'true', or 'yes' for 1, or 0,
+        'false', or 'no' for 0. Any portion of 'true', 'yes', 'false', or
+        'no' may be used, and case does not matter.
+
+  -Chdir
+        Enable the user to change directories. The default is 1. If
+        disabled, the directory list box will not be shown.
+
+  -Create
+        Enable the user to specify a file that does not exist. If not
+        enabled, and the user specifies a non-existent file, a dialog box
+        will be shown informing the user of the error (This Dialog Box is
+        configurable via the EDlg* switches, below).
+
+        default: 1
+
+  -ShowAll
+        Determines whether hidden files (.*) are displayed in the File and
+        Directory Listboxes. The default is 0. The Show All Checkbox
+        reflects the setting of this switch.
+
+  -DisableShowAll
+        Disables the ability of the user to change the status of the ShowAll
+        flag. The default is 0 (the user is by default allowed to change the
+        status).
+
+  -DisableFPat
+        Disables the ability of the user to change the file selection
+        pattern. The default is 0 (the user is by default allowed to change
+        the status).
+
+  -Grab
+        Enables the File Dialog to do an application Grab when displayed.
+        The default is 1.
+
+  -History
+        Used with the "-HistFile" option. Specifies how many files to retain
+        in the history list. The default is 0 (keep all).
+
+  -HistDeleteOk
+        If set, allows user to delete items from the history dropdown list
+        and thus the history file.
+
+  -HistUsePath
+        If set, the path is set to that of the last file selected from the
+        history.
+
+  -HistUsePathButton
+        If set, the path is set to that of the last file selected from the
+        history.
+
+  -HistFile
+        Enables the keeping of a history of the previous files / directories
+        selected. The file specified must be writable. If specified, a
+        history of up to "-History" number of files will be kept and will be
+        displayed in a "JBrowseEntry" combo-box permitting user selection.
+
+  -PathFile
+        Specifies a file containing a list of "favorite paths" bookmarks to
+        show in a dropdown list allowing quick-changes in directories.
+        As of v1.4, this can be a directory on Windows systems which can 
+        contain ".lnk" files containing "Favorite" paths.
+
+  -Horiz
+        True sets the File List box to be to the right of the Directory List
+        Box. If 0, the File List box will be below the Directory List box.
+        The default is 1.
+
+  -QuickSelect
+        Default 1, if set to 0, user must invoke the "OK" button to complete
+        selection. If 1 or 2, clicking item in the history menu
+        automatically completes the selection. If 2, single-clicking a file
+        in the file list completes selection (otherwise, a double-click is
+        required).
+
+  -SelDir
+        If 1 or 2, enables selection of a directory rather than a file, and
+        disables the actions of the File List Box. Setting to 2 allows
+        selection of either a file OR a directory. The default is 0.
+
+  *Special*
+  -FPat
+        Sets the default file selection pattern. The default is '*'. Only
+        files matching this pattern will be displayed in the File List Box.
+
+  -Geometry
+        Sets the geometry of the File Dialog. Setting the size is a
+        dangerous thing to do. If not configured, or set to '', the File
+        Dialog will be centered.
+
+  -SelHook
+        SelHook is configured with a reference to a routine that will be
+        called when a file is chosen. The file is called with a sole
+        parameter of the full path and file name of the file chosen. If the
+        Create flag is disabled (and the user is not allowed to specify new
+        files), the file will be known to exist at the time that SelHook is
+        called. Note that SelHook will also be called with directories if
+        the SelDir Flag is enabled, and that the FileDialog box will still
+        be displayed. The FileDialog box should not be destroyed from within
+        the SelHook routine, although it may generally be configured.
+
+        SelHook routines return 0 to reject the selection and allow the user
+        to reselect, and any other value to accept the selection. If a
+        SelHook routine returns non-zero, the FileDialog will immediately be
+        withdrawn, and the file will be returned to the caller.
+
+        There may be only one SelHook routine active at any time.
+        Configuring the SelHook routine replaces any existing SelHook
+        routine. Configuring the SelHook routine with 0 removes the SelHook
+        routine. The default SelHook routine is undef.
+
+  *Strings*
+        The following two switches may be used to set default variables, and
+        to get final values after the Show method has returned (but has not
+        been explicitly destroyed by the caller)
+
+  -SelectMode
+        Sets the selectmode of the File Dialog. If not configured it will be
+        defaulted to 'single'. If set to 'multiple', then the user may
+        select more than one file and a comma-delimited list of all selected
+        files is returned. Otherwise, only a single file may be selected.
+
+        -File The file selected, or the default file. The default is ''.
+
+        -Path The path of the selected file, or the initial path. The
+        default is $ENV{'HOME'}.
+
+  *Labels and Captions*
+        For support of internationalization, the text on any of the
+        subwidgets may be changed.
+
+        -Title The Title of the dialog box. The default is 'Select File:'.
+
+        -DirLBCaption The Caption above the Directory List Box. The default
+        is 'Directories'.
+
+        -FileLBCaption The Caption above the File List Box. The default is
+        'Files'.
+
+        -FileEntryLabel The label to the left of the File Entry. The Default
+        is 'Filename:'.
+
+        -PathEntryLabel The label to the left of the Path Entry. The default
+        is 'Pathname:'.
+
+        -FltEntryLabel The label to the left of the Filter entry. The
+        default is 'Filter:'.
+
+        -ShowAllLabel The text of the Show All Checkbutton. The default is
+        'Show All'.
+
+  *Button Text*
+        For support of internationalization, the text on the three buttons
+        may be changed.
+
+        -OKButtonLabel The text for the OK button. The default is 'OK'.
+
+        -RescanButtonLabel The text for the Rescan button. The default is
+        'Refresh'.
+
+        -CancelButtonLabel The text for the Cancel button. The default is
+        'Cancel'.
+
+        -HomeButtonLabel The text for the Home directory button. The default
+        is 'Home'.
+
+        -CWDButtonLabel The text for the Current Working Directory button.
+        The default is 'C~WD'.
+
+  *Error Dialog Switches*
+        If the Create switch is set to 0, and the user specifies a file that
+        does not exist, a dialog box will be displayed informing the user of
+        the error. These switches allow some configuration of that dialog
+        box.
+
+  -EDlgTitle
+        The title of the Error Dialog Box. The default is 'File does not
+        exist!'.
+
+  -EDlgText
+        The message of the Error Dialog Box. The variables $path, $file, and
+        $filename (the full path and filename of the selected file) are
+        available. The default is *"You must specify an existing
+        file.\n(\$filename not found)"*
+
+Author
+        Jim Turner
+
+        turnerjw at mesh . net
+
+        A derived work from Tk::FileDialog, by:
+
+        Brent B. Powers, Merrill Lynch (B2Pi)
+
+        powers@ml.com
+
+        This code may be distributed under the same conditions as Perl
+        itself.
+

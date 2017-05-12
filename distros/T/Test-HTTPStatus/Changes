@@ -1,0 +1,49 @@
+Revision history for Perl module Test::HTTPStatus
+
+2.002 2017-01-05T03:40:10Z
+	* Fix issues with new Mojo stuff not handling redirects
+
+2.001_02 2016-12-07T15:38:24Z
+	* Bump to next dev version
+	* The tests should now get a 200 status for www.perl6.org. This 
+	requires HTTP::SimpleLinkChecker 1.165, which turns on automatic
+	redirect support.
+
+2.001_01 2016-11-16T01:58:56Z
+	* Work harder to return an undef status when it's a bad URL. Mojo::URL
+	does things a bit differently.
+
+2.001 2016-10-26T03:51:14Z
+	* Fix up for new HTTP::SimpleLinkChecker that moved to Mojo.
+	* The interface is the same
+	* Slaven ReziÄ reported this as https://github.com/briandfoy/test-httpstatus/issues/1
+
+1.081 2016-01-25T19:38:01Z
+	* Forgot to bump the version!
+
+1.08 2016-01-25T19:36:12Z
+	*Freshen up the distro and move everything to GitHub
+
+0.62 - 2004-09-07
+	* cleaned up distribution
+	* no need to upgrade
+
+1.08 - 2008-08-15
+	* Update the tests for the exported constants
+	* No need to upgrade
+
+1.07 - 2007-10-27
+	* distro cleanups after moving from CVS to SVN
+
+1.06 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.05 - 2006-05-17
+	* updates for the documentation and kwalitee. No need to upgrade.
+
+1.04 - 2005-03-08
+	* Added POD coverage tests: no need to upgrade
+
+0.62 - 2005-03-08
+	* Added POD coverage tests: no need to upgrade

@@ -1,0 +1,26 @@
+Revision history for Tapper-TestSuite-HWTrack
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        - move script/ -> bin/
+
+4.0.1     2012-05-16
+        - sleep on sending (cargo cult, yes, but The Real Deal)
+        - Review default usage of hosts/ports - OSRC#1016
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* fix missing dependency
+	* release version++ roundhouse kick
+
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.1
+
+	* first public CPAN release

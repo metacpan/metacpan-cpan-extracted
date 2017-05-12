@@ -1,0 +1,57 @@
+Revision history for Perl extension Text::Fracture.
+
+1.02  Thu Jun 26 01:39:38 CEST 2008
+	- new wheighting code, new mountaineering algorithm.
+	- fract is no longer fragile.
+	- studied rolling hash in rsync and spamsum.
+	- decided to keep the mountaineering algorithm
+	  and improved it further to behave in pathological cases.
+	- Done excessive testing. Really nice now.
+
+0.11  Thu May  1 13:19:11 CEST 2008
+	- made cooked() aware of \v and \f.
+	- found that the fract-algorithm is fragile.
+	  a local text change can have global effects.
+	  -> re-designing...
+	- do_fract() is now a shell for a new upcoming 
+	  algorithm, it only takes care of offset calculation.
+	  And it does it right for the first time.
+	- char_stat() implemented, tested good.
+	- weight_line() started, unfinished.
+
+0.08  Thu Sep 13 01:52:12 CEST 2007
+	- added draft of cooked() code.
+
+0.07  Thu Sep  6 23:43:30 CEST 2007
+	- fixed the final off by one error. :-)
+
+0.06  Wed Aug 29 23:57:22 CEST 2007
+	- char_input_fetch() no longer returns offsets > text_len
+	  when faking a terminal newline.
+	  Off by one in line counting fixed.
+
+0.05  Thu Aug 23 22:20:49 CEST 2007
+	- in_ra_buf() update never happened due to inverted logic.
+	  line weights look good now.
+
+0.04  Thu Aug 23 01:16:25 CEST 2007
+	- frac() code implementation completed. untested.
+
+0.03  Tue Aug 21 21:25:13 CEST 2007
+	- frac() loop implementation half done.
+
+0.02  Sun Aug 19 11:00:25 CEST 2007
+	- expanded ruleset definition in perldoc Fracture.pm
+	- introduced struct line [], instead of llen[].
+	- odd: Config_heavy.pl brings in compiler command line parameters,
+	  but does not check which compiler we use.
+	  gcc-4.0.2 does not understand -fstack-protector.
+
+0.01  Fri Aug 17 21:26:35 CEST 2007
+	- original version; created by h2xs 1.23 with options
+		-A -n Text-Fracture
+	- Changed XSLoader::load('Text-Fracture', ...) into
+	          XSLoader::load('Text::Fracture', ...);
+	  to make it find it .so module. h2xs bug. grrr.
+	- test.pl runs, but only dummy code in fract().
+

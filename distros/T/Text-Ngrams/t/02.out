@@ -1,0 +1,66 @@
+BEGIN OUTPUT BY Text::Ngrams version 1.8
+
+1-GRAMS (total count: 17)
+FIRST N-GRAM: A
+ LAST N-GRAM: P
+-------------------------
+_	1
+A	1
+B	1
+C	1
+D	1
+E	1
+F	1
+G	1
+H	1
+I	1
+J	1
+K	1
+L	1
+M	1
+N	1
+O	1
+P	1
+
+2-GRAMS (total count: 16)
+FIRST N-GRAM: A B
+ LAST N-GRAM: O P
+-------------------------
+_ H	1
+A B	1
+B C	1
+C D	1
+D E	1
+E F	1
+F G	1
+G _	1
+H I	1
+I J	1
+J K	1
+K L	1
+L M	1
+M N	1
+N O	1
+O P	1
+
+3-GRAMS (total count: 15)
+FIRST N-GRAM: A B C
+ LAST N-GRAM: N O P
+-------------------------
+_ H I	1
+A B C	1
+B C D	1
+C D E	1
+D E F	1
+E F G	1
+F G _	1
+G _ H	1
+H I J	1
+I J K	1
+J K L	1
+K L M	1
+L M N	1
+M N O	1
+N O P	1
+
+END OUTPUT BY Text::Ngrams

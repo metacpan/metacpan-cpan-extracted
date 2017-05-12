@@ -1,0 +1,17 @@
+Revision history for TeX-AutoTeX
+
+0.9    01/21/2011
+        First version, released on an unsuspecting world.
+
+0.901  01/23/2011
+        list known dependencies in build_requires
+        add a signature
+
+0.902  01/23/2011
+        add 'parent' module to build_requires
+
+0.903  01/24/2011
+	fix typo in pod
+
+0.906  09/25/2011
+        fix typo in attribution (sorry Rob)

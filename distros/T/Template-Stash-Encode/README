@@ -1,0 +1,38 @@
+Template-Stash-Encode
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Template::Stash::Encode
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Template-Stash-Encode
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Stash-Encode
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Template-Stash-Encode
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Template-Stash-Encode
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Toru Yamaguchi
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

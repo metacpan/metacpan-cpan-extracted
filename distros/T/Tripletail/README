@@ -1,0 +1,32 @@
+
+Tripletail
+==========
+
+Tripletail is an open-source framework which is for web applications
+treat Japanese. It is supposed to run on Linux + Apache + MySQL + Perl.
+
+
+INSTALLATION
+~~~~~~~~~~~~
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SEE ALSO
+~~~~~~~~
+
+For further information, please refer to http://tripletail.jp/
+
+
+COPYRIGHT AND LICENSE
+~~~~~~~~~~~~~~~~~~~~~
+
+Copyright (C) 2006 YMIRLINK Inc.
+
+This framework is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself
+

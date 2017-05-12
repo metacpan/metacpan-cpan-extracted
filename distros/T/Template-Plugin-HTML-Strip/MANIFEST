@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Template/Plugin/HTML/Strip.pm
+t/00_compile.t
+t/01_pod.t
+t/02_pod-coverage.t
+t/03_output.t

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+Orientation.pm
+README
+Orientation/StringOperation.pm
+test.pl

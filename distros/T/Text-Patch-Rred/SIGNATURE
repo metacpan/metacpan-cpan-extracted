@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 c02161a4b3cfd362fe9c65166e687c65f8570677 Build.PL
+SHA1 9bf6e6bccb93c2474d503c663d630d92d1c9b443 Changes
+SHA1 c971d15559d31683c54f58c72df0ccd79c4e55d9 INSTALL
+SHA1 ee958bd5561a11e7b8aed85d341cbb4a362aabf6 MANIFEST
+SHA1 1e2326877b25f755baa4786432d6abd87a2fe5ae META.yml
+SHA1 df200fac6bc23bccc1d11cf1607c533a6504084e Makefile.PL
+SHA1 1cc34b7a13148d4c2679d6d13b7d5d6a4091c785 README
+SHA1 f6c93c5cb107006fa9966c7acacdc84016ace87f bin/rred.pl
+SHA1 c0880a0c28c874254ac820fd5863e95cbfa37faf lib/Text/Patch/Rred.pm
+SHA1 ebf1edcca39ffa7b6cc02e6db7f0e898c2a7b5d2 t/01basic.t
+SHA1 4b0ef4fce5db5caea202314259961be5a2611363 t/04pod.t
+SHA1 9bfa5f158ca9369cc181961f931cc7f7088c91dd t/05podcoverage.t
+SHA1 91dff2e065c6195d78171345f111f233679635e0 t/06critic.t
+SHA1 c00b685f30cd158ebc7367a5ad15931fa7380d45 t/perlcriticrc
+SHA1 356ce00b6aa1751ebbfea14c1498be21e70c3200 t/perltidyrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iQIcBAEBCgAGBQJLDx6iAAoJEGrkldSkB8hclvQQAIfbrFMlRUP4oYxyU2UZjszM
+RYWmVngXLdZgq44g18J+KX59Y51ARwSam+UtpWdO2U5A6ahpr+GiuY/agzGWMKt1
+1vYQMjZkQCN58C39sBozlG2Pdm16499qcb0nlYKPlWDVvrBB0Gc4VL4+5ibRo7hK
+AXYwqxOwH5tqK9bvO0ogHxHUji8sOOJjAYnGznszQa4YK0Jc0rmOJY4HA4K/zLgh
+SpoD82exlRGMWHu/p+LsAfuY4SDwkOWsOY2ef4mXV3TzF0b3RvhFCI1S8JCnpvGv
+0Ge8QD0h+VX7GfDOyKGq3xtcuDGzWmJTUbvG+OWdfWOV5WJBB2AO8JLWszS1WunH
+RJG2J54CCk3qh4jNuhxoYgVrB2OPLiD4WWAj1Cj3bgBGQ+ipiMBOKNrM9zLJG2mo
+it3OWpDJ7Y6En4Z4rjVlfTqFq+gbt7SwXrNnlQn+vori/i9gaKPuUFF1l0mW5QcB
+EdHJjdYiYV/3a7JsKNcsfH0wq2ml7MP6vprqbcPhdcHOvQ/4642zqdw2Lo7Jqw2A
+zSz1YwZ5ohr8R/uFGMWpU4DLPJfG1el30drWXxoWRojOXB82k1nt2Z/63LES0N75
+ofOcRhv/c+1R/TZJDW0PtOtJHI5+GP5rQVmF7UyZwzDqTNK15eFV7CjMMKsmc6kJ
+cSguHifSND8binkHFQkQ
+=zOdA
+-----END PGP SIGNATURE-----

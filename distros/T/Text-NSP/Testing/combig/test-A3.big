@@ -1,0 +1,17 @@
+@count.Ngram=2
+@count.WindowSize=5
+@count.FrequencyCut=0
+@count.InputFilePath=train/art.n.count
+23
+file<>line<>4 8 10
+text<>print<>3 6 7
+print<>file<>3 5 8
+file<>text<>2 8 5
+print<>line<>2 5 10
+line<>file<>2 4 8 
+print<>text<>2 5 5 
+text<>line<>1 6 10
+line<>print<>1 4 7
+file<>print<>1 8 7
+line<>text<>1 4 5
+text<>file<>1 6 8 

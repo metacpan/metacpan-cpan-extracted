@@ -1,0 +1,27 @@
+Guidelines to add support for a new SQL database
+------------------------------------------------
+
+Let's say you add support for the sqlfoo database
+
+3) Testing
+   . Create a t/sqlfoo.pl file on the model of t/mysql.pl
+     If possible run a separate server to prevent any lossage during the tests.
+     The t1 table will be created during the test and removed afterwards.
+   . Create a t/07sqlfoo.t on the model of t/03mysql.t
+     The goal of this test file is to check that the 'where' strings generated
+     by your module are correct.
+   . Create a t/08sqlfoo.t on the model of t/04mysql.t
+     The goal of this test file is to create a table (defined in t/sqlfoo.pl),
+     fill it, run queries and see if it returns the expected result.
+
+2) Implementation
+   . Create lib/Text/Query/BuildSQLsqlfoo.pm on the model of
+     lib/Text/Query/BuildSQLMySQL.pm
+   . run make TEST_VERBOSE=1 TEST_FILES=t/07sqlfoo.t test
+   . run DBI_DSN=dbi:sqlfoo:... DBI_USER=... DBI_PASS make TEST_VERBOSE=1 TEST_FILES=t/08sqlfoo.t test
+   . run make test
+
+3) Documentation
+   . Update the README file
+   . Add a README.sqlfoo to shortly describe how to install the 
+     associated perl module

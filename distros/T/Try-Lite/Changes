@@ -1,0 +1,12 @@
+Revision history for Perl extension Try::Lite
+
+0.0.3  2013-07-25 18:38:17 JST
+    - fix nested exception less than Perl version 5.14 (reported & some code idea by koba04++)
+    - milla migration
+
+0.0.2 2013-02-18T14:31:01+09:00
+    - you can receives the return value of the catches return value
+    - doc fixs
+
+0.0.1 2013-02-15T20:46:36+09:00
+    - original version

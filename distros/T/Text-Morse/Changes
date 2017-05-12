@@ -1,0 +1,36 @@
+Revision history for Perl extension Text::Morse.
+
+0.07  2015/06/09
+
+	Correcting the source URL in the README file.
+		(from Syohei Yoshida - https://github.com/syohex)
+
+0.06
+
+	Bulgarian and Russian language support by svetoslav.chingov@gmail.com 
+
+0.04 2014/03/09
+
+	Automatically generated meta data
+
+0.03  2014/03/01
+
+	No longer selecting a has variable based on unchecked user input
+	Now using warnings
+	Adding a README file
+	Adding license and copyright info into main POD
+	Added POD testing
+
+0.02	2014/02/27
+
+	Applied patch from RT #20580 by Kevin J Walters <kevin.walters@morganstanley.com>
+	Added updated tests based on Test::Simple
+	Added a LICENSE file
+	Updated meta information for indexing
+	Suppressed qw// warnings due to commas
+	Explicitly declared version within the module	
+
+0.01  2001/07/20
+
+	Original version
+	Authored by Ariel Brosh <schop@cpan.org>, now deceased

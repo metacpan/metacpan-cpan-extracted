@@ -1,0 +1,54 @@
+Revision history for Perl extension Test::CPANpm.
+
+0.010  Sat Jan 21 11:29:00 2006
+    - Fix STDIN/STDOUT redirection "once and for all"; we now use the lowest
+      common denominator: obtaining "fileno" on a filehandle and redirecting
+      to that. This should work as early as perl 5.005, and should work
+      equally well on UNIX, Win32, Amiga, and Commodore 64. Thanks to
+      Gurusamy Sarathy <gsar@activestate.com> for his help with this one.
+
+0.009  Tue Jan 17 23:23:23 2006
+    - If there isn't a CPAN::Config yet, get CPAN to generate one for us.
+      I'm toying with the idea of making our own CPAN::Config whether or not
+      there is one (to prevent permissions problems on cpan_home, etc) -
+      might do that next release.
+    - Removed dependancy on Test::Deep. Instead, we just depend on Test::More
+      now.
+    - perl 5.6.1 doesn't support "open(FOO, ">&", $foo)", so use
+      open(FOO, ">&$foo") instead.
+
+0.008  Wed Jan 11 18:45:00 2006
+    - Got rid of unititialized value errors
+    - Use tempfile() instead of /dev/null - Should make this work on non-UNIXes
+    - Don't close STDIN, redirect it from a tempfile instead
+      (gets rid of 'STDIN reopened for output' warning)
+
+0.007  Fri Jan  6 21:28:00 2006
+    - Hopefully fixed CPAN testers failures:
+      Jost was using a newer version of CPAN.pm than me (1.87, I was on 1.7601),
+      and this new version requires that 'archive' and 'unwrapped' need to be
+      set.
+      
+
+0.006  Thu Jan  5 08:03:33 2006
+    - Another "debug Jost Krieger's Smokehouse" release:
+        - Depends on CPAN.pm now
+        - When debugging is on, print out what version of CPAN we are using.
+    - Update year number on change history :-)
+
+0.005  Tue Jan  3 10:32:00 2006
+    - made logging on unit tests a bit better so I can see why some CPAN
+      testers aren't passing
+
+0.004  Mon Jan  2 12:54:00 2006
+    - fixed cpanemu to jive with the package rename. d'oh!
+
+0.003  Mon Jan  2 12:07:00 2006
+    - renamed module to Test::CPANpm to make brian d. foy happy
+
+0.002  Thu Dec 29 12:12:12 2005
+    - added "cpanemu" command-line to interactively test modules against CPAN
+
+0.001  Mon Dec 19 21:17:39 2005
+    - original version; created by h2xs 1.23 with options
+        -AXP -b 5.6.0 Test::CPAN

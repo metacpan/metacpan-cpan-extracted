@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::Statistics::GreekAndCoptic.
+
+0.01  Sat Jul 14 05:51:14 2007
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Text::Statistics::GreekAndCoptic
+

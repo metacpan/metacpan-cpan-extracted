@@ -1,0 +1,18 @@
+Revision history for Test::ParallelSubtest
+
+0.05    2014-01-15
+        Propagate comments in TAP, RT #92119
+ 
+0.04    2010-04-27
+        Avoid POSIX::_exit(), since it exits the entire process not just
+            one pseudo-process under win32 fork emulation.
+
+0.03    2010-04-04
+        Fix incorrect operation under Test-Simple 0.95_01
+
+0.02    2010-03-30
+        Fix incorrect Test::Builder version dep in Makefile.PL
+
+0.01    2010-03-22
+        Initial release.
+

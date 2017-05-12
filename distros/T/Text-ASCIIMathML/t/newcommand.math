@@ -1,0 +1,78 @@
+? newsymbol{"!le"}{"&#x2270;" "\not\leq"} a !le b
+<math title="newsymbol{&quot;!le&quot;}{&quot;&amp;#x2270;&quot; &quot;\not\leq&quot;} a !le b">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+    <mo>&#x2270;</mo>
+    <mi>b</mi>
+  </mstyle>
+</math>
+$$a \not\leq b$$
+
+? newsymbol{"!le"}{"&#x2270;"} a !le b
+<math title="newsymbol{&quot;!le&quot;}{&quot;&amp;#x2270;&quot;} a !le b">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+    <mo>&#x2270;</mo>
+    <mi>b</mi>
+  </mstyle>
+</math>
+
+? newsymbol{"(R)"}{"&#x00AE;" "\textregistered"} (R)
+<math title="newsymbol{&quot;(R)&quot;}{&quot;&amp;#x00AE;&quot; &quot;\textregistered&quot;} (R)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&#x00AE;</mo>
+  </mstyle>
+</math>
+$$\textregistered$$
+
+? newcommand "DDX" "{:d/dx:}" DDXf(x) = f'(x)
+<math title="newcommand &quot;DDX&quot; &quot;{:d/dx:}&quot; DDXf(x) = f'(x)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mfrac>
+        <mi>d</mi>
+        <mrow>
+          <mi>d</mi>
+          <mi>x</mi>
+        </mrow>
+      </mfrac>
+    </mrow>
+    <mrow>
+      <mi>f</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <mi>f</mi>
+      <mo>'</mo>
+    </mrow>
+    <mrow>
+      <mo>(</mo>
+      <mi>x</mi>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\frac{d}{d x} f ( x ) = f ' ( x )$$
+
+? newcommand "FUNKY" ""
+
+? newcommand "NAME" bad
+<math title="newcommand &quot;NAME&quot; bad">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>newcommand</mo>
+      <mrow>
+        <mtext>NAME</mtext>
+      </mrow>
+      <mi>b</mi>
+    </mrow>
+    <mi>a</mi>
+    <mi>d</mi>
+  </mstyle>
+</math>
+$$\mbox{newcommand} \mbox{NAME} b a d$$

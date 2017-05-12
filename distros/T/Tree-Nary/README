@@ -1,0 +1,383 @@
+Tree::Nary extension module for Perl
+------------------------------------
+
+Author:		Frederic Soriano [FSORIANO]
+		best reached at : fsoriano@cpan.org
+
+Version:	1.3
+
+Date:		January 2004
+
+DSLI:		RdpO
+		- stable release
+		- support by developer
+		- plain functions, no references used
+
+Copyright:	Public domain
+
+Documentation is in pod format at the end of Tree::Nary.pm.
+Installation hints are in a file named INSTALL inside this package.
+See also CHANGES for a history of updates to this module.
+
+-----------------------------------------------------------------------------
+  THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+-----------------------------------------------------------------------------
+
+NAME
+
+	Tree::Nary - Perl implementation of N-ary search trees.
+
+SYNOPSIS
+
+  use Tree::Nary;
+
+  $node = new Tree::Nary;
+
+  $inserted_node = $node->insert($parent, $position, $node);
+  $inserted_node = $node->insert_before($parent, $sibling, $node);
+  $inserted_node = $node->append($parent, $node);
+  $inserted_node = $node->prepend($parent, $node);
+  $inserted_node = $node->insert_data($parent, $position, $data);
+  $inserted_node = $node->insert_data_before($parent, $sibling, $data);
+  $inserted_node = $node->append_data($parent, $data);
+  $inserted_node = $node->prepend_data($parent, $data);
+
+  $node->reverse_children($node);
+
+  $node->traverse($node, $order, $flags, $maxdepth, $funcref, $argref);
+
+  $node->children_foreach($node, $flags, $funcref, $argref);
+
+  $root_node = $obj->get_root($node);
+
+  $found_node = $node->find($node, $order, $flags, $data);
+  $found_child_node = $node->find_child($node, $flags, $data);
+
+  $index = $node->child_index($node, $data);
+  $position = $node->child_position($node, $child);
+
+  $first_child_node = $node->first_child($node);
+  $last_child_node = $node->last_child($node);
+
+  $nth_child_node = $node->nth_child($node, $index);
+
+  $first_sibling = $node->first_sibling($node);
+  $next_sibling = $node->next_sibling($node);
+  $prev_sibling = $node->prev_sibling($node);
+  $last_sibling = $node->last_sibling($node);
+
+  $bool = $node->is_leaf($node);
+  $bool = $node->is_root($node);
+
+  $cnt = $node->depth($node);
+
+  $cnt = $node->n_nodes($node);
+  $cnt = $node->n_children($node);
+
+  $bool = $node->is_ancestor($node);
+
+  $cnt = $obj->max_height($node);
+
+  $node->tsort($node);
+
+  $normalized_node = $node->normalize($node);
+
+  $bool = $node->is_identical($node, $another_node);
+  $bool = $node->has_same_struct($node, $another_node);
+
+  $node->unlink($node);
+
+DESCRIPTION
+
+	The Tree::Nary class implements N-ary trees (trees of data with any 
+	number of branches), providing the organizational structure for a tree (collection) 
+	of any number of nodes, but knowing nothing about the specific type of node used. 
+	It can be used to display hierarchical database entries in an internal application (the
+	NIS netgroup file is an example of such a database). It offers the capability to select 
+	nodes on the tree, and attachment points for nodes on the tree. Each attachment point 
+	can support multiple child nodes.
+
+	The data field contains the actual data of the node. The next and previous fields point
+	to the node's siblings (a sibling is another node with the same parent). The parent
+	field points to the parent of the node, or is undef if the node is the root of the
+	tree. The children field points to the first child of the node. The other children are
+	accessed by using the next pointer of each child.
+
+	This module is a translation (albeit not a direct one) from the C implementation of 
+	N-ary trees, available in the GLIB distribution (see SEE ALSO).
+
+GLOBAL VARIABLES
+
+  BOOLEANS
+
+	TRUE
+
+	FALSE
+
+  TRAVERSE FLAGS
+
+	Specifies which nodes are visited during several of the tree functions, including
+	traverse() and find().
+
+  TRAVERSE_LEAFS 
+
+	Specifies that only leaf nodes should be visited.
+
+	TRAVERSE_NON_LEAFS
+
+		Specifies that only non-leaf nodes should be visited.
+
+	TRAVERSE_ALL 
+
+		Specifies that all nodes should be visited.
+
+	TRAVERSE_MASK
+
+		Combination of multiple traverse flags.
+
+  ORDER FLAGS
+
+	Specifies the type of traversal performed by traverse() and find(). 
+
+	PRE_ORDER
+
+		Visits a node, then its children.
+
+	IN_ORDER
+
+		Visits a node's left child first, then the node itself, then its right child.
+		This is the one to use if you want the output sorted according to the compare
+		function.
+
+	POST_ORDER
+
+		Visits the node's children, then the node itself.
+
+	LEVEL_ORDER
+
+		Calls the function for each child of the node, then recursively visits each child.
+
+METHODS
+
+	new( [DATA] )
+
+	Creates a new Tree::Nary object. Used to create the first node in a tree.
+	Insert optional DATA into new created node.
+
+	insert( PARENT, POSITION, NODE )
+
+	Inserts a NODE beneath the PARENT at the given POSITION, returning
+	inserted NODE. If POSITION is -1, NODE is inserted as the last child
+	of PARENT.
+
+	insert_before( PARENT, SIBLING, NODE )
+
+	Inserts a NODE beneath the PARENT before the given SIBLING, returning 
+	inserted NODE. If SIBLING is undef, the NODE is inserted as the last child
+	of PARENT.
+
+	append( PARENT, NODE )
+
+	Inserts a NODE as the last child of the given PARENT, returning inserted NODE.
+
+	prepend( PARENT, NODE )
+
+	Inserts a NODE as the first child of the given PARENT, returning inserted NODE.
+
+	insert_data( PARENT, POSITION, DATA )
+
+	Inserts a new node containing DATA, beneath the PARENT at the given POSITION.
+	Returns the new inserted node.
+
+	insert_data_before( PARENT, SIBLING, DATA )
+
+	Inserts a new node containing DATA, beneath the PARENT, before the given
+	SIBLING. Returns the new inserted node.
+
+	append_data( PARENT, DATA )
+
+	Inserts a new node containing DATA as the last child of the given PARENT.
+	Returns the new inserted node.
+
+	prepend_data( PARENT, DATA )
+
+	Inserts a new node containing DATA as the first child of the given PARENT.
+	Returns the new inserted node.
+
+	reverse_children( NODE )
+
+	Reverses the order of the children of NODE.
+	It doesn't change the order of the grandchildren.
+
+	traverse( NODE, ORDER, FLAGS, MAXDEPTH, FUNCTION, DATA )
+
+	Traverses a tree starting at the given root NODE. It calls the given FUNCTION
+	(with optional user DATA to pass to the FUNCTION) for each node visited.
+
+	The traversal can be halted at any point by returning TRUE from FUNCTION.
+
+	The ORDER in which nodes are visited is one of IN_ORDER, PRE_ORDER, POST_ORDER and
+	LEVEL_ORDER.
+
+	FLAGS specifies which types of children are to be visited, one of TRAVERSE_ALL, 
+	TRAVERSE_LEAFS and TRAVERSE_NON_LEAFS.
+
+	MAXDEPTH is the maximum depth of the traversal. Nodes below this depth will not
+	be visited. If MAXDEPTH is -1, all nodes in the tree are visited. If MAXDEPTH
+	is 1, only the root is visited. If MAXDEPTH is 2, the root and its children are
+	visited. And so on.
+
+	children_foreach( NODE, FLAGS, FUNCTION, DATA )
+
+	Calls a FUNCTION (with optional user DATA to pass to the FUNCTION) for each
+	of the children of a NODE. Note that it doesn't descend beneath the child nodes.
+	FLAGS specifies which types of children are to be visited, one of TRAVERSE_ALL,
+	TRAVERSE_LEAFS and TRAVERSE_NON_LEAFS.
+
+	get_root( NODE )
+
+	Gets the root node of a tree, starting from NODE.
+
+	find( NODE, ORDER, FLAGS, DATA )
+
+	Finds a NODE in a tree with the given DATA.
+
+	The ORDER in which nodes are visited is one of IN_ORDER, PRE_ORDER, POST_ORDER and
+	LEVEL_ORDER.
+
+	FLAGS specifies which types of children are to be searched, one of TRAVERSE_ALL,
+	TRAVERSE_LEAFS and TRAVERSE_NON_LEAFS.
+
+	Returns the found node, or undef if the DATA is not found.
+
+	find_child( NODE, FLAGS, DATA )
+
+	Finds the first child of a NODE with the given DATA.
+
+	FLAGS specifies which types of children are to be searched, one of TRAVERSE_ALL,
+	TRAVERSE_LEAFS and TRAVERSE_NON_LEAFS.
+
+	Returns the found child node, or undef if the DATA is not found.
+
+	child_index( NODE, DATA )
+
+	Gets the position of the first child of a NODE which contains the given DATA.
+	Returns the index of the child of node which contains data, or -1 if DATA is
+	not found. 
+
+	child_position( NODE, CHILD )
+
+	Gets the position of a NODE with respect to its siblings. CHILD must be a child
+	of NODE. The first child is numbered 0, the second 1, and so on. Returns the position
+	of CHILD with respect to its siblings.
+
+	first_child( NODE )
+
+	Returns the first child of a NODE. Returns undef if NODE is undef or has
+	no children.
+
+	last_child( NODE )
+
+	Returns the last child of a NODE. Returns undef if NODE is undef or has
+	no children.
+
+	nth_child( NODE, INDEX )
+
+	Gets a child of a NODE, using the given INDEX. The first child is at INDEX 0.
+	If the INDEX is too big, undef is returned. Returns the child of NODE at INDEX. 
+
+	first_sibling( NODE )
+
+	Returns the first sibling of a NODE. This could possibly be the NODE itself.
+
+	prev_sibling( NODE )
+
+	Returns the previous sibling of a NODE.
+
+	next_sibling( NODE )
+
+	Returns the next sibling of a NODE.
+
+	last_sibling( NODE )
+
+	Returns the last sibling of a NODE. This could possibly be the NODE itself.
+
+	is_leaf( NODE )
+
+	Returns TRUE if NODE is a leaf node (no children).
+
+	is_root( NODE )
+
+	Returns TRUE if NODE is a root node (no parent nor siblings).
+
+	depth( NODE )
+
+	Returns the depth of NODE. If NODE is undef, the depth is 0. The root node has 
+	a depth of 1. For the children of the root node, the depth is 2. And so on.
+
+	n_nodes( NODE, FLAGS )
+
+	Returns the number of nodes in a tree.
+
+	FLAGS specifies which types of children are to be counted, one of TRAVERSE_ALL,
+	TRAVERSE_LEAFS and TRAVERSE_NON_LEAFS.
+
+	n_children( NODE )
+
+	Returns the number of children of NODE.
+
+	is_ancestor( NODE, DESCENDANT )
+
+	Returns TRUE if NODE is an ancestor of DESCENDANT. This is true if NODE is the
+	parent of DESCENDANT, or if NODE is the grandparent of DESCENDANT, etc.
+
+	max_height( NODE )
+
+	Returns the maximum height of all branches beneath NODE. This is the maximum
+	distance from NODE to all leaf nodes.
+
+	If NODE is undef, 0 is returned. If NODE has no children, 1 is returned.
+	If NODE has children, 2 is returned. And so on.
+
+	tsort( NODE )
+
+	Sorts all the children references of NODE according to the data field.
+
+	normalize( NODE )
+
+	Returns the normalized shape of NODE.
+
+	is_identical( NODE, ANOTHER_NODE )
+
+	Returns TRUE if NODE and ANOTHER_NODE have same structures and contents.
+
+	has_same_struct( NODE, ANOTHER_NODE )
+
+	Returns TRUE if the structure of NODE and ANOTHER_NODE are identical.
+
+	unlink( NODE )
+
+	Unlinks NODE from a tree, resulting in two separate trees.
+	The NODE to unlink becomes the root of a new tree.
+
+EXAMPLES
+
+	An example for each function can be found in the test suite bundled with
+	Tree::Nary.
+
+AUTHOR
+
+	Frederic Soriano, <fsoriano@cpan.org>
+
+COPYRIGHT
+
+	This package is free software and is provided "as is" without express or
+	implied warranty.  It may be used, redistributed and/or modified under the
+	same terms as Perl itself.
+
+SEE ALSO
+
+	API from the GLIB project,
+	http://developer.gnome.org/doc/API/glib/glib-n-ary-trees.html.

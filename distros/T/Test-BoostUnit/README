@@ -1,0 +1,157 @@
+NAME
+    Test::BoostUnit - Allow Tests to output Boost C++ XML format test
+    reports
+
+VERSION
+    Version 0.05
+
+SYNOPSIS
+    A collection of routines to aid in automated testing
+
+EXPORT
+            compareTwoDirecoryTrees  
+            compareTwoLists 
+            makeCheck 
+            makeCheckEqual 
+            makeError 
+            makeInfo 
+            makeCDATA 
+            makeCloseTestSuite
+            linearRegression 
+            correlateTwoHashes 
+            matchTwoHashes 
+            generateConfusionMatrix
+            makeComment 
+            makeOpenTestCase 
+            makeCloseTestCase 
+            makeOpenTestSuite 
+            makeOpenTestLog 
+            makeCloseTestLog
+            calculateErrorMetricForTwoHashes 
+            calculateWeightedKappaOnConfusionMatrix
+
+SUBROUTINES/METHODS
+  calculateErrorMetricForTwoHashes
+    Runs two hashes through a set of functions to return a single metric
+    value
+
+    Assume N matching keys in both hashes (V1 and V2): foreach n in N: Run a
+    COMPARE_FUNC C(V1(n), V2(n)) Run a ACCUMULATION_FUNC A(n) =
+    A(A(n-1),C(V1(n), V2(n)))
+
+    Finally:
+
+    Return a SUMMARY_FUNC S(A(N),N)
+
+    The default calculates the L2 Norm
+
+  matchTwoHashes
+    Return the % of matching keys in Two hashes (VECTOR1 and VECTOR2):
+
+  generateConfusionMatrix
+    Generates a confusion matrix between two vectors VECTOR1 and VECTOR2
+    VECTOR1 being an "expected" map between keys and values VECTOR2 being an
+    "observed" map between keys and values
+
+  calculateWeightedKappaOnConfusionMatrix
+    Given a confusion matrix and a weight matrix, generates a Kappa result
+
+  correlateTwoHashes
+    Given two vectors, calculates the common correlation between them
+
+  linearRegression
+    Performs a linear regression of a CDF in Y (in a COUNT and TOTAL_Y hash)
+    against an X_HASH
+
+  makeError
+    Generates an XML boost unit test V1.4.5 Error Node
+
+  makeInfo
+    Generates an XML boost unit test V1.4.5 Info Node
+
+  makeCDATA
+    Generates an XML CDATA Node
+
+  makeComment
+    Generates an XML Comment Node
+
+  makeOpenTestCase
+    Generates an XML boost unit test V1.4.5 Test Case open tag
+
+  makeCloseTestCase
+    Generates an XML boost unit test V1.4.5 Test Case close tag
+
+  makeOpenTestSuite
+    Generates an XML boost unit test V1.4.5 Test Suite Open tag
+
+  makeCloseTestSuite
+    Generates an XML boost unit test V1.4.5 Test Suite Close tag
+
+  makeOpenTestLog
+    Generates an XML boost unit test V1.4.5 Test log open tag
+
+  makeCloseTestLog
+    Generates an XML boost unit test V1.4.5 Test log close tag
+
+  compareTwoLists
+    Compares Two Lists with some COMPARE_CODE
+
+    Default compares for equality ignoring whitespace
+
+  compareTwoDirecoryTrees
+    Compares the contents of two directory trees file by file
+
+  makeCheck
+    Checks a test condition and generates either an XML boost unit test
+    V1.4.5 Info Node Or an XML boost unit test V1.4.5 Error Node
+
+  formatList
+    private helper function for printing lists
+
+  makeCheckEqual
+    Checks two lists for equality and generates either an XML boost unit
+    test V1.4.5 Info Node Or an XML boost unit test V1.4.5 Error Node
+
+AUTHOR
+    Robert Haxton, "<robert.haxton at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-format-printutils at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TestTools-BoostUnitTest>
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::BoostUnit
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=TestTools-BoostUnitTest>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/TestTools-BoostUnitTest>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/TestTools-BoostUnitTest>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/TestTools-BoostUnitTest/>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2011 Robert Haxton.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

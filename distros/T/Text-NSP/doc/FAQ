@@ -1,0 +1,447 @@
+NAME
+    FAQ Frequently Asked Questions about the Ngram Statistics Package
+
+SYNOPSIS
+    Frequently Asked Questions about the Ngram Statistics Package.
+
+DESCRIPTION
+    This FAQ is very much a work in progress, and is written somewhat
+    informally. Please take the information contained herein in that light.
+    I'd be happy to elaborate on any point raised here that isn't clear.
+    Also, if you spot errors or have suggestions I'd be happy to hear about
+    those!
+
+    Please send your questions to me (tpederse@d.umn.edu) or the NSP mailing
+    list <http://groups.yahoo.com/group/ngram/>.
+
+  How should I cite NSP in a paper?
+    This is our preferred reference:
+
+     @inproceedings{BanerjeeP03,
+            author = {Banerjee, S. and Pedersen, T.},
+            title = {The Design, Implementation, and Use of the 
+                    {N}gram {S}tatistic {P}ackage},     
+            booktitle = {Proceedings of the Fourth International 
+                    Conference on Intelligent Text Processing and
+                    Computational Linguistics},
+            year = {2003},
+            month ={February},
+            pages = {370--381}, 
+            address = {Mexico City}}
+
+    You can get a copy of this paper at:
+
+     L<http://www.d.umn.edu/~tpederse/Pubs/cicling2003-2.pdf>
+
+    If you would also like to cite a URL, the official home page of NSP is :
+
+     L<http://ngram.sourceforge.net>
+
+  Where can I find other papers by users of NSP?
+    We have established an NSP bibliography that includes some papers by
+    users. Please make contributions to this bibliography when you publish a
+    paper using NSP!
+
+     L<http://www.d.umn.edu/~tpederse/nsp-bib/>
+
+  General Questions
+  What is the class structure of your Measure hierarchy?
+    The following diagram tries to lay that all out:
+
+    <http://cpansearch.perl.org/src/TPEDERSE/Text-NSP-1.13/doc/NSP-Class-dia
+    gram.pdf>
+
+    In general we've tried to group the measures into families that reflect
+    their underlying relationships, and allow us to avoid replicating a lot
+    of code.
+
+   Why do you have 'make test' and then csh ./ALL-TESTS.sh
+    This reflects the historical development of NSP. Initially NSP was based
+    on command line scripts, and was not easy to test using the standard
+    Perl methods you see in 'make test'. However, once NSP went object
+    oriented, using 'make test' became much easier.
+
+    We use ./ALL-TESTS.sh to test our command line programs very
+    extensively, so you should still run this and take note of any errors.
+    Please make sure you run 'csh ./ALL-TESTS.sh' AFTER running 'make
+    install', otherwise some of the tests cases won't find the modules they
+    need (since they haven't been installed and since ./ALL-TESTS.sh does
+    not look into the build libraries prior to installation.
+
+   Why do you use the C shell (csh) so much?
+    This reflects the historical development of NSP. Initially NSP was
+    developed on Solaris systems, which use tcsh as their default shell.
+    Since we do not do anything too fancy with the shell, it seemed like a
+    reasonable thing to stay with csh even after our site and many others
+    moved to Linux, where the bash shell is more common.
+
+   What is in the future for NSP?
+    Many things! See TODO.pod for a fairly complete accounting of our future
+    plans. We are always open to suggestions, so please send those to the
+    mailing list for consideration and discussion.
+
+   Why is NSP so slow on large files of text?
+    As of version 0.61 (and before) NSP does all counting using a Perl hash.
+    In other words, each Ngram is an element in a hash, and a counter is
+    kept for that Ngram. This works very nicely, but if you start to deal
+    with millions of words of text it can result in a very large hash that
+    consumes quite a bit of memory.
+
+    Remember, the crucial constraint is not how many words in the corpus,
+    but how many unique Ngrams you have in the text. As N gets larger, the
+    number of hash elements grows larger and larger. However, if you are
+    dealing with unigrams NSP can process extremely large files (50 million
+    words) quite efficiently.
+
+    To start with I would recommend that you gradually increase the value of
+    N and the amount of text you try to process with NSP, just to get a
+    sense of how long things take on your system. Start with processing
+    unigrams in a 1,000,000 word corpus, then try bigrams. Then move up to
+    5,000,000 words with unigrams, and so forth.
+
+  Questions about Significance Testing
+   What is Fisher's exact test?
+    Fisher's exact test is a significance test that is considered to be more
+    appropriate for sparse and skewed samples of data than statistics such
+    as the log likelihood ratio (G^2) or Pearson's Chi-Squared test (X^2).
+
+    The paper "Fishing for Exactness" gives a fairly detailed description of
+    Fisher's exact test relative to these other tests. Find it with the 1996
+    entries at: <http://www.d.umn.edu/~tpederse/pubs.html> It is also
+    available at: <http://xxx.lanl.gov/abs/cmp-lg/9608010>
+
+   What is a left sided, right sided, and two sided Fisher's exact test?
+    Fisher's exact test is computed by fixing the marginal totals of a 2x2
+    table and then determining the probability of each of the possible
+    tables that could result in those marginal totals. The different sided
+    tests vary in how these individual probabilities are summed into the
+    final value produced by the test.
+
+    The left sided test is recommended (see 3) since it results in a value
+    that is easy to interpret as a measure of association between words.
+    Rather loosely speaking, it is the probability of randomly sampling a
+    2x2 table where a bigram occurs less frequently than was observed in the
+    corpus you are working with. So, a high left sided probability indicates
+    that you are very unlikely to observe the bigram more frequently than
+    you already have (if you took a random sample from a similar
+    population). This suggests that the bigram is a "special" pair of words
+    that may merit further attention.
+
+    The paper "Fishing for Exactness" gives a fairly detailed description of
+    computing left, right and two sided values. Find it with the 1996
+    entries at: <http://www.d.umn.edu/~tpederse/pubs.html> It is also
+    available at: <http://xxx.lanl.gov/abs/cmp-lg/9608010>
+
+   Why do you recommend the use of a left sided Fisher's exact test?
+    The main advantage of the left sided test it is interpreted much like
+    the other tests that we provide. The larger the value the stronger the
+    association between the words in the bigram. This is the same property
+    as mutual information (tmi.pm), the Dice Coefficient (dice.pm),
+    Loglikelihood ratio (ll.pm), and Pearson's test (x2.pm). Rankings that
+    are done by these measures can all be compared directly, where rank 1 is
+    assigned to the most strongly associated bigram/s.
+
+    A right sided test is symmetric with the left sided test, so larger
+    values indicate weaker association between the words. There is nothing
+    wrong with this approach, except that you can not directly compare the
+    rankings of a right sided test with, for example, mutual information.
+
+    A two sided test doesn't seem to have a very natural mapping to
+    explaining bigram data.
+
+   Why don't the log likelihood tests (ll.pm) and Pearson's test (x2.pm) report the significance values associated with their raw scores?
+    We don't assign significance values to these tests since setting the
+    p-values seems to be a fairly arbitrary choice. It isn't clear that p
+    should be .01, .05, or something else. This strikes us as an important
+    limitation of significance tests. Rather than setting an arbitrary
+    cutoff on these values, we recommend looking at the raw scores from
+    these tests in order to establish cutoffs.
+
+    Having said all this, it is very likely that future versions of NSP will
+    have this capability.
+
+   How do I decide which of the tests your provide is the one I should use?
+    The tests provided here can be divided into three classes:
+
+     1) Power Divergence Family:
+            Log Likelihood ratio (ll.pm) 
+            Pearson's Chi Squared test (x2.pm)
+
+     2) Exact test of statistical significance
+            Fisher's exact test (leftFisher.pm and rightFisher.pm)
+
+     3) Information theoretic measures
+            Mutual Information (tmi.pm)
+            Dice Coefficient (dice.pm)
+
+    If you would like to use a significance test with a predefined p-value
+    then Fisher's exact test is your choice. We have tried to implement this
+    as efficiently as possible, and it seems to run fairly quickly even with
+    large sample sizes.
+
+    If you would prefer to have a score that provides you with a measure of
+    the divergence of the observed from the expected values (given an
+    assumption of independence between the words in the bigram) then the
+    power divergence family is a fine choice. Note that Ll.pm and X2.pm
+    should provide the same results if the data is such that no asymptotic
+    assumptions are being violated. If you observe difference values for the
+    same bigram from these tests, then one of them is flawed! You can't be
+    sure which one it is either. There is some very fine background material
+    on the issue of the likelihood ratio (G^2) versus Pearson's test (X^2)
+    in the following:
+
+            @book{ReadC88,
+            author={Read, T. and Cressie, N.},
+            title={Goodness of fit Statistics for Discrete Multivariate Data},
+            year = {1988},
+            address = {New York, NY},
+            publisher = {Springer-Verlag}}
+
+    If you are interested in Mutual information, then you have it, and you
+    have the closely related alternative measure the Dice Coefficient.
+
+   How do I interpret the values of these test scores?
+    Carefully. Subjectively. Creatively.
+
+    For all of the tests, a higher score means a stronger measure of
+    association among the words in the bigram.
+
+    In general, we prefer to make comparisons among the tests based on the
+    different rankings they assign rather than the absolute scores they
+    return. However, you can directly compare the scores from the likelihood
+    ratio (Ll.pm) and Pearson's test (X2.pm). Otherwise, you should not
+    think of comparing these scores because they are apples and oranges. The
+    rank program (rank.pl) ranks the bigrams as scored by any two given
+    measures and will produce a table and rank correlation coefficient
+    showing how they compare. Please note however that you should not
+    include a right sided or two sided Fisher's test in such comparisons
+    since they do not follow the convention that a higher score means that
+    there is greater association between the bigrams. These tests should not
+    be compared to others with the rank.pl program!
+
+   Fisher's left sided test seems to rank a lot of bigrams first! Why?
+    As sample sizes get larger, the hypergeometric probabilities associated
+    with each possible 2x2 table of bigram data (given fixed marginal
+    totals) tend to approach 1. Consider setting the precision of the test
+    relatively high (10 or 15 digits) in order to observe this. When the
+    default setting is used (4 digits) there tends to be quite a lot of
+    rounding to 1.0000.
+
+    The paper "Fishing for Exactness" shows how these hypergeometric
+    probabilities are computed. Find it with the 1996 entries at:
+    <http://www.d.umn.edu/~tpederse/pubs.html> It is also available at:
+    <http://xxx.lanl.gov/abs/cmp-lg/9608010>
+
+  Questions about stop lists and removing non-tokens
+   How does the stop list option (--stop) work?
+    [Revised for version 0.53]
+
+    A stop list is a list of words that you don't want count.pl to count.
+    These words (or the Ngrams that they form) are not counted and do not
+    figure into the overall sample size.
+
+    Rather than specifying a list of words in a stoplist, as of version 0.53
+    you can specify Perl regular expressions.
+
+    There are two modes in which stop lists can be used. In the "AND" mode,
+    every word that makes up an N-gram must be found in the stoplist for
+    that N-gram to be eliminated. In the "OR" mode, any N-gram that includes
+    at least one word from the stoplist will be eliminated.
+
+    Your stop list should be a plain text file that has one Perl regular
+    expression per line.
+
+    For example, suppose your stop list consisted of:
+
+     @stop.mode=OR
+     /\bthe\b/
+     /\band\b/
+     /\bof\b/
+
+    [Note that \b indicates a word boundary in a Perl regex.]
+
+    Any N-gram that contains 'the', 'and', or 'of' would be excluded.
+
+    A note on counting. Suppose that the bigram "of the" occurred 700 times
+    in a text and was excluded by an AND mode stop list. Let's suppose for
+    this example that it is the only bigram excluded. The total sample size
+    reported by count.pl would be 700 less than without the stop list. The
+    frequency count for "of" occurring as the first component of a bigram
+    would be reduced by 700, as would the frequency count for "the"
+    occurring as the second component of a bigram. Note that the counts for
+    "of" as the second component and "the" as the first component will not
+    be affected by the stoplist. Note that without the stop list it will
+    typically be the case that the first and second position counts for a
+    word will be the same.
+
+   Can I have modifiers in my stoplist regular expressions?
+    No. :)
+
+    The documentation suggests that given a list of regular expressions such
+    as:
+
+     /\bis\b/
+     /\bthe\b/
+     /\ban\b/
+
+    NSP actually checks each regular expression one by one. Unfortunately if
+    the list of regex's is very long, this becomes too slow computationally,
+    and so instead we actually concatenate all the regular expressions to
+    form one big regex, which is then used to do the matching. For example
+    given the regexes above, they will be combined into a single regex, like
+    so:
+
+    /(\bis\b)|(\bthe\b)|(\ban\b)/
+
+    and then this regex is used to do the matching. Observe of course that
+    this produces exactly the same effect as if we had done the comparisons
+    one after another, and runs much faster. However the price we pay is
+    that you can't use modifiers (things outside the / /'s) while defining
+    the regex, since then we wouldn't be able to concatenate them together
+    like we are doing now.
+
+   Why is there a --stop and a --nontoken option for count.pl?
+    The stop option allows you to specify a stop list that eliminates Ngrams
+    if they are completely made up of stop words (AND mode) or if one of the
+    words in the Ngram is a stop word (OR mode). The effect of the stop
+    option is to remove Ngrams from the sample.
+
+    The nontoken option allows you to eliminate words from the text prior to
+    the formation of Ngrams. This processing occurs well before the stop
+    option, which is carried out after Ngrams have been formed.
+
+   How can I disregard n-grams that cross sentence boundaries or other punctuation marks?
+    For example, in :
+
+     I am here today. Where are you?
+
+     I do not want to consider "today Where are" as a 3-gram.
+
+    There is a built-in option (--newline) to disregard Ngrams across the
+    newline (\n), but there is not one to do the same across punctuation
+    marks at this time. But you can use the existing functionality to
+    accomplish the same!
+
+    Replace punctuation marks with new line characters and then use the
+    option --newLine. This will disregard Ngrams that cross newline
+    boundaries and thereby (in this case) cross punctuation marks.
+
+    For example, assume file "sentence.txt" is as follows:
+
+     this is a sentence. this is a sentence.
+
+    Then the following command-line script:
+
+     perl -e "while(<>){s/[.]/\n/g; print}" sentence.txt > sentence.tmp
+
+    would create the following in file "sentence.tmp":
+
+     this is a sentence
+      this is a sentence
+
+    (To use more punctuation marks, you'd want to put them inside the
+    [square brackets])
+
+    And then if you run the following:
+
+     count.pl --token token_file.txt --newLine sentence.cnt sentence.tmp
+
+    the following is produced in file "sentence.cnt":
+
+     6
+     a<>sentence<>2 2 2
+     this<>is<>2 2 2
+     is<>a<>2 2 2
+
+    Of course, there'd be other ways of replacing punctuation marks with
+    newlines. Programs like sed would probably do the trick too...
+
+    There's one problem in this approach though. Assume the following is
+    your original "sentence.txt" file:
+
+     this is a sentence. this is
+     a sentence.
+
+    Replacing '.' with \n would produce the following:
+
+     this is a sentence
+     this is
+     a sentence
+
+    And then if you use --newLine, you'd not be able to catch the second
+    "is<>a" bigram.
+
+    To avoid this I would suggest the following:
+
+     1. First replace all new lines with spaces
+     2. Then replace punctuations with new lines.
+
+    The following command-line script seems to work:
+
+     perl -e "while(<>){chomp; s/[.]/\n/g; print}" sentence.txt > sentence.tmp
+
+    Be warned though that very long lines can lead to very slow processing.
+
+  Questions about rank.pl
+   In rank.pl you use Spearman's rank correlation coefficient. Why not use Kendall's tau or some other correlation measure?
+    The reason we use Spearman's measure is that it is geared towards
+    correlation among ranked items. Kendall's tau can be used with the
+    actual values of the ranked items. However, when comparing different
+    kinds of tests of association such direct comparisons may not be
+    meaningful. For example, the Dice Coefficient and the Log-likelihood
+    ratio produce values that are on different scales, and you can't compare
+    them directly. This is why we focus on comparing ranked values, which is
+    why we use Spearman's.
+
+    However, when your data has numerous ties in the ranks, then you may
+    want to employ a method of other than Spearman's as provided via
+    rank.pl, which reranks the tied items but continues to use the standard
+    Spearman's formula. See the TODO list for more discussion on this point.
+
+  Questions about kocos.pl
+   What is a kth order co-occurrence?
+    Two words are 2nd order co-occurrences if they occur with words that
+    occur with a particular word. For example, suppose that we observe the
+    following bigrams in a corpus of text:
+
+     telephone line
+     busy line
+     telephone operator
+
+    These are first order co-occurrences.
+
+    "telephone" and "busy" are said to be second order co-occurrences of
+    each other since they both occur with "line". (Both are first order
+    co-occurrences of "line"). Then "operator" is said to be a second order
+    co-occurrence of "line" since it occurs with "telephone" which is a
+    first order co-occurrence of "line".
+
+    These relationships can be visualized as graphs or chains.
+
+     line -> telephone -> operator
+
+    kocos.pl finds such kth order relationships among words.
+
+AUTHORS
+     Ted Pedersen, University of Minnesota, Duluth
+     tpederse at d.umn.edu         
+
+     Satanjeev Banerjee, Carnegie-Mellon University
+
+BUGS
+SEE ALSO
+     NSP home : L<http://ngram.sourceforge.net>
+     NSP mailing list : L<http://groups.yahoo.com/group/ngram/>
+
+COPYRIGHT
+    Copyright (C) 2000-2010 Ted Pedersen
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

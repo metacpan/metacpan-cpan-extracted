@@ -1,0 +1,12 @@
+Revision history for Perl extension Time::HR.
+
+0.02  Sat Apr  6 02:14:41 CEST 2002 by Márton Németh <nm127@hszk.bme.hu>
+	- minor changes: we also need perl 5.006 for install not only for run
+	- author name corrected
+	- using 'gettimeofday(&ts, NULL)' instead of 
+	  'clock_gettime(CLOCK_REALTIME, &ts)' on Linux if the second not exists
+
+0.01  Thu Jan 31 13:14:40 2002
+	- original version; created by h2xs 1.21 with options
+		-nTime::HR -v0.01 /usr/include/sys/time.h
+

@@ -1,0 +1,38 @@
+---
+abstract: 'A mock implementation of Fluent::Logger for testing'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Fluent-Logger
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Fluent::Logger:
+    file: lib/Test/Fluent/Logger.pm
+    version: '0.02'
+requires:
+  Fluent::Logger: '0.19'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/moznion/p5-Test-Fluent-Logger/issues
+  homepage: https://github.com/moznion/p5-Test-Fluent-Logger
+  repository: git://github.com/moznion/p5-Test-Fluent-Logger.git
+version: '0.02'
+x_authority: cpan:MOZNION

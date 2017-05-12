@@ -1,0 +1,66 @@
+{
+   "abstract" : "A POE Component providing TCP server services for test cases",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.045, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-POE-Server-TCP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47",
+            "Text::ParseWords" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE" : "1.004",
+            "POE::Filter" : "0",
+            "POE::Filter::Line" : "0",
+            "POE::Wheel::ReadWrite" : "0",
+            "POE::Wheel::SocketFactory" : "0",
+            "Socket" : "2.0",
+            "perl" : "v5.6.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/test-poe-server-tcp",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/test-poe-server-tcp.git",
+         "web" : "https://github.com/bingos/test-poe-server-tcp"
+      }
+   },
+   "version" : "1.20"
+}
+

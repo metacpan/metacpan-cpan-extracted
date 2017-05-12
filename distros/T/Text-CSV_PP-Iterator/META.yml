@@ -1,0 +1,27 @@
+---
+abstract: 'Provide fetchrow_hashref() for CSV files'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-CSV_PP-Iterator
+provides:
+  Text::CSV_PP::Iterator:
+    file: lib/Text/CSV_PP/Iterator.pm
+    version: 1.03
+requires:
+  Exception::Class: 0
+  Iterator: 0
+  Iterator::IO: 0
+  Text::CSV_PP: 0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.03

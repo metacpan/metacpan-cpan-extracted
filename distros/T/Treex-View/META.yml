@@ -1,0 +1,39 @@
+---
+abstract: 'Converts Treex::Core::Document to JSON'
+author:
+  - 'Michal Sedlák <sedlak@ufal.mff.cuni.cz>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Treex-View
+provides:
+  Treex::View:
+    file: lib/Treex/View.pm
+    version: v1.0.0
+  Treex::View::Node:
+    file: lib/Treex/View/Node.pm
+    version: v1.0.0
+  Treex::View::TreeLayout:
+    file: lib/Treex/View/TreeLayout.pm
+    version: v1.0.0
+requires:
+  EV: '0'
+  JSON: '2.90'
+  Treex::Core: '0'
+  Valence: '0'
+resources:
+  homepage: http://ufal.github.io/treex-view/
+  repository: https://github.com/ufal/perl-treex-view.git
+version: 1.0.0
+x_authority: cpan:MICHALS

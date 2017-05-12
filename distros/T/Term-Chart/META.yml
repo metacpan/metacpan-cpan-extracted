@@ -1,0 +1,24 @@
+---
+abstract: 'Create attractive bar charts for the terminal interface.'
+author:
+  - 'Dylan Doxey <dylan@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Chart
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Readonly: '0'
+  Term::ReadKey: '0'
+version: '0.04'

@@ -1,0 +1,39 @@
+
+Test of complete table: 
+
+<TABLE BORDER=1>
+<TR><TD COLSPAN="3" ALIGN=CENTER><B>Header</B></TD></TR>
+
+
+<TR><TD><FONT FACE="Arial,Helvetica" SIZE="-2">The apple is a 
+						round, red fruit that is medium in size.</FONT></TD>
+
+<TD><FONT FACE="Arial,Helvetica" SIZE="-2">The pear is a 
+						oblong, green fruit that is medium in size.</FONT></TD>
+
+<TD><FONT FACE="Arial,Helvetica" SIZE="-2">The grape is a 
+						round, purple fruit that is small in size.</FONT></TD>
+
+</TR>
+<TR><TD><FONT FACE="Arial,Helvetica" SIZE="-2">The pumpkin is a 
+						round, orange fruit that is large in size.</FONT></TD>
+
+<TD COLSPAN="2">&nbps;<I>filler</I>&nbsp;</TD>
+</TR>
+
+</TABLE>
+
+
+
+
+Test of empty table:
+
+
+<TABLE><TR><TD>This is an empty table.</TD></TR></TABLE>
+
+
+
+
+Test of null table:
+
+

@@ -1,0 +1,4 @@
+lib/TestUseAllModulesTest.pm
+lib/TestUseAllModulesTestFoo.pm
+t/lib/TestUseAllModulesTestTest.pm
+under/TestUseAllModulesUnder.pm

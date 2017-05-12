@@ -1,0 +1,37 @@
+---
+abstract: 'Filter Nodes in the AST made by Text::Xslate'
+author:
+  - 'aereal <aereal@aereal.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Xslate-AST-Walker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Xslate::AST::Walker:
+    file: lib/Text/Xslate/AST/Walker.pm
+    version: '0.01'
+requires:
+  Class::Accessor::Lite: '0'
+  Text::Xslate: '0'
+resources:
+  bugtracker: https://github.com/aereal/Text-Xslate-AST-Walker/issues
+  homepage: https://github.com/aereal/Text-Xslate-AST-Walker
+  repository: git://github.com/aereal/Text-Xslate-AST-Walker.git
+version: '0.01'

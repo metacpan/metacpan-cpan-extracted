@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>Smoke Reports</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <style type="text/css">
+    body {
+      background-color: white;
+      margin:           0;
+
+      font-family: sans-serif;
+      line-height: 1.3em;
+      font-size:   95%;
+    }
+
+    h1, h2 {
+      background-color: #313052;
+      color:            white;
+      padding:          10px;
+    }
+
+    th       { text-align: left; }
+    .category       { padding-top:  30px; border-bottom: 2px solid #313052; }
+    .subcategory    { padding-top:  10px; border-bottom: 1px solid #313052; }
+    .report_summary { padding-left: 40px; }
+    .report_details { padding-left: 80px; padding-bottom: 10px; }
+
+    p, dl, pre, table { margin:      15px; }
+    dt    { font-weight: bold; }
+    dd+dt { margin-top:  1em;  }
+    .leftsep  { padding-left: 10px;  }
+    .num      { text-align:   right; }
+
+    .details  { display: none; }
+    .expander { color: blue; cursor: pointer; }  /* hack? */
+
+    .tests_ok       { color: #050; }
+    .tests_failed   { color: #500; }
+    .tests_todo     { color: #030; }
+    .tests_skipped  { color: #555; }
+    .tests_unexpect { color: #550; }
+  </style>
+
+  <script type="text/javascript">//<![CDATA[[
+    function toggle_visibility (id) {
+      var elem     = document.getElementById("details_"  + id),
+          expander = document.getElementById("expander_" + id);
+      if(elem.className == "details") {
+	elem.className = "";  /* hack? */
+	expander.innerHTML = "&laquo;";
+      } else {
+	elem.className = "details";
+	expander.innerHTML = "&raquo;";
+      }
+    }
+  //]]></script>
+</head>
+
+<body>
+  <h1>Smoke Reports</h1>
+
+  <p>
+    Timezone is UTC
+  </p>
+
+  <table>
+% foreach my $category (sort keys %$categories) {
+      <tr><th colspan="11" class="category"><% $category %></th></tr>
+% foreach my $subcategory (sort keys %{$categories->{$category}}) {
+        <tr><th colspan="11" class="subcategory"><% $subcategory %></th></tr>
+% foreach my $report (@{$categories->{$category}->{$subcategory}}) {
+          <tr>
+            <td class="report_summary"><% $report->project %></td>
+            <td>
+              r<% $report->revision %>
+            </td>
+            <td class="leftsep"><% $report->committer %></td>
+            <td class="leftsep"><% $report->timestamp %></td>
+            <td class="leftsep num"><% $report->duration %>&nbsp;sec</td>
+            <td class="leftsep num"><% sprintf("%.2f", $report->total_ratio * 100) %>%&nbsp;ok</td>
+	    <td class="leftsep num tests_total"><span title="<% $report->total_seen %> total"><% $report->total_seen %></span>:</td>
+	    <td class="num tests_ok"><span title="<% $report->total_ok %> ok"><% $report->total_ok %></span>,</td>
+	    <td class="num tests_failed"><span title="<% $report->total_failed %> failed"><% $report->total_failed %></span>,</td>
+	    <td class="num tests_todo"><span title="<% $report->total_todo %> todo"><% $report->total_todo %></span>,</td>
+	    <td class="num tests_skipped"><span title="<% $report->total_skipped %> skipped"><% $report->total_skipped %></span>,</td>
+	    <td class="num tests_unexpect"><span title="<% $report->total_unexpectedly_succeeded %> unexpectedly succeeded"><% $report->total_unexpectedly_succeeded %></span></td>
+	    <td><span title="Details" class="expander" onclick="toggle_visibility('<% $report->id %>')" id="expander_<% $report->id %>">&raquo;</span></td>
+	    <td><a style="text-decoration: none" href="<% detail_url($cgi, $report) %>" title="Full smoke report">&raquo;</a></td>
+          </tr>
+          <tr class="details" id="details_<% $report->id %>">
+            <td colspan="11" class="report_details">
+                <span class="tests_total"><% $report->total_seen %> test cases</span>:<br />
+		<span class="tests_ok"><% $report->total_ok %> ok</span>,
+		<span class="tests_failed"><% $report->total_failed %> failed</span>,
+		<span class="tests_todo"><% $report->total_todo %> todo</span>,<br />
+                <span class="tests_skipped"><% $report->total_skipped %> skipped</span> and
+		<span class="tests_unexpect"><% $report->total_unexpectedly_succeeded %> unexpectedly succeeded</span>
+              <br />
+              <a href="<% detail_url($cgi, $report) %>" title="Full smoke report">View full smoke report</a>
+            </td>
+          </tr>
+% }
+% }
+% }
+  </table>
+</body>
+</html>
+
+<%args>
+$categories
+$cgi
+</%args>
+
+<%once>
+sub detail_url {
+  my ($cgi, $report) = @_;
+  return $cgi->url . "?id=" . $report->id;
+}
+</%once>
+
+<%doc>
+This template is based on code from smokeserv-server.pl in the
+Pugs distribution
+
+This template assumes the use of the following report variables:
+project
+revision
+committer
+duration
+</%doc>

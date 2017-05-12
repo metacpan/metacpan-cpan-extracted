@@ -1,0 +1,41 @@
+Revision history for Test-DiagINC
+
+0.006     2016-09-23 20:39:00-04:00 America/New_York
+
+    - No changes from 0.005.
+
+0.005     2016-09-10 14:07:35-04:00 America/New_York (TRIAL RELEASE)
+
+    [TESTS]
+
+    - Skips taint tests on MSWin32 to avoid File::Temp bugs
+
+0.004     2014-02-10 13:02:39-05:00 America/New_York
+
+    [FIXED]
+
+    - Localizes more %ENV vars to work under taint mode
+
+0.003     2014-02-07 12:54:54-05:00 America/New_York
+
+    [CHANGED]
+
+    - More robust error condition detection - now triggers on failures
+      in END-block-based test modules (e.g. Test::NoWarnings)
+    - Add diagnostic of "Attempted-but-failed-to-load" on perl >= 5.10
+    - Minimize amount of reported modules: anything Test::DiagINC loads
+      in order to compile the report is excluded
+    - No longr chdir() during the local-library heuristic
+    - No non-core runtime dependencies, add 5.6 support
+
+0.002     2014-02-04 22:17:58-05:00 America/New_York
+
+    [CHANGED]
+
+    - Will not report modules loaded from below the current directory
+      (suggested by Peter Rabbitson)
+
+0.001     2014-02-04 15:12:52-05:00 America/New_York
+
+    - First release
+

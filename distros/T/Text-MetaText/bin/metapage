@@ -1,0 +1,1130 @@
+#!/usr/bin/perl -w
+#========================================================================
+#
+# metapage
+#
+# DESCRIPTION
+#   Script for automating batch processing of files using the MetaText 
+#   module.  Configuration files are used to specify MetaText options 
+#   and pre-defined substitutions, as well as indicating the source and 
+#   destination directories for input/output files.  Generally useful for 
+#   processing entire directory trees of source files using a similar 
+#   template.
+#
+# AUTHOR
+#   Andy Wardley <abw@kfs.org>
+#
+# COPYRIGHT
+#   Copyright (C) 1996-1998 Andy Wardley.  All Rights Reserved.
+#   
+#   This script is free software; you can redistribute it and/or
+#   modify it under the terms of the Perl Artistic Licence.
+#
+#------------------------------------------------------------------------
+#
+# $Id: metapage,v 1.11 1998/04/02 09:05:36 abw Exp abw $
+#
+#========================================================================
+
+require 5.004;
+
+use strict;
+use Text::MetaText;
+use File::Recurse;
+
+
+my $NAME     = "metapage";
+my $VERSION  = sprintf("%d.%02d", q$Revision: 1.11 $ =~ /(\d+)\.(\d+)/);
+my $HOME     = $ENV{ HOME } || (getpwuid($<))[7] || die "No HOME\n";
+my $RCFILE   = $ENV{"\U${NAME}rc"} || "$HOME/.${NAME}rc";
+
+# configuration items
+my %mppath   = ();
+my %mtcfg    = (); 
+my %mtdef    = ();
+my @cfgfiles = ();
+my @casevars = qw(FILENAME FILEPATH FULLPATH FILETIME FILEMOD);
+
+# cmd line flags
+my ($verbose, $quiet, $debug, $force, $recurse, $today, $all, $noexec) 
+    = (0) x 8;
+
+# src/dest file and path names 
+my ($path, $file, $srcfile, $destfile);
+
+# file process/skip table
+my $filelist = { 
+    NOT_FOUND    => [],
+    NOT_ACCEPTED => [],
+    NOT_MODIFIED => [],
+    IGNORED      => [],
+    PROCESS      => [],
+};
+
+# process/skip stats.  $queued is for non-execute mode (-n)
+my ($processed, $skipped, $failed, $queued) = (0) x 4;
+
+
+
+#========================================================================
+#
+# process command line, .rc and config files 
+#
+#========================================================================
+
+# pull all "@config" file parameters into @cfgfiles...
+@cfgfiles = grep { /^@(.*)/ } @ARGV;
+
+# ...and remove leading '@'
+foreach (@cfgfiles) {
+    s/^@//;
+}
+
+# check all command line -opts
+foreach ( map{ /^-(.*)/ ? split('', $1) : () } @ARGV) {
+
+	/^-$/    && last;
+	/^h$/    && do { usage();                  exit };
+	/^v$/    && do { $verbose++;               next };
+	/^q$/    && do { $quiet++;                 next };
+	/^d$/    && do { $debug++;                 next };
+	/^f$/    && do { $force++;                 next };
+	/^m$/    && do { $today = 0;               next };
+	/^t$/    && do { $today = 1;               next };
+	/^n$/    && do { $noexec = 1; $verbose++;  next };
+	/^a$/    && do { $all++; $recurse++;       next };
+	/^[Rr]$/ && do { $recurse++;               next };
+
+	warn "Invalid option: $_\n";
+}
+
+# extract all non-opts and config file args from @ARGV...
+@ARGV = grep !/^[@-]/, @ARGV;
+
+# print script version and id if verbose
+print "$NAME $VERSION (MetaText version $Text::MetaText::VERSION)\n\n" 
+    if $verbose;
+
+# check metapage config file exists and parse it if it does
+die "$RCFILE: $!\n" unless -f $RCFILE;
+&cfg_file($RCFILE);
+
+# set default '.' path for [profile]->{ dir } and convert to an array ref
+$mppath{ DIR } ||= "";
+$mppath{ DIR }  = [ split(":", $mppath{ DIR }) ];
+unshift(@{ $mppath{ DIR } }, ".") 
+    unless (grep /^\.$/, @{ $mppath{ DIR } });
+
+# process each config file specified on the command line or in rc file
+foreach $file (@cfgfiles) {
+    if (defined($path = &find_file($file, $mppath{ DIR } ))) {
+	&cfg_file($path) ;
+	$file = $path;   # update @cfgfiles array elem to full path
+    }
+    else {
+	warn "Cannot locate $file in " 
+		. join(', ', @{ $mppath{ DIR } }) . "\n" unless $quiet;
+    }
+}
+
+# copy $mppath{ LIB } into $mtcfg{ LIB } so that MetaText gets 
+# to hear about it
+$mtcfg{ LIB } = $mppath{ LIB };
+
+# check SRC and DEST are defined and not pointing to the same place
+foreach (qw( SRC DEST )) {
+    die "[file] \L$_\E is not defined\n" unless defined $mppath{ $_ };
+}
+if ($mppath{ SRC } eq $mppath{ DEST }) {
+    $force
+    ? warn "[file] src and dest are identical\n"
+    : die  "[file] src and dest are identical: use -f to force\n";
+}
+
+
+
+#========================================================================
+#
+# expansion of files/directories specified
+#
+#========================================================================
+
+if ($all) {
+    # go get all files in the SRC tree
+    recurse(\&add_file, $mppath{ SRC }, $filelist);
+}
+else {
+    foreach $file (@ARGV) {
+	$srcfile = "$mppath{ SRC }/$file";
+
+	# recurse into sub-directory if $recurse mode set
+	if (-d $srcfile && $recurse) {
+	    recurse(\&add_file, $srcfile, $filelist);
+	}
+	else {
+	    add_file($srcfile, $filelist);
+	}
+    }
+}
+
+# the total number of files skipped is:
+#    NOT_FOUND + NOT_ACCEPTED + IGNORED + NOT_MODIFIED
+$skipped = @{ $filelist->{ NOT_FOUND    } }
+         + @{ $filelist->{ NOT_ACCEPTED } }
+         + @{ $filelist->{ IGNORED      } }
+	 + @{ $filelist->{ NOT_MODIFIED } };
+
+# print summary (if verbose) of files *not* being processed
+if ($verbose) {
+    print "Files not found:\n    ",
+	    join("\n    ", @{ $filelist->{ NOT_FOUND } }), "\n\n"
+       	if @{ $filelist->{ NOT_FOUND } };
+
+    print "Files not accepted:\n    ",
+	    join("\n    ", @{ $filelist->{ NOT_ACCEPTED } }), "\n\n"
+       	if @{ $filelist->{ NOT_ACCEPTED } };
+
+    print "Files ignored:\n    ",
+	    join("\n    ", @{ $filelist->{ IGNORED } }), "\n\n"
+       	if @{ $filelist->{ IGNORED } };
+
+    print "Files not modified:\n    ",
+	    join("\n    ", @{ $filelist->{ NOT_MODIFIED } }), "\n\n"
+       	if @{ $filelist->{ NOT_MODIFIED } };
+}
+
+
+
+#========================================================================
+#
+# prepare MetaText variables
+#
+#========================================================================
+
+# interpolate any embedded values in %mtdef values
+foreach my $key (keys %mtdef) {
+    my $val = $mtdef{ $key };
+    my $newval;
+
+    printf("%-12s  == << %-25s ", $key, $val) if $debug;
+
+    # loop while there are embedded '$' characters
+    while ($val =~ /\$/) {
+	($newval = $val) =~ s/ ( \$ \{? ([\w\.]+) \}? ) /
+	    defined $mtdef{ $2 } ? $mtdef{ $2 } : $1
+	/gex;
+
+	# drop out if there was no change (i..e symbol not resolved)
+	last if $val eq $newval;
+	$val = $newval;
+    }
+
+    # update hash array with new value
+    $mtdef{ $key } = $val;
+    print ">> $mtdef{ $key }\n" if $debug;
+}
+
+&debug_summary() if $debug;
+
+
+#========================================================================
+#
+# create a MetaText object and process the files
+#
+#========================================================================
+
+# MetaText configuration hash
+$mtcfg{ DEBUGLEVEL } = 'process' if $debug;
+$mtcfg{ CASEVARS   } = \@casevars;
+$mtcfg{ ERRORFN    } = sub { 
+    my $text = shift; 
+    $text =~ s/^/  ! /mg if $verbose;  # format for verbose output
+    print STDERR $text;
+};
+
+# create a new MetaText object; this never fails in normal use
+my $mt = Text::MetaText->new(\%mtcfg)
+    or die "failed to create Text::MetaText object\n";
+
+print "Processing files:\n" if $verbose && @{ $filelist->{ PROCESS } };
+
+# process/skip each file
+foreach $srcfile (@{ $filelist->{ PROCESS } }) {
+    my $proctext;
+
+    # construct destination filename from src filename
+    ($destfile = $srcfile) =~ s/^$mppath{ SRC }/$mppath{ DEST }/o;
+
+    # split the full filepath into path and filename
+    $srcfile           =~ /((.*)\/)?([^\/]*)/;
+    $mtdef{ FILEPATH } = $2;
+    $mtdef{ FILENAME } = $3;
+
+    # FILEPATH is relative to src tree, FULLPATH is abs destination path
+    $mtdef{ FILEPATH } =~ s[^$mppath{ SRC }\/?][]go;
+    $mtdef{ FULLPATH } =  $destfile;
+
+    # time stamps (generally useful for "file last modified" messages)
+    $mtdef{ FILEMOD }  = (stat($srcfile))[9];
+    $mtdef{ FILETIME } = $today ? time() : $mtdef{ FILEMOD };
+
+
+    # check the file has somewhere to go
+    $destfile =~ /^(.*)\/(.*)$/;
+    $path     =  $1;
+    $file     =  $2;
+
+    &chkpath($path) or do {
+	print "  ! $path: $!\n";
+	$failed++;
+	next;
+    };
+
+    print "    $srcfile\n" if $verbose;
+
+    # don't actually process the file if in no-execute mode
+    if ($noexec) {
+	$queued++;
+	next;
+    }
+
+    # open output file
+    open(DEST, "> $destfile") or do {
+	print "  ! $destfile: $!\n";
+	$failed++;
+	next;
+    };
+
+    # process and write output  
+    if (defined($proctext = $mt->process($srcfile, \%mtdef))) {
+	print DEST $proctext;
+	$processed++;
+    }
+    else {
+	$failed++;
+    }
+
+    close(DEST);
+}
+
+
+if ($verbose) {
+    # line break after processed files list
+    print "\n" if @{ $filelist->{ PROCESS } };
+
+    printf("   queued: %4d (non-execute mode)\n", $queued) if $noexec;
+    printf("processed: %4d\n", $processed);
+    printf("  skipped: %4d\n", $skipped);
+    printf("   failed: %4d\n", $failed);
+}
+
+
+#========================================================================
+#
+# --------------------------------- END ---------------------------------
+#
+#========================================================================
+
+
+
+#========================================================================
+#
+# cfg_file($file)
+# 
+# Reads and parses the file specified, updating the configuration
+# hash arrays, @cfgfiles (further config files to process), $mppath
+# (metapage paths), $mtcfg (MetaText configuration options) and
+# $mtdef (MetaText pre-definitions).
+#
+#========================================================================
+
+sub cfg_file {
+    my $file = shift;
+    my ($param, $value);
+    local(*F);
+
+    
+    # configuration hashes that are targets for the configuration 
+    # variables/values in the various sections
+    my $secthash = {
+	'file'    => \%mppath,
+	'profile' => \%mppath,
+	'config'  => \%mtcfg,
+	'define'  => \%mtdef,
+    };
+    my $section = 'define';   # default section
+
+    print STDERR "#", '-' x 72, "\nconfig file: $file\n"
+	if $debug;
+
+    open(F, $file) || do { 
+	warn "$file: $!\n"; 
+	return;
+    };
+
+
+    while(<F>) {
+	# ignore comments and blank lines
+	next if /^#/ || /^\s*$/;
+	chomp;
+
+	# look for a [section] line
+	/^\s*\[\s*(\S+)\s*\]/ && do {
+	    $section = $1;
+	    unless (defined $secthash->{ $section }) {
+		warn "Invalid section name in $file line $.\n";
+		$section = undef;
+	    }
+	    next;
+	};
+
+	# look for possible config options
+	/\s*(\S+)\s*=\s*(.*?)\s*$/ && do {
+	    $param  = $1;
+	    ($value = $2) =~ s/^(["'])(.*)\1$/$2/;  # strip quotes
+
+	    # check a section is defined
+	    unless (defined $section) {
+		warn "$file line $. is outside a \"[section]\" block\n";
+		next;
+	    }
+
+	    # the 'default' entry in the [profile] section names a
+	    # configuration file (a "profile") which should be processed 
+	    $section eq 'profile' && $param =~ /^default$/ && do {
+		unshift(@cfgfiles, $value);
+		next;
+	    };
+
+	    # items in the [file] and [profile] sections may need tweaking...
+	    $section =~ /^(pro)?file$/ && do {
+    		# ...paths that require tilde expansion 
+		# (e.g. ~/foo or ~abw/bar)
+    		&expand_home(\$value) ;
+	    };
+
+	    # any variables *not* in the [define] section can be coerced
+	    # to UPPER CASE
+	    $param = uc $param unless $section eq 'define';
+
+	    printf(STDERR "    %-10s ($param) = ($value)\n", "[$section]")
+		if $debug;
+
+	    # the ACCEPT and IGNORE parameters in [file] should be coerced
+	    # to array references and merged in with any current values
+	    if ($section eq 'file' && $param =~ /^(ACCEPT|IGNORE)$/) {
+		$value = [ 
+		    @{ $secthash->{ $section }->{ $param } || [] }, $value
+		];
+	    }
+
+	    # save variable/value pair in the appropriate hash
+	    $secthash->{ $section }->{ $param } = $value;
+	};
+    }
+    close(F);
+    print STDERR "#", '-' x 72, "\n"
+	if $debug;
+}
+
+
+
+#========================================================================
+#
+# find_file($file, $path)
+#
+# Attempts to locate the file $file in any of the directories referenced
+# by $path.  $path may be a reference to a single, or an array of,
+# directory string(s).
+# 
+# Returns a full file path on success or undef if the file cannot be
+# located.
+#
+#========================================================================
+
+sub find_file {
+    my $file = shift;
+    my $path = shift || "";
+    my $dir;
+
+
+    # iterate through each possible path
+    foreach $dir (ref($path) eq 'ARRAY' ? @$path : $path) {
+	return "$dir/$file" if -f "$dir/$file";
+    }
+
+    # no luck 
+    return undef;
+}
+
+
+
+#========================================================================
+#
+# expand_home($$path)
+#
+# Expands home directories of the form "~[uid]/..."
+#
+#========================================================================
+
+sub expand_home {
+    my $path = shift;
+
+    my @elements = split(':', $$path);
+    foreach (@elements) {
+	# expand "~" or "~uid" home directory
+	s{^~([^/]*)(.*)} {
+	    ((defined($1) && $1)
+	    ? (getpwnam($1))[7] || "~$1"
+	    : $HOME)
+	    . $2
+	}ex;
+    } 
+    $$path = join(':', @elements);
+}
+
+
+
+#========================================================================
+#
+# add_file($srcfile, \%filelist)
+#
+# Examines the source file, $srcfile, to determine if it should be 
+# processed or ignored.  Depending on the outcome it is added to one of 
+# the arrays referenced by the values of the has array referenced by 
+# $filelist.  
+#
+# If the source file doesn't exist, it is added to the array referenced by 
+# $filelist->{ NOT_FOUND }.  If the source filename doesn't match any 
+# defined ACCEPT pattern, it is added to the $filelist->{ NOT_ACCEPTED } 
+# array.  If it matches any defined IGNORE pattern, it is added to the 
+# $filelist->{ IGNORED } array.  If it has a modification timestamp that 
+# is older than its corresponding destination file, then it is added to 
+# the $filelist->{ NOT_MODIFIED } array.  Otherwise, it is added to the 
+# $filelist->{ PROCESS } array and is effecticely queued for processing.
+#
+#========================================================================
+
+sub add_file {
+    my $srcfile  = shift;
+    my $filelist = shift;
+    my ($relpath, $destfile);
+    my ($srctime, $desttime);
+
+
+    # construct destination path and extract relative path
+    ($destfile = $srcfile) =~ s
+	    {^$mppath{ SRC }(\/(.*))}
+	    {$mppath{ DEST }$1}ox;
+    $relpath = $2;
+
+    # check the src file exists 
+    unless (-e $srcfile) {
+	push(@{ $filelist->{ NOT_FOUND } }, $srcfile);
+	return 0;
+    }
+
+    # if ACCEPT is defined, the file must match
+    if ($mppath{ ACCEPT }) {
+	unless (&file_matches($relpath, $mppath{ ACCEPT })) {
+	    push(@{ $filelist->{ NOT_ACCEPTED } }, $srcfile);
+	    return 0;
+	}
+    }
+    
+    # if IGNORE is defined, the file must *not* match
+    if ($mppath{ IGNORE }) {
+	if (&file_matches($relpath, $mppath{ IGNORE })) {
+	    push(@{ $filelist->{ IGNORED } }, $srcfile);
+	    return 0;
+	}
+    }
+
+    # check src vs dest modification times unless in force mode
+    if (-f $destfile && ! $force) {
+	$srctime  = ( stat($srcfile)  )[9];
+	$desttime = ( stat($destfile) )[9];
+
+	if ($desttime > $srctime) {
+	    push(@{ $filelist->{ NOT_MODIFIED } }, $srcfile);
+	    return 0;
+	}
+    }
+
+    push(@{ $filelist->{ PROCESS } }, $srcfile) if -f $srcfile;
+}
+
+
+
+#========================================================================
+#
+# file_matches($file, \@matches)
+#
+# Simple function to test if the file name specified matches any of the
+# file match regexen in the $matches array reference.  
+#
+# Returns 1 if the file matches any of the patterns, 0 if not.
+#
+#========================================================================
+
+sub file_matches {
+    my $file    = shift;
+    my $matches = shift || return 0;
+    my $pattern;
+
+
+    # apply each regex to the relative file path
+    foreach $pattern (@$matches) {
+	return 1 if $file =~ /$pattern/;
+    }
+
+    # no match - return 0;
+    return 0;
+}
+
+
+
+#========================================================================
+#
+# chkpath($path)
+#
+# Checks the directory path specified in $path exists, creating any 
+# iintermediate directories along the way to ensure, wherever possible, 
+# that it does.
+#
+# Returns 1 if the path exists or has been created, 0 if not.
+#
+#========================================================================
+
+sub chkpath {
+    my $path = shift(@_) || return 1;  # return ok if ""
+    my $retval;
+
+    return 1 if (-d $path);  # yep, dir exists
+
+    $path =~ /(.*)\/(.*)/;
+    my $parent = $1;
+    my $cwd    = $2;
+
+    # check parent directory exists, or make it
+    if ($retval = &chkpath($parent)) {
+	# make current directory
+	$retval = mkdir("$parent/$cwd", 0755);
+    }
+
+    return $retval
+}
+
+
+
+#========================================================================
+#
+# debug summary
+#
+#========================================================================
+
+sub debug_summary {
+
+    print STDERR "Flags:\n";
+    printf(STDERR "    %-15s %s\n", "verbose", $verbose ? "on" : "off");
+    printf(STDERR "    %-15s %s\n", "quiet",   $quiet   ? "on" : "off");
+    printf(STDERR "    %-15s %s\n", "all",     $all     ? "on" : "off");
+    printf(STDERR "    %-15s %s\n", "recurse", $recurse ? "on" : "off");
+    printf(STDERR "    %-15s %s\n", "force",   $force   ? "on" : "off");
+    print STDERR "\n";
+
+    print STDERR "Command files:\n    ", 
+	join("\n    ", @cfgfiles), "\n\n";
+    print STDERR "Process files:\n    ", 
+	join("\n    ", @{ $filelist->{ PROCESS } }),    "\n\n";
+
+    print STDERR "metapage paths:\n";
+    foreach (sort keys %mppath) {
+	printf(STDERR "    %-12s => %s\n", $_, 
+		ref($mppath{ $_ }) eq 'ARRAY'
+		? join(', ', @{ $mppath{ $_ } })
+		: $mppath{ $_ });
+    }
+    print STDERR "\n";
+
+    print STDERR "MetaText configuration:\n";
+    foreach (sort keys %mtcfg) {
+	printf(STDERR "    %-12s => %s\n", $_, $mtcfg{ $_ });
+    }
+    print STDERR "\n";
+
+    print STDERR "MetaText pre-definitions:\n";
+    foreach (sort keys %mtdef) {
+	printf(STDERR "    %-12s => %s\n", $_, $mtdef{ $_ });
+    }
+    print STDERR "\n";
+}
+
+
+#========================================================================
+#
+# usage()
+#
+# Summary of usage. 
+#
+#========================================================================
+
+sub usage {
+
+    print <<EOF;
+$NAME [\@cmdfile] [-vqdrafmth] file [file...]
+
+  -v   verbose mode
+  -q   quiet mode - shut up about missing files
+  -d   debug mode 
+  -r   recurse into sub-directories
+  -a   make all files (implicit -r)
+  -f   force pages to be rebuilt even if source is not modified
+  -m   file modification date sets FILETIME variable (default)
+  -t   today's date/time sets FILETIME variable
+  -h   this help
+
+EOF
+
+}
+
+
+__END__
+
+=head1 NAME
+
+metapage - perl 5 utility for processing files using MetaText module.
+
+=head1 USAGE
+
+    metapage [@cmdfile] [-vqdrafmth] file [ file [...] ]
+
+    -v   verbose mode
+    -q   quiet mode - shut up about missing files
+    -d   debug mode 
+    -n   non-execute mode 
+    -r   recurse into sub-directories
+    -a   make all files (implicit -r)
+    -f   force pages to be rebuilt even if source is not modified
+    -m   file modification date sets FILETIME variable (default)
+    -t   today's date/time sets FILETIME variable
+    -h   this help
+
+=head1 DESCRIPTION
+
+The B<metapage> utility uses the Text::MetaText module to process files.
+It acts like the Unix make(1S) utility, traversing a document tree and 
+attempting to determine which files have been updated (by comparing the 
+date stamp of the source file with its corresponding processed 
+destination file).  Files that are identified in this way, or 
+explicitly specified by name or by using the C<-f> (force) flag, are 
+processed using a Text::MetaText object and the resulting output is
+written to each corresponding destination file.
+
+=head1 CONFIGURATION
+
+The B<metapage> utility first looks for a C<.metapagerc> file in the user's
+home directory.  The C<sample.metapagerc> file in the C<bin> sub-directory
+of the MetaText distribution can be used as a basis for your own
+configuration file.  Copy this file to your home directory, name it
+C<.metapagerc> and edit accordingly.  e.g (from MetaText distribution 
+directory)
+
+    cp bin/sample.metapagerc ~/.metapagerc
+
+The configuration file can contain (up to) four distinct blocks which each 
+determine the required configuration for an aspect of B<metapage's> use.  
+Each block commences in the configuration file with a line indicating the 
+block name in square brackets (e.g. "[file]").  Any lines following this 
+block definition (up to any subsequent block definition) are considered 
+part of the block.  Block names and configuration items may be specified
+case insensitively.  
+
+A typical C<.metapagerc> file is shown here:
+
+    [file]
+    src         = ~/websrc/docs
+    lib         = ~/websrc/lib
+    dest        = ~/web
+    ignore      = \b(CVS|RCS)\b
+    ignore      = \.gif$
+
+    [profile]
+    dir         = ~/etc/metapage
+    default     = abw
+
+    [config]
+    delimiter   = ,
+    debuglevel  = info,process,data
+
+    [define]
+    images      = /images
+    cgibin      = /cgi-bin
+    home        = /index.html
+    abw         = "Andy Wardley"
+
+Note that quoted values, such as that in the last line of the example 
+above, will have the surrounding quotes removed (the same applies for 
+single quotes "'").  It is not obligatory to quote values with embedded
+whitespace in this manner as the parser will treat the entire line after
+the '=' as the configuration value (apart from any extraneous whitespace 
+after the '=' or at the end of line).
+
+The configuration blocks and their associated values are as follows:
+
+=head2 FILE
+
+The B<[file]> block include items which specify the various directory trees
+on which B<metapage> should work.  Note that any directories specified in
+B<metapage> configuration files may start with a "~" or "~E<lt>uidE<gt>"
+to represent the current user's, or the named user's home directory
+respectively.  The sample configuration above demonstrates this.
+
+=over 4
+
+=item SRC
+
+C<src> defines the root directory under which all source ("template") files 
+should reside.  Thus the command C<metapage foo/bar.html> instructs 
+B<metapage> to process the file "foo/bar.html" relative to the C<src>
+directory.  
+
+=item DEST
+
+C<dest> defines the root directory of the "destination" tree where processed 
+files are output to.  Specifically, for a given E<lt>fileE<gt>, B<metapage> 
+processes the file E<lt>srcE<gt>/E<lt>fileE<gt> and saves the output 
+to E<lt>destE<gt>/E<lt>fileE<gt>.
+
+=item LIB
+
+C<lib> lists the root directory (or directories - each separated by a 
+colon ':') where INCLUDE'd files are to be found.  This is the equivalent 
+to setting the LIB configuration option directly in the Text::MetaText 
+object
+
+=item ACCEPT
+
+The C<accept> and C<ignore> options are used to specify which files in 
+the source directory should or shouldn't be processed.  By default, all
+files are considered (but may not actually be processed if the source
+file is older than the corresponding destination file).  If one or more 
+C<accept> values are specified, the only files considered will be those
+that match one of the C<accept> patterns.  The value should be a perl-like
+regular expression.  Multiple C<accept> options may be specified.
+
+=item IGNORE
+
+Like the C<accept> option described above, the C<ignore> option is used
+to specify a file pattern or patterns.  In this case, the patterns are 
+used to determine which files should I<not> be processed.  This is useful
+to tell B<metapage> to ignore images, source control directories (RCS, CVS, 
+etc) and so on.  The value should be a perl-like regular expression.
+Multiple C<ignore> options may be specified.
+
+Note that C<accept> and C<ignore> patterns are applied to file names
+I<relative> to the C<src> directory.  e.g. C<public/foo.html> rather than
+C</user/abw/websrc/public/foo.html>
+
+=back
+
+Example:
+
+    [file]
+    src    = ~/websrc/docs
+    dest   = ~/public_html
+    lib    = ~/websrc/lib
+    accept = ^public\/
+    accept = ^shared\/           
+    ignore = \b(RCS|CVS)\b
+    ignore = \.gif$
+
+=head2 PROFILE
+
+The <metapage> utility allows multiple configuration profiles to be defined
+and loaded from the command line (prefixed by an '@' symbol).  e.g.
+
+    metapage @profile ...
+
+Each "profile" is a configuration file which can contain any of the valid 
+B<metapage> items described in this section.
+
+The B<[profile]> block defines the location of these additional configuration
+files (C<dir>) and the default profile, if any, to use (C<default>).
+
+=over 4
+
+=item DIR
+
+C<dir> specifies the location of any additional configuration "profile"
+files.  Profiles specified on the B<metapage> command line are read 
+from this directory.
+
+=item DEFAULT
+
+C<default> names a default profile (in the directory specified above)
+which should be loaded regardless of any other command line profiles 
+specified.  Configuration files are processed in this order:
+
+    ~/.metapagerc
+    ~/<profile-dir>/<default-profile>     # e.g. default = abw
+    ~/<profile-dir>/<specific-profile>    # e.g. @web
+
+=back
+
+Example:
+
+    [profile]
+    dir     = ~/etc/metapage
+    default = abw
+
+=head2 CONFIG
+
+The C<[config]> section allows variables to be defined that relate 
+directly to the configuration of the Text::MetaText object.  See 
+C<perldoc Text::MetaText> for details of the configuration items 
+available.   Note that there is no facility to specify multiple values, 
+code blocks, etc., from within the configuration file and as such, only
+those configuration items that take simple scalars can be specified.
+
+The C<lib> configuration value specified in the C<[file]> block is also
+passed to the Text::MetaText configuration and does not need to be 
+explicitly added to the C<[config]> section.
+
+Example:
+
+    [config]
+    case    = 1
+    chomp   = 1
+    execute = 2
+    rogue   = warn,delete
+
+=head2 DEFINE
+
+The C<[define]> sections allows variables to be pre-defined for evaluation
+in all files subsequently processed by B<metapage>.  This is useful 
+for defining common elements (such as email address, default author name, 
+copyright message, etc) that may be scattered throughout many documents
+but can be updated en masse.
+
+Example:
+
+    [define]
+    email   = abw@kfs.org
+    name    = "Andy Wardley"
+    imgurl  = "/~abw/images"
+    homeurl = "/~abw/"
+
+B<metapage>, without any further variable definitions, will then correctly
+process the file:
+
+    <a href="%% homeurl %%/index.html">
+    <img src="%% imgurl %%/misc/abw.gif" alt="%% name %%">
+    </a>
+
+generating the output:
+
+    <a href="/~abw/index.html">
+    <img src="/~abw/images/misc/abw.gif" alt="Andy Wardley">
+    </a>
+
+Note that it is possible to embed variable names (prefixed by '$') within
+variable definitions.  These are then pre-expanded by metapage before being 
+passed to Text::MetaText for the processing phase.
+Variables that are not explicitly separated from other text 
+by non-word characters can be enclosed in braces to disambiguate them.  
+
+Examples:
+
+    [define]
+    server   = www.kfs.org
+    docs     = /~abw       
+    index    = index.html
+    homepage = $docs/$index
+    images   = $docs/images
+    homeurl  = http://${server}${docs}/$index
+
+=head1 COMMAND LINE OPTIONS
+
+The default behaviour for B<metapage> is to process all and any files
+specified on the command line.  All files are considered relative to the 
+C<src> option in the C<[file]> block of the configuration file.
+
+Example:
+
+    metapage index.html manual.html about.html
+
+The following command line options affect how B<metapage> works:
+
+=over 4
+
+=item -v (Verbose Mode)
+
+In verbose mode, B<metapage> generates informational messages about the
+files it is processing.
+
+=item -q (Quiet Mode)
+
+In quiet mode, B<metapage> ignores any "File not found" messages which are
+normally generated when a specified file does not exist or cannot be read.
+
+=item -d (Debug Mode)
+
+Additional debug messages are generated in debug mode.  This can be useful 
+for testing the correctness of B<metapage> and the Text::MetaText module
+and also to trace any formatting problems that may be caused by an 
+incorrect directive in the source text.
+
+=item -n (No Execution Mode)
+
+In no execution mode, B<metapage> examines the source tree to determine 
+which files should be processed but does not actually process them.  Verbose
+mode (C<-v>) is automatically set to print the file names and summary 
+statistics.  This is equivalent to the non-execute mode (also C<-n>) of 
+the make(1S) utility.
+
+=item -r (Recurse)
+
+With the recurse option specified, it is possible to name a directory on 
+the command line and have B<metapage> recurse into the directory and 
+process all modified files within.
+
+=item -a (All Files)
+
+When the "all files" option is specified, B<metapage> traverse the entire 
+document source tree and processes any updated files contain within.  The 
+"Recurse" (C<-r>) option is implicitly set.
+
+=item -f (Force Update)
+
+In normal usage, B<metapage> only processes files whose source file has
+been modified more recently than the destination file (or indeed, if there 
+is no destination file).  In "force" mode, all specified files are updated
+regardless.
+
+=item -m (Modification Time)
+
+By default, B<metapage> examines the file modification time of each source
+file and sets the Text::MetaText variable FILETIME to represent this value
+(in seconds since the epoch, 00:00:00 Jan 1 1970 - see time(2)).  See the 
+TIME variable in the SUBST section of L<METATEXT DIRECTIVES> in the 
+Text::MetaText documentation (C<perldoc Text::MetaText>) for information 
+on formatting time-based values.
+
+This is useful for adding a line such as:
+
+    File last modified: %% FILETIME format="%d-%b-%y" %%
+
+=item -t (Today Time)
+
+The C<-t> option overrides the above behaviour and sets the FILETIME variable
+to the current system time.  In this case, the previous example would be
+more accurate to read:
+
+    File processed on %% FILETIME format="%d-%b-%y" %% 
+
+=item -h (Help)
+
+This option displays a help message indicating the command line options 
+for B<metapage>.
+
+=back
+
+In addition to command line options, one or more "profile" configuration 
+files can be specifed (each prefixed by '@').  Each configuration file 
+named will be examined and acted upon in turn (after the .metapagerc and any 
+C<default> profile).  The configuration files should reside in a directory 
+named by the C<dir> element in the C<[profile]> block of the C<.metapagerc>
+file.
+
+Example:
+
+    metapage -vaf @abw @kfs  # force (-f) process all files (-a) verbosely
+                             # (-v) using profiles 'abw' and 'kfs' (as well
+                             # as .metapagerc and any default profile)
+
+=head2 PRE-DEFINED VARIABLES
+
+As mentioned in the section above, the FILETIME variable is set by 
+B<metapage> to indicate the source file modification time (default option
+- or explicitly set with C<-m>) or the current system time (C<-t>).
+
+Any files processed by B<metapage> can include a SUBST directive (see
+C<perldoc Text::MetaText>) to substitute the appropriate value:
+
+   File last modified: %% SUBST FILETIME format="%d-%b-%y" %%
+
+or, more succinctly:
+
+   File last modified: %% FILETIME format="%d-%b-%y" %%
+
+Note that the FILETIME and other variables listed below should always
+be specified in UPPER CASE, even when case sensitivity is disabled 
+(CASE == 0), as it is by default.  B<Metapage> uses the CASEVARS 
+configuration item of Text::MetaText to identify these variables as
+special case-sensitive system variables.  They cannot be re-defined
+(i.e. they're read-only) and should not conflict with any other 
+user-defined variables of the same name (i.e. 'FILETIME' is entirely 
+separate from some other 'filetime' variable).  This behaviour only applies 
+to the variables listed below.
+    
+The following variables are set for each file B<metapage> processes:
+
+=over 4
+
+=item FILEPATH
+
+The path (directory) of the current file relative to the source directory.
+e.g. "graphics/index.html"
+
+=item FILENAME
+
+The name of the file being processed.  e.g. "index.html"
+
+=item FULLPATH
+
+The full destination path of the file, irrespective of the destination tree 
+root.  e.g.  "/user/abw/public_html/home/index.html"
+
+=item FILEMOD
+
+The source file modification time in seconds since the epock (see time(2)).  
+e.g. "886518480"
+
+=item FILETIME
+
+The source file modification time as per FILEMOD (default) or the current
+system time if C<-t> specified.
+
+=back
+
+=head1 AUTHOR
+
+Andy Wardley E<lt>abw@kfs.orgE<gt>
+ 
+See also:
+
+    http://www.kfs.org/~abw/
+    http://www.kfs.org/~abw/perl/metatext/
+
+The B<metapage> utility is distributed as part of the Text::MetaText 
+package.  See the appropriate documentation (C<perldoc Text::MetaText>)
+for more information on MetaText.
+
+=head1 REVISION
+
+$Revision: 1.11 $
+
+=head1 COPYRIGHT
+
+Copyright (c) 1996-1998 Andy Wardley.  All Rights Reserved.
+ 
+This program is free software; you can redistribute it and/or
+modify it under the terms of the Perl Artistic Licence.
+
+=head1 SEE ALSO
+
+The Text::MetaText module.
+
+=cut
+

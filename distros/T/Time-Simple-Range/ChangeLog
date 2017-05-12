@@ -1,0 +1,13 @@
+2009-01-07
+	* 1.2
+	* added licence in Makefile.PL
+	* fixed duplicate entry in SEE ALSO
+	* added missing file in MANIFEST
+
+2009-01-02 Alessandro Zummo
+	* 1.1
+	* added stringify, = and bool overload
+	* added tests
+
+2008-12-09 Alessandro Zummo
+	* First release

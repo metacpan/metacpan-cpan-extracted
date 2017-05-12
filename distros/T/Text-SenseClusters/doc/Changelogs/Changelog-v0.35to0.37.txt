@@ -1,0 +1,21 @@
+Changes made in Sense-Clusters version 0.35 during version 0.37
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Fixed bug in prepare_sval2 with regex tr/[A-Z]/a-z/ that was 
+	converting characters to lower case of the next alphabet 
+
+2.	Fixed vector.pl and Demo scripts vecrun.sh, simrun.sh 
+	to balance and filter both .count and .xml files together if 
+	exist. Earlier, only the file that is used by these scripts was 
+	balanced/filtered.
+
+3.	Added --nolc option to prepare_sval2.pl not to do any lowercase 
+	conversion.
+
+4.	Added similarity.sh script to Demos/Sval
+
+(Changelog-v0.35to0.37 Last Updated on 07/18/2003 by Amruta)

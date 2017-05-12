@@ -1,0 +1,47 @@
+Revision history for Perl extension Time-List
+
+0.13 2015-06-08T01:41:50Z
+
+    - fix forget dereference before keys
+    - keys $row => keys %$row
+
+0.12 2014-10-29T08:45:12Z
+    - add array ref filter
+
+0.11 2014-08-04T04:09:59Z
+    - fix bug
+    - if summary target has decimal , minus value then summary do not calculate correctly.
+
+0.10 2014-02-25T10:16:31Z
+    - remove bsd test skip code
+
+0.09 2014-02-17T04:04:16Z
+    - move skip statement to top on t/000,t/001
+
+0.08 2014-01-06T10:32:03Z
+    - ADD: "use Time::List::Constant;" to some SYNOPSIS  (thanks reneeb)
+
+0.07 2013-12-31T17:17:55Z
+    - repair SYNOPSIS . thank you reneeb !
+    - The code which excepts Windows and BSD was added.
+    - add time::piece into cpanfile for perl 5.8 , 5.10 and other
+
+0.06 2013-12-11T07:48:26Z
+    - fix can not pass test if Timezone is not JST or UTC 
+
+0.05 2013-12-02T23:59:11Z
+    - fix get monthly list bug if enter a new years
+
+0.04 2013-11-25T08:08:14Z
+    - add decode_utf8 to value from $TimePiece->strftime
+
+0.03 2013-11-08T13:10:01Z
+    - remove use 5.16.2 and add require module : Class::Accessor::Lite 
+
+0.02 2013-11-06T06:59:37Z
+    - forgot require moduke : Data::Util
+
+0.01 2013-10-19T07:41:36Z
+
+    - original version
+

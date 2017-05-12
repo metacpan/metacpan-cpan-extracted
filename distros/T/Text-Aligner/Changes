@@ -1,0 +1,53 @@
+Revision history for Perl extension Text::Aligner.
+
+0.13  2016-04-17
+      - Eliminate a warning "Negative repeat count does nothing" in recent
+      perl5s in the test suite.
+            - https://rt.cpan.org/Ticket/Display.html?id=113841
+            - Thanks to KENTNL for the report and SREZIC for some guidance.
+
+0.12  2014-10-19
+      - Relicensed under the ISC license (with ANNO's permission).
+      - Better documentation.
+
+0.11  2014-10-10
+      - More meaningful README.
+            - https://rt.cpan.org/Public/Bug/Display.html?id=99412
+            - Thanks to MITHALDU for the report.
+
+0.10  2014-02-04
+      - Now requiring Term::ANSIColor version 2.02.
+            - First version with the colorstrip() function.
+            - Fixes some CPAN Testers failures on older perls.
+      - Remove some *~ files.
+
+0.09  2014-02-01
+      - Convert to Dist-Zilla / dist.ini for better CPANTS Kwalitee.
+      - Various changes were involved.
+
+0.08  2013-10-03
+      Correct typos. Thanks to dsteinbrunner for the report.
+      - https://rt.cpan.org/Public/Bug/Display.html?id=89035
+
+0.07  2010-09-12
+      One colorskip-dependent test moved into skip block as per rt. #61276
+
+0.06  2010-08-28
+      bug fix: auto alignment didn't recognize colorized numbers
+
+0.05  2010-08-28
+      added color support to aligner
+
+0.04  2010-05-05
+      Tests fail with perl 5.130
+      (this righted itself, not released)
+
+0.03  2004-05-04
+      Corrected a slew of (spurious) warnings during tests
+      See rt.cpan.org: Bug #6208 Warnings in make test
+
+0.02  2002-12-03
+
+0.01  2002-11-11
+    - original version; created by ExtUtils::ModuleMaker 0.204
+    - initial release to CPAN 03.12.02

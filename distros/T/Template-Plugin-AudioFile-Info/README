@@ -1,0 +1,31 @@
+Template::Plugin::AudioFile::Info
+=================================
+
+Template::Plugin::AudioFile::Info is a module for extracting information
+from audio files and using that information in templates that are
+processed by the Template Toolkit. Currently it works with both MP3 and
+Ogg Vorbis files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+The final stage will probably need to be carried out with superuser
+permissions.
+
+DEPENDENCIES
+
+* AudioFile::Info
+* Template
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Dave Cross
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

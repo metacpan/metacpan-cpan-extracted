@@ -1,0 +1,16 @@
+***************
+*** 1,6 ****
+  package Test::Able::Runner::Role::Meta::Class;
+  our $VERSION = '1.001';
+  use Moose::Role;
+  
+  =head1 NAME
+  
+--- 1,7 ----
+  package Test::Able::Runner::Role::Meta::Class;
+  our $VERSION = '1.001';
+  use Moose::Role;
++ use Class::Load;
+  
+  =head1 NAME
+  

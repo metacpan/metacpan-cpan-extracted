@@ -1,0 +1,107 @@
+#!/usr/local/bin/perl -w
+#
+# A partial implementation of various Hewlett Packard calculators.
+#
+# sol0@lehigh.EDU, LUCC, 2002/11/24.
+#
+# Copyright (C) 2001 - 2007 Stephen O. Lidie. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+use Getopt::EvaP;
+use Tk;
+use Tk::Calculator::RPN::HP;
+use Tk::ProgressBar::Mac;
+use Tk::Splashscreen;
+
+use subs qw/init main fini/;
+use strict;
+
+our (
+     @MM,                       # Message Module
+     %OPT,                      # command line options
+     @PDT,                      # Parameter Description Table
+);
+
+init;
+main;
+fini;
+
+sub main {
+
+    my $type = $OPT{type};
+
+    my $mw = MainWindow->new;
+    $mw->withdraw;
+    $mw->title('Hewlett-Packard ' . $type . ' Calculator');
+    $mw->iconname('HP ' . $type);
+
+    my $splash = $mw->Splashscreen;
+    $splash->Label(
+       -text       => 'Building your HP ' . $type . ' ...',
+    )->pack(qw/-fill both -expand 1/);
+    my $pb = $splash->ProgressBar(-width => 300);
+    $pb->pack(qw/-fill both -expand 1/);
+    $splash->Label(
+        -image => $mw->Photo(
+	    -file => Tk->findINC('Calculator/RPN/images/hp_' . $type . '-splash.gif')
+        ),
+    )->pack;
+    $splash->Splash;
+
+    $mw->Calculator(
+        -type        => $type, 
+        -progressbar => $pb,
+    )->pack;
+
+    $splash->Destroy;
+    $mw->deiconify;
+    
+    MainLoop;
+
+} # end main
+
+sub fini {
+} # end fini
+
+sub init {
+
+    @PDT = split /\n/, <<"end-of-PDT";
+PDT tkhpcal
+        type, t: key 21, 16c keyend = 16c
+PDTEND no_file_list
+end-of-PDT
+
+    @MM = split /\n/, <<"end-of-MM";
+
+        tkhpcal $Tk::Calculator::RPN::HP::VERSION
+
+        This program creates graphical representations of various
+	Hewlett-Packard Reverse Polish Notation (RPN) calculators.
+
+	This is a beta release that implements two RPN calculators.
+	The initial goal is to provide a base class suitable for
+	creating all kinds of HP RPN calculators, by factoring out
+	common code into the base class Tk::Calculator::RPN::HP.
+
+        . get online help:
+ 
+          tkhpcalc -full_help
+          tkhpcalc -help (-h)
+          tkhpcalc -usage_help
+
+        . display the default calculator, an HP-16C:
+
+          tkhpcalc
+
+        . display an HP-21 calculator
+
+          tkhpcalc -t(ype) 21
+.type
+        The desired calculator's model number.
+end-of-MM
+
+    EvaP \@PDT, \@MM, \%OPT;    # evaluate parameters
+
+} # end init

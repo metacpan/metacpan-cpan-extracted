@@ -1,0 +1,21 @@
+Test::Tiny version 0.02
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2010, 2011, Sean O'Rourke
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

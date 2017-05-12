@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+use Getopt::Long;
+use Tapir::Documentation::NaturalDocs;
+
+my %args = (
+    temp_dir    => $FindBin::Bin . '/../docs_tmp/',
+    output_dir  => $FindBin::Bin . '/../docs/',
+    debug       => $ENV{DEBUG},
+);
+
+GetOptions(
+    'input=s'   => \$args{input_fn},
+    'temp=s'    => \$args{temp_dir},
+    'output=s'  => \$args{output_dir},
+    'static=s'  => \$args{static_dir},
+    'naturaldocs=s' => \$args{naturaldocs_bin},
+    'debug'     => \$args{debug},
+);
+
+if (! $args{naturaldocs_bin}) {
+    $args{naturaldocs_bin} = `which NaturalDocs`;
+    chomp $args{naturaldocs_bin};
+    if (! $args{naturaldocs_bin}) {
+        die "You must pass --naturaldocs=... to indicate where the binary NaturalDocs is\n";
+    }
+}
+
+Tapir::Documentation::NaturalDocs->build(%args);
+
+print "Done!  Files written to $args{output_dir}\n";
+
+system 'rm', '-rf', $args{temp_dir};

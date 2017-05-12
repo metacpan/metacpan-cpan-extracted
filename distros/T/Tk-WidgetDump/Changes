@@ -1,0 +1,47 @@
+Revision history for Perl extension WidgetDump.
+
+1.39
+	- stable release with the changes in 1.38_51.
+
+1.38_51
+	- prefer Tk::More over Tk::ROText
+	- display and edit Tk::Text tags
+	- a little bit of distribution modernization
+
+1.37
+	- fix for Tk::DragDrop's OO violations
+	- modernized distribution (t/*.t)
+	- switch test to Test::More
+
+1.35
+	- changed Makefile.PL to use normal ExtUtils::MakeMaker
+	- tiny documentation changes
+
+1.34
+	- new "Set" button in edit config windows
+	- handle aliased config classes correctly
+
+1.33
+	- Deparse is not available with older Data::Dumper versions
+	- documented one-liner with Tk::WidgetDump
+
+1.29
+	- new buttons "Flash widget", missing close button
+	- buttons for execute method window
+	- some refactoring
+	- Bugs section id Pod
+
+1.28
+	- show binding details
+
+1.27
+	- show Subwidgets
+
+1.24
+	- show bindings
+
+1.21
+	- support for ObjEditor
+
+1.20
+	- first public release

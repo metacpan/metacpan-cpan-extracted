@@ -1,0 +1,25 @@
+---
+abstract: "check perl test files for 'no_plan'"
+author:
+  - 'Duncan Ferguson <duncan_j_ferguson@yahoo.co.uk>'
+build_requires:
+  Test::More: 0
+  version: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-NoPlan
+provides:
+  Test::NoPlan:
+    file: lib/Test/NoPlan.pm
+    version: v0.0.6
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-NoPlan
+  homepage: http://github.com/duncs/perl-test-noplan
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/duncs/perl-test-noplan
+version: v0.0.6

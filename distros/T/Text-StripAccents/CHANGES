@@ -1,0 +1,6 @@
+0.11
+11 June 2005
+
+After cpanrating feedback, documented the module as pure
+perl with no prereqs, and documented that it is only Latin1
+

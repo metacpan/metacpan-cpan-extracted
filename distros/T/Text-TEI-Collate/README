@@ -1,0 +1,7 @@
+This is a scholarly text collation program, which has been used
+successfully for editing the Armenian-language Chronicle of Matthew of
+Edessa.  Its documentation and test suite is half-done, its
+functionality is mostly there but not complete, and there are some
+improvements to the algorithm that are crying out to be made.  I am
+releasing it anyway in hopes that it may be useful, and I will be
+working to improve it in future.

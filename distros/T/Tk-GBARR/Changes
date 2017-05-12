@@ -1,0 +1,189 @@
+*** Release 2.08
+  - make test scripts more robust against missing DISPLAY
+
+*** Release 2.07
+  - fixed foreground propagation in Tk::NumEntry
+
+*** Release 2.06
+  - documented NumEntryPlain's -command option
+  - added -browsecmd option to NumEntryPlain
+
+*** Release 2.05
+  - added -readonly option to NumEntry
+
+*** Release 2.04
+  - warning fix in NumEntryPlain (thanks to John Coers)
+
+*** Release 2.03
+
+  - NumEntry uses NumEntryPlain's -increment value
+  - new test for NumEntryPlain
+
+*** Release 2.02
+
+  - new version numbers for all modules (now auto-generated)
+
+*** Release 2.01
+
+  - new methods for widget construction in Tk::NumEntry
+    (NumEntryPlainWidget, FireButtonWidget, IncFireButtonWidget,
+    DecFireButtonWidget) and Tk::FireButton (INCBITMAP,
+    HORIZINCBITMAP, DECBITMAP, HORIZDECBITMAP).
+  - NumEntryPlain: 
+    - new key bindings for Home, End, Prior and Next
+    - new options: -increment and -bigincrement
+    - Insert now accepts floating numbers, if -increment is a floating
+      number
+
+*** Release 2.00
+
+  - Removed Tk::Pane and Tk::ProgressBar - these are in the standard
+    Tk distribution. To get these modules, grab the old 1.401 Tk-GBARR
+    distribution.
+  - Better subclassing
+  - FireButton has now horizontal bitmaps, too. The new option -orient
+    in NumEntry can be used to create horizontal bitmaps.
+  - New Cloth item type Grid
+  - Replaced @ISA with "use base"
+  - Some POD additions.
+  - More regression tests
+
+*** Release ?
+	
+  Tk::ProgressBar
+	o value() method now resets value to -from option
+	  value when it get the undef value. (Now creating
+	  a ProgressBar without args does not complain about
+	  undefined values.
+
+	o Tk800 markup style fixes in POD
+
+  Tk::NumEntryPlain
+	o replaced DoWhenIdle with afterIdle so a
+	  pending idle callback is canceled when widget
+	  is destroyed.
+
+        o Used 'incdec' instead of \&incdec in afterIdle
+	  callback for proper subclassing. 
+
+	o enabled -textvariable + doc: that's only
+	  save for read
+
+  Tk::NumEntry:
+	o specify -anchor=>'center' for FireButton so
+	  one does not rely on the fact that it's the
+	  default.
+	o explicitly with off Focus of FireButton to 
+	  prevent hanging focus with hidden buttons.
+
+	o Tk800 markup style fixes in POD
+
+  Tk::FireButton:
+	o Apply Slaven Rezic (thanks) Firebutton patch so
+    	  option handling work and ContextHelp works
+    	  with FireButton.  This also fixes the
+    	  'hanging focus' problem Stephen O'Lidie
+    	  reported with NumEntry and hidden inc/dec.
+
+	o Tk800 markup style fixes in POD
+
+	o removed -anchor from ConfigSpec because it same
+	  as for Button.
+
+  Tk::TFrame
+  Tk::Pane
+  Tk::Cloth
+	o Tk800 markup style fixes in POD
+	o CR update and email pobox.com
+
+  Tk/*, Makefile.PL, MANIFEST
+
+	o better perllocal.pod entry now Tk::GBARR instead of Tk
+          (moved Tk/* . and set WriteMakefile's NAME to Tk::GBARR,
+    	  updated MANIFEST)
+
+	o added 1998 to copyright and changed @ti.com @pobox.com.
+
+  t/0basic.t
+	o simple tests for all widgets (derived from
+	  Tk800.005/t/create.t). Finds ConfigSpecs bug.
+
+  t/1numentryplain.t
+	o test if read of -textvariable works.
+
+	
+*** Release 1.03
+
+Wed Dec 10 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Tk::NumEntry
+	- changed -repeat* ConfigSpecs to [$binc,$bdec]
+	
+	Tk::NumEntryPlain
+	- Removed -repeat* ConfigSpecs
+	- Added -defaultvalue ConfigSpec for when the entry contains no text
+	
+	examples/numentry, examples/numentryplain
+	- Updated to use -defaultvalue
+
+Wed Dec 10 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Tk::Pane
+	- Fixed 'Use of uninitialized' warnings
+	
+	Tk::ListMgr
+	- Renamed Tk::ListItem to be Tk::ListMgr::Item
+	
+	Tk::MenuEntry
+	- Changed to use DefineBitmap
+	
+	Tk::IFrame
+	- Changed userInfo to privateData
+	
+	Tk::Cloth
+	- Several bug fixes
+	
+	Tk::TFrame
+	- Fix bug of not mapping widows if container frame was empty
+	
+	Added
+	- examples/firebutton
+	- examples/numentryplain
+	- Tk::FireButton
+	- Tk::NumEntryPlain
+	- tests
+
+Tue Dec  9 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Tk::TFrame
+	- Changed from using place to being a geom manager. This allows TFrame
+	  to see GeometryRequests from it's children.
+
+Tue Nov  4 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Tk::Pane
+	- Added see method
+	
+	Tk::Cloth
+	- Several bugfixes
+	
+	examples/pane2
+	- new example
+
+Mon Sep 15 1997 <gbarr@pobox.com> (Graham Barr)
+
+	-w cleanups
+
+	Achim's patch
+
+*** Release 1.02
+
+  - Fixed all widgets to they are -w and use strict clean
+  - Now all widgets have a $VERSION
+  - Changes to Makefile.PL to ensure clean install
+  - Added alpha directory
+
+*** Release 1.01
+
+  - Added Tk::NumEntry
+  - Added Tk::ProgressBar

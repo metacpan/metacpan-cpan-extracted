@@ -1,0 +1,377 @@
+#!perl
+
+use strict;
+use warnings;
+use version;
+use English qw( -no_match_vars );
+use File::Basename;
+use Getopt::Long;
+use Pod::Usage;
+use Readonly;
+use Text::RecordParser;
+use Text::TabularDisplay;
+
+Readonly our $VERSION    => 1.12;
+Readonly my $COMMA       => q{,};
+Readonly my $COMMA_SPACE => q{, };
+Readonly my $DASH        => q{-};
+Readonly my $EMPTY_STR   => q{};
+Readonly my $TAB         => qq{\t};
+Readonly my $NEWLINE     => qq{\n};
+
+my $fs = $TAB;
+my $rs = $NEWLINE;
+my ( $fields, $min, $max, $list, $sort, $stdout, 
+    $help, $man_page, $show_version );
+
+GetOptions(
+    'f|fields:s' => \$fields,
+    'help'       => \$help,
+    'fs:s'       => \$fs,
+    'l|list'     => \$list,
+    'man'        => \$man_page,
+    'min'        => \$min,
+    'max'        => \$max,
+    'rs:s'       => \$rs,
+    's|sort:s'   => \$sort,
+    'stdout'     => \$stdout,
+    'version'    => \$show_version,
+) or pod2usage;
+
+if ( $help || $man_page ) {
+    pod2usage({
+        -exitval => 0,
+        -verbose => $man_page ? 2 : 1
+    });
+};
+
+if ( $show_version ) {
+    my $prog = basename( $PROGRAM_NAME );
+    print "$prog $VERSION\n";
+    exit 0;
+}
+
+if ( scalar @ARGV < 2 ) {
+    pod2usage('Please supply two or more files');
+}
+
+my @files = @ARGV or pod2usage('No input files');
+
+$min = 1 unless $max or $fields;
+
+my $p = Text::RecordParser->new(
+    field_separator  => $fs,
+    record_separator => $rs,
+);
+
+if ( $list ) {
+    list( $p, @files ); 
+}
+elsif ( $min || $max || $fields ) {
+    intersection( 
+        fields => $fields, 
+        files  => \@files,
+        parser => $p, 
+        sort   => $sort,
+        type   => $min ? 'min' : 'max', 
+    );
+}
+else {
+    pod2usage(q[Can't figure out what to do.]);
+}
+
+# -------------------------------------------------------------------
+sub intersection {
+    my %args    = @_;
+    my $p       = $args{'parser'};
+    my $type    = $args{'type'};
+    my $files   = $args{'files'};
+    my $fields  = $args{'fields'} || $EMPTY_STR; # optional
+    my $sort    = $args{'sort'}   || $EMPTY_STR; # optional
+
+    my %fields;
+    for my $file ( @$files ) {
+        $p->filename( $file );
+        $p->bind_header;
+        $fields{ $_ }++ for $p->field_list;
+    }
+
+    my @intersect;
+    if ( $fields ) {
+        @intersect = map { s/^\s+|\s+$//g; $_ } split /$COMMA/, $fields;
+        die_if_bad( \%fields, \@intersect );
+    }
+    else {
+        my $no_files = scalar @$files;
+        for my $fld ( keys %fields ) {
+            push @intersect, $fld if 
+                ( $type eq 'max' ) || 
+                ( $type eq 'min' && $fields{ $fld } == $no_files )
+            ;
+        } 
+
+        @intersect = sort @intersect;
+    }
+
+    die "No intersection!\n" unless @intersect;
+
+    my @data;
+    for my $file ( @$files ) {
+        $p->filename( $file );
+        $p->bind_header;
+        while ( my $rec = $p->fetchrow_hashref ) {
+            push @data, { map { $_, $rec->{ $_ } } @intersect };
+        }
+    }
+
+    if ( my @sort = map { s/^\s+|\s+$//g; $_ } split /$COMMA/, $sort ) {
+        die_if_bad( \%fields, \@sort );
+
+        @data = 
+            map  { $_->[1] }
+            sort { $a->[0] cmp $b->[0] }
+            map  { [ join($DASH, @{ $_ }{ @sort } ), $_ ] }
+            @data;
+    }
+
+    if ( $stdout ) {
+        print join( $fs, @intersect ), $rs;
+        for my $rec ( @data ) {
+            print join( $fs, 
+                map { defined $rec->{$_} ? $rec->{$_} : $EMPTY_STR } @intersect 
+            ), $rs;
+        }
+    }
+    else {
+        my $tab = Text::TabularDisplay->new( @intersect );
+        for my $rec ( @data ) {
+            $tab->add( map { $rec->{ $_ } } @intersect );
+        }
+        print $tab->render, $NEWLINE;
+    }
+}
+
+# -------------------------------------------------------------------
+sub list {
+    my ( $p, @files ) = @_;
+
+    my %fields;
+    for my $file ( @files ) {
+        $p->filename( $file );
+        $p->bind_header;
+        $fields{ $_ }++ for $p->field_list;
+    }
+
+    my $tab = Text::TabularDisplay->new('Field', 'No. Times Present');
+    $tab->add( $_, $fields{ $_ } ) for sort keys %fields;
+    print $tab->render, $NEWLINE;
+}
+
+# -------------------------------------------------------------------
+sub die_if_bad {
+    my ( $fields, $check ) = @_;
+
+    my @bad;
+    for my $fld ( @$check ) {
+        push @bad, $fld unless $fields->{ $fld };
+    }
+
+    if ( @bad ) {
+        die sprintf "Bad field name%s: %s$NEWLINE", 
+            scalar @bad > 1 ? 's' : $EMPTY_STR,
+            join $COMMA_SPACE, @bad 
+        ;
+    }
+    else {
+        return 1;
+    }
+}
+
+__END__
+
+# -------------------------------------------------------------------
+
+# $Id: tabmerge,v 1.11 2006/03/07 17:20:00 kclark Exp $
+
+=pod
+
+=head1 NAME
+
+tabmerge - unify delimited files on common fields
+
+=head1 SYNOPSIS
+
+  tabmerge [action] [options] file1 file2 [...]
+
+Actions:
+
+  --min                Take only fields present in all files [DEFAULT]
+  --max                Take all fields present
+  -f|--fields=f1[,f2]  Take only the fields mentioned in the 
+                       comma-separated list
+
+Options:
+
+  -l|--list            List available fields
+  --fs=x               Use "x" as the field separator 
+                       (default is tab "\t")
+  --rs=x               Use "x" as the record separator 
+                       (default is newline "\n")
+  -s|--sort=f1[,f2]    Sort data ASCII-betically on field(s)
+  --stdout             Print data in original delimited format
+                       (i.e., not in a table format)
+
+  --help               Show brief help and quit
+  --man                Show full documentation
+
+=head1 DESCRIPTION
+
+This program merges the fields -- not the rows -- of delimited text
+files.  That is, if several files are almost but not quite entirely
+unlike each other in their structure (in their field names, numbers or
+orders), this script allows you to easily unify the files into one
+file with all the same fields.  The output can be based on fields as
+determined by the three "action" flags.
+
+For the following examples, consider three files that contain the
+following fields:
+
+  +------------+---------------------------------+
+  | File       | Fields                          |
+  +------------+---------------------------------+
+  | merge1.tab | name, type, position            |
+  | merge2.tab | name, type, position, lod_score |
+  | merge3.tab | name, position                  |
+  +------------+---------------------------------+
+
+To list all available fields in the files and the number of times they
+are present:
+
+  $ tabmerge --list merge*
+  +-----------+-------------------+
+  | Field     | No. Times Present |
+  +-----------+-------------------+
+  | lod_score | 1                 |
+  | name      | 3                 |
+  | position  | 3                 |
+  | type      | 2                 |
+  +-----------+-------------------+
+
+To merge the files on the minimum overlapping fields:
+
+  $ tabmerge merge*
+  +----------+----------+
+  | name     | position |
+  +----------+----------+
+  | RM104    | 2.30     |
+  | RM105    | 4.5      |
+  | TX5509   | 10.4     |
+  | UU189    | 19.0     |
+  | Xpsm122  | 3.3      |
+  | Xpsr9556 | 4.5      |
+  | DRTL     | 2.30     |
+  | ALTX     | 4.5      |
+  | DWRF     | 10.4     |
+  +----------+----------+
+
+To merge the files and include all the fields:
+
+  $ tabmerge --max merge*
+  +-----------+----------+----------+--------+
+  | lod_score | name     | position | type   |
+  +-----------+----------+----------+--------+
+  |           | RM104    | 2.30     | RFLP   |
+  |           | RM105    | 4.5      | RFLP   |
+  |           | TX5509   | 10.4     | AFLP   |
+  | 2.4       | UU189    | 19.0     | SSR    |
+  | 1.2       | Xpsm122  | 3.3      | Marker |
+  | 1.2       | Xpsr9556 | 4.5      | Marker |
+  |           | DRTL     | 2.30     |        |
+  |           | ALTX     | 4.5      |        |
+  |           | DWRF     | 10.4     |        |
+  +-----------+----------+----------+--------+
+
+To merge and extract just the "name" and "type" fields:
+
+  $ tabmerge -f name,type merge*
+  +----------+--------+
+  | name     | type   |
+  +----------+--------+
+  | RM104    | RFLP   |
+  | RM105    | RFLP   |
+  | TX5509   | AFLP   |
+  | UU189    | SSR    |
+  | Xpsm122  | Marker |
+  | Xpsr9556 | Marker |
+  | DRTL     |        |
+  | ALTX     |        |
+  | DWRF     |        |
+  +----------+--------+
+
+To merge the files on just the "name" and "lod_score" fields and sort on 
+the name:
+
+  $ tabmerge -f name,lod_score -s name merge*
+  +----------+-----------+
+  | name     | lod_score |
+  +----------+-----------+
+  | ALTX     |           |
+  | DRTL     |           |
+  | DWRF     |           |
+  | RM104    |           |
+  | RM105    |           |
+  | TX5509   |           |
+  | UU189    | 2.4       |
+  | Xpsm122  | 1.2       |
+  | Xpsr9556 | 1.2       |
+  +----------+-----------+
+
+To do the same but mimic the original tab-delimited input:
+
+  $ tabmerge -f name,lod_score -s name --stdout merge*
+  name    lod_score
+  ALTX
+  DRTL
+  DWRF
+  RM104
+  RM105
+  TX5509
+  UU189   2.4
+  Xpsm122 1.2
+  Xpsr9556        1.2
+
+Why would you want to do this?  Suppose you have several delimited text
+files with nearly the same structure and want to create just one file
+from them, but the fields may be in a different order in each file
+and/or some files may contain more or fewer fields than others.  (As
+far-fetched as it may seem, it happens to the author more than he'd
+like.)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Text::RecordParser
+
+=item * Text::TabularDisplay
+
+=back
+
+=head1 AUTHOR
+
+Ken Youens-Clark E<lt>kclark@cpan.orgE<gt>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2006-10 Ken Youens-Clark.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+=cut

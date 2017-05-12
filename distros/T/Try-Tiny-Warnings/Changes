@@ -1,0 +1,21 @@
+Revision history for Try-Triny-Warnings
+
+0.1.0 2016-11-26
+  [ ENHANCEMENTS ]
+    - Can import Try::Tiny's keywords via TTW.
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 83 insertions(+), 15 deletions(-)
+
+0.0.2 2015-09-29
+  [ BUG FIXES ]
+    - CORE::die wasn't playing nice with perl < 5.16
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 18 insertions(+), 1 deletion(-)
+
+0.0.1 2015-09-24
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 37 insertions(+), 1 deletion(-)

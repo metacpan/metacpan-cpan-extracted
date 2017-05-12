@@ -1,0 +1,223 @@
+1..1
+# Tapper-suite-version: 0.020016
+# Tapper-starttime-test-program: 20090205T205807
+# Tapper-machine-name: californium
+# Tapper-suite-name: KernBench
+# Tapper-reportgroup-arbitrary: 
+# Tapper-section: tapper-meta-information
+# Tapper-reportgroup-testrun: 1419
+ok 1 - tapper-meta-data
+1..1
+# Tapper-Section: stats-proc-interrupts-before
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 10635
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 8
+    linetail: IO-APIC-edge  i8042
+  4:
+    CPU0: 936
+    linetail: IO-APIC-edge  serial
+  7:
+    CPU0: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 2
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 104
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 3680
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 463
+    linetail: IO-APIC-level  xen-platform-pci
+  185:
+    CPU0: 58
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  NMI:
+    CPU0: 0
+    linetail:
+  LOC:
+    CPU0: 10225
+    linetail:
+  ERR:
+    CPU0: 0
+    linetail:
+  MIS:
+    CPU0: 0
+    linetail:
+  ...
+1..1
+# Tapper-section: kernel-untar
+ok 1 - untar of kernel succeeded.
+1..1
+# Tapper-section: kernbench-untar
+ok 1 - untar of testsuite succeeded.
+1..1
+# Tapper-section: kernbench-testrun
+ok 1 - Run took ntp: 2339s, system: 2459s
+1..1
+ok 1 - KernBench
+  ---
+  Thu Feb  5 21:06:47 CET 2009
+  2.6.16.60-0.27-default
+  Average Optimal load -j 4 Run (std deviation):
+  Elapsed Time 378.808 (35.6748)
+  User Time 224.908 (0.945473)
+  System Time 132.218 (18.6488)
+  Percent CPU 94 (4.1833)
+  Context Switches 26364.6 (368.087)
+  Sleeps 20866.2 (234.006)
+  ...
+1..1
+# Tapper-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Thu Feb  5 21:06:47 CET 2009
+  2.6.16.60-0.27-default
+  Average Optimal load -j 4 Run (std deviation):
+  Elapsed Time 378.808 (35.6748)
+  User Time 224.908 (0.945473)
+  System Time 132.218 (18.6488)
+  Percent CPU 94 (4.1833)
+  Context Switches 26364.6 (368.087)
+  Sleeps 20866.2 (234.006)
+  ...
+1..1
+# Tapper-section: kernbench-testrun
+ok 1 - Run took ntp: 2184s, system: 2207s
+1..1
+ok 1 - KernBench
+  ---
+  Thu Feb  5 21:47:22 CET 2009
+  2.6.16.60-0.27-default
+  Average Optimal load -j 4 Run (std deviation):
+  Elapsed Time 336.148 (10.9274)
+  User Time 220.664 (3.64592)
+  System Time 110.888 (4.54182)
+  Percent CPU 98 (1)
+  Context Switches 25636.6 (513.807)
+  Sleeps 20829.6 (384.487)
+  ...
+1..1
+# Tapper-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Thu Feb  5 21:47:22 CET 2009
+  2.6.16.60-0.27-default
+  Average Optimal load -j 4 Run (std deviation):
+  Elapsed Time 336.148 (10.9274)
+  User Time 220.664 (3.64592)
+  System Time 110.888 (4.54182)
+  Percent CPU 98 (1)
+  Context Switches 25636.6 (513.807)
+  Sleeps 20829.6 (384.487)
+  ...
+1..7
+# Tapper-Section: dmesg
+ok 1 - dmesg parsed (227 lines)
+not ok 2 - 2 not found! # TODO okay for us
+# 
+not ok 3 - 3 PIIX3: not 100% native mode: will probe irqs later # TODO okay for us
+# 
+not ok 4 - 4 register_blkdev: cannot get major 3 for ide # TODO okay for us
+# 
+not ok 5 - 5 xen_balloon: module not supported by Novell, setting U taint flag. # TODO okay for us
+# 
+not ok 6 - 6 drivers/usb/input/hid-core.c: v2.6:USB HID core driver
+# 
+not ok 7 - 7 powernow-k8: Power state transitions not supported # TODO okay for us
+# 
+# false positves ignored: 1
+1..5
+# Tapper-Section: var_log_messages
+ok 1 - /var/log/messages parsed (22 lines)
+not ok 2 - 2 not found! # TODO okay for us
+# 
+not ok 3 - 3 PIIX3: not 100% native mode: will probe irqs later # TODO okay for us
+# 
+not ok 4 - 4 register_blkdev: cannot get major 3 for ide # TODO okay for us
+# 
+not ok 5 - 5 xen_balloon: module not supported by Novell, setting U taint flag. # TODO okay for us
+# 
+not ok 6 - 6 drivers/usb/input/hid-core.c: v2.6:USB HID core driver
+# 
+not ok 7 - 7 powernow-k8: Power state transitions not supported # TODO okay for us
+# 
+not ok 8 - 2 rcpowersaved: ENABLED=no' in /etc/powersave/cpufreq to avoid this warning.
+# Feb  5 20:58:00 enter 'CPUFREQ californium
+not ok 9 - 3 freq governors - No cpufreq driver available # TODO okay for us
+# Feb  5 20:58:00 Cannot load cp californium
+not ok 10 - 4 know your machine. See 's2ram -i' for details. (127) # TODO okay for us
+# Feb  5 20:58:00 s2ram does not californium
+not ok 11 - 5 wer state transitions not supported # TODO okay for us
+# Feb  5 20:58:01 powernow-k8: P californium
+# false positves ignored: 1
+1..1
+# Tapper-Section: stats-proc-interrupts-after
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 1145721
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 8
+    linetail: IO-APIC-edge  i8042
+  4:
+    CPU0: 936
+    linetail: IO-APIC-edge  serial
+  7:
+    CPU0: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 2
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 104
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 50151
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 19083
+    linetail: IO-APIC-level  xen-platform-pci
+  185:
+    CPU0: 58
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  NMI:
+    CPU0: 0
+    linetail:
+  LOC:
+    CPU0: 1145331
+    linetail:
+  ERR:
+    CPU0: 0
+    linetail:
+  MIS:
+    CPU0: 0
+    linetail:
+  ...
+1..1
+# Tapper-section: clocksource
+ok 1 - Clocksource
+  ---
+  Cannot determine clocksource
+  ...
+1..1
+# Tapper-section: uptime
+ok 1 - got uptime
+  ---
+  uptime: 4731s
+  idletime: 100s
+  ...
+

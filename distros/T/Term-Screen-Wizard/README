@@ -1,0 +1,12 @@
+
+This is a module to have a Wizard-like interface on a Terminal Screen.
+It's a way to input fields into your Terminal based program and
+uses Term::Screen, and Term::Screen::ReadLine.
+
+Enjoy,
+
+Hans Oesterholt-Dijkema <hans@Oesterholt-Dijkema.emailt.nl>
+
+
+
+

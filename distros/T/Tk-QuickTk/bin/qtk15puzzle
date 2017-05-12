@@ -1,0 +1,40 @@
+exec /usr/bin/perl -M'Qtk::QuickTk=app' -e app $0;exit
+m MainWindow            title:'QuickTk Puzzle Demo'
+                          ... ini:$$gl{mcnt}=0;
+                          ...   $$w{mfr}->configure(-background=>
+                          ...                       $$w{m}->Scrollbar->
+                          ...                         cget(-troughcolor));
+                          ...   $$gl{iord}=[ 3, 1, 6, 2,
+                          ...                5, 7,15,13,
+                          ...                4,11, 8, 9,
+                          ...               14,10,12, 0];my $idx=0;
+                          ...   for my $row (0..3) { for my $col ( 0..3) {
+                          ...       $$gl{butno}=$$gl{iord}[$idx];
+                          ...       $$gl{but}[$$gl{butno}]=[$row,$col];
+                          ...       $gl->createwidget([$$gl{butno}],'mfrb')
+                          ...         if $$gl{butno};++$idx; } }
+  db Dialog             nopack : title:'About Puzzle Demo' buttons:['OK']
+                          ... text:'From the Tk widget demo, mod by JNK'
+  mb Frame              side:top fill:x : relief:raised bd:2
+    f Menubutton        side:left : text:File
+      q c               label:Quit sub:exit;
+    h Menubutton        side:right : text:Help
+      a c               label:About sub:$$w{mdb}->Show;
+  fr Frame              side:top padx:35 pady:10 : width:185 height:185
+                          ...                      borderwidth:2 relief:sunken
+    b Button            nocreate place relwidth:0.25 relheight:0.25
+                          ... rely:$$gl{but}[$1][0]*0.25
+                          ... relx:$$gl{but}[$1][1]*0.25 :
+                          ... relief:raised highlightthickness:0 text:$1
+                          ... sub:my $n=$1;
+                          ...   my ($b,$z)=($$gl{but}[$1],$$gl{but}[0]);
+                          ...   my ($br,$bc)=(\$$b[0],\$$b[1]);
+                          ...   my ($zr,$zc)=(\$$z[0],\$$z[1]);
+                          ...   if(((abs($$br-$$zr)==1)&&($$bc==$$zc))
+                          ...    ||((abs($$bc-$$zc)==1)&&($$br==$$zr))) {
+                          ...     my $x=$$br;$$br=$$zr;$$zr=$x;
+                          ...        $x=$$bc;$$bc=$$zc;$$zc=$x;
+                          ...     $$gl{widgets}{"mfrb_$1"}
+                          ...       ->place(-rely=>$$br*0.25,
+                          ...               -relx=>$$bc*0.25); }
+#     file: puzzleqtk

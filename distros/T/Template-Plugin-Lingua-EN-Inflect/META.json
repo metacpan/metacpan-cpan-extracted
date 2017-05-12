@@ -1,0 +1,66 @@
+{
+    "name": "Template-Plugin-Lingua-EN-Inflect",
+    "version": "0.04",
+    "abstract": "TT2 interface to Lingua::EN::Inflect module",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "template toolkit",
+        "checksum",
+        "lingua"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Template": "2.07",
+                "Template::Plugin": "2.07",
+                "Lingua::EN::Inflect": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Template::Test": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Template::Plugin::Lingua::EN::Inflect": {
+            "file": "lib/Template/Plugin/Lingua/EN/Inflect.pm",
+            "version": "0.04"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-Lingua-EN-Inflect" },
+        "repository": {
+            "url": "git://github.com/barbie/template-plugin-lingua-en-inflect.git",
+            "web": "http://github.com/barbie/template-plugin-lingua-en-inflect",
+            "type": "git"
+        }
+    }
+}

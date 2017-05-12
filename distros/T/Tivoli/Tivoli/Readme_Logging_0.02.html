@@ -1,0 +1,266 @@
+<HTML>
+<HEAD>
+<TITLE>Tivoli::Logging - Perl Extension for Tivoli</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#license">License</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#details">DETAILS</A></LI>
+		<LI><A HREF="#routines">Routines</A></LI>
+		<UL>
+
+			<LI><A HREF="#logopennew">LogOpenNew</A></LI>
+			<LI><A HREF="#logopenappend">LogOpenAppend</A></LI>
+			<LI><A HREF="#loginfo">LogInfo</A></LI>
+			<LI><A HREF="#logwarn">LogWarn</A></LI>
+			<LI><A HREF="#logfail">LogFail</A></LI>
+			<LI><A HREF="#logfat">LogFat</A></LI>
+			<LI><A HREF="#logclose">LogClose</A></LI>
+		</UL>
+
+		<LI><A HREF="#plattforms and requirements">Plattforms and Requirements</A></LI>
+		<LI><A HREF="#history">HISTORY</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+        Tivoli::Logging - Perl Extension for Tivoli</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Tivoli::Logging;</PRE>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<PRE>
+        v0.02</PRE>
+<P>
+<HR>
+<H1><A NAME="license">License</A></H1>
+<PRE>
+        Copyright (c) 2001 Robert Hase.
+        All rights reserved.
+        This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+        This Package will handle about everything you may need for Logging.
+        If anything has been left out, please contact me at
+        tivoli.rhase@muc-net.de
+        so it can be added.
+</PRE>
+<PRE>
+
+        Prints formated Logging-Informations to STDOUT and if wanted to one or more Files.
+        Supports an unlimited Numbers of open Files (dynamical Filehandlers) and
+        prints the Type of the STDOUT-Information in Color (requires ANSI).</PRE>
+<PRE>
+        Should be the first loaded Tivoli-Package.</PRE>
+<P>
+<H2><A NAME="details">DETAILS</A></H2>
+<PRE>
+        If Parameter L&lt;File-Handler&gt; = STDOUT the Logging-Message will only be sended to Standard-Out</PRE>
+<UL>
+<LI><STRONG><A NAME="item_Types_of_Logging_and_Colors">Types of Logging and Colors</A></STRONG><BR>
+
+<PRE>
+        ROUTINE         TYPE            FOREGROUND/BACKGROUND
+        -----------------------------------------------------
+        LogInfo         (Info)          black/green
+        LogWarn         (Warning)       black/yellow
+        LogFail         (Failed)        black/red
+        LogFat          (Fatal)         white/black</PRE>
+<LI><STRONG><A NAME="item_Loggings_to_STDOUT">Loggings to STDOUT</A></STRONG><BR>
+
+<PRE>
+        Prints Logging-Informations in the following Format:
+        TYPE dd.mm.yyyy hh:mm:ss MSG</PRE>
+<LI><STRONG><A NAME="item_SAMPLE">SAMPLE</A></STRONG><BR>
+
+<PRE>
+        &amp;LogInfo(STDOUT, &quot;This is an Information-Message only to Standard-Out&quot;);</PRE>
+<LI><STRONG><A NAME="item_OUTPUT">OUTPUT</A></STRONG><BR>
+
+<PRE>
+        INFO 23.07.2001 This is an Information-Message only to Standard-Out</PRE>
+<LI><STRONG><A NAME="item_Logging_to_Files">Logging to Files</A></STRONG><BR>
+
+<PRE>
+        Prints Logging-Informations in the following Format:
+        yyyy-mm-dd hh:mm:ss TYPE MSG</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        &amp;LogInfo($G_LOGFILE1, &quot;This is an Information-Message to Standard-Out AND Logfile $G_LOGFILE1&quot;);</PRE>
+<LI><STRONG>OUTPUT</STRONG><BR>
+
+<PRE>
+        STDOUT: INFO 23.07.2001 13:27:42 This is an Information-Message to Standard-Out AND Logfile $G_LOGFILE1
+        FILE  : 2001-07-23 13:27:42 INFO This is an Information-Message to Standard-Out AND Logfile $G_LOGFILE1</PRE>
+</UL>
+<P>
+<H2><A NAME="routines">Routines</A></H2>
+<PRE>
+        Details to the Logging-Functionality</PRE>
+<P>
+<H3><A NAME="logopennew">LogOpenNew</A></H3>
+<UL>
+<LI><STRONG><A NAME="item_CALL">CALL</A></STRONG><BR>
+
+<PRE>
+        $FileHandle = &amp;LogOpenNew(&lt;PATH/FILENAME&gt;);</PRE>
+<LI><STRONG><A NAME="item_DESCRIPTION">DESCRIPTION</A></STRONG><BR>
+
+<PRE>
+        - opens a new Log-File
+        - prints L&lt;INFO-Message&gt; to Display and L&lt;$FileHandle&gt;
+        - returns the File-Handler</PRE>
+</UL>
+<P>
+<H3><A NAME="logopenappend">LogOpenAppend</A></H3>
+<UL>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $FileHandle = &amp;LogOpenAppend(&lt;PATH/FILENAME&gt;);</PRE>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        - opens PATH/FILENAME for Append
+        - prints L&lt;INFO-Message&gt; to Display and $FileHandle
+        - returns the File-Handler</PRE>
+</UL>
+<P>
+<H3><A NAME="loginfo">LogInfo</A></H3>
+<UL>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        &amp;LogInfo($FileHandle, &lt;MSG&gt;);</PRE>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        - prints INFO-Message to Display
+        - prints INFO-Message to $FileHandle if $FileHandle not 0</PRE>
+</UL>
+<P>
+<H3><A NAME="logwarn">LogWarn</A></H3>
+<UL>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        &amp;LogWarn($FileHandle, &lt;MSG&gt;);</PRE>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        - prints WARN-Message to Display
+        - prints WARN-Message to $FileHandle if $FileHandle not 0</PRE>
+</UL>
+<P>
+<H3><A NAME="logfail">LogFail</A></H3>
+<UL>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        &amp;LogFail($FileHandle, &lt;MSG&gt;);</PRE>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        - prints FAILED-Message to Display
+        - prints FAILED-Message to $FileHandle if $FileHandle not 0</PRE>
+</UL>
+<P>
+<H3><A NAME="logfat">LogFat</A></H3>
+<UL>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        &amp;LogFat($FileHandle, &lt;MSG&gt;);</PRE>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        - prints FATAL-Message to Display
+        - prints FATAL-Message to $FileHandle if $FileHandle not 0</PRE>
+</UL>
+<P>
+<H3><A NAME="logclose">LogClose</A></H3>
+<UL>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        &amp;LogsClose;</PRE>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        - prints INFO-Message to Display
+        - prints INFO-Message to EVERY $FileHandle if exist
+        - close EVERY open (Logging-) File-Handler</PRE>
+</UL>
+<P>
+<H2><A NAME="plattforms and requirements">Plattforms and Requirements</A></H2>
+<PRE>
+        Supported Plattforms and Requirements</PRE>
+<UL>
+<LI><STRONG><A NAME="item_Plattforms">Plattforms</A></STRONG><BR>
+
+<PRE>
+        tested on:</PRE>
+<PRE>
+        - w32-ix86 (W9x, NT4, Windows 2000)
+        - aix4-r1 (AIX 4.3)
+        - Linux (Kernel 2.2.x)</PRE>
+</UL>
+<UL>
+<LI><STRONG><A NAME="item_Requirements">Requirements</A></STRONG><BR>
+
+<PRE>
+        requires Perl v5 or higher</PRE>
+</UL>
+<P>
+<H2><A NAME="history">HISTORY</A></H2>
+<PRE>
+        VERSION         DATE            AUTHOR          WORK
+        ----------------------------------------------------
+        0.01            2001-07-18      RHase           created
+        0.02            2001-07-23      RHase           POD-Doku added</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+        Robert Hase
+        ID      : RHASE
+        eMail   : Tivoli.RHase@Muc-Net.de
+        Web     : <A HREF="http://www.Muc-Net.de">http://www.Muc-Net.de</A></PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<PRE>
+        CPAN
+        <A HREF="http://www.perl.com">http://www.perl.com</A></PRE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,62 @@
+Revision history for Template::ShowStartStop
+
+1.0.1     2011-02-24
+	- Fix VERSION bug instroduced by OurPkgVersion
+	- add generic tests
+	- use Changes Spec for Changes
+
+1.0.0	2010-12-18
+	- oops 0.30.0 < 0.22 bump to 1.0.0 this is stable enough
+
+0.30.0	2010-12-18
+	- revert to older code, new split split functions doesn't seem right
+
+0.22	2010-07-21
+	- fix version numbers
+
+0.2.0	2010-07-20
+	- Discontinue Moose usage. I don't see the point for something so simple.
+
+0.12	2010-06-14
+	- T:SSS now composes the ShowStopStart Role which really provides the
+	  functionality
+
+0.11	2010-06-09
+	- Moosify T:SSS
+
+0.10	2010-06-08
+	- refactor code
+
+0.09 	2010-05-28
+	- fix bug 13225 for T:SSS
+	- refactor code
+	- add more tests
+
+0.08	2010-05-27
+	- Change License to Artistic 2.0 because dual license isn't required
+	- add more thorough tests
+	- simplify documentation
+	- add SubmittingPatches documentation
+
+0.07	2010-05-10
+	- Fix Licensing Issues
+
+0.06	2010-05-10
+	- Migrate completely to Dist::Zilla
+
+0.05 	2010-04-26
+	- change back to ternary.
+	- remove foreach.
+	- use Dist::Zilla for packaging
+
+0.04	2010-03-01
+	- change from heredoc. I think it's sloppy
+
+0.03	2010-01-15
+	- Clean up files for wrong comments
+
+0.02	2010-01-26
+	- Show process only comments to remove redunancy
+
+0.01	2010-01-25
+	- First rudimentary version.  Patches and comments welcome.

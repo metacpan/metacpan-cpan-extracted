@@ -1,0 +1,28 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Template/Flute/PDF.pm
+lib/Template/Flute/PDF/Box.pm
+lib/Template/Flute/PDF/Image.pm
+lib/Template/Flute/PDF/Import.pm
+lib/Template/Flute/PDF/Table.pm
+t/00-load.t
+t/boilerplate.t
+t/files/html_base.html
+t/files/images/base.jpg
+t/files/sample.bmp
+t/files/sample.jpg
+t/files/sample.html
+t/fonts.t
+t/images.t
+t/i-tag.t
+t/locate_images.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
+t/values.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

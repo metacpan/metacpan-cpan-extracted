@@ -1,0 +1,74 @@
+<TBX dialect="TBX-Min">
+    <header>
+        <id>TBX sample</id>
+        <description>A short sample file demonstrating TBX-Min</description>
+        <dateCreated>2013-11-12T00:00:00</dateCreated>
+        <languages source="de" target="en"/>
+        <creator>Klaus-Dirk Schmidt</creator>
+        <directionality>bidirectional</directionality>
+        <license>CC BY license can be freely copied and modified</license>
+    </header>
+    <body>
+        <termEntry id="C002">
+            <subjectField>biology</subjectField>
+            <langSet xml:lang="de">
+                <tig>
+                    <term>Hund</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                </tig>
+            </langSet>
+            <langSet xml:lang="en">
+                <tig>
+                    <term>dog</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                    <termStatus>preferred</termStatus>
+                    <customer>SAP</customer>
+                </tig>
+                <tig>
+                    <term>hound</term>
+                    <termStatus>obsolete</termStatus>
+                    <partOfSpeech>noun</partOfSpeech>
+                    <customer>SAP</customer>
+                    <noteGrp>
+                        <note>
+                            <noteKey>usage</noteKey>
+                            <noteValue>however bloodhound is used rather than blooddog</noteValue>
+                        </note>
+                    </noteGrp>
+                </tig>
+            </langSet>
+        </termEntry>
+        <termEntry id="c008">
+            <subjectField>biology</subjectField>
+            <langSet xml:lang="de">
+                <tig>
+                    <term>Katze</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                </tig>
+            </langSet>
+            <langSet xml:lang="en">
+                <tig>
+                    <term>cat</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                    <customer>SAP</customer>
+                </tig>
+            </langSet>
+        </termEntry>
+        <termEntry id="C007">
+            <subjectField>biology</subjectField>
+            <langSet xml:lang="de">
+                <tig>
+                    <term>Maus</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                </tig>
+            </langSet>
+            <langSet xml:lang="en">
+                <tig>
+                    <term>mouse</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                    <customer>PestGone</customer>
+                </tig>
+            </langSet>
+        </termEntry>
+    </body>
+</TBX>

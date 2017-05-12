@@ -1,0 +1,88 @@
+<corpus lang="english">
+<lexelt item="LEXELT">
+<instance id="hard-a.sjm-255_1:">
+<answer instance="hard-a.sjm-255_1:" senseid="HARD1"/>
+<context>
+doctors are having a <head>HARD</head> <sat id="14.902138:"> <item>time</item> </sat> helping President Bush
+</context>
+</instance>
+<instance id="hard-a.sjm-034_7:">
+<answer instance="hard-a.sjm-034_7:" senseid="HARD1"/>
+<context>
+I find it ;<head>HARD</head>; to believe that
+</context>
+</instance>
+<instance id="hard-a.sjm-195_5:">
+<answer instance="hard-a.sjm-195_5:" senseid="HARD1"/>
+<context>
+Our life is ;<head>HARDER</head>; now
+</context>
+</instance>
+<instance id="hard-a.sjm-097_8:">
+<answer instance="hard-a.sjm-097_8:" senseid="HARD2"/>
+<context>
+face the ;<head>HARD</head>; facts of life
+</context>
+</instance>
+<instance id="hard-a.sjm-196_2:">
+<answer instance="hard-a.sjm-196_2:" senseid="HARD1"/>
+<context>
+Its <head>HARD</head> to put into words
+</context>
+</instance>
+<instance id="hard-a.sjm-107_2:">
+<answer instance="hard-a.sjm-107_2:" senseid="HARD2"/>
+<context>
+Its ;<head>HARD</head>; to believe
+</context>
+</instance>
+<instance id="hard-a.sjm-130_9:">
+<answer instance="hard-a.sjm-130_9:" senseid="HARD1"/>
+<context>
+Its ;<head>HARD</head>; to control
+</context>
+</instance>
+<instance id="hard-a.sjm-074_11:">
+<answer instance="hard-a.sjm-074_11:" senseid="HARD3"/>
+<context>
+Its ;<head>HARD</head>; to define
+</context>
+</instance>
+<instance id="hard-a.sjm-249_2:">
+<answer instance="hard-a.sjm-249_2:" senseid="HARD1"/>
+<context>
+life is <head>HARD</head> to define
+</context>
+</instance>
+<instance id="hard-a.sjm-180_1:">
+<answer instance="hard-a.sjm-180_1:" senseid="HARD1"/>
+<context>
+words are <head>HARD</head> to define
+</context>
+</instance>
+<instance id="hard-a.br-l15:">
+<answer instance="hard-a.br-l15:" senseid="HARD1"/>
+<context>
+Its <head>HARD</head> not to be influenced
+</context>
+</instance>
+<instance id="hard-a.sjm-242_12:">
+<answer instance="hard-a.sjm-242_12:" senseid="HARD2"/>
+<context>
+He had a <head>HARD</head> time completing the task
+</context>
+</instance>
+<instance id="hard-a.sjm-070_4:">
+<answer instance="hard-a.sjm-070_4:" senseid="HARD1"/>
+<context>
+It was a <head>HARD</head> task
+</context>
+</instance>
+<instance id="hard-a.sjm-168_4:">
+<answer instance="hard-a.sjm-168_4:" senseid="HARD3"/>
+<context>
+I find it <head>HARD</head> to believe
+</context>
+</instance>
+</lexelt>
+</corpus>

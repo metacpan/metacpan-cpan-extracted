@@ -1,0 +1,20 @@
+Revision history for Test-Mail
+
+0.06    2007-03-29
+        Added dependency on Mail::Header.
+
+0.05    2007-03-19
+        Cleanup to work with current CPAN/Test/etc toolset.  No functional changes.
+
+0.04    2006-10-25
+        Unknown
+
+0.03    2001-09-17
+        Unknown
+
+0.02    Unknown
+        Unknown
+
+0.01    Initial release
+        First version, released on an unsuspecting world.
+

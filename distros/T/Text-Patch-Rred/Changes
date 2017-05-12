@@ -1,0 +1,34 @@
+Revision history for Perl extension Text::Patch::Rred.
+
+0.06  Thu Nov 26 20:09:00 2009
+   - Updated bug reporting instructions to point to the e-mail address
+    registered with PAUSE.
+   - Signed the package with real gpg key for the bug reporting e-mail
+    address.
+
+0.05  Fri Oct 30 20:28:00 2009
+   - Use two splice calls, not a big temporary array when skipping backwards
+    or forwards more than 1000 lines from one command to the next.  This is
+    significantly reduced memory consumption.
+
+0.04  Thu Aug 13 10:59:00 2009
+	- Use string references, not actual strings in the internal array of
+	   lines to avoid wasting lots of memory and cycles on needless string
+	   copying (it seems that perl does not do lazy string copying the way
+	   many other systems do).
+	- Relax the license to allow the version 5.60 to 5.83 perl licenses too
+	   (no real difference in practice, but simplifies Debian packaging).
+	- Remove the temporary "unreleased" license prefix.
+	- Add support for Module::Build in addition to MakeMaker.
+	- Added Pod::Coverage and Perl::Critic tests and made them pass.
+
+0.03  Sat Jul 12 23:48:00 2008
+	- Include rred.pl in Makefile.pl, so it will be installed
+
+0.02  Mon Jun 16 00:53:00 2008
+	- Renamed to Rred to match the rred name used by Debian apt internals.
+
+0.01  Fri May  5 23:58:16 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Text::Patch::EdSafe
+

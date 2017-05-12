@@ -1,0 +1,4 @@
+Before 
+[% USE transform = XSLT("t/test.xsl");  xml |
+$transform magicvariable = '"abracadabra"' %]
+After

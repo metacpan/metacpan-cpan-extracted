@@ -1,0 +1,5 @@
+$bar is not shared and <%=
+   no strict 'vars';
+   defined $bar ? '' : 'not'
+%> defined
+Foo is <%= $foo %>

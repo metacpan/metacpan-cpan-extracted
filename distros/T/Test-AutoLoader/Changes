@@ -1,0 +1,13 @@
+Revision history for Perl extension Test::AutoLoader.
+
+0.03  Fri Jul 22 01:53:00 2005
+
+	- Fixed minor problems with Makefile.PL and META.yml
+
+0.02  Wed Jul 20 12:58:23 2005
+	- Initial CPAN release
+
+0.01  Wed Jul 13 19:27:07 2005
+	- original version; created by h2xs 1.21 with options
+		-XAn Test::AutoLoader
+

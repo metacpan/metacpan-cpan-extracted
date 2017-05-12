@@ -1,0 +1,29 @@
+---
+name: Time-Mock
+version: v0.0.2
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: shift and scale time
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Time-Mock
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.scratchcomputing.com/Time-Mock/trunk
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+recommends:
+  Date::Parse: 2.27
+configure_requires:
+  Module::Build: 0.3401
+provides:
+  Time::Mock:
+    file: lib/Time/Mock.pm
+    version: v0.0.2
+  Time::Mock::Original:
+    file: lib/Time/Mock.pm
+generated_by: Module::Build version 0.3401
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

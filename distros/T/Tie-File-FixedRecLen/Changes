@@ -1,0 +1,82 @@
+2.112531  2011-09-10 14:22:12 Europe/London
+
+  * Try again to release from correct git branch
+
+2.112530  2011-09-10 14:20:36 Europe/London
+
+  * Port to Dist::Zilla
+  * Remove version check on Tie::File - seems a strange value (D. Walrond)
+
+libtie-file-fixedreclen-perl (1.01-1) UNRELEASED; urgency=low
+
+  * Move to Module::Install 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat,  8 Nov 2008 18:13:18 +0000
+
+libtie-file-fixedreclen-perl (0.4-1) unstable; urgency=low
+
+  * Test edits to make them skip on unsupported platforms
+  * POD tweaks
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 16 Jun 2007 22:49:24 +0100
+
+libtie-file-fixedreclen-perl (0.3-1) unstable; urgency=low
+
+  * New Store.pm ready for shipping, seems to work okay
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 15 Jun 2007 22:40:24 +0100
+
+libtie-file-fixedreclen-perl (0.2-5) unstable; urgency=low
+
+  * Bug fixes to Store.pm (got carried away and forgot it was meant to be
+    sequential writes only rather than random)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 15 Jun 2007 21:09:24 +0100
+
+libtie-file-fixedreclen-perl (0.2-4) unstable; urgency=low
+
+  * Add new Store.pm package for fast write-only access
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 15 Jun 2007 20:01:24 +0100
+
+libtie-file-fixedreclen-perl (0.2-3) unstable; urgency=low
+
+  * Revert to original code in 0.2-1, deciding on another strategy for speed
+    improvements
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 15 Jun 2007 15:58:24 +0100
+
+libtie-file-fixedreclen-perl (0.2-2) unstable; urgency=low
+
+  * Test masking the offsets array with a tie, to see if it's faster
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Wed, 13 Jun 2007 21:19:24 +0100
+
+libtie-file-fixedreclen-perl (0.2-1) unstable; urgency=low
+
+  * Change version check to be string comparison
+  * Remove devel code which actually did full file scan (duh!!)
+  * Set debug flag explicity to 0 if missing
+  * Include debian files in dist
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 11 Jun 2007 10:48:24 +0100
+
+libtie-file-fixedreclen-perl (0.1-3) unstable; urgency=low
+
+  * Override user and disable cache and defer modes because we know them to be
+    broken with FixedRecLen.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Wed,  6 Jun 2007 15:33:24 +0100
+
+libtie-file-fixedreclen-perl (0.1-2) unstable; urgency=low
+
+  * Tests working.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Wed,  6 Jun 2007 14:57:24 +0100
+
+libtie-file-fixedreclen-perl (0.1-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun,  3 Jun 2007 18:35:24 +0100
+

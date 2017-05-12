@@ -1,0 +1,21 @@
+Install TIB/Rendezvous first.  See README.
+
+To install Tibco::Rv:
+
+One of: TIB_HOME, TIB_RV_HOME, or TIBRV_DIR must be set.
+TIB_HOME must be your base Tibco directory, and it must contain "tibrv"; or:
+TIB_RV_HOME or TIBRV_DIR must be your Rendezvous installation directory.  It
+must contain "lib" and "include".
+
+For instance, execute this command:
+
+   $ export TIB_HOME=/usr/tibco
+
+Execute the following commands (use the current version instead of "x.xx"):
+
+   $ tar xvzf Tibco-Rv-x.xx.tar.gz
+   $ cd Tibco-Rv-x.xx
+   $ perl Makefile.PL
+   $ make
+   $ make test
+   $ make install

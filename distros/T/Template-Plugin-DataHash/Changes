@@ -1,0 +1,8 @@
+Revision history for Perl extension Template-Plugin-DataHash.
+
+0.04  Fri Dec 19 18:00:00 2003
+  - don't really need perl 5.8
+0.02  Tue Nov 25 17:53:48 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Template-Plugin-DataHash
+

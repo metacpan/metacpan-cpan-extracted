@@ -1,0 +1,107 @@
+Test-ModuleReady version 0.0.6
+
+This module was written to help me prepare updates to modules. I have a nasty habit of over-looking tedious things like
+checking that the version numbers in the README, POD and $VERSION variable in the module file are all equal. Also not
+only checking that all the files listed in the MANIFEST but more importantly checking that I haven´t left old .svn
+repositories, .Rhistory files Vim .swp files ect. have all been deleted. This modules is aimed at addressing these and
+other house-keeping chores just before submitting a new module release.
+
+    This module:
+
+    (1) Pulls the version numbers from the README, Module POD and Module $VERSION variable and checks they are all equal.
+    (2) Reads in the MANIFEST contents and checks that there are missing or extra files in the directory - see Below.
+        For missing files it just prints the problem and continues. However, for excess files or directories it asks
+        whether you want to ignore it, append it automatically to the MANIFEST file or delete it.
+    (3) Scans the Module.pm file for use statements and then cross-references these against the dependencies arguments
+        in Makefile.PL and Build.PL making sure you do not forget to include important dependencies. Specifically, for
+        every 'use' statement found it prints whether or not it found the appropriate dependency in the PREREQ_PM or
+        requires hashes for Makefile.PL and Build.PL respectively.
+    (4) Runs POD syntax checking using the Pod::Checker module.
+    (5) Prompts you for words to ignore before running spell-check using Test::Spelling/Test::More modules.
+    (6) Checks the Module.pm syntax using the basic Perl interpreter syntax check.
+    (7) Finally if you're happy with the results it tars the whole thing into a tar file with the full module name
+        appended by the version number from the $VERSION variable.
+
+This module does not recurse into the working directory and consequently if you choose to keep an excess directory it will totally
+ignore everything below. Intead the module takes the MANIFEST file contents and generates a hash of directories as keys
+and anonymous arrays containing the directory contents as values. It then enters each of those directories and checks the supposed 
+contents against their actual contents thereby detecting missing and excess files/dirs. For example the MANIFEST file:
+
+    Build.PL
+    Changes
+    MANIFEST
+    Makefile.PL
+    README
+    lib/Statistics/MVA/BayesianLinearDiscrimination.pm
+    t/00.load.t
+    t/pod.t
+
+Generates a hash of dirs to contents as (output generated using L<Data::TreeDraw>.
+
+    HASH REFERENCE (0)
+    |  
+    |__'lib/'=>ARRAY REFERENCE (1) [ '->{lib/}' ]
+    |    |  
+    |    |__SCALAR = 'Statistics' (2)  [ '->{lib/}[0]' ]
+    |  
+    |__'lib/Statistics/'=>ARRAY REFERENCE (1) [ '->{lib/Statistics/}' ]
+    |    |  
+    |    |__SCALAR = 'MVA' (2)  [ '->{lib/Statistics/}[0]' ]
+    |  
+    |__'./'=>ARRAY REFERENCE (1) [ '->{./}' ]
+    |    |  
+    |    |__SCALAR = 'MANIFEST' (2)  [ '->{./}[0]' ]
+    |    |  
+    |    |__SCALAR = 'lib' (2)  [ '->{./}[1]' ]
+    |    |  
+    |    |__SCALAR = 'Changes' (2)  [ '->{./}[2]' ]
+    |    |  
+    |    |__SCALAR = 'Build.PL' (2)  [ '->{./}[3]' ]
+    |    |  
+    |    |__SCALAR = 'Makefile.PL' (2)  [ '->{./}[4]' ]
+    |    |  
+    |    |__SCALAR = 'README' (2)  [ '->{./}[5]' ]
+    |    |  
+    |    |__SCALAR = 't' (2)  [ '->{./}[6]' ]
+    |  
+    |__'lib/Statistics/MVA/'=>ARRAY REFERENCE (1) [ '->{lib/Statistics/MVA/}' ]
+    |    |  
+    |    |__SCALAR = 'BayesianLinearDiscrimination.pm' (2)  [ '->{lib/Statistics/MVA/}[0]' ]
+    |  
+    |__'t/'=>ARRAY REFERENCE (1) [ '->{t/}' ]
+         |  
+         |__SCALAR = '00.load.t' (2)  [ '->{t/}[0]' ]
+         |  
+         |__SCALAR = 'pod.t' (2)  [ '->{t/}[1]' ]
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Carp'              => '1.08',
+'Pod::Checker'      => '1.45',
+'Test::More'        => '0.94',
+'Test::Spelling'    => '0.11',
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

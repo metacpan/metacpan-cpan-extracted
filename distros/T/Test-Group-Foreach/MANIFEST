@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/Test/Group/Foreach.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01basic.t
+t/10foreach.t
+t/20namelabel-equiv.t
+t/30pod-equiv.t
+t/40tgf_label.t
+xMakefile
+xt/checkchanges.t
+xt/cpanmeta.t
+xt/dependencies.t
+xt/distmanifest.t
+xt/hasversion.t
+xt/kwalitee.t
+xt/minimumversion.t
+xt/nobadtext.t
+xt/nobreakpoints.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml

@@ -1,0 +1,5 @@
+MANIFEST
+README
+HashHistory.pm
+t/01.t
+t/02.t

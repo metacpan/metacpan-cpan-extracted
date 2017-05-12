@@ -1,0 +1,21 @@
+Revision history for Trac::RPC
+
+0.01    2011-03-27
+        * First public release
+
+0.02    2012-07-22
+        * Correct matching connection errors
+        * Pod improvements
+        * Using croak insted of die
+        * Moving to ExtUtils::MakeMaker from Module::Install
+
+0.03    2013-06-23
+        * Switched to Dist::Zilla
+
+1.0.0   2013-09-01
+        [Major]
+        * Using SemVer for version numbers
+
+        [Patch]
+        * Added Perl 5.8 to be checked by Travis CI
+        * Fixing travis

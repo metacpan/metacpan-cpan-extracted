@@ -1,0 +1,193 @@
+
+=head1 NAME
+
+Test::MultiFork - Test suite support for multi-process programs
+
+=head1 SYNOPSIS
+
+	use Test::MultiFork;
+
+	($name, $letter, $number) = procname([new name])
+	lockcommon()
+	@oldvalues = getcommon()
+	setcommon(@newvalues)
+	unlockcommon()
+
+	use Test::MultiFork qw(groupwait setgroup dofork stderr bail_on_bad_plan)
+
+	groupwait([$tag])
+	$oldgroup = setgroup([$newgroup])
+	dofork(fork_specification)
+
+=head1 DESCRIPTION
+
+This test module is to support creating test suites for programs and
+modules that run as multiple processes and do mostly blocking I/O.
+
+Test::MultiFork handles the forking so that it can set up each child to
+coordinate the output.  The output from each child fork is redirected
+to the parent.  Each fork produces normal test output -- possibly using
+normal test modules like Test::Simple.  The output is collected and
+rewritten by the parent process.
+
+Each child fork has a letter and number designation.  The forks are
+created by C<dofork()>.  Dofork takes a specifiction on the form:
+([a-z](\d*))+.  That is to say, one or more lower-case letters, each
+optionally followd by a number.  The number says how many children
+to fork for that letter (default one).  The specifier C<ab2c3> means
+have one C<a> child (numbered C<1>); two C<b> children (numbered
+C<1>, C<2>); and three C<c> children (numbered C<1>, C<2>, C<3>).
+
+To aid in writing tests, Test::MultiFork will pass data between the
+child processes.  The data is test-writer defined.
+
+=head1 SOURCE FILTER
+
+Test::MultiFork acts as a source filter on your code.  It does this
+so that it can do lock-step execution control. 
+
+The source filtering is controlled with pseudo labels.  The labels must
+be the only thing on the line.  The main source control is a label like
+C<FORK_abc:>.  This label tells Test::MultiFork how many times to fork
+(see above).  Whatever comes after the C<FORK_> and before the C<:>
+is a fork specifier.
+
+With a C<FORK_abc:> label, varient execution labels are enabled.  
+Varient execution labels must be all lowercase.  This is to allow you
+to use something different for you loop control labels.   This module 
+can be used without putting in any special labels.
+
+Outside of a function, a varient execution label will synchronize
+all the program forks to that line of code.  As each fork reaches that
+line, it will stop and wait until all forks get there.  At that point, all
+of the forks will start up and run again.
+
+Inside or outside of a function, once a varient execution labels is seen,
+source code is turned on or off (commented out) depending on if the 
+process fork letter is in the label.
+
+For example:
+
+	# let's fork 5 times
+	FORK_abc2d:
+
+	ab:
+	print "I'm an 'a' or 'b' process\n";
+
+	cd:
+	print "I'm an 'c' or 'd' process\n";
+
+	abcd:
+	print "we are all running in lockstep\n";
+
+	sub xyz {
+	a: 
+		print "only a does something in this function\n";
+	abcd:
+	}
+
+Since the processes run in lockstep (synchronized at the labels), 
+loop controls must cover all processes.  
+
+In addition to fork() and the varient execution labels, you can
+override a default signal selection for debugging.  By default
+the C<USR1> signal is used to aid debugging: if the parent process
+bails out, it will send C<USR1> signals to all the children to ask
+them to print out some diagnostics.   The special label 
+C<SIGNAL_xyz:> changes which signal to use.  Substitute C<xyz> with
+your choice of signal or C<none> to disable this feature.
+
+=head1 IMPORTS
+
+=item stderr
+
+Import 'stderr' to send the STDERR output from each fork through
+the parent for tagging.  The default is to leave STDERR alone.
+
+=item bail_on_bad_plan
+
+Bail out if a test plan isn't followed.  This is most useful as a 
+way to exit early if one of the fork()ed children exits early.
+
+=item colorize
+
+If C<$ENV{TERM} =~ /xterm/>, then escape codes will be printed to change the
+background and foreground text colors so that each fork()ed child
+has a different color scheme.
+
+=head1 FUNCTIONS
+
+=item lockcommon()
+
+Sets a lock on the shared common data.
+
+=item getcommon()
+
+Returns the current value of the common data.  The common data is
+an array.  In scalar context, the first element is returned.
+getcommon does not care if the common data is locked.
+
+=item setcommon(@newvalues)
+
+Sets the value of the common data to the new values.  Dies
+if common data lock isn't held.
+
+=item unlockcommon()
+
+Releases a lock on the shared common data.  Dies if the lock
+isn't already held.
+
+=item groupwait([$tag])
+
+Wait for all process forks in the process group to get reach
+this same synchronization point as designated by the C<$tag>.  
+The default tag is the current source file name and line number.
+All processes start in the C<default> group.  This is the
+function used to implement the varient execution lockstep
+synchronization.
+
+=item setgroup([$newgroup])
+
+With a C<$newgroup>, changes the process' group identity.  All
+processes start in group C<default>.  Returns the old group 
+name.
+
+=item dofork($fork_specification)
+
+Fork off children processes.  The parent process becomes the
+special-purpose test coordinator.  The specification is as detailed
+in the DESCRIPTION above.
+
+=item procname([$new_name])
+
+Change the fork's name.  The return value is a list: the current
+name, process' letter, the process' number.
+
+=head1 INTEGRATION WITH TEST::*
+
+Test::Simple and Test::More encourage you to specify a test plan
+at compile time.  Make sure that dofork() is called before the
+test plan is specified.  
+
+When using Test::MultiFork's source filter in conjunction with
+Test::Builder anything built on top of it (eg: Test::Simple or
+Test::More) put Test::MultiFork first in the C<use> list.  
+
+=head1 SEE ALSO
+
+Test::Harness
+Test::Builder
+Test::Simple
+Test::More
+Test
+
+=head1 BUGS
+
+This is new and bearly tested.   Please provide feedback!
+
+=head1 LICENSE
+
+Copyright (C) 2003-2006 David Muir Sharnoff <muir@idiom.com>.
+This module may be used/copied/etc on the same terms as Perl
+itself.
+

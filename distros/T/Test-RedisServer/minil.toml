@@ -1,0 +1,3 @@
+name = "Test-RedisServer"
+authority="cpan:TYPESTER"
+module_maker="ModuleBuildTiny"

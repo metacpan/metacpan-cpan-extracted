@@ -1,0 +1,8 @@
+^Build$
+^_build/
+^MYMETA\.yml$
+^MYMETA\.json$
+^blib/
+^\.git/
+^\.gitignore$
+\.tar\.gz$

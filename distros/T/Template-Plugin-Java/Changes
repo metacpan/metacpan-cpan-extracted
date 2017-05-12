@@ -1,0 +1,38 @@
+Revision history for Perl extension Template::Plugin::Java.
+
+0.01  Mon Jul 17 13:05:15 PDT 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Template::Plugin::Java
+
+0.1   Thu Jul 27
+	- First CPAN release.
+
+0.2   Mon Jul 31 09:26:55 PDT 2000
+	- The sql stuff now at least compiles and works for select queries.
+	- Constructor for java.sql.Date called with (0) since the type has no
+	  () constructor. This is a general problem that must be solved later
+	  on using class file introspection.
+	- Very minor documentation update.
+
+0.3   Sat Aug  5 14:41:41 PDT 2000
+	- DBClass.template now works for selects, stores and removes.
+	- Small JavaSQL.pm and Java/Utils.pm update.
+
+0.4   Mon Oct  9 23:01:34 PDT 2000
+	- JavaSQL.pm didn't really parse queries correctly so the <query> tag
+	  did not work for more complex queries, fixed.
+	- Containers now fully parse themselves out of XML using SAX, no
+	  dependencies on an XML parser you have to write.
+	- Added a README.
+	- Added nopackage="true" to java: context to allow creating classes
+	  without a package.
+	- Added support for SQL blob types.
+	* Worked in support for java arrays. -- IN PROGRESS, only byte[] in
+	  DBClass.
+	- Templates are now installed in the make install process into
+	  $(PREFIX)/share/tjava and compiled therein.
+	- The "tjava" utility can now process files on standard input (i.e.
+	  cat Foo.xml | tjava) will work.
+	- Misc. annoyances fixed.
+	* tjava can now take files in a directory other than the current -- IN
+	  PROGRESS, very annoying bug

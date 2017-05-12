@@ -1,0 +1,33 @@
+----------------------------------------------------------------
+                             Lorem                              
+                          Lorem Ipsum                           
+                       Diagram Number 13                        
+----------------------------------------------------------------
+   Lorem Ipsum dolor sit amet, consectetuer adipiscing elit.    
+----------------------------------------------------------------
+      Column 1      ||      Column 2      ||      Column 3      
+----------------------------------------------------------------
+
++------------------.  +------------------.  +------------------.
+|      [I01]       |  |      [P01]       |  |      [O01]       |
+|      Lorem       |  |      Lorem       |  |      Lorem       |
+|   Lorem Ipsum    |  |   Lorem Ipsum    |  |   Lorem Ipsum    |
+| dolor sit amet,  |  | dolor sit amet,  |  | dolor sit amet,  |
+|   consectetuer   |  |   consectetuer   |  |   consectetuer   |
+| adipiscing elit. |  | adipiscing elit. |  | adipiscing elit. |
+`------------------'  `------------------'  `------------------'
+                                                                
+                                            +------------------.
+                                            |      [O02]       |
+                                            |      Lorem       |
+                                            |   Lorem Ipsum    |
+                                            | dolor sit amet,  |
+                                            |   consectetuer   |
+                                            | adipiscing elit. |
+                                            `------------------'
+
+   Lorem Ipsum dolor sit amet, consectetuer adipiscing elit.    
+
+----------------------------------------------------------------
+lorem_ipsum                                           00/00/0000
+----------------------------------------------------------------

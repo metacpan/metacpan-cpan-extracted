@@ -1,0 +1,82 @@
+Tie-DBIx-Class
+
+DBIx::Class puts a SQL row into a simple object and
+masks all SQL from you scripts, but it's strictly
+database based.
+
+Imagine you got a house:
+
+my $house = House->new(1);
+$house->open_door();
+
+$house could be a SQL row, but what if you'ld like
+to add methods or sub-objects which aren't SQL rows?
+
+Here is what Tie-DBIx-Class is for:
+
+package House;
+
+sub new {
+    my $class = shift;
+    my $house_id = shift;
+    tie(my %row,'Tie::DBIx::Class',$main::schema,'houses',$house_id);
+    return bless \row,$class;
+}
+
+sub open_door {
+    # Access the door controller
+}
+
+Every column is accessible as a hash key of the blessed object
+while you're still free to define additional methods.
+
+In addition, Tie::DBIx::Class waits for the first access to
+the hash's data before actually fetching the data from the
+database - saving resources in case you just want to open the
+door and don't need the SQL row's data at all.
+
+Tie::DBIx::Class has been developed for use with
+Template::Toolkit. Templates may get access to database rows
+without the need to preload everything which might be used by
+a template. Just create the objects and push them to
+Template::Toolkit and the required rows will be loaded
+automatically.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tie::DBIx::Class
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-DBIx-Class
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tie-DBIx-Class
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tie-DBIx-Class
+
+    Search CPAN
+        http://search.cpan.org/dist/Tie-DBIx-Class/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Sebastian Willing
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

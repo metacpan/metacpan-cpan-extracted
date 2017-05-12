@@ -1,0 +1,4 @@
+EMAIL,FNAME,LNAME,LOCATION,JAN,FEB,MAR,APR,MAY,JUN
+j.smith@example.com,Joe,Smith,Augusta,0,1,8,2,7,NULL
+may_jones@example.com,May,Jones,Seattle,1,NULL,NULL,NULL,,1
+ceaser@roman.empire.example.com,Augustus,Ceaser,Rome,20,22,24,26,28,30

@@ -1,0 +1,22 @@
+Template files are provided in the 'tm/' folder within the source distribution
+folder.  The template files are configured as follows:
+
+    Regular queries:
+        XQuery_Path[@attribute "%config_tag"]/@queried_data
+    or    
+        XQuery_Path[@attribute "%config_tag"]/string()
+
+    Hardcoded queries:
+        config_tag:XQuery_Path/string()
+
+    "Search and Replace" queries:
+        r=config_tag:%search% %search_also% %search_3_times%
+
+
+    Examples:
+        /*/test/data/columns/c[@id "%crazy_tag"]/@name
+        sum:/*/summary/string()
+        r=plot_title:%sum% - %xlabel% vs. %crazy_tag%
+
+
+# vim:set ai ts=4 sw=4 tw=78 expandtab:

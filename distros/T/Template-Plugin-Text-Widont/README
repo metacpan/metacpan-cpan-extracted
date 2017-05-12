@@ -1,0 +1,71 @@
+NAME
+    Template::Plugin::Text::Widont - A Template Toolkit filter for removing
+    typographic widows
+
+SYNOPSIS
+        [% USE Text::Widont nbsp => 'html' %]
+        [% "If the world didn't suck, we'd all fall off" | widont %]
+
+DESCRIPTION
+    "Template::Plugin::Text::Widont" provides a simple Template Toolkit
+    filter interface to the Text::Widont module.
+
+    See the NON-BREAKING SPACE TYPES section in Text::Widont's documentation
+    for more information about available values for "nbsp".
+
+METHODS
+  init
+    Overrides the method from Template::Plugin::Filter.
+
+  filter
+    Overrides the method from Template::Plugin::Filter.
+
+SEE ALSO
+    Template, Template::Plugin::Filter, Text::Widont
+
+DEPENDENCIES
+    *   Template::Plugin::Filter
+
+    *   Text::Widont
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-template-plugin-text-widont at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-Text-Wid
+    ont>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Template::Plugin::Text::Widont
+
+    You may also look for information at:
+
+    *   Template::Plugin::Text::Widont
+
+        <http://perlprogrammer.co.uk/modules/Template::Plugin::Text::Widont/
+        >
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Template-Plugin-Text-Widont/>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-Text
+        -Widont>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Template-Plugin-Text-Widont/>
+
+AUTHOR
+    Dave Cardwell <dcardwell@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Dave Cardwell. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

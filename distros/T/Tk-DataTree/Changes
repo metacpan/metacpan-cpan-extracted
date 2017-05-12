@@ -1,0 +1,50 @@
+-------------------------
+Version 0.06 (2008-04-13)
+-------------------------
+
+* wrap 'require Encode' in an eval {} within the
+  unicode test
+* set a license tag in Makefile.PL
+
+-------------------------
+Version 0.05 (2008-01-11)
+-------------------------
+
+* make XS _getval() unicode aware
+
+-------------------------
+Version 0.04 (2004-04-04)
+-------------------------
+
+* use DynaLoader instead of XSLoader
+
+* XS part is now optional, no C compiler needed
+
+* Scalar::Util is no longer a prerequisite
+
+-------------------------
+Version 0.03 (2004-03-31)
+-------------------------
+
+* improved handling of styles
+
+-------------------------
+Version 0.02 (2004-03-31)
+-------------------------
+
+* the update method wasn't compatible with
+  Scrolled widgets, changed to data method
+
+* data can now also be configured using
+  configure(-data => $data);
+
+* added styles for normal and node items
+
+* all styles are now advertised subwidgets
+
+-------------------------
+Version 0.01 (2004-03-30)
+-------------------------
+
+* initial release
+

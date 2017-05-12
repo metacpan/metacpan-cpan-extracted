@@ -1,0 +1,54 @@
+DESCRIPTION
+
+simplevCard - This package provides an API to reading a single vCard. A vCard
+is an electronic business card. You will find that many applications
+(KDE-Address book, Apple Address book, MS Outlook, Evolution, etc.) can export
+and import vCards.
+
+This module offers only basic vcard features (folding, ...). Grouping, etc. is
+not yet supported. For a complete description read the manualpages. Further
+enhancements are always welcome.
+
+This module has no other dependencies, it should work on every installation.
+
+If you want to process several vCards (e.g. addressbooks) try the module
+'Text::SimpleVaddrbook'.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::SimpleVcard
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-SimpleVcard
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-SimpleVcard
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-SimpleVcard
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-SimpleVcard
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2009 Michael Tomuschat
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

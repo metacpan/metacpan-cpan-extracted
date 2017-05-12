@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-JavaScript
+version:      0.06
+version_from: lib/Test/JavaScript.pm
+installdirs:  site
+requires:
+    JavaScript::SpiderMonkey:      0
+    Test::Simple:                  0.60
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

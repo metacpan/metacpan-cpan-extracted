@@ -1,0 +1,20 @@
+---
+name: Tie-DB_File-SplitHash
+version: 1.05
+author:
+  - Benjamin Franz <snowhare@nihongo.org>
+abstract: Transparently divides a DB_File hash into multiple smaller files
+license: perl
+requires:
+  Carp: 0
+  DB_File: 0
+  Digest::SHA1: 0
+  Fcntl: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+provides:
+  Tie::DB_File::SplitHash:
+    file: lib/Tie/DB_File/SplitHash.pm
+    version: 1.05
+generated_by: Module::Build version 0.261

@@ -1,0 +1,67 @@
+NAME
+    Template::Plugin::POSIX - TT2 plugin to import POSIX functions
+
+VERSION
+    This document describes Template::Plugin::POSIX 0.05 released on 12
+    March, 2007.
+
+SYNOPSIS
+      [% USE POSIX %]
+
+      [% POSIX.log(100) %]
+      [% POSIX.rand(1) %]
+      [% POSIX.exp(2) %]
+      [% POSIX.sprintf("%.0f", 3.5) %]
+      [% POSIX.pow(2, 3) %]
+      [% POSIX.ceil(3.8) %]
+      [% POSIX.floor(3.8) %]
+      [% POSIX.sin(3.14) %]
+      [% POSIX.cos(0) %]
+
+DESCRIPTION
+    As a TT programmer, I found it quite inflexible to use the Template
+    Toolkit's presentation language Language due to the very limited
+    vocabulary. So I wrote this little plugin in order to open a window for
+    the template file to the full richness of most POSIX functions, making
+    the Template language a "programming language" in a much more serious
+    sense.
+
+    Please keep in mind I just used AUTOLOAD, eval, and Data::Dumper to do
+    the magic here.
+
+    If you're looking for even more functions, I suggest you take a look at
+    the Template::Plugin::Perl module which exports the excellent POSIX
+    repertoire.
+
+METHODS
+    "new"
+        Constructor called by the TT2 template system
+
+    "throw"
+        TT2 exception handling procedure.
+
+TODO
+    *   Add more unit tests.
+
+SOURCE CONTROL
+    You can always get the latest version of the source code from the follow
+    Subversion repository:
+
+    <http://svn.openfoundry.org/ttposix>
+
+    There is anonymous access to all.
+
+    If you'd like a commit bit, please let me know :)
+
+AUTHOR
+    Agent Zhang, <agentzh@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2005, 2006, 2007 by Agent Zhang. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Template, Template::Plugin::Perl, Data::Dumper
+

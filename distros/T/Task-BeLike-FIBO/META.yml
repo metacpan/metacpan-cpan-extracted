@@ -1,0 +1,43 @@
+---
+abstract: 'Leonardo Pisano a.k.a. Fibonacci'
+author:
+  - 'G. Casati <fibo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  Test::Compile: v1.2.1
+  Test::More: '1.001009'
+  Test::Pod: '1.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-FIBO
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::Ack: '2.14'
+  CPAN: '2.10'
+  CPAN::Uploader: '0.103007'
+  ExtUtils::MakeMaker: '6.64'
+  Module::CoreList: '5'
+  PPI::HTML: '1.08'
+  Perl::Tidy: '20140711'
+  Term::ReadKey: '2.32'
+  Term::ReadLine::Perl: '1.0303'
+  Test::Compile: v1.2.1
+  Test::More: '1.001009'
+  Test::Pod: '1.48'
+  V: '0.13'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/fibo/Task-BeLike-FIBO-pm/issues
+  homepage: https://metacpan.org/pod/Task::BeLike::FIBO
+  license: http://g14n.info/artistic-license
+  repository: https://github.com/fibo/Task-BeLike-FIBO-pm
+version: '0.19'

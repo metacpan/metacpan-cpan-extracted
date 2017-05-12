@@ -1,0 +1,687 @@
+#!/usr/bin/perl -w
+
+use strict;
+use App::Prove;
+use Getopt::Long;
+
+our $VERSION = '3.27';
+$|++;
+
+# Fire up the app, process args, and run the tests.
+my $app = App::Prove::MyTAP->new;
+$app->process_args(@ARGV);
+exit($app->run ? 0 : 1);
+
+#######################################################################################
+package App::Prove::MyTAP;
+use base 'App::Prove';
+
+BEGIN {
+    __PACKAGE__->mk_methods(qw(mysql database user password host port));
+}
+
+sub _initialize {
+    my $self = shift->SUPER::_initialize(@_);
+
+    # Set up defaults.
+    $self->{sources} = ['MyTAP'];
+    $self->{color} = 1;
+    $self->{comments} = 1;
+    return $self;
+}
+
+sub process_args {
+    my $self = shift;
+    my $opts;
+    # We need to locally define a function to do argument processing.
+    my $get_options = sub(@) {
+        Getopt::Long::Configure(qw(no_ignore_case bundling pass_through));
+        # Silence "Duplicate specification" warnings, since we replace some of
+        # App::Prove's options.
+        local $^W;
+        return Getopt::Long::GetOptions(
+            @_,
+            'mysql-bin|b=s' => \$opts->{mysql},
+            'database|D=s'  => \$opts->{database},
+            'user|u=s'      => \$opts->{user},
+            'password|p=s'  => \$opts->{password},
+            'host|h=s'      => \$opts->{host},
+            'port|P=s'      => \$opts->{port},
+            'version|V'     => \$opts->{version},
+            'help|H'        => \$opts->{help},
+            'man|m'         => \$opts->{man},
+        );
+    };
+
+    do {
+        # Replace GetOptions in App::Prove and process the args. Yes, this is
+        # ugly, but it's the only way to inject additional options into the
+        # processing without running GetOptions twice (which has its own
+        # issues; see https://rt.cpan.org/Ticket/Display.html?id=114335).
+        no warnings 'redefine';
+        local *App::Prove::GetOptions = $get_options;
+        $self->SUPER::process_args(@_);
+    };
+
+    # Set argv to pass stuff through to MyTAP.
+    push @{ $self->{argv} } => (
+        (map { ('--mytap-option' => "suffix=$_") } @{ $self->{extensions} || [] }),
+        (map {
+            ('--mytap-option' => "$_=$opts->{$_}")
+        } grep {
+            $opts->{$_}
+        } qw(mysql database user password host port)),
+    );
+
+    $self->{extensions} ||= ['.my'];
+    return;
+}
+
+sub print_version {
+    my $self = shift;
+    print 'my_prove ', main->VERSION, $/;
+}
+
+sub _help {
+    my ( $self, $verbosity ) = @_;
+    require Pod::Usage;
+    Pod::Usage::pod2usage(
+        '-sections' => $verbosity > 1 ? '.+' : '(?i:(Usage|Options))',
+        '-verbose'  => 99,
+        '-exitval'  => 0,
+    )
+}
+__END__
+
+=encoding utf8
+
+=head1 Name
+
+my_prove - Run MyTAP MySQL tests through a TAP harness.
+
+=head1 Usage
+
+  my_prove -D myapp
+  my_prove -D testdb tests/
+  my_prove sometest.sql
+
+=head1 Description
+
+C<my_prove> is a command-line application to run one or more MyTAP tests in a
+MySQL database. The output of the tests is harvested and processed by
+L<TAP::Harness|TAP::Harness> in order to summarize the results of the test.
+
+Tests can be written and run as SQL scripts. If no files or directories are
+supplied, C<my_prove> looks for all files matching the pattern C<t/*.my>. If
+the tests fail, C<my_prove> will exit with non-zero status.
+
+=head2 Test Scripts
+
+MyTAP test scripts should consist of a series of SQL statements that output
+TAP. Here’s a simple example that assumes that the MyTAP functions have been
+installed in the "tap" database:
+
+    -- Start transaction and plan the tests.
+    BEGIN;
+    SELECT tap.plan(1);
+
+    -- Run the tests.
+    SELECT tap.pass( 'My test passed, w00t!' );
+
+    -- Finish the tests and clean up.
+    CALL finish();
+    ROLLBACK;
+
+Now run the tests by passing the list of SQL script names to C<my_prove>.
+Here’s what it looks like when the MyTAP tests are run with C<my_prove>
+
+    % my_prove -u root sql/*.sql
+    t/coltap.....ok
+    t/hastap.....ok
+    t/moretap....ok
+    t/pktap......ok
+    All tests successful.
+    Files=4, Tests=216,  1 wallclock secs ( 0.06 usr  0.02 sys +  0.08 cusr  0.07 csys =  0.23 CPU)
+    Result: PASS
+
+=head1 Options
+
+Boolean options:
+
+ -v,  --verbose         Print all test lines.
+ -l,  --lib             Add 'lib' to the path for your tests (-Ilib).
+      --blib            Add 'blib/lib' and 'blib/arch' to the path for
+                        your tests
+ -s,  --shuffle         Run the tests in random order.
+ -c,  --color           Colored test output (default).
+      --nocolor         Do not color test output.
+      --count           Show the X/Y test count when not verbose
+                        (default)
+      --nocount         Disable the X/Y test count.
+      --dry             Dry run. Show test that would have run.
+      --ext             Set the extension for tests (default '.my')
+ -f,  --failures        Show failed tests.
+ -o,  --comments        Show comments and diagnostics.
+      --ignore-exit     Ignore exit status from test scripts.
+      --merge           Merge test scripts' STDERR with their STDOUT.
+ -r,  --recurse         Recursively descend into directories.
+      --reverse         Run the tests in reverse order.
+ -q,  --quiet           Suppress some test output while running tests.
+ -Q,  --QUIET           Only print summary results.
+      --parse           Show full list of TAP parse errors, if any.
+      --directives      Only show results with TODO or SKIP directives.
+      --timer           Print elapsed time after each test.
+      --trap            Trap C<Ctrl-C> and print summary on interrupt.
+      --normalize       Normalize TAP output in verbose output
+ -T                     Enable tainting checks.
+ -t                     Enable tainting warnings.
+ -W                     Enable fatal warnings.
+ -w                     Enable warnings.
+ -H,  --help            Display this help
+ -?,                    Display this help
+ -m,  --man             Longer manpage for my_prove
+      --norc            Don't process default .proverc
+
+Options that take arguments:
+
+ -I                     Library paths to include.
+ -P                     Load plugin (searches App::Prove::Plugin::*.)
+ -M                     Load a module.
+ -e,  --exec            Interpreter to run the tests ('' for compiled
+                        tests.)
+      --harness         Define test harness to use.  See TAP::Harness.
+      --formatter       Result formatter to use. See FORMATTERS.
+ -a,  --archive out.tgz Store the resulting TAP in an archive file.
+ -j,  --jobs N          Run N test jobs in parallel (try 9.)
+      --state=opts      Control prove's persistent state.
+      --rc=rcfile       Process options from rcfile
+ -b   --mysql-bin       Location of the C<mysql> client.
+ -D,  --database        Database to use.
+ -u,  --user            User with which to connect.
+ -p,  --password        The password to use when connecting.
+ -h,  --host            Host to which to connect.
+ -P,  --port            Port to which to connect.
+
+=head1 Options Details
+
+=head2 Database Options
+
+=over
+
+=item C<-b>
+
+=item C<--mysql-bin>
+
+  my_prove --mysql-bin /usr/local/mysql/bin/mysql
+  my_prove -b /usr/local/bin/mysql
+
+Path to the C<mysql> client program, which will be used to actually run the
+tests. Defaults to F<mysql>, which should work well if an executable with that
+name is in your path.
+
+=item C<-D>
+
+=item C<--database>
+
+  my_prove --database try
+  my_prove -D root
+
+The name of database to use.
+
+=item C<-u>
+
+=item C<--user>
+
+  my_prove --user foo
+  my_prove -u root
+
+The MySQL user name to use when connecting to the server.
+
+=item C<-p>
+
+=item C<--password>
+
+  my_prove --password foo
+  my_prove -p root
+
+The password to use when connecting to the server. Specifying a password on
+the command line should be considered insecure. You can use a MySQL option
+file such as F</etc/my.cnf> or the F<.my.cnf> file in your home directory, to
+avoid giving the password on the command line.
+
+=item C<-h>
+
+=item C<--host>
+
+  my_prove --host mysql.example.com
+  my_prove -h dev.local
+
+Connect to the MySQL server on the given host.
+
+=item C<-p>
+
+=item C<--port>
+
+  my_prove --port 1234
+  my_prove -P 666
+
+The TCP/IP port number to use for the connection.
+
+=back
+
+=head2 Behavioral Options
+
+=over
+
+=item C<--ext>
+
+  my_prove --ext .sql tests/
+
+Set the extension for test files (default F<.my>). May be specified multiple
+times if you have test scripts with multiple extensions, though all must be
+MyTAP tests:
+
+  my_prove --ext .sql --ext .my --ext .myt
+
+If you want to mix MyTAP tests with other TAP-emitting tests, like Perl tests,
+use C<prove> instead, where C<--ext> identifies any test file, and
+C<--mytap-option suffix=> lets you specify one or more extensions for MyTAP
+tests.
+
+  prove --source Perl \
+        --ext .t --ext .my \
+        --source MyTAP --mytap-option suffix=.my
+
+=item C<-r>
+
+=item C<--recurse>
+
+  my_prove --recurse tests/
+  my_prove --recurse sql/
+
+Recursively descend into directories when searching for tests. Be sure to
+specify C<--ext> if your tests do not end in C<.my>.
+
+=item C<--ignore-exit>
+
+  my_prove --ignore-exit
+
+Ignore exit status from test scripts. Normally if a script triggers a database
+exception, C<mysql> will exit with an error code and, even if all tests passed,
+the test will be considered a failure. Use C<--ignore-exit> to ignore such
+situations (at your own peril).
+
+=item C<--trap>
+
+The C<--trap> option will attempt to trap C<SIGINT> (C<Ctrl-C>) during a test
+run and display the test summary even if the run is interrupted
+
+=item C<--harness>
+
+  my_prove --harness TAP::Harness::Color
+
+Specify a subclass of L<TAP::Harness> to use for the test harness. Defaults to
+TAP::Harness (unless C<--archive> is specified, in which case it uses
+L<TAP::Harness::Archive>).
+
+=item C<-j>
+
+=item C<-jobs>
+
+Run N test jobs in parallel (try 9.)
+
+=item C<--rc>
+
+  my_prove --rc my_prove.rc
+
+Process options from the specified configuration file.
+
+If C<--rc> is not specified and F<./.proverc> or F<~/.proverc> exist, they
+will be read and the options they contain processed before the command line
+options. Options in configuration files are specified in the same way as
+command line options:
+
+           # .proverc
+           --state=hot,fast,save
+           -j9
+
+Under Windows and VMS the option file is named F<_proverc> rather than
+F<.proverc> and is sought only in the current directory.
+
+Due to how options are loaded you cannot use F<.proverc> for
+C<my_prove>-specific options, only C<prove> options.
+
+=item C<--norc>
+
+Do not process F<./.proverc> or F<~/.proverc>.
+
+=item C<--state>
+
+You can ask C<my_prove> to remember the state of previous test runs and select
+and/or order the tests to be run based on that saved state.
+
+The C<--state> switch requires an argument which must be a comma separated
+list of one or more of the following options.
+
+=over
+
+=item C<last>
+
+Run the same tests as the last time the state was saved. This makes it
+possible, for example, to recreate the ordering of a shuffled test.
+
+    # Run all tests in random order
+    $ my_prove --state=save --shuffle
+
+    # Run them again in the same order
+    $ my_prove --state=last
+
+=item C<failed>
+
+Run only the tests that failed on the last run.
+
+    # Run all tests
+    $ my_prove --state=save
+
+    # Run failures
+    $ my_prove --state=failed
+
+If you also specify the C<save> option newly passing tests will be
+excluded from subsequent runs.
+
+    # Repeat until no more failures
+    $ my_prove --state=failed,save
+
+=item C<passed>
+
+Run only the passed tests from last time. Useful to make sure that no
+new problems have been introduced.
+
+=item C<all>
+
+Run all tests in normal order. Multiple options may be specified, so to run
+all tests with the failures from last time first:
+
+    $ my_prove --state=failed,all,save
+
+=item C<hot>
+
+Run the tests that most recently failed first. The last failure time of
+each test is stored. The C<hot> option causes tests to be run in most-recent-
+failure order.
+
+    $ my_prove --state=hot,save
+
+Tests that have never failed will not be selected. To run all tests with
+the most recently failed first use
+
+    $ my_prove --state=hot,all,save
+
+This combination of options may also be specified thus
+
+    $ my_prove --state=adrian
+
+=item C<todo>
+
+Run any tests with to-dos.
+
+=item C<slow>
+
+Run the tests in slowest to fastest order. This is useful in conjunction
+with the C<-j> parallel testing switch to ensure that your slowest tests
+start running first.
+
+    $ my_prove --state=slow -j9
+
+=item C<fast>
+
+Run test tests in fastest to slowest order.
+
+=item C<new>
+
+Run the tests in newest to oldest order based on the modification times
+of the test scripts.
+
+=item C<old>
+
+Run the tests in oldest to newest order.
+
+=item C<fresh>
+
+Run those test scripts that have been modified since the last test run.
+
+=item C<save>
+
+Save the state on exit. The state is stored in a file called F<.prove>
+(F<_prove> on Windows and VMS) in the current directory.
+
+=back
+
+The C<--state> switch may be used more than once.
+
+    $ my_prove --state=hot --state=all,save
+
+=item C<--rc>
+
+=item C<--no-rc>
+
+If F<~/.proverc> or F<./.proverc> exist they will be read and any
+options they contain processed before the command line options. Options
+in F<.proverc> are specified in the same way as command line options:
+
+    # .proverc
+    --state=hot,fast,save
+    -j9
+
+Additional option files may be specified with the C<--rc> option.
+Default option file processing is disabled by the C<--norc> option.
+
+Under Windows and VMS the option file is named F<_proverc> rather than
+F<.proverc> and is sought only in the current directory.
+
+=back
+
+=head2 Display Options
+
+=over
+
+=item C<-v>
+
+=item C<--verbose>
+
+  my_prove --verbose
+  my_prove -v
+
+Display standard output of test scripts while running them. This behavior can
+also be triggered by setting the C<$TEST_VERBOSE> environment variable to a
+true value.
+
+=item C<-f>
+
+=item C<--failures>
+
+  my_prove --failures
+  my_prove -f
+
+Show failed tests.
+
+=item C<-o>
+
+=item C<--comments>
+
+Show comments, such as diagnostics output by C<diag()>. Enabled by default.
+use C<--no-comments> to disable.
+
+=item C<--directives>
+
+  my_prove --directives
+
+Only show results with TODO or SKIP directives.
+
+=item C<-q>
+
+=item C<--quiet>
+
+  my_prove --quiet
+  my_prove -q
+
+Suppress some test output while running tests.
+
+=item C<-Q>
+
+=item C<--QUIET>
+
+  my_prove --QUIET
+  my_prove -Q
+
+Only print summary results.
+
+=item C<--parse>
+
+  my_prove --parse
+
+Enables the display of any TAP parsing errors as tests run. Useful for
+debugging new TAP emitters.
+
+=item C<--normalize>
+
+  my_prove --normalize
+
+Normalize TAP output in verbose output. Errors in the harnessed TAP corrected
+by the parser will be corrected.
+
+=item C<--dry>
+
+=item C<-D>
+
+  my_prove --dry tests/
+  my_prove -D
+
+Dry run. Just outputs a list of the tests that would have been run.
+
+=item C<--merge>
+
+Merge test scripts' C<STDERR> with their C<STDOUT>. Not really relevant to
+MyTAP tests, which only print to C<STDERR> when an exception is thrown.
+
+=item C<-t>
+
+=item C<--timer>
+
+  my_prove --timer
+  my_prove -t
+
+Print elapsed time after each test file.
+
+=item C<-c>
+
+=item C<--color>
+
+  my_prove --color
+  my_prove -c
+
+Display test results in color. Colored test output is the default, but if
+output is not to a terminal, color is disabled.
+
+Requires L<Term::ANSIColor|Term::ANSIColor> on Unix-like platforms and
+L<Win32::Console|Win32::Console> on Windows. If the necessary module is not
+installed colored output will not be available.
+
+=item C<--nocolor>
+
+Do not display test results in color.
+
+=item C<--shuffle>
+
+  my_prove --shuffle tests/
+
+Test scripts are normally run in alphabetical order. Use C<--reverse> to run
+them in in random order. Not relevant when used with C<--runtests>.
+
+=item C<--reverse>
+
+  my_prove --reverse tests/
+
+Test scripts are normally run in alphabetical order. Use C<--reverse> to run
+them in reverse order. Not relevant when used with C<--runtests>.
+
+=item C<-a>
+
+=item C<--archive>
+
+  my_prove --archive tap.tar.gz
+  my_prove -a test_output.tar
+
+=item C<-f>
+
+=item C<--formatter>
+
+  my_prove --formatter TAP::Formatter::File
+  my_prove -f TAP::Formatter::Console
+
+The name of the class to use to format output. The default is
+L<TAP::Formatter::Console|TAP::Formatter::Console>, or
+L<TAP::Formatter::File|TAP::Formatter::File> if the output isn't a TTY.
+
+=item C<--count>
+
+  my_prove --count
+
+Show the X/Y test count as tests run when not verbose (default).
+
+=item C<--nocount>
+
+  my_prove --nocount
+
+Disable the display of the X/Y test count as tests run.
+
+Send the TAP output to a TAP archive file as well as to the normal output
+destination. The archive formats supported are F<.tar> and F<.tar.gz>.
+
+=back
+
+=head2 Metadata Options
+
+=over
+
+=item C<-H>
+
+=item C<--help>
+
+  my_prove --help
+  my_prove -H
+
+Outputs a brief description of the options supported by C<my_prove> and exits.
+
+=item C<-m>
+
+=item C<--man>
+
+  my_prove --man
+  my_prove -m
+
+Outputs this documentation and exits.
+
+=item C<-V>
+
+=item C<--version>
+
+  my_prove --version
+  my_prove -V
+
+Outputs the program name and version and exits.
+
+=back
+
+=head1 Author
+
+David E. Wheeler <david@kineticode.com>
+
+=head1 Copyright and License
+
+Copyright (c) 2010-2016 David E. Wheeler. Some Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,12 @@
+Revision history for Perl extension Test::Fixture::KyotoTycoon
+
+0.13    Fri Apr 20 09:11:49 JST 2012
+        - update testcase (case ktserver is not exists)
+0.12    Tue Apr 10 13:49:32 JST 2012
+        - update pod spell miss
+0.11    Tue Apr 10 13:44:26 JST 2012
+        - update Makefile.PL, require module add parent.pm
+0.1     Thu Mar 22 02:21:48 JST 2012
+        - add make_kt_fixture command, require module from YAML::Syck to YAML::XS
+0.01    Sat Mar 17 15:35:01 JST 2012
+        - original version

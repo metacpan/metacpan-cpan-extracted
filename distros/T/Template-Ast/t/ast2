@@ -1,0 +1,16 @@
+$ast = {
+         'date' => undef,
+         'author' => 'agent',
+         'ram' => {
+                    'word_size' => 16,
+                    'delay' => 2
+                  },
+         'alu' => {
+                    'word_size' => 32,
+                    'sels' => [
+                                'MUL',
+                                'DIV'
+                              ],
+                    'delay' => 3
+                  }
+       };

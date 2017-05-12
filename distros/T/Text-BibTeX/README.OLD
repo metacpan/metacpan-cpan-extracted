@@ -1,0 +1,168 @@
+                               Text::BibTeX
+                               version 0.34
+                       Greg Ward (gward@python.net)
+                             22 December, 2000
+
+INTRODUCTION
+------------
+
+Text::BibTeX is a Perl library for reading, parsing, and processing
+BibTeX files.  It is the Perl half of btOOL, a pair of libraries for
+dealing with BibTeX data; the C half, btparse, is needed to compile
+Text::BibTeX (see below).
+
+Text::BibTeX gives you access to the data at many different levels: you
+may work with BibTeX entries as simple "field -> string" mappings, or
+get at the original form of the data as a list of simple values
+(strings, macros, or numbers) pasted together.  You can choose not to
+impose nany restrictions on the allowed/expected entry types or fields,
+or you can use the structure defined by BibTeX 0.99's standard style
+files, or you can invent your own.
+
+The library is copiously documented.  After installing the module, see
+the Text::BibTeX man page for a comprehensive introduction to the
+system.  If you wish to dive straight in without regards for niceties
+such as splitting and formatting names, defining or imposing database
+structures, getting access to unprocessed field values, and other nifty
+features, then you can probably get away with just reading the
+Text::BibTeX::Entry man page.  Comments/criticism of the documentation
+are welcome.
+
+In addition to the man pages embedded in each module (and available
+after installation), I have written a technical report describing btOOL,
+with the btparse and Text::BibTeX documentation included as appendices.
+The whole report is just over 100 pages, around 45 of which make up the
+Text::BibTeX documentation (the btparse documentation is a further 30
+pages).  You can find it at the btOOL home page:
+
+    http://starship.python.net/~gward/btOOL/
+
+I may also make the btparse and Text::BibTeX manuals available as
+separate PostScript files, but they aren't there as of this writing.
+
+
+DEPENDENCIES
+------------
+
+Text::BibTeX requires Perl 5.004 or later and an ANSI-compliant C
+compiler.
+
+You must also have the btparse distribution, the C library underlying
+Text::BibTeX.  If you didn't download btparse with Text::BibTeX, don't
+sweat it; the Makefile.PL is smart enough to go out and find it for you
+(using your preferred CPAN mirror if you have set one up,
+http://www.cpan.org/ otherwise).  If you did download btparse, just put
+it in the same directory as the Text::BibTeX tarball.  Text::BibTeX's
+Makefile.PL will unpack and configure it for you.
+
+
+BUILDING
+--------
+
+Start by generating the Makefile and other preparatory steps (most notably,
+preparing the btparse package for building).
+
+   perl Makefile.PL
+
+This goes to some lengths to ensure that btparse, the companion C library,
+is found and available.  It will configure btparse for you, so you
+shouldn't have to do anything in the 'btparse' directory unless things go
+wrong there.
+
+Note that if Perl was built with a non-ANSI C compiler, you will need to
+specify an ANSI compiler when running Makefile.PL.  For instance, if you're
+running SunOS and Perl was built with 'cc' (non-ANSI), you will need to
+build Text::BibTeX (and btparse as well, for that matter) with an ANSI
+compiler such as 'gcc' or Sun's 'acc'.  This can be done for Text::BibTeX
+as follows:
+
+   perl Makefile.PL CC=gcc      # or acc, or whatever works on your system
+
+However, this is fraught with danger and not recommended.  The only safe
+thing to do is to build Perl with an ANSI-compliant compiler.  This will
+probably save you trouble with other extensions that require an ANSI C
+compiler.
+
+Now, build everything:
+
+   make
+
+This takes care of building btparse as well as the Text::BibTeX modules, so
+again you don't have to go grubbing around in the btparse directory unless
+things go wrong.
+
+Optionally, you can test and install btparse:
+
+   cd btparse
+   make test
+   make install
+   cd ..
+
+(You do not have to install btparse to use Text::BibTeX; that's only needed
+if you plan to do C programming using btparse.  See btparse/README for
+details.)
+
+Finally, test and install the Text::BibTeX Perl modules:
+
+   make test
+   make install
+
+Note that you will need to be root on most systems in order to install
+either btparse or Text::BibTeX.  Consult the 'perlmodinstall' man page (as
+of Perl 5.005 or later) for more information on building and installing
+Perl module distributions.
+
+Please let me know if anything goes wrong with building either btparse
+or Text::BibTeX.
+
+
+BUGS AND LIMITIATIONS
+---------------------
+
+See the btparse(3) and Text::BibTeX(3) man pages for details.  Executive
+summary:
+
+  * Text::BibTeX is not thread-safe, due to a heavy dependence on
+    global variables in the parser and lexical scanner components
+    of btparse
+
+  * for the same reason, you can't have multiple files open and
+    being parsed at the same time; attempting to do so is an
+    invalid use of btparse
+
+  * Text::BibTeX cannot be used with an sfio-based Perl, because
+    the Perl I/O API is apparently not yet up to the task of replacing
+    stdio in third-party C libraries
+
+
+AVAILABILITY
+------------
+
+You can find the latest version of Text::BibTeX, as well as
+documentation, information on known bugs, etc. at the btOOL web site:
+
+   http://starship.python.net/~gward/btOOL/
+
+Here you will find HTML versions of the documentation and technical
+report describing the project, links to download the code, and whatever
+other goodies I can come up with over time.
+
+
+CREDITS
+-------
+
+For spotting bugs and sometimes even providing patches:
+
+    Dirk Vleugels <vleugels@do.isst.fhg.de>
+    Kjetil Kjernsmo <kjetil.kjernsmo@astro.uio.no>
+    Andrew Cassin <acassin@cs.mu.oz.au>
+    Thomas Kamphusmann <thomas@delphi.ping.de>
+    Horst Tellioglu <telliogl@h2hobel.phl.univie.ac.at>
+    Nikolay Pelov <Nikolay.Pelov@cs.kuleuven.ac.be>
+
+...and probably a few others.  Please send me email if you feel you
+belong on this list and I forgot to include you.
+
+Also, see the btparse README file for contributors to the C library.
+
+$Id$

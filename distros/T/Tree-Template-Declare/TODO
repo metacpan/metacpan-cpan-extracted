@@ -1,0 +1,4 @@
+.. -*- mode: rst; coding: utf-8 -*-
+
+- make it use whatever tree class we want, via adapters
+- try not to clobber ``@_`` *might work*

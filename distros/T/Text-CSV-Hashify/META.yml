@@ -1,0 +1,28 @@
+---
+abstract: 'Turn a CSV file into a Perl hash'
+author:
+  - 'James E Keenan (jkeenan@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-CSV-Hashify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Text::CSV: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-CSV-Hashify
+  homepage: http://thenceforward.net/perl/modules/Text-CSV-Hashify/
+  repository: https://github.com/jkeenan/text-csv-hashify.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

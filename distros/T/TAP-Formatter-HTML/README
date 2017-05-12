@@ -1,0 +1,385 @@
+NAME
+    TAP::Formatter::HTML - TAP Test Harness output delegate for html output
+
+SYNOPSIS
+     ##
+     ## command-line usage (alpha):
+     ##
+     prove -m -Q -P HTML=outfile:out.html,css_uri:style.css,js_uri:foo.js,force_inline_css:0
+
+     # backwards compat usage:
+     prove -m -Q --formatter=TAP::Formatter::HTML >output.html
+
+     # for more detail:
+     perldoc App::Prove::Plugin::HTML
+
+     ##
+     ## perl usage:
+     ##
+     use TAP::Harness;
+
+     my @tests = glob( 't/*.t' );
+     my $harness = TAP::Harness->new({ formatter_class => 'TAP::Formatter::HTML',
+                                       merge => 1 });
+     $harness->runtests( @tests );
+     # prints HTML to STDOUT by default
+
+     # or if you really don't want STDERR merged in:
+     my $harness = TAP::Harness->new({ formatter_class => 'TAP::Formatter::HTML' });
+
+     # to use a custom formatter:
+     my $fmt = TAP::Formatter::HTML->new;
+     $fmt->css_uris([])->inline_css( $my_css )
+         ->js_uris(['http://mysite.com/jquery.js', 'http://mysite.com/custom.js'])
+         ->inline_js( '$(div.summary).hide()' );
+
+     my $harness = TAP::Harness->new({ formatter => $fmt, merge => 1 });
+
+     # to output HTML to a file[handle]:
+     $fmt->output_fh( $fh );
+     $fmt->output_file( '/tmp/foo.html' );
+
+     # you can use your own customized templates too:
+     $fmt->template('custom.tt2')
+         ->template_processor( Template->new )
+         ->force_inline_css(0)
+         ->force_inline_js(0);
+
+DESCRIPTION
+    This module provides HTML output formatting for TAP::Harness (a
+    replacement for Test::Harness. It is largely based on ideas from
+    TAP::Test::HTMLMatrix (which was built on Test::Harness and thus had a
+    few limitations - hence this module). For sample output, see:
+
+    <http://www.spurkis.org/TAP-Formatter-HTML/test-output.html>
+
+    This module is targeted at all users of automated test suites. It's
+    meant to make reading test results easier, giving you a visual summary
+    of your test suite and letting you drill down into individual failures
+    (which will hopefully make testing more likely to happen at your
+    organization ;-).
+
+    The design goals are:
+
+    *   *easy to use*
+
+        Once you've got your test report, it should be obvious how to use
+        it.
+
+    *   *helpful*
+
+        It should be helpful by pointing out *where* & *why* your test suite
+        is breaking. If you've written your tests well, it should give you
+        enough info to start tracking down the issue.
+
+    *   *easy to install*
+
+        Eg: should be a clean install from CPAN, and you shouldn't need to
+        modify your existing test suite to get up & running, though *you
+        will need to stop using Test::Harness unfortunately*.
+
+    *   *work out of the box*
+
+        You shouldn't need to do any custom-coding to get it working - the
+        default configuration & templates should be enough to get started
+        with. Once installed it should be a matter of running:
+
+         % prove -m -Q --formatter=TAP::Formatter::HTML >output.html
+
+        From your project's home dir, and opening the resulting file.
+
+    *   *easy to configure*
+
+        You should be able to configure & customize it to suit your needs.
+        As such, css, javascript and templates are all configurable.
+
+METHODS
+  CONSTRUCTOR
+   new
+      my $fmt = $class->new({ %args });
+
+  ACCESSORS
+    All chaining accessors:
+
+   verbosity
+      $fmt->verbosity( [ $v ] )
+
+    Verbosity level, as defined in "new" in TAP::Harness:
+
+         1   verbose        Print individual test results (and more) to STDOUT.
+         0   normal
+        -1   quiet          Suppress some test output (eg: test failures).
+        -2   really quiet   Suppress everything to STDOUT but the HTML report.
+        -3   silent         Suppress all output to STDOUT, including the HTML report.
+
+    Note that the report is also available via "html". You can also provide
+    a custom "output_fh" (aka "output_file") that will be used instead of
+    "stdout", even if *silent* is on.
+
+   stdout
+      $fmt->stdout( [ \*FH ] );
+
+    An IO::Handle filehandle for catching standard output. Defaults to
+    "STDOUT".
+
+   output_fh
+      $fmt->output_fh( [ \*FH ] );
+
+    An IO::Handle filehandle for printing the HTML report to. Defaults to
+    the same object as "stdout".
+
+    Note: If "verbosity" is set to "silent", printing to "output_fh" will
+    still occur. (that is, assuming you've opened a different file, not
+    "STDOUT").
+
+   output_file
+      $fmt->output_file( $file_name )
+
+    Not strictly an accessor - this is a shortcut for setting "output_fh",
+    equivalent to:
+
+      $fmt->output_fh( IO::File->new( $file_name, 'w' ) );
+
+    You can set this with the "TAP_FORMATTER_HTML_OUTFILE=/path/to/file"
+    environment variable
+
+   escape_output
+      $fmt->escape_output( [ $boolean ] );
+
+    If set, all output to "stdout" is escaped. This is probably only useful
+    if you're testing the formatter. Defaults to 0.
+
+   html
+      $fmt->html( [ \$html ] );
+
+    This is a reference to the scalar containing the html generated on the
+    last test run. Useful if you have "verbosity" set to "silent", and have
+    not provided a custom "output_fh" to write the report to.
+
+   tests
+      $fmt->tests( [ \@test_files ] )
+
+    A list of test files we're running, set by TAP::Parser.
+
+   session_class
+      $fmt->session_class( [ $class ] )
+
+    Class to use for TAP::Parser test sessions. You probably won't need to
+    use this unless you're hacking or sub-classing the formatter. Defaults
+    to TAP::Formatter::HTML::Session.
+
+   sessions
+      $fmt->sessions( [ \@sessions ] )
+
+    Test sessions added by TAP::Parser. You probably won't need to use this
+    unless you're hacking or sub-classing the formatter.
+
+   template_processor
+      $fmt->template_processor( [ $processor ] )
+
+    The template processor to use. Defaults to a TT2 Template processor with
+    the following config:
+
+      COMPILE_DIR  => catdir( tempdir(), 'TAP-Formatter-HTML' ),
+      COMPILE_EXT  => '.ttc',
+      INCLUDE_PATH => parent directory TAP::Formatter::HTML was loaded from
+
+    Note: INCLUDE_PATH used to be set to: "join(':', @INC)" but this was
+    causing issues on systems with > 64 dirs in @INC. See RT #74364 for
+    details.
+
+   template
+      $fmt->template( [ $file_name ] )
+
+    The template file to load. Defaults to
+    "TAP/Formatter/HTML/default_report.tt2".
+
+    You can set this with the "TAP_FORMATTER_HTML_TEMPLATE=/path/to.tt"
+    environment variable.
+
+   css_uris
+      $fmt->css_uris( [ \@uris ] )
+
+    A list of URIs (or strings) to include as external stylesheets in
+    <style> tags in the head of the document. Defaults to:
+
+      ['file:TAP/Formatter/HTML/default_report.css'];
+
+    You can set this with the
+    "TAP_FORMATTER_HTML_CSS_URIS=/path/to.css:/another/path.css" environment
+    variable.
+
+    If you're using Win32, please see "WIN32 URIS".
+
+   js_uris
+      $fmt->js_uris( [ \@uris ] )
+
+    A list of URIs (or strings) to include as external stylesheets in
+    <script> tags in the head of the document. Defaults to:
+
+      ['file:TAP/Formatter/HTML/jquery-1.2.6.pack.js'];
+
+    You can set this with the
+    "TAP_FORMATTER_HTML_JS_URIS=/path/to.js:/another/path.js" environment
+    variable.
+
+    If you're using Win32, please see "WIN32 URIS".
+
+   inline_css
+      $fmt->inline_css( [ $css ] )
+
+    If set, the formatter will include the CSS code in a <style> tag in the
+    head of the document.
+
+   inline_js
+      $fmt->inline_js( [ $javascript ] )
+
+    If set, the formatter will include the JavaScript code in a <script> tag
+    in the head of the document.
+
+   minify
+      $fmt->minify( [ $boolean ] )
+
+    If set, the formatter will attempt to reduce the size of the generated
+    report, they can get pretty big if you're not careful! Defaults to 1
+    (true).
+
+    Note: This currently just means... *remove tabs at start of a line*. It
+    may be extended in the future.
+
+   abs_file_paths
+      $fmt->abs_file_paths( [ $ boolean ] )
+
+    If set, the formatter will attempt to convert any relative *file* JS &
+    css URI's listed in "css_uris" & "js_uris" to absolute paths. This is
+    handy if you'll be sending moving the HTML output around on your
+    harddisk, (but not so handy if you move it to another machine - see
+    "force_inline_css"). Defaults to *1*.
+
+   force_inline_css
+      $fmt->force_inline_css( [ $boolean ] )
+
+    If set, the formatter will attempt to slurp in any *file* css URI's
+    listed in "css_uris", and append them to "inline_css". This is handy if
+    you'll be sending the output around - that way you don't have to send a
+    CSS file too. Defaults to *1*.
+
+    You can set this with the "TAP_FORMATTER_HTML_FORCE_INLINE_CSS=0|1"
+    environment variable.
+
+   force_inline_js( [ $boolean ] )
+    If set, the formatter will attempt to slurp in any *file* javascript
+    URI's listed in "js_uris", and append them to "inline_js". This is handy
+    if you'll be sending the output around - that way you don't have to send
+    javascript files too.
+
+    Note that including jquery inline doesn't work with some browsers,
+    haven't investigated why. Defaults to *0*.
+
+    You can set this with the "TAP_FORMATTER_HTML_FORCE_INLINE_JS=0|1"
+    environment variable.
+
+   color
+    This method is for "TAP::Harness" API compatibility only. It does
+    nothing.
+
+  API METHODS
+   summary
+      $html = $fmt->summary( $aggregator )
+
+    "summary" produces a summary report after all tests are run. $aggregator
+    should be a TAP::Parser::Aggregator.
+
+    This calls:
+
+      $fmt->template_processor->process( $params )
+
+    Where $params is a data structure containing:
+
+      report      => %test_report
+      js_uris     => @js_uris
+      css_uris    => @js_uris
+      inline_js   => $inline_js
+      inline_css  => $inline_css
+      formatter   => %formatter_info
+
+    The "report" is the most complicated data structure, and will sooner or
+    later be documented in "CUSTOMIZING".
+
+CUSTOMIZING
+    This section is not yet written. Please look through the code if you
+    want to customize the templates, or sub-class.
+
+    You can use environment variables to customize the behaviour of TFH:
+
+      TAP_FORMATTER_HTML_OUTFILE=/path/to/file
+      TAP_FORMATTER_HTML_FORCE_INLINE_CSS=0|1
+      TAP_FORMATTER_HTML_FORCE_INLINE_JS=0|1
+      TAP_FORMATTER_HTML_CSS_URIS=/path/to.css:/another/path.css
+      TAP_FORMATTER_HTML_JS_URIS=/path/to.js:/another/path.js
+      TAP_FORMATTER_HTML_TEMPLATE=/path/to.tt
+
+    This should save you from having to write custom code for simple cases.
+
+WIN32 URIS
+    This module tries to do the right thing when fed Win32 File *paths* as
+    File URIs to both "css_uris" and "js_uris", eg:
+
+      C:\some\path
+      file:///C:\some\path
+
+    While I could lecture you what a valid file URI is and point you at:
+
+    http://blogs.msdn.com/ie/archive/2006/12/06/file-uris-in-windows.aspx
+
+    Which basically says the above are invalid URIs, and you should use:
+
+      file:///C:/some/path
+      # ie: no backslashes
+
+    I also realize it's convenient to chuck in a Win32 file path, as you can
+    on Unix. So if you're running under Win32, "TAP::Formatter::HTML" will
+    look for a signature 'X:\', '\' or 'file:' at the start of each URI to
+    see if you are referring to a file or another type of URI.
+
+    Note that you must use '"file:///C:\blah"' with *3 slashes* otherwie
+    '"C:"' will become your *host*, which is probably not what you want. See
+    URI::file for more details.
+
+    I realize this is a pretty basic algorithm, but it should handle most
+    cases. If it doesn't work for you, you can always construct a valid File
+    URI instead.
+
+BUGS
+    Please use http://rt.cpan.org to report any issues. Patches are welcome.
+
+CONTRIBUTING
+    Use github:
+
+    <https://github.com/spurkis/TAP-Formatter-HTML>
+
+AUTHOR
+    Steve Purkis <spurkis@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2008-2012 Steve Purkis <spurkis@cpan.org>, S Purkis
+    Consulting Ltd. All rights reserved.
+
+    This module is released under the same terms as Perl itself.
+
+SEE ALSO
+    Examples in the "examples" directory and here:
+
+    <http://www.spurkis.org/TAP-Formatter-HTML/test-output.html>,
+    <http://www.spurkis.org/TAP-Formatter-HTML/DBD-SQLite-example.html>,
+    <http://www.spurkis.org/TAP-Formatter-HTML/Template-example.html>
+
+    prove - TAP::Harness's new cmdline utility. It's great, use it!
+
+    App::Prove::Plugin::HTML - the prove interface for this module.
+
+    Test::TAP::HTMLMatrix - the inspiration for this module. Many good ideas
+    were borrowed from it.
+
+    TAP::Formatter::Console - the default TAP formatter used by TAP::Harness
+

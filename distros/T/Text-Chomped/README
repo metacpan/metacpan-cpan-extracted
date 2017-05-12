@@ -1,0 +1,107 @@
+NAME
+    Text::Chomped - A chomp and chop that will return the chomped and
+    chopped
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+        # Old way
+        sub sentence {
+            my $value = <<_END_
+    A quick brown fox jumped over the lazy dog
+    _END_
+            chomp $value;
+            return $value;
+        }
+
+        # New way
+        use Text::Chomped;
+
+        sub sentence { chomped <<_END_ }
+    A quick brown fox jumped over the lazy dog
+    _END_
+
+        # Chomp a list (have to use [], sorry)
+
+        my @got = chomped [ "A\n", "b", "c\n", ... ]
+
+        # ... or ...
+        my $got = chomped [ "A\n", "b", "c\n", ... ]
+        $got->[0] # A
+
+DESCRIPTON
+    Text::Chomped will export "chomped" and "chopped" which behave like
+    "chomp" and "chop" except return the cho[mp]ped value rather than what
+    was cho[mp]ped off (the character)
+
+    Unfortunately subroutine prototyping in Perl cannot ape the builtin
+    chomp/chop prototype, so you'll have to pass in an ARRAY reference if
+    you want to chomp/chop a list
+
+    Another consequence of the above, is that we can't use $_ without making
+    the interface annoying, so you can't do:
+
+        map { chomped } "A\n", "b", "c\n"
+
+    You have to do:
+
+        map { chomped $_ } "A\n", "b", "c\n"
+
+ACKNOWLEDGEMENTS
+                                      Y\     /Y
+                                      | \ _ / |
+                _____                 | =(_)= |
+            ,-~"     "~-.           ,-~\/^ ^\/~-.
+          ,^ ___     ___ ^.       ,^ ___     ___ ^.
+         / .^   ^. .^   ^. \     / .^   ^. .^   ^. \
+        Y  l    O! l    O!  Y   Y  lo    ! lo    !  Y
+        l_ `.___.' `.___.' _[   l_ `.___.' `.___.' _[
+        l^~"-------------"~^I   l^~"-------------"~^I
+        !\,               ,/!   !                   !
+         \ ~-.,_______,.-~ /     \                 /
+          ^.             .^       ^.             .^    -Row
+            "-.._____.,-"           "-.._____.,-"
+
+                       ->Mr&MrsPacman<-
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-text-chomped at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Chomped>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Text::Chomped
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Chomped>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Text-Chomped>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Text-Chomped>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Text-Chomped/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

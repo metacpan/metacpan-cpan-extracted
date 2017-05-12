@@ -1,0 +1,58 @@
+This is the README file for Tie::Hash::Array, Tie::Hash::Abbrev and
+Tie::Hash::Abbrev::Smart, by Martin H. Sluka <perl@sluka.de>.
+
+Tie::Hash::Array gives you hashes which are internally stored as
+sorted arrays, therefore you will retrieve its contents in a defined
+order and can use objects as keys if you like.
+
+Tie::Hash::Abbrev is a subclass of Tie::Hash::Array, and allows you to
+access the contents of tied hashes using unambiguously abbreviated
+keys.
+
+Tie::Hash::Abbrev::Smart, which sub-classes Tie::Hash::Abbrev.
+Here an abbreviation is still considered unambiguous even if more than
+one matching key exists, as long as all the corresponding values are
+equal (that is, they are either all undefined or have identical string
+representations).
+
+
+INSTALLATION
+
+This package uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tie::Hash::Array
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Hash-Array
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tie-Hash-Array
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tie-Hash-Array
+
+    Search CPAN
+        http://search.cpan.org/dist/Tie-Hash-Array
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002-2008 by Martin H. Sluka <perl@sluka.de>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

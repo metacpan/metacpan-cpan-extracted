@@ -1,0 +1,94 @@
+Revision history for Perl extension Test::Files.
+
+0.14 Wed Mar 28 10:14:05 CDT 2007
+    - Removed use Test::More from Test::Files package, which was causing
+      chatter during TODO tests that confused the harness.
+      Thanks to Julien Beasley for pointing out the problem and to
+      Schwern for sending the patch.
+
+Apologies to all CPAN users for omitting the following change entry from
+the 0.13 distribution.
+
+0.13 Wed Feb 14 09:45:54 CST 2007
+    - Added file_filter_ok, like the other filter functions.
+
+0.12 Wed Mar  1 16:35:30 PST 2006
+    Thanks to Robin Barker for help with all of the changes for this release.
+    - Added solaris to the list of unix style operating systems in tests 06
+      and 07.
+    - Altered the wanted sub in dir_only_contains_ok to test more carefully
+      for the base directory (which should be skipped).
+    - Corrected base_dir skip test in compare_dirs_only_ok.  A recent
+      change in File::Spec invalidated the old approach.
+
+0.11  Mon Nov  7 17:01:59 CST 2005
+    - Added Algorithm::Diff to the prereq list in Makefile.PL (Text::Diff
+      already requires it, but I wanted to make it more explicit).
+    - Corrected docs to explain that compare_dirs_ok and
+      compare_dirs_filter_ok compare files from the first directory (and
+      its sub dirs) to files in the second directory.  Files missing from
+      the second directory are noted, but files missing from the first
+      directory are not.  Callers should combine this test with
+      dir_contains_ok or dir_contains_only-ok, if they want to ensure
+      that the first directory is complete.
+
+0.10  Mon Sep  5 10:57:12 CDT 2005
+    - Converted to File::Spec inside the module and in the test suite.
+    - Added compare_filter_ok which works like compare_dirs_filter_ok,
+      but for single comparisons.
+    - Added documentation to make clear that this module uses Text::Diff
+      to report tables of diff output when text contents of files it is
+      comparing differ.
+
+0.05  Mon Oct 20 15:13:50 CDT 2003
+    - Corrected diagnostic output in compare_dirs* so that each missing file
+      is listed on its own line.  Previously, they were juxtaposed on one
+      line, including very pleasant #'s for decoration.
+    - Changed Files.pm so none of the tests report timestamps.  Some OSes
+      (notably Solaris) translated the timestamps, probably to deal with
+      time zones.  I am explicitly deciding that timestamps do not count
+      in file comparisons.  If you need to test timestamps, use -M etc.
+      Remember that the person installing your module won't always be in
+      your timezone.
+    - Corrected tests to reflect the removal of time stamps from file_ok
+      output.
+    - Sorted the list of missing files in compare_dirs* so that I can test
+      the error message (and the new vesion is neater).
+
+0.04  Fri Oct 17 09:14:20 CDT 2003
+    - Added compare_dirs_filter_ok which works like compare_dirs_ok, but sends
+      each line of input through a caller supplied filter function first.
+      This allows you to remove things like timestamps which though different
+      should not count as failure.
+    - Refactored to avoid code duplication in the compare_dirs* functions.
+    - On advice from Schwern, converted tests to use the very nice
+      Test::Builder::Tester.  This made the tests nicer and easier to work
+      on, but had no affect on the Files.pm code.
+    - Improved the documentation (well I think it as in improvement)
+
+0.03  Wed Oct 15 10:02:49 CDT 2003
+    - Made various refactorings to increase code reuse.
+    - Changed from using Test::Differences to using Text::Diff.  This has
+      two advantages:
+      1. It makes it slightly easier to have the location of the error
+         correctly reported when a test fails.
+      2. It enables compares_dirs_ok which needs to compare lots of files
+         while reporting a single error.
+    - Added compare_dirs_ok which compares all files in a pair of directory,
+      failing with diff diagnostics if any disagree.
+    
+
+0.02  Mon Oct 13 15:03:17 CDT 2003
+    - Added dir_contains_ok which checks a directory for the presence of
+      named files.
+    - Added dir_only_contains_ok which makes sure that a directory has
+      exactly a specified list of elements, nothing more or less.
+      This is a bit awkward since you must currently list subdirectories
+      explicitly, lest they show up in the list of unexpectedly seen files.
+    - Corrected diagnostic output so it works like other Test:: modules.
+      Previously, I had folded some error output into the test name
+
+0.01  Thu Oct  9 13:14:55 2003
+	- original version; created by h2xs 1.22 with options
+		-AXn Test::Files -b 5.6.0
+

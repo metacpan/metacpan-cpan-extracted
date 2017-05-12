@@ -1,0 +1,25 @@
+Revision history for Perl module TestLink::API
+
+0.011 2014-12-05 TEODESIAN
+    - Converted to dzil
+    - Fixed various spelling issues in the POD
+    - Removed some orphan vars
+
+0.010 2014-12-03 TEODESIAN
+    - Dist name was being set to TestLink::API instead of TestLink-API
+    - Added "use 5.010" to document required version of Perl.
+    - Reformatted Changes as per CPAN::Changes::Spec
+    - Added github repo to pod
+
+0.009 2014-11-28 TEODESIAN
+    - Add POD tests
+
+0.008 2014-09-15 TEODESIAN
+    - Allow platform to be passed as ID or name in reportTCResult
+
+0.007 2014-08-17 TEODESIAN
+    - from 0.002 to this release: the attainment of Kwalitee
+
+0.001 2014-07-25 TEODESIAN
+    - First release to CPAN
+

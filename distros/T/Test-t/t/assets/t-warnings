@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+use Test::t;
+
+sub xyzzy {
+}
+
+sub xyzzy {
+}
+
+eval {
+    Test::t->builder->skip_all;
+};

@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+test.pl
+SlideSwitch.pm
+slideswitch.pl

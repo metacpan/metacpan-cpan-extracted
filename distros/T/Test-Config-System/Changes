@@ -1,0 +1,67 @@
+Revision history for Test-Config-System
+
+0.63    2007-07-24
+        Added LICENSE file and parameter to Makefile.PL
+
+0.62    2007-07-18
+        Changed explicit 'return undef's to bare 'return's.
+
+0.61    2007-07-18
+        Tiny doc patch (removed the bit about being untested on windows)
+
+0.60    2007-07-17
+        Added t/warnings.t to test warnings.
+        Added t/failures.t to test failure conditions.
+        Found several untested branches with Devel::Cover, added tests.
+        Return undef if package manager is unsupported.
+        Made _installedp() safer.
+
+0.51    2007-07-16
+        Added Test::Builder's skip() to exports.
+
+0.50    2007-07-13
+        Added check_any_package
+        Moved the generic package checking code to a private sub.
+
+0.40    2007-07-08
+        Added RPM support to check_package
+
+0.32    2007-07-06
+        Fixed formatting of the ``Examples'' in the POD.
+
+0.31    2007-07-06
+        Additional documentation, clarification, and formatting.
+
+0.30    2007-07-06
+        Renamed check_file to check_file_contents
+        Added check_file as an analogue to check_dir
+
+0.22    2007-07-05
+        Fixed reference bug in check_dir
+
+0.21    2007-07-02
+        Clarified documentation for -mode in check_dir
+
+0.20    2007-07-02
+        Added check_dir
+
+0.12    2007-07-02
+        Doc patch (cleaned up FUNCTIONS section)
+
+0.11    2007-07-02
+        Some AUTOLOAD magic
+
+0.10    2007-06-29
+        Renamed file_contains -> check_file
+        Added check_link
+
+0.03    2007-06-27
+        More doc patches.
+
+0.02    2007-06-27
+        Fixed a bug in the tests and updated the docs, as suggested
+        by [naikonta].
+
+0.01    2007-06-25
+        First version, released on an unsuspecting world.
+

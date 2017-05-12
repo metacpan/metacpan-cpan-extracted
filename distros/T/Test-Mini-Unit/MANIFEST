@@ -1,0 +1,26 @@
+Changes
+lib/Test/Mini/Unit.pm
+lib/Test/Mini/Unit/SharedBehavior.pm
+lib/Test/Mini/Unit/Sugar/Advice.pm
+lib/Test/Mini/Unit/Sugar/Reuse.pm
+lib/Test/Mini/Unit/Sugar/Shared.pm
+lib/Test/Mini/Unit/Sugar/Test.pm
+lib/Test/Mini/Unit/Sugar/TestCase.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/Test/Mini/Unit/Sugar/Advice-Behavior.t
+t/Test/Mini/Unit/Sugar/Advice-Import.t
+t/Test/Mini/Unit/Sugar/Reuse-Behavior.t
+t/Test/Mini/Unit/Sugar/Reuse-Import.t
+t/Test/Mini/Unit/Sugar/Shared-Behavior.t
+t/Test/Mini/Unit/Sugar/Shared-Import.t
+t/Test/Mini/Unit/Sugar/Shared-Include.t
+t/Test/Mini/Unit/Sugar/Test-Behavior.t
+t/Test/Mini/Unit/Sugar/Test-Import.t
+t/Test/Mini/Unit/Sugar/TestCase-Advice.t
+t/Test/Mini/Unit/Sugar/TestCase-Includes.t
+t/Test/Mini/Unit/Sugar/TestCase-Nesting.t
+t/Test/Mini/Unit/Sugar/TestCase-Variables.t
+META.yml                                 Module meta-data (added by MakeMaker)
+lib/Test/Mini/Unit.pod

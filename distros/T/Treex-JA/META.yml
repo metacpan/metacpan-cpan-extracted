@@ -1,0 +1,34 @@
+---
+abstract: 'collection of blocks for processing Japanese'
+author:
+  - 'Dušan Variš <dvaris@seznam.cz>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Treex-JA
+requires:
+  Encode: '0'
+  Moose: '0'
+  Treex::Block::W2A::BaseChunkParser: '0'
+  Treex::Core::Block: '0'
+  Treex::Core::Common: '0'
+  Treex::Core::Config: '0'
+  Treex::Core::Resource: '0'
+  Treex::Tool::ProcessUtils: '0'
+  Treex::Unilang: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.13095'

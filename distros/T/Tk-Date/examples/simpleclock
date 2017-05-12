@@ -1,0 +1,25 @@
+#!/usr/local/bin/perl -w
+##
+## simpleclock - example for Tk::Date widget
+##
+##      5 minute hack just for fun.
+##      Achim Bohnet <ach@mpe.mpg.de>
+##
+use Tk;
+use Tk::Date;
+use strict;
+use vars '$VERSION';
+$VERSION = '0.002';
+
+my $mw   = MainWindow->new();
+my $time;
+my $date = $mw->Date(-editable => 0,
+		     -variable => \$time,
+		     -value => 'now',
+		    )->pack;
+
+$date->repeat(999, sub { $time = time(); });
+
+$mw->Button(-text=>'Quit', -command=>sub{$mw->destroy})->pack;
+
+MainLoop;

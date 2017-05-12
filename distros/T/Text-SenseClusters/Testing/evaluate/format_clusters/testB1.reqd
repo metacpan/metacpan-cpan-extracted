@@ -1,0 +1,2 @@
+ERROR(format_clusters.pl):
+                --context and --senseval2 options cannot be specified in a single run!

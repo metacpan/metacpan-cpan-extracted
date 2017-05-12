@@ -1,0 +1,23 @@
+---
+abstract: 'Dump template data in the same style as the'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Spec: 0.82
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.71'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Template-Plugin-Dumpvar
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Devel::Dumpvar: 0.02
+  Template: 2.10
+  perl: 5.005
+version: 1.03

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+test.pl
+test_ConvertPlatform.pl
+ConvertPlatform.pm

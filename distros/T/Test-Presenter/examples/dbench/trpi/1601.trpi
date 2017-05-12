@@ -1,0 +1,54 @@
+<component name='Dbench' version='3.04'>
+ <testname>Dbench</testname>
+ <version>3.04</version>
+ <description> dbench is a filesystem benchmark that generates load patterns similar to those of the commercial Netbench benchmark, but wi  thout requiring a lab of Windows load generators to run. It is now considered a de-facto standard for generating load on th  e Linux VFS.</description>
+ <summary> dbench produces only the filesystem load. It does all the same IO
+  calls that the smbd server in Samba would produce when confronted with
+  a netbench run. It does no networking calls.</summary>
+ <license>GPL2</license>
+ <vendor>Copyright Andrew Tridgell 1999-2004</vendor>
+ <release>3.04</release>
+ <url>tridge@samba.org</url>
+ <platform>1</platform>
+ <kernel>linux-2.6.17-rc2</kernel>
+ <test>
+  <data>
+   <columns>
+    <c id="01" name="Throughput" units="MB/sec"/>
+    <c id="02" name="Processes" units="procs"/>
+   </columns>
+   <datum id="1">
+    <d id="01">160.351</d>
+    <d id="02">1</d>
+   </datum>
+   <datum id="2">
+    <d id="01">293.078</d>
+    <d id="02">2</d>
+   </datum>
+   <datum id="3">
+    <d id="01">299.231</d>
+    <d id="02">4</d>
+   </datum>
+   <datum id="4">
+    <d id="01">301.164</d>
+    <d id="02">8</d>
+   </datum>
+   <datum id="5">
+    <d id="01">302.006</d>
+    <d id="02">16</d>
+   </datum>
+   <datum id="6">
+    <d id="01">279.87</d>
+    <d id="02">32</d>
+   </datum>
+   <datum id="7">
+    <d id="01">251.987</d>
+    <d id="02">64</d>
+   </datum>
+   <datum id="8">
+    <d id="01">130.222</d>
+    <d id="02">128</d>
+   </datum>
+  </data>
+ </test>
+</component>

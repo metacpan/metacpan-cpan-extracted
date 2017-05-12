@@ -1,0 +1,39 @@
+Tk-EntrySet version 0.04
+==========================
+
+Display/edit a list of values in a set of widgets. Contains
+Tk::EntrySet
+    - create a set of widgets to edit a list of values of the same type.
+Tk::ChoicesSet
+    - create a set of widgets to edit a list of choices from a given list
+    of options. 
+Tk::MatchingBE
+    - a single selection BrowseEntry used by Tk::ChoicesSet
+
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Tk;
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2008 by Ch. Lamprecht
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

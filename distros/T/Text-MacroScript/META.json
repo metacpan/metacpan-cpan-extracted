@@ -1,0 +1,55 @@
+{
+   "abstract" : "A macro pre-processor with embedded perl capability ",
+   "author" : [
+      "Mark Summerfield <summer@perlpress.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-MacroScript",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.22",
+            "Object::Tiny::RW" : "1.07",
+            "Path::Tiny" : "0.068",
+            "Test::Differences" : "0.61",
+            "Test::More" : "1.001014",
+            "enum" : "1.1",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pauloscustodio/Text-MacroScript.git",
+         "web" : "https://github.com/pauloscustodio/Text-MacroScript"
+      }
+   },
+   "version" : "2.11",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,177 @@
+Revision history for Time-Piece
+
+1.31    2015-10-20
+        - No Changes since 1.30_01
+
+1.30_01 2015-09-01
+        - Ignore some tests on non *nix platforms
+        - fix compile warnings
+        - Inherit from Dynaloader (fix static build issues)
+        - Fix windows mem corruption
+
+1.30    2015-05-16
+        - Stable release. Overview from 1.29:
+        - Make strftime more portable + fix %z %z
+        - Add many more tests
+        - Clean inheritance
+
+1.29_05   2015-05-02
+        - Combine multiple 'use constant' statements (saves 0.5ms at runtime)
+        - Don't leave c_epoch undef
+        - deprecate parse() function
+        - More constructor tests
+        - export() calls Exporter::export
+
+1.29_04   2015-04-09
+        - Clean inheritance of Exporter and DynaLoader (Thanks dolmen!)
+        - Refactor _strftime to use localtime/gmtime to generate tm struct
+
+1.29_03   2015-04-04
+        - Don't mix gmtime and mktime in _strftime
+        - Clean whitespace at end of lines
+        - Add more tests for DST issues and also strptime parsing
+
+1.29_02   2015-04-04
+        - Fix handling of %Z and %z in strftime (hopefully)
+        - Remove compile warnings for int cast
+
+1.29_01   2015-03-30
+        - Fix handling of %Z and %z in strftime (in progress)
+        - Remove unused constants from Time::Seconds (Thanks Xaerxess!)
+        - _strftime: use system mktime to better support past/future dates
+        - Relicense strptime as BSD 2-clause http://git.io/vfNSg
+
+1.29      2014-09-01
+        - when pretty printing negative Time::Seconds, do not lose the "minus"
+
+1.27      2014-01-03
+        - portability fixes for XS changes in 1.25_01
+
+1.26      2013-12-29
+        - no changes since previous (trial) release
+
+1.25_01   2013-12-16
+        - fix compiling for WinCE, execution is untested
+        - add a .gitignore (from Win32::API)
+        - fix a compiler warning about unused var, and add inlining
+        - add PERL_NO_GET_CONTEXT to XS to bring the binary into 21st century
+        - refactor XS code to remove large sections of duplicate machine code
+        - fix _crt_localtime to return year only once, previously
+          _crt_localtime returned year (item #6) twice in the list
+
+1.24      2013-12-03
+        - add repository metadata (thanks, David Steinbrunner)
+
+1.23      2013-09-06
+        - add a LICENSE file (thanks, John Peacock!)
+        - make sure Time::Seconds loads Exporter, which it relies on (thanks,
+          GFUJI and TOKUHIROM!)
+        - fix day of year parsing (like "%y%j") (thanks, Doug Wilson)
+
+1.22      2013-08-12
+        - add explicit copyright and license statements
+        - fix encoding of .pm files and add =encoding directive
+
+1.21      2013-07-06
+        - fix installation target; now installs to site in v5.12 and later
+        - make Time::Seconds match its VERSION to Time::Piece
+        - numerous portability fixes imported from perl core distribution
+
+1.20
+        - Fix for alloca broke Solaris
+        - Fixed documentation buggette about strptime
+        - Added ->pretty() method for Time::Seconds objects
+        - Add %s support to strptime
+
+1.19
+        - Fix for alloca broke FreeBSD
+
+1.18
+        - Fix for alloca on IRIX
+
+1.17
+        - Force all to use internal strptime then everyone gets %z even OSX
+          users.
+        - Finally figured out the timezone test failures on Win32 and fixed
+          them.
+
+1.16
+        - Implement %z for the internal implementation of strptime().
+          Unfortunately this doesn't get picked up everywhere, so there are
+          no tests for it (yet - patches welcome).
+        - Fix for major bug in add_months() using negative months which were
+          multiples of 12. Also affected add_years() with negative years.
+        - Fix for object creation bug in get_epochs which called new from
+          object but that wasn't supported in the new() code.
+        - Added docs about the weakness of using epoch seconds internally
+          and suggested alternatives.
+        - Removed useless "use UNIVERSAL qw(isa)" line.
+        - Fix for installing over core perl version.
+
+1.15
+        - Skip a test on Win32 that there's just no way of passing
+        - Document the above failure
+
+1.14
+        - rework add_months() to not rely on strptime being able to parse
+          illegal dates (Gisle Aas).
+        - Various win32 TZ fixes from p5p core perl version
+
+1.13
+        - More QNX fixes (kraai@ftbfs.org)
+        - Restore freebsd copyright on strptime.
+        - Added add_months and add_years methods.
+
+1.12
+        - QNX fixes
+        - Merge with perl core version
+
+1.11
+        - Skip %V test on Win32
+
+1.10
+        - Number of bug fixes from RT
+        - (maintenance by Ricardo SIGNES)
+        - avoid warning in _mktime (bug #19677)
+
+1.09
+        - (patches from Ricardo SIGNES)
+        - Tests largely moved to Test::More (from Test.pm)
+        - Time::Piece should now be safely subclassable
+
+1.08
+        - A number of fixes for strptime
+        - Fixed docs wrt Time::Object references
+        - Fixed docs wrt ->month returning short month name
+        - Added ->fullmonth and ->fullday to get full day names
+
+1.07
+        - Fix for ->week method
+
+1.06
+        - Fix for Solaris pre-2.8
+        - Compilation checked on:
+          sparc solaris 2.7
+          sparc solaris 2.8
+          i686 linux
+          ia64 linux
+          pa-risc1.1 hpux 10.20
+          pa-risc2.0 hpux 11.00
+          alpha dec_osf 4.0
+        - Fixes for Win32 (Randy Kobes)
+
+1.05
+        - Fix for Solaris (again)
+
+1.04
+        - Slight fixes to strptime for Solaris and MacOSX
+        - Bug in strptime with daylight savings fixed.
+
+1.03
+        - Updated MJD stuff (Tim Jeness)
+        - Added compare tests
+        - Ported test suite to Test.pm finally
+
+1.01
+        - Added cs_sec and cs_mon to Time::Seconds so that
+          old Time::Object installs still work (except for add())

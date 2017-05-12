@@ -1,0 +1,78 @@
+NAME
+    Text::Abbreviate - Perl extension for text abbreviations and ambiguities
+
+SYNOPSIS
+      use Text::Abbreviate;
+  
+      my @cmds = qw( help load list quit query save stop );
+      my $abbr = Text::Abbreviate->new(\%OPTS, @cmds);
+  
+      while (my $c = <STDIN>) {
+        chomp $c;
+        my @full = $abbr->expand($c);
+        if (@full == 0) {
+          print "Command '$c' could not be found.\n";
+        }
+        elsif (@full > 1) {
+          print "Command '$c' ambiguous; choose from [@full]\n";
+        }
+        else {
+          print "Command $full[0] selected.\n";
+        }
+      }
+
+DESCRIPTION
+    Text::Abbreviate takes a list of words (most commonly, commands for a
+    user interface) and provides a means for you to expand an abbreviation
+    of one of them into the full word. In the case that such an expansion is
+    ambiguous ('qu' in the code above is ambiguous, because it could expand
+    to 'quit' or 'query'), all expansions are returned.
+
+  Case Folding
+    You can turn case folding on and off with the folding() method; you can
+    also set it during the creation of the object, by passing a hash
+    reference as the first argument:
+
+      my $abbr = Text::Abbreviate->new({fold => 1}, @words);
+
+    Case folding (that is, case insensitivity) is off by default ("{fold ="
+    0}>). To change the setting later on, use the folding() method:
+
+      $abbr->folding(1);        # make case insensitive
+      $abbr->folding(0);        # make case sensitive
+      $state = $abbr->folding;  # get state (true/false)
+
+  Unambiguous Abbreviations
+    You can retrieve a hash of the unambiguous abbreviations of each word
+    with the unambiguous() method:
+
+      my %abbrevs = $abbr->unambiguous;     # hash
+      my $abbrev_ref = $abbr->unambiguous;  # hash ref
+
+    The keys are the full words themselves, and the values are array
+    references holding the abbreviations in order of length (smallest
+    first). Thus, for any word $w, the shortest unambiguous abbreviation for
+    it is "$abbrevs{$w}[0]". CAVEAT: each word is included in the value set,
+    even if the entirety of the word is still ambiguous. Specifically, if
+    the words "here" and "heresy" are both in the word list, unambiguous()
+    will return a hash that includes these key-value pairs:
+
+      here => ['here'],
+      heresy => ['heres', 'heresy'],
+
+    This is almost a replication of Text::Abbrev except that the hash is
+    inverted. (The caveat is replicated as well!)
+
+SEE ALSO
+    Text::Abbrev in the Perl core.
+
+AUTHOR
+    Jeff Pinyan, <japhy.734@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Jeff "japhy" Pinyan
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

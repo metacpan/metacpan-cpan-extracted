@@ -1,0 +1,13 @@
+Revision history for Template-Plugin-SumOf
+
+0.03
+
+    - modernize package
+
+0.02
+
+    - some tests moved to xt/
+
+0.0.1  Wed Sep 13 21:13:28 2006
+       Initial release.
+

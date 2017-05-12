@@ -1,0 +1,97 @@
+	<div class="main-cart">
+
+		<h1>Vaše naročilo</h1>
+
+		<div class="category-bg">
+		<div class="category-border">
+			<div class="step-box">1. Dostava</div>
+			<div class="step-box step-box-selected">2. Plačilo</div>
+			<div class="step-box">3. Povzetek</div>
+			<div class="step-box">4. Zaključek</div>
+			<div class="clear"></div>
+		</div>
+		</div>
+
+		<div class="alert">Prosimo, izpolnite zahtevana polja: Ime in priimek, Naslov, Pošta, Kraj.</div>
+		<div class="payment-error">Payment failed!</div>
+
+		<form name="payment" class="frm-default" action="/checkout" method="POST">
+
+			<fieldset>
+			<legend>Plačik</legend>
+			<ul>
+                <li>
+                    <label>Ime</label>
+                    <input type="text" name="first_name"/>
+                </li>
+				<li>
+					<label>Priimek</label>
+					<input type="text" name="last_name"/>
+				</li>
+				<li>
+					<label>Naslov</label>
+					<input type="text" name="street_address"/>
+				</li>
+				<li>
+					<label>Pošta in kraj</label>
+					<input type="text" name="zip" class="fld-small" /> <input type="text" name="city"/>
+				</li>
+				<li>
+					<label>Država</label>
+					<input type="text" disabled value="Slovenija" />
+				</li>
+				<li>
+					<label>Telefon</label>
+					<input type="text" name="phone"/>
+				</li>
+				<li>
+					<label>E-mail naslov</label>
+					<input type="text" name="email"/>
+				</li>
+			</ul>
+			</fieldset>
+
+			<fieldset>
+			<legend>Način plačila</legend>
+			<ul>
+				<li>
+					<a href="" class="cart-payment">
+						<img src="img/amex1.gif" />
+						Amex
+					</a>
+					<a href="" class="cart-payment">
+						<img src="img/visa1.gif" />
+						Visa
+					</a>
+					<a href="" class="cart-payment">
+						<img src="img/mastercard1.gif" />
+						Mastercard
+					</a>
+					<a href="" class="cart-payment">
+						<img src="img/predracun.gif" />
+						Predračun
+					</a>
+                    <a href="" class="cart-payment">
+                        PayPal
+                    </a>
+				</li>
+	<li>
+					<label>Številka kartice</label>
+					<input type="text" name="cc_number" autocomplete="off"/>
+				</li>
+				<li>
+					<label>Varnostna koda (CVC)</label>
+					<input type="text" class="fld-small" name="cvc_number" autocomplete="off"/> <a href=""><img src="img/i_info-small.png" style="margin-bottom: -5px;" /></a>
+				</li>
+				<li>
+					<label>Velja do (mesec/leto)</label>
+					<select class="fld-date" name="cc_month"><option>Mesec</option></select> <select class="fld-date" name="cc_year"><option>Leto</option></select>
+				</li>
+			</ul>
+			</fieldset>
+
+			<input type="submit" value="Naprej na povzetek naročila" class="btn-submit" />
+			
+		</form>
+
+	</div> <!-- end main -->

@@ -1,0 +1,142 @@
+version 0.008; 2012-02-05
+
+  * download leap-seconds.list from more reliable server
+    utcnist2.colorado.edu
+
+  * use HTTP::Tiny and Net::FTP instead of heavyweight LWP
+
+  * update built-in data to 2013-01-01
+
+  * add author tests for downloading data
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+version 0.007; 2010-11-21
+
+  * bugfix: require bugfixed version of Math::BigRat (for construction
+    from decimal fraction strings)
+
+  * after an attempted download of leap second data fails, retry after
+    one to two hours, rather than the 20 to 22 days that we wait before
+    attempting another update following a successful download
+
+  * check for required Perl version at runtime
+
+  * avoid latent bug of passing magic variables $1 et al into functions
+    where in the future they might unexpectedly change value
+
+  * update built-in data to 2011-07-01
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.006; 2009-05-19
+
+  * be more stringent in parsing leap second data files
+
+  * use simpler "parent" pragma in place of "base"
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * drop prototypes from method subs (where the prototypes have no effect)
+
+  * update built-in data to 2010-01-01
+
+  * in tests, avoid unreliable "\d" and "\S" regexp elements
+
+  * use full stricture in Build.PL
+
+  * quote a stray dependency version number in Build.PL
+
+version 0.005; 2007-09-17
+
+  * bugfix: in Time::UTC, ensure that the Time::UTC::Segment that is
+    loaded is recent enough to have the $SIG{__DIE__} bugfix
+
+  * download Mills-style leap-seconds.list, which contains an explicit
+    expiry date, in preference to USNO tai-utc.dat
+
+  * remove from .cvsignore items that don't occur with Module::Build
+
+version 0.004; 2007-09-15
+
+  * bugfix: override any ambient $SIG{__DIE__} handler when using eval { }
+
+  * update built-in data to 2008-07-01
+
+  * use "base" pragma to import Exporter behaviour
+
+  * test POD syntax and coverage, and rename some internal functions to
+    satisfy the coverage test
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.003; 2007-02-02
+
+  * new functions utc_day_to_mjdn() and utc_mjdn_to_day() for
+    interconversion with MJDNs for interoperability with other code that
+    deals with UT days
+
+  * update built-in data to 2008-01-01
+
+  * revise and expand history section in the documentation
+
+  * in documentation, reference Date::JD, Time::TAI, and Time::UTC::Now
+
+  * test explicitly for correct class of results
+
+version 0.002; 2006-08-03
+
+  * include "use" directive in synopsis for Time::UTC::Segment
+
+  * add test t/builtin.t of whether builtin TAI-UTC knowledge works at all
+
+  * use "=> 0" instead of "=> undef" in unversioned dependencies in
+    Makefile.PL
+
+  * don't include underscore in string version of module version numbers
+    in Makefile.PL
+
+version 0.001; 2006-05-18
+
+  * new functions utc_day_to_cjdn() and utc_cjdn_to_day() for
+    interconversion with CJDNs for interoperability with calendar code
+
+  * download new data if time appears to go backwards
+
+  * download new data by HTTP instead of FTP, for performance and to
+    get through NAT and firewalls better
+
+  * use integer arithmetic
+
+  * update built-in data to 2007-01-01
+
+  * bugfix: foreach_utc_segment_when_complete() wasn't exported
+
+  * tests for utc_check_instant() and the "when_complete" mechanism
+
+  * small correction to description of TAI in man page
+
+  * add Date::ISO8601 to "see also" list
+
+  * synch description in man page with README
+
+version 0.000; 2005-01-25
+
+  * initial released version

@@ -1,0 +1,351 @@
+=head1 NAME
+
+Tie::ListKeyedHash - A system allowing the use of anonymous arrays as keys to a hash.
+
+=head1 SYNOPSIS
+
+   use Tie::ListKeyedHash;
+
+   [$X =] tie %hash,  'Tie::ListKeyedHash';
+
+
+   my $live_key     = ['key','items','live'];
+   $hash{$live_key} = 'Hello!';
+
+   $hash{['key','trees','grow']} = 'Goodbye!';
+
+   print $hash{['key','items','live']},"\n";
+   delete $hash{$live_key};
+
+   my @list =  keys %{$hash{['key']}};
+   print "@list\n";
+
+   untie %hash ;
+
+Alternatively keys are accessible as:
+
+   $hash{'key','items','live'} = 'Hello!';
+
+(a bare list/array for the key rather than using an anon list/array reference).
+
+But that slows down the accesses by around 10% and cannot
+be used for keys that conflict with the value of the $; special
+variable.
+
+Also usable via the object interface methods 'put',
+'get','exists','delete','clear'. The object interface
+is about 2x as fast as the tied interface.
+
+=head1 DESCRIPTION
+
+Tie::ListKeyedHash ties a hash so that you can use a reference to an
+array as the key of the hash. It otherwise behaves exactly like
+a normal hash (including all caveats about trying to use a key
+as both a hash reference and a scalar value).
+
+This frees you from needing to 'hardwire' hash references in code or
+having to write tree traversal code to reach arbitrary points in a
+hash tree.
+
+Example:
+
+                   ########################
+
+ #!/usr/bin/perl
+
+ use strict;
+ use warnings;
+
+ use Data::Dumper;
+
+ use Tie::ListKeyedHash;
+
+ my %example;
+ tie (%example, 'Tie::ListKeyedHash');
+
+ %example = (
+     'a' => {
+       'b0' => {
+         'c' => 'value of c',
+         'd' => 'value of d',
+         'e' => {
+           'f' => 'value of f',
+         },
+       },
+       'b1' => {
+         'g' => 'value of g',
+       },
+     },
+     'h' => 'r',
+ );
+
+ my $b_key = ['a','b0'];
+
+ my $d_key = [@$b_key,'d'];
+ my $d     = $example{$d_key};
+ print "d = $d\n";
+
+ my $e_key = [@$b_key, 'e'];
+ my $e     = $example{$e_key};
+ print 'e = ' . Dumper ($e);
+
+ my $f_key = [@$b_key, 'e','f'];
+ my $f     = $example{$f_key};
+ print "f = $f\n";
+
+ my $h_key = ['h'];
+ my $h     = $example{$h_key};
+ print "h = $h\n";
+
+                   ########################
+
+The virtues of this particular way of accessing hash-of-hashes (HoH) vs bare
+hardwired derefererences or 'tree crawling' are as follows:
+
+1) As the number of levels in a HoH increases,
+the tied object asymptotically approaches the speed of hardwired hash
+dereferencing without the loss of flexibility penalty of having to hardwire the
+keys into code in advance.
+
+This gives an important property that it I<gets faster> the
+deeper a HoH becomes as compared with the speed of software driven tree traveral.
+
+So you can build and access arbitrarily structured HoH and still access deeply buried
+elements in the tree I<quickly>.
+
+2) The format was designed to use memory efficiently. It takes only a
+few hundred extra bytes over the size of an untied HoH in memory or
+when serialized (via Data::Dumper or Storable for example) regardless
+of how deep the hash is.
+
+3) A reference to an existing HoH can be passed into Tie::ListKeyedHash->new and
+all of the OO key lists access methods will B<"just work">.
+
+ Example:
+
+    use Tie::ListKeyedHash;
+
+    my %hash = ( 'a' => { 'b' => 'c' } );
+    my $obj = Tie::ListKeyedHash->new(\%hash);
+
+    my $b_value = $obj->get(['a','b']);
+
+=cut
+
+=head1 CHANGES
+
+ 1.02 17 Sep 2005 - Extended tests to 100% coverage. Fixed bugs in 'exists'.
+                    Fixed returned value for undefined values and handling
+                    of setting undefined values. Miscellaneous code cleanups
+                    and streamlining. Added examples to clarify what the
+                    module actually does and why it is useful.
+                    Extended the 'new' method to permit the efficient importing
+                    of a pre-existing hash or hash reference.
+
+ 1.01 16 Sep 2005 - Restoring POD that went missing in 1.00.
+                    Added META.yml to MANIFEST.
+
+ 1.00 15 Sep 2005 - Reorganized and clarified documentation, added build tests.
+                    Fixed bug in 'exists' support.
+
+ 0.41 09 Jun 1999 - Minor documentation changes.
+
+ 0.40 04 May 1999 - Renamed to 'Tie::ListKeyedHash' after discussion on
+                    comp.lang.perl.module and added (on the suggestion of
+                    Ilya Zakharevich, <ilya@math.ohio-state.edu>) support
+                    for using the tie hash as $hash{'key1','key2','key3'}
+                    as well as its native mode of $hash{['key1','key2','key3']}
+
+ 0.20 30 Apr 1999 - Initial public release as 'Tie::ArrayHash'
+
+=cut
+
+#######################################################################
+
+=head1 METHODS
+
+=over 4
+
+=item new([\%hash]);
+
+Returns an object reference for the hash accessor.
+
+ my $obj = Tie::ListKeyedHash->new;
+
+You can, optionally, pass a reference to a pre-existing hash in and the returned object
+will provide access to its contents via the Tie::ListKeyedHash object instance.
+
+Example:
+
+ my %hash = ( 'a' => { 'b' => 'c' }};
+ my $obj  = Tie::ListKeyedHash->new(\%hash);
+
+=back
+
+=cut
+
+#######################################################################
+
+=over 4
+
+=item clear;
+
+Clears the entire hash.
+
+Example:
+
+  $obj->clear;
+
+=back
+
+=cut
+
+#######################################################################
+
+=over 4
+
+=item exists(\@key_list);
+
+Returns true of the specified hash element exists, false if it does not.
+Just as with normal hashes, intermediate elements will be created if
+they do not already exist.
+
+Example:
+
+  my $key = ['a','b','c'];
+  if ($obj->exists($key)) {
+    # Stuff
+  }
+
+=back
+
+=cut
+
+#######################################################################
+
+=over 4
+
+=item get(\@key_list);
+
+Returns the contents of the object field denoted by the @key_list.
+This is a way of making arbitrary keys that act like hashes, with
+the 'hardwiring' requirements of hashes. The routine returns the
+the contents addressed by 'key1','key2','key3',...
+
+The special case of $obj->get([]); returns a reference to the anon
+hash containing the hash data. This is actually a blessed reference, but
+you can use normal hash operators on it (such as 'keys', 'values' and 'each').
+
+Note that returned anon hashes I<will not> be themselves be automatically
+blessed into Tie::ListKeyedHash. You get back I<exactly> whatever you stored
+originally. This is true of retrieving values via the tied interface as well.
+
+Example:
+
+  my $key = ['a','b','c'];
+  my $value = $obj->get($key);
+
+=back
+
+=cut
+
+#######################################################################
+
+=over 4
+
+=item put(\@key_list, $value);
+
+Sets $value as the contents of the object field denoted by the @key_list.
+
+This is a way of making arbitrary keys that act like hashes, without
+the 'hardwiring' requirements of hashes.
+
+Example:
+
+  my $key = ['a','b','c'];
+  $obj->put($key => 'help me');
+
+=back
+
+=cut
+
+#######################################################################
+
+=over 4
+
+=item delete(\@key_list);
+
+Deletes the object field denoted by the @key_list.
+
+This is a way of making arbitrary keys that act like hashes, without
+the 'hardwiring' requirements of hashes.
+
+  my $key = ['a','b','c'];
+  $obj->delete($key);
+
+=back
+
+=cut
+
+#######################################################################
+
+=head1 BUGS
+
+None known.
+
+=head1 TODO
+
+Nothing planned.
+
+=head1 AUTHORS
+
+Benjamin Franz <snowhare@nihongo.org>
+
+=head1 VERSION
+
+Version 1.02 17.Sep.2005
+
+=head1 SEE ALSO
+
+perl perltie
+
+=head1 COPYRIGHT
+
+Copyright 1999-2005 Benjamin Franz, <snowhare@nihongo.org>. All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify it under
+either the terms the GNU Public License (GPL) version 1 or later, or under the
+Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+1;

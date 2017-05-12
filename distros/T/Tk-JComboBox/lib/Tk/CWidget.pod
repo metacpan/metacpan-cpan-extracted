@@ -1,0 +1,74 @@
+=head1 NAME
+
+Tk::CWidget - Frame-based Composite Base class.
+
+=for category Tk Composite Widgets
+
+=head1 DESCRIPTION
+
+CWidget is a base class for Frame-based Composite widgets. It contains methods that may be useful for Composites, and is used as a way of extending or overriding the Widget, Derived, or Frame modules without directly changing them. It is not intended for use as a standalone widget. Currently, it has few methods, but will likely increase as common code is moved from subclasses to this one.
+
+=head1 OPTIONS
+
+=over 4
+
+=item Name  subwidgets
+
+=item Class Subwidgets
+
+=item Switch -subwidgets
+
+Specifies one or more configuration options for subwidgets contained within the Composite. Assuming a Composite that contains two subwidgets: LabelA and LabelB (both Label widgets), the following examples show how these might be configured.
+
+The first example shows that for each named subwidget, one or more
+options can be set.
+
+   $cwidget->configure(-subwidgets => [
+      LabelA => { -background => 'blue', -foreground => 'white' },
+      LabelB => { -background => 'white', -foreground => 'blue' }
+   ]);
+
+The second example show that more than one subwidget can be associated
+with a set of options.
+
+   $cwidget->configure(-subwidgets => [
+      ['LabelA', 'LabelB'] => { -bg => 'blue', -fg  => 'white'},
+      LabelA               => { -text => 'A'},
+      LabelB               => { -text => 'B'}
+   ]);
+
+Why is this useful? If you have several composites that have the same option configurations, this allows the options to be defined once in a variable, and then passed to each one, eliminating some of the common code from repeatedly calling:
+
+  $cwidget->Subwidget('LabelA')->configure(...)
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item I<$cwidget-E<gt>>B<configureSubwidgets>(I<array|arrayref>)
+
+Provides an alternative to using the -subwidgets option. This method
+take either an array reference or an array. Either way the contents
+of the array reference or array are identical.
+
+   $cwidget->configureSubwidgets(
+      ['LabelA', 'LabelB'] => { -bg => 'blue', -fg  => 'white'},
+      LabelA               => { -text => 'A'},
+      LabelB               => { -text => 'B'}
+   );
+
+or:
+
+   $cwidget->configureSubwidgets([   
+      ['LabelA', 'LabelB'] => { -bg => 'blue', -fg  => 'white'},
+      LabelA               => { -text => 'A'},
+      LabelB               => { -text => 'B'}
+   ]);
+
+=back
+
+=head1 AUTHOR
+
+Rob Seegel (RobSeegel@comcast.net)

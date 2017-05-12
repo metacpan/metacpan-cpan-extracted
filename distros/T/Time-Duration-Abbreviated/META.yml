@@ -1,0 +1,40 @@
+---
+abstract: 'Describe time duration in abbreviated English'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Duration-Abbreviated
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Time::Duration::Abbreviated:
+    file: lib/Time/Duration/Abbreviated.pm
+    version: '0.01'
+requires:
+  Time::Duration: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/moznion/Time-Duration-Abbreviated/issues
+  homepage: https://github.com/moznion/Time-Duration-Abbreviated
+  repository: git://github.com/moznion/Time-Duration-Abbreviated.git
+version: '0.01'

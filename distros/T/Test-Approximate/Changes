@@ -1,0 +1,16 @@
+0.009     2015-01-01 11:25:05+08:00 Asia/Shanghai
+add Test::Deep to the PreReqs
+0.008     2014-12-30 22:56:48+08:00 Asia/Shanghai
+1. str vs str will be true only if two string is equal
+   is_approx('str', 'str', 'str vs str', '1%'); # is true
+   
+   $got = [ 1, 2, 'strign'];
+   $expect = [ 0.999, 2.001, 'string'];
+   cmp_deeply( $got, approx($expect, '1%'), 'array element is str');  # is not ok
+
+2. add Test::Builder::Tester to test test
+
+3. fix typo
+
+4. improve document
+

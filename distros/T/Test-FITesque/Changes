@@ -1,0 +1,24 @@
+Revision history for Test-FITesque
+
+0.04      2015-04-19
+          * Update plan-setting for new Test::Builder
+
+0.03      2009-06-08
+          * Switch to using Module::Install
+          * Revert note() changes
+          * Allow for extra debugging details to be displayed upon twiddling
+
+0.02      2009-05-07
+          * Add more context to class loading exceptions
+          * Add more diagnostic information to test methods (test count)
+
+0.01      2008-01-22
+          * Make sure fixture objects go out of scope at end of test
+          * Ensure run_tests bails early on missing actions
+
+0.01_002  2007-07-10
+          * Add a minimum version to the Test::Builder prereq since its failure output changed
+          * Fix up some POD typos in Suite.pm
+
+0.01_001  2007-07-04
+          * First version released to the world

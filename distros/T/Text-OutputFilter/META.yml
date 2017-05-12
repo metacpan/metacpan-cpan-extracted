@@ -1,0 +1,26 @@
+--- 
+abstract: Filter and modify output
+author: 
+  - H.Merijn Brand <h.m.brand@xs4all.nl>
+configure_requires: 
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: Author, CPAN::Meta::Converter version 2.150005
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-OutputFilter
+provides: 
+  Text::OutputFilter: 
+    file: OutputFilter.pm
+    version: '0.20'
+requires: 
+  Carp: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+  perl: '5.008'
+resources: 
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Tux/Text-OutputFilter
+version: '0.20'

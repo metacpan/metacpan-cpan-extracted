@@ -1,0 +1,8 @@
+/\s(<[^>]*>)*personal computer(<[^>]*>)*\s/ @name = personal computer
+/\s(<[^>]*>)*stock market(<[^>]*>)*\s/ @name = stock market
+/\s(<[^>]*>)*telephone <head>lines<\/head>(<[^>]*>)*\s/ @name = telephone <head>lines</head>
+/\s(<[^>]*>)*electronic systems(<[^>]*>)*\s/ @name = electronic systems
+/\s(<[^>]*>)*toll free(<[^>]*>)*\s/ @name = toll free
+/\s(<[^>]*>)*white house(<[^>]*>)*\s/ @name = white house
+/\s(<[^>]*>)*operating system(<[^>]*>)*\s/ @name = operating system
+/\s(<[^>]*>)*commercial market(<[^>]*>)*\s/ @name = commerical market

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-Usage
+version:      0.08
+version_from: lib/Test/Usage.pm
+installdirs:  site
+requires:
+    File::Slurp:                   0
+    IO::Capture::Stderr:           0
+    IO::Capture::Stdout:           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

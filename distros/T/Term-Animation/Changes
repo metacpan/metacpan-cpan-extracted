@@ -1,0 +1,84 @@
+Revision history for Perl extension Term::Animation.
+
+Version 2.6 (2011/03/29)
+	- Removed broken pod tests
+
+Version 2.5 (2011/03/25)
+	- Added a workaround for problematic Curses/ncurses installs where the
+	  constructor does not return an object
+	- Added a 'follow' option, to attach one entity to another
+
+Version 2.4 (2006/12/17)
+	- Fixed a stupid bug that caused the is_living method to rarely work
+
+Version 2.3 (2006/12/14)
+	- Added framerate tracking
+	- Added accessor methods for a bunch of stuff in Term::Animation::Entity
+
+Version 2.2 (2006/10/21)
+	- Added die_entity parameter when creating an entity
+	- Fixed a bug that prevented the default entity position from working
+
+Version 2.1.1 (2006/10/03)
+	- Minor doc and test fixes
+
+Version 2.1 (2005/08/23)
+	- Fixed a memory leak when a entity is physical but
+	  doesn't have a collision handler
+	- Added get_entities and entity_count
+
+Version 2.0.1 (2005/07/13)
+	- No changes, using a more widely usable tar format
+
+Version 2.0 (2005/07/09)
+	- Added Term::Animation::Entity to replace the previous
+	  hash that an animation entity was composed of.
+	- This version breaks backwards compatibility with
+	  previous versions. See MIGRATION for details on
+	  moving to this version.
+	- Added optional collision detection between entities
+	- Names are no longer required for entities
+	- The direction of the Z dimension (depth) has been
+	  reversed. Higher numbers now indicate that the
+	  entity is further away
+
+Version 1.1 (2004/08/02)
+	- Added is_valid_color get_screen_size get_size set_shape
+	  set_color set_default color
+	- width() and height() now return actual value, instead
+	  of actual - 1
+	- Fixed a bug when parsing color masks that are not
+	  the same size as the sprite they are for
+
+Version 1.0 (2003/12/26)
+	- Added ANSI color support.
+	- Reduced CPU utilization
+	- Made screen resizing with update_term_size work
+	- Added 'animate' call to simplfy main animation loops
+
+Version 0.5 (2003/09/18)
+	- Added fractional frame deltas to move_object
+	- Fixed a bug that caused move_object to mangle 
+	  fractional x/y postions when wrapping around the screen
+	- Added some routines to get info about animation objects
+	  (get_current_frame, get_postion, exist, width, height)
+	- Now strip newline from the beginning of object shapes for convenience
+	- Added 'end' function to tidy up terminal settings when the program exits
+
+Version 0.4 (2003/07/27)
+	- Initial public release
+	- Code cleanup and documentation
+
+Version 0.3 (2003/04/17)
+	- Switched from Term::Cap to Curses
+	- Added path generator gen_path
+
+Version 0.2 (2003/02/15)
+	- Added support for multiple frames of animation for
+	  a single object
+	- Added automatic transparency for sprites
+	- Added callbacks and default callback routine
+
+Version 0.1
+	- Initial semi-functional version
+

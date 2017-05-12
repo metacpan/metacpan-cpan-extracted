@@ -1,0 +1,15 @@
+[Changes for 1.11 - 2009-01-28]
+
+* Updated the documentation to mention Scalar::Defer as an alternative.
+* Removed the dubious use of subroutine prototype signatures in methods.
+
+[Changes for 1.10 - 2004-10-02]
+
+* Maintainership assumed by Audrey Tang.
+* Arguments to FETCH are now passed verbatim to the discovery function.
+* As long as the discovery function returns a code reference, it will be
+  invoked repeatedly, until a final value is produced.
+
+[Changes for 1.00 - 2000-01-24]
+
+* Initial release to CPAN by Simon Cozens.

@@ -1,0 +1,116 @@
+--- ./src/os2/gclient.c-pre	Fri Mar 29 13:44:22 2002
++++ ./src/os2/gclient.c	Fri Sep  6 12:39:18 2002
+@@ -995,10 +995,12 @@ case WM_BUTTON3UP: /* WM_BUTTON3DBLCLK: 
+   double x,y;
+   HPS hps = WinGetPS(hWnd);
+ 
+-  GpiSetColor( hps, COLOR_ANNOTATE );    /* set color of the text */
++  GpiSetColor( hps, CLR_WHITE );    /* set color of the text */
++  GpiSetMix(hps,FM_XOR);
+   GpiSetCharMode(hps,CM_MODE1);
+   pt.x = mx; pt.y = my+4;
+   GpiCharStringAt(hps,&pt,(long)strlen(s),s);
++  DosBeep(440,111);
+   /* draw a cross at the clicked position */
+   pt.x = mx-3; pt.y = my; GpiMove(hps,&pt);
+   pt.x += 7; GpiLine(hps,&pt);
+@@ -2203,6 +2205,8 @@ server:
+ 
+                 case 'M' :   /* move */
+                 case 'V' :   /* draw vector */
++                    if( *buff=='V' )
++			GpiSetMix(hps, FM_OVERPAINT);
+ #ifdef PM3D
+ 		    {
+ 		    LONG curr_color = -1;
+@@ -2301,6 +2305,7 @@ server:
+                     else {
+                         ptl.x = (LONG)x ; ptl.y = (LONG)(y+sw) ;
+                         }
++		    GpiSetMix(hps, FM_OVERPAINT);
+                     if(bEnhanced)
+                         CharStringAt( hps, ptl.x, ptl.y, strlen( str ) , str ) ;
+                     else
+@@ -3402,12 +3407,13 @@ static void DisplayStatusLine ( HPS hps 
+ {
+ POINTL pt;
+ if (!sl_curr_text) return;
+-GpiSetColor( hps, COLOR_MOUSE ); /* set text color */
++/* GpiSetColor( hps, COLOR_MOUSE ); */ /* set text color */
++GpiSetColor( hps, CLR_WHITE );
+ GpiSetCharMode(hps,CM_MODE1);
+ pt.x = 2;
+ pt.y = 2;
+-GpiSetMix(hps,FM_INVERT);
+-/* GpiSetMix(hps,FM_XOR); */
++/* GpiSetMix(hps,FM_INVERT); */
++GpiSetMix(hps,FM_XOR);
+ GpiCharStringAt(hps,&pt,(long)strlen(sl_curr_text),sl_curr_text);
+ }
+ 
+--- ./src/readline.c-pre	Wed Aug 14 11:43:42 2002
++++ ./src/readline.c	Fri Sep  6 01:02:34 2002
+@@ -173,11 +173,13 @@ readline_ipc(const char* prompt)
+ #endif
+ 
+ /* replaces the previous klugde in configure */
+-#if defined(HAVE_TERMIOS_H) && defined(HAVE_TCGETATTR)
++#if defined(HAVE_TERMIOS_H) && defined(HAVE_TCGETATTR) && !defined(OS2)
+ # define TERMIOS
+ #else /* not HAVE_TERMIOS_H && HAVE_TCGETATTR */
+ # ifdef HAVE_SGTTY_H
+-#  define SGTTY
++#  ifndef OS2
++#   define SGTTY
++#  endif
+ # endif
+ #endif /* not HAVE_TERMIOS_H && HAVE_TCGETATTR */
+ 
+@@ -549,7 +551,7 @@ const char *prompt;
+ 	    putc(NEWLINE, stderr);	/* go to a fresh line */
+ 	    redraw_line(prompt);
+ #endif /* VREPRINT */
+-#ifdef VSUSP
++#if defined(VSUSP) && defined(SIGTSTP)
+ 	} else if (cur_char == term_chars[VSUSP]) {
+ 	    reset_termio();
+ 	    kill(0, SIGTSTP);
+--- ./src/specfun.c-pre	Thu May 16 06:48:28 2002
++++ ./src/specfun.c	Fri Sep  6 01:10:32 2002
+@@ -51,6 +51,13 @@ static char *RCSid() { return RCSid("$Id
+ 
+ #define ITMAX   200
+ 
++#ifndef SING
++#  define SING 0
++#  define OVERFLOW 0
++#  define UNDERFLOW 0
++#  define DOMAIN 0
++#endif
++
+ #ifdef FLT_EPSILON
+ # define MACHEPS FLT_EPSILON	/* 1.0E-08 */
+ #else
+--- ./src/syscfg.h-pre	Sat Mar  9 09:48:38 2002
++++ ./src/syscfg.h	Fri Sep  6 01:04:30 2002
+@@ -45,6 +45,12 @@
+ # include "config.h"
+ #endif
+ 
++#ifdef HAVE_SYS_TYPES_H
++#  include "sys/types.h"
++#endif
++#ifdef HAVE_SYS_STAT_H
++#  include "sys/stat.h"
++#endif
+ /*
+  * Define operating system dependent constants [default value]:
+  *
+@@ -115,6 +117,7 @@
+ 
+ #ifdef OS2
+ # define OS       "OS/2"
++# undef HELPFILE
+ # define HELPFILE "gnuplot.gih"
+ # define HOME     "GNUPLOT"
+ # define PLOTRC   "gnuplot.ini"

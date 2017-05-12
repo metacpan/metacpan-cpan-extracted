@@ -1,0 +1,20 @@
+[% # $Id: page,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+[%
+
+# Define page data structure.
+
+USE Date;
+
+page = {
+    file     = template.name
+    title    = template.title
+    about    = template.about
+    type     = template.type or 'html'
+    date     = template.date or Date.format(template.modtime)
+
+    # These come from the etc/ttree.cfg settings.
+    root     = rootdir
+    src      = tmplsrc
+}
+
+-%]

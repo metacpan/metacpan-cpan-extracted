@@ -1,0 +1,32 @@
+---
+abstract: 'Checks for pod coverage regression.'
+author:
+  - 'Andrey Kostenko, C<< <andrey at kostenko.name> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Pod-Coverage-Permissive
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Test::Pod::Coverage::Permissive:
+    file: lib/Test/Pod/Coverage/Permissive.pm
+    version: 0.05
+requires:
+  File::Spec: 0
+  Pod::Coverage: 0
+  Test::More: 0.88
+  YAML::Syck: 0
+  perl: 5.8.9
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.05

@@ -1,0 +1,16 @@
+RELEASE PROCEDURE
+
+* Update $VERSION in modified modules and/or files
+
+* Update release version in Makefile.PL
+
+* Update $VERSION in t/WizTestSettings.pm
+  to reflect the latest Wizard version
+
+* Update CHANGES log
+
+* Run make test - this will check MANIFEST too
+  Some of the tests require specific versions of Wizard.
+
+* After make tardist, run `make fix` if building on Win32
+  - cf. the GNU Win32 tar permission problem

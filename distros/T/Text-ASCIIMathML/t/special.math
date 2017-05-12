@@ -1,0 +1,90 @@
+? sin^-1(x)
+<math title="sin^-1(x)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mo>sin</mo>
+      <mrow>
+        <mo>-</mo>
+        <mn>1</mn>
+      </mrow>
+    </msup>
+    <mrow>
+      <mo>(</mo>
+      <mi>x</mi>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\sin^{- 1} ( x )$$
+
+? O(n \log n / \! \log\log n)
+<math title="O(n \log n / \! \log\log n)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>O</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi>n</mi>
+      <mfrac>
+        <mrow>
+          <mo>log</mo>
+          <mi>n</mi>
+        </mrow>
+        <mrow>
+          <mo>log</mo>
+          <mrow>
+            <mo>log</mo>
+            <mi>n</mi>
+          </mrow>
+        </mrow>
+      </mfrac>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$O \left( n \frac{\log n}{\log \log n} \right)$$
+
+? O(n \log n / \log\log n)
+<math title="O(n \log n / \log\log n)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>O</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi>n</mi>
+      <mfrac>
+        <mrow>
+          <mo>log</mo>
+          <mi>n</mi>
+        </mrow>
+        <mrow>
+          <mo>log</mo>
+          <mrow>
+            <mo>log</mo>
+            <mi>n</mi>
+          </mrow>
+        </mrow>
+      </mfrac>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$O \left( n \frac{\log n}{\log \log n} \right)$$
+
+? 7!
+<math title="7!">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mn>7</mn>
+    <mo>!</mo>
+  </mstyle>
+</math>
+$$7 !$$
+
+? "# of pigeons"
+<math title="&quot;# of pigeons&quot;">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mtext># of pigeons</mtext>
+    </mrow>
+  </mstyle>
+</math>
+$$\mbox{\# of pigeons}$$
+

@@ -1,0 +1,49 @@
+---
+abstract: 'Fast template engine sandboxed from your application.'
+author:
+  - 'Sam Graham <libtemplate-sandbox-perl@illusori.co.uk>'
+build_requires:
+  Cwd: 0
+  FindBin: 0
+  Module::Build: 0.07
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Sandbox
+provides:
+  Template::Sandbox:
+    file: lib/Template/Sandbox.pm
+    version: 1.04
+  Template::Sandbox::Library:
+    file: lib/Template/Sandbox/Library.pm
+    version: 1.04
+  Template::Sandbox::NumberFunctions:
+    file: lib/Template/Sandbox/NumberFunctions.pm
+    version: 1.04
+  Template::Sandbox::StringFunctions:
+    file: lib/Template/Sandbox/StringFunctions.pm
+    version: 1.04
+recommends:
+  Cache::Cache: 1
+  Cache::CacheFactory: 1.08
+requires:
+  Carp: 0
+  Class::Handle: 0
+  Clone: 0
+  Data::Dumper: 0
+  Digest::MD5: 0
+  File::Spec: 0
+  IO::File: 0
+  Log::Any: 0.03
+  Scalar::Util: 0
+  Storable: 1.014
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.04

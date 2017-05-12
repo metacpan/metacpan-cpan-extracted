@@ -1,0 +1,13 @@
+Test::JSYNC Installation
+
+# install via cpanminus
+cpanm Test::JSYNC
+
+# install via CPAN shell
+cpan Test::JSYNC
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

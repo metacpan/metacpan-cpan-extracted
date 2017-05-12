@@ -1,0 +1,6 @@
+elements:
+  - type: Textarea
+    name: preconditions
+  - type: Submit
+    name: submit
+    value: Update preconditions

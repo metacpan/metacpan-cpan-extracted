@@ -1,0 +1,440 @@
+#!/usr/bin/perl
+   eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
+       if $running_under_some_shell;
+
+# If debugging is the process of removing bugs, then programming must be the
+# process of putting them in.
+#   - Edsger Dijkstra
+
+use strict;
+use warnings;
+
+use vars qw($VERSION);
+
+$VERSION = '0.07';
+
+=head1 NAME
+
+psame - finds similarities between files or versions of files
+
+=head1 SYNOPSIS
+
+  psame [options] file1 file2
+  psame [options] file
+  psame [options] -r version file
+  psame [options] -r version_a -r version_b file
+
+The first usage compares the two files.
+The second usage compares the latest version from Subversion, CVS or RCS
+against the given file.
+The third usage will compare the given version from Subversion, CVS or
+RCS against the given file.
+The fourth usage will compare the two versions of the given file from
+Subversion, CVS or RCS.
+
+By default, blank lines, whitespace and case are ignored when comparing.
+The output will be a side-by-side view of matching regions with a
+few lines of context.
+
+=head1 MOTIVATION
+
+B<psame> was written to allow the author an easy way to compare two
+pieces of text.  In particular to find lines in one piece of text
+(generally from a file) that match some lines in a second piece of
+text.
+
+=head1 USES OF PSAME
+
+=head2 Code comparison
+
+The L<diff(1)> command is excellent for finding differences between files, but
+sometimes similarity is more interesting.  A common case is when a chunk of
+code is moved to another part of the same file.  In that case comparing the
+old and new versions of the file with B<diff> will tell you that there has
+been a deletion of text and an insertion.  B<psame>, on the other hand, will
+tell you where moved code is in the new version.  In simple cases, the output
+from B<diff> is clear enough but comparison with B<psame> can help in the
+cases where there have been many edits.
+
+=head1 DESCRIPTION
+
+=head2 Options
+
+=over 3
+
+=item B<-b>, B<--dont-ignore-spaces>
+
+don't ignore changes in whitespace with a line
+
+=item B<-i>, B<--dont-ignore-case>
+
+don't ignore case when comparing lines
+
+=item B<-B>, B<--dont-ignore-blank-lines>
+
+don't ignore blank lines
+
+=item B<< -M <num> >>, B<< --minimum-line-length <num> >>
+
+ignore simple/short lines (ie. those with less than <num> chars).  If the -b 
+flag is active, the line length is tested after removing whitespace.
+default: no lines are considered too simple
+
+=item B<< -S <num> >>, B<< --minimum-score <num> >>
+
+only show matches with score higher than <num> (see the SCORE section
+below) - default 0
+
+=item B<-y>, B<--side-by-side>
+
+side-by-side match view (default)
+
+=item B<-V>, B<--vertical>
+
+vertical match view
+
+=item B<-n>, B<--show-only-non-matches>
+
+show non-matches instead of matches
+
+=item B<-N>, B<--show-non-matches>
+
+show matches and non-matches
+
+=item B<< -x <wid> >>, B<< --terminal-width <wid> >>
+
+set terminal width in columns (normally guessed)
+
+=item B<< -r <ver> >>, B<< --revision <ver> >>,
+B<< -r <ver> -r <ver> >>
+
+compare with version(s) from SVN, CVS or RCS
+
+=item B<< -C <num> >>, B<< --context <num> >>
+
+number of lines of context - default 3
+
+=item B<< -m <mode> >>, B<< --mode <mode> >>
+
+use the <modeE<gt> to choose appropriate settings
+
+=over 3
+
+=item B<text>
+
+choose settings suitable for text/documentation: -M 10 -S 4
+
+=item B<code>
+
+choose setting for code: -i -M 5 -S 0
+
+=back
+
+=item B<-v>, B<--version>
+
+Display version number and exit
+
+=item B<-h>, B<-?>, B<--help>
+
+show a usage message
+
+=back
+
+=head1 MATCHES
+
+A "match" is some number of consecutive lines in one file (or file version)
+that are similar to some number of consecutive lines in a second file (or
+file version).  In the simplest case with no options specified, the lines
+in each file must be identical.  As an example, consider these two pieces
+of text (with added line numbers):
+
+=head2 B<text_1>
+
+ 1.  The parrot sketch -
+ 2.   'E's kicked the bucket, 'e's
+ 3.   shuffled off 'is mortal coil, run
+ 4.   down the curtain and joined the
+ 5.   bleedin' choir invisible!
+ 6.   THIS IS AN EX-PARROT!
+
+=head2 B<text_2>
+
+ 1.   'E's kicked the bucket, 'e's
+ 2.   shuffled off 'is mortal coil, run
+ 3.   down the curtain and joined the
+ 4.   bleedin' choir invisible!
+ 5.
+ 6.   This is an ex-parrot!
+
+=head2 Default settings
+
+Using the default settings, B<psame> will report this:
+
+ match 2..6==1..6
+   The parrot sketch -
+    'E's kicked the bucket, 'e's      =  'E's kicked the bucket, 'e's
+    shuffled off 'is mortal coil,     =  shuffled off 'is mortal coil,
+    run down the curtain and joined   =  run down the curtain and joined
+    the bleedin' choir invisible!     =  the bleedin' choir invisible!
+                                      >
+    THIS IS AN EX-PARROT!             =  This is an ex-parrot!
+
+which indicates that there are five lines from B<text_1> (ie. lines 2
+to 6) that match six lines from text_2 (ie. 1 to 6).  By default
+B<psame> is case and white-space insensitive and blank lines are
+ignored when comparing files.  The "=" symbol indicates an match
+between two lines.  The ">" indicates that B<text_2> has an extra
+blank line that has been ignored during the comparison.
+
+=head2 Case sensitivity and ignoring blank lines
+
+Adding the B<-B> parameter will produce this output:
+
+ match 2..5==1..4
+   The parrot sketch -
+    'E's kicked the bucket, 'e's      =  'E's kicked the bucket, 'e's
+    shuffled off 'is mortal coil, run =  shuffled off 'is mortal coil, run
+    down the curtain and joined the   =  down the curtain and joined the
+    bleedin' choir invisible!         =  bleedin' choir invisible!
+    THIS IS AN EX-PARROT!
+                                         This is an ex-parrot!
+ match 6..6==6..6
+    shuffled off 'is mortal coil, run    down the curtain and joined the
+    down the curtain and joined the      bleedin' choir invisible!
+    bleedin' choir invisible!
+    THIS IS AN EX-PARROT!             =  This is an ex-parrot!
+
+In this case blank lines are significant for the comparison.  B<psame>
+reports two distinct matches - one four lines long and the other one
+line long.
+
+Adding the B<-i> option as well will make B<psame> respect case.  Here
+is the output:
+
+ match 2..5==1..4
+  The parrot sketch -
+   'E's kicked the bucket, 'e's      =  'E's kicked the bucket, 'e's
+   shuffled off 'is mortal coil, run =  shuffled off 'is mortal coil, run
+   down the curtain and joined the   =  down the curtain and joined the
+   bleedin' choir invisible!         =  bleedin' choir invisible!
+   THIS IS AN EX-PARROT!
+                                        This is an ex-parrot!
+
+Note that the "This is an ex-parrot!" line doesn't match now.
+
+=head1 NON-MATCHES
+
+The B<-n> flag will report lines in each file that don't match any lines in
+the other file.  For example, running B<psame -n> on the files above, with no
+other options gives:
+
+ non matches in text_1:
+   1..1:
+     The parrot sketch -
+
+ie. line 1 in B<text_1> doesn't occur anywhere in B<text_2>
+
+In this case L<diff(1)> will tell us the same thing but in other situations we
+only want to know about lines in file A that don't appear anywhere in file B.
+An example might be when modifying the order of sections in a manuscript - we
+would like to check that all sections are still present, even if in a
+different place.
+
+=head1 SCORE
+
+The score of a match is currently the total number of lines this match covers
+in both files.  The B<-S> option for filtering by score is useful for
+filtering out small matches so that the larger similarity can be seen.
+
+=head1 BUGS
+
+None known
+
+=head1 LIMITATIONS
+
+The code works well with small input files (up to 10,000 lines or so), but is
+too slow and memory intensive for larger files.
+
+=head1 TO DO
+
+Output formatting should be done with Perl6::Form or some such and the output
+needs to be more readable.  Suggestions are very welcome.
+
+=head1 AUTHOR
+
+Kim Rutherford <kmr+same@xenu.org.uk>
+
+http://www.xenu.org.uk
+
+=cut
+
+use Text::Same;
+use Text::Same::TextUI qw( draw_match draw_non_match );
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $option_parser = new Getopt::Long::Parser;
+$option_parser->configure("gnu_getopt");
+
+# set defaults
+my %options = (
+               side_by_side => 1,
+               show_matches => 1,
+               ignore_case => 1,
+               ignore_blanks => 1,
+               ignore_space => 1,
+               min_score => 0,
+               ignore_simple => 0
+              );
+
+my $need_help = 0;
+my $need_version = 0;
+my $mode = "default";
+
+my %opt_config = (
+                  'revision|r=s@' => \$options{revisions},
+                  'show-matches' => \$options{show_matches},
+                  'show-non-matches|N' => \$options{show_non_matches},
+                  'show-only-non-matches|n' => sub {
+                        $options{show_non_matches} = 1;
+                        $options{show_matches} = 0;
+                    },
+                  'dont-ignore-case|i' => sub {$options{ignore_case} = 0;},
+                  'dont-ignore-spaces|b' => sub {$options{ignore_space} = 0;},
+                  'dont-ignore-blank-lines|B' => sub {$options{ignore_blanks} = 0;},
+                  'terminal-width|x' => \$options{term_width},
+                  'minimum-score|S=i' => \$options{min_score},
+                  'context|C=i' => \$options{context},
+                  'minimum-line-length|M=i' => \$options{ignore_simple},
+                  'side-by-side|y' => \$options{side_by_side},
+                  'vertical|V' => sub {$options{side_by_side} = 0;},
+                  'mode|m=s' => \$mode,
+                  'version|v' => \$need_version,
+                  'help|h|?' => \$need_help,
+                 );
+
+if (!$option_parser->getoptions(%opt_config)) {
+  usage(2);
+}
+
+if ($need_help) {
+  usage(1);
+}
+
+if ($need_version) {
+  print "psame version $VERSION\n";
+  exit(0);
+}
+
+sub usage
+{
+  my $exit_val = shift;
+  my $message = shift;
+  if (defined $message) {
+    pod2usage(-verbose => 1, -exitval => $exit_val, -message => $message);
+  } else {
+    pod2usage(-verbose => 1, -exitval => $exit_val);
+  }
+}
+
+if ($mode eq 'text') {
+  $options{ignore_simple} = 10;
+  $options{min_score} = 4;
+} else {
+  if ($mode eq 'code') {
+    $options{ignore_case} = 0;
+    $options{ignore_simple} = 5;
+    $options{min_score} = 0;
+  } else {
+    if ($mode ne 'default') {
+      usage(2, "error: unknown mode: $mode");
+    }
+  }
+}
+
+if (@ARGV < 1 or @ARGV > 2) {
+  usage(2, "error: one or two arguments needed\n");
+}
+
+my $revision_count = 0;
+
+if (defined $options{revisions}) {
+  $revision_count = scalar(@{$options{revisions}});
+}
+
+if ($revision_count > 2) {
+  usage(2, "error: a maximum of two revisions can be given");
+}
+
+if (@ARGV == 1) {
+  my $file_name = $ARGV[0];
+  my @revisions = ();
+
+  if (defined $options{revisions}) {
+    @revisions = @{$options{revisions}};
+  } else {
+    @revisions = "HEAD";
+  }
+
+  # we'll push two new arguments
+  @ARGV = ();
+
+  for my $revision (@revisions) {
+    if (-d ".svn") {
+      push @ARGV, "svn cat -r $revision $file_name|";
+    } else {
+      if (-d "CVS") {
+        push @ARGV, "cvs up -r $revision -p $file_name|";
+      } else {
+        if (-e "$ARGV[0],v") {
+          push @ARGV, "co -r $revision -p $file_name|";
+        } else {
+          usage;
+        }
+      }
+    }
+  }
+
+  if (@ARGV == 1) {
+    push @ARGV, $file_name;
+  }
+}
+
+if (!defined $options{term_width}) {
+  $options{term_width} = eval {require Term::Size; Term::Size::chars()};
+
+  if ($@ or $options{term_width} == 0) {
+    # pick a default
+    $options{term_width} = 80;
+  }
+}
+
+my $file1 = $ARGV[0];
+my $file2 = $ARGV[1];
+
+my $matchmap = compare(\%options, $file1, $file2);
+
+if ($options{show_matches}) {
+  my @matches = $matchmap->matches;
+
+  for my $match (@matches) {
+    if (!defined $options{min_score} or $match->score >= $options{min_score}) {
+      print draw_match(\%options, $match);
+    }
+  }
+}
+
+if ($options{show_non_matches}) {
+  my @source1_non_matches = $matchmap->source1_non_matches;
+  my @source2_non_matches = $matchmap->source2_non_matches;
+
+  print "non matches in ", $matchmap->source1()->name, ":\n";
+  for my $non_match (@source1_non_matches) {
+    print draw_non_match(\%options, $matchmap->source1, $non_match);
+  }
+  print "non matches in ", $matchmap->source2()->name, ":\n";
+  for my $non_match (@source2_non_matches) {
+    print draw_non_match(\%options, $matchmap->source2, $non_match);
+  }
+}

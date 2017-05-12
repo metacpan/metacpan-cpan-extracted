@@ -1,0 +1,13 @@
+lib/Docs/Site_SVD/Text_Column.pm
+MANIFEST
+Makefile.PL
+README
+lib/Text/Column.pm
+t/Text/Column.d
+t/Text/Column.pm
+t/Text/Column.t
+t/Text/File/Package.pm
+t/Text/Test/Tech.pm
+t/Text/Data/Secs2.pm
+t/Text/Data/SecsPack.pm
+t/Text/Data/Startup.pm

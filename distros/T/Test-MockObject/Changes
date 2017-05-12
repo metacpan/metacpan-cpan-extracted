@@ -1,0 +1,211 @@
+Revision history for Perl extension Test::MockObject.
+
+1.20161202 2016-12-02 15:12:41-08:00 America/Los_Angeles
+    - renamed README.pod to README (RT #118831)
+
+1.20150527 2015-05-27 08:33:52-07:00 America/Los_Angeles
+    - improved dependencies (build/run/requires), (Olivier Mengué, GH PR #10)
+    - improved runtime loading (Olivier Mengué, GH PR #11)
+
+1.20150521 2015-05-21 09:09:19-07:00 America/Los_Angeles
+    - updated CGI dependency
+    - improved README for GitHub (Rob Van Dam, GH PR #9)
+
+1.20140408 2014-04-07 17:38:44-07:00 America/Los_Angeles
+    - enabled Travis CI (no user-visible changes)
+    - improved fields-based object support (Olivier Mengué, Maxime Soulé)
+
+1.20140328 2014-03-28 16:17:59-07:00 America/Los_Angeles
+    - support added for fields-based objects (Gavin Mogan, RT #84535)
+
+1.20120301 2012-03-01 13:17:20 America/Los_Angeles
+    - updated dependencies to latest versions of UNIVERSAL::isa and UNIVERSAL::can
+
+1.20110612 2011-06-11 23:53:50 America/Los_Angeles
+    - removed Module::Build detritus
+    - improved Test::Warn testing dependency
+    - Added -debug flag to load UNIVERSAL::isa and UNIVERSAL::can on demand,
+      rather than in all situations.
+
+1.20110606
+    Sun Jun 04 2011
+    - converted to Dist::Zilla
+    - posted to GitHub
+
+1.09
+    Tue May 27 06:11:24 UTC 2008
+    - removed a buggy workaround for C<no warnings 'redefine';>, now that 5.6.2
+      is the baseline
+
+1.08
+    Fri Jun 29 01:36:24 UTC 2007 (chromatic)
+    - removed noisy diag() calls from successful tests (RT #19444, Adam Kennedy)
+    - removed some magic from the @ISA assignment to work with 5.9.5 (Andreas Koenig)
+
+1.07
+    Thu Oct  5 05:46:04 UTC 2006 (chromatic)
+    - clarified class mocking documentation (reported by Praveen Ray)
+
+    - T::MO::E should die when called with an unhandleable method (Paul the
+      Nomad)
+
+    Sat Sep 30 04:18:23 UTC 2006 (chromatic)
+    - fixed incorrect version request for Scalar::Util (alexchorny, RT #21773)
+
+    Sat Sep  9 21:19:35 UTC 2006 (chromatic)
+    - fixed a logging documentation error (Nicholas Clark)
+    - made fake_module() croak when mocking a loaded module but not mocking
+      subs (RT #21049, reported by Mutant)
+    - tested check_class_loaded() more carefully (fixes RT #19448, reported by
+      Adam Kennedy)
+
+1.06
+    Fri Apr 21 01:03:27 UTC 2006 (chromatic)
+    - added __get_parents() to list wrapped object's parents in T::M::O::E
+
+1.05
+    Sun Apr  9 05:58:52 UTC 2006 (chromatic)
+    - fixed anonymous subroutine name interaction with the debugger
+
+1.04
+    Sat Mar 18 21:52:52 UTC 2006 (chromatic)
+    - made all T::MO::E mocking methods return the invocant (bugfix)
+    - moved developer tests under t/developer/ to avoid running by default
+
+1.03
+    Sun Mar  5 01:43:20 UTC 2006 (chromatic)
+    - removed test dependency on Test::Warn
+    - improved signature test
+    - improved mock package loading in T::MO::E (RT #17692 from Badgersrc)
+    - clarified T::MO::E object wrapping behavior (RT #17929 from Larry Clapp)
+    - named generated can() and isa() methods in T::MO::E
+    - cleaned up some extraneous whitespace
+    - allowed isa() to check reference type of mocked object once again (RT
+      #15446 from PM)
+    - avoid circular references preventing mock destruction (RT #17941 from
+      David Pisoni)
+    - fixed inherited AUTOLOAD() calls from T::MO::E (RT #14445 from Adam
+      Kennedy)
+
+1.02
+    Sat Dec 24 08:36:07 UTC 2005 (chromatic)
+    - avoid warnings in UNIVERSAL::isa and UNIVERSAL::can by always calling
+      both as methods (oops)
+    - mark dependency on Perl 5.6.0
+    - skip signature check without SIGNATURE file
+    - remove chdir/library logic from tests and add warnings
+    - clean up warnings in t/bugs.t
+    - made Test::MockObject::Extends warnings clean
+
+1.01
+    Sat Aug 27 03:36:39 UTC 2005 (chromatic)
+    - set $AUTOLOAD in parent AUTOLOAD(), if delegating (RT #14251)
+    - don't require parent module if it has a new() method
+    - use UNIVERSAL::isa and UNIVERSAL::can modules
+    - give the installed isa() and can() methods the appropriate names in T::MO
+
+1.00
+    Tue Jul 12 01:49:06 UTC 2005 (chromatic)
+    - removed deprecated Test::MockObject::add()
+    - fixed stringification-finding bug (reported by water on Perl Monks)
+    - bumped up version numbers
+    - added POD and POD coverage tests
+    - added some documentation
+    - allow catchable warnings in fake_module()
+    - modify delegation approach (reported by Adam Kennedy in RT #13200)
+
+0.20
+    Wed Dec 15 02:57:48 UTC 2004 (chromatic)
+    - added set_isas() to Test::MockObject (Stevan Little)
+    - fixed typo in T::MO::E documentation (Stevan Little)
+    - added SIGNATURE and t/0-signature.t
+
+0.15
+    Sun Nov 14 04:53:01 UTC 2004
+    - allow skipping logging of certain methods (with tests and documentation)
+    - avoid subroutine redefinition warnings in T::MO::E
+
+    Sat Nov 13 05:32:29 UTC 2004
+    - fix Win32 test bug by not canonicalizing %INC paths (CPAN tester rrwo)
+
+0.14
+    Fri Mar 26 03:58:12 UTC 2004
+    - updated version number for new release
+    - improved documentation formatting in Test::MockObject
+    - added documentation for dispatch_mocked_method() in T::MO
+
+    Fri Mar 19 07:34:55 UTC 2004
+    - added log_call() to Test::MockObject
+
+    Sat Mar 13 05:49:39 UTC 2004
+    - added Test::MockObject::Extends and t/extends.t
+
+0.13 Sat Dec 20 00:16:36 UTC 2003
+    - new release 'cuz I accidentally deleted 0.12 from the CPAN (Chris Winters
+      reported it)
+    - make set_true() and set_false() work on lists of method names
+    - marked fake_module() and fake_new() as potentially deprecated
+
+0.12 Wed Feb  5 17:42:15 GMT 2003
+    - fix false positives in called_ok() (Jay Bonci found it)
+    - clarify documentation for clear() (Jay Bonci)
+
+0.11 Sat Jan 11 08:03:35 GMT 2003
+    - fix list context bug at end of series in set_series()
+
+0.10 Sun Jan  5 06:27:49 GMT 2003
+    - use flyweight objects (store state outside mocked objects)
+    - allow array, scalar, sub, and glob references as objects
+    - minor typo fixes and brace placement fixings
+
+0.09 Sun Jun 30 21:14:29 PDT 2002
+    - made most mocking methods return $self (Piers Cawley's suggestion)
+    - add $VERSION when mocking a module (ensure package is not empty)
+
+0.08 Wed Jun 26 03:38:45 UTC 2002
+    - pass $self to added add() methods (Ilya Martynov)
+    - test for same (Ilya again)
+    - localize $1 in AUTOLOAD() to prevent its clobbering (bugfix, tested)
+
+0.07 Sat Jun 22 06:43:47 UTC 2002
+    - deprecated add()
+    - added mock()
+    - expanded and reorganized documentation somewhat()
+    - added next_call()
+    - added carp() for unknown mocked method call attempt
+        (what a description!)
+
+0.06 Thu Jun 20 05:37:32 UTC 2002
+    - added t/bugs.t to catch regressions
+    - fixed several warnings:
+        - uninitialized values in called_pos_ok()
+        - improved diagnostics in called_pos_ok()
+        - avoid redefined subroutine warnings in fake_module()
+    - fixed behavior of called_pos_ok() -- avoid incorrect successes
+    - prevented called() from dying if $pos is out of range
+    - prevented _call() from autovivifying stack entries
+    - made fake_new() a wrapper around fake_module()
+
+0.05  Sun Jun  9 21:16:41 PDT 2002
+    - fixed tests for object passing
+    - added set_bound()
+    - removed fake_import() (retcon!) and modified fake_module() to be general
+      enough to do the same sort of thing
+
+      Fri Jun  7 23:15:41 PDT 2002
+    - fix typo in documentation
+    - pass along object to method calls (bugfix)
+
+      Mon May 27 20:31:35 UTC 2002
+    - fix fake_module(), which never worked.  Oops, bug in both test and module!
+    - added fake_import() and its tests
+
+0.04  Mon Apr 29 01:03:36 UTC 2002
+    - pass tests in 5.005_03 (Tatsuhiko Miyagawa)
+    - can() should return subref instead of just 1 (also Tatsuhiko)
+    - added test for can() buglet (me)
+    - added test numbers (hey, it's CPAN time!)
+
+0.03  Sat Apr 27 11:12:39 2002
+    - first released version, initially created with:
+        h2xs -A -X -n Test::MockObject

@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/TeX/Hyphen.pm
+lib/TeX/Hyphen/czech.pm
+lib/TeX/Hyphen/german.pm
+lib/TeX/Hyphen/utf8.pm
+t/hyphen.t
+t/xbench.t
+t/utf8.tex
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

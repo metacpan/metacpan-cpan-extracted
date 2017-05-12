@@ -1,0 +1,130 @@
+ftp.cpan.org
+  drwxrwxr-x  12 mirror   mirror       1024 Jun 24 14:23 CPAN
+    lrwxrwxrwx   1 mirror   mirror         28 Nov  8  1999
+        ... CPAN.html -> authors/Jon_Orwant/CPAN.html
+    lrwxrwxrwx   1 mirror   mirror         13 Nov  8  1999
+        ... ENDINGS -> .cpan/ENDINGS
+    -rw-r--r--   1 mirror   mirror      77225 Jun 18 09:46 MIRRORED.BY
+    -rw-r--r--   1 mirror   mirror       7292 Jun 24 14:23 MIRRORING.FROM
+    -rw-rw-r--   1 mirror   mirror       1941 Mar  5  1999 README
+    lrwxrwxrwx   1 mirror   mirror         10 Nov  8  1999
+        ... README.html -> index.html
+    lrwxrwxrwx   1 mirror   mirror         20 Nov  8  1999
+        ... RECENT -> indices/RECENT-print
+    -rw-rw-r--   1 mirror   mirror      43450 Jun 23 19:34 RECENT.html
+    -rw-rw-r--   1 mirror   mirror       1197 Nov  4  1999 ROADMAP
+    -rw-rw-r--   1 mirror   mirror       1678 Oct  9  1998 ROADMAP.html
+    -rw-rw-r--   1 mirror   mirror      10233 Jun 18 09:46 SITES
+    -rw-rw-r--   1 mirror   mirror      16013 Jun 18 09:46 SITES.html
+    drwxr-xr-x   3 mirror   mirror      10240 Dec 28 08:57 authors
+      lrwxrwxrwx   1 mirror   mirror          8 Nov  8  1999
+          ... Spider_Boardman -> id/SPIDB
+      lrwxrwxrwx   1 mirror   mirror          9 Nov  8  1999
+          ... Sriram_Srinivasan -> id/SRIRAM
+      lrwxrwxrwx   1 mirror   mirror          8 Nov  8  1999
+          ... brian_d_foy -> id/BDFOY
+      drwxr-xr-x  28 mirror   mirror       5120 May 23 06:12 id
+        drwxrwxr-x  20 mirror   mirror       1024 Jun 14 04:54 M
+          drwxrwxr-x  20 mirror   mirror       1024 Jun  4 11:49 MA
+          drwxrwxr-x   3 mirror   mirror       1024 Mar  8 16:11 MB
+          drwxrwxr-x   6 mirror   mirror       1024 May 19 05:08 MJ
+            drwxr-xr-x   2 mirror   mirror       1024 Dec 20  1998 MJAEG
+            include cpan_mjd.tre
+            drwxrwxr-x   2 mirror   mirror       1024 Dec 20  1998 MJHEWITT
+            drwxrwxr-x   2 mirror   mirror       1024 Dec 20  1998 MJS
+          drwxrwxr-x   3 mirror   mirror       1024 Jun 14 04:54 MK
+          drwxrwxr-x   4 mirror   mirror       1024 May 19 17:08 MV
+        lrwxrwxrwx   1 mirror   mirror         13 May 18 09:49
+            ... MARCLANG -> M/MA/MARCLANG
+        lrwxrwxrwx   1 mirror   mirror         11 May 18 10:49
+            ... MARKIM -> M/MA/MARKIM
+        lrwxrwxrwx   1 mirror   mirror         13 May 19 02:49
+            ... MIKEKING -> M/MI/MIKEKING
+        lrwxrwxrwx   1 mirror   mirror         13 May 19 03:49
+            ... MIKESTOK -> M/MI/MIKESTOK
+        lrwxrwxrwx   1 mirror   mirror         10 May 19 04:49
+            ... MJAEG -> M/MJ/MJAEG
+        lrwxrwxrwx   1 mirror   mirror          8 May 19 05:49
+            ... MJD -> M/MJ/MJD
+        lrwxrwxrwx   1 mirror   mirror          8 May 19 06:49
+            ... MJS -> M/MJ/MJS
+        lrwxrwxrwx   1 mirror   mirror         13 May 19 08:49
+            ... MLEHMANN -> M/ML/MLEHMANN
+        drwxrwxr-x  15 mirror   mirror       1024 May 22 17:08 T
+          drwxrwxr-x   4 mirror   mirror       1024 Apr 19 08:33 TA
+          drwxrwxr-x   3 mirror   mirror       1024 Dec  9  1999 TB
+          drwxrwxr-x   4 mirror   mirror       1024 Sep 16  1999 TE
+          drwxrwxr-x   4 mirror   mirror       1024 Sep  9  1999 TG
+          drwxrwxr-x   6 mirror   mirror       1024 May 22 12:08 TI
+            drwxr-xr-x   3 mirror   mirror       1024 Jun 14 14:08 TIMB
+            drwxrwxr-x   2 mirror   mirror       1024 Mar  7 14:56 TIMMY
+            drwxrwxr-x   2 mirror   mirror       1024 May 16 23:08 TIMPOTTER
+            drwxr-xr-x   2 mirror   mirror       1024 Sep 14  1999 TIMPX
+          drwxrwxr-x   3 mirror   mirror       1024 Jan 19  1999 TJ
+          drwxrwxr-x   3 mirror   mirror       1024 May 21 14:53 TK
+          drwxrwxr-x   9 mirror   mirror       1024 May 22 15:08 TO
+            drwxrwxr-x   2 mirror   mirror       1024 Mar  5 20:57 TOBIX
+            drwxrwxr-x   2 mirror   mirror       1024 Apr 25 14:43 TODD
+            drwxr-xr-x   4 mirror   mirror       1024 Dec 20  1998 TOMC
+            drwxr-xr-x   2 mirror   mirror       1024 May 22 14:08 TOMFA
+            drwxrwxr-x   2 mirror   mirror       1024 Jun 20  1999 TOMHUGHES
+            drwxr-xr-x   2 mirror   mirror       1024 Feb  3 08:57 TOMZO
+            drwxrwxr-x   2 mirror   mirror       1024 Feb 23  1999 TOSTI
+          drwxrwxr-x   4 mirror   mirror       1024 May 22 16:08 TR
+          drwxrwxr-x   3 mirror   mirror       1024 Apr 29  1999 TS
+          drwxrwxr-x   3 mirror   mirror       1024 Mar  8 15:11 TU
+          drwxrwxr-x   3 mirror   mirror       1024 May 22 17:08 TW
+          drwxrwxr-x   4 mirror   mirror       1024 May 22 18:08 TY
+        lrwxrwxrwx   1 mirror   mirror          9 May 22 13:49
+            ... TIMB -> T/TI/TIMB
+        lrwxrwxrwx   1 mirror   mirror         10 May 22 14:49
+            ... TIMPX -> T/TI/TIMPX
+        drwxrwxr-x   8 mirror   mirror       1024 Jun 12 01:14 U
+        lrwxrwxrwx   1 mirror   mirror         10 May 22 21:49
+            ... ULPFR -> U/UL/ULPFR
+        lrwxrwxrwx   1 mirror   mirror          9 May 22 21:49
+            ... UWEH -> U/UW/UWEH
+        drwxrwxr-x   5 mirror   mirror       1024 May 22 21:08 V
+        lrwxrwxrwx   1 mirror   mirror         11 May 22 23:49
+            ... VKHERA -> V/VK/VKHERA
+        drwxrwxr-x   9 mirror   mirror       1024 May 23 02:08 W
+        lrwxrwxrwx   1 mirror   mirror         13 May 23 00:49
+            ... WATANABE -> W/WA/WATANABE
+        lrwxrwxrwx   1 mirror   mirror         13 May 23 00:49
+            ... WAYNEDAV -> W/WA/WAYNEDAV
+        lrwxrwxrwx   1 mirror   mirror         10 May 23 02:49
+            ... WINKO -> W/WI/WINKO
+        lrwxrwxrwx   1 mirror   mirror          8 May 23 03:49
+            ... WPS -> W/WP/WPS
+        lrwxrwxrwx   1 mirror   mirror          8 May 23 04:49
+            ... WRW -> W/WR/WRW
+        drwxrwxr-x   4 mirror   mirror       1024 Jan 12 14:24 X
+        drwxrwxr-x   5 mirror   mirror       1024 May 23 04:08 Y
+        lrwxrwxrwx   1 mirror   mirror          8 May 23 05:49
+            ... YLU -> Y/YL/YLU
+        lrwxrwxrwx   1 mirror   mirror         10 May 23 06:49
+            ... YVESP -> Y/YV/YVESP
+        drwxrwxr-x   4 mirror   mirror       1024 May 23 05:08 Z
+        lrwxrwxrwx   1 mirror   mirror         10 May 23 07:49
+            ... ZENIN -> Z/ZE/ZENIN
+    drwxrwxr-x  64 mirror   mirror       2048 Jun  1 15:25 clpa
+    -rw-r--r--   1 mirror   mirror       2557 Nov  1  1999 disclaimer.html
+    drwxrwxr-x  10 mirror   mirror       1024 Nov  4  1999 doc
+    -rw-r--r--   1 mirror   mirror       2812 Nov  1  1999 index.html
+    drwxrwxr-x   2 mirror   mirror       1024 Jun 24 14:23 indices
+    lrwxrwxrwx   1 mirror   mirror         16 Nov  8  1999
+        ... ls-lR.gz -> indices/ls-lR.gz
+    drwxrwxr-x   5 mirror   mirror       1024 Jun 13 10:00 misc
+    drwxr-xr-x   5 mirror   mirror       1024 May 11 05:13 modules
+    drwxrwxr-x  23 mirror   mirror       1024 Jun 13 14:59 ports
+    drwxr-xr-x  29 mirror   mirror       1024 Jan 23 14:41 scripts
+    drwxrwxr-x   5 mirror   mirror       1024 Mar 27 11:29 src
+  lrwxrwxrwx   1 root     root           11 May  7 12:35
+      ... README -> welcome.msg
+  drwxrwxr-x  18 mirror   mirror       2048 Jun  8 20:30 apache
+  drwxr-xr-x   7 mirror   mirror       1024 Feb 18 08:59 backup.pause
+  drwxr-xr-x   3 mirror   mirror       1024 Apr  4 18:49 linux
+  drwxrwxr-x  28 mirror   mirror       2048 Jun 20 15:23 mysql
+  drwxr-xr-x   2 root     root         1024 May 22 16:28 perl
+  lrwxrwxrwx   1 root     root            1 May 22 16:27 pub -> .
+  -rw-r--r--   1 root     root          751 May 14 21:23 welcome.msg

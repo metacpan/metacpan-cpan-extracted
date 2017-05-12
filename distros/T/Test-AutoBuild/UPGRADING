@@ -1,0 +1,109 @@
+ Test-AutoBuild upgrade notes
+ ============================
+
+Incompatibilities with 1.0.3
+----------------------------
+
+ * The configuration file has been completely overhauled, so
+   existing config files from 1.0.x series will not work with
+   the newer releases.
+
+   The minimal effort upgrade path is to take the new example
+   configuration file, and just replace the 'modules' parameter
+   block with that of the old config file, then merely change
+   then place the 'path' and 'repository' options within a 
+   nested 'source' block, eg
+
+   Change:
+
+     modules = {
+       autobuild-dev = {
+         .....
+         repository = gna-cvs
+         path = testautobuild
+         .....
+       }
+     }
+
+   To look like:
+
+     modules = {
+       autobuild-dev = {
+         .....
+         source = {
+           repository = gna-cvs
+           path = testautobuild
+         }
+         .....
+       }
+     }
+
+   Consult 'man 5 auto-build.conf' for documentation on the
+   new configuration file format
+
+
+ * The layout of directories & files within the build home
+   has changed significantly. The default location has also
+   switched from /var/builder to /var/lib/builder. There is
+   now a command line tool for creating the expected directory
+   structure, so the simplest solution is to just remove your
+   existing build home & create a new one:
+
+    # rm -rf /var/builder
+    # auto-build-make-root /var/lib/builder
+
+   Consult 'man 1 auto-build-make-root' for documentation on
+   this new tool
+
+
+ * The name of the default script used to build a module has been
+   changed from 'rollingbuild.sh' to 'autobuild.sh'. Either rename
+   the script in your application's codebase, or set the following
+   configuration file option for each module:
+
+     modules = {
+       autobuild-dev = {
+         .....
+         options = {
+           control-file = rollingbuild.sh
+         }
+         .....
+       }
+     }
+
+
+ * There are a new set of environment variables passed to the build
+   control scripts:
+
+     $AUTOBUILD_INSTALL_ROOT
+       The location into which a module will install its files, 
+       typically used as value for --prefix argument to configure 
+       scripts. Equivalent to the old $AUTO_BUILD_ROOT variable
+
+     $AUTOBUILD_PACKAGE_ROOT
+       The location into which a module will create binary packages. 
+       For example, $AUTOBUILD_PACKAGE_ROOT/rpm would be used to set 
+       %_topdir when building RPMs. 
+
+     $AUTOBUILD_SOURCE_ROOT
+       The location into which the module was checked out.
+
+     $AUTOBUILD_MODULE
+       The name of the module being built. This can be used in 
+       conjunction with the $AUTOBUILD_SOURCE_ROOT to determine 
+       the top level directory of the module's source.
+
+     $AUTOBUILD_COUNTER
+       The build counter value. This counter is not guarenteed to 
+       be different on each build cycle, however, if a code change
+       was detected during checkout, this will change. Equivalent
+       of the old $AUTO_BUILD_COUNTER variable.
+
+     $AUTOBUILD_TIMESTAMP
+       The build timestamp value. This counter will uniquely refer 
+       to a particular checkout of the source code, across the entire
+       build engine.
+
+    The old variable names will be removed in a future release, thus
+    apps should be switched to the new names at soonest convenient
+    time.

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be111bc174dd0793055f5fc251a6cc2c977d99af AUTHOR_PLEDGE
+SHA1 8008817532432430e2792482444494cfc015f18d CONTRIBUTORS
+SHA1 2b3cbf1791050f08cc42f6eb23452f479ce5e1ab Changes
+SHA1 458f1562fc7019b9fe84176462e38be12027b718 INSTALL
+SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
+SHA1 f91dece0d679cac5294b9bc82845ea12c3970cb6 MANIFEST
+SHA1 1d8b284f8251b250ff7bac1b6617df98bfabf2bb META.json
+SHA1 c70b2a3d5f0c7098e2bef742088c4937a2ff27df META.yml
+SHA1 585ae8ff77bb47a61a66aeb1b2a3187fae5ea862 Makefile.PL
+SHA1 f638059de508192fbe8c2df72aa3186a78958406 README
+SHA1 d60b5dc6941de131c04af9a0d38ecd1a4cb231c4 README.mkdn
+SHA1 4a619d93c4b17a34f34bd22ed9288502cecc7852 cpanfile
+SHA1 7b6c6d29d5fc58df8bf884a4a38c4ac118f3f574 doap.xml
+SHA1 9a70670910990615267e0b2138a6c9e6028d1561 example.pl
+SHA1 049faca69b0c8c7f6302ad38ba79285a90722010 lib/Try/Tiny/Warnings.pm
+SHA1 c859601f9861043bf889d1b989a41a5f4fbcc379 t/00-compile.t
+SHA1 761fb29415f1d14d872deed6e0215af2cc2bbb41 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 3e9d4d0de961a102bf8cb38b091963e62bb7dee8 t/basic.t
+SHA1 9a6b648a655e91ad3998ef50da85054d24ac8f7a t/use_try_tiny.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlg55ucACgkQ34Hwf+GwC4xWPgCgsd6RKlH+X1EtjFrMM9ZQCABf
+u58Anjd40G1dunx6fh0Ujg5ziq6SbA4P
+=40WW
+-----END PGP SIGNATURE-----

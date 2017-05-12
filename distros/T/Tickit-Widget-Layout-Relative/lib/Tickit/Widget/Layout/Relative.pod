@@ -1,0 +1,199 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::Widget::Layout::Relative
+at lib/Tickit/Widget/Layout/Relative.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Tickit::Widget::Layout::Relative - apply sizing to a group of L<Tickit> widgets
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+ my $l = Tickit::Widget::Layout::Relative->new;
+ $l->add(
+  title  => 'Little panel',
+  id     => 'second',
+  border => 'round dashed single',
+  width  => '33%',
+  height => '5em',
+ );
+ $l->add(
+  title     => 'Another panel',
+  id        => 'first',
+  below     => 'second',
+  top_align => 'second',
+  border    => 'round dashed single',
+  width     => '33%',
+  height    => '10em',
+ );
+ $l->add(
+  title        => 'Something on the right',
+  id           => 'overview',
+  right_of     => 'first',
+  bottom_align => 'first',
+  margin_top   => '1em',
+  margin_right => '3em',
+ );
+ Tickit->new(root => $l)->run;
+
+=head1 DESCRIPTION
+
+A container widget which provides 'relative' layout for widgets:
+specify the relations between the widget locations and this will
+attempt to fit them to the available space.
+
+=begin HTML
+
+<p><img src="http://tickit.perlsite.co.uk/cpan-screenshot/tickit-widget-layout-relative1.png" alt="Relative layout" width="642" height="420"></p>
+
+=end HTML
+
+=head1 METHODS
+
+=head2 new
+
+Instantiate a new layout. Takes a single named parameter:
+
+=over 4
+
+=item * layout - the optional L<Tickit::Layout::Relative> layout to use
+for initial positioning, will create a new one if none is supplied
+
+=back
+
+=head2 layout
+
+Returns the L<Tickit::Layout::Relative> instance.
+
+=head2 lines
+
+Returns the number of lines, carefully calculated using science.
+
+=head2 cols
+
+Number of columns.
+
+=head2 add
+
+Adds the given widget. Also takes a plethora of named options to help
+decide where to put said widget and how it should be rendered:
+
+=over 4
+
+=item * title - a label to apply to this pane, default is blank
+
+=item * id - an ID used for looking up widgets in an existing layout,
+see L</widget_by_id> and L</window_by_id> for more details
+
+=item * left_of - attempt to position this to the left of the pane
+with the given ID
+
+=item * right_of - try to arrange this widget on the right of the given
+ID
+
+=item * above - if we can, stick this widget above the given pane ID
+
+=item * below - we want to be below the given ID
+
+=item * top_align - try to align the top edge with the given widgets
+(string containing space-separated list, or arrayref, of IDs)
+
+=item * bottom_align - align the bottom edge with the given panes
+(as top_align)
+
+=item * left_align - we would like this things to be aligned on the
+left (as top_align)
+
+=item * right_align - we would like this things to be aligned on the
+right (as top_align)
+
+=item * margin - margin to apply around this widget, this is a measurement
+(see L</MEASUREMENTS>).
+
+=item * margin_left - left margin
+
+=item * margin_right - right margin
+
+=item * margin_top - top margin
+
+=item * margin_bottom - bottom margin
+
+=item * padding - padding to apply around this widget, this is a measurement
+(see L</MEASUREMENTS>).
+
+=item * padding_left - left padding
+
+=item * padding_right - right padding
+
+=item * padding_top - top padding
+
+=item * padding_bottom - bottom padding
+
+=item * width - how big we'd like to be, see L</MEASUREMENTS>
+
+=item * height - how big we'd like to be, see L</MEASUREMENTS>
+
+=back
+
+Don't rely on the return value. It may change in future.
+
+Example:
+
+ $layout->add(
+  Tickit::Widget::Static->new(text => '...'),
+  title  => 'Some panel',
+  id     => 'send',
+  border => 'single',
+  width  => '85%',
+  height => '15em',
+ )
+
+=head2 render_to_rb
+
+Renders the layout to the given L<Tickit::RenderBuffer>. Used internally.
+
+=head2 render_corners
+
+Render the corners. Purely for aesthetic reasons (rounded corners look
+better than the usual square corners formed by vline/hline). Used internally.
+
+=head2 window_gained
+
+When we get a window, we perform some unfortunate hacks to allow focus
+notification. Most of this is highly likely to change in future.
+
+=head2 reshape
+
+Called when our main window changes shape. We recalculate layout to match
+the new dimensions then update all child widgets accordingly.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::ContainerWidget>
+
+L<child_opts|Tickit::ContainerWidget/child_opts>, L<child_resized|Tickit::ContainerWidget/child_resized>, L<children_changed|Tickit::ContainerWidget/children_changed>, L<find_child|Tickit::ContainerWidget/find_child>, L<focus_next|Tickit::ContainerWidget/focus_next>, L<remove|Tickit::ContainerWidget/remove>, L<set_child_opts|Tickit::ContainerWidget/set_child_opts>, L<window_lost|Tickit::ContainerWidget/window_lost>
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<on_pen_changed|Tickit::Widget/on_pen_changed>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_pen|Tickit::Widget/set_pen>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2014. Licensed under the same terms as Perl itself.

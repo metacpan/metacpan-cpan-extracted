@@ -1,0 +1,49 @@
+Revision history for Text-Table-Any
+
+0.08    2017-01-01 (PERLANCAR)
+
+        - Add backend: Text::Table::Paragraph.
+
+
+0.07    2016-12-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Forgot to mention about the new backends in the POD.
+
+
+0.06    2016-12-29 (PERLANCAR)
+
+	- Recognize new backends: Text::Table::HTML,
+	  Text::Table::HTML::DataTables.
+
+
+0.05    2016-10-19 (PERLANCAR)
+
+	- Support new backends: Text::Table::Tiny{Color,ColorWide,Wide}.
+
+
+0.04    2016-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+        - [doc] Show sample result for all backends.
+
+
+0.03    2016-09-03 (PERLANCAR)
+
+	- [Bugfix] Text::MarkdownTable backend: forgot to set columns().
+
+	- [Bugfix] Text::ANSITable backend: correctly observe header_row
+	  setting.
+
+
+0.02    2016-09-03 (PERLANCAR)
+
+	- [Bugfix] Text::ASCIITable backend: default to no header_row and
+	  observe the header_row setting.
+
+
+0.01    2015-12-19 (PERLANCAR)
+
+        - First release.

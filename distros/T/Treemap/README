@@ -1,0 +1,96 @@
+Treemap version 0.02
+====================
+
+   Traditional representations of hiarchal information trees are very space
+   consuming.  There is a large amount of redundant information and padding to
+   convey the tree structure.
+
+   Treemaps are representations of trees that use space-filling nested
+   rectangles to convey the tree structure. 
+
+   e.g., a directory tree:
+
+      2       ./CVS/Root
+      2       ./CVS/Repository
+      2       ./CVS/Entries
+      2       ./CVS/Entries.Log
+      10      ./CVS
+      2       ./Treemap/CVS/Root
+      2       ./Treemap/CVS/Repository
+      2       ./Treemap/CVS/Entries
+      2       ./Treemap/CVS/Entries.Log
+      .
+      .
+      .
+      (goes on for 80 lines)
+
+   e.g., a treemap of a directory tree:
+
+    .-------------------------------.
+    |             ROOT              |
+    |.-----------..-------..-------.|
+    ||ImUgly.ttf ||Treemap||  CVS  ||
+    ||           ||.-----.||       ||
+    ||           |||Input|||       ||
+    ||           |||     || >-----< |
+    ||           || >---< ||example||
+    ||           |||Outpu|||       ||
+    ||           ||`_____'||       ||
+    |`-----------'`-------'`-------'|
+    `-------------------------------'
+
+   Raster output is much more useful (like a GIF, or PNG) than ascii, as the
+   labels are scaled appropriately, and alpha transparency is used to show
+   information that would otherwise be hidden.
+
+INSTALLATION
+
+   To install this module type the following:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+DEPENDENCIES
+
+   This module requires these other modules and libraries:
+
+      Imager
+         Currently we are only support freetype2 for labelling. Expect Treemap
+         to explode if you don't build Imager with freetype2 support.
+
+      XML::Simple 
+         One pre-requisite it doesn't seem to include of it's own regard when
+         being installed is LWP::UserAgent
+
+GOTCHAS
+
+   When using Treemap::Output::Imager, you may get the mysterious error
+   message:
+
+   Can't call method "bounding_box" on an undefined value at
+   /usr/local/lib/perl5/site_perl/5.8.0/Treemap/Output/Imager.pm line 330.
+
+   What it's really saying is, "we couldn't find your true type font."
+
+THE FUTURE
+
+   Output Modules: Postscript/PDF, Flash
+   Input Modules: nntp
+
+   ... and anything else we can build a tree hiarchy out of. Contributions
+   welcomed!
+
+COPYRIGHT AND LICENCE
+
+   This library is free software; you can redistribute it and/or modify it under
+   the same terms as Perl itself.
+
+   (c)2003 Simon P. Ditner <simon@uc.org>, and Eric P. Maki <eric@uc.org>
+
+   Original Treemap Concept: Ben Shneiderman <ben@cs.umd.edu>,
+   http://www.cs.umd.edu/hcil/treemap-history/index.shtml
+
+   Squarified Treemap Concept: Visualization Group of the Technische
+   Universiteit Eindhoven

@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+use Test::t;
+
+$xyzzy = 1;
+
+eval {
+    Test::t->builder->skip_all;
+};

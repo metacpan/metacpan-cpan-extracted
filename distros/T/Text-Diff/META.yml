@@ -1,0 +1,27 @@
+---
+abstract: 'Perform diffs on files and record sets'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Diff
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Diff: '1.19'
+  Exporter: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/neilbowers/Text-Diff
+version: '1.44'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

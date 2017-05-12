@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Tanker;
+
+
+my $t = new Tanker("tanker.cfg");
+
+exit 0;
+
+

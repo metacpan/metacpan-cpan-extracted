@@ -1,0 +1,8 @@
+The following logs changes for the CPAN distribution Template::Lace
+
+0.002   25 April 2017
+        - Fixed POD errors in previous version
+
+0.001   25 April 2017
+        - First usable version, with caveats (its still earlly access)
+

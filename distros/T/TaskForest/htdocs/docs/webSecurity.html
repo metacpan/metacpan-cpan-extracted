@@ -1,0 +1,119 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Web Server Security</div>
+  <p>
+    To use the webserver (or even the web service described later) you
+    must have a valid userid and password. <code>taskforestd</code> does
+    not ship with any default userid and password pairs. A password is
+    required to authenticate the person making requests via the web
+    browswer. This userid and password combination may be (and should be)
+    different from the userid and password of the account under which
+    taskforestd is running.
+  </p>
+
+  <p>
+    Which reminds me, as you would expect, <code>taskforestd</code> runs with the
+    privileges of the account that invoked the program. If that account
+    does not have permissions to read and write the job and family files,
+    you will not be able to use the web server.
+  </p>
+
+  <p>
+    It is <b>not</b> a good idea to run <code>taskforestd</code> as root,
+    because even though taskforestd is written with security in mind,
+    running as root opens a huge security hole. And anyway, you shouldn't
+    run as root any program that you download off the 'net any more than
+    you should give a stranger the keys to your house.
+  </p>
+
+  <p>
+    The best method is to create a separate system user account
+    for <code>taskforest</code> and <code>taskforestd</code>, and run the
+    web server and command line requests as that user.
+  </p>
+
+  <p>
+    Coming back to the <code>taskforestd</code> userid and password: The
+    userids and passwords are specified in the configuration file using
+    the same format as Apache's .htpasswd files. You can see commented-out
+    examples of this in
+    the <a href="/docs/runningTaskForestd.html#config_file">configuration
+    file <code>taskforestd.cfg</code></a>. For your convenience, the
+    TaskForest distribution includes a program
+    called <code>gen_passwd</code> that generates text that you can copy
+    and paste into the config file:
+  </p>
+
+  <div class="code"><pre><code>gen_passwd foo bar</code></pre></div>
+
+  The above command will print out somthing that looks like the following;
+
+  <div class="code"><pre><code>foo:4poVZGiAlO1BY</code></pre></div>
+
+  <p>
+    This text can then be copied and pasted into the configuration file as
+    a <a href="/docs/runningTaskForestd.html#valid_user">valid_user
+    option</a>.
+  </p>
+
+  <p>
+    Please see
+    the <a href="/docs/runningTaskForestd.html#config_file">included
+    configuration file, taskforestd.cfg</a>, for a list of each
+    configuration option, and what it means.
+  </p>
+
+  <p>
+    Please keep in mind that the <code>>taskforestd</code> server is not
+    encrypted. Your userid and password will be transmitted in
+    cleartext. This is a huge security hole. Do not do this unless both
+    the client and the server behind a firewall, for example in a local
+    intranet. If someone sniffs your unencrypted userid and password, they
+    can change job files, family files, or delete them too.
+  </p>
+
+  <p>
+    If you wish to use an encrypted, SSL-enabled server, please use the
+    included <code>taskforestdssl</code> program instead
+    of <code>taskforestd</code>. The only difference between the two is
+    that the taskforestd
+    uses <a href="http://search.cpan.org/search?mode=all&query=HTTP%3A%3ADaemon"><code>HTTP::Daemon</code></a>,
+    and <code>taskforestdssl</code>
+    uses <a href="http://search.cpan.org/search?mode=all&query=HTTP%3A%3ADaemon%3A%3ASSL"><code>HTTP::Daemon::SSL</code></a>. To
+    set up SSL, you will need to set up a server key and a server
+    certificate. The locations of these files may be specified in the
+    <a href="/docs/runningTaskForestd.html#config_file">taskforestd
+    configuration file</a>,
+    under <a href="/docs/runningTaskForestd.html#server_key_file">server_key_file</a>
+    and <a href="/docs/runningTaskForestd.html#server_cert_file">server_cert_file</a>,
+    respectively. You can find more information in the documentation
+    of <a href="http://search.cpan.org/search?mode=all&query=HTTP%3A%3ADaemon%3A%3ASSL"><code>HTTP::Daemon::SSL</code></a>.
+  </p>
+
+  <p>
+    If you would like to self-sign a certificate, there are some
+    instructions in the <a href="/docs/howto.html">HOWTO section</a>.
+  </p>
+
+  <p>
+    If your system does not support SSL (for example, with openssl), and
+    you would like to use taskforestd across the Internet, my advice would
+    be: ``Don't.'' If you do, you would essentially be giving the world
+    the ability to run any command on your server. If you still want to do
+    it, at least make sure that the system account that taskforestd runs
+    under does not have write access to any files, especially those in
+    <a href="/docs/runningTaskForestd.html#job_dir">job_dir</a>, <a href="/docs/runningTaskForestd.html#log_dir">log_dir</a>
+    and <a href="/docs/runningTaskForestd.html#family_dir">family_dir</a>. This
+    means that you would not be able to change job or family files or
+    schedule reruns using taskforestd, but neither would the rest of the
+    world be able to do that on your machine.
+  </p>
+  
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

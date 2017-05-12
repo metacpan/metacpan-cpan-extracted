@@ -1,0 +1,12 @@
+Revision history for Perl Extention Text::CSV::LibCSV
+
+0.10 Thu Mar 05 07:04:33 JST 2007
+	- Followed libcsv 1.0.0. Required libcsv >= 1.0.0.
+	- Implemented OO interface.
+
+0.02 Thu Mar 01 19:24:30 JST 2007
+	- Fixed a bug that happens when data contains null characters.
+	  (Thanks to libcsv's author Robert Gamble)
+
+0.01 Thu Mar 01 00:21:17 JST 2007
+	- original version

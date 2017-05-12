@@ -1,0 +1,84 @@
+Revision history for Perl extension Test::XML::Simple.
+1.05 Tue Jan 3, 11:13:05 PST 2017
+    - Yet more fixes from Sergiy Borodych (thanks for your patience!):
+    -- Mark code in README with triple backticks
+    -- Update Perl version list in travis.yml
+    -- Change supported version comment to '5.8 and above'.
+    -- Fix double call of `like` when no child nodes are found at an xpath
+
+1.04  Mon Jan 18,13:23:21 PST 2016
+    - More fixes from Sergiy Borodych:
+    -- Add "use strict" and "use warnings"
+    -- Set minimum Perl version set to 5.8
+    -- Add .travis.yml file
+    -- is_xml now properly returns true or false
+    -- Minor test fixes
+
+1.03  Sat Jan 26 13:37:11 PST 2013
+    - Update README
+
+1.02  Fri Jan 25 18:09:24 PST 2013
+    - Added ability to pass in a XML::LibXML::Document object
+    - clean up unused variable
+      Thanks to bor@GitHub (Sergiy Borodych) for the fixes!
+
+1.01  Tue Jun  5 12:44:22 PDT 2012
+    - Changed LEGAL section to LICENSE so CPANTS sees it.
+    - Change XML::LibXML min version to 1.99 so tests are consistent.
+
+1.00  Sat Sep 19 02:52:31 PDT 2009
+	- Switched to Test::Builder::Tester for testing to get rid of
+	  problems with threaded Perls and Test::Builder::Capture.
+	- Fixed test levels for call so that test failures are reported
+          at the invocation of the test rather than down inside the module.
+
+0.10  Sun Aug 23 15:29:16 PDT 2009
+	- Added license
+        - Added Test::LongString prereq as per AKAPLAN
+        - Fixed META.yml to be a known-good format
+
+0.09  Tue Dec 20 17:20:44 PST 2005
+	- xml_like did not return a true value when it
+	  works properly.
+
+0.08  Tue Dec 20 16:04:14 PST 2005
+	- Make sure the backup error message for xml_like
+	  includes the user's supplied comment.
+
+0.07  Tue Dec 20 14:25:52 PST 2005
+	- change xml_like to search through all text and
+	  CDATA sections whe doing a match.
+
+0.06  Fri Dec  9 16:42:11 PST 2005
+	- Fixed some really egregious errors in the 
+	  XML comparisons. (Note to self: find *all*
+	  the interface differences next time!)
+	- added _long versions of the test functions.
+	  these use Test::More's comparisons. The 
+	  xml_is, xml_like, and xml_is_deeply
+	  functions all use Test::Longstring, for
+	  those who want the same tests, less filling.
+
+0.05  Mon Nov 28 14:41:58 2005
+	- Switched to XML::LibXML
+	- reordered Test::Tester to the top in all tests
+	- fixed test tests that had no result testing
+        - tests now fail with the appropriate message
+	  instead of diag'ing it
+
+0.04  Wed Sep 14 14:43:10 2005
+	- Fixed xml_is and xml_like to handle attributes better
+	  (//node[@attr] will now actually return the value of the
+	  attribute instead of dying)
+
+0.03  Thu Sep  8 17:36:52 2005
+	- Updated docs (included docs for xml_is_deeply)
+	- Added tests
+
+0.02  Thu Apr 21 14:05:42 2005 
+	- added Test::Tester to the prereqs (oops).
+
+0.01  Tue Mar  1 08:18:07 2005
+	- original version; created by h2xs 1.21 with options
+		-AX -n Test::XML::Simple
+

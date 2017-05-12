@@ -1,0 +1,29 @@
+---
+name: Config-Format-Ini
+version: 0.07
+author:
+  - 'Ioannis Tambouras <ioannis@cpan.org>'
+abstract: Reads INI configuration files
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Attribute::Handlers: 0
+  File::Slurp: 0
+  Parse::RecDescent: 0
+  perl: 5.008008
+recommends:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 1.0
+provides:
+  Config::Format::Ini:
+    file: lib/Config/Format/Ini.pm
+    version: 0.06
+  Config::Format::Ini::Grammar:
+    file: lib/Config/Format/Ini/Grammar.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

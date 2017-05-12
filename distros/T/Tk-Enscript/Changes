@@ -1,0 +1,21 @@
+Revision history for Perl extension Tk::Enscript.
+
+1.10
+	- make sure supplied enscript.cfg is always read
+	  (but a user-defined enscript.cfg may still override the
+	  defaults) 
+
+1.09
+	- workaround in test file for older perls/Tks
+
+1.08
+	- a2ps not supported anymore
+	- Pod fixes
+	- test script more robust
+
+1.05
+	- ready for CPAN
+
+0.01  Sun May 17 18:27:53 1998
+	- original version; created by h2xs 1.18
+

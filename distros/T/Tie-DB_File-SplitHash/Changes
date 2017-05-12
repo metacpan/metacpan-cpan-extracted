@@ -1,0 +1,20 @@
+
+ 1.05 2005.11.18 - Added version requirement for Pod::Coverage to tests
+
+ 1.04 2005.10.03 - Fixed build test failures under MSWindows.
+                   Merged db creation tests with newer tests.
+
+ 1.03 2005.09.29 - Fixed build test failure caused by root being able
+                   to create directories and files even in 'forbidden'
+                   directories. No functional changes.
+
+ 1.02 2005.09.27 - Added Build.PL support, META.yml and Changes. Revised
+                   documentation. Extended build test coverage to 100%
+                   code coverage. Removed unneeded usage of 'Tie::Hash'.
+                   Fixed bug in NEXTKEY causing CLEAR to throw errors.
+                   Added LICENSES, GPL_License.txt and
+                   Artistic_License.txt.
+
+ 1.01 2000.03.06 - Removed 'dependencies' on built-ins that caused
+                   'make' failures and added install tests.
+

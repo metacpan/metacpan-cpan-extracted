@@ -1,0 +1,88 @@
+{
+   "abstract" : "Detects needless modules which are being used in your module",
+   "author" : [
+      "moznion <moznion@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-UsedModules",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::LocalFunctions" : "0.21",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PPI::Document" : "1.215",
+            "PPI::Dumper" : "1.215",
+            "Test::Builder::Module" : "0.98",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Load" : "0",
+            "Test::Builder::Tester" : "1.22",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Test::UsedModules" : {
+         "file" : "lib/Test/UsedModules.pm",
+         "version" : "0.03"
+      },
+      "Test::UsedModules::Constants" : {
+         "file" : "lib/Test/UsedModules/Constants.pm"
+      },
+      "Test::UsedModules::PPIDocument" : {
+         "file" : "lib/Test/UsedModules/PPIDocument.pm"
+      },
+      "Test::UsedModules::Sandbox" : {
+         "file" : "lib/Test/UsedModules.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/Test-UsedModules/issues"
+      },
+      "homepage" : "https://github.com/moznion/Test-UsedModules",
+      "repository" : {
+         "url" : "git://github.com/moznion/Test-UsedModules.git",
+         "web" : "https://github.com/moznion/Test-UsedModules"
+      }
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+use strict;
+use Test::Standalone;
+
+main();
+
+sub main {
+    for my $file (@ARGV) {
+        die "No such file: $file" unless -f $file;
+        print "$file has ", -s $file, " bytes\n";
+    }
+}
+
+=begin test
+use Test::More tests => 3;
+use Test::Exception;
+
+use File::Temp qw(tempfile); 
+use Test::Output;
+
+my($fh, $file) = tempfile();
+print $fh "123";
+close $fh;
+
+@ARGV = ($file);
+stdout_is(\&main, "$file has 3 bytes\n", "Test STDOUT");
+
+is(-s $file, 3, "Check with -s");
+
+@ARGV = ("/tmp/does/not/exist");
+throws_ok { main() } qr/No such file/, "Dies with non-existent files";
+
+=end test

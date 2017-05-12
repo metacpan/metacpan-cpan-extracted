@@ -1,0 +1,34 @@
+Tie/FileHandle/Buffer version 0.11
+==================================
+
+This module, when tied to a filehandle, will capture and store all that
+is output to that handle.  You may then act on that stored information in
+one of the following ways.
+
+ my $contents = (tied *HANDLE)->get_contents; # retrieves the stored output
+
+ (tied *HANDLE)->clear; # clears the output buffer
+
+This module goes hand in hand with the Output::Buffer module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tie::FileHandle::Base (version 0.1 or greater)
+
+COPYRIGHT AND LICENCE
+
+Written by Robby Walker ( robwalker@cpan.org ) for Point Writer ( http://www.pointwriter.com/ ).
+
+You may redistribute/modify/etc. this module under the same terms as Perl itself.
+

@@ -1,0 +1,14 @@
+Revision history for Text-PageLayout
+
+0.04    2014-07-04
+        Better handling of over-long paragraphs
+
+0.04    2014-06-16
+        Fixed distribution (inclusion of Makefile.PL)
+
+0.03    2014-06-02
+        fillup_pages option, defualting to 1.
+
+0.01    2014-05-28
+        First version, released on an unsuspecting world.
+

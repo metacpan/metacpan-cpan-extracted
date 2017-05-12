@@ -1,0 +1,34 @@
+
+README for Tk::Tree
+===================
+
+This is a port of the Tix widget "TixTree" to Perl/Tk.
+
+My hope is that this will be merged in the normal Perl/Tk distribution.
+
+Please note that a Tree is not Scrolled like in Tix.  If you want it
+scrolled use $w->Scrolled( qw/Tree .../ ) or $w->ScrlTree( qw/.../ )
+
+This is my first foray into Perl/Tk programming, so I have certainly
+got some things wrong.  I'll be happy to fix any bugs or unimplemented
+features that you come across.
+
+This release includes:
+
+    VTree.pm            Base class for Tree
+    Tree.pm             The Tree class
+    TixWidget.pm        Implements tixEvent and tixGetimage
+    perl-tix-tree       Perl version of Tix4.1.0/demos/samples/Tree.tcl
+    perl-tix-dyntree    Perl version of Tix4.1.0/demos/samples/DynTree.tcl
+    adjuster            An example with an adjustable window.
+    HList.patch         Required patch for HList.pm
+    HList.pm.patched    Already patched version of HList.pm 2.013
+
+HList.patch
+===========
+This is a *required* patch for the HList.pm that comes with Tk402.003.
+It is installed automatically.
+
+Enjoy,
+Chris Dean
+12 January 1998

@@ -1,0 +1,168 @@
+#!/usr/bin/perl -w
+###########################################
+# trashpark - Park your trash at a safe location
+###########################################
+use strict;
+
+use Log::Log4perl qw(:easy);
+use Trash::Park;
+use Sysadm::Install qw(:all);
+use Test::More;
+use File::Basename;
+use Stat::lsMode;
+use Trash::Park;
+use Getopt::Std;
+use Pod::Usage;
+
+use vars qw($CVSVERSION);
+
+$CVSVERSION = '$Revision: 1.3 $';
+
+getopts("VLvd:e:ixlhs:p:", \my %opts);
+
+my $log_level = $INFO;
+$log_level = $DEBUG if $opts{v};
+
+Log::Log4perl->easy_init({
+    $log_level == $DEBUG ? () : (category => "Trash::Park"),
+    level    => $log_level,
+});
+
+if($opts{V}) {
+    my ($version) = 
+        $CVSVERSION =~ /(\d\S+)/;
+    die "$0 $version\n";
+}
+
+my @trashdir = (trash_dir => 
+                $opts{d}) if $opts{d};
+my $trasher = Trash::Park->new(@trashdir, opts => \%opts);
+
+if($opts{x}) {
+  my $answer = ask "Destroy everything " .
+    "in $trasher->{trash_dir} ([y]/n)?", 
+    "y";
+    rmf $trasher->{trash_dir} if 
+        $answer =~ /y/i;
+
+} elsif($opts{h} or $opts{l} or $opts{L}) {
+
+    my %argv = map { $_ => 1 } @ARGV;
+
+    my $history = $trasher->history or
+    LOGDIE "Cannot get history";
+
+    for my $item (@$history) {
+        my $base = basename($item->file());
+           # List only specified items via "-l file ..." ?
+        next if @ARGV and ! exists $argv{$base};
+
+        if($opts{L}) {
+            print $trasher->repo() . $item->file(), "\n";
+        } else {
+            print $item->as_string(), "\n";
+        }
+    }
+
+} elsif($opts{e}){
+    $trasher->expire($opts{e} || -1);
+} else {
+  pod2usage("No file given") unless @ARGV;
+  for(@ARGV) {
+    $trasher->trash($_);
+  }
+}
+
+__END__
+
+=head1 NAME
+
+    trashpark - Store files safely with querying capability
+
+=head1 SYNOPSIS
+
+        # Park one or more files or directories (recursively)
+    trashpark file ...
+
+        # Display parking history
+    trashpark -h
+      rw-rw-r-- 2005-08-10 23:45:38   mschilli /tmp/file
+      r--r--r-- 2005-08-10 23:46:04   mschilli /tmp/other
+
+        # Like history, just limit list to one or more
+        # file basenames (no path will be matched)
+    trashpark -l file ...
+      rw-rw-r-- 2005-08-10 23:45:38   mschilli /tmp/file
+
+        # Like -l, just show full path names to trashcan 
+        # instead of mode, user, move time listing
+    trashpark -L file ...
+      ~/.trashpark/repo/tmp/file
+
+        # Expire all files in the trash can
+        # older than 3 days
+    trashpark -e `expr 24 * 3600 * 3`
+
+=head1 DESCRIPTION
+
+C<trashpark> helps removing files by hiding them in a safe location
+and providing a query interface.
+
+Without any parameters, C<trashpark> will accept one or more
+names of files (or directories) to move to C<.trashpark>: 
+
+    $ trashpark some/file/somewhere/file.dat
+
+Later on, files in the trashpark can be queried or expired, see
+details below.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-d trashpark-repository-dir>
+
+Set the trash path directory explicitely. 
+If absent, C<~/.trashpark> will be used.
+
+=item B<-h>
+
+Show the parking history of the entire trashpath repository 
+chronologically.
+
+=item B<-l file ...>
+
+Like history, just limit list to one or more
+file basenames (no path).
+
+=item B<-i>
+
+Interactive. Confirm every move with the end user.
+
+    $ trashpark -i /tmp/some.dat
+    Move /tmp/some.dat to ~/.trashpark/repo/tmp/some.dat ([y]/n)? [y]
+
+=item B<-e age_in_seconds>
+
+Expire (i.e. delete) all files in the trashpark older than 
+C<age_in_seconds>. To calculate larger time spans, use 
+the C<expr> command line utility:
+
+    $ trashpark -e `expr 24 * 3600 * 3`
+
+=item B<-x>
+
+Destroy the entire trashpark, including the index.
+
+=back
+
+=head1 LEGALESE
+
+Copyright 2005 by Mike Schilli, 
+all rights reserved. This program is free 
+software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2005, Mike Schilli <cpan@perlmeister.com>

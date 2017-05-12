@@ -1,0 +1,14 @@
+---
+abstract: 'Tie::Locked -- lock hashes so that they cannot be easily changed'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Tie-Locked
+provides:
+    Tie::Locked:
+        file: lib/Tie/Locked.pm
+        version: 1.1
+requires:
+    perl: 5.003
+version: 1.1

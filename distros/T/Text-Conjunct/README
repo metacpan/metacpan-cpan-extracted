@@ -1,0 +1,26 @@
+Text::Conjunct exports a single routine, 'conjunct', which joins a list of words or phrases together, separating the last two by the specified conjunction.
+
+EXAMPLES
+
+"conjunct 'or', 'apples', 'oranges'" gives 'apples or oranges'.
+
+"conjunct 'or', 'apples', 'oranges', 'pears'" gives 'apples, oranges, or pears'.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Kevin Michael Vail
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

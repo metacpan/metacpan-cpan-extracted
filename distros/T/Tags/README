@@ -1,0 +1,48 @@
+NAME
+     Tags - Structure oriented SGML/XML/HTML/etc. elements manipulation.
+
+STRUCTURE
+     Perl structure:
+
+     Reference to array.
+     [type, data]
+
+     Types:
+     a  - Tag attribute.
+     b  - Begin of tag.
+     c  - Comment section.
+     cd - Cdata section.
+     d  - Data section.
+     e  - End of tag.
+     i  - Instruction section.
+     r  - Raw section.
+
+     Data:
+     a - $attr, $value
+     b - $element
+     c - @comment
+     cd - @cdata
+     d - @data
+     e - $element
+     i - $target, $code
+     r - @raw_data
+
+SEE ALSO
+    Task::Tags
+        Install the Tags modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Tags>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2005-2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.01
+

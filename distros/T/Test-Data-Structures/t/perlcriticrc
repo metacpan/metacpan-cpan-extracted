@@ -1,0 +1,10 @@
+[NamingConventions::Capitalization]
+packages = :no_restriction
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 80
+[InputOutput::ProhibitBacktickOperators]
+only_in_void_context = 1
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 35
+[InputOutput::RequireBriefOpen]
+lines = 25

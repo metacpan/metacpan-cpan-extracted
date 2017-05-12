@@ -1,0 +1,8 @@
+Revision history for Perl extension Template::Plugin::RSSLite.
+
+0.01  Sat Feb 15 19:57:46 2003
+	- original version; created by h2xs 1.21 with options
+		-n Template::Plugin::RSSLite -A -X
+
+0.02 Thu Apr 17 20:28:32 CEST 2003
+	- Fixed dep check and author in Makefile.PL

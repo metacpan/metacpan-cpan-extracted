@@ -1,0 +1,107 @@
+=head1 NAME
+
+Template::Refine::Cookbook::Attributes - learn how to annotate a form
+
+=head1 DESCRIPTION
+
+You have a form,
+and some fields are required.  You want to annotate the labels of the
+required fields with a C<*> so that the user knows they're required.
+(You also don't want the designer to do this manually, since you may
+change the requirements in your code at some point.)
+
+C<Template::Refine> to the rescue!
+
+We'll start by defining a Moose class that is the "result" of submitting
+the form:
+
+    package Person;
+    use Moose;
+
+    has 'name' => ( is => 'ro', isa => 'Str', required => 1 );
+    has 'bio'  => ( is => 'ro', isa => 'Str' );
+    has 'age'  => ( is => 'ro', isa => 'Int', required => 1 );
+
+Hopefully you're using Moose by now, but if not, I think the code is
+pretty easy to understand.  Person has three fields, name, bio, and
+age.  Name and age are required.  Bio is optional.
+
+Now let's see what the designer gave us as HTML:
+
+    <form>
+        <div id="name">
+            <span class="label">Name</span>: <input />
+        </div>
+        <div id="bio">
+            <span class="label">Biography</span>: <input />
+        </div>
+        <div id="age">
+            <span class="label">Age</span>: <input />
+        </div>
+    </form>
+
+You can see that each field has a region that can be selected with
+C<<//div[@id='<name>']>>.  Inside that region, the label can be
+selected with C<<//span[@class='label']>> or similar.
+
+Here's how to write a C<Template::Refine> rule for a two-stage scheme
+like this:
+
+    sub transform {
+        my $frag = shift;
+        for my $attribute (Person->meta->compute_all_applicable_attributes) {
+
+            my $attribute_id = $attribute->name;
+            $frag = $frag->process(
+                simple_replace {
+                    my $n = shift;
+                    my $sub_fragment = Template::Refine::Fragment->new_from_string(
+                        $n->toString,
+                    );
+                    return annotate_required_field($sub_fragment, $attribute)->fragment;
+                } "//*[\@id='$attribute_id']"
+            );
+        }
+        return $frag
+    }
+
+    sub annotate_required_field {
+        my ($fragment, $attribute) = @_;
+        return $fragment unless $attribute->is_required;
+        return $fragment->process(
+            simple_replace {
+                my $n = shift;
+                return replace_text $n, $n->textContent . ' *';
+            } q|//*[@class='label']|,
+        );
+    }
+
+The C<transform> subroutine processes the entire form.  For each
+attribute, it creates a rule that finds that attribute's region (the
+div).  In the coderef that generates the replacement, we generate a
+C<Template::Refine::Fragment> that represents only that region.  Then
+we process the "sub fragment", this time looking for the labels (via
+C<annotate_required_field>).  For each label found, we get the
+existing text and add a C<*> if the attribute's metaclass indicates
+that it is required.
+
+The whole script (minus those two functions) looks like this:
+
+    use Person;
+    use Template::Refine::Fragment;
+    use Template::Refine::Utils qw(replace_text simple_replace);
+
+    my $frag = Template::Refine::Fragment->new_from_file('person_form.html');
+    print transform($frag)->render;
+
+And the output is what you would expect from looking at the HTML and
+Moose class:
+
+    <form>
+        <div id="name">
+            <span class="label">Name *</span>: <input/></div>
+        <div id="bio">
+            <span class="label">Biography</span>: <input/></div>
+        <div id="age">
+            <span class="label">Age *</span>: <input/></div>
+    </form>

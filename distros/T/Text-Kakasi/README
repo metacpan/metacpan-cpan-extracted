@@ -1,0 +1,54 @@
+# $Id: README,v 2.0 2003/05/22 18:19:11 dankogai Exp $
+
+About this module
+-----------------
+
+This module provides interface to kakasi (kanji kana simple inverter).
+kakasi is a set of programs and libraries which does what Japanese
+input methods do in reverse order.  You feed Japanese and kakasi
+converts it to phonetic representation thereof.  kakasi can also be
+used to tokenizing Japanese text. To find more about kakasi, see
+<http://kakasi.namazu.org/> .
+
+How to install
+--------------
+
+0.  Make sure you have kakasi installed.  Here is a typical
+installation procedure.
+
+% gzip -dc kakasi-(version).tar.gz | tar xvf -
+% cd kakasi-2.3.4
+% ./configure
+% make
+% su make install
+
+There are also many ports/packages available for many platforms.
+Consult the documents of your platform.
+
+1.  Install this module.
+
+% gzip -dc Text-Kakasi-(version).tar.gz | tar xvf -
+% cd Text-Kakasi-(version)
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+1a. Install this module via CPAN
+
+% perl -MCPAN -e 'install Text::Kakasi'
+
+How to use
+----------
+
+See perldoc Text::Kakasi.
+
+Copyright
+---------
+
+(C) 1998, 1999, 2000 NOKUBI Takatsugu <knok@daionet.gr.jp>
+(C) 2003 Dan Kogai <dankogai@dan.co.jp>
+
+There is no warranty for this free software. Anyone can modify and/or
+redistribute this module under GNU GENERAL PUBLIC LICENSE. See COPYING
+file that is included in the archive for more details.

@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 60984c74d7086b1cd874005a042e975bccd144de COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 662762ecb07184f2ac595e0cae2431077921a6b9 Changes
+SHA1 659e31700c84d40b906c36a2c6e0f7541f343eaa INSTALL
+SHA1 ec5a7b4f3023f03ebf821b57690758f7e6f3ae2a LICENSE
+SHA1 2bd19f50b84a5e6634e9d0a8e1622751ad4ee55f MANIFEST
+SHA1 775baf8fd52bd380168f1717e765d7972e4785d4 META.json
+SHA1 45170a88004a1d1dbd86fbf4940fa98c94c997af META.yml
+SHA1 8d75e5c95eb7cf471e2a4345a0a3b1db6a487071 Makefile.PL
+SHA1 77a74aac4f98ae13711b5ace2aac4863aec78bff README
+SHA1 18f501739cf2e088b1a3ffc3025222a32df57ae1 dist.ini
+SHA1 d21e122131c685986ab6acac56320e7e2e545078 doap.ttl
+SHA1 954fb806be1f15d68999a0542a9612345748c757 lib/Type/Coercion/Wrapped.pm
+SHA1 894a99a1bd2b203e99d345df772492005027b842 lib/Type/Tiny/Wrapped.pm
+SHA1 ad5b3197450295844fc2cec350153bbce4406dfe lib/Type/Tiny/Wrapper.pm
+SHA1 a68cdc10f86eeaef58e24a8454b24ecf834ddf30 lib/Types/ReadOnly.pm
+SHA1 0c8290b30209b6499e38ed5d9183a9b5e2de114c t/01basic.t
+SHA1 c3c0cc34ac9250070d574516e4b5281f0f373957 t/02readonly.t
+SHA1 41d69c6db9b4f7a97cdd36792df7f8111b507e56 t/03locked.t
+SHA1 407be14b3bceb2e6a582d853e1ff3ce454a65bdd t/10combinations.t
+SHA1 3d07e2a01c7f8875c4dea8526022f42ab2ee8438 t/20moo.t
+SHA1 cc5103aa5d6948973f3a799cdc7b6e8a3d2d8ab8 t/30moose.t
+SHA1 abb32b5cb938a6c2b42aaecfb845ee56d91c6faa t/40mouse.t
+SHA1 8b66027be5061d4069037603d82439d98c384c7d t/50typeparams.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlJ4HfwACgkQzr+BKGoqfTnFzACdHrmfoj+/uDQF5Db1myeLqtj5
+MPMAnjI5kUIJ1jS8d7k2CHGLvOSGaUUk
+=+WBG
+-----END PGP SIGNATURE-----

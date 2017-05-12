@@ -1,0 +1,12 @@
+Revision history for Perl extension Test::Smart.
+
+0.02  Wed Jul 25 15:58:27 2007
+	- last Test::Smart version, name is changing
+	- no feature modifications
+	- you want Test::AskAnExpert now
+
+0.01  Mon Jul 24 16:08:34 2007
+	- original version
+	- proof of concept
+	- features stabilizing but I make no gurantees
+	- at least it has Kwalitee

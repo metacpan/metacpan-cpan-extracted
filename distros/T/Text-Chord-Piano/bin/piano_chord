@@ -1,0 +1,58 @@
+#!perl
+use strict;
+use warnings;
+use Text::Chord::Piano;
+
+my $p = Text::Chord::Piano->new;
+my $chord = shift or usage($p->all_chords);
+print $p->chord($chord);
+
+sub usage {
+    my @all_chords = grep { $_ !~ m![\(\)]! } sort @{ shift() };
+
+    warn <<"_USAGE_";
+$0 version $Text::Chord::Piano::VERSION
+Usage:   piano_chord CHORD_NAME
+Example: piano_chord D#7
+Support Chords:
+@all_chords
+_USAGE_
+    exit;
+}
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+piano_chord - view piano chord table
+
+
+=head1 SYNOPSIS
+
+    $ piano_chord CHORD_NAME
+
+
+=head1 EXAMPLES
+
+    $ piano_chord Dm9
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<Text::Chord::Piano>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut

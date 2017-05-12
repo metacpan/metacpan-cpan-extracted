@@ -1,0 +1,24 @@
+---
+abstract: 'Filter your CSS with CSS::LESSp'
+author:
+  - 'Michael Langner'
+build_requires:
+  Template::Context: 0
+  Template::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-CSS-LESSp
+requires:
+  CSS::LESSp: 0
+  Template::Plugin::Filter: 0
+  base: 0
+  strict: 0
+  warnings: 0
+version: 0.03

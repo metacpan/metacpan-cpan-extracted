@@ -1,0 +1,48 @@
+---
+abstract: 'Metabolic preforking AnyEvent HTTP server for PSGI'
+author:
+  - 'INA Lintaro <tarao.gnn@gmail.com>'
+build_requires:
+  AnyEvent::HTTP: '0'
+  HTTP::Headers: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  Plack: '0'
+  Test::More: '0'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Twiggy-Prefork-Metabolic
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Handler::Twiggy::Prefork::Metabolic:
+    file: lib/Plack/Handler/Twiggy/Prefork/Metabolic.pm
+  Twiggy::Prefork::Metabolic:
+    file: lib/Twiggy/Prefork/Metabolic.pm
+    version: '0.02'
+  Twiggy::Prefork::Metabolic::Server:
+    file: lib/Twiggy/Prefork/Metabolic/Server.pm
+  Twiggy::Prefork::Metabolic::Server::SS:
+    file: lib/Twiggy/Prefork/Metabolic/Server/SS.pm
+requires:
+  Twiggy::Prefork: '0'
+resources:
+  bugtracker: https://github.com/tarao/perl5-Twiggy-Prefork-Metabolic/issues
+  homepage: https://github.com/tarao/perl5-Twiggy-Prefork-Metabolic
+  repository: git://github.com/tarao/perl5-Twiggy-Prefork-Metabolic.git
+version: '0.02'

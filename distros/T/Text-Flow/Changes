@@ -1,0 +1,5 @@
+Revision history for Perl extension Moose
+
+0.01 
+    - I needed a text wrapping module which was a little 
+      more flexible then the other ones out there.

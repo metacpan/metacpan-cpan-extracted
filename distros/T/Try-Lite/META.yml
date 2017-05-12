@@ -1,0 +1,36 @@
+---
+abstract: 'easy exception catcher with auto rethrow'
+author:
+  - 'Kazuhiro Osawa <yappo {@} shibuya {dot} pl>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.020
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Try-Lite
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Exporter: 0
+  Scalar::Util: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/yappo/p5-Try-Lite/issues
+  homepage: https://github.com/yappo/p5-Try-Lite
+  repository: https://github.com/yappo/p5-Try-Lite.git
+version: 0.0.3
+x_contributors:
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

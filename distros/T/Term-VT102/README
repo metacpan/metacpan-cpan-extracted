@@ -1,0 +1,33 @@
+This is the README file for Term::VT102, a Perl module which provides
+emulation of a VT102 terminal.
+
+Like the "expect" Tcl extension, this module is intended primarily for use
+as a way of automating processes; for instance, you can write a script which
+connects via telnet to a full-screen service of some kind (such as a router,
+or a telephone switch), uses this module to parse the output, and therefore
+can tell what is currently "on the screen" and react accordingly.  "Expect"
+cannot really do this, as it is stream-oriented, rather than being able to
+tell you, say, what's on the top row of the screen.
+
+For installation instructions, see the INSTALL file.
+
+Please send bug reports, comments, and whatnot to the project maintainer,
+Andrew Wood <andrew dot wood at ivarch dot com>.
+
+Credit is also due to:
+
+  Charles Harker <CHarker at interland dot com>
+    - reported and helped to diagnose a bug in the handling of TABs
+
+  Steve van der Burg <steve dot vanderburg at lhsc dot on dot ca>
+    - supplied basis for an example script using Net::Telnet
+
+  Chris R. Donnelly <cdonnelly at digitalmotorworks dot com>
+    - added support for DECTCEM, partial support for SM/RM
+
+  Paul L. Stoddard
+    - reported a possible bug in cursor movement handling
+
+  Joerg Walter
+    - provided a patch for Unicode handling
+

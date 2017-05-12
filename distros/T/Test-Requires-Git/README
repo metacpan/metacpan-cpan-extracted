@@ -1,0 +1,34 @@
+NAME
+
+Test::Requires::Git - Check your test requirements against the available version of Git
+
+SYNOPSIS
+
+    use Test::Requires::Git;
+
+    # needs some git that supports `git init $dir`
+    test_requires_git version_ge => '1.6.5';
+
+DESCRIPTION
+
+Test::Requires::Git checks if the version of Git available for testing
+meets the given requirements.
+
+The "current git" is obtained by running "git --version" (so the first
+"git" binary found in the "PATH" will be tested).
+
+If the checks fail, then all tests will be skipped.
+
+AUTHOR
+
+Philippe Bruhat (BooK), <book@cpan.org>.
+
+COPYRIGHT
+
+Copyright 2015 Philippe Bruhat (BooK), all rights reserved.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

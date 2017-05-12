@@ -1,0 +1,167 @@
+0.81 Mon 25 Nov 13:23:57 UTC 2013
+    - Add the 'nofollow_extended' option to add rel="nofollow" to extended
+      links. Thanks to Ian McEwen for this patch.
+
+0.80 Mon 23 Jul 16:23:14 BST 2012
+    - Automatic absolute links now work when at the very start of some text
+      Fixes bug #27850.
+
+0.79
+    Fri Jun 29 01:43:12 UTC 2007 ($Rev: 4391 $, $Author: chromatic $)
+    - removed noisy and unnecessary diag() calls in tests
+    - fixed a magic @ISA assignment for 5.9.5 (Andreas Koenig)
+    - removed signature test (not that useful)
+
+	Tue Oct 10 04:46:55 UTC 2006 (Rev: 2945, Author: chromatic)
+	- removed directory changes in tests
+	- return merged hash from merge_hash()
+	- added hash merging tests from Derek Price (part of RT #21269)
+	- fixed nested lists error reported by Derek Price (RT #21269)
+
+0.78
+	Thu Mar 30 06:13:42 UTC 2006 (Rev: 14494, Author: chromatic)
+	- fixed merge_blocks() bug reported by Richard Harman
+	- moved developer tests to t/developer and skipped them for everyone else
+	- updated copyright notices
+
+0.77
+	Sat Oct 29 02:54:02 UTC 2005 (Rev: 9337, Author: chromatic)
+	- removed MANIFEST.SKIP (hopefully fixing Test::Signature errors)
+
+0.76
+	Mon Jul 25 05:58:24 UTC 2005 (Rev: 6518, Author: chromatic)
+	- bumped up version number
+	- added documentation to Text::WikiFormat::Blocks
+	- checked in t/pod.t
+
+	Thu Jul 14 06:45:57 UTC 2005 (Rev: 6309, Author: chromatic)
+	- fixed CAMELCASE linking bug reported by punkish on Perl Monks
+	- fixed inadvertent $title reuse in find_link_title()
+
+	Wed Jul 13 03:16:14 UTC 2005 (Rev: 6249, Author: chromatic)
+	- fixed a bug in list detection (find paragraphs correctly)
+	- removed unnecessary .t files in top-level directory (not distributed)
+	- removed unused functions:
+		- get_block()
+		- get_indentation()
+		- find_list()
+		- end_list()
+		- end_all_lists()
+	- added POD and POD coverage tests
+	- added stub documentation to Text::WikiFormat::Blocks
+	- modified tests to work better with Devel::Cover
+
+0.75
+	Sat Jul  2 19:48:00 UTC 2005 (Rev: 5727, Author: chromatic)
+	- support absolute_links (Alex Vandiver and Best Practical)
+	- edited documentation to use better English
+	- added tests for a few undertested functions (t/subs.t)
+	- signed distribution
+	- added passthrough Makefile
+	- bumped up copyright year
+
+	Sun Apr 17 05:10:19 UTC 2005 (Rev: 5727, Author: chromatic)
+	- added t/embedded-links.t from Art Henry
+	- allowed nested embedded links (MediaWiki support)
+
+	Sun Nov 28 23:58:18 UTC 2004 (Rev: 16, Author: chromatic)
+	- re-set properties on Changes
+	- bumped up version number (also stringify it)
+	- added Text::WikiFormat::Blocks to MANIFEST (oops)
+
+	Sun Nov 28 23:38:20 UTC 2004 (Rev: 15, chromatic)
+	- added more nesting tests (Teun van Eijsden)
+	- fix multiple levels of nesting (Teun van Eijsden)
+
+	Sun Nov 28 08:39:37 UTC 2004 (Rev: 14, chromatic)
+	- moved blocks into their own classes
+	- added Text::WikiFormat::Blocks
+	- fixed up failing tests from that fallout
+	- simplified lots of Text::WikiFormat internals
+
+	Sat Nov 27 16:44:38 UTC 2004
+	- mark build_requires in Build.PL
+	- use Scalar::Util::reftype() for checking ref
+	- added missing t/links.t test (don't know where it came from)
+
+0.72 Sun May  9 00:20:26 UTC 2004
+	- further code block nested indentation fixes (reported by Chris Winters)
+
+	Sat May  8 06:44:54 UTC 2004
+	- improve code block handling (reported by Chris Winters)
+
+	Sat Apr 24 18:57:17 UTC 2004
+	- don't add prefix to absolute links when expecting them (Paul Schmidt and
+	  Chris Winters)
+
+0.71 Tue Aug  5 00:49:09 GMT 2003
+	- fixed a bug in default paragraph regex (Sam Vilain and Kake)
+
+0.70 Thu Jul 31 04:56:51 GMT 2003
+	- apply slightly modified patch from Andy H. for absolute extended links
+
+Wed Jul 30 01:23:01 GMT 2003
+	- process header block contents (Kake)
+	- fix an unintentional static variable bug in find_link_title()
+	- fix a hash order bug in base.t (found by Kake)
+	
+Tue Jul 29 04:11:05 GMT 2003
+	- fix Kake's last nesting problem
+	- allow overriding strong and emphasized tag regexes
+
+Fri May 16 07:29:15 GMT 2003
+	- allow nested lists
+	- major cleanup (see first point)
+	- add indent tag
+	- remove indent from list regexes
+
+0.60 Sat Mar  1 18:54:06 GMT 2003
+	- ported to use Module::Build
+
+      Wed Feb 19 22:25:56 GMT 2003
+	- added t/merge-hash.t (Kake)
+	- make sure nested hashes merge even if not in destination (Kake)
+	- protect against overwriting values of 0 (almost wrote a bug!)
+	- fix a doc typo (Kake)
+	- allow alternate extended link delimiters (Kake)
+	- addede explicit.t (Kake)
+	- added t/tag-override-use-as.t (Kake)
+
+0.50 Thu Dec 26 23:07:07 GMT 2002
+	- added t/tag-override.t tests for tag overriding (Kake)
+	- minor refactorings to improve design
+	- use hash merging to fix HoH overriding (Kake, again)
+	- added t/lists-no-indent.t to test that non-indented lists work (kake)
+	- added patch from Kake to allow non-indented lists
+
+0.45 Fri Oct 18 01:14:53 UTC 2002
+	- signed distribution with Module::Signature (thanks, Autrijus!)
+
+     Thu Sep 12 18:11:10 UTC 2002
+	- end lists followed by empty paragraphs (RT #1455b, <kake@earth.li>)
+	- add 'implicit_links' flag (suggestion from Kate (kake))
+	- fixed an import bug (also from kake, who provided tests!)
+	- encode links property (yet another kake idea!)
+
+	 Sat Aug 24 23:35:44 UTC 2002
+	- don't end a list if no list is active (RT #1455, <deus_x@pobox.com>)
+
+0.40 Tue Jun 11 05:23:44 UTC 2002
+	- added _available_lists(), 'linkorder', and t/lists.t
+	- made format() respect 'linkorder'
+	- made end_list() return blank code for empty list
+	(all suggested by Tom Hukins, see CPAN RT #671)
+
+	- avoid 'Subroutine redefined' warning with 5.8 in t/Wiki.t
+
+0.30 Thu May  2 20:42:14 PDT 2002
+	- added import() and its tests, suggested by Tony Bowden <tony@kasei.com>
+
+0.20 Lost in the Mists of Time
+	- initial CPAN release
+
+0.10 Before Beer Was Invented
+	- distributed with SlashWiki
+
+0.01 Pre-History
+	- part of the Jellybean project

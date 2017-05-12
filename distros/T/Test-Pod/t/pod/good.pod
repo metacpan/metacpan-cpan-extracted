@@ -1,0 +1,17 @@
+=head1 NAME
+
+Test::Pod test pod -- a valid pod file
+
+=head1 DESCRIPTION
+
+This is a pod file without errors.
+
+=head1 AUTHOR
+
+Andy Lester, garbage-address@aol.com
+
+=head1 COPYRIGHT
+
+Copyright 2004, Andy Lester
+
+=cut

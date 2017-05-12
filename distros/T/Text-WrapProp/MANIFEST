@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-WrapProp.t
+lib/Text/WrapProp.pm
+eg/sample.pl
+eg/wrap_prop-regex_slow.pl
+eg/wrap_prop-chars_fast-alpha.pl 
+eg/NOTES
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

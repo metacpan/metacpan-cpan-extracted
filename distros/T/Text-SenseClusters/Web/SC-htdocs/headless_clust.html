@@ -1,0 +1,25 @@
+<html>
+<title>Headless Clustering (native SenseClusters)</title>
+<body>
+<h1>Headless Clustering (native SenseClusters)</h1>
+</body>
+</html>
+
+Headless clustering takes as input contexts that do not contain a target  
+or head word. The entire context must be considered during clustering, as 
+there is no target word around which to adjust the test or training 
+scope, for example. (These are options in discriminate.pl) 
+<br><br>
+Typical examples of headless contexts include email or other short 
+messages or documents, where the goal is to cluster them based on topic. 
+Note that in addition to test_scope and target_scope, target co-occurrence 
+(tco) features are not supported since there are no target words in the 
+contexts. 
+<br><br>
+In SenseClusters native mode, a word co-occurrence matrix is compiled, 
+and that is used to provide word vectors that replace each of the 
+words in a headless context. These word vectors are averaged together to  
+create a representation of that context. The premise is that contexts that  
+are made up of words that occur with some of the same other words will be  
+similar to each other. 
+

@@ -1,0 +1,44 @@
+Text::BasicTemplate v2.006.1
+----------------------------
+
+This is a template parsing module for perl5 and higher.  Originally
+written for use with HTML templates, it has proved quite useful for
+many kinds of printable-character file parsing.
+
+Essentially a highly flexible, efficient search-and-replace mechanism,
+it is typically used to parse templates on disk using specified key/value
+pairs, conditional evaluation, etc.  Templates and the locations in
+the templates of substitution keys are cached, so each template will
+be parsed at most once.
+
+Most template systems face a balancing issue -- too weak a template scheme
+is insufficiently useful, or requires too much involvement of document
+structure in code to achieve maximal benefit.  A template language with
+too much functionality becomes a scripting language itself, generally a poor
+one.  Text::BasicTemplate steps inbetween -- it provides substitution
+(inserting values in the right places) and conditions (outputting one or
+another block of parsed template depending on some input condition).  It does
+not provide functions, except that its substitutions may be composed of
+references to real perl functions in the main code.  This seems to me the ideal balance point -- making simple functionality, adequate to compose entire
+documents from templates -- without becoming itself a scripting language
+or altering the form of the main body of code.
+
+v2 of the module represents a total overhaul of the last released version,
+v0.9.8.  A temporary backwards-compatibility has been provided, and most
+templates written for v0.9.8 and earlier will remain compatible for the
+forseeable future.  This version adds a more robust, arbitrarily nestable
+conditional system, function references, etc.
+
+Text::BasicTemplate does not eval anything from the templates, and passes
+taint checking accordingly.  It uses references internally wherever
+possible for efficiency, and provides type-flexible arguments to
+the important functions (passage of substitutions by scalar, hash, hashref,
+etc).
+
+Copious documentation and examples provided within.
+
+
+Enjoy.
+  Devin Carraway <cpan-textbasictemplate@nospam.devin.com>
+  Sun Feb 24 22:51:10 PST 2002
+

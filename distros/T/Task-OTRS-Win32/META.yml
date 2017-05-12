@@ -1,0 +1,28 @@
+---
+abstract: 'Almost all of the modules required for installing OTRS Help Desk on win32.'
+author:
+  - 'Michiel Beijen <michiel.beijen@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-OTRS-Win32
+requires:
+  Date::Manip: 0
+  Log::Dispatch: 0
+  Log::Dispatch::FileRotate: 0
+  Log::Log4perl: 0
+  Module::Build: 0.39
+  Task::OTRS: 1.04
+  Win32: 0
+  Win32::Console::ANSI: 0
+  Win32::Daemon: 0
+  Win32::Service: 0
+resources:
+  repository: git://github.com/mbeijen/Task-OTRS-Win32.git
+version: 1.12

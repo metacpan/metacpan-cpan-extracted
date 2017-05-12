@@ -1,0 +1,12 @@
+Changes
+lib/Template/Plugin/DBM/Deep.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/01-core.t
+t/02-tt2.t
+t/99-test-distro.t
+t/99-test-pod-coverage.t
+t/99-test-pod.t

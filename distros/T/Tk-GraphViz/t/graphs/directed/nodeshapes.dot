@@ -1,0 +1,93 @@
+digraph test {
+
+ graph [label="Node shapes\nsee http://www.research.att.com/~erg/graphviz/info/shapes.html"];
+ node [style=filled];
+ edge [style=invis,dir=none];
+
+ { graph [rank=same];
+	box [shape=box];
+	ellipse [shape=ellipse];
+	circle [shape=circle];
+	box -> ellipse;
+	ellipse -> circle;
+	};
+ { graph [rank=same];
+	point [shape=point];
+	triangle [shape=triangle];
+	plaintext [shape=plaintext];
+	point -> triangle;
+	triangle -> plaintext;
+	};
+  { graph [rank=same];
+	diamond [shape=diamond];
+	trapezium [shape=trapezium];
+	parallelogram [shape=parallelogram];
+	house [shape=house];
+	diamond -> trapezium;
+	trapezium -> parallelogram;
+	parallelogram -> house;
+	};
+  { graph [rank=same];
+	pentagon [shape=pentagon];
+	hexagon [shape=hexagon];
+	septagon [shape=septagon];
+	octagon [shape=octagon];
+	pentagon -> hexagon;
+	hexagon -> septagon;
+	septagon -> octagon;
+	};
+  { graph [rank=same];
+	doublecircle [shape=doublecircle];
+	doubleoctagon [shape=doubleoctagon];
+	tripleoctagon [shape=tripleoctagon];
+	invtriangle [shape=invtriangle];
+	doublecircle -> doubleoctagon;
+	doubleoctagon -> tripleoctagon;
+	tripleoctagon -> invtriangle;
+	};
+  { graph [rank=same];
+	invtrapezium [shape=invtrapezium];
+	invhouse [shape=invhouse];
+	invtrapezium -> invhouse;
+	};
+  { graph [rank=same];
+	rect [shape=rect];
+	rectangle [shape=rectangle];
+        folder [shape=folder];
+        component [shape=component];
+	rect -> rectangle;
+        rectangle -> folder;
+        folder -> component;
+	};
+
+  box -> point;
+  polygon -> egg;
+  ellipse -> triangle;
+  circle -> plaintext;
+
+  point -> diamond;
+  egg -> trapezium;
+  triangle -> parallelogram;
+  plaintext -> house;
+
+  diamond -> pentagon;
+  trapezium -> hexagon;
+  parallelogram -> septagon;
+  house -> octagon;
+
+  pentagon -> doublecircle;
+  hexagon -> doubleoctagon;
+  septagon -> tripleoctagon;
+  octagon -> invtriangle;
+
+  doublecircle -> invtrapezium;
+  doubleoctagon -> invhouse;
+  tripleoctagon -> Mdiamond;
+  invtriangle -> Msquare;
+
+  invtrapezium -> Mcircle;
+  invhouse -> rect;
+  Mdiamond -> rectangle;
+}
+
+	

@@ -1,0 +1,13 @@
+<?pl start_capture('captured_part'); ?>
+<?pl	if ($exists) { ?>
+[== $exists =]
+<?pl	} else { ?>
+I don't have the exists variable.
+<?pl	}
+	if ($noexist) { ?>
+[== $noexist =]
+<?pl	} else { ?>
+I don't have the noexist variable.
+<?pl	} ?>
+<?pl stop_capture(); ?>
+[== $_context->{captured_part} =]

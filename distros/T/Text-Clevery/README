@@ -1,0 +1,48 @@
+This is Perl module Text::Clevy.
+
+SYNOPSIS
+
+    use Text::Clevy;
+
+    my $tc = Text::Clevy->new();
+
+    my %vars = (
+        lang => 'Smarty',
+    );
+
+    # pass a PSGI request
+    my $psgi_env = {};
+    print $tc->render_string('Hello, {$lang} world!',
+        \%vars, env => $psgi_env);
+
+    # or pass a request object
+    my $request = Plack::Request->new($psgi_env);
+    print $tc->render_string('Hello, {$lang} world',
+        \%vars, request => $request);
+
+
+INSTALLATION
+
+Text::Clevy installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    $ cpan Text::Clevy
+
+Download it, unpack it, then build it as per the usual:
+
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+Text::Clevy documentation is available as in POD. So you can do:
+
+    $ perldoc Text::Clevy
+
+to read the documentation online with your favorite pager.
+
+Goro Fuji (gfx)

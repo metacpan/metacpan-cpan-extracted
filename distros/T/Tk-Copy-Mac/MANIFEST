@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+Mac.pm
+NCopy.pm
+test.pl
+copy.pl

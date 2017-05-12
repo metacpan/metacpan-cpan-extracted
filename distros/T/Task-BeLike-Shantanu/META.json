@@ -1,0 +1,120 @@
+{
+   "abstract" : "All my default Modules in a perl installation",
+   "author" : [
+      "Shantanu Bhadoria <shantanu@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-Shantanu",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus",
+         "inc"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors::India" : "0",
+            "App::cpanminus" : "0",
+            "Authen::Passphrase" : "0",
+            "Catalyst" : "5.90000",
+            "Catalyst::Plugin::Assets" : "0",
+            "Catalyst::Plugin::Authentication" : "0",
+            "Catalyst::Plugin::Session" : "0",
+            "Catalyst::Plugin::Session::Store::FastMmap" : "0",
+            "Catalyst::Plugin::StatusMessage" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Class::InflateColumn::Authen::Passphrase" : "0",
+            "DBIx::Class::PassphraseColumn" : "0",
+            "DBIx::Class::Validation" : "0",
+            "Data::Dumper" : "2.14",
+            "DateTime::Format::MySQL" : "0",
+            "Digest::MD5" : "0",
+            "Dist::Zilla" : "4.300000",
+            "Dist::Zilla::PluginBundle::SHANTANU" : "0",
+            "ExtUtils::MakeMaker" : "6.60",
+            "ExtUtils::ParseXS" : "3.10",
+            "File::ChangeNotify" : "0.23",
+            "File::Copy" : "2.20",
+            "File::Find::Rule" : "0.33",
+            "File::HomeDir" : "1.00",
+            "File::Spec" : "3.40",
+            "File::UStore" : "0",
+            "JSON::XS" : "0",
+            "Log::Log4perl" : "1.40",
+            "Moose" : "2.06",
+            "Perl::Critic" : "0",
+            "Perl::Tidy" : "0",
+            "Pod::Simple" : "3.28",
+            "Pod::Weaver::PluginBundle::SHANTANU" : "0",
+            "Starman" : "0.30",
+            "Test::Pod" : "1.48",
+            "YAML" : "0.84",
+            "YAML::XS" : "0.38",
+            "autodie" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Task::BeLike::Shantanu" : {
+         "file" : "lib/Task/BeLike/Shantanu.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shantanubhadoria/task-belike-shantanu/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Task-BeLike-Shantanu",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/shantanubhadoria/task-belike-shantanu.git",
+         "web" : "https://github.com/shantanubhadoria/task-belike-shantanu"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "Shantanu <shantanu@cpan.org>"
+   ]
+}
+

@@ -1,0 +1,5 @@
+The example for usage of Test::Unit::Lite framework is in ./t directory of
+this distrubution.
+
+The good working examples are also included to Exception::Base and
+Exception::System modules source.

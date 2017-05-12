@@ -1,0 +1,33 @@
+NAME
+    Template::Plugin::Comma - TT Plugin to commify numbers
+
+SYNOPSIS
+      [% USE Comma %]
+
+      [% FILTER comma -%]
+      This item costs 10000 dollar.
+      [%- END %]
+
+      # Output:
+      # This item costs 10,000 dollar.
+
+      This item costs [% item.price | comma %] dollar.
+
+      # Output:
+      # This item costs 10,000 dollar.
+
+DESCRIPTION
+    Template::Plugin::Comma is a plugin for TT, which allows you to commify
+    your numbers in templates. This would be especially useful for prices.
+
+AUTHOR
+    Original idea by Yoshiki Kurihara <kurihara@cpan.org>
+
+    TT plugin implemented by Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Template manpage, "perldoc -q comma"
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension Data::Miscellany.
+
+ 1.02  Do Okt 18 10:09:39 CEST 2007
+        - fixed version requirement of Test::More
+
+ 0.02  Do Okt 18 10:09:39 CEST 2007
+         - fixed version requirement of Test::More
+
+ 0.01  Do Okt  4 19:16:00 CEST 2007
+        - original version
+

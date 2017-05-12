@@ -1,0 +1,46 @@
+Test/AutoLoader version 0.03
+============================
+
+DESCRIPTION
+
+This single-purpose module attempts to eliminate uncaught syntax
+errors or other obvious goofs in subroutines that are autosplit, and
+hence not looked at by C<perl -c Module.pm>.  Ideally, this module
+will become unnecessary as you reach full coverage of those
+subroutines in your unit tests.  Until that happy day, however, this
+should provide a quick and dirty backstop for embarrassing typos.
+
+Test::AutoLoader is built on Test::Builder, and should interoperate
+smoothly with other such modules (e.g. Test::Simple, Test::More).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+To run tests using this module, you will need:
+
+  Test::Builder
+  File::Spec
+
+To run the tests *on* this module, you will need:
+
+  Test::More
+  Test::Tester (optional, but required for the real tests)
+  Test::Pod    (optional)
+
+
+COPYRIGHT AND LICENSE
+
+This module and its accompanying files are distributed under the GNU
+General Public License.
+
+Copyright (C) 2005 Neurogen Corporation, Branford, CT, USA.
+

@@ -1,0 +1,40 @@
+Tree/FP version 0.04
+====================
+Tree::FP is an implementation of a FP-Tree data structure in Perl.
+
+PREREQUISITES
+
+Module currently only tested on 5.6 and up, although should work with earlier version of Perl 5.x.
+
+No non-standard modules required, POSIX is as fancy as it gets.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DOCUMENTATION
+
+See FP.pm for POD-formatted documentation.
+POD is readable with the 'perldoc' utility.
+
+SUPPORT
+
+Questions, bug reports, etc. should be sent to me at nitram@cpan.org
+
+AVAILABILITY
+
+The latest version of Tree::FP is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+COPYRIGHT
+Copyright (c) 2003 Martin Paczynski <nitram@cpan.org>.  All rights reserved.
+This package is free software and is provided "as is" without express or
+implied warranty.  It may be used, redistributed and/or modified under the
+same terms as Perl itself.
+

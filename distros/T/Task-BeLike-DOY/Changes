@@ -1,0 +1,38 @@
+Revision history for Task-BeLike-DOY
+
+0.12  2014-03-17
+      - more deps
+
+0.11  2013-07-26
+      - couple more deps
+
+0.10  2013-06-26
+      - switch to Carp::Reply, add Clipboard
+
+0.09  2013-06-08
+      - switch to reply, switch away from ack, add Unicode::Tussle
+
+0.08  2012-11-07
+      - remove some broken modules
+
+0.07  2012-11-07
+      - more updates
+
+0.06  2012-03-21
+      - more updates
+
+0.05  2012-02-13
+      - Task::SDK::Moose no longer exists
+
+0.04  2011-05-16
+      - more updates
+
+0.03  2011-01-26
+      - some updates
+
+0.02  2010-06-13
+      - add a few more things
+      - convert to more in depth dzil stuff
+
+0.01  2010-05-02
+      - Initial release

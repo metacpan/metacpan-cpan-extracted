@@ -1,0 +1,43 @@
+---
+abstract: 'Do a test code, specifying the time'
+author:
+  - 'shibayu36 <shibayu36@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Time::Piece: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Time-At
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Time::At:
+    file: lib/Test/Time/At.pm
+    version: '0.02'
+requires:
+  Exporter: '0'
+  Scalar::Util: '0'
+  Test::Time: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hatena/Test-Time-At/issues
+  homepage: https://github.com/hatena/Test-Time-At
+  repository: git://github.com/hatena/Test-Time-At.git
+version: '0.02'
+x_authority: cpan:SHIBAZAKI
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

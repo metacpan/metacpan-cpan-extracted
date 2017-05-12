@@ -1,0 +1,167 @@
+#! /usr/bin/perl
+#---------------------------------------------------------------------
+# up_menus
+# Copyright 1994-2007 Christopher J. Madsen
+#
+# Update menus and node structure in Texinfo files
+#---------------------------------------------------------------------
+
+use strict;
+use Texinfo::Menus;
+use Getopt::Long 2.17 ();
+
+#---------------------------------------------------------------------
+# Parse arguments:
+#---------------------------------------------------------------------
+my ($No_Comments, $No_Detail, $Verbose);
+
+Getopt::Long::Configure(qw(bundling no_getopt_compat));
+
+Getopt::Long::GetOptions(
+    'nocomments|c' => \$No_Comments,
+    'nodetail|d'   => \$No_Detail,
+    'verbose|v'    => \$Verbose,
+    'help|?'       => \&usage,
+    'version'      => \&usage
+) or usage();;
+
+sub usage
+{
+    printf "up_menus %s\n", Texinfo::Menus->VERSION;
+    exit if $_[0] and $_[0] eq 'version';
+    print "\n" . <<'';
+Usage:  up_menus [options] file
+  -c, --nocomments  Do not add comments for subsections to the main menu
+  -d, --nodetail    Do not add the detailed node listing to the main menu
+  -v, --verbose     Print warning messages
+  -?, --help        Display this usage information and exit
+      --version     Display version number and exit
+
+    exit;
+} # end sub usage
+
+#---------------------------------------------------------------------
+# Process file:
+#---------------------------------------------------------------------
+
+usage() unless ($#ARGV == 0) and -e $ARGV[0];
+update_menus($ARGV[0],
+             comments => !$No_Comments,
+             detailed => !$No_Detail,
+             verbose => $Verbose);
+exit;
+
+__END__
+
+=head1 NAME
+
+up_menus - Update node links and menus in Texinfo documents
+
+=head1 SYNOPSIS
+
+B<up_menus> [B<-cdv>] FILE
+
+=head1 DESCRIPTION
+
+B<up_menus> updates the menus and node links in a Texinfo file based
+on its chapter structure.  The FILE may use C<@include> to include
+other files, which may also C<@inlcude> other files.  Unlike the
+similar Emacs functions, B<up_menus> does not require that each
+chapter be in a separate file.
+
+The first node in FILE should be named `Top'.
+
+Each C<@node> command must be followed immediately by a Texinfo
+structuring command (e.g, C<@chapter>, C<@section>, C<@appendix>).  A
+comment may come between them, but nothing else.
+
+A node can supply a menu description with a comment in the form:
+
+ @c DESC: Menu description
+
+
+
+=head1 OPTIONS
+
+=over 5
+
+=item B<-c>, B<--nocomments>
+
+B<up_menus> normally adds comments to the master menu to retain the
+descriptions of subsection and lesser nodes.  (This is useful when the
+subfiles are automatically generated and the descriptions are added by
+hand.)  The B<-c> option prevents this.
+
+=item B<-d>, B<--nodetail>
+
+Normally, B<up_menus> generates a detailed node listing (consisting of
+the section nodes for each chapter) following the master menu.  The
+B<-d> option omits the detailed node listing.
+
+=item B<-v>, B<--verbose>
+
+The B<-v> option causes B<up_menus> to generate a warning message if
+it finds multiple descriptions for a node (only one of which will be
+used).
+
+=item B<-?>, B<--help>
+
+Display usage information and exit.
+
+=item B<--version>
+
+Display version number and exit.
+
+=back
+
+=head1 REQUIREMENTS
+
+B<up_menus> requires Getopt::Long 2.17 or later, which is distributed
+with recent versions of Perl.
+
+
+=head1 BUGS AND LIMITATIONS
+
+B<up_menus> cannot handle C<@include> inside a menu.
+
+
+=head1 AUTHOR
+
+Christopher J. Madsen  C<< <perl AT cjmweb.net> >>
+
+Please report any bugs or feature requests to
+S<< C<< <bug-Texinfo-Menus AT rt.cpan.org> >> >>,
+or through the web interface at
+L<http://rt.cpan.org/Public/Bug/Report.html?Queue=Texinfo-Menus>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 1994-2007 Christopher J. Madsen. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

@@ -1,0 +1,33 @@
+Revision history for Perl extension TAP::Parser::SourceHandler::MyTAP.
+
+3.27  2016-05-11T23:57:32Z
+      - Fixed password handling.
+      - Refactored `my_prove` to better follow the interface provided by
+        App::Prove. This improves option processing, notably single-letter
+         option bundling now works properly.
+
+3.26  2015-06-19T23:43:55Z
+      - The `--ext` option to `my_prove` now always identifies MyTAP tests. Use
+        `prove` with the `--mytap-option suffix=.foo` option to mix MyTAP tests
+        with other tests.
+      - Expanded option documentation.
+
+3.25  2013-12-18T00:45:29Z
+      - Removed Pod tests.
+      - Restored to CPAN (not sure when it was deleted or why).
+
+3.24  2011-03-30T18:24:32 
+      - Fixed exit code in `my_prove`. It no longer returns 0 on fail and 1 on
+        pass. Thanks to Rod Taylor for the report!
+
+3.23  2010-09-08T22:40:39
+      - Minor documentation tweaks.
+      - Disabled output buffering in `my_prove`, so that test output appears
+        as tests run.
+      - Enable comments by default. This is so that failure diagnostics will
+        always appear, not just when run with --verobse. Use --no-comments or
+        --quiet to disable comment output.
+
+3.22  2010-07-24T00:08:11
+      - Initial version, with code borrowed from
+        TAP::Parser::SourceHandler::pgTAP.

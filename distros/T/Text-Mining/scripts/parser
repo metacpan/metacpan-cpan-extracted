@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use Text::Mining;
+use Text::Mining::Parser;
+
+my $tm       = Text::Mining->new();
+my $corpus   = $tm->get_corpus({ corpus_id => 1 });
+my $document = $corpus->submit_document({ file_name => '/home/roger/fours', file_type => 'txt' });
+my $parser   = Text::Mining::Parser->new({ document => $document, parser => 'Text', algorithm => 'Base' });
+
+print $parser->version(), "\n";
+
+$parser->parse_document({ document => $document }), "\n";
+
+exit;
+

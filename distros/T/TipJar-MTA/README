@@ -1,0 +1,74 @@
+TipJar/MTA version 0.30
+=======================
+
+An outgoing SMTP system. All messages live in their own files
+under a directory that should be on a file system big enough to hold
+everything.
+
+We keep track of bad addresses, domains we failed to connect to,
+and queued messages with connection problems by domain, in additional
+files.  See the HISTORY section of the pod in the main module for
+the full (and hopefully not growing too much more!) feature list.
+
+as of version 0.19 a %SMTProutes data structure is available
+for per-domain routing or SMARTHOST specification, and the 'nodns'
+use-line parameter will suppress the requirement for Net::DNS.
+
+Messages that receive 400-level error codes (temporary delivery
+failure) will be retried at increasing random intervals for a
+week.
+
+New with version 0.30, multiple recipients are multiplexed into
+queued message objects rather than doing qmail-style one-recipient-only
+sending. (and with version 0.31, this works right.) (And with version 0.32,
+some other things that haven't been working right should start working 
+right too.)
+
+use TipJar::MTA::queue to add messages for sending, or simply
+link your properly formatted message into the working directory,
+or link your messages for single recipients into the immediate 
+directory.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or simply unpack it and refer to the directory with
+Perl's -I command line option.
+
+DEPENDENCIES
+
+Core perl.
+dateheader module for generating rfc-compliant Date header
+Net::DNS. (now optional!)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003,2004,2005,2007,2008,2009 David Nicol / TipJar LLC.
+
+You may use this software as downloaded, free of charge,
+without any warranty whatsoever.  If you find it necessary
+to modify your copy of TipJar::MTA, please post a diff patch
+file to the bug tracker at
+http://rt.cpan.org/Ticket/Create.html?Queue=TipJar-MTA
+along with a description of what you changed and why.
+
+Please do not distribute modified versions of TipJar::MTA.
+
+It gives me great validation to hear of people reusing my efforts,
+so send a postcard, if you like.  My address is
+
+    TipJar LLC (attn: MTA perl module)
+    Post office box 45163
+    Kansas City, Missouri 64171-8163
+    United States of America
+
+and I can be e-mailed at davidnico@cpan.org.
+

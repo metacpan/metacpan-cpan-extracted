@@ -1,0 +1,37 @@
+---
+abstract: 'the async counterpart to Test::HTTP::Server'
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires:
+  AnyEvent::HTTP: '0'
+  HTTP::Tiny: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-HTTP-AnyEvent-Server
+recommends:
+  Net::SSLeay: '0'
+requires:
+  AnyEvent: '7.0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Log: '0'
+  AnyEvent::Socket: '0'
+  AnyEvent::Util: '0'
+  HTTP::Headers: '0'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  Moo: '0'
+  MooX::Types::MooseLike::Base: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/creaktive/Test-HTTP-AnyEvent-Server/issues
+  homepage: https://github.com/creaktive/Test-HTTP-AnyEvent-Server
+  repository: git://github.com/creaktive/Test-HTTP-AnyEvent-Server.git
+version: '0.013'
+x_contributors:
+  - 'Сергей Романов <sromanov-dev@yandex.ru>'

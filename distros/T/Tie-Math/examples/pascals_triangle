@@ -1,0 +1,25 @@
+use Tie::Math qw(f X Y);
+
+my %pascal;
+tie %pascal, 'Tie::Math', sub { 
+                              if( X <= Y and Y > 0 and X > 0 ) {
+                                  f(X,Y) = f(X-1,Y-1) + f(X,Y-1);
+                              }
+                              else {
+                                  f(X,Y) = 0;
+                              }
+                          },
+                          sub { 
+                              f(1,1) = 1;  
+                              f(1,2) = 1;  
+                              f(2,2) = 1; 
+                          };
+
+my $height = 5;
+for my $y (1..$height) {
+    print " " x ($height - $y);
+    for my $x (1..$y) {
+        print $pascal{$x,$y}, " ";
+    }
+    print "\n";
+}

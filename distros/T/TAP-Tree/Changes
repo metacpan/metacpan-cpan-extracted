@@ -1,0 +1,37 @@
+Revision history for perl module TAP::Tree.
+
+v0.0.5 2014-06-09
+
+ - Improved parsing subtests.
+
+   There was a patterns of the subtest which cannot be parsed correctly.
+
+ - Deleted the parsing code for the version of tha TAP.
+
+   Since a specified of a version is unnecessary for the version lower than 12.
+   It is due to add when supporting version 13.
+
+ - Refactoring
+   
+   Simplified about the code of a parsing subtests.
+
+v0.0.4 2014-06-07
+
+ - When plan is not able to be acquired,
+   only the key of a hash corrects so that it may set up.
+ - Updated README
+
+
+v0.0.3 2014-06-06
+
+ - Changed the format of the summary.
+   For backward compatibility, also supported the old format.
+
+v0.0.2 2014-06-05
+
+ - Added the numbers ran to the summary.
+ - Added pod for summary method.
+
+v0.0.1 2014-05-27
+ 
+ - Initial release

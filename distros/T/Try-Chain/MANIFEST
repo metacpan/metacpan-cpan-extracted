@@ -1,0 +1,21 @@
+Changes
+example/01_try_chain_scalar.pl
+example/02_call_m_scalar.pl
+example/03_try_chain_list.pl
+example/04_call_m_list.pl
+lib/Try/Chain.pm
+MANIFEST			This list of files
+README
+t/01_try_chain_scalar.t
+t/02_call_m_scalar.t
+t/03_try_chain_list.t
+t/04_call_m_list.t
+t/11_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

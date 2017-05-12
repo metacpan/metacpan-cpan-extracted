@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+JBrowseTest.pl
+test.pl
+lib/Tk/JBrowseEntry.pm
+JBrowseEntry.htm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,67 @@
+######################################################################
+    Text::TermExtract 0.02
+######################################################################
+
+NAME
+    Text::TermExtract - Extract terms from text
+
+SYNOPSIS
+        use Text::TermExtract;
+
+        my $text = { Hey, hey, how's it going? Wanna go to Wendy's 
+                     tonight? Wendy's has great sandwiches." };
+
+        my $ext = Text::TermExtract->new();
+
+        for my $word ( $ext->terms_extract( $text, { max => 3 }) ) {
+            print "$word\n";
+        }
+
+        # "sandwiches"
+        # "tonight"
+        # "wendy"
+
+DESCRIPTION
+    Text::TermExtract takes a simple approach at extracting the most
+    interesting terms from documents of arbitrary length.
+
+    There's more scientific methods to term extraction, like Yahoo's online
+    term extraction API (but you can't have it locally) and the
+    Lingua::YaTeA module on CPAN (which is so poorly documented that I
+    couldn't figure out how to use it).
+
+    So I wrote Text::TermExtract, which first tries to guess the language a
+    text is written in, kicks out the language- specific stopwords, weighs
+    the rest with a hand-crafted formula and returns a list of (hopefully)
+    interesting words.
+
+    This is a very crude approach to term extraction, if you have a better
+    method and want to include it in Text::TermExtract, drop me an email,
+    I'm interested.
+
+  METHODS
+    new()
+        Constructor.
+
+    terms_extract( $text, $opts )
+        Goes through the text stringin $text, extracts the keywords and
+        returns them as a list.
+
+        To limit the number of words returned, use the "max" option:
+
+            $extr->terms_extract( $text, { max => 10 } );
+
+    exclude( $array_ref )
+        Add a list of words to exclude. The words listed in the array passed
+        in as a reference will never be used as keywords.
+
+            $extr->exclude( ['moe', 'joe'] );
+
+LEGALESE
+    Copyright 2008 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2008, Mike Schilli <cpan@perlmeister.com>
+

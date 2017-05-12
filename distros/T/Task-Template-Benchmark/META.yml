@@ -1,0 +1,57 @@
+---
+abstract: 'Task to install all template engines benchmarked by Template::Benchmark.'
+author:
+  - 'Sam Graham <libtemplate-benchmark-perl@illusori.co.uk>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Template-Benchmark
+provides:
+  Task::Template::Benchmark:
+    file: lib/Task/Template/Benchmark.pm
+    version: 1.00
+requires:
+  CHI: 0
+  Cache::Cache: 0
+  Cache::CacheFactory: 0
+  Cache::FastMemoryCache: 0
+  Cache::FastMmap: 0
+  File::Spec: 0
+  HTML::Template: 0
+  HTML::Template::Compiled: 0
+  HTML::Template::Expr: 0
+  HTML::Template::JIT: 0
+  HTML::Template::Pro: 0
+  IO::File: 0
+  JSON::Any: 0
+  Mojo: 0
+  Mojo::Template: 0
+  NTS::Template: 0
+  Template: 0
+  Template::Alloy: 0
+  Template::Benchmark: 0
+  Template::Parser::CET: 0
+  Template::Sandbox: 0
+  Template::Stash::XS: 0
+  Template::Tiny: 0
+  Tenjin: 0.05
+  Term::ProgressBar::Simple: 0
+  Text::ClearSilver: 0
+  Text::MicroMason: 0
+  Text::MicroTemplate: 0
+  Text::MicroTemplate::Extended: 0
+  Text::Template: 0
+  Text::Template::Simple: 0
+  Text::Tmpl: 0
+  Text::Xslate: 0.1030
+  Text::Xslate::Bridge::TT2: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

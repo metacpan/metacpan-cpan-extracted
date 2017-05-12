@@ -1,0 +1,8 @@
+<html>
+<head>
+<title>This is a simple HTML wrapper</title>
+</head>
+<body>
+[% content %]
+</body>
+</html>

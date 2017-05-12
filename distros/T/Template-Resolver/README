@@ -1,0 +1,87 @@
+NAME
+
+    Template::Resolver - A powerful, and simple, library for resolving
+    placeholders in templated files
+
+VERSION
+
+    version 1.13
+
+SYNOPSIS
+
+      use Template::Resolver;
+      my $resolver = Template::Resolver->new($entity);
+      $resolver->resolve(file => '/path/to/file', key => 'REPLACEME');
+
+DESCRIPTION
+
+    This module provides a powerful way to resolve placeholders inside of a
+    templated file. It uses Template::Transformer to interpolate the the
+    placeholder values.
+
+CONSTRUCTORS
+
+ new(\%entity, %options)
+
+    Creates a new resolver with properties from \%entity and %options if
+    any. The available options are:
+
+    additional_transforms
+
+      Additional custom transforms that will be added to the standard
+      transforms. Must be a hashref containing transform name to sub
+      reference mappings. The sub reference(s) will be called as a
+      method(s) with a single parameter containing the contents of the
+      placeholder.
+
+    os
+
+      The operating system path format used when resolving
+      ${TEMPLATE_os{xxx}} placeholders.
+
+METHODS
+
+ resolve(%options)
+
+    Will read the template and replace all placeholders prefixed by key.
+    One of the options content, handle, or filename is required. The
+    available options are:
+
+    content
+
+      A string containing templated content.
+
+    filename
+
+      The name of a file containing templated content.
+
+    handle
+
+      A handle to a file containing templated content.
+
+    key
+
+      The template key, defaults to TEMPLATE.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Template::Transformer
+
+      * Template::Overlay
+
+      * https://github.com/lucastheisen/template-resolver
+

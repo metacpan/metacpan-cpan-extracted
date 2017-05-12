@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Test/SynchHaveWant.pm
+t/00-load.t
+t/want.t
+t/havewant.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml

@@ -1,0 +1,13 @@
+Release history for Test-Stream-Plugin-Explain-Terse
+
+0.001001 2015-12-14T11:01:59Z 833d955
+ - Import ::Core explicitly stating the need for cmp_ok, which was omitted from default_exports before Test::Stream
+   1.302025-TRIAL
+ - Require at least 1.302025, which is the first version that had a cmp_ok at all.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - test: +2 ↑1
+
+0.001000 2015-12-13T09:31:20Z 2de012a
+ - First version.

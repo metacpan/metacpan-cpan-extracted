@@ -1,0 +1,19 @@
+1.01 
+     Fix unnecesary warning caused by using /x (RT#88189)
+     (Arthur Axel fREW Schmidt and Andrew Main)
+     https://github.com/2shortplanks/Test-utf8/pull/2
+
+1.00 Refactor build system to use Module::Install
+
+     Add test for pod, perl critic.  Make pass.
+
+     Make the ok, fail, pass, diag functions private
+
+     Improve documentation
+
+0.02 Change is_dodgy_utf8 to is_sane_utf8 after feedback from
+     London.pm.  New name was Richard Clamp's idea.
+
+     Fix missing use 5.007003 in Makefile.PL
+
+0.01 Initial Release

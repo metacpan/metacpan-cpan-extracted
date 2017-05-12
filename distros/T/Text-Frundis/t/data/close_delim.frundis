@@ -1,0 +1,19 @@
+.Sh section
+.Bm
+Some text to markup with a delimiter
+.Em .
+And some more text
+.Bm
+with another delimiter
+.Em ?
+.Bm
+text
+.Em #%!¡@?
+That's it.
+.Sm text \~!
+.Sm @
+.Sm text »
+.Lk url label .
+.Lk url .
+.Sx section .
+.Sx section \~.

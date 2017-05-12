@@ -1,0 +1,26 @@
+<html>
+<head>
+  <title>TLフレームワークサンプル</title>
+</head>
+<body>
+TLフレームワークのサンプルです．<br>
+<br>
+Session のテストです．<br>
+ボックスに整数を入力すると，そのデータを Session に記録します．<br>
+<hr>
+<form action="" method="post">
+ID: <input type="text" name="id" value="" size=5 maxlength=5><br>
+<input type="submit" name="submit" value="設定/リロード">
+</form>
+<hr>
+<!begin:session>
+現在のセッションデータは <&SESSIONDATA> です．<br>
+セッションIDは <&SESSIONID> です．<br>
+<!end:session>
+<!begin:nosession>
+現在セッションデータは空です．<br>
+<!end:nosession>
+
+</body>
+</html>
+

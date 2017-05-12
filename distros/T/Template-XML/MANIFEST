@@ -1,0 +1,25 @@
+lib/Template/Plugin/XML.pm
+lib/Template/Plugin/XML/DOM.pm
+lib/Template/Plugin/XML/File.pm
+lib/Template/Plugin/XML/LibXML.pm
+lib/Template/Plugin/XML/RSS.pm
+lib/Template/Plugin/XML/Simple.pm
+lib/Template/Plugin/XML/Style.pm
+lib/Template/Plugin/XML/View.pm
+lib/Template/Plugin/XML/XPath.pm
+lib/Template/XML.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/dom.t
+t/domview.t
+t/file.t
+t/rss.t
+t/test/xml/example.rdf
+t/test/xml/testfile.xml
+t/xml.t
+t/xml/example.xml
+t/xmlsimple.t
+t/xmlstyle.t
+t/xpath.t

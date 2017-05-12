@@ -1,0 +1,33 @@
+Text::NLP version 0.1
+=====================
+
+Perl module for Natural Language Processing
+
+Please see the example scripts for more information and 
+usage instructions.
+
+INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Makefile.PL
+   make
+   make test
+   make install
+ 
+DEPENDENCIES
+ 
+This module requires these other modules and libraries:
+ 
+  none
+
+AUTHOR
+
+Alistair Francis <cpan@alizta.com>
+
+COPYRIGHT AND LICENCE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+

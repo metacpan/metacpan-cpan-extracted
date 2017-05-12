@@ -1,0 +1,21 @@
+Revision history for Tickit-Widget-Statusbar
+
+0.004     2015-01-24 08:58:54+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Status is set correctly on instantiation
+
+0.003     2014-08-20 20:59:21+01:00 Europe/London
+	New features:
+	* ->update_status now accepts a String::Tagged object
+
+0.002     2014-08-16 03:30:15+01:00 Europe/London
+	Bugs fixed:
+	* Redraw after reshape
+
+	Dependency fixes:
+	* Tickit::Widget, add in Tickit::Widget::Progressbar as well
+
+0.001     2013-09-01 03:56:00 Europe/London
+	Initial CPAN release

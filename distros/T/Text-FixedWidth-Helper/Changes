@@ -1,0 +1,9 @@
+Revision history for Perl module Text::FixedWidth::Helper
+
+0.02 Sun Oct 30 09:03:00 2011
+    - add 'LICENSE' to Makefile.PL
+
+0.01 Sat Oct 29 09:06:47 2011
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

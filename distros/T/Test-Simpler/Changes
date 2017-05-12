@@ -1,0 +1,32 @@
+Revision history for Test-Simpler
+
+0.000001  Thu Apr 26 21:11:11 2012
+       Initial release.
+
+
+0.000002  Wed Jul 18 14:11:32 2012
+
+    First public release
+
+
+
+0.000004  Mon Aug  6 07:19:24 2012
+
+    - Added prereq modules to Makefile.PL
+      (Thanks Andreas)
+
+
+0.000005  Sat Feb 23 23:50:10 2013
+
+    - Added prereq modules to Build.PL
+
+
+0.000006  Thu Mar  7 17:13:59 2013
+
+    - Improved handling of method calls in tests
+      (Thanks Anthony!)
+
+
+0.000007  Mon Nov 11 07:02:55 2013
+
+    - Lobotomized for Perl 5.18 compatibility

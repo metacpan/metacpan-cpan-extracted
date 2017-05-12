@@ -1,0 +1,207 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use Getopt::Long;
+use Test::BrewBuild::Dispatch;
+
+our $VERSION = '2.17';
+
+my %args;
+my $help;
+
+GetOptions(
+    "auto"       => \$args{auto},
+    "cmd=s"      => \$args{cmd},
+    "testers=s@" => \$args{testers},
+    "r|repo=s"   => \$args{repo},
+    "R|rpi"      => \$args{rpi},
+    "debug=s"    => \$args{debug},
+    "forks=i"    => \$args{forks},
+    "help"       => \$help,
+);
+
+if ($help){
+    print <<'EOF';
+Usage: 
+
+bbdispatch -t IP:Port [-r https://github.com/user/repo] [-d 0-7] [--auto]
+
+EOF
+exit;
+}
+
+my $dispatcher = Test::BrewBuild::Dispatch->new(
+    debug => $args{debug},
+    forks => $args{forks},
+    auto => $args{auto},
+    rpi => $args{rpi}
+);
+
+if (defined $args{auto}){
+    $dispatcher->auto(%args);
+    exit();
+}
+
+my $return = $dispatcher->dispatch(%args);
+
+print $return;
+
+=pod
+
+=head1 NAME
+
+bbdispatch - Dispatch C<Test::BrewBuild> builds to remote test servers.
+
+=head1 SYNOPSIS
+
+Dispatch a default C<brewbuild> test run on the two listed remote servers,
+using the repository you're currently working in:
+
+    bbdispatch -t 10.0.0.1:7800 -t 10.0.0.2:9999
+
+Dispatch a custom command to a single remote tester:
+
+    bbdispatch -c "brewbuild -R" -t 10.0.0.1:7800
+
+Have the remote testers test a specified repository:
+
+    bbdispatch -r https://github.com/user/repo-name -t 10.0.0.1:7800
+
+Run in automated continuous mode. Reruns all tests continuously in a loop:
+
+    bbdispatch [...] -a
+
+Automated continuous mode, but run only 10 runs:
+
+    bbdispatch [...] -a 10
+
+Add debugging to any other command string:
+
+    bbdispatch [...] -d 0-7
+
+Set maximum number of concurrent testers to communicate with (default is 4):
+
+    bbdispatch [...] -f 8
+
+Example output of a basic run where I'm in a git repository directory:
+
+    bbdispatch -t localhost -t 192.168.252.90 -t 192.168.252.96 -t 192.168.252.95
+
+    192.168.252.95 - x86_64-linux
+
+    5.22.1 :: PASS
+
+    192.168.252.90 - MSWin32-x64-multi-thread
+
+    5.18.4 :: PASS
+    5.22.1 :: PASS
+
+    localhost - MSWin32-x64-multi-thread
+
+    5.22.1 :: FAIL
+
+    192.168.252.96 - amd64-freebsd
+
+    5.22.1 :: PASS
+    5.23.7 :: PASS
+    5.8.9 :: FAIL
+    5.10.1 :: FAIL
+    5.18.4 :: FAIL
+
+All FAIL log files are stored locally when dispatching to identify the issues.
+If I'm letting BrewBuild determine the repository, the files will be stored in
+C<./bblog>. If a repo is specified, they'll be put into
+C<~/brewbuild/repo/bblog>.
+
+    192.168.252.96_5.10.1-FAIL.bblog
+    192.168.252.96_5.18.4-FAIL.bblog
+    192.168.252.96_5.8.9-FAIL.bblog
+    localhost_5.22.1-FAIL.bblog
+
+=head1 DESCRIPTION
+
+This script dispatches C<brewbuild> build sets to pre-configured
+L<Test::BrewBuild::Tester> test servers.
+
+By default, we try to look up the repository information from your current
+working directory. If it can't be found, you must supply it on the command line
+or within the configuration file.
+
+=head1 COMMAND LINE OPTIONS
+
+=head2 -t, --testers
+
+A list of testers to dispatch to. Can be sent in multiple times. Format of the
+testers is C<IP:Port>. If C<Port> is ommitted, we'll default to C<7800>.
+
+Testers can also be configured within the config file. Testers set on the CLI
+will override those.
+
+=head2 -c, --cmd
+
+By default, the testers will simply run C<brewbuild>. You can send in any
+C<brewbuild> commands here within quotes, so long as the first argument is
+C<brewbuild>.
+
+This option will override anything in the configuration file.
+
+=head2 -r, --repo
+
+By default, if a repository isn't specified in the config file, we'll attempt
+to locate the repository information from the current working directory.
+
+Set this to the repo link to override both.
+
+=head2 -d, --debug
+
+Set to 0-7 to enable debug logging.
+
+=head2 -f, --forks
+
+By default, we maintain four (4) testers concurrently. Pass an integer to this
+argument to change the default number of concurrent testers.
+
+=head2 -a, --auto
+
+This command tells the dispatcher to throw tests at the Testers continuously.
+With no argument or an argument of C<1>, we'll run forever. Any other integer
+will run in auto mode for that many cycles.
+
+Note that you *must* be inside of a repository directory at this time to use
+this feature. It currently *DOES NOT* work with the C<--repo> flag.
+
+=head2 -R, --rpi
+
+This argument enables Raspberry Pi mode, and is *only* useful if running tests
+on an RPi, with an LCD connected, and C<bbdispatch> is running in C<--auto>
+mode. It requires the C<$ENV{BB_RPI_LCD}> environment variable set, with a
+comma-separated list of pin numbers in the format C<'1,2,3,4,5,6'>, where the
+GPIO pin numbers are in the order of C<RS, E, D0, D1, D2, D3>.
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 SEE ALSO
+
+    perldoc brewbuild
+    perldoc Test::BrewBuild
+
+    perldoc bbtester
+    perldoc Test::BrewBuild::Tester
+
+    perldoc Test::BrewBuild::brewbuild.conf
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
+

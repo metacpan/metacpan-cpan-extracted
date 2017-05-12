@@ -1,0 +1,65 @@
+NAME
+
+Time::UTC_SLS - UTC with Smoothed Leap Seconds
+
+DESCRIPTION
+
+Coordinated Universal Time (UTC) is a time scale with days of unequal
+lengths, due to leap seconds, in order to keep in step with both Terran
+rotation (Universal Time, UT) and International Atomic Time (TAI).
+Some applications that wish to use a time scale that maintains both of
+these relations can't cope with unequal day lengths, and so cannot use
+UTC properly.  UTC with Smoothed Leap Seconds (UTC-SLS) is another option
+in such cases.  UTC-SLS is a time scale that usually matches UTC exactly
+but changes rate in the time leading up to a leap second in order to
+make every day appear to be exactly the same length.
+
+On a normal UTC day, of length 86400 UTC seconds, UTC and UTC-SLS
+behave identically.  On a day with a leap second, thus having 86401 or
+(theoretically) 86399 UTC seconds, UTC and UTC-SLS behave identically
+for most of the day, but the last 1000 UTC seconds correspond to 999 or
+(theoretically) 1001 UTC-SLS seconds.  Thus every UTC-SLS day has exactly
+86400 UTC-SLS seconds.  UTC and UTC-SLS are equal on every half hour,
+and in particular the day boundaries (at midnight) are in the same place
+on both time scales.  See <http://www.cl.cam.ac.uk/~mgk25/time/utc-sls/>
+for further explanation.
+
+UTC-SLS is defined for the post-1972 form of UTC, using leap seconds.
+The prior form, from 1961, using `rubber seconds' as well as leaps,
+could be treated in a similar manner, but the exact algorithm has not
+been defined.  The rubber seconds system was itself trying to achieve
+part of what UTC-SLS does.
+
+This module represents instants on the UTC scale by the combination of
+a day number and a number of seconds since midnight within the day.
+In this module the day number is the integral number of days since
+1958-01-01, which is the epoch of TAI.  This is the convention used by
+the "Time::UTC" module.  Instants on the UTC-SLS scale are represented
+by a Modified Julian Date, which is a fractional count of days since
+1858-11-17T00Z.  The MJD is a suitable interchange format between
+date-manipulation modules.
+
+All numbers in this API are "Math::BigRat" objects.  All numeric function
+arguments must be "Math::BigRat"s, and all numeric values returned are
+likewise "Math::BigRat"s.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2009, 2010, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

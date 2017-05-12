@@ -1,0 +1,71 @@
+[% # $Id: layout,v 1.6 2005/02/02 19:34:06 jv Exp $ -%]
+<table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="[% site.logowidth + 10 %]" align="left">
+      [% INCLUDE page/logo %]
+    </td>
+    <td>
+      [% IF site.languages && template.name.search('^\w\w/') -%]
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+	  <tr>
+	    <td align="left" valign="top">
+              [% INCLUDE page/header %]
+	    </td>
+	    <td align="right" valign="top">
+              [% INCLUDE page/lang %]
+	    </td>
+	  </tr>
+	</table>
+      [% ELSE -%]
+        [% INCLUDE page/header %]
+      [% END -%]
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      [% INCLUDE page/name %]
+    </td>
+    <td>
+      [% INCLUDE page/navigate %]
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      [% INCLUDE util/line %]
+    </td>
+    <td>
+      [% INCLUDE util/line %]
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      [% INCLUDE page/menu UNLESS page.suppress_menu %]
+    </td>
+    <td>
+      [% content %]
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      [% INCLUDE util/line %]
+    </td>
+    <td>
+      [% INCLUDE util/line %]
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      [% INCLUDE page/credits %]
+    </td>
+    <td align="center">
+      [% INCLUDE page/footer %]
+    </td>
+  </tr>
+
+</table>

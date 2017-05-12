@@ -1,0 +1,15 @@
+---
+name: Tie-Array-Boolean
+version: 0.0.1
+author:
+  - 'Kyle Hasselbacher <kyleha@gmail.com>'
+abstract: A memory efficient array of boolean values.
+license: perl
+requires:
+  Test::More: 0
+  Tie::Array: 0
+provides:
+  Tie::Array::Boolean:
+    file: lib/Tie/Array/Boolean.pm
+    version: 0.0.1
+generated_by: Module::Build version 0.26

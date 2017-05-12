@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2137d8918961a8a24784238a47b28f007b9ec4f0 Changes
+SHA1 cfdf9403f86cd2f72829d71d05a6866317ec5716 LICENSE
+SHA1 c856b369f24918d5d5ecc3a7adb7edf91bd042a1 MANIFEST
+SHA1 3e3d65d27cc00afe81e37f7266b996d857766597 META.json
+SHA1 deb79496437d595240f3a317b8aa7e9231404755 META.yml
+SHA1 ec222c6dbd0d3774338a5864998f651a17788c3a Makefile.PL
+SHA1 0789c1f4f1bf622f7ca9efe6b0fc4e5a967cdb05 README
+SHA1 6ce839de491b07aea9dd64144fe62718fcda4e49 dist.ini
+SHA1 1382dbe6cf27987963215ec43de409be7434d8b7 lib/Template/Provider/PerContextDBIC.pm
+SHA1 5024ed425a567fd1fc4ecb52b4ae4497a0fb500f t/00-load.t
+SHA1 e2a1275f39ab38c18d02bbf6df21be993e72a7e8 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 2996ffcd142a9b90711fb47c7a10d5649b34d7fa t/01-simple.t
+SHA1 7140b3105dd4d1ee99c6234ae5e24a6bbe37bea7 t/02-search.t
+SHA1 22d7d3da6698dc25b4c60cbcd9a5a6c6a7325bca t/03-join.t
+SHA1 7d0051fddb1712724f9fc1135037b92fb24777d9 t/04-restricted.t
+SHA1 3b5a100450a7f54de6637f0e95f0a144f0948178 t/05-rs_method.t
+SHA1 e7ceed7f32e4536c5b2de5e09ab6d17cee269b0f t/06-fail.t
+SHA1 61f78d4af72827d285991bc5e616e713bfb69393 t/07-columns.t
+SHA1 7311b8124f26d96fd4c709d480a5aadbb7714933 t/08-tolerant.t
+SHA1 e3d6e20b20655018d68810be8ad80ac9fe60640a t/lib/TestSchema.pm
+SHA1 f2bdddb5e128b2656a551289896d99b8af6ab378 t/lib/TestSchema/Result/Template.pm
+SHA1 44e86c958edf7ef7444c606f98b8b20ee4c8fe32 t/lib/TestSchema/Result/Template2.pm
+SHA1 0e219dfa622f7212b55b3a72933678c097859c5c t/lib/TestSchema/Result/Template3.pm
+SHA1 717230a2e55c97b149da4691fe78dad2aad6ffb8 t/lib/TestSchema/Result/Template4.pm
+SHA1 4d4d4e6ffcc72892e4193f51f5ff31fa2e4d1025 t/lib/TestSchema/Result/TemplateSite.pm
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
+SHA1 cd0d37469e1761a4f309a80bdb39aa31f47adae3 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iD8DBQFVLb+Ylp+7gMsE0ucRAnEsAKCodNgP+u5PP8hJMaM2sI59rVf3dACdHZWw
+Sl7AxeCmhOwepctfkAl/UwY=
+=wG0U
+-----END PGP SIGNATURE-----

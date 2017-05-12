@@ -1,0 +1,140 @@
+#!/usr/bin/env perl
+# ABSTRACT: compute cosine similarity between two documents
+# PODNAME: cosine_cmp
+use autodie;
+use strict;
+use utf8;
+use warnings;
+
+our $VERSION = '0.012'; # VERSION
+
+
+use Getopt::Long;
+use Pod::Usage;
+use Text::SpeedyFx;
+
+GetOptions(
+    q(help)             => \my $help,
+    q(length=i)         => \my $length,
+    q(seed=i)           => \my $seed,
+    q(bits=i)           => \my $bits,
+) or pod2usage(-verbose => 1);
+pod2usage(-verbose => 2)
+    if $help or $#ARGV != 1;
+
+$length = 10
+    unless $length;
+$length *= 2 ** 10 << 3;
+
+$seed = 0x4c53_4820
+    unless $seed;
+$bits = 8
+    unless $bits;
+
+my $sfx = Text::SpeedyFx->new($seed, $bits);
+my @fv = map {
+    sub {
+        open my $fh, q(<:mmap), shift;
+        local $/ = undef;
+        my $data = <$fh>;
+        close $fh;
+
+        return $sfx->hash_fv($data, $length);
+    }->($_)
+} @ARGV;
+
+printf qq(similarity=%0.5f\n), cosine_similarity(@fv);
+
+sub cosine_similarity {
+    my ($a, $b) = @_;
+
+    my $nbits_a = unpack(q(%32b*) => $a);
+    my $nbits_b = unpack(q(%32b*) => $b);
+
+    return $nbits_a * $nbits_b
+        ? unpack(q(%32b*) => $a & $b) / sqrt $nbits_a * $nbits_b
+        : 0;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cosine_cmp - compute cosine similarity between two documents
+
+=head1 VERSION
+
+version 0.012
+
+=head1 SYNOPSIS
+
+    cosine_cmp [options] FILE1 FILE2
+
+=head1 DESCRIPTION
+
+Cosine similarity is a measure of similarity between two vectors of an inner product space that measures the cosine of the angle between them.
+The cosine of 0 is 1, and less than 1 for any other angle; the lowest value of the cosine is -1.
+The cosine of the angle between two vectors thus determines whether two vectors are pointing in roughly the same direction.
+This is often used to compare documents in text mining.
+In addition, it is used to measure cohesion within clusters in the field of data mining.
+
+(L<source|https://en.wikipedia.org/wiki/Cosine_similarity>)
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+This.
+
+=item --length
+
+Feature vector length (in KB, default: 10).
+
+=item --seed
+
+Custom seed (integer).
+
+=item --bits
+
+How many bits do represent one character.
+The default value, 8, sacrifices Unicode handling but is fast and low on memory footprint.
+The value of 18 encompasses I<Basic Multilingual>, I<Supplementary Multilingual> and I<Supplementary Ideographic> planes.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Text::SpeedyFx>
+
+=item *
+
+L<Tiny & fast document similarity estimation|https://coderwall.com/p/284hja>
+
+=item *
+
+L<Cosine similarity|https://en.wikipedia.org/wiki/Cosine_similarity>
+
+=back
+
+=head1 AUTHOR
+
+Stanislaw Pusep <stas@sysd.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Stanislaw Pusep.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

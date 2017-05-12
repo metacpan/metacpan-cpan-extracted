@@ -1,0 +1,78 @@
+{
+   "abstract" : "Describe time duration in abbreviated English",
+   "author" : [
+      "moznion <moznion@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.14.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-Duration-Abbreviated",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::Synopsis::Expectation" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::Duration" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Time::Duration::Abbreviated" : {
+         "file" : "lib/Time/Duration/Abbreviated.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/Time-Duration-Abbreviated/issues"
+      },
+      "homepage" : "https://github.com/moznion/Time-Duration-Abbreviated",
+      "repository" : {
+         "url" : "git://github.com/moznion/Time-Duration-Abbreviated.git",
+         "web" : "https://github.com/moznion/Time-Duration-Abbreviated"
+      }
+   },
+   "version" : "0.01"
+}

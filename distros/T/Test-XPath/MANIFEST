@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Test/XPath.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/atom.xml
+t/blocks.t
+t/css_selector.t
+t/ex.t
+t/menu.xml
+t/pod.t
+t/simple.t
+t/strongrrl.html
+t/subclass.t
+t/xhtml.t
+t/xmlns.t
+t/xpath.t

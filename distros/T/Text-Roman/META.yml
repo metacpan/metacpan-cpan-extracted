@@ -1,0 +1,29 @@
+---
+abstract: 'Allows conversion between Roman and Arabic algarisms.'
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+  Test::Simple: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Roman
+requires:
+  Carp: 0
+  Exporter: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/creaktive/Text-Roman/issues
+  homepage: https://github.com/creaktive/Text-Roman
+  repository: git://github.com/creaktive/Text-Roman.git
+version: 3.5

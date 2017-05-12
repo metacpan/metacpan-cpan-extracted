@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-WWW-Mechanize-CGIApp
+version:      0.05
+version_from: 
+installdirs:  site
+requires:
+    CGI::Application:              0
+    HTTP::Request::AsCGI:          0
+    Test::More:                    0.47
+    Test::WWW::Mechanize:          1.04
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

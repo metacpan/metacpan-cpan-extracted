@@ -1,0 +1,20 @@
+
+
+
+  Array
+
+    push
+      should push an element
+
+  Hash
+
+    fetch
+      take the value
+
+  Foo
+
+    bar
+
+
+ok
+1..1

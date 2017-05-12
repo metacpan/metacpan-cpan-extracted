@@ -1,0 +1,196 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>The Text-TransMetaphone Perl Module</title>
+</head>
+<body bgcolor="#fffffh">
+<h1 align="center">The Text-TransMetaphone Perl Module</h1>
+
+<h3><u>About this release</u></h3>
+
+<p align="justify">By releasing the Text-TransMetaphone package at this time
+I'm essentially using CPAN for CVS.  This is an "in case I get hit by a truck
+tomorrow" development release.  Accordingly, you use it at your own risk.
+Expect the trans-metaphone package to be in development for quite some time.</p>
+
+<h3><u>Principles of the Trans-Metaphone Algorithm</u></h3>
+
+<p align="justify">The Trans-Metaphone algorithm takes the principle of the
+Soundex and Metaphone algorithms a step further and attempts to produce "keys"
+that are comparable across writing systems.  The approach fascilitates 
+language independent text retrieval.  For example, the algorithm could be
+applied to find documents in any language that contained a topical word like
+"taliban"</p>
+
+<p align="justify">The Soudex and Metaphone family of algorithms both address
+the fundamental problem of the transcription of non-English names onto the 26 letter
+English alphabet.  The approach has been applied beyond proper nouns and has retained
+a good degree of success.  It has been extended to account for the in-English
+problem of representing phonemes in a writing system with an insufficient number
+of symbols to represent them.
+</p>
+
+<p align="justify">In the course of transcription between writing systems the
+transcriber goes thru the process of converting symbols into sounds and then back into
+symbols.  In the course of in-language writing the scribe skips the first step
+and writes sounds with symbols under a given convention.  This is largely an
+unconcious act for writers of any experience.</p>
+
+<p align="justify">The Soundex and Metaphone algorithms begin by reversing the
+in-language writing process converting symbols into sounds and then return
+to a reduced set of symbols in the initial writing system.  The trans metaphone
+approach attempts to arrest the process at the phonological abstraction.  Words
+of different languages may then be compared based on their phonemic pattern.</p>
+
+<p align="justify">This is the notion at least.  We still depend on symbols to
+represent sequences of phonemes so a final transcription step from phonemese to
+symbols still occurs.  Only this time the International Phonetic Alphabet (IPA)
+is used and the character set is Unicode.  Simplified keys
+are still generated to aid comparison and most of the same rules still apply.
+All but the first vowel in a word will be stripped out.  Consonants in the
+trans metaphone algorithm are not as aggressively reduced to the same key as its
+predecessors.  This is done to retain a higher degree of phonemic grandularity
+for comparision.  This will change over time and is expected to be the primary
+area of experimentation.</p>
+
+<h3><u>Folding Script and Generating Keys</u></h3>
+
+<p align="justify">The concept of folding script for text comparison was an
+objective of the Grand Unified Syllabary (<a href="http://syllabary.sourceforge.net/">GUS</a>) project.  The effort was postponed
+when problems were encountered with UTF-8 breakage in overloaded REs under Perl (since
+resolved in v5.8).
+The effort is expected to eventually resume ( /I anyone?).  GUS data has been applied
+in the Text-TransMetaphone package.</p>
+
+<p align="justify">Strictly speaking the trans metaphone algorithm does not fold
+script but like the other members of its family reduces strings to a simplified
+form for comparison.  Key representations allow for a matches to be made between
+like words with different spellings (and now spellings in different writing systems).
+</p>
+
+<p align="justify">Each module under the Text::TransMetaphone:: namespace has the
+responsibility of generating an IPA key (or keys) for a given language or dialect.
+The modules are named accordingly following locale conventions.  For example,
+Text::TransMetaphone::en_US will create keys for English as spoken in the United
+States.  Incidently, the en_US module is a version of the Text::DoubleMetaphone
+module modified to return keys in IPA notation.  Remember that we are working with
+written language and not spoken language.  While regional difference in spoken
+English occur within the US, written English is standardized.  An en_UK module
+might be practical as minor difference do occur between UK and US written English.</p>
+
+<p align="justify">The Text::TransMetaphone:: modules have only the responsibility
+of generating keys for words of the writing system used by the language.  Seperate
+modules should be made for languages using more than one writing system (::ja_hiragana
+and ::ja_katakana for example).  The modules will implement a
+<code>trans_metaphone</code> function that accepts a single string, converts it into
+an IPA sequence, parsing as per the orthography conventions of the langage, and
+retuns as many keys as deemed appropriate.  In short, each module acts like an
+independent N-Metaphone module for a specific language applying IPA notation.</p>
+
+<p align="justify">Additionally, it is required that each module contain a local
+<code>$LocaleRange</code> quoted RE that identifies the Unicode character range
+that it is accepts.  The RE will later be used by the Text::TransMetaphone class
+as a guess value to associate a string with a module when no locale has been
+specified for the string.</p>
+
+<p align="justify">While not required, it is recommended that each module also
+provide a <code>reverse_key</code> function.  The <code>reverse_key</code>
+function accepts a string of IPA sequences and will transliterate the sequence
+into the native writing system.  This function should generally be simple to
+implement and may be of some limited practical value.</p> 
+
+
+<h3><u>Double Trouble</u></h3>
+
+<p align="justify">The trans-metaphone algorithm allows the language specific
+key generators to return as many keys as deemed appropriate.  The only restriction
+imposed is that the first key returned should be the canonical (or literal conversion)
+and later keys should be in order of decreasing likelihood.  This is in keeping with
+the approach of th double-metaphone algorithm.  It is recommended that the final
+key be a regular expression that would match any of the returned keys.  This is
+considered an experimental aspect of the algorithm.</p>
+
+<p align="justify">The trans-metaphone algorithm does depart from the double-metaphone
+algorithm in one other importan aspect.  The secondary key in the double metaphone
+algorithm is also the most permuted key that could be created.  That is, the secondary
+key contains substitutions for every letter that could be substituted.  This is probably
+not much of an issue for English where only one secondary substitution may occur in
+a word.  The trans-metaphone approach at this time is a little more cautious and will
+return one key for each substitution made.  The last key will contain all secondary
+substitutions together and will be analogous to the double metaphone secondary key.
+For example:</p>
+
+<table border="1">
+  <tr bgcolor="#bfbfbf">
+    <th>ABC</th>
+    <td>Initial String</td>
+  </tr>
+  <tr>
+    <th>APK</th>
+    <td>Primary Key</td>
+  </tr>
+  <tr>
+    <th>AXK</th>
+    <td>Secondary Key for B</td>
+  </tr>
+  <tr>
+    <th>APY</th>
+    <td>Secondary Key for C</td>
+  </tr>
+  <tr>
+    <th>AXY</th>
+    <td>Secondary Keys for B &amp; C</td>
+  </tr>
+  <tr>
+    <th>A[PX][KY]</th>
+    <td>Terminal Regex Key</td>
+  </tr>
+</table>
+
+<p align="justify">Accordingly the number of returned keys will always be one
+greater than some power of two.  A table of the mappings of character sequences
+to IPA symbols with references is available <a href="KeyTable.html">here.</a></p>
+
+
+<h3><u>The Problem with Phonology</u></h3>
+
+&lt;rant level="11"&gt;<br/>
+<span align="justify">The problem with phonology is that no two people speak
+alike.  Generally, this is accepted as a good thing and likely prevents more
+confusion form occuring than it creates.  Inescapably, phonology surveys reflect a
+the intonations of a small sample of speakers from a given population.  Given
+the nature of language we end up with different phonemic inventories for
+speakers of the same language when different regions are surveyed.  Fortunately
+this fits in with the locale model and any time you are find a population that
+talks funny, you can assign them their own "special" locale.</span>
+
+<p align="justify">The real problem with phonology is that it is all in the
+ear of the beholder.  Not to mention the training of the beholder.  Surveyers
+of different experience levels can easily come up with different results for
+the same test subjects.  Phonology tables for a given language that you might
+find from 10, 20, 50 or 100 years ago will all use different symbology conventions.
+The present day isn't much better.  The IPA helps, when people use it, but even
+from one chapter to the next in the IPA handbook we find surveyor recording the
+same phonemes with different symbol choices.</p>
+
+<dir>They do this to hurt me...</dir>
+
+<span align="justify">These discrepancies ultimately will not impact the keys
+generated with the trans metaphone algorithm since the keys represent an approximation,
+a phomeic range and not a precise point.  Development of the trans metaphone
+algorithm is slowed down however by the unlike symbology conventions.</span>
+<br/>
+&lt;/rant&gt;
+
+
+<h3><u>Help Wanted</u></h3>
+
+<p align="justify">If you are knowledgable in the writing conventions of
+a partially or unsupported language and get your kicks tinkering with
+phonology, orthography, transliteration and transcription..
+</p>
+
+
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+NAME
+    Task::Dicom - Install the Dicom modules.
+
+SYNOPSIS
+     cpanm Task::Dicom
+
+SEE ALSO
+    DicomPack::DB::DicomTagDict
+        Dicom Data Dictionary
+
+    DicomPack::DB::DicomVRDict
+        Dicom Data Structure and Encoding
+
+    DicomPack::IO::DicomReader
+        A module to read Dicom Files
+
+    DicomPack::IO::DicomWriter
+        A module to create a dicom file from dicom...
+
+    DicomPack::Util::DicomAnonymizer
+        A module to anonymize Dicom files
+
+    DicomPack::Util::DicomDumper
+        dump the content of a dicom file to stdout
+
+    Dicom::DCMTK::DCMDump::Get
+        Perl Class for getting DICOM DCMTK dcmdump output for DICOM file.
+
+    Dicom::DCMTK::DCMQRSCP::Config
+        Perl class for reading/writing DCMTK dcmqrscp configuration file.
+
+    Dicom::File::Detect
+        Detect DICOM file through magic string.
+
+    Dicom::UID::Generator
+        DICOM UID generator.
+
+    File::Find::Rule::Dicom
+        Common rules for searching for DICOM things.
+
+REPOSITORY
+    <https://github.com/tupinek/Task-Dicom>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015-2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.07
+

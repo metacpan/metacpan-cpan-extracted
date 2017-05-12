@@ -1,0 +1,17 @@
+Changes
+Cleanup.xs
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Thread/Cleanup.pm
+samples/try.pl
+t/00-load.t
+t/10-join.t
+t/11-detach.t
+t/20-recurse.t
+t/21-ctl.t
+t/30-pseudoforks.t
+t/lib/Thread/Cleanup/TestThreads.pm
+t/lib/VPIT/TestHelpers.pm

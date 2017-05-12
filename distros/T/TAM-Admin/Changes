@@ -1,0 +1,49 @@
+Revision history for Perl extension TAM::Admin.
+
+0.35  Thu Jun 24 16:40:00 2004
+        - The following features were added in this release:
+		retrieve a user by LDAP DN
+		retrieve a group by LDAP DN
+		list protected objects
+	- Cleaned up code for the following:
+		list group membership of a user
+		list memebers of a group
+
+0.30  Tue Jun 01 16:16:00 2004
+	- The following features were added in this release:
+		list GSO objects
+		retrieve all GSO objects
+		get a GSO object by ID and type
+		create a GSO credential
+		retrieve a GSO credential
+		get GSO credential attributes (id, type, owner, username, password)	
+		delete a GSO credential
+		list group membership of a user
+		list members of a group
+	
+0.25  Thu May 27 14:45:00 2004
+	- Renamed module from Tivoli::AccessManager::Admin to TAM::Admin
+
+0.2   Thu May 27 13:00:00 2004
+	- The following features were added in this release:
+		get a group by ID
+		import a group
+		delete a group
+		remove a group
+		get group attributes (id, cn, dn, description)
+		set group attributes (description)
+
+0.1   Thu May 27 11:45:00 2004
+	- Initial release; the following features are available in this release:
+		ability to login to a policy server (default or custom)
+		get a user by ID
+		import a user
+		delete a user
+		remove a user
+		get user attributes (id, cn, dn, sn, description, valid, gso)
+		set user attributes (description, valid, gso)
+
+0.01  Fri May 21 10:04:47 2004
+	- original version; created by h2xs 1.20 with options
+		-n Tivoli::AccessManager::Admin /opt/PolicyDirector/include/ivadminapi.h
+

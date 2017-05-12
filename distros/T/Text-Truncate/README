@@ -1,0 +1,61 @@
+NAME
+    Text::Truncate - Perl module with simple string truncating routine
+
+REQUIREMENTS
+    This module only uses standard modules. It should run on Perl 5.004.
+
+INSTALLATION
+    Installation is pretty standard:
+
+      perl Makefile.PL
+      make test
+      make install
+
+    (On Windows platforms you should use nmake instead.)
+
+    Using Build.PL (if you have Module::Build installed):
+
+      perl Build.PL
+      perl Build test
+      perl Build install    
+
+SYNOPSIS
+      use Text::Truncate;
+
+      my $long_string = "This is a very long string";
+
+      # outputs "This is..."
+      print truncstr( $long_string, 10);
+
+      # outputs "This is a-"
+      print truncstr( $long_string, 10, "-");
+
+      # outputs "This is a "
+      print truncstr( $long_string, 10, "");
+
+      # outputs "This is---"
+      $Text::Truncate::DEFAULT_MARKER = "---";
+      print truncstr( $long_string, 10);
+
+DESCRIPTION
+    This is a simple, no-brainer subroutine to truncate a string and add an
+    optional cutoff marker (defaults to ``...'').
+
+    (Yes, this is a really brain-dead sort of thing to make a module out of,
+    but then again, I use it so often that it might as well be in a module.)
+
+    The synopsis gives examples of how to use it.
+
+SEE ALSO
+    <String::Truncate>, <Text::Elide>
+
+REPOSITORY
+    https://github.com/ileiva/Text-Truncate
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+    This is now being mantained by israel leiva <ilv@cpan.org>
+
+LICENSE
+    Unrestricted. This module is in the public domain. No copyright is claimed.
+

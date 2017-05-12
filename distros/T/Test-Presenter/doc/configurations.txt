@@ -1,0 +1,43 @@
+The configuration files are what gives Test::Presenter it's flexibility.  Due
+to this flexibility, however, configuration files are not included in the
+source distribution.  Instead, these files must be crafted manually based on
+the information needed for results analysis and/or presentation.  See examples
+under the examples directory with the module source.
+
+The format of these files is as follows:
+
+    Regular queries from test/data portion:
+        config_tag=id
+        config_tag<id
+        config_tag>id
+        config_tag<=id
+        config_tag>=id
+        config_tag!=id
+        <x|y>data=<column_name>                  # Notice no quotes
+        <x|y>data=<column_name> and <column_name> = <some value>
+        <x|y>data=<column_name> and <column_name> <= <some value>
+
+    Plaintext definitions:
+        config_tag="some text"
+
+    Hardcoded queries and "Search and Replace" queries:
+        config_tag=y
+        config_tag=n
+        config_tag<search_field>=y
+
+
+    Tags are allowed/required based on what type of plot is being done.
+    Example from a simple xy-plot:
+        xlabel="Processes"
+        ylabelid=3
+        yunitsid=3
+        xdataid=2 or =4 or =6 or =8 or =10
+        ydataid=1 or =3 or =5 or =7 or =9
+        key_titlekernel=y
+        summary=n
+        plot_title=y
+
+    Tags for a histogram:
+       xlabel, ylabel, xdata, ydata, yunits, plot_title, summary
+
+# vim:set ai ts=4 sw=4 tw=78 expandtab:

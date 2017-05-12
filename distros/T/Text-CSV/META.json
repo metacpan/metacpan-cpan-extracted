@@ -1,0 +1,51 @@
+{
+   "abstract" : "comma-separated values manipulator (using XS or PurePerl)",
+   "author" : [
+      "Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-CSV",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Text::CSV_XS" : "1.02"
+         },
+         "requires" : {
+            "IO::Handle" : "0",
+            "Test::Harness" : "0",
+            "Test::More" : "0.71"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/makamaka/Text-CSV"
+      }
+   },
+   "version" : "1.95"
+}

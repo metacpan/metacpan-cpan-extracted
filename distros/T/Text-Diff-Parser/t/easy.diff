@@ -1,0 +1,20 @@
+Index: Makefile.PL
+==============================================================
+--- Makefile.PL 11 Apr 2006 08:33:12 -0000  1.2
++++ Makefile.PL 12 Apr 2006 08:12:42 -0000
+@@ -60,10 +60,11 @@
+    ABSTRACT      => 'Generic non-blocking POE interface to any OO-module',
+    VERSION_FROM  => 'lib/POE/Component/Generic.pm', # finds $VERSION
+    PREREQ_PM     => {
+-       'Test::More'            => 0.32,
+-       'POE'                   => 0.31,
++       'Test::More'        => 0.32,
++       'POE'               => 0.31,
++        'Scalar::Util'      => undef,
+        'Devel::Symdump'    => undef,
++       'Carp'              => undef,
+-       'Carp'          => undef,
+    },
+    dist        => {
+        COMPRESS  => 'gzip -9f',
+Other comments

@@ -1,0 +1,20 @@
+Change for Perl extension Template-Provider-Preload
+
+0.05 Thu 25 Sep 2008
+	- Stop File::Find::Rule bitching when a provider has multiple
+	  include paths.
+
+0.04 Thu 18 Sep 2008
+	- Adding missing Params::Util dependency
+
+0.03 Fri 12 Sep 2008
+	- Adding support for the PREFETCH param
+	- Adding an independant preload cache to allow the regular cache
+	  to function as a post-fork correctly while preferentially
+	  using the prefork cache where entries in it exist.
+
+0.02 Wed 10 Sep 2008
+	- Changing from a sub-class to a Class::Adapter implementation
+
+0.01 Tue  9 Sep 2008
+	- Creating initial version

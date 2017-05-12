@@ -1,0 +1,5 @@
+This is the $Var1 line.
+# comment shouldn't show up
+@INCLUDE { file=> 'inc2_text.txt' , prefix=> '\\', comment=> '//', action=> '%' }
+# this comment shouldn't show up either
+2 times 3 gives @@2*3@@

@@ -1,0 +1,23 @@
+---
+abstract: 'Cross-platform directory selection widget.'
+author:
+  - 'Michael Carman <mjcarman@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-DirSelect
+provides:
+  Tk::DirSelect:
+    file: lib/Tk/DirSelect.pm
+    version: 1.12
+requires:
+  Tk: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.12

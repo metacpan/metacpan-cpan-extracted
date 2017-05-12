@@ -1,0 +1,37 @@
+Changes
+lib/Test/Classy.pm
+lib/Test/Classy/Base.pm
+lib/Test/Classy/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_plan.t
+t/11_no_plan.t
+t/20_basic.t
+t/30_inherit.t
+t/40_ostest.t
+t/50_limit.t
+t/60_die.t
+t/99_pod.t
+t/99_podcoverage.t
+t/lib/Test/Classy/Test/Basic/Plain.pm
+t/lib/Test/Classy/Test/Basic/Skip.pm
+t/lib/Test/Classy/Test/Basic/SkipClass.pm
+t/lib/Test/Classy/Test/Basic/SkipClassDeprecated.pm
+t/lib/Test/Classy/Test/Basic/Todo.pm
+t/lib/Test/Classy/Test/Die/FailsButContinues.pm
+t/lib/Test/Classy/Test/Die/Todo.pm
+t/lib/Test/Classy/Test/Inherit/Base.pm
+t/lib/Test/Classy/Test/Inherit/IgnoreMe.pm
+t/lib/Test/Classy/Test/Inherit/More.pm
+t/lib/Test/Classy/Test/Inherit/Use.pm
+t/lib/Test/Classy/Test/Inherit/UseBase.pm
+t/lib/Test/Classy/Test/Inherit/UseFurther.pm
+t/lib/Test/Classy/Test/Limit/Basic.pm
+t/lib/Test/Classy/Test/Limit/WithoutTarget.pm
+t/lib/Test/Classy/Test/NoPlan/NoPlan.pm
+t/lib/Test/Classy/Test/OSTest/NotWin.pm
+t/lib/Test/Classy/Test/OSTest/Win.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

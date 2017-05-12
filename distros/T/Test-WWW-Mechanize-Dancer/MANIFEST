@@ -1,0 +1,12 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+README.pod
+dist.ini
+lib/Test/WWW/Mechanize/Dancer.pm
+t/00-compile.t
+t/00-mech-class.t
+t/lib/TestPsgi.pm

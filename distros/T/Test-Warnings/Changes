@@ -1,0 +1,113 @@
+Revision history for Test-Warnings
+
+0.026     2016-01-27 03:13:25Z
+          - fixed use of modules loaded by t/zzz-check-breaks.t
+          - fix stderr suppression on perl 5.6
+
+0.025     2016-01-24 02:59:28Z
+          - prereqs lowered from required to suggested:
+            - CPAN::Meta::Check
+            - CPAN::Meta::Requirements
+          - tests are now quieter to avoid causing confusion, by suppressing
+            the printing of stderr in tests
+
+0.024     2015-12-24 18:44:29Z
+          - remove diagnostics accidentally left in new test
+
+0.023     2015-12-22 06:44:24Z
+          - properly handle propagating warnings to previously declared
+            handlers that are not coderefs (i.e. a sub name, or the magic
+            DEFAULT and IGNORE)
+
+0.022     2015-12-19 00:32:42Z
+          - propagate all warnings to any previously-declared __WARN__
+            handlers (unlike with __DIE__, merely calling warn() is not
+            sufficient)
+
+0.021     2015-03-21 18:48:27Z
+          - add a x_breaks entry for conflicting versions of File::pushd which
+            inadvertently call our exported warnings() rather than invoking
+            warnings.pm, and documented this undesired interaction
+
+0.020     2015-01-03 20:32:21Z
+          - re-release to fix problematic $VERSION declaration (RT#101239)
+
+0.019     2014-12-18 20:07:02Z
+          - fix test to allow for special characters (e.g. MSWin32 file
+            separators) in filenames (A. Sinan Unur, PR#7)
+
+0.018     2014-12-17 18:17:30Z
+          - fix test to not depend on message formatting changes in newer Carp
+
+0.017     2014-12-16 20:17:22Z
+          - handle other warning handlers passing us partial warning messages
+            by re-adding the source file and line number
+
+0.016     2014-06-21 04:04:55Z
+          - fix prereq problem with last release - now no longer testing the
+            example scripts for user installs
+
+0.015     2014-06-20 03:36:33Z
+          - adjusted packaging and tests to become perl-5.6 friendly,
+            including only using core or dual-lifed prerequisites
+
+0.014     2014-03-01 22:08:26Z
+          - fix test that was failing when FOO or BAR environment variables
+            were set (RT#93447)
+
+0.013     2013-12-14 21:26:06Z
+          - update configure_requires checking in Makefile.PL
+
+0.012     2013-10-14 16:54:47Z
+          - re-release to fix t/00-report-prereqs.t use of
+            CPAN::Meta::Requirements
+
+0.011     2013-10-12 22:15:02Z
+          - unnecessary tests removed; CONTRIBUTING file added
+
+0.010     2013-09-25 03:29:53Z
+          - re-release with fixed compile test
+
+0.009     2013-09-11 04:49:55Z
+          - fixed error in synopsis (we do not export anything by default)
+          - a caveat added to the documentation regarding embedding warning
+            checks inside another sub (this is for you, ribasushi!!!)
+          - ':no_end_test' now also covers side effects of done_testing, as
+            well as END blocks, making it possible to use the warning(s) subs
+            without having an end warning test while using done_testing
+            (necessary when combining with the 'if' pragma)
+
+0.008     2013-07-14 19:02:01Z
+          - compile test updated, to hopefully fix mswin32 parsing issues
+
+0.007     2013-07-09 22:10:36Z
+          - fix subtest tests to work on Test::More before 0.95_01
+            (RT#86802)
+
+0.006     2013-06-21 00:53:54Z
+          - remove use of Class::Method::Modifiers
+
+0.005     2013-06-20 19:18:42Z
+          - new feature: warnings { code } and warning { code }, for capturing
+            the contents of warnings for subsequent testing
+
+0.004     2013-05-21 21:58:55Z
+          - when allowing warnings (via allow_warnings()), messages are
+            emitted via note() rather than warn(), for less noisy output when
+            running in a harness
+
+0.003     2013-04-13 21:07:58Z
+          - Test suite (and code) fixed to work in the presence of
+            Test::Builder 1.005+ (TB2)
+          - END logic fixed: now a no-warnings test is added whenever any
+            tests have been run, even if there is no plan, as was originally
+            intended
+
+0.002     2013-03-14 21:47:30Z
+          Releasing as non-TRIAL for greater visibility.
+          - ':no_end_test' option added
+          - test added showing that we play nicely with 'skip_all'
+
+0.001     2013-03-10 00:56:29Z (TRIAL RELEASE)
+          - Initial release.
+

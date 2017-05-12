@@ -1,0 +1,11 @@
+EXAMPLES
+
+  This directory was added as of version 1.12, and I expect that I'll add more examples as time goes on. Refer to the tutorial that comes with Tk-JComboBox for more examples.
+
+Contents:
+
+* select.pl - Example demonstrating ways of getting selection.
+* simpleRO.pl - Simple JComboBox in readonly mode (from the tutorial)
+* simpleEd.pl - Simple JComboBox in editble mode (from the tutorial)
+* popupCreate.pl - Example of the -popupcreate option in action
+

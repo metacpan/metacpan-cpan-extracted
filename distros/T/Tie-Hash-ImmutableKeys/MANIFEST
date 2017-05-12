@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tie-Hash-ImmutableKeys.t
+lib/Tie/Hash/ImmutableKeys.pm
+META.yml                                 Module meta-data (added by MakeMaker)

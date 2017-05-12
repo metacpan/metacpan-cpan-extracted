@@ -1,0 +1,43 @@
+0.13 2014-05-16T14:35:53Z
+	- Fix warning (uninitialized value) (fixed by mattn)
+
+0.12 2014-05-15T23:47:04Z
+	- Fix test on Win32 (reported by MidLifeXis, fixed by wchristian)
+
+0.11 2013-07-09T05:39:27Z
+
+	- Fix error on pass/fail (reported by mosasiru)
+
+0.10 2013-05-31T07:38:39Z
+
+	- Append line number to exiting comment
+
+2012-12-07  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.09: Fix behaviour on -e
+
+2012-11-08  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.08: Fix getting real filename (fixed by miyagawa)
+
+2012-10-23  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.06: Fix strange error when $Test::Builder::Level is invalid (reported by tokuhirom)
+	* 0.07: Fix skipping test when $Test::Builder::Level is invalid
+
+2012-08-04  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.05: Fix bug with using chdir (by xaicron)
+
+2012-06-15  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.04: Fix Makefile.PL (by mechairoi)
+
+2012-02-29  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.03: Fix release engineering.
+
+2011-10-22  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.02: Enable cache
+

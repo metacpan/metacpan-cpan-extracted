@@ -1,0 +1,59 @@
+
+NAME
+       Tie::Hash::RegexKeys - Match hash keys using Regular Expressions
+
+SYNOPSIS
+               use Tie::Hash::RegexKeys;
+               use Data::Dumper;
+
+               my %h;
+
+               tie %h, 'Tie::Hash::RegexKeys';
+
+               my $a = '.1.2.3.4.5.6.2';
+               my $b = '.1.2.3.4.5.7';
+               my $c = '.1.2.3.4.5.6.1';
+               my $d = '.1.2.3.4.5.6.1.6';
+
+               $h{$a}="key1";
+               $h{$b}="key2";
+               $h{$c}="subkey1";
+               $h{$d}="subkey2";
+
+               my $pat = '^\.1\.2\.3\.4\.5\.6.*';
+               my @res = tied(%h)->FETCH_KEYS(qr/$pat/);
+               print Dumper(@res);
+
+       Return this:
+
+               $VAR1 = '.1.2.3.4.5.6.1';
+               $VAR2 = '.1.2.3.4.5.6.1.6';
+               $VAR3 = '.1.2.3.4.5.6.2'
+
+DESCRIPTION
+       Extend Tie::Hash::Regex to retrieve the KEYS in place of values
+
+METHODS
+       FETCH_KEYS
+      Get KEY(S) from the hash. If there isn't an exact match try a regex match.
+
+AUTHOR
+       Fabrice DULAUNOY <fabrice@dulaunoy.com>
+
+COPYRIGHT
+       Copyright (C) 2005, Fabrice DULAUNOY.  All Rights Reserved.
+
+       This script is free software; you can redistribute it and/or modify it under the same
+       terms as Perl itself.
+
+SEE ALSO
+       perl(1).
+
+       perltie(1).
+
+       Tie::RegexHash(1)
+
+       Tie::Hash::Regex(1)
+
+
+:

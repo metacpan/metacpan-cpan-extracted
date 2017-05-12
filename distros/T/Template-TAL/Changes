@@ -1,0 +1,12 @@
+0.9 2006-10-06
+
+  * Accepted patch from Chris <chris@linx.net> to treat objects that overload array
+    and hash dereferencing properly.
+  * Fixed bug found by noe.lutz@gmail.com where then 'end' parameter was set wrongly in loops
+  * Added XMLASCII output plugin, for pure ASCII output, encoding all characters as entities.
+  * language modules loaded into the TAL processor can now declare new TALES string types.
+  * General code cleanup, so things are neater and more abstracted.
+
+0.8 2005-11-03
+
+  * Initial release.

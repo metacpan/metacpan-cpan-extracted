@@ -1,0 +1,179 @@
+NAME
+    Template::TAL - Process TAL templates with Perl
+
+SYNOPSIS
+      # create the TT object, telling it where the templates are
+      my $tt = Template::TAL->new( include_path => "./templates" );
+
+      # data to interpolate into the template
+      my $data = {
+        foo => "bar",
+      };
+
+      # process the template from disk (in ./templates/test.tal) with the data
+      print $tt->process("test.tal", $data);
+
+DESCRIPTION
+    TAL is a templating language used in the Zope CMS. Template::TAL is a
+    Perl implementation of TAL based on the published specs on the Zope
+    wiki.
+
+    TAL templates are XML documents, and use attributes in the TAL namespace
+    to define how elements of the template should be treated/displayed. For
+    example:
+
+      my $template = <<'ENDOFXML';
+      <html xmlns:tal="http://xml.zope.org/namespaces/tal">
+        <head>
+          <title tal:content="title"/>
+        </head>
+        <body>
+          <h1>This is the <span tal:replace="title"/> page</h1>
+          <ul>
+            <li tal:repeat="user users">
+              <a href="?" tal:attributes="href user/url"><span tal:replace="user/name"/></a>
+            </li>
+          </ul>
+        </body>
+      </html>  
+      ENDOFXML
+
+    This template can be processed by passing it and the parameters to the
+    "process" method:
+
+      my $tt = Template::TAL->new();
+      $tt->process(\$template, {
+        title => "Bert and Ernie Fansite",
+        users => [
+          { url => "http://www.henson.com/",         name  => "Henson",       },
+          { url => "http://www.sesameworkshop.org/", name  => "Workshop",     },
+          { url => "http://www.bertisevil.tv/",      name  => "Bert is Evil", },
+        ],
+      })
+
+    Alternativly you can store the templates on disk, and pass the filename
+    to "process" directly instead of via a reference (as shown in the
+    synopsis above.)
+
+    Template::TAL is designed to be extensible, allowing you to load
+    templates from different places and produce more than one type of
+    output. By default the XML template will be output as cross-browser
+    compatible HTML (meaning, for example, that image tags won't be closed.)
+    Other output formats, including well-formed XML, can easily be produced
+    by changing the output class (detailed below.)
+
+    For more infomation on the TAL spec itself, see
+    http://www.zope.org/Wikis/DevSite/Projects/ZPT/TAL%20Specification%201.4
+
+METHODS
+    new( include_path => ['/foo/bar'], charset => 'utf-8' )
+        Creates and initializes a new Template::TAL object. Options valid
+        here are:
+
+        include_path
+            If this parameter is set then it is passed to the provider,
+            telling it where to load files from disk (if applicable for the
+            provider.)
+
+        charset
+            If this parameter is set then it is passed to the output,
+            telling it what charset to use instead of its default. The
+            default output class will use the 'utf-8' charset unless you
+            tell it otherwise.
+
+        provider
+            Pass a 'provider' option to specify a provider rather than using
+            the default provider that reads from disk. This can either be a
+            class name of a loaded class, or an object instance.
+
+        output
+            Pass a 'output' option to specify a output class rather than
+            using the default output class that dumps the DOM tree to as a
+            string to create HTML. This can either be a class name of a
+            loaded class, or an object instance.
+
+    languages
+        a listref of language plugins we will use when parsing. All
+        templates get at least the Template::TAL::Language:TAL language
+        module.
+
+    add_language( language module, module, module... )
+        adds a language to the list of those used by the template renderer.
+        'module' here can be a classname or an instance.
+
+    process( $template, $data_hashref )
+        Process the template with the passed data and return the resulting
+        rendered byte sequence.
+
+        $template can either be a string containing where the provider
+        should get the template from (i.e. the filename of the template in
+        the include path), a reference to a string containing the literal
+        text of the template, or a Template::TAL::Template object.
+
+        $data_hashref should be a reference to a hash containing the values
+        that are to be substituted into the template.
+
+    parse_tales( value, context, context,... )
+        Parses a TALES string (see
+        http://www.zope.org/Wikis/DevSite/Projects/ZPT/TALES), looking in
+        each of the passed contexts in order for variable values, and
+        returns the value.
+
+ATTRIBUTES
+    These are get/set chained accessor methods that can be used to alter the
+    object after initilisation (meaning they return their value when called
+    without arguments, and set the value and return $self when called with.)
+
+    In both cases you can set these to either class names or actual
+    instances and they with do the right thing.
+
+    provider
+        The instance of the Template::TAL::Provider subclass that will be
+        providing templates to this engine.
+
+    output
+        The instance of the Template::TAL::Output subclass that will be used
+        to render the produced template output.
+
+RATIONALE
+    Petal is another Perl module that can process a templating language
+    suspiciously similar to TAL. So why did we implement Yet Another
+    Templating Engine? Well, we liked Petal a lot. However, at the time of
+    writing our concerns with Petal were:
+
+    *   Petal isn't strictly TAL. We consider this a flaw.
+
+    *   Petal assumes rather strongly that templates are stored on disk. We
+        wanted a system with a pluggable template source so that we could
+        store templates in other places (such as a database.)
+
+    *   Petal does lots of caching. This is a good thing if you've got a
+        small number of templates compared to the number of pages you serve.
+        However, if you've got a vast number of templates - more than you
+        can hold in memory - then this quickly becomes self defeating. We
+        wanted code that doesn't have any caching in it at all.
+
+    In conclusion: You may be better off using Petal. Certainly the caching
+    layer could be very useful to you.
+
+    There's more than one way to do it.
+
+COPYRIGHT
+    Written by Tom Insam, Copyright 2005 Fotango Ltd. All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    Template::TAL creates superfluous XML namespace attributes in the
+    output.
+
+    Please report any bugs you find via the CPAN RT system.
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template::TAL
+
+SEE ALSO
+    The TAL specification:
+    http://www.zope.org/Wikis/DevSite/Projects/ZPT/TAL%20Specification%201.4
+
+    Petal, another Perl implementation of TAL on CPAN.
+

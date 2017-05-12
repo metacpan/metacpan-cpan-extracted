@@ -1,0 +1,70 @@
+---
+uri: http://test/home.html
+
+request: 'http://dean.serenevy.net/'
+--- |
+HTTP/1.1 200 OK
+Connection: close
+Date: Fri, 13 Mar 2009 20:21:09 GMT
+Server: Apache/2
+Vary: Accept-Encoding
+Content-Length: 1445
+Content-Type: text/html; charset=utf-8
+Content-Type: text/html; charset=UTF-8
+Client-Date: Fri, 13 Mar 2009 20:21:09 GMT
+Client-Peer: 206.212.243.242:80
+Client-Response-Num: 1
+Link: <http://dean.serenevy.net/styles/main.css>; /="/"; rel="stylesheet"; type="text/css"
+Link: <http://dean.serenevy.net/images/bob-16x16.png>; /="/"; rel="icon"; type="image/png"
+Title: Dean Serenevy
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Dean Serenevy  </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" href="http://dean.serenevy.net/styles/main.css" type="text/css" />
+  <link rel="icon" href="http://dean.serenevy.net/images/bob-16x16.png" type="image/png" />
+
+</head>
+<body>
+<div id="ContentBox"><div id="Content">
+<p><b>Name:</b> Dean Serenevy<br />
+<b>Email:</b> <img width="166" alt="no text email" src="http://dean.serenevy.net/images/email.png" class="email" height="22" />
+</p>
+
+
+</div></div>
+
+<div id="NavBarBox"><div id="NavBar">
+
+
+<h1><a href="/">Home</a></h1>
+
+<h1>Computers</h1>
+<ul>
+<li><a href="/code/projects">Coding Projects</a></li>
+</ul>
+
+<h1>Math</h1>
+<ul>
+<li><a href="/teaching">Some Courses I've Taught</a></li>
+<li><a href="/code/projects/arrangement">GAP Arrangements</a></li>
+</ul>
+
+
+<hr />
+
+<p class="about">
+<a href="/about/site">About this site</a><br />
+
+<a href="http://serenevy.net/">Main Serenevy Page</a><br />
+<a href="http://www.iusb.edu/~sbmath/">IUSB Math Department</a><br />
+<a href="http://www.math.neu.edu/">NEU Math Department</a><br />
+<a href="http://riverbendmath.org/">Riverbend Community Math Center</a><br />
+</p>
+
+</div></div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/demo.pl
+lib/Text/WagnerFischer/Amharic.pm
+t/01words.t

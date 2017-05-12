@@ -1,0 +1,6 @@
+name = "Test-Fluent-Logger"
+badges = ["travis"]
+authority="cpan:MOZNION"
+
+module_maker="ModuleBuildTiny"
+

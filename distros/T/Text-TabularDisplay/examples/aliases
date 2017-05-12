@@ -1,0 +1,31 @@
+#!/usr/bin/perl -l
+
+use Text::TabularDisplay;
+use Mail::Address;
+
+my @f = readfile("$ENV{'HOME'}/.mutt/aliases"); 
+my $t = Text::TabularDisplay->new("alias", "address");
+for (@f) {
+        my @l = split;  
+        shift @l;
+        my $alias = shift @l;
+        my $addr = Mail::Address->new("@l");
+        $addr = $addr->format;
+        $t->add($alias, $addr);
+}
+
+print $t->render;
+
+sub readfile {
+    my $file = shift;
+    my @lines;
+    local *F;
+
+    open F, $file or return;
+    while(<F>) {
+        chomp;
+        push @lines, $_;
+    }
+
+    return @lines;
+}

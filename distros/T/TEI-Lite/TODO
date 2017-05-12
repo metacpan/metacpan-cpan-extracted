@@ -1,0 +1,8 @@
+XML::TEILite TODO List
+======================
+
+*) Add DTD declaration to TEI::Lite::Documents.
+*) Add in tree validation.
+*) Document the methods of TEI::Lite::Header.
+*) Document the functions of TEI::Lite::Header.
+*) Switch away from Date::Calc to DateTime.

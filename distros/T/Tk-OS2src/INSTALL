@@ -1,0 +1,175 @@
+mv Tkperl/NotUnix.exc  Tkperl/OnlyWin.exc
+mv DragDrop/Win32Site/NotUnix.exc  DragDrop/Win32Site/OnlyWin.exc
+exit 0
+
+After running the commands above (in Tk directory!), the patches below,
+and the specified below manual changes Tk800.023 should build
+(checked with 5.6.1).
+
+MANUAL CHANGES to pTk/Makefile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+a) Remove the dependency of imgWindow.c on X11/XProto.h.
+b) AR = emxomfar -p64
+c) remove from O_FILES tkUnixFont.c
+
+PROBLEMS
+~~~~~~~~
+
+basic_demo locks even after removing ->Icon;
+demo labels-6:	Iconic buttons show as black;
+demo text-2:	Stippling does not work (or black on black)
+		Strange spacing...
+demo canvas:	Same for all Canvas demos...
+demo		Menus do not get focus...
+		Menus have a titlebar...
+demo    menus2:	Menubar centered... ?!
+    local grab:	Allows raising (but not interaction)
+   Gedi master:	Focus?!!!
+  Progress bar:	Only one is moving...
+
+PATCHES
+~~~~~~~
+
+--- ./Event/Event.xs-pre	Sat Apr  7 08:24:02 2001
++++ ./Event/Event.xs	Mon May 28 00:05:12 2001
+@@ -1063,6 +1063,13 @@ Callback_DESTROY(SV *sv)
+ 
+ #define Event_INIT()
+ 
++#if defined(__EMX__) && (defined(__WIN32__) || defined(__PM__))
++extern int (*Tcl_WaitForEventProc)(int, fd_mask *, Tcl_Time *);
++#  define get_pEvenProc()		((IV)&Tcl_WaitForEventProc)
++#else
++#  define get_pEvenProc()		0
++#endif
++
+ extern XSdec(XS_Tk__Event_INIT);
+ XS(XS_Tk__Event_INIT)
+ {
+@@ -1318,6 +1325,9 @@ void
+ Event_CleanupGlue()
+ 
+ MODULE = Tk::Event	PACKAGE = Tk::Event
++
++IV
++get_pEvenProc()
+ 
+ PROTOTYPES: DISABLE
+ 
+--- ./Tk.xs-pre	Mon May 28 00:01:44 2001
++++ ./Tk.xs	Mon May 28 00:01:54 2001
+@@ -127,6 +127,14 @@ PointToWindow(Tk_Window tkwin, int x, in
+  return (IV) win;
+ }
+ 
++#if defined(__EMX__) && (defined(__WIN32__) || defined(__PM__))
++typedef int (**WaitForEventProc_p)(int, fd_mask *, Tcl_Time *);
++extern WaitForEventProc_p Tcl_WaitForEventProc_p;
++#define set_pEvenProc(addr)	(Tcl_WaitForEventProc_p = (WaitForEventProc_p)(void*)(addr))
++#else
++#define set_pEvenProc(addr)
++#endif
++
+ 
+ MODULE = Tk	PACKAGE = Tk	PREFIX = Const_
+ PROTOTYPES: ENABLE
+@@ -861,6 +869,10 @@ SV *	arg
+ void
+ ClearErrorInfo(win)
+ SV *	win
++
++void
++set_pEvenProc(addr)
++IV	addr
+ 
+ BOOT:
+  {
+--- ./Tk.pm-pre	Tue May 15 06:43:00 2001
++++ ./Tk.pm	Mon May 28 00:04:00 2001
+@@ -73,6 +73,10 @@ my $boot_time = timeofday();
+ Preload(DynaLoader::dl_findfile('-L/usr/openwin/lib','-lX11'))
+   if (NeedPreload() && -d '/usr/openwin/lib');
+ 
++# OS/2 PM uses different event loops in presense and absense of windows
++# Allow window creation code to substitute 
++set_pEvenProc(Tk::Event::get_pEvenProc()) if $^O eq 'os2';
++
+ use Tk::Submethods ('option'    =>  [qw(add get clear readfile)],
+                     'clipboard' =>  [qw(clear append)]
+                    );
+--- ./pTk/mTk/unix/tkUnixPort.h~	Thu Mar 25 16:51:56 1999
++++ ./pTk/mTk/unix/tkUnixPort.h	Fri Apr 16 01:28:50 1999
+@@ -93,7 +93,9 @@
+ #include <X11/cursorfont.h>
+ #include <X11/keysym.h>
+ #include <X11/Xatom.h>
+-#include <X11/Xproto.h>
++#ifndef __PM__
++#  include <X11/Xproto.h>
++#endif
+ #include <X11/Xresource.h>
+ #include <X11/Xutil.h>
+ 
+--- ./pTk/mTk/tixGeneric/tixMwm.c~	Sat Aug  1 05:22:56 1998
++++ ./pTk/mTk/tixGeneric/tixMwm.c	Fri Apr 16 01:28:42 1999
+@@ -17,7 +17,9 @@
+ #include "tkVMacro.h"
+ #include <X11/Xlib.h>
+ #include <X11/Xatom.h>
+-#include <X11/Xproto.h>
++#ifndef __PM__
++#  include <X11/Xproto.h>
++#endif
+ #include <X11/Xutil.h>
+ 
+ 
+--- ./pTk/mTk/additions/imgWindow.c~	Sat Apr  3 12:26:44 1999
++++ ./pTk/mTk/additions/imgWindow.c	Fri Apr 16 01:30:06 1999
+@@ -15,7 +15,9 @@
+ #include "imgInt.h"
+ #include "X11/Xutil.h"
+ #ifndef	__WIN32__
+-#   include "X11/Xproto.h"
++#   ifndef __PM__
++#      include "X11/Xproto.h"
++#   endif
+ #else
+ #   include <windows.h>
+ #   include "X11/Xlib.h"
+--- ./Tk/MMutil.pm~	Fri Apr 16 01:33:34 1999
++++ ./Tk/MMutil.pm	Fri Apr 16 01:24:16 1999
+@@ -406,6 +406,14 @@ sub find_subdir
+       {
+        warn "Skip $dir on $win_arch\n"
+       }
++     elsif (($win_arch ne 'x') and -f "$dir/OnlyUnix.exc")
++      {
++       warn "Skip $dir on $win_arch\n"
++      }
++     elsif (($win_arch !~ /win/) and -f "$dir/OnlyWin.exc")
++      {
++       warn "Skip $dir on $win_arch\n"
++      }
+      else
+       {
+        $dir{$dir} = 1
+--- ./MANIFEST~	Mon Apr  5 14:58:52 1999
++++ ./MANIFEST	Fri Apr 16 01:38:06 1999
+@@ -31,7 +31,7 @@ DragDrop/DragDrop/SunSite.pm
+ DragDrop/DropSite.pm
+ DragDrop/Makefile.PL
+ DragDrop/Win32Site/Makefile.PL
+-DragDrop/Win32Site/NotUnix.exc
++DragDrop/Win32Site/OnlyWin.exc
+ DragDrop/Win32Site/Win32Site.pm
+ DragDrop/Win32Site/Win32Site.xs
+ DragDrop/drag_test
+@@ -217,7 +217,7 @@ Tk/winfolder.xpm
+ Tk/wintext.xpm
+ TkXSUB.def
+ Tkperl/Makefile.PL
+-Tkperl/NotUnix.exc
++Tkperl/OnlyWin.exc
+ Tkperl/winMain.c
+ ToDo
+ VERSIONS			Description of version naming scheme

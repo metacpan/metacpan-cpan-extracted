@@ -1,0 +1,55 @@
+{
+   "abstract" : "An ROText widget which renders HTML code.",
+   "author" : [
+      "Noah Petherbridge <kirsle@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-HyperText",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::TokeParser" : "0",
+            "Tk::BrowseEntry" : "0",
+            "Tk::Derived" : "0",
+            "Tk::JPEG" : "0",
+            "Tk::Listbox" : "0",
+            "Tk::PNG" : "0",
+            "Tk::Text" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kirsle/Tk-HyperText.git",
+         "web" : "https://github.com/kirsle/Tk-HyperText"
+      }
+   },
+   "version" : "0.12"
+}

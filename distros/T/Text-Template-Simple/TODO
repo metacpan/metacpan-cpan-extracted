@@ -1,0 +1,18 @@
+* Interpolated includes can not be used with monolith. It does not seem to be
+  possible to use shared variables in interpolated includes. An error message
+  is returned instead at the moment. Options:
+     o Remove monolith from the API
+     o Leave it as-is. i.e.: an error message will be returned
+     o Find a new way to implement interpolated includes (if possible at all!).
+* Implement a way to find out the name of the top level file which included the
+  sub-template.
+* Fix line numbering. It's probably badly broken (chomp, code/comment blocks, etc.)
+    o Implement a unit test related to this.
+* A more flexible BLOCK implementation. Which:
+    o Can have code in it
+    o Can be used later (like a function)
+* Map file path to digest hash to prevent re-reads upon cache hits
+* Test if some parts can use do {} instead of sub{} for capture.
+* ***LOW*** Partial output instead of collecting everything at once? Not sure if possible at all.
+* ***LOW*** Consider trying PPI. Resume?
+* ***LOW*** Implement TTS plugins for major frameworks.

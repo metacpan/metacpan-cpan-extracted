@@ -1,0 +1,14 @@
+@count.Ngram=2
+@count.WindowSize=5
+@count.FrequencyCut=0
+@count.RemoveCut=2
+@count.InputFilePath=lexelt.train_context
+21
+MN-55812<>.<>1 1 2
+pura0010@d.umn.edu<>pamruta2688@yahoo.com<>1 1 1
+(218)-726-7616<>Email<>1 1 1
+Email<>pura0010@d.umn.edu<>1 1 1
+Hall-338<>Department<>1 1 1
+Duluth<>MN-55812<>1 2 1
+Heller<>Hall-338<>1 1 1
+Phone<>(218)-726-7616<>1 1 1

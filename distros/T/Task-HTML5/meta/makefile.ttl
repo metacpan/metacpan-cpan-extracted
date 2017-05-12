@@ -1,0 +1,19 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/Task-HTML5/project>
+	:perl_version_from _:main ;
+	:version_from _:main ;
+	:readme_from _:main ;
+	:test_requires "Test::More 0.61" ;
+	:requires "HTML::HTML5::Builder 0.004" ;
+	:requires "HTML::HTML5::Entities 0.001" ;
+	:requires "HTML::HTML5::Outline 0.006" ;
+	:requires "HTML::HTML5::Parser 0.107" ;
+	:requires "HTML::HTML5::Sanity 0.102" ;
+	:requires "HTML::HTML5::Writer 0.104" ;
+	:requires "XML::LibXML 1.70" ;
+	:requires "XML::LibXML::PrettyPrint 0.001" .
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/Task/HTML5.pm" .

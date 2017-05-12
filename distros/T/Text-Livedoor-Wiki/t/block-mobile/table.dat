@@ -1,0 +1,16 @@
+=== args
+--- wiki
+|abc|bcd|
+|bgcolor(red):color(red):hoge|foo|
+--- html
+abc bcd <br />
+hoge foo 
+===
+--- wiki
+|!hoge|hoge|~hoge|hoge|hoge|hoge|hoge|
+|^   |>   |hoge|>   |hoge|^   |hoge|
+#
+--- html
+hoge hoge hoge hoge hoge hoge hoge <br />
+hoge hoge hoge <br />
+#

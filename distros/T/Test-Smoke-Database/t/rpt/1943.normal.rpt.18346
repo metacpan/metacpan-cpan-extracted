@@ -1,0 +1,32 @@
+From: abe@ztreet.demon.nl (Abe Timmerman)
+
+Automated smoke report for patch 18346 on openbsd - 3.2 (OpenBSD.i386/1 c=
+pu)
+          v1.16_07      using cc version 2.95.3 20010125 (prerelease)
+O =3D OK
+F =3D Failure(s), extended report at the bottom
+? =3D still running or test results not (yet) available
+Build failures during:       - =3D unknown
+    c =3D Configure, m =3D make, t =3D make test-prep
+
+ 18346   Configuration (common) none
+-------  --------------------------------------------------------------
+O O O O
+O O O O  -Duse64bitint
+O O O O  -Duse64bitall
+O O O O  -Duselongdouble
+O O O O  -Dusemorebits
+O O O O  -Duse64bitall -Duselongdouble
+m m m m  -Duseithreads
+m m m m  -Duseithreads -Duse64bitint
+m m m m  -Duseithreads -Duse64bitall
+m m m m  -Duseithreads -Duselongdouble
+m m m m  -Duseithreads -Dusemorebits
+m m m m  -Duseithreads -Duse64bitall -Duselongdouble
+| | | +- PERLIO =3D perlio -DDEBUGGING
+| | +--- PERLIO =3D stdio  -DDEBUGGING
+| +----- PERLIO =3D perlio
++------- PERLIO =3D stdio
+
+Summary: FAIL(m)
+

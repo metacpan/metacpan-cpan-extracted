@@ -1,0 +1,65 @@
+? hat x
+<math title="hat x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mover>
+      <mi>x</mi>
+      <mo>^</mo>
+    </mover>
+  </mstyle>
+</math>
+$$\hat{x}$$
+
+? bar x
+<math title="bar x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mover>
+      <mi>x</mi>
+      <mo>&macr;</mo>
+    </mover>
+  </mstyle>
+</math>
+$$\bar{x}$$
+
+? ul x
+<math title="ul x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <munder>
+      <mi>x</mi>
+      <mo>&UnderBar;</mo>
+    </munder>
+  </mstyle>
+</math>
+$$\underline{x}$$
+
+? vec x
+<math title="vec x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mover>
+      <mi>x</mi>
+      <mo>&rarr;</mo>
+    </mover>
+  </mstyle>
+</math>
+$$\vec{x}$$
+
+? dot x
+<math title="dot x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mover>
+      <mi>x</mi>
+      <mo>.</mo>
+    </mover>
+  </mstyle>
+</math>
+$$\dot{x}$$
+
+? ddot x
+<math title="ddot x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mover>
+      <mi>x</mi>
+      <mo>..</mo>
+    </mover>
+  </mstyle>
+</math>
+$$\ddot{x}$$

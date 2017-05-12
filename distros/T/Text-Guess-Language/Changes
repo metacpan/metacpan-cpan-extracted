@@ -1,0 +1,13 @@
+Revision history for Text::Guess::Language
+
+0.04  2016-03-06 23:49:05 CET
+        - use strict
+
+0.03  2016-03-06 23:14:14 CET
+        - added languages
+
+0.02  2016-03-06 13:26:58 CET
+        - added language tests
+
+0.01  2016-03-06 09:59:17 CET
+        - Initial release

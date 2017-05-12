@@ -1,0 +1,50 @@
+# Revision history for Perl extension Text::Darts.
+#
+# $Id: Changes,v 0.9 2011/01/11 04:45:59 dankogai Exp dankogai $
+#
+$Revision: 0.9 $ $Date: 2011/01/11 04:45:59 $
++   t/01_simple.t
+! Makefile.PL
+  Darts.xs
+  lib/Text/Darts.pm
+  Mac OS X fixes by @tokuhirom
+
+0.08  2009/04/06 10:29:38
+! README Darts.pm
+  More Documents
+
+0.07 2009/04/06 10:25:41
+  Internal Release
++ darts.h
+  Text::Darts now includes darts.h.
+  You no longer need to install darts a priori.
+! Darts.xs lib/Text/Darts.pm
+  More optimization
+
+0.06 2009/03/30 12:57:33
+! Darts.xs lib/Text/Darts.pm
+  Optimized gsub($str, \%hashref);
+
+0.05  2009/03/30 11:44:30
+! Darts.xs lib/Text/Darts.pm
+  gsub() now accepts hash reference, too.
+
+0.04 2008/09/27 15:24:53
+! Darts.xs
+  fixed for Darts-0.32 (by NAOYA)
+  Message-Id:	<20080927232111.3A0A.520E252C@hatena.ne.jp>
+! lib/Text/Darts.pm
+  Pod fixes
+
+0.03 2007/12/23
+! Makefile.pm
+  s@intra/@dan.co.jp/
+
+0.02 2007/12/23 16:32:49
+! Darts.xs lib/Text/Darts.pm
+  added $td->open();
+
+0.01  Sun Dec 23 19:26:55 2007
+	- original version; created by h2xs 1.23 with options
+		-n Text::Darts
+

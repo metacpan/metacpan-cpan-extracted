@@ -1,0 +1,33 @@
+[% META title = 'Create/Update Book' %]
+
+[%# Comment out the auto-rendered form %]
+[%# widget_result.as_xml %]
+
+
+[%# Iterate over the form elements and display each -%]
+<form name="book_form" action="[% widget_result.action %]" method="post">
+<table border="0">
+[% FOREACH element = widget_result.elements %]
+  <tr>
+    <td class="form-label">
+      [% element.label.as_text %]
+    </td>
+    <td class="form-element">
+      [% element.element_xml %]
+      <span class="form-error">
+        [% element.error_xml %]
+      </span>
+    </td>
+  </tr>
+[% END %]
+</table>
+</form>
+
+
+<p><a href="[% Catalyst.uri_for('list') %]">Return to book list</a></p>
+
+
+[%# A little JavaScript to move the cursor to the first field %]
+<script LANGUAGE="JavaScript">
+document.book_form.book_form_title.focus();
+</script>

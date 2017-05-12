@@ -1,0 +1,5 @@
+// Data access methods.
+[% FOREACH Java.variables %]
+public $type get$capName() { return $name; }
+public void set$capName($type $name) { this.$name = $name; }
+[% END %]

@@ -1,0 +1,39 @@
+--- #YAML:1.0
+name:               Task-CPANAuthors-STRO
+version:            2009.1223
+abstract:           "Task" for installing modules maintained by STRO
+author:
+    - Serguei Trouchelle <stro@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CGI::Application::Plugin::DevPopup::Params:  1.01
+    CGI::Application::Plugin::DevPopup::Query:  1.01
+    Data::Define:         1.03
+    FindBin::Real:        1.05
+    FTN::Address:         1.03
+    FTN::Nodelist:        1.07
+    Lingua::Cyrillic::Translit::ICAO:  1.05
+    Lingua::Multinational::Translit::ICAO:  1.05
+    Lingua::RU::Jcuken:   1.04
+    Lingua::UK::Jcuken:   1.04
+    perl:                 5.006001
+    Prompt::Timeout:      1.02
+    Text::Compare:        1.03
+    WWW::DreamHost::API:  1.02
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-CPANAuthors-STRO
+    license:     http://dev.perl.org/licenses/
+    repository:  http://svn.trouchelle.com/perlmodules/Task-CPANAuthors-STRO
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

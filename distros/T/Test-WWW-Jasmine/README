@@ -1,0 +1,32 @@
+Test::WWW::Jasmine
+==================
+
+This module implements Perl test runner for JavaScript test specs that use
+Jasmine BDD framework. Test::WWW::Jasmine uses WWW::Selenium to run tests
+in a browser, thus making possible to automatically test complex JavaScript
+applications that rely heavily on DOM availability.
+
+Test spec output is collected and converted to TAP format; from Perl
+perspective Jasmine test specs look just like ordinary Perl tests.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+    WWW::Selenium
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2012 by Alexander Tokarev
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. See perlartistic.
+

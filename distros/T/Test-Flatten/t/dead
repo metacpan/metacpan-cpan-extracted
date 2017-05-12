@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More;
+use Test::Flatten;
+
+subtest foo => sub {
+    bar(); # throw Undefined subroutine &main::bar
+};
+
+done_testing;

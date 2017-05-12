@@ -1,0 +1,5 @@
+1.10  Added the is_extractable_deeply and
+                is_extractable_isa
+
+1.01  Initial release to CPAN
+

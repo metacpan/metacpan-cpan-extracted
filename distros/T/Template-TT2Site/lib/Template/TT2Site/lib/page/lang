@@ -1,0 +1,32 @@
+[% # $Id: lang,v 1.3 2005/02/02 19:34:06 jv Exp $ -%]
+[%
+
+# Provide links to language alternatives.
+
+FOREACH lang IN site.languages;
+
+  UNLESS site.lang == lang;
+
+    IF site.image.flags.$lang;
+
+      other = template.name.replace("^$site.lang/","$lang/");
+
+      TRY;
+        tryfile = page.root _ "/" _ page.src _ "/" _ other;
+        USE File(tryfile);
+        other = template.name.replace("^$site.lang/","$site.realtop$lang/");
+      
+	"<a href=\"$other\">";
+	INCLUDE util/image image = site.image.flags.$lang;
+	"</a>";
+      CATCH;
+        "<!-- No file: " _ tryfile _ " -->";
+      END;
+
+    END;
+
+  END;
+
+END;
+
+-%]

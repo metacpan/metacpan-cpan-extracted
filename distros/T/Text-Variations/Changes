@@ -1,0 +1,8 @@
+0.01 - 4 Apr 2009
+    * first release to CPAN
+
+0.02 - 5 Apr 2009
+    * removed List::MoreUtils from test as not needed.
+
+0.03 - 16 Jun 2016
+    * fixed regex issue causing failure with Perl 5.25.1

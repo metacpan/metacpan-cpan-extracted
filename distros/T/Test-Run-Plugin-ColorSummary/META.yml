@@ -1,0 +1,37 @@
+---
+abstract: 'A Test::Run plugin that'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::Run::CmdLine::Trap::ProveApp: '0'
+  Test::Run::Trap::Obj: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Run-Plugin-ColorSummary
+provides:
+  Test::Run::CmdLine::Plugin::ColorSummary:
+    file: lib/Test/Run/CmdLine/Plugin/ColorSummary.pm
+    version: '0.0202'
+  Test::Run::Plugin::ColorSummary:
+    file: lib/Test/Run/Plugin/ColorSummary.pm
+    version: '0.0202'
+requires:
+  Scalar::Util: '0'
+  Term::ANSIColor: '0'
+  Test::More: '0'
+  Test::Run::CmdLine: '0.0111'
+  Test::Run::Core: '0.0118'
+  Test::Run::Obj: '0'
+  perl: '5.008'
+resources:
+  homepage: http://web-cpan.shlomifish.org/modules/Test-Run/
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://bitbucket.org/shlomif/perl-test-run
+version: '0.0202'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,21 @@
+Revision history for Perl extension Text::CSV::Flatten.
+
+0.04  Wed Mar 16 18:23:00 CET 2016
+	- No-op version bump for packaging reasons
+
+0.03  Wed Mar 16 15:23:19 CET 2016
+	- Support 'binary' data in column output
+	- Proper serialization for internal hash keys that represent tuples
+	- More test cases
+
+0.02  Sun Feb 14 12:20:12 CET 2016
+	- Add JSON as a dependency
+	  (it already was; just wasn't listed as such in the Makefile)
+	- Update documentation.
+
+0.01  Sun Jan 31 21:08:20 2016
+	- original version; created by h2xs 1.23 with options
+		-XAn Text::CSV::Flatten
+	- Initial functionality; api still subject to change.
+	  It is very likely that in the future, the constructor will only
+	  accept options and the data is passed to another method.

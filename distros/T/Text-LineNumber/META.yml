@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Text-LineNumber
+version:             0.02
+abstract:            Convert between offsets and line numbers.
+license:             ~
+author:              
+    - Juergen Weigert <jw@suse.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

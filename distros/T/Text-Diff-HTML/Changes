@@ -1,0 +1,41 @@
+Revision history for Perl extension Text::Diff::HTML.
+
+0.07  2011-06-26T05:48:03
+      - Moved to [GitHub](http://github.com/theory/text-diff-html/).
+      - Switched to a static README.md, rather than a generated README.
+
+0.06  2009-04-07T16:13:05
+      - Fixed a pasto in the "Support" section of the documentation.
+      - Changed the documention from recommending that the diff output be
+        wrapped in <pre> tags to suggesting instead that it be wrapped in an
+        element that uses the CSS "white-space: pre". Reported by Pete Gillin
+        (RT #24301).
+
+0.05  2008-05-04T02:11:09
+      - Added the "configure_requires" and "recommends" parameters to
+        Build.PL.
+      - Added a link to the Subversion repository.
+
+0.04  2005-09-06T16:33:51
+      - Swiched from <span class="ins"> and <span class="del"> to <ins>
+        and <del> elements. Why didn't I notice those before? Sorry for yet
+        another change in the XHTML, but this is more semantic, and I there-
+        fore don't expect to change it again. Suggested by Lucas Carlson.
+      - Rejiggered sample CSS in "eg/diff.css" for new XHTML elements and
+        shorter background color specs.
+
+0.03  2005-09-05T18:40:29
+      - Improved CSS examples in "eg/diff.css" by using more specific
+        selectors.
+      - Minor code and documentation reformatting.
+      
+
+0.02  2005-09-04T17:01:59
+      - Added "See Also" section to documentation.
+      - Added <div>s for the whole file and for each hunk. Suggested by
+        Marshall Roch.
+      - Fixed a number of annoying documentation typos and improved the
+        documentation of each XHTML element.
+
+0.01  2005-09-03T18:29:21
+      - Initial public release.

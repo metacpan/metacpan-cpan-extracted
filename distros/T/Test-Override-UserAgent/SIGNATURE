@@ -1,0 +1,76 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f1aae0a41d93f2dd384f719d13e7b5381cd08774 Build.PL
+SHA1 75b654db13a2d43ea19368400bcdf21e9f0ac636 Changes
+SHA1 a809c6971c66430d9e95ae5adb7d2ca76fa5b875 LICENSE
+SHA1 7cbbdcf65b2ae38eb92ea52f4f4ee82967a1e98e MANIFEST
+SHA1 0e98ba99602d803f3f385f341c48d599613b6ca6 META.json
+SHA1 139ffdb4cb3c358490df94f26eb0568376cb08c3 META.yml
+SHA1 3ecbb169c28336ac69b8acf4e7dd5cf8ff51e823 README
+SHA1 ab11277ce0cbd17393d2360c28fed85d6e7fcf40 lib/Test/Override/UserAgent.pm
+SHA1 5701e162af41e7cc2e2d3fb6839e074535f0f768 lib/Test/Override/UserAgent/Manual/ConfigurationPackage.pod
+SHA1 045bb02b1809c6bdf4a32b4feddea30211bfb724 lib/Test/Override/UserAgent/Scope.pm
+SHA1 e01692175c59631e2c895556164ecf341dc29150 t/00-load.t
+SHA1 961d2c3c3a203ed8fdebe07f87f6273a899a0db5 t/bad_handlers.t
+SHA1 3300c44dac3ad0539747fcc904624f1dcd91b801 t/configuration_with_defaults.t
+SHA1 1f41dfaf5c38a32a86dccccb271dd91b3c5cc2df t/constructor.t
+SHA1 cabdfd0459cd0e555d6c02db2097203f73287e21 t/from_configuration.t
+SHA1 61d195fd638f85cc6dbf76bc658bc53c6a16dc59 t/handle_request.t
+SHA1 8fe768ba405e02059e8629e09a433dfc23e4c13c t/lib/MyUAConfig.pm
+SHA1 cd4e25c858a3b77c586a6b5ab6e3038dc9f25188 t/lib/MyUAConfigDefaults.pm
+SHA1 4a0a831ba93c253eaff7b11682b5f1a0e1f07774 t/lib/MyUAConfigLive.pm
+SHA1 e0d70fb5208b62cca593e3ad7663fe2a2731c7f3 t/lib/MyUtil.pm
+SHA1 82bc0d8a5da5e97544c6703dedcd5ac99752c915 t/live_restriction.t
+SHA1 9c22e5598e04717f1e3b2a9495861d2755d680f6 t/override_request/host.t
+SHA1 2538029342053a8a388c3ebab3f2945f17065bbb t/override_request/method.t
+SHA1 402852a10e132116c299e1f04491e87b61fa668d t/override_request/path.t
+SHA1 2fe8def53571046aa1edf127012ca2e03abc9116 t/override_request/port.t
+SHA1 214edfd7c68109a218737ff8ff244910ee3be9f4 t/override_request/scheme.t
+SHA1 cf1c923f0d819d448e4170f049723ace5b869efa t/override_request/url.t
+SHA1 7263bd63bc08be30a68ea69fb50f4252d210e497 t/psgi.t
+SHA1 ff6f10b4aa446561effc9fb1edef3cb5dda71ff0 t/psgi_validate.t
+SHA1 6fbf440e57852c84581bc0abde21db8280d40ce1 t/scope.t
+SHA1 0098c0c1bcf587993404c421908dd664ec03b5f1 t/simple.t
+SHA1 6f712ad6033b11e24dbbb332dd37d5486ebf988f t/user_agent.t
+SHA1 3f1c9fae28f9ffa27092e4ba10050f955d99d5a3 xt/clean-namespaces.t
+SHA1 38d8ce1e4de7d0c87cfb912fd4bb5a8357ca7811 xt/consistent-version.t
+SHA1 617b83f7eabcb961afea6f3f449c6d54aa7922f1 xt/critic.t
+SHA1 e8cac77353e561f65c8ceaf801d7cb4e27e16c27 xt/eol.t
+SHA1 a1db6b35567196f75f782a9699e869742ead2564 xt/kwalitee.t
+SHA1 60a5b83e839e66bc7f52f0da3d9aef4d891ddecb xt/manifest.t
+SHA1 8b5d8044ee7a0d61865d4e8e0181aad51cee80d3 xt/perl-version.t
+SHA1 5e735cfaa30aa69032e83880503660b8aa5493c0 xt/perlcriticrc
+SHA1 39389b5ad48260f67ab578ad615a27bfac720215 xt/pod-coverage.t
+SHA1 7db1fcc4c42b28c02de9dc9b421e973dcef0f8f1 xt/pod.t
+SHA1 2fdbe618c508205c7a36d8608794cbd7ddda0e1a xt/used-check.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOpJucAAoJEGN8PvITkwmbQP4P/3reI6LJvVq6rFzgCE7sMXmP
+OFIiJqk1aluesOXfCf7KCz+afMC5brbpI8A03/VNYVDb3/0gdaEVxstcY3aeMYe6
+RHIMqcucjlfv2vqB5VVJ2HZ1+fxn85VrT6XPltxYp8/5Bel9E4lldN/M0CzNhXj7
+W5UhOhUvVWSgeN68UMwzJS7/8agnYlbY4JOwbDPu3VIGBYg0BtOQg/TDzL93j4TC
+sbZpazAX4/VsgZ8pRS17ra3VI9SHD+unVEOi9pdt7ILc2foYbUEO/JZd2gKvrD8r
+HUQsmVgUPiNjGpvwQ4i7UiWq6/oiwZX0+9J7acKkQHOKoPOkXo1HYe/if/5nzab/
+xgV95v7t+a4OP/xAW3k7jrMTIyxlJV2VI+pkB5MNOnK/fzzDPuieuK/NWoOEGCDK
+DHzaWJhiQP1JaU66QWRtPzxPxEzzRWv1m8N5IbbZ2eSjgXpOFd6GrZjQ1E6gnr3i
+VvN/HjSbxCaUjT/7rBjWpp39tYN1w32R5UoykOyU3ijJ+/sSfa1uvmBmg6swHJoi
+OovxaLeeiHXqLAHuV91SDQCGIK5zzgPFMhl48pkLtQV07SEn0kR19nE3qBSu70rZ
+CPfGPUhn+Pt7HV6uwrH+jX2PscDf5z3DbXG7Pg811UBKRQNnT3GKONsDnDbzRe/C
+2ksWFoElKuYmi29wKTFR
+=2tOx
+-----END PGP SIGNATURE-----

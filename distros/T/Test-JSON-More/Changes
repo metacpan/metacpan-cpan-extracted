@@ -1,0 +1,8 @@
+Revision history for Perl extension Test::JSON::More
+
+0.02    Thu Apr 28 10:23:29 JST 2016
+        - fix the dependent module(add 'parent')
+        - improve POD
+
+0.01    Wed Apr 27 21:00:35 JST 2016
+        - original version

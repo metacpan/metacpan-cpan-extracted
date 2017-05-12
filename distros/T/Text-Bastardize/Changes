@@ -1,0 +1,17 @@
+Revision history for Perl extension Crypt::Rot13.
+
+0.05  Mon May 10 17:04:24 1999 
+        - initial version, more functionality and bugfixes expected,
+          interface of current functions (execpt perhaps for rot13)
+          not expected to change.
+
+0.06  Mon May 10 20:06:51 1999
+        - improvements to k3wlt0k
+
+0.07  7 Oct 2006
+        - add disemvowel
+        - minor style changes
+        - change license from GPL to as-with-perl
+
+0.08  7 Oct 2006
+        - improve disemvowel

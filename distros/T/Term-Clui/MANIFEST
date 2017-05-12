@@ -1,0 +1,15 @@
+Changes
+Clui.pm
+Clui/FileSelect.pm
+Makefile.PL
+test.pl
+MANIFEST
+README
+META.yml
+examples/login_shell
+examples/test_script
+examples/linux_admin
+examples/audio_stuff
+examples/choose
+py/TermClui.py
+py/test_script

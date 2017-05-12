@@ -1,0 +1,11 @@
+Tk::SlideShow::Sprite->Get('i7')->place(291,221);
+Tk::SlideShow::Sprite->Get('i8')->place(293,163)->fontFamily('crillee')->color('green');
+Tk::SlideShow::Sprite->Get('i9')->place(294,106)->fontFamily('shohlfold');
+Tk::SlideShow::Sprite->Get('t')->multipos(6,7,473,69,146,435,136,378,140,313,139,251,133,191,126,132,127,78,124,19,26,263);
+Tk::SlideShow::Sprite->Get('i10')->place(294,40)->fontFamily('caligula');
+Tk::SlideShow::Sprite->Get('i1')->place(303,562);
+Tk::SlideShow::Sprite->Get('i2')->place(300,513);
+Tk::SlideShow::Sprite->Get('i3')->place(297,463);
+Tk::SlideShow::Sprite->Get('i4')->place(297,401)->fontFamily('crillee');
+Tk::SlideShow::Sprite->Get('i5')->place(294,344);
+Tk::SlideShow::Sprite->Get('i6')->place(294,283)->color('magenta');

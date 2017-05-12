@@ -1,0 +1,36 @@
+= NetBSD Installation Instructions =
+== Installation using the Package Manager ==
+For binary packages installation take a look at http://www.netbsd.org/docs/software/packages.html#binarydist.
+There are packages available for some platforms (including NetBSD and Darwin).
+The 2010Q1 release of pkgsrc will provide binary packages for Padre, too.
+
+Packed by Sno|, contact pkgsrc-users@NetBSD.org in case of problems.
+
+To install Padre on NetBSD or any other pkgsrc supported platform, simply
+{{{
+$ cd /usr/pkgsrc/editors/p5-Padre
+$ make install clean clean-depends
+}}}
+
+If you want to add plugin's, too, check which ones are already available:
+{{{
+$ cd /usr/pkgsrc
+$ echo */p5-Padre-Plugin-*
+}}}
+
+For each desired plugin, change the working directory to it's location and install as done above.
+
+If you have trouble installing Padre using pkgsrc (and read the pkgsrc guide, mailing list archives and open PR's carefully), feel free to send your question to {{{ pkgsrc-p5-people }}} or {{{ pkgsrc-users }}} mailing list as found on {{{ http://www.netbsd.org/mailinglists/#descriptions-of-mailing-lists }}}. Although the import and maintaining is mostly done by Jens Rehsack, your chance getting feedback is better asking the proper mailing list instead of the primary maintainer. You might get questions answered on {{{ irc://irc.freenode.net/ }}} in the channel {{{ #pkgsrc }}}.
+
+== Installation from CPAN ==
+Currently, there are no Padre CPAN installation instructions specific to NetBSD.
+Feel free to add comments and hints.
+
+== Still Not Working? ==
+Following the instructions on this page did not lead to a successful installation?
+
+[http://padre.perlide.org/contact.html Contact us].
+
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.

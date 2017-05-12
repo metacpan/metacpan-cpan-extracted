@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+TODO
+dist.ini
+lib/Trac/RPC.pm
+lib/Trac/RPC/Base.pm
+lib/Trac/RPC/Exception.pm
+lib/Trac/RPC/System.pm
+lib/Trac/RPC/Tools.pm
+lib/Trac/RPC/Wiki.pm
+t/errors.t
+t/utils.pl

@@ -1,0 +1,34 @@
+---
+abstract: 'test source code for errors in whitespaces'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131490'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Whitespaces
+requires:
+  Carp: 0
+  Cwd: 0
+  File::Find: 0
+  FindBin: 0
+  Getopt::Long: 0
+  List::Util: 0
+  Pod::Usage: 0
+  Term::ANSIColor: 0
+  open: 0
+  perl: v5.8.0
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/bessarabov/Test-Whitespaces/issues
+  homepage: https://github.com/bessarabov/Test-Whitespaces
+  repository: https://github.com/bessarabov/Test-Whitespaces.git
+version: 1.2.1

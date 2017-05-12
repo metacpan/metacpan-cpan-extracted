@@ -1,0 +1,42 @@
+#!/sbin/runscript
+# Copyright 1999-2007 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+depend() {
+        after *
+}
+
+start() {
+        ebegin "(gentoo) Starting tapper program run control"
+
+        #needed for NFS
+        /etc/init.d/portmap start
+
+        STARTSCRIPT=
+        FILENAME="tapper-automatic-test.pl"
+        POSSIBLE_PATHS="
+/mnt/opt/tapper/perl/perls/current/bin/
+/opt/tapper/perl/perls/current/bin/
+"
+        while (( 1 )); do
+            for DIR in $POSSIBLE_PATHS; do
+                STARTSCRIPT=${DIR}/$FILENAME
+                if [[ -e $STARTSCRIPT ]]
+                then
+                    # show network configuration so we can log into virtualisation guest
+                    /sbin/ifconfig
+
+                    ${DIR}/perl $STARTSCRIPT $*
+                    exit 0
+                fi
+            done
+            sleep 2
+        done
+
+        eend $? "Failed to start local"
+}
+
+stop() {
+        ebegin "Nothing to do"
+}
+

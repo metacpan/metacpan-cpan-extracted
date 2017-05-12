@@ -1,0 +1,22 @@
+1.14  Sat, 07 Sep 2013 10:34:04 -0400
+  * Add Term::ReadLine::EditLine support.
+
+1.13  Sat, 07 Sep 2013 09:51:35 -0400
+  * Fix a couple of typos.
+
+1.12  Sat, 07 Sep 2013 09:50:01 -0400
+  * Minor documentation changes.
+
+1.11  Sat, 07 Sep 2013 09:45:30 -0400
+  * Stop creating sys$command files w/o STDIN connected (msys).
+  * Rational findConsole dispatch.
+
+1.10  Tue, 11 Sep 2012 10:30:58 -0400
+  * Don't use /dev/tty if it happens to exist on Windows.
+
+1.09  Mon, 26 Mar 2012 14:49:18 +0200
+  * Optionally integrate with event loops other than Tk
+
+1.07  Thu, 07 Jul 2011 17:08:25 +0200
+  * First stand-alone release to CPAN. This release is identical to version 1.07
+    as shipped with the perl code as of 5.13.3.

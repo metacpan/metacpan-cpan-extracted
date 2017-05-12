@@ -1,0 +1,8 @@
+Revision history for Perl extension Text::DoubleMetaphone_PP.
+0.03  Thu Oct 25 13:40:16 2012
+        - renamed object to better comply with standards
+0.02  Sat Oct 20 14:45:41 2012
+	- fixed an export bug.
+0.01  Wed Oct 17 14:35:56 2012
+	- original version; created by h2xs 1.23 with options
+		-XAn Text::DoubleMetaphone_PP

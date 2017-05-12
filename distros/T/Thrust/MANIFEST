@@ -1,0 +1,11 @@
+Changes
+lib/Thrust.pm
+lib/Thrust/Window.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/load.t
+t/remote.t
+t/static/remote.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

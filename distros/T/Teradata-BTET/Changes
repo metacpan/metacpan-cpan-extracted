@@ -1,0 +1,10 @@
+Revision history for Perl extension Teradata::BTET.
+
+0.01  Fri Aug 12 08:44:26 2005
+	- original version; created by h2xs 1.21 with options
+		-n Teradata::BTET
+
+0.02  Thu Jun 15 08:26:48 2006
+	- Changed "long int" to "int" to avoid problems on 64-bit
+	  platforms. Thanks to Dave Dillenbeck of DataAllegro for
+	  this tip.

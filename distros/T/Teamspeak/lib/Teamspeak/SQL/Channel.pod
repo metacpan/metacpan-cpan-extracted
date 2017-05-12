@@ -1,0 +1,19 @@
+=head1 NAME
+
+Teamspeak::SQL::Channel - Teamspeak::Server have multiple Channels.
+
+=head1 SEE ALSO
+
+L<"Teamspeak::SQL ts2_channel">
+
+=head1 CLASS METHODS
+
+=head2 store()
+
+A modified ts2_channel object is stored at the database.
+
+=head2 parameter()
+
+Returns a list with possible Channel Parameter.
+
+=cut

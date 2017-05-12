@@ -1,0 +1,31 @@
+Revision history for Test-Mojo-Plack
+
+0.10    2015-11-07 13:07
+        Fix problems with encoding
+
+0.09    2015-11-07 13:07
+        Fix problems with Catalyst PSGI apps
+
+0.08    2015-11-01 15:10
+        Add META.yml
+
+0.07    2014-11-04 10:41
+        Test against local server instead of Google
+
+0.06    2014-10-27 22:40
+        Fix broken documentation
+
+0.05    2014-10-27 22:15
+        Add initial Dancer app test
+
+0.04    2014-10-27 21:50
+        Updated documentation
+
+0.03    2014-10-27 21:30
+        Fix dependencies and add missing tests
+
+0.02    2014-10-27 21:25
+        Fix dependencies and add missing tests
+
+0.01    2014-10-27 18:30
+        First version, released  on an unsuspecting world.

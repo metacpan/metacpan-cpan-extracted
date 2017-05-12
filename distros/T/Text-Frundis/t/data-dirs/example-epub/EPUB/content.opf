@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="epub-id-1">
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:opf="http://www.idpf.org/2007/opf">
+<dc:identifier id="epub-id-1">very-unique-identifier</dc:identifier>
+<dc:language>en</dc:language>
+<dc:title id="epub-title-1">Title</dc:title>
+</metadata>
+<manifest>
+<item id="epub2_ncx"
+      href="toc.ncx"
+      media-type="application/x-dtbncx+xml" />
+<item id="index" href="index.xhtml" media-type="application/xhtml+xml" />
+<item id="body-1-0" href="body-1-0.xhtml" media-type="application/xhtml+xml" />
+<item id="body-1-1" href="body-1-1.xhtml" media-type="application/xhtml+xml" />
+<item id="body-1-2" href="body-1-2.xhtml" media-type="application/xhtml+xml" />
+<item id="body-2-2" href="body-2-2.xhtml" media-type="application/xhtml+xml" />
+<item id="body-2-3" href="body-2-3.xhtml" media-type="application/xhtml+xml" />
+<item id="css"
+      href="stylesheet.css"
+      media-type="text/css" />
+</manifest>
+<spine toc="epub2_ncx">
+<itemref idref="index" />
+<itemref idref="body-1-0" />
+<itemref idref="body-1-1" />
+<itemref idref="body-1-2" />
+<itemref idref="body-2-2" />
+<itemref idref="body-2-3" />
+</spine>
+<guide>
+</guide>
+</package>

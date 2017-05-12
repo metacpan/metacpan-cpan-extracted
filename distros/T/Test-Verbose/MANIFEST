@@ -1,0 +1,13 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+bin/tv
+lib/Test/Verbose.pm
+t/pretend/lib/Foo.pm
+t/pretend/t/bar.t
+t/pretend/t/bat.t
+t/pretend/t/baz.t
+t/pretend/t/foo.t
+t/test.t

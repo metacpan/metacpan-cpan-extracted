@@ -1,0 +1,49 @@
+---
+abstract: 'stubbing on LWP request'
+author:
+  - 'NAKAGAWA Masaki <masaki@cpan.org>'
+build_requires:
+  Test::Fake::HTTPD: '0.03'
+  Test::More: '0.98'
+  Test::UseAllModules: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mock-LWP-Conditional
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Mock::LWP::Conditional:
+    file: lib/Test/Mock/LWP/Conditional.pm
+    version: '0.04'
+  Test::Mock::LWP::Conditional::Stubs:
+    file: lib/Test/Mock/LWP/Conditional/Stubs.pm
+requires:
+  Class::Method::Modifiers: '0'
+  LWP::UserAgent: '0'
+  Math::Random::Secure: '0'
+  Scalar::Util: '1.14'
+  Sub::Install: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/masaki/Test-Mock-LWP-Conditional/issues
+  homepage: https://github.com/masaki/Test-Mock-LWP-Conditional
+  repository: git://github.com/masaki/Test-Mock-LWP-Conditional.git
+version: '0.04'
+x_authority: cpan:MASAKI
+x_contributors:
+  - 'Michael Scragg <scraggm@mindbrix.com>'
+  - 'ikasam_a <masaki.nakagawa@gmail.com>'

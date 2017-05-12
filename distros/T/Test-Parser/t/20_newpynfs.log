@@ -1,0 +1,787 @@
+Starting Call Back server stub on port 43676
+Starting Call Back server stub on port 55648
+Sleeping for 135 seconds: 
+Woke up
+Sleeping for 135 seconds: 
+Woke up
+{}
+Sleeping for 135 seconds: 
+Woke up
+Sleeping for 45 seconds: 
+Woke up
+Sleeping for 45 seconds: 
+Woke up
+Sleeping for 45 seconds: 
+Woke up
+Sleeping for 45 seconds: Waiting for lock release
+Woke up
+Sleeping for 45 seconds: Waiting for lock release
+Woke up
+Sleeping for 45 seconds: Waiting for lock release
+Woke up
+Sleeping for 45 seconds: Waiting for lock release
+Woke up
+Sleeping for 45 seconds: Waiting for queued blocking lock to timeout
+Woke up
+Sleeping for 45 seconds: Waiting for queued blocking lock to timeout
+Woke up
+Sleeping for 45 seconds: Waiting for queued blocking lock to timeout
+Woke up
+Got error: Connection closed
+Sleeping for 135 seconds: 
+Woke up
+Sleeping for 135 seconds: 
+Woke up
+Sleeping for 135 seconds: 
+Woke up
+Sleeping for 1 seconds: 
+Woke up
+Got error: (104, 'Connection reset by peer')
+**************************************************
+ACC1a    st_access.testReadLink                                   : PASS
+ACC1b    st_access.testReadBlock                                  : PASS
+ACC1c    st_access.testReadChar                                   : PASS
+ACC1d    st_access.testReadDir                                    : PASS
+ACC1f    st_access.testReadFifo                                   : PASS
+ACC1r    st_access.testReadFile                                   : PASS
+ACC1s    st_access.testReadSocket                                 : PASS
+ACC2a    st_access.testAllLink                                    : PASS
+ACC2b    st_access.testAllBlock                                   : PASS
+ACC2c    st_access.testAllChar                                    : PASS
+ACC2d    st_access.testAllDir                                     : PASS
+ACC2f    st_access.testAllFifo                                    : PASS
+ACC2r    st_access.testAllFile                                    : PASS
+ACC2s    st_access.testAllSocket                                  : PASS
+ACC3     st_access.testNoFh                                       : PASS
+ACC4a    st_access.testInvalidsLink                               : PASS
+ACC4b    st_access.testInvalidsBlock                              : PASS
+ACC4c    st_access.testInvalidsChar                               : PASS
+ACC4d    st_access.testInvalidsDir                                : PASS
+ACC4f    st_access.testInvalidsFifo                               : PASS
+ACC4r    st_access.testInvalidsFile                               : PASS
+ACC4s    st_access.testInvalidsSocket                             : PASS
+CID1     st_setclientid.testClientReboot                          : WARNING
+           Trying to use old stateid after SETCLIENTID_CONFIRM
+           purges state should return NFS4ERR_OLD_STATEID,
+           instead got NFS4ERR_BAD_STATEID
+CID1b    st_setclientid.testClientUpdateCallback                  : PASS
+CID2     st_setclientid.testInUse                                 : PASS
+CID3     st_setclientid.testLoseAnswer                            : FAILURE
+           SETCLIENTID case not covered in RFC should return
+           NFS4_OK, instead got NFS4ERR_INVAL
+CID4     st_setclientid.testAllCases                              : FAILURE
+           OP_SETCLIENTID should return NFS4_OK, instead got
+           NFS4ERR_INVAL
+CID5     st_setclientid.testLotsOfClients                         : PASS
+CID6     st_setclientid.testNoConfirm                             : FAILURE
+           OPEN using clientid that was never confirmed should
+           return NFS4ERR_STALE_CLIENTID, instead got
+           NFS4ERR_EXPIRED
+CIDCF1   st_setclientidconfirm.testStale                          : PASS
+CIDCF2   st_setclientidconfirm.testBadConfirm                     : FAILURE
+           SETCLIENTID_CONFIRM with case not covered in RFC,
+           seems most likely should do nothing and should return
+           NFS4_OK, instead got NFS4ERR_CLID_INUSE
+CIDCF3   st_setclientidconfirm.testAllCases                       : PASS
+CLOSE1   st_close.testCloseCreate                                 : PASS
+CLOSE2   st_close.testCloseOpen                                   : PASS
+CLOSE3   st_close.testBadSeqid                                    : PASS
+CLOSE4   st_close.testBadStateid                                  : PASS
+CLOSE5   st_close.testOldStateid                                  : PASS
+CLOSE6   st_close.testStaleStateid                                : PASS
+CLOSE7   st_close.testNoCfh                                       : PASS
+CLOSE8   st_close.testTimedoutClose1                              : FAILURE
+           CLOSE after lease timeout should return
+           NFS4ERR_EXPIRED, instead got NFS4ERR_BAD_STATEID
+CLOSE9   st_close.testTimedoutClose2                              : FAILURE
+           CLOSE after lease timeout with lock held should return
+           NFS4ERR_EXPIRED, instead got NFS4ERR_BAD_STATEID
+CMT1a    st_commit.testCommitOffset0                              : PASS
+CMT1b    st_commit.testCommitOffset1                              : PASS
+CMT1c    st_commit.testCommitOffsetMax1                           : PASS
+CMT1d    st_commit.testCommitOffsetMax2                           : PASS
+CMT1e    st_commit.testCommitCount1                               : PASS
+CMT1f    st_commit.testCommitCountMax                             : PASS
+CMT2a    st_commit.testLink                                       : PASS
+CMT2b    st_commit.testBlock                                      : PASS
+CMT2c    st_commit.testChar                                       : PASS
+CMT2d    st_commit.testDir                                        : PASS
+CMT2f    st_commit.testFifo                                       : PASS
+CMT2s    st_commit.testSocket                                     : PASS
+CMT3     st_commit.testNoFh                                       : PASS
+CMT4     st_commit.testCommitOverflow                             : PASS
+COMP1    st_compound.testZeroOps                                  : PASS
+COMP2    st_compound.testGoodTag                                  : PASS
+COMP3    st_compound.testBadTags                                  : FAILURE
+           Compound with invalid utf8 tag '\xc0\xc1' should
+           return NFS4ERR_INVAL, instead got NFS4_OK
+COMP4    st_compound.testInvalidMinor                             : PASS
+COMP5    st_compound.testUndefined                                : PASS
+COMP6    st_compound.testLongCompound                             : FAILURE
+           COMPOUND with len=150 argarry got RPCError:
+           MSG_ACCEPTED: GARBAGE_ARGS, expected NFS4ERR_RESOURCE
+CR2      st_create.testDirOffLink                                 : PASS
+CR3      st_create.testDirOffBlock                                : PASS
+CR4      st_create.testDirOffChar                                 : PASS
+CR5      st_create.testDirOffSocket                               : PASS
+CR6      st_create.testDirOffFIFO                                 : PASS
+CR7      st_create.testDirOffFile                                 : PASS
+CR8      st_create.testNoFh                                       : PASS
+CR9      st_create.testZeroLength                                 : PASS
+CR10     st_create.testRegularFile                                : PASS
+CR11     st_create.testInvalidAttrmask                            : PASS
+CR12     st_create.testUnsupportedAttributes                      : FAILURE
+           Using unsupported attr acl in CREATE should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+CR13     st_create.testDots                                       : FAILURE
+           Trying to CREATE a dir named '.' should return NFS4_OK
+           or NFS4ERR_BADNAME, instead got NFS4ERR_INVAL
+CR14     st_create.testSlash                                      : FAILURE
+           Creation of dir named 'CR14/foo' should return
+           NFS4ERR_BADNAME or NFS4ERR_BADCHAR, instead got
+           NFS4ERR_INVAL
+CR15     st_create.testLongName                                   : PASS
+GATT1a   st_getattr.testMandLink                                  : PASS
+GATT1b   st_getattr.testMandBlock                                 : PASS
+GATT1c   st_getattr.testMandChar                                  : PASS
+GATT1d   st_getattr.testMandDir                                   : PASS
+GATT1f   st_getattr.testMandFifo                                  : PASS
+GATT1r   st_getattr.testMandFile                                  : PASS
+GATT1s   st_getattr.testMandSocket                                : PASS
+GATT2    st_getattr.testNoFh                                      : PASS
+GATT3a   st_getattr.testWriteOnlyLink                             : PASS
+GATT3b   st_getattr.testWriteOnlyBlock                            : PASS
+GATT3c   st_getattr.testWriteOnlyChar                             : PASS
+GATT3d   st_getattr.testWriteOnlyDir                              : PASS
+GATT3f   st_getattr.testWriteOnlyFifo                             : PASS
+GATT3r   st_getattr.testWriteOnlyFile                             : PASS
+GATT3s   st_getattr.testWriteOnlySocket                           : PASS
+GATT4a   st_getattr.testUnknownAttrLink                           : PASS
+GATT4b   st_getattr.testUnknownAttrBlock                          : PASS
+GATT4c   st_getattr.testUnknownAttrChar                           : PASS
+GATT4d   st_getattr.testUnknownAttrDir                            : PASS
+GATT4f   st_getattr.testUnknownAttrFifo                           : PASS
+GATT4r   st_getattr.testUnknownAttrFile                           : PASS
+GATT4s   st_getattr.testUnknownAttrSocket                         : PASS
+GATT5a   st_getattr.testEmptyLink                                 : PASS
+GATT5b   st_getattr.testEmptyBlock                                : PASS
+GATT5c   st_getattr.testEmptyChar                                 : PASS
+GATT5d   st_getattr.testEmptyDir                                  : PASS
+GATT5f   st_getattr.testEmptyFifo                                 : PASS
+GATT5r   st_getattr.testEmptyFile                                 : PASS
+GATT5s   st_getattr.testEmptySocket                               : PASS
+GATT6a   st_getattr.testSupportedLink                             : PASS
+GATT6b   st_getattr.testSupportedBlock                            : PASS
+GATT6c   st_getattr.testSupportedChar                             : PASS
+GATT6d   st_getattr.testSupportedDir                              : PASS
+GATT6f   st_getattr.testSupportedFifo                             : PASS
+GATT6r   st_getattr.testSupportedFile                             : PASS
+GATT6s   st_getattr.testSupportedSocket                           : PASS
+GATT7a   st_getattr.testLongLink                                  : PASS
+GATT7b   st_getattr.testLongBlock                                 : PASS
+GATT7c   st_getattr.testLongChar                                  : PASS
+GATT7d   st_getattr.testLongDir                                   : PASS
+GATT7f   st_getattr.testLongFifo                                  : PASS
+GATT7r   st_getattr.testLongFile                                  : PASS
+GATT7s   st_getattr.testLongSocket                                : PASS
+GATT8    st_getattr.testFSLocations                               : PASS
+GF1a     st_getfh.testLink                                        : PASS
+GF1b     st_getfh.testBlock                                       : PASS
+GF1c     st_getfh.testChar                                        : PASS
+GF1d     st_getfh.testDir                                         : PASS
+GF1f     st_getfh.testFifo                                        : PASS
+GF1r     st_getfh.testFile                                        : PASS
+GF1s     st_getfh.testSocket                                      : PASS
+GF9      st_getfh.testNoFh                                        : PASS
+GSS1     st_gss.testBadGssSeqnum                                  : OMIT
+           Dependency function _using_gss failed
+GSS2     st_gss.testInconsistentGssSeqnum                         : OMIT
+           Dependency function _using_gss failed
+GSS3     st_gss.testBadVerfChecksum                               : OMIT
+           Dependency function _using_gss failed
+GSS4     st_gss.testBadDataChecksum                               : OMIT
+           Dependency function _using_gss failed
+GSS5     st_gss.testBadVersion                                    : OMIT
+           Dependency function _using_gss failed
+GSS6     st_gss.testHighSeqNum                                    : OMIT
+           Dependency function _using_gss failed
+GSS7     st_gss.testBadProcedure                                  : OMIT
+           Dependency function _using_gss failed
+GSS8     st_gss.testBadService                                    : OMIT
+           Dependency function _using_gss failed
+INIT     st_setclientid.testValid                                 : PASS
+LINK1a   st_link.testLink                                         : PASS
+LINK1b   st_link.testBlock                                        : PASS
+LINK1c   st_link.testChar                                         : PASS
+LINK1d   st_link.testDir                                          : PASS
+LINK1f   st_link.testFifo                                         : PASS
+LINK1r   st_link.testFile                                         : PASS
+LINK1s   st_link.testSocket                                       : PASS
+LINK2    st_link.testNoSfh                                        : PASS
+LINK3    st_link.testNoCfh                                        : PASS
+LINK4a   st_link.testCfhLink                                      : FAILURE
+           LINK with <cfh> not a directory should return
+           NFS4ERR_NOTDIR, instead got NFS4ERR_SYMLINK
+LINK4b   st_link.testCfhBlock                                     : PASS
+LINK4c   st_link.testCfhChar                                      : PASS
+LINK4f   st_link.testCfhFifo                                      : PASS
+LINK4r   st_link.testCfhFile                                      : PASS
+LINK4s   st_link.testCfhSocket                                    : PASS
+LINK5    st_link.testExists                                       : PASS
+LINK6    st_link.testZeroLenName                                  : PASS
+LINK7    st_link.testLongName                                     : PASS
+LINK8    st_link.testInvalidUtf8                                  : FAILURE
+           LINK with invalid utf8 name LINK8/\xc0\xc1 should
+           return NFS4ERR_INVAL, instead got NFS4_OK
+LINK9    st_link.testDots                                         : FAILURE
+           Trying to make a hardlink named '.' should return
+           NFS4_OK or NFS4ERR_BADNAME, instead got NFS4ERR_INVAL
+LINKS    st_link.testSupported                                    : PASS
+LKT1     st_lockt.testUnlockedFile                                : PASS
+LKT2a    st_lockt.testLink                                        : PASS
+LKT2b    st_lockt.testBlock                                       : FAILURE
+           operation OP_SETCLIENTID_CONFIRM should return
+           NFS4_OK, instead got NFS4ERR_CLID_INUSE
+LKT2c    st_lockt.testChar                                        : PASS
+LKT2d    st_lockt.testDir                                         : PASS
+LKT2f    st_lockt.testFifo                                        : PASS
+LKT2s    st_lockt.testSocket                                      : PASS
+LKT3     st_lockt.testPartialLockedFile1                          : PASS
+LKT4     st_lockt.testPartialLockedFile2                          : PASS
+LKT5     st_lockt.test32bitRange                                  : PASS
+LKT6     st_lockt.testZeroLen                                     : PASS
+LKT7     st_lockt.testLenTooLong                                  : PASS
+LKT8     st_lockt.testNoFh                                        : PASS
+LKT9     st_lockt.testStaleClientid                               : PASS
+LKTOVER  st_lockt.testOverlap                                     : PASS
+LKU1     st_locku.testFile                                        : PASS
+LKU2     st_locku.test32bitRange                                  : PASS
+LKU3     st_locku.testZeroLen                                     : PASS
+LKU4     st_locku.testLenTooLong                                  : PASS
+LKU5     st_locku.testNoFh                                        : PASS
+LKU6     st_locku.testBadLockSeqid                                : PASS
+LKU6b    st_locku.testBadLockSeqid2                               : PASS
+LKU7     st_locku.testOldLockStateid                              : PASS
+LKU8     st_locku.testBadLockStateid                              : PASS
+LKU9     st_locku.testStaleLockStateid                            : PASS
+LKU10    st_locku.testTimedoutUnlock                              : FAILURE
+           Try to unlock file after timed out should return
+           NFS4ERR_EXPIRED or NFS4_OK, instead got
+           NFS4ERR_BAD_STATEID
+LKUNONE  st_locku.testUnlocked                                    : PASS
+LKUOVER  st_locku.testOverlap                                     : PASS
+LKUSPLIT st_locku.testSplit                                       : PASS
+LOCK1    st_lock.testFile                                         : PASS
+LOCK3    st_lock.testExistingFile                                 : PASS
+LOCK4    st_lock.testMode                                         : PASS
+LOCK5    st_lock.testZeroLen                                      : PASS
+LOCK6    st_lock.testLenTooLong                                   : PASS
+LOCK7    st_lock.testNoFh                                         : PASS
+LOCK8a   st_lock.testBadLockSeqid                                 : PASS
+LOCK8b   st_lock.testBadOpenSeqid                                 : PASS
+LOCK8c   st_lock.testNonzeroLockSeqid                             : FAILURE
+           LOCK with newlockowner's lockseqid=1 should return
+           NFS4ERR_BAD_SEQID, instead got NFS4_OK
+LOCK9a   st_lock.testOldLockStateid                               : PASS
+LOCK9b   st_lock.testOldOpenStateid                               : PASS
+LOCK9c   st_lock.testOldOpenStateid2                              : PASS
+LOCK10   st_lock.testStaleClientid                                : PASS
+LOCK11   st_lock.testBadStateid                                   : PASS
+LOCK12a  st_lock.testStaleLockStateid                             : PASS
+LOCK12b  st_lock.testStaleOpenStateid                             : PASS
+LOCK13   st_lock.testTimedoutGrabLock                             : PASS
+LOCK14   st_lock.testGrabLock1                                    : PASS
+LOCK15   st_lock.testGrabLock2                                    : PASS
+LOCK16   st_lock.testReadLocks1                                   : PASS
+LOCK17   st_lock.testReadLocks2                                   : PASS
+LOCK18   st_lock.testFairness                                     : WARNING
+           Locking is not fair
+LOCK19   st_lock.testBlockPoll                                    : WARNING
+           Locking is not fair
+LOCK20   st_lock.testBlockTimeout                                 : PASS
+LOCK21   st_lock.testBlockingQueue                                : WARNING
+           Locking is not fair
+LOCK22   st_lock.testLongPoll                                     : WARNING
+           Locking is not fair
+LOCKCHGD st_lock.testDowngrade                                    : PASS
+LOCKCHGU st_lock.testUpgrade                                      : PASS
+LOCKHELD st_lock.testClose                                        : PASS
+LOCKMRG  st_lock.testOverlap                                      : PASS
+LOCKRNG  st_lock.test32bitRange                                   : PASS
+LOOK1    st_lookup.testNoFh                                       : PASS
+LOOK2    st_lookup.testNonExistent                                : PASS
+LOOK3    st_lookup.testZeroLength                                 : PASS
+LOOK4    st_lookup.testLongName                                   : PASS
+LOOK5a   st_lookup.testSymlinkNotDir                              : PASS
+LOOK5b   st_lookup.testBlockNotDir                                : PASS
+LOOK5c   st_lookup.testCharNotDir                                 : PASS
+LOOK5f   st_lookup.testFifoNotDir                                 : PASS
+LOOK5r   st_lookup.testFileNotDir                                 : PASS
+LOOK5s   st_lookup.testSocketNotDir                               : PASS
+LOOK6    st_lookup.testNonAccessable                              : FAILURE
+           LOOKUP object in a dir with mode=000 should return
+           NFS4ERR_ACCESS, instead got NFS4_OK
+LOOK7    st_lookup.testInvalidUtf8                                : FAILURE
+           LOOKUP object with invalid utf-8 name \xc0\xc1 should
+           return NFS4ERR_INVAL, instead got NFS4ERR_NOENT
+LOOK8    st_lookup.testDots                                       : PASS
+LOOK9    st_lookup.testUnaccessibleDir                            : FAILURE
+           LOOKUP off of dir with mode=0 should return
+           NFS4ERR_ACCESS, instead got NFS4_OK
+LOOKBLK  st_lookup.testBlock                                      : PASS
+LOOKCHAR st_lookup.testChar                                       : PASS
+LOOKDIR  st_lookup.testDir                                        : PASS
+LOOKFIFO st_lookup.testFifo                                       : PASS
+LOOKFILE st_lookup.testFile                                       : PASS
+LOOKLINK st_lookup.testLink                                       : PASS
+LOOKP1   st_lookupp.testDir                                       : PASS
+LOOKP2a  st_lookupp.testLink                                      : FAILURE
+           LOOKUPP with non-dir <cfh> should return
+           NFS4ERR_NOTDIR, instead got NFS4ERR_SYMLINK
+LOOKP2b  st_lookupp.testBlock                                     : PASS
+LOOKP2c  st_lookupp.testChar                                      : PASS
+LOOKP2f  st_lookupp.testFifo                                      : PASS
+LOOKP2r  st_lookupp.testFile                                      : PASS
+LOOKP2s  st_lookupp.testSock                                      : PASS
+LOOKP3   st_lookupp.testAtRoot                                    : PASS
+LOOKP4   st_lookupp.testNoFh                                      : PASS
+LOOKSOCK st_lookup.testSocket                                     : PASS
+MKBLK    st_create.testBlock                                      : PASS
+MKCHAR   st_create.testChar                                       : PASS
+MKDIR    st_create.testDir                                        : PASS
+MKFIFO   st_create.testFIFO                                       : PASS
+MKFILE   st_open.testOpen                                         : PASS
+MKLINK   st_create.testLink                                       : PASS
+MKSOCK   st_create.testSocket                                     : PASS
+MODE     st_setattr.testMode                                      : PASS
+NVF1a    st_nverify.testMandLink                                  : PASS
+NVF1b    st_nverify.testMandBlock                                 : PASS
+NVF1c    st_nverify.testMandChar                                  : PASS
+NVF1d    st_nverify.testMandDir                                   : PASS
+NVF1f    st_nverify.testMandFifo                                  : PASS
+NVF1r    st_nverify.testMandFile                                  : PASS
+NVF1s    st_nverify.testMandSocket                                : PASS
+NVF2a    st_nverify.testTypeLink                                  : PASS
+NVF2b    st_nverify.testTypeBlock                                 : PASS
+NVF2c    st_nverify.testTypeChar                                  : PASS
+NVF2d    st_nverify.testTypeDir                                   : PASS
+NVF2f    st_nverify.testTypeFifo                                  : PASS
+NVF2r    st_nverify.testTypeFile                                  : PASS
+NVF2s    st_nverify.testTypeSocket                                : PASS
+NVF3a    st_nverify.testBadSizeLink                               : PASS
+NVF3b    st_nverify.testBadSizeBlock                              : PASS
+NVF3c    st_nverify.testBadSizeChar                               : PASS
+NVF3d    st_nverify.testBadSizeDir                                : PASS
+NVF3f    st_nverify.testBadSizeFifo                               : PASS
+NVF3r    st_nverify.testBadSizeFile                               : PASS
+NVF3s    st_nverify.testBadSizeSocket                             : PASS
+NVF4     st_nverify.testNoFh                                      : PASS
+NVF5a    st_nverify.testWriteOnlyLink                             : PASS
+NVF5b    st_nverify.testWriteOnlyBlock                            : PASS
+NVF5c    st_nverify.testWriteOnlyChar                             : PASS
+NVF5d    st_nverify.testWriteOnlyDir                              : PASS
+NVF5f    st_nverify.testWriteOnlyFifo                             : PASS
+NVF5r    st_nverify.testWriteOnlyFile                             : PASS
+NVF5s    st_nverify.testWriteOnlySocket                           : PASS
+NVF7a    st_nverify.testUnsupportedLink                           : FAILURE
+           NVERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+NVF7b    st_nverify.testUnsupportedBlock                          : FAILURE
+           NVERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+NVF7c    st_nverify.testUnsupportedChar                           : FAILURE
+           NVERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+NVF7d    st_nverify.testUnsupportedDir                            : FAILURE
+           NVERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+NVF7f    st_nverify.testUnsupportedFifo                           : FAILURE
+           NVERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+NVF7r    st_nverify.testUnsupportedFile                           : FAILURE
+           NVERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+NVF7s    st_nverify.testUnsupportedSocket                         : FAILURE
+           NVERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+OPCF1    st_openconfirm.testConfirmCreate                         : PASS
+OPCF2    st_openconfirm.testNoFh                                  : PASS
+OPCF3a   st_openconfirm.testLink                                  : FAILURE
+           OPEN_CONFIRM of a nonfile object should return
+           NFS4ERR_INVAL, instead got NFS4ERR_SYMLINK
+OPCF3b   st_openconfirm.testBlock                                 : PASS
+OPCF3c   st_openconfirm.testChar                                  : PASS
+OPCF3d   st_openconfirm.testDir                                   : PASS
+OPCF3f   st_openconfirm.testFifo                                  : PASS
+OPCF3s   st_openconfirm.testSocket                                : PASS
+OPCF4    st_openconfirm.testBadSeqid                              : PASS
+OPCF5    st_openconfirm.testBadStateid                            : PASS
+OPCF6    st_openconfirm.testStaleStateid                          : PASS
+OPDG1    st_opendowngrade.testRegularOpen                         : PASS
+OPDG2    st_opendowngrade.testNewState1                           : PASS
+OPDG3    st_opendowngrade.testNewState2                           : PASS
+OPDG4    st_opendowngrade.testBadSeqid                            : PASS
+OPDG5    st_opendowngrade.testBadStateid                          : PASS
+OPDG6    st_opendowngrade.testStaleStateid                        : PASS
+OPDG7    st_opendowngrade.testOldStateid                          : PASS
+OPDG8    st_opendowngrade.testNoFh                                : PASS
+OPDG9a   st_opendowngrade.testLink                                : WARNING
+           OPENDOWNGRADE with nonfile object should return
+           NFS4ERR_INVAL, instead got NFS4ERR_BAD_STATEID
+OPDG9b   st_opendowngrade.testBlock                               : WARNING
+           OPENDOWNGRADE with nonfile object should return
+           NFS4ERR_INVAL, instead got NFS4ERR_BAD_STATEID
+OPDG9c   st_opendowngrade.testChar                                : WARNING
+           OPENDOWNGRADE with nonfile object should return
+           NFS4ERR_INVAL, instead got NFS4ERR_BAD_STATEID
+OPDG9d   st_opendowngrade.testDir                                 : WARNING
+           OPENDOWNGRADE with nonfile object should return
+           NFS4ERR_INVAL, instead got NFS4ERR_BAD_STATEID
+OPDG9f   st_opendowngrade.testFifo                                : WARNING
+           OPENDOWNGRADE with nonfile object should return
+           NFS4ERR_INVAL, instead got NFS4ERR_BAD_STATEID
+OPDG9s   st_opendowngrade.testSocket                              : WARNING
+           OPENDOWNGRADE with nonfile object should return
+           NFS4ERR_INVAL, instead got NFS4ERR_BAD_STATEID
+OPEN2    st_open.testCreateUncheckedFile                          : PASS
+OPEN3    st_open.testCreatGuardedFile                             : PASS
+OPEN4    st_open.testCreatExclusiveFile                           : PASS
+OPEN5    st_open.testOpenFile                                     : PASS
+OPEN6    st_open.testOpenVaporFile                                : PASS
+OPEN7a   st_open.testLink                                         : PASS
+OPEN7b   st_open.testBlock                                        : FAILURE
+           operation OP_SETCLIENTID_CONFIRM should return
+           NFS4_OK, instead got NFS4ERR_CLID_INUSE
+OPEN7c   st_open.testChar                                         : PASS
+OPEN7d   st_open.testDir                                          : PASS
+OPEN7f   st_open.testFifo                                         : PASS
+OPEN7s   st_open.testSocket                                       : PASS
+OPEN8    st_open.testNoFh                                         : PASS
+OPEN10   st_open.testZeroLenName                                  : FAILURE
+           operation OP_SETCLIENTID_CONFIRM should return
+           NFS4_OK, instead got NFS4ERR_CLID_INUSE
+OPEN11   st_open.testLongName                                     : PASS
+OPEN12   st_open.testNotDir                                       : PASS
+OPEN13   st_open.testInvalidUtf8                                  : FAILURE
+           Trying to open file with invalid utf8 name
+           OPEN13/\xc0\xc1 should return NFS4ERR_INVAL, instead
+           got NFS4_OK
+OPEN14   st_open.testInvalidAttrmask                              : PASS
+OPEN15   st_open.testUnsupportedAttributes                        : FAILURE
+           Trying to OPEN with unsupported attribute should
+           return NFS4ERR_ATTRNOTSUPP, instead got NFS4_OK
+OPEN16   st_open.testClaimPrev                                    : WARNING
+           Trying to OPEN with CLAIM_PREVIOUS should return
+           NFS4ERR_RECLAIM_BAD, instead got NFS4ERR_NO_GRACE
+OPEN17   st_open.testModeChange                                   : FAILURE
+           Opening file OPEN17 with mode=000 should return
+           NFS4ERR_ACCESS, instead got NFS4_OK
+OPEN18   st_open.testShareConflict1                               : PASS
+OPEN19   st_open.testShareConflict2                               : PASS
+OPEN20   st_open.testFailedOpen                                   : PASS
+OPEN21   st_open.testDenyRead1                                    : PASS
+OPEN22   st_open.testDenyRead2                                    : PASS
+OPEN23   st_open.testDenyRead3                                    : PASS
+OPEN23b  st_open.testDenyRead3a                                   : PASS
+OPEN24   st_open.testDenyRead4                                    : PASS
+OPEN25   st_open.testDenyWrite1                                   : PASS
+OPEN26   st_open.testDenyWrite2                                   : PASS
+OPEN27   st_open.testDenyWrite3                                   : PASS
+OPEN28   st_open.testDenyWrite4                                   : PASS
+PUB1     st_putpubfh.testSupported                                : FAILURE
+           Invalid COMPOUND result: Returned ops = [10044],
+           expected [23]
+PUTFH1a  st_putfh.testLink                                        : PASS
+PUTFH1b  st_putfh.testBlock                                       : PASS
+PUTFH1c  st_putfh.testChar                                        : PASS
+PUTFH1d  st_putfh.testDir                                         : PASS
+PUTFH1f  st_putfh.testFifo                                        : PASS
+PUTFH1r  st_putfh.testFile                                        : PASS
+PUTFH1s  st_putfh.testSocket                                      : PASS
+PUTFH2   st_putfh.testBadHandle                                   : PASS
+PUTFH3   st_putfh.testStaleHandle                                 : PASS
+RD1      st_read.testSimpleRead                                   : PASS
+RD2      st_read.testStateidOnes                                  : PASS
+RD3      st_read.testWithOpen                                     : PASS
+RD4      st_read.testLargeCount                                   : WARNING
+           READ returned 32768 characters, expected 9000000
+RD5      st_read.testLargeOffset                                  : PASS
+RD6      st_read.testZeroCount                                    : PASS
+RD7a     st_read.testLink                                         : PASS
+RD7b     st_read.testBlock                                        : PASS
+RD7c     st_read.testChar                                         : PASS
+RD7d     st_read.testDir                                          : PASS
+RD7f     st_read.testFifo                                         : PASS
+RD7s     st_read.testSocket                                       : PASS
+RD8      st_read.testNoFh                                         : PASS
+RD9      st_read.testBadStateid                                   : PASS
+RD10     st_read.testStaleStateid                                 : PASS
+RD11     st_read.testOldStateid                                   : PASS
+RD12     st_read.testOpenMode                                     : WARNING
+           READ with file opened in WRITE mode should return
+           NFS4ERR_OPENMODE, instead got NFS4_OK
+RDDR1    st_readdir.testEmptyDir                                  : PASS
+RDDR2    st_readdir.testFirst                                     : PASS
+RDDR3    st_readdir.testAttr                                      : PASS
+RDDR4    st_readdir.testSubsequent                                : PASS
+RDDR5a   st_readdir.testFhLink                                    : PASS
+RDDR5b   st_readdir.testFhBlock                                   : PASS
+RDDR5c   st_readdir.testFhChar                                    : PASS
+RDDR5f   st_readdir.testFhFifo                                    : PASS
+RDDR5r   st_readdir.testFhFile                                    : PASS
+RDDR5s   st_readdir.testFhSocket                                  : PASS
+RDDR6    st_readdir.testNoFh                                      : PASS
+RDDR7    st_readdir.testMaxcountZero                              : PASS
+RDDR8    st_readdir.testMaxcountSmall                             : PASS
+RDDR9    st_readdir.testWriteOnlyAttributes                       : PASS
+RDDR10   st_readdir.testReservedCookies                           : PASS
+RDDR11   st_readdir.testUnaccessibleDir                           : FAILURE
+           READDIR of directory with mode=0 should return
+           NFS4ERR_ACCESS, instead got NFS4_OK
+RDDR12   st_readdir.testUnaccessibleDirAttrs                      : FAILURE
+           READDIR of directory with mode=0 should return
+           NFS4ERR_ACCESS, instead got NFS4_OK
+RDLK1    st_readlink.testReadlink                                 : PASS
+RDLK2b   st_readlink.testBlock                                    : PASS
+RDLK2c   st_readlink.testChar                                     : PASS
+RDLK2d   st_readlink.testDir                                      : PASS
+RDLK2f   st_readlink.testFifo                                     : PASS
+RDLK2r   st_readlink.testFile                                     : PASS
+RDLK2s   st_readlink.testSocket                                   : PASS
+RDLK3    st_readlink.testNoFh                                     : PASS
+RENEW1   st_renew.testRenew                                       : PASS
+RENEW2   st_renew.testBadRenew                                    : PASS
+RENEW3   st_renew.testExpired                                     : PASS
+RLOWN1   st_releaselockowner.testFile                             : PASS
+RM1a     st_remove.testLink                                       : PASS
+RM1b     st_remove.testBlock                                      : PASS
+RM1c     st_remove.testChar                                       : PASS
+RM1d     st_remove.testDir                                        : PASS
+RM1f     st_remove.testFifo                                       : PASS
+RM1r     st_remove.testFile                                       : PASS
+RM1s     st_remove.testSocket                                     : PASS
+RM2a     st_remove.testCfhLink                                    : PASS
+RM2b     st_remove.testCfhBlock                                   : PASS
+RM2c     st_remove.testCfhChar                                    : PASS
+RM2f     st_remove.testCfhFifo                                    : PASS
+RM2r     st_remove.testCfhFile                                    : PASS
+RM2s     st_remove.testCfhSocket                                  : PASS
+RM3      st_remove.testNoFh                                       : PASS
+RM4      st_remove.testZeroLengthTarget                           : PASS
+RM5      st_remove.testNonUTF8                                    : FAILURE
+           Trying to remove file with invalid utf8 name
+           RM5/\xc0\xc1 should return NFS4ERR_INVAL, instead got
+           NFS4ERR_NOENT
+RM6      st_remove.testNonExistent                                : PASS
+RM7      st_remove.testDots                                       : WARNING
+           REMOVE nonexistant '.' should return NFS4ERR_BADNAME,
+           instead got NFS4ERR_NOENT
+RM8      st_remove.testNotEmpty                                   : PASS
+RNM1a    st_rename.testValidLink                                  : PASS
+RNM1b    st_rename.testValidBlock                                 : PASS
+RNM1c    st_rename.testValidChar                                  : PASS
+RNM1d    st_rename.testValidDir                                   : PASS
+RNM1f    st_rename.testValidFifo                                  : PASS
+RNM1r    st_rename.testValidFile                                  : PASS
+RNM1s    st_rename.testValidSocket                                : PASS
+RNM2a    st_rename.testSfhLink                                    : PASS
+RNM2b    st_rename.testSfhBlock                                   : PASS
+RNM2c    st_rename.testSfhChar                                    : PASS
+RNM2f    st_rename.testSfhFifo                                    : PASS
+RNM2r    st_rename.testSfhFile                                    : PASS
+RNM2s    st_rename.testSfhSocket                                  : PASS
+RNM3a    st_rename.testCfhLink                                    : PASS
+RNM3b    st_rename.testCfhBlock                                   : PASS
+RNM3c    st_rename.testCfhChar                                    : PASS
+RNM3f    st_rename.testCfhFifo                                    : PASS
+RNM3r    st_rename.testCfhFile                                    : PASS
+RNM3s    st_rename.testCfhSocket                                  : PASS
+RNM4     st_rename.testNoSfh                                      : PASS
+RNM5     st_rename.testNonExistent                                : PASS
+RNM6     st_rename.testZeroLengthOldname                          : PASS
+RNM7     st_rename.testZeroLengthNewname                          : PASS
+RNM8     st_rename.testBadutf8Oldname                             : FAILURE
+           RENAME with non-UTF8 oldname RNM8/\xc0\xc1 should
+           return NFS4ERR_INVAL, instead got NFS4ERR_NOENT
+RNM9     st_rename.testBadutf8Newname                             : FAILURE
+           RENAME with non-UTF8 newname RNM9/\xc0\xc1 should
+           return NFS4ERR_INVAL, instead got NFS4_OK
+RNM10    st_rename.testDotsOldname                                : WARNING
+           RENAME from nonexistant '.' should return
+           NFS4ERR_BADNAME, instead got NFS4ERR_NOENT
+RNM11    st_rename.testDotsNewname                                : FAILURE
+           RENAME from nonexistant '.' should return
+           NFS4ERR_BADNAME, instead got NFS4ERR_INVAL
+RNM12    st_rename.testDirToObj                                   : PASS
+RNM13    st_rename.testDirToDir                                   : PASS
+RNM14    st_rename.testFileToDir                                  : PASS
+RNM15    st_rename.testFileToFile                                 : PASS
+RNM16    st_rename.testDirToFullDir                               : FAILURE
+           RENAME dir1 into existing, nonempty dir2 should return
+           NFS4ERR_EXIST, instead got NFS4ERR_NOTEMPTY
+RNM17    st_rename.testFileToFullDir                              : PASS
+RNM18    st_rename.testSelfRenameDir                              : PASS
+RNM19    st_rename.testSelfRenameFile                             : PASS
+RNM20    st_rename.testLinkRename                                 : PASS
+ROOT1    st_putrootfh.testSupported                               : PASS
+RPLY1    st_replay.testOpen                                       : PASS
+RPLY2    st_replay.testReplayState1                               : PASS
+RPLY3    st_replay.testReplayState2                               : PASS
+RPLY4    st_replay.testReplayNonState                             : PASS
+RPLY5    st_replay.testLock                                       : PASS
+RPLY6    st_replay.testLockDenied                                 : PASS
+RPLY7    st_replay.testUnlock                                     : PASS
+RPLY8    st_replay.testUnlockWait                                 : FAILURE
+           Call to be replayed should return NFS4_OK or
+           NFS4ERR_EXPIRED, instead got NFS4ERR_BAD_STATEID
+RPLY9    st_replay.testClose                                      : PASS
+RPLY10   st_replay.testCloseWait                                  : FAILURE
+           Call to be replayed should return NFS4_OK or
+           NFS4ERR_EXPIRED, instead got NFS4ERR_BAD_STATEID
+RPLY11   st_replay.testCloseFail                                  : PASS
+RPLY12   st_replay.testOpenConfirm                                : PASS
+RPLY13   st_replay.testOpenConfirmFail                            : PASS
+RSFH1    st_restorefh.testNoFh1                                   : PASS
+RSFH2    st_restorefh.testNoFh2                                   : PASS
+SATT1a   st_setattr.testLink                                      : FAILURE
+           Set attrs {33: 480} not equal to got attrs {33: 511}
+SATT1b   st_setattr.testBlock                                     : PASS
+SATT1c   st_setattr.testChar                                      : PASS
+SATT1d   st_setattr.testDir                                       : PASS
+SATT1f   st_setattr.testFifo                                      : PASS
+SATT1r   st_setattr.testFile                                      : PASS
+SATT2a   st_setattr.testUselessStateid1                           : PASS
+SATT2b   st_setattr.testUselessStateid2                           : PASS
+SATT2c   st_setattr.testUselessStateid3                           : PASS
+SATT3a   st_setattr.testResizeFile0                               : PASS
+SATT3b   st_setattr.testResizeFile1                               : PASS
+SATT3c   st_setattr.testResizeFile2                               : PASS
+SATT3d   st_setattr.testResizeFile3                               : PASS
+SATT4    st_setattr.testOpenModeResize                            : PASS
+SATT5    st_setattr.testNoFh                                      : PASS
+SATT6a   st_setattr.testReadonlyLink                              : OMIT
+           Dependency SATT6d st_setattr.testReadonlyDir had
+           status FAILURE.
+SATT6b   st_setattr.testReadonlyBlock                             : OMIT
+           Dependency SATT6d st_setattr.testReadonlyDir had
+           status FAILURE.
+SATT6c   st_setattr.testReadonlyChar                              : OMIT
+           Dependency SATT6d st_setattr.testReadonlyDir had
+           status FAILURE.
+SATT6d   st_setattr.testReadonlyDir                               : FAILURE
+           SETATTR the supported read-only attribute
+           time_metadata should return NFS4ERR_INVAL, instead got
+           NFS4_OK
+SATT6f   st_setattr.testReadonlyFifo                              : OMIT
+           Dependency SATT6d st_setattr.testReadonlyDir had
+           status FAILURE.
+SATT6r   st_setattr.testReadonlyFile                              : FAILURE
+           SETATTR the supported read-only attribute
+           time_metadata should return NFS4ERR_INVAL, instead got
+           NFS4_OK
+SATT6s   st_setattr.testReadonlySocket                            : OMIT
+           Dependency SATT6d st_setattr.testReadonlyDir had
+           status FAILURE.
+SATT7    st_setattr.testInvalidAttr1                              : PASS
+SATT8    st_setattr.testInvalidAttr2                              : PASS
+SATT9    st_setattr.testNonUTF8                                   : UNSUPPORTED
+           FATTR4_MIMETYPE not supported
+SATT10   st_setattr.testInvalidTime                               : PASS
+SATT11a  st_setattr.testUnsupportedLink                           : PASS
+SATT11b  st_setattr.testUnsupportedBlock                          : PASS
+SATT11c  st_setattr.testUnsupportedChar                           : PASS
+SATT11d  st_setattr.testUnsupportedDir                            : PASS
+SATT11f  st_setattr.testUnsupportedFifo                           : PASS
+SATT11r  st_setattr.testUnsupportedFile                           : PASS
+SATT11s  st_setattr.testUnsupportedSocket                         : PASS
+SATT12a  st_setattr.testSizeLink                                  : FAILURE
+           SETATTR(FATTR4_SIZE) of a symlink should return
+           NFS4ERR_INVAL, instead got NFS4ERR_SYMLINK
+SATT12b  st_setattr.testSizeBlock                                 : PASS
+SATT12c  st_setattr.testSizeChar                                  : PASS
+SATT12d  st_setattr.testSizeDir                                   : PASS
+SATT12f  st_setattr.testSizeFifo                                  : PASS
+SATT12s  st_setattr.testSizeSocket                                : PASS
+SATT13   st_setattr.testInodeLocking                              : PASS
+SATT14   st_setattr.testChange                                    : FAILURE
+           change attribute not affected by SETATTR(mode)
+SVFH1    st_savefh.testNoFh                                       : PASS
+SVFH2a   st_restorefh.testValidLink                               : PASS
+SVFH2b   st_restorefh.testValidBlock                              : PASS
+SVFH2c   st_restorefh.testValidChar                               : PASS
+SVFH2d   st_restorefh.testValidDir                                : PASS
+SVFH2f   st_restorefh.testValidFifo                               : PASS
+SVFH2r   st_restorefh.testValidFile                               : PASS
+SVFH2s   st_restorefh.testValidSocket                             : PASS
+VF1a     st_verify.testMandLink                                   : PASS
+VF1b     st_verify.testMandBlock                                  : PASS
+VF1c     st_verify.testMandChar                                   : PASS
+VF1d     st_verify.testMandDir                                    : PASS
+VF1f     st_verify.testMandFifo                                   : PASS
+VF1r     st_verify.testMandFile                                   : PASS
+VF1s     st_verify.testMandSocket                                 : PASS
+VF2a     st_verify.testTypeLink                                   : PASS
+VF2b     st_verify.testTypeBlock                                  : PASS
+VF2c     st_verify.testTypeChar                                   : PASS
+VF2d     st_verify.testTypeDir                                    : PASS
+VF2f     st_verify.testTypeFifo                                   : PASS
+VF2r     st_verify.testTypeFile                                   : PASS
+VF2s     st_verify.testTypeSocket                                 : PASS
+VF3a     st_verify.testBadSizeLink                                : PASS
+VF3b     st_verify.testBadSizeBlock                               : PASS
+VF3c     st_verify.testBadSizeChar                                : PASS
+VF3d     st_verify.testBadSizeDir                                 : PASS
+VF3f     st_verify.testBadSizeFifo                                : PASS
+VF3r     st_verify.testBadSizeFile                                : PASS
+VF3s     st_verify.testBadSizeSocket                              : PASS
+VF4      st_verify.testNoFh                                       : PASS
+VF5a     st_verify.testWriteOnlyLink                              : PASS
+VF5b     st_verify.testWriteOnlyBlock                             : PASS
+VF5c     st_verify.testWriteOnlyChar                              : PASS
+VF5d     st_verify.testWriteOnlyDir                               : PASS
+VF5f     st_verify.testWriteOnlyFifo                              : PASS
+VF5r     st_verify.testWriteOnlyFile                              : PASS
+VF5s     st_verify.testWriteOnlySocket                            : PASS
+VF7a     st_verify.testUnsupportedLink                            : FAILURE
+           VERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4ERR_NOT_SAME
+VF7b     st_verify.testUnsupportedBlock                           : FAILURE
+           VERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4ERR_NOT_SAME
+VF7c     st_verify.testUnsupportedChar                            : FAILURE
+           VERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4ERR_NOT_SAME
+VF7d     st_verify.testUnsupportedDir                             : FAILURE
+           VERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4ERR_NOT_SAME
+VF7f     st_verify.testUnsupportedFifo                            : FAILURE
+           VERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4ERR_NOT_SAME
+VF7r     st_verify.testUnsupportedFile                            : FAILURE
+           VERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4ERR_NOT_SAME
+VF7s     st_verify.testUnsupportedSocket                          : FAILURE
+           VERIFY with unsupported attr acl should return
+           NFS4ERR_ATTRNOTSUPP, instead got NFS4ERR_NOT_SAME
+WRT1     st_write.testSimpleWrite                                 : PASS
+WRT1b    st_write.testSimpleWrite2                                : PASS
+WRT2     st_write.testStateidOne                                  : PASS
+WRT3     st_write.testWithOpen                                    : PASS
+WRT4     st_write.testNoData                                      : PASS
+WRT5     st_write.testLargeData                                   : FAILURE
+           (104, 'Connection reset by peer')
+WRT6a    st_write.testLink                                        : PASS
+WRT6b    st_write.testBlock                                       : PASS
+WRT6c    st_write.testChar                                        : PASS
+WRT6d    st_write.testDir                                         : PASS
+WRT6f    st_write.testFifo                                        : PASS
+WRT6s    st_write.testSocket                                      : PASS
+WRT7     st_write.testNoFh                                        : PASS
+WRT8     st_write.testOpenMode                                    : PASS
+WRT9     st_write.testShareDeny                                   : PASS
+WRT10    st_write.testBadStateid                                  : PASS
+WRT11    st_write.testStaleStateid                                : PASS
+WRT12    st_write.testOldStateid                                  : PASS
+**************************************************
+Command line asked for 578 of 612 tests
+Of those: 13 Skipped, 57 Failed, 17 Warned, 491 Passed

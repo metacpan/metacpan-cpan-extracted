@@ -1,0 +1,10 @@
+Revision history for Tickit-WidgetRole-Movable
+
+0.002     2014-08-16 17:36:22+01:00 Europe/London
+	No new features
+
+	Bug fixes:
+	* Use $ev methods rather than deprecated multi-arg on_mouse handler
+
+0.001     2014-08-16 06:26:05+01:00 Europe/London
+	Initial CPAN release

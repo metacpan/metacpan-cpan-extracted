@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Template-Plugin-Handy
+version:             0.003
+abstract:            handy vmethods for Template Toolkit
+license:             perl
+author:              
+    - Peter Karman <karman@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Dump:                    0
+    JSON::XS:                      0
+    Template::Plugin::VMethods:    0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

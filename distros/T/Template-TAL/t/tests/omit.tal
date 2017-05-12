@@ -1,0 +1,7 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <p tal:omit-tag="string:1">no tag</p>
+    <p tal:omit-tag="string:0">has tag</p>
+    <p tal:omit-tag="string:1"><span tal:replace="string:still no tag"/></p>
+  </body>
+</html>

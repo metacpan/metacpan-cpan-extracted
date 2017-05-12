@@ -1,0 +1,438 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use Carp qw(croak);
+use Test::BrewBuild;
+
+our $VERSION = '2.17';
+
+# we let BrewBuild manage the argument list so that the other scripts can
+# simply pass in the args directly and use the API instead of wrapping around
+# this script
+
+my %args = Test::BrewBuild->options(\@ARGV) if @ARGV;
+
+if (defined $args{help}){
+    Test::BrewBuild->help;
+    exit;
+}
+if (defined $args{error}){
+    Test::BrewBuild->help;
+    exit;
+}
+if ($args{setup}){
+    Test::BrewBuild->setup;
+    exit;
+}
+
+my $is_win = Test::BrewBuild->is_win;
+
+# configure output for if *brew isn't installed
+
+my $brew_prog = $is_win ? 'berrybrew.exe' : 'perlbrew';
+my $brew_link = $is_win
+    ? 'https://github.com/stevieb9/berrybrew'
+    : 'http://perlbrew.pl';
+my $sep = $is_win ? ';' : ':';
+
+# check in PATH to see if berry/perlbrew exists
+
+if (! grep { -x "$_/$brew_prog"} split /$sep/, $ENV{PATH}){
+    warn "\nYou need to install '$brew_prog' to use this program...\n\n" .
+         "See $brew_link\n\n";
+    exit;
+}
+
+my $bb = Test::BrewBuild->new(%args);
+my $bb_log = $bb->log;
+my $log = $bb_log->child('brewbuild');
+
+if ($args{dispatch}){
+    my @testers = @{ $args{testers} };
+    my $dispatch = Test::BrewBuild::Dispatch->new;
+    my $return = $dispatch->dispatch(
+        testers => \@testers,
+    );
+    print $return;
+    exit;
+}
+if ($is_win && $args{on}){
+    warn "\nwe can't use --on with Windows... running on all\n\n";
+    delete $args{on};
+}
+
+# legacy perls in use?
+
+$bb->legacy($args{legacy});
+
+# remove
+
+$bb->instance_remove if $args{remove};
+
+# install
+
+$bb->instance_install($args{new}) if defined $args{new};
+$bb->instance_install($args{install}) if $args{install};
+
+if (! -d 't/' && ! $args{notest}){
+    $log->_0("\nthere's no 't/' directory, setting ``--notest''...\n");
+    $args{notest} = 1;
+}
+
+exit if $args{notest};
+
+if ($bb->perls_installed == 0){
+    print "\nno perls installed, nothing to do. Exiting...\n\n";
+    exit;
+}
+
+# revdep
+
+if ($args{revdep}){
+    $log->_6('running --revdep');
+
+    print $_ for @{ $bb->revdep(%args) };
+    exit;
+}
+elsif (defined $args{args}){
+    my %opts = %args;
+
+    $log->_7("running a plugin with args");
+
+    delete $args{args};
+
+    for (@{ $opts{args} }) {
+        $args{plugin_arg} = $_;
+        print $bb->test;
+    }
+
+    delete $args{new};
+    delete $args{remove};
+}
+else {
+    $log->_7("default run");
+    print $bb->test;
+}
+
+=pod
+
+=head1 NAME
+
+brewbuild - Automate module and reverse-dependency testing, on Windows and Unix
+
+=head1 SYNOPSIS
+
+You must be in the root directory of the distribution you want to test.
+
+Run all unit tests against all installed instances with no other action. Upon a
+FAIL, a log file will be generated in the current working directory named
+C<bblog/version.bblog>
+
+    brewbuild
+
+    # output
+
+    5.8.9 :: PASS
+    5.20.3 :: FAIL
+    5.22.1 :: PASS
+
+Run tests on the local working copy of the current module, then run all tests
+of all reverse dependencies of this module (as reported by CPAN), to ensure
+the down river modules will work with your new build. In this case, FAILs are
+stored in C<bblog/revdep-module-name.version.bblog>
+
+    brewbuild -R
+
+    # output, in my Mock::Sub repo directory
+
+    reverse dependencies: Test-BrewBuild, File-Edit-Portable,
+      Devel-Examine-Subs, Devel-Trace-Subs
+
+    Test::BrewBuild
+    5.18.4 :: FAIL
+    5.22.1 :: PASS
+
+    File::Edit::Portable
+    5.18.4 :: PASS
+    5.22.1 :: PASS
+
+    Devel::Examine::Subs
+    5.18.4 :: PASS
+    5.22.1 :: PASS
+
+    Devel::Trace::Subs
+    5.18.4 :: PASS
+    5.22.1 :: PASS
+
+Send a basic test run to remote testers (see C<bbdispatch> for more complex
+dispatching):
+
+    brewbuild -D -t localhost -t 192.168.252.90 -t 192.168.252.96 -t 192.168.252.95
+
+    192.168.252.95 - x86_64-linux
+
+    5.22.1 :: PASS
+
+    192.168.252.90 - MSWin32-x64-multi-thread
+
+    5.18.4 :: PASS
+    5.22.1 :: PASS
+
+    localhost - MSWin32-x64-multi-thread
+
+    5.22.1 :: FAIL
+
+    192.168.252.96 - amd64-freebsd
+
+    5.22.1 :: PASS
+    5.23.7 :: PASS
+    5.8.9 :: FAIL
+    5.10.1 :: FAIL
+    5.18.4 :: FAIL
+
+All FAIL log files are stored locally when dispatching to identify the issues:
+
+    192.168.252.96_5.10.1-FAIL.bblog
+    192.168.252.96_5.18.4-FAIL.bblog
+    192.168.252.96_5.8.9-FAIL.bblog
+    localhost_5.22.1-FAIL.bblog
+
+Print usage information
+
+    brewbuild -h
+
+Display test platform setup instructions for Unix and Windows
+
+    brewbuild --setup
+
+=head1 DESCRIPTION
+
+This C<brewbuild> script installed by the L<Test::Brewbuild> module allows you
+to perform your unit tests seamlessly across all of your Perlbrew (Unix) or
+Berrybrew (Windows) Perl instances, as well as test all of your down-river CPAN
+modules that rely on your module against the locally updated version, with
+support for L<ExtUtils::MakeMaker>, L<Module::Build> and L<Dist::Zilla>
+distributions.
+
+It also allows you to dispatch basic test runs to remote testing servers.
+
+For Windows, you'll need to install Berrybrew (see L</SEE ALSO> for details).
+For Unix, you'll need Perlbrew.
+
+It allows you to remove and reinstall on each test run, install random versions
+of perl and install specific versions.
+
+All unit tests are run against all installed C<perl> instances, unless
+otherwise specified.
+
+=head1 USAGE
+
+Many of the options listed below can be saved in a configuration file if you
+want to set them permanently, or override defaults. Arguments passed in on the
+command line override those in the configuration file. See
+L<configuration file docs|https://metacpan.org/pod/distribution/Test-BrewBuild/lib/Test/BrewBuild/brewbuild.conf.pod>.
+
+=head2 -o, --on
+
+Perl version number to run against (can be supplied multiple times). Can not be
+used on Windows at this time.
+
+=head2 -R, --revdep
+
+Run tests, install, then run tests on all CPAN reverse dependency modules.
+
+=head2 -d, --debug
+
+0-7, sets logging verbosity, default is 0.
+
+=head2 -n, --new
+
+How many random versions of perl to install (-1 to install all). On Windows,
+we'll default to installing 64-bit versions only, if a 64 bit perl is available
+for the version desired. See the C<--install> flag if you'd like to install
+32-bit versions, where both versions are present.
+
+=head2 -i, --install
+
+Number portion of an available perl version according to C<*brew available>.
+Multiple versions can be sent in at once.
+
+On Windows, by default, we install only 64-bit versions. You can append the
+C<_32> or C<_64> suffixes as displayed by C<berrybrew available> to override
+the default. If you're dispatching to both Unix and Windows systems, we'll strip
+this suffix on the Unix systems before performing any actions.
+
+=head2 -r, --remove
+
+Remove all installed perls (less the currently used one).
+
+=head2 -D, --dispatch
+
+Sends a basic test run to remote C<Test::BrewBuild> test servers, which are
+specified with the C<-t|--tester> flag. We'll get the repository inforation out
+of your current working directory, and simply run C<brewbuild> with no arguments
+on the testers (all other flags are removed if C<-D> is used).
+
+For more expansive dispatching functionality, see
+L<bbdispatch|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/bbdispatch>.
+
+=head2 -t, --tester
+
+Used only with the C<-D> flag, specify a tester for the dispatcher to dispatch
+to, in the form C<host_or_ip[:port]>.
+
+=head2 -N, --notest
+
+Do not run tests. Allows you to C<--remove> and C<--install> without testing.
+
+=head2 -S, --save
+
+By default, we save logs of C<FAIL> result logs into the C<bblog> directory.
+With this flag, we'll save both the C<FAIL> logs along with all the C<PASS> logs
+as well.
+
+=head2 -l, --legacy
+
+Operate on perls less than 5.8.x. The default plugins won't work with this flag
+set if a lower version is installed.
+
+=head2 -p, --plugin
+
+Optional module name of the exec command plugin to use. You can also specify a
+file name if the module is not installed.
+
+=head2 -a, --args
+
+List of args to pass into the plugin (one arg per loop).
+
+=head2 -X, --nocache
+
+Perlbrew fetches it's available information from the Internet. By default, we
+fetch it from there the first time, then cache that information for the
+remaining duration of the program run.
+
+Set this flag to disable this caching.
+
+=head2 -T, --selftest
+
+C<Test::BrewBuild> development testing only. Prevents recursive test loops.
+
+=head2 -s, --setup
+
+Display test platform setup instructions.
+
+=head2 -h, --help
+
+Print out the command line usage information.
+
+=head1 TEST PLATFORM CONFIGURATION
+
+C<Test::BrewBuild> test platform configuration guide
+
+=head2 UNIX
+
+Install perlbrew and related requirements:
+
+    cpanm App::perlbrew
+    perlbrew install-patchperl
+    perlbrew install-cpanm
+
+Install and switch to your base perl instance, and install C<Test::BrewBuild>:
+
+    perlbrew install 5.22.1
+    perlbrew switch 5.22.1
+    cpanm Test::BrewBuild
+
+=head2 WINDOWS
+
+Download/install git for Windows:
+
+    https://git-scm.com/download/win
+
+Create a repository directory, and enter it:
+
+    mkdir c:\repos
+    cd c:\repos
+
+Clone and configure berrybrew
+
+    git clone https://github.com/stevieb9/berrybrew
+    cd berrybrew
+    bin\berrybrew.exe config (type 'y' when asked to install in PATH)
+
+Close the current CMD window and open a new one to update the PATH environment
+variable.
+
+Check available perls, and install one that'll become your core base install:
+
+    berrybrew available
+    berrybrew install 5.22.1_64
+    berrybrew switch 5.22.1_64
+
+Open another new CMD window, and make sure the new Perl is in use:
+
+    perl -v
+
+Install Test::BrewBuild
+
+    cpanm Test::BrewBuild
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 SUPPORT
+
+You can find documentation for this script and module with the perldoc command.
+
+    perldoc brewbuild
+    perldoc Test::BrewBuild
+
+Documentation for the remote testing service script, and its API:
+
+    perldoc bbtester
+    perldoc Test::BrewBuild::Tester
+
+Documentation for the test dispatching script and its API:
+
+    perldoc bbdispatch
+    perldoc Test::BrewBuild::Dispatch
+
+=head1 SEE ALSO
+
+Berrybrew for Windows:
+
+L<https://github.com/stevieb9/berrybrew>
+
+Perlbrew for Unixes:
+
+L<http://perlbrew.pl>
+
+Remote testing server utility:
+
+L<bbtester|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/bbtester>
+
+Remote testing server API:
+
+L<Test::BrewBuild::Tester>
+
+Dispatching to remote testers:
+
+See C<brewbuild -h>, in the C<Dispatching Server options> section.
+
+Dispatcher API:
+
+L<Test::BrewBuild::Dispatch>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut

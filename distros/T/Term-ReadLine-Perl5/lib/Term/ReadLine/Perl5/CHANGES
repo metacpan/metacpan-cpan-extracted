@@ -1,0 +1,148 @@
+The below was originally comments inside readline.pm
+
+- Changes from Slaven Rezic (slaven@rezic.de):
+	* reverted the usage of $ENV{EDITOR} to set startup mode
+	  only ~/.inputrc or an explicit call to rl_set should
+	  be used to set startup mode
+
+1011109.011 - Changes from Russ Southern (russ@dvns.com):
+             * Added $rl_vi_replace_default_on_insert
+1000510.010 - Changes from Joe Petolino (petolino@eng.sun.com), requested
+              by Ilya:
+
+              * Make it compatible with perl 5.003.
+              * Rename getc() to getc_with_pending().
+              * Change unshift(@Pending) to push(@Pending).
+
+ 991109.009 - Changes from Joe Petolino (petolino@eng.sun.com):
+              Added vi mode.  Also added a way to set the keymap default
+      	action for multi-character keymaps, so that a 2-character
+      	sequence (e.g. <esc>A) can be treated as two one-character
+      	commands (<esc>, then A) if the sequence is not explicitly
+              mapped.
+      
+              Changed subs:
+
+              * preinit(): Initialize new keymaps and other data structures.
+		             Use $ENV{EDITOR} to set startup mode.
+
+              * init():    Sets the global *KeyMap, since &F_ReReadInitFile
+                           may have changed the key map.
+
+		* InitKeymap(): $KeyMap{default} is now optional - don't
+			     set it if $_[1] eq '';
+
+		* actually_do_binding(): Set $KeyMap{default} for '\*' key;
+			     warning if double-defined.
+
+		* rl_bind(): Implement \* to set the keymap default.  Also fix
+			     some existing regex bugs that I happened to notice.
+
+		* readline(): No longer takes input from $pending before
+                           calling &$rl_getc(); instead, it calls getc_with_pendg(),
+                           which takes input from the new array @Pending
+			     before calling &$rl_getc().  Sets the global
+			     *KeyMap after do_command(), since do_command()
+			     may change the keymap now.  Does some cursor
+			     manipulation after do_command() when at the end
+			     of the line in vi command mode, to match the
+			     behavior of vi.
+
+		* rl_getc(): Added a my declaration for $key, which was
+			     apparently omitted by the author.  rl_getc() is 
+			     no longer called directly; instead, getc_with_pendi() calls
+			     it only after exhausting any requeued characters
+			     in @Pending.  @Pending is used to implement the
+			     vi '.' command, as well as the emacs DoSearch
+			     functionality.
+
+		* do_command(): Now defaults the command to 'F_Ding' if
+			     $KeyMap{default} is undefined.  This is part
+			     of the new \* feature.
+
+		* savestate()/getstate(): Now use an anonymous array instead
+		             of packing the fields into a string.
+
+		* F_AcceptLine(): Code moved to new sub add_line_to_history(),
+			     so that it may be called by F_SaveLine()
+			     as well as by F_AcceptLine().
+
+		* F_QuotedInsert(): Calls getc_with_pending() instead of &$rl_ge().
+
+		* F_UnixWordRubout(): Fixed bug: changed 'my' declaration of
+		             global $rl_basic_word_break_characters to 'local'.
+
+		* DoSearch(): Calls getc_with_pending() instead of &$rl_getc(). ngets
+			     character onto @Pending instead of $pending.
+
+		* F_EmacsEditingMode(): Resets global $Vi_mode;
+
+		* F_ToggleEditingMode(): Deleted.  We use F_ViInput() and
+                           F_EmacsEditingMode() instead.
+
+		* F_PrefixMeta(): Calls getc_with_pending() instead of &$rl_getc.
+
+		* F_DigitArgument(): Calls getc_with_pending() instead of &$rl_gc().
+
+		* F_Ding(): Returns undef, for testing by vi commands.
+
+		* F_Complete(): Returns true if a completion was done, false
+                           otherwise, so vi completion routines can test it.
+
+		* complete_internal(): Returns true if a completion was done,
+                           false otherwise, so vi completion routines can
+                           test it.  Does a little cursor massaging in vi
+                           mode, to match the behavior of ksh vi mode.
+
+              Disclaimer: the original code dates from the perl 4 days, and
+              isn't very pretty by today's standards (for example,
+              extensive use of typeglobs and localized globals).  In the
+              interests of not breaking anything, I've tried to preserve
+              the old code as much as possible, and I've avoided making
+              major stylistic changes.  Since I'm not a regular emacs user,
+              I haven't done much testing to see that all the emacs-mode
+              features still work.
+
+ 940817.008 - Added $var_CompleteAddsuffix.
+		Now recognizes window-change signals (at least on BSD).
+              Various typos and bug fixes.
+	Changes from Chris Arthur (csa@halcyon.com):
+		Added a few new keybindings.
+              Various typos and bug fixes.
+		Support for use from a dumb terminal.
+		Pretty-printing of filename-completion matches.
+		
+ 930306.007 - Added rl_start_default_at_beginning.
+		Added optional message arg to &redisplay.
+		Added explicit numeric argument var to functions that use it.
+		Redid many commands to simplify.
+		Added TransposeChars, UpcaseWord, CapitalizeWord, DownCaseWord.
+		Redid key binding specs to better match GNU.. added
+		  undocumented "new-style" bindings.... can now bind
+		  arrow keys and other arbitrairly long key sequences.
+		Added if/else/then to .inputrc.
+		
+ 930305.006 - optional "default" added (from mmuegel@cssmp.corp.mot.com).
+
+ 930211.005 - fixed strange problem with eval while keybinding
+
+
+ Ilya: 
+
+ Added support for ReadKey, 
+
+ Added customization variable $minlength
+ to denote minimal lenth of a string to be put into history buffer.
+
+ Added support for a bug in debugger: preinit cannot be a subroutine ?!!!
+ (See immendiately below)
+
+ Added support for WINCH hooks. The subroutine references should be put into
+ @winchhooks.
+
+ Added F_ToggleInsertMode, F_HistorySearchBackward,
+ F_HistorySearchForward, PC keyboard bindings.
+ 0.93: Updates to Operate, couple of keybindings added.
+ $rl_completer_terminator_character, $rl_correct_sw added.
+ Reload-init-file moved to C-x C-x.
+ C-x ? and C-x * list/insert possible completions.

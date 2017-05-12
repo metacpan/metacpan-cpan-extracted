@@ -1,0 +1,47 @@
+=pod
+
+=head1 NAME
+
+HTML::ForumCode::Cookbook - Some common recipes
+
+=head1 DESCRIPTION
+
+The HTML::ForumCode cookbook is a series of recipes to demonstrate
+common ways to use HTML::ForumCode.
+
+=head1 RECIPES
+
+=head2 Getting Started
+
+These recipes provide information on how to utilise HTML::ForumCode in your
+own (Catalyst) application.
+
+=over 4
+
+=item L<HTML::ForumCode::Cookbook::Recipe1> - Catalyst Controller
+
+Method(s) to add to your own controller to ForumCodify some text and return
+the marked up HTML in a JSON response.
+
+This is useful as part of a solution to provide in-page edit-preview toggling
+(via YUI).
+
+=item L<HTML::ForumCode::Cookbook::Recipe2> - HTML, JavaScript and CSS
+
+The HTML and JavaScript required for taking a textarea and showing a preview
+of the marked up HTML. Also includes sample CSS for the preview overlay.
+
+This is the next step in providing in-page edit-preview toggling.
+
+=back
+
+=head1 AUTHOR
+
+Chisel Wright C<< <chiselwright@users.berlios.de> >>
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,16 @@
+Format: format_text_unicodebox_table, with border style 'light': 
+┌─────────────────────────┬───────────┬───────────────┬──────────┐
+│ Homepage                │ Country   │ Name          │ Metadata │
+├─────────────────────────┼───────────┼───────────────┼──────────┤
+│ http://savage.net.au/   │ Australia │ Ron Savage    │    undef │
+│ https://duckduckgo.com/ │     Earth │ Mr. S. Engine │    empty │
+└─────────────────────────┴───────────┴───────────────┴──────────┘
+
+Format: format_text_unicodebox_table, with border style 'horizontal_double': 
+╒═════════════════════════╤═══════════╤═══════════════╤══════════╕
+│ Homepage                │ Country   │ Name          │ Metadata │
+╞═════════════════════════╪═══════════╪═══════════════╪══════════╡
+│ http://savage.net.au/   │ Australia │ Ron Savage    │    undef │
+│ https://duckduckgo.com/ │     Earth │ Mr. S. Engine │    empty │
+╘═════════════════════════╧═══════════╧═══════════════╧══════════╛
+

@@ -1,0 +1,47 @@
+Test::HTTP::LocalServer - spawn a local HTTP server for testing
+
+DESCRIPTION
+
+This module implements a tiny web server suitable for running "live" tests
+of HTTP clients against it. It also takes care of cleaning C<%ENV> from settings
+that influence the use of a local proxy etc.
+
+Use this web server if you write an HTTP client and want to exercise its
+behaviour in your test suite without talking to the outside world.
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+
+
+
+AUTHOR
+
+Max Maischein, E<lt>corion@cpan.orgE<gt>
+
+Please contact me if you find bugs or otherwise improve the module. More tests
+are also very welcome !
+
+
+COPYRIGHT AND LICENSE
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+Copyright (C) 2003-2017 Max Maischein

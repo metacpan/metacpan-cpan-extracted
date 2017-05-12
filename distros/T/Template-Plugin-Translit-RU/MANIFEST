@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Template-Plugin-Translit-RU.t
+lib/Template/Plugin/Translit/RU.pm
+META.yml                                 Module meta-data (added by MakeMaker)

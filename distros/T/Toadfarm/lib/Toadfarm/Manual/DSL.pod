@@ -1,0 +1,119 @@
+=head1 NAME
+
+Toadfarm::Manual::DSL - Domain specific language for Toadfarm
+
+=head1 DESCRIPTION
+
+This manual gives an overview of which functions are available
+when building a L<Toadfarm> script.
+
+=head1 FUNCTIONS
+
+These functions are exported to the caller namespace by default. See
+L</SYNOPSIS> for example usage.
+
+=head2 app
+
+  $app = app;
+
+Used to fetch the L<Toadfarm> / L<Mojolicious> instance that the rest of
+the functions below are using.
+
+=head2 change_root
+
+  change_root qw(--userspec www-data:www-data /path/to/jail);
+
+Used to change user/group and root directory. Note that this require the
+Toadfarm script to be started as "root", but it also requires that the
+underlying "chroot" command result in changing the user. Not changing
+the effective user from "root" (UID=0) will result in an infinite loop.
+
+This function is experimental and subject to change.
+
+See also L</sudo>.
+
+=head2 logging
+
+  logging {
+    combined => 0,
+    path     => "/path/to/log/file.log",
+    level    => "info",
+  };
+
+Used to set up L<Mojo::Log>. See L<Mojo::Log/path> and L<Mojo::Log/level> for
+details on the accepted values. C<combined> can be set to true to make all
+the L<mounted|/mount> apps use the same L<Mojo::Log> object.
+
+=head2 mount
+
+  mount "/path/to/mojo-app" => \%config;
+  mount "My::Mojo::App" => \%config;
+  mount "My::Mojo::App";
+
+This function will mount a L<Mojolicious> application in the L<Toadfarm>
+application. An application can either be a full path to the application
+or a class name. The apps are processed in the order they are defined.
+This means that the first app that match a given rule will receive the
+request.
+
+See L<Toadfarm::Manual::Config> for details on C<%config>.
+
+An application without L<%config> is considered to be a "catch all"
+application, meaning that it will get all the requests that do not
+match any of the above.
+
+=head2 plugin
+
+  plugin "My::Mojo::Plugin" => \%config;
+  plugin "AccessLog";
+
+Used to load a L<Mojolicious::Plugin>. In addition to the default
+L<Mojolicious::Plugin> namespace, this application will also
+search in the C<Toadfarm::Plugin::> namespace.
+
+=head2 run_as
+
+  run_as $uid;
+  run_as $username;
+
+Use "sudo" (might change) to force the script to be run as a given user.
+
+See also L</change_root>.
+
+=head2 secrets
+
+  secrets @str;
+
+Used to set application L<Mojolicious/secrets>. A random secret will be set
+if none is specified.
+
+Note: This function is experimental and might be removed in future
+release.
+
+=head2 start
+
+  start;
+  start \@listen, %config;
+  start %config;
+
+Used to start the application. Both C<@listen> and C<%config> are optional,
+but will be used to specify the L<Mojo::Server::Hypnotoad/SETTINGS>.
+
+These three examples do the same thing:
+
+  # 1.
+  start proxy => 1;
+  # 2.
+  start ["http://*:8080"], {proxy => 1};
+  # 3.
+  start {listen => ["http://*:8080"], proxy => 1};
+
+=head1 SEE ALSO
+
+See also L<Toadfarm::Manual::Intro>.
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

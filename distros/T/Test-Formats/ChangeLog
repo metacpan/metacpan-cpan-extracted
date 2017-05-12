@@ -1,0 +1,59 @@
+Revision history for Test-Formats
+# $Id: ChangeLog 10 2008-10-22 09:57:04Z rjray $
+
+0.12    Wed Oct 22 03:00:00 PDT 2008
+
+        lib/Test/Formats/XML.pm:
+        t/10_xml/10_sgmldtd.t:
+        t/10_xml/20_xmlschema.t:
+        t/10_xml/30_relaxng.t:
+        t/90_integration/10_with_xml.t:
+        t/90_integration/90_empty_subclass.t:
+        Per suggestions from Schwern, added <type>_ok aliases for the
+        tests, and also swapped the order of the $document and $schema
+        arguments to all the tests. While at it, added tests for each of the
+        three schema-types to test the aliases directly.
+
+        lib/Test/Formats/XML.pm:
+        Follow-up the previous with carrying over the argument-ordering change
+        to the is_valid_against() subroutine. Also fleshed out some overlooked
+        (i.e., forgotten) documentation for is_well_formed_xml().
+
+0.11    Tue Oct 21 04:07:00 PDT 2008
+
+        MANIFEST:
+        lib/Test/Formats/XML.pm:
+        t/10_xml/05_xml_parsing.t:
+        Added testing routines to Test::Formats::XML to simple test that XML
+        content is well-formed. Tests only the parsing, no validation. Added
+        test suite for this, and added the suite file to MANIFEST.
+
+        Build.PL:
+        Makefile.PL:
+        Besides bumping the version number, added some clean-up to the
+        overall meta-information so that pre-reqs, etc., are better
+        spelled-out.
+
+0.10    Mon Oct 20 02:06:39 PDT 2008
+
+        Build.PL:
+        ChangeLog:
+        ChangeLog.xml:
+        MANIFEST:
+        MANIFEST.SKIP:
+        Makefile.PL:
+        README:
+        etc/ChangeLogML.xsd:
+        lib/Test/Formats.pm:
+        lib/Test/Formats/XML.pm:
+        t/00_load.t:
+        t/01_pod.t:
+        t/02_pod_coverage.t:
+        t/10_xml/10_sgmldtd.t:
+        t/10_xml/20_xmlschema.t:
+        t/10_xml/30_relaxng.t:
+        t/90_integration/10_with_xml.t:
+        t/90_integration/90_empty_subclass.t:
+        t/90_integration/MyTestFormats.pm:
+        Initial release. All basic functionality for the Test::Formats::XML
+        specialization is in place, but test coverage is embarrassing.

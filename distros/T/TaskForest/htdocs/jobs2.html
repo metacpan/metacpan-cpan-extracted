@@ -1,0 +1,15 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<div class="job_title">Viewing job $file_name</div>
+
+<div id="job_contents_div" class="file_contents"><pre>$file_contents</pre></div>
+<form name="job_form" action="/jobs.html/$file_name" method="POST">
+  <input type=hidden name="_method" value="PUT">
+  <textarea name="file_contents" rows=10 cols=92>$file_contents</textarea>
+  <br>
+  <input type=submit value="Update Job" name=update />
+</form>
+
+  
+
+<include TaskForest::REST::PassThrough /foot.html />

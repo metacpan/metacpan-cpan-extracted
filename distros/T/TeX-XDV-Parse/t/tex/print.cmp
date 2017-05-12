@@ -1,0 +1,223 @@
+Pream	247, i: 5, num: 25400000, den: 473628672, mag: 1000, k: 29
+	` XeTeX output 2013.05.05:0734'
+Bop	139, id: [1 0 0 0 0 0 0 0 0 0], previous page: -1
+Spec	239, len: 47
+	`pdf:pagesize width 614.295pt height 794.96999pt'
+Down	160, value: 39951004
+Push	141
+Down	160, value: -40073728
+Down	160, value: 38107648
+Push	141
+Down	160, value: -35022054
+Push	141
+Right	145, value: 2285581
+NatFont	252, ...
+    font id.................: 24
+    point size..............: 655360
+    flags...................: 2
+    postscript name length..: 55
+    family name length......: 0
+    style name length.......: 0
+    font name...............: [/usr/local/apache2/htdocs/fonts/lmroman10-regular.otf]
+    family name.............: 
+    style name..............: 
+    rgba color..............: 4294967295
+    number variations.......: 0
+    variations..............: 
+    extend..................: 65536
+    slant...................: 0
+    embolden................: 0
+Fnt num	195, k: 24
+GlyphSt	254, ...
+    width...................: 1562378
+    length..................: 6
+    x_locs..................: 0,427950,610140,867041,1125253,1380188
+    glyphs..................: 54,66,96,98,105,45
+Move w	150, value: 218235
+GlyphSt	254, ...
+    width...................: 692060
+    length..................: 2
+    x_locs..................: 0,327680
+    glyphs..................: 28,77
+Move w	147, value: no_b
+GlyphSt	254, ...
+    width...................: 1566310
+    length..................: 6
+    x_locs..................: 0,182190,546570,728760,910950,1275331
+    glyphs..................: 66,77,72,66,77,50
+Push	141
+Push	141
+Push	141
+Push	141
+Move w	147, value: no_b
+Spec	239, len: 7
+	`x:gsave'
+Spec	239, len: 15
+	`x:scale 1.0 1.0'
+Push	141
+Push	141
+PicFile	251, ...
+    box type................: 0
+    a.......................: 65536
+    b.......................: 0
+    c.......................: 0
+    d.......................: 65536
+    e.......................: 0
+    f.......................: 0
+    page number.............: 0
+    path length.............: 32
+    path....................: /usr/local/apache2/icons/pdf.png
+Pop	142
+Pop	142
+Spec	239, len: 10
+	`x:grestore'
+Pop	142
+Pop	142
+Pop	142
+Pop	142
+Right	145, value: 1752101
+GlyphSt	254, ...
+    width...................: 1856635
+    length..................: 6
+    x_locs..................: 0,182190,728105,1055785,1383465,1674445
+    glyphs..................: 66,75,28,59,50,88
+Pop	142
+Move y	164, value: 786432
+Push	141
+Right	145, value: 2285581
+GlyphSt	254, ...
+    width...................: 1220280
+    length..................: 3
+    x_locs..................: 0,491520,855900
+    glyphs..................: 27,77,47
+Move w	150, value: 218235
+GlyphSt	254, ...
+    width...................: 1422787
+    length..................: 4
+    x_locs..................: 0,258212,585892,1131807
+    glyphs..................: 98,81,75,50
+Move w	147, value: no_b
+GlyphSt	254, ...
+    width...................: 1494876
+    length..................: 5
+    x_locs..................: 0,327680,582615,946995,1237975
+    glyphs..................: 81,105,63,50,96
+Move w	147, value: no_b
+GlyphSt	254, ...
+    width...................: 2479227
+    length..................: 9
+    x_locs..................: 0,182190,728105,1055785,1383465,1674445,1932657,2114847,2297037
+    glyphs..................: 66,75,28,59,50,98,88,88,88
+Pop	142
+Move y	161, value: no_b
+Push	141
+Push	141
+Push	141
+Push	141
+Push	141
+Right	145, value: 2285581
+Spec	239, len: 7
+	`x:gsave'
+Spec	239, len: 17
+	`x:scale 0.25 0.25'
+Push	141
+Push	141
+PicFile	251, ...
+    box type................: 0
+    a.......................: 65536
+    b.......................: 0
+    c.......................: 0
+    d.......................: 65536
+    e.......................: 0
+    f.......................: 0
+    page number.............: 0
+    path length.............: 32
+    path....................: /usr/local/apache2/icons/pdf.png
+Pop	142
+Pop	142
+Spec	239, len: 10
+	`x:grestore'
+Pop	142
+Pop	142
+Pop	142
+Pop	142
+Pop	142
+Down	159, value: 5854312
+Push	141
+Push	141
+Push	141
+Push	141
+Push	141
+Right	145, value: 2285581
+Spec	239, len: 7
+	`x:gsave'
+Spec	239, len: 17
+	`x:scale 4.00 4.00'
+Push	141
+Push	141
+PicFile	251, ...
+    box type................: 0
+    a.......................: 65536
+    b.......................: 0
+    c.......................: 0
+    d.......................: 65536
+    e.......................: 0
+    f.......................: 0
+    page number.............: 0
+    path length.............: 32
+    path....................: /usr/local/apache2/icons/pdf.png
+Pop	142
+Pop	142
+Spec	239, len: 10
+	`x:grestore'
+Pop	142
+Pop	142
+Pop	142
+Pop	142
+Pop	142
+Move y	161, value: no_b
+Push	141
+Right	145, value: 2285581
+GlyphSt	254, ...
+    width...................: 1220280
+    length..................: 3
+    x_locs..................: 0,491520,855900
+    glyphs..................: 27,77,47
+Right	145, value: 218235
+GlyphSt	254, ...
+    width...................: 1529610
+    length..................: 5
+    x_locs..................: 0,364380,692060,1056440,1347420
+    glyphs..................: 47,81,77,50,88
+Pop	142
+Pop	142
+Down	159, value: 1966080
+Push	141
+Right	146, value: 15229093
+GlyphSt	254, ...
+    width...................: 327680
+    length..................: 1
+    x_locs..................: 0
+    glyphs..................: 82
+Pop	142
+Pop	142
+Eop	140
+Post	248, prev: 44, num: 25400000, den: 473628672, mag: 1000, 
+	l: 39951004, u: 29483324, s: 9, t: 1
+NatFont	252, ...
+    font id.................: 24
+    point size..............: 655360
+    flags...................: 2
+    postscript name length..: 55
+    family name length......: 0
+    style name length.......: 0
+    font name...............: [/usr/local/apache2/htdocs/fonts/lmroman10-regular.otf]
+    family name.............: 
+    style name..............: 
+    rgba color..............: 4294967295
+    number variations.......: 0
+    variations..............: 
+    extend..................: 65536
+    slant...................: 0
+    embolden................: 0
+PPost	249, q: 1021, i: 5

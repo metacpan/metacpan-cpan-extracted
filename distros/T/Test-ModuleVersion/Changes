@@ -1,0 +1,77 @@
+0.17
+  - Sorry. This module is DEPRECATED because L<cpanm> and L<cpanfile> is much better.
+    If you want to install moudles, use L<cpanm> and L<cpanfile> instead.
+    See L<https://github.com/kraih/mojo/wiki/Installation-of-cpan-modules-by-cpanm-and-cpanfile>
+    If you want to test module version, you write test by yourself.
+
+      is($DBIx::Custom::VERSION, '0.2108');
+
+    This module will be removed from CPAN on 2018/3/1
+
+0.16
+  - revert detect method to 0.13 for some bug
+0.15
+  - improved detect method detection
+0.14
+  - expriemntal flag is removed from this module
+  - added BACKWARDS COMPATIBILITY POLICY
+    ---------------------------------
+    If a functionality is DEPRECATED, you can know it by DEPRECATED warnings
+    except for attribute method.
+    You can check all DEPRECATED functionalities by document.
+    DEPRECATED functionality is removed after five years,
+    but if at least one person use the functionality and tell me that thing
+    I extend one year each time he tell me it.
+
+    EXPERIMENTAL functionality will be changed without warnings.
+    -------------------
+  - improved detect method detection
+0.13
+  - removed get_module_url method, and added Test::ModuleVersion::ModuleURL module
+  - detect method return modules instead of setting modules attribute
+  - ignore attribute is removed, and added ignore option to detect method
+0.12
+  - LWP::UserAgent is available if the version is 5.802+.
+0.11
+  - "use lib" in test script is moved to top of script
+    to load all module from the library path
+  - added LWP::UserAgent support if LWP::UserAgent is exists.
+  - added "--lwp" option to test script
+    to use LWP::UserAgent as HTTP client.
+  - added "--no-lwp" option to test script
+    not to use LWP::UserAgent as HTTP client.
+0.10
+  - Display error messege when HTTP request to metaCPAN fail.
+0.09
+  - removed "comment" attribute, and added "before" attribute
+  - added "output" option to "test_script" method
+0.08
+  - removed "list_fail" command, and added "list --fail" option
+  - fixed bug that "distnames" is ignored in test script
+  - added "privates" attribute to use private repositories
+0.07
+  - lib attribute can be set as string
+  - added distnames attribute to resolve distribution name
+    when module name is not same as distribution name.
+0.06
+  - require Perl 5.008007
+  - added comment attribute
+  - fixed bug that test number is printed when command is specified
+0.05
+  - reduced Object::Simple dependency
+  - reduced HTTP::Tiny dependency
+  - reduced JSON dependency
+0.04
+  - added "lib" attribute
+  - added test count to test script
+0.03
+  - renamed "exclude" attribute to "ignore"
+  - renamed "exclude_default" attribute to "default_ignore"
+  - removed "show_lack_module_url" attribute.
+  - "list" command renamed to "list_need"
+  - added "list_all" command
+0.02
+  - second release
+0.01
+  - first release
+  

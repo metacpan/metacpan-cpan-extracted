@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+use strict;
+use IO::File;
+use Term::TtyRec::Player;
+use Getopt::Std;
+
+getopts('nphs:', \my %opt);
+
+die <<'USAGE' if $opt{h};
+Usage: pttyplay [OPTION] [FILE]
+  -s SPEED Set speeed to SPEED [1.0]
+  -n       No wait mode.
+  -p       Peek another person's ttyrecord.
+USAGE
+;
+# ';
+
+my %attr;
+$attr{speed}  = $opt{s}		if defined $opt{s};
+$attr{nowait} = 1		if defined $opt{n};
+
+my $input = IO::File->new(shift || '-') or die $!;
+my $player = Term::TtyRec::Player->new($input, \%attr);
+
+my $method = $opt{p} ? 'peek' : 'play';
+$player->$method();
+
+__END__
+
+=head1 NAME
+
+pttyplay - ttyplay in Perl
+
+=head1 SYNOPSIS
+
+  pttyplay [OPTION] [FILE]
+    -s SPEED Set speed to SPEED [1.0]
+    -n       No wait mode
+    -p       Peek another person's ttyrecord
+
+=head1 DESCRIPTION
+
+pttyplay is ttyplay implemented in Perl. See L<Term::TtyRec> for
+details.
+
+=head1 AUTHOR
+
+Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Term::TtyRec::Player>, http://namazu.org/~satoru/ttyrec/
+
+=cut

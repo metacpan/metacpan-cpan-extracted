@@ -1,0 +1,7 @@
+=== uid increment
+--- wiki
+#####hoge#####
+#####hoge#####
+--- html
+<INLINE_2>hoge-1</INLINE_2>
+<INLINE_5>hoge-1</INLINE_5>

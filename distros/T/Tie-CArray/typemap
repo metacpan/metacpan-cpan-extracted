@@ -1,0 +1,45 @@
+# Those can also be T_CPTROBJ and then automatically use REF on DESTROY
+# needed are only T_AVREF and T_CARRAY.
+# T_NV is not defined in 5.005005
+IV *     		T_CPTR
+int2 *    		T_CPTR
+int3 *    		T_CPTR
+int4 *    		T_CPTR
+NV *  		        T_CPTR
+double2 * 		T_CPTR
+double3 * 		T_CPTR
+char **   		T_CSTRINGPTR
+AV *	  		T_AVREF
+Tie__CArray * 		T_CARRAY
+Tie__CIntArray * 	T_CARRAY
+Tie__CDoubleArray * 	T_CARRAY
+Tie__CStringArray * 	T_CARRAY
+
+#############################################################################
+INPUT
+T_CARRAY
+	g_classname = mysv_classname($arg);
+        if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/__(.*)Ptr$/::$1/;\$ntt}\")) {
+          IV tmp = SvIV((SV*)SvRV($arg));
+	  $var = INT2PTR($type, tmp);
+	} else {
+          croak(\"$var is not of type ${(my $ntt=$ntype)=~s/__(.*)Ptr$/::$1/;\$ntt}\");
+	}
+T_CPTR
+        if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/(.)(.*)Ptr$/'C'.uc($1).$2.'Array'/e;\$ntt}\")) {
+	  IV tmp = SvIV((SV*)SvRV($arg));
+	  $var = INT2PTR($type, tmp);
+	} else {
+          croak(\"$var is not of type ${(my $ntt=$ntype)=~s/(.)(.*)Ptr$/'C'.uc($1).$2.'Array'/e;\$ntt}\");
+	}
+T_AVREF
+        if (SvROK($arg)) $var = (AV*)SvRV($arg);
+	else croak(\"$var is no ARRAYREF\");
+#############################################################################
+OUTPUT
+T_CARRAY
+        sv_setref_pv($arg, g_classname, (void*)$var);
+T_CPTR
+        sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/(.)(.*)Ptr/'C'.uc($1).$2.'Array'/e;\$ntt}\", (void*)$var);
+T_CSTRINGPTR
+        sv_setref_pv($arg, \"CStringArray\", (void*)$var);

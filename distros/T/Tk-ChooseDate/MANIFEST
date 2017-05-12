@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-ChooseDate.t
+lib/Tk/ChooseDate.pm
+demos/choosedate.pl

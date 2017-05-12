@@ -1,0 +1,22 @@
+Revision history for Perl extension Tie::StorableDir.
+
+0.075 Sun Jan 30 00:52:54 EST 2005
+    - Applied patch from Dylan Hardison <dhardison@cpan.org> to correct some POD
+      style issues.
+
+0.073 Fri Jan 28 22:28:09 EST 2005
+    - Fix t/04errors.t when run as root
+
+0.072 Thu Jan 27 17:22:18 EST 2005
+	- Added two tests to t/04errors.t, and made it not fail on Windows.
+
+0.071 Wed Jan 26 17:50:30 2005
+    - Updated README and Build.PL with accurate licensing and other information
+
+0.07  Mon Jan 17 16:30:34 2005
+    - Replaced Makefile.PL with Build.PL
+
+0.01  Sun Jan 16 19:48:31 2005
+	- original version; created by h2xs 1.23 with options
+		-AX Tie::StorableDir
+

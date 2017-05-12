@@ -1,0 +1,9 @@
+# comments
+ok 1
+ok 2
+ok 3
+# comment
+ok 4
+# more ignored stuff
+# and yet more
+1..4

@@ -1,0 +1,27 @@
+---
+abstract: 'Test functions to ensure modules import things'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::Compile: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Import
+requires:
+  Capture::Tiny: 0
+  Test::Builder::Module: 0
+  Test::More: 0
+resources:
+  bugtracker: https://github.com/preaction/Test-Import/issues
+  homepage: https://github.com/preaction/Test-Import
+  repository: https://github.com/preaction/Test-Import.git
+version: 0.004

@@ -1,0 +1,36 @@
+Test::CPAN::Changes::ReallyStrict
+
+This module is for people who want their Changes file to be 1:1
+Identical to how it would be if they'd generated it programmatically
+with CPAN::Changes.
+
+This is not for the faint of heart, and will whine about even minor
+changes of white-space.
+
+You are also at upstream's mercy as to what a changes file looks like,
+and in order to keep this test happy, you'll have to update your whole
+changes file if upstream changes how they format things.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

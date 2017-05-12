@@ -1,0 +1,65 @@
+NAME
+    Template::Plugin::NDS_Multi - Interface to Data::NDS::Multi* modules
+
+SYNOPSIS
+       [% USE NDS %]
+
+DESCRIPTION
+    This allows easy access of data stored in a Data::NDS::Multiele or
+    Data::NDS::Multifile structure (as documented in those modules).
+
+    This deprecates the older Template::Plugin::Multisource module.
+
+METHODS
+    In all of the methods described below, obj is the name of a
+    Data::NDS::Multiele or Data::NDS::Multifile object (unless otherwise
+    noted). In the calling perl program, this was created and passed in as:
+
+       $obj = new Data::NDS::Multiele;
+       ...
+
+       $data = { "obj" => $obj, ... };
+
+       $t = Template->new();
+       $t->process(TEMPLATE,$data);
+
+    Template::Plugin::NDS makes the following methods available:
+
+    eles
+           [% list = NDS_Multi.eles(obj) %]
+
+        This returns a list of elements in the object.
+
+    ele
+           [% flag = NDS_Multi.ele(obj,ele) %]
+
+        This returns 1 if the given element is in any source, 0 otherwise.
+
+    value
+    keys
+    values
+           [% val  = NDS_Multi.value(obj,ele,path) %]
+           [% list = NDS_Multi.keys(obj,ele,path) %]
+           [% list = NDS_Multi.values(obj,ele,path) %]
+
+        This returns the value or list of values from the value, keys, and
+        values methods from the appropriate Data::NDS::* module. Please
+        refer to that documentation for information.
+
+    which
+           [% list = NDS_Multi.which(obj,path,val [,path,val, ...]) %]
+
+        This returns a list of all elements which match the criteria passed
+        in. Refer to the appropriate Data::NDS::* module for the description
+        of the arguments.
+
+KNOWN PROBLEMS
+    None at this point.
+
+LICENSE
+    This script is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Sullivan Beck (sbeck@cpan.org)
+

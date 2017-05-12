@@ -1,0 +1,128 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Text::BibTeX;
+use Getopt::Tabular;
+
+# ----------------------------------------------------------------------
+# Command-line options and option table
+
+my @select;                             # list of citation keys
+my $markup = 'latex';
+my $open_bib = 0;
+
+# Default markups -- should be customizable
+my %markup = 
+   (pre_entry => { latex => '\bibitem{%KEY%}' . "\n",
+                   latex2e => '\bibitem{%KEY%}' . "\n",
+                   html => '"[%LABEL%]"' },
+    inter_block => { latex => "\n\\newblock ",
+                     latex2e => "\n\\newblock ",
+                     html => $open_bib ? "<br>\n" : "  " },
+    atitle => { latex => ['{\em ', '}'],
+                latex2e => ['\emph{', '}'],
+                html => ['<emph>', '</emph>'] },
+    btitle => { latex => ['{\em ', '}'],
+                latex2e => ['\emph{', '}'],
+                html => ['<emph>', '</emph>'] },
+    journal => { latex => ['{\em ', '}'],
+                 latex2e => ['\emph{', '}'],
+                 html => ['<emph>', '</emph>'] },
+   );
+
+my @opt_table = 
+   (['-select', 'call', undef, sub { &get_list_arg (@_, \@select) },
+     'list of entries to format (selected by citation key)',
+     'key1 ...'],
+    ['-latex', 'const', 'latex', \$markup,
+     'add LaTeX 2.09 markup to the bibliography entries'],
+    ['-latex2e', 'const', 'latex2e', \$markup,
+     'add LaTeX 2e markup to the bibliography entries'],
+    ['-html', 'const', 'html', \$markup,
+     'add HTML markup to the bibliography entries'],
+    ['-openbib|-closedbib', 'boolean', 0, \$open_bib,
+     'use "open" bibliography format'],
+   );
+    
+
+
+# ----------------------------------------------------------------------
+# Main program
+
+# First, parse the command line and make sure there's exactly one
+# argument (the .bib file to format) left.
+
+my $usage = "usage: btformat [options] bibfile\n";
+Getopt::Tabular::SetHelp ($usage, undef);
+GetOptions (\@opt_table, \@ARGV) || exit 1;
+
+die "$usage\nIncorrect number of arguments\n" unless (@ARGV == 1);
+
+
+# OK, we're happy with the command-line -- let's start working for real
+my ($filename, $bibfile, $entry, %select);
+
+$filename = shift;
+$bibfile =  Text::BibTeX::File->new( $filename) or die "$filename: $!\n";
+$bibfile->set_structure ('Bib', namestyle => 'nopunct', nameorder => 'first');
+
+%select = map { ($_ => 1) } @select
+   if @select;
+
+my $entry_num = 0;
+while ($entry =  Text::BibTeX::Entry->new( $bibfile))
+{
+   next unless $entry->parse_ok && $entry->metatype == BTE_REGULAR;
+   next if (@select && ! $select{$entry->key});
+   $entry_num++;
+
+#   printf "formatting entry >%s<\n", $entry->key;
+   my (@blocks, $block, $sentence);
+   @blocks = $entry->format;
+   @blocks = grep ($_, @blocks);        # strip empty blocks
+
+   BLOCK:
+   for $block (@blocks)
+   {
+      SENTENCE:
+      for $sentence (@$block)
+      {
+         # If sentence has multiple clauses, process them: first, strip
+         # out empties, and jump to the next sentence if it turns out 
+         # this one is empty (ie. just a bunch of empty clauses).  Then
+         # join the left-over clauses with commas.
+         if (ref $sentence eq 'ARRAY')
+         {
+            @$sentence = grep ($_, @$sentence);
+            ($sentence = '', next SENTENCE) unless @$sentence;
+            $sentence = join (', ', @$sentence);
+         }
+
+         # finish sentence with a period if it's not already punctuated
+         $sentence .= '.' unless $sentence eq '' || $sentence =~ /[.!?]$/;
+      }
+
+      # Now join together all the sentences in the block, first stripping
+      # any empties.
+      @$block = grep ($_, @$block);
+      next BLOCK unless @$block;
+      $block = join (' ', @$block);     # put the sentences together
+   }
+
+   if (@blocks)
+   {
+      my ($key, $label, $header, $f_entry, $footer);
+
+      $key = $entry->key;
+      $label = $entry_num;              # for now!
+      $header = $markup{pre_entry}{$markup};
+      $header =~ s/%KEY%/$key/g;
+      $header =~ s/%LABEL%/$label/g;
+
+      $f_entry = join ($markup{inter_block}{$markup}, @blocks);
+
+      print $header;
+      print $f_entry;
+      print "\n\n";
+   }
+}

@@ -1,0 +1,105 @@
+Revision history for 'TAP-Formatter-HTML' Perl module
+-----------------------------------------------------
+
+All changes by Steve Purkis, unless otherwise noted.
+
+0.11
+    +	fixed RT #81922: tests no longer hang on Win32.  Didn't get to the bottom
+        of the issue (likely IPC::Open3 & redirecting STDOUT not playing nicely),
+        but worked around it.
+    +   fixed a bug on Win32 where default js_uris & css_uris were being mangled:
+        "C:%5C..." vs "C:\".  May have affected other Win32 URIs too.
+
+0.10
+    +	fixed RT #82738: color method was not implemented.
+    +   fixed RT #74364: TT2 INCLUDE_PATH no longer set to all dirs in @INC,
+        now it is set to parent directory TAP::Formatter::HTML was loaded from.
+
+0.09
+    +	upgraded to jQuery 1.4.2
+    +	updated App::Prove::Plugin::HTML to simplify cmdline usage to the
+	extent possible.
+    +	fixed RT #41457 & RT #49621: applied Neil Hemingway, Tim Esselens, and
+    	Panu Ervamaa's patches, and got everything working.  This addresses:
+	    +	small changes to the top-left corner menu (default_report.css)
+		to render it corretly with Firefox 3 (Linux)
+	    +	inline_js fix
+	    +	added support for force_inline_js (not on by default, including
+		jQuery inline causes errors)
+	    +	fixed bug in handling of parse_errors in default_report.tt
+	    +	fixed bug: nothing happens when I click on the test output.
+	    +	XHTML support
+    +	fixed bug: click on summary changes location
+    +	fixed 2 minor javascript bugs where '#' was being used as a jQuery id ref
+    +	added new feature: column sorting via Christian Bach's jquery.tablesorter
+	plugin (bundled from http://tablesorter.com). optional.
+    +	added new feature: up to top of test when the test filename is no longer
+	visible.
+
+
+0.08
+    +	applied Steffen Schwigon's patch to display YAML TAP as
+	pre-formatted text.
+    +	fixed RT #43871: missing dep on File::Temp 0.17
+	[reported by Paddy Newman]
+    +	fixed RT #37983: CSS and JS Paths on Win32 get mangled
+	and documented solution. [reported by Chris Davaz]
+    +	wrote some selenium tests, finally.  found & fixed small bug where
+	a test's html_id wasn't being set.
+    +	fixed RT #48296: pod for js_uris mentions styles, not scripts
+	[reported by Slaven Rezić]
+    +	started on RT #41457: only got "incline_js" fixed
+	[reported by Neil Hemingway]
+
+0.07
+    +	you can now specify an output file for the HTML to be written to!
+    +	you can now set some config params using environment vars. this should
+	make it easier to configure without having to write custom code.
+    +	started writing an App::Prove plugin
+    +	fixed RT #40306: Typo in TAP::Formatter::HTML (incline_js)
+	(also reported by Nathan S. Watson-Haigh)
+    +	applied patch from Michael Hendricks (who's work on this was sponsored
+	by Grant Street Group) for a bug he & others identified:
+	If tests are aggregated in multiple phases (per http://xrl.us/bedfih),
+	... the HTML output shows only the results from the final phase.
+    +	finally wrote some more tests, though selenium tests still not done
+    +	fixed RT #41411: fails on empty directory
+    *	started using IO::* modules for stdout & output_fh
+
+0.06
+    +	fixed RT #37019: tempdir without cleanup [reported by Steffen Schwigon]
+
+0.05
+    +	fixed width issue: test files with hundreds of tests were causing
+	uncontrollable width in summary, making the report pretty annoying
+	to read.
+    +	added toggle to display all / failed tests [requested by Alex Monney]
+    +	highlight failed test file names
+    +	reduced the size of generated HTML by a further ~10-35% (depending on
+	the number of tests you run):
+	  * set test title on mouse-over so it's included only once
+    *	moved inline JS out of default_report.tt2 to its own file that is
+	included by default.
+    *	split css into 'page' & 'report' for ease of user maintainability.
+	[requested by Steffen Schwigon]
+    +	fixed bug: % passed on test file != % ok, was really confusing people.
+	[requested by Wolfram Pfeiffer]
+    *	upgraded to jquery-1.2.6
+
+0.04
+    +	reduced the size of the generated HTML (by 25% on avg for my tests):
+	  * added 'minify' option to strip leading tabs
+	  * used short css class names
+	  * used numeric html id's
+	  * got rid of some other unnecessary whitespace
+
+0.03
+    +	updated deps in Build.PL (again, *sigh*)
+
+0.02
+    +	updated deps in Build.PL
+    +	wrote more docs, fixed a few errors & omissions
+    -	removed bin/runtests_html (it was added before I found out about 'prove')
+
+0.01
+    +	created Thurs May 14 2008

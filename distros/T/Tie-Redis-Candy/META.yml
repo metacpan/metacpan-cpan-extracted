@@ -1,0 +1,36 @@
+---
+abstract: 'Tie Redis to HashRef or ArrayRef'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Scalar::Util: '0'
+  Test::Mock::Redis: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Redis-Candy
+requires:
+  CBOR::XS: '0'
+  Carp: '0'
+  Exporter: '0'
+  Redis: '0'
+  Tie::Array: '0'
+  Tie::Hash: '0'
+  base: '0'
+  perl: '5.006'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/zurborg/libtie-redis-candy-perl/issues
+  homepage: https://github.com/zurborg/libtie-redis-candy-perl
+  repository: https://github.com/zurborg/libtie-redis-candy-perl.git
+version: '1.001'
+x_contributors:
+  - 'David Zurborg <d.zurborg@vcare24.de>'

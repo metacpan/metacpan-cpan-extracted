@@ -1,0 +1,31 @@
+---
+abstract: 'access to Trac via XML-RPC Plugin'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  IO::Socket: 0
+  RPC::XML::Server: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Trac-RPC
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Exception::Class: 0
+  File::Find: 0
+  RPC::XML::Client: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/bessarabov/Trac-RPC/issues
+  homepage: https://github.com/bessarabov/Trac-RPC
+  repository: https://github.com/bessarabov/Trac-RPC.git
+version: 1.0.0

@@ -1,0 +1,61 @@
+{
+   "abstract" : "calculate the Levenshtein edit distance between two strings",
+   "author" : [
+      "Dree Mistrut <dree@friul.it>",
+      "Josh Goldberg <jgoldberg@cpan.org>",
+      "Neil Bowers <neilb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-Levenshtein",
+   "no_index" : {
+      "package" : [
+         "Text::Levenshtein::TestUtils"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "List::Util" : "0",
+            "Unicode::Collate" : "1.04",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "lib" : "0",
+            "open" : "0",
+            "parent" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/Text-Levenshtein",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/Text-Levenshtein.git",
+         "web" : "https://github.com/neilbowers/Text-Levenshtein"
+      }
+   },
+   "version" : "0.13"
+}
+

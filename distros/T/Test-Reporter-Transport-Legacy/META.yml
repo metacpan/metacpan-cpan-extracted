@@ -1,0 +1,64 @@
+---
+abstract: 'Legacy Test::Reporter::Transport modules'
+author:
+  - 'Adam J. Foxson <afoxson@pobox.com>'
+  - 'David Golden <dagolden@cpan.org>'
+  - "Kirrily \"Skud\" Robert <skud@cpan.org>"
+  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Richard Soderberg <rsod@cpan.org>'
+  - 'Kurt Starsinic <Kurt.Starsinic@isinet.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+  Test::Reporter: 1.58
+  vars: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200009, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Reporter-Transport-Legacy
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Test::Reporter::Transport::HTTPGateway:
+    file: lib/Test/Reporter/Transport/HTTPGateway.pm
+    version: 1.59
+  Test::Reporter::Transport::Legacy:
+    file: lib/Test/Reporter/Transport/Legacy.pm
+    version: 1.59
+  Test::Reporter::Transport::Mail::Send:
+    file: lib/Test/Reporter/Transport/Mail/Send.pm
+    version: 1.59
+  Test::Reporter::Transport::Net::SMTP:
+    file: lib/Test/Reporter/Transport/Net/SMTP.pm
+    version: 1.59
+  Test::Reporter::Transport::Net::SMTP::TLS:
+    file: lib/Test/Reporter/Transport/Net/SMTP/TLS.pm
+    version: 1.59
+requires:
+  Carp: 0
+  Encode: 0
+  LWP::UserAgent: 0
+  MIME::QuotedPrint: 0
+  Mail::Send: 0
+  Net::SMTP: 0
+  Net::SMTP::TLS: 0
+  Test::Reporter::Transport: 1.58
+  bytes: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Reporter-Transport-Legacy
+  homepage: http://github.com/dagolden/test-reporter-transport-legacy
+  repository: http://github.com/dagolden/test-reporter-transport-legacy
+version: 1.59

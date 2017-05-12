@@ -1,0 +1,25 @@
+---
+abstract: 'Generate terminal base DataMatrix 2D Code'
+author:
+  - 'Dan Church <h3xx [a] gmx <d> com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.770'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-DataMatrix
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  FindBin: 0
+  Term::ANSIColor: 0
+  Barcode::DataMatrix: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

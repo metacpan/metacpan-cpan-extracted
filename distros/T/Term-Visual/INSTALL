@@ -1,0 +1,7 @@
+Term::Visual installs in the usual way:
+
+ perl Makefile.PL
+ make
+ make install
+
+

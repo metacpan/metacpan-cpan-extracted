@@ -1,0 +1,62 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Matthaeus Kiem <cuer2s@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-Choose-Util",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Encode::Locale" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec::Functions" : "0",
+            "List::Util" : "0",
+            "Term::Choose" : "1.500",
+            "Term::Choose::LineFold" : "1.500",
+            "Term::ReadKey" : "0",
+            "constant" : "0",
+            "perl" : "5.008003",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kuerbis/Term-Choose-Util",
+         "web" : "https://github.com/kuerbis/Term-Choose-Util"
+      }
+   },
+   "version" : "0.051",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

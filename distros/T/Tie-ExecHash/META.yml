@@ -1,0 +1,18 @@
+---
+abstract: 'Give special powers to only some keys in a hash'
+author:
+  - 'Becca <becca@referencethis.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200015, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-ExecHash
+requires:
+  Tie::Hash: 0
+version: 0.91

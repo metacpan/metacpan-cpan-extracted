@@ -1,0 +1,48 @@
+---
+abstract: 'Test posting of multi-part form data'
+author:
+  - 'Nicholas Bamber <nicholas@periapt.co.uk>'
+build_requires:
+  Perl6::Slurp: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - Test
+  - CGI
+  - upload
+  - image
+  - multipart/form-data
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-CGI-Multipart
+provides:
+  Test::CGI::Multipart:
+    file: lib/Test/CGI/Multipart.pm
+    version: v0.0.3
+  Test::CGI::Multipart::Gen::Image:
+    file: lib/Test/CGI/Multipart/Gen/Image.pm
+    version: v0.0.3
+  Test::CGI::Multipart::Gen::Text:
+    file: lib/Test/CGI/Multipart/Gen/Text.pm
+    version: v0.0.3
+recommends:
+  GD: 0
+  Text::Lorem: 0
+requires:
+  CGI: 3.41
+  MIME::Entity: 0
+  Params::Validate: 0
+  Readonly: 0
+  UNIVERSAL::require: 0
+  autodie: 0
+  perl: v5.6.1
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/periapt/Test-CGI-Multipart/tree
+version: v0.0.3

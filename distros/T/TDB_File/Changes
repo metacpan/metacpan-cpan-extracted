@@ -1,0 +1,33 @@
+Revision history for Perl extension TDB_File.
+
+0.01  Tue Mar 26 17:02:46 2002
+	- original version; created by h2xs 1.21 with options
+	   -x -n TDB_File -p tdb_ /home/gus/projects/tdb-perl/tdb-perl/tdb.h
+
+0.50  Sat Jun 29 15:29:20 2002
+	- initial release to CPAN
+
+0.90  Tue Jun 21 09:02:15 2005
+	- Support a log callback for each TDB_File object
+	- Pass logging function to tdb_open_ex()
+	- Remove tdb_lockkeys/tdb_unlockkeys functions, since they
+	  seem to have gone from TDB
+	- Use ExtUtils::Constant to build constant() function
+
+0.95  Tue Jun  5 00:12:02 2007
+	- Makefile.PL now attempts to determine various tdb
+	  differences.
+	- tdb_open_ex with a hash_fn arg now generates a warning if
+	  TDB_File was compiled against a tdb version that lacks this
+	  argument.
+	- Change tdb_printfreelist to return void, since the
+	  sourceforge 1.0.6 version has this, and we don't care about
+	  the return value in other versions.
+	- Protect TDB_ERR_LOCK_TIMEOUT, since that constant doesn't
+	  exist in some versions.
+
+0.96  Tue Jun  5 00:14:02 2007
+	- Fix memory leak in TDB_DATA typemap.  Thanks nigelw.
+
+0.96a Mon Mar 17 21:36:52 2008
+	- Remove bogus (and unused) stop() macro on freebsd.

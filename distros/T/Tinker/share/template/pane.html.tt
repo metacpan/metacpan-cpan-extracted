@@ -1,0 +1,19 @@
+<table class="pane">
+ <tbody>
+  <tr style="height:35px">
+   <td><h1>[%title%]</h1></td>
+   <td>&nbsp;
+    [%IF button %]<button>[%button%]</button>[%END%]
+   </td>
+  </tr>
+  <tr>
+   <td colspan="2">
+[%IF type == 'input' %]
+    <textarea class="input"></textarea>
+[%ELSE%]
+    <pre class="output"></pre>
+[%END%]
+   </td>
+  </tr>
+ </tbody>
+</table>

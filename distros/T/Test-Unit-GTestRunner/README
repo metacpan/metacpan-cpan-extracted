@@ -1,0 +1,44 @@
+Test-Unit-GTestRunner
+=====================
+
+If you came here by accident, and you have never heard about things
+like test driven development or unit testing, you probably want to
+read the pod of Test::Unit respectively the manpage Test::Unit(3pm)
+first.  
+
+GTestRunner is a Gtk+ based testrunner module for Perl, inspired by 
+JUnit, but with a slightly different user interface and functionality.
+If you were not satisfied with the Tk based graphical frontend that
+ships with Test-Unit, then GTestRunner is probably the tool of choice
+when you want to do test driven development in Perl.
+
+It also offers some improvements over the other test runner modules
+that ship with Test-Unit.  You can browse through the tree of test
+suites, and select individual test suites, test cases and even
+individual tests to run.
+
+You can use this module in two different ways.  Most users will just
+want to run the script "gtestrunner" to run their test suites.  If
+you want to integrate unit testing into your own software, you
+will probably use the module Test::Unit::GTestRunner.
+
+Some stupid test suites and test cases are included with this
+package.  Try
+
+    gtestrunner Suites/TS_TopLevel.pm
+
+or
+
+    gtestrunner Suites::TS_TopLevel
+
+to see gtestrunner in action.  The test suites fails five times,
+and you have probably guessed that this is intentionally, so that
+you can see all features.
+
+GTestRunner is fully internationalized.  See the file README-NLS
+for details.  See the file README-TRANSLATIONS for information about
+the currently available languages.  Feel free to contact the author
+if you want to contribute a translation for your own native
+langauge.
+
+$Id: README,v 1.2 2005/10/27 12:14:25 guido Exp $

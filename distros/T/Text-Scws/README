@@ -1,0 +1,57 @@
+Text::Scsw Version 0.01
+
+Copyright © 2008 Xueron Nee.  All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Description
+-----------
+
+This module provides a Perl interface to the libscsw library, 
+For more details see the POD documentation embedded in the file Scsw.pm,
+which will also be installed as Text::Scws(3) man page.
+
+Prerequisites
+-------------
+
+libscws
+
+Building the module
+-------------------
+
+The module can be built using this sequence of commands:
+
+    perl Makefile.PL
+    make
+    make test
+
+If your scws library is in a non-standard path, you might have to help it.  
+You can specify library and include paths like this:
+
+    perl Makefile.PL LIBS='-L/path/to/lib' INC='-I/path/to/include
+
+You might also have to do this if you have multiple libscws
+implementations installed and want to use a specific one.
+
+The purpose of the test scripts (run by "make test") is to check if an
+scws library can be found, and if the scws functions can be called.
+
+Installation
+------------
+
+    make install
+
+Feedback
+--------
+
+
+Thanks
+------
+
+Thanks for hightman's work of libscws
+http://www.hightman.cn
+
+Thanks go to all those who reported bugs and suggested features.
+
+Xueron Nee <xueron@xueron.com>

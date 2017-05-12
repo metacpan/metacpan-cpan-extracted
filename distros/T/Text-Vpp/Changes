@@ -1,0 +1,53 @@
+2005-06-09  Dominique Dumont  <domi@komarr.grenoble.hp.com> 1.17
+
+	* Vpp.pm (myEval): cleaned up handling of eval output (no longer
+	use $Put_Output_Sub global variable). Bug reported by Richard
+	Jelinek.
+
+2001-05-11  Dominique Dumont  <domi@komarr.grenoble.hp.com>
+
+	* Vpp.pm: added require 5.6.0
+	* README: perl version must be >= 5.6.0
+
+2001-02-22  Dominique Dumont  <domi@komarr.grenoble.hp.com>
+
+	* test.pl: v1.14 fix test that did not work under windoze.
+
+2001-02-20  Dominique Dumont  <domi@komarr.grenoble.hp.com>
+
+	* Vpp.pm: v1.13: buf fixes contributed by Helmut (Thanks Helmut)
+
+2000-07-12  Dominique Dumont  <domi@ISPSERV.grenoble.hp.com>
+
+	* Vpp.pm v1.12 : added inline subroutine (Tx to Helmut)
+
+1999-03-12  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	* Vpp.pm (processBlock): bug fix on substitute call (Thanks Helmut)
+
+1998-08-11  Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	* version 1.01: Added missing txt files used for the test :-(
+
+	Version 1.0:
+	* Vpp.pm :  added foreach loop, and @@ in line eval. (Thanks to
+	Helmut Jarausch)
+
+Tue Mar 17 15:45:37 1998  Dominique Dumont  <domi@marlis.grenoble.hp.com>
+
+	Version 0.2 :
+	* Vpp.pm : removed unnecessary "use English"
+	* README : better explanations
+		
+0.04 Mon Oct 20 15:17:09 METDST 1997
+        - added vpp executable
+
+0.03 Fri Oct  3 13:30:56 METDST 1997
+        - added ignoreBackslash method
+
+0.02 Mon Sep 22 17:57:54 METDST 1997
+	- Now we can chain more than one elsif (thanks to Jim Searle for the test
+	case)
+
+0.01  Wed Feb 26 13:51:52 1997
+	- original version; created by h2xs 1.16

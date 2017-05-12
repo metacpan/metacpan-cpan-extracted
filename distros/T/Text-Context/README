@@ -1,0 +1,62 @@
+NAME
+    Text::Context - Handle highlighting search result context snippets
+
+SYNOPSIS
+      use Text::Context;
+
+      my $snippet = Text::Context->new($text, @keywords);
+
+      $snippet->keywords("foo", "bar"); # In case you change your mind
+
+      print $snippet->as_html;
+      print $snippet->as_text;
+
+DESCRIPTION
+    Given a piece of text and some search terms, produces an object which
+    locates the search terms in the message, extracts a reasonable-length
+    string containing all the search terms, and optionally dumps the string
+    out as HTML text with the search terms highlighted in bold.
+
+  new
+    Creates a new snippet object for holding and formatting context for
+    search terms.
+
+  keywords
+    Accessor method to get/set keywords. As the context search is done
+    case-insensitively, the keywords will be lower-cased.
+
+  paras
+        @paras = $self->paras($maxlen)
+
+    Return shortened paragraphs to fit together into a snippet of at most
+    $maxlen characters.
+
+  as_text
+    Calculates a "representative" string which contains the given search
+    terms. If there's lots and lots of context between the terms, it's
+    replaced with an ellipsis.
+
+  as_html([ start => "<some tag>", end => "<some end tag>" ])
+    Markup the snippet as a HTML string using the specified delimiters or
+    with a default set of delimiters ("<span class="quoted">").
+
+AUTHOR
+    Original author: Simon Cozens
+
+    Current maintainer: Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Text-Context@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2002-2005 Kasei
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License; either version
+      2 of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

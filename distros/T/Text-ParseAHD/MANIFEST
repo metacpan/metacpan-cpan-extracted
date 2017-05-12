@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Text/ParseAHD.pm
+lib/Text/ParseAHD/Definition.pm
+lib/Text/ParseAHD/Word.pm
+t/00.load.t

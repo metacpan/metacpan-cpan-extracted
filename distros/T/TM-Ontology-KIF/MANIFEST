@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/basic.t
+bin/kif2atm
+lib/TM/Ontology/KIF.pm
+examples/Makefile
+META.yml                                 Module meta-data (added by MakeMaker)

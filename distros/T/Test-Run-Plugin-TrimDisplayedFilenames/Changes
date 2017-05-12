@@ -1,0 +1,51 @@
+Revision history for Test::Run::Plugin::TrimDisplaysFilenames
+
+0.0125  2015-06-19
+        - Add a version control repository link in META.yml.
+        - Update some old links.
+
+0.0124  2014-04-29
+        - Add t/style-trailing-space.t .
+        - Add t/cpan-changes.t and conver this file to CPAN::Changes.
+        - Minimal version of perl (CPANTS).
+        - Add scripts/bump-version-number.pl and scripts/tag-release.pl
+        - Add the LICENSE file (CPANTS kwalitee).
+
+0.0123  2012-09-29
+        - Remove a stray "END:" label in one of the tests that causes
+        breakages in some perl versions:
+            - http://www.cpantesters.org/cpan/report/0597188c-09a9-11e2-8e23-9a24f233959e
+
+0.0122  2010-02-09
+        - Remove _get_simple_params and _get_private_simple_params.
+            - they seem to be unused.
+        - Bumped the dependency on Test-Run and Test-Run-CmdLine.
+
+0.0121  2009-11-14
+        - Fixed the tests with the latest trunk - spacing between the dots
+        after the test script filenames.
+        - Bumped the dependency on Test-Run-Core to 0.0121.
+
+0.0120  2009-08-06
+        - Converted the tests to YAML::XS instead of YAML.pm.
+        - Converted to Moose.
+
+0.0103  2009-05-04
+        - Converted from NEXT.pm to MRO::Compat .
+
+0.0102  2008-08-19
+        - Converted to private_backend_plugins().
+        - Now depending on Test-Run-CmdLine-0.0110 which fixes the
+        relevant bugs.
+
+0.0101  2008-08-18
+        - Changed _initialize to _init.
+            - In accordance to the new Test-Run.
+        - Bumped the dependencies in the Build.PL.
+        - Fixed the tests.
+        - Refactored ib/Test/Run/Plugin/TrimDisplayedFilenames.pm .
+
+0.01    2008-04-04
+        - First version, released on an unsuspecting world.
+        - Forked from a previous module.
+        - very basic functionality - only fromre: and keep:.

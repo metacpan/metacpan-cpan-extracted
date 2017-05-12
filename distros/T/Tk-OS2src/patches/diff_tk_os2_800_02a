@@ -1,0 +1,284 @@
+This diff is between a "working" version of Tk800.05 and the distribution.
+
+This is the ONLY patch which is needed to make Tk800.05 work.  It is not
+needed with Tk800.11 any more.
+
+New file fix_4_os2.pl is included.  
+
+(One may also need to manually edit fileevent() from basic_demo!)
+
+diff -pru Tk800.0_02/pTk/Makefile.PL Tk800.0_02.my/pTk/Makefile.PL
+--- Tk800.0_02/pTk/Makefile.PL	Fri Mar  6 14:05:18 1998
++++ Tk800.0_02.my/pTk/Makefile.PL	Mon Apr  6 21:33:42 1998
+@@ -51,7 +51,7 @@ sub MY::post_initialize
+   }
+  elsif ($win_arch eq 'pm')
+   {
+-   @list = qw(os2 open32 xlib additions generic tixWin tixGeneric tclUnix tclGeneric );
++   @list = qw(os2 os2/unix open32 xlib additions generic tixWin tixGeneric tclUnix unix tclGeneric );
+   }
+  else
+   {
+diff -pru Tk800.0_02/pTk/mTk/generic/default.h Tk800.0_02.my/pTk/mTk/generic/default.h
+--- Tk800.0_02/pTk/mTk/generic/default.h	Mon Feb  9 16:48:30 1998
++++ Tk800.0_02.my/pTk/mTk/generic/default.h	Sat Apr  4 01:59:24 1998
+@@ -22,7 +22,11 @@
+ #   if defined(MAC_TCL)
+ #	include "tkMacDefault.h"
+ #   else
+-#	include "tkUnixDefault.h"
++#      ifdef __PM__
++#         include "tkOS2Default.h"
++#      else
++#         include "tkUnixDefault.h"
++#      endif
+ #   endif
+ #endif
+ 
+diff -pru Tk800.0_02/pTk/mTk/generic/tkCanvPs.c Tk800.0_02.my/pTk/mTk/generic/tkCanvPs.c
+--- Tk800.0_02/pTk/mTk/generic/tkCanvPs.c	Wed Feb 11 12:36:28 1998
++++ Tk800.0_02.my/pTk/mTk/generic/tkCanvPs.c	Sat Apr  4 01:59:24 1998
+@@ -395,7 +395,7 @@ TkCanvPostscriptCmd(canvasPtr, interp, a
+ 
+     Tcl_AppendResult(canvasPtr->interp, "%!PS-Adobe-3.0 EPSF-3.0\n",
+ 	    "%%Creator: Tk Canvas Widget\n", (char *) NULL);
+-#if !(defined(__WIN32__) || defined(MAC_TCL))
++#if !(defined(__WIN32__) || defined(MAC_TCL) || defined(__EMX__))
+     if (!Tcl_IsSafe(interp)) {
+ 	struct passwd *pwPtr = getpwuid(getuid());
+ 	Tcl_AppendResult(canvasPtr->interp, "%%For: ",
+diff -pru Tk800.0_02/pTk/mTk/generic/tkWindow.c Tk800.0_02.my/pTk/mTk/generic/tkWindow.c
+--- Tk800.0_02/pTk/mTk/generic/tkWindow.c	Fri Mar  6 07:58:12 1998
++++ Tk800.0_02.my/pTk/mTk/generic/tkWindow.c	Sat Apr  4 01:59:24 1998
+@@ -1167,7 +1167,7 @@ Tk_DestroyWindow(tkwin)
+ 	TkWmRemoveFromColormapWindows(winPtr);
+     }
+     if (winPtr->window != None) {
+-#if defined(MAC_TCL) || defined(__WIN32__)
++#if defined(MAC_TCL) || defined(__WIN32__) || defined(__PM__)
+ 	XDestroyWindow(winPtr->display, winPtr->window);
+ #else
+ 	if ((winPtr->flags & TK_TOP_LEVEL)
+diff -pru Tk800.0_02/pTk/mTk/tclUnix/tclUnixNotfy.c Tk800.0_02.my/pTk/mTk/tclUnix/tclUnixNotfy.c
+--- Tk800.0_02/pTk/mTk/tclUnix/tclUnixNotfy.c	Mon Feb  9 16:48:44 1998
++++ Tk800.0_02.my/pTk/mTk/tclUnix/tclUnixNotfy.c	Tue Apr  7 03:42:12 1998
+@@ -455,7 +455,12 @@ Tcl_WaitForEvent(timePtr)
+ 	timeout.tv_sec = timePtr->sec;
+ 	timeout.tv_usec = timePtr->usec;
+ 	timeoutPtr = &timeout;
+-    } else if (notifier.numFdBits == 0) {
++    } else if (
++		notifier.numFdBits == 0
++#if defined(__EMX__) && (defined(__WIN32__) || defined(__PM__))
++		&& !Tcl_WaitForEventProc
++#endif
++	      ) {
+ 	return -1;
+     } else {
+ 	timeoutPtr = NULL;
+@@ -463,6 +468,12 @@ Tcl_WaitForEvent(timePtr)
+ 
+     memcpy((VOID *) notifier.readyMasks, (VOID *) notifier.checkMasks,
+ 	    3*MASK_SIZE*sizeof(fd_mask));
++#if defined(__EMX__) && (defined(__WIN32__) || defined(__PM__))
++    if (Tcl_WaitForEventProc) {
++	numFound = (*Tcl_WaitForEventProc)(notifier.numFdBits, 
++					   notifier.readyMasks, timePtr);
++    } else
++#endif
+     numFound = select(notifier.numFdBits,
+ 	    (SELECT_MASK *) &notifier.readyMasks[0],
+ 	    (SELECT_MASK *) &notifier.readyMasks[MASK_SIZE],
+diff -pru Tk800.0_02/pTk/mTk/tixWin/tixWinDraw.c Tk800.0_02.my/pTk/mTk/tixWin/tixWinDraw.c
+--- Tk800.0_02/pTk/mTk/tixWin/tixWinDraw.c	Mon Feb  9 16:48:54 1998
++++ Tk800.0_02.my/pTk/mTk/tixWin/tixWinDraw.c	Sat Apr  4 01:59:24 1998
+@@ -72,6 +72,7 @@ TixpDrawTmpLine(x1, y1, x2, y2, tkwin)
+  *----------------------------------------------------------------------
+  */
+ 
++#ifndef __PM__
+ void
+ TixpDrawAnchorLines(display, drawable, gc, x, y, w, h)
+     Display *display;
+@@ -82,9 +83,6 @@ TixpDrawAnchorLines(display, drawable, g
+     int w;
+     int h;
+ {
+-#ifdef __PM__
+-    panic("Not implemented: TixpDrawAnchorLines");
+-#else
+     HDC hdc;
+     TkWinDCState state;
+     HPEN hpen;
+@@ -104,8 +102,8 @@ TixpDrawAnchorLines(display, drawable, g
+     DeleteObject(hpen);
+ 
+     TkWinReleaseDrawableDC(drawable, hdc, &state);
+-#endif
+ }
++#endif
+ 
+ /*----------------------------------------------------------------------
+  * TixpStartSubRegionDraw --
+diff -pru Tk800.0_02/Tk/MMutil.pm Tk800.0_02.my/Tk/MMutil.pm
+--- Tk800.0_02/Tk/MMutil.pm	Sun Feb 22 13:57:14 1998
++++ Tk800.0_02.my/Tk/MMutil.pm	Mon Apr  6 22:39:42 1998
+@@ -41,8 +41,10 @@ sub arch_prune
+     }
+    elsif ($win_arch eq 'pm') 
+     {
+-     delete $hash->{$_} if /Unix|Mwm/ and not /tclUnix/;
+-     delete $hash->{$_} if /os2Main|dllMain|tkOS2Dll|^xgc\./;
++     delete $hash->{$_} 
++       if /Unix|Mwm/ and not 
++	 /tclUnix|Unix(3d|Button|Dialog|Color|Embed|Focus|Font|Menu|Scrlbr|Send|Int\.|Scale)/;
++     delete $hash->{$_} if /os2Main|dllMain|tkOS2Dll|^x(colors\.c|gc\.)/;
+      delete $hash->{$_} if /ImgUtil|tkWin[A-Z0-9]/ and not /OS2/;
+     }
+    elsif ($win_arch eq 'MSWin32') 
+diff -pru Tk800.0_02/tkGlue.c Tk800.0_02.my/tkGlue.c
+--- Tk800.0_02/tkGlue.c	Fri Mar  6 16:04:10 1998
++++ Tk800.0_02.my/tkGlue.c	Tue Apr  7 02:09:32 1998
+@@ -38,7 +38,11 @@
+ #include "pTk/tkWin_f.h"
+ #include "pTk/tkWinInt_f.h"
+ #else
+-#include "pTk/tkUnixInt.h"
++#  ifdef OS2
++#    include "pTk/tkOS2Int.h"
++#  else
++#    include "pTk/tkUnixInt.h"
++#  endif
+ #endif
+ #include "tkGlue.h"
+ #include "tkGlue_f.h"
+@@ -1897,7 +1901,7 @@ XS(MainWindowCreate)
+    Tcl_AddErrorInfo(interp, "Tk::MainWindow::Create");
+    croak("%s",Tcl_GetResult(interp));
+   }
+-#ifndef WIN32
++#if !defined(WIN32) && !defined(__PM__) && !(defined(OS2) && defined(__WIN32__))
+  TkCreateXEventSource();
+ #endif
+  XSRETURN(Return_Results(interp,items,offset));
+diff -pru unix/tkUnixEmbed.c os2/unix/tkUnixEmbed.c
+--- Tk800.0_02/pTk/mTk/unix/tkUnixEmbed.c	Sat Feb 28 13:19:52 1998
++++ os2/unix/tkUnixEmbed.c	Tue Apr  7 02:34:04 1998
+@@ -229,12 +229,16 @@ TkpMakeWindow(winPtr, parent)
+ 	parent = containerPtr->parentRoot;
+     }
+ 
++#ifdef __PM__
++    return TkMakeWindow(winPtr, parent);
++#else
+     return XCreateWindow(winPtr->display, parent, winPtr->changes.x,
+ 	    winPtr->changes.y, (unsigned) winPtr->changes.width,
+ 	    (unsigned) winPtr->changes.height,
+ 	    (unsigned) winPtr->changes.border_width, winPtr->depth,
+ 	    InputOutput, winPtr->visual, winPtr->dirtyAtts,
+ 	    &winPtr->atts);
++#endif
+ }
+ 
+ /*
+--- Tk800.005/chnGlue.c~	Sun Feb 15 11:43:06 1998
++++ Tk800.005/chnGlue.c	Mon Jun  1 00:59:54 1998
+@@ -93,7 +93,7 @@ Tcl_SetChannelOption(Tcl_Interp *interp,
+   {
+    if (strcmp(newValue,"binary") == 0)
+     {
+-#ifdef WIN32
++#if defined(WIN32) || defined(__EMX__)
+      setmode(PerlIO_fileno(f), O_BINARY);
+ #endif
+      return TCL_OK;
+--- ./fix_4_os2.pl~	Mon Jun  1 01:06:32 1998
++++ ./fix_4_os2.pl	Mon Jun  1 01:06:48 1998
+@@ -0,0 +1,48 @@
++sub OS2_massage {		# Need to put before BEGIN
++  if (@ARGV) {
++    die <<EOD;
++
++Please start me as one of
++	perl $0 x
++	perl $0 open32
++	perl $0 pm
++EOD
++  }
++  if (not defined $win_arch) {
++      $win_arch = 'pm';
++      print STDERR <<EOP;
++
++No Window architecture specified, building for PM.
++
++Please start me as one of
++	perl $0 x
++	perl $0 open32
++	perl $0 pm
++if you want to specify architecture explicitely.
++
++EOP
++  }
++  if ($win_arch ne 'x' and not -r 'pTk/mTk/open32/tkWinOS2.c' ) {
++    my @zips = <../Tk-OS2-*/perltk_os2_common.zip>;
++    
++    die <<EOD unless @zips;
++
++Cannot find pTk/mTk/open32/tkWinOS2.c, did you read README.os2?
++
++EOD
++    system 'unzip', $zips[-1] and die "Unzip: $!";
++  }
++  if ($win_arch eq 'pm' and not -r 'pTk/mTk/os2/tkOS2Int.h') {
++    my @zips = <../Tk-OS2-*/perltk_os2_pm.zip>;
++    
++    die <<EOD unless @zips;
++
++Cannot find pTk/mTk/os2/tkOS2Int.h, did you read README.os2?
++
++EOD
++    system 'unzip', $zips[-1] and die "Unzip: $!";
++  }
++  $test_perl = 'perl__.exe' if $win_arch ne 'x';
++}
++
++1;
+--- ./Makefile.PL.orig	Sun May 17 12:00:18 1998
++++ ./Makefile.PL	Mon Jun  1 01:12:20 1998
+@@ -1,13 +1,17 @@
+ use Cwd;
+ use Config;
+ no  lib '.';
++
+ BEGIN 
+  {        
+   $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
+ 
+   $VERSION = '800.005';
+ 
+-  $win_arch = ($IsWin32) ? 'MSWin32' : 'x';		# Currently 'x' and 'open32' supported
++  $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
++  require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
++  $win_arch = ($IsWin32) ? $^O : 'x'
++    if not defined $win_arch; # Currently 'x', 'pm', 'open32', 'MSWin32'
+ 
+   require "./myConfig";
+   use lib ($Tk::MMutil::dir=getcwd);
+@@ -44,7 +48,7 @@ foreach my $dir (readdir(DIR))
+   next unless -d $dir;
+   if (-f "$dir/Makefile.PL")
+    {
+-    $dir{$dir} = 1 unless ($IsWin32 && -f "$dir/NotWin.exc"); 
++    $dir{$dir} = 1 if ($win_arch eq 'x' or not -f "$dir/NotWin.exc"); 
+    }
+  }
+ closedir(DIR);
+@@ -55,7 +59,7 @@ Tk::MMutil::TkExtMakefile(
+     'NAME'     => 'Tk',
+     'DIR'      => ['pTk',reverse(sort(keys %dir))],
+     'DISTNAME' => "Tk",
+-    'MYEXTLIB' => 'pTk/libpTk$(LIB_EXT)' . ($win_arch eq 'open32'
++    'MYEXTLIB' => 'pTk/libpTk$(LIB_EXT)' . ($win_arch =~ /^(open32|pm)$/
+ 					    ? ' pTk/dllInit$(LIB_EXT)'
+ 					    : ''),
+     'LIBS'    => \@libs,

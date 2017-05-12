@@ -1,0 +1,69 @@
+
+  Text::BibTeX
+---------------------------------------------------------------------------
+
+  Text::BibTeX is a Perl library for reading, parsing, and processing
+  BibTeX files.  It is the Perl half of btOOL, a pair of libraries for
+  dealing with BibTeX data.
+
+  Text::BibTeX gives you access to the data at many different levels:
+  you may work with BibTeX entries as simple "field -> string"
+  mappings, or get at the original form of the data as a list of
+  simple values (strings, macros, or numbers) pasted together.  You
+  can choose not to impose nany restrictions on the allowed/expected
+  entry types or fields, or you can use the structure defined by
+  BibTeX 0.99's standard style files, or you can invent your own.
+
+  The library is copiously documented.  After installing the module,
+  see the Text::BibTeX man page for a comprehensive introduction to
+  the system.  If you wish to dive straight in without regards for
+  niceties such as splitting and formatting names, defining or
+  imposing database structures, getting access to unprocessed field
+  values, and other nifty features, then you can probably get away
+  with just reading the Text::BibTeX::Entry man page.
+  Comments/criticism of the documentation are welcome.
+
+
+  In addition to the man pages embedded in each module (and available
+  after installation), Greg Ward has written a technical report
+  describing btOOL, with the btparse and Text::BibTeX documentation
+  included as appendices.  The whole report is just over 100 pages,
+  around 45 of which make up the Text::BibTeX documentation (the
+  btparse documentation is a further 30 pages).  You can find it at
+  the btOOL home page:
+
+    http://www.gerg.ca/software/btOOL/
+
+
+  INSTALLATION
+---------------------------------------------------------------------------
+
+  To install Text::BibTeX you need a recent Perl, an ANSI-compliant C
+  compiler and a bunch of Perl modules.
+
+  The build system changed with version 0.40, and has been tested in
+  different platforms, ranging from Linux, Mac OS X, Solaris and
+  Windows. Unfortunately on this last just the Strawberry Perl
+  distribution was a success.
+
+  To build the module use the usual set of commands for a
+  Module::Build distribution:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+
+  And then, as super user, install it
+
+    ./Build install
+
+  Note that if your Perl is installed in a non standard path you can
+  end up with libbtparse library in the wrong place. If the tests pass
+  successfully, but after installing you can not issue
+
+    perl -MText::BibTeX
+
+  without an error message, then probably libbtparse is not reachable
+  by the library loader. In this case you can either copy the library
+  to the proper place or add the path to the library in the
+  LD_LIBARY_PATH environment variable.

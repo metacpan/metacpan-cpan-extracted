@@ -1,0 +1,115 @@
+﻿Revision history for Task-Spark-Form
+
+1.0.1 2012-11-29T20:52:51Z
+ - maint release, only user visible changes: less tests run during install
+   =)
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.3601 -> 0.4003
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.3601 -> 0.4003
+
+ [Dependencies::Changed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803 -> v1.3.0
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.0.0 -> v1.6.0
+
+ [Dependencies::Changed / test requires]
+ - Test::More 0.88 -> 0.98
+
+ [Dependencies::New / develop requires]
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta
+ - Test::Pod 1.41
+ - Test::Pod::Coverage 1.08
+ - version 0.9901
+
+ [Dependencies::New / runtime requires]
+ - perl v5.10.0
+ - strict
+ - warnings
+
+ [Dependenciess::Removed / test requires]
+ - English
+
+ [Internals]
+ - $VERSION declaration moved out of BEGIN
+ - All packages declare $AUTHORITY
+
+ [Packaging]
+ - updated LICENSE indentation.
+ - updated COPYRIGHT year.
+ - moved author/release tests to xt/
+ - repository.url now an HTTPS://.*.git path
+
+1.0.0 2011-07-30T02:36:51Z
+ [Dependencies::Author::New]
+ - (suggests) Dist::Zilla::PluginBundle::Author::KENTNL v1.0.0
+ - (recommended) Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803
+ - (requires) Dist::Zilla::PluginBundle::Author::KENTNL::Lite
+
+ [Dependencies::Build::New]
+ - Module::Build 0.3601
+ - Test::More 0.88
+
+ [Dependencies::Configure::New]
+ - Module::Build 0.3601
+
+ [Dependencies::Test::New]
+ - English
+ - File::Find
+ - File::Temp
+
+ [Meta]
+ - Webpage/Issues/Source now point to github under "perl-spark"
+
+ [Packaging]
+ - Migrate Toolkit to @Author::KENTNL
+ - Migrate to CPANChanges format Changelogs
+ - add .perltidyrc
+ - add perlcritic.rc
+ - Module::Build script regenerated heavily
+ - Moving to x.y.z "Git Versions"
+ - Updated Copyright Licenses
+ - Added weaver.ini
+ - No longer ships a Makefile.PL
+
+ [Tests::Author::New]
+ - CriticTests
+
+ [Tests::New]
+ - Plugin::ReportVersions::Tiny
+
+ [Tests::Release::New]
+ - DistMetaTests - EolTests - KwaliteeTests
+
+ [Tests::Release::Removed]
+ - release-meta-yaml.t # Yaml sucks, JSON rules.
+
+ [Tests::Release::Updated]
+ - PodCoverageTests
+ - PodSyntaxTests
+
+ [Tests::Updated]
+ - Plugin::CompileTest
+
+0.03012607 2009-11-01T19:18:39Z
+ - Add dep on Catalyst::Plugin::Spark::Form
+ - Rebuild with newer pod tools.
+
+0.02 2009-09-16T00:46:54Z
+ - Bump Dep to 0.2102
+ - More tests
+ - Reorder dzil.ini
+ - ship dzil.ini
+ - Use my new Provides for META.yml
+ - Abstract Fixups
+ - Pod Cleanups/Improvements
+ - Install the manual
+ - Fix Copyright
+
+0.01 2009-06-29T14:11:03Z
+ - Initial Revision
+

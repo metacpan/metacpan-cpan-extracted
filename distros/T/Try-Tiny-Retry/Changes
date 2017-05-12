@@ -1,0 +1,25 @@
+Revision history for Try-Tiny-Retry
+
+0.004     2014-07-07 20:46:57-04:00 America/New_York
+
+    [ADDED]
+
+    - 'on_retry' function gets error in $_
+
+0.003     2014-01-21 13:27:40-05:00 America/New_York
+
+    [DOCUMENTED]
+
+    - Clarified behavior of 'retry_if' and 'delay' blocks
+
+0.002     2013-11-22 14:21:01 America/New_York
+
+    [ADDED]
+
+    - 'on_retry' function added to provide a block to be run
+      before each attempt after the first
+
+0.001     2013-11-21 17:18:19 America/New_York
+
+    - First release
+

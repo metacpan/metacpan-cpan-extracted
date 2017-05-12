@@ -1,0 +1,256 @@
+NAME
+    Test::Functional - Perl tests in a functional style.
+
+SYNOPSIS
+      use Test::Functional;
+
+      # make sure the bomb goes off
+      sub explode { die "BOOM" }
+      test { explode() } dies, "test-3";
+
+      # implicit and explicit equivalence
+      test { 2 * 2 } 4, "test-1";
+      test { 2 * 2 } eqv 4, "test-1";
+
+      # test blocks can be as simple or as involved as you want
+      test { 3 > 0 } true, "test-4";
+      test {
+          my $total = 0;
+          foreach my $person ($car->occupants) {
+              $total += $person->weight
+          }
+          $total < 600
+      } true, "test-5";
+
+      # after the test runs, you also get the result.
+      my $horse = test { Horse->new } typeqv "Horse", "test-6";
+
+      # you can make your own comparator functions, or use existing ones.
+      use Test::More import => [qw(like)];
+      sub islike {
+          my ($other) = @_;
+          return sub {
+              my ($got, $testname) = @_;
+              like($got, $other, $testname);
+          };
+      }
+      test { 'caterpillar' } islike(qr/cat/), 'is cat?';
+
+DESCRIPTION
+    This modules uses (abuses?) the ability to create new syntax via perl
+    prototypes to create a testing system focused on functions rather than
+    values. Tests run blocks of Perl, and use comparator functions to test
+    the output. Despite being a different way of thinking about tests, it
+    plays well with Test::More and friends.
+
+EXPORTS
+    Since this module is going to be used for test scripts, its methods all
+    export by default. You can choose which you want using the standard
+    directives:
+
+        # import only eqv
+        use Test::Functional tests => 23, import => ['eqv'];
+
+        # import all but notest
+        use Test::Functional tests => 23, import => ['!notest'];
+
+CONFIGURE
+    This package has two settings which can be altered to change
+    performance:
+
+        unstable - run tests which are normally skipped
+        fastout  - cause the entire test to end after the first failure
+
+    This package can be configured via Test::Functional::Conf or the
+    configure() function.
+
+    configure KEY => VALUE, ...
+        Changes configuration values at run-time.
+
+TEST STRUCTURES
+    test { BLOCK } [CONDITION,] NAME
+        This is the basic building block of Test::Functional. Each test
+        function contains an anonymous code block (which is expected to
+        return a scalar *result*), a name for the test, and a condition (an
+        optional subroutine to check the result).
+
+        In most cases, a test passes if the code block doesn't die, and if
+        the condition is true (or absent). There is a special condition
+        *dies* which expects the code block to die, and fails unless it does
+        so.
+
+        Whether the test passes or fails, *test* returns the value generated
+        by *BLOCK*.
+
+    pretest { BLOCK } [CONDITION,] NAME
+        This works like *test* except that if it fails, it will
+        short-circuit all testing at the current level. This means that
+        top-level *pretest* calls will halt the entire test if they fail.
+        One obvious example for this is:
+
+            BEGIN { pretest { use Foo::Bar } "test-use" }
+            test { Foo::Bar::double(2) } eqv(4), "double(2)";
+            test { Foo::Bar::double(3) } eqv(6), "double(3)";
+            test { Foo::Bar::double(4) } eqv(8), "double(4)";
+
+        If the "use Foo::Bar" fails, the information that all the other
+        tests are failing is less useful. *pretest* can also be combined
+        with *group* (described later) to short-circuit a small set of
+        related tests.
+
+    notest { BLOCK } [CONDITION,] NAME
+        This is has exactly the same semantics as *test*; the only
+        difference is that it normally doesn't run. If
+        "Test::Functional::Conf->unstable" is true, then this test will run,
+        otherwise it won't, and will just return undef.
+
+        For test-driven development, it is useful to create failing tests
+        using *notest* blocks; this prevents test regression. Once the
+        implementation starts working *notest* can be switched to *test*.
+
+    group { BLOCK } NAME
+        Groups are blocks which wrap associated tests. Groups can be used to
+        namespace tests as well as to allow groups of tests to fail
+        together. Here is a short example:
+
+            group {
+                my $a = coretest { Adder->new } typeqv 'Adder', "new";
+
+                test { $a->add(4, 6) } 10, "4 + 6";
+                test { $a->add("cat", "dog") } dies, "mass hysteria";
+                test { $a->add() } isundef, "not a number";
+
+            } "adder";
+
+        If "Adder->new" fails, the rest of the tests aren't producing useful
+        results, so they will be skipped. See the ETHOS section for a more
+        in-depth discussion of the package in general, and the implications
+        of test short-circuiting in particular.
+
+TEST CONDITIONS
+    eqv OBJECT
+        Creates a function which tests that the result is exactly equivalent
+        (eqv) to *OBJECT* (using Test::More::is_deeply). It works for both
+        simple values and nested data structures. See Test::More for more
+        details.
+
+        If *test* receives a condition which isn't a code-ref, it will be
+        wrapped in an *eqv* call, since this is the most common case
+        (testing that a result is the expected value).
+
+    ineqv OBJECT
+        Tests whether the result differs from (is inequivalent to) *OBJECT*
+        according to Data::Compare. This is expected (hoped?) to be inverse
+        of *eqv*.
+
+    typeqv TYPE
+        Creates a function which tests that the result is of (or inhereits
+        from) the provided *TYPE* (that the result's type is equivalent to
+        *TYPE*). For unblessed references, it checks that "ref($result) eq
+        $type". For blessed references it checks that "$result->isa($type)".
+        Results which are not references will always be false.
+
+    dies
+        Verifies that the test's code block died. It is unique amongst test
+        conditions in that it doesn't test the result, but rather tests $@.
+        Any result other than a die succeeds.
+
+    noop
+        This is the "default" condition; if no condition is given to a test
+        then this condition is used. As long as the code block does not die,
+        the test passes.
+
+    true
+        Verifies that the result is a true value.
+
+    false
+        Verifies that the result is a false value.
+
+    isdef
+        Checks that the result is defined (not undef).
+
+    isundef
+        Checks that the result is undefined.
+
+CUSTOM TEST CONDITIONS
+    Anonymous subroutines can be used in place of the provided test
+    conditions. These functions take two arguments: the test result and the
+    test's name. Here are some examples:
+
+      use Test::More;
+
+      sub over21 {
+          my ($result, $name) = @_;
+          return cmp_ok($result, '>=', 21, $name);
+      }
+      test { $alice->age } \&over21, 'can alice drink?';
+      test { $bob->age } \&over21, 'can bob drink?';
+
+    These examples are kind of clunky, but you get the idea. Using anything
+    complicated will probably require reading the source, and/or learning
+    how to use Test::Builder. In particular, it's important to make sure
+    "builder->level" is set correctly.
+
+ETHOS
+    This package exists to address some specific concerns I've had while
+    writing tests using other frameworks. As such, it has some pretty major
+    differences from the other testing frameworks out there.
+
+    Most Perl tests are written as perl scripts which test Perl code by
+    calling functions or methods, and then using various Test packages to
+    look at the result. This approach has some problems:
+
+    1   Test scripts can make bad assumptions or have bugs, causing problems
+        that aren't obviously linked to a particular test clause and which
+        can be hard to track down and fix.
+
+    2   Writing defensive test scripts involves a bunch of relatively
+        boiler-plate eval-blocks and $@ tests, as well as effectively
+        doubling the number of tests that are "run" without meaningfully
+        doubling the test coverage.
+
+    3   In some cases a small early error causes tons of test clauses to
+        spew useless messages about failing; this loses sight of the basic
+        issue that caused the problem (syntax error, missing module, etc).
+
+    Test::Functional addresses these concerns: it enables the programmer to
+    write all the "meat" of the test script inside anonymous subs which are
+    tests [1]. Since each test checks both that the code did not die and
+    that the result was what was expected, the tester doesn't have to worry
+    about what kind of failure might occur, just about the expected outcome
+    [2]. Especially when trying to test other people's code (gray box
+    testing?) this feature is invaluable.
+
+    The various features to prematurely end the test (using *pretest()*
+    and/or "$Test::Functional::Conf->fastout") can help the developer to
+    focus on the problem at hand, rather than having to filter through spew
+    [3]. This is especially nice during test-driven development, or when
+    trying to increase coverage for an old and crufty module.
+
+AUTHOR
+    Erik Osheim "<erik at osheim.org>"
+
+BUGS
+    The syntax takes some getting used to.
+
+    I should create default wrappers for things such as *like* and *compare*
+    from Test::More. Currently I mostly use *true* but that gives less
+    debugging information.
+
+    I wrote these tests to suit my needs, so I am sure there are cases I
+    haven't thought of or encountered. Also, I'm sure I have a lot to learn
+    about the intricacies of Test::Harness and Test::Module. Please contact
+    me (via email or <http://rt.cpan.org>) with any comments, advice, or
+    problems.
+
+ACKNOWLEDGEMENTS
+    This module is based on Test::Builder::Module, and relies heavily on the
+    work done by Michael Schwern. It also uses Data::Compare by David
+    Cantrell.
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Erik Osheim, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

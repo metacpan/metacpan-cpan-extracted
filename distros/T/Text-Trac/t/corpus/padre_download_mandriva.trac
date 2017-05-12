@@ -1,0 +1,35 @@
+= Madriva Installation Instructions =
+
+== Installation using the Package Manager ==
+
+Mandriva 2009.0 comes with pre-packaged Padre 0.10.
+Mandriva 2009.1 will ship Padre 0.29.
+Mandriva cooker (development version) is following upstream quite closely.
+
+To install padre:
+
+{{{
+# urpmi perl-Padre
+}}}
+
+
+== Installation from CPAN ==
+
+=== Mandriva 2008.1 ===
+To install Padre enter the following commands:
+
+{{{
+# urpmi perl-Alien-wxWidgets
+# urpmi perl-Wx
+$ cpan
+cpan> install Padre
+}}}
+
+== Still Not Working? ==
+Following the instructions on this page did not lead to a successful installation?
+
+[http://padre.perlide.org/contact.html Contact us].
+
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.

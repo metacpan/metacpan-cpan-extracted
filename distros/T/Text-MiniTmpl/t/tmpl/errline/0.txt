@@ -1,0 +1,5 @@
+Line 1
+Line 2 &~ my $i = 1; ~& &~ $i++ ~&
+Line 3 &~ $i++;
+          $i++; ~& &~ die ~&
+Line 5

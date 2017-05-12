@@ -1,0 +1,41 @@
+Test-A8N version 0.02
+=====================
+
+Test::A8N was created as a mechanism for writing and running automated
+storytests in a human-readable and reusable fashion.  Its storytest files
+are easily readable, are natural to write, and are easy for non-technical
+users to read, while still being easy for developers to automate.
+
+The tests themselves are written in YAML, and while they have a specific
+structure, it doesn't limit test author's flexibility.  And many of the
+features of YAML, most notably its concept of creating pointers between
+different parts of a document, means reusing parts of your tests for use
+elsewhere is trivial.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::FITesque
+    Test::Deep
+    Moose
+    YAML::Syck
+    Module::Load
+    Pod::Usage
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Sophos Plc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

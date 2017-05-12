@@ -1,0 +1,11 @@
+--- 
+Arrays can be referenced in files: 
+  - Foo
+  - Bar
+  - Baz
+Hashes can be referenced in files: 
+  bar: Bar
+  baz: Baz
+  foo: Foo
+Scalars can be referenced in files: Foo
+Undef can be referenced in files: ~

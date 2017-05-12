@@ -1,0 +1,28 @@
+[brewbuild]
+timeout = 300
+remove = 0
+plugin = Test::BrewBuild::Plugin::DefaultExec
+save = 0
+debug = 0
+legacy = 0
+nocache = 0
+revdep = 0
+
+[tester]
+ip = 0.0.0.0
+port = 7800
+logfile =
+auto = 
+csum =
+debug = 0
+
+
+[dispatch]
+testers = 127.0.0.1, 127.0.0.1:9999
+repo = https://github.com/stevieb9/test-brewbuild
+cmd = brewbuild -N
+forks = 4
+auto_sleep = 60
+rpi = 0
+debug = 0
+

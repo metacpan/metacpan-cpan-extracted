@@ -1,0 +1,57 @@
+Revision history for Perl extension Tk::Month
+
+1.8 Jan 2014
+        - switched from %e to %d as default because %e is not
+          portable. Thanks to Alex Becker
+	- Extended POD and Makefile.  Thanks to Alex Becker
+	- Fixed a bug in Panel.pm
+
+1.7 May 2012
+	- added a format specification for each individual day in
+	  Tk::Month widget. The default is still %e.
+
+1.6 Jan 2009
+	- modified tests to skip parts if there is no X11 display
+	  available.
+
+1.5 Jan 2003
+	- added Tk::Year widget.
+
+	- modified Tk::Month to work support Tk::Year.
+
+1.4  15 Nov 2002
+	- rewrote StrfClock completely to allow for different base
+	  widgets. Added -ontick and -action flags.
+
+	- corrected to bugs (code and documentation) in Month.pm.
+	  Thanks to Guido Van Hoecke
+
+	- added simple tests for the whole package.
+
+	- changed the Panel widget name to Tk::Panel.
+
+1.2  24 May 2000
+        - modified the code to correctly declare the version numbers to
+          CPAN.
+
+	- brought all the versions into line with Tk::Month package.
+
+1.1  24 April 2000
+	- Added a slightly different DoAfterIdle function to work with
+	  the newer Tk distributions.
+
+	- Allowed the user to add menu options to the title menu.
+
+        - Removed the 'close' and 'print month' menu options, and config
+        options '-close' and '-printcomand'. Not needed because the user
+        can added memu items.
+
+	- updated the pod documentation.
+
+	- Added 2 other widgets - StrfClock and Panel.
+
+1.0  13 Sept 1999
+	- started packaging it as a CPAN module.
+
+x.xx  
+	- original version

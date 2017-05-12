@@ -1,0 +1,4 @@
+badges = ['travis']
+
+[no_index]
+directory = ['t', 'xt', 'gen', 'inc', 'share', 'eg', 'examples', 'author' ]

@@ -1,0 +1,196 @@
+2.11	2015-09-13
+
+	Bug Fixes
+	* Reduce usage of variables in regexp that use (?{...}) to avoid perl errors
+	  (issue #64)
+	* Revert "Move "use re 'eval'" to global scope to try to overcome error message"
+	  (issue #64)
+	* Move "use re 'eval'" to global scope to try to overcome error message
+	  (issue #64)
+	* Remove dependency on Data::Dump - not used
+	  (issue #64)
+	* Fix typo
+	* Fix #2: expand() does not accept a multi-line text
+	* Fix #3: Cannot catch error "missing parameter or unescaped # in MACRO"
+	* Fix #4: undefine_all() should carp if no option is given
+	* Fix #7: expansion depends on size of script name
+	* Fix #27: undefine should not carp on undefined object
+	* Fix #28, #37: Variables should be expanded in all input text, not 
+	  only in macro scripts
+	* Fix #38: Variables with # syntax not parsed by $Macro->define()
+	* Fix #39: Undefined #var use causes perl error message without location
+	* Fix #40: Variables should accept expressions and compute them
+	* Fix #41: Macro/script arguments do not nest
+	* Fix #46: Syntax error in %CASE expression is not caught
+	* Fix #48: eval error when evaluating a SCRIPT is not caught and Perl 
+	  error message is output
+	* Fix #49: Missing parameter or unescaped # in MACRO not reported for 
+	  all missing parameters
+	* Fix #63: The body of a script may not contain a literal null
+
+	Feature Changes
+	* Move files to standard distribution directories
+	* Rewrite the parsing loop using one single regular expression to match 
+	  all active macros
+	* Each macro expansion is evaluated once and not looked-in again - 
+	  that means that the output is not rescanned for macros.
+	* list_... output is more consistent - always exactly one newline at 
+	  the end of each definition.
+	* Eval error messages are now correctly captured instead of being sent 
+	  to STDERR.
+	* The error message for non-matched structure is now the same for 
+	  all structures.
+	* Undefining a not-defined entity does no longer output an error message.
+
+2.10	2015-06-11
+
+	Bug Fixes
+	* Fix #61: in some test platforms tests cannot write in the user's 
+	  home directory
+	* Fix #53: [rt.cpan.org #104482] Wrong git repository URL
+	* Fix #60: CPAN test failed: new.t depends on example script that 
+	  requires Image::Size
+	* Fix #44, #54, #56: CPAN test failed: expand_file(): tilde (~) for 
+	  home directory does not work in windows
+	* Fix #59: CPAN test failed: In some OSs a file open on a directory 
+	  does not fail
+
+	Feature Changes
+	* expand_file(): Remove special error message when file does not exist
+
+	Other
+	* Makefile.PL changes
+	* Removed diagnostic messages for #44, #54 and #56
+
+2.09	2015-05-19
+
+	Other
+	* Comment test to skip issue Issue #59: reading a directory as a file 
+	  succeeds in some OS's
+
+2.08	2015-05-18
+
+	Bug Fixes
+	* Fix #52: [rt.cpan.org #104483] Image::Size prerequisite
+	* Fix #55: CPAN test failed: open() failure: $! outputs an OS-dependent 
+	  string
+	* Fix #57: CPAN test failed: Different perl versions output the keys 
+	  of an hash in a different order
+	* Fix #58: CPAN test failed: output of eval error depends on Perl version
+
+	Other
+	* Comment test to skip issue Issue #56: CPAN Tests FAIL Text-MacroScript-2.07 v5.10.1 Windows (Win32)
+	* Issues #54, #56: result of the same error of opening files started with '~' in Windows
+	* Uniform open file error messages
+
+2.07	2015-05-16
+
+    Other (contributed by Neil Bowers)
+    * Added the github repo to the dist metadata
+    * Added the min perl version (5.010) in the dist metadata
+    * Added the license as LGPL (GNU Lesser General Public License, Version 2.1)
+      in the dist metadata.
+
+2.06	2015-05-16
+
+	Bug Fixes
+	* Fix #43: expand_file() dies with double indication of file name
+	* Fix #47: %UNDEFINE[|_VARIABLE|_SCRIPT] within %DEFINE[|_SCRIPT] not 
+	  detected as runaway %DEFINE[|_SCRIPT]
+
+	Feature Changes
+	* expand and expand_embedded now get the line number as argument
+	* Error messages: starting capital letter, tell where runaway ... started
+
+	Other
+	* Add tests for error messages
+	* Rename test scripts, remove errors.t as all tests are somewhere else
+	* Factor test functions into t/mytests.pl
+	* "my $class = ref( $self ) || $self;" not needed
+	* No need to call Symbol::gensym, use open(my $fh, ...) instead.
+
+2.05	2015-05-05
+
+	Bug Fixes
+	* When calling scripts in tests, make sure to use the blib/lib directory
+	* Fix #42: %UNDEFINE_ALL removes comment macro
+	* Fix #6: %UNDEFINE_ALL_VARIABLE does not work
+	* Fix #24: macroutil.pl is an example but is installed at Text::macroutil.pl
+
+	New Features
+	* New methods define_script(), list_script(), undefine_script(), 
+	  undefine_all_script()
+	* New methods define_macro(), list_macro(), undefine_macro(), 
+	  undefine_all_macro()
+	* New methods define_variable(), list_variable(), undefine_variable(), 
+	  undefine_all_variable()
+
+	Feature Changes
+	* Require minimum perl 5.10 for extended regular expressions
+	* Use v5.10 syntax in require
+	* Reorganized documentation, added code comments
+
+	Other
+	* Use Object::Tiny::RW to create object and access attributes
+	* Add test for Issue #37: Variables should be expanded in all input 
+	  text
+	* Use YEAR, MONTH to make sure issue #18 is still OK (output order of 
+	  list() not predictable)
+	* Add commented tests for bug #23: macropp: report errors on syntax 
+	  error
+	* In test scripts: output a message when test code is commented out 
+	  due to open issue
+	* Test scripts
+	* Moved all TODO actions to issues in GitHub
+
+2.04	2015-04-18
+
+	Feature Changes
+	* #22: Remove references to emacro - not installed
+	* #20: The script macro has a too generic name - rename to macropp
+
+	Other
+	* #21: Remove RCS keywords - useless in GIT
+
+2.03	2015-04-18
+
+	Bug Fixes
+	* #19, RT 103777 Tests run with system perl
+	* #18: output order of list() not predictable
+	* #8: macrodir: verbose is on by default, option -v|--vervose is no-op
+	* #11: macrodir: Option -v eats diretory name if it looks like a number
+	* #12: use Path::Tiny instead of Cwd
+	* #14: Remove dead code from macrodir.t
+	* #15: macrodir expanding files in a different order. 
+	* #13: here documents in test scripts may include "\r\n" which 
+	  fail eq to "\n"
+
+	Other
+	* Use strict and warnings in all files, require perl 5.8
+	  (extended regular expressions)
+	* Set current versions of required modules as minimum version
+
+2.02	2015-04-13
+
+	Other
+	* Added test scripts
+
+2.01	2015-04-13
+
+	Bug Fixes
+	* Documentation
+
+	New Features
+	* Install scripts in Perl site bin
+
+	Other
+	* Added test scripts
+	* Raised issues at https://github.com/pauloscustodio/Text-MacroScript/issues
+	* Commented all tests that failed and added a diag() message
+	
+2.00	2015-04-04
+
+	* Module adopted by pscust@cpan.org
+	* Version bumped to 2.00
+	* Module repository moved to 
+	  https://github.com/pauloscustodio/Text-MacroScript

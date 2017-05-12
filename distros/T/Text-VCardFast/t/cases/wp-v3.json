@@ -1,0 +1,155 @@
+{
+   "objects" : [
+      {
+         "type" : "vcard",
+         "properties" : {
+            "n" : [
+               {
+                  "name" : "n",
+                  "values" : [
+                     "Gump",
+                     "Forrest",
+                     "Mr."
+                  ]
+               }
+            ],
+            "org" : [
+               {
+                  "name" : "org",
+                  "values" : [
+                     "Bubba Gump Shrimp Co."
+                  ]
+               }
+            ],
+            "photo" : [
+               {
+                  "params" : {
+                     "value" : [
+                        "URL"
+                     ],
+                     "type" : [
+                        "GIF"
+                     ]
+                  },
+                  "value" : "http://www.example.com/dir_photos/my_photo.gif",
+                  "name" : "photo"
+               }
+            ],
+            "version" : [
+               {
+                  "value" : "3.0",
+                  "name" : "version"
+               }
+            ],
+            "email" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "PREF",
+                        "INTERNET"
+                     ]
+                  },
+                  "value" : "forrestgump@example.com",
+                  "name" : "email"
+               }
+            ],
+            "tel" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "WORK",
+                        "VOICE"
+                     ]
+                  },
+                  "value" : "(111) 555-1212",
+                  "name" : "tel"
+               },
+               {
+                  "params" : {
+                     "type" : [
+                        "HOME",
+                        "VOICE"
+                     ]
+                  },
+                  "value" : "(404) 555-1212",
+                  "name" : "tel"
+               }
+            ],
+            "rev" : [
+               {
+                  "value" : "2008-04-24T19:52:43Z",
+                  "name" : "rev"
+               }
+            ],
+            "label" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "WORK"
+                     ]
+                  },
+                  "value" : "100 Waters Edge\nBaytown, LA 30314\nUnited States of America",
+                  "name" : "label"
+               },
+               {
+                  "params" : {
+                     "type" : [
+                        "HOME"
+                     ]
+                  },
+                  "value" : "42 Plantation St.\nBaytown, LA 30314\nUnited States of America",
+                  "name" : "label"
+               }
+            ],
+            "title" : [
+               {
+                  "value" : "Shrimp Man",
+                  "name" : "title"
+               }
+            ],
+            "adr" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "WORK"
+                     ]
+                  },
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "100 Waters Edge",
+                     "Baytown",
+                     "LA",
+                     "30314",
+                     "United States of America"
+                  ]
+               },
+               {
+                  "params" : {
+                     "type" : [
+                        "HOME"
+                     ]
+                  },
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "42 Plantation St.",
+                     "Baytown",
+                     "LA",
+                     "30314",
+                     "United States of America"
+                  ]
+               }
+            ],
+            "fn" : [
+               {
+                  "value" : "Forrest Gump",
+                  "name" : "fn"
+               }
+            ]
+         }
+      }
+   ]
+}

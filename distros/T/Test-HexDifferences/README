@@ -1,0 +1,34 @@
+Test::HexDifferences version 1.000
+==================================
+
+Test binary as hexadecimal string.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Hash::Util
+    Sub::Exporter
+    Test::Builder::Module
+    Text::Diff
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2012 - 2015,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

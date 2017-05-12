@@ -1,0 +1,70 @@
+---
+abstract: 'Base module for loading Test::Environment::Plugin::*'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Environment
+provides:
+  Apache2::Filter:
+    file: lib/Test/Environment/Plugin/Apache2/Apache2/Filter.pm
+    version: '0.07'
+  Apache2::Log:
+    file: lib/Test/Environment/Plugin/Apache2/Apache2/Log.pm
+    version: '0.07'
+  Apache2::Request:
+    file: lib/Test/Environment/Plugin/Apache2/Apache2/Request.pm
+    version: '0.07'
+  Apache2::RequestRec:
+    file: lib/Test/Environment/Plugin/Apache2/Apache2/RequestRec.pm
+    version: '0.07'
+  Test::Environment:
+    file: lib/Test/Environment.pm
+    version: '0.07'
+  Test::Environment::Plugin::Apache2:
+    file: lib/Test/Environment/Plugin/Apache2.pm
+    version: '0.07'
+  Test::Environment::Plugin::Apache2::Apache2::Filter:
+    file: lib/Test/Environment/Plugin/Apache2/Apache2/Filter.pm
+    version: '0.07'
+  Test::Environment::Plugin::Apache2::Apache2::Log:
+    file: lib/Test/Environment/Plugin/Apache2/Apache2/Log.pm
+    version: '0.07'
+  Test::Environment::Plugin::Apache2::Apache2::Request:
+    file: lib/Test/Environment/Plugin/Apache2/Apache2/Request.pm
+    version: '0.07'
+  Test::Environment::Plugin::Apache2::Apache2::RequestRec:
+    file: lib/Test/Environment/Plugin/Apache2/Apache2/RequestRec.pm
+    version: '0.07'
+  Test::Environment::Plugin::Dump:
+    file: lib/Test/Environment/Plugin/Dump.pm
+    version: '0.07'
+  Test::Environment::Plugin::PostgreSQL:
+    file: lib/Test/Environment/Plugin/PostgreSQL.pm
+    version: '0.07'
+requires:
+  APR::Pool: '0'
+  APR::Table: '0'
+  Carp::Clan: '0'
+  Class::Accessor::Fast: '0'
+  DBI: '0'
+  File::Basename: '0'
+  File::Slurp: '0'
+  IO::String: '0'
+  List::MoreUtils: '0'
+  Log::Log4perl: '0'
+  String::ShellQuote: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

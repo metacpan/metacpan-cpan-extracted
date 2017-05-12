@@ -1,0 +1,54 @@
+Revision history for Perl extension Time::TAI64.
+
+2.11  Fri Apr 28 2006
+    - Fixed a small bug in tai64nlocal where the character
+	  that separates seconds and the fractional seconds
+	  was omitted. Thanks, to Colin Robinson for the spot. 
+
+2.10  Tue Jan 07 2006
+    - Applied optimizations suggested by Ricardo Signes
+	  reducing overhead using substring compares instead 
+	  of regex matches.
+	- Modified Tests to use Test::More
+
+2.07  Tue Jun 14 2005
+    - Removed use 5.008; from Makefile.PL this should really
+	  make it work with 'older' versions of PERL.
+
+2.06  Wed May 25 2005
+    - Removed 'tai64nsyslog' from @EXPORT. The function
+      does not exist.
+
+2.05  Mon Apr 11 2005
+	- Removed 'require 5.008' This should work with older
+	  versions of perl.
+	- Reworked EXPORT_TAGS to also include 'generic' functions
+	  with each set: TAI64, TA64N, or TAI64NA.
+	- Cleaned up Documentation and indicated that functions
+	  must be 'properly' imported using any of the given tags.
+	
+2.04  Thu Dec 02 2004
+	- Updated tests... below.
+
+2.03  Mon Nov 29
+	- Change: tai64nlocal: used "%Y-%m-%d" instead of "%F"
+	  more portable, namely solaris strftime function does
+	  not support %F.
+
+2.02  Thu Nov 24
+	- Uploaded this version to CPAN replacing v1.80
+	  which uses libtai calls with this one using only PERL.
+	- cleaned up POD.
+	- updated Changes and README to reflect Module History.
+	- "first" public release.
+
+2.01  Fri Nov 19
+	- created additional tests.
+	- not released.
+
+2.00  Mon Nov 15 16:19:51 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -AX Time::TAI64
+	- not released.
+
+# vim: ts=4

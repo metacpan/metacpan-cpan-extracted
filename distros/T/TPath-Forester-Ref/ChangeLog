@@ -1,0 +1,15 @@
+Revision history for TPath::Forester::Ref
+
+0.004     2013-09-08 16:38:36 America/New_York
+  * modified tests to expect the node order produced by tpath 1.000
+
+0.003     2013-04-20 13:02:55 EST5EDT
+  * removed some redundant code
+  * adapted to new TPath API
+
+0.002     2013-03-12 00:18:36 EST5EDT
+  * made dsel sensitive to array context
+  * refactored to use new TPath API
+
+0.001     2013-03-10 20:40:41 EST5EDT
+  * first release

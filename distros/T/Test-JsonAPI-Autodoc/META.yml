@@ -1,0 +1,65 @@
+---
+abstract: 'Test JSON API response and auto generate API documents'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  Plack::Request: '0'
+  Plack::Test: '0'
+  Test::Mock::LWP::Conditional: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-JsonAPI-Autodoc
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::JsonAPI::Autodoc:
+    file: lib/Test/JsonAPI/Autodoc.pm
+    version: '0.22'
+  Test::JsonAPI::Autodoc::Markdown:
+    file: lib/Test/JsonAPI/Autodoc/Markdown.pm
+  Test::JsonAPI::Autodoc::Path:
+    file: lib/Test/JsonAPI/Autodoc/Path.pm
+  Test::JsonAPI::Autodoc::Request:
+    file: lib/Test/JsonAPI/Autodoc/Request.pm
+  Test::JsonAPI::Autodoc::Response:
+    file: lib/Test/JsonAPI/Autodoc/Response.pm
+requires:
+  Data::Section::Simple: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Path::Tiny: '0.051'
+  Scope::Guard: '0'
+  Test::More: '0.98'
+  Text::Xslate: '0'
+  Text::Xslate::Bridge::Star: '0'
+  Time::Piece: '0'
+  URL::Encode: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/moznion/Test-JsonAPI-Autodoc/issues
+  homepage: https://github.com/moznion/Test-JsonAPI-Autodoc
+  repository: git://github.com/moznion/Test-JsonAPI-Autodoc.git
+version: '0.22'
+x_contributors:
+  - 'y_uuki <yuki.tsubo@gmail.com>'
+  - 'meru_akimbo <merukatoruayu0@gmail.com>'
+  - 'shotaro.akiyama <satetsu888@gmail.com>'

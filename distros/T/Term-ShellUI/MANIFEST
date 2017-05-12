@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Term/ShellUI.pm
+lib/Text/Shellwords/Cursor.pm
+t/parse.t
+t/test-line-parse
+t/Parse.pm
+examples/synopsis
+examples/synopsis-big
+examples/fileman-example
+examples/tui-sample
+META.yml                                 Module meta-data (added by MakeMaker)

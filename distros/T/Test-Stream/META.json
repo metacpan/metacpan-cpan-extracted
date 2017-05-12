@@ -1,0 +1,78 @@
+{
+   "abstract" : "**DEPRECATED** See Test2-Suite instead",
+   "author" : [
+      "Chad Granum <exodist@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Stream",
+   "no_index" : {
+      "namespace" : [
+         "Test::Builder",
+         "Test::More",
+         "Test::Simple",
+         "Test::Tester"
+      ],
+      "package" : [
+         "Test::Builder",
+         "Test::More",
+         "Test::Simple",
+         "Test::Tester"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "PerlIO" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Test::Harness" : "0",
+            "overload" : "0",
+            "perl" : "5.008001",
+            "utf8" : "0"
+         },
+         "suggests" : {
+            "Sub::Name" : "0.11",
+            "Sub::Util" : "1.40",
+            "Term::ReadKey" : "2.03",
+            "Trace::Mask" : "0.000007",
+            "Unicode::GCString" : "2013.10",
+            "Unicode::LineBreak" : "v2015.7.16"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/Test-More/Test-Stream/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/Test-More/Test-Stream/"
+      }
+   },
+   "version" : "1.302027"
+}
+

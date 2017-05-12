@@ -1,0 +1,14 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/Text/WordCounter.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/word_count.t

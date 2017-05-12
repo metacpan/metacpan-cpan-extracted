@@ -1,0 +1,3 @@
+Foo: <%= $foo %>
+<%* t/data/shared-var-2.tts | SHARE: $foo, $bar %>
+$bar after: <%= $bar->{test} %>

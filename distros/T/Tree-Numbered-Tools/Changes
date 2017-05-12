@@ -1,0 +1,36 @@
+Revision history for Perl extension Tree::Numbered::Tools.
+
+1.04  Sat Jan 08 22:34:34 2011
+	- Added prerequisites for IO::Scalar in Makefile.PL, as the CPAN tests fail on several platforms if this module isn't included:
+          Before:
+            PREREQ_PM => {'Javascript::Menu' => 2.02,},
+          After:
+            PREREQ_PM => {'Javascript::Menu' => 2.02, 'IO::Scalar' => '0',},
+
+1.03  Thu Jul 30 12:06:34 2009
+	- Changed required Perl version from 5.008009 (introduced by mistake in 1.02) to 5.006000 (which should be a reasonable required version, including most of today's Perl users). Thanks to Daniel Higgins for pointing this out.
+	- BUG: The addition of "use warnings" in 1.02 causes one to show up on line 1480 if your sql string begin or end with a newline.
+          SOLUTION: Strip sql string from possible leading and trailing whitespace characters. Thanks to Daniel Higgins.
+	- Added prerequisites in Makefile.PL:
+            PREREQ_PM => {'Javascript::Menu' => 2.02,},
+
+1.02  Tue Jul 28 15:29:38 2009
+	- Bug fixes 1 and 2 (thanks to Daniel Higgins for patches).
+          Ticket: http://rt.cpan.org/Ticket/Display.html?id=48068
+          Bug 1: Module fails with undefined errors when list is not ordered by serial.
+          Bug 2: Module fails with undefined errors when list has serial with dependencies numbers higher than itself.
+        - Bug 3: Calling convertX2Y() functions (convertFile2Array, convertFile2SQL(), etc) using an existing tree object, the tree nodes are not replaced. The solution is to always use a new tree object to create the tree.
+        - Bug 4: Code snippet for array started with #!perl instead of #!/usr/bin/perl.
+        - Added sub _isInteger.
+        - Added tests to 'test.pl'.
+        - Replaced system warning message in readFile() (when reading from an incorrectly indented file) with a custom warning message.
+        - Updated SQL syntax to work with PostgreSQL 8.2.
+        - Document bug: Calling getColumnNames() with use_column_names=0 does not return 'undef', but the default column names when not specified: 'Value', 'Value2', 'Value3', etc.
+        - Document update: Tested on MySQL 3.23.54 and PostgreSQL 7.4.1 -> Tested with MySQL 5.0.77 and PostgreSQL 8.2.13 on FreeBSD 7.2
+
+1.01  Mon Apr 19 11:49:34 2004
+	- Added sub _getMaxColumnsFile(), minor changes, added comments.
+	- Changes in the 'examples' directory.
+
+1.00  Sun Apr 11 21:25:33 2004
+	- Original version; created by 'h2xs -XA -n Tree::Numbered::Tools'

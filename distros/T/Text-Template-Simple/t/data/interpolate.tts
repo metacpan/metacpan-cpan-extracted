@@ -1,0 +1,5 @@
+<% my $file = "t/data/interpolate_data"; %>
+<%* $file . ".tts" %>
+<%+ $file . ".tts" %>
+<%* $file . ".tts"; %>
+<%+ $file . ".tts"; %>

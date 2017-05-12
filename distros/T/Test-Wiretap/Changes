@@ -1,0 +1,5 @@
+Revision history for Test-Wiretap
+
+1.01    Added wiretap() to complement Test::Resub's resub().
+        Small doc cleanups.
+1.00    Initial release

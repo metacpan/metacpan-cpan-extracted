@@ -1,0 +1,52 @@
+
+Changes for TeX::DVI and TeX::DVI::Parse:
+
+1.01 Thu Mar  3 22:21:27 CET 2011
+	Updating the upstream URL to
+	http://www.adelton.com/perl/TeX-DVI/
+
+0.110 Thu Dec  1 19:34:03 MET 2004
+	TeX::DVI::Parse: Added fix for negative values with put_rule,
+	set_rule, reported by Jerry Hagon.
+
+0.101 Wed Mar 21 09:37:58 MET 2001
+	Added the PREREQ_PM to Makefile.PL.
+
+0.100 Mon Feb 14 18:08:07 MET 2000
+	Fixed sprintf/Y2K trouble.
+
+0.052 Thu Dec  3 14:45:27 MET 1998
+	Added binmode, suggested by Randy Kobes.
+
+0.051 Wed Aug 19 18:10:39 MET DST 1998
+	Fixed bug with pack "N" and non integer skips, spotted by
+	schinder@pobox.com/cpan-testers@perl.org.
+
+0.05 Tue Aug 18 19:07:04 MET DST 1998
+	The distribution now includes TeX::DVI and TeX::DVI::Parse.
+	Tests extended. Added close method.
+
+Changes for TeX::DVI:
+
+0.04 Sun Jun  1 13:28:41 MET DST 1997
+	Bug fix.
+
+0.03 Sun Feb 16 13:55:26 MET 1997
+	TeX::DVI::word no longer does the lig/kern expansion but
+	calls Font::TFM::expand.
+
+	Little/big endian incompatibility fixed.
+
+	Name set to TeX::DVI instead of just DVI.
+
+0.02 Thu Feb 13 20:43:38 MET 1997
+	First version released/announced on public.
+
+Changes for TeX::DVI::Parse:
+
+0.021
+	Bug in make_special fixed, patch by Petr Machacek.
+
+0.02 Thu Jul 17 19:53:45 MET DST 1997
+	The first release publicly announced.
+

@@ -1,0 +1,39 @@
+---
+abstract: 'PostgreSQL runner for tests'
+author:
+  - 'Toby Corkindale, Kazuho Oku, Peter Mottram, plus various contributors.'
+build_requires:
+  DBD::Pg: '0'
+  ExtUtils::MakeMaker: '6.59'
+  Test::SharedFork: '0.06'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-PostgreSQL
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBD::Pg: '0'
+  DBI: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  Function::Parameters: '0'
+  Moo: '0'
+  POSIX: '0'
+  Tie::Hash::Method: '0'
+  Try::Tiny: '0'
+  Types::Standard: '0'
+  User::pwent: '0'
+  perl: '5.014'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/TJC/Test-postgresql
+version: '1.23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7ba7cf7388729b639537d177a5f22da5429554c4 Changes
+SHA1 8417664c31e119bcc9fa919a9b1ae134872cea7e INSTALL
+SHA1 8a4fdad1020dbfd5154c3f042385ce86e2eefea2 LICENSE
+SHA1 5fc97a4156a118955c7526f1365d4aa8bda8fdc9 MANIFEST
+SHA1 94cbe05d32b4e3681829a0874f2e4f648c0033c0 META.json
+SHA1 af843f2b424eb149a6d5017b1189fff9e253a0e6 META.yml
+SHA1 2e93c1d0d363305dabf081814105cab69388e35e Makefile.PL
+SHA1 4558c7671939c8f3cad1288bf950d419123ba49c README
+SHA1 46da63ae3787788ff155a45bb6a855d0071a4ff3 cpanfile
+SHA1 fc9eb7682a3b8dab459b84e1b283245f662fd79e dist.ini
+SHA1 16f48d656f9293fbba695240639ec8fc28af65f2 examples/resample.pl
+SHA1 8727d1618df9a57fde73f675a38fd1a1ea65ad3b examples/sine.pl
+SHA1 fe1054e0db35b970e01e4775f53b4ca1670a2246 examples/sparkline.pl
+SHA1 67fd5a530961a63c089cf658e68ae47acb0a76c2 lib/Tickit/Widget/SparkLine.pm
+SHA1 fda0fcb998e0ab3d39df89ae4ad93915ae51e060 lib/Tickit/Widget/SparkLine.pod
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 724c74d3aed12f655f25e9b22079e5e92473c45e t/00-compile.t
+SHA1 77e96e9ce27c3471565de54d3889e84e465dacb6 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 fab9b7f3643e1863d2f6ebf7bbc6840ea79fe96a t/methods.t
+SHA1 321d682e8cd1a8b7063ad19192aff4a9d32f8cef t/resample.t
+SHA1 16a02a744ba97201ecdd6a3b556cc04301400b2e t/sparkline.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXo2/KAAoJEG2WkcbynxAlcZMQAMZobQB/HN0DMrGsjySyJ75C
+ZMR93p8/wR/FD/dq5W0dSpJiSE7A8TEhEicAZ5dsF/6uN0WCQrwsg/zx182Yq+Oj
+fWuRNukxvmFYr2+HW4ZmSr6dRoYK6kqbIMyeUuZFbZY7ub145IKkAOh+kcGZwDxy
+gTUGSuwDxGakX8phjN4+VdIG0Z32RsDebbx4PJjizb4F8SAXri0FAR1AaWiE77KD
+ZbGaxwCdrRb05kEnuFULYOBHJNmLubKOmTQQGLCmZRLB78xNGmKvUseBjTkBDZxl
+HabawIQcUZoQ4LGhmXyLJl5B23JecAT1Wdc1dQ2ELxe1z30TNLzOP8CT4V4xEORV
+8EklhEeHoiIsjvpTjb0uUbjBpiOX0i+j1Xu3Lgkr2cbD/1BbrsE7MQ3OvV6LMhth
+3mytQ4G9/jHaBuuQISM3HhlWXb/hqFDSNDQpSXpv9ZhpvZIhZzMH3a1mTA19wCgR
+ylrVWzSLCPJH0sBGmychb7eR9Qk96FsjbF8yCyFQrRyZbMQkscs4fVyqjjZGofQg
+MQuRCrshXqWIWLnJz3rkOZ9ckeVbv3NF/6uBJd1B8xkSHs2RvVWKiQ5R8Y1J/2UW
+nsqbGynn3hBr7166o/qcDkq7K6xP1rAWN+/XdUCGvFZi9M7OCopz3IXRStdEiy6B
+LoPMyllAFi1B27rCk296
+=8kWG
+-----END PGP SIGNATURE-----

@@ -1,0 +1,224 @@
+NAME
+    Transmission::Client - Interface to Transmission
+
+VERSION
+    0.0805
+
+DESCRIPTION
+    Transmission::Client is the main module in a collection of modules to
+    communicate with Transmission. Transmission is:
+
+     Transmission is a cross-platform BitTorrent client that is:
+      * Easy
+      * Lean
+      * Native
+      * Powerful
+      * Free
+
+    If you want to communicate with "transmission-daemon", this is a module
+    which can help you with that.
+
+    The documentation is half copy/paste from the Transmission RPC spec:
+    <https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt>
+
+    This module differs from P2P::Transmission in (at least) two ways: This
+    one use Moose and it won't die. The latter is especially annoying in the
+    constructor.
+
+SYNOPSIS
+     use Transmission::Client;
+
+     my $client = Transmission::Client->new;
+     my $torrent_id = 2;
+     my $data = base64_encoded_data();
+
+     $client->add(metainfo => $data) or confess $client->error;
+     $client->remove($torrent_id) or confess $client->error;
+
+     for my $torrent (@{ $client->torrents }) {
+        print $torrent->name, "\n";
+        for my $file (@{ $torrent->files }) {
+            print "> ", $file->name, "\n";
+        }
+     }
+
+     print $client->session->download_dir, "\n";
+
+FAULT HANDLING
+    In 0.06 Transmission::Client can be constructed with "autodie" set to
+    true, to make this object confess instead of just setting "error".
+    Example:
+
+        my $client = Transmission::Client->new(autodie => 1);
+
+        eval {
+            $self->add(filename => 'foo.torrent');
+        } or do {
+            # add() failed...
+        };
+
+SEE ALSO
+    Transmission::AttributeRole Transmission::Session Transmission::Torrent
+    Transmission::Utils
+
+ATTRIBUTES
+  url
+     $str = $self->url;
+
+    Returns an URL to where the Transmission rpc api is. Default value is
+    "http://localhost:9091/transmission/rpc";
+
+  error
+     $str = $self->error;
+
+    Returns the last error known to the object. All methods can return empty
+    list in addition to what specified. Check this attribute if so happens.
+
+    Like "autodie"? Create your object with "autodie" set to true and this
+    module will throw exceptions in addition to setting this variable.
+
+  username
+     $str = $self->username;
+
+    Used to authenticate against Transmission.
+
+  password
+     $str = $self->password;
+
+    Used to authenticate against Transmission.
+
+  timeout
+     $int = $self->timeout;
+
+    Number of seconds to wait for RPC response.
+
+  session
+     $session_obj = $self->session;
+     $stats_obj = $self->stats;
+
+    Returns an instance of Transmission::Session. "stats()" is a proxy
+    method on "session".
+
+  torrents
+     $array_ref = $self->torrents;
+     $self->clear_torrents;
+
+    Returns an array-ref of Transmission::Torrent objects. Default value is
+    a full list of all known torrents, with as little data as possible read
+    from Transmission. This means that each request on a attribute on an
+    object will require a new request to Transmission. See "read_torrents"
+    for more information.
+
+  version
+     $str = $self->version;
+
+    Get Transmission version.
+
+  session_id
+     $self->session_id($str);
+     $str = $self->session_id;
+
+    The session ID used to communicate with Transmission.
+
+METHODS
+  add
+     $bool = $self->add(%args);
+
+     key              | value type & description
+     -----------------+-------------------------------------------------
+     download_dir     | string    path to download the torrent to
+     filename         | string    filename or URL of the .torrent file
+     metainfo         | string    torrent content
+     paused           | boolean   if true, don't start the torrent
+     peer_limit       | number    maximum number of peers
+
+    Either "filename" or "metainfo" MUST be included. All other arguments
+    are optional.
+
+    See "3.4 Adding a torrent" from
+    <https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt>
+
+  remove
+     $bool = $self->remove(%args);
+
+     key                | value type & description
+     -------------------+-------------------------------------------------
+     ids                | array    torrent list, as described in 3.1
+     delete_local_data  | boolean  delete local data. (default: false)
+
+    "ids" can also be the string "all". "ids" is required.
+
+    See "3.4 Removing a torrent" from
+    <https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt>
+
+  move
+     $bool = $self->move(%args);
+
+
+     string      | value type & description
+     ------------+-------------------------------------------------
+     ids         | array      torrent list, as described in 3.1
+     location    | string     the new torrent location
+     move        | boolean    if true, move from previous location.
+                 |            otherwise, search "location" for files
+
+    "ids" can also be the string "all". "ids" and "location" is required.
+
+    See "3.5 moving a torrent" from
+    <https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt>
+
+  start
+     $bool = $self->start($ids);
+
+    Will start one or more torrents. $ids can be a single int, an array of
+    ints or the string "all".
+
+  stop
+     $bool = $self->stop($ids);
+
+    Will stop one or more torrents. $ids can be a single int, an array of
+    ints or the string "all".
+
+  verify
+     $bool = $self->stop($ids);
+
+    Will verify one or more torrents. $ids can be a single int, an array of
+    ints or the string "all".
+
+  read_torrents
+     @list = $self->read_torrents(%args);
+     $array_ref = $self->read_torrents(%args);
+
+     key         | value type & description
+     ------------+-------------------------------------------------
+     ids         | array      torrent list, as described in 3.1
+                 |            this is optional
+     lazy_read   | will create objects with as little data as possible.
+
+    List context
+        Returns a list of Transmission::Torrent objects and sets the
+        "torrents" attribute.
+
+    Scalar context
+        Returns an array-ref of Transmission::Torrent.
+
+  rpc
+     $any = $self->rpc($method, %args);
+
+    Communicate with backend. This methods is meant for internal use.
+
+  read_all
+     1 == $self->read_all;
+
+    This method will try to populate ALL torrent, session and stats
+    information, using three requests.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+COPYRIGHT
+    Copyright 2009-2013, Jan Henning Thorsen <jhthorsen@cpan.org>
+      and contributors
+
+    Current maintainer: Olof Johansson - "olof@cpan.org"

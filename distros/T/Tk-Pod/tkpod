@@ -1,0 +1,474 @@
+#!/usr/bin/perl -w
+
+use strict;
+use vars qw($VERSION $tk_opt $tree $server $portfile $Mblib @I $debug);
+
+$VERSION = '5.10';
+
+use IO::Socket;
+
+sub INIT {
+    my $home = $ENV{'HOME'} || $ENV{'HOMEDRIVE'}.$ENV{'HOMEPATH'};
+    $portfile = "$home/.tkpodsn";
+    my $port = $ENV{'TKPODPORT'};
+    return if $^C;
+    unless (defined $port) {
+	if (open(SN,"$portfile")) {
+	    $port = <SN>;
+	    close(SN);
+	}
+    }
+    if (defined $port) {
+	my $sock = IO::Socket::INET->new(PeerAddr => 'localhost',
+					 PeerPort => $port, Proto => 'tcp');
+	if ($sock) {
+	    binmode($sock);
+	    $sock->autoflush;
+	    foreach my $file (@ARGV) {
+		unless (print $sock "$file\n") {
+		    die "Cannot print $file to socket: $!";
+		}
+		print "Requested '$file'\n";
+	    }
+	    $sock->close || die "Cannot close socket: $!";
+	    exit(0);
+	} else {
+	    warn "Cannot connect to server on $port: $!";
+	}
+    }
+}
+
+use Tk;
+
+# Experimental mousewheel support. This is part of newer Tk versions.
+# XXX <MouseWheel> support for Windows is untested.
+BEGIN {
+    if ($Tk::VERSION < 800.024012) {
+	local $^W = 0;
+	require Tk::Listbox;
+	my $orig_tk_listbox_classinit = \&Tk::Listbox::ClassInit;
+	*Tk::Listbox::ClassInit = sub {
+	    my($class,$mw)=@_;
+	    $orig_tk_listbox_classinit->(@_);
+	    $mw->bind($class, "<4>", ['yview', 'scroll', -5, 'units']);
+	    $mw->bind($class, "<5>", ['yview', 'scroll', +5, 'units']);
+	    $mw->bind($class, '<MouseWheel>',
+		      [ sub { $_[0]->yview('scroll',-($_[1]/120)*3,'units') }, Tk::Ev("D")]);
+	};
+
+	require Tk::ROText;
+	my $orig_tk_text_classinit = \&Tk::ROText::ClassInit;
+	*Tk::ROText::ClassInit = sub {
+	    my($class,$mw)=@_;
+	    $orig_tk_text_classinit->(@_);
+	    $mw->bind($class, "<4>", ['yview', 'scroll', -5, 'units']);
+	    $mw->bind($class, "<5>", ['yview', 'scroll', +5, 'units']);
+	    $mw->bind($class, '<MouseWheel>',
+		      [ sub { $_[0]->yview('scroll',-($_[1]/120)*3,'units') }, Tk::Ev("D")]);
+	};
+
+	require Tk::HList;
+	my $orig_tk_hlist_classinit = \&Tk::HList::ClassInit;
+	*Tk::HList::ClassInit = sub {
+	    my($class,$mw)=@_;
+	    $orig_tk_hlist_classinit->(@_);
+	    $mw->bind($class, "<4>", ['yview', 'scroll', -5, 'units']);
+	    $mw->bind($class, "<5>", ['yview', 'scroll', +5, 'units']);
+	    $mw->bind($class, '<MouseWheel>',
+		      [ sub { $_[0]->yview('scroll',-($_[1]/120)*3,'units') }, Tk::Ev("D")]);
+	};
+    }
+}
+
+### Problems under Windows... do not use it anymore
+#BEGIN { eval { require Tk::FcyEntry; }; };
+use Tk::Pod 4.18;
+use Tk::Pod::Text; # for findpod
+use Getopt::Long;
+#require Tk::ErrorDialog;
+
+my $geometry;
+# Do a pre-scan of cmdline to see if -geometry is used
+Getopt::Long::Configure('pass_through');
+GetOptions("geometry=s" => \$geometry);
+Getopt::Long::Configure('nopass_through');
+
+my $mw = MainWindow->new();
+my $orig_state = $mw->state; # may be iconic
+$mw->withdraw;
+
+my $function;
+my $question;
+
+my $exit;
+
+$tree = 0;
+#XXX Getopt::Long::Configure ("bundling");
+if (!GetOptions("tk"           => \$tk_opt,
+		"tree"         => \$tree,
+		"notree"       => sub { $tree = 0 },
+		"s|server!"    => \$server,
+		"Mblib"        => \$Mblib,
+		"I=s@"         => \@I,
+		"d|debug!"     => \$debug,
+		'exit'         => \$exit,
+		"f=s"          => \$function,
+		"q=s"          => \$question,
+		"filedialog=s" => sub {
+		    my $mod = $_[1];
+		    eval qq{ use $mod qw(as_default) };
+		    die $@ if $@;
+		},
+		"version"      => sub {
+		    print <<EOF;
+tkpod $VERSION
+Tk::Pod $Tk::Pod::VERSION
+part of Tk-Pod-$Tk::Pod::DIST_VERSION
+EOF
+		    CORE::exit(0);
+		},
+	       )) {
+    die <<EOT;
+Usage:	$0  [-tk] [[-no]tree] [-Mblib] [-I dir] [-s|server]
+	    [-filedialog module]
+            [-f function | -q FAQRegex | directory | name [...]]
+            [-d|debug] [-exit]
+        $0  -version
+
+EOT
+}
+
+# Add 'Tk' subdirectories to search path so, e.g.,
+# 'Scrolled' will find doc in 'Tk/Scrolled'
+if ($tk_opt) {
+   my $tkdir;
+   foreach (reverse @INC) {
+	$tkdir = "$_/Tk";
+	unshift @ARGV, $tkdir if -d $tkdir;
+   }
+}
+
+if ($debug) {
+    $ENV{'TKPODDEBUG'} = $debug;
+}
+
+if ($exit) {
+    local $^W = 0;
+    *Tk::Pod::Text::_error_dialog = sub { die @_ };
+}
+
+my $use_reloader = 0;
+if ($ENV{'TKPODDEBUG'}) {
+    if (eval { require Tk::App::Reloader; 1 }) {
+	warn "Loaded Tk::App::Reloader ...\n";
+	$Tk::App::Reloader::VERBOSE = $Tk::App::Reloader::VERBOSE = 1;
+	Tk::App::Reloader::shortcut();
+	$use_reloader = 1;
+    }
+    if (eval { require Tk::App::Debug; 1 }) {
+	warn "Loaded Tk::App::Debug...\n";
+    }
+}
+
+start_server() if $server;
+
+# CDE use Font Settings if available
+my $ufont = $mw->optionGet('userFont','UserFont');     # fixed width
+my $sfont = $mw->optionGet('systemFont','SystemFont'); # proportional
+if (defined($ufont) and defined($sfont)) {
+    foreach ($ufont, $sfont) { s/:$//; };
+    $mw->optionAdd('*Font',       $sfont);
+    $mw->optionAdd('*Entry.Font', $ufont);
+    $mw->optionAdd('*Text.Font',  $ufont);
+}
+
+if (1 && $^O ne "MSWin32") { # XXX still decide
+    my $lighter = $mw->Darken(Tk::NORMAL_BG, 110);
+    foreach my $class (qw(Entry BrowseEntry.Entry More*ROText Pod*Tree)) {
+	$mw->optionAdd("*$class*background", $lighter, "userDefault");
+    }
+    $mw->optionAdd("*Pod*Pod*Frame*More*ROText*background", $lighter, "interactive");
+}
+
+$mw->optionAdd('*Menu.tearOff', $Tk::platform ne 'MSWin32' ? 1 : 0);
+
+my @extra_dirs;
+if (defined $Mblib) {
+    # XXX better to use Tk::Pod->Dir? blib/scripts => Tk::Pod->ScriptDir?
+    require blib;
+    blib->import;
+}
+if (@I) {
+    push @extra_dirs, @I;
+}
+Tk::Pod->Dir(@extra_dirs) if @extra_dirs;
+if ($ENV{TKPODDIRS}) {
+    require Config;
+    for my $dir (split $Config::Config{'path_sep'}, $ENV{TKPODDIRS}) {
+	Tk::Pod->Dir($dir);
+    }
+}
+
+my $tl;
+my $file;
+my $opened = 0;
+foreach $file (@ARGV)
+ {
+  if (-d $file && !Tk::Pod::Text->findpod($file, -quiet => 1))
+   {
+    Tk::Pod->Dir($file);
+   }
+  else
+   {
+    $tl = make_tk_pod_window();
+    # -file => ... should be called after creating the Pod window,
+    # because -title => ... is set implicitly by Pod's new
+    $tl->configure(-file => $file);
+    $opened++;
+   }
+ }
+
+if (defined $function)
+ {
+    $tl = make_tk_pod_window();
+    $tl->configure($tl->getpodargs(-f => $function));
+    $opened++;
+ }
+if (defined $question)
+ {
+    $tl = make_tk_pod_window();
+    $tl->configure($tl->getpodargs(-q => $question));
+    $opened++;
+ }
+
+if (!$opened) # This may happen if all arguments are directories
+ {
+  $tl = make_tk_pod_window();
+  if (!$tree)
+   {
+    $tl->configure(-file => "perl");
+   }
+ }
+
+if (Tk::Exists($tl) && $orig_state eq 'iconic') {
+    $tl->iconify;
+}
+
+# xxx dirty but it works. A simple $mw->destroy if $mw->children
+# does not work because Tk::ErrorDialogs could be created.
+# (they are withdrawn after Ok instead of destory'ed I guess)
+
+if ($mw->children) {
+    $mw->repeat(1000, sub {
+        if (Tk::Exists($mw)) {
+	    # ErrorDialog is withdrawn not deleted :-(
+	    foreach ($mw->children) {
+		return if "$_" =~ /^Tk::Pod/  # ->isa('Tk::Pod')
+	    }
+	    $mw->destroy;
+	}
+    });
+} else {
+    $mw->destroy;
+}
+Tk::App::Reloader::check_loop() if $use_reloader;
+MainLoop unless $exit;
+unlink($portfile);
+exit(0);
+
+sub make_tk_pod_window {
+    my $tl = $mw->Pod(
+		      -exitbutton => 1,
+		     );
+    if ($geometry) {
+	$tl->geometry($geometry);
+    }
+    if ($tree) {
+	$tl->tree($tree);
+    }
+    $tl;
+}
+
+sub start_server {
+    my $sock = IO::Socket::INET->new(Listen => 5, Proto => 'tcp');
+    die "Cannot open listen socket: $!" unless defined $sock;
+    binmode($sock);
+
+    my $port = $sock->sockport;
+    $ENV{'TKPODPORT'} = $port;
+    open(SN,">$portfile") || die "Cannot open $portfile: $!";
+    print SN $port;
+    close(SN);
+    print STDERR "Accepting connections on $port\n";
+    $mw->fileevent($sock,'readable',
+		   sub {
+		       print STDERR "accepting $sock\n";
+		       my $client = $sock->accept;
+		       if (defined $client) {
+			   binmode($client);
+			   print STDERR "Connection $client\n";
+			   $mw->fileevent($client,'readable',[\&PodRequest,$client]);
+		       }
+		   });
+    $SIG{TERM} = \&server_cleanup;
+}
+
+sub server_cleanup {
+    unlink $portfile if -e $portfile;
+}
+
+sub PodRequest {
+    my($client) = @_;
+    local $_;
+    while (<$client>) {
+	chomp($_);
+	print STDERR "'$_'\n";
+	my $pod = make_tk_pod_window();
+	$pod->configure(-file => $_);
+    }
+    warn "Odd $!" unless eof($client);
+    $mw->fileevent($client,'readable','');
+    print STDERR "Close $client\n";
+    $client->close;
+}
+
+__END__
+
+=head1 NAME
+
+tkpod - Perl/Tk Pod browser
+
+=head1 SYNOPSIS
+
+    tkpod   [-tk] [[-no]tree] [-Mblib] [-I dir] [-d|debug] [-s|server]
+	    [-filedialog module]
+            [-f function | -q FAQRegex | directory | name [...]]
+
+
+=head1 DESCRIPTION
+
+B<tkpod> is a simple Pod browser with hypertext capabilities.
+Pod (L<Plain Old Document|perlpod>) is a simple and readable
+markup language that could be mixed with L<perl> code.
+
+Pods are searched by default in C<@INC> and C<$ENV{PATH}>. Directories
+listed on the command line or with the B<-I> option are added to the
+default search path.
+
+For each C<name> listed on the command line B<tkpod> tries
+to find Pod in C<name>, C<name.pod> and C<name.pm> in the search
+path.  For each C<name> a new Pod browser window is opened.
+
+If no C<name> is listed, then the main C<perl> pod is opened instead.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-tree>
+
+When specified, C<tkpod> will show a tree window with all available
+Pods on the local host. However, this may be slow on startup,
+especially first time because there is no cache yet. You can always
+turn on the tree view with the menu entry 'View' -E<gt> 'Pod Tree'.
+
+=item B<-tk>
+
+Useful for perl/Tk documentation.  When specified it adds all
+C<Tk> subdirectories in C<@INC> to the Pod search path.   This way
+when C<Scrolled> is selected in the browser the C<Tk/Scrolled>
+documentation is found.
+
+=item B<-s> or B<-server>
+
+Start C<tkpod> in server mode. Subsequent calls to C<tkpod> (without
+the B<-s> option) will cause to load the requested Pods into the
+server program, thus minimizing startup time and memory usage. Note
+that there is no access control, so this might be a security hole!
+
+=item B<-Mblib>
+
+Add the C<blib> directories under the current directory to the Pod
+search path.
+
+=item B<-I> I<dir>
+
+Add another directory to the Pod search path. Note that the space is
+mandatory.
+
+=item B<-f> I<function>
+
+Show documentation for I<function>.
+
+=item B<-q> I<FAQRegex>
+
+Show the FAQ entry matching I<FAQRegex>.
+
+=item B<-filedialog> I<module>
+
+Use an alternative file dialog module, e.g. L<Tk::FileSelect>,
+L<Tk::FBox> or L<Tk::PathEntry::Dialog>.
+
+=item B<-d> or B<-debug>
+
+Turn debugging on.
+
+=item B<-exit>
+
+Only for internal testing: exit before entering C<MainLoop>.
+
+=back
+
+
+=head1 USAGE
+
+How to navigate with the Pod browser is described in L<Tk::Pod_usage>.
+It's also accessible via the menu 'Help' -> 'Usage...'.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item TKPODPORT
+
+Force a port for tkpod's server mode.
+
+=item TKPODDIRS
+
+A list of directories (on Unix usually separated by C<:>, on Windows
+by C<;>) for additional Pod directories. These directories will appear
+in the "local dirs" section of the tree view.
+
+=back
+
+See L<Tk::Pod::Text/Environment> and L<Tk::Pod::FindPods/Environment>
+for more environment variables.
+
+=head1 KNOWN BUGS
+
+see L<Tk::Pod::Text>
+
+=head1 SEE ALSO
+
+L<perlpod|perlpod>
+L<pod2man|pod2man>
+L<pod2text|pod2text>
+L<pod2html|pod2html>
+L<Tk::Pod|Tk::Pod>
+L<Tk::Pod::Text|Tk::Pod::Text>
+L<Tk::Pod::Tree|Tk::Pod::Tree>
+
+=head1 AUTHOR
+
+Nick Ing-Simmons <F<nick@ni-s.u-net.com>>
+
+Former maintainer: Achim Bohnet <F<ach@mpe.mpg.de>>.
+
+Code currently maintained by Slaven Rezic <F<slaven@rezic.de>>.
+
+Copyright (c) 1997-1998 Nick Ing-Simmons.
+Copyright (c) 2015 Slaven Rezic.
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

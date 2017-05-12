@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Tie/Hash/StructKeyed.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00use.t
+t/01basic.t
+t/02object.t

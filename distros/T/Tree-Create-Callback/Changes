@@ -1,0 +1,15 @@
+Revision history for Tree-Create-Callback
+
+0.03    2016-04-01 (PERLANCAR)
+
+	- [Bugfix] Fix algorithm in Callback::ChildrenPerLevel.
+
+
+0.02    2016-04-01 (PERLANCAR)
+
+	- Add module: Tree::Create::Callback::ChildrenPerLevel.
+
+
+0.01    2016-03-29 (PERLANCAR)
+
+        - First release.

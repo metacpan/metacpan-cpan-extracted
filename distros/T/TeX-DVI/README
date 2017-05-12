@@ -1,0 +1,50 @@
+
+			------------------------
+				TeX::DVI
+			------------------------
+
+This is the README file for the TeX::DVI and TeX::DVI::Parse modules.
+
+Module TeX::DVI:
+	Low level methods to write out DVI (DeVice Independent) file,
+	the default output format of the TeX typesetting file.
+
+Module TeX::DVI::Parse:
+	Class for parsing TeX's DVI output file, calls callback
+	functions for elements found in the file.
+
+Module TeX::DVI::Print:
+	Example how to use TeX::DVI::Parse to print the content of
+	DVI -- defines functions to print content of the DVI in
+	readable form.
+
+Installation:
+	Download the tar.gz, unpack it, change to the TeX-DVI-*
+	directory. Then do
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+	or you can use CPAN module and just type "install TeX::DVI".
+
+Use:
+	use TeX::DVI;
+	my $dvi = new TeX::DVI "texput.dvi";
+	$dvi->preamble();
+	$dvi->begin_page();
+
+	use TeX::DVI::Print;
+	my $dvi_parse = new TeX::DVI::Print("test.dvi");
+	$dvi_parse->parse();
+
+Available:
+	http://www.adelton.com/perl/TeX-DVI/ and from your favorite
+	CPAN site in the authors/id/JANPAZ/ directory.
+		
+Copyright: (c) 1996--2011 Jan Pazdziora.A
+	All rights reserved. This program is free software; you can
+	redistribute it and/or modify it under the same terms as Perl
+	itself. 
+

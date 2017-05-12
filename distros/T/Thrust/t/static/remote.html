@@ -1,0 +1,15 @@
+<html>
+  <body>
+    Remote test
+
+    <script>
+        THRUST.remote.listen(function(msg) {
+          console.log('MESSAGE');
+          console.log(JSON.stringify(msg));
+          THRUST.remote.send({ pong: msg['ping'] });
+        });
+
+        THRUST.remote.send({ ping: 'from JS' });
+    </script>
+  </body>
+</html>

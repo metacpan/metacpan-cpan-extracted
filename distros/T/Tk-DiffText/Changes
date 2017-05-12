@@ -1,0 +1,52 @@
+Revision history for Perl extension Tk::DiffText.
+
+0.19 (2008-03-21)
+    * Rerelease to fix fragile archive file. (IZArc 3.81 uses backslashes as 
+      path separators instead of forward slashes. This breaks some *nix unzip 
+      programs.)
+
+0.18 (2008-03-18)
+    * Added support for nagivating differences.
+    * Updated documentation to describe how to use with Unicode files.
+
+0.17 (2006-12-02)
+    * Clicking in the difference map will re-center the view on that location.
+    * Fix to prevent files with incomplete last lines (no \n) from interfering
+      with synchronized scrolling.
+    * The compare() method now accepts a user-defined key generation function
+      via the -keygen argument.
+
+0.16 (2006-11-30)
+    * Added scrolled difference map support.
+    * Added current view marker to scaled map.
+
+0.15 (2006-11-29)
+    * Added scaled difference map.
+    * Fixed a bug where stray data in $_ could show up in the first file loaded.
+
+0.14 (2006-11-21)
+    * Carp::carp now properly imported into package namespace so warnings
+      actually work.
+    * load() now clears line number gutter when a file load fails.
+    * load() now defaults to input being interpreted as a file name, so 
+      attempting to load a non-existant file will cause a "Can't read file..."
+      warning instead of a "Don't know how to load from..." one.
+
+0.13 (2006-11-19)
+    * Uses less memory. (Diffs now performed directly on contents of ROText
+      widgets.) This added a dependency on Tie::Tk::Text (new module).
+    * Added load() and compare() methods. diff() now deprecated.
+    * Panes are scroll-locked after being compared, unlocked whenever a pane is
+      loaded.
+
+0.12 (2006-11-15)
+    * Intra-line differences now use the key generation function. (i.e. they
+      respect settings to ignore case and whitespace.)
+
+0.11 (2006-11-14)
+    * Fix test suite to work better cross platform
+    * Initialized gutter width to minimal size on creation
+    * Renamed -colors option to -diffcolors
+
+0.10 (2006-11-12)
+    * original version released on CPAN

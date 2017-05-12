@@ -1,0 +1,47 @@
+This is the README file for Tie::SortHash.
+
+Tie::SortHash - Perl module to keep hashes in a sorted order
+
+SYNOPSIS ( quickie )
+
+  use Tie::SortHash;
+
+  my %ascii     =  ( n => ord 'n', a => ord 'a', z => ord 'z' );
+
+  my $sortblock = q( $hash{$a} <=> $hash{$b} );
+
+  tie %ascii, 'Tie::SortHash', \%ascii, $sortblock;
+
+  print "$_ => $ascii{$_}\n" foreach keys %ascii;
+
+ This module ensures that the output will _always_ be:
+
+  a => 97
+  n => 110
+  z => 122
+
+INSTALL
+
+ If, by chance, you don't know what this 'tar.gz' thing is... follow these
+ steps first:
+
+  gunzip Tie-SortHash-X.XX.tar.gz
+  tar -xvf Tie-SortHash-X.XX.tar
+  cd Tie-SortHash-X.XX
+
+ Next, yep, you guessed it:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+AUTHOR
+
+ Casey Tweten, crt@kiski.net
+
+COPYRIGHT
+
+ Copyright (c) 2000 Casey Tweten. All rights reserved.
+ This program is free software; you can redistribute it
+ and/or modify it under the same terms as Perl itself.

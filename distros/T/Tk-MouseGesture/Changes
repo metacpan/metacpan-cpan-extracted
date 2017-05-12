@@ -1,0 +1,15 @@
+Revision history for Perl extension Tk::MouseGesture.
+
+0.01  Mon Nov 24 15:27:09 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Tk::MouseGesture
+
+0.02  Tue Nov 25 12:01:51 2003
+	- added command() callback.
+	- fixed up pods a little.
+	- added 'use Tk;' to defined Construct().
+
+0.03  Mon Dec 15 16:52:17 2003
+	- B?-right was missing from pods.
+	- added test script that should get automatically
+	  installed under 'widget'.

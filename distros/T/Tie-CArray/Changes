@@ -1,0 +1,94 @@
+Revision history for Perl extension Tie::CArray
+
+0.15  2010-02-22
+	- fix #54864 Fails on systems with nvsize > 8 (-Duselongdouble)
+          exchanged double with NVTYPE, int by IVTYPE
+        - PAGESIZE => MY_PAGESIZE use our own
+        - require from 5.005005 to 5.006. 5.005 fails with 
+          undefined IVTYPE, NVTYPE and a simple workaround didn't work
+0.14  2008-01-20 11:56
+	- fix 64int warnings
+0.13  2008-01-15 20:00
+	- fixed wrong tests 
+0.12  2000-01-11 06:22
+	- added SLICE
+	- finally fixed eof problems strict unix c compilers
+	  (in 0.11 RCS put \r\n in again, sorry)
+        - under the Tie namespace (CArray -> Tie::CArray)
+	- added wantarray to functions which could return arrays
+	- fixed return of arrayrefs
+        - started with structured pack-style templates as in Tie::MmapArray
+	- changed test scripts
+0.11  2000-01-02 02:29
+	- added CArray.def to help cc/gcc
+	- fixed eof problems and c comments for strict unix c compilers
+	  (not really: RCS put \r\n in again, sorry)
+        - added XS_rcs_string, XS_compile_date
+        - added list() and init()
+	- changed SeqArrays to return arrayrefs instead of arrays (faster),
+          fast xs wantarray pending
+0.10  06:31 05.12.99
+        - complete rewrite: no Ptr/Array seperation anymore,
+          the XS array contains the size info (as a pascal string)
+	- 7 times faster for arrays, 24 times faster for seq. arrays.
+	- renamed size() to len()
+	- added easier array resize: internal ->freelen field,
+	  grow() and delete() methods, itemsize variable and read-only method
+	- fixed nreverse()
+	- still problematic DESTROY with DEBUGGING perl
+	- CStringArray's might be broken.
+	  no fails with t/02strarr.t but some with test.pl. strange.
+0.09  Tue Nov 30 21:45:09 1999
+        - removed Exporter
+	- fixed some bugs in ->ToInt3, ToInt4
+	  changed argument order in ->ToDouble2, ToDouble3
+        - fixed looping bug in all conversions: last element was not copied.
+	- Type coercion for the arrays was fixed as for the CPtrs quite okay.
+	  Any numeric value is accepted and converted on set()
+	- fixed a bug in CDoublePtr::new with the RvAV assignment
+	  (arrayrefs as ints instead of doubles)
+	  t/02dblptr.t: 7 passes now
+	- changed CSeqBase class hierarchy
+	- nreverse still buggy, tie not tested, some errors in CSeqBase classes.
+0.08  01:51 28.11.99
+        - added nreverse for IntPtr and DoublePtr
+        - new Int2 Int3 Int4 Double2 Double3 Ptr classes
+  	  and converters (for Geometry::Points, ...)
+	- changed classnames to full CArray::xxxPtr
+        - rewrote the importer
+	- removed SvROK_off from DESTROY, less crashes.
+	  (only in DEBUG Perl, but this seems to be unrelated)
+	- added some t/ harness tests
+	- renamed *.txt to *.readme
+0.07  05:23 26.11.99
+	- added SvROK_off to DESTROY
+	- CPtr::DESTROY crashes Perl_sysfree in DEBUG PERL
+0.06  Sun Nov 22 1999
+	- changed CintPtr to CIntPtr, ...
+        - optional AV* initializer for CIntPtr and CStringPtr
+        - fixed  OO methods
+        - changed CArray::C**Array to C**Array
+        - added convenient import tags
+        - CIntPtr->new() not supported
+        - added get_grouped_by(), isort(), and the CArray::CPtr base class
+        - test 15 fails: import tags. seems to be too lazy. ignore it.
+        - TIEARRAY not tested yet
+0.05  Sat Nov 20 1999
+	- changed intPtr to CintPtr, ...
+        - compiles fine,
+          raw function syntax (type::new) works but $obj = new type not.
+        - optional AV* initializer for CDoublePtr only
+0.04  Thu Nov 18 16:21:48 1999
+	- re-created from scratch by h2xs 1.19
+        - renamed from Geometry::CArray to CArray
+        - decided between CArray::CDoublePtr (raw) and
+          CArray::CDoubleArray (checked and tieable) objects
+      16:53 20.11.99
+        - fixed XS, PM, typemap
+0.03  13:26 18.11.99
+        - renamed from Geometry::Arrays to Geometry::CArray
+          TIEARRAY and range checked classes
+0.02  17.11.99 14:34
+	- fixed test (dangling indices), added array_isort,
+0.01  Mon Nov 16 15:57:36 1999
+	- original version Geometry::Arrays for Geometry::Delaunay

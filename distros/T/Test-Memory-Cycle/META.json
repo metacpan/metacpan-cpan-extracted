@@ -1,0 +1,47 @@
+{
+   "abstract" : "Verifies code hasn't left circular references",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Memory-Cycle",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Cycle" : "1.07",
+            "Getopt::Long" : "0",
+            "PadWalker" : "0",
+            "Test::Builder" : "0",
+            "Test::Builder::Tester" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.62"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.06"
+}

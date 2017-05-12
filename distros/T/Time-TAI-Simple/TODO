@@ -1,0 +1,18 @@
+Things to do:
+
+   * Switch from LWP::Simple to HTTP::Tiny (qv /home/ttk/.irclog.freenode-perl 2016-09-28)
+
+   * Instead of [Prereqs] in dist.ini, use [Prereqs::FromCPANfile] and don't list prereqs there.
+     This means I can just maintain the prereqs in cpanfile and eliminate some redundancy.
+     qv: .irclog.freenode-perl 2016-03-22 19:28:39
+
+   * Write a thinger that checks for leapsecond updates and emails me, so I can update this
+     module in a timely fashion.  Hasn't been necessary so far because I've noticed in advance 
+     when the IERS made rumblings about inserting a new leapsecond.
+
+   * Add some smarts to occasionally check for clock skew and introduce creeping adjustments.
+     Some clocks have a lot of skew.  Most generic motherboard crystals are rated to about
+     50ppm, so may drift up to 4 seconds per day, and even very good expensive crystals are only
+     rated to 2ppm.  Skew rate may be influenced by transient temperature and ground plane state,
+     so need to be careful about assumptions.
+     qv: .icbmlog.ttk 2016-03-22 19:43:39

@@ -1,0 +1,80 @@
+{
+   "abstract" : "show pulsed progress bar in terminal",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Term-YAP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008009"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Builder" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.30",
+            "Moo" : "2.000002",
+            "Thread::Queue" : "3.05",
+            "Time::HiRes" : "1.9726",
+            "Types::Standard" : "1.000005",
+            "namespace::clean" : "0.26",
+            "perl" : "5.008009",
+            "threads" : "2.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0.30",
+            "Moose" : "2.1604",
+            "Test::Moose" : "2.1604",
+            "Test::More" : "0",
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "provides" : {
+      "Term::YAP" : {
+         "file" : "lib/Term/YAP.pm",
+         "version" : "0.07"
+      },
+      "Term::YAP::Process" : {
+         "file" : "lib/Term/YAP/Process.pm",
+         "version" : "0.07"
+      },
+      "Term::YAP::iThread" : {
+         "file" : "lib/Term/YAP/iThread.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/Term-YAP/issues"
+      },
+      "homepage" : "https://github.com/glasswalk3r/Term-YAP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/Term-YAP.git",
+         "web" : "https://github.com/glasswalk3r/Term-YAP"
+      }
+   },
+   "version" : "0.07"
+}
+

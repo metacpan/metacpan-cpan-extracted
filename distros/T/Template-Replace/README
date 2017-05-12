@@ -1,0 +1,58 @@
+Template-Replace Version 0.04
+
+This is a rather basic, zero dependency "push style" templating
+module with a simple API
+
+This is a single file module that can be run without prior installation.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+Should run from Perl 5.8 up and uses this modules (Perl 5.8 core):
+
+    Carp
+    Encode
+    File::Spec::Functions
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Template::Replace
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Replace
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Template-Replace
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Template-Replace
+
+    Search CPAN
+        http://search.cpan.org/dist/Template-Replace/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Christian Augustin
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://dev.perl.org/licenses/ for more information.
+

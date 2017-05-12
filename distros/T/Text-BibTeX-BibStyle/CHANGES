@@ -1,0 +1,12 @@
+CHANGES for vcp - Version CoPy
+
+0.03 Fri Dec 07 15:22:08 CST 2007
+   - RST now does a convert_format on labels
+   - Properly quote special characters in newcommand processing.
+   - Modified xampl.bib to give deterministic order for references
+
+0.02 Thu Nov 29 16:50:46 CST 2007
+   - Updated expects for Text::ASCIIMathML version 0.7
+
+0.01 Thu Nov 29 15:55:24 CST 2007
+   - Initial public release.

@@ -1,0 +1,36 @@
+# Shamelessly stolen from LWP, but with some test cruft added
+
+# A version string, check we don't get this
+use 5.006_001;
+
+# Some pragmas
+use strict;
+use warnings
+use re 'debug';
+use bytes;
+
+no vars;
+
+# Create a user agent object
+# We don't need to be careful here, as PPI parses rather than loads.
+use LWP::UserAgent;
+use Encode;
+use File::Spec;
+use File::Copy::Recursive;
+
+$ua = new LWP::UserAgent;
+$ua->agent("AgentName/0.1 " . $ua->agent);
+# Create a request
+my $req = new HTTP::Request POST => 'http://www.perl.com/cgi-bin/BugGlimpse';
+$req->content_type('application/x-www-form-urlencoded');
+$req->content('match=www&errors=0');
+# Pass request to the user agent and get a response back
+my $res = $ua->request($req);
+# Check the outcome of the response
+if ($res->is_success) {
+    print $res->content;
+} else {
+    print "Bad luck this time\n";
+}
+
+1;

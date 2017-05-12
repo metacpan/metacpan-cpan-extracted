@@ -1,0 +1,6 @@
+0.10 - initial release to CPAN
+
+0.11 - augmented test suite using Test::Builder::Tester
+     - fixed a wee little bug where does_ok never failed.  hehe.
+
+0.12 - fix up POD where I was still using the old name Test::Roles

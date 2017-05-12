@@ -1,0 +1,62 @@
+<h1 id="DebianInstallationInstructions">Debian Installation Instructions</h1>
+<h2 id="InstallationusingthePackageManager">Installation using the Package Manager</h2>
+<p>
+Padre 0.63 is available in <a  href="http://www.debian.org/"><span ></span>Debian</a> 6.0 (&quot;squeeze&quot;),
+as well as in the <tt>unstable</tt> (Pare 0.90) and <tt>testing</tt> (Padre 0.90) branches of Debian.
+</p>
+<p>
+Install:
+<tt>
+# aptitude install padre
+</tt>
+</p>
+<h3 id="OlderStableReleases">Older Stable Releases</h3>
+<p>
+If you run a stable release prior to Squeeze (6.0), you'd have to add
+an &quot;unstable&quot; or &quot;testing&quot; source to <tt>/etc/apt/sources.list</tt>, e.g. as follows: 
+<tt>
+deb <a  href="http://mirror.isoc.org.il/pub/debian/"><span ></span>http://mirror.isoc.org.il/pub/debian/</a> unstable main
+deb-src <a  href="http://mirror.isoc.org.il/pub/debian/"><span ></span>http://mirror.isoc.org.il/pub/debian/</a> unstable main
+</tt>
+</p>
+<p>
+Then update the package list
+<tt>
+# aptitude update
+</tt>
+</p>
+<p>
+and perform the installation as described above.
+</p>
+<h2 id="InstallationfromCPANorSubversion">Installation from CPAN or Subversion</h2>
+<p>
+Make sure that CPAN can work properly. Install the <tt>build-essential</tt> package if it is not yet installed.
+</p>
+<pre >
+aptitude install libppix-regexp-perl libalien-wxwidgets-perl libppix-editortools-perl libio-string-perl libdevel-dumpvar-perl libfile-spec-perl libwx-perl libprobe-perl-perl libwxbase2.8-dev libdevel-refactor-perl libnet-daemon-perl libclass-unload-perl libthreads-shared-perl libwxgtk2.8-0 libtext-diff-perl libfile-next-perl libdbi-perl libtext-glob-perl ack-grep libclass-inspector-perl libtext-findindent-perl libfile-remove-perl libplrpc-perl libmodule-manifest-perl libparse-exuberantctags-perl libtemplate-tiny-perl libparse-errorstring-perl-perl libpod-pom-perl  liborlite-migrate-perl libfile-pushd-perl libio-stringy-perl libwxbase2.8-0 libipc-run-perl libclass-adapter-perl libtask-weaken-perl  libpod2-base-perl liborlite-perl libfile-find-rule-perl libpod-abstract-perl libclass-xsaccessor-perl libio-pty-perl libclone-perl  libwx-perl-processstream-perl libipc-run3-perl libwxgtk2.8-dev libdbd-sqlite3-perl libfile-sharedir-perl libppi-perl wx2.8-headers  libfile-homedir-perl liblist-moreutils-perl libdebug-client-perl libnumber-compare-perl libyaml-tiny-perl libgtk2.0-dev
+</pre>
+<p>
+Then either install from CPAN (which will help you to resolve possible additional dependencies), or run
+<tt>
+perl Makefile.PL
+make
+make test
+make install
+</tt>
+in the Padre directory. Pay attention to the output of <tt>perl Makefile.PL</tt>, it may remind you of some missing CPAN modules that you need to install.
+</p>
+<p>
+(last checked Sep. 22, 2011, on Debian testing)
+</p>
+<h2 id="StillNotWorking?">Still Not Working?</h2>
+<p>
+Following the instructions on this page did not lead to a successful installation?
+</p>
+<p>
+<a  href="http://padre.perlide.org/contact.html"><span ></span>Contact us</a>.
+</p>
+<p>
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.
+</p>

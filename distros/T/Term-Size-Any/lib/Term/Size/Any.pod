@@ -1,0 +1,112 @@
+
+=head1 NAME
+
+Term::Size::Any - Retrieve terminal size
+
+=head1 SYNOPSIS
+
+    # the traditional way
+    use Term::Size::Any qw( chars pixels );
+
+    ($columns, $rows) = chars *STDOUT{IO};
+    ($x, $y) = pixels;
+
+=head1 DESCRIPTION
+
+This is a unified interface to retrieve terminal size.
+It loads one module of a list of known alternatives,
+each implementing some way to get the desired terminal
+information. This loaded module will actually do the job
+on behalf of C<Term::Size::Any>.
+
+Thus, C<Term::Size::Any>
+depends on the availability of one of these modules:
+
+    Term::Size           (soon to be supported)
+    Term::Size::Perl
+    Term::Size::ReadKey  (soon to be supported)
+    Term::Size::Win32
+
+This release fallbacks to L<Term::Size::Win32> if
+running in Windows 32 systems. For other platforms,
+it uses the first of
+L<Term::Size::Perl>, L<Term::Size> or L<Term::Size::ReadKey>
+which loads successfully. (To be honest,
+I disabled the fallback to Term::Size and Term::Size::ReadKey
+which are buggy by now.)
+
+=begin comment
+
+HOW Term::Size MODULES WORK?
+
+Term::Size - XS which does ioctl( IOCGWINSZ )
+Term::Size::Perl - Perl which does ioctl( IOCGWINSZ ) - needs compiled probe at build time
+Term::Size::ReadKey - uses Term::ReadKey
+Term::Size::Win32 - uses Win32::Console
+
+HISTORY
+
+Tell the story.
+
+=end comment
+
+=head2 FUNCTIONS
+
+The traditional interface is by importing functions
+C<chars> and C<pixels> into the caller's space.
+
+=over 4
+
+=item B<chars>
+
+    ($columns, $rows) = chars($h);
+    $columns = chars($h);
+
+C<chars> returns the terminal size in units of characters
+corresponding to the given filehandle C<$h>.
+If the argument is omitted, C<*STDIN{IO}> is used.
+In scalar context, it returns the terminal width.
+
+=item B<pixels>
+
+    ($x, $y) = pixels($h);
+    $x = pixels($h);
+
+C<pixels> returns the terminal size in units of pixels
+corresponding to the given filehandle C<$h>.
+If the argument is omitted, C<*STDIN{IO}> is used.
+In scalar context, it returns the terminal width.
+
+Many systems with character-only terminals will return C<(0, 0)>.
+
+=back
+
+=head1 SEE ALSO
+
+It all began with L<Term::Size> by Tim Goodwin. You may want to
+have a look at:
+
+    Term::Size
+    Term::Size::Perl
+    Term::Size::Win32
+    Term::Size::ReadKey
+
+
+=head1 BUGS
+
+Please reports bugs via CPAN RT, via web
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=Term-Size-Any
+or e-mail to bug-Term-Size-Any@rt.cpan.org.
+
+=head1 AUTHOR
+
+Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008-2012 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,37 @@
+=head1 ABOUT
+
+This archive contains the distribution Text-ASCIIPipe
+
+It contains a module for pushing/pulling text files to/from pipes (or whatever is behind a file handle), while processing them in a line-based manner. The separation of files is achieved through usage of ASCII control characters (which thusly shall not appear in your files by themselves).
+
+Two example scripts pack/unpack a set of files into/from a pipe. This would be a funny way to copy two files using them:
+
+	asciipipe_in a b | asciipipe_out a.copy b.copy
+
+Of course, the interesting part is what happens between those two example scripts.
+
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+=head 1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::ASCIIPipe
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2011-2012 Thomas Orgis
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

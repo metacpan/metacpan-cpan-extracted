@@ -1,0 +1,7 @@
+mix cookbook and non cookbook tests
+
+say how and where to put the documentation on the 'use Module' line
+
+sub directories should be handled like chapters and sub chapters
+
+test should display the error if any

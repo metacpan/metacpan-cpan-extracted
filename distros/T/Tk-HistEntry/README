@@ -1,0 +1,31 @@
+Tk::HistEntry Module
+
+Tk::HistEntry implements an entry widget with history. You may use the up
+and down keys to select older entries (or use the associated listbox).
+
+Usage: $top->HistEntry(-textvariable => \$foo,
+                       -command => sub {
+                         # automatically adds $foo to history
+                         print STDERR "Do something with $foo\n";
+                       })->pack;
+
+The widget comes in two flavors: the "HistEntry" widget is an
+inherited BrowseEntry widget where you see history in the associated
+listbox, too. The "SimpleHistEntry" widget is a plain Entry widget.
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+Testing is done with
+
+	$ make test
+
+There's also a demo which can be started with
+
+	$ make demo
+
+Send bug reports, comments and suggestions to Slaven Rezic
+<slaven@rezic.de>.

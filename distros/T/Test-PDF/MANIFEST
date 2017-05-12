@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Test/PDF.pm
+t/10_Test-PDF_test.t
+t/20_cmp_pdf.t
+t/foo_bar.pdf
+t/hello_world.pdf
+t/hello_world_2.pdf
+t/pod.t
+t/pod_coverage.t

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Ensures a CPAN distribution has consistent versioning.",
+   "author" : [
+      "Glenn Fowler <cebjyre@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-ConsistentVersion",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod::Content" : "0"
+         },
+         "requires" : {
+            "Test::Builder" : "0.94",
+            "autodie" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::ConsistentVersion" : {
+         "file" : "lib/Test/ConsistentVersion.pm",
+         "version" : "v0.3.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/cebjyre/Test-ConsistentVersion"
+      }
+   },
+   "version" : "v0.3.0"
+}

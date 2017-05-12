@@ -1,0 +1,30 @@
+---
+abstract: 'ISO 8601 Subclass of Time::Piece'
+author:
+  - "David E. Wheeler <david@justatheory.com>, extending Matt Seargent's\n<matt@seargent.org> L<Time::Piece|Time::Piece> module."
+build_requires:
+  Module::Build: 0.2701
+  Test::More: 0.17
+configure_requires:
+  Module::Build: 0.2701
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Time-Piece-ISO
+provides:
+  Time::Piece::ISO:
+    file: lib/Time/Piece/ISO.pm
+    version: 0.12
+recommends:
+  Test::Pod: 1.41
+requires:
+  Time::Piece: 1.01
+resources:
+  bugtracker: http://github.com/theory/time-piece-iso/issues/
+  homepage: http://search.cpan.org/dist/Time-Piece-ISO/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/time-piece-iso/
+version: 0.12

@@ -1,0 +1,23 @@
+---
+abstract: "Template Toolkit plugin interface to Data::Dumper::Perltidy\r"
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.790'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Dumper-Perltidy
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dumper::Perltidy: 0
+  Template: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

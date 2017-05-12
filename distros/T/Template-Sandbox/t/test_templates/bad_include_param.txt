@@ -1,0 +1,1 @@
+<: include included_simple.txt paramwithavalue='value' paramwithoutavalue :>

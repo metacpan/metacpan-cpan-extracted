@@ -1,0 +1,6 @@
+README
+ChangeLog
+MANIFEST
+Makefile.PL
+ChaSen.pm
+ChaSen.xs

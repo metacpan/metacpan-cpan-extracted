@@ -1,0 +1,44 @@
+0.0301  2016-11-01
+    - Skip "sample-data" in t/dogfood.t .
+        - It made it fail some time in parallel tests:
+            - http://www.cpantesters.org/cpan/report/6bd20c86-952f-11e6-9d8c-fd3fe822d6a9
+
+0.0300  2016-05-17
+    - Made abs_path_prune_re affect files as well.
+        - This way one can skip files with offending extensions.
+
+0.0205  2015-05-30
+    - Add VCS repository and bugtracker info to META.yml.
+
+0.0204  2014-02-01
+    - Specify minimum version of perl to be 5.8. (CPANTS).
+    - Add provides to META.yml (CPANTS).
+    - Add Test::CPAN::Changes.
+
+0.0203  2013-05-31
+    - Fix the detection of directories to prune (version-control/etc.)
+    on systems that don't use "/"-es.
+    - Path fixes for t/object-test.t on Windows.
+
+0.0202  2013-05-27
+    - Fix the case where both abs_path_prune_re and the built-in prunes
+    match.
+
+0.0201  2013-05-27
+    - Fix the regex for the matching of a .hg or .bzr directory.
+
+0.0200  2013-05-27
+    - Add the 'abs_path_prune_re' parameter to the constructor.
+
+0.0103  2012-11-17
+    - Refer to Test::EOL in the documentation.
+
+0.0102  2012-08-08
+    - Clarified the documentation for ->no_trailing_space.
+        - Thanks to ik on Freenode.
+
+0.0101  2012-08-08
+    - Add $VERSION to lib/Test/TrailingSpace.pm .
+
+0.0100  2012-08-08
+    -First release.

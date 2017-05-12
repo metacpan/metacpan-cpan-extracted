@@ -1,0 +1,6 @@
+Revision history for Perl extension Table::ParentChild.
+
+0.01  Wed Dec  4 00:39:48 2002
+	- original version; created by h2xs 1.21 with options
+		-OXn Table::ParentChild
+

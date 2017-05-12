@@ -1,0 +1,19 @@
+Revision history for Perl extension Tree::R.
+
+0.01  Mon Apr 11 09:43:42 2005
+	- original version; created by h2xs 1.23 with options
+		-X Tree::R
+0.02  Apr 11 2005
+	- fixed a small bug in PickNext
+0.03  Apr 21 2005
+	- fixed a small bug in remove
+0.04  Jul 4 2005
+	- changed to non-recursive queries from liuyi at cis.uab.edu
+0.05  Jul 6 2005
+	- a fix for a bug of infinite loops in insert from devbrat at gmail.com
+0.06  Aug 10 2009
+      	- remove root if tree is empty after remove; check for empty trees in objects and dump
+0.07  Sep 14 2015
+        - Some modernizations.
+        - Remove deprecated recursive methods.
+        - Methods with empty trees should not cause warnings.

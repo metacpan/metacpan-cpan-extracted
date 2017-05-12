@@ -1,0 +1,20 @@
+Revision history for Test-CallFlow
+
+0.03    2008-01-25/12:42 EET
+        - updated version number
+        - fixed indentation with perltidy
+        - minor documentation cleaning
+
+0.02    2008-01-22/23:00 EET
+        - updated docs, fixed typos (#42655), fixed redefinition warning
+        - added test for recorded text and fixed it
+
+0.01    2008-01-21/23:45 EET
+        According to current tests, works ok for
+        - trivial planning and execution
+        - planning and executing unordered, repeated and optional calls
+        - fuzzy argument checking with regexps, code and always accepting
+        - recording call flows for later use in tests
+        - saving and restoring original subs.
+        Time to put it into some real use to find out what is needed.
+

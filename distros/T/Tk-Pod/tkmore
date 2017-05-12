@@ -1,0 +1,138 @@
+#!/usr/bin/perl -w
+
+use strict;
+use vars qw($VERSION);
+
+$VERSION = 5.08;
+
+use Tk;
+use Tk::More;
+use Getopt::Long;
+
+my %opt;
+
+Getopt::Long::config('pass_through');
+if (!GetOptions(\%opt, "font=s", "i|ignore-case!", "encoding=s", "S")) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(2);
+}
+
+my $mw = tkinit;
+
+# Unhandled options left?
+Getopt::Long::config('nopass_through');
+if (!GetOptions({})) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(2);
+}
+
+my $file = shift @ARGV;
+if (!defined $file) {
+    die "Filename is missing.\n";
+}
+
+my $more = $mw->Scrolled("More",
+			 -font => $opt{font},
+			 -scrollbars => "osoe",
+			 -searchcase => !$opt{i},
+			 ($opt{S} ? (-wrap => 'none') : ()),
+			)->pack(-fill => "both", -expand => 1);
+
+my $menu = $more->menu;
+my $fm = $menu->entrycget("File", -menu);
+$fm->insert("Exit", "command", -label => "Open ...", -underline => 0,
+	    -command => sub {
+		my $f = $more->getOpenFile;
+		return if !defined $f;
+		load_file($f);
+	    });
+$fm->entryconfigure("Exit", -accelerator => "Ctrl-Q");
+
+my $helpmenu = $menu->Menu
+    (-tearoff => 0,
+     -menuitems => [
+		    [Button => "~Usage",
+		     -command => sub {
+			 require Tk::Pod;
+			 $mw->Pod(-file => "Tk::More");
+		     }]
+		   ]
+    );
+$menu->cascade(-label => "Help", -underline => 0, -menu => $helpmenu);
+$mw->configure(-menu => $menu);
+
+$more->focus;
+load_file($file);
+$more->AddQuitBindings;
+MainLoop;
+
+sub load_file {
+    my $file = shift;
+ LOAD_FILE: {
+	# check if it's gzipped
+	my $buf;
+	if (open(FILE, "<$file") &&
+	    read(FILE, $buf, 2) == 2 &&
+	    $buf eq "\037\213" &&
+	    eval { require PerlIO::gzip; 1 }
+	   ) {
+	    seek FILE, 0, 0 or die $!;
+	    binmode FILE, ':gzip';
+	    $more->LoadFH(\*FILE, -encoding => $opt{encoding});
+	    last LOAD_FILE;
+	}
+
+	$more->Load($file, -encoding => $opt{encoding});
+    };
+    $mw->title("tkmore - $file");
+}
+
+__END__
+
+=head1 NAME
+
+tkmore - a Perl/Tk based pager
+
+=head1 SYNOPSIS
+
+    tkmore [X11 options] [-i] [-encoding encoding] filename
+
+=head1 DESCRIPTION
+
+B<tkmore> is a pager similar to L<more(1)> or L<less(1)>.
+
+=head2 OPTIONS
+
+Besides standard X11 options like C<-font>, B<tkmore> supports:
+
+=over
+
+=item -i
+
+Turn on case-insensitive search. Alias: C<-ignore-case>.
+
+=item -encoding encoding
+
+Specify the encoding for the specified file and all subsequently
+loaded files. By default no encoding is assumed.
+
+=item -S
+
+Set wrap mode to B<none>. The effect is similar like the C<-S> option
+of C<less>.
+
+=back
+
+=head2 KEY BINDINGS
+
+For a list of key bindings, see L<Tk::More/ADDITIONAL BINDINGS>.
+
+=head1 AUTHOR
+
+Slaven Rezic
+
+=head1 SEE ALSO
+
+L<Tk::More>, L<more(1)>, L<less(1)>
+
+=cut

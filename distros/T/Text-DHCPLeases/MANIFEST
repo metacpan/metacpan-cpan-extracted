@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Text/DHCPLeases.pm
+lib/Text/DHCPLeases/Object.pm
+lib/Text/DHCPLeases/Object/Iterator.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/dhcpd.leases.sample
+t/DHCPLeases.t
+t/Object.t

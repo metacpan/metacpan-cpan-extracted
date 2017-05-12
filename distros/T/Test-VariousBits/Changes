@@ -1,0 +1,44 @@
+Copyright 2011, 2012, 2015, 2017 Kevin Ryde
+
+This file is part of Test-VariousBits.
+
+Test-VariousBits is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Test-VariousBits is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Test-VariousBits.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 7, April 2017
+    - Module::Util::Masked allow for Test::Without::Module 0.20 path
+      names in its get_forbidden_list()
+
+Version 6, June 2015
+    - oops again, correction to version numbers in META.yml
+
+Version 5, June 2015
+    - oops, provides=> must list everything
+
+Version 4, June 2015
+    - META.yml provides=> for the Test::VariousBits dist name
+
+Version 3, March 2012
+    - Module::Util::Masked check Devel::Unplug too
+
+Version 3, February 2012
+    - Test::Without::GD fixes for without gifanim and xpm
+
+Version 2, October 2011
+    - new Module::Util::Masked
+
+Version 1, September 2011
+    - the first version,
+      Test::Without::Shm, Test::Without::GD, Test::Weaken::ExtraBits

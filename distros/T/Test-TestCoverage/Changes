@@ -1,0 +1,36 @@
+Revision history for Perl extension Test::TestCoverage.
+=======================================================
+
+0.12  2014-01-04
+    - fix bug:  coverage doesn't work when tested for a module that uses a module that used Moose, but didn't use Moose itself
+
+0.11  2011-05-02
+    - there were still some problems with Moose classes (original subroutine was
+      called twice) - thanks ALEXM, again
+
+0.10  2011-05-01
+    - skip test if no Moose is installed
+
+0.09  2011-04-30
+    - Test::TestCoverage now works with Moose classes (#67862, test case by ALEXM)
+    - removed dependency on Hook::LexWrap
+    - minor code changes
+    - switched to Dist::Zilla
+
+0.07  2008-06-29
+    - fixed test_coverage_except -> thanks to Edward Shrock and Anthony Gladdish
+    - added test for test_coverage_except
+
+0.06  2007-07-24
+    - fixed #24176
+    
+0.03  2006-08-31
+    - fixed some POD errors
+    - added test_coverage_except
+        
+0.02  2006-08-31
+    - added some POD 
+
+0.01  2006-08-29
+	- original version; created by h2xs 1.23 with options
+		-XA -n Test::TestCoverage

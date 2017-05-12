@@ -1,0 +1,26 @@
+0.05    2015-09-29
+        * Updated tests again, added minimum perl requirement of 5.10
+        
+0.04    2015-09-28
+        * Updated tests to skip on systems that do not have an X Server
+          running. This should avoid the large number of failures reported
+          by CPAN Testers service.
+
+0.03    2015-09-26
+		    * Updated show() method to remove use of the parent parameter. Found
+		      this was not working properly.
+		    * Updated release-kwalitee.t to skip tests if Test::Kwalitee module
+		      is not found
+		    * Updated release-kwalitee.t to skip tests SKIP_KWALITEE is defined
+		
+0.02    2015-08-26
+        * Added the initialize() method to allow initialization with a HASH
+          reference, JSON string, or filename of file containing JSON data
+        * Added button_spacing attribute to allow the addition of space
+          between buttons
+        * Updated example script to take advantage of the initialize() 
+          method
+          
+0.01    2015-08-25
+        * Initial TRIAL release
+

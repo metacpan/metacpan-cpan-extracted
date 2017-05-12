@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TAP-Harness-Archive
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Tar: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  TAP::Harness: '3.05'
+  Test::More: '0'
+  YAML::Tiny: '0'
+  base: '2.18'
+version: '0.18'

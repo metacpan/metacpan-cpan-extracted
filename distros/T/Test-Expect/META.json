@@ -1,0 +1,51 @@
+{
+   "abstract" : "Automated driving and testing of terminal-based programs",
+   "author" : [
+      "Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>",
+      "Original module by Leon Brocard, E<lt>acme@astray.comE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Expect",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Chained::Fast" : "0",
+            "Expect::Simple" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Term::ReadLine" : "0",
+            "Test::Builder" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Expect" : {
+         "file" : "lib/Test/Expect.pm",
+         "version" : "0.34"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.34",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

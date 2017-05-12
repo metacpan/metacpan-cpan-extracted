@@ -1,0 +1,28 @@
+Changes from NSP version 1.01 to 1.03
+--------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+
+September 16, 2006
+
+Saiyam fixed the Divide by Zero error that
+was being generated with tables of the form :
+
+9 0 | 9
+0 0 | 0
+----- 
+9 0   9
+
+and 
+
+9  0 | 9
+6  0 | 6
+------ 
+15 0  15
+
+Rather than generating divide by zero errors, these tables are
+independent and should report scores that reflect that (depending
+on the measure invoked). This error affected the measures ll and x2.
+
+

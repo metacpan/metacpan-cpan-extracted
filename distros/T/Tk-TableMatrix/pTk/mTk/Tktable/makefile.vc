@@ -1,0 +1,162 @@
+# Makefile.vc
+#
+# This makefile builds Tktable.dll, a table widget as a dynamically
+# loadable Tk extension.  This makefile is suitable for use with
+# Microsoft Visual C++ 4-5.
+# TkTable assumes that Tcl/Tk has already been installed on Windows.
+#
+# This does not provide support for static builds on Windows
+#
+!include <ntwin32.mak>
+
+#Get version info (this is in Makefile and C format)
+!include "version.h"
+PROJECT	= Tktable
+TBL_COMMAND = table
+TBL_RUNTIME = tkTable.tcl
+
+# Project directories -- these may need to be customized for your site
+#
+# ROOT --	location of the source files.
+# TMPDIR --	location for .obj files.
+# TOOLS32 --	location of VC++ compiler installation.
+# DESTDIR --	location of Tcl/Tk installation hierarchy
+# DESTDIRU --	same as above with "/" as path separator
+#
+
+ROOT		= .
+TMPDIR		= .
+TOOLS32		= C:\Progra~1\DevStudio\Vc
+DESTDIR		= C:\Progra~1\Tcl
+DESTDIRU	= C:/Progra~1/Tcl
+
+# Set your version of Tcl
+
+TCL_VERSION	= 8.1
+TK_VERSION	= 8.1
+TCL_LIB_V	= 81
+TK_LIB_V	= 81
+
+INST_RUNTIME	= $(DESTDIR)\lib\tkTable$(TBL_VERSION)
+INST_RUNTIMEU	= $(DESTDIRU)/lib/tkTable$(TBL_VERSION)
+
+# NO_EMBEDDED_RUNTIME means that the tkTable.tcl file will not be embedded
+# into the executable, thus the default tkTable.tcl library file will not
+# be available when the library is loaded.
+# If this is defined, the tkTable.tcl file must be available in a
+# predefined set of directories (see docs).
+#TBL_CFLAGS	+= -DNO_EMBEDDED_RUNTIME
+
+# comment the following line to compile with symbols
+NODEBUG=1
+
+# Necessary for some partially-installed VC++ setups:
+#INCLUDE="$(TOOLS32)\include"
+#LIB="$(TOOLS32)\lib"
+
+#
+# Visual C++ tools
+#
+
+PATH=$(TOOLS32)\bin;$(PATH)
+cc32	= "$(TOOLS32)\bin\cl" -I"$(TOOLS32)\include"
+CP      = copy
+RM      = del
+
+######################################################################
+# Project specific targets
+######################################################################
+
+TBL_LIBDIR	= $(ROOT)\..\lib
+# Assume that WISH is already INSTALLED
+TCLSH	= $(DESTDIR)\bin\tclsh$(TCL_LIB_V)
+WISH	= $(DESTDIR)\bin\wish$(TK_LIB_V)
+LIBS	= $(DESTDIR)\lib\tcl$(TCL_LIB_V).lib $(DESTDIR)\lib\tk$(TK_LIB_V).lib
+INCLUDES	= -I"$(TOOLS32)\include" -I"$(DESTDIR)\include"
+
+DEFINES = -DDLL_BUILD -DBUILD_tkTable $(TBL_CFLAGS) \
+	  -DTBL_VERSION=\"$(TBL_VERSION)\" \
+	  -DTBL_COMMAND=\"$(TBL_COMMAND)\" \
+	  -DTBL_RUNTIME="\"$(TBL_RUNTIME)\"" \
+	  -DTBL_RUNTIME_DIR="\"$(INST_RUNTIMEU)\""
+
+#
+# Global makefile settings
+#
+
+DLLOBJS = $(TMPDIR)\tkTable.obj $(TMPDIR)\tkTableWin.obj $(TMPDIR)\tkTableTag.obj $(TMPDIR)\tkTableEdit.obj $(TMPDIR)\tkTableCell.obj $(TMPDIR)\tkTableCmds.obj $(TMPDIR)\cmd.obj
+# $(TMPDIR)\tkTablePs.obj
+DLL=$(PROJECT).dll
+
+# Targets
+
+all: pkgIndex.tcl
+
+test: pkgIndex.tcl
+	@"$(WISH)" <<
+	    lappend auto_path $(ROOT)
+	    set code [catch {
+		    package require $(PROJECT)
+		    pack [$(TBL_COMMAND) .t]
+		} msg]
+	    if {$$code != 0} {
+		tk_messageBox -type ok -message\
+		    "$(PROJECT) failed to load and run: $$msg"
+	    } else {
+		tk_messageBox -type ok -message\
+		    "everything seems OK for 'package require $(PROJECT)'"
+	    }
+	    exit $$code
+<<
+
+pkgIndex.tcl: $(DLL)
+	"$(TCLSH)" << pkgIndex.tcl
+	set out [open [lindex $$argv 0] w]
+	puts $$out {if {[catch {package require Tcl $(TCL_VERSION)}]} return}
+	puts -nonewline $$out {package ifneeded $(PROJECT) $(TBL_VERSION) }
+	puts -nonewline $$out {"package require Tk $(TK_VERSION); }
+	puts $$out {[list load [file join $$dir $(DLL)] $(PROJECT)]"}
+	close $$out
+<<
+
+$(DLLOBJS): tkTable.tcl.h
+
+$(DLL): $(DLLOBJS)
+	$(link) $(linkdebug) $(dlllflags) $(LIBS) \
+		$(guilibsdll) -out:$(DLL) $(DLLOBJS)
+
+tkTable.tcl.h: $(TBL_LIBDIR)\tkTable.tcl
+	"$(TCLSH)" << $(TBL_LIBDIR)\tkTable.tcl >$(TMPDIR)\tkTable.tcl.h
+	set in [open [lindex $$argv 0] r]
+	while {[gets $$in line] != -1} {
+	    switch -regexp -- $$line "^$$" - {^#} continue
+	    regsub -all {\\} $$line {\\\\} line
+	    regsub -all {"} $$line {\"} line
+	    puts "\"$$line\\n\""
+	}
+<<
+
+# Implicit Targets
+
+.c.obj:
+	$(cc32) $(cdebug) $(cflags) $(cvarsdll) \
+		$(INCLUDES) $(DEFINES) -Fo$(TMPDIR)\ $<
+
+install:
+	if not exist "$(INST_RUNTIME)\" mkdir "$(INST_RUNTIME)"
+	copy "$(TBL_LIBDIR)\tkTable.tcl" "$(INST_RUNTIME)"
+	copy "$(DLL)" "$(INST_RUNTIME)"
+	copy pkgIndex.tcl "$(INST_RUNTIME)"
+
+uninstall:
+	-$(RM) "$(INST_RUNTIME)\tkTable.tcl"
+	-$(RM) "$(INST_RUNTIME)\$(DLL)"
+	-$(RM) "$(INST_RUNTIME)\pkgIndex.tcl"
+
+clean:
+	-$(RM) $(TMPDIR)\*.obj 2>nul
+	-$(RM) $(DLL) 2>nul
+	-$(RM) $(PROJECT).lib 2>nul
+	-$(RM) $(PROJECT).exp 2>nul
+	-$(RM) pkgIndex.tcl 2>nul
+	-$(RM) $(TMPDIR)\tkTable.tcl.h 2>nul

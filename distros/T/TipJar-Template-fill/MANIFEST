@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/TipJar-Template-fill.t
+lib/TipJar/Template/fill.pm
+META.yml                                 Module meta-data (added by MakeMaker)

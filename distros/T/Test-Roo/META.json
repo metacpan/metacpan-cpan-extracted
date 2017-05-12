@@ -1,0 +1,119 @@
+{
+   "abstract" : "Composable, reusable tests with roles and Moo",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Roo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.069",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "bareword::filehandles" : "0",
+            "indirect" : "0",
+            "multidimensional" : "0"
+         },
+         "requires" : {
+            "Moo" : "1.000008",
+            "MooX::Types::MooseLike::Base" : "0",
+            "Sub::Install" : "0",
+            "Test::More" : "0.96",
+            "perl" : "5.008001",
+            "strictures" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0.12",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.96",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Roo" : {
+         "file" : "lib/Test/Roo.pm",
+         "version" : "1.004"
+      },
+      "Test::Roo::Class" : {
+         "file" : "lib/Test/Roo/Class.pm",
+         "version" : "1.004"
+      },
+      "Test::Roo::Cookbook" : {
+         "file" : "lib/Test/Roo/Cookbook.pm",
+         "version" : "1.004"
+      },
+      "Test::Roo::Role" : {
+         "file" : "lib/Test/Roo/Role.pm",
+         "version" : "1.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Test-Roo/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Test-Roo",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Test-Roo.git",
+         "web" : "https://github.com/dagolden/Test-Roo"
+      }
+   },
+   "version" : "1.004",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>",
+      "Diab Jerius <djerius@gmail.com>"
+   ]
+}
+

@@ -1,0 +1,264 @@
+LEGALESE
+~~~~~~~~
+     Copyright (c) 1995 Ilya Zakharevich. All rights reserved.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+
+	You should have received a copy of the Perl license along with
+	Perl; see the file README in Perl distribution.
+ 
+	You should have received a copy of the GNU General Public License
+	along with Perl; see the file Copying.  If not, write to
+	the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+	You should have received a copy of the Artistic License
+	along with Perl; see the file Artistic.
+
+
+Author of this software makes no claim whatsoever about suitability,
+reliability, edability, editability or usability of this product, and
+should not be kept liable for any damage resulting from the use of
+it. If you can use it, you are in luck, if not, I should not be kept
+responsible. Keep a handy copy of your backup tape at hand.
+
+WHAT
+~~~~
+
+This module is intended for low-resolution or high-resolution graphics
+using gnuplot low-level functions. Documentation is at the start of
+the .pm file.
+
+INSTALL
+~~~~~~~
+You may need to edit LIBS line in Makefile.PL, and INC and CFLAGS lines
+in gnuterm/Makefile.PL (as based on the included platform-specific
+makefiles and READMEs in ./gnuterm directory), but if you do not
+wish to support platform-specific terminals, this should work:
+
+	perl Makefile.PL
+	make
+	make test
+		(Check whether you are satisfied with the result.)
+	make install
+
+By default, the following libs are tried to be found:
+
+  -L/usr/openwin/lib -lX11 -lm  -lsocket -lvga -llinuxvga \
+    -lgd -lpng -lz -ljmgraph -lvesa
+
+You may change this by putting TRY_LIBS="some libs" on the command line
+of Makefile.PL.  (Say, I needed to remove -lgd since the header file
+gd.h was for a newer version of gd than the library, and Term::Gnuplot
+could not determine the version of gd correctly.)
+
+If you needed some changed, and can automate them, please send patches to
+the address below.  Currently the defines HAVE_LIBGD, HAVE_LIBPNG,
+LINUXVGA, EMXVESA are automatically set to reasonable values.  X11 and DEBUG
+terminals are always included.  Gnuplot 3.7 would also use 
+
+ AMIGA ATARI MTOS _Macintosh DJGPP __ZTC__ PC NEXT APOLLO GPR IRIS MGR RGIP
+ SCO SUN UIS UNIXPC UNIXPLOT GNUGRAPH DEBUG
+
+Note that for some term types (such as X11, or PM) additional binaries are
+needed.  They should be available if gnuplot is already installed on your
+system.
+
+AUTHOR BUGS
+~~~~~~~~~~~
+Ilya Zakharevich
+ilya@math.ohio-state.edu
+
+CHANGES			(XXX - todo, +++ - where-todo/now-done)
+~~~~~~~
+0.2: Test added.
+0.3: Part of gnuplot3.5 distribution included to make it
+	into turnkey installation, tested on OS/2, Solaris.
+0.4: list_terms() added;
+     interactive test for different terminals;
+0.41:
+     change_term_address(), term_tbl_address() added;
+
+0.5:	uses Gnuplot 3.6pre built 340 (with a tiny patch, included);
+	change_term returns 1 on success, 0 on failure;
+0.51:	Does not need any change to Gnuplot source files.
+0.55:	Updated to latest Gnuplot.h from PARI 2.0.13 (with do_init => init).
+	setpointsize works now.
+	set_gnuplot_fh() removed, replaced by plot_outfile_set().
+	Updated to version 3.7.
+	stdfn.c needed too...
+	setpointsize(0.25) instead of pointsize().
+	GD terminal was coring, since it required calling option before plot.
+0.56:	Better docs, DEBUG terminal.
+	Setup a line buffer for options() so that gnuplot error reporting
+	works better.
+	New functions plotsizes_scale(), term_init(), term_start_plot(),
+	term_end_plot(), term_start_multiplot(), term_end_multiplot().
+	New C API setup_gpshim().
+	POD for Terminals.
+0.5601: syscfg.h was not \n-terminated
+	SET_OUTFILE() had wrong precedence of `,'.
+0.57:	Updated to 3.7.1.  Gnuplot.h from PARI 2.0.17 used.
+	New Makefile.PL option TRY_LIBS.
+0.5701:	New function _term_descrs(), hash %description.
+	A primitive support for direct-to-Tk drawing: create Tk
+	canvas $c, call Term::Gnuplot::setcanvas($c), then use
+	'tkcanvas' terminal with option 'tkperl_canvas'.  (Size is
+	determined at the moment of doing set_options().)
+0.5702:
+	Add a check for gdCreateGif too;
+	setcanvas was not exported;
+	Change TERM_PUBLIC to 'extern' for our private functions in
+	tkcanvas.trm.
+	Make Tk serve events while in test.pl.
+	BUGS with tkcanvas tests: Not realistic charcell/ticks sizes;
+	    $ptk_canvas->delete($ptk_canvas->find('all')) if $ptk_canvas;
+	segfaults; thus the canvas is not cleared between the iterations.
+
+0.5703:
+	$ptk_canvas->delete('all') works.  Go figure...
+	Refcount the canvas.
+	Off by one and 2 errors in the size of plotting area fixed.
+	Same for offsets of plotting area (including borders).
+	New make target gnuterm_dynamic to make loadable-at-runtime DLL.
+	Now queries the font size and calculates ticks accordingly.
+	Erase the canvas between builtin and Perl tests.
+
+0.5704:
+	Make x11 test optional if gnuplot_x11 is not on PATH.
+
+0.90_38b_00:
+	extract_help moved to ./utils/.
+	Update to version 3.8b with applied mouse patch
+	gnuplot-3709-Nov-01-99.diff by Piotr Mikulik.
+	Make the x11 modified executable named gplt_x11b.
+	Update to Gnuplot.h from GP/PARI 2.2.3.
+
+0.90_38i_00:
+	Updated to CVS state of 2002/09/05.
+	Make a PM modified executable named gplpmdrb.
+	Regenerate the POD.
+	Allow a missing ',' at the end of the line in the docs
+   [Uncompatible change: is not 1 any more!]
+	New constant TEXT_VERTICAL - the argument to text_angle() to make
+	    it vertical.  Exportable on the tag :JUSTIFY.
+	test.pl now takes optional parameters, the terminal name and files;
+            so one can
+		perl -Mblib test.pl png test.png testperl.png
+	New constants LT_BACKGROUND LT_AXIS LT_BLACK exportable
+	    (on the tag :LINETYPES)
+	Remove a leak in plot_outfile_set() [NO: segfaults in postscript...].
+	SYNOPSIS was not mentioning linewidth(1.0) at the start - same for
+	    test.pl; but it was mentioned later in the docs...  (Postscript
+	    would misbehave on an output file change).
+        fillbox() now will not segfault, but would die() if it is not
+	    implemented.  Test suite now tests the following new wrappers methods:
+		clear_box pattern_fill_box color_fill_box
+	    (exportable on :METHODS).
+	merge the patch to enable PIPE_IPC on OS/2 too.
+	Fix the macro XPutPixel given double arg when expecting an int.
+	New methods 		 make_gray_palette set_color previous_palette
+				 filled_polygon put_right_justified_text
+				 put_centered_text put_left_justified_text
+
+0.90_38i_01:
+	maybe_command_in_dirs() was removed from MakeMaker!!!
+	File::Basename need to be used by Makefile.PL...
+	remove file 'test_x11' on clean.
+	distribute as bz2.
+XXX	[dumb terminal on DOSISH systems rights in binary mode???]
++++	["drv: " messages from PM driver???]
+	[Pressing a key in PM terminal won't switch to the
+		text mode window; only SPACE works... - new (mis)feature]
+XXX	[XXX??? PM terminal does not implement density and pattern for fillbox]
+
+0.90_38i_02:
+	Add mousing.c and .h from Term-Gnuplot-0.90_38b_00.
+	Started to code USE_ACTIVE_EVENTS in PM driver.
+XXX	[PM terminal does not show if event_passive is changed
+		to initialized: static int events_active = 1]
+	Dummy enable_mousetracking().
+
+0.90_38i_03:
+	Some (broken?) Linux distributions had unusable -lgd -lpng; now
+		we check manually for presence of header files, and do not
+		let Perl try -lgd -lpng if the header files are not there.
+	-DHAVE_MEMCPY -DHAVE_MEMSET -DHAVE_STRCHR set if needed (but not
+		STRSTR).
+	enable_mousetracking() defined only if OS2.
+	Remove checks for -f test_X11 - now we provide our own X11 program.
+	In PM mouse coordinates turn on and off as they should by mouse menu
+		and Term::Gnuplot::enable_mousetracking().
+XXX	PM: WinSetPointer()???
+XXX	PM_text() sends info about mouse coordinate system.  Should not
+		this be done by PM_graphics(), so that area should be reserved
+	      for mouse coordinates?.
+XXX	PM: Colored rectangles are not gradually changing...
+XXX	One MUST set hMenuBar from WM_GPSTART, and one MUST enable menuitem from
+		there???
+XXX	PM: cur_mouse_mode - also can't initialize....
+	PM: freopen(stderr).
+	mousing.h: gp4mouse made not static.
+	STATUS_LINE_HEIGHT 14.
++++	Need ta way to specify the directory of executables (when DLL is
+		loaded standalone...)
+	Cosmetic updates to Gnuplot.h from PARI-200501
+
+0.90380904:
+	Name without "_"; "09" instead of "i".
+	Gnuplot.h updated from one in GP/PARI.
+	A way to specify the directory of executables (when DLL is
+		loaded standalone...):
+		HAVE_SETUP_EXE_PATH_FUNC, setup_exe_path_func entry,
+		my_term_ftable has flag 4.
+	mys_mouse_feedback_rectangle() sets gp4mouse.
++++	DEFINE_GP4MOUSE, enable_mousetracking() currently is PM_mouse_on()
+		but is disabled.
+	-DHAVE_MEMCPY -DHAVE_MEMSET -DHAVE_STRCHR autodeduced.
+	dist is not gz, not bz2.
+	test_x11 hack removed.
+	Mouse feedback rectangle kinda works in PM (but may be wrongly XORed
+		before screen-obscure/unobscure - irreproducible???)
+
+0.90380905:
+	protect mys_mouse_feedback_rectangle by DEFINE_GP4MOUSE
+	with -DGNUPLOT_NO_CODE_EMIT Gnuplot.h does not produce junk
+	C interface to options: support ""/''-quoted option strings.
+XXX	'dumb' output is in binmode (not when dynamically runtime linked)???
+XXX	gnuplot.dbg still written by PM driver...
+	remove dead enable_mousetracking() code.
+	make options() pass tokens[] with runtime link too.
+XXX		pm persist	==> not persist
+XXX		pm, then `pm persist'	==> "Cant find gnupmdrvb.exe..."
+	Added missing headers to my_utils.c; made it -Wall clean.
+	New C functions set_output_routines(), get_output_routines(),
+		get_terms();
+	New private Perl functions get_terms()/_available_terms()/term_count()
+		(for testing only).
+	New file utils/empty_gnuplot.c; check Gnuplot.h by
+			gcc -I.. -c empty_gnuplot.c && nm empty_gnuplot.o
+		There should be no symbols referenced (except compiler-stubs).
+	Assume that STRSTR and STRCHR are present simultaneously.
+	Translate NO_TIME_H to HAVE_TIME_H (was the only remaining NO_ macro).
+	Build X11 driver only if d_dup2 and d_pipe are defined, and not Win32.
+XXX	term\tpic.trm(887) : warning C4146: unary minus operator applied to 
+		unsigned type, result still unsigned
+	Support HAVE_DIRENT_H (in preparation to v4.0).
+	existdir() into util.c, recursivefullname() etc into my_util.c
+		from v4.0.
+	Propagate common::cflags to PM exe driver too.
+	Use ExtUtils::Liblist starting from 5.8.1 (old workaround code
+XXX		was not working???).
+	Terminals enabled: again: GIF, PNG, new: PDF
+XXX	Terminals not set: EMXVESA, GPR, LINUXVGA, VGAGL, THREEDKIT, MGR, RGIP,
+		SCO, SUN, UIS, UNIXPC, UNIXPLOT, GNUGRAPH, PNG_FOR_GIF,
+		USE_GGI_DRIVER, NEXT, APOLLO
+XXX	Not read: gdlib-config
+	Declare term_count().
+	Add code from Math::Pari to correctly $(AR) on Win*.
+	Do not retry libs from x_exec.
+	New macro MY_Windows (set on MSWin32).  Protects code borrowed from
+		gnuplot v4;
+XXX		temporarily disable sleep() in tek.trm.
+	New option 'none' to test.pl, which would test bookkeeping only.
+	Use $Config{cpprun} if present.
+XXX	When -DPNG_FOR_GIF???

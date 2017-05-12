@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+# Example code from the module's POD to ensure that it actually works.
+# Just three simple commands to show argument handling and completion.
+
+# This file is released under the MIT license.
+
+use strict;
+use lib '../lib';
+
+
+use Term::ShellUI;
+my $term = new Term::ShellUI(
+		commands => {
+			"cd" => {
+				desc => "Change to directory DIR",
+				maxargs => 1, args => sub { shift->complete_onlydirs(@_); },
+				proc => sub { chdir($_[0] || $ENV{HOME} || $ENV{LOGDIR}); },
+			},
+			"pwd" => {
+				desc => "Print the current working directory",
+				maxargs => 0, proc => sub { system('pwd'); },
+			},
+			"quit" => {
+				desc => "Quit using Fileman", maxargs => 0,
+				method => sub { shift->exit_requested(1); },
+			}},
+		history_file => '~/.shellui-synopsis-history',
+	);
+
+print 'Using '.$term->{term}->ReadLine."\n";
+$term->run(@ARGV);
+

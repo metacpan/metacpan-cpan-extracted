@@ -1,0 +1,172 @@
+
+<html>
+<head>
+<title>Thread::Apartment::Common</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;CONSTR&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;CONSTR&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Thread::Apartment::Common</h2>
+
+<p>
+<dl>
+<dt><b>Known Subclasses:</b>
+<dd><a href='../../Thread/Apartment/Server.html'>Thread::Apartment::Server</a></dd>
+<dd><a href='../../Thread/Apartment/Client.html'>Thread::Apartment::Client</a></dd>
+</dt>
+</dl>
+
+<hr>
+
+Provides common marshalling/unmarshalling methods, and common
+exported constants.
+<p>
+Licensed under the Academic Free License version 2.1, as specified in the
+License.txt file included in this software package, or at
+<a href="http://www.opensource.org/licenses/afl-2.1.php">OpenSource.org</a>.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.50</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2005-12-01
+</dd>
+
+<p>
+<i>Unless otherwise noted, <code>$self
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th colspan=2 align=left><font size='+2'>Exported Symbols</font></th></tr>
+<tr><td align=right valign=top><code>TA_SIMPLEX</code></td><td align=left valign=top>flag indicating a method/closure is simplex (i.e., does not return results)
+</td></tr>
+<tr><td align=right valign=top><code>TA_URGENT</code></td><td align=left valign=top>flag indicating a method/closure is urgent (i.e., should be posted to the head of the proxied object's TQD)
+</td></tr>
+<tr><td align=right valign=top><code>TA_NO_OBJECTS</code></td><td align=left valign=top>flag indicating a method does not return objects. Used by
+<a href='./Server.html'>Thread::Apartment::Server</a> objects
+to optimize the marhsalling of returned method results.
+
+</td></tr>
+
+</table>
+<p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#marshal'>marshal</a>(@params)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Marshall input parameters into a TQD-compatible format
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#unmarshal'>unmarshal</a>($result)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unmarshall the contents of the arrayref previsouly marshalled via
+<a href='#marshal'>marshal()</a>
+</td></tr>
+</table>
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='marshal'></a>
+<h3>marshal</h3>
+<pre>
+marshal(@params)
+</pre><p>
+<dl>
+<dd>Marshall input parameters into a TQD-compatible format.
+Each parameter is converted to a 2-tuple of a class descriptor
+string (undef for simple scalar parameters), and the marshalled
+version of the parameter. Marshalling rules are:
+<p>
+<ol>
+<li>Scalars and threads::shared values are marshalled as is.
+<li>non-threads::shared references to scalars, arrays, or hashes, or
+objects which do not implement <a href='http://search.cpan.org/perldoc?Thread::Queue::Queueable'>Thread::Queue::Queueable</a>
+are marshalled via <a href='http://search.cpan.org/perldoc?Storable'>Storable</a>
+<li>closures are converted to <a href='./Closure.html'>Thread::Apartment::Closure</a> objects.
+<li><a href='./Server.html'>Thread::Apartment::Server</a> objects are marshalled using their TAC's
+<li><a href='http://search.cpan.org/perldoc?Thread::Queue::Queueable'>Thread::Queue::Queueable</a>
+objects are marshalled using their onEnqueue()/curse() methods.
+</ol>
+<p>
+<b>NOTE:</b> Passing of GLOBs or other I/O objects is not currently supported; applications
+are responsible for implementing TQQ to curse() them into their fileno, and redeem() them
+via an fdopen() operation in the receiving thread.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@params</code> - parameters/results to be marshalled
+
+</dd>
+<dt><b>Returns:</b><dd>threads::shared arrayref of marshalled parameters
+</dd>
+</dl></dd></dl><hr>
+
+<a name='unmarshal'></a>
+<h3>unmarshal</h3>
+<pre>
+unmarshal($result)
+</pre><p>
+<dl>
+<dd>Unmarshall the contents of the arrayref previsouly marshalled via
+<a href='#marshal'>marshal()</a>. input parameters into a TQD-compatible format.
+Each parameter is retrieved from the 2-tuple (class descriptor, marshalled value).
+<p>
+Unmarshalling rules are:
+<p>
+<ol>
+<li>If the class descriptor is undef, the marshalled value is used as is
+<li>if the class descriptor is 'Storable', Storable::thaw() is used to recover the
+parameter value
+<li>if the marshalled value is threads::shared, the object is simply reblessed into the class
+<li>all other classes are assumed to be
+<a href='http://search.cpan.org/perldoc?Thread::Queue::Queueable'>Thread::Queue::Queueable</a>,
+and the class's redeem() method is called to recover the object.
+</ol>
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$result</code> - arrayref of marshalled parameters/results
+
+</dd>
+<dt><b>Returns:</b><dd>arrayref of unmarshalled parameters
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Mon Mar 27 08:51:36 2006</i>
+</center>
+</small>
+</body>
+</html>

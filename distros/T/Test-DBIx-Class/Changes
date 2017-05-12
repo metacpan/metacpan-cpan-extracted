@@ -1,0 +1,287 @@
+This file documents the revision history for Perl extension Test-DBIx-Class.
+
+0.52 17 November 2016
+
+    - Add support for default_resultset_attributes schema setting
+
+0.51 17 November 2016
+
+    - Updated documentation for fixture_path
+    - Fixed bug to add more than a single resultset from a hash
+
+0.50 14 November 2016
+
+    - Switched croak to die to prevent error info from being lost (#42).
+    - Fix for SQLite dsn parsing oddity (#42).
+
+0.49 02 November 2016
+
+    - General release after no problems with developer release.
+
+0.48_01 27 October 2016
+
+    - Switch to Test::Postgresql58 to retain Perl 5.8 support
+      with Postgres.
+
+0.47 22 February 2016
+
+    - Added support for deploy_opts->*->sources.
+
+0.46 22 February 2016
+
+    - Allow dropping of real views created. (VadimPushtaev)
+
+0.45 03 October 2015
+    - Another test fix
+
+0.44 02 October 2015
+    - Test fixes (colinnewell)
+
+0.43 03 November 2014
+    - Documentation fixes (felliot)
+    - bug fixes in the mysql trait (felliot)
+    - quiet down Postgresql pointless warnings (felliot)
+    - fix RT 75247 (felliot)
+    - Fixed bad test cases (felliot)
+    - Replaced Test::Postgresql dependency with Test::PostgreSQL for those
+      wanting to test Postgres. (colinnewell)
+
+0.42 13 Aug 2014
+    - Fixed issue where a resultset isn't properly 'reset'
+    - documentation improvements
+
+0.41 21 Jan 2014
+    - Change Moose load_class() (now deprecated) to Module::Runtime use_module()
+
+0.40 30 May 2013
+    - Add a dependency when using Postgresql so that Pg tests complete
+      properly (felliott++)
+
+0.39 15 April 2013
+    - New Options to better control how SQLT is configured.  (mattp++)
+    - don't forget to finish you taxes (USA only)
+
+0.38 30 November 2012
+    - New feature: You can now fail instead of skipping a test if the
+      schema fails to initialize and connect. (colinnewell++)
+
+0.37 07 November 2012
+    - More typo fixes (oalders++)
+
+0.36 06 November 2012
+    - POD updates (oalders++)
+    - updated contributors
+    - don't forget to vote!
+
+0.35 05 November 2012
+    - ::Example::Schema::Result::Person's email column is now nullable as
+      intended (abraxxa++)
+
+0.34 05 July 2012
+    - new configure option to let you specify a pre-existing $schema, rather
+      than let Test::DBIx::Class build one for you.  Might be useful in sub
+      tests or when you want to use it with a web framework. (bphillips++)
+
+0.33 21 May 2012
+    - fixed typo in Makefile.PL which Perl 5.16.0 is actually noticing
+
+0.32 18 April 2012
+    - Made drop statement configurable and made the Postgres trait do a
+      drop ... cascade to ensure all tables are dropped cleanly. (colinnewell++)
+
+0.31 12 March 2012
+    - Documentation fixes (Volker++)
+
+0.30 18 January 2012
+    - New feature connect_opts that lets you customize DBIC connection options
+    - Less noisy output during tests
+    - documentation improvments
+    - lecstor++
+
+0.29 15 December 2011
+    - New option to enable verbose debugging output.  Now, by default you
+      should have more clean test output.  If you want the old, verbose test
+      output set env TDBC_DEBUG=1 when running the tests. (lecstor++)
+
+0.28 13 December 2011
+    - POSSIBLE BACKCOMPAT BREAKAGE: We now randomize the port under which an
+      instance of mysql is created, to help better support replication and
+      parallel testing.  As a result you can't rely on the starting port for
+      your custom tests, should you wish it.  We also now insert the port
+      into the tmp directory path where your instance of mysql is running so
+      that we can better support parallel testing.  If you used to rely on 
+      using KEEP_DB and reusing a database at a given path your code may not
+      work.  Please let the authors know if this is causing you trouble.
+    - for the mysql trait, we now control the temporary directory where the
+      instance of mysql is created, if you choose to let us make one.  This
+      means temporary directories created this way will properly support the
+      KEEP_DB option, and we can do a better job of cleaning up
+    - support new tmpdir option in Test::mysqld (lecstor++)
+    - As a result of above changes, I feel that support for mysql native
+      replication is no longer alpha code.  I still reserve the right to make
+      changes required to make this stable, but I think those changes should
+      be smaller in the future.
+    - documentation for above
+    - Added replication stress testing to test suite
+0.27 04 December 2011
+    - Randomize the starting port for when we create an instance of mysql.
+      This solves a problem where sometimes when doing parallel testing we 
+      port collisions. (lecstor++)
+    - forward support for controlling a temporary directory location in mysql
+      (support pending in test::mysql so we won't document feature for now.
+      (lecstor++)
+
+0.26 22 November 2011
+    - A tweak to prevent errors when cleaning up and the schema has disappeared
+      (hippich++)
+    - New Feature: Preserve existing DB rather than deploy from scratch each
+      test case.  Can speed things up when your fixtures are consistent.  See
+      docs and test cases (yanick++)
+
+0.25 21 October 2011
+    - A tweak to the documentation on how to silence some warnings when using
+      Postgresql (wlk++)
+
+0.24 05 October 2011
+    - Some changes to the way my build/installer works, that hopefully solves
+      a problem when installing using at least some versions of cpanplus.
+    - Release in memory of Steve Jobs (1955 - 2011).
+
+0.23 28 September 2011
+    - Patch from richard.foley++ who also submitted the RT bug
+      (https://rt.cpan.org/Public/Bug/Display.html?id=71305) to make some
+      types of errors in the cleanup not cause cleanup to fail in a messy
+      way.
+
+0.22 22 August 2011
+    - Documentation prefers the arrayref and not the hashref form when
+      installing fixtures.  We will leave support for both in code for
+      now to support backcompat, but at some point will warning and
+      eventually remove.  (hippich++)
+
+0.21 02 June 2011
+    - Fixed a bug when the test is named 'schema.t'
+
+0.20 28 March 2011
+    - Patch to cope with virtual views (colinnewell++)
+    - updated the author maint stuff
+    - stop the slave (in case it's running) before changing it)
+
+0.19 02 March 2011
+    - applied patch to fix bug in reporting error messages when using the
+      PopulateMore fixture command.  (mjg++)
+    - update copyright info
+
+0.18 07 December 2010
+    - Changed Makefile.PL and related toolchain stuff to reflect my more
+      current practice
+    - removed ";" from drop tables command so this works with more DBs
+      (RT https://rt.cpan.org/Ticket/Display.html?id=63660)
+
+0.17 07 November 2010
+    - Fixed a bug in Test::DBIx::Class::Types that prevented you from using the
+      4 argument version of 'connect_info' (reported by Colin Newell)
+    - Made some trivial reformatting of documentation that suits my current
+      formatting standards.  Split up the Makefile into install and developer
+      versions as part of a test to see if this could work better.
+
+0.16 30 October 2010
+    - added a bit to make sure we disambiguate column names in 'order by' by
+      the table it is in, to solve namespace clash when two tables have the
+      same column name.
+
+0.15 28 September 2010
+    - removed use MI:ManifestSkip since I'm not actually using it
+
+0.14 27 September 2010
+    - Replaced Test::Differences with Test::Deep in order to try and squash
+      the false positive error reported on cpan.  I personally like the less
+      noisy error output as well.
+    - Use more modern stuff in the Makefile.PL so is more like my current
+      automation process for developing and release cpan stuff.
+    - fixed the way the postgresql trait works so that it work on 9.0
+
+0.13 30 August 2010
+    - Well, I guess I shouldn't blame Data::Dumper on my test failures :)
+    - Specifying more dependencies to try and narrow down failures.
+
+0.12 27 August 2010
+    - Force Data::Dumper version to modern version to solve the number 
+      stringification bug.  Hopefully we can solve this in Test::Differences
+      but this will stop bug reports for now.
+
+0.11 25 August 2010
+    - update dependencies and validate on recent Moose
+    - hopefully fix most of the reported errors from cpan testers
+
+0.10
+    - New Functionality: MySQL Replication now supported.  Documention is
+      lagging, if you are interested check out t/10-replication-mysql.t
+    - Closed bug related controlling if database files are preserved or not
+    - Bunched of typos fixed from various contributors.
+    - tested on perl 5.12.0
+    - New Contributors POD.  Please let me know if I missed you
+    - Fixed bug where only one table would get loaded when using fixtures_ok
+      and added tests.  (Tristan Pratt)
+    - Diffs are now readable by humans when is_fixtures fails.  Changed uses
+      of Test::More::is_deeply to Test::Differences::eq_or_diff so that the
+      actual data structure contents are printed out instead of just
+      "HASH(0x1008032b8)".  (Tristan Pratt)
+    - Add feature to automatically load SQLite traits if connect_info's dsn
+      appears to be of sqlite variety.  (Tristan Pratt)
+    - Fixed bug where Traits::SQLite would not clean up your db even if keep_db
+      was set to 0 if you specified the dbname inside connect_info's dsn. 
+      (Tristan Pratt)
+
+0.09  28 August 2009
+    - New Functionality:  Added storage trait 'Testpostgresql' which works just
+      like the 'Testmysql' except deploys to a test Postgresql database.
+    - Changed some tests to prevent failures to install.
+    - updated the Makefile.PL so that the support for Mysql and Postgresql is
+      optional.
+    - New documentation to reflect the above.
+
+0.08  27 August 2009
+    - New Functionality:  Added storage trait 'Testmysql' which allows you
+      to create a temporary test instance of mysql, deploy and test against
+      it, and clean itself up afterward.  Now you can test against Mysql
+      nearly as easily as SQLite.
+    - Populating fixtures now wraps everything inside a transaction.
+    - Fixed an error in the Example Schema, now Email is a varchar instead of
+      an integer
+    - Documentation and tests for all the above
+
+0.07  26 August 2009
+    - Create framework for 'pluggable' storage traits and migrated all the
+      SQLite specific stuff to a SQLite trait.  This change will allow us
+      to add traits to test replication and other types of database setups.
+    - Documentation and test improvements to reflect the above.
+0.06  25 August 2009
+    - Documentation additions related to overridding configuration via %ENV
+    - Fixes to broken POD
+    - Allows the option 'force_drop_table' to be set at configuration time
+    - More completely documented ::SchemaManager options
+    - Some additional (undocumented) features added to the exported subroutine
+      generators.  
+	
+0.05  24 August 2009 @ 11::55::00 UTC
+    - New Feature: Perform configuration file substitutions, similar to the way
+      Catalyst::Plugin::ConfigLoader works.  Added tests and docs.
+
+0.04  24 August 2009
+    - Fixed some minor documentation typos and improved error reporting when a
+      schema fails to deploy (we now properly report the actual error instead of
+      silently dying).
+    - New Feature: You can now set $ENV{TEST_DBIC_CONFIG_SUFFIX} to add more
+      searchable paths when we are gathering and merging all the existing 
+      configuration files.  See documentation for more.
+
+0.03  23 August 2009
+    - Reverted to a version of the Makefile that actually has all the 
+      dependencies listed correctly.
+
+0.02  21 August 2009 @ 18:33:20 UTC	
+    - First usable version released.
+
+0.01  21 August 2009
+    - First usable version released.

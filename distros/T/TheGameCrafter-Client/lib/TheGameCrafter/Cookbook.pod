@@ -1,0 +1,35 @@
+=head1 Cookbook
+
+Some examples of how to use the client.
+
+=head1 Recipies
+
+=head2 Authenticate Yourself
+
+Make sure you've enabled the Developer flag in your TGC account and requested an API key. Then you can authenticate like this:
+
+ my $session = tgc_post('session', { 
+    username    => 'me', 
+    password    => '123qwe', 
+    api_key_id  => 'abcdefghijklmnopqrztuz',
+ });
+
+=head2 Upload A File
+
+If you want to create a file you can do that pretty easily. First you'll need a folder ID to attach it to. You can get your home folder ID like this:
+
+ my $user = tgc_get('user', {
+    session_id  => $session->{id},
+ });
+ my $home_folder_id = $user->{root_folder_id};
+
+Now you're ready to upload.
+
+ my $file = tgc_post('file', {
+    session_id  => $session->{id},
+    file        => ['/path/to/file.jpg'],
+    name        => 'file.jpg',
+    folder_id   => $home_folder_id,
+ });
+
+=cut

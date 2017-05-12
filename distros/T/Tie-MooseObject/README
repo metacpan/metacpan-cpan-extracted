@@ -1,0 +1,108 @@
+NAME
+    Tie::MooseObject - a tied hash interface to Moose object attributes
+
+VERSION
+    version 0.0001
+
+SYNOPSIS
+        package Point;
+
+        has 'x' => (
+            is => 'rw',
+            isa => 'Int',
+            predicate => 'has_x',
+            reader => 'get_x',
+            writer => 'set_x'
+        );
+        has 'y' => ( isa => 'Int', is => 'rw' );
+
+        my $p = new Point( x => 1, y => 20 );
+        my %point;
+        tie %point, 'Tie::MooseObject', { object => $p };
+
+        $point{set_x} = 4;
+        $point{y} = 20;
+        print $p->get_x, "\n",
+              $p->y, "\n";
+        use Data::Dumper;
+        print Dumper( \%point );
+
+DESCRIPTION
+    This module is BETA software. It seems to work so far, but it is not
+    well tested. USE AT YOUR OWN RISK .
+
+    NOTE: This documentation assumes you already have knowledge of Moose and
+    Moose attributes.
+
+    Tie::MooseObject allows you to tie a hash to a Moose object. The tied
+    hash uses the object's attributes accessor methods as keys. The "reader"
+    accessor method is the key for fetching from the tied hash, the "writer"
+    method is the key for assigning.
+
+    This module does not support "handles". "handles" is used to delegate
+    methods to the object stored in the attribute. There is no way to know
+    if the delegation is for an attribute accessor or to perform some task.
+    In the future this may be supported through explicit options.
+
+ATTRIBUTES
+  "is"
+    Expects a string of either "ro" or "rw", If set to "ro",
+    Tie::MooseObject will not allow access to the "writer" attribute
+    methods. This means that "STORE" will fatal.
+
+  "write_loop"
+    This tells Tie::MooseObject to use the "writer" method names as the keys
+    when you call "each()" or "keys()"
+
+  "object"
+    The object to "tie()" to. Required.
+
+METHODS
+  "TIEHASH"
+    When using "tie()", you should pass in a hash or hash reference of
+    arguments as the last argument. These arguments are the same style as a
+    standard Moose constructor. See "ATTRIBUTES" for a list of possible and
+    required arguments.
+
+  "STORE"
+    Assignment to a key in the hash will call the "writer" method by the
+    same name as the key. If you attempt to call this method on a read-only
+    hash, Tie::MooseObject will throw an error. Also, If you attempt to add
+    a new value to the tied hash a error will be thrown.
+
+  "FETCH"
+    When fetching a value from the tied hash, the key should be the name of
+    the "reader" attribute method. If you pass in a key which does not
+    exist, an error will be thrown.
+
+  "FIRSTKEY"
+  "NEXTKEY"
+    When looping, by default, the key will be the name of attributes
+    "reader" method. If you specify "write_loop" when constructing the tied
+    hash, the key will be the "writer" method instead.
+
+  "SCALAR"
+    In scalar context, by default, the number of "reader" attribute methods
+    are returned. If you specified "write_loop" when "tie()"ing the hash,
+    the number of "writer" attribute methods will be returned.
+
+  "EXISTS"
+    If the key is the name of the attributes "predicate" method, the value
+    returned by a call to this method is returned. If the key is the name of
+    a "reader" method, true is returned. If the hash is "rw" and the key is
+    the names of a "writer" method, this returns true.
+
+  "DELETE"
+  "CLEAR"
+    These method are not implemented so do not attempt to call them.
+
+AUTHOR
+      Scott A. Beck <scottbeck@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Scott A. Beck
+    <scottbeck@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

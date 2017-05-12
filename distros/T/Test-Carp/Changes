@@ -1,0 +1,9 @@
+Revision history for Test-Carp
+
+0.2  Wed Nov 17 09:13:45 2010
+       rt 63063 - change deprecated convention for my $x qw( ... ) {}
+          I am so sad that convention is deprecated: for qw(each of my tears) { $river .= $_ }
+
+0.1  Wed Apr 28 22:07:32 2010
+       Initial release.
+

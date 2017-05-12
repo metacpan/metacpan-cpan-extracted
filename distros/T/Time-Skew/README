@@ -1,0 +1,110 @@
+This module supports the computation of the skew between two clocks:
+the (relative) skew is the speed with which two clocks diverge. For
+instance, if yesterday two clocks, at the same time, showed
+respectively 10:00 and 10:05, while today when the former shows 10:00
+the latter shows 10:04, we say that their relative skew is 1 minute/24
+hours, roughly 7E-4.
+
+The module contains one single subroutine, which accepts as input a
+pair of timestamps, associated to a message from host A to
+host B: the timestamps correspond to the time when the message was
+sent, and to the time when message is received. Each timestamp
+reflects the value of the local clock where the operation takes place:
+the clock of host A for the send, the clock of B for the receive.
+
+Please note that the module does _not_ contain any message exchange
+facility, but only the mathematics needed to perform the skew
+approximation, once timestamps are known.
+
+The subroutine takes as argument:
+
+- a reference to a hash where values related to the timing of the
+network path from A to B;
+
+- a 2-elems array (a data point in the sequel) containing the
+timestamp of the receive event, and the differece between the send
+timestamp and the receive timestamp for one message;
+
+- a stack containing some data points, those that form the convex hull.
+
+The usage is very simple, and is illustrated by the following example:
+
+#!/usr/bin/perl -w
+use strict;
+use Time::Skew;
+
+# Initialize data
+my $hull=[];
+my $result={};
+while ( 1 ) {
+# Exchange message and acquire a new data point
+  my $datapoint = acquire();
+# Call the convexhull subroutine
+  Time::Skew::convexhull($result,$datapoint,$hull);
+# After first message some results are still undefined
+  ( defined $result->{skewjitter} ) || next;
+# here you can use the results
+
+  };
+}
+ 
+The data returned in the "result" hash is the following:
+
+result->{skew}       the clock skew;
+result->{skewjitter} the variance of the skew estimate, used to estimate
+                     convergence;
+result->{jitter}     difference between the current delay and the
+                     previous delay;
+result->{delay}      the communication delay, decremented by a constant 
+                     (yet unknown) value, used to compute communication
+                     jitter;
+result->{elems}      the number of data points in the convex hull;
+result->{select}     the index of the data point in the convex hull used to 
+                     compute the skew;
+result->{itimestamp} the timestamp, first element in the data point
+                     just passed to the subroutine;
+result->{delta}      the timestamp difference, second element in the data
+                     point just passed to the subroutine;
+
+The data returned in the "hull" stack is a series of data points,
+selected from those passed to successive calls of the subroutine. The
+number of data points in the "hull" stack usually does not exceed 20
+units.
+
+The algorithm is very fast: each call consists in scanning at most all
+data points in the "hull" stack, performing simple arithmetic operations
+for each element.
+
+The algorithm must be fed with a sequence of data points before
+returning significant results. The accuracy of the estimate keeps
+growing while new data points are passed to the subroutine. A rough
+rule of thumb to evaluate estimate accuracy is to observe the skew
+jitter, and assume it corresponds to the skew estimate accuracy. Paths
+with quite regular communication delay (small jitter) converge faster.
+
+INSTALLATION
+============
+
+perl Makefile.PL
+make
+make install
+
+TESTING
+=======
+
+Move into the t/ directory and call the testing program tester.pl. 
+
+$ ./tester.pl > /tmp/out
+
+The program takes data points from the "test_data" file, consisting of
+10000 data points. Their processing takes a few seconds. Five lines
+
+XXX HULL ALGORITHM ERROR (negative delay -7.105427357601e-15)
+
+are expected on the stderr. As long as they are very small numbers
+these warnings can be ignored. Collect the stdout in a file and compare
+with expected stdout in file check.data.
+
+The input data points are obtained simulating two clocks with a skew
+of 1E-4. After 10000 data skew is estimated with an error of 4E-7,
+while the skewjitter (optimistically) promises an error of 4E-9.

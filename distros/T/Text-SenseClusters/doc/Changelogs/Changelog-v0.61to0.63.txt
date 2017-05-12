@@ -1,0 +1,42 @@
+
+Changes made in Sense-Clusters version 0.61 during version 0.63
+
+Anagha Kulkarni  kulka020@d.umn.edu
+Ted Pedersen 	 tpederse@d.umn.edu
+Amruta Purandare amruta@cs.pitt.edu
+
+1. Added the cluster labeling program (clusterlabeling.pl) to              
+Toolkit/clusterlabel/ 					-Anagha
+
+2. Modified discriminate.pl to now also include the cluster   
+labeling program (clusterlabeling.pl).   	        -Anagha
+
+3. Modified the Docs/Flows/flowchart.fig and Docs/Flows/flowchart.pdf 
+to reflect additon of clusterlabeling.pl 		-Anagha
+
+4. Modified the Makefile.PL to reflect additon of clusterlabeling.pl       
+							-Anagha
+
+5. Added test cases for clusterlabeling.pl under
+Testing/clusterlabel/clusterlabeling	                -Anagha
+
+7. Added option in discriminate.pl to create dendogram trees of clusters.
+							-Amruta
+
+8. Added Test and Train scope options to the web-interface                 
+							-Anagha
+
+9. Added Format/Precision option to the web-interface   
+					                   -Anagha
+
+10. Modified Web/SC-cgi/callwrap.pl to include clusterlabeling.pl 
+and for handling the problem of browser timeout for large i/p data.
+						          -Anagha
+
+11. Added default stopfile to /Docs dir, and updated README.Docs.pod to
+document this change.					-Amruta
+
+12. Fixed mis-formatting of Senseval-2 example in FAQs.pod.
+							-Amruta
+
+(Changelog-v0.61to0.63 Last Updated on 02/11/2005 by Amruta)

@@ -1,0 +1,10 @@
+INSTALL
+Makefile.PL
+Build.PL
+MANIFEST
+META.yml
+desupercite
+lib/Text/DeSupercite.pm
+t/01normal.t
+t/02harsh.t
+tq.patch

@@ -1,0 +1,108 @@
+0.12 2016-06-27T11:33:08+02:00
+ - Update Map::Tube::Barcelona to 0.37 version.
+ - Update Map::Tube::Berlin to 0.14 version.
+ - Update Map::Tube::Delhi to 0.43 version.
+ - Update Map::Tube::London to 0.75 version.
+ - Update Map::Tube::NYC to 0.33 version.
+
+0.11 2016-04-04T15:10:52+02:00
+ - Rename LICENSE.artistic_2 file to LICENSE.
+ - Update Map::Tube::Barcelona to 0.31 version.
+ - Update Map::Tube::Delhi to 0.40 version.
+ - Update Map::Tube::NYC to 0.31 version.
+
+0.10 2016-02-17T08:44:18+01:00
+ - Update Map::Tube::Barcelona to 0.28 version.
+ - Update Map::Tube::Berlin to 0.12 version.
+ - Update Map::Tube::Delhi to 0.38 version.
+ - Update copyright years.
+
+0.09 2015-11-08T19:35:43+01:00
+ - Update Map::Tube::Bucharest to 0.08 version.
+ - Update Map::Tube::Delhi to 0.36 version.
+ - Update Map::Tube::NYC to 0.26 version.
+ - Update Map::Tube::SaintPetersburg to 0.06 version.
+ - Update Map::Tube::Samara to 0.06 version.
+ - Update Map::Tube::Singapore to 0.03 version.
+ - Update Map::Tube::Tokyo to 0.22 version.
+ - Update Map::Tube::Vienna to 0.07 version.
+
+0.08 2015-10-19T07:22:30+02:00
+ - Update Map::Tube::Berlin to 0.11 version.
+ - Update Map::Tube::Bucharest to 0.07 version.
+ - Update Map::Tube::Budapest to 0.04 version.
+ - Update Map::Tube::Dnipropetrovsk to 0.05 version.
+ - Update Map::Tube::Kazan to 0.04 version.
+ - Update Map::Tube::Kharkiv to 0.05 version.
+ - Update Map::Tube::Kiev to 0.05 version.
+ - Update Map::Tube::KualaLumpur to 0.05 version.
+ - Update Map::Tube::Malaga to 0.15 version.
+ - Update Map::Tube::Minsk to 0.05 version.
+ - Update Map::Tube::Moscow to 0.07 version.
+ - Update Map::Tube::Nanjing to 0.04 version.
+ - Update Map::Tube::NizhnyNovgorod to 0.03 version.
+ - Update Map::Tube::Novosibirsk to 0.03 version.
+ - Update Map::Tube::Prague to 0.13 version.
+ - Update Map::Tube::SaintPetersburg to 0.05 version.
+ - Update Map::Tube::Samara to 0.05 version.
+ - Update Map::Tube::Singapore to 0.02 version.
+ - Update Map::Tube::Sofia to 0.07 version.
+ - Update Map::Tube::Tbilisi to 0.04 version.
+ - Update Map::Tube::Vienna to 0.06 version.
+ - Update Map::Tube::Warsaw to 0.06 version.
+ - Update Map::Tube::Yekaterinburg to 0.05 version.
+
+0.07 2015-10-13T10:32:37+02:00
+ - Add Map::Tube::NizhnyNovgorod in 0.02 version.
+ - Update Map::Tube::Kiev to 0.04 version.
+ - Update Map::Tube::Minsk to 0.04 version.
+ - Update Map::Tube::Moscow to 0.06 version.
+ - Update Map::Tube::Novosibirsk to 0.02 version.
+ - Update Map::Tube::SaintPetersburg to 0.04 version.
+ - Update Map::Tube::Samara to 0.03 version.
+ - Update Map::Tube::Sofia to 0.06 version.
+ - Update Map::Tube::Tbilisi to 0.03 version.
+ - Update Map::Tube::Warsaw to 0.05 version.
+
+0.06 2015-10-05T23:27:56+02:00
+ - Fix author requires.
+ - Update Map::Tube::Bucharest to 0.06 version.
+ - Update Map::Tube::Budapest to 0.03 version.
+ - Update Map::Tube::Dnipropetrovsk to 0.04 version.
+ - Update Map::Tube::Kazan to 0.03 version.
+ - Update Map::Tube::Kharkiv to 0.04 version.
+ - Update Map::Tube::KualaLumpur to 0.04 version.
+ - Update Map::Tube::Nanjing to 0.03 version.
+ - Update Map::Tube::Prague to 0.12 version.
+ - Update Map::Tube::Vienna to 0.05 version.
+ - Update Map::Tube::Yekaterinburg to 0.04 version.
+
+0.05 2015-09-27T18:05:45+02:00
+ - Update Map::Tube::Barcelona to 0.25 version.
+ - Update Map::Tube::Delhi to 0.35 version.
+ - Update Map::Tube::Malaga to 0.14 version.
+ - Update Map::Tube::NYC to 0.25 version.
+ - Update Map::Tube::Tokyo to 0.21 version.
+
+0.04 2015-09-21T22:36:31+02:00
+ - Move author tests to xt/ directory.
+ - Remove obsolete test requires.
+ - Update Map::Tube::Barcelona to 0.24 version.
+ - Update Map::Tube::London to 0.74 version.
+
+0.03 2015-09-07T10:50:47+02:00
+ - Add Map::Tube::Malaga 0.13 version.
+ - Improve SEE ALSO section in doc.
+
+0.02 2015-08-07T17:40:06+02:00
+ - Add missing dependency to Map::Tube::KualaLumpur.
+ - Update Map::Tube::Barcelona to 0.23 version.
+ - Update Map::Tube::KualaLumpur to 0.03 version.
+ - Update Map::Tube::London to 0.73 version.
+ - Update Map::Tube::NYC to 0.24 version.
+ - Update Map::Tube::Tokyo to 0.20 version.
+ - Update Module::Install to 1.16 version.
+
+0.01 2015-03-28T18:07:40+01:00
+ - Add Map::Tube::KualaLumpur 0.01 version.
+ - Move from Task::Map::Tube.

@@ -1,0 +1,16 @@
+Changelog:
+
+0.01 : Fri Jul 11, around 23:00
+       - Initial release
+
+0.02 : Fri Jul 12 00:27:19 CEST 2002
+       - Added Perl::Tidy, Template, IO::Scalar and IO::ScalarArray as
+       prerequisites in Makefile.PL.
+       - Improved the documentation to state that Perl::Tidy is *not* 
+	   avavailable from the CPAN.
+	   - Added a couple of real tests
+
+0.03 : Sat Dec 14 15:59:25 CET 2002
+	   - Perl::Tidy is now available from CPAN!
+       
+

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+ignore.txt
+lib/Task/Template/Benchmark.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+SIGNATURE    Added here by Module::Build

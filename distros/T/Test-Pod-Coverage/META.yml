@@ -1,0 +1,31 @@
+---
+abstract: 'Check for pod coverage in your distribution'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Builder::Tester: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Pod-Coverage
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Pod::Coverage: '0'
+  Test::Builder: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/neilbowers/Test-Pod-Coverage.git
+version: '1.10'

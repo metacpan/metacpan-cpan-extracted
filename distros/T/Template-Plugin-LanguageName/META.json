@@ -1,0 +1,50 @@
+{
+   "abstract" : "Template filter to lookup the name for a ISO639-1 or ISO639-2 language code",
+   "author" : [
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Plugin-LanguageName",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Software::License" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Locale::Codes::Language" : "3.18",
+            "Template" : "2.22",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Plugin::LanguageName" : {
+         "file" : "lib/Template/Plugin/LanguageName.pm",
+         "version" : "0.0101"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.0101"
+}

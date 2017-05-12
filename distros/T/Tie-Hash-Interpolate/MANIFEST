@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Tie/Hash/Interpolate.pm
+t/01-basic.t
+META.yml

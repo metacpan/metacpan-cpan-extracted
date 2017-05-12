@@ -1,0 +1,8 @@
+Stuff that may make it into future versions (patches welcome!)
+ . Add debugging output to stderr from parser if ctx_is_debug()
+ . Add thorough documentation of the C++ class
+ . Make subclassing affect the template objects created in perl_tags.c
+ . Export default tags via XS, so that they can be assigned via register_*
+   from Perl (and get rid of alias_*)
+ . Turn the linked lists used for contexts, varlists and nclists into some
+   type of structure that is more efficient for large numbers of members

@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/TAP/Harness/Archive.pm
+Makefile.PL
+MANIFEST			This list of files
+t/archive.t
+t/bar.t
+t/extra_files.t
+t/extra_files/log1.txt
+t/extra_files/log2.txt
+t/extra_files/stuff/svk.info
+t/extra_properties.t
+t/foo.t
+t/pod-coverage.t
+t/pod.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+Revision history for Perl extension Text::CSV::BulkData.
+
+0.01  Sat Apr 19 02:31:01 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -n Text::CSV::BulkData
+
+0.02  Sun Apr 20 05:36:36 2008
+	- edit pod, Makefile.PL
+
+0.03  Mon Apr 21 23:30:06 2008
+	- bug fix (recursive calculate)
+
+0.04  Tue Apr 22 17:29:11 2008
+	- bug fix (residue operation)
+
+0.05  Thu Apr 24 01:46:39 2008
+	- add residue loop operation
+
+0.06  Tue Apr 29 01:35:29 2008
+	- add using fixed value
+

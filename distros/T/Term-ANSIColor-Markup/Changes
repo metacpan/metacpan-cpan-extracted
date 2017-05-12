@@ -1,0 +1,20 @@
+Revision history for Perl extension Term::ANSIColor::Markup
+
+0.06    Fri Mar 21 00:19:03 2009
+        - removed dependency on Term::ANSIColor.
+
+0.05    Sun Mar  2 23:37:02 2009
+        - renamed from Term::ANSIColor::Tag to Term::ANSIColor::Markup
+
+0.04    Sun Mar  2 09:09:52 2009
+        - now error message provides appropriate information.
+
+0.03    Sun Mar  2 09:05:26 2009
+        - removed unnecessary codes from parser.
+
+0.02    Sun Mar  2 03:21:20 2009
+        - parse() method now croaks if start tag and end tag aren't
+          correspondent with each other.
+
+0.01    Sun Mar  1 22:12:14 2009
+        - original version

@@ -1,0 +1,11 @@
+Changes
+lib/Tie/TimeSeries.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-tying-declare.t
+t/02-tying-basic.t
+t/03-objective-use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

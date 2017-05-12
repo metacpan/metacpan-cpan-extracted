@@ -1,0 +1,1018 @@
+/*
+ * $Id: svg.trm,v 1.20 2002/08/30 18:45:46 mikulik Exp $
+ *
+ */
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	GNUPLOT - svg.trm
+
+	This file is included by ../term.c.
+
+	This terminal driver supports:
+		W3C Scalable Vector Graphics
+
+	AUTHOR
+
+		Amedeo Farello
+		afarello@libero.it
+
+	HEAVILY MODIFIED by 
+
+		Hans-Bernhard Br"oker
+		broeker@physik.rwth-aachen.de
+
+------------------------------------------------------------------------------------------------------------------------------------*/
+
+/* PM3D support by Johannes Zellner <johannes@zellner.org>, May-16-2002 */
+/* set_color fixes by Petr Mikulik <mikulik@physics.muni.cz>, June-10-2002 */
+
+#include "driver.h"
+
+#ifdef TERM_REGISTER
+register_term (svg)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void SVG_options __PROTO ((void));
+TERM_PUBLIC void SVG_init __PROTO ((void));
+TERM_PUBLIC void SVG_graphics __PROTO ((void));
+TERM_PUBLIC void SVG_text __PROTO ((void));
+TERM_PUBLIC void SVG_linetype __PROTO ((int linetype));
+TERM_PUBLIC void SVG_move __PROTO ((unsigned int x, unsigned int y));
+TERM_PUBLIC void SVG_vector __PROTO ((unsigned int x, unsigned int y));
+TERM_PUBLIC void SVG_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void SVG_reset __PROTO ((void));
+TERM_PUBLIC int SVG_justify_text __PROTO ((enum JUSTIFY mode));
+TERM_PUBLIC int SVG_text_angle __PROTO ((int ang));
+TERM_PUBLIC void SVG_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
+TERM_PUBLIC int SVG_set_font __PROTO ((const char *font));
+/* TERM_PUBLIC void SVG_pointsize __PROTO((double pointsize)); */
+TERM_PUBLIC void SVG_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
+TERM_PUBLIC void SVG_linewidth __PROTO ((double linewidth));
+
+
+#ifdef PM3D
+TERM_PUBLIC int SVG_make_palette __PROTO((t_sm_palette *));
+TERM_PUBLIC void SVG_previous_palette __PROTO((void));
+TERM_PUBLIC void SVG_set_color __PROTO((double));
+TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
+#endif /* PM3D */
+
+#define SVG_XMAX	600
+#define SVG_YMAX	480
+
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+#ifdef PM3D
+#   include "getcolor.h"
+static t_sm_palette SVG_palette;
+static unsigned char SVG_red = 0;
+static unsigned char SVG_green = 0;
+static unsigned char SVG_blue = 0;
+static unsigned char SVG_use_pm3d_color = 0;
+#endif
+
+static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
+
+struct SVG_PEN
+{
+    double width;
+    char color[8];
+};
+
+static unsigned int SVG_xSize = SVG_XMAX; /* plot horizontal size */
+static unsigned int SVG_ySize = SVG_YMAX; /* plot vertical size*/
+
+static unsigned int SVG_xLast = UINT_MAX; /* current pen horizontal position*/
+static unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
+
+static int SVG_LineType = -3;	/* current line type*/
+static double SVG_LineWidth = 1.0; /* current line width*/
+static int SVG_TextAngle = 0;	/* current text orientation*/
+static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
+
+/* default text font family: */
+static char SVG_fontNameDef[MAX_ID_LEN + 1] = "Arial"; 
+static double SVG_fontSizeDef = 12;	/* default text size*/
+/* current text font family: */
+static char SVG_fontNameCur[MAX_ID_LEN + 1] = "Arial";
+static double SVG_fontSizeCur = 12;	/* current text size*/
+static TBOOLEAN SVG_groupIsOpen = FALSE; /* open group flag*/
+static TBOOLEAN SVG_pathIsOpen = FALSE; /* open path flag*/
+static unsigned int SVG_path_count = 0;	/* size of current path*/
+static struct SVG_PEN SVG_pens[16];	/* pen descriptors*/
+
+static int SVG_fillPattern = -1; /* active fill pattern (-1 == undefined) */
+static unsigned int SVG_fillPatternIndex = 0;
+
+static int SVG_fontAscent = 0;	/* estimated current font ascent*/
+static int SVG_fontDescent = 0;	/* estimated current font descent*/
+static int SVG_fontLeading = 0;	/* estimated current font leading*/
+static int SVG_fontAvWidth = 0;	/* estimated current font char average width*/
+
+static short SVG_Pen_RealID __PROTO ((int));
+static void SVG_PathOpen __PROTO ((void));
+static void SVG_PathClose __PROTO ((void));
+static void SVG_PathLimit __PROTO ((void));
+static void SVG_GroupOpen __PROTO ((void));
+static void SVG_GroupClose __PROTO ((void));
+static void SVG_SetFont __PROTO ((const char *name, double size));
+static void SVG_GroupFilledOpen __PROTO ((void));
+static void SVG_GroupFilledClose __PROTO ((void));
+static void SVG_StyleColor __PROTO((const char*));
+static void SVG_StyleFillColor __PROTO((void));
+#if USE_ULIG_FILLEDBOXES
+static void SVG_DefineFillPatternWithPath __PROTO((const char* path));
+static void SVG_DefineFillPattern __PROTO((int fillpat));
+#endif
+static void SVG_MoveForced __PROTO((unsigned int x, unsigned int y));
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_Pen_RealID
+------------------------------------------------------------------------------------------------------------------------------------*/
+static short 
+SVG_Pen_RealID (inPenCode)
+    int inPenCode;
+{
+    if (inPenCode >= 13)
+	inPenCode %= 13;	/* normalize pen code*/
+    if (inPenCode <= L_TYPE_NODRAW)
+	inPenCode = -2;
+
+    return (inPenCode + 2);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_GroupOpen
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_GroupOpen ()
+{
+    SVG_GroupFilledClose();
+    if (!SVG_groupIsOpen)     {
+	fprintf (gpoutfile,
+		 "<g style=\"fill:none; color:%s; stroke:currentColor; stroke-width:%.2f\">\n",
+		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
+		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width);
+
+	SVG_groupIsOpen = TRUE;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_GroupClose
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_GroupClose ()
+{
+    if (SVG_groupIsOpen)
+      {
+	  fprintf (gpoutfile, "</g>\n");
+	  SVG_groupIsOpen = FALSE;
+	  SVG_fillPattern = -1;
+      }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_PathOpen
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_PathOpen ()
+{
+    SVG_GroupFilledClose();
+    if (!SVG_pathIsOpen) {
+#ifdef PM3D
+	if (SVG_use_pm3d_color) {
+	    fprintf(gpoutfile, "\t<path style='stroke:rgb(%3d, %3d, %3d)' d='",
+		    SVG_red, SVG_green, SVG_blue);
+	} else {
+#endif
+	    fprintf (gpoutfile, "\t<path d='");
+#ifdef PM3D
+	}
+#endif
+
+	SVG_pathIsOpen = TRUE;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_PathClose
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_PathClose ()
+{
+    SVG_GroupFilledClose();
+    if (SVG_pathIsOpen) {
+	fprintf (gpoutfile, "'></path>\n");
+	SVG_path_count = 0;
+	SVG_pathIsOpen = FALSE;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_PathLimit
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_PathLimit ()
+{
+    if (SVG_path_count >= 10) {	/* avoid excessive line length*/
+	fprintf (gpoutfile, "\n\t\t");
+	SVG_path_count = 0;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_SetFont
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_SetFont (const char *name, double size)
+{
+    strcpy (SVG_fontNameCur, name);
+    SVG_fontSizeCur = size;
+
+/* since we cannot interrogate SVG about text properties and according
+ * to SVG 1.0 W3C Candidate Recommendation 2 August 2000 the
+ * "line-height" of the 'text' element is defined to be equal to the
+ * 'font-size' (!), we have to to define font properties in a less
+ * than optimal way */
+
+    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00);	/* estimated current font ascent*/
+    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25);	/* estimated current font descent*/
+    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25);	/* estimated current font leading*/
+    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70);	/* estimated current font char average width*/
+}
+
+static void
+SVG_GroupFilledOpen(void)
+{
+    SVG_PathClose();
+    if (!SVG_groupFilledIsOpen) {
+	fprintf(gpoutfile, "\t<g style = 'stroke:none; shape-rendering:crispEdges'>\n");
+	SVG_groupFilledIsOpen = TRUE;
+    }
+}
+
+static void
+SVG_GroupFilledClose(void)
+{
+    if (SVG_groupFilledIsOpen) {
+	fprintf(gpoutfile, "\t</g>\n");
+	SVG_groupFilledIsOpen = FALSE;
+    }
+}
+
+static void
+SVG_StyleColor(const char* paint)
+{
+#ifdef PM3D
+    if (SVG_use_pm3d_color)
+	fprintf(gpoutfile, "%s = 'rgb(%3d, %3d, %3d)'", paint, SVG_red, SVG_green, SVG_blue);
+    else
+#endif
+	fprintf(gpoutfile, "%s = 'currentColor'", paint);
+}
+
+static void
+SVG_StyleFillColor(void)
+{
+    SVG_StyleColor("fill");
+}
+
+#if USE_ULIG_FILLEDBOXES
+static void
+SVG_DefineFillPatternWithPath(const char* path)
+{
+    SVG_PathClose();
+    SVG_fillPatternIndex++;
+    fprintf(gpoutfile,
+	    "\t<defs>\n"
+	    "\t\t<pattern id='gpPat%d' patternUnits='userSpaceOnUse' x='0' y='0' width='8' height='8'>\n",
+	    SVG_fillPatternIndex);
+    if (path) {
+	/* NOTE: ?? fill = 'none' */
+	fprintf(gpoutfile, "\t\t\t<path style = 'stroke:currentColor' d='%s'/>\n", path);
+    }
+    fputs("\t\t</pattern>\n" "\t</defs>\n", gpoutfile);
+}
+
+static void
+SVG_DefineFillPattern(int fillpat)
+{
+    if (fillpat != SVG_fillPattern) {
+	SVG_fillPattern = fillpat;
+	switch (fillpat) {
+	    case 0:
+		SVG_DefineFillPatternWithPath((const char*)0);
+		break;
+
+	    case 1:
+		SVG_DefineFillPatternWithPath("M0,0 L7,7");
+		break;
+
+	    case 2:
+		SVG_DefineFillPatternWithPath("M0,7 L7,0");
+		break;
+
+	    case 3:
+		SVG_DefineFillPatternWithPath("M0,0 L3,7 M4,0 L7,7");
+		break;
+
+	    case 4:
+		SVG_DefineFillPatternWithPath("M0,7 L3,0 M4,7 L7,0");
+		break;
+
+	    case 5:
+		SVG_DefineFillPatternWithPath("M0,0 L7,3 M0,4 L7,7");
+		break;
+
+	    case 6:
+		SVG_DefineFillPatternWithPath("M0,3 L7,0 M0,7 L7,4");
+	     break;
+
+	}
+    }
+}
+#endif
+
+static void
+SVG_MoveForced(unsigned int x, unsigned int y)
+{
+    SVG_PathOpen ();
+
+    fprintf (gpoutfile, "M%u,%u ", x, term->ymax - y);
+    SVG_path_count++;
+
+    SVG_PathLimit ();
+
+    SVG_xLast = x;
+    SVG_yLast = y;
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_options
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_options ()
+{
+    struct value a;
+
+    if (!END_OF_COMMAND) {	/* get terminal size*/
+	if (almost_equals (c_token, "s$ize")) {
+	    c_token++;
+
+	    if (END_OF_COMMAND)
+		int_error(c_token,"expecting x size");
+	    SVG_xSize = (unsigned int) real (const_express (&a));
+	    if (SVG_xSize < 2 || SVG_xSize > 8192)
+		int_error(c_token,"x size out of range");
+
+	    if (END_OF_COMMAND)
+		int_error(c_token,"expecting y size");
+	    SVG_ySize = (unsigned int) real (const_express (&a));
+	    if (SVG_ySize < 2 || SVG_ySize > 8192)
+		int_error(c_token,"y size out of range");
+	}
+    }
+
+    if (!END_OF_COMMAND) {	/* get default font family name*/
+	if (almost_equals (c_token, "fn$ame"))  {
+	    c_token++;
+
+	    if (!END_OF_COMMAND && isstring (c_token)) {
+		quote_str (SVG_fontNameDef, c_token, MAX_ID_LEN);
+		c_token++;
+	    } else
+		int_error(c_token,"fname: expecting font name");
+	}
+    }
+
+    if (!END_OF_COMMAND) {	/* get default font size*/
+	if (almost_equals (c_token, "fs$ize")) {
+	    c_token++;
+
+	    if (END_OF_COMMAND)
+		int_error(c_token,"fsize: expecting font size");
+	    SVG_fontSizeDef = real (const_express (&a));
+	}
+    }
+
+    if (!END_OF_COMMAND)
+	 int_error(c_token, "unexpected text at end of command");
+
+    /* Save options back into options string in normalized format */
+    sprintf(term_options, "size %d %d fname '%s'  fsize %g",
+	    SVG_xSize, SVG_ySize, SVG_fontNameDef, SVG_fontSizeDef);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_init
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_init ()
+{
+    double stroke_width;
+
+    /* setup pens*/
+    SVG_pens[0].width = SVG_LineWidth;
+    sprintf (SVG_pens[0].color, "black");	/* black*/
+    SVG_pens[1].width = SVG_LineWidth;
+    sprintf (SVG_pens[1].color, "gray");	/* medium gray*/
+    SVG_pens[2].width = SVG_LineWidth;
+    sprintf (SVG_pens[2].color, "red");
+    SVG_pens[3].width = SVG_LineWidth;
+    /* sprintf (SVG_pens[3].color, "#%2.2X%2.2X%2.2X", 0, 209, 0); */	/* green*/
+    sprintf (SVG_pens[3].color, "green");
+    SVG_pens[4].width = SVG_LineWidth;
+    /* sprintf (SVG_pens[4].color, "#%2.2X%2.2X%2.2X", 74, 77, 201); */	/* blue*/
+    sprintf (SVG_pens[4].color, "blue");	/* blue*/
+    SVG_pens[5].width = SVG_LineWidth;
+    /* sprintf (SVG_pens[5].color, "#%2.2X%2.2X%2.2X", 173, 0, 0); */	/* brick*/
+    sprintf (SVG_pens[5].color, "cyan");
+    SVG_pens[6].width = SVG_LineWidth;
+    sprintf (SVG_pens[6].color, "#%2.2X%2.2X%2.2X", 21, 117, 69);	/* pine green*/
+    SVG_pens[7].width = SVG_LineWidth;
+    sprintf (SVG_pens[7].color, "#%2.2X%2.2X%2.2X", 0, 0, 148);	/* navy*/
+    SVG_pens[8].width = SVG_LineWidth;
+    sprintf (SVG_pens[8].color, "#%2.2X%2.2X%2.2X", 255, 153, 0);	/* orange*/
+    SVG_pens[9].width = SVG_LineWidth;
+    sprintf (SVG_pens[9].color, "#%2.2X%2.2X%2.2X", 0, 153, 161);	/* green blue*/
+    SVG_pens[10].width = SVG_LineWidth;
+    sprintf (SVG_pens[10].color, "#%2.2X%2.2X%2.2X", 214, 214, 69);	/* olive*/
+    SVG_pens[11].width = SVG_LineWidth;
+    sprintf (SVG_pens[11].color, "#%2.2X%2.2X%2.2X", 163, 145, 255);	/* cornflower*/
+    SVG_pens[12].width = SVG_LineWidth;
+    sprintf (SVG_pens[12].color, "#%2.2X%2.2X%2.2X", 255, 204, 0);	/* gold*/
+    SVG_pens[13].width = SVG_LineWidth;
+    sprintf (SVG_pens[13].color, "#%2.2X%2.2X%2.2X", 214, 0, 120);	/* mulberry*/
+    SVG_pens[14].width = SVG_LineWidth;
+    sprintf (SVG_pens[14].color, "#%2.2X%2.2X%2.2X", 171, 214, 0);	/* green yellow*/
+    SVG_pens[15].width = SVG_LineWidth;
+    sprintf (SVG_pens[15].color, "#%2.2X%2.2X%2.2X", 222, 0, 186);	/* red violet*/
+
+    SVG_LineType = -3;
+
+/* set xmax, ymax*/
+
+    term->xmax = SVG_xSize;
+    term->ymax = SVG_ySize;
+
+/* set current font*/
+
+    SVG_SetFont (SVG_fontNameDef, SVG_fontSizeDef);
+
+/* set h_char, v_char*/
+
+    term->h_char = SVG_fontAvWidth;
+    term->v_char = (SVG_fontAscent + SVG_fontDescent + SVG_fontLeading);
+
+/* set h_tic, v_tic*/
+
+    term->h_tic = term->v_char / 2;
+    term->v_tic = term->v_char / 2;
+
+/* write file header*/
+
+    fprintf (gpoutfile,
+	     "<?xml version=\"1.0\" standalone=\"no\"?>\n"
+	     "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20001102//EN\" \"svg-20001102.dtd\">\n"
+	     "<svg width=\"%u\" height=\"%u\" viewBox=\"0 0 %u %u\">\n\n"
+	     "<desc>Produced by GNUPLOT %s patchlevel %s </desc>\n\n",
+	     term->xmax, term->ymax, term->xmax, term->ymax,
+	     gnuplot_version, gnuplot_patchlevel);
+
+    /* definitions of point symbols */
+    /* FIXME: SVG scales linewidth along with the marker itself, and
+     * there seems to be no way to avoid that without copying the
+     * marker definition into the file, rather than referencing a
+     * defined one :-( That would make for much larger files */
+
+#if 0
+	     "\t<path id='gpPt3' style='stroke-width:%.3f' d='M-1,-1 h2 v2 h-2 z'/>\n"
+#endif
+       
+    stroke_width = 2.0 / term->h_tic;
+    fprintf (gpoutfile,
+	     "<defs>\n"
+	     /* dot: */
+	     "\t<circle id='gpDot' r='1'/>\n"
+	     /*  0 plus */
+	     "\t<path id='gpPt0' style='stroke-width:%.3f' d='M-1,0 h2 M0,-1 v2'/>\n"
+	     /*  1 X */
+	     "\t<path id='gpPt1' style='stroke-width:%.3f' d='M-1,-1 L1,1 M1,-1 L-1,1'/>\n"
+	     /*  2 star */
+	     "\t<path id='gpPt2' style='stroke-width:%.3f' d='M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1'/>\n"
+	     /*  3 box */
+	     "\t<rect id='gpPt3' style='stroke-width:%.3f' x='-1' y='-1' width='2' height='2'/>\n"
+	     /*  4 box                   filled */
+	     "\t<use xlink:href='#gpPt3' id='gpPt4' style='fill:currentColor; stroke:none'/>\n"
+	     /*  5 circle */
+	     "\t<circle id='gpPt5' style='stroke-width:%.3f' cx='0' cy='0' r='1'/>\n"
+	     /*  6 circle (disk)         filled */
+	     "\t<use xlink:href='#gpPt5' id='gpPt6' style='fill:currentColor; stroke:none'/>\n"
+	     /*  7 triangle */
+	     "\t<path id='gpPt7' style='stroke-width:%.3f' d='M0,-1.33 L-1.33,0.67 L1.33,0.67 z'/>\n"
+	     /*  8 triangle  filled */
+	     "\t<use xlink:href='#gpPt7' id='gpPt8' style='fill:currentColor; stroke:none'/>\n"
+	     /*  9 upside down triangle */
+	     "\t<use xlink:href='#gpPt7' id='gpPt9' transform='rotate(180)'/>\n"
+	     /*  10 upside down triangle filled */
+	     "\t<use xlink:href='#gpPt9' id='gpPt10' style='fill:currentColor; stroke:none'/>\n"
+	     /* 11 diamond */
+	     "\t<use xlink:href='#gpPt3' id='gpPt11' transform='rotate(45)'/>\n"
+	     /* 12 diamond               filled */
+	     "\t<use xlink:href='#gpPt11' id='gpPt12' style='fill:currentColor; stroke:none'/>\n"
+
+	     /* NOTE: Fill patterns must be defined after the stroke color has been
+	      * set to use the correct (current) stroke color. Therefore we can't
+	      * define fill patterns here. */
+
+	     "</defs>\n"
+	     , stroke_width
+	     , stroke_width
+	     , stroke_width
+	     , stroke_width
+	     , stroke_width
+	     , stroke_width
+	);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_graphics
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_graphics ()
+{
+    /* fprintf (gpoutfile, "<svg>\n"); --- disabled HBB 20001116*/
+
+    SVG_groupIsOpen = FALSE;
+    SVG_fillPattern = -1;
+    SVG_fillPatternIndex = 0;
+#ifdef PM3D
+    SVG_groupFilledIsOpen = FALSE;
+    SVG_use_pm3d_color = 0;
+#endif
+    SVG_pathIsOpen = FALSE;
+
+/* reset position*/
+
+    SVG_xLast = SVG_yLast = UINT_MAX;
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_text
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_text ()
+{
+    SVG_PathClose ();
+    SVG_GroupClose ();
+
+    /* fprintf (gpoutfile, "</svg>\n\n"); --- disabled HBB 20001116 */
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_reset
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_reset ()
+{
+    fprintf (gpoutfile, "</svg>\n\n");
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_linetype
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_linetype (int linetype)
+{
+#ifdef PM3D
+    SVG_use_pm3d_color = 0;
+#endif
+    if (linetype != SVG_LineType) {
+	SVG_PathClose ();
+	SVG_GroupClose ();
+	SVG_LineType = linetype;
+	SVG_GroupOpen ();
+    }
+}
+
+TERM_PUBLIC void
+SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
+{
+#if USE_ULIG_FILLEDBOXES
+    /* fillpar:
+     * - solid   : 0 - 100
+     * - pattern : 0 - 100
+     */
+    int fillpar = style >> 4;
+
+    /* style:
+     *   0 == empty
+     *   1 == solid
+     *   2 == pattern
+     */
+    style &= 0xf;
+
+    if (2 == style) {
+	/* make sure the pattern is defined (with the current stroke color)
+	 * must be defined AFTER the current group is opened with the color
+	 * attribue set, as the patterns use 'currentColor' */
+	SVG_DefineFillPattern(fillpar % 7);
+    }
+
+#endif
+    SVG_GroupFilledOpen();
+    fputs("\t\t<rect " , gpoutfile);
+#if USE_ULIG_FILLEDBOXES
+
+    switch (style) {
+	case 0: /* fill with background color */
+#endif
+	    /* TODO: and what if the background color is not white ? */
+	    fputs(" fill = 'white'", gpoutfile);
+#if USE_ULIG_FILLEDBOXES
+	    break;
+	case 1: /* solid fill */
+	    SVG_StyleFillColor();
+	    if (fillpar >= 0 && fillpar < 100)
+		fprintf(gpoutfile, " style = 'fill-opacity:%f'", ((double)fillpar * 0.01));
+	    break;
+	case 2: /* pattern fill */
+	    fprintf(gpoutfile, " fill = 'url(#gpPat%d)'", SVG_fillPatternIndex);
+	    break;
+	default:
+	    break;
+    }
+#endif
+
+    fprintf(gpoutfile, " x='%d' y='%d' width='%d' height='%d'/>\n", x1, (term->ymax - y1 - height + 1), width, height);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_linewidth - verificare
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_linewidth (double linewidth)
+{
+    if (linewidth != SVG_LineWidth) {
+	short k;
+
+	SVG_LineWidth = linewidth;
+
+	for (k = 0; k < 16; k++)
+	    SVG_pens[k].width = SVG_LineWidth;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_move
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_move (unsigned int x, unsigned int y)
+{
+    if (x != SVG_xLast || y != SVG_yLast)  {
+	SVG_MoveForced(x, y);
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_vector
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_vector (unsigned int x, unsigned int y)
+{
+    if (x != SVG_xLast || y != SVG_yLast) {
+
+	if (!SVG_pathIsOpen) {
+	    /* The SVG 'path' MUST have a 'moveto' as first command. */
+	    SVG_MoveForced(SVG_xLast, SVG_yLast);
+	}
+
+	fprintf (gpoutfile, "L%u,%u ", x, term->ymax - y);
+	SVG_path_count++;
+
+	SVG_PathLimit ();
+
+	SVG_xLast = x;
+	SVG_yLast = y;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_point
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_point (unsigned int x, unsigned int y, int number)
+{
+#ifdef PM3D
+    char color_spec[0x40];
+    if (SVG_use_pm3d_color) {
+       	sprintf(color_spec, " style='color:rgb(%3d, %3d, %3d)'",
+		SVG_red, SVG_green, SVG_blue);
+    } else {
+	*color_spec = '\0';
+    }
+#endif
+
+    SVG_PathClose ();
+    
+    if (number < 0) {		/* do dot */
+	fprintf (gpoutfile,
+		 "\t<use xlink:href='#gpDot' x='%u' y='%u'"
+#ifdef PM3D
+		 "%s"
+#endif
+		 "/>\n",
+		 x, term->ymax - y
+#ifdef PM3D
+		 , color_spec
+#endif
+		 );
+
+    } else {			/* draw a point symbol */
+	fprintf (
+	    gpoutfile,
+	    "\t<use xlink:href='#gpPt%u' transform='translate(%u,%u) scale(%.2f)'"
+#ifdef PM3D
+	     "%s"
+#endif
+	    "/>\n"
+	    , number % 13, x, term->ymax - y
+	    , term_pointsize * term->h_tic / 2
+#ifdef PM3D
+	     , color_spec
+#endif
+	    );
+    }
+    SVG_xLast = x;
+    SVG_yLast = y;
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_justify_text
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC int
+SVG_justify_text (enum JUSTIFY mode)
+{
+    SVG_TextJust = mode;
+    return (TRUE);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_text_angle
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC int
+SVG_text_angle (int ang)
+{
+    /* Can only do pure horizontal or vertical */
+    SVG_TextAngle = ang;
+    return (TRUE);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_put_text
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_put_text (unsigned int x, unsigned int y, const char *str)
+{
+    char *alignment;
+    int h = x, v = y;
+    
+    SVG_PathClose ();
+
+/* horizontal justification*/
+
+    switch (SVG_TextJust) {
+    case LEFT:
+	alignment = "start";
+	break;
+    case CENTRE:
+	alignment = "middle";
+	break;
+    case RIGHT:
+    default:   /* can't happen, just to make gcc happy */
+	alignment = "end";
+	break;
+    }
+
+/* vertical justification*/
+
+    if (SVG_TextAngle % 180) {
+	/* vertical text */
+	h += (SVG_fontAscent - SVG_fontDescent) / 2;
+    } else {
+	/* horizontal text */
+	v -= (SVG_fontAscent - SVG_fontDescent) / 2;
+    }
+
+/* define text position and attributes */
+
+    fprintf (gpoutfile, "\t<g transform=\"translate(%d,%d)", h, term->ymax - v);
+    if (SVG_TextAngle)
+	fprintf (gpoutfile, " rotate(%i)", -SVG_TextAngle);
+    fprintf (gpoutfile, "\" style=\"stroke:none; fill:");
+
+#ifdef PM3D
+    if (!SVG_use_pm3d_color)
+#endif
+	fprintf (gpoutfile, "%s", SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
+#ifdef PM3D
+    else
+	fprintf (gpoutfile, "rgb(%d,%d,%d)", SVG_red, SVG_green, SVG_blue);
+#endif
+    fprintf (gpoutfile, "; font-family:%s; font-size:%.2f; text-anchor:%s\">\n",
+	     SVG_fontNameCur, SVG_fontSizeCur, alignment);
+
+/* output text*/
+
+    fprintf (gpoutfile, "\t\t<text>%s</text>\n\t</g>\n", str);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_set_font
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC int
+SVG_set_font (const char *font)
+{
+    if (strlen (font) > 0) {	/* if available, parse the font specification ("fontname,fontsize")*/
+	short index;
+	char *token,
+	    seps[] = ",", *buffer = (char *) malloc (strlen (font) + 1);
+
+	if (buffer == NULL)
+	    return (FALSE);
+	strcpy (buffer, font);
+
+	for (token = strtok (buffer, seps), index = 1;
+	     token != NULL; token = strtok (NULL, seps), index++
+	    ) {
+	    switch (index) {
+	    case 1:
+		strcpy (SVG_fontNameCur, token);
+		break;	/* font name*/
+	    case 2:
+		SVG_fontSizeCur = atoi (token);
+		break;	/* font size*/
+	    default:
+		break;
+	    }
+	}
+
+	free (buffer);
+    } else {			/* otherwise simply reset the default font*/
+	strcpy (SVG_fontNameCur, SVG_fontNameDef);
+	SVG_fontSizeCur = SVG_fontSizeDef;
+    }
+
+    return (TRUE);
+}
+
+
+#ifdef PM3D
+
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_make_palette
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC int
+SVG_make_palette(t_sm_palette *palette)
+{
+    SVG_GroupFilledClose();
+    if (palette == NULL) {
+	/* svg can do continuous colors */
+	return 0;
+    }
+
+    /* save mapping formulae needed if SMPAL_COLOR_MODE_RGB */
+    SVG_palette.colorMode = palette->colorMode;
+    SVG_palette.formulaR = palette->formulaR;
+    SVG_palette.formulaG = palette->formulaG;
+    SVG_palette.formulaB = palette->formulaB;
+    SVG_palette.positive = palette->positive;
+
+    return 0;
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_set_color
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_set_color(double gray)
+{
+    unsigned char red, green, blue;
+
+    if (sm_palette.use_maxcolors != 0) {
+        /* finite nb of colors explicitly requested */
+        if( gray >= ( (double)(sm_palette.use_maxcolors-1) )
+	              / sm_palette.use_maxcolors )
+	    gray = 1.0;
+	else
+	    gray = floor( gray * sm_palette.use_maxcolors ) 
+	           / sm_palette.use_maxcolors;
+    }
+
+    rgb_from_gray( gray, &red, &green, &blue );
+    SVG_use_pm3d_color = 1;
+
+    if (red != SVG_red || green != SVG_green || blue != SVG_blue) {
+	/* pm3d color has changed. We've to start a new path
+	 * with a different line color. This is necessary when
+	 * using "linetype palette". */
+	SVG_PathClose();
+	SVG_red = red;
+	SVG_green = green;
+	SVG_blue = blue;
+    }
+
+    return;
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_filled_polygon
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_filled_polygon(int points, gpiPoint* corners)
+{
+    SVG_GroupFilledOpen();
+
+    if (4 != points) {
+	fprintf(stderr,
+	       	"** ERROR SVG_filled_polygon supports only 4 points (file %s, line %d)",
+	       	__FILE__, __LINE__);
+	return;
+    }
+
+    fputs("\t\t<polygon ", gpoutfile);
+    SVG_StyleFillColor();
+    fprintf(gpoutfile, " points = '%d,%d %d,%d %d,%d %d,%d'/>\n",
+	    corners[0].x, term->ymax - corners[0].y,
+	    corners[1].x, term->ymax - corners[1].y,
+	    corners[2].x, term->ymax - corners[2].y,
+	    corners[3].x, term->ymax - corners[3].y);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_previous_palette
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_previous_palette(void)
+{
+    SVG_GroupFilledClose();
+}
+
+#endif /* PM3D */
+
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START (svg_driver)
+    "svg", "W3C Scalable Vector Graphics driver",
+    0 /* xmax */ , 0 /* ymax */ , 0 /* vchar */ , 0 /* hchar */ ,
+    0 /* vtic */ , 0 /* htic */ ,
+    SVG_options, SVG_init, SVG_reset, SVG_text, null_scale, SVG_graphics,
+    SVG_move, SVG_vector, SVG_linetype, SVG_put_text, SVG_text_angle,
+    SVG_justify_text, SVG_point, do_arrow, SVG_set_font, do_pointsize,
+    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    0 /* suspend */, 0 /* resume */ , SVG_fillbox, SVG_linewidth
+#ifdef PM3D
+#   ifdef USE_MOUSE
+   , 0, 0, 0, 0, 0 /* no mouse support for svg */
+#   endif
+   , SVG_make_palette,
+   SVG_previous_palette,
+   SVG_set_color,
+   SVG_filled_polygon
+#endif /* PM3D */
+TERM_TABLE_END (svg_driver)
+#undef LAST_TERM
+#define LAST_TERM svg_driver
+#endif /* TERM_TABLE */
+
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+    START_HELP (svg)
+    "1 svg",
+    "?commands set terminal svg",
+    "?set terminal svg",
+    "?set term svg",
+    "?terminal svg",
+    "?term svg",
+    "?svg",
+    " This terminal produces files in the W3C Scalable Vector Graphics format.",
+    "",
+    " Syntax:",
+    "       set terminal svg {size <x> <y>}",
+    "                        {fname \"<font>\"} {fsize <fontsize>}",
+    "",
+    " where <x> and <y> are the size of the SVG plot to generate,",
+    " <font> is the name of the default font to use (default Arial) and",
+    " <fontsize> is the font size (in points, default 12)"
+    END_HELP (svg)
+#endif

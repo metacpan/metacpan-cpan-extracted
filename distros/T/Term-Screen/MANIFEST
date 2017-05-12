@@ -1,0 +1,9 @@
+MANIFEST
+README
+lib/Term/Screen.pm
+Makefile.PL
+example/test.pl
+t/01_basic.t
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

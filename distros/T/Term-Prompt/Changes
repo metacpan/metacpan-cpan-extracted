@@ -1,0 +1,125 @@
+Revision history for Perl extension Term::Prompt.
+
+1.04  Wed Jul 04 20:00:00 2007
+
+	- Fixed line 229 to avoid unit value warnings.
+
+	- Updated old-style &function calls.
+
+	- Fixed conflicts between global our $DEBUG and
+	function-internal my $DEBUG.
+
+	- General formatting stuff (whitespace, single vs. double
+	quotes, etc.)
+
+1.03  Thu Oct 08 20:00:00 2004
+	- Added option 'password' to not echo the value typed.
+	- Added options for menu: 'separator', 'ignore_whitespace' and
+	'ignore_empties'. This was prompted by Nicolas Cheve
+	discovering that when users mistakenly entered
+	the first letter of a menu item instead of the item number,
+	the code would happily use the letter as a separator of NO
+	entries and happily return if accept_empty_selection was
+	set. Now you can limit the separator list, ignore spurious
+	whitespace between responses (if whitespace is not a valid
+	separator) and ignore consecutive separators.
+
+1.02  Tue Jun 22 20:00:00 2004
+        - Always insure that $num_cols is at least 1.  If the longest
+        entry in a list is wider than the screen, then the number of
+        columns goes to zero which leads to a division by zero
+        otherwise. Thank you Andreas J Koenig.
+
+1.01  Thu May 13 21:30:00 2004
+	- Corrected typo at line 82 in Prompt.pm - the entry for code
+	ref was left a 'c' when merged in from Tuomas Jormola's
+	additions instead of changed to an 's. Obviously, this needs a
+	better test suite. Bug 6249 at rt.cpan.org. Thank you, Robert
+	Schott.
+
+1.00  Sat May 08 17:00:00 2004
+	- Corrected type in Changes for 0.13 entry.
+        - Made all Perl version references the same. 5.6.1 is
+        minumum version required to run.
+	- Module version is 1.00. No reason to keep it at pre-zero
+	anymore.
+
+0.13  Sun Apr 11 11:40:57 2004
+	- Maintanence: Package reconstructed using h2xs 1.23 with
+	  options '-AXc -nTerm::Prompt -v 0.13'.
+	  Minimum supported Perl version is now 5.6.1. Text::Wrap and
+	  Term::ReadKey added to the PREREQ_PM section of
+	  Makefile.PL. Whitespace cleanups. POD cleanups and
+	  expansions. Reordered Changes entries to put most recent
+	  at top.
+
+	- Added 'coderef' functionality (Tuomas Jormola
+	  <tjormola@cc.hut.fi>).
+
+0.12  Feb 2004
+	- Maintenance taken over by Matthew Persico (persicom@cpan.org).
+
+        - Maintenence release with fixes for menu functionality.
+
+0.11  Sat Mar 09 04:02:33 EST 2002
+	- This should have been done a lot earlier; the changes were
+	  mailed to me by Matthew O. Persico (persicom@acedsl.com)
+	  a while back... Sorry!
+
+        - Removed 5.002/5.005 specific versions; the one section of
+          differing functionality wasn't useful enough to justify
+          maintaining two files.
+
+        - Added 'menu' functionality.
+
+        - Added '-n' and '+-n'.
+
+        - $DEBUG is now a package global that can be set from outside
+          the package in order to debug it.
+
+        - Changed float regexps to the version in Perl Cookbook, page
+          44.
+
+0.10  Tue Apr 04 14:22:00 EDT 2000
+	- Further bugfix for PAUSE upload problem - PAUSE needs a .pm file
+	  to get the version.
+
+0.09  Tue Apr 04 12:59:15 EDT 2000
+	- Bugfix for uc/lc prompt type, fix PAUSE upload problem.
+
+
+0.08  Wed Mar 15 13:05:21 EST 2000
+	- Now have two seperate versions, one for 5.005 and above and one
+	  for below; the first uses qr. Grr... I dislike using two seperate
+	  files, but it seems the simplest way. Thanks to schinder@pobox.com
+	  for reminding me that a simple "if ($] >= 5.005)" won't work.
+
+0.07  Tue Mar 14 10:02:45 EST 2000
+	- legalit now uses qr if Perl version is 5.005 or above, and
+	  abbreviation code only matches start of text. Minor improvements
+	  to other code.
+
+0.06  Tue Nov 30 18:55:24 EST 1999
+	- termwrap made EXPORT_OK, description added to manpage. Bug in
+	  legalit not accepting 0 as legal fixed. Abbreviation code
+	  modified to more efficient (copying off of Getopt::Long).
+
+0.05  Wed Nov 10 13:21:03 EST 1999
+	- Missing right bracket restored... my thanks to
+	  schinder@pobox.com. I have no idea how I didn't load in 0.04
+	  here and spot the problem...
+
+0.04  Thu Oct 28 06:40:45 EDT 1999
+	- addition of f/F type; change from Term::Size to
+	  Term::ReadKey's GetTerminalSize (more portable and
+	  doesn't have to be a glob fed to it)
+
+0.03  Fri Oct 22 17:50:12 1999
+	- bugfix for $/, uppercase usage for ACINX types
+
+0.02  Fri Oct 22 15:31:45 1999
+	- bugfix for uppercase usage for ACINX types
+
+0.01  Tue Jul 28 21:04:22 1998
+	- original version; created by h2xs 1.18
+

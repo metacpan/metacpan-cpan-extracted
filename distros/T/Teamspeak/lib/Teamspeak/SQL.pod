@@ -1,0 +1,200 @@
+
+=head1 NAME
+
+Teamspeak::SQL - SQL-Interface to administrate Teamspeak-Voice-Server
+
+=head1 CLASS METHODS
+
+=head2 connect ( user => $dbuser, pwd => $pwd )
+
+MySQL needs a username and password to connect to the database.
+
+=head2 new ( host => 'localhost', port => 3306, db => $dbname )
+=head2 new ( file => $filename )
+
+MySQL needs a host, port and db parameter.
+SQLite needs the filename of the server.dbm.
+
+=head2 sl
+
+Returns a list of L<"Teamspeak::Server">s.
+
+=head2 get_channel
+
+Retrieves or refreshes the channel list of the TS-Server.
+
+=head1 DATABASE STRUCTURE
+
+for TS-Server of Version 2.0.23.19
+
+=head2 ts2_bans
+
+  i_ban_id integer primary key
+  i_ban_server_id integer
+  s_ban_ip varchar(40)
+  s_ban_by varchar(40)
+  dt_ban_created varchar(20)
+  i_ban_minutes integer
+
+=head2 ts2_channel_privileges
+
+  i_cp_id integer primary key
+  i_cp_server_id integer
+  i_cp_channel_id integer
+  i_cp_client_id integer
+  b_cp_flag_admin integer
+  b_cp_flag_autoop integer
+  b_cp_flag_autovoice integer
+
+=head2 ts2_channels
+
+  i_channel_id integer primary key
+  i_channel_server_id integer
+  i_channel_parent_id integer
+  b_channel_flag_moderated integer
+  b_channel_flag_hierarchical integer
+  b_channel_flag_default integer
+  i_channel_codec integer
+  i_channel_order integer
+  i_channel_maxusers integer
+  s_channel_name varchar(40)
+  s_channel_topic varchar(40)
+  s_channel_description text
+  s_channel_password varchar(80)
+  dt_channel_created varchar(20)
+
+=head2 ts2_clients
+
+  i_client_id integer primary key
+  i_client_server_id integer
+  b_client_privilege_serveradmin integer
+  s_client_name varchar(40)
+  s_client_password varchar(80)
+  dt_client_created varchar(20)
+  dt_client_lastonline varchar(20)
+
+=head2 ts2_nicks
+
+  i_nick_id integer primary key
+  i_nick_server_id integer
+  i_nick_client_id integer
+  s_nick_name varchar(40)
+
+=head2 ts2_server_privileges
+
+  i_sp_id integer primary key
+  i_sp_server_id integer
+  s_sp_usergroup varchar(40)
+  b_sp_AccessWebAdminServer integer
+  b_sp_AccessTcpServer integer
+  b_sp_AccessVoice integer
+  b_sp_AdminRegisterPlayer integer
+  b_sp_AdminSetServerPermissions integer
+  b_sp_AdminAddServer integer
+  b_sp_AdminDeleteServer integer
+  b_sp_AdminEditServerIpPort integer
+  b_sp_AdminEditServerWebpostUrl integer
+  b_sp_AdminEditServerName integer
+  b_sp_AdminEditServerWelcomeMessage integer
+  b_sp_AdminEditServerPassword integer
+  b_sp_AdminEditServerType integer
+  b_sp_AdminEditServerAllodCodecs integer
+  b_sp_AdminBanIp integer
+  b_sp_AdminMovePlayer integer
+  b_sp_AdminListDBUsers integer
+  b_sp_AdminChangeOwnPassword integer
+  b_sp_AdminChangeUserPassword integer
+  b_sp_AdminListDBServers integer
+  b_sp_AdminEditServerMaxUsers integer
+  b_sp_AdminStopServer integer
+  b_sp_AdminStartServer integer
+  b_sp_ChannelJoinRegisterred integer
+  b_sp_ChannelCreateRegisterred integer
+  b_sp_ChannelCreateUnregisterred integer
+  b_sp_ChannelCreateDefault integer
+  b_sp_ChannelCreateSubchannels integer
+  b_sp_ChannelCreateModerated integer
+  b_sp_ChannelDelete integer
+  b_sp_ChannelEditName integer
+  b_sp_ChannelEditPassword integer
+  b_sp_ChannelEditTopic integer
+  b_sp_ChannelEditDescription integer
+  b_sp_ChannelEditOrder integer
+  b_sp_ChannelEditMaxUsers integer
+  b_sp_ChannelEditCodec integer
+  b_sp_ChannelJoinChannelWithoutPassword integer
+  b_sp_PrivilegeGrantSA integer
+  b_sp_PrivilegeGrantCA integer
+  b_sp_PrivilegeGrantAutoOp integer
+  b_sp_PrivilegeGrantOp integer
+  b_sp_PrivilegeGrantAutoV integer
+  b_sp_PrivilegeGrantV integer
+  b_sp_PrivilegeGrantAllowRegistration integer
+  b_sp_PrivilegeRevokeSA integer
+  b_sp_PrivilegeRevokeCA integer
+  b_sp_PrivilegeRevokeAutoOp integer
+  b_sp_PrivilegeRevokeOp integer
+  b_sp_PrivilegeRevokeAutoV integer
+  b_sp_PrivilegeRevokeV integer
+  b_sp_PrivilegeRevokeAllowRegistration integer
+  b_sp_PrivilegeAdminPlayerRegister integer
+  b_sp_PrivilegePlayerDelete integer
+  b_sp_PrivilegeRegisterSelfByDefault integer
+  b_sp_SendTextToAll integer
+  b_sp_SendTextToOwnChannel integer
+  b_sp_SendTextToAllChannel integer
+  b_sp_SendTextToPlayer integer
+  b_sp_KickPlayerFromServer integer
+  b_sp_KickPlayerFromChannel integer
+  b_sp_AllowChannelCommanderStatus integer
+
+=head2 ts2_servers
+
+  i_server_id integer primary key
+  s_server_name varchar(40)
+  s_server_welcomemessage varchar(80)
+  i_server_maxusers integer
+  i_server_udpport integer
+  s_server_password varchar(80)
+  b_server_clan_server integer
+  b_server_allow_codec_celp51 integer
+  b_server_allow_codec_celp63 integer
+  b_server_allow_codec_gsm148 integer
+  b_server_allow_codec_gsm164 integer
+  b_server_allow_codec_celp52 integer
+  b_server_allow_codec_speex2150 integer
+  b_server_allow_codec_speex3950 integer
+  b_server_allow_codec_speex5950 integer
+  b_server_allow_codec_speex8000 integer
+  b_server_allow_codec_speex11000 integer
+  b_server_allow_codec_speex15000 integer
+  b_server_allow_codec_speex18200 integer
+  b_server_allow_codec_speex24600 integer
+  s_server_webposturl varchar(200)
+  s_server_weblinkurl varchar(200)
+  b_server_active integer
+  dt_server_created varchar(20)
+  s_server_description varchar(100)
+
+=head2 ts2_settings
+
+  i_setting_id integer primary key
+  i_setting_server_id integer
+  s_setting_section varchar(40)
+  s_setting_ident varchar(40)
+  s_setting_value varchar(40)
+
+=head1 AVAILABILITY
+
+=over
+
+=item Teamspeak::SQL has been uploaded to the CPAN.
+
+=item $Id: SQL.pod 33 2007-09-21 01:03:27Z maletin $
+
+=item $URL: http://svn.berlios.de/svnroot/repos/cpan-teamspeak/cpan/trunk/lib/Teamspeak/SQL.pod $
+
+=back
+
+=cut
+

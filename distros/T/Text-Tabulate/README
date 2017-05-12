@@ -1,0 +1,25 @@
+Text::Tabulate VERSION 1.0 - pretty print text tables
+
+DESCRIPTION
+Text::Tabulate - a module to pretty print text tables.
+
+COPYRIGHT
+Copyright (c) 1998-2007 Anthony Fletcher. All rights reserved.
+These modules are free software; you can redistribute them and/or modify
+them under the same terms as Perl itself.
+
+This code is supplied as-is - use at your own risk.
+
+PREREQUISITES
+Perl5
+Exporter
+
+HOW TO BUILD AND INSTALL
+perl Makefile.PL
+make
+make test
+make install
+
+SUGGESTIONS
+Send suggestions, bugs, etc. to arif@cpan.org
+

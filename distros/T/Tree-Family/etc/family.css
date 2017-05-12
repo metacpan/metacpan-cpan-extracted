@@ -1,0 +1,119 @@
+body {
+    background-color: #ddd;
+}
+
+a.page_selected,a.page_unselected {
+    border: 1px solid black;
+    text-decoration: none;
+    padding-left: 3px;
+    padding-right: 3px;
+    color: black;
+    background-color: #ccc;
+}
+a.page_selected {
+    background-color: white;
+}
+img {
+    border:0px;
+}
+
+div.title {
+    position: absolute;
+    top: 5;
+    left; 0;
+    font-weight: bold;
+}
+
+select.person_selector {
+    position:absolute;
+    top: 1;
+    right: 0;
+}
+
+input.name,select.name {
+    width:100px;
+}
+
+input.name:disabled,select.name:disabled {
+    background-color:lightgrey;
+    color:black;
+    padding: 2px;
+    width:100px;
+}
+select.name:disabled { width:50px; }
+select.name { width:50px; }
+input.gender {
+    background-color:lightgrey;
+    color:black;
+    padding: 2px;
+    width:30px;
+}
+
+input.date:disabled {
+    background-color:lightgrey;
+    color:black;
+}
+input.location:disabled {
+    background-color:lightgrey;
+    color:black;
+}
+
+div.person {
+    text-align:left;
+}
+
+div.person a {
+    color:white;
+    text-decoration:none;
+    padding-bottom: 1px;
+    padding-left: 1px;
+    padding-right: 1px;
+    border:1px solid #ddd;
+}
+
+div.person a.m {
+    border:3px solid #093AB5;
+    background-color:white;
+    color:black;
+    padding: 2px;
+    margin: 2px;
+}
+
+div.person a.f {
+    border:3px solid #C666B8;
+    background-color:white;
+    color:black;
+    padding: 2px;
+    margin: 2px;
+}
+
+hr {
+margin:0px;
+}
+
+a.edit_button {
+    font-weight:bold;
+}
+
+div.person a.addnew {
+    background-color:#aca;
+    color:#020;
+}
+
+pre.rebuild {
+    background-color: black;
+    color:white;
+    font-weight:bold;
+}
+
+div.person table {
+    width:100%;
+    border:1px solid black;
+}
+
+div.person table tr td {
+    padding: 2px;
+    height:22pt;
+}
+div.person table tr {
+}

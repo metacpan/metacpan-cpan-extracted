@@ -1,0 +1,32 @@
+=== right
+--- wiki
+&align(right){this is right aligned test}
+&align(RIGHT){this is right aligned test}
+--- html
+<div style="text-align:right;">this is right aligned test</div>
+<div style="text-align:right;">this is right aligned test</div>
+=== center
+--- wiki
+&align(center){this is center aligned}
+--- html
+<div style="text-align:center;">this is center aligned</div>
+===left
+--- wiki
+&align(left){this is left aligned as usual}
+--- html
+<div style="text-align:left;">this is left aligned as usual</div>
+=== invalid value
+--- wiki
+&align(hoge){wrong value}
+--- html
+&amp;align(hoge){wrong value}
+=== script
+--- wiki
+&align(<script>hoge</script>){<script>alert('hoge');</script>}
+--- html
+&amp;align(&lt;script&gt;hoge&lt;/script&gt;){&lt;script&gt;alert('hoge');&lt;/script&gt;}
+=== no argument
+--- wiki
+&align(){lack of argument}
+--- html
+&amp;align(){lack of argument}

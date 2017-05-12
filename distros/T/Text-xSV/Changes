@@ -1,0 +1,108 @@
+Revision history for Perl extension Text::xSV.
+
+0.01  Sat Mar 17 00:50:11 2001
+	- original version; posted to PerlMonks
+0.02  Sat Mar 17 14:00:00 2001
+        - Fixed bug in presentation of double-quotes
+0.03  Sun Apr 08 14:00:00 2001
+        - Made warnings safe
+0.04  Mon Apr 16 23:10:00 EDT 2001
+        - Add filter
+        - Slightly improved warnings
+        - Put on CPAN
+0.05  Sun Jun 3 10:00 2001
+	- Make empty unquoted strings null
+	- Fix bug that was hidden by a 5.005_03 bug
+	- Add success tests
+0.06  Sat Nov  1 23:45:00 PST 2003
+        - Fix misnaming of bind_header in documentation
+        - Apply patch from Klaus Weidner <kw@w-m-p.com>
+          for segmentation faults on large fields
+        - Switch to Module::Build
+        - Add alias, delete, get_fields.
+        - Add support for arbitrary computed fields with
+          add_compute.
+0.07  Mon Nov  3 8:30:00 PST 2003
+        - Hopefully fix caching test that was broken on Win32
+          (I strongly suspect due to different behaviour of
+          "local").  The fix also avoids a theroetical bug
+          that I had not thought through with multiple xSV
+          objects whose computes call each other.
+0.08 Sun Dec  7 11:49:39 PST 2003
+        - Made it ignore \r by default (helps *nix users who
+          are reading Windows files).
+        - Allow people to set arbitrary error handling routines.
+        - Added extract_hash and fetchrow_hash utility
+          functions.  I may add more of these later.
+0.09 Mon Mar 15 02:00:00 PST 2004
+        - Fixed bug where row_size would reset on error.
+          (Reported by Rob Kinyon.)
+        - Fixed false claim about Text::CSV.
+        - Made bind_headers an alias for bind_header.
+	- Made open_file not just be for reads.  Documented it.
+	- Added set_row_size.  Documented it.
+	- Gave reasonable defaults if both fh and filename are
+	  missing.  Documented it.
+	- Made row_size warning optional with set_row_size_warning.
+	  per request from Chad Simmons.  Documented it.
+	- Added format_* functions.  Documented them.
+	- Added print_* functions.  Documented them.
+
+0.10 Mon Mar 15 09:00:00 PST 2004
+        - Forgot date on version 0.09.
+        - Empty string when saved and read would come back as undef.
+          Fixed.
+
+0.11 Tue Mar 16 08:00:00 PST 2004
+        - Fix set_sep redefinition bug caught by warnings.
+        - Remove = in a conditional warnings.
+        - Add -w to test.pl so that I won't miss future warnings. :-)
+        - Add set_warning_handler.  Documented it.
+        - Documentation fixes.
+        - Added set_close_fh.  Documented it.  (May remove.)
+        - Added read_header and read_headers.  Removed bind_headers.
+          Documented bind_header as deprecated.
+
+0.12 Tue Sep 28 08:14:03 PDT 2004
+        - Make sure that error_handler is set up before it might be called.
+        - Update my email address.
+        - Update the date on the copyright notice.
+
+0.13 Tue Sep 28 08:35:57 PDT 2004
+        - Make the fallback fh be ARGV instead of STDIN.  This is NOT
+          backwards compatible.  However it is a significantly more
+          useful default.  If I accidentally broke your script, I
+          apologize.  Tell me if I ever meet you and I'll owe you a
+          beer or equivalent.
+
+0.14 Sat Apr 10 00:20 PDT 2005
+        - Change Module::Build to use traditional rather than passthrough.
+	- Document internally why the "single character seperator" limit
+	  exists.
+	- Add a couple of tests.
+
+0.15 Sun May 29 13:00 PDT 2005
+        - Apply patch from Gyepi SAM to prevent warning on fetchrow_hash
+	  at end of file.
+	- Point out that bind_headers does not have a consistent return.
+	  This is not a bug.
+	- Allow fetchrow_hash and extract_hash to take a list of arguments
+	  of the fields that you want extracted.
+
+0.16 Tue Oct  2 17:33 PDT 2007
+	- Fix DESTROY bug reported by Fred Steinberg.
+
+0.17 Thu Mar 12 18:00 PDT 2009
+        - Fix warning_handler bug reported by Carey Drake and Steve Caldwell.
+
+0.18 Fri Mar 13 18:00 PDT 2009
+        - Fix silly bug in last patch.
+
+0.19 Sun Jun 28 18:00 PDT 2009
+        - Add dont_quote and quote_all as suggested by Geoff Gariepy.
+
+0.20 Sat Jul 18 18:00 PDT
+        - Add patch from Ryan Martin to improve read performance over 75%.
+
+0.21 Mon Nov  2 23:18:44 PST 2009
+        - Add ability to parse in non-strict mode.

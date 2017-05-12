@@ -1,0 +1,93 @@
+? bb A
+<math title="bb A">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mstyle fontweight="bold">
+      <mi>A</mi>
+    </mstyle>
+  </mstyle>
+</math>
+$$\bf{A}$$
+
+? bbb A
+<math title="bbb A">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mstyle mathvariant="double-struck">&#xEF8C;</mstyle>
+  </mstyle>
+</math>
+$$\mathds{A}$$
+
+? cc A
+<math title="cc A">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mstyle mathvariant="script">&#xEF35;</mstyle>
+  </mstyle>
+</math>
+$$\cal{A}$$
+
+? tt A
+<math title="tt A">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mstyle fontfamily="monospace">
+      <mi>A</mi>
+    </mstyle>
+  </mstyle>
+</math>
+$$\tt{A}$$
+
+? fr A
+<math title="fr A">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mstyle mathvariant="fraktur">&#xEF5D;</mstyle>
+  </mstyle>
+</math>
+$$\mathfrak{A}$$
+
+? sf A
+<math title="sf A">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mstyle fontfamily="sans-serif">
+      <mi>A</mi>
+    </mstyle>
+  </mstyle>
+</math>
+$$\sf{A}$$
+
+? bb{AB3}.bbb(AB].cc(AB).fr{AB}.tt[AB].sf(AB)
+<math title="bb{AB3}.bbb(AB].cc(AB).fr{AB}.tt[AB].sf(AB)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mstyle fontweight="bold">
+      <mrow>
+        <mi>A</mi>
+        <mi>B</mi>
+        <mn>3</mn>
+      </mrow>
+    </mstyle>
+    <mo>.</mo>
+    <mstyle mathvariant="double-struck">
+      <mrow>&#xEF8C;&#xEF8D;</mrow>
+    </mstyle>
+    <mo>.</mo>
+    <mstyle mathvariant="script">
+      <mrow>&#xEF35;&Bernoullis;</mrow>
+    </mstyle>
+    <mo>.</mo>
+    <mstyle mathvariant="fraktur">
+      <mrow>&#xEF5D;&#xEF5E;</mrow>
+    </mstyle>
+    <mo>.</mo>
+    <mstyle fontfamily="monospace">
+      <mrow>
+        <mi>A</mi>
+        <mi>B</mi>
+      </mrow>
+    </mstyle>
+    <mo>.</mo>
+    <mstyle fontfamily="sans-serif">
+      <mrow>
+        <mi>A</mi>
+        <mi>B</mi>
+      </mrow>
+    </mstyle>
+  </mstyle>
+</math>
+$$\bf{A B 3} . \mathds{A} \mathds{B} . \cal{A} \cal{B} . \mathfrak{A} \mathfrak{B} . \tt{A B} . \sf{A B}$$

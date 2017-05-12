@@ -1,0 +1,17 @@
+Makefile.PL
+MANIFEST
+License.txt
+lib/Thread/Queue/Duplex.pm
+lib/Thread/Queue/Queueable.pm
+lib/Thread/Queue/TQDContainer.pm
+lib/Thread/Queue/Duplex.pod
+lib/Thread/Queue/Queueable.pod
+t/01test.t
+classdocs/index.html
+classdocs/podstyle.css
+classdocs/up.gif
+classdocs/Thread/Queue/Duplex.html
+classdocs/Thread/Queue/Duplex.pod.html
+classdocs/Thread/Queue/Queueable.html
+classdocs/Thread/Queue/Queueable.pod.html
+classdocs/Thread/Queue/TQDContainer.html

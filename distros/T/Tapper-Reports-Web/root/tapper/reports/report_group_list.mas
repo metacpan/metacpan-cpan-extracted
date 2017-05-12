@@ -1,0 +1,21 @@
+<%args>
+    $report
+    %reportlist_rga => {}
+    %reportlist_rgt => {}
+</%args>
+
+% no warnings 'uninitialized';
+% my %cols = $report->get_columns;
+% if (@{$reportlist_rga{reports} || []}) {
+      <h4>Reportgroup (<strong><% $cols{rga_id} %></strong>)</h4>
+      <& /tapper/reports/reportlist.mas, reportlist => \%reportlist_rga, mark_report_id => $report->id &>
+% }
+
+% if (@{$reportlist_rgt{reports} || []}) {
+      <h4>Reports <strong><% $cols{rgt_id} %></strong></h4>
+      <& /tapper/reports/reportlist.mas, reportlist => \%reportlist_rgt, mark_report_id => $report->id &>
+% }
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

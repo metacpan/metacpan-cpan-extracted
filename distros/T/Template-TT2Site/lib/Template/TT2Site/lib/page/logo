@@ -1,0 +1,4 @@
+[% # $Id: logo,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+<a href="[% site.url.home %]">
+[%- INCLUDE util/image image=site.image.logo | trim -%]
+</a>

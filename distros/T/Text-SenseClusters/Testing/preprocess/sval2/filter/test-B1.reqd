@@ -1,0 +1,3 @@
+ERROR(filter.pl):
+	Program allows only one of the filter conditions. 
+	Use either --rank or --percent options.

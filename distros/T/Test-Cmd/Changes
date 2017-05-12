@@ -1,0 +1,196 @@
+Revision history for Perl module Test::Cmd
+
+1.09 2015-10-25 NEILB
+    - README updated with current location of Aegis project.
+      Thanks to @SparkeyG for the pull request
+    - Updated github repo URL after changing my github username
+    - Switched to Dist::Zilla
+
+1.08 2015-01-25 NEILB
+    - Documentation improvements from JMATES++.
+
+1.07 2015-01-07 NEILB
+    - Linkify external module references. JMATES++
+    - Added Test::Pod as a release test. JMATES++
+
+1.06 2014-04-09
+    - First non-developer release by NEILB
+    - Fixed RT#41504
+    - Fixed RT#92082
+    - Fixed RT#92081
+    - Fixed RT#53619
+    - Noted in the pod that I'm now maintaining it.
+
+1.05_02 2014-04-08
+    - If the constructor failed part way, it would sometimes leave cruft
+      behind in TMPDIR. RT#41504 - thanks ANDK.
+
+1.05_01 2014-04-02
+
+    - Specified min perl version 5.6.0 in metadata and in code
+    - Moved the modules into lib/Test/
+    - Added PREREQ_PM, TEST_REQUIRES and CONFIGURE_REQUIRES to Makefile.PL
+    - Added github repo to metadata and the pod
+    - Reformatted Changes file as per CPAN::Changes::Spec
+    - Specified license as 'perl' in metadata, to match doc
+    - Fixed pod error RT#92082
+    - Pod spelling mistake RT#92081
+    - Clarification in doc for new(), that it returns undef on failure,
+      and not false. RT#53619
+
+1.05 2001-09-07
+
+    - Fix the subdir(), read(), and write() methods to handle
+      the case when the first element in an array-reference file
+      name is an absolute path name.
+
+    - Fix writable() so that it only records errors from chmod()
+      on files, not exit with no_result().
+
+    - Doc changes to make some of the variables in the SYNOPSIS
+      look like Perl variables.
+
+    - Add a Test::Cmd::Common module that sub-classes Test::Cmd to
+      provide common exception-handling, eliminating the need for
+      everyone to roll their own fail()/no_result() logic for common
+      errors.
+
+    - Update Test::Cmd documentation to add explicit examples of
+      using Test::Cmd in conjunction with Test::Harness, Test::Unit,
+      and Aegis.  Mention that Test::Cmd::Common is available.
+
+
+1.04 2001-06-16
+
+    - If the run() method is given an explicit 'prog' argument,
+      don't use the test environment's 'interpreter' attribute to run
+      it.  This loses if you're trying to run some other executable
+      that isn't in the same scripting language as the program under
+      test.
+
+
+1.03 2001-06-11
+
+    - Make specification of an 'interpreter' to the run() method
+      independent of whether a 'prog' has been specified.
+
+    - Actually store the absolute path to a workdir specified as a
+      relative path, as advertised.
+      (Thanks to Jonathan Ross <Jonathan.C.Ross@fmr.com> for
+      finding this bug and contributing a patch.)
+
+
+1.02 2001-05-26
+
+    - Small fix to make match() backwards compatible to Perl 5.003.
+
+    - Add diff_exact() and diff_regex() methods for returning
+      UNIX diff(1)-like output from file comparisons.
+
+    - Accomodate $TMPDIR specifications that vary from Cwd::cwd()
+      due to symbolic links or omission of NT drive letters.
+
+
+1.01 200-08-29
+
+    - Add a match_exact() method for non-regex matches.
+
+    - Change the name of the match() method to match_regex().
+
+    - Add a new match() method that calls a registered
+      line-matching subroutine to do the match.  By default,
+      this is match_regex(), so the external interface stays
+      backwards-compatible.
+
+    - Add a match_sub() method that allows an arbitrary
+      line-matching subroutine to be registered.
+
+    - EXPORT_OK the match_exact() and match_regex() methods
+      to make it easier to register them.
+
+
+1.00 2000-05-26
+
+    - The early versions have been out there long enough,
+      so promote the version number to 1.00.
+
+    - White space cleanup.
+
+    - Small fixes for Perl 5.003:  put quotes around hash index
+      strings; don't use "my" on the same line as "foreach".
+
+    - Add copyright statements to appropriate files.
+
+
+0.04 2000-02-09
+
+    - Removed unnecessary t0001a.pl file (internal testing glue
+      for the change management system).
+
+    - In the run() method, add the ability to pipe input into a
+      command.
+
+    - Add a match() method that matches input lines one-for-one
+      against an equal number of of regular expressions.
+
+    - Have the run() method support 'prog' and 'interpreter' arguments,
+      for one-shot execution of a program.
+
+    - Remove direct exception throws (calls to $self->no_result)
+      by the run() and workdir() methods.  Exceptions should be
+      handled by the test itself or a subclass specific to the
+      program under test.
+
+
+0.03 2000-02-01
+
+    - Minor white space cleanup.
+
+    - Allow the write() method to take an absolute path name.
+
+    - Documentation cleanup.
+
+    - Add a read() method as a companion to write().
+
+    - Directories were still removed on fail/no result if
+      PRESERVE_FAIL and PRESERVE_NO_RESULT were set.  Fixed.
+
+    - Where possible, use array assignment, not shift, for
+      method arguments.
+
+
+0.02 2000-01-13
+
+    - Add a string() method to arrange for printing info about
+      specific functionality under test upon failure or no result.
+
+    - Add a basename() method to return the basename of the
+      program under test (the prog() method returns the full path).
+
+    - Add a workpath() method to catfile its arguments to the
+      end of the temporary working directory; this pushes more
+      of the OS-dependent gunk into the module.
+
+    - Allow the write() method to take an array reference as a
+      file name argument, in which case the arguments are
+      concatenated using File::Spec->catfile().
+
+    - Allow the subdir() method to take a array references as
+      arguments, in which case the elements are concatenated
+      using File::Spec->catfile().
+
+    - Change the run() method to take named-keyword arguments
+      like $test->run(args => '1 2 3', chdir => 'sub/dir')
+      instead of the old positional arguments.
+
+    - Add $caller arguments to the fail() and no_result()
+      methods which specify how many levels back to print a
+      trace of the exiting line.  This allows nested packages
+      to get back to the original caller.
+
+
+0.01 1999-11-11
+
+    - Original version; created by h2xs 1.19
+    - Not released to CPAN
+

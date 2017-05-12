@@ -1,0 +1,10 @@
+Revision history for Perl extension Task-BeLike-TOKUHIROM
+
+0.02 2014-03-20T01:34:31Z
+
+    - Added App::scan_prereqs_cpanfile
+
+0.01 2013-08-21T03:25:52Z
+
+    - original version
+

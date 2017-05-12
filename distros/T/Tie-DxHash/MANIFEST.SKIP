@@ -1,0 +1,15 @@
+#defaults
+\.bak$
+\.gz$
+\.svn
+\.tdy$
+\.tmp$
+^Build$
+^Makefile$
+^\.cvs
+^_build/
+^blib/
+^blibdirs
+^cover_db/
+^pm_to_blib
+~$

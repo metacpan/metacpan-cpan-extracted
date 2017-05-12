@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-XPMs.t
+lib/Tk/XPMs.pm
+META.yml                                 Module meta-data (added by MakeMaker)

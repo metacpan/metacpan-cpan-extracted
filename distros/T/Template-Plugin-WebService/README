@@ -1,0 +1,58 @@
+NAME
+    Template::Plugin::WebService - plugin to allow webservice calls from
+    Template and Template::Alloy
+
+SYNOPSIS
+      [% USE web_service = WebService %]
+      [% form = { 'outserial' => 'xml' } %]
+      [% stuff = web_service.webservice_call(url, form) %]
+      # url is the url to hit
+
+      [% stuff = web_service.webservice_call('/path/to/api', form) %]
+      # form is a hash ref that gets appended to the url
+      # url can be relative, where the domain gets set to $self->default_host
+
+      [% stuff = web_service.webservice_call('http://domain.com/path/to/api', form) %]
+
+
+DESCRIPTION
+    Template::Plugin::WebService helps handle HTTP from a template.
+
+FEATURES
+     - handles web requests from your template
+     - passes along a passed in form
+     - passes along any cookies
+     - handles many serializations (JSON, Storable, XML::Simple, YAML)
+     - defaults to JSON
+
+OVERRIDABLE METHODS
+    content_cleanup - gets sent a Template::Plugin::WebService object and a
+    reference to the response content
+
+    default_host - gets prepended to your url if your url doesn't start with
+    http://. Defaults to 127.0.0.1
+
+    outserial_key - server sends out a key which defines serialization.
+    Defaults to outserial.
+
+AUTHOR
+    Copyright 2008, Earl J. Cahill. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Address bug reports and comments to: cahille@yahoo.com
+
+    When sending bug reports, please provide the version of
+    Template::Plugin::WebService, the version of Perl, and the name and
+    version of the operating system you are using.
+
+    Earl Cahill, cahille@yahoo.com
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by Earl Cahill
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

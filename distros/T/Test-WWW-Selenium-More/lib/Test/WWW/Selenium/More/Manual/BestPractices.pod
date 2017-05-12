@@ -1,0 +1,67 @@
+package Test::WWW::Selenium::More::Manual::BestPractices;
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::BestPractices
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::BestPractices
+
+=head1 BEST PRACTICES
+
+Following these guidelines will make your life easier when writing Selenium
+tests.  They are listed in order of importance.
+
+=head2 Don't use pause() or sleep()
+
+Sometimes people use pause() or sleep() because wait_for_page_to_load_ok()
+doesn't work for them.  The reason it doesn't work is page components are
+loading via JavaScript and wait_for_page_to_load_ok() ignores anything
+JavaScript related.
+
+However using these methods will make your tests take a long time and will
+cause hard to reproduce intermittent failures and generally drive you crazy.  
+
+If your page uses jQuery, use jquery_wait_for_page_to_load_ok().
+
+If your page doesn't use jQuery you can use wait_for_text_present_ok() in most
+cases.
+
+=head2 Use XPATH locators
+
+CSS can't choose the nth thing in a list or table.  XPATH can.  For the sake of
+consistency you may want to stay with XPATH.
+
+=head2 Use comments when things get complicated
+
+Most methods allow you to pass along a comment.  The comment shows up in your TAP output.  
+
+For example.  Sometimes when using XPATH, you should add a comment to the
+test output.  You can do that like this: 
+
+    $selenium->click_ok('//table/tbody/tr[3]/td/input[name=foo]', "click 3rd checkbox")
+
+=head2 Use $selenium->note() to document your tests
+
+This works like Test::More::note().
+
+=head1 AUTHOR
+
+Eric Johnson <kablamo at iijo dot nospamthanks dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Eric Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

@@ -1,0 +1,29 @@
+Term-Shelly version 0.01
+========================
+
+This is a shell-kit-thing useful for doing input handling. Supports tab completion presently, line editing, and that's about it. It'll support more in the future. Right now I needed something That Just Worked(tm).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Term::ReadKey
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Jordan Sissel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

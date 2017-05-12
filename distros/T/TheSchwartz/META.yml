@@ -1,0 +1,41 @@
+---
+abstract: 'reliable job queue'
+author:
+  - 'Six Apart <cpan@sixapart.com>'
+build_requires:
+  Data::ObjectDriver: 0.04
+  Digest::MD5: 0
+  Module::Build: 0
+  Storable: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TheSchwartz
+provides:
+  TheSchwartz:
+    file: lib/TheSchwartz.pm
+    version: 1.12
+  TheSchwartz::Error:
+    file: lib/TheSchwartz/Error.pm
+  TheSchwartz::ExitStatus:
+    file: lib/TheSchwartz/ExitStatus.pm
+  TheSchwartz::FuncMap:
+    file: lib/TheSchwartz/FuncMap.pm
+  TheSchwartz::Job:
+    file: lib/TheSchwartz/Job.pm
+  TheSchwartz::JobHandle:
+    file: lib/TheSchwartz/JobHandle.pm
+  TheSchwartz::Worker:
+    file: lib/TheSchwartz/Worker.pm
+requires:
+  Data::ObjectDriver: 0.04
+  Digest::MD5: 0
+  Storable: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.12

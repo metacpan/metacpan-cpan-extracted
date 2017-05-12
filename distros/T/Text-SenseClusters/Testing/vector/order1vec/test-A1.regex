@@ -1,0 +1,7 @@
+/\s(<[^>]*>)*time(<[^>]*>)*\s/ @name = time
+/\s(<[^>]*>)*task(<[^>]*>)*\s/ @name = task
+/\s(<[^>]*>)*believe(<[^>]*>)*\s/ @name = believe
+/\s(<[^>]*>)*life(<[^>]*>)*\s/ @name = life
+/\s(<[^>]*>)*control(<[^>]*>)*\s/ @name = control
+/\s(<[^>]*>)*words(<[^>]*>)*\s/ @name = words
+/\s(<[^>]*>)*define(<[^>]*>)*\s/ @name = define

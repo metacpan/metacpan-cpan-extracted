@@ -1,0 +1,19 @@
+#for ##for_block##
+    a = ##a##, b = ##b##, size=##for_block_SIZE##, id = ##for_block_IDX##
+#endfor
+
+#for ##for_block##; sep=","
+    a = ##a##, top-lvl-value = ##value##
+#endfor
+
+#for ##for_block##
+line1
+line2
+#endfor
+
+#for ##nested_for_block##; sep=","
+	a = ##a##
+    #for ##s##; sep=";"
+		a = ##a##
+    #endfor
+#endfor

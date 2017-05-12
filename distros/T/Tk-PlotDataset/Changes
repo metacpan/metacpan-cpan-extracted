@@ -1,0 +1,25 @@
+Revision history for Tk-PlotDataset
+
+2.05    15/08/2016
+        Fixed double usage of my in declaration of variable.
+
+2.04    12/04/2013
+        Support for plotting y-error bars added by Thomas Pissulla.
+        Added a setting to control when the data points are marked on the plot.
+
+2.03    05/11/2012
+        Added support for reversing an axis by swapping its minimum and maximum
+        scale values around.
+
+2.02    03/12/2007
+        Convert files to Unix line separators. Fixed the failing pod.t test.
+
+2.01    03/12/2007
+        Fixed the failing boilerplate.t test.
+
+2.00    03/12/2007
+        Improved support for log axes. Added extra options for formatting the
+        graph. Fixed a memory leak.
+
+1.00    16/04/2007
+        First version. Modified version of the Tk::LineGraph module.

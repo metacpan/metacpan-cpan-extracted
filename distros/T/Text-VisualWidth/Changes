@@ -1,0 +1,10 @@
+Revision history for Perl extension Text::VisualWidth.
+
+0.02  Thu May 22 17:36:04 2008
+        - Fixed bug that was reported at #34781.
+          ( Text::VisualWidth::UTF8::width("0"); # expected 1, but got 0. )
+        - Fixed other bugs about "0" string also.
+
+0.01  Mon Apr 23 05:20:50 2007
+	- original version; created by h2xs 1.23 with options
+		--compat-version=5.6.0 -cn Text::VisualWidth

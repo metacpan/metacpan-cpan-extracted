@@ -1,0 +1,27 @@
+
+
+UUT: File/Version.pm^
+File_Spec:  ^
+Revision: ^
+End_User:^
+
+Author: http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com^
+SVD: SVD::DataCop-DataFile^
+Template: STD/STD001.frm^
+
+~-~
+
+Email: nobody@hotmail.com^
+Form: Udo-fully processed oils^
+Tutorial: *~~* Better Health thru Biochemistry *~~*^
+REMOTE_ADDR: 213.158.186.150^
+HTTP_USER_AGENT: Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; DigExt)^
+HTTP_REFERER: http://computerdiamonds.com/^
+
+~-~
+
+EOF: \n^  EOL: \n^^\n^ EOV: }^ SOV: ${^ ~-~
+EOF: ^^ ^ EOL: ~--~^   SOV: ${^ EOV: }~-~
+EOF: ^^^ ^ EOL: ~----~^   SOV: ${^  EOV: }
+
+

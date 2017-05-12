@@ -1,0 +1,24 @@
+Revision history for Test-TempDir
+
+0.10   2015-05-16 03:52:31Z
+  - mark this distribution as deprecated in metadata
+
+0.09   2014-11-05 03:55:58Z
+  - add formal deprecation notice - please use Test::TempDir::Tiny instead!
+
+0.08   2013-09-25 02:21:17Z
+  - re-release with fixed compile test
+
+0.07   2013-09-12 05:13:09Z
+  - fixed test error from last release when Directory::Scratch is not
+    installed
+
+0.06   2013-09-12 00:22:49Z
+  - fixed enum declaration, as per deprecations in Moose-2.1100
+  - converted to Dist::Zilla
+
+0.05   2009-08-10 23:57:18Z
+  - Look! A changelog! This wasn't too hard, was it? :-)
+  - Allow setting the default for Test::TempDir::Factory's use_subdir using the
+    environment variable TEST_TEMPDIR_USE_SUBDIR.
+  - Depend on a Moose version where delegations to class names work.

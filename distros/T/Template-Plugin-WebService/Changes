@@ -1,0 +1,12 @@
+Revision history for Perl extension Template::Plugin::WebService.
+
+0.12  Wed Mar 26 22:54:33 2008
+	- original version; created by h2xs 1.23 with options
+		-e -n Template::Plugin::WebService
+
+0.14  Thu Mar 27 00:21:33 2008
+    - how about that Is?
+
+0.16  Thu Mar 27 00:50:33 2008
+    - need XML::Simple::XMLin
+    - allowing for outserial in the qs

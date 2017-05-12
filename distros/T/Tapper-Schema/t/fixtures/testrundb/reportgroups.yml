@@ -1,0 +1,161 @@
+---
+
+- schema: Report
+  name: dummy 1
+  data:
+    id: 21
+
+- schema: Tap
+  name: tap 1
+  data:
+    id: 1
+    report_id: 21
+    tap: |
+      1..4
+      # Tapper-Suite-Name: Hossa
+      # Tapper-Suite-Version: 1.0
+      OK 1 foo AAA
+      OK 2 bar AAA
+      OK 3 affe AAA
+      OK 4 zomtec AAA
+
+- schema: Report
+  name: dummy 2
+  data:
+    id: 22
+
+- schema: Tap
+  name: tap 2
+  data:
+    id: 2
+    report_id: 22
+    tap: |
+      1..4
+      # Tapper-Suite-Name: Hossa
+      # Tapper-Suite-Version: 1.0
+      OK 1 foo BBB
+      OK 2 bar BBB
+      NOT OK 3 affe BBB
+      OK 4 zomtec BBB
+
+- schema: Report
+  name: dummy 3
+  data:
+    id: 23
+
+- schema: Tap
+  name: tap 3
+  data:
+    id: 3
+    report_id: 23
+    tap: |
+      1..4
+      # Tapper-Suite-Name: Hossa
+      # Tapper-Suite-Version: 1.0
+      OK 1 foo CCC
+      OK 2 bar CCC
+      OK 3 affe CCC
+      OK 4 zomtec CCC
+
+- schema: Report
+  name: dummy 4
+  data:
+    id: 24
+
+- schema: Tap
+  name: tap 4
+  data:
+    id: 4
+    report_id: 24
+    tap: |
+      1..4
+      # Tapper-Suite-Name: Hossa
+      # Tapper-Suite-Version: 1.0
+      OK 1 foo DDD
+      OK 2 bar DDD
+      OK 3 affe DDD
+      OK 4 zomtec DDD
+
+- schema: Report
+  name: dummy 5
+  data:
+    id: 25
+
+- schema: Tap
+  name: tap 5
+  data:
+    id: 5
+    report_id: 25
+    tap: |
+      1..4
+      # Tapper-Suite-Name: Hossa
+      # Tapper-Suite-Version: 1.0
+      OK 1 foo EEE
+      OK 2 bar EEE
+      OK 3 affe EEE
+      OK 4 zomtec EEE
+
+- schema: Report
+  name: dummy 6
+  data:
+    id: 26
+
+- schema: Tap
+  name: tap 6
+  data:
+    id: 6
+    report_id: 26
+    tap: |
+      1..4
+      # Tapper-Suite-Name: Hossa
+      # Tapper-Suite-Version: 1.0
+      OK 1 foo FFF
+      OK 2 bar FFF
+      OK 3 affe FFF
+      OK 4 zomtec FFF
+
+# ---------- first group ----------
+
+- schema: ReportgroupTestrun
+  name: rg 1
+  data:
+    testrun_id: 753
+    report_id: 21
+    primaryreport: 0
+
+- schema: ReportgroupTestrun
+  name: rg 2
+  data:
+    testrun_id: 753
+    report_id: 22
+    primaryreport: 1
+
+- schema: ReportgroupTestrun
+  name: rg 3
+  data:
+    testrun_id: 753
+    report_id: 23
+    primaryreport: 0
+
+# ---------- second group ----------
+
+- schema: ReportgroupArbitrary
+  name: rs 4
+  data:
+    arbitrary_id: blubberzomtec
+    report_id: 24
+    primaryreport: 0
+
+- schema: ReportgroupArbitrary
+  name: rs 5
+  data:
+    arbitrary_id: blubberzomtec
+    report_id: 25
+    primaryreport: 0
+
+- schema: ReportgroupArbitrary
+  name: rs 6
+  data:
+    arbitrary_id: blubberzomtec
+    report_id: 26
+    primaryreport: 1

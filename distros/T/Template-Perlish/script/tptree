@@ -1,0 +1,319 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Carp;
+use Pod::Usage qw( pod2usage );
+use Getopt::Long qw( :config gnu_getopt );
+my $VERSION = '1.0';
+use English qw( -no_match_vars );
+use Fatal qw( open );
+use Storable qw( thaw fd_retrieve );
+use File::Spec::Functions qw( catdir catfile splitpath );
+use File::Path qw( mkpath );
+use Template::Perlish;
+
+my %config = (source => '', dest => '', process => '.');
+GetOptions(
+   \%config,                    'usage',
+   'help',                      'man',
+   'version',                   'source|src|s=s',
+   'dest|dst|d=s',              'define|D=s@',
+   'hdefine|hex-define|H|X=s@', 'sdefine|storable-define|S=s@',
+   'edefine|eval-define|E=s@',  'sstdin|storable-stdin|i!',
+   'process|p=s',               'verbose|v!',
+   'variables|V!',
+);
+
+pod2usage(message => "$0 $VERSION", -verbose => 99, -sections => '')
+  if $config{version};
+pod2usage(-verbose => 99, -sections => 'USAGE') if $config{usage};
+pod2usage(-verbose => 99, -sections => 'USAGE|EXAMPLES|OPTIONS')
+  if $config{help};
+pod2usage(-verbose => 2) if $config{man};
+
+# Script implementation here
+die 'no source directory, bailing out' unless -d $config{source};
+die 'no destination directory, bailing out' unless defined $config{dest};
+if (!-d $config{dest}) {
+   mkpath([$config{dest}])
+     or die "could not create destination directory '$config{dest}'";
+}
+
+my $variables = get_variables();
+if ($config{variables}) {
+   require Data::Dumper;
+   print {*STDERR} "Configuration: ", Data::Dumper::Dumper($variables);
+}
+my $tp            = Template::Perlish->new(variables => $variables);
+my $it            = input_file_iterator();
+my $process_regex = qr/$config{process}/;
+while (defined(my $file = $it->())) {
+   my $source = catfile($config{source}, $file);
+   my $dest   = catfile($config{dest},   $file);
+   my ($vol, $dir,) = splitpath($dest);
+   if (!-d (my $destdir = $vol . $dir)) {
+      mkpath([$destdir]);
+   }
+
+   print {*STDERR} $file, "\n" if $config{verbose};
+   my $template = read_file($source);
+   my $output =
+     $file =~ m{$process_regex} ? $tp->process($template) : $template;
+   write_file($dest, $output);
+} ## end while (defined(my $file =...
+exit 0;
+
+sub input_file_iterator {
+   my @dirstack = '.';
+   my @files;
+   return sub {
+      while (!@files) {
+         return unless @dirstack;
+         my $dir = shift @dirstack;
+         my $fulldir = catdir($config{source}, $dir);
+         opendir my $d, $fulldir or die "opendir(): $OS_ERROR";
+         while (defined(my $item = readdir $d)) {
+            next if $item eq '.' || $item eq '..';
+            my $relpath = catfile($dir, $item);
+            if (-d catfile($config{source}, $relpath)) {
+               push @dirstack, $relpath;
+            }
+            else {
+               push @files, $relpath;
+            }
+         } ## end while (defined(my $item =...
+         closedir $d;
+      } ## end while (!@files)
+
+      return shift @files;
+   };
+} ## end sub input_file_iterator
+
+sub get_variables {
+   my %variables;
+   for my $dtype (qw( define edefine hdefine sdefine )) {
+      my $definitions = $config{$dtype};
+      my $filter      = {
+         define  => sub { shift },
+         edefine => sub { eval shift },
+         hdefine => sub { pack 'H*', shift },
+         sdefine => sub { thaw pack 'H*', shift },
+      }->{$dtype};
+      for my $definition (@$definitions) {
+         my ($name, $value) = split /=/, $definition, 2;
+         $variables{$name} = defined $value ? $filter->($value) : 1;
+      }
+   } ## end for my $dtype (qw( define edefine hdefine sdefine ))
+
+   if (exists $config{sstdin}) {
+      my $href = fd_retrieve(\*STDIN);
+      while (my ($k, $v) = each %$href) {
+         $variables{$k} = $v;
+      }
+   } ## end if (exists $config{sstdin...
+
+   return %variables if wantarray;
+   return \%variables;
+} ## end sub get_variables
+
+sub read_file {
+   my ($input) = @_;
+   my $fh =
+     ref($input)
+     ? $input
+     : do { open my $fh, '<', $input; $fh };
+   local $INPUT_RECORD_SEPARATOR;    # to slurp whole file
+   binmode $fh;
+   my $retval = <$fh>;
+   close $fh unless ref $input;
+   return $retval;
+} ## end sub read_file
+
+sub write_file {
+   my $output = shift;
+   my $fh =
+     ref($output)
+     ? $output
+     : do { open my $fh, '>', $output; $fh };
+   binmode $fh;
+   print {$fh} @_;
+   close $fh unless ref $output;
+   return;
+} ## end sub write_file
+
+__END__
+
+=head1 NAME
+
+tptree - a very humble imitation of ttree from TT2
+
+=head1 VERSION
+
+Ask the version number to the script itself, calling:
+
+   shell$ tptree --version
+
+
+=head1 USAGE
+
+   tptree [--usage] [--help] [--man] [--version]
+
+   tptree [--source|--src|-s directory] [--dest|--dst|-d directory]
+      [--process|-p regex] [--verbose|-v] [--variables|-V]
+      [--define|-D item] [--edefine|--eval-define|-E item]
+      [--hdefine|--hex-define|-H|-X item] 
+      [--sdefine|--storable-define|-S item]
+      [--sstdin|--storable-stdin|-i]
+
+=head1 EXAMPLES
+
+   shell$ tptree
+
+   shell$ tptree --src source --dst /path/to/dst --define ciao='a tutti'
+
+=head1 DESCRIPTION
+
+This simple script tries to capture what I've personally found to be 90%
+of the useful functionality in TT2: recursing into a given file tree, 
+apply the transformations with the templating system, and put the result
+into a directory tree analogous to the starting one, but where I desire.
+
+As a minimum, you have to provide a source directory and a destination.
+Every output directory that's not already there will be created, so
+the destination directory needs not to be previously created.
+
+During processing, you can decide which files should be included by
+providing a selection regular expression through C<--process|-p>.
+
+One aspect where tptree goes quite on its own way is variable passing.
+While TT2's ttree is bound to simple C<variable=value> paradigm, tptree
+offers a wide variety for both escaping/encoding the variables, or
+get them via standard input (<--sstdin|--storable-stdin|-i>).
+
+=head1 OPTIONS
+
+Parameter passing options are discussed in a section by themselves, to
+be found later in this document.
+
+=over
+
+=item --dest | --dst | -d directory
+
+set the destination directory root.
+
+=item --help
+
+print a somewhat more verbose help, showing usage, this description of
+the options and some examples from the synopsis.
+
+=item --man
+
+print out the full documentation for the script.
+
+=item --process | -p regex
+
+set the given regex as a regular expression to be matched on each
+filename found in the hierarchy. If matches, the file is "executed",
+otherwise.
+
+=item --source | --src | -s directory
+
+set the source directory for directory root.
+
+=item --usage
+
+print a concise usage line and exit.
+
+=item --variables | -V
+
+print a dump of the configured variables.
+
+=item --verbose | -v
+
+output some debug messages during execution.
+
+=item --version
+
+print the version of the script.
+
+=back
+
+=head2 Variable Passing
+
+There are three variables-setting facilities that can be used on the
+command line:
+
+=over
+
+=item --define | -D name=value
+
+set name as value
+
+=item --edefine | --eval-define | -E name=expression
+
+evaluate expression and set name to the result. So, for example you can
+say:
+
+   name='[qw(ciao a tutti)]'
+
+and get name set to an anonymous array containing three elements
+(guess which?)
+
+=item --hdefine | --hex-define | -H | -X name=hexvalue
+
+convert hexvalue back to unencoded form, using C<pack>'s template
+'H*', then set as the value of variable C<name>.
+
+=item --sdefine | --storable-define | -S name=storable-hex
+
+convert storable-hex back into binary data (using 'H*'), then retrieve
+a value using Storable.
+
+=back
+
+Last, but not least, a set of variables embedded into a hash ref
+encoded with Storable can be read from the standard input:
+
+=over
+
+=item --sstdin | --storable-stdin | -i!
+
+get configuration from standard input, decoding it using Storable.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+tptree requires no configuration files or environment variables.
+
+
+=head1 DEPENDENCIES
+
+None, apart Template::Perlish. Unless it has been embedded in this very
+file.
+
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through http://rt.cpan.org/
+
+
+=head1 AUTHOR
+
+Flavio Poletti C<polettix@cpan.org>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008-2015 by Flavio Poletti C<polettix@cpan.org>.
+
+This program is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -1,0 +1,51 @@
+README for Tree::Trie
+
+			    Tree::Trie
+
+Tree::Trie is an implementation of a Trie data structure in Perl.
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.10.0, so for
+anything lower, you're on your own.
+
+Tree::Trie doesn't use any nonstandard modules.  In fact, it doesn't use
+any modules at all.
+
+INSTALLATION
+
+You install Tree::Trie, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Tree::Trie in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+DOCUMENTATION
+
+POD-format documentation is included in Trie.pm.  POD is readable
+with the 'perldoc' utility.
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Tree::Trie should just be sent to me at avi@finkel.org
+
+AVAILABILITY
+
+The latest version of Tree::Trie is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+COPYRIGHT
+
+Copyright 2010, Avi Finkel <avi@finkel.org>, all rights
+reserved.  This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.

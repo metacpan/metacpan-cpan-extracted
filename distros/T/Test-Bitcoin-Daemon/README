@@ -1,0 +1,33 @@
+Test::Bitcoin::Daemon
+=====================
+
+This module is meant to be used for testing. It will launch an instance of
+bitcoind in a temporary directory at a random port, and provide this
+information to the caller so tests that require an RPC connection to a running
+bitcoind instance can be run.
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+============
+
+This module requires bitcoind from bitcoin.org.
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2013 by Jean-Pierre Rupp
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

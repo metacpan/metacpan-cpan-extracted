@@ -1,0 +1,52 @@
+Test-Varnish
+
+Varnish is a high performance reverse proxy.
+
+Test::Varnish allows you to perform tests against a varnish server,
+asserting that a given resource (URL) is cached by varnish or not.
+
+See it as a sort of Test::More extension to test Varnish.
+This can be useful when you want to test that your varnish setup
+and configuration works as expected.
+
+Another use for this module would be to poll random webservers to
+discover who is using Varnish.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Varnish
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Varnish
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Varnish
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Varnish
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Varnish
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Cosimo Streppone
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

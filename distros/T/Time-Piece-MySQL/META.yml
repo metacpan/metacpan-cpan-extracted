@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Time-Piece-MySQL
+version:             0.06
+abstract:            Adds MySQL-specific methods to Time::Piece
+license:             ~
+author:              
+    - Marty Pauley <marty+perl@kasei.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0.47
+    Time::Piece:                   1.03
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

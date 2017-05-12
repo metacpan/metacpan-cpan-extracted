@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-too_many_test" errors="1" failures="4" tests="7" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/too_many.test">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Explanation:
+    failed tests (4, 5, 6, 7)
+    parse errors (Bad plan.  You planned 3 tests but ran 7.)
+Test output:
+    not ok - t/internal_tests/too_many.test
+]]>
+    </failure>
+  </testcase>
+  <testcase name="test 1"/>
+  <testcase name="test 2"/>
+  <testcase name="test 3"/>
+  <testcase name="test 4">
+    <failure>
+<![CDATA[Fail reason(s):
+    unplanned test
+Test output:
+    ok 4
+]]>
+    </failure>
+  </testcase>
+  <testcase name="test 5">
+    <failure>
+<![CDATA[Fail reason(s):
+    unplanned test
+Test output:
+    ok 5
+]]>
+    </failure>
+  </testcase>
+  <testcase name="test 6">
+    <failure>
+<![CDATA[Fail reason(s):
+    unplanned test
+Test output:
+    ok 6
+]]>
+    </failure>
+  </testcase>
+  <testcase name="test 7">
+    <failure>
+<![CDATA[Fail reason(s):
+    unplanned test
+Test output:
+    ok 7
+]]>
+    </failure>
+  </testcase>
+</testsuite>

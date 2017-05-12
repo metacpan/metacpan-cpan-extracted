@@ -1,0 +1,413 @@
+[% USE ListOps; -%]
+This tests list operations:
+
+[% l = [ 'a', 'a', 'c', 'b' ] -%]
+Print a list (a a c b)                 :
+[%- FOREACH ele = l -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'a', 'c', 'b' ] -%]
+  joined with (:)                      :
+[%- FOREACH ele = ListOps.join(l,':') -%]
+ [% ele -%]
+[% END -%]
+
+[% t = [ 'a', 'a', 'c', 'b' ] -%]
+  unique applied (a c b)               :
+[%- FOREACH ele = ListOps.unique(t) -%]
+ [% ele -%]
+[% END -%]
+
+  from data (A A C B)                  :
+[%- FOREACH ele = A -%]
+ [% ele -%]
+[% END -%]
+
+List with undef (A undef Z)            :
+[%- FOREACH ele = U -%]
+ [% ele -%]
+[% END -%]
+
+  and compacted                        :
+[%- FOREACH ele = ListOps.compact(U) -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+Union (duplicates) (a a c b a c d d e) :
+[%- FOREACH ele = ListOps.union(l1,l2,"duplicates") -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+  uniqued                              :
+[%- FOREACH ele = ListOps.union(l1,l2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+  alternate uniqued call               :
+[%- FOREACH ele = ListOps.union(l1,l2,"unique") -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+Difference (unique) of two lists (b)   :
+[%- FOREACH ele = ListOps.difference(l1,l2,"unique") -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+  alternate call                       :
+[%- FOREACH ele = ListOps.difference(l1,l2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+  removing only single instances (a b) :
+[%- FOREACH ele = ListOps.difference(l1,l2,"duplicates") -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'a', 'a', 'b' ] -%]
+Intersection (unique) of lists (a b)   :
+[%- FOREACH ele = ListOps.intersection(l1,l2,"unique") -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'a', 'a', 'b' ] -%]
+  alternate call                       :
+[%- FOREACH ele = ListOps.intersection(l1,l2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'a', 'a', 'b' ] -%]
+  (duplicates) version (a a b)         :
+[%- FOREACH ele = ListOps.intersection(l1,l2,"duplicates") -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'a', 'a', 'b' ] -%]
+Symmetric difference (unique) (c)      :
+[%- FOREACH ele = ListOps.symmetric_difference(l1,l2,"unique") -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'a', 'a', 'b' ] -%]
+  alternate call                       :
+[%- FOREACH ele = ListOps.symmetric_difference(l1,l2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'a', 'c', 'b' ] -%]
+[% l2 = [ 'a', 'a', 'a', 'b' ] -%]
+  (duplicates) version (c a)           :
+[%- FOREACH ele = ListOps.symmetric_difference(l1,l2,"duplicates") -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'a', 'c', 'b' ] -%]
+At (a c)                               : [% ListOps.at(l,1) %] [% ListOps.at(l,2) -%]
+
+[% l = [ 'a', 'a', 'c', 'b' ] -%]
+Sorted list (a a b c)                  :
+[%- FOREACH ele = ListOps.sorted(l,"forward") -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'a', 'c', 'b' ] -%]
+  alternate call                       :
+[%- FOREACH ele = ListOps.sorted(l) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'a', 'c', 'b' ] -%]
+  reversed                             :
+[%- FOREACH ele = ListOps.sorted(l,"reverse") -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ '10', '7', '15', '-5' ] -%]
+  numerical sort                       :
+[%- FOREACH ele = ListOps.sorted(l,"forw_num") -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ '10', '7', '15', '-5' ] -%]
+  reversed                             :
+[%- FOREACH ele = ListOps.sorted(l,"rev_num") -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ '128.227.208.63', '10.227.208.42', '128.227.208.75', '10.227.208.3' ] -%]
+  ips sorted                           :
+[%- FOREACH ele = ListOps.sorted(l,"ip") -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'Jul 4 2000', 'May 31 2000', 'Dec 31 1999', 'Jan 3 2001' ] -%]
+  dates sorted                         :
+[%- FOREACH ele = ListOps.sorted(l,"dates") -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'Jul 4 2000', 'May 31 2000', 'Dec 31 1999', 'Jan 3 2001' ] -%]
+  reversed                             :
+[%- FOREACH ele = ListOps.sorted(l,"rev_dates") -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+Testing first and last (a e)           : [% ListOps.first(l) %] [% ListOps.last(l) -%]
+
+[% l = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+  and shift (a c)                      : [% ListOps.shiftval(l) %] [% ListOps.shiftval(l) -%]
+
+[% l = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+  and pop (e d)                        : [% ListOps.popval(l) %] [% ListOps.popval(l) -%]
+
+[% l = [ 'm' ] -%]
+Testing unshift value (a m)            :
+[%- FOREACH ele = ListOps.unshiftval(l,'a') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'm' ] -%]
+        unshift values (a b m)         :
+[%- FOREACH ele = ListOps.unshiftval(l,'a','b') -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'm' ] -%]
+[% l2 = [ 'a', 'a', 'c', 'b' ] -%]
+        unshift list (a a c b m)       :
+[%- FOREACH ele = ListOps.unshiftval(l1,l2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'm' ] -%]
+Testing push value (m z)               :
+[%- FOREACH ele = ListOps.pushval(l,'z') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'm' ] -%]
+        push values (m y z)            :
+[%- FOREACH ele = ListOps.pushval(l,'y','z') -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'm' ] -%]
+[% l2 = [ 'a', 'a', 'c', 'b' ] -%]
+        push list (m a a c b)          :
+[%- FOREACH ele = ListOps.pushval(l1,l2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+Testing minalph (a)                    : [% ListOps.minalph(l) -%]
+
+[% l = [ 'a', 'c', 'd', 'd', 'e' ] -%]
+        maxalph (e)                    : [% ListOps.maxalph(l) -%]
+
+[% l = [ '10', '7', '15', '-5' ] -%]
+        min (-5)                       : [% ListOps.minval(l) -%]
+
+[% l = [ '10', '7', '15', '-5' ] -%]
+        max (15)                       : [% ListOps.maxval(l) -%]
+
+[% l = [ 'a', 'z' ] -%]
+Testing impose (append) (a_x z_x)      :
+[%- FOREACH ele = ListOps.impose(l,'_x','append') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'z' ] -%]
+        alternate                      :
+[%- FOREACH ele = ListOps.impose(l,'_x') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'z' ] -%]
+        prepend (x_a x_z)              :
+[%- FOREACH ele = ListOps.impose(l,'x_','prepend') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'a', 'c', 'b' ] -%]
+Testing reverse (b c a a)              :
+[%- FOREACH ele = ListOps.reverse(l) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'c', 'd' ] -%]
+Testing rotate (ftol) (c d a b)        :
+[%- FOREACH ele = ListOps.rotate(l,'ftol',2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'c', 'd' ] -%]
+        alternate                      :
+[%- FOREACH ele = ListOps.rotate(l,'ftol',2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'c', 'd' ] -%]
+        (ltof) (b c d a)               :
+[%- FOREACH ele = ListOps.rotate(l,'ltof',3) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Count (2)                              : [% ListOps.count(l,'a') -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Delete (b c)                           :
+[%- FOREACH ele = ListOps.delete(l,'a') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Delete (a unique)                      :
+[%- FOREACH ele = ListOps.delete(l,'a','unique') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Delete (a duplicates)                  :
+[%- FOREACH ele = ListOps.delete(l,'a','duplicates') -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'b' ] -%]
+[% l2 = [ 'a', 'c', 'b' ] -%]
+Testing is_equal (0)                   : [% ListOps.is_equal(l1,l2) %]
+                 (0)                   : [% ListOps.is_equal(l1,l2,"unique") %]
+                 (0)                   : [% ListOps.is_equal(l1,l2,"duplicates") -%]
+
+[% l1 = [ 'a', 'b', 'c' ] -%]
+[% l2 = [ 'a', 'c', 'b' ] -%]
+                 (1)                   : [% ListOps.is_equal(l1,l2) %]
+                 (1)                   : [% ListOps.is_equal(l1,l2,"unique") %]
+                 (1)                   : [% ListOps.is_equal(l1,l2,"duplicates") -%]
+
+[% l1 = [ 'a', 'b', 'a', 'c' ] -%]
+[% l2 = [ 'a', 'c', 'b' ] -%]
+                 (1)                   : [% ListOps.is_equal(l1,l2) %]
+                 (1)                   : [% ListOps.is_equal(l1,l2,"unique") %]
+                 (0)                   : [% ListOps.is_equal(l1,l2,"duplicates") -%]
+
+[% l1 = [ 'a', 'b', 'a', 'c' ] -%]
+[% l2 = [ 'a', 'a', 'c', 'b' ] -%]
+                 (1)                   : [% ListOps.is_equal(l1,l2) %]
+                 (1)                   : [% ListOps.is_equal(l1,l2,"unique") %]
+                 (1)                   : [% ListOps.is_equal(l1,l2,"duplicates") -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Chaining (c b)                         :
+[%- FOREACH ele = ListOps.delete(l,'a').reverse -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Clear                                  :
+[%- FOREACH ele = ListOps.clear(l) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Fill ()                                :
+[%- FOREACH ele = ListOps.fill(l) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+     (x x x x)                         :
+[%- FOREACH ele = ListOps.fill(l,'x') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+     (a b x x)                         :
+[%- FOREACH ele = ListOps.fill(l,'x',2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+     (a b x c)                         :
+[%- FOREACH ele = ListOps.fill(l,'x',2,1) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+     (a b x x x)                       :
+[%- FOREACH ele = ListOps.fill(l,'x',2,3) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Splice ()                              :
+[%- FOREACH ele = ListOps.splice(l) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+       (a)                             :
+[%- FOREACH ele = ListOps.splice(l,1) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+       (a c)                           :
+[%- FOREACH ele = ListOps.splice(l,1,2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+       (a x c)                         :
+[%- FOREACH ele = ListOps.splice(l,1,2,'x') -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+       (a x y c)                       :
+[%- FOREACH ele = ListOps.splice(l,1,2,'x','y') -%]
+ [% ele -%]
+[% END -%]
+
+[% l1 = [ 'a', 'b', 'a', 'c' ] -%]
+[% l2 = [ 'x', 'y' ] -%]
+       (a x y c)                       :
+[%- FOREACH ele = ListOps.splice(l1,1,2,l2) -%]
+ [% ele -%]
+[% END -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Index (0)                              : [% ListOps.indexval(l,'a') -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+      ()                               : [% ListOps.indexval(l,'x') -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Rindex (2)                             : [% ListOps.rindexval(l,'a') -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+       ()                              : [% ListOps.rindexval(l,'x') -%]
+
+[% l = [ 'a', 'b', 'a', 'c' ] -%]
+Set (a x a c)                          :
+[%- FOREACH ele = ListOps.set(l,1,'x') -%]
+ [% ele -%]
+[% END -%]

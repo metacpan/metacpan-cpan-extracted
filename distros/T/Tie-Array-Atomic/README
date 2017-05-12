@@ -1,0 +1,23 @@
+Tie/Array/Atomic version 0.01
+=============================
+
+Tie a Perl array to static-sized C-array. Array stored in virtual memory and can be shared between threads.
+All operations for array elements are atomic, so no mutexes needed for array synchronization.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Yury Kotlyarov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

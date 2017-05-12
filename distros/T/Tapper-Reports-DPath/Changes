@@ -1,0 +1,64 @@
+Revision history for Tapper-Reports-DPath
+
+5.0.2     2016-03-30
+        - more explicit dependencies for cpantesters
+
+5.0.1     2016-03-03
+        - drop 'exit' and 'wait' due to keyword conflicts in db
+
+5.0.0     2016-02-15
+        - database merge: TestrunDB+ReportsDB->TestrunDB
+        - performance tweaks
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        * PostgreSQL support
+        - [FIX] slow first() usage
+
+4.0.2     2012-06-04
+        - explicitely upgrade troublemaker deps
+
+4.0.1     2012-05-16
+        - [FEAT] provide testrundb_hostnames to templates
+        - [FEAT] provide Template::Plugin::Autoformat
+        - [FEAT] allow pure SQL::Abstract queries in query api
+        - [FIX] error handling of TT handler
+        - [FIX] rename utility vmethod 'match' -> 'dpath_math'
+        - [FIX] substitute YAML with YAML::XS
+        - [FIX] revitalize hardwaredb information
+        - [RFK] substitute Cache with CHI
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* enable reportdata() (the primary report api function) 
+	  in TT templates
+	* release version++ roundhouse kick
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.5
+
+	* distro maintenance
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-09 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.3
+
+	* fix dependencies
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

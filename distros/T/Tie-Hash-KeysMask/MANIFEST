@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tie-Hash-KeysMask.t
+lib/Tie/Hash/KeysMask.pm

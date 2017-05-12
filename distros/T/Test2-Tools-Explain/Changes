@@ -1,0 +1,7 @@
+Revision history for Test2-Tools-Explain
+
+0.02 - 2016-10-03 22:48:00 CDT
+    - First basic version just to get it up on CPAN and getting checked by Travis.
+
+    [New features]
+    - Add the explain() function.

@@ -1,0 +1,67 @@
+Revision history for Test-Parser.
+
+HEAD
+	Mark Wong:
+	- Fixed the metric calculation for DBT-5.
+	- Fixed the mix percentage reporting for DBT-5.
+
+1.4
+	Richard Kennedy:
+	- Fix use of default sort ordering, which was ascii sort not numeric sort
+	  effects the way NO90 is reported
+	- Fixed calculation of notpm, since rampup transactions were included in
+	  the total from which the rate was calculated
+
+	Mark Wong:
+	- Updates based on base class changes
+	- Moved html and plotting functions for Test::Parser::Iostat,
+	  Test::Parser::Vmstat, Test::Parser::Sar, and Test::Parser::Dbt2 to
+	  Test::Presenter.
+	- Added parser for DBT-5.
+	
+	John Daiker:
+	- Added call for to_xml() in Parser.pm
+	- Updated SysbenchCPU to use to_xml() from Parser.pm
+	- Fixes for Dbench.pm
+	- Documentation updates for perldoc compatibility
+	
+	Joshua Jakabosky:
+	- Dbench parser
+	- Add to_xml() routine
+	- Add more parameters to base class
+	
+	Bryce:
+	- Documentation for Dbench
+	- Added test for iozone
+	- Added new parser for iozone
+	- Added iozone_parser
+	- Added iozone tests
+	- Added new parser for sysbench cpu and sysbench fileio
+	- Renamed tests to be numerically ordered
+	- Added constant END_OF_RECORD for test parsers to return when
+	  they complete parsing a test log, but notice there's more 
+	  data to be parsed
+	- Renaming lhcs_regression.pm, ltp.pm, newpynfs.pm, iozone.pm to
+	  lowercase for easier autodetection in crucible
+	
+1.3  Thu June 29, 17:00:00 2006
+	- Added new parser for newpynfs
+	- Added new parser for readprofile
+	- Added new parser for oprofile
+	- Added new parser for vmstat
+	- Added new parser for sysctl
+	- Added new parser for PostgreSQL options
+	- Added new parser for iostat
+	- Added new parser for sar
+	- Added new parser for dbt-2 test results
+
+1.00  Fri Dec 16 17:52:00 2005
+	- Added new parser for LTP testruns
+	- Added test case 03 for LTP logs
+	
+0.99  Wed Oct 19 17:44:12 2005
+	- Added Test::Parser, created by h2xs via addpm 1.00
+	- original version; created by sdist 1.11
+
+
+

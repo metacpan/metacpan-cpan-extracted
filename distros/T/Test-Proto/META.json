@@ -1,0 +1,55 @@
+{
+   "abstract" : "OO test script golf sugar",
+   "author" : [
+      "Daniel Perrett <perrettdl@googlemail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Proto",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Moo" : "0",
+            "Object::ID" : "v0.0.5",
+            "Scalar::Util" : "1.14",
+            "Test::Deep::NoTest" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/pdl/Test-Proto/issues"
+      },
+      "homepage" : "http://github.com/pdl/Test-Proto",
+      "repository" : {
+         "url" : "http://github.com/pdl/Test-Proto"
+      }
+   },
+   "version" : "0.027"
+}

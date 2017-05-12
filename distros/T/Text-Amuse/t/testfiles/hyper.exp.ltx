@@ -1,0 +1,91 @@
+\chapter{Begin}
+
+
+\hyperdef{amuse}{label}{}%
+Here the doc start
+\#label here blablabla
+A simple internal link is created with \textbackslash{}hypertarget, with two parameters of an anchor name, and anchor text. \textbackslash{}hyperlink has two arguments, the name of a hypertext object defined somewhere by \textbackslash{}hypertarget, and the text which be used as the link on the page.
+
+\chapter{Middle}
+
+
+\hyperdef{amuse}{label2}{}%
+\#label2 Continue here
+A simple internal link is created with \textbackslash{}hypertarget, with two parameters of an anchor name, and anchor text. \textbackslash{}hyperlink has two arguments, the name of a hypertext object defined somewhere by \textbackslash{}hypertarget, and the text which be used as the link on the page.
+A simple internal link is created with \textbackslash{}hypertarget, with two parameters of an anchor name, and anchor text. \textbackslash{}hyperlink has two arguments, the name of a hypertext object defined somewhere by \textbackslash{}hypertarget, and the text which be used as the link on the page.
+A simple internal link is created with \textbackslash{}hypertarget, with two parameters of an anchor name, and anchor text. \textbackslash{}hyperlink has two arguments, the name of a hypertext object defined somewhere by \textbackslash{}hypertarget, and the text which be used as the link on the page.
+ \#label3 not a label
+
+\chapter{Next}
+
+
+\hyperdef{amuse}{label2}{}%
+This is valid.
+
+
+\#1blabla
+Not a label, starts with a number
+
+
+\begin{alltt}
+\#label3
+This is verbatim
+\end{alltt}
+
+
+
+\begin{quote}
+
+
+\hyperdef{amuse}{label5}{}%
+in quotation is not neutralized,
+
+
+
+\end{quote}
+
+
+
+\begin{verse}
+\hyperdef{amuse}{label6}{}%
+in verse is not neutralized
+\end{verse}
+
+
+
+\begin{verse}
+\hyperdef{amuse}{label7}{}%
+~in verse again, we have a label
+\end{verse}
+
+
+\hyperdef{amuse}{label9}{}%
+This is a label despite of the trailing whitespace.
+
+
+\hyperdef{amuse}{label9}{}%
+This is a label despite of the leading whitespace.
+
+
+\begin{enumerate}[1.]
+\item\relax 
+\#label8 not a label
+
+
+
+\item\relax 
+\hyperdef{amuse}{lable9}{}%
+This is a label
+
+
+
+
+\end{enumerate}
+\chapter{End}
+
+
+Here we \hyperref{}{amuse}{label}{go} and \hyperref{}{amuse}{label2}{label2} and \hyperref{}{amuse}{label3}{dead link} \hyperref{}{amuse}{label4}{label4}
+\href{\#1}{Preserved verbatim}
+\url{\#label2\%20unkown}
+\hyperref{}{amuse}{label}{\textbackslash{}tryme}
+

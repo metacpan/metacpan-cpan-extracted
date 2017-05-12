@@ -1,0 +1,23 @@
+Milestone 0
+-----------
+* (DONE) Test out the LTP parser against an LTP run
+* (DONE) Install onto cl023
+* (DONE) Integrate use of the LTP parser into web_test_reporter
+
+Milestone 1
+-----------
+* (DONE) Write parser for PyNFS
+* (DONE) Create initial Test::Parser::LHCS
+* (DONE) Test running on a LHCS test result file
+* (DONE) Conceptualize approach for parsing performance tests
+
+Milestone 2
+-----------
+* (DONE) Write output format to TRPI
+* test_parser:  Need to make --testname less case sensitive
+* test_parser:  Check if to_$format() exists before calling it
+* test_parser:  Check if data file exists
+* Write parser for cthon
+* Integrate use of the PyNFS parser into web_test_reporter
+* Release new version of Test::Parser
+

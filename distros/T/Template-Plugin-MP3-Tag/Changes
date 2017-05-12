@@ -1,0 +1,6 @@
+Revision history for Perl extension Template::Plugin::MP3::Tag.
+
+0.01  Sat Apr 15 04:29:10 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Template::Plugin::MP3::Tag
+

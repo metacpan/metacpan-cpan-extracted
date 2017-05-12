@@ -1,0 +1,43 @@
+=pod
+
+=head1 NAME
+
+Text::Hogan - A mustache templating engine statement-for-statement cloned from hogan.js
+
+=head1 DESCRIPTION
+
+Text::Hogan is a statement-for-statement rewrite of
+L<hogan.js|http://twitter.github.io/hogan.js/> in Perl.
+
+It is a L<mustache|https://mustache.github.io/> templating engine which
+supports pre-compilation of your templates into pure Perl code, which then
+renders very quickly.
+
+It passes the full L<mustache spec|https://github.com/mustache/spec>.
+
+=head1 SYNOPSIS
+
+    use Text::Hogan::Compiler;
+
+    my $text = "Hello, {{name}}!";
+
+    my $compiler = Text::Hogan::Compiler->new;
+    my $template = $compiler->compile($text);
+
+    say $template->render({ name => "Alex" });
+
+See L<Text::Hogan::Compiler|Text::Hogan::Compiler> and
+L<Text::Hogan::Template|Text::Hogan::Template> for more details.
+
+=head1 TEMPLATE FORMAT
+
+The template format is documented in
+L<mustache(5)|https://mustache.github.io/mustache.5.html>.
+
+=head1 AUTHOR
+
+Started out statement-for-statement copied from hogan.js by Twitter!
+
+Alex Balhatchet (alex@balhatchet.net)
+
+=cut

@@ -1,0 +1,23 @@
+Changes
+ignore.txt
+lib/Test/Mojo/Plack.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/01-main.t
+t/03-dancer.t
+t/boilerplate.t
+t/catalyst/catalyst.t
+t/catalyst/MyApp/lib/MyApp.pm
+t/catalyst/MyApp/lib/MyApp/Controller/Root.pm
+t/catalyst/MyApp/myapp.conf
+t/catalyst/MyApp/myapp.psgi
+t/lib/FakeDancerApp.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Test-Mojo-Plack-0.09.tar.gz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

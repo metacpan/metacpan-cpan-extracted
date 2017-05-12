@@ -1,0 +1,8 @@
+Revision history for Perl extension Text::DeDuper
+
+v1.01 (2009/01/15)
+- applied patch contributed by Frank Wiegand:
+  https://rt.cpan.org/Public/Bug/Display.html?id=42438
+
+v1.00 (2006/01/05)
+- first release

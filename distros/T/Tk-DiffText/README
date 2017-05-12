@@ -1,0 +1,31 @@
+Tk-DiffText
+===========
+
+This module defines a Perl/Tk composite widget that makes it simple to provide 
+basic "diff" functionality to your Tk applications.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Perl 5.005
+  Tk 800
+  Algorithm::Diff
+  Tie::Tk::Text
+  IO::File
+
+Algorithm::Diff and IO::File are "soft" requirements. Tk::DiffText is usable 
+without them but will suffer from degraded functionality.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Michael J. Carman
+
+This library is free software under the terms of the Perl Artistic License.

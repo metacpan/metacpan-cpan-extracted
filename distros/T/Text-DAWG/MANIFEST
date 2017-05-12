@@ -1,0 +1,6 @@
+lib/Text/DAWG.pm
+Makefile.PL
+MANIFEST
+README
+t/everything.t
+META.yml                                 Module meta-data (added by MakeMaker)

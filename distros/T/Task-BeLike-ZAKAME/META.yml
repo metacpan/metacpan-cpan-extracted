@@ -1,0 +1,70 @@
+---
+abstract: 'Be like ZAKAME'
+author:
+  - 'Zak B. Elep <zakame@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-ZAKAME
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Task::BeLike::ZAKAME:
+    file: lib/Task/BeLike/ZAKAME.pm
+    version: '0.09'
+recommends:
+  App::rainbarf: '0'
+  App::scan_prereqs_cpanfile: '0'
+  Perl::Critic: '0'
+requires:
+  AnyEvent: '0'
+  App::Ack: '0'
+  App::HTTPThis: '0'
+  App::Nopaste: '0'
+  App::cpanoutdated: '0'
+  App::metacpansearch: '0'
+  CPAN::Mini: '0'
+  CPAN::Uploader: '0'
+  Carton: '0'
+  Class::Refresh: '0'
+  Data::Printer: '0'
+  Devel::Confess: '0'
+  Minilla: '0'
+  Mojolicious: '0'
+  Moo: '0'
+  Paws: '0'
+  Perl::Tidy: '0'
+  Plack: '0'
+  Pod::Cpandoc: '0'
+  Proc::InvokeEditor: '0'
+  Pry: '0'
+  Reply: '0'
+  Text::Markdown: '0'
+  Type::Tiny: '0'
+  Version::Next: '0'
+  Web::Query: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/zakame/Task-BeLike-ZAKAME/issues
+  homepage: https://github.com/zakame/Task-BeLike-ZAKAME
+  repository: git://github.com/zakame/Task-BeLike-ZAKAME.git
+version: '0.09'
+x_contributors:
+  - 'Zak B. Elep <zak.elep@yoyo.ph>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

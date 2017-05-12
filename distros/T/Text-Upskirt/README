@@ -1,0 +1,165 @@
+SYNOPSIS
+        use Text::Upskirt qw/markdown smartypants/;
+    
+        my $markdown = << 'EOMD';
+        Installation
+        ============
+
+        The simplest way to install this is with cpanm!
+        Thanks to 'Natacha Porté' for Upskirt.
+        EOMD
+    
+        my $html = markdown($markdown);
+        my $fancyhtml = smartypants($html);
+
+    At this point $html contains the basic html rendered from the markdown,
+    which will look like
+
+        <h1>Installation</h1>
+    
+        <p>The simplest way to install this is with cpanm!
+        Thanks to 'Natacha Porté' and any other contributors for Upskirt</p>
+
+    and $fancyhtml has had smart quotes and things added to look like this
+
+        <h1>Installation</h1>
+    
+        <p>The simplest way to install this is with cpanm!
+        Thanks to &lsquo;Natacha Porté&rsquo; and any other contributors for Upskirt</p>
+
+Functions
+  markdown
+        $html = markdown($input, $extensions, $html_options)
+
+    "markdown" takes it's input as a string and returns the rendered HTML
+    output.
+
+    Both $extensions and $html_options are optional and default to nothing.
+
+   Extensions
+    "MKDEXT_AUTOLINK"
+            Automatically create links from urls and email addresses.
+
+    "MKDEXT_FENCED_CODE"
+            Allow for fenced code blocks using ~ and `. This lets you do
+            code blocks without indention which can make copy-paste easier
+            after the fact.
+
+                SYNOPSIS
+                --------
+    
+                ~~~~~~~
+                use Text::Upskirt qw/markdown smartypants/;
+
+                my $markdown = << 'EOMD';
+                Installation
+                ============
+
+                The simplest way to install this is with cpanm!
+                Thanks to 'Natacha Porté' for Upskirt.
+                EOMD
+
+                my $html = markdown($markdown);
+                my $fancyhtml = smartypants($html);
+                ~~~~~~~
+
+            NOTES: If you plan on using "smartypants" you may encounter
+            issues if you attempt to use the ``fancy'' quote style exhibited
+            there.
+
+    "MKDEXT_LAX_HTML_BLOCKS"
+            Allow HTML tags inside paragraphs without being surrounded by
+            newlines.
+
+    "MKDEXT_NO_INTRA_EMPHASIS"
+            Avoid turning text like "my_awesome_function" into
+            "<em>awesome</em>function". You will need to escape phrases as
+            "I like it when you say, "_I love you_.""
+
+    "MKDEXT_SPACE_HEADERS"
+            Force a space between header hashes and the header itself
+
+    "MKDEXT_STRIKETHROUGH"
+            Let you make strikethroughs by surrounding text with ~~.
+
+    "MKDEXT_TABLES"
+            Let you create tables similar to the PHP Markdown Extra
+
+                First Header  | Second Header
+                ------------- | -------------
+                Content Cell  | Content Cell
+                Content Cell  | Content Cell
+
+   Html Options
+    "HTML_SKIP_HTML"
+            Don't output any of the boilerplate HTML tags at the start of
+            the document
+
+    "HTML_SKIP_STYLE"
+            Don't add any "<style>" tags to the output
+
+    "HTML_SKIP_IMAGES"
+            Don't process any image markdown and remove any "<img>" tags
+            from the output
+
+    "HTML_SKIP_LINKS"
+            Don't process any link markdown and remove any "<a>" tags from
+            the output
+
+    "HTML_EXPAND_TABS"
+            Does not appear to be used in the code.
+
+    "HTML_SAFELINK"
+            Don’t make hyperlinks from links that have unknown URL types.
+
+    "HTML_TOC"
+            Build a table of contents on the top of the output
+
+    "HTML_HARD_WRAP"
+            Treat newlines in paragraphs as real line breaks, github style.
+
+    "HTML_GITHUB_BLOCKCODE"
+            Don't include any extra CSS for code blocks
+
+    "HTML_USE_XHTML"
+            Generate XHTML 1.0 compliant tags
+
+  smartypants
+        $html = smartpants($input)
+
+    "smartypants" takes input as a string and returns the fancy HTML output.
+    You can read a bit more about smartypants at
+    <http://daringfireball.net/projects/smartypants/>.
+
+UPSKIRT
+    Upskirt is a fast, robust Markdown parsing library that doesn't suck,
+    Created by Natacha Porté. This module is a set of bindings for it. It
+    is bundled along with the module and is seperately licensed as specified
+    below.
+
+      Copyright (c) 2008, Natacha Porté
+  
+      Permission to use, copy, modify, and distribute this software for any
+      purpose with or without fee is hereby granted, provided that the above
+      copyright notice and this permission notice appear in all copies.
+  
+      THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+      WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+      MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+      ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+      WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+      ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+      OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+    And while the sources are available with the module, you're probably
+    going to have a nicer time grabbing them from the github repository for
+    Upskirt at <https://github.com/tanoku/upskirt>
+
+LICENSE
+    This module is available under the Artistic 2.0 license as available at
+    <http://www.perlfoundation.org/artistic_license_2_0> Copyright Ryan
+    Voots 2011.
+
+SEE ALSO
+      * L<https://github.com/tanoku/upskirt>
+

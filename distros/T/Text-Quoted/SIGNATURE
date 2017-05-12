@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c0e2be080d04f10dc9be6b7080c06fcdcd6cde14 Changes
+SHA1 2aca8dce751e8f42fa76876026cd534c3cb91364 MANIFEST
+SHA1 3300a3f5d085dc93d71390686e30b2ba49eaf227 META.yml
+SHA1 cf4f2cae5f267bceff29ba0b7e4b2e48be72d19f Makefile.PL
+SHA1 b4621321fd300465c8acae3201645b37e3b23c23 README
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 403b610675b6019fd2a5879ce183bdcd5eebf8dd lib/Text/Quoted.pm
+SHA1 d3145c048061fe2930b267f076abf917fa7a4d95 t/basics.t
+SHA1 56fd7b92b0475ac2e5efddfea0e3f9fe5e06938e t/empty_text.t
+SHA1 8c77a2df056a8142c21d235898d3d22628296313 t/expand_tab_segfault.t
+SHA1 fd6dc4d1d8250ca4f40e1c49ff173486302cf0e1 t/life_sample.1.t
+SHA1 5cf928a4388aa6e55cca337cd13f2dea87bd8bd3 t/life_sample.2.t
+SHA1 055bc5cc3f5b6918a9420413a9d0f8a0ffd7eceb t/life_sample.3.t
+SHA1 7c3e198c7f077807ae1a21c8a9f06c1620b97a26 t/separator.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iEYEARECAAYFAlTndAQACgkQMflWJZZAbqD2YgCbBlo3xjUkRn5IJvZM+2rFab0n
+bF8AoI6WUtEF0RdZVOWh+f1TeNRUJ+o2
+=Qor9
+-----END PGP SIGNATURE-----

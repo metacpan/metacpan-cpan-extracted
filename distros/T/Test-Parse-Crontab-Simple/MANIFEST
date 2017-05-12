@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/crontab.txt
+eg/crontab_strict.txt
+eg/test_crontab.t
+lib/Test/Parse/Crontab/Simple.pm
+minil.toml
+t/00_compile.t
+t/01_match.t
+t/02_strict_match.t
+t/03_set_prefix.t
+META.yml
+MANIFEST

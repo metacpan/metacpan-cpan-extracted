@@ -1,0 +1,107 @@
+NAME
+    Text::Karma - Process (and optionally store) karma points
+
+SYNOPSIS
+     use 5.010;
+     use strict;
+     use warnings;
+     use Text::Karma;
+     use DBI;
+
+     my $dbh = DBI->connect("dbi:SQLite:dbname=karma.sqlite","","");
+     my $karma = Text::Karma(dbh => $dbh);
+
+     $karma->process_karma(
+         nick  => 'someone',
+         who   => 'someone!from@somewhere',
+         where => '#in_here',
+         str   => "this thing++ is awesome # some cool comment",
+     );
+
+     say "Karma for thing: ".$karma->get_karma("thing");
+
+METHODS
+  "new"
+    Constructs and returns a Text::Karma object. Takes the following
+    arguments:
+
+    'dbh', an optional database handle.
+
+    'table_prefix', a prefix to use for the table that will be created if
+    you supplied a database handle.
+
+  "process_karma"
+    Processes karma from a string, and returns the results. They will also
+    be stored in the database if you supplied a database handle to "new".
+    Takes the following arguments:
+
+    'nick', the nickname of the person who wrote the text. Required.
+
+    'who', the full name of the person who wrote the text. Required.
+
+    'where', the place where the person wrote the text. Required.
+
+    'str', the text that the person wrote. Required.
+
+    'self_karma', whether to allow people to affect their own karma.
+    Optional. Defaults to false.
+
+    The return value will be an arrayref containing a hashref for each karma
+    operation. They will have the following keys:
+
+    'subject', the subject of the karma operation (e.g. 'foo' in 'foo++').
+
+    'op', the karma operation (0 if it was '--', 1 if it was '++').
+
+    'comment', a potential comment for the karma change.
+
+  "get_karma"
+    This method returns the karma for a given subject from the database.
+    Takes one argument, a subject to look up. If the subject is unknown,
+    nothing is returns. Otherwise, you'll get a hashref with the following
+    keys:
+
+    'up', number of karma upvotes for the subject.
+
+    'down', number of karma downvotes for the subject.
+
+    'score', the karma score for the subject ('up' minus 'down').
+
+AUTHOR
+    Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
+
+    Apocalypse <APOCAL@cpan.org>
+
+CONTACT
+  Email
+    You can email the authors of this module at "hinrik.sig@gmail.com" or
+    "APOCAL@cpan.org" asking for help with any problems you have.
+
+  Internet Relay Chat
+    You can get live help by using IRC (Internet Relay Chat). If you don't
+    know what IRC is, please read this excellent guide:
+    <http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You can
+    join the following networks/channels and get help:
+
+    *   MAGnet
+
+        You can connect to the server at 'irc.perl.org', join the
+        "#perl-help" channel, and talk to "Hinrik" or "Apocalypse".
+
+    *   FreeNode
+
+        You can connect to the server at 'irc.freenode.net', join the
+        "#perl" channel, and talk to "literal" or "Apocal".
+
+    *   EFnet
+
+        You can connect to the server at 'irc.efnet.org', join the "#perl"
+        channel, and talk to "Hinrik" or "Ap0cal".
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Hinrik Örn Sigurðsson and Apocalypse
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

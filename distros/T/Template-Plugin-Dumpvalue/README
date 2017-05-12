@@ -1,0 +1,52 @@
+Template-Plugin-Dumpvalue version 1.0
+=====================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NAME
+    Template::Plugin::Dumpvalue - Interface to Dumpvalue through the
+    Template Toolkit
+
+SYNOPSIS
+     [% USE d = Dumpvalue %]
+     [% hash = {
+          a => 1,
+          b => 2,
+          c => 3
+        } %]
+     [% d.dumpValue(hash) %]
+     [% d.dump_template_vars() %]
+
+DESCRIPTION
+    This module gives access to Dumpvalue's powerful debugging capabilities.
+    Provides all the methods and options that Dumpvalue has with a little
+    extra.
+
+        Extra option:
+
+            inHTML
+
+                Can be set in the constructor or with the method *set()*.
+                Setting the inHTML option to 1 (i.e. [% d.set(inHTML => 1)
+                %]) will surround the dump with <pre></pre> tags and replace
+                <, and > with &lt; and &gt; so it looks nice in HTML.
+
+        Extra method:
+
+            dump_template_vars(),
+
+                Dumps the template's stash.
+
+SEE ALSO
+    Dumpvalue
+
+AUTHOR
+    John Allwine <jallwine86@yahoo.com>
+

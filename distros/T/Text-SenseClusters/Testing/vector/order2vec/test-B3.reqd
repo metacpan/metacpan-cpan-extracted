@@ -1,0 +1,3 @@
+ERROR(order2vec.pl):
+        1st line of WORDVEC file <test-B3.wordvec> shows #vectors = 19 while
+        the actual #vectors found in the file = 20

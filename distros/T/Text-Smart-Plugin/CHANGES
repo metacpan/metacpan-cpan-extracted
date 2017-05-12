@@ -1,0 +1,16 @@
+Change Log for Text::Smart::Plugin
+==================================
+
+v1.0.1: (20-08-2006)
+-------------------
+
+ * Added more POD doucmentation
+ * Added coverage testing of POD
+ * Added 'strict' pragma
+
+v1.0.0: (12-05-2004)
+--------------------
+
+ * Initial release.
+  
+  

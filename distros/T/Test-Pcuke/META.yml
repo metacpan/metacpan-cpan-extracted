@@ -1,0 +1,47 @@
+---
+abstract: 'Cucumber for Perl 5'
+author:
+  - "\"Andrei V. Toutoukine\" <\"tut@isuct.ru\">"
+build_requires:
+  Exporter: 0
+  FindBin: 0
+  Mock::Quick: 0
+  Test::Most: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Pcuke
+provides:
+  Test::Pcuke:
+    file: lib/Test/Pcuke.pm
+    version: 0.000006
+  Test::Pcuke::Executor:
+    file: lib/Test/Pcuke/Executor.pm
+  Test::Pcuke::Executor::Status:
+    file: lib/Test/Pcuke/Executor/Status.pm
+  Test::Pcuke::Executor::StepFailure:
+    file: lib/Test/Pcuke/Executor/StepFailure.pm
+  Test::Pcuke::Expectation:
+    file: lib/Test/Pcuke/Expectation.pm
+  Test::Pcuke::Manual:
+    file: lib/Test/Pcuke/Manual.pm
+  Test::Pcuke::Report:
+    file: lib/Test/Pcuke/Report.pm
+  Test::Pcuke::StepDefinition:
+    file: lib/Test/Pcuke/StepDefinition.pm
+  Test::Pcuke::World:
+    file: lib/Test/Pcuke/World.pm
+requires:
+  Carp: 0
+  Encode: 0
+  File::Find: 0
+  Template: 0
+  Template::Plugin::Filter::ANSIColor: 0
+  Test::Pcuke::Gherkin: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.000006

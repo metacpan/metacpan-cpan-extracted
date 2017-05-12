@@ -1,0 +1,45 @@
+Task::Twitter
+
+This module is a "task", which currently installs Net::Twitter,
+Log::Dispatch::Twitter, Twitter::TagGrep, WWWW:ItsABot and Net::PingFM . If
+you want your Twitter-related module included, let me know.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Task::Twitter
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task::Twitter
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Task::Twitter
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Task::Twitter
+
+    Search CPAN
+        http://search.cpan.org/dist/Task::Twitter
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Jonathan Leto
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

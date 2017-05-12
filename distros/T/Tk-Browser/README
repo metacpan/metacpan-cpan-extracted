@@ -1,0 +1,61 @@
+Tk::Browser.pm Installation
+
+
+System requirements:
+
+  1.  Unix or Linux.  Tk::Browser is untested with other 
+      operating systems.
+  2.  Perl, version 5.005 or later.
+  3.  Perl/Tk, version 800.010 or later.
+  4.  GNU make.
+
+
+Installation:
+
+  1.  Unpack the Tk::Browser archive:
+
+      gunzip -c Tk-Browser-<version>.tar.gz | tar xvf -
+
+  2.  Change to the top-level subdirectory:
+
+      $ cd Tk-Browser-<version>
+
+  3.  Create the Makefile.
+
+      $ perl Makefile.PL
+
+  4.  Build the program modules and documentation.
+
+      $ make
+
+  5.  If necessary, become the superuser (via, "su," for example), 
+      and install the source files, mkbrowser script, and 
+      documentation.
+
+	  $ su
+	  Enter Password:
+	  # make install
+
+
+Starting a Tk::Browser:
+
+  The shell command:
+
+    # mkbrowser &
+
+  creates and opens a Browser.  The mkbrowser(1) manual page 
+  describes command line options.  The Tk::Browser(3) and
+  Browser::LibModule(3) manual pages describe in detail 
+  Tk::Browser browser and library operations.
+
+
+Copyright:
+
+  Copyright © 2001-2004 Robert Kiesling, rkies@cpan.org.  Licensed 
+  under the same terms as Perl.  Refer to the file, "Artistic," in 
+  this directory.
+
+  $Id: README,v 1.1.1.1 2015/04/18 18:43:42 rkiesling Exp $
+
+  This software is distributed under the Perl Artistic License.
+  Please refer to the file "Artistic" in this directory.

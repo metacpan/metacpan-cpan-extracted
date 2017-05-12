@@ -1,0 +1,14 @@
+Changes
+Build.PL
+MANIFEST
+README
+Makefile.PL
+META.yml
+lib/Time/TimeTick.pm
+t/01tick.t
+t/02supp.t
+t/03rpt.t
+t/04opts.t
+t/05supprpt.t
+t/06time.t
+t/07no.t

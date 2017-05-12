@@ -1,0 +1,6 @@
+Revision history for Perl extension Tree::Nary::Extended.
+
+0.01  Sat Oct 20 19:12:50 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -a -n Tree::Nary::Extended
+

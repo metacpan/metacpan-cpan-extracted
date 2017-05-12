@@ -1,0 +1,21 @@
+---
+name: Template-Iterator-AlzaboWrapperCursor
+version: 0.01
+author:
+  - 'Dave Rolsky, <autarch@urth.org>'
+abstract: Turns a Class::AlzaboWrapper::Cursor object into a TT2 iterator
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::AlzaboWrapper: 0
+  Template: 2
+  Test::More: 0
+provides:
+  Template::Iterator::AlzaboWrapperCursor:
+    file: lib/Template/Iterator/AlzaboWrapperCursor.pm
+    version: 0.01
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

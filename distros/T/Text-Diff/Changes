@@ -1,0 +1,92 @@
+Revision history for Perl module Text::Diff
+
+1.44 2016-02-26 NEILB
+    - Fixed the handling of text without a trailing newline. This module now
+      adds the same text that the diff tool does, "\n\\ No newline at end of
+      file\n". Previously this module simply produced broken diffs when one or
+      both files had no trailing newline. Fixed by Dave Rolsky. GitHub #1.
+
+1.43 2015-08-21 NEILB
+    - Got rid of the "Redundant argument in sprintf" warnings from
+      Text:Diff::Table on Perl 5.021+. RT#100505 and RT#106602.
+    - Metadata and doc now refer to NEILB's repo rather than OVID's.
+
+1.42 2015-08-20 NEILB
+    - Fixed pod link that was referring to the wrong place.
+      Thanks to KENTNL for RT#106150.
+    - First non-developer released of the changes listed against 1.41_01.
+
+1.41_01 2015-06-02 NEILB
+    - Developer release with changes I submitted for my January PRC assignment.
+    - Updated all modules to "use warnings", and use "our ...", so bumped
+      min perl version to 5.006, and added MIN_PERL_VERSION to Makefile.PL
+    - RT#73505: if a file doesn't exist, you't get a warning about trying
+      to read a closed filehandle. Now we croak.
+    - RT#94895: blank line needed for =head1 OPTIONS to format properly.
+    - RT#51612: the '>' character needed escaping inside pod formatting code.
+    - RT#25283: fixed syntax error in SYNOPSIS of Text::Diff::Table
+    - RT#101553: updated FSF postal address in LICENSE
+    - Added SEE ALSO section to doc, with links to a bunch of Diff modules.
+    - Added link to github repository in the doc
+    - Deleted META.yml from the repo -- EUMM will generate it for us
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Added TODO.md, with two further things I can see need doing.
+    - Removed all tab characters from source
+
+1.41 2011-04-17 OVID
+    - Add Text::Dif::Config to MANIFEST.
+
+1.40 2011-04-16 OVID
+    - Added DIFF_OUTPUT_UNICODE env variable to allow outputting unicode
+      characters. Thanks to Shlomi Fish for the patch.
+
+1.37 2009-07-16 ADAMK
+    - Switching to a production release
+    - Switching to a 1.xx version to indicate this
+    - Added META.yml file
+
+1.36_01 2009-07-13 ADAMK
+    - Cleaning this up to pass tests
+    - Adding author tests
+
+0.35 2002-08-27 RBS
+    - Escape whitespace if a blank line is inserted or removed.  This
+      puts a "\n" in the column containing the blank line, for instance.
+
+0.34 2002-07-14 RBS
+    - Improved Table format's escaping
+    - that "\t" and "\\t" are displayed differently
+    - the entire line is escaped consistently if it is escaped
+      at all.
+
+0.33 2002-07-08 RBS
+    - Make diff() return "" instead of 0 when comparing two empty
+      things.  Patch from Rolf Grossmann <grossman@progtech.net>.
+
+0.32 2002-03-14 RBS
+    - Fix escaping of all-whitespace strings.
+
+0.31 2002-02-06 RBS
+    - Remove stray $SIG{__DIE__} that was confessing on every die.
+
+0.3 2001-12-21 RBS
+    - undocumented
+
+0.11 2001-12-10 RBS
+    - Remove hardcoded date string from t/general.t's test data, because
+      localtime is used to generate this in Diff.pm and the local machine's
+      timezone (and locale?) can cause the localtime for a given mtime to be
+      quite different.  Reported by  Andreas Marcel Riechert
+      <riechert@pobox.com> of cpan-testers.
+    - Start this Changes file.
+    - Added hunk_header() and hunk_footer() for symmetry in overloading.
+    - Added t/ext_format.t
+
+0.1 2001-12-09 RBS
+    - Initial public release.
+    - Added filename, filehandle, and string I/O options
+    - API resembles Algorithm::Diff's a bit more
+    - Reimplement output formats as classes so that external (user-supplied)
+      can be specified as class names (My::Diff::Format) and so that they may
+      be inherited from.  Should probably break out hunk_header() from hunk().
+    - Add footer() to all formats

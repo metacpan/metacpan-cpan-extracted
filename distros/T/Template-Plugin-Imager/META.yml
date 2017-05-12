@@ -1,0 +1,25 @@
+---
+abstract: 'Plugin interface to Imager'
+author:
+  - 'Tobias Kremer, L<tobias@funkreich.de>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Imager
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Imager: 0.57
+  Template::Plugin: 2.14
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

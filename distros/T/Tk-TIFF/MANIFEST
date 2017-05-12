@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TIFF.pm
+TIFF.xs
+imgTIFF.c
+#imgTIFFjpeg.c
+#imgTIFFzip.c
+t/tk-tiff.t
+t/test-2channel.tif
+t/test-lzw.tif
+t/test-none.tif
+t/test-packbits.tif
+t/test-float.tif
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

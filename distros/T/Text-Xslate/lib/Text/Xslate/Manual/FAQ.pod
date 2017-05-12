@@ -1,0 +1,360 @@
+
+=head1 NAME
+
+Text::Xslate::Manual::FAQ - Frequently asked questions and answers
+
+=head1 DESCRIPTION
+
+This manual page lists FAQs, which we've heard for now.
+
+=head1 QUESTIONS
+
+=head2 General
+
+=head3 How do you pronounce 'Xslate'?
+
+We read it C</eks-leit/>.
+
+=head3 What 'Xslate' stands for?
+
+It stands for I<XS template>, a template engine written in XS, although
+pure Perl implementations are also provided.
+
+=head3 What are 'Kolon', 'Metakolon', and 'TTerse' ?
+
+Xslate supports multiple template syntaxes. Kolon is the default syntax,
+Metakolon is suitable to output Kolon templates, and TTerse is compatible
+with Template-Toolkit 2. You can specify the template syntax by passing
+C<syntax> option to the Text::Xslate constructor.
+
+    my $tx = Text::Xslate->new(
+        syntax => 'TTerse', # by moniker
+    );
+
+    my $tx = Text::Xslate->new(
+        syntax => 'Text::Xslate::Syntax::TTerse', # by fully qualified name
+    );
+
+=head3 What version of perl does Xslate require?
+
+Xslate is tested on perl v5.8.1. No special settings should be required.
+
+=head3 How can I install the pure-Perl version of Xslate?
+
+Pass C<< PUREPERL_ONLY=1 >> to F<Makefile.PL>, which requests
+the Xslate build system not to make XS parts.
+
+Note that C<< cpanm 1.7 >> supports C<--pp> option to install pure-Perl
+alternatives, so you can type C<< cpanm --pp Text::Xslate >>.
+
+=head3 What optimizations does Xslate employs?
+
+Here are some optimizations worth noting that makes Text::Xslate run so fast,
+in no particular order:
+
+=over
+
+=item Pre-compiled templates
+
+Text::Xslate is among the template engines that pre-compile the templates.
+This is similar to, say, Template::Toolkit, but Text::Xslate compiles the
+templates to C structures and stores them as binary data.
+
+=item Built on top of a virtual machine
+
+Text::Xslate is built on top of virtual machine that executes bytecode, and
+this virtual machine is fine-tuned I<specifically> for template processing.
+
+The virtual machine also employs optimizations such as direct-threading
+style coding to shave off any extra milliseconds that the engine might take
+otherwise
+
+=item Custom byte codes for oft-used operations
+
+Some operations which are used very often are optimized into its own
+byte code. For example (as described elsewhere) Text::Xslate automatically
+escapes HTML unless you tell it not to. Text::Xslate implements this process
+which involves escaping the string I<while> appending the result to the
+output buffer in C, as a custom byte code. This lets you avoid the penalties
+usually involved in such operations.
+
+=item Pre-allocation of output buffers
+
+One of the main things to consider to reduce performance degradation
+while processing a template is to avoid the number of calls to C<malloc()>.
+One of the tricks that Text::Xslate employs to reduce the number of calls to
+C<malloc()> is to pre-allocate the output buffer in an intelligent manner:
+For example, Text::Xslate assumes that most templates will be rendered to be
+about the same as the previous run, so when a template is rendered it uses
+the size allocated for the previous rendering as an approximation of how much
+space the current rendering will require. This allows you to greatly reduce the
+number of C<malloc()> calls required to render a template.
+
+=back
+
+=head3 How can I throw errors in functions and/or methods?
+
+Handle warnings by C<warn_handler> and raises exceptions if needed.
+
+That's because Xslate catches exceptions in templates and emits them as warnings.
+
+=head2 Configuration
+
+=head3 When I create the Xslate instance?
+
+Xslate instances are reusable and creating the instance costs somewhat
+so you're recommended to reuse them as much as possible.
+That is, you should make the instance global.
+
+Consider a PSGI application:
+
+    # create Xslate here, not in psgi_app();
+    my $xslate = Text::Xslate->new(...);
+
+    sub psgi_app {
+        my($env) = @_;
+        # use $xslate and create $response
+        return $response;
+    }
+    return \&psgi_app; # as a PSGI app
+
+Don't create the instance in each request. It's less efficient.
+
+=head3 How can I change instance attributes dynamically?
+
+Instance attributes, e.g. C<include_path>, C<function>, or C<syntax>,
+are immutable, so you cannot change them dynamically.
+
+Instead, you can create multiple instances by different options.
+instance in order to avoid conflicts with cache directories.
+
+For example:
+
+    my %common_config = ( cache_dir => $dir, module => \@module );
+    my %xslate = (
+        ja => Text::Xslate->new( path => [ $template_ja ], %common_config ),
+        en => Text::Xslate->new( path => [ $template_en ], %common_config ),
+        ro => Text::Xslate->new( path => [ $template_ro ], %common_config ),
+    );
+    $xslate{$lang}->render(...);
+
+=head2 Templates
+
+=head3 How can I changes template tags?
+
+Use C<start_tag>, C<end_tag>, and C<line_start> options to C<new> method,
+which can be joined together with C<syntax> option:
+
+    my $tx = Text::Xslate->new(
+        syntax     => 'TTerse',
+        tag_start  => '{{',
+        tag_end    => '}}',
+        line_start => undef,
+    );
+    print $tx->render_string('Hello, {{lang}} world!', { lang => 'Xslate' });
+
+Note that you'd better to avoid symbols which can be used for operators.
+
+=head3 How can I iterate over HASH references?
+
+Convert HASH references into ARRAY references because C<for> methods can
+deal with just ARRAY references.
+
+    : # in Kolon
+    : # iterate $hash by keys
+    : for $hash.keys() -> $key {
+        <: $key :>
+    : }
+    : # by values
+    : for $hash.values() -> $value {
+        <: $value :>
+    : }
+    : # by key-value pairs
+    : for $hash.kv() -> $pair {
+        <: $pair.key :>=<: $pair.value :>
+    : }
+
+Note that the above methods return ARRAY references sorted by the keys.
+
+=head3 How can I use Template-Toolkit virtual methods and filters?
+
+Xslate itself does not support these methods and filters, but there
+are modules on CPAN that implement them.
+
+L<Text::Xslate::Bridge::TT2> provides almost all the TT methods and filters,
+but it requires Template-Toolkit installed.
+
+L<Text::Xslate::Bridge::TT2Like> provides the same features as
+C<T::X::Bridge::TT2>, and it does not require the Template-Toolkit runtime.
+
+These bridge modules are useful not only for TTerse users, but
+also for Kolon users.
+
+=head3 How can I (write|get) plugins?
+
+It is unlikely to need to write plugins for Xslate, because Xslate allows
+you to export any functions to templates. Any function-based modules
+are available by the C<module> option.
+
+Xslate also allows you to call methods for object instances, so you can
+use any object-oriented modules, except for classes which only provide
+class methods (they need wrappers).
+
+If you want to add methods to builtin data types (nil, scalars, arrays and
+hashes), you can write bridge modules. See L<Text::Xslate::Bridge> for details.
+
+=head3 How to limit while-loop like Template-Toolkit?
+
+While Template-Toolkit has a loop counter to prevent runaway C<WHILE> loop,
+Xslate has no arbitrary limitation.
+
+Instead, you can use C<alarm()> to limit B<any> runaway code:
+
+    eval {
+        local $SIG{ALRM} = sub { die @_ };
+        alarm(1); # set timeout
+        $tx->render('<: while true { } :>', \%vars);
+    };
+    if($@ =~ /\b ALRM \b/xms) {
+        # timeout!
+    }
+
+=head3 Does Xslate process text strings, or binary strings?
+X<utf8> X<UTF-8> X<utf8 flagged string> X<unicode>
+
+(The meaning of I<text string> and I<binary string> is that of Perl,
+see L<perlunifaq>.)
+
+Xslate assumes template files to be encoded in C<UTF-8> by default, so the
+output is a text string and template parameters, including values which
+registered functions return, B<must> be text strings.
+
+However, if you want to process binary strings, you can do so by passing
+C<:bytes> to C<input_layer>, although it's not recommended.
+
+=head3 Why doesn't I cannot access $object.attr like TT2?
+
+Template-Toolkit allows objects (i.e. blessed references) to access its element if the object has no accessor methods, i.e. C<< [% object.attr %] >> might mean C<< $object->{attr} >>. This behavior breaks encapsulation and hides typos, so Xslate doesn't allow such fallbacks.
+
+If you want to access object attributes, define the accessors of them,
+or prepare values as a non-object before calling C<render()>.
+
+=head3 Can I load macros in other template files?
+
+Not yet. Currently Xslate doesn't support external macros.
+
+=head2 Functions, filters and macros
+
+=head3 Where are the list of builtin functions?
+
+See L<Text::Xslate::Manual::Builtin>.
+
+=head3 How can I use macros as a callback to high-level functions?
+
+Macros are objects that overload C<&{}>, the CODE dereference operator, so
+all you have to do is to call them simply, but don't check their types because
+they are not a I<real> CODE reference.
+
+    my $tx = Text::Xslate->new(
+        function => {
+            count => sub {
+                my($a, $cb) = @_;
+                # Don't check the type of $cb!
+                return scalar grep { $cb->($_) } @{$a};
+            },
+        },
+    );
+
+    print $tx->render_string('<: count($a, -> $x { $x >= 50 }) :>',
+        { a => [ 0 .. 100 ] },
+    ); # => 50
+
+
+=head2 Web Application Frameworks
+
+=head3 How can I use Xslate in $my_favorite_WAF?
+
+There are bridges that integrate Xslate into WAFs:
+
+=over
+
+=item *
+
+L<Catalyst::View::Xslate> for L<Catalyst>
+
+=item *
+
+L<MojoX::Renderer::Xslate> for L<Mojolicious>
+
+=item *
+
+L<Tiffany> for general usage
+
+=back
+
+There are WAFs which adopt Xslate as the default template engine:
+
+=over
+
+=item *
+
+L<Amon2>
+
+=item *
+
+L<Pickles>
+
+=back
+
+=head3 Where are examples which use Xslate in Catalyst?
+
+There is a real-world project that uses Xslate with Catalyst.
+
+L<https://github.com/duckduckgo/community-platform>
+
+Initializing Xslate: L<https://github.com/duckduckgo/community-platform/blob/master/lib/DDGC.pm#L268>
+
+Working on: L<https://dukgo.com/>
+
+Enjoy!
+
+=head2 Development and support
+
+=head3 How can I colorize Xslate templates?
+
+For C<vim> user, there is F<xslate.vim> for Kolon:
+
+L<https://github.com/motemen/xslate-vim>
+
+For C<emacs> user, there are plugins:
+
+L<https://github.com/samvtran/kolon-mode>
+
+L<https://github.com/yoshiki/tx-mode>
+
+=head3 Where can I ask questions?
+
+The mailing list is recommended to ask questions.
+
+L<http://groups.google.com/group/xslate>
+
+If you find a bug or have a request, creating github issues is better
+because those tickets are less likely to disappear than the ports in the
+mailing list.
+
+L<https://github.com/xslate/p5-Text-Xslate/issues>
+
+=head3 I found a bug! What can I do for you?
+
+Please make a minimal test case to show the problem clearly.
+The code is the common language both I and you speak fluently ;)
+
+=head1 SEE ALSO
+
+L<Text::Xslate>
+
+L<Text::Xslate::Manual>
+
+L<Text::Xslate::Manual::Cookbook>
+
+=cut

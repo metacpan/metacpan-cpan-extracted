@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Test/Tail/Multi.pm
+t/01load.t
+t/02import.t
+t/03add.t
+t/04add_empty.t
+t/04add_missing.t
+t/04add_single
+t/05plan.t
+t/06no_plan.t
+t/07like.t
+t/08delay.t
+t/bar
+t/baz
+t/foo
+t/quux
+META.yml                                 Module meta-data (added by MakeMaker)

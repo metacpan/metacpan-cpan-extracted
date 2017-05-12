@@ -1,0 +1,113 @@
+NAME
+    Text::Cadenceparser - Perl module to parse Cadence synthesis tool
+    logfiles
+
+VERSION
+    version 1.12
+
+SYNOPSIS
+    my $parser = Text::Cadenceparser->new(folder => './REPORTS');
+
+    my $nr_warnings = $parser->count('warnings');
+
+    my $warnings = $parser->get('warnings');
+
+    $parser->overview(); # Prints a global report of the parsing results
+
+    $parser->list('error'); # Prints the errors to STDOUT
+
+DESCRIPTION
+    Module to parse and filter Cadence synthesis tool reports. The idea is
+    to present the user with a short and comprehensible overview of the
+    synthesis results.
+
+    The module supports two ways of working: either you pass the 'folder'
+    parameter, in which case all files in that folder will be searched for
+    basic synthesis status reporting.
+
+    The other way of working is that you pass an area and/or power report
+    file as parameter. The module then supports generating a compact
+    overview of the results sorted based on a "key" and a "threshold".
+
+    As an example, consider a design that has been simulated for power
+    results. Pass the are and power report files as parameter, and select as
+    "key" 'active' and "threshold" '5'. The report will list all first-level
+    design units that contribute to the active power consumption and that
+    have a power consumption of more that 5% of the total power. The units
+    that contribute less than 5% of the power will be merged into a single
+    block and their resulting power consumption is also listed.
+
+    For the power, area and leakage of the toplevel design (meaning the
+    total figure minus the numbers reported for the subunits) an entry
+    'toplevel' is added to the report.
+
+METHODS
+  "new(%parameters)"
+    This constructor returns a new Text::Cadenceparser object. Supported
+    parameters are listed below
+
+    folder
+        The folder where to gather the logfiles. If this option is passed,
+        the module will search through the folder and generate a short and
+        comprehensive overview of the results of the last synthesis run. If
+        you pass this parameter, other parameters will ignored.
+
+    area_rpt
+        Pass an area report file that will be used to gather area input. Not
+        to be used in combination with the 'folder' parameter.
+
+    power_rpt
+        Pass a power report file that will be used to gather power input.
+        Not to be used in combination with the 'folder' parameter.
+
+    key Key to sort the area/power results. Possible options are
+
+        active
+        leakage
+        area
+
+    threshold
+        The percentage-wise threshold of "key" that the design units need to
+        be above in order to be listed in the result table.
+
+  "files_parsed()"
+    This method reports the number of files that were parsed when creating
+    the object.
+
+  "count($type)"
+    This method returns the counted number of $type that were parsed.
+
+    $type can be either 'info', 'warning' or 'error'.
+
+  "overview()"
+    This method returns an overview of all parsed messages.
+
+  "get($type)"
+    Returns a hash containing the messages of type $type.
+
+    $type can be either 'info', 'warning' or 'error'.
+
+  "list($type)"
+    List the messages of type $type to STDOUT.
+
+    $type can be either 'info', 'warning' or 'error'.
+
+  "slack($clock)"
+    Report the slack of the synthesis run for a specific clock net
+
+  "report()"
+    Reports the reports/logs that are read
+
+  "get_final($key)"
+    Report the valus of a $key that was extracted from the final.rpt report.
+    Returns the value or "undef" in case the value does not exist.
+
+AUTHOR
+    Lieven Hollevoet <hollie@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Lieven Hollevoet.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

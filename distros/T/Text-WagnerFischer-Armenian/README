@@ -1,0 +1,39 @@
+Text::WagnerFischer::Armenian is an extension of the module
+Text::WagnerFischer.  It implements WagnerFischer string distances in
+a way that takes the vagaries of Armenian grammar and orthography into
+account.
+
+
+PREREQUISITES
+
+Text::WagnerFischer::Armenian needs Unicode support; it therefore
+depends on Perl 5.8.3 or later.  It also requires the module
+Text::WagnerFischer, although it is not a real subclass of that
+module.
+
+
+INSTALLATION
+
+Installation is done in the usual way:
+
+   perl Makefile.PL
+   make
+   make test (optional)
+   make install
+
+
+DOCUMENTATION
+
+For further information, consult the POD module documentation.
+
+   perldoc Text::WagnerFischer::Armenian
+
+The POD viewer does not display the Armenian characters correctly;
+however, transcriptions are provided just below the examples
+themselves.
+
+LICENSE
+
+This package is free software and is provided "as is" without express
+or implied warranty.  You can redistribute it and/or modify it under 
+the same terms as Perl itself.

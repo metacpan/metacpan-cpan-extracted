@@ -1,0 +1,8 @@
+Revision history for Test-JSON-Schema-Acceptance
+
+0.0.2   2015-09-04
+        Fixed Github issue #7 - Draft tested is dependant on last call to new, not object instance.
+
+0.0.1   2015-09-03
+        First version, released on an unsuspecting world.
+

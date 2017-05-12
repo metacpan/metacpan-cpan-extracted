@@ -1,0 +1,15 @@
+
+v1.02 - Fixing some potential undef warnings
+
+	Found by Tom insam
+
+v1.01 - Minor _make-matcher fix
+	
+	Escaping the character classes unneccessarily
+
+
+v1.00 - Jumping straight to a 1.0 release 
+
+	And why not? :)
+
+

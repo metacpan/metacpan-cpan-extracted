@@ -1,0 +1,11 @@
+Revision history for Perl extension Tie::NumRange.
+
+0.021 Tue Mar 27 16:32:00 2001
+	- minor doc fix (README)
+
+0.02  Tue Mar 27 16:14:00 2001
+	- added Tie::NumRange::Wrap class
+
+0.01  Tue Feb 27 12:40:04 2001
+	- original version; created by h2xs 1.18
+

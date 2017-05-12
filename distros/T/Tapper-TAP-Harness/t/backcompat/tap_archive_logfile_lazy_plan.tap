@@ -1,0 +1,47 @@
+# Artemis-explicit-section-start: 1
+# Artemis-Section: logfile
+# Artemis-Suite-Name: perfmon
+# Artemis-Suite-Version: 2.07.13
+# Artemis-Machine-Name: sandschaki
+# Artemis-Machine-Description: pc-ware
+# Artemis-Machine-cpuinfo: 1x AMD Athlon(tm) 64 X2 Dual Core Processor 5000+
+# Artemis-Machine-RAM: 4031 MB
+# Feb  5 13:06:51 ss5-laptop kernel: [63294.300845] serial 00:09: activated
+# Feb  5 13:06:51 ss5-laptop kernel: [63294.301614] parport_pc 00:0a: activated
+# Feb  5 13:06:51 ss5-laptop kernel: [63294.302402] nsc-ircc 00:0b: activated
+# Feb  5 13:06:51 ss5-laptop kernel: [63294.348147] sd 0:0:0:0: [sda] Starting disk
+# Feb  5 13:06:51 ss5-laptop kernel: [63294.379062] PM: resume devices took 1.812 seconds
+# Feb  5 13:06:51 ss5-laptop kernel: [63294.379219] PM: Finishing wakeup.
+# Feb  5 13:06:51 ss5-laptop kernel: [63294.379221] Restarting tasks ... done.
+ok Feb  5 13:06:51 ss5-laptop kernel: [63294.608050] hub 2-0:1.0: over-current change on port 1
+# Feb  5 13:06:51 ss5-laptop kernel: [63294.712470] hub 2-0:1.0: over-current change on port 2
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  Waking up... 
+ok Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth0): now managed 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth0): device state change: 1 -> 2 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth0): bringing up device. 
+not ok Feb  5 13:06:52 ss5-laptop kernel: [63295.340500] ADDRCONF(NETDEV_UP): eth0: link is not ready
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth0): preparing device. 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth0): deactivating device (reason: 2). 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  Unmanaged Device found; state CONNECTED forced. (see http://bugs.launchpad.net/bugs/191889) 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  Unmanaged Device found; state CONNECTED forced. (see http://bugs.launchpad.net/bugs/191889) 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth1): now managed 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth1): device state change: 1 -> 2 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth1): bringing up device. 
+not ok Feb  5 13:06:52 ss5-laptop kernel: [63295.346399] ADDRCONF(NETDEV_UP): eth1: link is not ready
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth1): preparing device. 
+# Feb  5 13:06:52 ss5-laptop NetworkManager: <info>  (eth1): deactivating device (reason: 2). 
+# Feb  5 13:06:52 ss5-laptop acpid: client connected from 5340[0:0] 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  (eth1): device state change: 2 -> 3 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  (eth1): supplicant interface state change: 1 -> 2. 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  Activation (eth1) starting connection 'Auto amdwlan' 
+ok Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  (eth1): device state change: 3 -> 4 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  Activation (eth1) Stage 1 of 5 (Device Prepare) scheduled... 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  Activation (eth1) Stage 1 of 5 (Device Prepare) started... 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  Activation (eth1) Stage 2 of 5 (Device Configure) scheduled... 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  Activation (eth1) Stage 1 of 5 (Device Prepare) complete. 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  Activation (eth1) Stage 2 of 5 (Device Configure) starting... 
+# Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  (eth1): device state change: 4 -> 5 
+not ok Feb  5 13:06:53 ss5-laptop NetworkManager: <info>  Activation (eth1/wireless): access point 'Auto amdwlan' has security, but secrets are required. 
+ok minimal dummy
+1..7
+

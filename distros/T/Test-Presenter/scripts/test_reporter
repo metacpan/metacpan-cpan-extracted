@@ -1,0 +1,396 @@
+#!/usr/bin/perl -w
+#========================================================================
+#
+# treport
+#
+# DESCRIPTION
+#                                                                       
+# Generates reports from test results                                   
+#
+# AUTHOR
+#   Bryce W. Harrington <bryce@bryceharrington.org>
+#
+# COPYRIGHT
+#   Copyright (C) 2005 Bryce W. Harrington  
+#   All Rights Reserved.
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#========================================================================
+
+use strict;                             # Forces variable decl's
+use Carp;                               # Improved error/warning prints
+use Pod::Usage;                         # To report program usage
+use Getopt::Long qw(:config no_ignore_case bundling); # Cmdline arg handling
+use File::Basename;                     # fileparse(), basename(), dirname()
+use File::Copy;                         # copy(), move()
+use File::Find;                         # find(), finddepth()
+use File::Path;                         # mkpath(), rmtree()
+use File::Spec::Functions  qw(:ALL);
+use Template;
+
+#------------------------------------------------------------------------
+# Global variables
+#------------------------------------------------------------------------
+
+use vars qw($VERSION $NAME);
+$VERSION              = '1.00';
+$NAME                 = 'treport';
+
+#------------------------------------------------------------------------
+# User config area
+#------------------------------------------------------------------------
+
+our $opt_version      = 0;   # Prints the version and exits
+our $opt_help         = 0;   # Prints a brief help message
+our $opt_helplong     = 0;   # Prints a long help message
+our $opt_man          = 0;   # Prints a manual page (detailed help)
+our $opt_debug        = 1;   # Prints debug messages
+our $opt_force        = 0;   # Forces overwriting of existing report files
+our $opt_text         = 0;   # Generate text report
+our $opt_web          = 0;   # Generate web (HTML) report
+our $opt_pdf          = 0;   # Generate PDF report
+our $opt_templates    = '.'; # Location of template files
+our $opt_run_dir      = '.'; # Location of run directories
+
+#------------------------------------------------------------------------
+# Commandline option processing
+#------------------------------------------------------------------------
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");  
+GetOptions(
+           "version|V",        # Prints the version and exits
+           "help|h",           # Prints a brief help message
+           "helplong|H",       # Prints a long help message
+           "man|",             # Prints a manual page (detailed help)
+           "debug|D=i",        # Prints debug messages
+           "force|f",          # Forces overwriting of existing report files
+           "text|t",           # Generate text report
+           "web|w",            # Generate web (HTML) report
+           "pdf|p",            # Generate PDF report
+	   "templates|T",      # Templates directory
+            ) or pod2usage(-verbose => 0, -exitstatus => 0);
+
+version_and_exit() if $opt_version;
+pod2usage(-verbose => 0, -exitstatus => 0) if $opt_help;
+pod2usage(-verbose => 1, -exitstatus => 0) if $opt_helplong;
+
+#========================================================================
+# Subroutines
+#------------------------------------------------------------------------
+
+=head2 version_and_exit()
+
+Displays text describing the version of the script
+
+=cut
+
+sub version_and_exit
+{
+    print "$NAME version $VERSION\n";
+    print "Copyright (C) 2005 Bryce W. Harrington <bryce\@bryceharrington.org>\n";
+    print "This program is free software; you can redistribute it and/or\n";
+    print "modify it under the same terms as Perl itself.\n";
+    exit(0);
+}
+
+=head2 msg($text, $level)
+
+Issues a debug warning message if the global $opt_debug parameter is
+greater than the indicated $level.
+
+=cut
+sub msg {
+    my $text = shift || return;
+    my $level = shift || 0;
+
+    if ($opt_debug>$level) {
+        warn $text if $opt_debug>$level;
+    }
+}
+
+=head2 parse_results($run_id)
+
+Parses a directory of test results, extracting relevant data for 
+reporting.
+
+Returns undef if the run directory for $run_id does not exist.
+
+=cut
+
+sub parse_results {
+    my $results_dir = shift;
+    my %results;
+
+    # Verify results directory exists
+    if (! -d $results_dir) {
+	msg("Error:  Results directory '$results_dir' does not exist.\n", 1);
+	return undef;
+    }
+
+    sub get_number {
+	return `grep '$1' $2 | sed -e 's/.*$1 *\([0-9]+\)/\1/'`;
+    }
+
+    sub get_count {
+	return `grep '$1' $2 | wc -l`;
+    }
+
+    # TODO:  Make this process for each platform
+    # TODO:  Identify which log to scan more specifically
+    $results{platforms}->{debian x86} = {
+	unpack_status  => get_number('UNPACK STATUS:',  '$results_dir/*.log'),
+	config_status  => get_number('CONFIG STATUS:',  '$results_dir/*.log'),
+        build_status   => get_number('BUILD STATUS:',   '$results_dir/*.log'),
+        install_status => get_number('INSTALL STATUS:', '$results_dir/*.log'),
+        num_warnings   => get_count ('warning:',        '$results_dir/*.log'),
+        num_errors     => get_count ('error:',          '$results_dir/*.log'),
+    };
+
+    # Open the results directory
+    if (! opendir(DIR, $results_dir) ) {
+	msg("Error:  Could not open directory '$results_dir':  $!\n", 1);
+	return undef;
+    }
+
+    while ( defined( my $file = readdir(DIR)) ) {
+	next if ($file !~ /\.log$/);
+	if (! open(FILE, "< $file")) {
+	    msg("Error:  Could not open file '$file' for reading:  $!\n", 1);
+	    next;
+	}
+
+	# TODO:  Improve parsing
+	undef $/;
+	$results{tests}->{$file} = {
+	    name    => 'undefined',
+	    raw_log => <FILE>,
+	    status  => '??',
+	    score   => '-1',
+	};
+	close(FILE);
+    }
+
+    close(DIR);
+    return \%results;
+}
+
+#========================================================================
+# Main program
+#------------------------------------------------------------------------
+sub main() {
+
+    msg("Starting main program\n", 1);
+
+    my $text_template_dir = catdir($opt_templates, "text");
+    my $web_template_dir  = catdir($opt_templates, "web");
+    my $pdf_template_dir  = catdir($opt_templates, "pdf");
+
+    foreach my $run_id (@ARGV) {
+	if ($run_id !~ /^\d+$/) {
+	    msg("Error:  Invalid run id '$run_id'.  Skipping.\n", 0);
+	    next;
+	}
+	my $run_dir = catdir($opt_run_dir, $run_id);
+
+	my $results = parse_results($run_dir);
+	if (! $results) {
+	    msg("Error:  Could not parse results.  Skipping '$run_id'\n", 0);
+	    next;
+	}
+
+	if ($opt_text) {
+	    my $tt_config = {
+		INCLUDE_PATH => $text_template_dir,  # or list ref
+		ABSOLUTE     => 1,
+	    };
+	    my $template = Template->new($tt_config);
+
+	    if (! opendir(DIR, $text_template_dir)) {
+		msg("Error:  Could not open dir '$text_template_dir': $!.\n", 0);
+		msg("Error:  Skipping '$run_id'\n", 0);
+		next;
+	    }
+
+	    while ( defined(my $file = readdir(DIR)) ) {
+		next if $file =~ /^\./;
+		my $outfile = catfile($run_dir, 'report', 'text', $file);
+		$outfile =~ s/\.tt2$//;
+		if (! open(OUTFILE, ">$outfile")) {
+		    msg("Error:  Could not open '$outfile' for writing: $!\n");
+		    next;
+		}
+		$template->process($file, $results, \*OUTFILE)
+		    || msg("Error: Template process failed: ".$template->error()."\n", 0);
+
+		close(OUTFILE);
+	    }
+	    closedir(DIR);
+	}
+	if ($opt_web) {
+	    msg("Unimplemented:  web report.  Skipping.\n", 0);
+	}
+	if ($opt_pdf) {
+	    msg("Unimplemented:  PDF report.  Skipping.\n", 0);
+	}
+    };
+
+    msg("Ending main program\n\n", 1);
+    return 0;
+}
+
+exit(main());
+
+#########################################################################
+
+__END__
+
+
+=head1 NAME
+
+B<treport> - Generates reports from test results
+
+
+
+=head1 SYNOPSIS
+
+treport [options] [ [ options ] ]
+
+ Options:
+   -V, --version=boolean         Prints the version and exits
+   -h, --help=boolean            Prints a brief help message
+   -H, --helplong=boolean        Prints a long help message
+       --man=boolean             Prints a manual page (detailed help)
+   -D, --debug=integer           Prints debug messages
+   -f, --force=boolean           Forces overwriting of existing report files
+   -t, --text=boolean            Generate text report
+   -w, --web=boolean             Generate web (HTML) report
+   -p, --pdf=boolean             Generate PDF report
+
+=head1 DESCRIPTION
+
+treport - Generates reports from test results
+
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Prints the version and exits
+
+=item B<-h>, B<--help>
+
+Prints a brief help message
+
+=item B<-H>, B<--helplong>
+
+Prints a long help message
+
+=item B<--man>
+
+Prints a manual page (detailed help)
+
+=item B<-D> I<D>, B<--debug>=I<D>
+
+Prints debug messages
+
+=item B<-f>, B<--force>
+
+Forces overwriting of existing report files
+
+=item B<-t>, B<--text>
+
+Generate text report
+
+=item B<-w>, B<--web>
+
+Generate web (HTML) report
+
+=item B<-p>, B<--pdf>
+
+Generate PDF report
+
+
+=back
+
+See B<treport> -h for a summary of options.
+
+
+=head1 PREREQUISITES
+
+L<Pod::Usage>,
+L<Getopt::Long>,
+L<Config::Simple>,
+L<File::Basename>,
+L<File::Copy>,
+L<File::Find>,
+L<File::Path>,
+L<File::Spec>,
+L<Carp>
+
+=head1 COREQUISITES
+
+CGI
+
+=head1 SCRIPT CATEGORIES
+
+# Official categories:
+Audio : MP3
+CGI
+CGI : Filter
+CPAN
+CPAN : Administrative
+Educational
+Educational : ComputerScience
+Mail
+Networking
+News
+Search
+UNIX : System_administration
+VersionControl : CVS
+Web
+Win32
+Win32 : Utilities
+
+# See http://www.cpan.org/scripts/submitting.html for directions on
+# adding new categories for your script
+
+=head1 BUGS
+
+None known.
+
+=head1 VERSION
+
+1.00
+
+=head1 SEE ALSO
+
+L<perl(1)>
+
+
+=head1 AUTHOR
+
+Bryce W. Harrington E<lt>bryce@bryceharrington.orgE<gt>
+
+L<http://www.bryceharrington.org|http://www.bryceharrington.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Bryce W. Harrington.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.1.1.1 $
+
+=cut
+
+
+

@@ -1,0 +1,39 @@
+This is Perl module Test::Deep::Between.
+
+INSTALLATION
+
+Type the following command:
+
+    $ curl -L http://cpanmin.us | perl - Test::Deep::Between
+
+Or install cpanm and then run the following command to install
+Test::Deep::Between:
+
+    $ cpanm Test::Deep::Between
+
+If you get an archive of this distribution, unpack it and build it
+as per the usual:
+
+    $ tar xzf Test-Deep-Between-$version.tar.gz
+    $ cd Test-Deep-Between-$version
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+Test::Deep::Between documentation is available as in POD. So you can do:
+
+    $ perldoc Test::Deep::Between
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2013, Makoto Taniwaki. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

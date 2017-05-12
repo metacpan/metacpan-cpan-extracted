@@ -1,0 +1,17 @@
+REVISION HISTORY
+
+0.01    2014-08-24
+        - initial release version
+
+0.02    2014-08-25
+        - update pod
+        - add pod.t and pod-coverage.t
+        - update README
+
+0.03    2014-08-26
+        - increment module version - forgot to do so last release
+
+0.04    2014-08-27
+        - specify licence in makefile for CPAN
+        - update POD
+        - remove use libs from tests

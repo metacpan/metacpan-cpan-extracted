@@ -1,0 +1,171 @@
+
+NAME
+    Tie::Coupler - Tie based implementation of coupled scalars
+
+SYNOPSIS
+     use Tie::Coupler;
+
+     my $options = { fconvert => \&double,
+                     rconvert => \&half,
+                     init     => 1,
+                   };
+
+     my $impl = new Tie::Coupler($var, $coupled, $options);
+
+     $var = 2;
+     print "$var, $coupled\n";   ## Would print: 2, 4
+
+     $coupled = 6;
+     print "$var, $coupled\n";   ## Would print: 3, 6
+
+     $impl->fconvert(\&triple);
+     $var = 5;
+     print "$var, $coupled\n";   ## Would print: 5, 15
+
+     $impl->decouple();          ## The two scalars are now independent
+                                 ## of each other now
+
+     sub double { my ($val) = @_; $val * 2; }
+     sub triple { my ($val) = @_; $val * 3; }
+     sub half   { my ($val) = @_; int($val / 2); }
+
+DESCRIPTION
+
+    `Tie::Coupler' provides a mechanism by which you can couple two scalars.
+    That is the value of the coupled scalar would determined by the value of
+    the scalar to which it is coupled. The code referenced by the options
+    fconvert and rconvert determine the relation between the two scalars.
+
+    The complexity/functionality of the coupling is only limited by your
+    sense of imagination. The simplest form of coupling is a one to one
+    coupling wherein the conversion functions are undefined. In this form of
+    coupling the two scalars would have the same value at any point of time.
+
+CONSTRUCTOR
+
+    new (VAR, COUPLED [, OPTIONS ])
+        Creates a new coupling. It takes two mandatory parameters, the first
+        one VAR is the scalar to be coupled and second parameter COUPLED is
+        the scalar to which VAR is coupled. OPTIONS is an optional parameter
+        specifying the behaviour of the coupling. The options are passed to
+        the constructor as a hash reference. The following are the valid
+        keys and their corresponding effect on the coupling:
+
+           Option      Type              Default
+           -------     ----              -------
+           fconvert    Code Reference     None
+           rconvert    Code Reference     None
+           init        Boolean             0
+
+        The constructor returns the implementation object that gives the
+        coupled scalar the desired functionality. This implementation object
+        can be used to alter the behaviour of the coupling by calling the
+        appropriate methods.
+
+        After the constructor successfully creats the coupling, the two
+        scalars can be used as normal scalar variables. But the magical
+        spell (coupling) cast on the scalars would mean that at any point
+        the value held by the scalars would be based on:
+
+             1. The value of the other scalar 
+             2. The characteristics of coupling as specified by the
+                conversion routines (fconvert & rconvert)
+
+OPTIONS
+
+    fconvert => CODEREF
+        This options defined the callback to be invoked whenever the COUPLED
+        scalar's value changes. The value of the COUPLED scalar is passed as
+        an implicit parameter to this function. The code reference can be
+        specified in one of the following ways:
+
+        1. As a code reference - \&function 2. As an anonymous function -
+        sub { function(); } 3. As an array reference - [ $obj, $method,
+        @params ]
+
+        The value returned by the function referred by fconvert would be
+        used to determine the relation between the two scalars in the
+        forward direction.
+
+    rconvert => CODEREF
+
+        Same as fconvert, but determines the relation between the two
+        scalars in the reverse direction.
+
+    init => BOOLEAN
+
+        If this option is TRUE, then the value of the coupled scalars would
+        be initialized based on the conversion functions.
+
+METHODS
+
+    $impl->fconvert (CODEREF)
+        Utility method to set the value of the fconvert function.
+
+    $impl->rconvert (CODEREF)
+        Utility method to set the value of the fconvert function.
+
+    $impl->decouple ()
+        Decouples the scalars, releasing the scalars from the magical spell.
+        Once decoupled the scalars continue to behave like normal perl
+        scalars.
+
+LIMITATIONS
+
+    The code has not been fully optimized in terms of processing speed and
+    memory utilization. Every read/write access on a coupled scalar has a
+    constant overhead. The magnitude of the overhead is determined purely by
+    the complexity of the conversion routine(s).
+
+KNOWN BUGS
+
+    May be lot of them :-), but hopefully none. Bug reports, fixes,
+    suggestions or feature requests are most welcome.
+
+COPYRIGHT
+
+    Copyright (c) 2001-02 Arun Kumar U <u_arunkumar@yahoo.com> 
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+
+    Arun Kumar U <u_arunkumar@yahoo.com>, <uarun@cpan.org>
+
+SEE ALSO
+
+    perl(1), perltie(1)
+
+                          =======================
+
+HOW TO INSTALL IT ?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+  perl Makefile.PL
+  make 
+  make test
+  make install
+
+To install this module into a specific directory, do:
+perl Makefile.PL PREFIX=/name/of/the/directory
+...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+Share and Enjoy !!
+
+Arun Kumar U
+<u_arunkumar@yahoo.com>
+<uarun@cpan.org>
+
+
+-------------------------------------------------------------------------------
+    Only wimps use tape backup: *real* men just upload their important
+    stuff on ftp, and let the rest of the world mirror it.
+                                                            - Linus Torvalds
+-------------------------------------------------------------------------------
+

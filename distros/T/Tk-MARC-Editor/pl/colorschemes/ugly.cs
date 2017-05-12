@@ -1,0 +1,17 @@
+datafg	yellow
+databg	black
+fieldfg	yellow
+fieldbg	black
+fixedfg	yellow
+fixedbg	black
+ind1fg	black
+ind1bg	yellow
+ind2fg	black
+ind2bg	yellow
+leaderfg	#ffff00
+leaderbg	#400000
+leadereditfg	#000000
+leadereditbg	#fbfbfb
+subfieldfg	black
+subfieldbg	yellow
+background	#7d0300

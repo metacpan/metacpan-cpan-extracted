@@ -1,0 +1,49 @@
+Revision history for Perl extension Test::RedisServer
+
+0.20 2015-06-08T16:35:26Z
+    - Fixed grammar and typos, fixed pod_spell test, fixed MYMETA error in cover test (ncstang)
+    - use Mouse; no Any::Moose;
+
+0.14 2013-10-21T12:56:00+09:00
+     - remove Path::Class dependency from new test added 0.13
+
+0.13 2013-10-21T20:55:00+09:00
+     - make tmp_dir attribute public (basiliscos)
+
+0.12 2012-10-17T13:37:15+09:00
+     - workaround perl SEGV (perlbug #115206) on Makefile.PL
+
+0.11 2012-09-19T08:20:02+09:00
+     - make all waitpid non-blocking
+
+0.10 2012-09-07T15:23:08+09:00
+     - specified Redis.pm minimum version because there's old version which doesn't support UNIX socket
+
+0.09 2012-08-31T11:17:24+09:00
+     - set dir parameter if not already set so that tests are more repeatable if the use save()
+       (Jeremy Zawodny)
+
+0.08 2012-08-16T12:46:15+09:00
+     - fixed wait_exit inf loop
+
+0.07 2012-08-16T11:06:23+09:00
+     - added exec method
+
+0.06 2012-08-15T17:02:00+09:00
+     - copy pid to avoid a uninitialized warning when stopping a instance
+
+0.05 2012-08-15T16:47:06+09:00
+     - fixed wrong pid reference
+
+0.04 2012-08-03T10:38:38+09:00
+     - fixed a test does not pass in localized environment (Reported by Sergey Gladkov)
+     - added pid method in document
+
+0.03 2012-08-02T15:27:55+09:00
+     - don't listen tcp port by default.
+
+0.02 2012-08-01T16:29:38+09:00
+     - added wait_exit method
+
+0.01 2012-07-30T17:40:41+09:00
+     - initial version

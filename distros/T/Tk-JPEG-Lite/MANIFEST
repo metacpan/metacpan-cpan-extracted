@@ -1,0 +1,14 @@
+Changes
+Lite.pm
+Lite.xs
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+imgJPEG.c
+t/Read.t
+t/more.t
+t/testimg.jpg
+tkjpeg-lite
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

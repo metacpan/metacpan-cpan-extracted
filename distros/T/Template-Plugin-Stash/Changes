@@ -1,0 +1,22 @@
+Revision history for Perl module Template::Plugin::Stash
+
+1.006 Tue Mar  9 20:28:54 2004
+    - the stash returned now is not blessed (kinda significant, thank markthomas.org)
+
+1.005 Fri Jan 23 14:40:16 2004
+    - pod typo (bug-)
+
+1.004 Tue Jan 20 09:23:19 2004
+    - resolved lame tar perms issue (grrr) by using ptar
+    - changed =head1 LICENSE text
+    - fixed up this file
+...
+
+0.02 Tue Dec 23 02:38:37 2003
+	- dropped in source, added version, massaged readme, Makefile.PL :)
+
+
+0.01 Tue Dec 23 02:38:37 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

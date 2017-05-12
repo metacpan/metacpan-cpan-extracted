@@ -1,0 +1,64 @@
+{
+   "abstract" : "Flexible and prowerful class and object mocking library for perl",
+   "author" : [
+      "Dave Mueller <dave@perljedi.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Mock-Wrapper",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Exporter" : "0",
+            "Module::Runtime" : "0",
+            "Scalar::Util" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "perl" : "v5.18.0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::Fatal" : "0",
+            "Test::Spec" : "0",
+            "metaclass" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/perljedi/test-mock-wrapper",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perljedi/test-mock-wrapper.git",
+         "web" : "https://github.com/perljedi/test-mock-wrapper"
+      }
+   },
+   "version" : "0.18"
+}
+

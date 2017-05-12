@@ -1,0 +1,62 @@
+Test/ManyParams version 0.10
+============================
+
+SYNOPSIS
+
+  use Test::ManyParams;
+
+  all_ok {foo(@_)}  
+         [ [$arg1a, $arg2a], [$arg2b, $arg2b, $arg3b, $arg4b] ],
+         "Testing that foo returns true for every combination of the arguments";
+         
+  all_ok {bar(shift())}
+         [qw/arg1 arg2 arg3 arg4 arg5 arg6/],
+         "Testing every argument with bar";
+         
+  any_ok {drunken_person() eq shift()}
+         ["Jim Beam", "Jonny Walker", "Jack Daniels"];
+  any_is {ask_for_sense_of_life(shift())} 42, ["Jack London", "Douglas Adams"];
+           
+  most_ok {$img->colorAt($_[0],$_[1]) == BLACK} 
+         [ [0 .. 10_000], [0 .. 10_000] ] => 100,
+         "100 random pixels of a black image should be black";
+  
+  [NOT YET IMPLEMENTED]
+  
+  all_are_deeply  CODE  SCALAR,  PARAMETERS, [ TEST_NAME ]
+  all_like        CODE  REGEXP,  PARAMETERS, [ TEST_NAME ]
+  all_unlike      CODE  REGEXP,  PARAMETERS, [ TEST_NAME ]
+  all_can         CODE  METHODS, PARAMETERS, [ TEST_NAME ]
+  all_dies_ok     CODE           PARAMETERS, [TEST_NAME]
+  all_lives_ok    CODE           PARAMETERS, [TEST_NAME]
+  all_throws_ok   CODE  REGEXP,  PARAMETERS, [TEST_NAME]            
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::Builder       
+    Set::CrossProduct   
+    Data::Dumper      
+
+    Test::More               # for testing
+    Test::Exception     
+    Test::Builder::Tester
+    Test::Differences
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Janek Schleicher
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

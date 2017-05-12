@@ -1,0 +1,18 @@
+[% # $Id: html,v 1.3 2005/01/16 16:09:40 jv Exp $ -%]
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>[% page.title %]</title>
+  <link rel="stylesheet" href="[% site.url.css %]/site.css">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="[% site.col.back %]"
+       text="[% site.col.text %]" link="[% site.col.link %]"
+       vlink="[% site.col.vlink %]" alink="[% site.col.alink %]"
+       [%- " background=\"${site.background.src}\"" IF site.background -%] >
+  [% content %]
+ </body>
+</html>

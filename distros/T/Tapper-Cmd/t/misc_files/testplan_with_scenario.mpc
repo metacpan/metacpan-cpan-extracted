@@ -1,0 +1,49 @@
+---
+type: scenario
+testplan_description:
+  scenario_type: interdep
+  scenario_name: client-server
+  scenario_options:
+    no_sync: 1
+  scenario_description: 
+  - requested_hosts_all:
+    - einstein
+    preconditions:
+      - precondition_type: testprogram
+        program: /home/user/bin/start_client.sh
+        parameters:
+        - --first
+        - --second
+        timeout: 2000
+      - precondition_type: hint
+        local: 1
+        skip_install: 1
+  - requested_hosts_all:
+    - bohr
+    preconditions:
+      - precondition_type: testprogram
+        program: /home/user/bin/start_server.sh
+        parameters:
+        - first
+        - second
+        timeout: 2000
+      - precondition_type: hint
+        local: 1
+        skip_install: 1
+---
+type: multitest
+description:
+  requested_hosts_all:
+  - bullock
+  preconditions:
+  - arch: linux64
+    image: suse/suse_image.tar.gz
+    mount: /
+    partition: sda2
+    precondition_type: image
+  - precondition_type: testprogram
+    program: /home/user/bin/start_server.sh
+    parameters:
+      - first
+      - second
+    timeout: 2000

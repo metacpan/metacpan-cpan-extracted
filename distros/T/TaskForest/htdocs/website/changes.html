@@ -1,0 +1,565 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<div class="width2"><div class="primary_header">Change Log</div></div>
+
+
+
+<div class="width6 last">
+
+
+<div class="section_header"><a name="1.37"></a>1.37 Tue March 23 2010</div>
+<p>
+  Enhancements
+</p>
+      <p class="front_news">
+        There are two main enhancements in this release.  The first is
+        that now you can configure TaskForest to <a href="/docs/configuring/retry.html">automatically retry</a>
+        running a job if it fails.  The number of times it retries, as
+        well as the amount of time between retries is configurable on a
+        per-job basis.
+      </p>
+      <p class="front_news">
+        TaskForest now also features a very powerful email system.  You
+        can configure TaskForest to <a href="/docs/configuring/email.html">email you when a job fails</a>, when a job
+        is retried, and when a job suceeds after failing and being
+        retried.  Each kind of email can be sent to a different email
+        address, and these email addresses can be configured system-wide,
+        or for each job, or for anything in the middle.
+      </p>
+      <p>
+        If you have developed your own run wrapper, please be advised that
+        the interface to the run wrappers has changed.  Instead of being
+        passed parameters as command line arguments, the wrappers now look
+        for environment variables.  
+      </p>
+  
+
+<div class="new_section_header"><a name="1.36"></a>1.36 Tue February 23 2010</div>
+<p>
+  Enhancements
+</p>
+<ul class=bullet>
+      <li class="front_news">
+        We've added a button to the logs form on the website that pops up
+        a calendar window to help you select a date.  Many thanks to Steve Hulet
+        for providing the patch.
+      </li>
+      <li class="front_news">
+        The logs display page on the website now has links to navigate to the
+        previous and next days.  Many thanks to Steve Hulet for providing the
+        patch.
+      </li>
+      <li class="front_news">
+        This version fixes a few more test cases that wouldn't run properly
+        during certain times of the day.
+      </li>
+</ul>
+  
+
+<div class="new_section_header"><a name="1.35"></a>1.35 Thu February 11 2010</div>
+<p>
+  Enhancements and Minor Bug Fixes
+</p>
+<ul class=bullet>
+      <li class="front_news">
+        Starting in this release, you can now place a Waiting
+        job <a href="/docs/hold.html">on hold</a>. If a job is placed on
+        hold, it will not run during the current day even if all its
+        dependencies are met.  The only way to make it run as normal is if
+        you first release the hold off the job.
+      </li>
+      <li class="front_news">
+        The taskforestd web server now supports
+        the <a href="/docs/configuring/options.html#default_time_zone">default_time_zone</a>
+        option.  This new configuration option will control how times are
+        displayed in the 'logs' page, when the time zone in which the job
+        ran is not known.
+      </li>
+      <li>
+        This version now gracefully handles the case where a job is marked
+        for rerun and then removed from the Family file before it has the
+        chance to rerun.
+      </li>
+      <li>
+        If a job fails, its status line on the web page is now colored.
+      </li>
+      <li>
+        The web site now prunes out carriage returns from job files. This would cause
+        interpreted scripts to fail because the '#!' line contained a \r.
+      </li>
+      <li>
+        This version fixes a few test cases that wouldn't run properly
+        during certain times of the day.
+      </li>
+</ul>
+  
+
+<div class="new_section_header"><a name="1.33"></a>1.33 Mon Jun 1 2009</div>
+<p>
+  Enhancements.
+</p>
+<ul class="bullet">
+  <li>
+    Added support for external dependencies (jobs depending on jobs that
+    are in other families.
+  </li>
+  <li>
+    Removed the VERSION string from all the .pm files, and moved it to
+    Makefile.PL.  Thils will mean less diffs between versions.
+  </li>
+  <li>
+    Got rid of unused code.
+  </li>
+  <li>
+    Improved some test cases, to reduce the risk of false test failures. 
+  </li>
+  <li>
+    Fixed a bug where the last entry of a recurring job was sometimes not run.
+  </li>
+  <li>
+    Modified taskforestd and taskforestdssl to accept the 'chained' option in the config file.
+  </li>
+</ul>
+  
+
+  
+
+<div class="new_section_header"><a name="1.26"></a>1.26 Tue May 19 2009</div>
+<p>
+Minor bug fix
+</p>
+<ul class="bullet">
+  <li>
+    There was an unnecessary call to 'use Date::Calc' in Calendar.pm.  I
+    didn't notice it, because I have it installed. It is not being used. It
+    may cause tests to fail.  I have removed the line.
+  </li>
+</ul>
+  
+
+<div class="new_section_header"><a name="1.25"></a>1.25 Mon May 18 2009</div>
+<p>
+Enhancements
+</p>
+<ul class="bullet">
+  <li>
+    TaskForest now
+    supports <a href="/docs/configuring/calendars.html">calendars</a>.  A
+    calendar is a set of rules that defines on what days a job may run.
+    Each rule can may or may not conclusively determine whether or not a
+    Family should run today.  The rules are evaluated in the order in
+    which they are specified.  The last rule that conclusively determines
+    whether of not a Family should run wins, in the case of conflicting
+    rules.  If none of the rules is conclusive, then the Family will not
+    run today.  You can set rules to specify certain dates or ranges of
+    dates, or specific days, like "third friday of every month."
+  </li>
+  <li>
+    Added an FAQ section to the website.
+  </li>
+  <li>
+    Fixed small bug in REST website where logs were not being displayed for
+    jobs that ran earlier today (but yesterday by its family's timezone)
+  </li>
+
+
+</ul>
+
+
+<div class="new_section_header"><a name="1.24"></a>1.24 Sun Apr 26 2009</div>
+<p>
+Enhancements
+</p>
+<ul class="bullet">
+  <li>
+    Added support for tokens, which can be used to control how many jobs can run simultaneously.
+  </li>
+  <li>
+    Formalized the way Families with foreign time zones are handled.  This
+    allows you to 'time shift' your family, essentially allowing your
+    family to run for 24 hours in a later timezone.  This shifts the end
+    of day towads the end of the family's running time.
+  </li>
+</ul>
+
+  
+
+<div class="new_section_header"><a name="1.23"></a>1.23 Thu Mar 24 2009</div>
+<p>
+  Bug fix
+</p>
+<ul class="bullet">
+  <li>
+    This release fixes a nasty bug where Family files were not being
+    parsed properly if the files were in DOS format (with CRLF endings,
+    instead of just LF).  Unfortunately, most web browsers save textarea
+    text with CRLF, so a Family file that was originally in Unix format
+    (LF) could wind up being in DOS (CRLF) format if you edited it via the
+    website.
+  </li>
+</ul>
+
+  
+
+<div class="new_section_header"><a name="1.22"></a>1.22 Mon Mar 23 2009</div>
+<p>
+  Feature Addition and minor bug fix
+</p>
+<ul class="bullet">
+  <li>
+    Added the ability to release all dependencies from a job.  This makes
+    the job available to run immediately, regardless of how many jobs it
+    is supposed to wait for, or what time dependency it has.  Releasing a
+    job effectively changes its status from 'Waiting' to 'Ready.'  This
+    option is only available to jobs that are currently in the 'Waiting'
+    state.
+  </li>
+  <li>
+    Fixed a minor bug where status on the website was sometimes showing a
+    previous day's status if the website had been up for more than a day.
+  </li>
+  <li>
+    Added a line break between the words in the headers in the status and
+    log pages on the website, so that the table doesn't take up too much
+    horizontal space.
+  </li>
+  <li>
+    Eliminated a debug message saying that the ignore_regex option changed
+    every time the system cycled.
+  </li>
+</ul>
+  
+
+<div class="new_section_header"><a name="1.21"></a>1.21 Thu Mar 12 2009</div>
+<p>
+  Bug fix
+</p>
+<ul class="bullet">
+  <li>
+Fixed a bug that was causing the rerun and mark commands run with the
+  --cascade or --dependents_only flag to print an error message when
+  there was, in fact, no error, and possibly exit before rerunning or
+  marking all requested jobs.
+  </li>
+</ul>
+
+
+<div class="new_section_header"><a name="1.20"></a>1.20 Tue Mar 10 2009</div>
+<p>
+  Minor bug fixes and documentation changes
+</p>
+<ul class="bullet">
+  <li>
+    Fixed a bug where the end time wasn't being calculated properly.
+  </li>
+  <li>
+    Added some licensing text to comply with yui licensing requirements.
+  </li>
+</ul>
+
+
+  
+<div class="new_section_header"><a name="1.19"></a>1.19 Sat Mar 07 2009</div>
+<p>
+  Minor bug fixes and documentation changes
+</p>
+<ul class="bullet">
+  <li>
+    In Log page, successful job should show 'mark Failure' not 'mark Success'.
+  </li>
+  <li>
+    Added log_date to website to make Rerun/Mark of a job from a previous
+    day work as expected.
+  </li>
+  <li>
+    Changed RESTful service header and docs - added log_date.
+  </li>
+</ul>
+
+
+<div class="new_section_header"><a name="1.18"></a>1.18 Fri Mar 06 2009</div>
+
+<p>
+  All of the changes in this release are related to the website.
+</p>
+<ul class="bullet">
+  <li>
+  Made sure that if a job file dies after the fork but before ceding
+  control back to the wrapper, you can at least see its log, if it was run
+  with run_with_log.
+  </li>
+  <li>
+    The website now shows the log file for running jobs, not just jobs
+    that have completed.
+  </li>
+  <li>
+    Fixed bug where marking a job as Success was not working after it had
+    been marked as Failure.
+  </li>
+  <li>
+    Moved mark and rerun forms to buttons on the status and logs tables
+  </li>
+  <li>
+    Changed website to a horizontal layout, so that we have the full
+    window width for tables.
+  </li>
+  <li>
+    Fixed a bug so that rerun jobs log files are displayed correctly on
+    the web site.
+  </li>
+  <li>
+    Added 'Cache-Control: Public' HTTP response header to allow Firefox 3
+    to cache SSL pages which it does not do by default. This greatly
+    improves website performance if you're using Firefox 3.  Firefox 2
+    does not support the Cache-Control response header, so the website
+    will be slower if you're using SSL and Firefox 2 or earlier.
+  </li>
+  <li>
+    Added the 'help' and 'about' documentation sections to the website.
+  </li>
+</ul>
+
+<div class="new_section_header"><a name="1.17"></a>1.17 Sat Feb 21 2009</div>
+
+<p>
+The major change in this release is the addition of an alternative run
+wrapper script called run_with_log.  It performs the same functions as the
+original wrapper, and also creates a log file that captures both STDOUT
+and STDERR of the job being run.  On the website you can now display the
+log file of any running or completed job, by clicking on the displayed
+status of the job.  The RESTful web service also supports this.  A couple
+of entries have also been added to the HOWTO section of the documentation.
+</p>
+
+<div class="new_section_header"><a name="1.16"></a>1.16 Wed Feb 18 2009</div>
+
+<p>
+Minor bug fix.  An incorrect test job file was shipped in the previous
+version.  This file relied on /bin/bash, and not /bin/sh.  This caused
+test 017 to fail on any machine that did not have /bin/bash.  The file has
+been fixed in this release.
+</p>
+
+<div class="new_section_header"><a name="1.15"></a>1.15 Sun Feb 15 2009</div>
+
+<p>
+The ordering of jobs displayed by the status command was changed.  The
+status command now accepts a --date option, to view jobs that ran on a
+previous date.  When run for the current day, the status command now also
+displays all jobs that ran that are not currently in any Family.  This
+handles the case where the jobs are removed from family files intra-day,
+after running.  These jobs are displayed using the newly-supported
+default_time_zone option.
+</p>
+
+<p>
+This release also introduces taskforestd, a perl-only web server that
+implements a RESTful web service that can be used by programatic clients
+to access the Taskforest system.  The web server also includes a web site
+that can be used by humans to interact with Taskforest.  The web server
+uses Basic Authentication to authenticate the user, so if you wish to use
+it outside an intranet, you should use taskforestdssl, the SSL version of
+the program.  
+</p>
+
+<div class="new_section_header"><a name="1.14"></a>1.14 Thu Jan 22 2009</div>
+
+<p>
+A new config option (and command line argument) was added.  The
+ignore_regex option instructs the system to ignore any Family files whose
+names match the regular expressions specified by this option.  It's
+primarily used to ignore .bak and ~ files left by text editors.  Also
+fixed a bug so that invalid file names are excluded.
+</p>
+
+<div class="new_section_header"><a name="1.13"></a>1.13 Mon Jun 02 2008</div>
+
+<p>
+The behavior of recurring jobs that are scheduled in a foreign time zone
+was not well defined.  Now, the 'start' and 'until' of recurring jobs are
+always based on the most specific timezone of the job. 
+</p>
+
+<div class="new_section_header"><a name="1.12"></a>1.12 Sun Jun 01 2008</div>
+
+<p>
+A border-condition bug dealing with foreign timezones crossing a date
+boundary was fixed. 
+</p>
+
+<div class="new_section_header"><a name="1.11"></a>1.11 Wed May 28 2008</div>
+
+<p>
+Minor errors in the documentation and logging
+were fixed. A test case that was returing
+false negatives was made more robust. 
+</p>
+
+<div class="new_section_header"><a name="1.10"></a>1.10 Mon May 26 2008</div>
+
+<p>
+Syntax error checking was added to the Family
+file parser.  Optional logging of STDOUT and
+STDERR is now possible.  The mark and rerun
+commands can now act on just the job specified,
+or on all its dependents or on both - the job and
+its dependents.  Finally, a config file can now
+be used in lieu of command-line options or
+environment variables. 
+</p>
+
+<p>New options are:</p>
+
+<ul>
+  <li>--log</li>
+  <li>--config_file</li>
+  <li>--chained</li>
+  <li>--log_threshold</li>
+  <li>--log_file</li>
+  <li>--err_file</li>
+</ul>
+
+<p>
+A sample config file can be found in the main
+directory as well as in the pod for TaskForest.
+</p>
+
+<p>
+Please see the TaskForest pod for more details:
+perldoc TaskForest
+OR
+man TaskForest
+</p>
+
+<p>
+Because of these changes, there are two new
+dependencies:
+</p>
+
+Log::Log4perl version 1.16 or higher<br>
+Config::General version 2.38 or higher<br>
+
+<div class="new_section_header"><a name="1.09"></a>1.09 Sun Apr 27 2008</div>
+     
+<p>
+    Two new scripts were added: 'rerun' schedules
+    A job to be rerun, and 'mark' marks a
+    previously job as Success or Failure.  A new
+    'chained' option was added to the definition
+    of repeat jobs, and a '--collapsed' option was
+    added to the status script.
+</p>
+    
+    <ul class="bullet">
+    
+    <li> The 'rerun' script makes a job available to be
+       rerun, regardless of whether or not it ran
+       successfuly.  It does this by renaming the
+       job's log files from FF.JJ.* to
+       FF.JJ--Orig_n--.* where n is an integer that
+       starts at 1 for the first rerun, and is
+       incremented by one at every rerun.
+    </li>
+    
+    <li> The 'mark' job marks a job as 'Success' or
+       'Failure', regardless of whether or not it ran
+       successfully.  It does this by renaming the job
+       rc file from FF.JJ.x to FF.JJ.0 (in the case of
+       Success) or FF.JJ.1 (in the case of Failure).
+       If the job's status is already as requested, a
+       warning is printed, and nothing is done.
+    </li>
+    
+    <li> By default, repeat jobs (those that have the
+       'every' and 'until' options) have only one
+       dependency - their time dependency.  They are
+       not dependent on each other.  In retrospect,
+       the correct behavior should have been to make
+       the jobs also dependent on each other.
+       Consider the case where a job is to run every
+       hour, but for whatever reason, taskforest does
+       not run until half-way through the day.  This
+       would cause half of the jobs to run at the same
+       time at the first opportunity.  The new
+       'chained' option makes the repeat jobs
+       dependent on each other.
+    </li>
+    
+    <li> Also related to repeat jobs: the new
+       --collapsed option to the status command
+       prevents repeat jobs that are in the 'Waiting'
+       state from being displayed.  This is especially
+       useful when you have a job scheduled to be run
+       once every minute, and it's only 8:00 a.m.  You
+       probably wouldn't want to see 960 entries when
+       one would suffice.
+    </li>
+    </ul>
+    
+<div class="new_section_header"><a name="1.08"></a>1.08 Mon Apr 07 20:52:00 2008</div>
+<p>
+     A couple of the files required for the most recent test case was
+     missing from the distribution.  Added those files to the
+     distribution.  No code changes are present in this distribution.
+</p>
+     
+<div class="new_section_header"><a name="1.07"></a>1.07 Sun Apr 06 20:50:00 2008</div>
+<p>
+     A major bug was fixed in this release. Long-running jobs (that ran for
+     longer than the wait time, or longer than the time between two
+     invocations of taskforest) were not recognized as such.  This caused
+     the jobs to be marked as 'Ready' and not 'Running', causing them to
+     be run again.  All users are urged to upgrade to this release and
+     make sure to use the current version of the 'run' wrapper.
+</p>
+     
+<div class="new_section_header"><a name="1.06"></a>1.06 Fri Apr 04 22:00:00 2008</div>
+<pre>
+    - fixed a bunch of minor bugs
+      - implement --help functionality
+      - added $VERSIONS and pod to every .pm file
+      - got rid of extra call to localtime
+      - removed the default_timezone command line option
+      - got rid of redundant regex match for parens in job name
+      - removed unused variable $forest from Family::readFromFile
+      - renamed $this_jobs_dependencies to $this_jobs_time_dependencies
+    - enhancements
+      - refactored Family::readFromFile into smaller functions
+      - use croak instead of die
+      - Added more detailed info into the pid file
+      - Added more test cases
+      - Made the Family->display() output prettier
+      - Added the StringHandle and StringHandleTier class to
+        make testing easier.
+</pre>    
+    
+<div class="new_section_header"><a name="1.05"></a>1.05 Fri Mar 28 22:00:00 2008</div>
+<pre>
+    - added more test cases
+    - fixed all known bugs
+       Family::readFromFile makes a Family no longer current        
+       Family::readFromFile now accepts both single and double quotes.  
+       getLogDir throws an exception if the mkdir fails            
+    - Added a DESIGN document
+</pre>
+    
+<div class="new_section_header"><a name="1.04"></a>1.04 Sun Mar 23 20:56:00 2008</div>
+<pre>
+    - added a lot more documentation to the man page and the code
+    - gave files svn:keyword properties for Date and Revision
+</pre>
+    
+<div class="new_section_header"><a name="1.03"></a>1.03 Sat Mar 22 08:29:00 2008</div>
+    - allow '-' within the job_dir, log_dir and family_dir
+
+<div class="new_section_header"><a name="1.02"></a>1.02 Sat Mar 22 07:22:00 2008</div>
+    - fixed bug where options weren't being read from the command line properly
+
+<div class="new_section_header"><a name="1.01"></a>1.01 Sat Mar 22 01:05:00 2008</div>
+    - added bin files to MANIFEST and fixed test
+
+<div class="new_section_header"><a name="1.00"></a>1.00 Thu Mar 20 20:39:24 2008</div>
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+</div>
+<include TaskForest::REST::PassThrough /foot.html />

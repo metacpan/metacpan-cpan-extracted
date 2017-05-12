@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/bigslowtest.t
+examples/mediumslowtest.t
+examples/test.pl
+examples/tickit.pl
+lib/TAP/Harness/Async.pm
+lib/TAP/Parser/Iterator/Process/Async.pm
+t/00-pod.t
+t/00-use.t
+test-files/test.t

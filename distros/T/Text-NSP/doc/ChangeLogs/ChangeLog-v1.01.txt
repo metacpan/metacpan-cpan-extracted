@@ -1,0 +1,14 @@
+Changes from NSP version 0.99 to 1.01
+--------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+
+June 23, 2006
+
+The CVS directories were left by mistake in version 0.99.
+They have been removed in version 1.01. This does not affect
+the functionality of the package, but it takes up a lot
+of space, and is sort of messy. It also causes one of the
+test scripts to fail (the one that checks the --recurse
+option in count.pl)

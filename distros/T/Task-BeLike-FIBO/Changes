@@ -1,0 +1,49 @@
+
+0.19 2015-07-05
++ Install Devel::Cover only if Perl < 5.22
++ scaffonding script replaces files in place
++ Updated travis to Perl v5.22
++ I prefer MINOR_PERL_VERSION 5.12.0
++ Exclude *.ERR files form dist, e.g. perltidy.ERR
++ Few improvements in documentation
+
+0.18 2015-05-14
++ Changed Changes format
++ Added App::Ack
++ Added scaffolding script
++ Minor improvements in documentation
++ Code coverage report with syntax highlight
+
+0.17 2015-04-24
++ Added test coverage instructions
++ Added how to use GitHub Pages
++ Replaced urls on raw.githubusercontent.com with my own domain g14n.info
++ Moved some files on GitHub Pages to make it DRY
+
+0.16 2015-04-21
++ Updated travis to Perl v5.20
++ Added perltidyrc config
++ Minor modifications in documentation
+
+0.15 2015-02-03
++ Added commands to download file samples
+
+0.14 2015-01-14
++ Added modules to enable cpan client history
+
+0.12 2014-12-29
++ Added Module::Corelist to bundle
+
+0.11 2014-12-18
++ Added badges
++ Added git tag instructions
++ Better git branch workflow
+
+0.10 2014-12-17
++ Updated dependencies versions
++ Fixed some errors in POD
+
+0.9 2014-12-02
++ Added Changes file
++ Added MINOR_PERL_VERSION in Makefile.PL
++ Updated Artistic license url

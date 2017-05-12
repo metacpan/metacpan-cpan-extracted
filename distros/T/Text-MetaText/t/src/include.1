@@ -1,0 +1,15 @@
+#
+# This file tests the INCLUDE directive
+#
+
+# basic INCLUDE
+%% INCLUDE anyfile %%
+--
+<<PRE>> %% INCLUDE anyfile %%
+--
+%% INCLUDE anyfile %% <<POST>>
+--
+<<PRE>> %% INCLUDE anyfile %% <<POST>>
+--
+<<PRE>> %% INCLUDE anyfile %% <<MID>> %% INCLUDE anyfile %% <<POST>>
+==

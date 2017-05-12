@@ -1,0 +1,110 @@
+NAME
+    Test::Subroutines - Standalone execution of Perl program subroutines
+
+VERSION
+    version 1.113350
+
+PURPOSE
+    You have a (possibly ancient) Perl program for which you'd like to write
+    some unit tests. The program code cannot be modified to accommodate
+    this, and you want to test subroutines but not actually *run* the
+    program. This module permits running of the program subroutines
+    standalone, and in relative safety.
+
+SYNOPSIS
+     use Test::Subroutines; # exports load_subs
+ 
+     # set up any globals to match those in the Perl program
+     my $global = 'foo';
+ 
+     load_subs( $perl_program_file );
+     # subs from $perl_program_file are now available for calling directly
+ 
+     # OR
+ 
+     load_subs( $perl_program_file, $namespace );
+     # subs from $perl_program_file are now available for calling in $namespace
+
+USAGE
+    You'll need to set-up any environment the subroutines may need, such as
+    global lexical variables, and also be aware that side effects from the
+    subroutines will still occur (e.g. database updates).
+
+    Load the module like so:
+
+     use Test::Subroutines;
+
+    Then use "load_subs()" to inspect your program and make available the
+    subroutines within it. Let's say your program is "/usr/bin/myperlapp".
+    The simplest call exports the program's subroutines into your own
+    namespace so you can call them directly. Note use of the "&" subroutine
+    sigil which is *required*:
+
+     load_subs( '/usr/bin/myperlapp' );
+     # and then...
+     $retval = &myperlapp_sub($a,$b);
+
+    If the subroutines happen to use global lexicals in the program, then
+    you do need to set these up in your own namespace, otherwise
+    "load_subs()" will die with an error message. Note that they must be
+    lexicals - i.e. using "my".
+
+    If you don't want your own namespace polluted, then load the subroutines
+    into another namespace:
+
+     load_subs( '/usr/bin/myperlapp', 'MyTestNamespace' );
+     # and then...
+     $retval = &MyTestNamespace::myperlapp_sub($a,$b);
+
+    Note that this namespace must not be nested, in other words it cannot
+    contain the "::" characters. This is a simple limitation which could be
+    patched.
+
+  Catching "exit()" and other such calls
+    There's the potential for a subroutine to call "exit()", which would
+    seriously cramp the style of your unit tests. All is not lost, as by
+    default this module installs a hook which turns "exit()" into "die()",
+    and in turn "die()" can be caught by an "eval" as part of your test. You
+    can override the hook by passing a HASH reference to "load_subs", like
+    so:
+
+     load_subs( '/usr/bin/myperlapp', {
+         exit => sub { $_[0] ||= 0; die "caught exit($_[0])\n" }
+     } );
+
+    In fact the example above is the default hook - it dies with that
+    message. Pass a subroutine reference as shown above and you can get
+    "exit()" to do whatever you like. With the default hook, you might have
+    this in your tests:
+
+     # unit test
+     eval { &sub_which_exits($a,$b) };
+     is( $@, 'caught exit(0)', 'subroutine exit!' );
+
+    Finally, a similar facility to that described here for overriding
+    "exit()" is available for the "system()" builtin as well. The default
+    hook for "system()" is a noop though - it just allows the call to
+    "system()" to go ahead.
+
+CAVEATS
+    *   You have to call the subroutines with leading "&" to placate strict
+        mode.
+
+    *   Warnings of category "closure" are disabled in your loaded program.
+
+    *   You have to create any required global lexicals in your own
+        namespace.
+
+ACKNOWLEDGEMENTS
+    Some folks on IRC were particularly helpful with suggestions: "batman",
+    "mst" and "tomboh". Thanks, guys!
+
+AUTHOR
+    Oliver Gorwits <oliver@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by University of Oxford.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

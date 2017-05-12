@@ -1,0 +1,142 @@
+Revision history for TPath
+
+1.007     2014-08-05 12:22:57-04:00 America/New_York
+  * added /.../ and :m/.../mods regex syntax
+  * removed most of grammar section from documentation, referring instead to
+    TPath::Grammar
+  * fixed case-insensitivity code for v5.16
+  * silenced Regexp::Grammars warning that emerged in v5.16
+
+1.006     2014-02-14 12:10:54-05:00 America/New_York
+  * fixed enum deprecation warning
+
+1.005     2013-10-27 14:11:20 America/New_York
+  * fix index predicates *yet again*, now the index is relative to list of 
+    of elements selected for that step unless it is an inner predicate -- inside
+    any parentheses -- and the anywhere separator // precedes the step
+
+1.004     2013-09-29 21:46:55 America/New_York
+  * escape sequences \v, \t, \n, \r, \f, \b now available.
+
+1.003     2013-09-28 16:24:08 America/New_York
+  * improved documentation
+  * fixed bug whereby duplicate nodes were being returned
+  * further optimization
+  * added adjacent:: axis
+  * added variables with @v, @var, and @clear_var
+
+1.002     2013-09-17 06:25:16 America/New_York
+  * optimized matching by addition of more caching and elimination of much
+    array copying
+
+1.001     2013-09-12 18:15:44 America/New_York
+  * made it possible to construct case-insensitive expressions
+
+1.000     2013-09-06 22:01:52 America/New_York
+  * BUMPED MAJOR VERSION NUMBER -- significant change in semantics of core tpath
+    features
+  * improved effiency of axis selection in TPath::Selector::Test objects
+  * changed index predicates to match behavior of xpath index predicates, modulo
+    the difference in index base
+  * created outer predicates: (//*)[0] in addition to //*[0]
+
+0.020     2013-07-25 21:33:15 America/New_York
+  * added the standard boolean attributes @all, @some, @one, @none and the 
+    corresponding @fcount and @tcount, which count the number of parameters
+    evaluating as true
+
+0.019     2013-07-07 21:43:15 America/New_York
+  * added string concatenation
+  * added caching of reflection results
+
+0.018     2013-06-30 17:22:59 America/New_York
+  * cleaned up prereqs a bit
+  * cleaned up error message when logging under to TPath::StderrLog
+
+0.017     2013-06-25 21:17:38 America/New_York
+  * improved efficiency of |= and =|
+  * fixed undefined string bug in matching operator application
+
+0.016     2013-05-12 13:17:56 America/New_York
+  * added check for overloaded == to single equals equality function
+  * fixed stringification bug in TPath::Context for overloaded nodes
+  * added autoloading of attributes
+
+0.015     2013-05-11 18:28:56 America/New_York
+  * added math in attribute tests
+  * allowing bare expressions in attribute tests
+
+0.014     2013-04-20 13:20:03 America/New_York
+  * added :p selector
+  * added previous:: axis
+
+0.013     2013-04-14 17:32:57 America/New_York
+  * multi-line paths and comments
+  * refactored to work on TPath::Contexts rather than nodes
+  * fix for regex stringification in v5.14+
+
+0.012     2013-04-11 08:39:27 America/New_York
+  * added /a/"foo bar" and /a/@"foo bar" style name quoting
+  * qname quoting now requires balancing of brackets -- :{foo bar} instead of
+    :{foo bar{
+  * changed exists-one operator from ` to ; to improve readability
+  * improved documentation
+  * made expressions stringifiable
+  * fixed bug in compilation of :root steps
+  * added the string index attribute tests |=, =|=, and =|
+  * refined definitions of equality used by attribute tests
+  * added @card attribute
+  * rename TPath::Test::XOr to TPath::Test::One and removed traces of ^ operator
+  * created @at attribute, which returns an attribute value
+
+0.011     2013-04-04 20:06:57 America/New_York
+  * added :'quote' style quoting
+  * improved error message in event of failure to parse
+
+0.010     2013-03-30 22:22:12 America/New_York
+  * added enumerated repetition -- a{2}, a{,2}, a{2,}, a{2,3}
+  * added matching as attribute test
+  * improved documentation
+
+0.009     2013-03-25 18:31:11 America/New_York
+  * some documentation fixes
+  * replaced special status of first step with general firstness concept in 
+    preparation for adding optional and repeated steps
+  * added :root selector
+  * replaced id(.) selector with :id(.)
+  * changed exists-one operator from ^ to `
+  * added sub-path grouping, alternation, and quantification
+  * added step quantification
+
+0.008     2013-03-17 13:08:25 EST5EDT
+  * added complement selectors -- ^a, ^~a~, and ^@a
+
+0.007     2013-03-12 19:05:01 EST5EDT
+  * removed inner regexes from parsing to prevent segfaults on versions less
+    than v5.14
+
+0.006     2013-03-12 00:39:55 EST5EDT
+  * removed unnecessary URI escaping of attributes
+
+0.005     2013-03-11 19:35:08 EST5EDT
+  * added required tag method
+  * provided default implementations of has_tag and matches_tag methods
+  * added wrap method to handle coercion
+
+0.004     2013-03-10 20:42:16 EST5EDT
+  * added . as a non-terminal character not requiring an escape
+  * refactored grammar a little to reduce repetition
+  * refactored methods to reverse order of TPath::Index and collections in
+    parameters so as to reduce use of undef
+  * removed some redundant steps
+
+0.003     2013-03-09 06:15:32 EST5EDT
+
+0.002     2013-03-08 05:43:32 EST5EDT
+  * documentation improvements
+  * removed TPath::Expression::first, using wantarray in select instead
+  * added optimization step to parsing
+  * fixed parent axis bug
+
+0.001     2013-03-05 05:52:24 EST5EDT
+  * first release

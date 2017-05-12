@@ -1,0 +1,30 @@
+Tk-Image-Calculation version 0.03
+=================================
+
+ This module calculates points and lines inside or outside from simple graphic objects.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Torsten Knorr
+torstenknorr@tiscali.de
+http://www.planet-interkom.de/t.knorr/index.html
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.9.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+

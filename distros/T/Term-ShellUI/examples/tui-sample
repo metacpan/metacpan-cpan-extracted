@@ -1,0 +1,85 @@
+#!/usr/bin/perl -w
+# tui-sample Scott Bronson 16 Dec 2003
+
+# This shows the similarities between Term::TUI (see the sample.pl file)
+# and Term::ShellUI.  This example allows you to enter any number of arguments
+# (except for subs of course).
+
+# This file is released under the MIT license.
+
+use strict;
+use lib '../lib';
+use Term::ShellUI;
+
+my $term = new Term::ShellUI(commands => get_commands());
+$term->run();
+
+sub get_commands
+{
+	return {
+		"abort" =>  { alias => "quit" },
+		"help" => 	{ desc => "Print helpful information",
+					  args => sub { shift->help_args(undef, @_); },
+					  method => sub { shift->help_call(undef, @_); } },
+		"quit" =>	{ desc => "Quit using this program",
+					  maxargs => 0, method => sub { shift->exit_requested(1); } },
+		"math" => {
+			desc => "A simple calculator",
+			cmds => {
+				"add" => {
+					args => "(any number of decimal numbers)",
+					desc => "Add numbers together",
+					proc => sub { print "Total=" . add(@_) . "\n" }, },
+				"mult" => {
+					args => "(any number of decimal numbers)",
+					desc => "Multiply numbers together",
+					proc => sub { print "Total=" . mult(@_) . "\n" }, },
+				"hex" => {
+					desc => "Do math in hex",
+					cmds => {
+						"add" => {
+							args => "(any number of hexadecimal numbers)",
+							desc => "Add numbers together, result in hex",
+							proc => sub { print "Total=" . ashex(\&add,@_) . "\n" }, },
+						"mult" => {
+							args => "(any number of hexadecimal numbers)",
+							desc => "Multiply numbers together, result in hex",
+							proc => sub { print "Total=" . ashex(\&mult,@_) . "\n" }, },
+					},
+				},
+			},
+		},
+		"string" => {
+			desc => "String operations",
+			cmds => {
+				"subs" => {
+					args => ["(string)", "(pos)", "(len)"],
+					desc => "Take STRING,POS,LEN and return a substring.",
+					minargs => 1, maxargs => 3,
+					proc => sub { print "Substring=".substr(shift,shift||0,shift||0)."\n" }, },
+				"len" => {
+					args => "(any number of strings)",
+					desc => "Calculate length of arguments",
+					proc => sub { print "Length=" . join(", ", map { length } @_) . "\n" }, },
+			},
+		},
+	};
+}
+
+sub add {
+	my $sum=0;
+	for(@_) { $sum+=$_; }
+	return $sum;
+}
+
+sub mult {
+	my $prod=1;
+	for(@_) { $prod*=$_; }
+	return $prod;
+}
+
+sub ashex {
+	my $sub = shift;
+	return sprintf("%x", &$sub(map { hex } @_));
+}
+

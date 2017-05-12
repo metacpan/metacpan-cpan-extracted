@@ -1,0 +1,16 @@
+Changes from NSP version 1.03 to 1.04
+--------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+
+Ying Liu, liux0395@umn.edu
+University of Minnesota, Twin Cities 
+
+February 14, 2010
+
+Updated the huge-count.pl file. Added huge-sort.pl and 
+huge-merge.pl to accelerate the speed to deal huge corpora.
+
+ 
+

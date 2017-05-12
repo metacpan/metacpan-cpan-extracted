@@ -1,0 +1,20 @@
+# Tapper-Section: t/00-tapper-meta.t
+ok 1 - tapper-test-meta
+ ---
+ some: yaml01
+ ...
+# Tapper-reportgroup-testrun:     2013071102
+# Tapper-Suite-Name:              Tapper
+# Tapper-Suite-Version:           2.010004
+# Tapper-Suite-Type:              software
+# Tapper-Machine-Name:            bascha
+# Tapper-Language-Description:    Perl 5.010000, /2home/ss5/perl510/bin/perl
+# Tapper-uname:                   Linux bascha 2.6.24-18-generic #1 SMP Wed May 28 19:28:38 UTC 2008 x86_64 GNU/Linux
+# Tapper-osname:                  Ubuntu 8.04
+# Tapper-cpuinfo:                 2 cores [AMD Athlon(tm) 64 X2 Dual Core Processor 6000+]
+1..1
+# Tapper-ram:                     1887MB
+# Tapper-starttime-test-program:  Fri Jun 13 11:16:35 CEST 2008
+All tests successful.
+Files=10, Tests=42,  2 wallclock secs ( 0.06 usr  0.01 sys +  1.78 cusr  0.16 csys =  2.01 CPU)
+Result: PASS

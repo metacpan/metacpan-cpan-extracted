@@ -1,0 +1,48 @@
+---
+abstract: 'redis-server runner for tests.'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Redis: '0'
+  Test::More: '0.98'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-RedisServer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::RedisServer:
+    file: lib/Test/RedisServer.pm
+    version: '0.20'
+requires:
+  File::Temp: '0'
+  Mouse: '0'
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/typester/Test-RedisServer/issues
+  homepage: https://github.com/typester/Test-RedisServer
+  repository: git://github.com/typester/Test-RedisServer.git
+version: '0.20'
+x_authority: cpan:TYPESTER
+x_contributors:
+  - 'Jeremy Zawodny <jzawodn@craigslist.org>'
+  - 'Ivan Baidakou <dmol@gmx.com>'
+  - 'Daisuke Murase <typester@gmail.com>'
+  - 'Sean Smith <ssmith@localhost.localdomain>'
+  - 'Songmu <y.songmu@gmail.com>'

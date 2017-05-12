@@ -1,0 +1,58 @@
+Tie::Plural, version 0.01
+=========================
+
+This module provides a simple and convenient way to format strings
+with plural or singular inflections of various words or phrases,
+using a tied hash to embed the choices within the strings.
+
+This is a small, special-purpose module.  For a more general, powerful
+set of functions for pluralizing words, see Damian Conway's excellent
+Lingua::EN::Inflect module.
+
+EXAMPLES
+
+for $num (0..3)
+{
+    print "I have $num dog$pl{$num}.\n";
+}
+
+The above prints:
+    I have 0 dogs.
+    I have 1 dog.
+    I have 2 dogs.
+    I have 3 dogs.
+
+$num = 700;
+print "My wife owns $pl{$num,'many','one','no'} dress$pl{$num,'es'}.";
+
+The above prints
+    My wife owns many dresses.
+
+DEVELOPMENT STATE
+
+This is an early version of this module, so who knows what bugs lurk.
+
+If you find any bugs, or if any behavior of Tie::Plural surprises you,
+I would be grateful if you could send me an email message about it.
+Thanks.
+
+INSTALLATION
+
+To install this module, do the standard Perl module four-step:
+
+   perl Makefile.PL    or    perl Makefile.pl LIB='my/install/path'
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Exporter.pm and Carp.pm, both of which come with Perl.
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode, roode@cpan.org
+
+Copyright (c) 2005 by Eric J. Roode.  All Rights Reserved.
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,54 @@
+Revision history for Text-FixedWidth
+
+0.13    2013-07-25 jhannah
+        - Whoops! use %07.0f not %07d or you may suffer off-by-a-penny rounding errors. 
+          Thanks mauke in irc.perl.org #perl-help
+
+0.12    2013-07-25 jhannah
+        - Added optional 'writer' subs to set_attribute for when you need to do
+          magic when setting attributes. 
+
+0.11    2013-06-09 jhannah
+        - Added set_attribute(), which allows anonymous subs to be set into 'reader'
+          for when simple sprintf 'format' attributes prove insufficiently flexible.
+
+0.10    2013-05-26 jhannah
+        - Added getf_*
+
+0.09    2013-05-21 jhannah
+        - Added link to github repo. 
+
+0.08_01 2010-10-19 jhannah
+        - Stopped using new_ok(), which wasn't added to Test::More until 
+          0.81_01  Sat Sep  6 15:13:50 PDT 2008
+
+0.08    2010-09-29 jhannah
+        CPAN Testers are happy. Bumping version, pushing.
+
+0.07_01 2010-09-28
+        - Testing additional warnings.  (jhannah)
+        - Use Storable::dclone() instead. (jmmills)
+
+0.07    2009-06-16 jhannah
+        - Found another instance of the warning below. Now tests for "" and undef.
+        - Added more helpful warning instead of this Perl warning:
+          Argument "" isn't numeric in sprintf at Text/FixedWidth.pm line 162.
+
+0.05    2009-04-29 jhannah
+        - Suppress spurious warnings when at attribute is explicitly set to undef.
+        - Carp out a warning if the user tries to set auto_truncate() on an 
+          attribute that doesn't exit.
+
+0.04    2008-09-03 jhannah
+        Added SVN tags so I don't forget where this lives.  :)
+        t/boilerplate.t tasks are done, so removed TODO-ishness
+
+0.03    2008-09-03 jhannah
+        Fixing POD, general cleanup
+
+0.02    2008-09-02 jhannah
+        Fixing META.yml
+
+0.01    2008-09-02 jhannah
+        First version, released on an unsuspecting world.
+

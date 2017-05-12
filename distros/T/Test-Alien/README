@@ -1,0 +1,291 @@
+NAME
+
+    Test::Alien - Testing tools for Alien modules
+
+VERSION
+
+    version 0.14
+
+SYNOPSIS
+
+    Test commands that come with your Alien:
+
+     use Test2::Bundle::Extended;
+     use Test::Alien;
+     use Alien::patch;
+     
+     plan 4;
+     
+     alien_ok 'Alien::patch';
+     run_ok([ 'patch', '--version' ])
+       ->success
+       # we only accept the version written
+       # by Larry ...
+       ->out_like(qr{Larry Wall}); 
+
+    Test that your library works with XS:
+
+     use Test2::Bundle::Extended;
+     use Test::Alien;
+     use Alien::Editline;
+     
+     alien_ok 'Alien::Editline';
+     my $xs = do { local $/; <DATA> };
+     xs_ok $xs, with_subtest {
+       my($module) = @_;
+       ok $module->version;
+     };
+     
+     __DATA__
+     
+     #include "EXTERN.h"
+     #include "perl.h"
+     #include "XSUB.h"
+     #include <editline/readline.h>
+     
+     const char *
+     version(const char *class)
+     {
+       return rl_library_version;
+     }
+     
+     MODULE = TA_MODULE PACKAGE = TA_MODULE
+     
+     const char *version(class);
+         const char *class;
+
+    Test that your library works with FFI::Platypus:
+
+     use Test2::Bundle::Extended;
+     use Test::Alien;
+     use Alien::LibYAML;
+     
+     alien_ok 'Alien::LibYAML';
+     ffi_ok { symbols => ['yaml_get_version'] }, with_subtest {
+       my($ffi) = @_;
+       my $get_version = $ffi->function(yaml_get_version => ['int*','int*','int*'] => 'void');
+       $get_version->call(\my $major, \my $minor, \my $patch);
+       like $major, qr{[0-9]+};
+       like $minor, qr{[0-9]+};
+       like $patch, qr{[0-9]+};
+     };
+
+DESCRIPTION
+
+    This module provides tools for testing Alien modules. It has hooks to
+    work easily with Alien::Base based modules, but can also be used via
+    the synthetic interface to test non Alien::Base based Alien modules. It
+    has very modest prerequisites.
+
+    Prior to this module the best way to test a Alien module was via
+    Test::CChecker. The main downside to that module is that it is heavily
+    influenced by and uses ExtUtils::CChecker, which is a tool for checking
+    at install time various things about your compiler. It was also written
+    before Alien::Base became as stable as it is today. In particular,
+    Test::CChecker does its testing by creating an executable and running
+    it. Unfortunately Perl uses extensions by creating dynamic libraries
+    and linking them into the Perl process, which is different in subtle
+    and error prone ways. This module attempts to test the libraries in the
+    way that they will actually be used, via either XS or FFI::Platypus. It
+    also provides a mechanism for testing binaries that are provided by the
+    various Alien modules (for example Alien::gmake and Alien::patch).
+
+    Alien modules can actually be useable without a compiler, or without
+    FFI::Platypus (for example, if the library is provided by the system,
+    and you are using FFI::Platypus, or if you are building from source and
+    you are using XS), so tests with missing prerequisites are
+    automatically skipped. For example, "xs_ok" will automatically skip
+    itself if a compiler is not found, and "ffi_ok" will automatically skip
+    itself if FFI::Platypus is not installed.
+
+FUNCTIONS
+
+ alien_ok
+
+     alien_ok $alien, $message;
+     alien_ok $alien;
+
+    Load the given Alien instance or class. Checks that the instance or
+    class conforms to the same interface as Alien::Base. Will be used by
+    subsequent tests. The $alien module only needs to provide these methods
+    in order to conform to the Alien::Base interface:
+
+    cflags
+
+      String containing the compiler flags
+
+    libs
+
+      String containing the linker and library flags
+
+    dynamic_libs
+
+      List of dynamic libraries. Returns empty list if the Alien module
+      does not provide this.
+
+    bin_dir
+
+      Directory containing tool binaries. Returns empty list if the Alien
+      module does not provide this.
+
+    If your Alien module does not conform to this interface then you can
+    create a synthetic Alien module using the "synthetic" function.
+
+ synthetic
+
+     my $alien = synthetic \%config;
+
+    Create a synthetic Alien module which can be passed into "alien_ok".
+    \%config can contain these keys (all of which are optional):
+
+    cflags
+
+      String containing the compiler flags.
+
+    cflags_static
+
+      String containing the static compiler flags (optional).
+
+    libs
+
+      String containing the linker and library flags.
+
+    libs_static
+
+      String containing the static linker flags (optional).
+
+    dynamic_libs
+
+      List reference containing the dynamic libraries.
+
+    bin_dir
+
+      Tool binary directory.
+
+    See Test::Alien::Synthetic for more details.
+
+ run_ok
+
+     my $run = run_ok $command;
+     my $run = run_ok $command, $message;
+
+    Runs the given command, falling back on any Alien::Base#bin_dir methods
+    provided by Alien modules specified with "alien_ok".
+
+    $command can be either a string or an array reference.
+
+    Only fails if the command cannot be found, or if it is killed by a
+    signal! Returns a Test::Alien::Run object, which you can use to test
+    the exit status, output and standard error.
+
+    Always returns an instance of Test::Alien::Run, even if the command
+    could not be found.
+
+ xs_ok
+
+     xs_ok $xs;
+     xs_ok $xs, $message;
+
+    Compiles, links the given XS code and attaches to Perl.
+
+    If you use the special module name TA_MODULE in your XS code, it will
+    be replaced by an automatically generated package name. This can be
+    useful if you want to pass the same XS code to multiple calls to xs_ok
+    without subsequent calls replacing previous ones.
+
+    $xs may be either a string containing the XS code, or a hash reference
+    with these keys:
+
+    xs
+
+      The XS code. This is the only required element.
+
+    pxs
+
+      The ExtUtils::ParseXS arguments passes as a hash reference.
+
+    verbose
+
+      Spew copious debug information via test note.
+
+    You can use the with_subtest keyword to conditionally run a subtest if
+    the xs_ok call succeeds. If xs_ok does not work, then the subtest will
+    automatically be skipped. Example:
+
+     xs_ok $xs, with_subtest {
+       # skipped if $xs fails for some reason
+       my($module) = @_;
+       plan 1;
+       is $module->foo, 1;
+     };
+
+    The module name detected during the XS parsing phase will be passed in
+    to the subtest. This is helpful when you are using a generated module
+    name.
+
+ ffi_ok
+
+     ffi_ok;
+     ffi_ok \%opt;
+     ffi_ok \%opt, $message;
+
+    Test that FFI::Platypus works.
+
+    \%opt is a hash reference with these keys (all optional):
+
+    symbols
+
+      List references of symbols that must be found for the test to
+      succeed.
+
+    ignore_not_found
+
+      Ignores symbols that aren't found. This affects functions accessed
+      via FFI::Platypus#attach and FFI::Platypus#function methods, and does
+      not influence the symbols key above.
+
+    lang
+
+      Set the language. Used primarily for language specific native types.
+
+    As with "xs_ok" above, you can use the with_subtest keyword to specify
+    a subtest to be run if ffi_ok succeeds (it will skip otherwise). The
+    FFI::Platypus instance is passed into the subtest as the first
+    argument. For example:
+
+     ffi_ok with_subtest {
+       my($ffi) = @_;
+       is $ffi->function(foo => [] => 'void')->call, 42;
+     };
+
+SEE ALSO
+
+    Alien
+
+    Alien::Base
+
+    Alien::Build
+
+    alienfile
+
+    Test2
+
+    Test::Alien::Run
+
+    Test::Alien::CanCompile
+
+    Test::Alien::CanPlatypus
+
+    Test::Alien::Synthetic
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

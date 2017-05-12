@@ -1,0 +1,158 @@
+NAME
+    Template::Extract - Use TT2 syntax to extract data from documents
+
+VERSION
+    This document describes version 0.41 of Template::Extract, released
+    October 16, 2007.
+
+SYNOPSIS
+        use Template::Extract;
+        use Data::Dumper;
+
+        my $obj = Template::Extract->new;
+        my $template = << '.';
+        <ul>[% FOREACH record %]
+        <li><A HREF="[% url %]">[% title %]</A>: [% rate %] - [% comment %].
+        [% ... %]
+        [% END %]</ul>
+        .
+
+        my $document = << '.';
+        <html><head><title>Great links</title></head><body>
+        <ul><li><A HREF="http://slashdot.org">News for nerds.</A>: A+ - nice.
+        this text is ignored.</li>
+        <li><A HREF="http://microsoft.com">Where do you want...</A>: Z! - yeah.
+        this text is ignored, too.</li></ul>
+        .
+
+        print Data::Dumper::Dumper(
+            $obj->extract($template, $document)
+        );
+
+DESCRIPTION
+    This module adds template extraction functionality to the Template
+    toolkit. It can take a rendered document and its template together, and
+    get the original data structure back, effectively reversing the
+    "Template::process" function.
+
+METHODS
+  new(\%options)
+    Constructor. Currently all options are passed into the underlying
+    "Template::Parser" object. The same set of options are also passed to
+    classes responsible to compile and run the extraction process, but they
+    are currently ignored.
+
+  extract($template, $document, \%values)
+    This method takes three arguments: the template string, or a reference
+    to it; a document string to match against; and an optional hash
+    reference to supply initial values, as well as storing the extracted
+    values into.
+
+    The return value is "\%values" upon success, and "undef" on failure. If
+    "\%values" is omitted from the argument list, a new hash reference will
+    be constructed and returned.
+
+    Extraction is done by transforming the result from Template::Parser to a
+    highly esoteric regular expression, which utilizes the "(?{...})"
+    construct to insert matched parameters into the hash reference.
+
+    The special "[% ... %]" directive is taken as the "/.*?/s" regex, i.e.
+    *ignore everything (as short as possible) between this identifier and
+    the next one*. For backward compatibility, "[% _ %]" and "[% __ %]" are
+    also accepted.
+
+    The special "[% // %]" directive is taken as a non-capturing regex,
+    embedded inside "/(?:)/s"; for example, "[% /\d*/ %]" matches any number
+    of digits. Capturing parentheses may not be used with this directive,
+    but you can use the "[% var =~ // %]" directive to capture the match
+    into "var".
+
+    You may set $Template::Extract::DEBUG to a true value to display
+    generated regular expressions.
+
+    The extraction process defaults to succeed even with a partial match. To
+    match the entire document only, set $Template::Extract::EXACT to a true
+    value.
+
+  compile($template)
+    Use Template::Extract::Compile to perform the first phase of "extract",
+    by returning the regular expression compiled from $template.
+
+  run($regex, $document, \%values)
+    Use Template::Extract::Run to perform the second phase of "extract", by
+    applying the regular expression on $document and returning the resulting
+    "\%values".
+
+SUBCLASSING
+    If you would like to use different modules to parse, compile and run the
+    extraction process, simply subclass "Template::Extract" and override the
+    "COMPILE_CLASS", "PARSER_CLASS" and "RUN_CLASS" methods to return
+    alternate class names.
+
+CAVEATS
+    Currently, the "extract" method only supports "[% GET %]", "[% SET %]"
+    and "[% FOREACH %]" directives, because "[% WHILE %]", "[% CALL %]" and
+    "[% SWITCH %]" blocks are next to impossible to extract correctly.
+
+    "[% SET key = "value" %]" only works for simple scalar values.
+
+    Outermost "[% FOREACH %]" blocks must match at least once in the
+    document, but inner ones may occur zero times. This is to prevent the
+    regex optimizer from failing prematurely.
+
+    There is no support for different *PRE_CHOMP* and *POST_CHOMP* settings
+    internally, so extraction could fail silently on extra linebreaks.
+
+    It is somewhat awkward to use global variables to control "EXACT" and
+    "DEBUG" behaviour; patches welcome to promote them into per-instance
+    options.
+
+NOTES
+    This module's companion class, Template::Generate, is still in early
+    experimental stages; it can take data structures and rendered documents,
+    then automagically generates templates to do the transformation. If you
+    are into related research, please mail any ideas to me.
+
+SEE ALSO
+    Template::Extract::Compile, Template::Extract::Run,
+    Template::Extract::Parser
+
+    Template, Template::Generate
+
+    Simon Cozens's introduction to this module, in O'Reilly's *Spidering
+    Hacks*:
+    <http://www.oreillynet.com/pub/a/javascript/excerpt/spiderhacks_chap01/i
+    ndex.html>
+
+    Mark Fowler's introduction to this module, in The 2003 Perl Advent
+    Calendar: <http://perladvent.org/2003/5th/>
+
+AUTHORS
+    Audrey Tang <cpan@audreyt.org>
+
+COPYRIGHT
+    Copyright 2001, 2002, 2003, 2004, 2005, 2007 by Audrey Tang
+    <cpan@audreyt.org>.
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

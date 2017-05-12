@@ -1,0 +1,46 @@
+CHANGES
+    Revision history for Perl extension Time::DayOfWeek:
+
+    - 1.8 G7MMAGT7 Fri Jul 22 10:16:29:07 -0500 2016
+      * updated license to GPLv3
+
+      * removed PT from VERSION
+
+    - 1.6.A6FFxZB Tue Jun 15 15:59:35:11 2010
+      * had to bump minor version to keep them ascending
+
+    - 1.4.A6FCO7V Tue Jun 15 12:24:07:31 2010
+      * added hack to shift days right one between Feb2008..2009 (still not
+      sure why algorithm skewed)
+
+    - 1.4.75R5ulZ Sun May 27 05:56:47:35 2007
+      * added kwalitee && POD tests, bumped minor version
+
+      * condensed code && moved POD to bottom
+
+    - 1.2.4CCMRd5 Sun Dec 12 22:27:39:05 2004
+      * updated License
+
+    - 1.0.429BmYk Mon Feb 9 11:48:34:46 2004
+      * updated DoW param tests to turn zero month or day to one
+
+      * updated POD to contain links
+
+    - 1.0.41M4ecn Thu Jan 22 04:40:38:49 2004
+      * made bin/dow as EXE_FILES && added named month param detection
+
+    - 1.0.3CNH7Fs Tue Dec 23 17:07:15:54 2003
+      * removed most eccentric misspellings
+
+    - 1.0.3CCA4sO Fri Dec 12 10:04:54:24 2003
+      * removed indenting from POD NAME field
+
+    - 1.0.3CB7PxT Thu Dec 11 07:25:59:29 2003
+      * added month name data and tidied up for release
+
+    - 1.0.3C7IOam Sun Dec 7 18:24:36:48 2003
+      * wrote pod and made tests
+
+    - 1.0.3C7Exdx Sun Dec 7 14:59:39:59 2003
+      * original version
+

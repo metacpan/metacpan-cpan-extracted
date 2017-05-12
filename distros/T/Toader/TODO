@@ -1,0 +1,5 @@
+A list of things to add to Toader.
+
+-CGI app integration.
+-Update the flink, upOneDirLink, and autodocList to support fullURL.
+-Automatic module selection.

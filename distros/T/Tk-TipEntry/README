@@ -1,0 +1,38 @@
+Tk-TipEntry
+========================
+
+This widget is derived from L<Tk::Entry>. It implements an other kind of
+tooltip, that is displayed inside the entry when it's empty.
+The tooltip will be removed, if the entry gets the focus and reinserted, if
+the entry loses the focus and it's value is empty (C<$entry->get() eq ''>).
+
+In addition, the entry evaluates the escape-key. If the entry has the focus
+and the escape-key is pressed, the original input will be restored. If there
+is no previous input, the tooltip will be displayed again.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+  Test::More
+  Test::Pod
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 - 2016 by Alexander Becker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

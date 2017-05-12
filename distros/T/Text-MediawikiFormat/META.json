@@ -1,0 +1,61 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-MediawikiFormat",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "HTML::Parser" : "0",
+            "HTML::Tagset" : "0",
+            "Scalar::Util" : "1.14",
+            "Test::More" : "0.3",
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "version" : "0.74"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/szabgab/Text-MediawikiFormat/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/szabgab/Text-MediawikiFormat.git",
+         "web" : "http://github.com/szabgab/Text-MediawikiFormat",
+         "x_license" : "http://dev.perl.org/licenses/"
+      }
+   },
+   "version" : "1.04"
+}

@@ -1,0 +1,53 @@
+README for Test::WWW::Mechanize::CGIApp
+
+This document refers to version 0.05 of Test::WWW::Mechanize::CGIApp.
+This version was released July 11, 2007.
+
+To install this module on your system, place the tarball archive file in a 
+temporary directory and call the following:
+
+% gunzip Test-WWW-Mechanize-CGIApp-0.05.tar.gz
+% tar xf Test-WWW-Mechanize-CGIApp-0.05.tar
+% cd Test-WWW-Mechanize-CGIApp-0.05
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+If during installation you wish to view more information on test results, 
+substitute the following for the sixth line in the sequence of commands
+above:
+
+% make test TEST=VERBOSE
+
+If you are installing this module over any earlier version, you may 
+substitute the following for the last line in the sequence of commands 
+above:
+
+% make install UNINST=1
+
+If you are installing this module on a Win32 system with 'nmake', 
+substitute 'nmake' for 'make' in the sequence of commands above.
+
+This package requires CGI::Application, Test::WWW::Mechanize, and
+HTTP::Request::AsCGI from CPAN.  If will supports 
+CGI::Application::Dispatch and CGI::Application::Plugin::AutoRunmode
+if they are installed.
+
+In sending e-mail to the maintainer, please put
+"Test-WWW-Mechanize-CGIApp" or "Test::WWW::Mechanize::-CGIApp", 
+in the subject line.
+
+Author:  George Hartzell
+CPAN ID:  HARTZELL
+hartzell@cpan.org
+
+Copyright (c) 2007 George Hartzell.  All rights reserved.
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+This README was modeled on the README from File::Save::Home by
+James E. Keenan.

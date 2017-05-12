@@ -1,0 +1,15 @@
+% if ($c->stash->{we_have_a_problem}){
+<table bgcolor=#fff000 borders=0 width=100%><tr><td><% $c->stash->{we_have_a_problem}->{text} %>(<a href="<% $c->stash->{we_have_a_problem}->{link} %>">more detail</a>)</td></tr></table>
+% }
+% my $title = $c->stash->{title};
+% if ($title) {
+<title><% $title | n %></title>
+% } else {
+<title>Tapper</title>
+%}
+<!-- DEBUG AREA:
+% if ($c->stash->{DEBUG}) {
+
+<% $c->stash->{DEBUG} %>
+% }
+-->

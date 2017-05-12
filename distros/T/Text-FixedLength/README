@@ -1,0 +1,41 @@
+# ----------------------------------------------------------------------------
+# README
+# Text::FixedLength
+# Version 0.12
+# Dion Almaer (dion@member.com)
+# Wed Nov 18 16:55:46 CST 1998
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# ABOUT
+# ----------------------------------------------------------------------------
+Manipulates fixed length fields. You can create, and parse fixed length
+fields, write out files, and read in files to convert
+To see more, type: perldoc Text::FixedLength
+
+# ----------------------------------------------------------------------------
+# COMPATIBILITY
+# ----------------------------------------------------------------------------
+This module is pure Perl. It should work with any Perl5
+
+# ----------------------------------------------------------------------------
+# INSTALL
+# ----------------------------------------------------------------------------
+To build and test this distribution, type:
+
+  perl Makefile.PL
+  make test
+
+If the tests pass, install it:
+
+  make install
+# ----------------------------------------------------------------------------
+# CHANGES
+# ----------------------------------------------------------------------------
+0.12: Added setCrop( 1 | 0 ) to force the fixed field format:
+      setCrop sets whether records should be cropped to the size of the format
+      or not.
+      For example if you have a string 'whee' that is meant to be fit into
+      a fixed format of 2 then if setCrop is true the record will be changed
+      to 'wh' to constrain it
+# ----------------------------------------------------------------------------

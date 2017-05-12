@@ -1,0 +1,6 @@
+name    = "TOML"
+badges  = ["travis"]
+license = "gpl_2"
+
+# Module::Build::Tiny
+module_maker = "ModuleBuildTiny"

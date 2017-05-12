@@ -1,0 +1,30 @@
+Revision history for Perl extension Text::Convert::PETSCII.
+
+0.05  2013-03-08
+    - skipped UTF-8 validation unit-tests for Perl 5.6.2, because regular
+      expression engine in this version of Perl does not support matching
+      of individual UTF-8 characters, treating them as an encoded sequence
+      of bytes instead
+
+0.04  2013-02-24
+    - added new methods to validate if given text may be considered a valid
+      PETSCII string and testing whether given PETSCII string can be printed
+      out
+    - added two new conversion subroutines: "screen_codes_to_petscii" and
+      "petscii_to_screen_codes", which can be used to convert text strings
+      between PETSCII character set and CBM screen codes
+
+0.03  2013-02-17
+    - reverted previous patch and fixed failing unit-tests for Perl 5.6.2 by
+      switching IO::Capture to Capture::Tiny which is able to correctly capture
+      the contents written into standard output and standard error filehandles
+
+0.02  2013-02-16
+    - added minimum required version of Perl 5.8.0 for this distribution due to
+      failing unit-tests for Perl 5.6.2 which is unaware of the SIGALRM signal,
+      and thus unable to correctly capture STDERR output
+
+0.01  2011-04-22
+    - initial version (provides subroutines to convert text format between ASCII
+      and PETSCII character sets, and writing PETSCII character's textual
+      representation to a file handle)

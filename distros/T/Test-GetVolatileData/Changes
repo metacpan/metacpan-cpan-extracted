@@ -1,0 +1,8 @@
+Revision history for Test-GetVolatileData
+
+1.0102  2014-01-17
+        - Fixed up the POD to be more explanatory
+
+1.0101  2014-01-16
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,10 @@
+
+DESCRIPTION
+       This widget provides a switchable open or closed Frame
+       that provides for the vertical arrangement of widget con-
+       trols. This is an alternative to Notebook style tabbed
+       widgets.
+
+Steve Lidie
+2003/07/18
+sol0@lehigh.edu

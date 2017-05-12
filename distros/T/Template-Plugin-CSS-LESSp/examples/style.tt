@@ -1,0 +1,30 @@
+[% USE CSS::LESSp %]
+[% FILTER CSS::LESSp %]
+
+// for more examples see http://lesscss.org/docs.html
+
+@brand_color: #4D926F;
+
+#header {
+  color: @brand_color;
+}
+
+h2 {
+  color: @brand_color;
+}
+
+.rounded_corners {
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+}
+
+#header {
+  .rounded_corners;
+}
+
+#footer {
+  .rounded_corners;
+}
+
+[% END %]

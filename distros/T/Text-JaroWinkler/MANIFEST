@@ -1,0 +1,7 @@
+JaroWinkler.pm
+JaroWinkler.xs
+MANIFEST
+Makefile.PL
+README
+strcmp95.c
+test.pl

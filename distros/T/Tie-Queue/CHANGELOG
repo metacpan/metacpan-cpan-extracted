@@ -1,0 +1,84 @@
+----------------------------
+revision : 0.19
+Date:   Thu Dec 10 11:31:28 2009 +0100
+if first elem NOK do a REPAIR
+if _clear_on_error , CLEAR the queue if error in PUSH otherwise REPAIR
+----------------------------
+revision : 0.18
+Date:   Mon Dec 7 14:35:23 2009 +0100
+in PUSH if last elem not a number don't try any action ( insert or test duplicate )
+----------------------------
+revision : 0.17
+Date:   Mon Nov 23 15:18:46 2009 +0100
+prevent a warning when using no_duplicate and item are not present
+----------------------------
+revision : 0.16
+Date:   Sat Nov 21 23:13:10 2009 +0100
+add code and flag to prevent duplicate value in the queue
+----------------------------
+revision : 0.15
+Date:   Thu Oct 22 14:45:04 2009 +0200
+more strict check on the name of item in DELETE and REPAIR ( /$name(\d+)/ become /^$name(\d+)$/ )
+----------------------------
+revision : 0.14
+Date:   Thu Oct 15 18:19:13 2009 +0200
+add methode REPAIR
+use that function internaly when the queue is corrupted
+----------------------------
+revision : 0.13
+Date:   Tue Oct 13 14:17:47 2009 +0200
+check start elem is numeric in fetch and exists and clear data if clear_on_error flag is set
+----------------------------
+revision : 0.12
+Date:   Fri Oct 9 16:28:21 2009 +0200
+add some self healing features
+add debug flag
+----------------------------
+revision : 0.11
+Date:   Wed Oct 7 12:24:35 2009 +0200
+add a flag to reset the queue if the data are corrupted
+more strict in the data to add ( check if first and last elem are >= 3 )
+carp give the queue name if the data is corrupted
+----------------------------
+revision : 0.10
+Date:   Tue Sep 29 14:16:19 2009 +0200
+don't push if the item number is not a integer
+----------------------------
+revision : 0.09
+Date:   Thu Sep 24 15:53:14 2009 +0200
+fix a warning when getting the size of an empty queue
+----------------------------
+revision : 0.08
+Date:   Thu Sep 24 11:49:39 2009 +0200
+add a flag to prevent insertion of undef value
+--------------------------------------------------------
+revision : 0.07
+Date:   Wed Aug 12 12:10:37 2009 +0200
+fix an error when calculation size on a non initialized queue
+----------------------------
+revision : 0.06
+date : 2009/07/17 10:47:33
+add STORESIZE to allow undef
+really delete item from the queue with SHIFT and POP
+----------------------------
+revision : 0.05
+date : 2009/07/17 08:51:17
+typo error in POP
+----------------------------
+revision : 0.04
+date : 2009/07/15 19:18:24
+don't do autosync by default
+add paramter for autosync
+----------------------------
+revision : 0.03
+date : 2009/07/10 16:33:20
+remove some debug warning
+----------------------------
+revision : 0.02
+date : 2009/07/10 15:52:17
+add namespace and a small header on each queue (to check validity of a previuous queue)
+----------------------------
+revision : 0.01
+date : 2009/07/10 11:10:20
+first full functional version
+----------------------------

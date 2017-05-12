@@ -1,0 +1,195 @@
+Release history for Test-CPAN-Changes-ReallyStrict
+
+1.000004 2017-03-07T11:00:55Z 8ea097f
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000003, see misc/*.deps* for details
+ - develop: +3 ↑2 (suggests: ↑2)
+
+1.000003 2015-07-30T05:03:24Z 14306fe
+ [Bugfix]
+ - Further narrow the range of versions we do testing on, we missed an important one :(
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - test: -1
+
+ [Tests]
+ - Centralised version checking logic.
+ - Remove use of FindBin
+
+1.000002 2015-07-29T04:58:58Z 2696750
+ [Bugfix]
+ - Ensure encoding of source and normalised lines are the same.
+ - Ensure attempting to load source file in the same manner as CPAN::Changes does w/rt UTF8
+ - Guard against test failure if 0.5x radically changes how things format by degrading currently affected tests to TODO
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +12 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: +1 ↓1 -1
+ - test: +1 (recommends: ↑1 ↓1)
+
+1.000001 2014-08-15T23:33:57Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - metadata updated.
+ - whitespace reduced.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑1)
+ - test: +1 -3 (recommends: ↑1 -1)
+
+ [Metadata]
+ - move to kentnl org.
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update Test::ReportPrereqs
+
+1.000000 2014-07-14T20:00:31Z
+ [00 Major]
+ - Packaging changes that may break downstreams that work by hand.
+ - Internals and stylistic tweaks.
+
+ [01 New Version Scheme]
+ - Moving to x.yyyyyy instead of x.y.z ( https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129 )
+ - This is the primary reason for the 1.0 on the box.
+
+ [02 New Toolkit]
+ - This release ships with EUMM instead of MB ( https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f )
+ - "latest" Toolkit dependencies softened to "recommends" instead of "requires"
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.0, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +7 -8 (suggests: +2 -1)
+ - test: +5 ↓1 (recommends: +4)
+
+0.2.0 2013-12-30T03:31:25Z
+ [00 Major]
+ - Internals overhauled into a more logical object per-file.
+ - Test::MockObject logic eliminated.
+
+ [Dependencies::Noteworthy]
+ - Class::Tiny⁺
+ - Try::Tiny⁺
+ - Test::MockObject¯
+ - perl → 5.008
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.6, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: +3 ↑1
+ - test: +1 -1
+
+0.1.6 2013-12-29T06:57:51Z
+ [Bugfix]
+ - Attempt to fix tests failing on recent CPAN::Changes
+
+ [Dependencies::Noteworthy]
+ - CPAN::Changes 0.27 mininum
+ - Newer Module::Build and Test::More
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.5, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +44 -1 (recommends: -1, suggests: +1 -1)
+ - runtime: ↑1 ↓1
+ - test: ↑1 -2
+
+ [Test]
+ - Use Test::Compile::PerFile
+
+0.1.5 2013-04-09T02:57:17Z
+ - Maintenance release for MB 0.4004
+
+ [Dependencies::Noteworthy]
+ - Module::Build 0.3601 → 0.4004
+ - Test::More 0.96 → 0.98
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.4, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 (recommends: ↑1, suggests: ↑1)
+ - test: ↑1
+
+ [Documentation]
+ - Update Copyright year
+ - Add README.mkdn
+
+ [Meta]
+ - bug tracker to github
+
+ [Packaging]
+ - utilise test_requires in Module::Build
+
+0.1.4 2012-02-03T03:51:16Z
+ - Maintenance Release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.3, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +3
+ - test: -1
+
+ [Internals]
+ - name-spaces provide $AUTHORITY
+ - $VERSION moved out of BEGIN
+
+ [Packaging]
+ - Update LICENSE ( Year, Indentation, Address )
+ - Move extra tests to xt/
+ - GIT urls moved to https://
+ - export x_authority
+
+0.1.3 2011-04-24T13:37:34Z
+ - No changes, just this time hopefully the twitter plugin will work because  I actually have LWP::Protocol::https
+   installed.
+
+0.1.2 2011-04-24T13:33:38Z
+ [Dependencies::Noteworthy]
+ - Depend on CPAN::Changes Version 0.17 which contains the surplus whitespace fix.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.1, see misc/*.deps* for details
+ - runtime: ↑1
+
+ [Internals]
+ - Redundant code that handled <=0.14 versions removed as 0.17 is now a mandatory pre-requisite.
+
+ [Tests]
+ - Updated NEXT token extra whitespace test to adapt to changes in CPAN::Changes 0.17
+
+ [Utils::Internals]
+ - normalize.pl now uses CPAN::Changes 0.17 instead of hacking the output manually.
+
+0.1.1 2011-04-17T00:38:07Z
+ [BugFix]
+ - Depend on CPAN::Changes version 0.16 which exposes the regex we consume.
+
+ [Dependencies::Noteworthy]
+ - CPAN::Changes now version 0.16 ( 0.160.0 )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - runtime: ↑1
+
+ [Features]
+ - Add utils for migrating/tidying Changes files. zuluize.pl de-dist-zilla-izes it, and normalize runs it through
+   CPAN::Changes to tidy it, both reading Changes and writing Changes.out
+
+0.1.0 2011-04-13T20:36:43Z
+ - First version.
+ - Does Self-Testing for now with a hard-coded example script.

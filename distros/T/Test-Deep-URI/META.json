@@ -1,0 +1,68 @@
+{
+   "abstract" : "Easier testing of URIs for Test::Deep",
+   "author" : [
+      "Nigel Gregoire <nigelgregoire@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Deep-URI",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "0",
+            "Test::Deep" : "0",
+            "URI" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Tester" : "0",
+            "Test::Warnings" : "0.005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nfg/Test-Deep-URI/issues"
+      },
+      "homepage" : "https://github.com/nfg/Test-Deep-URI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nfg/Test-Deep-URI.git",
+         "web" : "https://github.com/nfg/Test-Deep-URI"
+      }
+   },
+   "version" : "0.02"
+}
+

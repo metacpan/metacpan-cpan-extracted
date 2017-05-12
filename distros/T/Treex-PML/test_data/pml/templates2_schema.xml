@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pml_schema
+  xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/"
+  version="1.2">
+  <template name="example2.template">
+    <param name="content"/>
+    <import schema="example2_schema.xml"/>
+    <derive type="terminal.type">
+      <container  type="content" role="#NODE">
+	<attribute name="id" required="0" role="#ID">
+	  <cdata format="ID"/>
+	</attribute>
+      </container>
+    </derive>
+  </template>
+  <copy template="example2.template" prefix="e2.">
+    <let param="content">
+      <cdata format="string"/>
+    </let>
+  </copy>
+  <derive type="e2.terminal.type">
+    <container>
+      <attribute name="xml:id" required="0" role="#ID">
+	<cdata format="NCName"/>
+      </attribute>
+      <delete>id</delete>
+    </container>
+  </derive>
+  <derive type="e2.meta.type">
+    <structure>
+      <member name="xml:id" required="0" role="#ID" as_attribute="1">
+	<cdata format="NCName"/>
+      </member>
+    </structure>
+  </derive>
+</pml_schema>

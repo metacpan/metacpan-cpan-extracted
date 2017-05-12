@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - 'Cory Bennett <cpan@corybennett.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.132140'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Trivial
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Filter::Simple: 0
+  IO::Scalar: 0
+  IO::Tee: 0
+  Regexp::Common: 0
+  Test::More: 0
+  Text::Diff: 0
+version: v1.901.2

@@ -1,0 +1,52 @@
+Revision history for Perl module ThaiSchema
+
+0.10 2017-05-08T01:28:43Z
+
+    commit 1ca3621b80c58ad9bd6ea63e67387bb666d3c5fa
+    Merge: 2959412 7247e2f
+    Author: Tokuhiro Matsuno <tokuhirom@gmail.com>
+    Date:   Mon May 8 10:26:11 2017 +0900
+
+        Merge pull request #4 from tokuhirom/fix-issue-3
+
+        type_maybe(type_hash) should work. close #3.
+
+0.09 2013-09-02T03:22:39Z
+
+    - Oops. Older version things 0 as invalid integer in non-strict mode.
+
+0.08 2013-02-01T15:02:11
+
+    - allow raw array-ref in json schema validation.
+
+0.07 2012-11-20
+
+    - bug fix: thaischema::json cannot detect missing keys
+
+0.06 2012-11-19
+
+    - fixed 'maybe' validation in JSON validation.
+    - throw exception when parser can't continue parsing
+
+0.05 2012-11-18
+
+    - [JSON] allow raw hashref as schema.
+
+0.04 2012-11-17
+
+    - support validating json directly.
+    - fixed minimal perl version. don't use package block syntax
+      (reported by syohex++)
+
+0.03 2012-11-15
+
+    - bug fixed in Test::ThaiSchema. It's not works in 0.02-
+
+0.02 2012-11-15
+
+    - fixed documentation bug
+
+0.01 2012-11-15
+
+    - original version
+

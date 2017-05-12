@@ -1,0 +1,26 @@
+Revision history for Text-Fold
+
+0.5  Wed Apr  9 17:45:30 2014
+    - rt 67060 Add =encoding utf8 to POD
+    - fix test failures caused by Encode.pm version behavior changes (by using module that normalizes the functionality we want)
+
+0.4  Mon Nov 29 20:18:56 2010
+       - Address “dangling spaces” + unpack() issue
+       - Change test failure diag() to only output if one or more of the related tests fail
+       - add soft-hyphen threshold (and hashref arg interface)
+       - minor POD tweaks
+       
+0.3  Fri Nov 19 11:24:42 2010
+       Add Encode to pre reqs in Build.PL and Maekfile.PL
+       Added diag() to test in order to help me track down test failure's:
+          i686-linux / 5.8.9: http://www.cpantesters.org/cpan/report/c05b3842-f362-11df-a005-f1772e454b7b
+          x86_64-linux-thread-multi / 5.8.3: http://www.cpantesters.org/cpan/report/29f98f96-f346-11df-a593-5470b0d14a89
+          x86_64-linux-thread-multi / 5.8.7: FAIL http://www.cpantesters.org/cpan/report/2b1ec3dc-f346-11df-a593-5470b0d14a89
+          x86_64-linux-thread-multi / 5.8.9: FAIL http://www.cpantesters.org/cpan/report/0992fb2a-f346-11df-86d9-6e6bb0d14a89
+       
+0.2  Thu Nov 18 12:39:58 2010
+       Allow for string made up of all new lines.
+
+0.1  Wed Nov 17 22:34:39 2010
+       Initial release.
+

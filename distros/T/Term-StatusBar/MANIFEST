@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+README
+tools/build_manifest.pl
+tools/build_readme.pl
+tools/package_up.pl
+t/use.t
+lib/Term/StatusBar.pm

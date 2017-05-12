@@ -1,0 +1,19 @@
+---
+abstract: 'Check International Standard Book Numbers'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-ISBN
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/briandfoy/Test-ISBN.git
+version: 2.04

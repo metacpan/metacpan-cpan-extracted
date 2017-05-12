@@ -1,0 +1,59 @@
+Revision history for Test-Run-Plugin-ColorFileVerdicts
+
+0.0124  2015-06-02
+        * Add a link to the VCS repository in META.yml.
+        * Replace old links.
+
+0.0123  2014-01-31
+        * Build.PL configure_requires , dep MRO::Compat and min
+        dep on perl-5.008 (CPANTS).
+        * Add LICENSE file.
+        * Add t/cpan-changes.t and t/style-trailing-space.t - fix their
+        problems.
+
+0.0122  2010-02-09
+        * Got rid of _get_private_fields() _get_simple_params() and
+        _get_private_simple_params().
+
+0.0121  2009-08-06
+        * Fixed a bug that could cause a crash when a failure was encountered.
+        Moose didn't like assigning an undef to
+        individual_test_file_verdict_colors .
+
+0.0120  2009-08-06
+        * Converted to Moose and to Test-Run-Core/Test-Run-CmdLine 0.0120.
+
+0.0106  2009-05-04
+        * Converted from NEXT.pm to MRO::Compat.
+
+0.0105  2008-08-19
+        * Converted to private_backend_plugins().
+        * Bumped the dependency to the latest Test-Run-CmdLine.
+
+0.0104  2008-08-18
+        * Changed _initialize() to _init().
+            - In accordance to the new Test-Run.
+        * Bumped the dependencies.
+        * Changed the licence to "mit" instead of "bsd".
+
+0.0103  2007-06-23
+        * Simplified the CanonFailedObj plugin-specifying code based on the
+        new development of Test::Run::Base.
+        * Converted the tests to use the Test::Trap-based classes.
+
+0.0102  2007-06-12
+        * Fixed a class-inheritance-graph problem in which the plugin
+        inherited from Test::Run::Core and caused the functions of the
+        plugins following it to be referenced directly from Test::Run::Core.
+        * Note: instead of inheriting from Class::Accessor inherit from
+        Test::Run::Base which defines ->new properly.
+
+0.0101  2007-06-11
+        * Converted from Test::Trap to Test::Run::Trap::Obj.
+        * Extracted the Test::Run::Plugin::ColorFileVerdicts::ColorBase class.
+        * Converted to private_non_direct_backend_env_mapping
+        * Adapted to the new Test::Run semantics by creating:
+            Test::Run::Plugin::ColorFileVerdicts::CanonFailedObj
+
+0.01    2007-03-19
+        First version, released on an unsuspecting world.

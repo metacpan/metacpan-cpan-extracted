@@ -1,0 +1,276 @@
+=head1 NAME
+
+Test::BrewBuild::Tutorial - Basic overview of using the client/server aspects
+of the Test::BrewBuild build system
+
+=head1 DESCRIPTION
+
+This document gives a basic overview of setting up remote test servers,
+and how to dispatch build requests to them.
+
+=head1 BEFORE YOU BEGIN
+
+At this time, there is no security around the network portions of this suite.
+To mitigate, you can use IP filters, SSH tunnels etc. We do however do a
+reasonably good job of ensuring the commands executed on the testers have been
+verified.
+
+Read through the
+L<brewbuild|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/brewbuild> 
+documentation so you know how the actual tester works. Documentation for the
+scripts used in this tutorial can be found in L<SEE ALSO>.
+
+You'll need Git on both the dispatcher and all testers, your module accessible
+via a Git repository, and the dispatch and all tester servers configured, see
+L</SERVER CONFIGURATION>.
+
+=head1 SERVER CONFIGURATION
+
+Recommended initial platform configuration guide:
+L<Test Platform Configuration|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/brewbuild#TEST-PLATFORM-CONFIGURATION>.
+
+This applies to all C<Test::BrewBuild> systems, whether they'll be stand-alone,
+a dispatcher or a tester.
+
+=head1 SCENARIO
+
+You've got a Linux box at C<10.1.1.1> with all IP addresses and ports bound on
+the server available for listening on.
+
+You've also got a Windows server on C<172.16.1.1>, but our
+default port C<TCP 7800> is not available, which can only listen on that
+specific IP address.
+
+You will be dispatching from a FreeBSD server, so you also want to run a tester
+on the C<localhost>.
+
+On the dispatcher, we'll be located within a Git repository directory, so we'll
+let the system take care of the repo management so we don't have to continuously
+specify it.
+
+See L</SEE ALSO> for more elaborate uses, command-line options of each script,
+and details of the optional configuration file.
+
+=head1 STEP 1: CONFIGURE TESTERS
+
+=head2 Linux (10.1.1.1)
+
+Since we can listen on all IPs and the default port is available for use, this
+simple command will start the tester, and put it into the background:
+
+    bbtester start
+
+=head2 Windows (172.16.1.1)
+
+On this server, we're not permitted to listen on all IP addresses, and since
+port C<7800> is unavailable, we have to specify an alternate.
+
+    bbtester start -i 172.16.1.1 -p 9999
+
+=head2 localhost
+
+Since this tester is the dispatching server, we don't want it listening on
+public-facing IP addresses, so we'll specify just the local loopback:
+
+    bbtester start -i 127.0.0.1
+
+=head1 STEP 2: CONFIGURE DISPATCHER
+
+=head2 COMMAND LINE BASIC RUN
+
+C<brewbuild> itself can send in test run to remotes in an extremely basic way,
+but we're going to focus on C<bbdispatch> here which allows for far more complex
+cases.
+
+By default, we dispatch the most basic build, by sending C<brewbuild> as the
+test command. The following will dispatch a build to all three testers we
+configured above, and then wait for them to return the results.
+
+    bbdispatch -t 127.0.0.1 -t 172.16.1.1:9999 -t 10.1.1.1
+
+To specify a different command string:
+
+    bbdispatch -c "brewbuild -r -R -d 7" -t 127.0.0.1 -t 172.16.1.1:9999 -t 10.1.1.1
+
+To specify a different repository:
+
+    bbdispatch -r https://github.com/user/repo -t 127.0.0.1 -t 172.16.1.1:9999 -t 10.1.1.1
+
+Example output of a basic run where I'm in a git repository directory:
+
+    bbdispatch -t localhost -t 192.168.252.90 -t 192.168.252.96 -t 192.168.252.95
+
+    192.168.252.95 - x86_64-linux
+
+    5.22.1 :: PASS
+
+    192.168.252.90 - MSWin32-x64-multi-thread
+
+    5.18.4 :: PASS
+    5.22.1 :: PASS
+
+    localhost - MSWin32-x64-multi-thread
+
+    5.22.1 :: FAIL
+
+    192.168.252.96 - amd64-freebsd
+
+    5.22.1 :: PASS
+    5.23.7 :: PASS
+    5.8.9 :: FAIL
+    5.10.1 :: FAIL
+    5.18.4 :: FAIL
+
+All FAIL log files are stored locally when dispatching to identify the issues:
+
+    192.168.252.96_5.10.1-FAIL.bblog
+    192.168.252.96_5.18.4-FAIL.bblog
+    192.168.252.96_5.8.9-FAIL.bblog
+    localhost_5.22.1-FAIL.bblog
+
+
+=head2 CONFIGURATION FILE RUN
+
+In your configuration file, you can set up all of your testers, along with the
+preferred command string (and repository if need be):
+
+    [dispatch]
+    cmd = brewbuild -R -d 7
+    testers = 127.0.0.1, 172.16.1.1:9999, 10.1.1.1
+
+Then your dispatch run can be initiated simply by:
+
+    bbdispatch
+
+=head1 TROUBLESHOOTING
+
+If your dispatcher doesn't seem to be doing the right thing, you can enable
+debug logging, which will print directly to C<STDOUT>:
+
+    bbdispatch [...] -d 7
+
+If your testers don't seem to be behaving properly, first, log into the remote
+server and stop the currently running tester:
+
+    bbtester stop
+
+Restarting the tester in daemon mode with a debug level will include its logging
+in the return to the dispatcher:
+
+    bbtester start -d 7
+
+You can also run the tester in the foreground, and get its logging displayed to
+C<STDOUT> live-time:
+
+    bbtester --fg -d 7 --stdout
+
+If you want to get the debugging information from the actual C<brewbuild>
+process included in the tester debug results, call C<brewbuild> from the
+dispatcher with debug flags enabled. These debug results will be either included
+in the tester's return, or printed to its C<STDOUT>, depending on how you're
+debugging the tester:
+
+    bbdispatch [...] -c "brewbuild -d 7"
+
+Using the various APIs, you can enclose all debug output and return values into
+one scalar variable, and either dump it to a file or examine it all in one
+location:
+
+    use Capture::Tiny qw(capture_stdout);
+    use Test::BrewBuild::Dispatch;
+    use Test::BrewBuild::Tester;
+
+    my $return;
+
+    my $stdout = capture_stdout {
+        my $d = Test::BrewBuild::Dispatch->new(debug => 7);
+        my $t = Test::BrewBuild::Tester->new(debug => 7);
+
+        $t->start;
+
+        $return = $d->dispatch(
+            cmd     => 'brewbuild -i 5.10.1_32 -d 7',
+            repo    => 'https://stevieb9@github.com/stevieb9/mock-sub',
+            testers => [ qw(10.1.1.1) ],
+        );
+
+        $t->stop;
+    };
+
+    $return .= $stdout;
+
+    print $return;
+
+=head1 QUICK START
+
+Quick start basic example, with one remote tester.
+
+Tester 10.1.1.1:
+
+    bbtester start
+
+brewbuild:
+
+    brewbuild -D -t 10.1.1.1
+
+Dispatcher:
+
+    bbdispatch -t 10.1.1.1
+
+Auto run a specific number of dispatch runs to the testers. You *must* specify
+the repository URL on the command line when using auto mode:
+
+    bbtester start -a
+
+    bbdispatch -t 10.1.1.1 -a -r ...    # run forever
+
+    bbdispatch -t 10.1.1.1 -a 10 -r ... # run 10 cycles
+
+=head1 AUTO MODE
+
+Here's an example of a full-blown automated run. It will automatically check
+the commit checksums on the local copy of a repository, and the remote. If they
+differ, we'll run the test suite.
+
+You'll want to run the commands likely from somewhere like the C<@reboot>
+C<crontab> entry of the user you want running the tests.
+
+=head2 Basic implementation
+
+    bbtester start -a
+    bbdispatch -t localhost -r https://github.com/user/repo -a
+
+=head2 Skip checksum check
+
+You can run the test suite on every iteration even if the repository checksums
+are the same (ie. no commits have been pushed to remote).
+
+    bbtester start -a -c
+    bbdispatch -t localhost -r https://github.com/user/repo -a
+
+=head2 Integrate with a Raspberry Pi
+
+We provide the ability to run tests on a Raspberry Pi, and optionally display
+the result information to an LCD screen. First, you need to set up an
+environment variable set to the pins the LCD is connected to (RS, E, D0, D1, D2,
+D3):
+
+    BB_RPI_LCD=5,6,4,17,27,22
+
+Then use the special C<--rpi> flag in the dispatch command:
+
+    bbtester start -a
+    bbdispatch -t localhost -r https://github.com/user/repo -a --rpi
+
+=head1 SEE ALSO
+
+Details on the L<configuration file|https://metacpan.org/pod/distribution/Test-BrewBuild/lib/Test/BrewBuild/brewbuild.conf.pod>.
+
+Dispatch script usage information:
+L<bbdispatch|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/bbdispatch>.
+
+Tester script usage information:
+L<bbtester|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/bbtester>.
+
+BrewBuild script usage information:
+L<brewbuild|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/brewbuild>.

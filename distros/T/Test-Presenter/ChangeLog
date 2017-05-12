@@ -1,0 +1,78 @@
+Revision history for Test::Presenter
+
+HEAD
+    Mark Wong <markwkm@gmail.com>:
+	Fixed units of the metric plotting for DBT-5.
+	Fixed the mix percentage reporting for DBT-5.
+
+0.2	as of Mon 12 Feb 15:17:00 -0700 2007
+
+    Bryce Harrington <bryce@osdl.org>:
+	Updated version number for release
+	
+	README:  Filled in description of the module
+
+	Makefile.PL:  Added Template dependency
+
+    John Daiker <daikerjohn@gmail.com>:
+	Rename Test::Reporter to Test::Presenter
+
+	Added support for constraining queries through configuration files
+
+	Added Present.pm and a simple to_plot() method to support gnuplot
+	output in a very simple way
+
+	Queries can now be sorted (ascending|descending) before being returned
+	by the DB
+
+	Added "recursive replacement" so that templates can define other
+	sections of the same template
+	
+	Added support for plaintext in configuration files (which override any
+	template definitions)
+	
+	Various bugfixes for supporting "recursive replacement" in config and
+	template files
+	
+	Updated templates (and configs) to support "recursive replacement"
+
+	Added support for naming the document as it is placed in the DB
+	
+	Update remove_doc() call for new Document Name support
+	
+	Fixed issue where DB was being corrupted when Document was removed.
+
+	Added open_template() and open_config() methods
+	
+	Added process() method to combine query scripts with config files
+	
+	Added save_query() method to QueryTemplate.pm so that queries could be
+	saved to disk for later use
+	
+	Added load_query() method: if we can save, we should be able to
+	load as well
+	
+	Made _hpush an internal method
+	
+	Return "1" from methods that previously weren't returning any value
+
+	Updated all documention for perldoc support
+	
+	Changed results storage to an array instead of a CSV
+	
+	Created a more modular design with Query.pm, DbXml.pm, and QueryTemplate.pm
+	
+	Added explanation of project from mailing list
+
+    Mark Wong <markw@osdl.org>:
+	Moved plotting and html generation functions from Test::Parser::Iostat,
+	Test::Parser::Vmstat, Test::Parser::Sar, and Test::Parser::Dbt2 to here
+
+	Added Test::Presenter::Dbt5.
+
+    Richard Kennedy <richardk@enterprisedb.com>:
+	Output transaction response time data sorted in numeric order not ascii
+	order
+
+1.02	Wed Sep  7 23:30:02 2005
+	- original version; created by sdist 1.10

@@ -1,0 +1,45 @@
+Revision history for Perl extension Tk-PopEntry-0.04.
+
+0.01  Tue Sep 26 07:49:58 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Tk-PopEntry-0.01
+
+0.02  Wed Dec 20 12:00:00 2000
+        - corrected error with '-nospace' option
+        - Makefile.PL corrected
+        - test.pl modified
+
+0.03  Fri Dec 22 09:00:00 2000
+        - eliminated ugly error messages when using a hotkey
+          while the menu isn't actually visible.
+        - changed "Select All" to "Sel. All" to make the menu
+          line up and look pretty.        
+        - changed the README file.
+
+0.04  Thu Dec 28 08:00:00 2000
+        - Added methods 'addItem' and 'deleteItem'.
+
+0.05  Sun Feb 25 19:00:00 2001
+        - Scrapped old PopEntry code completely and used code
+          from LabPopEntry instead.  The two widgets now
+          share about 98% of the same code.
+        - The 'spaces allowed' issued was resolved with regards
+          to -pattern.
+        - Regular expression for 'float' pattern works.
+        - Turned all "Control" strings on the menu into "Ctrl"
+          so that the pop down menu would align properly in 
+          all window managers.
+        - Binds now work better, though the window manager can 
+          still take control for various sequences with
+          unpredictable results.
+        - Toplevel control made better with judicious use of 
+          'ismapped()'.
+        - Pod fixed (hopefully) and updated.
+
+0.06  Fri Apr 12 23:25:01 2002
+        - Fixed issue where cursor did not scroll to right if
+          text inserted exceeded with of the Entry widget.  Thanks
+	  to Amable Ventura Miguel Angel for the spot.
+
+	- Fixed some 'uninitialized' warnings that started
+	  showing up in Perl 5.6.

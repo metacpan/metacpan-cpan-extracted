@@ -1,0 +1,7 @@
+CHANGES
+MANIFEST
+Makefile.PL
+ReadLine/TTYtter.pm
+ReadLine/readline_ttytter.pm
+README
+test.pl

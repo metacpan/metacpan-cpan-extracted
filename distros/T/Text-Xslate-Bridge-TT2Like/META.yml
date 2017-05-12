@@ -1,0 +1,28 @@
+---
+abstract: 'TT2 Variable Method Clone For Text::Xslate'
+author:
+  - 'Copyright (c) 2010 Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Xslate-Bridge-TT2Like
+no_index:
+  directory:
+    - inc
+    - src
+    - t
+    - xt
+requires:
+  Scalar::Util: 0
+  Text::Xslate: 1.3000
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00010

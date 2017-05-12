@@ -1,0 +1,41 @@
+[% # $Id: col,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+[%
+
+# Site colo(u)rs.
+
+rgb = {
+    white    = '#FFFFFF'
+    black    = '#000000'
+    red      = '#C81900'
+    orange   = '#F08900'
+    skyblue  = '#00AAF0'
+    paleblue = '#80C0F0'
+    midblue  = '#6080C0'
+    darkblue = '#202060'
+    misty    = '#C0C0F0'
+    ltgrey   = '#E0E0E0'
+    vltgrey  = '#F0F0F0'
+}
+
+# Save in site hash.
+site.rgb = rgb
+
+site.col = {
+    back  = rgb.white
+    text  = rgb.black
+    link  = rgb.skyblue
+    vlink = rgb.midblue
+    alink = rgb.red
+    mlink = rgb.red
+    line  = rgb.skyblue
+    head  = rgb.darkblue
+    squirrel = rgb.red
+    table = {
+	edge = rgb.skyblue
+	back = rgb.white
+	head = rgb.misty
+	cell = rgb.ltgrey
+    }
+}
+
+-%]

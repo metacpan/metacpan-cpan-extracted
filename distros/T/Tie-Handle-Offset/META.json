@@ -1,0 +1,72 @@
+{
+   "abstract" : "Tied handle that hides the beginning of a file",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-Handle-Offset",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tie::Handle" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::Handle::Offset" : {
+         "file" : "lib/Tie/Handle/Offset.pm",
+         "version" : "0.003"
+      },
+      "Tie::Handle::SkipHeader" : {
+         "file" : "lib/Tie/Handle/SkipHeader.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-tie-handle-offset at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Handle-Offset"
+      },
+      "homepage" : "https://github.com/dagolden/tie-handle-offset",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/tie-handle-offset.git",
+         "web" : "https://github.com/dagolden/tie-handle-offset"
+      }
+   },
+   "version" : "0.003"
+}
+

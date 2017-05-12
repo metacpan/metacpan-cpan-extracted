@@ -1,0 +1,15 @@
+CVS/
+^tgz/
+\.~$
+\.#
+\w#$
+\.bak$
+Makefile$
+Makefile\.old$
+blib
+\.gz$
+.cvsignore
+tmon\.out
+WrapEx.pm
+bench_various_templaters.pl.out
+^cover_db/

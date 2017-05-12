@@ -1,0 +1,35 @@
+Revision history for Perl extension Thread::Cancel.
+
+1.13 Fri Dec 24 17:59:17 2010
+	- POD update
+
+1.11 Fri Apr 16 13:45:44 2010
+	- Fix tests following recent changes to blead
+
+1.09 Thu Jun 12 13:44:17 2008
+	- Fix SKIPs in tests
+
+1.08 Tue Jun 10 16:56:17 2008
+	- End all tests with exit(0)
+
+1.07 Fri Feb 22 22:12:47 2008
+	- Allow installation on non-threaded Perls
+
+1.06 Wed Feb 20 17:29:39 2008
+	- Build/test updates
+
+1.05 Sat Oct 14 09:17:09 EST 2006
+	- Check for $Config{useithreads}
+
+1.04 Thu Oct 12 11:23:09 EDT 2006
+	- Added example and POD tests
+
+1.03 Wed Aug 30 14:25:35 EDT 2006
+	- Support 5.8.0
+
+1.02 Tue Aug  1 14:05:41 EDT 2006
+	- Fixes to tests
+
+1.01 Tue Jul 11 14:38:35 EDT 2006
+	- Initial release
+

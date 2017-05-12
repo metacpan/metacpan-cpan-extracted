@@ -1,0 +1,15 @@
+Revision history for Perl extension Tk::ChooseDate.
+
+0.4  Sun May 15 10:13:04 2005
+        -added support for the varying languages according to
+         the Date::Calc documentation
+        -new option "-language"
+        -fixed new bugs on splitting/parsing the returned calendar
+         data with languages other than English
+        -changed the default arrow color to a darker shade
+        -tested only on Win32
+
+0.3  Fri May 13 22:19:16 2005
+	- original version; created by h2xs 1.23 with options
+		-X -v 0.3 -b 5.6.1 -n Tk::ChooseDate
+

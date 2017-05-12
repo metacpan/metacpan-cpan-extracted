@@ -1,0 +1,599 @@
+
+<html>
+<head>
+<title>Thread::Apartment::Server</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;CONSTR&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;CONSTR&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Thread::Apartment::Server</h2>
+
+<p>
+<dl>
+<dt><b>Inherits from:</b>
+<dd><a href='../../Thread/Apartment/Common.html'>Thread::Apartment::Common</a></dd>
+<dd><a href='../../Exporter.html'>Exporter</a></dd>
+</dt>
+</dl>
+
+<p>
+<dl>
+<dt><b>Known Subclasses:</b>
+<dd><a href='../../Thread/Apartment/MuxServer.html'>Thread::Apartment::MuxServer</a></dd>
+<dd><a href='../../Thread/Apartment/EventServer.html'>Thread::Apartment::EventServer</a></dd>
+</dt>
+</dl>
+
+<hr>
+
+Abstract base class for proxied objects. Also
+acts as a container class for POPO's. Provides
+introspection methods to collect an object's
+class hierarchy, public methods and method
+behavior map, as well as marshalling results
+of method calls, and creating wrappers for
+proxied closures.
+<p>
+Licensed under the Academic Free License version 2.1, as specified in the
+License.txt file included in this software package, or at
+<a href="http://www.opensource.org/licenses/afl-2.1.php">OpenSource.org</a>.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.50</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2005-12-01
+</dd>
+
+<p>
+<i>Unless otherwise noted, <code>$self
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Constructor Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Thread::Apartment::Server'>new_from_hash</a>($tac)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Used for objects using hash-based constructor
+parameter lists
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Thread::Apartment::Server'>new_from_list</a>($tac)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Used for objects using list-based constructor
+parameter lists
+</td></tr>
+</table><p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#create_client'>create_client</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Creates a TAC for the object or class;
+a subclass may override this to provide their
+own TAC implementation
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#debug'>debug</a>($level)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set debug level
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#evict'>evict</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pure virtual function called when an object is evicted from
+a thread
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_client'>get_client</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return the object's TAC
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_no_objects'>get_no_objects</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Virtual function to return a hashref of public method names
+that are do not return objects
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_simplex_methods'>get_simplex_methods</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Virtual function to return a hashref of public method names
+that are simplex
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_urgent_methods'>get_urgent_methods</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Virtual function to return a hashref of public method names
+that are urgent
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#init_tas'>init_tas</a>($tqd, $timeout, $installed)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Init class/thread-global variables
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#install'>install</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Pure virtual function called when an object is installed in
+a thread
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#introspect'>introspect</a>($base, $objid, $autoload)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Introspects a class or object
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#marshalResults'>marshalResults</a>(@results)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Marshalls results from method calls
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#new_simplex_tacl'>new_simplex_tacl</a>($closure)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Create a <a href='./Closure.html'>Thread::Apartment::Closure</a>
+object to contain a simplex, non-urgent closure, and map it into
+the apartment thread's closure map
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#new_tacl'>new_tacl</a>($closure)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Create a <a href='./Closure.html'>Thread::Apartment::Closure</a>
+object to contain a duplex, non-urgent closure, and map it into
+the apartment thread's closure map
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#new_urgent_simplex_tacl'>new_urgent_simplex_tacl</a>($closure)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Create a <a href='./Closure.html'>Thread::Apartment::Closure</a>
+object to contain a simplex, urgent closure, and map it into
+the apartment thread's closure map
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#new_urgent_tacl'>new_urgent_tacl</a>($closure)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Create a <a href='./Closure.html'>Thread::Apartment::Closure</a>
+object to contain a duplex, urgent closure, and map it into
+the apartment thread's closure map
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#set_client'>set_client</a>($tac)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the local reference to an object's TAC, so it can be passed
+to other T::A objects
+</td></tr>
+</table>
+<p>
+
+<a name='constructor_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Constructor Details</font></th>
+</tr>
+</table>
+
+<a name='new_from_hash'></a>
+<h3>new_from_hash</h3>
+<pre>
+new_from_hash($tac)
+</pre><p>
+<dl>
+<dd>Used for objects using hash-based constructor
+parameter lists.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$tac</code> - TAC for the object
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Apartment::Server object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='new_from_list'></a>
+<h3>new_from_list</h3>
+<pre>
+new_from_list($tac)
+</pre><p>
+<dl>
+<dd>Used for objects using list-based constructor
+parameter lists.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$tac</code> - TAC for the object
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Apartment::Server object
+</dd>
+</dl></dd></dl><hr>
+
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='create_client'></a>
+<h3>create_client</h3>
+<pre>
+create_client()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Creates a TAC for the object or class;
+a subclass may override this to provide their
+own TAC implementation
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>Thread::Apartment::Client object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='debug'></a>
+<h3>debug</h3>
+<pre>
+debug($level)
+</pre><p>
+<dl>
+<dd>Set debug level.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$level</code> - debug level
+
+</dd>
+</dl></dd></dl><hr>
+
+<a name='evict'></a>
+<h3>evict</h3>
+<pre>
+evict()
+</pre><p>
+<dl>
+<dd>Pure virtual function called when an object is evicted from
+a thread. Useful for cleaning up any persistent context.
+
+
+<p>
+<dd><dl>
+</dl></dd></dl><hr>
+
+<a name='get_client'></a>
+<h3>get_client</h3>
+<pre>
+get_client()
+</pre><p>
+<dl>
+<dd>Return the object's TAC.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>Thread::Apartment::Client for the object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_no_objects'></a>
+<h3>get_no_objects</h3>
+<pre>
+get_no_objects()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Virtual function to return a hashref of public method names
+that are do not return objects.
+Called during introspection. The returned map is used
+internally to optimize marshalling of method call results.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>hashref of public non-object-returning methods
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_simplex_methods'></a>
+<h3>get_simplex_methods</h3>
+<pre>
+get_simplex_methods()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Virtual function to return a hashref of public method names
+that are simplex.
+(i.e., do not return results, and hence the TAC does not
+wait for returned results when another T::A object
+calls the method). Called during introspection.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>hashref of public simplex methods
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_urgent_methods'></a>
+<h3>get_urgent_methods</h3>
+<pre>
+get_urgent_methods()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Virtual function to return a hashref of public method names
+that are urgent.
+(i.e., proxied method calls should be placed at the head of
+the TQD in order to be serviced ASAP).
+Called during introspection.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>hashref of public urgent methods
+</dd>
+</dl></dd></dl><hr>
+
+<a name='init_tas'></a>
+<h3>init_tas</h3>
+<pre>
+init_tas($tqd, $timeout, $installed)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Init class/thread-global variables
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$tqd</code> - apartment's TQD
+</dd>
+<dd><code>$timeout</code> - response timeout for TQD
+</dd>
+<dd><code>$installed</code> - flag to indicate if the object has been install()'ed, rather
+than constructed
+
+</dd>
+</dl></dd></dl><hr>
+
+<a name='install'></a>
+<h3>install</h3>
+<pre>
+install()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Pure virtual function called when an object is installed in
+a thread.
+
+
+<p>
+<dd><dl>
+</dl></dd></dl><hr>
+
+<a name='introspect'></a>
+<h3>introspect</h3>
+<pre>
+introspect($base, $objid, $autoload)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Introspects a class or object. Used to
+<ol>
+<li>collect the class/object's class hierarchy for proxied isa() calls
+<li>collect a map of public method names to their behavior flags for
+proxied can() and method calls
+<li>establish the object as reentrant, and/or AUTOLOAD-all
+<li>create a TAC for the object
+<li>create a TACo for installed objects
+</ol>
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$base</code> - either a class name, or an object instance
+</dd>
+<dd><code>$objid</code> - unique object ID assigned to the object
+</dd>
+<dd><code>$autoload</code> - (optional) boolean indicating the object is autoload-all; default false
+
+</dd>
+<dt><b>Returns:</b><dd>((arrayref if class hierarchy, hashref of public method map, object's TAC)
+)</dd>
+</dl></dd></dl><hr>
+
+<a name='marshalResults'></a>
+<h3>marshalResults</h3>
+<pre>
+marshalResults(@results)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Marshalls results from method calls. Overrides
+<a href='./Common.html#marshal'>Thread::Apartment::Common::marshal</a>
+to trap returned objects for conversion to TACs by adding to, or recovering
+from, the containing apartment thread's object map.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@results</code> - list of results to be marshalled
+
+</dd>
+<dt><b>Returns:</b><dd>threads::shared arrayref of marshalled parameters
+</dd>
+</dl></dd></dl><hr>
+
+<a name='new_simplex_tacl'></a>
+<h3>new_simplex_tacl</h3>
+<pre>
+new_simplex_tacl($closure)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Create a <a href='./Closure.html'>Thread::Apartment::Closure</a>
+object to contain a simplex, non-urgent closure, and map it into
+the apartment thread's closure map.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$closure</code> - closure to be contained.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Apartment::Closure object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='new_tacl'></a>
+<h3>new_tacl</h3>
+<pre>
+new_tacl($closure)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Create a <a href='./Closure.html'>Thread::Apartment::Closure</a>
+object to contain a duplex, non-urgent closure, and map it into
+the apartment thread's closure map.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$closure</code> - closure to be contained.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Apartment::Closure object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='new_urgent_simplex_tacl'></a>
+<h3>new_urgent_simplex_tacl</h3>
+<pre>
+new_urgent_simplex_tacl($closure)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Create a <a href='./Closure.html'>Thread::Apartment::Closure</a>
+object to contain a simplex, urgent closure, and map it into
+the apartment thread's closure map.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$closure</code> - closure to be contained.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Apartment::Closure object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='new_urgent_tacl'></a>
+<h3>new_urgent_tacl</h3>
+<pre>
+new_urgent_tacl($closure)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Create a <a href='./Closure.html'>Thread::Apartment::Closure</a>
+object to contain a duplex, urgent closure, and map it into
+the apartment thread's closure map.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$closure</code> - closure to be contained.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Apartment::Closure object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='set_client'></a>
+<h3>set_client</h3>
+<pre>
+set_client($tac)
+</pre><p>
+<dl>
+<dd>Set the local reference to an object's TAC, so it can be passed
+to other T::A objects. Note that this is usually called
+from the constructor of TAS implementors.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$tac</code> - Thread::Apartment::Client for the object
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Apartment::Server object
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Mon Mar 27 08:51:36 2006</i>
+</center>
+</small>
+</body>
+</html>

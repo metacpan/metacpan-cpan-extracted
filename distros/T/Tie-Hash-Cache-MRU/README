@@ -1,0 +1,27 @@
+Tie-Hash-Cache-MRU version 0.01
+===============================
+
+ A MRU (Most Recently Used) cache that is very simple in
+operation and accessed via a TIEHASH interface.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ Pure perl.
+
+COPYRIGHT AND LICENCE
+
+ GPL/AL, the same terms as Perl itself.
+
+Copyright (C) 2004 by david l nicol
+
+
+

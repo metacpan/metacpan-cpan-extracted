@@ -1,0 +1,43 @@
+This is a mapping of database fields to Tapper meta information
+that should be used in the daily reports.
+
+
+    *  Machine: manach, Sahara/4GB/Phenom 9600
+          o report.machine_name                                             # Tapper-machine-name: 
+          o report.machine_description                                      # Tapper-machine-description: 
+          o report.ram                                                      # Tapper-ram: 
+          o report.cpuinfo                                                  ! Tapper-cpuinfo: 
+          o report.lspci                                                    ! Tapper-lspci: 
+
+    * Changeset: 3.1.2-87.el5 i686
+          o report.xen_changeset                                            # Tapper-xen-changeset: 
+
+    * Execution Date: 2008-04-07 12:01:30
+          o report.created_at                                               ! Tapper-created-at: 
+          o report.execution_start                                          # Tapper-execution-start: 
+
+    * Duration: 16hr
+          o report.duration                                                 # Tapper-duration: 
+
+    * Hypervisor: 2.6.18-87.el5xen i686
+!         o report.xen_dom0_kernel                                          # Tapper-xen-dom0-kernel: 
+
+    * DOM0: RHEL 5.2 Beta 20080326
+!         o report.xen_base_os_description                                  # Tapper-xen-base-os-description:
+
+    * Guest: suse_suse10_32bpae_smp
+          o report.xen_guests_description                                   # Tapper-xen-guests-description: 
+
+    * Flags: vcpus=2; memory=1024; shadow_memory=10; pae=1; acpi=1; apic=1; 
+          o report.flags                                                    # Tapper-flags: 
+
+    * Test: RH-BZ-301451-retest
+          o report.id                                                       ! Tapper-id: 
+          o report.suite.name                                               # Tapper-suite-name: 
+
+    * Result: some tests failed
+          o report.successgrade                                             ! Tapper-successgrade: 
+          o report.reviewed_successgrade                                    ! Tapper-reviewed-successgrade: 
+
+    * Comments:
+          o report.reportcomment(s)                                         # Tapper-reportcomment: 

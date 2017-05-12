@@ -1,0 +1,29 @@
+Revision history for Perl extension Task-Moose
+
+0.03
+    - added minimum versions for modules that conflict with latest Moose
+      (daxelrod)
+
+0.02
+    - added (stevan, Sartak, doy):
+      - MooseX::Clone
+      - MooseX::Role::TraitConstructor
+      - MooseX::Declare
+      - MooseX::Method::Signatures
+      - MooseX::Role::Parameterized
+      - MooseX::Types::Structured
+      - MooseX::Traits
+      - MooseX::NonMoose
+      - MooseX::Types::DateTime
+      - TryCatch
+      - namespace::autoclean
+    - removed (doy):
+      - MooseX::Method
+      - MooseX::Compile
+      - MooseX::AttributeHelpers
+
+    - reorganized into sections, and using proper headers (perigrin)
+
+0.01 Fri. March 14, 2008
+    - making it easier to install Moose and all 
+      the various extension modules

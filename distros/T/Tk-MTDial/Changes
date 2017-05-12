@@ -1,0 +1,7 @@
+-*- org -*-
+
+* 0.001
+
+  1. [2016-07-19 Tue] Initial version.
+  2. [2016-07-26 Tue] Renamed the module. It was called Tk::Knob. It
+     is now called Tk::MTDial (Multiple Turn Dial)

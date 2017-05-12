@@ -1,0 +1,43 @@
+{
+   "abstract" : "manage a collection of floating widgets",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tickit-Widget-FloatBox",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Identity" : "0",
+            "Test::More" : "0.88",
+            "Tickit::Test" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tickit::ContainerWidget" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tickit::Widget::FloatBox" : {
+         "file" : "lib/Tickit/Widget/FloatBox.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

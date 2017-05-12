@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+package DumperParser;
+use base qw( Tangence::Compiler::Parser );
+
+sub make_class    { shift; DumperParser::Class->new( @_ ) }
+sub make_method   { shift; DumperParser::Method->new( @_ ) }
+sub make_event    { shift; DumperParser::Event->new( @_ ) }
+sub make_property { shift; DumperParser::Property->new( @_ ) }
+sub make_argument { shift; DumperParser::Argument->new( @_ ) }
+
+package DumperParser::Class;
+use base qw( Tangence::Meta::Class );
+
+sub _vals { my $h = shift; map { $h->{$_} } sort keys %$h }
+
+sub as_text
+{
+   my $self = shift;
+   join "\n",
+      "class ".$self->name." {",
+      ( map { "  isa ".$_->name.";" } $self->direct_superclasses ),
+      ( map { "  " . $_->as_text } _vals $self->direct_methods ),
+      ( map { "  " . $_->as_text } _vals $self->direct_events ),
+      ( map { "  " . $_->as_text } _vals $self->direct_properties ),
+      "}\n";
+}
+
+package DumperParser::Method;
+use base qw( Tangence::Meta::Method );
+
+sub as_text
+{
+   my $self = shift;
+   join "",
+      "method ",
+      $self->name,
+      "(",
+      join( ",", map { $_->as_text } $self->arguments ),
+      ")",
+      defined $self->ret ? ( " -> ", $self->ret->sig ) : (),
+      ";";
+}
+
+package DumperParser::Event;
+use base qw( Tangence::Meta::Event );
+
+sub as_text
+{
+   my $self = shift;
+   join "",
+      "event ",
+      $self->name,
+      "(",
+      join( ",", map { $_->as_text } $self->arguments ),
+      ");",
+}
+
+package DumperParser::Property;
+use base qw( Tangence::Meta::Property );
+
+use Tangence::Constants;
+my %dimnames = (
+   DIM_SCALAR, "scalar",
+   DIM_HASH,   "hash",
+   DIM_ARRAY,  "array",
+   DIM_QUEUE,  "queue",
+   DIM_OBJSET, "objset",
+);
+
+sub as_text
+{
+   my $self = shift;
+
+   my $dimension = $self->dimension;
+
+   join "",
+      ( $self->smashed ? "smashed " : () ),
+      "prop ",
+      $self->name,
+      " = ",
+      ( $dimension == DIM_SCALAR ? ()
+                                       : ( $dimnames{$dimension} . " of " ) ),
+      $self->type->sig,
+      ";";
+}
+
+package DumperParser::Argument;
+use base qw( Tangence::Meta::Argument );
+
+sub as_text
+{
+   my $self = shift;
+   return join " ",
+      $self->type->sig,
+      ( defined $self->name ? $self->name : () );
+}
+
+package main;
+
+my $parser = DumperParser->new;
+
+my $meta = $parser->from_file( $ARGV[0] );
+
+# TODO: This needs to be sorted in a better order for dependencies, or else
+# make the compiler parser able to handle out-of-order dependencies
+foreach my $class ( sort keys %$meta ) {
+   print $meta->{$class}->as_text;
+   print "\n";
+}

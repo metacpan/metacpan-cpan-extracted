@@ -1,0 +1,13 @@
+Changes from NSP version 0.93 to 0.95
+--------------------------------------
+
+Saiyam Kohli, kohli003@d.umn.edu
+University of Minnesota, Duluth
+
+June 17, 2006
+
+Measures
+--------
+
+Corrections to the Perldocs of some of the measures. The documentation of
+these measures were not being indexed in CPAN.

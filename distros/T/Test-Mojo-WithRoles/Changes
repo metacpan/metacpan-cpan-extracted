@@ -1,0 +1,7 @@
+Revision history for Perl module Mojo::IOLoop::ForkCall
+
+0.02 2015-03-02
+  - Require at least Mojolicious 4.0, for Mojo::JSON 'j'
+
+0.01 2015-03-01
+  - Initial release

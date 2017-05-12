@@ -1,0 +1,17 @@
+#
+#  Fichier comptable des mouvements généraux et divers
+#
+
+#
+# Mois de janvier 2002
+#
+
+01 2002 CCP DIV         56,35 C 01/12/2001 # Courses
+01 2002 CCP DIV         20,81 C 08/12/2001 # Fnac
+01 2002 CCP DIV         33,97 C 15/12/2001 # Courses
+
+01 2002 CCP CFI          2,50   01/01/2002 # Commission sur virement
+01 2002 CCM PEL        304,90   03/01/2002 # Transfert
+01 2002 CCP PEL      5.000,00   03/01/2002 # Transfert
+01 2002 CCM CCA        304,90   03/01/2002 # Transfert
+01 2002 CCP DIV         30,00   05/01/2002 # Retrait

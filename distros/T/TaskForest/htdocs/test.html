@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+  <head> 
+
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+
+<!-- This must be the first css link.  Reset everything -->
+<link rel="stylesheet" type="text/css" href="/yui/build/reset-fonts-grids/reset-fonts-grids.css">
+
+<!-- Fonts CSS - Recommended but not required -->
+<link rel="stylesheet" type="text/css" href="/yui/build/fonts/fonts-min.css">
+
+<!-- Core + Skin CSS -->
+<link rel="stylesheet" type="text/css" href="/yui/build/menu/assets/skins/sam/menu.css">
+
+<!-- Dependencies --> 
+<script type="text/javascript" src="/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="/yui/build/container/container_core-min.js"></script>
+<script type="text/javascript" src="/yui/build/yahoo/yahoo-min.js"></script>
+
+
+<!-- Source File -->
+<script type="text/javascript" src="/yui/build/menu/menu-min.js"></script>
+<script type="text/javascript" src="/yui/build/event/event-min.js"></script>
+<script type="text/javascript" src="/yui/build/connection/connection-min.js"></script>
+
+<script type="text/javascript">
+  function mc (loc) {
+     window.location = loc;
+  }
+  function mor (id) {
+     var e = document.getElementById(id);
+     e.className = "linkh";
+  }
+  function mot (id) {
+     var e = document.getElementById(id);
+     e.className = "link";
+  }
+  function morl (id) {
+     var e = document.getElementById(id);
+     e.className = "link_lasth";
+  }
+  function motl (id) {
+     var e = document.getElementById(id);
+     e.className = "link_last";
+  }
+</script>
+
+<title>TaskForest - $title</title>
+
+   <link rel=stylesheet TYPE="text/css" href="/css/newStyles.css">
+
+   <!-- Boy, do I hate IE -->
+<!--[if IE]>
+  <link rel="stylesheet" type="text/css" href="/css/iestyles.css">
+<![endif]-->
+
+  </head>
+  <body class="yui-skin-sam">
+    <div id=main_body>
+  
+      <div id=bar></div>
+      <div class="logo"></div><div class="title">TaskForest</div>
+      <div class="blurb">A simple, expressive, open-source, text-file-based Job Scheduler with console, HTTP, and RESTful API interfaces. </div>
+      <div class="nav">
+        <div id="link1" class="link"      onMouseOver="mor('link1')" onMouseOut="mot('link1')" onClick="mc('/familyList.html')" ><a href="/">Families</a></div>
+        <div id="link2" class="link"      onMouseOver="mor('link2')" onMouseOut="mot('link2')" onClick="mc('/jobs.html')"      ><a href="/about.html">Jobs</a></div>
+        <div id="link3" class="link"      onMouseOver="mor('link3')" onMouseOut="mot('link3')" onClick="mc('/status.html')"    ><a href="/download.html">Status</a></div>
+        <div id="link4" class="link"      onMouseOver="mor('link4')" onMouseOut="mot('link4')" onClick="mc('/rerun_form.html')"><a href="/docs.html">Rerun</a></div>
+        <div id="link5" class="link"      onMouseOver="mor('link5')" onMouseOut="mot('link5')" onClick="mc('/mark_form.html')" ><a href="/support.html">Mark</a></div>
+        <div id="link6" class="link"      onMouseOver="mor('link6')" onMouseOut="mot('link6')" onClick="mc('/logs_form.html')" ><a href="/support.html">Logs</a></div>
+        <div id="link7" class="link_last"                                                                                       >&nbsp;</div>
+        <div class="clear_both"></div>
+      </div>
+      <div class="clear_both"></div>
+      
+      <div id=thin_bar></div>
+      
+      <h1>Welcome to TaskForest</h1>
+      
+    </div>
+  </body>
+ </html>
+
+ 

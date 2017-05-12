@@ -1,0 +1,165 @@
+NAME
+    Tk::MouseGesture - Create bindings for mouse gestures.
+
+SYNOPSIS
+        use Tk::MouseGesture;
+        my $mg = $top->MouseGesture('B1-left',
+                              -xres     => 20,
+                              -yres     => 20,
+                              -min      => 50,
+                              -command  => sub { print "yes!\n" });
+        $mg->addGesture('B3-diag-UL');
+
+DESCRIPTION
+    Tk::MouseGesture allows your Perl/Tk app to recognize various mouse
+    gestures. A mouse gesture is a series of mouse motions (usually
+    accompanied by a button drag) that act as short-cuts to certain
+    operations. They are most widely used in web browsers like Opera and
+    Mozilla. Gestures are bound to callbacks such that when a user performs
+    a recognized gesture, the corresponding callback is called.
+
+CONSTRUCTOR
+    A new mouse gesture binding can be created as follows:
+
+    "$mg = $top->MouseGesture(Gesture, ?options?);"
+
+    where "Gesture" is one of the defined gestures, as described in the
+    section on "GESTURES". The parent of a Tk::MouseGesture object has to be
+    a Toplevel widget (Tk::MainWindow is a Toplevel). If the parent is not a
+    Toplevel widget, then Tk::MouseGesture will figure out the Toplevel
+    window that contains the parent, and assume that as its parent. The
+    other options come in hash-value syntax, and are described below. The
+    call to "MouseGesture()" returns a Tk::MouseGesture object.
+
+    Valid options are:
+
+    -xres
+        This defines the *X resolution in pixels*, which is a vertical
+        window of this width that the mouse pointer has to stay within for
+        the entire duration of the gesture. Defaults to 20 pixels.
+
+    -yres
+        This defines the *Y resolution in pixels*, which is a horizontal
+        window of this width that the mouse pointer has to stay within for
+        the entire duration of the gesture. Defaults to 20 pixels.
+
+    -min
+        This defines the minimum length of the gesture in pixels. If a
+        gesture is shorter than this length, then it is not recognized.
+        Defaults to 50 pixels.
+
+    -command
+        This defines the callback to be executed upon the successful
+        completion of a gesture. It accepts any valid Tk Callback as defined
+        in the Tk::Callbacks pod. It defaults to an empty sub. You can
+        modify it via the call to "command()" as described in the METHODS
+        entry elsewhere in this document.
+
+    Note that there is no destructor. Currently, there is no way to destroy
+    a Tk::MouseGesture object as this might delete any bindings to the
+    parent widget set by the user. You can disable the recognition of a
+    mouse gesture via a call to "disable()" as described in the METHODS
+    entry elsewhere in this document.
+
+METHODS
+    The following methods are available:
+
+    *$mg*->command(?Callback?)
+        This method allows you to modify the callback bound to the gesture
+        object "$mg". It takes one optional argument which is a valid Tk
+        Callback as defined in the Tk::Callbacks pod. If no argument is
+        given, then the currently bound callback is returned.
+
+    *$mg*->disable()
+        This disables the recognition of this particular gesture.
+
+    *$mg*->enable()
+        This enables the recognition of this particular gesture.
+
+    *$mg*->disableAll()
+        This disables the recognition of all defined mouse gesture.
+
+    *$mg*->enableAll()
+        This enables the recognition of all defined mouse gesture.
+
+    *$mg*->addGesture(Gesture)
+        This adds another gesture binding. "Gesture" has to be one of the
+        defined gestures, as described in the GESTURES entry elsewhere in
+        this document. The callback associated with this gesture is the same
+        as that supplied during the constructor (or set via a "command()"
+        call). This allows you to create multiple gesture definitions that
+        are bound to the same callback. To define another callback, you have
+        to create a new Tk::MouseGesture object.
+
+GESTURES
+    For now, only linear gesture are defined. These are:
+
+    B1-left
+    B2-left
+    B3-left
+        Click on the first, second or third button, and drag the mouse to
+        the left.
+
+    B1-right
+    B2-right
+    B3-right
+        Click on the first, second or third button, and drag the mouse to
+        the right.
+
+    B1-up
+    B2-up
+    B3-up
+        Click on the first, second or third button, and drag the mouse
+        upwards.
+
+    B1-down
+    B2-down
+    B3-down
+        Click on the first, second or third button, and drag the mouse
+        downwards.
+
+    B1-diag-UL
+    B2-diag-UL
+    B3-diag-UL
+        Click on the first, second or third button, and drag the mouse
+        diagonally upwards and to the left (north-west) at 45 degrees.
+
+    B1-diag-UR
+    B2-diag-UR
+    B3-diag-UR
+        Click on the first, second or third button, and drag the mouse
+        diagonally upwards and to the right (north-east) at 45 degrees.
+
+    B1-diag-LL
+    B2-diag-LL
+    B3-diag-LL
+        Click on the first, second or third button, and drag the mouse
+        diagonally downwards and to the left (south-west) at 45 degrees.
+
+    B1-diag-LR
+    B2-diag-LR
+    B3-diag-LR
+        Click on the first, second or third button, and drag the mouse
+        diagonally downwards and to the right (south-east) at 45 degrees.
+
+BUGS
+    None that I know of.
+
+INSTALLATION
+    Either the usual:
+
+            perl Makefile.PL
+            make
+            make install
+
+    or just stick it somewhere in @INC where perl can find it. It's in pure
+    Perl.
+
+AUTHOR
+    Ala Qumsieh <aqumsieh@cpan.org>.
+
+    Copyright (c) 2003 Ala Qumsieh. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

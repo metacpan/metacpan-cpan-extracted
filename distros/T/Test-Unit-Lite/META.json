@@ -1,0 +1,70 @@
+{
+   "abstract" : "Unit testing without external dependencies",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Unit-Lite",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Unit::Debug" : {
+         "file" : "lib/Test/Unit/Lite.pm",
+         "version" : 0
+      },
+      "Test::Unit::HarnessUnit" : {
+         "file" : "lib/Test/Unit/Lite.pm",
+         "version" : 0
+      },
+      "Test::Unit::Lite" : {
+         "file" : "lib/Test/Unit/Lite.pm",
+         "version" : "0.1202"
+      },
+      "Test::Unit::Lite::AllTests" : {
+         "file" : "lib/Test/Unit/Lite.pm",
+         "version" : 0
+      },
+      "Test::Unit::Result" : {
+         "file" : "lib/Test/Unit/Lite.pm",
+         "version" : 0
+      },
+      "Test::Unit::TestCase" : {
+         "file" : "lib/Test/Unit/Lite.pm",
+         "version" : 0
+      },
+      "Test::Unit::TestRunner" : {
+         "file" : "lib/Test/Unit/Lite.pm",
+         "version" : 0
+      },
+      "Test::Unit::TestSuite" : {
+         "file" : "lib/Test/Unit/Lite.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/perl-Test-Unit-Lite/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perl-Test-Unit-Lite"
+      }
+   },
+   "version" : "0.1202"
+}

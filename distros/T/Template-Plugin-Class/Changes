@@ -1,0 +1,18 @@
+0.14    Wednesday 5th May, 2009
+        Removed a bogus testcase which fails on newer versions of TTD
+
+0.13	Wednesday 10th May, 2006
+	Make it work correctly when diagnostics.pm is in use.
+	http://rt.cpan.org/Ticket/Display.html?id=11538
+	Changed to ship a traditional Makefile.PL
+	Pulled the copy about rt.cpan.org from L</BUGS>
+
+0.12	Tuesday 13th January, 2004
+	Make the require logic softer by stealing from base.pm.
+	https://rt.cpan.org/Ticket/Display.html?id=4897
+
+0.11	Tuesday 26th August, 2003
+	test suite fixup
+
+0.10	Saturday 15th August, 2003
+	initial CPAN release

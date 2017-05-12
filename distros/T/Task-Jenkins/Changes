@@ -1,0 +1,71 @@
+Changes file for Task::Jenkins
+
+$Id$
+
+Project Change Log:
+http://logiclab.jira.com/browse/TJENKINS#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+0.05 2014-01-27
+
+- Feature release, update recommended - if you want to get more out of your CI ;-)
+
+- Added requirement for Module::Build 0.40 as configure_requires as 
+  specified by Module::Build itself
+
+- Added Devel::Cover::Report::Clover, providing parsing of Devel::Cover
+  report as in clover format [TJENKINS-5]
+
+  https://logiclab.jira.com/browse/TJENKINS-5
+
+
+0.04 2014-01-18
+
+- Maintenance release, update not required
+
+- Updated licence information in Build.PL
+
+- Added Test::Kwalitee::Extra test in attempt to address issue described in
+  issue TJENKINS-4, issue was reported by CPAN testers 
+
+  https://logiclab.jira.com/browse/TJENKINS-4
+  
+
+0.03 2014-01-13
+
+- Maintenance release, update not required
+
+- Added Test::Kwalitee test
+
+- Specified github as repository
+
+- Added strict and warnings to satisfy CPANTS
+
+- Added Perl minimum version (v5.6.0) located by Perl::MinimumVersion and required by CPANTS
+
+- Added changes.t automatic assertion of the integrity of the Changes file, 
+ see also TJENKINS-5 [TJENKINS-3]
+
+  https://logiclab.jira.com/browse/TJENKINS-3
+
+
+0.02 2013-07-26
+
+- Maintenance release, update not required
+
+- Fixed up Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [TJENKINS-5]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+  
+  https://logiclab.jira.com/browse/TJENKINS-2
+
+
+0.01 2011-12-26
+
+- Initial release
+
+	Including:
+    	App::Prove
+    	Devel::Cover
+    	TAP::Formatter::JUnit

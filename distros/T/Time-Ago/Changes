@@ -1,0 +1,12 @@
+Version 0.09
+
+  Arabic translation added (thanks to github.com/aborazmeh)
+
+Version 0.08
+
+  Removed defined-or operator use in tests for backward
+  compatibility with perl 5.8.x (thanks to Slaven Rezić)
+
+Version 0.01
+
+  Initial release

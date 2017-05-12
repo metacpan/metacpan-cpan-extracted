@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      EtText: Documentation: Links in EtText
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      // OL,UL,P,BODY,TD,TR,TH,FORM {
+       // font-family: verdana,lucida,helvetica,sans-serif;
+       // font-size: medium;
+       // color: #000000;
+      }
+      code, samp, pre
+      {
+       font-family: monospace;
+      }
+      H1 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/EtTextTitle.png" width="489" height="113" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://ettext.taint.org/">EtText</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="sidebars.html">Back</a> | <a href="similar.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h2>Links in EtText</h2><p>
+                          As well as the standard <strong>&lt;a href=url&gt;...&lt;/a&gt;</strong> link
+                          specification used in HTML, EtText will automatically add href tags for URLs
+                          and email addresses that occur in the text. In addition, EtText supports its
+                          own link format, as follows.
+                          
+                        </p>
+                        <p>
+                          To use labelled links, you surround the link text with double-square-brackets,
+                          and (optionally) use a single open-square-bracket on the right-hand side with
+                          the link label.
+                          
+                        </p>
+                        <p>
+                          Here's an example:
+                          
+                        </p>
+                        <p>
+                          <!--etsafe-->
+                          <pre>
+
+  WebMake's home page is &#91;&#91;at this website &#91;WebMake&#93;&#93;.
+                        </pre>
+<!--/etsafe-->
+                                              </p>
+                      <p>
+                        Alternatively, if the link text matches the link label, the link label is
+                        optional.
+                        
+                      </p>
+                      <p>
+                        <!--etsafe-->
+                        <pre>
+
+  Here's an example: &#91;&#91;WebMake&#93;&#93;.
+                      </pre>
+<!--/etsafe-->
+                                          </p>
+                    <p>
+                      The href used in the link is then defined at another point in the document, as
+                      an indented line like this:
+                      
+                    </p>
+                    <p>
+                      <!--etsafe-->
+                      <pre>
+
+	&#91;WebMake&#93;: http://webmake.taint.org/
+                    </pre>
+<!--/etsafe-->
+                                      </p>
+                  <p>
+                    Even simpler: if the link label has been set as an <a href="#Auto_Links_Even_More_Convenient">Auto link</a>, you can omit the square
+                    brackets altogether:
+                    
+                  </p>
+                  <p>
+                    <!--etsafe-->
+                    <pre>
+
+  Here's an example: WebMake.
+                  </pre>
+<!--/etsafe-->
+                                  </p>
+                <p>
+                  Text and markup can be enclosed in the double-square-brackets, everything
+                  quoted will become part of the link text. Unlike the older form of EtText
+                  links (see below), even single words need to be enclosed in brackets
+                  to become links. This protects against accidentally interpreting normal
+                  text as a broken link.
+                  
+                </p>
+                <a name="EtText_Linking_Backwards_Compatibility"><h3>EtText Linking, Backwards Compatibility</h3></a><p>
+                  The following text describes the old style for EtText links. Since it
+                  was way too easy to produce links this way where they were not intended
+                  to be, it has now been obsoleted by the method described above. However,
+                  support for it will remain on by default for a few revisions.
+                  
+                </p>
+                <p>
+                  To turn off this backwards compatibility, set the <strong>EtTextOldLinkStyle</strong> option
+                  to 0, either using <a href="http://webmake.taint.org/">WebMake</a>'s &lt;option&gt; tag, or from your code.
+                  
+                </p>
+                <p>
+                  The basic concept is of a word or "quoted set of words" followed by an
+                  optional link label in [square brackets], like this: <strong>"this is a
+                  link" [label]</strong>.
+                  
+                </p>
+                <p>
+                  The href used in the link is then defined at another point in the document, as
+                  above.
+                  
+                </p>
+                <p>
+                  Text and markup can be enclosed in the quotes, everything quoted will become
+                  part of the link text. Single words or HTML tags do not need to be quoted, so
+                  
+                </p>
+                <p>
+                  <!--etsafe-->
+                  <pre>
+
+  &lt;img src="/license_plate.jpg" width="10" height="10"&gt; &#91;homepage&#93;
+                </pre>
+<!--/etsafe-->
+                              </p>
+              <p>
+                will work correctly.
+                
+              </p>
+              <a name="Glossary_Links"><h3>Glossary Links</h3></a><p>
+                EtText also supports a concept called <em>glossary links</em>; if you define a link,
+                the name of that link will automatically become a href if enclosed in
+                double-square-brackets or quotes. For example:
+                
+              </p>
+              <p>
+                <!--etsafe-->
+                <pre>
+
+  &#91;Justin Mason&#93;: http://jmason.org/
+              </pre>
+<!--/etsafe-->
+                          </p>
+            <p>
+              will mean that any occurrence of <strong>[[Justin Mason]]</strong>, or
+              <strong>"Justin Mason"</strong>, in <em>any</em> EtText content chunk or file in the
+              site, becomes a link to that address.
+              
+            </p>
+            <blockquote>
+              <p>
+                These links are stored in the <a href="http://webmake.taint.org/">WebMake</a> cache file, if <a href="http://webmake.taint.org/">WebMake</a> is being used.
+                 If you use EtText in a standalone mode, without <a href="http://webmake.taint.org/">WebMake</a>, you can provide an
+                 implementation of the <strong>Text::EtText::LinkGlossary</strong> interface to store
+                 defined links so that they can be used in other EtText files.
+                
+              </p>
+            </blockquote>
+            <p>
+              Quoted bits of text that do not map to an entry in the glossary are not
+              converted to links (unless they're followed by a square-bracketed link-label
+              reference).
+              
+            </p>
+            <a name="Auto_Links_Even_More_Convenient"><h3>Auto Links - Even More Convenient</h3></a><p>
+              In addition, if the link definition is preceded with <code>Auto:</code>, the quotes are
+              not required, and any occurrence of the link label -- with or without quotes or
+              double-square-brackets -- will become a link.
+              
+            </p>
+            <p>
+              <!--etsafe-->
+              <pre>
+
+  Auto: &#91;WebMake&#93;: http://webmake.taint.org/
+  Auto: &#91;any occurrence of the words&#93;: http://webmake.taint.org/
+            </pre>
+<!--/etsafe-->
+                      </p>
+          <a name="URLs_and_Email_Addresses"><h3>URLs and Email Addresses</h3></a><p>
+            URLs, such as <a href="http://webmake.taint.org/">http://webmake.taint.org/</a> , and email addresses, such as
+            <a href="mailto:jm@nospam-jmason.org">jm@nospam-jmason.org</a>, are automatically converted into links to that same
+            address.
+            
+          </p>
+          <a name="Blocking_EtText_Link_Interpretation"><h3>Blocking EtText Link Interpretation</h3></a><p>
+            To block interpretation as a link, replace square brackets with the HTML
+            entities <strong>&amp;etsqi;</strong> and <strong>&amp;etsqo;</strong>, which map to [ and ]
+            respectively; replace quote characters, <strong>"</strong>, with two apostrophes,
+            <strong>&#39;&#39;</strong>. If that doesn't do the trick, wrap the entire section of text
+            with the <strong>&lt;!--etsafe--&gt;</strong>...<strong>&lt;!--/etsafe--&gt;</strong> tags.
+            
+          </p>
+          <p>
+            
+          </p>
+        </p>
+      </td>
+    </tr>
+  </table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <strong><a href="http://ettext.taint.org/">EtText</a>
+       Documentation</strong> (version 2.2)
+       
+    </td>
+    <td valign="top">
+      <div align="right">
+        
+         [ <a href="sidebars.html">Back</a> | <a href="similar.html">Forward</a> | <a href="index.html">Index</a>
+         | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+         
+      </div>
+    </td>
+  </tr>
+</table>
+<div align="right">
+  <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" border="0" width="88" height="31" /></a>
+</div>
+</font>
+</body>
+</html>

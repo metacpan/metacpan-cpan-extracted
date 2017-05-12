@@ -1,0 +1,98 @@
+Tk::Pgplot
+==========
+
+**Beta version**
+
+Pgplot widget for Perl/Tk. This module is the perl front end to a port
+of the pgplot Tcl/Tk driver to Perl/Tk. It uses the same basic X code
+used by the Tcl/Tk and Motif drivers supplied with pgplot, and a
+modified version of the Tcl/Tk code. Due to this dependency on X code,
+it is unlikely to run on any OS that does not support X (ie Windows). 
+
+Requirements:
+-------------
+
+- An ansi C compiler
+- Standard X libraries
+- A *modified* version of pgplot 5.2.2
+- A Fortran 77 compiler (for pgplot)
+
+Platforms:
+----------
+ This has been tested with
+
+   - Linux
+	CentOS 5	gcc 4.1.1 / perl 5.8.7 / Tk-804.027
+
+Installation:
+-------------
+
+ - You *must* supply a patch to pgplot to include the Perl/Tk driver
+   (see PGPLOT.patch).
+
+ - Run 'perl Makefile.PL'. By default, Makefile.PL assumes the pgplot 
+   includes and libraries are pointed to by the environment variable
+   PGPLOT_DIR. You can override these defaults via command-line options,
+   as shown below. You can also override the X11 library directory, if
+   necessary.
+
+  > perl Makefile.PL IDIR=<pgplot include file directory> LDIR=<pgplot library file directory>
+  > make
+  > make test
+  > make install
+
+Dependencies:
+-------------
+ 
+ - The Caltech pgplot library
+ - The Perl PGPLOT Module (available from CPAN)
+ - The Perl Tk Module (available from CPAN)
+ - The ExtUtils::F77 Module from CPAN (also needed by the Perl PGPLOT module)
+
+
+Authors:
+-------
+ Please send comments and bug fixes to r.kackley@jach.hawaii.edu
+ Russell Kackley, Joint Astronomy Centre, Hilo, HI
+
+ Chris Phillips was the original author of this module (Tk-Pgplot-0.30)
+
+Documentation:
+--------------
+
+Please see the driver documentation for options from the Tcl/Tk
+version. However there is one difference in usage. The Tcl version
+uses the Tcl name of the widget to identify the widget to pgopen. This
+does not map well to perl, so an extra configure option has been
+added, "name". The name given to the widget must be supplied to
+pgopen(). E.g.
+
+  use Tk;
+  use Tk::Pgplot;
+  use PGPLOT;
+  my $mw = MainWindow->new;
+  my $f = $mw->Frame();
+  my $pgplot = $f->Pgplot(-name => 'mypgplot');
+  pgopen('mypgplot/ptk');
+
+The supported options should work identically. See the included test
+scripts for an example of usage.
+
+Bugs:
+-----
+
+- You cannot create a Pgplot widget directly in the MainWindow. It needs to
+  be created within a Frame.
+- the scroll bars don't work on the test program (but they do on the demo)
+
+Copyright
+---------
+
+This module is copyright (C) 2000-2002 Chris Phillips.  All rights
+reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This module is copyright (C) 2007 Science and Technology Facilities
+Council.  All rights reserved.  This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+

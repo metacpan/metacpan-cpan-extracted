@@ -1,0 +1,17 @@
+Revision history for Text-Report
+
+1.004		Monday, 09 July, 2007 08:43 EST
+		* Fixed code error in 05.report.t _test_defaults()
+		* Added example to pod
+		* Modified pod
+		* Updated README
+
+1.003		Friday, 06 July, 2007 17:17 EST
+		* Humbly cleaned up -warnings
+		* Fixed formline accumulator reset algorithm
+		* Fixed POD format
+		* Changed new() attr key from 'Log' to 'logfh'
+		  (backward compatible)
+
+1.002		Wednesday, 04 July, 2007 23:17 EST
+		* Initial release

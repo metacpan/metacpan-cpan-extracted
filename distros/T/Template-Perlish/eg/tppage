@@ -1,0 +1,226 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Carp;
+use Pod::Usage qw( pod2usage );
+use Getopt::Long qw( :config gnu_getopt );
+my $VERSION = '1.0';
+use English qw( -no_match_vars );
+use Fatal qw( open );
+use Storable qw( thaw );
+use Template::Perlish;
+
+my %config = ();
+GetOptions(\%config, 'usage', 'help', 'man', 'version', 'input|in|i=s',
+   'output|out|o=s', 'define|D=s@', 'hdefine|hex-define|H|X=s@',
+   'ddefine|dumper-define|eval-define|E=s@', 'sdefine|storable-define|S=s@');
+$config{input} = shift if @ARGV && ! defined $config{input};
+$config{input} = \*STDIN unless defined $config{input};
+$config{output} = \*STDOUT unless defined $config{output};
+
+pod2usage(message => "$0 $VERSION", -verbose => 99, -sections => '')
+  if $config{version};
+pod2usage(-verbose => 99, -sections => 'USAGE') if $config{usage};
+pod2usage(-verbose => 99, -sections => 'USAGE|EXAMPLES|OPTIONS')
+  if $config{help};
+pod2usage(-verbose => 2) if $config{man};
+
+# Script implementation here
+my $template = read_file($config{input});
+my $tp       = Template::Perlish->new();
+my %variables = get_variables();
+write_file($config{output}, $tp->process($template, \%variables));
+
+sub get_variables {
+   my %variables;
+   for my $dtype (qw( define hdefine ddefine sdefine )) {
+      my $definitions = $config{$dtype};
+      my $filter = {
+         define => sub { shift },
+         hdefine => sub { pack 'H*', shift },
+         ddefine => sub { eval pack 'H*', shift },
+         sdefine => sub { thaw pack 'H*', shift },
+      }->{$dtype};
+      for my $definition (@$definitions) {
+         my ($name, $value) = split /=/, $definition, 2;
+         $variables{$name} = defined $value ? $filter->($value) : 1;
+      }
+   }
+   return %variables if wantarray;
+   return \%variables;
+}
+
+sub read_file {
+   my ($input) = @_;
+   my $fh =
+     ref($input)
+     ? $input
+     : do { open my $fh, '<', $input; $fh };
+   local $INPUT_RECORD_SEPARATOR; # to slurp whole file
+   binmode $fh;
+   my $retval = <$fh>;
+   close $fh unless ref $input;
+   return $retval;
+} ## end sub read_file
+
+sub write_file {
+   my $output = shift;
+   my $fh =
+     ref($output)
+     ? $output
+     : do { open my $fh, '>', $output; $fh };
+   binmode $fh;
+   print {$fh} @_;
+   close $fh unless ref $output;
+   return;
+} ## end sub write_file
+
+__END__
+
+=head1 NAME
+
+tppage - [Una riga di descrizione dello scopo dello script]
+
+
+=head1 VERSION
+
+Ask the version number to the script itself, calling:
+
+   shell$ tppage --version
+
+
+=head1 USAGE
+
+   tppage [--usage] [--help] [--man] [--version]
+
+   tppage
+  
+=head1 EXAMPLES
+
+   shell$ tppage
+
+=for l'autore, da riempire:
+   Qualche breve esempio con codice che mostri l'utilizzo più comune.
+   Questa sezione sarà quella probabilmente più letta, perché molti
+   utenti si annoiano a leggere tutta la documentazione, per cui
+   è meglio essere il più educativi ed esplicativi possibile.
+
+  
+=head1 DESCRIPTION
+
+=for l'autore, da riempire:
+   Fornite una descrizione completa del modulo e delle sue caratteristiche.
+   Aiutatevi a strutturare il testo con le sottosezioni (=head2, =head3)
+   se necessario.
+
+
+=head1 OPTIONS
+
+=for l'autore, da riempire:
+   Una descrizione di tutte le opzioni possibili nella chiamata allo script
+
+=over
+
+=item --help
+
+print a somewhat more verbose help, showing usage, this description of
+the options and some examples from the synopsis.
+
+=item --man
+
+print out the full documentation for the script.
+
+=item --usage
+
+print a concise usage line and exit.
+
+=item --version
+
+print the version of the script.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=for l'autore, da riempire:
+   Elencate qualunque singolo errore o messaggio di avvertimento che
+   lo script può generare, anche quelli che non "accadranno mai".
+   Includete anche una spiegazione completa di ciascuno di questi
+   problemi, una o più possibili cause e qualunque rimedio
+   suggerito.
+
+
+=over
+
+=item C<< Error message here, perhaps with %s placeholders >>
+
+[Descrizione di un errore]
+
+=item C<< Another error message here >>
+
+[Descrizione di un errore]
+
+[E così via...]
+
+=back
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=for l'autore, da riempire:
+   Una spiegazione completa di qualunque sistema di configurazione
+   utilizzato dallo script, inclusi i nomi e le posizioni dei file di
+   configurazione, il significato di ciascuna variabile di ambiente
+   utilizzata e proprietà che può essere impostata. Queste descrizioni
+   devono anche includere dettagli su eventuali linguaggi di configurazione
+   utilizzati.
+  
+tppage requires no configuration files or environment variables.
+
+
+=head1 DEPENDENCIES
+
+=for l'autore, da riempire:
+   Una lista di tutti i moduli su cui si basa questo script,
+   incluse eventuali restrizioni sulle relative versioni, ed una
+   indicazione se il modulo in questione è parte della distribuzione
+   standard di Perl, parte della distribuzione del modulo o se
+   deve essere installato separatamente.
+
+None.
+
+
+=head1 BUGS AND LIMITATIONS
+
+=for l'autore, da riempire:
+   Una lista di tutti i problemi conosciuti relativi al modulo,
+   insime a qualche indicazione sul fatto che tali problemi siano
+   plausibilmente risolti in una versione successiva. Includete anche
+   una lista delle restrizioni sulle funzionalità fornite dal
+   modulo: tipi di dati che non si è in grado di gestire, problematiche
+   relative all'efficienza e le circostanze nelle quali queste possono
+   sorgere, limitazioni pratiche sugli insiemi dei dati, casi
+   particolari che non sono (ancora) gestiti, e così via.
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through http://rt.cpan.org/
+
+=head1 AUTHOR
+
+Flavio Poletti C<polettix@cpan.org>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008-2015 by Flavio Poletti C<polettix@cpan.org>.
+
+This program is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+
+=cut

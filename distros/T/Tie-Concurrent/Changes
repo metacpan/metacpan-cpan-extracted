@@ -1,0 +1,12 @@
+Revision history for Perl extension Tie::Concurrent.
+
+0.05 Apr 15 2009
+    - Kwalitee tweaks
+
+0.04  2006/Feb21
+    - Added prerequisite of GDBM_File, which is only need for the
+      test suite really.
+
+0.01  Thu Dec 23 17:59:28 1999
+	- original version; created by h2xs 1.18
+

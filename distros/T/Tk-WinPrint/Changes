@@ -1,0 +1,9 @@
+Revision history for Perl extension Tk::XMLViewer.
+
+0.05
+	- changes by John Cerney: Pod documentation, new options to
+	  the print method similar to the existing canvas postscript
+	  method	
+
+0.04
+	- first version

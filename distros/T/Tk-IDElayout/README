@@ -1,0 +1,65 @@
+
+		*************************************
+		  The Tk::IDElayout Widget
+		*************************************
+
+INTRODUCTION
+
+Tk::IDElayout is a widget for managing the layout of Tk frames
+(and other widgets) like an IDE (Integrated Development Environment)
+similar to Ecliplse or Microsoft Visual Studio.
+
+Features:
+
+See "Screenshots.pdf" in the source distribution for some screenshots
+demonstrating some of these features.
+
+* Layout and management of subwidgets/frames similar to an IDE.
+	
+* Resizable panes: Separate frames/widgets in the top-level window can be resized by dragging
+the separator border between the frames.
+	
+* Support for Tabbed-Frames (using of subclass of L<Tk::DynaTabFrame>, where each tab
+can be dragged/dropped; to another tabframe in the IDE, or to a new separate window,
+or to "edge" ares in the mainwindow to create new tabframes.
+
+
+BUILDING AND INSTALLING THE WIDGET
+
+1. Uncompress and unpack the distribution
+
+   ON UNIX:
+	gzip -d Tk-TableMatrix<version>.tar.gz
+	tar -xf Tk-TableMatrix<version>.tar
+
+   ON WINDOWS:
+	use something like WinZip to unpack the archive.
+
+    
+   This will create a subdirectory TableMatrix<version> with all the files in it.
+
+2. Build/Test
+
+  Note: A c-compiler is required, due to the CaptureRelease extension, which enables windows
+  to be released from the IDE to separate windows and captured back to the IDE.
+
+    perl Makefile.PL
+    make 
+    make test
+    
+ The test case t/simpleIDElayout2.t serves a simple demo. Run it using
+    perl -Mblib t/simpleIDElayout2.t
+   
+3. Install
+    make install
+
+4. Read the documentation
+
+   Read it using the standard 'perldoc Tk::IDElayout' command.
+
+           
+           LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

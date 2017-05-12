@@ -1,0 +1,25 @@
+---
+abstract: 'create an array where key are aggregated by step ( and optionally could start with an offset )'
+author:
+  - 'DULAUNOY Fabrice <fabrice@dulaunoy.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Array-Cavity
+provides:
+  Tie::Array::Cavity:
+    file: lib/Tie/Array/Cavity.pm
+    version: '0.03'
+requires:
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

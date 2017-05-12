@@ -1,0 +1,6 @@
+sub {
+    my $self = shift;
+    $self->my_head;
+    $self->my_body;
+}
+

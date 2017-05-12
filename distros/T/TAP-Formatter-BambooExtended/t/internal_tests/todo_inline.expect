@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-todo_inline_test" errors="0" failures="0" tests="3" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/todo_inline.test">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Explanation:
+    unexpected TODO passed (2)
+Test output:
+    not ok - t/internal_tests/todo_inline.test
+]]>
+    </failure>
+  </testcase>
+  <testcase name="- Foo">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Explanation:
+    Just testing the todo interface.
+Test output:
+    not ok 1 - Foo # TODO Just testing the todo interface.
+]]>
+    </failure>
+  </testcase>
+  <testcase name="- Unexpected success">
+    <failure>
+<![CDATA[Fail reason(s):
+    unexpected TODO passed
+Explanation:
+    Just testing the todo interface.
+Test output:
+    ok 2 - Unexpected success # TODO Just testing the todo interface.
+]]>
+    </failure>
+  </testcase>
+  <testcase name="- This is not todo"/>
+</testsuite>

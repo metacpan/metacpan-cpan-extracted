@@ -1,0 +1,15 @@
+Revision history for Perl extension Tie::Hash::Approx.
+0.03  Thu Aug  1 23:16:03 CEST 2002
+    - Fixed a bug regarding an approxmative match during an
+      exists() check.
+    - Fixed a bug regarding the exits() check on empty "''" hash
+      key.
+
+0.02  Thu Sep 06 12:31:10 CEST 2001
+	- Fixed a pod bug which sometime showed the test before
+	the documentation.
+
+0.01  Wed Aug 22 01:02:23 2001
+	- original version; created by h2xs 1.20 with options
+		-cfn Tie::Hash::Approx
+

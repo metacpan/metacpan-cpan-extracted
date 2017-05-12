@@ -1,0 +1,13 @@
+Changes
+dist.ini
+ignore.txt
+lib/Tie/Wx/Widget.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-run.t
+t/manifest.t
+t/pod.t

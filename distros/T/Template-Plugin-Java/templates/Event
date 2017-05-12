@@ -1,0 +1,41 @@
+// Generated event class.
+[%# vim: set syntax=java: %]
+
+[% USE Java %]
+[% PROCESS FileHeader %]
+[% PROCESS ClassHeader %]
+{
+[% PROCESS DataDeclarations %]
+
+public $class()
+throws Exception
+{
+	super("$class", $dest, "$source");
+}
+
+public $class(String reqType, String dest, String source)
+throws Exception
+{
+	super(reqType, dest, source);
+}
+
+public $class(InputSource from) throws Exception { set(from); }
+
+public $class([% Java.variableDeclarations.join(", ") %])
+{
+[% FOREACH Java.variables %]
+	this.$name = $name;
+[% END %]
+}
+
+public void deliver(Service s)
+throws Exception
+{
+	(($handler)s).$tag(this);
+}
+
+[% PROCESS DataAccess %]
+[% PROCESS XMLEncode  %]
+[% PROCESS ParseFromXML %]
+$append
+} // End class ${class}.

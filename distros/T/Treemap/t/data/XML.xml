@@ -1,0 +1,9 @@
+<children name="test1" size="12" colour="#FFFFFF">
+   <children name="test1sub1" size="4" colour="#FF0000">
+      <children name="test1sub1sub1" size="2" colour="#00FF00" />
+      <children name="test1sub1sub2" size="2" colour="#00FF00" />
+   </children>
+   <children name="test1sub2" size="4" colour="#FFFF00" />
+   <children name="test1sub3" size="2" colour="#FFFF00" />
+   <children name="test1sub4" size="2" colour="#FFFF00" />
+</children>

@@ -1,0 +1,9 @@
+Changes
+Tx.xs
+MANIFEST
+Makefile.PL
+README
+lib/Text/Tx.pm
+t/Text-Tx.t
+t/benchmark.pl
+META.yml                                 Module meta-data (added by MakeMaker)

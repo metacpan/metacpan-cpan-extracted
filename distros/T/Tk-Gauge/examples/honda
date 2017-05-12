@@ -1,0 +1,281 @@
+#!/usr/local/bin/perl
+use Tk;
+use Tk::Gauge;
+use Tk::Pane;
+use subs qw/ fuel speedometer tachometer temperature /;
+use strict;
+use warnings;
+
+my $mw = MainWindow->new;
+$mw = $mw->Scrolled( qw/ Pane -width 400 -height 400 / )->pack( qw/ -fill both -expand 1 / );
+$mw->configure( -background => 'black' );
+
+my $tachf  = $mw->Frame->pack( qw/ -side left / );
+my $speedf = $mw->Frame->pack( qw/ -side left / );
+my $fuelf  = $mw->Frame->pack( qw/ -side left / );
+my $gearf  = $mw->Frame->pack( qw/ -side left / );
+my $tempf  = $mw->Frame->pack( qw/ -side left / );
+
+my $t = $tachf->Frame->pack( qw/ -side left / );
+$t->Frame( qw/ -height 30 -background black / )->pack( qw/ -fill both -expand yes / );
+tachometer  ( $t )->pack( qw/ -side left / );
+
+speedometer ( $speedf )->pack( qw/ -side left / );
+
+my $ff = $fuelf->Frame->pack( qw/ -side left / );
+$ff->Frame( qw/ -height 180 -background black / )->pack( qw/ -fill both -expand yes / );
+fuel        ( $ff )->pack( qw/ -side left / );
+
+my $gf = $gearf->Frame( qw/ -background black / )->pack( qw/ -side left / );
+$gf->Button( qw/ -state disabled -text P  -foreground white -background black / )->pack( qw/ -side top -padx 10 -pady 5 / );
+$gf->Button( qw/ -state disabled -text R  -foreground white -background black / )->pack( qw/ -side top -padx 10 -pady 5 / );
+$gf->Button( qw/ -state disabled -text N  -foreground white -background black / )->pack( qw/ -side top -padx 10 -pady 10 / );
+$gf->Button( qw/ -state disabled -text D4 -disabledforeground green -background black / )->pack( qw/ -side top -padx 10 -pady 5 / );
+$gf->Button( qw/ -state disabled -text D3 -foreground white -background black / )->pack( qw/ -side top -padx 10 -pady 5 / );
+$gf->Button( qw/ -state disabled -text 2  -foreground white -background black / )->pack( qw/ -side top -padx 10 -pady 5 / );
+$gf->Button( qw/ -state disabled -text 1  -foreground white -background black / )->pack( qw/ -side top -padx 10 -pady 5 / );
+
+my $tf = $tempf->Frame->pack( qw/ -side left / );
+$tf->Frame( qw/ -height 180 -background black / )->pack( qw/ -fill both -expand yes / );
+temperature ( $tf )->pack( qw/ -side left / );
+
+MainLoop;
+
+sub fuel {
+
+    my $c = shift;
+
+    my $font = 'Helvetica 20';
+    my $fuelv;
+    my $tempv;
+    my $radius = 80;
+    my $ticks  = 36;
+
+    my $fuel = $c->Gauge(
+        -background           => 'black',
+        -extent               => 90,	      
+        -fill                 => 'black',
+        -from                 => 0,
+        -highlightthickness   => 0,
+        -hubcolor             => 'gray21',
+        -huboutline           => 'gray21',
+        -hubplace             => 'underneedle',
+        -hubradius            => 10,
+        -majortickinterval    => 18,
+        -majorticklength      => 15,
+        -majortickcolor       => 'white',
+        -majorticklabelcolor  => 'white',
+        -majorticklabelplace  => 'hide',
+        -majorticklabelscale  => .5,
+        -majortickthickness   => 4,
+        -minortickinterval    => 1,
+        -minortickcolor       => 'white',
+        -minorticklength      => 10,
+        -needles              => [
+		              {
+		                  -radius     => $radius,
+		                  -color      => 'orangered2',
+		                  -variable   => \$fuelv,
+		                  -width      => 3,
+                                  -showvalue  => 0,
+                                  -titlecolor => 'white',
+                                  -titleplace => 'north',
+                                  -arrowshape => [ 6, 6, 0 ],
+		              },
+		             ] ,
+        -to                   => $ticks,
+        -start                => 0,
+        -style                => 'pieslice',
+    );
+
+    my( $hx, $hy ) = $fuel->centerpoint;
+    my $fw = $fuel->fontMeasure( $font, '0' );
+    $fuel->createText( $hx - $fw , $hy - $radius, -text => 'F', -fill => 'white', -font => $font );
+    $fuel->createText( $hx + $radius , $hy + $fw, -text => 'E', -fill => 'white', -font => $font );
+    $mw->after(1000 => sub {$fuelv = $ticks * 0.75 } );
+
+    return $fuel;
+
+} # end fuel
+
+sub temperature {
+
+    my $c = shift;
+
+    my $font = 'Helvetica -20';
+    my $fuelv;
+    my $tempv;
+    my $radius = 80;
+    my $ticks  = 36;
+
+    my $temp = $c->Gauge(
+        -background           => 'black',
+        -bands                => [
+                              {
+                                  -arccolor => 'red', 
+                                  -minimum  => 32,
+                                  -maximum  => 36,
+                                  -piecolor => 'red', 
+                                  -tags     => 'redtemp',
+                              },
+                             ],
+        -bandplace            => 'overticks',
+        -bandstyle            => 'band',
+        -bandwidth            => 16,
+        -extent               => -90,	      
+        -fill                 => 'black',
+        -from                 => 0,
+        -highlightthickness   => 0,
+        -hubcolor             => 'gray21',
+        -huboutline           => 'gray21',
+        -hubplace             => 'underneedle',
+        -hubradius            => 10,
+        -majortickinterval    => 36,
+        -majorticklength      => 15,
+        -majortickcolor       => 'white',
+        -majorticklabelcolor  => 'white',
+        -majorticklabelplace  => 'hide',
+        -majorticklabelscale  => .5,
+        -majortickthickness   => 4,
+        -minortickinterval    => 1,
+        -minortickcolor       => 'white',
+        -minorticklength      => 10,
+        -needles              => [
+		              {
+		                  -radius     => $radius,
+		                  -color      => 'orangered2',
+		                  -variable   => \$tempv,
+		                  -width      => 3,
+                                  -showvalue  => 0,
+                                  -titlecolor => 'white',
+                                  -titleplace => 'north',
+                                  -arrowshape => [ 6, 6, 0 ],
+		              },
+		             ] ,
+        -to                   => $ticks,
+        -start                => 180,
+        -style                => 'pieslice',
+    );
+
+    my( $hx, $hy ) = $temp->centerpoint;
+    my $fw = $temp->fontMeasure( $font, '0' );
+    $temp->createText( $hx + $fw , $hy - $radius, -text => 'H', -fill => 'white', -font => $font );
+    $temp->createText( $hx - $radius , $hy + $fw, -text => 'C', -fill => 'white', -font => $font );
+
+    $mw->after(1000 => sub {$tempv = $ticks * 0.25 } );
+
+    return $temp;
+
+} # end temperature
+
+sub speedometer {
+    
+    my $c = shift;
+
+    my $speedv;
+    my $speed = $c->Gauge(
+        -background           => 'black',
+        -fill                 => 'black',
+        -finetickinterval     => 5,
+        -fineticklength       => 5,
+        -finetickcolor        => 'white',
+        -from                 => 0,
+        -highlightthickness   => 0,
+        -hubcolor             => 'gray21',
+        -huboutline           => 'gray21',
+        -hubplace             => 'underneedle',
+        -hubradius            => 20,
+        -majortickinterval    => 20,
+        -majorticklength      => 15,
+        -majortickcolor       => 'white',
+        -majorticklabelcolor  => 'white',
+        -minortickinterval    => 10,
+        -minorticklength      => 15,
+        -minortickcolor       => 'white',
+        -needles              => [
+		              {
+		                  -radius     => 160,
+		                  -color      => 'orangered2',
+		                  -variable   => \$speedv,
+		                  -width      => 3,
+                                  -showvalue  => 0,
+                                  -title      => 'mph',
+                                  -titlecolor => 'white',
+                                  -titleplace => 'north',
+                                  -arrowshape => [ 6, 6, 0 ],
+		              },
+		             ] ,
+        -needlepad            => 15,
+        -to                   => 150,
+    );
+
+    $mw->after(1000 => sub {$speedv = 55 } );
+
+    return $speed;
+
+} # end speedoemter
+
+sub tachometer {
+
+    my $c = shift;
+
+    my $iLCD = 50;		# integral Lowest Common Denominator
+    my $tachv;
+    my $tach = $c->Gauge(
+    -start => 225, -extent => -270,
+        -background           => 'black',
+        -bands                => [
+		              {
+		                  -arccolor => 'red', 
+		                  -minimum  => 6250 / $iLCD,
+		                  -maximum  => 8000 / $iLCD,
+		                  -tags     => 'redtach',
+		              },
+		             ],
+        -bandplace            => 'overticks',
+        -bandwidth            => 12,
+        -fill                 => 'black',
+        -finetickinterval     => 250 / $iLCD,
+        -fineticklength       => 5,
+        -finetickcolor        => 'white',
+        -from                 => 0,
+        -highlightthickness   => 0,
+        -hubcolor             => 'gray21',
+        -huboutline           => 'gray21',
+        -hubplace             => 'underneedle',
+        -hubradius            => 20,
+        -majortickinterval    => 1000 / $iLCD,
+        -majorticklength      => 15,
+        -majortickcolor       => 'white',
+        -majorticklabelcolor  => 'white',
+        -majorticklabelscale  => $iLCD / 1000,
+        -margin               => 50,
+        -minortickinterval    => 500 / $iLCD,
+        -minorticklength      => 10,
+        -minortickcolor       => 'white',
+        -needles              => [
+		              {
+		                  -radius     => 120,
+		                  -color      => 'orangered2',
+                                  -command    => [ sub {
+				      print "tach args=@_!\n";
+				      1;
+                                  }, 1, 2 ],
+		                  -variable   => \$tachv,
+		                  -width      => 3,
+                                  -showvalue  => 0,
+                                  -title      => 'x 1000 r / min',
+                                  -titlecolor => 'white',
+                                  -titleplace => 'north',
+                                  -arrowshape => [ 6, 6, 0 ],
+		              },
+		             ] ,
+        -needlepad            => 15,
+        -to                   => 8000 / $iLCD,
+    );
+
+    $mw->after(1000 => sub { $tachv = 1800 / $iLCD } );
+
+    return $tach;
+
+} # end tachometer

@@ -1,0 +1,11 @@
+--- Text/Quoted.pm	2002-12-17 16:42:17.000000000 +0000
++++ /Text/Quoted.pm.new	2003-09-22 12:25:01.000000000 +0100
+@@ -155,7 +155,7 @@
+ # BITS OF A TEXT LINE
+ 
+ my $quotechar = qq{[!#%=|:]};
+-my $quotechunk = qq{(?:$quotechar(?![a-z])|[a-z]*>+)};
++my $quotechunk = qq{(?:$quotechar(?![a-z0-9])|[a-z0-9]*>+)};
+ my $quoter = qq{(?:(?i)(?:$quotechunk(?:[ \\t]*$quotechunk)*))};
+ 
+ my $separator = q/(?:[-_]{2,}|[=#*]{3,}|[+~]{4,})/;

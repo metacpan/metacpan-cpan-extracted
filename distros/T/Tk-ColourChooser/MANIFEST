@@ -1,0 +1,11 @@
+lib/Tk/ColourChooser.pm
+examples/example.pl
+t/01_colourchooser.t
+t/02_pod.t
+t/03_pod_cover.t
+MANIFEST
+Makefile.PL
+README
+META.yml
+Build.PL
+Changes

@@ -1,0 +1,28 @@
+---
+name: Test-Approx
+version: 0.03
+author:
+  - 'Steve Purkis <spurkis@cpan.org>'
+abstract: compare two things for approximate equality
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Module::Build: 0.20
+  Test::Builder: 0.01
+  Test::More: 0.01
+requires:
+  POSIX: 0.01
+  Test::Builder: 0.01
+  Text::LevenshteinXS: 0.03
+  perl: v5.6.0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Test::Approx:
+    file: lib/Test/Approx.pm
+    version: 0.03
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

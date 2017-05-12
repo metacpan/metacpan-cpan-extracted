@@ -1,0 +1,79 @@
+{
+   "abstract" : "be able to generate stub (submodule and method) having check argument and control return value.",
+   "author" : [
+      "Hiroyoshi Houchi <hixi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.2",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Stub-Generator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Monadic" : "0",
+            "Exporter" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep::Matcher" : "0",
+            "Test::Tester" : "0.109"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Stub::Generator" : {
+         "file" : "lib/Test/Stub/Generator.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hixi-hyi/p5-Test-Stub-Generator/issues"
+      },
+      "homepage" : "https://github.com/hixi-hyi/p5-Test-Stub-Generator",
+      "repository" : {
+         "url" : "git://github.com/hixi-hyi/p5-Test-Stub-Generator.git",
+         "web" : "https://github.com/hixi-hyi/p5-Test-Stub-Generator"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Hiroyoshi Houchi <git@hixi-hyi.com>"
+   ]
+}

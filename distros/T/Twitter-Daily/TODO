@@ -1,0 +1,8 @@
+To Do list
+----------
+
+- Pass string like 'today' and 'yesterday' into --date  (this is very useful
+  to avoid making scripting to change every day the --date parameter)
+- Use non repeating names for twitter published files like adding the date 
+  and the time, to avoid deletion of older entries
+- Check if it works fine with older dates

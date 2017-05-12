@@ -1,0 +1,73 @@
+Revision history for Perl extension Test::Vars
+
+0.014 2017-04-11T23:02:41Z
+
+    - Fixed a bug where false positives were reported for some code constructs
+      where a variable was used on the right side of an lvalue-expression. For
+      example:
+
+          sub foo {
+              my @foo = qw( foo bar );
+              my $last = $foo[-1];
+              return $last;
+          }
+
+      In this case the "@foo" variable would be reported as unused.
+
+0.013 2017-03-17T01:56:45Z
+    - Worked around a very weird bug with B's handling of multideref aux_list
+      values on 5.22 and 5.24. This could cause a warning like "Use of
+      uninitialized value $i in array element at
+      /home/autarch/projects/p5-Test-Vars/lib/Test/Vars.pm line ..." when
+      testing certain Perl constructs for unused vars. This appears to be
+      fixed in blead's B.
+
+0.012 2016-12-09T23:56:28Z
+    - On Perl 5.22+, variables used in a substitution operator ($foo =~
+      s/foo/bar/) would be ignored. Reported by Greg Oschwald. (#28)
+
+0.011 2016-10-16T19:54:15Z
+    - Fixed tests to pass on Windows. Patch by Michael Schwern. (#26 and #27)
+
+0.010 2016-07-01T03:13:42Z
+    - Fix for pp_match in Perl 5.22+ (#23)
+
+0.009 2016-05-21T16:41:58Z
+    - On recent Perls (5.22 and 5.24, maybe more) this module could detect an
+      unused variable named "$". This was a bogus false positive, as opposed
+      to just a missing variable name in the output. Reported by Alexander
+      Hartmaier. GitHub #22.
+    - Fixed tests to use File::Spec->catfile to generate paths so that tests
+      pass on Windows. Reported by Paul Durden. Based on GitHub PR #20.
+
+0.008 2015-08-19T21:08:28Z
+    - In some corner cases, Test::Vars would try to look inside the body of a
+      stub sub ("sub foo;") and then blow up. This could be triggered by
+      declaring a stub sub and then an attribute with a reader of the same
+      name in a Moose::Role, for example. Reported by Andy Jack.
+
+0.007 2015-08-19T15:54:27Z
+    - Fix tests with threaded Perl 5.22+. Reported by Paul Howarth.
+
+0.006 2015-08-19T02:23:16Z
+    - This module now calls Test::Builder->diag and ->note _after_ calling
+      ->ok. This is more in line with how most test modules work. Patch by Ran
+      Eilam.
+    - Added a new exported sub, test_vars(), which does not output TAP. This
+      is useful for integrating this module with things like
+      Code::TidyAll. Patch by Dave Rolsky.
+
+0.005 2013-05-31T02:04:42Z
+    - Use skip_all instead of planning 0 tests (#4)
+
+0.004 2013-05-05T13:48:11Z
+    - Remove an unnecessary use of smart match operator
+
+0.003 2013-05-05T12:57:49Z
+    - re-package with Module::Build
+
+0.002 2012-10-09 08:50:46
+    - fix for perl 5.16+ by Nicholas Clark, committed by Olivier Mengué
+
+0.001 Wed Mar 10 12:32:56 2010
+    - original version; created by Module::Setup

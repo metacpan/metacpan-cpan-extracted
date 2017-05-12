@@ -1,0 +1,27 @@
+Revision history for Time-Duration-Object
+
+0.301     2013-10-18 12:04:48 America/New_York
+          add a repo and bugtracker link to metadata
+
+0.300   2012-05-24
+        add the as_string method
+
+0.200   2007-04-04
+        add Time::Duration::Object::Infinite
+
+0.161   2006-11-10
+        kwalitee improvements
+
+0.16    2006-02-18
+        fix broken parameter-passing to T::D routines
+
+0.14    2004-10-28 21:35
+        add prereq for Time::Duration. oops.
+
+0.12    2004-10-28 08:00
+        removed unneeded numification overload
+        improved test coverage
+
+0.10    2004-10-27
+        first release
+

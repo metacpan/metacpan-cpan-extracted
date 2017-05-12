@@ -1,0 +1,55 @@
+From: h.m.brand@hccnet.nl (H.Merijn Brand)
+
+Nothing to add :) [ Except maybe that I plan to upgrade 10.20's gcc to 3.1 too ]
+
+Automated smoke report for patch 17046                               cc         gcc
+                                                      | HP-UX 11.00  B.11.11.04    3.1   32-bit
+O = OK                                                |                            3.1   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.0.4
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.4   3.0.4
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.0.4
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.10              2.95.3-5
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX      AIX    cygwin  
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3    4.2.1   1.3.10-1  
+  HPc      gcc      HPc      gcc      vac      gcc      xlc      gcc   
+ 17046    17046    17048    17048    17021    16984    17048    17014   Configuration
+-------  -------  -------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  -Uuseperlio
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  F F F F  -Duseperlio
+O O O O  O O O O                    O O O O  O O O O           F F F F  -Duseperlio -Duse64bitint
+O O O O  O O O O                                               . . . .  -Duseperlio -Duse64bitall
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  F F F F  -Duseperlio -Duselongdouble
+O O O O  O O O O                    O O O O                    F F F F  -Duseperlio -Dusemorebits
+O O O O  O O O O                                               . . . .  -Duseperlio -Duse64bitall -Duselongdouble
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  ? ? ? ?  -Duseperlio -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O  O O O O           ? ? ? ?  -Duseperlio -Duse64bitint -Dusethreads -Duseithreads
+O O O O  O O O O                                               ? ? ? ?  -Duseperlio -Duse64bitall -Dusethreads -Duseithreads
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  ? ? ? ?  -Duseperlio -Duselongdouble -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O                    ? ? ? ?  -Duseperlio -Dusemorebits -Dusethreads -Duseithreads
+O O O O  O O O O                                               ? ? ? ?  -Duseperlio -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+| |                            | |
+| +----- PERLIO = perlio       | +- PERLIO = perlio -DDEBUGGING
++------- PERLIO = stdio        +--- PERLIO = stdio  -DDEBUGGING
+
+Failures:
+
+Cygwin 1.3   stdio/perlio     -Duseperlio
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duseperlio
+Cygwin 1.3   stdio/perlio     -Duseperlio -Duse64bitint
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duseperlio -Duse64bitint
+Cygwin 1.3   stdio/perlio     -Duseperlio -Duselongdouble
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duseperlio -Duselongdouble
+Cygwin 1.3   stdio/perlio     -Duseperlio -Dusemorebits
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duseperlio -Dusemorebits
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 403
+
+-- 
+H.Merijn Brand        Amsterdam Perl Mongers (http://amsterdam.pm.org/)
+using perl-5.6.1, 5.8.0 & 631 on HP-UX 10.20 & 11.00, AIX 4.2, AIX 4.3,
+  WinNT 4, Win2K pro & WinCE 2.11.  Smoking perl CORE: smokers@perl.org
+http://archives.develooper.com/daily-build@perl.org/   perl-qa@perl.org
+send smoke reports to: smokers-reports@perl.org, QA: http://qa.perl.org
+
+

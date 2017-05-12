@@ -1,0 +1,15 @@
+all: index.html
+
+# index file
+index.html: summary.json rss.xml
+	touch index.html    # index.html is created together with summary.json
+
+summary.json: meta.yml
+	test-daily test-summary
+
+rss.xml: summary.json [% ttdir %]/summary2rssfeed.tt2 [% ttlibdir %]/atom.tt2 [% ttlibdir %]/test-feed-summary.tt2
+	test-daily summary2rssfeed [% "${project}/${curfolder}" %]
+
+# clean up the mess
+clean:
+	rm -f index.html index.html-new summary.json rss.xml

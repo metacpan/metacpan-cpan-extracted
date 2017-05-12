@@ -1,0 +1,21 @@
+Changes
+lib/Test/Text.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00.load.t
+t/01.spell.t
+t/02.just_check.t
+text/en/words.dic
+text/en/text.md
+text/en/README.md
+text/en/code.md
+text/es/words.dic
+text/es/texto.md
+text/README.md
+data/en_US.aff		English affixes 
+data/en_US.dic		... and dicts
+data/Spanish.aff		Spanish affixes 
+data/Spanish.dic		... and dictionnary
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

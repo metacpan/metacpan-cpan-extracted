@@ -1,0 +1,37 @@
+Revision history for Perl extension Time::Object::ISO.
+
+0.12  2011-06-26T06:23:03
+      - Moved repostitory to [GitHub](https://github.com/theory/time-piece-iso/).
+      - Switched to a "traditional" `Makefile.PL`.
+
+0.11  2008-05-05T19:35:45
+      - Added the "configure_requires" parameter to Build.PL.
+      - Update copyright.
+      - Added a link to the Subversion repository.
+
+0.10  2004-12-09T06:03:25
+      - Possible backwards compatability change: Added override for
+        Time::Piece's implementation of strptime to return a Time::Piece::ISO
+        object and to default to the ISO 8601 format instead of the ctime
+        format. Thanks to Dagfinn Ilmari Mannsåker for the spot!
+      - Switched to Test::More for tests.
+      - Switched to Test::Pod 1.20 in POD tests.
+      - Various minor refactorings.
+
+0.05  Tue Aug 26 03:45:32 2003
+      - Switched to Module::Build.
+      - Added note about preferring DateTime now.
+
+0.04  2002-07-20T02:26:37
+      - Removed Time zone dependency from test script.
+      - Added two more tests.
+      - Reorganized package so that library is in lib subdirectory.
+
+0.03  2002-05-10T15:18:53
+      - No changes - replaces empty 0.02 file uploaded to the CPAN.
+
+0.02  2002-05-09T16:50:13
+      - Added more credit to Matt Seargent for providing Time::Piece.
+
+0.01  2002-04-26T14:46:58
+      - Original (unreleased) version.

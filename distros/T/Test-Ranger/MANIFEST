@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Test/Ranger.pm
+lib/Test/Ranger/List.pm
+MANIFEST
+README
+t/00.load.t
+t/minimum.t
+t/sub-new-02.t
+t/sub-new-03.t
+META.yml

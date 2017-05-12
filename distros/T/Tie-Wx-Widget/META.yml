@@ -1,0 +1,37 @@
+---
+# http://module-build.sourceforge.net/META-spec.html
+name:         Tie-Wx-Widget
+version:      1.0
+abstract:     get and set main value of a Wx widget with less syntax and more magic
+installdirs:  site
+distribution_type: module
+author:       Herbert Breunung <lichtkind@cpan.org>
+license:      perl
+build_requires:
+  Wx: 0.74
+  Tie::Scalar: 0
+  Test::More: 0.47
+  Test::Exception: 0
+  Test::Warn: 0
+  Test::CheckManifest: 0.9
+  Test::Pod: 1.22
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+generated_by: ''
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.6.0
+  Tie::Scalar: 0
+  Wx: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Wx-Widget
+  repository: https://bitbucket.org/lichtkind/tie-wx-widget
+  license: http://www.perlfoundation.org/artistic_license_2_0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  

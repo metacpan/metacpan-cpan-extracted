@@ -1,0 +1,10 @@
+--- #YAML:1.0
+name: Template-Plugin-KwikiFormat
+version: 1.04
+author:
+  - Thomas Klausner, domm@zsi.at, http://domm.zsi.at
+  - From March 2006, this module is taken over and maintained by Satoshi
+Tanimoto E<lt>tanimoto@cpan.orgE<gt>
+abstract: filter to convert kwiki formatted text to html
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

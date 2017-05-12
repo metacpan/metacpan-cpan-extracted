@@ -1,0 +1,66 @@
+{
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+   ],
+   "generated_by" : "Author",
+   "license" : [
+      "perl_5"
+   ],
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Tk::Widget" : "0",
+            "perl" : "5.006",
+            "POSIX" : "0",
+            "Encode" : "0",
+            "Carp" : "0",
+            "Tk::Canvas" : "0",
+            "Tk" : "402.000",
+            "Tk::Derived" : "0"
+         },
+         "recommends" : {
+            "Encode" : "2.84",
+            "Tk" : "804.033"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::More" : "1.302015"
+         },
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.40",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "dynamic_config" : 1,
+   "abstract" : "Clock widget with analog and digital display",
+   "name" : "Tk-Clock",
+   "provides" : {
+      "Tk::Clock" : {
+         "version" : "0.40",
+         "file" : "Clock.pm"
+      }
+   },
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/Tux/Tk-Clock",
+         "url" : "https://github.com/Tux/Tk-Clock"
+      }
+   }
+}

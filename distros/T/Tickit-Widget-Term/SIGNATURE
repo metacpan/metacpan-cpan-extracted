@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 67d0ed510f54f77fcaceba6cd3cf2cbce374cc16 Changes
+SHA1 d27487b6347498765d232df97eed5965c15f6a27 INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 9eaed7384c48813cbef01299de6bf43cd7c925f4 MANIFEST
+SHA1 5c6cfdb77c443acc881085d6ffc4fd63b04785b0 META.json
+SHA1 cecb59ede271facaad934e5efd63c3efa724c4c4 META.yml
+SHA1 d77da3c15439c9a878379fda2a0f386883b4bd6a Makefile.PL
+SHA1 ba253c21b5243166617124cfc707bb030502e320 README
+SHA1 081a3910cbb875814d5da852aa3dd75a2f09d3bb cpanfile
+SHA1 054d878ad4dc20279ca93583c7b304e87917618f dist.ini
+SHA1 0e8c49cc41368bd055fa3cfec78cdb48baa32040 examples/synopsis.pl
+SHA1 ea69cea6248d1d1b7f71dea2acb697d940302952 lib/Tickit/Widget/Term.pm
+SHA1 28cca816cdbe93387c3e870b24154b89abf80f9e lib/Tickit/Widget/Term.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 f09946d4ccc2e8093a14a898dd2d6887fe8485e5 t/00-compile.t
+SHA1 c174d2e730eafc73d6e7c352f103745204976662 t/000-report-versions-tiny.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU+w39AAoJEFKElMNpjtyDNW4IAInSmiqvMSIUIRlF5ydyMunu
+nUJQ6PFXM2trIKxpbXVRNmARKZOcxwLgByXiVbVI7pLQpswWGskGPZQr2/R/NM07
+vZC4J3FbdLJ9I2LkVsoIRZBgm10aG1pC4xTSPPy8Y2MGu6tsCh2xjIdlSjAYiAFs
+SJxaqTW7KV8uhiDRZ09A8nUruPIKz2qCiIQPReQGcqh1nScZvv34SXfgGpzVCxK/
+7bl+4+cIOybN3EMzgFx/jMrtiia0lWpq7iBba3ZB8ZDfJFC45Uy3sPHH+wfgaYnH
+YI3MhMpM1qXFe4H75dN/T5Snq8qYHRAhB3LMA7KOgn4KCbTk4zO8pVmx7cOCwiU=
+=khrq
+-----END PGP SIGNATURE-----

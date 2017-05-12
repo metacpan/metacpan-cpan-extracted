@@ -1,0 +1,20 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="0"
+             tests="5"
+             name="data_tests_skip">
+    <testcase name="1"></testcase>
+    <testcase name="2"></testcase>
+    <testcase name="3"></testcase>
+    <testcase name="4"></testcase>
+    <testcase name="5"></testcase>
+    <system-out><![CDATA[1..5
+ok 1
+ok 2    # skip rain delay
+ok 3
+ok 4
+ok 5
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

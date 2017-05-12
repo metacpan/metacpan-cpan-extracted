@@ -1,0 +1,38 @@
+TAP Version 13
+1..2
+# Artemis-Suite-Name: KVM-Migration-Checkpoint
+# Artemis-Suite-version: 0.01
+# Artemis-Machine-Name: $MACHINE
+# Artemis-reportgroup-arbitrary: kvm-0815
+# Artemis-reportgroup-primary: 0
+# Artemis-starttime-test-program: Fri, 08 Aug 2008 14:34:48 +0200
+# Artemis-endtime-test-program:   Fri, 08 Aug 2008 14:36:21 +0200
+ok 1 - details
+  ---
+  source:
+    vendor: AMD
+    mode: K8RevF
+    flags:
+      tpr: 1
+      npt: 1
+      flexmig: 0
+    software: 29-rc3/KVM-81
+  target:
+    vendor: Intel
+    mode: C2Q
+    flags:
+      tpr: 0
+      npt: 0
+      flexmig: 1
+    software: 29-rc3/KVM-81
+  guest:
+    system: Linux
+    bitness: 64
+    up: 1
+    smp: 0
+    memory: 512
+  migration: stop-cross
+  workload: Passmark
+  comment: ~
+  ...
+ok 2 - status

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+lib/Template/Plugin/HTML/Prototype.pm
+README
+t/1.t

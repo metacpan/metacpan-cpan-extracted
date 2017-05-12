@@ -1,0 +1,19 @@
+Revision history for Perl module Tie::Array::BoundedIndex
+
+0.01 Fri Oct 10 21:07:38 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+0.02 Tue Dec 16 10:12:32 2003
+	- Name changed from Tie::Array::Bounded, incorporated feedback
+
+0.03 Tue Jun 21 17:16:50 2005
+	- Fixed bug in arrays of length 1.
+
+0.04 Fri Dec 28 08:05:17 2007
+	- Tests no longer fail without Test::Exception
+
+0.05 Fri Dec 28 11:19:21 2007
+	- Fix bug with newer Attribute::Handlers
+
+0.06 Sat Dec 29 18:33:53 2007
+	- Gave up on getting attributes to work in 5.6.

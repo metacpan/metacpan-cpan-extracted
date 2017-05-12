@@ -1,0 +1,96 @@
+NAME
+    Text::CSV::Slurp - Text::CSV::Slurp - convert CSV into an array of
+    hashes, or an array of hashes into CSV
+
+VERSION
+    version 1.03
+
+SUMMARY
+    I often need to take a CSV file that has a header row and turn it into a
+    perl data structure for further manipulation. This package does that in
+    as few steps as possible.
+
+    I added a "create" method in version 0.8 because sometimes you just want
+    to create some bog standard CSV from an array of hashes.
+
+USAGE
+     use Text::CSV::Slurp;
+     use strict;
+
+     # load data from CSV input
+
+     my $data = Text::CSV::Slurp->load(file       => $filename   [,%options]);
+     my $data = Text::CSV::Slurp->load(filehandle => $filehandle [,%options]);
+     my $data = Text::CSV::Slurp->load(string     => $string     [,%options]);
+
+     # create a string of CSV from an array of hashes
+     my $csv  = Text::CSV::Slurp->create( input => \@array_of_hashes [,%options]);
+
+METHODS
+  new
+     my $slurp = Text::CSV::Slurp->new();
+
+    Instantiate an object.
+
+  load
+      my $data = Text::CSV::Slurp->load(file => $filename);
+      my $data = $slurp->load(file => $filename);
+
+    Returns an arrayref of hashrefs. Any extra arguments are passed to
+    Text::CSV. The first line of the CSV is assumed to be a header row. Its
+    fields are used as the keys for each of the hashes.
+
+  create
+     my $csv = Text::CSV::Slurp->create( input => \@array_of_hashes [,%options]);
+     my $csv = $slurp->create( input => \@array_of_hashes [,%options]);
+
+     my $file = "/path/to/output/file.csv";
+
+     open( FH, ">$file" ) || die "Couldn't open $file $!";
+     print FH $csv;
+     close FH;
+
+    Creates CSV from an arrayref of hashrefs and returns it as a string. All
+    optional arguments are passed to Text::CSV except for "field_order".
+
+   field_order
+    "field_order" which is used to determine the fields and order in which
+    they appear in the CSV. For example:
+
+     my $csv = Text::CSV::Slurp->create( input => \@array_of_hashes,
+                                         field_order => ['one','three','two'] );
+
+    If field_order is not supplied then the sorted keys of the first hash in
+    the input are used instead.
+
+DEPENDENCIES
+    Text::CSV
+
+    IO::File
+
+    Test::Most - for tests only
+
+LICENCE
+    GNU General Public License v3
+
+SOURCE
+    Available at <https://github.com/babf/Text-CSV-Slurp>
+
+SEE ALSO
+    Text::CSV
+
+    Spreadsheet::Read
+
+THANKS
+    To Kyle Albritton for suggesting and testing the create method To Tomas
+    Pokorny for the IO::Scalar patch for the load method
+
+AUTHOR
+    BABF <babf@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 by BABF.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

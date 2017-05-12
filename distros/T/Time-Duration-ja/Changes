@@ -1,0 +1,14 @@
+Revision history for Perl extension Time::Duration::ja
+
+0.03 2014-02-20T09:29:32Z
+
+    - use 'utf8' pragma instead of the 'encoding' pragma.
+      'encoding' pragma was deprecated.
+      https://rt.cpan.org/Public/Bug/Display.html?id=64982
+      (Reported by tomita++)
+
+0.02  Mon Apr 25 01:49:16 UTC 2005
+        - Fixed silly translation mistake in ago() and from_now()
+
+0.01  Mon Apr 25 00:49:14 2005
+	- original version

@@ -1,0 +1,49 @@
+#! /usr/bin/env perl
+# PODNAME: tap-waive
+# ABSTRACT: frontend to TAP::DOM::Waivers
+
+use strict;
+use warnings;
+
+use YAML::Any;
+use TAP::DOM 0.06;
+use TAP::DOM::Waivers 'waive';
+
+my $waiverfile = "t/waiver.yml";
+my $tapfile    = "t/failed_IPv6.tap";
+
+sub slurp {
+        my ($filename) = @_;
+
+        local $/;
+        open (TAP, "<", $filename) or die "Cannot read $filename";
+        return <TAP>;
+}
+
+my $waivers        = YAML::Any::Load(slurp($waiverfile));
+my $tapdom         = TAP::DOM->new(tap => slurp($tapfile));
+my $patched_tapdom = waive($tapdom, $waivers);
+print $patched_tapdom->to_tap;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tap-waive - frontend to TAP::DOM::Waivers
+
+=head1 AUTHOR
+
+Steffen Schwigon <ss5@renormalist.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Steffen Schwigon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

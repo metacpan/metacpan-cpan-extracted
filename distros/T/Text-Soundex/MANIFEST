@@ -1,0 +1,10 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+Soundex.pm
+Soundex.xs
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,32 @@
+---
+name: Text-Decorator
+version: 1.65
+author: ~
+abstract: Apply a chain of filters to text
+license: perl
+requires:
+  UNIVERSAL::require: 0.03
+recommends:
+  Template: 0
+  URI::Find: 0
+build_requires:
+  Test::More: 0.47
+provides:
+  Text::Decorator:
+    file: lib/Text/Decorator.pm
+    version: 1.65
+  Text::Decorator::Filter:
+    file: lib/Text/Decorator/Filter.pm
+  Text::Decorator::Filter::Quoted:
+    file: lib/Text/Decorator/Filter/Quoted.pm
+  Text::Decorator::Filter::TTBridge:
+    file: lib/Text/Decorator/Filter/TTBridge.pm
+  Text::Decorator::Filter::Test:
+    file: lib/Text/Decorator/Filter/Test.pm
+  Text::Decorator::Filter::URIFind:
+    file: lib/Text/Decorator/Filter/URIFind.pm
+  Text::Decorator::Group:
+    file: lib/Text/Decorator/Group.pm
+  Text::Decorator::Node:
+    file: lib/Text/Decorator/Node.pm
+generated_by: Module::Build version 0.26

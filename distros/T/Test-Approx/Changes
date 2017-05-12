@@ -1,0 +1,19 @@
+Revision history for 'Test-Approx' Perl module
+----------------------------------------------
+
+All changes by Steve Purkis, unless otherwise noted.
+
+0.03
+    +	After a discussion on cpan ratings with نديم الخمير, is_approx() is now
+	a wrapper that does basic checks to decide which sub to call.  Not yet
+	plugin-friendly, but it will be easy to convert it as needed.
+    +	now handles numbers (& ints) as well as strings.  New API methods:
+	is_approx_num(), is_approx_int() & is_approx_str().
+    *	fixed a weird bug using POSIX::strtod():
+	$dist = 0.05; $threshold = 0.05; $dist <= $threshold; # false ??!?
+
+0.02
+    ?	not sure what changed in this release
+
+0.01
+    +	created Thurs Apr 24 2008

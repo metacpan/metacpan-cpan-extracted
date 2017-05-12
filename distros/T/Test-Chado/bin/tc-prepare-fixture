@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+
+package preparedbic;
+{
+  $preparedbic::VERSION = 'v4.1.1';
+}
+
+use strict;
+use DBIx::Class::Fixtures;
+use Path::Class;
+use Archive::Tar;
+use File::Find::Rule;
+use File::Temp;
+use feature qw/say/;
+use Getopt::Long::Descriptive;
+use Cwd;
+use File::Spec::Functions;
+use Bio::Chado::Schema;
+use File::Basename;
+
+my ( $opt, $usage ) = describe_options(
+    '%c %o',
+    [ 'dsn=s',    'Database dsn', { required => 1 } ],
+    [ 'user|u:s', 'Database username' ],
+    [ 'pass|p:s', 'Database password' ],
+    [   'config-dir:s',
+        'Folder where DBIC-Fixtures json configuration file(s) are kept, default is the config folder under the current directory',
+        { default => catdir( getcwd(), 'config' ) }
+    ],
+    [   'output|o:s',
+        'Name of the output fixture file, will be a bzipped tarball, the extension tar.bz2 will be appended. Default is preset',
+        { default => 'preset' }
+    ],
+    [   'pg-schema:s',
+        'Name of Postgresql schema to use for dumping fixtures, default is ignored unless it is explicitly set for postgresql backend'
+    ],
+    [   'output-folder:s',
+        'Output folder where the compressed output will be written',
+        { default => getcwd() }
+    ],
+    [ 'help|h' => 'Print this help' ]
+);
+
+say $usage->text, exit if $opt->help;
+
+my $pg_schema = $opt->pg_schema;
+my $schema
+    = $pg_schema
+    ? Bio::Chado::Schema->connect( $opt->dsn, $opt->user, $opt->pass,
+    { on_connect_do => "SET schema '$pg_schema'" } )
+    : Bio::Chado::Schema->connect( $opt->dsn, $opt->user, $opt->pass );
+
+my $tmp_dir     = File::Temp->newdir;
+my $fixture_dir = Path::Class::Dir->new($tmp_dir)->subdir('fixtures');
+
+my $fixture
+    = DBIx::Class::Fixtures->new( { config_dir => $opt->config_dir } );
+
+my $archive    = Archive::Tar->new;
+my $config_dir = Path::Class::Dir->new( $opt->config_dir );
+
+for my $config_file ( sort { $a <=> $b } $fixture->available_config_sets ) {
+
+    #add config to the archive
+    my $json_data = $config_dir->file($config_file)->slurp;
+    $archive->add_data( catfile('config', basename($config_file) ), $json_data );
+
+    my $config_name = ( ( split /\./, $config_file ) )[0];
+    my $dump_dir = $fixture_dir->subdir($config_name);
+
+    $fixture->dump(
+            {   config    => $config_file,
+                schema    => $schema,
+                directory => $dump_dir
+            }
+    );
+}
+
+my $outfile = Path::Class::Dir->new( $opt->output_folder )->file(
+        $opt->output . '.tar.bz2' );
+for my $file ( File::Find::Rule->file->in($fixture_dir) ) {
+        ( my $strip_file = $file ) =~ s/^$tmp_dir\///;
+        my $data = Path::Class::File->new($file)->slurp;
+        $archive->add_data( $strip_file, $data );
+}
+$archive->write( $outfile, COMPRESS_BZIP );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+preparedbic
+
+=head1 VERSION
+
+version v4.1.1
+
+=head1 NAME
+
+tc-prepare-fixture - Create DBIC-Fixtures from chado database
+
+=head1 AUTHOR
+
+Siddhartha Basu <biosidd@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Siddhartha Basu.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

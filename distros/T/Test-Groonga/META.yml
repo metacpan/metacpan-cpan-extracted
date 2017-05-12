@@ -1,0 +1,33 @@
+---
+abstract: 'Server runner for testing Groonga full-text search engine'
+author:
+  - Okamura
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Temp: 0
+  LWP::UserAgent: 0
+  Path::Class: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Groonga
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::Spec: 0
+  File::Temp: 0
+  File::Which: 0
+  Test::TCP: 1.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

@@ -1,0 +1,111 @@
+Revision history for Text-WideChar-Util
+
+0.16    2015-07-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace named Unicode literal \N{...} with hexcode to accomodate
+	  older perls [CT].
+
+
+0.15    2015-07-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Unicode literal with \N{...} so code (except POD) does
+	  not contain Unicode literals, to make it easier to pack with
+	  App::depak.
+
+
+0.14    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.13    2014-02-17 (SHARYANTO)
+
+        - Add function length_height().
+
+
+0.12    2014-02-11 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - mbwrap(): Whitespace before broken CJK word was omitted.
+
+
+0.11    2014-02-11 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - mbwrap(): Long CJK word should not be truncated before line-broken.
+
+
+0.10    2014-02-08 (SHARYANTO)
+
+        - No functional changes.
+
+        - Change CJK regexes from my() to our() so it's usable by other module
+          (namely, Text::ANSI::Util).
+
+
+0.09    2014-02-08 (SHARYANTO)
+
+        - mbwrap(): Fix bug when truncating long word.
+
+        - mbwrap(): Add support for wrapping CJK text (which do not use
+          whitespace to separate words).
+
+        - Mention Text::WrapI18N.
+
+
+0.08    2013-10-29 (SHARYANTO)
+
+        - No functional changes. Rebuild to resolve 'nested encoding' problem
+          causing MetaCPAN to fail to index the dist (thanks Shantanu Bhadoria).
+
+
+0.07    2013-09-10 (SHARYANTO)
+
+        - Replace Text::CharWidth with Unicode::GCString. It's about 2.5x slower
+          but it is more proper and builds on Windows.
+
+
+0.06    2013-05-18 (SHARYANTO)
+
+        - Provide pad() and trunc() which are respectively the non-wide version
+          of mbpad() and mbtrunc().
+
+
+0.05    2013-05-17 (SHARYANTO)
+
+        - Add return_stats option to {mb,}wrap.
+
+
+0.04    2013-04-19 (SHARYANTO)
+
+        - Fix bug in mbtrunc().
+
+
+0.03    2013-04-18 (SHARYANTO)
+
+        - Reimplement mbwrap() to be more like Emacs and Text::ANSI::Util's
+          behavior.
+
+        - Provide wrap() as an alternative for Text::Wrap's wrap().
+
+
+0.02    2013-04-09 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - mbpad(): Since mbtrunc() can generate text with width ($width-1) or
+        even less, depending on the width of truncated wide character, we need
+        to pad again to get to $width.
+
+
+0.01    2013-04-09 (SHARYANTO)
+
+        - First release.

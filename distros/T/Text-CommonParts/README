@@ -1,0 +1,7 @@
+The usual kaffuffle
+
+    % perl Build.PL
+    % ./Build
+    % ./Build test
+    % sudo ./Build install
+    

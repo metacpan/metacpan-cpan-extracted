@@ -1,0 +1,27 @@
+---
+abstract: 'xUnit with Moose'
+author:
+  - 'Justin DeVuyst, C<justin@devuyst.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Test::Able
+name: Test-Able
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Moose: 0.94
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

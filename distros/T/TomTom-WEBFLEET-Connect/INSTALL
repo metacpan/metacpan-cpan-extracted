@@ -1,0 +1,20 @@
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+  perl Makefile.PL
+  make
+  make install
+
+WHAT ARE THE DEPENDENCIES?
+
+This module requires these other modules and libraries:
+
+  LWP::UserAgent
+  Text::ParseWords
+
+Some of the examples require additional modules and libraries:
+
+  Getopt::Long
+  DBI

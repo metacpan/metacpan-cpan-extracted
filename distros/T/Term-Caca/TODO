@@ -1,0 +1,4 @@
+
+* Add coord($x, $y) helping class. See Grid::Coord for inspiration
+
+

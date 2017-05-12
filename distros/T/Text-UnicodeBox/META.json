@@ -1,0 +1,64 @@
+{
+   "abstract" : "Text box drawing using the Unicode box symbols",
+   "author" : [
+      "Eric Waters <ewaters@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-UnicodeBox",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Term::ANSIColor" : "2.01",
+            "Text::CharWidth" : "0.04"
+         }
+      }
+   },
+   "provides" : {
+      "Text::UnicodeBox" : {
+         "file" : "lib/Text/UnicodeBox.pm",
+         "version" : "0.03"
+      },
+      "Text::UnicodeBox::Control" : {
+         "file" : "lib/Text/UnicodeBox/Control.pm",
+         "version" : 0
+      },
+      "Text::UnicodeBox::Table" : {
+         "file" : "lib/Text/UnicodeBox/Table.pm",
+         "version" : 0
+      },
+      "Text::UnicodeBox::Text" : {
+         "file" : "lib/Text/UnicodeBox/Text.pm",
+         "version" : 0
+      },
+      "Text::UnicodeBox::Utility" : {
+         "file" : "lib/Text/UnicodeBox/Utility.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

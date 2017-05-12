@@ -1,0 +1,26 @@
+---
+abstract: 'Testing pings using Net::Ping'
+author:
+  - 'Sawyer X'
+build_requires:
+  Test::More: 0.92
+  Test::Timer: 0.05
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Ping
+requires:
+  Carp: 0
+  Net::Ping: 2.33
+  Test::Builder: 0.86
+  Test::More: 0.92
+  Tie::Scalar: 0
+resources:
+  bugtracker: https://github.com/xsawyerx/test-ping/issues
+  repository: git://github.com/xsawyerx/test-ping.git
+version: 0.203

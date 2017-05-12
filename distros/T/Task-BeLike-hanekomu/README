@@ -1,0 +1,73 @@
+NAME
+    Task::BeLike::hanekomu - Install modules I like
+
+VERSION
+    version 1.103620
+
+DESCRIPTION
+    This Task installs modules that I need to work with. They are listed in
+    this distribution's "Makefile.PL".
+
+TASK CONTENTS
+  Toolchain
+   App::Ack
+   App::Rgit
+   DB::Pluggable
+   DB::Pluggable::StackTraceAsHTML
+   Devel::NYTProf
+   Devel::Loaded
+   Devel::SearchINC
+   Perl::Tidy
+   Pod::Wordlist::hanekomu
+   Dist::Zilla
+   Dist::Zilla::PluginBundle::MARCEL
+   Pod::Weaver::PluginBundle::MARCEL
+   Dist::Zilla::Plugin::Git::Init
+   App::cpanoutdated
+   App::cpanminus
+   App::distfind
+   Pod::Coverage::TrustPod
+  Useful modules
+   YAML
+   DBI
+   DBD::SQLite
+   File::Which
+   File::Slurp
+   Test::Differences
+  Web, Networking, Events
+   LWP
+   Web::Scraper
+   Coro
+   AnyEvent
+   Task::Plack
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-hanekomu>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Task-BeLike-hanekomu/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Task-BeLike-hanekomu.git> and may be cloned
+    from <git://github.com/hanekomu/Task-BeLike-hanekomu.git>. Instead of
+    sending patches, please fork this project using the standard git and
+    github infrastructure.
+

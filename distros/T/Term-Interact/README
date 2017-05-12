@@ -1,0 +1,117 @@
+Term/Interact version 0.50
+==========================
+
+NAME
+    Term::Interact - Interactively Get Validated Data
+
+SYNOPSIS
+    use Term::Interact;
+
+    my $ti = Term::Interact->new( @args );
+
+    # get validated data interactively
+    $validated_data = $ti->get( @args );
+
+    # check existing data non-interactively
+    die "Invalid!" unless $ti->validate( $data, @args );
+
+DESCRIPTION
+    Term::Interact enables you to interactively get validated
+    data from a user.  This is accomplished via a *simple*
+    API, wherein you specify various parameters for prompting
+    the user, as well as "checks" with which gotten data will
+    be validated.
+
+    VARIETIES OF CHECKS:
+
+      Term::Interact comes with support for six varieties of check
+      expressions:
+
+      sql_check
+        *str*: A SQL statement (i.e. 'SELECT field FROM table'). Will be
+        used to generate a list of validation values from a database. Valid
+        data is that which appears in the list.
+
+      regex_check
+        *qr//*: A compliled regular expression used to validate data. Valid
+        data is that which matches the regular expression.
+
+      list_check
+        *aref*: An aref of values used to validate data. Valid data is that
+        which appears in the list.
+
+      compare_check
+        *str*: A comparison test in string form. Valid data is that which
+        satisfies the comparison test.
+
+      filetest_check
+        *str*: A filetest operator in string form. Valid data is that which
+        satisfies the filetest operator.
+
+      custom_check
+        *coderef*: For special occasions (or to make use of Perl's built in
+        functions), you can write your own custom check. This must be a
+        reference to a function that accepts one value and returns true if
+        that value is valid. Example: check => [ sub{getgrnam shift}, '%s is
+        not a valid group' ]
+
+    NOTE ON AVAILABLE CHECK TYPES:
+          This module steers clear of offering explicit checks like
+          'phone_number_check' or 'email_address_check'. In the author's
+          opinion one may generally obtain all the convenience and code
+          readability one needs via the built in varieties of checks.
+          However, if you have regular need for complex additional checks,
+          you'll likely want to steer clear of the built in custom_check
+          option (see above), which is most appropriate for small anonymous
+          subroutines, especially those which make use of Perl's built in
+          functions. You can permanently add complex custom checks by
+          subclassing Term::Interact and providing the desired checks as
+          subroutines (all the check subs follow a simple API, just follow
+          the pattern from the source code). Additionally you will need to
+          modify the private _classify_check_type function.
+
+ONE EXAMPLE
+
+     my $num1 = $ti->get(
+         msg         => 'Enter a single digit number.',
+         prompt      => 'Go ahead, make my day: ',
+         re_prompt   => 'Try Again Here: ',
+         check       => [
+                          qr/^\d$/,
+                          '%s is not a single digit number!'
+                        ]
+     );
+     #
+     # Resulting Interaction looks like:
+     #
+     # Enter a single digit number.
+     #    Go ahead, make my day: w
+     #    'w' is not a single digit number!
+     #    Try Again Here: 23
+     #    '23' is not a single digit number!
+     #    Try Again Here: 2
+
+DOCUMENTATION
+    For more examples and full documentation, see
+    perldoc Term::Interact
+
+INSTALLATION
+    To install this module type the following:
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+DEPENDENCIES
+    This module requires these other modules:
+      Text::Autoformat
+      Term::ReadKey
+      Date::Manip
+      File::Spec
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2002-2009 Phil R Lawrence.  All rights reserved.
+
+    This module is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+

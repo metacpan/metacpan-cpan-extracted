@@ -1,0 +1,63 @@
+NAME
+    Template::Plugin::Filter::Pipe - Filter plugin adapter for Text::Pipe
+
+VERSION
+    version 1.100860
+
+SYNOPSIS
+        [%- USE Filter.Pipe -%]
+        [%- 'a test' | pipe("Uppercase") |
+            pipe("Repeat", times => 2, join => " = ") |
+            pipe("Reverse") -%]
+        EOTMPL
+
+DESCRIPTION
+    This Template Toolkit filter plugin is an adapter for Text::Pipe. The
+    default filter name is "pipe", but you can override this with the "USE"
+    directive.
+
+    When using the filter, you need to pass the name of the pipe segment you
+    would like to create, and optionally named arguments to be passed to the
+    pipe.
+
+    See Text::Pipe and its derived distributions for more detail on which
+    pipe segments are available and which arguments they take.
+
+METHODS
+  init
+    Overridden method - see Template::Plugin::Filter for details.
+
+  filter
+    Overridden method - see Template::Plugin::Filter for details.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-Filter
+    -Pipe>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Template-Plugin-Filter-Pipe/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Template-Plugin-Filter-Pipe/>. Instead of
+    sending patches, please fork this project using the standard git and
+    github infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

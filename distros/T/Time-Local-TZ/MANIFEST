@@ -1,0 +1,17 @@
+Changes
+lib/Time/Local/TZ.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/00-base.t
+t/01-tz_localtime-tz_timelocal.t
+t/02-tz_truncate.t
+t/03-tz_offset.t
+t/pod-coverage.t
+t/pod.t
+TZ.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,494 @@
+Revision history for Test-BrewBuild
+
+2.17    2017-04-27
+        - troubleshooting issue where this current commit is causing the LCD
+          to shift off a couple chars per run. This needs to be looked at
+        - workaround for above off-by-one LCD issue (stevieb9/rpi-lcd#5). The
+          global LCD object is now created on each return of a Tester. This
+          isn't ideal but we'll fix that next
+        - Git should log out checksums (closes #198)
+        - each module logs out a characteristic header when an object is
+          initialized
+        - cleaned up the log entry for the plugin args in BrewBuild
+        - added "waiting for tester" log entry line (closes #200)
+        - re-ordered log entries at the point the tester goes into listen state
+          (closes #197)
+        - wrap code lines > 80 cols
+        - reduced the number of calls to Git::name() in Tester::listen().
+          Instead of making numerous repeated calls, we now just stash a single
+          call into a variable (closes #196)
+        - Tester now logs out its arguments when in debug 7 mode (closes #195)
+        - POD cleanup (closes #170)
+        - added RPi integration examples to the FAQ
+        - slight changes to test_log tests to conform to the changes made within
+          this version
+        - Git::git() now keeps a copy of the actual command and returns it
+          after the first full run. This removes unneeded duplicate log
+          entries(closes #203)
+        - several log entry modifications/cleanup
+        - in Dispatch::auto(), only attempt to fetch the commit csums if there
+          were results returned (work on #205)
+        - in Tester::listen(), moved the logging of the csums up one level.
+          Instead of only logging if we're comparing csums, we log them in all
+          auto runs regardless if the check is done or not (work on #205)
+        - added several more command line args to the config file (work on
+          #202)
+        - fix issue in Git::revision(). If Dispatch wasn't run from the repo
+          directory directly, 'git ls-remote' wouldn't ever get any csums back.
+          Now, revision() requires a repo param if remote is sent in (closes
+          #205)
+        - added numerous additional config file directives (not yet implemented
+          in code) (work on #202)
+
+2.16    2017-04-21
+        - remove the named loop in Dispatch::_fork() (closes #188)
+        - changed all calls to die() to croak() (closes #189)
+        - in doc and help screen, specify 5.8.9 specifically as the lowest
+          version of perl we'll use if --legacy isn't sent in (closes #190)
+        - --auto mode for the dispatcher now defaults to 0 (closes #192)
+        - fix issue in Dispatch where if we have to set --auto to 0, we were
+          using the wrong variable rendering early exit 
+        - finished the auto-test (--csum) code in tester/Tester to skip the
+          checking of repository checksums before deciding whether a test run
+          should proceed
+        - now that we've decided not to use plugins for --auto, removed an if()
+          clause that was in place for that purpose
+        - in Tester, --csum now is properly passed along when in background
+          (start) mode
+        - --auto, --csum and --rpi mode all work correctly
+
+2.15    2017-04-12
+        - fixed issue in Git::revision() where we weren't actually checking the
+          remote commit SHA1 sum correctly
+        - all log objects reflect the module short name, not the full module
+          path (closes #176)
+        - moved all auto repo checking and comparisons to Tester
+        - repo param must be sent in to bbdispatch when running in auto mode
+          (fixes #176)
+        - added -a|--auto flag to tester. This must be set when running dispatch
+          in auto mode (closes #177)
+        - clean up erroneous and incorrect error in logs about brewbuild args in
+          auto mode if nothing is returned from the tester
+        - fix issue with auto, if 0 is specified it wasn't acting like unlimited
+          but stopping after first run
+        - fix issue where --auto param wasn't being used when Tester was running
+          in the background (ie. bbtester start)
+        - remove Contributing and support sections in POD, updated copyright
+          year (closes #175)
+        - added --rpi flag to bbdispatch, used with --auto to enable LCD output
+          when running RPi::WiringPi unit tests on a Raspberry Pi (this is a
+          specific purpose feature only for my own testing). In order to work,
+          bbtester needs to run in auto mode as does dispatch, and the
+          BB_RPI_LCD env var must be set to a comma delimited list of six pin
+          numbers that connect the LCD to the GPIO
+        - added _lcd() in Dispatch for the above addition
+        - backed out the check in Git::clone() using head(), as it wasn't
+          working correctly on the RPi
+        - built in RPi::WiringPi auto tester implemented. Runs tests in auto
+          mode, and displays results to LCD
+        - fix bug in Git::revision(). The git command wasn't quoted, so on
+          Windows, it broke at "C:\Program"
+        - links within the config file POD now direct to the binaries, not the
+          libraries (closes #174)
+
+2.14    2017-04-07
+        - added revision() to Git, returns the SHA1 sum for the most recent
+          commit, for both local and remotes
+        - added _separate_url() to Git. This is currently unused as we're not
+          yet using Github's API to fetch commit info
+        - added --auto|-a to bbdispatch, spins off an auto run
+        - added auto() to Dispatch. Checks git commit revision numbers, and if
+          different, we'll do a pull and run the test suite
+        - added auto_sleep option to the config file for [Dispatch]. This is how
+          long in seconds we sleep in between runs and run checks for --auto
+        - added status() in Git, checks whether the current repo is ahead or
+          behind in commits compared to remote
+        - --auto flag to bbdispatch takes an integer, the number of runs to
+          dispatch out. Send in 0 to run forever
+        - fully added initial cut of CI automation (via bbdispatch as opposed to
+          berrybrew) (closes #172)
+
+2.13    2017-03-28
+        - *NOTE* this release has been tested on win7 with berrybrew v1.10, but
+          on win10, there may be issues. This is due to an internal library in
+          that project that is questionable on win10 (Ionic.Zip). This is being
+          investigated, and an update is planned. I wouldn't recommend trusting
+          this distribution on Windows 10 at this time for that reason. The
+          problem stems from the fact that the portable Strawberry Perl that
+          is being installed is not always extracted fully, despite the fact the
+          download is ok, and the checksum checks out. Extraction via Explorer
+          performs correctly. Again, don't trust on win10
+        - several various POD corrections/updates
+        - fix issue where info_cache() wasn't being updated after instance
+          removal (fixes #167)
+        - added build prereq of Archive::Zip to prevent certain tests from
+          failing when it isn't installed
+        - fix bug in BCMD::using() in the Windows regex check. Was missing a \s+
+        - fix issue in BCMD::info_cache(). A regex was incorrect. It worked on
+          Unix just due to sheer luck
+        - added additional argument checking in the command string to Tester
+          (closes #144)
+
+2.12    2017-03-27
+        - extended default install timeout to 600 seconds
+        - fix erroneous uninitialized warning in Dispatch if a repo isn't sent
+          in, and one isn't found with Git in the cwd. (fixes #165)
+        - clarify what course of action to take if no testers can be found
+          when bbdispatch is run (fixes #164)
+        - added proper links to berrybrew and perlbrew in pod description
+          (closes #145)
+        - added LWP::Simple for #142 (check if clone URL exists)
+        - added check in Git::clone() to ensure that the remote repo exists
+          before we attempt a clone, and croak() if not (fixes #142)
+        - added logging to all methods in Git, updated POD, and all locations
+          that initiate a new Git object send in their own debug level 
+          (closes #166)
+        - we now cache the results of the '*brew available' calls. Perlbrew
+          fetches this info from the Internet (and berrybrew will soon too), so
+          this feature will speed things up when multiple calls for info happen
+          within a single test run. Can be disabled with the -X param to
+          brewbuild (closes #163)
+        - finalized Tester's ability to write logs to a file, and added POD
+          (closes #149)
+
+2.11    2017-03-26
+        - we now filter out cperls until we can do further testing. This is
+          handled in BCMD::available() with a `[^c]` entry in the regex when we
+          pull out the perls listed in $info (fixes #162)
+        - _validate_opts() now only compares against argument directives, not
+          their values (fixes #161)
+        - in perlbrew v0.77, they introduced a confirmation requirement for
+          'uninstall', which was breaking things for us. Went through the code,
+          and found that sending in '--yes' as an argument to perlbrew in the
+          uninstall command will bypass this confirmation, allowing things to
+          work correctly here for the perls_remove() functionality
+        - several test updates due to above changes
+        - added additional logging to various areas
+        - bumped prereq of Mock::Sub to 1.07
+
+2.10    2016-11-19
+        - fix shebang line in the scripts to reference `/usr/bin/env perl`
+          instead of `/usr/bin/perl` (Thanks 'nigelhorne' (github) for the
+          report) (closes #157)
+        - change perms on the bin/ files to 755 from 644 (thanks again to
+          'nigelhorne' from github for reporting) (closes #156)
+        - moved BrewBuild object creation in brewbuild down below the checks to
+          see if *brew is installed. No need for the object if they aren't
+          (closes #160)
+        - brewbuild was deleting $args{args} instead of $opts{args} when a
+          plugin is in use without --revdep (fixes #159)
+        - in BB::_exec(), we were returning before unloading the dzil shim. This
+          technically shouldn't have caused any issues, but in some cases it may
+          have (closes #158)
+
+2.09    2016-11-06
+        - added "logfile" flag for bbtester. If not in --fg mode with --stdout
+          set and --logfile is set, we'll write to a file in
+          "workdir/bbtester.log". This is to help in situations where the
+          tester is hanging in 'start' mode, but not in --fg mode. Without this
+          flag, no logging info is displayed or returned (closes #149)
+        - fixed issue where setup info was not being displayed with -s
+          (closes #154)
+        - fixed issue where sending -1 to --new was causing brewbuild help to
+          be displayed (closes #151)
+        - required Perl version now 5.10 from 5.8, due to that limit in 
+          MetaCPAN::Client
+        - removed Perl 5.8 tests from Travis
+        - added help entry for the -S|--save option
+        - fixed t/test_api/95, as Mock::Sub now has more revdeps (closes #155)
+        - slight wording change in Tutorial (closes #147)
+        - brewbuild will now let the user know that no perls are installed
+          instead of just outputting nothing (closes #150)
+
+2.08    2016-06-23
+        - changed from using HOMEPATH env var to USERPROFILE on Windows, as the
+          former didn't contain the drive letter (fixes #96)
+        - legacy perls were not being excluded when legacy was disabled
+          (fixes #137)
+        - changed all links to dnmfarrell berrybrew repo to stevieb9 (closes
+          #136)
+        - removed notices about MSWin PATH issues, as they were completely
+          rectified in berrybrew after it's "off" feature was added
+        - several POD corrections
+        - confirmed that all tests still pass after berrybrew version
+          sb-20160602 changes (ensured PATH is still ok)
+        - fixed a couple of tests that had the perl ver hard-coded, and another
+          two that were trying to use a regex in is()
+
+2.06    2016-06-12
+        - no functional changes
+        - BBDEV_TESTING tests now require a version (eg: 5.24.0) set in
+          $ENV{PERLVER}, instead of having 5.22.1 hardcoded for a few test
+          files, and other tests don't use the ver anymore (closes #132)
+        - tests now reside in sub-directories, cleaning the t/ directory up
+          significantly (closes #133)
+        - fixed config file doc link in BrewBuild's POD (closes #131)
+        - new berrybrew build, in prep for using --on on Windows
+          (https://github.com/stevieb9/berrybrew ver: sb-20160601)
+
+2.05    2016-05-06
+        - added [brewbuild] section to config file (closes #128)
+        - cleaned up test logic due to failing MSWin tests
+        - switched from CPAN::ReverseDependencies to MetaCPAN::Client, as the
+          former was using MetaCPAN::API which is depricated, and failing to
+          install on MSWin systems. (I sent a PR to the dist which fixes it). We
+          now have our own revdep discovery process
+        - fixed logic issue where -1 wasn't being used in instance_install(),
+          breaking the ability to install all perl instances (fixes #130)
+
+2.04    2016-04-27
+        - Results from MSWin now properly show the _bit suffix for the perl used
+          in test results (closes #124)
+        - instance_install() when installing randomly doesn't attempt duplicate
+          versions any longer (fixes #123)
+        - cleaned up formatting of revdep returned output (closes #126)
+        - on Unix, we now include Release Candidate perl instances when using
+          random install, eg perl-5.24.0-RC3 (closes #127)
+        - various log entry cleanup (closes #112)
+
+2.03    2016-04-26
+        - brewbuild can now dispatch the most basic of testing to remotes via
+          the -D and -t flags. For more advanced remote testing, use bbdispatch
+          (closes #122)
+        - changed to searching %PATH% for binaries as opposed to using 'where'
+          on MSWin, as on pre 2k3, 'where' didn't exist (closes #117)
+        - moved setting the brewbuild command default from bbdispatch to
+          Dispatch (closes #118)
+        - On MSWin, we now accept the _32/_64 suffixes in --install, otherwise
+          we'll default to 64-bit. This suffix will be stripped on Unix systems
+          if dispatching to both Unix and Windows testers (closes #114)
+        - removed prerequisite of needing to be an Administrator user on MSWin
+          from the Tutorial (closes #119)
+        - fixed a series of out-of-order debug logging message entries
+        - added a timeout param to instance_install(), default 300 secs. If an
+          install takes longer than this, it'll roll out the changes and log an
+          entry of the problem (closes #110)
+        - enhanced the argument handling for brewbuild to be much more
+          resilient and specific to help prevent executing rogue commands on
+          the remote testers (closes #66)
+        - POD updates
+
+2.02    2016-04-22
+        - fixed issue in T::BB::Tester where we weren't checking for the 'new'
+          param, hence we weren't doing install if 'new' was set
+        - added brief SYNOPSIS in Dispatch
+        - fixed issue in Tester where the log scalar wasn't being reset after a
+          run (we also now shutdown() the socket after a finished run)
+        - correct issues preventing the brewbuild -i and -n flags from working
+          correctly on remote testers
+        - dzil dists now get a authordeps run by default, logging organized
+          (closes #104)
+
+2.01    2016-04-22
+        - no functional changes
+        - POD updates/fixes
+
+2.00    2016-04-21
+        - added T::BB::workdir() as a common source for workdir retrieval
+        - major POD updates
+
+1.05_02 2016-04-20
+        - we now set up a log file within Tester for BrewBuild if Tester is
+          logging, but not to STDOUT
+        - added a POD document for the config file
+        - created a Tutorial for the distributed testing environment setup
+
+1.05_01 2016-04-19
+        - we can now distribute test builds to remote Test::BrewBuild test
+          servers
+        - bbdispatch and bbtester scripts added, which handle the test
+          distribution network/systems
+        - Dispatch.pm and Tester.pm modules, containing the APIs for the
+          distribution setup
+        - we no longer now print anything out by default; everything is
+          returned, and its up to end-user to handle
+        - major debug logging improvements
+        - significant code cleanup and tests implemented
+        - added/improved upon the flags for the ``brewbuild'' script
+
+1.05    2016-04-04
+        - we're now Dist::Zilla compliant and tested (closes #33)
+        - added _dzil_shim() and _dzil_unshim() for Dist::Zilla distributions
+        - bumped prereq of TestAgainst plugin to 0.06
+        - added -T (--selftest), to prevent recursive testing loops when 
+          testing this distribution
+        - POD updates
+        - stderr.bblog as well as cpanm build.log files are now aggregated into
+          the FAIL log reports (closes #61 and #62)
+        - added -T, --selftest, to avoid recursive testing of Test::BrewBuild
+          with the BBDEV_TESTING env var set
+
+1.04    2016-04-01
+        - ensure FAIL files are created properly and test (closes #53)
+        - fix issue where --on wasn't setting up the environment correctly
+          (fixes #54)
+        - on Unix, we catch if an installed version is attempting to be
+          installed, instead of letting perlbrew handle it (closes #50)
+        - prereq 'version' added to correctly get version info from pre 5.10
+          (fixes #51)
+        - renamed --version|-v to --install|-i
+        - added --notest|-N, allows install/remove without running exec()
+          (closes #49)
+        - added --setup|-s, displays Windows and Unix test platform setup guide
+        - added --legacy|-L. Due to the fact ``cpanm'' requires 5.8.1, and we
+          use it in the default exec plugin, we won't install versions lower
+          than that, unless this flag is set
+        - FAIL logs are now stored in a temp directory, then moved to './bblog'
+          after completion, ensuring manifest.t tests don't fail (fixes #56)
+        - fixed bug where on Windows, if a module build fails, the revdeps
+          could still pass (fixes #57)
+        - POD updates
+        - created berrybrew PR dnmfarrell/brewberry#16 which added the --with
+          arg to exec
+        - bumped prereq of Test::BrewBuild::Plugin::TestAgainst to 0.05 due
+          to the Windows path issues
+
+1.03_03 2016-03-29
+        - --revdep, auto-testing of CPAN down-river modules working very well
+          (work on #39)
+        - added t/dev-1xx tests, need perlbrew/berrybrew installed to run. Set
+          BBDEV_TESTING environment variable to run these tests (these tests
+          can take a very long time to process, and currently, may be
+          unreliable)
+        - added Archive::Extract prereq for BBDEV_TESTING
+        - fixed bug where --version wasn't doing anything
+        - fixed bug on Windows where instance_remove() was removing the
+          currently in-use perl instance
+        - if an invalid arg is sent in, we now print help screen and exit
+          (closes #45)
+        - fix bug in results(), where the regex wasn't capturing properly on
+          Windows
+        - added blurb in SYNOPSIS about the importance of having a central
+          cpanm (closes #44)
+        - corrected a whole bunch of inconsistencies between win/nix throughout
+          the dev test writing
+        - we now re-check brew_info after an install, so we don't exit
+          prematurely thinking no perls are installed, even after a --new 1
+          (closes #46)
+        - had to change the DATA section in the plugins to one cmd per line,
+          due to Windows not properly able to manage PATH env var on each exec
+          run. The actual command to perform the tests *must* be the last line
+          executed
+        - added BrewExec::using(), sends back the exact version we're using, so
+          remove_instance() does the right thing on Windows (fixes #47)
+        - disabled 'on' tests on Windows, as berrybrew doesn't have a --with
+          flag for 'exec'. We warn() if it's attempted
+        - added examples/config.txt, shows a working Windows %PATH% env setup
+        - began, albeit lightly, code cleanup (#36)
+        - set objectives for v1.05 (full win/nix compat, document pristine
+          testing environment, fix all outstanding non-wishlist issues and
+          at minimum, document irregularities of test failures beyond this
+          modules control)
+
+1.03_02 2016-03-26
+        - FAIL strategy completed. If there's STDERR output, we write it all to
+          brewbuild_err.bblog. FAIL reports go into $perlver.bblog, and if
+          we're using a plugin that accepts a module, we put fail reports into
+          Tested::Module-$perlver.bblog, with the '::' replaced into '-'. The
+          results (PASS and FAIL) are now all displayed at the end of output
+          for easy identification (closes #43)
+        - fixed case-insensitivity bug with options. -R and -r now do the
+          respective Right Thing
+        - cpanm is now called with the -v flag on the --test-only portion of
+          the default plugin
+
+1.03_01 2016-03-25
+        - if --args is passed in, brewbuild runs the number of times the list
+          has elements, and on each pass, the plugin receives the current arg
+          in the list
+        - --args executes --new and --remove only on first run through the loop
+        - plugins now get a copy of the parent log for cloning
+        - added --revdep, tests all CPAN reverse dependencies on the module
+          you're testing
+        - added prereq CPAN::ReverseDependencies for --revdep
+        - Plugin::Simple v0.06 now required (fixes #28, #30)
+        - documented $log as first param to a plugin (closes #35)
+        - cleaned up SYNOPSIS (closes #38)
+        - add tests for --args param for plugins (closes #32)
+        - we now croak if there's no 't/' dir, as there'd be nothing to test
+          (closes #34)
+        - removed -R flag, -r was interfering. We'll figure this out later
+        - cleaned up logging. By default 0 will display install/remove actions,
+          all other logging needs debug 5-7 (closes #37)
+
+1.02    2016-03-24
+        - default plugin now uses cpanm for all installs, rendering the build
+          system in use irrelevant (should work for distzilla) (closes #29)
+        - added new --args arg to 'brewbuild', this is an aref that gets
+          dereferenced and the list passed into the 'brewbuild_exec()' sub
+          in each plugin
+        - fixed abstract issue (closes #27)
+        - removed t/11-results.t, as we don't return results anymore
+        - modified logging levels
+
+1.01    2016-03-22
+        - set README to the binary, not the module... d'oh!
+
+1.00    2016-03-22
+        - removed Plugin.pm, we now use Plugin::Simple for the plugin init work
+        - BUILD_REQUIRES Mock::Sub v1.06 for testing purposes, so we can test
+          without *brew installed (and if it is, we don't want to be managing
+          instances)
+        - finally got around to implementing a near full test suite (closes #4)
+        - removed version() from BrewCommands.pm, not needed
+        - bumped major version number now that we're tested and stable
+
+0.06    2016-03-21
+        - added '--on' param, send in a list of perl versions to run against,
+          instead of the default all (closes #17)
+        - renamed 'count' param to 'new', kept change for backwards
+          compatibility reasons (closes #23)
+        - we can now load non-installed local plugins by specifying the full or
+          relative path name plus name of file to the --plugin param (closes
+          #24)
+        - all *brew command creation moved to Test::BrewBuild::BrewCommands.pm
+          (closes #19)
+        - new round of unit tests
+        - added debug logging to Test::BrewBuild::BrewCommands
+        - added warning in Makefile.PL and skip a bunch of tests if *brew isn't 
+          installed
+        - 'brewbuild' command warns with a link to the respective *brew, and
+          exits if it isn't installed
+
+0.05    2016-03-18
+        - we now recognize when Module::Build is being used, as opposed
+          to EUMM, and it works properly (fixes #12)
+        - *brew exec commands are now loaded via a plugin architecture. Set by
+          the '-p|--plugin' or an environment variable, plugin writing is
+          exceptionally simplistic
+        - renamed --reload arg to --remove
+        - fix undef issue in Plugin.pm if a plugin name can't be found
+        - --debug param now accepts a level param (0-7) to set the level (added
+          Logging::Simple as prereq)
+        - remove all prereqs from Makefile.PL that are already in core
+          (closes #15)
+        - add prereqs that aren't in core as of v5.8 into Makefile.PL (closes
+          #20)
+        - completely peppered the modules with various debugging level
+          statements
+        - added POD in Test::BrewBuild::Plugin
+
+0.04    2016-03-16
+        - testing now properly works across all installed perls
+        - the exec file is now auto-generated with File::Temp, and unlinked
+          after use (closes #9)
+        - install now skips and warns (w/ debug) if a version it's trying to
+          install is already installed (closes #8)
+        - added POD for both the script and module (closes #5)
+
+0.03    2016-03-01
+        - App::cpanminus now a prereq
+        - fixed issue in split in results() (fixes #6)
+
+0.02    2016-02-23
+        - implemented Object Oriented approach
+        - added _test_file(), returns the test file brew will run (uses
+          File::Temp)
+        - added t/01-test_file.t
+        - added POD (closes #3)
+        - version arg now accepts multiple values (closes #1)
+        - fixed defined-or to be 5.8 compatible
+
+0.01    2016-02-23
+        First version, released on an unsuspecting world.
+

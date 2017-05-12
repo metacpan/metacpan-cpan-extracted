@@ -1,0 +1,13 @@
+Revision history for Perl extension Tie::Array::Packed::Auto.
+
+0.03  Mar 11, 2007
+        - eliminate bug in test script failing in 64bits systems
+        - pod test added
+
+0.02  Apr 27 2006
+        - on TIEARRAY copy string value before making reference to it.
+
+0.01  Thu Apr 27 10:59:38 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn Tie::Array::Packed::Auto
+

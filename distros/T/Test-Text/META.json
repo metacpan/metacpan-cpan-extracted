@@ -1,0 +1,54 @@
+{
+   "abstract" : "A module for testing text files for spelling and (maybe) more. ",
+   "author" : [
+      "JJ Merelo <jj@merelo.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Text",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Slurp::Tiny" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "1",
+            "Text::Hunspell" : "2.08",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JJ/Test-Text.git",
+         "web" : "https://github.com/JJ/Test-Text"
+      }
+   },
+   "version" : "0.4.0",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}
+

@@ -1,0 +1,2 @@
+# Stop perlcritic from complaining about the PkgVersion code
+exclude = RequireUseStrict RequireUseWarnings

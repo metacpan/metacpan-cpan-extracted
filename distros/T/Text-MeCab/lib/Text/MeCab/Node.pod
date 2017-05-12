@@ -1,0 +1,46 @@
+=head1 NAME
+
+Text::MeCab::Node - MeCab Node Object
+
+=head1 SYNOPSIS
+
+  use Text::MeCab;
+  my $mecab = Text::MeCab->new();
+  my $node  = $mecab->parse($text);
+
+  $node->id;
+  $node->surface;
+  $node->length;
+  $node->rlength;
+  $node->feature;
+  $node->next;
+  $node->prev;
+  $node->rcattr;
+  $node->lcattr;
+  $node->stat;
+  $node->isbest;
+  $node->alpha;
+  $node->beta;
+  $node->prob;
+  $node->wcost;
+  $node->cost;
+
+  $node->format($mecab);
+
+=head1 DESCRIPTION
+
+Text::MeCab::Node encapsulates the mecab node structure returned by parsing
+some text.
+
+=head1 METHODS
+
+=head2 format($mecab)
+
+Given a mecab instance, formats the node as specified by the option arguments
+(e.g. --node-format)
+
+=head1 SEE ALSO
+
+L<Text::MeCab|Text::MeCab>
+
+=cut

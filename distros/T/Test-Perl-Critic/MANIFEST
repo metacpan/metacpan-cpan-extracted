@@ -1,0 +1,16 @@
+Build.PL
+Changes
+INSTALL
+lib/Test/Perl/Critic.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_api.t
+xt/author/96_perlcritic.t
+xt/author/98_pod_syntax.t
+xt/author/99_pod_coverage.t
+xt/author/perlcriticrc

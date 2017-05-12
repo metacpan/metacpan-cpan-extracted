@@ -1,0 +1,23 @@
+---
+abstract: 'Convert NT System Time to Unix Timestamp and vice versa'
+author:
+  - 'Jason Fried <fried@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Time-NT
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/fried/Time-NT
+version: 0.007

@@ -1,0 +1,8 @@
+Revision history for Perl extension Text::IdMor.
+
+0.01  Sat Aug 25 21:10:49 2007
+	- original version; created by h2xs 1.23 with options
+		-X -n Text::IdMor
+
+0.9   Wed Nov 11 21:21:21 2009
+	- first public version

@@ -1,0 +1,9 @@
+Changes
+Iterable.pm
+Iterable/ForwardIterator.pm
+Iterable/BackwardIterator.pm
+Makefile.PL
+MANIFEST
+README
+t/forward.t
+t/reverse.t

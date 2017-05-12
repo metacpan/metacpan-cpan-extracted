@@ -1,0 +1,56 @@
+Revision history for Tie-Wx-Widget
+
+1.0     3. december
+        doc fixes  
+
+0.991   17.july
+        accepting also selfderived widget classes
+        dummy UNTIE method
+        more precise error messages when attempt to tie all sorts of things
+
+0.99    11.july
+        changing internal API, own callback now replace the default ones completely
+
+0.98    7.july
+        fixing all the visible quirks in tgz and META.yml that introduced
+        by release tools with 0.91, 0.95, 0.96, 0.97, 0.98
+
+
+0.9     6.july
+        added warn_mode mode so program hasn't to die,
+        when not trying to tie a none widget
+
+0.8     5.july
+        alternative shortcut key for the widgetref ('w')
+        test for that
+        typos in the doc
+
+0.7     5.july
+        $tref->DESTROY doesn't crash anymore
+        tests for internal access
+        refined docs
+
+0.6     5.july
+        made code a bit clearer (and longer) named key 'w' => 'widget'
+        inherit with @ISA (faster) not base
+        setter don't allow references as input (has no useful effect, makes things just ugly)
+        added a test if teference to tie is a nine widget wx class
+        test perl version
+
+0.5     31.May
+        check if a wx widget is a widget (inherits from Wx::Window)
+        better error message in case it can't tie
+        use base instead @ISA (parent is still too fresh)
+        real tests! , wrote t/01-run.t and deleted boilerpate.t
+        docs for the internal API
+
+0.2     30. May
+        check if a wx widget ref can GetValue and SetValue
+        add Wx as dependency
+        reworked META.yml
+
+0.01__2 added META.yml and fixed spacing in doc
+
+0.01__1 29. May 2011
+        initial draft, started as idea during Linuxtag Berlin 2 weeks ago
+        run Module::Starter

@@ -1,0 +1,108 @@
+Template::Plugin::HTML::SuperForm version 1.0
+=============================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NAME
+    Template::Plugin::HTML::SuperForm - Template Plugin for HTML::SuperForm
+
+SYNOPSIS
+     [% USE form = HTML.SuperForm %]
+     [% form.text(name => 'my_text', default => 'default text') %]
+
+DESCRIPTION
+    This is an interface into HTML::SuperForm through the Template Toolkit.
+    When created without arguments (i.e. [% USE form = HTML.SuperForm %]),
+    the Template's stash is searched for an Apache object or a CGI object to
+    pass to HTML::SuperForm's constructor.
+
+    When created with arguments (i.e. [% USE form = HTML.SuperForm(arg) %]),
+    the arguments are passed to HTML::SuperForm's constructor.
+
+USES
+    With mod_perl:
+
+        myHandler.pm:
+        package myHandler;
+
+        use Apache::Constants qw(OK);
+        use Template;
+
+        sub handler {
+            my $r = shift;
+
+            my $tt = Template->new();
+
+            $r->content_type('text/html');
+            $r->send_http_header();
+
+            $tt->process('my_template.tt', { r => $r });
+
+            return OK;
+        }
+
+        my_template.tt:
+        [% USE form = HTML.SuperForm %]
+        <html>
+        <body>
+            [% form.start_form(name => 'my_form') %]
+            [% form.text(name => 'my_text', default => 'default text') %]
+            [% form.submit %]
+            [% form.end_form %]
+        </body>
+        </html>
+
+    With CGI:
+
+        cgi-script:
+        use Template;
+
+        print "Content-Type: text/html\n\n";
+        my $tt = Template->new();
+        $tt->process('my_template.tt');
+
+        my_template.tt:
+        [% USE CGI %]
+        [% USE form = HTML.SuperForm %]
+        <html>
+        <body>
+            [% form.start_form(name => 'my_form') %]
+            [% form.text(name => 'my_text', default => 'default text') %]
+            [% form.submit %]
+            [% form.end_form %]
+        </body>
+        </html>
+
+    Without CGI or mod_perl:
+
+        cgi-script:
+        use Template;
+
+        print "Content-Type: text/html\n\n";
+        my $tt = Template->new();
+        $tt->process('my_template.tt');
+
+        my_template.tt:
+        [% USE form = HTML.SuperForm %]
+        <html>
+        <body>
+            [% form.start_form(name => 'my_form') %]
+            [% form.text(name => 'my_text', default => 'default text') %]
+            [% form.submit %]
+            [% form.end_form %]
+        </body>
+        </html>
+
+SEE ALSO
+    HTML::SuperForm
+
+AUTHOR
+    John Allwine <jallwine86@yahoo.com>
+

@@ -1,0 +1,22 @@
+---
+abstract: 'Perl extension for very fast parsing of VCards'
+author:
+  - 'Bron Gondwana <brong@>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-VCardFast
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::XS: 0
+version: 0.11

@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::MultiProcess.
+
+0.01  Mon Mar 22 13:55:33 2010
+	- original version; created by h2xs 1.23 with options
+		-X Test::MultiProcess
+

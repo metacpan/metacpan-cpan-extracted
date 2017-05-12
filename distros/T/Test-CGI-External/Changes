@@ -1,0 +1,100 @@
+Revision history for perl module Test::CGI::External
+
+0.22 2017-03-06
+
+- test_411 method
+- QUERY_STRING is always set, as required by the RFC.
+
+0.21 2017-02-26
+
+- Add test_status method
+- README improved
+- In test_method_not_allowed, make more effort to create a genuine
+  POST request if the Allow: header specifies POST.
+
+0.20 2017-02-19
+
+- Change the path for the test scripts to the user's Perl path in "Makefile.PL"
+
+0.19 2017-02-17
+
+- Test REQUEST_METHOD handling,
+  "test_method_not_allowed" and "test_not_implemented"
+
+0.18 2017-02-06
+
+- Insist on blank line even if there is no response body, just headers
+- Documentation
+
+0.17 2016-12-06
+
+- Test option "png" tests for PNG output
+
+0.16 2016-05-10
+
+- Test fixes for a limited number of systems
+
+0.15 2016-05-03
+
+- Add no_check_request_method option
+
+0.14 2016-02-04
+
+- Changes to testing methodology only, no change in module functionality.
+
+0.13 2016-02-02
+
+- Load JSON::Parse for JSON validation.
+
+0.12 2015-12-07
+
+- Closes a loophole where a test passed if a value (Status) was
+  undefined, where it should have failed.
+
+0.11 2015-11-14
+
+- Reduce dependencies, fall back to core modules when available
+- Optionally switch off warnings
+- Bugs fixed in caching test
+- Improved documentation
+
+0.10 2015-11-06
+
+- The caching tests were documented.
+- The tests applied by the module were listed.
+- The invalid option "die_on_failure" was removed from the documentation.
+- Refactoring.
+
+0.09 2015-11-04
+
+- Unicode upgrade depending on encoding
+- Build to halt on MS Windows
+- Cacheing test support (undocumented)
+
+0.07 2015-11-04
+
+- Re-release to CPAN
+
+0.06 2014-05-08
+
+- Add meaningless pass result for "-x" test for Windows
+
+0.05 2014-05-07
+
+- Document the ability to add command line options.
+- Remove "-x" test for Windows.
+
+0.04 2014-04-16
+
+- Add tests for $tester->set_no_content_type (1)
+
+0.03 2014-04-09
+
+- Conversion to Test::Builder dependency
+
+0.01 2014-04-01
+
+- Initial release
+
+
+

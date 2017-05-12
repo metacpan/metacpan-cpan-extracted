@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Test::Mock::Furl>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Test-Mock-Furl"><img src="https://secure.travis-ci.org/bayashi/Test-Mock-Furl.png"/></a> <a href="https://coveralls.io/r/bayashi/Test-Mock-Furl"><img src="https://coveralls.io/repos/bayashi/Test-Mock-Furl/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Test::Mock::Furl installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Test::Mock::Furl
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Test::Mock::Furl documentation is available as in POD. So you can do:
+
+    % perldoc Test::Mock::Furl
+
+
+=head1 REPOSITORY
+
+Test::Mock::Furl is hosted on github
+L<http://github.com/bayashi/Test-Mock-Furl>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

@@ -1,0 +1,30 @@
+exec /usr/bin/perl -M'Tk::QuickTk=app' -e app $0;exit
+m MainWindow         title:'QuickTk Minimal Demo'
+  mb Frame           side:top fill:x :
+    f Menubutton     side:left       : text:File
+      o command      label:Open sub:my($wid)=@_;
+                       ...my $out=$$w{mts};my $tf=$$w{mtf};
+                       ...$$gl{efile}=$tf->Show;$$gl{eww}=0;
+                       ...my $fh=new FileHandle "<$$gl{efile}";
+                       ...while(<$fh>) { $out->insert('end',$_); }
+                       ...close $fh;$out->yview('1.0');print "ok 2\n";
+      q command      label:Quit sub:print "ok 8\n";exit;
+    t Menubutton     side:left       : text:Tool
+      d command      label:'Directory Listing'
+                       ... sub:$$gl{widgets}{mts}->insert('end',
+                       ...  `pwd`);$$gl{widgets}{mts}->insert('end',
+                       ...  `ls -alF`);print "ok 3\n";
+      s command      label:Satisfaction sub:print "ok 4\n";
+    h Menubutton     side:right      : text:Help
+      a command      label:About sub:$$gl{widgets}{mts}->insert('end',
+                       ... 'this is a demo of perl module Tk::QuickTk');
+                       ... print "ok 5\n";
+  tb Frame           side:top fill:x :
+    d Button         side:left       : text:Dir
+                       ... sub:$$w{mts}->insert('end',`ls -alF`);
+                       ... print "ok 6\n";
+    q Button         side:left       : text:Geom sub:$$w{mts}->insert('end',
+                       ... "geom: ".$$w{m}->geometry."\n");
+                       ... print "ok 7\n";
+  ts Scrolled        side:top fill:both expand:1 : Text: scrollbars:osoe
+  tf FileSelect      nopack                      : directory:.

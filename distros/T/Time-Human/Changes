@@ -1,0 +1,10 @@
+Revision history for Perl extension Time::Human.
+
+1.03  Wed Jan 10 15:38:11 HST 2007
+    - applied a one line to trim whitespace in the output, from Ricardo SIGNES 
+    - misc. doc cleanups
+
+0.01  Thu Mar  1 21:27:47 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n Time::Human
+

@@ -1,0 +1,40 @@
+Revision history for Perl extension Thread::Isolate.
+
+0.05  2005-05-01
+      - Added standby jobs.
+      - Fixed wait_job_to_start() lock.
+      - Fixed is_running_any_job() deadlock.
+      - Added pack_call() and pack_eval().
+      - Added detach() method to job.
+      - Added time() attribute to job.
+      - Changed required Perl version to 5.8.6 (was 5.8.3). Less memory leak at 5.8.6.
+      - Added get/set_attr() and get/set_global() to share data between 2 running threads,
+        or to spy the internal status of a thread.
+      - POD improvements.
+      - Added improvements to the process to past data/objects from one thread to another,
+        where now is possible to paste IO/GLOB and objects with CODE references inside.
+
+
+0.04  2005-02-02
+      - Fixed memory leak for Perl 5.8.4-Win32 for push() and shift() of shared @{ $this->{jobs} }.
+      - Fixed Job destruction in the thread execution side.
+      - Added limit (200) of added jobs in the list and a delay until reduce that.
+
+
+0.03  2005-01-31
+      - Added Thread::Isolate::Map. (see POD).
+      - Added Thread::Isolate::Pool. (see POD).
+      - Fixed memory leack for eval() calls to a thread. (Memory is stable now).
+      - More tests.
+      - Many new resources. (see POD).
+
+
+0.02  2005-01-31
+      - Added Mother Thread, that holds cleaner state of Perl, as the generator of all threads.
+      - Added support to create Thread::Isolate objects inside other Thread::Isolate. So, is possible
+        to clone a thread from outside too.
+
+
+0.01  2005-01-29 17:51:27
+      - original version;
+

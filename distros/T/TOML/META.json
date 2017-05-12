@@ -1,0 +1,85 @@
+{
+   "abstract" : "Parser for Tom's Obvious, Minimal Language.",
+   "author" : [
+      "Darren Chamberlain <darren@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TOML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "TOML::Parser" : "0.04",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "TOML" : {
+         "file" : "lib/TOML.pm",
+         "version" : "0.97"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/toml/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/toml",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/toml.git",
+         "web" : "https://github.com/karupanerura/toml"
+      }
+   },
+   "version" : "0.97",
+   "x_contributors" : [
+      "Sergey Romanov <Sergey.Romanov@emc.com>",
+      "tokuhirom <tokuhirom@gmail.com>",
+      "Darren Chamberlain <dlc@sevenroot.org>",
+      "Olivier Mengué <dolmen@cpan.org>",
+      "karupanerura <karupanerura@users.noreply.github.com>",
+      "Vickenty Fesunov <kent@setattr.net>",
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

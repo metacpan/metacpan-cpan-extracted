@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Autotie.
+
+0.01  Wed May 12 11:47:58 2004
+	- original version; created by h2xs 1.23 with options
+		-A -X Tie::Autotie
+

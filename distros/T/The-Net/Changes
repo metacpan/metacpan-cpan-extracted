@@ -1,0 +1,13 @@
+Version 2009110702
++ Fix prerequisites.
+
+Version 2009110701
++ Modernized Makefile.PL
++ Added POD and Kwalitee tests
+
+Version 2009040401
++ Move to git.
++ Modernization.
+
+Version 1.1
++ Initial revision

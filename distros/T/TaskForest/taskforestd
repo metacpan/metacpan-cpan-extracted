@@ -1,0 +1,663 @@
+#!/usr/bin/perl  -T
+
+################################################################################
+#
+# $Id$
+#
+# The main program that processes jobs and families
+#
+################################################################################
+
+use strict;
+use warnings;
+
+use HTTP::Daemon;
+use HTTP::Status;
+use Data::Dumper;
+use CGI;
+use TaskForest::Template;
+use HTTP::Request;
+use HTTP::Response;
+use File::Basename;
+use Fcntl qw(:DEFAULT :flock);
+use Config::General qw(ParseConfig); 
+use Getopt::Long;
+use Log::Log4perl qw(get_logger :levels :nowarn);
+use Log::Log4perl::Layout;
+use Log::Log4perl::Level;
+use POSIX;
+use TaskForest::REST;
+
+$|++;
+
+## Copyright (c) 1996, 1998 by Randal L. Schwartz
+## This program is free software; you can redistribute it
+## and/or modify it under the same terms as Perl itself.
+
+BEGIN {
+    use vars qw($VERSION);
+    $VERSION     = '1.37';
+}
+
+
+&setup_signals();
+
+my $config_file = 'taskforestd.cfg';;
+my $stop;
+my $start;
+GetOptions("config_file=s" => \$config_file,
+           "start"         => \$start,
+           "stop"          => \$stop,
+    );
+
+my $config = getConfig($config_file);
+
+if ($stop) {
+    if (open (F, $config->{pid_file})) {
+        my $pid = <F>;
+        close F;
+        chomp $pid;
+        $pid =~ /(\d+)/;
+        $pid = $1;
+        print "Killing server with pid $pid\n";
+        kill "INT", $pid;
+        exit 0;
+    }
+    exit 1;
+}
+
+my $access_log;
+my $error_log;
+my $iappender;
+my $eappender;
+
+
+### configuration
+my $HOST          = $config->{host};
+my $PORT          = $config->{port};
+my $CHILD_COUNT   = $config->{child_count};         # how many children to fork
+my $MAX_PER_CHILD = $config->{requests_per_child};         # how many transactions per child
+my $lock_file     = $config->{lock_file};
+my $pid_file      = $config->{pid_file};
+
+### set up env
+my $doc_root = $TaskForest::Template::doc_root = $config->{document_root};
+
+
+my %typeOf = (
+    ".txt"   => "text/plain",
+    ".html"  => "text/html",
+    ".css"   => "text/css",
+    ".js"    => "text/javascript",
+    ".pdf"   => "application/x-pdf",
+    ".gif"   => "image/gif",
+    ".png"   => "image/png",
+    ".jpg"   => "image/jpeg",
+    ".jpeg"  => "image/jpeg",
+    );
+
+
+### main
+
+my $pid;
+
+initLogs($config, "Welcome to taskforestd");
+
+if ($config->{run_as_daemon}) {
+    $pid = fork;
+    if (defined($pid)) { 
+        if ($pid) {
+            exit 0;
+        }
+    }
+    else {
+        die "Can't daemonize";
+    }
+}
+$pid = $$;
+
+
+
+open (OUT, ">$pid_file") || die "cannot write to pid file";
+print OUT "$pid\n";
+close OUT;
+
+
+&main();
+exit 0;
+
+### subs
+sub main {                      # return void
+    my %kids;
+
+    my $master = HTTP::Daemon->new(LocalPort => $PORT, LocalAddr => $HOST) or die "Cannot create master: $!";
+    $error_log->info("master is $$ ", $master->url);
+
+    $master->product_tokens("TaskForest Web Server : $VERSION");
+    
+    ## fork the right number of children
+    
+    for (1..$CHILD_COUNT) {
+        $kids{&fork_a_child($master)} = "child";
+    }
+    
+    while (1) {                             # forever:
+        my $pid = wait;
+        my $was = delete ($kids{$pid}) || "?unknown?";
+        $error_log->debug("child $pid ($was) terminated status $?");
+        if ($was eq "child") {                    # oops, lost a child
+            sleep $config->{respawn_wait};        # avoid thrash
+            $kids{&fork_a_child($master)} = "child";
+        }
+    }
+}
+
+sub setup_signals {             
+    setpgrp;                      # I *am* the leader
+    $SIG{INT} = sub {
+        my $sig = shift;
+        # remove pid file
+        unlink $pid_file;
+        $SIG{$sig} = 'IGNORE';
+        kill $sig, 0;               # death to all-comers
+        $error_log->fatal("killed by $sig");
+
+        exit 0;
+    };
+    $SIG{TERM} = sub {
+        my $sig = shift;
+        # remove pid file
+        unlink $pid_file;
+        $SIG{$sig} = 'IGNORE';
+        kill $sig, 0;               # death to all-comers
+        $error_log->fatal("killed by $sig");
+
+        exit 1;
+    };
+}
+
+sub fork_a_child {
+    my $master = shift;           # HTTP::Daemon
+
+    my $pid = fork;
+    if (defined ($pid)) {
+        if ($pid == 0) {
+            # child
+            &child_does($master);
+        }
+        else {
+            return $pid;
+        }
+    }
+    else {
+        die "Cannot fork: $!";
+    }
+}
+
+sub child_does {                # return void
+    my $master = shift;           # HTTP::Daemon
+
+    my $did = 0;                  # processed count
+
+    $error_log->debug("child started");
+
+    for ($did = 0; $did < $MAX_PER_CHILD; $did++) {
+        
+        sysopen(FH, $lock_file, O_RDWR|O_CREAT);
+        flock(FH, LOCK_EX);
+        $error_log->debug("child has lock");
+        
+        my $child = $master->accept or die "accept: $!";
+        $error_log->debug("child releasing lock");
+
+        flock(FH, LOCK_UN);
+        close FH;
+        
+        my @start_times = (times, time);
+        $child->autoflush(1);
+        
+        #warn("connect from ", $child->peerhost) if $LOG_TRAN;
+        my $peerhost = $child->peerhost();
+        my $request_info = &handle_one_connection($child); # closes $child at right time
+        my @finish_times = (times, time);
+        for (@finish_times) {
+            $_ -= shift @start_times; # crude, but effective
+        }
+        $access_log->info(sprintf("%s %s %.2f %.2f %.2f %.2f %d\n", $peerhost, $request_info, @finish_times));
+        
+        #    warn(sprintf "times: %.2f %.2f %.2f %.2f %d\n", @finish_times);
+        #}
+
+    }
+    $error_log->debug("child terminating");
+    exit 0;
+}
+
+sub handle_one_connection {     # return void
+    my $connection = shift;           # HTTP::Daemon::ClientConn
+
+    my $request = $connection->get_request;
+    defined($request) or die "bad request"; # XXX
+
+    my $request_info = "";
+
+    # get parms
+    # create $h
+    # get method
+    # call handler on file
+    # check for redirect
+    # print headers if necessary
+    # print text
+    
+    my $uri    = $request->uri;
+    my $path   = $uri->path;
+    my $method = $request->method;
+    my $file = "$doc_root$path";
+    my $path_info = '';
+
+    my $authenticated = authenticate($request);
+
+    if (! (defined $authenticated) ) {
+        # return a response with a challenge for basic auth
+        my $response = HTTP::Response->new(RC_UNAUTHORIZED, status_message(RC_UNAUTHORIZED));
+        $response->www_authenticate('Basic realm="TaskForest"');
+        $response->content_type("text/plain");
+        my $content = join("\n",
+                           "401 - Unauthorized",
+                           "You must provide a valid user id and password to access this system.",
+                           "",
+                           "If you haven't set up the list of valid users, you must do so in",
+                           "the taskforest configuration file.   For your convenience, we have",
+                           "included the gen_password script with this distribution to help",
+                           "you generate the crypt hash of the password you choose.");
+        my $len = length($content);
+        $response->content($content);
+        $connection->send_response($response);
+        $connection->close;
+        $request_info = join(" ",
+                             "",
+                             "()",
+                             $method,
+                             $uri,
+                             $request->protocol(),
+                             "'".$request->user_agent()."'",
+                             "'".($request->referer() || "")."'",
+            );
+    
+        return "$request_info ".RC_UNAUTHORIZED." $len";
+   }
+
+    
+
+    if (-d $file) {
+        $file = "$file/index.html";
+    }
+
+    if ($file =~ /(.*?\.html)\/(.*)/) {
+        $file = $1;
+        $path_info = $2;
+    }
+    
+    if (!-e $file) {
+        my $response = HTTP::Response->new(RC_NOT_FOUND, status_message(RC_NOT_FOUND));
+        $connection->send_response($response);
+        $connection->close;
+        $request_info = join(" ",
+                             $authenticated,
+                             "()",
+                             $method,
+                             $uri,
+                             $request->protocol(),
+                             "'".$request->user_agent()."'",
+                             "'".($request->referer() || "")."'",
+            );
+    
+        return "$request_info ".RC_NOT_FOUND." 0";
+        
+    }
+    
+    my ($basename, $dir, $type) = fileparse($file, qr/\..*/);
+    my $ct = $typeOf{$type} || "application/octet-stream";
+    
+    my ($q, $h);
+    
+    # begin to construct the components of a response
+    my $resp_headers = HTTP::Headers->new();
+    $resp_headers->content_type($ct);
+    my $orig_method = '';
+    
+    if ($method eq 'GET' or $method eq 'HEAD') {
+        $q = new CGI($uri->query);
+        $h = $q->Vars;
+    }
+    else {
+        # POST, PUT or DELETE
+        $q = new CGI($request->content);
+        $h = $q->Vars;
+
+        # check for real method
+        if ($method eq 'POST' && $h->{_method}) {
+            $orig_method = $method;
+            $method = $h->{_method};
+        }
+
+        $resp_headers->expires("-1d");  # only in the case of non-safe methods
+    }
+    
+    $request_info = join(" ",
+                         $authenticated,
+                         "($orig_method)",
+                         $method,
+                         $uri,
+                         $request->protocol(),
+                         "'".$request->user_agent()."'",
+                         "'".($request->referer() || "")."'",
+        );
+    
+
+    if ($path_info) {
+        $h->{path_info} = $path_info;
+    }
+
+    my ($hash, $text);
+    $hash = { response_headers => $resp_headers, http_content => undef , method => $method, config => $config, request_headers => $request->headers, request => $request, file => $file, basename => $basename, dir => $dir, type => $type };
+
+
+    if ($ct ne 'text/html') {
+        # check for HEAD or GET and stop there.  We know the file exists
+        handleNonHTMLFile($file, $hash, $method);
+    }
+    else {     
+        $text = &TaskForest::Template::readFile ($q, $file, $hash, $h);
+    }
+
+    if (defined($hash->{http_content})) { $text = $hash->{http_content}; }
+    if (defined($hash->{content_type})) { $resp_headers->content_type($hash->{http_content});}
+
+    if (defined $hash->{REDIRECT}) {
+        $connection->send_redirect( $hash->{REDIRECT}, RC_SEE_OTHER ); # 303
+        $connection->close;
+        return "$request_info ".RC_SEE_OTHER." 0";
+    }
+    elsif (defined $hash->{FILE}) {
+        # return handleFile($q, $hash);
+    }
+
+    my $status = $hash->{http_status} || RC_OK;
+    my $response;
+    if ($status == RC_NOT_FOUND) {
+        $resp_headers->content_type("text/plain");
+        $response = HTTP::Response->new($status, status_message($status), $resp_headers, "404 - Not Found");
+    }
+    else {
+        $response = HTTP::Response->new($status, status_message($status), $resp_headers, $text);
+    }
+
+    $connection->send_response($response);
+    my $cl = $response->content_length() || 0;
+    
+    $connection->close;
+
+    return "$request_info $status $cl";
+}
+
+
+
+sub handleNonHTMLFile {
+    my ($file, $hash, $method) = @_;
+    if ($method eq 'GET' || $method eq 'HEAD') {
+        my @stat              = stat($file);
+        my $last_modified     = $stat[9];
+        my $etag              = $stat[7].$stat[9];
+        my $if_modified_since = $hash->{request_headers}->if_modified_since;
+        my $if_none_match     = $hash->{request_headers}->header('if-none-match');
+
+        if (
+            ($if_modified_since && $last_modified <= $if_modified_since)
+            ||
+            ($if_none_match     && $etag eq $if_none_match)
+            ) {
+            # don't need to send anything back;
+            $hash->{http_content} = "";
+            $hash->{http_status} = RC_NOT_MODIFIED;
+            $hash->{response_headers}->date(time);
+            $hash->{response_headers}->last_modified($last_modified);
+            $hash->{response_headers}->header('ETag', $etag);
+            $hash->{response_headers}->header('Cache-Control', 'Public');
+            return;
+        }
+
+        # get the contents and populate the hash as needed
+        $hash->{http_status} = RC_OK;
+        $hash->{response_headers}->date(time);
+        $hash->{response_headers}->last_modified($last_modified);
+        $hash->{response_headers}->header('ETag', $etag);
+        $hash->{response_headers}->header('Cache-Control', 'Public');
+        if ($method eq "HEAD") {
+            $hash->{http_content} = "";
+        }
+        else {
+            if (open(FILE, $file)) { 
+                binmode(FILE);
+                my $cnt = 0;
+                my $buf = "";
+                my $n;
+                while ($n = read(FILE, $buf, 8*1024)) {
+                    last if !$n;
+                    $cnt += $n;
+                    $hash->{http_content} .= $buf
+                }
+                close FILE;
+            }
+            else {
+                $hash->{http_content} = "";
+                $hash->{http_status} = RC_FORBIDDEN;
+            }
+        }
+    }
+    else {
+        &TaskForest::REST::methodNotAllowed($hash, 'GET, HEAD');
+    }
+}
+
+
+sub handleFile {
+    my ($query, $hash) = @_;
+    my $file = $hash->{FILE};
+    
+    return RC_OK if $file eq "__DONE__";
+
+    my $content_length         = -s $file;
+    my ($name, $path, $suffix) = fileparse($file, qr{\..*});
+    my $file_name              = "$name$suffix";
+    my %mime_types             = ( ".pdf" => "application/pdf",
+                                   ".txt" => "text/plain",
+                                   ".csv" => "application/vnd-ms-excel",
+        );
+    my $mime_type              = $mime_types{$suffix};
+
+    if (!$mime_type) {
+        print $query->header(-type => "text/plain", -expires => "-1d", -status => '500 Unrecognized File Type');
+        print "Unrecognized file type\n";
+        return 500;
+    }
+
+    if (open (FILE, $file)) {
+        my ($buffer, $length);
+        $query->headers_out->set("expires"             => "-1d");
+        $query->headers_out->set("Content-Length"      => $content_length);
+        $query->headers_out->set("Content-Disposition" => "inline; filename=\"$file_name\"");
+        $query->send_htt_header($mime_type);
+
+        while (1) {
+            $length = read(FILE, $buffer, 8192);
+            if (defined ($length)) {
+                if ($length) {
+                    print $buffer;
+                }
+                else {
+                    return RC_OK;
+                }
+            }
+            else {
+                return RC_OK;
+            }
+        }
+        close FILE;
+    }
+    else {
+        $query->headers_out->set("expires", "-1d");
+        $query->send_http_header("text/plain");
+        print "ERROR: Cannot open file\n";
+        return RC_NOT_FOUND;
+    }
+}
+
+sub authenticate {
+    my $request = shift;
+
+    my ($login, $password);
+    eval {
+        ($login, $password) = $request->authorization_basic();
+    };
+    if ($@) {
+        return undef;
+    }
+    return undef unless (defined $login && defined $password);
+    
+    my $correct_password = $config->{valid_users}->{$login};
+    if ($correct_password && crypt($password, $correct_password) eq $correct_password) {
+        return $login;
+    }
+    return undef;
+}
+
+sub getConfig {
+    my $config_file = shift;
+    my %tainted_config = ParseConfig(-ConfigFile => $config_file);
+
+    my %config = ();
+
+    # get default values
+    $tainted_config{log_threshold}      = "info"                          unless $tainted_config{log_threshold};
+    $tainted_config{log_dir}            = "t/logs"                        unless $tainted_config{log_dir};
+    $tainted_config{family_dir}         = "t/families"                    unless $tainted_config{family_dir};
+    $tainted_config{job_dir}            = "t/jobs"                        unless $tainted_config{job_dir};
+    $tainted_config{calendar_dir}       = "t/calendars"                   unless $tainted_config{calendar_dir};
+    $tainted_config{lock_file}          = "lock_file"                     unless $tainted_config{lock_file};
+    $tainted_config{document_root}      = "htdocs"                        unless $tainted_config{document_root};
+    $tainted_config{host}               = "127.0.0.1"                     unless $tainted_config{host};
+    $tainted_config{log_file}           = "taskforestd.%Y%m%d.%H%M%S.out" unless $tainted_config{log_file};
+    $tainted_config{err_file}           = "taskforestd.%Y%m%d.%H%M%S.err" unless $tainted_config{err_file};
+    $tainted_config{pid_file}           = "taskforestd.pid"               unless $tainted_config{pid_file};
+    $tainted_config{port}               = 8080                            unless $tainted_config{port};
+    $tainted_config{child_count}        = 10                              unless $tainted_config{child_count};
+    $tainted_config{requests_per_child} = 20                              unless $tainted_config{requests_per_child};
+    $tainted_config{respawn_wait}       = 1                               unless $tainted_config{respawn_wait};
+    $tainted_config{run_as_daemon}      = 1                               unless defined $tainted_config{run_as_daemon};
+    $tainted_config{server_key_file}    = "certs/server-key.pem"          unless $tainted_config{server_key_file};
+    $tainted_config{server_cert_file}   = "certs/server-cert.pem"         unless $tainted_config{server_cert_file};
+    $tainted_config{chained}            = 0                               unless $tainted_config{chained};
+    $tainted_config{default_time_zone}  = 'America/Chicago'               unless $tainted_config{default_time_zone};
+    $tainted_config{instructions_dir}   = "instructions"                  unless $tainted_config{instructions_dir};
+
+    foreach (qw (default_time_zone) ) {
+        $tainted_config{$_} =~ /([a-z0-9\/_]+)/i; $config{$_} = $1;
+    }
+
+    foreach (qw (log_threshold) ) {
+        $tainted_config{$_} =~ /([a-z]+)/i; $config{$_} = $1;
+    }
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time); 
+    foreach (qw (log_dir family_dir job_dir instructions_dir calendar_dir lock_file document_root host log_file err_file pid_file server_key_file server_cert_file) ) {
+        $tainted_config{$_} =~ /([a-z0-9\.\_\/\%\-]+)/i;
+        $config{$_} = $1;
+        $config{$_} = POSIX::strftime($config{$_}, $sec,$min,$hour,$mday,$mon,$year);
+    }
+    
+    foreach (qw (port child_count requests_per_child respawn_wait run_as_daemon chained) ) {
+        $tainted_config{$_} =~ /([0-9]+)/i; $config{$_} = $1;
+    }
+
+    my $valid_users = $tainted_config{valid_user};
+
+    unless (ref($valid_users)) {
+        $valid_users = [ $valid_users ];
+    }
+    
+    foreach my $valid (@$valid_users) {
+        $valid =~ s/[^:\.\/0-9A-Za-z]//g;
+        my ($user, $password) = split(/:/, $valid);
+        $config{valid_users}->{$user} = $password;
+    }
+
+    $config{pid_file} = $config{log_dir}.'/'.$config{pid_file};
+
+    return \%config;
+}
+
+
+sub initLogs {
+    my ($config, $banner) = @_;
+    
+    my $log_dir = $config->{log_dir};
+    
+    my $log_file = "$log_dir/$config->{log_file}";
+    my $err_file = "$log_dir/$config->{err_file}";
+    my $files = "$log_file\n$err_file";
+    
+    if ($banner) { 
+        print "********************************************************************************\n$banner\n";
+    }
+    print "********************************************************************************\n";
+    print "Log file: $log_file\n";
+    print "Error file: $err_file\n";
+    print "********************************************************************************\n";
+    my $levels = { debug => $DEBUG, info => $INFO, warn => $WARN, error => $ERROR, fatal => $FATAL };
+    
+    # Define a category logger
+    $error_log = get_logger("ErrorLog");
+    $access_log = get_logger("AccessLog");
+    $error_log->level($levels->{$config->{log_threshold}});
+    
+    # Define a layout
+    my $error_layout  = Log::Log4perl::Layout::PatternLayout::Multiline->new("%d %6p %4L:%F{1} - %m%n");
+    my $access_layout = Log::Log4perl::Layout::PatternLayout::Multiline->new("%d %m%n");
+    
+    
+    # Define 2 file appenders
+    
+    $iappender = Log::Log4perl::Appender->new( "Log::Log4perl::Appender::File",
+                                               filename  => $log_file,
+                                               mode      => 'append');
+    
+    $eappender = Log::Log4perl::Appender->new( "Log::Log4perl::Appender::File",
+                                               filename  => $err_file,
+                                               mode      => 'append');
+    
+    $eappender->threshold($levels->{$config->{log_threshold}});
+    $iappender->threshold($INFO);
+    
+    $iappender->layout($access_layout);
+    $eappender->layout($error_layout);
+    
+    $access_log->add_appender($iappender);
+    $error_log->add_appender($eappender);
+    
+   
+   
+    #$iobj = tie (*STDOUT, 'TaskForest::OutLogger');    
+    #$eobj = tie (*STDERR, 'TaskForest::ErrLogger');    
+    
+    if ($banner) { 
+        $error_log->warn( "********************************************************************************\n$banner\n");
+    }
+    $error_log->warn("********************************************************************************\n");
+    $error_log->warn("Log file: $log_file\n");
+    $error_log->warn("Error file: $err_file\n");
+    $error_log->warn("********************************************************************************\n");
+}
+    
+
+

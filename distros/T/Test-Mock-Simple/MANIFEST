@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mock/TestModule.pm
+t/Mock/StrictModule.pm
+t/Failures.t
+t/StrictModule.pm
+t/Test-Mock-Simple.t
+t/TestModule.pm
+lib/Test/Mock/Simple.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

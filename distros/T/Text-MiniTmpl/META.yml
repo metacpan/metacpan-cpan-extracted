@@ -1,0 +1,44 @@
+---
+abstract: 'Compile and render templates'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Filter::CommaEquals: '0'
+  Path::Tiny: '0'
+  Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+configure_requires:
+  Devel::AssertOS: '0'
+  Devel::CheckOS: '1.63'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-MiniTmpl
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Text::MiniTmpl:
+    file: lib/Text/MiniTmpl.pm
+    version: v2.0.0
+requires:
+  Export::Attrs: '0'
+  HTML::Entities: '0'
+  JSON::XS: '0'
+  URI::Escape: '0'
+  perl: '5.012000'
+resources:
+  bugtracker: https://github.com/powerman/perl-Text-MiniTmpl/issues
+  homepage: https://github.com/powerman/perl-Text-MiniTmpl
+  repository: https://github.com/powerman/perl-Text-MiniTmpl.git
+version: v2.0.0

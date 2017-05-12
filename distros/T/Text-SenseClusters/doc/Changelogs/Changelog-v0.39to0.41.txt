@@ -1,0 +1,39 @@
+Release of 0.41 is mainly motivated to bring the memory usage in SenseClusters 
+down 
+
+Changes made in Sense-Clusters version 0.39 during version 0.41
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Removed programs 
+	mcquitty.pl and sparse_mcquitty.pl from /Toolkit/cluster
+	sparse_matrix.pl from Toolkit/matrix/construct
+	
+2.	Modified agglom.pl to support cluto's similarity matrix format
+
+3.	Modified contextvec.pl by
+	adding --rlabel, --rclass options 
+	avoiding word matrix loading 
+	changing option --precision to --format 
+
+4.	Changed name of vec2matrix.pl as matrix.pl and put into 
+	Toolkit/matrix to make it common for context vectors and
+	similarity space programs
+
+	Rewrote this program to avoid loading.
+
+5.	Modified mat2harbo by 
+	changing option --bytein to --format for consistency
+	changing the format of internal temporary files from 
+	all entries on single line to single entry per line 
+
+6.	Modified svdpackout to avoid loading. Provided option to 
+	reconstruct full or just rows via --rowonly option
+
+7.	Updated vector wrapper to support new changes
+
+
+(Changelog-v0.39to0.41 Last Updated on 10/16/2003 by Amruta)

@@ -1,0 +1,39 @@
+1.07    2015-09-29
+        * In Tk::FromUI::Field::Directory, removed "-mustexist" option so
+          the chooseDirectory() will work in linux.
+        * Updated tests to remove calls to diag() that are not needed
+
+1.06    2015-09-28
+        * Updated tests to skip on systems that do not have an X Server
+          running. This should avoid the large number of failures reported
+          by CPAN Testers service.
+        
+1.05    2015-09-17
+        * Added support for Tk::FormUI::DIRECTORY field
+        
+1.04    2015-08-30
+        * Corrected bug with release-kwalitee.t test failing if
+          Test::Kwalitee was not installed
+        * Corrected bug with key bindings
+		
+1.03    2015-08-19
+        * Minor corrections to POD
+
+1.02    2015-08-19
+        * Initial upload to CPAN
+        * Now sets focus to the first field
+        
+1.1     2015-06-03
+        * The set_field_data() now will silently return if a parameter is
+          not provided.
+        * For the Entry field, added trim_leading and trim_trailing attributes
+          to control trimming of leading and trailing whitespace when the
+          value() method is called. Both attributes default to 1
+          
+1.0     2015-06-02
+        * Added support for a validation function for each field
+        * Added support for form validation by invoking each field's 
+          validation function
+        
+0.8     2015-05-04
+        * Initial release

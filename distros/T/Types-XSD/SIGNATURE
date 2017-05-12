@@ -1,0 +1,78 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 8bfa21595f1c5af134a1b368fabd82c02b522c0d COPYRIGHT
+SHA1 05f33692d35fa4efe4bdfaf3e523a86828c8ca07 CREDITS
+SHA1 0a9314cd1e547e169f2cf06f344cb81d8d52ac55 Changes
+SHA1 63dddc51861186c61078b1d21dfc77c53db44c45 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 3a42326ecf8c1420b189980a7c25df7e9be764b6 MANIFEST
+SHA1 40bedf1c6fc88f556f6564ee1c019f7de0fb2b87 META.json
+SHA1 ec334521369ed77b38cd69c300f1665e92288d19 META.yml
+SHA1 9bd1eb7847cbdeb377f5707a77a99262251273b9 Makefile.PL
+SHA1 72b10154f24a3d6f4f02a534298f563d61c144a1 README
+SHA1 38c7f231b2c9a84c47fa812b5abce9f7952b5525 dist.ini
+SHA1 d13efd7d10212b1757941946067db5eac24f43a2 doap.ttl
+SHA1 0953f0d3367827ca679fa91dbc289034dcda8e02 lib/Types/XSD.pm
+SHA1 213eb5e2c48e0f91b1e668b8e38bcd87ae9c3455 t/01basic.t
+SHA1 c0bde0b5677aee6be95c077eebd43c8029adb9aa t/02datetimes.t
+SHA1 7a914e26444c5ff066561de7153aaf41d22def41 t/03duration.t
+SHA1 91d7a740140a467761afb6451ff209c4cc2a9dff t/50ID.t
+SHA1 75b4a2241ec1627342e6a517dfdf004c620d92a4 t/50NCName.t
+SHA1 ad376d151012d749f6f0f1f06b3aca64130de866 t/50NMTOKEN.t
+SHA1 695008f9b76ca3ffacc6ece4f27109d3173ee375 t/50Name.t
+SHA1 143b33515365c98c818828514692e90811bd4b0c t/50QName.t
+SHA1 25a039f5f73edb3ffb3aef7d0d0e2f2a1f2dadc3 t/50anyURI.t
+SHA1 52b55855e05628183800a1712850c81f9ef6314c t/50base64Binary.t
+SHA1 a407a8731af6c947b9ae6571a42ccb6d0ac41836 t/50boolean.t
+SHA1 dfe530a281178c3c8c88fdd51c89f8c183e55fdd t/50byte.t
+SHA1 00bd077c1c99e965072d5b26936d6b2ca80e4238 t/50date.t
+SHA1 9fc41c7d079151ea7402d3d902c27b912dd55eae t/50dateTime.t
+SHA1 62dad5cf2be96fc988ec5e00f8f146cb00df1d3a t/50decimal.t
+SHA1 5a0ec26210b3de2535ae775ad7829bee395664e1 t/50double.t
+SHA1 fb9e7f830349787bce8d753d79770187ce730a49 t/50duration.t
+SHA1 f774abd7427ec3a2412006bf146fb956d7dedaf9 t/50float.t
+SHA1 a264b40ed1a301d228767fbfb2248e1664f8aa17 t/50gDay.t
+SHA1 9dad7099ecc8b215db0cb029d70871b6731e5a5f t/50gMonth.t
+SHA1 760e4d42fc512697469c51b8ec79880548aa7568 t/50gMonthDay.t
+SHA1 15f4585e0ae5950671debdf7c7c48835ee27f47b t/50gYear.t
+SHA1 c1fb1ecb95386fbdbc898910ce486dc7ab64bb8b t/50gYearMonth.t
+SHA1 8fa3f2167b846977016bc007255a7afd9e65f63c t/50hexBinary.t
+SHA1 b12af6b11ec2b94e51cff9cfadfdfab1350d1ece t/50int.t
+SHA1 24c241056cd3149020380f3b7be845ce057bc215 t/50integer.t
+SHA1 90c382eabbb715eda1fff84696961034e885c72b t/50language.t
+SHA1 9a97bf91e2fd50f0fd88261c825323bcb1cf19ef t/50long.t
+SHA1 6be7b2b00710b2205b62f471b29fbd73aaec3285 t/50negativeInteger.t
+SHA1 11ab679dc16c890557a099d25a419d2158a1c12f t/50nonNegativeInteger.t
+SHA1 48bbafa14078c8c460378377d925403b2ceb18a8 t/50nonPositiveInteger.t
+SHA1 676f67817c478717ec8e1accafc9f3feba7ee8ab t/50normalizedString.t
+SHA1 2c9861fde2788d19dc967843d1c20d0875449e9b t/50positiveInteger.t
+SHA1 ba9b3a51798664ea4f11f6a5d3a376c0f12d6519 t/50short.t
+SHA1 ae81077dcf83b7ebfc52c3585055cd8f1a237357 t/50string.t
+SHA1 8800721933474649e06ca3b999e3820e5b7cac2c t/50time.t
+SHA1 a991fab8796dda9ac076c78b64610d959084c618 t/50token.t
+SHA1 92adae06451129a713e04406705f7b4508a7fe30 t/50unsignedByte.t
+SHA1 a79742e09227deaef0d7e280a4d3a0f021c36ea4 t/50unsignedInt.t
+SHA1 89595b55b3b6ef8d136d664d92dc858d200fe83e t/50unsignedLong.t
+SHA1 d9c0eb27c119f32836634be8e758b1ed5b337435 t/50unsignedShort.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQRnr8ACgkQzr+BKGoqfTnGsACfcCuMfGtFub/YhNgeT7c2SJnB
+HmcAmwbZv5foNkHW51dQVgbBMeKsYWvC
+=42vr
+-----END PGP SIGNATURE-----

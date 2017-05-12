@@ -1,0 +1,5 @@
+#!/bin/sh
+cat <<EOT
+1..1
+not ok 1 Hamlette # TODOORNOTTODO
+EOT

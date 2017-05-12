@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Cwd qw(getcwd);
+use File::Path qw(remove_tree);
+use Test::BrewBuild::Dispatch;
+use Test::BrewBuild::Git;
+use Test::BrewBuild::Tester;
+use Test::More;
+
+if (! $ENV{BBDEV_TESTING}){
+    plan skip_all => "developer tests only";
+    exit;
+}
+
+my $t = Test::BrewBuild::Tester->new;
+my $d = Test::BrewBuild::Dispatch->new;
+my $git = Test::BrewBuild::Git->new;
+
+my $cwd = getcwd();
+
+mkdir 't/repo';
+chdir 't/repo';
+remove_tree("$ENV{HOME}/brewbuild/test-fail") or die $!
+  if -d "$ENV{HOME}/brewbuild/test-fail";
+
+$git->clone('https://github.com/stevieb9/test-fail');
+chdir 'test-fail';
+
+$t->start;
+
+my $ret = $d->dispatch(
+    cmd => 'brewbuild',
+    testers => [ qw(127.0.0.1:7800) ],
+);
+
+$t->stop;
+
+my @ret = split /\n/, $ret;
+
+ok (@ret > 3, "line count ok");
+is ($ret[0], '', "blank line");
+like ($ret[1], qr/127\.0\.0\.1 - /, "remote tester info");
+is ($ret[2], '', "blank line");
+like ($ret[3], qr/.*?:: FAIL/, "FAIL ok");
+
+chdir $cwd or die $!;
+
+is (-d "$ENV{HOME}/brewbuild/test-fail", 1, "dispatch properly collected the current repo");
+
+done_testing();

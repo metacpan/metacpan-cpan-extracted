@@ -1,0 +1,28 @@
+---
+abstract: 'Perl interface to the NetBSD editline library'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Ulrich Burgbacher, <ulrich@burgbacher.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-EditLine
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0.96'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Term-EditLine/issues
+  homepage: http://perl.wdlabs.com/Term-EditLine/
+  repository: git://github.com/plicease/Term-EditLine.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

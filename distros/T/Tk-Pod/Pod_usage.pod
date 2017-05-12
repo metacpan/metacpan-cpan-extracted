@@ -1,0 +1,131 @@
+
+=head1 NAME
+
+Tk::Pod_usage - How to use the perl/Tk Pod browser widget
+
+=head1 DESCRIPTION
+
+To navigate through the documentation one could use
+
+=head2 Hyperlinks
+
+A B<click> on a hyperlink display the corresponding Pod documentation
+(if there is any) in the same window. An URL will be displayed in a
+web browser. A man page will be displayed in a man viewer (if one is
+available).
+
+With <Button-2> the documentation is loaded into a new window
+(<Shift-Button-1> works also for those with only a 2 button mouse).
+
+=head2 Selection
+
+A B<double click> tries to load the documentation for the selected
+word in the same window.
+
+If the C<Shift> key is simultaneously pressed a new browser window
+is opened.
+
+=head2 Key bindings
+
+The L<Tk::Pod::Text> widget is based on the L<Tk::More> widget
+inheriting its key bindings.
+
+=head2 Search
+
+Pressing <Key-/> lets you search in the displayed documentation.
+
+=head2 Section Menu
+
+The Section Menu
+
+The 'Section' menu allows one to directly jump to the start of a
+section in the documentation.
+
+=head2 Action Menu
+
+If you press the right mouse button you get a popup menu
+that allows:
+
+=over 4
+
+=item o Back
+
+in history of displayed documentation
+
+=item o Forward
+
+in history of displayed documentation
+
+=item o Reload
+
+the documentation
+
+=item o Edit Pod
+
+Start editor with source of the displayed document.
+
+The used editor is selected by the first definition of the environment
+variables C<TKPODEDITOR>, C<XEDITOR>, C<VISUAL>, C<EDITOR> or as default
+F</usr/bin/vi>. If no terminal is available (or on Windows platforms),
+the L<ptked|ptked> editor (bundled with Perl/Tk) will be used instead.
+
+See also the menu entries 'File' -E<gt> 'Edit' and 'File' -E<gt> 'Edit
+with ptked'.
+
+=item o Search fulltext
+
+Full text search of the Pod in the perl library directories. (Note: to
+use it one has to install the perlindex distribution and build an
+index for the perl documentation, see L<Text::English|Text::English>)
+
+=back
+
+The remaining menu entries are the same as in normal C<Text> widgets.
+
+=head2 Tree view
+
+You can toggle the tree view of all installed modules on or off with
+the 'View' -E<gt> 'Pod Tree' menu entry. The tree view is organized in
+three sections: Perl language (general documentation about Perl),
+Pragmata, and Modules. The labels in the tree are colored, where green
+means E<quot>standard module which comes with the Perl core
+distributionE<quot>, red means E<quot>locally installed module,
+probably from CPANE<quot>, and grey means E<quot>no module available,
+look at the subtreeE<quot>.
+
+The tree data is cached in a temporary directory on a per-perl-version
+and per-user basis. A reload can be forced with the B<Reload> entry in
+the action menu of the tree view. With the B<Search> entry a search in
+the tree can be performed. The B<Show modules at CPAN> entry is highly
+experimental - you can download, extract and look at the
+documentation of all CPAN modules.
+
+=head1 SEE ALSO
+
+L<tkpod>,
+L<perlpod>,
+L<pod2man>,
+L<pod2text>,
+L<pod2html>,
+L<Tk::Pod>,
+L<Tk::Pod::Text>,
+L<Tk::Pod::Tree>,
+L<Tk::More>,
+L<Text::English>.
+
+=head1 KEYWORDS
+
+pod, browser, tk, hypertext
+
+=head1 AUTHOR
+
+Achim Bohnet <F<ach@mpe.mpg.de>>
+
+Current maintainer is Slaven Rezic <F<slaven@rezic.de>>
+
+Copyright (c) 1997-1998 Achim Bohnet. All rights reserved.  This
+documentation is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,16 @@
+---
+name: Template-Plugin-Clickable-Email
+version: 0.01
+author:
+  - Nik Clayton <nik@FreeBSD.org>
+abstract: Make email addresses in to HTML links
+license: bsd
+requires:
+  Email::Find: 0
+  Template: 0
+  Test::More: 0
+provides:
+  Template::Plugin::Clickable::Email:
+    file: lib/Template/Plugin/Clickable/Email.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

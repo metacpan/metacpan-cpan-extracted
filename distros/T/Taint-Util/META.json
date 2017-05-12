@@ -1,0 +1,35 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Taint-Util/",
+      "repository" : "http://github.com/avar/taint-util",
+      "bugtracker" : "https://rt.cpan.org/Dist/Display.html?Name=Taint-Util",
+      "license" : "http://dev.perl.org/licenses/",
+      "Ratings" : "http://cpanratings.perl.org/d/Taint-Util"
+   },
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "0.08",
+   "name" : "Taint-Util",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "requires" : {
+      "Test::More" : "0",
+      "XSLoader" : "0"
+   },
+   "abstract" : "Test for and flip the taint flag without regex matches or C<eval>",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

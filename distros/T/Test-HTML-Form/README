@@ -1,0 +1,35 @@
+Test-HTML-Form
+==============
+
+Test HTML pages and forms, and extract values.
+
+Developed for and released with permission of Slando.
+
+SVN and homepage at http://code.google.com/p/test-html-form/
+
+Bug reports to rt.cpan.org
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::TreeBuilder
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Slando, Aaron Trevena
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

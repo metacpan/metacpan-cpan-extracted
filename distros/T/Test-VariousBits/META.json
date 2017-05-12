@@ -1,0 +1,101 @@
+{
+   "abstract" : "Various test helpers.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-VariousBits",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "maximum_interoperation" : {
+         "description" : "Have maximum inter-operation with other modules.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Sub::Delete" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "lib" : "0",
+            "perl" : "5",
+            "vars" : "0"
+         },
+         "suggests" : {
+            "Sub::Delete" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         },
+         "suggests" : {
+            "IPC::SysV" : "0",
+            "Module::Mask" : "0",
+            "Module::Util" : "0",
+            "Scalar::Util" : "0",
+            "Test::Without::Module" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Util::Masked" : {
+         "file" : "lib/Module/Util/Masked.pm",
+         "version" : "7"
+      },
+      "Test::VariousBits" : {
+         "file" : "META.yml",
+         "version" : "7"
+      },
+      "Test::Weaken::ExtraBits" : {
+         "file" : "lib/Test/Weaken/ExtraBits.pm",
+         "version" : "7"
+      },
+      "Test::Without::GD" : {
+         "file" : "lib/Test/Without/GD.pm",
+         "version" : "7"
+      },
+      "Test::Without::Shm" : {
+         "file" : "lib/Test/Without/Shm.pm",
+         "version" : "7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/test-variousbits/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "7",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

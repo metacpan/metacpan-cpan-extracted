@@ -1,0 +1,52 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Rerunning a Job</div>
+
+  <p>
+    To rerun a job, enter the following command:
+  </p>
+
+  <div class="code"><pre><code>rerun --log_dir=l_d --job=Ff::Jj</code></pre></div>
+
+  <p>
+    where l_d is the log directory and Ff is the family name and Jj is the
+    job name.
+  </p>
+
+  <p>
+    If you run the command like this:
+  </p>
+
+  <div class="code"><pre><code>rerun --log_dir=l_d --job=Ff::Jj \
+--cascade --family_dir=f_d</code></pre></div>
+
+  <p>
+    then all the jobs that are directly or indirectly dependent on job Jj
+    in family Ff will also be rerun.
+  </p>
+
+  <p>
+    If you run the command like this:
+  </p>
+
+  <div class="code"><pre><code>rerun --log_dir=l_d --job=Ff::Jj \
+--dependents_only --family_dir=f_d</code></pre></div>
+
+  <p>
+    then only those jobs that are directly or indirectly dependent on job Jj in family Ff will be rerun. Job Jj will be unaffected.
+  </p>
+
+  <div class="new_section_header">Rerunning a Job Via the Web Site</div>
+
+  <p>
+    You can use the "Rerun" button on the 'Status' or 'View Logs' page.
+  </p>
+
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

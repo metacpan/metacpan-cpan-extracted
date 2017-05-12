@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<annotation xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head><schema href="example3_schema.xml"/></head>
+  <S>
+    <NP form="John"/>
+    <VP form="loves">
+      <NP form="Mary"/>
+    </VP>
+  </S>
+  <S>
+    <NP form="He"/>
+    <VP form="told">
+      <NP form="her"/>
+      <ADVP form="this Friday"/>
+    </VP>
+  </S>
+</annotation>

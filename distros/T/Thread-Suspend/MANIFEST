@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Thread/Suspend.pm
+t/00_basic.t
+t/01_self.t
+t/02_signal.t
+t/03_detach.t
+t/04_all.t
+t/05_some.t
+t/99_pod.t
+t/test.pl
+examples/suspend.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

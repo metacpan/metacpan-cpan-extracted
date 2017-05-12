@@ -1,0 +1,47 @@
+Tk-CanvasLogo version 0.01
+==========================
+
+Tk::CanvasLogo - a Tk::Canvas widget that can support methods based on the
+Logo Programming Language as well as multiple turtles.
+
+	use Tk;
+	use CanvasLogo;
+
+	my $top = MainWindow->new();
+	my $logo = $top->CanvasLogo->pack();
+	my $turtle = $logo -> NewTurtle;
+	$turtle -> LOGO_FD(50); # forward 50 
+	MainLoop();
+
+The Tk::CanvasLogo widget is a regular Canvas widget that adds
+support to allow drawing on the canvas with Logo commands.
+The user first creates a CanvasLogo widget. Then using that
+widget, the user creates turtle objects which are attached 
+to that CanvasLogo widget. Turtle objects can then execute
+Logo-based methods. 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Greg London
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

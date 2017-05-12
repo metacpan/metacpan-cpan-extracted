@@ -1,0 +1,52 @@
+{
+   "abstract" : "simple forking http server",
+   "author" : [
+      "Przemysław Iskra <sparky@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-HTTP-Server",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket" : "0",
+            "POSIX" : "0",
+            "URI::Escape" : "0",
+            "bytes" : "0",
+            "constant" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Select" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Test-HTTP-Server",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Test-HTTP-Server.git",
+         "web" : "https://github.com/neilb/Test-HTTP-Server"
+      }
+   },
+   "version" : "0.04"
+}
+

@@ -1,0 +1,10 @@
+Revision history for Task-CPANAuthors-Regional
+
+1.001 Thu May 15 2014
+        - require versions of Acme::CPANAuthors::EU and
+          Acme::CPANAuthors::European that pass their tests
+          (now that Acme::CPANAuthors::Italian has been removed from CPAN)
+
+1.000 Sat May 10 2014
+        - First version of the task
+        - Includes 30 regional Acme::CPANAuthors modules

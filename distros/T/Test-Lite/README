@@ -1,0 +1,256 @@
+NAME
+    Test::Lite - A small Perl Test Library
+
+DESCRIPTION
+    Test::Lite is just that. A minimal test library based on the brilliant
+    Test::Builder. The main focus of this project was to learn more about
+    testing while building this module. A pretty overlooked subject amongst
+    some Perl developers is testing (myself included). I've tried to offer
+    some different features in this module, but you're probably still better
+    off with Test::More, Test::Most or one of the many other testing
+    libraries out there.
+
+SYNOPSIS
+    Using Test::Lite is pretty similar to other test modules (Why break
+    tradition, eh?)
+
+        use Test::Lite;
+
+        my $a = { name => 'World' };
+        my $b = { name => 'Worlds' };
+    
+        diff ($a, $b, "Difference between hash 'a' and hash 'b'");
+
+        my @non_ref qw(not a ref);
+        my $true_ref = [1, 2, 3];
+        is_ref(@non_ref, 'Name of test');
+        is_ref($true_ref => 'HASH', 'Name of test'); # Checks to see if $true_ref returns a HASH
+
+        use_ok [qw( A::Module Another::Module )];
+
+TESTS
+  is
+        is ( $a, $b, {}, 'Name of test');
+
+    Does $a equal $b? This particular test can match integers or strings.
+    Third parameter takes a hashref. Using this hashref you can make the
+    test a little more 'strict' by setting a type to check for.
+
+        my $a = 1;
+        my $b = 'one';
+    
+        is ($a, $b, { type => 'Int' });
+
+    The above will fail because it expects an integer, but $b is a string.
+
+  ok
+        my $test = "World";
+        my $pass = 0;
+
+        ok ( $test, $name ); # passes
+        ok ( $pass ); # fails
+
+    Checks that the first parameter returns "true". If not, it will fail.
+
+  cmp_ok
+    Evaluates the parameters using the operator specified as the second
+    parameter.
+
+        cmp_ok ( 'this', 'eq', 'that', 'Test Name' );
+        cmp_ok ( 1, '==', 2, 'Test Name' );
+
+  like
+        like( 'Hello, World!', qr/Hello/, 'Test Name');
+
+    Searches the first parameter for the regex specified in the second. If
+    it's found it will pass the test.
+
+  unlike
+    Similar to "like", but the opposite.
+
+  diff
+    Checks the values of two references (HashRef or ArrayRef). If any are
+    different the test will fail and you'll be able to see the output of
+    what "diff" was expecting, and what it actually got
+
+        my $a = { foo => 'bar' };
+        my $b = { baz => 'foo' };
+    
+        diff $a, $b, 'Test name'; # fail
+
+        my $ary = [1, 2, 3];
+        my $ary2 = [1, 2, 3];
+    
+        diff $ary, $ary2, 'Test name'; # pass
+
+  can_ok
+    Finds out whether the specified module can call on certain methods.
+
+        can_ok 'Foo' => qw/ this that them who what /;
+
+  isa_ok
+    Tests to see if the specified object returns the right class
+
+        my $ob = Foo->new;
+        isa_ok $ob, 'Foo', 'Test Name';
+
+  diag
+    Pretty much the same as other Test libraries. Returns output that won't
+    interrupt your tests.
+
+        diag 'Boo!';
+
+  methods
+    Returns a string listing all the methods callable by a module.
+
+        can_ok( Foo => ['test'] ) or diag methods('Foo');
+
+  explain
+    Returns a dump of an object (like a hash/arrayref).
+
+        my $hash = {
+            a => 1,
+            b => 'foo',
+            c => 'baz'
+        };
+        diag explain $hash;
+
+    Will return
+
+        # {
+        #   'a' => 1,
+        #   'b' => 'foo',
+        #   'c' => 'baz'
+        # }
+
+  use_ok
+    Attempts to use the module given, or multiple modules if an arrayref is
+    provided
+
+        use_ok 'Foo';
+        use_ok [qw( Foo Foo::Bar Baz )];
+
+  todo_start
+    Signifies the beginning of todo tests
+
+        todo_start("Starting todo tests");
+        # ...
+
+  todo_end
+    The end of the todo tests. Don't forget to call when you've finished
+    your todo tests.
+
+        todo_end("Finished todo tests");
+        todo_end();
+
+  is_ref
+    Checks to see if the value given is a true reference. You can go one
+    step further and prove a reference type to check against.
+
+        my @non_ref qw(not a ref);
+        my $true_ref = [1, 2, 3];
+    
+        is_ref(@non_ref, 'Name of test');
+        is_ref($true_ref => 'HASH', 'Name of test'); # Checks to see if $true_ref returns a HASH
+
+  subtest
+    Create subtests within a test.
+
+        use Test::Lite;
+
+        use_ok 'Some::Module';
+    
+        subtest 'My test name' => sub {
+            ok ref({}), 'HASH' => 'Reference type is hash';
+        };
+
+        subtest 'Another subtest' => sub {
+            my $ob = Some::Module->new;
+            isa_ok( $ob, 'Some::Module' => 'Matching class with object' );
+        };
+
+  has_key
+    Searches an ArrayRef or HashRef (deeply) for a specific element or key.
+
+        my $hash = {
+            name => 'World',
+            foo  => 'baz',
+            berry => {
+                fruit => {
+                    melon => 'Yum!',
+                },
+            },
+        };
+
+        has_key $hash, 'melon' => 'Found melon!';
+
+        my $ary = [qw(this that there where who what)];
+
+        has_key $ary, 'there' => 'Found "there" in arrayref';
+
+  plan
+    Declare how many tests you are going to run. This is not needed if you
+    have included "done_testing"
+
+        use Test::Lite;
+
+        plan tests => 2;
+        plan 'no_plan';
+        plan skip_all => 'reason';
+
+  is_passing
+    Detects whether the current test suite is passing.
+
+        is_passing or diag "Uh-Oh. We're currently failing the test..."
+
+  note
+    Just prints text to output(), so it should only be displayed in verbose
+    mode.
+
+        note 'Some note to describe stuff';
+
+  count
+    Counts the number of keys from a hashref, or elements from an arrayref
+    and matches them against the expected value.
+
+        my $h = {
+            foo => 'bar',
+            baz => 'foo'
+        };
+        count $h, 2 => 'Expecting 2 keys in hash';
+
+        my $a = [1, 2, 3, 4];
+        count $a, $a->[3] => "Expecting $a->[3] elements from array";
+
+  extended
+    Searches the module deeply for extended modules. ie: When you "use base
+    'Module'" or "extends" in most OOP frameworks.
+
+        package Foo;
+    
+        use base qw/
+            Foo::Baz
+            Foo::Baz::Foobar
+            Foo::Baz::Foobar::Frag
+        /;
+    
+        1;
+
+        # t/01-extends.t
+
+        use Test::Lite;
+    
+        use_ok 'Foo';
+        extended 'Foo' => qw/
+            Foo::Baz
+            Foo::Baz::Foobar::Frag
+        /;
+    
+        done_testing;
+
+AUTHOR
+    Brad Haywood <brad@geeksware.net>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

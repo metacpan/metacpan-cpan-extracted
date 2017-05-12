@@ -1,0 +1,195 @@
+NAME
+    Test::WWW::Selenium::More - More tools for Selenium testing
+
+SYNOPSIS
+        use Test::WWW::Selenium::More;
+
+        Test::WWW::Selenium::More->new()
+          ->note('this is a test.  this is only a test.')
+          ->open_ok("/") 
+          ->is_text_present_ok("Welcome to the internet") 
+          ->download_file_ok('link=Download my file');
+
+DESCRIPTION
+    This module provides method chaining and some useful tools for Selenium
+    testing.
+
+    If you are new to this module or Selenium testing in general, see the
+    Test::WWW::Selenium::More::Manual.
+
+    This library extends Test::WWW::Selenium. Method chaining is available
+    for all Test::WWW::Selenium::More methods and all Test::WWW::Selenium
+    methods whose names end in _ok, _is, _isnt or _like.
+
+ATTRIBUTES
+  host
+    The hostname or ip address of the Selenium server. Defaults to
+    'localhost'.
+
+  port
+    The port of the Selenium server. Defaults to '4444'.
+
+  browser
+    The browser to run tests against on the Selenium server. Defaults to
+    '*chrome'.
+
+  browser_url
+    The Selenium server runs tests against this website.
+
+  autostop
+    When $selenium goes out of scope the browser will be automatically shut
+    down if this attribute is set to true. Otherwise stop() must be called
+    explicitly. Defaults to 1.
+
+  slow
+    The number of seconds to sleep after each call to any
+    Test::WWW::Selenium method. This is useful for slowing down tests if you
+    are watching them run in a browser. Defaults to 0.
+
+  stash
+    A HashRef of saved values. This behaves similar to the Catalyst stash.
+
+METHODS
+  load_data( $file )
+    Returns a data structure from $file. $file must have valid Perl syntax.
+
+    This method is for use with data driven tests. It helps you to separate
+    your Perl code from your test data.
+
+    Here is an example of what the contents of $file could look like:
+
+    ( { name => 'Name of my test', link => 'Click me', text => 'Ponies', },
+    { name => 'Test downloading stuff', link => 'Download', text =>
+    'Download worked', }, ... );
+
+  follow_link_ok( $locator, $test_description )
+    Returns $self.
+
+    This method performs a click_ok on the page element specified by
+    $locator and then does a wait_for_page_to_load(). $test_description is
+    optional. It will be set to something appropriate if you don't set it.
+
+  fill_form_ok( $form )
+    Returns $self.
+
+    $form must be a hashref that looks like this:
+
+        $selenium->fill_form_ok(
+            { select => { locator => value, ... },
+              input  => { locator => value, ... },
+            }
+        );
+
+    The 'select' key indicates dropdown menus that will be selected. The
+    'input' key indicates text input, hidden input, checkboxes, and radio
+    buttons.
+
+    The form is not submitted.
+
+  submit_form_ok( $form )
+    Returns $self.
+
+    $form must be a hashref that looks like this:
+
+        $selenium->submit_form_ok(
+            { select => { locator => value, ... },
+              input  => { locator => value, ... },
+              click  => 'locator', # or 'submit' instead of 'click'
+            }
+        );
+
+    $form is simply passed to fill_form_ok(). Afterwards submit_form_ok()
+    looks for 2 keys to process: 'click' and 'submit'. The form is submitted
+    via a click on page element indicated by 'locator' when 'click' is used.
+    The form is submitted without a click when 'submit' is used. This is
+    useful for forms without submit buttons.
+
+  wait_for_jquery_ok()
+    Returns $self.
+
+    This blocks until jQuery.active returns false.
+
+  jquery_select_ok($locator, $menu_option)
+    Returns $self.
+
+    $locator should point to a dropdown menu on the page. This method will
+    select the $menu_option from the dropdown. Then it will call
+    wait_for_jquery().
+
+  select_and_page_load_ok($locator, $menu_option)
+    Returns $self.
+
+    $locator should point to a dropdown menu on the page. This method will
+    select the $menu_option from the dropdown. Then it will call
+    wait_for_page_to_load().
+
+  jquery_click_ok($locator, $menu_option)
+    Returns $self.
+
+    Click whatever is located at $locator. Then wait for jquery to finish by
+    calling wait_for_jquery().
+
+  stash_text( $locator => $key )
+    Returns $self.
+
+    Retrieves the value of $locator from selenium and stores it in the stash
+    under the name $key.
+
+  stash_location( $key )
+    Returns $self.
+
+    Retrieves the location from selenium and stores it in the stash under
+    the name $key.
+
+  from_stash( $key )
+    Returns a value from the stash.
+
+  stash( $value => $key )
+    Returns $self.
+
+    Saves $value to the stash under the name $key.
+
+  note( $msg )
+    Returns $self.
+
+    calls Test::Most::note($msg);
+
+  is_text_not_present_ok( $text )
+    Returns $self.
+
+    The opposite of is_text_present_ok().
+
+  note_line( $msg )
+    Outputs an underlined message, useful for dividing up test output. If no
+    message specified, then just prints the separator line.
+
+  download_file_ok($locator)
+    Parses the href attribute from a link on the current page. Downloads
+    that url via javascript's XMLHttpRequest. Checks that response status is
+    200.
+
+  change_speed($seconds)
+    This just updates the slow() attribute. The only difference is that it
+    returns $self so that you can do method chaining.
+
+ENVIRONMENT VARIABLES
+    The following is a list of environment variables that affect the
+    behavior of this library. Each corresponds to an attribute (see the
+    ATTRIBUTES section).
+
+  SELENIUM_HOST
+  SELENIUM_PORT
+  SELENIUM_BROWSER
+  SELENIUM_BROWSER_URL
+  SELENIUM_TIMEOUT
+  SELENIUM_AUTOSTOP
+  SELENIUM_SLOW
+AUTHOR
+    Eric Johnson <kablamo at iijo dot nospamthanks dot org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Eric Johnson.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

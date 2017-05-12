@@ -1,0 +1,10 @@
+Revision history for Perl extension Tie::GHash.
+
+0.12 Sat Jul  7 22:30:15 BST 2001
+	- merged in patch by Richard Clamp to allow FIRSTKEY and
+	NEXTKEY to work (so you can now iterative over the hash, which
+	is somewhat more useful)
+
+0.10 Thu Jun 14 21:46:58 BST 2001
+	- created and released first version
+

@@ -1,0 +1,27 @@
+# this tests simple variable definition and substitution, in particular
+# testing the DEFINE directive.
+# Expected text is shown in (parenthesis).
+
+
+# single value definition
+%% DEFINE name=MetaText %%
+%%name%%
+--
+%% name %%
+--
+%% name other_junk_should_be_ignored %%
+--
+pre-directive %% name %%
+--
+%% name %% post-directive
+--
+pre-directive %% name %% post-directive 
+--
+pre %% name %% mid %% name %% post
+--
+%%
+	name
+%%
+--
+%% name and more stuff just hanging about %%
+==

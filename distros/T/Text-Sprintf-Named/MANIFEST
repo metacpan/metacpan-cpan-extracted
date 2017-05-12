@@ -1,0 +1,21 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+TODO
+inc/Test/Run/Builder.pm
+lib/Text/Sprintf/Named.pm
+t/00-load.t
+t/01-use.t
+t/02-override-param-retrieval.t
+t/03-incomplete.t
+t/04-procedural-iface.t
+t/boilerplate.t
+t/cpan-changes.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t

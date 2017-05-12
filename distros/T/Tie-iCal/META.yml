@@ -1,0 +1,23 @@
+---
+abstract: 'Tie iCal files to Perl hashes'
+author:
+  - 'Blair Sutton <bsdz@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-iCal
+provides:
+  Tie::iCal:
+    file: lib/Tie/iCal.pm
+    version: 0.15
+requires:
+  Tie::File: 0.97
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.15

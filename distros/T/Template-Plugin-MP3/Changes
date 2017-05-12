@@ -1,0 +1,19 @@
+# ======================================================================
+#                      --- Template::Plugin::MP3 ---
+# ======================================================================
+
+# ----------------------------------------------------------------------
+# Version 1.02                                            June 23,  2003
+# ----------------------------------------------------------------------
+* Maintenance/bugfix release -- Updated docs to do reflect the actual
+  behavior of the module.  Thanks to Enrico Sorcinelli
+  <enrico@sorcinelli.it> for the catch.
+
+* Added SIGNATURE and META.yml files to the distribution.
+
+# ----------------------------------------------------------------------
+# Version 1.01                                         November 7,  2002
+# ----------------------------------------------------------------------
+* Bugfix release -- Fixed some uninitialized variable warnings, thanks
+  to Doug Gorley <douggorley@shaw.ca>.
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Tk::LineNumberText.
+
+0.5  Sun Nov 14 20:19:01 2004
+	- complete re-write using a Canvas instead of a ROText
+        - see POD for new/changed functionality
+        - this release is NOT backwards compatible
+        - you have not missed any releases - v0.2 through v0.4
+          were never uploaded
+
+0.1  Sun Jan 25 15:20:24 2004
+	- original version; created by h2xs 1.22 with options
+		-X -v0.1 -n Tk::LineNumberText
+

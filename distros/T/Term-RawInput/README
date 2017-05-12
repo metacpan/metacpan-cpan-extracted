@@ -1,0 +1,62 @@
+NAME
+    Term::RawInput - A simple drop-in replacement for <STDIN> in scripts
+    with the additional ability to capture and return the non-standard keys
+    like 'End', 'Escape' [ESC], 'Insert', etc.
+
+SYNOPSIS
+       use Term::RawInput;
+
+       my $prompt='PROMPT : ';
+       my ($input,$key)=('','');
+       ($input,$key)=rawInput($prompt,0);
+
+       print "\nRawInput=$input" if $input;
+       print "\nKey=$key\n" if $key;
+
+       print "Captured F1\n" if $key eq 'F1';
+       print "Captured ESCAPE\n" if $key eq 'ESC';
+       print "Captured DELETE\n" if $key eq 'DELETE';
+       print "Captured PAGEDOWN\n" if $key eq 'PAGEDOWN';
+
+DESCRIPTION
+    I needed a ridiculously simple function that behaved exactly like
+    $input=<STDIN> in scripts, that captured user input and and populated a
+    variable with a resulting string. BUT - I also wanted to use other KEYS
+    like DELETE and the RIGHT ARROW key and have them captured and returned.
+    So I really wanted this:
+
+    my $prompt='PROMPT : '; ($input,$key)=rawInput($prompt,0);
+
+    ... where I could test the variable '$key' for the key that was used to
+    terminate the input. That way I could use the arrow keys to scroll a
+    menu for instance.
+
+    I looked through the CPAN, and could not find something this simple and
+    straight-forward. So I wrote it. Enjoy.
+
+    The second argument to rawInput() is optional, and when set to 1 or any
+    positive value, returns all keys instantly, instead of waiting for
+    ENTER. This has turned out to be extremely useful for creating command
+    environment "forms" without the need for curses. See Term::Menus and/or
+    Net::FullAuto for more details.
+
+    NOTE: When the second argument is 0 or not used, BACKSPACE and TAB are
+    not captured - but used to backspace and tab. DELETE is captured. Also,
+    no Control combinations are captured - just the non-standard keys
+    INSERT, DELETE, ENTER, ESC, HOME, PAGEDOWN, PAGEUP, END, the ARROW KEYS,
+    and F1-F12 (but *NOT* F1-F12 with Windows Version of Perl - especially
+    Strawberry Perl [ This is a limitation of the Term::ReadKey Module. ];
+    but, works with Cygwin Perl!). All captured keys listed will terminate
+    user input and return the results - just like you would expect using
+    ENTER with <STDIN>.
+
+AUTHOR
+    Brian M. Kelly <Brian.Kelly@fullautosoftware.net>
+
+COPYRIGHT
+    Copyright (C) 2011-2014 by Brian M. Kelly.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License.
+    (http://www.gnu.org/licenses/agpl.html).
+

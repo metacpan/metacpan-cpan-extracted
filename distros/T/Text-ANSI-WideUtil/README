@@ -1,0 +1,112 @@
+SYNOPSIS
+
+     use Text::ANSI::WideUtil qw(
+                               ta_mbpad
+                               ta_mbsubstr
+                               ta_mbswidth
+                               ta_mbswidth_height
+                               ta_mbtrunc
+                               ta_mbwrap
+                              );
+    
+     # calculate visual width of text if printed on terminal (can handle Unicode
+     # wide characters and exclude the ANSI color codes)
+     say ta_mbswidth("\e[31mred");  # => 3
+     say ta_mbswidth("\e[31m红色"); # => 4
+    
+     # ditto, but also return the number of lines
+     say ta_mbswidth_height("\e[31mred\n红色"); # => [4, 2]
+    
+     # wrap text to a certain column width, handle ANSI color codes
+     say ta_mbwrap(...);
+    
+     # pad (left, right, center) text to a certain width
+     say ta_mbpad(...);
+    
+     # truncate text to a certain width while still passing ANSI color codes
+     say ta_mbtrunc(...);
+    
+     # get substring, like ta_substr()
+     my $substr = ta_mbsubstr("...", $pos, $len);
+    
+     # return text but with substring replaced with replacement
+     say ta_mbsubstr("...", $pos, $len, $replacement);
+
+DESCRIPTION
+
+    This module contains the wide-character variant (ta_mb*()) for some
+    functions in Text::ANSI::Util. It is split so only this module requires
+    Text::WideChar::Util and Text::ANSI::Util can be kept slim.
+
+FUNCTIONS
+
+ ta_mbpad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
+
+    Pad <$text> to $width. Like ta_pad() but it uses ta_mbswidth() to
+    determine visual width instead of ta_length(). See documentation for
+    ta_pad() for more details on the other arguments.
+
+ ta_mbtrunc($text, $width) => STR
+
+    Truncate $text to $width. Like ta_trunc() but it uses ta_mbswidth() to
+    determine visual width instead of ta_length().
+
+ ta_mbswidth($text) => INT
+
+    Return visual width of $text (in number of columns) if printed on
+    terminal. Equivalent to
+    Text::WideChar::Util::mbswidth(ta_strip($text)). This function can be
+    used e.g. in making sure that your text aligns vertically when output
+    to the terminal in tabular/table format.
+
+    Note that ta_mbswidth() handles multiline text correctly, e.g.:
+    ta_mbswidth("foo\nbarbaz") gives 6 instead of 3-1+8 = 8. It splits the
+    input text first with /\r?\n/ as separator.
+
+ ta_mbswidth_height($text) => [INT, INT]
+
+    Like ta_mbswidth(), but also gives height (number of lines). For
+    example, ta_mbswidth_height("西爪哇\nb\n") gives [6, 3].
+
+ ta_mbwrap($text, $width, \%opts) => STR
+
+    Like ta_wrap(), but it uses ta_mbswidth() to determine visual width
+    instead of ta_length().
+
+    Performance: ~300/s on my Core i5 1.7GHz laptop for a ~1KB of text
+    (with zero to moderate amount of color codes). As a comparison,
+    Text::WideChar::Util's mbwrap() can do about 650/s.
+
+ ta_mbsubstr($text, $pos, $len[ , $replacement ]) => STR
+
+    Like ta_substr(), but handles wide characters. $pos is counted in
+    visual width, not number of characters.
+
+FAQ
+
+ How do I truncate string based on number of characters instead of columns?
+
+    You can simply use ta_trunc() from Text::ANSI::Util even on text
+    containing wide characters. ta_trunc() uses Perl's length() which works
+    on a per-character basis.
+
+SEE ALSO
+
+    Text::ANSI::Util
+
+    Text::WideChar::Util
+
+    Term::ANSIColor
+
+    http://en.wikipedia.org/wiki/ANSI_escape_code
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 15:
+
+      Non-ASCII character seen before =encoding in
+      'ta_mbswidth("\e[31m红色");'. Assuming UTF-8
+

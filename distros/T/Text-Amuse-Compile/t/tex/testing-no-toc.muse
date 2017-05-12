@@ -1,0 +1,11 @@
+#title Testing *for* me
+#author Second author
+#date 2014
+#lang sr
+#hyphenation a-no-ther te-st
+
+This is just a test
+
+àààà test ć đ ÀÀÀÀ TEST Ć Đ 
+
+Another test

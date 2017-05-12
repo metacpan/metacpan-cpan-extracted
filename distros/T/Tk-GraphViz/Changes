@@ -1,0 +1,52 @@
+Revision history for Perl extension Tk::GraphViz.
+
+1.01  Mon Dec  8 21:32:21 MST 2008
+	- Added 'folder' and 'component' node shapes (Jogi Kuenstner)
+
+1.00  Sat Mar 29 12:38:22 MDT 2008
+	- Use layout_cmd as an array so shell isn't require to
+	  exec it (Reiner Post);
+	- Fixed used of fillcolor vs color for filled nodes (Phil Kasten);
+	- Added missing 'invtrapezium' shape (Charles Minc)
+
+0.90  Thu Apr 09 23:27:55 MDT 2007
+	- Fixes for zooming
+	- Changes to support fontcolor, arrowhead/arrowtail (Tobias Lorenz)
+	
+0.15  Thu Jun 23 11:12:20 MDT 2005
+	- Fixed issue with stopping dot subprocess already in progress
+	
+0.14  Thu Apr 21 14:12:58 MDT 2005
+	- Use '>&STDERR' with IPC::Open3::open3()
+	
+0.13  Tue Feb 15 22:24:15 MST 2005
+	- Handle negative font sizes (John Cerney)
+	- Better DOS/Win support (John Cerney)
+
+0.11  Thu Sep 16 15:46:18 PDT 2004
+	- use reaper to handle child processes
+
+0.10  Wed Feb  5 10:06:00 2003
+	- asynchronous layout mode
+
+0.07  Thu Sep 18 09:53:16 2003
+	- Minor clean-up of some warnings and such
+	- Doc updates
+
+0.06  Wed Mar  5 23:54:55 2003
+	- Supports more shape types, still not all of them though
+	- Added options to show() to allow use of neato for layout
+
+0.05  Tue Mar  4 21:27:39 2003
+	- Added -keypad bindings option
+        - Implemented record nodes, font scaling, bezier curves (John Cerney)
+
+0.04  Tue Feb 25 21:46:45 2003
+	- A few minor enhancements to existing functionality
+
+0.03  Wed Feb  5 10:06:00 2003
+	- Original version packaged for submission to CPAN
+
+0.01  Sat Jan 25 14:28:47 2003
+	- Original version packaged for submission to CPAN
+

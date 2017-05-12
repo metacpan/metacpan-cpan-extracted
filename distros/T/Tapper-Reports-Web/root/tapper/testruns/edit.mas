@@ -1,0 +1,14 @@
+<%args>
+$testrun
+$form
+$message => ''
+</%args>
+
+% if ($message) {
+<h4><% $message %></h4>
+<p><a href="/tapper/testruns/id/<% $testrun->id %>">Back to testrun</a></p>
+% } else {
+<h3>Edit preconditions for testrun <% $testrun->id %></h3>
+<% $form|n %>
+<p><a href="/tapper/testruns/id/<% $testrun->id %>">Cancel</a></p>
+% }

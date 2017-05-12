@@ -1,0 +1,13 @@
+Changes
+lib/Template/Recall.pm
+lib/Template/Recall/Base.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/1.htmt
+t/simple-usage.t
+t/template-from-str.t
+t/Template-Recall.t
+t/trim.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,59 @@
+---
+abstract: 'Parser for Test::Base format'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Digest::MD5: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-TestBase
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Section::TestBase:
+    file: lib/Data/Section/TestBase.pm
+    version: '0.13'
+  Test::Base::Less:
+    file: lib/Test/Base/Less.pm
+    version: '0.13'
+  Test::Base::Less::Filter:
+    file: lib/Test/Base/Less.pm
+  Text::TestBase:
+    file: lib/Text/TestBase.pm
+    version: '0.13'
+  Text::TestBase::Block:
+    file: lib/Text/TestBase/Block.pm
+requires:
+  Class::Accessor::Lite: '0.05'
+  Exporter: '0'
+  Test::Builder::Module: '0'
+  Test::More: '0.98'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Text-TestBase/issues
+  homepage: https://github.com/tokuhirom/Text-TestBase
+  repository: git://github.com/tokuhirom/Text-TestBase.git
+version: '0.13'
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Hiroki Honda <cside.story@gmail.com>'
+  - 'Nathan Glenn <nathan.g.glenn@atr-trek.co.jp>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

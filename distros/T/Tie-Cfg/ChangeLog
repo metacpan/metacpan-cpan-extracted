@@ -1,0 +1,24 @@
+0.32 -- Added 'CHANGE' attribute to TIE method of Tie::Cfg.
+
+0.31 -- test.pl: Sorry! A strange character came in front of #!
+	locking mechanism inherited from LockFile::Simple
+
+0.30 -- .ini support is default now. Also recurrent sections are possible:
+		$ini{"key"}{"sub1"}{"sub2"}{"sub3"}{"par"}="value", will be in the configuration file as
+		
+			[key.sub1.sub2.sub3]
+			par=value
+			
+			
+
+0.20 -- .ini support changed, for %ini, $ini{"section.key"} has been changed to $ini{"section"}{"key"}
+
+
+0.14 -- .ini files with arrays
+
+0.13 -- ChangeLog needed updating.
+
+0.12 -- .ini file support added.
+
+0.10 -- Initial version
+

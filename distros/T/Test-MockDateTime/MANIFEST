@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Test/MockDateTime.pm
+t/0-basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

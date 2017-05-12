@@ -1,0 +1,10 @@
+Revision history for Test-Reporter-Transport-Legacy
+
+1.59      2011-07-21 10:37:32 America/New_York
+
+  - Fix test bugs and prerequisite versions
+
+1.58      2011-07-19 09:37:13 America/New_York
+
+  - Transport modules split out from Test-Reporter-1.57
+

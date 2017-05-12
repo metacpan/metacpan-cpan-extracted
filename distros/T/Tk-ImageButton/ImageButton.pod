@@ -1,0 +1,124 @@
+
+=head1 NAME
+
+Tk::ImageButton - Customizable/Graphical button
+
+=head1 SYNOPSIS
+
+	use Tk::ImageButton;
+	...
+	$b = $MW->ImageButton(	-imagedisplay  => "Tk::Photo variable",
+				-imageover     => "Tk::Photo variable",
+				-imageclick    => "Tk::Photo variable",
+				-imagedisabled => "Tk::Photo variable",
+				-state         => 'normal/disabled',
+				-command       => [ sub {a callback} ]
+	)->pack();
+	...
+	MainLoop;
+
+=head1 DESCRIPTION
+
+B<ImageButton> allows the user to have a customised graphical button on
+their GUI. 4 separate images can be used, one for the normal display, 
+one when the mouse is over the button, one for when the mouse is clicked
+over the button and finally one for when the button is disabled.
+
+=head2 Images
+
+There are 4 button states available.
+1. Button without interaction - this is the default and is set by using
+   the -imagedisplay option and passing a Tk::Photo object as it's
+   argument. This image is displayed when the button is not in use.
+2. Button with mouse over - this is when the mouse has been moved over
+   the button. It is set by calling the -imageover option and passing
+   a Tk::Photo object as it's argument.
+3. Button when mouse click - this is when the left mouse button is clicked
+   over the button. It is set by calling the -imageclick option and
+   passing a Tk::Photo object as it's argument.
+4. Button disabled - this is when the button has been disabled. It is set
+   by calling the -imagedisabled option and passing a Tk::Photo object as
+   it's argument.
+
+When the options have been set, the widget will take care of changing the
+displayed images when needed.
+
+=head2 State / Command
+
+As with usual buttons you can enable and disable them. To enable a button
+(this is the default setting) you call the -state option and pass 'normal'
+as the argument. To disable a button, call the -state option with
+'disabled' as the argument.
+
+=head1 OPTIONS
+
+B<ImageButton> accepts all of the options that the B<Label> widget accepts.
+In addition, the following options are recognised.
+
+=over 4
+
+=item B<-imagedisplay>
+
+This sets the image to be displayed when the button is not in use. It takes
+a Tk::Photo object as it's argument. It's default is 0.
+
+=item B<-imageover>
+
+This sets the image to be displayed when the mouse pointer moves over the
+button. It takes a Tk::Photo object as it's argument. It's default is 0.
+
+=item B<-imageclick>
+
+This sets the image to be displayed when the left mouse button is clicked
+over the button. It takes a Tk::Photo object as it's argument.
+It's default is 0.
+
+=item B<-imagedisabled>
+
+This sets the image to be displayed when the button is disabled. It takes
+a Tk::Photo object as it's argument. It's default is 0.
+
+=item B<-state>
+
+Can be one of 'normal' or 'disabled', as per usual buttons. If the button
+is disabled, as per usual button widgets, the associated callback/-command
+will not be executed. It's default is 'normal', I.E. enabled.
+
+=item B<-command>
+
+As with any -command, this takes a subroutine to call when the button widget
+is clicked.
+
+=back
+
+B<NB:> If you wish to change and ImageButton object so that a previously set
+    image is no longer used, make sure you re-set the required option to 0.
+    B<E.G.> $ib->configure(-imageover => 0);
+
+=head1 EXAMPLES
+
+See the ib_test.pl script included with this distribution.
+
+=head1 NOTES
+
+The user will need to load in the images themselves, into Tk::Photo objects
+and then pass these objects to ImageButton.
+
+=head1 CAVEATS
+
+None.
+
+=head1 BUGS
+
+None known at this time.
+
+=head1 AUTHOR
+
+B<Dave Hickling> dhickling@eidosnet.co.uk
+
+=head1 HISTORY
+
+First version written on 9/8/2002, complete overhaul written on 16/6/2004.
+
+=cut
+

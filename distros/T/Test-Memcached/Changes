@@ -1,0 +1,19 @@
+Changes
+=======
+
+0.00004 - 09 Nov 2010
+    * Fix problems running the test under root
+      (http://d.hatena.ne.jp/okamuuu/20101107/1289104446). Next time, I would
+      appreciate it you notified me ;)
+
+0.00003 - 27 Aug 2010
+    * Add memcached_version, memcached_major_version, memcached_minor_version, 
+      and memcached_micro_version
+    * Fix port detection
+
+0.00002 - 23 Feb 2010
+    * Localize $? upon cleanup
+    * Tweak tests
+    
+0.00001 - 04 Feb 2010
+    * Initial release

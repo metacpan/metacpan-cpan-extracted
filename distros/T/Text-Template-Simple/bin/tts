@@ -1,0 +1,286 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Spec;
+use File::Basename;
+use Getopt::Long;
+use Data::Dumper;
+use Scalar::Util qw( blessed );
+use Carp         qw( croak );
+
+our $VERSION = '0.12';
+our %OPT;
+
+local $| = 1;
+
+BEGIN {
+    GetOptions( \%OPT => qw(
+        e=s
+        version
+        http-header
+        help
+
+        debug=i
+        debug-tokens
+
+        new-cache
+        new-capture-warnings
+        new-safe
+        new-stack
+        new-strict
+        new-verbose_errors
+        new-warn-ids
+        new-monolith
+
+        new-add-args=s@
+        new-cache-dir=s
+        new-delimiters=s@
+        new-header=s
+        new-include-paths=s@
+        new-iolayer=s
+        new-pre-chomp=s
+        new-post-chomp=s
+
+        compile-param=s@
+        compile-id=s
+        compile-map-keys
+        compile-chkmt
+    ));
+
+    $OPT{file} = shift;
+
+    if ( $OPT{'debug-tokens'} ) {
+        *Text::Template::Simple::Tokenizer::DEBUG_TOKENS =
+        *Text::Template::Simple::Tokenizer::DEBUG_TOKENS = sub { 1 };
+    }
+}
+
+use Text::Template::Simple;
+use Text::Template::Simple::Constants qw( EMPTY_STRING );
+
+BEGIN {
+    Text::Template::Simple->DEBUG( $OPT{debug} ) if $OPT{debug};
+}
+
+my %CONTROLLER; # registry
+
+run( %OPT ) if not caller;
+
+sub run {
+    my %opt  = @_;
+
+    if ( $opt{help} ) {
+        require Pod::Usage;
+        Pod::Usage::pod2usage(1);
+    };
+    usage() if $opt{version};
+
+    my $file = delete $opt{file};
+    my %p    = parse_arg( %opt );
+    my $cp   = delete($p{compile}->{param}) || [];
+    my $in   = exists $p{e} ? ( $p{e} || croak 'No code specified for -e' )
+             :                ( $file || croak 'No input file specified'  )
+             ;
+
+    my $TTS = {
+        header => {
+            charset => EMPTY_STRING,
+            type    => 'text/html',
+        },
+    };
+
+    $p{new}->{add_args} ||= [];
+    $p{new}->{header}   ||= EMPTY_STRING;
+    unshift @{ $p{new}->{add_args} }, $TTS;
+    $p{new}->{header} = q{my $}.q{TTS = shift;} . $p{new}->{header};
+
+    my $t = object($file, \%p );
+
+    my $rv;
+    my $ok = eval {
+        $rv = $t->compile(
+                exists $p{e} ? [ STRING => $in ] : $in,
+                $cp,
+                %{ $p{compile} }
+            );
+    };
+    my $error = $@;
+    my $head  = EMPTY_STRING;
+    if ( $p{'http-header'}  ) {
+        require CGI;
+        $head = CGI::header(
+                    -charset => $TTS->{header}{charset},
+                    -type    => $TTS->{header}{type},
+                );
+    }
+    binmode STDOUT, ':utf8' if lc $TTS->{header}{charset} eq 'utf8';
+    $rv = "Error in template: $error" if $error;
+    croak $rv if $error && ! $head;
+
+    my $pok = print $head.$rv;
+    return 1;
+}
+
+sub object {
+    my($file, $p) = @_;
+    my $global    = Text::Template::Simple->new( %{ $p->{new} } );
+    my $path      = $global->io->file_exists( $file );
+    my $t;
+
+    if ( $path ) {
+        my $dir  = dirname  $path;
+        my $base = basename $path;
+        my $c    = File::Spec->catfile( $dir, $base . '.pl' );
+
+        $t = exists $CONTROLLER{ $c } ?       $CONTROLLER{     $c }->{handler}
+           :     -e $c                ? _object_from_file( $p, $c )
+           : undef;
+    }
+    return $t || $global;
+}
+
+sub _object_from_file {
+    my($p, $controller) = @_;
+    my $f = $controller;
+    ## no critic (ProhibitEnumeratedClasses)
+    (my $pkg   = 'TTS'.$controller) =~ s{[^a-zA-Z0-9_]}{_}xmsg;
+    (my $file3 = $controller      ) =~ s{ "           }{\\"}xmsg;
+
+    my $h = eval qq{package $pkg; require "$controller";};
+    croak "Error compiling controller: $@" if $@;
+
+    my $cref = $pkg->can('tts_controller')
+                    || croak 'Controller present but does not '
+                            .'implement a tts_controller() function';
+    my $o = $cref->( %{ $p->{new} } );
+
+    croak 'Controller returned non-object'
+        if ! ref $o;
+    croak 'Controller returned a non-blessed reference'
+        if ! blessed $o;
+    croak 'Controller returned a non-Text::Template::Simple object'
+        if ! $o->isa('Text::Template::Simple');
+
+    $CONTROLLER{ $controller } = {
+        handler => $o,
+        package => $pkg,
+        date    => time,
+    };
+    return $CONTROLLER{ $controller }->{handler};
+}
+
+sub parse_arg {
+    my %original = @_;
+    my %param    = ( new => {}, compile => {} );
+    foreach my $key ( keys %original ) {
+        if ( $key =~ m{ \A (new|compile) \- (.*) \z }xms ) {
+            my $id = $1;
+            (my $name = $2) =~ s{\-}{_}xmsg;
+            $param{ $id }->{ $name } = delete $original{ $key };
+        }
+    }
+
+    $param{ $_ } = delete $original{ $_ } for keys %original;
+    local_conf( \%param );
+    return %param;
+}
+
+sub local_conf {
+    return if 1; # TODO: set defaults from file
+
+    my $p = shift;
+    require File::HomeDir;
+    my $CONF = File::Spec->catfile( File::HomeDir->my_home, '.tts' );
+    return if ! -e $CONF;
+
+    open my $FH, '<', $CONF or croak "Can not open $CONF: $!";
+    my $raw = do { my $rv; local $/; $rv = <$FH>; $rv };
+    close $FH or croak "Unable to close filehandle: $!";
+    return;
+}
+
+sub usage {
+    #require Config; $Config::Config{archname}
+    local $SIG{__WARN__} = sub {
+        my $w = shift;
+        return if $w =~ m{Sys/Info}xms; # noise
+        warn "$w\n";
+    };
+    my $info = eval { require Sys::Info; return Sys::Info->new; };
+    my $os   = $info ? $info->os->name( edition => 1 )  : $^O;
+    my $perl = $info ? $info->perl_long                 : $];
+    printf <<'USAGE', basename($0), $VERSION, $os, $perl or croak $!;
+Bah-weep-Graaaaagnah wheep ni ni bong!
+I am %s v%s running under %s with perl %s
+USAGE
+    exit 0;
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+C<tts> - Command line interface to Text::Template::Simple
+
+=head1 SYNOPSIS
+
+You have to either pass a file name or pass C<-e> with a template string.
+
+    tts -e 'My perl is at <%= $^X %>'
+    tts /home/burak/template.tts
+
+=head1 OPTIONS
+
+    -e                      String template to execute
+    --http-header           Print a HTTP Header?
+    --help                  Display help
+
+    --debug                 Integer. Sets the debuggging level
+    --debug-tokens          Enable token debugging?
+
+    --new-cache             Flag.
+    --new-capture-warnings  Flag.
+    --new-safe              Flag.
+    --new-stack             Flag.
+    --new-strict            Flag.
+    --new-verbose_errors    Flag.
+    --new-warn-ids          Flag.
+    --new-monolith          Flag.
+
+    --new-add-args          Add global arguments
+    --new-cache-dir         Path to cache directory
+    --new-delimiters        Sets the delimiters
+    --new-header            Injects a default code onto the template
+    --new-include-paths     List of include paths
+    --new-iolayer           Perl I/O layer
+    --new-pre-chomp         Global pre-chomp
+    --new-post-chomp        Global post-chomp
+
+    --compile-param         List of parameters to pass to compiler
+    --compile-id            Set the template cache id manually
+    --compile-map-keys      Flag. Enable map keys interface?
+    --compile-chkmt         Flag. Check modification time of the template?
+
+=head1 DESCRIPTION
+
+This a command line front end to L<Text::Template::Simple>.
+
+=head1 AUTHOR
+
+C<Burak Gursoy>, E<lt>burakE<64>cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2004-2012 C<Burak Gursoy>. All rights reserved.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself, either Perl version 5.12.0 or, 
+at your option, any later version of Perl 5 you may have available.
+
+=cut

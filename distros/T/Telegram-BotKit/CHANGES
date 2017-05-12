@@ -1,0 +1,53 @@
+==================================================
+Changes from 2016-03-18 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.03 at 2017-03-18 21:42:08 +0000
+-----------------------------------------
+
+  Change: ad6cd39bf92ba46dbcf2f14bd8c2596de098bb8a
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-19 00:40:18 +0000
+
+    Added support of utf8 emoji symbols 
+
+  Change: b424c143edf18230b3666c2a7bd8ba64c7a4d39e
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-19 00:20:41 +0000
+
+    Added utf8 pragma 
+
+  Change: 2493a1843989668cf12644670bbcc07fd8100cd1
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-19 04:27:20 +0000
+
+    Fixed docs 
+
+  Change: 2b09955058b7f11aa8dd3f6d5535af0f3836a4d5
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-19 04:12:31 +0000
+
+    Added BotKit.pm - superclass 
+
+  Change: 7c98377eb9d62adb557498720f9b8ab63192f19f
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-13 13:08:35 +0000
+
+    Fixed bugs before initial release on CPAN 
+
+  Change: a1530ff109abc942dcb47c6b1960dfeaa4852c49
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-13 12:00:21 +0000
+
+    Added README.md 
+
+  Change: cde1dfd8913c33846864248379b2dd2fc7cb47f2
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-13 11:54:49 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

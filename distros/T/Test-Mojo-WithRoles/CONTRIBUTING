@@ -1,0 +1,14 @@
+This project is managed via App::ModuleBuildTiny and is intended for installation from the CPAN release.
+
+The release process is as follows
+
+<<update $VERSION>>
+<<update Changes>>
+podselect <<path/to/primary.pm>> > README.pod
+git commit -a -m '<<prepare for release commit message>>'
+prove -l
+mbtiny dist
+mojo cpanify -u <<USERNAME>> -p <<PASSWORD>> <<tarball>>
+git tag -a <<$VERSION>> -m '<<release message, typically "$VERSION (bugfix)? release">>'
+git push --tags origin master
+

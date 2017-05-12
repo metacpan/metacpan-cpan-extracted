@@ -1,0 +1,15 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<div class="instructions_title">Viewing instructions $file_name</div>
+
+<div id="instructions_contents_div" class="file_contents"><pre>$file_contents</pre></div>
+<form name="instructions_form" action="/instructions.html/$file_name" method="POST">
+  <input type=hidden name="_method" value="PUT">
+  <textarea name="file_contents" rows=10 cols=92>$file_contents</textarea>
+  <br>
+  <input type=submit value="Update Instructions" name=update />
+</form>
+
+  
+
+<include TaskForest::REST::PassThrough /foot.html />

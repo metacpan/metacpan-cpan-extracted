@@ -1,0 +1,17 @@
+0.03 2015-10-15T22:03:52+02:00
+ - Clean Error::Pure structure after error in tests.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Rewrite modules in SEE ALSO section to proper Tasks.
+ - Sort tests.
+ - Update Module::Install to 1.16 version.
+
+0.02 2015-03-19T11:02:24+01:00
+ - Add comments to tests.
+ - Add missing tests for 'Test::NoWarnings'.
+ - Rename tests for put to form ??-put-precision.t .
+ - Update LICENSE AND COPYRIGHT section in doc to my standard.
+ - Update copyright years.
+
+0.01 2014-11-05T07:40:20+01:00
+ - First version.

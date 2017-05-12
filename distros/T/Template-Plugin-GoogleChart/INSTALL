@@ -1,0 +1,28 @@
+This is the Perl distribution Template-Plugin-GoogleChart.
+
+## Installation
+
+Template-Plugin-GoogleChart installation is straightforward. If your CPAN shell
+is set up, you should just be able to do
+
+    % cpan Template::Plugin::GoogleChart
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Template-Plugin-GoogleChart documentation is available as in POD. So you can
+do:
+
+    % perldoc Template::Plugin::GoogleChart
+
+to read the documentation online with your favorite pager.
+
+Marcel Gruenauer

@@ -1,0 +1,12 @@
+This is a Task distribution.  See http://search.cpan.org/dist/Task
+
+This distribution will require all distributions maintained by the Perl Email
+Project.  http://emailproject.perl.org/
+
+Installing this properly without using CPAN.pm or CPANPLUS will be a pain.  You
+can run:
+
+  perl Makefile.PL
+  make # or your make tool of choice
+
+This will list missing dependencies.  It will not install them.

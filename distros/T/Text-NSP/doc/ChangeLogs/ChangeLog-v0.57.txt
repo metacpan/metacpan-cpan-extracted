@@ -1,0 +1,72 @@
+
+Changes from NSP version 0.55 to 0.57
+-------------------------------------
+
+Amruta Purandare, pura0010@umn.edu
+Ted Pedersen, tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+July 3, 2003
+
+Utils
+-----
+
+(1)     Total rewrite of Utils/kocos.pl to make it more efficient 
+	and reliable. kocos allows a user to find Kth order 
+        co-occurrences of a given target word or target regexes.
+	The process of identifying "cycles" in the co-occurrence
+        chains has been significantly improved, and problems that
+	existed in handling special characters such as . and ,
+        have been resolved. In addition kocos now only displays
+	the Kth order co-occurrences. Previously it displayed the
+	1st through Kth order co-occurrences. ADP.05
+
+(2)     Because of (1) program socs.pl has been removed from NSP.
+        It was provided in .55 as a fast alternative to kocos for
+	2nd order co-occurrences only. Since kocos is now much 
+	faster it is no longer needed and is superseded.
+
+(3)	Added Utils/combig.pl. This program converts output from count.pl 
+	such that bigrams are treated as unordered word pairs. count views 
+	a bigram "W1 W2" as W1 preceding W2, while combig.pl views bigram  
+	"W1 W2" as W1 and W2 occurring together in either order. 
+
+(4)     Added script/drivers for combig.pl (combig-script.sh).
+
+(5)     Changed version number of rank.pl from 0.5 to 0.01 to make 
+	it consistent with current numbering scheme. rank.pl has 
+	not been modified since the very early days of BSP. 
+
+count.pl
+--------
+(1)     display value of --remove in --extended output TDP.57.1
+
+(2)     make sure source and destination file exist TDP.57.2
+
+(3)     minor rewording of warning/error messages
+
+statistic.pl
+------------
+
+(1)     make sure source and destination file exist TDP.57.3
+
+(2)     minor re-wording of warning/error messages
+
+
+Testing
+-------	
+
+(1)     Added test cases for new Util combig.
+
+(2)     Added new tests cases for kocos.pl.
+
+(3)     Modified test case for count.pl --extended for TDP.57.1
+
+(4)     Modified test cases for count.pl and statistic.pl due to
+        rewording of warning and error messages. 
+
+
+[Ted - 07/03/2003]
+
+

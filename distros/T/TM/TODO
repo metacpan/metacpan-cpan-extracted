@@ -1,0 +1,233 @@
+TM::Serializable::CSV
+	- more DWImming: sub { $tm, record, adds tm fragment}, use &PRE to cleanup data
+	- serialize
+
+TM::Synchronizable::MapSphere
+	- document
+
+TM::*
+	- assert: proper VERSION
+	- assert: proper email
+	- assert: proper name
+	- assert: proper copyright
+	- test: coverage
+
+TM::Overview
+
+	- add: tutorial on virtual maps
+	- add: howto logging
+	- add: link to diagram of all packages
+	- add: diagram of data structure
+	- add: how to write a driver for source and drivers for filters?
+
+TM::FAQ
+
+	- add: how to get rid of infrastructure assocs?
+
+#-- base class ------------------------------------------------------------------------------
+
+TM:
+	- iterator for toplets and midlets
+	  $tm->forall_toplets (sub { ....},  [ query-spec ]);
+	  $tm->forall_maplets (sub { .... }, [ query-spec ]);
+
+	- differences between two maps
+
+	  more test cases
+	  does this work with assertions coming and going?
+
+	- equivalence of two maps
+
+	  if ($tm1->equivalent ($tm2))
+
+	- add: consolidate
+	  - clean duplicate subject indicators
+	  - remove unused topics?
+	  - remove unused variants
+	  - ?? collision of ids, do they remain??
+
+	- cleanup: match_forall
+	  - remove any predefined axes
+	  - add registration for axes
+	  - add iterators
+	  - exception on not defined axes (no fallback any longer)
+
+	- fix: generic match_forall
+		- works with undef role types? => exception
+		- works with 2 different players for one role?
+
+	  - toplets and maplets (tids are local identifiers)
+	  - maplets are special toplets
+
+	- add: tests for variants
+	- fix: variants according to TMDM are not any longer deeply nested?
+
+	- change: UUIDs for generated identifiers?
+	- TM::subtract
+
+TM::PSI:
+
+	- all predefined stuff as AsTMa map in __DATA__ ?
+	- tmdm PSI set? tmdm:subject
+	- test: replace with your own PSIs
+	- astma 1/2 PSI set? (data occ, uri occ) ???
+
+TM::Literal:
+
+	- doc: @@@@@@
+	- add: more functions
+
+TM::DM:
+	- test: works on virtual map?
+	- add: indices for characteristics, match
+
+TM::Index:
+	- docu: last index can be closed?
+	- docu: remove link to TM::Index
+
+TM::Utils:
+	- check: VERSION
+
+#-- drivers --------------------------------------------------------------------------------
+
+TM::Synchronizable:
+	- introduce delta_t for allowable time inconsistency
+	- default: 0
+
+TM::Serializable::XTM
+	- support 1.0, 1.1, 2.0
+	- load opera.xtm -> maps
+	- mergeMap
+
+TM::Serializable::JTM
+	- ????
+
+TM::Serializable::TMXML
+	- to be added (http://topicmaps.bond.edu.au/mda/internet/semantic-web/topicmaps/tmxml)
+
+TM::Serializable::CXTM
+	- to be added
+
+TM::Serializable::AsTMa:
+
+	- version 2.0 support
+	- parametrized:
+		which types to organize by
+		sorting
+		cluster (topic + all its assocs)
+
+TM::Synchronizable::MLDBM:
+	- doc: add SYNOPSIS
+	- test: locking ok?
+
+TM::ResourceAble::DBI
+	- to be added
+	- virtual map, based on DBI
+	 {
+	   my $tm = new TM::DBI (dbi => 'mysql:wherever', { some config });
+
+	- generic implementation, maybe tweak with config
+
+TM::MapSphere::NULL
+	- ephemeral mapsphere
+	- factorize from 09x.t
+
+TM::MapSphere::MLDBM
+	- persistent mapsphere
+	- factorize from 09x.t
+
+
+#-- Tau ------------------------------------------------------------------------------------
+
+TM::Tau::Federate
+	- implement it as subclass of TM::Tau::Filter
+	- docu
+	- test suite
+
+TM::Tau::Filter::QL
+	- to be added
+	- takes a TMQL query at constructor time
+	- produces a TS
+
+TM::Tau::Transactions
+	- to be added
+	- is a specialization of Federate
+	- modifications only go into the transactive map
+	- on commit changes are flushed
+	- on rollback transactive map is deleted
+
+	{
+	 my $tx = new TM::Tau::Transactions ($tm);
+	 $tx->assert...
+	 die ..... if ...
+	 $tx->commit; # merge changes into $tm
+         }
+	- consistency req's in $tm rule
+
+TM::Semantics
+
+	- to be re-added
+	- virtual map, reacts on changes
+
+#-- ------------------------------------------------------------------------------------
+
+TM::Analysis:
+	- add: derive high-level numbers 'coherence', 'balance' for QA
+	- optimize: clusters() slow
+	- test: works on virtual map?
+	- add: sanity test
+		- suspicious assoc types? is-related-to, is-associated-with
+		- type loops?
+		- unused topics?
+		- topics without chars?
+		- topics without subject identification?
+
+	- add: topics used as type, scope, assoc-type, role-type
+
+TM::Tree:
+	- test: works on virtual map?
+	- check: VERSION
+
+
+#-- mapsphere ------------------------------------------------------------------------------
+
+TM::MapSphere:
+	- help function to derive tree of maps (+ url + class + stats)
+	- clean up
+
+#-- TMQL -----------------------------------------------------------------------------------
+
+TM::QL
+
+	- doc: link to tutorial
+
+TM::QL::TS
+
+	- doc: @@@
+	- check: || implemented?
+	- check: semantics && exceptions
+		- lengths ok, widths ok
+
+TM::QL::PE
+
+	- add: optimization pe1 == pe1 ==> pe1
+
+#-- tm workbench ----------------------------------------------------------------------------
+
+tm
+
+	- add: persistent mapsphere
+		- configurable
+	- fix: how to avoid final DESTROY
+		- overload it?
+	- test: --source, --filter
+	- add: XML content, TS content
+
+	- tm-script
+		- tm ' ... * query > -' | xmllint --format -
+		- tm '- > -' converter different formats
+			- how to control details?
+			- comments
+		- tm '- * check_urls > -'
+			- tests URLs in map whether reachable
+

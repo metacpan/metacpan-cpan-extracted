@@ -1,0 +1,111 @@
+---
+abstract: 'an easy way to install lots of modules needed for testing'
+author:
+  - 'Gabor Szabo'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Test
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Browser::Open: '0.04'
+  Capture::Tiny: '0.24'
+  DBD::Mock: '1.45'
+  Data::Random: '0.11'
+  Devel::Cover: '1.15'
+  Devel::NYTProf: '5.06'
+  Expect: '1.21'
+  Expect::Simple: '0.04'
+  Fennec: '2.017'
+  Fennec::Declare: '1.002'
+  File::Compare: 0
+  HTML::Lint: '2.20'
+  HTML::Tidy: '1.56'
+  HTTP::CookieJar::LWP: '0.006'
+  HTTP::Daemon: '6.01'
+  HTTP::Proxy: '0.301'
+  HTTP::Status: '6.03'
+  IO::Socket: '1.25'
+  IPC::Run: '0.92'
+  IPC::Run3: '0.048'
+  JSON::XS: '3.01'
+  LWP::Protocol::https: '6.04'
+  LWP::Simple: '6.00'
+  LWP::UserAgent: '6.06'
+  List::MoreUtils: '0.33'
+  Net::FTP: '1.27'
+  Net::SSH: '0.09'
+  Net::SSH::Perl: '1.37'
+  Net::Server: '2.008'
+  Net::Telnet: '3.04'
+  PPI::HTML: '1.08'
+  Parallel::Iterator: '1.00'
+  Perl::Tidy: '20140711'
+  Plack: '1.0031'
+  Pod::Coverage: '0.23'
+  Pod::Coverage::CountParents: 0
+  Pod::Spell: '1.15'
+  Selenium::Remote::Driver: '0.2102'
+  Smolder: '1.51'
+  TAP::Formatter::HTML: '0.11'
+  Template: '2.25'
+  Term::ANSIColor: '4.03'
+  Test::Class: '0.46'
+  Test::Class::Moose: '0.54'
+  Test::Compile: 1.2.0
+  Test::DatabaseRow: '2.04'
+  Test::Deep: '0.112'
+  Test::Differences: '0.62'
+  Test::Distribution: '2.00'
+  Test::Exception: '0.32'
+  Test::Expect: '0.31'
+  Test::FailWarnings: '0.008'
+  Test::Fatal: '0.013'
+  Test::File: '1.36'
+  Test::HTML::Lint: '2.20'
+  Test::HTML::Tidy: '1.00'
+  Test::Inline: '2.213'
+  Test::Kwalitee: '1.19'
+  Test::LongString: '0.15'
+  Test::Memory::Cycle: '1.04'
+  Test::Mock::Simple: '0.04'
+  Test::MockObject: '1.20140408'
+  Test::MockTime: '0.12'
+  Test::More: '1.001003'
+  Test::Most: '0.33'
+  Test::NoWarnings: '1.04'
+  Test::Output: '1.03'
+  Test::Perl::Critic: '1.02'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.10'
+  Test::Script: '1.07'
+  Test::Snapshots: '0.02'
+  Test::Spelling: '0.19'
+  Test::Strict: '0.23'
+  Test::Taint: '1.06'
+  Test::WWW::Mechanize: '1.44'
+  Test::WWW::Mechanize::PSGI: '0.35'
+  Test::Warn: '0.30'
+  Test::Warnings: '0.016'
+  Test::XPath: '0.16'
+  Text::Diff: '1.41'
+  WWW::Mechanize::Firefox: '0.76'
+  WWW::Mechanize::PhantomJS: '0.06'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/szabgab/Task-Test
+  homepage: https://github.com/szabgab/Task-Test
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/szabgab/Task-Test
+version: '0.06'

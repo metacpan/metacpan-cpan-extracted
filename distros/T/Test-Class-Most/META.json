@@ -1,0 +1,45 @@
+{
+   "abstract" : "Test Classes the easy way",
+   "author" : [
+      "Curtis \"Ovid\" Poe <ovid@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Class-Most",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::Class" : "0.38",
+            "Test::Most" : "0.31"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Class::Most" : {
+         "file" : "lib/Test/Class/Most.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/Ovid/Test-Class-Most/"
+      }
+   },
+   "version" : "0.08"
+}

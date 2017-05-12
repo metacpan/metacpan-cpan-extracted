@@ -1,0 +1,111 @@
+---
+name: Text-Editor-Vip
+version: 0.08.1
+author:
+  - 'Khemir Nadim ibn Hamouda. <nadim@khemir.net>'
+abstract: Text editor
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Clone: 0
+  Data::Hexdumper: 0
+  Data::TreeDumper: 0.24
+  File::Slurp: 0
+  Readonly: 0
+  Text::Diff: 0
+build_requires:
+  Test::Block: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Warn: 0
+  Text::Diff: 0
+provides:
+  Text::Editor::Vip:
+    file: lib/Text/Editor/Vip.pm
+    version: 0.08
+  Text::Editor::Vip::Actions:
+    file: lib/Text/Editor/Vip/Actions.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer:
+    file: lib/Text/Editor/Vip/Buffer.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Constants:
+    file: lib/Text/Editor/Vip/Buffer/Constants.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::DoUndoRedo:
+    file: lib/Text/Editor/Vip/Buffer/DoUndoRedo.pm
+    version: 0.011
+  Text::Editor::Vip::Buffer::Indenter:
+    file: lib/Text/Editor/Vip/Buffer/Indenter.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::List:
+    file: lib/Text/Editor/Vip/Buffer/List.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::Case:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/Case.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::Clipboard:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/Clipboard.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::Display:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/Display.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::File:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/File.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::FindReplace:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/FindReplace.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::GetWord:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/GetWord.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::InsertConstruct:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/InsertConstruct.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::InsertDelete:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/InsertDelete.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::Movements:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/Movements.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::PageUpDown:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/PageUpDown.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::Selection:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/Selection.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Plugins::Tags:
+    file: lib/Text/Editor/Vip/Buffer/Plugins/Tags.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Selection:
+    file: lib/Text/Editor/Vip/Buffer/Selection.pm
+    version: 0.01
+  Text::Editor::Vip::Buffer::Test:
+    file: lib/Text/Editor/Vip/Buffer/Test.pm
+    version: 0.01
+  Text::Editor::Vip::Color::Color:
+    file: lib/Text/Editor/Vip/Color/Color.pm
+    version: 0.01
+  Text::Editor::Vip::CommandBlock:
+    file: lib/Text/Editor/Vip/CommandBlock.pm
+    version: 0.01
+  Text::Editor::Vip::Selection:
+    file: lib/Text/Editor/Vip/Selection.pm
+    version: 0.011
+  Text::Editor::Vip::View:
+    file: lib/Text/Editor/Vip/View.pm
+    version: 0.011
+  Text::Editor::Vip::View::Plugins::IncrementalFind:
+    file: lib/Text/Editor/Vip/View/Plugins/IncrementalFind.pm
+    version: 0.01
+  Text::Editor::Vip::View::Plugins::Macro:
+    file: lib/Text/Editor/Vip/View/Plugins/Macro.pm
+    version: 0.01
+  Text::Editor::Vip::View::Plugins::WordCompletion:
+    file: lib/Text/Editor/Vip/View/Plugins/WordCompletion.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

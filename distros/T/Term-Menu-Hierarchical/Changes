@@ -1,0 +1,56 @@
+Revision history for Perl extension Term::Menu::Hierarchical.
+
+0.01  Fri Dec 31 02:38:33 EST 2010
+	- original version; created by h2xs 1.23 with options
+		-AX Term::Menu::Hierarchical
+
+0.02  Sat Jan  1 02:46:00 EST 2011
+    - Major cleanup/revision
+		- Rewrote the pager from scratch (much more solid, better UI)
+		- Separated all the subs
+		- Cleaned up the logic
+		- Cleaned up minor-but-annoying scoping issues
+
+0.03  Sat Jan  1 13:49:02 EST 2011
+    - Added long line handling
+	- The output is now explicitly declared to be UTF-8
+
+0.10  Sat Jan  1 20:05:12 EST 2011
+    - Simplified page fill method
+
+0.20  Sat Jan  1 23:55:21 EST 2011
+    - Added a 'require 5.007_001' (earlier Perl versions don't support
+      PerlIO layers)
+
+0.50  Sun Jan  2 01:41:58 EST 2011
+    - Fixed namespace problem
+
+0.60  Sun Jan  2 01:52:51 EST 2011
+    - Fixed $VERSION mismatch, created 'CHECK' document
+
+0.70  Sun Jan  3 10:00:09 EST 2011
+    - Added 'OS unsupported' message for Win32 platforms to Makefile.PL
+
+0.75  Tue Jan  4 19:44:25 EST 2011
+    - Major documentation rewrite
+	- Split tests so that the OS test happens first
+
+0.80  Wed Jan  5 00:32:34 EST 2011
+    - Made the 'rec' script UTF8-clean
+	- Added an external Perl version test
+	- Fixed the docs so the HTML would display correctly
+
+0.85  Wed Jan  5 22:16:44 EST 2011
+	- More HTML documentation fixups
+	- Clearer message on version failure
+
+0.90  Fri Jan  7 01:33:59 EST 2011
+	- Even more HTML tweakage ('pod2html' output is *not* the same as what CPAN shows!)
+	- BIG_FAIL: Turns out "$^V" fails in ok() tests! Dropping back to "$]" for version testing
+
+0.95  Fri Jan  7 22:25:09 EST 2011
+	- Moved the version check into Makefile.PL (removed t/Perl_version.t)
+	- Moved the scripts into 'scripts/' rather than 'eg/'
+	- Added 'LICENSE' line to Makefile.PL
+	- Using 'make dist', so now we have a META.yml
+

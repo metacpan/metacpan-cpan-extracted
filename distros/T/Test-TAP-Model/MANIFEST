@@ -1,0 +1,19 @@
+Changes
+example.pl
+lib/Test/TAP/Model.pm
+lib/Test/TAP/Model/Consolidated.pm
+lib/Test/TAP/Model/File.pm
+lib/Test/TAP/Model/File/Consolidated.pm
+lib/Test/TAP/Model/Subtest.pm
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/comprehensive.t
+t/consolidate.t
+t/lib/StringHarness.pm
+t/oop_file.t
+t/oop_subtest.t
+t/pos_guessing.t
+t/serializable.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

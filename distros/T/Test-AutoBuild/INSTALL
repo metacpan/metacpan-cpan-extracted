@@ -1,0 +1,30 @@
+ Test::AutoBuild Installation
+ ============================
+
+Install the perl modules in the usual MakeMaker way:
+
+	perl Makefile.PL
+	make
+	make sysconfdir=/etc install
+
+While it can run as any user, the recommended approach for 
+setting up automatic unattended builds is to create a dedicated 
+(unprivileged) user account. By convention this is called 
+'builder' with a home dir of '/var/lib/builder'
+
+  # useradd -d /var/lib/builder builder
+  # auto-build-make-root /var/lib/builder
+  # chown -R builder.builder /var/lib/builder
+
+Once this is complete, edit the file /etc/autobuild/autobuild.conf
+to suit your environment & modules. The build can be invoked as the
+builder user, thus
+   
+  # su - builder
+  $ autobuild.pl --config /etc/autobuild/autobuild.conf
+
+
+More details on installation can be found in the manual page for
+the Test::AutoBuild module
+
+-- End of file

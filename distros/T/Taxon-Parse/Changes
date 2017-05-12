@@ -1,0 +1,41 @@
+Revision history for Taxon::Parse
+
+0.013  2014-08-16 23:48:09 CEST
+       - badges to pod
+
+0.012  2014-08-16 14:29:51 CEST
+       - added tests, improve coverage
+
+0.011  2014-08-16 06:57:47 CEST
+       - add travis CI
+
+0.010  2014-08-16 05:34:29 CEST
+       - more author and taxon corner cases
+
+0.009  2014-08-15 09:08:07 CEST
+       - more corner cases
+
+0.008  2014-08-14 16:07:32 CEST
+       - more post author qualifiers, hort.
+       - more infragenus
+
+0.007  2014-08-13 09:15:21 CEST
+       - more post author qualifiers
+
+0.006  2014-08-12 09:20:10 CEST
+       - more qualifiers
+
+0.005  2014-08-11 23:57:44 CEST
+       - more date variants
+
+0.004  2014-08-11 22:58:32 CEST
+       - parse more special cases
+
+0.003  2014-08-11 09:40:27 CEST
+       - parse more patterns
+
+0.002  2014-07-31 19:01:18 CEST
+       - needs perl 5.10
+
+0.001  2014-07-30 23:33:02 CEST
+       - Initial release.

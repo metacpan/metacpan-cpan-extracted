@@ -1,0 +1,508 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Tk::JBrowseEntry - Full-featured &quot;Combo-box&quot; 
+derived from Tk::BrowseEntry with many additional features and options.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#widget_specific_options">WIDGET-SPECIFIC OPTIONS</a></li>
+	<li><a href="#inherited_options">INHERITED OPTIONS</a></li>
+	<li><a href="#widget_methods">WIDGET METHODS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Tk::JBrowseEntry - Full-featured &quot;Combo-box&quot; (Text-entry combined with drop-down listbox) 
+derived from Tk::BrowseEntry with many additional features and options.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        use Tk;
+        use Tk::JBrowseEntry;</pre>
+<pre>
+        my $mw = MainWindow-&gt;new;
+        my $var;</pre>
+<pre>
+        my $widget = $mw-&gt;JBrowseEntry(
+                -label =&gt; 'Normal:',
+                -variable =&gt; \$var,
+                -state =&gt; 'normal',
+                -choices =&gt; [qw(pigs cows foxes goats)],
+                -width  =&gt; 12
+        )-&gt;pack(
+                -side   =&gt; 'top',
+                -pady =&gt; '10',
+                -anchor =&gt; 'w');</pre>
+<pre>
+        MainLoop;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Tk::JBrowseEntry is a derived widget from Tk::BrowseEntry, but adds numerous 
+features and options.  Among them are hash lists (one set of values is displayed 
+for the user, but another is used as data), ability to disable either the text 
+entry widget or the listbox, ability to allow user to delete items from the list, 
+additional keyboard bindings, and much more.</p>
+<p>JBrowseEntry widgets allow one to specify a full combo-box, a &quot;readonly&quot; 
+box (text field allows user to type the 1st letter of an item to search for, 
+but user may only ultimately select one of the items in the list), or a 
+&quot;textonly&quot; version (drop-down list disabled), or a completely disabled 
+widget.</p>
+<p>This widget is similar to other combo-boxes, ie. 	JComboBox, but has good 
+keyboard bindings and allows for quick lookup/search within the listbox. 
+pressing &lt;RETURN&gt; in entry field displays the dropdown box with the 
+first entry most closly matching whatever's in the entry field highlighted. 
+Pressing &lt;RETURN&gt; or &lt;SPACE&gt; in the listbox 
+selects the highlighted entry and copies it to the text field and removes the 
+listbox.  &lt;ESC&gt; removes the listbox from view.  
+&lt;UP&gt; and &lt;DOWN&gt; arrows work the listbox as well as pressing a key, which will 
+move the highlight to the next item starting with that letter/number, etc. 
+&lt;UP&gt; and &lt;DOWN&gt; arrows pressed within the entry field circle through the 
+various list options as well (unless &quot;-state&quot; is set to 'textonly').  
+Set &quot;-state&quot; to &quot;text&quot; to disable the dropdown list, but allow &lt;UP&gt; and 
+&lt;DOWN&gt; to cycle among the choices.  Setting &quot;-state&quot; to 'textonly' completely 
+hides the choices list from the user - he must type in his choice just like 
+a normal entry widget.</p>
+<p>One may also specify whether or not the button which activates the 
+dropdown list via the mouse can take focus or not (-btntakesfocus) or 
+whether the widget itself can take focus or is skipped in the focusing 
+order.  The developer can also specify alternate bitmap images for the 
+button (-arrowimage and -farrowimage).  The developer can also specify the 
+maximum length of the dropdown list such that if more than that number of 
+items is added, a vertical scrollbar is automatically added (-height).  
+A fixed width in characters (-width) can be specified, or the widget can be 
+allowed to resize itself to the width of the longest string in the list.  The 
+listbox and text entry field are automatically kept to the same width.</p>
+<p>One can optionally specify a label (-label), similar to the &quot;LabEntry&quot; widget.  
+By default, the label appears packed to the left of the widget.  The 
+positioning can be specified via the &quot;-labelPack&quot; option.  For example, to 
+position the label above the widget, use &quot;-labelPack =&gt; [-side =&gt; 'top']&quot;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<pre>
+ It is easiest to illustrate this widget's capabilities via examples:
+ 
+ use Tk;
+ use Tk::JBrowseEntry;
+ 
+ $MainWin = MainWindow-&gt;new;
+ 
+ #SET UP SOME DEFAULT VALUES.
+ 
+ $dbname1 = 'cows';
+ $dbname2 = 'foxes';
+ $dbname3 = 'goats';
+ $dbname5 = 'default';
+ 
+ #HERE'S A NORMAL COMBO-BOX.
+ 
+ $jb1 = $MainWin-&gt;JBrowseEntry(
+        -label =&gt; 'Normal:',
+        -variable =&gt; \$dbname1,
+        -state =&gt; 'normal',
+        -choices =&gt; [qw(pigs cows foxes goats)],
+        -width  =&gt; 12);
+ $jb1-&gt;pack(
+        -side   =&gt; 'top', -pady =&gt; '10', -anchor =&gt; 'w');
+ 
+ #THIS ONE HAS THE DROPDOWN LIST DISABLED.
+ 
+ $jb2 = $MainWin-&gt;JBrowseEntry(
+        -label =&gt; 'TextOnly:',
+        -variable =&gt; \$dbname2,
+        -state =&gt; 'text',
+        -choices =&gt; [qw(pigs cows foxes goats)],
+        -width  =&gt; 12);
+ $jb2-&gt;pack(
+        -side   =&gt; 'top', -pady =&gt; '10', -anchor =&gt; 'w');
+ 
+ #THIS ONE'S &quot;READONLY&quot; (USER MUST PICK FROM THE LIST, TEXT BOX ALLOWS QUICK 
+ #SEARCH.
+ 
+ $jb3 = $MainWin-&gt;JBrowseEntry(
+        -label =&gt; 'ReadOnly:',
+        -variable =&gt; \$dbname3,
+        -choices =&gt; [qw(pigs cows foxes goats)],
+        -state =&gt; 'readonly',
+        -width  =&gt; 12);
+ $jb3-&gt;pack(
+        -side   =&gt; 'top', -pady =&gt; '10', -anchor =&gt; 'w');
+ 
+ #THIS ONE'S COMPLETELY DISABLED!
+ 
+ $jb4 = $MainWin-&gt;JBrowseEntry(
+        -label =&gt; 'Disabled:',
+        -variable =&gt; \$dbname3,
+        -state =&gt; 'disabled',
+        -choices =&gt; [qw(pigs cows foxes goats)],
+        -width  =&gt; 12);
+ $jb4-&gt;pack(
+        -side   =&gt; 'top', -pady =&gt; '10', -anchor =&gt; 'w');
+ 
+ #HERE'S ONE WITH A SCROLLBAR (NOTE THE &quot;-height&quot; ATTRIBUTE).
+ 
+ $jb5 = $MainWin-&gt;JBrowseEntry(
+        -label =&gt; 'Scrolled List:',
+        -width =&gt; 12,
+        -default =&gt; $dbname5,
+        -height =&gt; 4,
+        -variable =&gt; \$dbname5,
+        -browsecmd =&gt; sub {print &quot;-browsecmd!\n&quot;;},
+        -listcmd =&gt; sub {print &quot;-listcmd!\n&quot;;},
+        -state =&gt; 'normal',
+        -choices =&gt; [qw(pigs cows foxes goats horses sheep dogs cats ardvarks default)]);
+ $jb5-&gt;pack(
+        -side   =&gt; 'top', -pady =&gt; '10', -anchor =&gt; 'w');
+ 
+ #HERE'S ONE THAT THE BUTTON TAKES KEYBOARD FOCUS.
+ 
+ $jb6 = $MainWin-&gt;JBrowseEntry(
+        -label =&gt; 'Button Focus:',
+        -btntakesfocus =&gt; 1,
+        -arrowimage =&gt; $MainWin-&gt;Getimage('balArrow'),   #SPECIFY A DIFFERENT BUTTON IMAGE.
+        -farrowimage =&gt; $MainWin-&gt;Getimage('cbxarrow'),  #OPTIONAL 2ND IMAGE FOR BUTTON WHEN FOCUSED. 
+        -width =&gt; 12,
+        -height =&gt; 4,
+        -variable =&gt; \$dbname6,
+        -browsecmd =&gt; sub {print &quot;-browsecmd!\n&quot;;},
+        -listcmd =&gt; sub {print &quot;-listcmd!\n&quot;;},
+        -state =&gt; 'normal',
+        -choices =&gt; [qw(pigs cows foxes goats horses sheep dogs cats ardvarks default)]);
+ $jb6-&gt;pack(
+        -side   =&gt; 'top', -pady =&gt; '10', -anchor =&gt; 'w');
+ 
+ #HERE'S ONE THAT DOWS NOT TAKE KEYBOARD FOCUS.
+ 
+ $jb7 = $MainWin-&gt;JBrowseEntry(
+        -label =&gt; 'Skip Focus:',
+        -takefocus =&gt; 0,
+        -width =&gt; 12,
+        -height =&gt; 4,
+        -variable =&gt; \$dbname7,
+        -browsecmd =&gt; sub {print &quot;-browsecmd!\n&quot;;},
+        -listcmd =&gt; sub {print &quot;-listcmd!\n&quot;;},
+        -state =&gt; 'normal',
+        -choices =&gt; [qw(pigs cows foxes goats horses sheep dogs cats ardvarks default)]);
+ $jb7-&gt;pack(
+        -side   =&gt; 'top', -pady =&gt; '10', -anchor =&gt; 'w');
+ 
+ $jb7-&gt;choices([qw(First Second Fifth Sixth)]);   #REPLACE LIST CHOICES!
+ $jb7-&gt;insert(2, 'Third', 'Fourth');              #ADD MORE AFTER 1ST 2.
+ $jb7-&gt;insert('end', [qw(Seventh Oops Eighth)]);  #ADD STILL MORE AT END.
+ $jb7-&gt;delete(7);                                 #REMOVE ONE.
+ 
+ $b = $MainWin-&gt;Button(-text =&gt; 'Quit', -command =&gt; sub {exit(); });
+ $b-&gt;pack(-side =&gt; 'top');
+ $jb1-&gt;focus;   #PICK ONE TO START WITH KEYBOARD FOCUS.
+ 
+ MainLoop;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Tk/JComboBox.html">the Tk::JComboBox manpage</a> <a href="/Tk/BrowseEntry.html">the Tk::BrowseEntry manpage</a> <a href="/Tk/Listbox.html">the Tk::Listbox manpage</a> <a href="/Tk/Entry.html">the Tk::Entry manpage</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="widget_specific_options">WIDGET-SPECIFIC OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="state_normal_readonly_text_textonly_disabled" class="item"><strong>-state</strong> =&gt; <em>normal | readonly | text | textonly | disabled</em></a></strong></dt>
+
+<dd>
+<p>Default: <strong>normal</strong></p>
+<p>JBrowseEntry supports 5 different states:</p>
+<p><em>normal</em>:  Default operation -- Both text entry field and dropdown list button function normally.</p>
+<p><em>readonly</em>:  Dropdown list functions normally. When text entry field has focus, user may type in a letter, and the dropdown list immediately drops down and the first/ next matching item becomes highlighted. The user must ultimately select from the list of valid entries and may not enter anything else.</p>
+<p><em>text</em>:  Text entry functions normally, but dropdown list button is disabled. User must type in an entry or use the up and down arrows to choose from among the list items.</p>
+<p><em>textonly</em>:  Similar to &quot;text&quot;: Text entry functions normally, but dropdown list button is disabled. User must type in an entry. The list choices are completely hidden from the user.</p>
+<p><em>disabled</em>:  Widget is completely disabled and greyed out. It will not activate or take focus.</p>
+</dd>
+<dt><strong><a name="altbinding" class="item"><strong>-altbinding</strong></a></strong></dt>
+
+<dd>
+<p>Allows one to specify alternate binding schema for certain keys. Currently valid values are &quot;Return=Next&quot; (which causes pressing the [Return] key to advance the focus to the next widget in the main window); and &quot;Down=Popup&quot;, which causes the [Down-arrow] key to pop up the selection listbox.</p>
+</dd>
+<dt><strong><a name="btntakesfocus" class="item"><strong>-btntakesfocus</strong></a></strong></dt>
+
+<dd>
+<p>The dropdown list button is normally activated with the mouse and is skipped in the focusing circuit. If this option is set, then the button will take keyboard focus. Pressing &lt;Return&gt;, &lt;Spacebar&gt;, or &lt;Downarrow&gt; will cause the list to be dropped down, repeating causes the list to be removed again. Normally, the text entry widget receives the keyboard focus. This option can be used in combination with &quot;-takefocus&quot; so that either the text entry widget, the button, or both or neither receive keyboard focus. If both options are set, the entry field first receives focus, then pressing &lt;Tab&gt; causes the button to be focused.</p>
+</dd>
+<dt><strong><a name="deleteitemsok" class="item"><strong>-deleteitemsok</strong></a></strong></dt>
+
+<dd>
+<p>If set, allows user to delete individual items in the drop-down list by pressing the &lt;Delete&gt; key to delete the current (active) item.</p>
+</dd>
+<dt><strong><a name="farrowimage" class="item"><strong>-farrowimage</strong></a></strong></dt>
+
+<dd>
+<p>Allows one to specify a second alternate bitmap for the image on the button which activates the dropdown list when the button has the keyboard focus. The default is to use the &quot;-arrowimage&quot; image. This option should only be specified if the &quot;-arrowimage&quot; option is also specified. See the &quot;-arrowimage&quot; option under Standard BrowseEntry options for more details.</p>
+</dd>
+<dt><strong><a name="height" class="item"><strong>-height</strong></a></strong></dt>
+
+<dd>
+<p>Specify the maximum number of items to be displayed in the listbox before a vertical scrollbar is automatically added. Default is infinity (listbox will not be given a scrollbar regardless of the number of items added).</p>
+</dd>
+<dt><strong><a name="labelpack" class="item"><strong>-labelPack</strong></a></strong></dt>
+
+<dd>
+<p>Specify alternate packing options for the label. The default is: &quot;[-side =&gt; 'left', -anchor =&gt; 'e']&quot;. The argument is an arrayref. Note: if no label is specified, none is packed or displayed.</p>
+</dd>
+<dt><strong><a name="labelrelief" class="item"><strong>-labelrelief</strong></a></strong></dt>
+
+<dd>
+<p>Default <strong>&quot;flat&quot;</strong></p>
+<p>Allow relief of the label portion of the widget to be specified.</p>
+</dd>
+<dt><strong><a name="listfont" class="item"><strong>-listfont</strong></a></strong></dt>
+
+<dd>
+<p>Specify an alternate font for the text in the listbox. Use &quot;-font&quot; to change the text of the text entry field. For best results, &quot;-font&quot; and &quot;-listfont&quot; should specify fonts of similar size.</p>
+</dd>
+<dt><strong><a name="noselecttext" class="item"><strong>-noselecttext</strong></a></strong></dt>
+
+<dd>
+<p>Normally, when the widget has the focus, the current value is &quot;selected&quot; (highlighted and in the cut-buffer). Some consider this unattractive in appearance, particularly with the &quot;readonly&quot; state, which appears as a raised button in Unix, similar to an &quot;Optionmenu&quot;. Setting this option will cause the text to not be selected.</p>
+</dd>
+<dt><strong><a name="width" class="item"><strong>-width</strong></a></strong></dt>
+
+<dd>
+<p>The number of characters (average if proportional font used) wide to make the entry field. The dropdown list will be set the same width as the entry widget plus the width of the button. If not specified, the default is to calculate the width to the width of the longest item in the choices list and if items are later added or removed the width will be recalculated.</p>
+</dd>
+<dt><strong><a name="nobutton" class="item"><strong>-nobutton</strong></a></strong></dt>
+
+<dd>
+<p>Default <strong>0</strong></p>
+<p>Prevents dropdown list button from being displayed.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="inherited_options">INHERITED OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="arrowimage" class="item"><strong>-arrowimage</strong></a></strong></dt>
+
+<dd>
+<p>Specifies the image to be used in the arrow button beside the entry widget. The default is an downward arrow image in the file cbxarrow.xbm</p>
+</dd>
+<dt><strong><a name="browsecmd" class="item"><strong>-browsecmd</strong></a></strong></dt>
+
+<dd>
+<p>Specifies a function to call when a selection is made in the popped up listbox. It is passed the widget and the text of the entry selected. This function is called after the entry variable has been assigned the value.</p>
+</dd>
+<dt><strong><a name="choices" class="item"><strong>-choices</strong></a></strong></dt>
+
+<dd>
+<p>Specifies the list of choices to pop up. This is a reference to an array of strings specifying the choices.</p>
+</dd>
+<dt><strong><a name="colorstate" class="item"><strong>-colorstate</strong></a></strong></dt>
+
+<dd>
+<p>Depreciated -- Appears to force the background of the entry widget on the Unix version to &quot;grey95&quot; if state is normal and a &quot;-background&quot; color is not specified.</p>
+</dd>
+<dt><strong><a name="listcmd" class="item"><strong>-listcmd</strong></a></strong></dt>
+
+<dd>
+<p>Specifies the function to call when the button next to the entry is pressed to popup the choices in the listbox. This is called before popping up the listbox, so can be used to populate the entries in the listbox.</p>
+</dd>
+<dt><strong><a name="listrelief" class="item"><strong>-listrelief</strong></a></strong></dt>
+
+<dd>
+<p>Specifies relief for the dropdown list (default is &quot;sunken&quot;).</p>
+</dd>
+<dt><strong><a name="listwidth" class="item"><strong>-listwidth</strong></a></strong></dt>
+
+<dd>
+<p>Specifies the width of the popup listbox.</p>
+</dd>
+<dt><strong><a name="maxwidth" class="item"><strong>-maxwidth</strong></a></strong></dt>
+
+<dd>
+<p>Specifies the maximum width the entry and listbox widgets can expand to in characters. The default is zero, meaning expand to the width to accomodate the widest string in the list.</p>
+</dd>
+<dt><strong><a name="state" class="item"><strong>-state</strong></a></strong></dt>
+
+<dd>
+<p>Specifies one of four states for the widget: &quot;normal&quot;, &quot;readonly&quot;, &quot;textonly&quot;, or &quot;disabled&quot;. If the widget is &quot;disabled&quot; then the value may not be changed and the arrow button won't activate. If the widget is &quot;readonly&quot;, the entry may not be edited, but it may be changed by choosing a value from the popup listbox. &quot;textonly&quot; means the listbox will not activate. &quot;normal&quot; is the default.</p>
+</dd>
+<dt><strong><a name="tabcomplete" class="item"><strong>-tabcomplete</strong></a></strong></dt>
+
+<dd>
+<p>If set to &quot;1&quot;, pressing the &quot;&lt;Tab&gt;&quot; key will cause the string in the entry field to be &quot;auto-completed&quot; to the next matching item in the list. If there is no match, the typed text is not changed. If it already matches a list item, then the listbox is removed from view and keyboard focus transfers to the next widget. If set to &quot;2&quot; and there is no match in the list, then entry is set to the default value or empty string.</p>
+</dd>
+<dt><strong><a name="variable" class="item"><strong>-variable</strong></a></strong></dt>
+
+<dd>
+<p>Specifies the variable in which the entered value is to be stored.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="widget_methods">WIDGET METHODS</a></h1>
+<dl>
+<dt><strong><a name="activate" class="item">$widget-&gt;<strong>activate</strong>(index)</a></strong></dt>
+
+<dd>
+<p><a href="#activate"><code>activate()</code></a> invokes the <a href="#activate"><code>activate()</code></a> option on the listbox to make the item with the 
+index specified by the first argument &quot;active&quot;.  Unless a second argument is 
+passed containing a false value, the value of the &quot;-textvariable&quot; variable is also 
+set to this now active value.</p>
+</dd>
+<dt><strong>$widget-&gt;<strong>choices</strong>([listref])</strong></dt>
+
+<dd>
+<p>Sets the dropdown list listbox to the list of values referenced by <em>listref</em>, if
+specified.  Returns the current list of choices in the listbox if no arguments 
+provided.</p>
+</dd>
+<dt><strong><a name="curselection" class="item">$widget-&gt;<strong>curselection</strong>()</a></strong></dt>
+
+<dd>
+<p>Returns the currently-selected element in the listbox, if any, otherwise, <strong>undef</strong>.</p>
+</dd>
+<dt><strong><a name="delete" class="item">$widget-&gt;<strong>delete</strong>(first [, last])</a></strong></dt>
+
+<dd>
+<p>Deletes one or more elements of the listbox.  First and last are indices specifying 
+the first and last elements in the range to delete.  If last isn't specified it 
+defaults to first, i.e. a single element is deleted.</p>
+</dd>
+<dt><strong><a name="delete_byvalue" class="item">$widget-&gt;<strong>delete_byvalue</strong>(hashkey)</a></strong></dt>
+
+<dd>
+<p>Deletes one or more elements of the listbox.  &quot;hashkey&quot; specifies the element to 
+be deleted by the value visible to the user.</p>
+</dd>
+<dt><strong><a name="reference" class="item">$widget-&gt;<strong>reference</strong>(hashkey)</a></strong></dt>
+
+<dd>
+<p>Returns the actual option key value that corresponds to the choice value displayed 
+in the listbox.  (undef if there is none).  (Opposite of <a href="#dereference"><code>dereference()</code></a> and 
+<a href="#dereferenceonly"><code>dereferenceOnly()</code></a>.</p>
+</dd>
+<dt><strong><a name="dereference" class="item">$widget-&gt;<strong>dereference</strong>(hashkey)</a></strong></dt>
+
+<dd>
+<p>Returns the value (displayed in the listbox) that corresponds to the choice key 
+specified by &quot;hashkey&quot;.  If the key is not one of the valid choices or the choices 
+are a list instead of a hash, then &quot;hashkey&quot; is returned.</p>
+</dd>
+<dt><strong><a name="dereferenceonly" class="item">$widget-&gt;<strong>dereferenceOnly</strong>(hashkey)</a></strong></dt>
+
+<dd>
+<p>Returns 1 if the key specified by &quot;hashkey&quot; is one of the valid choices and the list 
+of choices is a hash, otherwise <strong>undef</strong> is returned.</p>
+</dd>
+<dt><strong><a name="get_hashref_byname" class="item">$widget-&gt;<strong>get_hashref_byname</strong>()</a></strong></dt>
+
+<dd>
+<p>Returns a reference to the current hash of choices (keyed by the option visable to
+the user) if the choice list is a hash (reversed from the hash passed to choices()), 
+otherwise, <strong>undef</strong> is returned.</p>
+</dd>
+<dt><strong><a name="get_hashref_byvalue" class="item">$widget-&gt;<strong>get_hashref_byvalue</strong>()</a></strong></dt>
+
+<dd>
+<p>Returns a reference to the current hash of choices (keyed by actual option value) 
+if the choice list is a hash (same as the hash passed to choices()), 
+otherwise, <strong>undef</strong> is returned.</p>
+</dd>
+<dt><strong><a name="get" class="item">$widget-&gt;<strong>get</strong>([first [, last])</a></strong></dt>
+
+<dd>
+<p><a href="#get"><code>get()</code></a> with no arguments returns the current value of the &quot;-textvariable&quot; variable.  
+If any arguments are passed, they are passed directly to the listbox-&gt;<a href="#get"><code>get()</code></a> 
+function, ie. &quot;0&quot;, &quot;end&quot; to return all values of the listbox.</p>
+</dd>
+<dt><strong><a name="get_index" class="item">$widget-&gt;<strong>get_index</strong>(hashkey)</a></strong></dt>
+
+<dd>
+<p>Returns the index number in the list (zero-based) that can be used by <a href="#get"><code>get()</code></a> of 
+the value specified by &quot;hashkey&quot;.</p>
+</dd>
+<dt><strong><a name="hasreference" class="item">$widget-&gt;<strong>hasreference</strong>(hashkey)</a></strong></dt>
+
+<dd>
+<p>Returns the value (displayed in the listbox) that corresponds to the choice key 
+specified by &quot;hashkey&quot;.  If the key is not one of the valid choices or the choices 
+are a list instead of a hash, then <strong>undef</strong> is returned.</p>
+</dd>
+<dt><strong><a name="index" class="item">$widget-&gt;<strong>index</strong>(index)</a></strong></dt>
+
+<dd>
+<p>Invokes and returns the result of the listbox-&gt;<a href="#index"><code>index()</code></a> function.</p>
+</dd>
+<dt><strong><a name="insert" class="item">$widget-&gt;<strong>insert</strong>(index, [item | list | listref | hashref])</a></strong></dt>
+
+<dd>
+<p>Inserts one or more elements in the list just before the element given by index.  
+If <em>index</em> is specified as &quot;end&quot; then the new elements are added to the end of the list.
+List can be a reference to a list (<em>listref</em>).  If a hash reference is specified, 
+then the values are displayed to the user in the dropdown list, but the values 
+returned by the &quot;-textvariable&quot; variable or the <a href="#get"><code>get()</code></a> function are the corresponding 
+hash key(s).</p>
+</dd>
+<dt><strong><a name="size" class="item">$widget-&gt;<strong>size</strong>()</a></strong></dt>
+
+<dd>
+<p>Invokes and returns the result of the listbox <a href="#size"><code>size()</code></a> function (the number of items in 
+the list.</p>
+</dd>
+<dt><strong>$widget-&gt;<strong>state</strong>([normal | readonly | text | textonly | disabled])</strong></dt>
+
+<dd>
+<p>Get or set the state of the widget.</p>
+<pre>
+
+=back</pre>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Jim Turner, <code>&lt;http://home.mesh.net/turnerjw/jim&gt;</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright 2001-2011 (c) Jim Turner &lt;http://home.mesh.net/turnerjw/jim&gt;.  
+All rights reserved.</p>
+<p>This program is free software; you can redistribute 
+it and/or modify it under the same terms as Perl itself.</p>
+<p>This is a derived work from Tk::BrowseEntry.  Tk::BrowseEntry is 
+copyrighted by Rajappa Iyer</p>
+
+</body>
+
+</html>

@@ -1,0 +1,38 @@
+---
+abstract: 'Interface to test and compare Excel files.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Excel
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Test::Excel:
+    file: lib/Test/Excel.pm
+    version: '1.39'
+requires:
+  Crypt::RC4: '0'
+  Digest::Perl::MD5: '0'
+  File::Spec: '0'
+  OLE::Storage_Lite: '0'
+  Scalar::Util: '0'
+  Spreadsheet::ParseExcel: '0.58'
+  Test::Builder: '0'
+  Test::Builder::Tester: '0'
+  Test::More: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Test-Excel.git
+version: '1.39'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,9 @@
+Revision history for Perl extension Tk::Spectrum.
+
+0.02  Tue Mar 31 17:09:00 2009
+	- Updated Makefile.PL to add dependencies Tk and Tk::PNG
+
+0.01  Thu Mar 27 14:24:15 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Tk::Spectrum
+

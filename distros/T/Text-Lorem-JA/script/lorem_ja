@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+=head1 NAME
+
+lorem_ja - Generate random Japanese looking text
+
+=head1 SYNOPSIS
+
+    $ lorem_ja [options]
+
+    Options:
+      --sentence -s <count>     number of sentences
+      --word     -w <length>    length of word
+
+      --dictionary -d <dict>    dictionary file
+      --chain      -c <chain>   number of chain (default: dict's default)
+
+    --sentence or --word option must be specified.
+
+=head1 OPTIONS
+
+=over 8
+
+=item --sentence
+
+Generate sentence(s).
+
+=item --word
+
+Generate word.
+
+=item --dictionary
+
+External dictionary file.
+
+=item --chain
+
+Number of chain for generating sentence by Markov chain.
+
+=back
+
+=cut
+
+use Getopt::Long qw( :config posix_default no_ignore_case bundling auto_help );
+use Pod::Usage qw( pod2usage );
+
+use Text::Lorem::JA;
+
+my %opt = (
+);
+GetOptions(\%opt, qw(
+    sentence|sentences|s=i
+    word|w=i
+    dictionary|dict|d=s
+    chain|chains|c=i
+    help|h|?
+)) or pod2usage(2);
+$opt{help} and pod2usage( -exitval => 2, -verbose => 2 );
+
+if ($opt{sentence} && $opt{word}) {
+    pod2usage( -message => "--sentence and --word options must not be specified at same time", -exitval => 1);
+}
+
+my %ctor_args;
+if ($opt{dictionary}) {
+    $ctor_args{dictionary} = $opt{dictionary};
+}
+if ($opt{chain}) {
+    $ctor_args{chain} = $opt{chain};
+}
+
+my $lorem = Text::Lorem::JA->new(%ctor_args);
+
+binmode \*STDOUT, ':encoding(UTF-8)';
+
+if (defined $opt{word} && $opt{word} > 0) {
+    print $lorem->word($opt{word}), "\n";
+} else {
+    $opt{sentence} = 1  if ! defined $opt{sentence} || $opt{sentence} < 1;
+    print $lorem->sentences($opt{sentence}), "\n";
+}

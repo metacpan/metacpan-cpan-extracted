@@ -1,0 +1,12 @@
+span.chart_error, span.chart_info {
+    position    : relative;
+    top         : 40%;
+    font-size   : 20px;
+    font-weight : bold;
+}
+span.chart_error {
+    color       : red;
+}
+font.chart_error {
+    color       : red;
+}

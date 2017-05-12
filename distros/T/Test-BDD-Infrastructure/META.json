@@ -1,0 +1,74 @@
+{
+   "abstract" : "a collection of step file definitions for Test Driven Infrastructure",
+   "author" : [
+      "Markus Benning <ich@markusbenning.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-BDD-Infrastructure",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Augeas" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "File::stat" : "0",
+            "HTTP::Request" : "0",
+            "IO::Select" : "0",
+            "IO::Socket::INET" : "0",
+            "IO::Socket::UNIX" : "0",
+            "IPC::Run" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "MooseX::Singleton" : "0",
+            "Net::DNS::Resolver" : "0",
+            "Proc::ProcessTable" : "0",
+            "Test::BDD::Cucumber::StepFile" : "0",
+            "Test::More" : "0",
+            "Time::Seconds" : "0",
+            "URI" : "0",
+            "YAML" : "0",
+            "perl" : "v5.8.5",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Test-BDD-Infrastructure@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-BDD-Infrastructure"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/Test-BDD-Infrastructure",
+         "web" : "https://github.com/benningm/Test-BDD-Infrastructure.git"
+      }
+   },
+   "version" : "1.005"
+}
+

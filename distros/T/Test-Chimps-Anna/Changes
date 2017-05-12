@@ -1,0 +1,13 @@
+Revision history for Test-Chimps-Anna
+
+0.04    Sun Aug 13 14:33:42 EDT 2006
+        * added information about the mailing list
+
+0.03    Fri Jul 21 21:36:01 EDT 2006
+        * anna now announces when a project passes all its tests after having failed them
+
+0.02    Wed Jul 12 17:07:57 EDT 2006
+        Initial CPAN release, now with documentation.
+
+0.01    Thu Jun 22 15:37:00 EDT 2006
+        Initial release 

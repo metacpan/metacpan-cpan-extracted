@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+use 5.006;
+use strict;
+use warnings;
+package metabase_cpanp;
+BEGIN {
+  $metabase_cpanp::VERSION = '0.08';
+}
+# NAME: metabase_cpanp
+# ABSTRACT: create a metabase profile
+
+use JSON 2;
+use Metabase::User::Profile;
+use Metabase::User::Secret;
+use File::Path;
+use File::Spec;
+use Term::UI;
+use Term::ReadLine;
+use CPANPLUS::Configure;
+use Module::Load::Conditional qw[check_install];
+
+my $url = 'metabase.cpantesters.org/api/v1/';
+
+if ( check_install( module => 'Crypt::SSLeay' ) ) {
+  $url = 'https://' . $url;
+}
+else {
+  $url = 'http://' . $url;
+}
+
+my (%profile, $help, $output, $full_name, $email_address, $password);
+
+$|=1; # autoflush prompts
+
+my $term = Term::ReadLine->new('metabase');
+my $conf = CPANPLUS::Configure->new();
+
+# setup output file and confirm it doesn't exist
+my $dir = _get_dir();
+mkpath( $dir );
+
+$output = File::Spec->catfile( $dir, 'metabase_id.json' );
+
+if ( -f $output ) {
+  warn "Won't over-write existing '$output' file.\n";
+}
+
+unless ( -f $output ) {
+  my @prompts = (
+    full_name     => [ 'full name', qr/.+/ ],
+    email_address => [ 'email address', qr/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i ],
+    password      => [ 'password/secret', qr/.+/ ],
+  );
+
+  while (@prompts) {
+    my ($key, $opts) = splice(@prompts,0,2);
+    my $answer = $term->get_reply(
+      prompt => 'Enter your ' . $opts->[0] . ': ',
+      allow  => $opts->[1],
+    );
+    $profile{$key} = $answer;
+  }
+
+  # create profile and secret objects
+  $password = delete $profile{password};
+  my $profile = Metabase::User::Profile->create( %profile );
+  my $secret = Metabase::User::Secret->new(
+    resource => $profile->resource,
+    content  => $password,
+   );
+
+  # write output
+  print "Writing profile to '$output'\n";
+  open my $fh, ">", $output;
+  print {$fh} JSON->new->ascii->pretty->encode([
+    $profile->as_struct,
+    $secret->as_struct,
+  ]);
+  close $fh;
+  chmod 0600, $output;
+
+  $conf->set_conf( email => $profile{email_address} );
+}
+
+print "Updating CPANPLUS configuration\n";
+$conf->set_conf( 'cpantest' => 1 );
+$conf->set_conf( 'cpantest_reporter_args' => 
+    {
+      transport       => 'Metabase',
+      transport_args  => [ uri => $url, id_file => $output ],
+    },
+);
+$conf->save;
+exit 0;
+
+sub _get_dir {
+  my $base = glob('~');
+  if ( $base eq '~' and $^O eq 'MSWin32' ) {
+      $base = File::Spec->catdir( $ENV{APPDATA}, 'metabase' );
+  }
+  else {
+     $base = File::Spec->catdir( $base, '.metabase' );
+  }
+  return $base;
+}
+
+
+__END__
+=pod
+
+=head1 NAME
+
+metabase_cpanp - create a metabase profile
+
+=head1 VERSION
+
+version 0.08
+
+=head1 SYNOPSIS
+
+  $ metabase_cpanp
+  Enter full name: John Doe
+  Enter email address: jdoe@example.com
+  Enter password/secret: zqxjkh
+  Writing profile to 'metabase_id.json'
+  Updating CPANPLUS configuration
+
+=head1 USAGE
+
+The metabase_cpanp program makes it easy to create a user profile for
+submitting facts and reports to a Metabase server and automatically
+configuring L<CPANPLUS>.
+
+The default name C<'metabase_id.json> will be used and will be written to
+the C<~/.metabase> directory (to %APPDATA%\metabase on Windows).
+If the the output filename (or default) exists, the program will skip
+rather than overwrite the file.  The output file will be in JSON and contain
+the user profile and the user's shared secret.
+
+Typically, when a Metabase server first receives a report from a new user
+profile, the shared secret is recorded and will be used to authenticate
+subsequent submissions.  The output should not be shared publicly or
+made group or world readable.
+
+L<CPANPLUS> will be enabled for test report submission and configured to use
+the generated file.
+
+You may wish to copy the id file across computers if you would like
+to be identified consistently when submitting reports from different
+locations.
+
+=head1 AUTHOR
+
+Chris Williams <chris@bingosnet.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Chris Williams.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

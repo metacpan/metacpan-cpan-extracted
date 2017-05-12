@@ -1,0 +1,20 @@
+Started smoke at 1114949485
+Smoking patch 24355
+Stopped smoke at 1114949486
+Started smoke at 1114949486
+
+Configuration: -Dusedevel -Duseithreads
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3 20030304 (Apple Computer, Inc. build 1666)
+TSTENV = stdio	u=9.15  s=4.99  cu=642.43  cs=151.16  scripts=931  tests=106662
+All tests successful.
+TSTENV = perlio	u=8.60  s=4.89  cu=571.17  cs=148.59  scripts=931  tests=106662
+All tests successful.
+TSTENV = locale:nl_NL.UTF-8	u=8.04  s=4.58  cu=566.51  cs=148.52  scripts=930  tests=106659
+
+Inconsistent test results (between TEST and harness):
+    ../t/op/stat.t..........................FAILED at test 3
+
+Finished smoking 24355
+Stopped smoke at 1114956195

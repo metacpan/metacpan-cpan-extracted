@@ -1,0 +1,10 @@
+58
+print<>text<>5 18 16
+para<>words<>7 20 18
+read<>text<>5 22 16
+para<>print<>5 20 18
+doc<>print<>8 22 18
+read<>doc<>9 22 22
+text<>words<>6 16 18
+doc<>words<>5 22 18
+para<>read<>8 20 22

@@ -1,0 +1,63 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Fergal Daly <fergal@esatclear.ie>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Deep",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.09",
+            "Scalar::Util" : "1.09",
+            "Test::Builder" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Tester" : "0.04"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/rjbs/Test-Deep/issues"
+      },
+      "homepage" : "http://github.com/rjbs/Test-Deep/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rjbs/Test-Deep.git",
+         "web" : "https://github.com/rjbs/Test-Deep"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perl-qa",
+      "x_MailingList" : "http://lists.perl.org/list/perl-qa.html"
+   },
+   "version" : "1.127",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

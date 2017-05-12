@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Text-SenseClusters-LabelEvaluation
+version:            0.06
+abstract:           Module for evaluation of labels of the clusters. 
+author:
+    - Ted Pedersen <tpederse at d.umn.edu>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:        0
+    Text::Similarity:  0.08
+    WWW::Wikipedia:    2
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,1 @@
+<!ELEMENT dictionary-body (%div.mix; | %dict.mix;)*>

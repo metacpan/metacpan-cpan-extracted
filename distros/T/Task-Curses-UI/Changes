@@ -1,0 +1,13 @@
+0.03 2015-11-05T11:58:07+01:00
+ - Update Curses::UI::Number to 0.06 version.
+ - Update Curses::UI::Time to 0.05 version.
+ - Update Curses::UI::Volume to 0.02 version.
+
+0.02 2015-10-12T21:01:53+02:00
+ - Add modules to SEE ALSO section in doc.
+ - Fix dependency for Curses::UI::Grid (Thanks shalk).
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.01 2015-01-21T07:47:27+01:00
+ - First version

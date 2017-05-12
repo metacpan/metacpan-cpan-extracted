@@ -1,0 +1,3 @@
+name = "Test-Mojo-Session"
+authority = "cpan:AVKHOZOV"
+badges = ['travis']

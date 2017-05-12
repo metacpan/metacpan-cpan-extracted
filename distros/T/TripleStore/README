@@ -1,0 +1,14 @@
+TripleStore 0.03
+================
+
+This module is indeed ALPHA software!
+
+TripleStore is a triple store manipulation and query interface with a sample
+MySQL implementation which is provided.
+
+COPYRIGHT AND LICENCE
+
+This module free software and is distributed under the same license as Perl
+itself.
+
+Copyright (C) 2002 Jean-Michel Hiver <jhiver@mkdoc.com> 

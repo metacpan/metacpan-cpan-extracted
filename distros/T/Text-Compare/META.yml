@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                Text-Compare
+version:             1.03
+abstract:            Language sensitive text comparison
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Carp:                          0
+    HTML::Strip:                   0
+    Lingua::Identify:              0
+    Lingua::Stem:                  0
+    Lingua::StopWords:             0
+    Memoize:                       0
+    Sparse::Vector:                0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Serguei Trouchelle <stro@railways.dp.ua>, Marcus Thiesen <marcus@thiesen.org>

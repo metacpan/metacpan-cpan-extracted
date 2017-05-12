@@ -1,0 +1,41 @@
+Revision history for Perl extension Task-BeLike-ZAKAME
+
+0.09 2016-09-25T09:47:38Z
+
+    - Add Devel::Confess and Pry
+
+0.08 2016-09-13T07:46:04Z
+
+    - Add more modules needed by my Reply setup
+    - Add App::HTTPThis, Mojo, Paws, Plack
+
+0.07 2016-09-08T10:57:46Z
+
+    - Remove App::ph, add some others I now use
+
+0.06 2014-04-04T17:18:40Z
+
+    - Downgrade Perl::Critic to recommends
+
+0.05 2014-03-07T02:37:43Z
+
+    - Add App::metacpansearch and Pod::Cpandoc
+
+0.04 2013-12-02T07:49:53Z
+
+    - Downgrade App::rainbarf to install via cpanm --with-recommends
+    - Add Text::Markdown
+
+0.03 2013-10-17T10:31:51Z
+
+    - Add App::Nopaste for my pastebin needs
+
+0.02 2013-10-14T03:54:54Z
+
+    - Add rainbarf for my tmux setup
+
+0.01 2013-09-20T03:09:08Z
+
+    - original version
+    - Just a small selection of modules for now ;)
+

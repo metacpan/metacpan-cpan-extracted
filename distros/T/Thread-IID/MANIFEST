@@ -1,0 +1,13 @@
+Changes
+IID.xs
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Thread/IID.pm
+ppport.h
+t/Thread-IID.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

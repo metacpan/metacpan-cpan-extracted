@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Term-Menu.t
+t/tables.t
+t/menu.t
+Expect.pl
+lib/Term/Menu.pm

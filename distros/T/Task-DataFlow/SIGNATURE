@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 de3ff4ccd06e36be0550ffeea4dbae2a1799a4c9 Changes
+SHA1 e22e721835062139a151063b1c6e3248f2e32a51 INSTALL
+SHA1 9328a1f4faa7321677d73a89660878d80bec55c0 LICENSE
+SHA1 e4eb58d86efed826da645761c80f5ab643d67171 MANIFEST
+SHA1 bd240875cb2931099abb9b6bf1c2d40c0468ef35 META.json
+SHA1 8fcdff3842e3b0f0006c44ab06288e24fa01a268 META.yml
+SHA1 58cef092df9e1576c6199a57cdbdb5f6c293441b Makefile.PL
+SHA1 173e55a7674254b4e5c1a154e88303c68db19e32 README
+SHA1 665847016e125e83710712b5fc8a3f5cf316fd33 dist.ini
+SHA1 3ef615df6abba81e9948851a36bd1539f3655f23 lib/Task/DataFlow.pm
+SHA1 cd912ed42a657b40ceaca72e89345bd69ccca3bf scripts/encoding.pl
+SHA1 c38409566badaaea9fd78812715eaac090e648e2 scripts/portaltransparencia/ceis.pl
+SHA1 1a130d03a974681d7576ae96ca842ae717e01b55 scripts/simple-deref.pl
+SHA1 8b9d71ba222c38c620a26a9e2b92253b03adef3f scripts/simple-noref.pl
+SHA1 f569349577fbe486e48ac56fbc0cf153c2e64aef scripts/simple.pl
+SHA1 cedf4210c1a539ffd9458716b30ae76da38fd4ff t/task-bogus.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJP3TfWAAoJEMZvtcdxyp88q38QALtOlq91vvbqqZD6nSsfDNux
+fqf+2MgcPJQWc2Mx1rbZoSK+53wPxWOTUWTU84wyNW3vA8RWRoALdCutWc0dBJJV
+bswjYsftJL1+tl91+6WJd6eJKUA4LD4BtWwy2nAAOtDllhzvomlsTmiUvOsBBJXw
+Bmi/ysjY6fLYKE2gFFejxo7cAN6m90Pqj9bMGMlKflataTfnE/4WGmgEWwhmVmoS
+QCBU/LlDBsYo5/GePoqKKbKuUpDViHAgkEj5+9YsmEMkxrHMPMalfpbqDbcIQWz1
+oSFCz9iGkP0C0y61eAAQbt7m+FbpsLF9gCrJ0YtxGx/ihxx/a8M1x38ycUTvJ3oK
+mud5Q5g2Ud4OJZzKu/Dz8BWE3QkVmuu8jqR7MNqYGWCDaV5fm2vZw2oc+546mfuw
+NKBRPIdmn+KzWyRJDbRc/FZ3hkXYAjh9NxTDKmHX+ySSvs7vG+zfdVb3X9xMXNko
+N29GLQg+qyq1O0CFnu5S+nf7yb9f4+T7DgdqQA1uYWV26sfvotvne4sKIZknJFaK
+hiK1czXmMvO2npl1vTNOSLOdnx3ved9cNNNHCXFiwL5Qv6rKVCORp7EYEmy4aYZx
+t8osg3R2ejVpftfSzWLQayxNb79EhmjY1mYL8c2fVvy2EH5JZkfmMtHL78uLuhQM
+xoRR/ivXgoYZHmpDM3Nb
+=e+I3
+-----END PGP SIGNATURE-----

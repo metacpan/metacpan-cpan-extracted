@@ -1,0 +1,13 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Text/Corpus/CNN.pm
+lib/Text/Corpus/CNN/Document.pm
+scripts/update_Text_Corpus_CNN.pl
+scripts/update_Text_Corpus_CNN.sh
+scripts/examples_Text_Corpus_CNN.pl
+t/001_test.t
+META.yml                                 Module meta-data (added by MakeMaker)

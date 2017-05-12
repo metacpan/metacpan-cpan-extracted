@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Test/Parallel.pm
+t/01-basic.t
+t/02-tests.t
+t/03-add.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,15 @@
+Changes
+lib/Task/Pluggable.pm
+lib/Task/Pluggable/AbstractTask.pm
+lib/Task/Pluggable/AbstractTaskManager.pm
+lib/Task/Pluggable/CommandLineTaskManager.pm
+lib/Task/Pluggable/PluginManager.pm
+lib/Task/Pluggable/Tasks/CreateTask.pm
+lib/Task/Pluggable/Tasks/CreateTaskEnvironment.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

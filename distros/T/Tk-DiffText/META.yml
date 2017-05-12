@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Tk-DiffText
+version:             0.19
+abstract:            Perl/Tk composite widget for colorized diffs.
+license:             ~
+author:              
+    - Michael J. Carman <mjcarman@mchsi.com>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    Algorithm::Diff:               1.13
+    IO::File:                      0
+    Tie::Tk::Text:                 0.01
+    Tk:                            0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

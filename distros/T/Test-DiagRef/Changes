@@ -1,0 +1,17 @@
+Revision history for Test::DiagRef.
+
+1.132080    2013-07-27    DOLMEN (Olivier Mengué)
+	Fix duplicate Exporter use.	
+
+1.131040    2013-04-14    DOLMEN (Olivier Mengué)
+        Fixed Changes file from latest release. Kwalitee should be now ok.
+
+0.131020    2013-04-12    DOLMEN (Olivier Mengué)
+	No code changes.
+	Added 'Changes' file.
+	Added metadata (repo, bugtracker).
+
+0.130670    2013-03-08    DOLMEN (Olivier Mengué)
+	Initial public release.
+	Most of the code has been written while commuting to go to the
+	Quack-and-Hack Europe 2012 in december.

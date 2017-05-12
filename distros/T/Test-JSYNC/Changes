@@ -1,0 +1,14 @@
+---
+version: 0.02
+date:    2011-03-13
+changes:
+- Renamed is_valid_jsync to jsync_ok
+- Added is_valid_jsync as a non-exported alternative to jsync_ok
+- Added is_jsync as a non-exported alternative to jsync_is
+---
+version: 0.01
+date:    2011-02-23
+changes:
+- First release
+- Forked from Test::JSON by Curtis "Ovid" Poe
+- Broke naming convention of Test::JSON with jsync_is instead of is_jsync

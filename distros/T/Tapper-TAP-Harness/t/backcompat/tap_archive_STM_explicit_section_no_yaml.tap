@@ -1,0 +1,7 @@
+# Artemis-Explicit-Section-Start: 1 ---- metainfo ----
+# Artemis-suite-name:               STM_benchmark_tests
+# Artemis-suite-version:            1.001
+# Artemis-machine-name:             mautern
+ok - test suite started
+ok - 2 cores
+1..3

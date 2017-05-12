@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Test-Wiretap
+version:             1.01
+abstract:            ~
+license:             ~
+author:              
+    - Airwave Wireless <cpan@airwave.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::Delegator:              0.01
+    Class::Std:                    0
+    Storable:                      0
+    Test::More:                    0
+    Test::Resub:                   1.03
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

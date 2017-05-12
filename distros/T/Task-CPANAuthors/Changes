@@ -1,0 +1,28 @@
+Revision history for Task-CPANAuthors
+
+1.005 Sun Nov 20 2016
+    - add Acme::CPANAuthors::CPAN::MostScripts
+    - add Acme::CPANAuthors::CPAN::TopDepended
+    - add Acme::CPANAuthors::CPAN::TopDepended::ByOthers
+
+1.004 Sun Jan 18 2015
+    - add Acme::CPANAuthors::MBTI
+
+1.003 Tue Sep 30 2014
+    - add Acme::CPANAuthors::DebianDev
+
+1.002 Tue Jun 3 2014
+    - add Acme::CPANAuthors::MetaSyntactic
+    - add Acme::CPANAuthors::BackPAN::OneHundred
+    - add Acme::CPANAuthors::CPAN::OneHundred
+    - created a release test to check the list of Acme::CPANAuthors
+      modules against CPAN
+
+1.001 Thu May 15 2014
+    - removed Acme::CPANAuthors::British::Companies from the list of
+      requirements as it's packaged with Acme::CPANAuthors::British
+      which is required by Task-CPANAuthors
+
+1.000 Sun May 11 2014
+    - First version of the task
+    - includes 17 Acme::CPANAuthors modules and Task::CPANAuthors::Regional

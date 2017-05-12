@@ -1,0 +1,30 @@
+.ackrc
+.mailmap
+.travis.yml
+Changes
+lib/Test/Pod.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/all_pod_files.t
+t/cut-outside-block.pod
+t/cut-outside-block.t
+t/empty-file.pod
+t/good.t
+t/item-ordering.pod
+t/item-ordering.t
+t/load.t
+t/missing-file.t
+t/pod/good-pod-script
+t/pod/good-pod-script.bat
+t/pod/good.pod
+t/pod/no_pod.pod
+t/selftest.t
+t/spaced-directives.pod
+t/spaced-directives.t
+t/unknown-directive.pod
+t/unknown-directive.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

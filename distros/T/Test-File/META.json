@@ -1,0 +1,76 @@
+{
+   "abstract" : "test file attributes",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "testing",
+      "file"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-File",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t/inc",
+         "inc"
+      ],
+      "file" : [
+         "t/lib/test.pm"
+      ],
+      "namespace" : [
+         "Local"
+      ],
+      "package" : [
+         "version",
+         "Local"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Builder" : "1.001006",
+            "Test::Builder::Tester" : "1.04",
+            "Test::More" : "0.95",
+            "Test::utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/test-file/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/test-file",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/test-file.git",
+         "web" : "https://github.com/briandfoy/test-file"
+      }
+   },
+   "version" : "1.443",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

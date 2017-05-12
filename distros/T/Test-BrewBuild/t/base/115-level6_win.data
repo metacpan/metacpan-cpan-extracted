@@ -1,0 +1,58 @@
+[2016-03-28 09:45:41.874][info][Test::BrewBuild] in _create_log()
+[2016-03-28 09:45:41.874][info][Test::BrewBuild] in new(), constructing Test::BrewBuild object
+[2016-03-28 09:45:41.874][info][Test::BrewBuild.Test::BrewBuild::BrewCommands] constructing new Test::BrewBuild::BrewCommands object
+[2016-03-28 09:45:41.874][notice][Test::BrewBuild] 
+[2016-03-28 09:45:41.875][warning][Test::BrewBuild] successfully loaded Test::BrewBuild::Plugin::DefaultExec plugin
+[2016-03-28 09:45:41.875][notice][Test::BrewBuild.run] commencing run()
+[2016-03-28 09:45:41.875][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.available] generating available
+[2016-03-28 09:45:41.912][info][Test::BrewBuild.brew_info] brew info set to:
+
+The following Strawberry Perls are available:
+
+	5.22.1_64       [installed]*
+	5.22.1_64_PDL  
+	5.22.1_32      
+	5.22.1_32_PDL  
+	5.22.1_32_NO64 
+	5.20.3_64       [installed]
+	5.20.3_64_PDL  
+	5.20.3_32      
+	5.20.3_32_PDL  
+	5.18.4_64      
+	5.18.4_32      
+	5.16.3_64      
+	5.16.3_32      
+	5.14.4_64      
+	5.14.4_32      
+	5.12.3_32      
+	5.10.1_32      
+
+* Currently using
+
+[2016-03-28 09:45:41.912][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.available] determining available perls
+[2016-03-28 09:45:41.912][info][Test::BrewBuild.perls_available] perls available: 5.22.1_64, 5.22.1_64, 5.22.1_32, 5.22.1_32, 5.22.1_32, 5.20.3_64, 5.20.3_64, 5.20.3_32, 5.20.3_32, 5.18.4_64, 5.18.4_32, 5.16.3_64, 5.16.3_32, 5.14.4_64, 5.14.4_32, 5.12.3_32, 5.10.1_32
+[2016-03-28 09:45:41.912][info][Test::BrewBuild.perls_installed] checking perls installed
+[2016-03-28 09:45:41.912][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.installed] cleaning up perls installed
+[2016-03-28 09:45:41.912][warning][Test::BrewBuild.run] installed perls: 5.22.1_64, 5.20.3_64
+[2016-03-28 09:45:41.913][info][Test::BrewBuild.perls_installed] checking perls installed
+[2016-03-28 09:45:41.913][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.installed] cleaning up perls installed
+[2016-03-28 09:45:41.913][info][Test::BrewBuild.results] warnings trapped locally
+[2016-03-28 09:45:41.913][info][Test::BrewBuild.exec] creating temp file
+[2016-03-28 09:45:41.914][info][Test::BrewBuild.exec] temp filename: C:\Users\admin\AppData\Local\Temp\2\CkJsv7uVKK
+[2016-03-28 09:45:41.914][info][Test::BrewBuild] Test::BrewBuild class/obj retrieving a log object
+[2016-03-28 09:45:41.914][info][Test::BrewBuild.Test::BrewBuild::Plugin::DefaultExec::brewbuild_exec] performing plugin duties
+[2016-03-28 09:45:41.914][info][Test::BrewBuild.exec] instructions to be executed:
+system "cpanm --installdeps . && cpanm -v --test-only .";
+
+[2016-03-28 09:45:41.914][info][Test::BrewBuild.exec] system "cpanm --installdeps . && cpanm -v --test-only .";
+
+[2016-03-28 09:45:41.914][info][Test::BrewBuild.exec] temp file handle closed
+[2016-03-28 09:45:41.914][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.brew] *brew cmd is: berrybrew
+[2016-03-28 09:45:41.914][notice][Test::BrewBuild.exec] exec'ing: berrybrew exec perl C:\Users\admin\AppData\Local\Temp\2\CkJsv7uVKK
+[2016-03-28 09:45:46.564][notice][Test::BrewBuild.results] got 2 results
+[2016-03-28 09:45:46.564][info][Test::BrewBuild.results] 5.22.1 PASSED...
+[2016-03-28 09:45:46.564][info][Test::BrewBuild.results] 5.20.3 PASSED...
+
+5.22.1 :: PASS
+5.20.3 :: PASS
+[2016-03-28 09:45:46.564][notice][Test::BrewBuild.results] Test::BrewBuild run finished

@@ -1,0 +1,207 @@
+#!perl
+
+use strict;
+use warnings;
+use version;
+use English qw( -no_match_vars );
+use File::Basename;
+use Getopt::Long;
+use GraphViz;
+use List::Util qw( max );
+use Pod::Usage;
+use Readonly;
+use Scalar::Util qw( openhandle );
+use Text::RecordParser;
+
+Readonly our $VERSION => 1.01;
+
+my $add_color    = 0;
+my $fields       = '';
+my $fs           = qq{\t};
+my $is_directed  = 0;
+my $layout       = 'circo';
+my $out_file     = '';
+my $out_format   = 'png';
+my $rs           = qq{\n};
+my $show_numbers = 0;
+
+my ( $help, $man_page, $show_version );
+
+GetOptions(
+    'c|color'    => \$add_color,
+    'd|directed' => \$is_directed,
+    'format:s'   => \$out_format,
+    'fs:s'       => \$fs,
+    'f|fields:s' => \$fields,
+    'help'       => \$help,
+    'l|layout:s' => \$layout,
+    'man'        => \$man_page,
+    'n|numbers'  => \$show_numbers,
+    'o|out:s'    => \$out_file,
+    'rs:s'       => \$rs,
+    'version'    => \$show_version,
+) or pod2usage;
+
+if ( $help || $man_page ) {
+    pod2usage({
+        -exitval => 0,
+        -verbose => $man_page ? 2 : 1
+    });
+};
+
+if ( $show_version ) {
+    my $prog = basename( $PROGRAM_NAME );
+    print "$prog $VERSION\n";
+    exit 0;
+}
+
+if ( !@ARGV ) {
+    pod2usage('No input files');
+}
+elsif ( @ARGV > 1 ) {
+    pod2usage('Too many input files');
+}
+
+my %field_filter = map { $_, 1 } split( /\s*,\s*/, $fields );
+
+my $file = shift @ARGV;
+my $p    = Text::RecordParser->new(
+    filename         => $file,
+    field_separator  => $fs,
+    record_separator => $rs,
+    trim             => 1,
+);
+
+my $g = GraphViz->new( 
+    directed      => $is_directed,
+    layout        => $layout,
+    bgcolor       => $add_color ? 'lightgoldenrodyellow' : 'white',
+    no_overlap    => 1,
+    node          => {
+        style     => 'filled',
+        fillcolor => 'white',
+    }
+);
+
+my @cols = $p->field_list;
+my %col_pos;
+for my $i ( 1..$#cols ) { # skip first col
+    my $col_name = $cols[ $i ];
+
+    if ( %field_filter ) {
+        next unless $field_filter{ $col_name };
+    }
+
+    $g->add_node( $col_name );
+
+    $col_pos{ $i } = $col_name;
+}
+
+my $records = $p->fetchall_arrayref;
+my @edges;
+for my $data ( @$records ) {
+    my $node_name = $data->[0];
+    $g->add_node( $node_name );
+
+    for my $i ( 1..$#cols ) {
+        my $val = $data->[ $i ]  or next;
+        my $col = $col_pos{ $i } or next;
+
+        if ( %field_filter ) {
+            next unless defined $field_filter{ $col };
+        }
+
+        if ( $val =~ /^\d+$/ && $val > 0 ) {
+            push @edges, [ $cols[ $i ], $node_name, $val ];
+        }
+    }
+}
+
+my $max_val = max( map { $_->[-1] } @edges );
+for my $edge ( @edges ) {
+    my $val    = $edge->[-1];
+    my $weight = ( $val / $max_val ) * .5;
+
+    $g->add_edge( 
+        $edge->[0], $edge->[1],
+        $show_numbers ? ( label => $val ) : (),
+        weight => $weight,
+    );
+}
+
+my $method = join '', 'as_', lc $out_format;
+if ( $out_file ) {
+    open my $fh, '>', $out_file or die "Can't write '$out_file': $!\n";
+    binmode $fh;
+    print $fh $g->$method;
+    close $fh;
+    my $basename = basename( $out_file );
+    print STDERR qq[Image created "$basename."\n];
+}
+else {
+    print $g->$method;
+}
+
+__END__
+
+# -------------------------------------------------------------------
+
+=pod
+
+=head1 NAME
+
+tab2graph - turn tabular data into a graph
+
+=head1 SYNOPSIS
+
+  tab2graph [options] file.tab
+
+Options:
+
+  -c|--color           Add some color to the output (default is white)
+  -d|--directed        Make graph directed (default is not)
+  -l|--layout          GraphViz layout; choose from dot, neato, twopi,
+                       circo (default), and fdp
+  -f|--fields          Restrict to set of fields in first row
+  -n|--numbers         Show the numbers (default is not)
+  -o|--out             Name of output file (default is STDOUT)
+  --format             Output format (default is PNG)
+  --fs=x               Use "x" as the field separator (default is tab)
+  --rs=x               Use "x" as the record separator (default is newline)
+
+  --help               Show brief help and quit
+  --man                Show full documentation
+
+=head1 DESCRIPTION
+
+Turns tabular data into a graph using GraphViz.  This may or may not 
+be useful.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Text::RecordParser
+
+=item * GraphViz
+
+=back
+
+=head1 AUTHOR
+
+Ken Youens-Clark E<lt>kclark@cpan.orgE<gt>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2009-10 Ken Youens-Clark.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+=cut

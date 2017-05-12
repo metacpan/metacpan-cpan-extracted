@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Text/AutoLink.pm
+lib/Text/AutoLink/Plugin.pm
+lib/Text/AutoLink/Plugin/CPAN.pm
+lib/Text/AutoLink/Plugin/FTP.pm
+lib/Text/AutoLink/Plugin/HTTP.pm
+lib/Text/AutoLink/Plugin/Mailto.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-sanity.t
+t/02-basic.t
+t/03-html.t
+t/99-pod-coverage.t
+t/99-pod.t
+t/plugin/cpan.t

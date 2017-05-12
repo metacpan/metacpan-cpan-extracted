@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Tie-Hash-Constant
+version: 0.01
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: make a hash return a constant for all its members
+license: perl
+build_requires:
+  Test::More: 0
+provides:
+  Tie::Hash::Constant:
+    file: lib/Tie/Hash/Constant.pm
+    version: 0.01
+generated_by: Module::Build version 0.23

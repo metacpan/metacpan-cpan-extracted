@@ -1,0 +1,29 @@
+--- |
+
+Basic test of Test::WWW::Mechanize::Driver features. First a comment
+document. It should be ignored completely.
+
+---
+# This is a configuration document.
+# The following tag will be appended to all tests to the end of the file
+tags: basic
+
+---
+# This is a test document
+
+- url: http://test/home.html
+  description: The very basic tests of functionality
+  title_is: Dean Serenevy
+  contains:
+    - GAP Arrangements
+    - Riverbend Community Math Center
+
+- url: http://test/missing.html
+  TODO: Create this page
+  contains:
+    - The answers to the universe
+
+- url: http://test/Unfinished.cgi
+  SKIP: Not yet finished
+  contains:
+    - ...

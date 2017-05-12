@@ -1,0 +1,109 @@
+{
+   "abstract" : "Generic interface for Perl5 template engines.",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tiffany",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tiffany" : {
+         "file" : "lib/Tiffany.pm",
+         "version" : "1.01"
+      },
+      "Tiffany::HTML::Template" : {
+         "file" : "lib/Tiffany/HTML/Template.pm"
+      },
+      "Tiffany::HTML::Template::Pro" : {
+         "file" : "lib/Tiffany/HTML/Template/Pro.pm"
+      },
+      "Tiffany::TT" : {
+         "file" : "lib/Tiffany/TT.pm"
+      },
+      "Tiffany::Template::Declare" : {
+         "file" : "lib/Tiffany/Template/Declare.pm"
+      },
+      "Tiffany::Template::Semantic" : {
+         "file" : "lib/Tiffany/Template/Semantic.pm"
+      },
+      "Tiffany::Text::ClearSilver" : {
+         "file" : "lib/Tiffany/Text/ClearSilver.pm"
+      },
+      "Tiffany::Text::MicroMason" : {
+         "file" : "lib/Tiffany/Text/MicroMason.pm"
+      },
+      "Tiffany::Text::MicroTemplate::Extended" : {
+         "file" : "lib/Tiffany/Text/MicroTemplate/Extended.pm"
+      },
+      "Tiffany::Text::MicroTemplate::File" : {
+         "file" : "lib/Tiffany/Text/MicroTemplate/File.pm"
+      },
+      "Tiffany::Text::Xslate" : {
+         "file" : "lib/Tiffany/Text/Xslate.pm"
+      },
+      "Tiffany::Util" : {
+         "file" : "lib/Tiffany/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Tiffany/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Tiffany",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Tiffany.git",
+         "web" : "https://github.com/tokuhirom/Tiffany"
+      }
+   },
+   "version" : "1.01",
+   "x_contributors" : [
+      "lestrrat <lestrrat+github@gmail.com>",
+      "gfx <gfuji@cpan.org>",
+      "tokuhirom <tokuhirom@gmail.com>"
+   ]
+}

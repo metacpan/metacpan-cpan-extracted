@@ -1,0 +1,16 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Test/Command.pm
+t/00-load.t
+t/01-funcs.t
+t/02-exit.t
+t/03-stdout.t
+t/04-stderr.t
+t/05-object.t
+t/06-signal.t
+t/pod-coverage.t
+t/pod.t

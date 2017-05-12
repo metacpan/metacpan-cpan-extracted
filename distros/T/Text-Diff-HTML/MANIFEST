@@ -1,0 +1,11 @@
+Build.PL
+Changes
+eg/diff.css
+lib/Text/Diff/HTML.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/base.t
+t/pod.t

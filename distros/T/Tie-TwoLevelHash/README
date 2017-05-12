@@ -1,0 +1,94 @@
+
+This is the Tie::TwoLevelHash module.  It is a TIEHASH interface which lets you
+tie to a text file which is a multi-dimensional (two level) hash.
+
+To use it, tie a hash to a directory:
+
+ tie(%hash, 'Tie::TwoLevelHash', $file, 'rw');  # Open in read/write mode
+
+If you pass 'rw' as the third parameter, you'll be in read/write mode,
+and any changes you make to the hash will create or modify the file.
+If you don't open in read/write mode you'll be in read-only mode, 
+and any changes you make to the hash won't have any effect
+in the given file. It's actually useless to tie to the file in read mode
+and make write calls to it, or the hash you are tying to it. If you do, it 
+may croak, depending on what you are trying. If you want to grab values and
+play with them, do that in your script, and get the values out of the hash name
+you are tying with, so you can write to a local hash, and not affect, or try to affect
+the hash you are tying with.
+
+
+
+A two level hash file (I use a .tlh extension) is a file after the same format as
+the defunct(?) Windows .ini files. A simple example of a small TLH file is as follows:
+
+
+	# This is a TLH file
+	# Comments on top of this file are allowed
+
+	COLORS
+		Red: #ff0000
+		Black: #000000
+		White: #ffffff
+
+	PEOPLE
+		Dog: Zeke
+		Cat: Tigger
+		PerlHacker: Randal
+		Author: Kevin Meltzer
+
+	EXTRA
+		Key: Val
+		Test: Vest
+
+
+This file is a textual representation of a two-level hash, also known as a 
+Hash of hashes. The file itself is the main hash, and each section contains another
+hash. So, this file contains the hash COLORS the hash PEOPLE and the hash EXTRA. 
+Tie::TwoLevelHash allows for you to tie to the entire hash of hashes, or directly 
+to one of the hashes within that hash of hashes. When you make a change in your 
+script to the tied hash, it makes that change in your file.
+
+EXAMPLES
+
+Examples are given within the POD.
+
+INSTALLATION
+
+You install Apache::Htpasswd, as you would install any perl module library,
+by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   make clean
+
+DOCUMENTATION
+
+POD style documentation is included in the module.  
+These are normally converted to manual pages and installed as part 
+of the "make install" process.  You should also be able to use 
+the 'perldoc' utility to extract and read documentation from the 
+module files directly.
+
+
+AVAILABILITY
+
+The latest version of Tie::TwoLevelHash should always be available from:
+
+    $CPAN/modules/by-authors/id/K/KM/KMELTZ/
+
+Visit <URL:http://www.perl.com/CPAN/> to find a CPAN
+site near you.
+
+
+COPYRIGHT
+
+  © 1998 Kevin Meltzer. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+Enjoy!

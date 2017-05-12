@@ -1,0 +1,38 @@
+
+Test::Dynamic - automatic counting of your tests for Test::More
+
+DESCRIPTION:
+------------
+
+This is version 1.3.3 of Test::Dynamic
+
+COPYRIGHT:
+----------
+
+	Copyright (c) 2007 Greg Sabino Mullane <greg@endpoint.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+REQUIREMENTS:
+-------------
+
+None, but it won't make much sense without Test::More.
+
+INSTALLATION:
+-------------
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DOCUMENTATION:
+--------------
+
+The latest documentation and news can be found at:
+
+http://bucardo.org/test_dynamic/
+

@@ -1,0 +1,69 @@
+{
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tux/Tie-Hash-DBD",
+         "web" : "https://github.com/Tux/Tie-Hash-DBD"
+      }
+   },
+   "abstract" : "Tie plain hashes to DBI interface",
+   "provides" : {
+      "Tie::Array::DBD" : {
+         "version" : "0.16",
+         "file" : "lib/Tie/Array/DBD.pm"
+      },
+      "Tie::Hash::DBD" : {
+         "file" : "lib/Tie/Hash/DBD.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "DBI" : "1.634",
+            "DBD::Pg" : "v3.5.3",
+            "DBD::CSV" : "0.48",
+            "DBD::SQLite" : "1.48"
+         },
+         "requires" : {
+            "DBI" : "1.613",
+            "Carp" : "0",
+            "Storable" : "0",
+            "perl" : "5.008003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Harness" : "0",
+            "Test::More" : "0.90",
+            "Time::HiRes" : "0"
+         },
+         "recommends" : {
+            "Test::More" : "1.001014"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "version" : "0.16",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "dynamic_config" : 1,
+   "generated_by" : "Author",
+   "name" : "Tie-Hash-DBD",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+   ]
+}

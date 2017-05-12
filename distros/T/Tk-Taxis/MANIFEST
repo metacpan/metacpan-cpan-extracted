@@ -1,0 +1,27 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Tk/Taxis.pm
+lib/Tk/Taxis/Critter.pm
+lib/Tk/Taxis/images/woodlice/n.gif
+lib/Tk/Taxis/images/woodlice/ne.gif
+lib/Tk/Taxis/images/woodlice/e.gif
+lib/Tk/Taxis/images/woodlice/se.gif
+lib/Tk/Taxis/images/woodlice/s.gif
+lib/Tk/Taxis/images/woodlice/sw.gif
+lib/Tk/Taxis/images/woodlice/w.gif
+lib/Tk/Taxis/images/woodlice/se.gif
+lib/Tk/Taxis/images/woodlice/louse.gif
+lib/Tk/Taxis/images/woodlice/louse.ico
+lib/Tk/Taxis/images/bacteria/n.gif
+lib/Tk/Taxis/images/bacteria/ne.gif
+lib/Tk/Taxis/images/bacteria/e.gif
+lib/Tk/Taxis/images/bacteria/se.gif
+lib/Tk/Taxis/images/bacteria/s.gif
+lib/Tk/Taxis/images/bacteria/sw.gif
+lib/Tk/Taxis/images/bacteria/w.gif
+lib/Tk/Taxis/images/bacteria/se.gif
+t/Tk-Taxis.t
+eg/woodlice.pl
+META.yml                                 Module meta-data (added by MakeMaker)

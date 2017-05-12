@@ -1,0 +1,49 @@
+1.113350  2011-12-01 17:51:23 Europe/London
+
+  * Fix bug introduced in code tidying not_external()
+
+1.113280  2011-11-24 22:19:09 Europe/London
+
+  * Port to Dist::Zilla
+  * Renamed to Test::Subroutines
+
+libtest-glassbox-heavy-perl (1.02-1) UNRELEASED; urgency=low
+
+  * Fix for files using __END__ and __DATA__
+  * Doc patch to mention that currently the custom namespace cannot include ::
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue,  2 Jun 2009 10:42:14 +0100
+
+libtest-glassbox-heavy-perl (1.01-1) UNRELEASED; urgency=low
+
+  * Move to Module::Install
+  * Add example
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat,  8 Nov 2008 18:07:31 +0000
+
+libtest-glassbox-heavy-perl (0.04-1) UNRELEASED; urgency=low
+
+  * Bug fix for nested test namespaces (::)
+  * Major fix to allow ignoring of globals defined in use'd packages
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 25 May 2008 23:12:49 +0100
+
+libtest-glassbox-heavy-perl (0.03-1) UNRELEASED; urgency=low
+
+  * Fix for dumb mistake in POD. My proofreader has been fired. 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 19 May 2008 15:15:44 +0100
+
+libtest-glassbox-heavy-perl (0.02-1) UNRELEASED; urgency=low
+
+  * Remove option to have local and specified namespace imports
+  * Add facility for overriding exit,system builtins with sub hooks
+  * Tighten warning disabling to only category 'closure' (see perldiag)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 17 May 2008 19:22:11 +0100
+
+libtest-glassbox-heavy-perl (0.01-1) UNRELEASED; urgency=low
+
+  * Initial Release.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Wed, 14 May 2008 18:29:00 +0100

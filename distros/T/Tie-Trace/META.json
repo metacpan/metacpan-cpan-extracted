@@ -1,0 +1,81 @@
+{
+   "abstract" : "easy print debugging with tie, for watching variable",
+   "author" : [
+      "Ktat, C<< <ktat.is at gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-Trace",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PadWalker" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::Trace" : {
+         "file" : "lib/Tie/Trace.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ktat/Tie-Trace/issues"
+      },
+      "homepage" : "https://github.com/ktat/Tie-Trace",
+      "repository" : {
+         "url" : "git://github.com/ktat/Tie-Trace.git",
+         "web" : "https://github.com/ktat/Tie-Trace"
+      }
+   },
+   "version" : "0.17",
+   "x_contributors" : [
+      "ktat <ktat.is@gmail.com>"
+   ]
+}

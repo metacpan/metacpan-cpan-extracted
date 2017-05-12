@@ -1,0 +1,10 @@
+Change history:
+
+0.02    16 September 2007
+        - now print test names as 
+           "test variety: test input => expected output (is actual output)"
+        - allow undef as input/output without warning
+        - print the undefined value as "undef" 
+        
+0.01	1 Setpember 2007
+	- first release, released upon an unsuspecting CPAN

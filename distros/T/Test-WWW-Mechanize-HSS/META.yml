@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-WWW-Mechanize-HSS
+version:      0.02
+version_from: lib/Test/WWW/Mechanize/HSS.pm
+installdirs:  site
+requires:
+    HTTP::Server::Simple:          0
+    LWP::UserAgent:                5.815
+    parent:                        0.218
+    Test::WWW::Mechanize:          1.16
+    WWW::Mechanize:                1.5
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

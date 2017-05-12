@@ -1,0 +1,111 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be655ee997bbf4af5d8e826ae61a55b157ccd1d1 Changes
+SHA1 9824b738979005e36ccc0e8bcaeb6fb6a3fd2544 MANIFEST
+SHA1 e88dc2660bf954ef433f792a5bf3e336fba2ae96 META.yml
+SHA1 80f66f61476a20c9c6cc3b026f0d9a7fb85cab9b Makefile.PL
+SHA1 905306828e9c306c62ed8ef62e05f8dd480daab2 README
+SHA1 1a106c6564b73232154ace49980b14dbe5c9b322 lib/TeX/Hyphen/Pattern.pm
+SHA1 2e5e40b103f59ceefa56033ced55925cc721c960 lib/TeX/Hyphen/Pattern/Af_ZA.pm
+SHA1 ce5d8702a64c507b5f45bcd8d7be6f25c1da9761 lib/TeX/Hyphen/Pattern/Bg.pm
+SHA1 9a280e5123c6bb04b5f01e9158b3ef6aaa3d3808 lib/TeX/Hyphen/Pattern/Ca.pm
+SHA1 59b152626ce3637955d8c9e037eb926b0dc759ee lib/TeX/Hyphen/Pattern/Cs.pm
+SHA1 ca29e2ade3e83b90935e6c382f7c730c31e7b3d3 lib/TeX/Hyphen/Pattern/Cy.pm
+SHA1 8bc1a4873c5b5de8ae54770cec61bc9e14a94d68 lib/TeX/Hyphen/Pattern/Da.pm
+SHA1 71cbd2f995bb42fb807026870d7e460c44e1df62 lib/TeX/Hyphen/Pattern/Da_DK.pm
+SHA1 7f43e3d794ff916fe133bb66cdeee3048a8d4f5f lib/TeX/Hyphen/Pattern/De_1901.pm
+SHA1 07943995af99b6ef8729c1a223ee3c3fb0445041 lib/TeX/Hyphen/Pattern/De_1996.pm
+SHA1 a7565902fa3de3712f4613cab7b19d82c7a2c56e lib/TeX/Hyphen/Pattern/De_DE.pm
+SHA1 71364693e7572e0f9976c4139c9fa7e1d39751ba lib/TeX/Hyphen/Pattern/De_ch_1901.pm
+SHA1 58dbeaa17f05cce2b9aa9f0e071cca50dbc4eae1 lib/TeX/Hyphen/Pattern/El_monoton.pm
+SHA1 c40f9324080f75d8a88556e5fbb9a27b0b9fb4e3 lib/TeX/Hyphen/Pattern/El_polyton.pm
+SHA1 38f91b761a7d109a8a3bc1a29079a040c25a31a7 lib/TeX/Hyphen/Pattern/En_gb.pm
+SHA1 92e41df48b13c42f503cb7cd437ff88f4883a7c0 lib/TeX/Hyphen/Pattern/En_us.pm
+SHA1 a25f9a16da3b9112798860223268d13923205b50 lib/TeX/Hyphen/Pattern/Es.pm
+SHA1 1b69323693503258f88f4d24c959949beb8ae587 lib/TeX/Hyphen/Pattern/Et.pm
+SHA1 24cde0ef4e258352f2901575f2ab7ee41eea8aeb lib/TeX/Hyphen/Pattern/Et_EE.pm
+SHA1 1202a237ea782d299b2f190060489fe9944cd50a lib/TeX/Hyphen/Pattern/Eu.pm
+SHA1 145564167df517ebc27ae67851222b9e8da6f85e lib/TeX/Hyphen/Pattern/Fi.pm
+SHA1 e8e53fd8d0e8cdfb0df5e57fd04f14c3761524f6 lib/TeX/Hyphen/Pattern/Fr.pm
+SHA1 a6b3dc0f6ce9ba2547318d6bd7f4bf0cf9914484 lib/TeX/Hyphen/Pattern/Fr_FR.pm
+SHA1 069f2bd8a3e9f9abd26dad57db44eafd5525962d lib/TeX/Hyphen/Pattern/Ga.pm
+SHA1 d65b02bb727fdf292b35c671c72ae4121be823ff lib/TeX/Hyphen/Pattern/Gl.pm
+SHA1 9e582060e9a2ccdf9abca3cb56784839d347b86d lib/TeX/Hyphen/Pattern/Grc.pm
+SHA1 7d913aafbffde69e8786344da645eb3f058b3527 lib/TeX/Hyphen/Pattern/Hr.pm
+SHA1 e48b90bdf2944a41057e48526dc59e8e23947598 lib/TeX/Hyphen/Pattern/Hsb.pm
+SHA1 3c59e7aeeffac786b9152e5d663d25534c51fbd1 lib/TeX/Hyphen/Pattern/Hu.pm
+SHA1 a117dcd4ff7561648695961041b7799d7cede426 lib/TeX/Hyphen/Pattern/Hu_HU.pm
+SHA1 a4c459501fa7fc7e19ee28326592f886153e0adc lib/TeX/Hyphen/Pattern/Ia.pm
+SHA1 2be0a37e8309f2656c15934b7b178778f2e2896a lib/TeX/Hyphen/Pattern/Id.pm
+SHA1 0f8ca661a1f4f01a5d5696edf3f98c53f13af68d lib/TeX/Hyphen/Pattern/Is.pm
+SHA1 8b52942a19f6141ce2e3ffd6c4c5518948ec51fe lib/TeX/Hyphen/Pattern/It.pm
+SHA1 aec3e2edee3e240b4d6a29fc8ffe2ea6714e4778 lib/TeX/Hyphen/Pattern/It_IT.pm
+SHA1 c73c1495e1403b99f23018b764c98bbdee56754d lib/TeX/Hyphen/Pattern/Kmr.pm
+SHA1 0a03aa1a0d2814465154cdd508a213dc6527974e lib/TeX/Hyphen/Pattern/La.pm
+SHA1 27e10f7d5ec4445abe59f88164671ea9b5047b81 lib/TeX/Hyphen/Pattern/Lt.pm
+SHA1 be5c1d20f669612ab7bc6d3f4546a54b1d846a1b lib/TeX/Hyphen/Pattern/Lt_LT.pm
+SHA1 eb09f0a4fe7198735102414acd61f6b51265c52c lib/TeX/Hyphen/Pattern/Lv.pm
+SHA1 5b07209159f5ed9f326ca92e69134c11dccfa118 lib/TeX/Hyphen/Pattern/Mn_cyrl.pm
+SHA1 f6a2a598cb74eb6584a3b86eb127d1c163894a59 lib/TeX/Hyphen/Pattern/Mn_cyrl_x_2a.pm
+SHA1 74a4f285e1343b0e1306fdd869b0b01ed637ad26 lib/TeX/Hyphen/Pattern/Nb.pm
+SHA1 3d9091f1e7dc091bd2ac4f623ec1f33108fc3efb lib/TeX/Hyphen/Pattern/Nl.pm
+SHA1 3fd6a650d8e510ea192fb53400c83a760d7eb6d8 lib/TeX/Hyphen/Pattern/Nl_NL.pm
+SHA1 2fa106ad945de8b8b5219fe347df9e35c3352c2a lib/TeX/Hyphen/Pattern/Nn.pm
+SHA1 220fa3b3efb82af411c431f472aed74fdcf85d7b lib/TeX/Hyphen/Pattern/No.pm
+SHA1 5f226d4c486cf621eb4afe69b8dd5fcb7d449338 lib/TeX/Hyphen/Pattern/Pl.pm
+SHA1 c02cb3f73597d1e30d18f4d009139a9f00a4ae4b lib/TeX/Hyphen/Pattern/Pl_PL.pm
+SHA1 9b102f358aca5aaaab867d1f6d994c680df2c11f lib/TeX/Hyphen/Pattern/Pt.pm
+SHA1 3e67852b516e85a95592659423da1644e4c7e52c lib/TeX/Hyphen/Pattern/Pt_BR.pm
+SHA1 a88d21b89590070d9ed21e29014738117c9839e1 lib/TeX/Hyphen/Pattern/Ro.pm
+SHA1 b818ea28edd2df2a0c38034c69ce4ee1fdd47771 lib/TeX/Hyphen/Pattern/Ru.pm
+SHA1 714783e028ad7084c253cc8797e6b0fd628b863e lib/TeX/Hyphen/Pattern/Ru_RU.pm
+SHA1 7faa982db5cf2e983ca43a20c3555cabb87b316f lib/TeX/Hyphen/Pattern/Sa.pm
+SHA1 11999fa8e9649d185d70ec7ef49e96636ffb8726 lib/TeX/Hyphen/Pattern/Sh.pm
+SHA1 f5dbd230e7d89350fb31be2cfa09eb9dcb590957 lib/TeX/Hyphen/Pattern/Sh_cyrl.pm
+SHA1 1d53c0edc8ffae3e3a34ae7adbc03924d45eb774 lib/TeX/Hyphen/Pattern/Sh_latn.pm
+SHA1 01082e85c917f6199bc75dba5e96e13d2e408355 lib/TeX/Hyphen/Pattern/Sk.pm
+SHA1 ffec579c9b7e728becab4b4a884d5c3553be1cc3 lib/TeX/Hyphen/Pattern/Sl.pm
+SHA1 a38f9602ade65e0ef65ad2ce5491d421d7661639 lib/TeX/Hyphen/Pattern/Sl_SI.pm
+SHA1 ee617a1ac6a135838b272b7231ec3764e9002538 lib/TeX/Hyphen/Pattern/Sr.pm
+SHA1 d2f92b90207ad18c10ca93643b0138e1bede96ad lib/TeX/Hyphen/Pattern/Sr_cyrl.pm
+SHA1 8fa29bc4df98369a70de12a50c9c59fe8976fc61 lib/TeX/Hyphen/Pattern/Sv.pm
+SHA1 c0cc1cca1c86730b45739445cccb810478f621a5 lib/TeX/Hyphen/Pattern/Tr.pm
+SHA1 e2856ad95359f7ccc2e991a4e7c098ae1ccff747 lib/TeX/Hyphen/Pattern/Uk.pm
+SHA1 f8a0410ab5c5b2778b344bc4c4486b2533a770cc lib/TeX/Hyphen/Pattern/Zh_latn.pm
+SHA1 e84f1f7c735fd6661a91fadbe2f84e80d11f9c1d lib/TeX/Hyphen/Pattern/Zu_ZA.pm
+SHA1 4df5d4b947cf4e63e675729dd3f168ba844483c7 lib/TeX/Hyphen/Pattern/lgpl-2.1.txt
+SHA1 e203d4ef09d404fa5c03cf6590e44231665be689 lib/TeX/Hyphen/Pattern/lgpl-3.0.txt
+SHA1 47438d5b2ab351796b64b62da105432ab71369ab lib/TeX/Hyphen/Pattern/lppl.txt
+SHA1 e4fedf4e82ef82077a54bebf93cb80ab9d0aaa01 t/00_base.t
+SHA1 e910557082009632bc037c9bc5ec672624c46a73 t/00_signature.t
+SHA1 459d59425fb163fdbe2fb5f8c35ab521244abc7f t/01_tex_hyphen.t
+SHA1 a9148d93d6a862fdfaec2319889ac57026c72d98 t/09_pod.t
+SHA1 cfb7ef16713d3573267be14617e09a51bf2e0a82 t/10_pod-coverage.t
+SHA1 9388863cd2f309b98c1695f68f0f3921923a8a0c t/11_test-coverage.t
+SHA1 96cadb63ffe9d931db89e9cc9437f830a3d5901b t/12_manifest.t
+SHA1 bb643f3d7bc06d64ba2e834cf4c721afd73e2531 t/13_critic.t
+SHA1 4cab2dd05f3d8cf569a30cce1d0ce2598a4d3242 t/14_kwalitee.t
+SHA1 27477ada31b3a7ec8c97796173c250e2daeeb7b5 t/15_spell.t
+SHA1 33ed84b7a77c10f66cd7cb2d226ac5f08a164100 t/perlcriticrc
+SHA1 28076ac5b108f9c8a95d7eff4467dc9c6186483a tools/build_catalog.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.10 (Darwin)
+
+iEYEARECAAYFAkqJBosACgkQ8EyqqHBOVHeotACg9K653zTMLpzjkJqX2JnDa6Rv
+nUEAnj5bSkEAD0UEpGv2cRfUwOTqoLTn
+=Rh8u
+-----END PGP SIGNATURE-----

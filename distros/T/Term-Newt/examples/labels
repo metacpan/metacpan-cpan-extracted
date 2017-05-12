@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+# $Id: labels,v 1.1 1998/11/09 02:29:51 daniel Exp daniel $
+
+use strict;
+use ExtUtils::testlib;
+use Term::Newt;
+
+my $n = Term::Newt->new;
+
+$n->init;
+$n->cls;
+
+$n->open_window(10, 5, 40, 8, "Entry and Label Sample");
+
+my $label = $n->label(1, 1, "Enter a string");
+
+my $entry_val = 0;
+my $entry = $n->entry(16,1,"sample",20,\$entry_val,NEWT_FLAG_SCROLL|NEWT_FLAG_RETURNEXIT);
+
+my $button = $n->button(17, 3, "Ok");
+
+my $ref = 0;
+my $form = $n->form(\$ref,'', 0);
+
+$n->form_add_components($form, $label, $entry, $button);
+$n->run_form($form);
+$n->finished;
+
+printf "Final string was: %s\n", $entry_val;
+$n->form_destroy($form);

@@ -1,0 +1,10 @@
+2012-11-26  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.02: Fix dependencies (reported by ANDK)
+
+2012-10-25  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01: Initial release.
+
+
+vim:set ft=changelog:

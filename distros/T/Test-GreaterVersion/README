@@ -1,0 +1,18 @@
+This is the README file for Test::GreaterVersion, utilities
+for comparing versions of development, installed and CPAN versions
+of a module, by Gregor Goldbach <ggoldbach@cpan.org>.
+
+There are two functions which are supposed to be used
+in your automated release suites to assure that you incremented your
+version before your install the module or upload it to CPAN.
+
+Test::GreaterVersion uses the standard perl module installation
+process.
+
+perl Makefile.PL
+make
+make test
+make install
+
+This is my first module upload to CPAN, so please be gentle but
+do critisize me so I can improve ;-)

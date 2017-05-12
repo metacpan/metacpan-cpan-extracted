@@ -1,0 +1,44 @@
+---
+abstract: 'Install the Map::Tube modules.'
+author:
+  - 'Michal Spacek <skim@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Map-Tube
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Map::Tube: 3.15
+  Map::Tube::CLI: 0.18
+  Map::Tube::Cookbook: 0.03
+  Map::Tube::Exception: 3.06
+  Map::Tube::Graph: 0.05
+  Map::Tube::GraphViz: 0.06
+  Map::Tube::Plugin::Formatter: 0.09
+  Map::Tube::Plugin::FuzzyFind: 0.08
+  Map::Tube::Plugin::Graph: 0.2
+  Map::Tube::Text::Shortest: 0.01
+  Map::Tube::Text::Table: 0.04
+  Task::Map::Tube::Metro: 0.12
+  Test::Map::Tube: 0.17
+  perl: 5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Map-Tube
+  homepage: https://github.com/tupinek/Task-Map-Tube
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: git://github.com/tupinek/Task-Map-Tube
+version: '0.46'

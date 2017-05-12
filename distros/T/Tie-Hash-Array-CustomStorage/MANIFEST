@@ -1,0 +1,10 @@
+Array/CustomStorage.pm
+Hash/CustomStorage.pm
+Makefile.PL
+ChangeLog
+MANIFEST			This list of files
+README
+t/tie_array.t
+t/tie_hash.t
+t/TieScalarTest.pm
+META.yml                                 Module meta-data (added by MakeMaker)

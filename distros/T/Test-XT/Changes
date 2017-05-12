@@ -1,0 +1,31 @@
+Changes for Perl extension Test-XT
+
+0.04 Thu 7 Jul 2011
+	- No functional changes, moving to production release
+	- Updating to Module::Install::DSL 1.01 (ADAMK)
+
+0.03_02 Thu 10 Feb 2011
+	- Updating to Module::Install::DSL 1.00 (ADAMK)
+	- Updated copyright year (ADAMK)
+	- Dramatically reduce the dependency burden, except at release (ADAMK)
+	- Convenience access to underlying %STANDARD hash (FREQUENCY)
+	- Added various tests for the new modules added in 0.03_01 (FREQUENCY)
+	- Fix mistake (pod_coverage_ok -> all_pod_coverage_ok) (FREQUENCY)
+	- Remove Test::Fixme, it's too much of a pain to test (FREQUENCY)
+	- Now throws exceptions using Carp's croak rather than die (FREQUENCY)
+
+0.03_01 Thu 3 Sep 2009
+	- Updating Module::Install to 0.91
+	- Adds several new modules
+	    Test::DistManifest
+	    Test::CheckChanges
+	    Test::Fixme
+	    Test::Pod::Coverage
+	- More documentation on everything
+	- Add support for RELEASE_TESTING-only modules
+
+0.02 Thu 23 Apr 2009
+	- Adding two more modules
+
+0.01 Fri 17 Apr 2009
+	- Creating the initial release

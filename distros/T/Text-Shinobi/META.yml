@@ -1,0 +1,39 @@
+---
+abstract: '忍びいろは (Ninja Alphabet) encoding'
+author:
+  - 'Naoki Tomita aka "Tomimaru" <tomita@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Shinobi
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Shinobi:
+    file: lib/Text/Shinobi.pm
+    version: '0.01'
+requires:
+  Exporter: '0'
+  Lingua::JA::Regular::Unicode: '0'
+  Unicode::Normalize: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/tomill/Text-Shinobi/issues
+  homepage: https://github.com/tomill/Text-Shinobi
+  repository: git://github.com/tomill/Text-Shinobi.git
+version: '0.01'

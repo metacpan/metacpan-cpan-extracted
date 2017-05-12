@@ -1,0 +1,12 @@
+Revision history for Perl module documentation ThreatNet::DATN2004
+
+0.20 Tue  3 Jun 2008
+	- Decided that it was better in Module::Install after all
+	- Syncing version to main package
+
+0.02 Thu Feb 15 2008
+	- Backporting Makefile.PL to raw EU:MM to prevent the need
+	  to rerelease when Module::Install is updated.
+
+0.01 Fri Apr  8 2004
+	- Packaged up the documentation from November 2004

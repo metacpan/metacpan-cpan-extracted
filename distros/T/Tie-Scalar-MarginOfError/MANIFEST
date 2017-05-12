@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tie-Scalar-MarginOfError.t
+lib/Tie/Scalar/MarginOfError.pm
+META.yml                                 Module meta-data (added by MakeMaker)

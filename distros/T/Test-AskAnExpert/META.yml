@@ -1,0 +1,29 @@
+---
+name: Test-AskAnExpert
+version: 0.03
+author:
+  - 'Edgar A. Bering, E<lt>trizor@cpan.orgE<gt>'
+abstract: Automatically test things that require Human Intelligence (by asking someone).
+license: open_source
+requires:
+  perl: 5.6.2
+provides:
+  Test::AskAnExpert:
+    file: lib/Test/AskAnExpert.pm
+    version: 0.03
+  Test::AskAnExpert::Interface:
+    file: lib/Test/AskAnExpert/Interface.pm
+    version: 1
+  Test::AskAnExpert::Interface::File:
+    file: lib/Test/AskAnExpert/Interface/File.pm
+    version: 0.5
+  Test::AskAnExpert::Interface::Mock:
+    file: lib/Test/AskAnExpert/Interface/Mock.pm
+    version: 1.1
+  Test::AskAnExpert::Question:
+    file: lib/Test/AskAnExpert/Question.pm
+    version: 1
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

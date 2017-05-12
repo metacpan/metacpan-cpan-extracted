@@ -1,0 +1,22 @@
+#!perl 
+
+# mkws -- Workspace launcher
+# Substitute path of the perl binary on your system
+# in the line above.
+# When installing, change permissions to executable
+# using 'chmod +x mkws'.  
+
+use Tk;
+use Tk::Workspace;
+
+my $name;
+
+if ( defined @ARGV ) {
+	$name = $ARGV[0];
+	} else {
+	$name = 'workspace'
+}
+# If you place Workspace.pm in the current directory, 
+# us: 'Workspace::open(Workspace::create($name));
+
+Tk::Workspace::open(Tk::Workspace::create($name));

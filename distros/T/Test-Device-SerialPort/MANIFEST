@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+eg/elec_meter.pl                         Read-only French electric meter demo
+t/AltPort.pm
+t/Test-Device-SerialPort.t
+t/test2.t
+t/test3.t
+lib/Test/Device/SerialPort.pm
+META.yml                                 Module meta-data (added by MakeMaker)

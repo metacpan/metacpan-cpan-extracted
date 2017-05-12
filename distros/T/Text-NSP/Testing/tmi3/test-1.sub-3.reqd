@@ -1,0 +1,17 @@
+Warning from statistic library!
+  Warning code: 200
+  Warning message: Total trigram count cannot be less than to zero
+Skipping ngram one<>two<>three<>2 14 15 11 5 4 6
+Warning from statistic library!
+  Warning code: 200
+  Warning message: Total trigram count cannot be less than to zero
+Skipping ngram one<>two<>four<>2 14 13 19 4 7 7
+Warning from statistic library!
+  Warning code: 200
+  Warning message: Total trigram count cannot be less than to zero
+Skipping ngram two<>three<>one<>1 14 13 21 4 8 5
+Warning from statistic library!
+  Warning code: 200
+  Warning message: Total trigram count cannot be less than to zero
+Skipping ngram two<>three<>four<>4 16 13 23 4 9 11
+Wrong number of tokens in ngram on line 6. Expecting 3.

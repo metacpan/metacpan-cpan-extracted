@@ -1,0 +1,24 @@
+Revision history for Perl extension Test::Device::SerialPort.
+
+0.05  Thu Jun 10 12:59:04 2010 (Bill Birthisel)
+	- Add status and is_status methods
+	- Work around POSIX.pm warnings on Windows
+
+0.04  Tue Jun 01 15:55:00 2010 (Bill Birthisel)
+	- Add demo eg/elect_meter.pl
+	- Allow 1200 baud
+	- resolve timing test failures
+
+0.03  Tue Mar 23 15:15:15 2010
+	- Add many methods from Win32 and Device versions (major rewrite)
+	- Add tests
+	- Add Win32 and ControlX10 compatibility
+	- changes by Bill Birthisel
+
+0.02  Wed Mar 03 03:03:03 2010 (time estimated)
+	- create github repository
+
+0.01  Wed Feb 14 15:07:07 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.6.1 -n Test::Device::SerialPort
+

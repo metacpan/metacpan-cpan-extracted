@@ -1,0 +1,13 @@
+Revision history for Text-SenseClusters-Wikipedia-LabelEvaluation
+
+0.06 	Mon Dec 24 13.25:49 CST 2012
+		Rearranged the directory structure. Added more test cases. Also added code snipet to test each module.
+
+0.05    Sun Dec 2 13:32:41 CST 2012
+        Fifth version, added the various input parameters of the program as hash instead of taking all the parameters individually.
+
+
+0.04    Sun Nov 18 19:28:13 CST 2012
+        Fourth version, restructure label evaluation program to have modular structures and added an example of using this module in SYNOPSIS.
+
+

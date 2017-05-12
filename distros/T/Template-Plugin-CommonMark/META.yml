@@ -1,0 +1,29 @@
+---
+abstract: 'Template Toolkit plugin to generate HTML from CommonMark'
+author:
+  - 'A. Sinan Unur <nanis@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-CommonMark
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CommonMark: '0'
+  Template: '0'
+  parent: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nanis/template-plugin-commonmark/issues
+  repository: https://github.com/nanis/template-plugin-commonmark
+version: '1.000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

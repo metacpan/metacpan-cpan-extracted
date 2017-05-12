@@ -1,0 +1,17 @@
+start => '00:00', tz => 'America/Chicago', days => 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
+
+J1( token => "token_n1" )  J2 ( token => "token_n1" )
+
+
+--------------------------------------------------------------------------------
+
+J3( token => "token_n2" )  J4 ( token => "token_n2" )  J5 ( token => "token_n2" )
+
+J6( token => "token_n2" )
+
+--------------------------------------------------------------------------------
+
+J7( token => "token_n2_2" )  J8 ( token => "token_n2_2" )  J9 ( token => "token_n2_2" )
+
+J10( token => "token_n2_2" )  J11 ( token => "token_n1" )
+

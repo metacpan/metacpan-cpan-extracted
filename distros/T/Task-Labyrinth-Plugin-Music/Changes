@@ -1,0 +1,9 @@
+Changes for Task-Labyrinth-Plugin-Music
+=======================================
+
+1.01    2015-01-18
+        - documentation updates.
+        - fixed license fields in META.json to be lists.
+
+1.00    2014-05-14
+        - first official release.

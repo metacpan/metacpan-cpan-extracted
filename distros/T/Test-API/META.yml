@@ -1,0 +1,50 @@
+---
+abstract: 'Test a list of subroutines provided by a module'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Carp: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Builder::Tester: '1.18'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-API
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Test::API:
+    file: lib/Test/API.pm
+    version: '0.008'
+requires:
+  Symbol: '0'
+  Test::Builder::Module: '0.86'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Test-API/issues
+  homepage: https://github.com/dagolden/Test-API
+  repository: https://github.com/dagolden/Test-API.git
+version: '0.008'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Toby Inkster <mail@tobyinkster.co.uk>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

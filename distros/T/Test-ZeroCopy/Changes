@@ -1,0 +1,6 @@
+0.110   2014-10-30
+  * Avoid creating a new stack frame to better integrate
+    with Test::More (thanks Salvador)
+
+0.100   2014-04-19
+  * Initial CPAN release

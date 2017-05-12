@@ -1,0 +1,11 @@
+app.config
+app.psgi
+cfi.psgi
+.git
+.bak
+~
+blib
+.tar.gz
+-0.
+^MYMETA.yml$
+^MYMETA\.json$

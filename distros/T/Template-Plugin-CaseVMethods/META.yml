@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Template-Plugin-CaseVMethods
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  Template::Plugin::VMethods: 0
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Template::Plugin::CaseVMethods:
+    file: lib/Template/Plugin/CaseVMethods.pm
+    version: 0.01
+generated_by: Module::Build version 0.18_02

@@ -1,0 +1,10 @@
+twitter:
+  consumer_key: your_consumer_key
+  consumer_secret: your_consumer_secret
+  token: your_token
+  token_secret: your_token_secret
+delicious:
+  user: your_delicious_username
+  pswd: your_password
+t2delicious:
+  twitter_screen_name: your_twitter_name

@@ -1,0 +1,10 @@
+NAME
+    TemplateM - *ML templates processing module
+
+ABSTRACT
+    The TemplateM module means for text templates processing in XML, HTML,
+    TEXT and so on formats. TemplateM is the alternative to most of standard
+    modules, and it can accomplish remote access to template files, has
+    simple syntax, small size and flexibility. Then you use TemplateM,
+    functionality and data are completely separated, this is quality of
+    up-to-date web-projects.

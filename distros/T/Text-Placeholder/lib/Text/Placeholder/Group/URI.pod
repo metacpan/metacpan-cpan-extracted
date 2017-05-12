@@ -1,0 +1,54 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Group::URI - symbolic access to parts of an URI
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder;
+	my $placeholder = Text::Placeholder->new(
+		my $uri = '::URI');
+	$placeholder->compile('Host: [=uri_host=]');
+
+	$uri->subject('http://www.perl.org/');
+	print ${$placeholder->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+A proof-of-concept module.
+
+Text::Placeholder::Group::URI provides the placeholders 'uri_(scheme|opaque|host|path|full)'.
+
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item subject($uri)
+
+Sets or gets the string representation of the URI.
+
+=item add_placeholder($placeholder, $code_ref)
+
+Adds the $code_ref under the name of $placeholder. $code_ref is executed and returns the current value to be substituted for $placeholder.
+
+=back
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,39 @@
+Changelog for Test-Mojo-Role-TestDeep
+
+0.007 2016-03-15T06:27:50
+ - add all_text_deeply method
+ - add diagnostic information when tests fail
+
+0.006 2016-03-13T20:27:34Z
+ - fix doc examples missing quotes
+
+0.005 2016-03-13T19:44:23Z
+ - mention that test descriptions are optional
+ - expand new method docs to match json_deeply
+ - fix method usage having the wrong method name
+ - expand on the description a bit
+ - fix synopsis formatting
+ - add new methods to synopsis
+ - add text_deeply and attr_deeply
+ - add contributors to docs
+
+0.004 2015-08-11T01:05:18Z
+ - fix synopsis example
+
+0.003 2015-08-10T01:00:09Z
+ - fix link to Test::Deep comparisons
+
+0.002 2015-08-10T00:55:30Z
+ - fix docs to better work with Test::Deep's docs
+ - bump version requirement to perl 5.10
+
+0.001 2015-08-10T00:25:35Z
+ - release v0.001
+ - add build artifacts
+ - remove ModuleBuild
+ - add documentation and tests
+ - set the success flag correctly
+ - add support for json pointers
+ - add initial implementation from Dynamocles
+ - Minting dist
+

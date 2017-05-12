@@ -1,0 +1,52 @@
+Changes
+=======
+
+0.00010 - 15 Sep 2011
+    * Release solely to fix this Change log
+    * Require Text::Xsate 1.3000 (suggested by nihen)
+    * Changes that went in 0.0009, but had completely escaped my memory:
+        * These filters now *ESCAPE* html before doing their magic
+            html_para
+            html_break
+            html_para_break
+            html_line_break
+
+0.00009 - 15 Sep 2011
+    * XXX INITIALLY THIS RELEASE WAS DESCRIVED AS "NO CHANGES", BUT
+      THERE WERE CHANGES. SEE 0.00010 ABOVE
+    * Add t/005_xss.t to validate we're safe from potential xss attacks
+      [https://github.com/lestrrat/Text-Xslate-Bridge-TT2Like/pull/1] (gfx)
+
+0.00008 - 11 May 2011
+    * Now html_* and xml filters return strings that are prorperly
+      marked as raw via Text::Xslate::html_builder()
+      (http://cpanbook.koneta.org/post/5361569358)
+
+0.00007 - 4 Sep 2010
+    * Grrrr, fight against PAUSE indexer.
+    * No code changes
+
+0.00006 - 3 Sep 2010
+    * Rename the functions so that they are private
+    * Split up the .pm file and the .pod file so I can auto-generate 
+      the list of functions that are available.
+      (request for the list of functions by gfx)
+    * Add pod tests
+
+0.00005 - 9 Aug 2010
+    * Add truncate() filter.
+
+0.00004 - 1 Aug 2010
+    * Update Text::Xslate dependency
+    * Remove uri() which is a builtin filter since Xslate 0.1052 (gfx)
+    * Use uri_escape from Xslate 0.1052 as the background for url filter (gfx)
+
+0.00003 - 19 Jul 2010
+    * Add dynamic filter support (tokuhirom)
+
+0.00002 - 19 Jul 2010
+    * Add filter support (tokuhirom)
+    * Update Text::Xslate dependency
+
+0.00001 - 09 Jun 2010
+    * Initial release

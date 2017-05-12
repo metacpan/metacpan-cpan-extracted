@@ -1,0 +1,23 @@
+---
+abstract: 'control the flow of time'
+author:
+  - 'Aaron Cohen <acohen@shutterstock.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: 0.05
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Time-StasisField
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker::CPANfile: 0
+version: 0.01

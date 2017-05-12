@@ -1,0 +1,108 @@
+As a programmer,
+
+  * I want to tag the start of my task with some string, as simply as
+    using a print statement.  This tag string will be automatically
+    indented appropriately if it falls within other tasks (nesting).
+    Example output:
+        Starting molecular transport process...
+          Starting atomic disassociator...
+
+  * I want to indicate that the end of the task was successfully completed
+    and the ending status string will be automatically printed,
+    right-justified, with an optional dot-dot leader.  The start tag string
+    will automatically be included.
+    Example output:
+          End of atomic disassociator..................... [OK]
+        End of molecular transport process................ [WARN]
+
+  * I want the option to specify start/end text pairs that go infront
+    of each message.  For example, ["Beginning ", "Ending "], or
+    ["Start of ", "End of "].
+
+  * if the ending status is to be emitted and there's no intervening
+    other output lines, and there's enough room, I want the status
+    to be on the same line as the starting string.
+    Example output:
+            Proton coupling phase..................... [FAIL]
+
+  * if program control leaves the current scope where I tagged the start
+    of a task, I want the task status to be automatically closed with some
+    preset status ('Done' presumably).
+
+  * I want to have a colorize mode that prints ending statii in color;
+    for example: green for OK, success; Yellow for warnings; Red for
+    errors, etc.
+
+  * I want to have an easy way to insert 'informative' chunks of text at
+    the current level that don't close out or otherwise affect the current
+    level.
+    Example output:
+        Starting molecular transport process...
+
+          In this process we use quantum bindings to "move" the
+          molecules from one place to another.
+
+          Starting atomic disassociator...
+
+  * I want a way to give a progress indicator.  These could be
+        N           3
+        M/N         3/7
+        percent     20%
+        dots        ....
+        tics        .........:.........:...
+        countdown   9... 8... 7...
+    Depending on the style, these could overwrites themselves (^H's) as
+    they update.
+    Example output:
+          Proton coupling phase... 40%
+          Proton coupling phase... 2/14
+          Proton coupling phase.........:.........:...
+          Proton coupling phase... 4...3...2...1...
+
+  * I want to indicate an unstatused completion of a task - it's simply
+    "done" without a status.
+    Example output:
+          Proton coupling phase... done.
+
+  * I want to emit an event message - one that has no duration or status
+    or scope.
+    Example output:
+          Neutron beam established.
+
+  * the output must be easily parsed for use by GUIs and WUIs.  For example,
+    simple substitution to convert the output stream into HTML.
+
+  * I want to emit bullets with the messages.  The bullets can be
+    per-level or all the same.
+    Example output:
+      *  Starting molecular transport process...
+      +  Starting atomic disassociator...
+      -  Proton coupling phase....................... [FAIL]
+      -  Quark realignment........................... [DONE]
+      -  Charm spinner............................... [DONE]
+      +  End of atomic disassociator................. [OK]
+      *  End of molecular transport process.......... [WARN]
+
+  * I want an option to emit timestamps with the messages.  The timestamps
+    should all line up on the left.  I can specify the timestamp format too,
+    but it defaults to an ISO-8601 short time.
+    Example output:
+      23:47:13  Starting molecular transport process...
+      23:47:15    Starting atomic disassociator...
+      23:47:15      Proton coupling phase...................... [FAIL]
+      23:47:16    End of atomic disassociator.................. [OK]
+      23:47:29  End of molecular transport process............. [WARN]
+
+  * I want the automatic indentation to be thread-aware and
+    "do the right thing".
+
+  * I want the indentation level as something I can specify,
+    including 0 (no indentation).
+
+  * if my app wraps anoth app (via system() or qx() or exec() calls, etc),
+    and both apps use this module, I want the indentation to proceed naturally
+    across the apps.  That is, the wrapped inner app's emissions are indented
+    as if they were part of my app.  If using an envvar to transfer context,
+    then the envvar should be cleaned up at the outer level.
+
+  * I want output to different filehandles to be independently managed.

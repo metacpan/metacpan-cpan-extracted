@@ -1,0 +1,132 @@
+---
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+    active: 1
+
+# -------------------- "test requests" (Testruns)
+
+- schema: Testrun
+  name: aaa-xen
+  data:
+    id: 1001
+    owner_id: 12
+    shortname: aaa-xen
+    notes: aaa
+    topic_name: Distribution
+    
+- schema: TestrunScheduling
+  name: Xen-aaa
+  data:
+    id: 101
+    testrun_id: 1001           
+    queue_id: 1                
+    status: schedule
+    auto_rerun: 1
+
+# -------------- Preconditions 
+
+- schema: Precondition
+  name: root_image
+  data:
+    id: 1
+    precondition: |
+      ---
+      arch: linux64
+      image: root/image.img
+      mount: /
+      partition: sda2
+      precondition_type: image
+
+- schema: Precondition
+  name: some_pkg
+  data:
+    id: 2
+    precondition: |
+      ---
+      precondition_type: package
+      filename: kernel/package.tgz
+
+- schema: Precondition
+  name: testprogram
+  data:
+    id: 3
+    precondition: |
+      ---
+      precondition_type: testprogram
+      program: /bin/true
+      timeout: 72
+
+# ----------- assign preconditions to testruns 
+
+- schema: TestrunPrecondition
+  name: image precondition
+  data:
+    testrun_id: 1001
+    precondition_id: 1
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: package precondition
+  data:
+    testrun_id: 1001
+    precondition_id: 2
+    succession: 2
+
+- schema: TestrunPrecondition
+  name: testprogram precondition
+  data:
+    testrun_id: 1001
+    precondition_id: 3
+    succession: 3
+    
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 1
+    name: iring
+    free: 1
+    active: 1
+
+
+# iring bound to Xen queue
+- schema: QueueHost
+  name: iring
+  data:
+    id: 1
+    queue_id: 1
+    host_id: 1
+
+- schema: TestrunRequestedHost
+  name: iring_on_Xen
+  data:
+    id: 1
+    testrun_id: 1001
+    host_id: 1
+

@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use Template::Toolkit::Simple;
+
+Template::Toolkit::Simple->_run_command(@ARGV);

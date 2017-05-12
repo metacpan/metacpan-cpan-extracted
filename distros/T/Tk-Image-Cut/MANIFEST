@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-Image-Cut.t
+lib/Tk/Image/Cut.pm
+test.jpg
+test.pl
+
+
+META.yml                                 Module meta-data (added by MakeMaker)

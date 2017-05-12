@@ -1,0 +1,15 @@
+Revision history for Perl extension Tk::CanvasFig.
+
+1.017
+	- 2nd attempt on: make sure test does not fail if DISPLAY is missing
+
+1.016
+	- make sure test does not fail if DISPLAY is missing
+
+1.015
+	- hide from CPAN indexer
+	- make sure tests are non-interactive
+
+1.014
+	- first CPAN release
+	- bugfixes suggested by Joseph A. Calandrino

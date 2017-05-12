@@ -1,0 +1,50 @@
+{
+   "abstract" : "Implement a mock HTTP server for use in tests",
+   "author" : [
+      "Daniel Ruoso <druoso@bloomberg.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-HTTP-MockServer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Parser" : "0",
+            "HTTP::Response" : "0",
+            "JSON::XS" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::HTTP::MockServer" : {
+         "file" : "lib/Test/HTTP/MockServer.pm",
+         "version" : "v0.0.1"
+      },
+      "Test::HTTP::MockServer::REST" : {
+         "file" : "lib/Test/HTTP/MockServer/REST.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/bloomberg/Test-HTTP-MockServer"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.27200"
+}

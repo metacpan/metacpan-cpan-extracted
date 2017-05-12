@@ -1,0 +1,44 @@
+{
+   "abstract" : "Install the things to make a CPAN Testers smokebox",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-CPAN-SmokeBox",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Metabase::Relayd" : "0.22",
+            "App::SmokeBox::Mini" : "0.40",
+            "App::SmokeBox::Mini::Plugin::IRC" : "0.06",
+            "App::SmokeBox::Mini::Plugin::Stats" : "0.08",
+            "App::SmokeBrew" : "0.28",
+            "App::SmokeBrew::Plugin::BINGOS" : "0.04"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/bingos/perl-task-modules/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bingos/perl-task-modules.git",
+         "web" : "http://github.com/bingos/perl-task-modules/tree"
+      }
+   },
+   "version" : "0.04"
+}
+

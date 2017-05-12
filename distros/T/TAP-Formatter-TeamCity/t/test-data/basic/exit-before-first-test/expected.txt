@@ -1,0 +1,5 @@
+##teamcity[testSuiteStarted flowId='t/test-data/basic/exit-before-first-test/input.st' name='t/test-data/basic/exit-before-first-test/input.st']
+##teamcity[testStarted captureStandardOutput='true' flowId='t/test-data/basic/exit-before-first-test/input.st' name='Test died']
+##teamcity[testFailed flowId='t/test-data/basic/exit-before-first-test/input.st' message='not ok' name='Test died']
+##teamcity[testFinished flowId='t/test-data/basic/exit-before-first-test/input.st' name='Test died']
+##teamcity[testSuiteFinished flowId='t/test-data/basic/exit-before-first-test/input.st' name='t/test-data/basic/exit-before-first-test/input.st']

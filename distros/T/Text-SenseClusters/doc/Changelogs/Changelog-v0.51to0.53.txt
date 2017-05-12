@@ -1,0 +1,53 @@
+
+Changes made in Sense-Clusters version 0.51 during version 0.53
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Added programs -
+
+	reduce-count.pl - to reduce the training bigram file by removing
+	bigrams made up of both words not present in the test data
+
+ 	maketarget.pl - to automatically create the target word by searching
+	possible forms of the target in the given sval2 file
+
+	sval2plain.pl - to convert a sval2 formatted file into plain text
+
+2.	Updated programs 
+
+	wordvec.pl, order2vec.pl, svdpackout.pl, mat2harbo.pl, svdpackout.pl
+	by adding error checks to detect floating point overflow and underflow
+	errors
+
+	wordvec.pl - with an option to specify features file via --feats option
+
+	simat.pl - no normalization for null vectors
+	
+	mat2harbo.pl - added help in perldoc on setting parameters in las2.h
+	and problem of las2 running infinitely. Changed default iter to 
+	min(3*maxprs, cols). For previous default iter = #cols, las2 was 
+	running infinitely for quite a few experiments.
+
+3.	Updated wrapper discriminate.pl by - 
+
+	a. supporting global test and training data that might not contain 
+	<head> tags
+
+	b. adding unigram feature types for order1 type vectors
+
+4.	Updated /Demos dir. by -
+
+	a. providing fewer scripts that show all possible variations
+	b. demonstrating use of both global and local training data
+
+5.	Updated /Docs dir -
+
+	a. modified flow diagrams
+	b. removed pseudo scripts as the new demo scripts show all possible
+	   variations
+	c. updated the html documentation files
+	
+(Changelog-v0.51to0.53 Last Updated on 06/18/2004 by Amruta)

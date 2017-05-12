@@ -1,0 +1,41 @@
+$Revision: 3768 $
+
+Test::HTML::W3C is a testing module, which uses Test::Builder::Module and is in
+the spirit Test::More. It simply wraps WebService::Validator::HTML::W3C and
+provides some convenient functions to detect HTML/XHTML validation problems
+using services provided by the World Wide Web Consortium (W3C). Please note
+that, as with WebService::Validator::HTML::W3C, this particular module has
+absolutely no connection with the good folks at W3C. Please DO NOT report any
+problems with it to them. In addition, please do not abuse the W3C's validator
+service. If you need to do lots of validation testing, try downloading and
+installing the validator software and modifying the validator uri this module
+uses per the documentation.
+
+PREREQUISITES
+
+WebService::Validator::HTML::W3C
+Test::Builder::Module
+
+INSTALLATION
+
+You should be able to install Test::HTML::W3C in any of the usual ways:
+
+    perl -MCPAN -e 'install Test::HTML::W3C'
+
+or
+
+    perl -MCPANPLUS -e 'install Test::HTML::W3C'
+
+or 
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+TESTS
+
+Currently, the only tests provided test for POD correctness and
+coverage. More tests will be supplied later...
+
+For everything else see the POD documentation.

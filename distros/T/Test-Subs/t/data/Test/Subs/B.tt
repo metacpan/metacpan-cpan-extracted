@@ -1,0 +1,8 @@
+use strict;
+use warnings;
+use Test::Subs;
+
+test { 1 == 1 }
+
+test { 42 };
+

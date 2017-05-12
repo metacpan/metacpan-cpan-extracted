@@ -1,0 +1,22 @@
+.gitignore
+Changes
+lib/Text/CSV/Hashify.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/000-test-prep.t
+t/001-new.t
+t/002-functional.t
+t/003-methods.t
+t/004-passthru.t
+t/005-aoh.t
+t/data/dupe_field_names.csv
+t/data/dupe_key_names.csv
+t/data/names.csv
+t/data/pipe_names.csv
+t/data/whitespace_names.csv
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cca1f05e29564083e1399ec369015322c55ee785 MANIFEST
+SHA1 9be293452e45d8209316f11dd93664e95e68109c MANIFEST.SKIP
+SHA1 63e0aa015e16a2cf4b11edf059bcf5bb184736cb META.yml
+SHA1 f1f169bf88850fa84d0cccbe287bcadb5fa4332d Makefile.PL
+SHA1 78edb89a439463e44c33a72bbee84c54d0dc8aaf inc/Module/Install.pm
+SHA1 8ea4e37df83fd0c1c050be5c8da75545c3828d9b inc/Module/Install/Base.pm
+SHA1 1da6031583c32f0d1ec073b8376102fc51427dcc inc/Module/Install/Can.pm
+SHA1 b779375b90c16af2f31f38a1dd2b5df223c7f2fb inc/Module/Install/Fetch.pm
+SHA1 2054450e1e9c1dd8056362bf4a64ae70d5d71476 inc/Module/Install/Makefile.pm
+SHA1 5d6189b2cad15cf9932a28faafd55130c8247e83 inc/Module/Install/Metadata.pm
+SHA1 02af973fae2ac3531fa6b704574b2b8cb2a08148 inc/Module/Install/Win32.pm
+SHA1 3a2eab96e91cca8d99938cda7791759ae9d97b3a inc/Module/Install/WriteAll.pm
+SHA1 0ea7126bd28e9f9eaf1e46cb1410da6dbf529d82 lib/Test/Depends.pm
+SHA1 8e4d7e13673a150aeadab23ac2ad150c8546003d t/00-load.t
+SHA1 deba64dbf788556519df2af0e0a658ea586c993e t/02-test-budget-rentaharness.t
+SHA1 e7ee2411d6be3a0ab0155a0acc9951698df303c9 t/SecondClass.pm
+SHA1 b90dc60a2bc34b0719e44163451cff4225e9c8d6 t/SomeClass.pm
+SHA1 8cb0782d17bb7e6487b15f7f91faf156403b8753 t/someclass-import.pl
+SHA1 fcf26d132b6ed56f6e4a1f48ddc74354e6a660e9 t/someclass-version.pl
+SHA1 239d79004df15cd5926fc383d274b6d55ed5c505 t/someclass.pl
+SHA1 2baa4e43e160d139e81d9baf1885d56d75516e4d t/twoclasses.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iEYEARECAAYFAkc5LRcACgkQ/AZAiGayWEPo8gCgrL+6L7sQaSd5rNZwS9G0C8WU
+CrYAoLzqp1gwm6wjdqhZFIU4sjcOFj6N
+=uyoB
+-----END PGP SIGNATURE-----

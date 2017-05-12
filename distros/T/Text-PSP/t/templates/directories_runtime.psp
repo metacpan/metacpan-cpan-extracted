@@ -1,0 +1,3 @@
+In t/templates
+<%= $_[0]->include("includes/inc2/dirtest2.psp") %>
+In t/templates

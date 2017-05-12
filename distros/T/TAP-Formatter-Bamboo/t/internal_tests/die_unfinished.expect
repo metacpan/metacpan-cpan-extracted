@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testsuites>
+  <testsuite name="t/internal_tests/die_unfinished.test" errors="1" failures="0" tests="3">
+    <system-out/>
+    <testcase name="t/internal_tests/die_unfinished.test" time="TEST_TIME">
+      <failure><![CDATA[Fail reason(s):
+    parse errors (Bad plan.  You planned 4 tests but ran 3.)
+Test output:
+1..4
+ok 1
+ok 2
+ok 3
+
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

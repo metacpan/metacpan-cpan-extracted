@@ -1,0 +1,26 @@
+---
+abstract: 'Read-only text widget with syntax highlighting'
+author:
+  - 'Ken Cotterill <kcott@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-ROSyntaxText
+provides:
+  Tk::ROSyntaxText:
+    file: lib/Tk/ROSyntaxText.pm
+    version: 1.001
+requires:
+  Syntax::Highlight::Engine::Kate: 0.06
+  Test::More: 0.94
+  Tk: 0
+  Tk::Derived: 0
+  Tk::ROText: 0
+  Tk::Widget: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.001

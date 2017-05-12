@@ -1,0 +1,2 @@
+27-Oct-1998	SplitFrame.pm	In RedrawTrim(), a test for -trimcount disallowed zero when,
+				in fact, zero was a desirable value

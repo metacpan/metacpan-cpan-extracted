@@ -1,0 +1,43 @@
+
+Changes from NSP version 0.51 to 0.53
+-------------------------------------
+
+Amruta Purandare, pura0010@umn.edu
+Ted Pedersen, tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+
+count.pl
+--------
+ 
+(1)	Perl regular expression support for --stop option. 
+
+(2)	OR mode for --stop option to remove Ngrams that are made up of at 
+	least one stop word. Original AND mode (removing Ngrams of all  
+	stop words) is made default. 
+
+(3)	--nontoken FILE option to remove any sequence of characters matching 
+	the Perl Regular expressions in the FILE.
+
+Utils
+-----
+
+(1)	New utility program kocos.pl to find the Kth order co-occurrences of a 
+	given word. 
+
+(2)	New utility program socs.pl to find the 2nd order co-occurrences of a 
+	given word.  
+
+organizational changes
+----------------------
+
+(1)	nsp-v0.53/ contains general purpose programs count.pl and  
+	statistic.pl 
+	
+	Utils/ contains special purpose programs kocos.pl and rank.pl
+
+	Measures/ contains modules (.pm files) that implement measures
+	of association
+
+[Amruta - 01/10/2003]

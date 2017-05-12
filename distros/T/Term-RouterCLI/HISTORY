@@ -1,0 +1,29 @@
+I started this project because I needed to create a Router (Stanford) style CLI for a project I 
+was working on and was faced with the oft asked question, build your own module that does 
+exactly what you need or find one that gets you close and live with the differences. So I went 
+looking for a Perl or Python module that would get me close.  
+
+Initially I found and settled on Term::ShellUI, a Perl module, and tried to make it work for me. 
+I spent several weeks working with it only to realize that it would only do about 80% of what I 
+needed, there were some thing that it was missing and some things it did that I just did not like. 
+I reached out to the original author but did not hear anything back from him, so with that I 
+start to write and rewrite code.
+
+I started making little changes here and there that turned in to large structural changes that 
+turned in to complete re-writes of entire methods and the creation of whole new sub classes. 
+Eventually I realized I was going in a completely different direction from Term::ShellUI and I 
+had diverged the code to the point where merging my changes in was not possible. Basically I have 
+taken this beyond the functional scope of what Term::ShellUI, written by Scott Bronson, is. 
+
+At this point I decided to fork the code and finish doing a major rewrite one method at time.  
+This way I could remove features that are not applicable to a Router style CLI and add features 
+that are fundamentally needed.  As of right now there is very little of the original code left.  
+
+My goal with this project is a clean easy to use class library and API framework complete with 
+working examples that should help someone in building a Router style CLI for a Linux based appliance. 
+This is not a drop in replacement for Term::ShellUI.  Features, functions, methods, and directives, 
+have all been changed, re-written, deleted, or written from scratch.
+
+I hope you find this code useful and that it works for your needs. If you have fixes or things 
+you would like to see, please email me. Also once again, credit for the initial code and inspiration 
+goes to Scott Bronson.

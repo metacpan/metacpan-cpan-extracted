@@ -1,0 +1,93 @@
+from: http://www.schaffter.com/cpu/tz.html
+                                  Timezones                              
+
+ Relative     Common                         Alternative     Daylight    
+   GMT     abbreviation     Verbal name     abbreviation      Savings    
+            / pt char                            (s)        Time (DST)   
+
+ -12 (12)  IDLW  / C     International      NZST                         
+ (west)                  Date Line West                                  
+ -11 (13)  NT    / D     Nome Time                                       
+ (west)                                                                  
+ -10 (14)                Alaska-Hawaii      CAT (Central   HDT (Hawaii   
+ (west)    AHST  / E     Standard Time      Alaska Time)   Daylight      
+                                            HST (Hawaii    Time)         
+                                            Standard                     
+                                            Time)                        
+ -09 (15)                Yukon Standard     AKST (Alaska   YDT (Yukon    
+ (west)    YST   / F     Time               Standard       Daylight      
+                                            Time)          Time)         
+ -08 (16)                Pacific Standard                  PDT (Pacific  
+ (west)    PST   / G     Time                              Daylight      
+      * or empty Zone assumes G *                          Time)         
+ -07 (17)                Mountain Standard                 MDT (Mountain 
+ (west)    MST   / H     Time                              Daylight      
+                                                           Time)         
+ -06 (18)                Central Standard                  CDT (Central  
+ (west)    CST   / I     Time                              Daylight      
+                                                           Time)         
+ -05 (19)                Eastern Standard                  EDT (Eastern  
+ (west)    EST   / J     Time                              Daylight      
+                                                           Time)         
+ -04 (20)                Atlantic Standard                 ADT (Atlantic 
+ (west)    AST   / K     Time                              Daylight      
+                                                           Time)         
+ -03 (21)  GST   / L     Greenland                                       
+ (west)                  Standard Time                                   
+ -02 (22)  AT    / M     Azores Time                                     
+ (west)                                                                  
+ -01 (23)  WAT   / N     West Africa Time                                
+ (west)                                                                  
+ 00        GMT   / 0     Greenwich Mean     UT (Universal  BST (British  
+                         Time               Time)          Summer Time)  
+                                            UTC                          
+                                            (Coordinated                 
+                                            Universal                    
+                                            Time)                        
+                                            WET (Western                 
+                                            European                     
+                                            Time)                        
+ 01       CET    / 1    Central European    FWT (French    MEST (Middle  
+ (east)                  Time               Winter Time)   European      
+                                            MET (Middle    Summer Time)  
+                                            European       MESZ (Middle  
+                                            Time)          European      
+                                            MEWT (Middle   Summer Time)  
+                                            European       SST (Swedish  
+                                            Winter Time)   Summer Time)  
+                                            SWT (Swedish   FST (French   
+                                            Winter Time)   Summer Time)  
+ 02       EET    / 2    Eastern European                                 
+ (east)                  Time and                                        
+                         USSR Zone 1                                     
+ 03       BT     / 3    Baghdad Time and                                 
+ (east)                  USSR Zone 2                                     
+ 04       ZP4    / 4    USSR Zone 3                                      
+ (east)                                                                  
+ 05       ZP5    / 5    USSR Zone 4                                      
+ (east)                                                                  
+ 06       ZP6    / 6    USSR Zone 5                                      
+ (east)                                                                  
+ 07       ZP7    / 7    USSR Zone 6                                      
+ (east)                                                                  
+ 08       WAST   / 8    West Australian    CCT (China     WADT (West     
+ (east)                 Standard Time and  Coast Time)    Australian     
+                        USSR Zone 7                       Daylight       
+                                                          Time)          
+ 09       JST    / 9    Japan Standard                                   
+ (east)                  Time and                                        
+                         USSR Zone 8                                     
+ 09.5     ACT    / 9    Australian         ACST                          
+ (east)                  Central Time                                    
+ 10       EAST   / A    East Australian    GST (Guam      EADT (East     
+ (east)                 Standard Time and  Standard       Australian     
+                        USSR Zone 9        Time)          Daylight       
+                                                          Time)          
+ 11                B                                                     
+ (east)                                                                  
+ 12       IDLE   / C    International       NZST (New      NZDT (New     
+ (east)                  Date Line East     Zealand        Zealand       
+                                            Standard       Daylight      
+                                            Time)          Time)         
+                                            NZT (New                     
+                                            Zealand Time)                

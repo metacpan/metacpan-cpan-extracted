@@ -1,0 +1,85 @@
+Revision history for Perl module Test::MockRandom
+
+1.01      2014-02-08 05:53:59-05:00 America/New_York
+
+    [CHANGED]
+
+    - Distribution converted to Dist::Zilla; updated
+      repo, issue tracker, etc. metadata
+
+1.00 Mon Dec 17 11:39:59 EST 2007
+
+    - added prototype to rand() function to match built-in
+      (RT#30471; patch by INFINOID)
+    
+    - removed Exporter as superclass (unused)
+
+    - changed to the Apache License, version 2.0; (it's clearer, relicensable,
+      and is explicit about contributions)
+
+    - updated Build/documentation system and associated packaging; author
+      tests moved to xt directory; various perl critic and other cleanups
+    
+0.99 Tue Feb  7 07:09:45 EST 2006
+
+    - removed Test::Exception dependency
+
+    - added optional pod/pod-coverage tests (skipped by default)
+    
+    - downgraded Test::More prereq version
+    
+    - removed 'warnings' pragma for backwards compatibility
+
+0.98 Mon Aug  1 10:41:51 EDT 2005
+
+    - build_requires moved to requires to workaround CPANPLUS bug
+
+0.97 Thu Jun  9 07:14:36 EDT 2005
+
+    - removed pod/podcoverage tests to minimize dependencies
+
+0.96 Tue Jun  7 17:54:17 EDT 2005
+
+    - updated Build.PL with dependencies
+    
+    - changed Makefile compatibility to traditional
+
+0.95 Tue Mar  8 22:46:51 EST 2005
+
+    - added pod and pod coverage tests
+
+0.94 Mon Jan 31 21:11:50 EST 2005
+
+    - changed exports so that nothing is exported by default
+    
+    - API for "use" changed substantially -- see POD for new API
+    
+    - redefine warnings supressed
+
+0.93 Wed Jan  5 14:44:00 EST 2005
+
+    - added export_srand_to function
+
+    - cleaned up Todo
+
+0.92 Tue Dec 21 00:21:50 EST 2004
+
+    - changed API for "use" to facilitate exporting rand to other packages
+      (the common case when used in test scripts)
+    
+    - improved documentation substantially, particularly around "use"
+
+    - expanded the test suite
+    
+0.91 Thu Dec 16 13:17:46 EST 2004
+
+    - Added Test::MockObject and Test::MockModule to the "See Also" section
+    
+    - changed oneish to use 2**32 instead of 2**31
+    
+    - added function "export_rand_to"
+
+0.90 Tue Dec 14 17:03:45 EST 2004
+
+    - first public release
+

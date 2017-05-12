@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+# PODNAME: xsd2library
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use TypeLibrary::FromXSD;
+
+GetOptions(
+    'output=s'      => \my $output,
+    'namespace=s'   => \my $namespace,
+    'version_add=s' => \my $version_add,
+    'help'          => \my $help,
+);
+
+if ( $help || !$ARGV[0] || !-f $ARGV[0] ) {
+    print_usage();
+    exit;
+}
+
+$version_add ||= 0.01;
+
+my %params = (
+    xsd         => $ARGV[0],
+    version_add => $version_add,
+);
+
+$params{output}    = $output    if $output;
+$params{namespace} = $namespace if $namespace;
+
+Type::Library::FromXSD->new(\%params)->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+xsd2library
+
+=head1 VERSION
+
+version 0.03
+
+=head1 SYNOPSIS
+
+  $ xsd2library myfile.xsd
+  $ xsd2library --output /home/test myfile.xsd
+  $ xsd2library --output /home/test --namespace MyModule::Types myfile.xsd
+  $ xsd2library --output /home/test --namespace MyModule::Types --version_add 0.01 myfile.xsd
+
+=head1 OPTIONS
+
+=over 4
+
+=item * output
+
+Path were the module is stored
+
+=item * namespace
+
+Namespace for the library module.
+
+=item * version_add
+
+Diff that is added to the version of the module
+
+=back
+
+=head1 AUTHOR
+
+Renee Baecker <github@renee-baecker.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

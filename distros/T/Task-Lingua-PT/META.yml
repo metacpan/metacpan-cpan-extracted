@@ -1,0 +1,41 @@
+---
+abstract: 'Replacement for the PT NLP tools Bundle'
+author:
+  - 'Alberto Simoes, C<< <ambs at perl.pt> >>'
+  - 'Alberto Simoes <ambs@perl.pt>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Lingua-PT
+no_index:
+  directory:
+    - inc
+requires:
+  Lingua::Identify: 0.27
+  Lingua::Jspell: 1.69
+  Lingua::PT::Abbrev: 0.07
+  Lingua::PT::Conjugate: 1.17
+  Lingua::PT::Hyphenate: 1.05
+  Lingua::PT::Inflect: 0.06
+  Lingua::PT::Nums2Ords: 0.07
+  Lingua::PT::Nums2Words: 1.06
+  Lingua::PT::Ords2Nums: 0.07
+  Lingua::PT::PLN: 0.17
+  Lingua::PT::PLNbase: 0.21
+  Lingua::PT::ProperNames: 0.09
+  Lingua::PT::Speaker: 0.10
+  Lingua::PT::Words2Nums: 1.04
+  Text::Affixes: 0.07
+  Text::Ngram: 0.13
+  Text::WordGrams: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,156 @@
+=head1 NAME
+
+USAGE How to use the Ngram Statistics Package (Text-NSP)
+
+=head1 SYNOPSIS
+
+Examples of how to use NSP. 
+
+=head1 DESCRIPTION
+
+These are some sample usages of NSP. While this is not intended
+to be an exhaustive treatment of the various features, it should
+give you some idea of some of the ways you can use NSP.
+
+=head2 GETTING HELP
+
+ count.pl -help
+
+ rank.pl -help
+
+ statistic.pl -help
+
+=head2 COUNT.PL
+
+=over 4
+
+=item *
+
+count all the bigrams in h.txt and store counts in holmes1.out
+
+ count.pl h.cnt h.txt
+
+=item *
+
+count all bigrams that occur 5 or more times and store counts in 
+holmes1.out5 AND create a histogram of the bigram counts and store
+in h-5.hist
+ 
+ count.pl -frequency 5 -hist h-5.hist h-5.cnt h.txt
+
+=item *
+
+exclude all bigrams made up two words from stop.txt
+
+ count.pl -stop stop.txt h-stop.cnt h.txt
+
+=item * 
+
+count all bigrams that occur within a 4 word window AND use a stop 
+list (this is especially useful to prevent bigrams 
+caused by multiple occurrences of frequent words within
+the given window size (like 'and and' 'of of' etc.)
+
+ count.pl -stop stop.txt -window 4 h-stop-w5.cnt h.txt
+
+=back
+
+=head2 STATISTIC.PL
+
+=over 4
+
+=item * 
+
+create a list of bigrams ranked by log-likelihood ratios.
+only allow scores of 6.00 or better among bigrams that occur
+more 3 or more times. (if you had used count to exclude
+certain frequencies you could simply use that file as input)
+(the .pm after the test name is optional)
+
+ statistic.pl -score 6.00 -frequency 5 ll.pm holmes1.ll h.cnt
+
+=item *
+
+create a list of bigrams ranked by fisher's exact test (left
+sided) that only allow scores of 0.90 or better 
+
+ statistic.pl -score 0.90 leftFisher.pm h.fish h.cnt
+
+=item *
+
+create a list of the top 10 bigrams as ranked by the dice 
+coefficient. 
+
+ statistic.pl -rank 10 dice.pm h.dice h.cnt
+
+=item * 
+
+create a formatted report where bigrams are ranked by pointwise
+mutual information values, reported to 4 digits of precision. 
+
+ statistic.pl -format mi.pm -precision 4 h.report h.cnt
+
+=back
+
+=head2 RANK.PL
+
+=over 4
+
+=item *
+
+compare the ranked list of bigrams created by pointwise 
+mutual information and the log-likelihood ratio. make 
+comparisons based on 3 digits of precision. 
+
+ rank.pl -precision 3 mi ll h.mi-ll-rank h.cnt
+
+=item *
+
+compare the ranked list of bigrams created by pointwise 
+mutual information and the dice coefficient. make 
+comparisons based on 5 digits of precision and compare
+only the top 10 bigrams selected by mutual information. 
+
+ rank.pl -precision 5 -rank 10 mi dice h.mi-dice-rank h.cnt
+
+=item *
+
+compare the ranked list of bigrams found by fisher's exact
+test and the dice coefficient. make comparisons based on 
+2 digits of precision and compare only those bigrams that
+score greater than 0.90 on fisher's exact test. 
+
+ rank.pl -precision 5 -score 0.90 leftFisher dice h.fish-dice-rank h.cnt
+
+=back
+
+=head1 AUTHOR
+
+Ted Pedersen, tpederse at d.umn.edu
+
+=head1 BUGS
+
+Last update on 02/15/01 by TDP based on BSP v0.3. This is very old, and 
+should be updated to include many more examples of both command line use 
+of NSP as well as module use. 
+
+=head1 SEE ALSO
+
+ NSP home :    L<http://ngram.sourceforge.net> 
+
+ NSP mailing list: L<http://groups.yahoo.com/group/ngram/>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2000-2003 Ted Pedersen.
+
+Permission is granted to copy, distribute and/or modify this  document  
+under the terms of the GNU Free Documentation License, Version 1.2 or  any  
+later version published by the Free Software Foundation; with no  
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+Note: a copy of the GNU Free Documentation License is available on the web   
+at L<http://www.gnu.org/copyleft/fdl.html> and is included in this    
+distribution as FDL.txt. 
+
+

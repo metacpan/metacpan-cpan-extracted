@@ -1,0 +1,57 @@
+Revision history for Term-Shell-MultiCmd
+
+
+0.01   2010-07-01
+       First version, released on an unsuspecting world.
+
+1.01   2010-07-14
+       After more work, it seems to be mature enough to be cpan uploaded.
+
+1.02   2010-07-15
+       Eliminated one test, which seems to fail in Term::ReadLine (regardless this module).
+
+1.03   2010-07-15
+       POD format fixes, avoid another test fail case when /dev/tty is not readable.
+
+1.04   2010-07-16
+       More POD format & grammer fixes.
+
+1.05   2010-07-23
+       Initialize Term::ReadLine just before the loop.
+       Support completion of hash keys.
+       Some cleanup.
+
+1.05   2010-08
+       Support optional parameters to flags.
+
+1.06   2010-09-21
+       Support root command
+
+1.07   2010-10-21
+       Support pager
+
+1.08   2010-12-22
+       add examples
+
+1.09   2011-05-17
+       add command with echo
+       history changes format
+       verbose saved file at exit
+
+1.091  2012-07-04
+       Small adjustment to Term::Readline's GNU mode
+       Special thanks to Ask Bjørn Hansen
+
+1.093  2013-08-20
+       Adjust completion for pure Term::ReadLine::Gnu systems
+       (centos it is)
+
+2.01   2015-09-10
+       support empty_cmd: user function to call when user hits 'Return' without command
+
+2.02   2015-10-7
+       Add silent aliases 'cd', 'ls' for setting/clearing root and display options
+       (emulating pseudo dir tree of commands)
+
+3.01   2016-06-10
+       Allow default query command (when excuting a node)

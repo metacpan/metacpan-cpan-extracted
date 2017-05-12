@@ -1,0 +1,23 @@
+<testsuites>
+  <testsuite failures="1"
+             errors="0"
+             tests="5"
+             name="data_tests_no_nums">
+    <testcase name="1"></testcase>
+    <testcase name="2"></testcase>
+    <testcase name="3">
+      <failure type="TestFailed"
+               message="not ok 3"><![CDATA[not ok 3]]></failure>
+    </testcase>
+    <testcase name="4"></testcase>
+    <testcase name="5"></testcase>
+    <system-out><![CDATA[1..5
+ok
+ok
+not ok
+ok
+ok
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

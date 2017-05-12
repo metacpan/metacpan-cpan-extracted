@@ -1,0 +1,30 @@
+// Generated response event class.
+[%# vim: set syntax=java: %]
+[% USE Java %]
+[% PROCESS FileHeader %]
+[% PROCESS ClassHeader %]
+{
+[% PROCESS DataDeclarations %]
+
+public $class() {}
+public $class(ValidRequest req) { super(req); }
+public $class(InputSource from) throws Exception { set(from); }
+
+public $class([% Java.variableDeclarations.join(", ") %])
+{
+[% FOREACH Java.variables %]
+	this.$name = $name;
+[% END %]
+}
+
+public void deliver(Service s)
+throws Exception
+{
+	(($handler)s).$tag(this);
+}
+
+[% PROCESS DataAccess %]
+[% PROCESS XMLEncode %]
+[% PROCESS ParseFromXML %]
+$append
+} // End class ${class}.

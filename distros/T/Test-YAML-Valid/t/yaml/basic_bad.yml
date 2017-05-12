@@ -1,0 +1,7 @@
+baz:
+  - quux
+  - quuuux
+  - quuuuuux
+  - car
+  - cdr
+foo::*)-> bar

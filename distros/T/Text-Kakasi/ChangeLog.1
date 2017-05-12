@@ -1,0 +1,62 @@
+2001-04-11  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 1.05.
+
+	* Kakasi.xs (do_kakasi): Fixed a bug: segfault on null string.
+
+2000-12-18  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Kakasi.pm: Fixed bad place of "=back".
+
+2000-04-07  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 1.04.
+
+	* Kakasi.xs: Fixed incomplete corresponding for old perl.
+
+2000-04-06  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 1.03.
+
+	* Kakasi.xs: Fixed old perl probrem.
+
+2000-03-30  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Vesion 1.02.
+
+	* Kakasi.xs: Changed to use free() instead Safefree().
+	Changed to use PL_na instead na (for perl 5.6.0).
+
+1999-12-03  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Kakasi.xs: Fixed incorrect handling about strings with `\0'
+	character.
+
+1999-09-29  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 1.00 for KAKASI-2.3.0.
+	* Added test.pl.
+
+1999-03-09  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* typo fix (close_kanwadic -> close_kanwadict)
+	  (レポートして下さった奥西さんありがとうございます)
+
+1999-03-04  NOKUBI Takatsugu <knok@daionet.gr.jp
+
+	* 利用するlibraryをkakasi-2.2.5w-lib2.diffベースに変更
+
+1999-02-03  Nokubi Takatsugu  <knok@daionet.gr.jp>
+
+	* getopt_argvの内部で必要なら辞書をcloseするよう変更
+
+1999-01-11  Nokubi Takatsugu  <knok@daionet.gr.jp>
+
+	* パッケージ名をText::Kakasiに改名
+	* close_kanwadictを追加
+	* @EXPORT_OK, %EXPORT_TAGSを設定
+
+1999-01-08  Nokubi Takatsugu  <knok@daionet.gr.jp>
+
+	* 初期バージョン作成
+

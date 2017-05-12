@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Template/LiquidX/Tag/Dump.pm
+minil.toml
+t/00_compile.t
+t/01_synopsis.t
+META.yml
+MANIFEST

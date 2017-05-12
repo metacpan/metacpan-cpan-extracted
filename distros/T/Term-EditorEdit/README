@@ -1,0 +1,84 @@
+NAME
+    Term::EditorEdit - Edit a document via $EDITOR
+
+VERSION
+    version 0.0016
+
+SYNOPSIS
+        use Term::EditorEdit;
+    
+        # $VISUAL or $EDITOR is invoked
+        $document = Term::EditorEdit->edit( document => <<_END_ );
+        Apple
+        Banana
+        Cherry
+        _END_
+
+    With post-processing:
+
+        $document = Term::EditorEdit->edit( document => $document, process => sub {
+            my $edit = shift;
+            my $document = $edit->document;
+            if ( document_is_invalid() ) {
+                # The retry method will return out of ->process immediately (via die)
+                $edit->retry
+            }
+            # Whatever is returned from the processor will be returned via ->edit
+            return $document;
+        } );
+
+    With an "out-of-band" instructional preamble:
+
+        $document = <<_END_
+        # Delete everything but the fruit you like:
+        ---
+        Apple
+        Banana
+        Cherry
+        _END_
+
+        # After the edit, only the text following the first '---' will be returned
+        $content = Term::EditorEdit->edit(
+            separator => '---',
+            document => $document,
+        );
+
+DESCRIPTION
+    Term::EditorEdit is a tool for prompting the user to edit a piece of
+    text via $VISUAL or $EDITOR and return the result
+
+    In addition to just editing a document, this module can distinguish
+    between a document preamble and document content, giving you a way to
+    provide "out-of-bound" information to whoever is editing. Once an edit
+    is complete, only the content (whatever was below the preamble) is
+    returned
+
+USAGE
+  $result = Term::EditorEdit->edit( ... )
+    Takes the following parameters:
+
+        document            The document to edit (required)
+
+        separator           The string to use as a line separator dividing
+                            content from the preamble
+
+        process             A code reference that will be called once an edit is complete.
+                            Within process, you can check the document, preamble, and content.
+                            You can also have the user retry the edit. Whatever is returned
+                            from the code will be what is returned from the ->edit call
+
+    Returns the edited document (or content if a separator was specified) or
+    the result of the "process" argument (if supplied)
+
+SEE ALSO
+    Term::CallEditor
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

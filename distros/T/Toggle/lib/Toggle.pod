@@ -1,0 +1,224 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Toggle - Feature toggles (a.k.a. flippers, flags, switches etc.)
+
+=head1 SYNOPSIS
+
+    use Redis;
+    use Toggle;
+    
+    # This probably happens once for your application, e.g. via Bread::Board
+    my $redis = Redis->new;
+    my $toggle = Toggle->new( storage => $redis );
+    
+    # Define any groups you might need - your sub will be passed the $user
+    # object that you send to is_active(), and should return true/false.
+    $toggle->define_group( staff => sub {
+        my $user = shift;
+        return $user->has_role('staff');
+    });
+    
+    ...
+    
+    # In your controllers
+    
+    # $user must either have an ->id accessor, or return the id when used
+    # as a string.
+    if ( $toggle->is_active(chat => $user) ) {
+        # Show this user the shiny new chat feature
+    }
+    
+    ...
+    
+    # Elsewhere, in a management UI tool
+    $toggle->activate_user( chat => $bob );      # Turn it on for Bob
+    $toggle->activate_group( chat => 'staff' );  # Enable staff testing
+    $toggle->activate_percentage( chat => 10 );  # 10% rollout
+
+    ...
+
+    if ( my $variant = $toggle->variant( chat => $user ) ) {
+        if ( $variant eq 'a' ) {
+            ...
+        }
+        elsif ( $variant eq 'b' ) {
+            ...
+        }
+    }
+
+
+=head1 DESCRIPTION
+
+L<Toggle> lets you activate features for different users, storing this
+configuration in a database like Redis.  You can use it to roll out your
+code to a percentage of users, or specific users/groups that you define.
+
+=head1 METHODS
+
+=head2 new
+
+Constructor.
+
+    my $toggle = Toggle->new( storage => $store );
+
+The storage attribute must be an object that supports C<get($key)>,
+C<set($key, $value)> and C<del($key)> methods.  This happens to be the same
+interface that Redis uses, but you could make your own.
+
+=head2 is_active
+
+Check whether a feature is active.  This is the method which you would expect
+to use all the time in your application code.  Can be called in two ways -
+either to check whether a feature is active for everyone:
+
+    $toggle->is_active( 'chat' );
+
+or to check whether it is enabled for a particular user:
+
+    $toggle->is_active( chat => $user );
+
+In the second case, the $user object must have an id accessor, or
+stringify to the id (so a scalar is fine).
+
+=head2 activate
+
+Enable a feature for everyone.
+
+    $toggle->activate( 'chat' );
+
+=head2 deactivate
+
+Disable a feature for everyone.  Useful if you discover a critical bug and
+want to turn it off altogether.  Overrides all the user/group/percentage
+activations that may have been on previously.
+
+    $toggle->deactivate( 'chat' );
+
+=head2 define_group
+
+You may wish to use this method to define groups for use below in
+L</activate_group>.  You pass a subroutine which will accept a single
+argument (the $user object given to L</is_active>) and will return a
+boolean to say whether the user is in the group.
+
+    $toggle->define_group( admins => sub { shift->is_an_admin() } );
+
+The group 'all' is defined by default.
+
+    $toggle->define_group( all => sub { 1 } );
+
+=head2 activate_group
+
+Turn on a feature for a group.  The group must have been defined previously
+(see L</define_group>), or be the "all" group.
+
+    $toggle->activate_group( chat => 'admins' );
+
+=head2 deactivate_group
+
+Turn off a feature for a group.  The group must have been defined previously
+using L</define_group>.
+
+    $toggle->deactivate_group( chat => 'admins' );
+
+Note that any users which have been explicitly enabled via L</activate_user>
+will still be able to see the feature, even if they are in the group.
+
+=head2 activate_user
+
+Turn on a feature for an individual user.
+
+    $toggle->activate_user( chat => $user );
+
+=head2 deactivate_user
+
+Turn off a feature for an individual user.
+
+    $toggle->deactivate_user( chat => $user );
+
+=head2 activate_percentage
+
+Activate a feature for a percentage of users, such as for an incremental
+rollout of a new feature.
+
+    $toggle->activate_percentage( chat => 10 );
+
+The algorithm used is C<< CRC32( $user->id ) % 100 < percentage >>, so as the
+percentage increases, users do not fall out of the group.
+
+Due to this implementation, it is important to understand that for the same set
+of users across multiple experiments, those who might fall within the 10th
+percentile for one rollout would be the same set of users to fall within
+the 10th percentile of the rollout for an entirely different experiment.
+
+This also has implications for using a subset of users admitted by one toggle
+for use in a subsequent toggle check, where both checks are based off percentage.
+For example, admitting 50% of users for a feature and then attempting to derive
+50% from that subset using another toggle. Instead of the 2nd toggle rolling out
+a feature to 25% of the users it checks against, it will be rolling it out to
+100% of those users.
+
+Finally, note that activating the feature for 100% of users will activate the feature
+globally (i.e. when L</is_active> is called without a $user argument).
+
+=head2 deactivate_percentage
+
+Deactivate a feature for all users that were receiving an incremental
+rollout.
+
+    $toggle->deactivate_percentage( 'chat' );
+
+Note that users who were previously activated individually or as part of a
+group will still have the feature active.
+
+=head2 features
+
+List all the features that the storage knows about.
+
+    my @features = $toggle->features();
+
+=head2 add_feature
+
+Add a feature to the storage, but do not activate it for anyone.
+
+    $toggle->add_feature( 'chat' );
+
+=head2 remove_feature
+
+Remove a feature from the storage.
+
+    $toggle->remove_feature( 'chat' );
+
+This will disable it for all users, and will also stop it appearing in the
+output of L</features>.
+
+=head2 variant
+
+Test what variant that user should see.
+
+    $toggle->variant( chat => $user );
+
+=head2 set_variants
+
+Set the variants for a given feature.
+
+    $toggle->set_variants(
+        chat => [
+           a => 20,
+           b => 40,
+        ],
+    );
+
+=head1 SEE ALSO
+
+Github repo: L<https://github.com/cv-library/Toggle>
+
+Inspired/shamelessly ported from L<https://github.com/FetLife/rollout>
+
+=head1 COPYRIGHT
+
+Copyright © 2014 CV-Library Ltd.
+
+Licensed under the same terms as Perl 5.

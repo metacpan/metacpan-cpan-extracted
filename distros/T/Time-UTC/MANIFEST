@@ -1,0 +1,26 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Time/UTC.pm
+lib/Time/UTC/Segment.pm
+t/builtin.t
+t/cjdn.t
+t/day.t
+t/dl_lslist.at
+t/dl_taiutcdat.at
+t/hms.t
+t/mjdn.t
+t/pod_cvg.t
+t/pod_syn.t
+t/seg_of.t
+t/segments.t
+t/start.t
+t/when_comp.t
+t/ymd.t
+t/ymdhms.t
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,11 @@
+use inc::Module::Install;
+name 'Text-Bayon';
+all_from 'lib/Text/Bayon.pm';
+requires 'Class::Accessor::Fast';
+requires 'File::Temp';
+requires 'Carp';
+build_requires 'Test::More';
+build_requires 'File::Spec';
+use_test_base;
+auto_include;
+WriteAll;

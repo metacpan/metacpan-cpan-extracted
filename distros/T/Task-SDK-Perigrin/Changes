@@ -1,0 +1,19 @@
+Revision history for Task-SDK-Perigrin
+
+0.05  2010-10-04
+        Add Net::Hiveminder Dep for 
+            alias todo='perl -MNet::Hiveminder -le'\''print for Net::Hiveminder->new(use_config=>1)->todo'\'''
+        Add CPAN::Uploader
+
+0.04  2010-04-13
+       Simplify the system a bunch
+
+0.03  2009-05-25
+	   Third Time is a Charm
+	
+0.02  2009-05-25
+	   Fix a bad dist
+	
+0.01  2009-05-25
+       Initial release.
+

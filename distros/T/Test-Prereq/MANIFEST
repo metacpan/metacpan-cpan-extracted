@@ -1,0 +1,27 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/Test/Prereq.pm
+lib/Test/Prereq/Build.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README.pod
+t/get_from_file.t
+t/get_loaded_modules.t
+t/get_prereqs.t
+t/import.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_ok.t
+t/prior_plan.t
+t/test_manifest
+testdir/bad_makefile/Makefile.PL
+testdir/build_pl/Build.PL
+testdir/good_makefile/Makefile.PL
+testdir/good_makefile/MANIFEST
+xt/changes.t
+META.json                                Module JSON meta-data (added by MakeMaker)

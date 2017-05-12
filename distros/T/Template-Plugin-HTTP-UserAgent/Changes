@@ -1,0 +1,43 @@
+Revision history for perl module Template::Plugin::HTTP::UserAgent
+
+0.08 2015-03-08
+    - Added a ua_string method, for getting the raw user agent string.
+
+0.07 2014-05-14
+    - Switched to Dist::Zilla
+    - Switched Perl version dependency from 5.10.0 to 5.6.0.
+      I don't seem to have recorded a reason for 5.10.0, and can't
+      see an actual dependency on 5.10.0.
+    - Various minor documentation improvements.
+
+0.06 2013-12-29
+    - Set MIN_PERL_VERSION to 5.010 in Makefile.PL
+    - Specified license type as 'perl' in Makefile.PL
+
+0.05 2013-10-16
+
+    - Added use strict and use warnings
+    - Added "use 5.10.0" to specify min perl version
+    - Added new-style github repo details in Makefile.PL
+    - Corrected the NAME in Makefile.PL
+      (was set to dist, instead of module, name)
+
+0.04 2012-02-28
+
+    - Fixed a typo and other tidy-ups of documentation.
+    - added 'parent' as a pre-req. Not having it meant that Perl 5.8.9 was
+      failing on CPAN testers.
+
+0.03 2012-02-27
+
+    - Oops, forgot to include MANIFEST
+
+0.02 2012-02-27
+
+    - Added repository location to pod
+    - Added reference to HTML::ParseBrowser to SEE ALSO in pod
+
+0.01 2012-02-26
+
+    - first version of module
+

@@ -1,0 +1,173 @@
+package Typist::Builder;
+use strict;
+
+use Tie::IxHash;
+use base qw( Class::ErrorHandler );
+
+my $PREFIX = Typist->instance->prefix;
+my $START  = "$PREFIX.+";
+my $END    = "/$PREFIX.+";
+my $EMPTY  = "\\\$$PREFIX.+\\\$";
+my $TAG    = "<(?:(?:$START)?|(?:$END)?|(?:$EMPTY)?)>";
+my $TEXT   = "(?:(?!$TAG).|\n)*";
+my $TOK    = "$TAG|$TEXT";
+
+sub new { bless {}, $_[0] }
+
+sub compile {
+    my $build = shift;
+    my ($ctx, $text) = @_;
+    my $out;
+    eval {
+        $build->start_document;
+        while ((my $tok) = $text =~ m/$TOK/gs) {
+            if ($tok =~ /$TAG/) {
+                $tok =~ s{(<[$/])?$PREFIX(.*)$?>}{$2};
+                my $type = $1;
+                my ($tag, $args) = split /\s+/, $tok, 2;
+                $args ||= '';
+                my %args;
+                if ($args) {
+                    tie %args, "Tie::IxHash";    # maintain order.
+                    while ($args =~ m{(\w+)\s*=\s*(["'])(.*?)\2/gs}) {
+                        $args{$1} = $3;
+                    }
+                }
+                if ($type eq '<') {
+                    $build->start_element($tag, \%args);
+                } elsif ($type eq '<$') {
+                    $build->start_element($tag, \%args);
+                    $build->end_element($tag);
+                } else {                         # assume end tag
+                    $build->end_element($tag);
+                }
+            } else {    # TEXT
+                $build->characters($tok);
+            }
+        }
+        $out = $build->end_document;
+    };
+    $@ ? $build->error($@) : $out;
+
+}
+
+sub build {
+    my $build = shift;
+    my ($ctx, $tokens, $cond) = @_;
+    $cond ||= {};
+    $ctx->('builder', $build);
+    $ctx->stash('root', $tokens) unless $ctx->stash('root');
+    my $res = '';
+    my $ph  = $ctx->post_process_handler;
+    for my $t (@$tokens) {
+        if ($t->[0] eq 'TEXT') {
+            $res .= $t->[1];
+        } else {
+            my ($tokens, $tokens_else);
+            my ($tag, $args, $children) = @$t;
+            if (exists $cond->{$tag} && !$cond->{$tag}) {
+                for my $child (@$children) {
+                    if ($child->[0] eq 'Else') {
+                        $tokens = $child->[2];
+                        last;
+                    }
+                }
+                next unless $tokens;
+            } elsif ($children && ref($children) eq 'ARRAY') {
+                for my $child (@$children) {
+                    if ($child->[0] eq 'Else') {
+                        push @$tokens_else, $child;
+                    } else {
+                        push @$tokens, $child;
+                    }
+                }
+            }
+            my ($h) = $ctx->handler_for($tag);
+            if ($h) {
+                $ctx->stash('tag',         $tag);
+                $ctx->stash('tokens',      $tokens);
+                $ctx->stash('tokens_else', $tokens_else);
+                my $out = $h->($ctx, $args, $cond);
+                return $build->error("Error in <$PREFIX$tag>: " . $ctx->errstr)
+                  unless defined $out;
+                $out = $ph->($ctx, $args, $out) if $ph;
+                $res .= $out;
+            } # here is where we could process unknown tag errors. add strict mode.
+        }
+    }
+    $res;
+}
+
+#--- compile handlers
+
+sub start_document { $_[0]->{__stack} = [[]]; }
+
+sub start_element {
+    my ($build, $tag, $args) = @_;
+    my $parent = $build->{__stack}->[-1];
+    $parent->[2] ||= [];
+    my $e = [$tag, $args];
+    push @{$parent->[2]}, $e;
+    push @{$build->{__stack}}, $e;
+}
+
+sub characters {
+    my ($build, $text) = @_;
+    my $parent = $build->{__stack}->[-1];
+    $parent->[2] ||= [];
+    push @{$parent->[2]}, $text;
+}
+
+sub end_element {
+    my ($build, $tag) = @_;
+    my $e = pop @{$_[0]->{__stack}};
+    die Typist->translate("[_1]  is missing a closing tag.", "<$PREFIX$tag>")
+      if $e->[0] ne $tag;
+}
+
+sub end_document {
+    my $build = shift;
+    my $root  = pop @{$build->{__stack}};
+    die Typist->translate('Elements left on the build stack.')
+      if scalar @{$build->{__stack}};    # localize!
+    $build->{__stack} = undef;
+    $root;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Typist::Builder - Compilation and building of templates into output
+
+=head1 METHODS
+
+=over
+
+=item Typist::Builder->new
+
+Constructor. Instaniates a new object
+
+=item $builder->compile($ctx, $text)
+
+Compiles a template into a tree of text and tag tokens.
+
+Requires a L<Typist::Template::Context> object and a string
+containing all the template markup.
+
+=item $builder->build($ctx, $tokens, $cond)
+
+Builds a template into output. The builder works it way
+through the tokens tree calling the associated tag handlers
+along the way and assembling the output.
+
+Requires a L<Typist::Template::Context> object and an ARRAY
+reference containing a tokenized template presumably
+generated by the C<compile> method. A third parameter, a
+HASH reference containing flags for conditional tags may
+optionally be passed in. If one is not an empty HASH
+reference is created.
+
+=back

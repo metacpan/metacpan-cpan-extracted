@@ -1,0 +1,151 @@
+1.020
+      2013-09-20
+        * Fix COMPILE_PERL with GLOBAL_CACHE compilation bug that was modifying the tree.
+        * Fix caching bugs when GLOBAL_CACHE and COMPILE_PERL or COMPILE_JS are used in conjunction with each other.
+
+1.019
+      2013-08-23
+        * Fix comment bug on perl 5.8 or older
+        * Fix many pod typos that accumulated over the years
+
+1.018
+      2013-08-22
+        * Final prep for release (1.017 never saw cpan)
+        * RT #76570 - bugfix provided by onken@netcubed.de to fix encoding error or scalar ref templates.
+        * RT #79641 - copy buggy behavior of Template::Toolkit in that we now allow for [% # comment %] all on one line (we previously supported [%# comment %])
+        * RT #69966 - allow for node_info to be a little safer, allow DUMP to also be more safe, allow block _filename to get passed along
+        * Add real json methods
+        * Fix warning when calling .html on undefined
+        * Fix bug in HTE with ASSOCIATE pointed out by David Warring
+
+1.017
+      2012-02-10
+        * Add necessary hooks to allow for COMPILE_JS (See Template::Alloy::JS)
+        * Test suite cleanup
+        * Add missing squote and dquote item vmethods
+        * Fix bug in internal iterator
+
+1.016
+      2011-01-26
+        * Add AUTO_FILTER configuration item to TT and HTE flavors.
+
+1.015
+      2010-12-29
+        * Add missing Iterator features odd, even, parity
+        * Add .xml vmethod/filter
+        * Change .html method to not encode apostrophe - that is what .xml is for (thanks to Ashley Pond V)
+        * Add STRICT and STRICT_THROW configuration items including code, tests, and documentation
+        * Add tt_var_string method and document ast_string method.
+        * Fix pod errors reported by Frank Wiegand in VMethod.pm
+        * Update test suite to not test stringification of perl regex (thanks to ANDK@cpan)
+        * Fix path of file cache names on MSWin32 (thanks to BEROV@cpan)
+        * Fix EXPOSE_BLOCKS to follow TT 2.22 behavior
+        * Add tests to cover block use from included/processed blocks
+
+1.014
+      2010-03-31
+        * Fix localization issue in set
+
+1.013
+      2008-09-18
+        * Make PLUGIN_BASE work like TT (always falls back to Template::Plugins)
+        * Make case searching for PLUGINS work like TT (only those listed in PLUGINS or STD_PLUGINS apply.
+        * Test all input and output methods (fix accompanying errors)
+        * Fix local pos warning.
+        * Fix Template::Alloy::Iterator to follow exact TT iterator behavior during new
+
+1.012
+      2008-04-10
+        * Allow scalar refs passed as variables to be processed
+        * Allow ADD_LOCAL_PATH to function in more areas (including INSERT)
+        * Don't let ADD_LOCAL_PATH modify INCLUDE_PATHS
+        * Let ADD_LOCAL_PATH be modified at runtime
+        * Stream cleanup
+        * Added CALL_CONTEXT configuration item
+        * Added @() list context specifier
+        * Added $() item context specifier
+        * Cleanup some of the pod on vmethods.
+        * Add the ITEM_METHOD API which is hybrid SCALAR_OPS and filters
+        * Add the ->() MACRO operator
+        * Allow map, grep, and sort to use the new operator
+        * Add return values to RETURN directive
+        * Add return item, list, and hash vmethods
+
+1.011
+      2007-12-10
+        * Boneheaded release bug - add Stream.pm to manifest
+
+1.010
+      2007-12-10
+        * Add missing ||= operator (we already had //=)
+        * Cleanup some POD
+        * Add STREAM support for printing out the template as it is generated.
+        * Fix CASE_SENSITIVE on HT
+
+1.009
+      2007-11-07
+        * Add ADD_LOCAL_PATH configuration item
+        * Try to cleanup some failing tests on other platforms - particularly with Andy's view tests
+        * Resample benchmarks to allow for updates to HTML::Template::Compiled
+
+1.008
+      2007-10-26
+        * Fix split_paths to work with objects
+        * Make 5.6 a requirement
+        * Add patches for ENCODING (thanks to Carl Franks)
+        * Fix broken tests on low perl version
+
+1.007
+      2007-10-04
+        * Patch to bench_various_templaters.pl to fix HTC_file test (Tina Müller via RT)
+        * Update coverage tests
+        * Allow relative to get/set better when calling parse_file in Tmpl.pm
+        * Fix DUMP directive to show keys when QR_PRIVATE is set to false.
+        * Fix HTE mode to handle <TMPL_VAR "foo"> which is the same as <TMPL_VAR foo> (undocumented HT feature)
+
+1.006
+      2007-07-03
+        * Fix parsing errors in HTE syntax with <TMPL_IF expr="1 + 1">foo</TMPL_IF>
+
+1.005
+      2007-06-28
+        * Update evaluation order of files and arguments to PROCESS and INCLUDE
+
+1.004
+      2007-06-20
+        * Fix braindead bug in COMPILE_DIR
+        * Fix many caching bugs particularly with string refs
+        * Add GLOBAL_CACHE support
+        * Add 02_cache.t
+
+1.003
+      2007-06-20
+        * Fix several issues with the HTE role
+        * Add a few more tests
+
+1.002
+      2007-06-12
+        * Documentation fixes
+        * Allow for some easier subclassing
+
+1.002
+      2007-06-08
+        * Fix initial release blues
+        * Add support for overriding other classes
+        * Document roles a little better.
+        * Allow for STASH to be passed - even though we won't use its methods.
+        * Make sure compile_RAWPERL works
+        * Allow methods without entries in the Compile::DIRECTIVES table to defer to Play::DIRECTIVES table.
+
+1.001
+      2007-06-07
+        * Added strref cache support
+        * Added compile_perl support.
+        * Added support of Text::Tmpl style templates
+        * Added support for Velocity style templates
+        * More edge cases
+        * More sample syntax
+
+1.000
+      2007-05-25
+        * First from CGI::Ex::Template version 2.13

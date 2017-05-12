@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Test-MockObject-Chain.t
+lib/Test/MockObject/Chain.pm

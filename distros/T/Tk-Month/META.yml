@@ -1,0 +1,25 @@
+---
+abstract: 'Calendar widget which shows one month at a time.'
+author:
+  - 'Anthony R Fletcher, E<lt>arif@cpan.orgE<gt>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-Month
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Text::Abbrev: 1
+  Time::Local: 1
+  Tk: 800
+  perl: 5.014
+version: 1.8

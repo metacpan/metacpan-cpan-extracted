@@ -1,0 +1,20 @@
+
+=== ChangeLog and Future Plans ===
+
+plan
+- reduce buffer copying overhead
+- more code reduction
+- may incorporate code caching method for speedup
+
+0.07
+- added "include" method
+- now "setq" method returns self object reference
+- documentation update
+
+0.06
+- complete documentation update
+- added benchmark script for performance checking
+- fixed bug that caused \ (backslash) to disappear
+
+0.05
+- initial version based on Text::SimpleTemplate

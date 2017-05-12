@@ -1,0 +1,29 @@
+Revision history for Perl extension Text::FormatTable.
+
+2009-07-24 (1.03)
+     * Fix for rt34546, uninitialized warning generated with a
+     zero-length column
+
+2009-07-23 (1.02)
+     * Added support for ASCII color sequences.  The escape codes are
+       no longer included when calculating column widths. (Trey
+       Harris)
+     * Trey Harris takes over maintainership.
+
+2004-06-10 (1.01)
+     * Fixed column width and bottom alignment (Veselin Slavov)
+
+2003-01-28
+     * add Text::ASCIITable to SEE ALSO
+
+2002-11-05
+     * nicely format space rules
+
+2002-11-05
+
+     * released 1.00 (code seems to be stable, no problems since 1.5 years)
+     * small documentation fix
+
+2001-08-22
+
+     * first version (0.01)

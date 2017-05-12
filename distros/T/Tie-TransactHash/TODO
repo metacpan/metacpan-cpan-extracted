@@ -1,0 +1,38 @@
+1 build more tests
+
+	test against db files.. but check what database mechanisms are
+	available.
+
+2 take more care about binary keys and values in edit-db
+
+3 consider opening up b-tree functionality (but why would you need it
+for a b-tree anyway?) through passing object methods
+
+4 In an ideal world, a transaction is a thing which either goes through
+or doesn't.  It would be nice to provide some kind of reliable
+transaction mechanism.  If
+
+	o your underlying hash never passes through any undefined
+	values (that is, you could always read it as a valid hash
+	whilst it's being changed)
+
+	o we wrote all of the data for the transaction out to a file
+	(just needs IxHash to be using DBMfiles and on disk arrays)
+
+	o we flushed all of those IxHash files
+
+	o we flagged commits on disk (log file?)
+
+We could provide a mechanism which could always roll forward whatever
+transaction it was doing at failure time (just reload the IxHashes
+then redo all of the values in them.. doesn't matter if you set the
+same value twice).
+
+In the meantime, the suggestion is, after writing to disk, to read
+back the values from the hash to check they have been correctly
+updated.  I'm not convinced that this provides _much_ more security than
+the fsync call we make.  The key thing it does check is that the
+TransactHash module is working properly.
+
+5+ avoid feeping creatures..
+

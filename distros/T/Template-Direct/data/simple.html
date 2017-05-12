@@ -1,0 +1,47 @@
+s1:$Simple1
+s2:$Simple2
+h0:[list hash sort="name"][entry]$name=$value[/entry][seperator], [/seperator][/list]
+h1:[list hash sort="value"][entry]$name=$value[/entry][seperator], [/seperator][/list]
+h2:$hash_A
+h3:$hash_B
+h4:[list hash sort="name"][entry]$name=[list value][entry]$value[/entry][seperator], [/seperator][/list][/entry][seperator]; [/seperator][/list]
+l0:[list array][entry]$value[/entry][seperator], [/seperator][/list]
+l1:$array_0
+l2:$array_1
+l3:[list array2][entry]([list value][entry]$value[/entry][seperator], [/seperator][/list])[/entry][seperator] - [/seperator][/list]
+l4:[list array3][entry]($A, $B, $C)[/entry][seperator] - [/seperator][/list]
+l5:[list array4][entry][list A]([entry]$value[/entry])[seperator], [/seperator][/list][/entry][seperator] - [/seperator][/list]
+l6:$array_-1
+nl0:[list array0]FALSE[noentry]TRUE[/noentry][/list]
+nl1:[list array0][entry]FALSE[/entry][noentry]TRUE[/list]
+i0:[list integer][entry]$value[/entry][seperator], [/seperator][/list]
+i1:$integer
+i2:[list hash_B][entry]$value[/entry][seperator], [/seperator][/list]
+i3:[list 4]$value[seperator], [/seperator][/list]
+c1:[list array5]-[list subhash sort="name"]$name=$value, [/list][/list]
+e1:[list struct1][entry]$name:$value[if $_sublist]([sublist var="children"])[/if][/entry][seperator],[/seperator][/list]
+e2:[list struct2][entry]$name=$value[list children]([entry]id:$id[if $_sublist]\[[sublist var="subchildren" deep="1"]\][/if][/entry][seperator]|[/seperator])[/list][/entry][seperator],[/seperator][/list]
+e3:[list struct2][entry]$name=${value}[list children]([entry]id:$id|[list other][entry]$value[seperator],[/entry][/list][if $_sublist]\[[sublist var="subchildren" deep="1"]\][/if][/entry][seperator]|[/seperator])[/list][/entry][seperator],[/seperator][/list]
+e4:[list struct2][entry]$name=${value}[list other]|[entry]$value[seperator]@[/entry][/list][list children]([entry]id:$id|[list other][entry]$value[seperator],[/entry][/list][if $_sublist]\[[sublist var="subchildren" deep="1"]\][/if][/entry][seperator]|[/seperator])[/list][/entry][seperator],[/seperator][/list]
+oe1:[list struct1][if $name eq 'A']Ey[elif $name eq 'B']Bee[elif $name eq 'D']Dee[else]Not[/if][seperator], [/seperator][/list]
+oe2:[list struct3][if $v1_name eq 'A' and $v2_name eq 'Z']Ey[elif $v1_name eq 'B' and $v2_name eq 'Y']Bee[elif $v1_name eq 'C' and $v2_name eq 'X']See[else]Not[/if][seperator], [/seperator][/list]
+o1:[if $integer]True[else]False[/if]
+o2:[if ($integer and $Simple1) or ($hash_A and $hash_B)]True[else]False[/if]
+o3:[if not $integer and $Simple1]False[else]True[/if]
+o4:[if not $integer]False[elif $hash_A]True[else]False[/if]
+o5:[if $integer][if $hash_A]True[else]False[/if][/if]
+o6:[if $hash_A in {1 2}]True[else]False[/if]
+o7:[if 'A' in $array]True[else]False[/if]
+o8:[if not 'Z' in $array]True[else]False[/if]
+o9:[if $array7]True[else]False[/if]
+lac:[list array][entry]$value[/entry][seperator], [/seperator][/list]
+li:[list array6][entry]$name=\[[list values][entry]$name[/entry][seperator], [/seperator][/list]\][/entry][seperator], [/seperator][/list]
+p1:*[page otherpage.html]*
+m1:[maths 2 + 2]
+m2:[maths 2 + 5 * 4]
+m3:[maths 3 * (4 + 2)]
+m4:[maths 2 / 3=%0.2f]
+m5:[maths $number_0 * $number_4 / $number_2=%0.2f]
+m6:[maths 2 + 3 - 4 * 3 / 8]
+m7:[maths 5 % 3 * 5 ^ 2]
+sort1:[list number sort numericalSort][entry]$value[/entry][seperator], [/seperator][/list]

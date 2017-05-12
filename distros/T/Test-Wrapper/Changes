@@ -1,0 +1,21 @@
+Revision history for Test::Wrapper
+
+0.3.0 2014-03-11
+ - Adding 'test_name' and 'test_args' attributes..
+
+ [STATISTICS]
+ - code churn: 5 files changed, 83 insertions(+), 109 deletions(-)
+
+0.2.1 2010-11-06
+ - add README to the MANIFEST so that signature is okay (RT#62772)
+
+0.2.0 2010-10-24
+ - now compatible with Test::Builder2.
+ - add a README to the distribution.
+
+0.1.1 2010-07-20
+ - add 'make_immutable' at the end of the class.
+
+0.1.0 2010-07-20
+ - initial release.
+

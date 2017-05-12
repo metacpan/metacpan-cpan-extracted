@@ -1,0 +1,3 @@
+#!/bin/bash
+
+find t lib -name '*.pm' -o -name '*.pod' -o -name '*.t' | xargs podchecker

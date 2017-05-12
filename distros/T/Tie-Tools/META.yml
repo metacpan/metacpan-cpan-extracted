@@ -1,0 +1,31 @@
+---
+abstract: 'a collection of tying tools'
+author:
+  - 'Jonas B. Nielsen <jonasbn@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.30
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  Module::Build: 0.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Tools
+requires:
+  Test::Class: 0
+  Tie::Cache: 0.08
+  Tie::DBI: 0
+  Tie::Hash: 0
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/gitpan/Tie-Tools/issues
+  homepage: http://search.cpan.org/dist/Tie-Tools/
+  repository: git://github.com/gitpan/Tie-Tools.git
+version: 1.10

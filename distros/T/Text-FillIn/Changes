@@ -1,0 +1,43 @@
+Revision history for Perl extension Text::FillIn.
+
+0.05  Wed Jan  6 00:37:36 EST 1999
+	- Fixed a nasty bug that made some distinct templates share their
+	  'properties' and 'path' attributes.  All users of 0.04 should upgrade.
+
+0.04  Sun Oct  4 00:22:55 CDT 1998
+   - Added support for using another object's method calls as interpretation
+     hooks.  Potentially powerful feature suggested by Jesse Chisolm.
+   - Please note that the get_text(), set_text(), get_property(), and
+     set_property() methods will go away in version 0.05.  Migrate
+     to text() and property().
+
+0.03  Thu Oct  1 20:46    EDT 1998
+   There are Significant Changes In The Interface.
+   - The default delimiters, hooks, and path now have accessor functions.
+   - One can now set the delimiters, hooks, and path for an instance of
+     a template without affecting the default, or other templates.
+     This is achieved by letting these facts be object data rather than 
+     just package variables.
+   - Because of the above change, code which uses this module cannot
+     change the delimiters, hooks, or path by assigning to variables in
+     the Text::FillIn package anymore.
+   - The get_text() and set_text() methods are now deprecated, use the
+     text() method instead, which takes an optional argument for setting
+     the text.  The deprecated methods will be removed in a future version.
+   - Same goes for get_property() and set_property().  Use property() now.
+   - Fixed a bug in the interpret engine - a '2' was hard-coded which 
+     should have been length(right delimiter).
+   - Hook functions now take the hook character as a second argument, making
+     it possible for one function to handle several kinds of hooks.
+
+   Thanks to Jesse Chisholm for most of these suggestions.
+
+0.02  Fri May 22 15:18:28 1998
+   - included two basic hook functions in the distribution
+   - moved TEST_SUITE out of docs, into 'make test' tests
+   - separated POD and Perl - POD is at the end of file now, not interspersed
+
+
+0.01  Tue Mar 24 17:32:35 1998
+   - original version; created by h2xs 1.18
+

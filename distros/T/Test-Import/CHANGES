@@ -1,0 +1,73 @@
+==================================================
+Changes from 2013-04-08 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2014-04-08 05:20:42 +0000
+------------------------------------------
+
+  Change: a8320bb9deae20b3b1beed01164950a64e822f62
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2014-04-08 00:20:31 +0000
+
+    update build artifacts 
+
+  Change: b96d51606477d61504b55a65a19f5110661c17c7
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2014-04-08 00:20:14 +0000
+
+    fix prereqs list in build config 
+
+  Change: bec83a1d4901d3b0446d6b852ea6ed4e208b21db
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2014-04-08 00:16:04 +0000
+
+    Merge pull request #1 from karenetheridge/patch-1
+
+    Add some links to prior art 
+
+  Change: cd5b2b0bdcf8a5d0dfd88bf04aa636eab13f9bc0
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2014-04-07 20:48:51 +0000
+
+    Reference previous implementation of this concept 
+
+------------------------------------------
+version 0.003 at 2014-04-08 05:19:43 +0000
+------------------------------------------
+
+  Change: d4d42b4e08cd96109e4b17e6ee2aa674eb3621de
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2014-04-08 00:19:43 +0000
+
+    fix prereqs list in build config 
+
+------------------------------------------
+version 0.002 at 2014-04-08 03:28:08 +0000
+------------------------------------------
+
+  Change: 470497a9981946bbdf16087e615d0c696c9502c4
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2014-04-07 22:28:08 +0000
+
+    update build artifacts for new version 
+
+------------------------------------------
+version 0.001 at 2014-04-08 03:27:16 +0000
+------------------------------------------
+
+  Change: ba9bae7eec93a2e103574efb1465b963d01e50cb
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2014-04-07 22:27:16 +0000
+
+    add build artifacts 
+
+  Change: affbcc369f5f23af426cc17030d12b1ddf9e8be3
+  Author: Doug Bell <madcityzen@gmail.com>
+  Date : 2014-04-07 22:26:54 +0000
+
+    add initial module 
+
+================
+End of releases.
+================

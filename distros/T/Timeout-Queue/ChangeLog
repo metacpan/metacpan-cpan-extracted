@@ -1,0 +1,10 @@
+Version 1.02 ()
+ * Make sure timeouts are never negativ
+ * Correct documentation
+
+Version 1.01 (Sun Dec 30 2007)
+ * Auto generate Makefile.PL
+ * Convert to use fake timer in tests, much faster.
+
+Version 1.00 (Tue Sep 4 2007)
+ * First version released

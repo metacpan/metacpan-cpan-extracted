@@ -1,0 +1,12 @@
+Revision history for Perl extension Teng::Plugin::TextTable
+
+0.03
+
+    - suppress uuv
+
+0.02
+
+    - more docs.
+
+0.01    Thu Nov 15 18:56:44 2012
+    - original version

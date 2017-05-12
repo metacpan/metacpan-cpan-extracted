@@ -1,0 +1,280 @@
+==================================================
+Changes from 2013-01-23 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 1.1 at 2014-01-23 06:00:21 +0000
+----------------------------------------
+
+  Change: 15860f2bf88ac6b5a678f5bb613ec9e8c2ebdd96
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 19:00:14 +0000
+
+    now that we have kyoto we can actually remove stuff 
+
+  Change: 88f5976ab9dfc5ab6d0944dbd074985abd7e1c36
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:54:27 +0000
+
+    v1.0 
+
+----------------------------------------
+version 1.0 at 2014-01-23 05:54:01 +0000
+----------------------------------------
+
+  Change: 086f7d9902acb7ef7b970a2000dbf675031a42c9
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:54:01 +0000
+
+    make sure we have everything in the right order 
+
+  Change: 1622d45c40c7e49458e3ec66961c0366d5003460
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:51:49 +0000
+
+    v0.9 
+
+----------------------------------------
+version 0.9 at 2014-01-23 05:49:41 +0000
+----------------------------------------
+
+  Change: 57f161e40977f3ff4a633e6e42012ba1669dc587
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:49:41 +0000
+
+    dzilify the 2nd 
+
+  Change: 63c1707cfef1c10d7d0a1fce629661a31a367b3b
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:46:24 +0000
+
+    dzilify the 2nd 
+
+  Change: 10befede2d9caaef1cfaa30bf240e2c46e1904a3
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:42:59 +0000
+
+    auto generated README 
+
+  Change: 000128a5f5f748dd38ba0c246d83763eb30aea81
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:42:13 +0000
+
+    more cleanup 
+
+  Change: d02832db6c54045209c6de103905725b83797bed
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:41:39 +0000
+
+    move to Dist::Zilla 
+
+  Change: b7f0cfadb4a8a9f8772e7f0ccabcc5d83eba3e3d
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-23 18:37:04 +0000
+
+    moved from Redis to KyotoTycoon 
+
+  Change: 78ba3e3d4019ee60108010d427862d9d2b64b37f
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-02-25 00:12:37 +0000
+
+    Checking in changes prior to tagging of version 0.8.
+
+    Changelog diff is: 
+
+  Change: 6b94515c84c8e754ca5ae226a83f2fb89a2641ed
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-02-25 00:08:27 +0000
+
+    use Redis reconnect feature, check if input is HASH 
+
+  Change: 81771ae5995662b06d8f58aa2b43912dc923f68f
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2012-07-11 13:21:18 +0000
+
+    added missing Module::Include 
+
+  Change: 642c2df5f2b4247b49591dfae4efb223e108e596
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-06-05 14:15:06 +0000
+
+    Checking in changes prior to tagging of version 0.7.
+
+    Changelog diff is:
+
+    diff --git a/Changes b/Changes index 6a549bc..f8d767f 100644 ---
+    a/Changes +++ b/Changes @@ -1,5 +1,8 @@
+
+    Revision history for True-Truth
+
+    +0.7 2012-06-05T14:14:49 + Fixed Redis connection string bug +
+
+    0.6 2012-05-09T07:26:47
+
+    fixed tests 
+
+  Change: 6b3a9da8d3ad3f7ca0d4245ca27a6b52c3f6fbf0
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-06-05 14:13:34 +0000
+
+    fixed redis connection issue 
+
+  Change: f79a9e3cb3260a09c614d52ce65aca794efbabc2
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-05-09 07:27:13 +0000
+
+    Checking in changes prior to tagging of version 0.6.
+
+    Changelog diff is:
+
+    diff --git c/Changes w/Changes index 48b4956..6a549bc 100644 ---
+    c/Changes +++ w/Changes @@ -1,5 +1,8 @@
+
+    Revision history for True-Truth
+
+    +0.6 2012-05-09T07:26:47 + fixed tests +
+
+    0.5 2012-05-08T12:07:39
+
+    changed the _truth hash key to _locked 
+
+  Change: 345b4fef81384b2edeb1485d841802eef8d47533
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-05-08 12:08:02 +0000
+
+    Checking in changes prior to tagging of version 0.5.
+
+    Changelog diff is:
+
+    diff --git c/Changes w/Changes index be08ef2..48b4956 100644 ---
+    c/Changes +++ w/Changes @@ -1,5 +1,8 @@
+
+    Revision history for True-Truth
+
+    +0.5 2012-05-08T12:07:39 + changed the _truth hash key to _locked +
+
+    0.4 2012-05-08T08:37:02
+
+    fixed the pending flag for shallow hash structures 
+
+  Change: f026efc6f14afcc16317c0f4747e798f8964ca15
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-05-08 12:07:24 +0000
+
+    chenged the _truth hash key to _locked 
+
+  Change: 96e4426fbc4bd85ff919dd8cc63a6e1a5fed382a
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-05-08 08:37:31 +0000
+
+    Checking in changes prior to tagging of version 0.4.
+
+    Changelog diff is:
+
+    diff --git c/Changes w/Changes index 40e1aa8..be08ef2 100644 ---
+    c/Changes +++ w/Changes @@ -1,5 +1,7 @@
+
+    Revision history for True-Truth
+
+    +0.4 2012-05-08T08:37:02 + fixed the pending flag for shallow hash
+    structures
+
+    0.3 2012-05-04T13:45:18
+
+    small patch for redis connection handling 
+
+  Change: ad3c9b38122f3e9298bea0d846e0a6b8eee70916
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-05-08 08:36:49 +0000
+
+    fixed pending flag 
+
+  Change: 76f1e453672723645a565dac0da712cb1ba7cba0
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-05-04 13:45:37 +0000
+
+    Checking in changes prior to tagging of version 0.3.
+
+    Changelog diff is:
+
+    diff --git c/Changes w/Changes index 9cff44f..40e1aa8 100644 ---
+    c/Changes +++ w/Changes @@ -1,6 +1,9 @@
+
+    Revision history for True-Truth
+
+    +0.3 2012-05-04T13:45:18 + small patch for redis connection handling
+    +
+
+    0.2 2012-04-30T13:27:18
+
+    added autoexpire support for cached keys (defaults to 1 hour) 
+
+  Change: 223ff773a8d18f8a750ade1192c039ad8c02d869
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-05-04 13:44:58 +0000
+
+    small patch for redis connection handling 
+
+  Change: 8b72912ca5b24f8f3183b3687bbfcbdd35ef2bce
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-04-30 13:27:49 +0000
+
+    Checking in changes prior to tagging of version 0.2.
+
+    Changelog diff is:
+
+    diff --git c/Changes w/Changes index 426803a..9cff44f 100644 ---
+    c/Changes +++ w/Changes @@ -1,6 +1,9 @@
+
+    Revision history for True-Truth
+
+    +0.2 2012-04-30T13:27:18 + added autoexpire support for cached keys
+    (defaults to 1 hour) +
+
+    0.1 2012-04-26T13:41:41
+
+    First version of the True::Truth 
+
+  Change: 36e10dffead3c1f0d0b198049e2deab6f80bf792
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-04-30 13:26:55 +0000
+
+    fixed tests if redis is not running 
+
+  Change: 74fc270add300aabeebf547a6570d6fbd87eeec8
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-04-30 13:19:50 +0000
+
+    added expire support 
+
+  Change: ace55e9aea9a899ee19a16b1cb93a761a94760a2
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-04-26 13:54:51 +0000
+
+    Checking in changes prior to tagging of version 0.1.
+
+    Changelog diff is:
+
+    diff --git c/Changes w/Changes index 59847a5..426803a 100644 ---
+    c/Changes +++ w/Changes @@ -1,5 +1,6 @@
+
+    Revision history for True-Truth
+
+    -0.01 Date/time - First version, released on an unsuspecting world. +
+    +0.1 2012-04-26T13:41:41 + First version of the True::Truth 
+
+  Change: 14eb65de2356a6b2c97df2051ee8dca2fb949fbf
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-04-26 13:40:50 +0000
+
+    first working version - we even get expected answers and have tests 
+
+  Change: 99b4e2635f2798a149dbf87077a2fd5bd70b215a
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-04-26 13:10:20 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,9 @@
+Revision history for Test-Async-HTTP
+
+0.02    2014/12/08 19:26:58
+        [CHANGES]
+         * Add the GET/HEAD/PUT/POST convenience wrappers
+
+0.01    2014/10/24 13:35:00
+        First version, released on an unsuspecting world.
+

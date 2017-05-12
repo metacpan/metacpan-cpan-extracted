@@ -1,0 +1,11 @@
+Revision history for Term-Pulse
+
+0.05    2013/7/15
+        fix bug #86865 reported by Alceu
+
+0.04    2012/10/9
+        fix a bug reported by glasswalk3r
+        update documentation
+
+0.03    2009/9/8
+        use Module::Install 

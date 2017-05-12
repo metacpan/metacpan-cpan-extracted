@@ -1,0 +1,30 @@
+CHANGES
+lib/Text/ASCIIMathML.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/acc.math
+t/arrow.math
+t/basic.math
+t/def.math
+t/Entities.pm
+t/expr.math
+t/faq.math
+t/font.moz.math
+t/functions.math
+t/greek.math
+t/group.math
+t/intermed.math
+t/latex.math
+t/logic.math
+t/matrix.math
+t/newcommand.math
+t/op.math
+t/rel.math
+t/sandbox.math
+t/special.math
+t/symbols.math
+t/tester.t
+tbin/testMathML
+META.yml                                 Module meta-data (added by MakeMaker)

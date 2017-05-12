@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.53.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 edf71ff136dd9fadee83fd5d0c708de0d6da03e7 Changes
+SHA1 005755b2faa4f80b3176a1c282f2bdbf9a68d4dc MANIFEST
+SHA1 23b830d022747e4840012b81c48327d35da2cba6 META.yml
+SHA1 d93350bbb6e6ebd4a8ff3817caab817a32c25a58 Makefile.PL
+SHA1 7136332a7f1c84d1517fd18ad9e70160bc89be61 README
+SHA1 e974f78178f53c88fb7e3f8d20f7df184d13e1d0 inc/Module/AutoInstall.pm
+SHA1 017bedfcba1e0c72b36301e6ef21b8712b84d175 inc/Module/Install.pm
+SHA1 bcfb15c6a158831c45b5100a7aa94e0f88fced9f inc/Module/Install/AutoInstall.pm
+SHA1 b1a70869c098ba602151631386fc510b5bfd3511 inc/Module/Install/Base.pm
+SHA1 dd7313db23119d49ae78593bfa576554fb5b0fd8 inc/Module/Install/Can.pm
+SHA1 7c3a5153a5574556d895f23e121a41e680da11c1 inc/Module/Install/Fetch.pm
+SHA1 2e9c012e58c778a4a83c5eaea20c3aed306ad0c5 inc/Module/Install/Include.pm
+SHA1 176d68fe7c07b6ab7cfe09093078b8127bbde786 inc/Module/Install/Makefile.pm
+SHA1 8b37b38215d14f922b3d5132ce33d11d21d531ba inc/Module/Install/Metadata.pm
+SHA1 7eb44b00058c44795038d7fa4c0c77470f20a7f8 inc/Module/Install/Win32.pm
+SHA1 6d05967a5e1680b5f118315aaa6b8a1e143d79d8 inc/Module/Install/WriteAll.pm
+SHA1 3378eccdfa56774f2a15f6509a4180e8ef43bcb8 lib/Task/Math/Symbolic.pm
+SHA1 1d400f8641eb40e24343ef10ea1e1006454e8ac7 t/01use.t
+SHA1 29444cb2628d4a53cb4212956375adfa24298bf3 t/02pod.t
+SHA1 4ffd4155caf492b2e1c3574437a60fdec7704755 t/03podcoverage.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iD8DBQFEibtOZCuimE51gxcRAnQ4AJ9mAMccN/ttlNbYIQBbawVSACcwXgCgiLQM
+BsoIce4yIEOtOG53IAyCI1w=
+=QzgT
+-----END PGP SIGNATURE-----

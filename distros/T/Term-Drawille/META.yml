@@ -1,0 +1,26 @@
+---
+abstract: 'Draw to your terminal using Braille characters'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Drawille
+requires:
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/hoelzro/term-drawille/issues
+  homepage: https://github.com/hoelzro/term-drawille
+  repository: https://github.com/hoelzro/term-drawille.git
+version: '0.01'

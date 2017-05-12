@@ -1,0 +1,53 @@
+
+-- Catalyst 'subrequest' handler example
+
+my $component_handler_registry = Template::Lace::ComponentHandlerRegistry->new;
+
+$component_handler_registry
+  ->add(Template::Lace::ComponentHandler::CodeRef->new(
+      code=>sub { my ($self, $dom, $attrs) = @_; ... });
+
+my $user_template_factory = Template::Lace::Factory->new(
+  class=>'MyApp::Template::User',
+  component_handlers=>$component_handler_registry);
+
+
+my $user_template = $user_template_factory->create(%args);
+
+$user_template->add_friends(@friends);
+my $content = $user_template->render;
+    
+
+  my $registry = Template::Lace::Registry->new(
+    component_handlers
+
+  my $template_factory = Template::Lace::Factory
+
+
+  package MyApp::DisplayModel::User;
+
+  use Moose;
+  use Lace::AttributeAnnotations;
+  use MyApp::Types;
+
+  has 'name', (
+    is=>'ro',
+    isa=>String,
+    display_html=>sub {
+      my ($self, $data, $dom) = @_;
+      $dom->at('#user-name', $data);
+    });
+
+  has 'friends, (
+    is=>'ro',
+    isa=>ArrayRef[Person],
+    display_hmtl=> sub {
+      my ($self, $data, $dom) = @_;
+      $dom->ul('#friends, $data)
+  );
+
+# The idea is that the sub component gets it args from
+# the contaiing componet
+ <lace-form errors='$.form.errors' ...>
+  <input errors='$.errors.age' value='$.values.age' title='$self.title' />
+ </lace-form>

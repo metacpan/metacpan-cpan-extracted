@@ -1,0 +1,28 @@
+---
+abstract: 'L<Try::Tiny> extension to warn exceptions'
+author:
+  - 'Joel Bernstein C< rataxis@cpan.org >.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Try-Tiny-WarnCaught
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Sub::Exporter: 0
+  Try::Tiny: 0
+  strictures: 0
+  true: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

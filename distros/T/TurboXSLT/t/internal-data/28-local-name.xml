@@ -1,0 +1,61 @@
+<biblio_genres>
+	<subgenres>
+		<root_title value="Фантастика" root_id="31">
+			<subgenre sub_id="6155" sub_name="foreign_sf" sub_title="Зарубежная фантастика" count_recommended="0">
+				<genre_type type="audio" arts_count="34"/>
+				<genre_type type="hardcopy" arts_count="438"/>
+				<genre_type type="text" arts_count="663"/>
+			</subgenre>
+		<subgenre sub_id="351" sub_name="sf" sub_title="Научная фантастика" count_recommended="0">
+			<genre_type type="audio" arts_count="108"/>
+			<genre_type type="hardcopy" arts_count="258"/>
+			<genre_type type="text" arts_count="3049"/>
+		</subgenre>
+		<subgenre sub_id="6303" sub_name="popadanec" sub_title="Попаданцы" count_recommended="0">
+			<genre_type type="audio" arts_count="12"/>
+			<genre_type type="hardcopy" arts_count="204"/>
+			<genre_type type="text" arts_count="868"/>
+		</subgenre>
+		<subgenre sub_id="379" sub_name="sf_humor" sub_title="Юмористическая фантастика" count_recommended="0">
+			<genre_type type="audio" arts_count="29"/>
+			<genre_type type="hardcopy" arts_count="69"/>
+			<genre_type type="text" arts_count="555"/>
+		</subgenre>
+		<subgenre sub_id="339" sub_name="sf_history" sub_title="Историческая фантастика" count_recommended="0">
+			<genre_type type="audio" arts_count="29"/>
+			<genre_type type="hardcopy" arts_count="187"/>
+			<genre_type type="text" arts_count="539"/>
+		</subgenre>
+		<subgenre sub_id="375" sub_name="sf_heroic" sub_title="Героическая фантастика" count_recommended="0">
+			<genre_type type="audio" arts_count="14"/>
+			<genre_type type="hardcopy" arts_count="34"/>
+			<genre_type type="text" arts_count="219"/>
+		</subgenre>
+		<subgenre sub_id="376" sub_name="sf_detective" sub_title="Детективная фантастика" count_recommended="0">
+			<genre_type type="audio" arts_count="10"/>
+			<genre_type type="hardcopy" arts_count="62"/>
+			<genre_type type="text" arts_count="312"/>
+		</subgenre>
+		<subgenre sub_id="377" sub_name="sf_space" sub_title="Космическая фантастика" count_recommended="0">
+			<genre_type type="audio" arts_count="19"/>
+			<genre_type type="hardcopy" arts_count="103"/>
+			<genre_type type="text" arts_count="599"/>
+		</subgenre>
+		<subgenre sub_id="378" sub_name="sf_social" sub_title="Социальная фантастика" count_recommended="0">
+			<genre_type type="audio" arts_count="58"/>
+			<genre_type type="hardcopy" arts_count="93"/>
+			<genre_type type="text" arts_count="1053"/>
+		</subgenre>
+		<subgenre sub_id="340" sub_name="sf_cyberpunk" sub_title="Киберпанк" count_recommended="0">
+			<genre_type type="audio" arts_count="1"/>
+			<genre_type type="hardcopy" arts_count="13"/>
+			<genre_type type="text" arts_count="84"/>
+		</subgenre>
+		<subgenre sub_id="373" sub_name="sf_action" sub_title="Боевая фантастика" count_recommended="0">
+			<genre_type type="audio" arts_count="70"/>
+			<genre_type type="hardcopy" arts_count="175"/>
+			<genre_type type="text" arts_count="1717"/>
+		</subgenre>
+	</root_title>
+	</subgenres>
+</biblio_genres>

@@ -1,0 +1,17 @@
+Revision history for Tapper-TestSuite-Netperf
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-21
+        - sync with release version
+
+4.0.1     2012-05-16
+        - Restructure TAP output
+        - big Dist::Zilla roundhouse kick
+
+2011-08-23  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.1
+
+	* initial version

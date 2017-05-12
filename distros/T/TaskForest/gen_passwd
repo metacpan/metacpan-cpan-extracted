@@ -1,0 +1,28 @@
+#!/usr/bin/perl  -T
+
+################################################################################
+#
+# $Id$
+#
+# 
+#
+################################################################################
+
+use strict;
+use warnings;
+
+my $user     = shift;
+my $password = shift;
+my @valid    = ('a'..'z', 'A'..'Z', 0..9, '.', '/');
+my $i1       = int(rand() * 64);
+my $i2       = int(rand() * 64);
+my $salt     = $valid[$i1].$valid[$i2];
+
+$user        =~ /([^\:]+)/;
+$user        = $1;
+$password    =~ /(\S+)/;
+$password    = $1;
+
+my $crypt = crypt($password, $salt);
+
+print "$user:$crypt\n";

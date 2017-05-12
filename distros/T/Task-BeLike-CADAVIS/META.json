@@ -1,0 +1,77 @@
+{
+   "abstract" : "Chad's favorites",
+   "author" : [
+      "Chad A Davis <chad.a.davis@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-CADAVIS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bundle::CPAN" : 0,
+            "Class::DBI" : 0,
+            "DBD::mysql" : 0,
+            "Log::Any" : 0,
+            "Mason" : 0,
+            "PDL" : 0,
+            "Sort::Key" : 0,
+            "Task::CPAN::Reporter" : 0,
+            "Task::Catalyst" : 0,
+            "Task::Dist::Zilla" : 0,
+            "Task::Kensho::CLI" : 0,
+            "Task::Kensho::DBDev" : 0,
+            "Task::Kensho::Exceptions" : 0,
+            "Task::Kensho::Hackery" : 0,
+            "Task::Kensho::ModuleDev" : 0,
+            "Task::Kensho::OOP" : 0,
+            "Task::Kensho::Scalability" : 0,
+            "Task::Kensho::Testing" : 0,
+            "Task::Kensho::Toolchain" : 0,
+            "Test::Approx" : 0,
+            "Test::Class" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chadadavis/Task-BeLike-CADAVIS/issues"
+      },
+      "homepage" : "https://github.com/chadadavis/Task-BeLike-CADAVIS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chadadavis/Task-BeLike-CADAVIS.git",
+         "web" : "https://github.com/chadadavis/Task-BeLike-CADAVIS"
+      }
+   },
+   "version" : "20111013"
+}
+

@@ -1,0 +1,6 @@
+v0.11 2010-08-29
+    - update POD to include detail on Attributes::Method::Tags
+    - no code or test changes
+
+v0.10 2010-08-25
+    - initial CPAN release

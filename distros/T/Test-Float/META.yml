@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Test-Float
+version:            0.3
+abstract:           Test::Harness modified to accept floating point test result values
+author:
+    - Scott Walters <scott@slowass.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.46
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Acme::State:    0.03
+    autobox::Core:  1
+    Devel::Caller:  0.1
+    PPI:            0.1
+    StupidMarkov:   0.002
+resources:
+    bugtracker:  mailto:scott@slowass.net
+    repository:  http://github.com/scrottie/autobox-Bless
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

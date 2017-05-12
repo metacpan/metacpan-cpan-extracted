@@ -1,0 +1,27 @@
+2.50  Add the ability to have future timestamps
+
+2.10  Change diagnostics to show what time we're comparing against.
+      Very useful when looking at old log files from jenkins hours later...
+
+      Add a postgres torture test in the authors test section
+
+2.05  Add ability to set "now" that we're comparing against
+
+2.04  Add suport for epoch seconds
+
+2.03  Ignore nanoseconds to account for DateTime->now() not returning
+      nanoseconds and therefore erroneously determining that a timestamp
+      created with nanoseconds occurred in the future when it's just more
+      accurate
+
+2.02  Add support for Postgres TIMEZONE WITH TIMESTAMP type dates
+
+2.01  Remove spurious use of Test::MockTime from test suite
+      (Thanks to many CPAN Testers for pointing this out)
+
+2.00  Move to DateTime::Format::ISO8601 from DateTimeX::Easy because
+      timezones do not work in the latter
+
+1.01  Improved handling of bad times
+
+1.00  Initial release to the CPAN

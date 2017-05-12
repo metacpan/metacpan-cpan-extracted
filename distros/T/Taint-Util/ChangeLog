@@ -1,0 +1,57 @@
+2010-03-17  Ævar Arnfjörð Bjarmason  <avar@cpan.org> (0.08)
+
+	* META.yml: RT#55666: Don't depend on Taint::Util, resolves a
+	circular dependency
+
+2010-03-12  Ævar Arnfjörð Bjarmason  <avar@cpan.org> (0.07)
+
+	* Util.pm: A new POD section titled "About tainting in Perl"
+	inspired by RT#53988. Grammar fixes by Chris Nehren
+	* t/usage.t: Skip the qr// test known to fail on <5.6.2
+	* t/usage.t: Test for $code and $code->() taintedness
+	* Makefile.PL: Removed in the repository in favour of
+	Dist::Zilla. This has no effect on users since Dist::Zilla is a
+	distro compiler and not a build system.
+
+2008-01-25  Ævar Arnfjörð Bjarmason  <avar@cpan.org> (0.06)
+
+	* Util.xs: Don't attempt to taint constants, it doesn't work and
+	this fixes a bug on tainting hash keys in older perls
+	* Util.pm: Use my own import routine instead of Exporter.pm, works
+	on 5.6 now
+	* Makefile.PL: Using EU::MM instead of M::I
+	* t/export.t: Test importing a lot better
+	* t/usage.t: Update tests for changes in Util.xs
+
+2007-05-09 Ævar Arnfjörð Bjarmason <avar@cpan.org> (0.05)
+
+	* t/reftaint.t: Specify how many tests are planned
+	* Util.pm: Don't inherit from Exporter
+	* Util.pm: POD: "used by perl" => "used by perl internally"
+
+2007-03-21 Ævar Arnfjörð Bjarmason <avar@cpan.org> (0.04)
+
+	* t/usage.t: Test for qr// taintness
+	* t/reftaint.t: Test tainting of stringified objects
+	* Util.pm: Section in taint/untaint explaining qr// and taintness
+  	of stringified objects
+	* Util.pm: Minor rewording in POD
+	* ChangeLog: s/Usage\.(pm|xs)/Util.$1/g
+
+2007-03-17 Ævar Arnfjörð Bjarmason <avar@cpan.org> (0.03)
+
+	* t/usage.t: A lot more tests
+	* t/prototype.t: New tests for prototypes
+	* Util.xs: Support multiple arguments to taint/untaint
+	* Util.pm: Expanded a lot on the documentation
+
+2007-03-14 Ævar Arnfjörð Bjarmason <avar@cpan.org> (0.02)
+
+	* Util.pm: Re-worded and added to the POD
+	* ChangeLog: Added a changelog file
+	* Makefile.PL: Explicitly get version from Util.pm
+
+2007-03-14 Ævar Arnfjörð Bjarmason <avar@cpan.org> (0.01)
+
+	* Initial release
+

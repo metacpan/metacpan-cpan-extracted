@@ -1,0 +1,45 @@
+---
+abstract: 'Scalable template engine for Perl5'
+author:
+  - 'Fuji, Goro (gfx) <gfuji@cpan.org>.'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  File::Copy::Recursive: 0
+  File::Path: '2.07'
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 3.18
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Text::Xslate
+name: Text-Xslate
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  Data::MessagePack: '0.38'
+  Mouse: v2.4.5
+  Scalar::Util: '1.14'
+  XSLoader: 0.02
+  parent: '0.221'
+  perl: 5.8.1
+resources:
+  MailingList: http://groups.google.com/group/xslate
+  ProjectHome: https://github.com/xslate
+  bugtracker: https://github.com/xslate/p5-Text-Xslate/issues
+  homepage: http://xslate.org/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/xslate/p5-Text-Xslate
+version: 3.4.0

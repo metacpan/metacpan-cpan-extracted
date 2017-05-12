@@ -1,0 +1,45 @@
+{
+   "abstract" : "Subclass of Time::Piece with some useful method",
+   "author" : [
+      "Nishibayashi Takuji <takuji31@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-Piece-Plus",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.038"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Validator" : "0",
+            "Mouse" : "0",
+            "Scalar::Util" : "0",
+            "Time::Piece" : "1.20",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Time::Piece::Plus" : {
+         "file" : "lib/Time/Piece/Plus.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

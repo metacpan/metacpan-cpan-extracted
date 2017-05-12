@@ -1,0 +1,28 @@
+---
+abstract: 'Tear down and bring up databases with Mojo::Pg'
+author:
+  - RICHE
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mojo-Pg
+provides:
+  Test::Mojo::Pg:
+    file: lib/Test/Mojo/Pg.pm
+    version: '0.33'
+requires:
+  File::Basename: '0'
+  Mojo::Base: '0'
+  Mojo::Pg: '0'
+resources:
+  IRC: irc://irc.perl.org/#mojo
+  bugtracker: https://github.com/rpcme/Test-Mojo-Pg/issues
+  homepage: https://github.com/rpcme/Test-Mojo-Pg
+  repository: https://github.com/rpcme/Test-Mojo-Pg.git
+version: '0.33'

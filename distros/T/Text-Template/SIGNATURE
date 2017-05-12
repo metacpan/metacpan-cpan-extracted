@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
+SHA1 ab8577d3eb0eedf3f98004e381a9cee30e7224e1 COPYING
+SHA1 43beb657271f1e1e9cb584840e8ee943c681c947 Changes
+SHA1 b457bd56a70b838ccc55d183ab09de64b6996958 INSTALL
+SHA1 f12894289cb0f379f24b8d63e2e761dbcba1b216 LICENSE
+SHA1 15c979eac5716cebc281bb61333349fd6602a2c3 MANIFEST
+SHA1 2266ea77c62b205d35051ff0f26dfe2da457c3e6 META.json
+SHA1 211c9680545a4a71b1623142a0976a2b7a43fb19 META.yml
+SHA1 718f9f9b865df45db83b0288f790f8c53e39c042 Makefile.PL
+SHA1 5d77dacc6fbc44c87a96bbf67cb5c988be4ce5ee README
+SHA1 da4182e4294f849bd4439a5fd0921f2342123171 lib/Text/Template.pm
+SHA1 836447bd5d442416a2565f7e62374d9bbca56894 lib/Text/Template/Preprocess.pm
+SHA1 5faf3ecf92314b033bcccb40a84a1a4ad0c83dc6 t/00-version.t
+SHA1 24b3086d4e2614dad9a8a620c88fbccaa039d915 t/01-basic.t
+SHA1 fb6312cbdf23d2b7432ac583a3385b8fcfd3ac57 t/02-hash.t
+SHA1 7217bace07f864bfda030f4042437a8c05776ba7 t/03-out.t
+SHA1 ad0c362cf467b7e1892b22a1f18a79c514b4a439 t/04-safe.t
+SHA1 a78aee9ccdb179755f2e4ea3b3918334cef7788a t/05-safe2.t
+SHA1 ef3aeaa58bc4f04bd75b16de27e92aa988fe5e8a t/06-ofh.t
+SHA1 667da67f35783ffea9ef749578332dcee34bb636 t/07-safe3.t
+SHA1 23fff8b4a4416be3a0642206f7848d7f85fb8019 t/08-exported.t
+SHA1 8c044296f34321532fb81b3f735b2ae7eb469041 t/09-error.t
+SHA1 8ccec0d79c50eb68ede1d69b655e95692a84f141 t/10-delimiters.t
+SHA1 158d92f56a690da05f894fee111d4d788f87007b t/11-prepend.t
+SHA1 b169342c187879870e12349e52c8b7dfa1849924 t/12-preprocess.t
+SHA1 dcc157ff4cfc1a3e68ba82e50d2b24ebaa30f517 t/13-taint.t
+SHA1 d45e4ea21f436366c33b9921b7c0fe3ca90cad98 t/14-broken.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWLRc6KQl27WkM10aAQijiRAA8/cXNX7udrWbrhNtRstB7ao3ewmTK3Sd
+9SkQ9gTUdaEaF6eBs3BjZjqu4k/OPVJTUUsjsb/pjAC5Zd8x6Jg83+MLRZC1lMqV
+TLx9AhwmSYmRpILBg+W8wrwZvG/XU7Lf5gLHvgLpW84qimvWRHm+YB1vOXafhAhS
+0G+voOMOD+619+eEwZBb18Jf4u7mreHk32WCgj6iCAlTEE7Pu7iORQvnbIwGE+6+
+kifk9+NhTDg9/4jD9i8kA23Q3/SBwin6Gj9fILsL39xriVQhPCARJKSs2DHZohPf
+hidICtM35cweQvIkwL3MMBGoJ6fuQQLWaCwsWnjaZSLhw92TunUgxWx0p1WFIwfT
+8iYmQd2lEKReoDIN0Nhy5DRidZQxmS6QNK43KImsfEmYz8xC6cSpfJbNeWLhqvGj
+qai57xcBQvF+33IjdxprI0ebhXqlgvj1gmgtGJdgsqO50FqTR5L125A4OUEL4ryG
+2maiJe2tmW8d4n76VMIzYVNgTRmTVJouf7i2yMhae2ADqHNU9pw5p6yRdLtUsYyp
+EJDAbQUbr8CDUr0XxivQmOMJo0jRUKC9KzU5H6AjsSlaGdTtnPuwlwGRdacp2WKa
+HEGjPR37rJP+Lkt4PSTHxUCAIrha8IW7gdn4MDgRaplmtihZ9/pAqb/MpvOnv1rD
+1MT2LvIcEmk=
+=ExEp
+-----END PGP SIGNATURE-----

@@ -1,0 +1,53 @@
+<html>
+<head>
+	<title>Wiki: Fit Acceptance Tests</title>
+<head>
+<body bgcolor=#FFFFFF link=#d06040 vlink=#806040>
+	<h1>Fit Acceptance Tests</h1>
+	<wiki>These are the tests that we expect any implementation of fit to pass. Run these tests with the following command. Be patient. This can take some time.
+<p><UL>
+<li> <a href="run.cgi">http:run.cgi</a>
+<p></UL>
+First we define the various framework implementations we will be testing. Each implementation provides a RunScript that will return and annotated version of the test pages listed below.
+<p><p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=3> fat.Frameworks </td></tr>
+<tr><td> language </td><td> page </td><td> runscript </td></tr>
+<tr><td> java </td><td> JavaPlatform </td><td> <a href="//fit.c2.com/fatJava.cgi">http://fit.c2.com/fatJava.cgi</a>? </td></tr>
+<tr><td> c# </td><td> DotNetPlatform </td><td>&nbsp;</td></tr>
+<tr><td> clisp </td><td> LispPlatform </td><td> <a href="//fit.c2.com/fatLisp.cgi">http://fit.c2.com/fatLisp.cgi</a>? </td></tr>
+<tr><td> scheme </td><td> LispPlatform </td><td> <a href="//fit.c2.com/fatScheme.cgi">http://fit.c2.com/fatScheme.cgi</a>? </td></tr>
+</table>
+<p><p>Then we list the tests that we expect them to pass. For each test and each language we run the test with that language's runscrip and report the the wrong and exception counts. 0/0 means all tests passed.
+<p>We will group tests into categories. We begin with the two examples from fit.c2.com that are expected to be free of errors. These are the 'tests' recommended in TipsForCoreImplementors.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=5> fat.Tests </td></tr>
+<tr><td> page </td><td> java </td><td> c# </td><td> clisp </td><td> scheme </td></tr>
+<tr><td> SimpleExample </td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td> MusicExample </td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+<p>Now we proceed with more through specification and testing of exactly what an implementation must do to be a version 1.0 implementation.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=5> fat.Tests </td></tr>
+<tr><td> page </td><td> java </td><td> c# </td><td> clisp </td><td> scheme </td></tr>
+</table>
+<p><em>(Nothing hear yet. This is an active area of development.)</em>
+<p>Some implementations have capabilities beyond that currently considered part of the fit core. These are under consideration as core pending positive experience in real testing and support from a majority of implementations.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=5> fat.Tests </td></tr>
+<tr><td> page </td><td> java </td><td> c# </td><td> clisp </td><td> scheme </td></tr>
+</table>
+<p><em>(Nothing hear yet. This is an active area of development.)</em>
+<p><hr>
+<p>These fixtures are really test runners written as fixtures. The <strong>Frameworks</strong> fixture collects information about the framework implementations to be tested. The <strong>Tests</strong> fixture combines this information with a list of test pages and reports run results in the remaining blank cells of the table.
+<p>The actual running of the tests is delegated to cgi scripts that can be scattered around the internet. Not all implementations need be hosted here at fit.c2.com. We ask that implementors provide a cgi specifically for running these tests that doesn't exploit the HttpReferer trick common with RunScript. This makes tracking down test failures much simpler.
+<p>The interaction with these cgi scripts is model on the fixture used in the WebPageExample. The td tags present in the cgi output are classified as red, green, yellow or gray based on the presence of bgcolor attributes in the tags. The various colors are counted and selected totals reported. 
+<p>See the source.
+<p><UL>
+<li> <a href="Release/Source/fat/Frameworks.java">http:Release/Source/fat/Frameworks.java</a>
+<li> <a href="Release/Source/fat/Tests.java">http:Release/Source/fat/Tests.java</a></UL>
+</wiki>
+<hr>
+	Last edited April 22, 2003
+</body>
+</html>
+

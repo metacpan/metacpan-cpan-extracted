@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ -e fatlib ]; then rm -r fatlib; fi
+fatpack tree $(fatpack packlists-for strictures.pm Moo.pm JSON/PP.pm MRO/Compat.pm Class/C3.pm Algorithm/C3.pm Log/Contextual.pm Exporter/Declare.pm Data/Dumper/Concise.pm Meta/Builder.pm aliased.pm Capture/Tiny.pm)
+rm lib/Tak/STDIONode.pm
+(
+  echo 'package Tak::STDIONode;
+our $DATA = do { local $/; <DATA> };
+1;
+__DATA__
+';
+  fatpack file;
+  cat bin/tak-stdio-node
+)>lib/Tak/STDIONode.pm
+rm -r fatlib

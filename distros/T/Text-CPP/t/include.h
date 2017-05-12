@@ -1,0 +1,4 @@
+HeaderToken
+
+#define firstheadermacro ValFirstHeaderMacro
+#define secondheadermacro ValFirstHeaderMacro

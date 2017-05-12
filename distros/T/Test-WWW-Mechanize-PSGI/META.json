@@ -1,0 +1,74 @@
+{
+   "abstract" : "Test PSGI programs using WWW::Mechanize",
+   "author" : [
+      "Leon Brocard <acme@astray.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-WWW-Mechanize-PSGI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Code::TidyAll" : "0.24",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.24",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Message::PSGI" : "0",
+            "Test::WWW::Mechanize" : "0",
+            "Try::Tiny" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CGI::Cookie" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/acme/Test-WWW-Mechanize-PSGI/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Test-WWW-Mechanize-PSGI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/acme/test-www-mechanize-psgi.git",
+         "web" : "https://github.com/acme/test-www-mechanize-psgi"
+      }
+   },
+   "version" : "0.36",
+   "x_contributors" : [
+      "Chia-liang Kao <clkao@clkao.org>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Shin Kojima <shin@kojima.org>",
+      "tokuhirom <tokuhirom@gmail.com>"
+   ]
+}
+

@@ -1,0 +1,509 @@
+policy_module(autobuild,0.0.1)
+
+###################################################################
+#
+# Core domain types
+#
+###################################################################
+
+# The engine types
+
+type abengine_t;
+type abengine_exec_t;
+domain_type(abengine_t)
+
+
+# The SCM tool types
+
+type abscmtool_t;
+type abscmtool_exec_t;
+domain_type(abscmtool_t)
+
+# The module build types
+
+type abmodbuild_t;
+type abmodbuild_exec_t;
+domain_type(abmodbuild_t)
+
+
+# Package repo types yum-arch/createrepo/genbasedir
+type abrepotool_t;
+type abrepotool_exec_t;
+domain_type(abrepotool_t)
+
+
+###################################################################
+#
+# Core file types
+#
+###################################################################
+
+
+# For config files
+type abconfig_t;
+files_type(abconfig_t)
+
+
+# The checked out source files
+type absource_t;
+files_type(absource_t)
+
+
+# The virtual install root files
+type abinstall_t;
+files_type(abinstall_t)
+
+
+# The builder archive files
+type abarchive_t;
+files_type(abarchive_t)
+
+
+# The build log files
+type ablog_t;
+files_type(ablog_t)
+
+
+# Published build results
+type abpublish_t;
+files_type(abpublish_t)
+
+
+# Generated packages (ie RPMs, Debs, etc)
+type abpackage_t;
+files_type(abpackage_t)
+
+
+# The overall root directory for build engine
+type abroot_t;
+files_type(abroot_t)
+
+
+# The log file of the engine itself
+type abperllog_t;
+files_type(abperllog_t)
+
+
+# SCM tool files, eg .cvspass
+type abscmtool_conf_t;
+files_type(abscmtool_conf_t)
+
+# RPM tool conf .rpmmacros
+type abrpm_conf_t;
+files_type(abrpm_conf_t)
+
+
+###################################################################
+#
+# Domain entry rules
+#
+###################################################################
+
+# If the binary is labelled abengine_exec_t then tranisition to 
+# abengine_t
+
+domain_entry_file(abengine_t, abengine_exec_t)
+corecmd_executable_file(abengine_exec_t)
+domain_auto_trans(unconfined_t, abengine_exec_t, abengine_t)
+# XXX we should
+#domain_auto_trans(cron_t, abengine_exec_t, abengine_t)
+
+# XXX probably redundant - we manually set exec context
+# via /proc/self/attr/exec
+
+domain_entry_file(abscmtool_t, abscmtool_exec_t)
+corecmd_executable_file(abscmtool_exec_t)
+
+# XXX probably redundant - we manually set exec context
+# via /proc/self/attr/exec
+
+domain_entry_file(abmodbuild_t, abmodbuild_exec_t)
+corecmd_executable_file(abmodbuild_exec_t)
+
+
+###################################################################
+#
+# General rules that all processes need
+#
+###################################################################
+
+# For the build engine
+
+files_read_usr_files(abengine_t)
+libs_use_ld_so(abengine_t)
+libs_use_shared_libs(abengine_t)
+miscfiles_read_localization(abengine_t)
+domain_use_interactive_fds(abengine_t)
+term_use_all_terms(abengine_t)
+dev_read_urand(abengine_t)
+corecmd_search_bin(abengine_t)
+corecmd_getattr_bin_files(abengine_t)
+corecmd_read_bin_symlinks(abengine_t)
+nscd_socket_use(abengine_t)
+files_read_etc_files(abengine_t)
+files_read_etc_runtime_files(abengine_t)
+files_search_var_lib(abengine_t)
+
+
+# For the SCM tools
+
+files_read_usr_files(abscmtool_t)
+libs_use_ld_so(abscmtool_t)
+libs_use_shared_libs(abscmtool_t)
+miscfiles_read_localization(abscmtool_t)
+domain_use_interactive_fds(abscmtool_t)
+term_use_all_terms(abscmtool_t)
+dev_read_urand(abscmtool_t)
+corecmd_search_bin(abscmtool_t)
+corecmd_getattr_bin_files(abscmtool_t)
+corecmd_read_bin_symlinks(abscmtool_t)
+nscd_socket_use(abscmtool_t)
+files_read_etc_files(abscmtool_t)
+files_read_etc_runtime_files(abscmtool_t)
+files_search_var_lib(abscmtool_t)
+
+
+# For the module build process
+
+files_read_usr_files(abmodbuild_t)
+libs_use_ld_so(abmodbuild_t)
+libs_use_shared_libs(abmodbuild_t)
+miscfiles_read_localization(abmodbuild_t)
+domain_use_interactive_fds(abmodbuild_t)
+term_use_all_terms(abmodbuild_t)
+dev_read_urand(abmodbuild_t)
+corecmd_search_bin(abmodbuild_t)
+corecmd_getattr_bin_files(abmodbuild_t)
+corecmd_read_bin_symlinks(abmodbuild_t)
+nscd_socket_use(abmodbuild_t)
+files_read_etc_files(abmodbuild_t)
+files_read_etc_runtime_files(abmodbuild_t)
+files_search_var_lib(abmodbuild_t)
+
+
+# For the module build process
+
+files_read_usr_files(abrepotool_t)
+libs_use_ld_so(abrepotool_t)
+libs_use_shared_libs(abrepotool_t)
+miscfiles_read_localization(abrepotool_t)
+domain_use_interactive_fds(abrepotool_t)
+term_use_all_terms(abrepotool_t)
+dev_read_urand(abrepotool_t)
+corecmd_search_bin(abrepotool_t)
+corecmd_getattr_bin_files(abrepotool_t)
+corecmd_read_bin_symlinks(abrepotool_t)
+nscd_socket_use(abrepotool_t)
+files_read_etc_files(abrepotool_t)
+files_read_etc_runtime_files(abrepotool_t)
+files_search_var_lib(abrepotool_t)
+
+###################################################################
+#
+# Specific rules for the build engine
+#
+###################################################################
+
+# XXX, wtf.com was this for ?
+
+#type abengine_tmp_t;
+#files_tmp_file(abengine_tmp_t)
+#allow abengine_t abengine_tmp_t:file create_file_perms;
+#files_tmp_filetrans(abengine_t,abengine_tmp_t,file)
+
+
+# Engine can read its own executable
+allow abengine_t abengine_exec_t:file read_file_perms;
+
+# Engine can read the config files
+allow abengine_t abconfig_t:file read_file_perms;
+allow abengine_t abconfig_t:dir search_dir_perms;
+
+# Can do anything to source root
+allow abengine_t absource_t:dir create_dir_perms;
+allow abengine_t absource_t:file create_file_perms;
+allow abengine_t absource_t:lnk_file create_file_perms;
+
+# Can do anything to install root
+allow abengine_t abinstall_t:dir create_dir_perms;
+allow abengine_t abinstall_t:file create_file_perms;
+allow abengine_t abinstall_t:lnk_file create_file_perms;
+
+# Can do anything to archive root
+allow abengine_t abarchive_t:dir create_dir_perms;
+allow abengine_t abarchive_t:file create_file_perms;
+allow abengine_t abarchive_t:lnk_file create_file_perms;
+
+# Add/remove files in logs
+allow abengine_t ablog_t:dir rw_dir_perms;
+allow abengine_t ablog_t:file create_file_perms;
+
+# Can do anything to publish dir
+allow abengine_t abpublish_t:dir create_dir_perms;
+allow abengine_t abpublish_t:file create_file_perms;
+allow abengine_t abpublish_t:lnk_file create_file_perms;
+
+# Can do anything to package root
+allow abengine_t abpackage_t:dir create_dir_perms;
+allow abengine_t abpackage_t:file create_file_perms;
+allow abengine_t abpackage_t:lnk_file create_file_perms;
+
+# Needed for lockfile & logfile creation
+allow abengine_t abroot_t:dir ra_dir_perms;
+allow abengine_t abroot_t:file create_file_perms;
+
+# Needed for email alert stage
+corenet_tcp_sendrecv_smtp_port(abengine_t);
+corenet_tcp_connect_smtp_port(abengine_t);
+sysnet_dns_name_resolve(abengine_t);
+
+# Allow creation of pipes for spawning child processes
+allow abengine_t self:fifo_file rw_fifo_file_perms;
+
+# Allow daemon to renice itself for Test::AutoBuild::Stage::SetNice
+allow abengine_t self:process {setsched };
+
+# Allow daemon to set exec context, so it can switch to abscmtool_t
+# or abmodbuild_t for run child proceses
+allow abengine_t self:process {setexec };
+
+corecmd_exec_all_executables(abengine_t);
+
+# Allow engine to transition to SCM tool or module build
+domain_trans(abengine_t, bin_t, abscmtool_t);
+domain_trans(abengine_t, cvs_exec_t, abscmtool_t);
+domain_trans(abengine_t, absource_t, abmodbuild_t);
+domain_trans(abengine_t, bin_t, abrepotool_t);
+
+###################################################################
+#
+# Specific rules for SCM tools
+#
+###################################################################
+
+# XXX, wtf.com was this for ?
+
+#type abscmtool_tmp_t;
+#files_tmp_file(abscmtool_tmp_t)
+#allow abscmtool_t abscmtool_tmp_t:file create_file_perms;
+#files_tmp_filetrans(abscmtool_t,abscmtool_tmp_t,file)
+
+# Can do anything to source root
+allow abscmtool_t absource_t:dir create_dir_perms;
+allow abscmtool_t absource_t:file create_file_perms;
+allow abscmtool_t absource_t:lnk_file create_file_perms;
+
+# Can create / write to log files
+allow abscmtool_t ablog_t:file create_file_perms;
+allow abscmtool_t ablog_t:dir rw_dir_perms;
+
+# Need to search root dir
+allow abscmtool_t abroot_t:dir search_dir_perms;
+
+# Allow execution of other SCM tools (hg)
+allow abscmtool_t bin_t:file entrypoint;
+can_exec(abscmtool_t, bin_t);
+
+# Allow execution of CVS tool
+cvs_exec(abscmtool_t);
+allow abscmtool_t cvs_exec_t:file entrypoint;
+
+# Engine needs to see SIG_CHILD from SCM tool exit
+allow abscmtool_t abengine_t:process sigchld;
+
+# Not sure why, but we inherit a FD to ld-2.5.so
+allow abscmtool_t abengine_t:fd use;
+
+# Need to read/write to stdin/out/err which are pipes from engine
+allow abscmtool_t abengine_t:fifo_file rw_fifo_file_perms;
+
+# Need to read network config files like resolv.conf
+#sysnet_read_config(abscmtool_t);
+sysnet_dns_name_resolve(abscmtool_t);
+
+# CVS PServer
+corenet_tcp_connect_cvs_port(abscmtool_t);
+corenet_tcp_sendrecv_cvs_port(abscmtool_t);
+
+# SVN/HG http
+corenet_tcp_sendrecv_http_cache_port(abscmtool_t);
+corenet_tcp_connect_http_cache_port(abscmtool_t);
+corenet_tcp_sendrecv_http_port(abscmtool_t);
+corenet_tcp_connect_http_port(abscmtool_t);
+
+# CVS/HG over SSH
+#ssh_exec(abscmtool_t);
+#ssh_rw_tcp_sockets(abscmtool_t);
+
+# Python (HG) likes to access /proc/meminfo
+kernel_read_system_state(abscmtool_t);
+
+# XXX God knows ? Still seems to work without it, although we get audit messages
+#allow abscmtool_t self:netlink_route_socket bind;
+#allow abscmtool_t self:netlink_route_socket create;
+
+allow abscmtool_t abscmtool_conf_t:file rw_file_perms;
+allow abscmtool_t abscmtool_conf_t:file setattr_file_perms;
+
+# XXX not clear that we want this, or if it is sufficient
+files_manage_generic_tmp_files(abscmtool_t);
+allow abscmtool_t tmp_t:dir create;
+allow abscmtool_t tmp_t:dir rmdir;
+
+# XXX wtf.com is signull ? Mercurial seems to use it
+allow abscmtool_t self:process signull;
+
+###################################################################
+#
+# Specific rules for module build process
+#
+###################################################################
+
+# XXX, wtf.com was this for ?
+
+#type abmodbuild_tmp_t;
+#files_tmp_file(abmodbuild_tmp_t)
+#allow abmodbuild_t abmodbuild_tmp_t:file create_file_perms;
+#files_tmp_filetrans(abmodbuild_t,abmodbuild_tmp_t,file)
+
+# Can do anything to source root
+allow abmodbuild_t absource_t:dir create_dir_perms;
+allow abmodbuild_t absource_t:file create_file_perms;
+allow abmodbuild_t absource_t:lnk_file create_file_perms;
+allow abmodbuild_t absource_t:file exec_file_perms;
+allow abmodbuild_t absource_t:file entrypoint;
+
+# Can do anything to install root
+allow abmodbuild_t abinstall_t:dir create_dir_perms;
+allow abmodbuild_t abinstall_t:file create_file_perms;
+allow abmodbuild_t abinstall_t:lnk_file create_file_perms;
+
+# Can create / write to log files
+allow abmodbuild_t ablog_t:file create_file_perms;
+allow abmodbuild_t ablog_t:dir rw_dir_perms;
+
+# Can do anything to package root
+allow abmodbuild_t abpackage_t:dir create_dir_perms;
+allow abmodbuild_t abpackage_t:file create_file_perms;
+allow abmodbuild_t abpackage_t:lnk_file create_file_perms;
+
+# getattr on filesystems
+fs_getattr_xattr_fs(abmodbuild_t);
+
+# Read default selinux contexts (rpm wants this)
+seutil_read_default_contexts(abmodbuild_t);
+
+# bash likes checking your mail spool
+mta_getattr_spool(abmodbuild_t)
+
+# Can run shell scripts, binaries, etc
+corecmd_exec_shell(abmodbuild_t);
+corecmd_exec_ls(abmodbuild_t);
+allow abmodbuild_t bin_t:file entrypoint;
+corecmd_exec_bin(abmodbuild_t);
+# eg python in /usr/share/*
+allow abmodbuild_t usr_t:file entrypoint;
+can_exec(abmodbuild_t, usr_t);
+# eg, /usr/lib/rpm/rpmb from rpmbuild
+allow abmodbuild_t lib_t:file entrypoint;
+can_exec(abmodbuild_t, lib_t);
+
+# Run the hostname command
+hostname_exec(abmodbuild_t)
+
+# Anything with pipes in self
+allow abmodbuild_t self:fifo_file rw_fifo_file_perms;
+
+# Need to search root dir
+allow abmodbuild_t abroot_t:dir search_dir_perms;
+
+# Engine needs to see SIG_CHILD from SCM tool exit
+allow abmodbuild_t abengine_t:process sigchld;
+
+# Not sure why, but we inherit a FD to ld-2.5.so
+allow abmodbuild_t abengine_t:fd use;
+
+# Need to read/write to stdin/out/err which are pipes from engine
+allow abmodbuild_t abengine_t:fifo_file rw_fifo_file_perms;
+
+# XXX not clear that we want this, or if it is sufficient
+files_manage_generic_tmp_files(abmodbuild_t);
+allow abmodbuild_t tmp_t:dir manage_dir_perms;
+
+kernel_read_system_state(abmodbuild_t);
+
+kernel_read_sysctl(abmodbuild_t)
+kernel_read_vm_sysctls(abmodbuild_t)
+kernel_read_device_sysctls(abmodbuild_t)
+kernel_read_kernel_sysctls(abmodbuild_t)
+kernel_read_net_sysctls(abmodbuild_t)
+kernel_read_fs_sysctls(abmodbuild_t)
+
+# RPM lib likes to read .rpmmacros
+allow abmodbuild_t abrpm_conf_t:file r_file_perms;
+
+# 'install' typically tries to relabel, block & ignore
+seutil_read_file_contexts(abmodbuild_t)
+dontaudit abmodbuild_t abinstall_t:file { relabelto relabelfrom };
+dontaudit abmodbuild_t absource_t:file { relabelto relabelfrom };
+#dontaudit abmodbuild_t ldconfig_exec_t:file execute;
+
+#unconfined_domain_noaudit(abmodbuild_t);
+
+###################################################################
+#
+# Specific rules for package repo tools
+#
+###################################################################
+
+# Can do anything to published files
+allow abrepotool_t abpublish_t:dir create_dir_perms;
+allow abrepotool_t abpublish_t:file create_file_perms;
+
+# package files may be hardlinked into published dir
+allow abrepotool_t abpackage_t:file r_file_perms;
+
+# Need to search root dir
+allow abrepotool_t abroot_t:dir search_dir_perms;
+
+# Engine needs to see SIG_CHILD from SCM tool exit
+allow abrepotool_t abengine_t:process sigchld;
+
+# Not sure why, but we inherit a FD to ld-2.5.so
+allow abrepotool_t abengine_t:fd use;
+
+# Need to read/write to stdin/out/err which are pipes from engine
+allow abrepotool_t abengine_t:fifo_file rw_fifo_file_perms;
+
+# Allow execution of other tools eg /usr/bin/createrepo
+allow abrepotool_t bin_t:file entrypoint;
+corecmd_exec_bin(abrepotool_t);
+
+# Need to read-write pipes - Perl genbasedir execs itself via a pipe
+allow abrepotool_t self:fifo_file rw_fifo_file_perms;
+
+# Need to read/execute python files in /usr/share/createrepo
+can_exec(abrepotool_t, usr_t);
+
+# python likes to read /proc/meminfo
+kernel_read_system_state(abrepotool_t);
+
+# RPM lib likes to read .rpmmacros
+allow abrepotool_t abrpm_conf_t:file r_file_perms;
+
+# XXX not clear that we want this, or if it is sufficient
+files_manage_generic_tmp_files(abrepotool_t);
+allow abrepotool_t tmp_t:dir create;
+allow abrepotool_t tmp_t:dir rmdir;
+
+
+###################################################################
+#
+# Other integration points
+#
+###################################################################
+
+#type httpd_t;
+
+#allow httpd_t abpublish_t:file r_file_perms;
+#allow httpd_t abpublish_t:dir r_dir_perms;

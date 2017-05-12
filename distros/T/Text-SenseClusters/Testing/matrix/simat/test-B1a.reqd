@@ -1,0 +1,3 @@
+ERROR(simat.pl):
+	Line1 in Vector file <test-B1a.vec> should show
+        #nrows #ncols when --dense is ON.

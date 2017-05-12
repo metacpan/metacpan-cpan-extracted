@@ -1,0 +1,72 @@
+	-*- Indented-text -*-
+$Id: README 477 2014-12-14 05:35:36Z hayashi $
+
+Term::ReadLine::Gnu --- GNU Readline Library Wrapper Module
+
+	Copyright (c) 1996 Hiroo Hayashi.  All rights reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+Description:
+
+	Term::ReadLine::Gnu (TRG) is an implementation of the
+	interface to the GNU Readline Library.  This module gives you
+	input line editing facility, input history management
+	facility, word completion facility, etc.  It uses the real GNU
+	Readline Library and has the interface with the almost all
+	variables and functions which are documented in the GNU
+	Readline/History Library.  So you can program your custom
+	editing function, your custom completion function, and so on
+	with Perl.  TRG may be useful for a C programmer to prototype
+	a program which uses the GNU Readline Library.
+
+	TRG is upper compatible with Term::ReadLine included in Perl
+	distribution.  Term::ReadLine uses TRG automatically when TRG
+	is available.  You can enjoy full line editing feature with
+	Perl debugger which use Term::ReadLine with no patch.
+
+	Ilya Zakharevich distributes his implementation,
+	Term::ReadLine::Perl, which bases on Jeffrey Friedl's
+	readline.pl.  His module works very well, and is easy to
+	install because it is written by only Perl.  I am trying to
+	make my module compatible with his.  He gives useful advises
+	for me.  Unfortunately readline.pl simulated old GNU Readline
+	library before TRG was born.  For example, it was not 8 bit
+	clean and it warns to the variables in ~/.inputrc which it did
+	not know yet.  We Japanese usually use 8 bit characters, so
+	this was bad feature for me.  I could make a patch for these
+	problems but I had interest with C interface facility and
+	dynamic loading facility of Perl, so I thought it was a good
+	chance for me to study them.  Then I made this module instead
+	of fixing his module.
+
+Prerequisites:
+	You must have Perl 5.8 or later.  If you have to use old Perl
+	for some reason, use Term::ReadLine::Gnu 1.09.  (I recommend
+	you to use newer Perl.)
+
+	You must have GNU Readline Library Version 2.1 or later.  See
+	INSTALL for more detail.
+
+	A report said GNU Readline Library might not work with perl with
+	sfio.  Since I do not have sfio library, I am not sure.
+
+How to build/install:
+	See INSTALL.
+
+Bugs:
+	There may be many bugs in both programs and documents.
+	Comments and bug reports are very welcome. Send me a E-Mail or
+	open a ticket on the bug tracker at rt.cpan.org;
+
+	http://rt.cpan.org/Dist/Display.html?Queue=Term-ReadLine-Gnu
+
+Author:
+	Hiroo Hayashi <hiroo.hayashi@computer.org>
+
+Project Home Page
+	http://sourceforge.net/projects/perl-trg/
+
+Revision History:
+	See Changes.

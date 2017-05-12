@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use Tie::Coupler;
+
+my $options = { fconvert => \&double,
+								rconvert => \&half,
+								init     => 1,
+							};
+my $impl = new Tie::Coupler($var, $coupled, $options);
+
+$var = 2;
+print "$var, $coupled\n";   ## Would print: 2, 4
+
+$coupled = 6;
+print "$var, $coupled\n";   ## Would print: 3, 6
+
+$impl->fconvert(\&triple);
+$var = 5;
+print "$var, $coupled\n";   ## Would print: 5, 15
+
+$impl->decouple();          ## The two scalars are now independent
+										  			## of each other now
+
+sub double { my ($val) = @_; $val * 2; }
+sub triple { my ($val) = @_; $val * 3; }
+sub half   { my ($val) = @_; int($val / 2); }
+

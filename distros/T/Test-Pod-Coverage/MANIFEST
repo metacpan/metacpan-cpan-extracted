@@ -1,0 +1,24 @@
+Changes
+lib/Test/Pod/Coverage.pm
+MANIFEST
+README
+Makefile.PL
+t/00.load.t
+t/all_pod_coverage_ok.t
+t/alt_class.t
+t/PC_Inherited.pm
+t/PC_Inherits.pm
+t/Nopod.pm
+t/Nosymbols.pm
+t/Privates.pm
+t/Simple.pm
+t/all_modules.t
+t/nopod.t
+t/nosymbols.t
+t/parms.t
+t/pod.t
+t/privates.t
+t/self.t
+t/simple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

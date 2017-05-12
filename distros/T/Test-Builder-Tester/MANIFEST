@@ -1,0 +1,14 @@
+Build.PL
+Makefile.PL
+CHANGES
+lib/Test/Builder/Tester.pm
+lib/Test/Builder/Tester/Color.pm
+MANIFEST			This list of files
+META.yml
+t/01basic.t
+t/02fhrestore.t
+t/03die.t
+t/04line_num.t
+t/05faildiag.t
+t/06errormess.t
+t/07args.t

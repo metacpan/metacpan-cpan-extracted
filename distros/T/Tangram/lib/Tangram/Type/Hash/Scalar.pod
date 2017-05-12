@@ -1,0 +1,88 @@
+=head1 NAME
+
+Tangram::Type::Hash::Scalar - map Perl hash of scalar keys and values
+
+=head1 SYNOPSIS
+
+   use Tangram::Core;
+   use Tangram::Type::Hash::Scalar; # always
+
+   $schema = Tangram::Schema->new(
+      classes => { NaturalPerson => { fields => {
+
+      flat_hash =>
+      {
+         opinions =>
+         {
+            table => 'NP_ops',
+            key_sql => 'VARCHAR(10)',
+            type => 'int',
+            sql => 'NUMERIC(1)',
+         },
+
+         lucky_numbers => 'int', # use defaults
+      }
+
+=head1 DESCRIPTION
+
+Maps references to a Perl hash. The persistent fields are grouped in
+a hash under the C<flat_hash> key in the field hash.
+
+The hash may contain as keys and values only 'simple' scalars like
+integers, strings or real numbers. It may not contain references. For
+hashs of objects, see L<Tangram::Type::Hash::FromMany> and L<Tangram::Type::Hash::FromOne>.
+
+Tangram uses a table to save the state of the collection. The table
+has three columns, which contain
+
+=over 4
+
+=item * the id of the container object
+
+=item * the key of the element in the hash
+
+=item * the value of the element
+
+=back
+
+The field names are passed in a hash that associates a field name with
+a field descriptor. The field descriptor may be either a hash or a
+string. The hash uses the following fields:
+
+=over 4
+
+=item * key_type
+
+=item * key_sql
+
+=item * type
+
+=item * sql
+
+=item * table
+
+=back
+
+The optional fields C<key_type> and C<type> specify the key and value
+types of the hash. If the type is C<string> Tangram quotes the values
+as they are passed to the database. Not specifying a C<type> is
+exactly equivalent to specifying C<string>.
+
+Optional field C<table> sets the name of the table that contains the
+elements. This defaults to 'C_F', where C is the class of the
+containing object and F is the field name.
+
+The optional fields C<key_sql> and C<sql> specify the type that
+deploy() (see L<Tangram::Deploy>) should use for the column containing
+the key and value of the hash. If this field is not present, the SQL
+type is derived from the C<type> field: if C<type> is C<string> (or is
+absent) VARCHAR(255) is used; otherwise, the C<type> field is
+interpreted as a SQL type.
+
+If the descriptor is a string, it is interpreted as the value of the
+C<type> field and all the other fields take the default value.
+
+=head1 AUTHOR
+
+This mapping was contributed by Gabor Herr
+<herr@iti.informatik.tu-darmstadt.de>

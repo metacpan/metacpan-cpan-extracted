@@ -1,0 +1,77 @@
+Revision history for Perl extension Tie::Tools
+
+1.10 2014-09-26 maintenance release, update not required
+
+- Added missing dependency Test::Class
+
+
+1.09 2014-09-24 maintenance release, update not required
+
+- Added Perl::Critic configuration, no code changed for now
+
+- Added documentation placeholders for subroutines
+
+- test.pl deleted, obsoleted by migration to Dist::Zilla
+
+- TODO file practically completed, so it has been deleted
+
+- Tie::Depth has been deprected for a long time, deleting 
+  the class
+
+
+1.08 2014-08-23 maintenance release, update not required
+
+- Added warnings to all modules
+
+
+1.07 2014-08-16, maintenance release, update not required
+
+- Exchanging Makefile.PL based build system for Dist::Zilla
+
+- All version numbers aligned to upcoming release 1.07
+
+
+1.06 2007-10-29 maintenance/bug fix release, update not necessary
+
+- updated MANIFEST
+
+- removed weird characters in Tie::Collection
+
+- updated t/kwalitee.t and t/pod-coverage.t to contemporary versions
+
+- added patch from Brian Dowling, flush method in Tie::Collection
+
+- added version to Tie::Collection, set to 0.02
+
+- turned Changes (this) file up side down
+
+- updated version in Tie::Tools to 1.06
+
+- cleaned some POD and added acknowledgement section
+
+
+1.05 2003-12-08 maintenance release, update not necessary
+
+- maintenance taken over by jonasbn <jonasbn@cpan.org>
+
+- 1.03 was the latest working release I could find on CPAN, 1.04 is
+there, but it seems empty.
+
+- renamed manifest to MANIFEST, elimnating build warning
+
+- added module Tie::Tools and single point of entry for Tie::Tools
+
+- moved $VERSION for Tie::Tools from Tie::Func to Tie::Tools
+
+- moved readme content to newly added TODO
+
+- fixed breaking test (issuing warning instead of death sentence)
+
+- added verbosity flag to test.pl
+
+- added CVS is tags to everything
+
+
+0.01 2000-07-10, Initial version
+
+- original version; created by h2xs 1.19

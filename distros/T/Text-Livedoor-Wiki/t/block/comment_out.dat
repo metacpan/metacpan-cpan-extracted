@@ -1,0 +1,20 @@
+=== comment out
+--- wiki
+a
+// hgoehoge <hoge>
+b
+--- html
+a<br />
+b
+=== comment out multiple line
+--- wiki
+aa
+// hgoehoge <hoge>
+// hogehoge
+// hagehage
+aa
+bb
+--- html
+aa<br />
+aa<br />
+bb

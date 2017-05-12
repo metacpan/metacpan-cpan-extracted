@@ -1,0 +1,96 @@
+{
+   "abstract" : "Preforking AnyEvent HTTP server for PSGI",
+   "author" : [
+      "Masahiro Nagano <kazeburo {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Twiggy-Prefork",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Parallel::Prefork" : "0.13",
+            "Server::Starter" : "0",
+            "Twiggy" : "0.1020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "LWP::UserAgent" : "0",
+            "Plack::Test::Suite" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "Test::SharedFork" : "0",
+            "Test::TCP" : "2.00"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Handler::Twiggy::Prefork" : {
+         "file" : "lib/Plack/Handler/Twiggy/Prefork.pm"
+      },
+      "Twiggy::Prefork" : {
+         "file" : "lib/Twiggy/Prefork.pm",
+         "version" : "0.08"
+      },
+      "Twiggy::Prefork::Server" : {
+         "file" : "lib/Twiggy/Prefork/Server.pm"
+      },
+      "Twiggy::Prefork::Server::SS" : {
+         "file" : "lib/Twiggy/Prefork/Server/SS.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Twiggy-Prefork/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Twiggy-Prefork",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Twiggy-Prefork.git",
+         "web" : "https://github.com/kazeburo/Twiggy-Prefork"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "nhayashi <hayashi.naritoshi@dena.jp>",
+      "soh335 <sugarbabe335@gmail.com>",
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ]
+}

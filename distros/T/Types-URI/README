@@ -1,0 +1,111 @@
+NAME
+    Types::URI - type constraints and coercions for URIs
+
+SYNOPSIS
+       package FroobleDocument;
+   
+       use Moose;
+       use Types::URI -all;
+   
+       has source => (
+          is      => 'ro',
+          isa     => Uri,
+          coerce  => 1,
+       );
+
+DESCRIPTION
+    Types::URI is a type constraint library suitable for use with Moo/Moose
+    attributes, Kavorka sub signatures, and so forth.
+
+  Types
+    This module provides some type constraints broadly compatible with those
+    provided by MooseX::Types::URI, plus a couple of extra type constraints.
+
+    `Uri`
+        A class type for URI/URI::WithBase. Coercions from:
+
+        from `Uuid`
+            Coerces to a URI in the `urn:uuid:` schema. (See Types::UUID.)
+
+        from `Str`
+            Uses "new" in URI.
+
+        from `Path`
+            Uses "new" in URI::file. (See Types::Path::Tiny.)
+
+        from `ScalarRef`
+            Uses "new" in URI::data.
+
+        from `HashRef`
+            Coerces using URI::FromHash.
+
+        from `Iri`
+            Uses "new" in URI.
+
+        from RDF::Trine::Node::Resource, RDF::Trine::Namespace, XML::Namespace
+            Uses "new" in URI.
+
+    `FileUri`
+        A subtype of `Uri` covering URI::file. Coercions from:
+
+        from `Str`
+            Uses "new" in URI::file.
+
+        from `Path`
+            Uses "new" in URI::file. (See Types::Path::Tiny.)
+
+        from `HashRef`
+            Coerces using URI::FromHash.
+
+        from `Iri`
+            Uses "new" in URI.
+
+        from RDF::Trine::Node::Resource, RDF::Trine::Namespace, XML::Namespace
+            Uses "new" in URI.
+
+    `DataUri`
+        A subtype of `Uri` covering URI::data. Coercions from:
+
+        from `Str`
+            Uses "new" in URI::data.
+
+        from `ScalarRef`
+            Uses "new" in URI::data.
+
+        from `HashRef`
+            Coerces using URI::FromHash.
+
+        from `Iri`
+            Uses "new" in URI.
+
+        from RDF::Trine::Node::Resource, RDF::Trine::Namespace, XML::Namespace
+            Uses "new" in URI.
+
+    `Iri`
+        A class type for IRI. Coercions as per `Uri` above, plus can coerce
+        from `Uri`.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-URI>.
+
+SEE ALSO
+    MooseX::Types::URI, Type::Tiny::Manual, URI, URI::file, URI::data,
+    URI::FromHash, RDF::Trine::Node::Resource, IRI.
+
+    Types::UUID, Types::Path::Tiny, Types::Standard.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

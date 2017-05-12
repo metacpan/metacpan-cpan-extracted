@@ -1,0 +1,191 @@
+#!/usr/bin/env perl
+# ABSTRACT: Bulk mark entire runs/plans (or groups of tests therein) as the provided status.
+# PODNAME: TestRail::Bin::BulkMarkResults
+
+package TestRail::Bin::BulkMarkResults;
+$TestRail::Bin::BulkMarkResults::VERSION = '0.039';
+use strict;
+use warnings;
+use utf8;
+
+use TestRail::API;
+use TestRail::Utils;
+use TestRail::Utils::Results;
+
+use Getopt::Long qw{GetOptionsFromArray};
+Getopt::Long::Configure('pass_through');
+
+use File::HomeDir qw{my_home};
+
+if ( !caller() ) {
+    my ( $out, $code ) = run( 'args' => \@ARGV );
+    print $out;
+    exit $code;
+}
+
+sub run {
+    my %params = @_;
+    my $opts   = {};
+
+    # Parse config file
+    my $homedir = my_home() || '.';
+    if ( -e $homedir . '/.testrailrc' ) {
+        $opts = TestRail::Utils::parseConfig($homedir);
+    }
+
+    # Override configuration with switches
+    GetOptionsFromArray(
+        $params{'args'},
+        'apiurl=s'        => \$opts->{'apiurl'},
+        'password=s'      => \$opts->{'password'},
+        'user=s'          => \$opts->{'user'},
+        'status=s@'       => \$opts->{'statuses'},
+        'j|project=s'     => \$opts->{'project'},
+        'p|plan=s'        => \$opts->{'plan'},
+        'r|run=s'         => \$opts->{'run'},
+        'c|config=s@'     => \$opts->{'configs'},
+        'a|assignedto=s@' => \$opts->{'users'},
+        'e|encoding=s'    => \$opts->{'encoding'},
+        'h|help'          => \$opts->{'help'},
+    );
+
+    if ( $opts->{help} ) { return ( '', TestRail::Utils::help() ); }
+
+    $opts->{'browser'} = $params{'browser'};
+
+    my $status = $params{'args'}->[0];
+    my $reason = $params{'args'}->[1];
+
+    die("No status to set provided.") unless $status;
+    TestRail::Utils::interrogateUser( $opts,
+        qw{apiurl user password project run} );
+
+    my $tr = TestRail::Utils::getHandle($opts);
+
+    $opts->{'set_status_to'} = $status;
+    $opts->{'reason'}        = $reason;
+    my $results = TestRail::Utils::Results::bulkMarkResults( $opts, $tr );
+
+    return (
+        "Successfully set the status of "
+          . scalar(@$results)
+          . " cases to $status.\n",
+        0
+    ) if $results;
+    return ( "Could find no cases to set results for.\n", 255 );
+}
+
+1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+TestRail::Bin::BulkMarkResults - Bulk mark entire runs/plans (or groups of tests therein) as the provided status.
+
+=head1 VERSION
+
+version 0.039
+
+=head1 DESCRIPTION
+
+Sometimes it is useful to mark entire runs of tests when, for example, a prerequisite test in a sequence invalidates all further tests.
+For example, if a binary produced for test fails to run at all, more detailed testing will be impossible;
+it would save time to just mark everything as blocked.
+
+Can be used as the modulino TestRail::Bin::BulkMarkResults.
+Has a single 'run' function which accepts a hash with the 'args' parameter being the array of arguments.
+
+=head1 USAGE
+
+  testrail-bulk-mark-results [OPTIONS] status [reason]
+
+  require `which testrail-bulk-mark-results`;
+  TestRail::Bin::BulkMarkResults::run('args' => \@args);
+
+=head1 PARAMETERS:
+
+=head2 MANDATORY PARAMETERS
+
+=over 4
+
+--apiurl     : full URL to get to TestRail index document
+
+--password   : Your TestRail Password, or a valid API key (TestRail 4.2 and above).
+
+--user       : Your TestRail User Name.
+
+-j --project : desired project name.
+
+-r --run     : desired run name.
+
+=back
+
+All mandatory options not passed with the above switches, or in your ~/.testrailrc will be prompted for.
+
+=head2 SEMI-OPTIONAL PARAMETERS
+
+=over 4
+
+-p --plan     : desired plan name.  Required if the run passed is a child of a plan.
+
+-e --encoding : Character encoding of arguments.  Defaults to UTF-8. See L<Encode::Supported> for supported encodings.
+
+=back
+
+=head2 OPTIONAL PARAMETERS
+
+=over 4
+
+-c --config     : configuration name to filter plans in run.  Can be passed multiple times.
+
+-s --status     : only mark tests already marked as [status] in testrail.  Can be passed multiple times.
+
+-a --assignedto : only mark tests assigned to user. Can be passed multiple times.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+In your \$HOME, (or the current directory, if your system has no concept of a home directory) put a file called .testrailrc with key=value syntax separated by newlines.
+Valid Keys are the same as documented by L<App::Prove::Plugin::TestRail>.
+All options specified thereby are overridden by passing the command-line switches above.
+
+=head1 MISCELLANEOUS OPTIONS:
+
+=over 4
+
+--help : show this output
+
+=back
+
+=head1 SPECIAL THANKS
+
+Thanks to cPanel Inc, for graciously funding the creation of this distribution.
+
+=head1 AUTHOR
+
+George S. Baugh <teodesian@cpan.org>
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by George S. Baugh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+L<TestRail::API>
+
+L<File::HomeDir> for the finding of .testrailrc
+

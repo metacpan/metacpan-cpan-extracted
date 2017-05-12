@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Tie-TextDir
+version: 0.06
+license: perl
+distribution_type: module
+requires:
+  Carp: 0
+  Fcntl: 0
+  File::Spec: 0
+  File::Temp: 0
+  Symbol: 0
+recommends: {}
+build_requires:
+  Test: 0
+conflicts: {}
+provides:
+  Tie::TextDir:
+    file: TextDir.pm
+    version: 0.06
+generated_by: Module::Build version 0.20_01

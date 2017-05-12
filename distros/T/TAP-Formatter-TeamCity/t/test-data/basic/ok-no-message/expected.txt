@@ -1,0 +1,4 @@
+##teamcity[testSuiteStarted flowId='t/test-data/basic/ok-no-message/input.st' name='t/test-data/basic/ok-no-message/input.st']
+##teamcity[testStarted captureStandardOutput='true' flowId='t/test-data/basic/ok-no-message/input.st' name='NO TEST NAME']
+##teamcity[testFinished flowId='t/test-data/basic/ok-no-message/input.st' name='NO TEST NAME']
+##teamcity[testSuiteFinished flowId='t/test-data/basic/ok-no-message/input.st' name='t/test-data/basic/ok-no-message/input.st']

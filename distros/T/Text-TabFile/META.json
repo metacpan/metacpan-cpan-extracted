@@ -1,0 +1,60 @@
+{
+   "abstract" : "Parsing tab delimited files",
+   "author" : [
+      "Phil Pollard <bennie@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.140630",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-TabFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test" : "0",
+            "Text::Delimited" : "2.00",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "provides" : {
+      "Text::TabFile" : {
+         "file" : "lib/Text/TabFile.pm",
+         "version" : "1.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Text-TabFile"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bennie/perl-Text-TabFile.git",
+         "web" : "http://github.com/bennie/perl-Text-TabFile"
+      }
+   },
+   "version" : "1.14"
+}

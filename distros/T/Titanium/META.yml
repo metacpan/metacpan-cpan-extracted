@@ -1,0 +1,37 @@
+---
+name: Titanium
+version: 1.04
+author:
+  - 'Mark Stosberg <mark@summersault.com>'
+abstract: 'A strong, lightweight web application framework'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Application: 4
+  CGI::Application::Dispatch: 0
+  CGI::Application::Plugin::ConfigAuto: 0
+  CGI::Application::Plugin::DBH: 0
+  CGI::Application::Plugin::DebugScreen: 0
+  CGI::Application::Plugin::DevPopup: 0
+  CGI::Application::Plugin::ErrorPage: 1.2
+  CGI::Application::Plugin::FillInForm: 0
+  CGI::Application::Plugin::Forward: 0
+  CGI::Application::Plugin::LogDispatch: 0
+  CGI::Application::Plugin::Redirect: 0
+  CGI::Application::Plugin::Session: 0
+  CGI::Application::Plugin::Stream: 0
+  CGI::Application::Plugin::ValidateRM: 0
+  CGI::Application::Server: 0
+  CGI::Application::Standard::Config: 0
+  Compress::Raw::Zlib: 2
+  Module::Starter::Plugin::CGIApp: 0.05
+  Test::WWW::Mechanize::CGIApp: 0
+provides:
+  Titanium:
+    file: lib/Titanium.pm
+    version: 1.04
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,10 @@
+Revision history for Perl extension Template-Plugin-Filter-Base64
+
+0.02 2017-01-11T14:00:00Z
+
+    - allow to convert text with html entities before base64-encoding
+
+0.01 2017-01-09T16:10:34Z
+
+    - original version
+

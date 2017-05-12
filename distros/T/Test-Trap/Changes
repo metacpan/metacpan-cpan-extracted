@@ -1,0 +1,551 @@
+Revision history for Test-Trap
+
+0.3.2	Tue Feb 24 00:19:23 CET 2015
+        The tempfile-preserve strategy was (always) broken on
+        non-perlio perls.
+        Also, some of the tests were (recently) noisy on old perls.
+        Test::Trap::Builder::TempFile:
+        - add a GOTPERLIO guard to each IO_LAYERS block.
+        Tests:
+        - 03-files.pl now avoid "used only once" warnings.
+
+0.3.1	Mon Feb 23 21:43:30 CET 2015
+	This release doesn't touch library code, but addresses some
+	test issues:
+        - It fixes RT #102271 by checking for the presence of a
+	  utf8-layer on the original STDOUT, instead of assuming its
+	  absence.
+        - It makes some test code cleaner.
+        - It silences redefine warnings during testing on certain
+	  platforms.
+        Library files: No change but version bump.
+        Tests:
+        - 03-files* now use another global to specify the class to
+          require, replacing a quick-and-dirty hack that turned out to
+          be noisy on some platforms, including Cygwin.
+        - {15-tempfile,16-systemsafe}-options.t now check for the
+          presence of utf8-layer on STDOUT, instead of assuming its
+          absence.  (Either of the environment variables PERL_UNICODE
+          and PERL5OPT could cause such a layer to be present, and
+          there might be other ways to do it.)
+
+0.3.0	Thu Dec 18 21:57:51 CET 2014
+	This release, in brief:
+        - improves clarity through nomenclature:
+              * renames "(output layer) backend implementation" to
+                "(capture) strategy", for more standard nomenclature
+                (and less of a mouthful);
+              * renames "pseudo-layer" to "multi-layer" (if so
+                declared) or "non-trapping layer" (neither is a direct
+                analogue to PerlIO pseudo layers, so the nomenclature
+                was misleading);
+        - adds (import) options to the TempFile and SystemSafe capture
+	  strategy factories, allowing for different ways to handle
+	  PerlIO layers;
+        - using these for two new standard capture strategies,
+          "tempfile-preserve" and "systemsafe-preserve"; and
+        - fixes a bug in SystemSafe.
+        And, in more detail ...
+        Test::Trap::Builder:
+        - Changes method names per the nomenclature changes, leaving
+          back-compat aliases behind.
+        - Changes error message per the nomenclature changes.  (No
+          back-compat possible, sorry.)
+        - Updates the documentation.
+        Test::Trap::Builder::{TempFile,SystemSafe}:
+        - Import now takes arguments:
+		strategy name (default {"tempfile","systemsafe"}); and
+                strategy options (default empty hash).
+        - The following options are supported:
+		preserve_io_layers (boolean; default false); and
+        	io_layers (colon-separated string; default unset).
+        Test::Trap::Builder::SystemSafe:
+        - Fixes a bug where the original perlio layers were not
+	  restored after the trap was sprung.
+        Test::Trap::Builder::{PerlIO,TempFile,SystemSafe}:
+        - Updates the code in accordance with Test::Trap::Builder
+          changes; see above.
+        - Updates the documentation.
+        Test::Trap:
+        - Imports new capture strategy, "tempfile-preserve", from
+          TempFile with option preserve_io_layers.
+        - Imports new capture strategy, "systemsafe-preserve", from
+          SystemSafe with option preserve_io_layers.
+        - Updates the code in accordance with Test::Trap::Builder
+          changes; see above.
+        - Updates the documentation.
+        Tests:
+        - changes variable names and comments in accordance with
+          nomenclature changes;
+        - adds tests for the no-restore bug in t/03-files.pl (hence
+          for each tested strategy);
+        - adds t/03-files-{tempfile,systemsafe}-preserve.t to run the
+          basic tests against the new capture strategies;
+        - accounts for the changed error message in t/06-layers.t;
+        - adds t/{15-tempfile,16-systemsafe}-options.t to check
+          capture strategies of varying options.
+
+0.2.5	Sun Nov 16 18:31:42 CET 2014
+	This release localizes $! (ERRNO) for internal operations that
+	change it, as suggested by Felipe Gasper.  For the same
+	operations, it also localizes $^E (extended OS error).
+        Library files:
+        - Localize $! and $^E for internal operations that change them.
+        Tests:
+        - Check that bare test blocks leave $!, %!, and $^E unchanged,
+          but that blocks that modify $! and $^E still do so.
+        Also:
+        - Added Module::Build to the configure_requires.
+        - Fix emacs mode line on t/14-leaks.t.
+        - Better comments in lib/Test/Trap/Builder.pm.
+
+0.2.4	Sun Mar 30 10:02:16 CEST 2014
+	This release fixes a memory leak with the default tempfile
+	backend layer implementation for trapping output.  The
+	systemsafe alternative backend had the same kind of leak, and
+	has also been fixed.  (The perlio alternative backend was not
+	affected.)
+        Thanks go again to Felipe Gasper for discovering this!
+        Test::Trap::Builder:
+        - Add a method ExceptionFunction to make it easier to avoid
+          circular references arising from registered closures.
+          Document and export this method.
+        Test::Trap::Builder::TempFile:
+        - Break a circular reference chain.
+        Test::Trap::Builder::SystemSafe:
+        - Break a similar but slightly more complicated circular
+          reference chain.
+        Tests:
+        - Added t/14-leaks.t to check that the reference count is as
+          expected, at least with trivial code and standard setup for
+          all three output layer backends.
+        Also:
+        - Use ebhanssen@cpan.org for my email address.
+        - Update copyright years.
+        - Update MANIFEST.SKIP &c for use of git (goodbye subversion).
+
+0.2.3   Mon Dec 30 14:46:15 CET 2013
+        Library files:
+        - RT #87263: typo fixes, courtesy dsteinbrunner@pobox.com.
+        - Localize the trap coderef, so that it does not hold on to
+          what it closes over, creating stale references, but lets
+          them go out of scope; thanks go to Felipe Gasper.
+        Documentation:
+        - Some clarification for RT #91687: Wrong exit code after die.
+        Tests:
+        - Regression test for the stale references.
+
+0.2.2	Fri Mar  2 02:23:04 CET 2012
+        Test::Trap::Builder::TempFile & Test::Trap::Builder::SystemSafe:
+        - RT #61776: Remove temporary files at first opportunity;
+          thanks go to Ian Goodacre.
+        Documentation:
+        - RT #61773: return from trap function
+          Document what trap { ... } returns.
+        Tests:
+        - RT #75430: Failing tests in 06-layer.t
+          Convert a number of die_is to die_like, handling cases with
+          and without trailing comma from carp.
+        - Unset another taint-checked environment variable, CDPATH;
+          thanks go to CPAN testers.
+
+0.2.1	Tue Dec 29 23:14:45 CET 2009
+	Documentation:
+	 - fix a typo, [RT #48941]; thanks go to David Taylor;
+	Tests:
+	 - use .PL-files to build the test files t/08-fork.t and
+           t/11-systemsafe-basic.t instead of dispatching through
+           *-taint.t and *-no-taint.t files at runtime;
+	Build:
+	 - setup the build of the above test files in Build.PL;
+	 - add a ACTION_distmeta override to check for patch to or
+           version of Module::Build::Compat with correct handling of
+           PL_FILES/PL_files;
+	 - update the MANIFEST and .SKIP files accordingly.
+
+0.2.0	Tue Sep 30 04:28:30 CEST 2008
+	Test::Trap::Builder::SystemSafe:
+	 - add explicit close()s, as it seems various files otherwise
+           remain open for too long;
+	 - register the teardown sub as soon as we have a tempfile, so
+           that we'll close it in teardown even if internal exceptions
+           are raised;
+	Test::Trap::Builder::Tempfile:
+	 - added an explicit close($fh), as it seems it otherwise
+           remains open for too long;
+	 - register the teardown sub as soon as we have a tempfile, so
+           that we'll close it in teardown even if internal exceptions
+           are raised;
+	Test::Trap::Builder:
+	 - add an ' id ' member to the object, for use with tag-on
+           properties, as the ref stringification does not survive a
+           pseudo-fork (inside-out objects are *hard*);
+	 - make sure all registered teardowns are called, even after
+           one or more internal exceptions;
+	Test::Trap:
+	 - use a different workaround (by way of Teardown) for
+           $SIG{__WARN__} temporary value, as it seems local %SIG does
+           not restore the previous value or lack thereof upon scope
+           exit (may perlbug that one);
+	Tests:
+	 - add a regression test for $SIG{__WARN__} restoration to
+           t/03-files.pl;
+	 - add a regression test for the ", <$fh> line 1." bug to
+           t/03-files.pl;
+	 - t/03-files.pl and t/06-layers.t: add necessary close()s and
+           local *FH to make sure all files are closed before exiting
+           (as otherwise, tempfiles are not being cleaned on windows);
+	 - added "~" to the characters accepted in the $^X path, for
+           t/11-systemsafe-basic.pl;
+	 - reorganize: move "unnumbered" tests to xt/author;
+	Build:
+	 - bump the minor version number, in response to the internal
+           changes in Test::Trap::Builder;
+	 - don't list Config as a prereq, as that seems to mess up
+           CPANPLUS(?) installations;
+	 - updated MANIFEST, MANIFEST.SKIP, and Build.PL (adding
+           ACTION_authortest) in accordance with the above test
+           reorganization.
+
+0.1.2	Fri Sep 12 17:30:42 CEST 2008
+	Test::Trap::Builder::TempFile:
+	 - use *$globref, not $globref directly -- I have no idea why
+           this suddenly broke, but it did;
+	Tests:
+	 - make t/10-tester.t independent of the exact format of the
+           Test::More diagnostics -- just dependent on it staying the
+           same within one process;
+	    - thanks go to Andreas Koenig, cpantesters, and Michael
+              Schwern for providing early warning that this was going
+              to fail!
+	 - make t/03-files.pl use backticks (`) instead of null chars
+           (\0) as a warning record separator -- makeshift fix --
+           I should do better, but this must do for now;
+	Build:
+	 - up the perl dependency to 5.6.2 -- 5.6.0/5.6.1 may be
+           salvageable, but do not seem worth it.
+
+0.1.1	Tue Mar 11 20:08:31 CET 2008
+	Documentation:
+	 - document the indexing/slicing of ->return and ->warn;
+	 - smaller tweaks;
+	 - new methods *_isa_ok;
+	Test::Trap:
+	 - usage patterns clearly indicate we need *_isa_ok tests: a
+	   $trap->did_return w/BAIL_OUT followed by an
+	   isa_ok($trap->return(0)) w/BAIL_OUT must constitute the
+	   clearest test-trap anti-pattern since C<() = trap {...}>;
+	 - note: *_can_ok is still out, since it does not take any
+	   kind of name, and the TTB interface still expects a name;
+	Tests:
+	 - subclass Pod::Coverage so that it treats the functions
+	   "imported" from Test::Trap::Builder as though they were
+	   native, not imported, to the package we're testing;
+	 - update t/pod-coverage.t to ignore the latest methods and
+	   functions somehow documented: layer:*, *_isa_ok, Next,
+	   Prop, Run, etc;
+	 - prevent t/99-coverage.t exiting with code 8 on success, now
+	   that Test-Simple actually catches that stuff;
+	Build:
+	 - up the Test::Tester dependency to 0.107 -- I don't know
+	   what broke t/10-tester.t; I don't think it was anything of
+	   mine -- but upgrading Test::Tester fixed it.
+
+0.1.0	Mon Jan 14 18:31:09 CET 2008
+	Overall:
+	 - Continuing to fix small stuff, but also beginning to mess
+	   with the interfaces, adding new stuff and rewriting most of
+	   the builder.
+	 - Applied a patch from Michael Schilli (in response to a bug
+	   reported by Kimo Rosenbaum) adding UNLINK => 1 to the
+	   arguments for File::Temp::tempfile().  (Duh!)
+	Documentation:
+	 - revised section on TTB exports;
+	 - revised section on TTB methods;
+	 - document the new pseudo-layers;
+	Nomenclature:
+	 - s/trapper layer/trap layer/g;
+	 - s/trap (module|package)/trapper/g;	# (and similar)
+	 - s/result object/trap object/g;	# consistency
+	 - s/object/trap/g;			# argspec ~~ clarity
+	 - s/all/entirety/g;			# argspec ~~ s/adjective/noun/
+	 - s/indexed/element/g;			# argspec ~~ s/adjective/noun/
+	 - ... but keep backwards compatibility with the previous argspec,
+	       for now (just don't advertise it in the docs);
+	Test::Trap::Builder:
+	 - clean up the test method generation code;
+	 - clean up the accessor method generation code;
+	 - clean up the layer registration code;
+	 - pass the args string to the simple layers;
+	 - new export method: Prop, returning a hash for tag-on properies;
+	 - new export method: DESTROY, cleaning up tag-on properties;
+	 - new export method: TestFailure, running on_test_failure tag-on;
+	 - new export method: TestAccessor, returning test_accessor tag-on;
+	 - pull out members test and accessor, as these are conceptually
+	   (private) trapper class state, not builder instance members;
+	 - pull out member output_layer_backend, as this is
+	   conceptually (private) builder class state, not a builder
+	   instance member;
+	 - turn members _code, _layers, _teardown, _test_accessor, and
+	   _exception, (all without the leading underscore) into tag-on
+	   properties, rather than pollute the trap object;
+	 - get rid of more trap object pollution: __exception;
+	 - in test callback argspecs, refer to trap objects as "trap",
+	   not "object";
+	 - better handling of exceptions in layers and teardown.
+	Test::Trap:
+	 - run the test failure callback from the quiet() test;
+	 - new utility method: diag_all, basically {diag dump $self};
+	 - new utility method: diag_all_once, a "smarter" version.
+	 - new (non-default) pseudo-layers:
+	    :void      - user code is trapped in void context
+	    :scalar    - user code is trapped in scalar context
+	    :list      - user code is trapped in list context
+	    :on_fail() - method name for test failures callback
+	Tests:
+	 - full coverage for the new methods and exception handling;
+	 - t/00-load.t does BAIL_OUT if Test::Trap cannot be used;
+	 - t/07-subclass.t no longer needs to test the case of the empty 
+	   default_output_layer_backends(), since this has now been
+	   removed from the extension interface;
+	 - t/06-layers.t cleaned up and expanded to cover the new layers; except
+	 - t/10-tester.t covers the :on_fail() layer;
+	 - t/10-tester.t now tests a simple non-leaveby accessor too;
+	 - t/11-systemsafe-basic.pl now actually prints diagnostics when the
+	   system() call fails.  Duh!  (I still don't know why some Cygwin
+	   setups fails these tests, but I'd sure like to.)
+
+0.0.23	Mon Jun 25 22:47:50 CEST 2007
+	More blead stuff; otherwise just making a convenient small-stuff cut.
+	Test::Trap:
+	 - Don't use IO::Handle here.  (Only needed with File::Temp.)
+	Test::Trap::Builder::PerlIO:
+	 - Don't need ->autoflush, nor IO::Handle.
+	Test::Trap::Builder::TempFile:
+	 - Need IO::Handle, so use it.
+	Test::Trap::Builder::SystemSafe:
+	 - Need IO::Handle, so use it.
+	 - The strange buffering bug seems to have disappeared
+           (between revisions 99 and 100), though I have no idea how.
+	   This ought to mean I no longer need to maintain the clumsy
+	   work-around.  So, removed!
+	Tests:
+	 - As a concession to the CPANTS game, reinstated the pod tests.  :)
+	 - The regression test for the workaround for the pseudo-fork
+	   bug was broken.  Fixed by using the (implicit) :default
+	   layer in t/08-fork.pl.
+	 - t/02-reentrant.t caused a warning under bleed.  Fixed.
+	 - t/03-files.pl is now blead-ready (warning texts changed).
+	 - t/11-systemsafe-basic.pl now detects system() failure and
+	   fails the relevant tests as well (thank you cpan testsers).
+
+0.0.22	Sun May 20 23:21:36 CEST 2007
+	No big changes this time.
+	Cleanup:
+	 - remove unused Getopt::Long from tests;
+	 - rearrange some tests for better readability;
+	 - rewrite some systemsafe pod for better readability.
+	Tests:
+	 - delete $ENV{ENV} (tainted);
+	 - for coverage, first don't use Test::More in t/99-coverage.t;
+	 - for coverage, test the internals of exiting breaking badly;
+	 - simpler (and better covering) subclass tests.
+	Test::Trap:
+	 - don't AUTOLOAD on behalf of Test::More after all (unclean);
+	 - last TEST_TRAP_EXITING rather than goto EXITING (avoid collisions).
+	Test::Trap::Builder:
+	 - localize the builder's internals of the trap object, so
+	   that they are gone as soon as the trap has sprung, leaving
+	   pay data only;
+	 - last TEST_TRAP_BUILDER_INTERNAL_EXCEPTION rather than
+	   goto INTERNAL_EXCEPTION (avoid collision);
+	 - note (in the pod) a caveat for diamond inheritance wrt
+	   autogeneration of test methods.
+	Build:
+	 - don't include author's tests (pod*, kwalitee, etc) in the tarball;
+	 - note _all_ mandatory module dependencies (overkill?).
+
+0.0.21	Sun Oct 29 15:53:07 CET 2006
+	Test::Trap::Builder::SystemSafe:
+	 - Fix typo in the NAME section of the POD.
+	Test::Trap::Builder:
+	 - Export a method ->TestAccessor, giving the tested accessor's name.
+	 - Remove (ugly) register method ->test_method.
+	 - Add (cleaner) register method ->test.
+	Test::Trap:
+	 - Better diagnostics to failing *_ok/*_nok test.
+	 - AUTOLOAD Test::More when required.
+
+0.0.20	Sun Oct 22 09:21:55 CEST 2006
+	Test::Trap::Builder:
+	 - Backend implementations are now methods, almost layers, not functions.
+	    - Called with the (layer) name, the fileno, and the globref.
+	    - local(*$globref) is now left to the implementation.
+	 - Add method ->trap, implementing trap entry.
+	 - Add exportable methods Run, Next, Exception, Teardown:
+	    - Run runs the user's code;
+	    - Next continues to the next layer;
+	    - Exception raises an internal exception;
+	    - Teardown registers cleanup code.
+	Test::Trap::Builder::TempFile, Test::Trap::Builder::PerlIO:
+	 - Use ->Teardown instead of &DESTROY.
+	Add Test::Trap::Builder::SystemSafe.
+	 - Add three test scripts for this.
+	 - Work hard, and make those tests pass on 5.6.2!  :-)
+	t/03-files.pl: Simpler, less hacky, choice of backend.
+	t/07-subclass.t: Use the core alarm(), not the Time::HiRes one.
+	t/08-fork.t: Remember to wait() on all children.
+	t/99-coverage.t: What I cannot test without hacking.
+	t/*{-no-,-}taint.t:
+	 - Since Windows fork() does not work with taint mode.
+	t/*.t, t/*.pl:
+	 - Add comments and refactor into subroutines.
+	 - Replace pass()/fail() with simpler/clearer ok().
+
+0.0.19	Wed Sep 27 20:48:20 CEST 2006
+	No new functionality -- just bugfixes!
+	Address three portability issues:
+	 - added binmode to the second handle on the tempfile;
+	 - skip timout tests if Time::HiRes::ualarm cannot be imported;
+	 - todo & skip the fork test on windows;
+	 - thanks go to Alexandr Ciornii for reporting these failures!
+	Also:
+	 - document the fork() issue on Windows as a Test::Trap bug;
+	 - just skip the fork tests on platforms without fork;
+	 - drop the Time::HiRes dependency (we only need it for a test);
+	 - a little more POD and code (readability) cleanup.
+
+0.0.18	Mon Sep 25 23:49:48 CEST 2006
+	Basically just pushing to get a well-packaged version out.
+	Packaged with a newer MB to get a (hopefully) better META.yml.
+	Cleaned up the error messages somewhat.
+
+0.0.17	Sat Sep 23 00:47:13 CEST 2006
+	Overview:
+	 - Test::Temp gets new optional layers:
+		:stdout(perlio)
+		:stdout(tempfile)
+		:stderr(perlio)
+		:stderr(tempfile)
+	 - Test::Temp interface is otherwise unchanged.
+	 - Test::Trap::Builder interface is mostly unchanged, but now:
+	    - treats braces in layer names as syntactical;
+	    - has an interface for registering output layer backends;
+	    - also lets you register default backends;
+	    - has some more changes in non-interface (internal) functions.
+	 - Test::Trap::Builder::TempFile added.
+	 - Test::Trap::Builder::PerlIO added.
+	Added a File::Temp backend for output layers, and require it.
+	Made the PerlIO backend optional, and require no more than 5.6.0.
+	Moved each backend to its own file.
+	Update the tests to cover both backends.
+	Skip the PerlIO backend tests if PerlIO is not availible.
+	For whatever reason, make noisy ugly META.yml after upgrades.
+	Let the user specify implementation, f ex: ":stdout(perlio)".
+	Test this new interface.
+	Update the POD.
+
+0.0.16	Tue Sep 19 21:52:03 CEST 2006
+	Note dependency on perl 5.8.0 and Time::HiRes.
+	Pod updates to Builder.pm.
+	Added tests for layer permutation :raw:warn:stderr:stdout:exit:die.
+	Added tester tests for TODO and SKIP.
+
+0.0.15	Mon Sep 18 23:53:05 CEST 2006
+	Move the extension interface into its own Test::Trap::Builder.
+	Change the extension interface somewhat:
+	  - methods on the builder object, not the calling package;
+	  - simpler methods for making accessors;
+	  - methods also for registering test method prototypes;
+	  - generate test methods from accessor + test pairs;
+	  - ... even if the test or accessor is inherited;
+	  - &layer_implementation needs both $module and $Builder now;
+	  - update the tests accordingly.
+	Also, added some new tests for the builder.
+
+0.0.14	Tue Sep  5 16:40:13 CEST 2006
+	Rewrite the "layer:$name" methods:
+	  - return the layer implementation rather than be it, and
+	  - can handle multi_layer definitions as well,
+	  - changing &layer, &layer_implementation, and &multi_layer.
+	Update the POD accordingly.
+	Add an example using the extension interface.
+	Polish the POD, and add some more vertical spacing.
+
+0.0.13	Tue Aug 29 06:54:05 CEST 2006
+	Add the standard test methods.
+	Document them -- overall, not one by one.
+	Test them -- using Test::Tester.
+	Add a dependency on Test::Tester.
+	Add a trustme for the pod coverage check.
+	Add a dependency on Data::Dump (for quoting, more or less).
+	Add factories for accessors and test methods.
+	Let array accessors produce elements and slices as well.
+	Add extra test methods: did_die, did_exit, did_return, quiet.
+	Document these.
+	Test them -- using Test::Tester.
+
+0.0.12	Sun Aug 27 03:05:45 CEST 2006
+	Don't trap exits in children!  Revert to outer exit-handler instead.
+	Test undefined *CORE::GLOBAL::exit.
+	Test forked exits.
+	Document the fork/exit caveat.
+	Rename some layers: :return:raw are now :raw:flow.
+	Base non-empty layer specifications too on :default.
+	Tests updated accordingly.
+
+0.0.11	Sun Aug 27 01:51:30 CEST 2006
+	Test a bad class definition.
+	Clean up the code.
+
+0.0.10	Sun Aug 27 01:18:09 CEST 2006
+	Add tests for subclassing.
+	Implement subclassing.
+
+0.0.9	Sat Aug 26 23:51:26 CEST 2006
+	Implement layers as methods, anonymous or with mangled names.
+	Update the special layers test accordingly.
+	Move POD to beyond __END__.
+
+0.0.8	Sat Aug 26 22:19:53 CEST 2006
+	s/mode/leaveby/g;
+
+0.0.7   Thu Aug 24 04:35:04 CEST 2006
+	Implement user-defined trapper layers!  Wrappers are now layers!
+	Test trapper layers!
+
+0.0.6   Thu Aug 24 02:28:08 CEST 2006
+	Protect the method calls of the local $trap test.
+	Pull the wrapper list out of the exported sub and into its factory.
+	Add a &write_trapper factory to replace &_trap_std{err,out}.
+	Trap warnings as well.
+	Add tests for trapping warnings.
+
+0.0.5	Wed Aug 23 18:32:28 CEST 2006
+	Back to exporting just a scalar instead of the glob.
+	Export an anonymous closure combo instead of our $trap / &trap.
+	Eliminate our $trap / &trap.  (Use a factory instead.)
+	Update the tests accordingly.
+
+0.0.4   Wed Aug 23 15:44:00 CEST 2006
+	New test: Apply local() to the scalar.
+	Implementation: Export a glob instead of just the scalar.
+
+0.0.3   Wed Aug 23 03:39:03 CEST 2006
+	Decompose the different wrappers.  Eliminate the %trap hash.
+	Update tests to account for:
+	 - missing 'die' was '', is now undef;
+	 - void 'return' was [undef], is now [];
+	 - missing 'return' was context dependent, is now undef.
+
+0.0.2   Wed Aug 23 00:01:14 CEST 2006
+	Export a global scalar, by default $trap, instead of &trapped.
+	Make &trap merely the default name of the function.
+	Update tests accordingly.
+	Test for ->import failing in various ways.
+	Query exists &CORE::GLOBAL::exit instead of defined *...{CODE}.
+	Add pod.
+
+0.0.1   Sun Aug  6 15:26:47 CEST 2006
+        Began extracting useful stuff from messy old code.
+

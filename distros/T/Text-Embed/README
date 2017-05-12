@@ -1,0 +1,44 @@
+Text-Embed version 0.02
+=======================
+
+Text-Embed is a simple module that solves a simple problem - keeping 
+unwieldy chunks of text seperate from source code. 
+
+If you need to keep large constant strings (or the likes) with your code, 
+eg SQL/HTML/Source-Code Templates, then Text-Embed could be for you.
+
+See the POD for the full abstract. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On windows the above may not work. Text-Embed is a pure perl 
+module, so you can simply copy Embed.pm to 
+
+    C:\<YOUR_PERL_SITE_LIB>\Text\Embed.pm
+
+Before you do, you may want to run:
+
+    perl -Ilib t\Text-Embed.t
+
+from the Text-Embed directory, to make sure all tests pass.
+
+DEPENDENCIES
+
+none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Chris McEwan <mcewan@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

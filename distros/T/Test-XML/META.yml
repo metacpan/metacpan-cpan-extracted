@@ -1,0 +1,39 @@
+---
+name: Test-XML
+version: 0.08
+author: []
+abstract: Compare XML in perl tests
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::More: 0
+  XML::Parser: 2.34
+  XML::SemanticDiff: 0.95
+  perl: 5.6.0
+recommends:
+  XML::SAX: 0
+  XML::SAX::Writer: 0
+  XML::Twig: 0
+  XML::XPath: 0
+provides:
+  Test::XML:
+    file: lib/Test/XML.pm
+    version: 0.08
+  Test::XML::SAX:
+    file: lib/Test/XML/SAX.pm
+    version: 0.01
+  Test::XML::Twig:
+    file: lib/Test/XML/Twig.pm
+    version: 0.01
+  Test::XML::XPath:
+    file: lib/Test/XML/XPath.pm
+    version: 0.03
+  Test::XML::XPath::XML::LibXML:
+    file: lib/Test/XML/XPath.pm
+  Test::XML::XPath::XML::XPath:
+    file: lib/Test/XML/XPath.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

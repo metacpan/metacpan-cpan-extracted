@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+use lib "./lib";
+use Text::Refer;
+use Benchmark;
+
+my $parser = new Text::Refer::Parser;
+while ($ref = $parser->input(\*STDIN)) {
+    print "Title: ", $ref->title, "\n";
+    print "Title: ", $ref->get('T'), "\n";
+    print "Authors: ", join('; ', $ref->author), "\n";
+    print "Authors: ", join('; ', $ref->get('A')), "\n";
+    print "\n";
+    print $ref->as_string(Quick=>1), "\n";
+}
+defined($ref) or die "error!";
+

@@ -1,0 +1,42 @@
+---
+abstract: "Provides an interface to TestLink's XMLRPC api via HTTP"
+author:
+  - 'George S. Baugh <teodesian@cpan.org>'
+build_requires:
+  Class::Inspector: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  MIME::Base64: '0'
+  Prompt::Timeout: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TestLink-API
+provides:
+  TestLink::API:
+    file: lib/TestLink/API.pm
+    version: '0.011'
+requires:
+  Carp: '0'
+  Clone: '0'
+  Data::Validate::URI: '0'
+  Scalar::Util: '0'
+  XMLRPC::Lite: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TestLink-API
+  homepage: https://github.com/teodesian/TestLink-Perl
+  repository: git://github.com/teodesian/TestLink-Perl.git
+version: '0.011'
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'

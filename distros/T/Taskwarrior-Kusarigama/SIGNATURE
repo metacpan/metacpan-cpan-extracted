@@ -1,0 +1,68 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 73eb912df1015125f3dab924fe1a08dac9c19b42 AUTHOR_PLEDGE
+SHA1 838bd7e3fd5e3090a692d40756cd45bca03026f1 CONTRIBUTORS
+SHA1 5b44afbb2776a52dd4a7e0052f65b2589554298d Changes
+SHA1 0bfe79bd93599e55e7f8376f63d1def302273e68 INSTALL
+SHA1 16b1a3b5ba1139b3687701cf5b53ac6bbe73e005 LICENSE
+SHA1 582ae46474782631c59e18f6579a7e9d44472df9 MANIFEST
+SHA1 68e88611b57a4202d1c2beef05053728933b492c META.json
+SHA1 c03d3e920c262bc58133f357f14527068be302f3 META.yml
+SHA1 898b3948b550efaee5f295d5e8323221aaa25dd4 Makefile.PL
+SHA1 c79667ef6ea138610600518baa9be92f87b9de81 README.mkdn
+SHA1 01860079805cfc5b3ae577543c9ad90e7f7a542a TODO
+SHA1 df6bff046d6b872e407772f57d80f78a4c79b02d bin/task-kusarigama
+SHA1 b52407838a8cd07768d0030539ab862950108a62 cpanfile
+SHA1 825e352ba8fc7d92e52ea0a98b0a4a4d5edab811 doap.xml
+SHA1 365c13654ea21cdfee5549c3e1c0352dc0fdde87 lib/Taskwarrior/Kusarigama.pm
+SHA1 2be452d9aded61abd8f64872b46207c33a30a9de lib/Taskwarrior/Kusarigama/App.pm
+SHA1 aa656497a5e2dc6edabb0ecb38916ddef4341118 lib/Taskwarrior/Kusarigama/App/Add.pm
+SHA1 9489151c3c06fad93641f3c08bcfa9e58a36cc04 lib/Taskwarrior/Kusarigama/App/Install.pm
+SHA1 8bc462d8562db6d4fa52f9f16fdb95e594f7a0a5 lib/Taskwarrior/Kusarigama/Core.pm
+SHA1 bccf61c939ea7385611013f859f867dc440e4ebd lib/Taskwarrior/Kusarigama/Hook.pm
+SHA1 3b1d197a0957f1ea407f2a3ac3ce14bda6cfcd16 lib/Taskwarrior/Kusarigama/Hook/OnAdd.pm
+SHA1 3c2b8b9b1add6ffe12b4fe4cc1b0e87004af4513 lib/Taskwarrior/Kusarigama/Hook/OnCommand.pm
+SHA1 8eb52989d7d6c0934bf38ed250461e8d850086bc lib/Taskwarrior/Kusarigama/Hook/OnExit.pm
+SHA1 7062683a23e9992eb07b7f55ce708138a2edbb82 lib/Taskwarrior/Kusarigama/Hook/OnLaunch.pm
+SHA1 efaf90e75d27b1cf9a8b4ee1d04bf03f44463123 lib/Taskwarrior/Kusarigama/Hook/OnModify.pm
+SHA1 ba216fd268a85f67e7855b65978e87845abd8088 lib/Taskwarrior/Kusarigama/Plugin.pm
+SHA1 68ed3715f0018a9c8ff61ee222a6788c4aad00a3 lib/Taskwarrior/Kusarigama/Plugin/Command/AndAfter.pm
+SHA1 eb07f2d6c11763d52648ce147b72f0a3dbed377e lib/Taskwarrior/Kusarigama/Plugin/Command/ButBefore.pm
+SHA1 209adf3530ed129922176b6d6465ee904f6b4345 lib/Taskwarrior/Kusarigama/Plugin/Command/Morning.pm
+SHA1 4ab8c80099f82831bb8c686f6b94ea42ed9f2a6c lib/Taskwarrior/Kusarigama/Plugin/Command/Progress.pm
+SHA1 074f879841ba92fc32306f7a8b0dc7684a2acdf1 lib/Taskwarrior/Kusarigama/Plugin/Command/Wait.pm
+SHA1 f51a7fb24dbbe37353cb9b220160db3a9d94dcd6 lib/Taskwarrior/Kusarigama/Plugin/GitCommit.pm
+SHA1 8427948947553bc64d42d95129e46f5cb1b45eef lib/Taskwarrior/Kusarigama/Plugin/ProjectAlias.pm
+SHA1 1dda0bd17bca402ac0f0106188a6c01ca70229e8 lib/Taskwarrior/Kusarigama/Plugin/Renew.pm
+SHA1 79bc1efe2b9d351d291cdcb5f50d0826f2dceae8 lib/Taskwarrior/Kusarigama/Plugin/SingleActive.pm
+SHA1 1853927ab685826cf009999cbea06948f08af90a lib/Taskwarrior/Kusarigama/Task.pm
+SHA1 2275d317ceac9ec0dd156add196e73d330ae47eb lib/Taskwarrior/Kusarigama/Wrapper.pm
+SHA1 b506ae83a2e56c912ddc7c3d101ca006440d1ff3 lib/Taskwarrior/Kusarigama/Wrapper/Exception.pm
+SHA1 8508688b8192c9cbacc13db661e256b213e378fe misc/autocomplete.fish
+SHA1 f87d5211e96f2c14b913ba75c3806c469a01a4a1 misc/graph.pl
+SHA1 7fddd3c3f029eac23cdc9d5ae14497f1a607f2bd t/00-compile.t
+SHA1 4f0a6be2528bba052ff3cea7c70c30b9861a79fe t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 4789b949a43248a363532c46845092d5bdf38f28 t/task.t
+SHA1 11b1e92a440fefac70a6d5922e74dd762a81f2e1 t/wrapper.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAljVlAQACgkQ34Hwf+GwC4wluACg+xMPUtjszCLENKbJUXMAkd4d
+9DcAn2/Fxe8mf9ruWRJcnfMUgcBVWm+b
+=HPEv
+-----END PGP SIGNATURE-----

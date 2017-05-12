@@ -1,0 +1,9 @@
+<%args>
+$testrun
+</%args>
+
+<h2>UNSCHEDULED testrun <a href="/tapper/testruns/id/<% $testrun %>/"><% $testrun %></a></h2>
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+

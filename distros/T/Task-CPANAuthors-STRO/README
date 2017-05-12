@@ -1,0 +1,41 @@
+NAME
+    Task::CPANAuthors::STRO
+
+SYNOPSIS
+     perl -MCPAN -e 'install Task::CPANAuthors::STRO'
+
+CONTENTS
+    CGI-Application-Plugin-DevPopup-Params
+
+    CGI-Application-Plugin-DevPopup-Query
+
+    Data::Define
+
+    FindBin::Real
+
+    FTN::Address
+
+    FTN::Nodelist
+
+    Lingua::Cyrillic::Translit::ICAO
+
+    Lingua::Multinational::Translit::ICAO
+
+    Lingua::RU::Jcuken
+
+    Lingua::EN::Jcuken
+
+    Prompt::Timeout
+
+    Text::Compare
+
+    Win32::Uptime
+
+    WWW::DreamHost::API
+
+DESCRIPTION
+    Task:: of modules I maintain.
+
+AUTHOR
+    Serguei Trouchelle <stro@cpan.org>
+

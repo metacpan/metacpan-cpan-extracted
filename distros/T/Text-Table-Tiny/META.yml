@@ -1,0 +1,27 @@
+---
+abstract: 'makes simple tables from two-dimensional arrays, with limited templating options'
+author:
+  - 'Creighton Higgins <chiggins@chiggins.com>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Table-Tiny
+requires:
+  Exporter: '0'
+  List::Util: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/Text-Table-Tiny
+  repository: https://github.com/neilbowers/Text-Table-Tiny.git
+version: '0.04'

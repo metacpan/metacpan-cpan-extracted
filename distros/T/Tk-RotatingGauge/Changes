@@ -1,0 +1,51 @@
+Revision history for Tk-RotatingGauge
+
+1.100140  2010-01-14 11:27:51 Europe/Paris
+ - requiring perl 5.8.x
+ - forgot some hidden prereqs
+
+1.100120  2010-01-12 19:36:08 Europe/Paris
+ - no more makefile.pl, using module::build exclusively
+ - migration to dist-zilla (transparent for end-user)
+
+**
+
+0.25 Mon Nov 26 12:40:10 CET 2007
+ - kwalitee/cpants release
+
+0.24 Thu Oct 11 09:41:45 CEST 2007
+ - fixed way of requiring 5.008
+
+0.23 Tue Oct  9 17:53:26 CEST 2007
+ - requiring perl 5.8.0
+
+0.22 Sun Sep  9 14:56:43 CEST 2007
+ - new option -orient (gauge orientation)
+
+0.21 Sun Sep  9 11:01:26 CEST 2007
+ - new option -box (color of rounding box)
+ - new option -indicator (color of central indicator)
+
+0.20 Sat Sep  8 10:46:05 CEST 2007
+ - new option -labels (optional labels)
+ - fixed bug for non-zero minimum
+
+**
+
+0.11 Fri Sep  7 12:32:51 CEST 2007
+ - new -policy flag to control out-of-bound values
+ - new example: clock based on Tk::RotatingGauge
+ - fix $step computation
+
+0.10 Fri Sep  7 11:08:25 CEST 2007
+ - don't recreate items every time value changes: just move items
+
+**
+
+0.02 Thu Sep  6 15:54:06 CEST 2007
+ - better pod
+ - provided an example
+
+0.01 Thu Sep  6 12:40:19 CEST 2007
+ - initial release
+

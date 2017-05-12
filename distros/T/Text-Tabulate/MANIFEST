@@ -1,0 +1,15 @@
+bin/tabulate
+Changes
+INSTALL
+lib/Text/Tabulate.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/class.t
+t/common.t
+t/format.t
+t/script.data
+t/script.out
+t/script.t
+t/tabulate.t
+META.yml                                 Module meta-data (added by MakeMaker)

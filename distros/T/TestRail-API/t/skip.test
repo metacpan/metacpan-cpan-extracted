@@ -1,0 +1,17 @@
+use strict;
+use warnings;
+
+use Test::More 'tests' => 3;
+
+SKIP: {
+    skip 'STORAGE TANKS SEARED', 1;
+    fail('STROGGIFY POPULATION CENTERS');
+};
+TODO: {
+    todo_skip 'NOT SO SEARED AFTER ARR', 1;
+    fail('STROGGIFY POPULATION CENTERS');
+};
+TODO: {
+    local $TODO =  'skippity doo dah';
+    pass('STORAGE TANKS SEARED');
+};

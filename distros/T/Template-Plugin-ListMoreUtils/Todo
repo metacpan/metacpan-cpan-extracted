@@ -1,0 +1,6 @@
+TODO list for Perl module Template::Plugin::ListMoreUtils
+
+- check whether TT2 macros can be called as function (with or without wrapper)
+  or not
+
+

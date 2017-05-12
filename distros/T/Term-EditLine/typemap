@@ -1,0 +1,21 @@
+HistEvent *					T_PTROBJ
+History *					T_PTROBJ
+const LineInfo *				T_PTROBJ
+const char *					T_PTROBJ
+int *						T_PTROBJ
+
+TYPEMAP
+HistEdit *                                   T_PTROBJ_SPECIAL
+
+INPUT
+T_PTROBJ_SPECIAL
+  if (sv_derived_from($arg, \"Term::EditLine\")) {
+    IV tmp = SvIV((SV*)SvRV($arg));
+    $var = ($type) tmp;
+  }
+else
+  croak(\"$var is not of type Term::EditLine\");
+
+OUTPUT
+T_PTROBJ_SPECIAL
+  sv_setref_pv($arg, \"Term::EditLine\",(void*)$var);

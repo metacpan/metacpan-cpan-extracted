@@ -1,0 +1,130 @@
+---
+dns-resolution:
+    domains:
+        bratislava.pm.org:
+        camel.cle.sk:
+            A: 81.89.49.242
+        bratislava.pm.org:
+            A: 81.89.49.242
+            CNAME: camel.cle.sk
+        en.wikipedia.org:
+            count: 5
+            max-time: 300
+            time-failed: 1
+
+running-processes:
+    should-run:
+        - dhclient3
+        - /usr/sbin/sshd
+        - /usr/sbin/cron
+
+sites-ok:
+    sites:
+        http://bratislava.pm.org:
+            content: Kontakt
+        http://www.pm.org/groups/121.html:
+            title  : Perl .+
+            content: Bratislava
+
+open-ports:
+    connect:
+        localhost:
+            22: ssh
+        bratislava.pm.org:
+            80: http
+        camel.cle.sk:
+            443: https
+        koala.cle.sk:
+            138: closed
+            445: closed
+
+resolv.conf:
+    dns_retry  : 3
+    dns_timeout: 5
+
+time-sync:
+    tolerance: 5
+    ntp-servers:
+        - pool.ntp.org
+
+cmd-output:
+    -
+        cmd   : echo hell world!
+        desc  : hello printing
+        output: hello? world
+    -
+        cmd   : date
+        desc  : if date command is there
+        output: '[0-9]{2}:[0-9]{2}:[0-9]{2}'
+    -
+        cmd   : perl -e 'print "hi"; exit 1'
+        desc  : check perl exit 1 return value and hi
+        output: hi
+        exit  : 1
+    -
+        cmd   : perl -e 'exit 1'
+        desc  : check perl exit != 0
+        exit  : '!= 0'
+
+find-huge-files:
+    file-size-limit: 100M
+    files-count-limit: 1000 
+    search-folders:
+        - /var/log
+        - /var/cache
+        - /tmp
+    ignore:
+        - /tmp/huge
+
+folder-file:
+    /var/log:
+        user: root
+        group: root
+        max-size: 500M
+        perm: 755
+    /tmp/zero:
+        max-size: 2M
+    /etc:
+    /tmp/test:
+        perm: 2775
+        recurse: 1
+
+disk-free:
+    /:
+        max-used  : 90%
+        max-inodes: 80%
+    /var:
+        max-used  : 100G
+        max-inodes: 200K
+    /home:
+    /usr:        
+
+message:
+    - messages.log
+    - messages2.log
+
+interfaces-ptr:
+    ignore:
+        - tap0
+        - br0
+        - "br1:"
+
+wakeup:
+    period  : 30d
+    filename: /var/tmp/wakeup-state
+
+net-hops:
+    -
+        hostname: ba.pm.org
+        hops:
+            - 10.0.0.138
+            - 62.47.95.239
+            - 172.19.63.41
+    -
+        hostname: ba.pm.org
+        ttl: 50
+        skip: 4
+        last-hops:
+            - 217.119.114.30
+            - 81.89.48.168
+            - 81.89.49.242

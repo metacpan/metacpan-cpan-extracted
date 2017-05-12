@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/Template/Plugin/WikiCreole.pm
+t/001_filter.t
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

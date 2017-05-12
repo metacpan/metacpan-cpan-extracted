@@ -1,0 +1,23 @@
+Revision history for Perl extension Text::Embed.
+
+0.03  Thu Jun 16 12:19:00 2005
+
+    - improved POD
+    - tidied source
+    - modified #define syntax to accomodate single-line constants
+
+0.02  Thu Mar 31 16:53:11 2005
+
+    - made POD clearer
+    - improved regular expressions in utility functions
+    - added block-noindent/block-indent options
+
+0.01  Mon Mar 28 13:27:45 2005
+	- original version; created by h2xs 1.23 with options
+		-AXO -b 5.6.0 -n Text::Embed
+
+    - added comment stripping
+    - added utility functions
+    - added arbitrary callbacks
+    - added call by reference semantics to callbacks
+

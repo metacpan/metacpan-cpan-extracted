@@ -1,0 +1,99 @@
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+
+- schema: Queue
+  name: KVM Queue
+  data:
+    id: 2
+    name: KVM
+    priority: 200
+
+- schema: Queue
+  name: Kernel Queue
+  data:
+    id: 3
+    name: Kernel
+    priority: 10
+
+- schema: Queue
+  name: queue_with_deny
+  data:
+    id: 4
+    name: queue_with_deny
+    priority: 10
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 5
+    name: iring
+    free: 1
+
+- schema: Host
+  name: bullock
+  data:
+    id: 6
+    name: bullock
+    free: 1
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 7
+    name: dickstone
+    free: 1
+
+- schema: Host
+  name: athene
+  data:
+    id: 8
+    name: athene
+    free: 1
+
+- schema: Host
+  name: bascha
+  data:
+    id: 9
+    name: bascha
+    free: 1
+
+
+# ----------------- queues and hosts ---------------
+
+- schema: QueueHost
+  name: iring_on_queue_with_deny
+  data: 
+    id: 1
+    queue_id: 4
+    host_id: 5
+
+- schema: QueueHost
+  name: bullock_on_queue_with_deny
+  data: 
+    id: 2
+    queue_id: 4
+    host_id: 6
+
+- schema: DeniedHost
+  name: dickstone_denied_from_queue_with_deny
+  data: 
+    id: 1
+    queue_id: 4
+    host_id: 7
+
+- schema: DeniedHost
+  name: athene_denied_from_queue_with_deny
+  data: 
+    id: 2
+    queue_id: 4
+    host_id: 8
+

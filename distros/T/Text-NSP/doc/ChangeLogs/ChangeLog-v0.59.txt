@@ -1,0 +1,32 @@
+
+Changes from NSP version 0.57 to 0.59
+-------------------------------------
+
+Ted Pedersen, tpederse@umn.edu
+University of Minnesota, Duluth
+July 25, 2003
+
+Measures
+--------
+
+(1)    	repaired the measures phi.pm, tscore.pm, odds.pm, and 
+	rightFisher.pm. None of them were set up as proper statistics
+	modules and did not work. They did not have initializeStatistic
+	functions, nor did they have other necessary components. These
+	were user submitted functions, and should have been tested before
+	inclusion in NSP. In future all such submissions will be tested
+	before inclusion. 
+	
+Testing
+-------	
+
+(1)     Added test scripts for phi.pm, tscore.pm, odds.pm, and 
+	rightFisher.pm.
+
+(2)     Added test scripts for tmi3.pm, which was also a user submitted
+	module which functioned ok but had minimal test scripts associated
+	with it. 
+
+[Ted - 07/25/2003]
+
+

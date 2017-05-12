@@ -1,0 +1,73 @@
+# This is the spec file for building EtText RPM's.  Note that if you are
+# reading this as "specfile.raw", it is processed by 'build/mkrpm', which
+# substitutes in the correct version number instead of the __ VERSION __ token
+# below.
+
+%define ver      __VERSION__
+%define rel      1
+%define prefix   /usr
+%define siteperldir %{prefix}/lib/perl5/site_perl/5.6.0
+
+Name: EtText
+Summary: A plain-text markup format for HTML
+Version: %ver
+Release: %rel
+Copyright: Artistic
+
+Group: Applications/Text
+URL: http://ettext.taint.org/
+
+Source: http://ettext.taint.org/released/Text-EtText-%{ver}.tar.gz
+BuildRoot: /tmp/ettext-%{ver}-root
+Packager: Justin Mason <jm@jmason.org>
+BuildArchitectures: noarch
+
+Requires: perl >= 5.6
+Prefix: /usr
+
+%description
+
+EtText is a simple plain-text format which allows conversion to and from HTML.
+
+Like most simple text markup formats (POD, setext, etc.), EtText markup handles
+the usual things: insertion of P tags, header recognition and markup. However
+it also adds a powerful link markup system.
+
+EtText markup is simple and effective; it's very similar to WikiWikiWeb
+TextFormattingRules or Zope's StructuredText.
+
+EtText requires Perl 5.  This RPM assumes you are using Perl 5.6.0.
+
+%prep
+%setup -n Text-EtText-%{ver}
+
+%build
+perl Makefile.PL
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir $RPM_BUILD_ROOT
+make PREFIX=$RPM_BUILD_ROOT/usr install
+
+%clean
+[ "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+%post
+
+%postun
+
+%files
+%defattr(-,root,root)
+
+%{prefix}/bin/ethtml2text
+%{prefix}/bin/ettext2html
+%{prefix}/share/man/man1/ettext2html.1.gz
+%{prefix}/share/man/man1/ethtml2text.1.gz
+%{prefix}/share/man/man3/Text::EtText::*.3pm.gz
+
+%{siteperldir}/Text/EtText/*.pm
+
+%doc	README Changes TODO MANIFEST MANIFEST.SKIP
+%doc	doc/*
+

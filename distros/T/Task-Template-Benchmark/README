@@ -1,0 +1,59 @@
+Task-Template-Benchmark
+
+This distribution contains no actual code, it simply exists to provide
+a list of dependencies to assist in quickly installing all template engines
+and optional dependencies used by Template::Benchmark.
+
+Be warned, between them, the 34 modules installed by this task have a
+huge number of dependencies and prerequisites, on a fresh build of Perl
+with only Bundle::CPAN installed this will run for over 20 minutes.
+
+The current release of Task::Template::Benchmark aims to always track
+the dependencies required by the current release of Template::Benchmark.
+
+However, it should also be perfectly safe to use the current
+Task::Template::Benchmark with an older install of Template::Benchmark
+- you'll most likely only end up installing some extra modules that won't
+be used by that older version.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Build.PL
+  ./Build installdeps
+  ./Build test
+  ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Task::Template::Benchmark
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Template-Benchmark
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Task-Template-Benchmark
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Task-Template-Benchmark
+
+    Search CPAN
+        http://search.cpan.org/dist/Task-Template-Benchmark/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Sam Graham
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

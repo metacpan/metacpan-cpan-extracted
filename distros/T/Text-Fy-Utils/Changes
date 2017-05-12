@@ -1,0 +1,63 @@
+Revision history for Text-Fy-Utils
+
+0.10 - 2015-02-11T20:29:54+01:00
+
+  [ENHANCEMENTS]
+
+  - Additional iso-characters have been mapped into Ascii-space...
+
+0.09 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+0.08 - 2014-11-08T19:44:04+01:00
+
+  [DOCUMENTATION]
+
+  - Fix version numbers in this very document...
+
+0.07 - 2014-11-08T19:36:21+01:00
+
+  [REFACTORING]
+
+  - Refactor, create new sub simplify()
+
+0.06 - 2014-11-08T18:16:32+01:00
+
+  [REFACTORING]
+
+  - Refactor out asciify(), create new sub isoify()
+
+0.05 - 2014-09-06T14:54:37+01:00
+
+  [DOCUMENTATION]
+
+  - In Makefile.PL ==> meta files link to Github repository
+
+  - Add tests
+
+0.04 - 2014-09-05T21:13:40+01:00
+
+  [ENHANCEMENTS]
+
+  - added subroutines cv_from_win(), cv_to_win().
+
+0.03 - 2014-09-03T22:50:11+01:00
+
+  [ENHANCEMENTS]
+
+  - added conversion of unicode characters ",',-,...
+
+0.02 - 2014-08-31T19:04:50+01:00
+
+  [ENHANCEMENTS]
+
+  - added subroutines _make_tr(), set_amode(), asciify(), commify(), _make_amode().
+
+0.01 - 2014-08-31T13:24:33+01:00
+
+  [ENHANCEMENTS]
+
+  - first version released on an unsupecting population

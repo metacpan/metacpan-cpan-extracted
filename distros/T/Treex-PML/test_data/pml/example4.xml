@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<graph xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head><schema href="example4_schema.xml"/></head>
+  <verteces>
+    <LM id="v1"><label>A</label></LM>
+    <LM id="v2"><label>B</label></LM>
+    <LM id="v3"><label>A</label></LM>
+    <LM id="v4"><label>C</label></LM>
+    <LM id="v5"><label>D</label></LM>
+  </verteces>
+  <edges>
+    <LM from.rf="v1" to.rf="v2"/>
+    <LM from.rf="v1" to.rf="v3"/>
+    <LM from.rf="v2" to.rf="v4"/>
+    <LM from.rf="v3" to.rf="v4"/>
+    <LM from.rf="v4" to.rf="v1"/>
+  </edges>
+</graph>

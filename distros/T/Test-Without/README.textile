@@ -1,0 +1,46 @@
+h1. Test::Without - Run tests while hiding directories or modules
+
+Version: 0.100 (See CHANGES below)
+
+h2. WHAT IS IT
+
+This distribution provides a testing module that simplifies the process of
+hiding directories and/or modules from access by the block of code being
+tested.
+
+h2. BUILDING/INSTALLING
+
+This package uses Makefile.PL:
+
+<pre>
+<code>
+        perl Makefile.PL
+        make && make test
+        make install
+</code>
+</pre>
+
+You may need super-user access to install.
+
+h2. PROBLEMS/BUG REPORTS
+
+Please send any reports of problems or bugs to rjray@blackperl.com.
+
+h2. CHANGES
+
+* lib/Test/Without.pm (added)
+* t/01_pod.t (added)
+* t/02_pod_coverage.t (added)
+* t/03_meta.t (added)
+* t/04_minimumversion.t (added)
+* t/05_critic.t (added)
+
+p{margin-bottom:2em}. Initial commit.
+
+* t/01_pod.t
+* t/02_pod_coverage.t
+* t/03_meta.t
+* t/04_minimumversion.t
+* t/05_critic.t
+
+p{margin-bottom:2em}. Changed the checked-for environment var for author tests.

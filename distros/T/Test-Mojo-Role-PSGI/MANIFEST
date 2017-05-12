@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+cpanfile
+lib/Test/Mojo/Role/PSGI.pm
+t/basic.t
+t/catalyst/MyApp/lib/MyApp.pm
+t/catalyst/MyApp/lib/MyApp/Controller/Root.pm
+t/catalyst/MyApp/myapp.conf
+t/catalyst/MyApp/myapp.psgi
+t/catalyst/catalyst.t
+t/script/app.psgi

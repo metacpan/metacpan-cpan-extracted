@@ -1,0 +1,91 @@
+Revision history for Test-Continuous
+
+0.76:
+- Fix the crash when running under a non-git dir. (Joel Maslak)++
+- Add "--autoprove-skip-initial" CLI arg to skip the initial test (Joel Maslak)++
+- Fix: `autoprove <dir>` now works as it is supposed to be. (Sean Zellmer)++
+
+0.75:
+- Use .gitignore to build exclude list if it exists. (Sean Zellmer)++
+- better suppport for Test::Class-based tests. (Nelo Onyiah)++
+
+0.74:
+- Fix it for perl 5.18.
+
+0.73:
+- Ignore a lot more known boring files. Specifically Komodo project files. See RT #74670.
+
+0.72:
+- Now need 'autoprove -b' to build. In many cases, '-l' is sufficient.
+- '-b' and '-l' args are also populated to the underlying invocation to "prove".
+- Use system() instead to help preventing stucking in the middle of tests
+
+0.71:
+- let "autoprove <prove args>" run all tests instead of no tests at all.
+- fix typos
+
+0.70:
+- remove the use of Exporter::Lite in favor of using 'autoprove' command.
+- Fix RT 66822: exclude vim swap files.
+
+0.69:
+- If the current dir can be built with 'make' or "Build.PL", it'll be built before running tests. Closes RT #52159 and RT #52160. Thanks to Michael G Schwern for providing the suggestions and patches.
+
+0.68:
+- Closes RT: 52158. Monitor virtually all files.
+  .git and .svn directories are ignored, as long as vim and emacs temp files.
+- Closes RT: 50286. Thanks Yusuke Watase for providing the patch.
+
+0.67:
+- use File::ChangeNotify to watch changed files because it is much faster than
+  linux. Thanks to dann++
+
+0.66:
+- fix the massive warning coming from File::Modified.
+
+0.65:
+- Support TAP::Harness::Remote
+
+0.64:
+- now ship with an "autoprove" program as the runner.
+- documentation updates
+
+0.63:
+- refactor of previous release such that it does not
+  require an TAP Archive class to work.
+  This is better in general since some harness classes
+  do not work with archive easily.
+- therefore, remove a few modules from the dependency list
+
+0.62:
+- Fix dependencies
+
+0.61:
+- Make runtests function delegate unused @ARGV to App::Prove
+
+0.60:
+- Report comments in TAP output. So diag or dubious test file can be seen.
+- code refactoring.
+- Finally some meaningful tests for Test-Continuous!
+
+0.0.5:
+- Fix the case that it runs the whole t/ directory if there's
+  no subset of tests to run from dependency list. It should only
+  run those tests given in the command line.
+
+0.0.4:
+- Fix dependency list again. (Grr)
+
+0.0.3:
+- [Fix] The growl icon is only working for the first time.
+- Accept test files as arguments
+- Auto detect the subset of tests to run.
+
+0.0.2:
+- Sun Feb 17 00:55:03 CST 2008
+- [Growl] Use different icon for reporting FAIL.
+- Fix dependency. :(
+
+0.0.1  Sat Feb 16 14:09:02 2008
+       Initial release.
+

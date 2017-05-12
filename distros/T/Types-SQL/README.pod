@@ -1,0 +1,39 @@
+=head1 NAME
+
+Types::SQL - A library of SQL types
+
+=head1 SYNOPSIS
+
+  use Types::SQL -types;
+
+  my $type = Varchar[16];
+
+=head1 DESCRIPTION
+
+This module provides a type library of SQL types.  These are
+L<Type::Tiny> objects that are augmented with a C<dbic_column_info>
+method that returns column information for use with
+L<DBIx::Class>.
+
+=head1 SEE ALSO
+
+L<Type::Tiny>.
+
+L<Types::SQL::Util>, which provides a utility function for translating
+these types and other types from L<Types::Standard> into column
+information for L<DBIx::Class::ResultSource>.
+
+=head1 AUTHOR
+
+Robert Rothenberg, C<rrwo@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015 Robert Rothenberg.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+

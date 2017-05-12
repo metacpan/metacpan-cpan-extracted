@@ -1,0 +1,23 @@
+Revision history for Perl extension Text::MessageLibrary.
+
+0.15 (2002-10-30)
+     Minor documentation tweaks.
+
+0.14 (2002-10-29)
+     Packaged for distribution on CPAN.
+
+0.13 (2002-10-16)
+     Minor (mostly cosmetic) updates to documentation, code, and test suite.
+     Converted to Artistic License.
+
+0.12 (2002-01-06)
+     First public beta. Changed constructor to expect hash to be passed by
+     reference. Split C<_init> out from C<new>.
+
+0.11 (2002-01-05)
+     Removed method caching (which caused conflicts when instantiating
+     multiple objects), rationalized code, completed POD.
+
+0.10 (2001-12-17)
+     Initial implementation (not released).
+

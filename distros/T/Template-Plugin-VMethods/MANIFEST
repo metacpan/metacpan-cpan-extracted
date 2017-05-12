@@ -1,0 +1,16 @@
+Build.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+lib/Template/Plugin/VMethods.pm
+lib/Template/Plugin/VMethods/VMethodContainer.pm
+t/01basic.t
+t/include/thingy
+t/mylib/Template/Plugin/DoubleVMethod.pm
+t/mylib/Template/Plugin/GoSplat.pm
+t/mylib/Template/Plugin/GoSplatVMethod.pm
+t/mylib/Template/Plugin/Reverse2VMethod.pm
+t/mylib/Template/Plugin/ReverseVMethod.pm
+t/mylib/Template/Plugin/UppercaseButCalledReverseVMethod.pm
+META.yml
+CHANGES

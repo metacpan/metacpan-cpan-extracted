@@ -1,0 +1,23 @@
+
+Changes made in Sense-Clusters version 0.73 during version 0.83
+
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+
+1. Added Toolkit/clusterstop/clusterstopping.pl			     -Anagha
+
+2. Integrated clusterstopping.pl with discriminate.pl	     -Anagha
+
+3. Added test-cases for clusterstopping.pl                   -Anagha 
+
+4. Modified web-interface to support clusterstopping         -Anagha
+
+5. Modified/added documentation for cluster stopping:
+README.SC.pod, README.Toolkit.pod, discriminate.html,
+clusterstopping.html                                         -Anagha	
+
+6. Removed /svd/pdlsvd.pl and related threads				 -Anagha
+
+7. Fixed a bug about pattern matching in format_clusters.pl	 -Anagha
+
+(Changelog-v0.73to0.83 Last Updated on 02/07/2006 by Anagha)

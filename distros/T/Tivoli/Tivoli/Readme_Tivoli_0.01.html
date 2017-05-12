@@ -1,0 +1,183 @@
+<HTML>
+<HEAD>
+<TITLE>Tivoli - Perl extension for Tivoli TME10</TITLE>
+<LINK REV="made" HREF="mailto:prospector@porky.devel.redhat.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#license">License</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#details">DETAILS</A></LI>
+		<LI><A HREF="#dependencies">DEPENDENCIES</A></LI>
+		<LI><A HREF="#plattforms and requirements">Plattforms and Requirements</A></LI>
+		<LI><A HREF="#history">HISTORY</A></LI>
+	</UL>
+
+	<LI><A HREF="#installation">INSTALLATION</A></LI>
+	<UL>
+
+		<LI><A HREF="#unix">UNIX</A></LI>
+		<LI><A HREF="#win32">Win32</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+        Tivoli - Perl extension for Tivoli TME10</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        Not (yet) Autoloader implemented.</PRE>
+<PRE>
+        use Tivoli::DateTime;
+        use Tivoli::Logging;
+        use Tivoli::Fwk;
+        use Tivoli::Endpoints;</PRE>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<PRE>
+        v0.01</PRE>
+<P>
+<HR>
+<H1><A NAME="license">License</A></H1>
+<PRE>
+        Copyright (c) 2001 Robert Hase.
+        All rights reserved.
+        This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+        This Module will handle about everything you may need for Tivoli TME10.
+        If anything has been left out, please contact me at
+        tivoli.rhase@muc-net.de
+        so it can be added.</PRE>
+<P>
+<H2><A NAME="details">DETAILS</A></H2>
+<PRE>
+        This Module is still in work.</PRE>
+<PRE>
+        The following Packages are included in v0.01
+        (read Package-Documentations for Details)</PRE>
+<UL>
+<LI><STRONG><A NAME="item_Tivoli%3A%3ADateTime">Tivoli::DateTime</A></STRONG><BR>
+
+<PRE>
+        This Package will handle about everything you may need for handling the date / time.</PRE>
+<LI><STRONG><A NAME="item_Tivoli%3A%3ALogging">Tivoli::Logging</A></STRONG><BR>
+
+<PRE>
+        This Package will handle about everything you may need for Logging.</PRE>
+<LI><STRONG><A NAME="item_Tivoli%3A%3AFwk">Tivoli::Fwk</A></STRONG><BR>
+
+<PRE>
+        This Package will handle about everything you may need for Framework.</PRE>
+<LI><STRONG><A NAME="item_Tivoli%3A%3AEndpoints">Tivoli::Endpoints</A></STRONG><BR>
+
+<PRE>
+        This Package will handle about everything you may need for Endpoints.</PRE>
+</UL>
+<P>
+<H2><A NAME="dependencies">DEPENDENCIES</A></H2>
+<PRE>
+        The Tivoli Environment should be sourced at first</PRE>
+<P>
+<H2><A NAME="plattforms and requirements">Plattforms and Requirements</A></H2>
+<PRE>
+        read Package-Documentations for Details</PRE>
+<UL>
+<LI><STRONG><A NAME="item_Plattforms">Plattforms</A></STRONG><BR>
+
+<PRE>
+        tested on:</PRE>
+<PRE>
+        - w32-ix86 (Win9x, NT4, Windows 2000)
+        - aix4-r1 (AIX 4.3)
+        - Linux (Kernel 2.2.x)</PRE>
+</UL>
+<UL>
+<LI><STRONG><A NAME="item_Requirements">Requirements</A></STRONG><BR>
+
+<PRE>
+        requires Perl v5 or higher</PRE>
+</UL>
+<P>
+<H2><A NAME="history">HISTORY</A></H2>
+<UL>
+<LI><STRONG><A NAME="item_MODULE">MODULE</A></STRONG><BR>
+
+<PRE>
+        MODULE          AUTHOR          VERSION         DATE
+        ----------------------------------------------------
+        Tivoli          RHase           0.01            2001-08-05</PRE>
+<LI><STRONG><A NAME="item_PACKAGES">PACKAGES</A></STRONG><BR>
+
+<PRE>
+        PACKAGE         AUTHOR          VERSION         DATE
+        ----------------------------------------------------
+        DateTime        RHase           0.03            1999
+        Logging         RHase           0.02            2001-07-18
+        Fwk             RHase           0.04            2001-07-06
+        Endpoints       RHase           0.02            2001-07-06</PRE>
+</UL>
+<P>
+<HR>
+<H1><A NAME="installation">INSTALLATION</A></H1>
+<P>
+<H2><A NAME="unix">UNIX</A></H2>
+<PRE>
+        To install this module type the following:</PRE>
+<UL>
+<LI><STRONG><A NAME="item_perl_Makefile%2EPL">perl Makefile.PL</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_make">make</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_make_test">make test</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_make_install">make install</A></STRONG><BR>
+
+</UL>
+<P>
+<H2><A NAME="win32">Win32</A></H2>
+<PRE>
+        Still in work</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+        Robert Hase
+        ID      : RHASE
+        eMail   : Tivoli.RHase@Muc-Net.de
+        Web     : <A HREF="http://www.Muc-Net.de">http://www.Muc-Net.de</A></PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<PRE>
+        CPAN
+        <A HREF="http://www.perl.com">http://www.perl.com</A></PRE>
+<PRE>
+        Tivoli
+        <A HREF="http://www.tivoli.com">http://www.tivoli.com</A></PRE>
+
+</BODY>
+
+</HTML>

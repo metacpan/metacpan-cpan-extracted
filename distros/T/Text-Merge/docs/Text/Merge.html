@@ -1,0 +1,522 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Text::Merge - v.0.34  General purpose text/data merging methods in Perl.</title>
+<link rev="made" href="mailto:terrapin@furthur.nullspace.lan" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#technical_details">Technical Details</a></li>
+		<li><a href="#markup_tags">Markup Tags</a></li>
+		<li><a href="#item_support">Item Support</a></li>
+		<li><a href="#line_by_line_mode">Line by Line Mode</a></li>
+		<li><a href="#templates">Templates</a></li>
+		<li><a href="#methods">Methods</a></li>
+	</ul>
+
+	<li><a href="#prerequisites">PREREQUISITES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Text::Merge - v.0.34  General purpose text/data merging methods in Perl.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        $merge = new Text::Merge;</pre>
+<pre>
+        $merge-&gt;line_by_line();         # query
+        $merge-&gt;line_by_line(0);        # turn off
+        $merge-&gt;line_by_line(1);        # turn on</pre>
+<pre>
+        $merge-&gt;set_delimiters('&lt;&lt;', '&gt;&gt;');            # user defined delims</pre>
+<pre>
+        $success = $merge-&gt;publish($template, \%data);
+        $success = $merge-&gt;publish($template, \%data, \%actions);
+        $success = $merge-&gt;publish($template, $item);</pre>
+<pre>
+        $success = $merge-&gt;publish_to($handle, $template, \%data);
+        $success = $merge-&gt;publish_to($handle, $template, \%data, \%actions);
+        $success = $merge-&gt;publish_to($handle, $template, $item);</pre>
+<pre>
+        $text = $merge-&gt;publish_text($template, \%data);
+        $text = $merge-&gt;publish_text($template, \%data, \%actions);
+        $text = $merge-&gt;publish_text($template, $item);</pre>
+<pre>
+        $success = $merge-&gt;publish_email($mailer, $headers, $template, \%data);
+        $success = $merge-&gt;publish_email($mailer, $headers, $template, 
+                                                             \%data, \%actions);
+        $success = $merge-&gt;publish_email($mailer, $headers, $template, $item);</pre>
+<pre>
+        $datahash = $merge-&gt;cgi2data();        # if you used &quot;CGI(:standard)&quot;
+        $datahash = $merge-&gt;cgi2data($cgi);    # if you just used CGI.pm</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Text::Merge</code> package is designed to provide a quick, versatile, and extensible way to combine presentation
+templates and data structures.  The <code>Text::Merge</code> package attempts to do this by assuming that templates are
+constructed with text and that objects consist of data and functions that operate on that data.  <code>Text::Merge</code> 
+is very simple, in that it works on one file and one object at a time, although an extension exists to display 
+lists (<code>Text::Merge::Lists</code>) and <code>Text::Merge</code> itself could easily be extended further.</p>
+<p>This is not XML and is intended merely to ``flatten'' the learning curve for non-programmers who design display 
+pages for programmers or to provide programmers with a quick way of merging page templates with data sets or 
+objects without extensive research.</p>
+<p>The templates can be interpreted ``line by line'' or taken as a whole.</p>
+<p>
+</p>
+<h2><a name="technical_details">Technical Details</a></h2>
+<p>This object is normally inherited and so the <a href="#item_new"><code>new()</code></a> function is the constructor.  It just blesses an 
+anonymous HASH reference, sets two flags within that HASH, and returns it.  I'm am acutely aware 
+of the criticisms of the overuse of OOP (Object Oriented Programming).  This module needs to be OO 
+because of its extensibility and encapsulation; I wanted to impose classification of the objects to allow 
+the greatest flexibility in context of implementation.  <code>Text::Merge</code> is generally used on web servers, and 
+can become integrated quickly into the httpd using mod_perl, hence the encapsulation and inheritance provided 
+by the Perl OO model clearly outweighed the constraints thereby imposed.  That's my excuse...what's yours?</p>
+<p>There are four public methods for the <code>Text::Merge</code> object: <a href="#item_publish"><code>publish()</code></a>, <a href="#item_publish_to"><code>publish_to()</code></a>, <a href="#item_publish_text"><code>publish_text()</code></a>, 
+<a href="#item_publish_email"><code>publish_email()</code></a>.  The first, <a href="#item_publish"><code>publish()</code></a>, sends output to the currently selected file handle (normally 
+STDOUT).  The second method, <a href="#item_publish_text"><code>publish_text()</code></a>, returns the merged output as a text block.  The last method, 
+<a href="#item_publish_email"><code>publish_email()</code></a>, sends the merged output as a formatted e-mail message to the designated mailer.</p>
+<p>Support is provided to merge the data and the functions performed on that data with a text template that 
+contains substitution tag markup used to designate the action or data conversion.  Data is stored in a HASH 
+that is passed by reference to the publishing methods.  The keys of the data hash correspond to the field 
+names of the data, and they are associated with their respective values.  Actions (methods) are similarly 
+referenced in a hash, keyed by the action name used in the template.</p>
+<p>Here is a good example of a publishing call in Perl:</p>
+<pre>
+        $obj = new Text::Merge;
+        %data = ( 'Name'=&gt;'John Smith', 'Age'=&gt;34, 'Sex'=&gt;'not enough' );
+        %actions = ( 'Mock' =&gt; \&amp;mock_person,  'Laud' =&gt; \&amp;laud_person );
+        $obj-&gt;publish($template, \%data, \%actions);</pre>
+<p>In this example, <code>mock_person()</code> and <code>laud_person()</code> would be subroutines that took a single hash reference,
+the data set, as an argument.  In this way you can create dynamic or complex composite components and reference 
+them with a single tag in the template.  The actions HASH has been found to be useful for default constructs
+that can be difficult to code manually, giving page designers an option to work with quickly.</p>
+<p>
+</p>
+<h2><a name="markup_tags">Markup Tags</a></h2>
+<p>Simply put, tags are replaced with what they designate.  A tag generally consists of a prefix, followed by a
+colon, then either an action name or a field name followed by zero or more formatting directives seperated
+by colons.  In addition, blocks of output can be contained within curly brackets 
+in certain contexts for conditional display.</p>
+<dl>
+<dt><strong><a name="item_ref_3a_tags">REF: tags</a></strong><br />
+</dt>
+<dd>
+Simple data substitution is achieved with the <code>REF:</code> tag.  Here is an example of the use of a <code>REF:</code> tag
+in context, assume we have a key-value pair in our data HASH associating the key 'Animal' with the value of
+'turtle':
+</dd>
+<dd>
+<pre>
+        The quick brown REF:Animal jumped over the lazy dog.</pre>
+</dd>
+<dd>
+<p>when filtered, becomes:</p>
+</dd>
+<dd>
+<pre>
+        The quick brown turtle jumped over the lazy dog.</pre>
+</dd>
+<dd>
+<p>The <code>REF:</code> tag designators may also contain one or more format directives.  These are chained left
+to right, and act to convert the data before it is displayed.  For example:</p>
+</dd>
+<dd>
+<pre>
+        REF:Animal:lower:trunc3</pre>
+</dd>
+<dd>
+<p>would result in the first three letters of the SCALAR data value associated with Animal in lower case.  See
+the section, <code>Data Conversions Formats</code>, for a list of the available SCALAR data formatting directives.  Note 
+that some conversions may be incompatible or contradictory.  The system will not necessarily warn you of such 
+cases, so be forewarned.</p>
+</dd>
+<dd>
+<p>Any <code>REF:</code> tag designator can be surrounded by curly brace pairs containing text that would be included in the
+merged response only if the result of the designator is not empty (has a length).  There must be no spaces between 
+the tag and the curly braced text.  If line-by-line mode is turned off, then the conditional text block may span
+multiple lines.  For example:</p>
+</dd>
+<dd>
+<pre>
+        The {quick brown }REF:Animal{ jumps over where the }lazy dog lies.</pre>
+</dd>
+<dd>
+<p>Might result in:</p>
+</dd>
+<dd>
+<pre>
+        The quick brown fox jumps over where the lazy dog lies.</pre>
+</dd>
+<dd>
+<p>or, if the value associated with the data key 'Animal' was undefined, empty, or zero:</p>
+</dd>
+<dd>
+<pre>
+        The lazy dog lies.</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_if_3a_tags">IF: tags</a></strong><br />
+</dt>
+<dd>
+The <code>IF:</code> tag designators performs a conditional display.  The syntax is as follows:
+</dd>
+<dd>
+<pre>
+        IF:FieldName:formats{Text to display}</pre>
+</dd>
+<dd>
+<p>This designator would result in the string <strong>Text to display</strong> being returned if the formatted data value is
+not empty.  The curly braced portion is required, and no curly braces are allowed before the designator.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_neg_3a_tags">NEG: tags</a></strong><br />
+</dt>
+<dd>
+The <code>NEG:</code> tag designator is similar to the <code>IF:</code> tag, but the bracketed text is processed only if the
+formatted data value is empty (zero length) or zero.  Effectively the <code>NEG:</code> can be thought of as <strong>if not</strong>.  
+Here is an example:
+</dd>
+<dd>
+<pre>
+        NEG:FieldName:formats{Text to display if the result is empty.}</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_act_3a_tags">ACT: tags</a></strong><br />
+</dt>
+<dd>
+The <code>ACT:</code> tag designates that an action is to be performed (a subroutine call) to obtain the result for 
+substition.  The key name specified in the designator is used to look up the reference to the appropriate 
+subroutine, and the data HASH reference is passed as the sole argument to that subroutine.  The returned 
+value is the value used for the substition.
+</dd>
+<dd>
+<p><code>ACT:</code> is intended to be used to insert programmatic components into the document.  It can only specify
+action key names and has no equivalent tags to <code>IF:</code> and <code>NEG:</code>.  The curly brace rules for the <code>ACT:</code>
+tag are exactly the same as those for the <code>REF:</code> tag.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_conditional_text_braces">Conditional Text Braces</a></strong><br />
+</dt>
+<dd>
+All tags support conditional text surrounded by curly braces.  If the <a href="#item_line_by_line"><code>line_by_line()</code></a> switch is set, then
+the entire tag degignator must be on a single line of text, but if the switch is OFF (default) then the 
+conditional text can span multiple lines.
+</dd>
+<dd>
+<p>The two conditional tags, <code>IF:</code> and <code>NEG:</code>, require a single conditional text block, surrounded by curly 
+braces, immediately following (suffixing) the field name or format string.  For example:</p>
+</dd>
+<dd>
+<pre>
+        IF:SomeField{this text will print}</pre>
+</dd>
+<dd>
+<p>The <code>REF:</code> and <code>ACT:</code> tags allow for curly braces both at the beginning (prefixing) and at the end 
+(suffixing).  For example:</p>
+</dd>
+<dd>
+<pre>
+        {Some optional text }REF:SomeValue{ more text.}</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_command_braces">Command Braces</a></strong><br />
+</dt>
+<dd>
+You may bracket entire constructs (along with any conditional text) with double square brackets to set them
+off from the rest of the document.  The square brackets would be removed during substitution:
+</dd>
+<dd>
+<pre>
+        The [[IF:VerboseVar{quick, brown }]]fox jumped over the lazy dog.</pre>
+</dd>
+<dd>
+<p>assuming that 'VerboseVar' represented some data value, the above example would result in one of:</p>
+</dd>
+<dd>
+<pre>
+        The quick, brown fox jumped over the lazy dog.
+or
+        The fox jumped over the lazy dog.</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_data_conversion_formats">Data Conversion Formats</a></strong><br />
+</dt>
+<dd>
+Here is a list of the data conversion format and the a summary.  Details are undetermined in some cases for
+exceptions, but all of the conversion to some satisfactory degree.  These conversion methods will treat all
+values as SCALAR values:
+</dd>
+<dd>
+<pre>
+        upper   -  converts all lowercase letters to uppercase
+        lower   -  converts all uppercase letters to lower
+        proper  -  treats the string as a Proper Noun 
+        trunc## -  truncate the scalar to ## characters (## is an integer)
+        words## -  reduce to ## words seperated by spaces (## is an integer)
+        paragraph## -  converts to a paragraph ## columns wide
+        indent## - indents plain text ## spaces
+        int     -  converts the value to an integer
+        float   -  converts the value to a floating point value
+        string  -  converts the numeric value to a string (does nothing)
+        detab   -  replaces tabs with spaces, aligned to 8-char columns
+        html    -  replaces newlines with HTML B&lt;BR&gt; tags
+        dollars -  converts the value to 2 decimal places
+        percent -  converts the value to a percentage
+        abbr    -  converts a time value to m/d/yy format
+        short   -  converts a time value to m/d/yy H:MMpm format
+        time    -  converts a time value to H:MMpm (localtime am/pm)
+        24h     -  converts a time value to 24hour format (localtime)
+        dateonly - converts a time value to Jan. 1, 1999 format
+        date    - same as 'dateonly' with 'time'
+        ext     -  converts a time value to extended format:
+                        Monday, Januay 12th, 1999 at 12:20pm
+        unix    -  converts a time value to UNIX date string format
+        escape  -  performs a browser escape on the value (&amp;#123;)
+        unescape - performs a browser unescape (numeric only)
+        urlencode - performs a url encoding on the value (%3B)
+        urldecode - performs a url decoding (reverse of urlencode)</pre>
+</dd>
+<dd>
+<p>Most of the values are self-explanatory, however a few may need explanation:
+</p>
+</dd>
+<dd>
+<pre>
+
+The C&lt;trunc&gt; format must be suffixed with an integer digit to define at most 
+how many characters should be displayed, as in C&lt;trunc14&gt;.</pre>
+</dd>
+<dd>
+<p>The <code>html</code> format just inserts a &lt;BR&gt; construct at every newline in the 
+string.  This allows text to be displayed appropriately in some cases.</p>
+</dd>
+<dd>
+<p>The <code>escape</code> format performs an HTML escape on all of the reserved characters
+of the string.  This allows values to be displayed correctly on browsers in
+most cases.  If your data is not prefiltered, it is usually a good idea to
+use <strong>escape</strong> on strings where HTML formatting is prohibited.  For example
+a '$' value would be converted to '&amp;#36;'.</p>
+</dd>
+<dd>
+<p>The <code>unescape</code> format does the reverse of an <code>escape</code> format, however it
+does not operate on HTML mnemonic escapes, allowing special characters to
+remain intact.  This can be used to reverse escapes inherent in the use of
+other packages.</p>
+</dd>
+<dd>
+<p>The <code>urlencode</code> and <code>urldecode</code> formats either convert a value (text string)
+to url encoded format, converting special characters to their %xx equivalent,
+or converting to the original code by decoding %xx characters respectively from
+the url encoded value.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="item_support">Item Support</a></h2>
+<p>The publishing methods all require at the very least a template, a data set, and the action set; although
+either the data set or the action set or both could be empty or null.  You may also <strong>bundle</strong> this 
+information into a single HASH (suitable for blessing as a class) with the key 'Data' associated with
+the data HASH reference, and the key 'Actions' associated with the action HASH reference.  A restatement of
+a previous example might look like this:</p>
+<pre>
+        $obj = new Text::Merge;
+        $data = { 'Name'=&gt;'John Smith', 'Age'=&gt;34, 'Sex'=&gt;'not enough' };
+        $actions = { 'Mock' =&gt; \&amp;mock_person,  'Laud' =&gt; \&amp;laud_person };
+        $item = { 'Data' =&gt; $data,  'Actions' =&gt; $actions };
+        $obj-&gt;publish($template, $item);</pre>
+<p>In addition, if you specify a key 'ItemType' in your <code>$item</code> and give it a value, then the item reference
+will be handed to any methods invoked by the <code>ACT:</code> tags, rather than just the data hash.  This allows
+you to construct <strong>items</strong> that can be merged with templates.  For example, the following code is valid:</p>
+<pre>
+        %data = ( 'Author' =&gt; 'various',  'Title' =&gt; 'The Holy Bible' );
+        %actions = ( 'Highlight' =&gt; \&amp;highlight_item );
+        $item = { 'ItemType'=&gt;'book', 'Data'=&gt;\%data, 'Actions'=&gt;\%actions };
+        bless $item, Some::Example::Class;
+        $obj-&gt;publish($template, $item);</pre>
+<p>In this last example, the designator <code>ACT:Highlight</code> would result in the object <code>$item</code> being passed
+as the only argument to the subroutine <code>highlight_item()</code> referenced in the action HASH.</p>
+<p>
+</p>
+<h2><a name="line_by_line_mode">Line by Line Mode</a></h2>
+<p>By default, the publishing methods slurp in the entire template and process it as a text block.  This 
+allows for multi-line conditional text blocks.  However, in some cases the resulting output may be very 
+large, or you may want the output to be generated line by line for some other reason (such as unbuffered 
+output).  This is accomplished through the <a href="#item_line_by_line"><code>line_by_line()</code></a> method, which accepts an optional boolean value,
+which sets the current setting if specified or returns the current settingif not.  Note that this has the 
+most notable impact on the <a href="#item_publish"><code>publish()</code></a> and <a href="#item_publish_email"><code>publish_email()</code></a> methods, since the results of the merge operations 
+are sent to a handle.  If the line by line switch is set, then the <a href="#item_publish_text"><code>publish_text()</code></a> method will substitute line
+by line, but will still return the entire merged document as a single text block (not line by line).</p>
+<p>This is turned OFF by default.</p>
+<p>
+</p>
+<h2><a name="templates">Templates</a></h2>
+<p>Templates consist of text documents that contain special substitution designators as described previously.  The
+template arguments passed to the publishing functions can take one of three forms:</p>
+<dl>
+<dt><strong><a name="item_file_handle">File Handle</a></strong><br />
+</dt>
+<dd>
+This is a FileHandle object not a glob.  You must use the <code>FileHandle</code> package that comes with the Perl distribution
+for this type of template argument.  Processing begins at the current file position and continues until the end of 
+file condition is reached.
+</dd>
+<p></p>
+<dt><strong><a name="item_file_path">File Path</a></strong><br />
+</dt>
+<dd>
+If the argument is a scalar string with no whitespace, it is assumed to be a file path.  The template at that
+location will be used when merging the document.
+</dd>
+<p></p>
+<dt><strong><a name="item_text_block">Text Block</a></strong><br />
+</dt>
+<dd>
+If the argument is a scalar string that contains whitespace, it is assumed to be the actual text template.  
+Substitution will be performed on a locally scoped copy of this argument.
+</dd>
+<dd>
+<p>Note that you should not use this type of template argument if your template is very large and you 
+are using line by line mode.  In this case you should use a FileHandle or file path argument.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="methods">Methods</a></h2>
+<dl>
+<dt><strong><a name="item_new"><code>new()</code></a></strong><br />
+</dt>
+<dd>
+This method gives us a blessed hash reference, with the following attribute keys:
+</dd>
+<dd>
+<pre>
+        _Text_Merge_LineMode</pre>
+</dd>
+<dd>
+<p>Other keys can be added by objects which inherit <code>Text::Merge</code>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_line_by_line"><code>line_by_line($setting)</code></a></strong><br />
+</dt>
+<dd>
+This method returns the current setting if the <code>$setting</code> argument is omitted.  Otherwise it resets the
+line-by-line mode to the setting requested.  A non-zero value tells the publishing methods to process the
+template line by line.  For those methods that output results to a handle, then those results will also be 
+echoed line by line.
+</dd>
+<p></p>
+<dt><strong><a name="item_set_delimiters">set_delimiters($start, $end)</a></strong><br />
+</dt>
+<dd>
+This method assigns a new command delimiter set for the tags (double 
+square brackets by default).  The 'colon' character is not allowed within 
+the delimiter, and the delimiter may not be a single curly bracket.  Both 
+the <code>$start</code> and <code>$end</code> delimiters must be provided, and they cannot be 
+identical.
+</dd>
+<p></p>
+<dt><strong><a name="item_publish">publish($template, $dataref, $actionref)</a></strong><br />
+</dt>
+<dd>
+This is the normal publishing method.  It merges the specified template with the data and
+any provided actions.  The output is sent to the currently selected handle, normally STDOUT.
+</dd>
+<p></p>
+<dt><strong><a name="item_publish_to">publish_to($handle, $template, $dataref, $actionref)</a></strong><br />
+</dt>
+<dd>
+This is similar to the normal publishing method.  It merges the specified template with the data 
+and any provided actions.  The output is sent to the specified <code>$handle</code> or to the currently
+selected handle, normally STDOUT, if the <code>$handle</code> argument is omitted.
+</dd>
+<p></p>
+<dt><strong><a name="item_publish_text">publish_text($template, $dataref, $actionref)</a></strong><br />
+</dt>
+<dd>
+This method works similar to the <a href="#item_publish_to"><code>publish_to()</code></a> method, except it returns the filtered output as text
+rather than sending it to the currently selected filehandle.
+</dd>
+<p></p>
+<dt><strong><a name="item_publish_email">publish_email($mailer, $headers, $filepath, $data, $actions)</a></strong><br />
+</dt>
+<dd>
+This method is similar to <a href="#item_publish"><code>publish()</code></a> but opens a handle to <code>$mailer</code>, and sending the merged data
+formatted as an e-mail message.  <code>$mailer</code> may contain the sequences <code>RECIPIENT</code> and/or <code>SUBJECT</code>.  
+If either does not exists, it will be echoed at the beginning of the email (in the form of a header), allowing 
+e-mail to be passed preformatted.  This is the preferred method; use a mailer that can be told to 
+accept the ``To:'', ``Subject:'' and ``Reply-To:'' fields within the body of the passed message and do 
+not specify the <code>RECIPIENT</code> or <code>SUBJECT</code> tags in the <code>$mailer</code> string.  Returns false if failed, 
+true if succeeded.  The recommended mail program is 'sendmail'.  <code>$headers</code> is a HASH reference, containing
+the header information.  Only the following header keys are recognized:
+</dd>
+<dd>
+<pre>
+        To
+        Subject
+        Reply-To
+        CC
+        From (works for privileged users only)</pre>
+</dd>
+<dd>
+<p>The values associated with these keys will be used to construct the desired e-mail message header.  Secure 
+minded site administrators might put hooks in here, or even better clean the data,  to protect access to 
+the system as a precaution, to avoid accidental mistakes perhaps.</p>
+</dd>
+<dd>
+<p>Note: the <code>$mailer</code> argument string should begin with the type of pipe required for your request.  For
+sendmail, this argument would look something like (note the vertical pipe):</p>
+</dd>
+<dd>
+<pre>
+        '|/usr/bin/sendmail -t'</pre>
+</dd>
+<dd>
+<p>Be careful not to run this with write permission on the sendmail file and forget the process pipe!!!</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_cgi2data"><code>cgi2data($cgi)</code></a></strong><br />
+</dt>
+<dd>
+This method converts <code>CGI.pm</code> parameters to a data hash reference suitable
+for merging.  The <code>$cgi</code> parameter is a CGI object and is optional, but 
+you must have imported the <code>:standard</code> methods from <code>CGI.pm</code> if you omit 
+the <code>$cgi</code> paramter.  This method returns a hash reference containing the
+parameters as data.  Basically it turns list values into list references and 
+puts everything in a hash keyed by field name.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="prerequisites">PREREQUISITES</a></h1>
+<p>This module was written and tested in Perl 5.005 and runs with <code>-Tw</code> set and <code>use strict</code>.  It 
+requires use of the package <code>FileHandle</code> which is part of the standard perl distribution.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>This software is released under the Perl Artistic License.  Derive what you wish, as you wish, but please
+attribute releases and include derived source code.  (C) 1997-2004 by Steven D. Harris, <a href="mailto:perl@nullspace.com">perl@nullspace.com</a></p>
+
+</body>
+
+</html>

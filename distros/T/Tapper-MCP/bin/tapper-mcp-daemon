@@ -1,0 +1,56 @@
+#! /usr/bin/perl
+
+# PODNAME: tapper-mcp-daemon
+# ABSTRACT: cmdline frontend to Tapper::MCP/daemonize
+
+use strict;
+use warnings;
+
+use Cwd;
+use Tapper::MCP::Daemon;
+
+$ENV{MX_DAEMON_STDOUT} ||= '/var/log/tapper_mcp_daemon_stdout.log';
+$ENV{MX_DAEMON_STDERR} ||= '/var/log/tapper_mcp_daemon_stderr.log';
+
+$ENV{MX_DAEMON_STDOUT} = '/tmp/tapper_mcp_daemon_stdout.log' if not -w $ENV{MX_DAEMON_STDOUT};
+$ENV{MX_DAEMON_STDERR} = '/tmp/tapper_mcp_daemon_stderr.log' if not -w $ENV{MX_DAEMON_STDERR};
+
+my $mcp = Tapper::MCP::Daemon->new(
+    basedir => getcwd,
+    pidfile => '/tmp/tapper-mcp-daemon.pid'
+);
+$mcp->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-mcp-daemon - cmdline frontend to Tapper::MCP/daemonize
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=item *
+
+Tapper Team <tapper-ops@amazon.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

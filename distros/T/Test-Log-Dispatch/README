@@ -1,0 +1,81 @@
+NAME
+    Test::Log::Dispatch -- Test what you are logging
+
+SYNOPSIS
+        use Test::More;
+        use Test::Log::Dispatch;
+
+        my $log = Test::Log::Dispatch->new();
+
+        # ...
+        # call something that logs to $log
+        # ...
+
+        # now test to make sure you logged the right things
+
+        $log->contains_ok(qr/good log message/, "good message was logged");
+        $log->does_not_contain_ok(qr/unexpected log message/, "unexpected message was not logged");
+        $log->empty_ok("no more logs");
+
+        # or
+
+        my $msgs = $log->msgs;
+        cmp_deeply($msgs, ['msg1', 'msg2', 'msg3']);
+
+DESCRIPTION
+    `Test::Log::Dispatch' is a `Log::Dispatch' object that keeps track of
+    everything logged to it in memory, and provides convenient tests against
+    what has been logged.
+
+CONSTRUCTOR
+    The constructor returns a `Test::Log::Dispatch' object, which inherits
+    from `Log::Dispatch' and contains a single `Log::Dispatch::Array' output
+    at 'debug' level.
+
+    The constructor requires no parameters. Any parameters will be forwarded
+    to the `Log::Dispatch::Array' constructor. For example, you can pass a
+    *min_level* to override the default 'debug'.
+
+METHODS
+    The test_name is optional in the *_ok methods; a reasonable default will
+    be provided.
+
+    contains_ok ($regex[, $test_name])
+        Tests that a message in the log buffer matches *$regex*. On success,
+        the message is *removed* from the log buffer (but any other matches
+        are left untouched).
+
+    does_not_contain_ok ($regex[, $test_name])
+        Tests that no message in the log buffer matches *$regex*.
+
+    empty_ok ([$test_name])
+        Tests that there is no log buffer left. On failure, the log buffer
+        is cleared to limit further cascading failures.
+
+    contains_only_ok ($regex[, $test_name])
+        Tests that there is a single message in the log buffer and it
+        matches *$regex*. On success, the message is removed.
+
+    clear ()
+        Clears the log buffer.
+
+    msgs ()
+        Returns the current contents of the log buffer as an array
+        reference, where each element is a hash containing a *message* and
+        *level* key.
+
+TO DO
+    *   Allow testing of log levels.
+
+SEE ALSO
+    Log::Dispatch, Test::Log4perl
+
+AUTHOR
+    Jonathan Swartz
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2009 Jonathan Swartz, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,87 @@
+Changes for Thread::Queue::Duplex
+
+0.92	2006-Mar-05 D. Arnold
+
+	- added Thread::Queue::TQDContainer abstract class; made TQD a TQDContainer
+	
+	- updated class wait() methods to use Thread::Queue::TQDContainer,
+		rather than TQD's directly
+
+0.91	2006-Feb-18 D. Arnold
+
+	- updated TQD to properly use onEnqueue() in list context
+	
+	- added psichedoc classdocs, and modified Pod-ProjectDocs
+	
+	- changed to Academic Free License v2.1
+	
+	- fixed lock signalling bug in wait_until()
+	
+	- perf. opt. in wait()'s to reduce number of deref's
+
+0.90	2006-Jan-31 D. Arnold
+
+	- updated TQQ default redeem to auto-rebless thread::shared objects
+
+	- updated TQD to simplify Thread::Queue::Multiplex subclass
+	
+	- fix for CPAN bug 16944 (thnx to phernandez@friendfinderinc.com)
+	
+	- minimum Perl 5.8 required (for threads::shared::_id reference)
+	
+	- POD cleanup
+
+0.14	2005-Aug-29 D. Arnold
+
+	- fixed constructor to handle undef'd argument hash values
+
+	- changed to make TQD objects fully shared
+	
+	- changed default TQQ curse() to be NO-OP if object is already shared
+
+0.13	2005-Aug-19 D. Arnold
+
+	- added enqueue_and_wait(), 
+		enqueue_and_wait_until(),
+		enqueue_urgent_and_wait(),
+		enqueue_urgent_and_wait_until()
+
+0.12	2005-Aug-12	D. Arnold
+
+	- fixed bad test cases
+
+0.11	2005-Aug-15	D. Arnold
+
+	- added Thread::Queue::Queueable (aka TQQ) abstract class
+		to provide Observable pattern for queued
+		objects
+	
+	- added enqueue_urgent() to TQD
+	
+	- added cancel(), cancel_all() to TQD
+	
+	- made TQD a TQQ object
+	
+	- added enqueue_simplex(), enqueue_simplex_urgent()
+		to TQD for simplex request handling
+
+	- added listen(), ignore()
+	
+	- added ListenerRequired, MaxPending constructor hash
+		arguments
+	
+	- added class-level versions of wait(), wait_until(), wait_any(),
+		wait_all(), etc. to support waiting on multiple queues
+	
+	- added set_max_pending(), enqueue() block when pending requests
+		exceed MaxPending count
+	
+	- added dequeue_urgent(), similar to dequeue_nb, but only dequeues
+		urgent elements
+	
+	- added mark(), unmark(), get_mark(), marked() to TQD to permit 
+		properties to be added to requests after they've been queued, 
+		but before they've been respond()'d to.
+
+0.10	2005-Jul-01	D. Arnold
+	First release.

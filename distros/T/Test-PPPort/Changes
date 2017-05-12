@@ -1,0 +1,13 @@
+Revision history for Perl extension Test::PPPort
+
+0.03    2009-07-01T12:17:04+09:00
+        - supported for Test::More subtests
+          Ovid++ http://use.perl.org/~Ovid/journal/39193
+          dagolden++ http://echo.dagolden.com/~xdg/2009-06-30-test-builder-new.txt
+          charsbar++ http://d.hatena.ne.jp/charsbar/20090701/1246415840
+
+0.02    2009-04-10T17:26:56+09:00
+        - added to catch the detected xs files error
+
+0.01    2009-04-10T16:43:35+09:00
+        - original version

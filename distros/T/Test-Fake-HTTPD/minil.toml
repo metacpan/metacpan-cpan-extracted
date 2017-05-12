@@ -1,0 +1,6 @@
+name = "Test-Fake-HTTPD"
+# badges = ["travis"]
+authority="cpan:MASAKI"
+
+module_maker="ModuleBuildTiny"
+

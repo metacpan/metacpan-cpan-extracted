@@ -1,0 +1,9 @@
+Revision history for Perl extension Test::Deep::Between
+
+0.02 2013-01-28
+    - remove type check
+    - add between_str. this is compare in strings.
+
+0.01 2013-01-27
+    - original version; created by dim
+      at Sun Jan 27 04:33:44 2013.

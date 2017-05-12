@@ -1,0 +1,35 @@
+---
+abstract: 'L<TPath::Forester> that understands Perl structs'
+author:
+  - 'David F. Houghton <dfhoughton@gmail.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::MoreUtils: 0
+  Test::More: 0.88
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300036, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TPath-Forester-Ref
+no_index: {}
+requires:
+  Moose: 0
+  Moose::Exporter: 0
+  Moose::Role: 0
+  Moose::Util: 0
+  MooseX::MethodAttributes: 0
+  Scalar::Util: 0
+  TPath: 1.000
+  TPath::Expression: 0
+  TPath::Forester: 0
+  namespace::autoclean: 0
+  perl: v5.10.0
+  warnings: 0
+version: 0.004

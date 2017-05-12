@@ -1,0 +1,22 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Tie/Handle/CSV.pm
+lib/Tie/Handle/CSV/Array.pm
+lib/Tie/Handle/CSV/Hash.pm
+t/no_header.t
+t/header_in_file.t
+t/header_in_args.t
+t/key_case.t
+t/slurp.t
+t/seek.t
+t/stringify.t
+t/tell.t
+t/sep_char.t
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.json

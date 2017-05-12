@@ -1,0 +1,6 @@
+[% WRAPPER layout/html_wrapper.tt %]
+
+Hello World or [% name %]!
+
+[% END %]
+

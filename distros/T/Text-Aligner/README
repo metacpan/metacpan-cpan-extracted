@@ -1,0 +1,36 @@
+Text::Aligner
+
+A module to align text.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Alternatively, you should use your favourite CPAN client or distribution's
+package manager.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Text::Aligner
+
+You can also look for information at:
+
+    MetaCPAN
+        http://metacpan.org/release/Text-Aligner
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text::Aligner
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Anno Siegel. All rights reserved.
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+

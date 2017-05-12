@@ -1,0 +1,36 @@
+Tao-DBI version 0.012
+============================
+
+Tao::DBI is undocumented by now.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+
+and recommends
+
+  Test::Pod
+
+TO DO
+
+* everything
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, 2006 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

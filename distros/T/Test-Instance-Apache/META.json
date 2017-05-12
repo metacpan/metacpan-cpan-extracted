@@ -1,0 +1,72 @@
+{
+   "abstract" : "Create Apache instance for Testing",
+   "author" : [
+      "Tom Bloor <t.bloor@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Instance-Apache",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0",
+            "File::Which" : "0",
+            "IO::All" : "0",
+            "IPC::System::Simple" : "0",
+            "Moo" : "0",
+            "Net::EmptyPort" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::All" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/TBSliver/Test-Instance-Apache/issues"
+      },
+      "homepage" : "https://github.com/TBSliver/Test-Instance-Apache",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/TBSliver/Test-Instance-Apache.git",
+         "web" : "https://github.com/TBSliver/Test-Instance-Apache"
+      }
+   },
+   "version" : "0.001"
+}
+

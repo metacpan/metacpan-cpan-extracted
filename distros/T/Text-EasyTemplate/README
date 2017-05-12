@@ -1,0 +1,49 @@
+Text-EasyTemplate
+
+A simple text template system without a lot of complex and unnecessary features
+present in other existing template systems. It aims at ease of use without the
+need of setting up lots of configurations or complex frameworks. Ideal for
+simple applications, it can be used for any type of purpose: web, merge mail,
+or any other type of text.
+
+This is the first release of this module. It currently supports simple value
+substitution and simple if-else-endif conditionals on templates read from file.
+Planned features include nested conditionals and supplying user generated
+strings as templates.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Text::EasyTemplate
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-EasyTemplate
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-EasyTemplate
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Text-EasyTemplate
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Text-EasyTemplate
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Luis Chavez
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

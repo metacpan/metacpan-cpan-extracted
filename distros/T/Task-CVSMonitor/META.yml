@@ -1,0 +1,51 @@
+--- 
+abstract: Install all the CPAN modules needed by CVS Monitor
+author: 
+  - Adam Kennedy <cpan@ali.as>
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Task-CVSMonitor
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Array::Window: 0.4
+  CGI: 2.47
+  Chart::Math::Axis: 0
+  Class::Autouse: 1.04
+  Class::Default: 1.0
+  Class::Handle: 0
+  Class::Inspector: 1.07
+  Clone: 0.21
+  Config::Tiny: 1.6
+  Date::Format: 0
+  File::Copy: 0
+  File::Flat: 0.91
+  File::Spec: 0.80
+  File::Temp: 0.12
+  File::Which: 0
+  FindBin: 0
+  GD::Graph: 0
+  GD::Text: 0
+  Getopt::Long: 0
+  HTTP::BrowserDetect: 0.97
+  IO::File: 0
+  Net::Telnet: 0
+  Number::Compare: 0
+  Proc::ProcessTable: 0
+  Scalar::Util: 1.10
+  Sort::Versions: 0
+  Storable: 0
+  Text::Glob: 0
+  Time::Duration: 0
+  Time::ParseDate: 100.010301
+  URI::Escape: 0
+  Validate::Net: 0.5
+  XML::Generator: 0
+  perl: 5.005
+version: 0.006004

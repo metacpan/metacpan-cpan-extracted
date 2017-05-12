@@ -1,0 +1,33 @@
+Template::Direct
+
+This is a simple and delibratly restrictive templating engine to allow website construction.
+	
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008 Martin Owens
+
+This program is free software; you can redistribute it and/or modify it
+under the Affero General Public License (AGPL)
+
+http://www.fsf.org/licensing/licenses/agpl-3.0.html
+

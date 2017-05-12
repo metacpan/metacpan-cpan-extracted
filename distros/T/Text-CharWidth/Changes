@@ -1,0 +1,15 @@
+Revision history for Perl extension Text::CharWidth.
+
+0.04  Wed Jun 25 17:28:32 2003
+	- Clearification of the license.
+
+0.03  Sun Jun 22 09:02:10 2003
+	- Added test.
+
+0.02  Fri Jun 20 23:05:10 2003
+	- Added EXPORT_TAGS.
+
+0.01  Thu Jun 19 12:28:11 2003
+	- original version; created by h2xs 1.22 with options
+		-A -n Text::CharWidth
+

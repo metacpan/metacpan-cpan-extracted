@@ -1,0 +1,81 @@
+Revision history for Perl extension Tiffany
+
+1.01 2013-09-04T02:47:07Z
+
+    - minil migrate
+
+1.00
+
+    - bump up version.
+
+0.08
+
+    - oops
+
+0.07
+
+    - fixed deps
+
+0.06
+
+    - require Test::Requires
+
+0.05
+
+    - modernize package
+
+0.04
+
+
+        - fixed testing issue
+          ( no feature changes )
+
+0.03
+
+        - fixed test case
+          ( no feature changes )
+
+0.02
+
+        - first beta release.
+
+0.01_08
+
+        - added Text::ClearSilver support(gfx++)
+
+0.01_07
+
+        - english fix(lestrrat++)
+        - added documents for each child modules.
+
+0.01_06
+
+        - doc tweaks
+        - rename Tfall to Tiffany(suggested by miyagawa++)
+        - Tfall::*->new methods should take only one reference value.
+        - added brand new factory method
+
+0.01_05
+
+        - HTML::Template can take $ht->param(\%vars).
+
+0.01_04
+
+        - any ->render method MUST return plain string
+
+0.01_03
+
+        - support Text::MicroTemplate::Extended
+
+0.01_02
+
+        - support T::D(suggested by @c9s)
+        - remove Markdown support
+        - remove Sass support
+
+0.01_01
+
+        - first developer release.
+
+0.01    Wed Mar 24 22:16:13 2010
+        - original version

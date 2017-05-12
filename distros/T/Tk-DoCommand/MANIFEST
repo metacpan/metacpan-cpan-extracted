@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+DoCommand.pm
+test.pl
+docommandtest.pl
+META.yml                                 Module meta-data (added by MakeMaker)

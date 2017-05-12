@@ -1,0 +1,110 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: mhentsc3
+  data:
+    id: 12
+    name: Maik Hentsche
+    login: mhentsc3
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "perfmon", "lmbench"
+
+- schema: Testrun
+  name: Simnow
+  data:
+    id: 1
+    owner_id: 12
+    shortname: Simnow
+    notes: Simnow
+    topic_name: Software
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: Simnow image
+  data:
+    id: 1
+    shortname: simnow_image
+    precondition: |
+     precondition_type: copyfile
+     protocol: local
+     name: /data/local/mhentsc3/openSUSE11.1.hdd
+     dest: /tmp/images/
+
+- schema: Precondition
+  name: opt_tapper_simnow
+  data:
+    id: 2
+    shortname: opt_tapper_simnow
+    precondition: |
+      filename: tapperutils/opt-tapper32.tar.gz
+      precondition_type: package
+      mountfile: /tmp/images/openSUSE11.1.hdd
+      mountpartition: p1
+
+- schema: Precondition
+  name: config_simnow
+  data:
+    id: 3
+    shortname: config_simnow
+    precondition: |
+      config:
+        guest_number: 0
+        runtime: 20
+        test_program: /bin/true
+        timeout_testprogram: 200
+      mountfile: /tmp/images/openSUSE11.1.hdd
+      mountpartition: p1
+      precondition_type: prc
+
+- schema: Precondition
+  name: hint_simnow
+  data:
+    id: 4
+    shortname: hint_simnow
+    precondition: |
+      precondition_type: hint
+      simnow: 1
+      script: family10_sles10_xen.simnow
+
+# -------------------- 
+
+- schema: TestrunPrecondition
+  name: 1st simnow
+  data:
+    testrun_id: 1
+    precondition_id: 1
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd simnow
+  data:
+    testrun_id: 1
+    precondition_id: 2
+    succession: 2
+
+- schema: TestrunPrecondition
+  name: 3rd simnow
+  data:
+    testrun_id: 1
+    precondition_id: 3
+    succession: 3
+
+- schema: TestrunPrecondition
+  name: 4rd simnow
+  data:
+    testrun_id: 1
+    precondition_id: 4
+    succession: 4

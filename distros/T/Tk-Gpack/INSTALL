@@ -1,0 +1,9 @@
+
+###################
+
+perl Makefile.PL 
+make install 
+
+####################
+
+Or simply copy lib/Tk/Gpack.pm to where ever your lib directory is. 

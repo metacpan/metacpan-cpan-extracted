@@ -1,0 +1,45 @@
+Revision history for Perl extension Tk::XPMs.
+
+1.11  Fri Nov  28 12:14:07 2008
+  - arrow_left_xpm 
+  - arrow_right_xpm
+  - most all arrows and some other xpms accept $color parameter
+  - test suite aborts when MainWindow->new is undefined. 
+
+1.10  Mon Nov  24 09:26:13 2008
+  - box_nonsel_xpm
+  - box_yellow_xpm
+  - box_sel_xpm
+
+1.09  Tue Sep  11 16:12:18 2007
+  - tools_1_xpm
+
+1.08  Tue Jun  12 13:45:16 2007
+  - Terminate test with $top->after(3000, ...)
+  - dias_xpm, money_xpm, filter_xpm, filter_switch_xpm
+
+1.07  Wed Oct  26 18:23:45 2005
+  - tools_xpm, stop_xpm, thumbs_xpm, eye_xpm, noeye_xpm, lock_xpm icons added
+
+1.06  Thu Mar  31 19:14:35 2005
+  - exit_xpm icon added
+
+1.05  Wed Mar  16 17:45:12 2005
+  - rotate_left_xpm and rotate_rigth_xpm
+
+1.04  Fri Feb  25 14:34:47 2005
+  - cross_xpm, info_xpm, zoom_in_xpm, zoom_out_xpm, search_xpm added
+  - arrow_left_blue_xpm, arrow_right_blue_xpm added
+  - cut/paste_normal_xpm, cut_paste_disabled_xpm added
+  - Name space changed: Local::Tk::XPMs  ->  Tk::XPMs
+
+1.03  Thu Sep 30 12:34:09 2004
+  - Testsuite enhanced
+
+1.02  Mon May 10 21:16:37 2004
+  - Arrow icons added
+
+1.01  Wed Apr 23 20:23:08 2003
+  - original version; created by h2xs 1.22 with options
+      -AX -n Local::Tk::XPMs
+

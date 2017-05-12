@@ -1,0 +1,4 @@
+Switch to allow either nulling or just return of unsupported characters ?
+
+To fully support unicode will require a good deal of research and fiddling, but probably needs doing.
+

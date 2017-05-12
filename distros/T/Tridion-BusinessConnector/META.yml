@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tridion-BusinessConnector
+version:      0.03
+version_from: lib/Tridion/BusinessConnector.pm
+installdirs:  site
+requires:
+    SOAP::Lite:                    0.6
+    XML::LibXML:                   1.5
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17
+license: LGPL

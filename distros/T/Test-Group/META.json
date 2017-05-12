@@ -1,0 +1,69 @@
+{
+   "abstract" : "Group together related tests in a test suite",
+   "author" : [
+      "Nick Cleaton <ncleaton@cpan.org>",
+      "Dominique Quatravaux <domq@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Group",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "IO::File" : "0",
+            "Test::Builder" : "0",
+            "Test::Cmd" : "0",
+            "Test::Simple" : "0.59"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Group" : {
+         "file" : "lib/Test/Group.pm",
+         "version" : "0.20"
+      },
+      "Test::Group::NoWarnings" : {
+         "file" : "lib/Test/Group/NoWarnings.pm",
+         "version" : "0.01"
+      },
+      "Test::Group::Plan" : {
+         "file" : "lib/Test/Group/Plan.pm",
+         "version" : "0.01"
+      },
+      "Test::Group::Tester" : {
+         "file" : "lib/Test/Group/Tester.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

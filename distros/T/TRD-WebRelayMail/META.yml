@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               TRD-WebRelayMail
+version:            0.0.5
+abstract:           メールを送れないホストからのWebメールリレーモジュール
+author:
+    - Takuya Ichikawa <ichi@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                0
+    CGI:                 0
+    LWP:                 0
+    Test::More:          0
+    Test::Perl::Critic:  0
+    version:             0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

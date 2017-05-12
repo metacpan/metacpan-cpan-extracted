@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Tie-Quicksort-Lazy.t
+lib/Tie/Quicksort/Lazy.pm
+META.yml                                 Module meta-data (added by MakeMaker)

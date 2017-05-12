@@ -1,0 +1,26 @@
+---
+abstract: 'Extract phrases from maketext–call–looking text'
+author:
+  - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Extract-MaketextCallPhrases
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Temp: '0'
+  Module::Want: '0.6'
+  String::Unquotemeta: '0'
+  Test::More: '0'
+  Text::Balanced: '0'
+version: '0.94'

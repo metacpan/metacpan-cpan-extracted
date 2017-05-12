@@ -1,0 +1,24 @@
+# typemap for Text::ClearSilver
+
+Text::ClearSilver::HDF	T_TCS_PTR
+Text::ClearSilver::CS	T_TCS_PTR
+Text__ClearSilver__HDF	T_TCS_PTR
+Text__ClearSilver__CS	T_TCS_PTR
+NEOERR*					T_TCS_NEOERR
+
+SV*volatile				T_SV
+
+#############################################################################
+INPUT
+T_TCS_PTR
+    $var = ($type)tcs_get_struct_ptr(aTHX_ $arg, \"$ntype\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\")
+
+#############################################################################
+OUTPUT
+T_TCS_PTR
+    sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+
+T_TCS_NEOERR
+    CHECK_ERR($var);
+    sv_setiv($arg, TRUE);

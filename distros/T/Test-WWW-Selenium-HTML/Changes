@@ -1,0 +1,9 @@
+Revision history for Test-WWW-Selenium-HTML
+
+0.02    5 November 2013
+        - Only execute the implicit open('/') once per object.
+        - Handle waitForPageToLoad.
+        - Display the HTML source when a timeout occurs.
+
+0.01    15 June 2012
+        - Initial release.

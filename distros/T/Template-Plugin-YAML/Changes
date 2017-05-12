@@ -1,0 +1,9 @@
+1.23    15th December, 2008
+        Fix the tests so we don't rely on golden output.  Should fix
+        most of the failing smoke cases.
+
+1.22	29th August, 2003
+	Adds undump, dumpfile, undumpfile as provided by Randal L. Schwartz
+
+1.21	30th July, 2003
+	Initial CPAN release

@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/parsing.t
+t/include_path.t
+t/include_path.tt2
+t/pod-coverage.t
+t/pod.t
+lib/Template/HTML.pm
+lib/Template/HTML/Context.pm
+lib/Template/HTML/Stash.pm
+lib/Template/HTML/Variable.pm
+META.yml                                 Module meta-data (added by MakeMaker)

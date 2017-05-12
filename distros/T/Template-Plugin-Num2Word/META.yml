@@ -1,0 +1,27 @@
+---
+abstract: 'Convert numbers to words in Template.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Template::Plugin::Num2Word
+name: Template-Plugin-Num2Word
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Lingua::EN::Numbers: 1.01
+  Lingua::Num2Word: 0.07
+  Template: 2.2
+  Template::Plugin::VMethods: 0.003
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.30

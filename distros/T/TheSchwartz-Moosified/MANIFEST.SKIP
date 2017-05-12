@@ -1,0 +1,10 @@
+.git
+debian
+install-stamp
+build-stamp
+_build
+blib
+Makefile
+Makefile.old
+Build
+^MYMETA.yml$

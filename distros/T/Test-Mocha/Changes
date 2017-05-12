@@ -1,0 +1,163 @@
+Revision history for Test-Mocha
+
+0.64    2015-09-30
+
+    Fixed a bug with TODO not being looked for in the right place
+    due to $Test::Builder::Level not being restored after being modified.
+    This wasn't detected due to a bug in a test. (Thanks exodist!).
+
+0.63    2015-09-05
+
+    Make the latest development release official.
+
+0.62_02 2015-08-14
+
+    - Use Devel::PartialDump again, since bug fixes have been released.
+    - Enable multiple method calls from multiple mocks/spies to be captured
+      simultaneously in stub(), called_ok(), or inspect().
+
+0.62_01 2015-08-05
+
+    - Cleared out the namespaces of Mock and Spy as much as possible to avoid
+      getting in the way of AUTOLOAD.
+    - Added tests to make sure we keep the namespacees clean.
+    - Resolved failing tests in t/called_ok.t caused by Test::More v0.98.
+      The issue was resolved in Test::More v0.98_05.
+    - Stop skipping test_out(qr//) tests for newer versions of
+      Test::Builder::Tester. The issue was resolved in Test::More v0.99_01.
+
+0.62    2015-07-24
+
+    - Introducing: spy() for creating spies.
+    - Restructured internals to use proper methods instead of avoiding
+      polluting namespace of mock objects. Their names begin with 2 underscores
+      to mark them as private to the distribution.
+
+0.61    2015-04-23
+
+    - Added class_mock() for mocking class methods and module functions
+      (Scott Davis)
+
+0.60_02 2014-10-28
+
+    - Fix travis-ci configuration.
+
+0.60_01 2014-10-04
+
+0.60    2014-08-22
+
+    - Added function prototypes to trim down syntax (API change).
+      stub() and inspect() are no longer backwards compatible for v0.21 API.
+    - Apply perltidy and perlcritic to code.
+
+0.50    2013-11-18  Major interface change
+
+    - dies() is now throws().
+    - verify() is now called_ok().
+    - stub(), called_ok() and inspect() now take a coderef with a method
+      spec instead of a mock object.
+    - Backwards compatibility has been maintained with deprecation warnings.
+    - Carp 1.11 is no longer supported.
+
+0.21_02 2013-10-24
+
+    - Enable isa(), DOES() and can() to be stubbed and verified.
+    - Fix test failure with Carp 1.11 where Carp::Heavy calls ref() on mocks.
+    - Skip failing tests with Test::Builder::Test 1.23_002 where
+      `test_out(qr//)` does not work because it tries to stringify `qr//`.
+
+0.21    2013-10-16
+
+    - Fix test failure with Carp 1.32 where CARP_TRACE is called on mocks.
+
+    [Internal modifications to Devel::PartialDump]
+    - Removed Moose dependency
+    - Removed all functions (only dump() remains as a method)
+    - Minor bug fixes:
+        - 'list_delim' attribute is now used to separate lists.
+        - 'max_length' attribute with value 0 now dumps '...'.
+        - Object dumps have '=' after the class name.
+
+0.20    2013-10-11
+
+    - Allow ref() to be stubbed.
+    - Provide better diagnostics with method call history and caller info
+      when verify() fails.
+    - Make Moose an optional prerequisite.
+
+0.19    2013-09-18
+
+    - Add inspect_all() function.
+    - Remove Exception::Tiny test dependency.
+    - Fix returns() and dies() when no arguments.
+
+0.18    2013-09-13
+
+    - Fix tests for Perl versions older than 5.014 (operator precedence for
+      bitwise '&').
+    - Make matcher_moose.t optional using Test::Requires.
+    - Stub executes() should be given mock $self as its first argument.
+
+0.17    2013-09-10
+
+    - Set version dependency for Types::Standard to 0.008 when InstanceOf
+      was introduced.
+
+0.16    2013-09-04
+
+    - Fix for Perl versions older than 5.014 (s/// operator with /r switch).
+
+0.15    2013-09-02
+
+    - Don't let AUTOLOAD() handle DESTROY().
+    - Added stubbing with callbacks.
+
+0.14    2013-08-30
+
+    - Made inspect() public.
+    - Removed Moose and other dependencies.
+
+0.13    2013-08-26
+
+    - Distribution fix (no modules were provided).
+
+0.12    2013-08-26
+
+    - Added support for using Type::Tiny type constraints as matchers.
+
+0.11    2013-08-16
+
+    - Forked from Test-Magpie.
+    - Removed deprecated functions.
+    - Refined documentation.
+
+0.10    2013-08-12
+
+    - Changed when->then_return to stub->returns.
+
+    [Stub behaviour changed to match Mockito]
+    - The last stubbed response persists.
+    - New stubs take precedence over older stubs.
+
+0.09    2013-08-03
+
+    - Export main functions by default.
+    - Add optional parameter $test_name to verify().
+
+0.08    2013-07-22
+
+    - Fixed use of smartmatching and removed warnings
+    - Improved verify() print messages
+    - Added Mock::can() method
+
+0.07    2013-07-15
+
+    - Deprecated at_least() and at_most() functions.
+    - Added verify() options: at_least, at_most and between.
+    - Added argument checks for public functions.
+    - Added more comprehensive tests.
+
+0.06    2013-07-03
+
+    - Enable calling ref() on mock object to return a specified type.
+

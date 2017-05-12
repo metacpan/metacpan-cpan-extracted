@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Text-Restructured
+version:             0.003045
+abstract:            Perl implementation of reStructuredText parser
+license:             ~
+author:              
+    - Mark Nodine <mnodine@alum.mit.edu>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    HTML::Entities:                0
+    Safe::World:                   0
+    Slay::Makefile::Gress:         0
+    Text::ASCIIMathML:             0.5
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

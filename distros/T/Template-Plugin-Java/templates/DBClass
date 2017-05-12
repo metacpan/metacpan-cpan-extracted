@@ -1,0 +1,214 @@
+// Generated database class.
+[%# vim: set syntax=java: %]
+[% USE Java %]
+[% USE JavaSQL %]
+[% PROCESS FileHeader %]
+[% PROCESS ClassHeader %]
+{
+Connection myConnection;
+ResultSet myResults;
+
+Hashtable mySelectQueries = new Hashtable();
+[% IF JavaSQL.updatable %]
+PreparedStatement myInsert;
+PreparedStatement myUpdate;
+PreparedStatement myDelete;
+[% END %]
+
+[% PROCESS DataDeclarations %]
+[% FOREACH JavaSQL.columns %]
+boolean ${varName}Set = false;
+[% END %]
+
+public $class (Connection connection
+[%- FOREACH JavaSQL.columns -%]
+, $type $varName
+[% END %])
+throws SQLException
+{
+[% FOREACH JavaSQL.columns %]
+	this.$varName	= $varName;
+[% END %]
+	init(connection);
+}
+
+public $class(Connection connection)
+throws SQLException
+{
+	init(connection);
+}
+
+public $class(InputSource from) throws Exception { set(from); }
+
+public $class(Connection connection, InputSource from)
+throws Exception
+{
+	init(connection);
+	set(from);
+}
+
+public void init(Connection connection)
+throws SQLException
+{
+	myConnection = connection;
+[% IF variables.maxRows %]
+	maxRows = [% variables.maxRows %]
+[% END %]
+[% IF JavaSQL.updatable %]
+	String query;
+	query  = "insert into [% JavaSQL.tables.first %] ( 
+[%- JavaSQL.columnNames.join(', ') -%] )";
+	query += " values ( 
+[%- PERL -%]
+# Make a string with the right number of ?, ?, ?, ... ?
+substr ('?, ' x [% JavaSQL.columnCount %], 0, -2)
+[% END %] )";
+	myInsert = myConnection.prepareStatement(query);
+
+	query  = "update [% JavaSQL.tables.first %] ";
+	query += "set 
+[%- PERL -%]
+join ", ", (
+[%	FOREACH JavaSQL.columns %]
+"[% name %] = ?",
+[%	END %]
+);
+[%  END %]";
+	query += "where 0=0 
+[%- FOREACH JavaSQL.columns -%]
+and $name = ? 
+[% END %]";
+	myUpdate = myConnection.prepareStatement(query);
+
+	query  = "delete from [% JavaSQL.tables.first %] ";
+	query += "where 0=0 
+[%- FOREACH JavaSQL.columns -%]
+and $name = ? 
+[% END %]";
+	myDelete = myConnection.prepareStatement(query);
+[% END %]
+}
+
+[% FOREACH Java.variables %]
+public $type get$capName() { return $name; }
+public void set$capName($type $name) { this.$name = $name;
+[%-	IF JavaSQL.isColumn -%]
+ ${name}Set = true;
+[%	END %] }
+[% END %]
+
+public void find()
+throws SQLException
+{
+	String query_key = "";
+[% FOREACH JavaSQL.columns %]
+	if (${varName}Set) { query_key += "$name"; }
+[% END %]
+
+	PreparedStatement stmt;
+
+	if (mySelectQueries.containsKey((Object)query_key)) {
+		stmt = (PreparedStatement)(mySelectQueries.get((Object)query_key));
+	} else {
+		String query =
+"select [% JavaSQL.columnNames.join(", ") %] from [% JavaSQL.tables.join(", ") %]";
+[% IF JavaSQL.where %]
+		query += " where [% JavaSQL.where %] ";
+[% ELSE %]
+		query += " where 0=0 ";
+[% END %]
+[% FOREACH JavaSQL.columns %]
+		if (${varName}Set) { query += " and $name = ?"; }
+[% END %]
+[% IF JavaSQL.order %]
+		query += "order by [% JavaSQL.order %]";
+[% END %]
+		stmt = myConnection.prepareStatement(query);
+[% IF variables.maxRows %]
+		stmt.setMaxRows(maxRows);
+[% END %]
+		mySelectQueries.put((Object)query_key, (Object)stmt);
+	}
+	int parameter_index = 1;
+[% FOREACH JavaSQL.columns %]
+	[% IF capType == "Byte[]" %]
+	[% 	capType = "Bytes" %]
+	[% END %]
+	if (${varName}Set) { stmt.set$capType(parameter_index++, $varName); }
+[% END %]
+	myResults = stmt.executeQuery();
+}
+
+public boolean next()
+throws SQLException
+{
+	if (myResults == null) { find(); }
+
+	if (!myResults.next()) {
+		myResults = null;
+		return false;
+	}
+[% FOREACH JavaSQL.columns %]
+	[% IF capType == "Byte[]" %]
+	[% 	capType = "Bytes" %]
+	[% END %]
+	$varName	= myResults.get$capType($position);
+
+[% END %]
+	return true;
+}
+[% IF JavaSQL.updatable %]
+public void store()
+throws SQLException
+{
+	PreparedStatement stmt;
+	if (myResults == null) {
+		stmt = myInsert;
+	} else {
+		stmt = myUpdate;
+	}
+[% FOREACH JavaSQL.columns %]
+	[% IF capType == "Byte[]" %]
+	[% 	capType = "Bytes" %]
+	[% END %]
+	stmt.set$capType($position, $varName);
+[% END %]
+
+	if (myResults != null) {
+[% FOREACH JavaSQL.columns %]
+	[% IF capType == "Byte[]" %]
+	[% 	capType = "Bytes" %]
+	[% END %]
+		stmt.set$capType([% JavaSQL.columnCount + position %], myResults.get$capType($position));
+[% END %]
+	}
+
+	stmt.executeUpdate();
+}
+
+public void remove()
+throws SQLException
+{
+[% FOREACH JavaSQL.columns %]
+	[% IF capType == "Byte[]" %]
+	[% 	capType = "Bytes" %]
+	[% END %]
+	myDelete.set$capType($position, $varName);
+[% END %]
+	myDelete.executeUpdate();
+}
+[% END %]
+public void reset()
+throws SQLException
+{
+[% FOREACH JavaSQL.columns %]
+	$varName	= [% initializer || "null" %];
+	${varName}Set	= false;
+[% END %]
+	myResults = null;
+}
+
+[% PROCESS XMLEncode  %]
+[% PROCESS ParseFromXML %]
+$append
+} // End class ${class}.

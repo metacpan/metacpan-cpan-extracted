@@ -1,0 +1,8 @@
+Build.PL
+lib/Tie/Select.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/00-use.t
+t/nested.t

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/Deep/JSON.pm
+t/00_compile.t
+t/01_test.t
+xt/02_perlcritic.t
+xt/04_pod_coverage.t
+xt/05_kwalitee.t
+xt/perlcriticrc
+META.yml
+MANIFEST

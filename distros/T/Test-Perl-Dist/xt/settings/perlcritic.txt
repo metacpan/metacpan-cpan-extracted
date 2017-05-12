@@ -1,0 +1,29 @@
+verbose = %f:%l:%c:\n %p: %m\n
+theme = (core || more)
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | INTERFACE | CONFIGURATION AND ENVIRONMENT | DEPENDENCIES | INCOMPATIBILITIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 7
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[Modules::PerlMinimumVersion]
+version = 5.008001
+
+[ValuesAndExpressions::ProhibitMagicNumbers]
+allowed_values = 0..10
+
+# Exclusions
+[-CodeLayout::ProhibitHardTabs]
+[-Modules::ProhibitAutomaticExportation]
+[-ValuesAndExpressions::RequireConstantVersion]
+[-BuiltinFunctions::ProhibitStringyEval]
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+[-Miscellanea::RequireRcsKeywords]
+[-Subroutines::RequireArgUnpacking]
+# [-Documentation::RequirePodSections]
+[-Editor::RequireEmacsFileVariables]

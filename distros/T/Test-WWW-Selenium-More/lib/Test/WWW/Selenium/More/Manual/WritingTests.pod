@@ -1,0 +1,99 @@
+package Test::WWW::Selenium::More::Manual::WritingTests;
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::WritingTests
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::WritingTests
+
+=head1 A BASIC SELENIUM TEST
+
+    # in the file t/test.t write the following code:
+    use Test::Most;
+    use Test::WWW::Selenium::More;
+
+    my $s = Test::WWW::Selenium::More->new( 
+        host           => "localhost", # selenium server host
+        port           => 4444,        # selenium server port
+        browser        => "*firefox",
+        browser_url    => "http://www.google.com",
+        # default_names  => 1,           # TODO: not yet implemented
+        # error_callback => sub { ... }, # TODO: not yet implemented
+    );
+
+    $s->open_ok("http://www.google.com", undef, "fetched G's site alright");
+    $s->type_ok( "q", "hello world");
+    $s->click_ok("btnG");
+    $s->wait_for_page_to_load_ok(5000);
+    $s->title_like(qr/Google Search/);
+    $s->error_callback(sub {...});
+
+    done_testing;
+
+=head1 COMPOSING YOUR TESTS USING ROLES
+
+Lets say you decided to use Test::WWW::Selenium::More, but you want to add your
+own custom methods.  Instead of extending Test::WWW::Selenium::More, try
+grouping your methods by subject using Moose roles.  Here is an example.
+
+    # Create a role
+    package MySeleniumRoles::Auth;
+    use Moose::Role;
+
+    sub login_ok {
+        my ($self, $username, $password) = @_;
+        $self->open_ok('/login');
+        $self->is_text_present_ok('Please login thanks');
+        $self->type_ok('username' => $username);
+        $self->type_ok('password' => $password);
+        $self->follow_link_ok('login');
+    }
+
+    sub logout_ok {
+        my ($self, $username, $password) = @_;
+        $self->follow_link_ok('logout');
+        $self->is_text_present_ok('Goodbye');
+    }
+
+    # Subclass Test::WWW::Selenium::More
+    package MySelenium;
+    use Moose;
+    extends 'Test::WWW::Selenium::More';
+    with 'MySeleniumRoles::Auth';
+
+
+    # Use MySelenium in your test
+    use Test::Most;
+    use MySelenium;
+
+    MySelenium->new(...)
+        ->login_ok('Bartholomew', 'h@ts');
+        ->title_like(qr/Thanks for logging in Bartholomew/);
+
+    done_testing;
+
+=head1 METHOD CHAINING
+
+TODO
+
+=head1 AUTHOR
+
+Eric Johnson <kablamo at iijo dot nospamthanks dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Eric Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

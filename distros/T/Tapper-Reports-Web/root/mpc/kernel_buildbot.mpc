@@ -1,0 +1,484 @@
+# tapper-description: Build a kernel with Buildbot and test it with autotest (recommended kernelbuild)
+# tapper-optional-fields: changeset
+# tapper-config-file: buildbot.yml
+### Usecase: Build a kernel using Buildbot and test it with autotest 
+### Buildbot allows you to build kernels from git. It is well tested and stable. If your
+### test kernel is in one of the repositories it offers you should prefer this use case over
+### the build without Buildbot.
+###
+### Mandatory fields:
+###
+###  - repository:     One of stable2, stable3, stable, longterm, linus, mce, fsa, kfd, 
+###                    boris, robert, andreas, hans, hans-tip, simnow, sim-orochi, tip
+###
+### Optional fields:
+###
+###  - changeset: a branch name or commit ID or anything that git checkout understands
+###                   (default is HEAD)
+###
+###
+###  - Tests:          Choose one or more workloads to run on this kernel;
+###                    possible values are:
+###                      - Cerberus   - CTCS test suite
+###                      - LMBench    - LMbench benchmark suite
+###                      - LTP        - Linux Test Project test suite
+###                      - Kernbench  - Kernbench benchmark suite
+###                      - ReAim      - ReAim benchmark suite
+###                      - LLC        - LLC benchmark suite
+###                      - Hackbench  - Hackbench benchmark suite
+###                      - Tiobench   - Tiobench benchmark suite
+###                      - DBench     - DBench benchmark suite
+---
+arch: linux64
+image: debian_base64.tgz
+mount: /
+partition: sda2
+precondition_type: image
+---
+precondition_type: produce
+buildserver: acid
+producer: Builder
+repository: [% repository %]
+[% IF version %]
+version: [% changeset %]
+[% END %]
+---
+precondition_type: testprogram
+program: /opt/tapper/perl/perls/current/bin/tapper-testsuite-autotest
+parameters:
+[% IF (Tests.qemu_iotests) or (Tests == 'qemu_iotests') %]
+  - -t
+  - qemu_iotests
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.iperf) or (Tests == 'iperf') %]
+  - -t
+  - iperf
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.linus_stress) or (Tests == 'linus_stress') %]
+  - -t
+  - linus_stress
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.iosched_bugs) or (Tests == 'iosched_bugs') %]
+  - -t
+  - iosched_bugs
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.fsstress) or (Tests == 'fsstress') %]
+  - -t
+  - fsstress
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.sparse) or (Tests == 'sparse') %]
+  - -t
+  - sparse
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.sysbench) or (Tests == 'sysbench') %]
+  - -t
+  - sysbench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.dbench) or (Tests == 'dbench') %]
+  - -t
+  - dbench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.fsfuzzer) or (Tests == 'fsfuzzer') %]
+  - -t
+  - fsfuzzer
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.ipv6connect) or (Tests == 'ipv6connect') %]
+  - -t
+  - ipv6connect
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.stress) or (Tests == 'stress') %]
+  - -t
+  - stress
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.fio) or (Tests == 'fio') %]
+  - -t
+  - fio
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.libhugetlbfs) or (Tests == 'libhugetlbfs') %]
+  - -t
+  - libhugetlbfs
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.kvm) or (Tests == 'kvm') %]
+  - -t
+  - kvm
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.fsx) or (Tests == 'fsx') %]
+  - -t
+  - fsx
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.selftest) or (Tests == 'selftest') %]
+  - -t
+  - selftest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.bash_shared_mapping) or (Tests == 'bash_shared_mapping') %]
+  - -t
+  - bash_shared_mapping
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.dbt2) or (Tests == 'dbt2') %]
+  - -t
+  - dbt2
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.signaltest) or (Tests == 'signaltest') %]
+  - -t
+  - signaltest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.isic) or (Tests == 'isic') %]
+  - -t
+  - isic
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.barriertest) or (Tests == 'barriertest') %]
+  - -t
+  - barriertest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.btreplay) or (Tests == 'btreplay') %]
+  - -t
+  - btreplay
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.systemtap) or (Tests == 'systemtap') %]
+  - -t
+  - systemtap
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.tiobench) or (Tests == 'tiobench') %]
+  - -t
+  - tiobench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.iozone) or (Tests == 'iozone') %]
+  - -t
+  - iozone
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.fsdev) or (Tests == 'fsdev') %]
+  - -t
+  - fsdev
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.cerberus) or (Tests == 'cerberus') %]
+  - -t
+  - cerberus
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.reaim) or (Tests == 'reaim') %]
+  - -t
+  - reaim
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.profiler_test) or (Tests == 'profiler_test') %]
+  - -t
+  - profiler_test
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.pi_tests) or (Tests == 'pi_tests') %]
+  - -t
+  - pi_tests
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.rmaptest) or (Tests == 'rmaptest') %]
+  - -t
+  - rmaptest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.hwclock) or (Tests == 'hwclock') %]
+  - -t
+  - hwclock
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.bonnie) or (Tests == 'bonnie') %]
+  - -t
+  - bonnie
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.error_test_fail) or (Tests == 'error_test_fail') %]
+  - -t
+  - error_test_fail
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.dacapo) or (Tests == 'dacapo') %]
+  - -t
+  - dacapo
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.cpu_hotplug) or (Tests == 'cpu_hotplug') %]
+  - -t
+  - cpu_hotplug
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.spew) or (Tests == 'spew') %]
+  - -t
+  - spew
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.perfmon) or (Tests == 'perfmon') %]
+  - -t
+  - perfmon
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.npb) or (Tests == 'npb') %]
+  - -t
+  - npb
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.error_test_na) or (Tests == 'error_test_na') %]
+  - -t
+  - error_test_na
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.error_initialize) or (Tests == 'error_initialize') %]
+  - -t
+  - error_initialize
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.error_skip_step) or (Tests == 'error_skip_step') %]
+  - -t
+  - error_skip_step
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.error_test_bug) or (Tests == 'error_test_bug') %]
+  - -t
+  - error_test_bug
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.monotonic_time) or (Tests == 'monotonic_time') %]
+  - -t
+  - monotonic_time
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.error_cleanup) or (Tests == 'error_cleanup') %]
+  - -t
+  - error_cleanup
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.unixbench5) or (Tests == 'unixbench5') %]
+  - -t
+  - unixbench5
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.cyclictest) or (Tests == 'cyclictest') %]
+  - -t
+  - cyclictest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.netpipe) or (Tests == 'netpipe') %]
+  - -t
+  - netpipe
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.aiostress) or (Tests == 'aiostress') %]
+  - -t
+  - aiostress
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.compilebench) or (Tests == 'compilebench') %]
+  - -t
+  - compilebench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.real_time_tests) or (Tests == 'real_time_tests') %]
+  - -t
+  - real_time_tests
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.lmbench) or (Tests == 'lmbench') %]
+  - -t
+  - lmbench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.disktest) or (Tests == 'disktest') %]
+  - -t
+  - disktest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.memory_api) or (Tests == 'memory_api') %]
+  - -t
+  - memory_api
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.synctest) or (Tests == 'synctest') %]
+  - -t
+  - synctest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.unixbench) or (Tests == 'unixbench') %]
+  - -t
+  - unixbench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.pktgen) or (Tests == 'pktgen') %]
+  - -t
+  - pktgen
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.hackbench) or (Tests == 'hackbench') %]
+  - -t
+  - hackbench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.parallel_dd) or (Tests == 'parallel_dd') %]
+  - -t
+  - parallel_dd
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.posixtest) or (Tests == 'posixtest') %]
+  - -t
+  - posixtest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.ltp) or (Tests == 'ltp') %]
+  - -t
+  - ltp
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.interbench) or (Tests == 'interbench') %]
+  - -t
+  - interbench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.error_test_error) or (Tests == 'error_test_error') %]
+  - -t
+  - error_test_error
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.ebizzy) or (Tests == 'ebizzy') %]
+  - -t
+  - ebizzy
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.download) or (Tests == 'download') %]
+  - -t
+  - download
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.fs_mark) or (Tests == 'fs_mark') %]
+  - -t
+  - fs_mark
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.kvmtest) or (Tests == 'kvmtest') %]
+  - -t
+  - kvmtest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.tbench) or (Tests == 'tbench') %]
+  - -t
+  - tbench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.aborttest) or (Tests == 'aborttest') %]
+  - -t
+  - aborttest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.aio_dio_bugs) or (Tests == 'aio_dio_bugs') %]
+  - -t
+  - aio_dio_bugs
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.kernbench) or (Tests == 'kernbench') %]
+  - -t
+  - kernbench
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.uptime) or (Tests == 'uptime') %]
+  - -t
+  - uptime
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.kernelbuild) or (Tests == 'kernelbuild') %]
+  - -t
+  - kernelbuild
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.dma_memtest) or (Tests == 'dma_memtest') %]
+  - -t
+  - dma_memtest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.wb_kupdate) or (Tests == 'wb_kupdate') %]
+  - -t
+  - wb_kupdate
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.tsc) or (Tests == 'tsc') %]
+  - -t
+  - tsc
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.scrashme) or (Tests == 'scrashme') %]
+  - -t
+  - scrashme
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.netperf2) or (Tests == 'netperf2') %]
+  - -t
+  - netperf2
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.profiler_sync) or (Tests == 'profiler_sync') %]
+  - -t
+  - profiler_sync
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.flail) or (Tests == 'flail') %]
+  - -t
+  - flail
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.tracing_microbenchmark) or (Tests == 'tracing_microbenchmark') %]
+  - -t
+  - tracing_microbenchmark
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.lsb_dtk) or (Tests == 'lsb_dtk') %]
+  - -t
+  - lsb_dtk
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.sleeptest) or (Tests == 'sleeptest') %]
+  - -t
+  - sleeptest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.rtc) or (Tests == 'rtc') %]
+  - -t
+  - rtc
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.xmtest) or (Tests == 'xmtest') %]
+  - -t
+  - xmtest
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.rttester) or (Tests == 'rttester') %]
+  - -t
+  - rttester
+[% Timeout=Timeout+10800 %]
+[% END %]
+[% IF (Tests.error_setup) or (Tests == 'error_setup') %]
+  - -t
+  - error_setup
+[% Timeout=Timeout+10800 %]
+[% END %]
+timeout: [% Timeout %]

@@ -1,0 +1,41 @@
+graph ER {
+	node [label="\N", shape=box];
+	graph [label="\n\nEntity Relation Diagram\ndrawn by NEATO"];
+	graph [fontsize=20];
+	graph [lp="177,48"];
+	graph [bb="0,0,355,790"];
+	{
+		graph [label=""];
+		graph [fontsize=""];
+		graph [lp=""];
+		graph [bb=""];
+		node [label=name];
+		node [shape=ellipse];
+		node [style=""];
+		node [color=""];
+		name0 [pos="253,668", width="0.83", height="0.50"];
+		name1 [pos="119,312", width="0.83", height="0.50"];
+		name2 [pos="30,124", width="0.83", height="0.50"];
+	}
+	course [pos="290,594", width="0.78", height="0.50"];
+	institute [pos="195,406", width="0.94", height="0.50"];
+	student [pos="190,218", width="0.89", height="0.50"];
+	code [shape=ellipse, pos="328,668", width="0.75", height="0.50"];
+	grade [shape=ellipse, pos="108,124", width="0.83", height="0.50"];
+	number [shape=ellipse, pos="194,124", width="1.06", height="0.50"];
+	"C-I" [shape=diamond, style=filled, color=lightgrey, pos="214,500", width="0.83", height="0.56"];
+	"S-C" [shape=diamond, style=filled, color=lightgrey, pos="285,124", width="0.89", height="0.56"];
+	"S-I" [shape=diamond, style=filled, color=lightgrey, pos="195,312", width="0.78", height="0.56"];
+	name0 -- course [pos="262,650 268,639 275,624 281,612"];
+	code -- course [pos="319,651 313,639 305,624 299,612"];
+	course -- "C-I" [label=n, len="1.00", pos="272,576 266,570 260,564 255,558 243,543 231,526 223,514", lp="269,548"];
+	"C-I" -- institute [label=1, len="1.00", pos="210,482 207,466 202,441 199,424", lp="217,452"];
+	institute -- name1 [pos="180,388 166,371 145,345 132,328"];
+	institute -- "S-I" [label=1, len="1.00", pos="195,388 195,372 195,349 195,332", lp="204,360"];
+	"S-I" -- student [label=n, len="1.00", pos="194,293 193,276 192,252 191,236", lp="205,264"];
+	student -- grade [pos="174,200 159,183 136,157 122,140"];
+	student -- name2 [pos="158,209 113,189 71,157 48,139"];
+	student -- number [pos="191,200 192,184 193,159 193,142"];
+	student -- "S-C" [label=m, len="1.00", pos="208,200 227,182 256,153 273,136", lp="261,172"];
+	"S-C" -- course [label=n, len="1.00", pos="291,576 291,557 292,526 292,500 292,500 292,500 292,218 292,192 289,162 287,143", lp="303,360"];
+}

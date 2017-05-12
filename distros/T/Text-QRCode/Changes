@@ -1,0 +1,22 @@
+Revision history for Text-QRCode
+
+0.05    Wed Oct 12 04:30:17 GMT 2016
+        - Add 'defined' to check $text is set '0'(https://rt.cpan.org/Ticket/Display.html?id=117724).
+
+0.04    Tue Apr  1 04:12:18 GMT 2014
+        - Add '--cflags' option to pkg-config for when installed libqrencode
+          in an unusual directory(debug-ito).
+
+0.03    Thu Mar  6 08:57:19 GMT 2014
+        - Fix to avoid to conflict 'PKG_CONFIG_PATH' env name(ytnnobody).
+
+0.02    Fri May 17 06:12:20 GMT 2013
+        - Use pkg-config for finding libqrencode.
+        - Use QRcode_encodeString() when 'kanji' mode set.
+        - Fix typo.
+        - A inc/ updated for deprecated methods.
+        - Fix for build and link errors in some platform(debug-ito)
+ 
+0.01    Fri Oct 31 05:37:44 GMT 2008
+        First version, released on an unsuspecting world.
+

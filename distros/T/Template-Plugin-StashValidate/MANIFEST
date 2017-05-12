@@ -1,0 +1,12 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/Template/Plugin/StashValidate.pm
+t/01_sanity.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

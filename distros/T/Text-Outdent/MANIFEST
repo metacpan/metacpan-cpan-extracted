@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Text/Outdent.pm
+t/010basic.t
+t/021outdent.t
+t/022outdent_all.t
+t/023heredocify.t
+t/024expand_leading_tabs.t
+META.yml                                 Module meta-data (added by MakeMaker)

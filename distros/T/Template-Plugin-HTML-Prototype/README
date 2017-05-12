@@ -1,0 +1,32 @@
+Template/Plugin/HTML/Prototype version 0.01
+===========================================
+
+This module provides a simple interface to the Prototype JavaScript OO library
+for use in the Template Toolkit. 
+
+It directly returns a L<HTML::Prototype> object, so you can call all methods 
+here. Please refer to the documentation for L<HTML::Prototype> for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Template
+  HTML::Prototype
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Bernhard Bauer <bauerb@in.tum.de>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

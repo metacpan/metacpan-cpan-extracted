@@ -1,0 +1,110 @@
+Revision history for Perl extension Text::CSV::Separator
+
+0.20  November 2, 2008
+
+    * Minor changes in the documentation
+
+0.19  December 4, 2007
+
+    * More cosmetic changes
+
+0.18  November 30, 2007
+
+    * Minor cosmetic changes
+
+0.17  November 29, 2007
+   
+    * Removed the restriction of the 'on' value to activate the echo option.
+      Now it will work with every true value.
+    * Changed the sample standard deviation formula to fix an 'Illegal division
+      by zero' bug detected by Mario Krauss that shows up in single-line csv
+      files for which it is not possible to determine the field separator
+      (the previous versions used the "sample" standard deviation formula,
+      with an N-1 denominator).
+    * Updated the documentation.
+
+0.16  September 20, 2007
+
+    * Edited Makefile.PL to include the license field in META.yml
+      and change the contact e-mail address 
+
+0.15  April 6, 2007
+    
+    * Fixes in the example scripts
+
+0.14  April 6, 2007
+
+    * Minor fixes in Changes file
+    * META.yml conforms to spec 1.0
+    * Added an examples folder to the distribution
+
+0.13  February 26, 2007
+
+    * Code cleanup
+    * Updated the documentation
+
+0.12  February 16, 2007
+
+    * Some code improvements
+
+0.11  February 15, 2007
+
+    * Included new heuristics to reinforce the 2nd pass.
+      Now the function tries to detect regularities which can lead to false
+      positives in headerless files, like columns containing time values,
+      comma-separated decimal numbers and numbers containing the comma as the
+      group character (the last two cases are usual in some locales, like
+      German or Spanish).
+    * Changed several croaks to carps. If no candidate passes the tests,
+      get_separator returns undef in scalar context and an empty list in
+      array context.
+    * Updated (and improved) the documentation.
+    * Added more tests.
+
+0.10  November 6, 2006
+     
+     * Updated 2 tests
+     * Updated the Readme
+     * Changed the contact e-mail address in the doc
+
+0.09  July 13, 2006
+
+    * Fixed a POD bug
+
+0.08  July 13, 2006
+
+    * Added a couple of POD tests
+
+0.07  May 14, 2006
+
+    * Code cleanup
+
+0.06  May 2, 2006
+
+    * Fixed an indentation bug in the documentation
+
+0.05  May 2, 2006
+
+    * Added the 'echo' option
+    * Updated the documentation
+    * Added the References section
+
+0.04  April 14, 2006
+
+    * Fixed a typo
+
+0.03  April 14 2006
+
+    * Added the I'm Feeling Lucky alternative interface
+    * Updated the documentation
+
+0.02  April 13 2006
+
+    * Improved the error messages
+    * Changed EXPORT to EXPORT_OK
+    * Improved the documentation
+
+0.01  March 27 2006
+
+    * First version
+

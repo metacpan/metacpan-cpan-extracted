@@ -1,0 +1,18 @@
+This is version 2017040101 of Test::Regexp, a module to test regular
+expressions with.
+
+It's a pure perl module, and should install anywhere using
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+The module requires Perl 5.10 or later. It will not work on 5.8.x or
+before, and there are no plans to backport it.
+
+Development versions can be retrieved from github.
+
+
+Abigail, test-regexp@abigail.be

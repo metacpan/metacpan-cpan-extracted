@@ -1,0 +1,6 @@
+Revision history for Perl extension Telephone::Lookup::Americom.
+
+0.01  Thu Nov 13 14:57:01 2003
+	- original version; created by h2xs 1.23 with options
+		-AX Telephone::Lookup::Americom
+

@@ -1,0 +1,13 @@
+severity = brutal
+verbose = 9
+exclude = Documentation::RequirePodLinksIncludeText Editor::RequireEmacsFileVariables ErrorHandling::RequireUseOfExceptions
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+[Documentation::PodSpelling]
+stop_words = cPanel coderef filehandle BINMODE EOF GETC prepend PerlIO Prepends POSIX PRINTF READLINE timestamp timestamps TIEHANDLE
+
+[Documentation::RequirePodSections]
+language = en_US
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | METHODS | REQUIRES | BUGS AND LIMITATIONS | AUTHOR | COPYRIGHT AND LICENSE

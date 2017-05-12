@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Time/Progress.pm
+README
+t/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

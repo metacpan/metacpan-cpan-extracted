@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use Test::Metadata;
+use Test::Parser::KernelBuild;
+
+my $parser = new Test::Parser::KernelBuild;
+my $input = ($#ARGV < 0)? \*STDIN : $ARGV[0];
+$parser->parse($input);
+
+my $metadata = new Test::Metadata;
+$metadata->add_build($parser);
+
+my $platform = `uname -sm`;
+chomp $platform;
+
+$metadata->properties({
+    description => "Kernel build test",
+    summary => "Kernel build test",
+    license => "GPL",
+    product => "Linux kernel",
+    version => "2.6.x",
+    release => "2.6.x",
+    url => "http://www.kernel.org",
+    root => "http://developer.osdl.org/dev/nfsv4/results/80",
+    platform => $platform,
+});
+
+print $metadata->to_xml();
+

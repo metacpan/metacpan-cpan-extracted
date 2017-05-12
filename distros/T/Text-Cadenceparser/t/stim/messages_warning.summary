@@ -1,0 +1,32 @@
+
+  =================
+   Message Summary
+  =================
+
+Num   Sev      Id                       Message Text                    
+------------------------------------------------------------------------
+340 Warning CHNM-110 Failed to change names.                            
+  3 Warning PHYS-61  Expected data not found.                           
+                     The inclusion of this data is not required,        
+                     however it is highly recommended in order to       
+                     achieve the best result. Rerun the command after   
+                     supplying the data.                                
+  1 Warning POPT-26  Inserting hierarchical clock-gating.               
+                     The addition of new ports at the subdesign         
+                     boundaries might cause issues during formal        
+                     verification. If this is not acceptable, set the   
+                     attribute 'lp_clock_gating_hierarchical' to        
+                     'false' to turn off hierarchical clock-gating and  
+                     restart synthesis.                                 
+  1 Warning POPT-33  Failed to connect test signal to clock-gating      
+                     logic.                                             
+                     Define the test signal using the 'define_dft       
+                     test_mode' or the 'define_dft shift_enable'        
+                     command. Set the 'lp_clock_gating_test_signal'     
+                     attribute on the design or clock-gating            
+                     instance(s). Then rerun the 'clock_gating          
+                     connect_test' command.                             
+  4 Warning TIM-11   Possible timing problems have been detected in     
+                     this design.                                       
+                     Use 'report timing -lint' for more information.    
+

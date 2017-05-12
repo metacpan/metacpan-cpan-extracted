@@ -1,0 +1,48 @@
+Revision history for Perl extension Text::CSV::Track, Track::Max, Track::Min.
+
+0.8 2007 Nov 1
+    - safe path to test tempfile (none :)
+    - removed unknown Text::CSV_XS option - type
+
+0.7 2007 Oct 29
+    - cpants changes
+      pod & pod-coverage
+    - licence
+    - META.yml
+
+0.6 2007 Apr 6
+	- 'identificator_column_number' allows identificator to be in a different column
+	- replaced Text::CSV by Text::CSV_XS because that is the right one
+	- footer lines support added
+
+0.5 2007 Apr 4
+	- fixed Track::Max was requesting perl 5.008 by exident
+	- File::Slurp as dependency
+	- when storing values with new lines, by default replaced by '|' can be changed by 'replace_new_lines_with' parameter
+	- storing as binary data by default because of national characters
+	- error in generating csv line during store() will not corrupt .csv file
+
+0.4 2007
+	- trunc option
+	- fixed adding empty header lines if some missing
+	- hash_of() set functionality
+	- header lines can be defined in new
+
+0.3   Jan 18 2007
+	- multi column csv support for Track
+	- fixed bug with deleting field while lazy initialization was not trigered
+	- ignore_badly_formated option added
+	- csv_line_of($ident) method added
+	- formating of csv can be defined
+	- header lines support added
+	- hash_of() added
+	- single column files tracking support
+
+0.2   Jan 02 2007
+	- typing errors in comments corrected
+	- prerequisities changed no more Class::Accessor::Fast => 0.22 (it was there by exident)
+	- small cleanup
+	- todo list added
+
+0.1   Dec 29 2006
+	- created to track answer from survey

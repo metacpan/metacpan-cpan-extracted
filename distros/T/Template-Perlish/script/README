@@ -1,0 +1,5 @@
+tptree is a feeble attempt to have ttree functionalities in one companion
+script. It relies on Template::Perlish being available somewhere.
+
+As another bonus, you can generate a fully self-contained version of
+tptree by just calling the generate-standalone script.

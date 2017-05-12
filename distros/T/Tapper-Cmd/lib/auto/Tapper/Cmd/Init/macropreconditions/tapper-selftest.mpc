@@ -1,0 +1,18 @@
+[%#- -*- mode: tt -*- %]
+# Enqueue a testrun into a queue (tapper)
+# and it should run on the next available host of that queue.
+#
+# tapper testrun-new --macroprecond ~/.tapper/macropreconditions/tapper-selftest.mpc \
+#                    --shortname tapper-selftest \
+#                    --topic Tapper \
+#                    --queue tapper
+[% USE env = EnvHash %]
+---
+precondition_type: testprogram
+program: [% "$env.HOME/.tapper/testprogram/tapper-selftest.sh" %]
+timeout: 600
+capture: tap
+---
+precondition_type: hint
+skip_install: 1
+local: 1

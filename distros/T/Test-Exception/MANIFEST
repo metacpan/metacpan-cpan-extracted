@@ -1,0 +1,24 @@
+Changes
+lib/Test/Exception.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/caller.t
+t/edge-cases.t
+t/Exception.t
+t/import.t
+t/isa.t
+t/lives_and.t
+t/preserve.t
+t/return.t
+t/rt.t
+t/stacktrace.t
+t/throws_ok.t
+xt/distmanifest.t
+xt/documented.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/spelling.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

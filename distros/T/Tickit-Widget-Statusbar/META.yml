@@ -1,0 +1,37 @@
+---
+abstract: 'Terminal widget for showing status, CPU and memory'
+author:
+  - 'Tom Molesworth <cpan@perlsite.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
+  Test::Refcount: '0.07'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tickit-Widget-Statusbar
+requires:
+  Format::Human::Bytes: '0'
+  Memory::Usage: '0'
+  Proc::CPUUsage: '0'
+  String::Tagged: '0.09'
+  Tickit: '0.46'
+  Tickit::Widget: '0'
+  Tickit::Widget::Progressbar: '0.100'
+  Time::HiRes: '0'
+  curry: '0'
+  parent: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tickit-Widget-Statusbar
+  homepage: http://search.cpan.org/dist/Tickit-Widget-Statusbar/
+version: '0.004'

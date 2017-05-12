@@ -1,0 +1,20 @@
+bin/hi
+Changes
+lib/App/HI.pm
+lib/Term/ANSIColorx/AutoFilterFH.pm
+lib/Term/ANSIColorx/ColorNicknames.pm
+Makefile.PL
+MANIFEST
+README
+t/01_color_some_things.t
+t/02_fix_some_things.t
+t/05_color_file_handle.t
+t/07_test_hi.t
+t/09_test_extra_and_trunc.t
+t/09_test_no_extra_and_trunc.t
+t/10_hi_trunc.t
+t/50_exports.t
+t/99_versions_all_match.t
+t/60_hashed_color.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

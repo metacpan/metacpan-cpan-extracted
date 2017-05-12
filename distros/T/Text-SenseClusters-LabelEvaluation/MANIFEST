@@ -1,0 +1,21 @@
+Changes
+lib/Text/SenseClusters/LabelEvaluation/LabelEvaluation.pm
+lib/Text/SenseClusters/LabelEvaluation/ReadingFilesData.pm
+lib/Text/SenseClusters/LabelEvaluation/PrintingHashData.pm
+lib/Text/SenseClusters/LabelEvaluation/Wikipedia/GetWikiData.pm
+lib/Text/SenseClusters/LabelEvaluation/SimilarityScore.pm
+lib/Text/SenseClusters/LabelEvaluation/ConfusionMatrixTotalCalc.pm
+lib/Text/SenseClusters/LabelEvaluation/stoplist.txt
+Makefile.PL
+MANIFEST			This list of files
+README
+t/labelEvaluation.t
+t/getWikiData.t
+t/printingHashData.t
+t/readingFilesData.t
+t/similarityScore.t
+t/temp/temp_Output.txt
+TestData/BT/BT.label
+TestData/BT/BT.txt
+
+META.yml                                 Module meta-data (added by MakeMaker)

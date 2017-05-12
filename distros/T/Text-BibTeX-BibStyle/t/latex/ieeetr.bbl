@@ -1,0 +1,188 @@
+\newcommand{\noopsort}[1]{} \newcommand{\printfirst}[2]{#1}
+  \newcommand{\singleletter}[1]{#1} \newcommand{\switchargs}[2]{#2#1}
+\begin{thebibliography}{10}
+
+\bibitem{article-minimal}
+L.~A. Aamport, ``The gnats and gnus document preparation system,'' {\em
+  \mbox{G-Animal's} Journal}, 1986.
+
+\bibitem{article-full}
+L.~A. Aamport, ``The gnats and gnus document preparation system,'' {\em
+  \mbox{G-Animal's} Journal}, vol.~41, pp.~73+, July 1986.
+\newblock This is a full ARTICLE entry.
+
+\bibitem{article-crossref}
+L.~A. Aamport, ``The gnats and gnus document preparation system,'' in {\em
+  \mbox{G-Animal's} Journal\/} \cite{whole-journal}, pp.~73+.
+\newblock This is a cross-referencing ARTICLE entry.
+
+\bibitem{whole-journal}
+ {\em \mbox{G-Animal's} Journal}, vol.~41, July 1986.
+\newblock The entire issue is devoted to gnats and gnus (this entry is a
+  cross-referenced ARTICLE (journal)).
+
+\bibitem{inbook-minimal}
+D.~E. Knuth, {\em Fundamental Algorithms}, ch.~1.2.
+\newblock Addison-Wesley, {\noopsort{1973b}}1973.
+
+\bibitem{inbook-full}
+D.~E. Knuth, {\em Fundamental Algorithms}, vol.~1 of {\em The Art of Computer
+  Programming}, section 1.2, pp.~10--119.
+\newblock Reading, Massachusetts: Addison-Wesley, second~ed., 10~Jan.
+  {\noopsort{1973b}}1973.
+\newblock This is a full INBOOK entry.
+
+\bibitem{inbook-crossref}
+D.~E. Knuth, {\em Fundamental Algorithms}, section 1.2.
+\newblock Vol.~1 of {\em The Art of Computer Programming\/} \cite{whole-set},
+  second~ed., {\noopsort{1973b}}1973.
+\newblock This is a cross-referencing INBOOK entry.
+
+\bibitem{book-minimal}
+D.~E. Knuth, {\em Seminumerical Algorithms}.
+\newblock Addison-Wesley, {\noopsort{1981a}}1981.
+
+\bibitem{book-full}
+D.~E. Knuth, {\em Seminumerical Algorithms}, vol.~2 of {\em The Art of Computer
+  Programming}.
+\newblock Reading, Massachusetts: Addison-Wesley, second~ed., 10~Jan.
+  {\noopsort{1981b}}1981.
+\newblock This is a full BOOK entry.
+
+\bibitem{book-crossref}
+D.~E. Knuth, {\em Seminumerical Algorithms}.
+\newblock Vol.~2 of {\em The Art of Computer Programming\/} \cite{whole-set},
+  second~ed., {\noopsort{1981c}}1981.
+\newblock This is a cross-referencing BOOK entry.
+
+\bibitem{whole-set}
+D.~E. Knuth, {\em The Art of Computer Programming}.
+\newblock Four volumes, Addison-Wesley,
+  {\noopsort{1973a}}{\switchargs{--90}{1968}}.
+\newblock Seven volumes planned (this is a cross-referenced set of BOOKs).
+
+\bibitem{booklet-minimal}
+``The programming of computer art.''
+
+\bibitem{booklet-full}
+J.~C. Knvth, ``The programming of computer art.'' Vernier Art Center, Stanford,
+  California, Feb. 1988.
+\newblock This is a full BOOKLET entry.
+
+\bibitem{incollection-minimal}
+D.~D. Lincoll, ``Semigroups of recurrences,'' in {\em High Speed Computer and
+  Algorithm Organization}, Academic Press, 1977.
+
+\bibitem{incollection-full}
+D.~D. Lincoll, ``Semigroups of recurrences,'' in {\em High Speed Computer and
+  Algorithm Organization} (D.~J. Lipcoll, D.~H. Lawrie, and A.~H. Sameh, eds.),
+  no.~23 in Fast Computers, part~3, pp.~179--183, New York: Academic Press,
+  third~ed., Sept. 1977.
+\newblock This is a full INCOLLECTION entry.
+
+\bibitem{incollection-crossref}
+D.~D. Lincoll, ``Semigroups of recurrences,'' in Lipcoll {\em et~al.}
+  \cite{whole-collection}, pp.~179--183.
+\newblock This is a cross-referencing INCOLLECTION entry.
+
+\bibitem{whole-collection}
+D.~J. Lipcoll, D.~H. Lawrie, and A.~H. Sameh, eds., {\em High Speed Computer
+  and Algorithm Organization}.
+\newblock No.~23 in Fast Computers, New York: Academic Press, third~ed., Sept.
+  1977.
+\newblock This is a cross-referenced BOOK (collection) entry.
+
+\bibitem{manual-minimal}
+{\em The Definitive Computer Manual}.
+
+\bibitem{manual-full}
+L.~Manmaker, {\em The Definitive Computer Manual}.
+\newblock Chips-R-Us, Silicon Valley, silver~ed., Apr.-May 1986.
+\newblock This is a full MANUAL entry.
+
+\bibitem{mastersthesis-minimal}
+{\'{E}}.~Masterly, ``Mastering thesis writing,'' Master's thesis, Stanford
+  University, 1988.
+
+\bibitem{mastersthesis-full}
+{\'{E}}.~Masterly, ``Mastering thesis writing,'' master's project, Stanford
+  University, English Department, June-Aug. 1988.
+\newblock This is a full MASTERSTHESIS entry.
+
+\bibitem{misc-minimal}
+This is a minimal MISC entry.
+
+\bibitem{misc-full}
+J.-B. Missilany, ``Handing out random pamphlets in airports.'' Handed out at
+  O'Hare, Oct. 1984.
+\newblock This is a full MISC entry.
+
+\bibitem{inproceedings-minimal}
+A.~V. Oaho, J.~D. Ullman, and M.~Yannakakis, ``On notions of information
+  transfer in {VLSI} circuits,'' in {\em Proc. Fifteenth Annual ACM Symposium
+  on the Theory of Computing}, 1983.
+
+\bibitem{inproceedings-full}
+A.~V. Oaho, J.~D. Ullman, and M.~Yannakakis, ``On notions of information
+  transfer in {VLSI} circuits,'' in {\em Proc. Fifteenth Annual ACM Symposium
+  on the Theory of Computing} (W.~V. Oz and M.~Yannakakis, eds.), no.~17 in All
+  ACM Conferences, (Boston), pp.~133--139, The OX Association for Computing
+  Machinery, Academic Press, Mar. 1983.
+\newblock This is a full INPROCEDINGS entry.
+
+\bibitem{inproceedings-crossref}
+A.~V. Oaho, J.~D. Ullman, and M.~Yannakakis, ``On notions of information
+  transfer in {VLSI} circuits,'' in OX{\singleletter{stoc}}
+  \cite{whole-proceedings}, pp.~133--139.
+\newblock This is a cross-referencing INPROCEEDINGS entry.
+
+\bibitem{proceedings-minimal}
+{\em Proc. Fifteenth Annual Symposium on the Theory of Computing}, 1983.
+
+\bibitem{proceedings-full}
+W.~V. Oz and M.~Yannakakis, eds., {\em Proc. Fifteenth Annual Symposium on the
+  Theory of Computing}, no.~17 in All ACM Conferences, (Boston), The OX
+  Association for Computing Machinery, Academic Press, Mar. 1983.
+\newblock This is a full PROCEEDINGS entry.
+
+\bibitem{whole-proceedings}
+The OX Association for Computing Machinery, {\em Proc. Fifteenth Annual
+  Symposium on the Theory of Computing}, (Boston), 1983.
+\newblock This is a cross-referenced PROCEEDINGS.
+
+\bibitem{phdthesis-minimal}
+F.~P. Phony-Baloney, {\em Fighting Fire with Fire: Festooning {F}rench
+  Phrases}.
+\newblock PhD thesis, Fanstord University, 1988.
+
+\bibitem{phdthesis-full}
+F.~P. Phony-Baloney, {\em Fighting Fire with Fire: Festooning {F}rench
+  Phrases}.
+\newblock {PhD} dissertation, Fanstord University, Department of French,
+  June-Aug. 1988.
+\newblock This is a full PHDTHESIS entry.
+
+\bibitem{techreport-minimal}
+T.~Terrific, ``An {$O(n \log n / \! \log\log n)$} sorting algorithm,'' tech.
+  rep., Fanstord University, 1988.
+
+\bibitem{techreport-full}
+T.~T{\'{e}}rrific, ``An {$O(n \log n / \! \log\log n)$} sorting algorithm,''
+  Wishful Research Result~7, Fanstord University, Computer Science Department,
+  Fanstord, California, Oct. 1988.
+\newblock This is a full TECHREPORT entry.
+
+\bibitem{unpublished-minimal}
+U.~{\"{U}}nderwood, N.~{\~N}et, and P.~{\={P}}ot, ``Lower bounds for wishful
+  research results.'' Talk at Fanstord University (this is a minimal
+  UNPUBLISHED entry).
+
+\bibitem{unpublished-full}
+U.~{\"{U}}nderwood, N.~{\~N}et, and P.~{\={P}}ot, ``Lower bounds for wishful
+  research results.'' Talk at Fanstord University (this is a full UNPUBLISHED
+  entry), Nov., Dec. 1988.
+
+\bibitem{random-note-crossref}
+Volume~2 is listed under Knuth \cite{book-full}.
+
+\end{thebibliography}

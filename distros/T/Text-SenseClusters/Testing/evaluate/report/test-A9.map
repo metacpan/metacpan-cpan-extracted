@@ -1,0 +1,5 @@
+ClusterID->SenseID 
+0->S3
+1->S1
+3->S2
+score = 0.32

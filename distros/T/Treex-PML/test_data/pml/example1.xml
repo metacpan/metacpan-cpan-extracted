@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<annotation xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head>
+    <schema href="example1_schema.xml"/>
+  </head>
+  <meta>
+    <annotator>Jan Novak</annotator>
+    <datetime>Sun May 1 18:56:55 2005</datetime>
+  </meta>
+  <trees>
+    <LM ord="2">
+      <func>Pred</func>
+      <form>loves</form>
+      <governs>
+        <LM ord="1">
+          <func>Subj</func>
+          <form>John</form>
+        </LM>
+        <LM ord="3">
+          <func>Obj</func>
+          <form>Mary</form>
+        </LM>
+      </governs>
+    </LM>
+    <LM ord="2">
+      <func>Pred</func>
+      <form>told</form>
+      <governs>
+        <LM ord="1">
+          <func>Subj</func>
+          <form>He</form>
+        </LM>
+        <LM ord="3">
+          <func>Obj</func>
+          <form>her</form>
+        </LM>
+        <LM ord="5">
+          <func>Adv</func>
+          <form>Friday</form>
+          <governs ord="4"> <!-- ditto -->
+            <func>Attrib</func>
+            <form>this</form>               
+          </governs>
+        </LM>
+      </governs>
+    </LM>
+  </trees>
+</annotation>

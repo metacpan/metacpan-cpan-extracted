@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01.t
+lib/Test/Mimic/Library.pm
+lib/Test/Mimic/Library/PlayScalar.pm
+lib/Test/Mimic/Library/PlayArray.pm
+lib/Test/Mimic/Library/PlayHash.pm
+lib/Test/Mimic/Library/MonitorScalar.pm
+lib/Test/Mimic/Library/MonitorArray.pm
+lib/Test/Mimic/Library/MonitorHash.pm
+lib/Test/Mimic/Library/MonitorTiedScalar.pm
+lib/Test/Mimic/Library/MonitorTiedArray.pm
+lib/Test/Mimic/Library/MonitorTiedHash.pm
+META.yml                                 Module meta-data (added by MakeMaker)

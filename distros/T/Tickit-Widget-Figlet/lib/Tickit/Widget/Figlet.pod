@@ -1,0 +1,106 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::Widget::Figlet
+at lib/Tickit/Widget/Figlet.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Tickit::Widget::Figlet - trivial wrapper around L<Text::FIGlet> for banner rendering
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ use Tickit;
+ use Tickit::Widget::Figlet;
+ 
+ Tickit->new(
+ 	root => Tickit::Widget::Figlet->new(
+ 		font => shift // 'block',
+ 		text => 'Tickit & FIGlet'
+ 	)
+ )->run;
+
+=head1 DESCRIPTION
+
+Provides a minimal implementation for wrapping L<Text::FIGlet>. Essentially just creates
+a L<Text::FIGlet> instance and calls C< figify > for rendering into a window.
+
+=begin HTML
+
+<p>Basic rendering:</p>
+<p><img src="http://tickit.perlsite.co.uk/cpan-screenshot/tickit-widget-figlet-basic.png" alt="Simple FIGlet rendering with Tickit" width="508" height="78"></p>
+
+=end HTML
+
+=head1 METHODS
+
+=head2 new
+
+Creates a new instance.
+
+Named parameters:
+
+=over 4
+
+=item * text - the string to display
+
+=item * font - which font to use
+
+=item * path (optional) - path to load fonts from, will obey $ENV{FIGLIB} by default
+
+=item * align (optional) - horizontal alignment to apply to text, can be a number from 0..1 or
+the text 'left', 'right', 'centre' (or 'center')
+
+=back
+
+Returns the instance.
+
+=head2 render_to_rb
+
+Handles rendering.
+
+=head2 text
+
+Returns the current text to display. Pass a new string in to update the rendered text.
+
+ $figlet->text('new text');
+ is($figlet->text, 'new text');
+
+=head2 figlet
+
+Returns the L<Text::FIGlet> instance. Probably a L<Text::FIGlet::Font> subclass.
+
+=head1 SEE ALSO
+
+L<Text::FIGlet>, L<http://www.figlet.org/>, L<http://www.jave.de/figlet/fonts.html>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<on_pen_changed|Tickit::Widget/on_pen_changed>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<reshape|Tickit::Widget/reshape>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_pen|Tickit::Widget/set_pen>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>, L<window_gained|Tickit::Widget/window_gained>, L<window_lost|Tickit::Widget/window_lost>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2015. Licensed under the same terms as Perl itself.

@@ -1,0 +1,28 @@
+Template::Plugin::UTF8Decode version 0.01
+==========================================
+
+This module is a Template Toolkit filter, which decode a string to utf8.
+For example, using FreeTDS (http://www.freetds.org) in order to talk with 
+ms sql, can return an utf8 string as byte char.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  * Template
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Fabio Masini
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

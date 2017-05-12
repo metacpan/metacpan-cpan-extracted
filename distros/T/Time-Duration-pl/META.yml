@@ -1,0 +1,33 @@
+---
+abstract: 'Describe time duration in Polish'
+author:
+  - 'Grzegorz Rożniecki <xaerxess@gmail.com>'
+build_requires:
+  Test::More: 0
+  constant: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Time-Duration-pl
+provides:
+  Time::Duration::pl:
+    file: lib/Time/Duration/pl.pm
+    version: 0.002
+requires:
+  Exporter: 0
+  Time::Duration: 0
+  base: 0
+  perl: 5.008
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/Xaerxess/Time-Duration-pl/issues
+  homepage: https://github.com/Xaerxess/Time-Duration-pl
+  repository: https://github.com/Xaerxess/Time-Duration-pl.git
+version: 0.002

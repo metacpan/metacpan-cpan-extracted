@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Template/Plugin/DtFormatter/RelativeDate.pm
+lib/Template/Plugin/DtFormatter/RelativeDate/I18N.pm
+lib/Template/Plugin/DtFormatter/RelativeDate/I18N/en.pm
+lib/Template/Plugin/DtFormatter/RelativeDate/I18N/ja.pm
+lib/Template/Plugin/DtFormatter/RelativeDate/I18N/no.pm
+t/00-load.t
+t/01-functions.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

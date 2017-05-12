@@ -1,0 +1,14 @@
+lib/Docs/Site_SVD/Tie_Eudora.pm
+MANIFEST
+Makefile.PL
+README
+lib/Tie/Eudora.pm
+t/Tie/Eudora.d
+t/Tie/Eudora.pm
+t/Tie/Eudora.t
+t/Tie/Eudora2.mbx
+t/Tie/File/SmartNL.pm
+t/Tie/File/Package.pm
+t/Tie/Test/Tech.pm
+t/Tie/Data/Secs2.pm
+t/Tie/Data/Str2Num.pm

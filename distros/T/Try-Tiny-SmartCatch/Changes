@@ -1,0 +1,19 @@
+Revision history for Try-Tiny-SmartCatch
+
+0.5 2013-01-03
+    - missing Changes description
+0.4
+    - added throw function
+    - rewritten source
+0.3 
+    - do not use features from perl 5.10, maybe it repair working module on 5.8.x
+    - added 'then' block handling
+    - removed calling try blocks in same context as try subroutine
+0.2 2012-05-24
+    Few changes suggested by: mst - Matt S Trout (cpan:MSTROUT) <mst@shadowcat.co.uk> (thanks!):
+    - rename from Try::Tiny::Extended to Try::Tiny::SmartCatch
+    - rename function Try::Tiny::SmartCatch::catch -> Try::Tiny::SmartCatch::catch_when
+    - rename function Try::Tiny::SmartCatch::catch_all -> Try::Tiny::SmartCatch::catch_default
+0.1 2012-04-30
+    Initial version.
+

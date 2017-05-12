@@ -1,0 +1,8 @@
+[%INCLUDE include/header.tt %]
+% if (1) {
+hello there
+% } else {
+I am in the else
+% }
+
+What's up?

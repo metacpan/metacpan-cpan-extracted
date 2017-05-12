@@ -1,0 +1,30 @@
+---
+abstract: 'Simple stubbing for Mango to allow unit tests for code that uses it'
+author:
+  - 'J Gregory <jgregory@cpan.org>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '0.99'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.140640'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mock-Mango
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Mango: '0.30'
+  perl: '5.010001'
+resources:
+  bugtracker: http://github.com/necrophonic/test-mock-mango/issues
+  homepage: http://github.com/necrophonic/test-mock-mango
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: http://github.com/necrophonic/test-mock-mango
+version: '0.09'

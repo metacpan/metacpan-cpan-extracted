@@ -1,0 +1,10 @@
+lib/Term/Animation.pm
+lib/Term/Animation/Entity.pm
+Changes
+Makefile.PL
+MANIFEST
+MIGRATION
+README
+t/use.t
+examples/color_nature.pl
+META.yml

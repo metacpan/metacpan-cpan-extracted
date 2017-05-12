@@ -1,0 +1,40 @@
+---
+abstract: 'All you need to start with Amon2'
+author:
+  - 'Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Amon2
+no_index:
+  directory:
+    - inc
+provides:
+  Task::Amon2:
+    file: lib/Task/Amon2.pm
+    version: 0.02
+requires:
+  Amon2: 3.54
+  Amon2::DBI: 0.06
+  DBD::SQLite: 1.33
+  HTML::FillInForm::Lite: 1.09
+  JSON: 2.50
+  Plack::Middleware::ReverseProxy: 0.09
+  Plack::Middleware::Session: 0
+  Plack::Session: 0.14
+  Test::More: 0.98
+  Test::WWW::Mechanize::PSGI: 0
+  Text::Xslate: 1.5006
+  Time::Piece: 1.20
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

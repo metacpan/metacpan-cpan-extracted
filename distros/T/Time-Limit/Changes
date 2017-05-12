@@ -1,0 +1,19 @@
+Time-Limit
+==========
+
+Created:      2013-08-02
+Home page:    <https://metacpan.org/release/Time-Limit>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Time-Limit>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2013-08-02
+
+ [ Bug Fixes ]
+ - Eliminate warning when no explicit limit is given.
+
+0.001	2013-08-02	Initial release

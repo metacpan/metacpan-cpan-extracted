@@ -1,0 +1,24 @@
+Tk-FcyEntry
+========================
+
+This module is deprecated.
+
+It once served the purpose to replace the standard Perl/Tk Entry widget in order to reflect the Entry's state.
+This is standard behavior of an Entry widget by now, so you can just use a plain Entry widget (at least, in Tk 800.x).
+
+DEPENDENCIES
+
+See Makefile.PL for a list of dependencies.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2016 by Alexander Becker,
+Copyright (c) 1997-1998 Achim Bohnet.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

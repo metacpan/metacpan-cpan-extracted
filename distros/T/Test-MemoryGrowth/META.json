@@ -1,0 +1,45 @@
+{
+   "abstract" : "assert that code does not cause growth in memory usage",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-MemoryGrowth",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Builder::Tester" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Devel::MAT" : "0.04"
+         },
+         "requires" : {
+            "Test::Builder" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::MemoryGrowth" : {
+         "file" : "lib/Test/MemoryGrowth.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

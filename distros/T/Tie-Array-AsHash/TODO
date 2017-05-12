@@ -1,0 +1,6 @@
+TODO for Tie::Array::AsHash
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- add supoort for comments and/or commented lines
+  + RfC: new parameters: comment => regex, comment_join => ' #'
+         similar to split/join parameters?

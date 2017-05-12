@@ -1,0 +1,1166 @@
+NAME
+      Tie::Layers - read and write files pipelined through a stack of subroutine layers
+
+SYNOPSIS
+     #####
+     # Subroutines
+     #
+     use Tie::Layers qw(is_handle config);
+
+     $yes = is_handle( $file_handle );
+
+     ($key, $old_value) = config(\%options, $key);
+     ($key, $old_value) = config(\%options, $key => $new_value ); 
+
+     ####
+     # Config default startup options
+     #
+     @old_options_list = config(\%options, @option_list);
+     @old_options_list = config(\%options, \@option_list);
+     @old_options_list = config(\%options, \%option_list);
+
+     #####
+     # Class interface
+     #
+     require Tie::Layers;
+
+     #####
+     # Using support methods and file handle with
+     # the file subroutines such as open(), readline()
+     # print(), close()
+     #
+     tie *LAYERS_FILEHANDLE, 'Tie::Layers', @options
+     $layers = tied \*LAYERS_FILEHANDLE; 
+
+     #####
+     # Using support methods only, no file subroutines
+     # 
+     $layers = Tie::Layers->TIEHANDLE(@options);
+
+     ($key, $old_value) = $layers->config($key); 
+     ($key, $old_value) = $layers->config($key => $new_value );  
+
+     @old_options_list = $layers->config(@option_list); 
+     @old_options_list = $layers->config(\@option_list); 
+     @old_options_list = $layers->config(\%option_list);
+
+     $data = $layers->fin($filename, @options);
+
+     $data = $layers->fout($filename, $data, @options);
+
+     $yes = $layers->is_handle( $file_handle );
+
+    If a subroutine or method will process a list of options, "@options",
+    that subroutine will also process an array reference, "\@options",
+    "[@options]", or hash reference, "\%options", "{@options}".
+
+DESCRIPTION
+    The "Tie::Layers" program module contains the tie file handle
+    "Tie::Layers" package. The "Tie::Layers" package provides the ability to
+    insert a stack of subroutines between file subroutines "print" and
+    "realine" and the underlying "$file". The syntax of the subroutines of
+    each layer of the readline stack and the print stack must comply to the
+    the requirements described herein below. This is necessary so that the
+    "Tie::Layers" "READLINE" and "PRINT" subroutines know how to transfer
+    the output from one layer to the input of another layer. The stacks are
+    setup by supplying options with a reference to the subroutine for each
+    layer in the print stack and the readline stack. The "Tie::Layers" are
+    line orientated and do not support any character file subrouintes. The
+    "getc", "read", and "write" file subroutines are supported by the
+    "Tie::Layers" package. The seek routines are line oriented in that the
+    "seek" and "tell" subroutine positions are the line in the underlying
+    file and not the character position in the file.
+
+  options
+
+    The "Tie::Layers" program module subroutines/methods and the file
+    subroutines using a filehandle that was created with a "tie" to
+    'Tie::Layers, use the following options:
+
+     option            default            description
+     ----------------------------------------------------------------------
+     binary       =>   0,                 apply binmode to the $file
+     warn         =>   1,                 issue a warn for events
+     print_layers =>   [],                stack of print subroutines 
+     print_record =>   undef,             print to $file
+     read_layers  =>   [],                stack of readline subroutines
+     read_record  =>   \&layer_readline,  read a line from $file
+
+    The "Tie::Layers" package is a foundation that is inherited by other
+    packages. The object data hash must be shared by other classes. To
+    provide a orderly method of allocating object data space, the options
+    for the "Tie::Layers" class are stored in the following hash:
+
+     $self->{'Tie::Layers'}->{options}
+
+    This is public data that may be accessed directly or by using the
+    "config" subroutine. Future design changes of the "options" data will
+    emphasize backward compatibility. The private data for the "Tie::Layers"
+    classes is restricted all other members of "$self-"{'Tie::Layers}>. As
+    with all private data, future design changes will emphasize performance
+    over backward compatibility.
+
+  readline stack
+
+    The stack for "readline" is setup with the "read_layers" and
+    "read_record" options. Say the layers are numbered so that layer 0 reads
+    a line from the underlying "$file", and the line data is processing
+    layer_1 to layer_2 and so forth to the last layer_n. The reference to
+    the subroutine for each layer would be as follows:
+
+     read_record  => \&realine_0    #layer 0
+
+     read_layers => 
+         [ \&read_layer_routine_1,  # layer 1
+
+           # ....
+                  
+           \&read_layer_routine_n,  # layer n
+         ];
+
+    The synopsis for the "read_record" and "read_layers" subroutine
+    references are as follow:
+
+     $line = read_record($self);  # layer 0
+     $lineref = read_layer_routines($self, $lineref); # layers 1 - n
+
+    If the "read_record" option does not exist, the "Tie::Layers" methods
+    will supply a default "read_record".
+
+    Events are passed from the layer routines by as follows:
+
+     $self->{current_event} = $event;
+
+    The "$lineref" may be either a scalar text or any valid Perl reference.
+    When the layer "$lineref" are references, the
+
+      @array = readline(LAYER)  # or
+      @array = <LAYER>
+
+    will return an @array of references; otherwise, they behave as usual and
+    return an @array of text scalar lines. The added feature of allowing
+    returns of an array of references gives layered "Tie::Layers" the
+    capability to decode database files such as comma delimited variable
+    files.
+
+  print stack
+
+    The stack for "print" is setup with the "print_layers" and
+    "print_record" options. Say the layers are numbered so that layer 0
+    prints a line from the underlying "$file", and the line data is
+    processing from top layer_n down to layer_2 and layer_1. The reference
+    to the subroutine for each layer would be as follows:
+
+     print_record  => \&print_0    #layer 0
+
+     print_layers => 
+         [ \&print_layer_routine_1,  # layer 1
+
+           # ....
+                  
+           \&print_layer_routine_n,  # layer n
+         ];
+
+    If the "print_record" option does not exist, the "Tie::Layers" methods
+    will use "print" to print to the underlying file.
+
+    The synopsis for the "print_record" and "print_layers" subroutine
+    references are as follow:
+
+     $success = print_record($self, $line);  # layer 0
+     $lineref = print_layer_subroutine($self, $lineref); # layers 1 - n
+
+    Events are passed from the layer routines by as follows:
+
+     $self->{current_event} = $event;
+
+    The "$lineref" may be either a scalar text or any valid Perl reference.
+
+  config
+
+     ($key, $old_value) = config(\%options, $key);
+     ($key, $old_value) = config(\%options, $key => $new_value ); 
+
+     ####
+     # Config default startup options
+     #
+     @old_options_list = config(\%options, @option_list);
+     @old_options_list = config(\%options, \@option_list);
+     @old_options_list = config(\%options, \%option_list);
+
+    The "Tie::Layers" package maintains global startup (default) options.
+    When the "TIEHANDLE" method creates a new "Tie::Layers" object, the
+    "TIEHANLE" method sets options for the object,
+    "$self-"{'Tie::Layers'}->{options} to the startup (default) optins.
+
+    The "config" subroutine/method can read and modify either the startup
+    options or the individual options of a "Tie::Layers" object. When used
+    as a subroutine or class or a object without hash data, the "config"
+    subroutine/method access the startup options; otherwise, it accesses the
+    "Tie::Layers" options.
+
+    The "config" subroutine/method responses with no inputs with all the
+    "$key,$value" pairs in "\%options"; a single "$key" input with the
+    "$key,$value" for that "$key"; and, a group of "$key, $value" pairs,
+    "@option_list" by replacing all the "$option" "$key" in the group by the
+    paired <$value> returning the "@old_options_list" of old "$key,$value"
+    pairs. The "config" method does not care if the "@option_list" is an
+    array, a reference to an array or a reference to a hash.
+
+  fin
+
+     $data = $layers->fin($filename, @options);
+
+    The "fin" method slurps in the entire "$filename" using the readline
+    stack. The "$layers-"{event}> returns the events from each layer in the
+    readline stack.
+
+  fout
+
+     $success = $layers->fout($filename, $data, @options);
+
+    The "fout" method
+
+  is_handle
+
+     $yes = is_handle( $file_handle );
+
+    The "is_handle" subroutine determines whether or not "$file_handle" is a
+    file handle.
+
+DEMONSTRATION
+     #########
+     # perl Layers.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::Package;
+
+         my $uut = 'Tie::Layers'; # Unit Under Test
+         my $fp = 'File::Package';
+         my $loaded;
+
+         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         #
+         # LAYER 2:  ENCODE/DECODE FIELDS
+         #
+         #~~~~~~   
+
+         #####
+         # 
+         # Encodes a field a field_name, field_value pairs
+         # into a scalar encoded_field. Also get a snap shot 
+         # of the options.  
+         #
+         #
+         sub encode_field
+         {
+             my ($self,$record) = @_;
+             unless ($record) {
+                 $self->{current_event} = "No input\n" ;
+                 return undef;
+             }
+
+             return undef unless( $record);
+             my @fields = @$record;
+
+             ######
+             # Record that called a stub layer
+             #
+             my $encoded_fields = "layer 2: encode_field\n";
+
+             ######
+             # Process the data and record it
+             #
+             my( $name, $data );
+             for( my $i=0; $i < @fields; $i += 2) {
+                 ($name, $data) = ($fields[$i], $fields[$i+1]);   
+                 $encoded_fields .= "$name: $data\n";
+             }
+
+             #####
+             # Get a snap-short of the options
+             #
+             my $options = $self->{'Tie::Layers'}->{options};
+             foreach my $key (sort keys %$options ) {
+                 next if $key =~ /(print_record|print_layers|read_record|read_layers)/;
+                 $encoded_fields .= "option $key: $options->{$key}\n";
+             }
+             \$encoded_fields;
+         }
+
+         #####
+         # 
+         # Encodes a field a field_name, field_value pairs
+         # into a scalar encoded_field. Also get a snap shot 
+         # of the options.  
+         #
+         #
+         sub decode_field
+         {
+             my ($self,$record) = @_;
+             unless ($record) {
+                 $self->{current_event} = "No input\n" ;
+                 return undef;
+             }
+             $record  = "layer 2: decode_field\n" . $record;
+             my @fields = split /\s*[:\n]\s*/,$record;
+             return \@fields;
+         }
+
+         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         #
+         # LAYER 1:  ENCODE/DECODE RECORD
+         #
+         #~~~~~~   
+
+         #########
+         # This function un escapes the record separator
+         #
+         sub decode_record
+         {
+             my ($self,$record) = @_;
+             unless ($record) {
+                 $self->{current_event} = "No input\n" ;
+                 return undef;
+             }
+             #######
+             # Unless in strict mode, change CR and LF
+             # to end of line string for current operating system
+             #
+             unless( $self->{'Tie::Layers'}->{options}->{binary} ) {
+                 $$record =~ s/\015\012|\012\015/\012/g;  # replace LFCR or CRLF with a LF
+                 $$record =~ s/\012|\015/\n/g;   # replace CR or LF with logical \n 
+             }
+
+             "layer 1: decode_record\n" . $$record;
+          } 
+
+         #############
+         # encode the record
+         #
+         sub encode_record
+         {
+             my ($self, $record) = @_;
+             unless ($record) {
+                 $self->{current_event} = "No input\n" ;
+                 return undef;
+             }
+             my $output = "layer 1: encode_record\n" . $$record;   
+             \$output;
+         } 
+
+         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         #
+         # LAYER 0:  READ-WRITE FILE RECORD
+         #
+         #~~~~~~   
+
+         #########
+         # This function gets the next record from
+         # the file and unescapes the record separator
+         #
+         sub read_record
+         {
+            my ($self) = @_;
+
+            local($/);
+            $/ = "\n\~-\~\n";
+
+            my ($fh) = $self->{'Tie::Layers'}->{FH};
+            $! = 0;
+            my $record = <$fh>;
+            unless($record) {
+                $self->{current_event} = $!;
+                return undef;
+            }
+            $record = substr($record, 0, length($record) - 4);
+            $record = "layer 0: get_record\n" . $record;
+            return $record;
+         } 
+
+         #######
+         # append a record to the file and adding the
+         # record separator
+         #
+         sub print_record
+         {
+             my ($self, $record) = @_;
+             my ($fh) = $self->{'Tie::Layers'}->{FH};
+             $record .= "\n" unless substr($record, -1, 1) eq "\n";
+             $! = 0;
+             my $success = print $fh "layer 0: put_record\n$record\~-\~\n";
+             $self->{current_event} = $! unless($success);
+             $success;
+         }
+         my (@records, $record);   # force context
+
+     ##################
+     # Load UUT
+     # 
+
+     my $errors = $fp->load_package($uut)
+     $errors
+
+     # ''
+     # 
+         my $version = $Tie::Layers::VERSION;
+         $version = '' unless $version;
+
+     ##################
+     # Tie::Layers Version 0.05 loaded
+     # 
+
+     $fp->is_package_loaded($uut)
+
+     # 1
+     # 
+         tie *LAYERS, 'Tie::Layers', 
+             print_record => \&print_record, # layer 0
+             print_layers => [
+                \&encode_record, # layer 1
+                \&encode_field,  # layer 2
+             ],
+             read_record => \&read_record, # layer 0
+             read_layers => [
+                \&decode_record,  # layer 1
+                \&decode_field,    # layer 2
+             ];
+
+         my $layers = tied *LAYERS;
+         unlink 'layers1.txt';
+
+     ##################
+     # open( *LAYERS,'>layers1.txt')
+     # 
+
+     open( \*LAYERS,'>layers1.txt')
+
+     # 1
+     # 
+
+     ##################
+     # print LAYERS [qw(field1 value1 field2 value2)]
+     # 
+
+     (print LAYERS [qw(field1 value1 field2 value2)])
+
+     # '1'
+     # 
+
+     ##################
+     # print LAYERS [qw(field3 value3)]
+     # 
+
+     (print LAYERS [qw(field3 value3)])
+
+     # '1'
+     # 
+
+     ##################
+     # print LAYERS [qw(field4 value4 field5 value5 field6 value6)]
+     # 
+
+     (print LAYERS [qw(field4 value4 field5 value5 field6 value6)])
+
+     # '1'
+     # 
+
+     ##################
+     # print close(LAYERS)
+     # 
+
+     close(LAYERS)
+
+     # 1
+     # 
+         local(*FIN);
+         tie *FIN, 'Tie::Layers', 
+             binary => 1,
+             read_layers => [
+                 sub 
+                 {
+                     my ($self,$record) = @_;
+                     unless ($record) {
+                        $self->{current_event} = "No input\n" ;
+                        return undef;
+                     }
+                     #######
+                     # Unless in strict mode, change CR and LF
+                     # to end of line string for current operating system
+                     #
+                     $$record =~ s/\015\012|\012\015/\012/g;  # replace LFCR or CRLF with a LF
+                     $$record =~ s/\012|\015/\n/g;   # replace CR or LF with logical \n 
+                     $$record;
+                 }
+             ];
+         my $slurp = tied *FIN;
+
+     ##################
+     # Verify file layers1.txt content
+     # 
+
+     $slurp->fin('layers1.txt')
+
+     # 'layer 0: put_record
+     # layer 1: encode_record
+     # layer 2: encode_field
+     # field1: value1
+     # field2: value2
+     # option binary: 0
+     # option warn: 1
+     # ~-~
+     # layer 0: put_record
+     # layer 1: encode_record
+     # layer 2: encode_field
+     # field3: value3
+     # option binary: 0
+     # option warn: 1
+     # ~-~
+     # layer 0: put_record
+     # layer 1: encode_record
+     # layer 2: encode_field
+     # field4: value4
+     # field5: value5
+     # field6: value6
+     # option binary: 0
+     # option warn: 1
+     # ~-~
+     # '
+     # 
+
+     ##################
+     # open( *LAYERS,'<layers1.txt')
+     # 
+
+     open( \*LAYERS,'<layers1.txt')
+
+     # 1
+     # 
+
+     ##################
+     # readline record 1
+     # 
+
+     $record = <LAYERS>
+
+     # [
+     #           'layer 2',
+     #           'decode_field',
+     #           'layer 1',
+     #           'decode_record',
+     #           'layer 0',
+     #           'get_record',
+     #           'layer 0',
+     #           'put_record',
+     #           'layer 1',
+     #           'encode_record',
+     #           'layer 2',
+     #           'encode_field',
+     #           'field1',
+     #           'value1',
+     #           'field2',
+     #           'value2',
+     #           'option binary',
+     #           '0',
+     #           'option warn',
+     #           '1'
+     #         ]
+     # 
+
+     ##################
+     # readline record 2
+     # 
+
+     $record = <LAYERS>
+
+     # [
+     #           'layer 2',
+     #           'decode_field',
+     #           'layer 1',
+     #           'decode_record',
+     #           'layer 0',
+     #           'get_record',
+     #           'layer 0',
+     #           'put_record',
+     #           'layer 1',
+     #           'encode_record',
+     #           'layer 2',
+     #           'encode_field',
+     #           'field3',
+     #           'value3',
+     #           'option binary',
+     #           '0',
+     #           'option warn',
+     #           '1'
+     #         ]
+     # 
+
+     ##################
+     # readline record 3
+     # 
+
+     $record = <LAYERS>
+
+     # [
+     #           'layer 2',
+     #           'decode_field',
+     #           'layer 1',
+     #           'decode_record',
+     #           'layer 0',
+     #           'get_record',
+     #           'layer 0',
+     #           'put_record',
+     #           'layer 1',
+     #           'encode_record',
+     #           'layer 2',
+     #           'encode_field',
+     #           'field4',
+     #           'value4',
+     #           'field5',
+     #           'value5',
+     #           'field6',
+     #           'value6',
+     #           'option binary',
+     #           '0',
+     #           'option warn',
+     #           '1'
+     #         ]
+     # 
+
+     ##################
+     # seek(LAYERS,0,0)
+     # 
+
+     seek(LAYERS,0,0)
+     $record = <LAYERS>
+
+     # [
+     #           'layer 2',
+     #           'decode_field',
+     #           'layer 1',
+     #           'decode_record',
+     #           'layer 0',
+     #           'get_record',
+     #           'layer 0',
+     #           'put_record',
+     #           'layer 1',
+     #           'encode_record',
+     #           'layer 2',
+     #           'encode_field',
+     #           'field1',
+     #           'value1',
+     #           'field2',
+     #           'value2',
+     #           'option binary',
+     #           '0',
+     #           'option warn',
+     #           '1'
+     #         ]
+     # 
+
+     ##################
+     # seek(LAYERS,2,0)
+     # 
+
+     seek(LAYERS,2,0)
+     $record = <LAYERS>
+
+     # [
+     #           'layer 2',
+     #           'decode_field',
+     #           'layer 1',
+     #           'decode_record',
+     #           'layer 0',
+     #           'get_record',
+     #           'layer 0',
+     #           'put_record',
+     #           'layer 1',
+     #           'encode_record',
+     #           'layer 2',
+     #           'encode_field',
+     #           'field4',
+     #           'value4',
+     #           'field5',
+     #           'value5',
+     #           'field6',
+     #           'value6',
+     #           'option binary',
+     #           '0',
+     #           'option warn',
+     #           '1'
+     #         ]
+     # 
+
+     ##################
+     # seek(LAYERS,-1,1)
+     # 
+
+     seek(LAYERS,-1,1)
+     $record = <LAYERS>
+
+     # [
+     #           'layer 2',
+     #           'decode_field',
+     #           'layer 1',
+     #           'decode_record',
+     #           'layer 0',
+     #           'get_record',
+     #           'layer 0',
+     #           'put_record',
+     #           'layer 1',
+     #           'encode_record',
+     #           'layer 2',
+     #           'encode_field',
+     #           'field3',
+     #           'value3',
+     #           'option binary',
+     #           '0',
+     #           'option warn',
+     #           '1'
+     #         ]
+     # 
+
+     ##################
+     # readline close(LAYERS)
+     # 
+
+     close(LAYERS)
+
+     # 1
+     # 
+
+     ##################
+     # Verify fout content
+     # 
+
+     $slurp->fout('layers1.txt', $test_data1);
+     $slurp->fin('layers1.txt')
+
+     # 'layer 0: put_record
+     # layer 1: encode_record
+     # layer 2: encode_field
+     # field1: value1
+     # field2: value2
+     # option binary: 0
+     # option warn: 1
+     # ~-~
+     # layer 0: put_record
+     # layer 1: encode_record
+     # layer 2: encode_field
+     # field3: value3
+     # option binary: 0
+     # option warn: 1
+     # ~-~
+     # layer 0: put_record
+     # layer 1: encode_record
+     # layer 2: encode_field
+     # field4: value4
+     # field5: value5
+     # field6: value6
+     # option binary: 0
+     # option warn: 1
+     # ~-~
+     # '
+     # 
+
+     ##################
+     # $uut->config('binary')
+     # 
+
+     [$uut->config('binary')]
+
+     # [
+     #           'binary',
+     #           0
+     #         ]
+     # 
+
+     ##################
+     # $slurp->{'Tie::Layers'}->{options}->{binary}
+     # 
+
+     $slurp->{'Tie::Layers'}->{options}->{binary}
+
+     # 1
+     # 
+
+     ##################
+     # $slurp->config('binary', 0)
+     # 
+
+     [$slurp->config('binary', 0)]
+
+     # [
+     #           'binary',
+     #           1
+     #         ]
+     # 
+
+     ##################
+     # $slurp->{'Tie::Layers'}->{options}->{binary}
+     # 
+
+     $slurp->{'Tie::Layers'}->{options}->{binary}
+
+     # 0
+     # 
+
+     ##################
+     # $slurp->config('binary')
+     # 
+
+     [$slurp->config('binary')]
+
+     # [
+     #           'binary',
+     #           0
+     #         ]
+     # 
+     unlink 'layers1.txt'
+
+QUALITY ASSURANCE
+    Running the test script "Layers.t" verifies the requirements for this
+    module. The "tmake.pl" cover script for Test::STDmaker automatically
+    generated the "Layers.t" test script, "Layers.d" demo script, and
+    "t::Tie::Layers" Software Test Description (STD) program module POD,
+    from the "t::Tie::Layers" program module contents. The "tmake.pl" cover
+    script automatically ran the "Layers.d" demo script and inserted the
+    results into the 'DEMONSTRATION' section above. The "t::Tie::Layers"
+    program module is in the distribution file Tie-Layers-$VERSION.tar.gz.
+
+NOTES
+  Author
+
+    The holder of the copyright and maintainer is
+
+    < support@SoftwareDiamonds.com >
+
+  Copyright Notice
+
+    Copyrighted (c) 2002 Software Diamonds
+
+    All Rights Reserved
+
+  Binding Requirements Notice
+
+    Binding requirements are indexed with the
+
+    pharse 'shall[dd]' where dd is an unique number for each header section.
+    This conforms to standard federal government practices, 490A 3.2.3.6. In
+    accordance with the License for 'Tie::Gzip', Software Diamonds is not
+    liable for meeting any requirement, binding or otherwise.
+
+  License
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    3   Commercial installation of the binary or source must visually
+        present to the installer the above copyright notice, this list of
+        conditions intact, that the original source is available at
+        http://softwarediamonds.com and provide means for the installer to
+        actively accept the list of conditions; otherwise, a license fee
+        must be paid to Softwareware Diamonds.
+
+    SOFTWARE DIAMONDS, http://www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE ALSO
+    Docs::Site_SVD::Tie_Layers
+    Test::STDmaker
+NAME
+    Docs::Site_SVD::Tie_Layers - read and write files pipelined through a
+    stack of subroutine layers
+
+Title Page
+     Software Version Description
+
+     for
+
+     Docs::Site_SVD::Tie_Layers - read and write files pipelined through a stack of subroutine layers
+
+     Revision: E
+
+     Version: 0.06
+
+     Date: 2004/05/28
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright 2004 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The "Tie::Layers" program module contains the tie file handle
+    "Tie::Layers" package. The "Tie::Layers" package provides the ability to
+    insert a stack of subroutines between file subroutines "print" and
+    "realine" and the underlying "$file". The syntax of the subroutines of
+    each layer of the readline stack and the print stack must comply to the
+    the requirements described herein below. This is necessary so that the
+    "Tie::Layers" "READLINE" and "PRINT" subroutines know how to transfer
+    the output from one layer to the input of another layer. The stacks are
+    setup by supplying options with a reference to the subroutine for each
+    layer in the print stack and the readline stack. The "Tie::Layers" are
+    line orientated and do not support any character file subrouintes. The
+    "getc", "read", and "write" file subroutines are supported by the
+    "Tie::Layers" package. The seek routines are line oriented in that the
+    "seek" and "tell" subroutine positions are the line in the underlying
+    file and not the character position in the file.
+
+  1.3 Document overview.
+
+    This document releases Tie::Layers version 0.06 providing a description
+    of the inventory, installation instructions and other information
+    necessary to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     Tie-Layers-0.06.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright 2004 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        3   Commercial installation of the binary or source must visually
+            present to the installer the above copyright notice, this list
+            of conditions intact, that the original source is available at
+            http://softwarediamonds.com and provide means for the installer
+            to actively accept the list of conditions; otherwise, a license
+            fee must be paid to Softwareware Diamonds.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/Tie_Layers.pm                              0.06    2004/05/28 revised 0.05
+     MANIFEST                                                     0.06    2004/05/28 generated, replaces 0.05
+     Makefile.PL                                                  0.06    2004/05/28 generated, replaces 0.05
+     README                                                       0.06    2004/05/28 generated, replaces 0.05
+     lib/Tie/Layers.pm                                            0.06    2004/05/28 revised 0.05
+     t/Tie/Layers.pm                                              0.03    2004/05/28 revised 0.02
+     t/Tie/Layers.t                                               0.03    2004/05/28 revised 0.02
+     t/Tie/Layers.d                                               0.03    2004/05/28 revised 0.02
+     t/Tie/File/Package.pm                                        1.18    2004/05/28 unchanged
+     t/Tie/Test/Tech.pm                                           1.27    2004/05/28 revised 1.26
+     t/Tie/Data/Secs2.pm                                          1.26    2004/05/28 unchanged
+     t/Tie/Data/Str2Num.pm                                        0.08    2004/05/28 unchanged
+     t/Tie/Data/Startup.pm                                        0.08    2004/05/28 new
+
+  3.3 Changes
+
+    Changes are as follows
+
+    Tie::Layers-0.01
+        Originated
+
+    Tie::Layers-0.02
+        Sometimes get a "DESTROY" when coming out of "TIEHANDLE". Do not
+        want "TIEHANDLE" going around closing stuff, especially for an
+        "OPEN" with a file handle like "DATA". If something needs closing,
+        call CLOSE directly.
+
+    Tie::Layers-0.03
+        Added "Data::Startup" as perquisite.
+
+    Tie::Layers-0.04
+        Perquisite did not make it into 0.03. Try again.
+
+    Tie::Layers-0.05
+        Test Failure:
+
+         From: mhoyt@houston.rr.com 
+         Subject: FAIL Tie-Layers-0.04 darwin-thread-multi-2level 7.0 
+
+         t/Tie/Layers.t
+         t/Tie/Layers....Math::BigFloat version 1.4 required--this is only version 1.39 
+
+        Annalysis:
+
+        This is because using "Data::Secs2" to stringify test results for
+        comparision. The "Data::Secs2" includes "Data::SecsPack" which
+        includes "Math::BigFloat". There "Makerfile.PL" prerequisite is only
+        for the Unit Under Test (UUT) software, not the test software.
+
+        Corrective Action:
+
+        Since "Data::SecsPack" is not needed for "Data::Secs2" stringify,
+        rewrote "Data::Secs2" to include "Data::SecsPack" only if needed.
+        Thus, the test software will not longer be requiring
+        "Math::BigFloat".
+
+        Also drop the "Data::SecsPack" version for "Math::BigFloat" down
+        from 1.40 to 1.39.
+
+    Tie::Layers 0.06
+        Add the "config" subroutine. Redesigned the internal data
+        structures. Set aside a unique hash member for "Tie::Layers" class
+        options in the hash data used by both the "Tie::Layers" class and
+        any class that inherits the "Tie::Layers" class.
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'Tie-Layers-0.06.tar.gz' and download to a temporary
+        installation directory. Enter the following where $make is 'nmake'
+        for microsoft windows; otherwise 'make'.
+
+         gunzip Tie-Layers-0.06.tar.gz
+         tar -xf Tie-Layers-0.06.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         'Data::Startup' => '0.08',
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/Tie/Layers.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+
+    There are no known open issues.
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+2.0 SEE ALSO
+    Docs::US_DOD::SVD

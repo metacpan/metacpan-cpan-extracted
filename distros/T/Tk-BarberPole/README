@@ -1,0 +1,113 @@
+NAME
+    Tk::BarberPole - A rotating barber pole
+
+SYNOPSIS
+        use Tk::BarberPole;
+
+        $pole = $parent->BarberPole(
+            -width       => 200,
+            -length      => 20,
+            -bg          => 'white',
+            -orientation => 'vertical',
+            -colors      => [qw/red blue/],
+
+            -slant       => 38,
+            -stripewidth => 15,
+            -separation  => 35,
+
+            -delay       => 50,
+            -autostart   => 1,
+        );
+
+        $pole->start;
+        $pole->stop;
+
+DESCRIPTION
+    Tk::BarberPole is a widget in the shape of a rotating barber pole.
+    Animation can be started and stopped programatically.
+
+STANDARD OPTIONS
+    The following standard widget options are supported:
+
+    -borderwidth
+        Defaults to 0.
+
+    -highlightthickness
+        Defaults to 0.
+
+    -padx
+        Defaults to 0.
+
+    -pady
+        Defaults to 0.
+
+    -relief
+        Defaults to "flat".
+
+WIDGET-SPECIFIC OPTIONS
+    -autostart
+        If set to a true value, animation of the barber pole automatically
+        starts at widget creation. The animation can be further controlled
+        via the start and stop methods. Defaults to 1.
+
+    -colors
+        Specifies the colors of the stripes. The value must be an anonymous
+        list of the colors. The number of stripes will always be a multiple
+        of the number of colors specified. Defaults to "['red', 'blue']".
+
+    -delay
+        The delay, in milliseconds, between successive updates of the stripe
+        positions. Each update moves the stripes by one pixel. The smaller
+        the delay, the faster the animation. Defaults to 50.
+
+    -length
+        Specifies the desired long dimension of the BarberPole in screen
+        units (i.e. any of the forms acceptable to Tk_GetPixels). For
+        vertical BarberPoles this is the height; for horizontal ones it is
+        the width. Defaults to 100.
+
+    -orientation
+        Specifies the orientation of the BarberPole. Valid values are
+        'horizontal', and 'vertical'. Defaults to 'horizontal'.
+
+    -separation
+        Specifies the distance, in pixels, between successive stripes.
+        Defaults to 20.
+
+    -slant
+        Specifies the angle, in degrees, of each stripe. Defaults to 45.
+
+    -stripewidth
+        Specifies the width of each stripe in pixels. Defaults to 10.
+
+    -width
+        Specifies the desired short dimension of the BarberPole in screen
+        units (i.e. any of the forms acceptable to Tk_GetPixels). For
+        vertical BarberPoles this is the width; for horizontal ones it is
+        the height. Defaults to 30.
+
+WIDGET METHODS
+    *$pole*->start
+        Starts the animation.
+
+    *$pole*->stop
+        Stops the animation.
+
+INSTALLATION
+    Either the usual:
+
+            perl Makefile.PL
+            make
+            make install
+
+    or just stick it somewhere in \@INC where perl can find it. It's in pure
+    Perl.
+
+AUTHOR
+    Ala Qumsieh <aqumsieh@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2004 Ala Qumsieh. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

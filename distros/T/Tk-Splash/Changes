@@ -1,0 +1,45 @@
+Revision history for Perl extension Tk::Splash.
+
+0.16
+	Tk::FastSplash is now declared as unsupported
+	added lib directory
+	reworked test scripts
+
+0.15
+	doc update for Tk::ProgressSplash (about -fast option)
+
+0.14
+	doc update for JPEG and PNG images
+
+0.13
+	another workaround for the Tk804 workaround
+
+0.12
+	Tk804 compat workaround for Tk::FastSplash
+
+0.11
+	hide some packages from CPAN indexer in Tk::FastSplash
+
+0.10
+	doc updates
+	now on CPAN
+
+0.08
+	warning fixes
+
+0.07
+	width and height are now optional
+
+0.05
+	Additional override parameter for FastSplash.pm
+
+0.04
+	Another fix for FastSplash.pm (setting Exists manually)
+	Documentation fix
+
+0.03
+	compatibility fix in FastSplash.pm (again :-( )
+
+0.02  
+	two modules: Splash.pm and FastSplash.pm
+

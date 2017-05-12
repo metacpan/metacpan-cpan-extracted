@@ -1,0 +1,10 @@
+=head1 NAME
+
+Teamspeak::Privileges - Teamspeak::Server has Privileges for Users.
+
+=head1 SYNOPSIS
+
+See L<"Teamspeak::Telnet">, L<"Teamspeak::SQL">...
+
+=cut
+

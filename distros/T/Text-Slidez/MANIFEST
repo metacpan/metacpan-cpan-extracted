@@ -1,0 +1,13 @@
+bin/slidez
+Build.PL
+Changes
+examples/short.hbml
+lib/Text/Slidez.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+stylesheets/style-flat.css
+stylesheets/style.css
+t/00-load.t
+t/multi.t

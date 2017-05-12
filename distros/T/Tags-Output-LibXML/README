@@ -1,0 +1,189 @@
+NAME
+     Tags::Output::LibXML - Printing 'Tags' structure by LibXML library.
+
+SYNOPSIS
+     use Tags::Output::LibXML;
+     my $tags = Tags::Output::LibXML->new(%parameters);
+     $tags->put(['b', 'element']);
+     my @open_tags = $tags->open_tags;
+     $tags->finalize;
+     $tags->flush($reset_flag);
+     $tags->reset;
+
+DESCRIPTION
+     This class is only for XML structures.
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "cdata_callback"
+
+                     Subroutine for output processing of cdata.
+                     Input argument is reference to array.
+                     Default value is undef.
+                     Example is similar as 'data_callback'.
+
+            *       "data_callback"
+
+                     Subroutine for output processing of data, cdata and raw data.
+                     Input argument is reference to array.
+                     Default value is undef.
+
+                     Example:
+                     'data_callback' => sub {
+                             my $data_ar = shift;
+                             foreach my $data (@{$data_ar}) {
+
+                                     # Some process.
+                                     $data =~ s/^\s*//ms;
+                             }
+                     }
+
+            *       "encoding"
+
+                     Encoding for XML header.
+                     Default is 'UTF-8'.
+
+            *       "no_simple"
+
+                     TODO not implemented.
+                     Reference to array of tags, that can't by simple.
+                     Default is [].
+
+            *       "output_handler"
+
+                     Handler for print output strings.
+                     Must be a GLOB.
+                     Default is undef.
+
+            *       "preserved"
+
+                     TODO not implemented.
+                     Default value is reference to blank array.
+
+            *       "set_indent"
+
+                     Set indent flag.
+                     Default is 0.
+
+            *       "skip_bad_tags"
+
+                     Skip bad tags.
+                     Default value is 0.
+
+            *       "xml_version"
+
+                     XML version for XML header.
+                     Default is "1.1".
+
+    "finalize()"
+             Finalize Tags output.
+             Automaticly puts end of all opened tags.
+             Returns undef.
+
+    "flush($reset_flag)"
+             Flush tags in object.
+             If defined 'output_handler' flush to its.
+             Or return code.
+             If enabled $reset_flag, then resets internal variables via reset method.
+
+    "open_tags()"
+             Return array of opened tags.
+
+    "put(@data)"
+             Put tags code in tags format.
+             Returns undef.
+
+    "reset()"
+             Resets internal variables.
+             Returns undef.
+
+ERRORS
+     TODO
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Tags::Output::LibXML;
+
+     # Object.
+     my $tags = Tags::Output::LibXML->new;
+
+     # Put data.
+     $tags->put(
+             ['b', 'text'],
+             ['d', 'data'],
+             ['e', 'text'],
+     );
+
+     # Print.
+     print $tags->flush."\n";
+
+     # Output:
+     # <?xml version="1.1" encoding="UTF-8"?>
+     # <text>data</text>
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Encode;
+     use Tags::Output::LibXML;
+
+     # Object.
+     my $tags = Tags::Output::LibXML->new(
+             'data_callback' => sub {
+                     my $data_ar = shift;
+                     foreach my $data (@{$data_ar}) {
+                             $data = encode_utf8($data);
+                     }
+                     return;
+             },
+     );
+
+     # Data in characters.
+     my $data = decode_utf8('řčěšřšč');
+
+     # Put data.
+     $tags->put(
+             ['b', 'text'],
+             ['d', $data],
+             ['e', 'text'],
+     );
+
+     # Print.
+     print $tags->flush."\n";
+
+     # Output:
+     # <?xml version="1.1" encoding="UTF-8"?>
+     # <text>řčěšřšč</text>
+
+DEPENDENCIES
+    Error::Pure, Readonly, Tags::Output, XML::LibXML.
+
+SEE ALSO
+    Tags
+        Structure oriented SGML/XML/HTML/etc. elements manipulation.
+
+    Tags::Output
+        Base class for Tags::Output::*.
+
+    Task::Tags
+        Install the Tags modules.
+
+AUTHOR
+    Michal Špaček skim@cpan.org
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

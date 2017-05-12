@@ -1,0 +1,8 @@
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE image [
+  <!ELEMENT image EMPTY>
+  <!ATTLIST image
+    height CDATA #REQUIRED
+    width CDATA #REQUIRED>
+]>
+<image height="32" width="32"/>

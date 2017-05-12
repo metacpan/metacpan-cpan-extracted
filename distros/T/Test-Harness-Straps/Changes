@@ -1,0 +1,16 @@
+0.30  Tue Jan  8 14:33:02 PST 2008
+    Forgot to make it install into the core directory and overlay the
+    existing module [spotted by imcat]
+
+0.29  Wed Oct 17 18:42:23 EDT 2007
+    Forgot to update the MANIFEST to contain the testing copy of if.pm
+
+0.28  Wed Oct 17 02:30:16 EDT 2007
+    Downgraded to the version from Test::Harness 2.64.  The alpha has bugs.
+
+0.27  Tue Oct 16 16:02:03 EDT 2007
+    A separate distribution of Straps.pm forked off of Test::Harness 2.65_02.
+    It is provided for backwards compatibility only.  For customized TAP
+    parsing please use TAP::Parser.
+    
+    Past changes to Straps can be found in the Test::Harness distribution.

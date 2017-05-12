@@ -1,0 +1,114 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "affe", "zomtec", "perfmon", "lmbench", "tapper", "foo", "bar"
+
+- schema: Testrun
+  name: affe, started
+  data:
+    id: 21
+    owner_id: 12
+    shortname: affe
+    notes: affe
+    topic_name: Software
+    starttime_earliest: 2008-06-27 00:00:01
+    starttime_testrun: 2008-12-12 07:00:00
+    starttime_test_program: 
+    endtime_test_program: 
+
+- schema: Testrun
+  name: zomtec, started
+  data:
+    id: 22
+    owner_id: 12
+    shortname: zomtec
+    notes: zomtec
+    topic_name: Software
+    starttime_earliest: 2008-06-27 00:00:01
+    starttime_testrun: 2008-12-12 08:00:00
+    starttime_test_program: 
+    endtime_test_program: 
+
+- schema: Testrun
+  name: perfmon, started and finished
+  data:
+    id: 23
+    owner_id: 12
+    shortname: perfmon
+    notes: perfmon
+    topic_name: Software
+    starttime_earliest: 2008-06-27 00:00:01
+    starttime_testrun: 2008-12-10 08:00:00
+    starttime_test_program: 2008-12-10 09:00:00
+    endtime_test_program: 2008-12-10 10:00:00
+
+- schema: Testrun
+  name: lmbench
+  data:
+    id: 24
+    owner_id: 12
+    shortname: lmbench
+    notes: tapper test suite lmbench wrapper
+    topic_name: Distribution
+    # sic!, 3000, to have one in future
+    starttime_earliest: 3000-12-27 00:00:01
+    starttime_testrun: 
+    starttime_test_program: 
+    endtime_test_program: 
+
+- schema: Testrun
+  name: tapper
+  data:
+    id: 25
+    owner_id: 12
+    shortname: tapper-sanity
+    notes: tapper sanity tests
+    topic_name: Distribution
+    starttime_earliest: 2008-06-27 00:00:01
+    starttime_testrun: 
+    starttime_test_program: 
+    endtime_test_program: 
+
+- schema: Testrun
+  name: foo
+  data:
+    id: 26
+    owner_id: 12
+    shortname: foo
+    notes: foo tests
+    topic_name: Research
+    starttime_earliest: 2008-06-27 00:00:01
+    starttime_testrun: 
+    starttime_test_program: 
+    endtime_test_program: 
+
+- schema: Testrun
+  name: bar
+  data:
+    id: 27
+    owner_id: 12
+    shortname: bar
+    notes: bar tests
+    topic_name: Research
+    starttime_earliest: 2008-06-27 00:00:01
+    starttime_testrun: 
+    starttime_test_program: 
+    endtime_test_program: 
+

@@ -1,0 +1,53 @@
+==================================================
+Changes from 1741-04-23 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------------
+version 20150205.000 at 2015-02-05 04:25:27 +0000
+-------------------------------------------------
+
+  Change: 88a2381b69b9907fa47db34abe2d947961927989
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-02-05 05:25:20 +0000
+
+    Fixed pod 
+
+  Change: b602dd402dfd0ce20ddd938bc57141ed9b38ee02
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-02-05 05:23:36 +0000
+
+    Time to make some updates... 
+
+  Change: 8556f797d5fb577dea5a233f9ec99ca9e135dfa4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-21 01:23:48 +0000
+
+    Added .travis.yml 
+
+  Change: 9635d748bf27d583850c76fba13cfd248af5a667
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-01 06:08:30 +0000
+
+    Removed Template::Stash::XS, its not an independent distribution 
+
+  Change: 956594ed4268e9da9ee881b5c1dd2f2fb69ef298
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-01 05:35:47 +0000
+
+    Ok, much more serious, much more modules! 
+
+  Change: ee0a4767775d83b4163d315dc0901a406569c03a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-01 04:14:01 +0000
+
+    Deleted all skeleton tests, added task packages, set dist.ini 
+
+  Change: 306899d1e2720630dd98382facf174307273b192
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-01 03:40:08 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

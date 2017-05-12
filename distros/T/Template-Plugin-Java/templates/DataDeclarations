@@ -1,0 +1,8 @@
+// Data declarations.
+[% FOREACH Java.variables %]
+[%	IF initializer %]
+$type $name = $initializer;
+[%	ELSE %]
+$type $name;
+[%	END %]
+[% END %]

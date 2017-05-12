@@ -1,0 +1,9 @@
+use strict;
+use warnings;
+use Test::More tests => 4;
+
+ok(1, 'is okay');
+is(2,3, 'fails because 2 != 3');
+pass('this passes');
+fail('this fails');
+

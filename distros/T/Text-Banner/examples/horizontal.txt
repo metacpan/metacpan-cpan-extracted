@@ -1,0 +1,124 @@
+See the documentation.txt file for detailed information regarding
+this module.
+
+Examples of horizontal sizes available (sizes 1-5 are available, but 4 & 5
+are huge and won't be included here)
+
+
+[ SIZE 1 ]
+
+TTTTTTT                         
+   T     eeeeee   ssss    ttttt 
+   T     e       s          t   
+   T     eeeee    ssss      t   
+   T     e            s     t   
+   T     e       s    s     t   
+   T     eeeeee   ssss      t   
+
+
+
+[ SIZE 2 ]
+
+TTTTTTTTTTTTTT                                                  
+TTTTTTTTTTTTTT                                                  
+      TT          eeeeeeeeeeee      ssssssss        tttttttttt  
+      TT          eeeeeeeeeeee      ssssssss        tttttttttt  
+      TT          ee              ss                    tt      
+      TT          ee              ss                    tt      
+      TT          eeeeeeeeee        ssssssss            tt      
+      TT          eeeeeeeeee        ssssssss            tt      
+      TT          ee                        ss          tt      
+      TT          ee                        ss          tt      
+      TT          ee              ss        ss          tt      
+      TT          ee              ss        ss          tt      
+      TT          eeeeeeeeeeee      ssssssss            tt      
+      TT          eeeeeeeeeeee      ssssssss            tt      
+
+
+[ SIZE 3 ]
+
+TTTTTTTTTTTTTTTTTTTTT                                                                           
+TTTTTTTTTTTTTTTTTTTTT                                                                           
+TTTTTTTTTTTTTTTTTTTTT                                                                           
+         TTT               eeeeeeeeeeeeeeeeee         ssssssssssss            ttttttttttttttt   
+         TTT               eeeeeeeeeeeeeeeeee         ssssssssssss            ttttttttttttttt   
+         TTT               eeeeeeeeeeeeeeeeee         ssssssssssss            ttttttttttttttt   
+         TTT               eee                     sss                              ttt         
+         TTT               eee                     sss                              ttt         
+         TTT               eee                     sss                              ttt         
+         TTT               eeeeeeeeeeeeeee            ssssssssssss                  ttt         
+         TTT               eeeeeeeeeeeeeee            ssssssssssss                  ttt         
+         TTT               eeeeeeeeeeeeeee            ssssssssssss                  ttt         
+         TTT               eee                                    sss               ttt         
+         TTT               eee                                    sss               ttt         
+         TTT               eee                                    sss               ttt         
+         TTT               eee                     sss            sss               ttt         
+         TTT               eee                     sss            sss               ttt         
+         TTT               eee                     sss            sss               ttt         
+         TTT               eeeeeeeeeeeeeeeeee         ssssssssssss                  ttt         
+         TTT               eeeeeeeeeeeeeeeeee         ssssssssssss                  ttt         
+         TTT               eeeeeeeeeeeeeeeeee         ssssssssssss                  ttt         
+
+
+
+
+
+Changing the fill character to '*' would result in output as follows:
+
+
+[ SIZE 1 ]
+
+*******                         
+   *     ******   ****    ***** 
+   *     *       *          *   
+   *     *****    ****      *   
+   *     *            *     *   
+   *     *       *    *     *   
+   *     ******   ****      *   
+
+
+
+[ SIZE 2 ]
+
+**************                                                  
+**************                                                  
+      **          ************      ********        **********  
+      **          ************      ********        **********  
+      **          **              **                    **      
+      **          **              **                    **      
+      **          **********        ********            **      
+      **          **********        ********            **      
+      **          **                        **          **      
+      **          **                        **          **      
+      **          **              **        **          **      
+      **          **              **        **          **      
+      **          ************      ********            **      
+      **          ************      ********            **      
+
+
+[ SIZE 3 ]
+
+*********************                                                                           
+*********************                                                                           
+*********************                                                                           
+         ***               ******************         ************            ***************   
+         ***               ******************         ************            ***************   
+         ***               ******************         ************            ***************   
+         ***               ***                     ***                              ***         
+         ***               ***                     ***                              ***         
+         ***               ***                     ***                              ***         
+         ***               ***************            ************                  ***         
+         ***               ***************            ************                  ***         
+         ***               ***************            ************                  ***         
+         ***               ***                                    ***               ***         
+         ***               ***                                    ***               ***         
+         ***               ***                                    ***               ***         
+         ***               ***                     ***            ***               ***         
+         ***               ***                     ***            ***               ***         
+         ***               ***                     ***            ***               ***         
+         ***               ******************         ************                  ***         
+         ***               ******************         ************                  ***         
+         ***               ******************         ************                  ***         
+
+
+

@@ -1,0 +1,15 @@
+t/00-artemis-meta..........
+1..1
+ok 1 - artemis-suite-meta
+# Artemis-reportgroup-arbitrary:   1822
+# Artemis-suite-name:              Artemis-Reports-DPath-2.010005
+# Artemis-suite-version:           2.010005
+t/artemis_reports_dpath....
+TAP Version 13
+1..2
+ok 1 - count ALL plans including sections - empty braces
+  ---
+  foo: bar
+  affe: zomtec
+  ...
+ok 2 - allow easier report.id column 1

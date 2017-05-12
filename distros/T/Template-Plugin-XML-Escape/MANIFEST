@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Template-Plugin-XML-Escape.t
+lib/Template/Plugin/XML/Escape.pm

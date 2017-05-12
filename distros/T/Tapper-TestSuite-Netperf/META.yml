@@ -1,0 +1,194 @@
+---
+abstract: 'Tapper - Network performance measurements'
+author:
+  - 'AMD OSRC Tapper Team <tapper@amd64.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tapper-TestSuite-Netperf
+requires:
+  IO::Handle: 0
+  IO::Socket::INET: 0
+  Log::Log4perl: 0
+  Moose: 0
+  MooseX::Log::Log4perl: 0
+  YAML: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tapper-TestSuite-Netperf
+  homepage: http://metacpan.org/release/Tapper-TestSuite-Netperf
+  repository: git://github.com/tapper/Tapper-TestSuite-Netperf.git
+version: 4.1.1
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@TAPPER/GatherDir'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@TAPPER/PruneCruft'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@TAPPER/ManifestSkip'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@TAPPER/MetaYAML'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@TAPPER/Readme'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@TAPPER/ExtraTests'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@TAPPER/ExecDir'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@TAPPER/ShareDir'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@TAPPER/MakeMaker'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@TAPPER/Manifest'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@TAPPER/TestRelease'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@TAPPER/ConfirmRelease'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@TAPPER/UploadToCPAN'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@TAPPER/MetaConfig'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@TAPPER/MetaJSON'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@TAPPER/PkgVersion'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@TAPPER/PodSyntaxTests'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@TAPPER/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@TAPPER/PodCoverageTests'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@TAPPER/MetaResources'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@TAPPER/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@TAPPER/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@TAPPER/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@TAPPER/AutoPrereqs'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::Git::Describe
+      name: '@TAPPER/Git::Describe'
+      version: 0.002
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@TAPPER/CheckChangesHasContent'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@TAPPER/NextRelease'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
+      name: '@TAPPER/Git::CheckFor::CorrectBranch'
+      version: 0.004
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@TAPPER/Git::NextVersion'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@TAPPER/@Git/Check'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@TAPPER/@Git/Commit'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@TAPPER/@Git/Tag'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@TAPPER/@Git/Push'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300023
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300023
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300023
+x_authority: cpan:TAPPER

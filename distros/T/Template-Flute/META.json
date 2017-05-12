@@ -1,0 +1,71 @@
+{
+   "abstract" : "Modern designer-friendly HTML templating Engine",
+   "author" : [
+      "Stefan Hornburg (Racke) <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Flute",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "HTML::Entities" : "0",
+            "Hash::MultiValue" : "0",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Page" : "0",
+            "Data::Transpose" : "0.0009",
+            "HTML::Scrubber" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "1.001",
+            "Parse::RecDescent" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "Text::Markdown" : "0",
+            "Type::Tiny" : "0.008",
+            "URI" : "0",
+            "XML::Twig" : "3.48",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/racke/Template-Flute/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/racke/Template-Flute.git"
+      }
+   },
+   "version" : "0.025",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

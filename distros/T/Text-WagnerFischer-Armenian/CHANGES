@@ -1,0 +1,9 @@
+Revision history for Text::WagnerFischer::Armenian
+
+0.04	9 Feb 2015
+  * Add =encoding declaration to POD
+
+0.03	3 Sep 2008
+  * Require 5.8.3 to run Makefile.PL
+  * Add vocalic equivalence 'yi' -> accent (useful for manuscripts, not so much
+	for modern orthography)

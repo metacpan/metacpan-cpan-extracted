@@ -1,0 +1,44 @@
+Revision history for Test::LocalFunctions
+
+0.23 2013-07-03T06:26:13Z
+        - Fix again.
+
+0.22 2013-07-02T15:57:02Z
+        - Fix some unfixed problems.
+
+0.21 2013-07-02T04:32:32Z
+        - Fix the problem that fails tests.
+          (@papix++)
+
+0.20 2013-06-21T04:31:08Z
+        - Added functions to ignore testing.
+
+0.14 2013-06-03T07:22:35Z
+        - Tiny fix to pass tests on perl-5.8.9.
+
+0.13 2013-05-31T11:21:12Z
+        - Added function to get the back end module name which is used.
+          (Thank you for your advice, @tokuhirom)
+
+0.12 2013-05-30T18:56:21Z
+        - Change environment variables for testing.
+
+0.11 2013-05-30T10:34:09Z
+        - Fix fatal bugs.
+          (Thanks a lot @syohex)
+
+0.10 2013-05-30T09:10:25Z
+        - Added Test::LocalFunctions::Fast
+          (It is really fast! Thank you @papix)
+
+0.04    Fri May 10 18:49:27 +0900 2013
+        - Tiny fixes
+
+0.03    Thu Apr 04 04:14:37 +0900 2013
+        - Removed a dependency on Module::Build::Pluggable::CPANfile
+
+0.02    Thu Apr 04 03:52:16 +0900 2013
+        - Fixed cpanfile errors
+
+0.01    Tue Apr 02 01:02:17 +0900 2013
+        - Initial release

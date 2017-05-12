@@ -1,0 +1,15 @@
+Revision history for Perl extension Text::Emoticon::MSN
+
+0.04  Wed Jan 11 10:33:35 UTC 2006
+        - Oops, fixed the typo in imgbase default URL
+
+0.03  Wed Jan 11 10:17:37 UTC 2006
+        - Now it requires Text::Emoticon 0.03
+        - Use MSN site as a default imgbase now
+
+0.02  Sun May 29 14:55:19 JST 2005
+        * Added 'strict' option
+          (Thanks to Marcus Ramberg)
+
+0.01  Fri Mar 26 18:22:38 2004
+	- original version

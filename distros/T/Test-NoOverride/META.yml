@@ -1,0 +1,28 @@
+---
+abstract: 'stop accidentally overriding'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-NoOverride
+provides:
+  Test::NoOverride:
+    file: lib/Test/NoOverride.pm
+    version: 0.04
+requires:
+  Module::Functions: 0
+  Test::More: 0.88
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/Test-NoOverride/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Test-NoOverride
+version: 0.04

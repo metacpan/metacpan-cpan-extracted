@@ -1,0 +1,61 @@
+NAME
+    TAP::Harness::Restricted - Skip some test files
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+        # command line
+        $ HARNESS_SUBCLASS=TAP::Harness::Restricted make test
+
+        # bashrc file
+        export HARNESS_SUBCLASS=TAP::Harness::Restricted
+
+DESCRIPTION
+    This module is a trivial subclass of TAP::Harness. It overrides the
+    "aggregate_tests" function to filter out tests that I didn't want
+    getting in the way of module installation.
+
+    The current criteria include:
+
+    *   File names that look like pod.t or pod-coverage.t, with optional
+        leading numbers
+
+    *   Files that contain the text "use Test::Pod"
+
+    *   Files matching any of the space-separated glob patterns in
+        $ENV{HARNESS_SKIP}
+
+    Suggestions for other annoying things to filter out are welcome.
+
+    If someone is inclined to make this extensible so people can put their
+    own criteria into configuration files, please email the author with
+    ideas before sending a patch.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/TAP-Harness-Restricted/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/TAP-Harness-Restricted>
+
+      git clone https://github.com/dagolden/TAP-Harness-Restricted.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

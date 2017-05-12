@@ -1,0 +1,15 @@
+Build.PL
+Changes
+INSTALL
+lib/Test/Builder/Clutch.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README.pod
+t/00-load.t
+t/antitest.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/Test-Builder-Clutch.t

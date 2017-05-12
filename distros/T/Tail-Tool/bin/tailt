@@ -1,0 +1,968 @@
+#!/usr/bin/perl
+
+# Created on: 2010-09-14 08:51:00
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Getopt::Alt qw/get_options/;
+use English qw/ -no_match_vars /;
+use Path::Tiny;
+use Tail::Tool;
+use AnyEvent;
+use AnyEvent::Loop;
+use TryCatch;
+use YAML qw/LoadFile DumpFile Dump/;
+use File::HomeDir;
+
+our $VERSION = version->new('0.4.7');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    lines    => 10,
+    disabled => [],
+);
+my %found_plugins;
+my $restart = {};
+my $tt;
+my $config_file = path(File::HomeDir->my_home, '.tailtrc');
+
+main();
+exit 0;
+
+sub main {
+    my %plugins = get_plugins();
+
+    my $opt = get_options(
+        {
+            default => \%option,
+            helper  => 1,
+        },
+        [
+            'disabled|d=s@',
+            'restart|r!',
+            'lines|n=i',
+            'no_inotify|no-inotify!',
+            'config|c=s',
+            'Highlight|highlight|h=s@',
+            'Match|match|m=s@',
+            'Ignore|ignore|i=s@',
+            'Replace|replace|r=s@',
+            ( map {  "$_|". lc $_. '=s%' } keys %plugins ),
+            'verbose|v+',
+        ]
+    );
+    %option = %{ $opt };
+
+    # do stuff here
+    for my $key (qw/Highlight Match Ignore Replace/) {
+        next if !exists $option{$key};
+        $option{$key} = { regex => [@{ $option{$key} }] };
+    }
+
+    my $restore;
+    if ( $option{config} && -f $config_file ) {
+        my $config = LoadFile($config_file);
+        $restore = $config->{configs}{ $option{config} };
+
+        delete $option{config};
+    }
+
+    if ( $option{restart} ) {
+        $restart->{normal} = AE::io *STDIN, 0, sub {
+            my $cmd = <STDIN>;
+
+            return if !$cmd || $cmd =~ /^\s*$/;
+
+            chomp $cmd;
+
+            exit 0 if lc $cmd eq 'q' || lc $cmd eq 'bye';
+
+            return if $cmd eq '';
+
+            restart();
+        };
+        $restart->{int} = AE::signal INT => \&restart;
+    }
+
+    my %disabled;
+    if ( @{ $option{disabled} } ) {
+        %disabled = (
+            map {
+                $_ => 1
+            }
+            map {
+                @{ get_files($_) }
+            }
+            map {
+                split /[,;]/, $_
+            }
+            @{ $option{disabled} }
+        );
+        push @ARGV, keys %disabled;
+    }
+    delete $option{disabled};
+
+    $tt = Tail::Tool->new(
+        files => get_files(@ARGV),
+        #printer => \&printer,
+        %option,
+    );
+
+    if ( %disabled ) {
+        for my $file ( @{ $tt->files } ) {
+            if ( $disabled{$file->name} ) {
+                $file->pause(1);
+            }
+        }
+    }
+
+    if ( $restore ) {
+        push @{ $tt->pre_process }, @{ $restore->{pre_process} }
+            if @{ $restore->{pre_process} || [] };
+        push @{ $tt->post_process }, @{ $restore->{post_process} }
+            if @{ $restore->{post_process} || [] };
+    }
+
+    my $w;
+    if ( grep { $_->{name} eq '-' } @{ $tt->files } ) {
+        # check that all files have finished if we are looking at STDIN
+        $w = AE::timer 0.1, 0.1, sub {
+            my $count = 0;
+            for my $file (@{ $tt->files }) {
+                $count++ if $file->watcher;
+            }
+            exit if $count == 0;
+        };
+    }
+
+    $tt->tail();
+
+    AnyEvent::Loop::run;
+
+    return $w;
+}
+
+sub restart {
+    print "\n";
+    my $files   = join ', ', map { colored( $_->name, $_->pause ? 'red' : 'green' ) } @{ $tt->files };
+    my $plugins = '';
+    my $i       = 0;
+    my %done;
+    my @plugins;
+
+    for my $plg ( @{ $tt->pre_process }, @{ $tt->post_process }, sort keys %found_plugins ) {
+        my $name = ref $plg || $plg;
+        $name =~ s/^(.+::)//xms;
+
+        next if !ref $plg && $done{$name};
+        $i++;
+        $done{$name} = $plg;
+        $plugins[$i] = $plg;
+
+        $plugins .= "\n" if $plugins;
+        $plugins .= sprintf "%2d  %s %s", $i, $name eq $plg ? 'Add' : 'Change', $name;
+        if ( ref $plg && $plg->can('summarise') ) {
+            $plugins .= ' (' . $plg->summarise(1) . ')';
+        }
+    }
+
+    print <<"MENU";
+
+$plugins
+ f  Change tailed files ($files)
+ r  Resume tailing
+ c  Clear screen and resume tailing
+ p  Plugin ordering
+ l  Load Config
+ s  Save Config
+ b  Shell out
+ q  Quit
+MENU
+
+    my $answer = prompt_menu( 1 .. $i, qw/f r c p l s q Q/ );
+
+    if ( $answer eq 'f' ) {
+        update_files();
+    }
+    elsif ( $answer eq 'r' ) {
+        return 1;
+    }
+    elsif ( $answer eq 'c' ) {
+        print "\n" x 2_000;
+        return 1;
+    }
+    elsif ( $answer eq 'p' ) {
+        plugin_order();
+    }
+    elsif ( $answer eq 'l' ) {
+        load_config();
+    }
+    elsif ( $answer eq 's' ) {
+        save_config();
+    }
+    elsif ( $answer eq 'b' ) {
+        system $ENV{SHELL} || '/bin/bash';
+    }
+    elsif ( $answer =~ /^\d+$/ ) {
+        update_plugin( $plugins[$answer] );
+    }
+
+    exit if !defined $answer || $answer eq '' || lc $answer eq 'q';
+
+    # reinstall interupt handler
+    $restart->{int} = AE::signal INT => \&restart;
+
+    return restart();
+}
+
+my $spinner;
+sub printer {
+    my @lines = @_;
+
+    if ( !$spinner ) {
+        require Term::Spinner;
+        $spinner = Term::Spinner->new();
+    }
+
+    if (@lines) {
+        $spinner->advance;
+    }
+    else {
+        $spinner->clear;
+        print {*STDOUT} @lines;
+    }
+    die "Why isn't this working?\n".@lines."\n";
+}
+
+sub get_plugins {
+    my %plugins;
+
+    for my $inc (@INC) {
+        my $dir = path($inc, 'Tail', 'Tool', 'Plugin');
+        next if !-d $dir;
+
+        my @modules = grep { /[.]pm$/ } $dir->children;
+
+        MODULE:
+        for my $module (@modules) {
+            my $name = $module->basename;
+            $name =~ s/[.]pm//xms;
+            next if $found_plugins{$name}++;
+
+            eval { require $module };
+            warn $@ if $@;
+            next if $EVAL_ERROR;
+
+            next MODULE if $name eq 'Highlight' || $name eq 'Ignore' || $name eq 'Match';
+
+            $module =~ s{$inc/}{}xms;
+            $module =~ s{[.]pm}{}xms;
+            $module =~ s{/}{::}gxms;
+            $plugins{$name} = $module->does('Tail::Tool::RegexRole');
+        }
+    }
+
+    return %plugins;
+}
+
+sub update_files {
+    my $i = 0;
+    my %map_orig = map { $_->name => $i++ } @{ $tt->files };
+    my @files
+        = sort {
+            my $aname = $a->name;
+            my $bname = $b->name;
+            $aname =~ s/(\d+)/sprintf "%05d", $1/egxms;
+            $bname =~ s/(\d+)/sprintf "%05d", $1/egxms;
+            $aname cmp $bname;
+        }
+        @{ $tt->files };
+    $i = 0;
+    my %map_new = map { ++$i => $map_orig{$_->name} } @files;
+    $i = 0;
+    my $files
+        = join "\n",
+        map {
+            sprintf "%2d  Change %s", ++$i, colored( $_->name, $_->pause ? 'red' : 'green' )
+        }
+        @files;
+    print <<"MENU";
+
+$files
+ a  Add another file to tail
+ r  Return to previous menu
+MENU
+
+    my $answer = prompt_menu( 1 .. $i, qw/a r R/ );
+
+    return if $answer eq 'r';
+
+    if ( $answer eq 'a' ) {
+        my $new_file = prompt("New file name : ", '-tty') . '';
+
+        my $file = Tail::Tool::File->new( name => $new_file );
+        $file->tailer($tt);
+        push @{ $tt->files }, $file;
+        $tt->tail( 1 );
+    }
+    else {
+        update_file( $map_new{$answer} );
+    }
+    return update_files();
+}
+
+sub update_file {
+    my ($i) = @_;
+    my $file = $tt->files->[$i];
+    my $name = $file->name;
+    my $pause = $file->pause ? 'Resume' : 'Pause';
+
+    print <<"MENU";
+ d  Delete $name
+ p  $pause tailing of $name
+ r  Return
+MENU
+
+    my $answer = prompt_menu( qw/d p r R/ );
+
+    return if $answer eq 'r';
+
+    if ( $answer eq 'p' ) {
+        $file->pause( ! $file->pause );
+        $file->watch();
+    }
+    elsif ( $answer eq 'd' ) {
+        my @files = @{ $tt->files };
+        if ( $i == 0 ) {
+            shift @files;
+        }
+        elsif ( $i == @files - 1 ) {
+            pop @files;
+        }
+        else {
+            @files = ( @files[ 0 .. $i - 1], @files[ $i + 1 .. @files - 1 ] );
+        }
+        $tt->files(\@files);
+
+        return;
+    }
+
+    return update_file($i);
+}
+
+sub update_plugin {
+    my ($plg) = @_;
+
+    my $plugin = $plg;
+    if ( !ref $plugin ) {
+        my $module = 'Tail::Tool::Plugin::' . $plugin;
+        $plugin = $module->new();
+    }
+
+    my $meta = $plugin->meta;
+    my $i = 0;
+    my @names;
+
+    for my $attrib ( $meta->get_all_attributes ) {
+        my $name = $attrib->name;
+        next if $name eq 'post';
+        next if !$attrib->has_init_arg;
+        next if $attrib->{isa} eq 'CodeRef';
+        #next if grep { $name eq $_ } qw/last_time/;
+        $i++;
+
+        $names[$i] = $attrib;
+        my $out = sprintf "%2d  Change $name", $i;
+
+        my $reader = $attrib->reader || $name;
+        my $value = $plugin->$reader();
+
+        $out .= ' (' . show_value($value) . ')' if $value;
+
+        print "$out\n";
+    }
+    print " a  Add a new instance\n" if $plg eq $plugin && $plugin->many;
+    print " r  Return to previous menu\n";
+
+    my $answer = prompt_menu( 1 .. $i, qw/a r R/ );
+
+    return if !defined $answer || $answer eq '' || $answer eq 'r';
+
+    if ( $answer eq 'a' ) {
+        $plg = ref $plugin;
+        $plg =~ s/^.*:://xms;
+        return update_plugin( $plg );
+    }
+
+    my $updated = update_attribute( $plugin, $names[$answer] );
+
+    if ( $updated && $plugin ne $plg ) {
+        if ( $plugin->post ) {
+            $tt->post_process( [ @{ $tt->post_process() }, $plugin ] );
+        }
+        else {
+            $tt->pre_process( [ @{ $tt->pre_process() }, $plugin ] );
+        }
+    }
+
+    return update_plugin($plugin);
+}
+
+sub update_attribute {
+    my ( $plugin, $attrib ) = @_;
+    my $name   = $attrib->name;
+    my $reader = $attrib->reader || $name;
+    my $writer = $attrib->writer || $name;
+    my $value = $plugin->$reader();
+
+    if ( ref $value eq 'ARRAY' ) {
+        try {
+            $plugin->$writer( update_array( $value ) );
+        }
+        catch ($e) {
+            warn "Error in updating value ($value): $e\n";
+        }
+        return 1;
+    }
+    else {
+        my $new_value = prompt("Change $name to : ", '-tty') . '';
+        try {
+            $plugin->$writer( $new_value );
+        }
+        catch ($e) {
+            if ( $e =~ /ArrayRefHashRef/ ) {
+                $plugin->$writer( [{ regex => qr/$new_value/, enabled => 1 }] );
+            }
+            else {
+                warn "Could not work out how to add this value: $e";
+            }
+        }
+        return 1;
+    }
+    return 0;
+}
+
+sub update_array {
+    my ($array) = @_;
+
+    my $i = 0;
+    for my $element ( @{ $array } ) {
+        printf "%2d  Update %s\n", $i++, show_value($element);
+    }
+
+    print <<"MENU";
+ a  Add new element
+ d  Delete element
+ r  Return to previous menu
+MENU
+
+    my $answer = prompt_menu( 0 .. $i - 1, qw/a d r R/ );
+
+    return $array if !defined $answer || lc $answer eq 'r';
+
+    my $regex = 'Tail::Tool::Regex';
+    if ( $answer eq 'd' ) {
+        my $delete = prompt("Delete which entry : ", '-tty');
+        if ( $delete == 0 ) {
+            shift @{ $array };
+        }
+        elsif ( $delete == @{ $array } - 1 ) {
+            pop @{ $array };
+        }
+        else {
+            $array = [ @{ $array }[ 0 .. $delete - 1 ], @{ $array }[ $delete + 1 .. @{ $array } - 1 ] ];
+        }
+    }
+    elsif ( $answer eq 'a' ) {
+        my $new
+            = ref $array->[0] eq 'ARRAY' ? update_array([])
+            : ref $array->[0] eq 'HASH'  ? update_hash({})
+            : ref $array->[0] eq $regex  ? update_regex( $regex->new(regex=>''), $array->[0] )
+            :                              prompt("Enter new element : ", '-tty') . '';
+        push @{ $array }, $new;
+    }
+    else {
+        $array->[$answer]
+            = ref $array->[$answer] eq 'ARRAY'  ? update_array( $array->[$answer] )
+            : ref $array->[$answer] eq 'HASH'   ? update_hash( $array->[$answer] )
+            : ref $array->[$answer] eq $regex   ? update_regex( $array->[$answer] )
+            :                                     prompt("Enter new value : ", '-tty') . '';
+    }
+
+    return $array;
+}
+
+sub update_hash {
+    my ( $hash ) = @_;
+    my @keys;
+
+    for my $key ( keys %{ $hash } ) {
+        printf "%2d  Change %s => %s\n", ( scalar @keys ), $key, show_value($hash->{$key});
+        push @keys, $key;
+    }
+    print <<"MENU";
+ a  Add new key
+ d  Delete key
+ r  Return
+MENU
+
+    my $answer = prompt_menu( 0 .. @keys - 1, qw/a d r R/ );
+
+    return $hash if !defined $answer || lc $answer eq 'r';
+
+    if ( $answer eq 'd' ) {
+        print "Select which key to delete: ";
+        my $answer = prompt_menu( 0 .. @keys - 1 );
+        delete $hash->{ $keys[ $answer ] };
+    }
+    elsif ( $answer eq 'a' ) {
+        my $key = prompt("Enter new key : ", '-tty') . '';
+        my $value = prompt("Enter new value : ", '-tty') . '';
+        $hash->{$key} = $value;
+    }
+    else {
+        my $key = $keys[ $answer ];
+        my $value
+            = ref $hash->{$key} eq 'ARRAY' ? update_array( $hash->{$key} )
+            : ref $hash->{$key} eq 'HASH'  ? update_hash( $hash->{$key} )
+            :                                prompt("Enter new value : ", '-tty') . '';
+        $hash->{$key} = $value;
+    }
+
+    return update_hash( $hash );
+}
+
+sub update_regex {
+    my ( $regex, $other ) = @_;
+
+    my @choice = ('x');
+    print " x  Change regex (" . $regex->regex .")\n";
+
+    if ( $regex->has_colour || ( $other && $other->has_colour ) ) {
+        print " c  Change colour (" . ( join ', ', @{ $regex->colour || [] } ) . ")\n";
+        push @choice, 'c';
+    }
+
+    if ( $regex->has_replace || ( $other && $other->has_replace ) ) {
+        print " p  Change replace value (" . $regex->replace . ")\n";
+        push @choice, 'p';
+    }
+
+    my $enabled = $regex->enabled ? 'Disable' : 'Enable';
+    print <<"MENU";
+ e  $enabled
+ r  Return
+MENU
+
+    my $answer = prompt_menu( @choice, qw/e r R/ );
+
+    if ( $answer eq 'r' ) {
+        return $regex;
+    }
+    elsif ( $answer eq 'x' ) {
+        my $new = prompt("Enter new regexp : ", '-tty');
+        $regex->regex(qr/$new/);
+    }
+    elsif ( $answer eq 'c' ) {
+        print "Possible colours: red green yellow blue magenta cyan on_red on_green on_yellow on_blue on_magenta on_cyan & bold\n";
+        my $new = update_array( $regex->colour || [] );
+        $regex->colour($new);
+    }
+    elsif ( $answer eq 'p' ) {
+        my $new = prompt("Enter new replace value : ", '-tty');
+        $regex->replace($new);
+    }
+    elsif ( $answer eq 'e' ) {
+        $regex->enabled( !$regex->enabled );
+    }
+
+    return update_regex($regex);
+}
+
+sub show_value {
+    my ($value) = @_;
+
+    if ( !ref $value ) {
+        return "'$value'";
+    }
+    elsif ( ref $value eq 'ARRAY' ) {
+        return '[' . ( join ', ', map { show_value($_) } @{ $value } ) . ']';
+    }
+    elsif ( ref $value eq 'HASH' ) {
+        return '{ ' . ( join ', ', map { "$_=>" . show_value($value->{$_}) } keys %{ $value } ) . ' }';
+    }
+    elsif ( ref $value eq 'Regexp' ) {
+        return "qr/$value/";
+    }
+    elsif ( eval { $value->can('summarise') } ) {
+        return $value->summarise(1);
+    }
+    else {
+        warn "Don't yet display " . ( ref $value ) . " values\n";
+    }
+
+    return '';
+}
+
+sub prompt_menu {
+    my @choices = @_;
+    my @onechar = ('-one_char');
+    for my $choice (@choices) {
+        @onechar = () if length $choice > 1;
+    }
+    my $match
+        = @onechar
+        ? '^[' . ( join '',  @choices ) . ']?$'
+        : '^(' . ( join '|', @choices ) . ')?$';
+
+    my $answer = prompt(
+        -prompt => 'Enter your choice [' . ( join ',', @choices ) . '] ',
+        @onechar,
+        '-tty',
+        -require => {
+            'Must be one of [' . ( join ', ', @choices ) . '] ' => qr/$match/,
+        },
+    );
+    print "\n" if @onechar;
+
+    return $answer;
+}
+
+sub plugin_order {
+    print "\nPlugins:\n";
+    print "1.  Pre  Processing: ";
+    print join ", ", map {$a = ref $_; $a =~ s/^.*:://; $a} @{$tt->pre_process};
+    print "\n";
+    print "2.  Post Processing: ";
+    print join ", ", map {$a = ref $_; $a =~ s/^.*:://; $a} @{$tt->post_process};
+    print "\n";
+
+    my $answer = prompt_menu( qw/ 1 2 r R/ );
+    print "\n";
+    if ( !$answer || lc $answer eq 'r' ) {
+        return;
+    }
+
+    plugin_reorder( $answer == 1 ? $tt->pre_process : $tt->post_process );
+
+    return plugin_order();
+}
+
+sub plugin_reorder {
+    my ($plugins) = @_;
+
+    print "\n";
+    print join ", ", map {$a = ref $_; $a =~ s/^.*:://; $a} @{$plugins};
+    print "\n";
+    my $i = 0;
+    for my $plugin (@{$plugins}) {
+        my $name = ref $plugin;
+        $name =~ s/^.*:://;
+
+        printf "%2d  %s (%s)\n", ++$i, $name, $plugin->can('summarise') ? $plugin->summarise(1) : '';
+    }
+
+    return if $1 == 1;
+
+    my $answer = prompt_menu( 1 .. $i, qw/r R/ );
+    print "\n";
+
+    return if !$answer || lc $answer eq 'r';
+
+    my ($first, $second);
+    if ( $answer == 1 ) {
+        $first  = 1;
+        $second = 2;
+    }
+    elsif ( $answer == $i ) {
+        $first  = $i - 1;
+        $second = $i;
+    }
+    else {
+        my $dir = prompt(
+            "Move (u)p or (d)own : ",
+            '-one_char',
+            '-tty',
+            -require => {
+                'Please enter either u or p' => qr/^[ud]$/,
+            },
+        ) . '';
+        if ( $dir eq 'u' ) {
+            $first  = $i;
+            $second = $i + 1;
+        }
+        else {
+            $first  = $i - 1;
+            $second = $i;
+        }
+    }
+
+    warn "Swapping $first => $second\n";
+    my $tmp = $plugins->[$first - 1];
+    $plugins->[$first - 1]  = $plugins->[$second - 1];
+    $plugins->[$second - 1] = $tmp;
+
+    return plugin_reorder($plugins);
+}
+
+sub load_config {
+    my $config = -f $config_file ? LoadFile($config_file) : { configs => {} };
+    my @saves;
+    my $save;
+
+    for my $key ( keys %{ $config->{configs} } ) {
+        printf "%2d  Load \"%s\"\n", ( scalar @saves ), $key;
+        push @saves, $key;
+    }
+
+    if ( !@saves ) {
+        print "No saved configs\n";
+        return;
+    }
+
+    print " r  Return\n";
+    my $answer = prompt_menu( 0 .. @saves - 1, qw/r R/ );
+
+    return if $answer eq 'r';
+
+    my $restore = $config->{configs}{ $saves[ $answer ] };
+
+    push @{ $tt->pre_process }, @{ $restore->{pre_process} }
+        if @{ $restore->{pre_process} || [] };
+    push @{ $tt->post_process }, @{ $restore->{post_process} }
+        if @{ $restore->{post_process} || [] };
+}
+
+sub save_config {
+    my $config = -f $config_file ? LoadFile($config_file) : { configs => {} };
+    my @saves;
+    my $save;
+
+    for my $key ( keys %{ $config->{configs} } ) {
+        printf "%2d  Save over \"%s\"\n", ( scalar @saves ), $key;
+        push @saves, $key;
+    }
+
+    if ( @saves ) {
+        print " n  Save as new name\n";
+        print " r  Return\n";
+        my $answer = prompt_menu( 0 .. @saves - 1, qw/n r R/ );
+        if ( $answer eq 'n' ) {
+            $save = prompt("Save AS : ", '-tty') . '';
+        }
+        elsif ( $answer ne 'r' ) {
+            $save = $saves[ $answer ];
+        }
+    }
+    else {
+        $save = prompt("Save AS : ", '-tty') . '';
+    }
+
+    return if !$save;
+
+    $config->{configs}{$save} = {
+        pre_process  => $tt->pre_process,
+        post_process => $tt->post_process,
+    };
+
+    DumpFile($config_file, $config);
+    return;
+}
+
+sub get_files {
+    my (@files) = @_;
+    my @all;
+
+    for my $file (@files) {
+        push @all,
+            $file =~ m{^ssh://} ? get_hosts([$file])
+            :                     glob($file);
+    }
+
+    return @all ? \@all : ['-'];
+}
+
+# converts host ranges to actual host names
+sub get_hosts {
+    my ($hosts) = @_;
+    my @hosts;
+
+    my $int_re       = qr/ [0-9a-zA-Z] /xms;
+    my $range_re     = qr/ ($int_re) (?:[.][.]|-) ($int_re)/xms;
+    my $group_re     = qr/ (?: $int_re | $range_re )       /xms;
+    my $seperated_re = qr/ $group_re (?: , $group_re )  *  /xms;
+    my $num_range_re = qr/ [[{] ( $seperated_re ) [\]}]    /xms;
+
+    while ( my $host_range = shift @{$hosts} ) {
+        my ($num_range) = $host_range =~ /$num_range_re/;
+
+        if (!$num_range) {
+            push @hosts, $host_range;
+            next;
+            #if ( is_host($host_range) ) {
+            #    push @hosts, $host_range;
+            #    next;
+            #}
+            #else {
+            #    unshift @{$hosts}, $host_range;
+            #    last;
+            #}
+        }
+
+        my @numbs    = map { /$range_re/ ? ($1 .. $2) : ($_) } split /,/, $num_range;
+        my @hostmaps = map { $a=$host_range; $a =~ s/$num_range_re/$_/e; $a } @numbs;
+
+        if ( $hostmaps[0] =~ /$num_range_re/ ) {
+            push @{$option{host}}, @hostmaps;
+        }
+        else {
+            push @hosts, @hostmaps;
+        }
+    }
+
+    return @hosts;
+}
+
+sub prompt {
+    require IO::Prompt;
+    return IO::Prompt::prompt(@_);
+}
+
+sub colored {
+    require Term::ANSIColor;
+    return Term::ANSIColor::colored(@_);
+}
+
+__DATA__
+
+=head1 NAME
+
+tailt - Tail files using the Tail::Tool library
+
+=head1 VERSION
+
+This documentation refers to tailt version 0.4.7.
+
+=head1 SYNOPSIS
+
+   tailt [option] file1 [ file2 ...]
+   tailt --help | --man | --VERSION
+
+ FILES:
+  Specify one or more local or remote files to tail:
+  local             specify local file (relative ./file, absolute /dir/file)
+  scp               Specify files (similar to vim) scp://[user@]host:[port](file/relative/to/home/dir|/absolute/file)
+  ssh               Specify files with ssh ssh://[user@]host[:port]/file
+
+ OPTIONS:
+  -r --restart      Turn on menu, which allows chnaging of options/files/plugin
+                    configuration on the fly. To see the menu type any thing
+                    other than q and press enter, typing q & enter quit.
+  -n --lines=int    The number of lines form the end of a file to start tailing
+                    The default is 10.
+  -c --config=str   Use the str config option from previously save config
+     --no_inotify   Inotify works wonderfully usually but if a file is on a network
+                    networked drive it sometimes doesn't fire when a tailed file
+                    changes, this option turns off inotify and uses the polling
+                    option
+  -d --disable=file
+                    Add the file to the list of files but don't automatically
+                    start tailing it. This can be specified more than once for
+                    multiple disabled files or comma/semi-comma seperated
+
+  -v --verbose      Show more detailed option
+     --VERSION      Prints the version information
+     --help         Prints this help information
+     --man          Prints the full documentation for tailt
+
+ PLUGIN OPTIONS:
+  -h --highlight    Sets up the hightlight plugin options
+  -m --match        Sets up the match plugin option to only show lines that natch
+                    the regexp.
+  -i --ignore       Sets up the ignore plugin options to hide all lines that
+                    match the regexp.
+  -r --replace key=value
+                    Sets op the replace plugin option which chnages match values.
+            Keys:
+                regex   A regular expression to match log line content
+                replace A string to replace the contents matched above
+     --spacing key=value
+                    Add spacing when no new lines have occured for a period
+                    of time
+            Keys:
+                times   he time in seconds since last seen output (comma separated list of times)
+                lines   he number of lines to show for the matching time (also comma separated list)
+     --grouplines key=value
+                    Controls the way lines are processed. If used this can
+                    allow you to control when a line is considered to start
+                    for example if you log file occasionally out puts messages
+                    that span several lines this can be used to group the
+                    lines back before (for example) using the highligh plugin.
+            Keys:
+                regex   A regular expression to match log line content
+                end     How to treat line ends? (Bool 0 or 1)
+
+=head1 DESCRIPTION
+
+=head2 Files
+
+You can specify local files either relatively or absolutely. Remote files uses
+a vim like syntax for specifying remote files, it uses the ssh protocol which
+may mean that you may have issues if you don't use ssh keys. The format for
+the URI is:
+
+ ssh://[user@]host[:port]/(home/relative/file|/absolute/file)
+
+Note if you want a absolute file location you must have two slashes at the
+start of the path. One slash means that the file is relative to the user
+that you are logging in as.
+
+=head2 Config
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=over 4
+
+=item ~/.tailtrc
+
+Stores the saved configuration options (stored in YAML format)
+
+=back
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gamil.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gamil.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2010 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW, Australia, 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

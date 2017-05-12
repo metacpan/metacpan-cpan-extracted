@@ -1,0 +1,7 @@
+Revision history for Perl extension Template::Plugin::Timer
+
+0.02    Tue Sep  9 20:28:34 2008
+        - fixed a documentation error in SYNOPSIS section.
+
+0.01    Tue Sep  9 17:21:10 2008
+        - original version

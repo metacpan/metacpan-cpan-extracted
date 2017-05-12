@@ -1,0 +1,323 @@
+NAME
+
+    Test::Pod::LinkCheck - Tests POD for invalid links
+
+VERSION
+
+      This document describes v0.008 of Test::Pod::LinkCheck - released November 01, 2014 as part of Test-Pod-LinkCheck.
+
+SYNOPSIS
+
+            #!/usr/bin/perl
+            use strict; use warnings;
+    
+            use Test::More;
+    
+            eval "use Test::Pod::LinkCheck";
+            if ( $@ ) {
+                    plan skip_all => 'Test::Pod::LinkCheck required for testing POD';
+            } else {
+                    Test::Pod::LinkCheck->new->all_pod_ok;
+            }
+
+DESCRIPTION
+
+    This module looks for any links in your POD and verifies that they
+    point to a valid resource. It uses the Pod::Simple parser to analyze
+    the pod files and look at their links. In a nutshell, it looks for
+    L<Foo> links and makes sure that Foo exists. It also recognizes section
+    links, L</SYNOPSIS> for example. Also, manpages are resolved and
+    checked.
+
+    This module does NOT check "http" links like L<http://www.google.com>
+    in your pod. For that, please check out Test::Pod::No404s.
+
+    Normally, you wouldn't want this test to be run during end-user
+    installation because they might not have the modules installed! It is
+    HIGHLY recommended that this be used only for module authors'
+    RELEASE_TESTING phase. To do that, just modify the synopsis to add an
+    env check :)
+
+    This module normally uses the OO method to run tests, but you can use
+    the functional style too. Just explicitly ask for the all_pod_ok or
+    pod_ok function to be imported when you use this module.
+
+            #!/usr/bin/perl
+            use strict; use warnings;
+            use Test::Pod::LinkCheck qw( all_pod_ok );
+            all_pod_ok();
+
+ATTRIBUTES
+
+ check_cpan
+
+    If enabled, this module will check the CPAN module database to see if a
+    link is a valid CPAN module or not. It uses the backend defined in
+    "cpan_backend" to do the actual searching.
+
+    If disabled, it will resolve links based on locally installed modules.
+    If it isn't installed it will be an error!
+
+    The default is: true
+
+ cpan_backend
+
+    Selects the CPAN backend to use for querying modules. The available
+    ones are: CPANPLUS, CPAN, CPANSQLite, MetaDB, MetaCPAN, and CPANIDX.
+
+    The default is: CPANPLUS
+
+            The backends were tested and verified against those versions. Older versions should work, but is untested!
+                    CPANPLUS v0.9010
+                    CPAN v1.9402
+                    CPAN::SQLite v0.199
+                    CPAN::Common::Index::MetaDB v0.005
+                    MetaCPAN::API::Tiny v1.131730
+                    MetaCPAN::Client v1.007001
+                    LWP::UserAgent v6.06
+
+ cpan_backend_auto
+
+    Enable to automatically try the CPAN backends to find an available one.
+    It will try the backends in the order defined in "cpan_backend"
+
+    If no backend is available, it will disable the "check_cpan" attribute
+    and enable the "cpan_section_err" attribute.
+
+    The default is: true
+
+ cpan_section_err
+
+    If enabled, a link pointing to a CPAN module's specific section is
+    treated as an error if it isn't installed.
+
+    The default is: false
+
+ verbose
+
+    If enabled, this module will print extra diagnostics for the links it's
+    checking.
+
+    The default is: copy $ENV{HARNESS_IS_VERBOSE} or $ENV{TEST_VERBOSE} or
+    false
+
+METHODS
+
+ pod_ok
+
+    Accepts the filename to check, and an optional test name.
+
+    This method will pass the test if there is no POD links present in the
+    POD or if all links are not an error. Furthermore, if the POD was
+    malformed as reported by Pod::Simple, the test will fail and not
+    attempt to check the links.
+
+    When it fails, this will show any failing links as diagnostics. Also,
+    some extra information is printed if verbose is enabled.
+
+    The default test name is: "LinkCheck test for FILENAME"
+
+ all_pod_ok
+
+    Accepts an optional array of files to check. By default it uses all POD
+    files in your distribution.
+
+    This method is what you will usually run. Every file is passed to the
+    "pod_ok" function. This also sets the test plan to be the number of
+    files.
+
+NOTES
+
+ backend
+
+    This module uses the CPANPLUS and CPAN modules as the backend to verify
+    valid CPAN modules. Please make sure that the backend you choose is
+    properly configured before running this! This means the index is
+    updated, permissions is set, and whatever else the backend needs to
+    properly function. If you don't want to use them please disable the
+    "check_cpan" attribute.
+
+    If this module fails to check CPAN modules or the testsuite fails, it's
+    probably because of the above reason.
+
+ CPAN module sections
+
+    One limitation of this module is that it can't check for valid sections
+    on CPAN modules if they aren't installed. If you want that to be an
+    error, please enable the "cpan_section_err" attribute.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * App::PodLinkCheck
+
+      * Pod::Checker
+
+      * Test::Pod::No404s
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Test::Pod::LinkCheck
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/Test-Pod-LinkCheck
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/Test-Pod-LinkCheck
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Pod-LinkCheck
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/Test-Pod-LinkCheck
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/Test-Pod-LinkCheck
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/Test-Pod-LinkCheck
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/overview/Test-Pod-LinkCheck
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/T/Test-Pod-LinkCheck
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=Test-Pod-LinkCheck
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=Test::Pod::LinkCheck
+
+ Email
+
+    You can email the author of this module at APOCAL at cpan.org asking
+    for help with any problems you have.
+
+ Internet Relay Chat
+
+    You can get live help by using IRC ( Internet Relay Chat ). If you
+    don't know what IRC is, please read this excellent guide:
+    http://en.wikipedia.org/wiki/Internet_Relay_Chat. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You
+    can join those networks/channels and get help:
+
+      * irc.perl.org
+
+      You can connect to the server at 'irc.perl.org' and join this
+      channel: #perl-help then talk to this person for help: Apocalypse.
+
+      * irc.freenode.net
+
+      You can connect to the server at 'irc.freenode.net' and join this
+      channel: #perl then talk to this person for help: Apocal.
+
+      * irc.efnet.org
+
+      You can connect to the server at 'irc.efnet.org' and join this
+      channel: #perl then talk to this person for help: Ap0cal.
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-test-pod-linkcheck at rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Pod-LinkCheck. You
+    will be automatically notified of any progress on the request by the
+    system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/apocalypse/perl-test-pod-linkcheck
+
+      git clone git://github.com/apocalypse/perl-test-pod-linkcheck.git
+
+AUTHOR
+
+    Apocalypse <APOCAL@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Apocalypse.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this distribution.
+
+DISCLAIMER OF WARRANTY
+
+    THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+    APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+    HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT
+    WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE
+    OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU
+    ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR
+    CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+    INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES
+    ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT
+    NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES
+    SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO
+    OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY
+    HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+

@@ -1,0 +1,40 @@
+NAME
+    Tatsumaki::Service::XMPP - XMPP inbound service for Tatsumaki
+
+SYNOPSIS
+      use Tatsumaki::Application;
+
+      package XMPPHandler;
+      use base qw(Tatsumaki::Handler::XMPP);
+
+      sub hello_command {
+          my($self, $message) = @_;
+          $message->reply("Hello!");
+      }
+
+      package main;
+      use Tatsumaki::Service::XMPP;
+
+      my $svc = Tatsumaki::Service::XMPP->new($jid, $password);
+      my $app = Tatsumaki::Application->new([
+          '/_services/xmpp/chat' => 'XMPPHandler',
+      ]);
+      $app->add_service($svc);
+      $app;
+
+DESCRIPTION
+    Tatsumaki::Service::XMPP is an inbound XMPP service for Tatsumaki, which
+    allows you to write an XMPP bot as a standard Tatsumaki web application
+    handler. Heavily inspired by Google AppEngine XMPP support.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Tatsumaki AnyEvent::XMPP
+    <http://code.google.com/appengine/articles/using_xmpp.html>
+

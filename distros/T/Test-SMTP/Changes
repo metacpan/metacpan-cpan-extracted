@@ -1,0 +1,25 @@
+Revision history for Perl module Test::SMTP
+
+0.01 Mon Apr 14 22:27:14 2008
+    - original version; created by ExtUtils::ModuleMaker 0.51
+0.02 Sun Apr 20 23:00:00 2008
+    - corrected harcoded hostname in test 003_basic.t
+    - added a Test::Pod::Coverage test
+    - corrected documentation (thanks to Test::Pod::Coverage)
+    - renamed smtp_diag to make it clear it's private
+0.03 Tue May 27 22:00:00 2008
+    - Tests now try to find a port to bind to. Testers were getting
+      "port already in use"
+    - First shot at STARTTLS support
+    - Auth support (now inheriting from Net::SMTP_auth instead of Net::SMTP)
+0.04 Wed May 28 20:20:00 2008
+    - Cleaned the use IO::Socket::SSL (was for testing)
+    - Cleaned verbosity of IO::Socket::SSL
+    - Declared dependancy on IO::Socket::SSL (Tests where failing)
+0.05 Wed Jul 20 22:45:00 2016
+    - Declared BENNING as CO-MAINT
+    - Adapted to Dist::Zilla (BENNING and JLMARTIN)
+    - Some dependencies are now test-only dependencies (JLMARTIN)
+    - Fix tests to pass due to Net::Server::Mail::ESMTP behaviour change (BENNING)
+    - Pass extra parameters to STARTTLS (BENNING)
+    - Silence undefined values on HELP methods (BENNING)

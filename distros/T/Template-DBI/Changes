@@ -1,0 +1,19 @@
+Revision history for Template-DBI
+
+2.65    2010-07-27
+        - take over maintainership from prior maintainers
+	  Andy Wardley and Simon Matthews (Jens Rehsack)
+	  Thanks to both guys for their great work so far
+	- improve connect to can reconnect after CLONE
+	- add support for keeping alive in threaded environment
+	- add ability to prepare/query with passing params to
+	  $dbh->prepare
+	- add some neat functions to the iterator of th $sth
+	- add ability to fetch and store $dbh and $sth attributes
+	- reap DBI handles for new threads when used in threaded
+	  environments and threads::variable::reap is available
+	- add test with two placeholders
+
+2.64    2006-05-25
+	- last release by Andy Wardley
+

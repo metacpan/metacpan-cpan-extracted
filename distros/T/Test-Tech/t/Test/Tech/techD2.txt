@@ -1,0 +1,67 @@
+
+ ~~~~~~ Demonstration overview ~~~~~
+ 
+Perl code begins with the prompt
+
+ =>
+
+The selected results from executing the Perl Code 
+follow on the next lines. For example,
+
+ => 2 + 2
+ 4
+
+ ~~~~~~ The demonstration follows ~~~~~
+
+ => my $x = 2
+ => my $y = 3
+ => $x + $y
+ '5'
+ 
+ => ($x+$y,$y-$x)
+ '5'
+ '1'
+ 
+ => ($x+4,$x*$y)
+ '6'
+ '6'
+ 
+ => $x*$y*2
+ '12'
+ 
+ => $x
+ 2
+ 
+ =>     my @expected = ('200','201','202');
+ =>     my $i;
+ =>     for( $i=0; $i < 3; $i++) {
+ => $i+200
+ '200'
+ 
+ => $i + ($x * 100)
+ '200'
+ 
+ =>     };
+ => $i+200
+ '201'
+ 
+ => $i + ($x * 100)
+ '201'
+ 
+ =>     };
+ => $i+200
+ '202'
+ 
+ => $i + ($x * 100)
+ '202'
+ 
+ =>     };
+ => $x + $y
+ '5'
+ 
+ => $x + $y + $x
+ '7'
+ 
+ => $x + $y + $x + $y
+ '10'
+ 

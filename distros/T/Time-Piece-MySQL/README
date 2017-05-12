@@ -1,0 +1,26 @@
+Time::Piece::MySQL
+==================
+
+Time::Piece::MySQL, when used, adds several MySQL-specific methods to
+the Time::Piece class.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module won't do much without Time::Piece!
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Marty Pauley
+Copyright (c) 2002 David Rolsky
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

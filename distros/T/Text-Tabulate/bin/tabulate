@@ -1,0 +1,119 @@
+#!perl
+
+=head1 NAME
+
+tabulate - a pretty text data tabulator that minimises the width of tables.
+
+=head1 SYNOPSIS
+
+tabulate <options> [input-files]
+
+=head1 DESCRIPTION
+
+This UNIX filter reads from either files or standard input, formats the
+tab-separated text data into pretty, minimal width, space padded tables,
+and prints to standard output. Various options change the behaviour.
+
+This script is based on, and is part of, the Perl Text::Tabulate module.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -s|--stanza
+
+Treat each paragraph as a individual table.
+
+=item -h|--html	
+
+Format each table as HTML.
+
+=item -t|--tab <tab>		
+
+Set the tab string.
+See module configuation options.
+
+=item -p|--pad <pad>		
+
+Set the pad character.
+See module configuation options.
+
+=item -g|--gutter <gutter>
+
+Set the gutter string.
+See module configuation options.
+
+=item -I|--Ignore <reg-ex>
+
+Ignore lines that match this regular expression.
+See module configuation options.
+
+=item -a|--adjust <string>
+
+Justify columns according to this string.
+See module configuation options.
+
+=item -T|--top <string>
+
+Set the top border characters.
+See module configuation options.
+
+=item -B|--top <string>
+
+Set the bottom border characters.
+See module configuation options.
+
+=item -l|--left <string>
+
+Set the left border string.
+See module configuation options.
+
+=item -r|--right <string>
+
+Set the right border string.
+See module configuation options.
+
+=item -c|--cf <number>
+
+This specifies if repeated values in the first few fields should be
+replaced by the empty string.
+See module configuation options.
+
+=item -d|--ditto <number>
+
+This specified the string that replaces common values (see cf above).
+See module configuation options.
+
+=back
+
+Most of these options correspond to the configuration options of the
+module Text::Tabulate.
+
+=head1 SEE ALSO
+
+See also Perl module Text::Tabulate
+
+=head1 VERSION
+
+This is version 1.0 of Text::Tabulate, released 1 July 2007.
+
+=head1 COPYRIGHT
+
+Copyright (c) 1998-2007 Anthony Fletcher. All rights reserved.
+This script is free software; you can redistribute them and/or modify
+them under the same terms as Perl itself.
+
+This code is supplied as-is - use at your own risk.
+
+=cut
+
+use 5;
+use warnings;
+use strict;
+
+use Text::Tabulate;
+
+Text::Tabulate::filter(@ARGV);
+
+1;
+

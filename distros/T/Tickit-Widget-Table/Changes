@@ -1,0 +1,156 @@
+Revision history for Tickit-Widget-Table
+
+0.216     2016-12-31 19:35:19+08:00 Asia/Kuala_Lumpur
+	Bugs fixed:
+	* Resolved some rendering glitches due to background not being erased
+
+0.215     2016-11-06 23:10:01+08:00 Asia/Kuala_Lumpur
+	Features:
+	* Rows past the end of storage now show as blank rather than rendering an error
+
+	New examples:
+	* multi-select.pl
+
+0.214     2015-02-06 22:17:40+00:00 Europe/London
+	Features:
+	* ->column_width method for checking the current allocated width for a given
+	column ID.
+
+	Bugs fixed:
+	* Off-by-one in ->body_rect meant that the last table row would not be
+	rendered correctly
+
+0.213     2015-02-06 19:37:00+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Return true value from all key handling methods, to avoid focus leakage
+
+0.212     2015-02-06 18:25:19+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Silenced some undef warnings
+
+0.211     2015-02-06 13:50:38+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Spacing between cells is now cleared properly, previous versions did
+	not erase the characters here.
+	* Header background is also erased on draw
+
+0.210     2015-02-05 12:14:33+00:00 Europe/London
+	Features:
+	* ->show_header / ->hide_header
+
+0.209     2015-02-05 11:27:42+00:00 Europe/London
+	No new features.
+
+	Documentation:
+	* Fixed synopsis to work with the new adapter code
+
+0.208     2015-01-24 14:19:58+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* WIDGET_PEN_FROM_STYLE is now set, needed for newer Tickit versions
+
+0.207     2014-08-31 14:54:56+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Cache was not invalidated correctly on splice
+	* Also invalidate cache and expose on window reshape
+
+0.206     2014-08-31 02:47:40+01:00 Europe/London
+	Features:
+	* Pass view transformations in constructor
+
+0.205     2014-08-31 00:33:35+01:00 Europe/London
+	Features:
+	* Modify event support
+	* failure transformations
+
+0.204     2014-08-17 08:56:51+01:00 Europe/London
+	No new features.
+
+	Dependency fixes:
+	* String::Tagged
+
+0.203     2014-08-16 19:47:09+01:00 Europe/London
+	No new features.
+
+	Documentation:
+	* Fixed self-ref in the SEE ALSO section
+	* Updated screenshot
+	* Mention Term::TablePrint, which also seems to have been updated today
+
+0.202     2014-08-16 19:25:44+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Support activation callbacks which don't return a Future
+
+0.201     2014-08-16 19:19:24+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Allow upgrading the 'data' parameter to an adapter
+	* Adding columns after instantiation now properly sanitises the values
+	and distributes the widths
+	* Failed items show as table entries rather than raising an exception
+
+0.200     2014-08-16 18:43:32+01:00 Europe/London
+	Renamed from Tickit::Widget::Table::Paged to Tickit::Widget::Table.
+	The old Tickit::Widget::Table implementation didn't work out
+	particularly well, and currently fails tests.
+
+	New features:
+	* Adapter support - underlying data is provided by an
+	Adapter::Async::OrderedList instance, allowing the table widget to
+	receive updates when the underlying data source changes
+	* Row visibility - allows filtering rows to show a subset of data,
+	see the ->filter method for more details
+	* Transformations - used for applying specific formatting or text
+	conversion, such as timestamp => date and time representation or
+	word highlighting
+
+	Bugs fixed:
+	* Avoid warnings when no alignment is specified (default is 'left')
+	* Fix numeric alignment (can now use 0.5, 1.0 etc. as originally
+	intended, previously it had to be 'centre', 'right' etc.)
+	* Scrollbar rendering - sometimes this extended into header due
+	to incorrect ratio calculation
+
+	Bugs introduced:
+	* Filtering does not yet work reliably. It might not work at all.
+	You should probably wait for the next version.
+	* Scrolling past the start or the end of the table is possible -
+	there's a plan to support "wrapped" tables but that requires splitting
+	the scrollbar, maybe fixed iin the next version
+
+0.004     2014-04-22 02:33:42+01:00 Europe/London
+	New features:
+	* ->data method returns the arrayref holding table data
+	* ->selected_rows returns all selected rows (highlighted row only
+	if we're not in multiselect mode). (both features thanks to a patch
+	from buu)
+
+0.003     2014-04-22 02:02:25+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Fixed off-by-one on scrollrect (thanks LeoNerd)
+	* An exception could be raised when scrolling off the end of a list,
+	due to incorrect scrollbar height calculation (thanks buu)
+
+0.002     2013-11-10 01:26:54 Europe/London
+	New features:
+	* Allow setting on_activate at instantiation or via accessor
+	(previously had to set ->{on_activate} manually)
+	* Multiselection support (disabled by default)
+
+0.001     2013-09-15 02:55:07 Europe/London
+	Initial CPAN release
+

@@ -1,0 +1,42 @@
+2009-02-17  Dave Cross  <dave@angel.mag-sol.com>
+
+	* lib/Template/Plugin/XML/Feed.pm: Fixes to pass pod tests
+
+	* commit 946eeb6c34b3c55ba4a1a57a39f22b1bd2e87775
+
+2009-02-17  Dave Cross  <dave@angel.mag-sol.com>
+
+	* t/pod.t, t/pod_coverage.t: Added pod tests
+
+	* commit ab0d241b0163b6524bd50d7e5a8eee7066c5ba72
+
+2009-02-17  Dave Cross  <dave@angel.mag-sol.com>
+
+	* t/xml/example.rdf: Added example file.
+
+	* commit 8171d7744cd6cab34445d983510d3b71d0e23824
+
+2009-02-17  Dave Cross  <dave@angel.mag-sol.com>
+
+	* lib/Template/Plugin/XML/Feed.pm: Fixes to pass initial tests.
+
+	* commit 4f41908d06b7835f8b7a6a15c7ec77bd5e523b7a
+
+2009-02-17  Dave Cross  <dave@angel.mag-sol.com>
+
+	* t/rss.t: First test file
+
+	* commit 6b1b481e545d2f5d57f217579e580df810b87605
+
+2009-02-17  Dave Cross  <dave@angel.mag-sol.com>
+
+	* Build.PL, lib/Template/Plugin/XML/Feed.pm: Added some files
+
+	* commit 7c866b67e7270fd49e3cefa9288e9b89fefc3d2a
+
+2009-02-17  Dave Cross  <dave@angel.mag-sol.com>
+
+	* README: Initial commit
+
+	* commit 6925765f77dcf5431f237973bff1e4fea7adce69
+

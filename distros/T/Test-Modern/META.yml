@@ -1,0 +1,47 @@
+---
+abstract: 'precision testing for modern perl'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Modern
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Test::Modern:
+    file: lib/Test/Modern.pm
+    version: '0.013'
+recommends:
+  Test::LongString: '0.15'
+requires:
+  Exporter::Tiny: '0.030'
+  Import::Into: '1.002000'
+  Module::Runtime: '0.012'
+  Test::API: '0.004'
+  Test::Deep: '0.111'
+  Test::Fatal: '0.007'
+  Test::More: '0.96'
+  Test::Warnings: '0.009'
+  Try::Tiny: '0.15'
+  perl: '5.006001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Test-Modern/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Test-Modern
+  homepage: https://metacpan.org/release/Test-Modern
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-test-modern.git
+version: '0.013'

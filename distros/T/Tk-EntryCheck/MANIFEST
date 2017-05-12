@@ -1,0 +1,10 @@
+CHANGES
+Makefile.PL
+MANIFEST
+README
+META.yml
+t/01_Tk-EntryCheck.t
+t/02_Tk-EntryCheck.t
+lib/Tk/EntryCheck.pm
+example/test-configure.pl
+

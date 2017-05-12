@@ -1,0 +1,7 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+lib/Template/Plugin/Jcode.pm
+t/00_compile.t
+t/01_euc.t

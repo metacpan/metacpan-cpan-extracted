@@ -1,0 +1,23 @@
+Revision history for Tk-Dressing
+
+1.04    01/01/2011 00:00:00
+        new theme : darkblue
+        POD documentation and code have been updated.
+        
+1.03    15/12/2010 21:04:28
+        Themes updated because some color options had been forgotten for standard widgets.
+        
+1.02    11/12/2010 19:53:06
+        minor bug resolved.
+        POD documentation updated
+        Thank you B. Jesson for yours new themes proposed
+          - pink
+          - purple
+          - sunflower
+
+1.01    10/12/2010 08:59:18
+        POD documentation updated and test script corected.
+
+1.00    09/12/2010 23:08:56
+        First version of Tk::Dressing.
+

@@ -1,0 +1,68 @@
+# Change history for Tie::Hash::Sorted
+
+0.01	2003-08-09 22:10:00 GMT 
+	- Basic idea for inplace upgrade to Tie::SortHash
+
+
+0.02	2003-08-09 23:47:00 GMT
+	- Removed eval string requirement while maintaining compatability
+
+
+0.03	2003-09-05 17:38:00 GMT
+	- Backwards compatability dropped and Tie::SortedHash is born
+
+
+0.04	2003-09-08 23:59:00 GMT
+	- Made to be compatible >= 5.005_03
+	- Added forcesort method
+	- Added README, POD, Changes, and tests
+
+
+0.05	2003-09-09 23:59:00 GMT
+	- Made default optimization to only resort when change detected
+	- Added optimization levels
+		default	- only regenerate order when change detected
+		none	- regenerate order everytime FIRSTKEY is called
+		keys	- STORE: don't set CHANGED flag unless new key
+		values	- STORE: don't set CHANGED flag if value stays the same
+	- Added dispatch table for STORE depending on optimization level
+	- Created set mutator method for altering options after tie()
+	- Updated README, POD, and tests
+
+
+0.06	2003-09-10 23:59:00 GMT
+	- Name change to Tie::Hash::Sorted
+	- Added Count method
+	- Changed _Iterate method to _FetchKey
+	- Changed forcesort method to Force_Sort
+	- Modified DELETE to return value if key existed
+	- Added some optimizations
+		DELETE does not set CHANGED flag if key is non-existant
+		DELETE returns without performing delete if key is non-existant
+		BEGIN { *NEXTKEY = \&_FetchKey };
+	- Changed Opt_Level => # to Optimization => string
+	- Change set mutator method to two mutators
+		Sort_Routine
+		Optimization
+	- Updated tests
+		verify DELETE works per docs
+	- Updated POD
+
+
+0.07	2003-09-11 18:00:00 GMT
+	- Released to CPAN incorrectly
+		- Built tar ball by hand - yay 'make dist'
+
+
+0.08	2003-09-11 19:30:00 GMT
+	- Released to CPAN incorrectly
+		- Building on different platforms borked - yay dos2unix
+
+
+0.09	2003-09-11 19:45:00 GMT
+	- Released to CPAN incorrectly
+		- Still having problems with signature
+
+
+0.10	2003-09-11 20:30:00 GMT
+	- Released to CPAN

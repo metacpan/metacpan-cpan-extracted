@@ -1,0 +1,6 @@
+name = "Test-HTML-Differences"
+# badges = ["travis"]
+authority="cpan:SATOH"
+
+module_maker="ModuleBuildTiny"
+

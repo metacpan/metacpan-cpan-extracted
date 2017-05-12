@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Test/Symlink.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-ok.t
+t/02-unsupp.t
+t/pod-coverage.t
+t/pod.t

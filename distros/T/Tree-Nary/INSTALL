@@ -1,0 +1,24 @@
+Installation Instructions
+-------------------------
+
+Usually all you have to do is:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+If that fails, regard the following instructions step by step.
+
+1)  Generate the Makefile: perl Makefile.PL
+
+2)  Compile the module: make
+
+3)  Test the module: make test
+
+4)  To install the module in your perl tree:  "make install"
+    You may need to su root before this step.
+
+Fred
+----
+fsoriano@cpan.org

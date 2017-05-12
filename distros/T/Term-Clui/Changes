@@ -1,0 +1,64 @@
+20170205 1.71 eliminate $[ and assume 0
+20141221 1.70 ask_filename() uses readline to display its own prompt
+20140712 1.69 ask() displays a default of "0"
+20130703 1.68 handle Haiku's \eO[ABCD] arrow-keys
+20130323 1.67 Home and End work in sub ask; bug fixes in sub ask_password
+20120905 1.66 ask_filename strips trailing space after filename-completion
+20120327 1.65 also ask_filename introduced
+20120310 view uses antiword, wv or catdoc on .doc files
+20101118 1.63 CLUI_MOUSE=OFF ask() pronounces the char being backspaced
+20101110 1.62 CLUI_MOUSE=OFF disables mouse-handling; bug fixed in ask_for_clue
+20101109 1.62 speech uses espeak if eflite isn't there, ctrl-X quits choose()
+20101108 1.62 speech silences speakup if it's running
+20101021 1.61 bug fixed in ask() with a default
+20101017 1.60 Spoken interface; see CLUI_SPEAK, emacspeak, eflite
+20100516 1.56 ^C calls endwin and raises SIGINT
+20100515 1.55 narrow_the_clue only leaves mouse-mode if we're in mouse-mode
+20100504 1.54 help_text() introduced; Delete works in ask; various bugs fixed
+20100502 1.53 TermClui.py does stty sane on return; bug fixed in audio_stuff
+20100501 1.52 disable debugging :-)
+20100430 1.51 bug fixed: &ask accepts spaces
+20100426 1.50 &choose supports mouse !! and utf8 clues supported
+20091104 1.44 ask() handles left-arrow at start of string
+20091003 1.43 choose and inform use :encoding(utf8) when in a utf8 environment
+20090928 1.42 fixed bug in &choose with items longer than screen-width
+20090307 1.41 icol,irow managed by puts; Install removed; Py3 translation
+20070511 1.40 removed spurious debug command: &puts("returned")
+20070309 1.39 no change
+20061005 1.37 uses Term::ReadKey if available, rather than `stty`
+20070309 1.38 choose with a long list asking for a clue offers ^X to quit
+20050928 1.35 FileSelect.pm returns correct var-type if q for quit
+20060816 1.36 neater pod SYNOPSIS formatting, audio_stuff uses mpg123 for mp3
+20050915 1.34 FileSelect.pm -Directory option; bugfix when -Chdir=-SelDir=0
+20050914 1.33 FileSelect.pm fix sort bug in line 90
+20050911 1.32 FileSelect.pm fix "sort interpreted as function" warning
+20050831 1.31 test.pl uses warnings; oct/chr/ord confusion fixed in Clui.pm
+20050121 1.30 test.pl uses Test::Simple
+20041208 1.29 ^C at the "give me a clue" prompt works like "q to quit"
+20041107 1.28 EXPORT_OK routines documented and ALL tag defined
+20041021 1.27 &choose handles multi-line question text
+20041016 1.26 Install offers default locations as default to first-time users
+20040809 1.25 'tput lines' tried before 'tput rows' for all OSs
+20040801 1.24 &edit checks in initial RCS version correctly
+20040720 1.23 @marked gets correctly reset at each invocation of &choose
+20040714 1.22 remove timeout for returning ESC (it fails on Fedora xterm)
+20040711 get_default and set_default handle arrays with $; but not used yet
+20040709 &choose does multiple choice if called in array context
+20040708 1.21 examples/test_script defaults to installed Clui.pm
+20040708 FileSelect -FPat bug fixed, and another minor doc fix
+20040520 1.20 minor doc fix for FileSelect, contact.html not email address
+20031214 select used in &getch to return ESC promptly
+20031103 1.19 bug fixed handling DOWN in &choose
+20030912 debug warn statements removed from FileSelect.pm
+20030701 1.18 FreeBSD bug corrected ($^O now gives freebsd)
+20021008 add &inform; &timestamp export-ok'd
+20020912 1.17 &choose default dbm handles collisions
+20020911 1.17 &choose default dbm is now in ~/.clui_dir & obeys $CLUI_DIR
+20020626 1.16 Install gets default dirs right, &tiview simpler if <3 lines
+20020622 1.15 new Install script, and old MakeMaker-compatible Makefile.PL
+20020601 1.14 fixed 'require Clui.raw' bug in test_script
+20020519 1.13 add FileSelect.pm and "man Term::Clui" works (ie with ::)
+20020130 1.12 &choose handles big lists with &narrow_the_search
+20020121 1.11 added README, &ask takes default and bugs fixed
+20020119 Term::Clui 1.10 old enter, choose, edit, confirm rolled into one
+

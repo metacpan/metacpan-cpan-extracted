@@ -1,0 +1,39 @@
+Revision history for Text-NumericData
+
+2.002000
+	- Officially added txdhistogram tool.
+	- Re-release after realising that the MANIFEST was missing the added tool
+	  and installation failed. Forget 2.001001. Please.
+
+2.001001
+	- Use deep copies of defaults to avoid multiple instances of
+	  Text::NumericData::App in one process messing with each other via
+	  possibly unsafe use of Config::Param.
+	- Text::NumericData::File avoids tainted column indices in sort code.
+	- Made tests more robust by limiting precision in places.
+	- All of the above shall fix a lot of test failures seen recently
+	  (strangely enough, Perl core behaviour changes were needed to trigger?).
+
+2.001000
+	- Correct defaults for txdinfo (--strict was on, which differed from the
+	  rest). This changes non-buggy behaviour, so bump at least a minor version.
+
+2.000004
+	- Fix output format of txdrecycle test to avoide false negatives.
+	- Change format of first txdcalc linear interpolation test to avoid
+	  sensitivity to rounding mode. Should have chosen less regular input.
+
+2.000003
+	- A missing semicolon that broke the code on many installs of Perl
+	  (but not mine, for a strange reason) got added.
+	- Dependency on Math::Spline got officially added.
+
+2.000002
+	- Fix documentation for mentioning the correct list of shortcuts
+	  in txdcalc (only x, y and z).
+
+2.000001
+	- inevitable documentation fix, finishing off a sentence
+
+2.000000
+	- initial release under the new name (replacing TextData-1.x)

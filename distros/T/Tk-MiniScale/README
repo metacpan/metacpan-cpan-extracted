@@ -1,0 +1,34 @@
+Tk::MiniScale
+
+A miniature Tk::Scale used when the user doesn't really care about the
+actual value of the variable they are modifying. In other words - they
+just want to increase or decrease *something* by a relative amount.
+This implies that less precision is needed and therefore less space can
+be used to draw this widget. i.e. the increment per pixel can be higher
+than in a normal scale
+
+Install like you would any other perl module (where X.X is
+the version number you have downloaded):
+
+   gzip -d Tk-MiniScale-X.X.tar.gz
+   tar -xvf Tk-MiniScale-X.X.tar
+   cd Tk-MiniScale-X.X
+   perl Makefile.PL
+   make
+   make test    #see NOTE below
+   make install
+
+For Windows and ActiveState Perl, replace "make" with "nmake". If
+you do not have the Visual C++ compiler available or have nmake
+installed on your system then just copy the following files to
+C:\Perl\lib\site\Tk :
+
+MiniScale.pm
+
+Send bug reports, comments and suggestions to dunniganj@cpan.org.
+
+Enjoy!
+
+Copyright (c) 2004 Jack Dunnigan. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

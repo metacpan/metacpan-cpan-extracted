@@ -1,0 +1,31 @@
+LIST OF CHANGES
+---------------
+
+release 0.2
+ - bug fix where failed test since t/lib/TestExtraNewAttributeCloner.pm no in distribution
+ - fix of deprecated passthrough version of Module::Build to small for Makefile.PL generation
+
+release 0.19
+ - put MooseX::Getopt in dependencies within Build.PL
+ - package name can be used (i.e. <package>->new_with_cloned_attributes($self, {}) ) but both classes need to utilise the role to do this
+
+release 0.18
+ - argv and ARGV attributes excluded from attributes_as_command_options by default, option to include them given
+
+release 0.17
+ - excluded_attributes option for attributes_as_command_options
+
+release 0.16
+ - bug when attributes are rw with no reader method specified - fixed
+ - booleans produced as normally expected with MooseX::Getopt/Getopt::Long in the command_line
+
+release 0.15
+ - test correction - added skip to author tests if $ENV{TEST_AUTHOR} not true
+
+release 0.14
+ - attributes_as_command_options - takes all built options and returns a string of them (with some exceptions, see POD) as command line options.
+
+release 0.1
+ - set up
+ - new_with_cloned_attributes method - returns a class object which contains the values in the current class
+ - attributes_as_json and attributes_as_escaped_json - a json string which has all currently built attributes unless they are objects. TODO, give option to pass an object using MooseX::Storage

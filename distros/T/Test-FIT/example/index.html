@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body>
+<h1 style="text-align: center;">Test::FIT Example Page<br>
+</h1>
+Click this link to run all the tests on this page: <big><big><a
+ href="fit-run.cgi">fit-run.cgi</a><br>
+</big></big><big><big><span style="font-style: italic;"></span></big></big><br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3>MathFixture Example<br>
+</h3>
+This is the same test that is discussed in the <a href="Test-FIT.html">Test::FIT
+documentation</a>.<br>
+<br>
+You just create an table like this:<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; margin-left: 40px;">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;" colspan="4">MathFixture<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">x<br>
+      </td>
+      <td style="vertical-align: top;">y<br>
+      </td>
+      <td style="vertical-align: top;">sum<br>
+      </td>
+      <td style="vertical-align: top;">diff<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">1<br>
+      </td>
+      <td style="vertical-align: top;">2<br>
+      </td>
+      <td style="vertical-align: top;">3<br>
+      </td>
+      <td style="vertical-align: top;">-1<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-8<br>
+      </td>
+      <td style="vertical-align: top;">12<br>
+      </td>
+      <td style="vertical-align: top;">4<br>
+      </td>
+      <td style="vertical-align: top;">-4<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+The MathFixture Perl class looks like this:<br>
+<pre style="margin-left: 40px;">package MathFixture;<br>use base 'Test::FIT::ColumnFixture';<br>use Test::FIT;<br><br>attribute 'x';<br>attribute 'y';<br><br>sub sum {<br>&nbsp;&nbsp;&nbsp; my $self = shift;<br>&nbsp;&nbsp;&nbsp; $self-&gt;eq_num($self-&gt;x + $self-&gt;y);<br>}<br><br>sub diff {<br>&nbsp;&nbsp;&nbsp; my $self = shift;<br>&nbsp;&nbsp;&nbsp; $self-&gt;eq_num($self-&gt;x - $self-&gt;y);<br>}<br><br>1;</pre>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3>SampleFixture Example<br>
+</h3>
+Here is a demonstration of some of the various properties of a
+ColumnFixture class:<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; margin-left: 40px;">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;" colspan="4">SampleFixture<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">first<br>
+      </td>
+      <td style="vertical-align: top;">last<br>
+      </td>
+      <td style="vertical-align: top;"> perl_hacker<br>
+      </td>
+      <td style="vertical-align: top;">last_backwards<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Brian<br>
+      </td>
+      <td style="vertical-align: top;">Ingerson </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">nosregnI<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Ward<br>
+      </td>
+      <td style="vertical-align: top;">Cunningham<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">draW<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">George<br>
+      </td>
+      <td style="vertical-align: top;">Bush<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">hsuB<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+The SampleFixture.pm Perl class looks like this:
+<pre style="margin-left: 40px;">package SampleFixture;<br>use base 'Test::FIT::ColumnFixture';<br>use Test::FIT;<br>    <br>attribute 'first';<br>attribute 'last';<br>    <br>sub perl_hacker {<br>    my $self = shift;<br>    my $name = join ' ', $self-&gt;first, $self-&gt;last;<br>    if ($name =~ /(Ward|Brian)/) {<br>        $self-&gt;pass("Oh yes");<br>    }<br>    else {<br>        $self-&gt;fail("No way!");<br>        $self-&gt;stop;<br>    }<br>}<br>    <br>sub last_backwards {<br>    my $self = shift;<br>    $backwards = join '', reverse split '', $self-&gt;last;<br>    $self-&gt;eq_str($backwards);<br>}<br><br>1;<br><br></pre>
+<hr style="width: 100%; height: 2px;">
+<h3>Test::FIT::ColumnFixture Example<br>
+</h3>
+You can actually use the ColumnFixture class all by itself. This is
+only for very simple types of tests.<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; margin-left: 40px;">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;" colspan="3">Test::FIT::ColumnFixture<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">x<br>
+      </td>
+      <td style="vertical-align: top;">x_eq_str<br>
+      </td>
+      <td style="vertical-align: top;">x_is_like<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Brian Ingerson<br>
+      </td>
+      <td style="vertical-align: top;">Brian Ingerson<br>
+      </td>
+      <td style="vertical-align: top;">ingy<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Ward Cunningham<br>
+      </td>
+      <td style="vertical-align: top;">Karen CunningHam<br>
+      </td>
+      <td style="vertical-align: top;">Cunning<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+The Test::FIT::Fixture provides a few dummy attributes like x, y and z
+for convenience. So the attribute definitions in the MathFixture example
+were not actually necessary.<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3>Error Examples<br>
+</h3>
+These tables show some various error conditions:<br>
+<br>
+<div style="margin-left: 40px;">No header row defined...<br>
+</div>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; margin-left: 40px;">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;" colspan="3">Test::FIT::ColumnFixture<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="margin-left: 40px;">Invalid method for class...<br>
+</div>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; margin-left: 40px;">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;" colspan="3">Test::FIT::ColumnFixture<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">x<br>
+      </td>
+      <td style="vertical-align: top;"> foo<br>
+      </td>
+      <td style="vertical-align: top;">is_like<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Brian Ingerson<br>
+      </td>
+      <td style="vertical-align: top;">Brian Ingerson<br>
+      </td>
+      <td style="vertical-align: top;">ingy<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Ward Cunningham<br>
+      </td>
+      <td style="vertical-align: top;">Karen CunningHam<br>
+      </td>
+      <td style="vertical-align: top;">Cunning<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="margin-left: 40px;">Invalid class altogether...<br>
+</div>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; margin-left: 40px;">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;" colspan="3">bogus_Fixture<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">x<br>
+      </td>
+      <td style="vertical-align: top;"> eq_str<br>
+      </td>
+      <td style="vertical-align: top;">is_like<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Brian Ingerson<br>
+      </td>
+      <td style="vertical-align: top;">Brian Ingerson<br>
+      </td>
+      <td style="vertical-align: top;">ingy<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Ward Cunningham<br>
+      </td>
+      <td style="vertical-align: top;">Karen CunningHam<br>
+      </td>
+      <td style="vertical-align: top;">Cunning<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+Note how error messages appear directly in the cell that caused them.<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+Click this link to run all the tests on this page: <big><big><a
+ href="file:///Users/ingy/dev/cpan/Test-FIT/example/fit-run.cgi">fit-run.cgi</a><br>
+</big></big>
+<p><span style="font-style: italic;">Download </span><span
+ style="font-weight: bold;">Test-FIT</span><span
+ style="font-style: italic;"> from </span><a
+ href="http://www.cpan.org/modules/by-authors/id/I/IN/INGY/">http://www.cpan.org/modules/by-authors/id/I/IN/INGY/</a><br>
+</p>
+</body>
+</html>

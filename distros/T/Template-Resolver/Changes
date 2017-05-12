@@ -1,0 +1,49 @@
+Revision history for Perl module Template::Resolver
+
+1.13 2016-10-12
+    - Resolved https://rt.cpan.org/Ticket/Display.html?id=116437 Fails with perls < 5.8.9
+    - Updated tests to use Log::Any instead of Log::Log4perl
+
+1.12 2016-07-23
+    - Added option for supplying additional transforms to the resolver constructor
+
+1.11 2016-07-01
+    - Removed double slash from path in destination file
+
+1.10 2016-07-01
+    - Added the ability to supply a resolver to the overlay method to augment the 
+      default behavior
+
+1.09 2016-03-31
+    - Remove file if it exists before processing template to ensure proper
+      permissions are propagated.
+
+1.08 2016-03-31
+    - Added O_TRUNC to sysopen to ensure file is truncated if it already exists 
+      during template resolution.
+
+1.07 2016-03-31
+    - Fixed overlay to maintain file permissions.  Will use permission from existing 
+      files, both base and template, augmented by the current umask.
+
+1.06 2016-03-23
+    - Fixed: Overlay fails if template is in a directory that does not exist in base 
+      (https://github.com/lucastheisen/template-resolver/issues/1)
+
+1.05 2016-01-25
+    - Added overlays
+
+1.04 2016-01-23
+    - Add support for any blessed entity to be treated as if it were a hashref
+
+1.03 2016-01-22
+    - Added support for multi-line placeholder
+
+1.02 2015-12-05
+    - Fixed deprecated regex syntax
+
+1.01 2015-10-03
+    - Removed dependency on Log4perl
+
+1.0 2015-10-03
+    - Initial release.

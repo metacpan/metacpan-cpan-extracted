@@ -1,0 +1,22 @@
+---
+name: Template-Plugin-ASCIITable
+version: 0.2
+author:
+  - 'dakkar <dakkar@tehanutilus.net>'
+abstract: "Allows you to use Text::ASCIITable in your templates.\n"
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Template: 0
+  Text::ASCIITable: 0
+build_requires:
+  Test::More: 0
+provides:
+  Template::Plugin::ASCIITable:
+    file: lib/Template/Plugin/ASCIITable.pm
+    version: 0.2
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

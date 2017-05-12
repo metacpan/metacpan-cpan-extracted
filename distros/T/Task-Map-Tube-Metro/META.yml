@@ -1,0 +1,63 @@
+---
+abstract: 'Install the Map::Tube concrete metro modules.'
+author:
+  - 'Michal Spacek <skim@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Map-Tube-Metro
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Map::Tube::Barcelona: 0.37
+  Map::Tube::Beijing: 0.01
+  Map::Tube::Berlin: 0.14
+  Map::Tube::Bucharest: 0.08
+  Map::Tube::Budapest: 0.04
+  Map::Tube::Delhi: 0.43
+  Map::Tube::Dnipropetrovsk: 0.05
+  Map::Tube::Glasgow: 0.07
+  Map::Tube::Kazan: 0.04
+  Map::Tube::Kharkiv: 0.05
+  Map::Tube::Kiev: 0.05
+  Map::Tube::KoelnBonn: 0.09
+  Map::Tube::KualaLumpur: 0.05
+  Map::Tube::London: 0.75
+  Map::Tube::Lyon: 0.06
+  Map::Tube::Malaga: 0.15
+  Map::Tube::Minsk: 0.05
+  Map::Tube::Moscow: 0.07
+  Map::Tube::NYC: 0.33
+  Map::Tube::Nanjing: 0.04
+  Map::Tube::NizhnyNovgorod: 0.03
+  Map::Tube::Novosibirsk: 0.03
+  Map::Tube::Prague: 0.13
+  Map::Tube::SaintPetersburg: 0.06
+  Map::Tube::Samara: 0.06
+  Map::Tube::Singapore: 0.03
+  Map::Tube::Sofia: 0.07
+  Map::Tube::Tbilisi: 0.04
+  Map::Tube::Tokyo: 0.22
+  Map::Tube::Vienna: 0.07
+  Map::Tube::Warsaw: 0.06
+  Map::Tube::Yekaterinburg: 0.05
+  perl: 5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Map-Tube-Metro
+  homepage: https://github.com/tupinek/Task-Map-Tube-Metro
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: git://github.com/tupinek/Task-Map-Tube-Metro
+version: '0.12'

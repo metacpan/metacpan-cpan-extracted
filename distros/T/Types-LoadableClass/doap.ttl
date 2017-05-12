@@ -1,0 +1,97 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [
+		doap-deps:on "Type::Library 0.026"^^doap-deps:CpanId;
+	], [ doap-deps:on "Type::Utils 0.026"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 0.026"^^doap-deps:CpanId;
+	], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Class::Load"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.006001"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Requires 0.06"^^doap-deps:CpanId;
+	];
+	doap-deps:test-suggestion [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Types-LoadableClass>;
+	doap:created         "2013-10-03"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/ilmari>, <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Types-LoadableClass>;
+	doap:homepage        <https://metacpan.org/release/Types-LoadableClass>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Types-LoadableClass";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-types-loadableclass>;
+	];
+	doap:shortdesc       "type constraints with coercion to load the class".
+
+<http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Types-LoadableClass-0.001"^^xsd:string;
+	dc:issued            "2013-10-03"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-LoadableClass-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Types-LoadableClass-0.002"^^xsd:string;
+	dc:issued            "2013-10-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "List correct dependencies.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-LoadableClass-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Types-LoadableClass-0.003"^^xsd:string;
+	dc:issued            "2013-04-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Various features inspired by RT#91802";
+			doap-changeset:thanks <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=91802>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-LoadableClass-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/ilmari>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:ilmari@cpan.org>;
+	foaf:name            "Dagfinn Ilmari Mannsåker";
+	foaf:nick            "ILMARI";
+	foaf:page            <https://metacpan.org/author/ILMARI>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>
+	foaf:mbox            <mailto:bpj@melroch.se>;
+	foaf:name            "Benct Philip Jonsson".
+

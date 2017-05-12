@@ -1,0 +1,57 @@
+# NAME
+
+Thrift::SASL::Transport - Thrift Transport allowing Kerberos auth/encryption through GSSAPI
+
+# VERSION
+
+version 0.003
+
+# SYNOPSIS
+
+run kinit first for getting your credentials cache in order, then (example for
+communicating with a secure HiveServer2 instance):
+
+    use Authen::SASL qw(XS);
+    my $sasl = Authen::SASL->new( mechanism => 'GSSAPI');
+
+    use Thrift::Socket;
+    use Thrift::BufferedTransport;
+    use Thrift::SASL::Transport;
+    use Thrift::API::HiveClient2;
+
+    my $socket = Thrift::Socket->new( $srv_host, 10000 );
+    my $strans = Thrift::SASL::Transport->new(
+        Thrift::BufferedTransport->new($socket),
+        $sasl,
+        $debuglevel
+    );
+
+    my $hive = Thrift::API::HiveClient2->new(
+        _socket    => $socket,
+        _transport => $strans,
+    );
+
+# DESCRIPTION
+
+Add SASL support to Apache's Thrift, in order to support Kerberos auth, among
+others. Highly experimental and hack-ish. Ideally this should be part of the
+Thrift distribution, once proven to work reliably.
+
+# ACKNOWLEDGEMENTS
+
+Based on the pyhs2 python module by Brad Ruderman [https://github.com/BradRuderman/pyhs2](https://github.com/BradRuderman/pyhs2)
+
+Initial version with simple SASL authentication (LDAP) developped by Vikentiy Fesunov at Booking.com
+
+Thanks to my employer Booking.com to allow me to release this module for public use
+
+# AUTHOR
+
+David Morel <david.morel@amakuru.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by David Morel.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

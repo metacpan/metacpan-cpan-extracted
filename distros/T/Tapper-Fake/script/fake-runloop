@@ -1,0 +1,17 @@
+#! perl
+
+use Tapper::Fake::Master;
+use Log::Log4perl;
+
+my $logconf = 'log4perl.rootlogger = ERROR, Screen
+log4perl.appender.Screen = Log::Log4perl::Appender::Screen
+log4perl.appender.Screen.layout = PatternLayout
+log4perl.appender.Screen.stderr = 1
+# date package category - message in  last 2 components of filename (linenumber) newline
+log4perl.appender.Screen.layout.ConversionPattern = %m%n';
+
+Log::Log4perl->init(\$logconf);
+
+my $mcp = Tapper::Fake::Master->new();
+
+$mcp->run();

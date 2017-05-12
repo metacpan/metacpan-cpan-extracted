@@ -1,0 +1,8 @@
+Revision history for Template-Plugin-Lingua-EN-NameCase
+=======================================================
+
+0.02    2015-01-03
+        - fixed license fields in META.json to be lists.
+
+0.01    2014-07-18
+	    - first version

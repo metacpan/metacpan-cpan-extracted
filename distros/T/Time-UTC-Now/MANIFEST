@@ -1,0 +1,18 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Time/UTC/Now.pm
+lib/Time/UTC/Now.xs
+lib/Time/UTC/features.probe
+t/cjdn.t
+t/mjdn.t
+t/now.t
+t/pod_cvg.t
+t/pod_syn.t
+t/threads.t
+SIGNATURE    Added here by Module::Build

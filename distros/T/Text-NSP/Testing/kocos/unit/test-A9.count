@@ -1,0 +1,7 @@
+line<>text<>
+print<>text<>
+para<>lines<>
+Line<>doc<>
+doc<>print<>
+text<>para<>
+para<>doc<>

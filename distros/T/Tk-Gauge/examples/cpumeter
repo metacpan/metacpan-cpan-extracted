@@ -1,0 +1,53 @@
+#!/usr/local/bin/perl
+use Tk;
+use Tk::Gauge;
+use strict;
+use warnings;
+
+my $mw = MainWindow->new;
+$mw->configure(-bg=>'white');
+
+my $iLCD = 100;
+my $xgrid = 0;
+my $cpu = $mw->Gauge(
+    -background           => 'black',
+    -caption              => "Xgrid CPU Power", 
+    -captioncolor         => 'white', 
+    -fill                 => 'black',
+    -from                 => 0,
+    -hubcolor             => 'darkgray', 
+    -hubradius            => 10,
+    -majortickinterval    => 1000 / $iLCD,
+    -majorticklength      => 15,
+    -majortickcolor       => 'white',
+    -majorticklabelcolor  => 'cyan',
+    -majorticklabelscale  => $iLCD / 1000,
+    -minortickinterval    => 500 / $iLCD,
+    -minorticklength      => 10,
+    -minortickcolor       => 'white',
+    -finetickinterval     => 100 / $iLCD,
+    -fineticklength       => 5,
+    -finetickcolor        => 'white',
+    -margin               => 65,
+    -needles              => [
+		              {
+                                 -arrowshape => [ 25, 11, 0 ],
+		                 -color      => 'red',
+		                 -format     => '%d',
+		                 -radius     => 64,
+                                 -showvalue  => 0,
+                                 -title      => 'GHz',
+                                 -titlecolor => 'white',
+		                 -variable   => \$xgrid,
+		                 -width      => 2,
+		              },
+		             ] ,
+    -needlepad            => 30,
+    -outline              => 'lightgray',
+    -outlinewidth         => 1, 
+    -to                   => 8000 / $iLCD,
+)->pack;
+
+$mw->repeat(500 => sub {$xgrid = 4000 / $iLCD } );
+
+MainLoop;

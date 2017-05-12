@@ -1,0 +1,32 @@
+* Speed up the performance of Test::Run. It's currently pretty slow.
+
+* Update the documentation - currently it's mostly updated only to
+Test::Harness.
+
+* Add an arbitrary number of leaked directories.
+
+* Add a registry for the classes of the helper objects.
+
+* Add examples for Test::Run (not T::R::CL) under examples/ in the T::R (core)
+distribution.
+
+* Add a module-starter adaptation for creating a Test::Run/T::R::CL plugin
+distribution.
+
+* Add a way to specify plugin parameters using the command line.
+
+* Add a way to append/remove plugins using the command line.
+
+* Add a plugin to skip tests that are long/known-to-fail/etc.
+
+* Add a plugin to display the blurbs of the failing tests in each test
+script (not just the numbers).
+
+Bugs:
+-----
+
+* Fix the confusing output of t/sample-tests/too_many2.
+    - see prove vs. runprove.
+
+* Deal with the bug as encountered in Parrot.
+

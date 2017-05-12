@@ -1,0 +1,63 @@
+Revision history for Perl extension Time::Interval.
+
+1.233		Fri Nov 22 15:49:20 CST 2013
+		fixed a long standing issue with parseInterval and fractional seconds.
+		NOTE: Date::Parse, does NOT handle resolutions < 1 second. For that,
+		you really should have a look at Time::HiRes. This fix quantizes fractional
+		second values to whole numbers. 		
+		Thanks for the patch, Bob <bob_freeman@hms.harvard.edu> !		
+
+1.232		Thu Jan 31 21:41:40 CST 2013
+		those damn ._* files os x kindly inserted into the distribution
+		I have removed them. sorry everyone.
+
+1.231	        Wed Jan 30 07:58:21 CST 2013
+		forgot to add LICENSE to manifest.
+		incremented version for CPAN upload
+
+1.23		Tue Jan 29 10:13:54 CST 2013
+		updated LICENSE.
+		this perl module is released under the same license
+		as perl itself
+
+1.22		Wed May 30 22:57:32 EDT 2007
+		applied patch to fix another warning when using -w flag.
+		thanks, Sean <sean.robinson@sccmail.maricopa.edu>
+
+1.21		Mon Jan 15 16:01:00 EST 2007
+		applied patch to fix warnings when using perl -w flag.
+		thanks, Ton <ton.voon@altinity.com>
+
+1.2		Tue Dec 12 08:46:00 EST 2006
+		added 'short' option to getInterval, and applied 
+		patch from Alberto Simones adding 'Short' option to parseInterval
+		which generates a string with abbreviated output in dhms format
+		(see pod)
+		Thanks, Alberto!
+		
+1.1		Thu Nov  2 18:08:48 GMT 2006
+		don't convert input strings to epoch if already converted 
+
+1.0.5		Mon May 17 18:18:26 EDT 2004
+		strange array problems fixed.
+
+1.0.4		Mon May 17 17:42:24 EDT 2004
+		fixed bug in coalesce causing undef array values.
+
+1.0.3		Thu May 13 17:24:58 EDT 2004
+		added coalesce method, takes a series of time intervals and returns 
+		the minimum number of intervals based on overlapping timespans.
+
+1.0.2		Tue Oct 14 11:00:05 EDT 2003
+		submitted by: Doug Ferguson <dougf@bookings.nl>.
+		Removed useage of 'our' to declare class global variables,
+		instead, using the 'use vars ()' method. In addition to being
+		'more correct', this also allows older versions of perl to 
+		use Time::Interval. Thanx, Doug!
+
+1.0.1		Mon Apr 28 14:25:58 2003
+		fixed dependancy list in Makefile.PL, added Date::Parse
+
+1.0		Fri Apr 25 10:58:30 2003
+		initial revision for release to CPAN
+

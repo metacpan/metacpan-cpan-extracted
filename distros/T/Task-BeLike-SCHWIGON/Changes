@@ -1,0 +1,26 @@
+Revision history for Task-BeLike-SCHWIGON
+
+0.007     2016-05-03
+        - drop Devel::bt - trouble maker on one of my systems
+
+0.006     2016-02-08
+        - some more and some less deps
+
+0.005     2015-10-02
+        - some more deps I currently use
+
+0.004     2015-09-28
+        - replace File::Slurp with File::Slurper
+
+0.003     2013-05-02
+        - add Archive::Tar::Wrapper
+        - add Task::PerlFormance
+        - add DBD::Pg
+        - add TAPPER deps
+        - drop lots of unused stuff
+
+0.002     2012-08-07
+        - add: indirect, multidimensional, bareword::filehandles
+
+0.001     2012-05-08
+        - initial module collection roughly based on FLORA

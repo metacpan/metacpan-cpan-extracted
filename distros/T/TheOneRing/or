@@ -1,0 +1,460 @@
+#!/usr/bin/perl
+# Copyright (C) 2009 Wes Hardaker
+# License: GNU GPLv2.  See the COPYING file for details.
+
+use TheOneRing;
+
+use Getopt::GUI::Long;
+
+our $VERSION = '0.3';
+
+my %opts;
+Getopt::GUI::Long::Configure(qw(display_help no_ignore_case no_gui
+				require_order));
+
+GetOptions(\%opts,
+	   ["d|debug",  "Turn on debugging output"],
+	   ["n|dryrun", "Dry run only; just show what would be done."],
+	   ["GUI:VERSION", $VERSION],
+	   ["GUI:otherargs_text", "COMMAND [COMMAND OPTIONS]"],
+	  ) || exit;
+
+my @or_opts;
+push @or_opts, 'debug',  1 if ($opts{'d'});
+push @or_opts, 'dryrun', 1 if ($opts{'n'});
+
+my $or = new TheOneRing(@or_opts);
+$or->dispatch(@ARGV);
+
+=head1 NAME
+
+or - The One Ring to manage all other version control systems
+
+=head1 SYNOPSIS
+
+  # cd svn_repository_checkout
+  # or update
+  # or diff
+  # or commit -m "woot"
+
+  # cd cvs_repository_checkout
+  # or update
+  # or diff
+  # or commit -m "woot"
+
+  # cd git_repository_checkout
+  # or update
+  # or diff
+  # or commit -m "woot"
+
+  # cd svk_repository_checkout
+  # or update
+  # or diff
+  # or commit -m "woot"
+
+=head1 DESCRIPTION
+
+If you're a developer of multiple projects like me, you'll find
+yourself needing to switch between multiple different Version Control
+Systems (VCSs).  After I've worked on one project using, say, SVN for
+an hour I may need to switch to a different one that's using, say,
+git.  That's where I start beating my head on a wall.
+
+Not because I dislike either system; I actually like both of those.
+It's because my mind thinks "check that in" and then my fingers have
+already started typing "svn commit ..." instead of using "git".  It's
+just habit.  The VCS should be getting out of my way, but because
+there are so many it just got in my way.  I can't work on auto-pilot
+because different projects need different VCSes.
+
+95% plus percent of your version control operations are the simple
+ones: modify, diff, commit, update, status, info, etc.  It's actually
+fairly rare that you need to dive into the more advanced operations.
+Thus, I thought, why can't I have a system that automatically figures
+out what sort of checkout path I'm in and invoke the right command for
+me.  Better yet, they can merge the common features of them all and do
+translations to the oddballs when necessary (for example, -N in many
+systems means "non-recursive" but in CVS it's "-l" (of course)).
+
+Hence, B<The One Ring was> forged.  And it was good (not evil).
+
+B<or> is the command line application that is a wrapper around SVN,
+SVK, CVS and GIT (currently just these 4; others are easy to add).
+Internally most of the work is done by the I<TheOneRing> perl module
+which does the brute force of the work (which is really driving the
+slave modules appropriately).
+
+=head1 MAIN OPTIONS
+
+The main options B<must> go before the version control command to be
+processed.
+
+=over
+
+=item  -d
+
+=item  --debug
+
+Turn on debugging output
+
+=item  -n
+
+=item  --dryrun
+
+Dry run only; just show what would be done.
+
+=back
+
+=head1 SUPPORTED COMMANDS
+
+The following are the currently supported commands that or
+understands and can convert from one system to the next.  Their
+individual options are shown as well.  The individual options B<must>
+go after the command.
+
+
+=head2 info
+
+=over
+
+=item  -q
+
+
+
+=item  --quiet
+
+Quiet output
+
+
+
+
+=back
+
+=head2 remove
+
+=over
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+=item  -q
+
+
+
+=item  --quiet
+
+Quiet output
+
+
+
+
+=back
+
+=head2 add
+
+=over
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+=item  -q
+
+
+
+=item  --quiet
+
+Quiet output
+
+
+
+
+=back
+
+=head2 status
+
+=over
+
+=item  -q
+
+
+
+=item  --quiet
+
+Quiet output
+
+
+
+
+=back
+
+=head2 ignore
+
+=over
+
+ERROR: The "SVK" module does know the command "ignore"
+
+
+=back
+
+=head2 annotate
+
+=over
+
+=item  -r STRING
+
+
+
+=item  --revision=STRING
+
+Revision to update to
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+
+
+
+=back
+
+=head2 commit
+
+=over
+
+=item  -m STRING
+
+
+
+=item  --message=STRING
+
+
+
+=item  --msg=STRING
+
+Commit message
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+=item  -q
+
+
+
+=item  --quiet
+
+Update quietly as possible
+
+
+
+
+=back
+
+=head2 revert
+
+=over
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+=item  -q
+
+
+
+=item  --quiet
+
+Quiet output
+
+
+
+
+=back
+
+=head2 diff
+
+=over
+
+=item  -r STRING
+
+
+
+=item  --revision=STRING
+
+
+
+=item  --msg=STRING
+
+Revision to diff against
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+
+
+
+=back
+
+=head2 log
+
+=over
+
+=item  -r STRING
+
+
+
+=item  --revision=STRING
+
+Revision to update to
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+=item  -q
+
+
+
+=item  --quiet
+
+Quiet output
+
+
+
+
+=back
+
+=head2 export
+
+=over
+
+
+
+=back
+
+=head2 update
+
+=over
+
+=item  -r STRING
+
+
+
+=item  --revision=STRING
+
+Revision to update to
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+=item  -q
+
+
+
+=item  --quiet
+
+Update quietly as possible
+
+
+
+
+=back
+
+=head2 list
+
+=over
+
+=item  -r STRING
+
+
+
+=item  --revision=STRING
+
+Revision to update to
+
+=item  -N
+
+
+
+=item  --non-recursive
+
+Don't decend into subdirectiories
+
+=item  -q
+
+
+
+=item  --quiet
+
+Quiet output
+
+
+
+
+=back
+
+
+
+=head1 EXAMPLE
+
+Debugging: use the -d and -n switch just to see what it'll do:
+
+  # or -d -n commit -m "do a commit"
+  found subtype SVK
+  running SVK->commit
+  would run: 'svk' 'commit' '-m' 'do a commit'
+
+=head1 CAVEATS
+
+B<or> will B<never> replace all the other command line utilties and
+wrap around them completely.  There B<will> be times you'll need to
+switch back to your natice client for complex operations.  But by that
+point, your brain will likely already be thinking about the version
+control system in question and it won't be a big leap to switch back.
+
+=head1 STATUS
+
+Alpha; it's just begun.  But I'm already using it.  Expect some bumps
+though, or missing features.
+
+=head1 AUTHOR
+
+Wes Hardaker <hardaker ATAT users.sourceforge.net>
+
+=cut

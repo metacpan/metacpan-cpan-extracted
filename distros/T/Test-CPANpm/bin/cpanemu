@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+use Test::CPANpm::Fake;
+use Pod::Usage;
+use CPAN;
+use Cwd qw(getcwd);
+use File::Path qw(rmtree);
+
+our(%opts, %modules, @ARGV, %ENV);
+
+getopts('mtihd', \%opts);
+
+if($opts{h}) {
+    pod2usage(0);
+}
+
+if($opts{d}) {
+    $ENV{DEBUG_TEST_CPAN} = 1;
+}
+
+if(!grep($opts{$_}, qw(m t i))) {
+    die "One of -m, -t, or -i is required. ($0 -h for help)";
+}
+
+if(grep($opts{$_}, qw(m t i)) > 1) {
+    die "Only one of -m, -t, or -i needs to be specified.";
+}
+
+%modules = map { $_ => 1 } @ARGV;
+
+run_with_fake_modules {
+    my $here = getcwd;
+    my $dir = dist_dir('.');
+
+    my $d = CPAN::Distribution->new(build_dir => $dir, ID => $dir);
+
+    if($opts{'m'}) {
+        $d->make;
+    } elsif($opts{'t'}) {
+        $d->test;
+    } elsif($opts{'i'}) {
+        $d->install;
+    }
+
+    chdir($here);
+    rmtree($dir) unless $ENV{DEBUG_TEST_CPAN};
+} %modules;
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+cpanemu - Pretend that CPAN has downloaded the package in the current directory
+
+=head1 SYNOPSIS
+
+  cpanemu -m|-t|-i [Missing::Module [Missing::Module ...]]
+
+    -m - Make package in current directory
+    -t - Test package in current directory
+    -i - Install package in current directory
+    -d - Debug mode
+
+=head1 EXAMPLE
+
+  # Test how the current module behaves on CPAN without Module::Build installed
+  cpanemu -t Module::Build
+
+=head1 DESCRIPTION
+
+cpanemu runs the "distdir" action on a perl package,
+loads up L<CPAN|CPAN>, and tells it it has just downloaded a distribution.
+
+Using the "-m", "-t", and "-i" switches, you can tell CPAN to attempt to
+"make", "test", and/or "install" your package. What you see when this happens
+should closely approximate what an end-user will see when they use the CPAN
+shell to download your package from CPAN.
+
+=head1 USAGE
+
+Run "Makefile.PL" or "Build.PL" in your distribution. Then, run C<cpanemu>
+in your distribution's directory, specifying the flags for the actions you want
+(-m for make, -t for test, -i for install).
+
+Any other arguments specified are considered the names of modules that should
+be marked as missing. This will be done by generating fake packages that
+fail to load, making CPAN believe that they are not available. Note that
+only I<the current> module will be tested; if some of these modules are
+prerequisites, they won't actually be downloaded, but you should expect
+CPAN's "Shall I follow them and prepend them to the queue" prompt if your
+module is set up correctly.
+
+=head1 SEE ALSO
+
+L<Test::CPANpm>, L<CPAN>
+
+=head1 AUTHOR
+
+Tyler "Crackerjack" MacDonald <japh@crackerjack.net>
+
+=head1 LICENSE
+
+Copyright 2005 Tyler MacDonald.
+
+This is free software; you may redistribute it under the same terms as perl itself.
+
+=cut

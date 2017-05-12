@@ -1,0 +1,38 @@
+# this tests evaluations in INCLUDE directives
+
+# test simple variable values 
+%% DEFINE age=30 %%
+Age defined: %%age%%
+Testing: $age > 20 
+%% INCLUDE foo pass=10 if="$age > 20" %%
+Testing: $age > 30 
+%% INCLUDE foo pass=11 if="$age > 30" %%
+Testing: $age > 40 
+%% INCLUDE foo pass=12 if="$age > 40" %%
+Testing: $age < 40 
+%% INCLUDE foo pass=13 if="$age < 40" %%
+Testing: $age >= 30 
+%% INCLUDE foo pass=14 if="$age >= 30" %%
+Testing: $age <= 30 
+%% INCLUDE foo pass=15 if="$age >= 30" %%
+Testing: $age >= 29 
+%% INCLUDE foo pass=16 if="$age >= 29" %%
+Testing: $age >= 31 
+%% INCLUDE foo pass=17 if="$age >= 31" %%
+
+%% DEFINE cutoff=40 %%
+ 
+Testing: age < $cutoff
+%% INCLUDE foo pass=21 if="age < $cutoff" %%
+Testing: $age < $cutoff 
+%% INCLUDE foo pass=22 if="$age < $cutoff" %%
+Testing: age > $cutoff
+%% INCLUDE foo pass=23 if="age > $cutoff" %%
+Testing: $age > $cutoff 
+%% INCLUDE foo pass=22 if="$age > $cutoff" %%
+
+
+__END__
+ 
+%% BLOCK foo %%<<< block pass=%%pass%% >>>%% ENDBLOCK %%
+

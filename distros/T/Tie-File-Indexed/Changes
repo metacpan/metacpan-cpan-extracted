@@ -1,0 +1,44 @@
+#-*- Mode: Change-Log; coding: utf-8 -*-
+#
+# Revision history for Perl module Tie::File::Indexed
+
+v0.09 Wed, 21 Sep 2016 09:12:16 +0200 moocow
+	+ use unique filenames in test/*.t
+	  - be nice to cpantesters running with "HARNESS_OPTIONS=j$N" $N>1 (multiple parallel jobs
+	  - should address weird cpantesters inconsistency e.g. for 5.10.0 GNU/Linux 3.16-3-amd64 x86_64-linux-thread-multi:
+	    ~ PASS: http://www.cpantesters.org/cpan/report/bf64695e-7f39-11e6-b850-10220ec14a5e
+	    ~ FAIL: http://www.cpantesters.org/cpan/report/569b1ec2-7f39-11e6-b850-10220ec14a5e
+	    here, FAIL run chokes on 03_utf8.t reporting an element value we set in 02_basic.t
+
+v0.08 Wed, 24 Aug 2016 16:04:51 +0200 moocow
+	+ force clear O_TRUNC on reopen()
+
+v0.07 Wed, 24 Aug 2016 10:55:16 +0200 moocow
+	+ added reopen() method (should be a force-flush())
+	+ flush() now calls reopen() if underlying handles don't have a flush() method
+	+ fixed off-by-one error in SPLICE method return values
+	+ ported tests to Test::More
+
+v0.06 Tue, 29 Sep 2015 09:21:11 +0200 moocow
+	+ consolidate() now closes and re-opens datafile
+	  - fixes win32 test failures with 'Permission denied' on cpantesters
+	+ doc fixes
+
+v0.05 Thu, 24 Sep 2015 15:19:48 +0200 moocow
+	+ added MIN_PERL_VERSION=>5.10.0 for // operator
+	+ use File::Copy::move() in consolidate() method (for cpantesters win32 failures)
+
+v0.04 Fri, 04 Sep 2015 10:22:22 +0200 moocow
+	+ changed default pack formats to 'J' (perl UV: should be safe but not portable)
+	+ fix annoying warnings during make test under perl 5.14.2 (lal)
+	  "untie attempted while 1 inner references still exist at t/02_basic.t line 109."
+
+v0.03 Thu, 20 Aug 2015 11:01:24 +0200 moocow
+	+ added copy(), rename(), and move() methods
+
+v0.02 Tue, 18 Aug 2015 10:07:16 +0200 moocow
+	+ added 'temp' option: auto-unlink on object-destruction
+	+ added ::Freeze and ::FreezeN subclasses
+
+v0.01 Wed, 12 Aug 2015 15:23:11 +0200 moocow
+	+ initial version

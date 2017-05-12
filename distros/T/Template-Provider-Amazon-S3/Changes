@@ -1,0 +1,46 @@
+Revision history for Template-Provider-Amazon-S3
+0.008    28 February 2012
+         After running the last build on an s3 volume with a very large
+         number of templates, the startup time was insane. This is becase,
+         the system was downloading and populating every template into the
+         fresh cache. So, I've opted for a lazier approach. I have, also,
+         increased the size of my test s3 bucket with many more small 
+         template files.
+
+0.007    21 February 2012
+         Changed out the cache logic, I have replace the complicated 
+         system of two CHI caches with one that just store the things
+         of interest. I think I was starting of over-engineered the 
+         caching. 
+
+0.006    21 February 2012
+         Changed out my naive cache logic, and replace it with Chi.
+         Added two options
+            * refresh_in_seconds
+               This was added in the last release, but I updated the 
+               doc this release.
+            * cache_options
+               This is passed to CHI->new(); The default is an in memory
+               cache.
+         Added better error handling around getting objects from S3. If
+         and error is thrown, it will remove the item from the cache and
+         try to retrieve it again.
+
+0.005    21 February 2012
+         The refresh of cache logic was not good enough, improved it a bit.
+
+0.004    14 February 2012
+         Left an errant say statement.
+         Fixed an issue with the cache not refreshing.
+
+0.003    11 February 2012
+         Fixed a few more bugs.
+
+0.002    6 February 2012
+         Removed some Debug breakpoints that I left in there
+         By mistake. 
+         Also, fixed the pod.
+
+0.001    5 February 2012
+         Initial creation, this is feature compleate.
+      

@@ -1,0 +1,68 @@
+#!/usr/local/bin/perl -w
+use Tk;
+use Tk::Gauge;
+use strict;
+use warnings;
+
+my $mw = MainWindow->new;
+
+our($temperature);
+
+my $thermo = $mw->Gauge(
+    -from                 => -20,
+    -to                   => 40,
+    -huboutline           => 'red',
+    -majorticklabelskip   => [-20,40],
+    -minortickinterval    => 5,
+    -finetickinterval     => 1,
+    -style                 => 'pieslice',
+    -margin 		   => 20,
+    -bandwidth		   => 5,
+    -bands		   => [
+				{
+				   -minimum  => -20,
+				   -maximum  => -5,
+				   -arccolor => '#aa00aa',
+				},
+				{
+				   -minimum  => -5,
+				   -maximum  =>  5,
+				   -arccolor => '#0000ff',
+				},
+				{
+				   -minimum  =>  5,
+				   -maximum  => 15,
+				   -arccolor => '#00ff00',
+				},
+				{
+				   -minimum  => 15,
+				   -maximum  => 25,
+				   -arccolor => '#ffff00',
+				},
+				{
+				   -minimum  => 25,
+				   -maximum  => 35,
+				   -arccolor => '#ff8800',
+				},
+				{
+				   -minimum  => 35,
+				   -maximum  => 40,
+				   -arccolor => '#ff0000',
+				},
+			      ],
+     -needles              =>[
+		              {
+				  -arrowshape => [0,0,0],
+		                  -radius     => 60,
+		                  -variable   => \$temperature,
+				  -color      => 'black',
+				  -width      => 2,
+				  -showvalue  => 1,
+				  -format     => '%.1f C',
+		              },
+			     ],
+)->pack;
+
+$mw->after( 1000, sub{ $temperature = 18.2 } );
+
+MainLoop;

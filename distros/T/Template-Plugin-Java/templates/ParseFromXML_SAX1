@@ -1,0 +1,128 @@
+[%# vim: set syntax=java: %]
+static String	DEFAULT_PARSER = "com.sun.xml.parser.Parser";
+DocumentHandler	myParent;
+Parser		myParser;
+CharArrayWriter contents = new CharArrayWriter();
+
+public $class(Parser parser, DocumentHandler parent)
+{
+	myParser = parser;
+	myParent = parent;
+	parser.setDocumentHandler(this);
+}
+
+Parser initParser()
+throws Exception
+{
+	String parser_name = System.getProperty("org.xml.sax.driver");
+	if (parser_name == null) {
+		parser_name = DEFAULT_PARSER;
+	}
+	return (Parser)Class.forName(parser_name).newInstance();
+}
+
+public void startElement(String name, AttributeList attributes)
+throws SAXException
+{
+// Ignore elements/attributes that are in a namespace.
+	if (inNameSpace(name)) {
+		return;
+	}
+
+[% FOREACH Java.variables({type => "Composite"}) %]
+	if (name.equals("$name")) {
+		set$capName(new $type(myParser, this)); return; }
+[% END %]
+[% FOREACH Java.variables({type => "CompositeArray"}) %]
+[%      array_type = Java.arrayType(name, value) %]
+	if (name.equals("$name")) {
+		${name}.addElement(new $array_type(myParser, this)); return; }
+[% END %]
+
+	contents.reset();
+
+	for (int i = 0; i < attributes.getLength(); i++) {
+		if (!inNameSpace(attributes.getName(i))) {
+			set (
+				attributes.getName(i),
+				attributes.getValue(i)
+			);
+		}
+	}
+} 
+
+public void characters( char[] ch, int start, int length ) 
+throws SAXException {
+	contents.write( ch, start, length );  
+}
+
+public void endElement(String name)
+throws SAXException
+{
+	if (name.equals("$tag") && myParent != null) {
+		myParser.setDocumentHandler(myParent);
+		return;
+	}
+
+	set(name, contents.toString());
+} 
+
+public void put(String name, String value) { set(name, value); }
+public void addElement(String name, String value) { set(name, value); }
+public void set(String name, String value) {
+[% FOREACH Java.variables({type => "Scalar"}) %]
+	if (name.equals("$name")) { set$capName(
+	[% Java.castJavaString("value", type) %]); return; }
+[% END %]
+[% FOREACH Java.variables({type => "ScalarArray"}) %]
+[%	array_type = Java.arrayType(name, value) %]
+	if (name.equals("$name"))
+		{ get$capName().addElement([% Java.castJavaString("value", array_type) %]); return; }
+[% END %]
+}
+
+public void set(InputSource from) 
+throws Exception
+{
+	if (myParser == null) { myParser = initParser(); }
+	myParser.setDocumentHandler(this);
+	myParser.parse(from);
+}
+
+// Check that whether an XML element or attribute is in a name space
+// (has a prefix and :).
+boolean inNameSpace(String xml_name) {
+	char[] chars = xml_name.toCharArray();
+
+	for (int i = 0; i < chars.length; i++) {
+		if (chars[i] == ':') {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// These are just to fullfill the DocumentHandler interface.
+
+public void endDocument() {}
+public void ignorableWhitespace(char[] ca1, int i1, int i2) {}
+public void processingInstruction(String s1, String s2) {}
+public void setDocumentLocator(org.xml.sax.Locator l) {}
+public void skippedEntity(String s1) {}
+public void startDocument() {}
+
+public static void main(String[] argv)
+{
+	try {
+		$class me = new $class();
+		if (argv.length > 0) {
+			me.set(new InputSource(new FileReader(argv[0])));
+		} else {
+			me.set(new InputSource(System.in));
+		}
+		System.out.print(me);
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+}

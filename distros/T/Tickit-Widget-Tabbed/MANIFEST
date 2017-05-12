@@ -1,0 +1,34 @@
+Changes
+dist.ini
+examples/demo-custom-ribbon.pl
+examples/demo-logtail.pl
+examples/demo-multiline-ribbon.pl
+examples/demo-tabs.pl
+lib/Tickit/Widget/Tabbed.pm
+lib/Tickit/Widget/Tabbed/Ribbon.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-pod.t
+t/00-use.t
+t/10-render-bottom.t
+t/10-render-left.t
+t/10-render-right.t
+t/10-render-top.t
+t/11-labels-horizontal.t
+t/11-labels-vertical.t
+t/12-pens-horizontal.t
+t/12-pens-vertical.t
+t/13-children-horizontal.t
+t/13-children-vertical.t
+t/14-input-horizontal.t
+t/14-input-vertical.t
+t/20-tabs.t
+t/21-tab-activate.t
+t/22-tabs-late.t
+t/23-tab-subclass.t
+t/30-remove-last.t
+t/31-change-orientation.t
+META.json                                Module JSON meta-data (added by MakeMaker)

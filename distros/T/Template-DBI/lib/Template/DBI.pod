@@ -1,0 +1,52 @@
+=head1 NAME
+
+Template::DBI - DBI plugin for the Template Toolkit
+
+=head1 SYNOPSIS
+
+    $ perldoc Template::Plugin::DBI
+
+=head1 DESCRIPTION
+
+The Template-DBI distribution contains the DBI plugin for the Template
+Toolkit.  At some point in the future it is likely to contain other
+DBI-related plugins and extension modules for the Template Toolkit.
+
+The DBI plugin was distributed as part of the Template Toolkit until
+version 2.15 released in May 2006.  At this time it was extracted into
+this separate Template-DBI distribution.
+
+See the documentation for L<Template::Plugin::DBI> for further details
+on using the DBI plugin.
+
+=head1 AUTHORS
+
+The DBI plugin was originally written by Simon A Matthews, and
+distributed as a separate module.  It was integrated into the Template
+Toolkit distribution for version 2.00 and included contributions from
+Andy Wardley, Craig Barratt, Dave Hodgkinson and Rafael Kitover.  Andy
+Wardley extracted it back into a separate distribution in May 2006.
+After that, in 2010 Jens Rehsack maintains this distribution.
+
+=head1 COPYRIGHT
+
+  Copyright (C) 1999-2006 Simon Matthews, Andy Wardley.  All Rights Reserved
+  Copyright (C) 2010 Jens Rehsack.  All Rights Reserved
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Template>, L<Template::Plugins>, L<Template::Plugin::DBI>, L<DBI>,
+L<Tie::DBI>
+
+=cut
+
+# Local Variables:
+# mode: perl
+# perl-indent-level: 4
+# indent-tabs-mode: nil
+# End:
+#
+# vim: expandtab shiftwidth=4:

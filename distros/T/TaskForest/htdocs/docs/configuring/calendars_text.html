@@ -1,0 +1,269 @@
+  <p>
+    A calendar is a set of rules that defines on what days a job may run.
+    The rules that make up a calendar are specified in
+    the <a href="/docs/configuring/configuration.html">configuration
+    file</a> and the calendars themselves are associated with a Family in
+    the Family file.  
+  </p>
+
+  <p>
+    Calendar names should contain only the characters shown
+    below:<br>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-
+  </p>
+
+  <p>
+    Let's start with the configuration file. You can have zero or more
+    calendars in the configuration file.  Each calendar may be associated
+    with zero or more Families.  A calendar consists of one or
+    more <em>rules</em>.  All rules belonging to a calendar are consulted
+    in order to determine whether or not the Family should run today. The
+    rules are consulted in the order in which they are specified in the
+    configuration file.  Rules may contradict each other.  A rule may not
+    conclusively determine whether or not the Family should run today.
+    The last rule that determines whether or not a Family should run today
+    will override any earlier rules.  Rules are case <em>in</em>sensitive.
+  </p>
+
+  <p>
+    Let's see some examples.  First, let's see how a Family file specifies
+    a calendar:
+  </p>
+
+  <div class=example_name>Example 1 - One day only</div>
+
+  <div class="code"><pre><code>   +-------------------------------------------------------
+01 |start =&gt; '00:00', tz =&gt; 'GMT', calendar =&gt; 'NY2010'
+02 |
+   | ...
+</code></pre></div>
+
+  <p>
+    You can see here that instead of
+    the <code>days&nbsp;=&gt;&nbsp;'...'</code>, we
+    have <code>calendar&nbsp;=&gt;&nbsp;'NY2010'</code>.  This tells the
+    system that this family will rely on the calendar named 'NY2010.'
+    This calendar is defined in its own file.  The file name should be the
+    same as the calendar name.  The directory in which the file exists is
+    specified by
+    the <a href="/docs/configuring/options.html#calendar_dir">calendar_dir</a>
+    option:
+  </p>
+    
+  <div class="code"><pre><code>   +-------------------------------------------------------
+   | ...
+   | calendar_dir = "/foo/bar/calendars"
+   | ...
+</code></pre></div>
+
+  <p>
+    The file /foo/bar/calendars/NY2010 looks like this (the # symbols and
+    anything after them are comments, just like in
+    the <a href="/docs/configuring/configuration.html">configuration
+    file</a>):
+  </p>
+  
+  <div class="code"><pre><code>   +-------------------------------------------------------
+01 | <span class=comments># NY2010</span>
+02 | + 2010/01/01  <span class=comments># Only valid on New Years Day, 2010</span>
+   +-------------------------------------------------------
+</code></pre></div>
+  
+  <p>
+    This calendar only has one rule.  It is "+ 2010/01/01".  The
+    '+' in the rule says that if the date specified in this rule matches,
+    then the Family <em>must</em> run on that day.  The '+' is optional.
+    This calendar will allow the Family that uses it to run on Jan 1,
+    2010, and on no other day.  Dates in rules should be in the YYYY/MM/DD
+    format.
+  </p>
+
+
+  <div class=example_name>Example 2 - One month only</div>
+
+  <p>
+    What if we want a job to run on every day in November 2010?  You can
+    use a rule like this:
+  </p>
+
+  <div class="code"><pre><code><span class=comments># Nov2010</span>
+        
+ 2010/11/*
+</code></pre></div>
+  
+  <p>
+    The '*' in the DD part of the date is like a wildcard.  It means that
+    the DD part of the rule will match any number.  In other words, if
+    today's date is November DD, 2010, then this rule will match, for all
+    values of DD.  Note that the '+' is missing here.  That's ok.  It's
+    optional, and if missing, the system will assume that you meant to put
+    in a '+'.
+  </p>
+    
+  <div class=example_name>Example 3 - Rejecting days</div>
+
+  <p>
+    If, on the other hand, you wanted this Families that use this calendar to run on all days in 2010 <em>except</em> all of November, you would use the '-' sign:
+  </p>
+
+  <div class="code"><pre><code><span class=comments># All_But_Nov2010</span>
+        
+ + 2010/*/*
+ - 2010/11/*
+</code></pre></div>
+  
+  <p>
+    The first line matches all days in 2010.  The MM and DD parts are both
+    wildcards.  The optional plus tells the system that if the date
+    matches this pattern, it should count as a valid run date.  The next
+    line, on the other, hand adds an exception to this rule: If the date
+    falls within November 2010, the date should <b>not</b> be a valid run
+    date - note the '-' sign that tells the system to exclude this date.
+  </p>
+    
+
+  <div class=example_name>Example 4 - Daily Calendar</div>
+
+  <p>
+    To specify a daily calendar, use this:
+  </p>
+
+  <div class="code"><pre><code><span class=comments># Daily</span>
+
+*/*/*
+</code></pre></div>
+
+  <p>
+    Of course, you don't have to name the calendar 'Daily.'  You can name
+    it whatever you want.  Using this calendar is equivalent to
+    having <code>days=&gt;'Mon,Tue,Wed,Thu,Fri,Sat,Sun'</code> in the
+    Family file.
+  </p>
+
+
+  <div class=example_name>Example 5 - Specifying days of the week</div>
+
+  <p>
+    You can also specify rules that specify days of the week with a
+    qualifier.  For example, to run a job on the first Monday of every
+    month in 2009, you should use a rule like this:
+  </p>
+
+  <div class="code"><pre><code><span class=comments># FirstMon09</span>
+
++ first Mon 2009/*
+</code></pre></div>
+
+  <p>
+    A couple of points to mention here: First, the '+' is optional here as
+    well.  Second, the date part of the rule only has the year and the
+    month (in YYYY/MM format).  When you use a qualifier like 'first,' it
+    makes no sense to say things like 'The first Monday of the 1st of
+    every month.'
+  </p>
+  
+  <p>
+    The word 'first' in line 2 above is called a qualifier.  Valid
+    qualifiers are:
+  </p>
+
+  <ul class=bullet>
+    <li>first</li>
+    <li>second</li>
+    <li>third</li>
+    <li>fourth</li>
+    <li>fifth</li>
+    <li>last</li>
+    <li>second last</li>
+    <li>third last</li>
+    <li>fourth last</li>
+    <li>every</li>
+  </ul>
+
+  <p>
+    The qualifiers 'first last,', 'last last' and 'every last' also work
+    in version 1.25, but they may stop working in a future version, so
+    don't get into the habit of using those qualifiers.
+  </p>
+
+  <p>
+    Unlike the 'days' specifier in the family file, the days of the week
+    in calendar rules may be spelled out.  Only the first 3 characters are
+    significant.
+  </p>
+
+  
+  <div class=example_name>Calendar Recipes</div>
+
+  <p>
+    The following 'recipes' show you some useful calendar rules:
+  </p>
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># Run every day</span>
+<span class="comments">#</span>
++ */*/*
+</code></pre></div>
+
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># Run on weekdays only</span>
+<span class="comments">#</span>
+*/*/*
+- every Saturday */*
+- every Sunday */*
+
+<span class="comments"># You could also replace the 3 lines above</span>
+<span class="comments"># with 5 '+' lines, one for each weekday.</span>
+</code></pre></div>
+
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># 'Thanksgiving Day' observed in the U.S.</span>
+<span class="comments">#</span>
+fourth Thursday */11
+</code></pre></div>
+
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># 'Thanksgiving Day' observed in Canada</span>
+<span class="comments">#</span>
+second Monday */10
+</code></pre></div>
+
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># 'Memorial Day' observed in the U.S.</span>
+<span class="comments">#</span>
+last Monday */5
+</code></pre></div>
+
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># The day Daylight Saving Time starts in the U.S.</span>
+<span class="comments">#</span>
+second Sun */03  <span class="comments"># this rule is valid for dates</span>
+                 <span class="comments"># after 2007, but not earlier</span>
+</code></pre></div>
+
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># The day Daylight Saving Time ends in the U.S.</span>
+<span class="comments">#</span>
+first Sun */11   <span class="comments"># this rule is valid for dates</span>
+                 <span class="comments"># after 2007, but not earlier</span>
+</code></pre></div>
+
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># The day Daylight Saving Time starts in Europe</span>
+<span class="comments">#</span>
+last Sun */03    <span class="comments"># tested for 2009</span>
+</code></pre></div>
+
+
+  <div class="code"><pre><code><span class="comments"># ############################################################</span>
+<span class="comments"># The day Daylight Saving Time ends in Europe</span>
+<span class="comments">#</span>
+last Sun */10    <span class="comments"># tested for 2009</span>
+</code></pre></div>
+  

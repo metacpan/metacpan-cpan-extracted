@@ -1,0 +1,27 @@
+Template::Plugin::SimpleJson version 0.01
+==========================================
+
+This module implements some methods to manipulate json string, using L<JSON|JSON> module
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  * Template
+  * JSON
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Fabio Masini
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,211 @@
+NAME
+
+    Test::Script::Async - Non-blocking friendly tests for scripts
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+     use Test2::Bundle::Extended;
+     use Test::Script::Async;
+     
+     plan 4;
+     
+     # test that the scripts compiles.
+     script_compiles 'script/myscript.pl';
+     
+     # test that we are able to run the script
+     script_runs('script/myscript.pl')
+       # and it exits with a success value
+       ->exit_is(0)
+       # and that the standard output has
+       # foo in it somewhere
+       ->out_like(qr{foo})
+       # print diagnostic if any of the tests
+       # for this run failed.  Useful for
+       # cpan testers reports
+       ->diag_if_fail;
+
+DESCRIPTION
+
+    This is a non-blocking friendly version of Test::Script. It is useful
+    when you have scripts that you want to test against a AnyEvent or
+    Mojolicious based services that are running in the main test process.
+    The AnyEvent implementations that are known to work with this module
+    are pure perl, EV and Event. Others may work, or may be added in the
+    future.
+
+    This module will use Mojo::IOLoop if any Mojo modules are loaded. The
+    Mojo event loop only works with EV if you want to use AnyEvent, so make
+    sure that you include a use EV line if you intend on using both
+    AnyEvent and Mojolicious.
+
+    The interface is different from Test::Script for running scripts, in
+    that it is object oriented. The "script_runs" function only tests that
+    the script was able to run normally, and returns an instance of
+    Test::Script::Async which can be interrogated for things like the exit
+    value and output.
+
+    It uses the brand spanking new Test2 framework, which is experimental
+    as of this writing. In particular it is not currently compatible with
+    Test::More and Test::Builder, but hopefully will be one day.
+
+FUNCTIONS
+
+ script_compiles
+
+     script_compiles $scriot;
+     script_compiles $script, $test_name;
+
+    Tests to see Perl can compile the script.
+
+    $script should be the path to the script in unix-format non-absolute
+    form.
+
+ script_runs
+
+     my $run = script_runs $script;
+     my $run = script_runs $script, $test_name;
+     my $run = script_runs [ $script, @arguments ];
+     my $run = script_runs [ $script, @arguments ], $test_name;
+
+    Attempt to run the given script. The only test made on this call is
+    simply that the script ran. The reasons this test might fail are: the
+    script does not exist, or the operating system is unable to execute
+    perl to run the script. The returned $run object (an instance of
+    Test::Script::Async) can be used to further test the success or failure
+    of the script run.
+
+    Note that this test does NOT fail on compile error, for that use
+    "script_compiles".
+
+ATTRIBUTES
+
+ out
+
+     my $listref = $run->out;
+
+    Returns a list reference of the captured standard output, split on new
+    lines.
+
+ err
+
+     my $listref = $run->err;
+
+    Returns a list reference of the captured standard error, split on new
+    lines.
+
+ exit
+
+     my $int = $run->exit;
+
+    Returns the exit value of the script run.
+
+ signal
+
+     my $int = $run->signal;
+
+    Returns the signal that killed the script, if any. It will be 0 if the
+    script exited normally.
+
+METHODS
+
+ exit_is
+
+     $run->exit_is($value);
+     $run->exit_is($value, $test_name);
+
+    Test passes if the script run exited with the given value.
+
+ exit_isnt
+
+     $run->exit_isnt($value);
+     $run->exit_isnt($value, $test_name);
+
+    Same as "exit_is" except the test fails if the exit value matches.
+
+ signal_is
+
+     $run->signal_is($value);
+     $run->signal_is($value, $test_name);
+
+    Test passes if the script run was killed by the given signal.
+
+    Note that this is inherently unportable! Especially on Windows!
+
+ signal_isnt
+
+     $run->signal_isnt($value);
+     $run->signal_isnt($value, $test_name);
+
+    Same as "signal_is" except the test fails if the exit value matches.
+
+ out_like
+
+     $run->out_like($regex);
+     $run->out_like($regex, $test_name);
+
+    Test passes if one of the output lines matches the given regex.
+
+ out_unlike
+
+     $run->out_like($regex);
+     $run->out_like($regex, $test_name);
+
+    Test passes if none of the output lines matches the given regex.
+
+ err_like
+
+     $run->out_like($regex);
+     $run->out_like($regex, $test_name);
+
+    Test passes if one of the standard error output lines matches the given
+    regex.
+
+ err_unlike
+
+     $run->err_like($regex);
+     $run->err_like($regex, $test_name);
+
+    Test passes if none of the standard error output lines matches the
+    given regex.
+
+ diag
+
+     $run->diag;
+
+    Print out diagnostics (with diag) to describe the run of the script.
+    This includes the script filename, any arguments, the termination
+    status (either error, exit value or signal number), the output and the
+    standard error output.
+
+ note
+
+     $run->note;
+
+    Same as "diag" above, but use note instead of diag to print out the
+    diagnostic.
+
+ diag_if_fail
+
+     $run->diag_if_fail;
+
+    Print out full diagnostic using "diag" if any of the tests for this run
+    failed. This can be handy after a long series of tests for cpan
+    testers. If everything is good then no diagnostic is printed but if
+    anything failed, then you will see the script, arguments, termination
+    status and output.
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

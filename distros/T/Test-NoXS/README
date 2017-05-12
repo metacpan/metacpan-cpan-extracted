@@ -1,0 +1,77 @@
+NAME
+    Test::NoXS - Prevent a module from loading its XS code
+
+VERSION
+    version 1.03
+
+SYNOPSIS
+        use Test::NoXS 'Class::Load::XS';
+        use Module::Implementation;
+
+        eval "use Class::Load";
+        is(
+            Module::Implementation::implementation_for("Class::Load"),
+            "PP",
+            "Class::Load using PP"
+        );
+
+        # Disable all XS loading
+        use Test::NoXS ':all';
+
+        # Disable all XS loading except core or dual-life modules
+        use Test::NoXS ':xs_core_or_dual';
+
+        # Disable all XS loading except modules that shipped in core
+        use Test::NoXS ':xs_core_only';
+
+DESCRIPTION
+    This modules hijacks DynaLoader and XSLoader to prevent them from
+    loading XS code for designated modules. This is intended to help test
+    how modules react to missing XS, e.g. by dying with a message or by
+    falling back to a pure-Perl alternative.
+
+USAGE
+    Arguments on the use line control which XS modules are allowed. One and
+    only one of the following options are allowed:
+
+    *   ":all" — all XS loading is disabled
+
+    *   ":xs_core_or_dual" — XS loading is disabled except for modules that
+        are core modules in the current perl, even if they have been
+        subsequently upgraded from CPAN
+
+    *   ":xs_core_only" — XS loading is disabled except for modules that
+        shipped with the current perl. Modules upgraded from CPAN will have
+        XS disabled. This vaguely simulates upgrading dual-life modules on a
+        system without a compiler.
+
+    *   a list of module names — disables XS loading for these specific
+        modules only
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Test-NoXS/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Test-NoXS>
+
+      git clone https://github.com/dagolden/Test-NoXS.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Sam Kaufman <sam@socialflow.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

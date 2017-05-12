@@ -1,0 +1,17 @@
+hardee=harhar
+apiurl=http://hokum.bogus
+user=zippy
+foo=bar
+password=happy
+nugs=gravy
+slkdjf;lanl.vnjnrohtowhjtoil4j423t90ujlkf;/z;nxfl`1`~@$%^^&*()_+?<:"{}
+=====================================
+project=TestProject66
+run=TestRun666
+plan=GosPlan666
+configs=config1:config2:config3: ... :configN
+version=xx.xx.xx.xx
+case_per_ok=0
+step_results=sr_sys_name
+spawn=123
+sections=section1:section2:section3:sectionN

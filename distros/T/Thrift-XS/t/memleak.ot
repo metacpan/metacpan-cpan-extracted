@@ -1,0 +1,141 @@
+# Check for memory leaks
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use Test::More;
+use Thrift::XS;
+eval "use Proc::ProcessTable";
+
+plan skip_all => 'Proc::ProcessTable required for this test' if $@;
+
+plan tests => 4;
+
+our $t = Proc::ProcessTable->new( cache_ttys => 1 );
+our ( $initial, $final ) = ( 0, 0 );
+
+# Test new/destroy leak
+{
+    my $sub = sub {
+        my $mb = Thrift::XS::MemoryBuffer->new;
+        undef $mb;
+    };
+    
+    for ( 1 .. 3 ) { $sub->() }
+    $initial = size_of();
+    
+    for ( 1 .. 2000 ) { $sub->() }
+    $final = size_of();
+    
+    is( $final - $initial, 0, "MemoryBuffer new/destroy not leaking" );
+}
+
+# Test write/read leak
+{
+    my $sub = sub {
+        my $mb = Thrift::XS::MemoryBuffer->new;
+        $mb->write("a" x 10240);
+        $mb->readAll(10240);
+        undef $mb;
+    };
+    
+    for ( 1 .. 3 ) { $sub->() }
+    $initial = size_of();
+    
+    for ( 1 .. 2000 ) { $sub->() }
+    $final = size_of();
+    
+    is( $final - $initial, 0, "MemoryBuffer write/read not leaking" );
+}
+
+# Test protocol new/destroy leak
+{
+    my $sub = sub {
+        my $xst = Thrift::XS::MemoryBuffer->new;
+        my $xsp = Thrift::XS::BinaryProtocol->new($xst);
+        undef $xsp;
+        undef $xst;
+    };
+    
+    for ( 1 .. 3 ) { $sub->() }
+    $initial = size_of();
+    
+    for ( 1 .. 2000 ) { $sub->() }
+    $final = size_of();
+    
+    is( $final - $initial, 0, "BinaryProtocol new/destroy not leaking" );
+}
+
+# Test protocol write/read leak
+{
+    my $sub = sub {
+        my $xst = Thrift::XS::MemoryBuffer->new;
+        my $xsp = Thrift::XS::BinaryProtocol->new($xst);
+        
+        my ($name, $type, $seqid);
+        $xsp->writeMessageBegin('login', TMessageType::CALL, 12345);
+        $xsp->readMessageBegin(\$name, \$type, \$seqid);
+        
+        $xsp->writeStructBegin('foo');
+        $xsp->readStructBegin(\$name);
+        
+        my ($id);   
+        $xsp->writeFieldBegin('start', TType::STRING, 2600);
+        $xsp->readFieldBegin(\$name, \$type, \$id);
+        
+        my ($keytype, $valtype, $size);
+        $xsp->writeMapBegin(TType::STRING, TType::LIST, 42);
+        $xsp->readMapBegin(\$keytype, \$valtype, \$size);
+        
+        my ($elemtype);
+        $xsp->writeListBegin(TType::STRUCT, 12345);
+        $xsp->readListBegin(\$elemtype, \$size);
+        
+        $xsp->writeSetBegin(TType::I16, 12345);
+        $xsp->readSetBegin(\$elemtype, \$size);
+        
+        my $value;
+        $xsp->writeBool('true');
+        $xsp->readBool(\$value);
+        
+        $xsp->writeByte(100);
+        $xsp->readByte(\$value);
+        
+        $xsp->writeI16(65534);
+        $xsp->readI16(\$value);
+        
+        $xsp->writeI32(1024 * 1024);
+        $xsp->readI32(\$value);
+        
+        $xsp->writeI64((1 << 37) * -1234);
+        $xsp->readI64(\$value);
+        
+        $xsp->writeDouble(-3.14159);
+        $xsp->readDouble(\$value);
+        
+        $xsp->writeString('This is a unicode test with русский');
+        $xsp->readString(\$value);
+        
+        undef $xsp;
+        undef $xst;
+    };
+    
+    for ( 1 .. 3 ) { $sub->() }
+    $initial = size_of();
+    
+    for ( 1 .. 2000 ) { $sub->() }
+    $final = size_of();
+    
+    is( $final - $initial, 0, "BinaryProtocol write/read not leaking" );
+}
+
+sub size_of {
+    foreach my $p ( @{ $t->table } ) {
+        if ( $p->pid == $$ ) {
+            return $p->rss;
+        }
+    }
+    
+    die "PID not found?";
+}

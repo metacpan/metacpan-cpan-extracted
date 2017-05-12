@@ -1,0 +1,12 @@
+Sample text for Text::Vpp using ELSEIF
+#@INCLUDE 'inc_text_elsif.txt'
+#
+@IF ($var1 == 1)
+We should not see this line, because var1 should not be 1
+@ELSIF ($var1 == 2)
+We should not see this line, because var1 should not be 2
+@ELSIF ($var1 == 3)
+We should see this line, because var1 should be 3
+@ELSE
+We should not see this line.
+@ENDIF

@@ -1,0 +1,2 @@
+- stop leaking magic
+- should $self be weakened in the magic data?

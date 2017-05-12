@@ -1,0 +1,17 @@
+Revision history for Template-Plugin-ByDate
+
+0.01    2006-04-24
+        * First version, released on an unsuspecting world.
+
+0.02    2006-04-25
+        * Clean up - use List::MoreUtils instead of home-grown any function
+        + Made the until clause more explicit
+        + Added some boundary tests
+
+0.03    2006-10-04
+        ! Fix YAML output by upgrading Module::Build on the build machine
+        + Added some samples
+
+0.04	2008-01-29
+	! Add Date::Parse dependency (apparently not available on some
+          perl 5.10 test machines)

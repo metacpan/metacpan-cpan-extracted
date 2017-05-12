@@ -1,0 +1,50 @@
+Revision history for Perl extension Test::Ika
+
+0.08 2014-03-28T18:30:09Z
+
+    - bypass example and group args to *_each hooks
+      (ikasam_a)
+
+0.07 2013-11-19T05:16:44Z
+
+    - can suppress colorize output in Spec format
+      (ryopeko)
+
+0.06 2013-07-18T19:19:32Z
+
+    - conditional context and describe (can use "when" statement)
+      (ikasam_a)
+    - replace $_ to lexical value
+      (ikasam_a)
+
+0.05 2013-06-04T14:53:36Z
+
+    - impl xdescribe and xcontext (skip all cases under there)
+      (ikasam_a)
+
+0.04
+
+    - conditional example (can use "when" statement)
+      (ikasam_a)
+
+0.03
+
+    - implements "xit" and "it SPECIFICATION" only pattern
+      (ikasam_a)
+
+0.02
+
+    - implements before_suite and after_suite
+      (ikasam_a)
+
+0.01
+
+    - first alpha release
+
+0.00_02
+
+    - Better API, Better Docs.
+
+0.00_01
+
+    - first development release

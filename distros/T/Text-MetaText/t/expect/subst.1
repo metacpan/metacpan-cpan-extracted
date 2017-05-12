@@ -1,0 +1,25 @@
+# this tests simple variable definition and substitution using simple
+# variables, references to variables and the optional leading '$'
+# in the SUBST directives.  Expected text is shown in (parenthesis).
+
+
+
+ foo (Foo Text): Foo Text
+ Foo (Foo Text): Foo Text
+$foo (Foo Text): Foo Text
+$Foo (Foo Text): Foo Text
+
+
+
+  bar (bartext): bartext
+  bar (bartext): bartext
+  bar (bartext): bartext
+  Bar (bartext): bartext
+ $bar (bartext): bartext
+ $Bar (bartext): bartext
+
+
+
+  baz (bartext): bartext
+ $baz (bartext): bartext
+ $Baz (bartext): bartext

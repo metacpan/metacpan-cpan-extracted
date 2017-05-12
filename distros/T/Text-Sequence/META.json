@@ -1,0 +1,38 @@
+{
+   "abstract" : "spot one-dimensional sequences in patterns of text",
+   "author" : [
+      "Simon Wistow <simon@thegestalt.org>",
+      "Adam Spiers <cpan@adamspiers.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Sequence",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Sequence" : {
+         "file" : "lib/Text/Sequence.pm",
+         "version" : "0.27"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.27",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

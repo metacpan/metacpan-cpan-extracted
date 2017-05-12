@@ -1,0 +1,44 @@
+Tree-Easy
+
+Tree::Easy is a very minimal tree class.  It was designed to be easy
+to use and quick.  It's one of the fastest pure-perl tree modules and
+easiest in my horribly biased opinion.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tree::Easy
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tree-Tiny
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tree-Tiny
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tree-Tiny
+
+    Search CPAN
+        http://search.cpan.org/dist/Tree-Tiny/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Justin Davis
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,30 @@
+---
+abstract: 'test method name'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  File::Spec: 0
+  FindBin: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-MethodName
+provides:
+  Test::MethodName:
+    file: lib/Test/MethodName.pm
+    version: 0.01
+requires:
+  List::MoreUtils: 0
+  Module::Functions: v2.1.0
+  Module::Pluggable::Object: 0
+  Test::More: 0.88
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Test-MethodName
+version: 0.01

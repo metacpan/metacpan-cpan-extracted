@@ -1,0 +1,13 @@
+use strict;
+use warnings;
+
+use Test::More;
+use Test::Differences;
+END { done_testing(); }
+
+eq_or_diff(
+    { foo => 'bar' },
+    { foo => 'baz' },
+    "both the same",
+    { filename_a => 'Lard', filename_b => 'Chips' }
+);

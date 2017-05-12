@@ -1,0 +1,5 @@
+Error from statistic library!
+  Error code: 101
+  Error message: Error calculateStatistic() - Mandatory function calculateStatistic() not defined.
+Your implementation should override this method. Aborting....
+

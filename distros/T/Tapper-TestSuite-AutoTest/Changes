@@ -1,0 +1,50 @@
+Revision history for Tapper-TestSuite-AutoTest
+
+4.1.2     2012-11-20
+        - fix forgotten frontend 'tapper-testsuite-autotest'
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        - utility script to build standalone PAR executable
+        - local file caching differenciates between users
+        - adapt to new autotest version 0.14.* (but not 0.15 yet)
+        - use autotest 0.14.3 as default
+        - become independent from Tapper::* libs
+
+4.0.1     2012-05-16
+        - get 'host:guest' name in Tapper-metainfo
+        - add metainfo from autotest data
+        - upload autotest log+result files
+        - improved download+temp file caching
+        - use default Tapper ports
+        - allow local file:// URLs for autotest client
+        - big Dist::Zilla roundhouse kick
+
+2011-11-24  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v3.0.11
+
+	* allow local file:// autotest URLs for --source
+	* improved download+temp file caching
+	* upload autotest log+result files
+	* add metainfo from autotest data
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* rewritable shebang line
+	* polish docs
+	* [FIX] TAP for suite meta info
+	* [FIX] source_url parameter expects a value now
+	* alernative cp when rsync not available
+	* release version++ roundhouse kick
+
+2011-03-22 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release
+

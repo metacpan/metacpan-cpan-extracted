@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+use Test::Fixture::DBIC::Schema;
+use Tapper::Schema::TestTools;
+
+construct_fixture( schema  => testrundb_schema, fixture => 't/fixtures/testrundb/testrun_with_scheduling_run1.yml' );
+construct_fixture( schema  => hardwaredb_schema, fixture => 't/fixtures/hardwaredb/systems.yml' );
+
+system(qq(tapper-testrun newqueue --name=Xen_1 --priority=100));
+system(qq(tapper-testrun newqueue --name=Xen_2 --priority=100));
+system(qq(tapper-testrun newqueue --name=Xen_3 --priority=100));
+system(qq(tapper-testrun newqueue --name=Xen_4 --priority=100));
+system(qq(tapper-testrun newqueue --name=Xen_5 --priority=100));
+system(qq(tapper-testrun newqueue --name=Xen_6 --priority=100));
+system(qq(tapper-testrun newqueue --name=AAAAAAAAAAAAAAA --priority=100));
+system(qq(tapper-testrun newqueue --name=BBBBBBBBBBBBBBB --priority=100));
+system(qq(tapper-testrun newqueue --name=CCCCCCCCCCCCCCC --priority=100));
+system(qq(tapper-testrun newqueue --name=DDDDDDDDDDDDDDD --priority=100));
+system(qq(tapper-testrun newqueue --name=EEEEEEEEEEEEEEE --priority=100));
+system(qq(tapper-testrun newqueue --name=FFFFFFFFFFFFFFF --priority=100));
+
+
+# system(qq(tapper-testrun new --precondition=1 --queue=Kernel --auto_rerun));
+# system(qq(tapper-testrun new --precondition=2 --queue=KVM    --auto_rerun));
+# system(qq(tapper-testrun new --precondition=3 --queue=Xen    --auto_rerun));
+system(qq(tapper-testrun new --precondition=1 --queue=AAAAAAAAAAAAAAA --auto_rerun));
+system(qq(tapper-testrun new --precondition=1 --queue=BBBBBBBBBBBBBBB --auto_rerun));
+system(qq(tapper-testrun new --precondition=1 --queue=CCCCCCCCCCCCCCC --auto_rerun));
+system(qq(tapper-testrun new --precondition=1 --queue=DDDDDDDDDDDDDDD --auto_rerun));
+system(qq(tapper-testrun new --precondition=1 --queue=EEEEEEEEEEEEEEE --auto_rerun));
+system(qq(tapper-testrun new --precondition=1 --queue=FFFFFFFFFFFFFFF --auto_rerun));
+system(qq(tapper-testrun new --precondition=3 --queue=Xen_1 --auto_rerun));
+system(qq(tapper-testrun new --precondition=3 --queue=Xen_2 --auto_rerun));
+system(qq(tapper-testrun new --precondition=3 --queue=Xen_3 --auto_rerun));
+system(qq(tapper-testrun new --precondition=3 --queue=Xen_4 --auto_rerun));
+system(qq(tapper-testrun new --precondition=3 --queue=Xen_5 --auto_rerun));
+system(qq(tapper-testrun new --precondition=3 --queue=Xen_6 --auto_rerun));
+
+system(qq(tapper-testrun updatehost --id=6 --addqueue=AAAAAAAAAAAAAAA));
+system(qq(tapper-testrun updatehost --id=6 --addqueue=BBBBBBBBBBBBBBB));
+system(qq(tapper-testrun updatehost --id=6 --addqueue=CCCCCCCCCCCCCCC));
+system(qq(tapper-testrun updatehost --id=6 --addqueue=DDDDDDDDDDDDDDD));
+system(qq(tapper-testrun updatehost --id=6 --addqueue=EEEEEEEEEEEEEEE));
+system(qq(tapper-testrun updatehost --id=6 --addqueue=FFFFFFFFFFFFFFF));

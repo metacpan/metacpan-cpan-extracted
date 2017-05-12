@@ -1,0 +1,35 @@
+Tie::Constrained -- Automatically pre-validate changes to a variable.
+
+Tie::Constrained is a simple class which causes every mutator operation
+to a tied variable to be validated before the variable is changed.
+That is done in the TIESCALAR and STORE methods, which highjack initialization, assignment and mutator operations.
+When tied to a variable, Tie::Constrained aggregates the variable with
+a user-defined validity test and handler for failed tests. The interface
+is deliberately low-level, with a dummy test and an exception-model
+fail handler as defaults.
+
+Tie-Constrained is fully usable as it is, but is easily subclassed to
+specialize the default handlers or to modify the runtime behavior.
+
+See the pod for usage details. A cookbook and examples are in the works.
+
+
+INSTALLATION
+
+Tie::Constrained is pure perl, with no prerequisite modules.
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005, Tom Leete (zaxo@cpan.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

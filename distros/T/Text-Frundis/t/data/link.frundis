@@ -1,0 +1,15 @@
+.Lk http://bardinflor.perso.aquilenet/frundis/ "Frundis"
+.Lk http://bardinflor.perso.aquilenet/frundis/
+.Im image.png
+.Im -link http://bardinflor.perso.aquilenet/bigimage.png image.png
+.Im image.png "image label"
+.Lk http://bardinflor.perso.aquilenet/haréka/#001%
+.Sx -t lof image label
+.P
+.Sm -id label1 Text
+.Sx -name "link to label" -id label1
+.Bm -id label2
+Text with label2
+.Em
+.Sx -name "link to label2" -id label2
+.Lk http://bardinflor.perso.aquilenet/forum/?bla=thing&blabla=

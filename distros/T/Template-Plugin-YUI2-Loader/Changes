@@ -1,0 +1,14 @@
+Revision history for Template-Plugin-YUI2-Loader
+
+0.02    2010-02-17
+- relax minimum requirement of perl version to 5.6
+- documentation changes
+- do not affect the original stash in the hierarchy 
+  when deliberately bypassing stash localisation 
+
+0.01    2010-02-05
+- minor documentation tweaks
+- bumped up module version to first non developer release
+
+0.01_1  2010-01-20 - developer release
+initial upload to cpan

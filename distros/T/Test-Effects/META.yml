@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Test-Effects
+version:            0.001005
+abstract:           Test all effects at once (return value, I/O, warnings, exceptions, etc.)
+author:
+    - Damian Conway <DCONWAY@CPAN.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::Trap:  0.002001
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

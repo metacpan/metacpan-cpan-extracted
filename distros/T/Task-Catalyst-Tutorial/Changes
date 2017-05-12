@@ -1,0 +1,18 @@
+Revision history for Task-Catalyst-Tutorial
+
+0.06    3 March 2009
+    Update loaded test.
+0.05    20 January 2009
+    0.04 was missing half of Module::Install; correct this
+
+0.04    16 November 2008
+    Update VERSION dependencies.
+
+0.03    1 February 2007
+    Moving POD into Catalyst::Manual	
+
+0.02	Somtime last year
+    I forgot.
+
+0.01    27 September 2006
+    First version, released on a possibly suspecting world.

@@ -1,0 +1,21 @@
+---
+abstract: 'Filter for Template Toolkit to convert UTF8 to ANSI'
+author:
+  - 'Andreas Hernitscheck <ahernit@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-UTF8toANSI
+requires:
+  Getopt::Long: '0'
+  Pod::Abstract: '0'
+  Pod::Abstract::BuildNode: '0'
+  Pod::Text: '0'
+  Unicode::String: '0'
+version: '0.02'

@@ -1,0 +1,119 @@
+{
+   "abstract" : "Modules MPERRY uses",
+   "author" : [
+      "Matt Perry <matt@mattperry.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-MPERRY",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Presto" : "0",
+            "App::cpanminus" : "0",
+            "CLI::Framework" : "0",
+            "CPAN::Mini" : "0",
+            "CPAN::Mini::Webserver" : "0",
+            "Capture::Tiny" : "0",
+            "Carton" : "0",
+            "Class::Tiny" : "0",
+            "Config::INI" : "0",
+            "DBD::SQLite" : "0",
+            "Data::Printer" : "0",
+            "Data::Util" : "0",
+            "Devel::Cover" : "0",
+            "Devel::REPL" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Prompt::Tiny" : "0",
+            "IO::Socket::INET" : "0",
+            "IO::Socket::SSL" : "0",
+            "Inline" : "0",
+            "Inline::C" : "0",
+            "Inline::Java" : "0",
+            "JSON" : "0",
+            "LWP" : "0",
+            "LWP::Protocol::https" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "MetaCPAN::Clients" : "0",
+            "Module::Starter" : "0",
+            "Mojolicious" : "0",
+            "Mojolicious::Plugin::ConsoleLogger" : "0",
+            "Moo" : "0",
+            "Moose" : "0",
+            "Mozilla::CA" : "0",
+            "Net::Appliance::Session" : "0",
+            "Net::CLI::Interact" : "0",
+            "Net::LDAP" : "0",
+            "Parallel::ForkManager" : "0",
+            "Path::Tiny" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Tidy" : "0",
+            "Plack" : "0",
+            "Pod::Coverage" : "0",
+            "Pod::Spell" : "0",
+            "Puppet::Tidy" : "0",
+            "REST::Client" : "0",
+            "RPC::XML" : "0",
+            "Readonly" : "0",
+            "Regexp::Common" : "0",
+            "Role::Tiny" : "0",
+            "SQL::Abstract" : "0",
+            "Sort::Naturally" : "0",
+            "Spreadsheet::ParseExcel" : "0",
+            "Spreadsheet::WriteExcel" : "0",
+            "Spreadsheet::XLSX" : "0",
+            "Template" : "0",
+            "Term::ReadPassword" : "0",
+            "Test::PerlTidy" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Text::CSV" : "0",
+            "Text::CSV::Slurp" : "0",
+            "Text::Diff" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "WWW::Mechanize" : "0",
+            "WWW::Mechanize::FormFiller" : "0",
+            "WWW::Mechanize::GZip" : "0",
+            "WWW::Mechanize::Shell" : "0",
+            "XML::Tiny" : "0",
+            "XML::Tiny::Simple" : "0",
+            "local::lib" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mperry2/Task-BeLike-MPERRY.git",
+         "web" : "https://github.com/mperry2/Task-BeLike-MPERRY"
+      }
+   },
+   "version" : "0.01"
+}

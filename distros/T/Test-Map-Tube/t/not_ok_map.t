@@ -1,0 +1,16 @@
+package BadSample;
+
+use 5.006;
+use Moo;
+use namespace::clean;
+
+has xml => (is => 'ro', default => sub { return File::Spec->catfile('t', 'bad-sample.xml') });
+with 'Map::Tube';
+
+package main;
+
+use 5.006;
+use strict; use warnings;
+use Test::Map::Tube;
+
+not_ok_map(BadSample->new);

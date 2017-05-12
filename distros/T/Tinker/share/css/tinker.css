@@ -1,0 +1,92 @@
+/*
+* { border: 1px solid red !important; }
+*/
+
+body {
+    overflow-y: hidden;
+}
+
+.head, .side, .foot {
+    background-color: #BDB76B;
+}
+
+.side {
+    background-color: #F0E68C;
+}
+
+.tinker.pane {
+    background-color: red;
+}
+
+.input {
+    border: 0;
+    padding: 2px 2px 2px 5px;
+    background-color: #F5F5F5;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.output {
+    border: 0;
+    padding: 2px 2px 2px 5px;
+    border-top: 4px solid black;
+    background-color: #EEE8AA;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.col1, .col2 {
+    width: 33%;
+}
+
+.col2 .pane-a {
+    height: 50%;
+}
+
+.col2 .pane-b {
+    height: 50%;
+}
+
+.col3 .pane-a {
+    height: 50%;
+}
+
+.col3 .pane-b {
+    height: 50%;
+}
+
+.col2 .pane-a pre {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.col2 .pane-b pre {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.col3 .pane-a pre {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.col3 .pane-b pre {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.column {
+    padding: 5px;
+}
+
+pre {
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.pane h1 {
+    font-weight: bold;
+}

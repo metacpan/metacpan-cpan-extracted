@@ -1,0 +1,29 @@
+---
+abstract: 'Automated driving and testing of terminal-based programs'
+author:
+  - 'Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>'
+  - 'Original module by Leon Brocard, E<lt>acme@astray.comE<gt>'
+build_requires:
+  Term::ReadLine: '0'
+  Test::Builder: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Expect
+provides:
+  Test::Expect:
+    file: lib/Test/Expect.pm
+    version: '0.34'
+requires:
+  Class::Accessor::Chained::Fast: '0'
+  Expect::Simple: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.34'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,613 @@
+NAME
+    Text::Scrub - used to wild card out text used for comparison
+
+SYNOPSIS
+      #########
+      # Subroutine Interface
+      #
+      use Text::Scrub qw(scrub_date scrub_date_ticket scrub_date_version scrub_file_line 
+                         scrub_probe scrub_test_file);
+
+      $scrubbed_text = scrub_architect($script_text)
+      $scrubbed_text = scrub_file_line($script_text)
+      $scrubbed_text = scrub_date($script_text)
+      $scrubbed_text = scrub_date_ticket($script_text)
+      $scrubbed_text = scrub_date_version($script_text)
+      $scrubbed_text = scrub_probe($script_text)
+      $scrubbed_text = scrub_test_file($script_text)
+
+      #########
+      # Class Interface
+      #
+      use Text::Scrub
+
+      $scrubbed_text = Text::Scrub->scrub_architect($script_text)
+      $scrubbed_text = Text::Scrub->scrub_file_line($script_text)
+      $scrubbed_text = Text::Scrub->scrub_date($script_text)
+      $scrubbed_text = Text::Scrub->scrub_date_ticket($script_text)
+      $scrubbed_text = Text::Scrub->scrub_date_version($script_text)
+      $scrubbed_text = Text::Scrub->scrub_probe($script_text)
+      $scrubbed_text = Text::Scrub->scrub_test_file($script_text)
+
+DESCRIPTION
+    The methods in the "Test::STD:Scrub" package are designed to support the
+    "Test::STDmaker" and the "ExtUtils::SVDmaker" package. This is the focus
+    and no other focus. Since "Test::STD::Scrub" is a separate package, the
+    methods may be used elsewhere. They are used to wild card out parts of
+    two documents before they are compared by making these snippets the
+    same. In all likehood, any revisions will maintain backwards
+    compatibility with previous revisions. However, support and the
+    performance of the "Test::STDmaker" and "ExtUtils::SVDmaker" packages
+    has priority over backwards compatibility.
+
+  scrub_architect
+
+     $scrubbed_text = Test::STD::Scrub->scrub_architect($script_text)
+
+    When comparing the contents of two Perl program modules, the architect
+    should not be used in the comparision. The "scrub_architect" method will
+    replace the architect with a generic value. Applying the
+    "scrub_architect" to the contents of both files before the comparision
+    will eliminate the date and version as factors in the comparision.
+
+  scrub_date_ticket
+
+     $scrubbed_text = Test::STD::Scrub->scrub_date_ticket($script_text)
+
+    When comparing the contents of email messages, the date and email ticket
+    should not be used in the comparision. The "scrub_date_ticket" method
+    will replace the date and email ticket with a generic value. Applying
+    the "scrub_date_ticket" to the contents of both files before the
+    comparision will eliminate the data and ticket as factors in the
+    comparision.
+
+  scrub_date_version
+
+     $scrubbed_text = Test::STD::Scrub->scrub_date_version($script_text)
+
+    When comparing the contents of two Perl program modules, the date and
+    version should not be used in the comparision. The *scrub_date_versiont*
+    method will replace the date and version with a generic value. Applying
+    the "scrub_date_version" to the contents of both files before the
+    comparision will eliminate the date and version as factors in the
+    comparision.
+
+  scrub_file_line
+
+     $scrubbed_text = Test::STD::Scrub->scrub_file_line($script_text)
+
+    When comparing the ouput of *Test* module the file and line number
+    should not be used in the comparision. The "scrub_file_line" method will
+    replace the file and line with a generic value. The subroutine changes
+    any double quotes around numbers to single quotes. Applying the
+    "scrub_file_line" to the contents of both files before the comparision
+    will eliminate the file and line as factors in the comparision.
+
+  scrub_test_file
+
+     $scrubbed_text = Test::STD::Scrub->scrub_test_file($script_text)
+
+    When comparing the ouput of *Test:Harness* module the test file should
+    not be used in the comparision. The "scrub_test_file" method will
+    replace the test file with a generic value. Applying the
+    "scrub_test_file" to the contents of both files before the comparision
+    will eliminate the test file as a factor in the comparision.
+
+REQUIREMENTS
+    Someday.
+
+DEMONSTRATION
+     #########
+     # perl Scrub.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::Spec;
+
+         use File::Package;
+         my $fp = 'File::Package';
+
+         my $uut = 'Text::Scrub';
+
+         my $loaded = '';
+         my $template = '';
+         my %variables = ();
+         my $expected = '';
+
+     ##################
+     # Load UUT
+     # 
+
+     my $errors = $fp->load_package($uut)
+     $errors
+
+     # ''
+     #
+
+     ##################
+     #  scrub_file_line
+     # 
+
+     my $text = 'ok 2 # (E:/User/SoftwareDiamonds/installation/t/Test/STDmaker/tgA1.t at line 123 TODO?!)'
+     $uut->scrub_file_line($text)
+
+     # 'ok 2 # (xxxx.t at line 000 TODO?!)'
+     #
+
+     ##################
+     #  scrub_test_file
+     # 
+
+     $text = 'Running Tests\n\nE:/User/SoftwareDiamonds/installation/t/Test/STDmaker/tgA1.1..16 todo 2 5;'
+     $uut->scrub_test_file($text)
+
+     # 'Running Tests xxx.t 1..16 todo 2 5;'
+     #
+
+     ##################
+     #  scrub_date_version
+     # 
+
+     $text = '$VERSION = \'0.01\';\n$DATE = \'2003/06/07\';'
+     $uut->scrub_date_version($text)
+
+     # '$VERSION = '0.00';\n$DATE = 'Feb 6, 1969';'
+     #
+
+     ##################
+     #  scrub_date_ticket
+     # 
+
+     $text = <<'EOF';
+     Date: Apr 12 00 00 00 2003 +0000
+     Subject: 20030506, This Week in Health'
+     X-SDticket: 20030205
+     X-eudora-date: Feb 6 2000 00 00 2003 +0000
+     X-SDmailit: dead Feb 5 2000 00 00 2003
+     Sent email 20030205-20030506 to support.softwarediamonds.com
+     EOF
+
+     my $expected_text = <<'EOF';
+     Date: Feb 6 00 00 00 1969 +0000
+     Subject: XXXXXXXXX-X,  This Week in Health'
+     X-SDticket: XXXXXXXXX-X
+     X-eudora-date: Feb 6 00 00 00 1969 +0000
+     X-SDmailit: dead Sat Feb 6 00 00 00 1969 +0000
+     Sent email XXXXXXXXX-X to support.softwarediamonds.com
+     EOF
+
+     # end of EOF
+     $uut->scrub_date_ticket($text)
+
+     # 'Date: Feb 6 00 00 00 1969 +0000
+     #Subject: XXXXXXXXX-X,  This Week in Health'
+     #X-SDticket: XXXXXXXXX-X
+     #X-eudora-date: Feb 6 00 00 00 1969 +0000
+     #X-SDmailit: dead Sat Feb 6 00 00 00 1969 +0000
+     #Sent email XXXXXXXXX-X to support.softwarediamonds.com
+     #'
+     #
+
+     ##################
+     #  scrub_date
+     # 
+
+     $text = 'Going to happy valley 2003/06/07'
+     $uut->scrub_date($text)
+
+     # 'Going to happy valley 1969/02/06'
+     #
+
+     ##################
+     #  scrub_probe
+     # 
+
+     $text = <<'EOF';
+     1..8 todo 2 5;
+     # OS            : MSWin32
+     # Perl          : 5.6.1
+     # Local Time    : Thu Jun 19 23:49:54 2003
+     # GMT Time      : Fri Jun 20 03:49:54 2003 GMT
+     # Number Storage: string
+     # Test::Tech    : 1.06
+     # Test          : 1.15
+     # Data::Dumper  : 2.102
+     # =cut 
+     # Pass test
+     ok 1
+     EOF
+
+     $expected_text = <<'EOF';
+     1..8 todo 2 5;
+     # Pass test
+     ok 1
+     EOF
+
+     # end of EOF
+     $uut->scrub_probe($text)
+
+     # '1..8 todo 2 5;
+     ## Pass test
+     #ok 1
+     #'
+     #
+
+     ##################
+     #  scrub_architect
+     # 
+
+     $text = 'ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.5"'
+     $uut->scrub_architect($text)
+
+     # 'ARCHITECTURE NAME="Perl"'
+     #
+     unlink 'actual.txt'
+
+QUALITY ASSURANCE
+    Running the test script "Scrub.t" verifies the requirements for this
+    module. The "tmake.pl" cover script for Test::STDmaker automatically
+    generated the "Scrub.t" test script, "Scrub.d" demo script, and
+    "t::Text::Scrub" program module POD, from the "t::Text::Scrub" program
+    module contents. The "tmake.pl" cover script automatically ran the
+    "Scrub.d" demo script and inserted the results into the 'DEMONSTRATION'
+    section above. The "t::Text::Scrub" program module is in the
+    distribution file Text-Scrub-$VERSION.tar.gz.
+
+NOTES
+  Author
+
+    The holder of the copyright and maintainer is
+
+    <support@SoftwareDiamonds.com>
+
+  Copyright
+
+    Copyrighted (c) 2002 Software Diamonds
+
+    All Rights Reserved
+
+  Binding Requirements
+
+    Binding requirements are indexed with the pharse 'shall[dd]' where dd is
+    an unique number for each header section. This conforms to standard
+    federal government practices, STD490A 3.2.3.6. In accordance with the
+    License, Software Diamonds is not liable for any requirement, binding or
+    otherwise.
+
+  License
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    3   Commercial installation of the binary or source must visually
+        present to the installer the above copyright notice, this list of
+        conditions intact, that the original source is available at
+        http://softwarediamonds.com and provide means for the installer to
+        actively accept the list of conditions; otherwise, a license fee
+        must be paid to Softwareware Diamonds.
+
+    SOFTWARE DIAMONDS, http://www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE ALSO
+    Docs::Site_SVD::Text_Srube
+    Test::STDmaker
+    ExtUtils::SVDmaker
+    L
+NAME
+    Docs::Site_SVD::Text_Scrub - Utilites to wild card parts of a text file
+    for comparisons.
+
+Title Page
+     Software Version Description
+
+     for
+
+     Docs::Site_SVD::Text_Scrub - Utilites to wild card parts of a text file for comparisons.
+
+     Revision: G
+
+     Version: 0.08
+
+     Date: 2004/05/25
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright © 2003 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The "Text::Scrub" module extends the Perl language (the system).
+
+    When comparing text there are small snippets such as version numbers and
+    dates that should be wild carded out and not influence the comparisions.
+    The Test::STD:Scrub module replaces these small snippets with invariant
+    snippet. By replacing the same part of each file with the same invariant
+    snippet, those small sections of text are effectively wild carded for
+    the comparisions.
+
+    When performing tests, the ability to wild card small snippets of text
+    is vital in making accurate comparison. The same capability is also
+    essential for version control in comparing two pieces of software to see
+    if there are significant changes.
+
+  1.3 Document overview.
+
+    This document releases Text::Scrub version 0.08 providing a description
+    of the inventory, installation instructions and other information
+    necessary to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     Text-Scrub-0.08.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright © 2003 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt> support@SoftwareDiamonds.com E<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        3   Commercial installation of the binary or source must visually
+            present to the installer the above copyright notice, this list
+            of conditions intact, that the original source is available at
+            http://softwarediamonds.com and provide means for the installer
+            to actively accept the list of conditions; otherwise, a license
+            fee must be paid to Softwareware Diamonds.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/Text_Scrub.pm                              0.08    2004/05/25 revised 0.07
+     MANIFEST                                                     0.08    2004/05/25 generated, replaces 0.07
+     Makefile.PL                                                  0.08    2004/05/25 generated, replaces 0.07
+     README                                                       0.08    2004/05/25 generated, replaces 0.07
+     lib/Text/Scrub.pm                                            1.17    2004/05/25 revised 1.16
+     t/Text/Scrub.d                                               0.03    2004/05/10 unchanged
+     t/Text/Scrub.pm                                              0.03    2004/05/10 unchanged
+     t/Text/Scrub.t                                               0.1     2004/05/10 unchanged
+     t/Text/File/Package.pm                                       1.18    2004/05/25 unchanged
+     t/Text/Test/Tech.pm                                          1.26    2004/05/25 unchanged
+     t/Text/Data/Secs2.pm                                         1.26    2004/05/25 unchanged
+     t/Text/File/SmartNL.pm                                       1.16    2004/05/25 unchanged
+     t/Text/Data/Str2Num.pm                                       0.08    2004/05/25 unchanged
+     t/Text/Data/Startup.pm                                       0.07    2004/05/25 unchanged
+
+  3.3 Changes
+
+    The changes are as follows:
+
+    Test-STD-Scrub-0.01
+        Rename Module
+            At 02:44 AM 6/14/2003 +0200, Max Maischein wrote: A second thing
+            that I would like you to reconsider is the naming of
+            "Test::TestUtil" respectively "Test::Tech" - neither of those is
+            descriptive of what the routines actually do or what the module
+            implements. I would recommend renaming them to something closer
+            to your other modules, maybe "Test::SVDMaker::Util" and
+            "Test::SVDMaker::Tech", as some routines do not seem to be
+            specific to the Test::-suite but rather general
+            (format_array_table). Some parts (the "scrub" routines) might
+            even better live in another module namespace,
+            "Test::Util::ScrubData" or something like that.
+
+            Broke away the "scrub" routines from Test::TestUtil created this
+            module Test::STD::Scrub.
+
+        new methods
+            Added the scrub_data and scrub_probe methods
+
+    Test-STD-Scrub-0.02
+        Use the new modules from the break-up of the "File::FileUtil" module
+
+    Text-Scrub-0.01
+        Moved to a more appropriate library location.
+
+    Text-Scrub-0.02
+        Change the test so that test support program modules resides in
+        distribution directory tlib directory instead of the lib directory.
+        Because they are no longer in the lib directory, test support files
+        will not be installed as a pre-condition for the test of this
+        module. The test of this module will precede immediately. The test
+        support files in the tlib directory will vanish after the
+        installtion.
+
+    Text-Scrub-0.03
+        Recreate distribution file with Archive::TarGzip 0.02 that uses mode
+        777 for directories instead of 666. Started to get emails from Unix
+        installers about untar not being able to change to a directory with
+        mode of 666.
+
+    Text-Scrub-0.04
+        Changes the 'stringify' module for 'Test-Tech' from 'Data::Strify'
+        to 'Data::Secs2'.
+
+    Text-Scrub-0.05
+        The lastest build of Test::STDmaker expects the test library in the
+        same directory as the test script. Coordiated with the lastest
+        Test::STDmaker by moving the test library from tlib to t/Text, the
+        same directory as the test script and deleting the test library
+        File::TestPath program module.
+
+        Added "SEE ALSO" section. Reworked QUALITY ASSURANCE and NOTES
+        sections.
+
+    Text-Scrub-0.06
+        Cleaned up POD. Add "scrub_architect" to "OK_EXPORT".
+
+    Text-Scrub-0.07
+        Added code to the "scrub_file_line" subroutine to change double
+        quotes around numbers to single quotes
+
+    Text-Scrub-0.08
+        Added code to the "scrub_architect" subroutine to "OS NAME" to "Site
+        OS".
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'Text-Scrub-0.08.tar.gz' and download to a temporary
+        installation directory. Enter the following where $make is 'nmake'
+        for microsoft windows; otherwise 'make'.
+
+         gunzip Text-Scrub-0.08.tar.gz
+         tar -xf Text-Scrub-0.08.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         None.
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/Text/Scrub.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt> support@SoftwareDiamonds.com E<gt>
+
+  3.7 Possible problems and known errors
+
+    There is still much work needed to ensure the quality of this module as
+    follows:
+
+    *   State the functional requirements for each method including not only
+        the GO paths but also what to expect for the NOGO paths
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+2.0 SEE ALSO
+    Text::Scrub
+    Docs::US_DOD::SVD
+    Docs::US_DOD::STD

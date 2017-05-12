@@ -1,0 +1,24 @@
+Tie::Hash::MultiValue.pm 
+
+A simple module implementing a tied class for hashes which can store 
+multiple values per key. It's specifically designed to be used in code 
+that was already using a standard hash and now needs to be able to store 
+multiple items per key. (This is in contrast to Data::MultiValueHash, which 
+creates an object which implements multiple values per key, but handles 
+access via method calls rather than the standard hash interface.)
+
+In addition, you can specify that you want only unique items to be stored;
+you can even supply your own function to make the decision as to what's 
+unique and what's not yourself.
+
+See the man page for further details.
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

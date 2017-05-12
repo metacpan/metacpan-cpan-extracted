@@ -1,0 +1,133 @@
+=head1 NAME
+
+Test::Override::UserAgent::Manual::ConfigurationPackage - Creating configuration packages
+
+=head1 WHAT IS A CONFIGURATION PACKAGE?
+
+A "configuration package" is a normal perl package that
+L<Test::Override::UserAgent> has imported a special set of symbols into and
+makes it easy to reuse override definitions in different test files.
+
+=head1 BOILERPLATE
+
+To create a configuration package, just import L<Test::Override::UserAgent>
+specifying it is for configuration:
+
+  package My::Overrides;
+
+  use Test::Override::UserAgent 0.001 for => 'configuration';
+
+  # ... configuration here
+
+  1;
+
+If you would like to setup your configuration module to give a nice error
+message, you may use:
+
+  package My::Overrides::Nice;
+
+  BEGIN {
+      if (!eval 'use Test::Override::UserAgent 0.001; 1;') {
+          die "Test::Override::UserAgent >= 0.001 must be installed: $@";
+      }
+
+      # Import for configuration
+      Test::Override::UserAgent->import(for => 'configuration');
+  }
+
+  # ... configuration here
+
+  1;
+
+=head1 WHAT IS IMPORTED
+
+When then module is imported for configuration, the following subroutines are
+imported into the package:
+
+=head2 allow_live
+
+This is the same as the method C<allow_live_requests> in
+L<Test::Override::UserAgent> but acts on the configuration in the package. If
+no arguments are provided, then live requests are enabled.
+
+  # Allow live requests
+  allow_live(1);
+
+=head2 configuration
+
+This is a special method that returns the instance of L<Test::Override::UserAgent>
+for this package.
+
+=head2 override_for
+
+B<Added in version 0.003>; be sure to require this version for this feature.
+
+This is a very convenient function to set some defaults for an entire block of
+code. This function takes the exact same arguments as C<override_request>
+except the subroutine reference at the end is a block that will be built with
+the default arguments to all calls of C<override_request> within. Calls made to
+C<override_for> within an C<override_for> block will extend the current scope's
+defaults with those provided. The main scope begins with no defaults.
+
+  override_for host => 'localhost', sub {
+      override_request path => '/', sub {
+          # ... only for host localhost and path /
+      };
+
+      # Make an easy REST URL
+      override_for path => '/rest', sub {
+          # GET
+          override_request method => 'GET'   , sub { ... };
+          # POST
+          override_request method => 'POST'  , sub { ... };
+          # DELETE
+          override_request method => 'DELETE', sub { ... };
+          # PUT
+          override_request method => 'PUT'   , sub { ... };
+      };
+  };
+
+=head2 override_request
+
+This is the same as the method in L<Test::Override::UserAgent> but acts on the
+configuration in the package.
+
+  override_request path => '/', sub {
+      # ...
+  };
+
+=head1 EXAMPLE
+
+A full example of a configuration file:
+
+  package My::Overrides;
+
+  use Test::Override::UserAgent 0.001 for => 'configuration';
+
+  # No live requests for us
+  allow_live(0);
+
+  # The root directory is always forbidden for localhost
+  override_request
+      host => 'localhost',
+      path => '/',
+      sub { [403, ['Content-Type' => 'text/plain'], ['Forbidden!'] };
+
+  1;
+
+=head1 USING IN A TEST
+
+To use a configuration package simply use it in the test file. Then using
+C<< Package::Name->configuration >> will return the instance object so the
+configuration may be installed in a user agent or into the scope.
+
+  #!/usr/bin/env perl -T
+
+  use My::Overrides;
+
+  # Install into the current scope
+  my $scope = My::Overrides->configuration->install_in_scope;
+
+  # ... tests
+
+  exit 0;

@@ -1,0 +1,43 @@
+
+
+
+  Feature Foo
+
+    Scenario Normal
+      Given An array
+       When Push one item
+       Then the number of array is 1
+
+  Feature Foo
+
+    Scenario Normal
+      Given An array
+       When Push one item
+       Then the number of array is 1
+
+
+
+  (Diagnostic message):
+
+    Feature Foo
+      Scenario Normal:
+
+      ♨
+      Show me
+         at eg/fail.t line 29
+
+      ✖
+      expect(0+@ary)->to_be(0);
+      Compared $data
+         got : '1'
+      expect : '0'
+      
+         at eg/fail.t line 30
+
+      ✓
+      ok { 1 };
+         at eg/fail.t line 31
+
+
+not ok
+1..1

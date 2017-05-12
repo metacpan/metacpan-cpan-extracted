@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 be078a925bfa9e924e9203f72b6a2bf94d98b2af Build.PL
+SHA1 361ddf32161f29d569443673ee7170d45de43444 COPYING
+SHA1 5f139a6fdceb2ecf85fcc2db376993d34acf83dc Changelog
+SHA1 dbfa68bbc5db8d6e2316f42c3cbc86b54b972c95 MANIFEST
+SHA1 3e3d67013ccf65ed118dc8e4b1bf1d2ba85d1aed META.json
+SHA1 5d48ddf1bbf13c62464546f8a5a8df1810823a4a META.yml
+SHA1 c7b929564540c358638b9bdf72a73f3f67482341 README
+SHA1 a2f15f0cc7acaa7bf67c62229684cf613ce467b3 bin/ura-m
+SHA1 be4b4956d70c06d2b5dbba1e55c39d933faed381 lib/Travel/Status/DE/ASEAG.pm
+SHA1 6d5e280d455c21f2a797d7b4b4c9e644624fc206 lib/Travel/Status/DE/MvgMainz.pm
+SHA1 f33001ed670842758b6a557c439438077b6f9ff9 lib/Travel/Status/DE/URA.pm
+SHA1 808728f691c8841c469a8c01ae92bc802d82c7cc lib/Travel/Status/DE/URA/Result.pm
+SHA1 013462a1dc5ce3d16b4cd4061babfbb9578ab24d lib/Travel/Status/DE/URA/Stop.pm
+SHA1 2f23bc1e4fe26083eeffe90d9e216cd7fbd1cd55 lib/Travel/Status/GB/TFL.pm
+SHA1 fd251ffc56ca6e52020c906b61158f78b035679d t/10-pod-coverage.t
+SHA1 22151590acac29e5ee53a85cb59b8f11d39b3cf9 t/20-aseag.t
+SHA1 7d787ae3e1337f4f84bf49a0823cd7bc3479ddf0 t/21-get-stop-by-name.t
+SHA1 0994644982f33689190031dab58cb3efbd11e855 t/22-results-via.t
+SHA1 ebcdeff4740ba25be0ceec3a6eb7b7d24d6d42d4 t/23-results.t
+SHA1 861f9e97b7e56209522b89880e2849025fb2d95b t/24-results-route.t
+SHA1 4d418a56304d834f129cc632fa8cb513b96b798e t/in/instant_V1
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeBu3Bxxr9kjq6wihEA1b+1Fm4AUFAlh+ETcACgkQEA1b+1Fm
+4AUjRw//YKrjMJKn5R7uIPMJ1L4r2D3RsX8dL1ZOa8/clWXCNLS+dBtCYQLB39Rj
+SuRM6rIf0gz8C3iPh7EZuIaiwUMeiIlqIjImgKy9Ez6zjjzdmMP176eRj8fwDaRn
+/G1JWk+s2TS25d1ETTv30IivIVK7p25f/LeyDW8eLx6xlzwxaKhK7aD6L/jsY7f4
+UXLdWQTiEdSpTwKeJmgP4LSwlud30BLVTnovtAYpQSWIkGmxBiUV8B5hORCFryq4
+jEOqAHvwNevokNbT6J7wauMmCmrgwSSeI/5mIbUTq21Kukjl3CjrKA0izI1/sMix
+HemhElHAo5mIq8aM3ycEdeLixLM7ztf18Us69mG/PS1ScMJDdx/bFrTTDUO9J5G7
+oq5P4x4DwQWiwqx4gpowkVaVvjh/n8DKJ8GNA0oHmhTHHgrxTJDntdAishrjtblT
+G/KC+P+nwXRZwEo96OIXkO1eyHD6cq76oOoG+j5Vad0EZH2/PtANhy7A+8JAeZ9Z
+Rv0SXETQcwf1SLAym+Yf7wy/K95TrV3FzLk6aJAGwEKrhd0Gwb/mLGNVfTDDB44G
+/n4ibIGGRSUOMdrIl8s1p+p8IwzDBX+n1SIGYeXflK60kXVlEkvU1t0N17k1kqIE
+cby5rJBr0rXZdQFRPpfK0UuolZvTVXZL50MdoHsL/CKb4lxodPw=
+=8wsh
+-----END PGP SIGNATURE-----

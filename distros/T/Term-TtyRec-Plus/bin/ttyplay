@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Term::TtyRec::Plus;
+
+use Getopt::Long;
+
+sub usage {
+    my ($exit) = @_;
+
+    my $out = $exit ? \*STDERR : \*STDOUT;
+
+    print { $out }
+          "$0 [-s <speed>] [-c <delay_clamp>] [-n] [-p] <ttyrec_files>\n";
+
+    exit($exit);
+}
+
+my ($speed, $clamp, $peek) = (1, undef, 0);
+GetOptions(
+    'speed=f' => \$speed,
+    'clamp=f' => \$clamp,
+    'peek'    => \$peek,
+    'nowait'  => sub { $clamp = 0 },
+    'help'    => sub { usage(0) },
+) || usage(1);
+
+$|++;
+
+foreach my $file (@ARGV) {
+    my $ttyrec = Term::TtyRec::Plus->new(
+        infile => $file,
+        (defined($clamp)
+            ? (time_threshold => $clamp)
+            : ()),
+    );
+
+    if ($peek) {
+        my $fh = $ttyrec->filehandle;
+        seek $fh, 0, 2;
+        while (1) {
+            seek $fh, 0, 1;
+            my $frame_ref = $ttyrec->next_frame;
+            print $frame_ref->{data}
+                if $frame_ref;
+
+            select undef, undef, undef, 0.1;
+        }
+    }
+    else {
+        while (my $frame_ref = $ttyrec->next_frame) {
+            select undef, undef, undef, ($frame_ref->{diff} / $speed);
+            print $frame_ref->{data};
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+ttyplay - play back ttyrec files
+
+=head1 SYNOPSIS
+
+  ttyplay [-s <speed>] [-c <delay_clamp>] [-n] [-p] <ttyrec_files>
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--speed> (C<-s>)
+
+Set a multiplier for how fast the ttyrec should be played back (C<-s 2> means
+twice as fast).
+
+=item C<--clamp> (C<-c>)
+
+Set the maximum delay between any two frames in the ttyrec. If unset, there is
+no maximum (the ttyrec will be played as written).
+
+=item C<--nowait> (C<-n>)
+
+Disable all delays between frames (equivalent to C<-c 0>).
+
+=item C<--peek> (C<-p>)
+
+"Peek" at a ttyrec that is currently being written. This will seek to the end
+of the file and display new ttyrec frames as they become available.
+
+=back
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy at tozt dot net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+
+=cut

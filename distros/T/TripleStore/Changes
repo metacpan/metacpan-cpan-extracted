@@ -1,0 +1,11 @@
+Revision history for Petal.
+
+0.03 Mon Jan 27 16:11:29 2003
+    - Fixed a few documentation bugs
+
+0.02 ?? ????
+    - Fixed the SQL driver to avoid systematic use of
+      SELECT DISTINCT
+ 
+0.01 ?? ???? 
+    - Initial release 

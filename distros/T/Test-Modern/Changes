@@ -1,0 +1,135 @@
+Test-Modern
+===========
+
+Created:      2014-03-07
+Home page:    <https://metacpan.org/release/Test-Modern>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Test-Modern>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.013	2014-10-05
+
+ [ Packaging ]
+ - Add 'test recommends' dependencies on a few modules.
+
+0.012	2014-09-30
+
+ - does_ok no longer calls the internal Test::Builder `_try` method.
+
+0.011	2014-09-17
+
+ - version_all_same now copes better with undef versions.
+
+0.010	2014-07-17
+
+ [ Bug Fixes ]
+ - Fix the behaviour of the BAIL_OUT called within object_ok.
+
+0.009	2014-07-04
+
+ - Added: Implement an `-internet` feature allowing test scripts to declare
+   they need access to the Internet. This honours the NO_NETWORK_TESTS
+   environment variable.
+ - Precautionary bypassing of prototype for internal calls to
+   `Test::More::subtest`.
+ - Updated: Improved `namespaces_clean` implementation along the same lines
+   as recent changes to Test::CleanNamespaces.
+
+0.008	2014-06-19
+
+ [ Packaging ]
+ - Package with a newer Dist::Inkt to provide a better Makefile.PL (copes
+   better with missing CPAN::Meta::Requirements).
+
+0.007	2014-04-10
+
+ [ Bug Fixes ]
+ - Fix for warnings being generated deep in the bowels of File::Spec.
+   Fixes RT#94383.
+   Andreas Vögele++
+   Paul Howarth++
+   <https://rt.cpan.org/Ticket/Display.html?id=94383>
+
+0.006	2014-04-02
+
+ - Added: EXPERIMENTALLY provide Test::Lib-like behaviour, and a related
+   -lib export tag.
+ - Added: Support an environment variable PERL_TEST_MODERN_ALLOW_WARNINGS
+   to allow end-users to skip running end warnings tests.
+ - Added: shouldnt_warn function.
+
+0.005	2014-03-25
+
+ - Support Perl 5.6.1+.
+
+0.004	2014-03-25
+
+ [ Documentation ]
+ - Mention -without in the EXPORT section of the pod.
+
+ [ Other ]
+ - Added: EXPERIMENTALLY provide Test::Pod functions.
+ - Added: EXPERIMENTALLY provide Test::Pod::Coverage functions.
+ - Added: EXPERIMENTALLY provide Test::Version functions.
+ - Improve the implementation of -without, including better compatibility
+   with pre-5.12 versions of Perl.
+
+0.003	2014-03-24
+
+ - Added: Provide a Test::Without::Module-like feature (-without).
+ - Load IO::File and IO::Handle like Modern::Perl does.
+
+0.002	2014-03-14
+
+ - No longer use superclass.pm.
+ - Updated: Use Test::API 0.004 which provides its own copy of
+   class_api_ok(), so Test::Modern no longer has to provide it.
+
+0.001	2014-03-12	Initial release
+
+ [ Documentation ]
+ - Change module abstract.
+ - Update SEE ALSO links.
+
+0.000_09	2014-03-11	Preview
+
+ [ Documentation ]
+ - Add SEE ALSO link to Test::CleanNamespaces.
+ - Add introductory paragraphs to several sections.
+ - Minor formatting improvements.
+
+0.000_08	2014-03-11	Preview
+
+ - Added: -requires => { perl => $version }
+ - Added: namespaces_clean, inspired by Test::CleanNamespaces
+ - Added: object_ok now has a `clean` test.
+ - Use superclass.pm.
+
+0.000_07	2014-03-10	Preview
+
+ - Added: object_ok now has a `more` test.
+ - object_ok will now BAIL_OUT(!!) if you pass unknown hash keys in %tests.
+
+0.000_06	2014-03-09	Preview
+
+ [ Test Suite ]
+ - Help Perl 5.8 pass the t/08object-ok.t test case.
+
+0.000_05	2014-03-09	Preview
+
+ - Added: Added an object_ok test function.
+
+0.000_04	2014-03-08	Preview
+
+ [ Bug Fixes ]
+ - Fix error messages related to Test::Modern::_TD::DESTROY getting called
+   in global cleanup.
+
+0.000_03	2014-03-07	Preview
+
+ - Added: Also export functions from Test::Deep.
+
+0.000_02	2014-03-07	Preview
+
+ - Added: Also export functions from Test::LongString.
+
+0.000_01	2014-03-07	Preview

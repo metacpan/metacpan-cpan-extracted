@@ -1,0 +1,20 @@
+key:
+  bits: 2048
+  opts:
+    - genrsa
+  block_cipher: 'aes256'
+req:
+  opts:
+    - req
+    - '-new'
+ca:
+  days: 3650
+  crl_days: 30
+  serial_number: 1
+san:
+  country: C
+  commonname: CN
+  locality: L
+  state: ST
+  organization: O
+  organizational_unit: OU

@@ -1,0 +1,10 @@
+Change History for Text::Indent
+===============================
+
+0.01    10 Dec 2003
+
+        initial release
+
+0.02    22 September 2010
+
+        fix warning when AddNewline is undefined.  Patch from Neil Hooey

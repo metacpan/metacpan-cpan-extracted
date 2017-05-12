@@ -1,0 +1,87 @@
+
+Checking lists with no start-end tags.
+
+	* list 1
+
+	* l1 i2
+
+	* l1 i3
+
+Next! I prefer this one I think.
+
+	1. foo
+
+	1. bar
+
+	1. baz
+
+How about definition lists?
+
+	Foo:	a random term
+
+	Bar:	yet another
+
+	Baz:	you get the idea.
+
+What about indented lists?
+
+    * list 1
+
+    * l1 i2
+
+	* l2 i1
+
+	* l2 i2
+
+    * l1 i3
+
+    * l1 i4
+
+	1. ol2 i1
+
+	1. ol2 i2
+
+    * l1 i5
+
+Tricky indented list -- it has 3 levels, and the innermost falls back
+to the outermost. Ouch.
+
+    * l1 i2
+
+	* l2 i1
+
+	* l2 i2
+
+		* l3 i1
+
+		* l3 i2
+
+		* l3 i3
+
+    * l1 i3
+
+That's the lot then. Oh, one more -- end on an EOF.
+
+	* foo
+
+I lied -- there's more.
+Lists where the items are right next to one another...
+    * foo
+    * bar
+    * baz
+    * glorp
+
+    * with a paragraph break
+
+    * and another.
+
+And where they look like they do on-screen in HTML:
+
+    * foo2
+    * bar2
+    * baz2
+    * glorp2
+
+    * withpara 2
+
+that's it.

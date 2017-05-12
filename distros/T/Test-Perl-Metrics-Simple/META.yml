@@ -1,0 +1,20 @@
+--- 
+abstract: Use Perl::Metrics::Simple in test programs
+author: Seiki Koga <koga@shanon.co.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Test-Perl-Metrics-Simple
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Perl::Metrics::Simple: 0
+  Test::Builder: 0
+version: 0.1

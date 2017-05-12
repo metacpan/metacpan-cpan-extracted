@@ -1,0 +1,30 @@
+Revision history for Perl extension Text::Record::Deduper.
+
+0.07  Jan 31 2011
+    - Minor fix for Makefile.PL
+
+0.06  Jan 31 2011
+    - Minor update to documentation
+
+0.05  Sep 04 2005
+    - Added report_file method
+    - Added report_array method
+    - Used an analysis stage to classify all records, prior to reporting or separating records
+
+0.04  Aug 16 2005
+    - Moved module namespace from Text::RecordDeduper to Text::Record::Deduper
+    - got alias duplicates to work correctly
+    - aliases can now be case insensitive
+
+0.03  Jul 28 2005
+    - added dedupe_array method
+    - fixed problems with tests in main.t
+
+0.02  Jul 20 2005
+    - added ignore_whitespace option
+    - allowed for apostrophes in names like O'Brein
+    - improved documentation
+
+0.01  Jul 12 2005
+    - initial release
+

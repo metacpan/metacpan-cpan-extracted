@@ -1,0 +1,39 @@
+<%args>
+        @week_reportlists
+        $list_count_all
+        $list_count_pass
+        $list_count_fail
+        $list_count_unknown
+</%args>
+
+% my $days = $c->stash->{days} || 7;
+% my $lastday = $days ;
+
+        <ul class="post_info">
+		<li class="comments">        <% $list_count_all     %> reports</li>
+		<li class="comments pass">   <% $list_count_pass    %> pass</li>
+		<li class="comments fail">   <% $list_count_fail    %> fail</li>
+		<li class="comments unknown"><% $list_count_unknown %> unknown</li>
+	</ul>
+
+% my $count_days;
+% foreach (0..$lastday) {
+%       my $day_infos = $week_reportlists[$_];
+%       my $day        = $day_infos->{day};
+%       my $reportlist = $day_infos;
+%       next unless (ref $reportlist eq 'HASH') and 
+%        (ref $reportlist->{all_reports} eq 'ARRAY') and
+%         @{$reportlist->{all_reports}};
+%       $count_days++;
+%       # my $rgt = $day_infos->{rgt};
+        <h4><a href="/tapper/reports/date/<% $day->ymd('-') %>">
+        <% $day->day_abbr %> <% $day->month_abbr %> <% $day->day %>, <% $day->year %></a></h4>
+<& /tapper/reports/reportlist.mas, reportlist => $reportlist &>
+% }
+% if (not $count_days){
+  <h4>No reports found within your requested time frame</h4>
+%}
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

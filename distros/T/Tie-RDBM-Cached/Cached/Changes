@@ -1,0 +1,11 @@
+Revision history for Perl extension Tie::RDBM::Cached.
+
+0.01  Sat Dec 13 20:28:00 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Tie::RDBM::Cached
+
+0.02  Sun May 22 20:28:00 2004
+	- Added Tie::RDBM dependancy to Makefile.PL
+
+0.03  Sat Sep 26 00:28:00 2004
+	- Version 2 was a bit to strict with the dependency

@@ -1,0 +1,52 @@
+Hi,
+
+This is the Tie::DB_Lock.pm module.  It is a TIEHASH class that implements
+a specific locking scheme when opening Berkeley (DB_File) databases.
+
+When you open a database for writing, an exclusive lock will get placed on
+the database, so nobody else (nobody who pays attention to locks, that is)
+will be able to open the database.
+
+When you open for reading only, a shared lock will be placed on the file,
+then the whole file will be copied to a temporary file, and that tempfile
+will be tied instead of the original file.  The lock on the original file is
+released when we tie the tempfile.  The tempfile will disappear when you
+close the database (or when your program dies, or whatever).
+
+YOU MIGHT WANT TO USE THIS MODULE IF:
+  - you read from your databases far more often than you write to them
+  - when reading, you keep your databases open for significant lengths
+    of time
+  - you have a reasonably fast means of copying files from one place to
+    another
+  - your system supports Perl's flock() function
+
+YOU DON'T WANT THIS MODULE IF:
+  - you write to your databases a lot (the writes will prevent anyone from
+    reading while they're happening, and any readers will have to re-copy 
+    the file whenever the writers finish) - this will be very inefficient.
+  - you don't want to use DB_File-style databases (support for other simple
+    kinds of databases might happen eventually)
+
+If you made it through this checklist and you still think you want to use
+this module, congratulations.  This locking scheme is the best I've come up
+with yet for my applications.  It's simple.  It lets people read from a
+database for as long as they want to, without blocking writes.  And it won't
+let anyone read from or write to a database file that's being updated by
+someone else.
+
+For more specific information, please see the documentation inside
+DB_Lock.pm, by doing "pod2txt DB_Lock.pm", or "perldoc Tie::DB_Lock" once
+you've installed the module.
+
+To install the module, do the usual:
+
+   perl Makefile.PL
+   make
+   make test   (optionally set TEST_VERBOSE=1 or VERY_VERBOSE=1)
+   make install
+
+
+
+-Ken Williams
+ ken@forum.swarthmore.edu

@@ -1,0 +1,112 @@
+Revision history for Perl extension Test::CheckManifest.
+========================================================
+
+1.31  2017-04-21
+
+      [IMPROVEMENT]
+      * Run tests in series, not parallel. This should fix github #4. Thanks to Michael Gray (mjg17).
+
+1.30  2015-09-22
+
+      [IMPROVEMENT]
+      * Check duplicate entries in the MANIFEST file (Thanks to Mohammad S Anwar (Manwar), github #5)
+
+1.29  2015-01-05
+
+      [DOCUMENTATION]
+      * document dir/file feature that was added in 1.27 (pr#2 - Thanks to Doug Hoyte (FRACTAL))
+
+1.28  2014-01-19
+      + fix bug where some files in the selftest were skipped while the files where added to the dist.
+
+1.27  2014-01-17
+      + added feature to specify path of MANIFEST or directory where it is stored
+
+1.26  2012-07-19
+      No changes after 1.25_01
+
+1.25_01 2012-07-17
+      + Module wasn't able to find the MANIFEST when the test file was in a subdirectory - Thanks to BBYRD
+      - sections "AUTHOR" and "COPYRIGHT AND LICENSE" were duplicated - Thanks to BIGPRESH
+        (once from Dist::Zilla and once in the original source)
+
+1.25  2012-01-31
+      - fix typo in documentation - Thanks to BIGPRESH
+
+1.24  2011-04-09
+      + MANIFEST spec allows whitespaces in filenames (when enclosed in single quotes)
+      this was not parsed correctly (see [#67334]). Fixed now - Thanks to JWEIGEL
+
+1.23  2011-03-28
+      + CPAN toolchain now creates MYMETA.yml and META.json. These files are in
+      the list of recognized files now.
+      + clarify license of this module (In README the Perl license was mentioned where
+      in all other files Artistic 2.0 was mentioned)
+      + switched to Dist::Zilla
+      + removed tests that are created by Dist::Zilla
+
+1.22  2010-07-29
+      + fix a bug that appears when there is no MANIFEST.SKIP
+
+1.21  2010-02-17
+      + return from sub when MANIFEST.SKIP does not exist
+
+1.2   2010-02-03
+      + moved from SVN to Git (and adapted the filters in testfiles)
+      + added support for MANIFEST.SKIP
+      + small code improvements
+
+1.1   2009-11-22
+      - CHECK as a label is not allowed in Perl > 5.11.x, so replace it
+      + switched license to Artistic 2.0
+      + bugfix in 01_selftest.t
+
+1.01  2007-12-29
+      - fixes in test scripts
+        - require 5.006001
+        - allow more characters in path
+      + added license to Makefile.PL
+      + changed META.yml
+
+1.0   2006-12-27
+      - bugfix: ok_manifest excludes files created by Module::Build
+
+0.9   2006-11-27
+      - bugfix: ok_manifest files without blib (http://rt.cpan.org/Public/Bug/Display.html?id=23580)
+      - bugfix: Test-CheckManifest.t  -- added ':' in character group (untaint $home)
+      - bugfix: 99_pod_coverage.t -- removed all_modules and now T::P::C 1.08 or higher is required
+      - bugfix: ref $_ --> ref($_)
+      - bugfix: "filter" to exclude files that match on specific regexp from test
+                (http://rt.cpan.org/Public/Bug/Display.html?id=23529)
+      + added:  00_load.t
+
+0.8   2006-11-24
+      + added: T::CM now tests also on files that are not part of the distro but named in the MANIFEST
+
+0.7   2006-11-23
+      + added: "filter" to exclude files that match on specific regexp from test
+               (http://rt.cpan.org/Public/Bug/Display.html?id=23529)
+      + added: "bool" to combine "filter" and "exclude"
+      + added: boilerplate.t
+
+0.6   2006-11-21
+        Test scripts improved
+      
+0.5   2006-11-18
+      - bugfix: T::CM now works under taint mode (http://rt.cpan.org/Public/Bug/Display.html?id=22927)
+      + added : ok_manifest accepts hashref where specific dirs can be excluded
+                from test
+
+0.4   2006-10-19
+      - bugfix: handles different newlines (mac, win, *nix)
+
+0.3   2006-10-18
+      - bugfix: CheckManifest works under Solaris now
+
+0.2   2006-10-03 
+      - bugfix: some files excluded from test
+
+0.1   2006-09-29
+      - original version; created by h2xs 1.23 with options
+        -XA -n Test::CheckManifest
+      + added tests for Pod coverage, Pod, Manifest

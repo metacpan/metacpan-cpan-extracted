@@ -1,0 +1,55 @@
+---
+abstract: 'My favourite and frequently used modules'
+author:
+  - 'Mark Phillips <phips@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-BeLike-PHIPS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  App::Ack: 0
+  App::cpanoutdated: 0
+  DDP: 0
+  Daemon::Control: 0
+  Devel::NYTProf: 0
+  ExtUtils::MakeMaker: 0
+  IO::Socket::SSL: 0
+  LWP: 0
+  LWP::Protocol::https: 0
+  Modern::Perl: 0
+  Module::Install: 0
+  Module::Install::GithubMeta: 0
+  Module::Starter::PBP: 0
+  Mojolicious: 4
+  Perl6::Export::Attrs: 0
+  Perl::Critic: 0
+  Perl::Tidy: 0
+  Plack: 0
+  Pod::Cpandoc: 0
+  Proc::Daemon: 0
+  Term::ReadKey: 0
+  Term::ReadLine::Gnu: 0
+  Test::Pod: 0
+  WWW::Mechanize: 0
+  WWW::RobotRules: 0
+  WWW::UserAgent::Random: 0
+  WebService::Amazon::Route53: 0
+  YAML::XS: 0
+  perl: 5.010001
+resources:
+  homepage: https://github.com/phips/Task-BeLike-PHIPS/tree
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/phips/Task-BeLike-PHIPS.git
+version: 0.0.8

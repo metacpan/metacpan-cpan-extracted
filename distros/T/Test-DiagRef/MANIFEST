@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/simple.pl
+lib/Test/DiagRef.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/kwalitee-cheat.t
+xt/release/cpan-changes.t
+xt/release/kwalitee.t
+xt/release/pod-syntax.t

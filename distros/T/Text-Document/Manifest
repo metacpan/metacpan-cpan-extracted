@@ -1,0 +1,15 @@
+README
+Bloom.pm
+Bloom.pod
+Document.pm
+Document.pod
+DocumentCollection.pm
+DocumentCollection.pod
+Makefile.PL
+Manifest
+t/bloom.t
+t/collection.t
+t/docsimil.t
+t/document.t
+t/persistent.t
+t/weightcos.t

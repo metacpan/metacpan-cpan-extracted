@@ -1,0 +1,30 @@
+---
+abstract: 'Simple TreePath'
+author:
+  - 'Daniel Brosseau <dab@catapulse.org>'
+build_requires:
+  MooseX::MarkAsMethods: '0.15'
+  MooseX::NonMoose: '0.26'
+  SQL::Translator: '0.11020'
+  Test::Most: '0'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TreePath
+requires:
+  Config::JFDI: '0'
+  DBIx::Class: '0.082810'
+  Hash::Merge: '0.200'
+  Moose: '2.1403'
+  MooseX::Object::Pluggable: '0.0014'
+  Path::Class: '0.35'
+  UNIVERSAL::require: '0.17'
+  YAML: '1.13'
+version: '0.22'

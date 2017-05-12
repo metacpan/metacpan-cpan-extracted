@@ -1,0 +1,148 @@
+# NAME
+
+Test::Some - test a subset of tests
+
+# VERSION
+
+version 0.2.1
+
+# SYNOPSIS
+
+```perl
+use Test::More;
+
+use Test::Some 'foo';
+
+plant tests => 3;
+
+subtest foo => sub { pass };
+
+# will be skipped
+subtest bar => sub { fail };
+```
+
+# DESCRIPTION
+
+This module allows to run a subset of the 'subtest' tests given in a test file.
+
+The module declaration takes a whitelist of the subtests we want to run. 
+Any subtest that doesn't match any of the whitelist
+items will be skipped (or potentially bypassed).
+
+The test files don't even need to be modified, as 
+the module can also be invoked from the command-line. E.g.,
+
+```
+$ perl -MTest::Some=foo t/tests.t
+```
+
+If no argument is given to the module declaration, the environment
+variable `TEST_SOME` will be used as the defaults. For example, this 
+is equivalent to the example above:
+
+```
+$ export TEST_SOME=foo
+$ perl -MTest::Some t/tests.t
+```
+
+## Whitelist items
+
+### '~'
+
+Tells Test::Some to bypass the non-whitelisted tests instead of skipping them. That makes for a smaller output, but
+the test file would now fail if it has a `plan tests =` $n> line (as we'll only report on `$n - bypassed` tests). 
+
+### Subtest name
+
+At its most simple, the names of the subtests we want to run can be passed.
+
+```perl
+# run subtests 'foo' and 'bar'
+use Test::Some 'foo', 'bar';
+```
+
+### Negation
+
+An item prefixed with a bang (!) is negated.
+
+```perl
+use Test::Some '!foo';  # run all tests but 'foo'
+```
+
+Note that a subtest is run if it matches any item in the whitelist, so
+
+```perl
+use Test::Some '!foo', '!bar';
+```
+
+will run all tests as \`foo\` is not \`bar\` and vice versa.
+
+### Regular expression
+
+A string beginning with a slash (/), or a regular expression object 
+will be considered to be a regular expression to be compared against the
+subtest name
+
+```perl
+use Test::Some '/foo';  # only tests with 'foo' in their name
+
+# equivalent to 
+use Test::Some qr/foo/;
+```
+
+### Tags
+
+Strings prefixed with a colon (:) are considered to be tags. 
+
+```perl
+# run all tests with the 'basic' tag
+use Test::Some ':basic';
+```
+
+Tags can be assigned to a subtest by putting them
+after the coderef. E.g.,
+
+```perl
+subtest foo, sub { 
+    ...     
+}, 'tag1', 'tag2';
+```
+
+Test::More's subtest ignore those trailing arguments, so they be put there without
+breaking backward compatibility. If you want to give more visibility to those
+tags, you can also do
+
+```perl
+subtest foo => $_, 'tag1', 'tag2', for sub {
+    ...;
+};
+```
+
+(that neat trick, incidentally, was pointed out by aristotle)
+
+### Code
+
+A coderef can be passed. It'll have the subtest name and its tags passed in as 
+`$_` and `%_`, respectively.
+
+```perl
+# run tests with tags 'important' *and* 'auth'
+use Test::Some sub { 
+    $_{important} and $_{auth} 
+};
+```
+
+# SEE ALSO
+
+\* [http://techblog.babyl.ca/entry/test-some](http://techblog.babyl.ca/entry/test-some) - introduction blog entry
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

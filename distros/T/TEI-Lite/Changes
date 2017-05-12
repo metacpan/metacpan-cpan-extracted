@@ -1,0 +1,57 @@
+TEI::Lite Revision History
+==========================
+
+0.60  Wed May 25 00:53:16 2005
+	- Added more documentation to the individual perl modules.
+	- Cleaned up code comments.
+	- Added easy way to set the language on elements.
+	- Added easy way to set/get the language on a document.
+	- Documents are created as UTF8 by default now.
+	- Added some more tests.
+
+0.52  Mon May 19 18:25:42 2003
+	- Corrected the namespace for XForms.
+
+0.50  Thu Apr 17 12:30:42 2003
+	- Added Utility.pm with the start of some functionality that may be 
+	  useful for people working with TEI Lite documents.  I will add more
+	  to this module as I find the time and need.
+	- Updated the html2tei.pl example to use the new utility functionality.
+	- Added more documentation.
+	- Added more tests.
+
+0.45  Wed Mar 19 22:30:11 2003
+	- Changed version numbering to reflect the more standard perl notation.
+	- Fix for undesirable behavior of Exporter::export_tags.
+	- Various changes to make the modules more backward compatible with
+	  older versions of perl.
+	- Few more sanity checks added.
+	- Added more tests.
+
+0.4.0 Sun Jul 28 01:25:48 2002
+	- Added some more sanity checks to ensure that "we do the right thing [tm]"
+	  with adding data to the DOM tree.
+	- A few more documentation updates.
+
+0.3.5 Sun Jul 21 01:26:18 2002
+	- Modification to a couple of elements to bring them into being
+	  compliant with the specification.
+	- Added the DTD of the TEI P4 specification.
+	- Added the 'url' attribute to xref, xptr and figure tags to ease the 
+	  issues involved with the conversion of TEI <-> HTML per suggestion 
+	  of the P4 spec.
+	- Added a simple HTML2TEI conversion utility.
+
+0.3.0 Sun Jul 07 15:00:00 2002
+	- Package has been renamed from just TEI Lite to TEI::Lite on the
+	  recommendation of the Perl Modules List.
+	- Reworked the testing framework a bit and added some more tests.
+	- Added some missing (?) elements into TEI::Lite::Element.
+
+0.2.5 Mon Jul 01 15:04:32 2002
+	- Added tests to Makefile.PL for XML::LibXML and Exporter::Cluster.
+	- Added some more documentation.
+
+0.2.0 Sun Jun 09 15:29:48 2002
+	- Completion of the first successful design approach of the module.
+

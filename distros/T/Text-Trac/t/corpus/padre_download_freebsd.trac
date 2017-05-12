@@ -1,0 +1,62 @@
+= FreeBSD Installation Instructions =
+== Installation using pkg_add ==
+Because the FreeBSD Perl package comes without threads support no official Padre packages are available. The prefered method is to manually recompile Perl port to support threads and then build Padre and all it's dependencies from Ports (see below).
+
+However there are __'''highly experimental'''__ packages available for FreeBSD 6-STABLE and 7-STABLE.
+
+First, make sure you have uninstalled the non-threaded Perl package or that you have threaded Perl already compiled. Please note, that after installing threaded Perl all Perl modules already installed have to be recompiled.
+All packages depend on Perl 5.8.9 (that's the current Perl version for 6 and 7 branches).
+
+First set `PACKAGESITE` environment variable to point to {{{ http://therek.net/freebsd/tb/6-STABLE-i386/All/Latest/ }}} for 6-STABLE or {{{ http://therek.net/freebsd/tb/7-STABLE-i386/All/Latest/ }}} for 7-STABLE. Then install packages as usual:
+
+{{{
+# setenv PACKAGESITE http://therek.net/freebsd/tb/6-STABLE-i386/All/Latest/ # for C Shell
+# export PACKAGESITE=http://therek.net/freebsd/tb/6-STABLE-i386/All/Latest/ # for Bourne Shell
+# pkg_add -r p5-Padre
+}}}
+
+Feedback is welcome.
+
+== Installation from Source ==
+
+To run Padre on FreeBSD you have to recompile Perl to support threads.
+To verify whether your Perl installation has thread support turned on run following command.
+{{{
+$ perl -V:usethreads
+usethreads='define';
+}}}
+
+If the result is `define` then you have already threaded Perl installed, otherwise execute:
+{{{
+# cd /usr/ports/lang/perl5.8 && make WITH_THREADS=yes
+# make deinstall && make reinstall
+}}}
+Optionally you can substitute `make WITH_THREADS=yes` with the following and choose `THREADS` in the menu.
+Then uninstall and reinstall Perl as above.
+This has an advantage over the previous method, because the preferred configuration options will be stored in your system's packing database.
+This way next time you'll be building Perl (i.e. updating) all stored options will be applied without the need to manually specify them.
+{{{
+# make config
+# make
+}}}
+
+To install Padre and its dependencies just execute:
+{{{
+# cd /usr/ports/editors/p5-Padre
+# make install clean
+}}}
+
+
+== Installation from CPAN ==
+
+Currently, there are no Padre CPAN installation instructions specific to FreeBSD.
+Feel free to add comments and hints.
+
+== Still Not Working? ==
+Following the instructions on this page did not lead to a successful installation?
+
+[http://padre.perlide.org/contact.html Contact us].
+
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.

@@ -1,0 +1,175 @@
+version 0.010; 2012-02-16
+
+  * repair portability to pre-5.8.6 non-threading Perls
+
+  * in documentation and comment, update location of Mills paper
+
+  * tweak thread cloning test
+
+version 0.009; 2012-02-13
+
+  * bugfix: require bugfixed version of Math::BigRat (for construction
+    from decimal fraction strings)
+
+  * bugfix: when loading Math::BigRat, do it in a way that isn't
+    vulnerable to the bug in Perls prior to 5.12 regarding loading
+    context-sensitive modules
+
+  * bugfix: when calling Time::Unix::time(), don't be too picky about
+    the internal flags on its return value
+
+  * new now_utc_dec() function to return time in the decimal string form
+    processed by Math::Decimal
+
+  * refactor documentation for time determination functions
+
+  * test that now_*() functions return well-formed results
+
+  * test thread safety (except for thread cloning on Perl 5.6)
+
+  * new internal architecture to better handle multiple time acquisition
+    APIs
+
+  * perform transformations of time data into output formats in XS code
+
+  * new undocumented function to query all time acquisition APIs, for
+    porting and debugging
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * correct dynamic_config setting to 0
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+version 0.008; 2010-10-20
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, declare all local symbols static
+
+  * load some modules at build time instead of configure time, to avoid
+    dependency problems
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * slightly reformat some C code to avoid exceeding 80 columns
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.007; 2009-03-24
+
+  * bugfix: require bugfixed versions of Data::Float and Module::Runtime
+    (for $SIG{__DIE__} handling)
+
+  * use Win32 API GetSystemTimeAsFileTime() where available
+
+  * when dealing with the BSD nanosecond-resolution ntp_gettime(),
+    process the uncertainty bound with nanosecond resolution
+
+  * document the origin of each API that the module attempts to use
+
+  * separate code for different APIs into different C functions
+
+  * use typemap to simplify handling of Boolean argument
+
+  * much improved probe system
+
+  * don't use ppport.h, because it wasn't doing anything for perl v5.6+
+
+  * use simpler "parent" pragma in place of "base"
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * rearrange source tree to fit Module::Build convention
+
+  * test POD syntax and coverage, and make a small style change in
+    documentation to satisfy the coverage test
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.006; 2007-02-05
+
+  * add the utc_day_to_mjdn() function, duplicated from Time::UTC,
+    for interoperability with other code that deals with UT days
+
+  * when falling back on time(), add half a second onto its return value,
+    because it rounds down
+
+version 0.005; 2007-01-14
+
+  * handle FreeBSD variations of ntp_gettime() interface: use of struct
+    timespec instead of struct timeval; time may be returned with
+    nanosecond precision instead of microsecond; leap state returned
+    in time_state member of struct ntptimeval instead of return value
+    of ntp_gettime()
+
+  * in documentation, list OS-specific experiences (so far for Cygwin,
+    FreeBSD, Linux, and Solaris)
+
+  * when performing configuration tests in Makefile.PL, display the
+    content of the test as well as the compilation command line
+
+version 0.004; 2006-08-05
+
+  * in now_utc_flt(), allow for the rounding error in converting the
+    uncertainty value to floating point, as well as the rounding error
+    in converting the seconds value to floating point
+
+  * in now_utc_flt(), when allowing for the rounding error in converting
+    to floating point, use the actual parameters of the floating point
+    type (from Data::Float) instead of assuming IEEE 754 double
+
+  * use "=> 0" instead of "=> undef" in unversioned dependencies in
+    Makefile.PL
+
+version 0.003; 2006-06-29
+
+  * use ntp_gettime() in addition to ntp_adjtime() on systems where
+    struct timex does not include the `time' member (the current time):
+    this situation has been seen on FreeBSD 5.4 and Solaris 10, and
+    prevented compilation of the previous version
+
+  * zero out entire timex structure before ntp_adjtime(), not just the
+    `modes' member, for the benefit of systems that check validity of
+    unused control variables: this problem caused fallback to
+    gettimeofday() on affected systems
+
+  * include XSLoader in dependency list in Makefile.PL
+
+  * various documentation clarifications
+
+  * discuss overflow of day number for now_utc_sna()
+
+  * add Time::TAI::Now to "see also" list
+
+version 0.002; 2006-05-19
+
+  * add the utc_day_to_cjdn() function, duplicated from Time::UTC, to
+    avoid the need to use that module in order to process the output of
+    this one
+
+  * documentation tweaks for clarity
+
+version 0.001; 2006-05-17
+
+  * bugfix: Unix epoch was wrong in the code, making all returned values
+    a day out
+
+version 0.000; 2006-05-16
+
+  * initial released version

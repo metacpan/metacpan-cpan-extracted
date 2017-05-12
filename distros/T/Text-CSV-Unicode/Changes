@@ -1,0 +1,62 @@
+Revision history for Perl extension Text::CSV::Unicode.
+
+0.01  Tue Jul 10 14:21:57 2007
+	- original version; created from my locally modified Text::CSV
+
+0.02  2007-07-19
+	- fix use of C< binary => 1 > in POD
+	- added requires => { perl => 5.008 } to Build.PL
+
+0.03  2007-07-24
+	- Add C<use 5.008;> to Makefile.PL to prevent test failures
+
+0.04  2007-08-08
+	- two typos in lib/Text/CSV/Unicode.pm, and hide URL
+	- skip_all tests in t/1.t if not perl v5.8.0 or Text::CSV
+
+0.05  2007-09-25
+	- use import to check Text::CSV 0.01 not the "UNAUTHORIZED RELEASE"
+	- use a variable for \N{QUOTATION MARK} in strings and regexp
+
+0.06  2007-12-30
+	- remove inc/Module/Build/Compat.pm: functionality now in release
+	- reinstate C<no warnings portable>: warnings clean for perl 5.10.0
+
+****  Release of Text::CSV 1.00 (November 2007) broke 0.06 
+
+0.099 2007-12-31
+	- Text::CSV::Base to substitute for Text::CSV 0.01
+
+0.100 2007-12-31
+	- more documentation from Text::CSV 
+	- documentation of the inclusion of lib/Text/CSV/Base.pm t/base.t
+
+0.110 2008-01-01
+	- use {_CHAROK} in combine
+	- fix Text::CSV::Unicode->version
+	- fix documentation of allowable characters in CAVEATS
+
+0.111 2008-04-08
+    	Changes to improve kwalitee
+	- Build.PL not executable
+	- added C<use warnings> to Text::CSV::Base
+	- added Test::More to build_requires
+	- added examples/
+
+0.112 2010-02-17
+	Change to _CHAROK due to changes to unicode properties in perl 5.11.4
+
+0.113 2011-08-24
+	Update Text/CSV/Base.pm to version 0.041
+	Add t/combine-undef.t
+	- avoid warnings on undef values in input array to combine
+
+0.114 2012-02-06
+	Some testers were failing with C<use strict> type failures
+	in the test scripts, despite no C<use strict>
+	- add <use strict;> and make the test scripts strict
+
+0.115 2012-02-19
+	perl 5.15.5 fails due to faulty installation:
+	put in explicit require/skip_all for charnames
+

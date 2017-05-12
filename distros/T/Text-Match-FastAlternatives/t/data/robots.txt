@@ -1,0 +1,246 @@
+Abilon
+Ace Explorer
+Active Cache Request
+ActiveRefresh
+Akregator
+alertra
+AmphetaDesk
+AppleSyndication
+Ask Jeeves/Teoma
+AvantGo
+Baiduspider
+BearShare
+Becky! BlogReader
+BitsCast
+Blogbot
+BlogMatrix Sparks
+Bordercore RSS User Agent
+BorderManager
+BottomFeeder
+BozPages
+BuzzRankingBot
+centericq
+Charlotte
+check_http
+ColdFusion
+ConveraCrawler
+d-news
+DAUM Web Robot
+DaylifeFeedFetcher
+Desktop Sidebar
+Dicole Feed Reader
+Diffbot
+dige.st
+Drupal
+duggmirror
+Echoping
+envolk
+eRONA
+Exabot
+Excite Europe Feed Agent
+eZ publish Link Validator
+fake_user_agent
+FAST Crawler
+Feed2Imap
+Feedable
+FeedBeep
+FeedBurner
+FeedCollector
+FeedDemon
+Feedfetcher-Google
+FeedGhost
+feedness-bot
+FeedOnFeeds
+Feedpath
+Feedreader
+feeds.reddit
+Feedshow
+Feedster Crawler
+FeedTools
+FeedValidator
+Fetch API Request
+findlinks
+fofRedux
+FreshCrawler
+FunWebProducts
+Gigabot
+gnome-vfs
+GoodNews
+Googlebot
+GreatNews
+Gregarius
+Hapax Newscrawler
+Hatena Antenna
+hcat
+htdig
+HttpTool
+ia_archiver
+IdeareNewSSpider
+INGRID
+intraVnews
+IPCheck Server Monitor
+iRc Search
+Jakarta Commons-HttpClient
+JetBrains Omea Reader
+JyxobotRSS
+k2spider
+kb.Rmail
+kinjabot
+KNewsTicker
+Labrador
+lanshanbot
+libcurl
+libfetch
+librss
+libwww-perl
+Liferea
+LimeWire
+link verifier
+LinkScan
+LinkWalker
+Live.Com Feed Manager
+LiveJournal.com
+lwp-request
+lwp-trivial
+LWP::Simple
+MagpieRSS
+mBot
+Mediapartners-Google
+Meerkat-Collector
+Memigo Spider
+metaRSS
+Microsoft Data Access Internet Publishing Provider Protocol Discovery
+Microsoft Office Protocol Discovery
+Microsoft URL Control
+MightyTicker
+MLdonkey
+MobiPocket WebCompanion
+mozbot
+MS Search
+MSIECrawler
+MSN Feed Manager
+msnbot
+mt-rssfeed
+MT::Telegraph::Agent
+MTLinkTitles
+myEarthLinkReaderTest
+NetMonks LinkChecker
+NetNewsWire
+Netvibes
+News Fetcher
+NewsAlloy
+NewsClient
+NewsClub
+newsexpress
+NewsFire
+NewsGator FetchLinks
+NewsGatorOnline
+NewsNow RSS Agent
+NewsPipe
+NewsRaider
+NewsReader
+NewsTicker
+newstin.com
+Newz Crawler
+NewzCrawler
+nicebot
+Norbert the Spider
+NutchCVS
+OvalEarthBot
+pagepan grabber robot
+page_verifier
+pavuk
+pertinence.net
+PHP
+Plagger
+Pluck Soap Client
+PluckFeedCrawler
+POE-Component-Client-HTTP
+PostNuke: Phoenix: 0.7.2.6
+Protopage
+psbot
+Python-urllib
+Quick News
+RabbitTicker
+Rainmeter WebParser plugin
+rawdog
+RDFGrabber
+ReadOnline.Info rss checker
+RedTram.com
+Rojo
+Rome Client
+RPT-HTTPClient
+RSS Popper
+RssBandit
+RSScache.com
+RSSFeeds
+RSSNewsTicker
+RSSOwl
+RSSPoint
+RssReader
+ScoopRDF
+Seekbot
+Sensis Web Crawler
+Serverstats::ping_http
+ShopWiki
+Shrook
+SimplePie
+SiteBar
+SmilingGoat.Syndication
+Snoopy
+Soup
+spip.net
+SquaceRSS
+squidclam
+st7bot
+StackRambler
+Strategic Board Bot
+Sunrise
+Supybot
+SWSBot
+syncrisis.com
+SYNMON
+T-H-U-N-D-E-R-S-T-O-N-E
+Temboz
+Tickershock
+TMCrawler
+trawlr
+TsWeb/Nutch
+UltraLiberalFeedParser
+UniversalFeedParser
+UOLCrawler
+URI::Fetch
+User Agent string is misconfigured
+User-Agent:
+Vagabondo/Kliksafe
+vb wininet
+Vienna
+VMBot
+WatzNew Agent
+Wazzup
+Webclipping.com
+Webinator-linuxindexer.cyberalert.com
+Webmail.us
+webpluck
+Wget
+Windows RSS Platform
+Windows-RSS-Platform
+Wizz RSS News Reader
+WMHeadlines
+WordPress
+wTicker
+www.feeds2.com
+www.forumsforyou.com
+XB Stream
+Xenu Link Sleuth
+xFruits
+XMission RPC Agent
+xscreensaver-text
+Yahoo! Slurp
+Yahoo-MMCrawler
+Yahoo-Newscrawler
+YahooFeedSeeker
+YandexSomething
+YeonMo
+zfeeder
+zibber

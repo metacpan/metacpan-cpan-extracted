@@ -1,0 +1,24 @@
+BEGIN:VCARD
+ADR;TYPE=home:;;Rudolfstr. 26;Tübingen;;72072;
+BDAY:1965-09-03T00:00:00Z
+CLASS:PUBLIC
+EMAIL:heiermann@gmx.de
+FN:Heiermann\, Heike
+N:Heiermann;Heike;;;
+REV:2006-04-01T22:07:01Z
+TEL;TYPE=HOME:(07071) 187763
+TEL;TYPE=CELL:(0172) 6169873
+UID:-1027624249
+VERSION:3.0
+END:VCARD
+
+BEGIN:VCARD
+ADR;TYPE=home:;;Michael-Tomuschat-Str. 10;Tübingen;;72072;
+BDAY:1961-05-14T00:00:00Z
+EMAIL:saubermann@gmx.de
+FN:Saubermann\, Heike
+N:Saubermann;Heike;;;
+TEL;TYPE=HOME:(07071) 360163
+UID:-1027624909
+VERSION:3.0
+END:VCARD

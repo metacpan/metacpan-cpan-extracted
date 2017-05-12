@@ -1,0 +1,15 @@
+To-do list for Tie::MmapArray
+=============================
+
+* if no mode options are specified and the file is read-only then the
+  mode should default to read-only (i.e. Do The Right Thing)
+
+* use ftruncate to extend file size (where available)
+
+* work out what should be done about extending mmaped arrays
+
+* write more rigorous test cases
+
+* tidy up documentation
+
+* Win32 support

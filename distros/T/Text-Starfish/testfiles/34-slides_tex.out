@@ -1,0 +1,23 @@
+% -*- compile-command: "make 01s 01"; -*-
+\foilhead{CSCI 2133: Rapid Programming Techniques for Innovation}
+\setslidesLarge
+\par\vspace{1cm}\hrule
+\vspace{0cm}\normalsize%
+\begin{center}
+\begin{tabbing}
+xxxxxxxxxxx\=\kill
+\>  Time:\' Tuesdays and Thursdays 10:05 -- 11:25 \nltabbing
+\> Location:\' ... \nltabbing
+\end{tabbing}
+\end{center}
+\setslidesLarge
+\bsl{Course Description}
+\item Introducing principles of practice of programming
+\esl
+These lines are slides only...
+and this
+and this
+done.
+both
+both
+\end{document}

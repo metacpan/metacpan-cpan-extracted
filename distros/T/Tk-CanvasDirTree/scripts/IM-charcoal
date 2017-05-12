@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Image::Magick;
+
+# this will create a nice charcoal sketch of the
+# input image. The charcoal can then be "lightened"
+# with z-brightner
+
+my $file = shift or die "Need a file $!\n";
+my $newtype = 'jpg';
+
+(my $filebase) = $file  =~ /(.*)\.(\w+)$/;
+print "$filebase\n";
+
+my $p = new Image::Magick;
+$p->Read($file);
+
+$p->Charcoal('0x1');
+
+$p->Write($filebase.'-charc.'.$newtype);
+#unlink $infile; #uncomment to delete the pngs
+
+exit;
+

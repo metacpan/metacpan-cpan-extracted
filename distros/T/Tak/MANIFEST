@@ -1,0 +1,43 @@
+bin/tak
+bin/tak-stdio-node
+Changes
+lib/App/Tak.pm
+lib/Tak.pm
+lib/Tak/Client.pm
+lib/Tak/Client/RemoteRouter.pm
+lib/Tak/Client/Router.pm
+lib/Tak/CommandService.pm
+lib/Tak/ConnectionReceiver.pm
+lib/Tak/ConnectionService.pm
+lib/Tak/ConnectorService.pm
+lib/Tak/EvalService.pm
+lib/Tak/JSONChannel.pm
+lib/Tak/Loop.pm
+lib/Tak/MetaService.pm
+lib/Tak/ModuleLoader.pm
+lib/Tak/ModuleLoader/Hook.pm
+lib/Tak/ModuleSender.pm
+lib/Tak/MyScript.pm
+lib/Tak/ObjectClient.pm
+lib/Tak/ObjectProxy.pm
+lib/Tak/ObjectService.pm
+lib/Tak/REPL.pm
+lib/Tak/Request.pm
+lib/Tak/Result.pm
+lib/Tak/Role/ObjectMangling.pm
+lib/Tak/Role/ScriptActions.pm
+lib/Tak/Role/Service.pm
+lib/Tak/Router.pm
+lib/Tak/Script.pm
+lib/Tak/STDIONode.pm
+lib/Tak/STDIOSetup.pm
+lib/Tak/Takfile.pm
+lib/Tak/WeakClient.pm
+maint/Makefile.PL.include
+maint/mk-fat
+Makefile.PL
+MANIFEST			This list of files
+t/00load_all.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

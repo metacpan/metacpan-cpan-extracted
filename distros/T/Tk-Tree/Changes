@@ -1,0 +1,73 @@
+Revision history for Perl extension Tk::Tree.
+
+Version 0.05
+============
+
+Mon Jan 12 13:21:41 1998  Chris Dean  <ctdean@cogit.com>
+
+      * Tk/Tree.pm: Version 0.05
+
+      * Tk/VTree.pm: From Achim -- A VTree isa HList, it doesn't have
+        a component that is a Scrolled HList.
+
+      * Tk/Tree.pm: From Achim -- Since a Tree is not scrolled by
+        default add the Tk::Widget::ScrlTree method.
+
+      * README: Trees are not Scrolled by default.
+
+      * examples/adjuster: Another example
+
+      * examples/perl-tix-*tree: Use ScrlTree
+
+      * Tk/Tree.pm: Mention that Trees are not Scrolled in the docs.
+
+Version 0.04
+============
+
+Mon Dec  8 13:00:46 1997  Chris Dean  <ctdean@cogit.com>
+
+      * Tk/Tree.pm: Version 0.04
+
+      * Tk/VTree.pm: Added VERSION to VTree.pm to help out CPAN.pm.
+        Otherwise CPAN.pm's `r' command gets confused.  (From Achim
+        Bohnet <ach@mpe.mpg.de>)
+
+Version 0.03
+============
+
+Mon Dec  8 09:26:32 1997  Chris Dean  <ctdean@cogit.com>
+
+      * Tk/Tree.pm: Version 0.03
+
+      * Tk/Tree.pm: More doc changes from Achim.  Removed some fo the
+        subwidget section.
+
+      * Tk/VTree.pm: Verify correct HList.pm version.
+
+      * test.pl: Check for patched HList.pm.
+
+      * Makefile.PL: Use new HList.pm if needed.
+
+Fri Dec  5 10:46:19 1997  Chris Dean  <ctdean@cogit.com>
+
+      * MANIFEST: Removed folder.xpm (already in Tk402.003), and Tree.n
+        (the pod info supersede it).
+
+      * Tk/Tree.pm: Moved Tree.pod to end of Tree.pm
+
+      * Tk/Tree.pod: Removed some Tix leftovers via patch
+        from Achim Bohnet <ach@mpe.mpg.de>.
+
+
+Version 0.02
+============
+
+0.02 Thu Dec  4 17:51:01 PST 1997
+        - Fixed package name in Makefile.PL.
+
+Version 0.01
+============
+
+0.01  Thu Dec  4 14:32:54 1997
+	- original version; created by h2xs 1.18
+

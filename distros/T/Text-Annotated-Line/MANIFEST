@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Text/Annotated/Line.pm
+lib/Text/Annotated/Reader.pm
+lib/Text/Annotated/Writer.pm
+t/annotate.an
+t/annotate.in
+t/annotate.t
+t/line.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+
+use Getopt::Long;
+use strict;
+use warnings;
+use Text::Mining;
+use Text::Mining::Corpus;
+
+our ( $function, $verbose );
+our $corpus_name = '';
+our $corpus_desc = '';
+our $corpus_path = '';
+
+our $features = { create => \&create_corpus,
+                  show   => \&show_corpus,
+                  update => \&update_corpus,
+                  delete => \&delete_corpus,
+		};
+
+get_options();
+
+$features->{ $function }->();
+
+exit;
+
+
+sub create_corpus {
+	status( "create_corpus $corpus_name" );
+	my $params = { corpus_name => $corpus_name,
+	               corpus_desc => $corpus_desc,
+		       corpus_path => $corpus_path };
+	
+	show_corpus( Text::Mining::Corpus->new( $params ) );
+}
+
+sub update_corpus {
+	print "update_corpus $corpus_name \n";
+}
+
+sub delete_corpus {
+	status( "delete_corpus $corpus_name" );
+	my $params = { corpus_name => $corpus_name };
+	
+	my $corpus = Text::Mining::Corpus->new( $params );
+	   $corpus->delete();
+}
+
+sub show_corpus {
+	status( "show_corpus $corpus_name" );
+	my $tm        = Text::Mining->new();
+
+	if (! $corpus_name ) {
+		# Show all corpuses
+		my $corpuses = $tm->get_all_corpuses();
+		
+		if ( @{ $corpuses }) { print_corpus_head(); }
+		foreach my $corpus ( @{ $corpuses }) {
+			print_corpus( $corpus );
+		}
+	} else {
+		# Show one corpus
+		my $corpus_id = $tm->get_corpus_id_from_name({ corpus_name => $corpus_name });
+		if ( $corpus_id ) {
+			print_corpus_head();
+			print_corpus( Text::Mining::Corpus->new({ corpus_id => $corpus_id }) );
+		} else {
+			print "  corpus not found ($corpus_name)\n";
+		}
+	}
+}
+
+sub print_corpus_head {
+	print "Corpus\tName\t\tDesc\t\tPath\n";
+}
+
+sub print_corpus {
+	my ( $corpus ) = @_;
+	print $corpus->get_corpus_id(), "\t", 
+	      $corpus->get_name(), "\t", 
+	      $corpus->get_desc(), "\t", 
+	      $corpus->get_path(), "\n";
+}
+
+
+sub get_options {
+	my ( $help, $create, $show, $update, $delete, $name, $desc, $path );
+	my $opts = GetOptions ( "verbose"  => \$verbose,
+				"help"     => \$help, 
+				"show"     => \$show, 
+				"create"   => \$create, 
+				"update"   => \$update, 
+				"delete"   => \$delete, 
+				"name=s"   => \$name,
+				"desc=s"   => \$desc,
+				"path=s"   => \$path,
+			      );
+
+	# Handle "immediate" switches
+	help()  if $help;
+
+	if    ( $desc )   { $corpus_desc = $desc; }
+	if    ( $path )   { $corpus_path = $path; }
+
+	# Handle assigned switches
+	if    ( $show )   { $function = 'show';   if (defined $name) { $corpus_name = $name; } }
+	elsif ( $create ) { $function = 'create'; $corpus_name = $name; }
+	elsif ( $update ) { $function = 'update'; $corpus_name = $name; }
+	elsif ( $delete ) { $function = 'delete'; $corpus_name = $name; }
+	else              { usage(); exit; }
+
+	if ( $verbose ) { print STDERR "  Function '$function' called.\n"; }
+}
+
+sub usage {
+	print STDERR << "EOF";
+usage: corpus [-v] -create -n corpus_name -desc corpus_desc -path corpus_path
+       corpus [-v] -show -n corpus_name 
+       corpus [-v] -del -n corpus_name 
+EOF
+}
+
+sub help {
+	usage();
+	print STDERR << "EOF";
+
+ -c                   : Create a new corpus
+ -s                   : Show an existing corpus
+ -delete              : Delete an existing corpus
+ -n corpus_name       : The short name of your corpus
+ -desc corpus_desc    : Corpus description
+ -path corpus_path    : Corpus project file path
+ -v                   : verbose output (when available)
+ -h                   : this (help) message
+
+example    : corpus -n Dev
+         corpus -c Dev
+         corpus -d Dev
+         corpus -v -n EnglishMedical
+         corpus -h
+
+EOF
+    exit;
+}
+
+sub status {
+	my ( $msg ) = @_;
+	if ( $verbose ) { print STDERR "  STATUS: $msg \n"; }
+}
+
+

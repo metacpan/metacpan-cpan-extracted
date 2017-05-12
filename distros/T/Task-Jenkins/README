@@ -1,0 +1,142 @@
+NAME
+    Task::Jenkins - collection of distributions for continuous integration
+    using Jenkins
+
+VERSION
+    This documentation describes version 0.04
+
+SYNOPSIS
+        % perl Build.PL
+    
+        % ./Build
+    
+        % ./Build install
+
+DESCRIPTION
+    Installation of Jenkins is beyond the scope of this distribution.
+    Task::Jenkins installs a collection of modules I have identified as
+    useful in utilizing Jenkins for *continuous integration* of Perl
+    distributions, applications and code.
+
+    The recommended distributions are described in detail below.
+
+    The key concept in the use of Jenkins for Perl is enabling the existing
+    tool chain with minor adjustments.
+
+    The basic requirements are that you are using some sort of build system,
+    I use Module::Build, but other systems should work equally well,
+    basically you just need some way to initiate an execution of you test
+    suite from a command line.
+
+    The test suite is then expected to output to the console so the output
+    from the test run can be inspected and the return value of the test run
+    can be used to indicate whether the test run was a success or failure.
+
+    Using basic tool chain components like Test::Harness works out of the
+    box.
+
+    For a tutorial on how to get started please see: <logicLAB Continuous
+    Integration wiki page>.
+
+    In order to extend this very basic behaviour you can use some additional
+    CPAN distributions described below.
+
+  TAP::Formatter::JUnit
+    Jenkins can visualize reports via it's own interface if these reports
+    are based on JUnit report format. TAP::Formatter can output test reports
+    in this format using TAP:Formatter::JUnit, so if you are using
+    Test::Harness you can get beautiful reports using this distribution in
+    your Jenkins setup.
+
+    1 tick the 'Publish JUnit test result report
+    2 specify the 'Test reports XMLs' as '*-junit.xml' (you have to match
+    the pattern you specify in you test suite execution string, see above)
+
+    Example:
+
+        % ./Build test merge=1 tap_harness_args=formatter_class=TAP::Formatter::JUnit > jenkins-${JOB_NAME}-${BUILD_NUMBER}-junit.xml
+
+    See also <TAP::Formatter::JUnit>, or <logicLAB TAP::Formatter::JUnit
+    wiki page >
+
+  App::Prove
+    App::Prove is a marvellous tool for initiating execution of a test
+    suite. The reason however it is listed in Task::Jenkins is that it
+    addressed a bug where timings on a test run was not showing correctly in
+    the report.
+
+    Example:
+
+        % prove --lib --timer --formatter=TAP::Formatter::JUnit t > jenkins-${JOB_NAME}-${BUILD_NUMBER}-junit.xml
+
+    See TAP::Formatter::JUnit above.
+
+    See also <App::Prove>, or <logicLAB App::Prove wiki page>
+
+  Devel::Cover
+    Devel::Cover can be used to generate HTML coverage reports. Jenkins can
+    visualise additional HTML pages generated as part of a test run, Jenkins
+    just have to be told where these are located.
+
+    1 tick 'Publish HTML reports'
+    2 specify the location:
+
+        *   HTML directory to archive: 'cover_db', Devel::Cover default
+
+        *   Index page(s): 'coverage.html', Devel::Cover default
+
+        *   Report title: 'Coverage Report', something identifiable
+
+    Example:
+
+        % ./Build testcover
+
+    See also <Devel::Cover>, or <logicLAB Devel::Cover wiki page>
+
+  Devel::Cover::Report::Clover
+    Jenkins has a plugin for visualization of Clover reports. Devel::Cover
+    can output Clover reports which integrate with this facility.
+
+SEE ALSO
+    The below section lists resources of interest to this distribution and
+    use of Jenkins.
+
+    In addition to what is used in combination with the Perl distributions
+    used in this distribtion, Jenkins also has a Perl::Critic compatible
+    plugin named 'Violations'.
+
+    Using Perl::Critic is important, but not essential in CI, so I have
+    chosen not to specify Perl::Critic as a part of this distribution for
+    now, but I can only recommended it and this standpoint might change in
+    the future.
+
+    *   <Jenkins>
+
+    *   logicLAB Jenkins wiki page
+
+    *   logicLAB Continuous Integration wiki page
+
+    *   <Module::Build>
+
+    *   logicLAB Module::Build wiki page
+
+    *   <Test::Harness>
+
+    *   <Jenkins HTML Publisher Plugin>, for use with Devel::Cover
+
+    *   <Jenkins Clover Plugin>, for use with Devel::Cover
+
+    *   <Jenkins Violations Plugin>, for use with Perl::Critic.
+
+AUTHOR
+    *   Jonas B. Nielsen (jonasbn), "<jonasbn@cpan.org>"
+
+COPYRIGHT
+    Task::Jenkins is (C) by Jonas B. Nielsen, (jonasbn) 2011-2014
+
+LICENSE
+    Task::Jenkins is released under the Artistic License 2.0
+
+    The distribution is licensed under the Artistic License 2.0, as
+    specified by the license file included in this distribution.
+

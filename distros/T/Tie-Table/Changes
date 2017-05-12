@@ -1,0 +1,22 @@
+Revision history for Perl module Tie::Table.
+
+1.1.2  Tue Oct 23 22:50:21 CEST 2001
+	- implemented the insert or update syntax
+	- added select1 and constraint1 functions
+	- name changed from TableMap to Tie::Table
+	- added key and order function
+	- documentation updates
+	- many small bugfixes
+
+1.0  Thu Oct 19 19:56:23 CEST 2000
+	- Small bug fix in "invalidate_cache" when called with [] parameter
+	- Lot of testing
+
+0.6.1  Sun Jul 10 01:27 2000
+	- Added test
+	- replace db.pm with TableMap::DB, which is more cleaner
+	- Small bug fix in the constraint code
+
+0.5.1  Sun Jul  2 20:47:58 2000
+	- original version; created by h2xs 1.19
+	- This is now working, but needs testing outside of the home environment

@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+use 5.014;
+use strict;
+no warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my %opts;
+GetOptions(\%opts => qw( usage|help|h pretty|p code_highlighting|s output|o=s )) or pod2usage(2);
+@ARGV == 1 or do { warn "No input specified!\n"; pod2usage(2) };
+pod2usage(1) if $opts{help};
+
+require TOBYINK::Pod::HTML;
+
+my $method   = delete($opts{output}) eq 'html' ? 'file_to_html' : 'file_to_xhtml';
+my $pod2html = "TOBYINK::Pod::HTML"->new(%opts);
+print $pod2html->$method($ARGV[0]);
+
+__DATA__
+
+=head1 NAME
+
+pod2html-tobyink - basic script wrapper around TOBYINK::Pod::HTML
+
+=head1 SYNOPSIS
+
+   pod2html-tobyink [options] file.pod
+   
+   Options:
+      --help                This help
+      --output=F            Output format ('xhtml' or 'html')
+      --pretty              Switch on pretty printing
+      --code_highlighting   Switch on syntax highlighting
+
+=head1 SEE ALSO
+
+L<TOBYINK::Pod::HTML>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

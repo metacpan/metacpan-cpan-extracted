@@ -1,0 +1,76 @@
+# -*- perl -*-
+
+=head1 NAME
+
+Tangram::Cursor - traverse a result set
+
+=head1 SYNOPSIS
+
+   $cursor = $storage->cursor($remote, $filter);
+
+   while (my $obj = $cursor->current())
+   {
+      # process $obj
+      $cursor->next();
+   }
+
+   $cursor->execute();
+
+   while (my $obj = $cursor->current())
+   {
+      # process $obj
+      $cursor->next();
+   }
+
+=head1 DESCRIPTION
+
+A Cursor makes it possible to iterate over a result set without
+loading all the objects in memory.
+
+See also the "limit" option to the select method of the
+Tangram::Storage class.
+
+=head1 INSTANCE METHODS
+
+=head2 current
+
+   $obj = $cursor->current();
+
+Returns the current object, or undef() if the result set is exhausted.
+
+=head2 next
+
+   $obj = $cursor->next();
+   @obj = $cursor->next();
+
+Moves to the next object in the result set, if any. Returns the new
+current object, or undef() if the result set is exhausted. In list
+context, return all the remaining objects.
+
+=head2 execute
+
+   $cursor->execute();
+
+Moves the cursor to the first object in the result set, and return it.
+Note that preparing Cursors is an expensive operation, you should
+reuse them if possible. execute() allows just that.
+
+execute() may be called several times in a row, or on a Cursor that
+has just been obtained from a Storage, without ill effects.
+
+=head2 residue
+
+   my @vals = $cursor->residue();
+
+Returns the values of the Expr that were passed to the C<retrieve>
+directive of the Storage::select() or Storage::cursor() statement.
+
+=head1 CURSORS AND CONNECTIONS
+
+Each Cursor opens its own connection to the database.
+
+=head1 SEE ALSO
+
+L<Tangram::Storage>
+
+

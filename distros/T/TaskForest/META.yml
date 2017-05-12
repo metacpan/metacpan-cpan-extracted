@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                TaskForest
+version:             1.37
+abstract:            Simple, powerful task scheduler
+license:             ~
+author:              
+    - Aijaz A. Ansari (v-cpan@enoor.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Config::General:               2.38
+    DateTime:                      0
+    HTTP::Daemon:                  5.818
+    HTTP::Request:                 5.818
+    HTTP::Response:                5.82
+    HTTP::Status:                  5.817
+    Log::Log4perl:                 1.16
+    Net::SMTP:                     2.31
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

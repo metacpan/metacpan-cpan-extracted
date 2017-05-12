@@ -1,0 +1,217 @@
+# Script to build the Tcl::Tk::TkFacelift file
+
+
+use strict;
+
+
+use Tcl::Tk qw/ :perlTk/;
+
+
+$| = 1;
+
+my $top = MainWindow->new();
+
+# list of old widgets to tile widgets that will be substituted
+my %subsList = ( qw/
+        Button  ttkButton
+        Frame   ttkFrame
+        Checkbutton     ttkCheckbutton
+        Entry           ttkEntry
+        Label           ttkLabel
+        Radiobutton     ttkRadiobutton
+        
+        
+        /);
+
+# ISAs for the subsituted widget. If not listed here, then they will be sub-classes
+#   of Widget.
+my %subISA = ( qw/
+        Frame   Frame
+        /);
+
+# Special code needed for some widgets
+my %specialCode = ( 
+
+'Frame' => '
+#Add -class to the list of options that will (if present) be fed to the base widget at creation
+sub CreateOptions{
+        my $self = shift;
+        return ($self->SUPER::CreateOptions, "-class");
+}
+
+# Wrapper sub so frame-based mega-widgets still work with the facelift
+sub Tcl::Tk::Frame{
+        my $self = shift;
+        my $obj = $self->Tcl::Tk::ttkFrame(@_);
+        bless $obj, "Tcl::Tk::Widget::FramettkSubs";
+        return $obj;
+}
+',
+
+'Label' => '
+# Wrapper sub so mega-widgets still work with the facelift
+sub Tcl::Tk::Label{
+        my $self = shift;
+        my $obj = $self->Tcl::Tk::ttkLabel(@_);
+        bless $obj, "Tcl::Tk::Widget::LabelttkSubs";
+        return $obj;
+}
+'
+);
+
+
+print getHeader();
+
+foreach my $oldWidgetName( keys %subsList ){
+        my $tileWidgetName = $subsList{$oldWidgetName};
+        translateWidget($top, $oldWidgetName, $tileWidgetName);
+}
+
+exit();
+
+# Sub to output the subsitution code ####
+sub translateWidget{
+        my $top            = shift;
+        my $oldWidgetName  = shift;
+        my $tileWidgetName = shift;
+        my $oldWidget      = $top->$oldWidgetName();
+        my $tileWidget     = $top->$tileWidgetName();
+
+        my @ignoreOptions = sort( getIgnoreOptions( $oldWidget, $tileWidget ) );
+
+        my $templateText = subsWidget();
+
+        my $ignoreText = "     " . join( ",\n     ", @ignoreOptions ) . "\n";
+
+        my $packageName = $oldWidgetName . "ttkSubs";
+        $templateText =~ s/__OLDWIDGET__/$oldWidgetName/g;
+        $templateText =~ s/__TILEWIDGET__/$tileWidgetName/g;
+        $templateText =~ s/__PACKAGENAME__/$packageName/g;
+        $templateText =~ s/__IGNOREOPTIONS__/$ignoreText/g;
+        
+        # Take care of ISA
+        my $ISAtext = '';
+        if( defined($subISA{$oldWidgetName})){
+                $ISAtext = "::".$subISA{$oldWidgetName};
+        }
+        $templateText =~ s/__ISA__/$ISAtext/g;
+        
+        # Take care of any special code
+        my $specialCode = '';
+        if( defined($specialCode{$oldWidgetName})){
+                $specialCode = $specialCode{$oldWidgetName};
+        }
+        $templateText =~ s/__SPECIALCODE__/$specialCode/g;
+                
+        print $templateText;
+
+}
+
+exit();
+
+# Sub to get the options in the old widget that aren't in the tile widget
+sub getIgnoreOptions{
+        my $oldWidget          = shift;
+        my $ttkWidget          = shift;
+        my %oldWidgetConfig = configSpecs($oldWidget);
+        my %ttkWidgetConfig = configSpecs($ttkWidget);
+
+        # Find options in old widget that aren't in ttk widget
+        my @ignoreOptions;
+        foreach my $oldOption ( keys %oldWidgetConfig ) {
+                push @ignoreOptions, $oldOption if !defined( $ttkWidgetConfig{$oldOption} );
+        }
+
+        return @ignoreOptions;
+}
+
+
+
+# build configspecs from a widget
+sub configSpecs{
+        my $cw = shift;
+
+        # Get native options first and turn into data to feed configSpaces
+        my @nativeOptions = $cw->Tcl::Tk::Widget::configure();
+        my %configSpecs;
+        foreach my $optElement (@nativeOptions) {
+                my $name = $optElement->[0];
+                my @optData = ( 'SELF', @$optElement[ 1 .. 3 ] );
+                next if ( $name eq '-class' );
+
+                # Change any '{}' that shows up for scrollcommands to undefs
+                #   Without this, configure is called with something like "-yscrollcommand => '{}'", which
+                #    causes problems
+                $optData[3] = undef if ( defined( $optData[3] ) && $optData[3] eq '{}' );
+                $configSpecs{$name} = [@optData];
+        }
+        return %configSpecs;
+}
+
+######################## Template Subs ##########################################
+
+# Sub to return the template for a substitution widget
+sub subsWidget{
+        
+        return <<'EOD';
+############# Substitution Package for oldwidget "__OLDWIDGET__" to tile widget "__TILEWIDGET__" ####################
+
+package Tcl::Tk::Widget::__PACKAGENAME__;
+
+
+@Tcl::Tk::Widget::__PACKAGENAME__::ISA = (qw / Tcl::Tk::Derived Tcl::Tk::Widget__ISA__/);
+
+
+Construct Tcl::Tk::Widget '__OLDWIDGET__';
+
+
+sub Populate {
+    my( $cw, $args ) = @_;
+
+    $cw->SUPER::Populate( $args );
+
+
+    #### Setup options ###
+    
+    
+    # Setup options that will be ignored  (setup to just be passive), because they don't
+    #  exists in the subsituted tile widget
+    my @ignoreOptions = (
+__IGNOREOPTIONS__
+    );
+    
+    my %ignoreConfigSpecs = map( ($_ => [ "PASSIVE", $_, $_, undef ]), @ignoreOptions);
+    #  gridded and sticky are here to emulate the original Tk::Pane version
+    #  They don't do anything in this widget
+    $cw->ConfigSpecs(
+        %ignoreConfigSpecs,
+        'DEFAULT' => ['SELF']
+    );
+
+
+
+}
+
+
+
+sub containerName{
+        return '__TILEWIDGET__';
+}
+
+__SPECIALCODE__
+
+1;
+
+############################################################
+
+
+EOD
+}
+
+# Sub to return the header text
+sub getHeader{
+        return <<'EOD'
+use Tcl::Tk;
+
+EOD
+}

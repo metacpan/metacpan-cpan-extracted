@@ -1,0 +1,17 @@
+Build.PL
+ChangeLog
+ChangeLog.xml
+etc/ChangeLogML.xsd
+lib/Test/Without.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.textile
+t/01_pod.t
+t/02_pod_coverage.t
+t/03_meta.t
+t/04_minimumversion.t
+t/05_critic.t
+Makefile.PL
+META.yml
+SIGNATURE    Added here by Module::Build

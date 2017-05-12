@@ -1,0 +1,55 @@
+Tie::Hash::Cannabinol
+
+WHAT IS Tie::Hash::Cannabinol?
+
+Tie::Hash::Cannabinol is a Perl module which "extends" the 
+functionality of Perl hashes so that they forget almost anything 
+you tell them.
+
+HOW DO I INSTALL IT?
+
+Tie::Hash::Cannabinol uses the standard Perl module architecture and can
+therefore be installed using the standard Perl method which, in brief, goes 
+something like this:
+
+   gzip -cd Tie-Hash-Cannabinol-X.XX.tar.gz | tar xvf -
+   cd Tie-Hash-Cannabinol-X.XX
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Where X.XX is the version number of the module which you are 
+installing.
+
+If this doesn't work for you then creating a directory called Tie/Hash 
+somewhere in your Perl library path (@INC) and copying the Cannabinol.pm file 
+into this directory should also do the trick.
+
+WHERE IS THE DODUMENTATION?
+
+All of the documentation is currently in POD format in the Cannabinol.pm
+file. If you install the module using the standard method you should be able 
+to read it by typing
+
+   perldoc Tie::Hash::Cannabinol
+
+at a comand prompt.
+
+LATEST VERSION
+
+The latest version of this module will always be available from 
+CPAN or from http://code.mag-sol.com.
+
+COPYRIGHT
+
+Copyright (c) 2001, Magnum Solutions Ltd. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+ANYTHING ELSE?
+
+If you have any further questions, please contact the author.
+
+Dave Cross dave@mag-sol.com

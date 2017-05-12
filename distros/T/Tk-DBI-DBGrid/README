@@ -1,0 +1,39 @@
+Tk::DBI::DBGrid - megawidget based on Label/Entry and Scrollbar widget.
+
+DBGrid allows to browse/edit any table to which a query can be applied.
+The query may join several tables.
+
+See the DBGrid.pod documentation for a full description
+of this module (on russion see the DBGrid.ru.pod).
+
+INSTALL
+
+HOW TO BUILD AND INSTALL
+
+	perl Makefile.PL
+	make
+	make install
+Or:
+	copy ./lib/Tk/DBI/* into perl/site/lib/Tk/DBI
+
+
+what's new
+
+[+] New
+[-] Fixed error
+[*] Changes
+
+ v.0.02 - 16.04.2005
+
+ + rename colunm name
+ + copy current row to clipboard (test with OpenOffice.org 1.1, Excel, Far; 
+   но не разобрался как для win скопировать строку в кирилице без перекодировки - в Far'е
+   при вставке из буфера проблем нет, а в тот же OOo Calc кодовая таблица портится)
+ * not use system color for not win
+ + refresh dbgrid
+ + call function for encode database data ( example, db use cp1251, but gnome use utf8 )
+ * insfinc, updfinc, delfunc
+ 
+	v.0.01 - 16.12.2004 
+
+ + beta

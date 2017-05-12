@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-IdMor.t
+lib/Text/IdMor.pm

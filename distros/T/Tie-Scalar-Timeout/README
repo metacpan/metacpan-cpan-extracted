@@ -1,0 +1,116 @@
+NAME
+    Tie::Scalar::Timeout - Scalar variables that time out
+
+VERSION
+    version 2.101420
+
+SYNOPSIS
+        use Tie::Scalar::Timeout;
+
+        tie my $k, 'Tie::Scalar::Timeout', EXPIRES => '+2s';
+
+        $k = 123;
+        sleep(3);
+        # $k is now undef
+  
+        tie my $m, 'Tie::Scalar::Timeout', NUM_USES => 3, VALUE => 456;
+  
+        tie my $n, 'Tie::Scalar::Timeout', VALUE => 987, NUM_USES => 1,
+            POLICY => 777;
+  
+        tie my $p, 'Tie::Scalar::Timeout', VALUE => 654, NUM_USES => 1,
+            POLICY => \&expired;
+        sub expired { our $is_expired; $is_expired++ }
+
+DESCRIPTION
+    This module allows you to tie a scalar variable whose value will be
+    reset (subject to an expiration policy) after a certain time and/or a
+    certain number of uses. One possible application for this module might
+    be to time out session variables in mod_perl programs.
+
+    When tying, you can specify named arguments in the form of a hash. The
+    following named parameters are supported:
+
+    "EXPIRES"
+        Use "EXPIRES" to specify an interval or absolute time after which
+        the value will be reset. (Technically, the value will still be
+        there, but the module's FETCH sub will return the value as dictated
+        by the expiration policy.)
+
+        Values for the "EXPIRES" field are modeled after Netscape's cookie
+        expiration times. Except, of course, that negative values don't
+        really make sense in a universe with linear, one-way time. The
+        following forms are all valid for the "EXPIRES" field:
+
+            +30s                    30 seconds from now
+            +10m                    ten minutes from now
+            +1h                     one hour from now
+            +3M                     in three months
+            +10y                    in ten years time
+            25-Apr-2001 00:40:33    at the indicated time & date
+
+        Assigning a value to the variable causes "EXPIRES" to be reset to
+        the original value.
+
+    "VALUE"
+        Using the "VALUE" hash key, you can specify an initial value for the
+        variable.
+
+    "NUM_USES"
+        Alternatively or in addition to "EXPIRES", you can also specify a
+        maximum number of times the variable may be read from before it
+        expires. If both "EXPIRES" and "NUM_USES" are set, the variable will
+        expire when either condition becomes true. If "NUM_USES" isn't set
+        or set to a negative value, it won't influence the expiration
+        process.
+
+        Assigning a value to the variable causes "NUM_USES" to be reset to
+        the original value.
+
+    "POLICY"
+        The expiration policy determines what happens to the variable's
+        value when it expires. If you don't specify a policy, the variable
+        will be "undef" after it has expired. You can specify either a
+        scalar value or a code reference as the value of the "POLICY"
+        parameter. If you specify a scalar value, that value will be
+        returned after the variable has expired. Thus, the default
+        expiration policy is equivalent to
+
+            POLICY => undef
+
+        If you specify a code reference as the value of the "POLICY"
+        parameter, that code will be called when the variable value is
+        "FETCH()"ed after it has expired. This might be used to set some
+        other variable, or reset the variable to a different value, for
+        example.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Scalar-Timeout>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Tie-Scalar-Timeout/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Tie-Scalar-Timeout/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2003 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

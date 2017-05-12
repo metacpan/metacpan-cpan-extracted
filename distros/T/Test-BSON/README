@@ -1,0 +1,71 @@
+NAME
+    Test::BSON - Test BSON documents
+
+VERSION
+    This document describes Test::BSON version 0.01.
+
+SYNOPSIS
+       use Test::BSON;
+
+       bson_ok $bson,                 'BSON is valid';
+       bson_is $bson, $expected_bson, 'BSON matches what we expected';
+
+DESCRIPTION
+    BSON is a binary-encoded extension of JSON. Test::BSON makes it easy to
+    verify that you have built a valid BSON document and that it matches
+    what you expected.
+
+EXPORTED TESTS
+  bson_ok
+    Test passes if the BSON document is valid.
+
+       bson_ok $bson, 'BSON is valid';
+
+    "is_valid_bson" is provided as an alternative to "bson_ok" using the
+    same naming convention as Test::JSON but is not exported by default.
+
+  bson_is
+    Test passes if the two BSON documents are valid and evaluate to the same
+    data structure.
+
+       bson_is $bson, $expected_bson, 'BSON matches what we expected';
+
+    Test::Differences is used to provide easy diagnostics of why the BSON
+    documents did not match. For example:
+
+          Failed test 'BSON matches what we expected'
+          in t/bson.t at line 10.
+        +----+----------------+----------------+
+        | Elt|Got             |Expected        |
+        +----+----------------+----------------+
+        |   0|{               |{               |
+        |   1|  BSON => [     |  BSON => [     |
+        *   2|    'AWSUM!!',  |    'awesome',  *
+        |   3|    '5.05',     |    '5.05',     |
+        *   4|    1984        |    1986        *
+        |   5|  ]             |  ]             |
+        |   6|}               |}               |
+        +----+----------------+----------------+
+
+    "is_bson" is provided as an alternative to "bson_is" using the same
+    naming convention as Test::JSON but is not exported by default.
+
+SEE ALSO
+    This module uses BSON and Test::Differences, and is based on Test::JSON.
+    Learn more about BSON at <http://bsonspec.org/>.
+
+AUTHOR
+    Nick Patch <patch@cpan.org>
+
+ACKNOWLEDGEMENTS
+    This module was forked from Test::JSYNC, which was forked from
+    Test::JSON authored by Curtis “Ovid” Poe.
+
+COPYRIGHT & LICENSE
+    © 2011–2012 Nick Patch
+
+    © 2005–2007 Curtis “Ovid” Poe
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

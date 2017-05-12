@@ -1,0 +1,25 @@
+---
+abstract: 'Module for evaluation of labels of the clusters. '
+author:
+  - 'Ted Pedersen <tpederse at d.umn.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-SenseClusters-LabelEvaluation-Driver
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Munkres: 0.08
+  Test::More: 0
+  Text::Similarity: 0.09
+  WWW::Wikipedia: 2
+version: 0.09

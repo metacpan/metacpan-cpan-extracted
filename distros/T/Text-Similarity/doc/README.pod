@@ -1,0 +1,107 @@
+=head1 NAME
+
+README - General information about Text::Similarity
+
+=head1 DESCRIPTION
+
+Text-Similarity is a Perl module that allows a user to measure the  
+similarity between two strings or two files. There is one method
+for computing similarity supported Text::Similarity::Overlaps, and
+others can be added.
+
+When using Text::Similarity::Overlaps, text similarity is based on 
+counting the number of overlapping words between the two files, and is 
+(optionally) normalized by the length of the files. 
+
+The lesk value provided in Text::Similarity::Overlaps is based on 
+counting the number of overlapping words and phrases between the two 
+files, and is (optionally) normalized by the length of the files. 
+Phrasal matches are scored more highly. 
+
+The smallest unit we are considered for matches are white space 
+separated strings. 'the cat and the hat' and 'these cats and these 
+hats' will only result in similarity between 'and', matches below the  
+word level are not measured. 
+
+Each input file is treated as a single string. There are methods 
+provided that allow you to write programs that measure files for 
+similarity (getSimilarity) and identifying the overlaps present in 
+strings (getOverlaps).
+
+=head1 CONTENTS
+
+When the distribution is unpacked, several subdirectories are created:
+
+=over
+
+=item /bin
+
+This directory contains a driver program called text_similarity.pl that can 
+be used to conveniently measure two files for similarity. Please see 
+the perldoc for this program for more details.
+
+=item /lib
+
+This directory contains the Perl modules that do the actual work of
+disambiguation. By default, these files are installed into
+/usr/local/lib/perl5/site_perl/PERL_VERSION (where PERL_VERSION is the
+version of Perl you are using).  See the INSTALL file for more information.
+
+=item /doc
+
+This directory contains all of the *pod files used to document the 
+system. These are processed via pod2text and the output of this is 
+placed in the top level directory, although these top level text files 
+should be considered read only.
+
+=item /t
+
+This directory contains test scripts.  These scripts are run when you
+execute 'make test'.
+
+=item /samples
+
+It includes two formats of stoplist file, one word per line (stoplist.txt) 
+and regular expression format (stoplist-nsp.regex).
+
+=back
+
+=head1 SEE ALSO
+
+L<http://text-similarity.sourceforge.net>
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+ Siddharth Patwardhan, University of Utah
+ sidd at cs.utah.edu 
+
+ Satanjeev Banerjee, Carnegie Mellon University
+ banerjee at cs.cmu.edu 
+
+ Jason Michelizzi 
+
+ Ying Liu, University of Minnesota, Twin Cities
+ liux0395 at umn.edu
+
+
+Last modified by:
+$Id: README.pod,v 1.2 2015/10/08 13:22:13 tpederse Exp $
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2004-2008 by Jason Michelizzi, Ted Pedersen, Siddharth 
+Patwardhan, Satanjeev Banerjee
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+Note: a copy of the GNU Free Documentation License is available on the
+web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+distribution as FDL.txt.
+
+=cut

@@ -1,0 +1,24 @@
+Changes made in Sense-Clusters version 0.29 during version 0.31
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1. 	Added new Toolkit directiry contexvec containing programs -
+	windower, wordvec, contextvec, vec2matrix 
+	
+	to perform word sense discrimination in vector space 
+
+2. 	Added wrapper vector.pl for new vector space approach 
+
+3.	Updated agglom.pl 
+	a. by making KEY file optional in the Input Matrix
+	b. putting matrix symmetry check
+
+4.	Added Impatients directory containing files that show
+	a sample experiment
+
+5.	Added README.Toolkit
+
+(Changelog-v0.29to0.31 Last Updated on 07/14/2003 by Amruta)

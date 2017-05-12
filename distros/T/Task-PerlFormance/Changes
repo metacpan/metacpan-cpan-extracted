@@ -1,0 +1,29 @@
+Revision history for Task-PerlFormance
+
+0.007     2016-05-06
+        - plus some useful deps, and SpamAssassin is back
+
+0.006     2016-04-23
+        - drop some too heavy deps from the default list
+
+0.005     2012-12-14
+        - drop re::engine::plan9
+
+0.004     2012-12-12
+        - depend on AAAA::Mail::SpamAssassin
+          to force SA deps come earlier
+
+0.003     2012-09-18
+        - drop "forks.pm" - I don't use it currently and it
+          stops install without distroprefs
+        - complementary work to dependency cleanup in
+          Benchmark::Perl::Formance
+
+0.002     2012-08-29
+        - add Benchmark::Perl::Formance::Cargo,
+          Task::PerlFormance is now the primary dependency bag,
+          while Benchmark::Perl::Formance becomes very basic
+
+0.001     2012-08-28
+        - initial version
+        - maximum dependencies for Benchmark::Perl::Formance

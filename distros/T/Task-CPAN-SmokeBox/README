@@ -1,0 +1,33 @@
+NAME
+    Task::CPAN::SmokeBox - Install the things to make a CPAN Testers
+    smokebox
+
+SYNOPSIS
+      perl -MCPANPLUS -e 'install Task::CPAN::SmokeBox'
+
+DESCRIPTION
+    Task::CPAN::SmokeBox is a Task that installs all the modules and
+    utilities useful to set up a CPAN Testers smokebox.
+
+    The following things will be installed:
+
+      App::SmokeBox::Mini               # provides minismokebox
+      App::SmokeBox::Mini::Plugin::IRC
+
+      App::SmokeBrew                    # provides smokebrew
+
+      App::Metabase::Relayd             # provides metabase-relayd
+
+    These should be installed into the system perl on a potential smokebox
+    and not the perls that will be used for CPAN testing.
+
+AUTHOR
+    Chris "BinGOs" Williams <chris@bingosnet.co.uk>
+
+LICENSE
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+

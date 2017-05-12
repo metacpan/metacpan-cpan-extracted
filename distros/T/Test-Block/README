@@ -1,0 +1,245 @@
+NAME
+    Test::Block - DEPRECIATED: Specify fine granularity test plans
+
+SYNOPSIS
+      use Test::More 'no_plan';
+      use Test::Block qw($Plan);
+
+      {
+          # This block should run exactly two tests
+          local $Plan = 2;
+          pass 'first test';
+          # oops. forgot second test
+      };
+
+      SKIP: {
+          local $Plan = 3;
+          pass('first test in second block');
+          skip "skip remaining tests" => $Plan;
+      };
+
+      ok( Test::Block->all_in_block, 'all test run in blocks' );
+      is( Test::Block->block_count, 2, 'two blocks ran' );
+
+      # This produces...
+  
+      ok 1 - first test
+      not ok 2 - block expected 2 test(s) and ran 1
+      #     Failed test (foo.pl at line 6)
+      ok 3 - first test in second block
+      ok 4 # skip skip remaining tests
+      ok 5 # skip skip remaining tests
+      ok 6 - all test run in blocks
+      ok 7 - two blocks ran
+      1..7
+      # Looks like you failed 1 tests of 7.
+
+DESCRIPTION
+    NOTE: This module was written before subtests existed in TAP and
+    Test::More. These days subtests will probably be a better option for
+    you.
+
+    This module allows you to specify the number of expected tests at a
+    finer level of granularity than an entire test script. It is built with
+    Test::Builder and plays happily with Test::More and friends.
+
+    If you are not already familiar with Test::More now would be the time to
+    go take a look.
+
+  Creating test blocks
+    Test::Block supplies a special variable $Plan that you can localize to
+    specify the number of tests in a block like this:
+
+        use Test::More 'no_plan';
+        use Test::Block qw($Plan);
+    
+        {
+            local $Plan = 2;
+            pass('first test');
+            pass('second test');
+        };
+
+  What if the block runs a different number of tests?
+    If a block doesn't run the number of tests specified in $Plan then
+    Test::Block will automatically produce a failing test. For example:
+
+        {
+            local $Plan = 2;
+            pass('first test');
+            # oops - forgot second test
+        };
+
+    will output
+
+        ok 1 - first test
+        not ok 2 - block 1 expected 2 test(s) and ran 1
+
+  Tracking the number of remaining tests
+    During the execution of a block $Plan will contain the number of
+    remaining tests that are expected to run so:
+
+        {
+            local $Plan = 2;
+            diag "$Plan tests to run";
+            pass('first test');
+            diag "$Plan tests to run";
+            pass('second test');
+            diag "$Plan tests to run";
+        };
+
+    will produce
+
+        # 2 tests to run
+        ok 1 - first test
+        # 1 tests to run
+        ok 2 - second test
+        # 0 tests to run
+
+    This can make skip blocks easier to write and maintain, for example:
+
+        SKIP: {
+            local $Plan = 5;
+            pass('first test');
+            pass('second test');
+            skip "debug tests" => $Plan unless DEBUG > 0;
+            pass('third test');
+            pass('fourth test');
+            skip "high level debug tests" => $Plan unless DEBUG > 2;
+            pass('fifth test');
+        };
+
+  Named blocks
+    To make debugging easier you can give your blocks an optional name like
+    this:
+
+        {
+            local $Plan = { example => 2 };
+            pass('first test');
+            # oops - forgot second test
+        };
+
+    which would output
+
+        ok 1 - first test
+        not ok 2 - block example expected 2 test(s) and ran 1
+
+  Test::Block objects
+    The $Plan is implemented using a tied variable that stores and retrieves
+    Test::Block objects. If you want to avoid the tied interface you can use
+    Test::Block objects directly.
+
+    plan
+          # create a block expecting 4 tests
+          my $block = Test::Block->plan(4);
+
+          # create a named block with two tests
+          my $block = Test::Block->plan('test name' => 2);
+
+        You create Test::Block objects with the "plan" method. When the
+        object is destroyed it outputs a failing test if the expected number
+        of tests have not run.
+
+    remaining
+        You can find out the number of remaining tests in the block by
+        calling the "remaining" method on the object.
+
+        Test::Block objects overload "" and "0+" to return the result of the
+        remaining method.
+
+    builder
+        Returns Test::Builder object used by Test::Block. For example:
+
+          Test::Block->builder->skip('skip a test');
+
+        See Test::Builder for more information.
+
+    block_count
+        A class method that returns the number of blocks that have been
+        created. You can use this to check that the expected number of
+        blocks have run by doing something like:
+
+          is( Test::Block->block_count, 5, 'five blocks run' );
+
+        at the end of your test script.
+
+    all_in_block
+        Returns true if all tests so far run have been inside the scope of a
+        Test::Block object.
+
+          ok( Test::Block->all_in_block, 'all tests run in blocks' );
+
+BUGS
+    None known at the time of writing.
+
+    If you find any please let me know by e-mail, or report the problem with
+    <http://rt.cpan.org/>.
+
+COMMUNITY
+    perl-qa
+        If you are interested in testing using Perl I recommend you visit
+        <http://qa.perl.org/> and join the excellent perl-qa mailing list.
+        See <http://lists.perl.org/showlist.cgi?name=perl-qa> for details on
+        how to subscribe.
+
+    perlmonks
+        You can find users of Test::Block, including the module author, on
+        <http://www.perlmonks.org/>. Feel free to ask questions on
+        Test::Block there.
+
+    CPAN::Forum
+        The CPAN Forum is a web forum for discussing Perl's CPAN modules.
+        The Test::Block forum can be found at
+        <http://www.cpanforum.com/dist/Test-Block>.
+
+    AnnoCPAN
+        AnnoCPAN is a web site that allows community annotations of Perl
+        module documentation. The Test::Block annotations can be found at
+        <http://annocpan.org/~ADIE/Test-Block/>.
+
+TO DO
+    If you think this module should do something that it doesn't (or does
+    something that it shouldn't) please let me know.
+
+    You can see my current to do list at
+    <http://adrianh.tadalist.com/lists/public/15423>, with an RSS feed of
+    changes at <http://adrianh.tadalist.com/lists/feed_public/15423>.
+
+ACKNOWLEDGMENTS
+    Thanks to chromatic and Michael G Schwern for the excellent
+    Test::Builder, without which this module wouldn't be possible.
+
+    Thanks to Michael G Schwern and Tony Bowden for the mails on
+    perl-qa@perl.org that sparked the idea for this module. Thanks to Fergal
+    Daly for suggesting named blocks. Thanks to Michael G Schwern for
+    suggesting $Plan. Thanks to Nadim Khemir for feedback and Andreas Koenig
+    for spotting bugs.
+
+AUTHOR
+    Adrian Howard <adrianh@quietstars.com>
+
+    If you can spare the time, please drop me a line if you find this module
+    useful.
+
+SEE ALSO
+    Test::Group
+        A framework for grouping related tests in a test suite
+
+    Test::Class
+        Test::Class is an xUnit testing framework for Perl. It allows you to
+        group tests into methods with independent test plans.
+
+    Test::Builder
+        Support module for building test libraries.
+
+    Test::Simple & Test::More
+        Basic utilities for writing tests.
+
+    <http://qa.perl.org/test-modules.html>
+        Overview of some of the many testing modules available on CPAN.
+
+LICENCE
+    Copyright 2003-2006 Adrian Howard, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

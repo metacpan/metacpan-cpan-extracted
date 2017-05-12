@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Text/TinySegmenter.pm
+t/00_compile.t
+t/01_simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 511a1a7e4781c6165b144c7142600061a4c6fe44 Changes
+SHA1 22609d07e9aec1575fac3461a895f82e92fddd5c HL7.pm
+SHA1 f6f99b50ddf40ff89a85a50ceaef1acd9756d898 LICENSE
+SHA1 1c00bfcaa29b7c2b07deb8897ce50e7df5ec0a94 MANIFEST
+SHA1 5642085865453bca20ae3e32b59f0b2394fdb673 META.yml
+SHA1 ffdb9a0766aa68f8f35b10058d2d1ba46b141d2c Makefile.PL
+SHA1 0aadc3e7432feae691ad829e57508572ebb661e0 README
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 c7d405f1623c93062d1b0414cb86dc3b0bfd8693 t/Task-HL7/01-use.t
+SHA1 f89749b78f68431e7f0120cfcb76f014948c4026 t/Task-HL7/02-version.t
+SHA1 dd892f18fbd4ec90802e6089793a5eecd9161213 xt/Task-HL7/01-pod_coverage.t
+SHA1 bad22506a372713ee52b486e41843397073e12d5 xt/Task-HL7/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXBuH+AAoJEJe+XXKaIuTl/tMIALxT1EmRt//OblduSOvnb42Z
+ZbLkBT1DShEVfUTJ7iOnye/K3w5HJtWJmhRPCzkV1AjIlLVfjdPPKDxmLQ0f7jB5
+w4BKC6LT+hA0b+NFNvyIVuiU+AHI7TZ1toAVxXqD4lSxRVClvtJh45O0ey67dblI
+qfzpbjvXCKn3FQhwFjL/LdzBmAIQA3bFdr3qh8xvfA72O9kfuC3v4Z8ReYFFl8M2
+bjGhQyv99b5v74pJ+0SkKVaxcuDeTxLTyySZe7VokC6B5tMFuO1gZ0ib2rNLVclW
+AdFOXUXCiSVhBGHhRACUzRziai1T3iwZZS+gPqyI/SseQBXoKYm2D9/fgBjeYdE=
+=WQd5
+-----END PGP SIGNATURE-----

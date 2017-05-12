@@ -1,0 +1,52 @@
+<html>
+<head>
+    <title>Events</title>
+    <script type="text/javascript">
+    // <!--
+    function hideAfter(ms)
+    {
+        var t = setTimeout(function () { 
+            document.getElementById('toggle').style.visibility = 'hidden';
+        }, ms);
+    }
+    function showAfter(ms)
+    {
+        var t = setTimeout(function () { 
+            document.getElementById('toggle').style.visibility = 'visible';
+        }, ms);
+    }
+    function appendNewDiv(new_id, ms)
+    {
+        var t = setTimeout(function () { 
+            var node = document.createElement("div");
+            node.setAttribute("id", new_id);
+            node.innerHTML = "<p>asdf</p>";
+            document.getElementById('toggle')
+                    .appendChild(node);
+        }, ms);
+    }
+    function doAlert(message, ms)
+    {
+        var t = setTimeout(function() {
+            alert(message);
+        }, ms);
+    }
+    // -->
+    </script>
+</head>
+<body>
+    <div id="create-new"
+         onClick="javascript:appendNewDiv('one', 500);"
+         onBlur="javascript:appendNewDiv('two', 500);"
+         onFocus="javascript:appendNewDiv('three', 500);"> </div>
+
+    <div id="my-alert"
+         onClick="javascript:doAlert('hello', 500);">alertdiv</div>
+
+    <div id="toggle" 
+         onClick="javascript:hideAfter(500);"
+         onBlur="javascript:showAfter(500);">
+        <p>Toggler</p>
+    </div>
+</body>
+</html>

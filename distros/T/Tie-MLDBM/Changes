@@ -1,0 +1,21 @@
+Revision history for Perl extension Tie::MLDBM
+
+1.00  Wed Sep 17 17:57:00 2002
+        - Original version; rob@cowsnet.com.au
+
+1.01  Wed Sep 17 20:23:00 2002
+        - Fix module packaging and Makefile.PL; rob@cowsnet.com.au
+
+1.02  Wed Sep 20 21:25:00 2002
+        - Incorporated Changes revision history; rob@cowsnet.com.au
+        - Updated Tie::MLDBM::Lock::Null to correct subroutine name bug found by David Golden; rob@cowsnet.com.au
+
+1.03  Wed Oct 15 20:05:00 2002
+	- Incorporated improved collection of module tests; rob@cowsnet.com.au
+        - Updated Tie::MLDBM to correct locking interface bug found by David Golden; rob@cowsnet.com.au
+        - Updated Tie::MLDBM to incorporate AUTOLOAD functions and synchronisation; rob@cowsnet.com.au
+	- Updated documentation and README file; rob@cowsnet.com.au
+
+1.04  Fri Oct 25
+	- Removed DESTROY subroutine from Tie::MLDBM class; rob@cowsnet.com.au
+	- Updated module tests; rob@cowsnet.com.au

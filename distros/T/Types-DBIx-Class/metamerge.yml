@@ -1,0 +1,11 @@
+---
+abstract: 'A Type::Library for DBIx::Class objects'
+author:
+  - 'Yary Hluchan <yary@cpan.org>'
+license: perl_5
+dynamic_config: 0
+release_status: stable
+version: 1.000006
+no_index:
+  file:
+    - .gitattributes

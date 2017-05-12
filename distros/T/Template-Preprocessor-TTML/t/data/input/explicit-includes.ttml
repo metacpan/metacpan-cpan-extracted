@@ -1,0 +1,3 @@
+[% PROCESS "header.tt2" %]
+[% PROCESS "inc2.tt2" %]
+[% man %] is [% joe %]

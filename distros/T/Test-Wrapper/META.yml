@@ -1,0 +1,41 @@
+---
+abstract: 'Use Test::* tests outside of a TAP context'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::More: '0.88'
+  perl: '5.006'
+  strict: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Wrapper
+provides:
+  Test::Wrapper:
+    file: lib/Test/Wrapper.pm
+    version: v0.3.0
+requires:
+  Moose: '0'
+  Moose::Exporter: '0'
+  Test::Builder: '0'
+  overload: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/test-wrapper/issues
+  homepage: http://search.cpan.org/dist/Test-Wrapper/
+  repository: https://github.com/yanick/test-wrapper.git
+version: 0.3.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

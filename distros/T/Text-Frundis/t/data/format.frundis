@@ -1,0 +1,23 @@
+Some text.
+.Bf -f latex
+\eemph{things}
+.Ef
+.Bf -f xhtml
+<em>things</em>
+.Ef
+More text.
+More:
+.Ft -f latex \eemph{things}
+.Ft -f xhtml <em>cosas</em>
+.Bl
+.It
+And textit:
+.Ft -f latex \etextit{things}
+That's it.
+.El
+Some text:
+.Bf -f xhtml
+xhtml text\"comment
+.Ef
+Some text.
+.Ft -ns -f xhtml <em>"'&gt</em>

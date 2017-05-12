@@ -1,0 +1,86 @@
+Release history for perl-Test-Dist-Zilla:
+
+v0.4.4 @ 2016-12-28 19:48 UTC
+
+    -   $Cleanup package variable introduced to control temporary directories.
+
+v0.4.3 @ 2016-11-26 19:05 UTC
+
+    -   `skip_if_exception` method added.
+
+    -   Documentation updated.
+
+    -   Synopses for `Build`, `BuiltFiles`, `Release` are tests now, which are included into POD.
+
+    -   `ArchiveRelease` 4.27 fails some tests under `Dist::Zilla` 6.x, and so, cannot be installed
+        cleanly. Because of it, `ArchiveRelease` plugin is not mandatory for author tests if
+        `Dist::Zilla` 6.0 installed.
+
+v0.4.2 @ 2015-10-31 08:49 UTC
+
+    -   One test fails with `Dist::Zilla` 4.300035 due to slightly different error message. The
+        test fixed to accept both variants.
+
+v0.4.1 @ 2015-10-29 22:06 UTC
+
+    -   One test fails on systems with `Dist::Zilla` pre-5.038 because old `Test::DZil` versions
+        write keys to `dist.ini` file in unpredictable order. The test skipped if `Dist::Zilla`
+        version older than required.
+
+v0.4.0 @ 2015-10-27 08:40 UTC
+
+    -   `Test::Dist::Zilla::Release` role added. The same as `Test::Dist::Zilla::Build` but runs
+        `release` method instead of `build`. It allows testing plugins which do `Releaser`,
+        `BeforeRelease`, and `AfterRelease` roles.
+
+    -   Dist::Zilla::Tester::DieHard` requirement is upgraded to v0.5.0 — need `release` method.
+
+    -   `use version 0.77` added to all modules.
+
+    -   Documented (and tested) priority of explicit `dist.ini` file over `dist` and `plugins`
+        attributes.
+
+    -   `Test::Pod::LinkCheck` found few broken links. Fixed.
+
+    -   `Test::Synopsis` found bugs in synopsis. Fixed.
+
+    -   `aspell.en.pws` renamed to `aspell-en.pws` to make `Test::Portability` happy.
+
+v0.3.4 @ 2015-10-10 22:27 UTC
+
+    -   A test added to check writing and reading files with Unicode characters.
+
+v0.3.3 @ 2015-09-27 17:10 UTC
+
+    -   Bug in `Path::Tiny` found, it affects `Test::Dist::Zilla::BuiltFiles`:
+        `lines_utf8( { chomp => 1 } )` strips trailing empty lines, see
+        <https://github.com/dagolden/Path-Tiny/issues/152>. The bug is workarounded.
+
+v0.3.2 @ 2015-09-25 21:42 UTC
+
+    -   Testing fails on some platform due to unexpected error message. Older `Dist::Zilla` prints
+        short plugin name. Test fixed to accept both variants.
+
+v0.3.1 @ 2015-09-21 23:32 UTC
+
+    -   Bug: If expected file content is specified as `re( qr{ ... } )`, `BuildFiles` reads actual
+        file content into an array, and then `cmd_deeply` fails to compare `ArrayRef` with
+        `RegExp`. Fixed.
+
+v0.3.0 @ 2015-09-19 23:00 UTC
+
+    -   `Test::Dist::Zilla::BuiltFiles` module added.
+
+    -   `test-dist-zilla-messages.t` fails on bunch of *BSD systems due to circular dependency: the
+        test uses `Dist::Zilla::Plugin::Hook`, the latter requires `Test::Dist::Zilla`. The test
+        changed to use two homebrew plugins to avoid circular dependency.
+
+    -   Version switched from old decimal style to new dotted-decimal style.
+
+0.002 @ 2015-08-29 19:03 UTC
+
+    -   Bug #106744 "DieHard prereq version too low?" Fixed by requiring `DieHard` v0.002.
+
+0.001 @ 2015-08-23 23:03 UTC
+
+    -   `Test::Dist::Zilla` and `Test::Dist::Zilla::Build` implemented.

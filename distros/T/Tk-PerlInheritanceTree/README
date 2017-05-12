@@ -1,0 +1,35 @@
+Tk-PerlInheritanceTree version 0.02
+==========================
+
+Tk::PerlInheritanceTree is a Tk::Frame-derived widget.
+
+Tk::PerlInheritanceTree displays a graphical representation of the inheritance tree for a given class(package)-name. The nodes representing classnames have mouseclick bindings to open a Tk::PerlMethodList - widget.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Tk
+Tk::NumEntry;
+Tk::GraphItems::TextBox;
+Tk::GraphItems::Connector;
+Tk::PerlMethodList;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Christoph Lamprecht
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

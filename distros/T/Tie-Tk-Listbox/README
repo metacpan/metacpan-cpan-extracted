@@ -1,0 +1,41 @@
+Tie::Tk::Listbox
+================
+
+INTRODUCTION
+
+Tie::Tk::Listbox - Access Tk::Listbox and similar widgets as arrays
+
+The Tie::Tk::Listbox module allows you to tie the contents of a Tk::Listbox
+widget to an ordinary Perl array for easy modification. Additionally,
+you may tie a Tk::Scrolled widget or any other widget that advertises
+a Tk::Listbox subwidget.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   pray
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Test::More
+   Tk
+   Tk::Scrolled
+   Tk::Listbox
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Steffen Mueller, all rights reserved.
+
+Author can be reached at <tklistbox-module@steffen-mueller.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

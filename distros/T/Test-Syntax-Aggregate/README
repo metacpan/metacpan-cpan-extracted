@@ -1,0 +1,16 @@
+Test-Syntax-Aggregate
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Run
+
+    perldoc Test::Syntax::Aggregate
+
+to read module documentation

@@ -1,0 +1,13 @@
+Revision history for Tickit-Widget-Breadcrumb
+
+0.003     2015-02-06 22:23:55+00:00 Europe/London
+	Features:
+	* skip_first support
+	* Updated for WIDGET_PEN_FROM_STYLE
+
+0.002     2014-08-30 02:22:03+01:00 Europe/London
+	Features:
+	* Item transformation support
+
+0.001     2014-08-23 01:52:45+01:00 Europe/London
+	Initial CPAN release

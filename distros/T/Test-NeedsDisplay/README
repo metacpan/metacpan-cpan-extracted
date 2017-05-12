@@ -1,0 +1,94 @@
+NAME
+    Test::NeedsDisplay - Ensure that tests needing a display have one
+
+SYNOPSIS
+    In your Makefile.PL...
+
+      use inc::Module::Install; 
+      # ... or whatever else you use
+  
+      # Check for a display
+      use Test::NeedsDisplay;
+  
+      # ... your Makefile.PL content as normal
+  
+    And again in each test script that loads Wx
+
+      #!/usr/bin/perl
+  
+      use strict;
+  
+      use Test::NeedsDisplay;
+  
+      # Test content as normal...
+
+DESCRIPTION
+    When testing GUI applications, sometimes applications or modules
+    absolutely insist on a display, even just to load a module without
+    actually showing any objects.
+
+    Regardless, this makes GUI applications pretty much impossible to build
+    and test on headless or automated systems. And it fails to the point of
+    not even running the Makefile.PL script because a dependency needs a
+    display so it can be loaded to find a version.
+
+    In these situations, what is needed is a fake display.
+
+    The "Test::NeedsDisplay" module will search around and try to find a way
+    to load some sort of display that can be used for the testing.
+
+  Strategies for Finding a Display
+    At this time, only a single method is used (and a very simple one).
+
+    Debian Linux has a script called "xvfb-run" which is a wrapper for the
+    "xvfb", a virtual X server which uses the linux frame buffer.
+
+    When loaded without a viable display, the module will re-exec the same
+    script using something like (for example) "xvfb-run test.t".
+
+    As such, it should be loaded as early as possible, before anything has a
+    chance to change script parameters. These params will be resent through
+    to the script again.
+
+METHODS
+    There are no methods. You simply use the module as early as possible,
+    probably right after "use strict;" and make sure to load it with only
+    default params.
+
+    Specifically, need must always load it before you set the test plan,
+    otherwise the test script will report two plans, and the harness will
+    complain about it and die.
+
+      # Use it like this ...
+      use Test::NeedsDisplay;
+  
+      # ... not like this ...
+      use Test::NeedsDisplay 'anything';
+  
+      # ... and not like this.
+      use Test::NeedsDisplay ();
+
+    And that's all there is to do. The module will take care of the rest.
+
+TO DO
+    - Find alternative ways to launch a display on different platforms
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-NeedsDisplay>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

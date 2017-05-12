@@ -1,0 +1,17 @@
+ChangeLog
+lib/Test.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/05_about_verbose.t
+t/fail.t
+t/mix.t
+t/multiline.t
+t/onfail.t
+t/qr.t
+t/skip.t
+t/success.t
+t/todo.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

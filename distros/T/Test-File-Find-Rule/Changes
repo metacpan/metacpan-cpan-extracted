@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::File::Find::Rule.
+
+1.00  Wed Apr  7 09:52:10 2004
+	- original version; created by h2xs 1.23 with options
+		-X Test::File::Find::Rule
+

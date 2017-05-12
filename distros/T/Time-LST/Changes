@@ -1,0 +1,29 @@
+#--------------------------------------------
+Revision history for Perl extension Time::LST.
+#--------------------------------------------
+
+#---
+0.038 Sept 2009 : continuing effort to make cross-platform friendly dist; cleanup pod
+
+0.03  Sat Dec 30 2006
+	- now able to make use of "08" for a month or day, which some module 
+	  croaked on otherwise
+      - handles Feb 29 for 1970 and 2037
+	- further cleanup of POD/man
+
+#---
+0.02  Fri Dec 08 2006
+	- error corrected in conversion fn: use gmtime not localtime (thanks to Astro::Time author for pointing it out)
+	- conversion re-written to directly use core methods of Astro::Time, not its internal wrappers
+	- now_2_lst() method: added - simple route to what time is above your head, counting the stars
+	- ymdhms_2_lst(): third argument for timezone added - note it is CASE SENSITIVE for now:
+		we need to quickly distinguish between Sudan/Regional_city and SUDAN and so on ...
+		So ymdhms_2_lst() presently permits and restricts parsing of timezone by: 
+			(i) Date::Parse (3-character (capital letter) format); or
+			(ii) DateTime ([C|c]ountry/locale string).
+
+#---
+0.01  Wed Nov 22 01:49:20 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Time::LST
+

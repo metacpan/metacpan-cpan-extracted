@@ -1,0 +1,33 @@
+---
+abstract: 'Links in your tweet to delicious.'
+author:
+  - 'Yoshihiro Sasaki <ysasaki at cpan.org>'
+build_requires:
+  Test::TCP: 1.13
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tweet-ToDelicious
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent::Twitter::Stream: 0.22
+  Class::Accessor::Lite: 0.05
+  Config::Any: 0.23
+  Coro: 6.06
+  LWP::Protocol::https: 6.02
+  List::MoreUtils: 0.33
+  Log::Minimal: 0.09
+  Net::Delicious: 1.14
+  Net::OAuth: 0.27
+  Net::SSLeay: 1.42
+  Sub::Retry: 0.04
+  YAML::XS: 0.37
+version: 0.08

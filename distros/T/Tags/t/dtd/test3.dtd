@@ -1,0 +1,10 @@
+<!ELEMENT MAIN (CHILD1+)>
+<!ATTLIST MAIN
+	id ID #IMPLIED
+>
+<!ELEMENT CHILD1 %child;>
+<!ATTLIST CHILD1
+	xml:space (default|preserve) #IMPLIED
+>
+<!ENTITY % child "(#PCDATA|CHILD2)*">
+<!ELEMENT CHILD2 (#PCDATA)>

@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+lib/Test/TempDatabase.pm
+t/001_load.t
+t/100_dropped.t
+t/200_setuid.t
+t/210_fork.t
+t/300_cluster.t
+Makefile.PL
+META.yml     Module meta-data (added by MakeMaker)

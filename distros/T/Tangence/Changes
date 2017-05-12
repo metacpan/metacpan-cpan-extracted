@@ -1,0 +1,136 @@
+Revision history for Tangence
+
+0.23    2017/01/09 13:40:23
+        [BUGFIXES]
+         * Fix handling of Inf and NaN float values to work on perl versions
+           other than 5.22 (RT118806)
+
+0.22    2016/11/16 23:38:38
+        [CHANGES]
+         * Rename 'iterators' to 'cursors'
+         * Document and support Inf and NaN float values, including on float16
+         * Support perl 5.24's lack of "." in @INC
+
+0.21    2015/10/28 21:07:15
+        [BREAKING CHANGES]
+         * Large API-breaking changes in Tangence::ObjectProxy - now works
+           entirely through Futures instead of one-shot continuation callbacks
+
+0.20    2014/08/13 23:23:11
+        [CHANGES]
+         * Better support for late declaration of Tangence class definitions
+           after the main tanfile is loaded
+
+        [BUGFIXES]
+         * Fix 'return or' operator precedence (RT97483)
+         * Compare floats by approximation during unit tests (RT94404)
+         * Fix block folding in syntax/tangence.vim
+
+0.19    2014/03/30 13:33:40
+        [CHANGES]
+         * Created new Tangence::Type classes to represent the type system as
+           firstclass objects
+         * Have Tangence::Type provide a suitable default value for
+           uninitialised properties
+         * Move most of the value pack/unpack code out of Tangence::Message
+           into the Type classes
+         * Support floating-point numbers as a native format
+         * Pack/unpack smashed objects using type-specific serialisation
+
+        [BUGFIXES]
+         * Quiet 'experimental' warnings about given/when
+
+0.18    BUGFIXES:
+         * Handle void-returning method signatures correctly
+           (RT#83637)
+
+0.17    CHANGES:
+         * Minimal minor version 2
+         * Expose ->class and ->can_method / ->can_event / ->can_property
+           on both Tangence::Object and Tangence::ObjectProxy
+
+0.16    CHANGES:
+         * Bumped wire protocol minor version to 3:
+            + Support GETPROPELEM operation
+            + Support WATCH_ITER for queue property iteration
+         * Internal rewrites to some unit tests for neatness
+
+0.15    BUGFIXES:
+         * Fix Tangence::Message on clientside when dealing with minor
+           version 2 servers, by actually 'use'ing classes it requires
+
+0.14    CHANGES:
+         * Bumped wire protocol minor version to 2:
+            + Provide wire-level struct record serialisations
+            + Encode classes as structs rather than use introspection dict
+         * Recognise struct definitions in the tanfile parser
+         * Minimum supported minor protocol version is now 1; minor version 0
+           is no longer supported
+
+0.13    CHANGES:
+         * Bumped wire protocol minor version to 1:
+            + Encode strings on the wire (dict keys and class names) as
+              Tangence strings
+            + Give classes ID numbers to refer to in CONSTRUCT messages,
+              rather then full class name every time
+
+0.12    CHANGES:
+         * Defined MSG_INIT for server/client version negitiations
+         * Implement it in the server, but not yet in the client as it crashes
+           pre 0.12 servers
+         * Implement types as first-class metadata values
+
+        BUGFIXES:
+         * Implement respondERROR since it is actually being used
+
+0.11    BUGFIXES:
+         * Handle UPDATE messages on objset properties correctly
+
+0.10    BUGFIXES:
+         * Fix memory cycle testing bug
+
+0.09    CHANGES:
+         * Renaming/reworking of internal metadata classes
+         * Optionally use Sub::Name to apply names to subscription / watch
+           callbacks
+
+0.08    CHANGES:
+         * Optionally use Sub::Name to name generated property
+           accessor/mutator methods
+         * Further improvements to metadata layer
+
+0.07    CHANGES:
+         * Redesign of metadata layer to use real objects rather than
+           unblessed hashrefs for structural information
+         * Optionally parse (but currently ignore) argument names in methods
+           and events
+         * Created a parse+dump script to test the parser
+
+0.06    CHANGES:
+         * Look up Tangence interface metadata from a specified file, rather
+           than per-class package variables.
+         * Added Tangence::Compiler::Parser
+
+0.05    CHANGES:
+         * Added documentation to some of the classes
+         * Moved the Net::Async::Tangence tree into its own module
+
+0.04    CHANGES:
+         * Properly split out lower-level abstract Tangence code, from
+           IO::Async-based Net::Async::Tangence wrappers
+         * Added some initial documentation to Tangence::Stream, ::Client and
+           ::Server
+
+0.03    CHANGES:
+         * Weaken references between objects and connections to remove
+           memory cycles
+         * Move all the IO::Async-based code into its own namespace tree of
+           Net::Async::Tangence
+
+0.02    CHANGES:
+         * New Meta::Class introspection objects
+         * Bugfixes for test reliability due to the way stream writes/reads
+           get split
+
+0.01    First version, released on an unsuspecting world.
+

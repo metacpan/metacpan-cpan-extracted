@@ -1,0 +1,63 @@
+NAME
+    `Test::Async::HTTP' - unit test code that uses `Net::Async::HTTP'
+
+DESCRIPTION
+    This module implements a mock version of Net::Async::HTTP suitable for
+    unit tests that virtualises the actual HTTP request/response cycle,
+    allowing the unit test script to inspect the requests made and provide
+    responses to them.
+
+METHODS
+  $f = $http->do_request( %args )
+    Implements the actual Net::Async::HTTP request API.
+
+    The following arguments are handled specially:
+
+    * timeout
+        The value of a `timeout' argument is captured as an extra header on
+        the request object called `X-NaHTTP-Timeout'.
+
+    * stall_timeout
+    * expect_continue
+    * SSL
+        These arguments are entirely ignored.
+
+  $response = $http->GET( $uri, %args )->get
+  $response = $http->HEAD( $uri, %args )->get
+  $response = $http->PUT( $uri, $content, %args )->get
+  $response = $http->POST( $uri, $content, %args )->get
+    Convenient wrappers for using the `GET', `HEAD', `PUT' or `POST' methods
+    with a `URI' object and few if any other arguments, returning a
+    `Future'.
+
+    Remember that `POST' with non-form data (as indicated by a plain scalar
+    instead of an `ARRAY' reference of form data name/value pairs) needs a
+    `content_type' key in `%args'.
+
+  $p = $http->next_pending
+    Returns the next pending request wrapper object if one is outstanding
+    (due to an earlier call to `do_request'), or `undef'.
+
+PENDING REQUEST OBJECTS
+    Objects returned by `next_pending' respond to the following methods:
+
+  $request = $p->request
+    Returns the HTTP::Request object underlying this pending request.
+
+  $p->respond( $resp )
+    Makes the request complete with the given HTTP::Response response. This
+    response is given to the Future that had been returned by the
+    `do_request' method.
+
+  $p->respond_header( $header )
+  $p->respond_more( $data )
+  $p->respond_done
+    Alternative to the single `respond' method, to allow an equivalent of
+    chunked encoding response. `respond_header' responds with the header and
+    initial content, followed by multiple calls to `respond_more' to provide
+    more body content, until a final `respond_done' call finishes the
+    request.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

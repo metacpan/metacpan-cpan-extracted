@@ -1,0 +1,307 @@
+=encoding utf-8
+
+=head1 NAME
+
+policy 設計方針
+
+=head1 DESCRIPTION
+
+このドキュメントは、TripletaiL を利用する際の設計の推奨方針について記述します。
+
+TripletaiL を利用する際に、必ずしもこの方針を採用する必要はありませんが、
+採用が可能であれば検討して頂ければと思います。
+
+
+=head2 関数の分け方
+
+以下の考え方に沿って大まかに3種類に関数を分けます。
+
+=over 4
+
+=item 1
+
+DoXXX リクエストを受け付けて処理する部分
+
+=item 2
+
+DispXXX 利用者に（次の）画面を返す部分
+
+=item 3
+
+1や2から呼び出される処理部分
+
+=back
+
+例えば、アンケートに記入してフォームをsubmitした場合、submitしたデータの内容をチェックし、DBに保存する部分が1に相当します。
+その後、アンケート回答ありがとうございました、などのHTMLを返す部分が2に相当します。
+
+TripletaiL では、1を DoXXX という名前、2 を DispXXX という名前で書くことを推奨しています。
+DoXXX という名前にしておくと、$TL->dispatch でそれぞれの関数に分岐させることが出来ます。
+
+1及び2の一部処理を別関数に切り出した部分は、3になります。
+3に関しては Do/Disp 以外で始まる名前を付けます。
+
+例えば、フォーム内容をチェックするメソッドであれば CheckQuestionForm、
+DBに保存する部分なら SaveQuestionForm 等です。
+
+ #Submitを押されたときの処理を実行する関数
+ sub DoSubmit {
+   #フォームをチェックする関数
+   if(&CheckQuestionForm) {
+     #フォームのデータを保存する関数
+     &SaveQuestionForm;
+     #ありがとうページを表示する関数
+     &DispThanksPage;
+   } else {
+     #エラーページを表示する関数
+     &DispErrorPage;
+   }
+ }
+
+表示のみをする場合もDoを利用し、表示の関数は別に記述する事を推奨しています。
+
+ sub DoTop {
+   &DispTopPage;
+ }
+
+こうすることにより、コメントをDo関数内に記述することにより流れが分かりやすくなります。
+
+フォームを表示し、submitすると確認画面を表示し、更にsubmitするとDBに保存し完了画面を表示するようなプログラムの場合は、
+以下のようなコードになります。
+
+dispatch でフォームの特定の値を使って、処理を分岐させます。
+テンプレートは DispXxx関数の中で表示し、次の分岐先を addHiddenForm で指定します。
+
+ sub main {
+   $TL->dispatch( $CGI->get('Command'),
+     default => 'Form',
+     onerror => \&DoError,
+   );
+ }
+ 
+ sub DoForm {
+   &DispForm();
+ }
+ 
+ sub DispForm { # フォームを表示
+   my $error = shift; # エラーの場合はエラー内容
+   
+   my $t = $TL->newTemplate('form.html');
+   if($error) {
+     # $errorがあればエラー内容を画面に追加表示し
+     # 入力されたフォームデータを戻す
+     $t->node('error')->add({ ERROR => $error });
+     $t->setForm($CGI);
+   }
+   $t->addHiddenForm({ Command => 'Confirm' });
+   $t->flush;
+ }
+ 
+ sub DoConfirm {
+   my $error = &CheckQuestionForm; # 入力内容をチェック
+   if($error) {
+     &DispForm($error); # エラーメッセージと共にフォームを再表示
+   } else {
+     &DispConfirm;
+   }
+ }
+ 
+ sub DispConfirm {
+   my $t = $TL->newTemplate('confirm.html');
+   # 入力内容を展開して再表示
+   $t->expand({
+     name => $CGI->get('name'),
+     answer => $CGI->get('answer'),
+   });
+   $t->addHiddenForm({ Command => 'Commit' });
+   $t->flush;
+ }
+ 
+ sub DoCommit {
+   my $error = &CheckQuestionForm; # 入力内容をチェック
+   if($error) {
+     &DispForm($error); # エラーメッセージと共にフォームを再表示
+                        # 通常は確認済みなのでここには来ない
+   } else {
+     &SaveQuestionForm; # DBに保存
+     &DispEnd;
+   }
+ }
+ 
+ sub DispEnd {
+   my $t = $TL->newTemplate('end.html');
+   $t->flush;
+ }
+
+
+=head2 SQLを記述する場所
+
+基本的に、SQLは都度コードに記述することを推奨します。
+
+SQLの発行をモジュール化するのは、複雑なSQLを発行する必要がある場合や、特定の手順で複数のSQLを発行しなければならない場合など、限定した利用にして下さい。
+
+TripletaiL の DBクラスは、SQLの中に、SQLが記述されたファイル名と行番号をコメントで埋め込む機能があります。
+この機能を利用すると、DBの負荷が高い場合に mysqladmin processlist の一覧を見て、負荷が高い場所をすぐに絞り込むことが可能です。
+
+なるべくモジュール化しない方針としているのは、次のような理由からです。
+
+=over 4
+
+=item *
+
+DBのデバッグ機能や、SQL の中にコメントでコードのファイル名・行番号を埋め込む機能などが有効に活用できなくなります。
+
+=item *
+
+モジュールに切り出すと、処理を追いかける場合に複数ファイルを閲覧する必要があります。TripletaiL ではエラー発生時にメール通知する機能がありますが、その場合に問題が起きたファイルから、素早く問題箇所を特定しにくくなります。
+
+=item *
+
+障害が発生した際などに、SQLを修正するときの影響範囲が広くなります。複数箇所から呼び出されている場合、共通の処理を修正するのがよいのか、問題が起きているプログラムからの呼び出しだけ別の処理に分けるのが良いのか、判断するのに時間がかかります。それぞれ直接SQLを記述している場合は、まず問題が起きている場所を修正することができ、他の同様箇所を直すかは後で検討することができます。
+
+=back
+
+
+=head2 DBのトランザクション
+
+DBのトランザクションは、CGIの中で開始・終了することを推奨します。
+
+CGIの中で、$DB->tx メソッドを使って下さい。
+
+モジュールの中からSQLを発行する場合も、モジュール内では tx を使用しないようにします。
+
+また、モジュールの中の SQL が他の SQL と組み合わせて使われていることが分かっている場合、以下のように記述し、tx 内での利用を強制します。
+
+ sub insert {
+   my $DB = $TL->getDB('DB');
+   $DB->inTx() or die "transaction required";
+   $DB->execute($sql, $param...);
+ }
+
+例えば、ポイントを管理するモジュールと、商品を管理するモジュールがあり、以下のように100ポイントで商品を購入する処理があったとします。
+
+ Point::spend($userid, 100);
+ Goods::get($userid, '商品名');
+
+このような利用をする場合、上記2つの呼び出しが同一トランザクションに入る必要がありますので、
+Point::spend や Goods::get メソッドの実行に、トランザクションを要求するような記述をしておきます。
+
+こうすることで、トランザクション制御を忘れて、DBの不整合を発生させてしまう可能性を低くすることが出来ます。
+
+コードでは以下のようになります。
+
+ package Point;
+ sub spend {
+   my $DB = $TL->getDB('DB');
+   $DB->inTx() or die "transaction required";
+   $DB->execute($sql, $param...);
+ }
+  
+ package Goods;
+ sub get {
+   my $DB = $TL->getDB('DB');
+   $DB->inTx() or die "transaction required";
+   $DB->selectAllHash($sql, $param...);
+ }
+  
+ package Cgi;
+ sub buyGoods {
+   $DB->tx(sub {
+     Point::spend($userid, 100);
+     Goods::get($userid, '商品名');
+   });
+ }
+
+このように書いておくと、トランザクションを使用し忘れ、以下のように書くとエラーになります。
+
+ package Cgi;
+ sub buyGoods {
+   Point::spend($userid, 100);
+   Goods::get($userid, '商品名');
+ }
+
+
+=head2 セッション管理
+
+TripletaiL では、セッションの機能を大幅に制限しています。
+以下のような会員テーブルを用意し、会員のログイン認証に使うことを主目的に設計しています。
+
+ CREATE TABLE user_info (
+   userid     INT      NOT NULL AUTO_INCREMENT,
+   email      TINYBLOB NOT NULL,
+   password   TINYBLOB NOT NULL,
+   username   TINYBLOB NOT NULL,
+   deletedate DATETIME NOT NULL DEFAULT 0,
+   PRIMARY KEY (userid),
+   UNIQUE KEY (email(255), deletedate)
+ ) TYPE = InnoDB;
+
+※deletedateは会員削除時にnow()にUPDATE。
+有効な会員なら0とする。
+
+会員IDはINTもしくはBIGINT型とすることを推奨しています。
+
+会員IDに関連した情報を他にも多数保存することになるかと思いますが、
+その際に主キーが文字列型などであると、JOINの速度が低下したり、
+インデックスのサイズが大きくなり、パフォーマンスが落ちるためです。
+
+
+また、セッションの機能では userid に相当する内容のみしか
+格納することが出来ないようになっています。
+
+これは、セッションの中にデータを安易に保存すると、以下のような
+問題が発生する可能性があるためです。
+
+=over 4
+
+=item *
+
+セッション情報はアクセスのたびに参照されるため、
+セッションのサイズが大きくなると、パフォーマンスが
+大きく低下します。
+
+=item *
+
+入力画面→確認画面→完了画面、のような画面遷移をする際に、
+入力内容をセッションに保存するような利用をされてしまいます。
+
+このような使い方をすると、複数のブラウザウィンドウ・タブで
+利用したときに、正しく遷移できないことがあります。
+
+=item *
+
+セッション情報を制限することで、セッションテーブルが
+固定長になります。
+
+これにより、MySQL の MyISAM エンジンを利用する場合、
+フォーマットが Fixed になり、高速なアクセスが可能になります。
+
+=back
+
+
+
+=head2 CGI変数
+
+TripletaiL では、CGIが受け取ったフォームの内容が $CGI で常に参照できます。
+
+必要のない限り、関数の引数に渡して別の名前で受け取るなどせず、
+常にこの変数 $CGI を参照することを推奨します。
+
+
+=head1 AUTHOR INFORMATION
+
+=over 4
+
+Copyright 2007 YMIRLINK Inc.
+
+This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+Address bug reports and comments to: tl@tripletail.jp
+
+HP : http://tripletail.jp/
+
+=back
+
+=cut

@@ -1,0 +1,56 @@
+TkUtil-Gui
+
+Basically allows naming widgets, auto-specification of variable
+references in GUI, and recovery of state of GUI with a single
+call.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+To see this module in use, run
+
+    perl eg/Gui.t
+
+Examine the code, and use the GUI, then hit button ("Show")
+at bottom of the screen. Change GUI again, hit "Show" and notice
+change in output. This makes it real easy to interrogate a GUI
+for final content before doing anything with it. You can check
+for valid, consistent input, tell the user if something is
+wrong, and pass information on in a nice, organized fashion
+to another program, if that's appropriate.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc TkUtil::Gui
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=TkUtil-Gui
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/TkUtil-Gui
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/TkUtil-Gui
+
+    Search CPAN
+        http://search.cpan.org/dist/TkUtil-Gui/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 X Cramps
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,35 @@
+---
+abstract: 'Check your test requirements against the available version of Git'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Requires-Git
+requires:
+  Carp: '0'
+  Git::Version::Compare: '1.003'
+  Test::Builder::Module: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Requires-Git
+  repository: http://github.com/book/Test-Requires-Git.git
+version: '1.008'
+x_contributors:
+  - 'Christian Walde <mithaldu@cpan.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Pine Mizune <pine@cpan.org>'

@@ -1,0 +1,72 @@
+1.01
+
+ - Schwern's prototype of Test::Builder adds an extra newline
+   when running under Test::Harness.  We now fake not running under
+   Test::Harness during the testing (we twiddle the ENV variable)
+
+1.00
+
+ - prepped for release after testing at Fotango
+
+ - Added additional test name argument 'label'
+
+0.99_01
+
+ - Convert to Module::Build
+
+ - Add ability to ignore test_err, test_out
+
+ - Added test name arguments 'name' and 'title' 
+
+0.09
+
+ - Make the code work on 5.004 (now works on all known perls greater
+   and including 5.004,) 
+   fixes http://rt.cpan.org/NoAuth/Bug.html?id=456
+
+ - Improve documentation readability
+
+ - Change colouring scheme to use background colouring rather than
+   foreground colouring (makes it easyier to see spare spaces)
+   fixes http://rt.cpan.org/NoAuth/Bug.html?id=386
+
+ - Added this changelog file.
+
+0.08 
+
+ - Changes to work with new version of Test::Builder that has
+   a differing diag text 
+   fixes http://rt.cpan.org/NoAuth/Bug.html?id=379
+
+ - Fix missing files from the distribution
+   fixes http://rt.cpan.org/NoAuth/Bug.html?id=384
+
+0.07 (First release to CPAN)
+
+ - colouring added
+
+0.06 
+
+ - test_diag and test_fail added
+
+ - better tests added
+
+0.05
+
+ - line_num added
+
+0.04
+
+ - More tests added.
+
+0.03
+
+ - Minor documentation change
+
+0.02 
+
+ - Solved problem with running extra tests with no_ending
+
+ - Got permission from schwern to steal his code
+
+0.01 Prototype version

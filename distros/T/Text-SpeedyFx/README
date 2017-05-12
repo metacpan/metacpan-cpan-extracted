@@ -1,0 +1,201 @@
+NAME
+
+    Text::SpeedyFx - tokenize/hash large amount of strings efficiently
+
+VERSION
+
+    version 0.012
+
+SYNOPSIS
+
+        use Data::Dumper;
+        use Text::SpeedyFx;
+    
+        my $sfx = Text::SpeedyFx->new;
+    
+        my $words_bag = $sfx->hash('To be or not to be?');
+        print Dumper $words_bag;
+        #$VAR1 = {
+        #          '1422534433' => '1',
+        #          '4120516737' => '2',
+        #          '1439817409' => '2',
+        #          '3087870273' => '1'
+        #        };
+    
+        my $feature_vector = $sfx->hash_fv("thats the question", 8);
+        print unpack('b*', $feature_vector);
+        # 01001000
+
+DESCRIPTION
+
+    XS implementation of a very fast combined parser/hasher which works
+    well on a variety of bag-of-word problems.
+
+    Original implementation
+    <http://www.hpl.hp.com/techreports/2008/HPL-2008-91R1.pdf> is in Java
+    and was adapted for a better Unicode compliance.
+
+METHODS
+
+ new([$seed, $bits])
+
+    Initialize parser/hasher, can be customized with the options:
+
+    $seed
+
+      Hash seed (default: 1).
+
+    $bits
+
+      How many bits do represent one character. The default value, 8,
+      sacrifices Unicode handling but is fast and low on memory footprint.
+      The value of 18 encompasses Basic Multilingual, Supplementary
+      Multilingual and Supplementary Ideographic planes. See also "UNICODE
+      SUPPORT"
+
+ hash($octets)
+
+    Parses $octets and returns a hash reference (not exactly; see "CAVEAT")
+    where keys are the hashed tokens and values are their respective count.
+    $octets are assumed to represent UTF-8 string unless Text::SpeedyFx is
+    instantiated with "$bits" == 8 (which forces Latin-1 mode, see "UNICODE
+    SUPPORT"). Note that this is the slowest form due to the
+    (computational) complexity of the associative array
+    <https://en.wikipedia.org/wiki/Associative_array> data structure
+    itself: hash_fv()/hash_min() variants are up to 260% faster!
+
+ hash_fv($octets, $n)
+
+    Parses $octets and returns a feature vector (string of bits) with
+    length $n. $n is supposed to be a multiplier of 8, as the length of the
+    resulting feature vector is ceil($n / 8). See the included utilities
+    cosine_cmp and uniq_wc.
+
+ hash_min($octets)
+
+    Parses $octets and returns the hash with the lowest value. Useful in
+    MinHash <http://en.wikipedia.org/wiki/MinHash> implementation. See also
+    the included minhash_cmp utility.
+
+UNICODE SUPPORT
+
+    Due to the nature of Perl, Unicode support is handled differently from
+    the original implementation. By default, Text::SpeedyFx recognizes
+    UTF-8 encoded code points in the range 00000-2FFFF:
+
+      * Plane 0, the Basic Multilingual Plane (BMP, 0000–FFFF)
+
+      * Plane 1, the Supplementary Multilingual Plane (SMP, 10000–1FFFF)
+
+      * Plane 2, the Supplementary Ideographic Plane (SIP, 20000–2FFFF)
+
+      * There are planes up to 16; however, as in Perl v5.16.2, there are
+      no code points matching isALNUM_utf8() there (so it's irrelevant for
+      proper algorithm operation).
+
+    Although, there is a major drawback: in this mode, each instance
+    allocates up to 1 MB of memory.
+
+    If the application doesn't need to support code points beyond the Plane
+    0 (like the original SpeedyFx implementation) it is possible to
+    constraint the address space to 16 bits, which lowers memory allocation
+    to up to 256 KB. In fact, Text::SpeedyFx constructor accepts bit range
+    between 8 and 18 to address code points.
+
+ LATIN-1 SUPPORT
+
+    8 bit address space has one special meaning: it completely disables
+    multibyte support. In 8 bit mode, each instance will only allocate 256
+    bytes and hashing will run up to 340% faster! Tokenization will
+    fallback to ISO 8859-1 West European languages (Latin-1) character
+    definitions.
+
+BENCHMARK
+
+    The test platform configuration:
+
+      * Intel® Xeon® E5620 CPU @ 2.40GHz (similar to the one cited in the
+      reference paper);
+
+      * Debian 6.0.6 (Squeeze, 64-bit);
+
+      * Perl v5.16.1 (installed via perlbrew);
+
+      * enwik8 from the Large Text Compression Benchmark
+      <https://cs.fit.edu/~mmahoney/compression/text.html>.
+
+                           Rate murmur_utf8 hash_utf8 hash_min_utf8  hash hash_fv hash_min
+        murmur_utf8      6 MB/s          --      -79%          -86%  -89%    -97%     -97%
+        hash_utf8       30 MB/s        376%        --          -35%  -47%    -84%     -85%
+        hash_min_utf8   47 MB/s        637%       55%            --  -18%    -76%     -77%
+        hash            58 MB/s        803%       90%           23%    --    -70%     -72%
+        hash_fv        194 MB/s       2946%      541%          313%  237%      --      -6%
+        hash_min       206 MB/s       3143%      582%          340%  259%      6%       --
+
+    All the tests except the ones with _utf8 suffix were made in Latin-1
+    mode. For comparison, murmur_utf8 was implemented using
+    Digest::MurmurHash hasher and native regular expression tokenizer:
+
+        ++$fv->{murmur_hash(lc $1)}
+            while $data =~ /(\w+)/gx;
+
+    See also the eg/benchmark.pl script.
+
+CAVEAT
+
+    For performance reasons, hash() method returns a tied hash which is an
+    interface to nedtries
+    <http://www.nedprod.com/programs/portable/nedtries/>. The interesting
+    property of a trie data structure <https://en.wikipedia.org/wiki/Trie>
+    is that the keys are "nearly sorted" (and the first key is guaranteed
+    to be the lowest), so:
+
+        # This:
+        $fv = $sfx->hash($data);
+        ($min) = each %$fv;
+        # Is the same as this:
+        ($min) = $sfx->hash_min($data);
+        # (albeit the later being 2x faster)
+
+    The downside is the magic involved, the delete breaking the key order,
+    and the memory usage. The hardcoded limit is 524288 unique keys per
+    result, which consumes ~25MB of RAM on a 64-bit architecture. Exceeding
+    this will croak with the message "too many unique tokens in a single
+    data chunk". The only way to raise this limit is by recompilation of
+    the XS module:
+
+        perl Makefile.PL DEFINE=-DMAX_TRIE_SIZE=2097152
+        make
+        make test
+        make install
+
+REFERENCES
+
+      * Extremely Fast Text Feature Extraction for Classification and
+      Indexing <http://www.hpl.hp.com/techreports/2008/HPL-2008-91R1.pdf>
+      by George Forman <http://www.hpl.hp.com/personal/George_Forman/> and
+      Evan Kirshenbaum <http://www.kirshenbaum.net/evan/index.htm>
+
+      * MinHash — выявляем похожие множества
+      <http://habrahabr.ru/post/115147/>
+
+      * Фильтр Блума <http://habrahabr.ru/post/112069/>
+
+      * cosine_cmp, minhash_cmp and uniq_wc utilities from this
+      distribution
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+CONTRIBUTOR
+
+    Sergey Romanov <sromanov-dev@yandex.ru>
+

@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1ba932cc15e4419b1675c1ba2ddc3afb7fe24baa Changes
+SHA1 6056dddf20ed4e7cea8850acbe4f50dc2d398d8d MANIFEST
+SHA1 af54c7ba9b01d2c23557c2701ccc4f7e634f36a8 META.yml
+SHA1 d99be20702b634d837b46601276b3dc7b2442485 Makefile.PL
+SHA1 fc0abac10156a7821b7659c7789d2459473ba378 README
+SHA1 7e9788a371e53ab86108063092129f0610934da9 lib/TAP/Filter.pm
+SHA1 fa1964bcdaf76465889b35ae37a645d8250e1b67 lib/TAP/Filter/Iterator.pm
+SHA1 6939eda1bdbed85af83bd58df47e0a0d9c3c49ce t/00.load.t
+SHA1 7342a8cb455553c91c7610ade89aff8575c47beb t/a_test.tt
+SHA1 66980dc833beb7876f96de6f0805b8e0d2c796b8 t/b_test.tt
+SHA1 dca600586186bd09c6ed8141409eefd199534597 t/filter.t
+SHA1 0ef22761da734ce98e50383dcafee010cf5d9244 t/harness.t
+SHA1 1997db86b4ab4afba928632995480e72a3fb5dbe t/lib/DeepStuff.pm
+SHA1 30ca57bf40c50d1b090c329e55db5c90c5c75ecb t/lib/FakeFilter.pm
+SHA1 8155ba625004ac8f407b05b8f64b8210aeaba949 t/misc.t
+SHA1 ac0a4431176ea24ed91a2167edc500fe8e7d2dec t/parser.t
+SHA1 a8992f5926ea8893eada5497a1323e132b9312a0 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Darwin)
+
+iEYEARECAAYFAkhvg/UACgkQwoknRJZQnCGYWQCeJJ0jt3aDozwh2YF+hPiddKMV
+kLkAnArAcymjwb9CUo5hAUGRjsQunGQo
+=VxG2
+-----END PGP SIGNATURE-----

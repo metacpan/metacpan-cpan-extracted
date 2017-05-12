@@ -1,0 +1,43 @@
+{
+   "abstract" : "Filehandle tie that captures, splits and stores output into files in a given path.",
+   "author" : [
+      "Gonzalo Barco <gbarco@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-FileHandle-Split",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.22",
+            "File::Temp" : "0.16",
+            "Tie::FileHandle::Base" : "0.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.95"
+}

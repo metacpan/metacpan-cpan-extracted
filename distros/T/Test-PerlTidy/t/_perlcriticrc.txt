@@ -1,0 +1,33 @@
+severity = brutal
+verbose = 11
+
+[-BuiltinFunctions::ProhibitLvalueSubstr]
+
+[-CodeLayout::ProhibitParensWithBuiltins]
+
+[-CodeLayout::RequireTidyCode]
+
+[ControlStructures::ProhibitPostfixControls]
+    allow = if unless
+
+[-ControlStructures::ProhibitUnlessBlocks]
+
+[-Documentation::RequirePodAtEnd]
+
+[-Documentation::RequirePodLinksIncludeText]
+
+[-Documentation::RequirePodSections]
+
+[InputOutput::RequireCheckedSyscalls]
+    functions = :builtins
+    exclude_functions = print
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[Variables::ProhibitPunctuationVars]
+    allow = $@ $!
+

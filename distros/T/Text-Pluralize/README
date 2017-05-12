@@ -1,0 +1,54 @@
+NAME
+
+    Text::Pluralize - simple pluralization routine
+
+DESCRIPTION
+
+    Text::Pluralize provides a lightweight routine to produce the proper form, 
+    singular or plural, of a word or phrase. Its intended purpose is to produce 
+    messages for the user, whether error messages or informational messages, 
+    without the awkward "1 file(s) copied" appearance.
+
+EXAMPLES
+
+    In each of the examples below, the first column represents the template, the
+    second column the count, and the third column the result.
+
+    item                            0   items
+                                    1   item
+                                    2   items
+
+    item(s) need{|s|} attention     0   items need attention
+                                    1   item needs attention
+                                    2   items need attention
+
+    {No|%d} quer(y|ies) (is|are)    0   No queries are
+                                    1   1 query is
+                                    2   2 queries are
+
+    {No|One|Two|Three|%d} item(s)   0   No items
+                                    1   One item
+                                    2   Two items
+                                    3   Three items
+                                    4   4 items
+
+INSTALLATION
+
+    To install this module, use the following standard commands.
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2007 Kevin Michael Vail, all rights reserved.
+
+    This library is free software. You may modify and/or redistribute it under 
+    the same terms as Perl itself.
+
+AUTHOR
+
+    Kevin Michael Vail <kvail@cpan.org>
+

@@ -1,0 +1,22 @@
+{
+   "abstract" : "whee!",
+   "author" : [
+      "Karen Etheridge <ether@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Foo-Bar-Baz",
+   "provides" : {
+      "Moose::Cookbook" : {
+        "file" : "lib/Moose/Cookbook.pod",
+        "version" : "20.0"
+      }
+   },
+   "version" : "1.23"
+}

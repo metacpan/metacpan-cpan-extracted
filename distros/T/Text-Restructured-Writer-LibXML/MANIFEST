@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Text/Restructured/Writer/LibXML.pm
+t/00-load.t
+t/00-pod-coverage.t
+t/00-pod.t
+t/00-prereqs.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,25 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Text/Extract/MaketextCallPhrases.pm
+t/00.load.t
+t/01.get_phrases_in_text.t
+t/02.get_phrases_in_file.t
+t/03.debug_ignored_matches.t
+t/04.default_regex_non_maketext.t
+t/05.no_extract_maketext.t
+t/06.3rd_arg_hr_optional.t
+t/07.phrase_from_arg_n.t
+t/perlcritic.t
+t/perltidy.t
+t/pkg-changes.t
+t/pkg-readme.t
+t/pod-coverage.t
+t/pod-encoding.t
+t/pod-spelling.t
+t/pod-version.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

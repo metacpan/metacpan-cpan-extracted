@@ -1,0 +1,78 @@
+NAME
+    Test::Httpd::Apache2 - Apache2 runner for tests
+
+SYNOPSIS
+        use Test::Httpd::Apache2;
+
+        my $httpd = Test::Httpd::Apache2->new(
+            custom_conf => << 'EOT',
+        DocumentRoot "htdocs"
+        EOT
+        );
+
+        # do whatever you want
+        my $url = "http://" . $httpd->listen . "/";
+        ...
+
+DESCRIPTION
+    The module automatically setups an instance of Apache2 httpd server and
+    destroys it when the perl script exits.
+
+FUNCTIONS
+  new
+    Creates and runs the httpd server. Httpd is terminated when the returned
+    object is DESTROYed. The function accepts following arguments, which can
+    also be read and/or be set through the accessors of the same name.
+
+   listen
+    The address to which the httpd binds to. Corresponds to the "Listen"
+    configuration directive of Apache. The default value is
+    "127.0.0.1:<whatever_port_that_was_unused>".
+
+   server_root
+    The "ServerRoot" runtime directive. Set to current working directory if
+    omitted.
+
+   custom_conf
+    Application-specific configuration passed that will be written to the
+    configuration file of Apache. Default is none.
+
+   required_modules
+    An arrayref to specify the required apache modules. If any module are
+    specified, "Test::Httpd::Apache2" will check the list of
+    statically-compiled-in and dynamically-aviable modules and load the
+    necessary modules automatically. Module names should be specified
+    excluding the "mod_" prefix and ".so" suffix. For example,
+    "auth_basic_module" should be specified as "auth_basic". Default is an
+    empty arrayref.
+
+    Note: "Authz_host" is automatically translated to "access" if the found
+    httpd is Apache/2.0.x for compatibility.
+
+   search_paths
+    Paths to look for the httpd server in addition to the PATH environment
+    variable. The default is: /usr/sbin, /usr/local/sbin,
+    /usr/local/apache/bin.
+
+   pid
+    the read-only accessor returns pid of the httpd server or undef if it is
+    not running
+
+  start
+    the instance method starts the httpd server
+
+  stop
+    the instance method stops the httpd server
+
+COPYRIGHT
+    Copyright (C) 2010 Cybozu Labs, Inc. Written by Kazuho Oku.
+
+THANKS TO
+    Tatsuhiko Miyagawa mattn
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

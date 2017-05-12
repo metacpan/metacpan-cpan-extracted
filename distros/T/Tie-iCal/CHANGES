@@ -1,0 +1,34 @@
+CHANGES
+
+0.14 -> 0.15
+added NEXTKEY performance patch by BenRifkah Bergsten-Buret.
+added bug fix by Krishna Sethuraman.
+
+0.13 -> 0.14
+some optimisations, i.e. substr instead of m//
+"NAME:" becomes "NAME => ''"
+added outlook sync sample
+
+0.12 -> 0.13
+corrected unfold behaviour with "\n" character sequences.
+corrected property extraction with "\n" character sequences.
+added more documentation.
+
+0.11 -> 0.12
+fixed typo in Makefile.PL ASTRACT.
+fixed exists reset key interator bug in seekUid.
+added uniquify.pl example.
+added more documentation.
+
+0.10 -> 0.11
+added modified parse_line to ignore single quotes.
+remove dependency on Text::ParseWords.
+added b_tie.t test.
+fixed UID bug on STORE method.
+fixed typo in subcomponent creation.
+added c_storefetch.t test.
+fold lines over 75 characters.
+
+0.09 -> 0.10
+support multiple content lines with/without params.
+FETCH, EXISTS, DELETE all use seekUid.

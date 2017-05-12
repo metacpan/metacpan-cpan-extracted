@@ -1,0 +1,29 @@
+Revision history for Perl module Tie::Array::CSV.
+
+0.07  Mar 25, 2013
+	- Fix bug on directly accessing a line beyond the end of the current length
+
+0.06  Feb 6, 2013
+	- Force Tie::File to use \n as line separator, fixing tests on Win32 (Mithaldu++)
+	- Use Module::Build directly
+
+0.05  Feb 8, 2012
+	- 'hold_row' logic separated into T::A::CSV::HoldRow subclass
+	- T::A::CSV::HR::Row objects are more aware of their host's activities
+	- Text::CSV object may be passed to constructor
+	- Use Module::Build rather than EU::MM (still using dzil)
+
+0.04  Dec 18, 2011
+	- 'tie' constructor can accept same options as 'new'
+	- 'col_sep' added as class option (vs simply passthrough)
+	- 'hold_row' option added (deferred row opts)
+
+0.03  Oct 21, 2011
+	- 'new' constructor added, brings extra calling options
+
+0.02  Oct 21, 2011
+	- T::A::CSV behaves more like an array in odd cases
+
+0.01  Aug 12, 2011
+	- Initial release
+

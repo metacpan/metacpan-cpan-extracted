@@ -1,0 +1,6 @@
+0.001: Initial release
+0.008: Implement zero-padded sortable string output
+0.009: Moose cleanups
+0.010: Pad out whitespace in sortable strings with underscores
+0.011: Trim whitespace and condense whitespace, allow stem-only
+0.012: Add POD

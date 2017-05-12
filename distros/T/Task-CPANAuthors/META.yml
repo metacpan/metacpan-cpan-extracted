@@ -1,0 +1,50 @@
+---
+abstract: 'All Acme::CPANAuthors modules at once'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  File::Path: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-CPANAuthors
+requires:
+  Acme::CPANAuthors: '0'
+  Acme::CPANAuthors::Acme::CPANAuthors::Authors: '0'
+  Acme::CPANAuthors::AnyEvent: '0'
+  Acme::CPANAuthors::BackPAN::OneHundred: '0'
+  Acme::CPANAuthors::Booking: '0'
+  Acme::CPANAuthors::CPAN::MostScripts: '0'
+  Acme::CPANAuthors::CPAN::OneHundred: '0'
+  Acme::CPANAuthors::CPAN::TopDepended: '0'
+  Acme::CPANAuthors::CPAN::TopDepended::ByOthers: '0'
+  Acme::CPANAuthors::CPANTS::FiveOrMore: '0'
+  Acme::CPANAuthors::CodeRepos: '0'
+  Acme::CPANAuthors::DebianDev: '0'
+  Acme::CPANAuthors::DualLife: '0'
+  Acme::CPANAuthors::GeekHouse: '0'
+  Acme::CPANAuthors::GitHub: '0'
+  Acme::CPANAuthors::InMemoriam: '0'
+  Acme::CPANAuthors::MBTI: '0'
+  Acme::CPANAuthors::MetaSyntactic: '0'
+  Acme::CPANAuthors::Misanthrope: '0'
+  Acme::CPANAuthors::Nonhuman: '0'
+  Acme::CPANAuthors::Not: '0'
+  Acme::CPANAuthors::POE: '0'
+  Acme::CPANAuthors::Pumpkings: '0'
+  Acme::CPANAuthors::ToBeLike: '0'
+  Acme::CPANAuthors::You::re_using: '0'
+  Task::CPANAuthors::Regional: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-CPANAuthors
+  repository: http://github.com/book/Task-CPANAuthors.git
+version: '1.005'

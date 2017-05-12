@@ -1,0 +1,71 @@
+Tivoli::AccessManager::Admin provides a perl interface into the TAM Admin API
+
+PREREQUISITES
+
+Inline::C
+TAM v6.0 Web ADK
+gcc
+
+OPTIONAL
+
+Term::ReadLine::Zoid 
+ENV::PS1
+
+You will need these for the full power of the included example.  They are not
+mandatory, though
+
+TOYS
+
+I have included a fine bit of example code.  It is a rewrite of pdadmin with
+some suprising features.  It currently does not install.  You should be able
+to play with it by saying 'perl pdadmin.pl' from the top level of the install
+directory.  I am still working on installation directions for this.
+
+CAVEATS
+
+To date, this code is known to work only on Gentoo Linux[1], running the 2.6
+kernel with TAM 6 and IDS 6.  I do not believe I have used any Linuxisms,
+and so it should also compile on other *nix platforms.
+
+You must have the PDWeb ADK installed for this code to work.  IBM has
+trademarked, patented and otherwise owns any reference to TAM, Policy
+Director, etc.  I simply own the code within this package.
+
+Unless expicitly stated, all the code in here is Copyrighted be me, Michael
+Firestone.  You are granted use of the code under the same license as perl,
+aka, the Artistic license.
+
+I have not implemented the full API.  The library calls were not implemented
+for one of two reasons: false laziness or ignorance.  In roughly
+alphabetical order, the following calls have not been implemented:
+  ivadmin_accessOutdata*+
+  ivadmin_cfg*
+  ivadmin_context_cleardelcred()+
+  ivadmin_context_hasdelcred()+
+  ivadmin_protobj_access()+
+  ivadmin_protobj_multiaccess()+
+
+  + not implemented due to ignorance -- all others will appear in later
+    releases.
+
+The implementation is not one-for-one.  The get/set pairs have been
+collapsed into the same function, for example.  I have also added an object
+class for the "server task" commands for the webseal servers.  I intend to add
+more server types as I gain experience with them.
+
+If you don't like the way I have wrapped the API, all of the C functions are
+accessable via a decent OO-like syntax.  However, you are going to have to
+read the code to figure it out -- my interface has given me more than enough
+to document.
+
+There is no real make test.  You can try to run the tests included, but they
+will require some serious modifications to run in your environment.
+
+I thought about this for a very long time and came to the general conclusion I
+did not like the idea of my test cases messing up your security environment.
+I have left the tests in the distribution, though, because they are very good
+examples.
+
+For the full documentation and copy right notices, see
+Tivoli::AccessManager::Admin
+

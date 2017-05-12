@@ -1,0 +1,27 @@
+NAME
+    Template::Plugin::YAMLVal - yamlval vmethod for Template Toolkit
+
+SYNOPSIS
+        [% USE YAMLVal %]
+        foo: [% foo.yamlval %]
+        bar: [% bar.yamlval %]
+
+DESCRIPTION
+    This module lets you use Template Toolkit to write out YAML mapping
+    files in a certain top level key order, while making sure that the keys
+    are properly YAML encoded.
+
+    There may be other use cases, but that's the one that drove me to write
+    this.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright 2011-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

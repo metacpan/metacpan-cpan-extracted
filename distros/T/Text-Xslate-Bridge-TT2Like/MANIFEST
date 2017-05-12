@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Text/Xslate/Bridge/TT2Like.pm
+lib/Text/Xslate/Bridge/TT2Like.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+src/TT2Like.tx
+t/001_scalar.t
+t/002_array.t
+t/003_hash.t
+t/004_filters.t
+t/005_xss.t
+t/TT2LikeTest.pm
+xt/999_pod-coverage.t
+xt/999_pod.t

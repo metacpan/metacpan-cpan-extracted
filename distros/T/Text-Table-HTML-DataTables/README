@@ -1,0 +1,59 @@
+SYNOPSIS
+
+     use Text::Table::HTML::DataTables;
+    
+     my $rows = [
+         # header row
+         ['Name', 'Rank', 'Serial'],
+         # rows
+         ['alice', 'pvt', '123<456>'],
+         ['bob',   'cpl', '98765321'],
+         ['carol', 'brig gen', '8745'],
+     ];
+     print Text::Table::HTML::DataTables::table(rows => $rows, header_row => 1);
+
+DESCRIPTION
+
+    This module is just like Text::Table::HTML, except the HTML code will
+    also load jQuery (http://jquery.com) and the DataTables plugin
+    (http://datatables.net) from the local filesystem (distribution shared
+    directory), so you can filter and sort the table in the browser.
+
+    The example shown in the SYNOPSIS generates the following table:
+
+     <link rel="stylesheet" type="text/css" href="file:///home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/auto/share/dist/Text-Table-HTML-DataTables/datatables-1.10.13/css/jquery.dataTables.min.css">
+     <script src="file:///home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/auto/share/dist/Text-Table-HTML-DataTables/jquery-2.2.4/jquery-2.2.4.min.js"></script>
+     <script src="file:///home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/auto/share/dist/Text-Table-HTML-DataTables/datatables-1.10.13/js/jquery.dataTables.min.js"></script>
+     <script>$(document).ready(function() { $("table").DataTable(); });</script>
+    
+     <table>
+     <thead>
+     <tr><th>Name</th><th>Rank</th><th>Serial</th></tr>
+     </thead>
+     <tbody>
+     <tr><td>alice</td><td>pvt</td><td>12345</td></tr>
+     <tr><td>bob</td><td>cpl</td><td>98765321</td></tr>
+     <tr><td>carol</td><td>brig gen</td><td>8745</td></tr>
+     </tbody>
+     </table>
+
+FUNCTIONS
+
+ table(%params) => str
+
+ OPTIONS
+
+    The table function understands these arguments, which are passed as a
+    hash.
+
+      * rows (aoaos)
+
+      Takes an array reference which should contain one or more rows of
+      data, where each row is an array reference.
+
+SEE ALSO
+
+    Text::Table::HTML
+
+    See also Bencher::Scenario::TextTableModules.
+

@@ -1,0 +1,27 @@
+Text::Filter::Chain provides the possibility to chain multiple
+Text::Filter objects and run them in sequence.
+
+INSTALLATION
+
+Text::Filter::Chain is installed like any other Perl module:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+REQUIREMENTS
+
+Text::Filter::Chain requires that the Text::Filter module is installed.
+
+Requires perl 5.004_04 or higher.
+
+AUTHOR
+
+Wim Verhaegen <wim.verhaegen@ieee.org>
+
+COPYRIGHT
+
+Copyright (c) 2000 Wim Verhaegen. All rights reserved. 
+This program is free software; you can redistribute and/or 
+modify it under the same terms as Perl itself.

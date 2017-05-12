@@ -1,0 +1,5 @@
+[%- res = reportdata('{ "suite.name" => "perfmon" } :: //tap/tests_planned') -%]
+Planned tests:
+[%- FOREACH r IN res %]
+  [% r -%]
+[% END %]

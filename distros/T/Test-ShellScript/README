@@ -1,0 +1,25 @@
+Test-ShellScript
+================
+
+Call me insane, but sometimes a shell script becames too important or
+complicated that no one wants to touch it. Then why not to add some
+testing to gain some confidence and avoid disrupting its funcitionality ?
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Victor A. Rodriguez.
+                   El bit Fantasma (Bit-Man)
+                   http://www.bit-man.com.ar/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

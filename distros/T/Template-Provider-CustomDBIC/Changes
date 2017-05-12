@@ -1,0 +1,17 @@
+0.04 2015-11-21T22:43:16Z
+
+    - Move perlcritic-test to xt/ 
+      https://rt.cpan.org/Ticket/Display.html?id=109302
+
+0.03 2015-11-19T20:20:29Z
+
+    - Migrate to minil for release 
+
+0.02	2007-03-28:
+		Tidied up distribution:
+			* Improved documentation and moved it inline
+			* Tidied up testing
+			* Fixed problems with build system
+
+0.01	2007-03-02:
+		Initial release.

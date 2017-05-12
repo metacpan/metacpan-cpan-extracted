@@ -1,0 +1,32 @@
+NAME
+    Task::XNLSoar::Graphing - BUNDLE ALL MODULES NECESSARY FOR XNL-SOAR
+    GRAPHING
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        perl -MCPANPLUS -e 'install Task::XNLSoar::Graphing'
+
+DESCRIPTION
+    This task is merely a placeholder to pull all modules necessary for
+    XNL-Soar graphing in one go.
+
+TASK CONTENTS
+  Required modules
+   Soar::WM 0.03
+   opts
+   Path::Class
+  Install only to retrieve prerequisites
+   GraphViz
+  Only necessary if you want JSON graphing
+   JSON::XS
+AUTHOR
+    Nathan Glenn <garfieldnate@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Nathan Glenn.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

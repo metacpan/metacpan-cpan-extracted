@@ -1,0 +1,13 @@
+Changes
+HistEntry.pm
+MANIFEST
+Makefile.PL
+README
+examples/1.pl
+examples/newclass.pl
+t/basic.t
+t/newclass.t
+t/match.t
+t/invoke.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

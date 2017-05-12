@@ -1,0 +1,30 @@
+Revision history for Tie::Util
+
+0.04    1 February, 2015
+        Tests:  Suppress precedence warning in tests  in  perl  5.20.
+        Thanks to Reini Urban  for  the  patch  [rt.cpan.org #87230].
+        Bug fix: Fixed to work with perl 5.21.6.
+
+0.03    15 August, 2010
+        Bug fix:  Suppress  ‘Ambiguous use’  warnings  introduced  in
+        perl 5.13.3.
+
+0.02    15 November, 2009
+        Incompatible changes:
+        • is_weak_tie now returns false for a variable tied to  undef,
+          because the tie does not actually hold a weak reference; it 
+          holds no reference at all.
+        • This module no longer  works  with  perl  versions  earlier
+          lier than 5.8.
+        New features:
+        • Added support for tying to a  package  (or  anything  else)
+        • Added a  ‘tied’  function that returns  the  actual  scalar
+          the tie uses.
+        • Added  fix_tie,  as  a  work-around  for  perl  bug  #68192.
+        Bug fixes:
+        • Tying $@ no longer makes is_tied die.
+        • weak_tie  now returns the same scalar that  holds  the  tie,
+          the way ‘tie’ does.
+
+0.01    5 November, 2007
+        First release

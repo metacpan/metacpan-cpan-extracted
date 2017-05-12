@@ -1,0 +1,62 @@
+=head1 NAME
+
+C<Tickit::Widget::Scroller::Item> - interface for renderable scroller items
+
+=head1 DESCRIPTION
+
+Items added to a C<Tickit::Widget::Scroller> must adhere to the interface
+documented here.
+
+=head1 METHODS
+
+=head2 height_for_width
+
+  $height = $item->height_for_width( $width )
+
+Returns the number of screen lines the item would occupy if rendered to the
+given width. 
+
+=head2 render
+
+  $item->render( $rb, %args )
+
+Renders the item to the given L<Tickit::RenderBuffer>. C<%args> will contain
+the following keys:
+
+=over 8
+
+=item firstline => INT
+
+=item lastline => INT
+
+The (inclusive) bounds of the line numbers to render. If these do not cover
+the entire height of the item, then they imply that clipping will occur; the
+item need draw only the lines indicated.
+
+These are passed for informational purposes. Item implementations are free to
+ignore this if they wish, as clipping will be performed by the RenderBuffer.
+
+=item top => INT
+
+The line of C<$rc> to consider as the top of the item. This is passed for
+legacy purposes and will always be zero. Item implementations are free to
+ignore this value, as it will now be performed using the C<translate> facility
+of the RenderBuffer.
+
+=item width => INT
+
+=item height => INT
+
+The width in columns and the height in lines to render the item. This will
+correspond to the most recent call to C<height_for_width>, and is passed in
+for consistency and convenience of the item's render method. This is given as
+the full dimensions of the item, which may be larger than the subset of lines
+requested by the C<firstline> and C<lastline> parameters.
+
+=back
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

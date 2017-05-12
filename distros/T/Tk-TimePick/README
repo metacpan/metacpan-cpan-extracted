@@ -1,0 +1,35 @@
+Tk-TimePick version 0.02
+========================
+
+ Perl extension for a graphical user interface to pick timestrings syntax mistake-secure.
+ The module protect the application for syntax-mistakes,
+ made by users, while insert time specifications.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+
+COPYRIGHT AND LICENCE
+
+ Copyright (C) 2006 by Torsten Knorr
+ torstenknorr@tiscali.de
+ http://www.planet-interkom.de/t.knorr/index.html
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.9.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+

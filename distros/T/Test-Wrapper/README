@@ -1,0 +1,142 @@
+NAME
+    Test::Wrapper - Use Test::* tests outside of a TAP context
+
+VERSION
+    version 0.3.0
+
+SYNOPSIS
+        use Test::Wrapper;
+        use Test::More;
+
+        test_wrap( 'like' );
+
+        # doesn't output anything
+        my $test = like 'foo' => qr/bar/;
+
+        unless ( $test->is_success ) {
+            print "test failed, diag output is: ", $test->diag;
+        }
+
+DESCRIPTION
+    This module for the occasions where a "Test::*" test would be perfect
+    for what you want to do, but the module doesn't provide an helper
+    function that doesn't produce TAP.
+
+    "Test::Wrapper" exports a single function, "test_wrap", in the calling
+    package, which wraps the desired testing functions. After being wrapped,
+    the test functions will not emit TAP anymore, but rather return a
+    "Test::Wrapper" object.
+
+    It must be noted that "Test::Wrapper" only works with test modules
+    inheriting from Test::Builder::Module.
+
+    Finally, "Test::Wrapper" will not mess up the Test::Builder, which means
+    that if you really want, you can use it within a test file. For example,
+    this would work:
+
+        use strict;
+        use warnings;
+
+        use Test::More tests => 1;
+
+        use Test::Differences;
+        use Test::Wrapper;
+
+        test_wrap( 'eq_or_diff' );
+
+        my $test = eq_or_diff "foo", "bar";
+
+        ok $test, "eq_or_diff passed" or diag $test->diag;
+
+EXPORTED METHOD
+  test_wrap( $test | \@tests, %params )
+    Wraps the given test or tests such that, when invoked, they will not
+    emit TAP output but return a "Test::Wrapper" object.
+
+    The parameters the function accepts are:
+
+    prefix
+        If defined, a wrapped function named '$prefix_<original_name>' will
+        be created, and the original test function will be left alone.
+
+            use Test::More;
+            use Test::Wrapper;
+
+            test_wrap( 'like', prefix => 'wrapped_' );
+
+            like "foo" => qr/bar/;   # will emit TAP
+
+                                     # will not emit TAP
+            my $test = wrapped_like( "yadah" => qw/ya/ );
+
+        Note that since the wrapped function will be created post-compile
+        time, its prototype will not be effective, so parenthesis have to be
+        used.
+
+            test_wrap( 'is' );
+            test_wrap( 'like', prefix => 'wrapped' );
+
+                # prototype of the original function makes
+                # it magically work
+            my $t1 = is $foo => $bar; 
+
+                # this, alas, will break
+            my $t2 = like $foo => qr/$baz/;
+
+                # ... so you have to do this instead
+            my $t2 = like( $foo => qr/$baz/ );
+
+Attributes
+  diag
+    Diagnostic message of the test. Will be empty if the test passed. The
+    leading '#' of each line of the raw TAP output are stripped down.
+
+  is_success
+    Is "true" if the test passed, "false" otherwise.
+
+  todo
+    TODO message of the test.
+
+  output
+    TAP result of the test '(*ok 1 - yadah*').
+
+  test_name
+    Name of the wrapped test.
+
+  test_args
+    The list of arguments passed to the test.
+
+OVERLOADING
+  Boolean context
+    In a boolean context, the object will returns the value given by its
+    "is_success" attribute.
+
+        test_wrap( 'like' );
+
+        my $test = like $foo => $bar;
+
+        if ( $test ) {
+            ...
+        }
+
+  Stringify
+    If stringified, the object will return the content of its "diag"
+    attribute.
+
+        print $test unless $test;
+
+        # equivalent to 
+    
+        unless ( $test->is_success ) {
+            print $test->diag;
+        }
+
+AUTHOR
+    Yanick Champoux <yanick@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Yanick Champoux.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

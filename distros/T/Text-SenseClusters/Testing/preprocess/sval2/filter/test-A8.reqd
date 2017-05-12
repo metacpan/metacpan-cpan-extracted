@@ -1,0 +1,61 @@
+<!xml version="1.0">
+<corpus>
+<language ="transliterated Hindi"/>
+<data ="R.K Songs"/>
+<purpose="Testing Amruta's sense_filter program"/>
+<instance id="art.4001">
+<answer instance="art.4001" senseid="art%1:01:00::"/>
+<context>
+meri jaan kuchh bhi kijiye chahe jaan meri lijiye par dil hamiko dijiye :)
+</context>
+</instance>
+<instance id="art.4002">
+<answer instance="art.4002" senseid="art%1:02:00::"/>
+<context>
+yeto kaho kaun ho tum kaun ho tum, mujhse puchhe bina dil me aane lage
+mithi nazaronse bijli girane lage 
+yeto kaho kaun ho tum 2
+</context>
+</instance>
+<instance id="art.4003">
+<answer instance="art.4003" senseid="art%1:01:00::"/>
+<context>
+kaha ho tum jara aawaz do hum yaad karate hai !
+kabhi bharate hai aahe aur kabhi fariyaad karate hai :(
+</context>
+</instance>
+<instance id="art.4004">
+<answer instance="art.4004" senseid="art%1:01:00::"/>
+<context>
+jaha hai aur ab jis haal mai hai hum tumhare hai, tumhi Aabad  ho dilme tumhiko yaad karate hai, kaha hoooooooooo
+</context>
+</instance>
+<instance id="art.4005">
+<answer instance="art.4005" senseid="art%1:02:00::"/>
+<answer instance="art.4001" senseid="art%1:01:00::"/>
+<context>
+ooooooo ho ooo mujhe kisise pyar ho gaya 2
+pyar ho gaya dil bekrar ho gaya bekrara ho gaya 
+ooooooo ho ooo mujhe kisise pyar ho gaya :)
+</context>
+</instance>
+<instance id="art.4007">
+<answer instance="art.4007" senseid="art%1:04:00::"/>
+<context>
+dilne ye kya kiya ho salone piya mora dhadake jiya ooooooo
+</context>
+</instance>
+<instance id="art.4008">
+<answer instance="art.4008" senseid="art%1:02:00::"/>
+<context>
+aankho aankho me karake ishare kisne dilse kaha hum tumhare
+</context>
+</instance>
+<instance id="art.40010">
+<answer instance="art.40010" senseid="art%1:06:00::"/>
+<context>
+buddha mil gaya main kya karu raam mujhe budhha mil gaya :(
+</context>
+</instance>
+</corpus>
+</xml>

@@ -1,0 +1,19 @@
+---
+name: Tie-Hash-FixedKeys
+version: 1.12
+author:
+  - 'Dave Cross <dave@mag-sol.com>'
+abstract: Perl extension for hashes with fixed keys
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.6.0
+provides:
+  Tie::Hash::FixedKeys:
+    file: lib/Tie/Hash/FixedKeys.pm
+    version: 19
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

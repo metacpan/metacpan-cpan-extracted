@@ -1,0 +1,31 @@
+---
+abstract: 'Simple test harness of mod_perl handler'
+author:
+  - 'KATO Kazuyoshi <kzys@8-p.info>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Apache2
+no_index:
+  directory:
+    - inc
+    - t
+  package:
+    - Apache2::ServerUtil
+requires:
+  Class::Accessor::Fast: 0
+  IO::Scalar: 0
+  mod_perl2: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://bitbucket.org/kzys/test-apache2
+version: 0.05

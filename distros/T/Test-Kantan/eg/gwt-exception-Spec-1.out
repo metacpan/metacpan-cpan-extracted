@@ -1,0 +1,21 @@
+
+
+
+  Feature Foo
+
+    Scenario bar
+       Then baz
+
+
+
+  (Diagnostic message):
+
+    Feature Foo
+      Scenario bar:
+
+      ☠
+      Died at eg/gwt-exception.t line 9.
+
+
+not ok
+1..1

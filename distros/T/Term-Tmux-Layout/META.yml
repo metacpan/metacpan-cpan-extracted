@@ -1,0 +1,31 @@
+---
+abstract: 'Create tmux layout strings programmatically'
+author:
+  - 'Joel Maslak <jmaslak@antelope.net>'
+build_requires:
+  Cwd: '0'
+  File::Spec: '0'
+  IO::Socket::IP: '0'
+  Test::More: '0'
+  Time::Out: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Tmux-Layout
+requires:
+  Carp: '0'
+  Moose: '0'
+  autodie: '0'
+  namespace::autoclean: '0'
+  perl: v5.8.0
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/jmaslak/Term-Tmux-Layout.git
+version: '1.004'

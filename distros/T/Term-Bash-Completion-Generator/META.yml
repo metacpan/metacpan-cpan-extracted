@@ -1,0 +1,28 @@
+---
+name: Term-Bash-Completion-Generator
+version: 0.02.8
+author:
+  - 'Nadim ibn hamouda el Khemir. <nkh@cpan.org>'
+abstract: Generate bash completion scripts
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IO::Select: 0
+  Readonly: 0
+  Sub::Exporter: 0
+  Tree::Trie: 0
+build_requires:
+  Test::Block: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Warn: 0
+  Text::Diff: 0
+provides:
+  Term::Bash::Completion::Generator:
+    file: lib/Term/Bash/Completion/Generator.pm
+    version: 0.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,17 @@
+=head1 NAME
+
+Text::TreeFiles::internals - implementation details
+
+=head1 SYNOPSIS
+
+  use Text::TreeFile;
+
+  sub _loadtree;
+  sub _readspec;
+
+=head1 DESCRIPTION
+
+  (Nothing written, yet.)
+
+=cut
+

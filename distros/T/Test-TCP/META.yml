@@ -1,0 +1,77 @@
+---
+abstract: 'testing TCP program'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Socket: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-TCP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::EmptyPort:
+    file: lib/Net/EmptyPort.pm
+  Test::TCP:
+    file: lib/Test/TCP.pm
+    version: '2.18'
+  Test::TCP::CheckPort:
+    file: lib/Test/TCP/CheckPort.pm
+requires:
+  IO::Socket::INET: '0'
+  IO::Socket::IP: '0'
+  Test::More: '0'
+  Test::SharedFork: '0.29'
+  Time::HiRes: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Test-TCP/issues
+  homepage: https://github.com/tokuhirom/Test-TCP
+  repository: git://github.com/tokuhirom/Test-TCP.git
+version: '2.18'
+x_contributors:
+  - 'tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'mattn <mattn@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'
+  - '奥 一穂 <kazuho@EM114-48-138-123.pool.e-mobile.ne.jp>'
+  - 'gfx <gfuji@cpan.org>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Thomas Klausner <domm@plix.at>'
+  - 'Brendan Byrd <Perl@ResonatorSoft.org>'
+  - 'Ivan Baidakou <dmol@gmx.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Pavel Shaydo <zwon@cpan.org>'
+  - 'Petr Písař <ppisar@redhat.com>'
+  - 'Bartosz Jakubski <b.jakubski@gmail.com>'
+  - 'Kazuho Oku <kazuhooku@gmail.com>'
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Chad Granum <exodist7@gmail.com>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'David Precious <davidp@preshweb.co.uk>'
+  - 'Alex Vandiver <alex@chmrr.net>'
+  - 'richard.leach <richard.leach@nccgroup.com>'
+  - 'openstrike <git@openstrike.co.uk>'
+  - 'Pete Houston <githubdevteam@openstrike.co.uk>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Ichito Nagata <i.nagata110@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

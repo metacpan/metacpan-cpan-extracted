@@ -1,0 +1,8 @@
+~$
+\bblib\b
+^.$
+tmon\.out
+\b(Makefile|pm_to_blib)$
+%$
+\.(bak|old|gz)$
+\.gif$

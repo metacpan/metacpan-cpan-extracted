@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 392329b0d7edc91e2a32c36838c8deb5d71c9daf Build.PL
+SHA1 e119796a1ac5b501e13a323ca937eb6cc546bb97 Changes
+SHA1 42bfa2baa4f33f7d8f96b03797e6e17c08839097 LICENSE
+SHA1 cb390d9b49099c45e5d48fe601451170f415f6cf MANIFEST
+SHA1 a1dbf257177f9f76372ac111f127bc34f4f3fb24 MANIFEST.SKIP
+SHA1 6c0ff0c3f069f1589a99e4f4d98dd07b3b3e56bd META.yml
+SHA1 35e590853ef1ed1b0ddd80b1ea0794fc9b9cc8e6 Makefile.PL
+SHA1 11b86407b6dfa8f24f7b9ee6eeff8d4ff3f98e2b README
+SHA1 66e3d54411e76be7873521a9a6b8c04b0f3ff210 eg/mock_io_file.pl
+SHA1 95eaa633437d3257b2cdb9f2e963efa7d8c3194d eg/mock_meta_io_file.pl
+SHA1 947aba5194e94a211724687c9ed019d03153829d lib/Test/Mock/Class.pm
+SHA1 8ea4d7719cd0de98baae908c936f3f54abb6f63d lib/Test/Mock/Class/Role/Meta/Class.pm
+SHA1 7c19a5dc0b79582112848da0d174159b1f2d3003 lib/Test/Mock/Class/Role/Object.pm
+SHA1 c21578f4a722dbe8e302a27deaaa2ce5f68c5f9b t/all_tests.t
+SHA1 7fd6e2397259525641d03b6c8199b4e4c0e2dda7 t/test.pl
+SHA1 1e3890a38366ea03077f0e7e04161002bc6d1a01 t/tlib/Test/Mock/Class/APITest.pm
+SHA1 5fdd41703fca52c53e3f73f8cac8ab5e5b5ff470 t/tlib/Test/Mock/Class/ExampleTest.pm
+SHA1 c8f82cca00e17a1f76ce4c02dbc57fa6d9b3316f t/tlib/Test/Mock/Class/ExpectationsTest.pm
+SHA1 f8da1f8cd6ddfa3d752859971cd6959c08307d19 t/tlib/Test/Mock/Class/ExpectationsThatPassTest.pm
+SHA1 1e0e5183c31141391b05d01280138ed29031a616 t/tlib/Test/Mock/Class/GenerateAnonTest.pm
+SHA1 c0fcc1d7cd44241942d890630ff7a418b5ef55c8 t/tlib/Test/Mock/Class/GenerateAnonWithRoleTest.pm
+SHA1 e3bf15cac0f16b8ab7b8b5a55b01211dadfb4284 t/tlib/Test/Mock/Class/GenerateTest.pm
+SHA1 82a453f3b7e77ddf2911f89cd8c1f9ee35dd8e9a t/tlib/Test/Mock/Class/MockBaseTestRole.pm
+SHA1 d67813c6e4598a7acda60aae1d850fc6fe3132e6 t/tlib/Test/Mock/Class/MockTallyTestRole.pm
+SHA1 fc05fa925f2b5470ebaa44a0fffc59adccd6bf30 t/tlib/Test/Mock/Class/MockTestRole.pm
+SHA1 dfa515a34bccca19597aa8038f2542836b90c325 t/tlib/Test/Mock/Class/ReturnTest.pm
+SHA1 43eeb6e48add958ddae1b65969ab01741f19bcb0 t/tlib/Test/Mock/Class/Role/Meta/Class/APITest.pm
+SHA1 9080b06bfe188577c32a55f1786e811855f5eb7f t/tlib/Test/Mock/Class/Role/Object/APITest.pm
+SHA1 f52b271841a40395e5b511dfb7569c8a5bcbaa71 t/tlib/Test/Mock/Class/RoleTestRole.pm
+SHA1 8285c7759807f4bf8dad83f291b7b888ab83fb7b t/tlib/Test/Mock/Class/Test/Dummy.pm
+SHA1 0579aa28e795dd77552f21fd624527277ff909ff t/tlib/Test/Mock/Class/ThrowingTest.pm
+SHA1 1a773556eecd66165fee5ca25d393e22c8a30b03 t/tlib/Test/Mock/Class/UseTest.pm
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 a56d0c02b6c992e04a77d13a6ee89504bd718572 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 bc3447b88eb7e052140f312924a21f366d525131 xt/perlcriticrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod.t
+SHA1 775b3ac02805b6d703614f42608732fb43af2a41 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 be1a1ead98fcc947138ebfa31f198bbeb786da43 xt/pod_spellrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod_syntax.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkvcLRcACgkQhMHHe8CxClumYwCfRk2t/ERnMYm4evoEKRiAQhSv
+HbUAn3T5specNWgtCVkkrRwxLhQ8aY5l
+=iFaU
+-----END PGP SIGNATURE-----

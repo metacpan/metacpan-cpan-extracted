@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+  <head>
+    <meta name="dtb:uid" content="urn:uuid:very-unique-identifier" />
+    <meta name="dtb:depth" content="2" />
+    <meta name="dtb:totalPageCount" content="0" />
+    <meta name="dtb:maxPageNumber" content="0" />
+    <meta name="cover" content="cover-image" />
+  </head>
+  <docTitle>
+    <text>Title</text>
+  </docTitle>
+<navMap>
+    <navPoint id="titlepage">
+      <navLabel><text>Title</text></navLabel>
+      <content src="index.xhtml" />
+    </navPoint>
+    <navPoint id="body-1-0.xhtml">
+      <navLabel><text>1. Part1</text></navLabel>
+      <content src="body-1-0.xhtml" />
+      <navPoint id="body-1-1.xhtml">
+        <navLabel><text>1. Chap1</text></navLabel>
+        <content src="body-1-1.xhtml" />
+      </navPoint>
+      <navPoint id="body-1-2.xhtml">
+        <navLabel><text>2. Chap2</text></navLabel>
+        <content src="body-1-2.xhtml" />
+        <navPoint id="body-1-2.xhtml#s1-0">
+          <navLabel><text>2.1. Section1</text></navLabel>
+          <content src="body-1-2.xhtml#s1-0" />
+        </navPoint>
+        <navPoint id="body-1-2.xhtml#s2-0">
+          <navLabel><text>2.2. Section2</text></navLabel>
+          <content src="body-1-2.xhtml#s2-0" />
+          <navPoint id="body-1-2.xhtml#s2-1">
+            <navLabel><text>2.2.1. Subsection1</text></navLabel>
+            <content src="body-1-2.xhtml#s2-1" />
+          </navPoint>
+        </navPoint>
+      </navPoint>
+    </navPoint>
+    <navPoint id="body-2-2.xhtml">
+      <navLabel><text>2. Part2</text></navLabel>
+      <content src="body-2-2.xhtml" />
+      <navPoint id="body-2-3.xhtml">
+        <navLabel><text>3. Chap3</text></navLabel>
+        <content src="body-2-3.xhtml" />
+      </navPoint>
+    </navPoint>
+</navMap>
+</ncx>

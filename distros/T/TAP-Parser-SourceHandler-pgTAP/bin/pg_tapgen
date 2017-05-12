@@ -1,0 +1,649 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use DBI;
+use DBD::Pg;
+use Getopt::Long;
+use File::Spec;
+our $VERSION = '3.33';
+
+Getopt::Long::Configure (qw(bundling));
+
+my $opts = { psql => 'psql', directory => '.', create_extension => 1 };
+my $total_tests = 0;
+
+Getopt::Long::GetOptions(
+    'dbname|d=s'          => \$opts->{dbname},
+    'username|U=s'        => \$opts->{username},
+    'host|h=s'            => \$opts->{host},
+    'port|p=s'            => \$opts->{port},
+    'exclude-schema|N=s@' => \$opts->{exclude_schema},
+    'directory|dir=s'     => \$opts->{directory},
+    'create-extension|c!' => \$opts->{create_extension},
+    'verbose|v+'          => \$opts->{verbose},
+    'help|H'              => \$opts->{help},
+    'man|m'               => \$opts->{man},
+    'version|V'           => \$opts->{version},
+) or require Pod::Usage && Pod::Usage::pod2usage(2);
+
+if ( $opts->{help} or $opts->{man} ) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(
+        '-sections' => $opts->{man} ? '.+' : '(?i:(Usage|Options))',
+        '-verbose'  => 99,
+        '-exitval' => 0,
+    )
+}
+
+if ($opts->{version}) {
+    print 'pg_prove ', main->VERSION, "\n";
+    exit;
+}
+
+# Function to write a test script.
+sub script(&;$) {
+    my ($code, $fn) = @_;
+    my $file = File::Spec->catfile($opts->{directory}, $fn);
+    my $orig_fh = select;
+
+    my $output;
+    open my $str_fh, '>:encoding(UTF-8)', \$output;
+    select $str_fh;
+    my $saved_total_tests = $total_tests;
+    $total_tests = 0;
+    $code->();
+    close $str_fh;
+
+    open my $fh, '>:encoding(UTF-8)', $file or die "Cannot open $file: $!\n";
+    select $fh;
+    print "SET client_encoding = 'UTF-8';\n";
+    if ($opts->{create_extension}) {
+        print "SET client_min_messages = warning;\n",
+            "CREATE EXTENSION IF NOT EXISTS pgtap;\n",
+            "RESET client_min_messages;\n\n";
+    }
+    print "BEGIN;\n",
+          "SELECT plan($total_tests);\n\n",
+          $output,
+          "SELECT * FROM finish();\nROLLBACK;\n",
+;
+    close $fh or die "Error closing $file: $!\n";
+    select $orig_fh;
+    $total_tests = $saved_total_tests;
+}
+
+my @conn;
+for (qw(host port dbname)) {
+    push @conn, "$_=$opts->{$_}" if defined $opts->{$_};
+}
+my $dsn = 'dbi:Pg:';
+$dsn .= join ';', @conn if @conn;
+
+my $dbh = DBI->connect($dsn, $opts->{username}, $ENV{PGPASSWORD}, {
+    RaiseError     => 1,
+    PrintError     => 0,
+    AutoCommit     => 1,
+    pg_enable_utf8 => 1,
+});
+$dbh->do(q{SET client_encoding = 'UTF-8'});
+
+##############################################################################
+
+script {
+    if (my @schemas = get_schemas($opts->{exclude_schema})) {
+        schemas_are(\@schemas);
+        for my $schema (@schemas) {
+            tables_are($schema);
+            foreign_tables_are($schema);
+            views_are($schema);
+            materialized_views_are($schema);
+            sequences_are($schema);
+            functions_are($schema);
+            enums_are($schema);
+            extensions_are($schema);
+        }
+    }
+} 'schema.sql';
+
+##############################################################################
+
+sub get_schemas {
+    my @exclude = ('information_schema');
+    push @exclude, @{ $_[0] } if $_[0] && @{ $_[0] };
+
+    my $sth = $dbh->prepare_cached(q{
+        SELECT nspname
+          FROM pg_catalog.pg_namespace
+         WHERE nspname NOT LIKE 'pg_%'
+           AND nspname <> ALL(?)
+         ORDER BY nspname
+    });
+
+    my $schemas = $dbh->selectcol_arrayref($sth, undef, \@exclude) or return;
+    return @$schemas;
+}
+
+sub schemas_are {
+    my $schemas = shift;
+    return unless @$schemas;
+    my @schemas = @$schemas;
+    no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+    unless ('public' ~~ @schemas ) {
+        push @schemas, 'public';
+    }
+    print "SELECT schemas_are(ARRAY[\n    '",
+        join("',\n    '", @schemas),
+        "'\n]);\n\n";
+    $total_tests++;
+    schema_owners($schemas);
+}
+sub schema_owners {
+    my $schemas = shift;
+    return unless @$schemas;
+    foreach my $schema ( @$schemas )  {
+      my $owner = $dbh->selectcol_arrayref(q{
+         SELECT pg_catalog.pg_get_userbyid(nspowner)
+         FROM pg_catalog.pg_namespace
+         WHERE nspname = ?;
+      }, undef, $schema)->[0];
+      print "SELECT schema_owner_is('$schema','$owner');\n";
+      $total_tests++;
+    }
+}
+sub get_rels {
+    my $sth = $dbh->prepare_cached(q{
+        SELECT c.relname
+          FROM pg_catalog.pg_namespace n
+          JOIN pg_catalog.pg_class c ON n.oid = c.relnamespace
+         WHERE c.relkind = ?
+           AND n.nspname = ?
+         ORDER BY c.relname
+    });
+    return $dbh->selectcol_arrayref($sth, undef, @_);
+}
+
+sub tables_are {
+    my $schema = shift;
+    my $tables = get_rels(r => $schema);
+    return unless $tables && @{ $tables };
+    print "SELECT tables_are('$schema', ARRAY[\n    '",
+        join("',\n    '", @$tables),
+        "'\n]);\n\n";
+    $total_tests++;
+
+    for my $table (@{ $tables }) {
+      my $owner = relation_owner($schema, $table);
+      print "SELECT table_owner_is('$schema','$table','$owner','$schema.$table owner is $owner');\n";
+      $total_tests++;
+    }
+
+    for my $table (@{ $tables }) {
+        script { has_table($schema, $table) } "table_$schema.$table.sql";
+    }
+}
+
+sub views_are {
+    my $schema = shift;
+    my $tables = get_rels(v => $schema);
+    return unless $tables && @$tables;
+    print "SELECT views_are('$schema', ARRAY[\n    '",
+        join("',\n    '", @$tables),
+        "'\n]);\n\n";
+    $total_tests++;
+
+    for my $table (@{ $tables }) {
+      my $owner = relation_owner($schema, $table);
+      print "SELECT view_owner_is('$schema','$table','$owner', '$schema.$table owner is $owner');\n";
+      $total_tests++;
+    }
+}
+
+sub foreign_tables_are {
+    my $schema = shift;
+    my $tables = get_rels(f => $schema);
+    return unless $tables && @{ $tables };
+    print "SELECT foreign_tables_are('$schema', ARRAY[\n    '",
+        join("',\n    '", @$tables),
+        "'\n]);\n\n";
+    $total_tests++;
+    for my $table (@{ $tables }) {
+      my $owner = relation_owner($schema, $table);
+      print "SELECT foreign_table_owner_is('$schema','$table','$owner', '$schema.$table owner is $owner');\n";
+      $total_tests++;
+    }
+
+    for my $table (@{ $tables }) {
+        script { has_foreign_table($schema, $table) } "foreign_table_$schema.$table.sql";
+    }
+}
+
+sub materialized_views_are {
+    my $schema = shift;
+    my $tables = get_rels(m => $schema);
+    return unless $tables && @$tables;
+    print "SELECT materialized_views_are('$schema', ARRAY[\n    '",
+        join("',\n    '", @$tables),
+        "'\n]);\n\n";
+    $total_tests++;
+    for my $table (@{ $tables }) {
+      my $owner = relation_owner($schema, $table);
+      print "SELECT materialized_view_owner_is('$schema','$table','$owner','$schema.$table owner is $owner');\n";
+      $total_tests++;
+    }
+}
+
+sub sequences_are {
+    my $schema = shift;
+    my $tables = get_rels(S => $schema);
+    return unless $tables && @$tables;
+    print "SELECT sequences_are('$schema', ARRAY[\n    '",
+        join("',\n    '", @$tables),
+        "'\n]);\n\n";
+    $total_tests++;
+    for my $table (@{ $tables }) {
+      my $owner = relation_owner($schema, $table);
+      print "SELECT sequence_owner_is('$schema','$table','$owner','$schema.$table owner is $owner');\n";
+      $total_tests++;
+    }
+}
+
+sub functions_are {
+    my $schema = shift;
+    my $sth = $dbh->prepare(q{
+        SELECT p.proname
+          FROM pg_catalog.pg_proc p
+          JOIN pg_catalog.pg_namespace n ON p.pronamespace = n.oid
+         WHERE n.nspname = ?
+         ORDER BY p.proname
+    });
+    my $funcs = $dbh->selectcol_arrayref($sth, undef, $schema);
+    return unless $funcs && @$funcs;
+    print "SELECT functions_are('$schema', ARRAY[\n    '",
+        join("',\n    '", @$funcs),
+        "'\n]);\n\n";
+    $total_tests++;
+#
+# debating whether to check full function existance and thus full ownership ornot
+#    for my $func (@{ $funcs }) {
+#      my $owner = function_owner($schema, $func);
+#      print "SELECT function_owner_is('$schema','$func','$owner','$schema.$func owner is $owner');\n";
+#      $total_tests++;
+#    }
+}
+
+sub enums_are {
+    my $schema = shift;
+    my $enums = $dbh->selectall_arrayref(q{
+    SELECT e.oid, e.typname
+      FROM pg_catalog.pg_type e
+      JOIN pg_catalog.pg_namespace n ON n.oid = e.typnamespace
+     WHERE e.typtype = 'e'
+       AND n.nspname = ?
+    }, undef, $schema);
+    return unless $enums && @{ $enums };
+    print "SELECT enums_are('$schema', ARRAY[\n    '",
+        join("',\n    '", map { $_->[1] } @{ $enums }),
+    "'\n]);\n\n";
+    $total_tests++;
+
+    for my $enum (@{ $enums }) {
+      my $labels = enum_labels($enum->[0]);
+      print "SELECT enum_has_labels('$schema','$enum->[1]', ARRAY['",
+          join("','", map { $_->[0] } @{ $labels }),
+      "']);\n";
+      $total_tests++;
+    }
+    print "\n";
+}
+
+sub extensions_are {
+    my $schema = shift;
+    my $extensions = $dbh->selectall_arrayref(q{
+        SELECT e.oid, e.extname, e.extversion
+          FROM pg_catalog.pg_extension e
+          JOIN pg_catalog.pg_namespace n ON n.oid = e.extnamespace
+         WHERE n.nspname = ?
+    }, undef, $schema);
+    return unless $extensions && @{ $extensions };
+    print "SELECT extensions_are('$schema', ARRAY[\n    '",
+        join("',\n    '", map { $_->[1] } @{ $extensions }),
+    "'\n]);\n";
+    $total_tests++;
+
+    print "\n";
+}
+
+sub has_foreign_table {
+    my ($schema, $table) = @_;
+    print "SELECT has_foreign_table(
+    '$schema', '$table',
+    'Should have foreign table $schema.$table'
+);\n\n";
+    $total_tests++;
+    has_pk($schema, $table);
+    columns_are($schema, $table);
+}
+
+sub has_table {
+    my ($schema, $table) = @_;
+    print "SELECT has_table(
+    '$schema', '$table',
+    'Should have table $schema.$table'
+);\n\n";
+    $total_tests++;
+    has_pk($schema, $table);
+    columns_are($schema, $table);
+    triggers_are($schema, $table);
+}
+
+sub has_pk {
+    my ($schema, $table) = @_;
+    my $fn = _hasc($schema, $table, 'p') ? 'has_pk' : 'hasnt_pk';
+    print "SELECT $fn(
+    '$schema', '$table',
+    'Table $schema.$table should have a primary key'
+);\n\n";
+    $total_tests++;
+}
+
+sub columns_are {
+    my ($schema, $table) = @_;
+    # print "SET search_path = '$schema';\n";
+    my $cols = $dbh->selectall_arrayref(q{
+        SELECT a.attname AS name
+             , pg_catalog.format_type(a.atttypid, a.atttypmod) AS type
+             , a.attnotnull AS not_null
+             , a.atthasdef  AS has_default
+             , CASE WHEN pg_catalog.pg_get_expr(d.adbin, d.adrelid) LIKE '''%'
+                    THEN pg_catalog.pg_get_expr(d.adbin, d.adrelid)
+                    ELSE quote_literal(pg_catalog.pg_get_expr(d.adbin, d.adrelid))
+               END
+          FROM pg_catalog.pg_namespace n
+          JOIN pg_catalog.pg_class c ON n.oid = c.relnamespace
+          JOIN pg_catalog.pg_attribute a ON c.oid = a.attrelid
+          LEFT JOIN pg_catalog.pg_attrdef d ON a.attrelid = d.adrelid AND a.attnum = d.adnum
+         WHERE n.nspname = ?
+           AND c.relname = ?
+           AND a.attnum > 0
+           AND NOT a.attisdropped
+         ORDER BY a.attnum
+    }, undef, $schema, $table);
+
+    return unless $cols && @{ $cols };
+    print "SELECT columns_are('$schema'::name, '$table'::name, ARRAY[\n    '",
+        join("'::name,\n    '", map { $_->[0] } @{ $cols }),
+        "'::name\n]);\n\n";
+    $total_tests++;
+    for my $col (@{ $cols }) {
+        my $desc = 'Column ' . join('.', @{ $dbh->selectcol_arrayref(
+            'SELECT quote_ident(i) FROM unnest(?::text[]) i',
+            undef, [$schema, $table, $col->[0]],
+        ) });
+        my ($null_fn, $null_desc) = $col->[2]
+            ? ('col_not_null(', 'be NOT NULL')
+            : ('col_is_null( ', 'allow NULL');
+        my ($def_fn, $def_desc) = $col->[3]
+            ? ('col_has_default(  ', '')
+            : ('col_hasnt_default(', ' not ');
+        print "SELECT has_column(       '$schema', '$table', '$col->[0]', '$desc should exist');\n",
+            "SELECT col_type_is(      '$schema', '$table', '$col->[0]', '$col->[1]', '$desc should be type $col->[1]');\n",
+            "SELECT $null_fn     '$schema', '$table', '$col->[0]', '$desc should $null_desc');\n",
+            "SELECT $def_fn'$schema', '$table', '$col->[0]', '$desc should${def_desc} have a default');\n";
+        $total_tests = $total_tests + 4;
+        if ($col->[3]) {
+            print "SELECT col_default_is(   '$schema', '$table', '$col->[0]', $col->[4], '$desc default is');\n";
+            $total_tests++ ;
+        }
+        print "\n";
+    }
+
+}
+
+sub triggers_are {
+    my ($schema, $table) = @_;
+    my $triggers = $dbh->selectall_arrayref(q{
+    SELECT t.tgname, ni.nspname, p.proname
+      FROM pg_catalog.pg_trigger t
+      JOIN pg_catalog.pg_class ct     ON ct.oid = t.tgrelid
+      JOIN pg_catalog.pg_namespace nt ON nt.oid = ct.relnamespace
+      JOIN pg_catalog.pg_proc p       ON p.oid = t.tgfoid
+      JOIN pg_catalog.pg_namespace ni ON ni.oid = p.pronamespace
+     WHERE nt.nspname = ?
+       AND ct.relname = ?
+       AND NOT t.tgisinternal
+    }, undef, $schema, $table);
+
+    return unless $triggers && @{ $triggers };
+    print "SELECT triggers_are('$schema', '$table', ARRAY[\n    '",
+        join("',\n    '", map { $_->[0] } @{ $triggers }),
+        "'\n]);\n\n";
+    $total_tests++;
+
+    for my $trigger (@{ $triggers }) {
+        print "SELECT has_trigger( '$schema', '$table', '$trigger->[0]'::name);\n",
+              "SELECT trigger_is(  '$schema', '$table', '$trigger->[0]', '$trigger->[1]', '$trigger->[2]');\n";
+        $total_tests = $total_tests + 2;
+    }
+
+    print "\n";
+}
+
+sub _hasc {
+    my $sth = $dbh->prepare_cached(q{
+        SELECT EXISTS(
+            SELECT true
+              FROM pg_catalog.pg_namespace n
+              JOIN pg_catalog.pg_class c      ON c.relnamespace = n.oid
+              JOIN pg_catalog.pg_constraint x ON c.oid = x.conrelid
+             WHERE c.relhaspkey = true
+               AND n.nspname = ?
+               AND c.relname = ?
+               AND x.contype = ?
+        )
+    });
+    return $dbh->selectcol_arrayref($sth, undef, @_)->[0];
+}
+
+sub relation_owner {
+    my $sth = $dbh->prepare_cached(q{
+      SELECT pg_catalog.pg_get_userbyid(c.relowner)
+        FROM pg_catalog.pg_class c
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = ?
+       AND c.relname =  ?
+    });
+    return $dbh->selectcol_arrayref($sth, undef, @_)->[0];
+}
+sub function_owner {
+    my $sth = $dbh->prepare_cached(q{
+          SELECT pg_catalog.pg_get_userbyid(p.proowner)
+          FROM pg_catalog.pg_proc p
+          JOIN pg_catalog.pg_namespace n ON p.pronamespace = n.oid
+         WHERE n.nspname =  ?
+         and p.proname =  ?
+    });
+    return $dbh->selectcol_arrayref($sth, undef, @_)->[0];
+}
+
+sub enum_labels {
+    my $sth = $dbh->prepare_cached(q{
+        SELECT enumlabel
+          FROM pg_catalog.pg_enum
+         WHERE enumtypid = ?
+         ORDER BY enumsortorder
+    });
+    return $dbh->selectall_arrayref($sth, undef, @_);
+}
+
+
+__END__
+
+=encoding utf8
+
+=head1 Name
+
+pg_tapgen - Generate schema TAP tests from an existing database
+
+=head1 Usage
+
+  pg_tapgen -d template1 > schema_test.sql
+
+=head1 Description
+
+C<pg_tapgen> is a command-line utility to generate pgTAP tests to validate a
+database schema by reading an existing database and generating the tests to
+match. Its use requires the installation of the L<DBI> and L<DBD::Pg> from
+CPAN or via a package distribution.
+
+B<Warning:> These prerequisites are not validated by the pgTAP C<Makefile>, so
+you'll need to install them yourself. As a result, inclusion of this script in
+the pgTAP distribution is experimental. It may be moved to its own
+distribution in the future.
+
+=head1 Options
+
+  -d --dbname DBNAME        Database to which to connect.
+  -U --username USERNAME    Username with which to connect.
+  -h --host HOST            Host to which to connect.
+  -p --port PORT            Port to which to connect.
+  -v --verbose              Display output of test scripts while running them.
+  -N --exclude-schema       Exclude a schema from the generated tests.
+  -c --create-extension     Include CREATE EXTENSION pgtap statement.
+     --no-create-extension  Excluce CREATE EXTENSION pgtap statement.
+     --directory DIRECTORY  Directory to which to write the test files.
+  -H --help                 Print a usage statement and exit.
+  -m --man                  Print the complete documentation and exit.
+  -V --version              Print the version number and exit.
+
+=head1 Options Details
+
+=over
+
+=item C<-d>
+
+=item C<--dbname>
+
+  pg_tapgen --dbname try
+  pg_tapgen -d postgres
+
+The name of database to which to connect. Defaults to the value of the
+C<$PGDATABASE> environment variable or to the system username.
+
+=item C<-U>
+
+=item C<--username>
+
+  pg_tapgen --username foo
+  pg_tapgen -U postgres
+
+PostgreSQL user name to connect as. Defaults to the value of the C<$PGUSER>
+environment variable or to the operating system name of the user running the
+application. Password can be specified with C<$PGPASSWORD>.
+
+=item C<-h>
+
+=item C<--host>
+
+  pg_tapgen --host pg.example.com
+  pg_tapgen -h dev.local
+
+Specifies the host name of the machine on which the server is running. If the
+value begins with a slash, it is used as the directory for the Unix-domain
+socket. Defaults to the value of the C<$PGHOST> environment variable or
+localhost.
+
+=item C<-p>
+
+=item C<--port>
+
+  pg_tapgen --port 1234
+  pg_tapgen -p 666
+
+Specifies the TCP port or the local Unix-domain socket file extension on which
+the server is listening for connections. Defaults to the value of the
+C<$PGPORT> environment variable or, if not set, to the port specified at
+compile time, usually 5432.
+
+=item C<--dir>
+
+=item C<--directory>
+
+Directory to which to write test files. Defaults to the current directory.
+
+=item C<-c>
+
+=item C<--create-extension>
+
+=item C<--no-create-extension>
+
+  pg_tapgen --create-exension
+  pg_tapgen -c
+  pg_tapgen --no-create-exension
+
+Enable or disable the inclusion of C<CREATE EXTENSION pgtap;> statements in
+the generated test files. Enabled by default.
+
+=item C<-v>
+
+=item C<--verbose>
+
+  pg_tapgen --verbose
+  pg_tapgen -v
+
+Display standard output of test scripts while running them. This behavior can
+also be triggered by setting the C<$TEST_VERBOSE> environment variable to a
+true value.
+
+=item C<-N>
+
+=item C<--exclude-schema>
+
+  pg_tapgen --exclude-schema contrib
+  pg_tapgen -N testing -N temporary
+
+Exclude a schema from the test generation. C<pg_tapgen> always ignores
+C<information_schema>, as it is also ignored by pgTAP. But if there are other
+schemas in the database that you don't need or want to test for in the
+database (because you run the tests on another database without those schemas,
+for example), use C<--exclude-schema> to omit them. May be used more than once
+to exclude more than one schema.
+
+=item C<-H>
+
+=item C<--help>
+
+  pg_tapgen --help
+  pg_tapgen -H
+
+Outputs a brief description of the options supported by C<pg_tapgen> and exits.
+
+=item C<-m>
+
+=item C<--man>
+
+  pg_tapgen --man
+  pg_tapgen -m
+
+Outputs this documentation and exits.
+
+=item C<-V>
+
+=item C<--version>
+
+  pg_tapgen --version
+  pg_tapgen -V
+
+Outputs the program name and version and exits.
+
+=back
+
+=head1 Author
+
+David E. Wheeler <dwheeler@cpan.org>
+
+=head1 Copyright
+
+Copyright (c) 2009-2016 David E. Wheeler. Some Rights Reserved.
+
+=cut

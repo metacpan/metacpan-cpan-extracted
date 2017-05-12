@@ -1,0 +1,44 @@
+Revision history for Term-Chrome
+
+2.00  2016-03-04 01:17:31 CET
+	- Add '!' operator overloading to reverse a chrome:
+           - !Bold means 'unbold',
+           - !Reset is a no-op,
+	   - !Red means 'reset foreground color',
+           - !(Red/Blue) means 'reset foreground and background colors'
+	- Chromizers: after the text, reverse the chrome instead of
+	  applying a full "Reset" of the chrome. This is a BREAKING CHANGE
+	  as the stringification is changing, but it is more DWIM.
+	- Add 'bool' operator overloading. This allows to use '||' to set a
+	  default value:   $chrome ||= Red;
+	  (this was already working without the explicit overloading, except
+	  under Devel::Cover, see t/50-cover-bug.t)
+
+1.013  2016-02-17 21:58:41 CET
+	- Improved doc for ${} and &{} overloading
+	- Test::Synopsis is now an *optional* test dependency
+	- Dédicace spéciale à Andéol !
+
+1.012  2015-11-03 01:00:13 CET
+	- Document a workaround for codulation of constants on perl < 5.21.4
+	  (use a do {} around the constant)
+
+1.011  2015-10-21 09:13:44 CEST
+	- Fix t/12-codulation.t for perl >= 5.21.4
+
+1.010  2015-10-21 01:51:21 CEST
+	- Add &{} overloading ("codulate") to easily wrap some text with color
+	  and Reset. Unfortunately, it is not usable in practice due a core
+	  perl bug < 5.21.4.
+	  This allows to build efficient "chromizers" (closures that colorize
+	  and Reset).
+	- Disable fallbacks for overload.pm, to reduce (dangerous) magic
+	- Remove ->clone method that is useless as Term::Chrome values are
+	  immutables
+
+1.001  2014-08-24 00:43:54 EEST
+	- POD: add SEE ALSO links
+
+1.000  2014-08-23 12:35:33 EEST
+        - Initial release, from Sofia, at YAPC::EU::2014
+	  (Code is mature, extracted from angel-PS1)

@@ -1,0 +1,50 @@
+Term::Visual is a "visual" terminal interface for curses
+applications.  It provides the split-screen interface you may have
+seen in console based IRC and MUD clients.
+
+Term::Visual's interface includes four regions.  From top to bottom:
+
+  A title bar.  Term::Visual supports many terminals, each with its
+  own screen elements, and the title bar is a convenient way to
+  remember which is currently active.
+
+  A large scrolling terminal region.  In network clients, this is
+  where remote output is shown.  Many features are supported, the most
+  notable are colorized text and scrollback.
+
+  A one- or two-line configurable status bar.  Just about anything can
+  be placed here, including the current time, and statistics about the
+  runtime operation of whatever program you write with it.
+
+  A one-line entry bar, with many common editing keystrokes
+  supported. It scrolls horizontally to allow more than just a
+  screen's width of text.
+
+Term::Visual uses the POE networking and multitasking framework to support
+concurrent input from network sockets and the console, multiple
+timers, and more.
+
+Term::Visual is a "visual" terminal because it is display rather than line
+oriented.  It takes up the full screen, provides scrollback features,
+and allows you to edit input in what is essentially a one-line text
+editor.  Similar features make vi the "visual" text editor, and are
+elements of TinyFugue's "visual" mode.
+
+ - http://www.egr.msu.edu/decs/facilities/software/vi.php#Whatis
+ - http://www.muq.org/~hawkeye/tf/help/topics/mode.html
+
+The tarball currently has no tests, but there are sample programs in
+the examples directory.
+
+Term::Visual installs the usual way:
+
+  perl Makefile.PL
+  make
+  make install
+
+The project is managed at SourceForge.  Various support resources are
+available there.  Please see http://sourceforge.net/projects/visterm/
+for more information.
+
+-- Charles Ayres - lunartear@ambientheory.com
+-- Rocco Caputo  - troc@pobox.com - http://poe.perl.org/

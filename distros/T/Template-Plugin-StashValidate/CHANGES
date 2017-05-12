@@ -1,0 +1,7 @@
+0.03  Wed, 27 Jun 2012 06:30:00 +0100
+	- Update stash values if MPV changed values
+	- Use a real undef, rather than Template::Stash's one
+0.02  Wed, 27 Jun 2012 05:37:03 +0100
+    - Fixed deps
+0.01  Mon, 25 Jun 2012 14:38:02 +1100
+    - Initial release

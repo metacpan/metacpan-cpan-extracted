@@ -1,0 +1,59 @@
+#!/usr/bin/env perl ## no critic
+
+use 5.010;
+use lib 'lib';
+use TheEye;
+use Data::Dumper;
+
+# ABSTRACT: the script that runs TheEye
+# PODNAME: bin/TheEye.pod
+our $VERSION = '0.5'; # VERSION
+
+my $testdir = shift || 'share/TheEye/t';
+
+my $mon = TheEye->new(debug=> 1, test_dir => $testdir);
+$mon->debug(1);
+#$mon->load_plugin('Store::RRD');
+#$mon->load_plugin('Store::Collectd');
+#$mon->load_plugin('Store::Riemann');
+#$mon->load_plugin('Graph::RRD');
+$mon->load_plugin('Notify::Oncall');
+$mon->oncall_token('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+#$mon->rrd_dir('rrds/');
+#$mon->img_dir('images/');
+#$mon->prowl_apikeys(['XXXXXXXXXXXXXXXXXXXXXXX']);
+$mon->oncall_host($mon->hostname);
+my $results;
+@{$results} = $mon->run();
+#$mon->save($results);
+#$mon->graph($results);
+#$mon->notify($results);
+
+print Dumper($results);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bin/TheEye.pod - the script that runs TheEye
+
+=head1 VERSION
+
+version 0.5
+
+=head1 AUTHOR
+
+Lenz Gschwendtner <lenz@springtimesoft.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by springtimesoft LTD.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

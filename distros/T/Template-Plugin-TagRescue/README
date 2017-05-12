@@ -1,0 +1,37 @@
+NAME
+       Template::Plugin::TagRescue - TT Plugin to escape html
+       tags except for marked
+
+SYNOPSIS
+         [% USE TagRescue %]
+
+         [% FILTER html_except_for('b') -%]
+         <B>Bold!</B> and <I>Italic!</I><BR>
+         [%- END %]
+
+         # Output:
+         # <B>Bold!</B> and &lt;I&gt;Italic!&lt;/I&gt;&lt;BR&gt;
+
+         [% '<B>Bold!</B> and <I>Italic!</I><BR>' | html_except_for('i','br') %]
+
+         # Output:
+         # &lt;B&gt;Bold!&lt;/B&gt; and <I>Italic!</I><BR>
+
+         [% taglist = ['b', 'br']; '<B>Bold!</B> and <I>Italic!</I><BR>' | html_except_for(taglist) %]
+
+         # Output:
+         # <B>Bold!</B> and &lt;I&gt;Italic!&lt;/I&gt;<BR>
+
+DESCRIPTION
+       Template::Plugin::TagRescue is a plugin for TT, which
+       allows you to escape html tags except for ones you set in
+       templates.
+
+AUTHOR
+       Satoshi Tanimoto <tanimoto@edge.co.jp>
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+       the Template manpage

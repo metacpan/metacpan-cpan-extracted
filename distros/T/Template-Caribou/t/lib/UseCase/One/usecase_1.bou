@@ -1,0 +1,39 @@
+sub {
+html {
+    head {
+        title { say 'YarnLine' };
+    };
+    body {
+        h1 { 'Yarnline' };
+
+p { qq{
+    Welcome to Yarline, a little mashup that takes your (or anybody else's) projects on Ravelry and 
+    show them to you as a timeline looking like this:
+} };
+
+div {
+    attr align => 'center';
+};
+
+p { print qq{ How to use it? Dirt simple: click on the ' };
+    i{ 'authenticate' };  
+    print qq{ button below, confirms that you'll allow this app to do its thing (we're only peeking
+in project lists and not doing anything else, I swear) and... voilà. To
+look at the timeline of anybody else but you, put their ravelry username in 
+the top-right box and click on '};
+    i{'generate'};
+    print qq{'.};
+};
+
+p { "Happy Yarlining!" };
+
+div { 
+    attr align => 'center';
+    form {
+        attr method => 'GET', action => '/auth';
+    };
+};
+
+};
+}
+}

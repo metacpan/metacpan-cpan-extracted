@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<annotation xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head>
+    <schema href="example2_schema.xml"/>
+  </head>
+  <meta>
+    <annotator>John Smith</annotator>
+    <datetime>Sun May 1 18:56:55 2005</datetime>
+  </meta>
+  <nt label="S">
+    <nt label="NP">
+      <form>John</form>
+    </nt>
+    <nt label="VP">
+      <form>loves</form>
+      <nt label="NP">
+        <form>Mary</form>
+      </nt>
+    </nt>
+  </nt>
+  <nt label="S">
+    <nt label="NP">
+      <form>He</form>
+    </nt>
+    <nt label="VP">
+      <form>told</form>
+      <nt label="NP"><form>her</form></nt>
+      <nt label="ADVP"><form>this Friday</form></nt>
+    </nt>
+  </nt>
+</annotation>

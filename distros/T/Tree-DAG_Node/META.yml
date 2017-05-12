@@ -1,0 +1,31 @@
+---
+abstract: 'An N-ary tree'
+author:
+  - 'Sean M. Burke <sburke@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '3.4'
+  File::Temp: '0.19'
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tree-DAG_Node
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Slurp::Tiny: '0.003'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/Tree-DAG_Node.git
+version: '1.29'
+

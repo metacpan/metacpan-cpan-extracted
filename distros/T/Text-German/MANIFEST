@@ -1,0 +1,16 @@
+German.pod
+MANIFEST
+Makefile.PL
+README
+lib/Text/German.pm
+lib/Text/German/Adjektiv.pm
+lib/Text/German/Ausnahme.pm
+lib/Text/German/Cache.pm
+lib/Text/German/Endung.pm
+lib/Text/German/Regel.pm
+lib/Text/German/Util.pm
+lib/Text/German/Verb.pm
+lib/Text/German/Vorsilbe.pm
+t/basic.t
+t/cache.t
+META.yml                                 Module meta-data (added by MakeMaker)

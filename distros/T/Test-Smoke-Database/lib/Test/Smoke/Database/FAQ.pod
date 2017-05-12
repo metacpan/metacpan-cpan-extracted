@@ -1,0 +1,72 @@
+=head1 NAME
+
+FAQ about smoke database
+
+=head1 SYNOPSIS
+
+    lynx http://cpanplus.keradel.com/cgi-bin/smoke_db.cgi
+
+=head1 FAQ
+
+=over 4
+
+=item B<What is it?>
+
+An application that parses smoke-reports for perl-current and puts the
+results in a database.
+
+=item B<Why is it?>
+
+This allows for a simple overview of the build status on as wide a
+variety of supported platforms (operating system/architecture) as possible.
+
+=item B<Where do the reports come from?>
+
+From: 
+
+  nttp://nntp.perl.org/perl.daily-build.reports
+
+Which is basically a mirror of the C<smokers-reports@perl.org>
+mailing list.
+
+=item B<How long before one can see a report in this database that appears on the newsgroup?>
+
+12 hours maximum.
+
+=item B<How does one submit reports?>
+
+Use Test-Smoke available on CPAN:
+
+  http://search.cpan.org/author/ABELTJE/Test-Smoke/
+
+=item B<What is Test-Smoke?>
+
+Extract of README: The perl core smoke test suite is a set of simple 
+scripts that try to run the perl core tests on as many configurations as 
+possible and combine that into a easy to parse report.
+
+The perl source tree is refreshed using rsync to the latest level of the
+perl development branch before the smoke tests start.
+
+=item B<How does one use it on a *nix box?>
+
+Read README. Run perl configsmoke.pl.
+
+=item B<How does one use it on a windows box?>
+
+Get rsync(from cygwin). Read <perl_src>/README.win32.
+Choose a compiler from Borland, MinGW, Cygwin or Visual.
+And run perl configsmoke.pl
+
+=item B<Euh... I don't see my report!>
+
+Send me a mail: alian@cpan.org
+
+=back
+
+=head1 AUTHOR
+
+These FAQ were written and conceived by Alain Barbet <alain@cpan.org>
+with some help from Abe Timmerman <abeltje@cpan.org>
+
+=cut

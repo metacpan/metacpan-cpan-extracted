@@ -1,0 +1,33 @@
+
+				  Tie::Watch
+
+	An object oriented interface to the Perl builtin tie(), that allows
+a watchpoint to be placed on any Perl variable.  A watchpoint is simply a
+callback (subroutine) that is invoked when a variable is accessed.
+
+	The callback can do various things:
+
+ . alter a variable's value
+ . prevent a variable's value from being changed
+ . invoke a Perl/Tk callback when a variable changes
+ . trace references to a variable
+
+Do:
+
+   perl Makefile.PL
+   make test
+   make install
+
+You may find the programs in the .../examples directory interesting.
+
+This version supports tied arrays and REQUIRES Perl 5.004_57 or
+higher.  Also, the old Delete() method has been renamed Unwatch()
+since it conflicted with the builtin delete() function.
+
+BUGS:  not aware of any.
+
+Steve Lidie
+sol0@Lehigh.EDU
+
+1999/04/04
+2005/05/16

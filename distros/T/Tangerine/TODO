@@ -1,0 +1,15 @@
+Something to work on:
+
+Features:
+
+* Parse EXPR form of eval
+* A new Tangerine method to report required perl version
+* Allow users to specify additional hooks to run
+* Consider adding some handy CPAN::Meta* support
+* Consider adding support for inc::Module::Install,
+  e.g. create mapping between Module::Install subs and
+  the modules providing them
+* Support Prima
+* Support Test::Stream
+* Reconsier how to report optional module loading, such
+  as those performed by Test::Requires and Test::Needs

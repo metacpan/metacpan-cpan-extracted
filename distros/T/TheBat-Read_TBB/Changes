@@ -1,0 +1,8 @@
+Revision history for Perl extension TheBat::Read_TBB.
+
+0.01  Sat Jan  9 12:50:33 UTC 2016
+	- original version
+
+0.02  Sun Jan 10 01:59:24 UTC 2016
+	- Added Write_TBB functionality
+

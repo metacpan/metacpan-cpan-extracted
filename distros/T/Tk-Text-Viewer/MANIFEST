@@ -1,0 +1,14 @@
+Changes
+INSTALL
+MANIFEST			This list of files
+Makefile.PL
+README
+Viewer.pm
+Viewer.pod
+misc/prepare.pl
+html/Viewer.html
+html/docs.css
+scripts/viewer.pl                Demo utility
+t/viewer.t
+t/pl.t
+META.yml                         Module meta-data (added by MakeMaker)

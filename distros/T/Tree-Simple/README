@@ -1,0 +1,42 @@
+Tree-Simple is Copyright (C) 2004-2006 by Infinity Interactive, Inc.
+
+LICENSE INFORMATION
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl 5.10.0.
+
+For more details, see the full text of the licenses at
+http://www.perlfoundation.org/artistic_license_1_0,
+and http://www.gnu.org/licenses/gpl-2.0.html.
+
+See also CHANGES and Changelog.ini.
+
+Warning: WinZip 8.1 and 9.0 both contain an 'accidental' bug which stops
+them recognizing POSIX-style directory structures in valid tar files.
+You are better off using a reliable tool such as InfoZip:
+ftp://ftp.info-zip.org/pub/infozip/
+
+1 Installing from a Unix-like distro
+------------------------------------
+shell>gunzip Tree-Simple-1.23.tgz
+shell>tar mxvf Tree-Simple-1.23.tar
+
+Note: 'make' on MS Windows-like systems may be called 'nmake' or 'dmake'.
+
+shell>perl Makefile.PL
+shell>make
+shell>make test
+shell>su              (for Unix-like systems)
+shell>make install
+shell>exit            (for Unix-like systems)
+
+On all systems:
+
+Run Simple.pm through your favourite pod2html translator.
+
+2 Installing from an ActiveState distro
+---------------------------------------
+shell>unzip Tree-Simple-1.23.zip
+shell>ppm install --location=. Tree-Simple
+shell>del Tree-Simple-1.23.ppd
+shell>del PPM-Tree-Simple-1.23.tar.gz

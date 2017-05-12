@@ -1,0 +1,37 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Releasing all Dependencies from a Job</div>
+
+  <p>
+    When you release all dependencies from a job, you put that job in the
+    'Ready' state.  This causes TaskForest to run the job immediately,
+    regardless of what other jobs it is waiting on, or what its time
+    dependencies are.  To release all dependencies from a job, run the
+    following command:
+  </p>
+
+  <div class="code"><pre><code>release --log_dir=l_d --job=Ff::Jj --family_dir=f_d [--log_date=date]</code></pre></div>
+
+  <p>
+    where <code>l_d</code> is the log directory and <code>Ff</code> is the
+    family name and <code>Jj</code> is the job name and <code>f_d</code>
+    is the family_directory.  The log_date is an optional date in the
+    YYYYMMD format. If specified, that date's data will be used, instead of the
+    current date's.  Dependencies on a job will only be released if the job
+    is in the 'Waiting' state.
+  </p>
+
+  <div class="new_section_header">Releasing all Dependencies on a Job Via the Web Site</div>
+
+  <p>
+    You can use the "Release" button on the 'Status' or 'View Logs' page.
+  </p>
+
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

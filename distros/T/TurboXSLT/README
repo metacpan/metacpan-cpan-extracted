@@ -1,0 +1,6 @@
+TurboXSLT is Perl interface for libturboxsl
+(https://github.com/Litres/turboxsl)
+
+perl Makefile.PL
+make
+make install

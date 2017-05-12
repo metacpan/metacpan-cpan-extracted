@@ -1,0 +1,25 @@
+[% WRAPPER page.tt %]
+  <h2>Module groups</h2>
+
+  [% IF groups.size > 0 %]
+    <table id="modules" class="data">
+    [% FOREACH groups %]
+      [% IF modules.size > 0 %]
+          <thead>
+            <tr><th colspan="2">[% label | html %]</th></tr>
+          </thead>
+          <tbody>
+          [% FOREACH modules %]
+            <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <th><a href="module-[% name | html %].html">[% label | html %]</a></th>
+              <td class="status_[% status %]">[% status %]</td>
+            </tr>
+          [% END %]
+          </tbody>
+      [% END %]
+    [% END %]
+    </table>
+  [% ELSE %]
+    <p>There are no module groups defined</p>
+  [% END %]
+[% END %]

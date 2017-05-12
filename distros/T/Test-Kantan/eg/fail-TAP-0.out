@@ -1,0 +1,18 @@
+
+
+# Feature Foo
+# Feature Foo/Scenario Normal
+# Given An array
+#  When Push one item
+#  Then the number of array is 1
+# Don't show me
+ok 1 - -
+# Feature Foo
+# Feature Foo/Scenario Normal
+# Given An array
+#  When Push one item
+#  Then the number of array is 1
+# Show me
+not ok 2 - Compared $data\n   got : '1'\nexpect : '0'\n
+ok 3 - ok { 1 };
+1..3

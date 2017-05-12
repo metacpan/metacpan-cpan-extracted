@@ -1,0 +1,103 @@
+NetBSD 6.99.24/amd64
+
+Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
+    The NetBSD Foundation, Inc.  All rights reserved.
+Copyright (c) 1982, 1986, 1989, 1991, 1993
+    The Regents of the University of California.  All rights reserved.
+
+Build settings:
+          Build date   Sat Oct 12 15:45:06 UTC 2013
+            Built by   builds@b8.netbsd.org
+
+           BSDOBJDIR = '/usr/obj'
+           BSDSRCDIR = '/usr/src'
+             BUILDID = '201310121430Z'
+             DESTDIR = '/home/builds/ab/HEAD/amd64/201310121430Z-dest'
+          DISTRIBVER = '6.99.24'
+  EXTERNAL_TOOLCHAIN = (undefined)
+            HAVE_GCC = '45'
+            HAVE_GDB = '7'
+     INSTALLWORLDDIR = (undefined)
+         KERNARCHDIR = 'arch/amd64'
+         KERNCONFDIR = '/home/builds/ab/HEAD/src/sys/arch/amd64/conf'
+          KERNOBJDIR = '/home/builds/ab/HEAD/amd64/201310121430Z-obj/home/builds/ab/HEAD/src/sys/arch/amd64/compile'
+          KERNSRCDIR = '/home/builds/ab/HEAD/src/sys'
+             MACHINE = 'amd64'
+        MACHINE_ARCH = 'x86_64'
+                MAKE = '/home/builds/ab/HEAD/amd64/201310121430Z-tools/bin/nbmake'
+            MAKECONF = '/home/builds/etc/make.conf'
+           MAKEFLAGS = ' -d e -m /home/builds/ab/HEAD/src/share/mk -j 11 -J 15,16 .MAKE.LEVEL.ENV=MAKELEVEL HOST_OSTYPE=NetBSD-6.1.0_PATCH-amd64 MKOBJDIRS=yes NOPOSTINSTALL=1 USETOOLS=yes _SRC_TOP_=/home/builds/ab/HEAD/src _SRC_TOP_OBJ_=/home/builds/ab/HEAD/amd64/201310121430Z-obj/home/builds/ab/HEAD/src _THISDIR_=etc/'
+          MAKEOBJDIR = (undefined)
+    MAKEOBJDIRPREFIX = '/home/builds/ab/HEAD/amd64/201310121430Z-obj'
+         MAKEVERBOSE = '0'
+               MKATF = 'yes'
+               MKBFD = (undefined)
+          MKBINUTILS = 'yes'
+          MKCATPAGES = 'no'
+            MKCRYPTO = 'yes'
+        MKCRYPTO_RC5 = 'no'
+               MKCVS = 'yes'
+             MKDEBUG = 'no'
+          MKDEBUGLIB = 'no'
+               MKDOC = 'yes'
+            MKDTRACE = 'no'
+       MKDYNAMICROOT = 'yes'
+               MKGCC = 'yes'
+           MKGCCCMDS = 'yes'
+               MKGDB = 'yes'
+            MKHESIOD = 'yes'
+              MKHTML = 'yes'
+            MKIEEEFP = 'yes'
+             MKINET6 = 'yes'
+              MKINFO = 'yes'
+          MKIPFILTER = 'yes'
+          MKKERBEROS = 'yes'
+              MKKYUA = 'no'
+              MKLDAP = 'yes'
+           MKLINKLIB = 'yes'
+              MKLINT = 'no'
+               MKMAN = 'yes'
+              MKMANZ = 'no'
+              MKMDNS = 'yes'
+               MKNLS = 'yes'
+               MKNPF = 'yes'
+               MKOBJ = 'yes'
+           MKOBJDIRS = 'yes'
+               MKPAM = 'yes'
+                MKPF = 'yes'
+               MKPIC = 'yes'
+        MKPICINSTALL = 'yes'
+            MKPICLIB = 'yes'
+           MKPOSTFIX = 'yes'
+           MKPROFILE = 'yes'
+             MKSHARE = 'yes'
+              MKSKEY = 'yes'
+         MKSOFTFLOAT = 'no'
+         MKSTATICLIB = 'yes'
+          MKUNPRIVED = 'yes'
+            MKUPDATE = 'no'
+               MKX11 = 'yes'
+                MKYP = 'yes'
+          NBUILDJOBS = (undefined)
+        NETBSDSRCDIR = '/home/builds/ab/HEAD/src'
+          NOCLEANDIR = (undefined)
+       NODISTRIBDIRS = (undefined)
+          NOINCLUDES = (undefined)
+          OBJMACHINE = (undefined)
+          RELEASEDIR = '/home/builds/ab/HEAD/amd64/201310121430Z-rlse'
+   RELEASEMACHINEDIR = 'amd64'
+   TOOLCHAIN_MISSING = 'no'
+             TOOLDIR = '/home/builds/ab/HEAD/amd64/201310121430Z-tools'
+          USE_HESIOD = 'yes'
+           USE_INET6 = 'yes'
+        USE_JEMALLOC = 'yes'
+        USE_KERBEROS = 'yes'
+            USE_LDAP = 'yes'
+             USE_PAM = 'yes'
+            USE_SKEY = 'no'
+              USE_YP = 'yes'
+            USETOOLS = 'yes'
+      USR_OBJMACHINE = (undefined)
+           X11SRCDIR = '/home/builds/ab/HEAD/xsrc'
+          X11FLAVOUR = 'Xorg'

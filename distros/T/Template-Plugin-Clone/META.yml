@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Template-Plugin-Clone
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  Template: 2
+  Template::Plugin::VMethods: 2.06
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Template::Plugin::Clone:
+    file: lib/Template/Plugin/Clone.pm
+    version: 0.01
+  Template::Plugin::CloneVMethods:
+    file: lib/Template/Plugin/CloneVMethods.pm
+generated_by: Module::Build version 0.20

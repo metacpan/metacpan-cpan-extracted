@@ -1,0 +1,45 @@
+# $Id: item-ordering.pod 53 2003-03-04 17:41:18Z petdance $
+
+=head1 COPYRIGHT
+
+Copyright 2002, Andy Lester
+
+=cut
+
+# Here's a list with items out of order
+
+=over 4
+
+=item 2 
+
+This is the first prime number
+
+=item 3
+
+This is the second prime number
+
+=item 5
+
+This is the third prime number
+
+=back
+
+=cut
+
+
+# Here's a list with items that can't be
+
+=over 4
+
+Blah blah blah
+
+=item 1
+
+Item One
+
+=item 2
+
+Item 2
+
+=cut
+

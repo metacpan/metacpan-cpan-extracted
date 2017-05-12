@@ -1,0 +1,93 @@
+NAME
+    Tie::FileHandle::Split - Filehandle tie that captures, splits and stores
+    output into files in a given path.
+
+VERSION
+    Version 0.95
+
+DESCRIPTION
+    This module, when tied to a filehandle, will capture and store all that
+    is output to that handle. You should then select a path to store files
+    and a size to split files.
+
+SYNOPSIS
+     # $path should exist or the current process have enough priv. for creation.
+     # $size should be > 0.
+     tie *HANDLE, 'Tie::FileHandle::Split', $path, $size;
+
+     # Register code to listen to file creation
+     (tied *HANDLE)->add_file_creation_listeners( sub {
+            my ( $tied_object, $filename) = @_;
+            print "Created $filename with size: " . -s $filename . "\n";
+     } );
+
+     # Will create int( $many_times_size / $split_size) files of size $split_size.
+     # Will call each listener int( $many_times_size / $split_size) times.
+     # Buffers will hold $many_times_size % $split_size outstanding bytes.
+     (tied *HANDLE)->print( ' ' x $many_times_size );
+
+     # Write all outstanding output from buffers to files.
+     # The last file created can be smaller than split_size
+     (tied *HANDLE)->write_buffers;
+
+     # Get generated filenames to the moment
+     (tied *HANDLE)->get_filenames();
+
+METHODS
+   "write_buffers"
+    "write_buffers" writes all outstanding buffers to files. It is
+    automatically called before destroying the object to ensure all data
+    written to the tied filehandle is written to files. If additional data
+    is written to the filehandle after a call to "write_buffers" a new file
+    will be created. On a standard file split operation it is called after
+    writting all data to the tied file handle ensure the last bit of data is
+    written (in the most common case where data size is not exactly
+    divisible by the split size).
+
+   "get_filenames"
+    "get_filenames" returns a list of the files generates until the moment
+    of the call. It should be used to get the names of files and rename them
+    to the desired filenames. In a standard splitting operation
+    "get_filenames" is called after outputting all data to the filehandle
+    and calling "write_buffers".
+
+   "add_file_creation_listeners"
+    "add_file_creation_listeners" adds methods to the list of listeners of
+    the file creation event. Methods should be code, array, arrayref or any
+    non-recursive structure resulting from them. Since methods are added to
+    a HASH, several elements pointing to the same piece of code will be
+    added only once. Code observing this event is called once per file
+    created of the $split_size size defined in the tie clause. When called
+    the Tie::FileHandle::Split object and the complete path to the newly
+    created file is passed as parameter. The file is of the specified
+    $split_size defined in the tie clause unless generated from a
+    "write_buffers" call, has been closed and an effort has been made for it
+    to sync (untested).
+
+   "remove_file_creation_listeners"
+    "remove_file_creation_listeners" removes a list of methods from the list
+    of listeners of the file creation event. Methods should be code, array,
+    arrayref or any non-recursive structure resulting from them.
+
+   "clear_file_creation_listeners"
+    "clear_file_creation_listeners" removes all methods from the list of
+    listeners of the file creation event.
+
+TODO
+    *   Very untested for anything other than writing to the filehandle.
+
+    *   write_buffers should sync to disk, untested and seeking advice.
+
+BUGS
+    No known bugs. Please report and suggest tests to gbarco@cpan.org.
+
+AUTHORS AND COPYRIGHT
+    Written by Gonzalo Barco based on Tie::FileHandle::Buffer written by
+    Robby Walker ( robwalker@cpan.org ).
+
+    Project repository can be found at
+    https://github.com/gbarco/Tie-FileHandle-Split.
+
+    You may redistribute/modify/etc. this module under the same terms as
+    Perl itself.
+

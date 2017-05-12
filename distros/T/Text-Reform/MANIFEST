@@ -1,0 +1,25 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Text/Reform.pm
+t/00.load.t
+t/reform.t
+Makefile.PL
+demo/demo.pl
+demo/demo_badheader.pl
+demo/demo_cols.pl
+demo/demo_columns.pl
+demo/demo_filler.pl
+demo/demo_footer.pl
+demo/demo_leader1.pl
+demo/demo_locale.pl
+demo/demo_reentrant.pl
+demo/demo_simple.pl
+demo/demo_single.pl
+demo/demo_table.pl
+demo/demo_warnings.pl
+demo/demo_ws.pl
+t/pod.t

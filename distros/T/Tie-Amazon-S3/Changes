@@ -1,0 +1,13 @@
+Revision history for Tie-Amazon-S3
+
+0.02    2007-12-16/15:44 +0800
+        Now implementing FIRSTKEY, NEXTKEY, and SCALAR, fulfilling hash
+        iteration.  Changed the underlying abstraction a bit to use an
+        intermediate hash to hold the bucket keys and coderefs to
+        getting the corresponding values.
+
+0.01    2007-12-12/19:51 +0800
+        First version, featuring much what can be done with hashes.
+        Need to implement FIRSTKEY, NEXTKEY, SCALAR, UNTIE, and possibly
+        DESTROY.
+

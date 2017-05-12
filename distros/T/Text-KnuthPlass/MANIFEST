@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Text/KnuthPlass.pm
+lib/Text/KnuthPlass.xs
+lib/Text/typemap
+ppport.h
+t/00-load.t
+t/01-nodes.t
+t/02-javascript.t
+t/pod-coverage.t
+t/pod.t
+META.yml

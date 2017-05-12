@@ -1,0 +1,12 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="0"
+             tests="1"
+             name="data_tap_skip_nomsg">
+    <testcase name="1"></testcase>
+    <system-out><![CDATA[1..1
+ok 1 # Skip
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

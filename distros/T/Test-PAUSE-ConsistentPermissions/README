@@ -1,0 +1,76 @@
+NAME
+
+    Test::PAUSE::ConsistentPermissions
+
+VERSION
+
+    version 0.003
+
+DESCRIPTION
+
+    This module is designed to check the permissions of this distribution
+    and ensure that they are consistent. This checks that for all the
+    modules in the distribution the owner and comaintainer are the same.
+
+    To perform your own checks in some way other than a simple test look at
+    the Test::PAUSE::ConsistentPermissions::Check module.
+
+    Note that this is different to checking that the current author has
+    permission to upload this module.
+
+        use Test::More;
+        use Test::PAUSE::ConsistentPermissions;
+    
+        all_permissions_consistent 'Test::PAUSE::ConsistentPermissions';
+    
+        done_testing;
+
+    These test will only run if the RELEASE_TESTING environment variable is
+    set, otherwise they will skip.
+
+    Note that missing permissions will not cause a test failure, but if you
+    are in verbose mode a note will be made. This is because when you're
+    doing a release including new files those permissions will indeed not
+    be found.
+
+    The success message will be subtly different when the permissions don't
+    exist for some of the modules you are about to upload.
+
+    For a script to check modules on CPAN see pause-check-distro-perms.
+
+NAME
+
+    Test::PAUSE::ConsistentPermissions - Check your PAUSE permissions are
+    consistent in your distribution.
+
+FUNCTIONS
+
+ all_permissions_consistent
+
+    This needs to be passed the core module name.
+
+SEE ALSO
+
+      * App::PAUSE::CheckPerms
+
+      An application to check if an authors permissions are consistent.
+
+      * Test::PAUSE::Permissions
+
+      This module allows you to ensure that you will be able to upload your
+      module succesfully.
+
+      The test part of this module is heavily based on that module.
+
+AUTHOR
+
+    Colin Newell <colin.newell@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Colin Newell.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

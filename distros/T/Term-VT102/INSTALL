@@ -1,0 +1,12 @@
+To install Term::VT102, simply unpack the distribution archive (something
+like "tar xzvf Term-VT102-x.y.tar.gz" should do it), enter the top-level
+directory, and do:
+
+  perl Makefile.PL
+  make
+  make test           (this step is optional)
+  make install
+
+You should then be able to use the Term::VT102 module in your Perl scripts.
+See the README file for an introduction and do "perldoc Term::VT102" for API
+details.

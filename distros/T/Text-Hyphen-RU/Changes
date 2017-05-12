@@ -1,0 +1,12 @@
+Revision history for Text-Hyphen-RU
+
+0.12 2015-10-05T21:14:11Z
+		- Convert to Minilla
+		- Publish on Github
+		- move to GPLv3
+
+0.11    Mon Dec 15 12:27:36 MSK 2008
+        Require 5.8.
+
+0.1     Thu Dec 11 03:59:44 MSK 2008
+        Hyphenation for Russian based on Alexander Lebedev patterns.

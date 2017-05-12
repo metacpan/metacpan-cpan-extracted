@@ -1,0 +1,119 @@
+[%# vim: set syntax=java: %]
+static String	DEFAULT_PARSER = "org.apache.xerces.parsers.SAXParser";
+ContentHandler	myParent;
+XMLReader	myParser;
+CharArrayWriter contents = new CharArrayWriter();
+
+public $class(XMLReader parser, ContentHandler parent)
+{
+	myParser = parser;
+	myParent = parent;
+	parser.setContentHandler(this);
+}
+
+Parser initParser()
+throws Exception
+{
+	String parser_name = System.getProperty("org.xml.sax.driver");
+	if (parser_name == null) {
+		parser_name = DEFAULT_PARSER;
+	}
+	return (XMLReader)Class.forName(parser_name).newInstance();
+}
+
+public void startElement(String namespace_uri, String local_name,
+String name, Attributes attributes)
+throws SAXException
+{
+// Ignore elements/attributes that are in a namespace.
+	if (!local_name.equals(name)) {
+		return;
+	}
+
+[% FOREACH Java.variables({type => "Composite"}) %]
+	if (name.equals("$name")) {
+		set$capName(new $type(myParser, this)); return; }
+[% END %]
+[% FOREACH Java.variables({type => "CompositeArray"}) %]
+[%      array_type = Java.arrayType(name, value) %]
+	if (name.equals("$name")) {
+		${name}.addElement(new $array_type(myParser, this)); return; }
+[% END %]
+
+	contents.reset();
+
+	for (int i = 0; i < attributes.getLength(); i++) {
+		if (attributes.getLocalName(i)
+		    .equals(attributes.getQName(i))) {
+			set (
+				attributes.getQName(i),
+				attributes.getValue(i)
+			);
+		}
+	}
+} 
+
+public void characters( char[] ch, int start, int length ) 
+throws SAXException {
+	contents.write( ch, start, length );  
+}
+
+public void endElement(String namespace_uri, String local_name,
+		       String name)
+throws SAXException
+{
+	if (name.equals("$tag") && myParent != null) {
+		myParser.setContentHandler(myParent);
+		return;
+	}
+
+	set(name, contents.toString());
+} 
+
+public void put(String name, String value) { set(name, value); }
+public void addElement(String name, String value) { set(name, value); }
+public void set(String name, String value) {
+[% FOREACH Java.variables({type => "Scalar"}) %]
+	if (name.equals("$name")) { set$capName(
+	[% Java.castJavaString("value", type) %]); return; }
+[% END %]
+[% FOREACH Java.variables({type => "ScalarArray"}) %]
+[%	array_type = Java.arrayType(name, value) %]
+	if (name.equals("$name"))
+		{ get$capName().addElement([% Java.castJavaString("value", array_type) %]); return; }
+[% END %]
+}
+
+public void set(InputSource from) 
+throws Exception
+{
+	if (myParser == null) { myParser = initParser(); }
+	myParser.setDocumentHandler(this);
+	myParser.parse(from);
+}
+
+// These are just to fullfill the ContentHandler interface.
+
+public void endDocument() {}
+public void endPrefixMapping(String s1) {}
+public void ignorableWhitespace(char[] ca1, int i1, int i2) {}
+public void processingInstruction(String s1, String s2) {}
+public void setDocumentLocator(org.xml.sax.Locator l) {}
+public void skippedEntity(String s1) {}
+public void startDocument() {}
+public void startPrefixMapping(String s1, String s2) {}
+
+public static void main(String[] argv)
+{
+	try {
+		$class me = new $class();
+		if (argv.length > 0) {
+			me.set(new InputSource(new FileReader(argv[0])));
+		} else {
+			me.set(new InputSource(System.in));
+		}
+		System.out.print(me);
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+}

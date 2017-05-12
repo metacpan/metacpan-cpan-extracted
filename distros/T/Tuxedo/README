@@ -1,0 +1,26 @@
+The documentation on the Tuxedo perl module can be viewed 
+by running perdoc Tuxedo.pm.
+
+To build the Tuxedo module, you must have 
+
+- Tuxedo7.1 or later must be installed.  All my build tests have been
+  with Tuxedo8.0 and Tuxedo8.1.
+
+- a valid tuxedo development license should be in $TUXDIR/udataobj
+
+- $TUXDIR must set in your environment
+
+- $TUXDIR/bin must be in your PATH environment variable
+
+- The same compiler used to build perl must also be in your PATH
+
+- It is also recommended that LANG be set to C, but this is not mandatory.
+
+The steps to build the module are...
+
+1/ perl Makefile.pl
+
+2/ make test
+
+3/ make install
+

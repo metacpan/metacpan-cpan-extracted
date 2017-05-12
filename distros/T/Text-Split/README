@@ -1,0 +1,57 @@
+NAME
+    Text::Split - Text splitting with fine-grained control
+
+VERSION
+    version 0.0013
+
+SYNOPSIS
+        $data = <<_END_
+        # Xyzzy
+        #   --- START 
+            qwerty
+
+                1 2 3 4 5 6
+        8 9 10 The end
+
+        # abcdefghi
+                jklmnop
+        _END_
+
+        $split = Text::Split->new( data => ... )->find( qr/#\s*--- START/ )
+        ( $split, $content ) = $split->find( qr/ The end/, slurp => '[]' )
+
+    $content =
+
+        #   --- START 
+            qwerty
+
+                1 2 3 4 5 6
+        8 9 10 The end
+
+    Alternatively, with
+
+        ( $split, $content ) = $split->find( qr/ The end/, slurp => '()' )
+
+    $content =
+
+            qwerty
+
+                1 2 3 4 5 6
+
+DESCRIPTION
+    With Text::Split, given a split in some text, you can access the text
+    preceding and remaining the split. Consecutive splitting lets you slurp
+    text from between splits (optionally including the text from the splits
+    at either end).
+
+    This distribution is deprecated, and will be renamed to Text::Clip
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

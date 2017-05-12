@@ -1,0 +1,275 @@
+NAME
+    Test::System - Test suite oriented for testing system administration
+    tasks
+
+SYNOPSIS
+        use Test::System;
+
+        my $suite = Test::System->new(
+                format => 'consoletable',
+                nodes => 'example.com',
+                test_groups => '~/code/my/system/tests.yaml'
+                );
+        $suite->runtests;
+
+DESCRIPTION
+    Loads and runs a set of tests for verifying a system administration task
+    before a possible incident happens or after a task is executed.
+
+    Tests can be run as perl scripts and actually in any format TAP::Harness
+    supports.
+
+    Some examples of how Test::System can help you:
+
+    *   Before a deployment probably you want to make sure your systems and
+        configuration files are ready to go. Also you probably want to make
+        sure that if you needed to apply patches to your configuration
+        files, they really got applied (even in a development server or
+        verify directly on production servers). So here Test::System can
+        help you verifying this in the form of a test case. Of course, you
+        write the test case :-)
+
+    *   What about if you have many servers and although you have nagios to
+        verify the speed of the CPU sometimes you need to verify it
+        "on-demand" (perhaps when you get new servers in your datacenter).
+        Here Test::System can help you to verify that these servers are
+        ready to go before even they get connected to nagios or your
+        favorite monitoring tool.
+
+    One of the things you need to keep in mind is that Test::System is NOT a
+    monitoring system. It will let you verify things on demand, things that
+    are repetitive and perhaps you want them to be automated.
+
+Attributes
+    The module offers a list of attributes, some of them are read-only.
+
+    test_groups
+          YAML filename that has a list of available tests. This is not
+          required but can be useful if you want to group tests (like
+          *hardware.yaml*, *net.yaml*, etc). Comes also handy when user does
+          not provide a list of tests to execute, so all the tests listed in
+          this file are executed.
+
+          An example of a YAML file:
+
+              ping:
+                  description: Test the ping and do foo and make bar
+                  code: test/foo.pl
+              cpu:
+                  description: Test the CPU of nodes
+                  code: test/cpu.pl
+
+    available_tests
+          Is a read only attribute that contains a list of all available
+          tests found in the YAML file provided by "test_groups".
+
+    nodes Is an attribute that can be represented as a string (like a
+          hostname) or as a list (where each item will be a node/hostname).
+          This attribute has write access and is where the tests are going
+          to be executed to.
+
+          Another way of setting this value is when "runtests()" is called,
+          a test plan (in the form of a YAML file) can be provided and it
+          can contain the list of nodes to use.
+
+    format
+          A write access string that has the format of how the tests should
+          be presented, please refer to the modules available under
+          Test::System::Output or in your custom factory
+          ("format_factory_class" attribute) class if this is the case.
+
+    available_formats
+          A list of available formats, read only.
+
+    format_factory_class
+          If you want to use your own Factory for creating your output you
+          can set this to your class name (NOT the object).
+
+          Please note that Test::System will continue to use
+          Test::System::Output::Factory, the reason of this is that any
+          factory subclasses should add/register their classes via their
+          parent class. So in this case all your new format classes should
+          be added to Test::System::Output::Factory. For more information
+          please take a look to Class::Factory.
+
+    harness
+          Is (or will be) the harness instance once "runtests" is executed.
+
+    parameters
+          An attribute with write access permission. This attribute will
+          transform all the items of this hash to environment variables.
+
+          The use of this attribute is very handy if you want to provide
+          some additional data for your tests and since the tests are run in
+          separate forks with Test::Harness then the only possible way to
+          keep them is to make them available through the environment (%ENV
+          hash).
+
+          Please be warned that only scalars are stored in environment
+          variables, those that are an array will be converted to CSV values
+          while the rest of the data types will be lost.
+
+          In your tests if you want to use any of these parameters they will
+          be available through the environment variables with a prefix of:
+          "TEST_SYSTEM_" or you can use Test::System::Helper to get their
+          values.
+
+    results
+          A hash reference that contains the results of the tests. This
+          information is generated by the TAP::Parser::Aggregator.
+
+          * passed: Total of passed tests
+          * total: Total number of tests (passed or not)
+          * skipped: Total of skipped tests
+          * failed: Total of failed tests.
+
+    status
+          A string (read-only) that contains a word that describes the
+          status of all the tests. This value is also generated by
+          TAP::Parser::Aggregator.
+
+    show_warnings
+          By default we show warnings of all things that can make your tests
+          to run in a different way than expected.
+
+Methods
+  runtests(@tests,%options)
+    It will run the given test cases (@tests). The @tests can be:
+
+    * An array of test files to execute.
+    * Or, a string pointing to a test plan file (YAML).
+
+    If no @tests are given but we have a "test_groups" then ALL the tests
+    listed inside this file will be executed.
+
+    The %options is a hash of options that will be passed to the
+    TAP::Harness object, some useful parameters are:
+
+    * verbosity
+        By default we mute everything with -9.
+
+    * color
+        If you want the output (in console) to have color
+
+    * formatter
+        Although we use Test::System::Output::Factory to offer a set of
+        formatters you can provide your own formatter object. See
+        "available_formats".
+
+    * jobs
+        If you have many tests you probably want to increment this value
+        (that defaults to 1) so other tests can be run at the same time.
+
+  run_test_plan($test_plan, %options)
+    It loads the given test plan file (should be written in YAML) in order
+    to get a list of tests to execute. Once it has a list of tests then it
+    calls "runtests" with this list and with the %options.
+
+  setup_parser($parser)
+    This method should never be called directly since this is triggered by
+    TAP::Harness when every TAP::Parser object gets created.
+
+    This method is useful for setting the callbacks we want the parser to
+    trigger.
+
+    $parser should be a TAP::Parser object.
+
+  pretests_verification(@tests, %options)
+    Does some verification before the tests are executed. This method gets
+    called by "runtests".
+
+    The parameters it accepts are the same parameters passed to "runtests"
+    with the main difference the tests are already filtered (eg, if a test
+    plan in YAML was provided we will use it or we will use all the tests
+    listed inside the "test_groups".
+
+  what_happened($parser, $result_test)
+    Similar to *setup_parser*, this should never be called since it will be
+    triggered by TAP::Parser after each (sub)tests gets executed.
+
+    By default we check the reason of why the test failed so later we
+    provide a simple hash to parse with all the tests and the reasons of why
+    they failed (if this could be the case). And because we need to know
+    what TAP::Parser instance we are processing we need to ask for it as a
+    first parameter.
+
+    Parameters:
+
+    * $parser should be a TAP::Parser
+    * $result_test should be a TAP::Parser::Result::Test.
+
+  set_results($aggregator)
+    This is a callback and is only called/triggered by TAP::Harness when all
+    the tests are done. It will fill the "results" attribute with
+    information of everything.
+
+    Refer to the documentation of *results* for more information.
+
+    The paramenter $aggregator is a TAP::Parser::Aggregator.
+
+  prepare_environment()
+    Prepares the environment by settings the needed environment values so
+    they can be used later by the tests
+
+  clean_environment()
+    Cleans/deletes all the environment variables that match "TEST_SYSTEM_*"
+
+  get_tests_from_test_plan($yaml_file,
+        $do_not_fill_parameters, 
+        $do_not_fill_nodes)
+    Reads the given tests yaml file ($yaml_file). This YAML file should have
+    at least a list of tests and optionally can also have parameters the
+    tests should contain.
+
+    Although this method is used mostly internally there's the option to
+    call it as any other method *Test::System* offers.
+
+    By default it will fill the parameters of your *Test::System* instance
+    but by passing $do_not_fill_parameters (second parameter) as true or
+    something that Perl understands as true then it will skip the part. This
+    should be presented as a hash in YAML syntax.
+
+    The above apply also to $do_not_fill_nodes (third parameter). This
+    should be presented as an array in YAML syntax.
+
+    Once the file is read an array with all the tests will be returned.
+
+    All the tests should be contained inside a hash named 'tests'. All the
+    tests should be represented in the form of a list, each item of the list
+    is the test you want to execute. At least it should have a 'code' item,
+    this is the filepath of the test (or the ID from a "test_groups").
+    Optionally you can also provide the description of the test (cause
+    otherwise the filename will be used and it can make ugly your summary
+    report).
+
+    An example of a YAML test plan file can be found inside the "examples"
+    directory or:
+
+        tests:
+            - 
+                code: ping
+                description: Checking the ping
+            - 
+                code: example/tests/cpu.pl
+                description: foobar
+            -
+                code: memory
+                description: Ehmm.. my name?
+        parameters:
+            ping_count: 10
+        nodes:
+            - pablo.com.mx
+            - example.com
+
+SEE ALSO
+    Take a look to an awesome and pretty similar CPAN module: Test::Server.
+
+AUTHOR
+    Pablo Fischer (pablo@pablo.com.mx).
+
+COPYRIGHT
+    Copyright (C) 2009 by Pablo Fischer.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

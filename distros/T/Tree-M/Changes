@@ -1,0 +1,18 @@
+Revision history for Perl extension Tree::M
+
+0.031 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+0.03  Fri Jul 27 14:47:37 CEST 2001
+	- minor c++ fixes to make it more compliant ;) to the c++ standard.
+
+0.02  Sun May 27 15:39:08 CEST 2001
+	- corrected off-by-one in steps interpretation.
+	- some Makefile improvements. Thanks to the cpan-testers for all their
+          work ;)
+        - pagesize used for external storage now tunable.
+        - added very primitive lru page cache. effective on repeated searches.
+
+0.01  Sat May  5 04:41:24 CEST 2001
+	- original version; created manually(!)
+

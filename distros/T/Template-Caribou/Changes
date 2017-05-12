@@ -1,0 +1,82 @@
+Revision history for Template-Caribou
+
+1.2.1 2017-04-02
+  [ BUG FIXES ]
+    - properly process tag attributes that are stringifable objects.
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 32 insertions(+), 10 deletions(-)
+
+1.2.0 2017-02-25
+  [ BUG FIXES ]
+    - Bump minimum version to 5.20.0. (GH#11)
+
+  [ ENHANCEMENTS ]
+    - Use XML::Writer when creating tags to escape quotes. (GH#10, Lisa
+      Hare)
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 50 insertions(+), 15 deletions(-)
+
+1.1.0 2017-02-08
+  [ ENHANCEMENTS ]
+    - render can take a template name as well.
+    - put back 'show' to be backward-friendly(ish)
+    - can now use %_ as well as 'attr'
+
+  [ STATISTICS ]
+    - code churn: 11 files changed, 200 insertions(+), 73 deletions(-)
+
+1.0.0 2017-02-06
+  [ API CHANGES ]
+    - Maaaaaaassive refactoring/revisit of the API.
+
+  [ BUG FIXES ]
+    - POD fixes (GH#3, Mohammad S Anwar, GH#4, Paulo Custodio)
+    - Amend subroutine named inner to inner_tmpl. (GH#5, Lisa Hare)
+
+  [ MISC ]
+    - Switch from using Method::Signatures to perl 5.20's 'signatures'.
+
+  [ STATISTICS ]
+    - code churn: 41 files changed, 1358 insertions(+), 694 deletions(-)
+
+0.2.4 2014-06-02
+  [ BUG FIXES ]
+    - Add explicit dependency to Data::Alias. (GH#1, reported by jscook)
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 13 insertions(+), 2 deletions(-)
+
+0.2.3 2013-06-22
+  [ BUG FIXES ]
+    - Add 'select' statement so that 'print' always means 'print STDOUT';
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 9 insertions(+), 1 deletion(-)
+
+0.2.2 2013-05-22
+  [ BUG FIXES ]
+    - Test fake module 'Bar' was picked up as a dependency.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 18 insertions(+), 2 deletions(-)
+
+0.2.1 2013-05-20
+  [ BUG FIXES ]
+    - Inherited templates couldn't be found.
+
+  [ STATISTICS ]
+    - code churn: 10 files changed, 110 insertions(+), 10 deletions(-)
+
+0.2.0 2013-02-22
+  [ ENHANCEMENTS ]
+    - Adding documentation
+    - Lots of misc work
+
+  [ STATISTICS ]
+    - code churn: 32 files changed, 2137 insertions(+), 103 deletions(-)
+
+0.1.0 2012-02-05
+  [ ENHANCEMENTS ]
+    - Initial release

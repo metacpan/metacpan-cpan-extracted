@@ -1,0 +1,106 @@
+Revision history for Perl extension Tree::Simple::VisitorFactory:
+
+0.15  2016-05-04T08;15:00
+	- Correct physical address of Free Software Foundation in LICENSE file. See RT#114149.
+		Thanx to Petr Pisar.
+
+0.14  2016-04-27T17:35:00
+	- No code changes.
+	- Adopt workflow techniques suggested by Kent Fredric. This means a cleaner workdir and a
+		much more reliable dist. The latter now has auto-generated MANIFEST and META.* files.
+
+0.13  2016-04-25T09:26:00
+	- No code changes.
+	- Delete Build.PL.
+	- Fix my licence (sic) mess so all references are to Perl. This involves edits to Makefile.PL
+		and LICENSE. See RT#113949. Thanx Kent Fredric.
+	- Fix Makefile.PL so modules only used for testing are in TEST_REQUIRES and not PREREQ_PM.
+		See RT#113948. Thanx Kent Fredric.
+	- Fix README so it more-or-less conforms to the Perl Foundation's guidelines at
+		http://www.perlfoundation.org/cpan_licensing_guidelines.
+
+0.12  2013-11-01T09:23:00
+	- Update pre-reqs.
+	- Many, many doc typo fixes via github from dsteinbrunner.
+	- Add repos to Build.PL and Makefile.PL.
+
+0.11  2013-09-23T11:07:00
+	- Maintenance now by Ron Savage.
+	- Rectify datestamp format in this file.
+	- Add Changelog.ini.
+	- Add Build.PL.
+	- Clean up Makefile.PL.
+	- RT#40504: Add META.*.
+
+0.10  2005-11-25T12:00:00
+    - removing OS X resource fork files which are causeing
+      the pod test to fail
+
+0.09  2005-11-07T12:00:00
+    - fixing an error in the Tree::Simple::Visitor::LoadDirectoryTree test
+
+0.08  2005-07-18T12:00:00
+    - small bug fix in Tree::Simple::Visitor::VariableDepthClone visitor
+    - small bug fix with Tree::Simple::Visitor::FindByPath visitor
+
+0.07  2005-07-18T12:00:00
+    - forgot to implement the node filter in the
+      Tree::Simple::Visitor::VariableDepthClone visitor
+        - added this code and tested it
+
+0.06  2005-07-13T12:00:00
+    - added Tree::Simple::Visitor::VariableDepthClone
+        - added tests and docs for this
+        - bumped up the Tree::Simple version requirement to
+          support this new Visitor
+
+0.05  2004-11-18T12:00:00
+    - now using Scalar::Util::blessed() instead of
+      the convoluted UNIVERSAL::isa() stuff.
+      - added Scalar::Util as a dependency
+
+0.04  2004-10-27T12:00:00
+    - fixed broken test (70_Tree_Simple_Visitor_LoadDirectoryTree_test.t)
+      it made assumptions about directory ordering across OSes which was
+      not correct.
+    - added Tree::Simple::Visitor::FindByNodeValue
+        - added tests for this
+        - added docs for this
+
+0.03  2004-10-12T12:00:00
+	- fixed documentation in Tree::Simple::Visitor::Sort
+    - added Tree::Simple::Visitor::LoadClassHierarchy
+        - added tests for this
+        - added docs for this
+    - changed behavior in Tree::Simple::FromNestedHash
+      so that it sorts the hash keys before they are put
+      into the tree
+
+0.02  2004-09-29T12:00:00
+    - changed all Visitors to use 'base' for
+      inheritance, it just cuts down on the
+      line noise.
+    - improved the documentation in
+      Tree::Simple::VisitorFactory to include
+      a categorized list of available visitors
+    - added Tree::Simple::Visitor::LoadDirectoryTree Visitor
+        - added tests for this
+    - added Tree::Simple::Visitor::CreateDirectoryTree Visitor
+        - added tests for this
+    - added Tree::Simple::Visitor::FindByUID Visitor
+        - added tests for this
+        - thanks to Vitor Mori for the idea for this Visitor
+    - added Tree::Simple::Visitor::PreOrderTraversal Visitor
+        - added tests for this
+    - added Tree::Simple::Visitor::Sort Visitor
+        - added tests for this
+        - thanks to Vitor Mori for most of the code and
+          the idea for this Visitor
+    - added Tree::Simple::FromNestedArray, Tree::Simple::FromNestedHash
+      and their compliments Tree::Simple::ToNestedArray and
+      Tree::Simple::ToNestedHash
+        - added tests for these
+    - added the pod.t and pod_coverage.t tests
+
+0.01  2004-06-23T09:24:07
+    - module created

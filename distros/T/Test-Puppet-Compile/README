@@ -1,0 +1,63 @@
+NAME
+    Test::Puppet::Compile - Puppet catalog testing
+
+SYNOPSIS
+      use Test::Puppet::Compile;
+
+      my $TPC = Test::Puppet::Compile::->new({
+        'name'          => 'synopsis',
+        'manifests'     => [glob 'manifests/*.pp'],
+        'basedir'       => `pwd`,
+        'tpldir'        => '/your/template/dir', # must contain: hiera.yaml.tt, node.yaml.tt and puppet.conf.tt
+        'reqenvs'       => [qw(development staging superlive)],
+        'moduledirs'    => [qw(modules supermodules services subservices)],
+        'warnings'      => 1,
+        'domainpattern' => [
+          { match => qr/^int-/, domain => 'integrationdomain', }
+        ],
+        'defaultdomain' => 'localdomain',
+      });
+      $TPC->test();
+
+METHODS
+  test
+    After successfull initializtation call this method to detect all nodes
+    and compile a catalog for each node.
+
+HOWTO
+  USE THIS MODULE
+    See the synopsis
+
+  REDHAT
+    If you want to simulate another OS just copy all templates to a
+    directory of your choice and adjust them acording to your needs.
+
+    Then set tpldir to point to that directory.
+
+Q&A
+  WHY PERL
+    Because I'm most prolific with perl.
+
+  WHY IS IT SO SLOW
+    Because it does lots of computations.
+
+    Some performance hints:
+
+    Use a ramfs
+        Your temp directory, usually /tmp, should be located on a
+        sufficiently large ramdisk
+
+    Use forkprove
+        You should split your tests into multiple t files, each testing on
+        environment, and process them w/ forkprove, e.g. forkprove
+        -j<NUMCORES> -MMoose -MTest::More -MTest::Puppet::Compile t/
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

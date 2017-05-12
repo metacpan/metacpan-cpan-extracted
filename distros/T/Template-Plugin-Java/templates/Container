@@ -1,0 +1,22 @@
+// Generated XML sub-container.
+[%# vim: set syntax=java: %]
+
+[% USE Java %]
+[% PROCESS FileHeader %]
+[% PROCESS ClassHeader %]
+{
+[% PROCESS DataDeclarations %]
+[% PROCESS DataAccess %]
+public $class() {}
+public $class(InputSource from) throws Exception { set(from); }
+
+public $class([% Java.variableDeclarations.join(", ") %])
+{
+[% FOREACH Java.variables %]
+	this.$name = $name;
+[% END %]
+}
+[% PROCESS XMLEncode %]
+[% PROCESS ParseFromXML %]
+$append
+} // End class ${class}.

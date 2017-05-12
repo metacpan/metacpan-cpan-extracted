@@ -1,0 +1,6 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+Page.pm
+README
+t/page.t

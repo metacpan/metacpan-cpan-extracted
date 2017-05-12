@@ -1,0 +1,73 @@
+Test-Proto
+
+This module simplifies writing tests for deep structures and objects.
+
+	use Test::Proto qw(p pArray pHash pObject pSeries);
+	
+	pArray	->contains_only(pSeries('', pHash), 
+			"ArrayRef must contain only an empty string followed by a hashref")
+		->ok(["", {a=>'b'}]);
+		# provides diagnostics, including subtests as TAP, using Test::Builder
+	
+	p	->like(qr/^\d+$/, 'looks like a positive integer')
+		->unlike(qr/^0\d+$/, 'no leading zeros')
+		->validate('123');
+		# returns an object with a true value
+	
+	pObject	->is_a('XML::LibXML::Node', 'must inherit from XML::LibXML::Node')
+		->is_a('XML::LibXML::Element', 'what it really is')
+		->method_exists('findnodes', 'must have the findnodes method')
+		->method_scalar_context('localName', [], 
+			p->like(qr/blockquote|li|p/, 'We can add normal text here')
+		)
+		->ok(XML::LibXML::Element->new('li'));
+		# have a look at the nested prototype in try_can
+
+The idea behind Test::Proto is that test scripts for code written on modern, OO principles should themselves resemble the target code rather than sequential code. 
+
+Tests for deep structures and objects tend should not be repetitive and should be flexible so that when you decide you need $got->{'wurple'}{'diddle'}{'do'} to look like $got->{'wurple'}->diddle->[$i]{'do'} you can make a much smaller change to your script. Test::Proto is a framework primarily for testing the same thing for multiple conditions, and testing the things it contains/produces in a similar manner. 
+
+The way it works is that you create a "prototype" (using a subclass of Test::Proto::Base), add tests to the prototype, and validate then your string/arryref/object against the prototype. 
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Proto
+
+Once it's on CPAN, you can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Proto
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Proto
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Proto
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Proto/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Daniel Perrett
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

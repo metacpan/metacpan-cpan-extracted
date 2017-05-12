@@ -1,0 +1,60 @@
+DESCRIPTION
+
+This is Test::Group, a companion module to Test::Builder.  It allows
+to lump tests and fixture into groups that make sense together.  For
+example:
+
+    use Test::More tests => 1;
+    use Test::Group;
+   
+    test "hammering the server" => sub {
+        ok(I_can_connect);
+        for(1..1000) {
+           ok(I_can_make_a_request);
+        }
+    };
+
+produces
+
+ 1..1
+ ok 1 - hammering the server
+
+Diagnostics of failed subtests are shown, but successful subtests are
+muted. This makes the test output very legible even to the naked eye.
+
+Test::Group has no dependencies besides what is provided in stock Perl
+5.8.8. It also works under Perl 5.6.1 and 5.8.x (with dependencies).
+
+Test::Group has been in use in my shop under a different name for
+years, and has provided significant productivity improvements over
+plain Test::More in test-driven development.
+
+Note that you may want to investigate another CPAN module, Test::Class
+by Adrian Howard, which is older and offers a similar feature.  But
+being a full-fledged test framework it is also a little bit more
+cumbersome to use if all you want to do is to group tests.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or alternatively if you have Module::Build installed,
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 IDEALX and Dominique Quatravaux <domq@cpan.org>
+Copyright (C) 2009 Nick Cleaton <ncleaton@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

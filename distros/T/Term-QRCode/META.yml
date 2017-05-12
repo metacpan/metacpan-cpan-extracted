@@ -1,0 +1,25 @@
+---
+abstract: 'Generate terminal base QR Code'
+author:
+  - 'Kazuhiro Osawa <yappo <at> shibuya <döt> pl>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.770'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-QRCode
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  FindBin: 0
+  Term::ANSIColor: 0
+  Text::QRCode: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

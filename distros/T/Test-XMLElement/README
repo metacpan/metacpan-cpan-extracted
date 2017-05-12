@@ -1,0 +1,34 @@
+Test-XMLElement version 0.03
+============================
+
+This test module allows you to check some of the XML element properties.
+This is useful in testing applications which generate XML. Input for this
+module is valid XML Element. This module contains wrapper subroutines 
+which acts as testing block for custom XML test tools.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+    Test::XMLElement needs XML::Twig, XML::XPath and Test::Builder installed
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by Murugesan Kandasamy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

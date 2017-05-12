@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+# This script parses the output of `sysbench --test=fileio`, presenting the
+# info in a structure more ameniable to post-processing tools for test
+# reports
+# Usage:  parse_sysbench_fileio < fileio.output
+
+use strict;
+use warnings;
+use Test::Parser::SysbenchFileIO;
+
+my $parser = new Test::Parser::SysbenchFileIO
+    or die "Couldn't create Test::Parser::SysbenchFileIO object\n";
+
+$parser->parse($ARGV[0] or \*STDIN)
+    or die "Could not parse Sysbench log.\n";
+
+print $parser->to_xml();

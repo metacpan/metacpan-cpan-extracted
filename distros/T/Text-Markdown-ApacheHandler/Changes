@@ -1,0 +1,16 @@
+Revision history for Text-Markdown-ApacheHandler
+
+0.01    2006-07-07T09:59:42-0500
+        First version, released on an unsuspecting world.
+
+0.02    2006-07-07T13:35:05-0500
+        SYNOPSIS was silly and wrong. Really added 'text/markdown' type
+        support.
+
+0.03    2006-07-20T08:30:16-0500
+        Added rudimentary CSS support with PerlAddVar.
+
+0.04    2006-08-01T09:00:00-0500
+        Fixed incorrect sending of header before return code was fixed.
+
+# vi: set ts=8 sw=8 et: #

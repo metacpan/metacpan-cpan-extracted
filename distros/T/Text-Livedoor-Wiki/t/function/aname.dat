@@ -1,0 +1,20 @@
+=== basic
+--- wiki
+&aname(my_a_name){a name link label}
+--- html 
+<a class="anchor" id="my_a_name" name="my_a_name" title="my_a_name">a name link label</a>
+=== inline
+--- wiki
+hoge &aname(hogehoge){%%hoge%%}
+--- html 
+hoge <a class="anchor" id="hogehoge" name="hogehoge" title="hogehoge"><del>hoge</del></a>
+=== no args 
+--- wiki
+hoge &aname(){aaa}
+--- html 
+hoge &amp;aname(){aaa}
+=== invalid format
+--- wiki
+hoge &aname(anpan#man){aaa}
+--- html 
+hoge &amp;aname(anpan&#35;man){aaa}

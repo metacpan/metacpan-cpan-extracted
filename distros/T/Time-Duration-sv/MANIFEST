@@ -1,0 +1,8 @@
+ChangeLog
+sv.pm
+MANIFEST
+MANIFEST.SKIP
+SIGNATURE
+Makefile.PL
+README
+t/tdur.t

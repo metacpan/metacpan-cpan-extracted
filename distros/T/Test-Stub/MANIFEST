@@ -1,0 +1,20 @@
+.travis.yml
+Build.PL
+Changes
+lib/Test/Stub.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_simple.t
+t/02_autoload.t
+t/03_stub.t
+t/04_stacking.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t
+xt/06_meta_author.t

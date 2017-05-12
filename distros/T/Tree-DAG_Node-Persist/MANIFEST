@@ -1,0 +1,14 @@
+Changelog.ini
+Changes
+lib/Tree/DAG_Node/Persist.pm
+lib/Tree/DAG_Node/Persist/Create.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/create.table.pl
+t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

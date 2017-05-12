@@ -1,0 +1,7 @@
+Revision history for Perl extension TotalCmd::FSPlugin.
+
+0.01  Fri Mar 12 19:01:33 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n TotalCmd::FSPlugin
+
+

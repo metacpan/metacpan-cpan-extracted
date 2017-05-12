@@ -1,0 +1,58 @@
+NAME
+    Tie::Array::Sorted - An array which is kept sorted
+
+SYNOPSIS
+            use Tie::Array::Sorted;
+
+            tie @a, "Tie::Array::Sorted", sub { $_[0] <=> $_[1] };
+
+            push @a, 10, 4, 7, 3, 4;
+            print "@a"; # "3 4 4 7 10"
+
+DESCRIPTION
+    This presents an ordinary array, but is kept sorted. All pushes and
+    unshifts cause the elements in question to be inserted in the
+    appropriate location to maintain order.
+
+    Direct stores ("$a[10] = "wibble"") effectively splice out the original
+    value and insert the new element. It's not clear why you'd want to use
+    direct stores like that, but this module does the right thing if you do.
+
+    If you don't like the ordinary lexical comparator, you can provide your
+    own; it should compare the two elements it is given. For instance, a
+    numeric comparator would look like this:
+
+            tie @a, "Tie::Array::Sorted", sub { $_[0] <=> $_[1] }
+
+    Whereas to compare a list of files by their sizes, you'd so something
+    like:
+
+            tie @a, "Tie::Array::Sorted", sub { -s $_[0] <=> -s $_[1] }
+
+LAZY SORTING
+    If you do more stores than fetches, you may find
+    Tie::Array::Sorted::Lazy more efficient.
+
+AUTHOR
+    Original author: Simon Cozens
+
+    Current maintainer: Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Tie-Array-Sorted@rt.cpan.org
+
+    This module was originall written as part of the Plucene project.
+    However, as Plucene no longer uses this, it is effectively unmaintained.
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2003-2006 Simon Cozens and Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

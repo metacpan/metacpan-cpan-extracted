@@ -1,0 +1,55 @@
+{
+   "abstract" : "Portable support for named placeholders in DBI statements",
+   "author" : [
+      "Adriano R. Ferreira <ferreira@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tao-DBI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQlite" : "0",
+            "Data::Dumper" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/aferreira/cpan-Tao-DBI.git",
+         "web" : "https://github.com/aferreira/cpan-Tao-DBI"
+      }
+   },
+   "version" : "0.012"
+}

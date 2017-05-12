@@ -1,0 +1,26 @@
+Build.PL
+Changes
+examples/demo-menu.pl
+lib/Tickit/Widget/Menu.pm
+lib/Tickit/Widget/Menu/base.pm
+lib/Tickit/Widget/Menu/Item.pm
+lib/Tickit/Widget/Menu/itembase.pm
+lib/Tickit/Widget/MenuBar.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01item.t
+t/10menu-render.t
+t/11menu-input-key.t
+t/12menu-input-mouse.t
+t/20submenu-render.t
+t/21submenu-input-key.t
+t/22submenu-input-mouse.t
+t/30menubar-render.t
+t/31menubar-input-key.t
+t/32menubar-input-mouse.t
+t/99pod.t

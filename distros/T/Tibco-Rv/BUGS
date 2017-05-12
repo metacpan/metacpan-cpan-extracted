@@ -1,0 +1,59 @@
+Anything involving multiple threads segfaults, such as Dispatchers and Queue
+hooks.  It may work with various combinations of perl version and perl
+thread model (untested).
+
+
+Fault Tolerance unimplemented
+
+
+Distributed Queuing unimplemented
+
+
+Virtual Circuits unimplemented
+
+
+Secure Daemon connections unimplemented
+
+
+Cm::Transport connectToRelayAgent/disconnectFromRelayAgent return INVALID_ARG
+instead of ARG_CONFLICT as specified in the TIB/Rendezvous documentation.
+(It's just a documentation error.  I should really email them about that ...)
+
+
+IO should probably take socketId => \*GLOB instead of a fileno
+
+
+Queue hook should maybe be set up like Event's onEvent callback?
+
+
+Cm::Transport reviewLedger callback should maybe be set up like Event's
+onEvent callback?  Perhaps only if $callback parameter is undef?
+
+
+Gotta do something to abstract out createInbox ...
+
+
+Tibco::Rv::Msg::DateTime
+doesn't seem to hold its nsec value ...  I think it's a bug w/tibrv
+
+
+Tibco::Rv::Dispatcher::DESTROY
+If idleTimeout is something other than WAIT_FOREVER or NO_WAIT, and that
+idleTimeout is reached, then tibrvDispatcher_Destroy is called without
+calling the Perl DESTROY method, putting the dispatcher in a bad state.  No
+fix is contemplated.  So don't access a Dispatcher after it times out.
+I'm also thinking that DESTROY will throw an exception when the Perl object
+gets garbage collected in this situation.  But that's not really a big deal.
+
+
+Tibco::Rv::Event::DESTROY
+tibrvEvent_DestroyEx has a callback, but no closure data (unlike
+tibrvQueue_DestroyEx -- I wonder why?).  Since Perl callbacks are stored
+internally in the closure data, Tibco::Rv does not support the
+tibrvEvent_DestroyEx callback.  It could be hacked in by storing the DESTROY
+callback along with the onEvent callback in a hash or something, and passing
+both callbacks into the Perl constructor.
+
+
+tibrvMsg_SetHandlers
+Not supported.  I'm sure no one wants this stuff, anyway.

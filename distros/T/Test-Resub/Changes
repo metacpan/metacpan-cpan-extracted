@@ -1,0 +1,27 @@
+Revision history for Test-Resub
+
+2.03    * Better failed tests reporting
+2.02    * Fix for resubbing 'new' in Moose classes
+        * Add repo url to Makefile.PL (thanks dsteinbrunner)
+        * deep_copy is no longer on by default; it's now off by default.
+2.01    There actually was no 2.00 release of this module; the notes for 2.00
+        apply to 2.01.
+2.00    Re-release to CPAN under new maintainer. Changes include a few minor
+        bug fixes, removal of ->unique_args and ilk, and support for Moose
+        methods with 'before' and 'after' advice applied to them. Additionally,
+        the library has been largely rewritten not to use inside-out objects,
+        which makes extending this much easier.
+1.06    Added ->unique_args and ilk
+1.05    Small doc cleanup
+        Added test for resub()
+1.04    Cleanup of error messages: our croak()s no longer look like they come
+        from within Class::Std.
+1.03    Workarounds for perl 5.8.0 to allow basic functionality.
+        Match prototypes; should eliminate prototype-mismatch warnings.
+        Don't create functions without the 'create' flag.
+        Allow for optional deep-copying of captured arguments.
+1.02    Remove stale proprietary-license text. (Spotted by Joe Arnold)
+        To clarify, this module is released under the same terms as Perl itself.
+1.01    Documentation fixes
+1.00    Initial release
+

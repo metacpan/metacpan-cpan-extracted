@@ -1,0 +1,159 @@
+{
+   "abstract" : "install a lightweight development environment",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.013, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Tiny",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "Filesys" : {
+         "description" : "File system manipulation",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Types::Path::Tiny" : "0"
+               },
+               "requires" : {
+                  "Path::Tiny" : "0"
+               }
+            }
+         },
+         "x_default" : 1
+      },
+      "HTTP" : {
+         "description" : "Web stuff",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "HTTP::Tiny" : "0"
+               }
+            }
+         },
+         "x_default" : 1
+      },
+      "JSON" : {
+         "description" : "JSON stuff",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "JSON::PP" : "0"
+               }
+            }
+         },
+         "x_default" : 1
+      },
+      "Objects" : {
+         "description" : "Framework for OO programming",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Class::Method::Modifiers" : "0"
+               },
+               "requires" : {
+                  "Class::Tiny" : "0",
+                  "Class::Tiny::Antlers" : "0",
+                  "Role::Tiny" : "0"
+               }
+            }
+         },
+         "x_default" : 1
+      },
+      "Types" : {
+         "description" : "Type constraint framework",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Types::Path::Tiny" : "0"
+               },
+               "requires" : {
+                  "Type::Tiny" : "0"
+               }
+            }
+         },
+         "x_default" : 1
+      },
+      "Util" : {
+         "description" : "General utilities",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Config::Tiny" : "0"
+               },
+               "requires" : {
+                  "Exporter::Tiny" : "0",
+                  "Try::Tiny" : "0"
+               }
+            }
+         },
+         "x_default" : 1
+      },
+      "YAML" : {
+         "description" : "YAML stuff",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "YAML::Tiny" : "0"
+               }
+            }
+         },
+         "x_default" : 0
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Task::Tiny" : {
+         "file" : "lib/Task/Tiny.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Task-Tiny/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Task-Tiny"
+      },
+      "homepage" : "https://metacpan.org/release/Task-Tiny",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/tobyink/p5-task-tiny"
+      }
+   },
+   "version" : "0.002"
+}

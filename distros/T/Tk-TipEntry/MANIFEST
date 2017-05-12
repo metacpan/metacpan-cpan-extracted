@@ -1,0 +1,11 @@
+Changes
+lib/Tk/TipEntry.pm
+Makefile.PL
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+README
+t/00-load-Tk-TipEntry.t
+t/02-tipentry.t
+xt/90-pod.t
+xt/91-pod-coverage.t

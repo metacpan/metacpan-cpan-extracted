@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-CSV_Multiline.t
+t/1.csv
+t/multi.t
+lib/Text/CSV_Multiline.pm
+META.yml                                 Module meta-data (added by MakeMaker)

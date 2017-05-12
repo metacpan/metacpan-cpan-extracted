@@ -1,0 +1,77 @@
+.X mtag -f latex -t dm -c textit
+.X mtag -f xhtml -t dm -c strong
+.X mtag -f latex -t quotes -c "" -b «\~ -e \~»
+.X mtag -f xhtml -t quotes -c "" -b «\~ -e \~»
+.X set -f xhtml dmark "—"
+.Pt Primera parte
+.Ch \
+    Prólogo Sm muy corto
+Esta es la historia de Shaedra, pero en más breve, porque no tengo tiempo para
+escribir todo.
+.D
+Hola a todos, –dijo Shaedra.— ¡Aquí estoy!
+.P
+Otro párrafo, que con uno no se hace
+.Sm -t dm mucho .
+.Ch "Primer capítulo"
+Bueno, ¿
+.Sm -ns no
+.Sm \&@
+.\" Hay que idear algo aquí para el espacio
+vamos a escribir demasiado tampoco.\" a comment
+.Bm -t dm
+Syu, no comas tantos plátanos!
+.Em
+.Sm -t quotes quoted string
+.Ch "Nested spanning blocks"
+This
+.Bm
+is a
+.Bm
+nested
+.P
+spanning
+.Em
+block through
+.Em
+two paragraphs.
+.Ch "Spanning block"
+.Bm
+this is a
+.P
+spanning block
+.Em
+.Bm -t dm
+this is a tagged
+.P
+spanning block
+.Em
+.P
+.\" space mode
+.#fl ns 1
+.Sm arg1 arg2
+Text.
+.Lk link
+.#fl ns 0
+.Im image
+.Sx Prólogo Sm muy corto
+.Sm arg1 arg2
+Text.
+.X mtag -f latex -t ** -c textbf
+.X mtag -f xhtml -t ** -c strong
+.Sm -t ** Strong .
+.Bm
+.Sm Text
+.Em .
+.Ch Some Bm important Em \& thing
+.Ch More Bm emph Em \& and Sm more
+.Sh Bla Bm -t dm Emphblabla Em Bla
+.Ss Bla Bm -t dm Emphblabla Em \& Bla
+.Bl -t desc
+.It Sm Blabla
+Bla.
+.El
+.P Sm Emph
+Text.
+.P Not Emph and Sm Emph
+Text.

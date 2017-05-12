@@ -1,0 +1,19 @@
+Revision history for Perl extension Test-CallCounter
+
+0.04 2013-04-07T14:07:10Z
+
+    - Fixed deps.
+
+0.03 2013-04-04T11:20:12Z
+
+    - Restore prototype after wrapping
+      (Reported by @belden++)
+
+0.02 2013-04-04T10:09:49Z
+
+    - remove use parent qw(Export) and @EXPORT
+
+0.01 2013-04-04T08:06:01Z
+
+    - original version
+

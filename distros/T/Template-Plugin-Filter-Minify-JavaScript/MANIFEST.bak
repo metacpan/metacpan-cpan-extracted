@@ -1,0 +1,7 @@
+Changes
+lib/Template/Plugin/Filter/Minify/JavaScript.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/Template-Plugin-Filter-Minify-JavaScript.t

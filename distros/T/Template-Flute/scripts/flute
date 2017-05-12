@@ -1,0 +1,212 @@
+#! /usr/bin/env perl
+#
+# Copyright (C) 2010-2015 Stefan Hornburg (Racke) <racke@linuxia.de>.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public
+# License along with this program; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# MA 02110-1301, USA.
+
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long;
+use Data::Dumper;
+use File::Temp qw(tempfile);
+
+use Template::Flute;
+use Template::Flute::Config;
+use Template::Flute::Specification::XML;
+use Template::Flute::HTML;
+
+use Pod::Usage;
+
+=encoding utf8
+
+=head1 NAME
+
+flute -- Process template with L<Template::Flute> on the command line
+
+=head1 SYNOPSIS
+
+  flute [ options ] specification.xml template.html
+
+Available options
+
+=over 4
+
+=item --help
+
+Print this help and exit
+
+=item --browser
+
+Store the result in a temporary file and call C<x-www-browser> on
+that.
+
+=item --conf <configuration file>
+
+Load the L<Template::Flute> configuration from the given file.
+
+=item --pdf <output.pdf>
+
+Save the result in the named PDF file
+
+=item --iterator name=file.json
+
+Load the iterator named C<name> from a JSON file.
+
+=item --value name=value
+
+Pass the given value to the template for processing. This option can
+be repeated (for different names).
+
+=item --check
+
+Report template/specification inconsistencies. 
+
+=back
+
+The C<flute> script can also combine pdf in a single one:
+
+  flute --combine --pdf output.pdf file1.pdf file2.pdf ...
+
+=cut
+
+
+binmode STDERR, ":encoding(utf-8)";
+binmode STDOUT, ":encoding(utf-8)";
+my (%opts, %values);
+
+# commandline options
+$opts{value} = \%values;
+my $whandler = $SIG{__WARN__};
+$SIG{__WARN__} = sub {print STDERR "$0: @_";};
+unless (GetOptions (\%opts, 'browser', 'combine', 'conf=s', 'check', 'help',
+					'iterator=s', 'value=s%', 'pdf=s')) {
+	exit 1;
+}
+$SIG{__WARN__} = $whandler;
+
+if ($opts{help}) {
+    pod2usage("Using Template::Flute " . $Template::Flute::VERSION . "\n");
+    exit 2;
+}
+
+
+unless (@ARGV) {
+	die "$0: Commandline arguments missing.\n";
+}
+
+if ($opts{combine}) {
+	unless ($opts{pdf}) {
+		die "$0: --combine option only valid together with --pdf=FILE\n";
+	}
+
+	require Template::Flute::PDF;
+	require Template::Flute::PDF::Import;
+		
+	# combine PDF's from commandline
+	my ($pdf, $import);
+
+	$pdf = Template::Flute::PDF->new(
+                                     file => $opts{pdf},
+                                    );
+
+	$import = Template::Flute::PDF::Import->new;
+
+	for my $file (@ARGV) {
+		$import->import(pdf => $pdf->{pdf}, file => $file);
+	}
+
+	$pdf->{pdf}->saveas();
+
+	exit 0;
+}
+
+my ($config_file, $config_vars, $spec_file, $template_file,
+	%iterators);
+
+if ($opts{conf}) {
+	$config_file = $opts{conf};
+
+	$config_vars = Template::Flute::Config::load($config_file);
+
+}
+
+if ($opts{iterator}) {
+	my $name;
+
+	# shift name from iterator option
+	if ($opts{iterator} =~ s%^(\w+)=%%) {
+		$name = $1;
+	}
+	
+	if ($opts{iterator} =~ m%^(.*?/)*(.+)\.json$%) {
+		# JSON iterator
+		unless (defined $name) {
+			$name = $2;
+		}
+		require Template::Flute::Iterator::JSON;
+		$iterators{$name} = Template::Flute::Iterator::JSON->new(file => $opts{iterator});
+	}
+	else {
+		die "$0: Unknown format for iterator: $opts{iterator}\n";
+	}
+}
+
+# parse specification file
+my ($specification, $template) = @ARGV;
+die "Missing specification and template file at the command line\n"
+  unless ($specification && $template);
+
+my $flute = Template::Flute->new(template_file => $template,
+                                 specification_file => $specification,
+                                 iterators => \%iterators,
+                                 values => \%values);
+
+if ($opts{pdf}) {
+	require Template::Flute::PDF;
+
+	$flute->process();
+	
+	my $pdf = Template::Flute::PDF->new(
+                                        template => $flute->template,
+                                        file => $opts{pdf},
+                                       );
+	$pdf->process();
+}
+elsif ($opts{browser}) {
+	# store flute result in temporary file
+	my ($tmph, $tmpfile) = tempfile();
+    binmode $tmph, ":encoding(utf-8)";
+	print $tmph $flute->process();
+	print "Using temporary file $tmpfile\n";
+	system('x-www-browser', $tmpfile);
+}
+else {
+	print $flute->process(), "\n";
+}
+
+if ($opts{check}) {
+    if (my @empty = $flute->specification->dangling) {
+        warn "Found dangling elements in the specification\n";
+        foreach my $el (@empty) {
+            warn "$el->{type} $el->{name} ", Dumper($el->{dump});
+        }
+        die "Bad specification!\n";
+    }
+}
+
+

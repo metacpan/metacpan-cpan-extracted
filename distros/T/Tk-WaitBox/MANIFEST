@@ -1,0 +1,4 @@
+MANIFEST		This file
+Makefile.PL		Makemaker makefile
+README			General info
+WaitBox.pm		WaitBox package

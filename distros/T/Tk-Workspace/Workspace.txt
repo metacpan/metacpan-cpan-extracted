@@ -1,0 +1,407 @@
+NAME
+      Workspace.pm--Persistent, multi-purpose text processor.
+      (File browser, shell, editor) script.
+      Requires Perl/Tk; optionally Net::FTP.
+
+SYNOPSIS
+       # Create a workspace from the shell prompt:
+
+           mkws "workspace"
+
+       # Open an existing workspace from the shell prompt:
+
+           workspace [-background | -bg <color>] [-textbackground <color>]
+                     [-foreground | -fg <color>] [-textforeground <color>]
+                     [-font | -fn <fontdesc>] [-importfile <filename>]
+                     [-exportfile <filename>] [-dump] [-xrm <pattern>]
+                     [-class <Classname>] [-display | -screen <dpyname>]
+                     [-title <workspacename>] [-help] [-iconic]
+                     [-motif] [-synchronous] [-write] [-quit]
+
+       # Open from a Perl script:
+
+          use Tk;
+          use Tk::Workspace;
+
+          Tk::Workspace::open(Tk::Workspace::create("workspace"));
+
+       # Create workspace object within a Perl script:
+
+          $w = Tk::Workspace -> new( x => 100,
+                                     y => 100,
+                                     width => 300,
+                                     height => 250,
+                                     textfont => "*-courier-medium-r-*-*-12-*",
+                                     foreground => 'white',
+                                     background => 'black',
+                                     menuvisible => 'true',
+                                     scroll => 'se',
+                                     insert => '1.0',
+                                     menubarvisible => 'True',
+                                     text => 'Text to be inserted',
+                                     name => 'workspace' );
+
+DESCRIPTION
+    Workspace uses a modified Tk::Text widget to create an embedded Perl
+    text editor. The resulting file can be run as a standalone program.
+
+OPTIONS
+    In normal use, common X toolkit options apply to non-text areas, like
+    the window border and menus. Text resources can also be specified, but
+    they often have a lower priority than the Workspace's saved values and
+    user selections. Refer to the section: X RESOURCES, below.
+
+    Command line options are described more fully in the Tk::CmdLine manual
+    page.
+
+  X Toolkit Options
+
+    -foreground | -fg <color>
+        Foreground color of widgets. -fg is a synonym for -foreground.
+
+    -background | -bg <color>
+        Background color of widgets. -bg is a synonym for -background.
+
+    -class <classname>
+        Name of X Window resource class. In normal use, this is overriden by
+        the Workspace name.
+
+    -display | -screen <displayname>
+        Name of X display. -screen is a synonym for -display.
+
+    -font | -fn <fontname>
+        Font descriptor for widgets. -fn is a synonym for -font.
+
+    -iconic
+        Start with the window iconfied.
+
+    -motif
+        Adhere as closely as possible to Motif look-and-feel standards.
+
+    -name <resourcename>
+        Specifies the name under which X resources can be found. Refer to
+        the section: X RESOURCES, below.
+
+    -synchronous
+        Requests should be sent to the X server synchronously. Mainly useful
+        for debugging.
+
+    -title <windowtitle>
+        Title of the window. This is overridden by the Workspace.
+
+    -xrm <resourcestring>
+        Specifies a resource pattern to override defaults. Refer to the
+        section: X RESOURCES, below.
+
+  Workspace Specific Options
+
+    -textforeground <color>
+        Set the color of the text foreground. Overrides the Workspace's own
+        setting.
+
+    -textbackground <color>
+        Set the color of the text background. Overrides the Workspace's own
+        setting.
+
+    -importfile <filename>
+        At startup, import <filename> into the workspace at the cursor
+        position.
+
+    -exportfile <filename>
+        Export the text of the workspace to <filename>.
+
+    -title <workspacename>
+        Set the window title and workspace name.
+
+    -write
+        Save the workspace in its current state. If the window is not yet
+        drawn, use the default geometry of 565x351+100+100 and insertion
+        cursor index of 1.0.
+
+    -dump
+        Print the Workspace text to standard output.
+
+    -quit
+        Close the Workspace without saving.
+
+X RESOURCES
+    In normal use, a workspace's Xresources begin with its name in
+    lower-case letters.
+
+      myworkspace*borderwidth:       3
+      myworkspace*relief:            sunken
+      myworkspace*takefocus:         true
+
+    Top-level options are described in the Tk::Toplevel and Tk::options
+    manual pages.
+
+    In addition, several subwidgets have standard names, so properties can
+    easily apply to all Workspaces:
+
+          Widget             Resource Name
+          ------             -------------
+          Text Editor        workspaceText
+          Menu Bar Menus     workspaceMenuBar
+          Popup Menus        workspacePopupMenu
+
+    Examples of resource settings that apply to all Workspaces:
+
+      *workspaceText*insertwidth:         5
+      *workspaceText*spacing1:            20
+      *workspaceMenuBar*foreground:       white
+      *workspaceMenuBar*background:       darkslategray
+      *workspacePopupMenu*foreground:     white
+      *workspacePopupMenu*background:     mediumgray
+
+    Complete descriptions of the options that each widget recognizes are
+    given in the Tk::Text, Tk::TextUndo, and Tk::Menu manual pages.
+
+MENU FUNCTIONS
+    A workspace contains a menu bar with File, Edit, Options, and Help
+    menus.
+
+    The menus also pop up by pressing the right mouse button (Button-3) over
+    the text area, whether the menu bar is visible or not.
+
+    The menu functions are provided by the Tk::Workspace, Tk::TextUndo,
+    Tk::Text, and Tk::Widget modules.
+
+  File Menu
+
+    Import Text -- Insert the contents of a selected text file at the
+    insertion point.
+
+    Export Text -- Write the contents of the workspace to a text file.
+
+    The Import and Export Text functions allow saving to files on remote
+    hosts using FTP, if the Perl Net::FTP module is installed. Please refer
+    to the file INSTALL in the distribution archive and the
+    Tk::RemoteFileSelect manual page.
+
+    System Command -- Prompts for the name of a command to be executed by
+    the shell, /bin/sh. The output is inserted into the workspace.
+
+    For example, to insert a manual page into the workspace, enter:
+
+       man <programname> | colcrt - | col -b
+
+    Shell -- Starts an interactive shell. The prompt is the PS1 prompt of
+    the environment where the workspace was started. At present the
+    workspace shell recognizes only a subset of the bash prompt variables,
+    and does not implement command history or setting of environment
+    variables in the subshell.
+
+    Due to I/O blocking, results can be unpredictable, especially if the
+    called program causes an eof condition on STDERR. For details refer to
+    the Tk::Shell POD documentation.
+
+    Refer to the bash(1) manual page for further information.
+
+    Typing 'exit' leaves the shell and returns the workspace to normal text
+    editing mode.
+
+    Filter -- Specify a filter and output destination for the text in the
+    Workspace. A ``filter'' is defined as a program that takes its input
+    from standard input, STDIN, and sends its output to standard output,
+    STDOUT. By default, output is inserted into the Workspace at the cursor
+    position. Other destinations are:
+
+      - File--Write output to the file name specified.
+      - Terminal--Write output to the Workspace's STDOUT or to a
+        character device specified as the output file.
+      - New Workspace--Write output to a new Workspace with the
+        name specified.
+
+    If the Perl Net::FTP module is installed, filter output can be sent to a
+    remote host, using the pathname syntax, hostname:/filepathname .
+
+    Save -- Save the workspace to disk.
+
+    Quit -- Close the workspace window, optionally saving to disk.
+
+    Workspaces are saved with file mode permissions 0700 (read, write, and
+    execute for the owner of the file).
+
+  Edit Menu
+
+    Undo -- Reverse the next previous change to the text.
+
+    Cut -- Delete the selected text and place it on the X clipboard.
+
+    Copy -- Copy the selected text to the X clipboard.
+
+    Paste -- Insert text from the X clipboard at the insertion point.
+
+    Evaluate Selection -- Interpret the selected text as Perl code.
+
+    Search & Replace -- Open a dialog box to enter search and/or replace
+    strings. Users can select options for exact upper/lower case matching,
+    regular expression searches, forward or backward searches, and no query
+    on replace. If "Replace without Asking" is selected, then all search
+    matches will be replaced. The default is to prompt before the
+    replacement. Replacements for regular expression matches are not
+    supported.
+
+    Goto Line -- Go to the line entered by the user.
+
+    Which Line -- Report the line and column position of the insertion
+    point.
+
+  Options Menu
+
+    Wrap -- Select how the text should wrap at the right margin.
+
+    Scroll Bars -- Select from scroll bars at right or left, top or bottom
+    of the text area.
+
+    Encoding -- Select the encoding to use when exporting text. Does not
+    affect the Workspace text itself. When importing, the text is mapped
+    into ISO-8859-1, regardless of encoding. This option is only available
+    if the UTF16 libraries are installed on the system. If they aren't, then
+    the Workspace uses the default ISO 8859-1 encoding. Refer to the file
+    INSTALL in the distribution archive for information about the required
+    libraries.
+
+    Show/Hide Menubar -- Toggle whether the menubar is visible. A popup
+    version of the menus is always available by pressing the right mouse
+    button (Button 3) over the text area.
+
+    Color Editor -- Pops up a Color Editor window. You can select the text
+    attribute that you want to change from the Colors -> Color Attributes
+    menu. If your system libraries have an rgb.txt file, a list of the
+    available colors is displayed on the left-hand side of the window.
+    Double-clicking on a color name, or selecting its color space parameters
+    from the sliders in the middle of the ColorEditor, displays that color
+    in the swatch on the right-hand side of the window. Pressing the
+    Apply... button at the bottom of the Color Editor applies the color
+    selection to the text. The most useful attributes for Workspace text are
+    foreground, background, and insertBackground.
+
+    Text Font -- Select text font from list of system fonts.
+
+  Help Menu
+
+    About -- Report name of workspace and modification time, and version of
+    Workspace.pm library.
+
+    Help -- Display the Workspace.pm POD documentation in a text window
+    formatted by pod2text.
+
+KEY BINDINGS
+    For further information, please refer to the Tk::Text and Tk::bind man
+    pages.
+
+        Alt-Q                 Quit, Optionally Saving Text
+        Alt-S                 Save Workspace to Disk
+        Alt-I                 Import Text
+        Alt-W                 Export Text
+        Alt-U                 Undo
+        Alt-X                 Copy Selection to Clipboard and Delete
+        Alt-C                 Copy Selection to Clipboard
+        Alt-V                 Insert Clipboard Contents at Cursor
+        Alt-F                 Search & Replace
+        Alt-H                 Select Paragraph
+        Alt-L                 Fill Paragraph
+        Alt-P                 Print
+
+        Right, Ctrl-F         Forward Character
+        Left, Ctrl-B          Backward Character
+        Up, Ctrl-P            Up One Line
+        Down, Ctrl-N          Down One Line
+        Shift-Right           Forward Character Extend Selection
+        Shift-Left            Backward Character Extend Selection
+        Shift-Up              Up One Line, Extend Selection
+        Shift-Down            Down One Line, Extend Selection
+        Ctrl-Right, Meta-F    Forward Word
+        Ctrl-Left, Meta-B     Backward Word
+        Ctrl-Up               Up One Paragraph
+        Ctrl-Down             Down One Paragraph
+        PgUp                  Scroll View Up One Screen
+        PgDn                  Scroll View Down One Screen
+        Ctrl-PgUp             Scroll View Right
+        Ctrl-PgDn             Scroll View Left
+        Home, Ctrl-A          Beginning of Line
+        End, Ctrl-E           End of Line
+        Ctrl-Home, Meta-<     Beginning of Text
+        Ctrl-End, Meta->      End of Text
+        Ctrl-/                Select All
+        Ctrl-\                Clear Selection
+        F16, Copy, Meta-W     Copy Selection to Clipboard
+        F20, Cut, Ctrl-W      Copy Selection to Clipboard and Delete
+        F18, Paste, Ctrl-Y    Paste Clipboard Text at Insertion Point
+        Delete, Ctrl-D        Delete Character to Right, or Selection
+        Backspace, Ctrl-H     Delete Character to Left, or Selection
+        Meta-D                Delete Word to Right
+        Meta-Backspace, Meta-Delete
+                              Delete Word to Left
+        Ctrl-K                Delete from Cursor to End of Line
+        Ctrl-O                Open a Blank Line
+        Ctrl-X                Clear Selection
+        Ctrl-T                Reverse Order of Characters on Either Side
+                              of the Cursor
+        Ctrl-.                Center the line the insertion cursor is on
+                              in the window.
+
+        Mouse Button 1:
+        Single Click: Set Insertion Cursor at Mouse Pointer
+        Double Click: Select Word Under the Mouse Pointer and Position 
+        Cursor at the Beginning of the Word
+        Triple Click: Select Line Under the Mouse Pointer and Position 
+        Cursor at the Beginning of the Line
+        Drag: Define Selection from Insertion Cursor
+        Shift-Drag: Extend Selection
+        Double Click, Shift-Drag: Extend Selection by Whole Words
+        Triple Click, Shift-Drag: Extend Selection by Whole Lines
+        Ctrl: Position Insertion Cursor without Affecting Selection
+
+        Mouse Button 2:
+        Click: Copy Selection into Text at the Mouse Pointer
+        Drag:Shift View
+
+        Mouse Button 3:
+        Pop Up Menu Bar
+
+        Meta                  Escape
+
+METHODS
+    There is no actual API specification, but Workspaces recognize the
+    following instance methods:
+
+    about, bind, close_dialog, cmd_import, commandline, create, custom_args,
+    defaultcursor, do_win_signal_event, dump, editmenu, elementColor,
+    evalselection, exportfile, filemenu, filenotfound, filepath, filter,
+    filter_dialog, filter_text, fontdialogaccept, fontdialogapply,
+    fontdialogclose, geometry, goto_line, havenet, height, helpmenu,
+    importfile, insertionpoint, libname, menubar, menubarvisible, menus,
+    mktmpfile, my_directory, name, new, open, optionsmenu, outputfile,
+    outputmode, parent_ws, popupmenu, postpopupmenu, quit, requirecond,
+    scroll, scrollbar, self_help, set_scroll, text, textbackground,
+    textfont, textforeground, title, togglemenubar, user_import,
+    watchcursor, what_line, width, window, wmgeometry, workspaceobject,
+    wrap, write, write_to_disk, ws_copy, ws_cut, ws_export, ws_font,
+    ws_paste, ws_undo, x, y
+
+    The following class methods are available:
+
+    new, ScrollMenuItems, WrapMenuItems, workspaceobject.
+
+    The 'new' constructor recognizes the settings of the following options,
+    which are used by the Workspace.pm :
+
+    window, name, textfont, width, height, x, y, foreground, background,
+    textfont, filemenu, editmenu, optionsmenu, wrapmenu, scrollmenu,
+    modemenu, helpmenu, menubar, popupmenu, menubarvisible, scroll,
+    scrollbuttons, insertionpoint, text
+
+CREDITS
+    Tk::Workspace by rkiesling@mainmatter.com (Robert Kiesling)
+
+    Perl/Tk by Nick Ing-Simmons. Tk::ColorEditor widget by Steven Lidie.
+    Perl by Larry Wall and many others.
+
+REVISION
+    $Id: Workspace.pm,v 1.74 2001/09/20 00:19:27 kiesling Exp $
+
+SEE ALSO:
+    Tk::overview(1), Tk::ColorEditor(1), perl(1) manual pages.
+

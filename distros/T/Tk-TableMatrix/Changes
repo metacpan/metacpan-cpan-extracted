@@ -1,0 +1,104 @@
+Summary of Changes to Tk::TableMatrix
+
+See ChangeLog for detailed changes.
+
+Release 1.23   1/9/2007
+
+* Changed TableMatrix::Spreadsheet row/col resize behavior to be more
+spreadsheet-like.
+ 
+Release 1.22   3/23/06
+
+* Misc Bugs fixed in Tk::TableMatrix::SpreadsheetHideRows
+ 
+Release 1.21   3/2/06
+
+* Updated to make the row/size resize operation (that happens when you
+  drag the row/col borders) apply to every row or column that is currently
+  selected, instead of just the	row/col border that was dragged.
+  
+Release 1.2   1/26/05
+
+* Fixed bug which was causing crashes on perl 5.8.4 on win32 when 
+  anything was copied into the clipboard (i.e. when control-c pressed).
+  
+* Fixed row/col insert/deletes to work more reliably in TableMatrix::Spreadsheet
+
+
+Release 1.1:   2/12/04
+
+* Updated to be compatible with the new Tk804 series.
+
+
+Release 1.01:  12/6/02
+
+* Fixed Error where the rowHeight method
+  was getting executed like a colWidth. This was introduced in the
+  update of TkTable 2.5 to 2.6
+
+Release 1.0:  12/2/02
+
+* Updated core C-code for the changes made from TkTable 2.6 to 2.8.
+  (Tk::TableMatrix is derived from the TkTable Tcl/Tk Widget.
+    See tktable.sourceforge.net ) 
+    
+  From the TkTable 2.7 and 2.8 Release Notes:
+  
+    * Corrected memory leaks in caching.
+    * Added the ability to select borders with Button1.
+    * Added global -justify option.
+  
+    * Added -ipadx/-ipady table options and swapped them with
+      the old -padx/-pady.  This gives better control over the
+      cell padding. **** POTENTIAL INCOMPATABILITY ****
+    * -borderwidth now takes up to 4 values to allow you to
+      customize edge edge of a cell.
+    * Added priorities to tags, so tags can be raised and
+      lowered in priority. **** POTENTIAL INCOMPATABILITY ****  
+      
+* Numerous minor bugs fixed.
+
+Release 0.9:  5/22/02
+
+* Added an experimental widget: SpreadsheetHideRows. This enables
+  display of tabular info, with selectable hide/unhide of detail
+  data. See demos/SpreadsheetHideRows
+  
+* Numerous minor bugs fixed.
+  
+Release 0.8:  10/5/01
+
+* Removed un-needed dependencies on Data::Parse and Date::Format
+  for TableMatrix::Spreadsheet
+  
+* Fixed problem with the selection going nuts when dragging the 
+  selection out of the window.
+
+Release 0.71:  6/15/01
+
+* Fixed to compile with the new Tk800.023 release.
+
+Release 0.7:  6/7/01
+
+* Added TableMatrix::Spreadsheet widget. This is a TableMatrix Derived
+        widget with Excel-like bindings.
+
+* Reverted back to the cell sorting method implemented in tktable 2.5 (and
+	TableMatrix 0.3).  The new cell sorting method didn't sort negative
+	row/column indexes correctly, which caused the data from a
+	copy/paste operation to be out-of-order, if the selection included
+        multiple negative row/col indexes.
+	
+* Fixed control +/- key bindings for modifying the column with. 
+        (Patch from Slaven)
+	
+Release 0.5:  12/20/00
+
+* Updated to be consistent with tkTable 2.6
+
+
+Release 0.3  9/16/00
+
+* Initial Release (based on tkTable 2.5)
+
+

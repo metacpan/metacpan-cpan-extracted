@@ -1,0 +1,12 @@
+
+Changes made in Sense-Clusters version 0.85 during version 0.87
+
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+
+1. Fixed a bug in clusterstopping.pl related to the case of empty column, 
+   i.e, when a feature(s) does not occur in any of the contexts/instances.		-Anagha
+
+2. Updated INSTALL and Makefile.PL to require v0.03 of Algorithm::RandomMatrixGeneration.		-Anagha	
+
+(Changelog-v0.85to0.87 Last Updated on 05/16/2006 by Anagha)

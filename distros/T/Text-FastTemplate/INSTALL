@@ -1,0 +1,20 @@
+
+The Text::FastTemplate class requires Perl version 5.004_05 or above.  In the
+future, this could change to require version 5.005 or above.
+
+Install this module the same way as any other Perl module.
+
+	1.  perl Makefile.PL
+	2.  make test
+	3.  make install
+
+Don't forget the PREFIX option if you don't have permission to write into the
+default directories on your Perl installation.  Many people forget about this;
+then they either give up or ask their sys admin to install it for them.
+
+Try this instead:
+
+	1.  perl Makefile.PL PREFIX=$HOME/perl-modules
+	2.  make test
+	3.  make install
+

@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Next;
+use File::Basename;
+use YAML qw/LoadFile/;
+
+my @files;
+my $iter = File::Next::files('lib/', 'bin/', 'doc/', 't/');
+
+while (defined (my $file = $iter->())) {
+    next if $file =~ /~$/;
+    open my $handle, '<', $file
+        or do {
+            warn "Unable to open $file for reading: $!";
+            next;
+        };
+
+    my $lines      = 0;
+    my $with_know  = 0;
+    my $with_doc   = 0;
+    my $with_blank = 0;
+    while (<$handle>) {
+        ++$with_blank;
+        next if /^\s*$/;
+
+        ++$with_doc;
+        next if /^=head/ .. /^=cut/;
+        next if /^\s*#/;
+        next if $file =~ /\bdoc\b/;
+        last if $file =~ /__END__/;
+
+        ++$with_know;
+        next if $file =~ /\bSpoilers?\b/;
+
+        ++$lines;
+    }
+
+    push @files, [$file, $lines, $with_know, $with_doc, $with_blank];
+}
+
+@files = sort {
+    $a->[1] <=> $b->[1] ||
+    $a->[2] <=> $b->[2] ||
+    $a->[3] <=> $b->[3] ||
+    $a->[4] <=> $b->[4]
+} @files;
+
+my $total_lines = 0;
+my $total_know  = 0;
+my $total_doc   = 0;
+my $total_blank = 0;
+my $length      = 0;
+
+my @out;
+
+for (@files) {
+    my ($file, $lines, $with_know, $with_doc, $with_blank) = @$_;
+
+    $total_lines += $lines;
+    $total_know  += $with_know;
+    $total_doc   += $with_doc;
+    $total_blank += $with_blank;
+
+    my $out = sprintf "%7d %7d %7d %7d  %s\n",
+              $lines, $with_know, $with_doc, $with_blank, $file;
+    push @out, $out;
+
+    $length = length($out)
+        if length($out) > $length;
+}
+
+$length = 80 if $length > 80;
+
+print "  lines   +spoil   +doc  +blank  file\n";
+printf "%s\n", '-' x $length;
+print @out;
+printf "%s\n", '-' x $length;
+printf "%7d %7d %7d %7d\n\n", $total_lines, $total_know, $total_doc, $total_blank;
+
+my $author_map = LoadFile((fileparse($0))[1] . '../etc/nicks.yml');
+
+my %commits_by;
+for (`darcs show authors`) {
+    next if $_ eq "\n";
+    my ($commits, $author) = $_ =~ /^(\d+).*\s(\S+@\S+)/ or warn "Unable to parse '$_'";
+    $author =~ s/.*<(.*)>.*/$1/;
+    $author = $author_map->{$author} if exists $author_map->{$author};
+    $commits_by{$author} += $commits;
+    $commits_by{'*'} += $commits;
+}
+
+print "  commits     committer\n";
+printf "%s\n", '-' x $length;
+for my $author (sort {$commits_by{$b} <=> $commits_by{$a} || $a cmp $b} keys %commits_by) {
+    printf " %10d   %s\n", $commits_by{$author}, $author;
+}
+

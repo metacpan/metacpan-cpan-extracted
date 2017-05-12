@@ -1,0 +1,1 @@
+test2: <%= $0 %> - <%* test3.tts %> - <%+ test4.tts %>

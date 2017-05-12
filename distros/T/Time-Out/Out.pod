@@ -1,0 +1,98 @@
+=head1 NAME
+
+Time::Out - Easily timeout long running operations
+
+
+=head1 SYNOPSIS
+
+  use Time::Out qw(timeout) ;
+
+  timeout $nb_secs => sub {
+    # your code goes were and will be interrupted if it runs
+    # for more than $nb_secs seconds.
+  } ;
+  if ($@){
+    # operation timed-out
+  }
+
+
+=head1 DESCRIPTION
+
+C<Time::Out> provides an easy interface to I<alarm(2)> based timeouts. 
+Nested timeouts are supported.
+
+
+=head2 RETURN VALUE
+
+'timeout' returns whatever the code placed inside the block returns:
+
+  use Time::Out qw(timeout) ;
+
+  my $rc = timeout 5 => sub {
+	return 7 ;
+  } ;
+  # $rc == 7
+
+
+=head1 C<Time::HiRes>
+
+If C<Time::Out> sees that C<Time::HiRes> has been loaded, it will use 
+that 'alarm' function (if available) instead of the default one, allowing 
+float timeout values to be used effectively:
+
+  use Time::Out ;
+  use Time::HiRes ;
+
+  timeout 3.1416 => sub {
+	# ...
+  } ;
+
+
+=head1 BUGS
+
+=over 4 
+
+=item Blocking I/O on MSWin32
+
+I<alarm(2)> doesn't interrupt blocking I/O on MSWin32, so 'timeout' won't
+do that either.
+
+=item @_
+
+One drawback to using 'timeout' is that it masks @_ in the affected code. 
+This happens because the affected code is actually wrapped inside another 
+subroutine that provides it's own @_. You can get around this by 
+specifically passing your @_ (or whatever you want for that matter) to 
+'timeout' as such:
+
+  use Time::Out ;
+
+  sub test {
+    timeout 5, @_ => sub {
+      print "$_[0]\n" ;
+    } ;
+  }
+
+  test("hello") ; # will print "hello\n" ;
+
+=back
+
+
+=head1 SEE ALSO
+
+eval, closures, I<alarm(2)>, L<Sys::AlarmCall>
+
+
+=head1 AUTHOR
+
+Patrick LeBoutillier, E<lt>patl@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2008 by Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

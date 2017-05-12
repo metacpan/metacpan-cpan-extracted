@@ -1,0 +1,29 @@
+---
+abstract: 'Feature toggles for Perl'
+author:
+  - 'Tim Retout <t.retout@cv-library.co.uk>'
+build_requires:
+  Test::Spec: '0'
+  Test::Spec::Mocks: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Toggle
+provides:
+  Toggle:
+    file: lib/Toggle.pm
+    version: '0.003'
+  Toggle::Feature:
+    file: lib/Toggle.pm
+    version: '0.003'
+requires:
+  Moo: '0'
+  String::CRC32: '0'
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/cv-library/Toggle/issues
+  repository: git://github.com/cv-library/Toggle.git
+version: '0.003'

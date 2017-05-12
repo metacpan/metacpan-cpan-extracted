@@ -1,0 +1,142 @@
+NAME
+        WorkspaceText.pm - Text editor widget.
+
+SYNOPSIS
+        use Tk::WorkspaceText;
+
+        my $w = new Tk::WorkspaceText (<options>);
+
+DESCRIPTION
+    The Tk::WorkspaceText widget is derived from the Tk::Text and
+    Tk::TextUndo widgets. For information about standard options, refer to
+    the widgets' documentation.
+
+    Tk::WorkspaceText widgets use fixed tabs, and support paragraph filling
+    and selection, a "text modified" flag, recentering, and additional key
+    bindings.
+
+    Paragraphs are defined as contiguous lines of text separated by blank
+    lines.
+
+WIDGET METHODS
+    The Tk::WorkspaceText widget supports the configure and cget methods
+    described in the the Tk::options manpage documentation. The
+    Tk::WorkspaceText widget also inherits all the methods of the the
+    Tk::Widget manpage, the Tk::Text manpage, and the Tk::TextUndo manpage
+    widget classes.
+
+    In addition, Tk::WorkspaceText widgets recognize these methods:
+
+    *$text*->paragraphFill
+        Fill the paragraph that contains the insertion point. Paragraphs are
+        defined as a series of contiguous lines of text separated by blank
+        lines. Text is filled against the left margin, and wraps before the
+        right margin, which can be set with the wrapcolumn method, below.
+
+    *$text*->selectPara
+        Select the entire paragraph. As with paragraphFill, paragraphs are
+        defined as a set of contiguous lines separated by blank lines.
+
+    *$text*->prevPara
+        Set the insertion cursor to the first line of a paragraph. Does
+        nothing if the insertion cursor is already on the first line of the
+        paragraph.
+
+    *$text*->setFixedTabs
+        Set fixed tab stops to the value of the numeric argument. Tab stops
+        occur every 8 columns by default.
+
+    *$text*->center
+        Center the line that contains the insertion cursor in the window.
+
+    *$text*->modified
+        With argument, sets the modified flag to the argument. With no
+        argument, returns the value of the modified flag. By default, the
+        value of the modified flag is '1' if text was modified, '' if
+        unmodified.
+
+    *$text*->setFillColumn
+        Set the right margin column for filling paragraphs. The default is
+        column 65.
+
+KEY BINDINGS
+    Tk::WorkspaceText widgets support the keybindings of the Tk::Text and
+    Tk::TextUndo widgets, in addition to its own bindings. For further
+    information, please refer to the the Tk::Text manpage, the Tk::TextUndo
+    manpage and the Tk::bind manpage man pages.
+
+        Alt-H                 Select Paragraph
+        Alt-L                 Fill Paragraph
+
+        Right, Ctrl-F         Forward Character
+        Left, Ctrl-B          Backward Character
+        Up, Ctrl-P            Up One Line
+        Down, Ctrl-N          Down One Line
+        Shift-Right           Forward Character Extend Selection
+        Shift-Left            Backward Character Extend Selection
+        Shift-Up              Up One Line, Extend Selection
+        Shift-Down            Down One Line, Extend Selection
+        Ctrl-Right, Meta-F    Forward Word
+        Ctrl-Left, Meta-B     Backward Word
+        Ctrl-Up               Up One Paragraph
+        Ctrl-Down             Down One Paragraph
+        PgUp                  Scroll View Up One Screen
+        PgDn                  Scroll View Down One Screen
+        Ctrl-PgUp             Scroll View Right
+        Ctrl-PgDn             Scroll View Left
+        Home, Ctrl-A          Beginning of Line
+        End, Ctrl-E           End of Line
+        Ctrl-Home, Meta-<     Beginning of Text
+        Ctrl-End, Meta->      End of Text
+        Ctrl-/                Select All
+        Ctrl-\                Clear Selection
+        F16, Copy, Meta-W     Copy Selection to Clipboard
+        F20, Cut, Ctrl-W      Copy Selection to Clipboard and Delete
+        F18, Paste, Ctrl-Y    Paste Clipboard Text at Insertion Point
+        Delete, Ctrl-D        Delete Character to Right, or Selection
+        Backspace, Ctrl-H     Delete Character to Left, or Selection
+        Meta-D                Delete Word to Right
+        Meta-Backspace, Meta-Delete
+                              Delete Word to Left
+        Ctrl-K                Delete from Cursor to End of Line
+        Ctrl-O                Open a Blank Line
+        Ctrl-X                Clear Selection
+        Ctrl-T                Reverse Order of Characters on Either Side
+                              of the Cursor
+        Ctrl-.                Center the line the insertion point is on
+                              in the window.
+
+        Mouse Button 1:
+        Single Click: Set Insertion Cursor at Mouse Pointer
+        Double Click: Select Word Under the Mouse Pointer and Position 
+        Cursor at the Beginning of the Word
+        Triple Click: Select Line Under the Mouse Pointer and Position 
+        Cursor at the Beginning of the Line
+        Drag: Define Selection from Insertion Cursor
+        Shift-Drag: Extend Selection
+        Double Click, Shift-Drag: Extend Selection by Whole Words
+        Triple Click, Shift-Drag: Extend Selection by Whole Lines
+        Ctrl: Position Insertion Cursor without Affecting Selection
+
+        Mouse Button 2:
+        Click: Copy Selection into Text at the Mouse Pointer
+        Drag:Shift View
+
+        Mouse Button 3:
+        Pop Up Menu Bar
+
+        Meta                  Escape
+
+CREDITS
+    Tk::WorkspaceText by rkiesling@mainmatter.com (Robert Kiesling)
+
+    Perl/Tk by Nick Ing-Simmons. Tk::ColorEditor widget by Steven Lidie.
+    Perl by Larry Wall and many others.
+
+REVISION
+    $Id: WorkspaceText.pm,v 0.57 2001/08/01 08:46:28 kiesling Exp $
+
+SEE ALSO:
+    Tk::Workspace(3), Tk::overview(3), Tk::ColorEditor(3), perl(1) manual
+    pages.
+

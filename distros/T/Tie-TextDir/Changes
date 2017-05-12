@@ -1,0 +1,46 @@
+Revision history for Perl extension Tie::TextDir.
+
+0.06
+
+ - Improved speed considerably by using Perl's open() instead of the
+   FileHandle module, and sysread() instead of <FH>. [patch by Perrin
+   Harkins]
+
+ - Data is now written to a temporary file using File::Temp, and then
+   we rename() to the destination file, making the actual write an
+   atomic operation.  [patch by Perrin Harkins]
+
+ - When creating filehandles, we now use Symbol.pm if perl's version
+   is less than 5.6, and just auto-vivify them otherwise.
+
+0.05  Wed Jul  9 16:35:11 CDT 2003
+
+ - Added a Build.PL script for installing via Module::Build if the
+   user wishes to.
+
+0.04  Wed Oct 17 12:49:21 CDT 2001
+   - Now accepts the opening-mode as 'rw', 'ro', or a bitmask like
+     O_CREAT|O_RDWR.  This improves compatibility with things like MLDBM
+     and MLDBM::Sync. (Thanks to Joshua Chamas)
+   
+   - Uses File::Spec to construct file paths, so it should now work on
+     other OSs like Windows, Mac
+   
+   - delete($hash{key}) will now return the deleted value, like it should.
+   
+   - General code cleanup - the old code style was rather embarassing
+
+   - Lots of documentation updates
+
+0.03  21-Oct-1998 08:44
+   - No changes - just added a copyright notice, which should have been
+     present before, but I overlooked it.
+
+0.02  Tue Aug 11 16:10:32 EDT 1998
+   - fixed bug in EXISTS method that reported that the keys
+     '', '.', and '..' existed in a hash when that was not
+     the case.
+
+0.01  Sun Jun 28 18:34:36 1998
+   - original version; created by h2xs 1.18
+

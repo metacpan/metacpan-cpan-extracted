@@ -1,0 +1,19 @@
+<doc>
+ <page title="Template">
+  <section title="DESCRIPTION">
+    This documentation describes the Template module which is the
+    direct Perl interface into the <em>Template Toolkit</em>.  It
+    covers the use of the module &amp; gives a brief summary of
+    configuration options and template directives.  Please see
+    <pod>Template::Manual</pod> for the complete reference manual
+    which goes into much greater depth about the features and use of
+    the Template Toolkit.  The <pod>Template::Tutorial</pod> is also
+    available as an introductory guide to using the Template Toolkit.
+  </section>  
+ 
+  <section title="AUTHOR">
+   Andy Wardly <email>abw@andwardly.com</email>
+   <url>http://www.andywardley.com/</url>
+  </section>
+ </page>
+</doc>

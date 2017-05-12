@@ -1,0 +1,16 @@
+#,# Configuration,
+config,xhtml=1,
+
+#,# Rules for all pages,
+all body,<h1>Welcome</h1>,
+except,(test02|test03).html,
+all body,Copyright &#169; 2010,.. Footer found
+
+#,# Main Page,
+file,./t/samples/test01.html,
+body,the first test page,
+
+#,# About Page,
+file,./t/samples/test02.html,
+body,<h1>About</h1>,
+

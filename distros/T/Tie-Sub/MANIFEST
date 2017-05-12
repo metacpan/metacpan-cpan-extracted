@@ -1,0 +1,19 @@
+Changes
+example/01_example.pl
+example/02_default_hash.pl
+lib/Tie/Sub.pm
+MANIFEST			This list of files
+README
+t/01_basics.t
+t/02_like_function.t
+t/03_like_sub.t
+t/04_like_method.t
+t/11_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

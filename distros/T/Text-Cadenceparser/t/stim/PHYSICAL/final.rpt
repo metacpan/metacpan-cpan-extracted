@@ -1,0 +1,46 @@
+
+
+Working Directory = /scratch/my_design
+QoS Summary for my_design
+========================================================================================
+Metric                  elab       generic    map        map_incr   phys       enc        phys_incr  final     
+========================================================================================
+Slack (ps):                 39.5       74.0      -54.2        0.0        0.9       25.0       -0.3       -0.3
+  R2R (ps):                479.6      482.6       19.9        5.8        3.5       92.0        3.5        3.5
+  I2R (ps):                 39.5       74.0      -54.2        0.0        0.9       25.0       -0.3       -0.3
+  R2O (ps):                866.3      866.3      809.9      800.5      728.7      804.0      728.7      728.7
+  I2O (ps):             no_value   no_value   no_value   no_value   no_value        n/a   no_value   no_value
+  CG  (ps):             no_value   no_value      951.8      951.8      947.1      946.0      947.1      947.1
+TNS (ps):                      0          0        117          0          0          0          0          0
+  R2R (ps):                  0.0        0.0        0.0        0.0        0.0        0.0        0.0        0.0
+  I2R (ps):                  0.0        0.0      117.0        0.0        0.0        0.0        0.0        0.0
+  R2O (ps):                  0.0        0.0        0.0        0.0        0.0        0.0        0.0        0.0
+  I2O (ps):             no_value   no_value   no_value   no_value   no_value        n/a   no_value   no_value
+  CG  (ps):             no_value   no_value        0.0        0.0        0.0        0.0        0.0        0.0
+Failing Paths:                 0          0          3          0          0          0          2          2
+Area:                       4904       4615       2287       2294       1974       2294       1940       1940
+Instances:                  2431       2351       1151       1085       1009       1085        996        996
+Utilization (%):            0.00       0.00       0.00       0.00      43.08      50.07      42.35      42.35
+Tot. Net Length (um):   no_value   no_value   no_value   no_value  10864.420  11165.528  10859.030  10859.030
+Avg. Net Length (um):   no_value   no_value   no_value   no_value      9.450      9.092      9.550      9.550
+Total Overflow H:              0          0          0          0          0   no_value          0          0
+Total Overflow V:              0          0          0          0          0   no_value          0          0
+Route Overflow H (%):   no_value   no_value   no_value   no_value       0.00       0.00       0.00       0.00
+Route Overflow V (%):   no_value   no_value   no_value   no_value       0.00       0.00       0.00       0.00
+========================================================================================
+CPU  Runtime (m:s):        00:13      00:02      00:06      00:07      00:20      00:00      00:08      00:03
+Real Runtime (m:s):        00:14      00:02      00:45      00:06      00:47      00:00      00:08      00:03
+CPU  Elapsed (m:s):        00:16      00:18      00:24      00:31      00:51   no_value      00:59      01:02
+Real Elapsed (m:s):        00:15      00:17      01:02      01:08      01:55      01:55      02:03      02:06
+Memory (MB):              243.00     244.00     250.00     255.00     264.00     532.03     266.00     266.00
+========================================================================================
+
+========================================================================================
+Flow Settings:
+========================================================================================
+Total Runtime (m:s): 02:06
+Total Memory (MB):   266.00
+Executable Version:  12.20
+========================================================================================
+
+

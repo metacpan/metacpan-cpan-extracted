@@ -1,0 +1,52 @@
+Revision history for Task-BeLike-RSRCHBOY
+
+0.007     2015-04-09 20:46:43 PDT-0700
+	* + Dist::Zilla::App::Command::cover
+	* + Dist::Zilla::App::Command::gh
+	* + Dist::Zilla::App::Command::dumpwith
+	* = namespace::autoclean >= 0.24
+	* - Directory::Scratch
+	* + Path::Tiny
+	* + MooseX::Types::LoadableClass
+	* + MooseX::AttributeShortcuts
+	* + MooseX::AlwaysCoerce
+	* + OrePAN2
+
+0.006     2015-04-06 20:44:02 PDT-0700
+	* + App::Cmd
+	* + Devel::Confess
+	* + Dist::Zilla::App::Command::issues
+	* + Dist::Zilla::PluginBundle::RSRCHBOY
+	* + L
+	* - Git::CPAN::Patch (BackPAN::Index is broken, and we have the gitpan now)
+	* - File::Slurp
+	* long overdue additions, deletions
+
+0.005     2013-12-06 19:09:34 PST-0800
+	* add: App::cpanminus::reporter
+	* require autodie >= 2.22; add autobox::Colors
+	* add: Carp::Always
+	* add: Moo, MooX::Types::MooseLike, MooX::Cmd
+	* drop Moose::Autobox, as I'm more an autobox::Core kinda person
+	* add App::AltSQL, as it ROCKS.
+	* add TAP::Harness::Restricted, Class::Method::Modifiers::Fast
+	* drop Role::Basic
+	* add Task::CPAN::Reporter
+	* add Travis-CI configuration
+
+0.004     2013-02-23 10:23:10 PST-0800
+	* add cpandoc, autodie 0.16
+	* add MXRC, bump TMM and Reindeer req versions to latest
+	* add Directory::Scratch and Test::TempDir
+	* add Regexp::Debugger
+	* add various autobox packages
+	* make Changes more changelogy
+
+0.003     2012-05-29 14:51:31 America/Los_Angeles
+	* misc version updates; add Software::License::CCpack
+
+0.002     2012-03-30 20:45:53 America/Los_Angeles
+	* Split web deps out
+
+0.001     2011-09-29 11:23:39 America/Los_Angeles
+	* initial release

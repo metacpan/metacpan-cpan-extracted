@@ -1,0 +1,108 @@
+=head1	NAME
+
+Tk::mySplashScreen - annother Perl/Tk implementation of a splash screen
+
+
+=head1	SYNOPSIS
+
+
+use Tk;
+require Tk::mySplashScreen;
+
+my $Splash = Tk::mySplashScreen->new(
+	
+	-image	=> "/path/to/image.gif",
+	
+	-text	=> "this is a splash screen"
+
+);
+
+$Splash->configure(-text => "new message");
+
+$Splash->configure(-image => $newTKimageObject);
+
+$Splash->configure(-image => "path/to/new/file.gif");
+
+$Splash->configure(-anchor => 'n|s|e|w');
+
+$Splash->configure(-hide => 1);		#hide it
+
+$Splash->configure(-hide => 0);		#unhide it (if already hidden)	
+
+$myContentFrame = $Splash->AltContent();
+
+$Splash->destroy();
+
+
+
+=head1	new	(Constructor)
+
+=head2	Notes
+
+The new method creates a new toplevel window and puts an image and 
+a message in it. Note that there is no parent widget.
+
+
+=head2	Options
+
+=over
+
+=item	-text
+
+this is the message text you wish to display in the splash screen
+
+=item	-image
+
+this is alternately, the path to a file containing a supported image type, or a reference to a
+pre-existing Tk::Image object. In either case the image is displayed in the splash screen window.
+
+
+=back
+
+
+
+=head1	hide
+
+=head2	Notes
+
+this will hide (undraw) the splash screen, but not destroy the object.
+
+
+
+=head1	unhide
+
+head2	Notes
+
+this will unhide a hidden splash screen. Obviously, this dosen't do much unless the 
+window has already been hidden.
+
+
+=head1	AltContent
+
+=head2	Notes
+
+this allows you to add custom content on the splash screen between the image and the message
+display. This is handy if, for instance, you want to ask for a username and password before 
+showing your main program or whatever. This works by returning a frame reference. You can pack
+whatever you want into the frame. When you're done, just destroy the frame reference.
+
+=head2	Example
+
+
+$frame = $Splash->AltContent();
+
+$frame->label(-text => "enter your password")->pack();
+
+$frame->entry(
+	-width => 20, 
+	-show => '*', 
+	-variable => \$pass
+)->pack();
+
+..etc
+
+
+=head1	Author
+
+Andrew N. Hicox	<andrew@hicox.com>
+

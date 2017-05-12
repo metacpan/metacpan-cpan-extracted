@@ -1,0 +1,579 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Data::Pond 0.000 qw(pond_write_datum);
+use End 1.2 qw(end);
+use Errno 1.00 qw(ENOENT);
+use File::Find qw(find);
+use File::Path 2.07 qw(mkpath);
+use Getopt::Std 1.02 qw(getopts);
+use IO::File 1.03 ();
+use IPC::Filter 0.002 qw(filter);
+use Time::OlsonTZ::Download 0.003 ();
+
+my %opts;
+getopts("t:", \%opts) or die "bad options\n";
+
+my $target_dir = exists($opts{t}) ? $opts{t} : ".";
+foreach(qw(
+	Build.PL
+	MANIFEST.base
+	lib/Time/OlsonTZ/Data.pm.tpl
+)) {
+	unless(-f "$target_dir/$_") {
+		die "bad target directory: $target_dir/$_ not available\n";
+	}
+}
+
+my $data_relpath = "lib/Time/OlsonTZ/Data";
+
+sub read_file($) {
+	my($fn) = @_;
+	my $h = IO::File->new($fn, "r") or die "$fn unreadable: $!\n";
+	local $/ = undef;
+	my $content = $h->getline;
+	defined $content or die "$fn unreadable: $!\n";
+	return $content;
+}
+
+sub read_target_file($) { read_file("$target_dir/$_[0]") }
+
+sub write_file($$) {
+	my($fn, $content) = @_;
+	(my $dir = $fn) =~ s#/[^/]*\z##;
+	mkpath($dir);
+	my $tfn = "$fn.new$$";
+	clean_file($tfn);
+	my $done = 0;
+	my $clean_tfn = end {
+		local($., $@, $!, $^E, $?);
+		clean_file($tfn) unless $done;
+	};
+	my $h = IO::File->new($tfn, "w") or die "$fn unwritable: $!\n";
+	local $\ = undef;
+	$h->print($content) or die "$fn unwritable: $!\n";
+	$h->flush or die "$fn unwritable: $!\n";
+	$h->close or die "$fn unwritable: $!\n";
+	rename($tfn, $fn) or die "can't create $fn: $!\n";
+	$done = 1;
+}
+
+sub write_target_file($$) { write_file("$target_dir/$_[0]", $_[1]) }
+
+sub tabbed_pond($) {
+	my $expr = pond_write_datum($_[0], {indent=>0});
+	$expr =~ s/^( +)/"\t" x (length($1)>>2)/meg;
+	return $expr;
+}
+
+my @status_checks = (
+	{ st => "bare wrapper source", gp => "Olson source", cks => [
+		{ item => "tzsrc subdirectory", ck => sub {
+			-d "$target_dir/tzsrc"
+		} },
+		{ item => "tzsrc.meta file", ck => sub {
+			-f "$target_dir/tzsrc.meta"
+		} },
+	] },
+	{ st => "combined true source", gp => "data build", cks => [
+		{ item => "MANIFEST", ck => sub {
+			-f "$target_dir/MANIFEST"
+		} },
+		{ item => "lib/Time/OlsonTZ/Data.pm", ck => sub {
+			-f "$target_dir/lib/Time/OlsonTZ/Data.pm"
+		} },
+		{ item => "$data_relpath/country_selection.tzp", ck => sub {
+			-f "$target_dir/$data_relpath/country_selection.tzp"
+		} },
+		{ item => "full set of tzfiles", ck => sub {
+			return 0 unless -f "$target_dir/MANIFEST";
+			my @names = grep { m#\Alib/.*\.tz\z#s }
+				split(/\n/, read_target_file("MANIFEST"));
+			foreach(@names) {
+				return 0 unless -f "$target_dir/$_";
+			}
+			return 1;
+		} },
+	] },
+	{ st => "data built", gp => "target configuration", cks => [
+		{ item => "Build script", ck => sub {
+			-f "$target_dir/Build"
+		} },
+		{ item => "_build subdirectory", ck => sub {
+			-d "$target_dir/_build"
+		} },
+	] },
+	{ st => "configured for target", gp => "target build", cks => [
+		{ item => "blib subdirectory", ck => sub {
+			-d "$target_dir/blib"
+		} },
+	] },
+	{ st => "built for target", cks => [{item=>"",ck=>sub{0}}] },
+);
+
+sub action_status(@) {
+	die "bad arguments\n" if @_;
+	my $found_state;
+	foreach my $check (@status_checks) {
+		my($have_any, $lack_any);
+		my @desc;
+		foreach my $c (@{$check->{cks}}) {
+			my $have = $c->{ck}->();
+			push @desc, ($have?q(have):q(lack))." ".$c->{item};
+			($have ? $have_any : $lack_any) = 1;
+		}
+		if(!$found_state && $lack_any) {
+			print "overall state: @{[$check->{st}]}\n";
+			$found_state = 1;
+		}
+		if($found_state && $have_any) {
+			print "also have ",
+				$lack_any ? q(partial) : q(complete),
+				" ", $check->{gp}, ":\n";
+			print "    $_\n" foreach @desc;
+		}
+	}
+}
+
+sub clean_file($) {
+	unlink($_[0]) || $! == ENOENT or die "failed to remove $_[0]: $!\n";
+}
+
+sub clean_dir($) {
+	my($topdir) = @_;
+	return unless -d $topdir;
+	find({
+		no_chdir => 1,
+		bydepth => 1,
+		wanted => sub {
+			-d $_ ? rmdir($_) : unlink($_)
+				or die "failed to remove $_: $!\n";
+		},
+	}, $topdir);
+}
+
+sub action_unbuild_data(@) {
+	die "bad arguments\n" if @_;
+	if(-f "$target_dir/Build") {
+		filter("", "cd $target_dir && ./Build realclean");
+	}
+	clean_dir("$target_dir/lib/Time/OlsonTZ/Data");
+	clean_file("$target_dir/lib/Time/OlsonTZ/Data.pm");
+	clean_file("$target_dir/MANIFEST");
+}
+
+sub action_bare(@) {
+	die "bad arguments\n" if @_;
+	action_unbuild_data();
+	clean_file("$target_dir/tzsrc.meta");
+	clean_dir("$target_dir/tzsrc");
+}
+
+sub action_get_olson(@) {
+	die "bad arguments\n" unless @_ >= 1;
+	my $acquire;
+	if($_[0] eq "download") {
+		die "bad arguments\n" unless @_ == 2;
+		my(undef, $ver) = @_;
+		$acquire = sub {
+			Time::OlsonTZ::Download->new(
+				$ver eq "latest" ? () : ($ver))
+		};
+	} elsif($_[0] eq "local") {
+		die "bad arguments\n" unless @_ == 3;
+		my(undef, $dir, $ver) = @_;
+		$acquire = sub {
+			Time::OlsonTZ::Download->new_from_local_source(
+				source_dir => $dir, version => $ver)
+		};
+	} else {
+		die "bad arguments\n";
+	}
+	if((-e "$target_dir/tzsrc") || (-e "$target_dir/tzsrc.meta")) {
+		die "won't replace existing Olson source\n";
+	}
+	my $dl = $acquire->();
+	my $dldir = $dl->unpacked_dir;
+	my $tdir = "$target_dir/tzsrc.new$$";
+	clean_dir($tdir);
+	my $dirdone = 0;
+	my $clean_tdir = end {
+		local($., $@, $!, $^E, $?);
+		clean_dir($tdir) unless $dirdone;
+	};
+	mkpath($tdir);
+	my @files;
+	read_file("$dldir/README") =~ /
+		\n\n
+		Unless[ \n]otherwise[ \n]specified,[ \n]all[ \n]files[ \n]
+		in[ \n]the[ \n]tz[ \n]code[ \n]and[ \n]data[ \n]are[ \n]in[ \n]
+		the[ \n]public[ \n]domain,[ \n]so[ \n]clarified[ \n]as[ \n]
+		of[ \n]2009-05-17[ \n]by[ \n]Arthur[ \n]David[ \n]Olson\.
+	/x or die "could not confirm general PD status\n";
+	find({
+		no_chdir => 1,
+		wanted => sub {
+			return unless -f $_;
+			unless(m#\A$dldir/([^/]+)\z#) {
+				die "downloaded file $_ in unexpected place\n";
+			}
+			my $lname = $1;
+			if(m#/tz(?:code|data)\.tar\.(?:Z|gz)\z#) {
+				# Is download tarball; not a source file.
+				return;
+			}
+			my $bname;
+			if($lname =~ /\A(.+\.[1-8])\.txt\z/ &&
+					-f $dldir."/".($bname = $1) &&
+					read_file("$dldir/$bname") =~
+						/copyright \(c\)/i) {
+				# Is rendering of man page that's under
+				# copyright.
+				return;
+			}
+			my $content = read_file($_);
+			if($content =~ /copyright \(c\)/i) {
+				# Is under copyright.
+				return;
+			}
+			write_file("$tdir/$lname", $content);
+			push @files, $lname;
+		},
+	}, $dldir);
+	rename($tdir, "$target_dir/tzsrc")
+		or die "can't create $target_dir/tzsrc: $!\n";
+	$dirdone = 1;
+	write_target_file("tzsrc.meta", "+".tabbed_pond({
+		version => $dl->version,
+		code_version => $dl->code_version,
+		data_version => $dl->data_version,
+		files => [ sort @files ],
+	})."\n");
+}
+
+my %tpl_handler = (
+	canonical_names_list => sub ($) {
+		my @names = sort keys %{$_[0]->canonical_names};
+		my $lines = "";
+		my $line = "";
+		while(@names) {
+			my $name = shift(@names);
+			if(length($line)+1+length($name) > 73) {
+				$lines .= $line . "\n";
+				$line = "";
+			}
+			$line .= ($line ? " " : "\t") . $name;
+		}
+		$lines .= $line . "\n";
+		return "qw(\n".$lines.")";
+	},
+	links_hash => sub ($) { tabbed_pond($_[0]->threaded_links) },
+	version_lettered => sub ($) { $_[0]->version },
+	version_numeric => sub ($) {
+		my $v = $_[0]->version;
+		$v =~ s/([a-z])/sprintf("%02d", ord($1)-0x60)/eg;
+		return $v;
+	},
+	code_version_lettered => sub ($) { $_[0]->code_version },
+	data_version_lettered => sub ($) { $_[0]->data_version },
+);
+
+sub expand_template_item($$) {
+	my($dl, $itemname) = @_;
+	my $handler = $tpl_handler{$itemname}
+		or die "unknown template item `$itemname'\n";
+	return $handler->($dl);
+}
+
+sub expand_template($$) {
+	my($dl, $filename) = @_;
+	my $content = read_target_file("$filename.tpl");
+	$content =~ s/<\?([0-9A-Z_a-z]+)\?>/expand_template_item($dl, $1)/eg;
+	write_target_file($filename, $content);
+}
+
+sub generate_country_selection($) {
+	my($dl) = @_;
+	my $expr = tabbed_pond($dl->country_selection);
+	write_target_file("$data_relpath/country_selection.tzp",
+		q{{ use 5.006; }}."\n".
+		q{use warnings;}."\n".
+		q{no if "$]" < 5.007, "warnings", "deprecated";}."\n".
+		q{use strict;}."\n".
+		"+$expr\n");
+}
+
+sub expand_manifest($) {
+	my($extra_names) = @_;
+	my @base_names = split(/\n/, read_target_file("MANIFEST.base"));
+	write_target_file("MANIFEST", join("", map { $_."\n" }
+		sort { $a cmp $b } @base_names, @$extra_names));
+}
+
+sub tzfile_name($) {
+	my($zonename) = @_;
+	unless($zonename =~ m#\A[0-9A-Za-z\-\+_]+(?:/[0-9A-Za-z\-\+_]+)*\z#) {
+		die "zone name `$zonename' is not good as a filename\n";
+	}
+	return "$data_relpath/$zonename.tz";
+}
+
+sub action_build_data(@) {
+	die "bad arguments\n" if @_ > 1;
+	my($type) = @_;
+	my %type;
+	if(defined $type) {
+		die "bad arguments\n" unless $type =~ /\A(?:tzfiles|meta)\z/;
+		$type{$type} = undef;
+	} else {
+		$type{$_} = undef foreach qw(tzfiles meta);
+	}
+	action_unbuild_data();
+	my $tzsrc_meta = do {
+		$@ = "";
+		do("$target_dir/tzsrc.meta") ||
+			die($@ eq "" ? "$target_dir/tzsrc.meta: $!\n" : $@);
+	};
+	my $dl = Time::OlsonTZ::Download->new_from_local_source(
+		version => $tzsrc_meta->{version},
+		code_version => $tzsrc_meta->{code_version},
+		data_version => $tzsrc_meta->{data_version},
+		source_dir => "$target_dir/tzsrc",
+	);
+	if(exists $type{meta}) {
+		expand_template($dl, "lib/Time/OlsonTZ/Data.pm");
+		generate_country_selection($dl);
+		expand_manifest([
+			(map { "tzsrc/$_" } @{$tzsrc_meta->{files}}),
+			(map { tzfile_name($_) } keys %{$dl->canonical_names}),
+		]);
+	}
+	if(exists $type{tzfiles}) {
+		my $dl_tzfile_dir = $dl->zoneinfo_dir;
+		foreach(keys %{$dl->canonical_names}) {
+			write_target_file(tzfile_name($_),
+				read_file("$dl_tzfile_dir/$_"));
+		}
+	}
+}
+
+my $action = shift(@ARGV);
+defined $action or die "no action specified\n";
+{
+	no strict "refs";
+	unless(defined(&{"action_$action"})) {
+		die "no action '$action' defined\n";
+	}
+	&{"action_$action"}(@ARGV);
+}
+
+exit 0;
+
+=head1 NAME
+
+prebuild - custom build process for Time::OlsonTZ::Data
+
+=head1 SYNOPSIS
+
+	./prebuild status
+
+	./prebuild get_olson download latest
+	./prebuild build_data
+
+	./prebuild unbuild_data
+	./prebuild bare
+
+=head1 DESCRIPTION
+
+This program performs build actions for the L<Time::OlsonTZ::Data>
+module that should run I<before> the usual build process of C<Build.PL>
+and C<Build>.  The module distribution tarball for CPAN includes the
+results of the prebuild process, because the prebuilding process only
+runs on Unix and requires a C compiler, whereas some CPAN users use other
+platforms or lack a compiler.  The products of the prebuild process are
+treated as source for by C<Build.PL> and C<Build>.  Those who are on Unix
+can use this program to rebuild the data files from their true source,
+possibly with modifications.
+
+A further complication is that the source for the data files, and for the
+program that builds most of the data files, is not actually maintained
+as part of the L<Time::OlsonTZ::Data> module.  These source files are
+maintained and canonically distributed by the maintainers of the Olson
+timezone database, entirely outside the Perl context.  The purpose of
+this module is to repackage this data for Perl purposes.  For this reason,
+this program supports downloading that part of the source.
+
+The process of building L<Time::OlsonTZ::Data> thus involves the following
+sequence of states for the module distribution directory:
+
+=over
+
+=item bare wrapper source
+
+Directory contains only the CPAN wrapper code.  There are no Olson
+source files, no built tzfiles or Perl-format metadata, no C<Build>
+script, and no C<blib> subdirectory.
+
+This is the form of the directory that version-control repositories
+should have, if they're tracking only the CPAN wrapper project.
+
+=item combined true source
+
+In addition to the CPAN wrapper code, there is a full set of Olson
+source files (C<tzcode> and C<tzdata>) in the C<tzsrc> subdirectory,
+and a C<tzsrc.meta> file giving identification details for the Olson
+source files.  There are no built tzfiles or Perl-format metadata,
+no C<Build> script, and no C<blib> subdirectory.
+
+This is the main form of the directory that should be used by someone
+who edits the Olson source as well as wanting the CPAN wrapper.
+A version-control repository could sensibly track this, for such a user.
+However, if you maintain a non-standard version of the Olson database
+outside the context of this wrapper, and want to apply this wrapper to it,
+it's better to work from the bare wrapper source and use the B<get_olson
+local> mechanism to incorporate the Olson source.
+
+=item data built
+
+In addition to the combined true source, there is a full
+set of tzfiles under C<lib/Time/OlsonTZ/Data>, and metadata
+described in Perl form in C<lib/Time/OlsonTZ/Data.pm> and
+C<lib/Time/OlsonTZ/Data/country_selection.tzp>.  There is no C<Build>
+script, and no C<blib> subdirectory.
+
+This is the form of the directory that is published as a tarball on CPAN.
+The tzfiles and Perl-format metadata are generated from Olson data source
+files, using a combination of Olson and wrapper code.  All the generated
+files are platform-neutral.
+
+=item configured for target
+
+In addition to the combined source and built data files, there is a
+C<Build> script incorporating knowledge of a particular host and proposed
+installation location.  There is no C<blib> subdirectory.
+
+This is an intermediate stage in normal CPAN build processing.
+
+=item built for target
+
+In addition to the combined source, built data files, and C<Build>
+script, there is a C<blib> subdirectiory which contains all the files
+that are to be installed, laid out as they will be when installed.
+
+This is an intermediate stage in normal CPAN build processing.
+Installation and automated testing proceed from this state.
+
+=back
+
+=head1 ACTIONS
+
+The first command-line argument specifies what action is required from
+this program.  The actions are:
+
+=over
+
+=item B<status>
+
+Describe the status of the build process.  This will primarily be one
+of the five states listed above.  If some build products exist from
+later in the process, but not enough to reach the next major state,
+the specific additional items are listed.
+
+=item B<get_olson> B<download> I<version>
+
+=item B<get_olson> B<local> I<directory> I<version>
+
+Acquire Olson database source, placing (most of) it in a C<tzsrc>
+subdirectory and creating a C<tzsrc.meta> file to describe it.  This will
+not replace an existing C<tzsrc> directory; use the B<bare> action first
+if you want to throw away existing source.
+
+In the B<download> form, the database will be downloaded from an
+appropriate distribution site.  The I<version> argument may be an Olson
+database version number such as "C<2012b>", to download that specific
+version, or "B<latest>" to get the current version.
+
+In the B<local> form, the database will be copied from a local
+I<directory> where it's already been unwrapped.  The I<version> argument
+must be an Olson database version number such as "C<2012b>", specifying
+which version is in the I<directory>.
+
+This action ensures that only public-domain matter goes into the C<tzsrc>
+subdirectory.  The downloaded source is checked for the expected markers
+indicating public-domain status, and an error is signalled if it cannot
+be confirmed.  A small number of known files are filtered out, because
+they are either definitely not PD (they are BSD licensed) or not properly
+labelled (though presumably actually are PD).  None of the files that
+are filtered out are required for building tzfiles.
+
+The downloading and PD-checking code is quite strict about the expected
+form of the Olson source distribution.  Anything surprising is liable
+to cause an abort, and it is entirely foreseeable that it will abort
+in situations that are actually acceptable.  An error at this stage,
+therefore, does not necessarily indicate a fatal problem; it indicates
+a need for human attention, potentially resulting in editing this code
+to handle the new situation.
+
+=item B<build_data>
+
+Build a full set of tzfiles and put metadata into Perl form.  This
+requires Olson source to be available in the C<tzsrc> subdirectory.
+It will replace any existing tzfiles and metadata files.
+
+=item B<build_data> B<tzfiles>
+
+=item B<build_data> B<metadata>
+
+Build a subset of the data files.  This requires Olson source to be
+available in the C<tzsrc> subdirectory.  It will replace any existing
+tzfiles and metadata files.
+
+=item B<unbuild_data>
+
+Remove any target build, target configuration, and data build products.
+This cleans up the distribution directory as far as the combined true
+source state.
+
+=item B<bare>
+
+Remove any target build, target configuration, and data build products,
+and Olson database source.  This cleans up the distribution directory
+as far as the bare wrapper source state.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-t> I<target-dir>
+
+Operate on the module distribution in the specified directory.
+Defaults to the current directory.
+
+=back
+
+=head1 AUTHOR
+
+The Olson timezone database was compiled by Arthur David Olson, Paul
+Eggert, and many others.  It is maintained by the denizens of the mailing
+list <tz@iana.org> (formerly <tz@elsie.nci.nih.gov>).
+
+The C<Time::OlsonTZ::Data> Perl module wrapper for the database was
+developed by Andrew Main (Zefram) <zefram@fysh.org>.
+
+=head1 COPYRIGHT
+
+The Olson timezone database is is the public domain.
+
+The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
+Copyright (C) 2010, 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>.
+
+=head1 LICENSE
+
+No license is required to do anything with public domain materials.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

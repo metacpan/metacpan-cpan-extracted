@@ -1,0 +1,19 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/WriteAll.pm
+lib/Text/Xslate/Bridge/Alloy.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/000_load.t
+t/001_basic.t
+xt/01_podspell.t
+xt/02_pod.t
+xt/03_pod-coverage.t
+xt/04_synopsis.t

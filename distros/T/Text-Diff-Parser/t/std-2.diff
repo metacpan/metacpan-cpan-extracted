@@ -1,0 +1,28 @@
+? Makefile
+? blib
+? cover_db
+? diff
+? pm_to_blib
+? t-cover
+? t-diff
+? example/LTjake.pl
+? lib/POE/Component/Generic/Net/SSH2.pma
+? t/Config.pm
+Index: example/demo.pl
+===================================================================
+RCS file: /home/cvs/poco-generic/example/demo.pl,v
+retrieving revision 1.1.1.1
+diff -r1.1.1.1 demo.pl
+8c8
+< my $obj = POE::Component::Generic->new(
+---
+> my $obj = POE::Component::Generic->spawn(
+Index: example/postback.pl
+===================================================================
+RCS file: /home/cvs/poco-generic/example/postback.pl,v
+retrieving revision 1.1.1.1
+diff -r1.1.1.1 postback.pl
+12c12
+< my $obj = POE::Component::Generic->new(
+---
+> my $obj = POE::Component::Generic->spawn(

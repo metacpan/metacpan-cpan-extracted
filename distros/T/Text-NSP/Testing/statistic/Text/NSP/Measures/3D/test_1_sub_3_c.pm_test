@@ -1,0 +1,19 @@
+package Text::NSP::Measures::3D::test_1_sub_3_c;
+use Text::NSP::Measures::3D;
+use strict;
+use Carp;
+use warnings;
+no warnings 'redefine';
+require Exporter;
+
+our ($VERSION, @EXPORT, @ISA);
+
+@ISA  = qw(Exporter);
+
+@EXPORT = qw(initializeStatistic calculateStatistic
+             getErrorCode getErrorMessage getStatisticName);
+
+sub calculateStatistic { return 0; }
+
+1;
+__END__

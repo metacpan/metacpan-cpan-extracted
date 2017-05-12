@@ -1,0 +1,215 @@
+=head1 NAME
+
+Tk::DBI::DBGrid - grid for browse and edit database.
+
+=head1 SYNOPSIS
+
+ use DBI;
+ use Tk;
+ use Tk::DBI::DBGrid;
+
+
+ my $dbh = DBI->connect( $dbhstr, $name, $pas, {AutoCommit => 0, RaiseError => 0}) or die DBI::errstr;
+
+ my $w = $MW->Toplevel(-title => 'dbgrid');
+
+ .....
+ 
+ my $sql = "SELECT field0, field1, field2 FROM table0";
+
+ # read only
+
+ my $grid = $w->DBGrid( -dbh => $dbh, -sql => $sql )->pack;
+
+
+
+ # with edit, without INSERT and DELETE
+
+ my @pkey = ('field0');
+
+ my $upd = sub {
+     my @row = @_;
+     ..... # any kod before UPDATE, if need
+     $dbh->do("UPDATE table0 SET  WHERE field0 = $row[0]");
+     $dbh->commit;
+     ..... # any kod after UPDATE, if need
+     0; 
+ };
+
+ my $grid = $w->DBGrid( -dbh => $dbh, -sql => $sql, -maxrow => 10, -edit => 1,
+     -pkey => \@pkey, -updfunc => $upd, -font => 'Courier 10' )->pack;
+
+
+
+ # with INSERT, DELETE and formating sells
+
+ my @pkey = ('field0');
+
+ my @cell;
+ $cell[0]{width} = 5;
+ $cell[0]{edit} = 0;       
+ $cell[0]{name} = 'title0'	# new title for field0
+ $cell[1]{width} = undef;   # width field read from table 
+ $cell[1]{edit} = 1;
+ $cell[2]{width} = 7;
+ $cell[2]{edit} = 1;
+ $cell[2]{justify} = 'left';
+
+
+ my $ins = sub {
+     my @row = @_;
+     ......
+     $dbh->do("INSERT INTO table0 (field0, field1, field2) VALUES ($row[0], $row[1], $row[2])");
+     $dbh->commit;
+     ......
+     1;
+ };
+
+ my $upd = sub {
+     my @row = @_;
+     ..... 
+     $dbh->do("UPDATE table0 SET  WHERE field0 = $row[0]");
+     $dbh->commit;
+     ..... 
+     0;
+ };
+
+ my $del = sub {
+     my ($pkey) = @_;
+     .....
+     $dbh->do("DELETE FROM table0 WHERE field0 = $pkey");
+     $dbh->commit;
+     .....
+     0;
+ };
+
+ my %fkey;                                                                             *
+ $fkey{ins} = 'Key-F5';
+ $fkey{del} = 'Key-F8';
+ $fkey{copy} = 'Control-Key-c';
+ $fkey{copy2} = 'Control-Key-C';
+ $fkey{copy3} = 'Control-Insert';
+
+ my $encd = sub {
+     return decode('cp1251', $_[0]); # from module Encode
+ };
+
+
+ my $grid = $w->DBGrid( -dbh        => $dbh, 
+                        -sql        => $sql, 
+                        -maxrow     => 10, 
+                        -edit       => 1, 
+                        -pkey       => \@pkey, 
+                        -insfunc    => $ins, 
+                        -updfunc    => $upd, 
+                        -delfunc    => $del, 
+                        -titlbg     => '#f0f0f0', 
+                        -seltitlbg  => 'gray',
+                        -font       => 'Courier 10', 
+                        -cellformat => \@cell, 
+                        -fkeys      => \%fkey, 
+                        -encodes    => $encd 
+ )->pack(-fill => 'x');
+
+=head1 DESCRIPTION
+
+B<DBGrid> allows to browse/edit any table to which a query can be applied.
+The query may join several tables. 
+
+=head2 Edit table
+
+Every record should be monosemantically defined by some field perfoming 
+a primary key function for editing. So as to transfer changes to the database 
+one may use the functions, pointers to which have been delivered 
+to the constructor ( -insfunc, -updfunc & -delfunc ). 
+The functions themselves are described in the basic program text. 
+If a pointer is not for delivering or I<undef> is transferred the action 
+is not worked up. If the key words of group operation or I<UNION> are
+found in the query, B<DBGrid> will turn to browse mode ( -edit => 0 ). 
+The data are not refreshed after calling functions in this B<DBGrid> version.
+
+=head2 Formating cells
+
+Table parameters define every field parameter of reflection (the length and 
+type - char, numeric or others - are read). Editing for the field defined through
+B<-pkey> is inaccessible. All B<DBGrid> cells are the control elements B<Label>
+or B<Entry> and after visibility one may rule them separately, for example
+I<$grig-E<gt>{rowframee}-E<gt>[$i][$j]-E<gt>configure( -font =E<gt> 'Courier 12')>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-dbh>
+
+contains database handle object. It is a required item.
+
+=item B<-sql>
+
+contains query, B<DBGrid> defines the result of which. The result of the query is
+inserted into the array I<$grid-E<gt>{table}-E<gt>{data}-E<gt>[row_number][field_number]>.
+This array is zero based. It is a required item.
+
+=item B<-maxrow>
+
+defines the maximum quantity of records displayed in the B<DBGrid>. Default is 10.
+
+=item B<-edit>
+
+defines the mode B<DBGrid> being reflected (it must be 0 for browse mode or 1 for edit mode).
+Default is 0.
+
+=item B<-pkey>
+
+must be defined for edit mode. If B<-pkey> is not defined or its meaning is not
+found in the query then I<edit =E<gt> 0>.
+
+=item B<-incfunc>
+
+defines the pointer to the function which is called for a new record insertion.
+The array containing the record for insertion into table is transferred
+to the function. The sequence of the fields is the same as it is in
+the received query through B<-sql>. If the function is not defined a new
+record will not be added. Default is B<undef>.
+
+=item B<-updfunc>
+
+serves as B<-insfunc> but with one difference: when it means B<undef> it still
+allows to change cell contents although these changes are not transferred to
+the database. Default is B<undef>.
+
+=item B<-delfunc>
+
+serves as B<-insfunc>.
+
+=item B<-font>
+
+Specifies the font used in cells. Since the width of the elements B<Entry> & B<Label>
+is set in symbols the font must be monospaced, for example Courier.
+Default value is B<'Courier 9'>.
+
+=item B<-cellformat>
+
+Specifies the pointer to the array the first element of which defines the field number
+and the second one is an item of field formating. B<width> is a field width in symbols,
+B<edit> sets the possibility of editing this field (and so -edit => does), B<justify> 
+defines the text position in the cell (it must be one of I<left>, I<center>, I<right>).
+
+=item B<-fkeys>
+
+Specifies the hash pointer where new key combinations of record insertion and
+deleting are kept. The insertion of a new record is kept in the I<{ins}>.
+The deleting of a current one is kept in the I<{del}>. If the meaning of B<-fkeys>
+is not defined one should set F5 for inserting and F8 for deleting.
+
+=back
+
+=head1 AUTHORS
+
+B<vadim-lvv@yandex.ru>
+
+=head1 KEYWORDS
+
+dbgrid, entry, label, database, table
+
+ 

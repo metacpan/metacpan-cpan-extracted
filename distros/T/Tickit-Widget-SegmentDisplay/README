@@ -1,0 +1,84 @@
+NAME
+    `Tickit::Widget::SegmentDisplay' - show a single character like a
+    segmented display
+
+DESCRIPTION
+    This class provides a widget that immitates a segmented LED or LCD
+    display. It shows a single character by lighting or shading fixed
+    rectangular bars.
+
+STYLE
+    The default style pen is used as the widget pen, though only the
+    background colour will actually matter as the widget does not directly
+    display text.
+
+    The following style keys are used:
+
+    lit => COLOUR
+    unlit => COLOUR
+        Colour descriptions (index or name) for the lit and unlight segments
+        of the display.
+
+CONSTRUCTOR
+  new
+       $segmentdisplay = Tickit::Widget::SegmentDisplay->new( %args )
+
+    Constructs a new `Tickit::Widget::SegmentDisplay' object.
+
+    Takes the following named arguments
+
+    value => STR
+            Sets an initial value.
+
+    type => STR
+            The type of display. Supported types are:
+
+            seven
+                A 7-segment bar display. The display can also be blanked
+                with the value " ".
+
+            seven_dp
+                A 7-segment bar display with decimal-point. To light the
+                decimal point, append the value with ".".
+
+            colon
+                A static `:'
+
+            symb
+                A unit, prefix symbol or other character. The following
+                characters are recognised:
+
+                  V A W Ω F H s
+                  G M k m µ n p
+                  + - %
+
+                Each will be drawn in a style approximately to fit the
+                general LED shape display, by drawing lines of erased cells.
+                Note however that some more intricate shapes may not be very
+                visible on smaller scales.
+
+    use_unicode => BOOL
+            If true, use Unicode block-drawing characters. If false, use
+            only coloured erase cells using the background colour.
+
+    use_halfline => BOOL
+            If true, vertical resolution of rendered block characters is
+            effectively doubled by using half-filled Unicode block-drawing
+            characters. Setting this option implies `use_unicode'.
+
+    thickness => INT
+            Gives the number of columns wide and half-lines tall that LED
+            bars will be drawn in. Note that unless `use_halfline' is set,
+            this value ought to be an even number. Defaults to 2.
+
+ACCESSORS
+  value
+       $value = $segmentdisplay->value
+
+       $segmentdisplay->set_value( $value )
+
+    Return or set the character on display
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

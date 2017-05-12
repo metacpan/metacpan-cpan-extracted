@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/metabase_cpanp
+dist.ini
+lib/Task/CPANPLUS/Metabase.pm
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

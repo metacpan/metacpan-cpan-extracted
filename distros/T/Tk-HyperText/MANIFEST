@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+pod.css
+HyperText.html
+eg/demo/about.html
+eg/demo/demo.html
+eg/demo/escape.html
+eg/demo/gba.png
+eg/demo/index.html
+eg/demo/tk.png
+eg/example
+t/Tk-HyperText.t
+lib/Tk/HyperText.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

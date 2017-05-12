@@ -1,0 +1,14 @@
+MANIFEST
+README
+CHANGES
+INSTALL
+Makefile.PL
+lib/Text/Filter.pm
+lib/Text/Filter/Cooked.pm
+t/00basic.t
+t/01simple.t
+t/10cooked.t
+examples/testfilter.pl
+perl-Text-Filter.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

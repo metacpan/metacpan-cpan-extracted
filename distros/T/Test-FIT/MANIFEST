@@ -1,0 +1,22 @@
+Changes
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+example/MathFixture.pm.xxx
+example/SampleFixture.pm.xxx
+example/Test-FIT.html
+example/index.html
+fit-run.cgi
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+lib/Test/FIT.pm
+lib/Test/FIT/Cell.pm
+lib/Test/FIT/ColumnFixture.pm
+lib/Test/FIT/Fixture.pm
+lib/Test/FIT/Harness.pm
+t/notatest.t

@@ -1,0 +1,27 @@
+Makefile.PL
+MANIFEST			This list of files
+README
+lib/Template/Plugin/GD.pm
+lib/Template/Plugin/GD/Constants.pm
+lib/Template/Plugin/GD/Graph/area.pm
+lib/Template/Plugin/GD/Graph/bars.pm
+lib/Template/Plugin/GD/Graph/bars3d.pm
+lib/Template/Plugin/GD/Graph/lines.pm
+lib/Template/Plugin/GD/Graph/lines3d.pm
+lib/Template/Plugin/GD/Graph/linespoints.pm
+lib/Template/Plugin/GD/Graph/mixed.pm
+lib/Template/Plugin/GD/Graph/pie.pm
+lib/Template/Plugin/GD/Graph/pie3d.pm
+lib/Template/Plugin/GD/Graph/points.pm
+lib/Template/Plugin/GD/Image.pm
+lib/Template/Plugin/GD/Polygon.pm
+lib/Template/Plugin/GD/Text.pm
+lib/Template/Plugin/GD/Text/Align.pm
+lib/Template/Plugin/GD/Text/Wrap.pm
+t/gd.t
+t/gdgraph.t
+t/gdgraph3d.t
+t/gdtext.t
+t/gdtextalign.t
+t/gdtextwrap.t
+META.yml                                 Module meta-data (added by MakeMaker)

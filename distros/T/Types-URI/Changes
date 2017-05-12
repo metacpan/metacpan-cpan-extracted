@@ -1,0 +1,43 @@
+Types-URI
+=========
+
+Created:      2014-03-24
+Home page:    <https://metacpan.org/release/Types-URI>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-URI>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2014-09-28
+
+ [ Bug Fixes ]
+ - Coercion to_Iri should load IRI.pm at run time, not compile time.
+
+0.005	2014-09-27
+
+ [ Packaging ]
+ - Bump dependency on Type::Library to version 1.000000.
+
+0.004	2014-09-27
+
+ [ Packaging ]
+ - Add dependency on Perl 5.8.
+
+ [ Other ]
+ - Added: Add a new Iri type, like Uri but using GWILLIAMS' IRI class.
+   There are coercions between Uri and Iri.
+ - Coercions are now made immutable.
+
+0.003	2014-05-20
+
+ - Added: Coercion from RDF::Trine::Namespace.
+ - Added: Coercion from XML::Namespace.
+
+0.002	2014-05-20
+
+ [ Packaging ]
+ - Repo metadata should not have been commented out.
+
+ [ Other ]
+ - Added: Coercion from RDF::Trine::Node::Resource.
+ - Coercion from HashRef now also applies to DataUri and FileUri.
+
+0.001	2014-04-13	Initial release

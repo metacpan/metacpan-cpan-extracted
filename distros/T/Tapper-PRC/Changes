@@ -1,0 +1,85 @@
+Revision history for Tapper-PRC
+
+5.0.2     2016-11-11
+        - Rename PRC-Testcontrol process name (\$0) with a testrun_id
+          (e.g., tapper-prc-testcontrol-12345)
+
+5.0.1     2016-04-04
+        - timeout handling kills whole process tree
+
+5.0.0     2016-02-15
+        - output files
+        - lot of edge case polishing around
+          * timeout handling
+          * interdependent scenarios
+          * capturing TAP/stderr from test program output
+          * better sleep time coordination between MCP and PRC
+          * working from Gearman job servers
+        - find test programs in PATH
+        - file upload moved to PRC from MCP
+        - handle file upload outside of timeout handled code
+
+4.1.2     2012-11-23
+        - self-made daemonize for better support of
+          tapper-client for local test
+
+4.1.1     2012-11-19
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-21
+        - sync with release version
+
+4.0.2     2012-06-05
+        - give SIG handlers some time between SIGKILL and SIGTERM
+        - [TEST] for sending TAP uses separate testprogram now
+        - [TEST] inline headers for TAP sending
+        - [FIX] have header inline for TAP sending
+
+4.0.1     2012-05-16
+        - [FEAT] add testplan info to %ENV
+        - [FEAT] send keep-alive messages
+        - [FEAT] capture:tap - send TAP output
+        - [FEAT] chdir: AUTO - chdir to dirname of programe
+        - [FEAT] chdir: path - chdir to path
+        - [FEAT] upload files given in precondition
+        - [FEAT] setting env vars from precondition to testprogram
+        - [FEAT] use xl to start Xen guest
+        - [FEAT] add a client script for SSH
+        - [FEAT] use state message API from Remote::Net
+        - [FEAT] use http for state messages
+        - [FIX] evaluate return value of tap_report_away
+        - [FIX] *lots* of bugs and cornercases everywhere
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* Try to mount /data/tapper as configured in fstab
+	* release version++ roundhouse kick
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.5
+
+	* rewritable shebang line
+	* distro maintenance
+	* [TEST] change testport
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* 3.0.2
+
+	* try to force YAML versions
+
+2011-03-02 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.1
+
+	* cpan release

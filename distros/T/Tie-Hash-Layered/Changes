@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Hash::Chain.
+
+0.01  Sat Jul 21 15:38:31 2001
+	- original version; created by h2xs 1.20 with options
+		-X Tie::Hash::Chain
+

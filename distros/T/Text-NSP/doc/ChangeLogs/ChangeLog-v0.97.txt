@@ -1,0 +1,27 @@
+Changes from NSP version 0.95 to 0.97
+--------------------------------------
+
+Saiyam Kohli, kohli003@d.umn.edu
+University of Minnesota, Duluth
+
+June 21, 2006
+
+Measures
+--------
+
+The NSP versions 0.91, 0.93 and 0.95 were significantly slower than 
+NSP-0.73. This was primarily due to the use of Objects. In this release 
+all the measures have been rewritten without using objects. The hierarchy  
+of the Measures has been maintained, and thus there is very little or no 
+code duplication.
+
+Another reason for the performance degradation was the policy of not using 
+object variables. This resulted in more data being passed to and from all 
+the methods and thus resulting in a bottleneck. In this release we use 
+global variables to represent the contingency table.
+
+Programs
+--------
+
+A few changes in statistic.pl were required to incorporate the changes in 
+the various Measures.

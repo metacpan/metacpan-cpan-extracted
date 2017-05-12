@@ -1,0 +1,16 @@
+@count.Ngram=2
+@count.WindowSize=2
+@count.FrequencyCut=0
+17
+line<>of<>3 3 3 
+of<>the<>2 3 2 
+same<>text<>2 2 3 
+the<>same<>2 2 2 
+a<>third<>1 1 1 
+text<>second<>1 2 1 
+third<>line<>1 1 3 
+second<>line<>1 1 3 
+and<>a<>1 1 1 
+first<>line<>1 1 3 
+text<>and<>1 2 1 
+of<>text<>1 3 3 

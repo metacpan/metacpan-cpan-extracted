@@ -1,0 +1,90 @@
+* Key
+
+X = Done
+C = Canceled
+- = Pending
+
+* Development stuff
+
+X Rename tests from 00x.t to something more meaningful
+X Remove DataDumper Sortkeys dependency (more backward compatible)
+
+* Improvements
+
+X Make Paste combinator accept List arguments (via concat).
+
+X Multiple generator-bindings per Property to allow for
+  focusing on certain subpaces of the haystack:
+    ##[ [ x <- Int ], [ x <- Int(range=>[-1,1]) ]##
+  X all bindings must have identical sets of variables
+  X test runner runs a full set of trials against each binding
+
+X Better handling of errors caught durring testing
+  X Include "Error caught: $@" in output.
+
+X Combinators
+  X Size
+  X Each -- Impl: List of length 1 w/ multiple generators
+  X Apply(f,gs...) -- returns f(@{Each(gs)})
+  X Concat(gs) = Apply(map {@$_ $_}, @{Each(gs)})
+  X Map(f, gs...)
+  X ConcatMap
+  X Flatten(gs)
+
+- Test apparatus
+  X label & friends
+  X output & reporting
+  X integrate w/ Test::Harness
+  - Seed for repeatable tests
+  - Flight recorder -- record everything to file
+  - allow and report multiple test failures -- maybe separate pkg?
+  - Allow behavior tests to add notes to a trial; include
+    the notes in details.
+
+- Docs
+  X TestRunner
+  X Property
+  - Tutorial 
+  - Topics
+    - When not to use LectroTest
+    - Using LectroTest with Test::More and ilk
+
+- Repeatability
+  - Emit the RNG seed at the outset of the tests for repeatability
+  - Accept an option to use a given seed
+
+* CPAN submission
+
+X Module list short description:
+
+  "automatic, specification-based testing tool"
+
+X Rename for better harmony with the global Perl namespace:
+  LectroTest.pm --> Poof! (?)
+  LectroTest::Simple     -> Test::LectroTest (::Simple ?)
+  LectroTest::Test       -> Test::LectroTest::Property
+  LectroTest::TestRunner -> Test::LectroTest::TestRunner
+  LectroTest::Generator  -> Test::LectroTest::Generator
+
+- Docs review
+
+X Make sure LectroTest URL is in all docs
+
+X Set version to something sensible
+
+* Old stuff
+
+X Replace Char's range=>[] w/ charset=>"".
+
+X Test case $t
+    return $t->redo; # if random vars don't satisfy test preconditions
+    $t->label("zero") if $x == 0;
+    $t->trivial       if $x == 0 && $y == 0;
+
+C Let each property optionally specify how many times it is
+  to be tested:  Property { ... } name => ..., trials => 100;
+
+
+Local variables:
+mode: outline
+End:

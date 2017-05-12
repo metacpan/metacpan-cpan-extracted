@@ -1,0 +1,71 @@
+.Bl -t table -columns 3
+.It one
+.Ta two
+.Ta three
+.It a
+.Ta b
+.Ta c
+.El
+.Bl -t table -columns 3
+.It
+one
+.Ta
+two
+.Ta
+three
+.It
+a
+.Ta
+b
+.Ta
+c
+.It
+A
+.Ta B \&
+C
+.Ta D
+E
+.El
+.Bl -t table -columns 3 Title
+.It one
+.Ta two
+.Ta three
+.It a
+.Ta b
+.Ta c
+.El
+.Tc -lot
+.Bl -t table -columns 2 Title
+.It one
+.Ta two
+.It a
+.Ta b
+.El
+.Bl -t table
+.El
+.Bl -t table -columns cc Title
+.It 1
+.Ta 2
+.It A
+.Ta B
+.El
+.Bl -t table -columns l Title
+.Bf -f xhtml
+<tr><td>Cell</td></tr>
+.Ef
+.El
+.Bl -t table -columns l Title
+.Bf -f latex
+.Ef
+.El
+.Bl -t table -columns |l|l| Titre
+.Bf -f xhtml,epub
+<tr>
+<td rowspan="2">Cellule 1</td>
+<td>Cellule 2</td>
+</tr>
+<tr>
+<td>Cellule 3</td>
+</tr>
+.Ef
+.El

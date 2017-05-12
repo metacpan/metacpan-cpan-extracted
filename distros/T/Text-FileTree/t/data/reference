@@ -1,0 +1,4 @@
+Makefile.PL
+lib/Text/FileTree.pm
+t/01-distribution.t
+t/02-parse.t

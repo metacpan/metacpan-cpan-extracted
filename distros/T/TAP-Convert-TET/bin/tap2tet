@@ -1,0 +1,111 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+
+use strict;
+use warnings;
+use File::Find;
+use File::Spec;
+use Pod::Usage 1.12;
+use Getopt::Long;
+use TAP::Parser 0.51;
+use TAP::Convert::TET;
+
+Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
+GetOptions(
+    'v|verbose' => \my $VERBOSE,
+    'h|help|?'  => sub { pod2usage( { -verbose => 1 } ); exit },
+    'H|man'     => sub { pod2usage( { -verbose => 2 } ); exit },
+);
+
+my $converter = TAP::Convert::TET->new( { program => 'tap2tet' } );
+
+$converter->start;
+while ( my $file = shift ) {
+    open my $tap, '<', $file or die "Can't read $file ($!)\n";
+    my $parser = TAP::Parser->new( { source => $tap } );
+    $converter->convert( $parser, $file );
+    close $tap;
+}
+$converter->end;
+
+__END__
+
+=head1 NAME
+
+tap2tet - Convert TAP to TET
+
+=head1 USAGE
+
+ tap2tet [options] [files]
+
+=head1 OPTIONS
+
+Boolean options
+
+ -v,  --verbose     Print all test lines.
+ -h,  --help        Display this help
+ -?,                Display this help
+ -H,  --man         Longer manpage for tap2tet
+
+=head1 DESCRIPTION
+
+Convert TAP (Test Anything Protocol) test transcripts into TET journals.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-tap-convert-tet@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 REFERENCES
+
+=over
+
+=item The TETware User Guide, Appendix C, TETware journal lines
+
+L<http://tetworks.opengroup.org/documents/3.3/uguide.pdf>
+
+=item tjreport
+
+L<http://ftp.freestandards.org/pub/lsb/test_suites/released-3.0.0/source/runtime/tjreport-1.4.tar.gz>
+
+=back
+
+=head1 AUTHOR
+
+Andy Armstrong  C<< <andy@hexten.net> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2007, Andy Armstrong C<< <andy@hexten.net> >>. All
+rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

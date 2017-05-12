@@ -1,0 +1,72 @@
+Revision history for Tail-Stat
+
+0.26    2016-12-03
+        - Added support for HTTP/2 for nginx plugin.
+
+0.25    2015-11-29
+        - Added META.yml into distribution.
+
+0.24    2015-11-06
+        - Fixed parsing extended nginx fileds (thanks to Vytis Valentinavičius)
+
+0.23    2015-10-21
+        - Workaround for perl 5.18+.
+
+0.22    2014-10-17
+        - Fixed parsing nginx lines with $request_uri contains spaces.
+
+0.21    2013-07-12
+        - Ignore http statuses 400,408 in nginx access logs.
+        - Fixed write attempt to previously closed socket (thanks to Dmitry Pryadko).
+
+0.20    2012-10-15
+        - Calculate http statuses separately (apache,nginx)
+
+0.19    2011-11-24
+        - New IceCast plugin.
+
+0.18    2011-06-16
+        - HTTP statuses 503,504 for Plugin::nginx.
+
+0.17    2011-03-28
+        - Test fixed
+
+0.16    2011-03-27
+        - Increased timeouts in tests
+
+0.15    2011-03-23
+        - Try to fix automated tests
+
+0.14    2011-03-19
+        - Removed useless use of Data::Dumper
+
+0.13    2011-03-10
+        - Forced PERL5LIB for test environment.
+
+0.12    2011-03-10
+        - Created tests with real log files.
+
+0.11    2011-02-25
+        - Sliding window for Plugin::cvsupd
+
+0.10    2011-02-25
+        - Fixed forgotten bin/tstatd.
+
+0.09    2010-11-07
+        - New CVSupd plugin.
+
+0.08    2010-11-07
+        - Created pod for bin/tstatd.
+
+0.07    2010-11-06
+        - Removed PREREQ_FATAL flag.
+
+0.06    2010-07-22
+        - Some additional HTTP statuses.
+
+0.02    2010-02-24
+        - Some documentation fixes.
+
+0.01    2010-02-18
+        - First version, released on an unsuspecting world.
+

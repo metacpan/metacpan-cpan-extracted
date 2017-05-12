@@ -1,0 +1,12 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/Thread/Conveyor.pm
+lib/Thread/Conveyor/Array.pm
+lib/Thread/Conveyor/Tied.pm
+lib/Thread/Conveyor/Throttled.pm
+t/Conveyor.t
+META.yml                                Module meta-data (added by MakeMaker)

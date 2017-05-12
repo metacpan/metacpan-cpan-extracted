@@ -1,0 +1,28 @@
+---
+abstract: 'An easy and convenient way to test Ext.Direct code'
+author:
+  - 'Alex Tokarev <tokarev@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.82'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-ExtDirect
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  RPC::ExtDirect::Client: '1.02'
+  RPC::ExtDirect::Server: '1.01'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/nohuhu/Test-ExtDirect/issues
+  repository: https://github.com/nohuhu/Test-ExtDirect
+version: '1.01'

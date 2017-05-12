@@ -1,0 +1,23 @@
+Changes
+examples/deep.pl
+examples/help_titles.pl
+examples/multi_option.pl
+examples/pager.pl
+examples/synopsis.pl
+examples/redirect_output.pl
+examples/redirect_output2.pl
+lib/Term/Shell/MultiCmd.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-populate.t
+t/02-cmd.t
+t/03-args.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

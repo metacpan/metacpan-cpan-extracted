@@ -1,0 +1,104 @@
+Revision history for Perl module Test::WWW::Mechanize::Catalyst:
+
+0.51 Mon Mar 16 10:00 GMT 2009
+     - Doc updates from thejester
+     - User agent fixes from ANDREMAR
+     - Fix bug where redirect was followed on a 500 response
+     - All remote requests (i.e. CATALYST_SERVER env var) now use our own
+       mechanize object, rather than an unconfigurable one from Catalyst:Test
+
+0.50 Tue Feb 17 09:12 GMT 2009
+     - Remove warning in HTTP::Cookies
+     - Call BUILDALL
+
+0.50_2 Thur Feb 12 09:47 GMT 2009
+     - Make t/multi_content_type.t handle case when server cant be started,
+       which is almost always due to port in use.
+
+0.50_1 Thur Feb 5 09:02 GMT 2009
+     - App classname no longer has to be passed to import:
+        $m = T::W::M::C->new(catalyst_app => 'Catty')
+       now works.
+     - Can now use TWMC two test two different apps in the same perl
+       interpreter due to the above change
+     - Removed Test::WWW::Mechanize::Catalyst::Aux package as it isn't needed
+       any more
+     - Add 'host' accessor for white-label testing
+     - Moosification
+     - Can now test against remote CATALYST_SERVER without having to load the
+       app class
+
+0.45 Mon Nov 24 20:39:19 GMT 2008
+     - be forwards-compatible with Catalyst 5.80's virtual
+       domain testing (thanks Jason Gottshall)
+
+0.44 Mon Oct 27 13:48:22 GMT 2008
+     - fix longstanding bug with recent LWP, requiring
+       WWW::Mechanize 1.50 (thanks to petdance, mst, dakkar)
+     - add machine- and human-readable license, add abstract
+
+0.43 Mon Aug 18 15:42:03 BST 2008
+     - add missing prereqs to Catalyst::Plugin::Session::State::Cookie
+       and Catalyst::Plugin::Session::Store::Dummy (thanks kd)
+
+0.42 Tue Apr 29 20:25:06 BST 2008
+     - stop multi_content_type.t killing smoke testing
+       (patch by Andreas König)
+     - fix a case where HTTP::Cookies dies when trying to
+       extract_cookies (patch by Andreas Marienborg)
+     - add Test::Exception as a prerequisite
+
+0.41 Mon Sep 17 20:28:59 BST 2007
+     - fix to cope with gzipped content and the test from the
+       rt.cpan queue about multiple content types
+       (patch by Ash Berlin)
+
+0.40 Tue Aug 21 20:51:13 BST 2007
+     - external requests (as per last release) are now only allowed
+       if you set allow_external (sorry about that)
+
+0.39 Sat Aug  4 08:01:38 BST 2007
+     - external requests are now allowed (patch by Edmund von der Burg)
+     - remove Build.PL
+
+0.38 Sat Jun 30 14:07:24 BST 2007
+     - document and test that you can use URLs without schema
+       or hostname
+     - add debug screen error to test diagnostics (patch by
+       Jonathan Swartz)
+     - add basic authentication support (patch by Gareth Kirwan)
+     - add test for charset=utf-8 (patch by Chris Dolan)
+     - added CATALYST_SERVER mention in the documentation
+       (patch by Kieren Diment)
+
+0.37 Tue Jun  6 08:54:07 BST 2006
+     - patch to follow LWP's $m->requests_redirectable() and small
+       docpatch (thanks to Daniel McBrearty)
+     - mention Catalyst::Test (thanks to guest)
+
+0.36 Mon Apr 17 11:27:17 BST 2006
+     - perltidy
+     - Catalyst debug screens are now failures (thanks to Kieren Diment)
+
+0.35 Tue Jan 22 17:06:00 GMT 2006
+     - handle redirects (patch by Mark Fowler)
+
+0.33 Tue Jun  7 17:38:45 BST 2005
+     - we need at least version 1.04 of Test::WWW::Mechanize
+       (spotted by Jesse Vincent, patch by Shlomi Fish)
+
+0.32 Tue May  3 16:14:40 BST 2005
+     - removed 'use Image::Size' in test, as spotted by SMPETERS
+
+0.31 Sun Apr 17 10:30:18 BST 2005
+     - update for Catalyst 5.00
+
+0.30 Fri Mar 25 04:34:50 GMT 2005
+     - add Test::WWW::Mechanize to prereqs
+     - remove useless "use URI"
+     - "borrow" lots of docs from Test::WWW::Mechanize
+     - Catalyst 4.30 adds support for HTTP::Request objects in
+       Catalyst::Test::request(), so use it (thanks to Christian Hansen)
+
+0.29 Thu Mar 17 22:42:04 EST 2005
+     - initial release

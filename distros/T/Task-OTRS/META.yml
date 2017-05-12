@@ -1,0 +1,46 @@
+---
+abstract: 'Almost all of the modules required for installing OTRS Help Desk.'
+author:
+  - 'Michiel Beijen <michiel.beijen@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-OTRS
+requires:
+  Archive::Zip: '0'
+  Authen::NTLM: '0'
+  Compress::Zlib: '0'
+  Crypt::Eksblowfish::Bcrypt: '0'
+  DBI: '0'
+  Date::Format: '0'
+  Digest::HMAC_MD5: '0'
+  Encode::HanExtra: '0'
+  GD: '0'
+  GD::Graph: '0'
+  GD::Text: '0'
+  IO::Socket::SSL: '0'
+  JSON::XS: '0'
+  Mail::IMAPClient: '0'
+  Net::DNS: '0.61'
+  Net::LDAP: '0'
+  PDF::API2: '0.73'
+  SOAP::Lite: '0.713'
+  Template: '0'
+  Text::CSV_XS: '0'
+  XML::Parser: '0'
+  YAML::XS: '0'
+  perl: v5.10.0
+  version: '0'
+resources:
+  repository: git://github.com/rs-otrs/Task-OTRS.git
+version: '1.10'

@@ -1,0 +1,25 @@
+---
+name: Test-ModuleReady
+version: v0.0.6
+author:
+  - 'Daniel S. T. Hughes <dsth@cantab.net>'
+abstract: Simple module for checking that a module is ready for submission.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 1.08
+  Pod::Checker: 1.45
+  Test::More: 0.94
+  Test::Spelling: 0.11
+  version: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Test::ModuleReady:
+    file: lib/Test/ModuleReady.pm
+    version: v0.0.6
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

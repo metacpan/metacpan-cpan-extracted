@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-Median.t
+lib/Text/Median.pm
+META.yml                                 Module meta-data (added by MakeMaker)

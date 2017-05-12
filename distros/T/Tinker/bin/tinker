@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Tinker;
+
+exit Tinker::App->get_app_class(@ARGV)->new->run;

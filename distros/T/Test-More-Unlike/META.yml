@@ -1,0 +1,30 @@
+---
+abstract: 'show the matched position'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-More-Unlike
+provides:
+  Test::More::Unlike:
+    file: lib/Test/More/Unlike.pm
+    version: 0.03
+requires:
+  Test::More: 0.88
+  Text::MatchedPosition: 0.03
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/bayashi/Test-More-Unlike/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Test-More-Unlike
+version: 0.03

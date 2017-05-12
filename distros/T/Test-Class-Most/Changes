@@ -1,0 +1,36 @@
+Revision history for Test-Class-Most
+
+0.08    November 22, 2012
+        - No functional change. Bump Test::Class dependendency to 0.38. This
+          fixes an issue where Test::Class fails to install on Windows. #81274
+
+0.07    September 6, 2012
+        - No functional change. Bump Test::Most dependency to 0.31. This fixes
+          prototype warnings when using Moose.
+
+0.06    December 29, 2011
+        - Added is_abstract property.
+
+0.05    April 10, 2010
+        - Extended and reorganized the documentation.
+        - Add 'attributes' to Test::Class::Most.
+          http://blogs.perl.org/users/ovid/2010/04/vienna-perl-qa-hackathon-day-1.html
+
+0.04    February 6, 2010
+        - Removed all trace of "feature" and "mro" handling.  This is because
+          it turns out to be fraught with error (what happens if your
+          inheritance heirarchy tries to use different MROs in different
+          classes? You should not be using multiple inheritance anyway!
+
+0.03    February 4, 2010
+        - Remove bad shebang causing some tests to fail if /usr/bin/env picks
+          up a perl not in their path.
+
+0.02    February 3, 2010
+        - Fix a broken diagnostic message in t/lib/My/Test/Class.pm
+        - Correct the MANIFEST for a renamed file.
+        - Add repository info to Build.PL
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

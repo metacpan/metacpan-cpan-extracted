@@ -1,0 +1,29 @@
+---
+name: Text-GooglewikiFormat
+version: 0.05
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: Translate Google Code Wiki markup into HTML
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Scalar::Util: 0
+  Test::More: 0
+  URI: 0
+  URI::Escape: 0
+  URI::Find: 0
+provides:
+  Text::GooglewikiFormat:
+    file: lib/Text/GooglewikiFormat.pm
+    version: 0.05
+  Text::GooglewikiFormat::Block:
+    file: lib/Text/GooglewikiFormat/Blocks.pm
+  Text::GooglewikiFormat::Block::code:
+    file: lib/Text/GooglewikiFormat/Blocks.pm
+  Text::GooglewikiFormat::Blocks:
+    file: lib/Text/GooglewikiFormat/Blocks.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

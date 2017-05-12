@@ -1,0 +1,3 @@
+[% FILTER upper -%]
+Hello [% t.uri %]!
+[% END -%]

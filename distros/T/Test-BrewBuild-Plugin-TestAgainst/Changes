@@ -1,0 +1,31 @@
+Revision history for Test-BrewBuild-Plugin-TestAgainst
+
+0.06    2016-04-03
+        - removed unneeded prereq of Test::BrewBuild, which was causing a
+          recursive dependency issue (fixes stevieb9/test-brewbuild#60)(thanks
+          for the report, Slaven Rezić)
+        - POD updates
+        - removed erroneous extra package statement
+
+0.05    2016-03-31
+        - finalized DATA section
+
+0.04    2016-03-29
+        - due to windows and its %PATH% and other issues, we had to change the
+          format of the plugins to individual lines, so that the nix/win
+          layout of the commands could be integrated and tested more easily
+
+0.03    2016-03-25
+        - an initial throwaway shift() has been standardized due to fixes in
+          the plugin execution code in Test::BrewBuild::exec()
+
+0.02    2016-03-24
+        - added check to verify we have to shift off a a caller before
+          retrieving the module name in brewbuild_exec()
+        - fixed bug where if the module is called more than once per run, the
+          DATA file handle is empty after the first one
+
+0.01    2016-03-24
+        - takes a module name as a parameter to brewbuild_exec, and tests that
+          module against the current revision of the one you're working on
+

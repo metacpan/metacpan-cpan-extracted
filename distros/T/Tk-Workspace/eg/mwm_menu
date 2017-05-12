@@ -1,0 +1,221 @@
+#!/usr/bin/perl
+my $text = <<'end-of-text';
+
+
+Motif Dynamic Workspaces Menu
+
+
+How to create a submenu of the mwm root menu that contains
+the contents of a "workspaces" subdirectory. 
+
+The "Workspaces" submenu is updated whenever:
+  - You start mwm.
+  - You select "Update This Menu" from the "Workspaces" sub menu 
+    of the root menu, and then select "Restart..." from the root 
+    menu.
+
+The you can either copy  and paste the paste example scripts here using
+the X clipboard, to files that reside in the ~/Scripts directory, or
+use them to modify your existing files.  In these examples, the 
+workspaces that are listed all reside in ~/workspaces directory. You
+could create directories with these names, or substitute your own 
+directory configuration in the examples below.
+
+If you have CDE, substitute ~/.dt/C/dtwmrc for ~/.mwmrc, and, if
+possible, create the new menu as ~/.dt/dtwmrc, following the 
+instructions in ~/.dt/C/dtwmrc.
+
+
+
+1.  Save a copy of your ~/.mwmrc file, call it ~/.mwmrc-orig
+    or something similar.
+
+2.  in the ~/Scripts directory, create a template of a prototype 
+    ~/.mwmrc file, called '.mwmrc-raw' as shown here:
+
+cut here
+................................................................
+!!
+!! Root Menu Template
+!!
+
+Menu DefaultRootMenu
+{
+	"Mwm Menu"		f.title
+	"New Window"		f.exec "xterm &"
+	 no-label		f.separator
+!!
+!!  The Workspaces menu will be constructed when mwm is started,
+!!  or when the user selects the "Rebuild List" option  from  the
+!!  menu, and restarts the window manager.
+!!
+	"Workspaces"            f.menu "workspaces"
+	 no-label		f.separator
+	"Windows"		f.menu "winmenu"
+	"Reload ~/.Xdefaults" 	f.exec "/usr/bin/X11/xrdb ~/.Xdefaults"
+	"Restart..."		f.restart
+	 no-label		f.separator
+	"Quit..."		f.quit_mwm
+}
+
+!!
+!! Default Window Menu
+!!
+Menu DefaultWindowMenu
+{
+	Restore		_R	Alt<Key>F5	f.restore
+	Move		_M	Alt<Key>F7	f.move
+	Size		_S	Alt<Key>F8	f.resize
+	Minimize	_n	Alt<Key>F9	f.minimize
+	Maximize	_x	Alt<Key>F10	f.maximize
+	Raise		_L	Alt<Key>F2	f.raise
+	Lower		_L	Alt<Key>F3	f.lower
+	no-label				f.separator
+	Close		_C	Alt<Key>F4	f.kill
+}
+
+
+menu winmenu
+{
+	"Shuffle Up"		f.circle_up
+	"Shuffle Down"		f.circle_down
+	"Refresh"		f.refresh
+	"Pack Icons"		f.pack_icons
+	"Toggle Behavior..."	f.set_behavior
+}
+
+!!
+!! Default Key Bindings
+!!
+Keys DefaultKeyBindings
+{
+	Shift<Key>Escape	window|icon		f.post_wmenu
+	Alt<Key>space		window|icon		f.post_wmenu
+	Alt<Key>Tab		root|icon|window	f.next_key
+	Alt Shift<Key>Tab	root|icon|window	f.prev_key
+	Alt<Key>Escape		root|icon|window	f.circle_down
+	Alt Shift<Key>Escape	root|icon|window	f.circle_up
+	Alt Shift Ctrl<Key>exclam root|icon|window	f.set_behavior
+	Alt<Key>F6		window			f.next_key transient
+	Alt Shift<Key>F6	window			f.prev_key transient
+	Shift<Key>F10		icon			f.post_wmenu
+	Alt Shift<Key>Delete	root|icon|window	f.restart
+}
+
+!!
+!! Button Binding Description(s)
+!!
+!! These can be used anywhere
+!!
+Buttons DefaultButtonBindings
+{
+	<Btn1Down>	icon|frame	f.raise
+	<Btn1Down>	root		f.window_list
+	<Btn3Down>	icon|frame	f.post_wmenu
+	<Btn3Down>	root		f.menu	DefaultRootMenu
+}
+ 
+!! End of .mwmrc-raw.  The "Workspaces" menu description will
+!! added to the end of this file whenever mwm starts or when you
+!! select "Rebuild List" from the menu.
+
+cut here
+................................................................
+
+
+2.  The following bash script, wslist, creates a raw listing of the 
+    workspaces in the ~/workspaces directory.  Place this in the 
+    ~/Scripts directory, as in the "Workspaces" option in the menu 
+    definition above, or some other directory where you have write
+    permissions.remember to make the script executable using 
+    "chmod +x wslist".  
+
+    It also creates the actual ~/.mwmrc file that will be sourced 
+    whenever mwm is started or restarted, so make sure that you've
+    made a copy of the original .mwmrc file, as per above.  
+
+
+cut here
+................................................................
+
+#!/bin/bash
+
+# If $HOME is not set in the environment, uncomment the line below
+# and set to your home directory.
+HOME=/home/joeuser
+
+ls -1p $HOME/workspaces >$HOME/Scripts/wsnames
+sed -f $HOME/Scripts/buildmwmmenu.sed $HOME/Scripts/wsnames \
+	>$HOME/Scripts/wsnames.2
+cat $HOME/Scripts/mwmrc-raw $HOME/Scripts/wsnames.2 >$HOME/.mwmrc
+
+# wslist ends here.
+
+cut here
+................................................................
+
+3.  The following sed script, buildmwmmenu.sed, also resides in 
+    the ~/.Scripts directory.  It does the work of creating a menu 
+    description from the ~/workspaces directory listing.  The script 
+    is written to work with GNU sed, so you may or may not have 
+    difficulty using it with other system's sed implementations.  
+
+
+cut here
+................................................................
+
+1i\
+Menu workspaces\
+{
+s_^\(.*\)_& f.exec \"cd \~/workspaces \&\& \(\./&\)_g
+s/$/ \&\"/g
+/\@/ d
+/\~$/ d
+/\.bak/ d
+$a\
+no-label f.separator\
+"Update This Menu" f.exec "~/Scripts/wslist"\
+}
+
+cut here
+................................................................
+
+
+4.  Insert the following shell command goes in the ~/.xinitrc file if
+    you start X from a console, or in the ~/.Xclients or ~/.xsession
+    file if your system has a graphical login, or even in 
+    ~/.dtlogin, ~/bash_profile, or another startup file:
+
+$HOME/Scripts/wslist
+
+
+end-of-text
+
+
+my $geometry='565x351+34+40';
+my $wrap='word';
+my $fg='black';
+my $bg='white';
+my $name='mwm_menu';
+my $menuvisible='1';
+my $scrollbars='e';
+my $insert='2.0';
+my $font='*-courier-medium-r-*-*-12-*"';
+use Tk::Workspace;
+@ISA = qw(Tk::Workspace);
+use strict;
+use Tk;
+use FileHandle;
+use Env qw(HOME);
+my $workspace = Tk::Workspace -> new ( menubarvisible => $menuvisible, 
+scroll => $scrollbars );
+$workspace -> name($name);
+$workspace -> textfont($font);
+$workspace -> text -> insert ( 'end', $text );
+$workspace -> text -> configure( -foreground => $fg, -background => $bg, -font => $font, -insertbackground => $fg );
+$workspace -> text -> pack( -fill => 'both', -expand => '1');
+bless($workspace,ref('Tk::Workspace'));
+$workspace -> bind;
+$workspace -> wrap( $wrap );
+$workspace -> geometry( $geometry, $insert );
+MainLoop;

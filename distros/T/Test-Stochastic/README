@@ -1,0 +1,36 @@
+Test-Stochastic version 0.00_01
+===============================
+
+This module can be used to check the probability distribution of answers given by a method. For example:
+
+ stochastic_ok  {a => 0.4, b => 0.6}, sub { ...random sub...};
+
+The code fragment above checks that the subroutine passed to C<stochastic_ok> returns C<a> with probability 0.4, and C<b> with probability 0.6.
+
+This module will work only if the return values are numbers or strings. Future versions will handle references as well.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Test::More
+	Scalar::Util
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Abhijit Mahabal
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,471 @@
+=head1 NAME
+
+Time::TT::Agencies - list of Terran horological agencies
+
+=head1 DESCRIPTION
+
+Precision timekeeping on Terra is a complex task undertaken by a group of
+about seventy agencies around the planet, mostly national metrological
+laboratories.  The time scales that they produce are conventionally
+labelled using short abbreviations, mostly of two to four letters,
+identifying the agency concerned.  This document lists the abbreviations
+and their meanings.
+
+The BIPM maintains a similar list at
+L<ftp://ftp2.bipm.fr/pub/tai/publication/acronyms.txt>, but that only
+includes current laboratory abbreviations, and does not include special
+cases such as GPS.  The list below is more complete.
+
+=head1 AGENCIES
+
+=over
+
+=item B<AMC>
+
+Alternate Master Clock station of USNO, Colorado Springs, Colorado, United States of America
+
+=item B<AOS>
+
+Astrogeodynamical Observatory, Space Research Centre P.A.S., Borowiec, Poland
+
+=item B<APL>
+
+Applied Physics Laboratory, Laurel, Maryland, United States of America
+
+=item B<ASMW>
+
+[no information available]
+
+=item B<AUS>
+
+consortium of laboratories in Australia
+
+=item B<BEV>
+
+Bundesamt fur Eich- und Vermessungswesen (Federal Office for Calibration and Surveying), Vienna, Austria
+
+=item B<BIM>
+
+Bulgarian Institute of Metrology, Sofia, Bulgaria
+
+=item B<BIPM>
+
+Bureau international des poids et mesures (International Bureau of Weights and Measures), Sevres, France
+
+=item B<BIRM>
+
+Beijing Institute of Radio Metrology and Measurement, Beijing, People's Republic of China
+
+=item B<BY>
+
+Belarussian State Institute of Metrology, Minsk, Belarus
+
+=item B<CAO>
+
+Stazione Astronomica di Cagliari (Cagliari Astronomical Observatory), Cagliari, Italy
+
+=item B<CH>
+
+Metrology and Accreditation (METAS), Bern, Switzerland
+
+=item B<CNM>
+
+Centro Nacional de Metrologia (CENAM) (National Centre of Metrology), Queretaro, Mexico
+
+=item B<CNMP>
+
+Centro Nacional de Metrologia de Panama (National Centre of Metrology of Panama), Panama
+
+=item B<CRL>
+
+Communications Research Laboratory, Tokyo, Japan (renamed to NICT in 2004-04)
+
+=item B<CSAO>
+
+[name missing], Lintong, People's Republic of China (renamed to NTSC in 2002-01)
+
+=item B<CSIR>
+
+Council for Scientific and Industrial Research, Pretoria, South Africa (renamed to ZA in 2007-01)
+
+=item B<DLR>
+
+Deutsche Zentrum fur Luft- und Raumfahrt (German Aerospace Centre), Oberpfaffenhofen, Germany
+
+=item B<DMDM>
+
+Direkcija za mere i dragocene metale (Directorate of Measures and Precious Metals), Belgrade, Serbia
+
+=item B<DPT>
+
+[name and location missing] (renamed to CSIR in 1993)
+
+=item B<DTAG>
+
+Deutsche Telekom AG, Frankfurt am Main, Germany
+
+=item B<EIM>
+
+Ellyniko Institouto Metrologias (Hellenic Institute of Metrology), Thessaloniki, Greece
+
+=item B<F>
+
+Commission Nationale de l'Heure (National Time Commission), Paris, France
+
+=item B<FTZ>
+
+Forschungs- und Technologiezentrum (Research and Technology Centre), Darmstadt, Germany (renamed to DTAG in 1996-05)
+
+=item B<GLO>
+
+Global Navigation Satellite System (GLONASS)
+
+=item B<GPS>
+
+Global Positioning System
+
+=item B<GUM>
+
+Glowny Urzad Miar (Central Office of Measures), Warsaw, Poland (succeeded by PL in 2001-07)
+
+=item B<HKO>
+
+Hong Kong Observatory, Hong Kong, People's Republic of China
+
+=item B<IEN>
+
+Istituto Elettrotecnico Nazionale Galileo Ferraris (Galileo Ferraris National Electrical Engineering Institute), Turin, Italy (renamed to IT in 2006-02)
+
+=item B<IFAG>
+
+Bundesamt fur Kartographie und Geodasie (Federal Agency for Cartography and Geodesy), Fundamental station, Wettzell, Kotzting, Germany
+
+=item B<IGMA>
+
+Instituto Geografico Militar (Military Geographic Institute), Buenos Aires, Argentina (renamed to IGNA in 2009-10)
+
+=item B<IGNA>
+
+Instituto Geografico Nacional (National Geographic Institute), Buenos Aires, Argentina
+
+=item B<INPL>
+
+National Physical Laboratory, Jerusalem, Israel
+
+=item B<INTI>
+
+Instituto Nacional de Tecnologia Industrial (National Industrial Technology Institute), Buenos Aires, Argentina
+
+=item B<IPQ>
+
+Institute Portugues da Qualidade (Portuguese Institute of Quality), Monte de Caparica, Portugal
+
+=item B<IT>
+
+Istituto Nazionale di Ricerca Metrologica (National Institute of Metrological Research), Turin, Italy
+
+=item B<JATC>
+
+Joint Atomic Time Commission, Lintong, People's Republic of China
+
+=item B<JV>
+
+Justervesenet, Norwegian Metrology and Accreditation Service, Kjeller, Norway
+
+=item B<KEBS>
+
+Kenya Bureau of Standards, Nairobi, Kenya
+
+=item B<KIM>
+
+Pusat Penelitian Kalibrasi Instrumentasi Dan Metrologi (Research Centre for Calibration Instrumentation and Metrology), Lembaga Ilmu Pengetahuan Indonesia (Indonesian Institute of Sciences), Serpong-Tangerang, Indonesia
+
+=item B<KRIS>
+
+Korea Research Institute of Standards and Science, Daejeon, Republic of Korea
+
+=item B<KSRI>
+
+Korea Standards Research Institute, Daejeon, Republic of Korea (renamed to KRIS in 1991-10)
+
+=item B<KZ>
+
+Kazakhstan Institute of Metrology, Astana, Kazakhstan
+
+=item B<LDS>
+
+University of Leeds, Leeds, United Kingdom
+
+=item B<LT>
+
+Lithuanian National Metrology Institute, Vilnius, Lithuania
+
+=item B<LV>
+
+Latvijas Nacionalais Metrolojiias Centrs (Latvian National Metrology Centre), Riga, Latvia
+
+=item B<MIKE>
+
+Centre for Metrology and Accreditation, Espoo, Finland
+
+=item B<MKEH>
+
+Magyar Kereskedelmi Engedelyezesi Hivatal (Hungarian Trade Licensing Office), Budapest, Hungary
+
+=item B<MSL>
+
+Measurement Standards Laboratory, Lower Hutt, New Zealand
+
+=item B<NAO>
+
+National Astronomical Observatory, Mizusawa, Japan
+
+=item B<NAOM>
+
+National Astronomical Observatory, Mizusawa, Japan (renamed to NAO in 1997-01)
+
+=item B<NAOT>
+
+National Astronomical Observatory, Tokyo, Japan
+
+=item B<NICT>
+
+National Institute of Information and Communications Technology, Tokyo, Japan
+
+=item B<NIM>
+
+National Institute of Metrology, Beijing, People's Republic of China
+
+=item B<NIMB>
+
+National Institute of Metrology, Bucharest, Romania
+
+=item B<NIMT>
+
+National Institute of Metrology, Pathumthani, Thailand
+
+=item B<NIS>
+
+National Institute for Standards, Cairo, Egypt
+
+=item B<NIST>
+
+National Institute of Standards and Technology, Boulder, Colorado, United States of America
+
+=item B<NMC>
+
+National Centre of Metrology, Sofia, Bulgaria (renamed to BIM in 2007-01)
+
+=item B<NMIJ>
+
+National Metrology Institute of Japan, Tsukuba, Japan
+
+=item B<NML>
+
+National Measurement Laboratory, Sydney, Australia
+
+=item B<NMLS>
+
+National Metrology Laboratory of SIRIM Berhad, Sepang, Malaysia
+
+=item B<NPL>
+
+National Physical Laboratory, Teddington, United Kingdom
+
+=item B<NPLI>
+
+National Physical Laboratory, New Delhi, India
+
+=item B<NRC>
+
+National Research Council of Canada, Ottawa, Canada
+
+=item B<NRL>
+
+United States Naval Research Laboratory, Washington D.C., United States of America
+
+=item B<NRLM>
+
+National Research Laboratory of Metrology, Tsukuba, Japan (renamed to NMIJ in 2001-12)
+
+=item B<NTSC>
+
+National Time Service Centre of China, Lintong, People's Republic of China
+
+=item B<OMH>
+
+Orszagos Meresugyi Hivatal (National Office of Measures), Budapest, Hungary (renamed to MKEH in 2007-01)
+
+=item B<ONBA>
+
+Observatorio Naval (Naval Observatory), Buenos Aires, Argentina
+
+=item B<ONRJ>
+
+Observatorio Nacional (National Observatory), Rio de Janeiro, Brazil
+
+=item B<OP>
+
+Observatoire de Paris (Paris Observatory), Paris, France
+
+=item B<ORB>
+
+Observatoire Royal de Belgique (Royal Observatory of Belgium), Brussels, Belgium
+
+=item B<PEL>
+
+Physics and Engineering Laboratory, Lower Hutt, New Zealand (renamed to MSL in 1992)
+
+=item B<PKNM>
+
+Polski Komitet Normalizacji (Polish Committee for Standardization), Warsaw, Poland (renamed to GUM in 1994)
+
+=item B<PL>
+
+consortium of laboratories in Poland
+
+=item B<PSB>
+
+National Measurement Centre, Singapore Productivity and Standards Board, Singapore (renamed to SG in 2002-03)
+
+=item B<PTB>
+
+Physikalisch-Technische Bundesanstalt (Federal Standards Laboratory), Braunschweig, Germany
+
+=item B<RC>
+
+[no information available]
+
+=item B<ROA>
+
+Real Instituto y Observatorio de la Armada (Royal Spanish Naval Observatory), San Fernando, Spain
+
+=item B<SCL>
+
+Standards and Calibration Laboratory, Hong Kong, People's Republic of China
+
+=item B<SG>
+
+Standards Productivity and Innovation Board, Singapore
+
+=item B<SIQ>
+
+Slovenski institut za kakovost in meroslovje (Slovenian Institute of Quality and Metrology), Ljubljana, Slovenia
+
+=item B<SMD>
+
+Metrology Division of the Quality and Safety Department - Scientific Metrology, Brussels, Belgium
+
+=item B<SMU>
+
+Slovensky metrologicky Ustav (Slovak Institute of Metrology), Bratislava, Slovakia
+
+=item B<SNT>
+
+[name and location uncertain, probably Sistema Nazionale di Taratura, Italy]
+
+=item B<SO>
+
+[name missing], Shanghai, People's Republic of China
+
+=item B<SP>
+
+Sveriges Provnings- och Forskningsinstitut (Swedish National Testing and Research Institute), Boras, Sweden
+
+=item B<STA>
+
+[name and location missing] ([possibly renamed to SNT in 1991])
+
+=item B<SU>
+
+Institute of Metrology for Time and Space (IMVP), NPO "VNIIFTRI" Mendeleevo, Moscow Region, Russia
+
+=item B<TAO>
+
+[name and location uncertain, probably Telecommunications Advancement Organization of Japan] ([possibly succeeded by NAOT in 1992])
+
+=item B<TCC>
+
+Transportable Integrated Geodetic Observatory (TIGO), Concepcion, Chile
+
+=item B<TL>
+
+Telecommunication Laboratories, Chung-Li, Taiwan
+
+=item B<TP>
+
+Institute of Radio Engineering and Electronics, Academy of Sciences of the Czech Republic, Prague, Czech Republic
+
+=item B<TUG>
+
+Technischen Universitat Graz (Technical University of Graz), Graz, Austria
+
+=item B<UA>
+
+National Science Center Institute of Metrology, Kharkov, Ukraine
+
+=item B<UME>
+
+Ulusai Metroloji Enstitusu (National Metrology Institute), Marmara Research Centre, Gebze Kocaeli, Turkey
+
+=item B<USNO>
+
+United States Naval Observatory, Washington D.C., United States of America
+
+=item B<VMI>
+
+Vietnam Metrology Institute, Ha Noi, Vietnam
+
+=item B<VSL>
+
+Nederlands Meetinstituut Van Swinden Laboratorium, Delft, Netherlands
+
+=item B<YUZM>
+
+[no information available]
+
+=item B<ZA>
+
+Council for Scientific and Industrial Research, Pretoria, South Africa
+
+=item B<ZIPE>
+
+[no information available]
+
+=item B<ZMDM>
+
+Zavod za mere i dragocene metale (Bureau of Measures and Precious Metals), Belgrade, Serbia (renamed to DMDM in 2009-10)
+
+=back
+
+=head1 BUGS
+
+Some information is missing from the above list.  If you can fill in
+any of the blanks, please mail <zefram@fysh.org>.
+
+=head1 SEE ALSO
+
+L<Time::TAI>,
+L<Time::TT>
+
+=head1 AUTHOR
+
+This document is derived from the BIPM-maintained abbreviation list
+at L<ftp://ftp2.bipm.fr/pub/tai/publication/acronyms.txt>.  Andrew Main
+(Zefram) <zefram@fysh.org> added information on historical abbreviations,
+and made the presentation more consistent.
+
+=head1 COPYRIGHT
+
+It is questionable whether this document is copyrightable, due to its
+essentially functional nature as a collection of raw data.  If there is
+any copyright on the file that this is based on, it is presumably held
+by the BIPM.  Andrew Main does not claim copyright on any part of this
+document, and hereby places into the public domain any copyrightable
+aspect of it over which he would otherwise hold the copyright.
+
+=head1 LICENSE
+
+No license is required to do anything with public domain materials.
+To the extent that the BIPM holds copyright on the file that this is
+based on, reproducing certain aspects of it here is probably fair use.

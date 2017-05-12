@@ -1,0 +1,49 @@
+Revision history for Tie-DxHash
+
+1.05
+- delete was not returning the expected value.  It now returns a reference to a list of the
+removed values.  If no values were removed, it returns a reference to the empty list.
+Thanks to Bart Lateur for the spot.
+
+1.04
+- did not upload to PAUSE successfully
+
+1.03
+- only run Test::Perl::Critic if AUTHOR_TEST env var is set
+
+1.02
+- Removed the SIGNATURE file.  A number of people have reported failures during automatic installation
+caused by SIGNATURE files.  My own file caused an installation failure for one of the CPAN testers
+and I was able to repeat the failure for myself when installing as root.  I will reinstate this feature
+when the mechanism works more reliably.
+
+1.01
+- Changed version numbering style back to a Numeric Version
+(see the documentation for the version pragma).  PAUSE does not appear
+to like Extended Versions.
+
+1.0.0
+- fixed bug: tied hashes did not work correctly when used with keys/values;
+tested with keys.t and scalar.t
+- Added Build.PL, MANIFEST.SKIP, META.yml and SIGNATURE files to distribution
+- Added support for testing with Test::Distribution, Test::Kwalitee,
+  Test::Perl::Critic, Test::Pod and Test::Pod::Coverage
+- Updated code to match Perl Best Practices and pass all tests down to severity 1
+- Ran tests through Devel::Cover and confirmed 100% coverage
+
+0.93
+- added a version number to the top-level directory
+within the tarball.
+
+0.92
+- fixed a bug related to passing additional
+arguments to the tie function;
+thanks to Daniel Kubb for the spot
+
+0.91
+- added a version number to the tarball
+- shortened the module's short description in order
+that it is not truncated on CPAN
+
+0.90  Thu Mar  8 18:13:47 2001
+- original version; created by h2xs 1.19

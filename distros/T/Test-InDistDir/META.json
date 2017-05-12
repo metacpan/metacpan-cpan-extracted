@@ -1,0 +1,68 @@
+{
+   "abstract" : "test environment setup for development with IDE",
+   "author" : [
+      "Christian Walde <walde.christian@googlemail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200013, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-InDistDir",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Test::InDistDir" : {
+         "file" : "lib/Test/InDistDir.pm",
+         "version" : "1.112071"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-test-indistdir at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Test-InDistDir"
+      },
+      "homepage" : "https://github.com/wchristian/Test-InDistDir",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wchristian/Test-InDistDir",
+         "web" : "https://github.com/wchristian/Test-InDistDir"
+      }
+   },
+   "version" : "1.112071"
+}
+

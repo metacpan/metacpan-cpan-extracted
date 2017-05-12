@@ -1,0 +1,32 @@
+Revision history for Perl extension Test::Memory::Cycle
+
+1.06    Wed Jan 27 22:36:55 CST 2016
+        This release has no changes in functionality.
+
+        [FIXES]
+        * One of the tests used to use CGI.pm, but it was not a declared
+          dependency, so Perl 5.22+ would fail because CGI.pm is no longer
+          shipped as core.  The test now uses a local module for testing.
+          Thanks, Graham Ollis.
+
+
+1.04    Sun Aug  6 22:09:36 CDT 2006
+        [FIXES]
+        * Updated the minimum version requirements.
+
+        [ENHANCEMENTS]
+        * Added support for detecting closures.  Thanks Yuval Kogman.
+
+        [INTERNALS]
+        * Internal code optimizations
+
+
+1.02    Tue May 17 11:22:09 CDT 2005
+        [ENHANCEMENTS]
+        * Added weakened_memory_cycle_ok() and
+          weakened_memory_cycle_exists().  Thanks, Stevan Little.
+
+
+1.00    Sun Jan 23 01:00:32 CST 2005
+        [ENHANCEMENTS]
+        * Added memory_cycle_exists().  Thanks, Stevan Little.

@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+use YAML::Syck;
+use Data::Dumper;
+use Getopt::Long;
+
+our $opt_tag = undef;
+our $verbose;
+GetOptions(
+    'tag=s' => $opt_tag,
+    'verbose' => $verbose
+);
+
+our $testcase_string;
+{
+    local $/ = undef;
+    $testcase_string = <>;
+}
+
+my @testcases;
+eval {
+    @testcases = Load($testcase_string);
+};
+if ($@ and $testcase_string =~ /\{\{\{/) {
+    die "    This test case looks like a legacy one; I don't understand how to parse it\n";
+} elsif ($@) {
+    die "    There was an error parsing this test case: $@\n";
+}
+
+foreach my $tc (@testcases) {
+    check_testcase($tc);
+}
+
+sub check_testcase {
+    my ($tc) = @_;
+    next if exists $tc->{TESTLINK_ID};
+    die "    A test case was found with no name\n" unless exists($tc->{NAME});
+
+    if ($opt_tag) {
+        if (ref($tc->{TAGS}) ne 'ARRAY' or ! grep /$opt_tag/, @{ $tc->{TAGS} }) {
+            print "    Skipping testcase \"$tc->{NAME}\" since it doesn't have the tag \"$opt_tag\"\n";
+            return;
+        }
+    }
+
+    print "    Checking testcase \"$tc->{NAME}\"\n";
+    if (ref($tc->{INSTRUCTIONS}) ne 'ARRAY') {
+        print "  ** This is not automated; skipping\n";
+        return;
+    }
+    my @test_cases = @{ $tc->{INSTRUCTIONS} };
+    while (my $test = shift @test_cases) {
+        my ($name) = keys %$test;
+        my ($value) = values %$test;
+        if (ref($value) eq 'ARRAY') {
+            unshift(@test_cases, @{ $value });
+            next;
+        }
+        check_fixture($name, $value);
+    }
+    print "        Testcase looks okay!\n";
+}
+
+sub check_fixture {
+    my ($name, @args) = @_;
+    print "\t$name\n" if $verbose;
+    # Magic happens here
+}

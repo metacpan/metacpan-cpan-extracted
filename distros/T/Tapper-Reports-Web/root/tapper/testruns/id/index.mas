@@ -1,0 +1,66 @@
+<%args>
+$report
+$testrun
+$overview
+$hostname
+$time
+%reportlist_rgt => {}
+$precondition_string => ''
+</%args>
+
+% use Data::Dumper;
+% my $topic = $testrun->topic_name;
+
+<h3>
+  Testrun
+  <strong><% $testrun->id %></strong>:
+  <strong><a href="/tapper/testruns/topic/<% $topic %>"><% $topic %></a></strong>
+</h3>
+
+    <!-- ************************************************************ -->
+
+% if (%reportlist_rgt) {
+<h4>Reports</h4>
+<& /tapper/reports/reportlist.mas, reportlist => \%reportlist_rgt &>
+%}
+
+    <!-- ************************************************************ -->
+
+
+	<ul class="post_info">
+		<li class="date"><% $time || '' %></li>
+		<li class="meta">Host: '<% $hostname || '' %>'</li>
+	</ul>
+
+    <!-- ************************************************************ -->
+
+    <& /tapper/testruns/testrun_overview.mas, overview => $overview &>
+
+<!-- <a href="/tapper/testruns/<% $testrun->id %>/similar" title="Create a new precondition and use this precondition as a template.">Create similar Testrun</a> |> -->
+<!-- <a href="/tapper/testruns/<% $testrun->id %>/change" title="Change values of this preconditions without creating a new one">Change Testrun</a> | -->
+<!-- <a href="/tapper/testruns/<% $testrun->id %>/delete" title="Information about testruns using this precondition will be wrong.">Delete Testrun</a> | -->
+
+    <!-- ************************************************************ -->
+
+    <h4>Preconditions</h4>
+        <pre>
+<% $precondition_string %>
+        </pre>
+% if ($testrun->testrun_scheduling->status eq 'schedule' or $testrun->testrun_scheduling->status eq 'prepare'){
+<a href="/tapper/testruns/<% $testrun->id %>/preconditions/edit/">Edit precondition</a>
+% }
+    <h4>Details</h4>
+    <ul style="list-style-type:disc;">
+      <li style="margin-left: 1em;"><a href="/tapper/testruns/<% $testrun->id %>/preconditions/yaml/">Preconditions in raw YAML</a></li>
+% if ($testrun->testplan_id) {
+      <li style="margin-left: 1em;"><a href="/tapper/testplan/id/<% $testrun->testplan_id %>">Associated testplan</a></li>
+% }
+   </ul>
+
+    <!-- ************************************************************ -->
+
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+

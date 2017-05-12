@@ -1,0 +1,27 @@
+---
+global:
+  name: Template-Plugin-CPAN-Packages
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - set the version to 0.03
+      - replaced FIXME text in NAME section with something more informative
+      - updated t/perlcriticrc
+      - 'get_primary_package(): Only take those packages whose names start with the equivalent of the dist'
+      - get_primary_package() is now more robust; takes the first available package if there is no real primary package
+    date: 2008-02-13T23:09:14Z
+    tags: []
+    version: 0.03
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - set the version to 0.02
+      - 'Makefile.PL: requires Parse::CPAN::Packages'
+    date: 2007-11-19T20:52:38Z
+    tags: []
+    version: 0.02
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - original version
+    date: 2007-11-19T08:13:59Z
+    tags: []
+    version: 0.01

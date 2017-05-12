@@ -1,0 +1,17 @@
+Changes made in Sense-Clusters version 0.31 during version 0.33
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Added Demos directory containing scripts 
+	makedata.sh - to create experimental data for demos
+	vecrun.sh   - a demo script for vector clustering 
+	simrun.sh   - a demo script for similarity space clustering
+
+2.	Added Flows directory containing flow diagrams and pseudo scripts
+	
+3.	Added tree diagrams in /Toolkit showing Toolkit organization
+
+(Changelog-v0.31to0.33 Last Updated on 07/15/2003 by Amruta)

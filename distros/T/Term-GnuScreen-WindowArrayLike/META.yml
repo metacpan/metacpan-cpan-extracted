@@ -1,0 +1,37 @@
+---
+abstract: 'window list is operated like Array'
+author:
+  - 'tokubass <tokubass@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-GnuScreen-WindowArrayLike
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Term::GnuScreen::WindowArrayLike:
+    file: lib/Term/GnuScreen/WindowArrayLike.pm
+    version: '0.01'
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokubass/p5-Term-GnuScreen-WindowArrayLike/issues
+  homepage: https://github.com/tokubass/p5-Term-GnuScreen-WindowArrayLike
+  repository: git://github.com/tokubass/p5-Term-GnuScreen-WindowArrayLike.git
+version: '0.01'
+x_authority: cpan:TOKUBASS

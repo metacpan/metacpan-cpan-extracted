@@ -1,0 +1,267 @@
+{
+   "abstract" : "Modules FLORA uses",
+   "author" : [
+      "Florian Ragwitz <rafl@debian.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-FLORA",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::MetaSyntactic" : 0,
+            "App::Ack" : 0,
+            "App::Metabase::Relayd" : 0,
+            "App::Nopaste" : 0,
+            "App::Software::License" : 0,
+            "App::cpanminus" : 0,
+            "App::cpanoutdated" : 0,
+            "CPAN::Mini" : 0,
+            "CPAN::Mini::Devel" : 0,
+            "CPAN::Reporter" : 0,
+            "CPAN::Uploader" : 0,
+            "Carp::Always" : 0,
+            "Carp::Always::Color" : 0,
+            "Carp::REPL" : 0,
+            "Catalyst::Model::KiokuDB" : 0,
+            "Data::Visitor" : 0,
+            "Devel::Cover" : 0,
+            "Devel::NYTProf" : 0,
+            "Devel::bt" : 0,
+            "Dist::Zilla" : 0,
+            "Dist::Zilla::PluginBundle::FLORA" : 0,
+            "Email::MIME::Kit" : 0,
+            "Email::MIME::Kit::Assembler::Markdown" : 0,
+            "Email::MIME::Kit::Renderer::TT" : 0,
+            "Email::Sender" : 0,
+            "Function::Parameters" : 0,
+            "Gitalist" : 0,
+            "JSON" : 0,
+            "List::AllUtils" : 0,
+            "Method::Signatures::Simple" : 0,
+            "Module::CPANTS::Analyse" : 0,
+            "Module::Install" : "0.95",
+            "Module::Install::AuthorRequires" : 0,
+            "Module::Install::AuthorTests" : 0,
+            "Module::Install::CheckConflicts" : 0,
+            "Module::Install::ExtraTests" : 0,
+            "Moose" : 0,
+            "Moose::Autobox" : 0,
+            "MooseX::Declare" : 0,
+            "MooseX::LazyRequire" : 0,
+            "MooseX::Types::Common" : 0,
+            "MooseX::Types::DateTime" : 0,
+            "MooseX::Types::Email" : 0,
+            "MooseX::Types::LoadableClass" : 0,
+            "MooseX::Types::Path::Class" : 0,
+            "MooseX::Types::URI" : 0,
+            "PadWalker" : 0,
+            "Perl::Tidy" : 0,
+            "Perl::Version" : "1.010",
+            "Pod::Coverage::TrustPod" : 0,
+            "Task::Catalyst" : 0,
+            "Task::KiokuDB" : 0,
+            "Task::Plack" : 0,
+            "Task::SDK::Moose" : 0,
+            "Term::ReadLine::Gnu" : 0,
+            "Test::Aggregate" : 0,
+            "Test::Pod" : 0,
+            "Test::Pod::Coverage" : 0,
+            "Test::Reporter" : 0,
+            "Test::Reporter::Transport::Socket" : 0,
+            "Test::WWW::Mechanize::Catalyst" : 0,
+            "Test::Without::Module" : 0,
+            "V" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Task-BeLike-FLORA@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-FLORA"
+      },
+      "homepage" : "http://search.cpan.org/dist/Task-BeLike-FLORA",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rafl/task-belike-flora.git",
+         "web" : "http://github.com/rafl/task-belike-flora"
+      }
+   },
+   "version" : "0.06",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@FLORA/@Basic/GatherDir",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@FLORA/@Basic/PruneCruft",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@FLORA/@Basic/ManifestSkip",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@FLORA/@Basic/MetaYAML",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@FLORA/@Basic/License",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@FLORA/@Basic/Readme",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@FLORA/@Basic/ExtraTests",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@FLORA/@Basic/ExecDir",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@FLORA/@Basic/ShareDir",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@FLORA/@Basic/MakeMaker",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@FLORA/@Basic/Manifest",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@FLORA/@Basic/TestRelease",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@FLORA/@Basic/ConfirmRelease",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@FLORA/@Basic/UploadToCPAN",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@FLORA/MetaConfig",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@FLORA/MetaJSON",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@FLORA/PkgVersion",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@FLORA/PodSyntaxTests",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@FLORA/NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@FLORA/PodCoverageTests",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@FLORA/MetaResources",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@FLORA/Authority",
+            "version" : "1.000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@FLORA/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TaskWeaver",
+            "name" : "@FLORA/TaskWeaver",
+            "version" : "0.101620"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@FLORA/AutoPrereqs",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.102341"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.102341"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.102341"
+      }
+   },
+   "x_authority" : "cpan:FLORA"
+}
+

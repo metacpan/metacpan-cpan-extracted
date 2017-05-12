@@ -1,0 +1,135 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::API::Constraint::Constructor - a pattern for constructing new type constraint objects
+
+=head1 INTERFACE
+
+This interface can be implemented as a class method for a type constraint
+class, or as an object method for a factory object of some sort.
+
+=over
+
+=item C<< $implementation->new(%spec) >>
+
+Returns an object implementing the Type::API::Constraint interface. The
+specification allows the following keys. Each is B<OPTIONAL>. Implementations
+B<MAY> accept other keys in addition to those given below.
+
+=over
+
+=item B<constraint>
+
+The heart of the type constraint; a function (coderef) to check a value
+and return true/false. When this function is called, the value to be tested
+is available as the global variable C<< $_ >> and is also passed as the
+first argument to the function.
+
+This is optional, and if omitted, implementations B<MUST> assume a function
+that always returns true. Implementations B<MUST NOT> ignore the constraint
+function if one is provided, and B<MUST> throw an exception if the constraint
+function is not acceptable for some reason.
+
+=item B<parent>
+
+Another type constraint which the new type will be a child of. All values
+passing the child constraint, must also pass the parent constraint; the
+constraint function (above) is not even called if a value does not pass the
+parent constraint.
+
+Implementations B<MUST NOT> ignore the parent if one is provided, and B<MUST>
+throw an exception if the parent type is not acceptable.
+
+=item B<name> 
+
+An optional name for the type constraint. The implementation B<MAY> impose
+naming restrictions on constraints. Implementations providing only anonymous
+type constraints B<SHOULD> silently ignore this parameter.
+
+=item B<message>
+
+A function (coderef) to generate a message (suitable for returning from
+C<get_message>) for a value, and return it as a string. The value is available
+as the global variable C<< $_ >> and is also passed as the first argument to
+the function.
+
+Implementations not supporting custom messages B<SHOULD> silently ignore this,
+and use their own logic to return a string from C<get_message>.
+
+=item B<inlined>
+
+A function (coderef) to generate a string of code capable to checking a value.
+This function is called with two parameters - the first is a reference back
+to the type constraint itself; the second is a string representing the name
+of a variable. The returned code is expected to be self-contained, and
+encompass checks for the parent type constraint too (if any).
+
+Implementations not supporting inlining B<SHOULD> silently ignore this.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=head2 Implementations
+
+The following CPAN classes are known to implement
+Type::API::Constraint::Constructor:
+
+=over
+
+=item *
+
+L<Moose::Meta::TypeConstraint> (and its subclasses)
+
+=item *
+
+L<MooseX::Meta::TypeDecorator>
+
+=item *
+
+L<Type::Tiny> (and its subclasses)
+
+=back
+
+The following CPAN classes implement variations of this interface with
+minor differences:
+
+=over
+
+=item *
+
+L<Mouse::Meta::TypeConstraint> - does not set global $_ for message.
+
+=item *
+
+L<MouseX::Meta::TypeDecorator> - does not set global $_ for message.
+
+=item *
+
+L<Specio::Constraint::Simple> (and several other classes in the Specio distribution) - does not set global $_ for message or constraint.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

@@ -1,0 +1,1 @@
+<!ATTLIST poem xml:space (default|preserve) 'preserve'>

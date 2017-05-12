@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tie-Autotie.t
+lib/Tie/Autotie.pm
+META.yml                                 Module meta-data (added by MakeMaker)

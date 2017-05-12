@@ -1,0 +1,367 @@
+=head1 NAME
+
+Test::Database::Tutorial - How to use Test::Database
+
+=head1 INTRODUCTION
+
+The goal of the L<Test::Database> module is to provide easy to use test
+databases for test scripts that need them.
+
+=head2 The problem
+
+Until now, when a test script needed a database, it either used SQLite
+(or some other easy to setup database), or required some environment
+variables to be present, or used default credentials, or even set up
+the database by itself.
+
+Most of those methods have pros and cons:
+
+=over 4
+
+=item *
+
+using SQLite
+
+No setup needed, but the test script can only use SQLite's dialect of SQL.
+So much for portability across database engines.
+
+=item *
+
+using environment variables
+
+The environment variables are different for every module to test, and
+usually only the main developers/testers know about them. Since most of
+the CPAN testers probably don't bother setting them up, these modules
+are most certainly undertested.
+
+=item *
+
+using default credentials
+
+Typically using C<'root'> and C<''> to connect to the C<test> MySQL
+database, these test script assume a default installation on the host
+system. These credentials often provide full access to the database
+engine, which is a security risk in itself (see below).
+
+=item *
+
+setting up the database by itself
+
+This method usually uses the default credentials to access an account
+with enough privileges to create a database. The host system data may
+be at risk!
+
+=back
+
+
+=head2 A solution: L<Test::Database>
+
+Many modules use a database to store their data, and often support
+several database engines.
+
+Wouldn't it be nice to be able to test on all the supported databases
+that are available on the test system? Without breaking (into) anything?
+
+This is the goal of the L<Test::Database> module. It supports:
+
+=over 4
+
+=item *
+
+getting DSN information from a list of pre-configured database and engines
+
+=item *
+
+automatic detection of "file-based" database engines (typically, SQLite).
+
+=back
+
+The rest of this document describes various use cases for L<Test::Database>.
+
+
+=head1 MODULE AND TEST AUTHOR
+
+L<Test::Database> has a single interface for test authors:
+
+    my @handles = Test::Database->handles( @requests );
+
+C<@request> is a list of "requests" for databases handles. Requests
+must declare the DBD they expect, and can optionaly add version-based
+limitations (only available for drivers supported by L<Test::Database>).
+
+The handles returned are objects of the L<Test::Database::Handle> class.
+
+The data contained in the database is never destroyed or cleaned
+up by L<Test::Database>, so it's perfectly fine to have a startup script
+that will setup the necessary tables and test data, several tests scripts
+that will build and update the data, and a eventually a teardown script
+that will drop all created tables.
+
+L<Test::Database> can return two types of databases handles:
+
+=over 4
+
+=item *
+
+either a handle to a newly created database (created especially at the
+test script's request)
+
+=item *
+
+or a handle to an already existing database
+
+=back
+
+There is no way for the test script to tell the difference.
+
+In any case, the database is assumed to provide C<DROP TABLE> and
+C<CREATE TABLE> rights, and the test script is by definition allowed
+to do whatever it pleases with the tables that exist in the database.
+
+Note that L<Test::Database> supports any DSN, not just those for which
+it has a driver. If your module supports Oracle, you can add C<'Oracle'>
+to your list of requests, and if the host owner configured a C<dsn>
+pointing at an Oracle database, then it will be available for your tests.
+
+=head2 Specific database support
+
+It is possible to request specific versions of a database engine.
+
+    use Test::Database;
+
+    # request database handles for all available databases
+    my @handles = Test::Database->handles();
+
+    # or for only the databases we support
+    my @handles = Test::Database->handles(
+        { dbd => 'SQLite' },
+        { dbd => 'SQLite2' },
+        { dbd => 'mysql', min_version => '4.0' },
+    );
+
+See L<Test::Database> documentation for details about how
+to write a request.
+
+=head2 Testing on a development box
+
+The first systems on which you are going to test your module are the
+ones you own. On these system, it's up to you to configure the databases
+you want to make available.
+
+A typical F<~/.test-database> configuration file would look like this:
+
+    dsn      = dbi:mysql:database=test
+    username = root
+
+    dsn      = dbi:Pg:database=test
+    username = postgres
+
+    dsn      = dbi:Oracle:test
+
+There is no need to add C<dsn> sections for file-based drivers
+(at least the ones that have a corresponding L<Test::Database::Driver>),
+since the module will automatically detect the available ones and create
+databases as needed.
+
+To find out which of the DBD that L<Test::Database> supports are
+installed, use the following one-liner:
+
+    $ perl -MTest::Database -le 'print for Test::Database->list_drivers("available")'
+    DBM
+    SQLite
+    mysql
+
+With no parameter, it will return the list of configured ones:
+
+    $ perl -MTest::Database -le 'print for Test::Database->list_drivers()'
+    DBM
+    SQLite
+
+
+=head1 CPAN TESTER
+
+The main goal of L<Test::Database> from the point of view of a tester
+is: "configure once, test everything".
+
+As a CPAN tester, once you have installed L<Test::Database>, you
+should edit the local equivalent of F<~/.test-database> for the
+user that will be running the CPAN test suites.
+
+=head2 C<dsn> versus C<driver_dsn>
+
+C<dsn> sections define the information needed to connect to a single
+database. Any database listed here can be used by any test script that
+requests it.
+
+C<driver_dsn> sections define the information needed to connect to a
+database engine (a "driver") with sufficient rights to run a
+C<CREATE DATABASE> command. This allows L<Test::Database> to create the
+databases on demand, thus ensuring every test suite will get a specific
+database.
+
+If you have file-based database engine, there is nothing to setup, as
+L<Test::Database> is able to detect available file-based engines and
+use them as needed.
+
+Other database engines like C<mysql> and C<Pg> require a little more
+configuration. For example, here's the content of my F<~/.test-database>
+configuration file:
+
+    driver_dsn  = dbi:mysql:
+    username    = root
+    
+    driver_dsn  = dbi:Pg:
+    username    = postgres
+
+For C<Pg>, I had to edit the F<pg_hba.cong> file in F</etc> to make sure
+anyone would be able to connect as the C<postgres> user, for example.
+
+=head2 Several test hosts accessing the same database engine
+
+If you have a large scale testing setup, you may want to setup a single
+MySQL or Postgres instance for all your test hosts, rather than one per
+test host.
+
+Databases created by L<Test::Database::Driver> (using a configured
+C<driver_dsn> have a name built after the following template:
+C<tdd_I<driver>_I<login>_I<n>>, where I<driver> is the DBD name, I<login>
+is the login of the user running L<Test::Database> and I<n> a number that
+
+If the same database server is used by several host running
+L<Test::Database> from the same user account, there is a race condition
+during with two different host may try to create the a database with
+the same name. A simple trick to avoid this is to add a C<key> section
+to the F<~/.test-database> configuration file.
+
+If the C<key> entry exists, the template used by L<Test::Database::Driver>
+to create new databases is C<tdd_I<driver>_I<login>_I<key>_I<n>>.
+
+=head2 Cleaning the test drivers
+
+When given a C<driver_dsn>, L<Test::Database> will use it to create a
+database for each test suite that requests one. Some mapping information
+is created to ensure the same test suite always receives a handle to
+the same database. (The mapping of test suite to database is based on
+the current working directory when L<Test::Database> is loaded).
+
+After a while, your database engine may fill up with unused test databases.
+
+All drivers store their mapping information in the system's temporary
+directory, so the mapping information is relatively volatile, which implies
+more unused test databases (at least for non file-based drivers, since the
+file-based drivers store their database files in the system's temporary
+directory too).
+
+The following one-liner will list all the existing databases that were
+created by L<Test::Database> in your configured drivers:
+
+    perl -MTest::Database -le 'print join "\n  ", $_->name, $_->databases for Test::Database->drivers'
+
+Example output:
+
+    CSV
+      tdd_csv_book_0
+      tdd_csv_book_1
+    DBM
+    SQLite
+      tdd_sqlite_book_0
+      tdd_sqlite_book_1
+    SQLite2
+      tdd_sqlite2_book_0
+    mysql
+      tdd_mysql_book_0
+      tdd_mysql_book_1
+
+The following one-liner will drop them all:
+
+    perl -MTest::Database -le 'for$d(Test::Database->drivers){$d->drop_database($_)for$d->databases}'
+
+If a C<key> has been defined in the configuration, only the databases
+corresponding to that key will be dropped.
+
+=head1 ADDING SUPPORT FOR A NEW DATABASE ENGINE
+
+L<Test::Database> currently supports the following DBD drivers:
+C<CSV>, C<DBM>, C<mysql>, C<Pg>, C<SQLite2>, C<SQLite>.
+
+Adding a new driver requires writing a corresponding
+L<Test::Database::Driver> subclass, having the same name as the original
+C<DBD> driver.
+
+An example module is provided in F<eg/MyDriver.pm>, and the other
+drivers can also be used as an example. See also the I<WRITING A
+DRIVER FOR YOUR DATABASE OF CHOICE> section in the documentation for
+L<Test::Database::Driver>.
+
+
+=head1 WHERE DO DSN COME FROM?
+
+The following ASCII-art graph shows where the L<Test::Database::Handle>
+objects returned by the C<handles()> method come from:
+
+
+    ,-------------,      ,-------------,      ,--------------,
+    |   DSN from  |      | File-based  |      | Drivers from |
+    | config file |      |   drivers   |      |  config file |
+    '-------------'      '-------------'      '--------------'
+           |                   |                      |
+           |                   |    ,-----------,     |
+           |                   '--->| Available |<----'
+           |                        |  drivers  |
+           |                        '-----------'
+           |                              |
+           |              ,-----------,   |
+           '------------->| Available |<--'
+                          |    DSN    |
+                          '-----------'
+
+
+Here are a few details about the C<handles()> method works:
+
+=over 4
+
+=item *
+
+L<Test::Database> maintains a list of L<Test::Database::Handle> objects
+computed from the DSN listed in the configuration.
+
+The handles matching the request are selected.
+
+=item *
+
+L<Test::Database> also maintains a list of L<Test::Database::Driver>
+objects computed from the list of supported file-based drivers that are
+locally available and from the list in the configuration file.
+
+The list of matching drivers is computed from the requests.  Each driver
+is then requested to provide an existing database (using its existing
+mapping information) or to create one if needed, and returns the
+corresponding L<Test::Database::Handle> objects.
+
+=item *
+
+Finally, all the collected L<Test::Database::Handle> objects are returned.
+
+=back
+
+So, without any configuration, L<Test::Database> will only be able to
+provide file-based databases. It is also recommended to B<not> put DSN
+or driver information for the file-based database engines that have
+a corresponding L<Test::Database::Driver> class, since it will cause
+C<handles()> to return several handles for the same database engine.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>
+
+=head1 COPYRIGHT
+
+Copyright 2009-2010 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+You can redistribute this tutorial and/or modify it under the same terms
+as Perl itself.
+
+=cut
+

@@ -1,0 +1,9 @@
+name = "Text-Diff-Unified-XS"
+badges = ["travis"]
+authority = "cpan:PINE"
+license = "mit"
+
+module_maker="ModuleBuild"
+
+[build]
+build_class = 'builder::MyBuilder'

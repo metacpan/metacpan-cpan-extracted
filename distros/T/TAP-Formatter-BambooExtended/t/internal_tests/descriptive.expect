@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-descriptive_test" errors="0" failures="0" tests="5" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/descriptive.test"/>
+  <testcase name="Interlock activated"/>
+  <testcase name="Megathrusters are go"/>
+  <testcase name="Head formed"/>
+  <testcase name="Blazing sword formed"/>
+  <testcase name="Robeast destroyed"/>
+</testsuite>

@@ -1,0 +1,43 @@
+---
+abstract: 'More Succinct Trie Data structure (binding for ux-trie)'
+author:
+  - 'Jiro Nishiguchi <jiro@cpan.org>'
+build_requires:
+  ExtUtils::ParseXS: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::Warn: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Ux
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+    - vendor
+provides:
+  Text::Ux:
+    file: lib/Text/Ux.pm
+    version: '0.11'
+requires:
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/spiritloose/Text-Ux/issues
+  homepage: https://github.com/spiritloose/Text-Ux
+  repository: git://github.com/spiritloose/Text-Ux.git
+version: '0.11'
+x_contributors:
+  - 'Norikazu Kato <s_wool@mac.com>'

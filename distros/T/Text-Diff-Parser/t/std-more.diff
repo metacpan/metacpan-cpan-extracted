@@ -1,0 +1,22 @@
+diff something something.1
+2,3d1
+< TWO
+< THREE
+diff something something.2
+3d2
+< THREE
+diff something something.3
+1a2
+> biff
+3c4
+< THREE
+---
+> THREE HONK
+diff something something.4
+3c3
+< THREE
+---
+> honk
+4a5,6
+> honk
+> honk

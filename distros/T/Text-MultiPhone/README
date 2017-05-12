@@ -1,0 +1,43 @@
+Text-MultiPhone version 0.01
+============================
+
+This is yet another solution to the problem of phonetic
+similarities. In contrast to L<Soundex> or L<Metaphone>, vowels
+matter, and it is thus more useful for other (germanic?) languages. It
+has currently implementations for norwegian and german.
+
+In languages, there are often cases where an automated phonetic
+analyzer cannot detect the correct pronounciation. I.e. can the german
+v be pronounced as english v (as in I<Verb>) or as english f (as in
+I<verstehen>), without obvious reason. In those cases, this analyzer
+returns both solutions.
+
+While L<Soundex>/L<Metaphone> have been designed for search of similar
+(english) names, they give to many and misleading results on a
+full-text index.
+
+This module has been proven to be useful for full-text indices, in particular
+to detect orthographic errors. It is a pure-perl implementation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Heiko Klein
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

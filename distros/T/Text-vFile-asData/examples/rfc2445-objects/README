@@ -1,0 +1,8 @@
+A selection of sample calendars for testing.
+
+Filenames take the form
+
+  x.y.z-type-n.ics
+
+Where "x.y.z" is the section from RFC2445 that the example is from, "type"
+is the object type, and "n" is the example number.

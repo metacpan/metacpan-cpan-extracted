@@ -1,0 +1,26 @@
+Revision history for Titantium.
+
+1.04 Nov  23, 2009
+  (No code changes)
+  * Update Build.PL to explicitly require a newer version of Compress::Raw::Zlib, an indirect dependency.
+
+1.03 June 26, 2009
+  (No code changes)
+  * Update AUTOLOAD docs reflect that we load the ErrorPage plugin.
+
+1.02 June 22, 2009
+  (No code changes)
+  * Fix "framework" typo (David Blank-Edelman)
+  * Fix typo in "setup()" example. (Justin Simoni).
+
+1.01 Dec 6, 2008
+  * Update Build.PL to require CGI::Application::Plugin::ErrorPage 1.20, a bugfix release. 
+  * Remove "titanium-starter" from the TODO list. (Jaldhar) 
+  * Add initial INSTALL file (RT#41276, David)
+
+1.00 Sep 4, 2008
+  * Declaring Stable  
+  * Clarify copyright/license to be the same as Perl
+
+0.90_1 Aug 8, 2008
+  * Initial release on unsuspecting world. 

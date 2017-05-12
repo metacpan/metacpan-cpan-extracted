@@ -1,0 +1,1214 @@
+
+<html>
+<head>
+<title>Thread::Apartment</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;<A HREF='#constructor_summary'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;<A HREF='#constructor_detail'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Thread::Apartment</h2>
+
+<hr>
+
+Provides apartment threading wrapper to encapsulate Perl objects
+in their own apartment thread.
+<p>
+Licensed under the Academic Free License version 2.1, as specified in the
+License.txt file included in this software package, or at
+<a href="http://www.opensource.org/licenses/afl-2.1.php">OpenSource.org</a>.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.50</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2005-12-01
+</dd>
+
+<p>
+<i>Unless otherwise noted, <code>$self
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th colspan=2 align=left><font size='+2'>Exported Symbols</font></th></tr>
+<tr><td align=right valign=top><code>start</code></td><td align=left valign=top>async method/closure request method
+</td></tr>
+<tr><td align=right valign=top><code>rendezvous</code></td><td align=left valign=top>method to wait for completion of async method/closure calls
+</td></tr>
+<tr><td align=right valign=top><code>rendezvous_any</code></td><td align=left valign=top>method to wait for completion of async method/closure calls
+</td></tr>
+<tr><td align=right valign=top><code>rendezvous_until</code></td><td align=left valign=top>method to wait for completion of async method/closure calls
+</td></tr>
+<tr><td align=right valign=top><code>rendezvous_any_until</code></td><td align=left valign=top>method to wait for completion of async method/closure calls
+</td></tr>
+
+</table>
+<p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Constructor Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Thread::Apartment'>new</a>(AptClass =&gt; <i>value</i>, AptMaxPending =&gt; <i>value</i>, AptQueue =&gt; <i>value</i>, AptTimeout =&gt; <i>value</i>, AptParams =&gt; <i>value</i>, AptReentrant =&gt; <i>value</i>, AptAutoload =&gt; <i>value</i>, AptClosureCalls =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Factory method to create an instance of a class in an
+apartment thread
+</td></tr>
+</table><p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#CLONE'>CLONE</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ithreads CLONE() method to cleanup context when a new thread is spawned
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#add_mapped_object'>add_mapped_object</a>($objid, $tac, $result, $isa, $methods)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Add an object to the object map
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#add_object_reference'>add_object_reference</a>($objid)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Increment the reference count for an object
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#alloc_mapped_object'>alloc_mapped_object</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Allocate a unique object ID
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#create_pool'>create_pool</a>(AptMaxPending =&gt; <i>value</i>, AptPoolSize =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Create a thread pool for apartment threaded objects
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#destroy_object'>destroy_object</a>($objecid)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Destroy a mapped object
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#destroy_pool'>destroy_pool</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Stop and remove all threads
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#evict_objects'>evict_objects</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Evict the current resident objects from the apartment thread
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#free_thread'>free_thread</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Return a thread to the pool
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_autoload'>get_autoload</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Get current autoload setting
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_closure'>get_closure</a>($sig, $id)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Return the closure for a specified closure ID
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_closure_behavior'>get_closure_behavior</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Get current closure call behaviors
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_factory'>get_factory</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Factory constructor
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_object_by_id'>get_object_by_id</a>($objid)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Return the object for a specified object ID
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_object_methods'>get_object_methods</a>($objid)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Return the hash map of method names to simplex/urgent flags
+for a specified object ID
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_pending_request'>get_pending_request</a>($tac)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Return the pending request ID for the input TAC
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_reentrancy'>get_reentrancy</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Get current re-entrancy setting
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_tac_for_object'>get_tac_for_object</a>($object)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Return the TAC for a mapped object
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#install'>install</a>(AptClass =&gt; <i>value</i>, AptMaxPending =&gt; <i>value</i>, AptQueue =&gt; <i>value</i>, AptTimeout =&gt; <i>value</i>, AptParams =&gt; <i>value</i>, AptReentrant =&gt; <i>value</i>, AptAutoload =&gt; <i>value</i>, AptClosureCalls =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Install an object into the current thread
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#map_async_request_id'>map_async_request_id</a>($key, $tac, $id)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Map a TAC to a async method/closure request ID
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#register_closure'>register_closure</a>($closure, $flags)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Registers a closure with the apartment thread before
+it is passed to another thread as either a parameter, or
+as a return value
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#remove_thread'>remove_thread</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Remove a thread from the pool
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#rendezvous'>rendezvous</a>(@tac_list)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Wait for completion of pending method/closure requests
+on <b>all</b> of the specified TACs/closures
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#rendezvous_any'>rendezvous_any</a>(@tac_list)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Wait for completion of pending method/closure requests
+on <b>any</b> of the specified TACs
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#rendezvous_any_until'>rendezvous_any_until</a>($timeout, @tac_list)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Wait upto to $timeout seconds for completion of pending
+method/closure requests on <b>any</b> of the specified TACs
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#rendezvous_until'>rendezvous_until</a>($timeout, @tac_list)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Wait upto to $timeout seconds for completion of pending
+method/closure requests on <b>all</b> of the specified TACs
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#run'>run</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> 
+Thread governor for installed objects
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#run_wait'>run_wait</a>($pendingq, $call_id, $timeout)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Intermediate thread governor for re-entrant method calls
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#set_autoload'>set_autoload</a>($autoload)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Set autoload flag
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#set_closure_behavior'>set_closure_behavior</a>($behavior)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Set closure call behaviors
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#set_reentrancy'>set_reentrancy</a>($reentrancy)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Set re-entrancy flag
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#set_single_threaded'>set_single_threaded</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Class method to force single threading
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#start'>start</a>($tac_or_closure)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> Starts an asynchronous method or closure call
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#stop'>stop</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stop and remove a thread
+
+
+</td></tr>
+</table>
+<p>
+
+<a name='constructor_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Constructor Details</font></th>
+</tr>
+</table>
+
+<a name='new'></a>
+<h3>new</h3>
+<pre>
+new(AptClass =&gt; <i>value</i>, AptMaxPending =&gt; <i>value</i>, AptQueue =&gt; <i>value</i>, AptTimeout =&gt; <i>value</i>, AptParams =&gt; <i>value</i>, AptReentrant =&gt; <i>value</i>, AptAutoload =&gt; <i>value</i>, AptClosureCalls =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd>Factory method to create an instance of a class in an
+apartment thread. Produces a client proxy version as the return
+value. If <a href="#set_single_threaded">set_single_threaded()</a>
+has been called, then acts as a simple factory returning an instance
+of the class without installing in an apartment thread (useful for
+debugging purposes).
+<p>
+The caller may supply a <a href='http://search.cpan.org/perldoc?Thread::Queue::Duplex'>TQD</a>
+(<i> and hence, the apartment thread</i>)
+to be used as the communications channel between the apartment thread and client proxy instances.
+If not provided, either a thread and TQD are allocated from the existing pool
+(see <a href="#create_pool">create_pool()</a>), or, if no pooled threads
+are available, a new apartment thread and TQD are created, in which to install the created object.
+By supplying a TQD, the application can create a pool
+of threads and TQDs as early as possible with the least context neccesary, and then
+allocate them to apartment threads as needed. However, the
+<a href="#create_pool">create_pool()</a> method may be simpler for most applications.
+<p>
+Some default behaviors of the object(s) created/installed in the apartment thread may be
+directed using the AptReentrant, AptAutoload, or AptClosureCalls parameters
+<i>(see below)</i>.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>AptClass</code> =&gt; class to be instantiated into an apartment thread
+</dd>
+<dd><code>AptMaxPending</code> =&gt; (optional) passed throught to any TQD created for the thread
+</dd>
+<dd><code>AptQueue</code> =&gt; (optional) <a href='Thread_Queue_Duplex.html'>Thread::Queue::Duplex</a>
+to be used to communicate to the proxied object(s)
+</dd>
+<dd><code>AptTimeout</code> =&gt; (optional) timeout (in seconds) for responses to any non-simplex
+proxied method call.
+</dd>
+<dd><code>AptParams</code> =&gt; (optional) arrayref or hashref of parameters required for the proxied
+class's constructor (if the object requires something other than
+a hash for constructor parameters)
+</dd>
+<dd><code>AptReentrant</code> =&gt; (optional) boolean indicating whether the objects in the apartment
+thread should permit re-entrancy (i.e., handle inbound method calls)
+while waiting for the results of outbound calls to other T::A objects;
+default is undef (false).
+</dd>
+<dd><code>AptAutoload</code> =&gt; (optional) boolean indicating whether the objects in the apartment
+thread should permit <i>any</i> method call, rather than be restricted
+to introspected, public methods. Default is undef (false).
+</dd>
+<dd><code>AptClosureCalls</code> =&gt; (optional) scalar string, or arrayref of strings, indicating whether
+proxied closures called from objects in the apartment
+should be treated as 'Simplex', 'Urgent', or both.
+Default is undef (duplex, non-urgent). Valid (case-insensitive) values
+are 'Simplex', 'Urgent', or an arrayref containing either or both of
+those values.
+
+</dd>
+<dt><b>Returns:</b><dd><a href='./Apartment/Client.html'>Thread::Apartment::Client</a> object
+</dd>
+</dl></dd></dl><hr>
+
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='CLONE'></a>
+<h3>CLONE</h3>
+<pre>
+CLONE()
+</pre><p>
+<dl>
+<dd>ithreads CLONE() method to cleanup context when a new thread is spawned.
+
+<p>
+<dd><dl>
+</dl></dd></dl><hr>
+
+<a name='add_mapped_object'></a>
+<h3>add_mapped_object</h3>
+<pre>
+add_mapped_object($objid, $tac, $result, $isa, $methods)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Add an object to the object map
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$objid</code> - object ID
+</dd>
+<dd><code>$tac</code> - the TAC (or possibly TACo) for the object
+</dd>
+<dd><code>$result</code> - the object to map
+</dd>
+<dd><code>$isa</code> - the class hierarchy of the object
+</dd>
+<dd><code>$methods</code> - the method name map for the object
+
+</dd>
+<dt><b>Returns:</b><dd><a href='./Apartment/Client.html'>TAC</a> for the object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='add_object_reference'></a>
+<h3>add_object_reference</h3>
+<pre>
+add_object_reference($objid)
+</pre><p>
+<dl>
+<dd>Increment the reference count for an object.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$objid</code> - object ID
+
+</dd>
+<dt><b>Returns:</b><dd>the object's new reference count
+</dd>
+</dl></dd></dl><hr>
+
+<a name='alloc_mapped_object'></a>
+<h3>alloc_mapped_object</h3>
+<pre>
+alloc_mapped_object()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Allocate a unique object ID. ID's are indexes into the
+object ID map array; a scan of the array is performed
+to locate the first free entry. If no free entries remain,
+the array is extended.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the object ID
+</dd>
+</dl></dd></dl><hr>
+
+<a name='create_pool'></a>
+<h3>create_pool</h3>
+<pre>
+create_pool(AptMaxPending =&gt; <i>value</i>, AptPoolSize =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Create a thread pool for apartment threaded objects.
+Useful for limiting the amount of context cloned into
+apartment threads. By creating a pool of threads before
+<code>require</code>'ing any modules, the threads will
+have minimal context before the apartment thread objects
+are installed into them.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>AptMaxPending</code> =&gt; used to set MaxPending on created <a href='http://search.cpan.org/perldoc?Thread::Queue::Duplex'>TQD's</a>.
+</dd>
+<dd><code>AptPoolSize</code> =&gt; the number of threads to create in the pool
+
+</dd>
+<dt><b>Returns:</b><dd>number of threads created
+</dd>
+</dl></dd></dl><hr>
+
+<a name='destroy_object'></a>
+<h3>destroy_object</h3>
+<pre>
+destroy_object($objecid)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Destroy a mapped object. Decrements the object's
+external reference count. If the reference count drops to
+zero, removes the object from the object map.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$objecid</code> - object ID
+
+</dd>
+<dt><b>Returns:</b><dd>1 if the ID is for the root object; undef otherwise
+</dd>
+</dl></dd></dl><hr>
+
+<a name='destroy_pool'></a>
+<h3>destroy_pool</h3>
+<pre>
+destroy_pool()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Stop and remove all threads
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>1
+</dd>
+</dl></dd></dl><hr>
+
+<a name='evict_objects'></a>
+<h3>evict_objects</h3>
+<pre>
+evict_objects()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Evict the current resident objects from the apartment thread.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>undef
+</dd>
+</dl></dd></dl><hr>
+
+<a name='free_thread'></a>
+<h3>free_thread</h3>
+<pre>
+free_thread()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Return a thread to the pool. Called within the
+thread to be returned.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>1
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_autoload'></a>
+<h3>get_autoload</h3>
+<pre>
+get_autoload()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Get current autoload setting.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>autoload flag value
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_closure'></a>
+<h3>get_closure</h3>
+<pre>
+get_closure($sig, $id)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Return the closure for a specified closure ID.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$sig</code> - closure signature (used to reject stale closures when an appartment thread is recycled)
+</dd>
+<dd><code>$id</code> - closure ID
+
+</dd>
+<dt><b>Returns:</b><dd>if the signature and ID match, the closure; undef otherwise
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_closure_behavior'></a>
+<h3>get_closure_behavior</h3>
+<pre>
+get_closure_behavior()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Get current closure call behaviors
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>closure call behaviors bitmask
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_factory'></a>
+<h3>get_factory</h3>
+<pre>
+get_factory()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Factory constructor. Creates a factory object
+for Thread::Apartment (useful for apps which
+may subclass T::A in future)
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>T::A object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_object_by_id'></a>
+<h3>get_object_by_id</h3>
+<pre>
+get_object_by_id($objid)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Return the object for a specified object ID.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$objid</code> - object ID
+
+</dd>
+<dt><b>Returns:</b><dd>the object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_object_methods'></a>
+<h3>get_object_methods</h3>
+<pre>
+get_object_methods($objid)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Return the hash map of method names to simplex/urgent flags
+for a specified object ID.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$objid</code> - object ID
+
+</dd>
+<dt><b>Returns:</b><dd>hashref mapping method names to behavior flags
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_pending_request'></a>
+<h3>get_pending_request</h3>
+<pre>
+get_pending_request($tac)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Return the pending request ID for the input TAC.
+Called from TAC::<a href='./Apartment/Client.html#get_pending_results'>get_pending_results()</a>
+to recover the pending request ID. Causes the TAC and request ID to be removed
+from the TAC map.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$tac</code> - TAC for which the pending request ID is to be returned
+
+</dd>
+<dt><b>Returns:</b><dd>undef if the input TAC has no pending requests;
+otherwise, the request id
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_reentrancy'></a>
+<h3>get_reentrancy</h3>
+<pre>
+get_reentrancy()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Get current re-entrancy setting.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>re-entrancy flag value
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_tac_for_object'></a>
+<h3>get_tac_for_object</h3>
+<pre>
+get_tac_for_object($object)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Return the TAC for a mapped object
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$object</code> - the object (<b>not</b> the object ID!)
+
+</dd>
+<dt><b>Returns:</b><dd><a href='./Apartment/Client.html'>TAC</a> for the object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='install'></a>
+<h3>install</h3>
+<pre>
+install(AptClass =&gt; <i>value</i>, AptMaxPending =&gt; <i>value</i>, AptQueue =&gt; <i>value</i>, AptTimeout =&gt; <i>value</i>, AptParams =&gt; <i>value</i>, AptReentrant =&gt; <i>value</i>, AptAutoload =&gt; <i>value</i>, AptClosureCalls =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Install an object into the current thread. Similar to <a href="#new">new()</a>,
+except that the current thread is converted to an apartment thread, rather
+than creating a new thread (or allocating one from a thread pool). Useful for
+some legacy packages (e.g., <a href="http://search.cpan.org/perldoc?Tk">Perl/Tk</a>).
+<p>
+Whereas <a href='#new'>new()</a> creates a new instance of
+a class and installs it in <b>another</b> thread, which immediately begins
+monitoring the TQD channel for proxied method calls,
+<code>install()</code> creates a new instance of a class and installs it <b>in the
+current thread</b>, returning a <a href='./Apartment/Container.html'>TACo</a>,
+which references both the actual created object, <b>and</b> its TAC, so the installed object
+can be invoked within the current thread, yet still be distributed to other apartment
+threaded objects.
+<p>
+When an application needs to pass an <code>install()</code>ed object to other threads,
+it has 2 options:
+<ol>
+<li>The TAC objects to receive a reference to the installed object must be
+passed to the installed object constructor, and implement a known method which the
+installed object calls to supply its own TAC. The resulting tight coupling
+requires additional wrappers or subclassing for use by POPOs and legacy classes.
+<p>
+<li>Alternately, install() simply returns a TACo for the installed object
+(rather than its TAC, as for <a href='#new'>new()</a>), and the
+main flow of the application can distribute the TACo object to the other
+apartment threaded objects as needed. Once the installed object is fully distributed,
+and any other initialization is completed,
+the main flow simply calls <a href="#run">Thread::Apartment::run()</a> method,
+which assumes control of the current thread.
+The resulting loosely coupled component based architecture simplifies the assembly
+of apartment threaded objects, and is more easily supported by POPO's and legacy objects.
+</ol>
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>AptClass</code> =&gt; class to be instantiated into an apartment thread
+</dd>
+<dd><code>AptMaxPending</code> =&gt; (optional) passed throught to any TQD created for the thread
+</dd>
+<dd><code>AptQueue</code> =&gt; (optional) <a href='http://search.cpan.org/perldoc?Thread::Queue::Duplex'>Thread::Queue::Duplex</a>
+to be used to communicate to the proxied object(s)
+</dd>
+<dd><code>AptTimeout</code> =&gt; (optional) timeout (in seconds) for responses to any non-simplex
+proxied method call.
+</dd>
+<dd><code>AptParams</code> =&gt; (optional) arrayref or hashref of parameters required for the proxied
+class's constructor
+</dd>
+<dd><code>AptReentrant</code> =&gt; (optional) boolean indicating whether the objects in the apartment
+thread should permit re-entrancy (i.e., handle inbound method calls)
+while waiting for the results of outbound calls to other T::A objects;
+default is undef (false).
+</dd>
+<dd><code>AptAutoload</code> =&gt; (optional) boolean indicating whether the objects in the apartment
+thread should permit <i>any</i> method call, rather than be restricted
+to introspected, public methods. Default is undef (false).
+</dd>
+<dd><code>AptClosureCalls</code> =&gt; (optional) scalar string, or arrayref of strings, indicating whether
+proxied closures called from objects in the apartment thread
+should be treated as 'Simplex', 'Urgent', or both.
+Default is undef (duplex, non-urgent). Valid (case-insensitive) values
+are 'Simplex', 'Urgent', or an arrayref containing either or both of
+those values.
+
+</dd>
+<dt><b>In scalar context, returns:</b><dd>nothing
+</dd>
+<dt><b>In list context, returns:</b><dd>(nothing
+)</dd>
+</dl></dd></dl><hr>
+
+<a name='map_async_request_id'></a>
+<h3>map_async_request_id</h3>
+<pre>
+map_async_request_id($key, $tac, $id)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Map a TAC to a async method/closure request ID.
+Called by a TAC when the async request has been initiated.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$key</code> - TAC or closure being mapped
+</dd>
+<dd><code>$tac</code> - TAC to map to async request id
+</dd>
+<dd><code>$id</code> - request id
+
+</dd>
+<dt><b>Returns:</b><dd>The TAC object.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='register_closure'></a>
+<h3>register_closure</h3>
+<pre>
+register_closure($closure, $flags)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Registers a closure with the apartment thread before
+it is passed to another thread as either a parameter, or
+as a return value. Unlike a closure, the returned
+<a href='./Apartment/Closure.html'>Thread::Apartment::Closure</a> <i>aka</i>
+<b>TACl</b> object is suitable for marshalling across threads.
+<p>
+When another thread receives the TACl it will unmarshall it as
+a local closure that invokes a special method on the originating
+thread's TAC, which in turn will cause the originating thread
+to invoke the locally registered closure.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$closure</code> - closure to be registered
+</dd>
+<dd><code>$flags</code> - bitmask of flags indicating simplex and/or urgent behavior
+(see <a href="./Apartment/Common.html#exports">Thread::Apartment::Common</a>
+for bitmask values)
+
+</dd>
+<dt><b>Returns:</b><dd><a href='./Apartment/Closure.html'>Thread::Apartment::Closure</a> object.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='remove_thread'></a>
+<h3>remove_thread</h3>
+<pre>
+remove_thread()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Remove a thread from the pool. Called within the
+thread to be returned.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>1
+</dd>
+</dl></dd></dl><hr>
+
+<a name='rendezvous'></a>
+<h3>rendezvous</h3>
+<pre>
+rendezvous(@tac_list)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Wait for completion of pending method/closure requests
+on <b>all</b> of the specified TACs/closures. If no TACs/closures are
+specified, waits for all TACs/closures currently in the async TAC map.
+Returns when the pending requests are completed, using the
+Thread::Queue::Duplex <code>wait_all()</code> class method.
+<p>
+Note that the application is responsible for calling
+<a href='classdocs/Thread/Apartment/Client.html#get_pending_results'>
+get_pending_results()</a> on the appropriate TACs to get any method/closure
+return values.
+<p>
+For closures, the input parameter is the closure
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@tac_list</code> - (optional) list of TACs or closures to wait for;
+default is all pending TACs
+
+</dd>
+<dt><b>Returns:</b><dd>list of TACs that have rendezvoused; note that closures
+will be replaced by an appropriate TAC
+</dd>
+</dl></dd></dl><hr>
+
+<a name='rendezvous_any'></a>
+<h3>rendezvous_any</h3>
+<pre>
+rendezvous_any(@tac_list)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Wait for completion of pending method/closure requests
+on <b>any</b> of the specified TACs. If no TACs are
+specified, waits for any TACs currently in the async TAC map.
+Returns when the pending requests are completed, using the
+Thread::Queue::Duplex <code>wait_any()</code> class method.
+<p>
+Note that the application is responsible for calling
+<a href='classdocs/Thread/Apartment/Client.html#get_pending_results'>
+get_pending_results()</a> on the appropriate TACs to get any method/closure
+return values.
+<p>
+For closures, the input TAC parameter is the TAC returned by <A href='#start'>start()</a>.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@tac_list</code> - (optional) list of TACs to wait for;
+default is all pending TACs
+
+</dd>
+<dt><b>Returns:</b><dd>list of TACs that have rendezvoused
+</dd>
+</dl></dd></dl><hr>
+
+<a name='rendezvous_any_until'></a>
+<h3>rendezvous_any_until</h3>
+<pre>
+rendezvous_any_until($timeout, @tac_list)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Wait upto to $timeout seconds for completion of pending
+method/closure requests on <b>any</b> of the specified TACs.
+If no TACs are specified, waits for any TACs currently in the async TAC map.
+Returns when the pending requests are completed, or the timeout has expired,
+using the Thread::Queue::Duplex <code>wait_all_until()</code> class method.
+<p>
+Note that the application is responsible for calling
+<a href='classdocs/Thread/Apartment/Client.html#get_pending_results'>
+get_pending_results()</a> on the appropriate TACs to get any method/closure
+return values.
+<p>
+For closures, the input TAC parameter is the TAC returned by <A href='#start'>start()</a>.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - timeout in seconds to wait for completion
+</dd>
+<dd><code>@tac_list</code> - (optional) list of TACs to wait for;
+default is all pending TACs
+
+</dd>
+<dt><b>Returns:</b><dd>undef if $timeout expired; otherwise, the list of TACs that
+have rendezvoused
+</dd>
+</dl></dd></dl><hr>
+
+<a name='rendezvous_until'></a>
+<h3>rendezvous_until</h3>
+<pre>
+rendezvous_until($timeout, @tac_list)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Wait upto to $timeout seconds for completion of pending
+method/closure requests on <b>all</b> of the specified TACs.
+If no TACs are specified, waits for any TACs currently in the async TAC map.
+Returns when the pending requests are completed, or the timeout has expired,
+using the Thread::Queue::Duplex <code>wait_all_until()</code> class method.
+<p>
+Note that the application is responsible for calling
+<a href='classdocs/Thread/Apartment/Client.html#get_pending_results'>
+get_pending_results()</a> on the appropriate TACs to get any method/closure
+return values.
+<p>
+For closures, the input TAC parameter is the TAC returned by <A href='#start'>start()</a>.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - timeout in seconds to wait for completion
+</dd>
+<dd><code>@tac_list</code> - (optional) list of TACs to wait for;
+default is all pending TACs
+
+</dd>
+<dt><b>Returns:</b><dd>undef if $timeout expired; otherwise, the list of TACs that have rendezvoused
+</dd>
+</dl></dd></dl><hr>
+
+<a name='run'></a>
+<h3>run</h3>
+<pre>
+run()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> 
+Thread governor for installed objects
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>1
+</dd>
+</dl></dd></dl><hr>
+
+<a name='run_wait'></a>
+<h3>run_wait</h3>
+<pre>
+run_wait($pendingq, $call_id, $timeout)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Intermediate thread governor for re-entrant method calls.
+Used when an object has made a call on another proxied object,
+but needs to be able to service external calls to itself until
+the pending call completes.
+<p>
+Relies on the threads::shared nature of the thread pool
+map to recover the TQD for the thread in which the re-entrant call
+is made, <b>and</b> the <b>non-</b>threads::shared nature of the
+proxied object map to recover the root object.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$pendingq</code> - TQD of the proxied object with a pending call
+</dd>
+<dd><code>$call_id</code> - request ID of the pending call
+</dd>
+<dd><code>$timeout</code> - (optional) max. number of seconds to wait for an event
+
+</dd>
+<dt><b>Returns:</b><dd>undef if timeout expires before the pending call returns,
+or if a STOP, DESTROY on the root object, or evict()
+call is received. 1 otherwise.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='set_autoload'></a>
+<h3>set_autoload</h3>
+<pre>
+set_autoload($autoload)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Set autoload flag.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$autoload</code> - the boolean value for the flag
+
+</dd>
+<dt><b>Returns:</b><dd>previous $autoload_all flag value
+</dd>
+</dl></dd></dl><hr>
+
+<a name='set_closure_behavior'></a>
+<h3>set_closure_behavior</h3>
+<pre>
+set_closure_behavior($behavior)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Set closure call behaviors
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$behavior</code> - the bitmask of TA_SIMPLEX and/or TA_URGENT values
+
+</dd>
+<dt><b>Returns:</b><dd>previous $closure_calls bitmask value
+</dd>
+</dl></dd></dl><hr>
+
+<a name='set_reentrancy'></a>
+<h3>set_reentrancy</h3>
+<pre>
+set_reentrancy($reentrancy)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Set re-entrancy flag.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$reentrancy</code> - the boolean value for the flag
+
+</dd>
+<dt><b>Returns:</b><dd>previous re-entrancy flag value
+</dd>
+</dl></dd></dl><hr>
+
+<a name='set_single_threaded'></a>
+<h3>set_single_threaded</h3>
+<pre>
+set_single_threaded()
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Class method to force single threading.
+Note that this behavior is irreversible.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>nothing
+</dd>
+</dl></dd></dl><hr>
+
+<a name='start'></a>
+<h3>start</h3>
+<pre>
+start($tac_or_closure)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> Starts an asynchronous method or closure call.
+Sets the <i>thread-local</i> TAC async flag class variable.
+When the next proxied TAC method/closure call
+is invoked within the thread, the TAC will
+<ol>
+<li>add itself and the pending method/closure request identifier,
+to T::A's <i>thread-local</i> async TAC map class variable
+<li>clear the TAC async flag
+<li>return the TAC for the method/closure request.
+</ol>
+<p>
+For async method calls, the parameter is the TAC object; for proxied
+closure calls, the closure is specified. The returned value is the provided
+TAC or closure, in order to support the following syntax<br>
+<pre>
+my $tac = Thread::Apartment::start($tac)->someMethod(@params);
+my $tac = Thread::Apartment::start($closure)->(@params);
+</pre>
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$tac_or_closure</code> - TAC or closure to be invoked asynchronously
+
+</dd>
+<dt><b>Returns:</b><dd>the input TAC or closure parameter
+</dd>
+</dl></dd></dl><hr>
+
+<a name='stop'></a>
+<h3>stop</h3>
+<pre>
+stop()
+</pre><p>
+<dl>
+<dd>Stop and remove a thread
+
+
+<p>
+<dd><dl>
+<dt><b>Simplex</b></dt>
+<dt><b>Returns:</b><dd>The object
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Mon Mar 27 08:51:36 2006</i>
+</center>
+</small>
+</body>
+</html>

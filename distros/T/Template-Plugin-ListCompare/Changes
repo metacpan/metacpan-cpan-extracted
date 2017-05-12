@@ -1,0 +1,12 @@
+Revision history for Template-Plugin-ListCompare
+
+0.05 2011-01-23
+Tidy up, perlcritic-friendly, added some tests
+
+0.02 - November 24, 2009
+
+Changed Template::Plugin::List::Compare from the POD with Template::Plugin::ListCompare for not generating wrong results in CPAN search.
+
+0.01 - November 24, 2009
+        First version, released on an unsuspecting world.
+

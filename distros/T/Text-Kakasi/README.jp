@@ -1,0 +1,59 @@
+Text::Kakasi
+
+Copyright (C) 1998, 1999, 2000 NOKUBI Takatsugu <knok@daionet.gr.jp>
+
+$Id: README.jp,v 2.0 2003/05/22 18:19:11 dankogai Exp $
+
+はじめに
+--------
+
+このモジュールは、高橋裕信さんの作成されたソフトウェアKAKASIを
+perlから用いるためのものです。
+
+このモジュールを使うためには、最新版のKAKASI(2.3.0以降)が必要です。最
+新版に関しては、<http://kakasi.namazu.org/>を参照してください。
+
+インストール
+------------
+
+0.  kakasi をあらかじめインストールしておいて下さい。たいていの場合、
+以下のとおりとなります。
+
+% gzip -dc kakasi-(version).tar.gz | tar xvf -
+% cd kakasi-(version)
+% ./configure
+% make
+% su make install
+
+すでに多くのプラットフォームにおいて、portsないしpackageが存在します。
+詳しくは各プラットフォームの文書を参照して下さい。
+
+1.  Install this module.
+
+% gzip -dc Text-Kakasi-(version).tar.gz | tar xvf -
+% cd Text-Kakasi-(version)
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+1a. Install this module via CPAN
+
+% perl -MCPAN -e 'install Text::Kakasi'
+
+使い方
+------
+
+perldoc Text::Kakasi を参照して下さい
+
+著作権表示
+----------
+
+Copyright (C) 1988, 1999, 2000 NOKUBI Takatsugu <knok@daionet.gr.jp>
+Copyright (C) 2003 Dan Kogai <dankogai@dan.co.jp>
+
+このモジュールは完全に無保証です。
+
+また、このモジュールはGNU General Public Licenceのもとで再配付、改変が
+認められています。詳細については付属のCOPYINGというファイルを参照して
+下さい。

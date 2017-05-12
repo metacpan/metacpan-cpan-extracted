@@ -1,0 +1,222 @@
+NAME
+    Text::CPP - A full C Preprocessor in XS
+
+SYNOPSIS
+            use Text::CPP;
+            my $reader = new Text::CPP(
+                    Language        => CLK_GNUC99,
+                    Options         => {
+                            ...
+                    },
+                    Builtins        => {
+                            foo     => 'this',
+                            bar     => 'that',
+                            ...
+                    },
+                    Callbacks       => {
+                            ...
+                    },
+            );
+            $reader->read("file.c");
+            while (my $token = $reader->token) {
+                    print "Token: $token\n";
+            }
+
+            $reader->data->{MyKey} = $MyData;
+
+DESCRIPTION
+    A fast C preprocessor in XS. This does not require an external C
+    preprocessor, and will not fork() or exec() any external process.
+
+USAGE
+    The following methods have been implemented, allowing the use of this
+    module as a pure C preprocessor, or as a lexer for a C, C++ or
+    Assembler-like language.
+
+    new Text::CPP(...)
+        Takes a hash or hashref with the following possible keys:
+
+        Language
+            Defines the source language to preprocess and/or tokenise. It
+            may be any of:
+
+            CLK_GNUC89 - GNU C89
+            CLK_GNUC99 - GNU C99
+            CLK_STDC89 - Standard C89
+            CLK_STDC94 - Standard C94
+            CLK_STDC99 - Standard C99
+            CLK_GNUCXX - GNU C++
+            CLK_CXX98 - Standard C++ 98
+            CLK_ASM - Assembler
+
+        Options
+            A hashref of options for the preprocessor. Valid entries are
+            given with alternative forms (from GNU cpp) in brackets.
+
+            Define (-D): array of strings or hash
+                Strings should be of the form NAME=VALUE.
+
+            Undef (-U): array of strings
+            DiscardComments (-C): boolean
+            DiscardCommentsInMacroExp (-CC): boolean
+            PrintIncludeNames (-H): boolean
+            NoLineCommands (-P): boolean
+            WarnComments (-Wcomment -Wcomments): boolean
+            WarnDeprecated (-Wdeprecated): boolean
+            WarningsAreErrors (-Werror): boolean
+            WarnImport (-Wimport): boolean
+            WarnMultichar (-Wmultichar): boolean
+            WarnSystemHeaders (-Wsystem-headers): boolean
+                Ignore errors in system header files.
+
+            WarnTraditional (-Wtraditional): boolean
+            WarnTrigraphs (-Wtrigraphs): boolean
+            WarnUnusedMacros (-Wunused-macros): boolean
+            Pedantic (-pedantic): boolean
+            PedanticErrors (-pedantic-errors): boolean
+                Implies, and overrides, Pedantic.
+
+            Remap (-remap): boolean
+                Deal with some brokennesses of MSDOS. Untested.
+
+            Trigraphs (-trigraphs): boolean
+            Traditional (-traditional): boolean
+            NoWarnings (-w): boolean
+            IncludePrefix (-iprefix): string
+            SystemRoot (-isysroot): string
+            Include (-include): array of strings
+                Include the specified files before reading the main file to
+                be processed.
+
+            IncludeMacros (-imacros): array of strings
+                Include the specified files before reading the main file to
+                be processed. Output from preprocessing these files is
+                discarded. Files specified by IncludeMacros are processed
+                before files specified by Include.
+
+            IncludePath (-I): array of strings
+                This include path is searched first.
+
+            SystemIncludePath (-isystem): array of strings
+                Specify the standard system include path, searched second.
+
+            AfterIncludePath (-idirafter): array of strings
+                This include path is searched after the system include path.
+
+        Builtins
+            A hashref of predefined macros. The values must be strings or
+            integers. Macros in this hash will be defined before
+            preprocessing starts. These correspond to true "builtin" macros.
+            You should probably prefer to use the 'Define' option.
+
+        Callbacks
+            The preprocessor makes callbacks when certain events occur.
+
+            LineChange
+                Called when the line in the source file changes. Arguments
+                are (XXX see BUGS)
+
+            Ident
+            Define
+            Undef
+
+    $text = $reader->token
+    ($text, $type, $flags) = $reader->token
+        Return the next available preprocessed token. Some tokens are not
+        stringifiable. These include tokens of type CPP_MACRO_ARG,
+        CPP_PADDING and CPP_EOF. Text::CPP returns a dummy string in the
+        'text' field for these tokens. Tokens of type CPP_EOF should never
+        actually be returned. Instead, an empty list is returned in list
+        context, or undef in scalar context.
+
+    @tokens = $reader->tokens
+        Preprocess and return a list of tokens. This is approximately
+        equivalent to:
+
+                push(@tokens, $_) while ($_ = $reader->token);
+
+    $reader->type($type)
+        Return a human readable name for a token type, as returned by
+        $reader->token.
+
+    $reader->data
+        Returns a hashref in which user data may be stored by subclasses.
+        This hashref is created with a new Text::CPP object, and is ignored
+        for all functional purposes. The user may do with it as he wishes.
+
+    $reader->errors
+        In scalar context, returns the fatal error count. In list context,
+        returns a list of warnings and errors encountered by the
+        preprocessor. Thus scalar(@errors) >= $errors, since @errors will
+        also contain the warnings.
+
+BUGS
+    Fewer than in the last release, and hopefully not very many.
+
+    This documentation is probably incomplete. There are many important
+    functions in the source which are not yet documented.
+
+    It is not possible to instantiate multiple Text::CPP objects, since the
+    underlying library uses many global variables.
+
+    C99 may not implement variadic macros correctly according to the ISO
+    standard. I must check this. If anyone knows, please tell me.
+
+    The -M option is not yet handled.
+
+    Callbacks are not yet fully implemented.
+
+CAVEATS
+    Memory for hash tables, token names, etc is only freed when the reader
+    is destroyed.
+
+    Assertions are a deprecated feature, and thus the -A flag is not
+    supported.
+
+    It does not seem necessary to support the following flags:
+
+    -x
+    -iwithprefix
+    -iwithprefixbefore
+    -fpreprocessed
+    The following options may be requested, but seem boring, so are not
+    currently supported.
+
+    -std
+    -ansi
+    -foperator-names
+    -fshow-column
+    -ftabstop
+
+TODO
+    Dependency output
+    Lots more tests
+    Remaining callbacks
+    Virtual file support
+    Multiplicity
+
+SUPPORT
+    Mail the author at <cpan@anarres.org>
+
+AUTHOR
+            Shevek
+            CPAN ID: SHEVEK
+            cpan@anarres.org
+            http://www.anarres.org/projects/
+
+COPYRIGHT
+    Copyright (c) 2002 Shevek. All rights reserved.
+
+    This program is free software; but parts of it have been borrowed from,
+    or based on, parts of the GNU C Compiler version 3.3.2. You may
+    therefore redistribute and/or modify this code under the terms of the
+    GNU GENERAL PUBLIC LICENSE. I am unable to release this code under the
+    usual Perl license because that license includes the Artistic License,
+    and I cannot rerelease GPL code under the Artistic License. Sorry.
+
+    The full text of the license can be found in the COPYING file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

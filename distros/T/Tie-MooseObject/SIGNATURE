@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b3da7daf79f33d1b50fe4f7a218b0c28d4bcc17e Changes
+SHA1 70d863f8e56bc53edb3d640eb08029edc8f20e0a INSTALL
+SHA1 ac73e38e5136b4f3b44e244fed529327d07ce3d0 LICENSE
+SHA1 a56ca4aeda3a4dd2d50933135098ecc743524452 MANIFEST
+SHA1 92c77ea167832a803f167cfb84784a04a11ae989 META.json
+SHA1 7d94c278ad0d76c22bdd8fde93331b0b1fff3b0e META.yml
+SHA1 6f48b34916d2eba468c2996858d63e29f3cf6790 Makefile.PL
+SHA1 620510a554d73b9479b5e8c957f5efed1860f445 README
+SHA1 f8ceb931e06f56731b9cff8d0ac73bcdece5eb80 dist.ini
+SHA1 6f61a8d19562ad27e49097167a9ba51db3453df1 lib/Tie/MooseObject.pm
+SHA1 2366377fb0fa9e1a2b5ecbb530a23b5f23070c98 t/00-test.t
+SHA1 0b65c2614fe38ba694029649e8b020ca668a3199 t/author-critic.t
+SHA1 9fcc209ca9e2781c42018f75da213fa6f497480d t/release-eol.t
+SHA1 93797583dc7bfd6e98033c0d55f5692e5798dbf3 t/release-kwalitee.t
+SHA1 ac3b0d8532277d82b9e048ae618a32ef08868350 t/release-no-tabs.t
+SHA1 5da741e4cabd859cbd6a3f2ad1c9901b892da4d0 t/release-pod-coverage.t
+SHA1 3958ebba788f1c3baebf2a2ee7a42f0eda01c991 t/release-pod-spell.t
+SHA1 4be1e0c8e385f4ef98dcce52aba9521f32a808e0 t/release-pod-syntax.t
+SHA1 276a5c8dafac47bab4385e224a5319697e7ea8f8 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFMFVgjwqjRn7fQy6ARAkDHAJ0fljga5Z7ihX4kgRG7VeqmD1iJEgCdHsnJ
+QJ/9aMxi3tOZ+dCVr6BRYuI=
+=b6ba
+-----END PGP SIGNATURE-----

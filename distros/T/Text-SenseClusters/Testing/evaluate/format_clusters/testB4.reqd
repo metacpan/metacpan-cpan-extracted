@@ -1,0 +1,2 @@
+Usage: format_clusters.pl [OPTIONS] CLUTO_SOLUTION RLABEL
+TYPE format_clusters.pl --help for help

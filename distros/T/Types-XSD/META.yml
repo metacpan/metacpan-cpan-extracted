@@ -1,0 +1,42 @@
+---
+abstract: 'type constraints based on XML schema datatypes'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+  Test::TypeTiny: '0.004'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-XSD
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Types::XSD:
+    file: lib/Types/XSD.pm
+    version: '0.005'
+requires:
+  DateTime::Incomplete: '0'
+  DateTimeX::Auto: '0.004'
+  Type::Library: '0.004'
+  Types::XSD::Lite: '0.004'
+  XML::RegExp: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Types-XSD/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD
+  homepage: https://metacpan.org/release/Types-XSD
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-types-xsd.git
+version: '0.005'

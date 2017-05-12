@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl -w
+our $VERSION = "0.5b";
+
+use strict;
+use TapeChanger::MTX;
+
+my @problems = TapeChanger::MTX->cannot_run();
+if (scalar @problems) {
+  print "Unable to run program:\n ", join("\n ", @problems), "\n"; 
+  exit 0;
+}
+
+my $tape = TapeChanger::MTX->loadtape('next');
+print TapeChanger::MTX->reportstatus, "\n";
+exit ($tape && $tape =~ /^\d+$/) ? 0 : 1;
+
+exit(0);
+
+##### Version History
+# v0.5    Fri Nov  9 15:39:15 CST 2001
+### Initial version, based off old mtx-changer code (also self-written).
+### Documentation and such are written.

@@ -1,0 +1,42 @@
+public method clone
+
+known RPM types should be defined on class level and have to be read-only available
+
+basic tests should cover _all_ basic methods
+
+incoming data validation
+
+Cool Code for Array Initiation:
+-------------------------------
+@allow_extensions = <<End_of_Lines =~ m/(\S.*\S)g;
+	pm
+	pod
+	htm
+	html
+End_of_Lines
+
+#       This looks cool, but does not work... The last slash ?..
+#       my @simple_keys = <<End_of_Lines =~ m/(\S.*\S)g;
+#                       max_nodes
+#                       rpm_type
+#                       rpm_active
+#       End_of_Lines
+
+
+Storage Policy:
+allow-deny
+deny-allow
+case-sensitive
+File Storage Policy:
+allow all
+allow unknown
+allow no file-extentions
+allow file-extentions (list)
+deny no file-extentions
+deny file-extentions (list)
+deny unknown
+Directory Storage Policy
+allow empty
+deny empty
+
+

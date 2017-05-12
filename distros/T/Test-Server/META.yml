@@ -1,0 +1,44 @@
+---
+name: Test-Server
+version: 0.06
+author:
+  - 'Jozef Kutej <jozef@kutej.net>'
+abstract: what about test driven administration?
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp::Clan: 0
+  Class::Accessor::Fast: 0
+  File::Slurp: 0
+  IO::Socket::INET: 0
+  List::MoreUtils: 0
+  Socket: 0
+  Test::Differences: 0
+  Test::Exception: 0
+  Test::More: 0
+  YAML::Syck: 0
+recommends:
+  Filesys::DiskSpace: 0
+  Filesys::DiskUsage: 0
+  Net::DNS::Resolver: 0
+  Net::NTP: 0
+  Proc::ProcessTable: 0
+  Test::WWW::Mechanize: 0
+  Time::HiRes: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Sys::Net:
+    file: lib/Sys/Net.pm
+    version: 0.06
+  Test::Net::Service:
+    file: lib/Test/Net/Service.pm
+    version: 0.06
+  Test::Server:
+    file: lib/Test/Server.pm
+    version: 0.06
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

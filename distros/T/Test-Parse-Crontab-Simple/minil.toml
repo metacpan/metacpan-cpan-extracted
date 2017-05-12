@@ -1,0 +1,4 @@
+name = "Test-Parse-Crontab-Simple"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

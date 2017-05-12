@@ -1,0 +1,23 @@
+Name             DLSI  Description                        Info
+---------------  ----  ---------------------------------  --------
+Tree::MultiNode  adpO  Multi node unordered tree objects  KRBURTON
+
+This is an implementation of a multi node tree.  The uniqueness of
+keys is not enforced, nor is there enforcement of ordering of nodes.
+
+Tree::MultiNode was created to aid in modeling heriarchical 
+relationships, like the relationships inherent in the records from
+a RDBMS.  Where multi-to-multi relationships could produce multiple
+child nodes with the same types or basic attributes.  Unique key
+enforcement would be inappropriate in these cases (at least for me).
+
+
+Copyright 1997-2002 Kyle R. Burton.  All rights reserved.
+  mortis@voicenet.com
+  http://www.voicenet.com/~mortis
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)     
+

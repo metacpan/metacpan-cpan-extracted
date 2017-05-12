@@ -1,0 +1,24 @@
+<html>
+  <body>
+    <div>
+      <div>#0 .0 red red</div>
+      <div>#0 .1 red green</div>
+      <div>#0 .2 red blue</div>
+    </div>
+    <div>
+      <div>#1 .0 green red</div>
+      <div>#1 .1 green green</div>
+      <div>#1 .2 green blue</div>
+    </div>
+    <div>
+      <div>#2 .0 blue red</div>
+      <div>#2 .1 blue green</div>
+      <div>#2 .2 blue blue</div>
+    </div>
+
+    <span>red</span>
+    <span>green</span>
+    <span>blue</span>
+
+  </body>
+</html>

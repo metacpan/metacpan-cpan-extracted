@@ -1,0 +1,32 @@
+@c chapter3-4.texi
+
+@node Syntax, Chapter 4, Data Structures, Top
+@chapter Syntax
+
+Syntax goes here.  This comes before the menu.
+
+@menu
+* Syntax Overview::             
+* Declarations::                
+* Comments::                    
+@end menu
+
+@node Syntax Overview, Declarations, Syntax, Syntax
+@section Syntax Overview
+
+Syntax Overview goes here.
+
+@node Declarations, Comments, Syntax Overview, Syntax
+@section Declarations
+
+Declarations come here.
+
+@node Comments, , Declarations, Syntax
+@section Comments
+
+Comments here.
+
+@node Chapter 4, , Syntax, Top
+@chapter Chapter Four
+
+Each @@include file doesn't have to be a single chapter.

@@ -1,0 +1,11 @@
+TODO LIST
+---------
+
+- New type for content items: TSV table, which gets converted to a HTML table
+  on reading. e.g. "foo,bar,baz" => "<td>foo</td><td>bar</td><td>baz</td>"
+  Do a <csvtable> tag instead for use in EtText.
+
+- Provide a decent shortcut to create <A HREF=foo TITLE=foo> link titles from
+  EtText.
+
+

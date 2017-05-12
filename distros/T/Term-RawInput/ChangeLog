@@ -1,0 +1,149 @@
+2016-05-04  Brian M. Kelly  in M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.23 released.
+
+        * Added \n to printf when PAR and Cygwin.
+
+
+2014-07-30  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.22 released.
+
+        * Added code to handle arrows on CentOS. 
+
+
+2014-07-27  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.21 released.
+
+        * Added code to handle cases where ReadMode(-1)
+          doesn't work - DELETE
+
+
+2014-07-18  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.20 released.
+
+        * Added an argument to rawInput() that sets single return
+          mode, where keys are returned instantly instead of
+          waiting for ENTER
+
+        * Updated documentation
+
+        * Changed 'Escape' to 'ESC'
+
+
+2014-07-15  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.19 released.
+
+        * Added code to handle cases where ReadMode(-1)
+          doesn't work - PAGEUP & PAGEDOWN
+
+
+2014-07-14  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.18 released.
+
+        * Added code to handle cases where ReadMode(-1)
+          doesn't work - F9
+
+        * Changed License to GNU Affero version 3.0.
+
+
+2014-07-12  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.17 released.
+
+        * Added code to handle cases where ReadMode(-1)
+          doesn't work - PAGEDOWN and PAGEUP
+
+
+2014-06-23  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.16 released.
+
+        * Added code to handle cases where ReadMode(-1)
+          doesn't work.
+
+
+2013-06-16  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.15 released.
+
+        * Created new distribution with new public key.
+
+
+2011-01-28  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.14 released. (1.13 is embedded in Term::Menus)
+
+        * Attempt to fix CPAN indexing so module appears in
+          the CPAN module list.
+
+
+2011-01-23  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.10 released. (1.09 is embedded in Term::Menus)
+
+        * Term::RawInput NOW WORKS WITH WINDOWS!! (YEAH!). Tested
+          with Strawberry Perl. (Note: F1-F12 don't work in
+          Windows versions of Perl - limitation of Term::ReadKey;
+          works in Cygwin however!).
+
+
+2011-01-21  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.08 released.
+
+        * Fixed META.yml to indicate module RawInput.
+
+
+2011-01-21  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.07 released. (1.06 is embedded in Term::Menus)
+
+        * Fixed test.t to load Term::RawInput.
+
+
+2011-01-16  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.05 released.
+
+        * Changed package name to Term::RawInput in response
+          to Brian Foy's suggestion.
+
+
+2011-01-16  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.04 released.
+
+        * Fixed package name in Input.pm.
+
+
+2011-01-16  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.03 released.
+
+        * Fixed POD name to show up better in CPAN.
+
+        * Did some minor code clean-up.
+
+
+2011-01-15  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.02 released.
+
+        * Another META.yml tweak
+
+
+2011-01-15  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.01 released.
+
+        * Fixed META.yml
+
+
+2011-01-15  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 1.0 released.

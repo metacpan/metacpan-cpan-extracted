@@ -1,0 +1,310 @@
+#PODNAME: bobby_tables.pl
+
+__END__
+
+=pod
+
+=head1 NAME
+
+bobby_tables.pl
+
+=head1 VERSION
+
+version v4.1.1
+
+=head2 Quick Start
+
+This guide assumes familiarity with following concepts ..
+
+=over
+
+=item
+
+Writing unit test with L<Test::More>
+
+=item
+
+Running unit tests either with L<prove>, L<Module::Build> or L<Makefile|ExtUtils::MakeMaker>
+
+=item
+
+Working knowledge of L<DBIx::Class> or preferably L<Bio::Chado::Schema>
+
+=item
+
+Have used or using L<GMOD|http://gmod.org> L<chado|http://gmod.org/wiki/Introduction_to_Chado> schema.
+
+=back
+
+=head4 Basic setup
+
+Install
+
+    cpanm Test::Chado Module::Starter
+
+Install from github(if needed)
+
+    cpanm git://github.com/dictyBase/Test-Chado.git
+
+Create module skeleton
+
+    module-starter --module=TestChado::QuickStart --author="Sidd Basu" --email=sidd.basu@gmail.com
+
+    Added to MANIFEST: Changes
+    Added to MANIFEST: ignore.txt
+    Added to MANIFEST: lib/TestChado/QuickStart.pm
+    Added to MANIFEST: Makefile.PL
+    Added to MANIFEST: MANIFEST
+    Added to MANIFEST: README
+    Added to MANIFEST: t/00-load.t
+    Added to MANIFEST: t/boilerplate.t
+    Added to MANIFEST: t/manifest.t
+    Added to MANIFEST: t/pod-coverage.t
+    Added to MANIFEST: t/pod.t
+    Created starter directories and files
+
+=head4 Write test file
+
+Write a test file called B<t/test_chado.t> and include the two modules L<Test::Chado> and L<Test::Chado::Common>
+
+    use Test::More qw/no_plan/;
+    use Test::Chado;
+    use Test::Chado::Common;
+
+Now load the default test fixtures and check their existence in the database
+
+    my $schema = chado_schema(load_fixture => 1)
+    has_cv($schema,'sequence', 'should have sequence cv namespace');
+
+At the end it's a good practice to drop the schema
+
+    drop_schema()
+
+=head4 Run the test 
+
+    prove -l t/test_chado.t
+
+Should produce the following output
+
+    All tests successful.
+    Files=1, Tests=1,  6 wallclock secs ( 0.02 usr  0.00 sys +  6.27 cusr  0.16 csys =  6.45 CPU)
+    Result: PASS
+
+Now add few more tests, this time check for cvterms and dbxrefs
+
+    has_cvterm($schema,'gene', 'should have gene cvterm');
+    has_cvterm($schema,'polypeptide', 'should have polypeptide cvterm');
+    has_cvterm($schema,'part_of', 'should have part_of cvterm');
+
+    has_dbxref($schema,'SO:0000704', 'should have dbxref' );
+    has_dbxref($schema,'SO:0000253', 'should have tRNA dbxref' );
+
+Run with verbose
+
+    prove -vl t/test_chado.t
+
+Output
+
+    ok 1 - should have sequence cv namespace
+    ok 2 - should have gene cvterm
+    ok 3 - should have polypeptide cvterm
+    ok 4 - should have part_of cvterm
+    ok 5 - should have dbxref
+    ok 6 - should have tRNA dbxref
+    1..6
+    ok
+    All tests successful.
+    Files=1, Tests=6,  6 wallclock secs ( 0.02 usr  0.00 sys +  6.27 cusr  0.18 csys =  6.47 CPU)
+    Result: PASS
+
+Here is the full code
+
+    use Test::More qw/no_plan/;
+    use Test::Chado;
+    use Test::Chado::Common;
+
+
+
+    my $schema = chado_schema(load_fixture => 1);
+
+    has_cv($schema,'sequence', 'should have sequence cv namespace');
+
+    has_cvterm($schema,'gene', 'should have gene cvterm');
+    has_cvterm($schema,'polypeptide', 'should have polypeptide cvterm');
+    has_cvterm($schema,'part_of', 'should have part_of cvterm');
+
+    has_dbxref($schema,'SO:0000704', 'should have dbxref' );
+    has_dbxref($schema,'SO:0000253', 'should have tRNA dbxref' );
+
+    drop_schema();
+
+=head4 Write another test file
+
+Write another file B<t/test_chado_feature.t> where presence of features will be tested
+
+First, load some test features by adding the following subroutine in the above test file
+
+    sub create_test_gene {
+        my ($schema, $gene_name) = @_;
+        my $organism = $schema->resultset('Organism')
+            ->search( { common_name => 'human' }, { rows => 1 } )->first;
+        $schema->resultset('Feature')->create(
+        {   uniquename  => $gene_name,
+            organism_id => $organism->organism_id,
+            type_id =>
+                $schema->resultset('Cvterm')->find( { name => 'gene' } )
+                ->cvterm_id
+        });
+     }
+
+Now add the boilerplate and write the tests functions
+
+    use Test::More qw/no_plan/;
+    use Test::Chado;
+    use Test::Chado::Common;
+
+    my $schema = chado_schema(load_fixture => 1);
+    create_test_gene($schema, $_) for qw/caboose tucker/;
+
+    has_feature $schema,$_,"should have gene $_" for qw/caboose tucker/;
+
+    drop_schema();
+
+Run and check the output
+
+    prove -lv t/test_chado_feature.t
+    ok 1 - should have gene caboose
+    ok 2 - should have gene tucker
+    1..2
+    ok
+    All tests successful.
+    Files=1, Tests=2,  6 wallclock secs
+
+Now add some tests for feature locations. For that first, some test data needs to be loaded
+
+    sub create_test_floc {
+        my ($schema, $locations) = @_;
+
+        my $organism = $schema->resultset('Organism')
+            ->search( { common_name => 'human' }, { rows => 1 } )->first;
+
+        for my $data(@$locations) {
+            $schema->resultset('Feature')->create(
+                {   
+                    uniquename  => $data->{name},
+                    organism_id => $organism->organism_id,
+                    type_id =>
+                            $schema->resultset('Cvterm')->find( { name => 'gene' } )
+                            ->cvterm_id,
+                    featureloc_features => [
+                      {
+                        fmin => $data->{start},
+                        fmax => $data->{end}
+                      }
+                    ]
+                }
+            );
+        }
+    }
+
+Now the tests itself
+
+    create_test_floc($schema, 
+        [
+            {name => 'caboose', start => 10, end => 50},
+            {name => 'tucker', start => 60, end => 100}
+        ]);
+
+    has_featureloc $schema,$_,"should have featureloc for gene $_" for qw/caboose tucker/;
+
+Run them as usual
+
+    prove -lv t/test_chado_feature.t
+
+    ok 1 - should have gene caboose
+    ok 2 - should have gene tucker
+    ok 3 - should have featureloc for gene todd
+    ok 4 - should have featureloc for gene jorn
+    1..4
+    ok
+    All tests successful.
+    Files=1, Tests=4,  6 wallclock secs
+
+And here is the entire code
+
+    use strict;
+    use Test::More qw/no_plan/;
+    use Test::Chado;
+    use Test::Chado::Common;
+
+
+    my $schema = chado_schema( load_fixture => 1 );
+    create_test_gene( $schema, $_ ) for qw/caboose tucker/;
+
+    has_feature $schema, $_, "should have gene $_" for qw/caboose tucker/;
+
+    create_test_floc(
+        $schema,
+        [   { name => 'jorn', start => 10, end => 50 },
+            { name => 'todd', start => 60, end => 100 }
+        ]
+    );
+
+    has_featureloc $schema, $_, "should have featureloc for gene $_"
+        for qw/todd jorn/;
+
+    drop_schema();
+
+    sub create_test_gene {
+        my ( $schema, $gene_name ) = @_;
+        my $organism = $schema->resultset('Organism')
+            ->search( { common_name => 'human' }, { rows => 1 } )->first;
+        $schema->resultset('Feature')->create(
+            {   uniquename  => $gene_name,
+                organism_id => $organism->organism_id,
+                type_id =>
+                    $schema->resultset('Cvterm')->find( { name => 'gene' } )
+                    ->cvterm_id
+            }
+        );
+    }
+
+    sub create_test_floc {
+        my ( $schema, $locations ) = @_;
+
+        my $organism = $schema->resultset('Organism')
+            ->search( { common_name => 'human' }, { rows => 1 } )->first;
+
+        for my $data (@$locations) {
+            $schema->resultset('Feature')->create(
+                {   uniquename  => $data->{name},
+                    organism_id => $organism->organism_id,
+                    type_id =>
+                        $schema->resultset('Cvterm')->find( { name => 'gene' } )
+                            ->cvterm_id,
+                    featureloc_features => [
+                        {   fmin => $data->{start},
+                            fmax => $data->{end}
+                        }
+                    ]
+                }
+            );
+        }
+    }
+
+=head4 What's next
+
+This guide gets you started with L<Test::Chado>. For more use cases and details, go through rest of the documentation.
+
+=head1 AUTHOR
+
+Siddhartha Basu <biosidd@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Siddhartha Basu.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

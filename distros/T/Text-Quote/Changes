@@ -1,0 +1,34 @@
+Revision history for Perl module Text::Quote
+
+0.32 2014-06-28 NEILB
+    - Doh, the test for regexp serialization format clearly needs to
+      check what version of Perl it's running under, and change expectations
+      accordingly.
+
+0.31 2014-06-28 NEILB
+    - Some tests were failing on perls built with -Duselongdouble --
+      regexp wasn't handling enough digits. RT#66934
+    - Fixed failing test due to regexp serialization format RT#66934
+    - Switched to Dist::Zilla
+    - Added github repo to pod
+    - Reformatted as per CPAN::Changes::Spec
+    - Added COPYRIGHT AND LICENSE section to pod
+
+0.3 2002-05-06 YVES
+    - First release to CPAN
+
+0.021 2002-05-03
+    - Fixed bug where quote_best and _textquote_escape had different
+      ideas of what needed escaping.  Added option 'encode_high' to determine
+      if high bit chars needed escaping or if they can be left as literals
+    - Fixed minor bug in quote_best where it was using the last lowest instead
+      of the first lowest used quote char.
+
+
+0.02 2002-05-02
+    - Cleaned up code, added pod.
+
+0.01 2002-04-22
+    - original version; created by h2xs 1.21
+      with options -n Text::Quote -v0.01 -XA
+

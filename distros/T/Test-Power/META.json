@@ -1,0 +1,83 @@
+{
+   "abstract" : "With great power, comes great responsibility.",
+   "author" : [
+      "tokuhirom <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Power",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::CodeObserver" : "0.10",
+            "Test::More" : "0.98",
+            "Text::Truncate" : "0",
+            "parent" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Tester" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Power" : {
+         "file" : "lib/Test/Power.pm",
+         "version" : "0.14"
+      },
+      "Test::Power::FromLine" : {
+         "file" : "lib/Test/Power/FromLine.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Test-Power/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Test-Power",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Test-Power.git",
+         "web" : "https://github.com/tokuhirom/Test-Power"
+      }
+   },
+   "version" : "0.14",
+   "x_contributors" : [
+      "adrian.candos <adrian.candos@dena.jp>"
+   ]
+}

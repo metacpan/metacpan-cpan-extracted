@@ -1,0 +1,66 @@
+Revision history for Test-FailWarnings
+
+0.008     2013-09-25 14:08:48 America/New_York
+
+    [FIXES]
+
+    - Compile test could hang on Windows
+
+    [PREREQS]
+
+    - Dropped configure_requires for ExtUtils::MakeMaker to 6.17
+
+0.007     2013-08-30 09:53:47 America/New_York
+
+    [FIXED]
+
+    - In some situations, the source of a local warning can have an
+      absolute filename and would not be reported if ALLOW_DEPS were true.
+      Now absolute filenames are made relative to the original cwd before
+      checking if they are local or not.
+
+    [DOCUMENTED]
+
+    - Fixed synopsis to match new failing test label
+
+0.006     2013-08-22 10:41:11 America/New_York
+
+    [CHANGED]
+
+    - The label of the failing test has been revised for clarity
+
+0.005     2013-05-03 14:03:28 America/New_York
+
+    [DOCUMENTED]
+
+    - Added Test::Warnings to See Also
+
+0.004     2013-05-02 10:50:37 America/New_York
+
+    [FIXED]
+
+    - Bumped Capture::Tiny test prerequisite version
+
+0.003     2013-03-13 13:30:24 America/New_York
+
+    [FIXED]
+
+    - Fixed @ALLOW_FROM initialization to suppress our own warning
+
+0.002     2013-03-10 17:28:53 America/New_York
+
+    [ADDED]
+
+    - Now can optionally allow warnings from dependencies
+
+    - Now can optionally allow warnings from specific modules
+
+    [CHANGED]
+
+    - warnings handler only installed by import(); handler function
+      is now available for custom, localized use
+
+0.001     2013-02-25 17:44:33 America/New_York
+
+    - First release
+

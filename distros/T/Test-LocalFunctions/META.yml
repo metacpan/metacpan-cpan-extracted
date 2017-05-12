@@ -1,0 +1,61 @@
+---
+abstract: 'Detects unused local functions'
+author:
+  - 'moznion  C<< <moznion@gmail.com> >>'
+build_requires:
+  FindBin: 0
+  Test::Builder::Tester: 1.22
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-LocalFunctions
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Test::LocalFunctions:
+    file: lib/Test/LocalFunctions.pm
+    version: 0.23
+  Test::LocalFunctions::Fast:
+    file: lib/Test/LocalFunctions/Fast.pm
+  Test::LocalFunctions::PPI:
+    file: lib/Test/LocalFunctions/PPI.pm
+  Test::LocalFunctions::Receptor:
+    file: lib/Test/LocalFunctions/Receptor.pm
+  Test::LocalFunctions::Util:
+    file: lib/Test/LocalFunctions/Util.pm
+recommends:
+  Compiler::Lexer: 0.13
+requires:
+  Carp: 0
+  Exporter: 0
+  ExtUtils::Manifest: 0
+  Module::Load: 0
+  PPI: 1.215
+  Sub::Identify: 0
+  Test::Builder::Module: 0.98
+  parent: 0
+  perl: 5.008006
+resources:
+  bugtracker: https://github.com/moznion/Test--LocalFunctions/issues
+  homepage: https://github.com/moznion/Test--LocalFunctions
+  repository: git://github.com/moznion/Test--LocalFunctions.git
+version: 0.23
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'papix <mail@papix.net>'
+  - 'moznion <moznion@gmail.com>'

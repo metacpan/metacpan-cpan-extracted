@@ -1,0 +1,289 @@
+NAME
+    Term::Shell::Enhanced - More functionality for Term::Shell
+
+VERSION
+    version 1.101420
+
+SYNOPSIS
+        package MyShell;
+        use parent qw(Term::Shell::Enhanced);
+        sub run_date { print scalar localtime, "\n" }
+        sub smry_date { 'prints the current date and time' }
+
+        sub help_date {
+            'This command prints the current date and time as returned
+             by the localtime() function.'
+        }
+
+        package main;
+        my $shell = MyShell->new;
+        $shell->print_greeting;
+        $shell->cmdloop;
+
+DESCRIPTION
+    This class subclasses Term::Shell and adds some functionality.
+
+METHODS
+  DEFAULTS
+    This method returns a hash of default attribute mappings. Among these,
+    the shell's name is set to "mysh"; the prompt is set and the hostname is
+    set per Sys::Hostname. You can override these attributes when
+    subclassing this class or when instantiating the shell.
+
+  PROMPT_VARS
+    Defines variables that can be used in prompt strings. See "FEATURES" for
+    details.
+
+  catch_run
+    This is a fallback handler used by Term::Shell when the "run" command is
+    invoked on an unimplemented command. It checks whether the command line
+    entered starts with a "!" and if so, evaluates it as a perl command. If
+    the command line starts with a "@", it is executed as a "system()"
+    command. If the command line starts with a ":", it is ignored.
+
+  cmd
+    Extends Term::Shell's "cmd()" by adding aliases. See "FEATURES" for
+    details.
+
+  expand
+    When the command line has been split into words, this method is called.
+    It performs tilde and environment variable expansion.
+
+  get_history_filename
+    Returns the name of the file in which the shell's command line history
+    is being stored. If the "history_filename" attribute is defined, that
+    value will be returned. Otherwise %s_history where %s is replaced by the
+    shell's name.
+
+  help_alias
+    Returns a help string for the "alias" command.
+
+  help_apropos
+    Returns a help string for the "apropos" command.
+
+  help_cd
+    Returns a help string for the "cd" command.
+
+  help_echo
+    Returns a help string for the "cd" command.
+
+  help_eval
+    Returns a help string for the "eval" command.
+
+  help_pwd
+    Returns a help string for the "pwd" command.
+
+  help_quit
+    Returns a help string for the "quit" command.
+
+  help_set
+    Returns a help string for the "set" command.
+
+  init
+    FIXME
+
+  postloop
+    FIXME
+
+  precmd
+    FIXME
+
+  print_greeting
+    FIXME
+
+  prompt_str
+    FIXME
+
+  run_
+    FIXME
+
+  run_alias
+    Runs the "alias" command.
+
+  run_apropos
+    Runs the "apropos" command.
+
+  run_cd
+    Runs the "cd" command.
+
+  run_echo
+    Runs the "cd" command.
+
+  run_pwd
+    Runs the "pwd" command.
+
+  run_quit
+    Runs the "quit" command.
+
+  run_set
+    Runs the "set" command.
+
+  smry_alias
+    Returns a summary string for the "alias" command.
+
+  smry_apropos
+    Returns a summary string for the "apropos" command.
+
+  smry_cd
+    Returns a summary string for the "cd" command.
+
+  smry_echo
+    Returns a summary string for the "cd" command.
+
+  smry_eval
+    Returns a summary string for the "eval" command.
+
+  smry_pwd
+    Returns a summary string for the "pwd" command.
+
+  smry_quit
+    Returns a summary string for the "quit" command.
+
+  smry_set
+    Returns a summary string for the "set" command.
+
+FEATURES
+    The following features are added:
+
+    "history"
+        When the shell starts up, it tries to read the command history from
+        the history file. Before quitting, it writes the command history to
+        the history file - it does not append to it, it overwrites the file.
+
+        The default history file name is the shell name - with non-word
+        characters replaced by underscores -, followed by "_history", as a
+        dotfile in $ENV{HOME}. For example, if you shell's name is "mysh",
+        the default history file name will be "~/.mysh_history".
+
+        You can override the history file name in the "DEFAULTS()", like
+        this:
+
+            use constant DEFAULTS => (
+                history_filename => ...,
+                ...
+            );
+
+    "alias replacement"
+        See the "alias" command below.
+
+    "prompt strings"
+        When subclassing Term::Shell::Enhanced, you can define how you want
+        your prompt to look like. Use "DEFAULTS()" to override this.
+
+            use constant DEFAULTS => (
+                prompt_spec => ...,
+                ...
+            );
+
+        You can use the following prompt variables:
+
+            h    the hostname
+            n    the shell name
+            '#'  the command number (increased after each command)
+            \\   a literal backslash
+
+        You can extend the list of available prompt variables by defining
+        your own PROMPT_VARS() - they are cumulative over the class
+        hierarchy.
+
+            use constant PROMPT_VARS => (
+                key => value,
+                ...
+            );
+
+        Since more elaborate prompt variables will have some interaction
+        with the shell object, you might need a more elaborate
+        "PROMPT_VARS()" definition:
+
+            sub PROMPT_VARS {
+                my $self = shift;
+                (
+                    key => $self->some_method,
+                    ...
+                );
+            }
+
+        The prompt variables are interpolated anew for every prompt.
+
+        The default prompt string is:
+
+            ': \n:\#; ',
+
+        so if your shell is called "mysh", the default prompt looks somewhat
+        like this:
+
+           : mysh:1;
+
+COMMANDS
+    The following commands are added:
+
+    "eval"
+        You can evaluate snippets of Perl code just by putting them on a
+        line beginning with "!":
+
+          psh:~> ! print "$_\n" for keys %ENV
+
+    "set [name[=value] ... ]"
+        "set" lets you manipulate environment variables. You can view
+        environment variables using "set". To view specific variables, use
+        "set name". To set environment variables, use "set foo=bar".
+
+    "cd [dir]"
+          cd foo/bar/baz
+
+        Change the current directory to the given directory. If no directory
+        is given, the current value of $HOME is used.
+
+    "pwd"
+        Prints the current working directory.
+
+    "alias [ name[=value] ... ]"
+        "alias" with no arguments prints the list of aliases in the form
+        "NAME=VALUE" on standard output. An alias is defined for each "NAME"
+        whose "VALUE" is given.
+
+        When you enter any command, it is checked against aliases and
+        replaced if there is an alias defined for it. Only the command name
+        - that is, the first word of the input line - undergoes alias
+        replacement.
+
+    "echo [arg ...]"
+        Output the args.
+
+    "quit"
+        Exits the program.
+
+    "apropos <word">
+        Like the "help" command, but limits the information to commands that
+        contain the given word in the command name or the summary.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Term-Shell-Enhanced>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Term-Shell-Enhanced/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Term-Shell-Enhanced/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2005 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="tools/tei_ms_crit.rng" type="xml"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Ժամանակագրութիւն</title>
+                <author>Մատթէոս Ուռհայեցի</author>
+                <respStmt xml:id="tla">
+                    <resp>Transcription by</resp>
+                    <name>Tara L Andrews</name>
+                </respStmt>
+            </titleStmt>
+            <publicationStmt>
+                <p>Unpublished manuscript</p>
+            </publicationStmt>
+            <sourceDesc>
+                <msDesc>
+                    <msIdentifier>
+                        <settlement>Venice</settlement>
+                        <repository>Mekhitarist Library</repository>
+                        <idno>917</idno>
+                    </msIdentifier>
+                    <p>pp. 152-173</p>
+                </msDesc>
+            </sourceDesc>
+        </fileDesc>
+    </teiHeader>
+    <text>
+        <body>
+<div> <!-- began on p. 71 -->
+<p> <!-- began on p. 144 -->
+<pb n="152"/>
+Արդ՛ ահայ մինչև ցայս վարս բազ<lb/>
+մաջան և աշխատաւոր քննութ<ex resp="#tla">եամ</ex>բ գտեալ գրեցա՛ք զշա<lb/>
+րագրական գրեալս զ<num value="100">Ճ</num>ից ամաց, զորս ի <expan>բազում</expan> <expan>ժամանակաց</expan> <lb/>
+շունչ <abbr>կտրածսն</abbr>, զա՛յս սոսկալի բարկութի<ex resp="#tla">ւն</ex>ս զոր կրեաց <lb/>
+առին <expan>զամենայն</expan> <expan>աշխարհն</expan> <subst><del>հայոց</del><add place="overwrite">հոռոմոց</add></subst>, <expan>զքաղաքս</expan> ծովեզերաց և զկղզի<lb/>
+<pb n="153"/>
+նք զմանկութի<ex resp="#tla">ւն</ex> յարիութե<ex resp="#tla">ան</ex>ն ի կու՛րտս փոխարկեցին, և <expan>փոխանակ</expan> <lb/>
+ի գերութի<ex resp="#tla">ւն</ex> <expan>աշխարհն</expan> պարսից։ </p><p><hi><supplied reason="omitted" resp="#tla">Յ</supplied></hi>այ՛սմ <expan>ժամանակիս</expan> <expan>թագաւորն</expan> տուկի<lb/>
+ծն խորհեցաւ <expan>խորհուրդ</expan> <expan>չար</expan>, և <expan>կամեցաւ</expan> բառնալ <lb/>
+նստու՛ցանեն զաթոռ՛ <expan>հայրապետութեան</expan> <expan>զտէր</expan> խաչիկ։ <lb/></p>
+</div> <!-- ends on p. 213 -->
+
+        </body>
+    </text>
+</TEI>

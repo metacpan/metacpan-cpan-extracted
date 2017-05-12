@@ -1,0 +1,11 @@
+0.200
+  * Now depend on Alien::Thrust
+  * http error logging, fix for https (thanks jp)
+  * Hopefully support OS X (thanks jp)
+  * Implicit Thrust context created by window for one-liners
+
+0.101
+  * Change zip extracter module to Archive::Extract since it is more portable
+
+0.100
+  * Initial CPAN release

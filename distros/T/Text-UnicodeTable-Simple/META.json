@@ -1,0 +1,78 @@
+{
+   "abstract" : "Create a formatted table using characters.",
+   "author" : [
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-UnicodeTable-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::ANSIColor" : "2.01",
+            "Unicode::EastAsianWidth" : "1.30",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Text::UnicodeTable::Simple" : {
+         "file" : "lib/Text/UnicodeTable/Simple.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/syohex/p5-Text-UnicodeTable-Simple/issues"
+      },
+      "homepage" : "https://github.com/syohex/p5-Text-UnicodeTable-Simple",
+      "repository" : {
+         "url" : "git://github.com/syohex/p5-Text-UnicodeTable-Simple.git",
+         "web" : "https://github.com/syohex/p5-Text-UnicodeTable-Simple"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "trapple <trapplejp@gmail.com>"
+   ]
+}

@@ -1,0 +1,79 @@
+#!/usr/local/bin/perl -w
+
+$| = 1;
+
+use lib qw( lib );
+use Text::Ispell qw( :all );
+
+use Getopt::Std;
+
+use strict;
+
+my %options;
+getopts( "hv", \%options );
+$options{'h'} and die "Usage: $0 [-v] [<] inputfile\n-v : verbose; report on every term\n";
+$options{'v'} or Text::Ispell::terse_mode(1);
+
+while ( <> ) {
+  chomp;
+  my $line = $_;
+
+  if ( s/^-C\s*// ) { allow_compounds(1); next; }
+  if ( s/^-m\s*// ) { infer_root_affix_combos(1); next; }
+  if ( s/^-d\s*// ) { use_dictionaries(split); next; }
+  if ( s/^-p\s*// ) { use_personal_dictionaries(split); next; }
+
+
+  for my $r ( spellcheck( $line ) ) {
+
+    {
+      'ok' =>
+        sub { print "ok: $r->{'term'}\n"; },
+
+      'compound' =>
+        sub { print "ok: $r->{'term'}\n"; },
+
+      'root' =>
+        sub { print "ok: '$r->{'term'}' can be formed from root '$r->{'root'}'\n"; },
+
+      'none' =>
+        sub {
+          my $indent = ' ' x $r->{'offset'};
+          print <<EOF;
+No match found for term "$r->{'term'}" in:
+"$line"
+$indent^
+
+EOF
+        },
+
+      'miss' =>
+        sub {
+          my $indent = ' ' x $r->{'offset'};
+          print <<EOF;
+Near miss on term "$r->{'term'}" in:
+"$line"
+$indent^
+missed terms: $r->{'misses'}
+
+EOF
+        },
+
+      'guess' =>
+        sub {
+          my $indent = ' ' x $r->{'offset'};
+          print <<EOF;
+Guess on term "$r->{'term'}" in:
+"$line"
+$indent^
+missed terms: $r->{'misses'}
+guesses: $r->{'guesses'}
+
+EOF
+        },
+
+    }->{ $r->{'type'} }->();
+  }
+}
+
+

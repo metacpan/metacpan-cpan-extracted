@@ -1,0 +1,92 @@
+
+1.18 Mon Dec 12 23:07:57 CET 2016
+
+	Fixing docs typo.
+
+1.17 Thu Aug 25 20:12:12 CEST 2016
+
+	RT#117217: Fix compile errors on Perl 5.25.
+
+1.16 Sun Mar 22 19:18:22 CET 2015
+
+	RT#82513: Fix pattern file closing, reported by Knut Arne Bjørndal.
+	Localized * FILE.
+
+1.15 Wed Jan 21 20:59:51 CET 2015
+
+	Add style utf8.
+	Debug output shows dots to mark end patterns.
+	Minor performance improvement related to rightmin.
+	Contributed by David Gardner.
+
+1.02 Tue Jan 20 21:39:34 CET 2015
+
+	Do not ruin performance, stop using $&.
+	Patch by Nicolas Mendoza.
+
+1.01 Thu Mar  3 21:20:00 CET 2011
+
+	Updating the upstream URL to
+	http://www.adelton.com/perl/TeX-Hyphen/
+
+0.140 Tue Sep 24 22:30:46 MET DST 2002
+
+	Fixed the support for new with odd number of parameters, bug
+	reported by Christophe Hermier.
+
+	Added support for multiple objects that all use the internal
+	hyphenation file.
+
+0.130 Fri Aug 23 10:32:11 MET DST 2002
+
+	Added Russian parsing module, provided by Eugene Morozov.
+
+0.121 Wed Apr 24 12:20:07 MET DST 2002
+
+	Fix for ^^hex notation, spotted and patch provided by Pasi
+	Ryhanen.
+
+0.111 Tue Dec 11 15:45:25 MET 2001
+
+	Support for leftmin and rightmin parameters fixed.
+
+0.110 Tue Dec 11 15:28:03 MET 2001
+
+	Support for more languages made modular, via style parameter,
+	code for German parsing provided by Slaven Rezic.
+
+	Support for LEFTMIN and RIGHTMIN values in styles added.
+
+0.101 Wed Nov  3 16:06:02 MET 1999
+
+	Parsing of patterns extended to allow other styles as well
+	-- Spanish pattern file provided by Adrian Perez Jorge.
+
+0.10 Fri Dec 11 10:58:01 MET 1998
+
+	Bug fixes concering LEFTMIN and RIGHTMIN values and use of
+	exceptions (thanks go to Vladimir Volovich).
+
+0.06 Mon Jul 21 18:53:26 MET DST 1997
+
+	Exception table handling added -- error spotted by Jon Orwant.
+
+0.05 Wed Jul  9 14:49:42 MET DST 1997
+
+	Added the default hyphen.tex into the module and possibility
+	to call the constructior without argument to get this default
+	pattern file.
+
+0.04 Wed Apr  9 15:41:32 MET DST 1997
+
+	Hash lookup made faster.
+
+	Method TeX::Hyphen::visualize() only takes one argument, it calls
+	hyphenate().
+
+0.03 Sun Feb 16 13:55:26 MET 1997
+
+	Hash lookup made faster.
+
+	Original name Hyphen chaged to TeX::Hyphen.
+

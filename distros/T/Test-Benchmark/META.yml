@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-Benchmark
+version:      0.004
+version_from: ./lib/Test/Benchmark.pm
+installdirs:  perl
+requires:
+    Benchmark:                     1
+    Test::Builder:                 0
+    Test::NoWarnings:              0
+    Test::Tester:                  0.103
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

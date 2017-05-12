@@ -1,0 +1,37 @@
+Revision history for Perl extension Test::Mock::Simple.
+
+0.09 Mon Apr  6 14:16:00 2015
+    - add no_load option
+
+0.081 Thu Dec 18 14:07:00 2014
+    - fix tarball - used Mac's broken tar to create the tardist
+
+0.08  Sat Dec  7 08:39:00 2014
+    - Removed my debugging module which I accidentally deployed
+
+0.07  Sat Dec  6 20:48:00 2014
+	- Added 'allow_new_methods' flag
+      This breaks backwards compatibility, however, the arguments for including
+      this flag have been persuasive enough for me to break it.
+      Hopefully, this only creates a small headache for anyone using Test::Mock::Simple.
+
+0.06  Sun Aug 31 21:27:00 2014
+	- Rewrote Failures without Test::Exception
+
+0.05  Fri Aug 29 21:07:00 2014
+	- Added Failures test and cleaned up serveral bugs
+
+0.04  Wed Jan 10 09:28:00 2014
+	- Added TEST_MOCK_SIMPLE_DISABLE
+
+0.03  Wed Oct 11 11:08:00 2013
+	- updated (downgraded) perl version in Makefile.PL
+
+0.02  Wed Oct  9 10:46:00 2013
+	- changed method 'it' to 'add'
+	- lowered required perl method to 5.8.8
+
+0.01  Fri Oct  4 10:21:24 2013
+	- original version; created by h2xs 1.23 with options
+		-AXn Test::Mock::Simple
+

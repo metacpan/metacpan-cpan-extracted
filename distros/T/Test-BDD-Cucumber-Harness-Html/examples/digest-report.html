@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Test Report">
+
+    <title>Test Report</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <style type="text/css">
+    .step-name { display: inline; text-align: left; }
+    .step-line { display: inline; text-align: left; color: grey; }
+    .step-result { float: right; display: inline; color: black; }
+    .panel-heading a { color: black; }
+    .panel-heading a:before {
+        font-family: 'Glyphicons Halflings';
+        content: "\e114";    
+     }
+     .panel-heading a.collapsed:before {
+         content: "\e080";
+     }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <div class="page-header"><h1>Test Report</h1></div>
+
+      <h2>Document meta information</h2>
+      <table class="table table-bordered">
+      	<thead>
+	  <th>Key</th>
+	  <th>Value</th>
+	</thead>
+	<tbody>
+	  <tr><td>Hostname</td><td>affenschaukel</td></tr>
+	  <tr><td>Time</td><td>Fri Feb  5 10:33:18 2016</td></tr>
+	  <tr><td>Command</td><td>/usr/local/bin/pherkin -o Html features/</td></tr>
+	</tbody>
+      </table>
+
+      <h2>Summary</h2>
+<table class="table table-bordered">
+<thead>
+  <th>Status</th>
+  <th>Count</th>
+</thead>
+<tbody>
+  <tr class="success">
+  	<td>Passed</td><td>22</td>
+  </tr>
+  <tr class="">
+  	<td>Failed</td><td>0</td>
+  </tr>
+  <tr class="">
+  	<td>Pending</td><td>0</td>
+  </tr>
+  <tr class="">
+  	<td>Skipped</td><td>0</td>
+  </tr>
+</tbody>
+</table>
+      <h2>Table of Content</h2>
+<ul>
+  <li><a href="#feature-60070320">Simple tests of Digest.pm</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">22</button>
+				</li>
+  <ul>
+      <li><a href="#scenario-60671648">Check MD5</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">6</button>
+				</li>
+      <li><a href="#scenario-60672464">Check SHA-1</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">4</button>
+				</li>
+      <li><a href="#scenario-60672464">Check SHA-1</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">4</button>
+				</li>
+      <li><a href="#scenario-60672464">Check SHA-1</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">4</button>
+				</li>
+      <li><a href="#scenario-60672224">MD5 longer data</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">4</button>
+				</li>
+    </ul>
+</ul>
+
+
+        <h2 id="feature-60070320">Simple tests of Digest.pm <small>(features/basic.feature) 	<button type="button" class="btn  btn-success" data-toggle="tooltip" data-placement="right" title="passed">22</button>
+				</small></h2>
+<pre><code>As a developer planning to use Digest.pm
+I want to test the basic functionality of Digest.pm
+In order to have confidence in it</code></pre>
+    <h3 id="scenario-60671648">Check MD5</h3>
+<div class="panel-group" id="scenario-60671648-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6685043-body">
+<b class="text-success">Given</b> a usable &quot;Digest&quot; class
+
+<div class="step-line">(background, line: 8)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6685043-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a usable &quot;Digest&quot; class
+ok 2 - use Digest;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1007354-body">
+<b class="text-success">Given</b> a Digest MD5 object
+
+<div class="step-line">(line: 11)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1007354-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a Digest MD5 object
+ok 2 - Object created
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-985927-body">
+<b class="text-info">When</b> I've added &quot;foo bar baz&quot; to the object
+
+<div class="step-line">(line: 12)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-985927-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: I've added &quot;foo bar baz&quot; to the object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8274784-body">
+<b class="text-info">And</b> I've added &quot;bat ban shan&quot; to the object
+
+<div class="step-line">(line: 13)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8274784-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: I've added &quot;bat ban shan&quot; to the object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2031258-body">
+<b class="text-warning">Then</b> the hex output is &quot;bcb56b3dd4674d5d7459c95e4c8a41d5&quot;
+
+<div class="step-line">(line: 14)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2031258-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the hex output is &quot;bcb56b3dd4674d5d7459c95e4c8a41d5&quot;
+ok 2
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4891590-body">
+<b class="text-warning">Then</b> the base64 output is &quot;1B2M2Y8AsgTpgAmY7PhCfg&quot;
+
+<div class="step-line">(line: 15)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4891590-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the base64 output is &quot;1B2M2Y8AsgTpgAmY7PhCfg&quot;
+ok 2
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-60672464">Check SHA-1</h3>
+<div class="panel-group" id="scenario-60672464-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4457231-body">
+<b class="text-success">Given</b> a usable &quot;Digest&quot; class
+
+<div class="step-line">(background, line: 8)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4457231-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a usable &quot;Digest&quot; class
+ok 2 - use Digest;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2069941-body">
+<b class="text-success">Given</b> a Digest SHA-1 object
+
+<div class="step-line">(line: 18)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2069941-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a Digest SHA-1 object
+ok 2 - Object created
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1647913-body">
+<b class="text-info">When</b> I've added &quot;foo&quot; to the object
+
+<div class="step-line">(line: 19)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1647913-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: I've added &quot;foo&quot; to the object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7215994-body">
+<b class="text-warning">Then</b> the hex output is &quot;0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&quot;
+
+<div class="step-line">(line: 20)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7215994-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the hex output is &quot;0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&quot;
+ok 2
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-60672464">Check SHA-1</h3>
+<div class="panel-group" id="scenario-60672464-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7148528-body">
+<b class="text-success">Given</b> a usable &quot;Digest&quot; class
+
+<div class="step-line">(background, line: 8)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7148528-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a usable &quot;Digest&quot; class
+ok 2 - use Digest;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8954522-body">
+<b class="text-success">Given</b> a Digest SHA-1 object
+
+<div class="step-line">(line: 18)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8954522-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a Digest SHA-1 object
+ok 2 - Object created
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5440448-body">
+<b class="text-info">When</b> I've added &quot;bar&quot; to the object
+
+<div class="step-line">(line: 19)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5440448-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: I've added &quot;bar&quot; to the object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2648557-body">
+<b class="text-warning">Then</b> the hex output is &quot;62cdb7020ff920e5aa642c3d4066950dd1f01f4d&quot;
+
+<div class="step-line">(line: 20)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2648557-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the hex output is &quot;62cdb7020ff920e5aa642c3d4066950dd1f01f4d&quot;
+ok 2
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-60672464">Check SHA-1</h3>
+<div class="panel-group" id="scenario-60672464-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1554198-body">
+<b class="text-success">Given</b> a usable &quot;Digest&quot; class
+
+<div class="step-line">(background, line: 8)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1554198-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a usable &quot;Digest&quot; class
+ok 2 - use Digest;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4318092-body">
+<b class="text-success">Given</b> a Digest SHA-1 object
+
+<div class="step-line">(line: 18)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4318092-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a Digest SHA-1 object
+ok 2 - Object created
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8666383-body">
+<b class="text-info">When</b> I've added &quot;baz&quot; to the object
+
+<div class="step-line">(line: 19)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8666383-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: I've added &quot;baz&quot; to the object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-983089-body">
+<b class="text-warning">Then</b> the hex output is &quot;bbe960a25ea311d21d40669e93df2003ba9b90a2&quot;
+
+<div class="step-line">(line: 20)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-983089-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the hex output is &quot;bbe960a25ea311d21d40669e93df2003ba9b90a2&quot;
+ok 2
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-60672224">MD5 longer data</h3>
+<div class="panel-group" id="scenario-60672224-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2017745-body">
+<b class="text-success">Given</b> a usable &quot;Digest&quot; class
+
+<div class="step-line">(background, line: 8)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2017745-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a usable &quot;Digest&quot; class
+ok 2 - use Digest;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4303160-body">
+<b class="text-success">Given</b> a Digest MD5 object
+
+<div class="step-line">(line: 28)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4303160-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a Digest MD5 object
+ok 2 - Object created
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9499035-body">
+<b class="text-info">When</b> I've added the following to the object
+
+<div class="step-line">(line: 29)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-9499035-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: I've added the following to the object
+1..1
+</pre>
+<h4>Example Data:</h4>
+<pre>Here is a chunk of text that works a bit like a HereDoc. We'll split
+off indenting space from the lines in it up to the indentation of the
+first &quot;&quot;&quot;
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5528785-body">
+<b class="text-warning">Then</b> the hex output is &quot;75ad9f578e43b863590fae52d5d19ce6&quot;
+
+<div class="step-line">(line: 35)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5528785-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the hex output is &quot;75ad9f578e43b863590fae52d5d19ce6&quot;
+ok 2
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+
+    </div> <!-- /container -->
+  </body>
+</html>

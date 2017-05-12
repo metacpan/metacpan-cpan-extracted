@@ -1,0 +1,72 @@
+---
+abstract: 'Perl wrapper for The MovieDB API'
+author:
+  - 'Mithun Ayachit <mithun@cpan.org>'
+build_requires:
+  Test::More: '0'
+  version: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - movies
+  - movie
+  - themoviedb
+  - tmdb
+  - api
+  - metadata
+  - imdb
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TMDB
+provides:
+  TMDB:
+    file: lib/TMDB.pm
+    version: v1.2.1
+  TMDB::Collection:
+    file: lib/TMDB/Collection.pm
+    version: v1.2.1
+  TMDB::Company:
+    file: lib/TMDB/Company.pm
+    version: v1.2.1
+  TMDB::Config:
+    file: lib/TMDB/Config.pm
+    version: v1.2.1
+  TMDB::Genre:
+    file: lib/TMDB/Genre.pm
+    version: v1.2.1
+  TMDB::Movie:
+    file: lib/TMDB/Movie.pm
+    version: v1.2.1
+  TMDB::Person:
+    file: lib/TMDB/Person.pm
+    version: v1.2.1
+  TMDB::Search:
+    file: lib/TMDB/Search.pm
+    version: v1.2.1
+  TMDB::Session:
+    file: lib/TMDB/Session.pm
+    version: v1.2.1
+  TMDB::TV:
+    file: lib/TMDB/TV.pm
+    version: v1.2.1
+requires:
+  Encode: '0'
+  HTTP::Tiny: '0.016'
+  IO::Socket::SSL: '1.56'
+  JSON::MaybeXS: '0'
+  Locale::Codes: '3.20'
+  Net::SSLeay: '1.49'
+  Object::Tiny: '1.03'
+  Params::Validate: '1.03'
+  URI::Encode: '0.05'
+resources:
+  bugtracker: https://github.com/mithun/perl-tmdb/issues
+  homepage: https://github.com/mithun/perl-tmdb
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mithun/perl-tmdb.git
+version: v1.2.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

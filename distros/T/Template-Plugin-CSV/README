@@ -1,0 +1,17 @@
+This module is a plugin for Template Toolkit that helps you generate
+CSV output.  It can be installed using followoing commands:
+
+  perl Makefile.PL
+  make
+  make install
+
+And it is suggested to test the module before installing it:
+
+  make test
+
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself. Use it at your own risk.
+
+Cheers
+Kang-ming Liu
+

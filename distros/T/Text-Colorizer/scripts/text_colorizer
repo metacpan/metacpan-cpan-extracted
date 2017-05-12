@@ -1,0 +1,121 @@
+#!/usr/bin/perl -w
+
+use strict ;
+use warnings ;
+use Carp ;
+
+=head1 NAME 
+
+ $> text_colorizer - transforms a text file with embeded color tags to HTML or ANSI
+
+=head1 USAGE
+
+ $> text_colorizer [options] file_name
+
+Use B<AE<lt>ansi_color on_ansi_colorE<gt>> tags where you want the color to change, IE:
+
+ display_help() A<bright_green>unless @ARGV ;A<bright_white>
+ 
+ use A<bright_red>Data::TreeDumperA<bright_white> ;
+ use Text::Colorizer  A<yellow>qw() ;
+
+displays as (can't be rendered in a man page but will be in the html documentation):
+
+=begin html
+
+<pre style ="font-family: monospace; background-color: #000 ;">
+<span style = ' color:#fff; '>display_help() </span><span style = ' color:#0f0; '>unless @ARGV ;</span><span style = ' color:#fff; '>
+
+use </span><span style = ' color:#f00; '>Data::TreeDumper</span><span style = ' color:#fff; '> ;
+use Text::Colorizer  </span><span style = ' color:#880; '>qw() ;
+</span>
+</pre>
+
+=end html
+
+The start color is B<bright_white> rendered on a B<black> background.
+
+=head1 OPTIONS
+
+ format|f                          ANSI or HTML
+ color_file|c                      file containing color definitions
+
+=head1 EXIT STATUS
+
+Non zero in case of error.
+
+=head1 AUTHOR
+
+	Nadim ibn hamouda el Khemir
+	CPAN ID: NKH
+	mailto: nkh@cpan.org
+
+=cut
+
+#------------------------------------------------------------------------------------------------------------------------
+
+use Getopt::Long ;
+use English qw( -no_match_vars ) ;
+use File::Slurp ;
+
+our $VERSION = '0.01' ;
+
+#------------------------------------------------------------------------------------------------------------------------
+
+display_help() unless 
+	GetOptions
+		(
+		'format|f=s' => \ my $format,
+		'color_file|c=s' => \ my $color_file,
+		) ;
+	
+display_help() unless @ARGV ;
+
+my $tag_regex = qr/(A<[^[]+?>)/ ;
+
+for my $file_to_colorize (@ARGV)
+	{
+	my @chunks =  split $tag_regex , read_file($file_to_colorize) ;
+
+	if(@chunks)
+		{
+		unshift @chunks, 'bright_white' unless $chunks[0] =~ $tag_regex  ;
+		@chunks = map {s/^A<(.*)>$/$1/; $_} @chunks ;
+
+		use Data::TreeDumper ;
+		@chunks % 2 and die DumpTree \@chunks, 'text and color chunks' ;
+
+		my @extra_options ;
+		push @extra_options, 'COLORS' => $color_file if defined $color_file ;
+		
+		use Text::Colorizer  qw() ;
+		my $c= Text::Colorizer->new
+				(
+				FORMAT => defined $format ? $format : 'ANSI',
+				@extra_options
+				) ;
+				
+		print $c->color(@chunks) ;
+		}
+	}
+	
+#------------------------------------------------------------------------------------------------------------------------
+
+sub display_help
+{
+
+#~ =head2 display_help()
+
+#~ I<Arguments> - None
+
+#~ I<Returns> - Nothing
+
+#~ I<Exceptions> - exits with status code B<1>
+
+#~ =cut
+
+my ($this_script) = ($PROGRAM_NAME =~m/(.*)/sxm ) ;
+
+print {*STDERR} `perldoc $this_script`  or croak 'Error: Can\'t display help!' ; ## no critic (InputOutput::ProhibitBacktickOperators)
+exit(1) ;
+}

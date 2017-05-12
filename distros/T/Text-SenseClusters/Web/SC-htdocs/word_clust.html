@@ -1,0 +1,29 @@
+<html>
+<title>Word Clustering (native SenseClusters)</title>
+<body>
+<h1>Word Clustering (native SenseClusters) </h1>
+</body>
+</html>
+
+Word clustering relies on the creation of a word by word matrix from 
+bigram or co-occurrence features. The first word in these pairs serves as 
+the row, the second word serves as the column, and the cell contains the 
+association score, frequency count, or binary value indicating the 
+relationship between the pair of words. 
+<br><br>
+This matrix can be reduced via SVD, and is reconstructed such that the 
+original rows are preserved and the columns are reduced. Thus the rows are 
+clustered such that word that occur with similar words in bigrams or 
+co-occurrences are grouped together. 
+<br><br>
+Note that the word matrix used is identical to that which is used in 
+creating the second order representation for context discrimination. 
+<br><br>
+The input must be a Senseval-2 formatted test file. It can be either
+headed or headless. Even if the data has target words (marked with head 
+tags) the test_scope option and target co-occurrence features are not  
+available. Only bigram or co-occurrence features may be used, and it  
+should be understand that the first word in the bigram or co-occurrence  
+pairs is what will be clustered. A separate set of feature selection data  
+(ie., training data) may not be used with word clustering.
+

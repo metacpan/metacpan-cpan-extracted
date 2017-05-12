@@ -1,0 +1,10 @@
+severity        = 3
+verbose         = 6
+top             = 50
+theme           = pbp || core || bugs || security || maintenance
+criticism-fatal = 1
+color           = 1
+allow-unsafe    = 1
+
+[Subroutines::RequireArgUnpacking]
+allow_delegation_to = _self_or_default

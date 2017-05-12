@@ -1,0 +1,90 @@
+
+Changes from NSP version 0.61 to 0.63
+-------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+December 2003
+
+Docs
+----
+	
+	1) Converted README.txt to README.pod
+
+	To create plain text: pod2text README.pod > README.txt
+	To create html:       pod2html README.pod > README.html
+
+	2) Converted FAQ.txt to FAQ.pod
+
+	3) removed README.txt and FAQ.txt (now replaced by pod). 
+
+	4) moved /Measures/README.measures.txt to /Docs and converted
+	to Measures.pod
+	
+	5) Converted NewStats.txt to NewStats.pod
+
+	6) Converted Todo.txt to Todo.pod
+
+	7) Converted Usage.txt to Usage.pod
+
+	8) renamed Docs as docs
+
+Utils
+-----
+
+	1) Incorporated all documentation for combig into combig.pl.
+	Removed file README.combig.txt
+
+	2) Incorporated all documentation for kocos into kocos.pl.
+	Removed file README.kocos.txt
+
+	3) Incorporated all documentation for rank into rank.pl.
+	Removed file README.rank.txt
+
+count.pl
+--------
+
+	1) added simple perldoc to program
+
+statistic.pl
+------------
+
+	1) added simple perldoc to program
+	
+
+Makefile.PL
+-----------
+	
+	1) added to support standard perl installation of NSP.
+	   Now possible to install NSP using the standard perl
+	   "3 step" install. Still possible to install simply
+	   by setting paths. 
+
+	2) creates html versions of pod documenations and stores
+	   in doc/html.
+	
+	
+CPAN Release
+------------
+
+	1) NSP is now distributed via CPAN as Text::NSP.
+
+  	   http://search.cpan.org/dist/Text-NSP/
+
+  	   In order to take advantage of CPANs distribution
+	   mechanism, we needed to rename a few files, and
+	   add a dummy module stub (NSP.pm). NSP still works
+	   the same as it always did, it just looks slightly
+	   different now. Files that were added or renamed 
+	   because of CPAN include INSTALL, README, CHANGES, 
+	   MANIFEST, NSP.pm, and Makefile.PL. There is also a
+	   directory /t that is to be used for testing (invoked
+	   via make test). Right now there isn't much that is
+	   tested there, but that could/should change in future.
+	   We still have very extensive testing available via
+	   /Testing, it just isn't integrated into "make test"
+	   at this time. 
+
+
+
+

@@ -1,0 +1,29 @@
+pm_to_blib
+Fuzzy\.(bs|c|o)
+edit-distance-.*\.o
+build\.pl
+cleanup\.pl
+MANIFEST\.bak
+.*\.~.*~
+#.*
+\.git
+blib
+MYMETA\.
+text-fuzzy\.o
+text-fuzzy\.c\.in
+Makefile$
+.*\.tmpl
+edit-distance-short\..*
+make-edit-distance-c\.pl
+Text-Fuzzy-[\.\d]+
+makeitfile
+# Documentation of module algorithms.
+doc/.*
+# Benchmarking.
+benchmarks/.*
+MYMETA\..*
+# Used to create "config.h" in distribution.
+^config$
+# Template
+^declaration$
+^timesheet\.txt$

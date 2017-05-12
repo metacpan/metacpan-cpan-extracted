@@ -1,0 +1,36 @@
+Changes made in Sense-Clusters version 0.05 during version 0.07
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota at Duluth
+
+(1)	Changed names of eval and preval to label and prelabel resp. 
+(2)	Added throw option to prelabel program to throw single instance
+	clusters
+(3)	Added report.pl program	to create a report showing confusion table,
+	precision and recall
+(4)	Added tagger program to tag test instances with the labels assigned
+	by label.pl
+(5)	Added sparse_matrix.pl and sparse_mcquitty.pl to use sparse matrix 
+	formats
+(6)	Added force option to mcquitty 
+(7)	Set default score value to minimum similarity
+(8)	Added a Utils directory to include following programs 
+	* checkmat.pl that tells if given sparse and full matrices are 
+	  equivalent 
+	* info_matrix.pl and info_sparse.pl programs which give some
+	  interesting information about given matrices
+	* keyconvert.pl that converts format of Senseval-2 key file to 
+	  SenseClusters format
+	* sense_frequency.pl that shows number of senses and their
+	  distribution in a training or test file
+	* sense_filter.pl that filters given data by removing instances of low 
+	  frequency sense tags
+	* Sval_proc.pl preprocesses Senseval-2 data by removing or attaching P
+	  tags
+(9)	Added experiment.tar.gz file to include the Scripts and the Data 
+	to recreate the experimental results created for NAACL-HLT2003 paper.
+
+(Changelog-v0.05to0.07 Last Updated on 03/22/2003 by Amruta)
+

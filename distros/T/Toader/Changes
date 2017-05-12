@@ -1,0 +1,205 @@
+Revision history for Toader
+
+1.2.1	 2016-01-08/02:30
+		 -Reroll tarball.
+
+1.2.0	 2016-01-07/13:00
+		 -More verbose warning on trying to set an entry name.
+		 -Fix various instances of keys being used ona hashref.
+		 -Various POD cleanups.
+		 -bin/toader-migrate will now ignore anything in the directory matching /^\./
+		 -add missing newlines to bin/toader-entry for --help
+		 -bin/toader-dir now exits and errors if -a is not given
+		 -Fix improper init of Toader::Gallery in Toader::Render::General
+		 -Add support for Tags in Toader::Render::Entry and add the methods below.
+		 	  tags
+			  tagsContent
+		 -Add cache support to Toader::Entry::Manage and add the methods below.
+		 	  cacheGet
+			  cacheUpdateAll
+			  touch
+		 -Add the modules below.
+		 	  Toader::Entry::Cache
+		 -Add the default templates listed below.
+		 	  copyright
+
+1.1.1	 2013-05-11/07:20
+		 -Reupload to CPAN because of a archive error.
+
+1.1.0	 2013-05-11/07:15
+		 -Add 'siderbar' method to 'Toader::Render::General'.
+		 -Correct lots of incorrect initialization.
+		 -Add forgotten docs to 'bin/toader-migrate'
+
+1.0.0	 2013-05-11/04:30
+		 -Add POD for bin/toader-gallery.
+		 -Add bin/toader-migrate for entry migration.
+		 -Add tag support to 'bin/toader-entry'.
+		 -Add template del/set support to 'bin/toader-temp'.
+		 -Misc. documentation cleanups and corrections.
+		 -Add 'Toader::VCS' for VCS integration.
+		 -Note that Toader::Config->new requires a Toader object
+		    passed to it.
+		 -Now supports 'Error::Helper' flags for all modules.
+		 -Remove the colon to make entry names happy under Windows as
+		      per MITHALDU, 78782. This requires renaming all previous
+			  entries.
+		 -Add 'delConfig' to 'Toader::Gallery'.
+		 -Correct action name in 'bin/toader-gallery' from 'sg' to 'gs'.
+		 -Add 'dc' action to 'bin/toader-gallery' to call 'delConfig'.
+		 -Remove error 10 from 'Toader::Render::AutoDoc' as it was a
+		      duplicate of 5.
+		 -Remove error 10 from 'Toader::Render::Entry' as it was a
+		      duplicate of 5.
+		 -Remove error 10 from 'Toader::Render::General' as it was a
+		      duplicate of 5.
+		 -Add 'getVCS' to 'Toader'.
+		 -Add the methods below to 'Toader::Template'.
+		 	  remove
+			  set
+			  templateInDir
+		 -Break the sidebar out of the 'page' template
+		 	and add it as it's own template, 'sidebar'.
+		 -The modules below now use Toader::VCS.
+		 	  Toader::AutoDoc
+		      Toader::Config
+			  Toader::Directory
+		 	  Toader::Entry
+			  Toader::Entry::Manage
+			  Toader::Gallery
+			  Toader::Page
+			  Toader::Page::Manage
+			  Toader::Template
+		 -Change calling conventions for the modules below as
+		 	  they take a Toader object.
+		 	  Toader::AutoDoc
+			  Toader::Config
+			  Toader::Directory
+		 	  Toader::Entry
+			  Toader::Entry::Helper
+			  Toader::Entry::Manage
+			  Toader::Gallery
+			  Toader::Page
+			  Toader::Page::Helper
+			  Toader::Page::Manage
+
+0.4.0	 2012-08-04/10:00
+		 -Document tags support for entries.
+		 -Actually require some minimum versions in Makefile.PL.
+		 -Now uses Script::isAperlScript for with Toader::AutoDoc.
+		 -For Toader::Render::Genderal->adlink if nothing is specified
+		 	  for the link text, it will remove ".html" from the end.
+		 -Add the methods below to Toader::Entry.
+		 	  tagsGet
+			  tagsGetAsString
+			  tagsSet
+			  tagsSetFromString
+
+0.3.0	 2012-05-19/16:00
+		 -Toader::Render::General->autodocList sorts.
+		 -'page' template now properly displays the directory menu.
+		 -'bin/toader-css' now allows editing and getting of the include.
+		 -Add nasty hack to fix returning of dupes by Toader::AutoDoc->findDocs.
+		 -'bin/toader-page' now properly processes the 'rg' action.
+		 -Publish support finalized for entries and pages.
+
+0.2.0	 2012-03-30/06:20
+		 -Add POD backends.
+		 -Minor POD corrections.
+		 -Expand upon the config documentation.
+		 -Add url to the config.
+		 -Add full/relative URL option to Toader::Render::General.
+		 -Add the methods below to Toader::Render::General.
+		 	  galleryDirURL
+			  galleryImageLarge
+			  galleryImageSmall
+			  galleryLargeURL
+			  galleryLargeImageURL
+			  galleryLocationbar
+			  gallerySmallImageURL
+			  galleryLink
+			  gallerySrcURL
+			  hasGallery
+			  hashToTable
+			  imageDiv
+			  imageExitTables
+			  locationSub
+			  locationSubSet
+		 -Add the modules below.
+		 	  Toader::Gallery
+			  Toader::Render::Gallery
+		 -Add non-relative URL capabilities to Toader::Render::General.
+		 -Correct error handling for Toader::Templates::Defaults->getTemplate.
+		 -Update bin/toader-ra to support everything.
+		 -Add publish support to the modules below.
+		 	  Toader::Entry
+			  Toader::Page
+		 -Misc documentation correction.
+		 -Some double slash cleanup.
+		 -Add cssInclude, allowing custamization with out touching the default
+		 	  CSS template.
+		 -Add gallery and autodoc support to bin/toader-autodoc.
+		 -Add the methdods below to Toader::Templates::Defaults.
+		 	  exists
+			  listTemplates
+		 -Add the methods below to Toader::Templates.
+		 	  getTemplateDefault
+			  listDefaultTemplates
+			  setTemplate
+		 -Add the templates listed below.
+		 	  cssInclude
+		 	  galleryDir
+		 	  gallerySmallImage
+		 	  gallerySmallImageBegin
+			  gallerySmallImageJoin
+			  gallerySmallImageEnd
+			  galleryLocationStart
+			  galleryLocationPart
+			  galleryLocationJoin
+			  galleryLocationEnd
+		 	  galleryLocationImage
+		 	  hashToTableBegin
+			  hashToTableTitle
+			  hashToTableRow
+			  hashToTableJoin
+			  hashToTableEnd
+			  imageDiv
+		 -Adds the scripts below.
+		 	  bin/toader-css
+			  bin/toader-gallery
+			  bin/toader-temp			  
+
+0.1.0	 2012-02-02/14:10
+		 -Add Toader::AutoDoc, Toader::Render::AutoDoc, and
+		 	  Toader::Render::AutoDoc::Cleanup, Documentation/AutoDoc.pod 
+		 -Add supporting AutoDoc methods to Toader::Render::General.
+		 -Add AutoDoc related templates to Toader::Templates::Defaults.
+		 -Add bin/toader-autodoc.
+		 -Add the methodes below to Toader::Render::General.
+		 	  hasSubDirs
+		 	  hasAnyDirs
+		 	  autodocList
+		 	  adlink
+			  adListLink
+		 -Change content float method to none. This allows it to wrap around the
+		 	  menu. Avoiding misc formatting issues.
+		 -Correct date processessing.
+		 -Note security related issues with Toader.
+		 -Note VCS integration.
+		 -Misc. cleanups.
+		 -Rework the page template so the HR is only present in the sidebar if there
+		 	  is more than one section.
+		 -Add the templates listed below.
+		 	  autodocLink
+			  linkAutoDocList
+			  autodocListBegin
+			  autodocContent
+			  autodocListRow
+			  autodocListJoin
+			  autodocListEnd			  
+
+0.0.1	 2011-12-24/17:30
+		 -Correct some POD NAME issues.
+
+0.0.0	 2011-12-24/09:00
+		-Initial release.

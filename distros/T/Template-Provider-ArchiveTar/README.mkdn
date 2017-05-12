@@ -1,0 +1,55 @@
+# NAME
+
+Template::Provider::ArchiveTar - fetch templates from an archive
+
+# SYNOPSIS
+
+    my $t = $info->{template} || Template->new({
+        POST_CHOMP => 1,
+        DEBUG => 1,
+        LOAD_TEMPLATES => [
+            Template::Provider::ArchiveTar->new({
+                archive => Archive::Tar->new('theme.tar'),
+            }),
+        ],
+    });
+
+# DESCRIPTION
+
+Using this module you can provide templates through a Tar archive or any
+object compatible with the API of [Archive::Tar](https://metacpan.org/pod/Archive::Tar). Interesting examples
+are [Archive::Dir](https://metacpan.org/pod/Archive::Dir), [Archive::Merged](https://metacpan.org/pod/Archive::Merged) and [Archive::SevenZip](https://metacpan.org/pod/Archive::SevenZip).
+
+# SEE ALSO
+
+[Template::Provider](https://metacpan.org/pod/Template::Provider)
+
+[Template::Provider::DBI](https://metacpan.org/pod/Template::Provider::DBI)
+
+# REPOSITORY
+
+The public repository of this module is 
+[http://github.com/Corion/template-provider-archivetar](http://github.com/Corion/template-provider-archivetar).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Template-Provider-ArchiveTar](https://rt.cpan.org/Public/Dist/Display.html?Name=Template-Provider-ArchiveTar)
+or via mail to [Template-Provider-ArchiveTar-Bugs@rt.cpan.org](https://metacpan.org/pod/Template-Provider-ArchiveTar-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2014-2016 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

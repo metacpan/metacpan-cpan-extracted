@@ -1,0 +1,4 @@
+0.2 2004-01-12
+  + Added support for creating multiple instances of the Text::Lorem object.
+0.3 2004-03-25
+  + Added command line utility submitted by Darren Chamberlain

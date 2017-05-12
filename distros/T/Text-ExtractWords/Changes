@@ -1,0 +1,31 @@
+Revision history for Perl extension Text::ExtractWords.
+
+0.08  Mon Oct 13 18:31:00 WEST 2003
+	- Another bug in "unescape_str" function was fixed.
+
+0.07  Fri Sep 26 14:54:46 WEST 2003
+	- Minor bugfixes and feature enchancements.
+
+0.06  Thu Sep 25 10:46:33 WEST 2003
+	- The module has been rewritten
+	- Optional hash variable to customize was added
+
+0.05  Fri May 23 18:07:03 WEST 2003
+	- "t" directory has been added with test scripts.
+
+0.04  Fri May 23 12:00:27 WEST 2003
+	- In this version there was a bug fixed in "unescape_str"
+	  function.
+
+0.03  Thu May  8 10:58:03 WEST 2003
+	- This release fixes the bug in XS "str_scan" function.
+
+0.02  Wed May  7 11:21:39 WEST 2003
+	- The documentation was added.
+	- The function str_to_lower was removed from XS.
+	- The scan of words like cp@n or su$picion was was improved.
+	  Change words like cp@n to cpan but not cp@nx.org and words like
+	  su$picion to suspicion.
+
+0.01  Tue May  6 14:39:07 WEST 2003
+	- original version; created by h2xs 1.19

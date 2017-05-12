@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+Shift.pm
+t/1.t

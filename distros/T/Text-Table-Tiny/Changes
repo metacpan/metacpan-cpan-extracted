@@ -1,0 +1,23 @@
+Revision history for Perl module Text::Table::Tiny
+
+0.04 2015-11-05 NEILB
+    - Added this Changes file. Addresses RT#97285
+    - Now use Exporter, and provide an optional export generate_table(),
+      which works exactly the same as the previous table() function.
+      The old interface is provided for back compat. Tests for new interface.
+    - Restructured the doc.
+    - Cleaned up the dist.ini, which now adds a META.json to releases.
+    - Added a SEE ALSO section to the doc, which refers the reader to
+      the See Also section in Text::Table::Manifold RT#107613.
+    - Specified min perl version as 5.006
+    - Github repo now listed in the doc and in the dist metadata
+ 
+0.03 2012-01-24 CHIGGINS
+    - Unknown changes
+
+0.02 2012-01-24 CHIGGINS
+    - Unknown changes
+
+0.001 2012-01-23 CHIGGINS
+    - First release to CPAN
+

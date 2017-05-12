@@ -1,0 +1,55 @@
+=head1 NAME
+
+Toadfarm::Manual::BehindReverseProxy - Toadfarm behind nginx
+
+=head1 DESCRIPTION
+
+This is useful when you want to run L<Toadfarm> behind a reverse
+proxy, such as C<nginx>.
+
+=head2 Nginx config
+
+The "rewrite" rule is very important, since it will remove the "/myapp" part
+from the request URL that the Mojolicious route dispatcher will see.
+
+  upstream myapp {
+    server 10.11.12.13:8001;
+  }
+
+  server {
+    listen 80;
+    server_name domain.com
+
+    location /myapp {
+      rewrite ^/myapp/?(.*)$ /$1 break;
+      proxy_set_header X-Request-Base http://$host/myapp;
+      proxy_pass http://myapp;
+    }
+  }
+
+=head2 Toadfarm script
+
+The magic part here is the "X-Request-Base" HTTP header which is set by
+C<nginx>. In addition, you need to set C<proxy> to "1" so
+L<Mojo::Server::Daemon> can behave correctly.
+
+  #!/usr/bin/perl
+  use Toadfarm -init;
+
+  mount "/home/www/project1/script/app1" => {
+    "X-Request-Base" => "http://domain.com/myapp",
+  };
+
+  start [ "http://*:8080" ], proxy => 1, workers => 8;
+
+=head1 SEE ALSO
+
+L<http://wiki.nginx.org/HttpProxyModule>
+
+L<http://wiki.nginx.org/HttpUpstreamModule>
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

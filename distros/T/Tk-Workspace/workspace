@@ -1,0 +1,28 @@
+#!/usr/local/bin/perl
+my $text='';
+my $geometry='565x351+100+100';
+my $wrap='word';
+my $fg='black';
+my $bg='white';
+my $name='workspace';
+my $menuvisible='1';
+my $scrollbars='';
+my $insert='1.0';
+my $font='*-courier-medium-r-*-*-12-*"';
+use Tk;
+use Tk::Workspace;
+use strict;
+use FileHandle;
+use Env qw(HOME);
+my $workspace = Tk::Workspace -> new ( menubarvisible => $menuvisible, 
+scroll => $scrollbars );
+$workspace -> name($name);
+$workspace -> textfont($font);
+$workspace -> text -> insert ( 'end', $text );
+$workspace -> text -> configure( -foreground => $fg, -background => $bg, -font => $font, -insertbackground => $fg );
+$workspace -> text -> pack( -fill => 'both', -expand => '1');
+bless($workspace,'Tk::Workspace');
+$workspace -> wrap( $wrap );
+$workspace -> geometry( $geometry, $insert );
+$workspace -> commandline;
+MainLoop;

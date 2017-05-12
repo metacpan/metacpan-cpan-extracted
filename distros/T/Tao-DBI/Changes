@@ -1,0 +1,57 @@
+Revision history for Perl extension Tao-DBI.
+
+0.012    Tue Jan 6 2016
+        - Fix again hash randomization test failures (CPAN RT #109435)
+
+0.011    Tue Jan 5 2016
+        - Fix hash randomization test failures (CPAN RT #109435)
+        - Add json support to Tao::DBI nested statements
+
+0.01     Sun Jan 3 2016
+        - Skip t/006deep.t if YAML is not installed (CPAN RT #109435)
+
+0.0008   Sat Feb 10 2007
+        - the default DBI attribute AutoCommit for Tao
+          connections is now '0'
+        - &dbi_connect was deprecated and replaced by
+          the class method Tao::DBI->connect
+
+0.0007   Mon Nov 4 2006
+        - this immature code was promoted to a non-development version
+        - expression @{%$href}{@idx} used in Tao::DBI::st corrected to
+          @{$href}{@idx}
+        - I am suspicious some DBD::SQLite versions raised an error
+          when preparing statements with invalid SQL, so
+          RaiseError => 0 is explicit now in t/007bad.t
+
+0.00_06  Thu Oct 20 2005
+        - Tao::DBI::st::initialize() now returns the newly 
+          created statement (or not)
+        - FIX: prepare() and Tao::DBI::st::new() return undef
+          if raw DBI::prepare() returned undef
+        - FIX: ':' followed by /[^\w]/ should be literally 
+          interpreted, but instead was leaving the SQL with
+          translated ? placeholders incomplete
+        - the default DBI attribute FetchHashKeyName for Tao
+          connections is now 'NAME_lc' - it still misses
+          integration with Tao::DBI::st in execute()
+        - added new tests "t/007bad.t", "t/008edges.t", "t/009uc_key.t"
+
+0.00_05  Wed Oct 19 2005
+       - Tao::DBI::st croaks on undef 'sql'
+       - Tao::DBI uses croak rather than die
+
+0.00_03  Sun Aug 29 2005
+        - deep Tao statements - absolute beginning
+
+0.00_02  Fri Aug 26 2005
+        - second release to CPAN
+        - POD errors (st.pm documenting Tao::DBI) fixed
+        - more POD
+        - README fixed
+
+0.00_01  Thu Aug 25 2005
+        - first release to CPAN 
+
+0.00_01  Tue Aug 24 2005
+        - original version; created by hand.

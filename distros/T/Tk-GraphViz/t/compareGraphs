@@ -1,0 +1,142 @@
+#!/usr/bin/perl -w
+# Utility to compare dot-generated images, with the graphs drawn using Tk::GraphViz
+#
+
+use lib '../blib/lib';
+
+use Tk;
+use Tk::Pane;
+use Tk::GraphViz;
+use Tk::LabFrame;
+
+# Get files from the command line, if supplied
+
+my @dots = @ARGV;
+my $async = 1;
+
+my $inputDir = "graphs/directed";
+
+unless(@dots){ # get files in the local directory, if none supplied
+
+	opendir(DIR, $inputDir) || die "can't opendir $inputDir: $!";
+	@dots = grep { /\.dot$/ && -f "$inputDir/$_" } readdir(DIR);
+	closedir DIR;
+
+	# Add path to dot files
+	@dots = map "$inputDir/$_", sort @dots;
+}
+
+my $mw = new MainWindow ();
+
+# Frame for the two images
+my $topFrame = $mw->Frame;
+$topFrame->pack(-side => 'top', -fill => 'both', -expand => 1 );
+
+# left image, including a label (We don't use a LabFrame here, because
+# it doesn't appear to work with packAdjust
+#    (At least on the test platform tk804.027 and Perl 5.8.4
+my $leftFrame = $topFrame->Frame(-relief => 'sunken');
+my $leftLabel = $leftFrame->Label(-text => "Dot-Generated GIF Image")
+  ->pack ( -side => 'top' );
+$leftFrame->packAdjust ( -fill => 'both', -expand => 1,
+			 -side => 'left', -delay => 1 );
+
+# right image, including a label
+my $rightFrame = $topFrame->LabFrame(-label => 'Tk::GraphViz-Generated Canvas', -labelside => 'top', -relief => 'sunken');
+$rightFrame->pack(-side => 'right', -fill => 'both', -expand => 1 );
+
+my $currentFile = shift @dots;
+my $image = GenerateImage($leftFrame, $currentFile);
+
+my $imagepane = $leftFrame->Scrolled(Pane, 
+	-scrollbars => 'osoe',
+	-sticky => 'nsew',
+);
+
+$imagepane->pack(-fill => 'both', -expand => 1,  -side => 'top');
+
+my $imageLabel = $imagepane->Label( -image => $image)->pack(-fill => 'both', -expand => 1);
+
+# Right picture is a Tk::GraphViz object
+
+
+
+my $gv = $rightFrame->Scrolled ( 'GraphViz',
+			 -background => 'white',
+			 -scrollbars => 'osoe' )
+  ->pack ( -expand => '1', -fill => 'both', -side => 'right' );
+
+$gv->createBindings();
+$gv->show($currentFile, async => $async);
+
+my $buttonFrame = $mw->Frame();
+
+my $statusLabel = $buttonFrame->Label( -text => $currentFile);
+
+$statusLabel->pack(-side => 'left');
+
+
+$buttonFrame->pack(-side => 'bottom' );
+
+$buttonFrame->Button(-text => 'Quit', -command => [$mw, 'destroy'])->pack(-side => 'right');
+my $nextButton = $buttonFrame->Button(-text => 'Next', -state => 'disabled');
+
+$nextButton->configure( -command =>
+	sub{
+		$currentFile = shift @dots;
+		$statusLabel->configure(-text => "Generating GIF for $currentFile ...");
+		$mw->Busy;
+		$mw->update;
+		$image = GenerateImage($leftFrame, $currentFile);
+		$imageLabel->configure(-image => $image);
+
+		$statusLabel->configure(-text => "Generating Tk::GraphViz Canvas for $currentFile ...");
+		$mw->update;
+
+		$gv->show($currentFile, async => $async);
+		
+		$statusLabel->configure(-text => $currentFile);
+
+		$mw->Unbusy;
+		
+		unless( @dots){ # disable next button if there are more files to look at
+			$nextButton->configure(-state => 'disabled');
+		}
+	}
+);
+
+$nextButton->pack(-side => 'left');
+
+if( @dots){ # enable next button if there are more files to look at
+	$nextButton->configure(-state => 'normal');
+}
+
+$mw->geometry( "800x400");
+
+MainLoop;
+
+##############################################
+# Sub to generate gif file from dot file
+sub GenerateImage{
+
+	my ($frame, $filename) = @_;
+	
+	unless( -f $filename){
+		die("Can't find file '$filename'\n");
+	}
+	
+	
+	print "Processing file $filename\n";
+
+	
+	$command = "dot -Tgif $filename > tempFile.gif";
+	
+	system($command) && die("Error executing $command\n".$!);
+	
+	my $image = $frame->Photo(-file => "tempFile.gif");
+	
+	#unlink 'tempFile.gif'
+	
+	return $image;
+	
+}

@@ -1,0 +1,188 @@
+0.40	- 12 May 2016, H.Merijn Brand
+    * Fix backdrop test
+    * Add CONTRIBUTING.md
+    * It's 2016
+    * Tested with 5.24.0, blead and Tk (git)
+
+0.39	- 12 Feb 2015, H.Merijn Brand
+    * Move repo to github
+    * Remove perl recommendation from META as it breaks cpan clients
+
+0.38	- 03 Jan 2015, H.Merijn Brand
+    * Fix skip_all. require Test::More 0.88
+
+0.37	- 02 Jan 2015, H.Merijn Brand
+    * Use 12:15 AM instead of 00:15 AM
+    * Upped Copyright to 2015
+
+0.36	- 10 Apr 2014, H.Merijn Brand
+    * Fix locales for non-utf8 (and windows)
+    * Upped Copyright to 2014
+    * Make sure boolean attributes are 0 or 1
+    * Protect internal attributes from new and config calls
+    * Dynamically determine width of digital date and time
+
+0.35	- 20 Aug 2013, H.Merijn Brand
+    * Indented SYNOPSIS (RT#85697 - Djibril Ousmanou)
+    * Support for locales in long day and month formats
+    * Support for local offset (in seconds)
+
+0.34	- 28 May 2013, H.Merijn Brand
+    * Force update if time wound back (ntp, date command)
+    * Upped Copyright to 2013
+    * Forced order of config attributes (destroying attribs last)
+
+0.33	- 17 Apr 2012, H.Merijn Brand
+    * Upped Copyright to 2012
+    * Better protect against CPANTESTERS with non-Tk environment
+
+0.32	- 07 Sep 2011, H.Merijn Brand
+    * NAME / DISTNAME in Makefile.PL
+
+0.31	- 07 Sep 2011, H.Merijn Brand
+    * More cross-checks for META data
+
+0.30	- 12 May 2011, H.Merijn Brand
+    * Initialization fix (attributes can be passed to constructor as it has
+      always be intended)
+    * Upped Copyright to 2011
+
+0.29	- 02 Aug 2010, H.Merijn Brand
+    * Spell-checking
+    * Added useInfo, infoColor, infoFormat, and infoFont
+    * timeFormat, dateFormat and infoFormat now all support all abbreviations
+    * Added timerValue and corresponding Hc, Mc, and Sc format entries
+
+0.28	- 16 Mar 2010, H.Merijn Brand
+    * Allow to change backdrop while running
+    * Upped Copyright to 2010
+    * Dropped YAML spec to 1.0
+
+0.27	- 18 May 2009, H.Merijn Brand
+    * Enabled backdrop
+    * Add useSecHand option
+    * Overhauled the documentation
+
+0.26	- 20 Mar 2009, H.Merijn Brand
+    * replace ->_packMethod () with ->manager
+    * t/30_dual.t now allows resizing in grid
+    * examples/cdclock.pl now acts as I had in mind
+    * Added Test::NoWarnings
+
+0.25	- 08 Mar 2009, H.Merijn Brand
+    * Vastly improved on resizing.
+    * Prefer autoScale => 1 over anaScale => 0
+    * Add examples/cdclock.pl (Lightning Talk countdown clock)
+
+0.24	- 20 Jan 2009, H.Merijn Brand
+    * Wrong e-mail in META.yml
+    * Copyright 2009
+    * Guard cpantesters with $DISPLAY unset
+
+0.23	- 21 Oct 2008, H.Merijn Brand
+    * Added tgzdist make target
+    * Slightly changed the cover make target
+    * Allow yyyy in date formats
+    * Add `weird' TimeZones to examples/world.pl
+    * examples/station.pl can have reversed colors, is resizeable,
+      and the ticks don't touch the edges
+
+0.22	- 02 Jan 2008, H.Merijn Brand
+    * Tk::Clock is now under git
+    * Upped copyright to 2008
+    * Added complete prereq list to Makefile.PL
+
+0.21	- 09 Nov 2007, H.Merijn Brand
+    * Added tickDiff attribute for width-diff of the ticks
+    * Added handCenter attribute (see examples/station.pl)
+    * Added examples/station.pl (Stations klok)
+    * Added countDown attribute and examples/countdown.pl
+    * Fixed auto-resize for clocks with digital disabled
+    * Tested with Tk-804.027_501+
+
+0.20	- 08 Oct 2007, H.Merijn Brand
+    * Added a 7-clocks wide example/world.pl
+    * And fixed the Time Zones in world.pl
+    * Raised requirement to 5.006, as I use our and recent Tk builds
+      require 5.007
+
+0.19	- 08 May 2007, H.Merijn Brand
+    * LICENSE entry for MakeMaker only for newer versions
+    * Updated plans/TODO
+    * Updated Copyrights
+    * Moved pod to bottom
+    * Added timeZone support!
+    * Split up tests
+    * Loosened up the dateFormat and timeFormat attributes to
+      allow fixed text. Needs documentation!
+    * Added a test with three clocks side-by-side with different TZ's
+
+0.18	- 27 Apr 2007, H.Merijn Brand
+    * Added cover make target
+    * Added auto-resize test. Still depends on user doing the resize
+    * Increased coverage. More coverage is doable, but it'll be a
+      booooring job to wait for the tests to finish
+
+0.17	- 16 Nov 2006, H.Merijn Brand
+    * Missed one '.' in the format change (K.Wittrock)
+    * secsColor was missed in config attrib handling
+    * allow both -secsColor and secsColor
+
+0.16	- 17 Oct 2006, H.Merijn Brand
+    * Default format for time HH.MM:SS => HH:MM:SS (wish K.Wittrock)
+    * Added digiAlign option. Default: "center" (wish K.Wittrock)
+    * $clock->coords (...) now used for the hands instead of
+      deleting and (re)creating them (suggestion K.Wittrock)
+
+0.15	- 18 Sep 2005, H.Merijn Brand
+    * Added Test::Pod
+    * Added Test::Pod::Coverage
+
+0.12	- 31 Aug 2005, H.Merijn Brand
+    * 24 Hour clock for Abe
+    * config () now returns the widget, so it's stackable
+
+0.11	- 14 Aug 2005, H.Merijn Brand
+    * Resize reconfigured wrong widget
+
+0.10	- 11 Aug 2005, H.Merijn Brand
+    * Solved digital clock misplacement when anaScale passed (Abeltje)
+    * Improved resizing
+    * Set geometry of parent if MainWindow
+    * Changed README and updated Copyright
+    * Added a warning for resizing and pack
+    * Changed the tests to use Test::More
+    * config now returns the widgets new geometry
+
+0.07	- 03 Apr 2000, H.Merijn Brand
+    * Added 'w' and 'ww' for weeknumbers in dateFormat
+    * Added 'd' and 'dd' for day of the week in timeFormat (for Henry)
+
+0.06	- 27 Sep 1999, H.Merijn Brand
+    * Analog clock now scalable (anaScale)
+    * Number of ticks configurable (tickFreq)
+
+0.05	- 07 Apr 1999, H.Merijn Brand
+    * Updated the README
+    * Implemented ddd, dddd, mmm, mmmm (English only)
+    * Enabled \n in date format. If combined with empty time
+      format, formats like "dddd\nd mmm yyyy" can be used.
+
+0.04	- 15 Dec 1998, H.Merijn Brand
+    * Changed README according to perlmodlib manpage
+    * Made date formats more Y2K reliable
+      dd-mm-yyy still doesn't fit in the allocated space
+
+0.03	- 26 Aug 1998, H.Merijn Brand
+    * Analog/Digital part can be disabled.
+
+0.02	- 22 Jul 1998, H.Merijn Brand
+    * Support date/time formats through config
+
+0.01	- 20 Jul 1998, H.Merijn Brand
+    * First attempt to get it on the CPAN
+    * Added config ()
+    * minimized update of the text fields
+
+0.00	- 09 Jun 1998, H.Merijn Brand
+    * First post to Achim, as excerpt from xamen.pl

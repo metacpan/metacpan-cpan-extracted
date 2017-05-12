@@ -1,0 +1,251 @@
+NAME
+
+    Time::Slideshow - simple stateless slideshow with a fixed set of images
+
+SYNOPSIS
+
+        my $slideshow= Time::Slideshow->new(
+            starttime => 0,
+            slides => [ 'picture1.jpg', 'picture2.jpg' ],
+            shuffle => 0, # pseudo-rng
+            duration => 45, # show each slide for 45 seconds
+        );
+        my $current_slide= $slideshow->current_slide;           # picture1.jpg
+        my $next_slide= $slideshow->next_slide;                 # picture2.jpg
+        sleep $slideshow->seconds_to_next_slide;
+
+OVERVIEW
+
+    This module abstracts the inner workings of a slideshow, selecting the
+    next slide to display and calculating the time until the next picture.
+    It is possible to use this object in an asynchronous manner across
+    machines as the complete slide sequence is precalculated from the
+    wallclock time.
+
+    The module has no methods to advance the slideshow forwards or
+    backwards other than through the passage of time.
+
+METHODS
+
+ Time::Slideshow->new %options
+
+      my $slideshow= Time::Slideshow->new(
+          slides => [ glob '~/backgrounds/*.jpg' ],
+          duration => 300, # five minutes per image
+          shuffle => 1, # permute the order of images
+      )
+
+    Creates a new slideshow object and returns it. The options are
+
+    slides
+
+      Array reference to the slides. These can be filenames or URLs or
+      whatever else helps your program to find and display the appropriate
+      image.
+
+    duration
+
+      The time how long every image is displayed, in seconds. The default
+      value is 45.
+
+    shuffle
+
+      If you want the order of the images to be shuffled, pass a true value
+      to this option. See the below discussion on what different orders you
+      can expect from shuffling.
+
+    starttime
+
+      If you want to set up a different offset of the start time, pass this
+      option with the epoch value of the start time. Usually, you want to
+      leave this parameter at its default of 0.
+
+ $show->add_slide( @slides )
+
+      $show->add_slide( glob '~/new_backgrounds/*' );
+
+    If you want to add slides after object creation, you can use this
+    method.
+
+ $show->current_slide
+
+      print "Now displaying ", $show->current_slide, "\n";
+
+    Returns the name of the slide that is currently displayed.
+
+    This method is the central method for your application to get the
+    filename or URL of the image that your application needs to display.
+
+ $show->next_slide
+
+      print "Next up is ", $show->next_slide, "\n";
+
+    Returns the name of the slide that will be displayed after the current
+    slide.
+
+    You can use this method to preload the image data for the upcoming
+    slide.
+
+ $show->seconds_to_next_slide
+
+      my $wait= $show->seconds_to_next_slide;
+      sleep $wait;
+
+    Returns the time remaining to the next slide transition.
+
+    You can use this method to pause your program or perform other tasks
+    until the next image needs to be displayed.
+
+ $show->current_slide_index
+
+      my $current_slide_index= $show->current_slide_index;
+
+    This returns the index of the slide that is currently displayed.
+
+    Most likely, you want to use $show->current_slide instead.
+
+ $show->slide_at $index
+
+        my $slide_count= @{ $show->slides };
+        for my $slide ( 0..$slide_count-1 ) {
+            print "Slide $slide: ", $show->slide_at( $slide ), "\n";
+        };
+
+    Returns the name of the slide at the given index.
+
+SHUFFLING PERMUTATIONS
+
+    This module does not use the real permutations of the slides,
+
+INTEGRATION
+
+ Console
+
+    This is the most basic slideshow display. It demonstrates the
+    functionality of the module but only outputs the text. Displaying the
+    image itself is left to you to implement with your favourite image
+    display method.
+
+      use Time::Slideshow;
+    
+      my $s= Time::Slideshow->new(
+          slides => [ glob 'slides/*.jpg' ],
+      );
+    
+      while(1) {
+          print sprintf "Now showing slide '%s'\n", $s->current_slide;
+          print sprintf "Next up is '%s'\n', $s->next_slide;
+    
+          sleep( $s->seconds_to_next_slide );
+      };
+
+ AnyEvent
+
+    This example uses AnyEvent to show how you can perform other tasks
+    while also reacting to the timer events to display a new image.
+
+      use AnyEvent;
+      use Time::Slideshow;
+    
+      my $s= Time::Slideshow->new(
+          slides => [ glob 'slides/*.jpg' ],
+      );
+    
+      my $slideshow_timer;
+      my $display_and_reschedule; $display_and_reschedule= sub {
+          print sprintf "Now showing slide '%s'\n", $s->current_slide;
+          print sprintf "Next up is '%s'\n', $s->next_slide;
+          $slideshow_timer= AnyEvent->timer(
+              after => $s->seconds_to_next_slide,
+              cb => $display_and_reschedule,
+          );
+      };
+      $display_and_reschedule->();
+    
+      # Wait and do other stuff
+      AnyEvent->condvar->recv;
+
+ CGI
+
+    This example assumes that your images are available via your webserver
+    under the URL /slides and will display a page that shows the same image
+    to all users that load that page.
+
+      use CGI;
+      use Time::Slideshow;
+    
+      my $s= Time::Slideshow->new(
+          slides => [ glob 'slides/*.jpg' ],
+      );
+    
+      my $image= "/" . $s->current_slide;
+      my $reload= $s->seconds_to_next_slide;
+      my $q= CGI->new;
+      print $q->header('text/html');
+      print <<HTML;
+          <html>
+          <head>
+              <meta http-equiv="refresh" content="$reload">
+          </head>
+          <body><img src="$image" /></body></html>
+      HTML
+
+ Prima
+
+    Using Prima, we can create an application with a natve UI that displays
+    the images. Not implemented here are the resizing or zooming of the
+    images to the window size.
+
+      use Prima qw(Application ImageViewer);
+      use Time::Slideshow;
+    
+      my $s= Time::Slideshow->new(
+          slides => [ glob 'demo/*.png' ],
+      );
+      my $window = Prima::MainWindow->new();
+      my $image = $window->insert( ImageViewer =>
+          growMode => gm::Client,
+          rect => [0, 0, $window->width, $window->height],
+          autoZoom => 1,
+      );
+      my $filename = $s->current_slide;
+      $image->imageFile($filename);
+      $window->insert( Timer =>
+          timeout => 5000, # checking every 5 seconds is enough
+          onTick  => sub {
+              if( $s->current_slide ne $filename ) {
+                  $filename = $s->current_slide;
+                  $image->imageFile($filename);
+              };
+          }
+      )->start;
+    
+      Prima->run;
+
+REPOSITORY
+
+    The public repository of this module is
+    http://github.com/Corion/time-slideshow.
+
+SUPPORT
+
+    The public support forum of this module is http://perlmonks.org/.
+
+BUG TRACKER
+
+    Please report bugs in this module via the RT CPAN bug queue at
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Time-Slideshow or via
+    mail to time-slideshow@rt.cpan.org.
+
+AUTHOR
+
+    Max Maischein corion@cpan.org
+
+COPYRIGHT (c)
+
+    Copyright 2014-2016 by Max Maischein corion@cpan.org.
+
+LICENSE
+
+    This module is released under the same terms as Perl itself.
+

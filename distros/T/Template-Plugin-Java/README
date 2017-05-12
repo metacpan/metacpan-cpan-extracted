@@ -1,0 +1,72 @@
+				tjava 0.4
+
+This is the CPAN module Template::Plugin::Java. It is designed to assist
+in the generation of Java code using the Template toolkit. To this end,
+it offers generation of Java beans from XML description files, and from
+table schemas via Template::Plugin::JavaSQL.
+
+THIS IS AN INTERMEDIATE RELEASE
+-------------------------------
+
+I was annoyed with how long all the necessary changes were taken, so this is
+already MUCH more useful than 0.3. There is no dependency on any non-existant
+parser any more. Beans parse themselves out of SAX, quickly, recursively. The
+toString() method of all beans now replaces any need for an xmlEncode(). The
+DBClass template works much better. Etc. This thing is actually more or less
+usable now.
+
+I hope 0.5 to be more documented and cleaner over all.
+
+QUICKSTART
+----------
+
+Make an .xml file I will use the one in the Template::Plugin::Java
+manpage:
+
+<aBean> 
+	<foo>10</foo>
+	<bar>String</bar>
+	<container>
+		<baz>20</baz>
+	</container>
+</aBean>
+
+called ABean.xml.
+
+For a database generated bean, it'd look something like this:
+
+<aBean>
+        <java:
+		template="DBClass"/>
+        <sql:
+                table="tin_can"/>
+</aBean>
+
+The SQL context can also be:
+
+	<sql:
+		query="select * ... (complex select expression here)"/>
+
+Then, make sure TEMPLATEPATH is set correctly, the default templates are
+installed into ${PREFIX}/share/tjava, so usually you will want to have:
+
+export TEMPLATEPATH=/usr/local/share/tjava
+
+tjava ABean.xml
+jikes ABean.java # or javac, whatever
+
+Look at the source for ABean.java to see how to use it. The database clases
+support basically, setX(), find() (based on what is set), store() (current row
+update, or insert new row if not on something from find()); and remove() to
+delete the row on which the cursor is currently. Most importantly, after
+find() you MUST call next() to advance the cursor to the next row, and
+thereafter until next() returns a false value. Example usage:
+
+Employee e = new Employee(db_connection);
+e.setFirstName("Rafael");
+e.find(); // select * from employee where first_name = 'Rafael';
+while (e.next()) {
+	System.out.println(e);	// Print them all out.
+}
+
+More extensive documentation is forthcoming.

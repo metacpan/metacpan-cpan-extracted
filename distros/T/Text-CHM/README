@@ -1,0 +1,40 @@
+Text-CHM version 0.01
+=====================
+
+Text::CHM is a module that implements a (partial) support for handling
+MS Compiled HtmlHelp Files (chm files for short) via CHMLib. CHMLib is
+a small library designed for accessing MS ITSS files.  The ITSS file
+format is used for chm files, which have been the predominant medium
+for software documentation from Microsoft.
+
+Chm is a filesystem based file format, such as MS Excel or MS Word
+file formats, but they aren't the same.
+
+Text::CHM allows you to open chm files, get their filelist, get the
+content of each file and close them; at the moment, no write support
+is available.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the CHMLib library, available at
+
+http://66.93.236.84/~jedwin/projects/chmlib/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Domenico Delle Side
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

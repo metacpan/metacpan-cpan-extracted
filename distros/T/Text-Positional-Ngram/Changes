@@ -1,0 +1,21 @@
+Revision history for Perl extension Text::Positional::Ngram.
+
+0.1  Mon Feb  2 17:35:56 2004
+	- original version; created by h2xs 1.22 with options
+		-X -n Text::Positional::Ngram
+
+0.2 Tue Apr 20 13:31:34 2004
+        - updated the Perldoc and Readme documentation
+        - removed the normal-op.pl tests
+        - added text-positional-ngram-driver.pl program
+
+0.3 Fri Apr 30 10:15:45 2004
+	- modified a bug in the driver program
+
+0.4 Mon Aug 29 9:12:56 2007
+        - modified Makefile to die if the version of 
+	  Perl used is less than 5.8.0 
+
+0.5 Tue Aug 28 14:04:21 2007
+        - modified Makefile to die if the version of 
+	  Perl used is less than 5.8.5

@@ -1,0 +1,5 @@
+In order to install TXTCOD type:
+
+perl Makefile.PL
+make
+make install

@@ -1,0 +1,65 @@
+Changes from NSP version 0.73 to 0.91
+-------------------------------------
+
+Saiyam Kohli, kohli003@d.umn.edu
+University of Minnesota, Duluth
+
+February 7, 2006
+
+Measures
+--------
+
+Complete rewrite of Measures from scratch using Object Oriented Perl.
+
+All the measures have now been moved from the Measures directory to the lib
+directory and have been rearranged according to the following hierarchy:
+
+Text::NSP
+Text::NSP::Measures
+Text::NSP::Measures::2D
+Text::NSP::Measures::2D::MI
+Text::NSP::Measures::2D::MI::ll
+Text::NSP::Measures::2D::MI::pmi
+Text::NSP::Measures::2D::MI::tmi
+Text::NSP::Measures::2D::CHI::x2
+Text::NSP::Measures::2D::CHI::phi
+Text::NSP::Measures::2D::CHI::tscore
+Text::NSP::Measures::2D::Fisher::left
+Text::NSP::Measures::2D::Fisher::right
+Text::NSP::Measures::2D::Fisher::twotailed
+Text::NSP::Measures::2D::odds
+Text::NSP::Measures::2D::dice
+Text::NSP::Measures::3D
+Text::NSP::Measures::3D::MI
+Text::NSP::Measures::3D::MI::ll
+Text::NSP::Measures::3D::MI::pmi
+Text::NSP::Measures::3D::MI::tmi
+
+Similar measures have been grouped together, and the error checks and
+computations common to these measures have been moved to the base class for
+these measures. The error codes have also been reoragnised, with every mearure
+familiy getting a particular range of error codes, the details are available in
+the Text::NSP documentation.
+
+We are now using hashes instead of arrays to store the data related to a
+continhency table(observed/expected counts) internally.
+
+The overflow errors in the rightFisher and leftFisher measures have been
+resolved and a new measure for the twotailed Fishers exact test has been added.
+
+
+Programs
+--------
+
+Changes to statistic.pl have been made to get it working with the new
+implementation of measures.
+
+Now statistic.pl searches for the Measure modules using PERL5LIB environment
+variable instead of PATH. Some changes were made to make the commnadline
+interface backwards compatibile, that is the systems that were using NSP-0.73
+(specifically statistic.pl) will keep on working with the new NSP-0.75, without
+any changes.
+
+Other changes include printing all the error messaged to STDERR and also a check
+to ensure that the sum of all the obseved bigram counts is less than the total
+bigram count.

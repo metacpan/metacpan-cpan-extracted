@@ -1,0 +1,9 @@
+# Note: The first line and the word root are not case-sensitive.
+
+Parent	Place	Node
+root	Above	Beetles
+root	Below	1
+1		Above	Wasps, bees, ants
+1		Below	2
+2		Above	Butterflies, moths
+2		Below	Flies

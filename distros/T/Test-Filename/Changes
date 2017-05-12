@@ -1,0 +1,18 @@
+Revision history for Perl module Test::Filename
+
+0.03      2013-01-31 16:13:17 America/New_York
+
+    - Now converts both comparison arguments and does so with
+      Path::Tiny to handle minor details like "./foo" being
+      the same as "foo"
+
+    - Converted distribution management to Dist::Zilla
+
+0.02 Sat Oct  6 13:28:46 EDT 2007
+
+    - Fixes bug on win32 (PIBK)
+
+0.01 Sat Oct  6 11:00:40 EDT 2007
+
+    - initial release with filename_is() and filename_isnt()
+

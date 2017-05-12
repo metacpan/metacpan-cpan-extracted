@@ -1,0 +1,37 @@
+---
+name: TeamCity-BuildMessages
+version: 0.999003
+author:
+  - 'Elliot Shank <perl@galumph.com>'
+abstract: Encode and emit messages that TeamCity can interpret during a build.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Exporter: 5.58
+  IO::Handle: 0
+  Readonly: 1.03
+  autodie: 0
+  strict: 0
+  utf8: 0
+  version: 0.74
+  warnings: 0
+build_requires:
+  Test::Exception: 0
+  Test::More: 0.72
+dynamic_config: 0
+provides:
+  TeamCity::BuildMessages:
+    file: lib/TeamCity/BuildMessages.pm
+    version: 0.999003
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+no_index:
+  directory:
+    - xt
+  file: []
+configure_requires:
+  Module::Build: 0.2808

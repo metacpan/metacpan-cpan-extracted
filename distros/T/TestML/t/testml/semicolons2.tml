@@ -1,0 +1,11 @@
+# Trailing semicolons are allowed in other places
+
+%TestML 0.1.0
+
+Plan = 1;
+
+{ foo() }
+{ a = 1 }
+
+Label = 'functions without final semicolons compile'
+1.OK

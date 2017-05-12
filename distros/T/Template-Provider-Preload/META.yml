@@ -1,0 +1,29 @@
+---
+abstract: 'Preload templates to save memory when forking'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::More: 0.47
+  Test::SubCalls: 1.07
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Template::Provider::Preload
+name: Template-Provider-Preload
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Adapter: 1.05
+  File::Find::Rule: 0.30
+  File::Spec: 0.80
+  Params::Util: 0.30
+  Template: 2.20
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

@@ -1,0 +1,35 @@
+@c chapter2.texi
+
+@node Data Structures
+@chapter Data Structures
+
+This part comes before the menu.
+
+@menu
+* Variable names::              This gets overridden by the Top menu
+* Context::                     This came from the Data Structures menu
+@end menu
+
+This part comes after the menu.
+
+@node Variable names
+@section Variable names
+
+Variable names defined here.
+
+@node Context
+@section Context
+
+Context goes here.
+
+@menu
+@end menu
+
+@include section22.texi
+
+@node Scalar values
+@section Scalar values
+
+Scalar values go here.
+
+@c DESC: Scalar values DESC comment

@@ -1,0 +1,57 @@
+Tie::Hash::Sorted version 0.10
+===========================
+
+INTRODUCTION
+This module allows you to retrieve keys/values from a hash in a sorted order.
+
+
+COMPARISON
+Q:  Is this module any different from Tie::IxHash or Tie::SortHash?
+A:  Yes, let me explain
+
+Tie::IxHash vs Tie::Hash::Sorted:
+  Tie::IxHash:
+    Preserves insertion order
+    Provides two sort routines, SortByKey & SortByValue, using textual compare
+  Tie::Hash::Sorted
+    Order is maintained regardless of insertion order
+    Arbitrary sorting, may be changed at any time
+
+Tie::SortHash vs Tie::Hash::Sorted
+  Tie::SortHash:
+     Uses pseudo hashes (a deprecated perl feature)
+     Uses eval("...") for sorting
+     To generate the sorted list one time:
+        Re-sort the list as many times as there are keys
+        Loop over the hash as many times as there are keys, stopping on match
+        Compare current key against last key (keys^2 + keys)/2 times
+     Slow
+     No support for lexical variables in sorting code
+     Inflexible calling syntax
+  Tie::Hash::Sorted
+     Uses no deprecated perl features (tested from 5.004_3 .. 5.8.1)
+     Uses a proper code reference
+     To generate the sorted list one time:
+        Potentially re-sort the list one time
+        Add one to an iterator, and lookup the corresponding array element        
+     Potentially slow but with opportunities for optimization
+     Supports lexicals, closures, etc
+     flexible/expandable calling syntax
+
+WHY I WROTE IT
+Tie::SortHash was a perfect answer to a question on PerlMonks
+(http://www.perlmonks.org) Unfortunately it had a lot of issues with it and I
+received no response from the author. Originally, I wanted an drop in
+replacement, but it became nearly impossible to do that and maintain
+backwards compatability.
+
+FAQ
+Send me an email
+
+INSTALLATION
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

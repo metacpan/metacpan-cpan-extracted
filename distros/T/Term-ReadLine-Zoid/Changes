@@ -1,0 +1,90 @@
+Revision history for Term-ReadLine-Zoid - another ReadLine package
+
+0.07 Mon Nov 22 2004
+	Maintenance release, just one bugfix
+
+     Fri Oct 22
+	- Fixed a bug with the completion of quoted strings
+
+0.06 Wed Sep 15 2004
+        - Fixed a bug in the clear_screen() function
+	- Touched documentation for FileBrowse
+	- Changed return_empty_string logic
+	- Added T:RL:Z::Emacs with 'emacs' and 'emacs_multiline' modes
+	- Added ^O (operate_and_get_next)
+
+0.05 Mon Sep  6 2004
+        Release to accompany the 0.90 release of Zoidberg to Adam.pm
+        - Made 'beat' also an attribute
+
+     Sun Sep  5
+        - Made it possible for "quote" meta field to be a CODE reference so
+        the application can handle escaping in a custom way
+
+     Mon Aug 30
+        - Some bugfixes in FileBrowse
+	- Modified behaviour of ^D for multiline buffers
+	- Added basic support for buffers that have more lines then the screen
+
+     Mon Aug  9
+        - Reverse direction of arrays in SetHistory to be compatible with
+	T::RL::Gnu's behaviour
+	- Added the FileBrowse (fbrowse) mode
+
+     Wed Aug  4
+        - Added support to set attributes through the PERL_RL variable
+	- Added the 'default_mode' attribute
+	- Refactored the way keymaps and modes are handled
+	- Renamed most key routines with functional names
+	- Incorporated T:RL:Z:MultiLine into T:RL:Zoid, not all modii need to
+	have a .pm anymore, there still is a 'multiline' keymap of course
+
+     Tue Aug  3
+        - Fixed behaviour of 'e' and 'E' in ViCommand
+	- ISearch does now repeated search at ^R
+	- Changed behaviour on terminal resize a bit
+
+     Tue Jul 20
+        - Added automatic logic for the 'maxcomplete' option
+
+     Mon Jul 12
+        - Fixed 'quoted' vs 'quote' logic for advanced completion
+
+0.04 Sun Jul  4 2004
+        - Made cursor position take control chars into account
+	- Reversed the output of GetHistory after testing with cpan(1)
+
+     Thu Jul  1
+        - Fixed a bug, escaped returns are now really removed
+	- Fixed a bug, expansion works again in a non-zoid application,
+	like cpan(1)
+	- Added pager support for long lists of completions
+
+0.03 Tue Jun 29 2004
+        - Fixed a bug in the expansion code regarding escaping
+	- Fixed 'bindchr' and 'bindkey' vi commands
+	- Added code for '=', '*', and '\' keybindings in the vi mode
+
+0.02 Tue May 25 2004
+
+     Mon May 24
+        - Added support for more advanced completion functions
+
+     Sun May 23
+        - Added "RPS1" setting after reading something about zsh on /.
+	- Made it possible for the prompts to be a scalar reference
+
+     Fri May 21
+        - Fixed an AUTOLOADER inheritance problem leading to bugs in zoid
+
+     Sun May 16
+        - Added some simple emacs bindings like ^F, ^B etc.
+
+     Tue Mar 30
+        - Fixed typo in the synopsis, patch by Mike Castle
+
+0.01 Sun Mar 28 2004
+	Initial feature set is complete enough to release
+
+     Thu Jan 15 2004
+	Initialised the module

@@ -1,0 +1,12 @@
+\bCVS\b
+^MANIFEST\.bak$
+^Makefile$
+\..*\.swp$
+~$
+\bblib\b
+\b\.xvpics\b
+\b_build\b
+^Build$
+^.*tar\.gz$
+^x.pl$
+^z_end$

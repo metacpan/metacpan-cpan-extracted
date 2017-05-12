@@ -1,0 +1,21 @@
+---
+abstract: 'Simple exceptions that do the right things in multiple contexts'
+author:
+  - "['Paul Seamons <paul@seamons.com>', 'Jason Terry <oaxlin@cpan.org>',]"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Throw
+requires:
+  JSON: '0'
+  perl: v5.8.8
+resources:
+  homepage: https://github.com/oaxlin/Throw
+  repository: https://github.com/oaxlin/Throw.git
+version: '0.13'

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bffa2842419626ee067f2b9d073705ca955a69da Build.PL
+SHA1 6a266225c3187be35b5ef505993753d5eead756a Changes
+SHA1 e21ffb51c6fa9ea22093b59ca2bf31c173c7c063 MANIFEST
+SHA1 924d9866c103f9c5d1805e274841538051aa43cc META.yml
+SHA1 c43b6ded002be3a1d438cfc7e25685c5016912d6 Makefile.PL
+SHA1 0f84dfddca770d321496c232b2df32004daa5890 README
+SHA1 e1960324ac5bbd569cc09af98738bdff5c787df3 examples/01_hostname-and-interfaces.t
+SHA1 d004712e2ec982ed58b10fbc3283d0ed3ee37623 examples/01_running-processes.t
+SHA1 300595163c64b542533711c205bc4dad28f5181c examples/02_disk-free.t
+SHA1 9631ef49475df733198f849bcbe39afe2d7e8184 examples/02_dns-resolution.t
+SHA1 268df5d79c62d5feddfae537e74c5f838a25da2b examples/02_resolv.conf.t
+SHA1 69e32682872295ffe0c72595717af9d69cfca1ac examples/02_time-sync.t
+SHA1 74be82b3b4cf7a620ea097325a0b5da6400af1b6 examples/03_cmd-output.t
+SHA1 7af0e409dce73b3d5e3f27cfc06d81fb1d29bf02 examples/03_find-huge-files.t
+SHA1 4851aecdb4100ef369e86763ef929305cc2095c7 examples/03_folder-file.t
+SHA1 3b56319987197fcdc674b950110b0d575b18db75 examples/03_open-ports.t
+SHA1 c993091058c3a9196200a014a43599bc02ece76b examples/03_sites-ok.t
+SHA1 4a04aa7bab39283b1b50134330e600baa6cfa6bb examples/test-server.yaml
+SHA1 0246b6e28a5bd2bbb1a8c985f5c713b1dcfd1062 lib/Sys/Net.pm
+SHA1 ec32a2f4adb07c640b6c9120247f94274784388d lib/Test/Net/Service.pm
+SHA1 4c94a08a36331ff24f6a357dfe2ffb2a7f9fc86e lib/Test/Server.pm
+SHA1 74c3dc1b2b2ae19dbb088c1e0e03118bba45da39 lib/Test/Server/Util.pm
+SHA1 0519c326194a85c8bd1aaec0d4a3c4850e9df638 t/00_Test-Server.t
+SHA1 25d0d8e604c2b3d2ab3cbe6dade51b4d1fa2a84d t/01_Test-Net-Service.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAksibc0ACgkQC0OgUPgL2Sc2awCggjly7dDTv39jrIjbELUjQlpF
+NAUAoIOJ5TAPy59VRZz52GrVBol4yLlh
+=Vf13
+-----END PGP SIGNATURE-----

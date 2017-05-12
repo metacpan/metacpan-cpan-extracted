@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+
+# Tests the Term::ShellUI tokenizer/parser.
+# Pass the indexes of the tests you want to run as arguments.
+# If no arguments supplied, runs all tests.
+# If arguments supplied, verbosely displays results.
+
+use strict;
+
+use lib '.';
+use Parse;
+use lib '../lib';
+use Text::Shellwords::Cursor;
+
+use FreezeThaw qw(freeze cmpStr);
+use YAML qw(Dump);
+
+my $parser = Text::Shellwords::Cursor->new();
+die "No parser" unless $parser;
+
+# Parse cmdline args
+my %seltest;
+for(@ARGV) { $seltest{$_} = 1; }
+my $verbose = 1, $parser->{debug} = 1 if @ARGV;
+
+print "\nTest Result\n---------------------------------\n" unless $verbose;
+
+my($ntests, $nfail) = (0,0);
+for my $input (sort keys %Parse::Tests) {
+    my($index,$cpos,$test) = $input =~ /^(\d+):(\d*):(.*)$/;
+    die "No test in item $index:    $input\n" unless defined $test;
+    next if %seltest && !exists($seltest{0+$index});
+
+    my($toks, $tokno, $tokoff) = $parser->parse_line($test, messages=>$verbose, cursorpos=>$cpos);
+    my $result = [$toks, $tokno, $tokoff];
+    my $eq = 0 == cmpStr($result, $Parse::Tests{$input});
+    
+    if($verbose) {
+        print "\nTest $index: $test cursor=$cpos\n";
+        print "Expected output: " . freeze($Parse::Tests{$input}) . "\n";
+        print Dump($Parse::Tests{$input});
+        print "Received output: " . freeze($result) . "\n";
+        print Dump($result);
+    } else {
+        printf("%2d: %s    $test\n", $index, ($eq ? 'OK  ' : 'FAIL'));
+    }
+
+    $ntests++;
+    $nfail++ unless $eq;
+}
+
+print "\n\n$ntests test" . ($ntests == 1 ? "" : "s") ." run, ";
+print "$nfail failure" . ($nfail == 1 ? "" : "s") . ".\n\n";
+

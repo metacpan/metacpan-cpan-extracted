@@ -1,0 +1,4 @@
+DEFINEA = ${DEFINEA}
+DEFINEB = ${DEFINEB}
+Inner with DEFINEA = 99 and DEFINEB unchanged.
+<: include included_defines.txt DEFINEA=99 :>

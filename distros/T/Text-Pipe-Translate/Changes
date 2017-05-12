@@ -1,0 +1,35 @@
+Revision history for Perl extension Text-Pipe-Translate
+
+1.100890  2010-03-30 00:55:43 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.05  Thu 2009.10.08 22:29:11 CEST (Marcel Gruenauer <marcel@cpan.org>)
+    - re-release with fixed inc::Module::Install::ReadmeMarkdownFromPod
+
+0.04  Mon 2009.10.05 13:15:06 CEST (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed Babelfish backend; removing the URL helped
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+    - Added INSTALL; now generate README and README.mkdn
+
+0.03  Thu, 29 May 2008 12:08:58 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.03
+    - updated MANIFEST
+    - slight fix to documentation
+    - updated t/perlcriticrc
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - t/01_babelfish.t: Text::Pipe doesn't export pipe() anymore, it's called
+      PIPE() now
+    - .shipit: fixed svk.tagpattern
+
+0.02  Fri, 16 Nov 2007 07:32:18 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.02
+    - added Twitter step to .shipit
+    - removed comment from Makefile.PL
+    - re-generated and re-released now that Module-Install-Template uses
+      Data::Dumper instead of YAML; there were CPAN testers failure reports
+
+0.01  Wed, 14 Nov 2007 21:27:30 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

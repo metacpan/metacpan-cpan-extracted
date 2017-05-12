@@ -1,0 +1,12 @@
+Revision history for Text-Tweet
+
+0.004     2011-02-03 05:39:04 Europe/Berlin
+	- Fixed requirements
+	- Tuned keyword cleaning regexp
+
+0.003     2011-01-10 22:14:41 Europe/Berlin
+
+0.002     2011-01-10 22:00:49 Europe/Berlin
+
+0.001     2011-01-10 08:02:54 Europe/Berlin
+	- Inital release

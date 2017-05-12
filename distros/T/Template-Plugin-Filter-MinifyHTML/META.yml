@@ -1,0 +1,23 @@
+---
+abstract: 'HTML minification filter for Template Toolkit'
+author:
+  - 'Jarrod Linahan <txh@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Filter-MinifyHTML
+provides:
+  Template::Plugin::Filter::MinifyHTML:
+    file: lib/Template/Plugin/Filter/MinifyHTML.pm
+    version: 0.02
+requires:
+  Template::Plugin::Filter: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

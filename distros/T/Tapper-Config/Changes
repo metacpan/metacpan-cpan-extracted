@@ -1,0 +1,73 @@
+Revision history for Tapper-Config
+
+5.0.3     2016-11-11
+        - default config for tapper_prc: tapper-client without path
+
+5.0.2     2016-03-10
+        - store actually used tapper config file in config itself
+        - disable TAP::DOM caching in DB by default
+
+5.0.1     2016-02-16
+        - set default log4perl dirs to /tmp
+
+5.0.0     2016-02-08
+        - log4perl tweaks
+        - database merge TestrunDB+ReportsDB->TestrunDB
+
+4.1.3     2012-11-23
+        - default config values for testing
+
+4.1.2     2012-11-22
+        - silence test log4perl
+
+4.1.1     2012-11-19
+        - dzil pluginbundle TAPPER
+        - use $HOME/.tapper/tapper.cfg instead of $HOME/.tapper.cfg
+
+4.1.0     2012-10-19
+        - [FEAT] special config handling for multiple databases
+        - [TEST] for new special db entries
+        - default entries:
+          - web.use_authentication
+          - testplans.path
+
+4.0.2     2012-06-04
+        - test more lax on matching paths with slashes
+          for better Windows support
+
+4.0.1     2012-05-16
+        - Added default configs for new features
+        - drop too heavy test requirements
+        - provide new clientpkg architecture 'local'
+        - Carved out installer grub file
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* [FIX] allow absolute path for log4perl config
+	* adapt config defaults to new server name and dir layout
+	* release version++ roundhouse kick
+
+2010-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+	* rework log4perl handling
+	* message receiver logfile to /var/log
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* added webserver name to config
+
+	* try to force YAML versions
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

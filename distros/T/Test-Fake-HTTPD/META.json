@@ -1,0 +1,92 @@
+{
+   "abstract" : "a fake HTTP server",
+   "author" : [
+      "NAKAGAWA Masaki <masaki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Fake-HTTPD",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "HTTP::Daemon" : "0",
+            "HTTP::Message::PSGI" : "0",
+            "Scalar::Util" : "1.14",
+            "Test::SharedFork" : "0.29",
+            "Test::TCP" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "LWP::UserAgent" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::TCP" : "0",
+            "Test::UseAllModules" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Fake::HTTPD" : {
+         "file" : "lib/Test/Fake/HTTPD.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/masaki/Test-Fake-HTTPD/issues"
+      },
+      "homepage" : "https://github.com/masaki/Test-Fake-HTTPD",
+      "repository" : {
+         "url" : "git://github.com/masaki/Test-Fake-HTTPD.git",
+         "web" : "https://github.com/masaki/Test-Fake-HTTPD"
+      }
+   },
+   "version" : "0.08",
+   "x_authority" : "cpan:MASAKI",
+   "x_contributors" : [
+      "Olivier Mengué <dolmen@cpan.org>",
+      "ikasam_a <masaki.nakagawa@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

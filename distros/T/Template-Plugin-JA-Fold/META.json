@@ -1,0 +1,67 @@
+{
+   "abstract" : "Template plugin that interface to Lingua::JA::Fold",
+   "author" : [
+      "Hideaki Ohno<hide.o.j55@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "keywords" : [
+      "template",
+      "fold"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Plugin-JA-Fold",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Template::Test" : 0,
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::JA::Fold" : "0.08",
+            "Template" : "2.00",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Plugin::JA::Fold" : {
+         "file" : "lib/Template/Plugin/JA/Fold.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hideo55/p5-Template-Plugin-JA-Fold/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/hideo55/p5-Template-Plugin-JA-Fold.git"
+      }
+   },
+   "version" : "0.03"
+}

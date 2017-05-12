@@ -1,0 +1,34 @@
+TipJar-sparse-array-perl-hashbased version 0.01
+===============================================
+
+An implementation of a spare array tie class based on 
+a Perl hash. This module is intended as a reference
+implementation for testing, and other modules providing
+the same semantics but better performance will be
+forthcoming later.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Nothing. In the future, BigInt support would be good, but
+it isn't in place yet.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by David Nicol / TipJar LLC
+
+This library is free software; you may redistribute and/or modify
+it under the same terms as Perl itself.
+
+

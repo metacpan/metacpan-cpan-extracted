@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Template-Plugin-deJSON.t
+lib/Template/Plugin/deJSON.pm
+META.yml                                 Module meta-data (added by MakeMaker)

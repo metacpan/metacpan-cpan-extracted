@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg"
+  xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Lorem ipsum</title>
+        <author>Cero</author>
+        <respStmt xml:id="tla">
+          <resp>Transcription by</resp>
+          <name> Tara L Andrews</name>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>Unpublished use case</p>
+      </publicationStmt>
+      <sourceDesc>
+        <p>Digital test file.</p>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <front>
+      <head>A selection of pseudo-Latin texts</head>
+    </front>
+    <group>
+      <text>
+        <body>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec mi et felis gravida 
+            hendrerit ornare eget lorem. Proin nisi sem, aliquam eget aliquet ut, lacinia sed erat. 
+            Morbi posuere euismod turpis et volutpat. Mauris suscipit, nisi eget dignissim con 
+sectetur, tortor felis tristique lorem, lacinia feugiat leo ante vel diam. Duis ac 
+            mauris libero, at suscipit risus. Curabitur orci nunc, commodo sed ornare sed, dictum et 
+            nunc. Nulla facilisi. Suspendisse vestibulum dignissim turpis, ut pellentesque orci 
+            convallis aliquet. Mauris metus purus, ullamcorper ut imperdiet et, tristique fermentum 
+            arcu. Donec congue blandit aliquet. Nunc semper mollis mollis. Nulla tempus, augue vitae 
+            iaculis vulputate, neque diam placerat risus, lacinia luctus purus mauris in ligula. 
+            Fusce vehicula eleifend pharetra. Cras nec libero diam, at semper lacus. Nulla 
+            tristique, ligula id lobortis volutpat, eros metus condimentum orci, in interdum lorem 
+            nisi ut justo. </p>
+        </body>
+      </text>
+      <text>
+        <body>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec mi et felis gravida 
+            hendrerit ornare eget lorem. Proin nisi sem, aliquam eget aliquet ut, lacinia sed erat. 
+            Morbi posuere euismod turpis et volutpat. Mauris suscipit, nisi eget dignissim 
+            consectetur, tortor felis tristique lorem, lacinia feugiat leo ante vel diam. Duis ac 
+            mauris libero, at suscipit risus. Curabitur orci nunc, commodo sed ornare sed, dictum et 
+            nunc. Nulla facilisi. Suspendisse vestibulum dignissim turpis, ut pellentesque orci 
+            convallis aliquet. Mauris metus purus, ullamcorper ut imperdiet et, tristique fermentum 
+            arcu. Donec congue blandit aliquet. Nunc semper mollis mollis. Nulla tempus, augue vitae 
+            iaculis vulputate, neque diam placerat risus, lacinia luctus purus mauris in ligula. 
+            Fusce vehicula eleifend pharetra. Cras nec libero diam, at semper lacus. Nulla 
+            tristique, ligula id lobortis volutpat, eros metus condimentum orci, in interdum lorem 
+            nisi ut justo. Fusce felis ante, vestibulum condimentum aliquet eget, lobortis quis 
+            nibh. Quisque eget malesuada sem. Integer congue luctus rhoncus. </p>
+        </body>
+      </text>
+    </group>
+  </text>
+</TEI>
+

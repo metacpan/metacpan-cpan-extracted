@@ -1,0 +1,15 @@
+<html>
+<head></head>
+<body>
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+$ if (hoge) { $ $= h: fuga $ $ } $
+</body>
+</html>

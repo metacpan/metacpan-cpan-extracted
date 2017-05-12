@@ -1,0 +1,3 @@
+drh      = dbi:mysql:
+username = root
+

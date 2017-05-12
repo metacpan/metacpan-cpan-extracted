@@ -1,0 +1,293 @@
+<html>
+<head>
+<title>Capabilities</title>
+</head>
+<body bgcolor="#EEEEFF" link="#0000FF" vlink="#FF00FF" alink="#FF0000" text="#000000">
+
+<h1>Demonstration of Capabilities</h1>
+
+This page demonstrates some of the capabilities of Tk::HyperText's rendering
+power.
+
+<hr>
+
+<h1>Heading Level 1</h1>
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. In vitae lorem sed
+ tellus egestas vestibulum. Ut vulputate porttitor ligula. Maecenas facilisis
+ suscipit quam. Nam diam.
+
+<h2>Heading Level 2</h2>
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum et diam
+ vitae nibh semper porttitor. Donec blandit nunc quis diam. Donec sed risus
+ malesuada neque.
+
+<h3>Heading Level 3</h3>
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Fusce est ipsum,
+ porta non, condimentum ac, laoreet vel, augue. Vivamus hendrerit dictum ipsum.
+ Pellentesque scelerisque enim.
+
+<h4>Heading Level 4</h4>
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Integer facilisis,
+ libero nec congue pellentesque, erat ipsum pulvinar orci, a pulvinar ligula
+ augue a mauris. Suspendisse.
+
+<h5>Heading Level 5</h5>
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin diam justo,
+ elementum eu, convallis nec, pulvinar ac, orci. Phasellus ultrices nulla
+ nec lorem. Maecenas scelerisque.
+
+<h6>Heading Level 6</h6>
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Quisque sed risus
+ consectetuer eros posuere eleifend. Aenean ipsum lorem, pulvinar ac,
+ consectetuer eu, pretium vitae, nibh.
+
+<hr size="10">
+
+<h1>Font Tags</h1>
+
+Basic, unformatted font.<p>
+
+<font face="Comic Sans MS">Comic Sans font, with a little
+ <font face="Impact">Impact</font> thrown in the middle.</font><p>
+
+Some <font color="red">"red" font, with some <font color="#0000FF">"#0000FF"
+ font</font> in the middle.</font><p>
+
+<font size="1">Small font.</font> <font size="4">Big font.</font>
+ <font size="6">Very big font.</font><p>
+
+<font back="#FFFF00">This text was important enough to highlight.</font><p>
+
+<font face="Comic Sans MS" size="4" color="#0000FF" back="#FFFFFF">This particular
+ string of text has all the possible font attributes defined.</font>
+
+<hr size="10">
+
+<h1>Hyperlinks</h1>
+
+This link to <a href="http://www.google.com/" target="_blank">Google</a> should
+ open in your own web browser if you click it, as would this other link to
+ <a href="http://www.fedoraproject.org/" target="_blank">the Fedora Project</a>.<p>
+
+On the other hand, this link <a href="index.html">back to the homepage</a> should
+ load within this window, as would this link to <a href="about.html">the About page</a>.<p>
+
+Finally, <a href="nothing.html">this link should get you a "404 Error"</a> if you
+ click on it. :)
+
+<hr size="10">
+
+<h1>Markup Tags</h1>
+
+We have <b>bold</b> text, and some <b>strong</b> text. Also, some <i>italic</i>
+ text, and some <em>emphasized</em> ones too.<p>
+
+We also have text that is <u>underlined</u> or <ins>inserted</ins>, as well as
+ some that has been <s>overstriked</s> or <del>deleted</del>.<p>
+
+<b>The tags can <em>stack on top of <u>eachother</u> rather <del>easily</del></em>,
+ as well.</b><p>
+
+There is also <sup>superscript</sup> and <sub>subscript</sub>, and <code>coded
+ text</code>, and <tt>typewrited</tt> text.<p>
+
+And finally, preformatted text, like this:<p>
+
+<pre> #####\             _             /#####
+ #( )# |          _( )__         | #( )#
+ ##### |         /_    /         | #####
+ #" "# |     ___m/I_ //_____     | #" "#
+ # O # |____#-x.\ /++m\ /.x-#____| # O #
+ #m.m# |   /" \ ///###\\\ / "\   | #m.m#
+ #####/    ######/     \######    \#####</pre>
+
+<br>That was ASCII art of a disk jockey, found at this site:
+ <a href="http://www.chris.com/ASCII/" target="_blank">http://www.chris.com/ASCII/</a>
+
+<hr size="10">
+
+<h1>Lists</h1>
+
+Lists include both ordered lists, and unordered lists.
+
+<ul type="disc">
+	<li>These are unordered lists.</li>
+	<li>The default icon type is "disc"</li>
+	<ul type="square">
+		<li>But, squares can also be used...</li>
+		<li>As seen here.</li>
+	</ul>
+	<li>You can also use circles.</li>
+	<ul type="circle">
+		<li>Circles are these things.</li>
+		<li>They're hollow, unlike the discs.</li>
+	</ul>
+	<li>I've extended the HTML specs and added "diams"</li>
+	<ul type="diams">
+		<li>These are diams.</li>
+		<li>They're diamonds.</li>
+	</ul>
+	<li>Or take it one step further and allow decimal escape codes.</li>
+	<ul type="#0169">
+		<li>Check out these bullets.</li>
+		<li>Copyright symbols!</li>
+		<li>&lt;ul type="#0169"&gt;</li>
+	</ul>
+</ul>
+
+Ordered lists are just as much fun.
+
+<ol type="1">
+	<li>Here's a typical ordered list.</li>
+	<li>They begin at 1 and increment from there.</li>
+	<li>How predictable.</li>
+	<ol type="i">
+		<li>But how about some lower-case Roman numerals?</li>
+		<li>But that's not all...</li>
+		<ol type="I" start="10">
+			<li>We can do uppercase ones too.</li>
+			<li>This particular set started at 10.</li>
+		</ol>
+	</ol>
+	<li>Oh, and letters, of course:</li>
+	<ol type="a">
+		<li>Lowercase ones...</li>
+		<li>And...</li>
+		<ol type="A" start="24">
+			<li>Uppercase ones!</li>
+			<li>This set started at 24.</li>
+			<li>It should roll over past 26.</li>
+			<li>Let's see what happens...</li>
+		</ol>
+	</ol>
+</ol>
+
+<hr size="10">
+
+<h1>Images</h1>
+
+Here's a quick test of images:<p>
+
+<img src="gba.png" align="center">This is a GameBoy Advance icon.<p>
+
+This image points to a file which doesn't exist: <img src="nothing.png"><p>
+
+Similarly, this image points to a file which is not an image: <img src="demo.html">
+
+<hr size="10">
+
+<h1>Tables</h1>
+
+<table border="2" cellspacing="2" cellpadding="2">
+	<tr>
+		<td colspan="2">This is a table in Tk::HyperText.</td>
+	</tr>
+	<tr>
+		<td>This is a cell.</td>
+		<td>As is this.</td>
+	</tr>
+</table>
+
+<hr>
+
+<h1>Forms</h1>
+
+This tests various form elements. This form is "submittable" -- it'll POST back
+to the index page.<p>
+
+<form name="login" action="index.html" method="POST">
+
+Login Name: <input type="text" size="20" name="name"><br>
+Password: <input type="password" size="20" name="pass"><br>
+<input type="checkbox" name="remember" value="yes" checked> Remember me<p>
+
+Favorite Color:<br>
+<input type="radio" name="color" value="red" checked> Red<br>
+<input type="radio" name="color" value="blue"> Blue<br>
+<input type="radio" name="color" value="green"> Green<p>
+
+<select name="select">
+<option value="Click me!" selected>Click me!</option>
+<option value="Select me!">Select me!</option>
+</select><p>
+
+Leave a short comment:<br>
+<textarea cols="20" rows="3" name="comment"></textarea><p>
+
+Submit the form:<br>
+<input type="submit" value="Submit Me!">&nbsp;<input type="reset" value="Reset">
+</form>
+
+<hr>
+
+<h1>Blockquotes</h1>
+
+Blockquotes create indented sections of text. They can even "stack" within eachother.
+ Take for example this poem:
+
+<blockquote>
+<font size="5">I</font>n Xanadu did Kubla Khan<br>
+A stately pleasure-dome decree :<br>
+Where Alph, the sacred river, ran<br>
+Through caverns measureless to man
+    <blockquote>Down to a sunless sea.</blockquote>
+So twice five miles of fertile ground<br>
+With walls and towers were girdled round :<br>
+And there were gardens bright with sinuous rills,<br>
+Where blossomed many an incense-bearing tree ;<br>
+And here were forests ancient as the hills,<br>
+Enfolding sunny spots of greenery.
+
+    <blockquote>But oh ! that deep romantic chasm which slanted<br>
+    Down the green hill athwart a cedarn cover !<br>
+    A savage place ! as holy and enchanted<br>
+    As e'er beneath a waning moon was haunted<br>
+    By woman wailing for her demon-lover !<br>
+    And from this chasm, with ceaseless turmoil seething,<br>
+    As if this earth in fast thick pants were breathing,<br>
+    A mighty fountain momently was forced :<br>
+    Amid whose swift half-intermitted burst<br>
+    Huge fragments vaulted like rebounding hail,<br>
+    Or chaffy grain beneath the thresher's flail :<br>
+    And 'mid these dancing rocks at once and ever<br>
+    It flung up momently the sacred river.<br>
+    Five miles meandering with a mazy motion<br>
+    Through wood and dale the sacred river ran,<br>
+    Then reached the caverns measureless to man,<br>
+    And sank in tumult to a lifeless ocean :<br>
+    And 'mid this tumult Kubla heard from far<br>
+    Ancestral voices prophesying war !<br>
+    The shadow of the dome of pleasure<br>
+    Floated midway on the waves ;<br>
+    Where was heard the mingled measure<br>
+    From the fountain and the caves.</blockquote>
+It was a miracle of rare device,<br>
+A sunny pleasure-dome with caves of ice !
+    <blockquote>A damsel with a dulcimer<br>
+    In a vision once I saw :<br>
+    It was an Abyssinian maid,<br>
+    And on her dulcimer she played,<br>
+    Singing of Mount Abora.<br>
+    Could I revive within me<br>
+    Her symphony and song,<br>
+    To such a deep delight 'twould win me,</blockquote>
+That with music loud and long,<br>
+I would build that dome in air,<br>
+That sunny dome ! those caves of ice !<br>
+And all who heard should see them there,<br>
+And all should cry, Beware ! Beware !<br>
+His flashing eyes, his floating hair !<br>
+Weave a circle round him thrice,<br>
+And close your eyes with holy dread,<br>
+For he on honey-dew hath fed,<br>
+And drunk the milk of Paradise.
+</blockquote>
+
+</body>
+</html>

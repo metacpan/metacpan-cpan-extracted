@@ -1,0 +1,75 @@
+Revision history for Perl extension Tk::HistEntry.
+
+0.44	- stable release with all changes in 0.43_50..0.43_51
+
+0.43_51
+	- tests do not hang anymore on twm
+	- converted one test file to Test::More
+
+0.43_50
+	- more robust test against missing DISPLAYs
+
+0.43
+	- no code changes, just fixed a possibly failing test
+	  (depending on setting of window focus)
+
+0.42
+	- fixed a failing test (it was a delegation problem)
+
+0.41
+	- just a Pod example fix
+
+0.40
+	- ->class() now returns more meaningful names: SimpleHistEntry
+	  and HistEntry 
+	- do not do auto-completion if typing _before_ the cursor
+	- new -history option (like history method, with tests)
+
+0.37
+	- fixed bug in historyAdd of Browse version of HistEntry
+
+0.36
+	- new -case option
+	- fixed Control- handling when -match is on
+
+0.35
+	- insert, delete and get is now delegated to the Entry subwidget
+
+0.34
+	- fixed test scripts
+	- another example in the pod
+
+0.33
+	- bug fix: Home, End and Delete did not work in -match mode
+
+0.32
+	- new methods historySave and historyMergeFromFile
+
+0.31
+	- bugfix solving disappearing leading characters
+
+0.30
+	- using auto-completion (code stolen from Dave Collins),
+	  if option -match is set
+
+0.22
+	- bug fix in t/newclass.t
+
+0.21
+	- bug fixes for Tk::HistEntry::Browse
+	- new bindings M-< and M->
+
+0.20
+        - split Tk::HistEntry into Tk::HistEntry::Simple and
+          Tk::HistEntry::Browse
+        - new options: -dup, -limit, -bell, -command
+	- new methods: invoke, history
+        - some fixes
+	- POD
+
+0.10  Mon Dec  8 03:07:00 1997
+	- using Tk::BrowseEntry as base class instead of Tk::Entry
+
+0.01  Sat Dec  6 17:43:45 1997
+	- original version
+

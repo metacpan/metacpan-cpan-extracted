@@ -1,0 +1,282 @@
+{
+   "abstract" : "A Thrift message (de)serialization OO representation",
+   "author" : [
+      "Eric Waters <ewaters@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Thrift-Parser",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Class::Accessor::Grouped" : "0",
+            "Class::Data::Accessor" : "0",
+            "Class::ISA" : "0",
+            "Exception::Class" : "0",
+            "JSON::XS" : "0",
+            "Params::Validate" : "0",
+            "Parse::RecDescent" : "0",
+            "Thrift" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Thrift::IDL" : {
+         "file" : "lib/Thrift/IDL.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Base" : {
+         "file" : "lib/Thrift/IDL/Base.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Comment" : {
+         "file" : "lib/Thrift/IDL/Comment.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Constant" : {
+         "file" : "lib/Thrift/IDL/Constant.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::CppInclude" : {
+         "file" : "lib/Thrift/IDL/CppInclude.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Definition" : {
+         "file" : "lib/Thrift/IDL/Definition.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Document" : {
+         "file" : "lib/Thrift/IDL/Document.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::DocumentHeader" : {
+         "file" : "lib/Thrift/IDL/DocumentHeader.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Enum" : {
+         "file" : "lib/Thrift/IDL/Enum.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Exception" : {
+         "file" : "lib/Thrift/IDL/Exception.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Field" : {
+         "file" : "lib/Thrift/IDL/Field.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Header" : {
+         "file" : "lib/Thrift/IDL/Header.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Include" : {
+         "file" : "lib/Thrift/IDL/Include.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Method" : {
+         "file" : "lib/Thrift/IDL/Method.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Namespace" : {
+         "file" : "lib/Thrift/IDL/Namespace.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Senum" : {
+         "file" : "lib/Thrift/IDL/Senum.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Service" : {
+         "file" : "lib/Thrift/IDL/Service.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Struct" : {
+         "file" : "lib/Thrift/IDL/Struct.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Type" : {
+         "file" : "lib/Thrift/IDL/Type.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Type::Base" : {
+         "file" : "lib/Thrift/IDL/Type/Base.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Type::Custom" : {
+         "file" : "lib/Thrift/IDL/Type/Custom.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Type::List" : {
+         "file" : "lib/Thrift/IDL/Type/List.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Type::Map" : {
+         "file" : "lib/Thrift/IDL/Type/Map.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::Type::Set" : {
+         "file" : "lib/Thrift/IDL/Type/Set.pm",
+         "version" : 0
+      },
+      "Thrift::IDL::TypeDef" : {
+         "file" : "lib/Thrift/IDL/TypeDef.pm",
+         "version" : 0
+      },
+      "Thrift::JSONProtocol" : {
+         "file" : "lib/Thrift/JSONProtocol.pm",
+         "version" : 0
+      },
+      "Thrift::JSONProtocol::JSONBaseContext" : {
+         "file" : "lib/Thrift/JSONProtocol.pm",
+         "version" : 0
+      },
+      "Thrift::JSONProtocol::JSONListContext" : {
+         "file" : "lib/Thrift/JSONProtocol.pm",
+         "version" : 0
+      },
+      "Thrift::JSONProtocol::JSONPairContext" : {
+         "file" : "lib/Thrift/JSONProtocol.pm",
+         "version" : 0
+      },
+      "Thrift::JSONProtocol::LookaheadReader" : {
+         "file" : "lib/Thrift/JSONProtocol.pm",
+         "version" : 0
+      },
+      "Thrift::JSONProtocolFactory" : {
+         "file" : "lib/Thrift/JSONProtocol.pm",
+         "version" : 0
+      },
+      "Thrift::Parser" : {
+         "file" : "lib/Thrift/Parser.pm",
+         "version" : "0.06"
+      },
+      "Thrift::Parser::Exceptions" : {
+         "file" : "lib/Thrift/Parser/Exceptions.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Field" : {
+         "file" : "lib/Thrift/Parser/Field.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::FieldSet" : {
+         "file" : "lib/Thrift/Parser/FieldSet.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Message" : {
+         "file" : "lib/Thrift/Parser/Message.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Method" : {
+         "file" : "lib/Thrift/Parser/Method.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type" : {
+         "file" : "lib/Thrift/Parser/Type.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::Container" : {
+         "file" : "lib/Thrift/Parser/Type/Container.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::Enum" : {
+         "file" : "lib/Thrift/Parser/Type/Enum.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::Exception" : {
+         "file" : "lib/Thrift/Parser/Type/Exception.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::Number" : {
+         "file" : "lib/Thrift/Parser/Type/Number.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::Struct" : {
+         "file" : "lib/Thrift/Parser/Type/Struct.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::binary" : {
+         "file" : "lib/Thrift/Parser/Type/binary.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::bool" : {
+         "file" : "lib/Thrift/Parser/Type/bool.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::byte" : {
+         "file" : "lib/Thrift/Parser/Type/byte.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::double" : {
+         "file" : "lib/Thrift/Parser/Type/double.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::i16" : {
+         "file" : "lib/Thrift/Parser/Type/i16.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::i32" : {
+         "file" : "lib/Thrift/Parser/Type/i32.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::i64" : {
+         "file" : "lib/Thrift/Parser/Type/i64.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::list" : {
+         "file" : "lib/Thrift/Parser/Type/list.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::map" : {
+         "file" : "lib/Thrift/Parser/Type/map.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::set" : {
+         "file" : "lib/Thrift/Parser/Type/set.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::string" : {
+         "file" : "lib/Thrift/Parser/Type/string.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Type::void" : {
+         "file" : "lib/Thrift/Parser/Type/void.pm",
+         "version" : 0
+      },
+      "Thrift::Parser::Types" : {
+         "file" : "lib/Thrift/Parser/Types.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ewaters/thrift-parser/issues?labels=bug"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ewaters/thrift-parser"
+      }
+   },
+   "version" : "0.06"
+}

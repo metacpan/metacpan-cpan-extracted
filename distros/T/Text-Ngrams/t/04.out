@@ -1,0 +1,100 @@
+BEGIN OUTPUT BY Text::Ngrams version 
+
+1-GRAMS (total count: 55)
+FIRST N-GRAM: \t
+ LAST N-GRAM: \n
+-------------------------
+\t	3
+\n	3
+_	12
+,	2
+.	3
+T	1
+b	3
+c	1
+e	1
+f	3
+h	1
+i	1
+k	1
+n	3
+o	6
+q	1
+r	3
+u	1
+w	3
+x	3
+
+2-GRAMS (total count: 54)
+FIRST N-GRAM: \t T
+ LAST N-GRAM: . \n
+-------------------------
+\t _	1
+\t T	1
+\t b	1
+\n \t	2
+_ _	5
+_ .	1
+_ b	2
+_ f	3
+_ q	1
+, \n	2
+. \n	1
+. .	2
+T h	1
+b r	3
+c k	1
+e _	1
+f o	3
+h e	1
+i c	1
+k _	1
+n _	3
+o w	3
+o x	3
+q u	1
+r o	3
+u i	1
+w n	3
+x _	1
+x ,	2
+
+3-GRAMS (total count: 53)
+FIRST N-GRAM: \t T h
+ LAST N-GRAM: . . \n
+-------------------------
+\t _ _	1
+\t T h	1
+\t b r	1
+\n \t _	1
+\n \t b	1
+_ _ _	4
+_ _ b	1
+_ . .	1
+_ b r	2
+_ f o	3
+_ q u	1
+, \n \t	2
+. . \n	1
+. . .	1
+T h e	1
+b r o	3
+c k _	1
+e _ b	1
+f o x	3
+h e _	1
+i c k	1
+k _ f	1
+n _ f	2
+n _ q	1
+o w n	3
+o x _	1
+o x ,	2
+q u i	1
+r o w	3
+u i c	1
+w n _	3
+x _ .	1
+x , \n	2
+
+END OUTPUT BY Text::Ngrams

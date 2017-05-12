@@ -1,0 +1,12 @@
+Changes
+lib/Tie/Util.pm
+Makefile.PL
+MANIFEST
+misc/dummy.pm
+README
+t/Test/Builder/Module.pm
+t/Test/Builder.pm
+t/Test/More.pm
+t/Test/README
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

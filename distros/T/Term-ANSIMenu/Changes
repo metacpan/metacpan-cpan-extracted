@@ -1,0 +1,9 @@
+Revision history for Perl extension Term::ANSIMenu.
+
+0.01  Thu Apr 17 14:14:29 2003
+	- Original version; created by h2xs 1.21 with options -XA -n Term::ANSIMenu
+0.02  Sat Apr 19 12:16:42 2003
+  - Added 76 tests
+  - Made clearing the screen after exit optional
+  - Added line_after_menu() method
+  - Improved POD

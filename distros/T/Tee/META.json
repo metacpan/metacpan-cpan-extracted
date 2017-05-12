@@ -1,0 +1,74 @@
+{
+   "abstract" : "Pure Perl emulation of GNU tee",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tee",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : 0,
+            "File::Basename" : 0,
+            "Getopt::Long" : 0,
+            "IO::File" : 0,
+            "Probe::Perl" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Spec" : 0,
+            "File::Temp" : 0,
+            "IO::CaptureOutput" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Tee" : {
+         "file" : "lib/Tee.pm",
+         "version" : "0.14"
+      },
+      "Tee::App" : {
+         "file" : "lib/Tee/App.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/dagolden/tee/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dagolden/tee.git",
+         "web" : "http://github.com/dagolden/tee/tree"
+      }
+   },
+   "version" : "0.14"
+}
+

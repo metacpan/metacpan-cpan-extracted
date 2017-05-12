@@ -1,0 +1,11 @@
+CHANGES
+lib/Tie/STDOUT.pm
+Makefile.PL
+MANIFEST
+README
+t/00_use.t
+t/01_defaults.t
+t/02_user_defined.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

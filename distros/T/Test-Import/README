@@ -1,0 +1,53 @@
+NAME
+    Test::Import - Test functions to ensure modules import things
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        use Test::Import qw( :all );
+
+        # Ensure our base module imports strict
+        does_import_strict 'My::Base';
+
+        # Ensure our base module imports warnings
+        does_import_warnings 'My::Base';
+
+        # Ensure our base module imports a sub from another module
+        does_import_sub 'My::Base', 'Scalar::Util', 'blessed';
+
+        # Ensure our base module loads a class
+        does_import_class 'My::Base', 'File::Spec';
+
+DESCRIPTION
+    This module encapsulates a bunch of tests for testing base or
+    boilerplate modules (e.g. modules that use Import::Into to force things
+    into the calling namespace). These tests ensure that the base module
+    imports what it says it imports.
+
+EXPORTED FUNCTIONS
+  does_import_strict 'My::Module'
+    Ensure My::Module forces strict into the calling namespace.
+
+  does_import_warnings 'My::Module'
+    Ensure My::Module forces warnings into the calling namespace.
+
+  does_import_sub 'My::Module', 'Imported::Module', 'imported_sub'
+    Ensure that My::Module exports 'imported_sub' from Imported::Module into
+    the calling namespace.
+
+  does_import_class 'My::Module', 'Imported::Class'
+    Ensure that My::Module loads Imported::Class.
+
+SEE ALSO
+    *   Test::Exports
+
+AUTHOR
+    Doug Bell <preaction@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Doug Bell.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

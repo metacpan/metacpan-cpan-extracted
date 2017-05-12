@@ -1,0 +1,134 @@
+Revision history for Perl extension Tie::DiskUsage.
+
+0.22  2016-11-30  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.21_05  2016-11-26  <schubiger@cpan.org>
+
+ - List FindBin as prerequisite.
+
+ - Mention elevating permissions.
+
+0.21_04  2016-11-22  <schubiger@cpan.org>
+
+ - Document all possible operations on tied hash.
+
+ - Optimize fetching single disk usage entry.
+
+0.21_03  2016-11-19  <schubiger@cpan.org>
+
+ - Don't inherit from Tie::StdHash.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+0.21_02  2016-11-17  <schubiger@cpan.org>
+
+ - Improve {FIRST,NEXT}KEY().
+
+ - Skip documentation tests for non-release testing.
+
+ - Add metadata repository link.
+
+0.21_01  2016-11-14  <schubiger@cpan.org>
+
+ - Parse disk usage each time data is requested.
+
+ - Implement all read-only operations on tied hash;
+   add tests.
+
+ - Croak when attempting to modify the tied hash.
+
+0.21  2010-09-08  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.20_01  2010-08-22  <schubiger@cpan.org>
+
+ - Validate arguments passed to tie().
+
+ - Refactor _locate_du() and _parse_usage().
+
+ - Don't implicitly pass @_ to _tie() and _parse_usage().
+
+ - Require Cwd in order to get the current working directory.
+
+ - Reword the message being printed when du can't be located.
+
+ - Rephrase the description part of the documentation.
+
+ - Mention bugs and caveats.
+
+ - Spell disk usage without a hyphen.
+
+ - Update broken license link.
+
+ - Add a test file for validations.
+
+ - Move BAIL_OUT() to 00-load.t and correct the message emitted.
+
+ - Remove the testing diagnostic.
+
+ - Restore $Tie::DiskUsage::DU_BIN's default in tie.t.
+
+ - Enclose tests in blocks within tie.t.
+
+ - Use ok() instead of is() when testing to locate du.
+
+ - Adjust some file permissions.
+
+0.20 Sat Jan 19 15:49:19 CET 2008
+
+ - Require File::Spec at compile-time within the tie test
+   and bail out when 'du' cannot be located. Moreover, don't
+   check for exact disk-usage within the target dir, but for
+   greater than zero disk-usage [reported by cpantesters].
+
+0.19 Thu Jan 17 14:27:27 CET 2008
+
+ - Added basic tie test.
+
+ - Beautified code layout.
+
+ - Added AUTHOR/LICENSE sections to the documentation.
+
+0.18 Don Dec 14 02:17:28 CET 2006
+
+ - Extended the "SEE ALSO" section to include links
+   to similar minded distributions. [belg4mit@mit.edu]
+
+0.17 Tue Dec 12 09:58:58 CET 2006
+
+ - Instead of populating an array with the output of
+   du, iterating through each element will take place.
+
+0.16 Mon Dec 11 22:07:09 CET 2006
+
+ - Applied bugfix to allow file-/pathnames to
+   contain whitespaces [John Stoffel, john.stoffel@taec.toshiba.com]
+
+ - Cleaned whitespace up in DiskUsage.pm
+
+0.15 Tue May  2 20:52:27 CEST 2006
+
+ - The function _locate_du() croaks in case the du
+   binary can't be found with the du basename prefixed.
+
+0.14 Mon May  1 16:30:27 CEST 2006
+
+ - Symbol is now part of the prerequisite set.
+
+ - A suitable Build.PL has been added.
+
+ - Made the INSTALL file a part of the distribution.
+
+ - The test-suite has been extended to include module
+   loading & pod tests.
+
+0.03 2004/01/27
+
+ - bin/du.pl has been added.
+
+0.01 2004/01/26
+
+ - Initial version.

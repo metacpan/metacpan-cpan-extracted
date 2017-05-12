@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+TextDir.pm
+t/basic.t

@@ -1,0 +1,1 @@
+Hello, {$lang|capitalize} world!

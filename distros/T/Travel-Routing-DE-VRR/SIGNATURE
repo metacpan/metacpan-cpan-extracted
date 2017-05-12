@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 fe7a884bae43146ed5576d4ed25f0c0c79827975 Build.PL
+SHA1 430fa50626090724afc7896d6abc5c6bd837ceab Changelog
+SHA1 4866e931889044e286e4b67cb767023e6b5909ff MANIFEST
+SHA1 5b57abfa2b062f212a7029f8db873356452539eb META.json
+SHA1 afc905bdc05100154244c47b1ebd3ed0f8ab06fb META.yml
+SHA1 c6e303925407d26c163199ed9271b53a78fcb72e README
+SHA1 7daff8fcd3b56e78a77f52cdccd59610addb2249 bin/efa
+SHA1 11dd417fa4b6bd258129a5d94010795e3193dcf3 lib/Travel/Routing/DE/EFA.pm
+SHA1 4e81d0b9b147908893b14bf39b55a1919fad5a83 lib/Travel/Routing/DE/EFA/Exception.pod
+SHA1 afaf7aeb27ee900630feeba53865a88c482c8a63 lib/Travel/Routing/DE/EFA/Route.pm
+SHA1 1c5c5a152c22519ac1b95857f7fb3ca60e8da4da lib/Travel/Routing/DE/EFA/Route/Message.pm
+SHA1 316b4d1ab82bd69602eb17af52f37778d03eaac0 lib/Travel/Routing/DE/EFA/Route/Part.pm
+SHA1 d945b927d6b5e3455a03f8183779226ea9a86df1 lib/Travel/Routing/DE/VRR.pm
+SHA1 261db543570571077efcef95de8bb1ed54e2ca9e provides/zsh/completions/_efa
+SHA1 6cfaebdb4d57688b8ac50f3e840a99a48c15457b t/00-compile-pm.t
+SHA1 3adfc7da6082f15051da7fbda884723388738b61 t/01-compile-pl.t
+SHA1 fd251ffc56ca6e52020c906b61158f78b035679d t/10-pod.t
+SHA1 8dc8c00805587f384169c37a1b1ba58c35441b50 t/20-vrr.t
+SHA1 bff170282d6990434cda28454e1d1ad6a746f02f t/21-vrr.t
+SHA1 03c61137db01ab6c66d6d57c6de800033e8f2966 t/in/ambiguous
+SHA1 7f75ab59522856d704efb6e94d3d76bf830b26b0 t/in/e_alf_d_hbf.xml
+SHA1 b090ebff2ae34df32f307c0a3cd5b90b7140044a t/in/e_hbf_b_hbf.ice
+SHA1 c9bbc91ea2a9412a0710ac51b3b3aa1170d4e737 t/in/e_hbf_b_hbf.xml
+SHA1 f2eca047f6ac07a38cd7438a4d9f6429201bc45b t/in/e_hbf_d_hbf.json
+SHA1 2653e00afa657bcaa7983046856314b3dfd2f485 t/in/e_hbf_du_hbf.ice
+SHA1 71a6764869c3a451d8bbdf88a62d6d36aab26f86 t/in/e_hbf_e_alfredusbad.json
+SHA1 acf8aadf2536de7c4ee297b9e3be110efb9e6a05 t/in/e_hbf_k_hbf.xml
+SHA1 90fb6ff0cfe39ec7a4ed7eec2c48c62ca21a637c t/in/e_hbf_mh_hbf
+SHA1 52c4bdb38ab8fc19dc4c8d30ecbcca3e4267cce1 t/in/e_hbf_mh_hbf.xml
+SHA1 45c2836cb02fda0befc7c014aa1e91fd849f08c7 t/in/e_martinstr_e_florastr
+SHA1 ae32311fc3fcc472bc8e8d859c334863c0e2b0ce t/in/e_werden_e_hbf
+SHA1 17b18a70d24e307826c7701b6ed38bb9e470de5c t/in/invalid_input
+SHA1 4b671309c970bc1c0ea0d9dd2f4094df1b246c86 t/in/no_connections
+SHA1 750c1b500bc0bf95c83b83670646624c8d97693a t/out/e_hbf_b_hbf.ice
+SHA1 368485420399cdc7b724f815e1a8790eeb3a4b70 t/out/e_hbf_b_hbf.ice.ignore_all
+SHA1 3c10463afe1249175c480148af33c6b8f0f321f3 t/out/e_hbf_du_hbf.ice
+SHA1 805181465d06c31f11d3c456276c9a747b7feafb t/out/e_hbf_mh_hbf
+SHA1 cb58b25096325a6080109f0323c42a80726b38a2 t/out/e_hbf_mh_hbf.ignore_none
+SHA1 7469ef9df305ac872ca14f85c6e99c53db9a3dd1 t/out/e_martinstr_e_florastr
+SHA1 a5f60da1ae99a74c798a8aa25dc92d8e469176fd t/out/e_werden_e_hbf
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeBu3Bxxr9kjq6wihEA1b+1Fm4AUFAli63h8ACgkQEA1b+1Fm
+4AWlwQ/8CSmzUz1Z2loNDS3puaapUMwleTApSlgKliSo2KpyGVc9xa91PgNeOs2M
+R7mm9fhoUJ+eWsoJml0q1/10ll0b2UqW2H3H39/yyhK172BLqkKSxIUVoA3kXif3
+v6nGez63xCVR24onJWdaAgAootGXjMCeJH8BUoQHpI45u068p3DMIXYW1BpJlYVM
+Yc06mTsSIWKqK49rzRd4vN1QQ1DpspVNgqlc7PNN9fv1qJsVc5W6kyGcFswSnDI6
+97qIo90Ejl0Gj0W+RpbLniCpNqIY57eoDOwahwG7sjpgOyPl/P8GGDeRbbqDd5Z7
+4ughtSOn8jQvWYbDTn4//Gn31GN6ZVZPhUfbV8HX3uHwS0RBwDlLfBObYDFR2pdK
+MOQqE+cJLZwXUkDVAR6RK4axg1ylKdcX9Tj9a9UnldUmf+o54aEmiHYMZ2+/eSwK
+OPHHJibjyEDHOcaQ5rUXYPJ5Gp8oN5kxFKxiGaWWWJs7uQ01cEhJJaT8GSusvZPi
+nUqw5Zd4C8uO1x7wuxmI87q3GAWcy9AG9Bf7kH0nIkfeX4ZGk6JZwMH2U8XpCnEq
+7ogAxvDd+Kom8RKF+Edjhq+JQSJxS2jmbyT5qlGEMhpFqPg0mKD9WyoVQJ/XdXZ7
+FwiPZhBZtcrfZbr5o1V1qWrvhrTapp9acf+0HB5x6sswQHp58kY=
+=OCrU
+-----END PGP SIGNATURE-----

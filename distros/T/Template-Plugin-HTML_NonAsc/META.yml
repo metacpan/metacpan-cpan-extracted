@@ -1,0 +1,26 @@
+---
+name: Template-Plugin-HTML_NonAsc
+version: 0.03
+author:
+  - 'Johan Vromans <jv@cpan.org>'
+abstract: Slightly less picky html filter.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  HTML::Entities: 0
+  Template: 0.22
+  Test::More: 0
+requires:
+  HTML::Entities: 0
+  Template: 0.22
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Template::Plugin::HTML_NonAsc:
+    file: lib/Template/Plugin/HTML_NonAsc.pm
+    version: 0.03
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

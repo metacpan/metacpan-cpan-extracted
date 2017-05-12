@@ -1,0 +1,1333 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Test::CGI::External - run tests on an external CGI program
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Test::More;
+    use Test::CGI::External;
+    my $tester = Test::CGI::External->new ();
+    $tester->set_cgi_executable ("$Bin/x.cgi");
+    my %options;
+    note ("Automatically tests");
+    $tester->run (\%options);
+    note ("Test with a query");
+    $options{REQUEST_METHOD} = 'GET';
+    $options{QUERY_STRING} = 'text="alcohol"';
+    $tester->run (\%options);
+    note ("Test compression of output");
+    $tester->do_compression_test (1);
+    note ("Test that you're getting the right kind of character output.");
+    $tester->expect_charset ('UTF-8');
+    note ("Test the mime type");
+    $tester->expect_mime_type ('text/html');
+    $tester->run (\%options);
+    note ("Run your own tests on the results");
+    like ($options{body}, qr/私/, "IT'S ALRIGHT!");
+    done_testing ();
+
+
+produces output
+
+    ok 1 - found executable /usr/home/ben/projects/test-cgi-external/examples/x.cgi
+    ok 2 - /usr/home/ben/projects/test-cgi-external/examples/x.cgi is executable
+    # Automatically tests
+    You have not set the request method, so I am setting it to the default, 'GET' at /usr/home/ben/projects/test-cgi-external/examples/synopsis.pl line 12.
+    ok 3 - The CGI executable exited with zero status
+    ok 4 - The CGI executable produced some output
+    ok 5 - The CGI executable did not produce any output on the error stream
+    ok 6 - Output contains a blank line
+    ok 7 - The header on line 1, 'Content-Type: text/html;charset=UTF-8', appears to be a correctly-formed HTTP header
+    ok 8 - There is a Content-Type header
+    ok 9 - The Content-Type header is well-formed
+    # Test with a query
+    ok 10 - The CGI executable exited with zero status
+    ok 11 - The CGI executable produced some output
+    ok 12 - The CGI executable did not produce any output on the error stream
+    ok 13 - Output contains a blank line
+    ok 14 - The header on line 1, 'Content-Type: text/html;charset=UTF-8', appears to be a correctly-formed HTTP header
+    ok 15 - There is a Content-Type header
+    ok 16 - The Content-Type header is well-formed
+    # Test compression of output
+    # Test that you're getting the right kind of character output.
+    # Test the mime type
+    ok 17 - The CGI executable exited with zero status
+    ok 18 - The CGI executable produced some output
+    ok 19 - The CGI executable did not produce any output on the error stream
+    ok 20 - Output contains a blank line
+    ok 21 - The header on line 1, 'Content-Type: text/html;charset=UTF-8', appears to be a correctly-formed HTTP header
+    ok 22 - The header on line 2, 'Content-Encoding: gzip', appears to be a correctly-formed HTTP header
+    ok 23 - There is a Content-Type header
+    ok 24 - The Content-Type header is well-formed
+    ok 25 - Got expected mime type text/html = text/html
+    ok 26 - Specifies a charset
+    ok 27 - Got expected charset UTF-8 = UTF-8
+    ok 28 - The header claims that the output is compressed
+    ok 29 - The body of the CGI output was able to be decompressed using 'gunzip'. The uncompressed size is 56. The compressed output is 137.5% of the uncompressed size.
+    # Run your own tests on the results
+    ok 30 - IT'S ALRIGHT!
+    1..30
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/synopsis.pl> in the distribution.)
+
+
+After the test has run, the uncompressed output is in
+C<$options{body}>.
+
+=head1 VERSION
+
+This documents Test::CGI::External version 0.22
+corresponding to git commit L<240033de16aaa936eba002912df13b193e26fea1|https://github.com/benkasminbullock/test-cgi-external/commit/240033de16aaa936eba002912df13b193e26fea1> released on Mon Mar 6 16:51:25 2017 +0900.
+
+=head1 DESCRIPTION
+
+Test::CGI::External is a tool for mocking a CGI (common gateway
+interface) environment and running basic checks of the operation of a
+CGI program. For example,
+
+    use Test::More;
+    my $tester = Test::CGI::External->new ();
+    $tester->set_cgi_executable ('example.cgi');
+    $tester->run ({});
+    done_testing ();
+
+tests whether
+
+=over
+
+=item * there is a program called F<example.cgi>,
+
+=item * the program F<example.cgi> is executable (except on Windows),
+
+=back
+
+and when run, F<example.cgi> 
+
+=over
+
+=item * produces something on standard output;
+
+=item * produces a correct C<Content-Type> header;
+
+=item * does not print out ill-formed headers (for example, print
+debugging messages on standard output);
+
+=item * exits with a zero status;
+
+=item * does not print any error messages.
+
+=back
+
+Test::CGI::External tests for mistakes such as forgetting to install
+the program, forgetting to make it executable, executing print
+statements before the headers are printed, exiting without any
+printing output, or printing useless error messages during running.
+
+Test::CGI::External runs CGI programs as stand-alone programs, under a
+faked CGI-like environment created by manipulating environment
+variables. Thus it does not require a web server.  The tested CGI
+program can be in any language, not just Perl; the "external" in
+Test::CGI::External means it is meant to test external programs which
+are completely independent of itself. Test::CGI::External was
+originally created to check the operation of CGI programs written in
+C.
+
+Test::CGI::External is meant for the testing stage before the program
+is put onto a web server. For example, if a program with stray printf
+statements is uploaded to the web server and run as a CGI program, the
+browser will show only a 500 Server Error message. If the program is
+tested with this module before being uploaded, it will be much easier
+to find the error. Another typical mistake is forgetting to make the
+CGI program executable; again, this results in a
+difficult-to-understand server error. This module nips these sorts of
+problems in the bud by checking for careless mistakes before the
+uploading.
+
+Test::CGI::External is TAP (Test Anything Protocol)-compliant and
+works with the standard Perl testing modules like L<Test::More>.
+
+=head1 METHODS
+
+These are the main methods you need to run tests.
+
+=head2 new
+
+    my $tester = Test::CGI::External->new ();
+
+Create a new testing object.
+
+=head2 plan
+
+Print the TAP (Test Anything Protocol) plan. This has to be done at
+the end of the execution. As shown in L</SYNOPSIS>, you usually don't
+have to print this but can use L<Test::More/done_testing>, since this
+module uses the L<Test::Builder> singleton internally.
+
+=head2 run
+
+    $tester->run (\%options);
+
+Run the cgi executable specified using L</set_cgi_executable> with the
+inputs specified in C<%options>. The argument must be a hash
+reference. See L</Possible options> for possible options. See
+L</Outputs> for outputs. Here is an example:
+
+    
+    use FindBin '$Bin';
+    use Test::More;
+    use Test::CGI::External;
+    my %options;
+    $options{REQUEST_METHOD} = 'GET';
+    $options{QUERY_STRING} = "q=rupert+the+bear";
+    my $tester = Test::CGI::External->new ();
+    $tester->set_cgi_executable ("$Bin/rupert.cgi");
+    $tester->run (\%options);
+    like ($options{body}, qr/everyone/i);
+    done_testing ();
+
+
+produces output
+
+    ok 1 - found executable /usr/home/ben/projects/test-cgi-external/examples/rupert.cgi
+    ok 2 - /usr/home/ben/projects/test-cgi-external/examples/rupert.cgi is executable
+    ok 3 - The CGI executable exited with zero status
+    ok 4 - The CGI executable produced some output
+    ok 5 - The CGI executable did not produce any output on the error stream
+    ok 6 - Output contains a blank line
+    ok 7 - The header on line 1, 'Content-Type: text/plain', appears to be a correctly-formed HTTP header
+    ok 8 - There is a Content-Type header
+    ok 9 - The Content-Type header is well-formed
+    ok 10
+    1..10
+
+
+(This example is included as L<F<rupert.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/rupert.pl> in the distribution.)
+
+
+You can also use run without an argument to do basic tests, but this
+module will print warnings. Use L</set_no_warnings> to stop it
+printing these.
+
+=head2 set_cgi_executable
+
+    $tester->set_cgi_executable ('my.cgi');
+
+Set the CGI program to be tested to F<my.cgi>. This runs tests which
+check whether the file exists and is executable. 
+
+To send command-line options to the program, give arguments after the
+name of the executable:
+
+    $tester->set_cgi_executable ('my.cgi', '-o', 'xyz');
+
+=head2 test_not_implemented
+
+    $tester->test_not_implemented ();
+
+Test how your CGI program responds to an unknown request method. This
+sends a request with a method consisting of gibberish to the CGI and
+checks that the response contains the HTTP status C<501 Not
+Implemented>. 
+
+This tests compliance with B<6.3.3. Status> of L<RFC
+3875|/Specification of the Common Gateway Interface>:
+
+=over
+
+Status code 501 'Not Implemented' may be returned by a script if it
+receives an unsupported REQUEST_METHOD.
+
+=back
+
+If you need to, you can supply your own request method as the first
+argument:
+
+    $tester->test_not_implemented ('SUFFER');
+
+The request method probably should not be something like C<POST> or
+C<HEAD>. If you need to test how your script handles a known but not
+supported request method, for example if you want to reject POST
+requests, use L</test_method_not_allowed>.
+
+All the script outputs and headers are discarded after this method has
+completed.
+
+This method was added in version 0.19. 
+
+=head2 test_method_not_allowed
+
+    $tester->test_method_not_allowed ('POST');
+
+Test how your CGI program responds to a known but unsupported request
+method, such as POST, HEAD, or OPTIONS. This sends a request with the
+tested method to your CGI program and captures the response. It then
+checks that the captured response contains the HTTP status C<405
+Method Not Allowed>, and an C<Allow:> header. This tests compliance
+with B<6.3.3. Status> of L<RFC 3875|/Specification of the Common
+Gateway Interface>:
+
+=over
+
+The script MAY reject with error 405 'Method Not Allowed' HTTP/1.1
+requests made using a method it does not support.
+
+=back
+
+and B<10.4.6 405 Method Not Allowed> of L<RFC 2616|/Specification for
+HTTP headers>:
+
+=over
+
+The response MUST include an Allow header containing a list of valid
+methods for the requested resource.
+
+=back
+
+This test further checks the validity of the allow header by making
+requests for each of the request methods it defines. For example, if
+your allow header contains C<GET> and C<POST>, this makes GET and POST
+requests to your script to see whether it handles them or not. If a
+POST request is made, a very simple request with the content type set
+to C<application/x-www-form-urlencoded> and the content C<a=b> is
+made.
+
+If you need to check how your script responds to completely unexpected
+request methods, use L</test_not_implemented> rather than this method.
+
+All the CGI script outputs, including headers, are discarded after
+this method has completed.
+
+For example, given this script:
+
+    
+    my $rm = $ENV{REQUEST_METHOD};
+    if (! $rm) {
+        die "No request method";
+    }
+    if ($rm eq 'POST') {
+        print <<EOF;
+    Status: 405
+    Allow: GET, HEAD
+    
+    EOF
+    }
+    elsif ($rm eq 'GET') {
+        print <<EOF;
+    Content-Type: text/plain
+    
+    Greetings
+    EOF
+    }
+    elsif ($rm eq 'HEAD') {
+        print <<EOF;
+    Content-Type: text/plain
+    
+    EOF
+    }
+    else {
+        print <<EOF;
+    Status: 501
+    
+    EOF
+    }
+    
+
+
+this test:
+
+    
+    use FindBin '$Bin';
+    use Test::More;
+    use Test::CGI::External;
+    my $tester = Test::CGI::External->new ();
+    $tester->set_cgi_executable ("$Bin/../examples/bad-method.cgi");
+    $tester->test_not_implemented ();
+    $tester->test_method_not_allowed ('POST');
+    done_testing ();
+
+
+produces output
+
+    ok 1 - found executable /usr/home/ben/projects/test-cgi-external/examples/../examples/bad-method.cgi
+    ok 2 - /usr/home/ben/projects/test-cgi-external/examples/../examples/bad-method.cgi is executable
+    ok 3 - The CGI executable exited with zero status
+    ok 4 - The CGI executable produced some output
+    ok 5 - The CGI executable did not produce any output on the error stream
+    ok 6 - Output contains a blank line
+    ok 7 - The header on line 1, 'Status: 501', appears to be a correctly-formed HTTP header
+    ok 8 - Got status header
+    ok 9 - Got 501 status
+    ok 10 - The CGI executable exited with zero status
+    ok 11 - The CGI executable produced some output
+    ok 12 - The CGI executable did not produce any output on the error stream
+    ok 13 - Output contains a blank line
+    ok 14 - The header on line 1, 'Status: 405', appears to be a correctly-formed HTTP header
+    ok 15 - The header on line 2, 'Allow: GET, HEAD', appears to be a correctly-formed HTTP header
+    ok 16 - Got Allow header
+    ok 17 - Got method not allowed status
+    ok 18 - The CGI executable exited with zero status
+    ok 19 - The CGI executable produced some output
+    ok 20 - The CGI executable did not produce any output on the error stream
+    ok 21 - Output contains a blank line
+    ok 22 - The header on line 1, 'Content-Type: text/plain', appears to be a correctly-formed HTTP header
+    ok 23 - Method GET specified by Allow: header was allowed
+    ok 24 - The CGI executable exited with zero status
+    ok 25 - The CGI executable produced some output
+    ok 26 - The CGI executable did not produce any output on the error stream
+    ok 27 - Output contains a blank line
+    ok 28 - The header on line 1, 'Content-Type: text/plain', appears to be a correctly-formed HTTP header
+    ok 29 - Method HEAD specified by Allow: header was allowed
+    1..29
+
+
+(This example is included as L<F<bad-request.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/bad-request.pl> in the distribution.)
+
+
+This method was added in version 0.19.
+
+=head2 test_status
+
+    $tester->run (\%options);
+    $tester->test_status (501);
+
+Call this method with a numerical HTTP status. It provides a
+convenient way to test whether you got an expected C<Status:> header
+in the output after using L</run>. It runs two tests. First it runs a
+test that there is a status header in the output, and second it runs a
+test that the output status header matches your required status. If
+there is no output available for C<$tester> to look at, a warning is
+printed and no tests are run. The argument must be a three-digit
+integer number. If not, a warning is printed and no tests are run.
+
+Note that you do not need to produce a 200 status header from a CGI
+script. From L<RFC 3875|/Specification of the Common Gateway
+Interface>
+
+=over
+
+Status code 200 'OK' indicates success, and is the default value
+assumed for a document response.
+
+=back
+
+Thus this test is not part of the tests done by L</run>. It is only
+necessary for when you expect the status to not be 200. See the
+L</Specification for HTTP headers> and related documents, or the Perl
+module L<HTTP::Status> (part of the L<HTTP::Message> distribution),
+for a list of valid HTTP statuses.
+
+This method was added in version 0.21.
+
+=head2 test_411
+
+    $tester->test_411 ();
+
+Test whether your CGI program responds to a POST request with a
+CONTENT_LENGTH of zero with a C<411 Length Required> header.
+
+Since this response is not compulsory, and not every program needs to
+respond to POST requests, this test is optional. From B<4.4 Message
+Length> of L<RFC 2616|/Specification for HTTP headers>:
+
+=over
+
+If a request contains a message-body and a Content-Length is not
+given, the server SHOULD respond with 400 (bad request) if it cannot
+determine the length of the message, or with 411 (length required) if
+it wishes to insist on receiving a valid Content-Length.
+
+=back
+
+It's possible to send your own message, as in
+
+    $tester->test_411 (\%options);
+
+You need to set L</REQUEST_METHOD> to C<POST>. The output is not
+checked for a correct Content-Type: header.
+
+This method was added in version 0.22. See also L<this discussion|https://groups.google.com/forum/#!topic/sljfaqorg/HqhWjPg25lU> for motivation.
+
+=head1 TEST OPTION METHODS
+
+These methods control test options.
+
+=head2 do_caching_test
+
+    $tester->do_caching_test (1);
+
+Turn on or off testing of caching. If this test is "on", it will be
+tested whether the CGI executable produces a "Last-Modified: " header
+with a correctly-formatted date, and is able to respond with a 304
+"Not modified" response when sent an identical query and a date later
+than its "Last-Modified" date. This requires L<HTTP::Date> to be
+installed.
+
+The test of the "Not modified" part is sandboxed away from the normal
+testing, so at the completion of L</run>, the outputs are from the
+first run, where the program was not responding to "If Modified
+Since", rather than the second run. Warnings are also switched off
+during the "If Modified Since" part of the testing.
+
+Here is an example, using a CGI program which always claims not to be
+modified when asked:
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Test::More;
+    use Test::CGI::External;
+    my $tester = Test::CGI::External->new ();
+    $tester->set_cgi_executable ("$Bin/never-modified.cgi");
+    $tester->do_caching_test (1);
+    my %options = (
+        REQUEST_METHOD => 'GET',
+    );
+    $tester->run (\%options);
+    note ("The output is the output from the non-cached version.");
+    like ($options{body}, qr/Columbus/, "Body is from non-cached version");
+    done_testing ();
+    
+
+
+produces output
+
+    ok 1 - found executable /usr/home/ben/projects/test-cgi-external/examples/never-modified.cgi
+    ok 2 - /usr/home/ben/projects/test-cgi-external/examples/never-modified.cgi is executable
+    ok 3 - The CGI executable exited with zero status
+    ok 4 - The CGI executable produced some output
+    ok 5 - The CGI executable did not produce any output on the error stream
+    ok 6 - Output contains a blank line
+    ok 7 - The header on line 1, 'Content-Type: tura/satana', appears to be a correctly-formed HTTP header
+    ok 8 - The header on line 2, 'Last-Modified: Thu, 1 Jan 1970 00:00:00 GMT', appears to be a correctly-formed HTTP header
+    ok 9 - There is a Content-Type header
+    ok 10 - The Content-Type header is well-formed
+    ok 11 - Has last modified header
+    ok 12 - Last modified time can be parsed by HTTP::Date
+    ok 13 - The CGI executable exited with zero status
+    ok 14 - The CGI executable produced some output
+    ok 15 - The CGI executable did not produce any output on the error stream
+    ok 16 - Output contains a blank line
+    ok 17 - The header on line 1, 'Status: 304', appears to be a correctly-formed HTTP header
+    ok 18 - Got status header
+    ok 19 - Got 304 status
+    ok 20 - No body returned with 304 response
+    # The output is the output from the non-cached version.
+    ok 21 - Body is from non-cached version
+    1..21
+
+
+(This example is included as L<F<never-modified.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/never-modified.pl> in the distribution.)
+
+
+This method was added in version 0.10.
+
+=head2 do_compression_test
+
+    $tester->do_compression_test (1);
+
+Turn on or off testing of compression of the output of the CGI program
+which is being tested. Give any true value as the first argument to
+turn on compression testing. Give any false value to turn off
+compression testing. This requires either L<Gzip::Faster> or
+L<IO::Uncompress::Gunzip> to be installed.
+
+=head2 expect_charset
+
+    $tester->expect_charset ('UTF-8');
+
+Tell the tester to test whether the header declares the output
+character set correctly. 
+
+If you set an expected character set with C<expect_charset>, then the
+body of the output is upgraded from that encoding into Perl's Unicode
+encoding, C<utf8>. Unless the encoding is UTF-8, that upgrading is
+also added as a pass or fail test. For example,
+
+    $tester->expect_charset ('EUC-JP');
+
+adds a test for decoding from the EUC-JP encoding.  
+
+The behaviour of the module was changed in version 0.08 of this
+module. Prior to version 0.08, C<$output{body}> was not upgraded to
+C<utf8>. If you do not set an expected character set, no upgrading is
+done.
+
+=head2 expect_mime_type
+
+    $tester->expect_mime_type ('text/html');
+
+Tell C<$tester> what mime type to expect on the C<Content-Type> line
+of the header. A test is run that the mime type is what you said.
+
+This method was added in version 0.11.
+
+=head2 set_html_validator
+
+    $tester->set_html_validator ('./my-favourite-validator.pl');
+
+Set an HTML validator. The validator should be a standalone
+program. It should take take arguments of file names to validate, and
+print out to standard output the errors it finds. It should print
+nothing if it doesn't find any errors. Empty output from the HTML
+validator program is regarded as successful completion. The error
+output of the HTML validator is discarded. See also L</HISTORY> and
+L</BUGS> for why this is done this way.
+
+This method was added in version 0.10.
+
+=head2 set_no_check_content
+
+    $tester->set_no_check_content (1);
+
+This turns off testing of the "Content-Type" HTTP header. For example
+if you want to send redirects or "not modified" responses, you usually
+will not send any content, but just the HTTP headers, so you don't
+need a "Content-Type" header.
+
+=head2 set_no_warnings
+
+    $tester->set_no_warnings (1);
+
+Setting this to any true value turns off all the warnings. Setting
+this to a false value restores the warnings. Although the warnings are
+annoying, I suggest being cautious about turning these off.
+
+This method was added in version 0.12.
+
+=head2 set_verbosity
+
+    $tester->set_verbosity (1);
+
+This turns on or off messages from the module informing you of what it
+is doing. The default is "off".
+
+=head1 INPUT AND OUTPUT
+
+=head2 Possible options
+
+The following values may be set in the argument to L</run>,
+C<%options>.
+
+=over
+
+=item CONTENT_TYPE
+
+     $options{REQUEST_METHOD} = 'POST';
+     $options{CONTENT_TYPE} = 'application/x-www-form-urlencoded';
+     $test->run (\%options);
+
+The content type of the input. This is necessary when
+L</REQUEST_METHOD> is POST. It is usually either
+C<application/x-www-form-urlencoded> or
+C<multipart/form-data>. C<application/x-www-form-urlencoded> is the
+default value for CGI form queries.
+
+=item expect_errors
+
+     $options{expect_errors} = 1;
+     $test->run (\%options);
+
+Set to a true value if the program is expected to produce errors. This
+inverts the test that errors are not printed, and makes it into a test
+that errors are printed, so if your program doesn't print an error it
+will fail a test.
+
+=item expect_failure
+
+    $options{expect_failure} = 1;
+    $test->run (\%options);
+
+Expect the CGI program to exit with a non-zero error status. This
+switches off the test that the exit status of the executable is
+zero. It does not actually test what error status the CGI program
+exits with, so a zero error status will not cause a failed test. Note
+carefully that this behaviour is slightly different from that of
+L</expect_errors> in that it does not invert the test, but skips it.
+
+=item html
+
+     $options{html} = 1;
+     $test->run (\%options);
+
+If set to a true value, validate the html using a validator you have
+set up with L</set_html_validator>. It will also print a warning
+message if the mime type has not been set to C<text/html> with
+L</expect_mime_type>. The C<html> option is incompatible with the
+L</json> and L</png> options.
+
+=item HTTP_COOKIE
+
+     $options{HTTP_COOKIE} = 'nice=day';
+     $test->run (\%options);
+
+This option sets the environment variable C<HTTP_COOKIE> to whatever
+its value is. The environment variable is then unset at the end of the
+test run.
+
+=item input
+
+     $options{input} = $post_input;
+     $test->run (\%options);
+
+Input to send to the CGI program with a POST request. The environment
+variable CONTENT_LENGTH in the CGI program is automatically set to the
+length of this variable. See also L</content_length>.
+
+=item json
+
+     $options{json} = 1;
+     $test->run (\%options);
+
+Validate the body of the output as JSON using L<JSON::Parse>. The
+validation is run after decompression. It will also print a warning
+message if the mime type has not been set to C<application/json> or
+C<text/plain> with L</expect_mime_type>. The C<json> option is
+incompatible with the L</html> and L</png> options.
+
+=item no_check_content
+
+     $options{no_check_content} = 1;
+     $test->run (\%options);
+
+If this is set to a true value, the program does not check for the
+"Content-Type" header line produced by the CGI. This option is for the
+case where the CGI produces, for example, a "Location: " response
+without a body. See also the L</set_no_check_content> method.
+
+=item no_check_request_method
+
+    $options{no_check_request_method} = 1;
+
+If you need to set L</REQUEST_METHOD> to a method other than
+POST, GET, or HEAD, set this to a true value to override the check of
+the request method. For example, if you need to check how your CGI
+program responds to PROPFIND requests, use
+
+    $options{no_check_request_method} = 1;
+    $options{REQUEST_METHOD} = 'PROPFIND';
+
+This option was added in version 0.15.
+
+=item png
+
+     $options{png} = 1;
+     $test->run (\%options);
+
+Validate the body of the output as PNG (portable network graphics, an
+image format) using L<Image::PNG::Libpng>. If you choose this, the
+parsed PNG data is output into C<$options{pngdata}>, where you can
+apply any further tests to it if you wish. The following example
+demonstrates how this test could be applied to a CGI binary which
+produces a PNG output.
+
+    
+    use Test::More;
+    use Test::CGI::External;
+    use Image::PNG::Libpng ':all';
+    my $binary = "/home/ben/projects/kanjivg/www/memory.cgi";
+    my $tester = Test::CGI::External->new ();
+    $tester->set_cgi_executable ($binary);
+    my %apple;
+    $apple{REQUEST_METHOD} = 'GET';
+    $apple{QUERY_STRING} = 'o=apple-touch-icon-57x57.png';
+    $apple{REMOTE_ADDR} = '127.0.0.1';
+    $apple{png} = 1;
+    $tester->expect_mime_type ('image/png');
+    $tester->run (\%apple);
+    my $pngdata = $apple{pngdata};
+    SKIP: {
+        if (! $pngdata) {
+            skip 2, "no png data";
+        }
+        my $ihdr = get_IHDR ($pngdata);
+        ok ($ihdr->{width} == 57, "width 57 as expected");
+        ok ($ihdr->{height} == 57, "height 57 as expected");
+    }
+    done_testing ();
+
+
+produces output
+
+    ok 1 - found executable /home/ben/projects/kanjivg/www/memory.cgi
+    ok 2 - /home/ben/projects/kanjivg/www/memory.cgi is executable
+    ok 3 - The CGI executable exited with zero status
+    ok 4 - The CGI executable produced some output
+    ok 5 - The CGI executable did not produce any output on the error stream
+    ok 6 - Output contains a blank line
+    ok 7 - The header on line 1, 'Content-Type: image/png', appears to be a correctly-formed HTTP header
+    ok 8 - The header on line 2, 'Expires: Fri, 03 Mar 2017 01:41:48 GMT', appears to be a correctly-formed HTTP header
+    ok 9 - The header on line 3, 'Content-Length: 3000', appears to be a correctly-formed HTTP header
+    ok 10 - There is a Content-Type header
+    ok 11 - The Content-Type header is well-formed
+    ok 12 - Got expected mime type image/png = image/png
+    ok 13 - Could read PNG from body
+    ok 14 - Got a valid value for PNG
+    ok 15 - width 57 as expected
+    ok 16 - height 57 as expected
+    1..16
+
+
+(This example is included as L<F<png-test.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/png-test.pl> in the distribution.)
+
+
+It will also print a warning message if the mime type has not been set
+to C<image/png> with L</expect_mime_type>. The C<png> option is
+incompatible with the L</html> and L</json> options.
+
+=item QUERY_STRING
+
+     $options{QUERY_STRING} = "word=babies";
+     $test->run (\%options);
+
+This option sets the environment variable C<QUERY_STRING> to whatever
+its value is. The environment variable is then unset at the end of the
+test run. If you do not set this, the environment variable
+QUERY_STRING is set to an empty string, as required by the CGI
+specification. From L<RFC 3875|/Specification of the Common Gateway
+Interface>, section 4.1.7. QUERY_STRING:
+
+=over
+
+The server MUST set this variable; if the Script-URI does not include
+a query component, the QUERY_STRING MUST be defined as an empty
+string ("").
+
+=back
+
+This behaviour was changed in version 0.22; prior to that,
+QUERY_STRING was not set in the environment if the user had not set
+it.
+
+=item REMOTE_ADDR
+
+     $options{REMOTE_ADDR} = "127.0.0.1";
+     $test->run (\%options);
+
+This option sets the environment variable C<REMOTE_ADDR> to whatever
+its value is. The environment variable is then unset at the end of the
+test run.
+
+=item REQUEST_METHOD
+
+     $options{REQUEST_METHOD} = "GET";
+     $test->run (\%options);
+
+This option may be set to one of POST, GET and HEAD. The module then
+sets the environment variable REQUEST_METHOD to this value. If not set
+at all, the module sets it to a default and prints a warning
+message.
+
+You can also set this to any other value you want, like C<OPTIONS> or
+something, using L</no_check_request_method>.
+
+=back
+
+=head2 Outputs
+
+The various outputs of the CGI program are also put into
+C<%options>. The entire output is available as L</output>, the entire
+error output is available as L</error_output>, and the parsed and
+processed output is available as L</body>, L</header>, and
+L</headers>.
+
+=over
+
+=item body
+
+    my %options;
+    $test->run (\%options);
+    my $body = $options{body};
+
+The body of the CGI output, the part after the headers. If you have
+requested compression testing with L</do_compression_test>, this will
+be the output after uncompression. If you have specified a character
+set with L</expect_charset>, it will be parsed from that character set
+into Perl's internal Unicode format.
+
+=item content_length
+
+The content length of your input in bytes, if you are making a C<POST>
+request. Note that this is the length in bytes, so it may differ from
+the return value of Perl's length function.
+
+For example,
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Test::More;
+    my $stuff = 'ばびぶべぼ';
+    note (length ($stuff));
+    use Test::CGI::External;
+    my %options;
+    $options{input} = $stuff;
+    my $tester = Test::CGI::External->new ();
+    $tester->set_cgi_executable ("$Bin/../t/test.cgi");
+    $tester->run (\%options);
+    note ($options{content_length});
+    $tester->plan ();
+
+
+produces output
+
+    # 5
+    ok 1 - found executable /usr/home/ben/projects/test-cgi-external/examples/../t/test.cgi
+    ok 2 - /usr/home/ben/projects/test-cgi-external/examples/../t/test.cgi is executable
+    You have not set the request method, so I am setting it to the default, 'GET' at /usr/home/ben/projects/test-cgi-external/examples/length.pl line 14.
+    ok 3 - The CGI executable exited with zero status
+    ok 4 - The CGI executable produced some output
+    ok 5 - The CGI executable did not produce any output on the error stream
+    ok 6 - Output contains a blank line
+    ok 7 - The header on line 1, 'Content-Type: text/html; charset=UTF-8', appears to be a correctly-formed HTTP header
+    ok 8 - There is a Content-Type header
+    ok 9 - The Content-Type header is well-formed
+    # 15
+    1..9
+
+
+(This example is included as L<F<length.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/length.pl> in the distribution.)
+
+
+=item error_output
+
+    my %options;
+    $test->run (\%options);
+    my $error_output = $options{error_output};
+
+Any errors output by the CGI program. This is an empty string if there
+were no errors, not the undefined value. If you are expecting to get
+error messages, remember to set L</expect_errors>, otherwise any error
+output at all will cause a test to fail.
+
+=item exit_code
+
+    $test->run (\%options);
+    my $exit_code = $options{exit_code};
+
+The exit value of the CGI program, the value of C<$status> in 
+
+    $status = system ('./example.cgi');
+
+=item header
+
+    $test->run (\%options);
+    my $header = $options{header};
+
+The header part of the CGI output as a single string. This is split
+from L</output>.
+
+=item headers
+
+    $test->run (\%options);
+    my $headers = $options{headers};
+    print $headers->{'content-type'};
+
+The received headers, parsed and put into lower case, with the
+key/value pairs of the hash reference C<$headers> being the keys and
+values from the HTTP header.
+
+For example, the status header is C<$options{headers}{status}>, so one
+could test for a 400 "Bad request" HTTP status like this:
+
+     $test->run (\%options);
+     like ($options{headers}{status}, qr/400/);
+
+This output was added in version 0.09 of this module.
+
+=item output
+
+    $test->run (\%options);
+    my $output = $options{output};
+
+The entire output of the CGI program, unprocessed. If you have
+requested compression testing with L</do_compression_test>, this will
+contain binary compressed data. It is also not upgraded into Unicode.
+
+=back
+
+=head1 TESTS APPLIED
+
+The following tests are applied. "Must-pass" tests cannot be switched
+off. "Skippable" tests can be skipped if you choose. "Optional" tests
+are not run unless you request them. "Invertible" tests can be made to
+test the opposite result.
+
+=over
+
+=item CGI executable exists (Must-pass) 
+
+This test is run by L</set_cgi_executable>.
+
+=item CGI executable is an executable file (Must-pass) 
+
+This test is run by L</set_cgi_executable>. This test is skipped on Windows.
+
+=item The exit status of the CGI program is zero (Skippable) 
+
+This test is run by L</run>. It may be skipped using L</expect_failure>.
+
+=item The program has produced output (Must-pass)
+
+This test is run by L</run>. This tests for the problem that the
+program has exited without producing any output whatsoever, not that
+the program has not produced correctly formatted message body or
+headers.
+
+=item The program does not produce error output (Invertible)
+
+This test is run by L</run>. It may be inverted using
+L</expect_errors>. It's meant to catch things like stray fprintf
+statements in the executable.
+
+=item The program has printed headers (Must-pass)
+
+This test is run by L</run>. This tests for some headers followed by a
+blank line.
+
+=item Each header is correctly formatted (Must-pass)
+
+This test is run by L</run>. It's meant to catch things like stray
+printf statements in the executable, or forgetting to print a
+header. The header format is as defined by L</Specification for HTTP
+headers>. Each line of the header is checked as a separate test.
+
+=item The program has printed a Content-Type header (Skippable)
+
+This test is run by L</run>. It may be skipped using L</no_check_content>.
+
+=item The mime type in the Content-Type header is what you want (Optional)
+
+This test is run by L</run>. It is an optional test switched on by the
+L</expect_mime_type> method.
+
+=item The charset parameter of the Content-Type header is what you want (Optional)
+
+This test is run by L</run>. It is an optional test switched on by the
+L</expect_charset> method.
+
+=item There is a blank line after the headers (Must-pass)
+
+This test is run by L</run>. A blank line is compulsory after the
+headers, even if there is no response body. From L<RFC
+3875|/Specification of the Common Gateway Interface>, section 6.2:
+
+=over
+
+The response comprises a message-header and a message-body, separated
+by a blank line.  The message-header contains one or more header
+fields.  The body may be NULL.
+
+    generic-response = 1*header-field NL [ response-body ]
+
+=back
+
+=item The body of the output is compressed (Optional)
+
+This test is run by L</run>. It is an optional test switched on by the
+L</do_compression_test> method. This only supports C<gzip> encodings.
+
+=item The body of the output is in the encoding you specified (Optional)
+
+This test is run by L</run>. It is an optional test switched on by the
+L</expect_charset> method. If the parameter set by L</expect_charset>
+is not UTF-8, it runs a test that the encoding of the output is as
+expected.
+
+=item Caching works correctly (Optional)
+
+This test is run by L</run>. It is an optional test switched on by
+L</do_caching_test>. It tests the following:
+
+=over
+
+=item * The CGI is producing a Last-Modified header
+
+If this test fails, it assumes that the CGI cannot understand
+If-Modified-Since requests and does not perform the following tests.
+
+=item * The CGI's Last-Modified header contains a date which HTTP::Date can parse
+
+=item * Basic tests are all run again
+
+All of the tests of basic functioning, such as producing output and
+correctly-formatted HTTP headers, are re-run under the
+"If-Modified-Since" regimen.
+
+=item * The CGI is correctly producing a 304 response
+
+It is tested whether the program is correctly producing a 304 response
+when sent an "If-Modified-Since" request using the Last-Modified date
+which it supplied in the above test. Because this is CGI, the
+If-Modified-Since header is supplied to your CGI program using the
+environment variable C<HTTP_IF_MODIFIED_SINCE>.
+
+=item * The CGI is not producing a body
+
+It is tested whether the CGI is producing a body after it produces the
+304 response described above. There should not be any body, just
+headers, in this situation.
+
+=back
+
+=item The output is valid HTML (Optional)
+
+This test is run by L</run>. It is an optional test switched on by the
+L</html> parameter. You also need to supply your own HTML validator
+using the L</set_html_validator> method. You should also set the
+expected mime type to C<text/html> with L</expect_mime_type> if you
+use this.
+
+=item The output is valid JSON. (Optional)
+
+This test is run by L</run>. It is an optional test switched on by the
+L</json> parameter.  You should also set the expected mime type to
+C<application/json> with L</expect_mime_type> if you use this.
+
+=item The output is valid PNG. (Optional)
+
+This test is run by L</run>. It is an optional test switched on by the
+L</png> parameter.  You should also set the expected mime type to
+C<image/png> with L</expect_mime_type> if you use this.
+
+=back
+
+=head1 BUGS
+
+This assumes line endings are C<\n> in some places. There may be
+problems with C<\r\n> support.
+
+Due to originally not being Test::Builder based, the tests are a
+little strange-looking, and the pass/fail test messages are somewhat
+disorganized (see also L</HISTORY>).
+
+The mixture of methods (see L</METHODS>) and options (see L</Possible
+options>) to control the tests is messy.
+
+There is no check for MD5 checksums. For completeness, there probably
+should be a check for this.
+
+The module is not adapted for Microsoft Windows. See also
+L<https://github.com/benkasminbullock/test-cgi-external/issues/1>.
+
+I wanted to include an example validator program in this distribution
+but I cannot find anything useable on CPAN. For example L<HTML::Lint>
+seems to be very problematic, and the W3C validator seems intent on
+making huge amounts of fuss about things which are almost irrelevant
+for practical purposes. The Go program I made, mentioned below, is
+barely useable to anyone except me, since it insists on a range of
+personal coding conventions and checks for mistakes which I commonly
+make but which are probably unlikely to be made by anyone else. Please
+get in touch if you have a good idea for HTML validation.
+
+The program doesn't sanitize %ENV, but it probably should do.
+
+The number of tests is not really fixed, so the older way of using
+Test::More with a plan won't work with this module.
+
+The HTML validator writes into the directory of the executable file,
+found using L<FindBin/$Bin>, rather than using L<File::Temp> or
+something similar.
+
+=head1 DEPENDENCIES
+
+This module depends on
+
+=over
+
+=item L<Carp>
+
+Carp is used to print error messages.
+
+=item L<Encode>
+
+Encode is used for converting charset encodings into Unicode. It's not
+necessary unless you use L</expect_charset> but it is included as a
+dependency since almost every Perl installation will have it.
+
+=item L<File::Temp>
+
+File::Temp is used for the temporary files which store the input,
+output, and error stream of the CGI program.
+
+=item L<FindBin>
+
+FindBin is used by the HTML validation routines. See L</html>.
+
+=item L<Test::Builder>
+
+Test::Builder is used for the testing framework.
+
+=back
+
+=head2 Optional
+
+Test::CGI::External uses the following modules to do optional tests
+(see L</TESTS APPLIED>). It can be installed without these modules,
+since they are only used when they are required by specific tests.
+
+=over
+
+=item L<Gzip::Faster>
+
+It is used to do the compression testing, so you don't need this
+unless you choose L</do_compression_test>.
+
+=item L<HTTP::Date>
+
+HTTP::Date is used to check the dates, if you check caching with
+L</do_caching_test>.
+
+=item L<IO::Uncompress::Gunzip>
+
+It is used to do the compression testing, so you don't need this
+unless you choose L</do_compression_test>. This module is used as a
+fallback if you don't have Gzip::Faster. It is used because it's a
+core Perl module, so most people will have this installed.
+
+=item L<Image::PNG::Libpng>
+
+Optionally, Image::PNG::Libpng is used if you select the L</png>
+option to test the output is valid PNG data.
+
+=item L<JSON::Parse>
+
+JSON::Parse is used to test JSON for validity, if you choose to check
+JSON with L</json>.
+
+=item L<Unicode::UTF8>
+
+Optionally, Unicode::UTF8 is used for converting UTF-8 encodings into
+Perl's internal Unicode, if you set the charset to UTF-8 with
+L</expect_charset>. If you don't have this, it falls back to Encode.
+
+=back
+
+The module also used to depend on L<IPC::Run3>, but there were some
+issues with this module messing around with the global variables. It
+does something like C<binmode STDOUT>, which interferes with other
+parts of the program, so that had to be removed.
+
+=head1 SEE ALSO
+
+=head2 Specifications used
+
+=over
+
+=item Specification of the Common Gateway Interface
+
+The current specification of the Common Gateway Interface is RFC
+(Request For Comments) 3875 by D. Robinson and K. Coar of The Apache
+Software Foundation, dated October 2004. See
+L<http://www.ietf.org/rfc/rfc3875>.
+
+=item Specification for HTTP headers
+
+This module's check for HTTP headers was written against the
+specification on pages 15 and 16 of RFC 2616 by R. Fielding et al,
+dated June 1999. See L<http://www.ietf.org/rfc/rfc2616.txt>.
+
+=item L<The Common Gateway Interface|http://www.lemoda.net/cgi/simple-guide/index.html>
+
+This is my own web page which explains some things about CGI.
+
+=back
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Test::More>
+
+Test::CGI::External is built on top of the Test::More framework for
+testing Perl programs, so you need to have some familiarity with that.
+
+=item L<CGI::Test>
+
+This is similar in some ways to Test::CGI::External, but with the following differences
+
+=over 
+
+=item Much more comprehensive mocking of environment
+
+CGI::Test works really hard to generate a complete mock CGI
+environment, including sanitizing the environment variables in
+C<%ENV>. Test::CGI::External is lazy about this. (See also L</BUGS>.)
+
+=item Throws exceptions rather than tests
+
+CGI::Test doesn't test for the very basic problems (non-executable
+files, stray printf statements, etc.) that Test::CGI::External does,
+and if it detects problems like these, it dies (throws exceptions),
+rather than making them into pass and fail tests.
+
+In contrast, Test::CGI::External's philosophy is Murphy's law,
+"anything which can go wrong, will go wrong", and it uses the "test"
+channel to check that the most basic kinds of problems are not
+occurring, rather than throwing exceptions. CGI::Test just runs the
+CGI program for you and returns its output for you to test yourself.
+
+=back
+
+=back
+
+=head1 HISTORY
+
+This module started out as a test program for a CGI program written in
+C. Originally, it didn't use the Perl Test::More-style framework, but
+counted its pass and fail tests itself. I released the module to CPAN
+because I couldn't find a similar alternative, and I thought it might
+be useful to someone. Since the initial release I have changed it to
+use the Test::More framework.
+
+After version 0.05, I thought the module was not being used and
+deleted it from CPAN. At this point I added some options like HTML
+validation using an external program (which is written in Go).
+
+Version 0.07 marked the module's return to CPAN by popular demand.
+
+Version 0.09 added Unicode upgrading of L</body>.
+
+Version 0.10 added C<do_caching_test> and removed C<die_on_failure>,
+which was made invalid by the move to L<Test::Builder>.
+
+Version 0.11 added support for testing mime types with
+L</expect_mime_type> and offered a way to sidestep the nag messages
+with L</set_no_warnings>. It also reduced the number of dependencies,
+most of which were only needed for optional tests.
+
+Version 0.18 added the new test that the header contains a blank line
+even when the body is empty. 
+
+Version 0.19 added L</test_not_implemented> and
+L</test_method_not_allowed>.
+
+Version 0.21 added L</test_status>.
+
+Version 0.22 changed to always set L</QUERY_STRING> and introduced
+L</test_411>.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2011-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

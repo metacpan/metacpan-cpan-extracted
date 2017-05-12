@@ -1,0 +1,13 @@
+Revision history for Template::Plugin::CSS::LESSp
+
+0.03   2014-01-05
+       - convert distribution to use Dist::Zilla
+       - adjusted test to LESSp
+
+0.02   2009-10-10
+       - added example
+       - added LICENSE in Makefile.PL
+       - added tests
+
+0.01   2009-10-09
+       - Initial release

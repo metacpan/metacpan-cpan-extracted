@@ -1,0 +1,17 @@
+Revision history for Perl extension Test::LoadAllModules
+
+0.022 Sat May 18 20:11:00 2013
+	* use Win32 if OS is windows to make CWD module work in tests.
+
+0.021 Wed Sep 21 23:11:00 2011
+	* Removed FindBin::libs dependency from tests 
+      because it depends on perl 5.12
+
+0.02 Tue Feb 25 21:47:35 2009
+	* parameterize lib param
+
+0.011 Tue Feb 24 21:21:35 2009
+	* added requires 
+
+0.01  Tue Feb 24 18:30:45 2009
+	* original version

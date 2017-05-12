@@ -1,0 +1,21 @@
+Revision history for Test-Mojo-Role-Debug
+
+1.003004  2015-11-16
+    - Fix warnings on older perls; for real this time
+
+1.003003  2015-11-14
+    - Fix warnings on older perls
+
+1.003002  2015-11-13
+    - Added "da" method
+
+1.002002  2015-11-13
+    - Fixed missing x_contributors from META
+
+1.002001  2015-11-13
+    - "d" now uses diag() and is a NOP when tests aren't failing (jberger)
+    - Simplify examples and test dir (jberger)
+    - Wrote automated test suite
+
+1.001001  2015-11-13
+   - First version released on an unsuspecting world

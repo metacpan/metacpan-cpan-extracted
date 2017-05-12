@@ -1,0 +1,158 @@
+=== cp
+--- wiki
+[-]aa
+=||
+[+]hoge
+||=
+[END]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-close"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p>aa</p></div>
+<div id="content_block_1-inside" class="toggle-display">
+<pre id="content_block_2" class="PLAIN-BOX">
+[+]hoge
+</pre>
+</div>
+</div>
+=== close
+--- wiki
+[-] hoge
+hogehoge
+[END]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-close"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p> hoge</p></div>
+<div id="content_block_1-inside" class="toggle-display">
+hogehoge
+</div>
+</div>
+=== toggle has h4 
+--- wiki
+[+] たいとるだよ
+** title
+トグルとグル
+** title2
+とぐるだよ
+[END]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p> たいとるだよ</p></div>
+<div style="display:none" id="content_block_1-inside" class="toggle-display">
+<div id="content_block_2" class="wiki-section-2">
+<div class="title-2"><h4> title</h4></div>
+<div id="content_block_2-body" class="wiki-section-body-2">
+トグルとグル
+</div>
+</div>
+<div id="content_block_4" class="wiki-section-2">
+<div class="title-2"><h4> title2</h4></div>
+<div id="content_block_4-body" class="wiki-section-body-2">
+とぐるだよ
+</div>
+</div>
+</div>
+</div>
+=== toggle has h3
+--- wiki
+[+] たいとるだよ
+* title
+トグルとグル
+** title2
+とぐるだよ
+*** title3
+とぐるだよ
+[END]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p> たいとるだよ</p></div>
+<div style="display:none" id="content_block_1-inside" class="toggle-display">
+<div id="content_block_2" class="wiki-section-1">
+<div class="title-1"><h3> title</h3></div>
+<div id="content_block_2-body" class="wiki-section-body-1">
+トグルとグル
+</div>
+</div>
+<div id="content_block_4" class="wiki-section-2">
+<div class="title-2"><h4> title2</h4></div>
+<div id="content_block_4-body" class="wiki-section-body-2">
+とぐるだよ
+</div>
+</div>
+<div id="content_block_6" class="wiki-section-3">
+<div class="title-3"><h5> title3</h5></div>
+<div id="content_block_6-body" class="wiki-section-body-3">
+とぐるだよ
+</div>
+</div>
+</div>
+</div>
+=== no end
+--- wiki
+[+]aiueo
+aiu
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p>aiueo</p></div>
+<div style="display:none" id="content_block_1-inside" class="toggle-display">
+aiu
+</div>
+</div>
+=== end with line break (no content)
+--- wiki
+[+]title
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p>title</p></div>
+<div style="display:none" id="content_block_1-inside" class="toggle-display">
+</div>
+</div>
+=== end with line break (some contents)
+--- wiki
+[+]abc
+aiu
+
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p>abc</p></div>
+<div style="display:none" id="content_block_1-inside" class="toggle-display">
+aiu
+</div>
+</div>
+=== no line
+--- wiki
+[+]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p></p></div>
+<div style="display:none" id="content_block_1-inside" class="toggle-display">
+</div>
+</div>
+=== no content at all
+--- wiki
+[+]
+[END]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p></p></div>
+<div style="display:none" id="content_block_1-inside" class="toggle-display">
+</div>
+</div>
+=== another type
+--- wiki
+[-]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-close"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p></p></div>
+<div id="content_block_1-inside" class="toggle-display">
+</div>
+</div>
+=== another type with END
+--- wiki
+[-]
+[END]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-close"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p></p></div>
+<div id="content_block_1-inside" class="toggle-display">
+</div>
+</div>

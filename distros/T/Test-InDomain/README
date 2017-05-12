@@ -1,0 +1,24 @@
+NAME
+
+Test::InDomain - Testing deep datastructures against data domains
+
+DESCRIPTION
+
+This module is a complement to L<Test::Simple> or L<Test::More> (or
+any other testing module based on L<Test::Builder>). It adds the
+function C<in_domain> to your panoply of testing tools; that function
+uses the functionalities of L<Data::Domain> to check deep
+datastructures and produce detailed reports about where the data
+differs from the expectations.
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Laurent Dami
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,22 @@
+Revision history for Perl module Task::Unicode
+
+0.06 2014-08-05
+ - Added Unicode::Casing module
+ - Added Unicode::UTF8 module
+ - Converted this file from YAML to CPAN Changes spec
+
+0.05 2012-04-15
+ - Added Unicode::Util module
+
+0.04 2012-04-11
+ - Added Unicode::Regex::Set module
+
+0.03 2012-03-05
+ - Added Unicode::CaseFold module
+
+0.02 2012-01-23
+ - Fixed bug preventing Unicode::Tussle inclusion on Perl 5.14+
+ - Added links to the modules in the SEE ALSO section
+
+0.01 2012-01-22
+ - First release

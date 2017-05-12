@@ -1,0 +1,52 @@
+{
+   "abstract" : "Creates corpora for summarization testing.",
+   "author" : [
+      "Jeff Kubina (jeff.kubina@gmail.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Corpus-Summaries-Wikipedia",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump" : "1.15",
+            "Date::Manip" : "6.11",
+            "File::Path" : "2.08",
+            "File::Slurp" : "9999.13",
+            "Forks::Super" : "0.30",
+            "HTML::TreeBuilder::XPath" : "0.11",
+            "LWP::Simple" : "5.827",
+            "LWP::UserAgent" : "5.834",
+            "Log::Log4perl" : "1.28",
+            "Statistics::Descriptive" : "2.6",
+            "XML::Code" : "0.4",
+            "XML::Simple" : "2.18"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.22"
+}

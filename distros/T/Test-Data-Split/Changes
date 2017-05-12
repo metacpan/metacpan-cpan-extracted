@@ -1,0 +1,28 @@
+Revision history for Test-Data-Split
+
+v0.2.0  2016-04-22
+    - Now passing the data to contents_cb so it can be serialised into the
+    file.
+    - Add Test::Data::Split::Backend::ValidateHash .
+
+v0.0.4  2016-01-02
+    - Fix an erroneous List::MoreUtils::notall call in the hash backend.
+        - It was introduced in the latest release.
+        - It was not caught by the test, but was caught by a failed run
+        of fc-solve’s Travis-CI build (and later the local build).
+            - Thanks to Travis-CI!
+        - Tests were fixed to catch it in the future.
+
+v0.0.3  2016-01-01
+    - Move a costly sanity check of notall from the constructor into
+    list_ids().
+        - This way lookup_data may run faster.
+
+v0.0.2  2015-04-28
+    - Specify minimum version of perl
+        - CPANTS / Kwalitee
+    - Add provides to META.yml.
+        - CPANTS / Kwalitee
+
+v0.0.1  2014-10-23
+    - First version, released on an unsuspecting world

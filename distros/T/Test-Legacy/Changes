@@ -1,0 +1,10 @@
+1.2502  Sun Oct  9 19:12:43 PDT 2005
+    * Added Test::Legacy::More.
+
+1.2501  Wed Dec 15 06:52:29 EST 2004
+    - Fixed todo tests so the diagnostic output doesn't go to STDERR.
+
+1.2500_01  Sat Dec 11 19:09:38 EST 2004
+    * Hey, it works!  With the exception of two tests failing because of
+      formatting differences, and one failing because onfail isn't fully
+      implemented, this passes Test.pm's test suite!

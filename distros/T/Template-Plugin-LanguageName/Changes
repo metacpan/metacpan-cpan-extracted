@@ -1,0 +1,8 @@
+Revision history for Template-Plugin-LanguageName
+
+0.0101  2012-05-14
+  - fix dependency on parent.pm for perl < 5.10.1
+
+0.01    2012-05-05
+  - initial release
+

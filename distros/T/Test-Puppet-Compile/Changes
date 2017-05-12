@@ -1,0 +1,13 @@
+Revision history for Test-Puppet-Compile
+
+0.04    2013-11-13
+        Fix permissions of temp dirs.
+
+0.03    2013-10-04
+        Add ENC support.
+
+0.02    2013-06-10
+        Generate HTML reports.
+
+0.01    2013-06-09
+        First version, released on an unsuspecting world.

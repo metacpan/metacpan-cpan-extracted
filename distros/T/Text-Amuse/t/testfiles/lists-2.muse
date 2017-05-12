@@ -1,0 +1,57 @@
+#title Lists
+
+   1. this is
+  10. a test
+ 100. and it's fine, hopefully
+
+   i. One
+  ii. Two
+ iii. Tree
+  iv. Four
+   v. File
+
+Break
+
+   i. One    (2)   
+   ii. Two   (2)
+   iii. Tree (2)
+   iv. Four  (2)
+   v. Five   (2)
+
+List switching
+
+ description list :: Definitino
+ here the defintion continues
+ 1. enum
+ 2. enum (2)
+ a. alpha
+ b. alpha (2)
+ i. lower-roman
+ ii. lower-roman
+ A. upper alpha
+ I. upper-roman
+
+List switching
+
+ description list :: Definitino
+ here the defintion continues
+   1. enum
+   2. enum (2)
+      a. alpha
+      b. alpha (2)
+    i. lower-roman
+   ii. lower-roman
+ back to desc list :: Another definition
+    A. upper alpha
+    I. upper-roman
+ 1. enum
+ 2. enum (2)
+      a. alpha
+      b. alpha (2)
+            desc :: list
+            description :: list
+            desc []{}^_%\$# :: []{}^_%\$#
+      c. alpha (c)
+ 3. back to enum
+ 10. This is 4
+  9. This is 5

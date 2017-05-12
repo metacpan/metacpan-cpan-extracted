@@ -1,0 +1,11 @@
+MANIFEST.SKIP
+Makefile.PL
+README
+Changes
+MANIFEST
+configure
+t/test.pm
+t/basic.t
+make.pm
+lib/Tie/Proxy/Hash.pm
+t/translate.t

@@ -1,0 +1,7 @@
+TODO
+==============================
+
+These are the things I want to take care of, but am not doing so just yet.
+
+1) Handle hashrefs as args to subroutines.
+2) Handle arguments to constructors.

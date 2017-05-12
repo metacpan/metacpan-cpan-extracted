@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# This temare test script prints an error message but does not exit with
+# an error code. This way we check whether capturing exceptions for
+# laoding YAML works
+
+echo 'No such host.
+
+Usage: temare subjectprep HOSTNAME [SUBJECT BITNESS]
+' > $TAPPER_TEMARE
+

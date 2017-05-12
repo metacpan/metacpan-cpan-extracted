@@ -1,0 +1,60 @@
+-
+ - 'H.sapiens'
+ - 'Homo'
+ - 'sapiens'
+ - 'human'
+-
+ - 'D.melanogaster'
+ - Drosophila
+ - melanogaster
+ - fruitfly
+-
+ - 'M.musculus'
+ - Mus
+ - musculus
+ - mouse
+-
+ - 'A.gambiae'
+ - Anopheles
+ - gambiae
+ - mosquito
+-
+ - 'R.norvegicus'
+ - Rattus
+ - norvegicus
+ - rat
+-
+ - 'A.thaliana'
+ - Arabidopsis
+ - thaliana
+ - 'mouse-ear cress'
+-
+ - 'C.elegans'
+ - Caenorhabditis
+ - elegans
+ - worm
+-
+ - 'D.rerio'
+ - Danio
+ - rerio
+ - zebrafish
+-
+ - 'O.sativa'
+ - Oryza
+ - sativa
+ - rice
+-
+ - 'S.cerevisiae'
+ - Saccharomyces
+ - cerevisiae
+ - yeast
+-
+ - 'X.leavis'
+ - Xenopus
+ - leavis
+ - frog
+-
+ - 'D.discoideum'
+ - Dictyostelium
+ - discoideum
+ - dicty

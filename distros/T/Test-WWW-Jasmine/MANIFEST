@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_basic.t
+t/pod.t
+t/htdocs/index.html
+t/htdocs/jasmine.js
+t/lib/server.pm
+t/lib/HTTP/Server/Simple.pm
+t/lib/HTTP/Server/Simple/CGI.pm
+t/lib/HTTP/Server/Simple/CGI/Environment.pm
+lib/Test/WWW/Jasmine.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+<config>
+	<!-- Find FQDN's that match all corporate group's responsible -->
+	<pattern name="Corporate">
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.csc\.</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.mso\.</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.npa\.</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.pas\.</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.aas\.</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.asd\.\w{2}</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.msc\.\w{2}</inclusion>
+                <!-- Datacenters -->
+		<inclusion>^corp.*\.net</inclusion>
+		<inclusion>^nasun-.*</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.aka\.\w{2}</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.ldc\.\w{2}</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.sdc\.\w{2}</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.ndc\.\w{2}</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.odc\.\w{2}</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.pdc\.\w{2}</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.cdc\.\w{2}</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-\w\.fdc\.\w{2}</inclusion>
+		<inclusion>^atclo-\w{4}-\d+-\w-\w\.clo</inclusion>
+		<inclusion>^ofclo-\w{4}-\d+-\w-\w\.clo</inclusion>
+		<inclusion>^\S+-\w{4}-\d+-\w-(l|t|c|d)\.\w{3}\.\w{2}</inclusion>
+         	<tag>networks</tag>
+       </pattern>
+</config>

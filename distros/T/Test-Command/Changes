@@ -1,0 +1,56 @@
+Revision history for Test-Command
+
+0.11    4/29/2013
+        - fix determination of diagnostic test name in signal_is_undef()
+
+0.10    2/8/2013
+        - fix signal tests on Win32 platforms
+
+0.09    2/1/2013
+        - added exit_value(), signal_value(), stdout_value(), stdout_file(),
+          stderr_value() and stderr_file() (these provide access to raw value
+          for arbitrary testing not covered by this module)
+
+0.08    Wed May 13 23:04 2009
+        - removed use of POSIX module (need a better understanding of how
+          to use it on BSD systems), reverted back to hand-rolled exit and
+          signal determination
+        - changed signal tests to use Config.pm to determine symbolic signal
+          values
+
+0.07    Mon May 11 23:42 2009
+        - removed internal requirement that ref $self eq 'Test::Command' to
+          allow subclassing (requested by Lanny Ripple via
+          http://rt.cpan.org/Public/Bug/Display.html?id=43541)
+
+0.06    Mon May 11 23:01 2009
+        - only use POSIX::W* macros when available
+        - skip signal tests on MSWin32
+
+0.05    Mon May 11 21:32 2009
+        - use ${^CHILD_ERROR_NATIVE} if available (hopefully will help with
+          BSD test failures)
+
+0.04    Sun May 10 09:38 2009
+        - exit and signal values can be undef if POSIX::WIFEXITED() or
+          POSIX::WIFSIGNALED return false respectively
+        - added exit_is_defined(), exit_is_undef(), signal_is_defined() and
+          signal_is_undef()   
+
+0.03    Sat May 9 23:21 2009
+        - use POSIX::WEXITSTATUS() to find exit status instead of manual bit
+          shift
+        - added terminating signal handling via POSIX::WTERMSIG() (was
+          mentioned in "DEVELOPMENT IDEAS" but finally spurred on by Lanny
+          Ripple via http://rt.cpan.org/Public/Bug/Display.html?id=43541)
+        - added t/06-signal.t
+
+0.02    Tue Apr 10 21:58 2007
+        - added 'tests => 11' import to 'use Test::Command' in SYNOPSIS
+        - modified "No such file" tests to only test for $@ after the eval
+          since the regex test wasn't valid for other languages
+        - added development idea about creating a script to generate test
+          files
+
+0.01    Sun Apr  8 15:36 2007
+        - First release.

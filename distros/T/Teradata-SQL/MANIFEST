@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+SQL.pm
+SQL.xs
+WINNOTES
+hints/aix.pl
+tdsql.c
+tdsql.h
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

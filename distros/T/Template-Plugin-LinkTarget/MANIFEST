@@ -1,0 +1,11 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+lib/Template/Plugin/LinkTarget.pm
+t/01-filter.t
+t/pod.t
+t/pod-coverage.t

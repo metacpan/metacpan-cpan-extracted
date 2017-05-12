@@ -1,0 +1,11 @@
+Test::TAP::HTMLMatrix creates colorful matrix of L<Test::Harness>
+friendly test run results using L<Test::TAP::Model>.
+
+You can see example output of this module here:
+
+L<http://smoke.pugscode.org/>
+
+A talk discussing this and related modules is here:
+
+L<http://perlcabal.org/~gaal/pugstest/start.html>
+

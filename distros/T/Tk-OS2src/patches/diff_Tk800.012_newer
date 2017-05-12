@@ -1,0 +1,97 @@
+diff -pru Tk800.011/myConfig Tk800.011.my/myConfig
+--- Tk800.011/myConfig	Wed Jul 22 08:22:52 1998
++++ Tk800.011.my/myConfig	Fri Nov 13 01:19:30 1998
+@@ -321,6 +321,7 @@ if ($win_arch eq 'x') {
+   $xlib = "-L$toolkit/LIB -lpmwinx";
+ } elsif ($win_arch eq 'pm') {
+   $define .= " -D__PM__";
++  $define .= " -DINIT_VIA_PERL" if $] >= 5.00553;
+   $inc = "-I../pTk/mTk/xlib -I../../pTk/mTk/xlib -IpTk/mTk/xlib -ImTk/os2_rc";
+   $xlib = "";                          # No library is needed
+ } elsif ($IsWin32) {
+diff -pru Tk800.011/pod/Makefile.PL Tk800.011.my/pod/Makefile.PL
+--- Tk800.011/pod/Makefile.PL	Sun May 17 11:59:40 1998
++++ Tk800.011.my/pod/Makefile.PL	Tue Oct  6 01:13:22 1998
+@@ -9,6 +9,27 @@ sub MY::postamble {
+     '
+ html :: 
+ 	@echo "Sorry no HTML building yet"
++
++tk.ipf: tkpod2ipf
++	$(PERL) tkpod2ipf > tmp && mv tmp $@
++
++tk.ipf.old: subpodify
++	pod2ipf --nofaqs --debug --by-dirs "--title=Tk/Perl book" \
++		"--section-name=Perl/Tk Constructs" --dir=constructs \
++		"--section-name=Tk Generic Methods" --dir=generic \
++		"--section-name=Tk User Interaction" --dir=interaction \
++		"--section-name=Partially Converted Methods" --dir=unfinished \
++		"--section-name=Tix Extensions" --dir=tix \
++		"--section-name=Tk Geometry Management" --dir=geometry \
++		"--section-name=Tk Selection Handling" --dir=selection \
++		"--section-name=Tk Image Classes" --dir=image_classes \
++		"--section-name=Tk Library Procedures" --dir=library \
++		"--section-name=Tk Modules" --dir=../blib/lib \
++			--about > tk.ipf
++
++tk.inf: tk.ipf
++	ipfc /inf tk.ipf
++
+ '
+ }
+ 
+diff -pru Tk800.011/pTk/mTk/tclUnix/tclUnixNotfy.c Tk800.011.my/pTk/mTk/tclUnix/tclUnixNotfy.c
+--- Tk800.011/pTk/mTk/tclUnix/tclUnixNotfy.c	Fri Jun 26 09:57:40 1998
++++ Tk800.011.my/pTk/mTk/tclUnix/tclUnixNotfy.c	Thu Oct  8 22:37:42 1998
+@@ -18,6 +18,11 @@
+ #include "Lang.h"
+ #include <signal.h> 
+ 
++#ifdef __EMX__
++#  include <sys/ioctl.h>
++#  include <sys/termio.h>
++#endif 
++
+ /*
+  * This structure is used to keep track of the notifier info for a 
+  * a registered file.
+@@ -242,6 +247,25 @@ Tcl_CreateFileHandler(fd, mask, proc, cl
+     if (notifier.numFdBits <= fd) {
+ 	notifier.numFdBits = fd+1;
+     }
++#ifdef __EMX__
++    {
++	/* TTY under EMX are always ready for input, unless ~IDEFAULT.
++	   ICANON is put off, otherwise you cannot read() 1 char - it
++	   will wait until the whole line is read  ===> blocking.
++	   This does not help if in fileevent() one reads by lines
++	   instead of by chars - but that's life.
++	 */
++	int type;
++	struct termio tio;
++
++	if (!isatty(fd)) 
++	    return;
++	ioctl(fd, TCGETA, &tio);
++	tio.c_lflag &= ~(IDEFAULT | ICANON);
++	
++	ioctl(fd, TCSETA, &tio);
++    }
++#endif 
+ }
+ 
+ /*
+diff -pru Tk800.011/pTk/mTk/unix/tkUnixMenu.c Tk800.011.my/pTk/mTk/unix/tkUnixMenu.c
+--- Tk800.011/pTk/mTk/unix/tkUnixMenu.c	Wed Feb 11 12:36:30 1998
++++ Tk800.011.my/pTk/mTk/unix/tkUnixMenu.c	Tue Oct  6 13:30:00 1998
+@@ -803,6 +803,10 @@ TkpPostMenu(interp, menuPtr, x, y)
+     int x;
+     int y;
+ {
++#ifdef __PM__
++    if (menuPtr->tkwin)
++	((TkWindow *)menuPtr->tkwin)->atts.override_redirect = 1;
++#endif
+     return TkPostTearoffMenu(interp, menuPtr, x, y);
+ }
+ 

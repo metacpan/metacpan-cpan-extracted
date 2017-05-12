@@ -1,0 +1,25 @@
+Revision history for Test-Mojo-Role-ElementCounter
+
+1.001006 2016-08-11
+   - Add workaround for Mojolicious 7.0 Test::Mojo text_is not trimming whitespace
+
+1.001005 2015-09-06
+   - Added proper tests
+   - Fixed improper handling of ',' in selectors when ->dive_in is used (#1)
+   - Fatalized cases where quantity for element count is undefined (#2)
+
+1.001004 2015-05-06
+   - Reuploading: PAUSE failure
+
+1.001003  2015-05-05
+   - Fixed fatal error with ->dived_text_is
+
+1.001002  2015-04-06
+   - Added Test::Mojo::WithRoles to prereqs
+   - Added POD note about Test::Mojo's native element_count_is
+   - Fixed SYPONSIS error
+
+1.001001  2015-04-04
+   - First version released on an unsuspecting world
+
+

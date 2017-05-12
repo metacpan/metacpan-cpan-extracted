@@ -1,0 +1,40 @@
+---
+abstract: 'Harness output delegate for Jenkins TAP Plugin'
+author:
+  - 'Evgeniy Vostrov <vostrov.e@gmail.com>'
+build_requires:
+  File::Slurp: 0
+  File::Temp: 0
+  TAP::Harness: 0
+  Test::MockObject::Extends: 0
+  Test::More: 0
+  Test::Spec: 0
+  Test::Spec::Mocks: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAP-Formatter-Jenkins
+provides:
+  TAP::Formatter::Jenkins:
+    file: lib/TAP/Formatter/Jenkins.pm
+    version: 0.02
+  TAP::Formatter::Jenkins::MyParser:
+    file: lib/TAP/Formatter/Jenkins/MyParser.pm
+    version: 0
+  TAP::Formatter::Jenkins::Session:
+    file: lib/TAP/Formatter/Jenkins/Session.pm
+    version: 0
+requires:
+  Encode: 2.42
+  Moose: 2
+  MooseX::NonMoose: 0.2
+  TAP::Harness: 3.2
+  TAP::Parser::YAMLish::Writer: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

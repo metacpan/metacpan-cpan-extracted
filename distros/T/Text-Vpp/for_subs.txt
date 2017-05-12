@@ -1,0 +1,25 @@
+Sample text for demonstrating loops and subsitution patterns
+@IF ($Complex)
+ don't print this line
+  @FOREACH $Col (7,11)
+don't print generated line:  \Col  <<<
+    @IF ($Col != 11)
+don't print ---------------------
+    @ENDIF
+  @ENDFOR
+@ENDIF
+numbers 0: @@2*$Complex@@  and  3: @@3*$Real@@ on this line
+@IF ($Real)
+ print this line
+
+@FOREACH $Line (1,2,3)
+  @FOREACH $Col (7,11)
+    @IF ($Col != 11)
+---------------------
+    @ENDIF
+generated line: \Line column: \Col position @@($Line-1)*80+$Col@@ <<<
+  @ENDFOR
+@ENDFOR
+@ENDIF
+
+last line

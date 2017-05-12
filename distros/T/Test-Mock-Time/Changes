@@ -1,0 +1,24 @@
+Revision history for Test-Mock-Time
+
+v0.1.6  2016-02-29 23:22:56 EET
+	- Reformat doc.
+	- Drop support for Mojolicious < 6.0.
+
+v0.1.5  2016-02-18 14:27:57 EET
+	- Fix floating point math on perl with -Duselongdouble.
+
+v0.1.4  2016-02-17 19:37:45 EET
+	- Fix EV::run() support.
+
+v0.1.3  2016-02-15 20:15:56 EET
+	- Fix POD.
+
+v0.1.2  2016-02-15 15:37:39 EET
+	- Improve EV::run() support.
+	- Bugfixes.
+
+v0.1.1  2016-02-15 08:27:25 EET
+	- Improve tests portability (BSD).
+
+v0.1.0  2016-02-14 21:59:31 EET
+        - Initial release

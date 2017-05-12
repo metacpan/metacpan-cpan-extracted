@@ -1,0 +1,13 @@
+<%!
+
+sub a_method {
+	my ($self) = @_;
+	return "a method!";
+}
+
+%><% my $self = shift; %>Hello, World
+
+I am a template of class <%= ref $self %>
+
+I can even run <%= $self->a_method() %>
+

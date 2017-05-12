@@ -1,0 +1,46 @@
+#! /usr/bin/perl
+# PODNAME: tapper-rest-api-messagereceiver-daemon (hypnotoad)
+# ABSTRACT: daemon for Tapper::API
+
+# Get the path of the script hypnotoad needs to daemonize for us. This
+# script should have the same path as this script only without the
+# -daemon suffix.
+(my $api = $0) =~ s/-daemon$//;
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
+
+GetOptions
+  'f|foreground' => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
+  's|stop'       => sub { $ENV{HYPNOTOAD_STOP}       = 1 },
+  't|test'       => sub { $ENV{HYPNOTOAD_TEST}       = 1 };
+
+use Mojo::Server::Hypnotoad;
+my $toad = Mojo::Server::Hypnotoad->new->run($api);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-rest-api-messagereceiver-daemon (hypnotoad) - daemon for Tapper::API
+
+=head1 AUTHOR
+
+Tapper Team <tapper-ops@amazon.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Amazon.
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

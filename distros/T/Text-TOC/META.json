@@ -1,0 +1,68 @@
+{
+   "abstract" : "Build a table of contents from text documents",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-TOC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "HTML::DOM" : "0",
+            "HTML::Entities" : "0",
+            "List::AllUtils" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Params::Validate" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::SemiAffordanceAccessor" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Combine" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Path::Class" : "0",
+            "Tie::IxHash" : "0",
+            "base" : "0",
+            "namespace::autoclean" : "0.12",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-text-toc@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-TOC"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.urth.org/Text-TOC.git",
+         "web" : "http://git.urth.org/Text-TOC.git"
+      }
+   },
+   "version" : "0.10"
+}
+

@@ -1,0 +1,65 @@
+# -*-mode: text; fill-column: 80; comment-column: 80; -*-
+
+# README --
+#
+#       This file provides out of bounds mechanics.
+#
+# Copyright (c) 2000-2007 Meccanomania
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# svn: @(#) $Id: README 55 2008-01-10 23:23:38Z meccanomania $
+#-------------------------------------------------------------------------------
+
+
+If you read this file _as_is_, just ignore the funny characters you
+see.  It is written in the POD format (see pod/perlpod.pod) which is
+specifically designed to be readable as is.
+
+=head1 NAME
+
+README - This file provides out of bounds mechanics.
+
+=head1 DESCRIPTION
+
+This document describes the main features of the out-of-bounds mechanics that
+extends the bind and bindtags functions.
+
+The B<bound> method associates callbacks with X events in the same manner as
+bind does. For example :
+
+S<    >I<$widget>-E<gt>B<bound>(I<tag>,I<sequence>,I<oob>,I<callback>)
+
+If I<oob> is specified, B<bound> will arrange for I<oob> to be evaluated
+whenever the event(s) given by I<sequence> occur in the window(s) identified by
+I<$widget> or I<tag>. If I<oob> is an empty string then the current binding for
+I<sequence> is destroyed, leaving I<sequence> bound less. In all of the cases
+where a I<oob> argument is provided, B<bind> returns an empty string. If I<oob>
+is specified and evaluated to a valid out of bounds bit mask, then B<bound> will
+arrange for I<callback> to be called, if specified, for the previous callback to
+be called otherwise. 
+
+The B<boundtags> method associates callbacks with X events in the same manner
+as bindtags does. For example :
+
+S<    >I<$widget>-E<gt>B<boundtags>([I<tagList>],[I<levellist>]);
+
+When a bounding is created with the B<bound> command, it is associated either
+with a particular window such as I<$widget>, a class name such as B<Tk::Button>,
+the keyword B<all>, or any other string. All of these forms are called
+I<bounding tags>. Each window has a list of bounding tags and levels that
+determine how events are processed for the window.  When an event occurs in a
+window, it is applied to each of the window's tags in order:  for each tag, the
+most specific bounding that matches the given tag and event is executed. See the
+L<Tk::bound> documentation for more information on the matching process.
+
+In addition, Tk::Bounded is used with Perl's multiple inheritance to override
+some methods normally inherited from Tk::Derived and Tk::Widget. It also
+specifies level 1 bound tags for caller class.
+
+=head1 AUTHOR
+
+Copyright (c) 2000-2007 Meccanomania
+
+=cut

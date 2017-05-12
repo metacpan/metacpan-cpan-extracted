@@ -1,0 +1,48 @@
+README for Text::Bind
+
+---------------------------------------------------------------------------
+    Copyright (C) 1997-1999	Earl Hood, ehood@pobox.com
+        All rights reserved.
+  
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+---------------------------------------------------------------------------
+SUMMARY
+
+Text::Bind allows you to bind Perl structures (strings, routines,
+filehandles, objects, and arrays) to specific locations (called *data
+sites*) in text files.
+
+The main purpose of this module is to support HTML templates for
+CGI programs. Therefore, HTML pages design can be kept separate from
+CGI code. However, the class is general enough to be used in other
+contexts than CGI application development.
+
+---------------------------------------------------------------------------
+INSTALLATION
+
+You should be able to install the module(s) with the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you want to install in a specific directory, try:
+
+    perl Makefile.PL PREFIX=/tmp/myperl5
+    make
+    make test
+    make install
+
+---------------------------------------------------------------------------
+DOCUMENTATION
+
+Documentation is in POD format and should automatically get installed
+with the module(s).
+
+---------------------------------------------------------------------------
+Earl Hood, ehood@pobox.com
+http://www.oac.uci.edu/indiv/ehood/
+99/07/07 21:53:58

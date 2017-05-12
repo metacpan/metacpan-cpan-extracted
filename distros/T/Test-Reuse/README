@@ -1,0 +1,111 @@
+NAME
+    Test::Reuse - Reusable Test::More tests in classes
+
+DESCRIPTION
+    Test::Reuse was created for the sole purpose of writing really
+    easy-to-use, reusable tests. You can create tests in a class, "use" your
+    class name in the test (which will also deploy all Test::More features
+    for you), then you can use specific tests from that class. You can also
+    pass arguments to these tests.
+
+SYNOPSIS
+    OK, say we have the very same test running in several different tests.
+    You don't want to just keep copy and pasting that code because it
+    clutters up space when it doesn't need to. So we start by writing the
+    test class to where our reusable tests will be imported from.
+
+        package MyTestClass;
+    
+        use Test::Reuse;
+
+        subtest 'is_it_ok' => sub {
+            my $test = shift;
+        
+            for (@_) {
+                ok $_, "$_ seems just fine!";
+            }
+        };
+
+    The "subtest" method in class that uses "Test::Reuse" actually stores
+    the tests that are reusable. It won't actually run a subtest. The first
+    argument will always be the test class name. In this instance it is
+    MyTestClass. Now let's write the actual test.
+
+        #!perl
+    
+        use MyTestClass;
+    
+        use_test 'is_it_ok', qw<1 2 3 4 0 5>;
+    
+        runtests();
+
+    That's it. We use "use_test" followed by the subtest name. You can
+    supply optional arguments afterwards if you like. Remember to always
+    call "runtests" when you're done, which is identical to "done_testing".
+    In the above example it will loop through all of numbers in the array we
+    provided and will obviously fail on the fifth argument (the 0). You can
+    also run "use_test" within the test class to control the flow a bit
+    more.
+
+        package MyTestClass;
+    
+        use Test::Reuse;
+
+        subtest 'is_it_ok' => sub {
+            my $test = shift;
+        
+            if (@_) {
+                for (@_) {
+                    ok $_, "$_ seems just fine!";
+                }
+            }
+            else {
+                use_test 'show_problem', 'No arguments for is_it_ok';
+            }
+        };
+
+        subtest 'show_problem' => sub {
+            my ($test, $text) = @_;
+            note "Woops!: ${text}";
+        };
+
+METHODS
+    Test::Reuse uses all the methods from Test::More, but there are a couple
+    that are used just in this module.
+
+  use_test
+    Calls a test from the test class. They must be defined in the test class
+    using "subtest"
+
+        use_test 'method_name', qw<optional arguments here>;
+        use_test 'my_test';
+
+  subtest
+    Technically this works exactly the same as Test::More's subtest in your
+    test file, but in the test class it simply defines a reusable test.
+
+        subtest 'reusable_test_name' => sub {
+            my $test_class = shift;
+        
+            note "Running from ${test_class}";
+        };
+
+  runtests
+    I don't like the way "done_testing" looks, so swapped it for "runtests".
+    But you are welcome to use either one in your code. This MUST be run at
+    the bottom of your normal test file (.t), or it will freak out. Which is
+    pretty normal if you don't declare a plan.
+
+LIMITATIONS
+    This module is still new, so there are plenty. The main one at the
+    moment being that you can only "use" ONE reusable test class per test.
+    It really sucks, I know. In the future I would love to be able to reuse
+    tests from multiple classes, but at the moment it only works with one.
+
+AUTHOR
+    Brad Haywood <brad@perlpowered.com>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself,
+    because Perl is awesome, and so are you for using it.
+

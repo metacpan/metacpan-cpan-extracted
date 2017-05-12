@@ -1,0 +1,32 @@
+Revision history for Term-TtyRec-Plus
+
+0.09    2012-03-06
+        Add ttytime script (Jesse Luehrs)
+
+0.08    2012-02-24
+        Add ttyplay script (Jesse Luehrs)
+
+0.07    Fri Jun 5 00:08:43 EST 2009
+        Modernize the distribution.
+
+0.06    Mon Feb 26 01:14:20 UTC 2007
+        Fixed a bug with time_threshold.
+
+0.05    Mon Feb 19 04:57:21 UTC 2007
+        Note dependency on IO::Uncompress::Bunzip2. Oops. :)
+
+0.04    Mon Feb 12 00:55:30 UTC 2007
+        Improve tests.
+
+0.03    Sun Feb 11 23:40:37 UTC 2007
+        Add transparent bzip2 support via IO::Uncompress::Bunzip2.
+        rewind() on an unseekable filehandle will die.
+
+0.02    Fri Dec 15 22:03:23 UTC 2006
+        Add grep() method to look for the next frame matching criteria.
+        Add rewind() to reset state.
+        If infile and filehandle are both undef, use STDIN.
+
+0.01    Thu Dec 14 10:00:57 UTC 2006
+        First version.
+

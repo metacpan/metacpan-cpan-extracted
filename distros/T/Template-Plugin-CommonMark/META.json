@@ -1,0 +1,53 @@
+{
+   "abstract" : "Template Toolkit plugin to generate HTML from CommonMark",
+   "author" : [
+      "A. Sinan Unur <nanis@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Plugin-CommonMark",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CommonMark" : "0",
+            "Template" : "0",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nanis/template-plugin-commonmark/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/nanis/template-plugin-commonmark"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

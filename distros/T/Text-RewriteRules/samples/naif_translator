@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+use Text::RewriteRules;
+
+%dict=(driver=>"motorista",
+       the=>"o",
+       of=>"de",
+       car=>"carro");
+
+$word='\b\w+\b';
+
+if( b(a("I see the Driver of the car")) eq "(I) (see) o Motorista do carro" )
+     {print "ok\n"}
+else {print "ko\n"}
+
+RULES/m a
+($word)==>$dict{$1}!!                  defined($dict{$1})
+($word)=e=> ucfirst($dict{lc($1)}) !!  defined($dict{lc($1)})
+($word)==>($1)
+ENDRULES
+
+RULES/m b
+\bde o\b==>do
+ENDRULES

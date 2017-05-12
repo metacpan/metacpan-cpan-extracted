@@ -1,0 +1,44 @@
+---
+abstract: 'Configuration management framework'
+author:
+  - 'Adam Flott <adam@npjh.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Thorium
+requires:
+  Class::MOP: 0
+  DateTime: 0
+  Devel::Symdump: 0
+  File::Find::Rule: 0
+  File::Slurp: 0
+  Hash::Merge::Simple: 0
+  Hobocamp: 0
+  IO::Interactive: 0
+  IPC::Cmd: 0
+  LWP: 0
+  Log::Log4perl: 0
+  Moose: 0
+  MooseX::Role::Strict: 0
+  MooseX::Types: 0
+  Params::Util: 0
+  Proc::ProcessTable: 0
+  Regexp::Common: 0
+  Sub::Exporter: 0
+  Sys::HostAddr: 0
+  Sys::HostIP: 0
+  Sys::Info: 0
+  Template: 0
+  Try::Tiny: 0
+  YAML::XS: 0
+  indirect: 0
+resources:
+  repository: git://github.com/aflott/libthorium-perl.git
+version: 0.510
+x_authority: cpan:AFLOTT

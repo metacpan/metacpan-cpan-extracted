@@ -1,0 +1,18 @@
+Revision history for Perl extension Time-Crontab
+
+0.04 2016-07-11T09:02:32Z
+
+    - fixed bug in Testcase for dow and dom (Thanks ufobat)
+
+0.03 2016-03-18T00:00:06Z
+
+    - fixed bug. match() should match on day *and* dow, not day or dow (Thank you barbie)
+
+0.02 2014-01-06T07:19:22Z
+
+    - add document about Algorithm::Cron
+
+0.01 2013-12-27T04:10:21Z
+
+    - original version
+

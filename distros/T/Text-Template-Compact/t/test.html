@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html lang="ja">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>test of Text::Template::Compact</title>
+<style>
+dt{
+	font-weight:bold;
+	margin: 0.5em 0;
+}
+</style>
+<body>
+<h1>test of Text::Template::Compact</h1>
+
+<H4>制御タグのエスケープ</h4>
+<ul>
+<li>$${}
+<li>$${ }
+<li>$$
+<li>$${
+<li>$$${
+</ul>
+
+<H4>変数展開</h4>
+<ul>
+<li>単純なdataspec: ${%print text}</li>
+<li>%varを省略: ${text}</li>
+<li>key.key: ${hash.a}</li>
+<li>key.index:	${tlist.0}</li>
+<li>key[dataspec]: ${%evalperl "1" tmp}${tlist[tmp]}</li>
+</ul>
+
+<H4>forループ</h4>
+<ul>
+<li>before loop: ${index} ${text}</li>
+${%for text in tlist index 10}
+<li>in loop: ${index} ${text}</li>
+${%end}
+<li>after loop: ${index} ${text}</li>
+</ul>
+
+<h4>evalperl</h4>
+${%evalperl "0" v}
+${%evalperl "$_->{loop}=[(1..10)]"}
+${%for n in loop}
+	${%evalperl "$a+1" v v}
+	${v}
+${%end}
+<p>error case: ${%evalperl "$_->{loop}=[(1..10]"}</p>
+
+
+<H4>blockdefine,blockpaste</H4>
+
+${%blockdefine block1}
+<li>v=${v}</li>
+${%end}
+
+<ul>
+${%evalperl "1" v }${%blockpaste block1}
+${%evalperl "2" v }${%blockpaste block1}
+${%evalperl "3" v }${%blockpaste block1}
+</ul>
+
+
+<H4>フィルタ</h4>
+<ul>
+<li>省略: ${htmltest}
+<li>raw: ${htmltest  #raw}
+<li>html: ${htmltest  #html}
+<li>nobr: ${htmltest  #nobr}
+<li>uri: ${htmltest  #uri} 
+</ul>
+
+
+
+<H4>if-elsif-else-end</h4>
+	${%evalperl "1" th}
+	<table border="1">
+	${%for v  in varlist}
+	<tr>
+		<td>[${v}]</td>
+		<td>${%if defined  v } defined  	${%end}&nbsp;</td>
+		<td>${%if not defined v } notdefined	${%end}&nbsp;</td>
+		<td>${%if length v } length 		${%end}&nbsp;</td>
+		<td>${%if not length v } notlength 	${%end}&nbsp;</td>
+		<td>${%if bool v } bool 			${%end}&nbsp;</td>
+		<td>${%if not v } not 				${%end}&nbsp;</td>
+		<td>${%if nz v } ${%evalperl "$a+0" n v} ${n} ${%end}&nbsp;</td>
+		<td>${%if v > th  } >${th}		${%end}&nbsp;</td>
+	</tr>
+	${%end}
+	</table>
+
+<ul>
+	${%for v in testif}
+		<li>[${v}] is :
+		${%if    v==1 } first
+		${%elsif v==2 } second
+		${%elsif v==3 } third
+		${%else}             else
+		${%end}
+		</li>
+	${%end}
+</ul>
+
+<H4>ifc-elsifc-else-end</h4>
+	${%evalperl "1" th}
+	<table border="1">
+	${%for v  in varlist}
+	<tr>
+		<td>[${v}]</td>
+		<td>${%ifc "defined $a" v } defined  	${%end}&nbsp;</td>
+		<td>${%ifc "not defined $a" v } notdefined	${%end}&nbsp;</td>
+		<td>${%ifc "length $a" v } length 		${%end}&nbsp;</td>
+		<td>${%ifc "not length $a" v } notlength 	${%end}&nbsp;</td>
+		<td>${%ifc "$a" v } bool 			${%end}&nbsp;</td>
+		<td>${%ifc "not $a" v } not 				${%end}&nbsp;</td>
+		<td>${%ifc "$a!=0" v } ${%evalperl "$a+0" n v} ${n} ${%end}&nbsp;</td>
+		<td>${%ifc "$a>$b" v th  } >${th}		${%end}&nbsp;</td>
+	</tr>
+	${%end}
+	</table>
+
+<ul>
+	${%for v in testif}
+		<li>[${v}] is :
+		${%ifc    "$a==1" v } first
+		${%elsifc "$a==2" v } second
+		${%elsifc "$a==3" v } third
+		${%else}             else
+		${%end}
+		</li>
+	${%end}
+</ul>
+
+
+<hr>
+
+<H4>演算子</h4>
+
+${%evalperl "0" v0}
+${%evalperl "1" v1}
+${%evalperl "2" v2}
+${%evalperl "3" v3}
+${%evalperl "[0,1,2,3]" va}
+${%evalperl "[0,1,2,3]" $2 }
+${%evalperl "{v2=>'hello',va=>[0,1,2,3]}" vh}
+
+<dl>
+
+<dt>( a )
+<dd> $${1+(*3)} => ${ 1+(2*3)}
+<dd> $${(1+2)*3} => ${ (1+2)*3}
+
+<dt> $ 
+<dd>$ は パラメータ構造体を示すデータ参照式です。$の直後にキーワードや定数を書いた場合はそれは常に$[keyword]と解釈されます。
+<dd>たとえばdefined は演算子ですが、 $defined はパラメータ参照式として扱われます。
+<dd>使用例は次の項目を参照してください。
+
+<dt> a[b] メンバ/配列参照
+<dt> a.b メンバ参照
+<dd> a[b] はexprを評価した値を使ってハッシュ/配列のメンバを参照します。
+<dd> a.b は左右の項を連結してデータ参照パスを組み立てます。
+<dd> 左項はデータ参照式である必要があります。
+<dd>a.bは、項がキーワードの場合はそのキーワードを連結します。
+<br>a.bは、項がデータ参照式の場合はそのパスを連結します。
+<br>a.bは、項がそれ以外の値の場合はその値を連結します。
+
+<dd>例： パラメータが次のようになっている場合、
+<pre>
+	{
+		v0=>0, v1=>1, v2=>2, v3=>3,
+		va=>[0,1,2,3],
+		2=>[0,1,2,3],
+		vh=>{v2=>'hello',va=>[0,1,2,3]},
+		defined=>'yes,defined',
+	}
+</pre>
+${%evalperl "0" v0}
+${%evalperl "1" v1}
+${%evalperl "2" v2}
+${%evalperl "3" v3}
+${%evalperl "[0,1,2,3]" va}
+${%evalperl "[0,1,2,3]" $2 }
+${%evalperl "{v2=>'hello',va=>[0,1,2,3]}" vh}
+${%evalperl "'yes,defined'" $defined}
+
+以下の式は次のように展開されます。
+<table border=1>
+<tr><td>$${va[2]}   => ${va[2]}   </td><td># 数値で配列インデクスを指定</td></tr>
+<tr><td>$${va[-1]}  => ${va[-1]}  </td><td># マイナスの添字は配列の末尾から</td></tr>
+<tr><td>$${va[v2]}  => ${va[v2]}  </td><td># 別のデータ参照式の値で添字を指定</td></tr>
+<tr><td>$${vh["v2"]}=> ${vh["v2"]}</td><td># 左項がハッシュの場合も使えます</td></tr>
+
+<tr><td>$${vh.v2}  => ${vh.v2}</td><td># 右項がキーワードの場合はそのキーワードを参照パスに連結します</td></tr>
+<tr><td>$${va.-1}  => ${va.-1}<br>$${va.(1+2)}=> ${va.(1+2)}</td><td># 値を参照パスに連結: 項が参照ではない値の場合</td></tr>
+<tr><td>$${vh."v2"}=> ${vh."v2"}</td><td># 値を参照パスに連結: 項が文字列定数の場合</td></tr>
+<tr><td>$${a.2   }=> ${va.2}</td><td># 値を参照パスに連結: 項が数値定数の場合</td></tr>
+<tr><td>$${va.v3}  => ${va.v3}</td><td># 左項が配列だった場合、右項は数値コンテキストで解釈されます</td></tr>
+<tr><td>$${vh.(va.2)}=> ${vh.(va.2)}</td><td>項が参照パスだった場合はパス同士をを連結します。用途は特にありませんが対称性のため。</td></tr>
+<tr><td>$${ $2.2}=> ${$2.2}</td><td>$ を使った参照パスの例</td></tr>
+<tr><td>$${ $.2.2}=> ${$.2.2}</td><td>$ を使った参照パスの例</td></tr>
+<tr><td>$${ $[2].2}=> ${$[2].2}</td><td>$ を使った参照パスの例</td></tr>
+<tr><td>$${ $defined }=> ${ $defined }</td><td>$ の直後では、予約キーワードは参照パスとして扱われます</td></tr>
+<tr><td>$${ $"defined" }=> ${ $"defined" }</td><td>$ の直後では、定数は参照パスとして扱われます</td></tr>
+<tr><td>$${ $.defined }=> エラーになります</td><td> '.' の右項は通常の式を書けるため、裸のdefinedは演算子として扱われます。</td></tr>
+</table>
+
+<dt> ++a , --a , a++ , a--
+<dd> Cの単項インクリメント/デクリメント演算子と同じです。
+<dd>項はデータ参照式である必要があります。
+<dd>$${v=5} $${++v} $${++v} => ${v=5} ${++v} ${++v}
+<dd>$${v=5} $${--v} $${--v} => ${v=5} ${--v} ${--v}
+<dd>$${v=5} $${v++} $${v++} => ${v=5} ${v++} ${v++}
+<dd>$${v=5} $${v--} $${v--} => ${v=5} ${v--} ${v--}
+
+<dt> a**b
+<dd> perlのべき乗演算子と同じです。
+<dd> $${2**8} => ${2**8}
+
+<dt> !a , ~a , +a , -a
+<dd> 単項演算子の論理否定、ビット否定、プラス、マイナスです。
+<dd> $${!1} $${!0} => ${!1} ${!0}
+<dd> $${~1} $${~0} => ${~1} ${~0}
+<dd> $${+1} $${+0} => ${+1} ${+0}
+<dd> $${-1} $${-0} => ${-1} ${-0}
+
+<dt> a*b , a/b , a%b , a repeat b 
+<dd> 乗除、商、 文字列の反復
+<dd> $${30 *7 }=> ${ 30 * 7}
+<dd> $${30 /7 }=> ${ 30 / 7}
+<dd> $${30 %7 }=> ${ 30 % 7}
+<dd> $${30 repeat 7} => ${ 30 repeat 7}
+
+<dt> a+b , a-b , a cat b
+<dd> 加算、減算、 文字列の連結
+<dd> $${30 +7} => ${ 30 + 7}
+<dd> $${30 -7} => ${ 30 - 7}
+<dd> $${30 cat 7} => ${ 30 cat 7}
+
+<dt> &lt;&lt; >>
+<dd> ビットシフト
+<dd> $${16 &lt;&lt; 1} => ${ 16<<1 }
+<dd> $${16 >> 1} => ${ 16>>1 }
+
+<dt> int a,defined a , length a , bool a, nz a
+<dd>int     は 数値の整数部分を返します。 ex: $${int 30/7} => ${ int 30/7}
+<dd>defined は 値が未定義なら0を、そうでないなら1を返します。
+<dd>length  は 値が空文字列なら0を、そうでないなら1を返します。
+<dd>bool    は 値がperl的に偽なら0を、そうでないなら1を返します。
+<dd>nz      は 値が数値的に0なら０を、そうでないなら1を返します。
+<dd>defined等の条件演算の例はifの項を参照して下さい。
+
+<dt> &lt; > &lt;= >= lt gt le ge
+<dd> perlの比較演算子です。
+
+<dt> == != &lt;=> eq ne cmp
+<dd> perlの比較演算子です。
+
+<dt> &
+<dd> ビットANDです。
+<dd> $${ 3 & 6 } => ${ 3 & 6 }
+
+<dt> | ^
+<dd> ビット or, xor です。
+<dd> $${ 3 | 6 } => ${ 3 | 6 }
+<dd> $${ 3 ^ 6 } => ${ 3 ^ 6 }
+
+<dt> &&
+<dd> 論理ANDです。
+<dd> $${ 0 && 6 } => ${ 0 && 6 }
+<dd> $${ 1 && 6 } => ${ 1 && 6 }
+
+<dt> || //
+<dd> || は論理 or です。 a//b は defined($a)?$a:$b と等価です。
+<dd> $${ 0 || 6 } => ${ 0 || 6 }
+<dd> $${ 1 || 6 } => ${ 1 || 6 }
+<dd> $${ undef // 6 } => ${ undef // 6 }
+<dd> $${ 3 // 6 } => ${ 3 // 6 }
+
+<dt> a?b:c
+<dd>三項演算子です。
+<dd> $${ 0 ? "true" : "false" } => ${ 0 ? "true" : "false" }
+<dd> $${ 1 ? "true" : "false" } => ${ 1 ? "true" : "false" }
+<dd>
+<table border="1">
+<tr><th>v</th><th>v?"true":"false"</th><th>v//"undef"</th><th>v||"false"</th></tr>
+${%for v in varlist}
+<tr><td>[${v}]</td><td>${v?"true":"false"}</td><td>[${v//"undef"}]</td><td>[${v||"false"}]</td></tr>
+${%end}
+</table>
+
+
+<dt> = **= *= /= %= += -= &lt;&lt;= >>= &= |= ^= &&= ||= //=
+<dd> = は代入演算子です。
+<dd> それ以外の op= のような形をしているものは  a = (a op b) と等価です。
+
+<dt>not a
+<dd>論理否定です。
+
+<dt>a and b
+<dd>論理積です。
+
+<dt>a or b , a xor b
+<dd>論理和と排他的論理和です。
+</dl>
+
+</html>

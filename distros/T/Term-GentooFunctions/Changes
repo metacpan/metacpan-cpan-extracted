@@ -1,0 +1,117 @@
+1.3607: Mon Nov 26 2012
+   - updated test for 5.17.x
+
+1.3606: Mon Oct 04 2010
+   - the edo() auto-eindents have always bugged me... made them
+     work how I expect.
+
+1.3600: Thu Sep 02 2010
+   - equiet() -- turns off the prints
+
+1.3600: Sun Aug 29 2010
+   - spinners -- these aren't in /sbin/functions.sh, but they're
+     handy.
+
+1.3505: Thu Apr 30 07:11:23 EDT 2009
+   - altered wash() a little, to allow \n's in the middle of messages
+
+1.3501: Mon Apr 27 21:41:53 EDT 2009
+   - added another test... mystified by errors in git-svn-replay
+
+1.3501: Sun Apr 26 22:47:09 EDT 2009
+   - fixed bug shown in t/09 
+
+1.3501: Sun Apr 26 18:47:54 EDT 2009
+   - grr, edo doesn't return arrays right, see t/09
+
+1.3500: Sun Apr 26 09:44:40 EDT 2009
+   - way more better pods
+   - fixed bug in edie()
+   - added edo()
+   - made edie exit(0x65) instead of exit(1)
+
+1.302: Sat Apr 25 12:47:53 EDT 2009
+   - very minor doc fixes
+   - bumped the version for perl 5.6.1
+
+1.3: Thu Apr 23 15:10:07 EDT 2009
+   - got rid of version.pm (blech)
+   - modernized the distribution
+   - added a non-trivial test
+   - told Makefile.PL and GT.pm that this works fine in perl5.6.1
+
+1.2.2: Tue May 27 12:06:23 EDT 2008
+   - (wow, use version has to be on the same line as our $VERSION
+      for older EUMM)
+
+1.2.1: Mon May 26 15:58:50 EDT 2008
+   - I might as well do a new version of everything using
+     version.pm while I wait for all my CPAN deletes to go
+     through.  I just discovered that version.pm doesn't/didn't
+     go core until perl 5.9...  I really wish I'd have prereqed
+     it everywhere I used it, but I didn't.  *sigh*
+
+1.2.0: Sat May 24 09:21:21 EDT 2008
+   - using version.pm as suggested by Andreas Koenig
+
+1.2.0: Fri May 23 08:34:17 EDT 2008
+   - This can work under win32... code added
+
+1.1.7: Tue May 20 10:24:18 EDT 2008
+   - People have told me that two dotted versions cause problems
+     on CPAN.  It's true, and the leading zero on the second
+     number sure didn't help.  I refuse to abandon this type of
+     versioning though.  Linux uses it, Perl iteself uses it.
+
+         major_version.minor_version.bugs  <- not wrong
+
+     Oh well...
+
+1.01.4: Mon Jun 11 2007
+   - I added require 5.008 lines to the .PL and .pm
+
+1.01.3: Mon Jun 11 2007
+   - I updated the version and fixed a few things.
+     edie was missing from whatever I have on cpan so I needed a new version for:
+     "use Term::GentooFunctions 1.010_003 qw(:all);"
+
+1.01.1: Mon Jun 11 2007
+   - I removed a &wash regex
+
+1.01:  Sun Feb 26 07:56:47 EST 2006
+   - jettero fixed several compile time bugs
+
+1:  Tue Feb 14 17:54:19 EST 2006
+   - jettero added a $|=1 to einfon ... cuz c'mon
+
+0.99.3:  Mon Feb  6 18:24:10 EST 2006
+   - jettero have added einfon
+   - jettero fixed a wrong subtraction on [ ok ] placement
+     ... how did I miss that before?
+
+0.99.2:  Mon Jan 30 15:51:09 EST 2006
+   - jettero found yet another bug between the interaction
+     of the shell version and the perl version
+
+0.99.1:  Mon Jan 30 15:44:15 EST 2006
+   - jettero removed some debugging code
+
+0.99:  Mon Jan 30 15:17:05 EST 2006
+   - jettero made Term::GF understand the shell
+     RC_DEFAULT_INDENT and RC_INDENTATION, however you must
+     export them wherever you fork to perl ... and perl
+     cannot modify them back up to the shell. So maybe not
+     so helpful, but complete feeling
+
+0.98:  Fri Jan 27 16:28:10 EST 2006
+   - jettero added minor changes to eend, such as $_ use and
+     argument passthrough...
+
+0.97.1:  Thu Jan 26 17:15:05 EST 2006
+   - jettero made the OK an ok instead
+
+0.97:  Thu Jan 26 15:53:17 EST 2006
+   - jettero added eindent and eoutdent
+
+0.95:  Thu Jan 26 12:00:ish EST 2006
+   - jettero first built this module

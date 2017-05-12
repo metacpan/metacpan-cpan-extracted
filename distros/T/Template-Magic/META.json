@@ -1,0 +1,72 @@
+{
+   "abstract" : "Template using dynamic scoped vars and more",
+   "author" : [
+      "Domizio Demichelis - perl.4pro.net"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Magic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "HTML::FillInForm" : "1.07",
+            "HTML::TableTiler" : "1.21"
+         },
+         "requires" : {
+            "Class::Util" : "2.1",
+            "Class::constr" : "2.1",
+            "Class::props" : "2.1",
+            "File::Spec" : 0,
+            "IO::Util" : "1.46",
+            "Object::props" : "2.1",
+            "perl" : "5.006_001"
+         }
+      }
+   },
+   "provides" : {
+      "Bundle::Template::Magic" : {
+         "file" : "lib/Bundle/Template/Magic.pm",
+         "version" : 0
+      },
+      "Template::Magic" : {
+         "file" : "lib/Template/Magic.pm",
+         "version" : "1.4"
+      },
+      "Template::Magic::HTML" : {
+         "file" : "lib/Template/Magic/HTML.pm",
+         "version" : "1.4"
+      },
+      "Template::Magic::QuickStart" : {
+         "file" : "lib/Template/Magic/QuickStart.pm",
+         "version" : "1.4"
+      },
+      "Template::Magic::Zone" : {
+         "file" : "lib/Template/Magic/Zone.pm",
+         "version" : "1.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.4"
+}

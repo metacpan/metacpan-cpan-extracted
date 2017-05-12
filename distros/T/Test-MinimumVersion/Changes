@@ -1,0 +1,58 @@
+Revision history for Test-MinimumVersion
+
+0.101082  2015-12-06 23:40:03-05:00 America/New_York
+        - add all_minimum_version_from_mymetayml_ok (thanks, Steve Hay!)
+        - add all_minimum_version_from_mymetajson_ok (thanks, Steve Hay!)
+
+0.101081  2013-11-30 18:10:02 America/New_York
+        - add a "skip" option to all_minimum_version_ok
+        - use CPAN::Meta for META.* files, which should do a better
+          job at figuring out prereqs
+
+0.101080  2010-04-18 14:07:08 America/New_York
+          more "comparison to undef" bugs fixed (thanks, Tux)
+
+0.101050  2010-04-15 15:31:56 America/New_York
+          convert to dzil, fix a prereq num/str conversion stupidity
+          fix bug when comparing versions to undef
+
+0.013     2010-01-17
+          declare the dependency on YAML::Tiny (thanks, jawnsy)
+
+0.012     2010-01-16
+          stop inlining YAML::Tiny
+          add a very, very, very basic test
+
+0.011     2009-06-29
+          update code to behave better with subtests
+
+0.010     2009-05-31
+          attempt to not croak on empty files
+
+0.009     2009-04-18
+          display version_markers when syntax requirements are too high
+
+0.008     2008-05-22
+          change default search locations for code to test
+          update embedded YAML::Tiny
+          packaging updates
+
+0.007     2007-09-17
+          fix t/pod-coverage.t; numerous stupid bugs!
+
+0.006     2007-08-24
+          all_version_* methods only plan, now, if there is no plan
+          added no_plan option to all_version_* methods
+
+0.005     2007-07-03
+          quash some warnings
+          added all_version_from_metayml_ok
+
+0.004     2007-04-04
+          add prereq for File::Find::Rule::Perl
+
+0.003     2007-04-03
+          change how it all interfaces with the programmer
+
+0.001     2007-04-02
+          initial release

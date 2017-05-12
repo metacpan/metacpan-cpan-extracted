@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Test/Puppet/Compile.pm
+share/tpl/hiera.yaml.tt
+share/tpl/node.yaml.tt
+share/tpl/puppet.conf.tt
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-syntax.t
+weaver.ini

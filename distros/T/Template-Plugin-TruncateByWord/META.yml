@@ -1,0 +1,20 @@
+---
+abstract: 'A Template Toolkit filter to truncate not the number of bytes but characters'
+author:
+  - 'User & KAWABATA Kazumichi (Higemaru) <kawabata@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Template-Plugin-TruncateByWord
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Encode: 0
+  Template: 0
+  perl: 5.8.0
+version: 0.1

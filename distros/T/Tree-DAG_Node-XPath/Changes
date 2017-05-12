@@ -1,0 +1,44 @@
+Revision history for Perl extension Tree::Dag_Node::XPath.
+
+0.11 2010-08-24
+
+  - fixed bug RT #60602 (https://rt.cpan.org/Ticket/Display.html?id=60602)
+    xpath_get_next/previous_sibling methods are aliased backwards found and
+    fix provided by trlorentz
+
+0.10 2009-04-24
+
+  - fixed bug rt #44248 (https://rt.cpan.org/Ticket/Display.html?id=44248)
+    bug found and patched by dakkar
+
+0.09 2008-10-09
+
+  - added docs for a few aliased methods, to keep Test::Pod::Coverage happy
+
+0.08 
+
+  - removed requirement for 5.8.4 (5.6 should be enough)
+
+0.06 2006-01-24
+
+  - switched the module to using Tree::XPathEngine to remove
+    the dependancy on XML::Parser (which requires expat).
+
+0.04 2004-05-22
+
+  - the fake root is now created on the fly, so it leaves the
+    original tree untouched
+
+0.03 2004-05-20
+
+  - redesigned version (quite a bit simpler), with a lot more tests
+    (including tests that fail with XML::XPath 1.13)
+
+0.02 2004-05-18
+
+  - first working version
+
+0.01 2004-05-17
+	- original version; created by h2xs 1.23 with options
+		-X -n Tree::DAG_Node::XPath
+

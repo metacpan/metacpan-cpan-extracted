@@ -1,0 +1,257 @@
+=head1 NAME
+
+TUWF::DB - Database handling and convenience functions for TUWF
+
+=head1 DESCRIPTION
+
+This module provides convenient methods for interacting with SQL databases and
+takes care to properly start, commit or rollback transactions for each request.
+This module is automatically loaded by TUWF when the L<db_login|TUWF/db_login>
+configuration parameter has been set before calling C<TUWF::run()>. The methods
+this module provides are then automatically available from the main TUWF
+object.
+
+While most of the functionality of this module can only be used within the TUWF
+framework, this module does export a single utility function that can be used
+outside TUWF. See L<FUNCTIONS|/FUNCTIONS> below.
+
+When running in FastCGI, the connection to the database is persistent: it will
+stay open as long as the FastCGI process is running. This can add some
+significant performance improvements. 
+
+Note that this module does have several limitations not imposed by L<DBI|DBI>:
+
+=over
+
+=item *
+
+It can only be used for a single database connection within a TUWF website. If
+you want to connect to multiple databases you will have to use the usual DBI
+functions. In which case it is also the responsibility of your code to properly
+handle transactions.
+
+=item *
+
+The database you are connecting to B<must> implement transactions. MySQL with
+MyISAM is probably not going to work.
+
+=item *
+
+This module has only been properly tested for PostgreSQL. Other databases will
+most likely work as well, but you might run into some issues.
+
+=back
+
+=head2 Every request is one transaction
+
+TUWF automatically makes sure that before a request will be processed (that is,
+before the I<pre_request_handler> is called), the database connection will be
+in a clean state and has just started a new transaction. After the request has
+been successfully handled (that is, none of your functions C<die()>'d), the
+transaction will be committed automatically. If something went wrong while
+processing the request, the transaction will be rolled back before the
+I<error_500_handler> is called. So from the perspective of the database, each
+request is atomic: the request either never happened or everything is
+committed.
+
+Of course, you are free to commit or rollback changes or use savepoints (if
+your database has those) thourough your code as much as you wish. As long as
+you keep in mind that TUWF also does some transaction handling.
+
+
+=head1 METHODS
+
+The following methods are added to the main TUWF object:
+
+=head2 dbh()
+
+Returns the DBI connection handle.
+
+=head2 dbCommit()
+
+Commits the current transaction. You normally don't have to call this method
+since TUWF does this automatically after each request.
+
+=head2 dbRollback()
+
+Rolls back the current transaction. You normally don't have to call this method
+since TUWF does this automatically if something goes wrong.
+
+=head2 dbExec(query, @params)
+
+Execute an SQL query and return the number of rows affected. This is similar to
+C<$dbh-E<gt>do()>, except C<dbExec()> simply returns 0 (zero and false) instead
+of "0E0" (zero but true) when no rows are affected, and this method passes the
+query through the C<sqlprint()> function (see below), allowing you to use the
+extended formatting codes in the query.
+
+Example of an "UPDATE or INSERT" query:
+
+  $self->dbExec(
+    'UPDATE users !H !W',
+    {'username = ?' => $user, 'email = ?' => $email},
+    {'id = ?' => $uid}
+  ) || $self->dbExec(
+    'INSERT INTO users (id, username, email) VALUES(!l)',
+    [ $uid, $user, $email ]
+  );
+
+Of course, the use of the extended formatting in the above example is not very
+practical. Their advantage is more apparent when the queries get more dynamic.
+
+=head2 dbRow(query, @params)
+
+Accepts the same arguments as C<dbExec()>, and returns the first row of the
+result as a hashref. The return value is equivalent to
+C<$sth-E<gt>fetchrow_hashref()>, except C<dbRow()> returns an empty hash if the
+query did not return any rows.
+
+Examples:
+
+  my $count = $self->dbRow('SELECT COUNT(*) AS num FROM users')->{num};
+
+  my %latest_announcement = %{$self->dbRow(q{
+    SELECT title, message, post_date
+      FROM announcements
+     ORDER BY post_date DESC
+     LIMIT 1
+  })};
+  die "No announcements!" if !keys %latest_announcement;
+
+=head2 dbAll(query, @params)
+
+Accepts the same arguments as C<dbExec()>, and returns an arrayref of hashrefs.
+The return value is equivalent to C<$sth-E<gt>fetchall_arrayref({})>.
+
+=head2 dbPage(opts, query, @params)
+
+This method is similar to C<dbAll()>, but provides some extra functionality to
+ease the paging of the results. I<opts> should be a hashref with the keys
+I<results>, a number indicating the maximum number of rows per page, and
+I<page>, a number indicating the currently requested page, counting from 1.
+This method automatically adds a C<LIMIT> and C<OFFSET> to the end of the
+query, so these should be omitted from the I<query> argument.
+
+This method returns two values: the first value identical to the return value
+of C<dbAll()> with the proper C<LIMIT> and C<OFFSET> clauses. The second value
+is either 0 or 1, and indicates whether there are more rows. That is, if the
+second value is true, calling the this method with the same arguments but with
+the I<page> option increased with one will return at least one more row.
+
+  my($rows, $nextpage) = $self->dbPage(
+    {page => 2, results => 10},
+    'SELECT title FROM threads ORDER BY title'
+  );
+  # $rows is now equivalent to:
+  # $self->dbAll('SELECT title FROM threads ORDER BY title LIMIT 10 OFFSET 10')
+
+The value of C<$nextpage> is determined by fetching one row more than requested
+and later removing it from the results.
+
+
+=head1 FUNCTIONS
+
+C<TUWF::DB> exports one function, which can also be used outside of the TUWF
+framework by 'use'ing the module as follows:
+
+  use TUWF::DB 'sqlprint';
+  
+  # or, if you don't want to import the function but prefer to call it as
+  # TUWF::DB::sqlprint(): (the parentheses are important)
+  use TUWF::DB ();
+
+=head2 sqlprint(query, @params)
+
+This function expands the extended formatting codes in I<query> and returns a
+new query and parameters, suitable for use as arguments to C<DBI> functions.
+
+The following codes are supported:
+
+=over
+
+=item ?
+
+The standard placeholder for bind values. These will be left untouched by this
+function.
+
+=item !l
+
+List of placeholders. The corresponsing value in I<@params> should be an array
+reference. Will be expanded to a comma-separated list of standard placeholders.
+
+=item !s
+
+Will be replaced with the corresponding value in I<@params>, without any
+quoting or escaping. Similar to the C<%s> format of L<printf|printf>. There is
+a difference with simply adding a string in the query manually and using this
+formatting code, though: C<sqlprint()> will not attempt to interpret the
+string, so any formatting codes in the string are ignored.
+
+B<IMPORTANT:> Do B<NOT> use this format to insert user input in the query, or
+you will make your application vulnerable to SQL injection attacks.
+
+=item !W
+
+Generates a C<WHERE> clause. The corresponding value in I<@params> is expected
+to be a hashref or arrayref, in both cases containing key/value pairs that will
+be C<AND>'ed together. If the hash or array is empty, no C<WHERE> clause will
+be generated at all.
+
+The keys should consist of strings that contain formatting codes, and the
+values can be either scalars (if the key only has one formatting code) or
+arrayrefs (if it has multiple). Note that you should still use an extra
+arrayref as value if you want to pass an arrayref as parameter. For example, if
+you have a key such as C<'id IN(!l)'>, then the value should be
+C<[ [ id1, id2, .. ] ]>.
+
+=item !H
+
+Similar to C<!W>, except it generates a C<SET> clause and the key/value pairs
+are joined together with a comma instead of C<AND>.
+
+=back
+
+The above explanation warrants some examples, here you go:
+
+  my($q, @p) = sqlprint('SELECT !s FROM threads !W LIMIT ?',
+    # parameter for !s
+    'id, title',
+    # parameter for !W
+    { 'title like ?' => $title,
+      'id IN(!l)'    => [ [ 2, 5 ] ] },
+    # parameter for ?
+    10
+  );
+  # $q = 'SELECT id, title FROM threads WHERE title like ? AND id IN(?,?) LIMIT ?'
+  # @p = ($title, 2, 5, 10);
+  
+  my($q, @p) = sqlprint('UPDATE posts !H !W',
+    # parameter for !H:
+    { 'uid = ?' => $user },
+    # parameter for !W, this time using an array
+    [ 'msg like ?' => $msg1,
+      'msg like ?' => $msg2 ]
+  );
+  # $q = 'UPDATE posts SET uid = ? WHERE msg like ? AND msg like ?'
+  # @p = ($user, $msg1, $msg2)
+
+
+=head1 SEE ALSO
+
+L<TUWF>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008-2015 Yoran Heling.
+
+This module is part of the TUWF framework and is free software available under
+the liberal MIT license. See the COPYING file in the TUWF distribution for the
+details.
+
+
+=head1 AUTHOR
+
+Yoran Heling <projects@yorhel.nl>
+
+=cut

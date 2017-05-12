@@ -1,0 +1,282 @@
+# NAME
+
+Text::SpanningTable - ASCII tables with support for column spanning.
+
+# SYNOPSIS
+
+        use Text::SpanningTable;
+
+        # create a table object with four columns of varying widths
+        my $t = Text::SpanningTable->new(10, 20, 15, 25);
+
+        # enable automatic trailing newlines
+        $t->newlines(1);
+
+        # print a top border
+        print $t->hr('top');
+
+        # print a row (with header information)
+        print $t->row('Column 1', 'Column 2', 'Column 3', 'Column 4');
+
+        # print a double horizontal rule
+        print $t->dhr; # also $t->hr('dhr');
+
+        # print a row of data
+        print $t->row('one', 'two', 'three', 'four');
+
+        # print a horizontal rule
+        print $t->hr;
+
+        # print another row, with one column that spans all four columns
+        print $t->row([4, 'Creedence Clearwater Revival']);
+
+        # print a horizontal rule
+        print $t->hr;
+
+        # print a row with the first column as normal and another column
+        # spanning the remaining three
+        print $t->row(
+                'normal',
+                [3, 'this column spans three columns and also wraps to the next line.']
+        );
+
+        # finally, print the bottom border
+        print $t->hr('bottom');
+
+        # the output from all these commands is:
+        .----------+------------------+-------------+-----------------------.
+        | Column 1 | Column 2         | Column 3    | Column 4              |
+        +==========+==================+=============+=======================+
+        | one      | two              | three       | four                  |
+        +----------+------------------+-------------+-----------------------+
+        | Creedence Clearwater Revival                                      |
+        +----------+------------------+-------------+-----------------------+
+        | normal   | this column spans three columns and also wraps to the  |
+        |          | next line.                                             |
+        '----------+------------------+-------------+-----------------------'
+
+# DESCRIPTION
+
+`Text::SpanningTable` provides a mechanism for creating simple ASCII tables,
+with support for column spanning. It is meant to be used with monospace
+fonts such as common in terminals, and thus is useful for logging purposes.
+
+This module is inspired by [Text::SimpleTable](https://metacpan.org/pod/Text::SimpleTable) and can generally produce
+the same output (except that `Text::SimpleTable` doesn't support column
+spanning), but with a few key differences:
+
+- In `Text::SimpleTable`, you build your table in the object and
+`draw()` it when you're done. In `Text::SpanningTable`, you can print
+your table (or do whatever you want with the output) as it is being built.
+If you don't need to have your tables in "real-time", you can just save the
+output in a variable, but for convenience and compatibility with
+`Text::SimpleTable`, this module provides a `draw()` method (which is
+actually an alias for the `output()` method) that returns the table's
+output.
+- `Text::SimpleTable` takes care of the top and bottom borders of
+the table by itself. Due to `Text::SpanningTable`'s "real-time" nature,
+this functionality is not provided, and you have to take care of that yourself.
+- `Text::SimpleTable` allows you to pass titles for a header column
+when creating the table object. This module doesn't have that functionality,
+you have to create header rows (or footer rows) yourself and how you see
+fit.
+- `Text::SpanningTable` provides a second type of horizontal rules
+(called 'dhr' for 'double horizontal rule') that can be used for header
+and footer rows (or whatever you see fit).
+- `Text::SpanningTable` provides an option to define a callback
+function that can be automatically invoked on the module's output when
+calling `row()`, `hr()` or `dhr()`.
+- In `Text::SimpleTable`, the widths you define for the columns
+are the widths of the data they can accommodate, i.e. without the borders
+and padding. In `Text::SpanningTable`, the widths you define are WITH
+the borders and padding. If you are familiar with the CSS and the box model,
+then columns in `Text::SimpleTable` have `box-sizing` set to `content-box`,
+while in `Text::SpanningTable` they have `box-sizing` set to `border-box`.
+So take into account that the width of the column's data will be four
+characters less than defined.
+
+Like `Text::SimpleTable`, the columns of the table will always be exactly
+the same width as defined, i.e. they will not stretch to accommodate the
+data passed to the cells. If a cell's data is too big, it will be wrapped
+(with possible word-breaking using the '-' character), thus resulting in
+more lines of text.
+
+# METHODS
+
+## new( \[@column\_widths\] )
+
+Creates a new instance of `Text::SpanningTable` with columns of the
+provided widths. If you don't provide any column widths, the table will
+have one column with a width of 100 characters.
+
+Note that currently, a column cannot be less than 6 characters in width.
+
+## newlines( \[$boolean\] )
+
+By default, trailing newlines will NOT be added automatically to the output generated
+by this module (for example, when printing a horizontal rule, a newline
+character will not be appended). Pass a boolean value to this method to
+enable/disable automatic newline creation. Returns the current value of
+this attribute (after changing it if a boolean value had been passed).
+
+## decoration( \[$boolean\] )
+
+By default, the table will be printed with border decoration. If you want a table
+with no decoration at all, pass this a false value. Returns the current value of this
+attribute (after changing it if a boolean value had been passed).
+
+Note that in undecorated tables, the `hr()` method will behave differently, as
+documented under ["hr( \['top'|'middle'|'bottom'|'dhr'\] )"](#hr-top-middle-bottom-dhr).
+
+## exec( \\&sub, \[@args\] )
+
+Define a callback function to be invoked whenever calling `row()`, `hr()`
+or `dhr()`. Pass this method an anonymous subroutine (`\&sub` above)
+or a reference to a subroutine, and a list of parameters/arguments you
+wish this subroutine to have (`@args` above). When called, the subroutine
+will receive, as arguments, the generated output, and `@args`.
+
+So, for example, you can do:
+
+        $t->exec(sub { my ($output, $log) = @_; $log->info($output); }, $log);
+
+This would result in `$log->info($output)` being invoken whenever
+calling `row()`, `hr()` or `dhr()`, with `$output` being the output
+these methods generated. See more info at the `row()`'s method documentation
+below.
+
+## hr( \['top'|'middle'|'bottom'|'dhr'\] )
+
+Generates a horizontal rule of a certain type. Unless a specific type is
+provided, 'middle' we be used. 'top' generates a top border for the table,
+'bottom' generates a bottom border, and 'dhr' is the same as 'middle', but
+generates a 'double horizontal rule' that is more pronounced and thus can
+be used for headers and footers.
+
+This method will always result in one line of text.
+
+If table decoration is off (see ["decoration( \[$boolean\] )"](#decoration-boolean)), this method
+will return an empty string, unless 'dhr' is passed, in which case a horizontal
+rule made out of dashes will be returned.
+
+## dhr()
+
+Convenience method that simply calls `hr('dhr')`.
+
+## row( @column\_data )
+
+Generates a new row from an array holding the data for the row's columns.
+At a maximum, the number of items in the `@column_data` array will be
+the number of columns defined when creating the object. At a minimum, it
+will have one item. If the passed data doesn't fill the entire row, the
+rest of the columns will be printed blank (so it is not structurally
+incorrect to pass insufficient data).
+
+When a column doesn't span, simply push a scalar to the array. When it
+does span, push an array-ref with two items, the first being the number
+of columns to span, the second being the scalar data to print. Passing an
+array-ref with 1 for the first item is the same as just passing the scalar
+data (as the column will simply span itself).
+
+So, for example, if the table has nine columns, the following is a valid
+value for `@column_data`:
+
+        ( 'one', [2, 'two and three'], 'four', [5, 'five through nine'] )
+
+The following is also valid:
+
+        ( 'one', [5, 'two through six'] )
+
+Columns seven through nine in the above example will be blank, so it's the
+same as passing:
+
+        ( 'one', [5, 'two through six'], ' ', ' ', ' ' )
+
+If a column's data is longer than its width, the data will be wrapped
+and broken, which will result in the row being constructed from more than one
+lines of text. Thus, as opposed to the `hr()` method, this method has
+two options for a return value: in list context, it will return all the
+lines constructing the row (with or without newlines at the end of each
+string as per what was defined with the `newlines() method`); in scalar
+context, however, it will return the row as a string containing newline
+characters that separate the lines of text (once again, a trailing newline
+will be added to this string only if a true value was passed to `newlines()`).
+
+If a callback function has been defined, it will not be invoked with the
+complete output of this row (i.e. with all the lines of text that has
+resulted), but instead will be called once per each line of text. This is
+what makes the callback function so useful, as it helps you cope with
+problems resulting from all the newline characters separating these lines.
+When the callback function is called on each line of text, the line will
+only contain the newline character at its end if `newlines()` has been
+set to true.
+
+## output()
+
+## draw()
+
+Returns the entire output generated for the table up to the point of calling
+this method. It should be stressed that this method does not "finalize"
+the table by adding top and bottom borders or anything at all. Decoration
+is done "real-time" and if you don't add top and bottom borders yourself
+(with `hr('top')` and `hr('bottom')`, respectively), this method will
+not do that for you. Returned output will or will not contain newlines as
+per the value defined with `newlines()`.
+
+Both the above methods do the same, `draw()` is provided as an alias for
+compatibility with [Text::SimpleTable](https://metacpan.org/pod/Text::SimpleTable).
+
+# AUTHOR
+
+Ido Perlmuter, `<ido at ido50.net>`
+
+# BUGS
+
+Please report any bugs or feature requests to `bug-text-spanningtable at rt.cpan.org`, or through
+the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-SpanningTable](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-SpanningTable). I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+        perldoc Text::SpanningTable
+
+You can also look for information at:
+
+- RT: CPAN's request tracker
+
+    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-SpanningTable](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-SpanningTable)
+
+- AnnoCPAN: Annotated CPAN documentation
+
+    [http://annocpan.org/dist/Text-SpanningTable](http://annocpan.org/dist/Text-SpanningTable)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/d/Text-SpanningTable](http://cpanratings.perl.org/d/Text-SpanningTable)
+
+- Search CPAN
+
+    [http://search.cpan.org/dist/Text-SpanningTable/](http://search.cpan.org/dist/Text-SpanningTable/)
+
+# ACKNOWLEDGEMENTS
+
+Sebastian Riedel and Marcus Ramberg, authors of [Text::SimpleTable](https://metacpan.org/pod/Text::SimpleTable), which
+provided the inspiration of this module.
+
+# LICENSE AND COPYRIGHT
+
+Copyright 2017 Ido Perlmuter
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

@@ -1,0 +1,58 @@
+Revision history for Template-Plugin-Gravatar
+
+0.10  Sun Sep 11 08:52:46 EDT 2016
+      - [rt.cpan.org #117779] nhorne@cpan.org - https is a better
+        default scheme.
+
+0.09  Tue Dec  2 08:25:04 PST 2014
+      - Patch from Cyclenerd to correctly setup email before hashing
+        with trim and lc.
+
+0.08  Tue Oct 14 08:36:52 PDT 2014
+      - Oriol Soriano Vila patch for Base problem; RT#99482.
+
+0.07  Thu Apr  3 12:57:04 PDT 2014
+      - Moved to github.
+      - https://rt.cpan.org/Public/Bug/Display.html?id=93542 - up size
+        limit and take the border out of the tests.
+
+0.06  Thu Oct 15 16:20:42 PDT 2009 
+      - Downcased a couple of \Zs.
+      - I was looking to base this on Gravatar::URL this time but I'm
+        not quite ready. I'd like to get Schwern to expose the base URI
+        and maybe do one or two things first.
+      - Deprecated borders. They won't be in the URIs at all and carp
+        when you use them.
+      - Fixed broken URIs from Gravatar changing them without redirects.
+      - Yes, the date is accurate. I forgot to release it but figure
+        I may as well before I do 0.07 for a bug fix. Uploading
+        20140403.
+
+0.05  Sat Sep  8 20:12:24 PDT 2007
+      - Fixed a misspelling.
+      - Fixed 404/broken Gravatar site links.
+      - See also for the new standalone module, Gravatar::URL.
+
+0.04  Sun Jun 17 16:38:26 PDT 2007
+      - Fixed a pre-req moment of madness, Template wasn't required
+        and caused failures for builds without it.
+      - POD updates about absolute URIs for "default" images.
+
+0.03  Sat Mar 25 13:45:15 PST 2006
+      - Couple of POD tweaks.
+
+0.02  Sun Mar 19 10:25:55 PST 2006
+      - Um... considered "beta" I meant (that's what the other docs said).
+      - Changed the paramter joiner from "&amp;" to "&" -- wisely
+        suggested by Darren Chamberlain. Doc changes to reflect it
+        too.
+      - Added tests to check GRAVATAR settings in config and realized
+        I wasn't getting them. Fixed it.
+      - Added tests to check fatals.
+      - Expanded POD quite a bit about settings.
+      - Validating border now too (was already doing rating and size).
+
+0.01  Sat Mar 18 13:22:15 2006
+      - First stab. Considered alpha till I get some feedback and
+        use testing in.
+

@@ -1,0 +1,43 @@
+SYNOPSIS
+
+     use Term::ANSIColor;
+     use Text::Table::TinyColorWide qw/ generate_table /;
+    
+     my $rows = [
+         # header row
+         [colored(['bright_green'],'Name'), colored(['bright_green'],'Rank'), colored(['bright_green'],'Serial')],
+         # rows
+         ["\x{7231}\x{4E3D}\x{4E1D}", 'pvt', '123456'],
+         [colored(['bold'],"\x{9C8D}\x{6B65}"),   'cpl', '98765321'],
+         ['carol', 'brig gen', colored(['bold'],'8745')],
+     ];
+     binmode('STDOUT', ':utf8');
+     print generate_table(rows => $rows, header_row => 1);
+
+DESCRIPTION
+
+    This module is like Text::Table::Tiny (0.04) with added support for
+    colored text (text containing ANSI color codes) and wide characters.
+    With this module, text with ANSI color codes and/or wide characters
+    will still line up.
+
+    Interface, options, and format variables are the same as in
+    Text::Table::Tiny.
+
+SEE ALSO
+
+    Text::Table::Tiny
+
+    Text::Table::TinyColor for table with just colored text support. If you
+    only use colored text and not wide characters, this module offers fewer
+    dependencies.
+
+    Text::Table::TinyWide for table with just wide character support. If
+    you only use wide characters and not colored text, this module offers
+    fewer dependencies.
+
+    Text::Table::Any
+
+    Text::ANSITable for more formatting options, but with larger footprint
+    and slower rendering speed.
+

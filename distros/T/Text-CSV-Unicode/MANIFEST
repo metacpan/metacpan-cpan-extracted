@@ -1,0 +1,16 @@
+README
+MANIFEST
+Changes
+examples/combine.pl
+examples/parse.pl
+lib/Text/CSV/Unicode.pm
+lib/Text/CSV/Base.pm
+Build.PL
+Makefile.PL                              Created by Module::Build 
+t/base.t
+t/combine-undef.t
+t/pod-coverage.t
+t/pod.t
+t/unicode.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json

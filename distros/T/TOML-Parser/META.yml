@@ -1,0 +1,57 @@
+---
+abstract: 'simple toml parser'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  MIME::Base64: '0'
+  Storable: '2.38'
+  Test::Deep: '0'
+  Test::Deep::Fuzzy: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TOML-Parser
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  TOML::Parser:
+    file: lib/TOML/Parser.pm
+    version: '0.10'
+  TOML::Parser::Tokenizer:
+    file: lib/TOML/Parser/Tokenizer.pm
+  TOML::Parser::Tokenizer::Strict:
+    file: lib/TOML/Parser/Tokenizer/Strict.pm
+  TOML::Parser::Util:
+    file: lib/TOML/Parser/Util.pm
+requires:
+  Encode: '0'
+  Exporter: '5.57'
+  Types::Serialiser: '0'
+  parent: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/karupanerura/TOML-Parser/issues
+  homepage: https://github.com/karupanerura/TOML-Parser
+  repository: git://github.com/karupanerura/TOML-Parser.git
+version: '0.10'
+x_authority: cpan:KARUPA
+x_contributors:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'karupanerura <karupanerura@users.noreply.github.com>'
+  - 'yowcow <yowcow@cpan.org>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

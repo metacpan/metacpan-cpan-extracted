@@ -1,0 +1,17 @@
+Revision history for Perl extension Test::Stub
+
+0.04 2013-02-28T08:41:20
+
+    - Don't allow stub($object)->some_method to work unless $object->can('some_method')
+      (belden)
+
+0.03
+
+    - added make_stub() function
+
+0.02
+
+    - pod fix
+
+0.01    Fri Nov  2 14:39:09 2012
+    - original version

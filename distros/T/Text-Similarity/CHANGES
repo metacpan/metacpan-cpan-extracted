@@ -1,0 +1,185 @@
+NAME
+    CHANGES - Revision history for Text::Similarity
+
+DESCRIPTION
+    0.13
+        Released October 7, 2015 (all changes by TDP)
+
+        *   Misc pod fixes, primarily those reported by Alex Becker to bug
+            list.
+
+    0.11
+        Released October 6, 2015 (all changes by TDP)
+
+        *   Contributed enhancement by Tani Hosokawa : Not a bug, but an
+            optimization. Original version does inefficient repeated linear
+            search over text that can't possibly match. Instead, precaches
+            locations of keywords. Comparing 100 semi-randomly generated
+            fairly similar documents of about 500 words each results in
+            approx 90% speed increase, the efficiency increases as the
+            documents get larger.
+            https://rt.cpan.org/Public/Ticket/Attachment/999948/520850
+
+        *   Make various documentation/typo fixes as suggested by Alex
+            Becker. Found in CPAN bug list.
+
+    0.10
+        Released June 26, 2013
+
+        *   Version 0.09 did not fix the windows testing error that we
+            thought was fixed in 0.09. We think it has been fixed now. :)
+
+    0.09
+        Released January 22, 2013
+
+        *   This release includes changes contributed by Myroslava Dzikovska
+            that provide the full set of similarity scores programmatically.
+            She modified the interface so that the getSimilarity function
+            returns a pair ($score, %allScores) where %allScores is a hash
+            of all possible scores that it computes. She made it so that in
+            scalar context it will only return $score, so it is fully
+            backwards compatible with the older versions. She also changed
+            the printing to STDERR, to make it easier to use the code in
+            filter scripts that depend on STDIN/STDOUT.
+
+        *   This release also inludes changes ontributed by Nathan Glen to
+            allow test cases to pass on Windows. The single quote used
+            previously caused arguments to the script not to be passed
+            corrected, leading to test failures. The single quotes have been
+            changed to double quotes.
+
+    0.08
+        Released June 11, 2010 (all changes by YL)
+
+        *   Changed the stoplist option. stoplist file can be one word per
+            line or one word in the regular expression format per line, or
+            the mix of these two formats.
+
+    0.07
+        Released November 14, 2008 (all changes by TDP)
+
+        *   Changed test case that was tripping up Windows. In Linux these
+            are treated as being the same (when order doesn't matter) but
+            this is not the case in Windows.
+
+                    'sir winston churchill' 'winston churchill SIR!!!'
+
+            The case has been changed to :
+
+                    'sir winston churchill' 'winston churchill sir'
+
+    0.06
+        Released April 5, 2008 (all changes by TDP)
+
+        *   Added Dice coefficient to Overlaps.pm output. Dice is equivalent
+            to F-measure, but formulated slightly differently so could be
+            useful to catch errors.
+
+        *   Modified Overlaps method to provide lesk text matching score,
+            that is the sum of the squared lengths of all phrasal matches
+            (optionally normalized by the product of the lengths of the
+            strings). It provides both Raw lesk and lesk (the normalized
+            form) when run in verbose mode.
+
+        *   Reogranized some documentation to make it more clear that
+            Overlaps is just one possible way of measuring similarity, and
+            that other methods can and should be added.
+
+        *   Renamed text_compare.pl as the more natural and fitting
+            text_similarity.pl
+
+    0.05
+        Released April 4, 2008 (all changes by TDP)
+
+        *   Made it possible for users to input strings directly via
+            text_compare.pl and getSimilarityStrings. Previously it was only
+            possible to directly measure the similarity of files, but now
+            strings can be measured.
+
+    0.04
+        Released March 21, 2008 (all changes by TDP)
+
+        *   Introduced tests for text_compare.pl (t/text_compare.t) - added
+            support for os neutral file reads via FILE::SPEC in this and
+            other .t files.
+
+        *   Introduced tests for getOverlaps (t/overlaps.t)
+
+        *   Improved synopsis examples to show how to pass options via
+            arguments in hashes
+
+        *   Clarified that stemming and compounding are not currently
+            supported disabled compfile option in text_compare.pl
+
+        *   Made file handling in text_compare more robust so that when a
+            file does not exist an error message is given and failure is
+            immediate
+
+        *   Changed method of passing constants in test cases from (eg.)
+            "Text::Similarity::NORMALIZE" to "normalize" in order to support
+            backwards compatability with perl 5.6.
+
+        *   Introduce normalize and no-normalize tests for getSimilarity
+
+        *   Fix Similarity.pm Synopsis example not to use files in /t that
+            are no longer available
+
+    0.03
+        Released March 20, 2008 (all changes by TDP)
+
+        *   fix divide by zero errors reported on cpan by cernst at
+            esoft.com, who also provided fix
+
+        *   update test cases to improve coverage of partial matches and no
+            matches
+
+        *   update synopsis examples so they can be run via cut and paste
+
+        *   improve README content to make it more descriptive
+
+        *   introduce /doc directory for pod of INSTALL README and CHANGES
+
+        *   introduce 'use constant' to support perl 5.6
+
+    0.02
+        Released October 16, 2004, all changes by JM
+
+        *   fixed overlap finding & added new module Text::OverlapFinder
+
+        *   improved command-line interface
+
+        *   improved documentation and help messages
+
+        *   added support for a stoplist
+
+    0.01
+        Released September 23, 2004, all changes by JM
+
+        *   original version; created by h2xs 1.23 with options -b 5.6.0 -A
+            -X Text::Similarity
+
+AUTHORS
+     Ted Pedersen, University of Minnesota, Duluth
+     tpederse at d.umn.edu
+
+     Ying Liu, University of Minnesota, Twin Cities
+     liux0395 at umn.edu
+
+    This document last modified by : $Id: CHANGES.pod,v 1.4 2015/10/08
+    13:11:44 tpederse Exp $
+
+SEE ALSO
+    <L http://text-similarity.sourceforge.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2004-2010 Ted Pedersen
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

@@ -1,0 +1,16 @@
+MANIFEST
+Makefile.PL
+README
+Thumbnail.pm
+test.pl
+thumbnail.pl
+tkthumb
+images/Icon.bmp
+images/Icon.gif
+images/Icon.ppm
+images/Icon.xbm
+images/Icon.xpm
+images/Apple_guy.gif
+images/Astronaut1.gif
+images/info3.png
+META.yml                                 Module meta-data (added by MakeMaker)

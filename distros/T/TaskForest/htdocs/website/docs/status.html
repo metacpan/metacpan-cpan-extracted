@@ -1,0 +1,67 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Checking TaskForest Status</div>
+  <p>
+    To get the status of all currently running and recently run jobs,
+    enter the following command:
+  </p>
+
+  <div class="code"><pre><code>status
+
+OR
+
+status <a href="/docs/configuring/options.html#log_dir">--log_dir</a>=/foo/logs <a href="/docs/configuring/options.html#family_dir">--family_dir</a>=/foo/families
+
+OR
+
+status <a href="/docs/configuring/options.html#log_dir">--log_dir</a>=/foo/logs <a href="/docs/configuring/options.html#family_dir">--family_dir</a>=/foo/families \
+<a href="/docs/configuring/options.html#collapse">--collapse</a></code></pre></div>
+
+  <p>
+    If the <a href="/docs/configuring/options.html#collapse">--collapse</a> option is used then pending repeat jobs will not be
+    displayed.
+  </p>
+
+  <p>
+    The ``status'' command also accepts a ``--date'' option, in which case
+    it displays all the jobs that ran for that date. The date must be in
+    the ``YYYYMMDD'' format:
+  </p>
+
+  <div class="code"><pre><code>status <a href="/docs/configuring/options.html#log_dir">--log_dir</a>=/foo/logs <a href="/docs/configuring/options.html#family_dir">--family_dir</a>=/foo/families \
+--date 20090201</code></pre></div>
+
+  <p>
+    If the date specified is not the same as the current date, the
+    ``<a href="/docs/configuring/options.html#collapse">--collapse</a>'' option doesn't make any sense, because there can't be
+    any pending jobs for a date in the past.
+  </p>
+
+  <p>
+    When displaying the status for days in the past, there is no way for
+    the system to know what time zone the jobs were scheduled for. This is
+    because the corresponding family file could have changed between the
+    time that the job ran and the time that you're running the status
+    command. To resolve this, the system will always display jobs in the
+    time zone specified by the '<a href="/docs/configuring/options.html#default_time_zone">default_time_zone</a>' option. If the default
+    time zone is not specified, its default value is
+    ``America/Chicago''.
+  </p>
+
+  <div class="new_section_header">Checking Status Via the Web Site</div>
+
+  <p>
+    To check the status for the current day's jobs, direct your browser
+    to <code>/status.html</code>.  To check the status for earlier days,
+    use the "View Logs" form that's available on every page of the web
+    site.
+  </p>
+
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

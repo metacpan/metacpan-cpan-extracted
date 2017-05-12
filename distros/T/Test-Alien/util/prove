@@ -1,0 +1,28 @@
+use strict;
+use warnings;
+use File::Temp qw( tempdir );
+use Capture::Tiny qw( capture_merged );
+
+my $root = tempdir( CLEANUP => 1 );
+
+foreach my $mod (@ARGV)
+{
+  eval qq{ use $mod () };
+  die "$mod already installed!" unless $@;
+  
+  my($out, $err) = capture_merged {
+    system( 'cpanm', '--reinstall', -l => $root,  -n => $mod );
+    $?;
+  };
+  
+  if($err)
+  {
+    print $out;
+    die "cpanm failed";
+  }
+}
+
+my $lib = File::Spec->catdir( $root, qw( lib perl5 ));
+
+exec 'prove', '-lv', -I => $lib, 't';
+

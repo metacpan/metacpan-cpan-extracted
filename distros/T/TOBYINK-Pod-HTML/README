@@ -1,0 +1,163 @@
+NAME
+    TOBYINK::Pod::HTML - convert Pod to HTML like TOBYINK
+
+SYNOPSIS
+       #!/usr/bin/perl
+   
+       use strict;
+       use warnings;
+       use TOBYINK::Pod::HTML;
+   
+       my $pod2html = "TOBYINK::Pod::HTML"->new(
+          pretty             => 1,       # nicely indented HTML
+          code_highlighting  => 1,       # use PPI::HTML
+          code_line_numbers  => undef,
+          code_styles        => {        # some CSS
+             comment   => 'color:green',
+             keyword   => 'font-weight:bold',
+          }
+       );
+   
+       print $pod2html->file_to_html(__FILE__);
+
+DESCRIPTION
+    Yet another pod2html converter.
+
+    Note that this module requires Perl 5.14, and I have no interest in
+    supporting legacy versions of Perl.
+
+  Constructor
+    `new(%attrs)`
+        Moose-style constructor.
+
+  Attributes
+    `pretty`
+        If true, will output pretty-printed (nicely indented) HTML. This
+        doesn't make any difference to the appearance of the HTML in a
+        browser.
+
+        This feature requires XML::LibXML::PrettyPrint.
+
+        Defaults to false.
+
+    `code_highlighting`
+        If true, source code samples within pod will be syntax highlighted as
+        Perl 5.
+
+        This feature requires PPI::HTML and PPI::Document.
+
+        Defaults to false.
+
+    `code_line_numbers`
+        If undef, source code samples within pod will have line numbers, but
+        only if they begin with "#!".
+
+        If true, all source code samples within pod will have line numbers.
+
+        This feature only works in conjunction with `code_highlighting`.
+
+        Defaults to undef.
+
+    `code_styles`
+        A hashref of CSS styles to assign to highlighted code. The defaults
+        are:
+
+           +{
+              symbol        => 'color:#333;background-color:#fcc',
+              pod           => 'color:#060',
+              comment       => 'color:#060;font-style:italic',
+              operator      => 'color:#000;font-weight:bold',
+              single        => 'color:#909',
+              double        => 'color:#909',
+              literal       => 'color:#909',
+              interpolate   => 'color:#909',
+              words         => 'color:#333;background-color:#ffc',
+              regex         => 'color:#333;background-color:#9f9',
+              match         => 'color:#333;background-color:#9f9',
+              substitute    => 'color:#333;background-color:#f90',
+              transliterate => 'color:#333;background-color:#f90',
+              number        => 'color:#39C',
+              magic         => 'color:#900;font-weight:bold',
+              cast          => 'color:#f00;font-weight:bold',
+              pragma        => 'color:#009',
+              keyword       => 'color:#009;font-weight:bold',
+              core          => 'color:#009;font-weight:bold',
+              line_number   => 'color:#666',
+              # for non-Perl code
+              alert         => 'color:#f00;background-color:#ff0',
+              warning       => 'color:#f00;background-color:#ff0;font-style:italic',
+              error         => 'color:#f00;background-color:#ff0;font-style:italic;font-weight:bold',
+              bstring       => '',
+              function      => '',
+              regionmarker  => '',
+              others        => '',
+           }
+
+        Which looks kind of like the Perl highlighting from SciTE.
+
+  Methods
+    `file_to_dom($filename)`
+        Convert pod from file to a XML::LibXML::Document object.
+
+    `string_to_dom($document)`
+        Convert pod from string to a XML::LibXML::Document object.
+
+    `file_to_xhtml($filename)`
+        Convert pod from file to an XHTML string.
+
+    `string_to_xhtml($document)`
+        Convert pod from string to an XHTML string.
+
+    `file_to_html($filename)`
+        Convert pod from file to an HTML5 string.
+
+        This feature requires HTML::HTML5::Writer.
+
+    `string_to_html($document)`
+        Convert pod from string to an HTML5 string.
+
+        This feature requires HTML::HTML5::Writer.
+
+  Alternative Syntax Highlighting
+    This module defines an additional Pod command to change the language for
+    syntax highlighting. To tell TOBYINK::Pod::HTML to switch to, say, Haskell
+    instead of the default (Perl), just use:
+
+       =for highlighter language=Haskell
+
+    Then all subsequent code samples will be highlighted as Haskell, until
+    another such command is seen.
+
+    While syntax highlighting for Perl uses PPI::HTML, syntax highlighting for
+    other languages uses either Syntax::Highlight::RDF or
+    Syntax::Highlight::Engine::Kate as appropriate, so you need to have them
+    installed if you want this feature.
+
+    Note that the language names defined by Syntax::Highlight::Engine::Kate
+    are case-sensitive, and TOBYINK::Pod::HTML makes no attempt at
+    case-folding, so you must use the correct case!
+
+    Note that only the PPI highlighter supports line numbering.
+
+    The following command can be used to switch to plain text syntax
+    highlighting (i.e. no highlighting at all):
+
+       =for highlighter language=Text
+
+SEE ALSO
+    Pod::Simple, PPI::HTML, etc.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

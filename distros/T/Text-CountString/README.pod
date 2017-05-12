@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Text::CountString>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Text-CountString"><img src="https://secure.travis-ci.org/bayashi/Text-CountString.png"/></a> <a href="https://coveralls.io/r/bayashi/Text-CountString"><img src="https://coveralls.io/repos/bayashi/Text-CountString/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Text::CountString installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Text::CountString
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Text::CountString documentation is available as in POD. So you can do:
+
+    % perldoc Text::CountString
+
+
+=head1 REPOSITORY
+
+Text::CountString is hosted on github
+L<http://github.com/bayashi/Text-CountString>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

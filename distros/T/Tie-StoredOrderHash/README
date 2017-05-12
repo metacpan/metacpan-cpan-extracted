@@ -1,0 +1,31 @@
+Tie-StoredOrderHash version 0.22
+================================
+
+Tie::StoredOrderHash is a(nother) implementation of a Perl hash that
+preserves the order in which elements are stored.
+
+While uncooked Perl hashes make no guarantees about the order in which
+elements are iterated, T::SOH objects iterate over elements in a
+consistent order, starting with the least-recently-updated element,
+and finishing with the element that was most-recently added or updated.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Developed on Perl 5.8.8; not much controversial in there, it should work
+with earlier perls.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2009-2010 tom murtagh.  All rights reserved.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

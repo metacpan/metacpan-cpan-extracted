@@ -1,0 +1,10 @@
+TAP version 13
+1..5
+# Tapper-suite-name: benchmark-s3
+# Tapper-machine-name: taylor
+# Tapper-section: results
+ok 1 - Getting content
+ok 2 - raw values
+ok 3 - sorted time data
+ok 4 - benchmarks
+ok 5 - successfully finished cycle

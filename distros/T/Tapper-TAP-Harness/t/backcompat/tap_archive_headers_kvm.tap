@@ -1,0 +1,36 @@
+1..1
+# Artemis-section: Metainfo
+# Artemis-Suite-Name: Daily-Report
+# Artemis-Suite-version: 0.01
+# Artemis-machine-name: kepek
+# Artemis-reportername: sschwigo
+# Artemis-Hardwaredb-Systems-Id: 4711
+# Artemis-machine-description: PC-Ware
+# Artemis-cpuinfo: 1x Family: 15, Model: 107, Stepping: 1
+# Artemis-ram: 3839 MB
+# Artemis-bios: American Megatrends Inc., 0201, 10/15/2007
+# Artemis-uptime: 21 hrs
+# Artemis-reportcomment: Hot Funky Report
+ok 1 host metadata
+1..1
+# Artemis-section: KVM-Metainfo
+# Artemis-kvm-module-version: kvm-84-6620-ge3dbe3f
+# Artemis-kvm-userspace-version: kvm-84-488-gee8b55c
+# Artemis-kvm-base-os-description: Fedora release 10 (Cambridge)
+# Artemis-kvm-kernel: 2.6.27.21-170.2.56.fc10.x86_64 x86_64
+# Artemis-description: description affe 0
+ok 1 kvm metadata
+1..3
+# Artemis-section: guest_1_ms_vista_32b_up_qcow
+# Artemis-kvm-guest-description: 001-WinSST
+# Artemis-kvm-guest-test: WinSST-4.7.4
+# Artemis-kvm-guest-start: 2009-04-06 19:52:18
+# Artemis-kvm-guest-flags: -m 2304 -smp 1
+# Artemis-description: description affe 1
+ok 1 general
+ok 2 time 
+ok 3 WinSST 4.7.4
+1..1
+# Artemis-section: host
+# Artemis-description: description affe 2
+ok 1 no test performed 

@@ -1,0 +1,19 @@
+Revision history for Task-Dancer2
+
+0.06    2015-11-08
+        Changed link for Dancer2::Logger::File::RotateLogs in README from
+        Dancer to Dancer2 (roryzweistra)
+
+0.05    2015-10-26
+        Dancer2::Plugin::Queue::MongoDB enabled
+
+0.04    2015-10-23
+        Dancer2::Plugin::Queue enabled
+        Dancer2::Plugin::REST enabled
+
+0.03    2015-10-22
+        Re-enabled Dancer2::Session::JSON (Thanks, xdg!)
+
+0.02    2015-10-07
+        Initial version. Expect issues :)
+

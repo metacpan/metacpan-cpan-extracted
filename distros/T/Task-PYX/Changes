@@ -1,0 +1,55 @@
+0.09 2016-02-17T12:02:11+01:00
+ - Add App::PYX2XML 0.01 version.
+ - Add PYX::SGML::Raw 0.01 version.
+ - Update PYX::XMLSchema::List to 0.04 version.
+ - Update copyright years.
+
+0.08 2015-10-25T17:42:21+01:00
+ - Fix PYX description in SEE ALSO section.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update PYX to 0.04 version.
+ - Update PYX::GraphViz to 0.04 version.
+ - Update PYX::Hist to 0.03 version.
+ - Update PYX::SGML::Raw to 0.02 version.
+ - Update PYX::Sort to 0.03 version.
+ - Update PYX::Stack to 0.04 version.
+ - Update PYX::Utils to 0.04 version.
+ - Update PYX::XMLNorm to 0.04 version.
+ - Update PYX::XMLSchema::List to 0.03 version.
+ - Update Tags::Output::PYX to 0.03 version.
+
+0.07 2015-04-05T00:37:18+02:00
+ - Add PYX::SGML::Raw 0.01 version.
+ - Add PYX::Sort to SEE ALSO section in doc.
+ - Add PYX::XMLSchema::List 0.01 version.
+
+0.06 2015-03-31T23:18:34+02:00
+ - Add XML::PYX 0.07 version.
+ - Add XML::MinWriter 0.08 version.
+ - Rewrite SEE ALSO section to NEILB format.
+ - Update PYX::XMLNorm to 0.03 version.
+
+0.05 2015-03-22T01:16:07+01:00
+ - Add PYX::Sort 0.02 version.
+ - Add PYX::XMLNorm 0.01 version.
+ - Add Tags::Output::PYX 0.01 version.
+ - Update PYX to 0.03 version.
+
+0.04 2015-02-04T23:10:02+01:00
+ - Update PYX::Hist to 0.02 version.
+ - Update PYX::Stack to 0.03 version.
+ - Update PYX::Utils to 0.03 version.
+
+0.03 2015-01-26T01:00:34+01:00
+ - Add PYX::Hist 0.01 version.
+ - Add missing PYX::Parser to SEE ALSO section in doc.
+ - Update PYX::Stack to 0.02 version.
+
+0.02 2015-01-18T19:00:08+01:00
+ - Add PYX::Stack 0.01 version.
+ - Update PYX to 0.02 version.
+ - Update PYX::GraphViz to 0.03 version.
+
+0.01 2015-01-16T17:40:44+01:00
+ - First version

@@ -1,0 +1,4 @@
+name = "Test-Deep-Fuzzy"
+badges = ["travis", "codecov"]
+module_maker = "ModuleBuildTiny"
+markdown_maker = "Pod::Markdown::Github"

@@ -1,0 +1,28 @@
+{
+  "belongs_to": { "fetch": 0},
+	"sets": [
+		{
+			"class": "Cv::Cv",
+			"quantity": "all",
+			"cond":
+			    {
+			      "name":
+			          [
+			            "sequence",
+			            "relationship",
+			            "cvterm_property_type",
+			            "chado_properties",
+			            "feature_property"
+			        ]
+			 }
+		},
+		{
+			 "class": "General::Db",
+			 "quantity": "all"
+		},
+		{
+			 "class": "Organism::Organism",
+			 "quantity": "all"
+		}
+	]
+}

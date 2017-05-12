@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<annotation xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head>
+    <schema href="example7_schema.xml"/>
+    <references>
+      <reffile name="tokenization" id="t" href="example6.xml"/>
+    </references>
+  </head>
+  <S sentence.rf="s1">
+    <LM label="NP"><w.rf>t#s1w1</w.rf></LM>
+    <LM label="VP">
+      <w.rf>t#s1w2</w.rf>
+      <constituents label="NP">
+        <w.rf>t#s1w3</w.rf>
+      </constituents>
+    </LM>
+  </S>
+  <S sentence.rf="s2">
+    <LM label="NP"><w.rf>t#s2w1</w.rf></LM>
+    <LM label="VP">
+      <w.rf>t#s2w2</w.rf>
+      <constituents>
+        <LM label="NP"><w.rf>t#s2w3</w.rf></LM>
+        <LM label="ADVP">
+          <w.rf>
+            <LM>t#s2w4</LM>
+            <LM>t#s2w5</LM>
+          </w.rf>
+        </LM>
+      </constituents>
+    </LM>
+  </S>
+</annotation>

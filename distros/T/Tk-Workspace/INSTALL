@@ -1,0 +1,77 @@
+Tk::Workspace.pm, Version 1.75, installation:
+
+The Tk::Workspace.pm distribution has been tested only on the Linux
+and Solaris operating systems.  Refer all questions and problem
+reports to the author, Robert Allan Kiesling <rkiesling@earthlink.net>.
+
+
+System Requirements:
+
+1.  A Unix or derivative operating system.
+2.  Perl version 5.005 or greater.
+3.  Perl/Tk, version 800.022 or later.
+4.  GNU make.
+
+Optional:
+
+The following packages, which are available at http://www.cpan.org/,
+are required to enable specific features: 
+
+  Remote File Import/Export
+
+    1. Net::FTP (part of libnet)
+
+  Unicode Support:
+
+    1. MIME::Base64
+    2. Unicode::Map
+    3. Unicode::String
+
+Installation:
+
+1.  Untar the Tk-Workspace-1.75 archive with the guzip and tar commands:
+
+  # gzip -dc Tk-Workspace-1.75.tar.gz | tar xvf -
+ 
+   or, using GNU tar,
+
+  # tar zxvf Tk-Workspace-1.75.tar.gz
+
+2.  Change to the top-level subdirectory:
+
+  # cd Tk-Workspace-1.75
+
+3.  Optionally, install the workspace.xpm icon in your normal personal
+    or system icon directory if you have permission to do so.  (For
+    example, "/home/joeuser/.icons/workspace.xpm".)  Edit the value of
+    $iconpath in line 32 of Workspace.pm to the icon's full pathname,
+    including the quotes.
+
+4.  The top-level Makefile should work on any Unix or derivative
+    system that has GNU make installed.  It uses the Perl ExtUtils 
+    installation to build the package's Makefile.  At the prompt, 
+    type:
+
+  # perl Makefile.PL
+
+5.  Build the program modules and documentation.  Type:
+
+  # make
+
+6.  If necessary, become root (via "su", for example), and 
+    install the source files and documentation in the system's 
+    site_perl library.
+
+  # su
+  Enter Password:
+  $ make install
+
+
+Copyright:
+
+This software is distributed under the Perl Artistic License.
+Please refer to the file "Artistic" in this directory.
+
+Bugs:
+
+Please send bug reports to: Robert Allan Kiesling <rkiesling@earthlink.net>

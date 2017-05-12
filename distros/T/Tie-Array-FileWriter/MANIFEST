@@ -1,0 +1,8 @@
+t/1.t
+lib/Tie/Array/FileWriter.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+COPYRIGHT
+LICENSE

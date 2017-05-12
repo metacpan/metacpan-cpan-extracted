@@ -1,0 +1,65 @@
+Revision history for Perl module Text::Phonetic
+
+2.06 Wed Sep 23 2015
+    - Moose -> Moo (implemented by Miquel Ruiz)
+    - Update Phonix to match WAIS (implemented by olsgaard)
+    - Fix typo (implemented by Dmitri Tikhonov)
+    - Remove mymenta.* from dist (implemented by Sandro Cazzaniga)
+
+2.05 Mon Jan 27 2014
+    - Update POD
+    - Dist housekeeping
+    - Use Class::Load instead of Class::MOP to load classes
+
+2.04 Sat Nov 17 2012
+    - Fix failing tests
+    - Check predicates only once
+    - Dist housekeeping
+    - Update documentation
+
+2.02 Sat Oct 30 2009
+    - Fix failing tests
+
+2.01 Mon Oct 26 2009
+    - Use Moose' extend instead of parent
+
+2.00 Sun Oct 25 2009
+    - Use Moose
+    - Implement new constructor
+    - Add optional attributes to soundex algorithm
+    - Remove soundexnara algorithm (now in Soundex)
+    - New API
+    - Move author tests to xt/
+    - Update makefile: Text::* modukes are optional, generate readme, add github repo
+    - Fix linebreaks
+
+1.07 Thu Oct 20 2008
+    - Fixed warnings on empty strings (reported by Jürgen Peters)
+    - Returns undef on empty strings
+
+1.06 Thu Jul 16 2008
+    - Fixed rule bug in T::P::Phonix (reported by Bart Massey)
+
+1.05 Thu Jul 16 2008
+    - More tests
+    - Test coverage 94.8%
+    - Fixed compare bugs
+    - Pod encoding
+
+1.04 Sun Apr 13 2008
+    - Fixed Text::Phonetic::Phonix
+    - Switched to Module::Install
+    
+1.03 Fri Apr 13 2008
+    - Makefile not executable
+    - Documentation
+    - Added Text::Phonetic::Phonem
+
+1.02 Sun Dec 12 2007
+    - Corrected depenedicies in Makefile and META.yml, so that cpantesters tests don't fail
+    
+1.01 Sun Dec 10 2007
+    - Corrected depenedicies in Makefile and META.yml, so that cpantesters tests don't fail
+    
+1.00 Sun Nov 11 2007
+    - original version; created by ExtUtils::ModuleMaker 0.49

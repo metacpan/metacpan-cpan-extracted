@@ -1,0 +1,269 @@
+NAME
+    Tk::ToolBar - A toolbar widget for Perl/Tk
+
+SYNOPSIS
+            use Tk;
+            use Tk::ToolBar;
+
+            my $mw = MainWindow->new;
+            my $tb = $mw->ToolBar(qw/-movable 1 -side top
+                                     -indicatorcolor blue/);
+
+            $tb->ToolButton  (-text  => 'Button',
+                              -tip   => 'tool tip',
+                              -command => sub { print "hi\n" });
+            $tb->ToolLabel   (-text  => 'A Label');
+            $tb->Label       (-text  => 'Another Label');
+            $tb->ToolLabEntry(-label => 'A LabEntry',
+                              -labelPack => [-side => "left",
+                                             -anchor => "w"]);
+
+            my $tb2 = $mw->ToolBar;
+            $tb2->ToolButton(-image   => 'navback22',
+                             -tip     => 'back',
+                             -command => \&back);
+            $tb2->ToolButton(-image   => 'navforward22',
+                             -tip     => 'forward',
+                             -command => \&forward);
+            $tb2->separator;
+            $tb2->ToolButton(-image   => 'navhome22',
+                             -tip     => 'home',
+                             -command => \&home);
+            $tb2->ToolButton(-image   => 'actreload22',
+                             -tip     => 'reload',
+                             -command => \&reload);
+
+            MainLoop;
+
+DESCRIPTION
+    This module implements a dockable toolbar. It is in the same spirit as
+    the "short-cut" toolbars found in most major applications, such as most
+    web browsers and text editors (where you find the "back" or "save" and
+    other shortcut buttons).
+
+    Buttons of any type (regular, menu, check, radio) can be created inside
+    this widget. You can also create Label, Entry and LabEntry widgets.
+    Moreover, the ToolBar itself can be made dockable, such that it can be
+    dragged to any edge of your window. Dragging is done in "real-time" so
+    that you can see the contents of your ToolBar as you are dragging it.
+    Furthermore, if you are close to a stickable edge, a visual indicator
+    will show up along that edge to guide you. ToolBars can be made
+    "floatable" such that if they are dragged beyond their associated
+    window, they will detach and float on the desktop. Also, multiple
+    ToolBars are embeddable inside each other.
+
+    If you drag a ToolBar to within 15 pixels of an edge, it will stick to
+    that edge. If the ToolBar is further than 15 pixels away from an edge
+    and still inside the window, but you release it over another ToolBar
+    widget, then it will be embedded inside the second ToolBar. You can
+    "un-embed" an embedded ToolBar simply by dragging it out. You can change
+    the 15 pixel limit using the -close option.
+
+    Various icons are built into the Tk::ToolBar widget. Those icons can be
+    used as images for ToolButtons (see the SYNOPSIS entry elsewhere in this
+    document). A demo program is bundled with the module that should be
+    available under the 'User Contributed Demonstrations' when you run the
+    widget program. Run it to see a list of the available images.
+
+    Tk::ToolBar attempts to use Tk::CursorControl if it's already installed
+    on the system. You can further control this using the *-cursorcontrol*
+    option. See the PREREQUISITES entry elsewhere in this document.
+
+    The ToolBar is supposed to be created as a child of a Toplevel
+    (MainWindow is a Toplevel widget) or a Frame. You are free to experiment
+    otherwise, but expect the unexpected :-)
+
+WIDGET-SPECIFIC OPTIONS
+    The ToolBar widget takes the following arguments:
+
+    -side
+        This option tells the ToolBar what edge to *initially* stick to. Can
+        be one of 'top', 'bottom', 'left' or 'right'. Defaults to 'top'.
+        This option can be set only during object creation. Default is
+        'top'.
+
+    -movable
+        This option specifies whether the ToolBar is dockable or not. A
+        dockable ToolBar can be dragged around with the mouse to any edge of
+        the window, subject to the sticky constraints defined by *-sticky*.
+        Default is 1.
+
+    -close
+        This option specifies, in pixels, how close we have to drag the
+        ToolBar an edge for the ToolBar to stick to it. Default is 15.
+
+    -sticky
+        This option specifies which sides the toolbar is allowed to stick
+        to. The value must be a string of the following characters 'nsew'. A
+        string of 'ns' means that the ToolBar can only stick to the north
+        (top) or south (bottom) sides. Defaults to 'nsew'. This option can
+        be set only during object creation.
+
+    -in This option allows the toolbar to be embedded within another already
+        instantiated Tk::ToolBar object. The value must be a Tk::ToolBar
+        object. This option can be set only during object creation.
+
+    -float
+        This option specifies whether the toolbar should "float" on the
+        desktop if dragged outside of the window. It defaults to 1. Note
+        that this value is ignored if *-cursorcontrol* is set to 1.
+
+    -cursorcontrol
+        This option specifies whether to use Tk::CursorControl to confine
+        the cursor during dragging. The value must be either 1 or 0. The
+        default is 1 which checks for Tk::CursorControl and uses it if
+        present.
+
+    -mystyle
+        This option indicates that you want to control how the ToolBar looks
+        like and not rely on Tk::ToolBar's own judgement. The value must be
+        either 1 or 0. For now, the only thing this controls is the relief
+        of ToolButtons and the borderwidth. Defaults to 0.
+
+    -indicatorcolor
+        This option controls the color of the visual indicator that tells
+        you whether you are close enough to an edge when dragging the
+        ToolBar. Defaults to some shade of blue and green (I like it :P).
+
+    -indicatorrelief
+        This option controls the relief of the visual indicator that tells
+        you whether you are close enough to an edge when dragging the
+        ToolBar. Defaults to flat.
+
+WIDGET METHODS
+    The following methods are used to create widgets that are placed inside
+    the ToolBar. Widgets are ordered in the same order they are created,
+    left to right.
+
+    For all widgets, except Labels, a tooltip can be specified via the -tip
+    option. An image can be specified using the -image option for Button-
+    and Label-based widgets.
+
+    *$ToolBar*->ToolButton(?-type => *buttonType*,? *options*)
+    *$ToolBar*->Button(?-type => *buttonType*,? *options*)
+        This method creates a new Button inside the ToolBar. The *-type*
+        option can be used to specify what kind of button to create. Can be
+        one of 'Button', 'Checkbutton', 'Menubutton', or 'Radiobutton'. A
+        tooltip message can be specified via the -tip option. An accelerator
+        binding can be specified using the -accelerator option. The value of
+        this option is any legal binding sequence as defined in the bind
+        manpage. For example, "-accelerator => '<f>'" will invoke the button
+        when the 'f' key is pressed. Any other options will be passed
+        directly to the constructor of the button. The Button object is
+        returned.
+
+    *$ToolBar*->ToolLabel(*options*)
+    *$ToolBar*->Label(*options*)
+        This method creates a new Label inside the ToolBar. Any options will
+        be passed directly to the constructor of the label. The Label object
+        is returned.
+
+    *$ToolBar*->ToolEntry(*options*)
+    *$ToolBar*->Entry(*options*)
+        This method creates a new Entry inside the ToolBar. A tooltip
+        message can be specified via the -tip option. Any other options will
+        be passed directly to the constructor of the entry. The Entry object
+        is returned.
+
+    *$ToolBar*->ToolLabEntry(*options*)
+    *$ToolBar*->LabEntry(*options*)
+        This method creates a new LabEntry inside the ToolBar. A tooltip
+        message can be specified via the -tip option. Any other options will
+        be passed directly to the constructor of the labentry. The LabEntry
+        object is returned. In horizontal ToolBars, the label of the
+        LabEntry widget will be packed to the left of the entry. On vertical
+        ToolBars, the label will be packed on top of the entry.
+
+    *$ToolBar*->ToolOptionmenu(*options*)
+    *$ToolBar*->Optionmenu(*options*)
+        This method creates a new Optionmenu inside the ToolBar. A tooltip
+        message can be specified via the -tip option. Any other options will
+        be passed directly to the constructor of the Optionmenu. The
+        Optionmenu object is returned.
+
+    *$ToolBar*->separator(?-movable => 0/1, -space => num?)
+        This method inserts a separator. Separators are movable by default.
+        To change that, set the -movable option to 0. If you want to add
+        some space to the left of a separator (or at the top if your ToolBar
+        is vertical), then you can specify the amount of space (in pixels)
+        via the -space option. This can be used to "right-justify" some
+        buttons.
+
+IMAGES
+    Tk::ToolBar now comes with a set of useful images that can be used in
+    your Tk programs. To view those images, run the widget program that is
+    bundled with Tk, scroll down to the 'User Contributed Demonstrations',
+    and click on the Tk::ToolBar entry.
+
+    Note that the images are created using the text method. Also,
+    Tk::ToolBar, upon its creation, pre-loads all of the bundled images into
+    memory. This means that those images are available for use in other
+    widgets in your Tk program. This also means that unless those images are
+    explicitly destroyed, they will use up a small amount of memory even if
+    you are not using them explicitly.
+
+    As far as I know, all the bundled images are in the free domain. If that
+    is not the case, then please let me know.
+
+BUGS
+    Not really a bug, but a feature ;-) The ToolBar widget assumes that you
+    use *pack* in its parent. Actually, it will *pack()* itself inside its
+    parent. If you are using another geometry manager, then you *MIGHT* get
+    some weird behaviour. I have tested it very quickly, and found no
+    surprises, but let me know if you do.
+
+    Another thing I noticed is that on slower window managers dragging a
+    ToolBar might not go very smoothly, and you can "drop" the ToolBar
+    midway through dragging it. I noticed this on Solaris 7 and 8, running
+    any of OpenLook, CDE or GNOME2 window managers. I would appreciate any
+    reports on different platforms.
+
+TODO
+    I have implemented everything I wanted, and then some. Here are things
+    that were requested, but are not implemented yet. If you want more, send
+    me requests.
+
+    o Allow buttons to be "tied" to menu items. Somewhat taken care of with
+    the -accelerator method for buttons.
+    o Implement Drag-n-Drop to be able to move Tool* widgets interactively.
+    Do we really want this?
+PREREQUISITES
+    Tk::ToolBar uses only core pTk modules. So you don't need any special
+    prerequisites. But, if Tk::CursorControl is installed on your system,
+    then Tk::ToolBar will use it to confine the cursor to your window when
+    dragging ToolBars (unless you tell it not to).
+
+    Note also that Tk::CursorControl is defined as a prerequisite in
+    Makefile.PL. So, during installation you might get a warning saying:
+
+    "Warning: prerequisite Tk::CursorControl failed to load ..."
+
+    if you don't have it installed. You can ignore this warning if you don't
+    want to install Tk::CursorControl. Tk::ToolBar will continue to work
+    properly.
+
+INSTALLATION
+    Either the usual:
+
+            perl Makefile.PL
+            make
+            make install
+
+    or just stick it somewhere in @INC where perl can find it. It's in pure
+    Perl.
+
+ACKNOWLEDGEMENTS
+    The following people have given me helpful comments and bug reports to
+    keep me busy: Chris Whiting, Jack Dunnigan, Robert Brooks, Peter
+    Lipecka, Martin Thurn and Shahriar Mokhtarzad.
+
+    Also thanks to the various artists of the KDE team for creating those
+    great icons, and to Adrian Davis for packaging them in a Tk-friendly
+    format.
+
+AUTHOR
+    Ala Qumsieh *aqumsieh@cpan.org*
+
+COPYRIGHTS
+    This module is distributed under the same terms as Perl itself.
+

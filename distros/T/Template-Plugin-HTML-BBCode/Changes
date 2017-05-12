@@ -1,0 +1,6 @@
+Revision history for Perl extension Template::Plugin::HTML::BBCode.
+
+0.01  Sat Mar 26 20:56:31 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n Template::Plugin::HTML::BBCode
+

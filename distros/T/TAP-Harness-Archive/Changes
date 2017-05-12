@@ -1,0 +1,46 @@
+Revision history for TAP-Harness-Archive
+
+0.18    27 Nov, 2015
+    + fix getting error message from Archive::Tar (rt#109774)
+
+0.17    02 Apr, 2015
+    + fix YAML::Tiny warning in version >= 0.57 (rt#95465) [Michal Špaček]
+
+0.16    14 Jan, 2015
+    + allow relative paths to archive [Renée Bäcker]
+    + Bump base.pm requirement [Tatsuhiko Miyagawa]
+
+0.15    13 Apr, 2013
+    + Fix tests to correctly use File::Temp which no longer allows wrong
+      use of tempdir() as class method. [Steffen Schwigon]
+
+0.14    27 Jul, 2009
+    + Added file_attributes hash to the META.yml file of the archive [Justin DeVuyst]
+    + Added traditional Makefile.PL generation [M. Peters]
+
+0.13    11 Mar, 2009
+    + explicitly use 'TAP::Parser::Aggregator' instead of relying on TAP::Archive to do it for us [M. Peters]
+    + Allow archive to be a directory in which case we just dump stuff in to it. [Andy Armstrong, Steffen Schwigon, M. Peters]
+
+0.12    21 Jul, 2008
+    + Re-fixing RT#37795 on Windows [Tim Heckman]
+
+0.11    19 Jul, 2008
+    + Fixing RT#37795. This should fix failing tests on windows. [Tim Heckman]
+    + Only run t/pod.t and t/pod-coverage.t if RELEASE_TESTING is set. [M. Peters]
+
+0.10    04 Jul, 2008
+    + Added full path as extra argument to made_parser_callback [M. Peters]
+    + Added extra_files argument to new() [M. Peters]
+    + Added extra_properties argument to new() [M. Peters]
+    + Fixed RT# 35649 [M. Peters]
+
+0.03    15 Dec, 2007
+    + Removed Archive::Builder and Archive::Extract as dependencies because they
+      have soooo many other dependencies. Just using Archive::Tar instead [M. Peters]
+    + Removed support for ZIP files (due to removing Archive::Extract). If this
+      is needed we can always use Archive::Zip. [M. Peters]
+
+0.01    20 Aug, 2007
+    + First version, released on an unsuspecting world. [M. Peters]
+

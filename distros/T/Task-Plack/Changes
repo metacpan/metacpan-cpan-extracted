@@ -1,0 +1,92 @@
+Revision history for Perl extension Task::Plack
+
+0.28  2013-05-12 15:03:47 PDT
+        - Use requires instead of recommends
+
+0.27  2013-04-25 12:02:27 PDT
+        - Switch to Milla and use optional_features in CPAN Meta spec 2
+
+0.26
+        - Upped versions
+
+0.25
+        - Upped versions added new servers and middleware components
+
+0.24
+        - Upped versions
+
+0.23
+        - Added back IO::Handle::Util
+        - Upped versions
+
+0.22
+        - Moved more modules to 'recommended' and install by default
+
+0.21
+        - Added Starlet
+
+0.20
+        - Upped versions
+        - Added SCGI
+
+0.19
+        - Upped versions
+        - Added Corona
+
+0.18
+        - Upped versions
+        - Added Starman, Twiggy, File::Sass, Handler::SCGI, Handler::AnyEvent::HTTPD
+        - renamed handlers
+        - Uses cpanminus to extract versions :)
+
+0.17
+        - Upped versions
+
+0.16
+        - Added Digest and PSSPSS
+        - Now auto-generates the spec file with the latest version from CPAN
+
+0.15
+        - Added Header, Session, FirePHP, Debug, Proxy and Test::WWW::Mechanize::PSGI
+
+0.14
+        - Added CGI::Compile
+
+0.13
+        - Added Rewrite, MobileDetector and Deflater
+
+0.12
+        - Added Middleware::JSConcat
+
+0.11
+        - Added CGI::Application::PSGI
+
+0.10
+        - Moved most Plack's C/XS optional deps here
+
+0.09
+        - Made dev PSGI servers optional in git_clone
+
+0.08
+        - Added CGI::Emulate::PSGI
+
+0.07
+        - Fixed typo in AnyEvent
+
+0.06
+        - Duh, fixed git_clone 
+
+0.05
+        - Fixed typo
+
+0.04
+        - Added perl -MTask::Plack -e git_clone
+
+0.03
+        - Added Coro and POE
+
+0.02
+        - Added Squatting::On::PSGI
+
+0.01
+        - original version

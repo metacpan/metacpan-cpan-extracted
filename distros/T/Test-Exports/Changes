@@ -1,0 +1,5 @@
+Revision history for Test::Exports
+
+1   2010-12-17
+    - Initial version, pulled out of the test code for Exporter::NoWork
+      since I need it elsewhere.

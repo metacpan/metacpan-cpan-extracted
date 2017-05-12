@@ -1,0 +1,10 @@
+Revision history for Perl extension JListbox.
+
+0.01  Thu Sep 21 08:21:31 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -n JListbox
+
+0.02  Fri Oct 27 07:39:19 2000
+	- Added a right-click menu option with "Cut, Copy and Paste" abilities.
+
+

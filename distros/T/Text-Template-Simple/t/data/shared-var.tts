@@ -1,0 +1,5 @@
+<%
+   my $foo = 42;
+   my $bar = { test => 123 };
+-%>
+<%* t/data/shared-var-1.tts | SHARE: $foo, $bar %>

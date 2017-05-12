@@ -1,0 +1,220 @@
+/***-*-C-*-******************** PRIVATE! */
+/******************************* YOU SHOULD NOT EVEN INCLUDE THIS FILE! */
+
+#ifndef _TV_SNEAKY_ON_
+#error PLEASE DO NOT INCLUDE THIS FILE!
+#endif
+
+#include "tvcommon.h"
+
+#ifndef TV_PLANT_KEY
+#define TV_PLANT_KEY(k)
+#endif
+#ifndef TV_UPROOT_KEY
+#define TV_UPROOT_KEY(k)
+#endif
+#ifndef TV_UNSET_DAT
+#define TV_UNSET_DAT TV_UPROOT_DAT
+#endif
+#ifndef TV_DAT_2STRING
+#define TV_DAT_2STRING(x) "?"
+#endif
+#ifndef TnDAT_ASSIGN
+#define TnDAT_ASSIGN(lvalue,rvalue) lvalue = *rvalue
+#endif
+#ifndef TnDAT_FETCH
+#define TnDAT_FETCH(lvalue,rvalue) *lvalue = &rvalue
+#endif
+#ifndef TnCLEARSLOT
+#define TnCLEARSLOT(k,d)
+#endif
+
+/* CLEARSLOT2 is used to cleanup after a memcpy or memmove.  However,
+   it is not used within tv_clear. */
+#define TnCLEARSLOT2(tn,xx)	TnCLEARSLOT(TnKEY(tn,xx), TnDAT(tn,xx))
+
+#define TnMIDDLE	(TnWIDTH/2)
+
+#define TnSLOT(tn,xx)	(tn)->tn_slots[xx]
+#define TnDAT(tn,xx)	(tn)->tn_slots[xx].slot_dat
+#define TnDATx(tn,xx)	(tn)->tn_slots[TnSTART(tn) + xx].slot_dat
+
+#undef TvROOT
+#define TvROOT(tv)	((TN*)(tv)->xtv_root)
+#undef TnKID
+#define TnKID(tn,xx)	((TN*)((TN0*)tn)->tn_kids[xx])
+#undef CeTN
+#define CeTN(ce)	((TN*)(ce)->tce_tn)
+#undef TcTN
+#define TcTN(tc,xx)	((TN*)(tc)->xtc_path[xx].tce_tn)
+
+#define TnGUARD(tn,xx)	((TN*)tn)->guard##xx
+
+#if defined(TV_TEST) && defined(TV_XTEST)
+# define TnSCANID(tn)	((TN*)tn)->tn_scanid
+# define TnINITGUARD(tn)	\
+	TnGUARD(tn,1)=0xbadc0de;\
+	TnGUARD(tn,2)=0xbadc0de;\
+	TnSCANID(tn)=0;
+# define TnGUARDOK(tn) \
+	(TnGUARD(tn,1)==0xbadc0de && \
+	 TnGUARD(tn,2)==0xbadc0de)
+
+#else
+# define TnSCANID(tn)
+# define TnINITGUARD(tn)
+# define TnGUARDOK(tn)
+#endif
+
+#ifdef TV_KEYCACHE
+# define TnKCACHE(tn,last)	(tn)->tn_kcache[last]
+#else
+# define TnKCACHE(tn,last)
+#endif
+
+#ifndef TV_KCACHE_INIT
+# define TV_KCACHE_INIT(kc) STMT_START {} STMT_END
+#endif
+#ifndef TV_KCACHE_CLEAR
+# define TV_KCACHE_CLEAR(kc) STMT_START {} STMT_END
+#endif
+#ifndef TV_KCACHE_LOAD
+# define TV_KCACHE_LOAD(key,dat,kc) STMT_START {} STMT_END
+#endif
+
+#define TV_KCACHE_LOADl(tn) \
+  TV_KCACHE_LOAD(TnKEY(tn,TnSTART(tn)), TnDAT(tn,TnSTART(tn)), TnKCACHE(tn,0))
+#define TV_KCACHE_LOADr(tn) \
+  TV_KCACHE_LOAD(TnKEY(tn,TnLAST(tn)), TnDAT(tn,TnLAST(tn)), TnKCACHE(tn,1))
+
+#define TnINIT(tn,fill,left,right)		\
+STMT_START {					\
+  TnSTART(tn)=(TnWIDTH - (fill))/2;		\
+  TnEND(tn)=TnSTART(tn) + (fill);		\
+  TnLEFT_set(tn,left); TnRIGHT_set(tn,right);	\
+  TnINITGUARD(tn);				\
+  TV_KCACHE_INIT(TnKCACHE(tn,0));		\
+  TV_KCACHE_INIT(TnKCACHE(tn,1));		\
+} STMT_END
+
+#define TcFREETN(tc,tv,tn,dtor,stepnext)		\
+STMT_START {						\
+    assert(tn_emptied(tn));				\
+    stepnext = tc_freetn(tc, tv, (TN0*)tn, dtor);	\
+} STMT_END
+
+#ifdef TV_TEST
+#  ifdef TV_KEYD
+#    define TnSNIF1SLOT(tn,sx) \
+(TnDAT(tn,_x) == (void*)0xbadc0de || TnKEY(tn,_x) == (char*)0xbadc0de)
+#  else
+     /* assumes that sizeof(TnDAT) >= sizeof(void*) */
+#    define TnSNIF1SLOT(tn,sx) \
+(*(void**)&TnDAT(tn,_x) == (void*)0xbadc0de)
+#  endif
+
+#define TnSNIFGUARD(tn)				\
+STMT_START {					\
+  register int _x;				\
+  for (_x=0; _x < TnWIDTH; _x++) {		\
+    if (TnSNIF1SLOT(tn,_x)) {			\
+      warn("snifguard failed at %d", _x);	\
+      assert(0);				\
+    }						\
+  }						\
+} STMT_END
+
+#else
+#define TnSNIFGUARD(tn) STMT_START {} STMT_END
+#endif
+
+/* backward compatibility */
+#define TnSUBl(tn,xx)	(xx==0? TnLEFT(tn) : (xx==TnFILL(tn)? TnRIGHT(tn) : 0))
+#define TnSUBr(tn,xx)	(xx==TnFILL(tn)-1 ? TnRIGHT(tn) : 0)
+
+#if defined(TV_TEST) && defined(TV_KEYD)
+#define TnCLEARSLOT1(tn,xx)	TnKEY(tn,xx)=(void*)0x69696969
+#define TnSLOTCLEAR(tn,xx)	(TnKEY(tn,xx)==(void*)0x69696969)
+#else
+#define TnCLEARSLOT1(tn,xx)
+#define TnSLOTCLEAR(tn,xx)	1
+#endif
+
+#if defined(TV_KEYD)
+#define TnKEY(tn,xx)		(tn)->tn_slots[xx].slot_key
+#define TnKEYx(tn,xx)		(tn)->tn_slots[TnSTART(tn) + xx].slot_key
+#define TnSETSLOT(tn,xx,k,d) \
+	STMT_START { TnKEY(tn,xx)=k; TnDAT_ASSIGN(TnDAT(tn,xx),d); } STMT_END
+#define TV_SETREMOTE(tc,key)	tc_seek(tc,key)
+#else
+#define TV_KEYCMP(cmp,a,b)
+#define TnKEY(tn,xx)		xx
+#define TnKEYx(tn,xx)		xx
+#define TnSETSLOT(tn,xx,k,d) \
+	STMT_START { TnDAT_ASSIGN(TnDAT(tn,xx),d); } STMT_END
+#define TV_SETREMOTE(tc,key)	tc_moveto(tc,key)
+#endif
+
+#define TnSHIFT(tn,xx)						\
+STMT_START {							\
+  register int _sx;						\
+  for (_sx=TnSTART(tn); _sx < TnSTART(tn)+(xx); _sx++) {	\
+    TnCLEARSLOT1(tn,_sx);					\
+    TnCLEARSLOT2(tn,_sx);					\
+  }								\
+  TnSTART(tn) += xx;						\
+} STMT_END
+
+#define TnPOP(tn,xx)					\
+STMT_START {						\
+  register int _sx;					\
+  for (_sx=TnLAST(tn); _sx > TnLAST(tn)-(xx); _sx--) {	\
+    TnCLEARSLOT1(tn,_sx);				\
+    TnCLEARSLOT2(tn,_sx);				\
+  }							\
+  TnEND(tn) -= xx;					\
+} STMT_END
+
+/* must do memmove & memcpy to evade evil C++ operator overloading */
+#define TnSHIFTl(tn,start,end,delta,yes)				\
+STMT_START {								\
+ register int _st = (start);						\
+ register int _end = (end);						\
+ yes = _st <= _end;							\
+ if (yes) {								\
+  int _z;								\
+  assert(delta);							\
+  memmove(&TnSLOT(tn,_st-(delta)), &TnSLOT(tn,_st),			\
+          TV_SLOTSIZE*(_end-_st+1));					\
+  TnSNIFGUARD(tn);							\
+  for (_z=_end-(delta)+1; _z <= _end; _z++) { TnCLEARSLOT1(tn,_z); }	\
+  TcRSTAT(tc,TCS_COPYSLOT,_end-_st+1);					\
+ }									\
+} STMT_END
+
+#define TnSHIFTr(tn,start,end,delta,yes)			\
+STMT_START {							\
+ register int _st = (start);					\
+ register int _end = (end);					\
+ yes = _st <= _end;						\
+ if (yes) {							\
+  int _z;							\
+  assert(delta);						\
+  memmove(&TnSLOT(tn,_st+(delta)), &TnSLOT(tn,_st),		\
+          TV_SLOTSIZE*(_end-_st+1));				\
+  TnSNIFGUARD(tn);						\
+  for (_z=_st; _z < _st+(delta); _z++) { TnCLEARSLOT1(tn,_z); }	\
+  TcRSTAT(tc,TCS_COPYSLOT,_end-_st+1);				\
+ }								\
+} STMT_END
+
+#define TnCOPYRANGE(sn,s1,dn,d1,len)				\
+STMT_START {							\
+  if (len) {							\
+    assert(len > 0);						\
+    memcpy(&TnSLOT(dn,d1), &TnSLOT(sn,s1), TV_SLOTSIZE * len);	\
+    TnSNIFGUARD(dn);						\
+    TcRSTAT(tc,TCS_COPYSLOT,(len));				\
+  }								\
+} STMT_END
+

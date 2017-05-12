@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+use strict;
+
+BEGIN {
+	-d "tmp/work" or die "You should run 'perl Makefile.PL; make test;' first";
+}
+
+my $times;
+if (@ARGV) {
+	$times = shift;
+}
+else {
+	print 
+"Number of iterations set to 1000, you probably need more
+if you want to time the 'Fully chached' method reliably
+nuse ./benchmark [number of iterations] to set the number of iterations
+
+Every iteration runs 4 templates, so multiply by 4 to get the
+number of templates per second
+";
+	$times = 1000;
+}
+
+
+
+use blib;
+use Text::PSP;
+use Symbol qw(delete_package);
+use Benchmark qw(timethese cmpthese);
+
+my $engine = Text::PSP->new('workdir' => 'tmp/work', template_root => 't/templates');
+
+$engine->clear_workdir;
+
+my @pspfiles = qw(simple_template.psp quotes.psp helloworld.psp includes/inc2/rec_find.psp);
+
+my @pmfiles;
+my $t;
+for (@pspfiles) {
+	my ($pmfile,$classname) = $engine->translate_filename($_);
+	push @pmfiles,$pmfile;
+}
+
+for (@pspfiles) {
+	$engine->template($_);
+}
+
+my $results = timethese ( $times,
+{
+	'Not cached' => sub {
+		unlink @pmfiles;
+		for (@pspfiles) {
+			$t= $engine->template($_, force_reload => 1);
+		}
+	},
+	'Cached on disk' => sub {
+		delete @INC{@pmfiles};
+		for (@pspfiles) {
+			$t = $engine->template($_);
+		}
+	},
+	'Fully cached (stat only)' => sub {
+		for (@pspfiles) {
+			$t =  $engine->template($_);
+		}
+	}
+}
+);
+
+
+cmpthese($results);
+

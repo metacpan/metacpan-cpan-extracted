@@ -1,0 +1,34 @@
+---
+abstract: 'Utilities to test STDOUT and STDERR messages.'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Tester: '0.107'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+keywords:
+  - testing
+  - STDOUT
+  - STDERR
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Output
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.17'
+  File::Temp: '0.17'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/test-output/issues
+  homepage: https://github.com/briandfoy/test-output
+  repository: https://github.com/briandfoy/test-output.git
+version: '1.031'

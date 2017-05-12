@@ -1,0 +1,29 @@
+NAME
+    Template::Plugin::Emoticon - Emoticon filter for TT
+
+VERSION
+    This document describes Template::Plugin::Emoticon version 0.01.
+
+SYNOPSIS
+        [% USE Emoticon('MSN', strict = 1, xhtml = 0) %]
+
+        [% 'Hello ;)' | emoticon %]
+
+DESCRIPTION
+    This is a Template::Toolkit plug-in to filter text-based emoticons and
+    replace them with corresponding icons using Text::Emoticon and supported
+    emoticon drivers.
+
+SEE ALSO
+    Currently available emoticon drivers: Text::Emoticon::GoogleTalk,
+    Text::Emoticon::MSN, Text::Emoticon::Plurk, Text::Emoticon::Yahoo
+
+AUTHOR
+    Nick Patch <patch@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2011 Nick Patch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

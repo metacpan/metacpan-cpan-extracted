@@ -1,0 +1,19 @@
+[Documentation::RequirePodSections]
+language = en_US
+source   = module_starter_pbp
+
+[NamingConventions::Capitalization]
+subroutines              = :starts_with_upper
+local_lexical_variables  = :starts_with_lower
+scoped_lexical_variables = :starts_with_lower
+subroutine_exemptions    = new import main
+
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+allow_if_string_contains_single_quote = 1
+
+[Subroutines::RequireArgUnpacking]
+allow_delegation_to = for
+         
+[CodeLayout::RequireTidyCode]
+perltidyrc = t/perltidyrc
+                      

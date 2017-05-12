@@ -1,0 +1,33 @@
+Tree-BPTree version 1.06
+========================
+
+This is a pure Perl implementation of B+ trees. I have based this implementation
+on a couple of sources. See the documentation of Tree::BPTree for those details.
+A B+ tree is essentially an order map from keys to values. Keys are multivalued
+so that there may be more than one value per key. This implementation will
+enforce uniqueness of keys, if requested.
+
+For more details see the documentation for Tree::BPTree. For examples using the
+code, see the documentation, try.pl, or the test files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module currently requires Perl 5.8.0 and that's it. It's probably
+compatible with previous versions of Perl, but I haven't tested it.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003 Andrew Sterling Hanenkamp. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

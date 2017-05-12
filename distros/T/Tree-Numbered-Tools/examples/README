@@ -1,0 +1,6 @@
+Examples for Tree::Numbered::Tools
+----------------------------------
+The example scripts are demos of the methods described in the Tree::Numbered::Tools documentation.
+
+Start with 'readFile.pl' to get an idea what this is all about.
+The source file for 'readFile.pl' (and many other examples) is 'tree.txt'.

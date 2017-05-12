@@ -1,0 +1,9 @@
+func_return_t T_FUNCRET
+
+INPUT
+T_FUNCRET
+   _T_FUNCRET_INPUT($arg,$var)
+
+OUTPUT
+T_FUNCRET
+   _T_FUNCRET_OUTPUT($arg,$var)

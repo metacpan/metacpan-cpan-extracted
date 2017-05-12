@@ -1,0 +1,30 @@
+---
+abstract: 'Distribution with a rich set of tools built upon the Test2 framework.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Suite
+requires:
+  B: '0'
+  Carp: '0'
+  Importer: '0.024'
+  Scalar::Util: '0'
+  Sub::Info: '0.001'
+  Term::Table: '0.002'
+  Test2: '1.302073'
+  overload: '0'
+  perl: '5.008001'
+  utf8: '0'
+resources:
+  bugtracker: http://github.com/Test-More/Test2-Suite/issues
+  repository: http://github.com/Test-More/Test2-Suite/
+version: '0.000070'
+x_serialization_backend: 'YAML::Tiny version 1.69'

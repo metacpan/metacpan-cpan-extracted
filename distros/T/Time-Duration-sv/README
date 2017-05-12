@@ -1,0 +1,40 @@
+NAME
+    Time::Duration::sv - rounded or exact Swedish expression of durations
+
+SYNOPSIS
+    Example use in a program that ends by noting its runtime:
+
+      my $start_time = time();
+      use Time::Duration::sv;
+  
+      # then things that take all that time, and then ends:
+      print "Runtime ", duration(time() - $start_time), ".\n";
+
+    Example use in a program that reports age of a file:
+
+      use Time::Duration::sv;
+      my $file = 'that_file';
+      my $age = $^T - (stat($file))[9];  # 9 = modtime
+      print "$file was modified ", ago($age);
+
+DESCRIPTION
+    This module provides functions for expressing durations in rounded or
+    exact terms.
+
+SEE ALSO
+    Time::Duration, the English original, for a complete manual.
+
+COPYRIGHT AND DISCLAIMER
+    Copyright 2002, Arthur Bergman "abergman@cpan.org", all rights reserved.
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+
+    Large parts of the code is Copyright 2002 Sean M. Burke.
+
+AUTHOR
+    Arthur Bergman, "abergman@cpan.org"
+

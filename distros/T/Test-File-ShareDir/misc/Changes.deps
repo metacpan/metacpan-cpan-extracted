@@ -1,0 +1,128 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001002
+
+1.001001 2015-03-01T05:44:37Z
+
+1.001000 2015-02-28T11:09:38Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / runtime requires]
+ - Exporter 5.57
+ - Scope::Guard
+ - parent
+
+ [Added / test requires]
+ - perl 5.006
+
+1.000005 2014-08-15T23:41:58Z
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+ - version 0.77
+
+1.000004 2014-07-22T19:29:27Z
+
+1.000003 2014-07-22T19:02:06Z
+ [Changed / runtime requires]
+ - Path::Tiny 0 → 0.018
+
+1.000002 2014-07-18T16:33:36Z
+ [Added / test requires]
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / test requires]
+ - version 0 → 0.77
+
+1.000001 2014-06-07T15:14:38Z
+ [Removed / runtime requires]
+ - File::Temp
+
+1.000000 2014-01-30T15:23:48Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+0.4.1 2013-11-21T06:51:24Z
+
+0.4.0 2013-11-21T06:38:44Z
+ [Added / runtime requires]
+ - Class::Tiny
+
+ [Added / test requires]
+ - lib
+
+ [Changed / build requires]
+ - Module::Build 0.4004 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4004 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Find
+
+0.3.3 2013-04-03T11:32:08Z
+ [Added / runtime requires]
+ - Path::Tiny
+
+ [Removed / runtime requires]
+ - Path::Class::Dir
+
+0.3.2 2013-04-03T07:03:58Z
+ [Added / runtime requires]
+ - perl 5.006
+
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+0.3.1 2011-10-28T20:58:28Z
+ [Added / runtime requires]
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.3.0 2011-05-05T03:29:45Z
+ [Added / test requires]
+ - Cwd
+
+0.2.0 2011-04-07T21:10:54Z
+
+0.1.2 2011-04-07T21:08:05Z
+
+0.1.1 2011-03-10T16:35:13Z
+ [Added / runtime requires]
+ - Path::Class::Dir
+
+ [Removed / runtime requires]
+ - Path::Class

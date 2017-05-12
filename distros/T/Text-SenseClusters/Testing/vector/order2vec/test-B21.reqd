@@ -1,0 +1,3 @@
+ERROR(order2vec.pl):
+        Line1 in WORDVEC file <test-B21.wordvec> should show #rows #cols
+        when --dense is ON.

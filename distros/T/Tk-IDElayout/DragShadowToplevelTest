@@ -1,0 +1,65 @@
+### Test for the DragShadow Widget #########
+###
+###  Expected Results:
+###   A Grey window should display. 
+###   After 2 seconds, and dark grey frame should appear inside the frame
+###   After 2 seconds, the frame should disappear
+###
+
+use Tk;
+use Tk::DragShadowToplevel;
+
+my $mw = new MainWindow ();
+
+my $Frame = $mw->Frame(-width => 100, -height => 200, -bg => 'white');
+$Frame->pack();
+
+my $widget;
+my $geometry;
+
+
+my ($offsetX, $offsetY) = (0,0);
+
+$mw->bind('<B1-Motion>', sub{
+	my $w = shift;
+	my $ev = $w->XEvent();
+	my $x = $ev->X;
+	my $y = $ev->Y;
+	#print "X = $x Y=$y\n";
+	$widget->MoveToplevelWindow($x-$offsetX,$y-$offsetY);
+}
+);
+
+$mw->bind('<ButtonPress-1>', sub{
+		
+	my $w = shift;
+	my $ev = $w->XEvent();
+	my $x = $ev->X;
+	my $y = $ev->Y;
+	
+	print "x/y = $x/$y\n";
+	
+	#$geometry = "100x200+100+100";
+	my $geometry = $mw->geometry;
+	print "MW G = $geometry \n";
+	print "FrameG = ".$Frame->geometry."\n";
+	print "Frame Root x/y ".$Frame->rootx." ".$Frame->rooty."\n";
+	my ($rootx,$rooty) = ( $Frame->rootx, $Frame->rooty);
+	($offsetX, $offsetY) = ($x-$rootx, $y-$rooty);
+	$geometry = $Frame->reqwidth."x".$Frame->reqheight."+".$Frame->rootx."+".$Frame->rooty;
+	$widget = $mw->DragShadowToplevel(-geometry => $geometry);
+	
+}
+);
+
+$mw->bind('<B1-ButtonRelease>', sub{
+
+	print "button release\n";
+	$widget->destroy if( defined( $widget ));
+	$widget = undef;
+	
+}
+);
+
+
+MainLoop;

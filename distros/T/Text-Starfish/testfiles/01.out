@@ -1,0 +1,19 @@
+
+Testing Hook adding:
+
+#
+
+# some normal text
+
+while (/\b$Qrel\b[ ,\w]*<${wQcatSD}(\w*)>/g)  { and so on "d$1";}
+while (/\b$Qrel\b[ ,\w]*<${wQcatSDii}(\w*)>/ig) { and so on "d$1";}
+while (/\b$Qrel\b[ ,\w]*<${wQcatSDi}(\w*)>/ig)  { NEW "d$1";}
+while (/\b$Qrel\b[ ,\w]*<${wQcat}(\w*)>/g)  { and so on "d$1";}
+
+Test finished.
+
+
+
+
+
+  # This is not a comment

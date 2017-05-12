@@ -1,0 +1,2101 @@
+# NAME
+
+Template::Pure - Perlish Port of pure.js and more
+
+# SYNOPSIS
+
+    use Template::Pure;
+
+    my $html = q[
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <section id="article">
+            <h1>Header</h1>
+            <div>Story</div>
+          </section>
+          <ul id="friendlist">
+            <li>Friends</li>
+          </ul>
+        </body> 
+      </html>
+    ];
+
+    my $pure = Template::Pure->new(
+      template=>$html,
+      directives=> [
+        'head title' => 'meta.title',
+        '#article' => [
+          'h1' => 'header',
+          'div' => 'content',
+        ],
+        'ul li' => {
+          'friend<-user.friends' => [
+            '.' => '={friend}, #={i.index}',
+          ],
+        },
+      ],    
+    );
+
+    my $data = +{
+      meta => {
+        title => 'Travel Poetry',
+        created_on => '1/1/2000',
+      },
+      header => 'Fire',
+      content => q[
+        Are you doomed to discover that you never recovered from the narcoleptic
+        country in which you once stood? Where the fire's always burning, but
+        there's never enough wood?
+      ],
+      user => {
+        name => 'jnap',
+        friends => [qw/jack jane joe/],
+      },
+    };
+
+    print $pure->render($data);
+
+Results in:
+
+    <html>
+      <head>
+        <title>Travel Poetry</title>
+      </head>
+      <body>
+        <section id="article">
+          <h1>Fire</h1>
+          <div>
+            Are you doomed to discover that you never recovered from the narcoleptic
+            country in which you once stood? Where the fire&#39;s always burning, but
+            there&#39;s never enough wood?
+          </div>
+        </section>
+        <ul id="friendlist">
+          <li>jack, #1</li>
+          <li>jane, #2</li>
+          <li>joe, #3</li>
+        </ul>
+      </body>
+    </html>
+
+# DESCRIPTION
+
+**NOTE** WARNING: Early access module. Although we have a lot of test cases and this is the
+third redo of the code I've not well tested certain features (such as using an object as
+a data context) and other parts such as the way we handle undefined values (or empty
+iterators) are still 'first draft'.  Code currently is entirely unoptimized.  Additionally the
+documenation could use another detailed review, and we'd benefit from some 'cookbook' style docs.
+Nevertheless its all working well enough that I'd like to publish it so I can start using it 
+more widely and hopefully some of you will like what you see and be inspired to try and help
+close the gaps.
+
+**NOTE** UPDATE (version 0.015): The code is starting to shape up and at this point I'm started to commit to
+things that pass the current test case should still pass in the future unless breaking changes
+are absolutely required to move the project forward. Main things to be worked out is if the
+rules around handling undef values and when we have an object as the loop iterator has not
+been as well tested as it should be.
+
+**NOTE** UPDATE (version 0.023): Error messaging is tremendously improved and a number of edge case
+issues have worked out while working on the Catalyst View adaptor (not on CPAN at the time of this
+writing).  Main blockers before I can consider this stable include lots of performance tuning,
+completion of a working Catalyst view adaptor, and refactoring of the way we use the [Mojo::DOM58](https://metacpan.org/pod/Mojo::DOM58)
+parser so that parsers are plugable.  I also need to refactor how processing instructions are
+handled so that its not a pile of inlined code (ideally you should be able to write your own
+processing instructions).  I feel commited to the existing test suite and documented
+API.
+
+[Template::Pure](https://metacpan.org/pod/Template::Pure) HTML/XML Templating system, inspired by pure.js [http://beebole.com/pure/](http://beebole.com/pure/), with
+some additions and modifications to make it more Perlish and to be more suitable
+as a server side templating framework for larger scale needs instead of single page
+web applications.
+
+The core concept is you have your templates in pure HTML and create CSS style
+matches to run transforms on the HTML to populate data into the template.  This allows you
+to have very clean, truely logicless templates.  This approach can be useful when the HTML designers
+know little more than HTML and related technologies.  It  helps promote separation of concerns
+between your UI developers and your server side developers.  Over the long term the separate
+and possibilities for code reuse can lead to an easier to maintain system.
+
+The main downside is that it can place more work on the server side developers, who have to
+write the directives unless your UI developers are able and willing to learn the minimal Perl
+required for that job.  Also since the CSS matching directives can be based on the document
+structure, it can lead to onerous tight binding between yout document structure and the layout/display
+logic.  For example due to some limitations in the DOM parser, you might have to add some extra markup
+just so you have a place to match, when you have complex and deeply nested data.
+
+Additionally many UI  designers already are familiar with some basic templating systems and 
+might really prefer to use that so that they can maintain more autonomy and avoid the additional
+learning curve that [Template::Pure](https://metacpan.org/pod/Template::Pure) will requires (most people seem to find its a bit more
+effort to learn off the top compared to more simple systems like Mustache or even [Template::Toolkit](https://metacpan.org/pod/Template::Toolkit).
+
+Although inspired by pure.js [http://beebole.com/pure/](http://beebole.com/pure/) this module attempts to help mitigate some
+of the listed possible downsides with additional features that are a superset of the original 
+pure.js specification. For example you may include templates inside of templates as includes or even
+overlays that provide much of the same benefit that template inheritance offers in many other
+popular template frameworks.  These additional features are intended to make it more suitable as a general
+purpose server side templating system.
+
+# CREATING TEMPLATE OBJECTS
+
+The first step is to create a [Template::Pure](https://metacpan.org/pod/Template::Pure) object:
+
+    my $pure = Template::Pure->new(
+      template=>$html,
+      directives=> \@directives);
+
+[Template::Pure](https://metacpan.org/pod/Template::Pure) has two required parameters:
+
+- template
+
+    This is a string that is an HTML template that can be parsed by [Mojo::DOM58](https://metacpan.org/pod/Mojo::DOM58)
+
+- directives
+
+    An arrayref of directives, which are commands used to transform the template when
+    rendering against data.  For more on directives, see ["DIRECTIVES"](#directives)
+
+[Template::Pure](https://metacpan.org/pod/Template::Pure) has a third optional parameter, 'filters', which is a hashref of
+user created filters.  For more see [Template::Pure::Filters](https://metacpan.org/pod/Template::Pure::Filters) and ["FILTERS"](#filters).
+
+Once you have a created object, you may call the following methods:
+
+- render ($data, ?\\@extra\_directives?)
+
+    Render a template with the given '$data', which may be a hashref or an object with
+    fields that match data paths defined in the directions section (see ["DIRECTIVES"](#directives))
+
+    Returns a string.  You may pass in an arrayref of extra directives, which are executed
+    just like directives defined at instantiation time (although future versions of this
+    distribution may offer optimizations to directives known at create time).  These optional
+    added directives are executed after the directives defined at create time.
+
+    Since we often traverse the $data structure as part of rendering a template, we usually call
+    the current path the 'data context'.  We always track the base or root context and you can
+    always return to it, as you will later see in the ["DIRECTIVES"](#directives) section.
+
+- process\_dom ($data, ?\\@extra\_directives?)
+
+    Works just like 'render', except we return a [Mojo::DOM58](https://metacpan.org/pod/Mojo::DOM58) object instead of a string directly.
+    Useful if you wish to retrieve the [Mojo::DOM58](https://metacpan.org/pod/Mojo::DOM58) object for advanced, custom tranformations.
+
+- data\_at\_path ($data, $path)
+
+    Given a $data object, returns the value at the defined $path.  Useful in your coderef actions
+    (see below) when you wish to grab data from the current data context but wish to avoid
+    using $data implimentation specific lookup.
+
+- escape\_html ($string)
+
+    Given a string, returns a version of it that has been properly HTML escaped.  Since we do
+    such escaping automatically for most directives you won't need it a lot, but could be useful
+    in a coderef action.  Can also be called as a filter (see ["FILTERS"](#filters)).
+
+- encoded\_string ($string)
+
+    As mentioned we automatically escape values to help protect you against HTML injection style
+    attacked, but there might be cases when you don't wish this protection.  Can also be called
+    as a filter (see ["FILTERS"](#filters)).
+
+There are other methods in the code but please consider all that stuff part of my 'black box'
+and only reach into it if you are willing to suffer possible breakage on version changes.
+
+# DIRECTIVES
+
+Directives are instructions you prepare against a template, upon which later we render
+data against.  Directives are ordered and are excuted in the order defined.  The general
+form of a directive is `CSS Match` => `Action`, where action can be a path to fetch data
+from, more directives, a coderef, etc.  The main idea is that the CSS matches
+a node in the HTML template, and an 'action' is performed on that node.  The following actions are allowed
+against a match specification:
+
+## Scalar - Replace the value indicated by the match.
+
+    my $html = qq[
+      <div>
+        Hello <span id='name'>John Doe</span>!
+      </div>
+    ];
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#name' => 'fullname',
+      ]);
+
+    my %data = (
+      fullname => 'H.P Lovecraft');
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <div>
+      Hello <span id='name'>H.P Lovecraft</span>!
+    </div>
+
+In this simple case the value of the CSS match '#name' is replaced by the value 'fullname'
+indicated at the current data context (as you can see the starting context is always the
+root, or top level data object.)
+
+If instead of a hashref the rendered data context is an object, we look for a method
+matching the name of the indicated path.  If there is no matching method or key, we generate
+an exception.
+
+If there is a key matching the requested data path as indicated by the directive, but the associated
+value is undef, then the matching node (tag included) is removed. If there is no matching key,
+this raises an error.
+
+**NOTE**: Remember that you can use dot notation in your action value to indicate a path on the
+current data context, for example:
+
+    my %data = (
+      identity => {
+        first_name => 'Howard',
+        last_name => 'Lovecraft',
+      });
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [ '#last_name' => 'identity.last_name']
+    );
+
+In this case the value of the node indicated by '#last\_name' will be set to 'Lovecraft'.
+
+**NOTE**: If your scalar action returns a [Template::Pure](https://metacpan.org/pod/Template::Pure) object, it will render as if
+it was an object action as described below ["Object - Set the match value to another Pure Template"](#object-set-the-match-value-to-another-pure-template).
+
+For example:
+
+    my $wrapper_html = qq[
+      <section>Example Wrapped Stuff</section>];
+
+    my $wrapper = Template::Pure->new(
+      template=>$wrapper_html,
+      directives=> [
+        'section' => 'content',
+      ]);
+
+    my $template = qq[
+     <html>
+        <head>
+          <title>Title Goes Here!</title>
+        </head>
+        <body>
+          <p>Hi Di Ho!</p>
+        </body>
+      </html>    
+    ];
+
+    my @directives = (
+      title => 'title | upper',
+      body => 'info',
+    );
+
+    my $pure = Template::Pure->new(
+      template => $template,
+      directives => \@directives);
+
+    my $data = +{
+      title => 'Scalar objects',
+      info => $wrapper,
+    };
+
+    ok my $string = $pure->render($data);
+
+Results in:
+
+    <html>
+       <head>
+         <title>SCALAR OBJECTS</title>
+       </head>
+       <body>
+     <section>
+         <p>Hi Di Ho!</p>
+       </section></body>
+     </html>
+
+This feature is currently only active for scalar actions but may be extended to other action
+types in the future.
+
+**NOTE** If your scalar action returns a coderefence, we process it as if the
+scalar action was itself a code reference.  See ["\\'Coderef - Programmatically replace the value indicated'"](#coderef-programmatically-replace-the-value-indicated).
+
+## ScalarRef - Set the value to the results of a match
+
+There may be times when you want to set the value of something to an existing
+value in the current template:
+
+    my $html = qq[
+      <html>
+        <head>
+          <title>Welcome Page</title>
+        </head>
+        <body>
+          <h1>Page Title</h1>
+        </body>
+      </html>
+    ];
+
+    my $pure = Template::Pure->new(
+      template = $html,
+      directives => [
+        'h1#title' => \'/title',
+      ]);
+
+    print $pure->render({});
+
+Results in:
+
+    <html>
+      <head>
+        <title>Welcome Page</title>
+      </head>
+      <body>
+        <h1>Welcome Page</h1>
+      </body>
+    </html>
+
+**NOTE** Since directives are processed in order, this means that you can
+reference the rendered value of a previous directive via this alias.
+
+**NOTE** The match runs against the current selected node, as defined by the last
+successful match.  If you need to match a value from the root of the DOM tree you
+can use the special '/' syntax on your CSS match, as shown in the above example,
+or:
+
+    directives => [
+      'h1#title' => \'/title',
+    ]);
+
+## Coderef - Programmatically replace the value indicated
+
+    my $html = qq[
+      <div>
+        Hello <span id='name'>John Doe</span>!
+      </div>
+    ];
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#name' => sub {
+          my ($instance, $dom, $data) = @_;
+          return $instance->data_at_path($data, 'id.first_name') .' '. 
+            $instance->data_at_path($data, 'id.last_name') ; 
+        },
+      ]
+    );
+
+    my %data = (
+      id => {
+        first_name => 'Howard',
+        last_name => 'Lovecraft',
+      });
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <div>
+      Hello <span id='name'>Howard Lovecraft</span>!
+    </div>
+
+For cases where the display logic is complex, you may use an anonymous subroutine to
+provide the matched value.  This anonymous subroutine receives the following three
+arguments:
+
+    $instance: The template instance
+    $dom: The DOM Node at the current match (as a L<Mojo::DOM58> object).
+    $data: Data reference at the current context.
+
+Your just need to return the value desired which will substitute for the matched node's
+current value.
+
+**NOTE**: Please note in the above example code that we used 'data\_at\_path' rather than
+dereferenced the $data scalar directly.  This is required since internally we wrap your
+$data in helper objects, so you can't be 100% certain of the actual structure.  In general
+using this method wouldbe a good idea anyway since it lets you achieve an API that is
+complete independent of your actual data structure (this way if you later change from a 
+simple hashref to an object, your code wouldn't break.
+
+### Coderef - No match specification
+
+Sometimes you may wish to have highly customized transformations, ones that are
+not directly attached to a match specification.  In those cases you may pass a
+match specification without a CSS match:
+
+    my $html = q[
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <p>foo</p>
+          <p>baz</p>
+          <div id="111"></div>
+        </body>
+      </html>
+    ];
+
+    my $pure = Template::Pure->new(
+      template=>$html,
+      directives=> [
+        sub {
+          my ($template, $dom, $data) = @_;
+          $dom->at('#111')->content("coderef");
+        },
+        'p' => sub {
+          my ($template, $dom, $data) = @_;
+          return $template->data_at_path($data, $dom->content)
+        }
+      ]);
+
+    my $data = +{
+      foo => 'foo is you',
+      baz => 'baz is raz',
+    };
+
+Renders as:
+
+    <html>
+      <head>
+        <title>Page Title</title>
+      </head>
+      <body>
+        <p>foo is you</p>
+        <p>baz is raz</p>
+        <div id="111">coderef</div>
+      </body>
+    </html>
+
+## Arrayref - Run directives under a new DOM root
+
+Somtimes its handy to group a set of directives under a given node.  For example:
+
+    my $html = qq[
+      <dl id='contact'>
+        <dt>Phone</dt>
+        <dd class='phone'>(xxx) xxx-xxxx</dd>
+        <dt>Email</dt>
+        <dd class='email'>aaa@email.com</dd>
+      </dl>
+    ];
+
+    my $pure = Template::Pure->new(
+      template = $html,
+      directives => [
+        '#contact' => [
+          '.phone' => 'contact.phone',
+          '.email' => 'contact.email',
+      ],
+    );
+
+    my %data = (
+      contact => {
+        phone => '(212) 387-9509',
+        email => 'jjnapiork@cpan.org',
+      }
+    );
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <dl id='contact'>
+      <dt>Phone</dt>
+      <dd class='phone'>(212) 387-9509</dd>
+      <dt>Email</dt>
+      <dd class='email'>jjnapiork@cpan.org'</dd>
+    </dl>
+
+For this simple case you could have made it more simple and avoided the nested directives, but
+in a complex template with a lot of organization you might find this leads to more readable and
+concise directives. It can also promote reusability.
+
+## Hashref - Move the root of the Data Context
+
+Just like it may be valuable to move the root DOM context to an inner node, sometimes you'd
+like to move the root of the current Data context to an inner path point.  This can result in cleaner
+templates with less repeated syntax, as well as promote reusability. In order to do this you
+use a Hashref whose key is the path under the data context you wish to move to and who's value
+is an Arrayref of new directives.  These new directives can be any type of directive as already
+shown or later documented.  
+
+    my $html = qq[
+      <dl id='contact'>
+        <dt>Phone</dt>
+        <dd class='phone'>(xxx) xxx-xxxx</dd>
+        <dt>Email</dt>
+        <dd class='email'>aaa@email.com</dd>
+      </dl>
+    ];
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#contact' => {
+          'contact' => [
+          '.phone' => 'phone',
+          '.email' => 'email',
+          ],
+        },
+      ]
+    );
+
+    my %data = (
+      contact => {
+        phone => '(212) 387-9509',
+        email => 'jjnapiork@cpan.org',
+      }
+    );
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <dl id='contact'>
+      <dt>Phone</dt>
+      <dd class='phone'>(212) 387-9509</dd>
+      <dt>Email</dt>
+      <dd class='email'>jjnapiork@cpan.org'</dd>
+    </dl>
+
+In addition to an arrayref of new directives, you may assign the new DOM and Data context
+directly to a template object (see ["Object - Set the match value to another Pure Template"](#object-set-the-match-value-to-another-pure-template)
+For example:
+
+    my $contact_include = Template::Pure->new(
+      template => q[
+        <dl>
+          <dt>Name</dt>
+          <dd class='name'>First Last</dd>
+          <dt>Email</dt>
+          <dd class='email'>Email@email.com</dd>
+        </dl>
+      ],
+      directives => [
+        '.name' => 'fullname',
+        '.email' => 'email',
+
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#contact' => {
+          'contact' => $contact_include;
+        },
+      ]
+    );
+
+    print $pure->render({
+      person => {
+        contact => {
+          fullname => 'John Doe',
+          email => 'jd@email.com'.
+        }
+      },
+    });
+
+This lets you isolate the data structure of your includes to improve reuse and clarity.
+
+## Hashref - Create a Loop
+
+Besides moving the current data context, setting the value of a match spec key to a
+hashref can be used to perform loops over a node, such as when you wish to create
+a list:
+
+    my $html = qq[
+      <ol>
+        <li class='name'>
+          <span class='first-name'>John</span>
+          <span class='last-name'>Doe</span>
+        </li>
+      </ol>
+    ];
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#name' => {
+          'name<-names' => [
+            '.first-name' => 'name.first',
+            '.last-name' => 'name.last',
+          ],
+        },
+      ]
+    );
+
+    my %data = (
+      names => [
+        {first => 'Mary', last => 'Jane'},
+        {first => 'Jared', last => 'Prex'},
+        {first => 'Lisa', last => 'Dig'},
+      ]
+    );
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <ol id='names'>
+      <li class='name'>
+        <span class='first-name'>Mary</span>
+        <span class='last-name'>Jane</span>
+      </li>
+      <li class='name'>
+        <span class='first-name'>Jared</span>
+        <span class='last-name'>Prex</span>
+      </li>
+      <li class='name'>
+        <span class='first-name'>Lisa</span>
+        <span class='last-name'>Dig</span>
+      </li>
+    </ol>
+
+The indicated data path must be either an ArrayRef, a Hashref, or an object that provides
+an iterator interface (see below).
+
+For each item in the array we render the selected node against that data and
+add it to parent node.  So the originally selected node is completely replaced by a
+collection on new nodes based on the data.  Basically just think you are repeating over the
+node value for as many times as there is items of data.
+
+In the case the referenced data is explicitly set to undefined, the full node is
+removed (the matched node, not just the value).
+
+### Special value injected into a loop
+
+When you create a loop we automatically add a special data key called 'i' which is an object
+that contains meta data on the current state of the loop. Fields that can be referenced are:
+
+- current\_value
+
+    An alias to the current value of the iterator.
+
+- index
+
+    The current index of the iterator (starting from 1.. or from the first key in a hashref or fields
+    interator).
+
+- max\_index
+
+    The last index item, either number or field based.
+
+- count
+
+    The total number of items in the iterator (as a number, starting from 1).
+
+- is\_first
+
+    Is this the first item in the loop?
+
+- is\_last
+
+    Is this the last item in the loop?
+
+- is\_even
+
+    Is this item 'even' in regards to its position (starting with position 2 (the first position, or also
+    known as index '1') being even).
+
+- is\_odd
+
+    Is this item 'even' in regards to its position (starting with position 1 (the first position, or also
+    known as index '0') being odd).
+
+### Looping over a Hashref
+
+You may loop over a hashref as in the following example:
+
+    my $html = qq[
+      <dl id='dlist'>
+        <section>
+          <dt>property</dt>
+          <dd>value</dd>
+        </section>
+      </dl>];
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        'dl#dlist section' => {
+          'property<-author' => [
+            'dt' => 'i.index',
+            'dd' => 'property',
+          ],
+        },
+      ]
+    );
+
+    my %data = (
+      author => {
+        first_name => 'John',
+        last_name => 'Napiorkowski',
+        email => 'jjn1056@yahoo.com',
+      },
+    );
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <dl id="dlist">
+      <section>
+        <dt>first_name</dt>
+        <dd>John</dd>
+      </section>
+      <section>
+        <dt>last_name</dt>
+        <dd>Napiorkowski</dd>
+      </section>
+      <section>
+        <dt>email</dt>
+        <dd>jjn1056@yahoo.com</dd>
+      </section>
+    </dl>
+
+**NOTE** This is a good example of a current limitation in the CSS Match Specification that
+requires adding a 'section' tag as a fudge to give the look something to target.  Future
+versions of this distribution may offer additional match syntax to get around this problem.
+
+**NOTE** Notice the usage of the special data path 'i.index' which for a hashref or fields
+type loop contains the field or hashref key name.
+
+**NOTE** Please remember that in Perl Hashrefs are not ordered.  If you wish to order your
+Hashref based loop please see ["Sorting and filtering a Loop"](#sorting-and-filtering-a-loop) below.
+
+### Iterating over an Object
+
+If the value indicated by the required path is an object, we need that object to provide
+an interface indicating if we should iterate like an ArrayRef (for example a [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx::Class::ResultSet)
+which is a collection of database rows) or like a HashRef (for example a [DBIx::Class](https://metacpan.org/pod/DBIx::Class)
+result object which is one row in the returned database query consisting of field keys
+and associated values).
+
+#### Objects that iterate like a Hashref
+
+The object should provide a method called 'display\_fields' (which can be overridden with
+the key 'display\_fields\_handler', see below) which should return a list of methods that are used
+as 'keys' to provide values for the iterator.  Each method return represents one item
+in the loop.
+
+#### Objects that iterate like an ArrayRef
+
+Your object should defined the follow methods:
+
+- next
+
+    Returns the next item in the iterator or undef if there are no more items
+
+- count
+
+    The number of items in the iterator (counting from 1 for one item)
+
+- reset
+
+    Reset the iterator to the starting item.
+
+- all 
+
+    Returns all the items in the iterator
+
+### Sorting and filtering a Loop
+
+You may provide a custom anonymous subroutine to provide a display
+specific order to your loop.  For simple values such as Arrayrefs
+and hashrefs this is simple:
+
+    my $html = qq[
+      <ol id='names'>
+        <li class='name'>
+          <span class='first-name'>John</span>
+          <span class='last-name'>Doe</span>
+        </li>
+      </ol>
+    ];
+
+    my $pure = Template::Pure->new(
+      template = $html,
+      directives => [
+        '#name' => {
+          'name<-names' => [
+            '.first-name' => 'name.first',
+            '.last-name' => 'name.last',
+          ],
+          'order_by' => sub {
+            my ($hashref, $a, $b) = @_;
+            return $a->{last} cmp $b->{last};
+          },
+        },
+      ]
+    );
+
+    my %data = (
+      names => [
+        {first => 'Mary', last => 'Jane'},
+        {first => 'Jared', last => 'Prex'},
+        {first => 'Lisa', last => 'Dig'},
+      ]
+    );
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <ol id='names'>
+      <li class='name'>
+        <span class='first-name'>Lisa</span>
+        <span class='last-name'>Dig</span>
+      </li>
+      <li class='name'>
+        <span class='first-name'>Mary</span>
+        <span class='last-name'>Jane</span>
+      </li>
+      <li class='name'>
+        <span class='first-name'>Jared</span>
+        <span class='last-name'>Prex</span>
+      </li>
+    </ol>
+
+So you have a key 'order\_by' at the same level as the loop action declaration
+which is an anonynous subroutine that takes three arguments, the first being
+a reference to the data you are sorting (an arrayref or hashref)
+followed by the $a and $b items to be compared for example as in:
+
+    my @display = sort { $a->{last} cmp $b->{last} } @list;
+
+If your iterator is over an object the interface is slightly more complex since
+we allow for the object to provide a sort method based on its internal needs.
+For example if you have a [DBIx::Class::Resultset](https://metacpan.org/pod/DBIx::Class::Resultset) as your iterator, you may
+wish to order your display at the database level:
+
+    'sort' => sub {
+      my ($object) = @_;
+      return $object->order_by_last_name;
+    },
+
+We recommend avoiding implimentation specific details when possible (for example
+in [DBIx::Class](https://metacpan.org/pod/DBIx::Class) use a custom resultset method, not a ->search query.).
+
+### Perform a 'filter' on your loop items
+
+You may wish for the purposes of display to skip items in your loop.  Similar to
+'order\_by', you may create a 'grep' key that returns either true or false to determine
+if an item in the loop is allowed (works like the 'grep' function).
+
+    # Only show items where the value is greater than 10.
+    'filter' => sub {
+      my ($template, $item) = @_;
+      return $item > 10; 
+    },
+
+Just like with 'order\_by', if your iterator is over an object, you recieve that
+object as the argument and are expected to return a new iterator that is properly
+filtered:
+
+    'grep' => sub {
+      my ($template, $iterator) = @_;
+      return $iterator->only_over_10;
+    },
+
+### Generating display\_fields
+
+When you are iterating over an object that is like a Hashref, you need
+to inform us of how to get the list of field names which should be the
+names of methods on your object who's value you wish to display.  By default
+we look for a method called 'display fields' but you can customize this
+in one of two ways.  You can set a key 'display\_fields' to be the name of
+an alternative method:
+
+    directives => [
+      '#meta' => {
+        'field<-info' => [
+            '.name' => 'field.key',
+            '.value' => 'field.value',
+          ],
+          'display_fields' => 'columns',
+        },
+      ]
+
+## Object - Set the match value to another Pure Template
+
+    my $section_html = qq[
+      <div>
+        <h2>Example Section Title</h2>
+        <p>Example Content</p>
+      </div>
+    ];
+
+    my $pure_section = Template::Pure->new(
+      template = $section_html,
+      directives => [
+        'h2' => 'title',
+        'p' => 'story'
+      ]);
+
+    my $html = qq[
+      <div class="story">Example Content</div>
+    ];
+
+    my $pure = Template::Pure->new(
+      template = $html,
+      directives => [
+        'div.story' => $pure_section,
+      ]);
+
+    my %data = (
+      title => 'The Supernatural in Literature',
+      story => $article_text,
+    );
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <div class="story">
+      <div>
+        <h2>The Supernatural in Literature</h2>
+        <p>$article_text</p>
+      </div>
+    </div>
+
+When the action is an object it must be an object that conformation
+to the interface and behavior of a [Template::Pure](https://metacpan.org/pod/Template::Pure) object.  For the
+most part this means it must be an object that does a method 'render' that
+takes the current data context refernce and returns an HTML string suitable
+to become that value of the matched node.
+
+When encountering such an object we pass the current data context, but we
+add one additional field called 'content' which is the value of the matched
+node.  You can use this so that you can 'wrap' nodes with a template (similar
+to the [Template](https://metacpan.org/pod/Template) WRAPPER directive).
+
+    my $wrapper_html = qq[
+      <p class="headline">To Be Wrapped</p>
+    ];
+
+    my $wrapper = Template::Pure->new(
+      template = $wrapper_html,
+      directives => [
+        'p.headline' => 'content',
+      ]);
+
+    my $html = qq[
+      <div>This is a test of the emergency broadcasting
+      network... This is only a test</div>
+    ];
+
+    my $wrapper = Template::Pure->new(
+      template = $html,
+      directives => [
+        'div' => $wrapper,
+      ]);
+
+Results in:
+
+    <div>
+      <p class="headline">This is a test of the emergency broadcasting
+      network... This is only a test</p>
+    </div>
+
+Lastly you can mimic a type of inheritance using data mapping and
+node aliasing:
+
+    my $overlay_html = q[
+       <html>
+         <head>
+           <title>Example Title</title>
+           <link rel="stylesheet" href="/css/pure-min.css"/>
+             <link rel="stylesheet" href="/css/grids-responsive-min.css"/>
+               <link rel="stylesheet" href="/css/common.css"/>
+           <script src="/js/3rd-party/angular.min.js"></script>
+             <script src="/js/3rd-party/angular.resource.min.js"></script>
+         </head>
+         <body>
+           <section id="content">...</section>
+           <p id="foot">Here's the footer</p>
+         </body>
+       </html>
+     ];
+
+     my $overlay = Template::Pure->new(
+       template=>$overlay_html,
+       directives=> [
+         'title' => 'title',
+         '^title+' => 'scripts',
+         'body section#content' => 'content',
+       ]);
+
+     my $page_html = q[
+       <html>
+         <head>
+           <title>The Real Page</title>
+           <script>
+           function foo(bar) {
+             return baz;
+           }
+           </script>
+         </head>
+         <body>
+           You are doomed to discover that you never
+           recovered from the narcolyptic country in
+           which you once stood; where the fire's always
+           burning but there's never enough wood.
+         </body>
+       </html>
+     ];
+
+     my $page = Template::Pure->new(
+       template=>$page_html,
+       directives=> [
+         'title' => 'meta.title',
+         'html' => [
+           {
+             title => \'title',
+             scripts => \'^head script',
+             content => \'body',
+           },
+           '^.' => $overlay,
+         ]
+       ]);
+
+     my $data = +{
+       meta => {
+         title => 'Inner Stuff',
+       },
+     };
+
+Results in:
+
+    <html>
+      <head>
+        <title>Inner Stuff</title><script>
+        function foo(bar) {
+          return baz;
+        }
+        </script>
+        <link href="/css/pure-min.css" rel="stylesheet">
+          <link href="/css/grids-responsive-min.css" rel="stylesheet">
+            <link href="/css/common.css" rel="stylesheet">
+        <script src="/js/3rd-party/angular.min.js"></script>
+          <script src="/js/3rd-party/angular.resource.min.js"></script>
+      </head>
+      <body>
+        <section id="content">
+        You are doomed to discover that you never
+        recovered from the narcolyptic country in
+        which you once stood; where the fire&amp;#39;s always
+        burning but there&amp;#39;s never enough wood.
+      </section>
+        <p id="foot">Here&#39;s the footer</p>
+      </body>
+    </html>
+
+## Object - A Mojo::DOM58 instance
+
+In the case where you set the value of the action target to an instance of
+[Mojo::DOM58](https://metacpan.org/pod/Mojo::DOM58), we let the value of that perform the replacement indicated by
+the match specification:
+
+    my $html = q[
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <p class="foo">aaa</a>
+        </body>
+      </html>
+    ];
+
+    my $pure = Template::Pure->new(
+      template=>$html,
+      directives=> [
+        'p' => Mojo::DOM58->new("<a href='localhost:foo'>Foo!</a>"),
+      ]);
+
+    my $data = +{
+      title => 'A Shadow Over Innsmouth',
+    };
+
+    my $string = $pure->render($data);
+
+Results in:
+
+    <html>
+      <head>
+        <title>A Shadow Over Innsmouth/title>
+      </head>
+      <body>
+        <p class="foo"><a href='localhost:foo'>Foo!</a></a>
+      </body>
+    </html>
+
+## Object - Any Object that does 'TO\_HTML'
+
+In addition to using a [Template::Pure](https://metacpan.org/pod/Template::Pure) object as the target action for
+a match specification, you may use any object that does a method called
+'TO\_HTML'.  Such a method would expect to recieve the current template
+object, the current matched DOM, and the current value of the Data context
+as arguments.  It should return a string that is used as the replacement
+value for the given match specification.  For example:
+
+    {
+      package Local::Example;
+
+      sub new {
+        my ($class, %args) = @_;
+        return bless \%args, $class;
+      }
+
+      sub TO_HTML {
+        my ($self, $pure, $dom, $data) = @_;
+        return $dom->attr('class');
+      }
+    }
+
+    my $html = q[
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <p class="foo">aaa</a>
+          <p class="bar">bbb</a>
+        </body>
+      </html>
+    ];
+
+    my $pure = Template::Pure->new(
+      template=>$html,
+      directives=> [
+        'title' => 'title',
+        'p' => Local::Example->new,
+      ]);
+
+    my $data = +{
+      title => 'A Shadow Over Innsmouth',
+    };
+
+    print $pure->render($data);
+
+Results in:
+
+    <html>
+      <head>
+        <title>A Shadow Over Innsmouth</title>
+      </head>
+      <body>
+        <p class="foo">foo</p>
+        <p class="bar">bar</p>
+      </body>
+    </html>
+
+**NOTE** For an alternative method see ["PROCESSING INSTRUCTIONS"](#processing-instructions)
+
+## Using Dot Notation in Directive Data Mapping
+
+[Template::Pure](https://metacpan.org/pod/Template::Pure) allows you to indicate a path to a point in your
+data context using 'dot' notation, similar to many other template
+systems such as [Template](https://metacpan.org/pod/Template).  In general this offers an abstraction
+that smooths over the type of reference your data is (an object, or
+a hashref) such as to make it easier to swap the type later on as
+needs grow, or for testing:
+
+    directives => [
+      'title' => 'meta.title',
+      'copyright => 'meta.license_info.copyright_date',
+      ...,
+    ],
+
+    my %data = (
+      meta => {
+        title => 'Hello World!',
+        license_info => {
+          type => 'Artistic',
+          copyright_date => 2016,
+        },
+      },
+    );
+
+Basically you use '.' to replace '->' and we figure out if the path
+is to a key in a hashref or method on an object for you.
+
+In the case when the value of a path is explictly undefined, the behavior
+is to remove the matching node (the full matching node, not just the value).
+
+Trying to resolve a key or method that does not exist returns an error.
+However its not uncommon for some types of paths to have optional parts
+and in these cases its not strictly and error when the path does not exist.
+In this case you may prefix 'optional:' to your path part, which will surpress
+an error in the case the requested path does not exist:
+
+    directives => [
+      'title' => 'meta.title',
+      'copyright => 'meta.license_info.optional:copyright_date',
+      ...,
+    ],
+
+In this case instead of returning an error we treat the path as though it
+returned 'undefined' (which means we trim out the matching node).
+
+In other cases your path might exist, but returns undefined.  This can be an
+issue if you have following paths (common case when traversing [DBIx::Class](https://metacpan.org/pod/DBIx::Class)
+relationships...) and you don't want to throw an exception.  In this case you
+may use a 'maybe:' prefix, which returns undefined and treats the entire remaining
+path as undefined:
+
+    directives => [
+      'title' => 'meta.title',
+      'copyright => 'meta.maybe:license_info.copyright_date',
+      ...,
+    ],
+
+## Using a Literal Value in your Directive Action
+
+Generally the action part of your directive will be a path that maps to
+a section of the data that is passed to the template at render.  However
+there can be some cases when its useful to indicate a literal value, particularly
+doing template development when you might not have written all the backend code
+that generates data.  In those cases you may indicate that the action is a
+string literal using single or double quotes as in the following example:
+
+    my $html = q[
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <p id="literal_q">aaa</a>
+          <p id="literal_qq">bbb</a>
+        </body>
+      </html>
+    ];
+
+    my $pure = Template::Pure->new(
+      template=>$html,
+      directives=> [
+        title=>'title',
+        '#literal_q' => "'literal data single quote'",
+        '#literal_qq' => '"literal data double quote"',
+
+      ]);
+
+    my $data = +{
+      title => 'A Shadow Over Innsmouth',
+    };
+
+Returns on processing:
+
+    <html>
+      <head>
+        <title>A Shadow Over Innsmouth</title>
+      </head>
+      <body>
+        <p id="literal_q">literal data single quote'</a>
+        <p id="literal_qq">literal data double quote</a>
+      </body>
+    </html>
+
+This feature is of limited value since at this time there is no way to indicate
+a literal other than a string.
+
+## Defaults in your Data Context
+
+By default there will be a key 'self' in your data context which refers to
+the current instance of your [Template::Pure](https://metacpan.org/pod/Template::Pure).  This is handy for introspection
+and for subclassing:
+
+    {
+      package Local::Template::Pure::Custom;
+
+      use Moo;
+      extends 'Template::Pure';
+
+      has 'version' => (is=>'ro', required=>1);
+
+      sub time { return 'Mon Apr 11 10:49:42 2016' }
+    }
+
+    my $html_template = qq[
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <div id='version'>Version</div>
+          <div id='main'>Test Body</div>
+          <div id='foot'>Footer</div>
+        </body>
+      </html>
+    ];
+
+    my $pure = Local::Template::Pure::Custom->new(
+      version => 100,
+      template=>$html_template,
+      directives=> [
+        'title' => 'meta.title',
+        '#version' => 'self.version',
+        '#main' => 'story',
+        '#foot' => 'self.time',
+      ]
+    );
+
+Results in:
+
+    <html>
+      <head>
+        <title>A subclass</title>
+      </head>
+      <body>
+        <div id="version">100</div>
+        <div id="main">XXX</div>
+        <div id="foot">Mon Apr 11 10:49:42 2016</div>
+      </body>
+    </html>
+
+Creating subclasses of [Template::Pure](https://metacpan.org/pod/Template::Pure) to encapsulate some of the view
+data abd view logic should probably be considered a best practice approach.
+
+**NOTE** if you create a subclass and want your methods to have access to
+and to modify the DOM, you can return a CODEREF:
+
+    {
+      package Local::Template::Pure::Custom;
+
+      use Moo;
+      extends 'Template::Pure';
+
+      has 'version' => (is=>'ro', required=>1);
+
+      sub time {
+        return sub {
+        my ($self, $dom, $data) = @_;
+        $dom->attr(foo=>'bar');
+        return 'Mon Apr 11 10:49:42 2016';
+        };
+      }
+    }
+
+Such a coderef may return a scalar value, an object or any other type of
+data type we can process.
+
+## Remapping Your Data Context
+
+If the first element of your directives (either at the root of the directives
+or when you create a new directives list under a given node) is a hashref
+we take that as special instructions to remap the current data context to
+a different structure.  Useful for increase reuse and decreasing complexity
+in some situations:
+
+    my $html = qq[
+      <dl id='contact'>
+        <dt>Phone</dt>
+        <dd class='phone'>(xxx) xxx-xxxx</dd>
+        <dt>Email</dt>
+        <dd class='email'>aaa@email.com</dd>
+      </dl>
+    ];
+
+    my $pure = Template::Pure->new(
+      template = $html,
+      directives => [
+        '#contact' => [
+          { 
+            phone => 'contact.phone',
+            email => 'contact.email,
+          },  [
+          '.phone' => 'phone',
+          '.email' => 'email',
+          ],
+        },
+      ]
+    );
+
+    my %data = (
+      contact => {
+        phone => '(212) 387-9509',
+        email => 'jjnapiork@cpan.org',
+      }
+    );
+
+    print $pure->render(\%data);
+
+Results in:
+
+    <dl id='contact'>
+      <dt>Phone</dt>
+      <dd class='phone'>(212) 387-9509</dd>
+      <dt>Email</dt>
+      <dd class='email'>jjnapiork@cpan.org'</dd>
+    </dl>
+
+## Using Placeholders in your Actions
+
+Sometimes it makes sense to compose your replacement value of several
+bits of information.  Although you could do this with lots of extra 'span'
+tags, sometimes its much more clear and brief to put it all together.  For
+example:
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#content' => 'Hi ={name}, glad to meet you on=#{today}',
+      ]
+    );
+
+In the case your value does not refer itself to a path, but instead contains
+one or more placeholders which are have data paths inside them.  These data
+paths can be simple or complex, and even contain filters:
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#content' => 'Hi ={name | uc}, glad to meet you on ={today}',
+      ]
+    );
+
+For more on filters see ["FILTERS"](#filters)
+
+## Using Placeholders in your Match Specification
+
+Sometimes you may wish to allow the user that is rendering a template the
+ability to influence the match specification.  To grant this ability you
+may use a placeholder:
+
+    my $html = q[
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <p id="story">Some Stuff</p>
+          <p id="footer">...</p>
+        </body>
+      </html>
+    ];
+
+    my $pure = Template::Pure->new(
+      template=>$html,
+      directives=> [
+        'body ={story_target}' => '={meta.title | upper}: ={story} on ={meta.date}',
+        '#footer' => '={meta.title} on ={meta.date}',
+    ]);
+
+    my $data = +{
+      story_target => '#story',
+      meta => {
+        title => 'Inner Stuff',
+        date => '1/1/2020',
+      },
+      story => 'XX' x 10,
+    };
+
+## Special indicators in your Match Specification
+
+In General your match specification is a CSS match supported by the
+underlying HTML parser.  However the following specials are supported
+for needs unique to the needs of templating:
+
+- '.': Select the current node
+
+    Used to indicate the current root node.  Useful when you have created a match
+    with sub directives.
+
+        my $pure = Template::Pure->new(
+          template => $html,
+          directives => [
+            'body' => [
+            ]
+          ]
+        );
+
+- '/': The root node
+
+    Used when you which to select from the root of the template DOM, not the current
+    selected node.
+
+- '@': Select an attribute within the current node
+
+    Used to update values inside a node:
+
+        my $pure = Template::Pure->new(
+          template => $html,
+          directives => [
+            'h1@class' => 'header_class',
+          ],
+        );
+
+- '+': Append or prepend a value
+
+        my $pure = Template::Pure->new(
+          template => $html,
+          directives => [
+            '+h1' => 'title',
+            '#footer+' => 'copyright_date',
+          ],
+        );
+
+    The default behavior is for a match to replace the matched node's content.  In some
+    cases you may wish to preserve the template content and instead either add more
+    content to the front or back of it.
+
+    **NOTE** Can be combined with '@' to append / prepend to an attribute.
+
+    **NOTE** Special handling when appending or prepending to a class attribute (we add a
+    space if there is an existing since that is expected).
+
+- '^': Replace current node completely
+
+    Normally we replace, append or prepend to the value of the selected node.  Using the
+    '^' at the front of your match indicates operation should happen on the entire node,
+    not just the value.  Can be combined with '+' for append/prepend.
+
+- '|': Run a filter on the current node
+
+    Passed the currently selected node to a code reference.  You can run [Mojo::DOM58](https://metacpan.org/pod/Mojo::DOM58)
+    transforms on the entire selected node.  Nothing should be returned from this 
+    coderef.
+
+        'body|' => sub {
+          my ($template, $dom, $data) = @_;
+          $dom->find('p')->each( sub {
+            $_->attr('data-pure', 1);
+          });
+        }
+
+# FILTERS
+
+You may filter you data via a provided built in display filter:
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#content' => 'data.content | escape_html',
+      ]
+    );
+
+If a filter takes arguments you may fill those arguments with either literal
+values or a 'placeholder' which should point to a path in the current data
+context.
+
+    my $pure = Template::Pure->new(
+      template => $html,
+      directives => [
+        '#content' => 'data.content | repeat(#{times}) | escape_html',
+      ]
+    );
+
+You may add a custom filter when you define your template:
+
+    my $pure = Template::Pure->new(
+      filters => {
+        custom_filter => sub {
+          my ($template, $data, @args) = @_;
+          # Do something with the $data, possible using @args
+          # to control what that does
+          return $data;
+        },
+      },
+    );
+
+An example custom Filter:
+
+    my $pure = Template::Pure->new(
+      filters => {
+        custom_filter => sub {
+          my ($template, $data, @args) = @_;
+          # TBD
+          # return $data;
+        },
+      },
+    );
+
+In general you can use filters to reduce the need to write your action as a coderef
+which should make it easier for you to give the job of writing directives / actions
+to non programmers.
+
+See [Template::Pure::Filters](https://metacpan.org/pod/Template::Pure::Filters) for all bundled filters.
+
+# PROCESSING INSTRUCTIONS
+
+Generally [Template::Pure](https://metacpan.org/pod/Template::Pure) proposes its best to keep your actual HTML templates as simple
+and valid as possible, instead putting your transformations and data binding logic into
+directives.  This leads to a strong separate of responsibilities and prevents your templates
+from getting messy.  However there are a few situations where we'd like to offer the template
+designer some options to control the overall template structure and to encapsulate common
+design elements or template rules.  For example its common in a website to have some common
+layouts that set overall page structure and import common CSS and Javascript libraries.  Additionally
+its common to have 'snippets' of HTML that are shared across lots of documents (such as common
+header or footer elements, or advertizements panels, etc.)  You can describe these via directives
+but in order to empower designers and reduce your directive complexity [Template::Pure](https://metacpan.org/pod/Template::Pure) allowes
+one to insert HTML Processing instructions into your templates that get parsed when the template
+object is instantiated and added as additional directives.  This allows one to create directives
+declaratively in the template, rather than programtically in your code.
+
+The availability of this feature in no way suggests that one approach or the other is best.  You
+should determine that based on your team and project needs.
+
+[Template::Pure](https://metacpan.org/pod/Template::Pure) currently offers the following three processing instructions, and does not
+yet offer an API to create your own.  This may change in the future.
+
+**NOTE** All processing instructions are parsed and evaluated during instantiation of your
+template object and all generated directives are adding to the end of your existing ones.  As
+a result these instructions are run last.
+
+## Includes
+
+Allows one to inject a template render into a placeholder spot in the current template.  Example:
+
+    my $include_html = qq[
+      <span id="footer">Copyright&nbsp;</span>];
+
+    my $include = Template::Pure->new(
+      template=>$include_html,
+      directives=> [
+        '#footer+' => 'copyright_year',
+      ]);
+
+    my $base_html = q[
+      <html>
+        <head>
+          <title>Page Title: </title>
+        </head>
+        <body>
+          <div id='story'>Example Story</div>
+          <?pure-include src='foot_include' copyright_year='meta.copyright.year'?>
+        </body>
+      </html>
+    ];
+
+    my $base = Template::Pure->new(
+      template => $base_html,
+      directives => [
+        'title+' => 'meta.title',
+        '#story' => 'story',
+      ]
+    );
+
+    print $base->render({
+      story => 'It was a dark and stormy night...',
+      foot_include => $include
+      meta => {
+        title=>'Dark and Stormy..',
+        copyright => {
+          year => 2016,
+          author=>'jnap'}
+        }
+      },
+    });
+
+Returns:
+
+      <html>
+        <head>
+          <title>Page Title: Dark and Stormy..'</title>
+        </head>
+        <body>
+          <div id='story'>It was a dark and stormy night...</div>
+          <span id="footer">Copyright 2016</span>
+        </body>
+      </html>
+
+This is basically the same as:
+
+    my $base_html = q[
+      <html>
+        <head>
+          <title>Page Title: </title>
+        </head>
+        <body>
+          <div id='story'>Example Story</div>
+          <span id='footer'>...</span>
+        </body>
+      </html>
+    ];
+
+    my $base = Template::Pure->new(
+      template => $base_html,
+      directives => [
+        'title+' => 'meta.title',
+        '#story' => 'story',
+        '^#footer' => 'foot_include',
+      ]
+    );
+
+    print $base->render({
+      story => 'It was a dark and stormy night...',
+      foot_include => $include
+      meta => {
+        title=>'Dark and Stormy..',
+        copyright => {
+          year => 2016,
+          author=>'jnap'}
+        }
+      },
+    });
+
+Or alternatively (if you don't want to allow one to alter the include via
+processing data):
+
+    my $base_html = q[
+      <html>
+        <head>
+          <title>Page Title: </title>
+        </head>
+        <body>
+          <div id='story'>Example Story</div>
+          <span id='footer'>...</span>
+        </body>
+      </html>
+    ];
+
+    my $base = Template::Pure->new(
+      template => $base_html,
+      directives => [
+        'title+' => 'meta.title',
+        '#story' => 'story',
+        '^#footer' => $include,
+      ]
+    );
+
+    print $base->render({
+      story => 'It was a dark and stormy night...',
+      meta => {
+        title=>'Dark and Stormy..',
+        copyright => {
+          year => 2016,
+          author=>'jnap'}
+        }
+      },
+    });
+
+Basically you set the processing directive and the PI is fully replaced by the referenced
+template.  Format is like:
+
+    <?pure-include src=$data_path @args?>
+
+Where 'src' must be a data context path (see ["\\Using Dot Notation in Directive Data Mapping"](#using-dot-notation-in-directive-data-mapping)
+for more on referencing a data path) that is an instance of [Template::Pure](https://metacpan.org/pod/Template::Pure) and @args are
+a list of mappings to import data into the target include from the calling instance current
+data context.  Alternatively, you may set a data context root instead using 'ctx' as an
+argument:
+
+    my $include_html = qq[
+      <span id="footer">Copyright&nbsp;</span>];
+
+    my $include = Template::Pure->new(
+      template=>$include_html,
+      directives=> [
+        '#footer+' => 'copyright.year',
+      ]);
+
+    ...
+    <?pure-include src='foot_include' ctx='meta'?>
+    ...
+
+This might be the preferred method when you wish to copy a full section of data to your
+target include.  You may not combine the 'ctx' method and the named args method.
+
+If you do not specify a 'ctx' or named args, we default to a context of the root data
+context.  This probably leaks too much information into your include but is not terrible
+for prototyping.
+
+## Wrapper
+
+Similar to the include processing instruction, it provides template authors with a declaritive
+approach to ["Object - Set the match value to another Pure Template"](#object-set-the-match-value-to-another-pure-template).  Example:
+
+    my $story_section_wrapper_html = qq[
+      <section>
+        <h1>story title</h1>
+        <p>By:&nbsp;</p>
+      </section>];
+
+    my $story_section_wrapper = Template::Pure->new(
+      template=>$story_section_wrapper_html,
+      directives=> [
+        'h1' => 'title',
+        'p+' => 'author',
+        '^p+' => 'content',
+      ]);
+
+    my $base_html = q[
+      <html>
+        <head>
+          <title>Page Title:&nbsp;</title>
+        </head>
+        <body>
+          <?pure-wrapper src='section_wrapper' ctx='meta'?>
+          <div id='story'>Example Story</div>
+        </body>
+      </html>
+    ];
+
+    my $base = Template::Pure->new(
+      template=>$base_html,
+      directives=> [
+        'title+' => 'meta.title',
+        '#story' => 'story,
+      ]
+    );
+
+    print $base->render({
+      story => 'Once Upon a Time...',
+      section_wrapper => $story_section_wrapper,
+      meta => {
+        title=>'Once',
+        author=>'jnap',
+      },
+    });
+
+Results in:
+
+    <html>
+      <head>
+        <title>Page Title:&nbsp;Once</title>
+      </head>
+      <body>
+        <section>
+          <h1>Once</h1>
+          <p>By:&nbsp;jnap</p>
+          <div id='story'>Once Upon a Time</div>
+        </section>
+      </body>
+    </html>
+
+This processing instructions 'wraps' the following tag node with the template that
+is the target of 'src'.  Like ["Includes"](#includes) you may pass data via named parameters or
+by setting a new data context, as in the given example.
+
+Similar approach using directives only:
+
+    my $base = Template::Pure->new(
+      template=>$base_html,
+      directives=> [
+        'title+' => 'meta.title',
+        '#story' => 'story,
+        '^#story => $story_section_wrapper,
+      ]
+    );
+
+## Overlay
+
+An overlay replaces the selected node with the results on another template.  Typically
+you will pass selected nodes of the original template as directives to the new template.
+This can be used to minic features like template inheritance, that exist in other templating
+systems.  One example:
+
+    my $overlay_html = q[
+      <html>
+        <head>
+          <title>Example Title</title>
+          <link rel="stylesheet" href="/css/pure-min.css"/>
+            <link rel="stylesheet" href="/css/grids-responsive-min.css"/>
+              <link rel="stylesheet" href="/css/common.css"/>
+          <script src="/js/3rd-party/angular.min.js"></script>
+            <script src="/js/3rd-party/angular.resource.min.js"></script>
+        </head>
+        <body>
+        </body>
+      </html>
+    ];
+
+    my $overlay = Template::Pure->new(
+      template=>$overlay_html,
+      directives=> [
+        'title' => 'title',
+        'head+' => 'scripts',
+        'body' => 'content',
+      ]);
+
+    my $base_html = q[
+      <?pure-overlay src='layout'
+        title=\'title'
+        scripts=\'^head script' 
+        content=\'body'?>
+      <html>
+        <head>
+          <title>Page Title:&nbsp;</title>
+          <script>
+          function foo(bar) {
+            return baz;
+          }
+          </script>
+        </head>
+        <body>
+          <div id='story'>Example Story</div>
+        </body>
+      </html>
+    ];
+
+    my $base = Template::Pure->new(
+      template=>$base_html,
+      directives=> [
+        'title+' => 'meta.title',
+        '#story' => 'story,
+      ]
+    );
+
+    print $base->render({
+      layout => $overlay,
+      story => 'Once Upon a Time...',
+      meta => {
+        title=>'Once',
+        author=>'jnap',
+      },
+    });
+
+Renders As:
+
+    <html>
+      <head>
+        <title>Once</title>
+        <link rel="stylesheet" href="/css/pure-min.css"/>
+          <link rel="stylesheet" href="/css/grids-responsive-min.css"/>
+            <link rel="stylesheet" href="/css/common.css"/>
+        <script src="/js/3rd-party/angular.min.js"></script>
+          <script src="/js/3rd-party/angular.resource.min.js"></script>
+            <script>
+            function foo(bar) {
+              return baz;
+            }
+            </script>
+      </head>
+      <body>
+        <div id='story'>Once Upon a Time...</div>
+      </body>
+    </html>
+
+The syntax of the processing instruction is:
+
+    <?pure-overlay src='' @args ?>
+
+Where 'src' is a data path to the template you want to use as the overlay, and @args is
+a list of key values which populate the data context of the overlay when you process it.
+Often these values will be references to existing nodes in the base template (as in the
+examples \\'title' and \\'body' above) but they can also be used to map values from your
+data context in the same way we do so for ["Include"](#include) and ["Wrapper"](#wrapper).
+
+If you were to write this as 'directives only' it would look like:
+
+    my $base = Template::Pure->new(
+      template=>$base_html,
+      directives=> [
+        'title+' => 'meta.title',
+        '#story' => 'story,
+        'html' => [
+          {
+            title => \'title'
+            script s=> \'^head script' 
+            content => \'body'
+          },
+          '^.' => 'layout',
+        ],
+      ]
+    );
+
+Please note that although in this example the overlay wrapped over the entire template, it is
+not limited to that, rather like the ["Wrapper"](#wrapper) processing instruction it just takes the next
+tag node following as its overlay target.  So you could have more than one overlap in a document
+and can overlay sections for those cases where a ["Wrapper"](#wrapper) is not sufficently complex.
+
+## Filter
+
+A Filter will process the following node on a [Template::Pure](https://metacpan.org/pod/Template::Pure) instance as if that node was the
+source for its template.  This means that the target source template must be a coderef that builds
+a <Template::Pure> object, and not an already instantiated one.  For Example:
+
+    my $base_html = q[
+      <html>
+        <head>
+          <title>Title Goes Here...</title>
+        </head>
+        <body>
+          <?pure-filter src=?>
+          <ul>
+            <li>One</li>
+            <li>Two</li>
+            <li>Three</li>
+          </ul>
+        </body>
+      </html>
+    ];
+
+    my $base = Template::Pure->new(
+      template => $base_html,
+      directives => [
+        'title' => 'title',
+      ]
+    );
+
+    print $base->render({
+      title => 'Dark and Stormy..',
+      style => 'red',
+      filter => sub {
+        my $dom = shift;
+        return Template::Pure->new(
+          template => $dom,
+          directives => [
+            'li@class' => 'style'
+          ]
+      },
+    });
+
+Outputs:
+
+    <html>
+      <head>
+        <title>Dark and Stormy..</title>
+      </head>
+      <body>
+        <ul>
+          <li class='red'>One</li>
+          <li class='red'>Two</li>
+          <li class='red'>Three</li>
+        </ul>
+      </body>
+    </html>
+
+As you can see, its similar to the Wrapper instruction, just instead of the matched template
+being passed as the 'content' argument to be used in anther template, it becomes the template.
+
+# IMPORTANT NOTE REGARDING VALID HTML
+
+Please note that [Mojo::DOM58](https://metacpan.org/pod/Mojo::DOM58) tends to enforce rule regarding valid HTML5.  For example, you
+cannot nest a block level element inside a 'P' element.  This might at times lead to some
+surprising results in your output.
+
+# ERROR MESSAGES AND DEBUGGING
+
+Some error messages will use [Class::MOP](https://metacpan.org/pod/Class::MOP) if its available for introspection.  Having this installed
+will greatly improve your debugging, so I recommend installing it on your development machines (good
+change you already have it via [Moose](https://metacpan.org/pod/Moose) anyway).  If its not installed we just do a general [Data::Dumper](https://metacpan.org/pod/Data::Dumper)
+which results in a lot of data that is not easy to read, but suitable for production.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Mojo::DOM58](https://metacpan.org/pod/Mojo::DOM58), [HTML::Zoom](https://metacpan.org/pod/HTML::Zoom).  Both of these are approaches to programmatically examining and
+altering a DOM.
+
+[Template::Semantic](https://metacpan.org/pod/Template::Semantic) is a similar system that uses XPATH instead of a CSS inspired matching
+specification.  It has more dependencies (including [XML::LibXML](https://metacpan.org/pod/XML::LibXML) and doesn't separate the actual
+template data from the directives.  You might find this more simple approach appealing, 
+so its worth alook.
+
+[HTML::Seamstress](https://metacpan.org/pod/HTML::Seamstress) Seems to also be prior art along these lines but I have trouble following
+the code and it seems not active.  Might be worth looking at at least for ideas!
+
+# COPYRIGHT & LICENSE
+
+Copyright 2016, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

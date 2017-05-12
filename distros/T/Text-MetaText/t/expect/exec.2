@@ -1,0 +1,28 @@
+# this tests execution of external methods and/or functions
+
+
+
+
+------------------------------------------------------------------------
+Calling mt_method(
+    foomsg = This is Foo,
+    barmsg = This is Bar,
+    bazmsg = This is Foo
+)
+
+mt_method(mt_method    foomsg = $foo    barmsg = $bar    bazmsg = $baz)
+    foomsg               => This is Foo
+    barmsg               => This is Bar
+    bazmsg               => This is Foo
+------------------------------------------------------------------------
+Calling mt_function(
+    foomsg = This is Foo,
+    barmsg = This is Bar,
+    bazmsg = This is Foo
+)
+
+mt_function(mt_function     foomsg = $foo    barmsg = $bar    bazmsg = $baz)
+    foomsg               => This is Foo
+    barmsg               => This is Bar
+    bazmsg               => This is Foo
+------------------------------------------------------------------------

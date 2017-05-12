@@ -1,0 +1,23 @@
+Revision history for Perl extension Test::TypeConstraints
+
+0.07 2013-04-13T07:48:33Z
+        - [MISC] switch Module::Install to Minilla
+
+0.06    Mon Jan 09 10:27:00 JST 2013
+        - [MISC] update docs. (thanks schwern)
+
+0.05    Mon Jan 08 10:13:00 JST 2013
+        - [FEATURE] added new api: type_isnt, type_doesnt. (thanks schwern)
+        - [MOD] option can take CodeRef for testing coercion results. (thanks schwern)
+
+0.04    Sun Nov 21 22:43:00 JST 2012
+        - MISC: update Module::Install 1.06 for perl 5.16 (thanks report miyagawa.)
+
+0.03    Thu Jul  7 05:25:49 JST 2011
+        - fixed dependency.
+
+0.02    Thu Jul  7 05:25:49 JST 2011
+        - fixed dependency.
+        - rewrite t/02_failcase.t using Test::Tester.
+0.01    Tue Jun 28 07:35:01 2011
+        - original version

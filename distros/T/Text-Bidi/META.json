@@ -1,0 +1,117 @@
+{
+   "abstract" : "Unicode bidi algorithm using libfribidi",
+   "author" : [
+      "Moshe Kamensky <kamensky@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "Bidi",
+      "RTL",
+      "Hebrew",
+      "Arabic"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Bidi",
+   "no_index" : {
+      "package" : [
+         "Text::Bidi::private",
+         "Text::Bidi::privatec"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Version" : "2.00"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DynaLoader" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Tie::Array" : "0",
+            "base" : "0",
+            "integer" : "0",
+            "open" : "0",
+            "overload" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "charnames" : "0",
+            "version" : "0.77"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Bidi" : {
+         "file" : "lib/Text/Bidi.pm",
+         "version" : "2.12"
+      },
+      "Text::Bidi::Array" : {
+         "file" : "lib/Text/Bidi/Array.pm",
+         "version" : "2.12"
+      },
+      "Text::Bidi::Array::Byte" : {
+         "file" : "lib/Text/Bidi/Array/Byte.pm",
+         "version" : "2.12"
+      },
+      "Text::Bidi::Array::Long" : {
+         "file" : "lib/Text/Bidi/Array/Long.pm",
+         "version" : "2.12"
+      },
+      "Text::Bidi::Constants" : {
+         "file" : "lib/Text/Bidi/Constants.pm",
+         "version" : "2.12"
+      },
+      "Text::Bidi::Paragraph" : {
+         "file" : "lib/Text/Bidi/Paragraph.pm",
+         "version" : "2.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-text-bidi at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Bidi"
+      },
+      "homepage" : "https://github.com/mkamensky/Text-Bidi",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mkamensky/Text-Bidi.git",
+         "web" : "https://github.com/mkamensky/Text-Bidi"
+      }
+   },
+   "version" : "2.12"
+}
+

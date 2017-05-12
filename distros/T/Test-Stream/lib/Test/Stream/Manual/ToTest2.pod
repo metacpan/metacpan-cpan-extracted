@@ -1,0 +1,172 @@
+package Test::Stream::Manual::ToTest2;
+use strict;
+use warnings;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Test::Stream::Manual::ToTest2 - How to move code to Test2/Test2-Suite
+
+=head1 DESCRIPTION
+
+Test::Stream is deprecated in favor of L<Test2>, L<Test2::Suite>, and
+L<Test2::Workflow>.
+
+=head1 MAP
+
+This section briefly tells you where to look for replacements.
+
+=head2 THE GUTS AND INTERNALS
+
+=head3 CONTEXT
+
+If you used the C<context()> method it can now be found in L<Test2::API>, usage
+is identical. Converting from Test-Stream's C<context()> function could be as
+easy as changing C<use Test::Stream::Context qw/context/> to
+C<use Test2::API qw/context/>.
+
+One major gotcha though is that the C<debug()> attribute is gone. Instead there
+is a C<trace()> attribute, but its usage is not identical.
+
+=head3 TODO/SKIP
+
+TODO and SKIP are no longer managed inside the Context and DebugInfo objects.
+Skip is now a full fledged event type C<Test2::Event::Skip>, and
+C<Test2::API::Context> has added a C<skip()> method.
+
+TODO is no longer tracked at all by the L<Test2> internals. Instead look at
+L<Test2::Tools::Todo> and/or L<Test2::Todo> which are both part of
+L<Test2::Suite>. These tools manage TODO as a hub filter.
+
+=head3 IPC
+
+IPC has not changed much. Load the L<Test2::IPC> module to make sure IPC is
+loaded if you need it.
+
+=head3 CAPABILITIES
+
+L<Test::Stream::Capabilities> has been merged with L<Test::Stream::Util> in
+L<Test2::Util>.
+
+=head3 EXPORTER
+
+L<Test::Stream::Exporter> is completely gone. Use L<Exporter>,
+L<Export::Declare>, L<Exporter::Declare>, or L<Sub::Exporter>.
+
+=head3 HASHBASE
+
+See L<Test2::Util::HashBase>.
+
+Change
+
+    use Test::Stream::HashBase(
+        base => 'Parent::Class',
+        accessors => [qw/foo bar baz/],
+    );
+
+To
+
+    use parent 'Parent::Class';
+    use Test2::Util::HashBase qw/foo bar baz/;
+
+=head3 EVENTS
+
+See L<Test2::Event> for the new event base class. Very little has changed apart
+from the HashBase usage.
+
+=head3 SYNC
+
+L<Test::Stream::Sync> has been replaced by L<Test2::API>. One major difference
+is that L<Test2::API> exports functions, you do not call clas methods on it the
+way you did with L<Test2::Sync>. L<Test2::API> also adds and renames several
+functions.
+
+=head3 HUB AND STATE
+
+L<Test::Stream::Hub> and L<Test::Stream::State> have been merged into
+L<Test2::API::Stack>. Methods form both are now in a single class. Some
+deprecated methods were removed.
+
+=head2 TOOLS, PLUGINS, FORMATTERS, ETC.
+
+There is a new namespace layout. C<Test::Stream::Plugin::> has been split into:
+
+=over 4
+
+=item Test2::Tools::
+
+Tools live here.
+
+=item Test2::Bundle::
+
+Bundles live here.
+
+=item Test2::Plugin::
+
+Plugins (behavior modifications) live here.
+
+=item Test2::Require::
+
+Things that cause a test to skip all live here.
+
+=item Test2::Formatter::
+
+Formatters live here.
+
+=back
+
+=head3 -V1
+
+L<Test::Stream::Bundle::V1> is now spelled L<Test2::Bundle::Extended>.
+
+=head3 -Classic
+
+L<Test::Stream::Bundle::Classic> is now spelled L<Test2::Bundle::Classic>.
+
+=head2 SPEC AND WORKFLOWS
+
+All the spec and workflow stuff has moved to L<Test2::Workflow>. This was never
+maked stable so I don't expect anyone to need a conversion guide.
+
+=head2 TESTING YOUR TESTS
+
+L<Test2::API> now exports the C<$events = intercept { ... }> function.
+
+=head1 SOURCE
+
+The source code repository for Test::Stream can be found at
+F<http://github.com/Test-More/Test-Stream/>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2015 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See F<http://dev.perl.org/licenses/>
+
+=cut

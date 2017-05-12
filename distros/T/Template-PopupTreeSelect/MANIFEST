@@ -1,0 +1,7 @@
+MANIFEST			This list of files
+Makefile.PL
+META.yml
+PopupTreeSelect.pm
+README
+Changes
+test.pl

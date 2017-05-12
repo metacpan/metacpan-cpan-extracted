@@ -1,0 +1,46 @@
+Text::Sprintf::Named
+
+This module provides a sprintf-like function with named conversions (similar
+to the one in Python). So for example the call:
+
+    named_sprintf("Hello %(name)s! Happy new %(year)d!",
+        { name => "Sophie", year => 2007 }
+    );
+
+Will return "Hello Sophie! Happy new 2006!".
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Text::Sprintf::Named
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Text::Sprintf::Named
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text::Sprintf::Named
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Text::Sprintf::Named
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Text::Sprintf::Named
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Shlomi Fish
+
+This program is released under the following license: MIT X11.

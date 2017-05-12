@@ -1,0 +1,59 @@
+---
+name: Text-Microformat
+version: 0.04
+author:
+  - 'Keith Grennan <kgrennan@cpan.org>'
+abstract: A Microformat parser
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Class::Accessor: 0.25
+  Class::Data::Inheritable: 0.04
+  Data::Dumper: 0
+  HTML::TreeBuilder: 3.21
+  Module::Pluggable: 3.4
+  NEXT: 0.60
+  Test::More: 0.62
+  UNIVERSAL::require: 0.10
+  XML::TreeBuilder: 3.09
+provides:
+  Text::Microformat:
+    file: lib/Text/Microformat.pm
+    version: 0.04
+  Text::Microformat::Element:
+    file: lib/Text/Microformat/Element.pm
+  Text::Microformat::Element::URI:
+    file: lib/Text/Microformat/Element/URI.pm
+  Text::Microformat::Element::hCal:
+    file: lib/Text/Microformat/Element/hCal.pm
+  Text::Microformat::Element::hCard:
+    file: lib/Text/Microformat/Element/hCard.pm
+  Text::Microformat::Element::hCard::HasValue:
+    file: lib/Text/Microformat/Element/hCard.pm
+  Text::Microformat::Element::hCard::email:
+    file: lib/Text/Microformat/Element/hCard.pm
+  Text::Microformat::Element::hCard::tel:
+    file: lib/Text/Microformat/Element/hCard.pm
+  Text::Microformat::Element::hGrant:
+    file: lib/Text/Microformat/Element/hGrant.pm
+  Text::Microformat::Element::rel_tag:
+    file: lib/Text/Microformat/Element/rel_tag.pm
+  Text::Microformat::HTML::Element:
+    file: lib/Text/Microformat/Element.pm
+  Text::Microformat::ML::Element:
+    file: lib/Text/Microformat/Element.pm
+  Text::Microformat::Plugin::Include:
+    file: lib/Text/Microformat/Plugin/Include.pm
+  Text::Microformat::Plugin::Parser::HTML:
+    file: lib/Text/Microformat/Plugin/Parser/HTML.pm
+  Text::Microformat::Plugin::Parser::RSS:
+    file: lib/Text/Microformat/Plugin/Parser/RSS.pm
+  Text::Microformat::Plugin::Parser::XML:
+    file: lib/Text/Microformat/Plugin/Parser/XML.pm
+  Text::Microformat::XML::Element:
+    file: lib/Text/Microformat/Element.pm
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

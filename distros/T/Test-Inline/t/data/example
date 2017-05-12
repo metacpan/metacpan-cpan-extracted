@@ -1,0 +1,58 @@
+package Foo::Bar;
+
+# This is a test package
+
+=pod
+
+=head1 NAME
+
+Foo::Bar - Test Package
+
+=begin testing SETUP 0
+
+my $Foo = Foo::Bar->new();
+
+=end test
+
+=cut
+
+sub foo {
+	my $self = shift;
+	return 1;
+}
+
+=pod
+
+=begin testing 1
+
+This is a test
+
+=end testing
+
+=cut
+
+=begin testing bar 2
+
+This is also a test
+
+=end testing
+
+Foo bar blah
+
+=begin testing foo after bar that 3
+
+This is another test
+
+=end testing
+
+=cut
+
+Some more stuff
+
+=begin testing that after bar 4
+
+Final test
+
+=end testing
+
+1;

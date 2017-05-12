@@ -1,0 +1,1 @@
+<: include template_subdir/template_in_a_subdir.txt :>

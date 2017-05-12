@@ -1,0 +1,129 @@
+=head1 NAME
+
+template_syntax - description of the syntax of a Text::Tmpl template.
+
+=head1 SYNOPSIS
+
+In general:
+
+<!--#function "argument1", $argument2, "argu" $ment "3"--><!--#endfunction-->
+
+Specifically:
+
+<!--#echo "text"-->
+
+<!--#include "file"-->
+
+<!--#comment-->This won't be printed<!--#endcomment-->
+
+<!--#if "value"-->This will be printed if "value" is "true"<!--#endif-->
+
+<!--#ifn "value"-->This will be printed if "value" is "false"<!--#endifn-->
+
+<!--#loop "loopname"-->This may be printed a bunch of times<!--#endloop-->
+
+<!--#debug--><!--#include "debug-include.tmpl"--><!--#enddebug-->
+
+debug-include.tmpl:
+
+Variables in this context:
+<!--#loop "variables-" $number-->
+
+<!--#echo $variable_name--> == <!--#echo $variable_value-->
+
+<!--#endloop-->
+
+Named children (loops) in this context:
+<!--#loop "named_children-" $number-->
+
+<!--#loop $nc_name-->
+<!--#echo $nc_name-->: <!--#include "debug-include.tmpl"-->
+<!--#endloop-->
+
+<!--#endloop-->
+
+=head1 DESCRIPTION
+
+The specific tags listed above are merely the default tags in the template
+library.  It is possible to add tags of your own.
+
+The tag format is: open_tag_delimiter (default: "<!--#") + function name
++ some whitespace + comma-separated argument list (described below)
++ close_tag_delimiter (default: "-->").
+
+Each argument in the comma-separated argument list consists of variables
+and strings - everything else is ignored.  A variable looks like $foo, where
+foo is any number of alphanumeric characters.  A string is anything (including
+whitespace, newlines, etc...) within double-quotes.  To put literal double
+quotes into a string, escape with a backslash.  For example, the following list:
+
+"argument1", $argument2, "argu" $ment "3"
+
+would become:
+
+argument1, (the value of $argument2), argu(the value of $ment)3
+
+Tag pair nesting is possible (and infinite, at least if you have an infinite
+stack...)  Also, the result of a simple tag evaluation will actually be parsed
+again, so you can (for example) include another template into the current one,
+and it will be parsed.
+
+=over 3
+
+=item B<echo>
+
+The echo tag is replaced by the concatenated string values of each of its
+arguments.
+
+=item B<include>
+
+The include tag is replaced by the contents of the named file.
+
+=item B<comment> / B<endcomment>
+
+The comment/endcomment tag pair, and everything it contains, is replaced
+by nothing.
+
+=item B<if> / B<endif>
+
+The if/endif tag pair, and everything it contains, is replaced by nothing or
+by the complete contents of the tag pair, depending on the "truth" of the
+first argument to the tag.  If the argument is true, the complete contents
+of the tag pair are output - otherwise, nothing is output.
+
+=item B<ifn> / B<endifn>
+
+The ifn/endifn tag pair, and everything it contains, is replaced by nothing or
+by the complete contents of the tag pair, depending on the "truth" of the
+first argument to the tag.  If the argument is false, the complete contents
+of the tag pair are output - otherwise, nothing is output.
+
+=item B<loop> / B<endloop>
+
+The loop/endloop tag pair is replaced by everything it contains, repeated 0
+or more times.  The first argument to the loop tag is the name of the loop,
+and the number of repetitions is equal to the number of times that
+loop_iteration() was called in the current context with that loop name as an
+argument.
+
+=item B<debug> / B<enddebug>
+
+The debug/enddebug tag pair is replaced by everything it contains.  This pair
+also dumps all of the information about the parent context into this
+sub-context, so that you can see the internal state of the context as output.
+The format for using the debug/enddebug tag pair is shown in the SYNOPSIS
+above.
+
+=back
+
+=head1 BUGS
+
+Hopefully none.
+
+=head1 AUTHOR
+
+J. David Lowe, dlowe@saturn5.com
+
+=head1 SEE ALSO
+
+libtmpl(1), Text::Tmpl(1), template_extend(1)

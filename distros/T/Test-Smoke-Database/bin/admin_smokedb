@@ -1,0 +1,245 @@
+#!/usr/bin/perl -w
+#
+# Simple perl example to interface with module Test::Smoke::Database
+# Copyright 200x A.Barbet alian@alianwebserver.com.  All rights reserved.
+# $Date: 2003/08/19 10:32:57 $
+# $Revision: 1.14 $
+#
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Test::Smoke::Database;
+$|=1;
+# Default value
+my %opts =
+  ( 'dir'         => $ENV{HOME}.'/.perl.daily-build.reports',
+    'nntp_server' => 'nntp.perl.org',
+    'debug'       => 0,
+    'mysql'       => 'mysql',
+    'user'        => $ENV{USER},
+    'password'    => '',
+    'database'    => 'smoke'
+  );
+
+# SQL request to clear db
+my $cleardb = <<EOF;
+delete from configure;
+delete from builds;
+delete from data;
+EOF
+
+# SQL request to drop all tables
+my $dropdb = <<EOF;
+drop table configure;
+drop table builds;
+drop table data;
+EOF
+
+# SQL request to create db
+my $createdb = <<EOF;
+CREATE TABLE builds (
+  id int(8) unsigned NOT NULL auto_increment,
+  os char(7) NOT NULL default '',
+  osver char(16) NOT NULL default '',
+  archi char(10) NOT NULL default 'i386',
+  cc char(20) NOT NULL default '',
+  ccver char(50) NOT NULL default '',
+  date datetime NOT NULL default '0000-00-00 00:00:00',
+  smoke int(5) unsigned NOT NULL default '0',
+  version char(5) NOT NULL default '5.9.x',
+  author char(25) NOT NULL default '',
+  nbc int(2) unsigned NOT NULL default '0',
+  nbco int(2) unsigned NOT NULL default '0',
+  nbcm int(2) unsigned NOT NULL default '0',
+  nbcc int(2) unsigned NOT NULL default '0',
+  nbcf int(2) unsigned NOT NULL default '0',
+  nbte int(3) unsigned NOT NULL default '0',
+  PRIMARY KEY  (id),
+  KEY os_osver_archi (os, osver, archi),
+  KEY os_osver_archi_smoke (os, osver, archi, smoke),
+  KEY os_archi_smoke (os, archi, smoke),
+  KEY os_osver (os, osver),
+  KEY os_archi (os, archi),
+  KEY os_smoke (os, smoke),
+  KEY archi_smoke (archi, smoke),
+  KEY os (os),
+  KEY osver (osver),
+  KEY archi (archi),
+  KEY cc (cc),
+  KEY ccver (ccver),
+  KEY smoke (smoke),
+  KEY date (date),
+  KEY os_date (os,date)
+) TYPE=MyISAM;
+
+CREATE TABLE configure (
+  id int(9) unsigned NOT NULL auto_increment,
+  idbuild int(8) unsigned NOT NULL default '0',
+  configure varchar(250) NOT NULL default '',
+  result char(12) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY idbuild (idbuild)
+) TYPE=MyISAM;
+
+CREATE TABLE data (
+  id int(9) unsigned NOT NULL auto_increment,
+  idbuild int(8) unsigned NOT NULL default '0',
+  matrix varchar(200) NOT NULL default '',
+  failure mediumblob,
+  PRIMARY KEY  (id),
+  KEY idbuild (idbuild)
+) TYPE=MyISAM;
+
+EOF
+
+my @options = qw/clear suck import dir=s verbose nntp_server=s create drop
+                 user=s password=s database=s help man graph
+                 min_smoke=i debug static/;
+
+GetOptions( \%opts, @options) or pod2usage( -verbose => 1, -exitval => 1 );
+$opts{help}  and pod2usage( -verbose => 1, -exitval => 0 );
+$opts{man}   and pod2usage( -verbose => 2, -exitval => 0 );
+my $debug=0; $opts{debug} and $debug = 1;
+
+# Create a Test::Smoke::Database instance
+my $d = new Test::Smoke::Database(\%opts);
+
+# Directory for report
+mkdir $opts{dir}, 0755 if (!-e $opts{dir});
+print "I use $opts{dir} for store reports\n" if ($debug);
+
+# Drop needed tables
+$d->db->rundb($dropdb) if ($opts{drop});
+
+# Create needed tables
+$d->db->rundb($createdb) if ($opts{create});
+
+# clear database
+$d->db->rundb($cleardb) if ($opts{clear});
+
+# Suck perl.daily-build.reports
+$d->suck_ng() if ($opts{suck});
+
+# Add no of smoke in name of report
+$d->rename_rpt() if ($opts{rename});
+
+# Parse & import
+$d->parse_import() if ($opts{import});
+
+# Create graph
+$opts{min_smoke}=0 if (!$opts{min_smoke});
+$d->build_graph($opts{min_smoke}) if ($opts{graph});
+
+__END__
+
+=pod
+
+=head1 NAME
+
+admin_smokedb - Import smoke report in a mysql database
+
+=head1 SYNOSPIS
+
+  admin_smokedb --clear  --create --database=s  --dir=s
+                 --drop --graph --help --import --man
+                 --min_smoke=i --nntp_server=s --mysql=s
+                 --password=s --suck --user=s --verbose
+
+=head1 DESCRIPTION
+
+This script help you to populate smoke database
+
+The first time you run this script, you must do:
+
+  admin_smokedb --create
+
+for create the needed mysql table. Use --user, --password, --database for
+overwrite default values.
+
+Then you must do:
+
+  admin_smokedb --suck --import
+
+for create a complete smoke database. It will take some times as it will fetch
+all reports from the newsgroup since the beginning of the smoke story. 
+You can then launch your browser with smoke_db.cgi.
+
+For a crontab use, do something like this:
+
+  CGI_BASE=/perl/smoke
+  0 8,19 * * * /usr/bin/admin_smokedb --suck --import --user=root --graph -v
+
+=head1 OPTIONS
+
+Options supported at this moment:
+
+=head2 Actions
+
+=over 4
+
+=item B<--clear>
+
+Remove all reports from database
+
+=item B<--create>
+
+Create needed tables in mysql for store reports
+
+=item B<--drop>
+
+Drop tables in mysql created by this app.
+
+=item B<--import>
+
+Parse and imports reports in database
+
+=item B<--suck>
+
+Fetch new report from perl.daily-build.reports
+
+=item B<--graph> [ B<--min_smoke=>I<no_smoke> ]
+
+Build with GD::Graph graph about smoke. Build them in current directory,
+with the help of the environnement variable CGI_BASE for base url in statics
+files created.
+
+=back
+
+=head2 Others options
+
+=over 4
+
+=item B<--dir=> I<directory>
+
+Directory where store fetched reports.
+Default is HOME/.perl.daily-build.reports
+
+=item B<--nntp_server=> I<nntp host>
+
+Nntp host to use with --fetch. Default is nntp.perl.org
+
+=item B<--verbose>
+
+Display informations during execution
+
+=item B<--user=> I<user> B<--password=>s I<pass> B<--database=> I<db>
+
+Informations about mysql connection. Default is current user, no password, 
+database 'smoke'
+
+=back
+
+=head1 SEE ALSO
+
+L<Test::Smoke::Database>, L<Test::Smoke::Database::FAQ>, L<Test::Smoke>
+
+=head1 VERSION
+
+$Revision: 1.14 $
+
+=head1 AUTHOR
+
+Alain BARBET with some help from Abe Timmerman
+
+=cut

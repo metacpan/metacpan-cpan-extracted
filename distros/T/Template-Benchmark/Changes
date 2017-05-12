@@ -1,0 +1,370 @@
+Revision history for Template-Benchmark
+
+1.09    Version released at 2010-10-18-10:26.
+        Version started at  2010-10-18-10:21.
+        Released rc 1.08_02 as 1.09 stable.
+
+        Summary of changes since 1.08:
+
+        Additions:
+            Cache::Ref/Cache::FastMemoryCache support for Template::Sandbox.
+            Support for multiple features_from and cache_types_from.
+
+        Enhancements:
+            Renamed TextClevy plugin to TextClevery.
+                (Reported by Goro Fuji [rt #61834])
+            Made preprocess_template() optional in plugins.
+            Expanded test suite.
+            Version requirements added to several parts of the documentation.
+
+        Bug Fixes:
+            None.
+
+1.08_02 Version released at 2010-10-11-05:57.  *** Development version. ***
+        Version started at  2010-10-11-05:38.
+        Renamed TextClevy plugin to TextClevery to match engine name change.
+            (Reported by Goro Fuji [rt #61834])
+        Pod tweaks for "added in version...".
+
+1.08_01 Version released at 2010-10-08-05:50.  *** Development version. ***
+        Version started at  2010-10-01-17:35.
+        Added Cache::Ref support to TemplateSandbox plugin.
+        Added Cache::FastMemoryCache support to TemplateSandbox plugin.
+        Support for multiple features_from and cache_types_from.
+        Made preprocess_template() optional in plugins.
+        Expanded test suite.
+
+1.08    Version released at 2010-09-30-19:07.
+        Version started at  2010-09-30-18:55.
+        Released rc 1.07_09 as 1.08 stable.
+
+        Summary of changes since 1.07:
+
+        Additions:
+            Added Parse::Template plugin.
+            Added HTML::Mason plugin.
+            Added Solution plugin.
+            Added HTML::Macro plugin.
+            Added Text::Templet plugin.
+            Added support for preprocess_template().
+
+        Enhancements:
+            Template output returnable as ref to reduce benchmark overhead.
+            Can now force specific plugin usage in test suite.
+
+        Bug Fixes:
+            Require min version of Text::Xslate in tests.
+            Removed test that was causing unneccessary test suite failures.
+
+1.07_09 Version released at 2010-09-27-08:58.  *** Development version. ***
+        Version started at  2010-09-27-08:54.
+        Removed 'command produces no warnings' test - too prone to
+            failures from engines and their dependencies.
+
+1.07_08 Version released at 2010-09-26-20:42.  *** Development version. ***
+        Version started at  2010-09-24-21:09.
+        Corrected SYNOPSIS example for obsoleted parameter name.
+        Added preprocess_template() support.
+        Added Text::Templet plugin.
+
+1.07_07 Version released at 2010-09-21-13:32.  *** Development version. ***
+        Version started at  2010-09-21-11:37.
+        Added hash-loops for Solution now sorting is added.
+
+1.07_06 Version released at 2010-09-20-15:20.  *** Development version. ***
+        Version started at  2010-09-20-13:58.
+        Added HTML::Macro plugin.
+
+1.07_05 Version released at 2010-09-20-11:28.  *** Development version. ***
+        Version started at  2010-09-20-11:12.
+        Added Solution plugin.
+        Added xt/release/manifest.t.
+
+1.07_04 Version released at 2010-09-17-12:10.  *** Development version. ***
+        Version started at  2010-09-17-11:53.
+        Require Text::Xslate 0.2007 in test suite, for taint-bug fix.
+
+1.07_03 Version released at 2010-09-15-10:39.  *** Development version. ***
+        Version started at  2010-09-10-09:53.
+        Added GitHub repository to Build.PL and META.yml.
+        Added HTML::Mason plugin.
+
+1.07_02 Version released at 2010-09-08-08:49.  *** Development version. ***
+        Version started at  2010-08-16-08:10.
+        Added instance_reuse to Parse::Template plugin.
+
+1.07_01 Version released at 2010-08-15-22:21.  *** Development version. ***
+        Version started at  2010-08-15-20:14.
+        Added Parse::Template plugin.
+        Return template output as ref to reduce benchmark overhead.
+        Added version info to plugin-selection diagnostics in tests.
+        Support for forcing plugin-selection in tests.
+        Added Text::Xslate min-version to tests plugin-selection.
+
+1.07    Version released at 2010-08-12-10:53.
+        Version started at  2010-08-12-10:49.
+        Released rc 1.06_01 as 1.07 stable.
+
+        Summary of changes since 1.06:
+
+        Additions:
+            Added Text::Clevy plugin.
+            Added instance_reuse to TextMicroTemplate.
+              (Contributed by Goro Fuji [rt #59989])
+
+        Enhancements:
+            TextXslate no longer needs literal-colon workaround.
+              (Contributed by Goro Fuji [rt #59989])
+            Version requirements added to TextXslateTT plugin.
+              (Contributed by Goro Fuji [rt #59989])
+
+        Bug Fixes:
+            None.
+
+1.06_01 Version released at 2010-08-09-09:09.  *** Development version. ***
+        Version started at  2010-08-02-07:39.
+        Added instance_reuse to TextMicroTemplate.
+          (Contributed by Goro Fuji [rt #59989])
+        TextXslate no longer needs literal-colon workaround.
+          (Contributed by Goro Fuji [rt #59989])
+        Version requirements added to TextXslateTT plugin.
+          (Contributed by Goro Fuji [rt #59989])
+        Added Text::Clevy plugin.
+
+1.06    Version released at 2010-08-02-06:51.
+        Version started at  2010-07-27-18:05.
+        Released rc 1.05_01 as 1.06 stable.
+
+        Summary of changes since 1.04:
+
+        Additions:
+            TextXslateTT plugin for Text::Xslate in Template::Toolkit compat.
+
+        Enhancements:
+            Added "see also" to POD and mention of Task-Template-Benchmark.
+
+        Bug fixes:
+            Added minimum version for File::Temp prerequisite.
+
+1.05_01 Version released at 2010-07-27-16:56.  *** Development version. ***
+        Version started at  2010-07-20-19:08.
+        Added minimum version for File::Temp prerequisite.
+        Added TextXslateTT plugin for Text::Xslate in Template::Toolkit compat.
+
+1.05    Version released at 2010-07-16-15:17.
+        Version started at  2010-07-16-15:10.
+        Released rc 1.04_01 as 1.05 stable.
+
+        Summary of changes since 1.04:
+
+        Additions:
+            Added skip_output_compare option.
+
+        Enhancements:
+            CR, CR/LF line-endings normalized before template output compare.
+              (Reported by Adam Kennedy [rt #59247])
+            Command-line options named more consistently with module names.
+            Use File::Temp for better compat then POSIX::tmpnam().
+            Destruction of benchmark closures to free locks on temp files.
+
+1.04_01 Version released at 2010-07-12-15:11.  *** Development version. ***
+        Version started at  2010-07-07-10:40.
+        Added skip_output_compare option.
+        Normalize Windows/UNIX line-endings in template output before compare.
+            (Reported by Adam Kennedy [rt #59247])
+        Made benchmark_template_engines option naming consistent.
+        Script now also supports "only_plugin" and "onlyplugin" option styles.
+        Converted to use File::Temp rather than POSIX::tmpnam().
+        Destroy benchmark closures to free locks before temp file deletion.
+
+1.04    Version released at 2010-07-12-10:30.
+        Version started at  2010-07-12-10:22.
+        Released rc 1.03_02 as 1.04 stable.
+
+        Summary of changes since 1.03:
+
+        Additions:
+            Support for custom datasets.
+            Support for per-feature repeats values.
+
+        Enhancements:
+            Corrections to build_requires and requires in Build.PL.
+            Now errors on unknown constructor options.
+            Test-suite now tests the constructor.
+            Minor documentation improvements.
+
+1.03_02 Version released at 2010-07-07-13:50.  *** Development version. ***
+        Version started at  2010-07-07-10:02.
+        Added Test::Exception to build_requires.
+        Added Scalar::Util to requires.
+        Added support for per-feature repeats values.
+
+1.03_01 Version released at 2010-07-06-10:04.  *** Development version. ***
+        Version started at  2010-07-06-07:41.
+        Typo fixes in Template::Benchmark::Engine documentation.
+        Added support for custom datasets.
+        Added unknown constructor option error.
+        Added constructor tests to test suite.
+
+1.03    Version released at 2010-07-05-09:45.
+        Version started at  2010-07-05-09:38.
+        Released rc 1.02_03 as 1.03 stable.
+
+        Summary of changes since 1.02:
+
+        Additions:
+            Text::MicroTemplate::Extended plugin added.
+            Text::Xslate plugin has template function/hash loop support.
+            Text::Xslate plugin attempts to recognise use of Text::Xslate::PP.
+
+        Enhancements:
+            Text::MicroTemplate plugin corrected disk-cache to uncached-disk.
+            Corrected description of Text::MicroMason::TextTemplate.
+              (Reported by Jakub Narebski.)
+
+1.02_03 Version released at 2010-07-02-17:41.  *** Development version. ***
+        Version started at  2010-07-02-17:39.
+        Update MANIFEST to include the new plugin, d'oh.
+
+1.02_02 Version released at 2010-07-02-08:12.  *** Development version. ***
+        Version started at  2010-07-01-10:58.
+        Corrected description of Text::MicroMason::TextTemplate.
+          (Reported by Jakub Narebski.)
+
+1.02_01 Version released at 2010-07-01-09:59.  *** Development version. ***
+        Version started at  2010-07-01-08:23.
+        Text::MicroTemplate plugin was incorrectly providing a disk-cache
+          function which should have been uncached-disk.
+        Added Text::MicroTemplate::Extended plugin.
+        Text::Xslate plugin now has template function and hash loop support.
+        Text::Xslate plugin now attempts to recognise use of Text::Xslate::PP.
+
+1.02    Version released at 2010-06-28-07:59.
+        Version started at  2010-06-28-07:54.
+        Released rc 1.01_01 as 1.02 stable.
+
+        Summary of changes since 1.01:
+
+        Additions:
+            Further robustness in instance tests part of Test-suite.
+
+        Enhancements:
+            Corrected terminology in plugin load failure error message.
+
+1.01_01 Version released at 2010-05-20-16:01.  *** Development version. ***
+        Version started at  2010-05-20-15:32.
+        Made selection of plugin for instance tests also check dependencies.
+        Corrected terminology in plugin load failure error message.
+
+1.01    Version released at 2010-05-18-13:18.
+        Version started at  2010-05-18-13:05.
+        Released rc 1.00_01 as 1.01 stable.
+
+        Summary of changes since 1.00:
+
+        Additions:
+            Test-suite diagnostics for edge-cases in plugin initialization.
+
+        Enhancements:
+            Improved Windows support in test-suite.
+
+1.00_01 Version released at 2010-05-14-08:54.  *** Development version. ***
+        Version started at  2010-05-13-09:00.
+        Check for engine errors in instance tests.
+        Better diagnostics for engine errors occuring in instance tests.
+        Added explicit test for engine availability detection.
+        Skip "is script executable?" test for MSWin.
+
+1.00    Version released at 2010-05-09-06:18.
+        Version started at  2010-05-03-20:46.
+        First stable release.
+        More Text::Xslate plugin tweaks, now supports uncached_disk.
+
+0.99_13 Version released at 2010-04-30-17:54.  *** Development version. ***
+        Version started at  2010-04-27-23:41.
+        Still more POD tweaks.
+        Don't try to print --featurematrix when no engines or features matched.
+        Renamed --typematrix to --syntaxmatrix to avoid cache_type confusion.
+        Text::Xslate plugin now works with latest Text::Xslate.
+            (Patch by Goro Fuji.)
+        First release candidate for v1.00.
+
+0.99_12 Version released at 2010-04-27-19:58.  *** Development version. ***
+        Version started at  2010-04-09-12:32.
+        Proofreading pass on the POD.
+        Added syntax_type() informative method to engine plugins to
+          distinguish between 'mini-language' and 'embedded-perl'
+          template engines.
+        Added pure_perl() informative method to engine plugins.
+        Now uses Text::Matrix for --featurematrix layout.
+        Added --typematrix option to benchmark_template_engines.
+        Added Text::Xslate plugin.
+        Changed deep_data_structure text to avoid HTML-autoescaping clashes.
+        Added features_from and cache_types_from options to module and
+          --featuresfrom and --typesfrom to cmdline tool.
+        Changed literal_text feature text to prevent Mojo::Template from
+          getting confused by extra newlines.
+
+0.99_11 Version released at 2010-04-06-09:33.  *** Development version. ***
+        Version started at  2010-04-06-09:30.
+        Helps if I remember to update the manifest and include the new files.
+
+0.99_10 Version released at 2010-04-06-09:25.  *** Development version. ***
+        Version started at  2010-03-22-15:15.
+        Removed caching types from HTML::Template::Pro as it doesn't cache.
+        Renamed confusing "benchmark types" to "cache types".
+        Fixed serialize of timings data for --json mode.
+        Added Text::ClearSilver plugin.
+
+0.99_09 Version released at 2010-03-15-17:45.  *** Development version. ***
+        Version started at  2010-03-14-20:41.
+        More robust in the face of erroring benchmark functions.
+
+0.99_08 Version released at 2010-03-14-16:14.  *** Development version. ***
+        Version started at  2010-03-13-12:46.
+        Bumped checked version of Test::CPAN::Meta for v-strings support.
+        Check stderr output in t/50-script-run.t.
+        Added test t/10-class-methods.t.
+        Added test t/20-instance-methods.t.
+
+0.99_07 Version released at 2010-03-10-16:39.  *** Development version. ***
+        Version started at  2010-02-17-13:44.
+        Added Tenjin plugin.
+        Added NTS::Template plugin.
+        Added Template::Tiny plugin.
+        Added Text::Template::Simple plugin.
+        Added uncached_disk benchmark type.
+        Split tests into t, xt/release and xt/slow dirs.
+        Added skip_plugin an only_plugin benchmark options.
+
+0.99_06 Version released at 2010-02-14-22:14.  *** Development version. ***
+        Version started at  2010-02-14-19:00.
+        50-script-run.t now uses Test::Command.
+
+0.99_05 Version released at 2010-02-13-17:50.  *** Development version. ***
+        Version started at  2010-02-13-17:32.
+        More tweaks to try to get 50-script-run.t to pass for strange testers.
+        Build now requires Config.pm.
+
+0.99_04 Version released at 2010-02-12-21:00.  *** Development version. ***
+        Version started at  2010-02-12-20:50.
+        50-script-run.t now passes @INC to script via -I option.
+
+0.99_03 Version released at 2010-02-11-07:52.  *** Development version. ***
+        Version started at  2010-02-11-07:32.
+        Removed remaining // missed in previous patch.  Grrr.
+        50-script-run.t regexp updated for other correct run formats.
+        Continued work on documentation.
+        Removed Makefile.PL.
+
+0.99_02 Version released at 2010-02-09-09:33.  *** Development version. ***
+        Version started at  2010-02-07-20:20.
+        Reverted "use parent" to "use base", needlessly modern.
+        Nuked use of //=, needlessly modern.
+        Typo fixes in documentation.
+        Corrected licence info in README.
+        Disabled POD Coverage tests of plugins since they may not load.
+
+0.99_01 Version released at 2010-02-07-17:15.  *** Development version. ***
+        Version started at  2010-01-22-11:13.
+        Initial release.

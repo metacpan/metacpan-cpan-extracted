@@ -1,0 +1,63 @@
+Revision history for Perl extension Tie::SecureHash.
+
+0.01  Fri Nov  6 10:26:20 1998
+	- original version; created by h2xs 1.18
+
+1.00	Fri Apr  9 11:18:40 1999
+	- first released version
+
+1.01	Wed Apr 14 17:54:56 1999
+
+1.02	Fri May 14 22:51:09 1999
+
+	- Added delete and reassignment operations
+
+	- Added initialization args to Tie::SecureHash::new
+
+
+1.03	Thu Nov 11 14:10:38 1999
+
+	- Added set-up for $::VERBOSE to Makefile.PL
+
+	- worked-around panic at end of test.pl (thanks David)
+
+	- fixed bug in initialization under fast mode (thanks David)
+
+
+1.04    Wed May 2015 15:38 2015
+
+	- Modernise dist to be more like a 2015 module. (ZARQUON)
+
+	- Note the existence of Tie::InSecureHash in the docs. (ZARQUON)
+
+	- Now that the test warns about fast mode, document it in the test. (ZARQUON)
+
+	- Minor tweak to new (thanks David)
+
+	- Fixed doc bug (thanks John)
+
+	- Added appropriate warnings against iteration under 'strict'
+	  (thanks MJD)
+
+	- Added workaround for $1->isa(...) bug in 5.6.0
+
+	- Added the full DESCRIPTION to the documentation (finally!)
+
+	- Squished spurious 5.6.1 warnings on sub each, sub keys, etc.
+	  (thanks Danny and Julian)
+
+	- Squished more warnings on core each and keys (thanks Kevin, Jeff, and
+      Steve)
+
+1.05 Wed May 20 16:17 2015
+
+	- Packaging errors corrected
+
+1.06 Thu May 21 10:58 2015
+
+     	- The new warnings don't respect backcompat so make them
+               optional with an ENV variable.
+
+1.06 Mon Aug 17 10:58 2015
+
+     	- Introduce $Tie::SecureHash::dangerous

@@ -1,0 +1,68 @@
+Text-Capitalize
+============================
+
+Text::Capitalize provides functions to transform lines of text
+into presentable titles (i.e. it does "title casing").  The most
+important function here is "capitalize_title".  It is exported by
+default.
+
+There is also an optional "scramble_case" function which is designed
+to produce a "wEiRD eFFeCt".
+
+Version 1.2 should work on perl 5.6 (there were problems in the tests).
+
+Version 1.1 improves the speed of the main capitalize_title routine.
+
+Version 1.0 was just fixes test cases with international
+characters (switching from latin-1 to utf-8, etc).
+Version 0.9 primarily provided some documentation revisions,
+and the switch to using Module::Build.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  The "use locale" pragma, standard with perl as of version 5.004.
+  Test::More is required to run "make test".
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::Capitalize
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Capitalize
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-Capitalize
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-Capitalize
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-Capitalize/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, 2010 Joseph Brenner
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

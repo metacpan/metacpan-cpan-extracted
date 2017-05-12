@@ -1,0 +1,24 @@
+Revision history for Perl extension Tie::Judy.
+
+0.05  Fri Mar 07, 2009
+	- added 'search' method to allow flexible range-based
+	  searching and filtering.  Thanks to Brendan [brendan -a t- tucows.com]
+	  for inspiration and design help.
+	- implemented list-context 'keys' and 'values' with 'search'
+	- some refactoring
+
+0.04
+	- Enhancements to insert/retrieve
+
+0.03  Wed Oct 26
+	- added 'clear' synonym to 'CLEAR'
+	- performance enhancements to object-oriented interface
+
+0.02  Mon Oct 24
+	- fleshed out object-oriented interface
+	- fixed bug on 64 bit systems
+
+0.01  Mon Oct 17 08:58:16 2005
+	- original version; created by h2xs 1.23 with options
+		-An Tie::Judy Judy-1.0.1/src/Judy1/Judy1.h Judy-1.0.1/src/JudyCommon/JudyPrivate1L.h Judy-1.0.1/src/JudyCommon/JudyPrivateBranch.h Judy-1.0.1/src/JudyCommon/JudyPrivate.h Judy-1.0.1/src/JudyHS/JudyHS.h Judy-1.0.1/src/JudyL/JudyL.h
+

@@ -1,0 +1,51 @@
+use lib 'alpha';
+use Tk;
+use Tk::ListMgr;
+use Tk::Menubar;
+
+my $mw = new MainWindow;
+
+$mb = $mw->Menubar(-borderwidth => 2, -relief => 'raised');
+$mb->Menubutton(-text => '~Help',-side => 'right');
+$mb->pack(-side => 'top', -fill => 'x');
+
+$lm = $mw->Scrolled('ListMgr',
+    -scrollbars => 'e',
+    -borderwidth => 2,
+    -relief => 'flat', 
+    -background => 'WhiteSmoke',
+    -layout => 'vertical',
+)->pack(-fill => 'both', -expand => 1);
+
+$lm->focus;
+$lm->subitemConfigure(0, -type => Image);
+$lm->subitemConfigure(1, -type => Text);
+$lm->subitemConfigure(2, -type => Text);
+
+$f1 = $mw->Frame(-height => 20)->pack(-side => 'bottom', -fill => 'x');
+$f1->Label(-text => 'Click middle button ...')->pack(-side => 'left');
+
+use Tk::Pixmap;
+
+$pm = $mw->Pixmap(-file => 'alpha/dir.xpm');
+
+$lm->insert(0,
+    [$pm,"a longer text","a longer text"],
+    [$pm,"two","tdsdsawo"],
+    [$pm,"three","a longer text"],
+    [$pm,"four","a longer text"],
+    [$pm,"five","a longer text"],
+    [$pm,"a longer text"],
+);
+
+$lm->bind("<2>", [
+    sub { 
+	my $lmgr = shift;
+	my $l = $lmgr->cget('-layout');
+	$lmgr->configure(-layout => $l eq 'vertical' ? 'horizontal' : 'vertical');
+    }
+]);
+
+
+Tk::MainLoop;
+

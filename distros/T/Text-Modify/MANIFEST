@@ -1,0 +1,17 @@
+Build.PL
+CHANGES
+examples/change_ip.pl
+lib/Text/Buffer.pm
+lib/Text/Modify.pm
+lib/Text/Modify/Rule.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-compile.t
+t/02-buffer.t
+t/03-modify.in
+t/03-modify.out
+t/03-modify.t
+t/99-pod-coverage.t
+t/99-pod.t

@@ -1,0 +1,38 @@
+We identified three different kinds of reports that are traditionally
+needed:
+
+1.  Single Testrun Report.  This summarizes the test run (perhaps with a
+    graph), captures interesting data about the test, and provides links
+    to the raw data and other useful info.
+
+2.  Testrun Diff Report.  This is used for comparative purposes, to show
+    changes between two (or more) test runs.  The idea here is to help
+    flag new issues such as significant performance changes,
+    regressions, or new test failures.  It would present sort of a
+    "side-by-side" view of the runs, to help highlight the differences.
+
+3.  Multiple Testrun Report.  This tabulates a number of test runs, and
+    some key data from them.  The linstab page is an excellent example
+    of this kind of report.
+
+We've all done the #1 and #3 style reports before, so these should be
+pretty straitforward.  But the goal is for Test-Presenter to do them in a
+more general purpose form (not tied to a specific test harness), and to
+make them prettier and more usable.
+The #2 report is new, but from our past experience, is going to be the
+most handy.  We need to be able to do better analysis of testruns, so
+this should take us a good solid step in that direction.
+
+Since we expect there may be other kinds of reports created in the
+future (perhaps specialized analysis reports), we figured each type of
+report could be implemented as a sub-module, e.g., Test::Presenter::Single,
+etc. so more reports can be added without disturbing the existing ones.
+
+We're going to try to use SpikeSource's TRPI XML format as the input for
+Test-Presenter, although it is going to have to be extended in order to
+support all the info we need.  We thought that perhaps merging your XML
+format for the performance tests into it could do it.  Judith was going
+to take a peek at the formats and see what fields will need to be added.
+
+References:
+http://developer.osdl.org/markw/trixie/

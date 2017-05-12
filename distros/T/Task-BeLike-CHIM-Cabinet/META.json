@@ -1,0 +1,103 @@
+{
+   "abstract" : "Install all the CPAN modules needed by Cabinet",
+   "author" : [
+      "Anton Gerasimov <chim@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-CHIM-Cabinet",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "examples",
+         "corpus"
+      ],
+      "namespace" : [
+         "t::lib"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bundle::PlRPC" : "0",
+            "Carp" : "0",
+            "DBI" : "0",
+            "Dancer" : "1.3100",
+            "Dancer::Plugin::Database" : "2.04",
+            "Dancer::Plugin::Redis" : "0.7",
+            "Dancer::Session::Redis" : "0.21",
+            "Digest::MurmurHash" : "0",
+            "JSON" : "0",
+            "List::MoreUtils" : "0",
+            "Module::Versions" : "0",
+            "Net::CIDR::Lite" : "0",
+            "Plack" : "0",
+            "Plack::Middleware::Debug" : "0",
+            "Plack::Middleware::Debug::DBIProfile" : "0",
+            "Plack::Middleware::Debug::Redis" : "0.02",
+            "Starman" : "0",
+            "Template::Plugin::Octets" : "0.18",
+            "Text::MicroTemplate" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "YAML" : "0",
+            "lib" : "0",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Pod" : "1.22"
+         }
+      }
+   },
+   "provides" : {
+      "Task::BeLike::CHIM::Cabinet" : {
+         "file" : "lib/Task/BeLike/CHIM/Cabinet.pm",
+         "version" : "0.15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Wu-Wu/Task-BeLike-CHIM-Cabinet/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Task-BeLike-CHIM-Cabinet",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Wu-Wu/Task-BeLike-CHIM-Cabinet.git",
+         "web" : "https://github.com/Wu-Wu/Task-BeLike-CHIM-Cabinet"
+      }
+   },
+   "version" : "0.15",
+   "x_authority" : "cpan:CHIM"
+}
+

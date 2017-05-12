@@ -1,0 +1,22 @@
+#use Tk;
+use Tcl::pTk;
+my $mw = MainWindow->new;
+
+$mw->geometry('400x400');
+
+my $t0=time;
+
+my $frame;
+my $entry;
+foreach my $row (1..500) {      
+        my $frame = $mw->Frame()->pack(-side=>'top');
+        foreach my $col (1..100){
+                $entry = $frame->Entry()->pack(-side => 'right');
+        }
+}
+
+my $t1=time;
+print STDERR "time=".($t1-$t0)."\n";
+
+#MainLoop;
+

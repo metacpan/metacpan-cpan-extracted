@@ -1,0 +1,44 @@
+---
+abstract: 'Catalyst and related modules for exploring Catalyst'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Task::CatInABox
+name: Task-CatInABox
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Authentication::Credential::HTTP: 0
+  Catalyst::Authentication::Credential::Password: 0
+  Catalyst::Authentication::Store::DBIx::Class: 0
+  Catalyst::Authentication::Store::Htpasswd: 0
+  Catalyst::Devel: 0
+  Catalyst::Model::DBIC::Schema: 0
+  Catalyst::Model::File: 0
+  Catalyst::Plugin::Authentication: 0
+  Catalyst::View::JSON: 0
+  Catalyst::View::TT: 0
+  DBIx::Class: 0
+  DBIx::Class::EncodedColumn: 0
+  DBIx::Class::InflateColumn::DateTime: 0
+  DBIx::Class::Schema::Loader: 0
+  DBIx::Class::Timestamp: 0
+  Template: 0
+  perl: 5.8.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Task-CatInABox
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Task-CatInABox
+version: 0.03

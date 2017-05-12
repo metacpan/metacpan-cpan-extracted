@@ -1,0 +1,85 @@
+Revision history for Perl extension Tibco::Rv.
+
+0.01  Wed Jan  8 18:36:33 2003
+	- original version; created by h2xs 1.18
+
+0.02  Wed Jan 15 11:46:40 CST 2003
+	- basic functionality
+
+0.03  Fri Jan 17 12:24:34 CST 2003
+	- renamed Tibco::Rv from Tib::Rv
+	- basic tibrv API almost completely implemented, with one glaring
+	  exception: functions to manipulate tibrvMsg fields (only
+	  addString( ) supported)
+	- useful factory methods and looping added to Tibco::Rv object
+
+0.90  Wed Jan 22 01:24:16 CST 2003
+	- implemented functions to manipulate tibrvMsg fields, except arrays
+
+0.99  Sat Jan 25 00:17:48 CST 2003
+	- tibrv API complete, except for a few minor exceptions listed in BUGS
+	- better handling of IPAddr32/IPPort16
+	- much better testing setup (t/*.t)
+
+1.00  Wed Jan 29 22:11:03 CST 2003
+	- tibrv API really complete now, including my embellishments
+	- Tibco::Rv API frozen
+	- misc. bug fixes
+	- documentation ~ 20% done
+	- test harness ~ 50% done
+
+1.01  Fri Jan 31 00:28:32 CST 2003
+	- Backwards-compatible with TIB/Rendezvous 6.x via TIBRV_VERISON_MAJOR
+	  variable in Rv.pm (build-time option)
+	- documentation ~ 60% done
+
+1.02  Mon Feb  3 10:54:24 CST 2003
+	- Changed TIBRV_VERSION_MAJOR to TIBRV_VERSION_RELEASE
+	- Fixed Dispatcher bug that snuck into 1.00
+	- documentation done
+
+1.03  Mon Feb  3 23:28:27 CST 2003
+	- Fixed another Dispatcher bug
+	- test harness 90% done
+	- documentation touchups
+
+1.04  Wed Feb  5 16:07:24 CST 2003
+	- test harness done
+
+1.10  Sun Mar  2 23:07:44 CST 2003
+	- basic Certified Messaging implementation -- no doc, no test
+	- Dispatcher name properly defaults to 'dispatcher'
+	- Transport service/network settings properly default to ''
+	- Transport get/set description behaviour now matches C API behaviour
+	- Queue get/set name behaviour now matches C API behaviour
+	- Msg::Field get/set name behaviour causes undef to be ''
+
+1.11  Mon Jan 12 18:29:09 PST 2004
+	- fix for building under tibrv 6.x
+	- automatically determine $TIBRV_VERSION_RELEASE from rvd
+
+1.12 Sat Feb 19 20:52:33 PST 2005
+	- split c functions out to each .pm file
+	- disabled tests that broke on known issues (threading)
+	- created sample files in eg/
+	- partial implementation of Certified Messaging
+
+1.13 Tue Feb 22 21:09:41 PST 2005
+	- improved Tibco::Rv::die behaviour
+	- setup mailing list (perl-tibco-discuss@branewave.com)
+	- finished Certified Messaging documentation
+
+1.14 Wed Feb 23 18:28:56 PST 2005
+	- removed unecessary pthread header/library
+	- implemented Cm::Transport->publisherInactivityDiscardInterval (7.3+)
+	- spruced up Transport->batchMode version checking
+	- fixed bug in Transport->DESTROY and Queue->DESTROY
+	- fixed bug in eg/tibrvsend.pl
+	- added eg/version.pl
+	- updated copyright notices
+
+1.15 Sun Jul 17 14:22:18 PDT 2005
+	- fixed bug in QueueGroup::DESTROY (was not properly calling
+	  tibrvQueueGroup_Destroy)
+	- fixed bug in Rv::DESTROY so that the default transport and queueGroup
+	  are deleted prior to tibrv_Close being called

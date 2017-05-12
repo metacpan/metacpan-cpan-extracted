@@ -1,0 +1,41 @@
+
+
+use Tcl::pTk (qw/ :perlTk /);
+
+use Tcl::pTk::TableMatrix::SpreadsheetHideRows;
+
+use Data::Dumper qw( DumperX);
+my $top = MainWindow->new;
+
+my $arrayVar = {};
+
+foreach my $row  (0..20){
+	foreach my $col (0..10){
+		$arrayVar->{"$row,$col"} = "r$row, c$col";
+	}
+}
+
+print "Got Here \n";
+
+my $t = $top->Scrolled('Spreadsheet', -rows => 21, -cols => 11, 
+                              -width => 6, -height => 6,
+			      -titlerows => 1, -titlecols => 1,
+			      -variable => $arrayVar,
+			      -selectmode => 'extended',
+			      -titlerows => 1,
+			      -titlecols => 1,
+			     #  -state => 'disabled'
+			    #  -colseparator => "\t",
+			    #  -rowseparator => "\n"
+                    );
+		    
+#$t->tagConfigure('active', -bg => 'gray90', -relief => 'sunken');
+#$t->tagConfigure( 'title', -bg => 'gray85', -fg => 'black', -relief => 'sunken');
+
+# $t->bind("<Any-Enter>", sub { $t->focus });
+
+
+
+$t->pack(-expand => 1, -fill => 'both');
+
+MainLoop;

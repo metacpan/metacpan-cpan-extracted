@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Term::Vspark qw{ vspark };
+
+# VERSION
+# PODNAME: vspark
+
+binmode STDOUT, ':encoding(UTF-8)';
+
+chomp( @ARGV = <STDIN> ) unless @ARGV;
+
+print vspark(values => \@ARGV);

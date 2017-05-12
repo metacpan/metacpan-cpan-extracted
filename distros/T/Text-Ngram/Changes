@@ -1,0 +1,66 @@
+Revision history for Text-Ngram
+
+0.15   Thu Jul 17 16:50:58 WEST 2014
+        - substitute lowercase by case folding.
+
+0.14   Wed Jan 25 15:40:30 WET 2012
+        - releasing as stable
+
+0.14_01 Sun Jan 22 11:40:24 WET 2012
+        - Fixed off-by-one error.
+        - Sped up UTF-8 processing; now uses XS instead of pure perl.
+        - Allowed config to be passed in as named arguments.
+        - Prevented compilation warnings.
+          [release by gray]
+
+0.13  Sat Oct 16 10:00:27 WEST 2010
+        - Require perl 5.8.8 for Unicode support
+
+0.12  Fri Jul 30 12:02:06 2010
+        - fixed misbehaviour of 'lowercase=>0'.
+          Thanks to Andreas Koenig for reporting the bug.
+
+0.11  Sun May 17 22:14:00 2009
+        - Some stupid behaviour on uploading the module.
+          Here it goes again
+
+0.10  Wed May 06 17:58:00 2009
+        - Added pure perl code to compute ngrams on unicode strings
+          [thanks to Alex Kapranoff]
+
+0.09  Mon Feb 27 15:06:00 2006 - "Overtake"
+        - Changed maintainership and contact information
+        - Moved .pm file to lib/Text
+
+0.08  (02 Nov 2005)
+
+0.07  Fri Apr 15 00:32:00 2005
+        - fixed a bug introduced in 0.06, thanks to Marcus (always remember to
+          make clean before make/make test)
+
+0.06  Sat Apr 03 11:48:00 2005
+        - added pod-coverage.t to the tests directory
+
+0.05  Wed Nov 03 00:04:00 2004
+        - added more tests
+        - added configuration, allowing parameter "punctuation", "spaces",
+          "lowercase" and "flankbreaks"; the default configuration is backwards
+          compatible
+        - ngrams of size 0 or less are now imediately returned as a reference
+          to an empty hash
+        - changes in the documentation
+        - added pod.t to the tests directory
+
+0.04
+        - minor changes to the documentation
+        - added META.yml
+
+0.03
+        - changed the way text is prepared
+
+0.02
+        - fixed an embarassing export bug
+
+0.01  Wed Apr  2 13:06:16 2003
+        - original version; created by h2xs 1.22 with options
+                -A -b 5.6.0 -n Text::Ngram

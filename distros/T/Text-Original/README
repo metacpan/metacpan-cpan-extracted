@@ -1,0 +1,25 @@
+NAME
+       
+Text::Original - Find original, non-quoted text in a message
+
+SYNOPSIS
+           
+	use Text::Original;
+	my $sentence = first_sentence($email->body);
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 The Siesta Project http://siesta.unixbeard.net
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

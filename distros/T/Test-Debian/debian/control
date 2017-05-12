@@ -1,0 +1,18 @@
+Source: libtest-debian-perl
+Section: perl
+Homepage: http://search.cpan.org/dist/Test-Debian/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Build-Depends: debhelper (>= 7), cdbs
+Standards-Version: 3.9.6
+Priority: extra
+VCS-Browser: https://github.com/unera/test-debian-perl
+
+Package: libtest-debian-perl
+Depends: ${perl:Depends}, ${misc:Depends}
+Architecture: all
+Description: perl tests for debian
+ The module provides some perl tests for debian system:
+    - system_is_debian
+    - package_is_installed
+    - package_isnt_installed
+ You can use them inside Your perl tests.

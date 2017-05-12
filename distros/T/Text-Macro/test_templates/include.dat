@@ -1,0 +1,5 @@
+in include.dat
+before include1.dat
+#include include1.dat
+after include1.dat
+leaving include.dat

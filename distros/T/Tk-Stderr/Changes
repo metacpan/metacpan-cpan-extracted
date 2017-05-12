@@ -1,0 +1,11 @@
+Revision history for Perl extension Tk::Stderr.
+
+1.0   Wed Mar 26 13:34:22 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -b 5.6.0 Tk::Stderr
+
+1.1   Wed Mar 26 21:48:43 2003
+	- fixed dependencies in Makefile.PL
+
+1.2   Mon Mar 31 22:58:42 2003
+	- added RedirectStderr method

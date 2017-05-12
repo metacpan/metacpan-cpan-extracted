@@ -1,0 +1,123 @@
+NAME
+    Test::Mojo::More - Test::Mojo and more.
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+      use Test::More;
+      use Test::Mojo::More;
+  
+      my $t = new Test::Mojo::More 'MyApp';
+  
+      $t->post_ok('/account/login/', form => {
+        login => 'false',
+        pass  => 123,
+      })
+        ->status_is(302)
+        ->flash_is( '/error/login' => 'Error login.' )
+        ->cookie_hasnt( 'user_id' );
+
+      $t->post_ok('account/login/', form => {
+        login => 'true',
+        pass  => 123,
+      })
+        ->status_is(302)
+        ->flash_hasnt( '/errror' )
+        ->cookie_has( 'user_id' );
+
+      done_testing;
+
+DESCRIPTION
+    Test::Mojo::More is an extension for the Test::Mojo which allows you to
+    test Mojo and Mojolicious applications.
+
+ATTRIBUTES
+    Test::Mojo::More inherits all attributed from Test::Mojo and inplements
+    the following new ones.
+
+  "dom"
+       @a = $t->dom->find('.menu li a');
+
+    Currect DOM from transaction.
+
+  "cookie_hashref"
+      $cookie = $t->cookie_hashref;
+
+    Current cookies from transaction.
+
+  "flash_hashref"
+      $flases = $t->flash_hashref;
+
+    Current flashes from transaction.
+
+METHODS
+    Test::Mojo::More inherits all method from Test::Mojo and inplements the
+    following new ones.
+
+  "flash_is"
+      $t = $t->flash_is( '/error', { message => 'error message' } );
+      $t = $t->flash_is( '/error/message', 'error message' );
+
+    Check flash the given JSON Pointer with Mojo::JSON::Pointer.
+
+  "flash_has"
+      $t = $t->flash_has( '/error' );
+      $t = $t->flash_has( '/error/message' );
+
+    Check if flash contains a value that can be identified using the given
+    JSON Pointer with Mojo::JSON::Pointer.
+
+  "flash_hasnt"
+      $t = $t->flash_hasnt( '/error' );
+      $t = $t->flash_hasnt( '/error/message' );
+
+    Check if flash no contains a value that can be identified using the
+    given JSON Pointer with Mojo::JSON::Pointer
+
+  "cookie_has"
+      $t = $t->cookie_has( 'error' );
+
+    Check if cookie contains a cracker.
+
+  "cookie_hasnt"
+      $t = $t->cookie_hasnt( 'error' );
+
+    Check if cookie no contains a cookie.
+
+  "cookie_like"
+      $t = $t->cookie_like( 'error', 'fatal error' );
+
+    Check if cookie for similar match.
+
+SEE ALSO
+    Test::Mojo, Test::Mojo::Session
+
+AUTHOR
+    coolmen, "<coolmen78 at gmail.com>"
+
+LICENSE AND COPYRIGHT
+    Copyright 2013 coolmen.
+
+    This program is distributed under the MIT (X11) License:
+    <http://www.opensource.org/licenses/mit-license.php>
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

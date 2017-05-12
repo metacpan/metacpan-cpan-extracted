@@ -1,0 +1,26 @@
+---
+abstract: 'easily add more template tags which are mapped onto filters'
+author:
+  - 'Ailin Nemui <ailin at devio dot us>'
+build_requires:
+  Mouse: 0
+  Test::More: 0
+  Test::Most: 0
+  Text::Xslate: 0
+  Text::Xslate::Syntax::Kolon: 0
+  Text::Xslate::Syntax::TTerse: 0
+  ok: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Xslate-Syntax-FiltersAsTags
+requires:
+  Mouse::Role: 0
+version: 0.1

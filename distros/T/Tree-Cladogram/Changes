@@ -1,0 +1,28 @@
+Revision history for Perl extension Tree::Cladogram.
+
+1.03  2016-08-14T11:33:00
+	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
+		See RT#116931. Thanx to Chad Granum aka EXODIST.
+	- Update version #s in pre-reqs.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Update .gitignore and MANIFEST.SKIP.
+	- Add File::Spec and File::Temp to TEST_REQUIRES within Makefile.PL.
+
+1.02  2016-04-25T09:26:00
+	- No code changes.
+	- Fix my licence (sic) mess so all references are to Perl. This involves edits to Makefile.PL
+		and LICENSE. See RT#113949. Thanx Kent Fredric.
+	- Fix Makefile.PL so modules only used for testing are in TEST_REQUIRES and not PREREQ_PM.
+		See RT#113948. Thanx Kent Fredric.
+	- Fix README so it more-or-less conforms to the Perl Foundation's guidelines at
+		http://www.perlfoundation.org/cpan_licensing_guidelines.
+
+1.01  2016-01-04T09:52:00
+	- Disable testing images in t/test.t because some CPAN testers have installed Imager without
+		support for *.ttf fonts. So, a group of tests have been commented out.
+	- Remove t/FreeSansBold.ttf, t/wikipedia.01.clad and wikipedia.01.png from the disto.
+		There is no point in shipping these files now that they can't be used.
+
+1.00  2015-12-29T11:50:00
+	- Original version

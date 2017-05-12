@@ -1,0 +1,24 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Tree/XPathEngine.pm
+lib/Tree/XPathEngine/Boolean.pm
+lib/Tree/XPathEngine/Expr.pm
+lib/Tree/XPathEngine/Function.pm
+lib/Tree/XPathEngine/Literal.pm
+lib/Tree/XPathEngine/LocationPath.pm
+lib/Tree/XPathEngine/NodeSet.pm
+lib/Tree/XPathEngine/Number.pm
+lib/Tree/XPathEngine/Root.pm
+lib/Tree/XPathEngine/Step.pm
+lib/Tree/XPathEngine/Variable.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/01_basic.t
+t/02_altername_word_tokens.t
+t/03_xpath.t
+t/04_errors.t
+t/minitree.pm

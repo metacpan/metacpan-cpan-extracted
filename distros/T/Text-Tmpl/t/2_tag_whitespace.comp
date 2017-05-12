@@ -1,0 +1,15 @@
+simple tag:
+  no extra whitespace           value1
+  whitespace after open delim   value1
+  whitespace before close delim value1
+  whitespace after command      value1
+
+tag pair:
+  no extra whitespace             value1
+  open tag:
+    whitespace after open delim   value1
+    whitespace before close delim value1
+    whitespace after command      value1
+  close tag:
+    whitespace after open delim   value1
+    whitespace before close delim value1

@@ -1,0 +1,28 @@
+<%args>
+        @requested_testrunlists => ()
+</%args>
+
+% my $days = $c->stash->{days} || 7;
+% my $lastday = $days - 1;
+
+%#        <ul class="post_info">
+%#		<li class="comments">        <% $list_count_all     %> reports</li>
+%#		<li class="comments pass">   <% $list_count_pass    %> pass</li>
+%#		<li class="comments fail">   <% $list_count_fail    %> fail</li>
+%#		<li class="comments unknown"><% $list_count_unknown %> unknown</li>
+%#	</ul>
+
+% use Data::Dumper;
+% foreach (0..$lastday) {
+%       my $day_infos = $requested_testrunlists[$_];
+%       my $day        = $day_infos->{day};
+%       my $testrunlist = $day_infos;
+%       # my $rgt = $day_infos->{rgt};
+        <h4><a href="/tapper/testruns/date/<% $day->ymd('-') %>">
+        <% $day->day_abbr %> <% $day->month_abbr %> <% $day->day %>, <% $day->year %></a></h4>
+<& /tapper/testruns/testrunlist.mas, testrunlist => $testrunlist &>
+% }
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

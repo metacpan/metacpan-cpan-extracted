@@ -1,0 +1,12 @@
+Revision history for Perl extension Tk::TimePick.
+
+0.02 Thu May 25 15:50:26 2006
+ 	- the hours put by 0 to 23.
+
+0.01  Fri May 12 18:41:36 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Tk::TimePick
+
+
+
+

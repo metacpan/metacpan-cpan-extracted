@@ -1,0 +1,40 @@
+Tk::XMLViewer Module
+
+Tk::XMLViewer is an extended Text widget which displays XML data in a
+hierarchical tree. It's possible to hide parts of the tree.
+
+As a bonus method, there is XMLDump, which can dump Tk::Text data to
+XML (this method is still imperfect).
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make demo
+	$ make install
+
+Additional requirements:
+XML-Parser and, of course, the Perl/Tk distribution. To automatically
+install these modules, use the prereqinst script:
+
+	$ perl prereqinst.pl
+
+To install with ActiveState Perl type
+
+	$ perl Makefile.PL
+	$ nmake
+	$ nmake test
+	$ nmake demo
+	$ nmake install
+
+If there are modules missing use the prereqinst script with the -ppm
+option:
+
+	$ perl prereqinst.pl -ppm
+
+Also included is a standalone program for viewing XML files:
+tkxmlview.
+
+Send bug reports, patches, comments and suggestions to slaven@rezic.de
+

@@ -1,0 +1,38 @@
+<html>
+<head>
+  <title>TLフレームワークサンプル</title>
+</head>
+<body>
+TLフレームワークのサンプルです．<br>
+<br>
+Session の mode=double のテストです．<br>
+https，http の両方に同じCGIを設置し，テストしてください．<br>
+<br>
+ボックスに整数を入力すると，そのデータを Session に記録します．<br>
+Session への記録は，https 側でのみ行えます．<br>
+値の取得は https，http の両方で行えます．<br>
+<br>
+発行されるセッションIDは，http，https のそれぞれで異なるため，
+http のセッションIDが漏洩し使用されたとしても，
+https 領域の参照内容に影響を与えることは出来ません．<br>
+しかし，http 領域に関しては改ざんが可能なので，
+重要な操作は https 領域でセッションを参照する必要があります．<br>
+<br>
+
+<hr>
+<form action="" method="post">
+ID: <input type="text" name="id" value="" size=5 maxlength=5><br>
+<input type="submit" name="submit" value="設定/リロード">
+</form>
+<hr>
+<!begin:session>
+現在のセッションデータは <&SESSIONDATA> です．<br>
+セッションIDは <&SESSIONID> です．<br>
+<!end:session>
+<!begin:nosession>
+現在セッションデータは空です．<br>
+<!end:nosession>
+
+</body>
+</html>
+

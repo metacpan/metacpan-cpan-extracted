@@ -1,0 +1,22 @@
+Revision history for Perl extension Text::Banner.
+
+2.01  Nov 4 2015 [GSULLIVAN]
+    - Fixed bug with string containing 0
+    - Added tests for corner cases
+    - Added examples/banner script
+
+2.00  Nov 2 2015 [GSULLIVAN]
+    - Gene Sullivan becomes a co-maintainer.  Previous version by LORY.
+    - Fixed RT bug #39431: applied patch for multi objects from Joshua Nekl
+    - Fixed RT bug #85381: applied patch for default/0 fill from Joshua Nekl
+    - Fixed RT bug #107946: applied my patch to example output in POD
+    - Fixed bug with fill=0
+    - Use a more standard VERSION variable
+    - Enabled lexical warnings
+    - Minor POD changes
+    - Added tests
+    - Use more standard files and directories
+
+1.00  Sun Dec 12 19:31:16 1999
+    - original version; created by h2xs 1.18
+

@@ -1,0 +1,20 @@
+{
+   "name" : "MyModule",
+   "abstract" : "my module",
+   "version" : "1",
+   "release_status" : "stable",
+   "author" : [ "unknown" ],
+   "dynamic_config" : 0,
+   "generated_by" : "hand",
+   "license" : [ "perl_5" ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "provides" : {
+      "MyModule" : {
+         "file" : "lib/MyModule.pm",
+         "version" : "1"
+      }
+   }
+}

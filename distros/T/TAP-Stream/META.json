@@ -1,0 +1,49 @@
+{
+   "abstract" : "Combine multiple TAP streams with subtests",
+   "author" : [
+      "Curtis \"Ovid\" Poe <ovid@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TAP-Stream",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Ovid/tap-stream/issues"
+      },
+      "homepage" : "https://github.com/Ovid/tap-stream",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Ovid/tap-stream.git",
+         "web" : "https://github.com/Ovid/tap-stream"
+      }
+   },
+   "version" : "0.44"
+}
+

@@ -1,0 +1,19 @@
+Changes
+Cycle.pm
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+
+t/00-load.t
+t/cycle-exists.t
+t/family-array.t
+t/family-hash.t
+t/family-object.t
+t/family-scalar.t
+t/Foo.pm
+t/good.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

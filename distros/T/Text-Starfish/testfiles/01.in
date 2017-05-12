@@ -1,0 +1,28 @@
+
+Testing Hook adding:
+
+#<?starfish
+# $Star->addHook("\n#sd!/", qr{/(?=\n)},  '$_ = "\\nwhile (/$_/g)  { and so on \\"d\\$1\\";}"');
+# $Star->addHook("\n#sdi!/",qr{/i(?=\n)}, '$_ = "\\nwhile (/$_/ig) { and so on \\"d\\$1\\";}"');
+# $Star->addHook("\n#s!/",  qr{/(?=\n)},  '$_ = "\\nwhile (/$_/g)  { and so on \\"d\\$1\\";}"');
+#
+# # This one did not get a proper priority:
+# $Star->addHook("\n#sd!/",qr{/i(?=\n)}, '$_ = "\\nwhile (/$_/ig)  { NEW \\"d\\$1\\";}"');
+#?>
+
+# some normal text
+
+#sd!/\b$Qrel\b[ ,\w]*<${wQcatSD}(\w*)>/
+#sdi!/\b$Qrel\b[ ,\w]*<${wQcatSDii}(\w*)>/i
+#sd!/\b$Qrel\b[ ,\w]*<${wQcatSDi}(\w*)>/i
+#sd!/\b$Qrel\b[ ,\w]*<${wQcat}(\w*)>/
+
+Test finished.
+
+<?starfish
+ $Star->addHook(qr/^#.*/m, 'comment');
+?>
+
+# This is a comment
+
+  # This is not a comment

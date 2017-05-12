@@ -1,0 +1,56 @@
+Text::Tradition and its graphs
+==============================
+
+Text::Tradition stores its collation information in the form of two overlaid graphs, the 'sequence' and the 'relationships'.  The collation sequence is a directed acyclic graph, running through the text from beginning to end.  The text is broken down into 'readings' (usually single words), and each witness (manuscript) has a text that is composed of a sequence of these readings.  Thus, a 'witness path' is the sequence of edges that connect a particular subset of the graph vertices into a single string of text, identical to the text that appears in the original manuscript.  All witnesses share a common START vertex and a common END vertex.
+
+The collation 'relationships' is an undirected graph whose vertices are identical to those in the 'sequence' graph.  If two vertices are connected, it implies some relationship between the readings they represent, such as 'different spellings of the same word' or 'different grammatical forms of the same root word.'  The possible relationships are:
+
+* spelling
+* grammatical
+* orthographic
+* meaning
+* lexical
+* collated
+* transposition (nonrank)
+* repetition (nonrank)
+
+Apart from the two 'nonrank' types, a relationship implies that the two readings in question are co-located, that is, that they appear in the same position (relative to other readings) in their respective witnesses.  As such, two 'rank'-related readings may not occur in a single witness path.
+
+A transposition denotes that the same reading appears in different locations in different texts; as such, transposed readings may also not appear in the same text.
+
+A repetition denotes that the reading was repeated (usually by inadvertent double-copying) in a text.  As such, repetition readings will occur in the same text.
+
+GraphML output format
+---------------------
+
+(For documentation on generic GraphML format, see http://graphml.graphdrawing.org/primer/graphml-primer.html)
+
+Text::Tradition can output its collation information in GraphML format, in which each vertex is a reading in one or more texts.  This does require some change in the representation of the graphs.
+
+The GraphML contains the two graphs that make up the collation; the first is directed (the witness path sequences) and the other undirected (the reading relationships).  Global information about the collation, as well as information about the readings, is stored in the first, 'sequence' graph.
+
+There also needed to be some way to represent specific witness paths in a regularized, machine-readable way, taking into account that witness names are not always made up of valid XML name characters.  Thus, instead of having a single 'path' edge between two readings (vertices) with the applicable witnesses given as attributes (as in the Text::Tradition API, and which would require a GraphML key to be defined per-witness using valid XML names), the sequence graph is multi-edged - there are as many edges between two readings as there are witnesses whose text has those readings consecutively.  The witness name is given as a node property value.
+
+The sequence graph has the following keys:
+* version - GraphML output format version.
+* wit_list_separator - The string used by the API to separate witness names in a list.
+* baselabel - The name of the 'default' witness.
+* linear - Whether the graph is acyclic.  A graph would be made non-linear (and therefore cyclic) by merging all of those vertices that are linked with 'transposition' relationships.
+* ac_label - The default label for the 'extra' layer of text in a witness, which usually represents something that was later changed or corrected.
+
+Nodes have the following keys:
+* id - A unique identifier
+* text - The 'word' or actual reading that this node represents
+* rank - Where in the text sequence this reading falls.  This is used to make a traditional alignment table; each column is a witness and each row is a rank.
+* is_start - True if the node is the common START vertex 
+* is_end - True if the node is the common END vertex
+* is_lacuna - True if the node is a 'meta' vertex representing a lacuna (that is, where some span of text is unreadable or lost in a witness.)
+
+Edges have the following keys:
+(for sequence edges)
+* witness - The name of the applicable witness 
+* extra - Set if this is from the 'extra' (usually pre-corrected) layer of witness text
+(for relationship edges)
+* colocated - Set if the relationship implies that the nodes have equal rank
+* non_correctable - Set if a scribe was unlikely to 'correct' one reading back to the other.
+* non_independent - Set if two different scribes were unlikely to introduce the same variation.

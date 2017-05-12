@@ -1,0 +1,14 @@
+use strict;
+use warnings;
+use Test::More;
+use Test::Flatten;
+
+subtest 'foo' => sub {
+    subtest 'bar' => sub {
+        pass 'baz';
+        die 'hoge';
+        pass 'fuga';
+    };
+};
+
+done_testing;

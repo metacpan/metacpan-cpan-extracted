@@ -1,0 +1,43 @@
+Revision history for Tempest
+
+2010.09.26
+        First stable (non-beta) release!
+        Included arithmetic fix in colorize opacity, thanks to John Drago
+        for providing this fix.
+
+2009.10.31
+        Forgot to add the GraphicsMagick adapter to the manifest, so it was
+        never included in the last two packaged releases.  Oops.
+
+2009.10.07
+        Made image comparisons (in unit tests) more stable and forgiving of
+        version differences
+
+2009.10.05
+        Added full support for Graphics::Magick.  Some minor but important
+        changes from the ImageMagick adapter (notably the lack of Fx or Clut
+        operators, meaning a manual color lookup implementation)
+
+2009.07.15
+        Added has_image_lib method, as specified in API version 2009.07.15.
+        Added tests for this and all other public static methods.
+
+2009.07.03
+        Fixed dubious dependancy tests (for GD and Image::Magick) bundled with
+        the distribution.  *Now* this should fix the failures in the CPAN
+        testers matrix.
+
+2009.07.02
+        In ImageMagick adapter, now checking if Clut method is supported and,
+        if it's not, use the Fx operator instead.  This should fix the failures
+        in the CPAN testers matrix.
+
+2009.06.28
+        Completely rewrote colorization to be simpler & produce more precise
+        results. In the process, fixed opacity issues where the opacity was
+        unintentionally inverted.
+        
+        Also expanded on lib-specific tests to include opacity comparisons.
+
+2009.06.25
+        First release packaged as a CPAN module.

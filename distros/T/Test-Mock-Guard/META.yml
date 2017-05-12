@@ -1,0 +1,48 @@
+---
+abstract: 'Simple mock test library using RAII.'
+author:
+  - 'Toru Yamaguchi <zigorou@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.96
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Mock-Guard
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Mock::Guard:
+    file: lib/Test/Mock/Guard.pm
+    version: 0.10
+requires:
+  Class::Load: 0.06
+  Exporter: 5.63
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/zigorou/p5-test-mock-guard/issues
+  homepage: https://github.com/zigorou/p5-test-mock-guard
+  repository: git://github.com/zigorou/p5-test-mock-guard.git
+version: 0.10
+x_contributors:
+  - 'chocolateboy <chocolate@cpan.org>'
+  - 'NAKAGAWA Masaki <masaki.nakagawa@gmail.com>'
+  - 'Toru Yamaguchi <yamaguchi.toru@51547-mac.dena.local>'
+  - 'Belden Lyman <blyman@shutterstock.com>'
+  - 'hitode909 <hitode909@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'

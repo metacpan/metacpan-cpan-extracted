@@ -1,0 +1,16 @@
+Template::Plugin::StringDump Installation
+
+# install via cpanminus
+cpanm Template::Plugin::StringDump
+
+# install via CPAN shell
+cpan Template::Plugin::StringDump
+
+# install via ActivePerl
+ppm install Template::Plugin::StringDump
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

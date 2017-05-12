@@ -1,0 +1,7 @@
+Changes
+lib/Template/Plugin/Filter/I18N.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/000-simple.t

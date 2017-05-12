@@ -1,0 +1,59 @@
+Time::Monotonic (0.9.8)
+
+  * Use || instead of // to work on older Perls.
+  * Tweak test timing to prevent spurious failures.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 25 Jun 2015 01:00:04 -0700
+
+Time::Monotonic (0.9.7)
+
+  * Tweak a number to make tests less timing dependent.
+
+ -- David Caldwell <david@porkrind.org>  Tue, 23 Jun 2015 20:12:00 -0700
+
+Time::Monotonic (0.9.6)
+
+  * Add OO interface (thanks David Zurborg <port@david-zurb.org>).
+
+ -- David Caldwell <david@porkrind.org>  Tue, 23 Jun 2015 14:44:14 -0700
+
+Time::Monotonic (0.9.5)
+
+  * Tweak version number slightly to attempt to fix some failing CPAN
+    Tester machines.
+
+ -- David Caldwell <david@porkrind.org>  Mon, 09 Mar 2015 20:11:37 -0700
+
+Time::Monotonic (0.9.4)
+
+  * Detect when linux needs -lrt.
+  * Don't use gettimeofday unless it's supported.
+
+ -- David Caldwell <david@porkrind.org>  Wed, 04 Mar 2015 03:18:02 -0800
+
+Time::Monotonic (0.9.3)
+
+  * Stop passing C files to the compiler with the -I option. Some
+    compilers consider this an error (while others only warn).
+
+ -- David Caldwell <david@porkrind.org>  Tue, 03 Mar 2015 14:29:03 -0800
+
+Time::Monotonic (0.9.2)
+
+  * Migrate to Module::Build in order to get Windows to work. Hopefully
+    this will help the failing Linux builds, too.
+
+ -- David Caldwell <david@porkrind.org>  Tue, 03 Mar 2015 12:26:09 -0800
+
+Time::Monotonic (0.9.1)
+
+  * Fix shared library issues w/gcc on linux.
+  * Package configure so autotools isn't required to install.
+
+ -- David Caldwell <david@porkrind.org>  Mon, 02 Mar 2015 19:51:57 -0800
+
+Time::Monotonic (0.9.0)
+
+  * First version
+
+ -- David Caldwell <david@porkrind.org>  Sun, 01 Mar 2015 17:12:04 -0800

@@ -1,0 +1,67 @@
+Text-xSV-Slurp
+
+Text::xSV::Slurp converts between xSV data and a variety of nested data
+shapes, allowing both column and row filtering using user defined functions.
+
+This brief example creates an array of hashes from a file, where each array
+record corresponds to a line of the file, and each line is represented as a hash
+of header-to-value pairs.
+
+    use Text::xSV::Slurp 'xsv_slurp';
+    
+    my $aoh = xsv_slurp( 'foo.csv' );
+    
+    ## if foo.csv contains:
+    ##
+    ##   uid,name
+    ##   342,tim
+    ##   939,danboo
+    ##
+    ## then $aoh contains:
+    ##
+    ##   [
+    ##     { uid => '342', name => 'tim' },
+    ##     { uid => '939', name => 'danboo' },
+    ##   ]
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::xSV::Slurp
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-xSV-Slurp
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-xSV-Slurp
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-xSV-Slurp
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-xSV-Slurp/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Dan Boorstein
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

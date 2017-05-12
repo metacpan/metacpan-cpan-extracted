@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Text-FromAny
+version:            0.21
+abstract:           a module to read pure text from a vareiety of formats
+author:
+    - zerodogg <zerodogg@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Any::Moose:           0
+    Archive::Zip:         0
+    CAM::PDF:             0
+    File::LibMagic:       0
+    HTML::FormatText::WithLinks:  0
+    OpenOffice::OODoc:    2.101
+    RTF::Parser:          1.09
+    Text::Extract::Word:  0
+    Try::Tiny:            0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

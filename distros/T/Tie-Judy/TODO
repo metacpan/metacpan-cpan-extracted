@@ -1,0 +1,2 @@
+o Replace all strcmp with memcmp, remove strlen  
+o Create an iterator interface for search

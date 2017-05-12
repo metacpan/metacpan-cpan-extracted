@@ -1,0 +1,12 @@
+Revision history for Perl extension Test::PureASCII.
+
+0.02  Oct 30, 2008
+        - Add support for options forbid_control, forbid_cr,
+          forbid_tab, forbid_tab and require_crlf.
+        - Add support for skip_data feature
+        - Add support for skip feature
+
+0.01  Tue Sep 16 12:18:37 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Test::PureASCII
+

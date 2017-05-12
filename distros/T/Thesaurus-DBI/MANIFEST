@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Thesaurus-DBI.t
+lib/Thesaurus/DBI.pm
+initialize_database.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

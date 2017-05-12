@@ -1,0 +1,9 @@
+Revision history for TAP::Stream
+
+0.44   March 13, 2014
+       - Originally this module was part of Test::Class::Moose, but when I
+         broke it out, it needed to have the same version number or higher or
+         else PAUSE rejects it.
+
+0.01   March 13, 2014
+       - Combine multiple TAP streams via subtests

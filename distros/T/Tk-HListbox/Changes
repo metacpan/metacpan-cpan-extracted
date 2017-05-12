@@ -1,0 +1,5 @@
+Revision history for Perl extension Tk::HListbox.
+
+1.00  Mon May 25, 2015
+	- original version; Derived from Tk::HList and Tk::Listbox, 
+	  created by h2xs 1.23 with options -X -n Tk::HListbox

@@ -1,0 +1,18 @@
+Revision history for Perl extension Term::Screen::Uni.
+
+0.04  Tue Mar 28 18:00:00 2006
+	- Serious bugfix: module was working on Win32 only
+
+0.03  Tue Mar 28 16:45:35 2006
+	- test.pl taken from Term::Screen to test the similarity of functionality
+
+0.02  Sat Mar 25 00:09:35 2006
+	- Bugfix: eval return value was not evaluated in new()
+	- Instance creation test added
+	- Minor fix in documentation
+
+
+0.01  Sat Mar 25 00:09:35 2006
+	- original version; created by h2xs 1.23 with options
+		-AXcfn Term::Screen::Uni
+

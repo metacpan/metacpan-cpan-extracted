@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+COPYING
+test.pl
+tanker
+Tanker.pm
+Tanker/Plugin.pm
+Tanker/Plugin/Log.pm
+Tanker/Request.pm
+Tanker/RequestGenerator.pm
+Tanker/RequestGenerator/IRC.pm
+Tanker/ResponseGenerator.pm
+Tanker/Config.pod
+

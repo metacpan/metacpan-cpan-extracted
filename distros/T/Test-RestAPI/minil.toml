@@ -1,0 +1,6 @@
+name = "Test-RestAPI"
+# badges = ["travis"]
+authority="cpan:JASEI"
+
+module_maker="ModuleBuildTiny"
+

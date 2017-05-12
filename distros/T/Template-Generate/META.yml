@@ -1,0 +1,10 @@
+name: Template-Generate
+module_name: Template::Generate
+version: 0.04
+abstract: Generate TT2 templates from data and documents
+author: Autrijus Tang (autrijus@autrijus.org)
+distribution_type: module
+private:
+  directory:
+    - inc
+generated_by: Module::Install version 0.23

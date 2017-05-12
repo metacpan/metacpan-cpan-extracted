@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Template-TAL
+version: 0.91
+author:
+  - Tom Insam / Fotango
+abstract: Process TAL templates with Perl
+license: perl
+generated_by: Module::Build version 0.2609, without YAML.pm

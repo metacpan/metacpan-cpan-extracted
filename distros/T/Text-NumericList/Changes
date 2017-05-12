@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::NumericList.
+
+0.01  Fri Apr 16 14:05:58 2004
+	- original version; created by h2xs 1.21 with options
+		-XA Text::NumericList
+

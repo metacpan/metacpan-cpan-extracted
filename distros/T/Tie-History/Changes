@@ -1,0 +1,13 @@
+Revision history for Perl extension Tie::History.
+
+0.01  Sat Mar 20 15:15:00, 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Tie::History
+
+0.02  Wed Apr 28, 2004
+	- Updated Makefile.PL to require 5.8
+	- Updated the POD and tests to reflect $tobj = tie($scalar, 'Tie::History'),
+		And then using $tobj->commit instead of tied($scalar)->commit.
+
+0.03  Mon May 17, 2004
+	- POD fixes.

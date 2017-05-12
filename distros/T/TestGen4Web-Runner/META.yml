@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         TestGen4Web-Runner
+version:      0.11
+version_from: lib/TestGen4Web/Runner.pm
+installdirs:  site
+requires:
+    HTTP::Cookies:                 0
+    LWP::UserAgent:                0
+    Term::ANSIColor:               0
+    URI::Escape:                   0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

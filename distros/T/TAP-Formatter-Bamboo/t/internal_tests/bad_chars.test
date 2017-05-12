@@ -1,0 +1,7 @@
+#!/bin/sh
+cat <<EOT
+1..3
+ok 1 - Control chars 
+ok 2 - Weird control chars 
+ok 3 - Unicode Þϴ쌇
+EOT

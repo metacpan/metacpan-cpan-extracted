@@ -1,0 +1,30 @@
+==================================================
+Changes from 2012-09-16 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.1.1 at 2013-09-16 16:54:56 +0000
+------------------------------------------
+
+  Change: c933edb27bc6ed9c212ae74b3db6e3b93f7d023d
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date : 2013-09-16 09:45:32 +0000
+
+    Added test to address warning issue when calling without query 
+
+  Change: f93fcd86f283f03a4539a950bd75f7f888e0fea3
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date : 2013-09-16 00:53:58 +0000
+
+    Added a return for _filter_params when there are no params. Thanks
+    Graham Ollis. 
+
+  Change: 9f7053ff3c6d632fe6044a22383cbcc2b321a8b6
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date : 2011-06-10 09:22:39 +0000
+
+    Modified dist.ini 
+
+===============================================
+Plus 1 release after 2012-09-16 00:00:00 +0000.
+===============================================

@@ -1,0 +1,36 @@
+Revision history for Perl extension Tie::DB_Lock.
+
+0.01 Tue May 26 16:27:27 1998
+   - original version; created by h2xs 1.18
+
+0.02 Thu Jul 23 11:08:25 EDT 1998
+   - I had omitted a file (db/README) from MANIFEST,
+     that made "make test" fail.  The code was still
+     fully operational, but the test failed.
+
+0.03 Thu Jul 23 18:52:07 EDT 1998
+   - cpan-testers report that 'make test' fails test 4,5,6 on Irix.
+     I'm not sure why, so I've added a 'verbose' mode to 'make test',
+     and one more test (#4) that may shed some light.  Do "make test
+     TEST_VERBOSE=1" to try it.  None of the real functionality of the
+     module is different in this release.
+
+0.04 Sun Jul 26 12:11:06 EDT 1998
+   - Apparently cpan-testers can't get the tests to pass on 
+     i86pc-solaris 2.6 either.  The error shown under TEST_VERBOSE=1
+     is "Bad file number."  Perhaps this has something to do with
+     the FileHandle package.  I've added a VERY_VERBOSE=1 test flag that
+	  should help track the problem further - it just sets the variable
+	  $Tie::DB_Lock::VERBOSE to 1.
+
+0.05 Tue Aug 11 18:14:32 EDT 1998
+   - Changed the TIEHASH method so that it returns undef when the $TIEPACK->TIEHASH
+     method fails.  This makes error checking much more reliable.
+
+0.06 Tue Sep  8 00:42:46 EDT 1998
+   - Put a #line statement at line 161.  Shouldn't affect performance, but
+     now Perl should know which line it dies at when it dies.
+
+0.07 Tue Oct 22 16:14:29 CDT 2002
+   - Fixed a bug with auto-arguments in &subr syntax which could cause
+     weird temporary filenames [spotted by Gavin Brock]

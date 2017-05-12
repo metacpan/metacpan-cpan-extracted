@@ -1,0 +1,27 @@
+Revision history for Perl extension Test::Internet.
+
+0.06  Sun Sep 04 21:55:00 2016
+      - Added unit test script t/00-load.t.
+      - Updated copyright year information.
+
+0.05  Wed Feb 18 18:05:00 2015
+      - Force the requirement of Net::DNS v0.82.
+      - Catch exception thrown by inet_aton().
+
+0.04  Fri Feb 13 15:30:00 2015
+      - Acted upon the issue RT #102095.
+      - Refactored the method connect_ok() to be more explicit.
+      - Exported method connect_ok() by default.
+      - Changed the default timeout to 2 seconds.
+      - Added unit test for the method connect_ok().
+
+0.03  Thu Feb 12 22:30:00 2015
+      - Added description to the method connect_ok().
+      - Tidied up the example code in the pod document and added link
+        to test script of WWW::Google::Places.
+
+0.02  Thu Feb 12 14:40:00 2015
+      - Fixed the typo in the Makefile.PL file.
+
+0.01  Thu Feb 12 14:35:00 2015
+      - First draft, released.

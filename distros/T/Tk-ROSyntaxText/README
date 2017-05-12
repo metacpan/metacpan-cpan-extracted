@@ -1,0 +1,88 @@
+Tk::ROSyntaxText version 1.001
+===================================================
+
+Tk::ROSyntaxText provides a read-only text widget that applies syntax
+highlighting to its data. It inherits from Tk::ROText.
+
+Optional modules for testing:
+    Test::Perl::Critic 1.02
+    Test::Pod 1.14
+    Test::Pod::Coverage 1.04
+
+
+INSTALLATION
+
+****************************************************************************
+Note for testers and developers:
+    If the environment variable CPAN_TEST_AUTHOR is set to a TRUE value,
+    additional functionality is switched on while the regression tests are
+    running:
+    1. Windows that are opened as part of the tests need to be closed
+       manually. This is to allow a visual check and to test window
+       resizing, scrolling and so on.
+       There's an 'Exit' button at the bottom of each window.
+    2. The following 'quality assurance' tests are run:
+       * perlcritic.t   - uses Test::Perl::Critic
+       * pod.t          - uses Test::Pod
+       * pod-coverage.t - uses Test::Pod::Coverage
+****************************************************************************
+
+Use any of the CPAN utilities, e.g.
+    perl -MCPAN -e shell (then 'install Tk::ROSyntaxText')
+    perl -MCPANPLUS -e shell (then 'i Tk::ROSyntaxText')
+    cpan (then 'install Tk::ROSyntaxText')
+    cpanp (then 'i Tk::ROSyntaxText')
+    cpan Tk::ROSyntaxText
+    cpanp i Tk::ROSyntaxText
+    etc.
+
+Or use the standard 'make' commands for a manual build:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+(you may need to substitute 'make' with a local version of this command,
+e.g. 'dmake' if you're using Strawberry Perl)
+
+Or use the Module::Build commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+****************************************************************************
+Installation Diagnostics
+------------------------
+
+skipped: No display detected.
+    Test GUIs cannot be displayed so these tests have been skipped.
+    The most likely causes are X Server not running or $DISPLAY not set.
+    This was introduced in version 1.001 - see the 'Changes' file for
+    a fuller explanation.
+
+skipped: Author test. To run: set $ENV{CPAN_TEST_AUTHOR} to a TRUE value.
+    Should be self-explanatory.
+    "Note for testers and developers" (above) has a few more details.
+****************************************************************************
+
+
+DEPENDENCIES
+
+Syntax::Highlight::Engine::Kate 0.06
+Test::More 0.94
+Tk
+Tk::Derived
+Tk::ROText
+Tk::Widget
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Ken Cotterill <kcott@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,12 @@
+Revision history for Perl extension Tk::XML::WizardMaker.
+
+0.01  Sat Oct 18 17:18:21 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -n Tk::XML::WizardMaker
+
+0.90  Sun Feb 01 00:00.00 2004
+	- some bugs founded
+	- some demos prepared 
+0.91  Fri Apr  9 19:17:22 2004 
+	- some bugs founded after Tk 804.026
+

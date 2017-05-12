@@ -1,0 +1,110 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+
+
+# ==================== "scheduling"
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: AdHoc
+  data:
+    id: 1
+    name: AdHoc
+    priority: 100
+    active: 1
+
+# -------------------- "test requests" (Testruns)
+
+# ======================= Xen requests =========================
+
+# ======================= Kernel requests =========================
+
+# --- ccc ---
+
+- schema: Testrun
+  name: ccc-kernel
+  data:
+    id: 3001
+    owner_id: 12
+    shortname: ccc-kernel
+    notes: ccc
+    topic_name: old_topic
+
+- schema: TestrunScheduling
+  name: Kernel-ccc
+  data:
+    id: 301
+    testrun_id: 3001            # ccc
+    queue_id: 3                 # Kernel
+    auto_rerun: 1
+    status: schedule
+
+# --- ccc2 ---
+
+- schema: Testrun
+  name: ccc2-kernel
+  data:
+    id: 3002
+    owner_id: 12
+    shortname: ccc2-kernel
+    notes: ccc2
+    topic_name: old_topic
+
+- schema: TestrunScheduling
+  name: Kernel-ccc2
+  data:
+    id: 302
+    testrun_id: 3002            # ccc2
+    queue_id: 3                 # Kernel
+    status: running
+
+
+
+- schema: Testrun
+  name: ccc-kernel
+  data:
+    id: 3003
+    owner_id: 12
+    shortname: ccc-kernel
+    notes: ccc
+    topic_name: old_topic
+
+- schema: TestrunScheduling
+  name: Kernel-ccc
+  data:
+    id: 303
+    testrun_id: 3003            # ccc
+    queue_id: 3                 # Kernel
+    auto_rerun: 1
+    status: finished
+
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 7
+    name: dickstone
+    free: 1
+    active: 0
+

@@ -1,0 +1,15 @@
+
+
+
+
+
+  (Diagnostic message):
+
+
+      ✖
+      ok { 0 };
+         at eg/flat-only-one-test.t line 6
+
+
+not ok
+1..1

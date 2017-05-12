@@ -1,0 +1,26 @@
+Time::Piece::DB2
+==================
+
+Time::Piece::DB2, when used, adds several DB2-specific methods to
+the Time::Piece class.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module won't do much without Time::Piece!
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Mark Ferris
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

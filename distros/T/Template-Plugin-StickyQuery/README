@@ -1,0 +1,33 @@
+NAME
+    Template::Plugin::StickyQuery - TT plugin for HTML::StickyQuery
+
+SYNOPSIS
+      use Template;
+      use Apache;
+      use Apache::Request;
+
+      my $apr      = Apache::Request->new(Apache->request); # or CGI.pm will do
+      my $template = Template->new( ... );
+      $template->process($filename, { apr => $apr });
+
+      # in your template
+      [% USE StickyQuery %]
+      [% FILTER stickyquery param => apr %]
+      <A HREF="go.cgi?page=&foo=&bar">go</A>
+      [% END %]
+
+DESCRIPTION
+    Template::Plugin::StickyQuery is a plugin for TT, which allows you to
+    make your HTML tag sticky using HTML::StickyQuery.
+
+    Special thanks to IKEBE Tomohiro.
+
+AUTHOR
+    Hiroyuki Kobayasi <kobayasi@piano.gs>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Template manpage, the HTML::StickyQuery manpage
+

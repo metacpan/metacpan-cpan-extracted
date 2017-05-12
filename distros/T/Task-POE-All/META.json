@@ -1,0 +1,1381 @@
+{
+   "abstract" : "All of POE on CPAN",
+   "author" : [
+      "Apocalypse <APOCAL@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.024, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-POE-All",
+   "no_index" : {
+      "directory" : [
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build::Tiny" : "0.039",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE::API::Hooks" : "2.03",
+            "POE::API::Peek" : "2.20",
+            "POE::Component::AI::MegaHAL" : "1.18",
+            "POE::Component::AIO" : "1.00",
+            "POE::Component::Algorithm::Evolutionary" : "0.002001",
+            "POE::Component::Amazon::S3" : "0.01",
+            "POE::Component::Archive::Any" : "0.002",
+            "POE::Component::AssaultCube::ServerQuery::Server" : "0.04",
+            "POE::Component::AtomAggregator" : "1.0",
+            "POE::Component::Basement" : "0.01",
+            "POE::Component::BlogCloud" : "0.01",
+            "POE::Component::Bundle::WebDevelopment" : "1.001004",
+            "POE::Component::CD::Detect" : "1.1",
+            "POE::Component::CD::Rip" : "1.2",
+            "POE::Component::CPAN::Mirror::Multiplexer" : "0.04",
+            "POE::Component::CPAN::Reporter" : "0.06",
+            "POE::Component::CPAN::SQLite::Info" : "0.11",
+            "POE::Component::CPAN::YACSmoke" : "1.36",
+            "POE::Component::CPANIDX" : "0.10",
+            "POE::Component::CPANPLUS::YACSmoke" : "1.62",
+            "POE::Component::Cache" : "0.001001",
+            "POE::Component::Captcha::reCAPTCHA" : "0.02",
+            "POE::Component::Child" : "1.39",
+            "POE::Component::Client::AMQP" : "0.03",
+            "POE::Component::Client::AirTunes" : "0.01",
+            "POE::Component::Client::Asterisk::Manager" : "0.08",
+            "POE::Component::Client::BigBrother" : "1.00",
+            "POE::Component::Client::CouchDB" : "0.05",
+            "POE::Component::Client::DNS" : "1.053",
+            "POE::Component::Client::DNS::Recursive" : "1.08",
+            "POE::Component::Client::DNSBL" : "1.08",
+            "POE::Component::Client::FTP" : "0.22",
+            "POE::Component::Client::Feed" : "0.901",
+            "POE::Component::Client::HTTP" : "0.949",
+            "POE::Component::Client::HTTPDeferred" : "0.02",
+            "POE::Component::Client::Halo" : "0.2",
+            "POE::Component::Client::Icecast" : "0.6",
+            "POE::Component::Client::Ident" : "1.16",
+            "POE::Component::Client::Keepalive" : "0.272",
+            "POE::Component::Client::LDAP" : "0.04",
+            "POE::Component::Client::Lingr" : "0.04",
+            "POE::Component::Client::MPD" : "2.000",
+            "POE::Component::Client::MSN" : "0.03",
+            "POE::Component::Client::MogileFS" : "0.02",
+            "POE::Component::Client::NNTP" : "2.22",
+            "POE::Component::Client::NNTP::Tail" : "0.03",
+            "POE::Component::Client::NRPE" : "0.20",
+            "POE::Component::Client::NSCA" : "0.16",
+            "POE::Component::Client::NTP" : "0.10",
+            "POE::Component::Client::POP3" : "0.02",
+            "POE::Component::Client::Pastebot" : "1.16",
+            "POE::Component::Client::Ping" : "1.174",
+            "POE::Component::Client::RADIUS" : "1.04",
+            "POE::Component::Client::Rcon" : "0.23",
+            "POE::Component::Client::SMTP" : "0.22",
+            "POE::Component::Client::SOCKS" : "1.00",
+            "POE::Component::Client::SimpleFTP" : "0.003",
+            "POE::Component::Client::Stomp" : "0.12",
+            "POE::Component::Client::Stomp::Utils" : "0.02",
+            "POE::Component::Client::TCPMulti" : "0.0524",
+            "POE::Component::Client::Telnet" : "0.06",
+            "POE::Component::Client::Traceroute" : "0.21",
+            "POE::Component::Client::Twitter" : "0.01",
+            "POE::Component::Client::UserAgent" : "0.08",
+            "POE::Component::Client::Whois" : "1.30",
+            "POE::Component::Client::Whois::Smart" : "0.187",
+            "POE::Component::Client::eris" : "1.4",
+            "POE::Component::Client::opentick" : "0.21",
+            "POE::Component::ControlPort" : "1.0266",
+            "POE::Component::Cron" : "0.021",
+            "POE::Component::Curl::Multi" : "0.10",
+            "POE::Component::Curses" : "0.211",
+            "POE::Component::DBIAgent" : "0.26",
+            "POE::Component::DHCP::Monitor" : "1.04",
+            "POE::Component::Daemon" : "0.1400",
+            "POE::Component::Daemon::Win32" : "0.01",
+            "POE::Component::DebugShell" : "1.412",
+            "POE::Component::DebugShell::Jabber" : "0.04",
+            "POE::Component::DirWatch" : "0.300001",
+            "POE::Component::DirWatch::Object" : "0.10",
+            "POE::Component::EasyDBI" : "1.24",
+            "POE::Component::Enc::Flac" : "1.01",
+            "POE::Component::Enc::Mp3" : "1.2",
+            "POE::Component::Enc::Ogg" : "1.05",
+            "POE::Component::FastCGI" : "0.19",
+            "POE::Component::FeedAggregator" : "0.902",
+            "POE::Component::Fuse" : "0.05",
+            "POE::Component::Gearman::Client" : "0.03",
+            "POE::Component::Generic" : "0.1403",
+            "POE::Component::Github" : "0.08",
+            "POE::Component::Growl" : "1.00",
+            "POE::Component::Hailo" : "0.10",
+            "POE::Component::ICal" : "0.130020",
+            "POE::Component::IKC" : "0.2402",
+            "POE::Component::IRC" : "6.88",
+            "POE::Component::IRC::Object" : "0.02",
+            "POE::Component::IRC::Plugin::BaseWrap" : "1.001001",
+            "POE::Component::IRC::Plugin::Blowfish" : "0.01",
+            "POE::Component::IRC::Plugin::Bollocks" : "1.00",
+            "POE::Component::IRC::Plugin::CPAN::Info" : "1.001002",
+            "POE::Component::IRC::Plugin::CoreList" : "1.02",
+            "POE::Component::IRC::Plugin::Donuts" : "0.07",
+            "POE::Component::IRC::Plugin::Eval" : "0.07",
+            "POE::Component::IRC::Plugin::FTP::EasyUpload" : "0.002",
+            "POE::Component::IRC::Plugin::Google::Calculator" : "0.04",
+            "POE::Component::IRC::Plugin::Hailo" : "0.18",
+            "POE::Component::IRC::Plugin::Hello" : "0.001002",
+            "POE::Component::IRC::Plugin::IRCDHelp" : "0.01",
+            "POE::Component::IRC::Plugin::ImageMirror" : "0.15",
+            "POE::Component::IRC::Plugin::Infobot" : "0.001002",
+            "POE::Component::IRC::Plugin::Karma" : "0.003",
+            "POE::Component::IRC::Plugin::Logger::Irssi" : "0.001002",
+            "POE::Component::IRC::Plugin::MegaHAL" : "0.46",
+            "POE::Component::IRC::Plugin::MultiProxy" : "0.01",
+            "POE::Component::IRC::Plugin::OutputToPastebin" : "0.002",
+            "POE::Component::IRC::Plugin::POE::Knee" : "1.08",
+            "POE::Component::IRC::Plugin::QueryDNS" : "1.04",
+            "POE::Component::IRC::Plugin::QueryDNSBL" : "1.04",
+            "POE::Component::IRC::Plugin::RSS::Headlines" : "1.08",
+            "POE::Component::IRC::Plugin::RTorrentStatus" : "0.17",
+            "POE::Component::IRC::Plugin::Role" : "0.06",
+            "POE::Component::IRC::Plugin::Seen" : "0.001001",
+            "POE::Component::IRC::Plugin::Trac::RSS" : "0.11",
+            "POE::Component::IRC::Plugin::URI::Find" : "1.10",
+            "POE::Component::IRC::Plugin::Unicode::UCD" : "0.004",
+            "POE::Component::IRC::Plugin::WWW::CPANRatings::RSS" : "0.0106",
+            "POE::Component::IRC::Plugin::WWW::Google::Time" : "0.0102",
+            "POE::Component::IRC::Plugin::WWW::KrispyKreme::HotLight" : "0.06",
+            "POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search" : "0.002",
+            "POE::Component::IRC::Plugin::WWW::Reddit::TIL" : "0.07",
+            "POE::Component::IRC::Plugin::WWW::Vim::Tips" : "0.14",
+            "POE::Component::IRC::Plugin::WWW::Weather::US" : "0.04",
+            "POE::Component::IRC::Plugin::WWW::XKCD::AsText" : "0.003",
+            "POE::Component::IRC::Plugin::WubWubWub" : "0.1",
+            "POE::Component::IRC::PluginBundle::Toys" : "1.001001",
+            "POE::Component::IRC::PluginBundle::WebDevelopment" : "2.001003",
+            "POE::Component::IRC::Service" : "0.996",
+            "POE::Component::Jabber" : "3.00",
+            "POE::Component::JobQueue" : "0.571",
+            "POE::Component::LaDBI" : "1.002001",
+            "POE::Component::Lightspeed" : "0.05",
+            "POE::Component::Lingua::Translate" : "0.06",
+            "POE::Component::Log4perl" : "0.03",
+            "POE::Component::Logger" : "1.10",
+            "POE::Component::MXML" : "0.03",
+            "POE::Component::MessageQueue" : "0.3001",
+            "POE::Component::Metabase::Client::Submit" : "0.12",
+            "POE::Component::Metabase::Relay::Server" : "0.34",
+            "POE::Component::Net::FTP" : "0.001",
+            "POE::Component::Net::LastFM::Submission" : "0.24",
+            "POE::Component::NetSNMP::agent" : "0.500",
+            "POE::Component::NomadJukebox" : "0.02",
+            "POE::Component::NonBlockingWrapper::Base" : "0.002",
+            "POE::Component::OSCAR" : "0.05",
+            "POE::Component::Omegle" : "0.02",
+            "POE::Component::OpenSSH" : "0.10",
+            "POE::Component::Pastebin::Create" : "0.0",
+            "POE::Component::Pcap" : "0.04",
+            "POE::Component::Player::Mpg123" : "1.2",
+            "POE::Component::Player::Musicus" : "1.32",
+            "POE::Component::Player::Slideshow" : "1.4",
+            "POE::Component::Player::Xmms" : "0.04",
+            "POE::Component::Pluggable" : "1.26",
+            "POE::Component::PluginManager" : "0.67",
+            "POE::Component::Pool::DBI" : "0.014",
+            "POE::Component::Pool::Thread" : "0.015",
+            "POE::Component::PreforkDispatch" : "0.101",
+            "POE::Component::ProcTerminator" : "0.03",
+            "POE::Component::Proxy::MySQL" : "0.04",
+            "POE::Component::Proxy::SOCKS" : "1.02",
+            "POE::Component::Proxy::TCP" : "1.2",
+            "POE::Component::RSS" : "3.01",
+            "POE::Component::RSSAggregator" : "1.11",
+            "POE::Component::RemoteTail" : "0.01011",
+            "POE::Component::Rendezvous::Publish" : "0.01",
+            "POE::Component::Resolver" : "0.921",
+            "POE::Component::ResourcePool" : "0.04",
+            "POE::Component::ResourcePool::Resource::TokenBucket" : "0.01",
+            "POE::Component::SASLAuthd" : "0.03",
+            "POE::Component::SNMP" : "1.1006",
+            "POE::Component::SNMP::Session" : "0.1202",
+            "POE::Component::SSLify" : "1.008",
+            "POE::Component::SSLify::NonBlock" : "0.41",
+            "POE::Component::Schedule" : "0.95",
+            "POE::Component::Sequence" : "0.02",
+            "POE::Component::Server::AsyncEndpoint" : "0.10",
+            "POE::Component::Server::Bayeux" : "0.04",
+            "POE::Component::Server::BigBrother" : "0.08",
+            "POE::Component::Server::Chargen" : "1.14",
+            "POE::Component::Server::DNS" : "0.30",
+            "POE::Component::Server::Daytime" : "1.14",
+            "POE::Component::Server::Discard" : "1.14",
+            "POE::Component::Server::Echo" : "1.64",
+            "POE::Component::Server::FTP" : "0.08",
+            "POE::Component::Server::HTTP" : "0.09",
+            "POE::Component::Server::HTTP::KeepAlive" : "0.0307",
+            "POE::Component::Server::HTTPServer" : "0.009002",
+            "POE::Component::Server::IRC" : "1.54",
+            "POE::Component::Server::Ident" : "1.16",
+            "POE::Component::Server::Inet" : "0.06",
+            "POE::Component::Server::JSONRPC" : "0.05",
+            "POE::Component::Server::MySQL" : "0.02",
+            "POE::Component::Server::NNTP" : "1.04",
+            "POE::Component::Server::NRPE" : "0.18",
+            "POE::Component::Server::NSCA" : "0.08",
+            "POE::Component::Server::POP3" : "0.10",
+            "POE::Component::Server::PSGI" : "0.6",
+            "POE::Component::Server::Postfix" : "0.001",
+            "POE::Component::Server::PreforkTCP" : "0.11",
+            "POE::Component::Server::Qotd" : "1.14",
+            "POE::Component::Server::RADIUS" : "1.08",
+            "POE::Component::Server::SMTP" : "1.6",
+            "POE::Component::Server::SOAP" : "1.14",
+            "POE::Component::Server::SimpleContent" : "1.14",
+            "POE::Component::Server::SimpleHTTP" : "2.18",
+            "POE::Component::Server::SimpleHTTP::PreFork" : "2.10",
+            "POE::Component::Server::SimpleSMTP" : "1.50",
+            "POE::Component::Server::SimpleXMLRPC" : "0.02",
+            "POE::Component::Server::Syslog" : "1.20",
+            "POE::Component::Server::TCP" : "1.365",
+            "POE::Component::Server::TacacsPlus" : "1.11",
+            "POE::Component::Server::Time" : "1.14",
+            "POE::Component::Server::Twirc" : "0.17",
+            "POE::Component::Server::XMLRPC" : "0.05",
+            "POE::Component::Server::eris" : "1.8",
+            "POE::Component::SimpleDBI" : "1.30",
+            "POE::Component::SimpleLog" : "1.05",
+            "POE::Component::SmokeBox" : "0.48",
+            "POE::Component::SmokeBox::Backend::Test::SmokeBox::Mini" : "0.58",
+            "POE::Component::SmokeBox::Dists" : "1.08",
+            "POE::Component::SmokeBox::Recent" : "1.46",
+            "POE::Component::SmokeBox::Uploads::CPAN::Mini" : "1.00",
+            "POE::Component::SmokeBox::Uploads::NNTP" : "1.00",
+            "POE::Component::SmokeBox::Uploads::RSS" : "1.00",
+            "POE::Component::SmokeBox::Uploads::Rsync" : "1.000",
+            "POE::Component::Spread" : "0.02",
+            "POE::Component::SpreadClient" : "1.002",
+            "POE::Component::SubWrapper" : "2.01",
+            "POE::Component::Supervisor" : "0.08",
+            "POE::Component::Syndicator" : "0.06",
+            "POE::Component::TFTPd" : "0.0302",
+            "POE::Component::TSTP" : "0.02",
+            "POE::Component::Telephony::CTPort" : "0.03",
+            "POE::Component::UserBase" : "0.09",
+            "POE::Component::WWW::CPANRatings::RSS" : "0.0101",
+            "POE::Component::WWW::DoingItWrongCom::RandImage" : "0.03",
+            "POE::Component::WWW::Google::Calculator" : "0.03",
+            "POE::Component::WWW::Google::Time" : "0.0102",
+            "POE::Component::WWW::OhNoRobotCom::Search" : "0.002",
+            "POE::Component::WWW::Pastebin::Bot::Pastebot::Create" : "0.003",
+            "POE::Component::WWW::Pastebin::Many::Retrieve" : "0.001",
+            "POE::Component::WWW::Shorten" : "1.20",
+            "POE::Component::WWW::XKCD::AsText" : "0.002",
+            "POE::Component::WakeOnLAN" : "1.04",
+            "POE::Component::Win32::ChangeNotify" : "1.22",
+            "POE::Component::Win32::EventLog" : "1.24",
+            "POE::Component::Win32::Service" : "1.24",
+            "POE::Component::XUL" : "0.02",
+            "POE::Component::YahooMessenger" : "0.05",
+            "POE::Component::YubiAuth" : "0.07",
+            "POE::Declarative" : "0.09",
+            "POE::Declare" : "0.59",
+            "POE::Declare::HTTP::Client" : "0.05",
+            "POE::Declare::HTTP::Online" : "0.02",
+            "POE::Declare::HTTP::Server" : "0.05",
+            "POE::Declare::Log::File" : "0.01",
+            "POE::Devel::Benchmarker" : "0.05",
+            "POE::Devel::ProcAlike" : "0.02",
+            "POE::Devel::Profiler" : "0.02",
+            "POE::Devel::Top" : "0.100",
+            "POE::Event::Message" : "0.11",
+            "POE::Filter::BigBrother" : "0.13",
+            "POE::Filter::Bzip2" : "1.58",
+            "POE::Filter::CSV" : "1.16",
+            "POE::Filter::CSV_XS" : "1.16",
+            "POE::Filter::DHCPd::Lease" : "0.0703",
+            "POE::Filter::DNS::TCP" : "0.06",
+            "POE::Filter::ErrorProof" : "0.01",
+            "POE::Filter::FSSocket" : "0.07",
+            "POE::Filter::Finger" : "0.08",
+            "POE::Filter::HTTP::Parser" : "1.06",
+            "POE::Filter::HTTPD::Chunked" : "0.9",
+            "POE::Filter::Hessian" : "1.00",
+            "POE::Filter::IASLog" : "1.08",
+            "POE::Filter::IRCD" : "2.44",
+            "POE::Filter::IRCv3" : "1.001001",
+            "POE::Filter::JSON" : "0.04",
+            "POE::Filter::JSON::Incr" : "0.03",
+            "POE::Filter::KennySpeak" : "1.02",
+            "POE::Filter::LOLCAT" : "1.10",
+            "POE::Filter::LZF" : "1.70",
+            "POE::Filter::LZO" : "1.70",
+            "POE::Filter::LZW" : "1.72",
+            "POE::Filter::LZW::Progressive" : "0.1",
+            "POE::Filter::Log::IPTables" : "0.02",
+            "POE::Filter::Log::Procmail" : "0.03",
+            "POE::Filter::Ls" : "0.01",
+            "POE::Filter::PPPHDLC" : "0.01",
+            "POE::Filter::ParseWords" : "1.06",
+            "POE::Filter::Postfix" : "0.003",
+            "POE::Filter::RecDescent" : "0.02",
+            "POE::Filter::Redis" : "0.02",
+            "POE::Filter::Regexp" : "1.0",
+            "POE::Filter::SSL" : "0.28",
+            "POE::Filter::SimpleHTTP" : "0.091710",
+            "POE::Filter::Slim::CLI" : "0.02",
+            "POE::Filter::Snort" : "0.031",
+            "POE::Filter::Stomp" : "0.04",
+            "POE::Filter::Transparent::SMTP" : "0.2",
+            "POE::Filter::XML" : "1.140700",
+            "POE::Filter::XML::RPC" : "0.04",
+            "POE::Filter::Zlib" : "2.02",
+            "POE::Framework::MIDI" : "0.09",
+            "POE::Future" : "0.03",
+            "POE::Loop::AnyEvent" : "0.004",
+            "POE::Loop::EV" : "0.06",
+            "POE::Loop::Event" : "1.305",
+            "POE::Loop::Glib" : "0.038",
+            "POE::Loop::Gtk" : "1.306",
+            "POE::Loop::IO_Async" : "0.004",
+            "POE::Loop::Kqueue" : "0.02",
+            "POE::Loop::Prima" : "1.02",
+            "POE::Loop::Tk" : "1.305",
+            "POE::Loop::Wx" : "0.04",
+            "POE::Quickie" : "0.18",
+            "POE::Session::Attribute" : "0.80",
+            "POE::Session::AttributeBased" : "0.10",
+            "POE::Session::GladeXML2" : "0.40",
+            "POE::Session::Irssi" : "0.50",
+            "POE::Session::MessageBased" : "0.111",
+            "POE::Session::MultiDispatch" : "1.3",
+            "POE::Session::Multiplex" : "0.0600",
+            "POE::Session::PlainCall" : "0.0301",
+            "POE::Session::YieldCC" : "0.202",
+            "POE::Stage" : "0.060",
+            "POE::Sugar::Args" : "1.3",
+            "POE::Sugar::Attributes" : "0.02",
+            "POE::TIKC" : "0.02",
+            "POE::Test::Helpers" : "1.11",
+            "POE::Test::Loops" : "1.359",
+            "POE::Wheel::Audio::Mad" : "0.3",
+            "POE::Wheel::GnuPG" : "0.01",
+            "POE::Wheel::MyCurses" : "1.2102",
+            "POE::Wheel::Null" : "0.01",
+            "POE::Wheel::Run::Win32" : "0.18",
+            "POE::Wheel::Sendfile" : "0.0200",
+            "POE::Wheel::TermKey" : "0.02",
+            "POE::Wheel::UDP" : "0.02",
+            "POE::Wheel::VimColor" : "0.0",
+            "POE::XS::Loop::EPoll" : "1.003",
+            "POE::XS::Loop::Poll" : "1.000",
+            "POE::XS::Queue::Array" : "0.006",
+            "POE::XUL::Javascript" : "0.0",
+            "POE::strict" : "3.01",
+            "POEx::HTTP::Server" : "0.0902",
+            "POEx::IRC::Backend" : "0.024006",
+            "POEx::IRC::Client::Lite" : "0.002002",
+            "POEx::Inotify" : "0.0201",
+            "POEx::Role::PSGIServer" : "1.110670",
+            "POEx::Tickit" : "0.02",
+            "POEx::URI" : "0.0301",
+            "POEx::Weather::OpenWeatherMap" : "0.002001",
+            "POEx::ZMQ" : "0.005002",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Task::POE::All" : {
+         "file" : "lib/Task/POE/All.pm",
+         "version" : "1.102"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-task-poe-all at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Task-POE-All"
+      },
+      "homepage" : "https://github.com/apocalypse/perl-poe-taskall",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/apocalypse/perl-poe-taskall.git",
+         "web" : "https://github.com/apocalypse/perl-poe-taskall"
+      }
+   },
+   "version" : "1.102",
+   "x_BuiltWith" : {
+      "failures" : {
+         "POE::API::Hooks" : "module was not found in INC",
+         "POE::Component::AI::MegaHAL" : "module was not found in INC",
+         "POE::Component::Algorithm::Evolutionary" : "module was not found in INC",
+         "POE::Component::Amazon::S3" : "module was not found in INC",
+         "POE::Component::Archive::Any" : "module was not found in INC",
+         "POE::Component::AssaultCube::ServerQuery::Server" : "module was not found in INC",
+         "POE::Component::AtomAggregator" : "module was not found in INC",
+         "POE::Component::Basement" : "module was not found in INC",
+         "POE::Component::BlogCloud" : "module was not found in INC",
+         "POE::Component::Bundle::WebDevelopment" : "module was not found in INC",
+         "POE::Component::CD::Detect" : "module was not found in INC",
+         "POE::Component::CD::Rip" : "module was not found in INC",
+         "POE::Component::CPAN::Mirror::Multiplexer" : "module was not found in INC",
+         "POE::Component::CPAN::Reporter" : "module was not found in INC",
+         "POE::Component::CPAN::SQLite::Info" : "module was not found in INC",
+         "POE::Component::CPAN::YACSmoke" : "module was not found in INC",
+         "POE::Component::CPANIDX" : "module was not found in INC",
+         "POE::Component::CPANPLUS::YACSmoke" : "module was not found in INC",
+         "POE::Component::Cache" : "module was not found in INC",
+         "POE::Component::Captcha::reCAPTCHA" : "module was not found in INC",
+         "POE::Component::Child" : "module was not found in INC",
+         "POE::Component::Client::AMQP" : "module was not found in INC",
+         "POE::Component::Client::AirTunes" : "module was not found in INC",
+         "POE::Component::Client::Asterisk::Manager" : "module was not found in INC",
+         "POE::Component::Client::BigBrother" : "module was not found in INC",
+         "POE::Component::Client::CouchDB" : "module was not found in INC",
+         "POE::Component::Client::DNS" : "module was not found in INC",
+         "POE::Component::Client::DNS::Recursive" : "module was not found in INC",
+         "POE::Component::Client::DNSBL" : "module was not found in INC",
+         "POE::Component::Client::FTP" : "module was not found in INC",
+         "POE::Component::Client::Feed" : "module was not found in INC",
+         "POE::Component::Client::HTTPDeferred" : "module was not found in INC",
+         "POE::Component::Client::Halo" : "module was not found in INC",
+         "POE::Component::Client::Icecast" : "module was not found in INC",
+         "POE::Component::Client::Ident" : "module was not found in INC",
+         "POE::Component::Client::LDAP" : "module was not found in INC",
+         "POE::Component::Client::Lingr" : "module was not found in INC",
+         "POE::Component::Client::MPD" : "module was not found in INC",
+         "POE::Component::Client::MSN" : "module was not found in INC",
+         "POE::Component::Client::MogileFS" : "module was not found in INC",
+         "POE::Component::Client::NNTP" : "module was not found in INC",
+         "POE::Component::Client::NNTP::Tail" : "module was not found in INC",
+         "POE::Component::Client::NRPE" : "module was not found in INC",
+         "POE::Component::Client::NSCA" : "module was not found in INC",
+         "POE::Component::Client::NTP" : "module was not found in INC",
+         "POE::Component::Client::POP3" : "module was not found in INC",
+         "POE::Component::Client::Pastebot" : "module was not found in INC",
+         "POE::Component::Client::Ping" : "module was not found in INC",
+         "POE::Component::Client::RADIUS" : "module was not found in INC",
+         "POE::Component::Client::Rcon" : "module was not found in INC",
+         "POE::Component::Client::SMTP" : "module was not found in INC",
+         "POE::Component::Client::SOCKS" : "module was not found in INC",
+         "POE::Component::Client::Stomp" : "module was not found in INC",
+         "POE::Component::Client::Stomp::Utils" : "module was not found in INC",
+         "POE::Component::Client::TCPMulti" : "module was not found in INC",
+         "POE::Component::Client::Telnet" : "module was not found in INC",
+         "POE::Component::Client::Traceroute" : "module was not found in INC",
+         "POE::Component::Client::Twitter" : "module was not found in INC",
+         "POE::Component::Client::UserAgent" : "module was not found in INC",
+         "POE::Component::Client::Whois" : "module was not found in INC",
+         "POE::Component::Client::Whois::Smart" : "module was not found in INC",
+         "POE::Component::Client::eris" : "module was not found in INC",
+         "POE::Component::Client::opentick" : "module was not found in INC",
+         "POE::Component::ControlPort" : "module was not found in INC",
+         "POE::Component::Cron" : "module was not found in INC",
+         "POE::Component::Curl::Multi" : "module was not found in INC",
+         "POE::Component::Curses" : "module was not found in INC",
+         "POE::Component::DBIAgent" : "module was not found in INC",
+         "POE::Component::DHCP::Monitor" : "module was not found in INC",
+         "POE::Component::Daemon" : "module was not found in INC",
+         "POE::Component::Daemon::Win32" : "module was not found in INC",
+         "POE::Component::DebugShell" : "module was not found in INC",
+         "POE::Component::DebugShell::Jabber" : "module was not found in INC",
+         "POE::Component::DirWatch::Object" : "module was not found in INC",
+         "POE::Component::Enc::Flac" : "module was not found in INC",
+         "POE::Component::Enc::Mp3" : "module was not found in INC",
+         "POE::Component::Enc::Ogg" : "module was not found in INC",
+         "POE::Component::FastCGI" : "module was not found in INC",
+         "POE::Component::FeedAggregator" : "module was not found in INC",
+         "POE::Component::Gearman::Client" : "module was not found in INC",
+         "POE::Component::Github" : "module was not found in INC",
+         "POE::Component::Growl" : "module was not found in INC",
+         "POE::Component::Hailo" : "module was not found in INC",
+         "POE::Component::ICal" : "module was not found in INC",
+         "POE::Component::IKC" : "module was not found in INC",
+         "POE::Component::IRC::Object" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::BaseWrap" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Blowfish" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Bollocks" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::CPAN::Info" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::CoreList" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Donuts" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Eval" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::FTP::EasyUpload" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Google::Calculator" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Hailo" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Hello" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::IRCDHelp" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::ImageMirror" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Infobot" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Karma" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Logger::Irssi" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::MegaHAL" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::MultiProxy" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::OutputToPastebin" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::POE::Knee" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::QueryDNS" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::QueryDNSBL" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::RSS::Headlines" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::RTorrentStatus" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Role" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Seen" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Trac::RSS" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::URI::Find" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::Unicode::UCD" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WWW::CPANRatings::RSS" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WWW::Google::Time" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WWW::KrispyKreme::HotLight" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WWW::Reddit::TIL" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WWW::Vim::Tips" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WWW::Weather::US" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WWW::XKCD::AsText" : "module was not found in INC",
+         "POE::Component::IRC::Plugin::WubWubWub" : "module was not found in INC",
+         "POE::Component::IRC::PluginBundle::Toys" : "module was not found in INC",
+         "POE::Component::IRC::PluginBundle::WebDevelopment" : "module was not found in INC",
+         "POE::Component::IRC::Service" : "module was not found in INC",
+         "POE::Component::Jabber" : "module was not found in INC",
+         "POE::Component::JobQueue" : "module was not found in INC",
+         "POE::Component::LaDBI" : "module was not found in INC",
+         "POE::Component::Lightspeed" : "module was not found in INC",
+         "POE::Component::Lingua::Translate" : "module was not found in INC",
+         "POE::Component::Log4perl" : "module was not found in INC",
+         "POE::Component::Logger" : "module was not found in INC",
+         "POE::Component::MXML" : "module was not found in INC",
+         "POE::Component::MessageQueue" : "module was not found in INC",
+         "POE::Component::Net::FTP" : "module was not found in INC",
+         "POE::Component::Net::LastFM::Submission" : "module was not found in INC",
+         "POE::Component::NetSNMP::agent" : "module was not found in INC",
+         "POE::Component::NomadJukebox" : "module was not found in INC",
+         "POE::Component::NonBlockingWrapper::Base" : "module was not found in INC",
+         "POE::Component::OSCAR" : "module was not found in INC",
+         "POE::Component::Omegle" : "module was not found in INC",
+         "POE::Component::OpenSSH" : "module was not found in INC",
+         "POE::Component::Pastebin::Create" : "module was not found in INC",
+         "POE::Component::Pcap" : "module was not found in INC",
+         "POE::Component::Player::Mpg123" : "module was not found in INC",
+         "POE::Component::Player::Musicus" : "module was not found in INC",
+         "POE::Component::Player::Slideshow" : "module was not found in INC",
+         "POE::Component::Player::Xmms" : "module was not found in INC",
+         "POE::Component::Pluggable" : "module was not found in INC",
+         "POE::Component::PluginManager" : "module was not found in INC",
+         "POE::Component::Pool::DBI" : "module was not found in INC",
+         "POE::Component::Pool::Thread" : "module was not found in INC",
+         "POE::Component::PreforkDispatch" : "module was not found in INC",
+         "POE::Component::ProcTerminator" : "module was not found in INC",
+         "POE::Component::Proxy::MySQL" : "module was not found in INC",
+         "POE::Component::Proxy::SOCKS" : "module was not found in INC",
+         "POE::Component::Proxy::TCP" : "module was not found in INC",
+         "POE::Component::RSS" : "module was not found in INC",
+         "POE::Component::RSSAggregator" : "module was not found in INC",
+         "POE::Component::RemoteTail" : "module was not found in INC",
+         "POE::Component::Rendezvous::Publish" : "module was not found in INC",
+         "POE::Component::ResourcePool" : "module was not found in INC",
+         "POE::Component::ResourcePool::Resource::TokenBucket" : "module was not found in INC",
+         "POE::Component::SASLAuthd" : "module was not found in INC",
+         "POE::Component::SNMP" : "module was not found in INC",
+         "POE::Component::SNMP::Session" : "module was not found in INC",
+         "POE::Component::SSLify::NonBlock" : "module was not found in INC",
+         "POE::Component::Schedule" : "module was not found in INC",
+         "POE::Component::Sequence" : "module was not found in INC",
+         "POE::Component::Server::AsyncEndpoint" : "module was not found in INC",
+         "POE::Component::Server::Bayeux" : "module was not found in INC",
+         "POE::Component::Server::BigBrother" : "module was not found in INC",
+         "POE::Component::Server::Chargen" : "module was not found in INC",
+         "POE::Component::Server::DNS" : "module was not found in INC",
+         "POE::Component::Server::Daytime" : "module was not found in INC",
+         "POE::Component::Server::Discard" : "module was not found in INC",
+         "POE::Component::Server::Echo" : "module was not found in INC",
+         "POE::Component::Server::FTP" : "module was not found in INC",
+         "POE::Component::Server::HTTP::KeepAlive" : "module was not found in INC",
+         "POE::Component::Server::HTTPServer" : "module was not found in INC",
+         "POE::Component::Server::IRC" : "module was not found in INC",
+         "POE::Component::Server::Ident" : "module was not found in INC",
+         "POE::Component::Server::Inet" : "module was not found in INC",
+         "POE::Component::Server::JSONRPC" : "module was not found in INC",
+         "POE::Component::Server::MySQL" : "module was not found in INC",
+         "POE::Component::Server::NNTP" : "module was not found in INC",
+         "POE::Component::Server::NRPE" : "module was not found in INC",
+         "POE::Component::Server::NSCA" : "module was not found in INC",
+         "POE::Component::Server::POP3" : "module was not found in INC",
+         "POE::Component::Server::PSGI" : "module was not found in INC",
+         "POE::Component::Server::Postfix" : "module was not found in INC",
+         "POE::Component::Server::PreforkTCP" : "module was not found in INC",
+         "POE::Component::Server::Qotd" : "module was not found in INC",
+         "POE::Component::Server::RADIUS" : "module was not found in INC",
+         "POE::Component::Server::SMTP" : "module was not found in INC",
+         "POE::Component::Server::SOAP" : "module was not found in INC",
+         "POE::Component::Server::SimpleContent" : "module was not found in INC",
+         "POE::Component::Server::SimpleHTTP::PreFork" : "module was not found in INC",
+         "POE::Component::Server::SimpleSMTP" : "module was not found in INC",
+         "POE::Component::Server::SimpleXMLRPC" : "module was not found in INC",
+         "POE::Component::Server::Syslog" : "module was not found in INC",
+         "POE::Component::Server::TacacsPlus" : "module was not found in INC",
+         "POE::Component::Server::Time" : "module was not found in INC",
+         "POE::Component::Server::Twirc" : "module was not found in INC",
+         "POE::Component::Server::XMLRPC" : "module was not found in INC",
+         "POE::Component::Server::eris" : "module was not found in INC",
+         "POE::Component::SimpleDBI" : "module was not found in INC",
+         "POE::Component::SimpleLog" : "module was not found in INC",
+         "POE::Component::SmokeBox::Backend::Test::SmokeBox::Mini" : "module was not found in INC",
+         "POE::Component::SmokeBox::Recent" : "module was not found in INC",
+         "POE::Component::SmokeBox::Uploads::CPAN::Mini" : "module was not found in INC",
+         "POE::Component::SmokeBox::Uploads::NNTP" : "module was not found in INC",
+         "POE::Component::SmokeBox::Uploads::RSS" : "module was not found in INC",
+         "POE::Component::Spread" : "module was not found in INC",
+         "POE::Component::SpreadClient" : "module was not found in INC",
+         "POE::Component::SubWrapper" : "module was not found in INC",
+         "POE::Component::Supervisor" : "module was not found in INC",
+         "POE::Component::TFTPd" : "module was not found in INC",
+         "POE::Component::TSTP" : "module was not found in INC",
+         "POE::Component::Telephony::CTPort" : "module was not found in INC",
+         "POE::Component::UserBase" : "module was not found in INC",
+         "POE::Component::WWW::CPANRatings::RSS" : "module was not found in INC",
+         "POE::Component::WWW::DoingItWrongCom::RandImage" : "module was not found in INC",
+         "POE::Component::WWW::Google::Calculator" : "module was not found in INC",
+         "POE::Component::WWW::Google::Time" : "module was not found in INC",
+         "POE::Component::WWW::OhNoRobotCom::Search" : "module was not found in INC",
+         "POE::Component::WWW::Pastebin::Bot::Pastebot::Create" : "module was not found in INC",
+         "POE::Component::WWW::Pastebin::Many::Retrieve" : "module was not found in INC",
+         "POE::Component::WWW::Shorten" : "module was not found in INC",
+         "POE::Component::WWW::XKCD::AsText" : "module was not found in INC",
+         "POE::Component::WakeOnLAN" : "module was not found in INC",
+         "POE::Component::Win32::ChangeNotify" : "module was not found in INC",
+         "POE::Component::Win32::EventLog" : "module was not found in INC",
+         "POE::Component::Win32::Service" : "module was not found in INC",
+         "POE::Component::XUL" : "module was not found in INC",
+         "POE::Component::YahooMessenger" : "module was not found in INC",
+         "POE::Component::YubiAuth" : "module was not found in INC",
+         "POE::Declarative" : "module was not found in INC",
+         "POE::Declare" : "module was not found in INC",
+         "POE::Declare::HTTP::Client" : "module was not found in INC",
+         "POE::Declare::HTTP::Online" : "module was not found in INC",
+         "POE::Declare::HTTP::Server" : "module was not found in INC",
+         "POE::Declare::Log::File" : "module was not found in INC",
+         "POE::Devel::Benchmarker" : "module was not found in INC",
+         "POE::Devel::Profiler" : "module was not found in INC",
+         "POE::Devel::Top" : "module was not found in INC",
+         "POE::Event::Message" : "module was not found in INC",
+         "POE::Filter::BigBrother" : "module was not found in INC",
+         "POE::Filter::Bzip2" : "module was not found in INC",
+         "POE::Filter::CSV" : "module was not found in INC",
+         "POE::Filter::CSV_XS" : "module was not found in INC",
+         "POE::Filter::DHCPd::Lease" : "module was not found in INC",
+         "POE::Filter::DNS::TCP" : "module was not found in INC",
+         "POE::Filter::ErrorProof" : "module was not found in INC",
+         "POE::Filter::FSSocket" : "module was not found in INC",
+         "POE::Filter::Finger" : "module was not found in INC",
+         "POE::Filter::HTTPD::Chunked" : "module was not found in INC",
+         "POE::Filter::Hessian" : "module was not found in INC",
+         "POE::Filter::IASLog" : "module was not found in INC",
+         "POE::Filter::IRCv3" : "module was not found in INC",
+         "POE::Filter::JSON" : "module was not found in INC",
+         "POE::Filter::JSON::Incr" : "module was not found in INC",
+         "POE::Filter::KennySpeak" : "module was not found in INC",
+         "POE::Filter::LOLCAT" : "module was not found in INC",
+         "POE::Filter::LZF" : "module was not found in INC",
+         "POE::Filter::LZO" : "module was not found in INC",
+         "POE::Filter::LZW" : "module was not found in INC",
+         "POE::Filter::LZW::Progressive" : "module was not found in INC",
+         "POE::Filter::Log::IPTables" : "module was not found in INC",
+         "POE::Filter::Log::Procmail" : "module was not found in INC",
+         "POE::Filter::Ls" : "module was not found in INC",
+         "POE::Filter::PPPHDLC" : "module was not found in INC",
+         "POE::Filter::ParseWords" : "module was not found in INC",
+         "POE::Filter::Postfix" : "module was not found in INC",
+         "POE::Filter::RecDescent" : "module was not found in INC",
+         "POE::Filter::Redis" : "module was not found in INC",
+         "POE::Filter::Regexp" : "module was not found in INC",
+         "POE::Filter::SSL" : "module was not found in INC",
+         "POE::Filter::SimpleHTTP" : "module was not found in INC",
+         "POE::Filter::Slim::CLI" : "module was not found in INC",
+         "POE::Filter::Snort" : "module was not found in INC",
+         "POE::Filter::Stomp" : "module was not found in INC",
+         "POE::Filter::Transparent::SMTP" : "module was not found in INC",
+         "POE::Filter::XML" : "module was not found in INC",
+         "POE::Filter::XML::RPC" : "module was not found in INC",
+         "POE::Filter::Zlib" : "module was not found in INC",
+         "POE::Framework::MIDI" : "module was not found in INC",
+         "POE::Future" : "module was not found in INC",
+         "POE::Loop::AnyEvent" : "module was not found in INC",
+         "POE::Loop::EV" : "module was not found in INC",
+         "POE::Loop::Event" : "module was not found in INC",
+         "POE::Loop::Glib" : "module was not found in INC",
+         "POE::Loop::Gtk" : "module was not found in INC",
+         "POE::Loop::IO_Async" : "module was not found in INC",
+         "POE::Loop::Kqueue" : "module was not found in INC",
+         "POE::Loop::Prima" : "module was not found in INC",
+         "POE::Loop::Tk" : "module was not found in INC",
+         "POE::Loop::Wx" : "module was not found in INC",
+         "POE::Quickie" : "module was not found in INC",
+         "POE::Session::Attribute" : "module was not found in INC",
+         "POE::Session::GladeXML2" : "module was not found in INC",
+         "POE::Session::Irssi" : "module was not found in INC",
+         "POE::Session::MessageBased" : "module was not found in INC",
+         "POE::Session::MultiDispatch" : "module was not found in INC",
+         "POE::Session::Multiplex" : "module was not found in INC",
+         "POE::Session::PlainCall" : "module was not found in INC",
+         "POE::Session::YieldCC" : "module was not found in INC",
+         "POE::Stage" : "module was not found in INC",
+         "POE::Sugar::Args" : "module was not found in INC",
+         "POE::Sugar::Attributes" : "module was not found in INC",
+         "POE::TIKC" : "module was not found in INC",
+         "POE::Test::Helpers" : "module was not found in INC",
+         "POE::Wheel::Audio::Mad" : "module was not found in INC",
+         "POE::Wheel::GnuPG" : "module was not found in INC",
+         "POE::Wheel::MyCurses" : "module was not found in INC",
+         "POE::Wheel::Null" : "module was not found in INC",
+         "POE::Wheel::Run::Win32" : "module was not found in INC",
+         "POE::Wheel::Sendfile" : "module was not found in INC",
+         "POE::Wheel::TermKey" : "module was not found in INC",
+         "POE::Wheel::VimColor" : "module was not found in INC",
+         "POE::XS::Loop::EPoll" : "module was not found in INC",
+         "POE::XS::Loop::Poll" : "module was not found in INC",
+         "POE::XS::Queue::Array" : "module was not found in INC",
+         "POE::XUL::Javascript" : "module was not found in INC",
+         "POE::strict" : "module was not found in INC",
+         "POEx::HTTP::Server" : "module was not found in INC",
+         "POEx::IRC::Backend" : "module was not found in INC",
+         "POEx::IRC::Client::Lite" : "module was not found in INC",
+         "POEx::Inotify" : "module was not found in INC",
+         "POEx::Role::PSGIServer" : "module was not found in INC",
+         "POEx::Tickit" : "module was not found in INC",
+         "POEx::URI" : "module was not found in INC",
+         "POEx::Weather::OpenWeatherMap" : "module was not found in INC",
+         "POEx::ZMQ" : "module was not found in INC"
+      },
+      "modules" : {
+         "CPAN::Meta" : "2.142690",
+         "ExtUtils::MakeMaker" : "7.00",
+         "File::Spec" : "3.47",
+         "File::Temp" : "0.2304",
+         "IO::Handle" : "1.34",
+         "IPC::Open3" : "1.13",
+         "Module::Build::Tiny" : "0.039",
+         "POE::API::Peek" : "2.20",
+         "POE::Component::AIO" : "1.00",
+         "POE::Component::Client::HTTP" : "0.949",
+         "POE::Component::Client::Keepalive" : "0.272",
+         "POE::Component::Client::SimpleFTP" : "0.004",
+         "POE::Component::DirWatch" : "0.300001",
+         "POE::Component::EasyDBI" : "1.24",
+         "POE::Component::Fuse" : "0.05",
+         "POE::Component::Generic" : "0.1403",
+         "POE::Component::IRC" : "6.88",
+         "POE::Component::Metabase::Client::Submit" : "0.12",
+         "POE::Component::Metabase::Relay::Server" : "0.34",
+         "POE::Component::Resolver" : "0.921",
+         "POE::Component::SSLify" : "1.008",
+         "POE::Component::Server::HTTP" : "0.09",
+         "POE::Component::Server::SimpleHTTP" : "2.18",
+         "POE::Component::Server::TCP" : "1.365",
+         "POE::Component::SmokeBox" : "0.48",
+         "POE::Component::SmokeBox::Dists" : "1.08",
+         "POE::Component::SmokeBox::Uploads::Rsync" : "1.000",
+         "POE::Component::Syndicator" : "0.06",
+         "POE::Devel::ProcAlike" : "0.02",
+         "POE::Filter::HTTP::Parser" : "1.06",
+         "POE::Filter::IRCD" : "2.44",
+         "POE::Session::AttributeBased" : "0.10",
+         "POE::Test::Loops" : "1.359",
+         "POE::Wheel::UDP" : "0.02",
+         "Test::More" : "1.001009",
+         "strict" : "1.07",
+         "warnings" : "1.18"
+      },
+      "perl" : {
+         "original" : "v5.18.2",
+         "qv" : 1,
+         "version" : [
+            5,
+            18,
+            2
+         ]
+      },
+      "platform" : "linux",
+      "uname" : "Linux 3.13.0-35-generic x86_64"
+   },
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.018002"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::NextVersion" : {
+                  "first_version" : "0.001",
+                  "version_by_branch" : "0",
+                  "version_regexp" : "(?^:^release-(.+)$)"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Apocalyptic/Git::NextVersion",
+            "version" : "2.025"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [
+                     "README.pod"
+                  ],
+                  "exclude_match" : [],
+                  "follow_symlinks" : "0",
+                  "include_dotfiles" : "1",
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               },
+               "Dist::Zilla::Plugin::Git::GatherDir" : {
+                  "include_untracked" : "0"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Apocalyptic/Git::GatherDir",
+            "version" : "2.025"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Apocalyptic/PruneCruft",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@Apocalyptic/AutoPrereqs",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenerateFile",
+            "name" : "@Apocalyptic/MANIFEST.SKIP",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Apocalyptic/ManifestSkip",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : "0",
+                  "fail_on_warning" : "author",
+                  "fake_home" : "1",
+                  "filename" : "t/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : "0",
+                  "phase" : "test",
+                  "script_finder" : [
+                     ":ExecFiles"
+                  ],
+                  "skips" : []
+               }
+            },
+            "name" : "@Apocalyptic/Test::Compile",
+            "version" : "2.051"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ApocalypseTests",
+            "name" : "@Apocalyptic/ApocalypseTests",
+            "version" : "1.002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
+            "name" : "@Apocalyptic/Test::ReportPrereqs",
+            "version" : "0.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prepender",
+            "name" : "@Apocalyptic/Prepender",
+            "version" : "1.112280"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@Apocalyptic/Authority",
+            "version" : "1.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Describe",
+            "name" : "@Apocalyptic/Git::Describe",
+            "version" : "0.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@Apocalyptic/PkgVersion",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TaskWeaver",
+            "name" : "@Apocalyptic/TaskWeaver",
+            "version" : "0.101626"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@Apocalyptic/NextRelease",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ChangelogFromGit",
+            "name" : "@Apocalyptic/ChangelogFromGit",
+            "version" : "0.016"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumPerl",
+            "name" : "@Apocalyptic/MinimumPerl",
+            "version" : "1.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Bugtracker",
+            "name" : "@Apocalyptic/Bugtracker",
+            "version" : "1.111080"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Apocalyptic/MetaConfig",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Contributors",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Contributors" : {
+                  "include_authors" : "0",
+                  "include_releaser" : "1",
+                  "order_by" : "name",
+                  "paths" : []
+               }
+            },
+            "name" : "@Apocalyptic/Git::Contributors",
+            "version" : "0.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaData::BuiltWith",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaData::BuiltWith" : {
+                  "_stash_key" : "x_BuiltWith",
+                  "show_config" : "0",
+                  "show_uname" : "1",
+                  "uname" : {
+                     "uname_args" : [
+                        "-s",
+                        "-r",
+                        "-m"
+                     ],
+                     "uname_call" : "uname"
+                  }
+               }
+            },
+            "name" : "@Apocalyptic/MetaData::BuiltWith",
+            "version" : "1.003001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "@Apocalyptic/GithubMeta",
+            "version" : "0.46"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@Apocalyptic/MetaResources",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Metadata",
+            "name" : "@Apocalyptic/Metadata",
+            "version" : "3.03"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@Apocalyptic/MetaNoIndex",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Apocalyptic/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "5.024"
+                     }
+                  ]
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
+               }
+            },
+            "name" : "@Apocalyptic/MetaProvides::Package",
+            "version" : "2.001002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Apocalyptic/License",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuildTiny",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Apocalyptic/ModuleBuildTiny",
+            "version" : "0.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker::Fallback",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Apocalyptic/MakeMaker::Fallback",
+            "version" : "0.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Apocalyptic/MetaYAML",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@Apocalyptic/MetaJSON",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "name" : "@Apocalyptic/InstallGuide",
+            "version" : "1.200005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DOAP",
+            "name" : "@Apocalyptic/DOAP",
+            "version" : "0.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Covenant",
+            "name" : "@Apocalyptic/Covenant",
+            "version" : "0.1.0"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CPANFile",
+            "name" : "@Apocalyptic/CPANFile",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "@Apocalyptic/ReadmeAnyFromPod",
+            "version" : "0.142470"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "@Apocalyptic/pod for github",
+            "version" : "0.142470"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ChangeStats::Git",
+            "name" : "@Apocalyptic/ChangeStats::Git",
+            "version" : "0.3.0"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Signature",
+            "name" : "@Apocalyptic/Signature",
+            "version" : "1.100930"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Apocalyptic/Manifest",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
+            "name" : "@Apocalyptic/CheckChangesHasContent",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Check" : {
+                  "untracked_files" : "die"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "README.pod",
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Apocalyptic/Git::Check",
+            "version" : "2.025"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
+            "config" : {
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Apocalyptic/Git::CheckFor::CorrectBranch",
+            "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
+            "config" : {
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Apocalyptic/Git::CheckFor::MergeConflicts",
+            "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Remote::Check",
+            "name" : "@Apocalyptic/Git::Remote::Check",
+            "version" : "0.1.2"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PromptIfStale",
+            "config" : {
+               "Dist::Zilla::Plugin::PromptIfStale" : {
+                  "check_all_plugins" : "1",
+                  "check_all_prereqs" : "1",
+                  "modules" : [],
+                  "phase" : "release",
+                  "skip" : []
+               }
+            },
+            "name" : "@Apocalyptic/PromptIfStale",
+            "version" : "0.029"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Apocalyptic/TestRelease",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
+            "name" : "@Apocalyptic/CheckPrereqsIndexed",
+            "version" : "0.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckSelfDependency",
+            "config" : {
+               "Dist::Zilla::Plugin::CheckSelfDependency" : {
+                  "finder" : [
+                     ":InstallModules"
+                  ]
+               }
+            },
+            "name" : "@Apocalyptic/CheckSelfDependency",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckIssues",
+            "name" : "@Apocalyptic/CheckIssues",
+            "version" : "0.004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Apocalyptic/ConfirmRelease",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Apocalyptic/UploadToCPAN",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ArchiveRelease",
+            "name" : "@Apocalyptic/ArchiveRelease",
+            "version" : "4.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [
+                     "releases"
+                  ],
+                  "commit_msg" : "New CPAN release of %N - v%v%n%n%c",
+                  "time_zone" : "UTC"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "README.pod",
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Apocalyptic/Git::Commit",
+            "version" : "2.025"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "signed" : 0,
+                  "tag" : "release-1.102",
+                  "tag_format" : "release-%v",
+                  "tag_message" : "Tagged release-%v",
+                  "time_zone" : "local"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Apocalyptic/Git::Tag",
+            "version" : "2.025"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin",
+                     "bitbucket"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Apocalyptic/Git::Push",
+            "version" : "2.025"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::Update",
+            "name" : "@Apocalyptic/GitHub::Update",
+            "version" : "0.38"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Bitbucket::Update",
+            "name" : "@Apocalyptic/Bitbucket::Update",
+            "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Clean",
+            "name" : "@Apocalyptic/Clean",
+            "version" : "0.07"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::SchwartzRatio",
+            "name" : "@Apocalyptic/SchwartzRatio",
+            "version" : "0.2.0"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "5.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::VerifyPhases",
+            "name" : "@Apocalyptic/VerifyPhases",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Apocalyptic/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "5.024"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "5.024"
+      }
+   },
+   "x_IRC" : {
+      "url" : "irc://irc.perl.org/#perl-help",
+      "web" : "https://chat.mibbit.com/?channel=%23perl-help&server=irc.perl.org"
+   },
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:APOCAL"
+}

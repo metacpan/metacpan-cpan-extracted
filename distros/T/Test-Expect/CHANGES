@@ -1,0 +1,24 @@
+Revision history for Perl module Test::Expect
+
+0.33 2015-04-02
+ - Allow multi-argument forms of "command" to be passed
+ - Force Term::ReadLine in called programs to use the "Stub"
+   implementation, which has consistent output (vs Term::ReadLine::Perl)
+
+0.32 2015-04-02
+ - Quote regex meta-characters before using them in a regex (fixes
+   #81987)
+ - Include leading space in PERL_RL variable (fixes #38914)
+ - New maintainer (BPS)
+
+0.31 2008-05-07
+ - add expect_quit method to close the Expect object (patch by Alex
+   Vandiver)
+
+0.30 2006-02-28
+ - added expect_handle to fetch the underlying Expect object (patch by
+   Kevin Riggle)
+
+0.29 2005-03-30
+ - initial release
+

@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Test::NoOverride>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Test-NoOverride"><img src="https://secure.travis-ci.org/bayashi/Test-NoOverride.png"/></a> <a href="https://coveralls.io/r/bayashi/Test-NoOverride"><img src="https://coveralls.io/repos/bayashi/Test-NoOverride/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Test::NoOverride installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Test::NoOverride
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Test::NoOverride documentation is available as in POD. So you can do:
+
+    % perldoc Test::NoOverride
+
+
+=head1 REPOSITORY
+
+Test::NoOverride is hosted on github
+L<http://github.com/bayashi/Test-NoOverride>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

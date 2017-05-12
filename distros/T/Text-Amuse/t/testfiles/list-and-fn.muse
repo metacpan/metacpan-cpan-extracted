@@ -1,0 +1,27 @@
+Regular
+
+ - First [1]
+ - Second
+ - Third
+
+  
+
+ 1. A numbered item [2]
+
+  
+
+ 1. List 
+
+  
+
+ 1. Reset with a nbspace
+
+[1] Footnote
+    multiline footnote
+
+
+[2] Footnotes
+multiline footnote (2) [3] recursive
+
+[3] Hello
+

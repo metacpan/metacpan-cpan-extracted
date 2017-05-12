@@ -1,0 +1,33 @@
+# -*- mode: perl; tab-width: 3; indent-tabs-mode: nil; -*-
+
+use vars qw{$VERSION};
+BEGIN {
+  $VERSION = '0.01';
+}
+
+sub parse {
+    my $class = shift;
+    my $text  = shift;
+    foreach my $foo (blah) {
+	foreach my $foo (blah) {
+	    foreach my $foo (blah) {
+		foreach my $foo (blah) {
+		    foreach my $foo (blah) {
+			foreach my $foo (blah) {
+			    foo;
+			}
+		    }
+		    foo;
+		}
+	    }
+	}
+	foreach my $foo (blah) {
+	    foo;
+	}
+
+    }
+
+    return 's4';
+}
+
+

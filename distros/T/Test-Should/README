@@ -1,0 +1,37 @@
+NAME
+    Test::Should - Should it be OK??
+
+SYNOPSIS
+        use Test::More;
+        use Test::Should;
+
+        1->should_be_ok;
+        [1,2,3]->should_include(3);
+
+        done_testing;
+
+        # testing result:
+        ok 1 - 1 should_be_ok
+        ok 2 - [1,2,3] should_include 3
+        1..2
+
+DESCRIPTION
+    Test::Should is yet another testing library to write human readable test
+    case.
+
+    And this module generates human readable test case description.
+
+    This is a development release. I may change the API in the future
+
+    For more method name details, please look Test::Should::Engine
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

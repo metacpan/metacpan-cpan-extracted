@@ -1,0 +1,8 @@
+# perl_critic setup file
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | DOCUMENTATION | SUBROUTINES/METHODS | BUGS AND LIMITATIONS | LICENSE AND COPYRIGHT | SUPPORT | AUTHOR  | SEE ALSO 
+#script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR
+
+[Documentation::PodSpelling]
+stop_words = unexisting config EVAL undef boolean perldoc CPAN's variable's breakpoint AddValidator AddValidators AddVariableValidator AnnoCPAN CPAN Category CheckHigherPriorityCategories CheckLowerPriorityCategories CheckAndSetVariable CheckCategoriesOrder CheckSetArguments CheckVariableInCategory CreateCustomGetFunctions CheckOptionNames GetAccessLog GetAttribute GetDump GetHashRef GetHistory GetHistoryDump GetInformation GetVariableHistory GetInheritable GetKeys GetKeyValueTuples GetMultiple IsCategoryLocked IsLocked LockCategories OverrideVariable SetCategoryAlias SetAttribute SetDisableSilentOptions SetDisplayExplicitCategoryWarningOption SetInteractionDefault SetMultiple SetupCategories UnlockCategories  VALIDATORS PositiveValueValidator SecondValidator Validators validator validators  Nadim nadim Khemir khemir  FIRSTKEY NEXTKEY TIEHASH  DumpConfigHierarchicalDelta GetConfigDelta GetConfigHierarchicalDelta lhs rhs

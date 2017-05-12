@@ -1,0 +1,54 @@
+Class: Thrift
+
+Type: bool
+
+A Thrift built-in type.
+
+Type: byte
+
+A Thrift built-in type.
+
+Type: i16
+
+A Thrift built-in type.
+
+Type: i32
+
+A Thrift built-in type.
+
+Type: i64
+
+A Thrift built-in type.
+
+Type: double
+
+A Thrift built-in type.
+
+Type: string
+
+A Thrift built-in type.
+
+Type: binary
+
+A Thrift built-in type.
+
+Type: slist
+
+A Thrift built-in type.
+
+Type: void
+
+A Thrift built-in type.
+
+Type: list
+
+A Thrift built-in type.
+
+Type: map
+
+A Thrift built-in type.
+
+Type: set
+
+A Thrift built-in type.
+

@@ -1,0 +1,9 @@
+Build.PL
+Changes
+INSTALL
+MANIFEST			This list of files
+META.yml
+Makefile
+Makefile.PL
+lib/Template/Plugin/ShellQuote.pm
+t/01simple.t

@@ -1,0 +1,213 @@
+%!PS
+
+/fs 10 def
+/ti-font   /Helvetica    findfont    fs 1.4 mul  scalefont def
+/code-font /Courier      findfont    fs          scalefont def
+/ital-font /Times-Italic findfont    fs          scalefont def
+/desc-font /Times-Roman  findfont    fs          scalefont def
+/copy-font /Times-Italic findfont    7           scalefont def
+/left-x 72 def
+/right-x 540 def
+/top-y  792 54 sub def
+/col1-x left-x 24 add def
+/col2-x col1-x 72 add def
+/copy-y 54 def
+
+/y top-y 16 sub def
+/downby { /y exch y exch sub def } def
+/bigspace fs 1.5 mul def
+
+left-x top-y moveto
+ti-font setfont
+(Quick reference for Time::Format formatting codes.) show
+16 downby
+
+code-font setfont
+left-x y moveto ($time{$format}) show
+fs downby
+left-x y moveto ($time{$format, $time_value}) show
+fs downby
+fs downby
+
+ital-font setfont
+left-x y moveto (Numbers:) show
+fs 1.2 mul  downby
+
+code-font setfont    col1-x y moveto    (yyyy) show
+desc-font setfont    col2-x y moveto    (4-digit year) show
+fs downby
+code-font setfont    col1-x y moveto    (yy) show
+desc-font setfont    col2-x y moveto    (2-digit year, 00\26199) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (m) show
+desc-font setfont    col2-x y moveto    (1- or 2-digit month, 1\26112) show
+fs downby
+code-font setfont    col1-x y moveto    (mm) show
+desc-font setfont    col2-x y moveto    (2-digit month, 01\26112) show
+fs downby
+code-font setfont    col1-x y moveto    (?m) show
+desc-font setfont    col2-x y moveto    (month with leading space if < 10) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (m{on}) show
+desc-font setfont    col2-x y moveto    (Unambiguous month, 1\26112) show
+fs downby
+code-font setfont    col1-x y moveto    (mm{on}) show
+desc-font setfont    col2-x y moveto    (Unambiguous month, 01\26112) show
+fs downby
+code-font setfont    col1-x y moveto    (?m{on}) show
+desc-font setfont    col2-x y moveto    (Unambiguous month with leading space if < 10) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (d) show
+desc-font setfont    col2-x y moveto    (day number, 1\26131) show
+fs downby
+code-font setfont    col1-x y moveto    (dd) show
+desc-font setfont    col2-x y moveto    (day number, 01\26131) show
+fs downby
+code-font setfont    col1-x y moveto    (?d) show
+desc-font setfont    col2-x y moveto    (day with leading space if < 10) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (h) show
+desc-font setfont    col2-x y moveto    (hour, 0\26123) show
+fs downby
+code-font setfont    col1-x y moveto    (hh) show
+desc-font setfont    col2-x y moveto    (hour, 00\26123) show
+fs downby
+code-font setfont    col1-x y moveto    (?h) show
+desc-font setfont    col2-x y moveto    (hour, 0\26123 with leading space if < 10) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (H) show
+desc-font setfont    col2-x y moveto    (hour, 1\26112) show
+fs downby
+code-font setfont    col1-x y moveto    (HH) show
+desc-font setfont    col2-x y moveto    (hour, 01\26112) show
+fs downby
+code-font setfont    col1-x y moveto    (?H) show
+desc-font setfont    col2-x y moveto    (hour, 1\26112 with leading space if < 10) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (m) show
+desc-font setfont    col2-x y moveto    (minute, 0\26159) show
+fs downby
+code-font setfont    col1-x y moveto    (mm) show
+desc-font setfont    col2-x y moveto    (minute, 00\26159) show
+fs downby
+code-font setfont    col1-x y moveto    (?m) show
+desc-font setfont    col2-x y moveto    (minute, 0\26159 with leading space if < 10) show
+bigspace downby
+ 
+code-font setfont    col1-x y moveto    (m{in}) show
+desc-font setfont    col2-x y moveto    (Unambiguous minute, 1\26112) show
+fs downby
+code-font setfont    col1-x y moveto    (mm{in}) show
+desc-font setfont    col2-x y moveto    (Unambiguous minute, 01\26112) show
+fs downby
+code-font setfont    col1-x y moveto    (?m{in}) show
+desc-font setfont    col2-x y moveto    (Unambiguous minute with leading space if < 10) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (s) show
+desc-font setfont    col2-x y moveto    (second, 0\26159) show
+fs downby
+code-font setfont    col1-x y moveto    (ss) show
+desc-font setfont    col2-x y moveto    (second, 00\26159) show
+fs downby
+code-font setfont    col1-x y moveto    (?s) show
+desc-font setfont    col2-x y moveto    (second, 0\26159 with leading space if < 10) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (mmm) show
+desc-font setfont    col2-x y moveto    (millisecond, 000\261999) show
+fs downby
+code-font setfont    col1-x y moveto    (uuuuuu) show
+desc-font setfont    col2-x y moveto    (microsecond, 000000\261999999) show
+16 downby
+
+ital-font setfont    left-x y moveto (Names and other strings:) show
+fs 1.2 mul downby
+
+code-font setfont    col1-x y moveto    (Month) show
+desc-font setfont    col2-x y moveto    (full month name, mixed-case (locale-speci\256c capitalization)) show
+fs downby
+code-font setfont    col1-x y moveto    (MONTH) show
+desc-font setfont    col2-x y moveto    (full month name, all-uppercase) show
+fs downby
+code-font setfont    col1-x y moveto    (month) show
+desc-font setfont    col2-x y moveto    (full month name, all-lowercase) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (Mon) show
+desc-font setfont    col2-x y moveto    (3-letter month abbreviation) show
+fs downby
+code-font setfont    col1-x y moveto    (MON) show
+desc-font setfont    col2-x y moveto    (ditto, all-uppercase) show
+fs downby
+code-font setfont    col1-x y moveto    (mon) show
+desc-font setfont    col2-x y moveto    (ditto, all-lowercase) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (Weekday) show
+desc-font setfont    col2-x y moveto    (weekday name) show
+fs downby
+code-font setfont    col1-x y moveto    (WEEKDAY) show
+desc-font setfont    col2-x y moveto    (weekday name, all-uppercase) show
+fs downby
+code-font setfont    col1-x y moveto    (weekday) show
+desc-font setfont    col2-x y moveto    (weekday name, all-lowercase) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (Day) show
+desc-font setfont    col2-x y moveto    (3-letter weekday name abbreviation) show
+fs downby
+code-font setfont    col1-x y moveto    (DAY) show
+desc-font setfont    col2-x y moveto    (ditto, all-uppercase) show
+fs downby
+code-font setfont    col1-x y moveto    (day) show
+desc-font setfont    col2-x y moveto    (ditto, all-lowercase) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (th) show
+desc-font setfont    col2-x y moveto    (day suf\256x (st, nd, rd, or th)) show
+fs downby
+code-font setfont    col1-x y moveto    (TH) show
+desc-font setfont    col2-x y moveto    (uppercase suf\256x) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (am) show
+desc-font setfont    col2-x y moveto    (The string \252am\272 or \252pm\272) show
+fs downby
+code-font setfont    col1-x y moveto    (pm) show
+desc-font setfont    col2-x y moveto    (ditto) show
+fs downby
+code-font setfont    col1-x y moveto    (AM) show
+desc-font setfont    col2-x y moveto    (The string \252AM\272 or \252PM\272) show
+fs downby
+code-font setfont    col1-x y moveto    (PM) show
+desc-font setfont    col2-x y moveto    (ditto) show
+fs downby
+code-font setfont    col1-x y moveto    (a.m.) show
+desc-font setfont    col2-x y moveto    (The string \252a.m.\272 or \252p.m.\272) show
+fs downby
+code-font setfont    col1-x y moveto    (p.m.) show
+desc-font setfont    col2-x y moveto    (ditto) show
+fs downby
+code-font setfont    col1-x y moveto    (A.M.) show
+desc-font setfont    col2-x y moveto    (The string \252A.M.\272 or \252P.M.\272) show
+fs downby
+code-font setfont    col1-x y moveto    (P.M.) show
+desc-font setfont    col2-x y moveto    (ditto) show
+bigspace downby
+
+code-font setfont    col1-x y moveto    (tz) show
+desc-font setfont    col2-x y moveto    (time zone abbreviation) show
+
+right-x copy-y moveto
+copy-font setfont
+(Copyright (c) 2003\2612012 by Eric J. Roode.  All rights reserved.)
+dup stringwidth pop neg 0 rmoveto show
+
+showpage

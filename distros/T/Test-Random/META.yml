@@ -1,0 +1,27 @@
+---
+abstract: 'Make testing random functions deterministic'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.32
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Random
+provides:
+  Test::Random:
+    file: lib/Test/Random.pm
+    version: 20130427
+requires:
+  perl: v5.8.1
+resources:
+  bugtracker: http://github.com/schwern/Test-Random/issues
+  homepage: http://github.com/schwern/Test-Random
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/schwern/Test-Random/tree/master
+version: 20130427

@@ -1,0 +1,11 @@
+README
+MANIFEST
+Changes
+Build.PL
+Makefile.PL
+META.yml
+lib/Tkx/FindBar.pm
+t/00-Tkx-FindBar.t
+t/01-search.t
+t/02-pack.t
+t/03-grid.t

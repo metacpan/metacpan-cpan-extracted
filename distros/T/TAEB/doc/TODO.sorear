@@ -1,0 +1,51 @@
+- Smarter searching (mostly done)
+
+  - Don't search walls we can path around (requires getting the whole tree
+    from dijkstra)
+
+
+- Armour swapping
+
+  - The current approach falls over with degenerate slots
+
+  - A better approach would probably be the greedy one
+
+  - For each item, see if we can approach a better state by putting it
+    on
+
+
+- When we do a pathfind, tile costs are partly determined by personality
+  (behavior dispatch)  (not really useful without the second)
+
+  - This would of course be ludicrously expensive
+
+  - Solution: make travel_cost an _attribute_ of tiles, which invalidate
+    when certain big things happen (e.g. PickaxeFinder gets a pick axe)
+
+  - Logical granularities are one tile (after every update), one map
+    (this is a non-dig level), one dungeon (use sparingly, probably best
+    to defer it on a level-by-level basis)
+
+  - Helps with water, etc
+
+
+- Improve special level detection
+
+
+- Testing
+
+  - A test is a situation, expressed in terms of a ttyrecish (probably
+    some human-editable format).  There is an interface for reading
+    ttyrecishes
+
+  - In test mode, TAEB does not load or save state and logs to memory
+
+  - Logs can be tested after the step in question
+
+  - Many tests will be expressed in terms of demo AI
+
+  - Test ability is a big deal; it is an enabler for a lot of caching
+    functions and real performance help
+
+  - Testing will probably have to be stacked on a process to be reasonably
+    fast

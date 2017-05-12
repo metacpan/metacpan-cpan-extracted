@@ -1,0 +1,40 @@
+Revision history for Text-Affixes
+
+0.09 2015-10-20T10:05:00Z
+    - doc fixes from gsulivan@
+    - convert to Minilla
+    - put on Github with history imported from gitpan
+
+0.08  Mon Oct 19 15:17:00 2015
+    - fix some Unicode issues
+
+0.07  Sat Nov 19 19:22:00 2005
+	- increased test coverage
+
+0.06  Fri Nov 05 00:17:14 2004
+	- added parameter "exclude_numbers" to the configuration
+	- added parameter "lowercase" to the configuration
+	- code for extracting prefixes and suffixes now resides in the same
+	  private function
+
+0.05  Mon Nov 01 15:18:00 2004
+	- Perl required version is now 5.006
+	- changes in the documentation
+	- added pod.t and pod-coverage.t to the tests directory
+	- when minimum size is bigger than maximum size, a reference to an
+	  empty hash is automatically returned
+
+0.04  Tue Oct 26 19:20:00 2004
+	- corrected grammar (it's "suffix", not "sufix"; duh!)
+
+0.03  Tue Oct 26 00:00:10 2004
+	- minor changes in the documentation
+	- added tests
+
+0.02  Sat Oct 23 17:04:20 2004
+	- added README
+
+0.01  Sat Oct 23 17:04:20 2004
+	- original version; created by h2xs 1.22 with options
+		-Xan Text::Affixes
+

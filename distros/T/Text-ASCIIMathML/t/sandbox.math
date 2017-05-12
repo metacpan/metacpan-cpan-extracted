@@ -1,0 +1,1209 @@
+? y=x^2
+<math title="y=x^2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>y</mi>
+    <mo>=</mo>
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+  </mstyle>
+</math>
+$$y = x^2$$
+
+? y=1/x
+<math title="y=1/x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>y</mi>
+    <mo>=</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mi>x</mi>
+    </mfrac>
+  </mstyle>
+</math>
+$$y = \frac{1}{x}$$
+
+? y=sqrt(x)
+<math title="y=sqrt(x)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>y</mi>
+    <mo>=</mo>
+    <msqrt>
+      <mrow>
+        <mi>x</mi>
+      </mrow>
+    </msqrt>
+  </mstyle>
+</math>
+$$y = \sqrt{x}$$
+
+? E=mc^(3 + e^(ipi)
+<math title="E=mc^(3 + e^(ipi)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>E</mi>
+    <mo>=</mo>
+    <mi>m</mi>
+    <msup>
+      <mi>c</mi>
+      <mrow>
+        <mn>3</mn>
+        <mo>+</mo>
+        <msup>
+          <mi>e</mi>
+          <mrow>
+            <mi>i</mi>
+            <mi>&pi;</mi>
+          </mrow>
+        </msup>
+      </mrow>
+    </msup>
+  </mstyle>
+</math>
+$$E = m c^{3 + e^{i \pi}}$$
+
+? a^2+b^2=c^2
+<math title="a^2+b^2=c^2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mi>a</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <msup>
+      <mi>b</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>=</mo>
+    <msup>
+      <mi>c</mi>
+      <mn>2</mn>
+    </msup>
+  </mstyle>
+</math>
+$$a^2 + b^2 = c^2$$
+
+? AA x in CC (sin^2x+cos^2x=1)
+<math title="AA x in CC (sin^2x+cos^2x=1)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&forall;</mo>
+    <mi>x</mi>
+    <mo>&isin;</mo>
+    <mo>&Copf;</mo>
+    <mrow>
+      <mo>(</mo>
+      <msup>
+        <mo>sin</mo>
+        <mn>2</mn>
+      </msup>
+      <mi>x</mi>
+      <mo>+</mo>
+      <msup>
+        <mo>cos</mo>
+        <mn>2</mn>
+      </msup>
+      <mi>x</mi>
+      <mo>=</mo>
+      <mn>1</mn>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\forall x \in \mathds{C} \left( \sin^2 x + \cos^2 x = 1 \right)$$
+
+? (AA x: x in CC: sin^2x+cos^2x=1)
+<math title="(AA x: x in CC: sin^2x+cos^2x=1)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>(</mo>
+      <mo>&forall;</mo>
+      <mi>x</mi>
+      <mo>:</mo>
+      <mi>x</mi>
+      <mo>&isin;</mo>
+      <mo>&Copf;</mo>
+      <mo>:</mo>
+      <msup>
+        <mo>sin</mo>
+        <mn>2</mn>
+      </msup>
+      <mi>x</mi>
+      <mo>+</mo>
+      <msup>
+        <mo>cos</mo>
+        <mn>2</mn>
+      </msup>
+      <mi>x</mi>
+      <mo>=</mo>
+      <mn>1</mn>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\left( \forall x : x \in \mathds{C} : \sin^2 x + \cos^2 x = 1 \right)$$
+
+? sum_(i=1)^ni^3=(sum_(i=1)^ni^2)^2
+<math title="sum_(i=1)^ni^3=(sum_(i=1)^ni^2)^2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <munderover>
+        <mo>&sum;</mo>
+        <mrow>
+          <mi>i</mi>
+          <mo>=</mo>
+          <mn>1</mn>
+        </mrow>
+        <mi>n</mi>
+      </munderover>
+    </mrow>
+    <msup>
+      <mi>i</mi>
+      <mn>3</mn>
+    </msup>
+    <mo>=</mo>
+    <msup>
+      <mrow>
+        <mo>(</mo>
+        <mrow>
+          <munderover>
+            <mo>&sum;</mo>
+            <mrow>
+              <mi>i</mi>
+              <mo>=</mo>
+              <mn>1</mn>
+            </mrow>
+            <mi>n</mi>
+          </munderover>
+        </mrow>
+        <msup>
+          <mi>i</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>)</mo>
+      </mrow>
+      <mn>2</mn>
+    </msup>
+  </mstyle>
+</math>
+$$\sum_{i = 1}^n i^3 = \left( \sum_{i = 1}^n i^2 \right)^2$$
+
+? (a,b)
+<math title="(a,b)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>(</mo>
+      <mi>a</mi>
+      <mo>,</mo>
+      <mi>b</mi>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$( a , b )$$
+
+? f
+<math title="f">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+#    <mrow>
+      <mi>f</mi>
+#      <mo></mo>
+#    </mrow>
+  </mstyle>
+</math>
+$$f$$
+
+? Delta x=(b-a)/n
+<math title="Delta x=(b-a)/n">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Delta;</mo>
+    <mi>x</mi>
+    <mo>=</mo>
+    <mfrac>
+      <mrow>
+        <mi>b</mi>
+        <mo>-</mo>
+        <mi>a</mi>
+      </mrow>
+      <mi>n</mi>
+    </mfrac>
+  </mstyle>
+</math>
+$$\Delta x = \frac{b - a}{n}$$
+
+? int_a^b f(x)dx=lim_(n->oo)sum_[i=1]^n f(x_i^(**))Delta x
+<math title="int_a^b f(x)dx=lim_(n-&gt;oo)sum_[i=1]^n f(x_i^(**))Delta x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <msubsup>
+        <mo>&int;</mo>
+        <mi>a</mi>
+        <mi>b</mi>
+      </msubsup>
+    </mrow>
+    <mrow>
+      <mi>f</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mrow>
+      <mi>d</mi>
+      <mi>x</mi>
+    </mrow>
+    <mo>=</mo>
+    <munder>
+      <mo>lim</mo>
+      <mrow>
+        <mi>n</mi>
+        <mo>&rarr;</mo>
+        <mo>&infin;</mo>
+      </mrow>
+    </munder>
+    <mrow>
+      <munderover>
+        <mo>&sum;</mo>
+        <mrow>
+          <mi>i</mi>
+          <mo>=</mo>
+          <mn>1</mn>
+        </mrow>
+        <mi>n</mi>
+      </munderover>
+    </mrow>
+    <mrow>
+      <mi>f</mi>
+      <mrow>
+        <mo>(</mo>
+        <mrow>
+          <msubsup>
+            <mi>x</mi>
+            <mi>i</mi>
+            <mrow>
+              <mo>&Star;</mo>
+            </mrow>
+          </msubsup>
+        </mrow>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>&Delta;</mo>
+    <mi>x</mi>
+  </mstyle>
+</math>
+$$\int_a^b f ( x ) d x = \lim_{n \to \infty} \sum_{i = 1}^n f \left( x_i^{\star} \right) \Delta x$$
+
+? x_i=a+iDeltax
+<math title="x_i=a+iDeltax">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msub>
+      <mi>x</mi>
+      <mi>i</mi>
+    </msub>
+    <mo>=</mo>
+    <mi>a</mi>
+    <mo>+</mo>
+    <mi>i</mi>
+    <mo>&Delta;</mo>
+    <mi>x</mi>
+  </mstyle>
+</math>
+$$x_i = a + i \Delta x$$
+
+? x_i^(**)in[x_[i-1],x_i]
+<math title="x_i^(**)in[x_[i-1],x_i]">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <msubsup>
+        <mi>x</mi>
+        <mi>i</mi>
+        <mrow>
+          <mo>&Star;</mo>
+        </mrow>
+      </msubsup>
+    </mrow>
+    <mo>&isin;</mo>
+    <mrow>
+      <mo>[</mo>
+      <msub>
+        <mi>x</mi>
+        <mrow>
+          <mi>i</mi>
+          <mo>-</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+      <mo>,</mo>
+      <msub>
+        <mi>x</mi>
+        <mi>i</mi>
+      </msub>
+      <mo>]</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$x_i^{\star} \in \left[ x_{i - 1} , x_i \right]$$
+
+? \int_0^oo e^{-x^2}dx = 1/2\sqrt{pi}.
+<math title="\int_0^oo e^{-x^2}dx = 1/2\sqrt{pi}.">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <msubsup>
+        <mo>&int;</mo>
+        <mn>0</mn>
+        <mo>&infin;</mo>
+      </msubsup>
+    </mrow>
+    <msup>
+      <mi>e</mi>
+      <mrow>
+        <mo>-</mo>
+        <msup>
+          <mi>x</mi>
+          <mn>2</mn>
+        </msup>
+      </mrow>
+    </msup>
+    <mrow>
+      <mi>d</mi>
+      <mi>x</mi>
+    </mrow>
+    <mo>=</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mn>2</mn>
+    </mfrac>
+    <msqrt>
+      <mrow>
+        <mi>&pi;</mi>
+      </mrow>
+    </msqrt>
+    <mo>.</mo>
+  </mstyle>
+</math>
+$$\int_0^{\infty} e^{- x^2} d x = \frac{1}{2} \sqrt{\pi} .$$
+
+? x/x=(1 if x!=0)
+<math title="x/x=(1 if x!=0)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mi>x</mi>
+      <mi>x</mi>
+    </mfrac>
+    <mo>=</mo>
+    <mrow>
+      <mo>(</mo>
+      <mn>1</mn>
+      <mrow>
+        <mspace width="1ex"/>
+        <mo>if</mo>
+        <mspace width="1ex"/>
+      </mrow>
+      <mi>x</mi>
+      <mo>&ne;</mo>
+      <mn>0</mn>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\frac{x}{x} = ( 1 \mbox{if } x \ne 0 )$$
+
+? int_0^pi sinxdx=-cosx]_0^pi=-cospi-(-cos0)=-(-1)-(-1)=2
+<math title="int_0^pi sinxdx=-cosx]_0^pi=-cospi-(-cos0)=-(-1)-(-1)=2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <msubsup>
+        <mo>&int;</mo>
+        <mn>0</mn>
+        <mi>&pi;</mi>
+      </msubsup>
+    </mrow>
+    <mrow>
+      <mo>sin</mo>
+      <mi>x</mi>
+    </mrow>
+    <mrow>
+      <mi>d</mi>
+      <mi>x</mi>
+    </mrow>
+    <mo>=</mo>
+    <mo>-</mo>
+    <mrow>
+      <mo>cos</mo>
+      <mi>x</mi>
+    </mrow>
+    <mrow>
+      <msubsup>
+        <mo>]</mo>
+        <mn>0</mn>
+        <mi>&pi;</mi>
+      </msubsup>
+    </mrow>
+    <mo>=</mo>
+    <mo>-</mo>
+    <mrow>
+      <mo>cos</mo>
+      <mi>&pi;</mi>
+    </mrow>
+    <mo>-</mo>
+    <mrow>
+      <mo>(</mo>
+      <mo>-</mo>
+      <mrow>
+        <mo>cos</mo>
+        <mn>0</mn>
+      </mrow>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mo>-</mo>
+    <mrow>
+      <mo>(</mo>
+      <mo>-</mo>
+      <mn>1</mn>
+      <mo>)</mo>
+    </mrow>
+    <mo>-</mo>
+    <mrow>
+      <mo>(</mo>
+      <mo>-</mo>
+      <mn>1</mn>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>2</mn>
+  </mstyle>
+</math>
+$$\int_0^{\pi} \sin x d x = - \cos x ]_0^{\pi} = - \cos \pi - ( - \cos 0 ) = - ( - 1 ) - ( - 1 ) = 2$$
+
+? -0.123.456
+<math title="-0.123.456">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>-</mo>
+    <mn>0.123</mn>
+    <mn>.456</mn>
+  </mstyle>
+</math>
+$$- 0.123 .456$$
+
+? epsilon=.001 quad h=-.01 quad pi~~3.14159 quad
+<math title="epsilon=.001 quad h=-.01 quad pi~~3.14159 quad">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>&epsilon;</mi>
+    <mo>=</mo>
+    <mn>.001</mn>
+    <mo>&nbsp;&nbsp;</mo>
+    <mi>h</mi>
+    <mo>=</mo>
+    <mo>-</mo>
+    <mn>.01</mn>
+    <mo>&nbsp;&nbsp;</mo>
+    <mi>&pi;</mi>
+    <mo>&asymp;</mo>
+    <mn>3.14159</mn>
+    <mo>&nbsp;&nbsp;</mo>
+  </mstyle>
+</math>
+$$\epsilon = .001 \,\, h = - .01 \,\, \pi \approx 3.14159 \,\,$$
+
+? u.v
+<math title="u.v">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>u</mi>
+    <mo>.</mo>
+    <mi>v</mi>
+  </mstyle>
+</math>
+$$u . v$$
+
+? RR = uuu_{n=0}^oo[-n,n]
+<math title="RR = uuu_{n=0}^oo[-n,n]">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Ropf;</mo>
+    <mo>=</mo>
+    <mrow>
+      <munderover>
+        <mo>&Union;</mo>
+        <mrow>
+          <mi>n</mi>
+          <mo>=</mo>
+          <mn>0</mn>
+        </mrow>
+        <mo>&infin;</mo>
+      </munderover>
+    </mrow>
+    <mrow>
+      <mo>[</mo>
+      <mo>-</mo>
+      <mi>n</mi>
+      <mo>,</mo>
+      <mi>n</mi>
+      <mo>]</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\mathds{R} = \bigcup_{n = 0}^{\infty} [ - n , n ]$$
+
+? {0} = nnn_{n=1}^oo(- 1/n,1/n)
+<math title="{0} = nnn_{n=1}^oo(- 1/n,1/n)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>{</mo>
+      <mn>0</mn>
+      <mo>}</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <munderover>
+        <mo>&Intersection;</mo>
+        <mrow>
+          <mi>n</mi>
+          <mo>=</mo>
+          <mn>1</mn>
+        </mrow>
+        <mo>&infin;</mo>
+      </munderover>
+    </mrow>
+    <mrow>
+      <mo>(</mo>
+      <mo>-</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mi>n</mi>
+      </mfrac>
+      <mo>,</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mi>n</mi>
+      </mfrac>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\{ 0 \} = \bigcap_{n = 1}^{\infty} \left( - \frac{1}{n} , \frac{1}{n} \right)$$
+
+? ^^^_{i=1}^nphi_i = phi_1 ^^ phi_2 ^^ cdots ^^ phi_n
+<math title="^^^_{i=1}^nphi_i = phi_1 ^^ phi_2 ^^ cdots ^^ phi_n">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <munderover>
+        <mo>&Wedge;</mo>
+        <mrow>
+          <mi>i</mi>
+          <mo>=</mo>
+          <mn>1</mn>
+        </mrow>
+        <mi>n</mi>
+      </munderover>
+    </mrow>
+    <msub>
+      <mi>&phi;</mi>
+      <mi>i</mi>
+    </msub>
+    <mo>=</mo>
+    <msub>
+      <mi>&phi;</mi>
+      <mn>1</mn>
+    </msub>
+    <mo>&and;</mo>
+    <msub>
+      <mi>&phi;</mi>
+      <mn>2</mn>
+    </msub>
+    <mo>&and;</mo>
+    <mo>&ctdot;</mo>
+    <mo>&and;</mo>
+    <msub>
+      <mi>&phi;</mi>
+      <mi>n</mi>
+    </msub>
+  </mstyle>
+</math>
+$$\bigwedge_{i = 1}^n \phi_i = \phi_1 \wedge \phi_2 \wedge \cdots \wedge \phi_n$$
+
+? vvv_{i=1}^nphi_i = phi_1 vv phi_2 vv cdots vv phi_n
+<math title="vvv_{i=1}^nphi_i = phi_1 vv phi_2 vv cdots vv phi_n">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <munderover>
+        <mo>&Vee;</mo>
+        <mrow>
+          <mi>i</mi>
+          <mo>=</mo>
+          <mn>1</mn>
+        </mrow>
+        <mi>n</mi>
+      </munderover>
+    </mrow>
+    <msub>
+      <mi>&phi;</mi>
+      <mi>i</mi>
+    </msub>
+    <mo>=</mo>
+    <msub>
+      <mi>&phi;</mi>
+      <mn>1</mn>
+    </msub>
+    <mo>&or;</mo>
+    <msub>
+      <mi>&phi;</mi>
+      <mn>2</mn>
+    </msub>
+    <mo>&or;</mo>
+    <mo>&ctdot;</mo>
+    <mo>&or;</mo>
+    <msub>
+      <mi>&phi;</mi>
+      <mi>n</mi>
+    </msub>
+  </mstyle>
+</math>
+$$\bigvee_{i = 1}^n \phi_i = \phi_1 \vee \phi_2 \vee \cdots \vee \phi_n$$
+
+? pi~~3.141592653589793
+<math title="pi~~3.141592653589793">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>&pi;</mi>
+    <mo>&asymp;</mo>
+    <mn>3.141592653589793</mn>
+  </mstyle>
+</math>
+$$\pi \approx 3.141592653589793$$
+
+? int_-1^1 sqrt(1-x^2)dx = pi/2
+<math title="int_-1^1 sqrt(1-x^2)dx = pi/2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <msubsup>
+        <mo>&int;</mo>
+        <mrow>
+          <mo>-</mo>
+          <mn>1</mn>
+        </mrow>
+        <mn>1</mn>
+      </msubsup>
+    </mrow>
+    <msqrt>
+      <mrow>
+        <mn>1</mn>
+        <mo>-</mo>
+        <msup>
+          <mi>x</mi>
+          <mn>2</mn>
+        </msup>
+      </mrow>
+    </msqrt>
+    <mrow>
+      <mi>d</mi>
+      <mi>x</mi>
+    </mrow>
+    <mo>=</mo>
+    <mfrac>
+      <mi>&pi;</mi>
+      <mn>2</mn>
+    </mfrac>
+  </mstyle>
+</math>
+$$\int_{- 1}^1 \sqrt{1 - x^2} d x = \frac{\pi}{2}$$
+
+? lim_(x->a) f(x)=l <=> AA epsi > 0 EE delta > 0 : 0 < {:|x-a|:} < delta => {:|f(x) - l|:} < epsi
+<math title="lim_(x-&gt;a) f(x)=l &lt;=&gt; AA epsi &gt; 0 EE delta &gt; 0 : 0 &lt; {:|x-a|:} &lt; delta =&gt; {:|f(x) - l|:} &lt; epsi">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <munder>
+      <mo>lim</mo>
+      <mrow>
+        <mi>x</mi>
+        <mo>&rarr;</mo>
+        <mi>a</mi>
+      </mrow>
+    </munder>
+    <mrow>
+      <mi>f</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>=</mo>
+    <mi>l</mi>
+    <mo>&hArr;</mo>
+    <mo>&forall;</mo>
+    <mi>&epsilon;</mi>
+    <mo>&gt;</mo>
+    <mn>0</mn>
+    <mo>&exist;</mo>
+    <mi>&delta;</mi>
+    <mo>&gt;</mo>
+    <mn>0</mn>
+    <mo>:</mo>
+    <mn>0</mn>
+    <mo>&lt;</mo>
+    <mrow>
+      <mrow>
+        <mo>|</mo>
+        <mi>x</mi>
+        <mo>-</mo>
+        <mi>a</mi>
+        <mo>|</mo>
+      </mrow>
+    </mrow>
+    <mo>&lt;</mo>
+    <mi>&delta;</mi>
+    <mo>&rArr;</mo>
+    <mrow>
+      <mrow>
+        <mo>|</mo>
+        <mrow>
+          <mi>f</mi>
+          <mrow>
+            <mo>(</mo>
+            <mi>x</mi>
+            <mo>)</mo>
+          </mrow>
+        </mrow>
+        <mo>-</mo>
+        <mi>l</mi>
+        <mo>|</mo>
+      </mrow>
+    </mrow>
+    <mo>&lt;</mo>
+    <mi>&epsilon;</mi>
+  </mstyle>
+</math>
+$$\lim_{x \to a} f ( x ) = l \Leftrightarrow \forall \epsilon > 0 \exists \delta > 0 : 0 < | x - a | < \delta \Rightarrow | f ( x ) - l | < \epsilon$$
+
+? 1/(1+1/(1+...))
+<math title="1/(1+1/(1+...))">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mn>1</mn>
+      <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+          <mn>1</mn>
+          <mrow>
+            <mn>1</mn>
+            <mo>+</mo>
+            <mo>...</mo>
+          </mrow>
+        </mfrac>
+      </mrow>
+    </mfrac>
+  </mstyle>
+</math>
+$$\frac{1}{1 + \frac{1}{1 + \ldots}}$$
+
+? x := y
+<math title="x := y">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>x</mi>
+    <mo>:=</mo>
+    <mi>y</mi>
+  </mstyle>
+</math>
+$$x := y$$
+
+? int vec{A} cdot vec{dl} = int int vec{B} cdot vec{dS}
+<math title="int vec{A} cdot vec{dl} = int int vec{B} cdot vec{dS}">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&int;</mo>
+    <mover>
+      <mrow>
+        <mi>A</mi>
+      </mrow>
+      <mo>&rarr;</mo>
+    </mover>
+    <mo>&sdot;</mo>
+    <mover>
+      <mrow>
+        <mi>d</mi>
+        <mi>l</mi>
+      </mrow>
+      <mo>&rarr;</mo>
+    </mover>
+    <mo>=</mo>
+    <mo>&int;</mo>
+    <mo>&int;</mo>
+    <mover>
+      <mrow>
+        <mi>B</mi>
+      </mrow>
+      <mo>&rarr;</mo>
+    </mover>
+    <mo>&sdot;</mo>
+    <mover>
+      <mrow>
+        <mi>d</mi>
+        <mi>S</mi>
+      </mrow>
+      <mo>&rarr;</mo>
+    </mover>
+  </mstyle>
+</math>
+$$\int \vec{A} \cdot \vec{d l} = \int \int \vec{B} \cdot \vec{d S}$$
+
+? 1/(1+1/(1+1/(1+1/(1+...))))=(sqrt5-1)/2
+<math title="1/(1+1/(1+1/(1+1/(1+...))))=(sqrt5-1)/2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mn>1</mn>
+      <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+          <mn>1</mn>
+          <mrow>
+            <mn>1</mn>
+            <mo>+</mo>
+            <mfrac>
+              <mn>1</mn>
+              <mrow>
+                <mn>1</mn>
+                <mo>+</mo>
+                <mfrac>
+                  <mn>1</mn>
+                  <mrow>
+                    <mn>1</mn>
+                    <mo>+</mo>
+                    <mo>...</mo>
+                  </mrow>
+                </mfrac>
+              </mrow>
+            </mfrac>
+          </mrow>
+        </mfrac>
+      </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+      <mrow>
+        <msqrt>
+          <mn>5</mn>
+        </msqrt>
+        <mo>-</mo>
+        <mn>1</mn>
+      </mrow>
+      <mn>2</mn>
+    </mfrac>
+  </mstyle>
+</math>
+$$\frac{1}{1 + \frac{1}{1 + \frac{1}{1 + \frac{1}{1 + \ldots}}}} = \frac{\sqrt{5} - 1}{2}$$
+
+? [a_0, a_1...a_(n-1)]
+<math title="[a_0, a_1...a_(n-1)]">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>[</mo>
+      <msub>
+        <mi>a</mi>
+        <mn>0</mn>
+      </msub>
+      <mo>,</mo>
+      <msub>
+        <mi>a</mi>
+        <mn>1</mn>
+      </msub>
+      <mo>...</mo>
+      <msub>
+        <mi>a</mi>
+        <mrow>
+          <mi>n</mi>
+          <mo>-</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+      <mo>]</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\left[ a_0 , a_1 \ldots a_{n - 1} \right]$$
+
+? [d_0, d_1...d_(n-1)]
+<math title="[d_0, d_1...d_(n-1)]">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>[</mo>
+      <msub>
+        <mi>d</mi>
+        <mn>0</mn>
+      </msub>
+      <mo>,</mo>
+      <msub>
+        <mi>d</mi>
+        <mn>1</mn>
+      </msub>
+      <mo>...</mo>
+      <msub>
+        <mi>d</mi>
+        <mrow>
+          <mi>n</mi>
+          <mo>-</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+      <mo>]</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\left[ d_0 , d_1 \ldots d_{n - 1} \right]$$
+
+? n
+<math title="n">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>n</mi>
+  </mstyle>
+</math>
+$$n$$
+
+? o
+<math title="o">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>o</mi>
+  </mstyle>
+</math>
+$$o$$
+
+? o = sum_(i=0)^n(a_i * prod_(j=0)^(i-1)d_j)
+<math title="o = sum_(i=0)^n(a_i * prod_(j=0)^(i-1)d_j)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>o</mi>
+    <mo>=</mo>
+    <mrow>
+      <munderover>
+        <mo>&sum;</mo>
+        <mrow>
+          <mi>i</mi>
+          <mo>=</mo>
+          <mn>0</mn>
+        </mrow>
+        <mi>n</mi>
+      </munderover>
+    </mrow>
+    <mrow>
+      <mo>(</mo>
+      <msub>
+        <mi>a</mi>
+        <mi>i</mi>
+      </msub>
+      <mo>&sdot;</mo>
+      <mrow>
+        <munderover>
+          <mo>&prod;</mo>
+          <mrow>
+            <mi>j</mi>
+            <mo>=</mo>
+            <mn>0</mn>
+          </mrow>
+          <mrow>
+            <mi>i</mi>
+            <mo>-</mo>
+            <mn>1</mn>
+          </mrow>
+        </munderover>
+      </mrow>
+      <msub>
+        <mi>d</mi>
+        <mi>j</mi>
+      </msub>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$o = \sum_{i = 0}^n \left( a_i \cdot \prod_{j = 0}^{i - 1} d_j \right)$$
+
+? a = [1,1,1]; n = 3; d = [2,3,2]; o = sum_(i=0)^3(a_i * prod_(j=0)^(i-1)d_j) = (1) + (1 * (2)) + (1 * (2*3)) = 1 + 2 + 6 = 9
+<math title="a = [1,1,1]; n = 3; d = [2,3,2]; o = sum_(i=0)^3(a_i * prod_(j=0)^(i-1)d_j) = (1) + (1 * (2)) + (1 * (2*3)) = 1 + 2 + 6 = 9">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+    <mo>=</mo>
+    <mrow>
+      <mo>[</mo>
+      <mn>1</mn>
+      <mo>,</mo>
+      <mn>1</mn>
+      <mo>,</mo>
+      <mn>1</mn>
+      <mo>]</mo>
+    </mrow>
+    <mo>;</mo>
+    <mi>n</mi>
+    <mo>=</mo>
+    <mn>3</mn>
+    <mo>;</mo>
+    <mi>d</mi>
+    <mo>=</mo>
+    <mrow>
+      <mo>[</mo>
+      <mn>2</mn>
+      <mo>,</mo>
+      <mn>3</mn>
+      <mo>,</mo>
+      <mn>2</mn>
+      <mo>]</mo>
+    </mrow>
+    <mo>;</mo>
+    <mi>o</mi>
+    <mo>=</mo>
+    <mrow>
+      <munderover>
+        <mo>&sum;</mo>
+        <mrow>
+          <mi>i</mi>
+          <mo>=</mo>
+          <mn>0</mn>
+        </mrow>
+        <mn>3</mn>
+      </munderover>
+    </mrow>
+    <mrow>
+      <mo>(</mo>
+      <msub>
+        <mi>a</mi>
+        <mi>i</mi>
+      </msub>
+      <mo>&sdot;</mo>
+      <mrow>
+        <munderover>
+          <mo>&prod;</mo>
+          <mrow>
+            <mi>j</mi>
+            <mo>=</mo>
+            <mn>0</mn>
+          </mrow>
+          <mrow>
+            <mi>i</mi>
+            <mo>-</mo>
+            <mn>1</mn>
+          </mrow>
+        </munderover>
+      </mrow>
+      <msub>
+        <mi>d</mi>
+        <mi>j</mi>
+      </msub>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <mo>(</mo>
+      <mn>1</mn>
+      <mo>)</mo>
+    </mrow>
+    <mo>+</mo>
+    <mrow>
+      <mo>(</mo>
+      <mn>1</mn>
+      <mo>&sdot;</mo>
+      <mrow>
+        <mo>(</mo>
+        <mn>2</mn>
+        <mo>)</mo>
+      </mrow>
+      <mo>)</mo>
+    </mrow>
+    <mo>+</mo>
+    <mrow>
+      <mo>(</mo>
+      <mn>1</mn>
+      <mo>&sdot;</mo>
+      <mrow>
+        <mo>(</mo>
+        <mn>2</mn>
+        <mo>&sdot;</mo>
+        <mn>3</mn>
+        <mo>)</mo>
+      </mrow>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>1</mn>
+    <mo>+</mo>
+    <mn>2</mn>
+    <mo>+</mo>
+    <mn>6</mn>
+    <mo>=</mo>
+    <mn>9</mn>
+  </mstyle>
+</math>
+$$a = [ 1 , 1 , 1 ] ; n = 3 ; d = [ 2 , 3 , 2 ] ; o = \sum_{i = 0}^3 \left( a_i \cdot \prod_{j = 0}^{i - 1} d_j \right) = ( 1 ) + ( 1 \cdot ( 2 ) ) + ( 1 \cdot ( 2 \cdot 3 ) ) = 1 + 2 + 6 = 9$$
+
+? o = i_0 + d_0[i_1 + d_1[...[i_(n-1)]]]
+<math title="o = i_0 + d_0[i_1 + d_1[...[i_(n-1)]]]">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>o</mi>
+    <mo>=</mo>
+    <msub>
+      <mi>i</mi>
+      <mn>0</mn>
+    </msub>
+    <mo>+</mo>
+    <msub>
+      <mi>d</mi>
+      <mn>0</mn>
+    </msub>
+    <mrow>
+      <mo>[</mo>
+      <msub>
+        <mi>i</mi>
+        <mn>1</mn>
+      </msub>
+      <mo>+</mo>
+      <msub>
+        <mi>d</mi>
+        <mn>1</mn>
+      </msub>
+      <mrow>
+        <mo>[</mo>
+        <mo>...</mo>
+        <mrow>
+          <mo>[</mo>
+          <msub>
+            <mi>i</mi>
+            <mrow>
+              <mi>n</mi>
+              <mo>-</mo>
+              <mn>1</mn>
+            </mrow>
+          </msub>
+          <mo>]</mo>
+        </mrow>
+        <mo>]</mo>
+      </mrow>
+      <mo>]</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$o = i_0 + d_0 \left[ i_1 + d_1 \left[ \ldots \left[ i_{n - 1} \right] \right] \right]$$
+
+? g o f = Id_(e)
+<math title="g o f = Id_(e)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mi>g</mi>
+      <mi>o</mi>
+    </mrow>
+    <mrow>
+      <mi>f</mi>
+      <mo>=</mo>
+    </mrow>
+    <mi>I</mi>
+    <msub>
+      <mi>d</mi>
+      <mrow>
+        <mi>e</mi>
+      </mrow>
+    </msub>
+  </mstyle>
+</math>
+$$g o f = I d_e$$
+
+? max
+<math title="max">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>max</mo>
+  </mstyle>
+</math>
+$$\max$$

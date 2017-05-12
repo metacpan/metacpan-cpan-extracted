@@ -1,0 +1,17 @@
+.X set -f latex lang fr
+.X set -f xhtml lang fr
+Quelques ponctuations  ! Pour voir qu'est-ce que ça donne! Génial, non ?
+Et voilà: c'est fini; presque. 
+«texte»
+« texte »
+« texte »
+« texte »
+\&:\&:\&:
+.#fl fr-nbsp-auto 0
+Pas d'espace insécable!
+.#fl fr-nbsp-auto 1
+De nouveau des espaces insécables!
+.Bd -t literal
+Frundis::Processing
+.Ed
+.Lk http://bardinflor.perso.aquilenet.fr/frundis/intro-en

@@ -1,0 +1,19 @@
+Revision history for Perl extension Tie::Config
+
+0.04  Sun Jan 27 11:47:18 CET 2002
+	- added warning message if file does not exist.
+
+0.03  Mon Jan 14 20:36:07 EST 2002
+	- renamed to Tie::Config ( universal name )
+	- implemented O_RDONLY access ( default access mode )
+	- assorted minor documentation fixes.
+
+0.02  Sun Jan  6 15:04:14 EST 2002
+	- renamed from Pobox::NConfig to Pobox::Config::Tie
+	- comments is grouped and wroted at the top of the file
+	- imlemented CLEAR ( if undef %hash )
+	- added test suite
+	- code cleanup, file open checking
+
+0.01  Fri Dec  7 22:05:22 EST 2001
+	- start :-{))

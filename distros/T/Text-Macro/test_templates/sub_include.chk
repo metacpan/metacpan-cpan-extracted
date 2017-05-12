@@ -1,0 +1,18 @@
+before include2
+include2 loaded
+after include2
+
+before call sub2
+
+before call sub1
+
+
+
+before call sub3
+in sub3/
+after call sub3
+
+after call sub1
+
+after call sub2
+done

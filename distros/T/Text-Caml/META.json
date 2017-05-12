@@ -1,0 +1,83 @@
+{
+   "abstract" : "Mustache template engine",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Caml",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Caml" : {
+         "file" : "lib/Text/Caml.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/text-caml/issues"
+      },
+      "homepage" : "https://github.com/vti/text-caml",
+      "repository" : {
+         "url" : "git://github.com/vti/text-caml.git",
+         "web" : "https://github.com/vti/text-caml"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "Sergey Zasenko <d3fin3@gmail.com>",
+      "Andrew Rodland <andrew@cleverdomain.org>",
+      "Alex Balhatchet <kaoru@slackwise.net>",
+      "Yves Chevallier <nowox@x0x.ch>",
+      "Ovidiu Stateina <ovidiu.stateina@buzzfeed.com>",
+      "Michael Ivanchenko <ivanchenko.michael.work@gmail.com>",
+      "vti <vti@clarive.com>",
+      "Fernando Oliveira <fco@cpan.org>",
+      "Shoichi Kaji <skaji@cpan.org>",
+      "vti <viacheslav.t@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

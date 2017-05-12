@@ -1,0 +1,112 @@
+#!/usr/bin/env perl
+
+use warnings FATAL => 'all';
+use strict;
+use Getopt::Long    qw(GetOptions);
+use Pod::Usage      qw(pod2usage);
+use Text::Banner    qw();
+
+my %opt;
+parse_args();
+
+my $banner_ref = Text::Banner->new();
+
+for my $word (@ARGV) {
+    $banner_ref->set($word);
+    $banner_ref->fill($opt{fill}) if defined $opt{fill};
+    $banner_ref->rotate('v') if $opt{vert};
+    $banner_ref->size($opt{size});
+    print $banner_ref->get();
+}
+exit;
+
+
+sub parse_args {
+    %opt = (size => 1);
+    GetOptions(\%opt, qw(
+        help
+        fill=s
+        vert
+        size=i
+    )) or pod2usage();
+
+    pod2usage(-verbose => 2) if $opt{help};
+    pod2usage('Error: string required.') unless @ARGV;
+}
+
+
+=head1 NAME
+
+B<banner> - Emulate the Unix "banner" command
+
+=head1 SYNOPSIS
+
+banner [options] string ...
+
+    Options:
+    -help           verbose help
+    -fill   str     character to use as the fill pattern
+    -size   int     size (1-5) [default is 1]
+    -vert           vertical output
+
+=head1 DESCRIPTION
+
+Create a large ASCII representation of an input string and print it to STDOUT.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item B<string>
+
+An input string is required.  Multiple strings are allowed and will be
+output on separate lines.
+
+=back
+
+=head1 OPTIONS
+
+All options can be abbreviated.
+
+=over 4
+
+=item B<-fill>
+
+By default, the output is shown with a different fill pattern for each
+character of the input string.  To use a constant fill pattern for all
+characters, use the C<-fill> option.  This outputs all letters of the
+string C<Hello> with the C<*> character:
+
+    banner -fill '*' Hello
+
+=item B<-size>
+
+By default, the size of the output is 1.  To increase the size (up to 5),
+use the C<-size> option.  If a size outside the range of 1-5 is given, 1
+will be used.
+
+    banner -size 3 foo bar
+
+=item B<-vert>
+
+By default, the output is oriented horizontally.  To rotate the output
+vertically, use the C<-vert> option.
+
+    banner -vert PASSED
+
+=item B<-help>
+
+Show verbose usage information.
+
+=back
+
+=head1 DEPENDENCIES
+
+L<Text::Banner>, L<Getopt::Long>, L<Pod::Usage>
+
+=head1 AUTHOR
+
+Gene Sullivan (gsullivan@cpan.org)
+
+=cut
+

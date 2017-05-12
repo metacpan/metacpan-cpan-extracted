@@ -1,0 +1,12 @@
+use strict;
+use warnings;
+use strict;
+use warnings;
+use Test::More;
+use Test::Flatten;
+
+subtest foo => sub {
+    # no tests;
+};
+
+done_testing;

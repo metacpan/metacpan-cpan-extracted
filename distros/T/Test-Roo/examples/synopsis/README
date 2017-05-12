@@ -1,0 +1,5 @@
+SYNOPIS example
+
+Assuming Test::Roo is installed, rom this directory:
+
+    $ prove -v t

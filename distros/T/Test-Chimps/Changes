@@ -1,0 +1,30 @@
+Revision history for Test-Chimps
+
+0.07    Thu Sep  7 17:37:38 EDT 2006
+        * added a C<table> method to ReportCollection for
+          compatibility with older version of Jifty::DBI
+
+0.06    Sun Aug 13 19:46:45 EDT 2006
+        * forgot -s option to smoker in howto
+        * fix in lister for small numbers of rows in reports
+
+0.05    Sun Aug 13 14:37:23 EDT 2006
+        * added package line to Test/Chimps.pm
+        * added report variables documentation
+        * added mailing list information
+        * added a HowTo
+        * Test::Chimps::Server will now create the db directory
+          if it does not exist when initializing the database
+
+0.04    Fri Jul 21 21:29:15 EDT 2006
+        * added dummy file to work around Module::Install bug
+
+0.03    Fri Jul 21 16:11:32 EDT 2006
+        * fixed extraneous dep
+
+0.02    Wed Jul 12 16:17:00 EDT 2006
+        Split off from main Chimps distribution and first CPAN
+        release.
+
+0.01    Fri Jun 16 13:21:11 EDT 2006
+        First revision.  

@@ -1,0 +1,51 @@
+Index: lib/POE/Component/Generic.pm
+===================================================================
+RCS file: /home/cvs/poco-generic/lib/POE/Component/Generic.pm,v
+retrieving revision 1.3
+diff -u -r1.3 Generic.pm
+--- lib/POE/Component/Generic.pm	11 Apr 2006 08:33:12 -0000	1.3
++++ lib/POE/Component/Generic.pm	12 Apr 2006 08:12:42 -0000
+@@ -1,6 +1,8 @@
+ package POE::Component::Generic;
+ # $Id: tripple.diff 118 2006-04-13 01:20:06Z fil $
+ 
++use strict;
++
+ use POE 0.31;
+ use POE::Wheel::Run;
+ use POE::Filter::Line;
+@@ -161,14 +140,14 @@
+         }
+     }
+ 
+-    $self->{package_map}{ $package } = $map;
++    $self->{package_map}{ $class } = $map;
+ }
+ 
+ ##################################################
+ sub __method_map
+ {
+-    my( $package, $p ) = @_;
+-    ($p =~ m/^(.+)\:\:([^\:]+)/);
++    my( $package, $method ) = @_;
++    ($method =~ m/^(.+)\:\:([^\:]+)/);
+     my $pk = $1;
+     my $sub = $2;
+ 
+@@ -281,13 +260,14 @@
+     $self->__request( $sender->ID, @_[ARG0..$#_] );
+ }
+ 
++
+ ######################################################
+ # Send request to child process
+ sub __request
+ {
+-    my ( $self, $sender, $state, $hash, @args ) = @_;
++    my ( $self, $sender, $method, $hash, @args ) = @_;
+   
+-    warn "$$: processing request $state\n" if ($self->{debug});
++    warn "$$: processing request $method\n" if ($self->{debug});
+     
+     # Get the arguments
+     if (ref( $hash ) eq 'HASH') {

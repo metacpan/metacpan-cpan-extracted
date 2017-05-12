@@ -1,0 +1,200 @@
+Notes on National Language Support (NLS)
+****************************************
+
+This package is internationalized with libintl-perl, a free
+internationalization library for Perl, you will need to install a copy of
+libintl-perl in order to use the package.  You can get libintl-perl from the
+Comprehensive Perl Archive Network CPAN at http://www.cpan.org/.
+
+The following notes are meant to be a quick start guide for somewhat
+experienced users and system administrators and many important details had to
+be omitted for brevity.  If you have any difficulties with the
+internationalization features of this package, no matter if you are a
+programmer, a translator, or an end user, feel free to ask at the mailing list
+for libintl-perl.  To do so, send an e-mail to the address 
+<libintl-perl AT imperia DOT net> (please replace "AT" with a "@", and "DOT"
+with a dot ".").
+
+You can subscribe to this list at 
+
+     http://ml.imperia.org/mailman/listinfo/libintl-perl
+
+A searchable archive of earlier postings is located at
+
+     http://ml.imperia.org/libintl-perl/
+
+You may already find an answer to your question there.
+
+Feel free to include this document in your own Perl packages internationalized
+with libintl-perl, no severe copyright restrictions apply.  You should send
+corrections or improvements to the author Guido Flohr <guido AT imperia DOT
+net>, so that others can benefit from your changes.
+
+The End User's View
+===================
+
+The installation routine for this package will automatically take care that
+your system has a sufficient version of libintl-perl installed.  This is
+basically sufficient for proper operation, but - especially if
+internationalized software is new to you - you should read on carefully in
+order to fully benefit from the internationalization (I18N) features of this
+package.
+
+Perl Setup
+----------
+
+The I18N library libintl-perl will run with a wide range of Perl versions (at
+least from Perl version 5.005_03 to Perl 5.8.0) but you will experience slight
+difference in features and performance depending on the version of Perl you
+use.
+
+With Perl versions prior to 5.7.3 you can use the package for all European
+scripts (including those with Greek or Cyrillic scripts), and also for many
+scripts used outside Europe, like Arabic, Hebrew, Georgian, Vietnamese or
+Thai, more general all scripts using 8 bit charsets.  Other scripts are only
+available if the translations in this package are provided in Unicode and they
+can only be output in Unicode.
+
+Beginning with Perl 5.7.3 the module Encode became part of the Perl core, and
+it offers you a much wider range of possible scripts.  If you plan to use some
+of the lesser used scripts for Chinese, Japanese, and Korean, you should also
+install the module Encode::HanExtra.
+
+Setting Your Language
+---------------------
+
+Most modern systems are already prepared and configured for
+internationalization, and the user interface of the software you have
+installed will already be configured for your preferred language.  Packages
+internationalized with libintl-perl will honor these configuration settings
+and will also operate in your preferred language if the necessary translations
+are available.
+
+The environment variable "LANGUAGE" has the highest precedence for
+translations.  The most common format for this environment variable is a
+(lowercase) two-letter language code and an (uppercase) two-letter country
+code separated by an underscore "_", for example:
+
+     LANGUAGE=fr_BE
+     export LANGUAGE
+
+This will set your language preferences to French ("fr") for Belgium ("BE").
+Other examples are French for France ("fr_FR"), German for Austria ("de_AT"),
+and so on.  You can also omit the country part ("FR", "DE", "IT", "RU", ...)
+in which case a default setting for the country will be assumed.
+
+If there are no translations available for your selected languages, the
+original message (normally in English) will be displayed.
+
+You can also define a chain of languages to be tried separated by a colon:
+
+     LANGUAGE=fr_BE:fr_FR:fr:it
+
+Read this as: "I want translations in French for Belgium.  If they are not
+available try French for France, then any French translation, and finally
+Italian".  Please note that this chain notation is only allowed for the
+environment variable "LANGUAGE", it is not valid for any of the following
+variables.
+
+If "LANGUAGE" is not set, the library checks the variable "LANG".  It has the
+same syntax as "LANGUAGE" but does not allow the preferences chain with the
+colon syntax.  After "LANG" the variable "LC_MESSAGES" (think "locale category
+messages") is tried, and finally "LC_ALL".
+
+Note for Microsoft Windows users: The locale preferences you have configured
+for your system cannot yet be evaluated by libintl-perl.  This may change for
+future versions of libintl-perl but for the moment you have to make do with
+the instructions given above.  In order to set environment variables, you have
+to right-click on the icon "My Computer" on your desktop, select "Properties"
+in the context menu, and then click the tab labelled "Environment variables".
+
+Setting the Output Charset
+--------------------------
+
+Even if you have managed to properly select your preferred language, you may
+still have difficulties reading the program languages, because libintl-perl
+was unable to determine the correct charset to use for messages.  For example,
+it may assume Unicode ("UTF-8") but you really need ISO-Latin-1 (also known as
+"Latin-1" or "ISO-8859-1").  If this is the case, please set the environment
+variable "OUTPUT_CHARSET" to the appropriate value, for example:
+
+     OUTPUT_CHARSET=iso-8859-1
+     export OUTPUT_CHARSET
+
+Charset names are case-insensitive, i. e. "LATIN-1" is the equivalent to
+"Latin-1" or even "lAtIn-1".
+
+Note: The output charset "utf8" is NOT recognized.  Please use the correct
+abbreviation "utf-8" (with a hyphen) instead.
+
+The Translator's View
+=====================
+
+If you want to contribute a new translation to this package, please contact
+the author first.  Somebody may have already started this translation, and
+furthermore the package author will be able to give you detailled instructions
+and help.
+
+Translating a Perl package is not much work and it does not require any
+technical skills.  If you are able to use the software itself, you will also
+be able to contribute a translation for your language.  But why should you do
+that? You are able to read and understand this text and you will also be able
+to understand the English messages that the software spits out by default.
+
+Computers are an integral part of today's society.  Computers are used to
+explore new sources of information, forbidding computers would be a modern
+form of censorship.  Computers may also improve social life, the internet
+helps people to find contacts in their area and all over the world, even if
+they would otherwise be deprived from that because of a handicap, lack of money
+for traveling, or other reasons.  In many societies, the ability to use and 
+handle a computer also has a strong impact on your perspectives in life, you 
+may not be able to find an adequate job because of your lack of computer 
+experience, or you may even lose your job because of that.
+
+Everybody should benefit from computers, regardless of cultural
+background. Computers are expansive goods, and their price is already a high
+barrier to cross.  If computers speak in a foreign language, the learning
+curve gets steeper and the barrier gets even higher.  You can help the people
+that share your native language by contributing a translation.  The author of
+this package has already prepared everything, the rest is up to you!
+
+The Programmer's View
+=====================
+
+You have downloaded this package because you want to use it in your own
+project(s).  The fact that the package is internationalized with libintl-perl
+does not affect its usability in any way.  But you should keep in mind that
+textual messages produced by the package may change according to the locale
+settings at run-time.  This can lead to errors.  For example, if you parse
+error messages produced by the package, you will most probably fail to detect
+what you are looking for, if these error messages are suddenly presented in
+another language or another output charset.
+
+It is probably needless to say that this is bad practice and an indicator for
+a poorly written interface.  Either you have missed the correct method for
+determining the substance of the message in a locale-independent manner, or
+the author of the package has mis-designed the package interface.  In any
+case, this is a technical problem that should be solved by technicians.  You
+should not put that burden on the shoulders of your users but rather solve the
+problem in cooperation with the author of the module that causes it.
+
+If this is absolutely impossible, as a temporary workaround you can completely
+switch off the native language support of the package by setting the
+environment variable "LANGUAGE" to the special value "C":
+
+     BEGIN {
+         $ENV{LANGUAGE} = $ENV{LANG} = "C";
+     }
+
+The value "C" instructs libintl-perl to leave all messages untouched, and you
+can use the package as if it was not internationalized at all.
+
+If the project you are working on is not yet internationalized, you should
+consider to prepare it for internationalization now.  Doing so is only little 
+work for yourself, but results in a large benefit for the users of your 
+software.  The package "libintl-perl" ships with exhaustive documentation for
+programmers and a sample package that you can use as a skeleton for your own
+project(s).  Internationalizing Perl software with libintl-perl is easy, the
+package that this file is a part of, prooves that.
+
+Guido Flohr

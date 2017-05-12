@@ -1,0 +1,417 @@
+--- ./src/readline.c-ini	Fri Sep  6 01:02:34 2002
++++ ./src/readline.c	Sat Sep 28 18:42:08 2002
+@@ -836,7 +836,14 @@ msdos_getch()
+     c = (ch & 0xff00) ? 0 : ch & 0xff;
+ #else /* not DJGPP */
+ # ifdef OS2
+-    char c = getc(stdin);
++    char c;
++
++#if defined(USE_MOUSE) && defined(PIPE_IPC)
++    if (term && term->waitforinput && interactive)
++	c = term->waitforinput();
++    else
++#endif
++    c = getc(stdin);
+ # else				/* not OS2 */
+     char c = getch();
+ # endif				/* not OS2 */
+--- ./src/gpexecute.c-pre	Sat Sep 28 16:55:24 2002
++++ ./src/gpexecute.c	Wed Oct  2 01:05:32 2002
+@@ -216,7 +216,7 @@ pipe_died_handler(int signum)
+ #endif /* PIPE_IPC */
+ 
+ void
+-gp_exec_event(char type, int mx, int my, int par1, int par2)
++gp_exec_event6(char type, int mx, int my, int par1, int par2, char *cmd)
+ {
+     struct gp_event_t ge;
+ #if defined(PIPE_IPC) /* || defined(WIN_IPC) */
+@@ -234,6 +234,8 @@ gp_exec_event(char type, int mx, int my,
+     ge.my = my;
+     ge.par1 = par1;
+     ge.par2 = par2;
++    if (type == GE_cmd)
++	strcpy(ge.text, cmd);
+ #ifdef PIPE_IPC
+     if (pipe_died)
+ 	return;
+@@ -292,3 +294,27 @@ gp_exec_event(char type, int mx, int my,
+     gp_post_shared_mem();
+ #endif
+ }
++
++void
++gp_exec_event(char type, int mx, int my, int par1, int par2)
++{
++   gp_exec_event6(type, mx, my, par1, par2, NULL);
++}
++
++#if defined(PIPE_IPC) && defined(OS2)
++int pausing;
++unsigned long ppidGnu;
++void
++gp_execute(char *s)
++{
++    if (strlen(s) >= sizeof(((struct gp_event_t*)0)->text)) {
++	fprintf(stderr, "Command string too long.\n");
++	return;
++    }
++    gp_exec_event6(GE_cmd, 0, 0, 0, 0, s);
++}
++
++/* Temprorary hacks to simplify updating */
++void* input_from_PM_Terminal;
++# endif
++
+--- ./src/gpexecute.h-pre	Wed Mar  6 08:27:42 2002
++++ ./src/gpexecute.h	Tue Oct  1 23:47:58 2002
+@@ -65,6 +65,13 @@ void gp_execute __PROTO((char *s));
+ 
+ #ifdef PIPE_IPC
+ 
++# ifdef OS2
++extern unsigned long ppidGnu;
++extern int pausing;
++/* Temprorary hack to simplify updating */
++extern void* input_from_PM_Terminal;
++# endif
++
+ extern int pipe_died;
+ RETSIGTYPE pipe_died_handler __PROTO((int signum));
+ 
+--- ./src/os2/gclient.c-pre	Fri Sep  6 12:39:18 2002
++++ ./src/os2/gclient.c	Wed Oct  2 00:33:48 2002
+@@ -2057,6 +2057,16 @@ static void ReadGnu( void* arg )
+ 			 PIPEBUF,
+ 			 PIPEBUF,
+ 			 0xFFFFFFFF) ;
++#ifdef PIPE_IPC
++    hRead = _imphandle(hRead);
++    if (hRead != 1) {
++      dup2(hRead,1);			/* PIPE_IPC writes to 1 */
++      close(hRead);
++      hRead = 1;
++    }
++    setmode(hRead, O_BINARY);
++#endif
++
+     hev = 0 ;       /* OK, gnuplot can try to open npipe ... */
+     DosOpenEventSem( pszSemName, &hev ) ;
+     DosPostEventSem( hev ) ;
+@@ -2080,6 +2090,7 @@ server:
+ 
+         DosRead( hRead, &ppidGnu, 4, &cbR ) ;
+ 
++#ifdef OS2_IPC
+ 	sprintf( mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", (int)ppidGnu );
+ 	if (DosGetNamedSharedMem(&input_from_PM_Terminal,
+ 		mouseShareMemName,
+@@ -2087,12 +2098,16 @@ server:
+ 	   /*now: gray menu items; old code: DosBeep(1440L,1000L); // indicates error */
+ 	   input_from_PM_Terminal = 0;
+ 	   }
+-
+ 	semInputReady = 0;
+ 	  /* semaphore 'semInputReady' must be open later in order to avoid problems */
+ 	  /* with the server mode; also 'bhave_*' init here because of server */
+ 
+ /*        DosPostEventSem( semStartSeq ) ;         // once we've got pidGnu */
++#else
++	/* Temporary hack - need a way of feedback */
++	input_from_PM_Terminal = malloc(4096);
++#endif /* OS2_IPC */
++
+ 	WinPostMsg( hApp, WM_GPSTART, 0, 0 ) ;
+ 
+ 
+--- ./term/x11.trm-pre	Thu Sep  5 12:42:50 2002
++++ ./term/x11.trm	Sat Sep 28 18:51:08 2002
+@@ -524,6 +524,9 @@ X11_waitforinput()
+ }
+ #endif /* USE_MOUSE */
+ 
++#ifdef OS2
++#  define USE_SPAWN	/* We can use a lot of memory, and fork() is slow */
++#endif
+ 
+ TERM_PUBLIC void
+ X11_init()
+@@ -542,18 +545,12 @@ X11_init()
+ 
+    	   X11_ipc = popen(X11_command, "w");
+ #else 
+-#if defined(OS2)
+-      /* FIXME amai 20020219: nice try...
+-       * But popen() does return a non-NULL handle to almost command,
+-       * it's just a new session which will stop if the command does
+-       * not exist... We should stat() for the argument?! */
+-      /* X11_ipc = popen(X11_full_command_path, "w");
+-      if (X11_ipc==NULL) */
+       {
+-   	   X11_ipc = popen(X11_command, "w");
+-      }
+-#else /* !(OSK || OS/2) */
+ 	int fdes[2];
++# ifdef USE_SPAWN
++	int new_stdout, new_stdin, fl_stdout, fl_stdin, pid;
++	char **restore_ptr = NULL;
++# endif
+ # ifdef PIPE_IPC
+ 	int fdes_back[2];
+ 
+@@ -566,13 +563,29 @@ X11_init()
+ 	if (pipe(fdes))
+ 	    perror("pipe() failed:");
+ 
+-	if (fork() == 0) {
++# ifdef USE_SPAWN
++	fl_stdin  = fcntl(0, F_GETFD);
++	fl_stdout = fcntl(1, F_GETFD);
++	new_stdin = dup(0);		/* Preserve stdout */
++	fcntl(new_stdin, F_SETFD, FD_CLOEXEC);
++	new_stdout = dup(1);		/* Preserve stdout */
++	fcntl(new_stdout, F_SETFD, FD_CLOEXEC);
++
++# else
++	if (fork() == 0)
++# endif
++	{
+ 	    /* child */
+ # ifdef PIPE_IPC
+ 	    char noevents[] = "-noevents";
+ 	    if (X11_ALLOW_EVENTS) {
+ 		dup2(fdes_back[1], 1);	/* stdout to pipe */
++		close(fdes_back[1]);
++#  ifdef USE_SPAWN
++		fcntl(fdes_back[0], F_SETFD, FD_CLOEXEC);
++#  else
+ 		close(fdes_back[0]);
++#  endif
+ 	    } else {
+ 		char **ptr;
+ 		for (ptr = optvec; ptr && *ptr; ptr++)
+@@ -580,19 +593,39 @@ X11_init()
+ 		/* tell the driver not to supply any events by
+ 		 * appending "-noevents" to the optvec list. */
+ 		*ptr = noevents;
++#  ifdef USE_SPAWN
++		restore_ptr = ptr;
++#  endif
+ 		*++ptr = (char *) 0;	/* terminate */
+ 	    }
+ # endif	/* PIPE_IPC */
+ 	    /* close the write side of the child's forward fd */
++# ifdef USE_SPAWN
++	    fcntl(fdes[1], F_SETFD, FD_CLOEXEC);
++# else
+ 	    close(fdes[1]);
++# endif
+ 
+ 	    dup2(fdes[0], 0);	/* stdin from pipe */
++# ifndef USE_SPAWN
+ 	    execvp(X11_full_command_path, optvec);
++# else
++	    pid = spawnvp(P_NOWAIT, X11_full_command_path, optvec);
++#  ifdef OS2
++	    if (pid == -1)
++		pid = spawnvp(P_NOWAIT, X11_command, optvec);
++#  endif
++	    if (pid == -1)
++# endif
++          {
+ 	    /* if we get here, something went wrong */
+ 	    fprintf(stderr,"Expected X11 driver: %s\n",X11_full_command_path);
+ 	    perror("Exec failed");
+ 	    fprintf(stderr,"See 'help x11' for more details\n");
++          }
++# ifndef USE_SPAWN
+ 	    exit(EXIT_FAILURE);
++# endif
+ 	}
+ 	/* parent */
+ # ifdef PIPE_IPC
+@@ -604,7 +637,11 @@ X11_init()
+ 	}
+ 	if (X11_ALLOW_EVENTS) {
+ 	    ipc_back_fd = fdes_back[0];
++# ifdef USE_SPAWN
+ 	    close(fdes_back[1]);	/* the parent doesn't need this */
++# else
++	    close(1);			/* Redirected to 1 already */
++# endif
+ 
+ 	    /* apparently multi-character inputs like escape sequences
+ 	     * but also mouse-pasted text got buffered and therefore
+@@ -628,8 +665,19 @@ X11_init()
+ 	/* close the read side of the parent's forward fd */
+ 	close(fdes[0]);
+ 	X11_ipc = fdopen(fdes[1], "w");
++
++# ifdef USE_SPAWN
++	dup2(new_stdout, 1);
++	close(new_stdout);
++	fcntl(1, F_SETFD, fl_stdout);
++	dup2(new_stdin, 0);
++	close(new_stdin);
++	fcntl(0, F_SETFD, fl_stdin);
++	if (restore_ptr)
++	    *restore_ptr = (char *) 0;	/* restore the options */
++# endif
++      }
+ #endif /* !OSK  */
+-#endif /* !OS/2 */
+     }
+ 
+     if (!been_here) {
+--- ./term/pm.trm-ini	Fri Jul 26 09:42:28 2002
++++ ./term/pm.trm	Wed Oct  2 14:44:14 2002
+@@ -165,6 +165,9 @@ static char PM_opts[256] = "";
+ static int PM_optargs = 0;
+ static int PM_plot_number = 0;
+ static char PM_term_title[128] = "";
++#ifdef PIPE_IPC
++static int PM_ipc_back_fd = -1;
++#endif
+ 
+ int mouseGnupmdrv = 0; //PM set to 1 if we are connected to a mouseable gnupmdrv
+ 
+@@ -209,6 +212,9 @@ PM_init()
+ 	    pid = pib->pib_ulpid;
+ 	    fwrite(&pid, 1, 4, PM_pipe);
+ 	    fflush(PM_pipe);
++#ifdef PIPE_IPC
++	    PM_ipc_back_fd = fileno(PM_pipe);
++#endif
+ 	    /* set new options */
+ /*            PM_reset_opts() ; */
+ 	}
+@@ -270,6 +276,9 @@ PM_init()
+ 	} else if (PM_termmode == 0)
+ 	    PM_savepipe = PM_pipe;
+ 	setvbuf(PM_pipe, buffer, _IOFBF, 1024);
++#ifdef PIPE_IPC
++	PM_ipc_back_fd = fileno(PM_pipe);
++#endif
+ 	pid = pib->pib_ulpid;
+ 	fwrite(&pid, 1, 4, PM_pipe);
+ 	fflush(PM_pipe);
+@@ -286,6 +295,80 @@ PM_init()
+     PM_query();
+ }
+ 
++#ifdef PIPE_IPC
++
++#include <sys/time.h>
++
++static void
++PM_serveinput(int wait_stdin)
++{
++    fd_set fds;
++    static struct gp_event_t ge;
++    static int l = 0;
++    int n;
++    int fd = fileno(stdin);
++    struct timeval tv;
++    struct timeval *tvp = NULL;
++
++    /* XXX:  if the input device it not a tty (e.g. /dev/null)
++     *       mouse events are not processed. This is necessary
++     *       as on some systems /dev/null is not selectable.
++     * TODO: should we close the ipc_back_fd in this case ? */
++    if (PM_ipc_back_fd >= 0)
++	do {
++	    FD_ZERO(&fds);
++	    if (wait_stdin) {
++		FD_SET(fd, &fds);
++	    } else {
++		tv.tv_sec = tv.tv_usec = 0;
++		tvp = &tv;
++	    }
++	    FD_SET(PM_ipc_back_fd, &fds);
++	    select(PM_ipc_back_fd + 1, SELECT_FD_SET_CAST & fds, 0, 0, tvp);
++	    if (FD_ISSET(PM_ipc_back_fd, &fds)) {
++		n = read(PM_ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
++		if (n == 0) {
++		    close(PM_ipc_back_fd);
++		    PM_ipc_back_fd = -1;
++		    /* don't close X11_ipc, otherwise later writes
++		     * to it will cause a segfault */
++		    break;	/* outboard driver has stopped */
++		}
++		l += n;
++		if (l == sizeof(ge)) {
++		    /* note: do_event() may not return (if an
++		     * error occurs), so need to reset l first */
++		    l = 0;
++		    do_event(&ge);
++		}
++	    }
++	} while (wait_stdin ? !FD_ISSET(fd, &fds)
++			    : FD_ISSET(PM_ipc_back_fd, &fds) || l );
++}
++
++TERM_PUBLIC int
++PM_waitforinput()			/* Identical to X11 one */
++{
++    PM_serveinput(1);
++# if 0
++/* HBB 20010620: switching back and forth between X11 and a non-GUI
++ * terminal, while stdin is redirected, causes gnuplot to terminate
++ * right after it re-enters the X11 terminal --- read() returns a '\0'
++ * character once, and then EOF. Switching to <stdio.h>'s getc() fixed
++ * that, for me. */
++    if (read(0, &c, 1) != 1)
++	return EOF;
++    else
++	return c;
++# else
++    return getc(stdin);
++# endif	/* 0/1 */
++}
++#else
++#  define PM_serveinput(fl) 	/* Do nothing */
++#endif /* PIPE_IPC */
++
++
+ static void
+ PM_make_servername(char *str)
+ {
+@@ -385,6 +468,8 @@ PM_query()
+ {
+     int rc;
+     ULONG cbR;
++
++    PM_serveinput(0);
+     putc(GR_QUERY, PM_pipe);
+     fflush(PM_pipe);
+     rc = DosRead(fileno(PM_pipe), &term->h_char, sizeof(int), &cbR);
+@@ -629,6 +714,7 @@ PM_pause(char *str)
+ 
+     if (PM_pipe == NULL)
+ 	return 2;
++    PM_serveinput(0);
+     bp = buf;
+     putc(GR_PAUSE, PM_pipe);
+     len = strlen(str) + 1;
+@@ -676,6 +762,8 @@ TERM_PUBLIC int PM_make_palette (t_sm_pa
+     int i;
+     int rc;
+     ULONG cbR, r, g, b, rgbTable[256];
++
++    PM_serveinput(0);
+     putc(GR_MAKE_PALETTE, PM_pipe);
+     if (palette == NULL) {
+ 	/* return maximal number of colours in palette */
+@@ -808,7 +896,11 @@ TERM_TABLE_START(PM_driver)
+     0 /*pointsize */ , TERM_CAN_MULTIPLOT, PM_suspend, PM_resume,
+     PM_fillbox, PM_linewidth
+ #ifdef USE_MOUSE
++#ifdef PIPE_IPC
++    , PM_waitforinput,
++#else
+     , 0 /* PM_waitforinput */, 
++#endif
+     PM_put_tmptext, PM_set_ruler, PM_set_cursor, PM_set_clipboard
+ #endif
+ #ifdef PM3D

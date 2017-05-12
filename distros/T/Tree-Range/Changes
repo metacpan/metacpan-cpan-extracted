@@ -1,0 +1,26 @@
+Changes — The history of the Tree-Range releases  -*- Changes -*-
+
+0.22  2013-08-06
+
+      – Reverted back to the explicit ‘$VERSION’ assignment (were: using
+        a two-argument ‘package’ form.)
+
+0.21  2013-08-05
+
+      – New ‘Tree::Range::conflict’ and ‘Tree::Range::RB::Conflict’
+        classes.
+
+      – New ‘range_free_p’, ‘range_set_over’, ‘range_iter_closure’,
+        ‘min_node’, and ‘max_node’ range tree methods.
+
+      – Removed all the mentions of the ‘base’ package (or pragma.)
+
+      – The key comparison function is now called only once per the
+        underlying tree node being deleted while associating a range
+        with a value (was: called up to two times.)
+
+      – Minor fixes and improvements to the documentation.
+
+0.1   2013-06-26 (7267e680)
+
+      – First public release.

@@ -1,0 +1,27 @@
+---
+abstract: 'Text table layout for matrices of short regular data.'
+author:
+  - 'Sam Graham <libtext-matrix-perl@illusori.co.uk>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.23
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Matrix
+provides:
+  Text::Matrix:
+    file: lib/Text/Matrix.pm
+    version: 1.00
+requires:
+  List::MoreUtils: 0
+  List::Util: 0
+  Storable: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

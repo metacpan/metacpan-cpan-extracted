@@ -1,0 +1,15 @@
+abstract: "text base template expand module\r"
+author: "tateisu C<tateisu@gmail.com >\r"
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Text-Template-Compact
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.3
+version: 0.1.11

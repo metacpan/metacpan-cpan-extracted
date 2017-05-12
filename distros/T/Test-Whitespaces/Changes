@@ -1,0 +1,61 @@
+Revision history for Test::Whitespaces
+
+0.01    2013-01-24
+        * First public release
+
+0.02    2013-02-03
+        * In output stripping max lines length to 78 symbols
+        * Using in output standart ASCII symbol
+        * Added SEE ALSO section with similar modules
+        * Added FAQ about Perltidy
+        * Other small fixes in pod
+
+0.03    2013-02-10
+        * Whitespaces errors output in color
+        * Removed default values and wrote faq about it
+        * Parameter --only_errors in script test_whitespaces
+        * Writing the word "line" instead of obscure "L"
+        * Other small improvements of output format
+
+0.04    2013-06-16
+        * Fixing utf8 bug. RT-85579
+        * Better unicode support
+        * Using Getopt::Long
+        * File README is renamed to README.md and completly rewritten
+        * Added link to the module Test::Tabs in SEE ALSO
+        * Tests are refactored and new tests are added
+
+0.05    2013-06-18
+        * Fixing unicode problem in test _print_diff()
+        * Switched to Dist::Zilla
+        * Small format changes in the file Changes
+        * Fixing warning in t/_print_diff in perl-5.8.9
+        * Small changes in pod
+
+1.0.0   2013-07-14
+        * Using semver for version numbers
+        * Fixing a bug. Not `prove` without `-v` whill show errors
+        * Explicidly specified that Perl 5.8.0 and above is supported
+        * A lot of changes in tests
+
+1.1.0   2013-07-28
+        [Minor]
+        * Simplified SYNOPSIS section
+        * FAQ section why it is better to create test file in xt directory
+
+        [Patch]
+        * Fixing link markup in pod
+
+1.2.0   2013-08-09
+        [Minor]
+        * Added standard directory `examples` to the POD SYNOPSIS
+        * Better POD markup in FAQ section
+        * Added Perl 5.8 to be checked by Travis CI
+
+        [Patch]
+        * Fixing text in SYNOPSIS to match text in FAQ
+        * Fixing misspell
+
+1.2.1   2013-08-12
+        [Patch]
+        * Using word 'whitespace' in POD

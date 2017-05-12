@@ -1,0 +1,258 @@
+Revision history for Perl module Tree::DAG_Node.
+
+1.29  2016-03-01T13:39:00
+	- After another email exchange with Kent Fredric (via RT) and Karen Etheridge (via the
+		cpan-testers-discuss mailing list), I've edited Makefile.PL, again, to indicate that
+		Test::Pod is needed neither for building nor testing this module, but is only needed for
+		development. Specifically, it's used by xt/author/pod.t, and not elsewhere. See
+		https://metacpan.org/pod/CPAN::Meta::Spec#PREREQUISITES for more details.
+
+1.28  2016-03-01T08:43:00
+	- No code changes.
+	- Rework Makefile.PL so File::Spec, File::Temp, Test::More and Test::Pod are in TEST_REQUIRES.
+		Many thanx to Kent Fredric in RT#112568 for this suggestion.
+	- Expand the SYNOPSIS.
+	- Update MANIFEST.SKIP to include .gitignore.
+	- Finally add lightweight git tags to distros, so that if you have a Bash alias such as:
+		alias gl='git log --decorate=full' you'll see something like these 5 lines:
+		commit 2501bd9672244fe698c0f3e48e142637e92eb7e5 (HEAD, tag: refs/tags/1.28, refs/heads/master)
+		Author: ronsavage <ron@savage.net.au>
+		Date:   Tue Mar 1 09:16:46 2016 +1100
+
+		    Update distmeta
+		The command used to generate the tags looks like:
+		git tag -afm 'V 1.28 @ Tue Mar  1 09:16:46 2016' 1.28
+
+1.27  2015-07-12T11:01:00
+	- Remove the line which reads 'use open qw(:std :utf8);'. As Tom Molesworth says:
+		"Specifically, it turns on the UTF-8 encoding layer on STDIO when any code does
+		'use Tree::DAG_Node'. That's no good when code is expecting a different encoding
+		(raw, etc.)". See RT#105798. Karen Etheridge followed up with a comment about it appearing
+		in another module of mine. Then I checked all my modules (including some not intended for
+		publication - Local::*) and found about 28 offenders, with some using it inn multiple files.
+		The original idea came from adopting what Tom Christiansen calls his 'Standard Preamble':
+		http://www.perl.com/pub/2012/04/perlunicook-standard-preamble.html
+		All tests still work after removing that line.
+	- Remove Build.PL. Ship only Makefile.PL.
+
+1.26  2015-04-12T13:37:00
+	- Fix bug in string2hashref(), which failed on some strings, such as {a => 'b, c'}.
+		string2hashref() is called by read_tree().
+		Escaped chars are still not handled.
+	- Add t/string2hash.t to test new code.
+
+1.25  2015-03-22T11:42:00
+	- I've deleted the undocumented sub _dump_quote(), which butchered Unicode characters
+		when it tried to convert ASCII control characters into printable strings (on the assumption
+		all data is ASCII). Thanx to Dr. Petra Steiner (Germany) for discussion and some testing.
+		I hope no-one was relying on this sub in output redirected to disk files, or otherwise
+		saved for later comparisons.
+		Methods which used to call _dump_quote() now just output the node's name by calling
+		quote_name(), which is discussed next. Undefined names are output as the string 'undef'.
+	- Add method quote_name(), which simply returns its input string surrounded by single-quotes.
+	- Add method decode_lol(). This converts the output of tree_to_lol() and tree_to_simple_lol()
+		into something which is easy to read. See scripts/read.tree.pl for sample usage.
+	- Reorder a couple of methods called tree_*(), so that they are in alphabetical order.
+	- Expand the docs for methods tree_to_*(), re undefined node names.
+	- Add scripts/write.tree.pl, which creates the test input file t/tree.utf8.attributes.txt.
+		Note: This latter file is now much more complex that in previous versions.
+	- Add scripts/read.tree.pl, and it's output file scripts/read.tree.log. This program
+		demonstrates the output produced by various methods.
+	- Fix the faulty syntax I had used in Build.PL to identify the github repo.
+	- Delete and re-create github repo after 'git push' failed to upload the new version.
+	- Add LICENSE file to MANIFEST.
+
+1.24  2015-01-25T14:17:00
+	- Clean up discussion in docs of original author's reluctance to allow parameters to new().
+	- Rewrite bareword filehandles (INX) to use a variable (my $fh).
+	- Rename github repo from Tree--DAG_Node to Tree-DAG_Node - My new standard.
+		Update Build.PL and Makefile.PL to match.
+	- Reformat the docs, and this file, slighty, to be <= 100 chars per line - My new standard.
+	- Change horizontal indentation used by node2string() to add 1 space, so '|' lines up underneath
+		the first char of the previous node's name. Use scripts/cut.and.paste.subtrees.pl
+		to see the difference.
+
+1.23  2014-10-20T18:12:00
+	- Change output format when using node2string(), which is called by tree2string().
+		Indentation which used to be '|---' is now '|--- '. So, a tree which used to be printed as:
+		|---:default
+		|   |---::=
+		|   |---action
+		|   |---=>
+		|   |---[values]
+		Is now printed as:
+		|--- :default
+		|   |--- ::=
+		|   |--- action
+		|   |--- =>
+		|   |--- [values]
+		This makes the difference between node names ''/'-', '1'/'-1', etc, much clearer.
+		Apologies to anyone who runs tests which compare the output with pre-existing files.
+
+1.22  2014-02-13T13:14:00
+	- t/read.tree.t was still using File::Slurp :-(.
+
+1.21  2014-02-13T11:14:00
+	- Switch from File::Slurp to File::Slurp::Tiny, on the advice of Karen Etheridge. See RT#92976.
+
+1.20  2014-01-31T09:46:00
+	- After a private email from Paul Howarth (yea!) I see I need File::Temp V 0.19 because that's
+		the version which introduced the newdir() method, as used in the test suite. Sorry for the
+		churn.
+
+1.19  2014-01-30T09:24:00
+	- Set pre-req File::Temp version # to 0 (back from 0.2301). See D A Golden's blog entry:
+		http://www.dagolden.com/index.php/2293/why-installing-distzilla-is-slow-and-what-you-can-do-about-it/.
+
+1.18  2013-09-19T14:24:00
+	- No changes, code or otherwise, except for the version # in the *.pm, this file, and
+		Changelog.ini.
+	- Somehow a corrupted version got uploaded to search.cpan.org, so I've just changed the
+		version #. The file on MetaCPAN was fine.
+	- Thanx to Rob (Sisyphus) for reporting this.
+
+1.17  2013-09-16T15:24:00
+	- Write test temp files in :raw mode as well as utf-8, for MS Windows users.
+	- Take the opportunity to change all utf8 to utf-8, as per the docs for Encode,
+		except for 'use warnings  qw(FATAL utf8);', which doesn't accept utf-8 :-(.
+
+1.16  Mon Sep  9 09;26:00 2013
+	- Accept a patch (slightly modified by me) from Tom Molesworth (see RT#88501):
+		Remove 'use open qw(:std :utf8);' because of its global effect.
+		Replace Perl6::Slurp with File::Slurp, using the latter's binmode option for the encoding.
+		Fix docs where I'd erroneously said File::Slurp didn't support utf8.
+
+1.15  2013-09-06T11:10:00
+	- Replace Path::Tiny with File::Spec, because the former's list of dependencies is soooo long.
+		Changed files: t/read.tree.t, Build.PL and Makefile.PL.
+		See: RT#88435 for an explanation.
+	- Move t/pod.t to xt/author/pod.t.
+
+1.14  2013-09-04T13:44:00
+	- Document the copy() method.
+	- Patch the copy() method so it respects the {no_attribute_copy => 1} option.
+	- Add method read_tree(), for text files. It uses Perl6::Slurp (which supports utf8).
+	- Add methods read_attributes() and string2hashref($s) for use by read_tree().
+	- Add t/read.tree.t to test read_tree().
+	- Add t/tree.utf8.attrbiutes.txt, in utf8, for use by t/read.tree.t.
+	- Add t/tree.with.attributes.txt and t/tree.without.attributes.txt for use by t/read.tree.t.
+	- Make Perl V 5.8.1 a pre-req so we have access to the utf8 pragma.
+
+1.13  2013-08-12T17:16:00
+	- Change the values accepted for the no_attributes option from undef and 1 to 0 and 1.
+		If undef is used, it becomes 0, so pre-existing code will not change behaviour.
+		This makes it easier to pass 0 or 1 from the command line, since there is no default value
+		available.
+
+1.12  2013-07-03T16:38:00
+	- Change text in README referring to licence to match text in body of source, since it was in
+		conflict with the Artistic Licence V 2.0.
+		This was requested by Petr Pisar who packages stuff for Red Hat.
+	- Rename CHANGES to Changes as per CPAN::Changes::SPEC.
+	- Various spelling fixes in the docs, as kindly reported by dsteinbrunner.
+
+1.11  2013-02-04T09:50:00
+	- Correct the date (2012 -> 2013) in this file used for V 1.10.
+	- Correct the text at L<Tree::DAG_Node/AUTHOR> so it refers to Artistic License 2.0,
+		which now matches what it says in Build.PL and Makefile.PL. Resolves RT#83088.
+
+1.10  2013-02-01T08:53:00
+	- Change t/pod.t to look for Test::Pod 1.45, but comment out Test::Pod in Build.PL and
+		Makefile.PL. This means Test::Pod is not used at all if it is not installed.
+		As per RT#83077.
+
+1.09  2012-11-08T12:38:00
+	- No code changes.
+	- Oops. The changes in V 1.08 we made in the other 10 distros, but not in this one.
+		My apologies.
+
+1.08  2012-11-08T12:38:00
+	- No code changes.
+	- For pre-reqs such as strict, warnings, etc, which ship with Perl, set the version # to 0.
+		Reported as RT#80663 by Father Chrysostomos for Tree::DAG_Node.
+
+1.07  2012-11-01T12:47:00
+	- New maintainer: Ron Savage
+	- Pre-emptive apologies for any changes which are not back-compat. No such problems are
+		expected, but the introduction of new methods may disconcert some viewers.
+	- Fix RT#78858, reported by Gene Boggs. Audit code for similar problems.
+	- Fix RT#79506. reported by Ron Savage.
+	- Rename ChangeLog to CHANGES, and add Changelog.ini.
+	- Replace all uses of cyclicity_fault() and Carp::croak with die.
+	- Remove unused methods: decommission_root(), cyclicity_allowed(), cyclicity_fault(),
+		inaugurate_root(), no_cyclicity() and _update_links(). OK - cyclicity_fault() was called
+		once. It just died.
+	- Add methods: format_node(), hashref2string(), is_root(), node2string(), tree2string().
+		tree2string($opts, $node) - unlike draw_ascii_tree() - can optionally print the tree
+		starting at any node. Override format_node(), hashref2string(), and node2string() if
+		desired.
+	- Reformat the POD big-time.
+	- Add Build.PL.
+	- Re-write Makefile.PL.
+	- Remove use vars(@ISA $Debug $VERSION). Replace latter 2 with 'our ...'.
+	- Rename t/00_about_verbose.t to t/about.perl.t.
+	- Add scripts/cut.and.paste.subtrees.pl. Warning: Some trees get into an infinite loop.
+	- Add t/cut.and.paste.subtrees.t.        Warning: Some trees get into an infinite loop.
+	- Document the options (discouraged by Sean) supported in the call to new($hashref).
+
+1.06  1998-12-02T12:00:00
+	- New maintainer: David Hand.
+	- No code changes.
+
+1.05  1998-12-29T12:00:00
+	- Just repackaging.
+	- No code changes.
+
+1.04  1998-02-23T12:00:00
+	- Bugfix: Olegt@dreamtime.net notes a bug in
+		depth_under that apparently always makes it return 0.
+
+1.03  1998-05-13T12:00:00
+	- Superficial changes:
+		Minor doc spiffing-up.
+		Noting my new email address.
+	- In order to keep its symbol table clean, DAG_Node no longer
+		imports routines from Carp and UNIVERSAL.  Should have no effect on existing code.
+	- I went and commented out all the places where I have asserts for
+		non-cyclicity.  I once had the idea that DAG_Node could be a base
+		class for graphs that /could/ allow cyclicity, or something like
+		that, so those assertions would apply for methods that work only
+		for acyclic networks.  But, in time, I realized that almost
+		everything in DAG_Node would have to have such assertions.  Moral
+		of the story: DAG_Node has nearly no code that it could share with
+		a class for anything but DAGs.  And since DAG_Node does everything it
+		can to /keep/ you from making cyclicities, there's no point in
+		constantly having assertions of noncyclicity (especially when
+		these assertions are rather expensive to check).
+
+1.02  Sun Mar  05 12:00:00 1998
+	- Minor bugfixes:
+		Fixed a typo in the docs: corrected one "right_sisters" to "right_sister"
+		Initialized a variable to '' to avoid warnings under -w. Thanks to Gilles Lamiral.
+
+1.01  1998-05-14T12:00:00
+	- Major additions:
+		Scads of new methods.  Still (as far as I know) backward
+		compatible with all previous versions.  Some minor changes in
+		coding, not affecting the interface.
+	- Hopefully more friendly to users that use -w (warnings).
+	- Cautionary tale: I started making big changes to this right around
+		mid-November 1998.  But I kept thinking "oh, ONE MORE change and
+		then I'll release it."  Famous last words!  Other things came up,
+		I forgot what was new and what was different in this module
+		(which is why you don't see a detailed list of differences here),
+		altho apparently somehow I managed to document all the new methods.
+
+0.75  1998-11-03T12:00:00
+	- Minor changes:
+		New methods new_daughter, new_daughter_left.
+		$obj->new constructor syntax now documented.
+		Internal accesses to "daughter" and "mother" attribs are now direct, for efficiency's sake.
+	- Minor improvements to the docs.
+
+0.74  1998-10-28T12:00:00
+	- Whoops, forgot to bundle the README.
+	- No change in the code.
+
+0.73  1998-10-27T12:00:00
+	- First release.

@@ -1,0 +1,46 @@
+NAME
+    Tie::DataUUID - tie interface to Data::UUID;
+
+SYNOPSIS
+      use Tie::DataUUID;
+      tie my $uuid, "Tie::DataUUID";
+
+      print "A uuid is $uuid, another is $uuid\n"
+
+DESCRIPTION
+    A simple tie interface to the Data::UUID module. Yes, this doesn't do
+    much - it's just me being to lazy when I have to keep creating UUIDs
+    from within strings.
+
+    To be really totally and utterly lazy you can use the exporting
+    interface that exports the $uuid variable so you don't even have to tie
+    things yourself:
+
+      use Tie::DataUUID qw($uuid);
+      print "A uuid is $uuid, another is $uuid\n"
+
+    In both cases the standard UUID string (that looks like
+    'E63E9204-9516-11D8-9C9F-AE87831498F6') are produced.
+
+AUTHOR
+    Written by Mark Fowler <mark@twoshortplanks.com>
+
+    Copyright Fotango 2004. All Rights Reserved.
+
+    Copyright Mark Fowler 2009, 2013. All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    Bugs (or feature requests) should be reported via this distribution's
+    CPAN RT queue. This can be found at
+    <https://rt.cpan.org//Dist/Display.html?Queue=Tie-DataUUID>
+
+    You can also address issues by forking this distribution on github and
+    sending pull requests. It can be found at
+    <http://github.com/2shortplanks/Tie-DataUUID>
+
+SEE ALSO
+    Data::UUID, Tie::Scalar
+

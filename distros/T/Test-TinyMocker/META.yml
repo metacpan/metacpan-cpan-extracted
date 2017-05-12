@@ -1,0 +1,27 @@
+---
+abstract: 'a very simple tool to mock external modules'
+author:
+  - 'Alexis Sukrieh <sukria@sukria.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-TinyMocker
+requires:
+  Carp: 0
+  Exporter: 0
+  base: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/sukria/Test-TinyMocker/issues
+  homepage: https://github.com/sukria/Test-TinyMocker/wiki
+  repository: git://github.com/sukria/Test-TinyMocker.git
+version: 0.05

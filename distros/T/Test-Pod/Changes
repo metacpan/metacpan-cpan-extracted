@@ -1,0 +1,236 @@
+Change log for Test::Pod
+
+1.51  2015-07-04 20:36:53Z
+    * convert tooling from Module::Build to ExtUtils::MakeMaker (resolves
+      circular dependency with MB on perl 5.21+)
+
+1.50  2015-05-28T21:42:48Z
+    * Restored support for ignoring directories listed in
+      `%Test::Pod::ignore_dirs`, inadvertently dropped by the switch to
+      File::Find in v1.46. Thanks to Julien ÉLIE for the report and diagnosis!
+
+1.49  2015-05-12T17:30:58Z
+    * Changed license in the README to "Same as Perl" to match the license
+      listed in `META.yml`, and in the POD as of v1.42.
+    * Tightened up the heuristic for matching Perl batch files to require
+      that the file end in `.bat`, as described in the documentation.
+      Patch from Luca Ferrari.
+    * Simplified some of the matching code. Patch from Luca Ferrari.
+    * Transferred ownership of the repository to the perl-pod organization on
+      GitHub.
+    * Removed the Pod testing test from the distribution. Seems silly for a
+      module designed for testing Pod, right? But it's considered best
+      practice to do Pod testing in development only, not in a release.
+
+1.48 - 2013-05-06T04:47:00Z
+    * Fixed test failure with versions of Pod::Simple lower than 3.24. Thanks
+      to Martin Holste and Tatsuhiko Miyagawa for the reports.
+
+1.47 - 2013-05-05T03:14:25Z
+    * Fixed failing test on Pod::Simple 3.27 and higher.
+
+1.46 - 2013-02-16T19:46:17Z
+    * Fixed a crash when `all_pod_files_ok()` finds no files to test. Thanks
+      to H.Merijn Brand.
+    * Switched from custom file searching code to File::Find. Suggested by
+      H.Merijn Brand.
+    * Fixed failing test on Pod::Simple 3.24.
+
+1.45 - 2011-03-09T20:00:59
+    * Removed Module::Build from `build_requires`, since it does nothing
+      out-of-the ordinary, and this keeps it out of the `Makefile.PL`'s
+      `PM_PREREQ`. Per gripe from Peter Scott.
+
+1.44 - 2010-04-26T17:33:02
+    * Restored the `Makefile.PL` by using Module::Build::Compat's
+      "traditional" configuration.
+
+1.43 - 2010-04-21T02:33:59
+    * Reduced prereq for Test::More to 0.62, prereq for Pod::Simple to 3.05,
+      and added File::Spec to the list of prereqs. The prerequisites were
+      needlessly high, and by reducing them Test::Pod can rely on the core
+      versions of those modules in on Perl 5.8.8. Thanks to Chris Wittmer for
+      the patch.
+
+1.42 - 2010-03-10T19:41:20
+    * Fixed invalid Pod link. Thanks to Markus Sonderegger.
+    * Changed license in the POD to "Same as Perl" to match the license listed in
+      `META.yml`.
+    * Changed `Build.PL` to require Module::Build 0.30. It already does in
+      `configure_requires`, but also doing so on the `use` line helps provide
+      a more useful error message in older toolchain tools that don't use
+      `configure_requires`.
+    * Updated `MANIFEST` so that the `README` is actually included in the
+      distribution.
+    * Now recognizes `.bat` files as Perl files when they contain
+      "--*-Perl-*--" on the first line. Thanks to Olivier 'dolmen' Mengué for
+      the patch (RT #46973).
+    * `all_pod_files_ok()` now operates on directories as well as files.
+      Thanks to Adriano Ferreira for the patch (RT #33025).
+    * Files with no POD now have " (no pod)" added to test name. Thanks to
+      Adriano Ferreira for the patch (RT #34955).
+    * Updated documentation to note that `.PL` files are considered Perl
+      files. Thanks to Adriano Ferreira for the spot (RT #34955).
+    * `all_pod_files_ok()` now lets `pod_file_ok()` set the default test name,
+      rather than doing so itself. Thanks to Adriano Ferreira for the spot (RT
+      #34955).
+
+1.41 - 2010-01-14T20:09:25
+    * Maintenance transfered to David Wheeler.
+    * Test::Pod no longer complains about the construct L<text|url>, as it is
+      no longer illegal (as of Perl 5.11.3).
+    * Switched to Module::Build.
+
+1.40 - Sun Jul 12 23:32:11 CDT 2009
+    [THINGS THAT MAY BREAK YOUR CODE]
+    Test::Pod now requires Perl 5.8.0.
+
+    [ENHANCEMENTS]
+    Test::Pod now complains about the illegal construct L<text|url>.
+    Thanks to Paul Miller.
+
+    The list of directories to exclude is now much longer, and is
+    available in %Test::Pod::ignore_dirs.  This list is right now:
+
+        '.bzr' => 'Bazaar',
+        '.git' => 'Git',
+        '.hg'  => 'Mercurial',
+        '.pc'  => 'quilt',
+        '.svn' => 'Subversion',
+        CVS    => 'CVS',
+        RCS    => 'RCS',
+        SCCS   => 'SCCS',
+        _darcs => 'darcs',
+        _sgbak => 'Vault/Fortress',
+
+
+1.26 - Wed Jul 19 09:54:48 CDT 2006
+
+    No new functionality in this version.
+
+    [FIXES]
+    * Fixed a Win32 build bug.
+    * Fixed a bug in the SYNOPSIS.
+
+1.24 - Wed Feb  1 15:18:06 PST 2006
+    [THINGS THAT MAY BREAK YOUR CODE]
+    * The long-deprecated pod_ok() is now gone, along with all its
+      constants.
+
+    [ENHANCEMENTS]
+    * Now runs properly under VMS.  Thanks to Peter Edwards.
+
+1.22 - Sun Oct 23 23:45:51 CDT 2005
+    [ENHANCEMENTS]
+    * Added check for lines with only whitespace before or after a
+      directive.  Older POD formatters can get confused by such
+      lines since they goof up paragraph mode. (RT #6467)
+
+    [FIXES]
+    * Bumped up requirements to Test::Simple 0.62.
+
+1.20 - Wed Jun 23 00:28:35 CDT 2004
+    [ENHANCEMENTS]
+    * Looks in blib/ if there is one, otherwise looks in lib/
+    * Thanks to David Wheeler for nudging.
+
+1.18 - Fri May 28 23:48:28 CDT 2004
+    [FIXES]
+    * Now exports all_pod_files() as advertised.
+    * Also includes *.t files as Pod.
+
+1.16 - Fri Apr 30 17:42:50 CDT 2004
+    [FIXES]
+    * Fixed a warning under 5.8.3.  Also explicitly closes dir handles
+      when searching for POD.
+
+1.14 - Wed Apr 28 23:38:29 CDT 2004
+    [ENHANCEMENTS]
+    * Now runs taint-safe.  No longer uses File::Find.  I'm trying to
+      get all my modules to run under -T correctly, so this is big.
+
+1.12 - Sat Mar 13 10:34:06 CST 2004
+    [ENHANCEMENTS]
+    * all_pod_files() now picks up *.PL files.
+
+1.10 - Tue Mar  9 23:27:16 CST 2004
+    [ENHANCEMENTS]
+    * Almost all of my coverage is almost to 100%.
+
+    [FIXES]
+    * Fixed some test bugs on Win32.
+    * Message problems if the file is missing.
+
+1.08 - Wed Jan 21 00:40:07 CST 2004
+    No new features or fixes.
+
+    [FIXES]
+    * t/all_pod_files.t failed because in my zeal to be a good
+      cross-platform guy, I used File::Spec separators on lists to
+      compare against those coming from File::Find, which uses slashes.
+
+1.06 - Sat Jan 10 08:47:55 CST 2004
+    No new features or fixes.
+
+    [FIXES]
+    * t/all_pod_files.t failed because all_pod_files() returns an
+      unsorted list.  Fixed.
+
+1.04 - Fri Jan  9 22:39:15 CST 2004
+    [ENHANCEMENTS]
+    * all_pod_files() can now take multiple start directories.
+      Thanks to David Wheeler for the patch.
+
+1.03
+    [FIXES]
+    * All the *ok() functions now return the value of the underlying ok().
+
+    [DOCUMENTATION]
+    * All functions are now documented.
+
+    [INTERNALS]
+    * Removed valid_file, which was not being used.
+
+
+1.02 - Mon Nov 10 09:07:39 CST 2003
+    No new functionality.  If 1.00 installed for you, then you don't
+    need 1.02.
+
+    [FIXES]
+    * Fixed dumb test failure in t/all_pod_files.t.
+
+    [DOCUMENTATION]
+    * Spiffed up the SYNOPSIS.
+
+
+1.00 - Mon Nov 10 00:06:30 CST 2003
+    [NEW FEATURES]
+    * Added all_pod_files_ok() method.
+
+0.96 - Sat Oct 11 22:46:00 CST 2003
+    * Removed dependency on IO::Scalar, which was wrong.
+    * Requires newest, most-lenient Pod::Simple.
+    * Added various tests to the t/ hierarchy.  Thanks to David Wheeler
+      for help on this.
+
+0.95 - Mon Mar  3 09:35:00 CST 2002
+    * Rewrote to use Pod::Simple instead of Pod::Checker
+    * Deprecated the pod_ok function.
+    * Added pod_file_ok() to replace pod_ok().
+
+0.90 - Tue Dec  3 18:59:39 CST 2002
+    * things seem to be going well, so this is not in beta :)
+    * cleanup up some formatting
+    * fixed the bad pod test which some Pod::Checker versions reported
+      extra errors
+
+0.72 - Thu Nov 14 20:16:13 CST 2002
+    * cleaned up Makefile.PL and tests
+    * no code changes
+
+0.71 - Mon Sep  9 10:58:22 CDT 2002
+    * added Test::Builder::Tester to PREREQ_PM
+
+0.70 - Thu Sep  5 22:39:13 CDT 2002
+    * pod_ok shows POD errors and warnings if it fails
+    * you can give the test a name

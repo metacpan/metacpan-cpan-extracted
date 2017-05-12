@@ -1,0 +1,15 @@
+Revision history for Perl extension Text::InHTML.
+
+0.0.4  Thu Jul 23 10:37:49 2008
+    - POD w/ TODO about JS based SH functions
+    - remove Syntax::Highlight::Universal as a dependency so it can be installed
+
+0.0.3  Wed Sep 14 11:33:57 2006
+        - re bundled without Mac's ._ files in the tarball
+
+0.0.2  Tue Aug 22 15:09:38 CDT 2006 
+	- fixed SHU mis name space
+
+0.0.1  Mon Aug 21 15:03:13 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Text::InHTML

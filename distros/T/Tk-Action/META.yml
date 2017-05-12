@@ -1,0 +1,31 @@
+---
+abstract: 'action abstraction for tk'
+author:
+  - 'Jerome Quelin'
+build_requires:
+  Module::Build: 0.35
+configure_requires:
+  Module::Build: 0.35
+generated_by: 'Dist::Zilla version 1.093290'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-Action
+provides:
+  Tk::Action:
+    file: lib/Tk/Action.pm
+    version: 1.093390
+requires:
+  English: 0
+  File::Find: 0
+  Moose: 0.92
+  MooseX::Has::Sugar: 0
+  MooseX::SemiAffordanceAccessor: 0
+  Test::More: 0
+  Tk::Sugar: 0
+  perl: 5.010
+resources:
+  homepage: http://search.cpan.org/dist/Tk-Action
+  repository: http://github.com/jquelin/tk-action
+version: 1.093390

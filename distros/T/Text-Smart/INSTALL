@@ -1,0 +1,9 @@
+To install:
+
+	perl Makefile.PL
+	make
+
+and then as root:
+
+	make install
+

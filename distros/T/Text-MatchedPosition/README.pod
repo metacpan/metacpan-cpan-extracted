@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Text::MatchedPosition>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Text-MatchedPosition"><img src="https://secure.travis-ci.org/bayashi/Text-MatchedPosition.png"/></a> <a href="https://coveralls.io/r/bayashi/Text-MatchedPosition"><img src="https://coveralls.io/repos/bayashi/Text-MatchedPosition/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Text::MatchedPosition installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Text::MatchedPosition
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Text::MatchedPosition documentation is available as in POD. So you can do:
+
+    % perldoc Text::MatchedPosition
+
+
+=head1 REPOSITORY
+
+Text::MatchedPosition is hosted on github
+L<http://github.com/bayashi/Text-MatchedPosition>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

@@ -1,0 +1,3 @@
+<TABLE BORDER=1>
+<TR><TD COLSPAN="REF:TableColumns" ALIGN=CENTER><B>Header</B></TD></TR>
+

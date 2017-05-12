@@ -1,0 +1,7 @@
+^\.git
+\.bak$
+^_build
+^Build$
+^blib
+^Debian
+\.tar\.gz$

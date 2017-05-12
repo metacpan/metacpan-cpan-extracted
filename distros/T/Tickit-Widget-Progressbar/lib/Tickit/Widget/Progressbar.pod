@@ -1,0 +1,81 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::Widget::Progressbar
+at lib/Tickit/Widget/Progressbar.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Tickit::Widget::Progressbar - simple progressbar implementation for Tickit
+
+=head1 VERSION
+
+Version 0.101
+
+=head1 SYNOPSIS
+
+ use Tickit::Widget::Progressbar::Horizontal;
+ my $bar = Tickit::Widget::Progressbar::Horizontal->new(
+ 	completion	=> 0.00,
+ );
+ $bar->completion($_ / 100.0) for 0..100;
+
+=head1 DESCRIPTION
+
+Provides support for a 'progress bar' widget. Use the L<Tickit::Widget::Progressbar::Horizontal>
+or L<Tickit::Widget::Progressbar::Vertical> subclasses depending on whether you want the progress
+bar to go from left to right or bottom to top.
+
+=head1 METHODS
+
+=head2 new
+
+Instantiate a new L<Tickit::Widget::Progressbar> object. Takes the following named parameters:
+
+=over 4
+
+=item * completion - a value from 0.0 to 1.0 indicating progress
+
+=item * orientation - 'vertical' or 'horizontal'
+
+=item * direction - whether progress goes forwards (left to right, bottom to top) or backwards
+(right to left, top to bottom).
+
+=back
+
+Note that this is a base class, and the appropriate L<Tickit::Widget::Progressbar::Horizontal>
+or L<Tickit::Widget::Progressbar::Vertical> subclass should be used when instantiating a real
+widget.
+
+=head2 completion
+
+Accessor for the current progress bar completion state - call this with a float value from 0.00..1.00
+to set completion and re-render.
+
+=head1 SEE ALSO
+
+L<Tickit>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<on_pen_changed|Tickit::Widget/on_pen_changed>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<reshape|Tickit::Widget/reshape>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_pen|Tickit::Widget/set_pen>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>, L<window_gained|Tickit::Widget/window_gained>, L<window_lost|Tickit::Widget/window_lost>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2013. Licensed under the same terms as Perl itself.

@@ -1,0 +1,8 @@
+Revision history for Perl extension Tivoli.
+
+0.01  Sun Aug  5 12:07:51 2001
+	- Tivoli Modul created
+	- Tivoli::DateTime	0.03	1999
+	- Tivoli::Logging	0.02	2001-07-18
+	- Tivoli::Fwk		0.04	2001-07-06
+	- Tivoli::Endpoints	0.02	2001-07-06

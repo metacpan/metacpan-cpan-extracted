@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>[% title %]</title>
+
+    <link rel="Stylesheet" href="[% default_css %]" title="Default Theme" type="text/css">
+    <link rel="Alternate StyleSheet" href="default.css" title="Test-AutoBuild Default Theme" type="text/css">
+    <link rel="Alternate StyleSheet" href="default-debug.css" title="Test-AutoBuild Default Debug Theme" type="text/css">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="Generator" content="Test-AutoBuild: http://www.autobuild.org">
+  </head>
+
+  <body>
+
+  <div id="header">
+    <h1><a href="index.html">[% title %]</a></h1>
+
+    <div id="tagline">
+      <p>The Perl framework for performing continuous, unattended, automated software builds</p>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="content">
+    [% content %]
+    </div>
+  </div>
+
+  <div id="panel">
+    <div id="navigation">
+      <div class="section">
+         <h3 id="status"><a href="./index.html">Overall status</a></h3>
+
+	 <table class="data">
+           <tbody>
+             <tr class="odd">
+               <th>Overall status:</th><td class="status_[% status %] big">[%IF status == 'success' %]Good[% ELSE %]Bad[% END %]</td>
+             </tr>
+             <tr class="even">
+               <th>Date:</th><td>[% cycle_start_date %]</td>
+             </tr>
+             <tr class="odd">
+               <th>Start Time:</th><td>[% cycle_start_time_utc %]</td>
+             </tr>
+             <tr class="odd">
+               <th></th><td>[% cycle_start_time_local %]</td>
+             </tr>
+             <tr class="even">
+               <th>Cycle Duration:</th><td>[% cycle_duration %]</td>
+             </tr>
+             <tr class="odd">
+               <th>Build Counter:</th><td>[% build_counter %]</td>
+             </tr>
+             <tr class="even">
+               <th>Build Timestamp:</th><td>[% build_timestamp %]</td>
+             </tr>
+           </tbody>
+	 </table>
+      </div>
+
+      [% IF isos && isos.size > 0 %]
+      <div class="section">
+         <h3 id="isos">ISO Images</h3>
+
+	 <table class="data">
+<!--
+	   <thead>
+             <tr>
+               <th>Filename</th>
+               <th>Size</th>
+             </tr>
+	   </thead>
+-->
+	   <tbody>
+             [% FOREACH isos %]
+             <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+               <th class="filename"><a href="isos/[% filename | html %]">[% label | html %]</a></th>
+               <td class="size big">[% size %]</td>
+             </tr>
+             <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+               <td colspan="2" class="md5sum">[% md5sum %]</td>
+             </tr>
+             [% END %]
+	   </tbody>
+	 </table>
+      </div>
+      [% END %]
+
+    </div>
+  </div>
+
+  <div id="footer">
+    <p>
+      Powered by <a href="http://autobuild.org/">Test-AutoBuild</a>, managed by <a href="mailto:[% admin_email %]">[% admin_name %]</a>.
+      &nbsp;&nbsp;
+      <img src="rss10.png" alt="RSS 1.0"> RSS feed for <a href="index.rss">all modules</a>, or <a href="failures.rss">failed modules</a>
+    </p>
+  </div>
+
+</body>
+</html>

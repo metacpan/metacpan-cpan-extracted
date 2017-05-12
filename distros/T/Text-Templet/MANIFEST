@@ -1,0 +1,7 @@
+Changes
+lib/Text/Templet.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/test.t

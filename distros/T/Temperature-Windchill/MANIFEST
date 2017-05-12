@@ -1,0 +1,16 @@
+Build.PL
+Changes
+etc/kwalitee.pl
+example/mk-graph.pl
+lib/Temperature/Windchill.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-exists.t
+t/10-us.t
+t/20-si.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

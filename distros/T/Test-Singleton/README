@@ -1,0 +1,48 @@
+NAME
+    Test::Singleton - Test for Singleton classes
+
+SYNOPSIS
+        use Test::More tests => 1;
+        use Test::Singleton;
+        is_singleton( "Some::Class", "new", "instance" );
+
+DESCRIPTION
+    ** If you are unfamiliar with testing read Test::Tutorial first! **
+
+    This is asimple, basic module for checking whether a class is a
+    Singleton. A Singleton describes an object class that can have only one
+    instance in any system. An example of a Singleton might be a print
+    spooler or system registry, or any kind of central dispatcher.
+
+    For a description and discussion of the Singleton class, see "Design
+    Patterns", Gamma et al, Addison-Wesley, 1995, ISBN 0-201-63361-2.
+
+SEE ALSO
+    Class::Singleton
+        Implementation of a "Singleton" class.
+
+    Test::Harness
+        Interprets the output of your test program.
+
+AUTHOR
+    Toni Prug <toni@irational.org>
+
+COPYRIGHT
+    Copyright (c) 2006. Toni Prug. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+    See <http://www.gnu.org/licenses/gpl.html>
+

@@ -1,0 +1,6 @@
+%spacy data
+%1, 2, 3: space comment
+%"column drum"; "yet a nother"; "bet your mother"
+-33; 34234.33440; 1.33e7
++0.001; 42.42e-9; 12343.3
+232; 435.42e-4; -23453.1

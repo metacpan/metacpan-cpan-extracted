@@ -1,0 +1,23 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Thread/Queue.pm
+t/00_load.t
+t/01_basic.t
+t/02_refs.t
+t/03_peek.t
+t/04_errs.t
+t/05_extract.t
+t/06_insert.t
+t/07_lock.t
+t/08_nothreads.t
+t/09_ended.t
+t/10_timed.t
+t/11_limit.t
+t/99_pod.t
+t/test.pl
+examples/callback.pl
+examples/queue.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

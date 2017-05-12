@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Telephony/Asterisk/AMI.pm
+t/00-all_prereqs.t
+t/00-load.t
+t/10-ami.t
+t/20-ami-events.t
+t/Fake_Socket.pm
+xt/author/pod-coverage.t
+xt/author/pod-syntax.t

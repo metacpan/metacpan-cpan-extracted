@@ -1,0 +1,120 @@
+NAME
+    TextLinkAds - Retrieve Text Link Ads advertiser data
+
+SYNOPSIS
+        use TextLinkAds;
+        
+    my $tla = TextLinkAds->new;
+        
+    # Fetch link information from text-link-ads.com...
+        my @links = @{ $tla->fetch( $inventory_key ) };
+        
+    # Output the data in some meaningful way...
+        print "<ul>\n";
+        foreach my $link ( @links ) {
+            my $before = $link->{BeforeText} || '';
+            my $after  = $link->{AfterText}  || '';
+
+            print <<"END_OF_HTML";
+            <li>
+                $before <a href="$link->{URL}">$link->{Text}</a> $after
+            </li>
+        END_OF_HTML
+        }
+        print '</ul>';
+
+DESCRIPTION
+    This module fetches advertiser information for a given Text Link Ads
+    publisher account.
+
+    See <http://www.text-link-ads.com/publisher_program.php?ref=23206>.
+
+METHODS
+  ->new( \%options )
+    Instantiate a new TextLinkAds object.
+
+   %options
+    cache
+        Optional. By default this module will try to use Cache::FileCache to
+        store data retrieved from the text-link-ads.com site for one hour.
+        You may use the "cache" parameter to provide an alternative object
+        that implements the Cache::Cache interface. To disable caching set
+        "cache" to a scalar value that resolves to "false".
+
+    tmpdir
+        Optional. A temporary directory to use when caching data. The
+        default behaviour is to use the directory determined by
+        File::Spec->tmpdir.
+
+  ->fetch( $inventory_key, \%options )
+    Fetch advertiser information for the given key. It will first attempt to
+    get the data from the cache where available, and failing that will send
+    a request to text-link-ads.com, using the *_proxy environment variables
+    and the If-Modified_Since request header.
+
+   $inventory_key
+    Required. The XML Key for the desired site as provided by Text Link Ads.
+
+   %options
+    user_agent
+        Optional. In the vanilla code examples provided by Text Link Ads,
+        both the user agent and referer CGI environment variables are
+        included in the URI used to retrieve the XML data. While the link
+        appears to function without them, it would probably be polite to
+        include them where possible.
+
+    referer
+        See above.
+
+DEPENDENCIES
+    TextLinkAds requires the following modules:
+
+    *   Carp
+
+    *   File::Spec
+
+    *   LWP::UserAgent
+
+    *   XML::Simple
+
+    TextLinkAds recommends the following modules:
+
+    *   Cache::FileCache
+
+BUGS
+    Please report any bugs or feature requests to "bug-textlinkads at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TextLinkAds>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc TextLinkAds
+
+    You may also look for information at:
+
+    *   TextLinkAds
+
+        <http://perlprogrammer.co.uk/modules/TextLinkAds/>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/TextLinkAds/>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TextLinkAds>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/TextLinkAds/>
+
+AUTHOR
+    Dave Cardwell <dcardwell@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Dave Cardwell. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

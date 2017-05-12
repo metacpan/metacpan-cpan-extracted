@@ -1,0 +1,27 @@
+lib/Text/Match/FastAlternatives.pm
+FastAlternatives.xs
+trie.c
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+typemap
+t/01_basic.t
+t/02_large.t
+t/03_exact.t
+t/04_at.t
+t/05_unicode.t
+t/06_multilen.t
+t/07_utf8.t
+t/08_magic.t
+t/98_pod.t
+t/99_pod_coverage.t
+t/data/README
+t/data/cities.txt
+t/data/robots.txt
+t/data/user_agents.txt
+t/data/yapc.txt
+misc/performance.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

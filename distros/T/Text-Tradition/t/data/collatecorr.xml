@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key attr.name="language" attr.type="string" for="graph" id="dg0"/>
+  <key attr.name="name" attr.type="string" for="graph" id="dg1"/>
+  <key attr.name="public" attr.type="boolean" for="graph" id="dg2"/>
+  <key attr.name="stemmata" attr.type="string" for="graph" id="dg3"/>
+  <key attr.name="user" attr.type="string" for="graph" id="dg4"/>
+  <key attr.name="version" attr.type="string" for="graph" id="dg5"/>
+  <key attr.name="grammar_invalid" attr.type="boolean" for="node" id="dn0"/>
+  <key attr.name="id" attr.type="string" for="node" id="dn1"/>
+  <key attr.name="is_common" attr.type="boolean" for="node" id="dn2"/>
+  <key attr.name="is_end" attr.type="boolean" for="node" id="dn3"/>
+  <key attr.name="is_lacuna" attr.type="boolean" for="node" id="dn4"/>
+  <key attr.name="is_nonsense" attr.type="boolean" for="node" id="dn5"/>
+  <key attr.name="is_ph" attr.type="boolean" for="node" id="dn6"/>
+  <key attr.name="is_start" attr.type="boolean" for="node" id="dn7"/>
+  <key attr.name="join_next" attr.type="boolean" for="node" id="dn8"/>
+  <key attr.name="join_prior" attr.type="boolean" for="node" id="dn9"/>
+  <key attr.name="language" attr.type="string" for="node" id="dn10"/>
+  <key attr.name="lexemes" attr.type="string" for="node" id="dn11"/>
+  <key attr.name="normal_form" attr.type="string" for="node" id="dn12"/>
+  <key attr.name="rank" attr.type="int" for="node" id="dn13"/>
+  <key attr.name="text" attr.type="string" for="node" id="dn14"/>
+  <key attr.name="alters_meaning" attr.type="int" for="edge" id="de0"/>
+  <key attr.name="annotation" attr.type="string" for="edge" id="de1"/>
+  <key attr.name="displayform" attr.type="string" for="edge" id="de2"/>
+  <key attr.name="extra" attr.type="boolean" for="edge" id="de3"/>
+  <key attr.name="non_correctable" attr.type="boolean" for="edge" id="de4"/>
+  <key attr.name="non_independent" attr.type="boolean" for="edge" id="de5"/>
+  <key attr.name="reading_a" attr.type="string" for="edge" id="de6"/>
+  <key attr.name="reading_b" attr.type="string" for="edge" id="de7"/>
+  <key attr.name="scope" attr.type="string" for="edge" id="de8"/>
+  <key attr.name="type" attr.type="string" for="edge" id="de9"/>
+  <key attr.name="witness" attr.type="string" for="edge" id="de10"/>
+  <graph edgedefault="directed" id="Verbum_uncorrected_CollateX_" parse.edgeids="canonical" parse.edges="100" parse.nodeids="canonical" parse.nodes="17" parse.order="nodesfirst">
+    <data key="dg3"/>
+    <data key="dg0">Latin</data>
+    <data key="dg5">3.2</data>
+    <data key="dg1">Verbum uncorrected CollateX </data>
+    <data key="dg2">0</data>
+    <node id="n0">
+      <data key="dn14">#END#</data>
+      <data key="dn3">1</data>
+      <data key="dn1">__END__</data>
+      <data key="dn13">14</data>
+    </node>
+    <node id="n1">
+      <data key="dn14">#START#</data>
+      <data key="dn7">1</data>
+      <data key="dn1">__START__</data>
+      <data key="dn13">0</data>
+    </node>
+    <node id="n2">
+      <data key="dn10">Latin</data>
+      <data key="dn14">Aue. </data>
+      <data key="dn1">n123</data>
+      <data key="dn13">1</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n3">
+      <data key="dn10">Latin</data>
+      <data key="dn14">et </data>
+      <data key="dn1">n124</data>
+      <data key="dn13">2</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n4">
+      <data key="dn10">Latin</data>
+      <data key="dn14">gracia. </data>
+      <data key="dn1">n125</data>
+      <data key="dn13">2</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n5">
+      <data key="dn10">Latin</data>
+      <data key="dn14">cetera. </data>
+      <data key="dn1">n126</data>
+      <data key="dn13">3</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n6">
+      <data key="dn10">Latin</data>
+      <data key="dn14">Secundo </data>
+      <data key="dn1">n127</data>
+      <data key="dn13">4</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n7">
+      <data key="dn10">Latin</data>
+      <data key="dn14">uera </data>
+      <data key="dn1">n128</data>
+      <data key="dn13">5</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n8">
+      <data key="dn10">Latin</data>
+      <data key="dn14">uero </data>
+      <data key="dn1">n129</data>
+      <data key="dn13">5</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n9">
+      <data key="dn10">Latin</data>
+      <data key="dn14">asserendo </data>
+      <data key="dn1">n130</data>
+      <data key="dn13">6</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n10">
+      <data key="dn10">Latin</data>
+      <data key="dn14">et </data>
+      <data key="dn1">n131</data>
+      <data key="dn13">7</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n11">
+      <data key="dn10">Latin</data>
+      <data key="dn14">cetera. </data>
+      <data key="dn1">n132</data>
+      <data key="dn13">8</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n12">
+      <data key="dn10">Latin</data>
+      <data key="dn14">Secundo </data>
+      <data key="dn1">n133</data>
+      <data key="dn13">9</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n13">
+      <data key="dn10">Latin</data>
+      <data key="dn14">uere </data>
+      <data key="dn1">n134</data>
+      <data key="dn13">10</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n14">
+      <data key="dn10">Latin</data>
+      <data key="dn14">asserendo </data>
+      <data key="dn1">n135</data>
+      <data key="dn13">11</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n15">
+      <data key="dn10">Latin</data>
+      <data key="dn14">ipsam </data>
+      <data key="dn1">n136</data>
+      <data key="dn13">12</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n16">
+      <data key="dn10">Latin</data>
+      <data key="dn14">commendando </data>
+      <data key="dn1">n137</data>
+      <data key="dn13">13</data>
+      <data key="dn2">0</data>
+    </node>
+    <edge source="n1" target="n2" id="e0">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n1" target="n2" id="e1">
+      <data key="de10">Er16</data>
+    </edge>
+    <edge source="n1" target="n2" id="e2">
+      <data key="de10">Gr314</data>
+    </edge>
+    <edge source="n1" target="n2" id="e3">
+      <data key="de10">Kf133</data>
+    </edge>
+    <edge source="n1" target="n2" id="e4">
+      <data key="de10">Kr185</data>
+    </edge>
+    <edge source="n1" target="n2" id="e5">
+      <data key="de10">Kr299</data>
+    </edge>
+    <edge source="n1" target="n2" id="e6">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n1" target="n2" id="e7">
+      <data key="de10">Mü22405</data>
+    </edge>
+    <edge source="n1" target="n2" id="e8">
+      <data key="de10">Mü28315</data>
+    </edge>
+    <edge source="n1" target="n2" id="e9">
+      <data key="de10">MüU151</data>
+    </edge>
+    <edge source="n1" target="n2" id="e10">
+      <data key="de10">Sg524</data>
+    </edge>
+    <edge source="n1" target="n2" id="e11">
+      <data key="de10">Wi3818</data>
+    </edge>
+    <edge source="n2" target="n6" id="e12">
+      <data key="de10">Er16</data>
+    </edge>
+    <edge source="n2" target="n6" id="e13">
+      <data key="de10">Gr314</data>
+    </edge>
+    <edge source="n2" target="n6" id="e14">
+      <data key="de10">Kf133</data>
+    </edge>
+    <edge source="n2" target="n6" id="e15">
+      <data key="de10">Kr185</data>
+    </edge>
+    <edge source="n2" target="n6" id="e16">
+      <data key="de10">Kr299</data>
+    </edge>
+    <edge source="n2" target="n6" id="e17">
+      <data key="de10">Mü22405</data>
+    </edge>
+    <edge source="n2" target="n6" id="e18">
+      <data key="de10">Mü28315</data>
+    </edge>
+    <edge source="n2" target="n6" id="e19">
+      <data key="de10">MüU151</data>
+    </edge>
+    <edge source="n2" target="n6" id="e20">
+      <data key="de10">Wi3818</data>
+    </edge>
+    <edge source="n2" target="n4" id="e21">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n2" target="n4" id="e22">
+      <data key="de10">Sg524</data>
+    </edge>
+    <edge source="n2" target="n3" id="e23">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n3" target="n5" id="e24">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n4" target="n10" id="e25">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n4" target="n6" id="e26">
+      <data key="de10">Sg524</data>
+    </edge>
+    <edge source="n5" target="n6" id="e27">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n6" target="n7" id="e28">
+      <data key="de10">Er16</data>
+    </edge>
+    <edge source="n6" target="n7" id="e29">
+      <data key="de10">Kf133</data>
+    </edge>
+    <edge source="n6" target="n7" id="e30">
+      <data key="de10">Kr185</data>
+    </edge>
+    <edge source="n6" target="n7" id="e31">
+      <data key="de10">Kr299</data>
+    </edge>
+    <edge source="n6" target="n7" id="e32">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n6" target="n7" id="e33">
+      <data key="de10">Mü22405</data>
+    </edge>
+    <edge source="n6" target="n7" id="e34">
+      <data key="de10">Mü28315</data>
+    </edge>
+    <edge source="n6" target="n7" id="e35">
+      <data key="de10">MüU151</data>
+    </edge>
+    <edge source="n6" target="n7" id="e36">
+      <data key="de10">Sg524</data>
+    </edge>
+    <edge source="n6" target="n7" id="e37">
+      <data key="de10">Wi3818</data>
+    </edge>
+    <edge source="n6" target="n8" id="e38">
+      <data key="de10">Gr314</data>
+    </edge>
+    <edge source="n7" target="n9" id="e39">
+      <data key="de10">Er16</data>
+    </edge>
+    <edge source="n7" target="n9" id="e40">
+      <data key="de10">Kf133</data>
+    </edge>
+    <edge source="n7" target="n9" id="e41">
+      <data key="de10">Kr185</data>
+    </edge>
+    <edge source="n7" target="n9" id="e42">
+      <data key="de10">Kr299</data>
+    </edge>
+    <edge source="n7" target="n9" id="e43">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n7" target="n9" id="e44">
+      <data key="de10">Mü22405</data>
+    </edge>
+    <edge source="n7" target="n9" id="e45">
+      <data key="de10">Mü28315</data>
+    </edge>
+    <edge source="n7" target="n9" id="e46">
+      <data key="de10">MüU151</data>
+    </edge>
+    <edge source="n7" target="n9" id="e47">
+      <data key="de10">Sg524</data>
+    </edge>
+    <edge source="n7" target="n9" id="e48">
+      <data key="de10">Wi3818</data>
+    </edge>
+    <edge source="n8" target="n9" id="e49">
+      <data key="de10">Gr314</data>
+    </edge>
+    <edge source="n9" target="n10" id="e50">
+      <data key="de10">Er16</data>
+    </edge>
+    <edge source="n9" target="n10" id="e51">
+      <data key="de10">Gr314</data>
+    </edge>
+    <edge source="n9" target="n10" id="e52">
+      <data key="de10">Kf133</data>
+    </edge>
+    <edge source="n9" target="n10" id="e53">
+      <data key="de10">Kr185</data>
+    </edge>
+    <edge source="n9" target="n10" id="e54">
+      <data key="de10">Kr299</data>
+    </edge>
+    <edge source="n9" target="n10" id="e55">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n9" target="n10" id="e56">
+      <data key="de10">Mü22405</data>
+    </edge>
+    <edge source="n9" target="n10" id="e57">
+      <data key="de10">Mü28315</data>
+    </edge>
+    <edge source="n9" target="n10" id="e58">
+      <data key="de10">MüU151</data>
+    </edge>
+    <edge source="n9" target="n10" id="e59">
+      <data key="de10">Sg524</data>
+    </edge>
+    <edge source="n9" target="n10" id="e60">
+      <data key="de10">Wi3818</data>
+    </edge>
+    <edge source="n10" target="n11" id="e61">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n10" target="n15" id="e62">
+      <data key="de10">Er16</data>
+    </edge>
+    <edge source="n10" target="n15" id="e63">
+      <data key="de10">Gr314</data>
+    </edge>
+    <edge source="n10" target="n15" id="e64">
+      <data key="de10">Kf133</data>
+    </edge>
+    <edge source="n10" target="n15" id="e65">
+      <data key="de10">Kr185</data>
+    </edge>
+    <edge source="n10" target="n15" id="e66">
+      <data key="de10">Kr299</data>
+    </edge>
+    <edge source="n10" target="n15" id="e67">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n10" target="n15" id="e68">
+      <data key="de10">Mü28315</data>
+    </edge>
+    <edge source="n10" target="n15" id="e69">
+      <data key="de10">MüU151</data>
+    </edge>
+    <edge source="n10" target="n15" id="e70">
+      <data key="de10">Sg524</data>
+    </edge>
+    <edge source="n10" target="n15" id="e71">
+      <data key="de10">Wi3818</data>
+    </edge>
+    <edge source="n10" target="n16" id="e72">
+      <data key="de10">Mü22405</data>
+    </edge>
+    <edge source="n11" target="n12" id="e73">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n12" target="n13" id="e74">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n13" target="n14" id="e75">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n14" target="n15" id="e76">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n15" target="n16" id="e77">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n15" target="n16" id="e78">
+      <data key="de10">Er16</data>
+    </edge>
+    <edge source="n15" target="n16" id="e79">
+      <data key="de10">Gr314</data>
+    </edge>
+    <edge source="n15" target="n16" id="e80">
+      <data key="de10">Kf133</data>
+    </edge>
+    <edge source="n15" target="n16" id="e81">
+      <data key="de10">Kr185</data>
+    </edge>
+    <edge source="n15" target="n16" id="e82">
+      <data key="de10">Kr299</data>
+    </edge>
+    <edge source="n15" target="n16" id="e83">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n15" target="n16" id="e84">
+      <data key="de10">Mü28315</data>
+    </edge>
+    <edge source="n15" target="n16" id="e85">
+      <data key="de10">MüU151</data>
+    </edge>
+    <edge source="n15" target="n16" id="e86">
+      <data key="de10">Sg524</data>
+    </edge>
+    <edge source="n15" target="n16" id="e87">
+      <data key="de10">Wi3818</data>
+    </edge>
+    <edge source="n16" target="n0" id="e88">
+      <data key="de10">Er16</data>
+    </edge>
+    <edge source="n16" target="n0" id="e89">
+      <data key="de10">Gr314</data>
+    </edge>
+    <edge source="n16" target="n0" id="e90">
+      <data key="de10">Kf133</data>
+    </edge>
+    <edge source="n16" target="n0" id="e91">
+      <data key="de10">Kr185</data>
+    </edge>
+    <edge source="n16" target="n0" id="e92">
+      <data key="de10">Kr299</data>
+    </edge>
+    <edge source="n16" target="n0" id="e93">
+      <data key="de10">Mü11475</data>
+    </edge>
+    <edge source="n16" target="n0" id="e94">
+      <data key="de10">Mü28315</data>
+    </edge>
+    <edge source="n16" target="n0" id="e95">
+      <data key="de10">MüU151</data>
+    </edge>
+    <edge source="n16" target="n0" id="e96">
+      <data key="de10">Wi3818</data>
+    </edge>
+    <edge source="n16" target="n0" id="e97">
+      <data key="de10">Ba96</data>
+    </edge>
+    <edge source="n16" target="n0" id="e98">
+      <data key="de10">Mü22405</data>
+    </edge>
+    <edge source="n16" target="n0" id="e99">
+      <data key="de10">Sg524</data>
+    </edge>
+  </graph>
+  <graph edgedefault="directed" id="relationships" parse.edgeids="canonical" parse.edges="1" parse.nodeids="canonical" parse.nodes="17" parse.order="nodesfirst">
+    <node id="n0">
+      <data key="dn1">__END__</data>
+    </node>
+    <node id="n1">
+      <data key="dn1">__START__</data>
+    </node>
+    <node id="n10">
+      <data key="dn1">n131</data>
+    </node>
+    <node id="n11">
+      <data key="dn1">n132</data>
+    </node>
+    <node id="n12">
+      <data key="dn1">n133</data>
+    </node>
+    <node id="n13">
+      <data key="dn1">n134</data>
+    </node>
+    <node id="n14">
+      <data key="dn1">n135</data>
+    </node>
+    <node id="n15">
+      <data key="dn1">n136</data>
+    </node>
+    <node id="n16">
+      <data key="dn1">n137</data>
+    </node>
+    <node id="n2">
+      <data key="dn1">n123</data>
+    </node>
+    <node id="n3">
+      <data key="dn1">n124</data>
+    </node>
+    <node id="n4">
+      <data key="dn1">n125</data>
+    </node>
+    <node id="n5">
+      <data key="dn1">n126</data>
+    </node>
+    <node id="n6">
+      <data key="dn1">n127</data>
+    </node>
+    <node id="n7">
+      <data key="dn1">n128</data>
+    </node>
+    <node id="n8">
+      <data key="dn1">n129</data>
+    </node>
+    <node id="n9">
+      <data key="dn1">n130</data>
+    </node>
+    <edge source="n9" target="n14" id="e0">
+      <data key="de6">asserendo </data>
+      <data key="de7">asserendo </data>
+      <data key="de0">0</data>
+      <data key="de9">transposition</data>
+      <data key="de8">local</data>
+    </edge>
+  </graph>
+</graphml>

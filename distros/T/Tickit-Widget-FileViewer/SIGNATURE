@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2cc8d1b646c7fbc547e180b16cf9b5b091927885 Changes
+SHA1 b62bf8b7c1ca43132d72a8584321be20d42e9306 INSTALL
+SHA1 8a4fdad1020dbfd5154c3f042385ce86e2eefea2 LICENSE
+SHA1 da1107e4f36553167f63f97375ed518012b1d345 MANIFEST
+SHA1 8f591a7c405cb82bdfa7ef380aba7fcecafe927b META.json
+SHA1 e2b8a60843be7f72caa99abddb434f6e3e59950c META.yml
+SHA1 ce97dbe8e9aae0f0f67c9c98b2f249441b7c7406 Makefile.PL
+SHA1 07aed7d039488b575d924115e85695291cc6da30 README
+SHA1 c491201a9aca0e21c98e135d77b41e89aee0cbd5 cpanfile
+SHA1 63447e42f868d04f3f32edb308edaa517363196d dist.ini
+SHA1 8707e7edefaad2faaf0cd59039ab1ac1274de17d examples/view.pl
+SHA1 8dd04663e60a0104f5c10b6cd6ea81fcebbaf25b lib/Tickit/Widget/FileViewer.pm
+SHA1 958d7d76a1000c27f9c57ed6b73877c8b103e6aa lib/Tickit/Widget/FileViewer.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 3c5118eee7b382b57c84ec1f2a45e716f7fac476 t/00-compile.t
+SHA1 cb8d91eb3af904dafec826bc614ae3f6ea58234b t/000-report-versions-tiny.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUAxTdAAoJEFKElMNpjtyD9ZoIAIDLaZZ/TKEar2HGKRNleVFs
+s3nMt4FWARQLQhEnT6nBB2YbxF8tr5PVZ3idMAPddW4jkdtgO6uEtfMAGY9bHfke
+P5qKI6Tp8EfI6s3x2EdCowKXcuwrN55yeSMN6LUN/JIYDHpvdg0CG9JQ274Pn6L8
+VlfOVabeaOkuXtgWtUvZcyzv3wIFDJF/UodpJWRTVJaawwa5/PPFPZoqoU5YxwVZ
+RyS+EQA7D6MLF/wCCllskyBF9VbKYDQq+pb35Ua/Gzd+hUW9dQ9VJBuePSN8XxDa
+aDz0qmhk+xSo945nI5RvImxjGiwWylonN5wbQQofdjwJzRaxQ6FvsqKsvymRAak=
+=3wXL
+-----END PGP SIGNATURE-----

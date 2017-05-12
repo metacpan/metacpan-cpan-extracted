@@ -1,0 +1,24 @@
+Revision history for Test-NoPlan
+
+0.0.1   20th May 2009
+    First version public, released on an unsuspecting world.
+
+0.0.2   21st May 2009
+    Export all_plans_ok by default rather than by request since this is why the module is used (see PBP: Exporting)
+    Amend test failure message to be a little clearer
+    Add in Kwalitee tests
+    Amend some prereqs and tests to be optional, for dev work only
+
+0.0.3   25th March 2010
+    Add in resource keywords (repository, bugtracker, homepage) to META.yml and Build.PL
+
+0.0.4   7th April 2010
+    Allow all_plans_ok constructor method to be changed from create to new, depending on how tests will be called (i.e. single test in file uses 'create', multiple tests should use 'new')
+
+0.0.5   7th April 2010
+    Fix silly mistake in 0.0.4 and rework tests accordingly
+    Add in 'ignore_files' option
+    Add THANKS file
+
+0.0.6   9th April 2010
+    Renamed THANKS as AUTHORS

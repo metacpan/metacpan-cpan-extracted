@@ -1,0 +1,15 @@
+---
+name:   TAP version
+tap: |
+  TAP version 13
+  1..1
+  ok 1
+want:
+  passed:               true
+  has_plan:             true
+  planned_tests:        1
+  version:              13
+  tests:
+    - number:   1
+      status:   ok
+      passed:   true

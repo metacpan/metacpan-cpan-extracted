@@ -1,0 +1,60 @@
+{
+   "abstract" : "Tk composite widget Obj editor",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-ObjEditor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "1.01",
+            "Storable" : "0",
+            "Tk" : "0",
+            "Tk::Derived" : "0",
+            "Tk::Dialog" : "0",
+            "Tk::DialogBox" : "0",
+            "Tk::Frame" : "0",
+            "Tk::ObjScanner" : "2.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::More" : "0",
+            "Tie::Hash" : "0",
+            "Tie::Scalar" : "0",
+            "Tk::ROText" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-project@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-ObjEditor"
+      },
+      "homepage" : "https://github.com/dod38fr/perl-tk-objeditor",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dod38fr/perl-tk-objeditor.git",
+         "web" : "https://github.com/dod38fr/perl-tk-objeditor"
+      }
+   },
+   "version" : "2.009"
+}
+

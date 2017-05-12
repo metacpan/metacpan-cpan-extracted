@@ -1,0 +1,8 @@
+#!/bin/sh
+
+for test in *.t ;do
+  if [ $test = "pod.t"  -o  $test = "pod_coverage.t" ]; then
+     continue
+  fi
+  perl -w $test 1
+done

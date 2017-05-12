@@ -1,0 +1,9 @@
+#
+# script for the fit-shell
+#
+# typically, called as follows:
+#
+# perl -MTest::C2FIT -e fit_shell <all.scr
+#
+set inc ../lib:fat
+runall

@@ -1,0 +1,14 @@
+
+Test of complete list: 
+
+REF:FruitList:list_teststyle
+
+
+Test of empty list:
+
+REF:EmptyList:list_teststyle
+
+
+Test of null list:
+
+REF:Null:list_teststyle

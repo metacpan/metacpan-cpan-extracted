@@ -1,0 +1,16 @@
+Revision history for Perl extension Time::Duration::sv
+                          
+2002-10-09  Arthur Bergman  abergman@cpan.org
+	* Release 1.01 -- 
+
+	* Remove the duplicate functions and use
+	  proper functions from Time::Duration
+
+	* Add PREQ_PM to the Makefile.PL
+	
+2002-10-08  Arthur Bergman  abermgan@cpan.org
+
+	* Release 1.00 -- first release of Swedish Time::Duration.
+	
+
+

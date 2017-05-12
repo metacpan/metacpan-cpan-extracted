@@ -1,0 +1,20 @@
+Test-Harness-FileFilter
+
+DESCRIPTION
+Test::Harness::FileFilter is an "extension" to Test::Harness that filters out what files to run from a given set. This is done by defining a regular expression in HARNESS_IGNORE_FILES and/or HARNESS_ACCEPT_FILES. If both are defined the set will first be reduced by HARNESS_IGNORE_FILES.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Claes Jacobsson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

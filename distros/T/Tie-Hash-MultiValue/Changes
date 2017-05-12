@@ -1,0 +1,40 @@
+Revision history for Perl module Tie::Hash::MultiValue
+
+1.02 Wed Dec 16 13:33:32 PST 2009
+	- Author should actually run author tests. POD tests now pass.
+
+1.01 Sat Dec 12 13:09:36 PST 2009
+	- Removed '._' files causing build fails
+	- Reordered revision history
+
+1.00 Fri Dec 11 15:43:50 PST 2009
+	- Compatible API change to support iterators
+	  -- New 'controller' methods can be called on the object
+	     returned by tie()
+	     --- tied(%hash)->refs (default): return all hash entries
+                 as anonymous array refs - this was the old default
+	     --- tied(%hash)->iterators: return each item stored in
+ 	         each key, one at a time, returning 'undef' when there
+                 are no more.
+
+0.06 Fri Feb  8 12:11:35 PST 2008
+	- Teeny-tiny miscapitalization of the module name in the USAGE. :(
+
+0.05 Thu Sep 20 (unknown time) 2007
+	- Corrected 'setting multiple values' example
+
+0.04 Tue Sep 20 17:48:52 2005
+	- Um, I guess I didn't add the pod tests. Trying again.
+
+0.03 Fri Sep  9 11:08:15 2005
+	- Added pod and pod coverage tests
+	- explicit requirement for 5.8 to make sure we don't try
+	  to re-install perl to get this module working
+
+0.02 Sat Aug  7 03:03:45 2004
+	- explicit requirement for Tie::Hash 1.00 to force Perl 5.6
+	  to pick it up
+
+0.01 Wed Apr  7 11:31:18 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+

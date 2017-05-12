@@ -1,0 +1,12 @@
+COPYING
+INSTALL
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+TODO
+bin/edit-db.pl
+lib/Tie/TransactHash.pm
+t/basic.t
+t/order.t
+t/validate.t

@@ -1,0 +1,23 @@
+<html>
+<title>Feature Clustering (LSA)</title>
+<body>
+<h1>Feature Clustering (LSA)</h1>
+</body>
+</html>
+
+Lexical features (unigrams, bigrams, co-occurrences, and target 
+co-occurrences) are clustered in the LSA methodology based on the 
+contexts in which they occur.  
+<br><br>
+This relies on a feature by context representation of the data, which  
+indicates the contexts in which a given feature occurs. This is to be 
+contrasted with the word (unigram) clustering supported by the native 
+SenseClusters methodology, which clusters words based on the words with 
+which they co-occur.
+<br><br>
+The input must be a Senseval-2 formatted test file. It can be either 
+headed or headless. Even if the data has target words (headed) the 
+test_scope option and target co-occurrence features are not available. 
+A separate set of feature selection data (ie., training data) may 
+not be used with feature clustering. 
+

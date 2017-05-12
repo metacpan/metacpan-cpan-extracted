@@ -1,0 +1,24 @@
+---
+abstract: 'Colorize tagged strings for screen output'
+author:
+  - 'Kentaro Kuribayashi, <kentarok@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: MIT
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-ANSIColor-Markup
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Lvalue::Fast: 0
+  Filter::Util::Call: 0
+  HTML::Parser: 0
+  perl: 5.8.1
+version: 0.06

@@ -1,0 +1,166 @@
+Revision history for Test-Database
+
+1.113 Sun May 25 2014
+        [IMPROVEMENTS]
+        - recommend DBD::CSV 0.30 (RT #59437)
+        - recommend DBD::SQLite 1.27 (RT #90631)
+
+1.112 Sat Mar 22 2014
+        [IMPROVEMENTS]
+        - use File::HomeDir's my_home() instead of my_data() (RT #93678)
+        - require YAML::Tiny 1.62 (RT #92916)
+
+1.111 Sun Mar 9 2014
+        [IMPROVEMENTS]
+        - the default value for username() and password() is now undef
+          (RT #93128, thanks to TIMB)
+        [TESTS]
+        - pod tests are now "release" tests, thanks to dzil (RT #85198)
+        [DOCUMENTATION]
+        - declare character encoding for files not in us-ascii (RT #92660)
+        - point to Test::Database::Tutorial in the DESCRIPTION (RT #78337)
+        - improve linkability by having each method at the =head2 level
+
+1.11 Tue May  4 01:03:10 CEST 2010
+        [IMPROVEMENTS]
+        - new version_string() method ensures version constraints on
+          requests work correctly (thanks to Erik Rijkers)
+        - new paramater for requests: regex_version
+        [TESTS]
+        - workaround for DBD::DBM errors in t/25-sql.t, thanks to
+          Birmingham.pm
+
+1.10 Tue Apr 27 00:58:22 CEST 2010
+        [IMPROVEMENTS]
+        - Do not print errors when errors are expected and will be ignored.
+          (Thanks to Barbie - RT #56516)
+        [TESTS]
+        - clean t/10-drivers.t of warnings and errors
+          (Thanks to Barbie & Martin J Evans - RT #56516)
+
+1.09 Tue Mar 16 12:43:08 CET 2010
+        [TESTS]
+        - added t/24-cleanup.t to ensure all databases used by the test suite
+        [DOCUMENTATION]
+        - fixed copyright dates, added an author/license section to the
+          tutorial
+
+1.08 Mon Mar 15 15:00:45 CET 2010
+        [IMPROVEMENTS]
+        - better dependencies lists and META.yml (Alexandr Ciornii)
+        - ignore errors when loading configuration
+        - more accessors added to Test::Database::Handle
+
+1.07 Mon Oct 12 23:25:26 CEST 2009
+        [IMPROVEMENTS]
+        - Test::Database::Driver now has a dbd_version() method
+        - Fixed a bug that created some warnings (thanks to Nicholas Bamber)
+        - Test::Database::Driver::Pg now accepts a 'template' parameter
+          (requested by Adam Kennedy)
+        [TESTS]
+        - Fixed warnings in t/10-drivers.t and t/25-sql.t
+
+1.06 Thu Sep  3 00:39:49 CEST 2009
+        [IMPROVEMENTS]
+        - better basename computation for database created by the module
+        [DOCUMENTATION]
+        - added explanations on how database handles are provided
+          in Test::Database::Tutorial
+        [PREREQUISITES]
+        - Need YAML::Tiny 1.27, since we use LoadFile in scalar context
+
+1.05 Fri Aug 28 00:09:31 CEST 2009
+        [IMPROVEMENTS]
+        - the key configuration item allows to add a unique key
+          to database created by Test::Database (useful when
+          sharing a database between several test hosts)
+        [DOCUMENTATION]
+        - Test::Database::Tutorial now documents how to use the
+          module as a CPAN author or CPAN tester
+
+1.04 Sun Aug 23 03:10:11 CEST 2009
+        [IMPROVEMENTS]
+        - re-introduced Test::Database::Driver::Pg
+        - more robust computation of base_dir()
+        [TESTS]
+        - tests for make_dsn()
+
+1.03 Fri Aug 21 23:01:10 CEST 2009
+        [IMPROVEMENTS]
+        - improved dsn and driver_dsn management
+        - database requests may include version information
+        - more robust test suite
+
+1.02 Sun Aug 16 14:47:04 CEST 2009
+        [IMPROVEMENTS]
+        - re-introduced Test::Database::Driver::mysql
+        - add support for driver_dsn in configuration file
+
+1.01 Sun Aug  2 01:03:22 CEST 2009
+        [IMPROVEMENTS]
+        - re-introduced Test::Database::Driver
+        - Test::Database::Driver supports file-based DBD
+        - Test::Database::Driver maps existing databases to cwd()
+        - Drivers for SQLite, SQLite2, CSV, DBM
+
+1.00 Sat Jul 11 00:39:04 CEST 2009
+        [IMPROVEMENTS]
+        - rewrite/cleanup: the module now only supports a list of DSN
+          provided in the ~/.test-database configuration file
+        - the only two modules lefts for now are Test::Database and
+          Test::Database::Handle
+        [TODO]
+        - future versions will appear shortly and bring back some
+          of the features that appeared in 0.99 and later
+
+0.99_03 Tue Apr  6 22:16:05 CEST 2009
+        [DRIVERS]
+        - new driver for DBD::Pg
+
+0.99_02 Mon Apr  6 03:21:51 CEST 2009
+        [IMPROVEMENTS]
+        - try to connect to non file-based databases to ensure we can,
+          before adding a driver to our collection
+        - cleanup() will only clean loaded drivers
+
+0.99_01 Wed Apr  1 10:01:57 CEST 2009
+        [FIXES]
+        - Do not die when automatically trying to load a non-existent
+          ~/.test-database file
+        [DOCUMENTATION]
+        - add some documentation about REQUESTS
+        [TESTS]
+        - add tests for save_driver() and load_drivers()
+        - increase test coverage to over 95%
+
+0.99 Mon Mar 30 16:20:23 CEST 2009 - Perl QA Hackathon 2009
+        [FEATURES]
+        - completely redesigned interface: the module never starts a
+          database engine, but simply makes pre-configured ones available
+          to test scripts
+        [DRIVERS]
+        - new driver for DBD::SQlite
+        - new driver for DBD::SQlite2
+        - new driver for DBD::CSV
+        - new driver for DBD::DBM
+        - new driver for DBD::mysql
+
+0.02 Tue Oct 14 03:04:27 CEST 2008
+        [FEATURES]
+        - improved database engine setup process, using setup_engine(),
+          start_engine() and stop_engine() methods in the driver classes
+        [DRIVERS]
+        - add a driver for DBD::mysql
+        [TESTS]
+        - fix t/10-drivers.t to not fail on uninstalled DBD drivers
+
+0.01 Fri Oct 10 17:44:24 CEST 2008
+        [FEATURES]
+        - provide a simple interface for obtaining a database handle
+        [DRIVERS]
+        - add a driver for DBD::SQlite
+        - add a driver for DBD::CSV
+        - add a driver for DBD::DBM
+        [TESTS]
+        - over 97% test coverage
+

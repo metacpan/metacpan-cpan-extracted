@@ -1,0 +1,249 @@
+Revision history for perl program frundis.
+
+2.15 2016-04-03
+
+    - fixed interpolation of arguments in arguments for textual macros
+    - reworked parsing (only parse once: faster)
+
+2.14 2016-01-02
+
+    - Use Text::Diff and File::DirCompare instead of "diff" in tests, to be
+      more portable ("diff -ru" behaves differently on Solaris, and does not
+      exist on Win32).
+    - Fix escaping of special characters in image caption.
+
+2.13 2016-01-01
+
+    - Fix another issue with perls <= 5.12.5 (don't use "a" modifier in
+      regexps)
+
+2.12 2016-01-01
+
+    - Fix issue with perls <= 5.12.5 (#110825)
+      Skip a non portable test on win32.
+
+2.11 2015-12-31
+
+    - Fix some tests issues on FreeBSD. (#110788)
+      Better diagnostics for tests of test.t.
+
+2.10 2015-12-30
+
+    - mainly some internal cleanups and factorizing.
+      First release on CPAN.
+
+2.09 2015-11-24
+
+    - fixed bug in href in content.opf for images, and some other stuff related
+      to images in epub.
+
+2.08 2015-10-18
+
+    - now Sm and Bm/Em macros can be used inline in some other macros,
+      including, but not limited to, header macros.
+
+2.07 2015-06-27
+
+    - improved some error messages.
+    - whitespace is now always any Unicode space character.
+    - improved whitespace handling in some corner cases.
+    - better handling of filehandles scope (internal).
+
+2.06 2015-04-11
+
+    - split in several modules, use Module::Build for distribution, and
+      "cpanize" things in order to be able to upload in the future to CPAN.
+    - add a module interface Text::Frundis. In particular, this allows to
+      faster processing of many little independent files and, as a consequence,
+      a faster test suite execution.
+    - Print only chapters for table of contents summary, as in html. It used to
+      have one more depth level.
+    - add support for custom perl filters in Bf and If macros
+
+2.5 2015-03-01
+
+    - fixed bug in url escaping.
+
+2.4 2015-02-21
+
+    - handle multi-character punctuations delimiters such as ")." and the like
+      without requiring to set "#fl ns". As before, "\&" can be used to don't
+      interpret the argument as a delimiter.
+    - fixed bug in Lk automatic labels (that is, when no label is provided).
+      Non breaking spaces were added when lang was set to fr (the link itself
+      was ok).
+
+2.3.3 2015-02-14
+
+    - minor fixes in manpages
+    - added vim syntax file for frundis
+
+2.3.2 2015-02-08
+
+    - several minor fixes in manpages
+
+2.3.1 2015-02-06
+
+    - don't add non-breaking spaces in Bd -t literal blocks, as this doesn't
+      make sense.
+
+2.3.0 2015-02-06
+
+    - If only a single quote character " appears after a space in a macro line,
+      all the remaining line forms a single argument (previously no behaviour
+      was specified for such cases).
+    - now the "white space" separating arguments are always the white spaces
+      characters of the ASCII range.
+    - Some fixes and improvements to perl object interface. In particular, new
+      flags can be defined.
+    - now -columns argument in tables can also be for LaTeX a normal LaTeX
+      specification, such as "|c|c|".
+    - #if invocations can be nested
+    - there is now a draft of a FAQ (in french only for now)
+    - perl macros are compiled in a dedicated package (so name clashes are no
+      more possible)
+
+2.2.0 2015-01-29
+
+    - manual identifiers (html "id" attribute, and LaTeX labels) can now be
+      specified in Bd, Bm and Sm macros, and then be referenced with the Sx
+      macro.
+    - poems can now be referenced with Sx.
+    - new parameters can be created in perl macros, and then used by users with
+      "X set" as with built-in parameters.
+    - fixed bug in manual toc generation (that is, a Tc invocation) for EPUB
+      output format.
+    - many cleanups in the code.
+
+2.1.0 2015-01-26
+
+    - add method to get html href suitable for custom index generation and
+      cross-references
+    - add two methods for simple custom list of cross-references generation
+    - fix incorrect value in html id after # in table cross-references.
+    - Sx now gets a -t argument so that it can be used for tables, figures, or
+      any user defined references.
+    - fixed bug in variable reinitialization between passes
+
+2.0.0 2015-01-24
+
+    This is a major release, and there are some incompatibilities, specially
+    for macros such as `de', `st', etc.
+
+    - Dt and Dd macros are gone, now `.X set document-title' and `.X set
+      document-date' should be used.
+    - `de' and `st' were renamed to #de and #fl (flag) respectively.
+    - de accepts now a -f option as many others macros, instead of an
+      additional argument.
+    - new #dv macro that allows to define variables that can be interpolated.
+    - new #if macro that allows to ignore or not content according to a
+      specific format and/or a boolean argument.
+    - The Tc macro supports now many options. In particular, a -summary flag
+      that reduces the depth of the table of contents, and a -mini flag that
+      allows to print local table of contents, for example at the beginning of
+      a chapter. Tc supports also list of figures and list of tables.
+    - The #de macro supports a -perl flag that allows to define a new macro
+      with perl code using a simple object-oriented api. This allows to extend
+      frundis in practically any way. More object methods should come in the
+      future.
+    - support for EPUB3 version, and html5 through an `.X set' declaration. Now
+      generated EPUB should be standard compliant.
+    - parameter xhtml-index allows to customize index page in indexed html
+      export.
+    - many small bug fixes and improvements to documentation
+
+1.4.2 2015-01-16 
+
+    - add simple html coloration script for frundis source files in tools/
+      directory
+    - fix handling of allowed macro check for user defined macros.
+
+1.4.1 2015-01-15 
+
+    - improve diagnostics, many syntax errors are no more fatal. Add a level
+      field in error format, in the spirit of the mandoc(1) program.
+    - unit tests for all warnings
+    - misc improvements to test-suite, and minor bug-fixes
+    - added examples to man page
+
+1.4.0 2015-01-14 
+
+    - fixed handling of -ns option in Dd and Dt macros
+    - improved significantly test coverage
+    - new `.st' macro to change state. Currently, space mode can be set with
+      this macro, and auto non-breaking space mode when lang is set to fr can
+      be switched.
+
+1.3.1 2015-01-13 
+
+    - new P paragraph optional title wasn't escaped properly
+    - several macro arguments weren't properly escaped
+
+1.3.0 2015-01-11 
+
+    - A punctuation character is no more considered a delimiter if it is the
+      only argument in a Sm macro, which allows to not precede it by \& in such
+      cases.
+    - Deprecate -c option of Ft and Bf macros, and issue a warning, as it is
+      useless, a simple P macro before does the job.
+    - Allow to attach a title to a paragraph (\paragraph{title} in LaTeX and <p
+      class="paragraph"><strong class="paragraph">title</strong> in XHTMl).
+
+1.2.0 2015-01-10 
+
+    - implement -name option for Sx macro, to provide arbitrary text for the
+      link text.
+    - support for adding arbitrary epub metadata with epub-metadata parameter
+    - (possibly breaking change) assume utf8, as this allows for better support
+      for punctuation characters, and better automatic add of non-breaking
+      spaces for french.  This means that files under another encoding should
+      be converted to utf8 before passing them to frundis.
+    - added support for filtering as-is text through external command
+    - fixed navigation in multi-file XHTML when there are sections and
+      subsections.
+
+1.1.4 2015-01-04 
+
+    - allow space between `.' and macro name, for better compatibility with
+      roff syntax.
+    - make epub-cover not mandatory in epub, as this wasn't documented anyway.
+    - better diagnostic when epub-css file is specified, but doesn't exist.
+
+1.1.3 2015-01-01 
+
+    - warn if there are trailing spaces.
+    - fixed line number in some diagnostics.
+    - factorize "Processing" code.
+    - lines with only a `.' with optional trailing space are no more an error,
+      for better compatibility with roff syntax.
+    - improved manpages.
+
+1.1.2 2014-12-29 
+
+    - improved/fixed paragraph handling: no important changes, apart avoiding
+      empty paragraphs in html before headers and display blocks if a .P macro
+      appears before, and allow for more fine-grained control in LaTeX of blank
+      lines before and after display blocks.
+    - fixed bug in handling of text just before a nested display block.
+
+1.1.1 2014-12-28 
+
+    - fixed issues in handling of automatic title-page in xhtml/epub
+    - improved some diagnostics
+    - minor improvements in manpage, including a complete example for
+      generating EPUB
+    - updated example stylesheet in examples/, and add example of LaTeX
+      minimal preamble
+
+1.1.0 2014-12-27 
+
+    - fixed command line usage message, and improved diagnostics for wrong
+      command line options
+    - fixed some errors in frundis(1) manpage
+    - added basic support for tables
+    - improved diagnostics
+    - minor fixes in frundis_syntax(5) manpage
+
+1.0.0 2014-12-26 
+
+    - First release

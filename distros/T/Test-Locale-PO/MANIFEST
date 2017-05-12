@@ -1,0 +1,16 @@
+CHANGES
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Test/Locale/PO.pm
+t/author-critic.t
+t/po/de.po
+t/po/fr.po
+t/po/it.po
+t/release-pod-syntax.t
+t/test-locale-po.t
+t/use.t

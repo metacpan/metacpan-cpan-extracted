@@ -1,0 +1,98 @@
+NAME
+    Types::Interface - fuzzy role constraints
+
+SYNOPSIS
+       package MyApp::Role::FooBar {
+          use Moose::Role;
+      
+          requires qw( foo bar );
+       }
+   
+       package MyApp::Class::FooBar {
+          use Moose;
+      
+          # Note, the following line is commented out!
+          # with qw( MyApp::Role::FooBar );
+      
+          sub foo { 1 }
+          sub bar { 2 }
+       }
+   
+       package MyApp::Class::Main {
+          use Moose;
+          use Types::Interface qw(ObjectDoesInterface);
+      
+          has foobar => (
+             is   => 'ro',
+             isa  => ObjectDoesInterface['MyApp::Role::FooBar'],
+          );
+       }
+   
+       # This is ok...
+       my $obj = MyApp::Class::Main->new(
+          foobar => MyApp::Class::FooBar->new(),
+       );
+
+DESCRIPTION
+    Types::Interface provides a type constraint library suitable for Moose,
+    Mouse, and Moo attributes, Kavorka signatures, and any other place where
+    type constraints might be used.
+
+    The type constraints it provides are based on the idea that an object or
+    class might fulfil all the requirements for a role without explicitly
+    consuming the role.
+
+  Type Constraints
+    This module provides the following type constraints:
+
+    `ObjectDoesInterface[$role]`
+        This type constraint accepts any object where `$object->DOES($role)`
+        returns true, or where the object happens to provide all the methods
+        that form part of the role's API, according to Role::Inspector.
+
+        This type constraint is a subtype of `Object` from Types::Standard.
+
+    `ObjectDoesInterface[$role, private => 0]`
+        This type constraint accepts any object where `$object->DOES($role)`
+        returns true, or where the object happens to provide all the public
+        methods (i.e. those not starting with an underscore) that form part of
+        the role's API, according to Role::Inspector.
+
+    `ClassDoesInterface[$role]`
+        This type constraint accepts any class name where
+        `$class->DOES($role)` returns true, or where the class happens to
+        provide all the methods that form part of the role's API, according to
+        Role::Inspector.
+
+        This type constraint is a subtype of `LoadableClass` from
+        Types::LoadableClass.
+
+    `ClassDoesInterface[$role, private => 0]`
+        This type constraint accepts any class name where
+        `$class->DOES($role)` returns true, or where the object class to
+        provide all the public methods (i.e. those not starting with an
+        underscore) that form part of the role's API, according to
+        Role::Inspector.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-Interface>.
+
+SEE ALSO
+    Type::Tiny::Manual, Types::LoadableClass, Types::Standard,
+    Role::Inspector.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

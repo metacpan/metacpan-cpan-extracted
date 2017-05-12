@@ -1,0 +1,17 @@
+The user_agents.txt file in this directory contains a duplicate-free list of
+User-Agent: headers sent to real, production web servers.  I've accumulated
+this list from a variety of sources.  I believe it contains no data that could
+identify any individual.  It bears the same copyright and licensing terms as
+the rest of the Text::Match::FastAlternatives module.
+
+The robots.txt file is a manually-selected list of substrings of the strings in
+user_agents.txt.  The idea is that each of the substrings in robots.txt
+identifies a user-agent that's probably not under direct manual control for
+each of the requests it makes (that is, a robot).  However, I didn't put much
+effort into ensuring that the list is accurate.  So trying to use this list
+directly for this purpose is probably unwise.  I wanted to use the real robots
+list we use (from http://www.iab.net/standards/spiders/Spiders.asp) but that
+list isn't freely available.  I cooked up the list in this robots.txt file
+specifically for testing Text::Match::FastAlternatives, so it bears the same
+copyright and licensing terms as the rest of the Text::Match::FastAlternatives
+module.

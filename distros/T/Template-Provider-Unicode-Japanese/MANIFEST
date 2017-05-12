@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Template/Provider/Unicode/Japanese.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00load.t
+t/01perlcritic.t
+t/02pod.t
+t/03pod-coverage.t
+t/data/ascii
+t/data/jis
+t/data/sjis
+t/data/ujis
+t/data/utf8
+t/Template-Provider-Unicode-Japanese.t

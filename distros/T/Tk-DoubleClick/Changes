@@ -1,0 +1,13 @@
+Revision history for Tk-DoubleClick
+
+0.04 2015/12/06
+   * Added missing Tk dependency
+
+0.03 2015/12/05 
+
+   * Moved pod-coverage test to xt/ (Closes: RT 108422) (dddumont)
+   * Fixed pod doc to fix pod-coverage tests (ddumont)
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

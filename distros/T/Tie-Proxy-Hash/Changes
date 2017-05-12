@@ -1,0 +1,12 @@
+Revision history for Perl extension Tie-Proxy-Hash.
+
+1.01  Wed Mar 19  4:42PM GMT 2003
+	- Fix permissions on configure
+
+1.00  Thu Jan 30  6:33PM GMT 2003
+	- original version
+	- full tie interface with hash merging implemented
+	- tieargs handled
+	- basic translations handled
+	- fully documented :-)
+

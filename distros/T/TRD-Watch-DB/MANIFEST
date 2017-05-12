@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/TRD-Watch-DB.t
+lib/TRD/Watch/DB.pm
+META.yml                                 Module meta-data (added by MakeMaker)

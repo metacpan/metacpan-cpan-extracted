@@ -1,0 +1,31 @@
+From: abeltje@hu01.hhit.hsholland.nl
+
+Automated smoke report for patch 18358 on linux - 2.4.17-1 (i686/2 cpus)
+          v1.16_08      using cc version 2.96 20000731 (Red Hat Linux 7.2 2.96-112.7.2)
+O = OK
+F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown
+    c = Configure, m = make, t = make test-prep
+
+ 18358   Configuration (common) -Dcf_email=abe@ztreet.demon.nl
+-------  --------------------------------------------------------------
+O O O O
+O O O O  -Duse64bitint
+O O O O  -Duse64bitall
+O O O O  -Duselongdouble
+O O O O  -Dusemorebits
+O O O O  -Duse64bitall -Duselongdouble
+O O O O  -Duseithreads
+O O O O  -Duseithreads -Duse64bitint
+O O O O  -Duseithreads -Duse64bitall
+O O O O  -Duseithreads -Duselongdouble
+O O O O  -Duseithreads -Dusemorebits
+O O O O  -Duseithreads -Duse64bitall -Duselongdouble
+| | | +- PERLIO = perlio -DDEBUGGING
+| | +--- PERLIO = stdio  -DDEBUGGING
+| +----- PERLIO = perlio
++------- PERLIO = stdio
+
+Summary: PASS
+

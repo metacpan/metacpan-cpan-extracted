@@ -1,0 +1,34 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_about.html />
+
+<div class="width6 last">
+  <div class="section_header">A Quick Introduction to Job Scheduling</div>
+  <p>
+    A Job Scheduler is an application that is responsible for scheduling
+    and running programs (also known as jobs or tasks).  The user
+    specifies dependencies between jobs, and the job scheduler runs each
+    job only after all its dependencies have been met.  Dependencies may
+    be the successful completion of another job (the prerequisite job), or
+    a certain time of day, or ownership of a limited resource or token. 
+  </p>
+
+  <p>
+    The job scheduler is also responsible for allowing the operator to
+    rerun failed (or even successful) jobs, mark jobs as having succeeded
+    or failed, and querying the status of all the jobs that are scheduled
+    to run.
+  </p>
+  
+  <p>
+    Collections of jobs that are dependent on each other are known as
+    Families.  Some schedulers call Families "Job Streams."
+  </p>
+  
+
+
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

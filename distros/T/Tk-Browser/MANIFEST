@@ -1,0 +1,15 @@
+Artistic
+Browser.ad
+Browser.pm
+Browser/LibModule.pm
+Browser/LibModuleSymbol.pm
+Browser/LibSymbolRef.pm
+Browser/Makefile.PL
+Browser/MYMETA.json
+Browser/MYMETA.yml
+Makefile.PL
+MANIFEST			This list of files
+mkbrowser
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

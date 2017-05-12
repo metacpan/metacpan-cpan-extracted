@@ -1,0 +1,26 @@
+
+Changes made in Sense-Clusters version 0.65 during version 0.67
+
+Anagha Kulkarni  kulka020@d.umn.edu
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@d.umn.edu
+
+1. Renamed the "co-occurrence" feature type for first order context 
+   representation to "target co-occurrence" in discriminate.pl                  -Anagha
+
+2. Made "bigram" as the default feature type for both order1 and
+   order2 context representation.                                               -Anagha
+
+3. Added the new feature type of normal "co-occurrences" to order1
+   representation                                                               -Anagha
+
+4. Added the new feature type of "target co-occurrences" to order2
+   representation                                                               -Anagha
+
+5. Updated the web-interface. Now it starts with a start-up page 
+   where one can select the type of experiment (With Head, 
+   Headless or Word Clustering) and then the applicable options
+   are only shown on the following screens.                                     -Anagha
+
+(Changelog-v0.65to0.67 Last Updated on 06/04/2005 by Anagha)
+

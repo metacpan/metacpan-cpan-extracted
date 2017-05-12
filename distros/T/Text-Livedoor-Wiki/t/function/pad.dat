@@ -1,0 +1,35 @@
+=== basic
+--- wiki 
+&pad(ps3){sankaku,shikaku}
+--- html
+<div class="pad"><div class="pad-inner"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/sankaku.gif" /><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/shikaku.gif" /></div></div>
+=== some additional text
+--- wiki
+&pad(ps3){sankaku,plus,shikaku,some text}
+--- html
+<div class="pad"><div class="pad-inner"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/sankaku.gif" /><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/plus.gif" /><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/shikaku.gif" />some text</div></div>
+=== some bad texts
+--- wiki
+&pad(ps3){sankaku,<script type="text/javascript">alert('Howdy!!')</script>}
+--- html
+<div class="pad"><div class="pad-inner"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/sankaku.gif" />&lt;script type=&quot;text/javascript&quot;&gt;alert('Howdy!!')&lt;/script&gt;</div></div>
+=== upper case pad_type
+--- wiki
+&pad(PS3){maru}
+--- html
+<div class="pad"><div class="pad-inner"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/maru.gif" /></div></div>
+=== no pad type
+--- wiki
+&pad(ps64){sankaku,shikaku,there is no such video game as ps64}
+--- html
+&amp;pad(ps64){sankaku,shikaku,there is no such video game as ps64}
+=== spaces around buttons
+--- wiki
+&pad(ps3){sankaku, shikaku , maru}
+--- html
+<div class="pad"><div class="pad-inner"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/sankaku.gif" /> shikaku  maru</div></div>
+=== blank
+--- wiki
+&pad(ps3){shikaku,,maru,}
+--- html
+<div class="pad"><div class="pad-inner"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/shikaku.gif" /><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/pad/ps3/maru.gif" /></div></div>

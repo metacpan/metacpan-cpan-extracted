@@ -1,0 +1,48 @@
+---
+abstract: 'prereqs of Padre::Plugins'
+author:
+  - 'Gabor Szabo'
+build_requires:
+  Test::More: 0
+  Test::NeedsDisplay: 1.05
+distribution_type: module
+generated_by: 'Module::Install version 0.790'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Padre-Plugin-Deps
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Acme::PlayCode: 0
+  App::Nopaste: 0
+  Audio::Beep: 0
+  CSS::Minifier::XS: 0
+  Capture::Tiny: 0.03
+  Crypt::Blowfish: 0
+  Crypt::CBC: 0
+  ExtUtils::InferConfig: 0.02
+  ExtUtils::InstallPAR: 0.01
+  HTML::Lint: 0
+  HTML::Tidy: 0
+  JavaScript::Beautifier: 0.03
+  JavaScript::Minifier::XS: 0
+  LWP::Simple: 0
+  PAR::Packer: 0
+  Padre: 0.21
+  Perl::Critic: 0
+  Perl::Tidy: 0
+  Syntax::Highlight::Engine::Kate: 0
+  Text::Autoformat: 0
+  WebService::Validator::CSS::W3C: 0
+  WebService::Validator::HTML::W3C: 0
+  Wx::Perl::DataWalker: 0.02
+  XML::Tidy: 0
+  XML::XPath: 0
+  YAML::XS: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.12

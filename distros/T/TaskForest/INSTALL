@@ -1,0 +1,12 @@
+To install the module, use the standard procedure:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you don't have root permissions, to install in a local directory, say,
+~/perl, replace the first command with:
+
+perl Makefile.PL prefix=~/perl
+

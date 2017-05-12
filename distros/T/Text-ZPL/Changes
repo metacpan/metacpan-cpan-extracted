@@ -1,0 +1,33 @@
+Revision history for Perl module Text-ZPL
+
+0.003001 2016-06-27
+
+  - Add 'zpl_to_pl' command line utility
+
+  - Improved error message regarding existing properties
+
+  - Various optimizations
+
+  - Packaging changes; use cpanfile dependency management
+
+0.002002 2014-10-08
+
+  - Fix a test case on perl-5.8/5.10
+
+0.002001 2014-10-07
+
+  - Add Text::ZPL::Stream decoder
+
+0.001003 2014-10-05
+
+  - Skip empty arrays when encoding
+
+  - Expanded documentation & tests
+
+0.001002 2014-10-05
+
+  - Fix handling of empty sections
+
+0.001001 2014-10-05
+
+  - Initial release

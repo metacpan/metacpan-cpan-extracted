@@ -1,0 +1,45 @@
+---
+abstract: 'Create a skeleton for a test file based on an existing module'
+author:
+  - 'Manni Heumann <github@lxxi.org>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Skeleton-Generator
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Skeleton::Generator:
+    file: lib/Test/Skeleton/Generator.pm
+    version: 0.06
+requires:
+  Class::Inspector: 0
+  File::Basename: 0
+  File::Path: 0
+  Getopt::Long: 0
+  HTML::Template: 0
+  Pod::Usage: 0
+  Sub::Information: 0
+  autodie: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com//mannih/Test-Skeleton-Generator/issues
+  homepage: https://github.com//mannih/Test-Skeleton-Generator
+  repository: git://github.com//mannih/Test-Skeleton-Generator.git
+version: 0.06
+x_authority: cpan:MANNI

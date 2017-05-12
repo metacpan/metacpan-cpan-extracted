@@ -1,0 +1,2 @@
+"John Doe","0123456789","Examplestreet 1a"
+"Otto Normalverbraucher","1234567890","Beispielstraﬂe 1a"

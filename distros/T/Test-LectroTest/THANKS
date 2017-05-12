@@ -1,0 +1,37 @@
+-*- Outline -*-
+
+* A BIG THANKS TO THE FOLLOWING GREAT PEOPLE
+
+- Koen Claessen and John Hughes for creating QuickCheck
+  for the Haskell programming language and providing the
+  inspiration for LectroCheck
+
+- Jacob Matthews for his constant Scheming (hee, hee)
+  and for his excellent suggestions
+
+- Casey West, Chris Winters, Dan Wright, and the rest of the
+  Pittsburgh Perl Mongers for continuing support, suggestions, and
+  abundant, all-around coolness
+
+- Andy Lester for prodding me into getting the word out and writing
+  something about LectroTest
+
+- Steffen Müller for good ideas about testing corner cases, which
+  became the basis for LectroTests's failure recording and playback
+  capabilities
+
+- Andreas Koenig (ANDK) for suggesting that I modify the test
+  suite for generators (t/gens.t) to emit a notice that test
+  failures do not necessarily indicate a failure.
+
+- Petr Pisar for reporting a missing prototype
+  https://rt.cpan.org/Ticket/Display.html?id=85281
+
+- Nicholas Bamber (SILASMONK) for patch to remove UNIVERSAL->import
+  https://rt.cpan.org/Public/Bug/Display.html?id=66114
+
+- Ricardo SIGNES for the thunderously time-saving Dist::Zilla
+
+
+--
+Tom Moertel <tom@moertel.com>

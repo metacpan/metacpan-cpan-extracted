@@ -1,0 +1,113 @@
+? \sinh x=\frac{e^x-e^{-x}}{2}
+<math title="\sinh x=\frac{e^x-e^{-x}}{2}">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>sinh</mo>
+      <mi>x</mi>
+    </mrow>
+    <mo>=</mo>
+    <mfrac>
+      <mrow>
+        <msup>
+          <mi>e</mi>
+          <mi>x</mi>
+        </msup>
+        <mo>-</mo>
+        <msup>
+          <mi>e</mi>
+          <mrow>
+            <mo>-</mo>
+            <mi>x</mi>
+          </mrow>
+        </msup>
+      </mrow>
+      <mrow>
+        <mn>2</mn>
+      </mrow>
+    </mfrac>
+  </mstyle>
+</math>
+$$\sinh x = \frac{e^x - e^{- x}}{2}$$
+
+? f(x)=\sum_{n=0}^\infty\frac{f^{(n)}(a)}{n!}(x-a)^n
+<math title="f(x)=\sum_{n=0}^\infty\frac{f^{(n)}(a)}{n!}(x-a)^n">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mi>f</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <munderover>
+        <mo>&sum;</mo>
+        <mrow>
+          <mi>n</mi>
+          <mo>=</mo>
+          <mn>0</mn>
+        </mrow>
+        <mo>&infin;</mo>
+      </munderover>
+    </mrow>
+    <mfrac>
+      <mrow>
+        <msup>
+          <mi>f</mi>
+          <mrow>
+            <mrow>
+              <mo>(</mo>
+              <mi>n</mi>
+              <mo>)</mo>
+            </mrow>
+          </mrow>
+        </msup>
+        <mrow>
+          <mo>(</mo>
+          <mi>a</mi>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+      <mrow>
+        <mi>n</mi>
+        <mo>!</mo>
+      </mrow>
+    </mfrac>
+    <msup>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>-</mo>
+        <mi>a</mi>
+        <mo>)</mo>
+      </mrow>
+      <mi>n</mi>
+    </msup>
+  </mstyle>
+</math>
+$$f ( x ) = \sum_{n = 0}^{\infty} \frac{f^{( n )} ( a )}{n !} ( x - a )^n$$
+
+? d/dx\,f(x)
+<math title="d/dx\,f(x)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mi>d</mi>
+      <mrow>
+        <mi>d</mi>
+        <mi>x</mi>
+      </mrow>
+    </mfrac>
+    <mo>&#x00A0;</mo>
+    <mrow>
+      <mi>f</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+  </mstyle>
+</math>
+$$\frac{d}{d x} \, f ( x )$$

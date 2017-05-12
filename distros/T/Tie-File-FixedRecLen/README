@@ -1,0 +1,205 @@
+NAME
+    Tie::File::FixedRecLen - Fixed Length Record support for Tie:File
+
+VERSION
+    version 2.112531
+
+SYNOPSIS
+     # for typical read/write random access...
+
+     use Tie::File::FixedRecLen;
+ 
+     tie @array, 'Tie::File::FixedRecLen', $file, record_length => 20
+         or die ...;
+ 
+     # or for faster, sequential write-only use...
+ 
+     use Tie::File::FixedRecLen::Store;
+ 
+     tie @array, 'Tie::File::FixedRecLen::Store', $file, record_length => 20
+         or die ...;
+
+DESCRIPTION
+    Use Tie::File::FixedRecLen as a drop-in replacement to Tie::File in
+    order to add support for fixed length records within your tied files.
+    When tieing to a file, you must specify the length of a record in the
+    file. This length does not include the record separator character(s).
+
+    Apart from the configuration parameters mentioned below, you should use
+    Tie::File::FixedRecLen in just the same way as Tie::File. This module is
+    designed to create files which are read/write compatible with Tie::File;
+
+    Please take just a minute to read the "CAVEATS" section, below.
+
+    There is an ancilliary module, Tie::File::FixedRecLen::Store, which
+    provides a subset of the features of Tie::File::FixedRecLen. It is
+    designed for fast, write-only, sequential data logging. More information
+    is given in the "STORE MODULE" section, below.
+
+CAVEATS
+    *   Tie::File::FixedRecLen is written for Tie::File 0.97, and cannot be
+        used with any other version of that module. This is because there is
+        no formlized API into Tie::File, so it's quite likely things will
+        break as Tie::File's internals are changed. Sorry about that.
+
+    *   Do not try using cacheing or deferred writing, at least not yet.
+        Tie::File is quite a complicated beast, so to make life simpler for
+        Tie::File::FixedRecLen it does not try to cope with cacheing or
+        deferring.
+
+    *   In Tie::File you could include the record separator character(s)
+        *within* a record, and although the module might get confused, the
+        file would still be valid. In Tie::File::FixedRecLen this is a
+        really bad thing to do, so please don't. Indeed, trailing multiple
+        record separator character(s) on a field will be (sliently) stripped
+        and replaced by a single record separator.
+
+    *   Anyone with multi-byte character set experience is very welcome to
+        lend support in making this module work in those environments.
+        Currently my best guess is that things will break if this module is
+        used with multi-byte character set files.
+
+CONFIGURATION
+    There are three configuration parameters you can pass when tieing to a
+    file (in addition to those offered by Tie::File). This module does not
+    support the fancy "-" prefix to option names that you have with
+    Tie::File.
+
+    record_length
+        This parameter is required. It specifies the length (in bytes) of a
+        record in the tied file. "record_length" must be an integer, and it
+        must be greater than zero. Each time a record is read or written, it
+        is compared to this length, and an error is raised if there is a
+        mismatch.
+
+        When writing records to the tied file, they are padded out to
+        "record_length" if necessary. Be aware that this length does not
+        include the record separator.
+
+    pad_char
+        This parameter is optional.
+
+        Records will be padded with this character until they are
+        "record_length" bytes in length. You should make this a single byte
+        character, otherwise things are likely to break.
+
+        The default padding character is the space character. This allows
+        the tied file to remain readable by a human. If you use leading or
+        trailing space characters in your records, then select another
+        character, and if you are not bothered about human readability, it
+        could be a control character (e.g. "^G").
+
+    pad_dir
+        This parameter is optional.
+
+        Records may be padded out to the record length either before the
+        first character or after the last character.
+
+        Set this option to "right" if you would prefer end padding; the
+        default is to pad with the "pad_char" character before the first
+        character of the record data. For example with "right" padding, a
+        record length of 10 and pad character of '.':
+
+         data: "abc123"
+         written record: "abc123....\n"
+         returned data when read back: "abc123"
+
+        And with the same settings except we'll use the module's default
+        "left" padding this time:
+
+         data: "abc123"
+         written record: "....abc123\n"
+         returned data when read back: "abc123"
+
+DIAGNOSTICS
+    "Tie::File::FixedRecLen written for Tie::File 0.97"
+        The Tie::File programmers' API is not standardized, and may change
+        in the future. You must have version 0.97 of Tie::File to use this
+        version of Tie::File::FixedRecLen.
+
+    "Useless use of Tie::File::FixedRecLen without a record_length"
+        You have forgotten to provide the "record_length" parameter when
+        tieing your file, or it is there but is not a positive integer.
+
+    "Record '...' does not match set length (...)"
+        When reading a record from the tied file, it is not the expected
+        "record_length" in size. Are you sure the file was created and
+        written by Tie::File::FixedRecLen?
+
+    "Record '...' exceeds fixed record length (...)"
+        When attempting to write a record to the tied file, you have passed
+        data which exceeds "record_length" in size. Please don't do that.
+
+    "File does not appear to be using fixed length records"
+        Internally, Tie::File and Tie::File::FixedRecLen compute offset
+        markers for each record in the file. This error indicates the file
+        is not a whole multiple of "record_length" (+ "recsep"'s length) in
+        size, which probably means it is not a Tie::File::FixedRecLen file.
+
+STORE MODULE
+  Rationale
+    The project for which Tie::File::FixedRecLen was written required very
+    fast logging of polled SNMP data, of the order of thousands of variables
+    every couple of minutes, to a remote networked server, for a period of
+    many years.
+
+    This requires very fast writes indeed on the storage server, so you will
+    find Tie::File::FixedRecLen to be a lot quicker than Tie::File (for most
+    operations), at the obvious cost of storage space. However this module
+    still suffers in that by using the core of Tie::File, its write time is
+    still proportional to the size of the file. There is no easy way around
+    this. Whilst the effect is measured in the milliseconds as file size
+    grows, it is not suitable for use over a period of years.
+
+    Hence the ancilliary module Tie::File::FixedRecLen::Store was written,
+    for really fast writes in a file format compatible with Tie::File and
+    Tie::File::FixedRecLen, with some compromise in functionality.
+
+  Usage
+    Use Tie::File::FixedRecLen for write-only, sequential storage of
+    fixed-length record data.
+
+    Records can only be written (not read), and only at the end of an array
+    ("push"), although this may be at the immediate end or at some further
+    point and the file will be suitably padded.
+
+    The module has a very simple interface:
+
+     use Tie::File::FixedRecLen::Store;
+ 
+     tie @store, 'Tie::File::FixedRecLen::Store', $filename, record_length => $record_length
+        or die...
+
+    Note that Tie::File::FixedRecLen::Store accepts the "record_length",
+    "recsep" and "pad_char" options just like Tie::File::FixedRecLen.
+    However, padding in the elements is always "left" (i.e. element start)
+    and there is currently no option to change this.
+
+    Other than that, you can use any write method on the array, for example:
+
+     push @store, 'item';
+     push @store, 'item1', 'item2', 'etc';
+     $store[10] = 'value'; # only if $#store < 10
+     $#store = 20; # again, only if $#store < 20
+
+    If you try to operate on the array in any other fashion, for instance to
+    "pop" an element, the module will die.
+
+ACKNOWLEDGEMENTS
+    *   Naturally this would not be here without the excellent Tie::File
+        module.
+
+    *   Tie::File::VERSION check bug - Tom Hukins
+
+    *   Thanks to my wife Suzanne, for her patience whilst I whined about
+        not being able to get the performance I wanted out of this project.
+
+AUTHOR
+    Oliver Gorwits <oliver@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by University of Oxford.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,71 @@
+---
+abstract: 'A Thrift-based rapid API framework'
+author:
+  - 'Eric Waters <ewaters@gmail.com>'
+build_requires:
+  Test::Deep: 0
+  Test::File::Contents: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tapir
+provides:
+  Tapir:
+    file: lib/Tapir.pm
+    version: 0.03
+  Tapir::Documentation::NaturalDocs:
+    file: lib/Tapir/Documentation/NaturalDocs.pm
+    version: 0
+  Tapir::Exceptions:
+    file: lib/Tapir/Exceptions.pm
+    version: 0
+  Tapir::Logger:
+    file: lib/Tapir/Logger.pm
+    version: 0
+  Tapir::MethodCall:
+    file: lib/Tapir/MethodCall.pm
+    version: 0
+  Tapir::Server:
+    file: lib/Tapir/Server.pm
+    version: 0
+  Tapir::Server::Handler:
+    file: lib/Tapir/Server/Handler.pm
+    version: 0
+  Tapir::Server::Handler::Class:
+    file: lib/Tapir/Server/Handler/Class.pm
+    version: 0
+  Tapir::Server::Handler::Signatures:
+    file: lib/Tapir/Server/Handler/Signatures.pm
+    version: 0
+  Tapir::Server::Transport:
+    file: lib/Tapir/Server/Transport.pm
+    version: 0
+  Tapir::Validator:
+    file: lib/Tapir/Validator.pm
+    version: 0
+  Tapir::Validator::Length:
+    file: lib/Tapir/Validator/Length.pm
+    version: 0
+  Tapir::Validator::Range:
+    file: lib/Tapir/Validator/Range.pm
+    version: 0
+  Tapir::Validator::Regex:
+    file: lib/Tapir/Validator/Regex.pm
+    version: 0
+requires:
+  Devel::Declare: 0
+  File::Spec: 0
+  Moose: 0
+  POE::Component::Sequence: 0.02
+  Thrift::Parser: 0.06
+resources:
+  bugtracker: http://github.com/ewaters/tapir/issues?labels=bug
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/ewaters/tapir
+version: 0.03

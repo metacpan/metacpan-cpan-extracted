@@ -1,0 +1,660 @@
+loaded results /var/v7/results.xml
+OS Version: Red Hat Enterprise Linux Server release 5.3 (Tikanga)
+Kernel RPM: kernel-2.6.18-128.el5
+v7 version 1.0, release 6
+saved test plan to /var/v7/results.xml
+1..1
+# Tapper-suite-version: 0.010003
+# Tapper-starttime-test-program: 20090710T100918
+# Tapper-machine-name: ruthenium.osrc.amd.com
+# Tapper-suite-name: RHV7
+# Tapper-reportgroup-arbitrary: 
+# Tapper-section: tapper-meta-information
+# Tapper-reportgroup-testrun: 
+ok 1 - tapper-meta-data
+1..1
+# Installing testsuite
+not ok 1 - testsuite install failed
+1..1
+# Tapper-Section: stats-proc-interrupts-before
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 160535869
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 3690
+    linetail: IO-APIC-edge  i8042
+  6:
+    CPU0: 4
+    linetail: IO-APIC-edge  floppy
+  8:
+    CPU0: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 29256
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 1686958
+    linetail: IO-APIC-edge  ide0
+  15:
+    CPU0: 1604971
+    linetail: IO-APIC-edge  ide1
+  177:
+    CPU0: 799260
+    linetail: IO-APIC-level  vboxadd
+  185:
+    CPU0: 229987
+    linetail: IO-APIC-level  eth0
+  193:
+    CPU0: 7
+    linetail: IO-APIC-level  Intel 82801AA-ICH
+  NMI:
+    CPU0: 0
+    linetail: ~
+  LOC:
+    CPU0: 2601413342
+    linetail: ~
+  ERR:
+    CPU0: 0
+    linetail: ~
+  MIS:
+    CPU0: 0
+    linetail: ~
+  ...
+1..1
+# Initialising test suite
+ok 1 - test suite initialised
+1..1
+# Tapper-section: rhv7-run
+ok 1 - Run took ntp: 0s, hwclock: 0s
+1..11
+# Tapper-section: RHV7-results
+not ok 1 - info 
+  ---
+  success: 0
+  fail: 4
+  not_run: 0
+  ...
+ok 2 - core
+  ---
+  success: 1
+  fail: 0
+  not_run: 0
+  ...
+not ok 3 - network 
+  ---
+  success: 0
+  fail: 1
+  not_run: 0
+  ...
+not ok 4 - floppy 
+  ---
+  success: 0
+  fail: 1
+  not_run: 0
+  ...
+ok 5 - dvd
+  ---
+  success: 1
+  fail: 0
+  not_run: 0
+  ...
+ok 6 - storage
+  ---
+  success: 1
+  fail: 0
+  not_run: 0
+  ...
+not ok 7 - profiler 
+  ---
+  success: 0
+  fail: 2
+  not_run: 0
+  ...
+not ok 8 - video 
+  ---
+  success: 0
+  fail: 2
+  not_run: 0
+  ...
+ok 9 - memory
+  ---
+  success: 2
+  fail: 0
+  not_run: 0
+  ...
+not ok 10 - cdrom 
+  ---
+  success: 0
+  fail: 1
+  not_run: 0
+  ...
+not ok 11 - audio 
+  ---
+  success: 0
+  fail: 1
+  not_run: 0
+  ...
+1..34
+# Tapper-Section: dmesg
+ok 1 - dmesg parsed (2553 lines)
+not ok 2 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 3 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 4 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 5 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 6 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 7 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 8 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 9 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 10 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 11 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 12 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 13 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 14 -  # TODO okay for us
+# [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 15 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 16 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 17 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 18 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 19 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 20 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 21 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 22 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 23 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 24 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 25 -  # TODO okay for us
+# [<ffffffff800f1d70>] inotify_d_instantiate+0x46/0x70
+not ok 26 -  # TODO okay for us
+# [<ffffffff8001dc39>] inotify_dev_queue_event+0x87/0x104
+not ok 27 -  # TODO okay for us
+# [<ffffffff8000d290>] inotify_inode_queue_event+0xad/0xe8
+not ok 28 - 
+# [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 29 - 
+# [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 30 -  # TODO okay for us
+# [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 31 -  # TODO okay for us
+# [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 32 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 33 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 34 -  # TODO okay for us
+# [<ffffffff8005ae35>] do_notify_resume+0x69a/0x7af
+# false positves ignored: 110
+1..192
+# Tapper-Section: var_log_messages
+ok 1 - /var/log/messages parsed (10162 lines)
+not ok 2 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 3 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 4 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 5 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 6 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 7 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 8 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 9 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 10 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 11 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 12 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 13 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 14 -  # TODO okay for us
+# [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 15 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 16 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 17 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 18 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 19 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 20 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 21 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 22 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 23 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 24 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 25 -  # TODO okay for us
+# [<ffffffff800f1d70>] inotify_d_instantiate+0x46/0x70
+not ok 26 -  # TODO okay for us
+# [<ffffffff8001dc39>] inotify_dev_queue_event+0x87/0x104
+not ok 27 -  # TODO okay for us
+# [<ffffffff8000d290>] inotify_inode_queue_event+0xad/0xe8
+not ok 28 - 
+# [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 29 - 
+# [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 30 -  # TODO okay for us
+# [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 31 -  # TODO okay for us
+# [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 32 -  # TODO okay for us
+# [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 33 -  # TODO okay for us
+# [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 34 -  # TODO okay for us
+# [<ffffffff8005ae35>] do_notify_resume+0x69a/0x7af
+not ok 35 -  # TODO okay for us
+#  Jul  8 16:52:56 ruthenium v7/runtests[31406]: Beginning test run.
+not ok 36 -  # TODO okay for us
+#  Jul  8 16:52:57 ruthenium v7/runtests[31406]: memory: begin
+not ok 37 -  # TODO okay for us
+#  Jul  8 17:20:45 ruthenium v7/runtests[31406]: memory: end
+not ok 38 -  # TODO okay for us
+#  Jul  8 17:20:46 ruthenium v7/runtests[31406]: info: begin
+not ok 39 - 44 ruthenium kernel
+# hda: task_no_data_intr: status=0x41 { DriveReady Error }
+not ok 40 - 44 ruthenium kernel
+# hda: task_no_data_intr: error=0x04 { DriveStatusError }
+not ok 41 - 44 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 42 - 44 ruthenium kernel
+# hda: task_in_intr: status=0x41 { DriveReady Error }
+not ok 43 - 44 ruthenium kernel
+# hda: task_in_intr: error=0x04 { DriveStatusError }
+not ok 44 - 44 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 45 - 44 ruthenium kernel
+# hda: task_no_data_intr: status=0x41 { DriveReady Error }
+not ok 46 - 44 ruthenium kernel
+# hda: task_no_data_intr: error=0x04 { DriveStatusError }
+not ok 47 - 44 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 48 - 44 ruthenium kernel
+# hda: task_in_intr: status=0x41 { DriveReady Error }
+not ok 49 - 44 ruthenium kernel
+# hda: task_in_intr: error=0x04 { DriveStatusError }
+not ok 50 - 44 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 51 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 52 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 53 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 54 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 55 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 56 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 57 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 58 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 59 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 60 -  # TODO okay for us
+#  Jul  8 17:28:48 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 61 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 62 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 63 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 64 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 65 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 66 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 67 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 68 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 69 -  # TODO okay for us
+#  Jul  8 17:28:49 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 70 -  # TODO okay for us
+#  Jul  8 17:28:50 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 71 -  # TODO okay for us
+#  Jul  8 17:28:50 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 72 -  # TODO okay for us
+#  Jul  8 17:28:50 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 73 -  # TODO okay for us
+#  Jul  8 17:28:50 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 74 -  # TODO okay for us
+#  Jul  8 17:28:51 ruthenium kernel:  [<ffffffff800f1d70>] inotify_d_instantiate+0x46/0x70
+not ok 75 -  # TODO okay for us
+#  Jul  8 17:28:51 ruthenium kernel:  [<ffffffff8004c138>] sys_inotify_add_watch+0x76/0x17f
+not ok 76 -  # TODO okay for us
+#  Jul  8 17:28:52 ruthenium kernel:  [<ffffffff8001dc39>] inotify_dev_queue_event+0x87/0x104
+not ok 77 -  # TODO okay for us
+#  Jul  8 17:28:52 ruthenium kernel:  [<ffffffff8000d290>] inotify_inode_queue_event+0xad/0xe8
+not ok 78 - 52 ruthenium kernel
+#  [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 79 - 52 ruthenium kernel
+#  [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 80 -  # TODO okay for us
+#  Jul  8 17:28:52 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 81 -  # TODO okay for us
+#  Jul  8 17:28:53 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 82 -  # TODO okay for us
+#  Jul  8 17:28:53 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 83 -  # TODO okay for us
+#  Jul  8 17:28:53 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 84 -  # TODO okay for us
+#  Jul  8 17:28:54 ruthenium kernel:  [<ffffffff8005ae35>] do_notify_resume+0x69a/0x7af
+not ok 85 -  # TODO okay for us
+#  Jul  8 17:28:54 ruthenium v7/runtests[31406]: info: end
+not ok 86 -  # TODO okay for us
+#  Jul  8 17:28:54 ruthenium v7/runtests[31406]: Testing complete.
+not ok 87 -  # TODO okay for us
+#  Jul  8 17:29:00 ruthenium v7/runtests[29139]: Beginning test run.
+not ok 88 -  # TODO okay for us
+#  Jul  8 17:29:01 ruthenium v7/runtests[29139]: video: begin
+not ok 89 -  # TODO okay for us
+#  Jul  8 17:29:01 ruthenium v7/runtests[29139]: video: end
+not ok 90 -  # TODO okay for us
+#  Jul  8 17:29:01 ruthenium v7/runtests[29139]: info: begin
+not ok 91 - 53 ruthenium kernel
+# hda: task_no_data_intr: status=0x41 { DriveReady Error }
+not ok 92 - 53 ruthenium kernel
+# hda: task_no_data_intr: error=0x04 { DriveStatusError }
+not ok 93 - 53 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 94 - 53 ruthenium kernel
+# hda: task_in_intr: status=0x41 { DriveReady Error }
+not ok 95 - 53 ruthenium kernel
+# hda: task_in_intr: error=0x04 { DriveStatusError }
+not ok 96 - 53 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 97 - 53 ruthenium kernel
+# hda: task_no_data_intr: status=0x41 { DriveReady Error }
+not ok 98 - 53 ruthenium kernel
+# hda: task_no_data_intr: error=0x04 { DriveStatusError }
+not ok 99 - 53 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 100 - 53 ruthenium kernel
+# hda: task_in_intr: status=0x41 { DriveReady Error }
+not ok 101 - 53 ruthenium kernel
+# hda: task_in_intr: error=0x04 { DriveStatusError }
+not ok 102 - 53 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 103 -  # TODO okay for us
+#  Jul  8 17:36:57 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 104 -  # TODO okay for us
+#  Jul  8 17:36:57 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 105 -  # TODO okay for us
+#  Jul  8 17:36:57 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 106 -  # TODO okay for us
+#  Jul  8 17:36:57 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 107 -  # TODO okay for us
+#  Jul  8 17:36:57 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 108 -  # TODO okay for us
+#  Jul  8 17:36:57 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 109 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 110 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 111 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 112 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 113 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 114 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 115 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 116 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 117 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 118 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 119 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 120 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 121 -  # TODO okay for us
+#  Jul  8 17:36:58 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 122 -  # TODO okay for us
+#  Jul  8 17:36:59 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 123 -  # TODO okay for us
+#  Jul  8 17:36:59 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 124 -  # TODO okay for us
+#  Jul  8 17:36:59 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 125 -  # TODO okay for us
+#  Jul  8 17:36:59 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 126 -  # TODO okay for us
+#  Jul  8 17:37:00 ruthenium kernel:  [<ffffffff800f1d70>] inotify_d_instantiate+0x46/0x70
+not ok 127 -  # TODO okay for us
+#  Jul  8 17:37:01 ruthenium kernel:  [<ffffffff8004c138>] sys_inotify_add_watch+0x76/0x17f
+not ok 128 -  # TODO okay for us
+#  Jul  8 17:37:01 ruthenium kernel:  [<ffffffff8001dc39>] inotify_dev_queue_event+0x87/0x104
+not ok 129 -  # TODO okay for us
+#  Jul  8 17:37:01 ruthenium kernel:  [<ffffffff8000d290>] inotify_inode_queue_event+0xad/0xe8
+not ok 130 - 01 ruthenium kernel
+#  [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 131 - 01 ruthenium kernel
+#  [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 132 -  # TODO okay for us
+#  Jul  8 17:37:01 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 133 -  # TODO okay for us
+#  Jul  8 17:37:04 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 134 -  # TODO okay for us
+#  Jul  8 17:37:04 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 135 -  # TODO okay for us
+#  Jul  8 17:37:04 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 136 -  # TODO okay for us
+#  Jul  8 17:37:04 ruthenium kernel:  [<ffffffff8005ae35>] do_notify_resume+0x69a/0x7af
+not ok 137 -  # TODO okay for us
+#  Jul  8 17:37:05 ruthenium v7/runtests[29139]: info: end
+not ok 138 -  # TODO okay for us
+#  Jul  8 17:37:05 ruthenium v7/runtests[29139]: Testing complete.
+not ok 139 -  # TODO okay for us
+#  Jul  8 17:37:10 ruthenium v7/runtests[26440]: Beginning test run.
+not ok 140 -  # TODO okay for us
+#  Jul  8 17:37:11 ruthenium v7/runtests[26440]: profiler: begin
+not ok 141 -  # TODO okay for us
+#  Jul  8 17:37:19 ruthenium kernel: NMI watchdog: cannot reserve perfctrs
+not ok 142 -  # TODO okay for us
+#  Jul  8 17:37:24 ruthenium v7/runtests[26440]: profiler: end
+not ok 143 -  # TODO okay for us
+#  Jul  8 17:37:25 ruthenium v7/runtests[26440]: info: begin
+not ok 144 - 26 ruthenium kernel
+# hda: task_no_data_intr: status=0x41 { DriveReady Error }
+not ok 145 - 26 ruthenium kernel
+# hda: task_no_data_intr: error=0x04 { DriveStatusError }
+not ok 146 - 26 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 147 - 26 ruthenium kernel
+# hda: task_in_intr: status=0x41 { DriveReady Error }
+not ok 148 - 26 ruthenium kernel
+# hda: task_in_intr: error=0x04 { DriveStatusError }
+not ok 149 - 26 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 150 - 27 ruthenium kernel
+# hda: task_no_data_intr: status=0x41 { DriveReady Error }
+not ok 151 - 27 ruthenium kernel
+# hda: task_no_data_intr: error=0x04 { DriveStatusError }
+not ok 152 - 27 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 153 - 27 ruthenium kernel
+# hda: task_in_intr: status=0x41 { DriveReady Error }
+not ok 154 - 27 ruthenium kernel
+# hda: task_in_intr: error=0x04 { DriveStatusError }
+not ok 155 - 27 ruthenium kernel
+# ide: failed opcode was: 0xb0
+not ok 156 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 157 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 158 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 159 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 160 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 161 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 162 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 163 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 164 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 165 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 166 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 167 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 168 -  # TODO okay for us
+#  Jul  8 17:45:34 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 169 -  # TODO okay for us
+#  Jul  8 17:45:35 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 170 -  # TODO okay for us
+#  Jul  8 17:45:35 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 171 -  # TODO okay for us
+#  Jul  8 17:45:35 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 172 -  # TODO okay for us
+#  Jul  8 17:45:35 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 173 -  # TODO okay for us
+#  Jul  8 17:45:35 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 174 -  # TODO okay for us
+#  Jul  8 17:45:35 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 175 -  # TODO okay for us
+#  Jul  8 17:45:36 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 176 -  # TODO okay for us
+#  Jul  8 17:45:36 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 177 -  # TODO okay for us
+#  Jul  8 17:45:36 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 178 -  # TODO okay for us
+#  Jul  8 17:45:36 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 179 -  # TODO okay for us
+#  Jul  8 17:45:36 ruthenium kernel:  [<ffffffff800f1d70>] inotify_d_instantiate+0x46/0x70
+not ok 180 -  # TODO okay for us
+#  Jul  8 17:45:37 ruthenium kernel:  [<ffffffff8001dc39>] inotify_dev_queue_event+0x87/0x104
+not ok 181 -  # TODO okay for us
+#  Jul  8 17:45:37 ruthenium kernel:  [<ffffffff8000d290>] inotify_inode_queue_event+0xad/0xe8
+not ok 182 - 37 ruthenium kernel
+#  [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 183 - 37 ruthenium kernel
+#  [<ffffffff8005dde9>] error_exit+0x0/0x84
+not ok 184 -  # TODO okay for us
+#  Jul  8 17:45:37 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 185 -  # TODO okay for us
+#  Jul  8 17:45:37 ruthenium kernel:  [<ffffffff800f2151>] inotify_poll+0x49/0x50
+not ok 186 -  # TODO okay for us
+#  Jul  8 17:45:39 ruthenium kernel:  [<ffffffff8005dfb1>] child_rip+0xa/0x11
+not ok 187 -  # TODO okay for us
+#  Jul  8 17:45:39 ruthenium kernel:  [<ffffffff8005dfa7>] child_rip+0x0/0x11
+not ok 188 -  # TODO okay for us
+#  Jul  8 17:45:39 ruthenium kernel:  [<ffffffff8005ae35>] do_notify_resume+0x69a/0x7af
+not ok 189 -  # TODO okay for us
+#  Jul  8 17:45:39 ruthenium v7/runtests[26440]: info: end
+not ok 190 -  # TODO okay for us
+#  Jul  8 17:45:39 ruthenium v7/runtests[26440]: Testing complete.
+not ok 191 -  # TODO okay for us
+#  Jul  8 17:45:44 ruthenium v7/runtests[24422]: Beginning test run.
+not ok 192 -  # TODO okay for us
+#  Jul  8 17:45:45 ruthenium v7/runtests[24422]: storage: begin
+# false positves ignored: 331
+1..1
+# Tapper-Section: stats-proc-interrupts-after
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 160537316
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 3690
+    linetail: IO-APIC-edge  i8042
+  6:
+    CPU0: 4
+    linetail: IO-APIC-edge  floppy
+  8:
+    CPU0: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 29256
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 1686966
+    linetail: IO-APIC-edge  ide0
+  15:
+    CPU0: 1604991
+    linetail: IO-APIC-edge  ide1
+  177:
+    CPU0: 799260
+    linetail: IO-APIC-level  vboxadd
+  185:
+    CPU0: 230067
+    linetail: IO-APIC-level  eth0
+  193:
+    CPU0: 7
+    linetail: IO-APIC-level  Intel 82801AA-ICH
+  NMI:
+    CPU0: 0
+    linetail: ~
+  LOC:
+    CPU0: 2601435864
+    linetail: ~
+  ERR:
+    CPU0: 0
+    linetail: ~
+  MIS:
+    CPU0: 0
+    linetail: ~
+  ...
+1..1
+# Tapper-section: clocksource
+ok 1 - Clocksource
+  ---
+  jiffies
+  ...
+1..1
+# Tapper-section: uptime
+ok 1 - got uptime
+  ---
+  uptime: 162884s
+  idletime: 2518910s
+  ...

@@ -1,0 +1,14 @@
+tests:
+    - 
+        code: ping
+        description: Checking the ping
+    - 
+        code: example/tests/cpu.pl
+        description: CPU test
+    -
+        code: memory
+parameters:
+    ping_count: 10
+nodes:
+    - pablo.com.mx
+    - example.com

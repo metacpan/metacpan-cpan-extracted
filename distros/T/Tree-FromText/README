@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution contains several modules for convenient construction
+    of tree object from text:
+
+    # INSERT_MODULES_LIST -Tree::FromText
+
+SEE ALSO
+
+    Tree::FromStruct
+

@@ -1,0 +1,25 @@
+.perlcriticrc
+.perltidyrc
+Build.PL
+Changes
+inc/MyBuild.pm
+lib/Test/Sims.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00compile.t
+t/control_rand.t
+t/diag_seed_on_fail.t
+t/diag_seed_on_plan_but_no_tests.t
+t/examples/datetime.t
+t/export_sims.t
+t/exports.t
+t/lib/MyTest.pm
+t/make_rand_code.t
+t/no_tests_no_seed.t
+t/note_seed_on_pass.t
+t/rand.t
+t/rand_check.plx
+SIGNATURE    Added here by Module::Build

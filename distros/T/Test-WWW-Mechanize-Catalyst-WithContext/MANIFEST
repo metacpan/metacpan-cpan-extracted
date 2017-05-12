@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/WWW/Mechanize/Catalyst/WithContext.pm
+minil.toml
+t/00_compile.t
+t/10_default.t
+t/20_inherited.t
+t/lib/Catty.pm
+t/lib/Catty/Controller/Root.pm
+t/lib/Catty/Model/Foo.pm
+META.yml
+MANIFEST

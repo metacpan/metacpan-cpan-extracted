@@ -1,0 +1,5 @@
+##teamcity[testSuiteStarted flowId='t/test-data/basic/simple-dies-mid-test/input.st' name='t/test-data/basic/simple-dies-mid-test/input.st']
+##teamcity[testStarted captureStandardOutput='true' flowId='t/test-data/basic/simple-dies-mid-test/input.st' name='simple-dies-mid-test-msg-1']
+##teamcity[testFailed details='Tests were run but no plan was declared and done_testing() was not seen.|nLooks like your test exited with 42 just after 1.' flowId='t/test-data/basic/simple-dies-mid-test/input.st' message='not ok' name='simple-dies-mid-test-msg-1']
+##teamcity[testFinished flowId='t/test-data/basic/simple-dies-mid-test/input.st' name='simple-dies-mid-test-msg-1']
+##teamcity[testSuiteFinished flowId='t/test-data/basic/simple-dies-mid-test/input.st' name='t/test-data/basic/simple-dies-mid-test/input.st']

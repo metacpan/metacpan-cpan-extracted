@@ -1,0 +1,10 @@
+Revision history for Perl extension Text::T9.
+
+1.01  Fri May 24 15:45:52 EEST 2013
+
+  1. fixed structure and version :)
+
+0.01  Fri Oct 26 00:56:18 2001
+  - original version; created by h2xs 1.21 with options
+    -X Text::T9
+

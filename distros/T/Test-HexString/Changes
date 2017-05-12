@@ -1,0 +1,14 @@
+Revision history for Attribute-Storage
+
+0.03    CHANGES:
+         * Minor toolchain updates:
+            + META.yml + META.json
+            + Don't add Module::Build to configure_requires
+         * Updated FSF address in LICENSE file
+
+0.02    CHANGES:
+         * Print differing bytes in bold if STDOUT is a terminal
+         * Various updates to keep CPANTS happy
+
+0.01    First version, released on an unsuspecting world.
+

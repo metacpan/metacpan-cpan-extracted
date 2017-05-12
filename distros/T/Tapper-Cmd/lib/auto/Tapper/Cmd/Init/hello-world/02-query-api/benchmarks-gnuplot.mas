@@ -1,0 +1,22 @@
+#! mason debug=1 <<EOTEMPLATE
+#! /usr/bin/env gnuplot
+TITLE = "Example bogomips"
+set title TITLE offset char 0, char -1
+set style data linespoints
+set xtics rotate by 45
+set xtics out offset 0,-2.0
+set term png size 1200, 800
+set output "example-03-benchmarks.png"
+#set yrange [0:2000]
+
+plot '-' using 1:2 with linespoints lt 3 lw 1 title "ratio"
+
+% my @time  = reportdata '{ "suite_name" => "example-03-benchmarks" } :: /report/id';
+% my @ratio = reportdata '{ "suite_name" => "example-03-benchmarks" } :: //tap//benchmarks/bogomips';
+% foreach (0..scalar @time) {
+%   if (my $t=$time[$_] and my $r=$ratio[$_]) {
+%      #my ($x, $y) = $t =~ m/\d{4}-(\d+)-(\d+)/g;
+       <% $t %> <% $r  %>
+%   }
+% }
+EOTEMPLATE

@@ -1,0 +1,26 @@
+---
+abstract: 'Just another HTML attribute generator.'
+author:
+  - 'Jeff Anderson <jeffa@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.130880'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Hash-Attribute
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::Entities: 3.69
+  perl: 5.006
+resources:
+  homepage: https://github.com/jeffa/Tie-Hash-Attribute
+  repository: https://github.com/jeffa/Tie-Hash-Attribute.git
+version: 1.04

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Fixed Length Record support for Tie:File",
+   "author" : [
+      "Oliver Gorwits <oliver@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-File-FixedRecLen",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Fcntl" : 0,
+            "Symbol" : 0,
+            "Tie::File" : 0,
+            "base" : 0,
+            "perl" : "5.008",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : 0,
+            "File::Spec" : 0,
+            "POSIX" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-File-FixedRecLen"
+      },
+      "homepage" : "https://github.com/ollyg/Tie-File-FixedRecLen/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ollyg/Tie-File-FixedRecLen.git",
+         "web" : "https://github.com/ollyg/Tie-File-FixedRecLen"
+      }
+   },
+   "version" : "2.112531"
+}
+

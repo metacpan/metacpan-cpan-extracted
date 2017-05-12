@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+Aspell.pm
+Aspell.xs
+typemap
+t/01-use.t
+t/02-pod.t
+t/05-core.t
+META.yml                                 Module meta-data (added by MakeMaker)

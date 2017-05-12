@@ -1,0 +1,28 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.7.
+Build.PL                                 #       3rd party file built by ModuleBuildTiny
+COPYING                                  # Test-Dist-Zilla file built by GenerateFile
+Changes                                  # Test-Dist-Zilla file added by Manifest::Read
+GPLv3                                    # Test-Dist-Zilla file added by Manifest::Read
+MANIFEST                                 #        metainfo file built by Manifest::Write
+META.json                                #        metainfo file built by MetaJSON
+META.yml                                 #        metainfo file built by MetaYAML
+README                                   # Test-Dist-Zilla file built by GenerateFile
+VERSION                                  # Test-Dist-Zilla file added by Manifest::Read
+lib/Test/Dist/Zilla.pm                   # Test-Dist-Zilla file added by Manifest::Read
+lib/Test/Dist/Zilla/Build.pm             # Test-Dist-Zilla file added by Manifest::Read
+lib/Test/Dist/Zilla/BuiltFiles.pm        # Test-Dist-Zilla file added by Manifest::Read
+lib/Test/Dist/Zilla/Release.pm           # Test-Dist-Zilla file added by Manifest::Read
+t/00-compile.t                           #       3rd party file built by Test::Compile
+t/lib/MessagePluginA.pm                  # Test-Dist-Zilla file added by Manifest::Read
+t/lib/MessagePluginB.pm                  # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-attributes.t           # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-build-synopsis.t       # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-build.t                # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-built-files-synopsis.t # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-built-files.t          # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-cleanup.t              # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-exception.t            # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-files.t                # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-messages.t             # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-release-synopsis.t     # Test-Dist-Zilla file added by Manifest::Read
+t/test-dist-zilla-release.t              # Test-Dist-Zilla file added by Manifest::Read

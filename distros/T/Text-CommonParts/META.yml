@@ -1,0 +1,14 @@
+---
+name: Text-CommonParts
+version: 0.5
+author:
+  - Simon Wistow <simon@thegestalt.org
+abstract: return the common starting parts of phrases
+license: perl
+requires:
+  Test::More: 0
+provides:
+  Text::CommonParts:
+    file: lib/Text/CommonParts.pm
+    version: 0.5
+generated_by: Module::Build version 0.2611

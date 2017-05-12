@@ -1,0 +1,13 @@
+Revision history for Perl extension Text::JavE.
+
+0.03  Mon May 05 2014
+    Move to slightly more modern layout
+    Fix /regex/and in case expression, which is now an error
+
+0.02  Tue Jul 29 21:54:23 2003
+    Documentation stubs
+
+0.01  Tue Nov 12 09:35:18 2002
+	- original version; created by h2xs 1.21 with options
+		-X Text::JavE
+

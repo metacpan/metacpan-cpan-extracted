@@ -1,0 +1,195 @@
+Travel::Status::DE::IRIS 1.14 - Mon Feb 06 2017
+
+    * IRIS->new: Add optional argument lookbehind
+    * db-iris: Remove a useless HTTP request, resulting in slightly faster
+               responses
+    * db-iris -V / --track-via: Improve support for faraway stations
+
+Travel::Status::DE::IRIS 1.13 - Thu Jan 26 2017
+
+    * Fix support for line numbers, remove manual line map workaround
+
+Travel::Status::DE::IRIS 1.12 - Fri Dec 30 2016
+
+    * Unfortunately, line numbers are not available at the moment due to IRIS
+      backend changes. Some lines in NRW have been provided with a manual line
+      number mapping to remedy this.
+    * Fix DS100 code for "Bielefeld Hbf"
+    * Travel::Status::DE::IRIS::Stations::get_station_by_location: Fix bug in
+      num_matches (parameter was silently ignored)
+
+Travel::Status::DE::IRIS 1.11 - Tue Oct 11 2016
+
+    * IRIS->new: Fix partially broken cache handling when using
+      "with_related => 1"
+    * Improve parser performance
+
+Travel::Status::DE::IRIS 1.10 - Sat Oct 01 2016
+
+    * Add qos code 71 ("WLAN in einzelnen Wagen nicht verfügbar")
+    * Fix DS100 codes for "Geilenkirchen" and "Montabaur"
+    * Travel::Status::DE::IRIS::Stations::get_station: Add support for
+      UIC / EVA numbers
+
+Travel::Status::DE::IRIS 1.09 - Mon Jun 27 2016
+
+    * Travel::Status::DE::IRIS::Result: Fix ->classes accessor
+      (returned a string instead of a list)
+    * Fix DS100 codes for "Stuttgart Hbf (tief)" and "Stuttgart-Feuerbach"
+
+
+Travel::Status::DE::IRIS 1.08 - Thu Jun 09 2016
+
+    * New dependency: Geo::Distance
+    * Update DS100 code list. Station names are now unabbreviated, e.g.
+      "Dortmund Univeristät" instead of "Do Universität". Also, stations
+      without train service are no longer included. Note that this list might
+      contain errors. If you get "Request error: Station ... has no associated
+      timetable" for a station which worked with previous versions, please
+      submit a bug report.
+    * Travel::Status::DE::IRIS::Stations now also returns international
+      station number, longitude and latitutde for most stations
+    * New method Travel::Status::DE::IRIS::Stations::get_station_by_location
+      allows station lookup by geolocation
+
+Travel::Status::DE::IRIS 1.07 - Sun May 01 2016
+
+    * Fix inefficient requests for stations with with heavily cross-referenced
+      related-station tags (most notable example: München Hbf)
+
+Travel::Status::DE::IRIS 1.06 - Mon Feb 29 2016
+
+    * Partially fix slow response time and excessive network requests for
+      stations with heavily cross-referenced related-station tags (most notable
+      example: München Hbf). The implementation is still slightly inefficient
+      in these cases, but far better than before -- A complete fix will follow
+      in the next release. Note that db-iris calls using
+      -x/--exact/--no-related are not affected by this issue.
+
+Travel::Status::DE::IRIS 1.05 - Sun Dec 20 2015
+
+    * Update station list. It now uses data supplied by the Deutsche Bahn
+      Open Data portal.
+    * db-iris: New option -x / --exact / --no-related
+    * IRIS->new: New options main_cache, realtime_cache and with_related
+    * IRIS: Add ->station and ->related_stations accessors
+    * db-iris: Include related stations in query output (for instance,
+      "Köln Messe Deutz" will include "Köln Messe Deutz (tief)" and
+      "Köln Messe Deutz Gl. 9-10"). Use --exact / --no-related to disable this.
+    * IRIS: Same. Also, IRIS->new can now be passed Cache objects to cache
+      HTTP requests for a user-defined time. This is most useful when
+      building infoscreens and similar, since the scheduled and station data
+      never changes and can therefore be cached to decrease network load and
+      increase response time.
+
+Travel::Status::DE::IRIS 1.04 - Thu Nov 12 2015
+
+    * Result: Add qos code 79 ("Ohne Mehrzweckabteil")
+    * db-iris: Accept UIC station codes
+    * Fix warnings with recent DateTime::Format::Strptime releases
+    * Improve parser speed
+
+Travel::Status::DE::IRIS 1.03 - Tue Sep 15 2015
+
+    * Result: Add info key 900
+    * Station: Improve get_station matching quality by using the Levenshtein
+      edit distance in addition to simple substring matching
+    * new dependency: Text::LevenshteinXS (see README for notes about
+      drop-in replacements)
+    * new dependency: List::UtilsBy
+
+Travel::Status::DE::IRIS 1.02 - Tue May 26 2015
+
+    * Added github repo to dist metadata and the doc
+    * Result: distinguish between overcrowded trains (q97) and very overcrowded
+      trains (q96)
+    * Result: Verify delay key 60 ("delays because of storm")
+    * Result: Add qos key 70 ("no wifi" -- not entirely sure yet)
+
+Travel::Status::DE::IRIS 1.01 - Fri May 15 2015
+
+    * IRIS->new: Fix default lwp_options value (was documented, but not used)
+    * Result->route_interesting: Also consider airports
+    * Stations: Update DS100 code list. Fixes 9 stations in Köln, Düsseldorf
+      and Wuppertal which had a wrong code/name combination assigned due to
+      a parser error
+
+Travel::Status::DE::IRIS 1.00 - Fri May 01 2015
+
+    * IRIS->new: Use lwp_options to explicitly pass arguments to the
+      LWP::UserAgent constructor. Unknown arguments are now longer
+      implicitly passed on
+    * db-iris: Improve output format for wing trains
+
+Travel::Status::DE::IRIS 0.10 - Tue Apr 30 2015
+
+    * Result: Fix deep recursion error in TO_JSON
+
+Travel::Status::DE::IRIS 0.09 - Tue Apr 28 2015
+
+    * Result: Add arrival_wings, departure_wings and is_wing accessors
+      (a wing train is coupled to the respective departure, but has its own ID)
+    * db-iris: Indicate wings in output
+    * Result: Remove train_no_transfer accessor (was based on erroneous
+      assumptions)
+    * Result: Add is_unscheduled, replaced_by and replacement_for accessors
+    * db-iris: Add -oR to show replacement information
+
+Travel::Status::DE::IRIS 0.08 - Thu Mar 12 2015
+
+    * Clarify Result->train_id documentation
+    * Add IRIS delay/qos keys 13, 60, 75, 76
+
+Travel::Status::DE::IRIS 0.07 - Fri Jan 09 2015
+
+    * Fix a crash related to unscheduled additional stops in a train's route
+    * Improve Travel::Status::DE::IRIS::Stations matching
+    * Add IRIS delay/qos keys 56, 59, 61, 65, 73, 74, 77
+
+Travel::Status::DE::IRIS 0.06 - Mon Nov 03 2014
+
+    * New non-core module dependency: List::Compare
+    * Add support for canceled and additional stops
+    * db-iris: Add options -oa and -oc
+    * Result: Add accessors additional_stops and canceled_stops
+    * Improve support for delayed trains
+    * Support additional IRIS delay messages
+
+Travel::Status::DE::IRIS 0.05 - Thu Oct 16 2014
+
+    * Support additional IRIS delay messages
+
+Travel::Status::DE::IRIS 0.04 - Sat Jun 28 2014
+
+    * Fix --track-via <stop> not matching trains changing their ID at <stop>
+    * Add new (not entirely verified) IRIS delay and qos messages
+    * IRIS: add serializable option. Use this if you intend to serialize
+      the list returned by ->results
+    * Do not errour out if only partial data is available, show partial data
+      and a warning instead (closes #4)
+    * Add several qos and delay messages
+
+Travel::Status::DE::IRIS 0.03 - Fri Feb 14 2014
+
+    * IRIS / db-iris: Add lookahead option
+    * db-iris: Fix --via not matching destination of trains with incomplete
+      route data
+    * Detect and merge duplicate results caused by train ID changes
+    * Result: Provide realtime data in ->platform, add ->sched_platform
+      accessor
+    * db-iris: indicate platform changes with an exclamation mark
+
+Travel::Status::DE::IRIS 0.02 - Mon Feb 03 2014
+
+    * Fix warnings when encountering unplanned (fchg-only) trains without
+      arrival or departure platform
+    * db-iris: add -V / --track-via option to display departure at start
+      and expected arrival at a destination station
+    * db-iris: Add -r / --realtime option to compute times using delay
+      data
+    * Result: Remove duplicates in qos_messages and delay_messages,
+      return all messages in reverse order (newest first)
+
+Travel::Status::DE::IRIS 0.01 - Fri Jan 24 2014
+
+    * Initial release. Experimental, API may change without notice

@@ -1,0 +1,110 @@
+NAME
+    T - Encapsulate testing tools instead of cluttering your namespace.
+
+DESCRIPTION
+    This module collection makes it possible to use popular testing tools
+    such as Test::More or Test2::Bundle::Extended without cluttering up your
+    namespace. Under the hood all the work is done by Import::Box which was
+    created specifically to implement this.
+
+SYNOPSIS
+  BOX FUNCTIONS
+        use T 'More'; # Loads Test::More, and provides the t() box function
+
+        use T2 'Basic'; # Loads Test2::Tools::Basic, and provides the t2() function
+
+        use T2::B 'Extended'; # Loads Test2::Bundle::Extended, also provides/appends to the t2() function
+
+        use T2::P 'SRand'; # Loads Test2::Plugin::SRand, and provides the t2p() function
+
+        t->is('a', 'a', "Can run Test::More::is()");
+        t2->is('a', 'a', "Can run Test2::Tools::Compare::is()"); # (Provided by the extended bundle)
+
+
+        # Alternate syntax:
+
+        t  is => ('a', 'a');
+        t2 is => ('a', 'a');
+
+  OO
+        use T;
+        use T2;
+        use T2::B;
+
+        my $t = T->new('More'); # Loads Test::More into $t
+
+        my $t2 = T2->new('Basic'); # Loads Test2::Tools::Basic into $t2
+
+        my $t2b = T2::B->new('Extended'); # Loads Test2::Bundle::Extended into $t2b
+
+        $t->is('a', 'a', "Can run Test::More::is()");
+
+        $t2->ok(1, "ok from Test2::Tools::Basic");
+
+        $t2b->is('a', 'a', "Can run Test2::Tools::Compare::is()");
+
+
+        # Indirect syntax (just say NO!)
+
+        is $t('a', 'a');
+        ok $t2(1, "pass");
+        is $t2b('a', 'a');
+
+PACKAGES
+    T   This is used for boxing "Test::" modules into the "t()" box.
+
+    T2  This is used for boxing "Test2::Tools::" modules into the "t2()"
+        box.
+
+    T2::B
+        This is used for boxing "Test2::Bundle::" modules into the "t2()"
+        box.
+
+    T2::P
+        This is used for boxing "Test2::Plugin::" modules into the "t2p()"
+        box. A plugin should never actually export anything, so this is
+        actually just a shortcut for loading plugins.
+
+METHODS
+    t->import($MODULE)
+    $t->import($MODULE)
+    t->import($MODULE => \@IMPORT_ARGS)
+    $t->import($MODULE => \@IMPORT_ARGS)
+        This will load $MODULE and place the exports into the box instead of
+        your namespace. A prefix is automatically prepended to $MODULE,
+        which prefix depends on the class used for boxing. To avoid the
+        prefix you can append '+' to the front of $MODULE:
+
+            t->import('+My::Module');
+
+        T   Prefixes with "Test::"
+
+        T2  Prefixes with "Test2::Tools::"
+
+        T2::B
+            Prefixes with "Test2::Bundle::"
+
+        T2::P
+            Prefixes with "Test2::Plugin::"
+
+SEE ALSO
+    Import::Box - Everything here is based off of this module.
+
+SOURCE
+    The source code repository for T can be found at
+    http://github.com/Test-More/T/.
+
+MAINTAINERS
+    Chad Granum <exodist@cpan.org>
+
+AUTHORS
+    Chad Granum <exodist@cpan.org>
+
+COPYRIGHT
+    Copyright 2016 Chad Granum <exodist@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

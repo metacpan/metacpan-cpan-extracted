@@ -1,0 +1,24 @@
+
+A Tk::Gauge widget creates an analog gauge.  A gauge has various
+components: a radius highlighted by a circumference, one or more
+needles, a hub, three granularities of tick marks, one of which has a
+value label, a caption, title and specialized bands that visually
+compartmentalize the gauge.
+
+A gauge's appearance is specified by manipulating a set of
+approximately 60 options, all described in the POD. Given this
+flexibility one may create instruments including, but not limited to,
+a 12 or 24 hour clock, CPU meter, voltmeter, fuel and temperature
+gauge, speedometer and tachometer.
+
+Note: You must apply the patch "Trace.pm.diff" before Gauge needles
+will move.  The patch should appear in Tk-804.028.
+
+perl Makefile.PL
+make 
+make test
+make install
+
+Steve Lidie (sol0@lehigh.edu)
+Lehigh University Computing Center
+2004/06/20

@@ -1,0 +1,7 @@
+start => '00:00', tz => 'America/Chicago', days => 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
+
+J10(tz=>'America/Chicago', every=>1, until=>'00:10', chained=>1)
+
+
+
+ 

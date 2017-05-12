@@ -1,0 +1,7 @@
+Revision history for Test-DBIC-Versioned
+
+0.01    2013-02-03
+        First version.
+
+        Sorry, no unit tests yet. I thought it better to release something
+        now rather than wait forever for it to be perfect.

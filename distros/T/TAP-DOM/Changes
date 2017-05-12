@@ -1,0 +1,108 @@
+Revision history for TAP-DOM
+
+0.14      2017-02-17
+        - new module TAP::DOM::Archive to extract TAP::Archive files
+          into a multi-document super DOM
+
+        - Store "# Test-key: value" entries also as 'kv_data' under
+          their parent ok line.
+
+          Please note, this creates redundancy with global
+          'document_data' as it still stores entries there. This is to
+          keep backwards compatibility with existing TAP documents'
+          DOM.
+
+          If you want clear separation between global 'document_data'
+          from #Test-key:value entries not belonging to a test
+          ok/notok line and 'kv_data' entries, then set option
+          'disable_global_kv_data'.
+
+0.13      2016-02-26
+        - add forgotten 'planned' attribute from ::Aggregator
+
+0.12      2015-09-16
+        - generate "document_data" key/value entry in the TAP-DOM
+          from hot comments of the form: # Test-<key>: <value>
+
+0.11      2014-03-14
+        - assume TAP version 13 if TAP::Parser supports this (v3.22+)
+        - TAP-DOM "reverse": to_tap() produces TAP from a TAP::DOM
+        - distro polishing (misc & rt#90178)
+        - Дист::Зилла roundhouse kick
+
+2010-08-26  Steffen Schwigon  <ss5@renormalist.net>
+
+	* 0.10
+
+	* New option "usebitsets":
+	- When creating a TAP::DOM with new(usebitsets => 1) then all
+	  the 'has_*' and 'is_*' attributes are stored in a common
+	  bitset entry 'is_has' with their respective bits set.
+	  This reduces the size of a TAP::DOM remarkably (by ~40%
+	  for a large TAP-DOM) and is meant as an optimization
+	  option for memory constrained problems.
+
+	* Additional entry "tapdom_config" to store parse options
+
+	* Data structure now with classes and accessors:
+	- TAP::DOM::Entry -- all 'lines' entries
+	  (with 'is_*' and 'has_*' attributes correctly handling bitsets)
+	- TAP::DOM::Summary -- the aggregated 'summary' part
+	- TAP::DOM::Config -- the 'tapdom_config' part
+
+	* More tests and benchmarks for evaluating speed/memory footprint
+
+2010-04-19  Steffen Schwigon  <ss5@renormalist.net>
+
+	* 0.07
+
+	* Bummer! I shouldn't work too late at night... Using
+	  Test::Harness features from the future is too bleading edge.
+
+2010-04-16  Steffen Schwigon  <ss5@renormalist.net>
+
+	* 0.06
+
+	* New option "ignorelines" to strip unneccessary lines from the
+ 	  TAP that would otherwise just blow-up memory in the DOM.
+
+	* distribution maintenance
+
+2009-09-24  Steffen Schwigon  <ss5@renormalist.net>
+
+	* 0.05
+
+	* Allow to create more terse DOMs by accepting an "ignore" option
+	  to declare items that should not be included.
+
+2009-05-18  Steffen Schwigon  <ss5@renormalist.net>
+
+	* 0.04
+
+	* Fix error with comment lines before everything else
+
+2009-04-17  Steffen Schwigon  <ss5@renormalist.net>
+
+	* 0.03
+
+	* support for summary results from TAP::Parser::Aggregator
+
+2009-03-08  Steffen Schwigon  <ss5@renormalist.net>
+
+	* 0.02
+
+	* yaml and comment lines are now assigned to the line before
+	  under the key {_children}
+
+	* improved documentation
+
+	* less redundant test suite to better serve as documentation
+
+2009-02-13  Steffen Schwigon  <ss5@renormalist.net>
+
+	* 0.01
+
+	* initial version
+
+	* just a data structure and docs
+

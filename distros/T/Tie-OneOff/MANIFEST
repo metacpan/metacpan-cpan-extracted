@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Tie/OneOff.pm
+t/tie.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,39 @@
+#title Фрагмент: насилство
+#lang mk
+
+Овој краток текст е само дел од серијата идни критички написи во врска
+со „граѓанскиот анархизам“ [1]
+
+** Thing in MK [2]
+
+#other
+Here [3]
+
+
+** Thing [4]
+
+Cosa [5]
+
+#internal
+This is linked
+
+** Another chap
+
+** Chap
+
+#same
+
+[[#internal][Internal link]] [[#internal]] [[#same]] [[#other]] [[#other][other with desc]]
+
+
+[1] uno
+
+[2] due
+
+[3] tre
+
+[4] quattro
+
+[5] cinque
+
+

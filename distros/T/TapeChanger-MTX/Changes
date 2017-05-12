@@ -1,0 +1,41 @@
+Revision history for Perl extension TapeChanger::MTX.
+
+1.01	Mon Mar 01 16:57:54 CST 2004 
+
+	No longer echoes STDERR in tape_cmd() and mt_cmd().  Documentation
+	fixes.
+
+1.00	Fri Jan 16 11:07:23 CST 2004 
+
+	Added a fair bit of contributed code to support multi-slot tape 
+	drives and volume tags.  Set as a 'v1.0' release because it seemed
+	appropriate.
+
+0.71b	Fri Feb  1 13:38:13 CST 2002
+
+	Changed _doloadtape() again to check the return status
+
+0.70b	Fri Feb  1 13:13:08 CST 2002
+
+	Fixed _doloadtape() to eject the tape first.
+
+0.61b	Wed May 22 10:13:13 CDT 2002
+
+	Added a 'nexttape' script.  It's handy a lot.
+
+
+0.60b	Tue Nov 13 16:00:29 CST 2001
+
+	Fixed 'nexttape' and such to eject the drive first.  
+
+
+0.51b 	Tue Nov 13 09:16:49 CST 2001
+
+	Took out support for multiple drives in the 'eject' option, because 
+	it operates weirdly.  'reportstatus' is a bit different.
+
+0.5	Fri Nov  9 15:39:15 CST 2001
+
+	Initial version, based off old mtx-changer code (also self-written).
+	Documentation and such are written.
+

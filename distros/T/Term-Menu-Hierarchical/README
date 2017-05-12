@@ -1,0 +1,44 @@
+Term-Menu-Hierarchical version 0.95
+===================================
+
+DESCRIPTION
+
+Term::Menu::Hierarchical is a basic but hopefully broadly useful
+hierarchical menu generator. Feed it a hashref of whatever size and depth,
+and it'll display a menu with a nice console UI. The keys (or labels, if
+you prefer to think that way) are used as the menu entries; once you've
+followed the menu to the end of the chain (i.e., a value), that value will
+be displayed in a pure-Perl pager that does not require any system
+binaries.
+
+I find it very useful for looking at textual data as a structure, so I
+usually use it as the "output section", right after a parser that converts
+the raw data to keys and values. You can think of it as a human-readable,
+interactive Data::Dumper for text.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	POSIX           # Core module; already installed
+	Term::Cap       # Ditto
+	Term::ReadKey   # Available at CPAN
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Ben Okopnik
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

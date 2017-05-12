@@ -1,0 +1,21 @@
+Tie/FileHandle/Base version 0.1
+================================
+
+A base module to simplify creation of new FileHandle Tie modules by
+noting redundancies in the required functions.  Currently supports
+only output tie modules.  Input support is forthcoming.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Written by Robby Walker ( robwalker@cpan.org ) for Point Writer ( http://www.pointwriter.com/ ).
+
+You may redistribute/modify/etc. this module under the same terms as Perl itself.

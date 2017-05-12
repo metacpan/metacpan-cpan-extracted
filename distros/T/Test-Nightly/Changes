@@ -1,0 +1,24 @@
+Revision history
+################
+
+0.1 Tue 12th July 2005
+
+	- First public release
+
+
+0.2 Wed 13th July 2005
+
+	- Updated POD documentation
+
+
+0.3 Wed 10th August 2005
+	
+	- Checking for spaces in build script
+	- Changed makefile for build_script
+	- You can now pass in a flag (install_module) to install the module.
+	- Test output is now being supressed
+	- You can now use build as well as make
+	- Implemented nmake for windows
+	- You can now have your tests run at random or in order
+	- Skipping of tests implemented
+	- Updated the POD documentation a bit more

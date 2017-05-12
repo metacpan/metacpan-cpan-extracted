@@ -1,0 +1,4 @@
+name = "Test-JSON-RPC-Autodoc"
+badges = ["travis"]
+authority="cpan:YUSUKEBE"
+module_maker="ModuleBuildTiny"

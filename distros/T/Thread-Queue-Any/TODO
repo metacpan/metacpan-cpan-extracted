@@ -1,0 +1,2 @@
+Check out whether Data::Dumper as an alternate way to safely serialize data
+(including code refs) between threads, as per suggestion of Brent Dax.

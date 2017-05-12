@@ -1,0 +1,16 @@
+MANIFEST
+MANIFEST_maint
+CHANGELOG
+README
+TODO
+Makefile.PL
+lib/Thread/Queue/Any/Monitored.pm
+lib_maint/Thread/Queue/Any/Monitored.pm_maint
+t/001basic.t
+t/010serializer.t
+t_maint/Queue-Any-Monitored01.t_maint
+t_maint/Queue-Any-Monitored02.t_maint
+META.yml                                Module meta-data (added by MakeMaker)
+threadsforks                threads/forks test (added by Devel::ThreadsForks)
+maintblead                      maint/blead test (added by Devel::MaintBlead)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,48 @@
+Revision history for Tickit-Async
+
+0.20    2017/03/01 21:53:55
+        [BUGFIXES]
+         * Fixes for Tickit 0.62:
+            + A terrible hack to not appear to hang entirely with new
+              C-library Window implementation of Tickit 0.62
+            + Make unit test not actually hang
+
+0.19    2016/12/20 20:01:41
+        [BUGFIXES]
+         * Fix tests for Tickit 0.58 event structure accessor method style
+
+0.18    CHANGES:
+         * Updated for Tickit 0.32's structural key/mouse events
+         * Implement Tickit->timer() API
+
+0.17    BUGFIXES:
+         * Use IO::Async::OS->pipepair now it's not on $loop in unit tests
+         * Use new 'linetype' style attribute to Tickit::Widget::Frame in
+           example
+
+0.16    BUGFIXES:
+         * Provide Tickit::Term with a real output handle to avoid breaking
+           tests with the DECVSSM probe sequence
+
+0.15    CHANGES:
+         * Removed $SIG{__DIE__} override as it wasn't needed, and in any case
+           didn't work properly
+
+0.14    CHANGES:
+         * Updated for Tickit 0.18
+           + added required $term->flush to unit tests
+
+0.13    CHANGES:
+         * Updated for Tickit 0.17
+         * Use a weasel for CODEref that flushes initial output events
+         * Catch fatal exceptions during main loop run, print after
+           restoring terminal
+
+0.12    CHANGES:
+         * Updated for Tickit 0.14 and IO::Async 0.47
+
+0.11    BUGFIXES:
+         * Handle SIGINT to terminate gracefully, restoring terminal state
+
+0.10    CHANGES:
+         * Split module out from base Tickit distribution

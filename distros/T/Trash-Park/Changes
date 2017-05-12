@@ -1,0 +1,11 @@
+######################################################################
+Revision history for Perl extension Trash::Park
+
+0.03  2005/08/16
+    (ms) Fixed bug with -d option of eg/trashpark
+
+0.02  2005/08/14
+    (ms) Corrected typo in doc
+
+0.01  2005/08/12
+    (ms) Where it all began.

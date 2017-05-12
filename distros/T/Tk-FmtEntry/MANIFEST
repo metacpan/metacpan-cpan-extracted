@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+FmtEntry.pm
+test.pl
+fmtentrytest.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,5 @@
+<% my $var = 'rocks' -%>
+Dynamic: <%* t/data/027-dynamic-inc.tts
+            | PARAM: 'perl', $var
+            | FILTER: foobar, baz
+        -%>

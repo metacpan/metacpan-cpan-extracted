@@ -1,0 +1,6 @@
+##teamcity[testSuiteStarted flowId='t/test-data/basic/tc-message-from-test/input.st' name='t/test-data/basic/tc-message-from-test/input.st']
+##teamcity[progressMessage 'before']
+##teamcity[testStarted captureStandardOutput='true' flowId='t/test-data/basic/tc-message-from-test/input.st' name='ok']
+##teamcity[progressMessage 'after']
+##teamcity[testFinished flowId='t/test-data/basic/tc-message-from-test/input.st' name='ok']
+##teamcity[testSuiteFinished flowId='t/test-data/basic/tc-message-from-test/input.st' name='t/test-data/basic/tc-message-from-test/input.st']

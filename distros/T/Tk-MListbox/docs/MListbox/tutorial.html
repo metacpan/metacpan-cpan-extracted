@@ -1,0 +1,108 @@
+
+<!doctype html public "-//w3c//dtd html 3.2//en">
+<html>
+<head>
+  <title>Exploring Tk::MListbox - A Tutorial</title>
+  <link rel="stylesheet" type="text/css" href="../ptkdocs.css">
+ </head>
+<body background="../bg.gif">
+
+<table CELLPADDING=4 WIDTH="100%" ALIGN=center>
+<tr valign=middle>
+  <td CLASS="header" >Exploring Tk::MListbox - A Tutorial</TD>
+  <th width=10%" class='subheader'>Document Info</th>
+  </tr>
+<tr>
+  <td><a  href="../MListbox.html">Class Reference</a> <b>|</b> 
+         <a href=""></a>FAQ <b>|</b> 
+         <a href="change.html">Changes/Bug fixes</a>
+  </td>
+  <td valign="top" width ="30%" height='100%' rowspan=2>
+    <table width="100%" >
+      <tr ><th align=right>Date:</th><td>20 Dec 2001</td></tr>
+      <tr><th align=right>Author:</th><td>Rob Seegel</td></tr>
+      <tr><th align=right>Package:</b></td><td>MListbox</td></tr>
+    </table>      
+  </td>
+</tr>
+
+<tr>
+  <td>
+<UL>
+    <li><A HREF="#introduction">What is it and what is it good for?</a></li>
+    <ul>
+      <li><A HREF="#add_elements">Features</a></li>
+    </uL>
+
+    <li><A HREF="#basics">Common tasks</a></li>
+    <ul>
+      <li><A HREF="#add_elements">Adding</a></li>
+      <li><A HREF="#select_elements">Selecting</a></li>
+      <li><a href="#remove_elements">Removing</a></li>
+    </ul>  
+    <li><a href="#additional">Additional Functionality</a></li>
+    <ul>
+      <li><a href="#binding">Binding Methods</a></li>
+    </ul>
+    <li><a href="#related_docs">Related Documents</a></li>
+</ul>
+  </td>
+</tr>
+</table>
+<hr>
+
+<a name="introduction"></a>
+<h2>What is it and what is it good for?</h2>
+<p class="pMargin">
+   MListbox is a composite widget that's all about making  potentially complicated 
+   tasks easier. It provides an easy way to implement tabular displays such as what 
+   might be needed to display the result set from a database query, or a list 
+   of files and directories. As it turns out, displaying data in columns is
+   a common task, and there are other Tk widgets that provide similar functionality,
+   and so much the better - choice is good. The different implementations each have
+   their own strengths, and while there is a lot of overlap, some have features that
+   the others don't. So what does MListbox offer?
+</p>
+
+
+<a name="features"></a>
+<h2>Using ML</h2>
+
+<center>
+<img src="ml.gif" width="486" height="252" alt="sample MListbox image">
+</center>
+
+<p class="pMargin"><b>MListbox...</b></p>
+<ul>
+  <li>Is coded in perl - no worries about compiling and customization is bit easier</li>
+  <li>Handles sorting, by pressing on column headers or by using the API. Further, it handles
+      multi-column sorting by one or more keys. You can even create your customized sorting
+      routines for a column.</li>
+  <li>Handles manual column resizing</li>
+  <li>Handles moveable columns. Users can reorder columns manually using drag and drop</li>
+  <li>Provides the means to efficiently show or hide individual columns</li>
+  <li>Offers a simple API - A majority of the methods should be familiar to Listbox users</li>
+</ul>
+
+<p class=pMargin>
+  Currently, MListbox does have a few limitations - most of these limitations are directly
+  because of Listbox. MListbox does not and cannot support several individually color rows -
+  columns, yes, but not rows. The same holds true for fonts. Also, other widgets cannot be
+  embedded into rows. Text justification is to the left only, and a single cells content can 
+  only be displayed in a single line without wrapping. All these things, and more  can be 
+  handled using Tk::HList should you require them.  Unfortunately, these other features come 
+  at the cost of built-in sorting, resizing, moveable columns and a slightly more complex API.
+</p>
+
+<a name="Using MListbox"></a>
+<h2>Features</h2>
+
+
+<hr>
+<Address><font size="-1">
+This document was written by Rob Seegel on 20 Apr 2001
+</font>
+</Address>
+
+</body>
+</html>

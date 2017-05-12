@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Test/Routine/AutoClear.pm
+lib/Test/Routine/DoesAutoClear.pm
+lib/Test/Routine/Meta/Attribute/Trait/AutoClear.pm
+lib/Test/Routine/Meta/Builder.pm
+t/autoclear.t
+t/does_autoclear.t
+t/with_builder.t
+weaver.ini

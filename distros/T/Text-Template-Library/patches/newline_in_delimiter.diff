@@ -1,0 +1,71 @@
+--- lib/Text/Template.pm~	2008-07-05 16:57:55.000000000 +0200
++++ lib/Text/Template.pm	2008-07-06 13:10:55.000000000 +0200
+@@ -160,10 +160,12 @@
+   
+ 
+   my ($t_open, $t_close) = ('{', '}');
++  my ($t_open_nl, $t_close_nl) = (0, 0);  # number of newlines per delimiter
+   my $DELIM;			# Regex matches a delimiter if $delim_pats
+   if (defined $delim_pats) {
+     ($t_open, $t_close) = @$delim_pats;
+     $DELIM = "(?:(?:\Q$t_open\E)|(?:\Q$t_close\E))";
++    ($t_open_nl, $t_close_nl) = map {tr/\n//} $t_open, $t_close;
+     @tokens = split /($DELIM|\n)/, $self->{SOURCE};
+   } else {
+     @tokens = split /(\\\\(?=\\*[{}])|\\[{}]|[{}\n])/, $self->{SOURCE};
+@@ -180,10 +182,12 @@
+     if ($t eq $t_open) {	# Brace or other opening delimiter
+       if ($depth == 0) {
+ 	push @content, [$state, $cur_item, $lineno] if $cur_item ne '';
++	$lineno += $t_open_nl;
+ 	$cur_item = '';
+ 	$state = 'PROG';
+ 	$prog_start = $lineno;
+       } else {
++	$lineno += $t_open_nl;
+ 	$cur_item .= $t;
+       }
+       $depth++;
+@@ -193,6 +197,7 @@
+ 	$ERROR = "Unmatched close brace at line $lineno";
+ 	return undef;
+       } elsif ($depth == 0) {
++	$lineno += $t_close_nl;
+ 	if ($cur_item =~ /^#line (\d+)$/) {
+ 	  $lineno = $1;
+ 	} elsif ($cur_item ne '') {
+--- t/10-delimiters.t~	2008-04-17 01:39:41.000000000 +0200
++++ t/10-delimiters.t	2008-07-06 13:28:01.000000000 +0200
+@@ -11,7 +11,7 @@
+ Aborting"
+   unless $Text::Template::VERSION == 1.45;
+ 
+-print "1..18\n";
++print "1..19\n";
+ $n = 1;
+ 
+ # (1) Try a simple delimiter: <<..>>
+@@ -95,5 +95,23 @@
+ }
+ 
+ 
++# (6) Delimiters with newline
++$template = qq{before\n\n<<\$1=1>>\n\nbetween\n\n<<1/0>>\n\nafter\n};
++$result = <<'RESULT';
++before
++Program fragment delivered error ``Modification of a read-only value attempted at template line 3.''
++between
++Program fragment delivered error ``Illegal division by zero at template line 7.''
++after
++RESULT
++$template1 = Text::Template->new(TYPE => STRING, 
++				 SOURCE => $template,
++				 DELIMITERS => [qq'\n<<', qq'>>\n']
++				)
++  or die "Couldn't construct template object: $Text::Template::ERROR; aborting";
++$text = $template1->fill_in();
++print +($text eq $result ? '' : 'not '), "ok $n\n";
++$n++;
++
+ exit;
+ 

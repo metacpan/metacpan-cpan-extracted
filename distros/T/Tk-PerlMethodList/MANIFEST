@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-PerlMethodList.t
+lib/Tk/PerlMethodList.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,18 @@
+Changes
+=======
+
+0.04000 - 01 Nov 2011
+  - "What this module is mine?" release
+  - Work with twitter/facebook style urls containing "#!". reported by Yappo
+  - Created a repository in github
+
+0.03000 - 27 Oct 2007
+  - Switch to Module::Install
+  - Add warnings
+
+0.02 - 09 Mar 2006
+  - Add Plugin::CPAN (e.g. cpan://Text::AutoLink)
+  - Actually add a Changes file (oops)
+
+0.01 - 09 Mar 2006
+  - Initial release

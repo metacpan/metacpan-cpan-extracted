@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use opts;
+
+opts (
+	my $hatena => 'Bool',
+	my $inline => { isa => 'Str', default => 'Text::Xatena::Inline' },
+);
+
+use Text::Xatena;
+
+my $input = do { local $/; <ARGV> };
+
+my $xatena = Text::Xatena->new(
+	hatena_compatible => $hatena,
+	inline            => $inline->new,
+);
+
+print $xatena->format($input), "\n";
+

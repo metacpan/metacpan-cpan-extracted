@@ -1,0 +1,32 @@
+
+This package implements various Hewlett-Packard RPN calculators.  This
+is the first beta release, designed to prototype the OO base class.
+
+Two HP RPN calculators are supplied:
+
+HP-21  Scientific (second generation HP-35), 1975
+HP-16C Computer Scientist, 1981
+
+These prerequsites are required to use the HP modules:
+
+    Tk::LCD
+    Tk::SlideSwitch
+
+These prerequisites, while not strictly required by the HP modules,
+are used by the sample program tkhpcalc:
+
+    Tk::ProgressBar::Mac
+    Tk::Splashscreen
+
+
+Installation follows the standard idiom:
+
+perl Makefile.PL
+make
+make test
+(sudo) make install
+
+Steve Lidie
+sol0@lehigh.edu
+
+2007/04/02

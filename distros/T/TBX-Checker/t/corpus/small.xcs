@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TBXXCS SYSTEM "tbxxcsdtd.dtd">
+<TBXXCS name="Small" version="2" lang="en">
+    <header>
+        <title>Example XCS file</title>
+    </header>
+    <!-- All languages used in a TBX document instance must be declared in the elements below.-->
+    <languages>
+        <langInfo>
+            <langCode>en</langCode>
+            <langName>English</langName>
+        </langInfo>
+        <langInfo>
+            <langCode>fr</langCode>
+            <langName>French</langName>
+        </langInfo>
+        <langInfo>
+            <langCode>de</langCode>
+            <langName>German</langName>
+        </langInfo>
+    </languages>
+    <!-- end of languages -->
+
+    <!-- Data category specifications start here -->
+    <datCatSet>
+        <termNoteSpec name="administrativeStatus" datcatId="ISO12620A-020903">
+            <contents datatype="picklist">preferredTerm-admn-sts admittedTerm-admn-sts
+                deprecatedTerm-admn-sts supersededTerm-admn-sts</contents>
+        </termNoteSpec>
+        <descripSpec name="context" datcatId="ISO12620A-0503">
+            <contents/>
+            <levels>term</levels>
+        </descripSpec>
+        <refSpec name="crossReference" datcatId="ISO12620A-1018">
+            <contents targetType="element"/>
+        </refSpec>
+        <adminSpec name="customerSubset" datcatId="ISO12620A-100301">
+            <contents datatype="plainText"/>
+        </adminSpec>
+        <descripSpec name="definition" datcatId="ISO12620A-0501">
+            <contents/>
+            <levels>langSet termEntry</levels>
+        </descripSpec>
+        <xrefSpec name="externalCrossReference" datcatId="ISO12620A-101807">
+            <contents targetType="external"/>
+        </xrefSpec>
+        <termNoteSpec name="geographicalUsage" datcatId="ISO12620A-020302">
+            <contents datatype="plainText"/>
+        </termNoteSpec>
+        <termNoteSpec name="grammaticalGender" datcatId="ISO12620A-020202">
+            <contents datatype="picklist" forTermComp="yes">masculine feminine neuter
+            other</contents>
+        </termNoteSpec>
+        <termNoteSpec name="partOfSpeech" datcatId="ISO12620A-020201">
+            <contents datatype="picklist" forTermComp="yes">noun verb adjective adverb properNoun
+                other</contents>
+        </termNoteSpec>
+        <adminSpec name="projectSubset" datcatId="ISO12620A-100303">
+            <contents datatype="plainText"/>
+        </adminSpec>
+        <transacNoteSpec name="responsibility" datcatId="ISO12620A-100202">
+            <contents targetType="respPerson"/>
+        </transacNoteSpec>
+        <adminSpec name="source" datcatId="ISO12620A-1019">
+            <contents/>
+        </adminSpec>
+        <descripSpec name="subjectField" datcatId="iso12620A-04">
+            <contents datatype="plainText"/>
+            <levels>termEntry</levels>
+        </descripSpec>
+        <termNoteSpec name="termLocation" datcatId="n/a">
+            <contents datatype="plainText"/>
+        </termNoteSpec>
+        <termNoteSpec name="termType" datcatId="ISO12620A-0201">
+            <contents datatype="picklist">abbreviation acronym fullForm shortForm variant
+            phrase</contents>
+        </termNoteSpec>
+        <transacSpec name="transactionType" datcatId="ISO12620A-1001">
+            <contents datatype="picklist">origination modification</contents>
+        </transacSpec>
+        <xrefSpec name="xGraphic" datcatId="ISO12620A-050501">
+            <contents targetType="external"/>
+        </xrefSpec>
+    </datCatSet>
+    <!-- end of data category specifications -->
+
+    <!-- For recording, in the backmatter of a TBX-Basic file, the names and other information about persons who are named in the transacNote elements, the elements are defined in the core structure DTD, and their type attributes are adopted from the vCard standard. See section 11.7 in the TBX Specification (ISO 30042). -->
+    <!-- the following markup is not required for TBX-Basic but must be included in the XCS file to make it valid. -->
+    <refObjectDefSet>
+        <refObjectDef>
+            <refObjectType/>
+            <itemSpecSet type="none">
+                <itemSpec type="none"/>
+            </itemSpecSet>
+        </refObjectDef>
+    </refObjectDefSet>
+</TBXXCS>

@@ -1,0 +1,136 @@
+Revision history for Tapper-MCP
+
+5.0.6     2016-11-11
+        - Cancel 'local' testruns kills the whole process tree behind it
+
+5.0.5     2016-11-11
+        - for 'local' replace hardcoded script with config entry
+
+5.0.4     2016-08-09
+        - scheduler fixes
+
+5.0.3     2016-03-11
+        - logfile wording and job finishing
+
+5.0.2     2016-03-03
+        - intermediate release with misc experimental fixes
+
+5.0.1     2016-02-16
+        - better version dependent experimental warnings
+
+5.0.0     2016-02-15
+        - internal refactoring
+        - use MooseX::Daemonize for daemon
+        - plugin system for organizing MCP functionality
+        - now as plugins: console handling, reset handling
+        - host pool handling: many "anonymous" hosts that have a
+          common name where only the count matters but not the
+          particular single name. Think of cloud instances.
+        - merged TestrunDB/ReportsDB
+        - polishing edge cases around:
+          * MCP chil exit handling
+          * state handling when installation is skipped
+          * output directory cleanup
+          * interdependent scenarios
+          * explicit db disconnects in MCP children
+
+4.1.2     2012-11-23
+        - new precondition hint 'local' to run a PRC locally
+          around any program which is then your hook to any testing
+          (kind of a lightweight machine automation)
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        * Speedup rework (factor 5)
+        - [FEAT] Scheduler with non-DBIC objects
+        - [FEAT] scheduler in separate process
+        - [TEST] for memory growth
+        - make package immutable
+
+        * PostgreSQL support
+        - [FIX] slow first() usage
+        - rename USER into OWNER
+
+        * Cobbler integration (first part)
+        - [FEAT] new precondition_type "cobbler"
+
+        * Features
+        - [FEAT] host blacklists per queue ("denied host")
+        - [FEAT] poor mans nesting for SimNow
+        - [FEAT] new precondition "testrun_stop"
+
+        * Misc
+        - [FIX] condition to grep for forbidden hosts
+        - [FIX] job has only one queue
+        - [FIX] report correct testrun id to notification framework
+        - [FIX] add hostname feature if not in DB
+        - [FIX] wrong 'passwd' parameter name
+        - [FIX] deprecated "use UNIVERSAL"
+        - [RFK] adapt API to WFQ API
+
+4.0.5     2012-06-26
+        - rework tmp/log/pid file handling in daemon and reset plugin
+
+4.0.4     2012-06-12
+        - help with Crypt::DH deps via AAAA::Crypt::DH
+
+4.0.3     2012-06-11
+        - hide test modules from PAUSE
+
+4.0.2     2012-06-05
+        - timeout handling bit more lax to adapt PRC timing changes
+        - log files during test
+
+4.0.1     2012-05-16
+        - *lots* of enhancements in whole automation layer
+        - MCP is now a stop/resume-able state engine,
+          based on event queues,
+          making the whole automation persistent,
+          inclusive still correctly recalculating timeouts
+        - introduce SSH-connect to test without complete machine setup
+        - introduce 'notification framework' to conditionally
+          trigger notifications on incoming results
+        - SIGUSR1 based live debugging, testrun-id part of process name
+        - introduced keep-alive detection
+        - reworked API for reset plugins
+        - OSRC-RESET plugin with watchdog-style success checking
+        - configurable and host-dependent grub-config
+        - improved integration with kickstart/autoyast/debinst installers
+        - allow lazy precondition producers also in "virt" preconditions
+        - big Dist::Zilla roundhouse kick
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.5
+
+	* rewritable shebang line
+	* yet another timeout increase
+	* [FIX] access to PRC number in message
+	* [FIX] handle warn-install message
+	* [FIX] provide testrun to TAP role
+	* [FIX] show error message when console can't be opened
+	* [FIX] provide MCP port
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.000002
+
+	* fix scheduler report sending with T::MCP::Net::TAP
+
+	* Make timouts more robust in tests
+
+	* try to force YAML versions
+
+2011-03-02 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.1
+
+	* cpan release

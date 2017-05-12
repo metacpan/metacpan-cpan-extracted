@@ -1,0 +1,19 @@
+Revision history for Perl extension Text::AAlib
+
+0.06 2013-07-05T01:34:31Z
+        - Fix configure dependency
+
+0.05 2013-07-01T01:58:07Z
+        - Improve dependency checking(Reported by tehmoth)
+
+0.04 2013-06-24T14:53:41Z
+        - Convert to Minilla
+
+0.03  2012-11-17
+        - Check system has aalib and its header file
+
+0.02  2012-10-20
+        - Bump Module::Install version
+
+0.01  2011-11-06
+        - original version

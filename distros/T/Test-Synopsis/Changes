@@ -1,0 +1,97 @@
+Revision history for Perl extension Test::Synopsis
+
+0.15  2016-03-02
+        - Specify Pod::Simple version to prereq, as needed
+          feature missing from older versions (by autarch)        
+
+0.14  2016-02-16
+        - Complete rewrite by dolmen
+        [BREAKING CHANGES]
+        - The undocumented PRIVATE subroutine extract_synopsis
+          has been renamed. Any code using it will break
+
+0.13  2016-01-04
+        - Fix #12 conflict with multiple chunks (by turnstep)
+
+0.12  2015-12-27
+        - Add META.json (monsieurp)
+
+0.11  2014-10-04
+        [Changes by ZOFFIX]
+        - Added #10 to CAVEATS (redefined warnings)
+        - Fixed #11 (failing tests on newer perls)
+
+0.10  2014-02-07
+        [Changes by ZOFFIX]
+        - Reverted the change of renaming extract_synopsis() to
+          _extract_synopsis(), as it appears some distros have used
+          undocumented extract_synopsis() in their user tests, and
+          the change is causing their distros to fail
+        - Added contributors into META file through dzil plugin
+
+0.09  2014-02-06
+        [Changes by ZOFFIX]
+        - Fixed prereqs to allow earlier versions of Test-Simple (Issue #9)
+        - Removed POD errors from test .pm's to increase Kwalitee
+
+0.08  2014-02-05
+        [Changes by ZOFFIX]
+        - Implemented proper handling of __DATA__ tokens
+        - Removed unwanted warnings issued during tests
+        - Upped required Test-Simple distro version (Fixes Issue #9)
+        - Minor pod fixes
+
+0.07  2014-02-04
+
+        [Changes by ZOFFIX]
+
+        - Converted to dzil for automation of everything and
+            auto-generation of all the author/release tests and extra files
+
+        - Fixed RT#84863 (should ignore descriptions, and
+            other text that is not code)
+            https://rt.cpan.org/Ticket/Display.html?id=84863
+
+        - Fixed RT#76856 (Sandbox breaks when combining synopses that use
+            Moose and Moose::Role)
+            https://rt.cpan.org/Ticket/Display.html?id=76856
+
+        - Fixed RT#69438 (heredocs fail to terminate because of the
+            leading space for verbatim blocks)
+            https://rt.cpan.org/Ticket/Display.html?id=69438
+
+        - Fixed RT#54731 (suggest =for conditionalized synopsis check)
+            https://rt.cpan.org/Ticket/Display.html?id=54731
+
+        - Fixed RT#53192 (missing Copyright information for Test::Synopsis)
+            https://rt.cpan.org/Ticket/Display.html?id=53192
+
+        - Fixed RT#52684 (pod directive to skip Test::Synopsis)
+            https://rt.cpan.org/Ticket/Display.html?id=52684
+
+        - Fixed RT#51534 (end =for at blank line)
+            https://rt.cpan.org/Ticket/Display.html?id=51534
+
+        - Fixed RT#51535 (show failing code on error)
+            https://rt.cpan.org/Ticket/Display.html?id=51535
+
+0.06  2009-06-06 11:07:50 PDT 2009
+        - Reworked NoPod tests so it doesn't sit in lib/ and won't be installed.
+
+0.05  2009-06-06 10:55:02 PDT 2009
+        - use Test::Builder::Module to support forward compatibilities with Test::More
+        - Don't warn in tr/// if there is no pod at all. (Thanks to hanekomu)
+
+0.04  2009-03-05 17:19:13 PST 2009
+        - Fixed a doc bug where all_synopsis_ok() is taking a directory which it doesn't.
+
+0.03  2009-02-25 20:48:54 PST 2009
+        - Added file name and line number to eval context
+          (Thanks to Daisuke Maki and Goro Fuji)
+
+0.02  2009-02-24 12:22:03 PST
+        - Added more docs.
+        - eval the code in a more separate sandbox so that variables in Test::Synopsis won't affect.
+
+0.01  2009-02-24 00:21:02 PST
+        - original version

@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Text/WikiCreole.pm
+t/block.html
+t/block.markup
+t/block.t
+t/escape.html
+t/escape.markup
+t/escape.t
+t/inline.html
+t/inline.markup
+t/inline.t
+t/link.t
+t/opentag.t
+t/plugin.t
+t/specialchars.html
+t/specialchars.markup
+t/specialchars.t
+t/amp.html
+t/amp.markup
+t/amp.t
+

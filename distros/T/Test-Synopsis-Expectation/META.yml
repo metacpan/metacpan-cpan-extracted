@@ -1,0 +1,50 @@
+---
+abstract: 'Test that SYNOPSIS code produces expected results'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::Builder::Tester: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Synopsis-Expectation
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Synopsis::Expectation:
+    file: lib/Test/Synopsis/Expectation.pm
+    version: '0.12'
+  Test::Synopsis::Expectation::Pod:
+    file: lib/Test/Synopsis/Expectation/Pod.pm
+  Test::Synopsis::Expectation::Sandbox:
+    file: lib/Test/Synopsis/Expectation.pm
+requires:
+  PPI::Tokenizer: '0'
+  Pod::Simple::Methody: '0'
+  Test::Builder::Module: '0'
+  Test::More: '0.98'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/moznion/Test-Synopsis-Expectation/issues
+  homepage: https://github.com/moznion/Test-Synopsis-Expectation
+  repository: git://github.com/moznion/Test-Synopsis-Expectation.git
+version: '0.12'
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'

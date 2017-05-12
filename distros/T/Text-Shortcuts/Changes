@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::Shortcuts.
+
+0.01  Sun Apr  7 12:33:04 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Text::Shortcuts
+

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-StatusBar.t
+lib/Tk/StatusBar.pm

@@ -1,0 +1,8 @@
+CVS/Root
+CVS/Repository
+CVS/Entries
+CVS/Entries.Log
+t/CVS/Entries
+t/CVS/Repository
+t/CVS/Root
+

@@ -1,0 +1,25 @@
+Revision history for Telephony-Asterisk-AMI
+
+0.006  2015-12-26
+	- No functional changes
+	- Add tests for Event_Callback (20-ami-events.t)
+
+0.005  2015-12-19
+	- No functional changes
+	- Clarify docs for read_response method
+
+0.004  2015-11-28
+	- No functional changes
+	- Add tests (10-ami.t)
+
+0.003  2015-11-14
+	- Add send_action and read_response methods
+	- Fix docs for error method (disconnect can set it)
+
+0.002  2015-11-07
+	- Validate Asterisk Call Manager header in connect method
+	- Add disconnect method
+	- In action method, check that the connection is open
+
+0.001  2015-10-31
+	- Initial release

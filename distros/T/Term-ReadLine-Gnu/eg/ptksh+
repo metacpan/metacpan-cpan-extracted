@@ -1,0 +1,127 @@
+#!/usr/local/bin/perl -w
+#
+# $Id: ptksh+ 475 2014-12-13 03:20:00Z hayashi $
+#
+# POD documentation after __END__
+
+# This program is contributed by Achim Bohnet.  It demonstrates how to
+# use the callback functions in the GNU Readline Library.  This script
+# is essentially equivalent with executing the following lines in
+# `eg/perlsh';
+#	$PerlSh::term->tkRunning(1);
+#	use Tk;
+#	$mw = MainWindow->new();
+#
+# Hiroo Hayashi
+
+require 5.003_92;
+
+use Tk;
+
+# Bug: Require script does not work with all possibilities of
+#      missing/existing   new MainWindow and MainLoop. Therefore
+#      I have disabled it.
+# Mainloop in script would be the end. No readline :-(
+#require shift @ARGV if (@ARGV);
+
+
+package Tk::RL;
+use Tk;
+use Term::ReadLine;
+
+$name = 'ptksh+';
+
+$mw = MainWindow->new() unless ($mw = Tk::Exists 'MainWindow');
+$mw->title($name);
+$mw->iconname($name);
+$mw->protocol('WM_DELETE_WINDOW' => \&quit);
+
+
+##### Gnu Readline Stuff #####
+my $term = new Term::ReadLine $name;
+my $attribs = $term->Attribs;
+
+$term->callback_handler_install("$name> ", \&doline);
+
+$mw->fileevent(STDIN,'readable',
+	$attribs->{callback_read_char});
+
+sub quit {
+   $mw->fileevent(STDIN,'readable','');
+   $term->callback_handler_remove();
+   $mw->destroy;
+}
+
+my $outstream = $attribs->{outstream};
+sub doline {
+    my $line = shift;
+
+    if (defined $line) {
+        if ($line =~ /^p\s(.*)$/) {              
+            $line = "print $1, \"!\\n\";";
+        }              
+
+        eval "{package main; $line }";
+        print $outstream "$@\n" if $@;
+        $term->add_history($line) if $line ne "";
+        $attribs->{line_buffer} = ''; # needed for eval errors
+    } else {
+        quit() unless defined $line;
+    }
+}
+
+# To test if Tk is not blocked:  Tk::RL::tk_active<return>
+sub tk_active {
+        print STDERR "I'm working behing the scene\n";
+        $mw->after(1500,\&tk_active);
+}
+#$mw->after(1500,\&tk_active);
+
+
+package main;
+
+# be gentle if 'required' script defined $mw;
+$mw = $Tk::RL::mw if not defined $mw;
+
+MainLoop;
+print "\n";
+
+__END__
+
+=head1 NAME
+
+ptksh+	- Simple perl/Tk shell that uses the Gnu Readline features
+
+=head1 SYNOPSIS
+
+    % ptksh+
+    ptksh+> $b=$mw->Button(-text=>'hello',-command=>sub{print STDERR 'hello'})
+    ptksh+> $b->pack;
+    ptksh+> ...
+    ptksh+> ^D
+    %
+
+=head1 DESCRIPTION
+
+This (very) simple perl/Tk shell allows you to enter perl/Tk commands
+interactively.
+Additionally it supports command line editing and keeps a history
+of previously entered commands.  It requires C<Term-Readline-Gnu>
+to be installed.
+
+You can exit ptksh+ with ^D or using your Window Manager 'Close'
+item.
+
+=head1 SEE ALSO
+
+Term::Readline, Term::Readline::Gnu, Tk, perldebug
+
+=head1 AUTHOR
+
+Achim Bohnet <F<ach@mpe.mpg.de>>, URL:L<http://www.xray.mpe.mpg.de/~ach/>
+
+Copyright (c) 1996-1997 Achim Bohnet. All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=cut

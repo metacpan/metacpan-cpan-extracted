@@ -1,0 +1,21 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tk-Schedule
+version:      0.01
+version_from: lib/Tk/Schedule.pm
+installdirs:  site
+requires:
+    B::Deparse:                    0
+    Bit::Vector:                   6.4
+    Carp::Clan:                    5.3
+    Date::Calc:                    5.4
+    Storable:                      2.05
+    Time::Local:                   0
+    Tk:                            0
+    Tk::ChooseDate:                0
+    Tk::Frame:                     0
+    Tk::Photo:                     0
+    Tk::TimePick:                  0.02
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.25

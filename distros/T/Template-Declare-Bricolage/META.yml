@@ -1,0 +1,32 @@
+---
+name: Template-Declare-Bricolage
+version: 0.01
+author: []
+abstract: Perlish XML Generation for Bricolage's SOAP API
+license: perl
+resources:
+  bugtracker: http://github.com/theory/template-declare-bricolage/issues/
+  homepage: http://search.cpan.org/dist/Template-Declare-Bricolage/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/template-declare-bricolage/tree/
+configure_requires:
+  Module::Build: 0.2701
+requires:
+  Template::Declare: 0
+build_requires:
+  Module::Build: 0.2701
+  Test::More: 0.17
+  Test::XML: 0
+recommends:
+  Test::Pod: 1.20
+  Test::Pod::Coverage: 1.06
+provides:
+  Template::Declare::Bricolage:
+    file: lib/Template/Declare/Bricolage.pm
+    version: 0.01
+  Template::Declare::TagSet::Bricolage:
+    file: lib/Template/Declare/TagSet/Bricolage.pm
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

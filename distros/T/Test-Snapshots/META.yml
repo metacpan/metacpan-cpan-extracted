@@ -1,0 +1,37 @@
+---
+abstract: 'for testing stand alone scripts and executables'
+author:
+  - 'Gabor Szabo'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.50
+distribution_type: module
+generated_by: 'Module::Install version 0.81'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Snapshots
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Exporter: 0
+  File::Basename: 0
+  File::Find::Rule: 0.30
+  File::Spec: 3.2701
+  File::Spec::Functions: 3.2701
+  File::Temp: 0
+  FindBin: 0
+  List::Util: 0
+  Test::Builder: 0.47
+  Test::Builder::Module: 0.47
+  Text::Diff: 0
+  perl: 5.008005
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/szabgab/test-snapshots
+version: 0.02

@@ -1,0 +1,76 @@
+# NAME
+
+Test2::Plugin::SpecDeclare - Syntax keywords for [Test2::Tools::Spec](https://metacpan.org/pod/Test2::Tools::Spec).
+
+# \*\*\* EXPERIMENTAL \*\*\*
+
+This distribution is experimental, anything can change at any time!
+
+# DESCRIPTION
+
+This adds keywords for all the exports provided by [Test2::Tools::Spec](https://metacpan.org/pod/Test2::Tools::Spec). These
+keywords add sugar-coating to the Spec tools.
+
+# SYNOPSIS
+
+    use Test2::Tools::Spec;
+    use Test2::Plugin::Spec;
+
+    tests foo {
+        ...
+    }
+
+    describe bar {
+        before_each blah { ... }
+
+        case a { ... }
+        case b { ... }
+
+        tests x(todo => 'not ready') { ... }
+        tests y(skip => 'will die' ) { ... }
+    }
+
+    done_testing;
+
+All exports from [Test2::Tools::Spec](https://metacpan.org/pod/Test2::Tools::Spec) gain keyword status. You can use a
+bareword or a quoted string as a name, you can specify options as a signature,
+then you provide a block, no trailing semicolon or 'sub' keyword needed.
+
+    KEYWORD NAME { ... }
+    KEYWORD NAME(KEY => VAL, ...) { ... }
+
+    KEYWORD 'NAME' { ... }
+    KEYWORD 'NAME'(KEY => VAL, ...) { ... }
+
+    KEYWORD "NAME" { ... }
+    KEYWORD "NAME"(KEY => VAL, ...) { ... }
+
+Non-keyword forms still work:
+
+    FUNCTION NAME => sub { ... };
+    FUNCTION NAME => {...}, sub { ... };
+
+    FUNCTION('NAME', sub { ... });
+    FUNCTION('NAME', {...}, sub { ... });
+
+# SOURCE
+
+The source code repository for Test2-Workflow can be found at
+`http://github.com/Test-More/Test2-Workflow/`.
+
+# MAINTAINERS
+
+- Chad Granum &lt;exodist@cpan.org>
+
+# AUTHORS
+
+- Chad Granum &lt;exodist@cpan.org>
+
+# COPYRIGHT
+
+Copyright 2015 Chad Granum &lt;exodist7@gmail.com>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See `http://dev.perl.org/licenses/`

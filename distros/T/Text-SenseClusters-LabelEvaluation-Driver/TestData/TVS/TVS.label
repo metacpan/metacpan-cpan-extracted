@@ -1,0 +1,12 @@
+Cluster 0 (Descriptive): George Bush, Russian President, Prime <head>T_V_S</head>, President <head>T_V_S</head>, British Prime, British Minister, India Pakistan, US George, Prime Minister, Minister <head>T_V_S</head>
+
+Cluster 0 (Discriminating): Russian President, Prime <head>T_V_S</head>, British Minister, India Pakistan, US George, Minister <head>T_V_S</head>
+
+Cluster 1 (Descriptive): George Bush, President <head>T_V_S</head>, British Prime, weapons mass, United Nations, September 11, mass destruction, United States, Prime Minister, military action
+
+Cluster 1 (Discriminating): United Nations, September 11, United States
+
+Cluster 2 (Descriptive): George Bush, weapons destruction, prime minister, axis evil, Saddam Hussein, weapons mass, mass destruction, Gulf War, military action, Iraqi leader
+
+Cluster 2 (Discriminating): weapons destruction, prime minister, axis evil, Saddam Hussein, Gulf War, Iraqi leader
+

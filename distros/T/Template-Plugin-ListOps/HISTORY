@@ -1,0 +1,28 @@
+###############################################################################
+# HISTORY
+###############################################################################
+
+Version 1.00  2007-08-16
+   Initial release
+
+Version 1.01  2007-12-17
+   Added op to delete function.
+   Modified sorted to use Sort::DataTypes.
+
+Version 1.02  2008-05-05
+   Added Build.PL and several other things to meet requirements on
+      http://cpants.perl.org/
+
+Version 1.03  2008-05-08
+   Additional changes to meet requirements on http://cpants.perl.org/
+
+Version 1.04  2008-05-09
+   Final changes to meet requirements on http://cpants.perl.org/
+   Bug fix so it won't fail with "Too early to specify a build action"
+
+Version 2.00  2009-04-14
+   Moved list operations to Set::ArrayAlt and rewrote functions here
+      as wrappers around that module.
+
+Version 2.01
+   Set::ArrayAlt renamed to Array::AsObject

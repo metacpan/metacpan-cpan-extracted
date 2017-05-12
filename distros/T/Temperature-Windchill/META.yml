@@ -1,0 +1,24 @@
+---
+abstract: 'calculate effective temperature on exposed skin'
+author:
+  - 'John Trammell <johntrammell@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Temperature-Windchill
+provides:
+  Temperature::Windchill:
+    file: lib/Temperature/Windchill.pm
+    version: 0.04
+requires:
+  Exporter: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

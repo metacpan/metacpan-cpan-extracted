@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::InsertOrderHash.
+
+0.01  Fri Jun 14 08:46:59 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Tie::InsertOrderHash -v 0.01 -b 5.6.1
+

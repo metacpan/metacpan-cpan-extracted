@@ -1,0 +1,10 @@
+Revision history for Perl extension Tie::FTP.
+
+0.02  Thu Aug 24 2006
+    - Add tests + config framework in Makefile.PL
+    - MIT licence
+    - Don't need config framework (that was overkill)
+      Tests for anonymous ftp and writeback
+
+0.01  Sat Aug  2 17:24:38 2003
+	- original version

@@ -1,0 +1,11 @@
+# Tapper-Explicit-Section-Start: 1 ---- metainfo ----
+# Tapper-suite-name:               STM_benchmark_tests
+# Tapper-suite-version:            1.001
+# Tapper-machine-name:             mautern
+ok - test suite started
+ok - bogomips
+  ---
+  Bogomips:  5226.88
+  ...
+ok - 2 cores
+1..3

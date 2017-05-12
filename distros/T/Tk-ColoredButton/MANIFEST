@@ -1,0 +1,13 @@
+Changes
+demo/create_buttons.pl
+demo/screenshot.png
+lib/Tk/ColoredButton.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

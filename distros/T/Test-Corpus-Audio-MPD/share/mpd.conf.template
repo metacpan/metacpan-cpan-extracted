@@ -1,0 +1,20 @@
+port                 "PORT"
+music_directory      "PWD/music"
+playlist_directory   "TMP/playlists"
+log_file             "/dev/null"
+#error_file           "/dev/null"
+db_file              "TMP/music.db"
+state_file           "TMP/state"
+pid_file             "TMP/pid"
+bind_to_address      "127.0.0.1"
+password             "fulladmin@read,add,control,admin"
+password             "foobar@read"
+default_permissions  "read,add,control,admin"
+connection_timeout   "10"
+bind_to_address      "::1"
+mixer_type           "software"
+audio_output {
+    name "null"
+    type "null"
+}
+

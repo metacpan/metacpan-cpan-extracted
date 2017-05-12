@@ -1,0 +1,408 @@
+#!/usr/bin/perl -w
+
+# $Id: smgtest,v 1.4 2000/03/29 17:48:20 daniel Exp $
+
+use strict;
+use ExtUtils::testlib;
+use Term::Slang qw(:all);
+
+SLtt_get_terminfo();
+SLang_init_tty(-1,0,1);
+SLsig_block_signals();
+SLsmg_init_smg;
+SLsig_unblock_signals();
+SLkp_init();
+
+my ($s_rows,$s_cols) = SLtt_get_screen_size();
+
+my @colors = qw(
+	black red green brown blue magenta cyan lightgray gray brightred
+	brightgreen yello brightblue brightmagenta brightcyan white
+);
+my $num_colors = scalar @colors;
+
+init_colors();
+	
+SLtt_set_mouse_mode(1,0);
+
+menu_loop();
+
+quit();
+
+###############
+sub quit {
+	SLang_reset_tty();
+	SLsmg_reset_smg();
+	exit;
+}
+
+sub print_menu {
+	SLsig_block_signals();
+	SLsmg_cls();
+	
+	my $row = 2;
+	my $i   = 1;
+
+	my @names = (
+		'Color Test',
+		'Alt charset test',
+		'Key Escape Sequence Report',
+		'Line Drawing Test',
+		'Test Mouse',
+		'Box Test',
+		'Test Low Level Functions',
+		'Quit',
+	);
+
+	for my $name (@names) {
+		SLsmg_gotorc($row, 3);
+		SLsmg_write_string("$i $name");
+		$row++;
+		$i++;
+	}
+	
+	$row = 0;
+	SLsmg_gotorc($row, 1);
+	SLsmg_write_string('Choose number:');
+	
+	SLsmg_refresh();
+	SLsig_unblock_signals();
+}
+
+sub menu_loop {
+	print_menu();
+
+	my @names = ('',
+		\&color_test,\&alt_char_test,\&esc_seq_test,\&line_test,
+		\&mouse_test,\&box_test,\&low_level_test,\&quit,
+	);
+	
+	while (1) {
+		my $ch = chr SLkp_getkey();
+		if ($names[$ch]) {
+			&{$names[$ch]};
+		} elsif ($ch eq '\r') {
+			next;
+		} else {
+			SLtt_beep();
+		}
+		print_menu();
+	}
+}
+
+sub write_centered_string {
+	my ($s,$row) = @_;
+	my $col;
+
+	return if $s =~ /^\s*$/;
+	my $len = length $s;  
+
+	# Want 2 * col + len == SLtt_Screen_Rows 
+	$col = $len >= $s_cols ? 0 : ($s_cols - $len) / 2;
+
+	SLsmg_gotorc($row,$col);
+	SLsmg_write_string($s);
+}
+
+sub pre_test {
+	my $title = shift;
+	SLsig_block_signals;
+	SLsmg_cls;
+	write_centered_string($title,0);
+}
+
+sub post_test {
+	write_centered_string('Press any key to return.',$s_rows - 1);
+	SLsmg_refresh;
+	SLsig_unblock_signals;
+	SLkp_getkey;
+}
+
+sub init_colors {
+	for(my $i = 0; $i < $num_colors; $i++) {
+		SLtt_set_color($i+1,'','black',$colors[$i]);
+	}
+}
+
+# The tests.
+sub box_test  {
+	my $msg = 'This is a box with changing background';
+	my $color;
+
+	pre_test('Box Test');
+	
+	my $dr = 8;
+	my $dc = 4 + length $msg;
+	my $r  = $s_rows / 2 - $dr/2;
+	my $c  = $s_cols / 2 - $dc/2;
+
+	SLsmg_set_color(1);
+	SLsmg_set_char_set(1);
+	SLsmg_fill_region($r + 1, $c + 1, $dr - 2, $dc - 2, 'a');
+	SLsmg_set_char_set(0);
+	SLsmg_set_color(0);
+	SLsmg_gotorc($r + $dr/2, $c + 2);
+	SLsmg_write_string($msg);
+	SLsmg_draw_box($r, $c, $dr, $dc);
+
+	SLsmg_refresh();
+
+	$color = 2;
+	while (0 == SLang_input_pending(10)) {
+		SLsmg_set_color_in_region($color,$r,$c,$dr,$dc);
+		SLsmg_refresh();
+		$color++;
+		$color = $color % $num_colors;
+	}
+	post_test();
+}
+
+sub color_test {
+	pre_test('Color Test');
+	
+	my $row = 1;
+	my $color = 0;
+	while ($row < $s_rows - 1) {
+		$color = $color % $num_colors;
+
+		SLsmg_gotorc($row, 0);
+		SLsmg_set_color(0);
+		SLsmg_write_string($colors[$color]);
+		$color++;
+		SLsmg_set_color($color);
+		SLsmg_erase_eol;
+		$row++;
+	}
+	
+	SLsmg_set_color(0);
+	post_test();
+}
+
+sub alt_char_test {
+	pre_test('Alternate Charset Test');
+	
+	my $row = $s_rows / 2 - 2;
+	my $col = 0;
+
+	for (my $ch = 32; $ch < 128; $ch++) {
+		SLsmg_gotorc($row, $col);
+		SLsmg_write_char(chr $ch);
+		SLsmg_gotorc($row + 1, $col);
+		SLsmg_set_char_set(1);
+		SLsmg_write_char(chr $ch);
+		SLsmg_set_char_set(0);
+		$col++;
+	
+		if ($col > 40) {
+			$col  = 0;
+			$row += 4;
+		}
+	}
+	post_test();
+}
+
+sub line_test {
+	pre_test('Line Test');
+	
+	my $row = 4;
+	my $col = 2;
+	SLsmg_gotorc($row, $col);
+	SLsmg_draw_hline(10);
+	SLsmg_write_string('Result of SLsmg_draw_hline(10)');
+	SLsmg_draw_vline(5);
+	SLsmg_write_string('Result of SLsmg_draw_vline(5)');
+
+	post_test();
+}
+
+sub esc_seq_test {
+	pre_test('Escape Sequence Report');
+	
+	my $row = $s_rows / 2;
+	
+	SLsmg_gotorc($row, 0);
+	SLsmg_write_string('Press key: ');
+	SLsmg_refresh();
+	
+	SLsmg_gotorc($row, 0);
+	SLsmg_write_string('Key returned ');
+
+	my $ch = SLang_getkey();
+	my $buf = '"';
+
+	if ($ch >= 127) {
+		$buf .= sprintf("\\d%d", $ch);
+
+	} elsif ($ch eq '"' or $ch eq '\\') {
+	    $buf .= '\\'.chr $ch;
+
+	} else { 
+		$buf .= chr $ch;
+	}
+
+	while (SLang_input_pending(3) > 0) { }
+
+	$buf .= '"';
+	SLsmg_write_string($buf);
+	post_test();
+}
+
+sub mouse_test {
+	pre_test('Mouse Test');
+	
+	my $row = $s_rows / 2;
+	
+	SLsmg_gotorc($row, 0);
+	SLsmg_write_string('Click Mouse: ');
+	SLsmg_refresh();
+
+	my $ch = SLang_getkey();
+	
+	if ($ch != 27) { 
+		SLsmg_gotorc($row, 0);
+		SLsmg_write_string('That did not appear to be a mouse escape sequence');
+		SLsmg_gotorc($row+1,0);
+		SLsmg_write_string("You pressed: $ch");
+		post_test();
+		return;
+	}
+	
+	my $b = SLang_getkey();
+	my $x = SLang_getkey();
+	my $y = SLang_getkey();
+	
+	SLsmg_gotorc($row, 0);
+	SLsmg_write_string("Button: $b     ");
+	SLsmg_gotorc($row + 1, 0);
+	SLsmg_write_string("Column: $x");
+	SLsmg_gotorc($row + 2, 0);
+	SLsmg_write_string("   Row: $y");
+	SLang_getkey();
+	SLang_getkey();
+	post_test();
+}
+
+sub low_level_test {
+	# XXX not implemented yet
+	#if (SLtt_Term_Cannot_Scroll) {
+	#	pre_test('Sorry!  Your terminal lacks scrolling capability.');
+	#	post_test();
+	#	return;
+	#}
+
+	SLsmg_suspend_smg();
+	SLtt_init_video();
+
+	my $mid = $s_rows / 2;
+	my $bot = $s_rows - 1;
+
+	SLtt_cls();
+	SLtt_goto_rc(0, 0);
+	SLtt_write_string("The following set of tests are designed to test the display system.");
+	SLtt_goto_rc(1, 0);
+	SLtt_write_string("There should be a line of text in the middle and one at the bottom.");
+	SLtt_goto_rc($mid, 0);
+	SLtt_write_string("This line is in the middle.");
+	SLtt_goto_rc($bot, 0);
+	SLtt_write_string("This line is at the bottom.");
+	
+	SLtt_goto_rc(2, 0); 
+	SLtt_write_string("Press return now.");
+	SLtt_flush_output();
+	SLang_flush_input();
+	SLang_getkey();
+	
+	SLtt_goto_rc(2, 0);
+	SLtt_write_string("The middle row should slowly move down next the bottom and then back up.");
+	SLtt_goto_rc($mid - 1, 0);
+	SLtt_write_string("This line should not move.");
+	SLtt_goto_rc($mid + 1, 0);
+	SLtt_write_string("This line should vanish at the bottom");
+	SLtt_goto_rc($mid + 1, $s_cols - 5);
+	SLtt_write_string("End->");
+	SLtt_flush_output();
+
+	SLtt_set_scroll_region($mid, $bot - 1);
+	
+	my $r = ($bot - $mid) - 1;
+
+	while ($r > 0) {
+		SLang_input_pending(2); # 3/10 sec delay
+		SLtt_goto_rc(0,0);	# relative to scroll region 
+		SLtt_reverse_index(1);
+		SLtt_flush_output();
+		$r--;
+	}
+	
+	$r = ($bot - $mid) - 1;
+	while ($r > 0) {
+		SLang_input_pending(2);
+		SLtt_goto_rc(0,0);
+		SLtt_delete_nlines(1);
+		SLtt_flush_output();
+		$r--;
+	}
+	
+	SLtt_reset_scroll_region();
+	SLtt_goto_rc($mid - 1, 0);
+	SLtt_write_string("Now the bottom will come up and clear the lines below");
+	
+	SLtt_set_scroll_region($mid, $bot);
+	$r = ($bot - $mid) + 1;
+	while ($r > 0) {
+		SLang_input_pending(2);
+		SLtt_goto_rc(0,0);
+		SLtt_delete_nlines(1);
+		SLtt_flush_output();
+		$r--;
+	}
+
+	SLtt_reset_scroll_region();
+	SLtt_goto_rc(3,0);
+	SLtt_write_string("This line will go down and vanish");
+	SLtt_set_scroll_region(3, $mid - 2);
+
+	$r = (($mid - 2) - 3) + 1;
+	while ($r > 0) {
+		SLang_input_pending(3);
+		SLtt_goto_rc(0,0);
+		SLtt_reverse_index(1);
+		SLtt_flush_output();
+		$r--;
+	}
+	
+	SLtt_reset_scroll_region();
+	SLtt_set_scroll_region(1,1);
+	SLtt_goto_rc (0,0);
+	SLtt_delete_nlines(1);
+	SLtt_reset_scroll_region();
+	SLtt_set_scroll_region(2,2);
+	SLtt_goto_rc(0,0);
+	SLtt_reverse_index(1);
+	SLtt_reset_scroll_region();
+
+	SLtt_goto_rc(1, 10);
+	SLtt_write_string("Press Any Key To Continue.");
+	SLtt_flush_output();
+	$r = 15;
+
+	#if (0 == SLtt_Term_Cannot_Insert()) {
+		while ($r) {
+			$r--;
+			SLtt_goto_rc(1, 0);
+			SLtt_begin_insert();
+			SLtt_putchar(' ');
+			SLtt_end_insert();
+			SLtt_flush_output();
+			SLang_input_pending(2);
+		}
+	#}
+	
+	SLang_flush_input();
+	SLang_getkey();
+	
+	SLtt_reset_video();
+	SLsmg_resume_smg();
+}
+
+__END__

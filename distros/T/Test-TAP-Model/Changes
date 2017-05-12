@@ -1,0 +1,15 @@
+0.10
+	- depend on Test::Harness::Straps and deprecate
+
+0.09
+	- Todd Hepler reported a bug that new_with_* were calling ->SUPER::new
+	  instead of ->new making subclassing and overriding new not work
+
+0.08
+	- Removed the Hash::AsObject dep as it was failing tests
+
+0.07
+	- Long awaited fix for the new Test::Harness (sorry everyone, I really suck).
+
+0.01--0.06
+	- Stuff happenned (check the darcs log at http://nothingmuch.woobling.org/Test-TAP-Model)

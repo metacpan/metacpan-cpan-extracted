@@ -1,0 +1,125 @@
+NAME
+
+    Tickit::Widget::Menu - display a menu of choices
+
+SYNOPSIS
+
+     use Tickit;
+     use Tickit::Widget::Menu;
+    
+     my $tickit = Tickit->new;
+    
+     my $menu = Tickit::Widget::Menu->new(
+        items => [
+           Tickit::Widget::Menu::Item->new(
+              name => "Exit",
+              on_activate => sub { $tickit->stop }
+           ),
+        ],
+     );
+    
+     $menu->popup( $tickit->rootwin, 5, 5 );
+    
+     $tickit->run;
+
+DESCRIPTION
+
+    This widget class acts as a display container for a list of items
+    representing individual choices. It can be displayed as a floating
+    window using the popup method, or attached to a Tickit::Widget::MenuBar
+    or as a child menu within another Tickit::Widget::Menu.
+
+    This widget is intended to be displayed transiently, either as a pop-up
+    menu over some other widget, or as a child menu of another menu or an
+    instance of a menu bar. Specifically, such objects should not be
+    directly added to container widgets.
+
+STYLE
+
+    The default style pen is used as the widget pen. The following style
+    pen prefixes are also used:
+
+    highlight => PEN
+
+      The pen used to highlight the active menu selection
+
+    The following style actions are used:
+
+    highlight_next (<Down>)
+
+    highlight_prev (<Up>)
+
+      Highlight the next or previous item
+
+    activate (<Enter>)
+
+      Activate the highlighted item
+
+    dismiss (<Escape>)
+
+      Dismiss the menu
+
+CONSTRUCTOR
+
+ $menu = Tickit::Widget::Menu->new( %args )
+
+    Constructs a new Tickit::Widget::Menu object.
+
+    Takes the following named arguments:
+
+    name => STRING
+
+      Optional. If present, gives the name of the menu item for a submenu.
+      Not used in a top-level menu.
+
+    items => ARRAY
+
+      Optional. If present, contains a list of Tickit::Widget::Menu::Item
+      or Tickit::Widget::Menu objects to add to the menu. Equivalent to
+      passing each to the push_item method after construction.
+
+ $separator = Tickit::Window::Menu->separator
+
+    Returns a special menu item which draws a separation line between its
+    neighbours.
+
+METHODS
+
+ $name = $menu->name
+
+    Returns the string name for the menu.
+
+ @items = $menu->items
+
+    Returns the list of items currently stored.
+
+ $menu->push_item( $item )
+
+    Adds another item.
+
+    Each item may either be created using Tickit::Window::Menu::Item's
+    constructor, another Tickit::Widget::Menu item itself (to create a
+    submenu), or the special separator value.
+
+ $menu->highlight_item( $idx )
+
+    Gives the selection highlight to the item at the given index. This may
+    be called before the menu is actually displayed in order to pre-select
+    the highlight initially.
+
+ $menu->popup( $win, $line, $col )
+
+    Makes the menu appear at the given position relative to the given
+    window. Note that as $win->make_popup is called, the menu is always
+    displayed in a popup window, floating over the root window. Passed
+    window is used simply as the origin for the given line and column
+    position.
+
+ $menu->dismiss
+
+    Hides a menu previously displayed using popup.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

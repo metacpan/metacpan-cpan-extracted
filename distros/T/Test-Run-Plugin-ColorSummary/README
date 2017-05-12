@@ -1,0 +1,21 @@
+Test-Run-Plugin-ColorSummary
+
+This plugin allows Test::Run to make color the summary line in one color
+on success and in a different color on failure. It uses the Term::ANSIColor
+module for that.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Shlomi Fish
+
+This program is released under the following license: MIT X11.

@@ -1,0 +1,56 @@
+Tk-Schedule version 0.01
+========================
+
+Perl extension for a graphical user interface to carrying out tasks up to schedule.
+With this Widget function at a certain time can be called.
+A schedule can be made for longer periods.
+The call of functions can be repeated in certain course of time.
+Possible repetition times are:
+ 	hourly
+ 	daily
+ 	weekly
+ 	monthly
+ 	yearly
+For seconds or minutes the functions 
+$widget->after(time, call) or
+$widget->repeat(time, call) 
+can be better used.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ 	Tk
+ 	Tk::Frame
+ 	Tk::Photo
+ 	Tk::TimePick
+ 	Tk::ChooseDate
+ 	Date::Calc
+ 	Bit::Vector
+ 	Carp::Clan
+ 	Time::Local
+ 	Storable
+ 	B::Deparse
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Torsten Knorr
+torstenknorr@tiscali.de
+http://www.planet-interkom.de/t.knorr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.9.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+

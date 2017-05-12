@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testsuites>
+  <testsuite name="t/internal_tests/simple.test" errors="0" failures="0" tests="5">
+    <system-out/>
+    <testcase name="t/internal_tests/simple.test" time="TEST_TIME"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,1127 @@
+NAME
+    Tie::FormA - access a machine readable database file that minics a
+    hardcopy form
+
+SYNOPSIS
+     require Tie::FormA;
+
+     #####
+     # Using support methods and file handle with
+     # the file subroutines such as open(), readline()
+     # print(), close()
+     #
+     tie *FORM_FILEHANDLE, 'Tie::FormA', @options
+     $form = tied \*FORM_FILEHANDLE; 
+
+     #####
+     # Using support methods only, no file subroutines
+     # 
+     $form = Tie::Form->new(@options);
+
+     \$encoded_fields  = $form->decode_record(\$record); 
+     \@fields          = $form->decode_field(\$encoded_fields);
+
+     \$encoded_fields  = $form->encode_field (\@fields);
+     \$record          = $form->encode_record(\$encoded_fields);
+
+     $record           = $form->get_record();
+
+     ####
+     # Subroutine interface
+     #
+     \$encoded_fields  = decode_record(\$record); 
+     \@fields          = decode_field(\$encoded_fields);
+
+     \$encoded_fields  = encode_field (\@fields);
+     \$record          = encode_record(\$encoded_fields);
+
+    If a subroutine or method will process a list of options, "@options",
+    that subroutine will also process an array reference, "\@options",
+    "[@options]", or hash reference, "\%options", "{@options}".
+
+DESCRIPTION
+    The "Tie::FormA" module provides a text database file suitable for local
+    data such as private mailing lists. The "Tie::FormA" cannot provide a
+    data warehouse shared by mulitple users.
+
+  File format description
+
+    Desireable goals for small local private databases file format are as
+    follows:
+
+    *   The database is a text file that can be edited with a simple text
+        editor. How many times have a basebase been corrupted and the data
+        cannot be recoveried? For most people many times. One time is one
+        time too many
+
+    *   The text format resembles as much as possible the standard forms
+        that all civilized people must from time to time fill out in order
+        to survive in a civilized society. Forms are a necessary evil in the
+        pursue of happiness, freedom and prosperity in a civilized society.
+        An example of a form is as follows:
+
+          manhood length: ________
+          time spent in big house: _________
+          what drugs do you use: _________
+
+        Notice the applicant is not required to specify the form data using
+        Perl hash notation such as
+
+          manhood_length => 2
+
+        By the way, that would be your entry. My entry would be
+
+          manhood_length => 22
+
+        The political incorrect NH live free or die response would be
+
+          manhood length: come up to my place and I'll show you
+          time spent in big house: none of your business
+          what drugs do you use: put it where the sun doesn't shine
+
+        The feds response to NH: no federal funding.
+
+    *   The record separator, field separator and any other separator is
+        unique and not embedded in the data. With unique separators, various
+        components of the database may be accessed with simple file read and
+        write functions. There is no need to buffer and process the data to
+        determine if the separator is really a separtor or part of the data.
+
+    *   The format has simple, straightforward method of escaping separators
+        when they are embedded in the data. Escape techiques such as the
+        back-slash besides causing blurred vision also leave the separator
+        embedded in the data. Try looking at the output of the metachar()
+        function and then try to read a eye chart. This is totally
+        unacceptable not only because it impairs vision but also for poor
+        computation performance.
+
+    The "Tie::FormA" program module solution is to use separators of the
+    following form:
+
+     (not_the_char) . (char) . (not_the_char)
+
+    The separators are escaped in embedded text by adding a extra (char) as
+    follows:
+
+     sequence             escaped
+
+     [^$c]$c[^c]          [^$c]$c$c[^c]
+     [^$c]$c$c[^c]        [^$c]$c$c$c[^c]
+
+                     ...
+
+     [^$c]$c x n[^c]      [^$c]$c($c x n)[^c]
+
+SUBROUTINES
+    This package inherits most of its Tie methods from the Tie::Layers
+    package.
+
+    The methods specific to this package are to encode and decode fields and
+    records, and to put and get records as follows:
+
+  TIEHANDLE
+
+     tie *FORM_FILEHANDLE, 'Tie::FormA', @options
+     tie *FORM_FILEHANDLE, 'Tie::FormA', \@options
+     tie *FORM_FILEHANDLE, 'Tie::FormA', \%options
+     $form = tied \*FORM_FILEHANDLE; 
+
+    The "TIEHANDLE" method supports the "tie" Perl built-in subroutine. The
+    "$form" object created by "tie" may be used to access the functions that
+    are in addition to the those established in Tie Handle Perl
+    specification. The available options are as follows:
+
+     option      description
+     ---------------------------
+     EON         End of Name field termination separator
+     EOD         End of Data field termination separator
+     EOR         End of Record termination separator
+     strict      strict processing of EON and EOD
+
+    Typically "EON", "EOD", "EOR" should be read-only. The requirements for
+    these options are very specific.
+
+  encode_field
+
+     \$encoded_fields = encode_field (\@fields);
+
+    The "encode_field" subroutine method takes a "@fields" and returns a
+    "encoded_fields" string. This subroutine will escape all field
+    separators.
+
+  encode_record
+
+     \$record = encode_record(\$encoded_fields);
+
+    The "encode_record" subroutine takes a "$encoded_fields" string and
+    encodes it as "$record". This subroutines escapes the record separator
+    and embeds the record separator in the "$record" string.
+
+  decode_field
+
+     \@fields = decode_field(\$encoded_fields);
+
+    The "decode_fiel" subroutine takes "$encoded_fields", unescape the field
+    separators, decodes the fields and places the results in "@fields". The
+    "@fields" array is ordered name, value pairs of the fields. The even
+    array elements are the field names and the following odd array element
+    is the field data.
+
+    The below code will convert the decoded "@fields" to a hash:
+
+      %fields = @fields
+
+  decode_record
+
+     \$encoded_fields  = decode_record(\$record); 
+
+    The "decode_record" subroutine takes a "$record" string, removes the
+    record separator, unescapes the record separator in the fields string
+    and leaves the fields string in "$encoded_fields".
+
+  get_record
+
+     $record = $form->get_record();
+
+    The get_record method reads a fully encoded "$record" from the
+    underlying file of the object.
+
+  new
+
+     $form = Tie::FormA->new(@options);
+     $form = Tie::FormA->new(\@options);
+     $form = Tie::FormA->new(\%options);
+
+    The "new" method provides an object that may be used to access the
+    functions that are in addition to the those established in Tie Handle
+    Perl specification. The "@options" are the same as "TIEHANDLE".
+
+REQUIREMENTS
+    The general "STD::TestGen" Perl module requirements are as follows:
+
+    general [1] - load
+        shall[1] load without error and
+
+    general [2] - pod check
+        shall[2] passed the Pod::Checker check without error.
+
+  File format requirements
+
+    For most databases, the file format is hidden. In this case, since the
+    file may be accessed and edited by any text editor, the file format
+    requirements must be rigorously established in order that they may be
+    properly edited.
+
+    The "Tie::FormA" module file format will be as follows:
+
+     $field_name: $field_data ^
+
+          ...
+
+     $field_name: $field_data ^
+     ~-~
+
+         ...
+
+     ~-~
+     $field_name: $field_data ^
+
+          ...
+
+     $field_name: $field_data ^
+     ~-~
+
+    The requirements for the file format are as follows:
+
+    format [1] - separator strings
+        The format separator strings shall[1] be as follows:
+
+         End of Field Name (EON):  [^:]:[^:]
+         ENd of Field Data (EOD):  [^\^]\^[^\^]
+         End of Record(EOR):  ~-~
+
+        The separator strings have the following format:
+
+         (not_the_char) . (char) . (not_the_char)
+
+        The '^' character was and still available in console text editors as
+        a cursor. Because it appears very rarely in text, it is a good
+        choice for use in a separator string. If it does not appear a lot,
+        it will not have to be escaped a lot. The "~-~" separator sequence
+        is a natural looking text section separator.
+
+    format [2] - separator escapes
+        Separator strings embedded in $field_name and $field_data strings
+        shall[2] be escaped by adding one additional middle character.
+        Escaped sequences must also be escaped. An escaped separator
+        sequence will always have one additional middle character from an
+        unescaped separator sequence.
+
+    format [3] - field names
+        The characters [\x00-\x1f] shall[3] not be allowed in $field_name
+        strings. Spaces will be allowed. The character set [\x00-\x1f] are
+        the ASCII control characters. See ascii.computerdiamonds.com.
+        Embedded [\x00-\x1f] characters will be converted to the '_'
+        character.
+
+    format [4] - field names
+        Leading and trailing [ \x00-\x1f] characters in any potential
+        $field_name string shall[4] not be part of the $field_name and
+        discarded.
+
+    format [5] - EON
+        A leading [^:] in the EON separator that is not a [ \x00-\x1f]
+        shall[5] be the be the last character in the $field_name string;
+        otherwise, it is not part of the the $field_name string and
+        discarded. For the situation where the last part of a $field_name
+        string is an escape sequence a [ \x00-\x1f] will be required between
+        the $field_name string and the EON. The following is a valid
+        $field_name EON sequence:
+
+          escaped              unescaped
+
+          field_name:: :       fieldname:
+
+    format [6] - Strict EOD
+        For the strict format option, the leading [^\^] of the EOD shall[6]
+        not be part of the $field_data. The [^\^] character may be any
+        character including the [\x00-\x1f] characters.
+
+        Examples of strict format option are as follows:
+
+         $field_name: $data ^
+         $field_name: $data$c^
+
+         $field_name: 
+         line1
+           ..
+         line2
+         ^
+
+        The $field_data for the above example is as follows:
+
+         Example               $field_data   
+
+         "$data ^"             "$data"  
+         "$data$c^"            "$data"
+         "$line1\n$line2\n^"   "$line1\n$line2"
+
+    format [7] - Lenient EOD
+        For the lenient format option, the leading [^\^] of the EOD shall[7]
+        be part of the $field_data. The lenient format has ambiguous case
+        when the last character in the $field_data is the [\^] character. In
+        order to be valid, a [^\^] must be used before the [\^], making the
+        [^\^] part of the $field_data whether that is intended or not. For
+        example in, "$data^^ ^", the $field_data is "$data^ " whether or not
+        the space is intended as part of the $field_data. If this cannot be
+        tolerated for an application the strict format opion should be
+        specified.
+
+        Examples of lenient format option are as follows:
+
+         $field_name: $data1 ^
+
+         $field_name: $data2^
+
+         $field_name: 
+         $line1
+         $line2
+         ^
+
+        The $field_data for the above example is as follows:
+
+         Example               $field_data   
+
+         "$data1 ^"            "$data1 "  
+         "$data2^"             "$data2"
+         "$line1\n$line2\n^"   "$line1\n$line2\n"
+
+  Methods requirements
+
+    There are two options, that impact the methodsas follows:
+
+    strict => 1 option
+        This option determines whether to encode a field in strict or
+        lenient format.
+
+    binary => 1 option
+        This option determines whether or not to process carriage returns
+        and line feeds. Different operating systems handle these characters
+        differently for text files.
+
+    The requirements for the methods are as follows:
+
+    methods [1] - encode_field
+         $field = $tdb->encode_field (\@fields, \$fields)
+
+        The @fields array will contain a number of fields. The $field_names
+        will be the even elements and the $field_data the following odd
+        elements.
+
+        The encode_field subroutine shall[1] encode the $field_name string
+        and $field_data string into the $field string in accordance with the
+        File Format requirements. The encoding shall escape the EON and EOD
+        separators and embed the EON and EOD separators.
+
+        The encoding will be conservative in complying with the File Format
+        requirements.
+
+        As established by the File Format requirements, the encoding will be
+        different depending upon the value of the strict option,
+        $tdb->{options}->{strict}.
+
+    methods [2] - decode_field
+         $success = $tdb->decode_field(\$fields, \@fields)
+
+        The decode_field subroutine shall[2] decode a $record string into
+        the @fields array in accordance with the File Format requirements.
+        The $field_names will be the even elements in the @fields array and
+        the $field_data the following odd elements.
+
+        The decoding will be liberal what it considers that complies to the
+        File Format requirements.
+
+        As established by the File Format requirements, the decoding will be
+        different depending upon the value of the strict option,
+        $tdb->{options}->{strict}.
+
+    methods [3] - encode_record
+         $success = $tdb->encode_record(\$fields, \$record) 
+         $success = $tdb->encode_record( \$fields) 
+
+        The encode_record subroutine shall[3] encode the $fields string into
+        the $record string in accordance with File Format requirements. If
+        the $record string is absence or the \$record reference and the
+        \$fields reference are the same, the encoding will modify the
+        \$fields string. In this case, the encoding will not perserve the
+        $fields string. The encoding will escape the EOR and embed the EOR.
+
+    methods [4] - decode_record
+         $success  = $tdb->decode_record(\$record, \$fields) 
+         $success  = $tdb->decode_record(\$record) 
+
+        The decode_record subroutine shall[4] decode the $record string and
+        into the $fields string in accordance with the File Format
+        requirements. If the $fields string is absence or the \$record
+        reference and the \$fields reference are the same, the encoding will
+        modify the \$record string. In this case, the encoding will not
+        perserve the $record string. The decoding will remove the EOR and
+        unescape the EOR.
+
+    methods [5] - put_record
+         $success = $tdb_out->put_record( \$record )
+
+        The put_record subroutine shall[5] write out the $record to the file
+        specified when the object $tdb_out was created with the following
+        statement
+
+         $tdb_out = Tie::FormA( flag => '>', file => $file, @options );
+
+    methods [6] - get_record
+         $success = $tdb_in->get_record( \$record )
+
+        The get_record subroutine shall[6] read a $record from the file
+        specified when the object $tdb_in was created with the following
+        statement
+
+         $tdb_in = Tie::FormA( flag => '<', file=>$file, @options );
+
+    methods [7] - get_record
+        Unless $tdb_in was created with the binary option, {binary => 1},
+        the get_record subroutine shall[7] translate any "\015\012"
+        combination into the "\n" for the current operating system.
+
+    Tie::Layers
+        The methods inherit from Tie::Layers will comply to the Tie::Layers
+        requirements
+
+DEMONSTRATION
+     #########
+     # perl FormA.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::Package;
+         use File::SmartNL;
+         use File::Spec;
+
+         my $uut = 'Tie::FormA'; # Unit Under Test
+         my $fp = 'File::Package';
+         my $loaded;
+
+         my (@fields);  # force context
+         my $out_file = File::Spec->catfile('FormA','form1.txt');;
+         unlink $out_file;
+
+         my $lenient_in_file = File::Spec->catfile('FormA','lenient0.txt');
+         my $strict_in_file = File::Spec->catfile('FormA','strict0.txt');
+
+     ##################
+     # Load UUT
+     # 
+
+     my $errors = $fp->load_package($uut)
+     $errors
+
+     # ''
+     # 
+
+     ##################
+     # Tie::FormA Version 0.01 loaded
+     # 
+
+     $fp->is_package_loaded($uut)
+
+     # 1
+     # 
+
+     ##################
+     # Read lenient FormA
+     # 
+
+         tie *FORM, 'Tie::FormA';
+         open FORM,'<',File::Spec->catfile($lenient_in_file);
+         @fields = <FORM>;
+         close FORM;
+     [@fields]
+
+     # [
+     #           [
+     #             'UUT',
+     #             'File/Version.pm',
+     #             'File_Spec',
+     #             '',
+     #             'Revision',
+     #             '',
+     #             'End_User',
+     #             '',
+     #             'Author',
+     #             'http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com',
+     #             'SVD',
+     #             'SVD::DataCop-DataFile',
+     #             'Template',
+     #             'STD/STD001.frm'
+     #           ],
+     #           [
+     #             'Email',
+     #             'nobody@hotmail.com',
+     #             'Form',
+     #             'Udo-fully processed oils',
+     #             'Tutorial',
+     #             '*~~* Better Health thru Biochemistry *~~*',
+     #             'REMOTE_ADDR',
+     #             '213.158.186.150',
+     #             'HTTP_USER_AGENT',
+     #             'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; DigExt)',
+     #             'HTTP_REFERER',
+     #             'http://computerdiamonds.com/'
+     #           ],
+     #           [
+     #             'EOF',
+     #             '\n',
+     #             'EOL',
+     #             '\n^\n',
+     #             'EOV',
+     #             '}',
+     #             'SOV',
+     #             '${'
+     #           ],
+     #           [
+     #             'EOF',
+     #             '^',
+     #             'EOL',
+     #             '~-~',
+     #             'SOV',
+     #             '${',
+     #             'EOV',
+     #             '}'
+     #           ],
+     #           [
+     #             'EOF',
+     #             '^^',
+     #             'EOL',
+     #             '~---~',
+     #             'SOV',
+     #             '${',
+     #             'EOV',
+     #             '}'
+     #           ]
+     #         ]
+     # 
+
+     ##################
+     # Write lenient FormA
+     # 
+
+         open FORM, '>', $out_file;
+         print FORM @fields;
+         close FORM;
+     File::SmartNL->fin($out_file)
+
+     # 'UUT: File/Version.pm^
+     # File_Spec: ^
+     # Revision: ^
+     # End_User: ^
+     # Author: http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com^
+     # SVD: SVD::DataCop-DataFile^
+     # Template: STD/STD001.frm^
+     # ~-~
+     # Email: nobody@hotmail.com^
+     # Form: Udo-fully processed oils^
+     # Tutorial: *~~* Better Health thru Biochemistry *~~*^
+     # REMOTE_ADDR: 213.158.186.150^
+     # HTTP_USER_AGENT: Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; DigExt)^
+     # HTTP_REFERER: http://computerdiamonds.com/^
+     # ~-~
+     # EOF: \n^
+     # EOL: \n^^\n^
+     # EOV: }^
+     # SOV: ${^
+     # ~-~
+     # EOF: ^^ ^
+     # EOL: ~--~^
+     # SOV: ${^
+     # EOV: }^
+     # ~-~
+     # EOF: ^^^ ^
+     # EOL: ~----~^
+     # SOV: ${^
+     # EOV: }^
+     # ~-~
+     # '
+     # 
+
+     ##################
+     # Read strict FormA
+     # 
+
+         tie *FORM, 'Tie::FormA';
+         open FORM,'<',File::Spec->catfile($strict_in_file);
+         @fields = <FORM>;
+         close FORM;
+     [@fields]
+
+     # [
+     #           [
+     #             'UUT',
+     #             'File/Version.pm',
+     #             'File_Spec',
+     #             '',
+     #             'Revision',
+     #             '',
+     #             'End_User',
+     #             '',
+     #             'Author',
+     #             'http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com',
+     #             'SVD',
+     #             'SVD::DataCop-DataFile',
+     #             'Template',
+     #             'STD/STD001.frm'
+     #           ],
+     #           [
+     #             'Email',
+     #             'nobody@hotmail.com',
+     #             'Form',
+     #             'Udo-fully processed oils',
+     #             'Tutorial',
+     #             '*~~* Better Health thru Biochemistry *~~*',
+     #             'REMOTE_ADDR',
+     #             '213.158.186.150',
+     #             'HTTP_USER_AGENT',
+     #             'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; DigExt)',
+     #             'HTTP_REFERER',
+     #             'http://computerdiamonds.com/'
+     #           ],
+     #           [
+     #             'EOF',
+     #             '\n',
+     #             'EOL',
+     #             '\n^\n',
+     #             'EOV',
+     #             '}',
+     #             'SOV',
+     #             '${'
+     #           ],
+     #           [
+     #             'EOF',
+     #             '^',
+     #             'EOL',
+     #             '~-~',
+     #             'SOV',
+     #             '${',
+     #             'EOV',
+     #             '}'
+     #           ],
+     #           [
+     #             'EOF',
+     #             '^^',
+     #             'EOL',
+     #             '~---~',
+     #             'SOV',
+     #             '${',
+     #             'EOV',
+     #             '}'
+     #           ]
+     #         ]
+     # 
+
+     ##################
+     # Write strict FormA
+     # 
+
+         open FORM, '>', $out_file;
+         print FORM @fields;
+         close FORM;
+     File::SmartNL->fin($out_file)
+
+     # 'UUT: File/Version.pm^
+     # File_Spec: ^
+     # Revision: ^
+     # End_User: ^
+     # Author: http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com^
+     # SVD: SVD::DataCop-DataFile^
+     # Template: STD/STD001.frm^
+     # ~-~
+     # Email: nobody@hotmail.com^
+     # Form: Udo-fully processed oils^
+     # Tutorial: *~~* Better Health thru Biochemistry *~~*^
+     # REMOTE_ADDR: 213.158.186.150^
+     # HTTP_USER_AGENT: Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; DigExt)^
+     # HTTP_REFERER: http://computerdiamonds.com/^
+     # ~-~
+     # EOF: \n^
+     # EOL: \n^^\n^
+     # EOV: }^
+     # SOV: ${^
+     # ~-~
+     # EOF: ^^ ^
+     # EOL: ~--~^
+     # SOV: ${^
+     # EOV: }^
+     # ~-~
+     # EOF: ^^^ ^
+     # EOL: ~----~^
+     # SOV: ${^
+     # EOV: }^
+     # ~-~
+     # '
+     # 
+     unlink $out_file;
+
+QUALITY ASSURANCE
+    The module "t::Tie::FormA" is the Software Test Description(STD) module
+    for the "Tie::FormA" program module.
+
+    To generate all the test output files, run the generated test script,
+    run the demonstration script, execute the following in any directory:
+
+     tmake -verbose -demo -run -test_verbose -pm=t::Tie::FormA
+
+    Note that tmake.pl must be in the execution path "$ENV{PATH}" and the
+    "t" directory on the same level as the "lib" that contains the
+    "Tie::FormA" program module. The "tmake" subroutine is in the
+    "Test::STDmaker|Test::STDmaker" distribution file.
+
+NOTES
+  Construction of Words
+
+    The construction of the words "shall", "may" and "should" shall[1]
+    conform to United States (US) Departmart of Defense (DoD) STD490A
+    3.2.3.6 which is more precise and even consistent, at times, with RFC
+    2119, http://www.ietf.org/rfc/rfc2119.txt Binding requirements shall[2]
+    be uniquely identified by the construction "shall[\d+]" , where "\d+" is
+    an unique number for each paragraph(s) uniquely identified by a header.
+    The construction of commonly used words and phrasing shall[3] conform to
+    US DoD STD490A 3.2.3.5 In accordance with US Dod STD490A 3.2.6,
+    requirments shall[4] not be emphazied by underlining and capitalization.
+    All of the requirements are important in obtaining the desired
+    performance.
+
+    Unless otherwise specified, in accordance with the Software Diamonds'
+    License, Software Diamonds shall[5] not be responsible for this program
+    module conforming to all the specified requirements, binding or
+    otherwise.
+
+  Author
+
+    The author, holder of the copyright and maintainer is
+
+    <support@SoftwareDiamonds.com>
+
+  Copyright
+
+    copyright © 2003 SoftwareDiamonds.com
+
+  License
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code, modified or unmodified must retain
+        the above copyright notice, this list of conditions and the
+        following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    3   In addition to condition (1) and (2), commercial installation of a
+        software product with the binary or source code embedded in the
+        software product or a software product of binary or source code,
+        with or without modifications, must visually present to the
+        installer the above copyright notice, this list of conditions
+        intact, that the original source is available at
+        http://packages.softwarediamonds.com and provide means for the
+        installer to actively accept the list of conditions; otherwise, the
+        commercial activity, as determined by Software Diamonds and
+        published at http://packages.softwarediamonds.com, shall[1] pay a
+        license fee to Software Diamonds and shall[2] make donations, to
+        open source repositories carrying the source code.
+
+    The construction of the word "shall[x]" is always mandatory and not
+    merely directory and identifies each binding requirement of this
+    License. It is the responsibility of the licensee to conform to all
+    requirements.
+
+    SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE ALSO
+    Tie::Layers
+    Test::STDmaker
+    Tie::CSV
+    Tie::Eudora
+    Data::Query
+NAME
+    Docs::Site_SVD::Tie::FormA - Software Version Description (SVD) for the
+    Tie::FormA program module.
+
+Title Page
+    Software Version Description
+
+    for
+
+    Tie::FormA - Text Database that mimics a Form
+
+    Revision: A
+
+    Version: 0.02
+
+    Date: 2004/06/03
+
+    Prepared for: General Public
+
+    Prepared by: SoftwareDiamonds.com < support@SoftwareDiamonds.comE <gt>
+
+    Copyright: copyright © 2003 Software Diamonds
+
+    Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The system is the Perl programming language software. As established by
+    the Perl referenced documents, program modules, such the "Tie::Form"
+    module, extends the Perl language.
+
+    The "Tie::Form" program module accesses a text database file in the very
+    specific Form format and inherits generic database methods from the
+    "DataPort::DataFile" module. The "Tie::Form" program module is a data
+    source for the "DataPort::DataFile" module.
+
+    The Form format has improve flexability and performance over other text
+    base formats such as the Comma Separated Variable (CSV) format.
+
+    The text format resembles as much as possible the standard hard copy
+    forms. An example of a "DatatPort::FIleType::Form record follows:
+
+     manhood length: ________ ^
+     time spent in big house: _________ ^
+
+     what drugs do you use:
+     _________ 
+     _________ 
+
+     ^
+
+     ~-~
+
+    The ':' separates field names and field content. The '^' tags the end of
+    a field and the '~-~' tags the end of the record. The separation
+    sequences are escaped within the form by adding an extra character as
+    follows:
+
+      sequence  escaped
+      --------  --------
+      ~-~       ~--~
+      ~--~      ~---~
+      ^         ^^
+      ^^        ^^^
+      :         :
+      ::        :::
+
+    Since ~-~ never appears inside a record, Perl or any other Programming
+    Language can very easily find the record separators just by ... well ...
+    searching for it. The search for the end of field and end of field name
+    are just a little bit more complicated. Search for a ':' or '^' all by
+    itself. Escaping and unescaping is just adding one more ':', '^', '-' or
+    removing one of these characters.
+
+    The Form record looks very much like a hard copy form yet is very simple
+    and straight forward for Perl or any other programming language to
+    process.
+
+  1.3 Document overview.
+
+    This document releases Tie::FormA version 0.02 providing description of
+    the inventory, installation instructions and other information necessary
+    to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     Tie-FormA-0.02.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright © 2003 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified shall[1]
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form shall[2] reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        3   In addition to condition (1) and (2), commercial installation of
+            a software product with the binary or source code embedded in
+            the software product or a software product of binary or source
+            code, with or without modifications, shall[3] visually present
+            to the installer the above copyright notice, this list of
+            conditions intact, that the original source is available at
+            http://packages.softwarediamonds.com and provide means for the
+            installer to actively accept the list of conditions; otherwise,
+            the commercial activity, as determined by Software Diamonds and
+            published at http://packages.softwarediamonds.com, shall[4] pay
+            a license fee to Software Diamonds and shall[5] make donations,
+            to open source repositories carrying the source code.
+
+        The construction of the word "shall[x]" is always mandatory and not
+        merely directory and identifies each binding requirement of this
+        License. It is the responsibility of the licensee to conform to all
+        requirements.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/Tie/FormA.pm                               0.02    2004/06/03 revised 0.01
+     MANIFEST                                                     0.02    2004/06/03 generated, replaces 0.01
+     Makefile.PL                                                  0.02    2004/06/03 generated, replaces 0.01
+     README                                                       0.02    2004/06/03 generated, replaces 0.01
+     lib/Tie/FormA.pm                                             0.02    2004/06/03 revised 0.01
+     lib/Bundle/Tie/FormA.pm                                      0.02    2004/06/03 revised 0.01
+     t/Tie/FormA.d                                                0.02    2004/06/03 revised 0.01
+     t/Tie/FormA.pm                                               0.02    2004/06/03 revised 0.01
+     t/Tie/FormA.t                                                0.02    2004/06/03 revised 0.01
+     t/Tie/FormA/lenient0.txt                                     0.01    2004/06/01 unchanged
+     t/Tie/FormA/lenient2.txt                                     0.01    2004/06/01 unchanged
+     t/Tie/FormA/strict0.txt                                      0.01    2004/06/01 unchanged
+     t/digest.t                                                   0.01    2004/06/03 new
+     t/File/Digest.pm                                             1.14    2004/05/03 new
+     t/Tie/Test.pm                                                1.25    2004/04/28 unchanged
+     t/Tie/Algorithm/Diff.pm                                      1.15               unchanged
+     t/Tie/File/SmartNL.pm                                        1.16    2004/05/24 unchanged
+     t/Tie/File/Package.pm                                        1.18    2004/05/24 unchanged
+     t/Tie/Test/Tech.pm                                           1.27    2004/05/28 unchanged
+     t/Tie/Data/Secs2.pm                                          1.26    2004/05/24 unchanged
+     t/Tie/Data/Str2Num.pm                                        0.08    2004/05/24 unchanged
+
+  3.3 Changes
+
+    Changes to previous revisions are as follows:
+
+    Tie::Form 0.01
+        Originated
+
+    Tie::Form 0.02
+        The "new" subroutine did not "bless" with the input "$class". Fixed.
+
+    Tie::FormA 0.01
+        Add the "config" subroutine.
+
+        Recoded the "new" subroutine changing the functional (user)
+        interface. The different user interface destories backward
+        compatiblitiy with the version. Adding a revision letter A to the
+        program module name starts a new development thread that superceds
+        and obsoletes the "Tie::Form" module.
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'Tie-FormA-0.02.tar.gz' and download to a temporary
+        installation directory. Enter the following where $make is 'nmake'
+        for microsoft windows; otherwise 'make'.
+
+         gunzip Tie-FormA-0.02.tar.gz
+         tar -xf Tie-FormA-0.02.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         'Tie::Layers' => '0.06',
+         'Data::Startup' => '0.08',
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/digest.t
+         t/Tie/FormA.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+
+    There are no known open issues.
+
+4.0 NOTES
+  Acronyms
+
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+  Construction of Words
+
+    The construction of the words "shall", "may" and "should" shall[1]
+    conform to United States (US) Departmart of Defense (DoD) STD490A
+    3.2.3.6 which is more precise and even consistent, at times, with RFC
+    2119, http://www.ietf.org/rfc/rfc2119.txt Binding requirements shall[2]
+    be uniquely identified by the construction "shall[\d+]" , where "\d+" is
+    an unique number for each paragraph(s) uniquely identified by a header.
+    The construction of commonly used words and phrasing shall[3] conform to
+    US DoD STD490A 3.2.3.5 In accordance with US Dod STD490A 3.2.6,
+    requirments shall[4] not be emphazied by underlining and capitalization.
+    All of the requirements are important in obtaining the desired
+    performance.
+
+    Unless otherwise specified, in accordance with Software Diamonds'
+    License, Software Diamonds shall[5] not be responsible for this program
+    module conforming to all the specified requirements, binding or
+    otherwise.
+
+2.0 SEE ALSO
+    Tie::FormA

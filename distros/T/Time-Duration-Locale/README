@@ -1,0 +1,55 @@
+Copyright 2009 Kevin Ryde
+
+This file is part of Time-Duration-Locale.
+
+Time-Duration-Locale is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Time-Duration-Locale is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Time-Duration-Locale.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Time::Duration::Locale offers versions of the Time::Duration functions
+which automatically dispatch to one of the language-specific
+sub-modules like Time::Duration::ja according to the user's locale and
+language preferences, and when available.
+
+This is an easy way to localize your prints, though you might wonder
+if the amount of code here to achieve it could be slightly excessive.
+
+The operative part is choosing a language from LANG, LANGUAGE etc.  An
+explicit language setting too seemed like a good idea.  And then
+instead of a single global variable for the language module it seemed
+like a good idea to use an object, so you could in theory operate in
+multiple language contexts.  Then some AUTOLOAD/can tricks allow
+future functions to pass-through too.  Maybe some of that
+function-to-method or method-to-function dispatch could be split out
+for general use, though mixing styles like that probably shouldn't be
+encouraged.
+
+Incidentally in a language with declensions you might want a different
+nominative/accusative/ablative etc according to what you're printing.
+That's not addressed by the Time::Duration modules.  A single form may
+at least be better than nothing.  Whole-message translations are of
+course the sort of thing Locale::TextDomain etc does, though it only
+supports variations on a single number like "2 hours", not multiple
+numbers like "X hour(s) Y minute(s)", so you'd likely still end up
+with some assumptions about how components should be joined up.
+
+The key prerequisites for Time::Duration::Locale are
+
+    * Time::Duration itself
+    * Module::Load
+    * Class::Singleton
+
+The Time-Duration-Locale home page is
+
+    http://user42.tuxfamily.org/time-duration-locale/index.html

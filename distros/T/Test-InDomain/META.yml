@@ -1,0 +1,30 @@
+---
+abstract: 'Testing deep datastructures against data domains'
+author:
+  - 'Laurent Dami, C<< <dami at cpan.org> >>'
+  - 'Laurent Dami <dami@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-InDomain
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Domain: 1.02
+  Scalar::Does: 0.007
+  Test::Builder::Module: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

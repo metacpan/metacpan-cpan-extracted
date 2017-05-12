@@ -1,0 +1,17 @@
+Revision history for Text-Matrix
+
+1.00    Version released at 2010-04-19-14:57.
+        Version started at  2010-04-19-14:56.
+        Released rc 0.99_02 as 1.00 stable.
+
+0.99_02 Version released at 2010-04-16-15:40.  *** Development version. ***
+        Version started at  2010-04-14-19:10.
+        Now explicitly enforces scalar context on mapper function.
+        Made use of $_ in mapper function officially supported and documented.
+        Added scalar-context mapper test.
+        Added tests for spacer().
+        Added tests that documentation code snippets work.
+
+0.99_01 Version released at 2010-04-14-14:24.  *** Development version. ***
+        Version started at  2010-04-11-18:45.
+        Initial release.

@@ -1,0 +1,56 @@
+Tree::Ternary_XS
+
+Tree::Ternary_XS is a Perl interface to a C implementation of ternary
+search trees as described by Jon Bentley and Robert Sedgewick.
+Ternary search trees are interesting data structures that provide a
+means of storing and accessing strings. They combine the time
+efficiency of digital tries with the space efficiency of binary search
+trees. Unlike a hash, they also maintain information about relative
+order.
+
+This module is an adaptation from the C implementation published in
+Bentley and Sedgewick's article in the April 1998 issue of Dr. Dobb's
+Journal (see SEE ALSO). This module attempts to recreate the interface
+as much as possible of Mark Rogaski's Tree::Ternary, a pure Perl
+implementation. As Tree::Ternary_XS uses C code, it has important
+space and speed advantages over Tree::Ternary.
+
+
+NOTES
+
+Tree::Ternary_XS hasn't been widely tested on architectures other than
+Linux or on Perl versions other than 5.005_03. Have a go and tell me
+how it went!
+
+
+INSTALLATION
+
+You install Tree::Ternary_XS, as you would install any Perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test     # Only if Test.pm is installed
+   make install
+
+If you want to install a private copy of Tree::Ternary_XS in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+POD-format documentation is included in Ternary_XS.pm. POD is readable
+with the 'perldoc' utility.
+
+
+SUPPORT
+
+Questions, comments, bugfixes, flames, and other administrivia pertaining
+to Tree::Ternary_XS should be sent to me at leon@astray.com
+
+
+
+

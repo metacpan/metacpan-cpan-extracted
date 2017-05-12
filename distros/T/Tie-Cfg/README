@@ -1,0 +1,30 @@
+
+jan 2003
+--------
+
+Tie-Cfg can now handle .ini files and you can access sections
+just by using the tied hash as follows:
+
+$ini{"$section}{$key"}="Set key $key in section $section";
+
+print $ini{"$section}{$key"},"\n";
+
+
+
+----pre 2003
+------------
+Tie-Cfg is a module to have simple configuration files
+tied to a hash.
+
+The configuration files have format:
+
+<key>[:=]<value>
+
+Empty lines are allowed, # <comment> is used for comments.
+
+Enjoy,
+
+Hans Oesterholt-Dijkema <hans@oesterholt-dijkema.emailt.nl>
+
+
+

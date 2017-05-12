@@ -1,0 +1,29 @@
+Tk-TextVi
+
+This provides a modified Tk::Text widget that behaves similar to Vi.  Many normal-mode commands are supported plus counts, registers, visual mode (both character and line) and incremental search.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+An additional module EditorVi.pm is included, but not installed be default.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tk::TextVi
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Joseph Strom
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

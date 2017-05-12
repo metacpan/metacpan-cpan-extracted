@@ -1,0 +1,15 @@
+Text::Smart - Simple text markup processing
+-------------------------------------------
+
+The Text::Smart module defines a simple inline
+markup syntax and provides a processor for translating
+this into common formats such as HTML.
+
+Feedback, bug reports, patches
+------------------------------
+
+Please send patches in unified diff format to:
+
+	Daniel Berrange <dan@berrange.com>
+
+-- End

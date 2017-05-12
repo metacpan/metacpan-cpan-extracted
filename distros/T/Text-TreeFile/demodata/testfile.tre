@@ -1,0 +1,9 @@
+line 01, level 0, yyyyy
+  line 02, level 1, yyyyy
+    line 03, level 2, yyyyy
+    line 04, level 2, yyyyy
+  line 05, level 1, yyyyy
+  line 06, level 1, yyyyy
+    include inclfile.tre all the rest of this line is commentary
+    line 13, level 2, yyyyy
+  line 14, level 1, yyyyy

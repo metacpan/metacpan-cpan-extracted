@@ -1,0 +1,132 @@
+NAME
+
+    Text::UnAbbrev - Expand abbreviations and acronyms.
+
+VERSION
+
+    version 0.03
+
+SYNOPSIS
+
+        use Text::UnAbbrev;
+    
+        my $unabbrev = Text::UnAbbrev->new(
+            language  => q(pt_BR),
+            domain    => q(Geography),
+            subdomain => q(unidade_federativa),
+        );
+    
+        my @expand = $unabbrev->lookup(q(SP));
+        # São Paulo
+
+DESCRIPTION
+
+    Text::UnAbbrev is a "dictionary-like" "domain-oriented" module.
+
+METHODS
+
+ lookup
+
+    Take one or two arguments and returns a array with expansions found in
+    dict()
+
+ dict
+
+    A hashref with dictionary. The first three hashref levels are language,
+    domain and subdomain, fourth and last hashref level is
+    abbreviation/acronym. Each entry ending in a arrayref of expansions.
+    Normally, this arrayref contains only one element, perhaps,
+    unfortunately, in the same subdomain, an abbreviation/acronym can have
+    more then one expansion.
+
+ language
+
+    The language definition. The language definition adopted by this module
+    looks like locale definitions ( pt_BR, en_US ...). If boolean-false,
+    all languages are used in lookup operations.
+
+ domain
+
+    The domain definition. If boolean-false, all domains are used in lookup
+    operations.
+
+ subdomain
+
+    The subdomain definition. If boolean-false, all domains are used in
+    lookup operations.
+
+EXAMPLES
+
+ Retrieve current valid values for ...
+
+  ... languages:
+
+        my @language = keys %{ $unabbrev->{dict} };
+
+  ... domains:
+
+        my @domain = keys %{ $unabbrev->{dict}{pt_BR} };
+
+  ... subdomains:
+
+        my @subdomain = keys %{ $unabbrev->{dict}{pt_BR}{DateTime} };
+
+ Consulting all dictionaries
+
+  Getting origins
+
+        $unabbrev->$_(undef) foreach qw[language domain subdomain];
+        my @lookup = $unabbrev->lookup( q(SP), q(with_origin) );
+    
+        # or create a new object
+        my $unabbrev2 = Text::UnAbbrev->new();
+        my @lookup = $unabbrev2->lookup( q(SP), q(with_origin) );
+
+    The output can be:
+
+        [
+            [0] {
+                'Service Pack' => {
+                    'domain'    => "technology",
+                    'language'  => "en_US",
+                    'subdomain' => "information"
+                }
+            },
+            [1] {
+                'São Paulo' => {
+                    'domain'    => "Geography",
+                    'language'  => "pt_BR",
+                    'subdomain' => "unidade_federativa"
+                }
+            },
+            [2] {
+                'Santo Padre' => {
+                    'domain'    => "Grammar",
+                    'language'  => "pt_BR",
+                    'subdomain' => "pronome_tratamento"
+                }
+            }
+        ]
+
+FILES
+
+ ./share/
+
+    Contains all dictionary data files.
+
+TODO
+
+      * Improve documentation
+
+      * Expand dictionaries
+
+AUTHOR
+
+    Ronaldo Ferreira de Lima aka jimmy <jimmy at gmail>.
+
+SEE ALSO
+
+      * Lingua::PT::Abbrev
+
+      * DateTime::Locale::pt_BR
+

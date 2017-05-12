@@ -1,0 +1,96 @@
+{
+   "abstract" : "parse date and time string.",
+   "author" : [
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-Strptime",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "DateTime::Format::Strptime" : "0",
+            "Getopt::Long" : "0",
+            "POSIX::strptime" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Time::Moment" : "0",
+            "Time::Piece" : "0",
+            "Time::TZOffset" : "0",
+            "feature" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Locale" : "0",
+            "DateTime::TimeZone" : "0",
+            "Encode" : "0",
+            "Encode::Locale" : "0",
+            "List::MoreUtils" : "0",
+            "Scalar::Util" : "0",
+            "Time::Local" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Time::Strptime" : {
+         "file" : "lib/Time/Strptime.pm",
+         "version" : "1.00"
+      },
+      "Time::Strptime::Format" : {
+         "file" : "lib/Time/Strptime/Format.pm",
+         "version" : "1"
+      },
+      "Time::Strptime::TimeZone" : {
+         "file" : "lib/Time/Strptime/TimeZone.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/Time-Strptime/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/Time-Strptime",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/Time-Strptime.git",
+         "web" : "https://github.com/karupanerura/Time-Strptime"
+      }
+   },
+   "version" : "1.00",
+   "x_authority" : "cpan:KARUPA",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

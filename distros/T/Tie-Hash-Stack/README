@@ -1,0 +1,53 @@
+Tie::Hash::Stack Version $Revision: 0.9 $
+=======================================
+
+Tie::Hash::Stack creates a stack of hashes (FILO) that acts like a
+single hash.  All hashes are examined when recalling values; in the 
+case of duplicate keys in separate hashes, the key nearest the top
+(most recently added) of the stack will be used.  Any storing of
+values is always done on the topmost hash.  Several functions are
+provided for manipulating this stack.
+
+This class can be used for cases where several 'pages' of data are
+collected in a linear series, with the possiblity that it may be
+necessary to back-up in the series (i.e. installation programs or
+web forms).  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not depend on any other non-standard modules.  
+It should work with Perl 5.0x and 5.x.
+
+COPYRIGHT AND LICENCE
+
+This program is Copyright 2001 by Michael K. Neylon.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+

@@ -1,0 +1,37 @@
+Tridion-BusinessConnector version 0.03
+======================================
+
+This module provides a handy interface to the Tridion CMS' SOAP interface,
+known as the "Business Connector" in their documentation. It handles things
+like escaping passwords, XML namespaces, request/response formats, and stuff
+like that.
+
+This is the first version, and as such provides only a few functions, mainly
+at low levels. For everything other than GetItem and SaveItem issues, you will
+use the execute() function. At a later date I will add direct functions for
+DeleteItem, GetList, Publish, Search, and so on.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SOAP::Lite
+  XML::LibXML
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Toby Corkindale
+
+This software is distributed under the terms of the Lesser Gnu Public License.
+This license can be found at http://www.gnu.org/licenses/lgpl.html
+

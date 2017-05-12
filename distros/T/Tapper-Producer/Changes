@@ -1,0 +1,33 @@
+
+Revision history for Tapper-Producer
+
+5.0.1     2016-02-22
+        - Assert OS Unix
+
+5.0.0     2016-02-15
+        - just version bump for v5
+
+4.1.3     2013-03-14
+        - drop T::Producer::Build
+
+4.1.2     2013-03-14
+        - new Tapper::Producer::ExternalProgram
+          a bridge to external non-Perl producers
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        - [FEAT] get packages in YAML from builder
+        - [FIX] regex to match . literally
+
+4.0.2     2012-06-12
+        - help with Crypt::DH deps via AAAA::Crypt::DH
+
+4.0.1     2012-05-16
+        - misc bugfixes, better error handling
+        - unified producers to die in case of an error
+        - upload output as file
+        - new Producer frontend for OSRC internal buildserver
+        - big Dist::Zilla roundhouse kick
+

@@ -1,0 +1,45 @@
+---
+abstract: 'an array tie for a file of enhanced Field:Value data'
+author:
+  - 'Kathryn Andersen'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-FieldVals
+provides:
+  Tie::FieldVals:
+    file: lib/Tie/FieldVals.pm
+    version: '0.6203'
+  Tie::FieldVals::Join:
+    file: lib/Tie/FieldVals/Join.pm
+    version: '0.6203'
+  Tie::FieldVals::Row:
+    file: lib/Tie/FieldVals/Row.pm
+    version: '0.6203'
+  Tie::FieldVals::Row::Join:
+    file: lib/Tie/FieldVals/Row/Join.pm
+    version: '0.6203'
+  Tie::FieldVals::Select:
+    file: lib/Tie/FieldVals/Select.pm
+    version: '0.6203'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  Getopt::ArgvFile: '1.08'
+  Getopt::Long: '2.34'
+  Pod::Usage: '0'
+  Tie::Array: '0'
+  Tie::File: '0'
+resources:
+  homepage: http://github.com/rubykat/Tie-FieldVals
+  repository: git://github.com/rubykat/Tie-FieldVals.git
+version: '0.6203'

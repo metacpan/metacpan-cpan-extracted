@@ -1,0 +1,9 @@
+LDAP.pm
+Makefile.PL
+MANIFEST
+README.DEV
+README.LOG
+README.TXT
+t/10basic.t
+Entry/Entry.pm
+Entry/Makefile.PL

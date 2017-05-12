@@ -1,0 +1,826 @@
+<!SGML "ISO 8879:1986"
+  -- ...................................................................... --
+  -- CSTS SGML declaration V0.92 .......................................... --
+  -- file csts.dcl ........................................................ --
+
+CHARSET
+BASESET "ISO 646-1983//CHARSET International Reference Version
+         (IRV)//ESC 2/5 4/0"
+DESCSET     0    9   UNUSED
+            9    2   9
+           11    2   UNUSED
+           13    1   13
+           14   18   UNUSED
+           32   95   32
+          127    1   UNUSED
+BASESET "ISO Latin 2//CHARSET Latin 2//ESC 2/13 4/1"
+DESCSET    128   32   UNUSED
+           160   94   32
+           254   1    127
+           255   1    UNUSED
+CAPACITY     PUBLIC "ISO 8879:1986//CAPACITY Reference//EN"
+SCOPE        DOCUMENT
+SYNTAX
+SHUNCHAR CONTROLS 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+         18 19 20 21 22 23 24 25 26 27 28 29 30 31 127 255
+BASESET "ISO 646-1983//CHARSET International Reference Version
+         (IRV)//ESC 2/5 4/0"
+DESCSET     0    9   UNUSED
+            9    2   9
+           11    2   UNUSED
+           13    1   13
+           14   18   UNUSED
+           32   95   32
+          127    1   UNUSED
+FUNCTION   RE                    13
+           RS                    10
+           SPACE                 32
+           TAB        SEPCHAR     9
+NAMING     LCNMSTRT   ""
+           UCNMSTRT   ""
+           LCNMCHAR   "-."
+           UCNMCHAR   "-."
+           NAMECASE   GENERAL    NO
+                      ENTITY     NO
+DELIM      GENERAL    SGMLREF
+           SHORTREF   SGMLREF
+NAMES      SGMLREF
+QUANTITY   SGMLREF
+GRPGTCNT 253
+GRPLVL 253
+NAMELEN  32
+LITLEN 1024
+FEATURES
+MINIMIZE   DATATAG   NO   OMITTAG    YES          RANK       NO    SHORTTAG YES
+LINK       SIMPLE    NO   IMPLICIT   NO           EXPLICIT   NO
+OTHER      CONCUR    NO   SUBDOC     YES 99999999 FORMAL     YES
+APPINFO    NONE
+
+  -- End of CSTS SGML declaration ......................................... --
+  -- ...................................................................... --
+
+>
+<!DOCTYPE csts [
+<!-- ...................................................................... -->
+<!-- CSTS DTD V1.04 ....................................................... -->
+<!-- File csts.dtd ........................................................ -->
+
+<!-- ChangeLog: -->
+<!-- ver 1.04 (Nov 5,2002) by Petr Pajas                       -->
+<!--        - added Tframeid, Tframeref elem. (valency frame)  -->
+<!--        - added wds (word sense disambiguation) element    -->
+<!--        - added Slash and Semicolon entitites              -->
+<!-- ver 1.03 (Sep 30,2002) by Petr Pajas                      -->
+<!--        - added PADT (arabic) specific attributes          -->
+<!--        - added Top                                        -->
+<!--        - revised coreference markup                       -->
+<!-- ver 1.02 (Apr 3,2002) by Petr Pajas                       -->
+<!--        - added TR-specific entitites                      -->
+<!--        - added status attribute to (M)TRl                 -->
+<!--        - fix: added missing quot attribute to MTRl        -->
+<!--        - added IDREFS attribute origin to (M)TRl          -->
+<!--        - added general purpose element x                  -->
+<!--                                                           -->
+<!-- ver 1.00 (Aug 13, 2001) by Jan Hajic                      -->
+<!--        - documentation to all elements and attributes     -->
+<!--          in a format suitable for generation              --> 
+<!--          (by getdesc.pl) of the description file as       -->
+<!--          required by the dtd2html program                 -->
+<!--        - added pn element & description                   -->
+<!--                                                           -->
+<!-- ver 0.96 (Jul 01, 2001) by Jan Hajic                      -->
+<!--        - upper.gen.phrase added to f*case                 -->
+<!--        - dtd2html "comments" (some) added for extraction  -->
+<!--          by the getdesc.pl program to be used by dtd2html -->
+<!--                                                           -->
+<!-- ver 0.95 (Jun 28, 2001) by Petr Pajas                     -->
+<!--        - obsolete reference to MTRt removed from TRl,MTRl -->
+<!--        - ignored section preserve.gen.entities added      -->
+<!--          making it possible to preserve general entities  -->
+<!--          in sgml parser output                            -->
+<!--        - case related values for the attribute            -->
+<!--          kind of w removed                                -->
+<!--                                                           -->
+<!-- ver 0.94 (May 23, 2001) by Petr Pajas                     -->
+<!--        - elements s and salt to allow any sequence        -->
+<!--          of i|w|f|d|D|fadd                                -->
+<!--        - agrave entity added                              -->
+<!--        - cap.gen.phrase case added for elmnt f            -->
+<!--        - (mixed|upper).(del|spell) kinds added for elmnt w-->
+<!--                                                           -->
+<!-- ver 0.93 (Feb 23, 2001) by Daniel Zeman                   -->
+<!--        - elements MMl, MMt, MDl, MDt, MDA, MDg, and MTRl  -->
+<!--          got a new attribute, src, identifying the source -->
+<!--          of annotation (e.g. distinguishing outputs of    -->
+<!--          two taggers)                                     -->
+<!--                                                           -->
+<!-- ver 0.92 (Nov 02, 2000)                                   -->
+<!--        corrections, element e deleted                     -->
+<!--                                                           -->
+<!-- ver 0.91 (Sep 12, 2000)                                   -->
+<!--         modified by Bohmova,Hladka,Pajas,Zeman            -->
+<!--         - added markup for tectogrammatical annotation    -->
+<!--         - of the elements present in previous version     -->
+<!--           only t and d are changed: element e completely  -->
+<!--           removed                                         -->
+<!--                                                           -->
+<!-- ver 0.9 a contents changed -->
+<!--         form -> med -->
+<!--         genr -> txtype -->
+<!--         spec -> genre -->
+<!--              -> spec -->
+<!--         auth -> authsex -->
+<!--              -> transsex -->
+<!--              -> authname -->
+<!--              -> transname -->
+<!--              -> srclang -->
+<!--              -> lang -->
+<!--              -> firsted -->
+<!--              + TEI header planned -->
+<!--         doc id=path changed -->
+<!-- 1.11.97 spec -> verse -->
+
+<!--                    A_attr_PADT                                -->
+<!ENTITY % A.attr.PADT 
+--                    PADT-specific attributes for A/MDA           --
+       "parallel  (Co|Ap|no-parallel) 'no-parallel'
+        paren     (Pa|no-paren)       'no-paren' 
+        arabfa    (Ca|Exp|Fi|no-fa)   'no-fa'
+        arabspec  (Ref|Msd|no-spec)  'no-spec'
+        arabclause (Pred|PredC|PredE|PredP|Pnom|no-clause) 'no-clause'"
+>
+
+
+<!ELEMENT csts - - (h?, doc*)
+-- el csts end --
+>
+<!ATTLIST csts
+          lang          CDATA     #REQUIRED
+
+>
+<!ELEMENT h - - (source, markup*)
+>
+
+<!ELEMENT source - - (#PCDATA) 
+>
+
+<!ELEMENT markup - - (mauth, mdate, mdesc+)
+>
+<!ELEMENT mauth - O (#PCDATA)
+>
+
+<!ELEMENT mdate - O (#PCDATA) -- /**/ format? --
+>
+
+<!ELEMENT mdesc - O (#PCDATA) 
+>
+<!ELEMENT doc - - (a, c+) 
+
+
+>
+
+<!ATTLIST doc
+          file          CDATA      #REQUIRED
+          id            NUMBER     #REQUIRED
+   -- file repeats the file path from archive root --
+   -- <mod>/<txtype>/<med>/<temp>/<opus> --
+   -- example: S/Inf/J/1993/lnd93001 --
+   -- id is the document identification within the file --
+>
+
+<!ELEMENT a - - (markup*, mod, txtype, genre, verse?, med,
+                 authsex?, lang?, transsex?,
+                 srclang?, temp, firsted?,
+                 authname,
+                 transname?,
+                 opus, id)
+         -- all subsequent elements (within a) can have these --
+         -- values: --
+
+         -- x   undetermined --
+         -- y   indeterminable --
+         -- na  not applicable --
+         -- mix mix of specific values, unspecified --
+         -- alt other then specific values --
+
+         -- document attributes included as SGML elements --
+>
+
+<!ELEMENT mod - O (#PCDATA)
+    -- mod possible contents:
+                              s - synchronic? corpus
+                              d - diachronic corpus
+                              o - oral (spoken) corpus --
+>
+<!ELEMENT txtype - O (#PCDATA)
+    -- txtype possible contents:
+                                 ima - imaginative
+                                 inf - informative
+                                 mix - mix of text types --
+>
+<!ELEMENT genre - O (#PCDATA)
+    -- genre possible contents:
+                son   song lyrics
+                ver   verse
+                nov   novels and stories
+                crm   crime fiction
+                sci   science fiction
+                adv   romance (adventure)
+                ero   erotica and pornography
+                bio   (auto)biography, memories, letters, diaries
+                tra   travels (by non-experts)
+                tab   yellow, fallen lit. (bulvar)
+                fab   myths, legends, fables, tales
+                hum   humor, satire, parody, jokes
+                jun   literature for children and youth
+                ess   essays, sketches, columns
+                chr   chronicles, annals, yearbooks
+                exc   eccentric literature
+                dra   dramas, sets, tv series, radio
+                mus   music
+                tvf   television, movies
+                jur   justice, criminology
+                his   history, expert biographies
+                psy   psychology
+                edu   education, training, teaching, edification
+                soc   sociology
+                mil   military
+                phi   philosophy
+                art   visual arts, architecture, applied arts
+                the   theatre, ballet
+                pol   politology
+                lit   literature
+                lin   linguistics
+                eth   etnography, antropology
+                agr   agriculture, forestry, breeding, raising
+                med   medicine
+                bio   biology, botanics, zoology
+                che   chemistry
+                mat   mathematics, logics
+                ggr   geography, travels (by experts)
+                phy   physics, astronomy
+                geo   geology, meteorology, hydrology
+                ind   industry, technology, building, energy, transportation,
+                      crafts
+                inf   information, computer science
+                eco   economy, bussines, banking
+                adm   administration, government, management, parliament
+                rel   religion, theology
+                hou   houshold economy (boarding, lodging, clothing)
+                spo   sports
+                sct   society (manners, gossips)
+                amu   amusement, games
+--
+>
+<!ELEMENT verse - O (#PCDATA)
+    -- verse possible contents:  DEFAULT - alt
+                                txb - textbook
+                                enc - dictionary, encyclopedia
+                                pop - popular style
+                                cri - critique
+                                adv - advertisement --
+>
+<!ELEMENT med - O (#PCDATA)
+    -- med possible contents:
+                                b - book
+                                nws - newspaper
+                                j - journal (periodic)
+                                scr - screenplay
+                                net - Internet
+                                oc - occasional --
+>
+<!ELEMENT authsex - O (#PCDATA)
+    -- authsex possible contents:  DEFAULT - y
+                                m - male
+                                f - female
+                             --
+>
+<!ELEMENT lang - O (#PCDATA)
+    -- lang possible contents:  DEFAULT - cze
+                                cze - Czech
+                                slo - Slovak
+                                eng - English
+                                ger - German
+                                fre - French (France)
+                                spa - Spanish
+                                rus - Russian
+                             --
+>
+<!ELEMENT transsex - O (#PCDATA)
+    -- transsex possible contents:  DEFAULT - na if srclang=no, x otherwise
+                                m - male
+                                f - female
+                             --
+>
+<!ELEMENT srclang - O (#PCDATA)
+    -- srclang possible contents:  DEFAULT - no
+                                no  - not a translation (original)
+                                eng - English
+                                ger - German
+                                fre - French (France)
+                                spa - Spanish
+                                rus - Russian
+                                slo - Slovak
+                                ... filled continuously
+                             --
+>
+<!ELEMENT temp - O (#PCDATA)
+    -- temp possible contents:
+                                yyyy - year of publication only, 4 digits --
+>
+<!ELEMENT firsted - O (#PCDATA)
+    -- lang possible contents:  DEFAULT - x
+                                yyyy - year of first publication
+                             --
+>
+<!ELEMENT authname - O (#PCDATA)
+    -- authname possible contents:  DEFAULT - y
+                                author's name abbreviation according to
+                                name table, up to 8 chars long
+                             --
+>
+<!ELEMENT transname - O (#PCDATA)
+    -- transname possible contents:  DEFAULT - na if srclang=no, x otherwise
+                                translator's name abbreviation according to
+                                name table, up to 8 chars long
+                             --
+>
+<!ELEMENT opus - O (#PCDATA)
+      -- opus possible contents: file name (up to 8 chars long)
+             ex.: Lidove noviny denik: lndyyxxx (yy = year, xxx = day)
+                  Lidove noviny ned.pr. lnnpyyxx (yy = year, xx = week)
+                  Mlada fronta denik: mfxxxxxx (xxxxxx = full date)
+                  Bloudeni (Durych): bloudeni
+             --
+>
+<!ELEMENT id - O (#PCDATA)
+      -- identification within file (ie within opus), 3 digit number --
+>
+<!ELEMENT c - - (p+) -- Contents or Chapter --
+>
+
+<!ELEMENT p - O (s+) -- Paragraph --
+>
+
+<!ATTLIST p
+          n   NUMBER   #REQUIRED 
+>
+
+
+<!ELEMENT s - O ((i|w|f|d|D|fadd)* , idioms?, salt*) -- sentence --
+>
+<!ATTLIST s
+          id   CDATA   #REQUIRED
+>
+
+<!ELEMENT salt - O ((i|f|w|d|D|fadd)* & idioms? )
+                 -- sentence with alternate annotation -->
+<!ATTLIST salt
+          id   CDATA   #REQUIRED 
+>
+<!ELEMENT i - O (#PCDATA) -- formatting from source -->
+
+<!ATTLIST x
+          name   CDATA   #REQUIRED 
+>
+
+<!ELEMENT x - O (#PCDATA)
+>
+
+<!ELEMENT f - O (#PCDATA & P* & Ct? & l* & MMl* & MDl* &
+                 A* & MDA* & TRl* & MTRl* & r? & g* & MDg* & wsd? & x*)
+                 -- word forms; text: form itself, rest: annotation -->
+<!ATTLIST f
+          case  (lower|cap|upper|mixed|gen|num|num.gen
+                |gen.phrase|cap.gen.phrase|upper.gen.phrase
+                |abbr|cap.abbr|cap.gen
+                |upper.abbr|upper.gen|mixed.abbr) lower
+                -- gen	- In most of the cases the word-form is identical
+                          with the original word-form as it has been found
+                          in the original text including the use of lower and/or
+                          upper case letters. Exceptions occur only in case
+                          the original word-form represents 
+                               * a number containing a decimal point 
+                               * the words aby, kdyby (to, in order to, so that, if) 
+                                 (denoting purpose, condition) 
+                               * a compact (contracted) form of a preposition linked
+                                 with a pronoun (e.g., naò, proò, zaò, oè, zaè) 
+                               * a word with an -s added to indicate 2nd person singular
+                                 of the verb být (to be) (e.g., tys, ses, udìlals) 
+                          for detailed information see
+                          "A Manual for Analytic Layer Tagging" --
+          cphr  NMTOKEN   #IMPLIED
+          id    CDATA   #IMPLIED >
+<!ELEMENT w - O (#PCDATA)
+                 --  original forms for normalized stuff (numbers, etc.) -->
+<!ATTLIST w
+          kind (same|ctcd|phrpart|del|spell|ins|num.orig)  same 
+		     -- original form from text if f tag differs;
+		     ctcd 	- original form is a contraction;
+                     phrpart 	- original form is split;
+		     del	- original form is removed;	
+		     spell 	- original form with spelling error; 
+		     ins 	- original form is missing;
+                     num.orig
+		     -->
+
+<!ELEMENT d - O (#PCDATA & P* & Ct? & l* & MMl* & MDl* &
+                 A* & MDA* & TRl* & MTRl* & r? & g* & MDg* & wsd? & x*)
+                 -- punctuation / delimiters;
+                    display "word-form-like" behavior --
+>
+<!ATTLIST d
+          type (std|gen) std
+          id    CDATA   #IMPLIED 
+            -- used for manual corrections if <w spell> used --
+>
+
+<!ELEMENT D - O EMPTY 
+                 -- no space in original -->
+<!ELEMENT P - O (#PCDATA)
+                 -- pronunciation hint (numbers, abbreviations) --
+>
+<!ELEMENT Ct - O (#PCDATA)
+                 -- list of all tags assigned by morphology, regardless
+                    of lemma, i.e. union of all sets of tags of all lemmas --
+>
+<!ELEMENT l - O (#PCDATA & R? & E? & t*)
+                 -- lemma (base form) as defined by morphology, including
+                    syntactic, semantic and style tags, derivation info,
+                    and comment;
+                    manually assigned;
+                    format:
+                    underline-separated parts, one-character 'tags' as
+                    defined by the morphology program;
+                    derivation info: (*<cut#><add>)    --
+>
+<!ELEMENT MMl - O (#PCDATA & R? & E? & (pn? & MMt)*)
+                 -- lemma (base form), description see the l tag;
+                    machine assigned (by a morphological analysis program),
+                    NOT disambiguated
+                    --
+>
+<!ATTLIST MMl
+          src     CDATA #IMPLIED -- morphological analyzer id --
+>
+<!ELEMENT MDl - O (#PCDATA & R? & E? & MDt*)
+                 -- lemma (base form), description see the l tag;
+                    machine assigned (by a tagger), disambiguated
+                    if more than 1: n-best
+                    --
+>
+<!ATTLIST MDl
+          w       NUTOKEN #IMPLIED -- weight / probability --
+          src     CDATA   #IMPLIED -- lemmatizer id        --
+>
+
+<!ELEMENT pn - O (#PCDATA)
+                 -- pattern name --
+>
+
+<!ELEMENT R - O (#PCDATA)
+                 -- word root (stem) as defined by the morphology program --
+>
+<!ELEMENT E - O (#PCDATA)
+                 -- word ending (suffix) as defined by the morphology
+                    program; concatenation of R and E gives f (contents-wise,
+                    of course) --
+>
+<!ELEMENT t - O (#PCDATA)
+                 -- morphological tag as assigned manually
+                    --
+>
+<!ATTLIST t
+          w  NUTOKEN #IMPLIED
+>
+<!ELEMENT MMt - O (#PCDATA)
+                 -- morphological tag(s) as assigned by morphology,
+                    NOT disambiguated
+                    --
+>
+
+<!ATTLIST MMt
+          src     CDATA #IMPLIED -- morphological analyzer id --
+>
+<!ELEMENT MDt - O (#PCDATA)
+                 -- morphological tag(s) as assigned by machine, disambiguated,
+                    possibly also with weight/prob; if more than 1: n-best
+                    --
+>
+
+<!ATTLIST MDt
+          w       NUTOKEN #IMPLIED -- weight / probability --
+          src     CDATA   #IMPLIED -- tagger id            --
+>
+
+<!ELEMENT A - O (#PCDATA)
+                 -- analytical (syntactic) function manually assigned
+                    to the word form
+                    in the f tag; for allowed list see annotator's guidelines
+                    at fairway.ms.mf.cuni.cz / Projects / Treebank / guide
+                    --
+>
+<!ELEMENT MDA - O (#PCDATA)
+                 -- analytical (syntactic) function(s) as assigned by machine,
+                    disambiguated, possibly with weight; if more than 1: n-best
+                    --
+>
+<!ATTLIST MDA
+          w       NUTOKEN #IMPLIED -- weight / probability  --
+          src     CDATA   #IMPLIED -- syntactical tagger id --
+          %A.attr.PADT;
+>
+
+<!-- ============================================================= -->
+<!--                    tectogrammatical elements                  -->
+<!-- 09/12/2000 A. Bohmova, B. Hladka, P. Pajas, D. Zeman          -->
+<!-- ============================================================= -->
+
+<!ELEMENT fadd - O (TRl* & MTRl* & r? & g* & wsd? & x*)
+                 -- nodes added on the tectogrammatical level;
+                 --
+>
+<!ATTLIST fadd
+          del  (elid|elex|expn|transf) elid 
+          id    CDATA   #IMPLIED 
+>
+
+<!ELEMENT MTRl - O (#PCDATA & T? & Tmo? & Tpa? & Top? & TRt? & tfa? & tfr? & fw? & phr? &
+                    Tframeid? & Tframere? & TRg? & coref*)
+                -- tectogrammatical lemma id. 
+                --
+>
+
+<!ATTLIST MTRl
+          src      CDATA #IMPLIED -- tectogrammatical lemmatizer id --
+          quot (quot|dsp|dsp.quot|dspp|dspp.quot|dspi|dspi.quot) #IMPLIED 
+          status (sound|hidden) "sound" 
+          origin IDREFS #IMPLIED
+>
+
+<!ELEMENT TRl - O (#PCDATA & T? & Tmo? & Tpa? & Top? & TRt? & tfa? & tfr? & fw? & phr? &
+                   Tframeid? & Tframere? & TRg? & coref* )
+                -- tectogrammatical lemma id. 
+                --
+>
+<!ATTLIST TRl
+          quot (quot|dsp|dsp.quot|dspp|dspp.quot|dspi|dspi.quot) #IMPLIED 
+          status (sound|hidden) "sound" 
+          origin IDREFS #IMPLIED
+>
+
+<!ELEMENT TRg - O (#PCDATA)
+                 -- governing node on the tectogrammatical level. For
+		    description see also annotator's guidelines (UFAL
+		    Technical Report TR-1999-07).
+                    Text contents points to identical <r> elsewhere in the
+                    same structure. Pointer to node 0 is allowed - it is
+                    the artificial root node added to each sentence
+                    annotated on the analytical/tectogrammatical level.
+                    This is the manually assigned gov. node.
+                    --
+>
+
+<!ELEMENT T - O (#PCDATA & grm?)
+                 -- tectogrammatical functor;
+                    should be one of the following values:
+
+                    ACT PAT ADDR EFF ORIG ACMP ADVS AIM APP 
+                    APPS ATT BEN CAUS CNCS COMPL COND CONJ 
+                    CPR CRIT CSQ CTERF DENOM DES DIFF DIR1 DIR2 
+                    DIR3 DISJ ETHD EXT EV GRAD HER INTF INTT ID 
+                    LOC MANN MAT MEANS MOD NORM PAR PREC PRED REAS 
+                    REG RESL RESTR RHEM RSTR SUBS TFHL TFRWH THL 
+                    THO TOWH TPAR TSIN TTILL TWHEN VOC VOCAT NA SENT           
+
+                 --
+>
+
+<!ELEMENT grm - O (#PCDATA)
+                 -- tectogrammatical grammateme;
+                --
+>
+
+<!ELEMENT Tmo - O (#PCDATA)
+                -- member of (coordination, apposition) --
+>
+
+<!ELEMENT Tpa - O (#PCDATA)
+                -- parenthesis --
+>
+
+<!ELEMENT Top - O (#PCDATA)
+                -- operand --
+
+>
+
+
+<!ELEMENT TRt - O (#PCDATA)
+                -- tectogrammatical tag;
+
+                   uses positional markup of the form
+
+                   [MIFN-X][SP-X][123-X][SPA-X][PCR-X][10-X][IMC-X][DBHVSPF-X][.!DM?]
+
+                   The fields represent the following categories:
+
+                   gender 
+                   number
+                   degree of comparison
+                   tense          (S...SIM,  P...POST, A...ANT)
+                   aspect         (P...PROC, C...CPL, R...RES)
+                   iterativeness 
+                   manner         (I...IND, M...IMP, C...CDN)
+                   deontmod       (D...DECL, B...DEB, H...HRT, V...VOL,
+                                   S...POSS, P...PERM, F...FAC)
+                   sentmod        (....ENUNC, !...EXCL, D...DESID,
+                                   M...IMPER, ?...INTER)
+                   In all fields dash (-) means N/A, X means not
+                   assigned.
+                --
+>
+
+<!ELEMENT tfa - O (#PCDATA)
+                -- tfa possible contents:
+                        T
+                        F
+                        C
+                        -       N/A
+                        X       not assigned (if tfa not present in
+                                TRl, this value should be assumed)
+                --
+>
+
+<!ELEMENT tfr - O (#PCDATA)
+                 -- used to assign a deep structure word order on the
+                    tectogrammatical level. In general, f and fadd tags
+                    are numbered
+                 --
+>
+
+<!ELEMENT fw  - O (#PCDATA)
+>
+<!ELEMENT phr - O (#PCDATA)
+                -- phraseme id;
+                --
+>
+
+
+<!ELEMENT coref  - O (#PCDATA)
+>
+
+<!ATTLIST coref
+          ref     CDATA   #IMPLIED -- ID's of coreferenced node --
+          type    CDATA   #REQUIRED -- coreference type --
+>
+
+<!-- ============================================================= -->
+<!--                    end of tectogrammatical elements            -->
+<!-- ============================================================= -->
+
+
+<!ELEMENT r - O (#PCDATA)
+                 -- word form id. In general, f tags are numbered 1..#of words
+                    --
+>
+<!ELEMENT g - O (#PCDATA)
+                 -- governing node on the analytical level. For description
+                    se also annotator's guidelines
+                    at fairway.ms.mf.cuni.cz / Projects / Treebank / guide.
+                    Text contents points to identical r elsewhere in the
+                    same sentence. Pointer to node 0 is allowed - it is
+                    the artificial root node added to each sentence
+                    annotated on the analytical level.
+                    This is the manually assigned gov. node.
+                    --
+>
+<!ELEMENT MDg - O (#PCDATA)
+                 -- governing node as assigned by machine (parsing program)
+                    --
+>
+<!ATTLIST MDg
+          w       NUTOKEN #IMPLIED -- weight / probability --
+          src     CDATA   #IMPLIED -- parser id            --
+>
+
+<!ELEMENT Tframeid - O (#PCDATA)
+                -- valency frame identifier
+                --
+>
+
+<!ELEMENT Tframere - O (#PCDATA)
+                -- valency frame realization
+                --
+>
+
+<!ELEMENT wsd - O EMPTY
+                -- word sense disambiguation; 
+                --
+>
+
+<!ATTLIST wsd
+          s             NUTOKEN #IMPLIED -- id of sense of the given EWN-literal -- 
+          ewn           NUTOKEN #IMPLIED -- id of the EWN-synset -- 
+          ili           NUTOKEN #IMPLIED -- id of the ILI-record -- 
+          iliOffset     CDATA #IMPLIED -- offset of the ILI-record in ILI-database -- 
+>
+
+
+<!ELEMENT idioms - O (idiom*)
+                 -- list of idioms by reference --
+>
+<!ELEMENT idiom - O (iref+)
+                 -- idiom is a nonempty list of references to idiom parts --
+>
+<!ELEMENT iref - O (#PCDATA)
+                 -- reference to idiom part, as defined by r tag within f --
+>
+
+<!ENTITY % preserve.gen.entities "IGNORE">   
+
+<![%preserve.gen.entities;[
+
+<!ENTITY percnt CDATA "&#38;percnt;" >
+<!ENTITY amp CDATA "&#38;amp;" >
+<!ENTITY num CDATA "&#38;num;" >
+<!ENTITY ast CDATA "&#38;ast;" >
+<!ENTITY dollar CDATA "&#38;dollar;" -- "$" -->
+<!ENTITY lt CDATA "&#38;lt;" -- "<" -->
+<!ENTITY gt CDATA "&#38;gt;" -- ">" -->
+<!ENTITY lowbar CDATA "&#38;lowbar;" -- "_" ??? -->
+<!ENTITY lsqb CDATA "&#38;lsqb;" -- "["  ??? -->
+<!ENTITY rsqb CDATA "&#38;rsqb;" -- "]" ??? -->
+<!ENTITY verbar CDATA "&#38;verbar;" -- "|" -->
+
+<!ENTITY circ CDATA "&#38;circ;" -- "circ" -->
+<!ENTITY rcub CDATA "&#38;rcub;" -- "rcub" -->
+<!ENTITY commat CDATA "&#38;commat;" -- "commat" -->
+<!ENTITY bsol CDATA "&#38;bsol;" -- "bsol" -->
+<!ENTITY lcub CDATA "&#38;lcub;" -- "lcub" -->
+<!ENTITY macron CDATA "&#38;macron;" -- "macron" -->
+<!ENTITY sect CDATA "&#38;sect;" -- "sect" -->
+<!ENTITY curren CDATA "&#38;curren;" -- "curren" -->
+<!ENTITY para CDATA "&#38;para;" -- "para" -->
+
+<!ENTITY agrave CDATA "&#38;agrave;" -- "agrave" -->
+
+<!ENTITY Period CDATA "&#38;Period;" -- "Period" -->
+<!ENTITY Comma CDATA "&#38;Comma;" -- "Comma" -->
+<!ENTITY Neg CDATA "&#38;Neg;" -- "Neg" -->
+<!ENTITY Colon CDATA "&#38;Colon;" -- "Colon" -->
+<!ENTITY Dash CDATA "&#38;Dash;" -- "Dash" -->
+<!ENTITY Lpar CDATA "&#38;Lpar;" -- "Lpar" -->
+<!ENTITY Forn CDATA "&#38;Forn;" -- "Forn" -->
+<!ENTITY Rcp CDATA "&#38;Rcp;" -- "Rcp" -->
+<!ENTITY Cor CDATA "&#38;Cor;" -- "Cor" -->
+<!ENTITY Emp CDATA "&#38;Emp;" -- "Emp" -->
+<!ENTITY EmpNoun CDATA "&#38;EmpNoun;" -- "EmpNoun" -->
+<!ENTITY Gen CDATA "&#38;Gen;" -- "Gen" -->
+<!ENTITY Idph CDATA "&#38;Idph;" -- "Idph" -->
+<!ENTITY Hyphen CDATA "&#38;Hyphen;" -- "Hyphen" -->
+<!ENTITY Slash CDATA "&#38;Slash;" -- "Slash" -->
+<!ENTITY Semicolon CDATA "&#38;Semicolon;" -- "Semicolon" -->
+]]>
+
+
+<!ENTITY percnt CDATA "&#37;" >
+<!ENTITY amp CDATA "&#38;" >
+<!ENTITY num CDATA "&#35;" >
+<!ENTITY ast CDATA "&#42;" >
+<!ENTITY dollar CDATA "&#36;" -- "$" -->
+<!ENTITY lt CDATA "&#60;" -- "<" -->
+<!ENTITY gt CDATA "&#62;" -- ">" -->
+<!ENTITY lowbar CDATA "&#95;" -- "_" ??? -->
+<!ENTITY lsqb CDATA "&#91;" -- "["  ??? -->
+<!ENTITY rsqb CDATA "&#93;" -- "]" ??? -->
+<!ENTITY verbar CDATA "&#124;" -- "|" -->
+
+<!ENTITY circ CDATA "&#1;" -- "circ" -->
+<!ENTITY rcub CDATA "&#1;" -- "rcub" -->
+<!ENTITY commat CDATA "&#1;" -- "commat" -->
+<!ENTITY bsol CDATA "&#1;" -- "bsol" -->
+<!ENTITY lcub CDATA "&#1;" -- "lcub" -->
+<!ENTITY macron CDATA "&#1;" -- "macron" -->
+<!ENTITY sect CDATA "&#167;" -- "sect" -->
+<!ENTITY curren CDATA "&#164;" -- "curren" -->
+<!ENTITY para CDATA "&#167;" -- "para" -->
+
+<!ENTITY agrave CDATA "&#233;" -- "agrave" -->
+
+<!ENTITY Period CDATA "." -- "Period" -->
+<!ENTITY Comma CDATA "," -- "Comma" -->
+<!ENTITY Neg CDATA "Neg" -- "Neg" -->
+<!ENTITY Colon CDATA ":" -- "Colon" -->
+<!ENTITY Dash CDATA "-" -- "Dash" -->
+<!ENTITY Lpar CDATA "(" -- "Lpar" -->
+<!ENTITY Forn CDATA "Forn" -- "Forn" -->
+<!ENTITY Rcp CDATA "Rcp" -- "Rcp" -->
+<!ENTITY Cor CDATA "Cor" -- "Cor" -->
+<!ENTITY Emp CDATA "Emp" -- "Emp" -->
+<!ENTITY EmpNoun CDATA "EmpNoun" -- "EmpNoun" -->
+<!ENTITY Gen CDATA "Gen" -- "Gen" -->
+<!ENTITY Idph CDATA "Idph" -- "Idph" -->
+<!ENTITY Hyphen CDATA "-" -- "Hyphen" -->
+<!ENTITY Slash CDATA "/" -- "Slash" -->
+<!ENTITY Semicolon CDATA ";" -- "Semicolon" -->
+]>

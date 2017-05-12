@@ -1,0 +1,49 @@
+{
+   "abstract" : "Tk::Photo loader for TIFF files",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-TIFF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Tk" : "0",
+            "Tk::MMutil" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tk" : "800.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://github.com/eserte/tk-tiff.git"
+      }
+   },
+   "version" : "0.11"
+}

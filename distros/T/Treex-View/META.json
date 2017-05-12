@@ -1,0 +1,70 @@
+{
+   "abstract" : "Converts Treex::Core::Document to JSON",
+   "author" : [
+      "Michal Sedlák <sedlak@ufal.mff.cuni.cz>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Treex-View",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "EV" : "0",
+            "JSON" : "2.90",
+            "Treex::Core" : "0",
+            "Valence" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Treex::View" : {
+         "file" : "lib/Treex/View.pm",
+         "version" : "v1.0.0"
+      },
+      "Treex::View::Node" : {
+         "file" : "lib/Treex/View/Node.pm",
+         "version" : "v1.0.0"
+      },
+      "Treex::View::TreeLayout" : {
+         "file" : "lib/Treex/View/TreeLayout.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://ufal.github.io/treex-view/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ufal/perl-treex-view.git",
+         "web" : "https://github.com/ufal/perl-treex-view"
+      }
+   },
+   "version" : "1.0.0",
+   "x_authority" : "cpan:MICHALS"
+}
+

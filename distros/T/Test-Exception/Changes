@@ -1,0 +1,238 @@
+Revision history for Perl extension Test::Exception:
+
+0.43   [2015-12-28]
+
+    -   No Changes from developer build 0.42_1
+
+0.42_1 [2015-12-28]
+
+    -   Remove Test2/Test-Stream special cases, they are not needed
+
+0.41   [2015-12-21]
+    -   Updated for Test2
+
+0.40   [2015-06-05]
+    -   Updated for changes in Test::Stream (Use Test::Stream::Sync)
+
+0.39   [2015-06-04]
+    -   Updated for changes in Test::Stream
+
+0.38   [2015-02-27]
+    -   fixed repository link in metadata
+
+0.37   [2015-02-27]
+    -   distribution is now managed by ExtUtils::MakeMaker (RT#102054)
+
+0.36   [2015-01-08]
+    -   Fix bug when Test::More has been downgraded
+
+0.35   [2014-09-20]
+    -   Fix a bug when Test::Builder isn't new (better version).
+
+0.34   [2014-09-20]
+    -   Fix a bug when Test::Builder isn't new.
+
+0.33   [2014-09-19] Or "Another Test-Simple change"
+    -   Fixed test broken by changes in Test::Builder and friends
+
+0.32   [2013-04-28] Or the "prepping for upcoming Test::Simple 0.99" release
+    -   Fixed tests that broke due to Test::More diagnostic changes
+
+0.31   [2010-10-10] Or the "Yay - an actual release!" release
+    -   Same as 0.30_2
+
+0.30_2 [2010-10-06] Or the "oh what a to do" release
+    -   Added a bunch of folk to the acknowledgements
+    -   Added some clarifying documentation to respond to RT#59293
+    -   Marked a test that was failing under T::B 2.0 until we figure out
+        whether it should pass or not. See http://is.gd/fNOFb    
+
+0.30_1 [2010-10-04] Or the "Peter Rabbitson did all the work" release
+    -   Added dates to changes file, as far as we can from backpan et al
+    -   Fix for DB::args bug (thanks Peter Rabbitson)
+    -   Fix for bizarre-copy bug (thanks Peter Rabbitson)
+
+0.29  [2010-01-11]
+    -   Same as 0.28_01 - Many thanks to Ricardo Signes for doing all the work
+        getting this release out
+
+0.28_01 
+    -   Patch to fix code with Sub::Uplevel again. Many thanks to David Golden
+
+0.27  [2008-02-16]
+    -   Patch to fix my broken code with the now working Sub::Uplevel. Many
+        thanks to David Golden
+
+0.26  [2007-12-10]
+    -   Added some more exposition on the usage of dies_ok() and lives_ok() for 
+        those who found them confusing. Also reordered presentation of docs so
+        more specific throws_ok() comes first.
+    -   Some misc. documentation tweaks.
+    -   Added some tests for RT#24678, but not actually fixed them yet
+        (thanks to Joshua ben Jore & David Golden). They skip for now.
+    -   Tests should now pass on Strawberry/Vanilla Perl (thanks Nadim Khemir
+        & Chris Dolan)
+    -   Added comment in docs about T::E not catching exit() in eval() blocks 
+        (thanks Peter Scott)
+    -   Updated Test::* & Sub::Uplevel version dependencies to something modern
+
+0.25  [2007-02-15]
+    -   Updated Test::Simple dependency to make sure it is in sync with
+        the latest T::B::T (thanks David Cantrell)
+
+0.24  [2006-10-07]
+    -   Fixed a bunch of spelling mistakes in the POD
+    -   Added an (optional) spelling test in t/developer
+
+0.23  [2006-10-03]
+    -   Added a bunch of missed acknowledgements
+    -   Made the fact that $@ is preserved by T::E subroutines explicit in
+        the synopsis
+
+0.22 - or the "about bloody time" release [2006-09-01]
+    -   We now test that the import works (it does :-)
+    -   Now works with exception classes that override isa
+    -   Added link to AnnoCPAN
+    -   Applied patch from Ben Prew to turn the misused TODO tests into
+        proper Test::Builder::Tester tests - thanks Ben
+    -   Now cannot pass undef as the exception to throws_ok
+    -   The optional test description for lives_and is now optional :)
+    -   Can now have empty test description for throws_ok
+    -   Requires Sub::Uplevel 0.13 - squashing several bugs (thanks to David 
+        Golden for fixing Sub::Uplevel, and for reporting the issue - along 
+        with Cees Hek & Steve Purkis)
+    -   Uses Test::Pod::Coverage rather than home grown script
+    -   Added (optional) Perl::Critic tests
+    -   Updated Test::Builder::Tester dependency to 1.04
+    -   Tidied up tests, code and POD a little
+    -   All developer tests live in t/developer and do not run by default
+    -   Added example of only using Test::Exception if it's installed (thanks
+        to Rob Muhlestein for suggesting this)
+    -   Test coverage now at 100% (statement, branch, condition, subroutine
+        & POD) according to Devel::Cover 0.58
+
+0.21  [2005-06-04]
+    -   Most of build_requires should have been in requires, which was 
+        causing CPANPLUS to choke on installs. Fixed (thanks Jos I. Boumans)
+    -   Test names now called test descriptions to fit in with latest TAP 
+        style
+    -   Added link to tada list to TO DO section of documentation
+    -   Added COMMUNITY section to POD
+    -   Added description of how to use Test::Exception in a sub-passing non
+        prototype style (after feedback from Jim Keenan & Perrin)
+
+0.20  [2004-08-27]
+    -   fixed bug in lives_and where $Test::Builder::Level was
+        set to high if test in block lived
+
+0.19  [2004-08-15]
+    -   Added support for Module::Build
+
+0.18  [2004-08-11]
+    -   Cosmetic POD tweaks
+    -   Added Test::Warn and Test::NoWarnings to SEE ALSO (thanks to
+        Andy Lester for pointing out the lack)
+
+0.17  [2004-01-18]
+    -   Tests now pass with Test::Simple 0.48
+
+0.16  []
+    -   pod.t now uses Test::Pod
+    -   cleaned up code a little
+    -   Fixed year in copyright in POD
+    -   Added import() after suggestion from Peter Scott
+    -   tidied tests a bit
+
+0.15  [2003-01-28]
+    -   Removed live() and added lives_and() after an excellent 
+        suggestion from Aristotle
+    -   Default name for throws_ok now has better output when passed
+        exceptions that overload "".
+    -   Refectored t/Exception.t a bit
+    -   Now handles bad exception classes that overload "" without      
+        overloading eq (thanks to Mark Fowler for bug report & patch).
+    -   extended _exception_as_string to cover undef and normal exit
+    -   made format of exception display in throws_ok constant with 
+        other functions.
+    -   extended _exception_as_string to add appropriate prefix
+
+0.14
+    -   Added live()
+    -   Added default test name for throws_ok if no supplied
+
+0.13  [2003-01-06]
+    -   fixed MANIFEST and added MANIFEST.SKIP
+    -   better output for lives_ok and throws_ok if exception classes 
+        overload ""
+    -   bug where it would fail if Test::Builder::ok ever threw 
+        exceptions internally fixed.
+
+0.12  [2002-08-26]
+    -   patched return.t so that it skips if we don't have a 
+        Test::Harness that can handle TODO tests (thanks to 
+        <chromatic@rmci.net> for pointing this out).
+    -   tweaked POD and README
+    -   Fixed prototypes
+
+0.11  [2002-06-29]
+    -   corrected README file
+    -   refactored code a little
+    -   minor tweaks to POD
+    -   Added test to Exception.t that demonstrated bug in throws_ok
+        (you couldn't regex an empty string - i.e. normal exit).
+    -   Fixed bug.
+
+0.10  [2002-06-02]
+    -   Stopped over-exuberant pod.t and documented.t checking that 
+        other peoples modules were documented and had legal POD!
+    -   Couple of minor tweaks to the docs.
+    -   Added caller.t and patch to Exception.pm from Michael G Schwern 
+        to stop dies_ok, lives_ok and throws_ok interfering with 
+        caller(). Much better than the regex hack added in 0.08 --- 
+        which has now been removed.
+
+0.09  [2002-06-01]
+    -   Fixed poor English in throws_ok docs.
+
+0.08  [2002-05-31]
+    -   Added reference to Test::Inline to docs
+    -   Test::More now in PREREQ_PM
+    -   Culled some code that could never be called
+    -   Added t/pod.t and t/documented.t
+    -   Now bails if cannot load module in tests
+    -   Fixed typo of Text::Differences in docs
+    -   Added stacktrace.t to demontrate error reported by Janek 
+        Schleicher <bigj@kamelfreund.de> where a stacktrace in the 
+        exception can cause throws_ok to always succeed.
+    -   Stopped stacktrace.t failing.
+
+0.07  [2002-04-12]
+    -   may_be_regex -> maybe_regex in Test::Builder
+
+0.06
+    -   couple of minor tweaks to the docs
+
+0.05
+    -   now uses may_be_regex public method from Test::Builder
+    -   should work & test under 5.005, don't have a perl to hand
+        to double check so feedback welcome
+
+0.04
+    -   Can now pass regex-like strings as well as regexes. Thanks to 
+        Mark Fowler for the suggestion and Michael G Schwern for adding
+        code to Test::Builder.
+
+0.03  [2002-04-09]
+    -   dies_ok, lives_ok & throws_ok now all return the result of the 
+        underlying ok
+    -   $@ is now guaranteed to be preserved (and is documented as 
+        such). Thanks to Michael G Schwern for suggesting this.
+    -   Tests run tainted, strict & with warnings 
+        (just to be on the safe side :-)
+
+0.02  [2002-04-09]
+    -   Documented properly
+
+0.01  [2002-03-20]
+    - original version; created by h2xs 1.21 with options
+        -AX -n Test::Exception

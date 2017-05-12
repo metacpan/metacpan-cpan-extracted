@@ -1,0 +1,29 @@
+# this tests simple variable definition and substitution using simple
+# variables, references to variables and the optional leading '$'
+# in the SUBST directives.  Expected text is shown in (parenthesis).
+
+%% DEFINE foo="Foo Text" %%
+
+ foo (Foo Text): %%  foo %%
+ Foo (Foo Text): %%  Foo %%
+$foo (Foo Text): %% $foo %%
+$Foo (Foo Text): %% $Foo %%
+
+%% DEFINE bar=bartext %%
+
+  bar (bartext): %% bar %%
+  bar (bartext): %%bar%%
+  bar (bartext): %%
+bar
+%%
+  Bar (bartext): %% Bar %%
+ $bar (bartext): %% $bar %%
+ $Bar (bartext): %% $Bar %%
+
+%% DEFINE baz=$bar %%
+
+  baz (bartext): %% baz %%
+ $baz (bartext): %% $baz %%
+ $Baz (bartext): %% 
+  $Baz 
+%%

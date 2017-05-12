@@ -1,0 +1,31 @@
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bblib
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build
+
+# Avoid temp and backup files.
+~$
+\.old$
+\.bak$
+\#$
+\b\.#
+
+monotone.db
+MT
+pod2htmd.tmp
+pod2htmi.tmp
+toms-notes.txt
+
+\b_darcs\b

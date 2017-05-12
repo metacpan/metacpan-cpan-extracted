@@ -1,0 +1,7 @@
+Revision history for Perl extension Text::Median.
+
+0.01  Sun Jun  7 20:37:31 2009
+	- original version; created by h2xs 1.23 
+
+0.02  Sun Nov 27 10:54:25 2011
+	- updated to fix tests running on linux

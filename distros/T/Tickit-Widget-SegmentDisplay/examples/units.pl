@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use Tickit;
+use Tickit::Widgets qw( SegmentDisplay Box VBox HBox );
+
+my $tickit = Tickit->new(
+   root => Tickit::Widget::VBox->new(
+      spacing => 1,
+      children => [
+         my $unit_box = Tickit::Widget::HBox->new(
+            spacing => 2,
+         ),
+         my $prefix_box = Tickit::Widget::HBox->new(
+            spacing => 2,
+         ),
+      ],
+   )
+);
+
+sub _add
+{
+   my ( $hbox, $unit ) = @_;
+
+   $hbox->add(
+      Tickit::Widget::Box->new(
+         child => Tickit::Widget::SegmentDisplay->new(
+            type => 'symb',
+            value => $unit,
+            use_halfline => 1,
+            thickness    => 1,
+         ),
+         child_lines => 11,
+         child_cols  => 14,
+      )
+   );
+}
+
+# Unit symbols
+_add( $unit_box,   $_ ) for qw( V A W Ω F H s );
+_add( $prefix_box, $_ ) for qw( G M k m µ n p );
+
+$tickit->run;

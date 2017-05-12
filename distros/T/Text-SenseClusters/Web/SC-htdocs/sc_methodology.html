@@ -1,0 +1,41 @@
+<html>
+<title>native SenseClusters Methodology</title>
+<body>
+<h1>native SenseClusters Methodology</h1>
+</body>
+</html>
+
+The native SenseClusters methodology supports both context discrimination  
+and word (unigram) clustering. Context discrimination is performed using   
+either first or second order representations, and word clustering can be   
+viewed as a side-effect of the second order representation. 
+<br>
+<br>
+A first order representation creates a vector for each context that 
+indicates which features (unigrams, bigrams, co-occurrence, or 
+target co-occurrences) occur in that context. This results in a context  
+by feature matrix that can optionally be reduced by SVD prior to 
+clustering. 
+<br>
+<br>
+A second order representation creates a vector for each context that 
+indicates which words occur with the words in that context (i.e., the 
+second order co-occurrences). A word by word matrix is created from a 
+given set of bigrams or co-occurrences, where the rows correspond with 
+the first word in the pair, and the columns with the second. This matrix  
+can then optionally be reduced by SVD. Each word in the context to be 
+discriminated is replaced by its corresponding vector (i.e., row) from 
+this word by word matrix. All of these vectors are averaged together to 
+represent the context. This averaged vector is the centroid of all the 
+word vectors that make up the context. 
+<br>
+<br>
+Word clustering treats the word by word matrix created for the second 
+order representation as input to the clustering process. Words are 
+clustered based on the words with which they co-occur. 
+<br>
+<br>
+This is to be contrasted with the feature clustering supported by Latent 
+Semantic Analysis, which clusters features based on the contexts in which 
+they occur.
+

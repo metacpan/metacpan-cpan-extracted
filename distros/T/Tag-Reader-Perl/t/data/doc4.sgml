@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE family [
+  <!ELEMENT family (#PCDATA|title|parent|child|image)*>
+  <!ELEMENT title (#PCDATA)>
+  <!ELEMENT parent (#PCDATA)>
+  <!ATTLIST parent role (mother | father) #REQUIRED>
+  <!ELEMENT child (#PCDATA)>
+  <!ATTLIST child role (daughter | son) #REQUIRED>
+  <!NOTATION gif SYSTEM "image/gif">
+  <!ENTITY JENN SYSTEM "http://images.about.com/sites/guidepics/html.gif"
+    NDATA gif>
+  <!ELEMENT image EMPTY>
+  <!ATTLIST image source ENTITY #REQUIRED>
+  <!ENTITY footer "Brought to you by Jennifer Kyrnin">
+]>
+<family>
+  <title>My Family</title>
+  <parent role="mother">Judy</parent>
+  <parent role="father">Layard</parent>
+  <child role="daughter">Jennifer</child>
+  <image source="JENN" />
+  <child role="son">Brendan</child>
+  &footer;
+</family>

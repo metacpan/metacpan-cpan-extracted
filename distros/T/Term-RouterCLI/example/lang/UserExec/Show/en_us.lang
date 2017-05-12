@@ -1,0 +1,14 @@
+# UserExec Mode - Show Commands
+# Last updated 2011-04-25
+<en_us>
+    history_d = Print history
+    history_h = <<EO-HISTORY
+            This will print the history and has a command syntax of history [INT]
+            EO-HISTORY
+            
+    show_interface_d = Show interface details
+    show_interface_a = Enter interface names
+    show_interface_h = <<EO-SHOW-INTERFACE
+            This is the help details for show interfaces
+            EO-SHOW-INTERFACE
+</en_us>

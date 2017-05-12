@@ -1,0 +1,70 @@
+# PerlUnit was originally written as a port of Kent Beck and Erich
+# Gamma's xUnit testing framework by Christian Lemburg and Brian
+# Ewins, and is now maintained by Adam Spiers and the rest of the
+# PerlUnit team. 
+#
+# The following is an alphabetical list of all the people who've
+# contributed code and effort to making PerlUnit what it is today.
+# Where possible we have included their Sourceforge usernames and
+# preferred email addresses.
+#
+# The use of this database for anything other than PerlUnit
+# development is strictly forbidden. (Passive distribution with the
+# PerlUnit source code package is naturally allowed)
+
+Adam Spiers		adamspiers	<perlunit@adamspiers.org>
+Brian Ewins		ba22a
+Cayte Linder		cayte
+Christian Lemburg	clemburg	<clemburg@acm.org>
+David Esposito		davide
+J.E. Fritz		jefritz
+Kevin Connor		wallisalviar	<kconnor@interwoven.com>
+Matthew Astley		mca1001 (was mca-gdl)
+Michael Schwern/Test::More project	for the deep structure comparison routines
+Piers Cawley		pdcawley	<pdcawley@iterative-software.com>
+Zhon Johansen		zhon
+
+
+
+As far as copyright years go (as if anyone cares), this may serve as a
+vague starting guide for who put together the bulk of the project:
+
+ 2000 ba22a, clemburg
+ 2001 clemburg, pdcawley
+ 2002 adamspiers, pdcawley
+
+Where specific files in the project have been contributed by one
+person and that person has claimed the copyright, I have left their
+authorship.
+
+The rest of the files have moved over to a more boilerplate style
+crediting the PerlUnit Development Team and referring to the
+Test::Unit docs and this file.  This is simply for maintenance sanity.
+
+
+
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself:
+
+------------------------------------------------------------------------------
+ Perl copyright:
+------------------------------------------------------------------------------
+    Copyright 1989-2001, Larry Wall  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+    a) the GNU General Public License as published by the Free Software
+       Foundation; either version 1, or (at your option) any later
+       version, or
+
+    b) the "Artistic License" which comes with Perl.
+
+------------------------------------------------------------------------------
+
+The GNU GPL version 2 is included here in the file COPYING.GPL-2 .
+You may use version 1 instead, but it has been superceded for good
+reasons...
+
+The Artistic License is included here in the file COPYING.Artistic

@@ -1,0 +1,60 @@
+=== Simple sanitize test ()
+--- input
+[% FILTER visual_truncate %]本日はごきげんよろしゅうございます。[% END %]
+--- expected
+本日はごきげんよろしゅうござ...
+=== Simple sanitize test ()
+--- input
+[% FILTER visual_truncate %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本日は,ごきげんよろしゅうござ...
+=== Simple sanitize test (5)
+--- input
+[% FILTER visual_truncate(5) %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本...
+=== Simple sanitize test (5, ',,')
+--- input
+[% FILTER visual_truncate(5, ',,') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本,,
+=== Simple sanitize test (10, '....')
+--- input
+[% FILTER visual_truncate(10, '....') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本日は....
+=== Simple sanitize test (10, '')
+--- input
+[% FILTER visual_truncate(10, '') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本日は,ご
+=== Simple sanitize test (3, '......')
+--- input
+[% FILTER visual_truncate(3, '......') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+...
+=== Simple sanitize test (6, '......')
+--- input
+[% FILTER visual_truncate(6, '......') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+......
+=== Simple sanitize test (9, '......')
+--- input
+[% FILTER visual_truncate(9, '......') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本......
+=== Simple sanitize test (1000, '......')
+--- input
+[% FILTER visual_truncate(1000, '......') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本日は,ごきげんよろしゅうございます。
+=== Simple sanitize test (not_integer, '......')
+--- input
+[% FILTER visual_truncate(not_integer, '......') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本日は,ごきげんよろしゅう......
+=== Simple sanitize test (32, '......')
+--- input
+[% FILTER visual_truncate(32, '......') %]本日は,ごきげんよろしゅうございます。[% END %]
+--- expected
+本日は,ごきげんよろしゅう......

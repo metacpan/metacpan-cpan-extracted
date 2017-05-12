@@ -1,0 +1,15 @@
+---
+name: Test-Mail
+version: 0.06
+author:
+  - 'Kirrily Robert <skud@cpan.org>'
+abstract: Test framework for email applications
+license: perl
+build_requires:
+  Mail::Header: 0
+  Test::More: 0
+provides:
+  Test::Mail:
+    file: lib/Test/Mail.pm
+    version: 0.06
+generated_by: Module::Build version 0.26

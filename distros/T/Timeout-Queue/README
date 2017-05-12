@@ -1,0 +1,122 @@
+NAME
+    Timeout::Queue - A priority queue made for handling timeouts
+
+DESCRIPTION
+    This module is a simple priority queue based on perl's own array
+    structures. The actual sleeping is not done by this module as it is ment
+    for integration with a IO::Select based event loop or similar.
+
+    Inserts are handled by using splice, deletes are done by marking and
+    later shifting off when it is posible.
+
+SYNOPSIS
+      #
+      # Use as an object
+      #
+
+      use Timeout::Queue;
+
+      my $timeouts = new Timeout::Queue(Time => sub { return time; });
+      $timeouts->queue(
+        timeout => 1, # time out in 1 seconds.
+        callme => sub {
+            print "I timed out!!\n";
+        }
+      );
+      sleep $timeouts->timeout();
+
+      foreach my $item ($timeouts->handle()) {
+        $item->{callme}->();
+      }
+
+      #
+      # Use with functions and own array
+      # 
+
+      use Timeout::Queue qw(queue_timeout handle_timeout, get_timeout);
+
+      my @timeouts;
+      my $timeout;
+      my $timeout_id = 1;
+
+      queue_timeout(\@timeouts, time,
+        timeout_id = ++$timeout_id,
+        timeout => 1, # time out in 1 seconds.
+        callme => sub {
+            print "I timed out!!\n";
+        }
+      );
+
+      # Get the first timeout
+      $timeout = get_timeout(\@timeouts, time);
+
+      sleep $timeout;
+
+      foreach my $item (handle_timeout(\@timeouts, time)) {
+        $item->{callme}->();
+      }
+
+      # Get the next timeout 
+      $timeout = get_timeout(\@timeouts, time);
+
+METHODS
+    new()
+        Creates a new Timeout::Queue object.
+
+        You can optionally add a a "Time" option if you would like to use
+        something else than the build in time function. This can be usefull
+        if your sleeping mechanism supports sub second precision.
+
+        The default works like this if nothing is given:
+
+          $timeouts->new(Time => sub { return time; });
+
+    queue(timeout => $timeout)
+        Queue a new timeout item, only the timeout values is used from the
+        list. The rest will be returned later in a hash reference by
+        "handle()".
+
+        Returns the timeout id or an array with timeout id and the next
+        timeout in the queue.
+
+    delete($key, $value)
+        Delete the item's where key and value are equal to what is given.
+
+        Returns the next timeout in the queue.
+
+    handle()
+        Returns all the items that have timed out so far.
+
+    timeout()
+        Return the next timeout on the queue or undef if it's empty.
+
+    timeouts()
+        Return array refrence with queued timeouts.
+
+    queue_timeout(\@timeouts, timeout => $timeout)
+        Queue a new timeout item, only the timeout values is used from the
+        list. The rest will be returned later in a hash reference by
+        "handle_timeout()".
+
+        Returns the next timeout or -1 if it was not change by the queueing.
+
+    delete_timeout(\@timeouts, $key, $value)
+        Delete the item's where key and value are equal to what is given.
+
+        Returns the next timeout.
+
+    handle_timeout(\@timeouts, time())
+        Returns all the items that have timed out so far.
+
+    get_timeout(\@timeouts, time())
+        Return the next timeout on the queue or undef if it's empty.
+
+AUTHOR
+    Troels Liebe Bentsen <tlb@rapanden.dk>
+
+COPYRIGHT
+    Copyright(C) 2005-2007 Troels Liebe Bentsen
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

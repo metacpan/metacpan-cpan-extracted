@@ -1,0 +1,89 @@
+NAME
+    Template::Plugin::DataHash - use INCLUDE_PATH to get confs with key
+    fallback
+
+OVERVIEW
+    Template::Plugin::DataHash provides a simple way to turn conf files,
+    gathered from your INCLUDE_PATH into a single hash ref (no support for
+    non hashes). I walk the INCLUDE_PATH, tack on the filename onto the end
+    of each directory and this gives me the full_path of the file I will
+    check. If the file exists, I run all the regexes in $self->{extension}
+    (going in the order specified in $self->{extension_order}), to see which
+    $type of conf I have, and then look for either a load_$type method or
+    $self->{load_$type} (a CODE ref) and run the appropriate method. Each
+    load_$type method takes a refence to $self and the full_path of the
+    file, and returns a hash ref.
+
+    Two structures in the object help manage the process.
+
+$self->{extension}
+    $self->{extension} contains a hash ref of regex objects that map a type
+    (Storable for example) to a regex that gets run on the full_path of the
+    file.
+
+$self->{extension_order}
+    $self->{extension_order} contains a array ref specifying the order to
+    check the extensions.
+
+EXAMPLE
+    Let's say you have two conf files:
+
+    /tmp/default/conf.yaml
+
+      key1: default1
+      key2: default2
+
+    /tmp/override/conf.yaml
+
+      key2: override2
+
+    In your template you could put
+
+      [% USE dho = DataHash({INCLUDE_PATH => ['/tmp/override', '/tmp/default']}) %]
+      [% hash = dho.hash('conf.yaml') %]
+
+    hash would then look like { key1 => 'default1', key2 => 'override2', }
+
+    By default, the INCLUDE_PATH comes from
+    $template_object->{CONFIG}{INCLUDE_PATH}.
+
+SUPPORTED EXTENSIONS
+    This is the set of default extension regexes
+
+        extension => {
+          perl     => qr/\.pl$/i,
+          split    => qr/\.split$/i,
+          storable => qr/\.sto$/i,
+          xml      => qr/\.xml$/i,
+          yaml     => qr/\.yaml$/i,
+        },
+
+    The default extension order is
+
+        extension_order => [qw(yaml perl storable xml split)],
+
+ADDING YOUR OWN EXTENSION TYPES
+    If I have left out an extension that you feel others may be interested
+    in, let me know and I can easily add new types. If you have a custom
+    extension, you need to get the custom name into $self->{extension}, like
+
+    $self->{extension}{custom} = qr/\.custom$/;
+
+    then you can either do an overriding object, or specify the method in
+    your object, like
+
+    $self->{load_custom} = sub { my $self = shift; my $full_path = shift;
+    ... convert file to $ref in custom fashion ... return $ref };
+
+AUTHOR
+    Copyright 2003, Earl J. Cahill. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Address bug reports and comments to: cpan@spack.net.
+
+    When sending bug reports, please provide the version of
+    Template::Plugin::DataHash, the version of Perl, and the name and
+    version of the operating system you are using.
+

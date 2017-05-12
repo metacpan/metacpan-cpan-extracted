@@ -1,0 +1,162 @@
+NAME
+    Tie::MLDBM - Multi-Level Storage and Locking Class
+
+SYNOPSIS
+     use Tie::MLDBM;
+
+     my $obj = tie my %hash, 'Tie::MLDBM', {
+         'Lock'      =>  'File',
+         'Serialise' =>  'Storable',
+         'Store'     =>  'DB_File'
+     } [.. other DBM arguments..] or die $!;
+
+DESCRIPTION
+    This module provides the means to store arbitrary perl data, including
+    nested references, in a serialised form within persistent data
+    back-ends. This module builds upon the storage and locking mechanisms of
+    MLDBM and MLDBM::Sync by incorporating a more expandible framework that
+    allows for a much wider variety of component modules for serialisation,
+    storage and resource locking. Indeed, all storage components of this
+    framework exist as a direct IS-A inherited class of their parent storage
+    module such that almost any module employing a tied-interface can now
+    store multi-level nested data structures and incorporate locking
+    synchronisation.
+
+    The Tie::MLDBM framework consists of four components: the interface, the
+    locking component, the serialisation component and the storage
+    component. The interface is implemented as a TIEHASH by the Tie::MLDBM
+    module which in turn depends upon the functions provided by component
+    modules. The locking or synchronisation component implements shared and
+    exclusive access to the underlying storage component by means of
+    semaphores. The serialisation component is that which serialises the
+    nested data structure into a flat form ready for storage in the
+    underlying storage component. The storage component can be any new or
+    existing module which implements a TIEHASH interface to a persistent
+    store. All storage modules of this framework inherit directly from the
+    storage mechanism which they represent.
+
+INTERFACE
+    The interface to the Tie::MLDBM module is intended to be simple and
+    impose little in the way of a learning curve in its usage.
+
+    The mandatory first argument of the TIEHASH interface of this module is
+    a hash reference which contains configuration parameters for the
+    Tie::MLDBM framework. These configuration parameters define the
+    interface behaviour and component modules of the Tie::MLDBM interface.
+
+    The following configuration parameters are mandatory:
+
+    Lock
+        The Lock parameter defines the Tie::MLDBM::Lock::* component module
+        to be employed by the Tie::MLDBM framework for locking and
+        synchronisation.
+
+        If left unspecified, this parameter defaults to "Null" which calls
+        upon the Tie::MLDBM::Lock::Null module for locking and
+        synchronisation - This module fulfills the locking component of the
+        Tie::MLDBM framework, without actually implementing any resource
+        synchronisation or locking.
+
+        The available locking and synchronisation mechanisms are dictated by
+        those modules installed in the Tie::MLDBM::Lock::* namespace.
+
+    Serialise
+        The Serialise parameter defines the Tie::MLDBM::Serialise::*
+        component module to be employed by the Tie::MLDBM framework for the
+        serialisation of nested data structures into flat forms ready for
+        persistent storage.
+
+        The available serialisation mechanisms are dictated by those modules
+        installed in the Tie::MLDBM::Serialise::* namespace.
+
+    Store
+        The Store parameter defines the Tie::MLDBM::Store::* component
+        module to be employed by the Tie::MLDBM framework for the persistent
+        storage of serialised data.
+
+        The available serialisation mechanisms are dictated by those modules
+        installed in the Tie::MLDBM::Store::* namespace.
+
+    In addition to these configuration parameters, component modules may
+    require additional configuration parameters to be defined in order to
+    change their behaviour. For example, the Tie::MLDBM::Lock::File module
+    allows for the filename and directory location of the semaphore file
+    employed to be defined via a "Lockfile" configuration argument.
+
+    The remaining arguments to the TIEHASH interface of the Tie::MLDBM
+    module are passed directly onto the underlying storage TIEHASH, as
+    defined by the "Store" configuration parameter. This arrangement allows
+    for any module employing a TIEHASH interface to a persistent store to be
+    used by the Tie::MLDBM framework, for the persistent storage of
+    serialised data.
+
+EXAMPLES
+  Example Using DB_File
+    An example of the TIEHASH interface of Tie::MLDBM, employing the DB_File
+    TIEHASH interface for persistent storage:
+
+     use Tie::MLDBM;
+
+     tie my %test, 'Tie::MLDBM', {
+         'Serialise' =>  'Storable',
+         'Store'     =>  'DB_File'
+     }, 'testdb.dbm', O_CREAT|O_RDWR, 0640 or die $!;
+
+    The above example creates a persistent store for the hash %test called
+    "testdb.dbm" with DB_File in which data is serialised using Storable.
+
+  Example Using DBI
+    An example of the TIEHASH interface of Tie::MLDBM, employing the TIEHASH
+    interface of Tie::DBI (by means of Tie::MLDBM::Store::DBI for persistent
+    storage:
+
+     use Tie::MLDBM;
+
+     tie my %db, 'Tie::MLDBM', {
+         'Lock'      =>  'File',
+         'Serialise' =>  'Storable',
+         'Store'     =>  'DBI'
+     }, {
+         'db'        =>  "Pg:dbname=@{[ DATABASE ]}",
+         'table'     =>  'sessions',
+         'key'       =>  'id',
+         'user'      =>  USERNAME,
+         'password'  =>  PASSWORD,
+         'CLOBBER'   =>  0
+     } or die $!;
+
+    The above example creates a persistent store for the hash %db which
+    employs the "sessions" table of a PostgreSQL database for the storage of
+    data serialised by Storable.
+
+WARNINGS
+    The addition or alteration of elements to nested data structures is not
+    entirely transparent in Perl. As such, in order to store a reference or
+    modify an existing reference value within a tied hash, the value must
+    first be retrieved and stored in a temporary variable before
+    modification. For example, the following will not work:
+
+     $hash{'key'}{'subkey'} = 'value';   #   Will not work
+
+    Instead, this operation should be performed in a two-step process, like
+    thus:
+
+     $temp = $hash{'key'};               #   Retrieve element
+     $temp->{'subkey'} = 'value';
+     $hash{'key'} = $temp;               #   Store element
+
+    This limitation exists because the perl TIEHASH interface currently has
+    no support for multidimensional ties.
+
+VERSION
+    1.04
+
+AUTHOR
+    Rob Casey <robau@cpan.org>
+
+COPYRIGHT
+    Copyright 2002 Rob Casey, robau@cpan.org
+
+SEE ALSO
+    MLDBM, MLDBM::Sync
+

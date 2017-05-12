@@ -1,0 +1,321 @@
+1..1
+# Tapper-suite-version: 0.2
+# Tapper-starttime-test-program: 20090128T130701
+# Tapper-machine-name: uran
+# Tapper-suite-name: Tapper-KernBench
+# Tapper-reportgroup-arbitrary: 
+# Tapper-section: tapper-meta-information
+# Tapper-reportgroup-testrun: 1381
+ok 1 - tapper-meta-data
+1..1
+# Tapper-Section: stats-proc-interrupts-before
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 20724
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 8
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  i8042
+  4:
+    CPU0: 3552
+    CPU1: 530
+    CPU2: 808
+    CPU3: 1451
+    CPU4: 0
+    linetail: IO-APIC-edge  serial
+  8:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 104
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 2300
+    CPU1: 1956
+    CPU2: 1213
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 139
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-level  eth0
+  177:
+    CPU0: 50
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 8
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail:
+  LOC:
+    CPU0: 19774
+    CPU1: 19743
+    CPU2: 19639
+    CPU3: 19534
+    CPU4: 19448
+    linetail:
+  ERR:
+    CPU0: 0
+    CPU1:
+    CPU2:
+    CPU3:
+    CPU4:
+    linetail:
+  MIS:
+    CPU0: 0
+    CPU1:
+    CPU2:
+    CPU3:
+    CPU4:
+    linetail:
+  ...
+1..1
+# Tapper-section: kernel-untar
+ok 1 - untar of kernel succeeded.
+1..1
+# Tapper-section: kernbench-untar
+ok 1 - untar of testsuite succeeded.
+1..1
+# Tapper-section: kernbench-testrun
+ok 1 - Run took ntp: 2855s, system: 2855s
+1..2
+ok 1 - KernBench
+  ---
+  Wed Jan 28 13:13:49 CET 2009
+  2.6.16.21-0.25-smp
+  Average Half load -j 3 Run (std deviation):
+  Elapsed Time 322.926 (0.893045)
+  User Time 493.042 (1.15861)
+  System Time 168.42 (1.75556)
+  Percent CPU 204.4 (0.547723)
+  Context Switches 25821.8 (528.176)
+  Sleeps 28507.6 (37.5673)
+  ...
+ok 2 - KernBench
+  ---
+  Average Optimal load -j 20 Run (std deviation):
+  Elapsed Time 154.316 (1.59459)
+  User Time 504.086 (11.6817)
+  System Time 174.822 (6.87301)
+  Percent CPU 327.6 (129.9)
+  Context Switches 35756.2 (10489.4)
+  Sleeps 31147.8 (2787.29)
+  ...
+1..2
+# Tapper-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Wed Jan 28 13:13:49 CET 2009
+  2.6.16.21-0.25-smp
+  Average Half load -j 3 Run (std deviation):
+  Elapsed Time 322.926 (0.893045)
+  User Time 493.042 (1.15861)
+  System Time 168.42 (1.75556)
+  Percent CPU 204.4 (0.547723)
+  Context Switches 25821.8 (528.176)
+  Sleeps 28507.6 (37.5673)
+  ...
+ok 2 - KernBench
+  ---
+  Average Optimal load -j 20 Run (std deviation):
+  Elapsed Time 154.316 (1.59459)
+  User Time 504.086 (11.6817)
+  System Time 174.822 (6.87301)
+  Percent CPU 327.6 (129.9)
+  Context Switches 35756.2 (10489.4)
+  Sleeps 31147.8 (2787.29)
+  ...
+1..1
+# Tapper-section: kernbench-testrun
+ok 1 - Run took ntp: 2869s, system: 2869s
+1..2
+ok 1 - KernBench
+  ---
+  Wed Jan 28 14:01:42 CET 2009
+  2.6.16.21-0.25-smp
+  Average Half load -j 3 Run (std deviation):
+  Elapsed Time 323.26 (0.677052)
+  User Time 490.716 (0.842099)
+  System Time 173.248 (1.31549)
+  Percent CPU 204.8 (0.447214)
+  Context Switches 20115.8 (2573.2)
+  Sleeps 28607.2 (36.0721)
+  ...
+ok 2 - KernBench
+  ---
+  Average Optimal load -j 20 Run (std deviation):
+  Elapsed Time 152.866 (3.24267)
+  User Time 501.226 (11.1287)
+  System Time 177.465 (4.5559)
+  Percent CPU 329 (131.122)
+  Context Switches 29739.7 (10293.1)
+  Sleeps 31200.1 (2745.05)
+  ...
+1..2
+# Tapper-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Wed Jan 28 14:01:42 CET 2009
+  2.6.16.21-0.25-smp
+  Average Half load -j 3 Run (std deviation):
+  Elapsed Time 323.26 (0.677052)
+  User Time 490.716 (0.842099)
+  System Time 173.248 (1.31549)
+  Percent CPU 204.8 (0.447214)
+  Context Switches 20115.8 (2573.2)
+  Sleeps 28607.2 (36.0721)
+  ...
+ok 2 - KernBench
+  ---
+  Average Optimal load -j 20 Run (std deviation):
+  Elapsed Time 152.866 (3.24267)
+  User Time 501.226 (11.1287)
+  System Time 177.465 (4.5559)
+  Percent CPU 329 (131.122)
+  Context Switches 29739.7 (10293.1)
+  Sleeps 31200.1 (2745.05)
+  ...
+1..1
+# Tapper-Section: stats-proc-interrupts-after
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 1469202
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 8
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  i8042
+  4:
+    CPU0: 3552
+    CPU1: 530
+    CPU2: 808
+    CPU3: 1451
+    CPU4: 0
+    linetail: IO-APIC-edge  serial
+  8:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 104
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 2300
+    CPU1: 75025
+    CPU2: 19472
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 22997
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail: IO-APIC-level  eth0
+  177:
+    CPU0: 50
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 8
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    CPU3: 0
+    CPU4: 0
+    linetail:
+  LOC:
+    CPU0: 1468392
+    CPU1: 1468362
+    CPU2: 1468258
+    CPU3: 1468153
+    CPU4: 1468067
+    linetail:
+  ERR:
+    CPU0: 0
+    CPU1:
+    CPU2:
+    CPU3:
+    CPU4:
+    linetail:
+  MIS:
+    CPU0: 0
+    CPU1:
+    CPU2:
+    CPU3:
+    CPU4:
+    linetail:
+  ...
+1..1
+# Tapper-section: clocksource
+ok 1 - Clocksource
+  ---
+  Cannot determine clocksource
+  ...
+1..1
+# Tapper-section: uptime
+ok 1 - got uptime
+  ---
+  uptime: 5878s
+  idletime: 2690s
+  ...
+

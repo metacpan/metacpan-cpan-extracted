@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Find;
+use YAML::Syck;
+
+our $config = {};
+my $home = $ENV{HOME};
+if (-f "$home/.a8rc") {
+    $config = LoadFile("$home/.a8rc");
+}
+
+GetOptions(
+    'r|file_root=s'    => \(my $file_root),
+    'verbose'	       => \(my $verbose),
+) or usage();
+
+my @failures;
+my $directory = $file_root || $config->{file_root} || "cases/testlink";
+find(\&wanted, $directory);
+summary();
+
+sub wanted {
+    if($File::Find::name =~ m{\.st$}){
+	print "Validating file $File::Find::name\n" if $verbose;
+	my $output = qx(a8-validate '$File::Find::name' 2>&1);
+	print $output if $verbose;
+	if ($?) {
+	    push @failures, {file => $File::Find::name, output => $output};
+	}
+    }
+}
+
+sub summary {
+    if (@failures) {
+	print "The following files failed validation:\n";
+	print "\t$_->{file}\n" for @failures;
+	exit 1;
+    } else {
+	print "All Ok\n";
+    }
+}

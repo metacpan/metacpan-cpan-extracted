@@ -1,0 +1,176 @@
+{
+   "abstract" : "Plack bundle",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Plack",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "optional_features" : {
+      "catalyst_engine" : {
+         "description" : "Catalyst Engine",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Catalyst::Engine::PSGI" : "0.13"
+               }
+            }
+         }
+      },
+      "cgi_application_psgi" : {
+         "description" : "CGI::Application::PSGI",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "CGI::Application::PSGI" : "1.00"
+               }
+            }
+         }
+      },
+      "extra_middleware_components" : {
+         "description" : "Extra Middleware Components",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Plack::Middleware::AutoRefresh" : "0.08",
+                  "Plack::Middleware::File::Sass" : "0.03",
+                  "Plack::Middleware::JSConcat" : "0.29",
+                  "Plack::Middleware::Status" : "1.101150",
+                  "Plack::Middleware::Throttle" : "0.01"
+               }
+            }
+         }
+      },
+      "extra_psgi_servers_and_plack_handlers" : {
+         "description" : "Extra PSGI servers and Plack handlers",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Perlbal::Plugin::PSGI" : "0.03",
+                  "Plack::Handler::AnyEvent::HTTPD" : "0.03",
+                  "Plack::Handler::AnyEvent::ReverseHTTP" : "0.04",
+                  "Plack::Handler::AnyEvent::SCGI" : "0.02",
+                  "Plack::Handler::SCGI" : "0.02"
+               }
+            }
+         }
+      },
+      "in_development_psgi_servers" : {
+         "description" : "In-Development PSGI Servers",
+         "prereqs" : {}
+      },
+      "mason_psgi_handler" : {
+         "description" : "Mason PSGI handler",
+         "prereqs" : {}
+      },
+      "maypole_psgi" : {
+         "description" : "Maypole::PSGI",
+         "prereqs" : {}
+      },
+      "sledge" : {
+         "description" : "Sledge",
+         "prereqs" : {}
+      },
+      "squatting_on" : {
+         "description" : "Squatting::On",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Squatting::On::PSGI" : "0.06"
+               }
+            }
+         }
+      },
+      "stacktrace_with_lexical_variables" : {
+         "description" : "Stacktrace with lexical variables",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Devel::StackTrace::WithLexicals" : "0.10"
+               }
+            }
+         }
+      },
+      "tools" : {
+         "description" : "Tools",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Flea" : "0.04",
+                  "Test::WWW::Mechanize::PSGI" : "0.35"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.019"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Compile" : "0.16",
+            "CGI::Emulate::PSGI" : "0.15",
+            "CGI::PSGI" : "0.15",
+            "Corona" : "0.1004",
+            "FCGI" : "0.74",
+            "FCGI::Client" : "0.08",
+            "FCGI::ProcManager" : "0.24",
+            "HTTP::Server::Simple::PSGI" : "0.14",
+            "IO::Handle::Util" : "0.01",
+            "Net::FastCGI" : "0.14",
+            "PSGI" : "1.101",
+            "Plack" : "1.0023",
+            "Plack::App::Proxy" : "0.27",
+            "Plack::Middleware::Auth::Digest" : "0.04",
+            "Plack::Middleware::ConsoleLogger" : "0.04",
+            "Plack::Middleware::Debug" : "0.14",
+            "Plack::Middleware::Deflater" : "0.08",
+            "Plack::Middleware::Header" : "0.04",
+            "Plack::Middleware::ReverseProxy" : "0.15",
+            "Plack::Middleware::Session" : "0.18",
+            "Starlet" : "0.18",
+            "Starman" : "0.3011",
+            "Twiggy" : "0.1021"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/Task-Plack/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/Task-Plack",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/Task-Plack.git",
+         "web" : "https://github.com/miyagawa/Task-Plack"
+      }
+   },
+   "version" : "0.28"
+}
+

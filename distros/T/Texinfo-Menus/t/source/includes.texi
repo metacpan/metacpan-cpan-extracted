@@ -1,0 +1,26 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@c includes.texi
+@setfilename includes.info
+@settitle Includes Test
+@c %**end of header
+
+@ifinfo
+@node Top
+@top Includes Test
+
+This document tests @@include files with Texinfo::Menus.
+
+@menu
+* Variable names::              This came from the Top menu
+* Scalar values::               This is overridden by a DESC comment
+
+@c * Void Context::             Void context from the Top menu
+@end menu
+@end ifinfo
+
+@include chapter1.texi
+@include chapter2.texi
+@include chapter3-4.texi
+
+@bye

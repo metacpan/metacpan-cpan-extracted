@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/demo.pl
+examples/helloworld.json
+examples/render.pl
+examples/sqlmonitor.pl
+lib/Tickit/Builder.pm
+t/00-pod.t
+t/00-use.t

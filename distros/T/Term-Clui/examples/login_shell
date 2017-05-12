@@ -1,0 +1,221 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2002, Peter J Billam         #
+#               c/o P J B Computing, www.pjb.com.au                     #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+
+use Term::Clui;
+use Term::Clui::FileSelect;
+my $home = $ENV{'HOME'} || $ENV{'LOGDIR'}  || (getpwuid($<))[7];
+my $user = $ENV{'USER'} || $ENV{'LOGNAME'} || (getpwuid($<))[0];
+my @path = split ':', $ENV{PATH};
+my $browser = '';
+my $mailer = '';
+use Cwd; my $dir = cwd();
+
+while (1) {
+	my @tasks = ('Browser','Config','ChDir','Edit','FTP', 'IRC','Mail');
+	if (-r './Makefile') { push (@tasks, 'Make'); }
+	push (@tasks, 'Manual', 'News');
+	if (-d "$home/.ssh") { push (@tasks, 'SSH'); }
+	push (@tasks, 'View');
+
+	my $shortdir = $dir;
+	if ((index $shortdir,$home)==0) {substr($shortdir,0,(length $home))= '~';}
+	my $task = &choose ("$user $shortdir", @tasks);
+	if (! $task) { exit 0;
+	} else { $task =~ s/ /_/g; eval "&$task";
+	}
+}
+sub Config {
+	my @files = grep (-w "$home/$_",
+	'.cshrc', '.efaxrc', '.emacspeak', '.edbrowse', '.exrc',
+	'.fvwmrc', '.html2psrc', '.jnewsrc',
+	'.login', '.lynxrc', 'lynx_bookmarks.html',
+	'.mailrc', '.mplayer/config', '.netrc', '.newsrc',
+	'.perltidyrc', '.pinerc', '.popslurp', '.profile',
+	'.rhosts', '.sig', '.slrnrc', '.ssh/config',
+	'.tiprc', '.xauth', '.Xauthority', '.xinitrc',
+	);
+	my $file;
+	$file = &choose("Edit which file ?", @files);
+	return unless $file;
+	&edit("$home/$file");
+}
+sub Browser {
+	if (! $browser) {
+		my ($bin, $prog);
+		DIR: foreach $bin (@path) {
+			foreach $prog ('lynx', 'w3m', 'links') {
+				if (-e "$bin/$prog") { $browser = "$bin/$prog"; last DIR; }
+			}
+		}
+	}
+	if (! $browser) {
+		&sorry("can't find a browser: tried lynx, w3m and links") ; return;
+	}
+	system $browser;
+}
+sub ChDir {
+	my $newdir = &ask('to which directory ?');
+	return unless $newdir;
+	$newdir =~ s/^~\//$home\//;
+	if (! -d $newdir) { &sorry("$newdir isn't a directory"); return; }
+	if (! chdir $newdir) { &sorry("can't chdir to $newdir: $!"); return; }
+	$dir = cwd();
+}
+sub Edit {
+	if (!opendir(D,'.')) { &sorry("can't open current directory: $!"); return; }
+	my @textfiles = sort grep (-T && !/^\./, readdir D); closedir D;
+	my $file = 'Create new file';
+	if (@textfiles) {
+		$file = &choose('Edit which file ?',@textfiles,'Create new file');
+		return unless $file;
+	}
+	if ($file eq 'Create new file') {
+		$file = &ask('New file name ?'); return unless $file;
+		system "touch $file";
+	}
+	&edit($file);
+}
+sub FTP {
+	if (!open(F,"$home/.netrc")) {
+		&sorry("can't open $home/.netrc: $!"); return;
+	}
+	my (%login, %password);
+	while (<F>) {
+		if (/^machine\s+(\S+)\s+login\s+(\S+)\s+password\s+(\S+)\s*$/) {
+			$login{$1} = $2; $password{$1} = $3;
+		}
+	}
+	close F;
+	my $task = &choose('FTP to :',keys %login,'Somewhere else','Edit ~/.netrc');
+	if (! $task) { return 1;
+	} elsif ($task eq 'Somewhere else') {
+		my $host = &ask('FTP to where ?'); if ($host) { system "ftp $host"; }
+	} elsif ($task eq 'Edit ~/.netrc') { &edit("$home/.netrc");
+	} else { system "ftp $task";
+	}
+}
+sub IRC {
+	if (! $ircclient) {
+		my ($bin, $prog);
+		DIR: foreach $bin (@path) {
+			foreach $prog ('sirc','tinyirc') {
+				if (-e "$bin/$prog") { $ircclient = "$bin/$prog"; last DIR; }
+			}
+		}
+	}
+	if (! $ircclient) {
+		&sorry("can't find a ircclient: tried sirc and tinyirc") ; return;
+	}
+	system $ircclient;
+}
+sub Mail {
+	if (! $mailer) {
+		my ($bin, $prog);
+		DIR: foreach $bin (@path) {
+			foreach $prog ('alpine','pine', 'elm') {
+				if (-e "$bin/$prog") { $mailer = "$bin/$prog"; last DIR; }
+			}
+		}
+	}
+	if (! $mailer) {
+		&sorry("can't find a mailer: tried alpine, pine and elm") ; return;
+	}
+	system $mailer;
+}
+sub Make {
+	if (!open(F,'./Makefile')) { &sorry("can't open Makefile: $!"); return; }
+	my (%vars, @targets, $target);
+	while (<F>) {
+		if (/^\s*(\S+)\s*=\s*(\S+)/) { $vars{$1} = $2; }
+		if (/^\s*(\S+)\s*:/) {
+			$target = $1;
+			while ($target =~ /\$[({](\w+)[)}]/ && $vars{$1}) {
+				$target =~ s/\$[({](\w+)[)}]/$vars{$1}/;
+			}
+			push (@targets, $target);
+		}
+	}
+	close F;
+	$target = &choose("$dir : Make what ?", @targets);
+	return unless $target;
+	system "make $target";
+}
+sub Manual {
+	my $topic = &ask('Topic ?'); return unless $topic;
+	if (system "man '$topic'") {
+		my $txt = `man -k '$topic'`;
+		&view("Keyword search on $topic", $txt);
+	}
+}
+sub News {
+	system 'slrn';  # /usr/bin/trn ?
+}
+sub SSH {
+ 	# make sure ~/.ssh/config contains:  HashKnownHosts no
+	if (! open(F,"$home/.ssh/known_hosts")) {
+		&sorry("can't open $home/.ssh/known_hosts: $!"); return;
+	}
+	my (%hosts);
+	while (<F>) { if (/^([.\w]+)/) { $hosts{$1}++; } }
+	close F;
+	my @hosts = sort keys %hosts;
+	my $host = &choose('SSH to :', @hosts, 'Somewhere else');
+	if (! $host) { return 1;
+	} elsif ($host eq 'Somewhere else') {
+		$host = &ask('ssh to which host ?');
+		if ($host) { system "ssh $host"; }
+	} else { system "ssh $host";
+	}
+}
+sub View {
+	my $file = select_file(-Readable=>1);
+	&view($file);
+}
+
+=pod
+
+=head1 NAME
+
+login_shell - wrapper for text-based browser, mail, news, ssh, ftp etc.
+
+
+=head1 SYNOPSIS
+
+$ login_shell
+
+=head1 DESCRIPTION
+
+This script offers the naive user arrow-key-and-return access to a
+text-based browser, a mail client, a news client, ssh, ftp, man
+and various other stuff.
+
+=head1 AUTHOR
+
+Peter J Billam  www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on Term::Clui
+
+=head1 SEE ALSO
+
+http://www.pjb.com.au/ ,
+http://search.cpan.org/~pjb , 
+Term::Clui,
+Term::Clui::FileSelect,
+lynx(1),
+slrn(1),
+pine(1),
+ssh(1),
+ftp(1),
+make(1),
+man(1)
+
+=cut
+

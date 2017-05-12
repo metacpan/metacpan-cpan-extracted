@@ -1,0 +1,13 @@
+@PERL << ^END_OF_PERL$
+      sub trans { Vpp_Out (join(':',@_));} ;
+END_OF_PERL
+
+@EVAL &trans('de' => '\usepackage[german]{babel}',\
+             'en' => '\usepackage[english]{babel}')
+
+@INCLUDE(file => "inc_text.txt")
+
+  {\Large \bf
+@EVAL &trans('de' => 'Produkte \& Services',\
+             'en' => 'Products \& Services')
+\\\medskip

@@ -1,0 +1,10 @@
+0.04      2017-03-03 10:45:22+01:00 Europe/Berlin
+ - dzil'ed the distribution and moved repository to git
+
+0.03  2010-02-17
+ - minor doc tweaks
+ - localise the temporary enabling of the ABSOLUTE configuration option 
+   further down to the template retrieval only
+
+0.02  2010-02-09
+ - initial upload to cpan

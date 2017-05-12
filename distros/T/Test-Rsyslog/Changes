@@ -1,0 +1,19 @@
+Revision history for Test-Rsyslog
+
+0.06   Fri Mar 31 18:46:00 2017
+        Lowering minimum perl version
+ 
+0.05   Thu Mar 30 17:40:00 2017
+        Fixing failing test to wait for rsyslog to output log entries
+ 
+0.04   Tue Mar 21 06:14:00 2017
+        Adding additional methods to improve test results
+ 
+0.03   Thu Mar 09 22:10:00 2017
+        Added README.
+ 
+0.02   Thu Mar 09 21:36:00 2017
+        Re-release for testing.
+ 
+0.01   Sat Mar 04 16:07:00 2017
+        Initial release.

@@ -1,0 +1,52 @@
+{
+   "abstract" : "Map values belonging to non-overlapping ranges using a tree",
+   "author" : [
+      "Ivan Shmakov <oneingray@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tree-Range",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.2",
+            "Scalar::Util" : "1.27",
+            "Tree::RB" : "0.500003",
+            "perl" : "5.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0.01",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://am-1.org/~ivan/archives/git/tree-range-2013.git/",
+         "web" : "http://am-1.org/~ivan/archives/git/gitweb.cgi?p=tree-range-2013.git"
+      }
+   },
+   "version" : "0.22"
+}

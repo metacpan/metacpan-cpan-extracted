@@ -1,0 +1,13 @@
+datafg	blue
+fieldfg	darkgreen
+fixedfg	black
+ind1fg	yellow
+ind1bg	darkslategrey
+ind2fg	yellow
+ind2bg	darkslategrey
+leaderfg	black
+leaderbg	blanchedalmond
+leadereditfg	blanchedalmond
+leadereditbg	white
+subfieldfg	darkgoldenrod
+background	white

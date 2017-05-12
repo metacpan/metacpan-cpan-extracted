@@ -1,0 +1,15 @@
+Revision history for Perl extension Tie::CheckVariables.
+
+0.01  Mon Jun 19 15:22:06 2006
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -XA -n Tie::CheckVariables
+
+0.02  Mon Oct 02 11:19:52 2006
+    - added tests: Pod, Pod_Coverage, Manifest
+
+0.03  Fri Dec 08 10:29:55 2006
+    - added: 98_boilerplate.t
+    - bugfix:97_manifest.t
+    - bugfix:99_pod.t
+    - bugfix:99_pod_coverage.t
+    - added: LICENSE field in Makefile.PL

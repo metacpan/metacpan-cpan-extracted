@@ -1,0 +1,3 @@
+ERROR(label.pl):
+        1st line in the PRELABEL file <test-B1.prelabel> should show 
+	the number of instances unclustered or 0.

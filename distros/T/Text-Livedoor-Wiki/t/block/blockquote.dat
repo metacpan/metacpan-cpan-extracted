@@ -1,0 +1,42 @@
+=== basic
+--- wiki
+>a
+>b
+ c
+	tab
+
+>e
+>f
+>g
+--- html
+<blockquote id="content_block_1">
+a
+b
+c
+tab
+</blockquote>
+<blockquote id="content_block_2">
+e
+f
+g
+</blockquote>
+=== inline
+--- wiki
+>test test
+>http://wiki.livedoor.com hgoe __hello__
+>inline 
+--- html
+<blockquote id="content_block_1">
+test test
+<a href="http://wiki.livedoor.com" class="outlink">http://wiki.livedoor.com</a> hgoe <sub>hello</sub>
+inline 
+</blockquote>
+=== ilegal word
+--- wiki
+><tag>&</tag>
+>
+--- html
+<blockquote id="content_block_1">
+&lt;tag&gt;&&lt;/tag&gt;
+
+</blockquote>

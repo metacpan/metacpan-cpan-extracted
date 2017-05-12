@@ -1,0 +1,2 @@
+Make sure non of the Perl modules in your code depends on itself.
+

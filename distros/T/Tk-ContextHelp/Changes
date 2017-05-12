@@ -1,0 +1,34 @@
+Revision history for Perl extension Tk::ContextHelp.
+
+0.12
+	- make sure module is not built at all under MSWin32
+
+0.11
+	- make sure tests are non-interactive
+
+0.10
+	- redesign of test script
+
+0.09
+	- save original HelpButton relief
+
+0.07
+	- Escape works now as expected
+	- new -helpkey option
+	- SimplePod bug fixes
+
+0.06
+	- Tk::Pod is not strictly necessary for the -podfile option
+	- message window does not exceed the screen anymore
+
+0.03
+	- new options -cursor, -offcursor, -callback
+	- new method toggle
+	- HelpButton: toggle stayactive with Button-3
+
+0.02  Fri Feb 20 22:54:46 CET 1998
+	- new option -stayactive
+
+0.01  Tue Feb 17 18:35:30 1998
+	- original version; created by h2xs 1.18
+

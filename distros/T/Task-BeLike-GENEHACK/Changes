@@ -1,0 +1,47 @@
+Revision history for Task-BeLike-GENEHACK
+
+0.303     2015-08-01 17:56:53-07:00 America/Los_Angeles
+
+  Add Reply
+  Add App::Uni
+
+0.302     2015-07-13 18:11:32-07:00 America/Los_Angeles
+
+  Add Dist::Zilla::Plugin::MakeMaker::Awesome
+
+0.301     2015-06-27 13:54:57-07:00 America/Los_Angeles
+
+  Add Dist::Zilla::Plugin::OSPrereqs
+
+0.300     2015-04-11 23:39:17-07:00 America/Los_Angeles
+
+  No changes from last dev release.
+
+0.2_02    2015-04-11 23:35:45-07:00 America/Los_Angeles
+
+  Minor tweaks
+
+0.2_01    2015-04-11 23:28:14-07:00 America/Los_Angeles
+
+  Major rearrangements & dist.ini tweaks
+
+0.2       2011-07-19 07:34:54 America/New_York
+
+  Add modules:
+
+    * Moose
+    * Pod::Coverage::TrustPod
+    * Audio::M4P::QuickTime
+    * Imager
+    * Bash::Completion (and plugins)
+    * Text::FindIndent
+
+0.1.1     2011-04-22 21:26:23 America/New_York
+
+  Had a stupid typo in namespace::autoclean...
+
+0.1       2011-04-22 20:49:17 America/New_York
+
+  Initial release -- test builds of 5.14.0 finally got me to put this
+  together rather than installing everything one-off...
+

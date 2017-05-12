@@ -1,0 +1,5 @@
+##teamcity[testSuiteStarted flowId='t/test-data/basic/skip-all/input.st' name='t/test-data/basic/skip-all/input.st']
+##teamcity[testStarted captureStandardOutput='true' flowId='t/test-data/basic/skip-all/input.st' name='Skipped']
+##teamcity[testIgnored flowId='t/test-data/basic/skip-all/input.st' message='skip-reason' name='Skipped']
+##teamcity[testFinished flowId='t/test-data/basic/skip-all/input.st' name='Skipped']
+##teamcity[testSuiteFinished flowId='t/test-data/basic/skip-all/input.st' name='t/test-data/basic/skip-all/input.st']

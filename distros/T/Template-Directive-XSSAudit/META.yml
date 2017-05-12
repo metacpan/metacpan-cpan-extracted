@@ -1,0 +1,33 @@
+---
+abstract: 'TT2 output filtering lint testing'
+author:
+  - 'David Bartle <dbartle@mediatemple.net>'
+build_requires:
+  List::Util: 0
+  Template: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Directive-XSSAudit
+provides:
+  Template::Directive::XSSAudit:
+    file: lib/Template/Directive/XSSAudit.pm
+    version: 1.03
+requires:
+  Carp: 0
+  FindBin: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+  Template: 0
+  Template::Directive: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Template-Directive-XSSAudit
+  homepage: http://github.com/captin411/template-directive-xssaudit
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/captin411/template-directive-xssaudit
+version: 1.03

@@ -1,0 +1,146 @@
+Revision history for Perl extension Text::ASCIITable.
+
+0.22  Thu Dec 29 15:25:00 2016
+	- Fixed missing version numbers in several files. Fixed some more utf8 problems
+	  in documentation.
+
+0.21  Thu Dec 29 15:25:00 2016
+	- Removed utf8 specific code, since all input should be utf8. Fixes #118483, #102993
+	- Patch by Salvatore Bonaccorso <carnil@debian.org> fixed utf8 in manpages.
+	- Fixed error-reporting not reporting errors anymore. Fixes #103937
+	- Fixed problem with negative repeat count. Fixes 118883
+
+0.20  Wed Nov 30 01:53:22 2011
+	- Patch by Salvatore Bonaccorso <carnil@debian.org> fixed spelling errors
+	  in manpage.
+	- Resolved debian bug #402906.
+	- Patch by <FANY@cpan.org> fixes problem with single-lines '0' not being
+	  printed.
+
+0.19  Wed Nov 23 12:43:12 2011
+	- Added patch by Alexey Sheynuk <asheynuk@iponweb.net> for a big speedup.
+	- Added UTF-8 awareness in counting function.
+	- Fixed some bugs.
+
+0.18  Sat Jul 15 00:00:00 2005
+	- Changed from ExtUtils::MakeMaker to Module::Build for better support for
+	  various platforms.
+	- Added the function addRowLine(), which allows you to add lines after any
+	  row.
+
+0.17  Tue Sep 27 01:00:00 2005
+	- Fixed a memory-leak in the overloaded tie-array. Thanks to Matt Trout and Andy
+	  Grundman in the Catalyst team for reporting, and submitting six.
+	- Added 'justify' alignment. Which gives you a newspaper way of aligning words.
+	- Added a example script to let you test ansi-support in Text::ASCIITable.
+	- Changed the default-layout a tiny bit.
+
+0.16  Thi Sep 22 18:41:00 2005
+	- Fixed bug that made warnings of uninitialized variables when you added
+	  a cell with an undefined value. Therefore a new option 'undef_as' variable
+	  was added. Bug ref: http://rt.cpan.org/NoAuth/Bug.html?id=14702
+	- Added the possibility to add several rows with addRow using array of
+	  arrayrefs. Wish ref: http://rt.cpan.org/NoAuth/Bug.html?id=14703
+	- Updated the documentation to use 'package->new()' instead of 'new package()'
+	- Added support for chaining methods. Added as an option for backwards
+	  compatibility. Wish ref: http://rt.cpan.org/NoAuth/Bug.html?id=14703
+
+0.15  Tue Apr 06 04:00:00 2004
+	- Added overloading of @{} so you can use push to add rows.
+	- Fixed a small unharmful bug in addRow.
+	- A few speed-fixes.
+	- Added support for multiline in headingText.
+
+0.14  Sun Mar 21 23:56:12 2004
+	- Cleaned/rewrote the Text::ASCIITable::Wrap code. Same result, better code.
+	- Removed code wich prevented a external callbacksub for align from functioning
+	  if allowANSI or allowHTML was set.
+	- Added support for a callback subroutine instead of the internal count function.
+	- Added some caching in getColWidth.
+	- alignCol and setOptions now accepts a hash to set values.
+	- Columns containing just 0 was not shown. Fixed.
+	- addRow no longer expects exact number of columns.
+
+0.13  Sun Feb 22 20:30:00 2004
+	- Fixed first bug. Tables got wider if it was a lot of html/ansi codes
+	  even if ansisupport was turned on.
+	- Fiex bug in draw() on designoutput. delim character was set to
+	  linecharacter.
+	- Made a wordwrap-module from scratch, and turned out to be more
+	  accurate than the previous. Text::ASCIITable::Wrap.
+	- Fixed a bug which prevented you to have ANSI/HTML-codes in the
+	  beginning and end of a rowline and in headingText.
+	- Added support for cutting the table for page-viewing. With a max
+	  width. Thanks to Khemir Nadim ibn Hamouda <nadim at khemir.net> for
+	  the code and the idea.
+
+0.12  Sat Jan 17 00:01:21 2004
+	- Made the ANSI stripper accept more advanced escape-codes.
+	- Added support for auto-aligning.
+	- Added support for "user-defined" aligning.
+	- Added alignColName to align each column in the "column-name-row".
+	- Beautified some code.
+
+0.11  Sat Aug 16 16:33:42 2003
+	- Added easier access to printing. You can now use print $t; which
+	  does the same as print $t->draw() do.
+	- Changed the default look/"theme". It was just too ugly :P
+	- Added multiline support for columnnames.
+	- Cleaned up some code.
+
+0.10  Sat Mar 22 15:44:12 2003
+	- Fixed so headingText makes the table wider, if its wider than the
+	  table should originally be. Thanks to my friend Rune F. Akselsen
+	  for the nice and easy "formula".
+	- Added allowANSI support. Works just like allowHTML just with ANSI
+	  codes. Exampletext with ansicodes: "Hi \33[1mThis is bold\33[m..."
+
+0.09  Sat Feb 15 12:24:42 2003
+	- Added headingText option, wich makes a Title on the top of
+	  the table, spanning all the columts to one large title.
+	- Added descriptions to all the possible options in the
+	  documentation.
+
+0.08  Sat Jan 18 14:44:21 2003
+	- Added drawRowLine option, to make it draw a line
+	  between every row.
+	- Added FEATURES section to the documentation.
+	- Added strict option to setColWidth. If $strict is set to a
+	  true value, the width of the column will be set to this width.
+
+0.07  Tue Jan 14 12:45:03 2003
+	- Stopped to use Text::Aligner, because I needed one
+	  with the possibillity to change strictness of the function
+	  and counting procedures. So I made my own simple align function.
+	- Added allowHTML option. To do this i needed to stop using
+	  Text::Aligner.
+
+0.06  Sat Jan 11 17:41:32 2003
+	- Went over to use Text::Aligner instead of own functions.
+	- Added alignCol. (Which uses Text::Aligner)
+	- Made alignColRight an alias to alignCol($col,'right');
+	- Added options to hide lines/headrow from output.
+	- Added 'reporterrors' for removal of error reporting to STDERR.
+        - Added multiline support for AddRow.
+	- Added wordwrap support, using Text::Wrap.
+
+0.05  Sun Dec 23 06:46:45 2002
+	- Started to use make dist instead of packing it wrong.
+	  (not making its own directory)
+
+0.04  Sun Dec 22 23:33:45 2002
+	- Added support for changing layout on rows.
+	- Updated the documentation
+
+0.03  Sun Dec 22 05:33:43 2002
+	- fixed a bug in draw() which could have made weird
+	  output in some cases.
+	- Fixed pod documentation to display code correctly when
+	  converted to html.
+	- Released it on CPAN.
+
+0.02  Sat Dec 21 --:--:-- 2002
+	- ported my similar script made in PHP
+
+0.01  Sat Dec 21 13:12:21 2002
+	- original version; created by h2xs 1.19

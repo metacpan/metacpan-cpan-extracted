@@ -1,0 +1,51 @@
+---
+abstract: 'parse date and time string.'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Strptime
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Time::Strptime:
+    file: lib/Time/Strptime.pm
+    version: '1.00'
+  Time::Strptime::Format:
+    file: lib/Time/Strptime/Format.pm
+    version: '1'
+  Time::Strptime::TimeZone:
+    file: lib/Time/Strptime/TimeZone.pm
+requires:
+  DateTime::Locale: '0'
+  DateTime::TimeZone: '0'
+  Encode: '0'
+  Encode::Locale: '0'
+  List::MoreUtils: '0'
+  Scalar::Util: '0'
+  Time::Local: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/karupanerura/Time-Strptime/issues
+  homepage: https://github.com/karupanerura/Time-Strptime
+  repository: git://github.com/karupanerura/Time-Strptime.git
+version: '1.00'
+x_authority: cpan:KARUPA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

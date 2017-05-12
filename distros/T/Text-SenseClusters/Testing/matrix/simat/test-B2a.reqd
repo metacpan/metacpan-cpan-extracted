@@ -1,0 +1,2 @@
+ERROR(simat.pl):
+        Vector 6 in Vector file <test-B2a.vec> doesn't have 6 components.

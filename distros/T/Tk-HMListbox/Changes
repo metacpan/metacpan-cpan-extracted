@@ -1,0 +1,5 @@
+Revision history for Perl extension Tk::HMListbox.
+
+3.00  Mon May 25, 2015
+	- original version; Derived from Tk::SMListbox,
+	  created by h2xs 1.23 with options -X -n Tk::SMListbox

@@ -1,0 +1,44 @@
+---
+abstract: 'A time object, with as little code as possible'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Tiny
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Time::Tiny:
+    file: lib/Time/Tiny.pm
+    version: '1.07'
+requires:
+  Carp: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Time-Tiny/issues
+  homepage: https://github.com/dagolden/Time-Tiny
+  repository: https://github.com/dagolden/Time-Tiny.git
+version: '1.07'
+x_authority: cpan:DAGOLDEN

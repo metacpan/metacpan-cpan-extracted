@@ -1,0 +1,33 @@
+---
+abstract: 'Helper syntax for writing Test::Class tests'
+author:
+  - 'Piers Cawley C<< <pdcawley@bofh.org.uk> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Class-Sugar
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Test::Most: 0
+requires:
+  B::Hooks::EndOfScope: 0
+  Devel::Declare: 0.003005
+  MooseX::Declare: 0
+  Sub::Name: 0
+  Test::Class: 0.33
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/pdcawley/test-class-sugar.git
+version: 0.0400

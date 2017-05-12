@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use Test::Inter;
+$o = new Test::Inter;
+
+print "The following tests should all succeed\n\n";
+
+$o->is  ( [ a,b ], [ a,b ], "List test" );
+$o->isnt( [ a,b ], [ a,c ], "List test" );
+
+$o->is  ( { a => 1, b => 2 }, { a => 1, b => 2 }, "Hash test" );
+$o->isnt( { a => 1, b => 2 }, { a => 1, b => 3 }, "Hash test" );
+
+print "\nThe following tests should all fail\n\n";
+
+$o->isnt( [ a,b ], [ a,b ], "List test" );
+$o->is  ( [ a,b ], [ a,c ], "List test" );
+
+$o->isnt( { a => 1, b => 2 }, { a => 1, b => 2 }, "Hash test" );
+$o->is  ( { a => 1, b => 2 }, { a => 1, b => 3 }, "Hash test" );

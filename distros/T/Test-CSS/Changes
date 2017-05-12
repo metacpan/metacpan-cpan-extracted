@@ -1,0 +1,25 @@
+Revision history for Perl extension Test::CSS.
+
+0.07  Wed Nov 02 04:45:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.06  Sat Oct 29 12:10:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.05  Sat Sep 03 09:25:00 2016
+      - Updated copyright year information.
+      - Tidied up unit test script t/00-load.t.
+
+0.04  Sun Mar 08 23:00:00 2015
+      - Added LICENSE file.
+
+0.03  Wed Mar 04 17:00:00 2015
+      - Added File::ShareDir::Install as configure requires in the Makefile.PL file.
+
+0.02  Sat Jan 17 10:00:00 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.01  Sun Nov 30 11:45:00 2014
+      - Module created.

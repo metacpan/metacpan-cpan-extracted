@@ -1,0 +1,109 @@
+
+=head1 NAME
+
+ t/ - worked examples for Tangram, some based on real world applications
+
+=head1 CONTENTS
+
+=over
+
+=item F<t/springfield/>
+
+Originally the only test suite for Tangram, this test suite balooned
+with extra relationship types and features until it became quite
+unmanagable!
+
+=item F<t/rt/>
+
+an example schema modeled after Request Tracker, a popular e-mail
+helpdesk application.  See F<t/rt/RT.pod> for documentation.
+
+=item F<t/musicstore/>
+
+an example schema modeled after the test database for Class::DBI, the
+schema for which is available at
+L<http://www.class-dbi.com/cgi-bin/wiki/index.cgi?ERD>.  Sections from
+this test suite are included in L</APP2ed>.
+
+=item F<t/timeseries/>
+
+This schema is for problems that relate to I<time series databases>,
+such as transaction record processing, system performance logs, etc.
+
+=item F<t/orange/>
+
+This is a "Hello, world" type demo.  No tests yet.
+
+=item F<t/moose/>
+
+Tests related to interoperating between L<Moose> and Tangram.
+
+=back
+
+=head1 PURPOSE
+
+This collection of schemas are for building test suites for Tangram
+based on a real world applications.
+
+The schemas here do not diverge from the original application schemas
+after which they are modeled so much that the conversion from the
+original application could not be completed by a SQL or simple DBI
+script.  For some of the applications, such conversion scripts will be
+provided.
+
+More complex conversions and optimisations of inefficient application
+schema, such as combining several L<Tangram::Scalar> C<string> fields
+that do not need to be searched into a single L<Tangram::IDBIF> field,
+should be performed as a seperate project.
+
+As such, some principles will apply to building the test suites that
+use these schemas:
+
+=over
+
+=item B<the test cases should be real>
+
+Nothing is worse than reading a test case and there being seemingly
+non-sensicle operations and C<foo>'s littered all over the place.
+
+If the test case is not from the application, it should be a good,
+logical `use case' of the application.
+
+C<musicstore> is an exception to this, as it is a widely popularised
+example.  C<springfield> will be kept around for as long as it is
+needed.  Once the coverage from the other test suites is complete, it
+will be marked as end-of-life and phased out.
+
+C<orange> is a real world example, and I challenge anyone who claims
+otherwise.
+
+=item B<the test scripts should be good reading>
+
+Well coded and presented examples will greatly assist new coders from
+learning the Tao of Tangram.  Always clearly describe what each test
+script is doing, consider that any of them might be a new user's first
+examination of the `real' way to use Tangram.
+
+Each set of tests should have accompanying comments that at least
+outline the tests that are run.  This documentation should be
+primarily inside the test suites, and should also be summarised in the
+documentation for each schema.
+
+=back
+
+=head1 REFERENCES
+
+=over
+
+=item APP2ed
+
+_Advanced Programming Perl, 2nd Edition_, Simon Cozens.
+
+=back
+
+=head1 AUTHOR
+
+Sam Vilain, L<samv@cpan.org>
+
+=cut
+

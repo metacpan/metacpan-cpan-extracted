@@ -1,0 +1,1 @@
+&~ for (@{ $_{users} }) { ~&#~ render('./t/tmpl/hello_user.txt', user=>$_) ~#&~ } ~&

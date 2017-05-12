@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+README
+ExecuteCommand.pm
+Killfam.pm
+test.pl
+executecommand.pl
+executecommand2.pl
+executecommand3.pl
+META.yml                                 Module meta-data (added by MakeMaker)

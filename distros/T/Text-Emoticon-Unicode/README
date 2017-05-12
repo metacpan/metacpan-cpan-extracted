@@ -1,0 +1,35 @@
+NAME
+    Text::Emoticon::Unicode - Text::Emoticon filter for Unicode emoticons
+
+VERSION
+    This document describes Text::Emoticon::Unicode version 0.02.
+
+SYNOPSIS
+        use Text::Emoticon;
+
+        my $emoticon = Text::Emoticon->new('Unicode');
+
+        my $msg = $emoticon->filter('Howdy :)');  # returns 'Howdy ☺'
+
+DESCRIPTION
+    This is a Text::Emoticon filter for converting ASCII emoticons to their
+    Unicode emoticon character equivalent. Unlike the other Text::Emoticon
+    filters, this one does not use images from an external site or even use
+    any HTML. Instead it replaces a series of characters like ":-)" with a
+    single character like "☺".
+
+    Currently only the Unicode 1.1 emoticons "☺" and "☹" are supported, but
+    an option to enable the vast range of Unicode 6.0 emoticons will be
+    added in a future version. An option to use numeric character references
+    for HTML or XML will also be added, but it’s easy to use HTML::Entities
+    or XML::Entities instead.
+
+AUTHOR
+    Nick Patch <patch@cpan.org>
+
+COPYRIGHT AND LICENSE
+    © 2012 Nick Patch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

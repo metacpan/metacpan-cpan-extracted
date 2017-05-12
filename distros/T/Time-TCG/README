@@ -1,0 +1,62 @@
+NAME
+
+Time::TCG - Geocentric Coordinate Time and realisations
+
+DESCRIPTION
+
+Geocentric Coordinate Time (TCG) is a coordinate time scale representing
+time in the Terran system.  Specifically, it is the proper time
+experienced by a distant clock comoving with the geocentre.  It is
+linearly related to Terrestrial Time (TT), which is the proper time scale
+underlying timekeeping on the Terran surface.  TT is formally defined
+in terms of TCG: TT ticks exactly 0.999_999_999_303_070_986_6 seconds
+for each second of TCG.
+
+This module represents instants on the TCG and TT time scales as scalar
+numbers of SI seconds since an epoch.  This is an appropriate form for
+all manner of calculations.  Both scales are defined with a well-known
+point at TAI instant 1977-01-01T00:00:00.0.  This point is used as the
+epoch for TCG, having the scalar value zero.  The same instant on the
+TT scale is assigned the scalar value 599_616_000 exactly, corresponding
+to an epoch near the TAI epoch 1958-01-01T00:00:00.0.  This matches the
+convention used by "Time::TT" for instants on the TT scale.  The use of
+very different epochs for the two scales avoids confusion between them.
+
+There is also a conventional way to represent TCG instants using day-based
+notations associated with planetary rotation `time' scales.  The `day'
+of TCG is a nominal period of exactly 86400 SI seconds, which is slightly
+shorter than an actual Terran day.  The well-known point at TAI instant
+1977-01-01T00:00:00.0 is assigned the label 1977-01-01T00:00:32.184
+(MJD 43144.0003725).  Because TCG is not connected to Terran rotation,
+and so has no inherent concept of a day, it is somewhat misleading to use
+such day-based notations.  Conversion between this notation and the linear
+count of seconds is supported by this module.  The day-based notations for
+TT and TCG instants yield very similar values for corresponding instants,
+so care must be taken to avoid confusion.
+
+Because TCG is a theoretical time scale, not directly accessible for
+practical use, it must be realised using atomic clocks.  In fact, it is TT
+that is directly so realised, but the linear relationship between TT and
+TCG means that any realisation of TT is effectively also realising TCG.
+This module supports conversion of times between different realisations of
+TCG, by making use of the facility in "Time::TT" for realisations of TT.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2010, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,79 @@
+{
+   "abstract" : "Text::Template with localized variables",
+   "author" : [
+      "Diab Jerius, C<< <djerius at cpan.org> >>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.12, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Template-LocalVars",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta::Check" : "0",
+            "Module::Install" : "0",
+            "Module::Install::AuthorTests" : "0",
+            "Module::Install::AutoLicense" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Module::Install::ReadmeFromPod" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::NoBreakpoints" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Package::Stash" : "0",
+            "Storable" : "0",
+            "Symbol" : "0",
+            "Text::Template" : "0",
+            "parent" : "0",
+            "perl" : "v5.8.9"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Template-LocalVars"
+      },
+      "license" : [
+         "http://opensource.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/djerius/text-template-localvars"
+      }
+   },
+   "version" : "0.04"
+}

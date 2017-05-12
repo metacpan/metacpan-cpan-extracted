@@ -1,0 +1,13 @@
+---
+- data:
+    artist: 2
+    cdid: 3
+    title: foo
+    year: 2007
+  name: cd
+  schema: CD
+- data:
+    artistid: 2
+    name: beatles
+  name: artist
+  schema: Artist

@@ -1,0 +1,378 @@
+0.33	20 September 2010
+	Checking the tool chain with perl5.13.5.  Fixed some tests that were
+	failing because of Test::Harness not being able to cope with threaded
+	tests and some issues with pickyness of newer executors.
+
+	28 January 2004
+	Made sure the test-suite cleans up on multi-versioned systems.
+
+0.32	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.31	17 November 2003
+	Added method "result_any" to fetch _any_ result, optionally setting
+	the jobid as well. After a suggestion by Matthew Kirkwood.
+
+0.30	9 November 2003
+	Increased dependency on Thread::Conveyor to 0.15 because of problem
+	fix for 5.8.2.
+
+	3 October 2003
+	Found still one reference to original name threads::farm in the POD.
+	Now removed.
+
+0.29	11 August 2003
+	Cleaned Makefile.PL and upgraded dependencies and copyright.
+
+	Fixed test-suite so it runs cleanly under warnings.  Added special
+	__WARN__ handler to tell where any warning came from.  Fixed a problem
+	in Thread::Pool->new with an undefined "maxjobs" setting.
+
+0.28	30 September 2002
+	Use "load.pm" instead of AutoLoader.  Increased dependency on
+        Thread::Conveyor and T::C::Monitored, which also use "load.pm" now.
+
+	Removed "our" from $VERSION, should shave off some bytes in
+	memory usage, as found from testing with Benchmark::Thread::Size.
+
+	22 September 2002
+	Removed some blurb about Thread::Tie.  Made internal use of
+	Thread::Tie unconditional, as Thread::Tie will always be loaded
+	because of Thread::Conveyor.  Spotted by Chris Rosebrugh.
+
+0.27    1 September 2002
+        Increased dependency on Thread::Conveyor to 0.10, to ensure we have
+        the latest and the best.
+
+	Adapted test-suite to account correctly for the extra thread that is
+	created by the new dependency of Thread::Conveyor on Thread::Tie.
+
+0.26	30 August 2002
+        Changed all modules to use AutoLoader to defer loading of necessary
+	subroutines to when they are actually needed.  This should save
+	memory and CPU for larger programs, or with large numbers of threads.
+	The test-suite only marginally takes more memory and uses 10% less CPU:
+	overhead of compiling is levelled out with the overhead of cloning
+	pre-compiled routines.
+
+0.25	27 August 2002
+	Added support for checkpointing on the monitor thread + documentation
+	+ adaptation of the test-suite.
+
+	Raised dependency on Thread::Conveyor::Monitored to take advantage of
+	the new checkpointing feature.
+
+0.24	14 August 2002
+	Raised dependency on Thread::Conveyor again to take advantage of
+	possible problem fix.
+
+	13 August 2002
+	Reduced number of tests in test-suite for the hammering bits: it
+	was taking about 30 minutes on my development machine, which is
+	really too much.
+
+	Now uses Thread::Serialize::(freeze|thaw) for serialization of
+	data structures between threads.  Raised dependency on
+	Thread::Conveyor to make sure this always works.
+
+	Added support for Thread::Tie: the workers array will use the
+	Thread::Tie implementation if it is available.  This to avoid the
+	memory leak with shared arrays.
+
+0.23	7 August 2002
+	Added documentation for the "optimize" field (in "new") and method.
+	Thread::Pool now has its own default setting for optimization.
+
+	Adapted writeup of "abort", it now is _the_ way of temporarily
+	shutting down a pool from which it is possible to recover later
+	by adding workers again.
+
+	Finally migrated the complete test-suite: now 1230 tests which take
+	almost 30 minutes on my development box.
+
+	6 August 2002
+	Continued with migration.  Unfortunately, it has become impossible
+	to recover from a shutdown.  Documentation has been adapted to
+	reflect this change, as well as the test-suite.  This also fixed
+	some problems that may have occurred in the test-suite on faster
+	machines.
+
+	5 August 2002
+	Started with migration to new Thread::Conveyor functionality.
+	Adapted requirements in Makefile.PL.  On towards a Thread::Pool and
+	Thread::Pool::Resolve that doesn't eat memory like crazy.
+
+0.22    1 August 2002
+	Fixed problem in random access test-suite that would fail only on
+	faster machines.
+
+	Increased Makefile.PL dependencies for Thread::Conveyor and
+	Thread::Conveyor::Monitored.
+
+	Added support for throttling Conveyor belts.  Removed local
+	throttling support, as it now uses the throttling support of
+	Thread::Conveyor.  This means that now monitoring belts will
+	be throttled the same way as the job belt (they were not throttled
+	before).
+
+0.21	29 July 2002
+	Hopefully fixed the last deadlock issues with regards to job
+	throttling.  Thread::Pool::Resolve finally gets through its test-suite
+	always.
+
+0.20	26 July 2002
+	Fixed some documentation nits.
+
+	Removed autoshutdown resetting hack in dispatcher routines: not needed
+	anymore because of the CLONE check.
+
+	25 July 2002
+	Added "maxjobs" and "minjobs" methods, so that job throttling can be
+	adapted on the fly.  Added documentation and adapted test-suite.
+
+	Added support for the "pre_post_monitor_only" field, which allows the
+	"pre" and "post" routine to only be executed for the "monitor" routine.
+	Added tests and documentation for it also.
+
+	Removed conditional Thread::Conveyor::Monitored loading code.  Since
+	Thread::Conveyor::Monitored is a prerequisite now, it was not necessary
+	anymore.
+
+0.19	25 July 2002
+	Made $VERSION have the : unique attribute to save memory.
+
+	Removed stray "use Carp" that was left behind from some debugging.
+	Rearranged -use-s to minimize what is really needed exactly.  Adapted
+	Makefile.PL to now also depend on Thread::Conveyor::Monitored.
+
+	Fixed problem in "shutdown" which would sometimes put too many stop
+	requests on the job belt.  With the new belt->peek_dontwait method
+	any remaining stop requests are removed from the belt.  This should
+	fix test-suite errors that occurred only on some systems.
+
+	Now depends on both Thread::Conveyor and Thread::Conveyor::Monitored
+	instead of Thread::Queue::Any and Thread::Queue::Any::Monitored.
+	Changed metaphor from queue to belt in the documentation and the
+	test-suite.
+
+	24 July 2002
+	Added a more elaborate example for log resolving, which is the base
+	code for the new Thread::Pool::Resolve module.
+
+0.18	23 July 2002
+	Finally (hopefully) fixed problems with deadlocking.  It seems that
+	accessing unlocked shared arrays and hashes may cause deadlocking
+	issues also because locks are happening at the C-level.  Will
+	investigate later.  Job throttling now considered beta.
+
+0.17	22 July 2002
+	Added support for job throttling by the "maxjobs" and "minjobs" field
+	in the "new" method.  Adapted the "_random" and "_stream" dispatchers
+	as well as the "job" method.  Added test-suite for this as well.
+	This code is really still alpha, it does not seem to get through the
+	test always, so there could still be some deadlocking issues here.
+
+	Added method "results".  Returns the job IDs of which there are still
+	results ready to be fetched.  Returns the number of results in scalar
+	context.
+
+	Added class method "monitor" that returns the
+	Thread::Queue::Any::Monitored object associated with the pool in the
+	"do", "pre" and "post" routine if monitoring.
+
+	Changed rogue DESTROY hack to use UNIVERSAL::isa().  Suggested by
+	Ken Williams.
+
+	Added the first full blown example: a simple log resolving filter.
+
+	Removed some "originatingthreadid" cruft that was left behind.  Also
+	removed some "destroyed" cruft.
+
+	Simplified the rogue DESTROY test hack.
+
+0.16	21 July 2002
+	Added test-case for testing all of the methods that can be called.
+	Completed the multi-thread job submission test.
+
+	Changed DESTROY to only do something when in the originating thread.
+	Found bug in 5.8.0 that is calling DESTROY just too many times.  Found
+	a way around that by using the CLONE subroutine.  This fixes the
+	segfaults that I have been seeing, that I realize now, were caused
+	by the extra DESTROYs.
+
+	20 July 2002
+	Started the multi-thread job-submitter test-suite.  Ran into
+	segfaults.  Trying to reproduce them in a simpler example now.
+
+0.15	19 July 2002
+	Also fixed "abort" functionality in case there weren't any jobs to
+	do anymore: the worker threads would be blocked on reading the job
+	queue and not see the abort flag.  Now, the remaining threads are
+	signalled to stop the ordinary way.
+
+	Added test-suite for "abort" functionality.  Added internal routine
+	"_first_todo_jobid" which allows "shutdown" to only stream results
+	of jobs actually done, rather then to try to stream results that
+	weren't created yet.  This should fix the "abort" functionality.
+
+	Renamed internal routine "_freeze" to "set_result" and exposed it to
+	the world as part of the "jobid" and "dont_set_result" combo.  This
+	should now allow the development of the completely asynchronous log
+	resolve module I was thinking about, where lookups on the same IP
+	number will be handled by a single thread rather than by any thread
+	that just happens to get the IP-number.
+
+	Removed internal routine "_thaw": all thawing internally is done by
+	calling Storable directly for speed, so it was dead wood.
+
+	Added "jobid" and "dont_set_result" methods to allow "do" subroutines
+	to have other threads create the result of the current thread.  Adapted
+	the _random and _stream dispatcher to honour these new methods.
+
+	Simplified the "remove_me" functionality by a simple lexical flag
+	rather than having to use the object.  This now also makes it a
+	class method.
+
+	Fixed several minor pod nits.  Removed some Carp cruft from the
+	test-suite.
+
+0.14	18 July 2002
+	Fixed problem with monitoring a thread that was't finished when
+	shutdown time was encountered.
+
+	Added support for the new "post" routine in
+	Thread::Queue::Any::Monitored in "new" and "add".  Needed so that
+	e.g. file handles are closed and buffers flushed.
+
+	Small performance improvement in "add" if more than one thread is
+	added: original input parameters are only thawed once.
+
+	Moved shutting down of monitoring thread from DESTROY back to
+	"shutdown".  This makes more sense.  Added code to restart the
+	monitoring thread if necessary in "add".
+
+	Found one problem remaining in shutdown that caused the errors I
+	was seeing yesterday.  I guess 13 _was_ an unlucky number.
+	Re-instated the full test-suite now.
+
+0.13	17 July 2002
+	Testing on large numbers of threads and/or jobs keeps failing
+	indeterminately.  Lowered the number of tests to be able to get
+	the module out there for testing on other machines.
+
+	No longer passes the Thread::Pool object to the "do", "pre" and
+	"post" routine.  This to conform to the way Thread::Queue::Monitored
+	works.  If the object is needed, the "self" class method should be
+	called.  This change should also speed up things a bit.
+
+        Added class method "self" for use within the "pre", "do", "post",
+	"stream" or "monitor" routine.  It returns the object they're
+	working for.
+	
+	The same "pre" routine is now also passed to the internal "monitor"
+	object.  If you really want to have a different "pre" routine, then
+	you can create a seperate Thread::Queue::Any::Monitored object and
+	use a "stream" routine to fill that monitored queue.
+
+	Changed the functionality of the "pre" routine to not save any
+	of the returned values.  It makes much more sense for the "pre"
+	routine to set either lexical or global variables that would be
+	automatically accessible to the "do" and "post" routine by virtue
+	of the fact that they have their own memory space to play with.
+	Adapted the test-suite accordingly.
+
+	Added support for "monitor" keyword in "new" method.  Allows you to
+	specify a streaming mode in which the stream is handled by a single
+	monitoring thread rather than by each thread themselves.  Courtesy
+	of the new Thread::Queue::Any::Monitored module.
+
+	Fixed problem with warning being issued when starting the object.
+	Caused by the originating thread id value not being set for the
+	originating thread itself.
+
+0.12	16 July 2002
+	Added method "waitfor" as a shortcut for using "job" and "result".
+
+	Moved checks for originating thread to new internal method
+	_check_originating_thread.
+
+	Added method "abort" to have all the worker threads stop after they're
+	finished with their current job.  Adapted new, _random and _stream
+	for this new feature.
+
+0.11	15 July 2002
+	Bumped up version to 0.11 to be higher than Malcolm Beattie's original
+	Thread::Pool module on CPAN.  No other changes were made.
+
+0.04	15 July 2002
+	Hopefully fixed problem in streaming caused by some stupid thread
+	inertia problem.  Problem was caused by the dispatcher assigning the
+	jobid rather than the "job" method.  Things could get out of sync
+	before the dispatcher was reached.
+
+	Added "join" method to allow intermediate cleanup of removed worker
+	threads.  Fixed up "shutdown" to call "join".
+
+	Internally changed dispatcher system: there are now different
+	dispatchers for streaming and random access mode.
+
+	Method "done" now only counts jobs by removed threads.  Job counts
+	are now kept in local thread space and only made shared when the
+	worker thread is removed.
+
+	Gone back to not detaching threads.  Detached threads cannot be
+	waited for, which is a major PITA.
+
+0.03	14 July 2002
+	Made sure that once the pool is shut down, calling method "shutdown"
+	again will not do anything.  At least not until method "add" is
+	called.  This should fix the situation where the pool is specifically
+	shut down, and again shut down when the object is destroyed.
+
+	Added method "notused" which returns the number of threads that
+	were removed before they got a chance to do anything.  Can be used
+	to give you a heuristic of how many threads you actually need for a
+	specific application.
+
+	Added functionality for streaming results.  This allows you to
+	specify a "stream" subroutine that allows you to handle the result
+	of the asynchronously executed "do" subroutines in the order in
+	which the jobs were submitted (rather than in the order in which the
+	results were obtained).
+
+	Added "remove_me" functionality, which allows a "do" routine to tell
+	its dispatcher that the worker thread should be removed.
+
+	Added Perl version requirement to README and pod, per suggestion of
+	mrbbking.  Added -use threads- to Makefile.PL to cause breakage of
+	the install process if threads are not available.
+
+	Added specific check for named subroutine reference.  The old
+	Thread::Pool module from CPAN also allowed this.
+
+0.02	13 July 2002
+	Added initial version of test-suite.
+
+	Added initial version of the documentation.
+
+	Added copyright info to pod.
+
+	Name change threads::shared:: -> Thread:: caused this module to be
+	renamed to the Thread:: namespace.  Per Dan Sugalski's suggestion,
+	the name became Thread::Pool.
+
+	Dave Rolsky suggested that "hire" and "fire" were too cutesy.  And I
+	figured that "fire" could be misinterpreted as "fire up a thread"
+	rather than retire.  Therefore the following changes were made:
+
+	 hire		-> add
+	 fire		-> remove
+	 fired		-> removed
+	 hired		(deleted, moved functionality to "workers")
+
+	I also changed "result_nb" to "result_dontwait", as that is a better
+	description of what it does (who knows that "nb" stands for
+	"non-blocking" and then knows what it means?).
+
+0.01	12 July 2002
+	First version as threads::farm.

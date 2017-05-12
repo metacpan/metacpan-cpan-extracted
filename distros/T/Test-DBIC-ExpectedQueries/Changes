@@ -1,0 +1,77 @@
+
+Feature oriented Revision history for Test-DBIC-ExpectedQueries
+===============================================================
+
+1.011 -- 2015-11-05 15:18:09 UTC
+
+* Bug fix: Avoid wantarray being masked inside try-catch block
+
+
+
+1.010 -- 2015-09-23 22:16:24 UTC
+
+* Bug fix: stack trace ignored classes
+
+
+
+1.009 -- 2015-09-20 21:34:08 UTC
+
+* Table level option "stack_trace" to show a strack trace for each SQL
+  query that fails.
+
+
+
+1.008 -- 2015-04-27 14:49:49 UTC
+
+* Replace Attribute::Exporter with Exporter::Tiny, since
+  Attribute::Exporter gone dun weird.
+
+
+
+1.007 -- 2015-04-27 13:25:09 UTC
+
+* Fixed prereq on Attribute::Exporter
+
+
+
+1.006 -- 2015-02-23 09:14:44 UTC
+
+* Fix #1 - Dereference hash for calling 'keys'
+  - patch by  Syohei YOSHIDA (syohex)
+
+
+
+1.005 -- 2015-02-22 17:58:28 UTC
+
+* More POD improvements
+
+
+
+1.004 -- 2015-02-20 17:30:45 UTC
+
+* Default ->test() to an empty hashref
+
+* Reset collected stats when calling ->test() properly!
+
+
+
+1.003 -- 2015-02-20 16:48:11 UTC
+
+* Reset collected stats when calling ->test().
+
+
+1.002 -- 2015-02-20 14:34:10 UTC
+
+* Even more better POD docs.
+
+
+
+1.001 -- 2015-02-20 13:51:38 UTC
+
+* POD
+
+
+
+1.000 -- 2015-02-19 20:51:12 UTC
+
+* First release

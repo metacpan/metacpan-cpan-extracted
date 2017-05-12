@@ -1,0 +1,10 @@
+MANIFEST
+Changes
+README
+Makefile.PL
+lib/Tie/Pick.pm
+t/000_tests.t
+t/950_pod.t
+t/960_pod_coverage.t
+t/990_kwalitee.t
+META.yml                                 Module meta-data (added by MakeMaker)

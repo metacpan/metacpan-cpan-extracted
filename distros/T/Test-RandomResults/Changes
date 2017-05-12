@@ -1,0 +1,16 @@
+Revision history for Test-RandomResults
+
+0.03  Fri Nov 04 20:56:00 2005
+	- fixed a glitch in the documentation
+	- minor changes in the documentation
+
+0.02  Fri Nov 04 08:32:00 2005
+        - minor changes in the documentation
+	- added version 0.32 of Test::Builder (actually, version 0.62 of the
+	  Test::Simple distribution, which includes this module) to
+	  dependencies, as the behavior of version 0.31 is slightly different
+	  and makes most tests fail
+
+0.01  Thu Nov 03 23:38:00 2005
+        First version, released on an unsuspecting world.
+

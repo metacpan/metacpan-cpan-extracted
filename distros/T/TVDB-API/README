@@ -1,0 +1,63 @@
+TVDB-API v0.21
+
+This module implements a perl module for the API detailed at
+
+    http://thetvdb.com/wiki/index.php/Programmers_API
+
+It allows access to the information about TV shows stored at
+
+    http://thetvdb.com/
+
+To use it you will first have to register for an apikey from thetvdb.
+
+    http://thetvdb.com/?tab=apiregister
+
+A different apikey is required per application which accesses thetvdb api.
+
+This modules requires the following extra perl modules:
+
+    Compress::Zlib
+    DBM::Deep
+    Debug::Simple
+    IO::Uncompress::Unzip
+    LWP
+    XML::Simple
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc TVDB::API
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=TVDB-API
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/TVDB-API
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/TVDB-API
+
+    Search CPAN
+        http://search.cpan.org/dist/TVDB-API
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Behan Webster
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,19 @@
+Change history for TypeLibrary::FromXSD
+=======================================
+
+0.03 2014-01-03T11:47:13
+
+     + added MetaResource in dist.ini
+     + fixed CPANTS issues
+
+0.02 2014-01-02T10:15:23
+
+     + add Changes file
+     + use PodWeaver
+     + fix Pod error
+     + fix prereq list in dist.ini
+     + add documentation to script xsd2library
+
+0.01 2013-12-09T22:40:46
+
+     + initial release

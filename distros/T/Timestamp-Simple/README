@@ -1,0 +1,32 @@
+Timestamp/Simple version 1.00
+=============================
+
+BACKGROUND
+
+Usually creating adhoc logfiles for various purposes, such as
+debugging and reporting, I realized I kept using the same,
+very simple, timestamp subroutine over and over.
+
+I figured other people might find it useful, too.
+
+Right now it's pure Perl, although it would probably benefit from
+being a compiled C module.  In fact, if you can't install it as a
+module, you may simply open the Simple.pm file, and copy the stamp
+subroutine to your own code.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Steve Shoopak
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

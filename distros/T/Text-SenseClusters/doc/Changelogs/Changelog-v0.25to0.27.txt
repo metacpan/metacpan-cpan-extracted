@@ -1,0 +1,23 @@
+Changes made in Sense-Clusters version 0.25 during version 0.27
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1. Shriking 2D PDL matrix after having iteration in agglom.pl
+
+2. modified 
+	a. --data option in tagger.pl to work on Senseval-2 files 
+   	b. --tags is renamed as --labels for label.pl 
+	c. added perldoc page for tagger
+	d. modified test scripts to test new functionality of 
+	--data and --labels
+
+3. added statistical test support to cluster.pl
+ 
+4. added perldoc for info_matrix.pl and info_sparse.pl programs
+
+5. added README.Impatient 
+
+(Changelog-v0.25to0.27 Last Updated on 06/15/2003 by Amruta)

@@ -1,0 +1,66 @@
+Revision history for Tk-Chart
+
+1.21 23/04/2017
+      Tk::Chart::Pie
+         bug reporting : after refreshing the chart with new data, the balloons are reporting always the first data when the chart was created. [https://rt.cpan.org/Public/Bug/Display.html?id=121319] bug fixed.
+
+1.20 2011
+      Minor modification
+
+1.19 21/10/2011 19:32:37
+      Tk::Chart::Bars 
+        undef values produce non fatal error. Bug have been resolved (Thank you A. Wadley)
+        -xlabelskip : tick and text will be now displayed correctly.
+      Tk::Chart::Mixed, Tk::Chart::Area, Tk::Chart::Boxplots...  
+        -xlabelskip : tick and text will be now displayed correctly.
+
+      -xvaluefont, -yvaluefont and -xvaluevertical options added.
+      In Tk::Chart::Bars, Tk::Chart::Mixed and Tk::Chart::Boxplots x values data are cut with ... if width text 
+      greater than width space between 2 ticks. Now, The text will not be cut but the rest of the text will be display below.
+      POD documentations updated.
+        
+1.18 20/07/2011 20/07/2011 22:30:31
+      Tk::Chart::Bars POD documentation have been updated and an option added.
+        -cumulatepercent option added (https://rt.cpan.org/Ticket/Display.html?id=69605)
+        BarsCumulatePercentZoomMenu.pl added in demo
+
+1.17  20/07/2011 00:08:49
+      Tk::Chart::Mixed POD documentation have been updated.      
+      Tk::Chart::Pie POD documentation have been updated and an option added.
+        -piesize option added (https://rt.cpan.org/Public/Bug/Display.html?id=69580)
+        
+1.16  01/01/2011 00:00:00
+      POD documentation and code have been updated.      
+        
+1.15  24/10/2010 14:21:11
+      POD documentation updated.
+      Tk::Chart::FAQ updated.
+      
+
+1.14  24/10/2010 01:59:15
+      Many options added :
+        PIE
+          -legendcolor, -legendfont and setlegend
+        BOXPLOT
+          -boxplotlinescolor
+        BARS
+          -barsvaluescolor
+        LINES, POINTS, SPLINES, BARS and BOXPLOTS
+          -xlongticks, ylongticks
+          -xlongtickscolor, ylongtickscolor
+          -axiscolor, longtickscolor
+          
+          -yminvalue and -ymaxvalue to allow you to represent charts with resizing y-axis as you want (example for data with little interval).
+          -interval fix yminvalue and ymaxvalue to minimum and maximum value of data sets.
+          -verbose option allow to disabled warning printing if necessary.
+ 
+           In set_legend methods, -legendcolor added.
+              
+      POD documentation updated.
+      demo updated : http://search.cpan.org/dist/Tk-Chart/MANIFEST
+            
+1.01  22/09/2010 07:57:44
+      Bug test installation boilerplate.t fixed
+
+1.00  21/09/2010 18:23:28
+      First version

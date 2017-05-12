@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+# 37CFQAE - fpt created by Pip@CPAN.Org to format PipTime data like `fmt`
+#   from "[{pt_descriptor}] Month {Day} {Hour:Minute:Second:60th} Year"
+#   eg. '[OrigSent] ( Sat Jul 12 17:18:25:24 2003 ) ' or '[done] Jul 2003'
+# Why:
+#   This is mostly useful for my e-mail (`mutt`) reply attribution but 
+#     might grow into other uses someday =).
+
+use Time::PT;
+
+my @data = shift || <STDIN>; $parm = '';
+my $ptst = 'http://Ax9.Org/pt?';
+foreach(@data) {
+  chomp;
+  if(/^\[[^\]]*\].*?((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\D+(\d+)\s*(\d*):?(\d*):?(\d*):?(\d*)\s*(\d*))/i) {
+    $parm = $1;
+    unless(/$ptst/) { 
+      $_ .= ' ' unless(/ $/);
+      $_ .= $ptst;
+    } 
+    $parm = Time::PT->new('verbose' => $parm);
+    $_ .= "$parm";
+  }
+  print "$_\n";
+}

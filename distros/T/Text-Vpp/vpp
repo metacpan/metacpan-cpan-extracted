@@ -1,0 +1,196 @@
+#!/usr/bin/perl
+
+use Text::Vpp ;
+use Getopt::Long ;
+
+require 5.6.0;
+
+sub usage
+  {
+    die "vpp [-var foo=bar] [-varFile] [-action] [-nocomment] [-comment]\n",
+    "    [-prefix] [-suffix] [-substitute] [-ignorebs] [-output output_file]\n",
+    "    input_file \n\n",
+
+    "var       : specify input_file variable, must be like var_name=var_value\n",
+    "varFile   : specify a filename containing a Perl hash in Data::Dumper format\n",
+    "action    : set action char (default \@)\n",
+    "nocomment : input_file has no comment, all lines are passed to out file\n",
+    "comment   : specify comment char (default #)\n",
+    "prefix    : specify prefix char (default \$)\n",
+    "suffix    : specify suffix char (default none)\n",
+    "substitute: specify a pair like /prefix/suffix/ for evaled substitution\n",
+    "            (default twice the action char)\n",
+    "ignorebs  : don't append lines ending with \\ \n",
+    "output    : output file name (default stdout)\n" ;
+  }
+
+my $ret = GetOptions('var=s@' => \@vars,'varFile=s' => \$varFile, 'action=s' => \$action,
+                     'nocomment!'=>\$nocomment, 'output=s' => \$foutName,
+                     'comment=s' => \$comment, 'prefix=s' => \$prefix,
+                     'suffix=s' => \$suffix, 'substitute=s' => \$substitute,
+                     'ignorebs'=> \$ignore)
+  or usage ;
+
+my $finName = shift ;
+die "No input file\n" unless defined $finName ;
+
+my $fin = Text::Vpp-> new($finName) ;
+
+if (defined @vars)
+  { my %Vars;
+    foreach (@vars)
+      {
+        $Vars{$1}= $2  if /(\w+)=(.*)/ ;
+      }
+      $fin->setVar(\%Vars) ;
+  }
+elsif (defined $varFile)
+  { $fin->setVarFromFile($varFile); }
+
+$fin->setActionChar($action) if defined $action ;
+$fin->setCommentChar(undef) if defined $nocomment ;
+$fin->setCommentChar($comment) if defined $comment ;
+$fin->setPrefixChar($prefix) if defined $prefix ;
+$fin->setSuffixChar($suffix) if defined $suffix ;
+if ( defined $substitute )
+  { my @LS = $substitute =~ /(\S)([^\1]+)\1([^\1]+)\1/;
+    shift @LS;
+    $fin->setSubstitute([@LS]);
+  }
+$fin->ignoreBackslash if defined $ignore;
+
+my $res;
+if ( defined $foutName )
+  { $res = $fin -> substitute($foutName) ;
+    die "Vpp error ",$fin->getErrors,"\n" unless $res ;
+  }
+else
+  { $res = $fin -> substitute;
+    die "Vpp error ",$fin->getErrors,"\n" unless $res ;
+    print join("\n",@{$fin->getText}),"\n";
+  }
+
+
+
+=head1 NAME
+
+vpp - versatile text pre-processor
+
+=head1 SYNOPSIS
+
+ vpp -var toto=1 file_in > file_out
+  
+ #same result
+ vpp -var toto=1 -output file_out file_in
+
+=head1 DESCRIPTION
+
+vpp enables you to pre-process a file.
+
+Note that vpp is not designed to replace the well known cpp. 
+
+=head1 INPUT FILE SYNTAX
+
+See L<Text::Vpp/"INPUT FILE SYNTAX">.
+
+=head1 command options
+
+=head2 -var var_name=value
+
+Specify variables that are used in the input file. The argument of the option
+must be written like var_name=var_value
+Don't forget to escape shell sensitive characters.
+
+=head2 -varFile FileName
+
+Specify a file (name FileName) which holds an 'external' representation of
+a hash as it is created by Perl's Data::Dumper module.
+Example:
+$People = { 'person' =E<gt> { 'nick' =E<gt> 'Larry',
+                               'name' =E<gt> 'Larry Wall',
+                               'address' =E<gt> {
+                                   'street' =E<gt> 'nirwana',
+                                   'city' =E<gt> 'Perl.Org',
+                                   'zip' =E<gt> '007'
+                               }
+                             },
+            'pumpkin' =E<gt> { 'nick' =E<gt> 'Guru',
+                               'name' =E<gt> 'Sarathy Gurusamy',
+                               'address' =E<gt> {
+                                   'state' =E<gt> 'Madison',
+                                   'zip' =E<gt> '008'
+                               }
+                             }
+          };
+
+=head2 -action 'char'
+
+Enables the user to use different char as action char. (default @)
+Don't forget to escape shell sensitive characters.
+
+Example: -action '#' will enable vpp to understand #include, #ifdef ..
+
+=head2 -comment 'char'
+
+Enables the user to use different char as comment char. (default #)
+Don't forget to escape shell sensitive characters.
+
+=head2 -nocomment
+
+no comments are possible.
+
+=head2 -prefix 'char'
+
+Enables the user to use different char(s) as prefix char(s), i.e. variables
+in your text (only) are prefixed by that character(s) instead of the
+default '$'. If no suffix character(s) has been defined (or set to 'undef')
+variables may be specified in the form ${variable} where '$' is the
+current prefix char(s). This form is necessary, if any character which
+is allowed within a name (regexp '\w') immediately follows the variable.
+Note, that all variables in 'actions' (like @@ @EVAL @FOREACH @IF)
+must still be prefixed by '$'.
+Don't forget to escape shell sensitive characters.
+
+=head2 -suffix 'char'
+
+Enables the user to use different char(s) as suffix char(s), i.e. variables
+in your text (only) are suffixed by that character(s).
+Note, that all variables in 'actions' (like @@ @EVAL @FOREACH @IF)
+don't use this.
+Don't forget to escape shell sensitive characters.
+
+=head2 -substitute /prefix/suffix/
+
+Enables the user to specify the prefix and suffix used to mark
+a Perl expression within the text that will be replaced by its
+value. The default value is twice the 'action' char as suffix
+and prefix. Instead of '/' any other non space character
+can be used.
+Don't forget to escape shell sensitive characters.
+
+
+=head2 -ignorebs
+
+By default, line ending with '\' are glued to the following line (like in
+ksh). Once this method is called '\' will be left as is.
+
+=head2 -output
+
+ Specify the output file name, defaults to STDOUT
+ You may prefix the filename with >> to get the output
+ appended to an existing file.
+
+
+=head1 AUTHOR
+
+Dominique Dumont    Dominique_Dumont@grenoble.hp.com
+
+Copyright (c) 1996-2001 Dominique Dumont. All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<perl>, L<Text::Vpp>
+
+=cut

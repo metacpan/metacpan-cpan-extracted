@@ -1,0 +1,33 @@
+################################################################################
+#
+# $Project: /Tie-Hash-Indexed $
+# $Author: mhx $
+# $Date: 2006/01/21 12:06:58 +0100 $
+# $Revision: 3 $
+# $Source: /typemap $
+#
+################################################################################
+# 
+# Copyright (c) 2002-2003 Marcus Holland-Moritz. All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+# 
+################################################################################
+
+TYPEMAP
+IXHV *	T_OBJECT
+
+OUTPUT
+T_OBJECT
+	sv_setref_pv($arg, CLASS, (void*)$var);
+
+INPUT
+T_OBJECT
+	if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVMG)
+	{
+	  IV tmp = SvIV((SV*)SvRV($arg));
+	  $var = INT2PTR($type, tmp);
+	}
+	else
+	  Perl_croak(aTHX_ \"${Package}::$func_name(): $var is not a blessed SV reference\");
+

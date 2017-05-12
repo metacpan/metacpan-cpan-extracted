@@ -1,0 +1,67 @@
+* General (not so precise)
+
+- add a notion of library of sprite (autoload-able, and browsable) 
+  Like compuman
+
+- add a sprite chooser with a library.
+
+- Add a way of producing postscript of slides.
+
+- Add a Pie and Histogram Sprite 
+
+* Functionnalities
+
+- add  a way of having a sumary of all slides
+  and a way of going from one slide to another.
+
+- adding a bottom bar for now where you are in the presentation
+  is better than text.
+
+- add arrive and leave from diagnoal points ...
+
+- change cursor form until event is ready to be taken into account.
+
+- change form of cursor when over an item : look at the performance
+  impact. Let have each item a different logo for cursor.
+
+- change the ticker tape to make it possible to tape any tagged widgets
+
+- add options of links and also for their title.
+
+- add break segment lines as link. 
+
+* Documentation
+
+- finalize documentation of SlideShow as a presentation.
+
+- add latex documentation when finalized
+
+- add  doc on ltx2gif.
+
+- reread and refresh sources
+
+- add a template exported method
+
+- add more example
+
+* Improvement
+
+- time info
+
+- the quality of the help box
+
+- see how to avoir destroy link each time it is moved
+
+- see how to configure Link (width, color).
+
+- change colors of demo (black or yellow on white or blue is nice)
+
+
+
+- improve help interface (key bindings)
+
+
+- Make it work even if X11:Protocol is not available
+
+  
+ 

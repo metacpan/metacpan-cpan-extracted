@@ -1,0 +1,55 @@
+{
+   "abstract" : "Standalone execution of Perl program subroutines",
+   "author" : [
+      "Oliver Gorwits <oliver@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Subroutines",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::LexAlias" : 0,
+            "Devel::Symdump" : 0,
+            "Exporter" : 0,
+            "File::Slurp" : 0,
+            "PadWalker" : 0,
+            "Symbol" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Getopt::Long" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Subroutines"
+      },
+      "homepage" : "https://github.com/ollyg/Test-Subroutines/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ollyg/Test-Subroutines.git",
+         "web" : "https://github.com/ollyg/Test-Subroutines"
+      }
+   },
+   "version" : "1.113350"
+}
+

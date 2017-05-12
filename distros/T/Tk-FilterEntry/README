@@ -1,0 +1,33 @@
+Tk/FilterEntry version 0.01
+===========================
+
+    Tk::FilterEntry - An entry with filter
+
+    This widget is derived from Tk::Entry and it implements an other way of
+    validation. The input is validate by a callback or more simply by a
+    filter, when the entry leaves the focus. And if is invalid, the
+    foreground color is changed.
+
+    So, this widget deals well with textVariable.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+
+COPYRIGHT AND LICENCE
+
+(c) 2003 Francois PERRAD, France. All rights reserved.
+
+This library is distributed under the terms of the Artistic Licence.
+

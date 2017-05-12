@@ -1,0 +1,35 @@
+---
+abstract: 'a rotating gauge for tk'
+author:
+  - 'Jerome Quelin'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+generated_by: 'Dist::Zilla version 1.100130'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-RotatingGauge
+provides:
+  Tk::RotatingGauge:
+    file: lib/Tk/RotatingGauge.pm
+    version: 1.100140
+requires:
+  DateTime: 0
+  English: 0
+  File::Find: 0
+  FindBin: 0
+  Module::Build: 0.3601
+  POSIX: 0
+  Test::More: 0
+  Time::HiRes: 0
+  Tk: 0
+  Tk::Canvas: 0
+  Tk::Derived: 0
+  perl: 5.008
+resources:
+  homepage: http://search.cpan.org/dist/Tk-RotatingGauge
+  repository: http://github.com/jquelin/tk-rotatinggauge
+version: 1.100140

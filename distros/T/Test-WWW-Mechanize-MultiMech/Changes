@@ -1,0 +1,27 @@
+Revision history for Test-WWW-Mechanize-MultiMech
+
+1.006001   2014-02-13
+    - Converted to dzil
+
+1.005   2014-01-14
+        - Fixed a bug where failing tests on all-user method calls
+          referenced line number in this module, instead of where they
+          were called from in the test.
+
+1.004   2014-01-13
+        - Clarified in the docs that "any" will ignore ->ignore()d users
+
+1.003   2014-01-13
+        - Fixed some issues due to new ->ignore_user feature. New
+          error checking to ensure mech object for ->any method calls
+          is available.
+        - Disallowed ignoring all users
+
+1.002   2014-01-13
+        - Added ->ignore_user and ->unignore_user
+        - Made ->all_users take an optional argument, specifying
+          whether to include ignored users in returned the list
+
+1.001   2014-01-11
+        - First version, released on an unsuspecting world.
+

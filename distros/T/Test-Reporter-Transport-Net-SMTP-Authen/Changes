@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::Reporter::Transport::Net::SMTP::Authen.
+
+1.00  Thu May  7 11:25:02 2009
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -n Test::Reporter::Transport::Net::SMTP::Authen
+

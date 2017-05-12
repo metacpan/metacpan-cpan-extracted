@@ -1,0 +1,31 @@
+Tk::LogScale Module
+
+Tk::LogScale is a Tk::Scale widget with logarithmic scale.
+
+For example, if you want to let the user input map scales from 1:1000
+to 1:100000, you can use this piece of code:
+
+    $logscale = $top->LogScale(-from       => 1000,
+                               -to         => 100000,
+                               -resolution => 0.01,
+                               -valuefmt   => sub { sprintf("1:%d", $_[0]) },
+                              );
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+Windows users should replace make by nmake (ActivePerl) or dmake
+(Vanilla/Strawberry Perl).
+
+For a demonstration, use
+
+	$ make demo
+
+As an additional requirement (it's only really necessary if the
+-variable option is used), the Tie::Watch module should be installed
+(which is by default since Tk 800.022).
+
+Send bug reports, comments and suggestions to slaven@rezic.de

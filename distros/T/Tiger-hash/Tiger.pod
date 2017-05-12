@@ -1,0 +1,63 @@
+=head1 NAME
+
+Tiger - Perl interface to the Tiger Hash Algorithm
+
+=head1 SYNOPSIS
+
+    use Tiger;
+
+    $context = new Tiger;
+    $context->reset();
+
+    $context->add(LIST);
+    $context->addfile(HANDLE);
+
+    $digest = $context->digest();
+    $string = $context->hexdigest();
+
+    $digest = $context->hash($string);
+    $string = $context->hexhash($string);
+
+=head1 DESCRIPTION
+
+The B<Tiger> module allows you to use the Tiger hash algorithm
+developed by Ross Anderson and Eli Biham in Perl programs.
+
+A new Tiger context object is created with the B<new> operation.
+Multiple simultaneous digest context can be maintained if desired.
+The context is updated with the B<add> operation which adds the
+strings contained in the I<LIST> parameter.
+
+The final message digest value is returned by the B<digest> operation
+as a 24-byte binary string. This operation delivers the result of
+operations since the last B<new> or B<reset> operation. Once the
+operation has been performed, the context must be B<reset> before
+being used to calculate another digest value.
+
+Several convenience functions are also provided. The B<addfile>
+operation takes an open file-handle and reads it until end-of file in
+8192-byte blocks adding the contents to the context. The B<hexdigest>
+operation calls B<digest> and returns the result as a printable string
+of hexadecimal digits in eight-digit groups. The B<hash> operation
+performs the complete series of steps: B<reset>, B<add>, B<digest> on
+the supplied scalar value, and returns the result as a 24-byte binary
+string. The B<hexhash> operation does the same thing, but returns the
+result in the format of the B<hexdigest> operation.
+
+=head1 NOTE
+
+The Tiger extension may be redistributed either under the GPL or the
+Perl Artistic License.  The Tiger code has been appropriated from the
+GNU Privacy Guard, and slightly modified to interface with Perl.
+
+=head1 AUTHOR
+
+The Tiger interface was written by Rafael Sevilla
+(C<dido@pacific.net.ph>), shamelessly stealing from the SHA interface
+written by Uwe Hollerbach (C<uh@alumni.caltech.edu>).
+
+For more information on Tiger see:
+
+http://www.cs.technion.ac.il/~biham/Reports/Tiger/
+
+

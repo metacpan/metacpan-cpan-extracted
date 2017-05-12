@@ -1,0 +1,41 @@
+---
+abstract: 'determine positions for hyphens inside russian words'
+author:
+  - 'Alex Kapranoff, C<< <kappa at cpan.org> >>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Hyphen-RU
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Hyphen::RU:
+    file: lib/Text/Hyphen/RU.pm
+    version: '0.12'
+requires:
+  Text::Hyphen: '0'
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/kappa/Text-Hyphen-RU/issues
+  homepage: https://github.com/kappa/Text-Hyphen-RU
+  repository: git://github.com/kappa/Text-Hyphen-RU.git
+version: '0.12'
+x_contributors:
+  - 'Alex Kapranoff <kappa@rambler-co.ru>'
+  - 'Alex Kapranoff <alex@kapranoff.ru>'

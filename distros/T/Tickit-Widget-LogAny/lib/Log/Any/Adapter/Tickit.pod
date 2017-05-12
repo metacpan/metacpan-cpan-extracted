@@ -1,0 +1,35 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Log::Any::Adapter::Tickit
+at lib/Log/Any/Adapter/Tickit.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Log::Any::Adapter::Tickit - Simple adapter for L<Tickit> logging from L<Log::Any>
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+TBD
+
+=head1 DESCRIPTION
+
+The C<log_level> attribute may be set to define a minimum level to log.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Log::Any::Adapter::Base>
+
+L<delegate_method_to_slot|Log::Any::Adapter::Base/delegate_method_to_slot>, L<new|Log::Any::Adapter::Base/new>
+
+=back

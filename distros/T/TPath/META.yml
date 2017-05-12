@@ -1,0 +1,52 @@
+---
+abstract: 'general purpose path languages for trees'
+author:
+  - 'David F. Houghton <dfhoughton@gmail.com>'
+build_requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::MoreUtils: '0'
+  MooseX::MethodAttributes: '0'
+  Test::Exception: '0'
+  Test::More: '0.88'
+  Test::Trap: '0'
+  base: '0'
+  feature: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TPath
+no_index: {}
+optional_features:
+  fc:
+    description: 'Better case normalization for Perl versions before 5.16'
+requires:
+  Exporter: '0'
+  List::Util: '0'
+  Math::Trig: '0'
+  Moose: '2.0604'
+  Moose::Role: '2.0604'
+  Moose::Util::TypeConstraints: '2.0604'
+  MooseX::MethodAttributes::Role: '0.28'
+  MooseX::SingletonMethod: '0.03'
+  POSIX: '0'
+  Regexp::Grammars: '1.026'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  aliased: '0'
+  if: '0'
+  namespace::autoclean: '0'
+  overload: '0'
+  parent: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+version: '1.007'

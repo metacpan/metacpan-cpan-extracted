@@ -1,0 +1,26 @@
+SUMMARY:
+    Term::Pager - Page through text, like more or less.
+
+INSTALLATION:
+    see the file INSTALL
+
+COPYRIGHT:
+    see the copyright notice in Pager.pm
+
+LICENSE INFORMATION:
+    This software may be copied and distributed under the terms
+    found in the Perl "Artistic License".
+
+    A copy of the "Artistic License" may be found in the standard
+    Perl distribution.
+
+DOCUMENTATION:
+    see the pod in Pager.pm
+
+WARNING:
+    this module uses Termcap, which has been deprecated
+    the Open Group, and may not be supported by your
+    operating system for much longer.
+
+AUTHOR:
+    Jeff Weisberg  - http://www.tcp4me.com/

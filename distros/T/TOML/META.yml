@@ -1,0 +1,48 @@
+---
+abstract: "Parser for Tom's Obvious, Minimal Language."
+author:
+  - 'Darren Chamberlain <darren@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TOML
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  TOML:
+    file: lib/TOML.pm
+    version: '0.97'
+requires:
+  Exporter: '5.57'
+  TOML::Parser: '0.04'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/karupanerura/toml/issues
+  homepage: https://github.com/karupanerura/toml
+  repository: git://github.com/karupanerura/toml.git
+version: '0.97'
+x_contributors:
+  - 'Sergey Romanov <Sergey.Romanov@emc.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'Darren Chamberlain <dlc@sevenroot.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'karupanerura <karupanerura@users.noreply.github.com>'
+  - 'Vickenty Fesunov <kent@setattr.net>'
+  - 'karupanerura <karupa@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

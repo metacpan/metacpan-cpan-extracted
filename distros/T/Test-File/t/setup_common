@@ -1,0 +1,59 @@
+use strict;
+
+use File::Temp qw(tempdir);
+use Test::More 0.95;
+
+my $dir = tempdir( CLEANUP => 1 ) or BAILOUT( "Could not setup temp directory" );
+
+unless( -d $dir ) {
+	mkdir 'test_files', 0700 
+		or BAILOUT( "Could not make directory! $!" );
+	}
+	
+chdir $dir or BAILOUT( "Could not change directory! $!" );
+
+my @files = qw(
+max_file       non_zero_file  not_readable   readable       zero_file
+executable     min_file       not_executable not_writeable  writeable
+mtime_file
+);
+
+foreach my $file ( @files ) {
+	open FH, "> $file";
+	close FH;
+	}
+
+{
+my $count = chmod 0644, @files;
+is( $count, scalar @files ) or BAILOUT( "Could not make files readable" );
+}
+
+{
+my $count = chmod 0400, 'readable', 'not_writeable', 'not_executable';
+is( $count, 3 ) or BAILOUT( "Could not make files readable" );
+}
+
+{
+my $count = chmod 0200, 'writeable', 'not_readable',
+		'zero_file', 'max_file', 'non_zero_file';
+is( $count, 5 ) or BAILOUT( "Could not make files writeable" );
+}
+
+{
+my $count = chmod 0100, 'executable';
+is( $count, 1 ) or BAILOUT( "Could not make files executable" );
+}
+
+truncate 'zero_file', 0;
+truncate 'max_file', 10;
+truncate 'min_file',  0;
+
+{
+open FH, '> min_file' or BAILOUT( "Could not write to min_file: $!" );
+binmode FH; #, Windows, yo!
+print FH 'x' x 40, $/, 'x' x 11, $/;
+close FH;
+}
+is( -s 'min_file', 51 + 2 * length( $/ ) );
+
+mkdir 'sub_dir', 0755 or BAILOUT( "Could not cerate subdir: $!" );

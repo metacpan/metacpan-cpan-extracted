@@ -1,0 +1,71 @@
+---
+abstract: 'Lightweight schema validator'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ThaiSchema
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::ThaiSchema:
+    file: lib/Test/ThaiSchema.pm
+  ThaiSchema:
+    file: lib/ThaiSchema.pm
+    version: '0.10'
+  ThaiSchema::Array:
+    file: lib/ThaiSchema.pm
+  ThaiSchema::Base:
+    file: lib/ThaiSchema/Base.pm
+  ThaiSchema::Bool:
+    file: lib/ThaiSchema.pm
+  ThaiSchema::Extra:
+    file: lib/ThaiSchema.pm
+  ThaiSchema::Hash:
+    file: lib/ThaiSchema.pm
+  ThaiSchema::Int:
+    file: lib/ThaiSchema.pm
+  ThaiSchema::JSON:
+    file: lib/ThaiSchema/JSON.pm
+  ThaiSchema::Maybe:
+    file: lib/ThaiSchema.pm
+  ThaiSchema::Null:
+    file: lib/ThaiSchema.pm
+  ThaiSchema::Number:
+    file: lib/ThaiSchema.pm
+  ThaiSchema::Str:
+    file: lib/ThaiSchema.pm
+requires:
+  Encode: '0'
+  Exporter: '0'
+  JSON: '2'
+  Scalar::Util: '0'
+  Test::Builder::Module: '0'
+  Test::More: '0.98'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/tokuhirom/ThaiSchema/issues
+  homepage: https://github.com/tokuhirom/ThaiSchema
+  repository: git://github.com/tokuhirom/ThaiSchema.git
+version: '0.10'
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,60 @@
+Template-Plugin-Digest-SHA1
+===========================
+
+The Digest.SHA1 Template Toolkit plugin provides access to the SHA1 algorithm 
+via the Digest::SHA1 module.  It is used like a plugin but installs filters 
+and vmethods into the current context.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these modules:
+
+  Digest::SHA1
+  Template
+  Template::Plugin
+  Template::Stash
+
+For testing the module requires these modules:
+
+  IO::File
+  Test::More
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+DEDICATION
+
+This distribution was originally created by Andrew Ford. Sadly in early 2014,
+Andrew was diagnosed with Pancreatic Cancer and passed away peacfully at home
+on 25th April 2014.
+
+One of his wishes was for his OpenSource work to continue. At his funeral, many
+of his colleagues and friends, spoke of how he felt like a person of the world, 
+and how he embrace the idea of OpenSource being for the benefit of the world.
+
+Anyone wishing to donate in memory of Andrew, please consider the following
+charities:
+
+* Dignity in Dying - http://www.dignityindying.org.uk/
+* Marie Curie Cancer Care - http://www.mariecurie.org.uk/
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2006-2014 Andrew Ford
+  Copyright (C) 2014      Barbie for Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic Licence v2.

@@ -1,0 +1,205 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [ doap-deps:on "Hash::FieldHash"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008005"^^doap-deps:CpanId ], [
+		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-suggests [
+		doap-deps:on "Types::Standard 0.004"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
+	doap-deps:test-suggests [
+		doap-deps:on "Types::Standard 0.004"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "MooseX::Types::Moose"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tie>;
+	doap:created         "2013-05-05"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Type-Tie>;
+	doap:homepage        <https://metacpan.org/release/Type-Tie>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Type-Tie";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-009>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-type-tie>;
+	];
+	doap:shortdesc       "tie a variable to a type constraint".
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Type-Tie-0.001"^^xsd:string;
+	dc:issued            "2013-05-05"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.002"^^xsd:string;
+	dc:issued            "2013-06-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Support Type::API.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.003"^^xsd:string;
+	dc:issued            "2013-09-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Implement SPLICE as part of the tied array interface.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Convert to Dist::Inkt.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix link to source code repository.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.004"^^xsd:string;
+	dc:issued            "2013-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use compiled checks and coercions when possible.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Rename the undocumented `store_value` method to `coerce_and_check_value`.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix weird bug in Perl < 5.14.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add a test case for using Type::Tie with MooseX::Types::Moose.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.005"^^xsd:string;
+	dc:issued            "2013-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Exporter::Tiny instead of Exporter::TypeTiny.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Stop using base.pm.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.006"^^xsd:string;
+	dc:issued            "2013-10-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Make Hash::FieldHash optional for Perl >= v5.9.4; use Hash::Util::FieldHash if Hash::FieldHash is unavailable.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.007"^^xsd:string;
+	dc:issued            "2014-02-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Change ttie prototype from ([\\$@%]$;@) to ([\\$@%]@).";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/haarg>;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Include my TODO list.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.008"^^xsd:string;
+	dc:issued            "2014-07-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Types::Standard and MooseX::Types::Moose are now just listed as 'suggested' for testing. (They were 'required' and 'recommended' respectively.)";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Include a test case with a simple local implementation of Type::API.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Type::Tie now passes through the type constraint's error message rather than generating its own. It will still generate its own error message if the type constraint object fails to provide a get_message method.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.009"^^xsd:string;
+	dc:issued            "2014-09-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Repackage with newer version of Dist::Inkt to fix META.json error.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/haarg>
+	a                    foaf:Person;
+	foaf:name            "Graham Knop";
+	foaf:nick            "HAARG";
+	foaf:page            <https://metacpan.org/author/HAARG>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

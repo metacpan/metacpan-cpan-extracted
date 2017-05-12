@@ -1,0 +1,24 @@
+Version 0.04 -12 May 2006
+
+* Experimental Build.PL as an alternative to make
+* Multiple selections allowed 
+* Test output (stdout and stderr) is now displayed in the error window
+
+Version 0.03 - 03 Nov 2005
+
+* Background color of progress bar now changes to red/green
+* New state "undecided" for tests
+* Bulgarian translation
+* Multiple test suites can be loaded and executed at once
+* Test suites can now be reloaded, so that changes are immediately visible
+  in the tree view
+* Test suites are now always loaded in subprocesses
+
+Version 0.02 - 27 Oct 2005
+
+* Some toolbar buttons did not work because they triggered
+  the wrong callback
+
+Version 0.01 - 26 Oct 2005
+
+* First version

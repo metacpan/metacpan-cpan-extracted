@@ -1,0 +1,25 @@
+---
+abstract: 'Use Test::Mojo roles cleanly and safely'
+author:
+  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.006, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mojo-WithRoles
+no_index:
+  directory:
+    - t
+requires:
+  Mojolicious: '4.0'
+  Role::Tiny: '0'
+resources:
+  bugtracker: http://github.com/jberger/Test-Mojo-WithRoles/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Test-Mojo-WithRoles
+version: '0.02'

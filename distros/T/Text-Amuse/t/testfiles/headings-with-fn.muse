@@ -1,0 +1,25 @@
+#title *headings with footnotes*
+
+* Part
+
+** Chapter [1]
+
+*** Section [2]
+
+**** Subsection [3]
+
+***** Sub-sub-section [4]
+
+[1] first
+
+[2] second
+
+[3] third
+
+[4] fourth
+
+
+
+
+
+

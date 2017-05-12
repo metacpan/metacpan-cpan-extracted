@@ -1,0 +1,3 @@
+ - document how wdiget methods that return widgets could be specified
+   (%methods_returning_widgets, sub widget_method_returns_widget, %ptk2tcltk)
+ - make demos/tcltkdb.pm into separate module

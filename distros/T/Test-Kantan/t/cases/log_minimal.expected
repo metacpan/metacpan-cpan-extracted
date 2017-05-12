@@ -1,0 +1,19 @@
+
+
+
+
+
+  (Diagnostic message):
+
+
+      ♨
+      2014-03-15T11:58:08 [INFO] Hey at t/cases/log_minimal.xt line 12
+         at t/cases/log_minimal.xt line 12
+
+      ✖
+      ok { 0 };
+         at t/cases/log_minimal.xt line 14
+
+
+not ok
+1..1

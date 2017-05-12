@@ -1,0 +1,1 @@
+[% USE mp3 = MP3::Tag( mp3_file ) %][% mp3.album %]

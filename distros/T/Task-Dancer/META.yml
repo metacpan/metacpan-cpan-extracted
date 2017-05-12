@@ -1,0 +1,22 @@
+---
+abstract: 'Dancer in a box'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Alberto Simoes <ambs@cpan.org>'
+build_requires:
+  Test::More: 0
+generated_by: 'Sawyer X INC. :)'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Dancer
+provides:
+  Task::Dancer:
+    file: lib/Task/Dancer.pm
+    version: 0.38
+requires:
+  perl: 5.00
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.38

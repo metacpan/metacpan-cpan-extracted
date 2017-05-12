@@ -1,0 +1,17 @@
+Revision history for TeX-Hyphen-Pattern
+
+0.04  Mon Aug 17 08:12:32
+	   Work around "x encoded carons RT#48763
+	   Work around \message in pattern so Hu.pm and De_*.pm are included
+       Made svn expand keywords
+       Tuned author tests
+
+0.03  Thu Jul 30 00:05:52 2009
+       Fixed missing TeX::Hyphen skip_all test (RT#48303)
+
+0.02  Wed Jul 29 17:20:12 2009
+       Fixed No warnings test failures (RT#48297 and RT#48298)
+
+0.01  Wed Jul 29 03:40:18 2009
+       Initial release.
+

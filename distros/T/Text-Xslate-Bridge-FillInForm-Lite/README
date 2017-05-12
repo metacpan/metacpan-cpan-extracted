@@ -1,0 +1,44 @@
+Text-Xslate-Bridge-FillInForm-Lite version 0.02
+===============================================
+
+HOW TO USE
+
+    use Text::Xslate;
+    my $tx = Text::Xslate->new(
+        module => ['Text::Xslate::Bridge::FillInForm::Lite'],
+    );
+
+    my %vars = (
+        q => { foo => "<filled value>" },
+    );
+    print $tx->render_string($tmpl, \%vars);
+
+    # in your template
+    : block form | fillinform($q) -> {
+    <form action="">
+        <input name="foo" type="" tyep="text" />
+        <textarea id="" name="bar" rows="10" cols="30"></textarea>
+    </form>
+    : }
+
+INSTALLATION
+
+To install this module type the following:
+
+    cpanm Text::Xslate::Bridge::FillInForm::Lite
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Text::Xslate
+  HTML::FillInForm::Lite
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Yoshihiro Sasaki
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

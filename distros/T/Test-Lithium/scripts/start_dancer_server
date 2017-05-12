@@ -1,0 +1,3 @@
+#!/bin/bash
+
+perl $(git rev-parse --show-toplevel)/t/dance.pm start

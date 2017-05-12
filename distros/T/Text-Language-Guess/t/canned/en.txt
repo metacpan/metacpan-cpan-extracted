@@ -1,0 +1,4 @@
+Hey Bill,
+
+just had an idea on how you could conventiently provide the level/threshold
+functionality we talked about yesterday.

@@ -1,0 +1,23 @@
+PASS
+   PASS:1
+   FAIL:0
+Parsing ./t/samples/test02.html: PASS
+  PAGES:1
+   PASS:1
+   FAIL:0
+    NET:0
+PASS
+   PASS:1
+   FAIL:0
+Parsing ./t/samples/test03.html: FAIL
+:17: validity error : ID test3 already defined
+  <input id="test3" name="test4" type="text" value="" />
+                                                      ^
+
+  PAGES:1
+   PASS:0
+   FAIL:1
+    NET:0
+FAIL
+   PASS:0
+   FAIL:1

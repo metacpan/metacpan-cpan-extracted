@@ -1,0 +1,12 @@
+#title Break the list
+
+Normal text.
+
+      - bullet item one
+      - bullet item two
+
+An enumerated list follows.
+
+      1. Enum item one
+      2. Enum item two
+

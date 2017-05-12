@@ -1,0 +1,26 @@
+
+Changes made in Sense-Clusters version 0.59 during version 0.61
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+
+1. removed <!DOCTYPE corpus SYSTEM  "lexical-sample.dtd"> from             -Anagha
+   Demos/eng-lex-samp.evaluation.xml.gz and               
+   Demos/eng-lex-sample.training.xml.gz
+
+2. Scripts/traverse.sh was moved to Docs/HTML/ during v0.57                -Anagha     
+   but was not removed from here. So removed it.                           
+
+3. Added an entry for README.user_data.pod under man pages section         -Anagha
+   Makefile.PL
+
+4. Modified the files containing Amruta's previous email-id and            -Anagha     
+   University.                                                  
+
+5. Modified the Docs/Flows/flowchart.fig and Docs/Flows/flowchart.pdf      -Anagha     
+   to reflect the addition of format_clusters.pl                                                   
+
+6. Updated the version information in  Toolkit/evaluate/report.pl          -Anagha     
+
+(Changelog-v0.59to0.61 Last Updated on 01/19/2005 by Anagha)

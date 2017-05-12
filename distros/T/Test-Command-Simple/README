@@ -1,0 +1,53 @@
+Test-Command-Simple
+
+This test module is intended to simplify testing of external commands.
+It does so by running the command under IPC::Open3, closing the stdin
+immediately, and reading everything from the command's stdout and stderr.
+It then makes the output available to be tested.
+
+It is not (yet?) as feature-rich as Test::Cmd, but I think the
+interface to this is much simpler.  Tests also plug directly into the
+Test::Builder framework, which plays nice with Test::More.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Command
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Command-Simple
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Command-Simple
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Command-Simple
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Command-Simple/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Darin McBride
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

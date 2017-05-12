@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Test-CGI-Untaint
+version: 1.10
+license: perl
+distribution_type: module
+requires:
+  CGI::Untaint: 0.82
+  Test::Builder: 0
+recommends: {}
+build_requires:
+  Test::Builder::Tester: 0.09
+conflicts: {}
+provides:
+  Test::CGI::Untaint:
+    file: lib/Test/CGI/Untaint.pm
+    version: 1.10
+generated_by: Module::Build version 0.18_02

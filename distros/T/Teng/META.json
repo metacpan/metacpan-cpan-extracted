@@ -1,0 +1,175 @@
+{
+   "abstract" : "very simple DBI wrapper/ORMapper",
+   "author" : [
+      "Atsushi Kobayashi  C<< <nekokak __at__ gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Teng",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "DBIx::Tracer" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.00",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0.05",
+            "Class::Load" : "0.06",
+            "DBI" : "1.33",
+            "DBIx::Inspector" : "0.06",
+            "DBIx::TransactionManager" : "1.06",
+            "Data::Page" : "0",
+            "Data::Page::NoTotalEntries" : "0.02",
+            "SQL::Maker" : "0.14",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "File::Temp" : "0",
+            "Test::Mock::Guard" : "0.10",
+            "Test::More" : "0.96",
+            "Test::Requires" : "0",
+            "Test::SharedFork" : "0.15"
+         }
+      }
+   },
+   "provides" : {
+      "Teng" : {
+         "file" : "lib/Teng.pm",
+         "version" : "0.28"
+      },
+      "Teng::Iterator" : {
+         "file" : "lib/Teng/Iterator.pm"
+      },
+      "Teng::Plugin::BulkInsert" : {
+         "file" : "lib/Teng/Plugin/BulkInsert.pm"
+      },
+      "Teng::Plugin::Count" : {
+         "file" : "lib/Teng/Plugin/Count.pm"
+      },
+      "Teng::Plugin::FindOrCreate" : {
+         "file" : "lib/Teng/Plugin/FindOrCreate.pm"
+      },
+      "Teng::Plugin::Lookup" : {
+         "file" : "lib/Teng/Plugin/Lookup.pm"
+      },
+      "Teng::Plugin::Pager" : {
+         "file" : "lib/Teng/Plugin/Pager.pm"
+      },
+      "Teng::Plugin::Pager::MySQLFoundRows" : {
+         "file" : "lib/Teng/Plugin/Pager/MySQLFoundRows.pm"
+      },
+      "Teng::Plugin::Replace" : {
+         "file" : "lib/Teng/Plugin/Replace.pm"
+      },
+      "Teng::Plugin::SQLPager" : {
+         "file" : "lib/Teng/Plugin/SQLPager.pm"
+      },
+      "Teng::Plugin::SingleBySQL" : {
+         "file" : "lib/Teng/Plugin/SingleBySQL.pm"
+      },
+      "Teng::QueryBuilder" : {
+         "file" : "lib/Teng/QueryBuilder.pm"
+      },
+      "Teng::Row" : {
+         "file" : "lib/Teng/Row.pm"
+      },
+      "Teng::Schema" : {
+         "file" : "lib/Teng/Schema.pm"
+      },
+      "Teng::Schema::Declare" : {
+         "file" : "lib/Teng/Schema/Declare.pm"
+      },
+      "Teng::Schema::Dumper" : {
+         "file" : "lib/Teng/Schema/Dumper.pm"
+      },
+      "Teng::Schema::Loader" : {
+         "file" : "lib/Teng/Schema/Loader.pm"
+      },
+      "Teng::Schema::Table" : {
+         "file" : "lib/Teng/Schema/Table.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nekokak/p5-Teng/issues"
+      },
+      "homepage" : "https://github.com/nekokak/p5-Teng",
+      "repository" : {
+         "url" : "git://github.com/nekokak/p5-Teng.git",
+         "web" : "https://github.com/nekokak/p5-Teng"
+      }
+   },
+   "version" : "0.28",
+   "x_authority" : "cpan:NEKOKAK",
+   "x_contributors" : [
+      "Yuki Ibe <yibe@yibe.org>",
+      "libkenta <libkenta@gmail.com>",
+      "Masahiro Honma <hiratara@cpan.org>",
+      "makamaka <makamaka.donzoko@gmail.com>",
+      "Nishibayashi Takuji <takuji@senchan.jp>",
+      "zentooo <ankerasoy@gmail.com>",
+      "Atsushi Kobayashi <nekokak _at_ gmail dot com>",
+      "Tomohiro Hosaka <bokutin@bokut.in>",
+      "issm <issmxx@gmail.com>",
+      "Atsushi Kato <ktat@cpan.org>",
+      "ktat <ktat.is@gmail.com>",
+      "Kazuhiro Osawa <yappo@shibuya.pl>",
+      "Masahiro Chiba <chiba@everqueue.com>",
+      "Jun Kuriyama <kuriyama@s2factory.co.jp>",
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "k-sato <k-sato@mfac.jp>",
+      "Asato Wakisaka <caaov627@hcn.zaq.ne.jp>",
+      "ITO Nobuaki <daydream.trippers@gmail.com>",
+      "karupanerura <karupa@cpan.org>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Geraud CONTINSOUZAS <geraud@hyaku.nijuu.nana>",
+      "moznion <moznion@gmail.com>",
+      "nobuoka <nobuoka@vividcode.info>",
+      "Kazuho Oku <kazuhooku@gmail.com>",
+      "Ichito Nagata <i.nagata110@gmail.com>",
+      "Atsushi Kobayashi <nekokak@gmail.com>",
+      "kawamuray <kawamuray.dadada@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "Songmu <y.songmu@gmail.com>",
+      "aereal <aereal@aereal.org>",
+      "Daisuke Maki <lestrrat+github@gmail.com>",
+      "cho45 <cho45@lowreal.net>"
+   ]
+}

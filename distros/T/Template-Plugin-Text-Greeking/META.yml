@@ -1,0 +1,30 @@
+---
+abstract: 'Text::Greeking interface in Template'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Template::Plugin::Text::Greeking
+name: Template-Plugin-Text-Greeking
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Template: 2.22
+  Text::Greeking: 0.12
+  Text::Greeking::zh_TW: 1
+  UNIVERSAL::require: 0.13
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.0

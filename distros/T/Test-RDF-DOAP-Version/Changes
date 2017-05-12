@@ -1,0 +1,57 @@
+Test-RDF-DOAP-Version
+=====================
+
+Created:      2011-10-03
+Home page:    <https://metacpan.org/release/Test-RDF-DOAP-Version>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Test-RDF-DOAP-Version>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.010	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.009	2013-05-19
+
+ [ Bug Fixes ]
+ - Explicitly load URI::file.
+
+ [ Packaging ]
+ - General tidy-up.
+
+0.008	2012-07-06
+
+ [ Packaging ]
+ - Bump RDF::TriN3 dependency to 0.202.
+
+0.007	2012-07-05	Bond, James Bond
+
+ [ Packaging ]
+ - Bump RDF::TriN3 dependency to 0.201.
+
+0.006	2012-07-04
+
+ [ Bug Fixes ]
+ - Ooops, forgot to 'use RDF::TrineX::Parser::Pretdsl'.
+
+0.005	2012-07-04
+
+ - Updated: Support changelogs written in Pretdsl.
+
+0.004	2011-12-04
+
+ [ Bug Fixes ]
+ - Newer version of Module::Package::RDF
+
+0.003	2011-11-27
+
+ - Better diagnostic messages if the test fails.
+ - Updated: use 5.010
+ - Updated: use parent instead of base.
+
+0.002	2011-10-06
+
+ [ Packaging ]
+ - Upgrade Module::Package::RDF version.
+
+0.001	2011-10-06	Initial release

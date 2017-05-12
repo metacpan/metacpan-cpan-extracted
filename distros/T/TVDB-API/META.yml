@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                TVDB-API
+version:             0.33
+abstract:            API to www.thetvdb.com
+license:             ~
+author:              
+    - Behan Webster <behanw@websterwood.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Compress::Zlib:                0
+    DBM::Deep:                     0
+    Debug::Simple:                 0
+    IO::Uncompress::Unzip:         0
+    LWP:                           0
+    Test::More:                    0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

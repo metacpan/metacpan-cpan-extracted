@@ -1,0 +1,45 @@
+---
+name: Test-Distribution
+version: 2.00
+author:
+  - 'Marcel GrE<uuml>nauer <marcel@cpan.org>'
+abstract: perform tests on all modules of a distribution
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  ExtUtils::Manifest: 1.43
+  File::Find::Rule: 0.03
+  Module::CoreList: 1.93
+  Pod::Coverage: 0.17
+  Test::More: 0.45
+  Test::Pod: 0.95
+  Test::Pod::Coverage: 0
+provides:
+  Test::Distribution:
+    file: lib/Test/Distribution.pm
+    version: 2.00
+  Test::Distribution::base:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::description:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::exports:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::manifest:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::pod:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::podcover:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::prereq:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::sig:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::use:
+    file: lib/Test/Distribution.pm
+  Test::Distribution::versions:
+    file: lib/Test/Distribution.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

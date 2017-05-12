@@ -1,0 +1,54 @@
+slides{
+slide{
+  em{Slidez}
+
+  A simple way to write slides.
+  \---;
+  Eric Wilhelm
+  http://scratchcomputing.com
+}
+slide{
+  This is a slide. 
+}
+slide{ This is another slide.  }
+slide{
+  This slide has a point
+
+  * simple
+  * bullets
+    * like em{so}
+      * see
+  * yay
+    * whee
+    * fun
+      * yep
+}
+slide{
+  Simple:
+
+  # TODO actually just load this file instead of explaining the present
+  # failure of the nested fatquote?  This manual recursion is confusing
+  # anyway.
+  pre{{{
+    slidez{
+      slide{This is a slide.}
+      slide{This is another slide.}
+      slide{
+        Simple:
+
+        pre{{{
+          slidez{
+            slide{This is a slide.}
+            ...
+          }
+        &#125;}}
+      }
+    }
+  }}}
+}#slide;
+slide{
+  pre{
+    <html>blah</html>
+  }
+}
+}#slides;

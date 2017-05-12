@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/simple.t
+t/simple_nocache.t
+t/testpod.t
+t/pod_coverage.t
+lib/Tree/Binary/Dictionary.pm
+META.yml                                 Module meta-data (added by MakeMaker)

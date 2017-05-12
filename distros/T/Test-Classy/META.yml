@@ -1,0 +1,30 @@
+---
+abstract: 'write your unit tests in other modules than *.t'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Classy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Data::Inheritable: '0'
+  Class::Inspector: '0'
+  Data::Dump: '0'
+  Encode: '0'
+  Module::Find: '0'
+  Sub::Install: '0'
+  Term::Encoding: '0'
+  Test::More: '0.47'
+  Test::UseAllModules: '0.09'
+version: '0.10'

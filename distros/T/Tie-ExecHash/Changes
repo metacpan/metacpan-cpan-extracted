@@ -1,0 +1,7 @@
+Revision history for Perl extension Tie::ExecHash.
+
+0.91  2011-08-22
+        - Module management moved, updated to dzil
+
+0.90  2005-09-25
+        - Seperated from the Volity project and packaged for the CPAN.

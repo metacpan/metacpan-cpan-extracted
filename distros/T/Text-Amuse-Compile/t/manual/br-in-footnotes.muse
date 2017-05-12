@@ -1,0 +1,36 @@
+#title Test br in fn !@#$%^&*() _Đć_;'"{}[]
+#subtitle My subject /again/ !@#$%^&*() _Đć_
+#author !@#$%^&*() _Đć_;'"{}[]
+#topics !@#$%^&*() _Đć_;'"{}[]; !@#$%^&__*() _Đć_;'"{}[]
+
+This is a line [1] with [2] some [3] footnotes [4]
+
+#internal
+Link here
+
+* This is a title [5] with [6] some [7] footnotes [8]
+
+blabla
+
+ | hello [9] | there |
+
+
+[[#internal][internal link]]
+
+[1] [first]
+
+[2] 0
+
+[3] <br>[second]<br>[third]<br>0<br>Hello.
+
+[4] {second}<br>{third}<br>0<br>Hello.
+
+[5] [first]
+
+[6] 0
+
+[7] <br>[second]<br>[third]<br>0<br>Hello.
+
+[8] {second}<br>{third}<br>0<br>Hello.
+
+[9] [brackets] <br> [brackets] <br>0<br>

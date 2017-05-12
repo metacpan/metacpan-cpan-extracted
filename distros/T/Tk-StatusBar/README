@@ -1,0 +1,44 @@
+Tk-StatusBar version 0.04
+=========================
+
+Tk-Statusbar is a composit Tk widget derived from a Tk-Frame.  The
+statusbar can be split up into any number of sections.  A section
+can contain either a label or a progress bar.  Each section can
+also be configured with a fixed width or a variable width.  Events
+can be bound to sections providing interactivity with the statusbar.
+The statusbar can also be hidden restored.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or
+
+   Just put the StatusBar.pm file somewhere where Perl can find it.
+   The StatusBar is written in pure perl.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Shawn Zabel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

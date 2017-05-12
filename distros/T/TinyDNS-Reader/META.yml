@@ -1,0 +1,30 @@
+---
+abstract: 'Parser for TinyDNS records.'
+author:
+  - 'Steve Kemp <steve@steve.org.uk>'
+build_requires:
+  Test::More: '0'
+  Test::NoTabs: '0'
+  Test::Pod: '0'
+  Test::Strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TinyDNS-Reader
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/skx/TinyDNS--Reader/issues
+  homepage: https://github.com/skx/TinyDNS--Reader/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/skx/TinyDNS--Reader.git
+version: v0.7.7

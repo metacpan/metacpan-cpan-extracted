@@ -1,0 +1,45 @@
+---
+abstract: 'Common Lightweight Markup Language Interface'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v0.9.0, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Markup-Any
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Markup::Any:
+    file: lib/Text/Markup/Any.pm
+    version: 0.04
+recommends:
+  Text::Markdown::Hoedown: 1.00
+requires:
+  Class::Load: 0
+  Text::Markdown: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/Songmu/p5-Text-Markup-Any/issues
+  homepage: https://github.com/Songmu/p5-Text-Markup-Any
+  repository: git://github.com/Songmu/p5-Text-Markup-Any.git
+version: 0.04
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'

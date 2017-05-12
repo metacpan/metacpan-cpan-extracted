@@ -1,0 +1,52 @@
+Revision history for Tapper-TestSuite-Benchmark-Perl-Formance
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-21
+        - sync with release version
+
+4.0.3     2012-09-04
+        - other plugins during test
+
+4.0.2     2012-08-16
+        - fix script/ -> bin/
+
+4.0.1     2012-05-16
+        - verbosity
+        - use moreinfor-url
+        - big Dist::Zilla roundhouse kick
+
+2012-01-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.5
+
+	* even less verbose, with extreme prejudice, *sigh*
+
+2012-01-01  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* less verbose (because it might break TAP output)
+
+2011-11-22  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.3
+
+	* Bummer! Fix wrong pathname and missing metainfo.
+
+2011-11-22  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.2
+
+	* polishing:
+	- special hostname mapping for perlformance.net Æsthetics
+	- perl version in testsuite name
+	- fix script path to be rewritable
+
+2011-08-12  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.1
+
+	* initial version
+

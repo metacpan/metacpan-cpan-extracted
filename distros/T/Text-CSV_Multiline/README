@@ -1,0 +1,36 @@
+Text-CSV_Multiline version 0.02
+===============================
+
+This is a very simple comma-separated-value (CSV) file reader
+and writer. At the time it was created, the standard Text::CSV
+module could not handle fields that had embedded newline codes, thus
+this module was written which could handle "multiple lines" in a
+single CSV field.
+
+It appears that newer versions of Text::CSV have added the capability,
+though I have not tested it to see if it meets my needs. Anyway, I
+already have several projects that use this module, so I am maintaining
+this for just a little longer.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007,2011 by Jason Long, Messiah College.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

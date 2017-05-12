@@ -1,0 +1,2 @@
+[% repeat = repeat || 1; 'a' | repeat(repeat) %]
+

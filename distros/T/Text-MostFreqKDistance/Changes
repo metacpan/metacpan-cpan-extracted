@@ -1,0 +1,27 @@
+Revision history for Text::MostFreqKDistance
+
+0.07  Fri Apr 07 11:40:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
+0.06  Tue Feb 14 11:55:00 2017
+      - Added test scripts (t/meta-json.t and t/meta-yml.t)
+      - Updated copyright year information.
+
+0.05  Sat Jan 21 20:00:00 2017
+      - Added key 'provides' to the Makefile.PL script.
+
+0.04  Tue Mar 31 10:25:00 2015
+      - Added the missing line 'use strict; use warnings;'.
+
+0.03  Mon Mar 30 11:40:00 2015
+      - Updated unit test data slightly.
+      - Added package variable $AUTHORITY.
+      - Fixed the typo in the pod document.
+      - Added more code to the pod document.
+      - Tidied up pod document in general.
+
+0.02  Sun Mar 29 19:20:00 2015
+      - Added link to source wikipedia in the pod document.
+
+0.01  Sun Mar 29 16:00:00 2015
+      - Module Created.

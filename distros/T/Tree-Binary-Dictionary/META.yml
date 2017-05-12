@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tree-Binary-Dictionary
+version:      1.01
+version_from: lib/Tree/Binary/Dictionary.pm
+installdirs:  site
+requires:
+    Tree::Binary:                  0.07
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

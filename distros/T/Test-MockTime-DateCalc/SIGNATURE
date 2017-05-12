@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 d0aa7402751c214b565689a76b60559cfcafa969 Changes
+SHA1 22f4eff92c8a9bb1967649ccc13094e0c13e92b3 MANIFEST
+SHA1 6c771cc4b0718f7bc9c9af01889700d7bce0a8e6 MANIFEST.SKIP
+SHA1 27a2eb8f6dbb09f47de7ec6ee14086245f95fd01 META.yml
+SHA1 4d716b669b02413e4664b5f38e7c02c2cd62195f Makefile.PL
+SHA1 309044456700a4ef4fb44b461f88bee4a790614d debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 67c9d82a70309827e36159e1cf55453986d2b11a debian/control
+SHA1 a4f8c88b4c20dbf408ffd256c620aeacf443dc4f debian/copyright
+SHA1 64387edf011ddf9f71485e3855685316521e6a82 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 9e6239e564723d8d60e6f9c9aeb4e8750f61fe13 debian/watch
+SHA1 cfc9ee431c4718e4cedae268105166cd2913b459 devel/override.pl
+SHA1 c8dbb9c088fd0cc35f4a0cbeeefb564d331aa9ef devel/redef.pl
+SHA1 2cab46dff2a866e274de80ab685c6e303216e16e devel/run.pl
+SHA1 36afa8e9f1412e42a369f270e59064730fd4a89f devel/time-fake.pl
+SHA1 87075c402668d4079ba8f8da52225a5ffec89235 devel/time-mock.pl
+SHA1 c373c65e950669e3183ca0fb530704598602c26e devel/time-warp.pl
+SHA1 cf647ee28a7aaad9896d0063f8a2529919ccfcd3 inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 4cf9c5c684b6c5a1ab6c9413465a5dbe927e2c55 lib/Test/MockTime/DateCalc.pm
+SHA1 ecb616d32267d0c246327730e167758a81920fe7 t/DateCalc.t
+SHA1 26b1132f206f9ad56b4d1958b76275888bf6ef60 t/MockTime.t
+SHA1 36b8eba56c87d62b1b41959187c717577dc16fa5 t/MyTestHelpers.pm
+SHA1 47dbd3b4638adbe0b864659e5da9f8220df71d87 t/not-before.t
+SHA1 46e026443a8c8885b4b83199a485878feb662653 t/sub-identify.t
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFNUJLeLFMCIV9q3ToRAq4UAJ9A0/ePSxNKw9FZLAs+7HN4Mu+LiQCgpP9W
+k6o91+qJtCd4TO3KtCYyzjg=
+=qjy1
+-----END PGP SIGNATURE-----

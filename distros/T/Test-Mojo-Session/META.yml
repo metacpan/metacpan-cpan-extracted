@@ -1,0 +1,40 @@
+---
+abstract: 'Testing session in Mojolicious applications'
+author:
+  - 'Andrey Khozov, C<avkhozov@googlemail.com>.'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.141170'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mojo-Session
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Mojo::Session:
+    file: lib/Test/Mojo/Session.pm
+    version: '1.04'
+requires:
+  Mojolicious: '4.82'
+resources:
+  bugtracker: https://github.com/avkhozov/Test-Mojo-Session/issues
+  homepage: https://github.com/avkhozov/Test-Mojo-Session
+  repository: git://github.com/avkhozov/Test-Mojo-Session.git
+version: '1.04'
+x_authority: cpan:AVKHOZOV
+x_contributors:
+  - 'Renee <reb@perl-services.de>'
+  - 'Andrey Khozov <avkhozov@gmail.com>'

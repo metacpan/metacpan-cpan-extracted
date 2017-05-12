@@ -1,0 +1,31 @@
+Term::Animation
+============================
+
+This module provides a framework to produce sprite animations using
+ASCII art. Each ASCII 'sprite' is given one or more frames, and
+placed into the animation as an 'animation entity'. An animation
+entity can have a callback routine that controls the position and
+frame of the entity. The module can also do collision detection
+between entities.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Curses
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Kirk Baucom L<kbaucom@schizoid.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,487 @@
+%{
+use Data::Dumper;
+use TM;
+use TM::Literal;
+
+use constant LEFT  => 'http://psi.tm.bond.edu.au/astma/1.0/#psi-left';
+use constant RIGHT => 'http://psi.tm.bond.edu.au/astma/1.0/#psi-right';
+
+my $tracing = 0;
+
+%}
+
+%token ISA
+%token BN
+%token OC
+%token IN
+%token SIN
+%token COMMENT
+%token STRING
+%token EOL
+%token ID
+%token REIFIES
+%token ISREIFIED
+%token ISINDICATEDBY
+%token LOG
+%token CANCEL
+%token TRACE
+%token ENCODING
+%token COLON
+%token LPAREN
+%token RPAREN
+%token LBRACKET
+%token RBRACKET
+%token AT
+
+%%
+
+maplet_definitions : #empty
+                   | maplet_definitions maplet_definition
+                   | maplet_definitions template_definition EOL
+                   | maplet_definitions COMMENT EOL
+                   | maplet_definitions LOG EOL             { warn "Logging $_[2]"; }
+                   | maplet_definitions CANCEL EOL          { die  "Cancelled"; }
+                   | maplet_definitions TRACE EOL           { $tracing = $_[2]; warn "# start tracing: level $tracing"; }
+                   | maplet_definitions ENCODING EOL        {
+		                                              use Encode;
+							      Encode::from_to ($_[0]->YYData->{INPUT}, "iso-8859-1", $_[2]);
+							     }
+;
+
+maplet_definition  : topic_definition
+                   | association_definition
+                   | EOL
+;
+
+topic_definition  : ID types reification_indication inline_assocs EOL
+                    {
+			$_[1] = $_[0]->{USER}->{store}->internalize ($_[1]);
+
+			if (ref $_[3]) {                                                   # we have reification info
+			    if (     $_[3]->[0] == 1) {                                    # 1 = REIFIES, means current ID is a shorthand for the other
+				$_[0]->{USER}->{store}->internalize ($_[1] => $_[3]->[1]); 
+			    } elsif ($_[3]->[0] == 0) {                                    # 0 = IS-REIFIED, this must be the other way round
+				$_[0]->{USER}->{store}->internalize ($_[3]->[1] => $_[1]);
+			    } elsif ($_[3]->[0] == 2) {                                    # 2 = ISINDICATEDBY, add the subject indicators
+				$_[0]->{USER}->{store}->internalize ($_[1] => \ $_[3]->[1]);
+			    } else {
+				die "internal fu**up";
+			    }
+			}
+			# assert instance/class
+                        if (@{$_[2]}) {
+			    $_[0]->{USER}->{store}->assert ( map { bless
+								       [ undef, 
+									 undef, 
+									 'isa', 
+									 undef,
+									 [ 'class', 'instance' ], 
+									 [ $_, $_[1] ], 
+									 ], 'Assertion' }  
+							     @{$_[2]} );
+			}
+			{                                                                     # memorize the types should be a 'topic'
+                                                                                              # at the end (see end of parse)
+			    my $implicits = $_[0]->{USER}->{implicits};
+			    map { $implicits->{'isa-thing'}->{$_}++ } 
+			             (@{$_[2]}, $_[1]);                                       # the types and the ID are declared implicitely
+			}
+			
+			if (ref $_[4]) {                                                      # there are inline assocs
+			    foreach (@{$_[4]}) {
+				my $type      = $_->[0];
+				my $player    = $_->[1];
+				my $store     = $_[0]->{USER}->{store};
+				my $templates = $_[0]->{USER}->{templates};
+				if ($type eq 'is-subclass-of' || $type eq 'subclasses') {
+				    $store->assert (bless [ undef,                            # LID
+							    undef,                            # SCOPE
+							    'is-subclass-of',                 # TYPE
+							    TM->ASSOC,                        # KIND
+							    [ 'subclass',  'superclass' ],    # ROLES
+							    [ $_[1],       $player ],         # PLAYERS
+							    undef ], 'Assertion' );
+				} elsif ($type eq 'is-a') {
+				    $store->assert (bless [ undef,                   	      # LID
+							    undef,                   	      # SCOPE
+							    'isa',                  	      # TYPE
+							    TM->ASSOC,        	              # KIND
+							    [ 'instance', 'class' ], 	      # ROLES
+							    [ $_[1],       $player ],	      # PLAYERS
+							    undef ], 'Assertion' );
+				} elsif ($type eq 'has-a') {                                  # same, but other way round
+				    $store->assert (bless [ undef,                   	      # LID
+							    undef,                   	      # SCOPE
+							    'isa',               	      # TYPE
+							    TM->ASSOC,        	              # KIND
+							    [ 'instance', 'class' ], 	      # ROLES
+							    [ $player,     $_[1] ],	      # PLAYERS
+							    undef ], 'Assertion' );
+				} elsif ($templates->tids ( $type ) &&
+					 (my @ts    = $templates->match (TM->FORALL, type => $templates->tids ( $type )  ))) {
+				    warn "duplicate template for '$type' found (maybe typo?), taking one" if @ts > 1;
+				    my $t = $ts[0];                                           # I choose one
+				    $store->assert (bless [ undef,                   	      # LID
+							    undef,                   	      # SCOPE
+							    $type,               	      # TYPE
+							    TM->ASSOC,              	      # KIND
+							    [  	                              # ROLES
+							      map {
+								  my $l = $templates->toplet ($_)->[TM->ADDRESS];
+								  ($l && $l eq LEFT ?
+							                 $_[1]
+								   :
+							           ($l && $l eq RIGHT ?
+                                                                         $player
+                                                                   :
+								         $_)
+							          )
+							          } @{$t->[TM->ROLES]} 
+						            ],
+						            [                       	      # PLAYERS
+							      map {
+							         my $l = $templates->toplet ($_)->[TM->ADDRESS];
+							         ($l && $l eq LEFT ?
+							                $_[1]
+							          :
+							          ($l && $l eq RIGHT ?
+                                                                        $player
+                                                                  :
+								        $_)
+							          )
+							          } @{$t->[TM->PLAYERS]} 
+						           ],
+							    undef ], 'Assertion' );
+				} else {
+				    die "unknown association type '$type' in inlined association";
+				}
+			    }
+			}
+			warn "added toplet $_[1]" if $tracing;
+		     }
+                       characteristics_indication
+                        {
+#warn "char/ind in topic: ".Dumper $_[7];
+                        my $id = $_[1];
+                        # add assertions for every characteristic
+                        $_[0]->{USER}->{store}->assert ( map {bless [ undef,                                          # LID
+								       $_->[1],                                       # SCOPE
+								       $_->[2] ||                                     # TYPE
+								       ($_->[0] == TM->NAME ? 'name' : 'occurrence'),
+								       $_->[0],                                       # KIND
+								       [ 'thing', 'value' ],                          # ROLES
+								       [ $id,             $_->[3] ],                  # PLAYERS
+								       undef ], 'Assertion' }
+							  @{$_[7]->[0]} );
+
+                        map { $store->internalize ($id => \ $_ ) } @{$_[7]->[1]};       # add the subject indicators
+
+			{                                                               # memorize basename types and scopes as implicitely defined
+			    my $implicits = $_[0]->{USER}->{implicits};
+			    map { $implicits->{'isa-scope'}->{$_}++ }
+                            map { $_->[1] }
+                            grep ($_->[1], @{$_[7]->[0]});                              # get the bloody scopes and tuck them away
+
+			    map { $implicits->{'subclasses'}->{ $_->[0] == TM->NAME ? 'name' : 'occurrence' }->{$_->[2]}++ }
+                            grep ($_->[2], @{$_[7]->[0]});                              # get all the characteristics with types
+			}
+			warn "added ".(scalar @{$_[7]->[0]})."characteristics for $_[1]" if $tracing > 1;
+		    }
+;
+
+reification_indication     : # empty
+                           | REIFIES       ID                        { [ 1, $_[2] ] }            # 0, 1, 2 are just local encoding, nothing relevant 
+                           | ISREIFIED     ID                        { [ 0, $_[2] ] }
+                           | ISINDICATEDBY ID                        { [ 2, $_[2] ] }
+;
+
+types                      :                                         { [] }                      # empty
+                           | types type                              { push @{$_[1]}, @{$_[2]}; $_[1] }
+;
+
+type                       : ISA ID                                  { [ $_[2] ] }
+                           | LPAREN ids RPAREN                       {   $_[2]   }
+;
+
+characteristics_indication : # empty
+                           | characteristics_indication  characteristic_indication
+                                                                     { push @{$_[1]->[ ref($_[2]) eq 'ARRAY' ? 0 : 1 ]}, $_[2]; $_[1] }
+;                                                                    # do not tell me this is not cryptic, it fast, though
+                                                                     # if we get a characteristic back, then it is a list ref, then we add it to $_[1]->[0]
+                                                                     # if we get a subject indication back, then it is a scalar, so we add it to $_[1]->[1]
+characteristic_indication  : characteristic
+                           | indication
+;
+
+indication                 : SIN           { $_[0]->{USER}->{string} ||= "\n" } string           
+                                                                     { $_[3] }                   # TODO: replace with ID?
+;
+
+characteristic             : class { $_[0]->{USER}->{string} ||= "\n" } 
+                             scope char_type string                  {                           # check whether we are dealing with URIs or strings
+				                                       if ($_[1] == TM->NAME) {  # names are always strings
+									   $_[5] = new TM::Literal  ($_[5], TM::Literal->STRING);
+								       } elsif ($_[5] =~ /^\w+:\S+$/) { # can only be OCC, but is it URI?
+									   $_[5] = new TM::Literal  ($_[5], TM::Literal->URI);
+								       } else {                  # occurrence and not a URI -> string
+									   $_[5] = new TM::Literal  ($_[5], TM::Literal->STRING);
+								       }
+## warn "char ".Dumper [ $_[1], $_[3], $_[4], $_[5] ];
+								      [ $_[1], $_[3], $_[4], $_[5] ]
+								      }
+;
+
+class                      : BN                                      { TM->NAME  }
+                           | OC                                      { TM->OCC  }
+                           | IN                                      { TM->OCC  }
+;
+
+char_type                  : # empty
+                           | assoc_type
+;
+
+assoc_type                 : LPAREN ID RPAREN                        {   $_[2]   }
+;
+
+scope                      : # empty
+                           | AT ID                                   { $_[2] }
+;
+
+
+inline_assocs              : # empty
+                           | inline_assocs inline_assoc              { push @{$_[1]}, $_[2]; $_[1] }
+;
+
+inline_assoc               : ID ID                                   { [ $_[1], $_[2] ] }
+;
+
+template_definition        : LBRACKET 
+                                      { ($_[0]->{USER}->{templates}, $_[0]->{USER}->{store}) = ($_[0]->{USER}->{store}, $_[0]->{USER}->{templates}); }
+                                                                         # flag that we are inside a template
+                             association_definition
+                                      { ($_[0]->{USER}->{templates}, $_[0]->{USER}->{store}) = ($_[0]->{USER}->{store}, $_[0]->{USER}->{templates}); }
+                             #RBRACKET                                   # consumed by members already
+;
+
+association_definition     : LPAREN ID RPAREN scope reification_indication EOL
+                             association_members
+                             {
+##warn "members ".Dumper $_[5];
+## ??? TODO SCOPE ????
+			       my (@roles, @players);
+			       foreach my $m (@{$_[7]}) {                 # one member
+				   my $role = shift @$m;                  # first is role
+				   
+				   while (@$m) {
+				       push @roles, $role;                # roles repeat for every player
+				       my $player = shift @$m;
+				       push @players, $player;
+				   }
+			       }
+			       my ($a) = $_[0]->{USER}->{store}->assert (bless [ undef, $_[4], $_[2], TM->ASSOC, \@roles, \@players, undef ], 'Assertion');
+##warn "templates" .Dumper $_[0]->{USER}->{store};
+                              { # reification
+				  my $ms = $_[0]->{USER}->{store};
+				  if (ref $_[5]) {
+				      if ($_[5]->[0] == 1) {                   # 1 = REIFIES, 0 = IS-REIFIED
+					  # (assoc) reifies http://.... means
+					  #     1) the assoc will be addes as thing (is done already)
+					  #     2) the http:// will be used as one subject indicator
+					  die "reifier of association must be a URI" unless $_[5]->[1] =~ /^\w+:.+/;
+					  $ms->internalize ($a->[TM::LID], $_[5]->[1]);
+				      } elsif ($_[5]->[0] == 0) {              # something reifies this assoc
+					  # (assoc) is-reified-by xxx   means
+					  #     1) assoc is added as thing (is done already)
+					  #     2) the local identifier is added as thing with the abs URL of the assoc as subject address
+					  die "reifier must be local identifier" unless $_[5]->[1] =~ /^[A-Za-z][A-Za-z0-9_\.-]+$/;
+					  $ms->internalize ($_[5]->[1] => $a);
+				      } else { # this would be 'indication' but we do not want that here
+					  die "indication for associations are undefined";
+				      }
+				  }
+			      }
+
+			       { # memorize that association type subclasses association
+#				   my $implicits = $_[0]->{USER}->{implicits};
+
+# implicit			   $implicits->{'subclasses'}->{'association'}->{$_[2]}++;
+				   $_[0]->{USER}->{implicits}->{'isa-scope'}->{$_[4]}++ if $_[4];
+			       }
+			       warn "added assertion $_[2]" if $tracing;
+			   }
+;
+
+association_members        : member                           {                       [ $_[1] ] }
+                           | association_members member       { push @{$_[1]}, $_[2];   $_[1]  }
+;
+
+member                     : ID COLON ids1 eom                { [ $_[1], @{$_[3]} ] }
+;
+
+eom                        : EOL                              # normal assoc
+                           | RBRACKET EOL                     # in case we are inside a template
+;
+
+ids1                       : ids ID                           { push @{$_[1]}, $_[2]; $_[1] }
+;
+
+ids                        :                                  { [] } # empty
+                           | ids ID                           { push @{$_[1]}, $_[2]; $_[1] }
+;
+
+string                     : STRING EOL { die "empty string in characteristics" unless $_[1]; $_[1] }
+;
+
+%%
+
+sub _Error {
+    die "Syntax error: Found ".$_[0]->YYCurtok." but expected ".join (' or ', $_[0]->YYExpect);
+}
+
+use constant CHUNK_SIZE => 32000;
+
+sub _Lexer {
+    my $parser = shift;
+    my $yydata = $parser->YYData;
+
+    if (length ($yydata->{INPUT}) < 1024 && $yydata->{OFFSET} < $yydata->{TOTAL}) { 
+	$yydata->{INPUT}  .= substr ($yydata->{RESERVE}, $yydata->{OFFSET}, CHUNK_SIZE);
+	$yydata->{OFFSET} += CHUNK_SIZE;
+    }
+    my $refINPUT = \$yydata->{INPUT};
+
+    my $aux;                                                                           # need this to store identifier/uri prefix for optimization
+
+    $$refINPUT                                        or  return ('',          undef);
+    $$refINPUT =~ s/^[ \t]+//so;
+
+#warn "lexer ($parser->{USER}->{string}):>>>".$parser->YYData->{INPUT}."<<<";
+
+    $$refINPUT =~ s/^\n//so                           and return ('EOL',       	   undef);
+    $$refINPUT =~ s/^in\b(?![\.-])//o                 and return ('IN',        	   undef);
+    $$refINPUT =~ s/^rd\b(?![\.-])//o                 and return ('IN',        	   undef);
+    $$refINPUT =~ s/^oc\b(?![\.-])//o                 and return ('OC',        	   undef);
+    $$refINPUT =~ s/^ex\b(?![\.-])//o                 and return ('OC',        	   undef);
+    $$refINPUT =~ s/^bn\b(?![\.-])//o                 and return ('BN',        	   undef);
+
+    $$refINPUT =~ s/^sin\b(?![\.-])//o                and return ('SIN',       	   undef);
+    $$refINPUT =~ s/^is-a\b(?![\.-])//o               and return ('ISA',       	   undef);
+    $$refINPUT =~ s/^reifies\b(?![\.-])//o            and return ('REIFIES',   	   undef);
+    $$refINPUT =~ s/^=//o                             and return ('REIFIES',   	   undef);
+    $$refINPUT =~ s/^is-reified-by\b(?![\.-])//o      and return ('ISREIFIED', 	   undef);
+    $$refINPUT =~ s/^~//o                             and return ('ISINDICATEDBY', undef);
+
+    if (my $t = $parser->{USER}->{string}) {                                           # parser said we should expect a string now, defaults terminator to \n
+##warn "scanning for string (..$t..) in ...". $$refINPUT . "....";
+	$$refINPUT =~ s/^:\s*<<<\n/:/o                and                              # we know it better, it is <<<
+	    $t = "\n<<<\n";
+
+	$$refINPUT =~ s/^:\s*<<(\w+)\n/:/o            and                              # we know it better, it is <<SOMETHING
+	    $t = "\n<<$1\n";
+
+##warn "try finding string ..$t..  " ;
+	$$refINPUT =~ s/^:\s*(.*?)\s*$t/\n/s          and 
+##            (warn "returning $1" or 1) and
+	    (undef $parser->{USER}->{string}          or  return ('STRING',    $1));
+##warn "no string";
+    }
+
+    $$refINPUT =~ s/^://o                             and return ('COLON',     undef);
+
+## unfortunately, this does not what I want
+##  $$refINPUT =~ s/^([A-Za-z][A-Za-z0-9_-]*)(?!:)//o and return ('ID',        $1); # negative look-ahead
+## tricky optimization: don't ask
+    $$refINPUT =~ s/^([A-Za-z][.A-Za-z0-9_-]*)//o     and $aux = $1                 # save this for later
+	                                              and $$refINPUT !~ /^:[\w\/]/
+                                                      and return ('ID',        $aux);
+
+    $$refINPUT =~ s/^\(//so                           and return ('LPAREN',    undef);
+    $$refINPUT =~ s/^\)//so                           and return ('RPAREN',    undef);
+    $$refINPUT =~ s/^@//so                            and return ('AT',        undef);
+
+    $$refINPUT =~ s/^(:[^\s\)\(\]\[]+)//o             and return ('ID',        $aux.$1); # is a URL/URN actually
+
+    $$refINPUT =~ s/^(\d{4}-\d{1,2}-\d{1,2})(\s+(\d{1,2}):(\d{2}))?//o
+                                                      and return ('ID',        sprintf "urn:x-date:%s:%02d:%02d", $1, $3 || 0, $4 || 0); # is a date
+
+    $$refINPUT =~ s/^%log\s+(.*?)(?=\n)//so           and return ('LOG',       $1); # positive look-ahead
+    $$refINPUT =~ s/^%cancel\s*(?=\n)//so             and return ('CANCEL',    $1); # positive look-ahead
+    $$refINPUT =~ s/^%trace\s+(.*?)(?=\n)//so         and return ('TRACE',     $1); # positive look-ahead
+    $$refINPUT =~ s/^%encoding\s+(.*?)(?=\n)//so      and return ('ENCODING',  $1); # positive look-ahead
+
+    $$refINPUT =~ s/^\*//o                            and return ('ID',        sprintf "uuid-%010d", $TM::toplet_ctr++); ## $parser->{USER}->{topic_count}++);
+
+    $$refINPUT =~ s/^\[//so                           and return ('LBRACKET',  undef);
+    $$refINPUT =~ s/^\]//so                           and return ('RBRACKET',  undef);
+    # should not be an issue except on error
+    $$refINPUT =~ s/^(.)//so                          and return ($1,          $1);
+
+}
+
+sub parse {
+    my $self  = shift;
+    $_        = shift;
+
+    s/\r\n/\n/sg;
+    s/\r/\n/sg;
+    s/(?<!\\)\\\n//sg;       						# a \, but not a \\
+    s/ \~ /\n/g;             						# replace _~_ with \n
+    s/ \~\~ / \~ /g;         						# stuffed ~~ cleanout
+    s/^\#.*?\n/\n/mg;        						# # at the start of every line -> gone
+    s/\s\#.*?\n/\n/mg;       						# anything which starts with <blank># -> gone
+    s/(?<!\\)\\\#/\#/g;      						# but # can be escaped with a single \, as in \#
+    s/\n\n\n+/\n\n/sg;       						# canonicalize line break (line count is gone already)
+
+    # we not only capture what is said EXPLICITELY in the map, we also collect implicit knowledge
+    # we could add this immediately into the map at parsing, but it would slow the process down and
+    # it would probably duplicate/complicate things
+    $self->{USER}->{implicits} = {
+	'isa-thing'  => undef,                                          # just let them spring into existence
+	'isa-scope'  => undef,                                          # just let them spring into existence
+	'subclasses' => undef
+	};
+                                                                        # clone a pseudo map into which to store templates as assocs temporarily
+    $self->{USER}->{templates} = new TM (baseuri => $self->{USER}->{store}->baseuri);
+
+    $self->YYData->{INPUT}   = '';
+    $self->YYData->{RESERVE} = $_;                                      # here we park the whole string
+    $self->YYData->{TOTAL}   = length ($_);                             # this is how much we have in the reserve
+    $self->YYData->{OFFSET}  = 0;                                       # and we start at index 0
+
+    eval {
+	$self->YYParse ( yylex => \&_Lexer, yyerror => \&_Error );
+    }; if ($@ =~ /^Cancelled/) {
+	warn $@;                                                        # de-escalate Cancelling to warning
+    } elsif ($@) {
+	die $@;                                                         # otherwise re-raise the exception
+    }
+
+
+    { # resolving implicit stuff
+	my $implicits = $self->{USER}->{implicits};
+	my $store     = $self->{USER}->{store};
+
+	{ # all super/subclasses
+	    foreach my $superclass (keys %{$implicits->{'subclasses'}}) {
+		$store->assert ( map {
+		    bless [ undef, undef, 'is-subclass-of', TM->ASSOC, [ 'superclass', 'subclass' ], [ $superclass, $_ ] ], 'Assertion' 
+		    }  keys %{$implicits->{'subclasses'}->{$superclass}});
+	    }
+#warn "done with subclasses";
+	}
+	{ # all things in isa-things are THINGS, simply add them
+##warn "isa things ".Dumper [keys %{$implicits->{'isa-thing'}}];
+	    $store->internalize (map { $_ => undef } keys %{$implicits->{'isa-thing'}});
+	}
+	{ # establishing the scoping topics
+	    $store->assert (map {
+                                 bless [ undef, undef, 'isa', TM->ASSOC, [ 'class', 'instance' ], [ 'scope', $_ ] ], 'Assertion' 
+				 } keys %{$implicits->{'isa-scope'}});
+	}
+    }
+
+    return $self->{USER}->{store};
+}
+
+#my $f = new TM::AsTMa::Fact;
+#$f->Run;

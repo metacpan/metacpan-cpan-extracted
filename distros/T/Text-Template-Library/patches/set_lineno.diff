@@ -1,0 +1,45 @@
+--- t/14-broken.t~	2008-04-17 01:39:41.000000000 +0200
++++ t/14-broken.t	2008-07-04 21:33:41.000000000 +0200
+@@ -3,7 +3,7 @@
+ 
+ use Text::Template;
+ 
+-print "1..5\n";
++print "1..6\n";
+ 
+ $n=1;
+ 
+@@ -76,6 +76,18 @@
+     print "ok $n\n";
+   } else {
+     print "not ok $n\n# $r\n";
++  }
++  $n++;
++}
++
++# (6) set lineno
++{ my $r = Text::Template->new(TYPE => 'string',
++                              SOURCE => '{#line 10}{1/0}',
++                             )->fill_in();
++  if ($r eq q{Program fragment delivered error ``Illegal division by zero at template line 10.''}) {
++    print "ok $n\n";
++  } else {
++    print "not ok $n\n# $r\n";
+   }
+   $n++;
+ }
+--- lib/Text/Template.pm~	2008-07-04 18:51:44.000000000 +0200
++++ lib/Text/Template.pm	2008-07-04 21:27:32.000000000 +0200
+@@ -191,7 +191,11 @@
+ 	$ERROR = "Unmatched close brace at line $lineno";
+ 	return undef;
+       } elsif ($depth == 0) {
+-	push @content, [$state, $cur_item, $prog_start] if $cur_item ne '';
++	if ($cur_item =~ /^#line (\d+)$/) {
++	  $lineno = $1;
++	} elsif ($cur_item ne '') {
++	  push @content, [$state, $cur_item, $prog_start];
++	}
+ 	$state = 'TEXT';
+ 	$cur_item = '';
+       } else {

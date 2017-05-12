@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+
+# fileman
+# Scott Bronson
+# 8 Dec 2003
+
+# This file shows how to use Term::ShellUI to create a simple
+# command-line environment.  It is similar to fileman.c, the
+# example that comes with the GNU Readline library.
+
+# This file is released under the MIT license.
+
+use strict;
+use lib '../lib';
+use Term::ShellUI;
+use File::stat qw(:FIELDS);
+use Cwd;
+
+
+# Prevents us from doing anything harmful.
+# Have it return 1 to live on the edge.
+sub danger
+{
+    print "Not performing task -- too dangerous!\n";
+    return 0;
+}
+
+
+my $term = new Term::ShellUI(commands => get_commands());
+$term->prompt(sub { getcwd() . " FM> " });
+$term->run();
+
+sub get_commands
+{
+    return {
+        "cd" =>     { desc => "Change to directory DIR",
+                      args => sub { shift->complete_onlydirs(@_); },
+                      maxargs => 1,
+                      proc => sub { chdir($_[0] || $ENV{HOME} || $ENV{LOGDIR}) or print("Could not cd: $!\n") } },
+        "delete" => { desc => "Delete FILEs",
+                      args => sub { shift->complete_onlyfiles(@_); },
+                      minargs => 1,
+                      proc => sub { danger() && (unlink(@_) or warn "Could not delete: $!\n") } },
+        "?" =>      { syn => "help" },
+        "help" =>   { desc => "Print helpful information",
+                      args => sub { shift->help_args(undef, @_); },
+                      meth => sub { shift->help_call(undef, @_); } },
+        "ls" =>     { syn => "list" },
+        "dir" =>    { syn => "ls" },
+        "list" =>   { desc => "List files in DIRs",
+                      args => sub { shift->complete_onlydirs(@_); },
+                      proc => sub { system('ls', '-FClg', @_); } },
+        "pwd" =>    { desc => "Print the current working directory",
+                      maxargs => 0,
+                      proc => sub { system('pwd'); } },
+        "quit" =>   { desc => "Quit using Fileman",
+                      maxargs => 0,
+                      meth => sub { shift->exit_requested(1); } },
+        "rename" => { desc => "Rename FILE to NEWNAME",
+                      args => sub { shift->complete_files(@_); },
+                      minargs => 2, maxargs => 2,
+                      proc => sub { danger() && system('mv', @_); } },
+        "stat" =>   { desc => "Print out statistics on FILEs",
+                      args => sub { shift->complete_files(@_); },
+                      proc => \&print_stats },
+        "cat" =>    { syn => "view" },
+        "view" =>   { desc => "View the contents of FILEs",
+                      args => sub { shift->complete_onlyfiles(@_); },
+                      proc => sub { system('cat', @_); } },
+# these demonstrate how parts of Term::ShellUI work:
+        echo =>     { desc => "Echoes the command-line arguments",
+                      proc => sub { print join(" ", @_), "\n"; } },
+        tok =>      { desc => "Print command-line arguments with clear separations",
+                      proc => sub { print "<" . join(">, <", @_), ">\n"; } },
+        debug_complete => { desc => "Turn on completion debugging",
+                      minargs => 1, maxargs => 1, args => "0=off 1=some, 2=more, 3=tons",
+                      proc => sub { $term->{debug_complete} = $_[0] },
+                    },
+    };
+}
+
+sub print_stats
+{
+    for my $file (@_) {
+        stat($file) or die "No $file: $!\n";    # die only stops this command
+        print "$file has $st_nlink link" . ($st_nlink==1?"":"s") .
+            ", and is $st_size byte" . ($st_size==1?"":"s") . " in length.\n";
+        print "Inode Last change at: " . localtime($st_ctime) . "\n";
+        print "      Last access at: " . localtime($st_atime) . "\n";
+        print "    Last modified at: " . localtime($st_mtime) . "\n";
+    }
+}
+

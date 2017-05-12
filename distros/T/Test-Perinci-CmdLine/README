@@ -1,0 +1,20 @@
+SEE ALSO
+
+    Supported Perinci::CmdLine backends: Perinci::CmdLine::Inline,
+    Perinci::CmdLine::Lite, Perinci::CmdLine::Classic.
+
+ENVIRONMENT
+
+ DEBUG => bool
+
+    If set to 1, then temporary files (e.g. generated scripts for testing)
+    will not be cleaned up, so you can inspect them.
+
+ TEST_PERICMD_EXCLUDE_TAGS => str
+
+    To set default for pericmd_ok()'s exclude_tags argument.
+
+ TEST_PERICMD_INCLUDE_TAGS => str
+
+    To set default for pericmd_ok()'s include_tags argument.
+

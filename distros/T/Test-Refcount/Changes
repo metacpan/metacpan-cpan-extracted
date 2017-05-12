@@ -1,0 +1,37 @@
+Revision history for Test-Refcount
+
+0.08    2014/03/27 16:10:38
+        [CHANGES]
+         * Optional integration with Devel::MAT if available, to heapdump the
+           running unit test for later analysis
+
+0.07    CHANGES:
+         * Use pureperl core B module rather than Devel::Refcount, for
+           avoiding XS in the deptree of a Test module
+
+0.06    CHANGES:
+         * Optionally use Devel::FindRef but don't depend on it being
+           installed. Removes the need to install it on smoke testers and have
+           it fail.
+
+0.05    CHANGES:
+         * Added 'use warnings'
+         * Various small updates to keep CPANTS happy
+
+0.04    BUGFIXES:
+         * Skip regexp count tests on perl 5.11 because of ongoing issue with
+           refcounts there.
+
+0.03    BUGFIXES:
+         * Updated regexps in test code to account for change in
+           Devel::FindRef's output format at version 1.4
+           (fixes http://rt.cpan.org/Public/Bug/Display.html?id=41487)
+
+0.02    CHANGES:
+         * Use Devel::FindRef to print a trace of references if the assert
+           fails.
+         * Much extended documentation, showing a likely use case and example
+           of broken code.
+
+0.01    First version, released on an unsuspecting world.
+

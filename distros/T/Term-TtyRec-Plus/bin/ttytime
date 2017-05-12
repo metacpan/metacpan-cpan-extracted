@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Term::TtyRec::Plus;
+
+use Getopt::Long;
+
+sub usage {
+    my ($exit) = @_;
+
+    my $out = $exit ? \*STDERR : \*STDOUT;
+
+    print { $out }
+          "$0 [-c <delay_clamp>] <ttyrec_files>\n";
+
+    exit($exit);
+}
+
+my $clamp;
+GetOptions(
+    'clamp=f' => \$clamp,
+    'help'    => sub { usage(0) },
+) || usage(1);
+
+for my $file (@ARGV) {
+    my $ttyrec = Term::TtyRec::Plus->new(
+        infile => $file,
+        (defined($clamp)
+            ? (time_threshold => $clamp)
+            : ()),
+    );
+    my $time = 0;
+    while (my $frame_ref = $ttyrec->next_frame) {
+        $time += $frame_ref->{diff};
+    }
+    printf("%7d\t%s\n", int($time), $file);
+}
+
+__END__
+
+=head1 NAME
+
+ttytime - calculate length of ttyrec files
+
+=head1 SYNOPSIS
+
+  ttytime [-c <delay_clamp>] <ttyrec_files>
+
+=head1 DESCRIPTION
+
+Outputs the length in seconds of each C<ttyrec> file given as input. For
+instance:
+
+  $ ttytime *.ttyrec
+     1234 foo.ttyrec
+    23425 bar.ttyrec
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--clamp> (C<-c>)
+
+Set the maximum delay between any two frames in the ttyrec. If unset, there is
+no maximum.
+
+=back
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy at tozt dot net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+
+=cut

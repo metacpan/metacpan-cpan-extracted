@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:               Test-MultiProcess
+version:            0.01
+abstract:           Run identical code in multiple fork'ed processes
+author:
+    - Danny Brian <garron@corp.verio.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    POSIX:  Cache::FastMmap
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

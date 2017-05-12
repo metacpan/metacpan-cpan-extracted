@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-Statistics-GreekAndCoptic.t
+lib/Text/Statistics/GreekAndCoptic.pm
+META.yml                                 Module meta-data (added by MakeMaker)

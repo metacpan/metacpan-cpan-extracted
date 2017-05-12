@@ -1,0 +1,2 @@
+<%= Dumper [ $foo, \%bar, @baz] %>
+<%* t/data/monolith-3.tts %>

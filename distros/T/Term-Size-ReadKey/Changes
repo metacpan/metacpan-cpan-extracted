@@ -1,0 +1,15 @@
+Revision history for Perl distribution Term-Size-ReadKey.
+
+0.03  Thu Feb 28 2008
+        - reconciliated dist with 5.005 (thanks, Slaven Rezic)
+        - we still cheat in tests
+
+0.02  Wed Feb 27 2008
+        - borrowed the rewritten basic test from Term-Size-Perl
+          (Jul 1 2007)
+        - applied an ugly cheat to test just like Term::ReadKey
+          actually does (set COLUMNS and LINES environment variables)
+
+0.01  Mon May 29 2006
+        - first release to CPAN
+

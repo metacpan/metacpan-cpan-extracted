@@ -1,0 +1,1 @@
+<!ELEMENT p (#PCDATA|a|ul|b|i|em)*>

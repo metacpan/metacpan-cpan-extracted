@@ -1,0 +1,45 @@
+0.10 2015-09-25T15:16:58+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Fix LICENSE file.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.09 2013-11-07
+ - Add minimal Perl version.
+
+0.08 2013-10-21
+ - Add new tests for multiple escaped characters in parsing.
+ - Fix parsing multiple escaped characters.
+
+0.07 2013-10-18
+ - Add new tests for multiple escaped characters in input data.
+ - Fix serializing multiple escaped characters in input data.
+
+0.06 2013-09-21
+ - Add LICENSE file.
+ - Add SIGNATURE file.
+ - Add Test::NoWarnings to tests.
+ - Rename CHANGES to Changes.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.05 2012-07-17
+ - Update build system.
+ - Update META.yml to right values.
+
+0.04 2012-07-16
+ - Add examples/ directory.
+ - Fix Makefile.PL to META 1.4.
+
+0.03 2011-10-16
+ - Test::Pod not usable in Perl lesser then 5.8.0. Fix this.
+
+0.02 2011-09-06
+ - Add test comment.
+ - Doc improvement.
+ - Add examples to doc.
+
+0.01 2011-07-22
+ - First version.

@@ -1,0 +1,39 @@
+The file tree does not contain the src/win subdirectory of gnuplot.
+
+Somebody with access to Win* machines should copy these files to gnuterm/win,
+and tune gnuterm/Makefile.PL to compile them...
+
+=====================
+
+On OS/2 x_exec requires USE_MOUSE: in fact pm_exec require OS2_IPC,
+and x_exec does not tolerate it...
+
+Retrofit tkcanvas.c into the new version;
+
+tkcanvas test was not working on OS/2;
+
+PM terminal leaks fill color between fillbox()
+[see the commented fillbox() call in test.pl].
+
+X terminal does not take fillpattern % 7...  GD does.
+
+Buffer overrun in PM's setpalette().
+
+use strict, -w
+
+use_maxcolors : the terminal driver will not use more colors than that
+		(to create another palette later...)
+positive:	unused (other than translate gray -> 1-gray before setcolor).
+
+gif: now separate from png (old gd)...
+
+-DPIPE_IPC needed outside of OS/2.
+==> x11.trm: mouse_setting not accessible
+
+x11 exec, missing symbols:
+   pipe_died
+   pipe_died_handler
+   GE_pending
+   buffered_output_pending
+
+PM term leaks if PIPE_IPC on server start (input_from...)

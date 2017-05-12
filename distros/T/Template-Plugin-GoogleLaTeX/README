@@ -1,0 +1,68 @@
+Template-Plugin-GoogleLaTeX
+
+Render LaTeX equations using Google's Chart API
+
+Generates an image tag to render the given LaTeX equation using Google's
+chart API. See
+http://code.google.com/apis/chart/docs/gallery/formulas.html.
+
+    [%- USE GoogleLaTeX -%]
+    <p>[%- FILTER latex
+        alt = '[ Utility maximization ]',
+        title = 'Utility maximization',
+        class = 'display',
+        style = 'border:3px outset #dde; padding:16px;',
+        id = 'umax',
+        height = 100,
+        color = 'fa1111',
+        fill = 'bg,lg,20,ddddee,1,1111ff,0'
+    -%]
+    \begin{eqnarray}
+    \max U(x,y) & = & \ln x + \ln y \\
+    \mathrm{s.t.} & & p_xx + p_yy = I \\
+    & & x \geq 0, y \geq 0
+    \end{eqnarray}
+    [%- END -%]
+    </p>
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Template::Plugin::GoogleLaTeX
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Plugin-GoogleLaTeX
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Template-Plugin-GoogleLaTeX
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Template-Plugin-GoogleLaTeX
+
+    Search CPAN
+        http://search.cpan.org/dist/Template-Plugin-GoogleLaTeX/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 A. Sinan Unur
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

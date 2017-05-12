@@ -1,0 +1,35 @@
+0.08 2016-08-27T10:51:31+02:00
+ - Update minimum Perl version to right Module::Install way. Fix number?
+
+0.07 2016-08-26T10:50:21+02:00
+ - Update minimal version of Perl to 5.8.3. In this version of Perl is
+   scalar %hash functional.
+
+0.06 2016-08-25T23:23:18+02:00
+ - Next fix of #117194 :-) - Change in `scalar %hash` was between 5.25.2
+   and 5.25.3 perl versions.
+
+0.05 2016-08-25T20:26:48+02:00
+ - Fix DEPENDENCIES section in doc.
+ - Revert last fix of #117194. Fix test on perl gt v5.25.0.
+ - Update copyright years.
+
+0.04 2016-08-25T13:27:04+02:00
+ - Fix #117194 ("scalar(%hash)" return signature changed).
+
+0.03 2015-09-25T15:30:18+02:00
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.02 2014-12-06T18:06:55+01:00
+ - Add Error::Pure::Utils to dependencies.
+ - Add comments to tests.
+ - Add tests for TIEHASH.
+ - Add tests for Test::NoWarnings.
+ - Fix test for scalar() method (#100706 Possible hash randomization
+   problems in test suite). Thanks Slaven Rezić.
+ - Update LICENSE AND COPYRIGHT section in doc.
+
+0.01 2014-11-27T20:00:34+01:00
+ - First version.

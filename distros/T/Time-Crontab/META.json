@@ -1,0 +1,80 @@
+{
+   "abstract" : "parser for crontab date and time field",
+   "author" : [
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-Crontab",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Set::Crontab" : "1.03",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Time::Local" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Time::Crontab" : {
+         "file" : "lib/Time/Crontab.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Time-Crontab/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Time-Crontab",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Time-Crontab.git",
+         "web" : "https://github.com/kazeburo/Time-Crontab"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Barbie <barbie@missbarbell.co.uk>",
+      "Martin Barth <martin@senfdax.de>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

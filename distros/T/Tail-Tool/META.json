@@ -1,0 +1,127 @@
+{
+   "abstract" : "Tool for sophisticated tailing of files",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tail-Tool",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Output" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Linux::Inotify2" : "0",
+            "Pod::Coverage" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Spelling" : "0"
+         },
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Impl::Perl" : "0",
+            "AnyEvent::Loop" : "0",
+            "File::HomeDir" : "0",
+            "Getopt::Alt" : "v0.1.1",
+            "IO::Prompt" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Usage" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::Spinner" : "0",
+            "TryCatch" : "0",
+            "YAML" : "0",
+            "perl" : "5.006",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tail::Tool" : {
+         "file" : "lib/Tail/Tool.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::File" : {
+         "file" : "lib/Tail/Tool/File.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::Plugin::GroupLines" : {
+         "file" : "lib/Tail/Tool/Plugin/GroupLines.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::Plugin::Highlight" : {
+         "file" : "lib/Tail/Tool/Plugin/Highlight.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::Plugin::Ignore" : {
+         "file" : "lib/Tail/Tool/Plugin/Ignore.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::Plugin::Match" : {
+         "file" : "lib/Tail/Tool/Plugin/Match.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::Plugin::Replace" : {
+         "file" : "lib/Tail/Tool/Plugin/Replace.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::Plugin::Spacing" : {
+         "file" : "lib/Tail/Tool/Plugin/Spacing.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::PostProcess" : {
+         "file" : "lib/Tail/Tool/PostProcess.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::PreProcess" : {
+         "file" : "lib/Tail/Tool/PreProcess.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::Regex" : {
+         "file" : "lib/Tail/Tool/Regex.pm",
+         "version" : "v0.4.7"
+      },
+      "Tail::Tool::RegexList" : {
+         "file" : "lib/Tail/Tool/RegexList.pm",
+         "version" : "v0.4.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tail::Tool"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/Tail-Tool.git"
+      }
+   },
+   "version" : "v0.4.7",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

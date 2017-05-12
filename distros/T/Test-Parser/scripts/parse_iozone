@@ -1,0 +1,267 @@
+#!/usr/bin/perl -w
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+#========================================================================
+#
+# parse_iozone
+#
+# DESCRIPTION
+#
+# Tool for parsing iozone data files in different ways, and creating
+# reports, graphs, etc. from them.
+#
+# AUTHOR
+#   Bryce W. Harrington <bryce@bryceharrington.org>
+#
+# COPYRIGHT
+#   Copyright (C) 2006 Bryce W. Harrington
+#   All Rights Reserved.
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#========================================================================
+
+use strict;
+use warnings;
+use Test::Parser::iozone;
+use Pod::Usage;
+use Getopt::Long qw(:config no_ignore_case bundling); ;
+
+#------------------------------------------------------------------------
+# User config area
+#------------------------------------------------------------------------
+
+our $opt_version      = 0;    # Prints the version and exits
+our $opt_help         = 0;    # Prints a brief help message
+our $opt_helplong     = 0;    # Prints a long help message
+our $opt_man          = 0;    # Prints a manual page (detailed help)
+our $opt_debug        = 0;    # Prints debug messages
+our $opt_2d_plot      = 0;    # Basic plots for each run
+our $opt_3d_plot      = 0;    # 3D plots for each run (Unimplemented)
+our $opt_hist_plot    = 0;    # Historical plots of all runs 
+our $opt_comp_plot    = 0;    # Comparison type plot
+our @opt_comp_names   = ();   # Names of data sets being compared
+our @opt_file_sizes   = (64,1024,16384,262144); # file sizes in kb's
+our @opt_record_sizes = (64); # record sizes in kb's
+our $opt_no_summary   = 0;    # Suppress general summary report
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           "version|V",        
+           "help|h",           
+           "helplong|H",       
+           "man|",             
+           "debug|D=i",        
+           "2d-plot|p",
+           "3d-plot",
+           "hist-plot",
+           "comp-plot|c",
+           "comp-names|n=s@"   => \@opt_comp_names,,
+           "file-sizes|f=i@"   => \@opt_file_sizes,
+           "record-sizes|r=i@" => \@opt_record_sizes,
+           "no-summary|N",
+           ) or pod2usage(-verbose => 0, -exitstatus => 0);
+
+version_and_exit() if $opt_version;
+pod2usage(-verbose => 0, -exitstatus => 0) if $opt_help;
+pod2usage(-verbose => 1, -exitstatus => 0) if $opt_helplong;
+
+@opt_comp_names = split(/,/, join(',', @opt_comp_names));
+@opt_file_sizes = split(/,/, join(',', @opt_file_sizes));
+@opt_record_sizes = split(/,/, join(',', @opt_record_sizes));
+
+#========================================================================
+# Subroutines
+#------------------------------------------------------------------------
+
+=head2 version_and_exit()
+
+Displays text describing the version of the script
+
+=cut
+
+sub version_and_exit
+{
+    my $NAME = $0;
+    my $VERSION = Test::Parser::iozone->VERSION;
+    print "$NAME.  Test::Parser::iozone version $VERSION\n";
+    print "Copyright (C) 2006 Bryce W. Harrington <bryce\@bryceharrington.org>\n";
+    print "This program is free software; you can redistribute it and/or\n";
+    print "modify it under the same terms as Perl itself.\n";
+    exit(0);
+}
+
+sub main {
+    my @parsers;
+
+    if (@ARGV<1) {
+        push @ARGV, \*STDIN;
+    }
+
+    INPUT:  foreach my $input (@ARGV) {
+        my $retval = Test::Parser::END_OF_RECORD;
+        my $input_stream;
+
+        # If the user has specified multi-record operation, we can't
+        # rely on T:P:iozone's file open code and must work with 
+        # streams, because we'll be creating multiple T:P:iozone 
+        # objects per file.  
+
+        # Open the file for streaming
+        if (ref($input)) {
+            $input_stream = $input;
+            warn "Parsing input stream...\n" if $opt_debug>0;
+        } elsif (-f $input) {
+            if (! open(FILE, "<$input")) {
+                warn "Could not open $input for reading: $!\n";
+                next INPUT;
+            }
+            $input_stream = \*FILE;
+        } else {
+            warn "Parsing file '$input'...\n" if $opt_debug>0;
+        }
+
+        # Now iterate over the contents of the stream as long as
+        # there are more records
+        while ($retval == Test::Parser::END_OF_RECORD){
+            my $parser = new Test::Parser::iozone
+                or die "Couldn't create Test::Parser::iozone object\n";
+            $retval = $parser->parse($input_stream);
+
+            # This is a total hack, but we can do better once TRPI is implemented...
+            if ($opt_hist_plot && !ref($input) 
+                && $input =~ m#^(.*)/test_output/iozone.log$#) {
+                my $rundir = $1;
+                my $profile = "$rundir/run_profile.txt";
+                my $kernelname = `grep -e ^pkg_file= $profile`;
+                $kernelname =~ s/^pkg_file=//;
+                $kernelname =~ s/\.diff$//;
+
+                $parser->name($kernelname);
+            }
+
+            if ($retval) {
+                push @parsers, $parser;
+                warn "Finished parsing record\n" if $opt_debug>1;
+            } elsif (!ref($input)) {
+                warn "Could not parse log file '$input'.\n";
+            } else {
+                warn "Could not parse input stream.\n";
+            }
+
+        }
+
+    }
+
+    # ------------------------------------------------------------
+    # Generate report(s) from the parsed data
+    # ------------------------------------------------------------
+
+    # Generate basic per-run plots
+    if ($opt_2d_plot) {
+        # If multiple files were parsed, only plot the first one
+        my $p = $parsers[0];
+        $p->plot_2d();
+
+    }
+
+    # Generate 3D plots
+    if ($opt_3d_plot) {
+        # If multiple files were parsed, only plot the first one
+        my $p = $parsers[0];
+        $p->plot_3d();
+    }
+
+    # Historical performance report
+    if ($opt_hist_plot) {
+        # Given a selected set of data points (@opt_file_sizes, @opt_record_sizes),
+        # generate graph showing the given data point from each run,
+        # with X axis being the software version, and Y being Kbytes/sec
+
+        Test::Parser::iozone::historical_plot(\@parsers, \@opt_file_sizes, \@opt_record_sizes);
+    }
+
+    # Generate comparison report of two or more runs
+    #  E.g., NFSv3 vs. NFSv4, or different filesystem types, or ...
+    if ($opt_comp_plot) {
+        if (@parsers < 2) {
+            warn "Error:  --comparison report requires at least 2 valid runs\n";
+        } elsif (@parsers != @opt_comp_names) {
+            warn "Error:  Names must be specified for each run.\n";
+            warn "        Use --comp-names=name1,name2,...\n"
+        } else {
+            Test::Parser::iozone::comparison_plot(\@parsers, \@opt_comp_names, 
+                                                  \@opt_file_sizes, \@opt_record_sizes);
+        }
+    }
+
+    # Generate general summary (text) report
+    if (! $opt_no_summary) {
+        warn "Printing summary report\n" if $opt_debug>2;
+        print Test::Parser::iozone::summary_report(\@parsers);
+    }
+
+    return 0;
+}
+
+exit(main());
+
+__END__
+
+=head1 NAME
+
+B<parse_iozone> - Generates reports and graphs from Iozone test results
+
+
+=head1 SYNOPSIS
+
+parse_iozone [options] <iozone-log>
+
+  Options:
+   -V, --version=boolean         Prints the version and exits
+   -h, --help=boolean            Prints a brief help message
+   -H, --helplong=boolean        Prints a long help message
+       --man=boolean             Prints a manual page (detailed help)
+   -D, --debug=integer           Prints debug messages
+
+=head1 DESCRIPTION
+
+treport - Generates reports from test results
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Prints the version and exits
+
+=item B<-h>, B<--help>
+
+Prints a brief help message
+
+=item B<-H>, B<--helplong>
+
+Prints a long help message
+
+=item B<--man>
+
+Prints a manual page (detailed help)
+
+=item B<-D> I<D>, B<--debug>=I<D>
+
+Prints debug messages
+
+=back
+
+See B<treport> -h for a summary of options.
+
+
+=head1 PREREQUISITES
+
+L<Pod::Usage>,
+L<Getopt::Long>,
+L<Test::Parser::iozone>
+
+

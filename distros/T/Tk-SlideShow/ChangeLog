@@ -1,0 +1,11 @@
+1999-07-27  Olivier Bouteille  <bouteille@dial.oleane.com>
+
+	* SlideShow/Sprite.pm: integrating slaven patch for NT.
+
+	*  (oli): avoiding non scalabled font
+
+1999-06-29  Olivier Bouteille  <bouteille@dial.oleane.com>
+
+	* todo: moving to cvs : done
+	using changelog techno : done
+

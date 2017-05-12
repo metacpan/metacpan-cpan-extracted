@@ -1,0 +1,6 @@
+A static variable is a variable that remembers the value it
+had the last time your function was called.  The usual way
+(aside from bugs in Perl) of producing static variables is
+to create a private scope to hold them.  This provides
+an alternate solution, tie the lexical to an implementation
+that remembers the old value.

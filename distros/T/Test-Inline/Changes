@@ -1,0 +1,283 @@
+Revision history for Perl extension Test-Inline
+
+2.213 Mon 8 Apr 2013
+	- Updating to Module::Install 1.06
+	- Fix tests to handle hash randomisation
+	- No functional changes
+
+2.212 Mon 22 Nov 2010
+	- Updating to Module::Install 1.00
+	- No functional changes
+
+2.211 Wed 15 Jul 2009
+	- Updating to Module::Install 0.91
+	- More complete removal of Class::Autouse
+
+2.210 Sun 17 May 2009
+	- Updating to Module::Install 0.88
+	- Adding support for error-via-exceptions
+	- Removing the use of Class::Autouse
+	- Removing the use of base.pm
+
+2.209 Sun 19 Apr 2009
+	- Updating to Module::Install 0.83
+	- Perl depedency corrected to 5.006
+
+2.208 Wed 12 Dec 2007
+	- Updating to Module::Install 0.68
+	- Updating bundled tests
+
+2.207 Fri 17 Aug 2007
+	- The filenames method not correctly returns 0 when there are no file names.
+
+2.206 Fri 17 Aug 2007
+	- Updating Params::Util dep to 0.21 to avoid a problem on ActivePerl
+	- Updating List::Util to 1.19 to avoid leaks on some platforms
+	- No longer include Test::ClassAPI
+	- Skip the false-negative failing readonly tests when testing as root
+	- Changed some non-working code in a heredoc that should never be
+	  run that was none-the-less breaking the RedHat package generator
+	  because it naively scans for dependencies.
+
+2.205 Thu 12 Jul 2007
+	- ACTUALLY adding a missing dependency on Test::Script
+
+2.204 Thu 12 Jul 2007
+	- Adding a missing dependency on Test::Script
+	- Correcting the script/inline2test version
+
+2.203 Wed 11 Jul 2007
+	- When overwriting readonly files, delete them properly first.
+	  Don't naively assume we can write to them (obviously, duh) :(
+	- It turns out that File::chmod is smart enough to correctly
+	  make files readonly even on Win32. Removed all the code that
+	  skipped on Win32. All platforms now equal again! Yay!
+
+2.202 Tue 10 Jul 2007
+	- Adding support for writing test scripts with read-only permissions
+	- Upgraded to Module::Install 0.65
+	- Moving bin/inline2test to the more correct script/inline2test
+	  (this has no effect on where it will actually be installed)
+	- Fixing another couple of kwalitee nigglies
+	  (automatically via release tool improvements since last release)
+
+2.201 Tue 16 Jan 2007
+	- [% plan %] in test2inline templates is no longer compulsory
+
+2.200 Sun 14 Jan 2007
+	- Added Win32 support
+
+2.105 Mon  2 Oct 2006
+	- No functional changes
+	- Upgraded to Module::Install 0.64
+	- Fixed a few kwalitee nigglies
+
+2.104 Sun  7 May 2006
+	- Moved from old CVS to new SVN repository
+	- Various POD spelling/grammer fixes (Jeff Defik)
+	- Moved t/t.data to t/data
+	- Upgraded to Module::Install 0.62
+
+2.103 Wed Sep 28 2005
+	- Removed Test::Inline::IO::File::VCS. It is incompleted, and never
+	  should have been distributed in the dist.
+
+2.102 Thu Sep 22 2005
+	- To handle people with problems installing RT and a few other
+	  programs, add a dependency on Pod::Tests
+
+2.101 Tue Sep 13 2005
+	- Rebuilding to synchronize with new Module::Install and
+	  ExtUtils::AutoInstall
+	- Tweaks the per-section test code to make more applicable value
+	  appear in the failure summary.
+	- Removed all remaining use of UNIVERSAL::isa, switching to a
+	  more accurate Params::Util approach. Should allow for improved
+	  extensibility.
+
+2.100 Thu Jul 14 2005
+	- Worked as good as I hoped, moving to production release
+	- Bundling a couple of build-time-only deps
+
+2.099_01 Tue Jul 12 2005
+	- More work on making inline2test just DWYM
+	- Added Test::Inline::Content::Simple
+
+2.099_01 Sun Jul 10 2005
+	- Starting to implement the 2.100 roadmap
+	- Moved Test::Inline::Handler::Extract   to Test::Inline::Extract
+	- Moved Test::Inline::Handler::File      to Test::Inline::IO::File
+	- Moved Test::Inline::Handler::File::VCS to Test::Inline::IO::File::VCS
+	- Convert inline2test to use a config file
+	- Added Test::Inline::Content
+	- Added Test::Inline::Content::Legacy
+	- Added Test::Inline::Content::Default
+	- Reorganised code to make it all work again
+	- Added 12_content.t
+
+2.002 Sat Jun 11 2005
+	- The Test::Builder interface changes, breaking the test counts.
+	- This change makes them work again
+
+2.001 Sat Jun 11 2005
+	- After determining Test::Inline 1 doesn't actually USE
+	  the Test::Inline namespace, decided Schwern can just sod off
+	  and I'm moving to production now.
+	- Old users should not be effected if they specifically install
+	  the module 'Pod::Test'
+
+2.00_10 Sat Jun 11 2005
+	- Making sure =begin testing SETUP behaves completely like the
+	  previous =begin test setup sections
+
+2.00_09 Fri Jun 10 2005
+	- Adding Test::Inline::Handler::File::VCS to support automatically
+	  adding output scripts to version control system, if they have one.
+	- Added a --vcs flag to inline2test to use Test::Inline::Handler::File::VCS
+	- Converted testing from =begin test setup to =begin testing SETUP
+
+2.00_08 Fri May 21 2005
+	- Adding a no_index to prevent bad things being indexed
+
+2.00_07 Fri May 21 2005
+	- Set inline2test to actually install
+	- Remove pod2test, since I'm leaving it as is.
+
+2.00_06 Thu May 20 2005
+	- Added a few more bug fixes, and made the warning only a print,
+	  and not a "true" warning.
+
+2.00_05 Sat Mar 26 2005
+	- Added support for =for example begin -> =for example end blocks
+
+2.00_04	Fri Mar 25 2005
+	- Resolved rt.cpan.org #557 (Catch and thow error for badly nested POD)
+
+2.00_03 Mon Mar 21 2005
+	- Forgot to update Changes in 2.00_02
+	- Added automatic inclusion of 99_pod.t to my build script,
+	  as recommended by CPANTS
+	- Fixed a POD bug in Inline.pm
+
+2.00_02 Mon Mar 21 2005
+	- Moving some things around to make Test::Inline less
+	  oriented around classes, and made adding things a bit
+	  smarter.
+
+2.00_01 Fri Mar 18 2005
+	- Formerly known as Test::Inline2, a private Phase N Australia module
+	- Moved from PCPP (Phase N private CPAN repository) to Open Source
+	  repository.
+	- Inlined File::DirUtils as Test::Inline::Util
+	- Renamed Test::Inline::TestFile as Test::Inline::Script
+	- Completed POD docs for what methods exist
+	- Partially completed main module DESCRIPTION
+
+2.12 Tue Mar 15 2005
+	- Fixed a bug in the generation of the manifest resulting from
+	  other fixes in 2.11
+
+2.11 Tue Mar 15 2005
+	- Added 06_multifile to test a basic multi-file generation
+	- Fixed so the we do actuall prepend the output path
+
+2.10 Thu Mar 10 2005
+	- Added support for the check_count flag, which allows the number
+	  of tests run to be checked section-by-section, rather than
+	  file-by-file only.
+
+2.01 Mon Mar  7 2005
+	- Tweaked some error messages
+
+2.00 Thu Nov 18 2004
+	- Mixed one final bug that was causing the manifest not to come out
+	  in dependency order.
+
+1.99 Thu Oct 28 2004
+	- Doing error messages a slightly different way
+
+1.98 Thu Oct 28 2004
+	- Adding yet more error messages
+
+1.97 Thu Oct 28 2004
+	- Added more error messages (when in verbose mode)
+
+1.96 Sun Sep  5 2004
+	- Cleaned up Makefile.PL and dependencies
+
+1.95 Sat Sep  4 2004
+	- Fix in add_class
+
+1.94 Fri Sep  3 2004
+	- Fix a bug when generating manifests with relative paths
+
+1.93 Fri Sep  3 2004
+	- Save in sorted order for consistency
+
+1.92 Fri Sep  3 2004
+	- Fixed the bool and "" overloads for ::TestFile
+	- Fixed manifest generation
+	- Changed the meaning of the 'output' option slightly to make it more useful
+
+1.91 Thu Sep  2 2004
+	- Added the ability to supply a custom file content generator
+
+1.90 Thu Sep  2 2004
+	- More bugs that slipped through in ->save
+
+1.64 Thu Sep  3 2004
+	- Fixed a number of calls to ->_write
+	- ->add and ->add_class both return the number of files added now
+
+1.63 Thu Sep  2 2004
+	- Made a small correction to the Test::Inline2::Handler::File API
+
+1.62 Wed Sep  1 2004
+	- Added a special hack to prevent one particular warning during a
+	 unit test script in which we don't want to see it.
+
+1.61 Wed Sep  1 2004
+	- Fixed some bugs in Test::Inline2::Handler::File
+
+1.60 Wed Sep  1 2004
+	- Changed to using Handler classes for the features we want to overload
+
+1.50 Tue Aug 31 2004
+	- Converted from Test::Inline::Heavy to Test::Inline2
+	- Removed Test::Inline2::Config
+	- Added class-level dependencies to a test section
+
+1.02 Mon Aug 30 2004
+	- Removed an erroneous $DB::single = 1
+
+1.01 Fri Aug 20 2004
+	- Updated Algorithm::Dependency to 1.02
+
+1.00 Fri Aug 20 2004
+	- Updating Algorithm::Dependency to 1.01 to fix critical ignore_orphans failure
+	- Added a warning when there is a missing dependency
+
+0.9  missing
+
+0.8  missing
+
+0.7  
+	- Using File::Slurp to read files
+
+0.6  missing
+
+0.5  missing
+
+0.4  Sat Apr 17 2004
+	- No changes to Test::Inline::Heavy itself
+	  Updated to match the changes from 0.3 to 0.4 of Test::ClassAPI
+
+0.3  Sat Apr 17 2004
+	- No changes to Test::Inline::Heavy itself
+	  Updated to use the more stable 0.3 version of Test::ClassAPI
+
+0.2  Wed Apr 14 2004
+	- Changed namespace to Test::Inline::Heavy
+
+0.1  Mon May 12 2003
+	- original version

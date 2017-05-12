@@ -1,0 +1,5 @@
+--- 
+match:
+  distribution: '^HAYASHI/Term-ReadLine-Gnu-\d'
+pl:
+  args: ["--libdir", "/usr/local/lib", "--includedir", "/usr/local/include" ]

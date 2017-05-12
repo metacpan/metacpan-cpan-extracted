@@ -1,0 +1,12 @@
+Revision history for Perl module Text::Corpus::Summaries::Wikipedia
+
+0.20 Aug 20 2010
+    - First release to CPAN.
+
+0.21 Aug 27 2010
+    - Added File::Path(2.08) to Makefile.PL.
+
+0.22 Feb 25 2012
+    - Updated the xpath queries to parse HTML files.
+    - Updated the documentation.
+    - Improved the parsing speed of the HTML pages.

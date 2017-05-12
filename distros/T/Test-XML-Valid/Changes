@@ -1,0 +1,16 @@
+Revision history for Perl module Test::XML::Valid
+
+0.04 Tue Jun 01 2004
+    - Added xml_string_ok() function and tests
+
+0.03 Tue Jun 01 2004
+    - Fixed POD formatting issue
+
+0.02 Mon May 17 2004
+    - Cleaned up POD
+    - removed use of 'our'
+
+0.01 Sat Feb  7 09:36:15 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

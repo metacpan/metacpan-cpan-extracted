@@ -1,0 +1,29 @@
+NOTES FOR HACKERS
+
+Easy evaluation:
+    $ xslate -e 'Hello, <: $ARGV[0] :> world!' Xslate
+
+Debugging options ($ENV{XSLATE}; or --debug for xslate(1)):
+    dump=proto  Output preprocessed proto templates
+    dump=token  Output token sequence
+    dump=denote Output code denotation
+    dump=gen    Output code generation
+    dump=ast    Output abstract syntax tree
+    dump=asm    Output xslate assembly
+    dump=asm:ix Output xslate assembly with indexes
+    dump=pp     Output Perl code PP::Booster generates
+    optimize=0  Suppress optimization
+    pp=verbose  Make error messages verbose (by Carp->import('verbose'))
+
+Parser's terminology:
+    arity  Symbol class; used while compiling
+    bp     Binding power; or operator precedence
+    nud    Null denotation; processing values and prefix operators
+    led    Left denotation; processing infix and postfix operators
+    std    Statement denotation; processing statements
+
+Callbacks: functios, methods, and macros
+tx_call_sv() is a thin wrapper to Perl_call_sv()
+tx_funcall()      tries to call Perl fuctions
+tx_proccall()     tries to call macros, or fallback to tx_funcall()
+tx_methodcall()   tries to call Perl methods, or fallback to tx_proccall()

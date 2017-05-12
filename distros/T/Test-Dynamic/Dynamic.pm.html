@@ -1,0 +1,292 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Test::Dynamic - Automatic test counting for Test::More</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#version">VERSION</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#methods">Methods</a></li>
+		<li><a href="#arguments">Arguments</a></li>
+	</ul>
+
+	<li><a href="#usage">USAGE</a></li>
+	<ul>
+
+		<li><a href="#basic_test_counting">Basic test counting</a></li>
+		<li><a href="#subroutines">Subroutines</a></li>
+		<li><a href="#adjusting_the_current_test_count">Adjusting the current test count</a></li>
+		<li><a href="#skipping_sections">Skipping sections</a></li>
+		<li><a href="#group_modifiers">Group modifiers</a></li>
+		<li><a href="#environment_groupings">Environment groupings</a></li>
+		<li><a href="#noop_lines">No-op lines</a></li>
+		<li><a href="#negation">Negation</a></li>
+	</ul>
+
+	<li><a href="#limitations">LIMITATIONS</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#website">WEBSITE</a></li>
+	<li><a href="#development">DEVELOPMENT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license_and_copyright">LICENSE AND COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>Test::Dynamic - Automatic test counting for Test::More</p>
+<p>
+</p>
+<hr />
+<h1><a name="version">VERSION</a></h1>
+<p>This documents version 1.3.3 of the Test::Dynamic module</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Test::More;
+  use Test::Dynamic;</pre>
+<pre>
+  my $tests = Test::Dynamic::count_tests
+        (
+         {
+          filehandle =&gt; \*DATA,
+          verbose    =&gt; 1,
+          local      =&gt; [qw(compare_tables)]
+          }
+         );</pre>
+<pre>
+  plan tests =&gt; $tests;</pre>
+<pre>
+  __DATA__</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module helps to count your tests for you in an automatic way. When you add 
+or remove tests, Test::Dynamic will attempt to keep track of the total correct 
+number for you.</p>
+<p>
+</p>
+<h2><a name="methods">Methods</a></h2>
+<dl>
+<dt><strong><a name="item_count_tests"><strong>count_tests</strong></a></strong>
+
+<dd>
+<p>Creates a Test::Dynamic instance and attempts to count the number of tests performed 
+in the supplied code. Note that this method is <em>not</em> exported by default.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="arguments">Arguments</a></h2>
+<p>The <a href="#item_count_tests"><code>count_tests</code></a> method takes the following arguments:</p>
+<dl>
+<dt><strong><a name="item_filehandle"><strong>filehandle</strong></a></strong>
+
+<dd>
+<p>Mandatory argument. An open filehandle to the file that contains the tests you want to 
+count. Usually, this is the same file you are already in. One way to provide your own 
+file is to give the filehandle argument the value <code>\*DATA</code>. If you do so, you must 
+also ensure that your script has a <code>__DATA__</code> section at the bottom of it.</p>
+</dd>
+</li>
+<dt><strong><a name="item_verbose"><strong>verbose</strong></a></strong>
+
+<dd>
+<p>Optional argument, defaults to false. If true, detailed information is sent to stderr 
+showing how many tests were found in each section, and generally allowing you to see how 
+Test::Dynamic arrived at its final test count.</p>
+</dd>
+</li>
+<dt><strong><a name="item_local"><strong>local</strong></a></strong>
+
+<dd>
+<p>Optional, empty by default. Test::Dynamic looks for simple test commands such as <code>cmp_ok</code> 
+and counts them as a single test. If you have your own tests, or subroutines that perform a test, 
+you can add your own here which will be counted as a single test for purposes of counting.  
+The input should be an arrayref of terms, for example:</p>
+</dd>
+<dd>
+<pre>
+  local =&gt; [qw/foo bar baz/]</pre>
+</dd>
+</li>
+<dt><strong><a name="item_skipuseline"><strong>skipuseline</strong></a></strong>
+
+<dd>
+<p>Optional, empty by default. If set, all lines until one that begins with 'use Test::Dynamic' 
+are skipped.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="usage">USAGE</a></h1>
+<p>
+</p>
+<h2><a name="basic_test_counting">Basic test counting</a></h2>
+<p>Test::Dynamic works by looking for basic test methods, such as <code>cmp_ok()</code>, but allows you to 
+define your own methods as well with the <a href="#item_local"><code>local</code></a> argument. Test counting stops then 
+<code>__DATA__</code>, <code>__END__</code>, or the word <code>exit;</code>`` is found. All test methods must be called 
+with parens: <code>pass(&quot;xxx&quot;);</code> will work, but <code>pass &quot;xxx&quot;;</code> will not. Test methods must 
+appear at the start of the line, although whitespace is allowed, of course.</p>
+<p>
+</p>
+<h2><a name="subroutines">Subroutines</a></h2>
+<p>An important part of counting the tests is keeping track of which subroutines are used and where. 
+Since subroutines can be nested within each other, Test::Dynamic needs to know exactly where a 
+subroutine ends. After the closing brace in a subroutine, add the following:</p>
+<pre>
+  ## end of subroutine_name</pre>
+<p>For example:</p>
+<pre>
+  sub foobar {
+    my $name = shift;
+    return Baz-&gt;mangle($name);
+  } ## end of foobar</pre>
+<p>
+</p>
+<h2><a name="adjusting_the_current_test_count">Adjusting the current test count</a></h2>
+<p>The number of tests that a subroutine within the script calls is kept track of, and each 
+call to that subroutine increments the number of tests by the amount in that subroutine. 
+For example:</p>
+<pre>
+  cmp($x, $y, &quot;Foo and bar are equal&quot;);</pre>
+<pre>
+  pickle();</pre>
+<pre>
+  sub pickle {
+    pass(&quot;Pickle is ok&quot;);
+    is_deeply($d,$e, &quot;Complex hashrefs look the same&quot;);
+  }</pre>
+<p>In the above, Test::Dynamic will count the number of tests as three.</p>
+<p>Comments with two hashes can be used to further control the behavior. To tell 
+Test::Dynamic that a particular line of code will run more than one test, 
+such as in a loop, you can use the <code>TESTCOUNT</code> parameter:</p>
+<pre>
+  for my $x (1..10) {
+    like($foo{$x}, qr{pickle}, &quot;Item $x contains a pickle&quot;); ## TESTCOUNT * 10
+  }</pre>
+<p>Any of the basic math multipliers can be used: addition, subtraction, multiplication, 
+or division. Addition and subtraction are handy for times when the number of tests needs 
+to be adjusted on the fly without anything else on the line:</p>
+<pre>
+  ## TESTCOUNT + 6</pre>
+<p>
+</p>
+<h2><a name="skipping_sections">Skipping sections</a></h2>
+<p>Entire sections of code can be skipped entirely for the purposed of test counting. 
+Simply add <code>## START_SKIP_TESTCOUNTING</code> to a line, and add <code>## STOP_SKIP_TESTCOUNTING</code> 
+when you wish the counting to pick up again.</p>
+<p>
+</p>
+<h2><a name="group_modifiers">Group modifiers</a></h2>
+<p>If you are working on a large test script, sometimes you may want to limit your current 
+testing to not include some related groups of tests. To do this with test_counting, 
+create global variables name <code>$TEST_name</code> at the top of your script, then assign them 
+either a 1 or a 0 to indicate that the sections are on or off. Then add that name as 
+a comment to each line that invokes it. For example:</p>
+<pre>
+  our $TEST_ALPHA = 1;
+  our $TEST_DELTA = 0;</pre>
+<pre>
+  pass(&quot;red&quot;);
+  pass(&quot;blue&quot;); ## TEST_ALPHA
+  pass(&quot;yellow&quot;); ## TEST_DELTA</pre>
+<p>In the above example, the ``yellow'' test will not be counted, because it belongs to the 
+TEST_DELTA group, which is off.</p>
+<p>Adding <code>START_</code> and <code>STOP_</code> before the group name allows you to associate a block of 
+code with a named section: this is usually used in conjunction with an <code>if</code> statement 
+telling those tests not to run. For example:</p>
+<pre>
+  if ($TEST_DELTA) { ## START_TEST_DELTA
+     cmp($x,$y, &quot;Values are the same&quot;);
+     ## Time-consuming tests here...
+  } ## STOP_TEST_DELTA</pre>
+<p>Note that lines may contain more than one control comment, such as:</p>
+<p>foo(3,42); ## TEST_DELTA TESTCOUNT + 10</p>
+<p>
+</p>
+<h2><a name="environment_groupings">Environment groupings</a></h2>
+<p>A named group can also be controlled by an environment variable. The format is 
+<code>## ENV_name</code>, or <code>## START_ENV_name</code> and <code>##STOP_ENV_name</code>.</p>
+<p>
+</p>
+<h2><a name="noop_lines">No-op lines</a></h2>
+<p>If you put a comment on a line with only a single semi-colon at the start of it, this 
+line will be evaluated right away for any TESTCOUNT effects. For example, to add 24 
+tests if the environment variable BUCARDO_TEST_RING is set:</p>
+<pre>
+  ;## ENV_BUCARDO_TEST_RING       TESTCOUNT+24</pre>
+<p>
+</p>
+<h2><a name="negation">Negation</a></h2>
+<p>The group and environment modifiers can be negated by using NOTEST and NOENV. When combined with 
+a no-op TESTCOUNT line, this can be an easy way to adjust the tests based on if, for example, 
+an ENV variable is set:</p>
+<pre>
+  ; ## NOENV_FOOBAR TESTCOUNT - 10;</pre>
+<p>In the example above, the total number of tests is reduced by 10 unless the environment 
+variable has been set.</p>
+<p>
+</p>
+<hr />
+<h1><a name="limitations">LIMITATIONS</a></h1>
+<p>This module is not going to be perfect at test counting every time - a task which 
+would require Artificial Intelligence - but is designed to make your task easier.</p>
+<p>For a small and simple test script, use of Test::Dynamic may be overkill.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Bugs should be reported to the author.</p>
+<p>
+</p>
+<hr />
+<h1><a name="website">WEBSITE</a></h1>
+<p>The latest information on this module can be found at:</p>
+<pre>
+  <a href="http://bucardo.org/test_dynamic/">http://bucardo.org/test_dynamic/</a></pre>
+<p>
+</p>
+<hr />
+<h1><a name="development">DEVELOPMENT</a></h1>
+<p>The latest development version can be checked out via git as:</p>
+<pre>
+  git-clone <a href="http://bucardo.org/testdynamic.git/">http://bucardo.org/testdynamic.git/</a></pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Greg Sabino Mullane &lt;<a href="mailto:greg@endpoint.com">greg@endpoint.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="license_and_copyright">LICENSE AND COPYRIGHT</a></h1>
+<p>Copyright 2006-2007 Greg Sabino Mullane &lt;<a href="mailto:greg@endpoint.com">greg@endpoint.com</a>&gt;.</p>
+<p>This software is free to use: see the LICENSE file for details.</p>
+
+</body>
+
+</html>

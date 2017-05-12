@@ -1,0 +1,8 @@
+start => '00:00', tz => 'Europe/London', calendar => 'Daily'
+
+EXTERNAL_1::J1()
+
+J1( start => '00:00' )
+
+
+ 

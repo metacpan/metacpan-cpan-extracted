@@ -1,0 +1,13 @@
+\.old$
+\.bak$
+\.tmp$
+\.txt$
+\.1p$
+\.3pm$
+\.html$
+\.gz$
+\.exists$
+^[Mm]akefile$
+^pm_to_blib$
+^blib\/
+\.DS_Store

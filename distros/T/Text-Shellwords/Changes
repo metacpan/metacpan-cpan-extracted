@@ -1,0 +1,12 @@
+Revision history for Perl extension Text::Shellwords.
+1.03 Sat Nov 15 13:52:37 EST 2003
+	- workaround for uninit variable warnings eminating from shellwords.pl
+	when called with array containing undef items.
+1.02 Sun Jun 22 00:00:00 EDT 2003
+	- fixed failing test 6
+1.01 Mon Jun 16 15:02:03 EDT 2003
+	- removed uninit variable warnings when shellwords() called without args
+0.01  Fri Dec 14 09:44:35 2001
+	- original version; created by h2xs 1.21 with options
+		-n Text::Shellwords -A
+

@@ -1,0 +1,272 @@
+1.25     2016-11-17
+
+- Reduce memory usage by only loading Config if needed and not importing from
+  Carp. Based on PR #2 from J. Nick Coston.
+
+
+1.24     2016-08-13
+
+- Set the INSTALLDIRS to 'perl' for Perl 5.10 and earlier. Without this, you
+  can upgrade Time::Local from CPAN but perl will not see the upgraded
+  version. Reported by Olivier Mengué. RT #116825.
+
+
+1.2300  2012-07-20
+
+- Doh, fix the repo & bugtracker info in the META files.
+
+
+1.2200  2012-07-09
+
+- Explicitly require Test::More 0.88+ for tests.
+
+
+1.2100  2012-07-09
+
+- A seconds value greater than 59 but less than 60 caused timegm() and
+  timelocal() to croak. Now we allow any value that's less than 60. RT #78189.
+
+
+1.2000  2011-01-02
+
+- Release 1.1902 as a stable version without any further chances.
+
+
+1.1902  2010-12-16  TRIAL RELEASE
+
+- Merge all changes from blead perl.
+- Try to restore compatibility with older perls, which don't have a 64bit
+  capable localtime/gmtime.
+
+
+1.1901  2008-11-01
+
+- Test fixes only. The tests planned the wrong number of tests on
+  32-bit platforms, causing failures.
+
+
+1.19    2008-11-01
+
+- The calculation of the maximum integer size was using
+  $Config{intsize} when it should use $Config{ivsize}. Apparently on a
+  64-bit platform intsize can be 4 when ivsize is 8. Based on a patch
+  from Jan Dubois.
+
+
+1.18    2007-10-31
+
+- Added pod and pod coverage tests.
+
+- Doing a new release to provide a conformant META.yml file.
+
+- This release contains no code changes from 1.17.
+
+
+1.17    2007-01-25
+
+- I made the same test count mistake as was in 1.14 again. This
+  release fixes the test count (again) when running on a system that
+  doesn't support negative epochs (like Win32). Patched by Kenichi
+  Ishigaki (again).
+
+
+1.16    2007-01-23
+
+- The leap year fix in 1.14 was pretty broken, as it checked after
+  converting the year to Perl's internal (year - 1900) format.
+
+
+1.15    2007-01-22
+
+- Fix Local.t test count when running on a system that doesn't support
+  negative epochs (like Win32). Patched by Kenichi Ishigaki.
+
+
+1.14    2007-01-21
+
+- Fixed leap year check to produce the right answer for years outside
+  of the 32-bit epoch range (such as 1900 and 2100). See rt.perl.org
+  #31241. Reported by Nathan Zook.
+
+
+1.13    2006-08-09
+
+- Switched to using Test::More for the tests.
+
+- Fixed a bug that occurred around the DST change for Europe/London
+  (and probably other time zones with a positive UTC offset). If
+  given, the hour immediately after the change (2:00 AM for
+  Europe/London), then the returned epoch was 3600 seconds too
+  large. Reported by Roger Picton. See RT #11662.
+
+
+1.12_01 2006-03-31
+
+- Reverted changes from 1.07_90 that attempted to extend range of
+  allowable epoch values around edge cases. It turns out that this was
+  causing integer overflows
+
+- In one error case, the module could warn and then croak. I changed
+  it to simply croak with the whole message. Based on a patch by
+  Michael Schwern from rt.perl.org #36268.
+
+- Removed the code from the docs that implied that the *_nocheck
+  variants were created for doing date math. They're just for speeding
+  things up when you have known valid data. If you pass them invalid
+  data, you'll probably get an incorrect answer. See #31421 on
+  rt.perl.org for discussion.
+
+
+1.12    2005-12-18
+
+- Explicitly turn off negative epoch testing on VMS.  Change #24310
+  from bleadperl, Craig Berry.
+
+- In the test suite when checking on whether negative epochs are
+  allowed, use 3 days before the epoch as a test, because just one
+  hour before may give false positives (for example on Win32 with the
+  Borland compiler).
+
+- Reverted an earlier change that slightly extended the range of
+  values for which timelocal worked (by about a day in either
+  direction) because it could cause an incorrect answer for certain
+  epoch values on the date of a DST change.  Reported by Gisle Aas.
+
+
+1.11    2005-02-09
+
+- Try to make detection of supported epoch range a little smarter.
+  The detection was allowing negative epochs on Win32 but apparently
+  this doesn't work, and trying to pass a pre-epoch date in just
+  causes a lot of warnings.  This silences warnings during the tests
+  on windows.
+
+
+1.10    2004-04-20
+
+- Fix compilation failure with older Test.pm (including the versions
+  shipped with 5.6.1 and earlier perls).  Ticket #6079 on rt.cpan.org.
+  Patch by somebody who didn't give their name on rt.cpan.org ;)
+
+
+1.09    2004-04-07
+
+- Fixed a bug in the test suite that led to timegm not getting tested
+  properly, and timelocal getting tested twice for the same values.
+
+
+1.08    2004-04-07
+
+- Changed occurences of "UTC" to "GMT" in order to agree with POSIX,
+  which defines the epoch in terms of GMT.
+
+- Documented the behavior of timelocal() when given a local time that
+  does not exist (due to a DST change).  Suggested by Nick
+  Ing-Simmons.
+
+- Don't expect edge case tests to pass on AIX 4.3, since the OS is
+  obsolete.  Patch from core passed on my H. Merijn Brand.
+
+
+1.07_94  2003-12-11
+
+- More changes from Henrik Gulbrandsen to make sure that very large
+  negative epoch values are handled properly on platforms that can
+  handle negative epoch values at all.
+
+- Make sure that we really do always return the earliest of two local
+  times when DST makes conversion from GMT to local time ambiguous.
+  Again by Henrik.
+
+- Fix a bug that could have occurred if the maximum or minimum integer
+  size on a platform was divisible by 86,400.  Also by Henrik.
+
+
+1.07_93  2003-07-23
+
+- Henrik's code explicitly didn't work with negative epoch values,
+  which is not good.  Now we assume that they are allowed, except on
+  MacOS, which is known to use an unsigned int for time_t.
+
+- Document that dates before the epoch should work on systems which
+  support negative epoch values, but that we can't test them because
+  we don't know _which_ systems support this.
+
+
+1.07_92  2003-07-23
+
+- Removed tests which relied on the zoneinfo database to be up to date
+  and accurate in order to pass, since we have absolutely no control
+  over this whatsoever.  I hate external dependencies.
+
+
+1.07_91  2003-07-22
+
+- Henrik refined his edge case fix to work on Win32, which apparently
+  dislikes large negative signed ints.  Tests now pass on Win32.  More
+  testing on other platforms is appreciated.
+
+- Documented Time::Local's behavior when timelocal is called with an
+  ambiguous local time.  Some local times occur twice on the same day
+  because a DST change causes the clock to move backwards one hour
+  earlier.  See "Ambiguous Local Times" in the docs for more details.
+  Closes perlbug 7822.
+
+- Removed the statement under "BUGS" that the proclivity to croak() is
+  probably a bug.  It's not a bug, and it sure isn't going to change
+  at this point in time, anyway!
+
+
+1.07_90  2003-07-15
+
+- Fixed behavior for edge cases like timegm(gmtime(0x7FFF_FFFF)),
+  which should work even on platforms where time_t is signed.  Patch
+  from Henrik Gulbrandsen.
+
+
+1.07  2003-06-10
+
+- Set INSTALLDIRS=perl in Makefile.PL, as suggested by Michael
+  Schwern, who heard it from Sergio Brandano.
+
+
+1.06  2003-06-04
+
+- A bug in the handling of negative offsets from UTC could lead to the
+  return of invalid times during a DST transition.  This is from a
+  patch by Dave Mitchell currently in bleadperl.  See
+  http://bugs6.perl.org/rt2/Ticket/Display.html?id=19393 for details.
+  Thanks to Rafael Garcia-Suarez for pointing this out to me.
+
+- Updated the AUTHORS section to include the actual authors.  Thanks
+  to Graham Barr for telling me who there are.
+
+- Added SUPPORT section which tells people to use bugs.perl.org or
+  perlbug, since I read p5p and I want to make sure that the core and
+  this code stay in sync.
+
+- Clarified docs to say that dates before the system's epoch may or
+  may not work, because POSIX only requires support for positive
+  time_t values.
+
+
+1.05  2003-06-03
+
+This version is nearly identical to version 1.04, which is included in
+the Perl core, but it removes the use of "our" in order to make the
+code backwards compatible with Perl 5.00503.  It probably works with
+earlier versions of Perl as well, but I don't have anything earlier
+than 5.00503 installed.
+
+Changes made from the core version include:
+
+- Packaged for distribution on CPAN.
+
+- Added an AUTHOR section to the docs.
+
+- Clarified some points in the docs, particularly the fact that this
+  module uses the local system's epoch, not the Unix epoch, contrary
+  to what the documentation suggests.
+
+- Disabled tests for timelocal.pl Perl4 library since it's not
+  included in standalone distribution.

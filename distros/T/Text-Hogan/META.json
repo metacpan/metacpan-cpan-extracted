@@ -1,0 +1,62 @@
+{
+   "abstract" : "Text::Hogan - A mustache templating engine statement-for-statement cloned from hogan.js",
+   "author" : [
+      "Alex Balhatchet"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-Hogan",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0.37",
+            "Scalar::Util" : "1.41",
+            "Text::Trim" : "1.02",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Visitor::Callback" : "0.30",
+            "Path::Tiny" : "0.059",
+            "Test::More" : "1.001008",
+            "Try::Tiny" : "0.22",
+            "YAML" : "1.13",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaoru/Text-Hogan/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kaoru/Text-Hogan",
+         "web" : "http://github.com/kaoru/Text-Hogan"
+      }
+   },
+   "version" : "1.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0214"
+}
+

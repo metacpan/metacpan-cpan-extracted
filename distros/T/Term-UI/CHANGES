@@ -1,0 +1,60 @@
+0.46 Mon May 25 18:47:04 BST 2015
+* Fix test skip count for non-terminals
+  (Alexandr Ciornii)
+
+0.44 Mon May 25 12:09:17 BST 2015
+* Fix multi-choice without defaults (Noel Maddy)
+
+0.42 Thu Jan  2 12:32:18 GMT 2014
+* Fix test skip count for non-terminals
+
+0.40 Wed Jan  1 15:00:29 GMT 2014
+* default can be expressed as an arrayref
+  (Marc Popp)
+
+0.38 Mon Sep 23 12:47:15 BST 2013
+* Version bump to give ::History a version number
+
+0.36 Wed Jun  5 23:04:06 BST 2013
+* Documentation fixes (David Steinbrunner)
+
+0.34 Tue Jan 22 12:19:40 GMT 2013
+* deprecate usage added if the library is found in
+  corelib location. Term::UI is leaving core with
+  v5.20.0
+
+0.32 Sat Nov 10 11:00:31 GMT 2012
+* Add a delimiter to a prompt that doesn't have a default
+  (Tommy Stanton)
+
+0.30 Wed Dec 21 23:30:39 GMT 2011
+* Resolve PAUSE indexer problems
+
+0.28 Wed Dec 21 22:26:05 GMT 2011
+* Apply Debian patches [rt.cpan.org #73400]
+
+0.26 Wed Feb  9 15:06:32 GMT 2011
+* Apply blead patch from Michael Stevens RT #65038
+
+0.24 Wed Jan 12 13:16:01 GMT 2011
+* Skip some tests if we are not on a terminal
+
+0.22 Fri Jan  7 21:55:38 GMT  2011
+* Apply blead patch from Peter Acklam
+
+0.20 Fri Apr 24 15:59:40 CEST 2009
+* Address: #45264 Patch for Term::UI; when get_reply
+  is called without a default, term::ui would emit a
+  warning.
+
+0.18 Sun Nov  4 18:30:41 CET 2007
+* Option parsing wasn't tolerant for cases where the
+  string *only* contained options. This is now fixed.
+
+0.16 Wed Oct  3 14:38:15 CEST 2007
+* Option parsing went wrong with 'foo-bar' arguments,
+  where it'd strip off -bar as an option. Fixed with
+  look-aheads.
+
+0.14 Fri Oct 20 17:42:11 CEST 2006
+* Clean up test files to work nicer with perl core

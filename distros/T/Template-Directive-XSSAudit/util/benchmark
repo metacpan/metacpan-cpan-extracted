@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Template::Directive::XSSAudit;
+use Template;
+use Benchmark qw(:all);
+
+my $input = <<'END';
+Good Day.  I'm feeling loopy.
+[% IF cloudy %]
+[% FOREACH meatball IN clouds %]
+    [% meatball | html %]
+[% END %]
+[% this_cant_be_safe %]
+[% END %]
+END
+
+my $vars = {
+    'cloudy' => 1,
+    'clouds' => [
+       'tasty', 'goody', 'foo', 'bar', 'baz'
+    ],
+    'this_cant_be_safe' => '<p>in the least</p>'
+};
+
+my $on_error = sub { 1; };
+
+my $tt_raw = Template->new();
+
+Template::Directive::XSSAudit->on_error( $on_error );
+my $tt_xss = Template->new({
+    FACTORY => 'Template::Directive::XSSAudit'
+});
+
+my $out;
+cmpthese( -15, {
+    'Default'  => sub {
+        $tt_raw->process(\$input,$vars,\$out);
+        return;
+    },
+    'XSSAudit' => sub {
+        $tt_xss->process(\$input,$vars,\$out);
+        return;
+    },
+});
+
+

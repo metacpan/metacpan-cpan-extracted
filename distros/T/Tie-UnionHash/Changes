@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::UnionHash
+#$Id: Changes 236 2007-11-29 12:37:58Z zag $
+
+    - speed optimize  keys %hash 
+0.01
+    -initial relize

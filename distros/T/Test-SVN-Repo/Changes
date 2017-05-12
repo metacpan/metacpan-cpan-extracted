@@ -1,0 +1,112 @@
+Revision History for perl module Test::SVN::Repo
+
+0.022     2014-11-17
+
+    - Unchanged from 0.021-TRIAL
+
+0.021-TRIAL 2014-11-12
+
+    - Attempting to fix https://rt.cpan.org/Public/Bug/Display.html?id=100208
+    - use LC_ALL=C not LC_MESSAGES=C
+    - extra diagnostics for svnserve EADDRINUSE message strangeness
+
+0.020     2014-07-29
+
+    - Fix unknown signal in tests
+
+0.019     2014-07-29
+
+    - Check signals exist before installing handlers for them
+
+0.018     2014-07-28
+
+    - Handle more signals (SEGV etc) in cleanup
+    - Remove unnecessary Try::Tiny dependency
+    - Remove unnecessary Test::Builder::Module base class
+
+0.017     2014-07-11
+
+    - Unchanged from 0.016-TRIAL
+
+0.016-TRIAL 2014-06-11
+
+    - Also use strerror(EADDRINUSE) to catch stubborn locales
+
+0.015-TRIAL 2014-06-04
+
+    - Use LC_MESSAGES=C to fix locale language
+    - Use EADDRINUSE rather than hardcoded errno value
+
+0.014     2014-06-02
+
+    - Unchanged from 0.013-TRIAL
+
+0.013-TRIAL 2014-05-27
+
+    - Use both methods of checking for port-already-in-use failures
+
+0.012-TRIAL 2014-05-26
+
+    - Use locale-indendent method of checking for port-already-in-use failures
+
+0.011 2013-02-20
+
+    - Fix regression from 0.010 - child process exit would kill global servers
+    - Added t/04-non-win32.t to house all non-win32 tests
+    - Extra server and root_path cleanup tests
+    - Simplified test plans and skipping
+
+0.010 2013-02-18
+
+    - Cleanup temporary directories in non-server mode
+    - Cleanup dangling servers in END block
+
+0.009 2013-02-01
+
+    - Fix url() return value https://github.com/sdt/Test-SVN-Repo/issues/7
+      - thanks to Tommy Stanton for the bug report
+
+0.008 2011-10-06
+
+    - Moved svn tests into Makefile, hoping to avoid cpan test failures
+
+0.007 2011-08-29
+
+    - Server no longer killed by child processes
+    - Tests using Probe::Perl instead of $Config{perlpath}
+    - Stronger checking in tests that svn is available and working
+
+0.006 2011-08-21
+
+    - Fix for race condition in svnserve startup
+    - Locale change now only for local scope
+    - Locale change using LC_MESSAGES, not LC_ALL
+    - Test::NoWarnings enabled only for release testing
+
+0.005 2011-08-20
+
+    - Fix for slow server shutdown on Win32
+    - Fix for file::// uris on Win32
+    - Fix for server pid file not being deleted on Win32
+    - Fix for busy-port test in non en_US locales
+    - Possible fix for 'process ended prematurely' error in server.t
+    - Skipping some server.t tests on Win32
+    - Tests ignore used-only-once warning in I18N/LangTags/Detect.pm
+
+0.004 2011-08-18
+
+    - Fix for failing tests 'svnserve process has shutdown'
+    - Fixed some broken diag messages
+
+0.003 2011-08-18
+
+    - Fixed skip-tests count in t/multiple.t
+
+0.002 2011-08-17
+
+    - Added missing META.yml
+    - Fixed format of Changes file
+
+0.001 2011-08-17
+
+    - Initial release

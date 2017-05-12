@@ -1,0 +1,18 @@
+
+		Task list management application
+		--------------------------------
+
+    This program is GUI application for the task list management.
+    It allows to track the tasks and time spend on each task.
+    This application keeps the hierarchical list of the tasks,
+    including the time logs for every task and saves them in XML file.
+    
+    Copyright (C) 2001 Sergey Gribov (sergey@sergey.com)
+
+    This is free software with ABSOLUTELY NO WARRANTY.
+    You can redistribute and modify it freely, but please leave
+    this message attached to this file.
+
+    Subject to terms of GNU General Public License (www.gnu.org)
+
+

@@ -1,0 +1,438 @@
+<html>
+    <head>
+        <title>TapirClient Implementation Test</title>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.8.0/dojo/dojo.js"></script>
+        <script type="text/javascript" src="js/Tapir.js"></script>
+        <script type="text/javascript" src="js/Tappy.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>
+            var $j = jQuery.noConflict();
+        </script>
+        <style>
+            .fieldError {
+                color: red;
+            }
+            #methodResults {
+                height: 300px;
+                overflow: scroll;
+            }
+            #methodResults div {
+                padding: 5px;
+                margin: 2px;
+            }
+            #methodResults .error {
+                border: 1px solid red;
+            }
+            #methodResults .success {
+                border: 1px solid green;
+            }
+            .fieldName .name {
+                font-weight: bold;
+                text-align: right;
+                font-size: 18px;
+            }
+            .fieldName .meta {
+                font-size: 12px;
+                color: #999;
+            }
+            .fieldName, .fieldValue, .containerItem > td {
+                vertical-align: top;
+            }
+            .fieldValue input {
+                border: 1px solid #aaa;
+                padding: 5px;
+            }
+            .container {
+                border: 1px solid black;
+                background-color: white;
+            }
+            .containerItem > td {
+                background-color: #eef;
+            }
+        </style>
+    </head>
+<body>
+
+    <div id='main'>
+        <div id='controls'>
+            <p>
+                <button onClick='TapirClient.bayeuxConnect()'>Connect to bayeux now</button>
+                <button onClick='dojox.cometd.disconnect()'>Disconnect bayeux now</button>
+                <button onClick='TapirClient.logout({ onSuccess: methodCallSuccess, onError: methodCallError })'>Logout</button>
+                <button onClick='TapirClient.pollPendingResults({ onSuccess: methodCallSuccess, onError: methodCallError })'>Request pending results</button>
+            </p>
+        </div>
+        <hr/>
+        <div id='callMethod'>
+            <p>
+            Select a Service: <span id='selectService'></span> &bull;
+            and Method: <span id='selectMethod'></span>
+            </p>
+            <div id='methodParams'></div>
+            <div id='methodResults'></div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    // Set some TapirClient global values for my web app
+
+    TapirClient.callUrl   = '/request';
+    TapirClient.cometdUrl = '/cometd';
+
+    // Register my method result callbacks for pending results
+
+    TapirClient.onPendingSuccess       = methodCallSuccess;
+    TapirClient.onPendingError         = methodCallError;
+    TapirClient.onPendingStatusMessage = methodCallStatusMessage;
+
+    // Draw the Service selection drop down
+
+    var selectService = $('selectService').appendChild($$('select', {}, [ $$('option') ]))
+        .addEventListenerChained('change', function (e) {
+            drawSelectMethod(this.value);
+        }, true);
+    for (var i in TapirClient.services) {
+        var service_name = TapirClient.services[i];
+        selectService.appendChild($$('option', { value: service_name }, [_(service_name)]));
+    }
+
+    // When a Service is selected, draw the Method selection drop down
+
+    function drawSelectMethod (serviceName) {
+        $('selectMethod').removeChildren();
+
+        var selectMethod = $('selectMethod').appendChild($$('select', {}, [ $$('option') ]))
+            .addEventListenerChained('change', function (e) {
+                drawMethodParams(serviceName, this.value);
+            }, true);
+
+        var Service = TapirClient.service(serviceName);
+        for (var i in Service.methods) {
+            var methodName = Service.methods[i];
+            selectMethod.appendChild($$('option', { value: methodName }, [_(methodName)]));
+        }
+    }
+
+    // When a Method is selected, draw all the parameters of the call and a submit button
+
+    function drawMethodParams (serviceName, methodName, parentDivId, defaultValues) {
+        if (! parentDivId) parentDivId = 'methodParams';
+        if (! defaultValues) defaultValues = {};
+        var methodParams = $(parentDivId);
+        methodParams.removeChildren();
+
+        var Method = TapirClient.service(serviceName).method(methodName);
+        var Fields = Method.fields();
+        var table = methodParams.appendChild($$('table'));
+
+        var formMeta = {
+            service: serviceName,
+            method: methodName,
+            Method: Method,
+            fields: [],
+            paramsDivId: parentDivId,
+        };
+
+        for (var i in Fields) {
+            var Field = Fields[i];
+            var fieldId = parentDivId + '_field_' + i;
+
+            var div = table.appendChild($$('tr', { class: 'methodField' }));
+            div.appendChild(
+                $$('td', { class: 'fieldName' }, [
+                    $$('div', { class: 'name' }, [_(Field.name)]),
+                    $$('div', { class: 'meta' }, [_('idx: ' + Field.index + ', type: ' + Field.type + ', opt: ' + Field.optional)])
+                ])
+            );
+            var valueDiv = div.appendChild(
+                $$('td', { class: 'fieldValue' })
+            );
+            var errorDiv = div.appendChild(
+                $$('td', { class: 'fieldError', id: fieldId + '_error' })
+            );
+
+            var collectorFunc = drawMethodField(Field, fieldId, valueDiv, defaultValues);
+            if (collectorFunc == null) continue;
+
+            formMeta.fields.push({
+                Field: Field,
+                fieldId: fieldId,
+                collectorFunc: collectorFunc,
+            });
+        }
+
+        methodParams.appendChild(
+            $$('button', {}, [_("Submit")])
+            .addEventListenerChained('click', function (e) {
+                sendMethodCall(formMeta);
+            })
+        );
+    }
+
+    function drawMethodField (Field, fieldId, parentDiv, defaultValues) {
+        var baseType = Field.Type().baseType();
+        var classChain = baseType.classChainHash();
+        var collectorFunc = null;
+
+        if (classChain['Tapir.Type.Number']) {
+            var input = $$('input', { id: fieldId });
+            parentDiv.appendChild(input);
+            parentDiv.appendChild(_(' (number)'));
+            eval ("collectorFunc = function () { return $('" + fieldId + "').value }");
+            if (defaultValues[ Field.name ])
+                input.value = defaultValues[ Field.name ];
+        }
+        else if (classChain['Tapir.Type.string']) {
+            var input = $$('input', { id: fieldId });
+            parentDiv.appendChild(input);
+            parentDiv.appendChild(_(' (string)'));
+            eval ("collectorFunc = function () { return $('" + fieldId + "').value }");
+            if (defaultValues[ Field.name ])
+                input.value = defaultValues[ Field.name ];
+        }
+        else if (classChain['Tapir.Type.Enum']) {
+            var input = $$('select', { id: fieldId });
+            parentDiv.appendChild(input);
+            for (var name in baseType.values)
+                input.appendChild($$('option', { value: name }, [_(name)]));
+            eval ("collectorFunc = function () { return $('" + fieldId + "').value }");
+            // if (defaultValues[ Field.name ]) FIXME
+        }
+        else if (classChain['Tapir.Type.Struct']) {
+            var subDiv = $$('table', { id: fieldId });
+            parentDiv.appendChild(subDiv);
+
+            var subFields = Field.Type().fields();
+            var collectorFuncs = [];
+            for (var i in subFields) {
+                var subField = subFields[i];
+                var subFieldId = fieldId + '_' + i;
+
+                var tr = subDiv.appendChild(
+                    $$('tr', { class: 'structField' }, [
+                        $$('td', { class: 'fieldName' }, [
+                            $$('div', { class: 'name' }, [_(subField.name)]),
+                            $$('div', { class: 'meta' }, [_('idx: ' + subField.index + ', type: ' + subField.type + ', opt: ' + subField.optional)])
+                        ]),
+                    ])
+                );
+                var td = tr.appendChild($$('td', { class: 'fieldValue' }));
+
+                var collectorFunc = drawMethodField(subField, subFieldId, td, {});
+                if (collectorFunc == null) continue;
+                collectorFuncs[ subField.name ] = collectorFunc;
+            }
+
+            collectorFunc = function () {
+                var struct = {};
+                for (var key in collectorFuncs) {
+                    var val = collectorFuncs[key]();
+                    if (val == null || val.length == 0) continue;
+                    struct[key] = val;
+                }
+                return struct;
+            };
+        }
+        else if (classChain['Tapir.Type.bool']) {
+            var input = $$('input', { type: 'checkbox', id: fieldId });
+            parentDiv.appendChild(input);
+            eval ("collectorFunc = function () { return $('" + fieldId + "').checked ? true : false }");
+            if (defaultValues[ Field.name ]) input.checked = true;
+        }
+        else if (classChain['Tapir.Type.Container']) {
+            var subDiv = $$('table', { class: 'container', id: fieldId });
+            parentDiv.appendChild(subDiv);
+
+            var is_map = classChain['Tapir.Type.map'] ? true : false;
+            var containerType = classChain['Tapir.Type.map'] ? 'map' : classChain['Tapir.Type.set'] ? 'set' : 'list';
+
+            var keyField = is_map ? new Tapir.Type.Field ({
+                name: 'key',
+                index: 1,
+                type: baseType.keyType,
+                optional: false,
+            }) : null;
+
+            var valField = new Tapir.Type.Field ({
+                name: 'value',
+                index: 1,
+                type: baseType.valType,
+                optional: false,
+            });
+
+            var collectorFuncs = {};
+            var rowCounter = 0;
+
+            var addFunc = function () {
+                var tr, td, rowId, collectorFunc;
+
+                tr = subDiv.appendChild($$('tr', { class: 'containerItem' }));
+                rowId = rowCounter++;
+
+                collectorFuncs[rowId] = {};
+
+                if (is_map) {
+                    td = tr.appendChild($$('td', { class: 'key' }));
+                    collectorFunc = drawMethodField(keyField, fieldId + '_' + rowId + '_key', td, {});
+                    if (collectorFunc != null) collectorFuncs[rowId]['key'] = collectorFunc;
+                }
+
+                td = tr.appendChild($$('td', { class: 'value' }));
+                collectorFunc = drawMethodField(valField, fieldId + '_' + rowId + '_val', td, {});
+                if (collectorFunc != null) collectorFuncs[rowId]['val'] = collectorFunc;
+
+                td = tr.appendChild($$('td', { class: 'deleteItem'}));
+                td.appendChild($$('button', {}, [_('Del')]))
+                    .addEventListenerChained('click', function (e) {
+                        delete collectorFuncs[rowId];
+                        subDiv.removeChild(tr);
+                    });
+            };
+
+            var controlTd = $$('td', { colspan: is_map ? 3 : 2 }, [_(containerType)]);
+            subDiv.appendChild($$('tr', { class: 'containerControl' }, [controlTd]));
+
+            var header = $$('tr', { class: 'containerHeader' });
+            if (is_map)
+                header.appendChild($$('td', {}, [_(baseType.keyType)]));
+            header.appendChild($$('td', {}, [_(baseType.valType)]));
+            subDiv.appendChild(header);
+
+            controlTd.appendChild($$('button', {}, [_('Add')]))
+                .addEventListenerChained('click', function (e) {
+                    addFunc()
+                });
+
+            controlTd.appendChild($$('button', {}, [_('Collect')]))
+                .addEventListenerChained('click', function (e) {
+                    console.info(collectorFunc());
+                });
+
+            collectorFunc = function () {
+                var container = [], i, keyVal, valVal;
+                for (i in collectorFuncs) {
+                    if (! collectorFuncs[i]) continue;
+                    valVal = collectorFuncs[i]['val']();
+                    keyVal = is_map ? collectorFuncs[i]['key']() : null;
+                    container.push(is_map ? [ keyVal, valVal ] : valVal);
+                }
+                return container;
+            };
+        }
+        else {
+            // FIXME
+            parentDiv.appendChild(_(
+                "No way at the moment to collect this field value ("
+                + baseType.classChain().join(', ')
+                + ")"
+            ));
+            return null;
+        }
+
+        return collectorFunc;
+    }
+
+    // When the submit button is pressed, collect the Method parameters and make the call
+
+    function sendMethodCall (formMeta) {
+        // Collect all the field values, validating them one by one
+
+        var params = {};
+        var errors = 0;
+        for (var i in formMeta.fields) {
+            var details = formMeta.fields[i];
+            var value = details.collectorFunc();
+            if (value != null && value.length == 0) value = null;
+
+            var fieldError = $(details.fieldId + '_error');
+            fieldError.removeChildren();
+
+            if (details.Field.optional && value == null) continue;
+
+            if (! details.Field.Type().validate(value)) {
+                fieldError.appendChild(_( TapirClient.lastValidateError ));
+                errors++;
+                continue;
+            }
+
+            params[ details.Field.name ] = value;
+        }
+        if (errors > 0) return;
+
+        dM('status',
+            "Method " + [ formMeta.service, formMeta.method ].join('.') + " call with params:\n" +
+            JSON.stringify(params)
+        );
+        return;
+
+        // Send the request
+
+        var callArgs = {
+            method: formMeta.method,
+            service: formMeta.service,
+            params: params,
+            context: {},
+            onSuccess: methodCallSuccess,
+            onError: methodCallError,
+        };
+
+        // Two ways of doing this.
+        // 1. Use the Method object ('method' and 'service' fields of args not needed)
+        // formMeta.Method.call(callArgs);
+        // 2. Use the TapirClient.sendRequests() method
+        TapirClient.sendRequests([ callArgs ]);
+        // This one allows you to send more than one request at once.  Each must be fully formed.
+    }
+
+    // After the method call concludes, display the result to the user
+
+    function methodCallSuccess (request, result) {
+        var message, dump;
+        if (request.pending == null) {
+            message = "successful with result:";
+            dump = YAMLDump(result);
+        }
+        else if (request.pending == true)
+            message = "is pending with id " + request.id;
+        else if (request.pending == false) {
+            message = "pending request successful with result:";
+            dump = YAMLDump(result);
+        }
+
+        var messages = [
+            _(request.service + '.' + request.method + ' ' + message),
+        ];
+        if (dump)
+            messages.push( $$('pre', {}, [_(dump)]) );
+
+        displayMessage($$('div', { class: 'success' }, messages));
+    }
+
+    function methodCallError (request, error) {
+        displayMessage($$('div', { class: 'error' }, [
+            _(request.service + '.' + request.method + " failed with error: " + dojo.toJson(error))
+        ]));
+    }
+
+    function methodCallStatusMessage (request, message) {
+        displayMessage($$('div', { class: 'status' }, [
+            _(request.service + '.' + request.method + " has a status update: " + dojo.toJson(message))
+        ]));
+    }
+
+    function dM (divClass, text) {
+        displayMessage($$('div', { class: divClass }, [
+            _(text)
+        ]));
+    }
+
+    function displayMessage (node) {
+        var parentDiv = $('methodResults');
+        parentDiv.insertBefore(node, parentDiv.firstChild);
+    }
+
+</script>
+
+</body>
+</html>

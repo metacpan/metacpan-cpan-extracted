@@ -1,0 +1,80 @@
+Tk/XML/WizardMaker version 0.90
+===============================
+
+The Software Wizards are popular for tasks like software installation,
+upgrade or just gathering of configuration options. There is a lot of
+good software (often called as Install Schild) which provides
+developers with APIs for building of those Wizards.
+
+This package is just one "Install Shild" more.
+
+Many of those Install Shields provide only API interface. You have
+a lot of functions or methods to build a wizard page and to bind
+some callbacks. So if you develope an install script, you have to
+code in how to create and maintain all its wizard pages.
+
+If you maintains this script some time later (because the new
+release of your software is ready in 6 months), you will have to
+change a lot of code. If you want to add a new page into the old
+script, you have to program:
+
+  1. prepare variables to hold new values.
+  2. the code to create the new page with all its components.
+  3. changes in callbacks (what to do on the NEXT button)
+
+But all this is not your problem as it is a new developer
+who must maintain your script now ...
+
+After some new releases your script is less readeable and seems to
+have bugs.
+
+Not so if you use the Tk::XML::WizardMaker. It does provide an API interface
+too, but it can help you separate the page building from what to do
+with information gathered.
+
+You just describe the entire wizard in XML. All the pages will be than
+generated automatically.
+
+All callbacks can be described both in XML or directly in the script
+code. All callbacks can be individual functions for every page -
+your code is more.
+
+If you will maintain your script some time later, the only you
+have to do is to program
+
+  1. what to do with new informations.
+
+All other things can be descriptive XML code.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or you simple copy the file WizardMaker.pm into one of the @INC 
+directories on your machine.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Tk
+    XML::Simple     (requires XML::Parser and File::Spec)
+    Data::Dumper
+    Storable
+    Win32           (Win32 plattform only)
+    Win32API::File  (Win32 plattform only)
+
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2004 Viktor Zimmermann, ZiMTraining@gmx.net
+
+  This library is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+

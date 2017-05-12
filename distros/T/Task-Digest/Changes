@@ -1,0 +1,16 @@
+Revision history for Task-Digest
+
+0.05  Sat Feb 12 09:29:55 UTC 2011
+    - Digest::CubeHash module was renamed.
+
+0.04  Thu Nov 25 11:22:37 UTC 2010
+    - Added Digest::EdonR.
+
+0.03  Thu Nov 25 06:47:24 UTC 2010
+    - Added Digest::GOST.
+
+0.02  Sun Nov 21 17:53:24 UTC 2010
+    - Added Crypt::RIPEMD160.
+
+0.01  Fri Nov 19 20:52:44 UTC 2010
+    - Initial distribution.

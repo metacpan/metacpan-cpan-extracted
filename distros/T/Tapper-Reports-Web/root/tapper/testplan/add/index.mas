@@ -1,0 +1,171 @@
+<h3>Not implemented yet</h3>
+<!-- <h3>Create a new testplan for "RHEL 5.6: Effective Frequency Reporting Interface" on RHEL5.6</h3> -->
+<!-- <form action="" method="post"> -->
+<!--   <fieldset> -->
+<!--     <strong>Choose use case</strong> -->
+<!--     <fieldset class="radiogroup"> -->
+<!--       <span class="radiogroup vertical"> -->
+<!--         <span> -->
+<!--           <input name="use_case" type="radio" value="/data/bancroft/tapper/development/configs/use_cases//kernel_build.mpc" /> -->
+<!--           <label>kernel_build - Build a kernel from git and test it</label> -->
+<!--         </span> -->
+<!--         <span> -->
+<!--           <input name="use_case" type="radio" value="/data/bancroft/tapper/development/configs/use_cases//kernel_reboot.mpc" /> -->
+<!--           <label>kernel_reboot - Reboot test with a prebuilt kernel package</label> -->
+<!--         </span> -->
+<!--       </span> -->
+<!--     </fieldset> -->
+<!--     <div class="file label"> -->
+<!--       <label>Upload a use case file</label> -->
+<!--       <input name="kernelpkg" type="file" /> -->
+<!--     </div> -->
+<!--     <div class="select label"> -->
+<!--       <label>Test on all these machines</label> -->
+<!--       <select name="requested_hosts_all" multiple="1" size="3"> -->
+<!--         <option value="host1">host1</option> -->
+<!--         <option value="host2">host2</option> -->
+<!--         <option value="host3">host3</option> -->
+<!--       </select> -->
+<!--     </div> -->
+<!--     <div class="select label"> -->
+<!--       <label>Test on all hosts with these features</label> -->
+<!--       <select name="requested_features_all" multiple="1" size="2"> -->
+<!--         <option value="feat.id.1">mem &gt; 4096</option> -->
+<!--         <option value="feat.id.2">cores = 8</option> -->
+<!--       </select> -->
+<!--     </div> -->
+<!--     <div> -->
+<!--       Provide requested feature:<input name="feat.new.all" type="text" size="30" maxlength="30"> -->
+<!--     </div> -->
+<!--     <div class="select label"> -->
+<!--       <label>Test on one these machines</label> -->
+<!--       <select name="requested_hosts_any" multiple="1" size="3"> -->
+<!--         <option value="host1">host1</option> -->
+<!--         <option value="host2">host2</option> -->
+<!--         <option value="host3">host3</option> -->
+<!--       </select> -->
+<!--     </div> -->
+<!--     <div class="select label"> -->
+<!--       <label>Test on one host with these features</label> -->
+<!--       <select name="requested_features_any" multiple="1" size="2"> -->
+<!--         <option value="feat.id.1">mem &gt; 4096</option> -->
+<!--         <option value="feat.id.2">cores = 8</option> -->
+<!--       </select> -->
+<!--     </div> -->
+<!--     <div> -->
+<!--       Provide requested feature:<input name="feat.new.any" type="text" size="30" maxlength="30"> -->
+<!--     </div> -->
+
+
+
+<!-- </div> -->
+<!-- <input name="add.plan"     type="submit" value="Create testplan with given use cases" /> -->
+<!-- <input name="add.use_case" type="submit" value="Add another use case" /> -->
+<!-- <hr/> -->
+<!-- <h4>Use cases already added to testplan</h4> -->
+<!-- <table class="reportsectionmeta"> -->
+<!--   <tbody> -->
+<!--     <tr> -->
+<!--       <td><h5>Description</h5></td> -->
+<!--       <td>Description given in usecase file</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td><h5>Use case filename</h5></td> -->
+<!--       <td>/data/bancroft/tapper/live/use_cases/some_file.mpc</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"><h5>Host</h5></td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <th>Architecture</th> -->
+<!--       <td></td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <th>Root image</th> -->
+<!--       <td>autoinstall-rhel-5.6</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <th>Test</th> -->
+<!--       <td>py_lmbench</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"><h5>Required testmachines, run on all listed</h5></td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"> -->
+<!--         <ul> -->
+<!--           <li>bullock</li> -->
+<!--           <li>dickstone</li> -->
+<!--         </ul> -->
+<!--       </td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"><h5>Required testmachines, choose one alternative from listed</h5></td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"> -->
+<!--         <ul> -->
+<!--           <li>Host: bullock</li> -->
+<!--           <li>Feature: mem > 8</li> -->
+<!--         </ul> -->
+<!--     </tr> -->
+<!--   </tbody> -->
+<!-- </table> -->
+<!-- <input name="del.plan.1" type="submit" value="Remove from testplan" /> -->
+<!-- <input name="edit.plan.1" type="submit" value="Change this plan again" /> -->
+
+<!-- <hr/> -->
+<!-- <table class="reportsectionmeta"> -->
+<!--   <tbody> -->
+<!--     <tr> -->
+<!--       <td><h5>Description</h5></td> -->
+<!--       <td>A different usecase file</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td><h5>Use case filename</h5></td> -->
+<!--       <td>/data/bancroft/tapper/live/use_cases/different_file.mpc</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"><h5>Host</h5></td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <th>Architecture</th> -->
+<!--       <td></td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <th>Root image</th> -->
+<!--       <td>/data/bancroft/tapper/live/images/rhel5.6_x86_64.img</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <th>Test</th> -->
+<!--       <td>CTCS</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"><h5>Required testmachines, run on all listed</h5></td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"> -->
+<!--         <ul> -->
+<!--           <li>bullock</li> -->
+<!--           <li>dickstone</li> -->
+<!--         </ul> -->
+<!--       </td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"><h5>Required testmachines, choose one alternative from listed</h5></td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--       <td colspan="2"> -->
+<!--         <ul> -->
+<!--           <li>Host: bullock</li> -->
+<!--           <li>Feature: mem > 8</li> -->
+<!--         </ul> -->
+<!--     </tr> -->
+<!--   </tbody> -->
+<!-- </table> -->
+<!-- <input name="del.plan.2" type="submit" value="Remove from testplan" /> -->
+<!-- <input name="edit.plan.2" type="submit" value="Change this plan again" /> -->
+<!-- </div> -->
+<!-- </form> -->
+
+<!-- </fieldset> -->

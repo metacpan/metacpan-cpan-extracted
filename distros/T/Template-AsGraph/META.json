@@ -1,0 +1,52 @@
+{
+   "abstract" : "Create a graph from a Template Toolkit file",
+   "author" : [
+      "Breno G. de Oliveira <garu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-AsGraph",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "Graph::Easy" : "0",
+            "Template" : "2",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      }
+   },
+   "provides" : {
+      "Template::AsGraph" : {
+         "file" : "lib/Template/AsGraph.pm",
+         "version" : "0.02"
+      },
+      "Template::AsGraph::Context" : {
+         "file" : "lib/Template/AsGraph/Context.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/garu/Template-AsGraph"
+      }
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Test/Subroutines.pm
+t/load.t
+t/pod-coverage.t
+t/pod.t
+t/src.pl
+t/test.pl

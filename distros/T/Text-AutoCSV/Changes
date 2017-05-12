@@ -1,0 +1,235 @@
+1.1.7 2017-02-08 Sébastien Millet <milletseb@laposte.net>
+
+	* Search functions now allow undef value passed as the value to look for.
+
+	* Adds internal debugging features to help with DateTime parsing
+
+	* Fixes some debugging that would incorrectly be thrown to standatd output
+	  instead of $self->{$_debugh} (STDERR by default).
+
+	* Improves error message in case a DateTime parsing error occurs while in
+	  verbose mode (Text::AutoCSV created with verbose => 1).
+
+1.1.6 2017-02-07 Sébastien Millet <milletseb@laposte.net>
+
+	* Ignores a failed test in Windows where UTF16 is not detected correctly.
+
+1.1.5 2017-02-04 Sébastien Millet <milletseb@laposte.net>
+
+	* requires DateTime::Format::Strptime 1.71 (before: would req 1.63)
+	  Text::AutoCSV does not work with DateTime::Format::Strptime 1.70.
+
+	* in_map: now can give an "undef" value to callback function (inside $_),
+	  unless no_undef is in use. Before, an undef value was given only if
+	  field was a date/time field (DateTime object), in which case undef would
+	  mean "empty value". Now, an undef value is passed to in_map as an empty
+	  string only if no_undef is set.
+
+	* Detects call to "trigger read all"-like functions (for ex. vlookup, that
+	  causes the input to be immediately read entirely into memory) while
+	  reading input. Such a situation produces weird error message and can
+	  lead to infinite recursion.
+
+	* _read_all_in_mem() made public, meaning, new member-function of name
+	  read_all_in_mem() added, that just calls _read_all_in_mem().
+
+	* Fixes a bug where an English time detection would assume the separator
+	  to be a double-space, see t/11-bugfix.t BUG-5 for details.
+
+1.1.4 2016-10-11 Sébastien Millet <milletseb@laposte.net>
+
+	* Adds member functions reset_next_record_hr and get_next_record_hr, to
+	  walk through records of input without dealing with the ugly key list
+	  (obtained with get_keys()).
+
+	* Have internal code rely on reset_next_record_hr and get_next_record_hr
+	  whenever possible, instead of the previously used get_keys.
+
+	* Provides a filter subref to get_values member-function, cleaner than
+	  getting all values in an array and passing through a grep.
+
+	* Fixes a mistake in the POD where \%attr was mentioned instead of %attr
+	  to create a Text::AutoCSV object.
+
+1.1.3 2016-10-10 Sébastien Millet <milletseb@laposte.net>
+
+	* In POD, fixes internal links that were broken (separate arguments from
+	  function names).
+
+	* In POD, cleanup many small issues (typos, inconsistencies, outdated
+	  text).
+
+1.1.2 2016-10-09 Sébastien Millet <milletseb@laposte.net>
+
+	* Commented a "use feature" in a t/15-lock.t that caused test plan to fail
+	  before Perl 5.10.0.
+
+1.1.1 2016-10-08 Sébastien Millet <milletseb@laposte.net>
+
+	* Fixes a bug where double-quote escape character was not detected,
+	  leading to an error during CSV read.
+
+	* Adds lock_keys to returned hash refs (for record values), so that one
+	  cannot read a non existing field.
+	  Don't lock keys if croak_if_error is set to 0.
+
+	* All CSV input files under Windows are now using CRLF (issue with 5.12.2
+	  that would not read correctly Unix line break inputs).
+
+1.1.0 2016-10-03 Sébastien Millet <milletseb@laposte.net>
+
+	* Removes an each instruction used to walk in an array (incompatible with
+	  some earlier Perl versions)
+
+1.0.9 2016-10-02 Sébastien Millet <milletseb@laposte.net>
+
+	* Minor updates utils/csvcopy.pl options: ',' replaces '||' as value
+	  separator in some cases
+
+	* Adds print_id() member function to Text::AutoCSV, to display all
+	  characteristics of input
+
+	* Adds out_header() member function, to set header of a field at write
+	  time
+
+	* Replace 'join' member function with 'links' member function, to avoid
+	  name collisions
+
+	* Fixes an issue with t/10-prepost.t that'd fail on some systems/perl
+	  versions.
+
+1.0.8 2016-10-01 Sébastien Millet <milletseb@laposte.net>
+
+	* Add out_fields (alias: write_fields) attribute, allowing to define
+	  fields written in output
+
+	* Add search_ignore_accents (object attribute) and its counterpart search
+	  option ignore_accents, true by default.
+
+	* Now accept "no CSV separator" detection if input seems to contain one
+	  unique column.
+
+	* Remove accents from characters when working out field names, in all
+	  encodings (uses s/\p{Nonspacing_Mark}//g on NFKD'ed strings to be as
+	  general as possible)
+
+	* Put function remove_accents in @EXPORT_OK
+
+	* When a field is unknown and Text::AutoCSV croaks miserably, print out
+	  the list of existing fields, to bring immediate help to caller.
+
+	* utils/csvcopy.pl: Add --out_fields option
+	                    Add --join (also -j) option
+
+	* On UTF-8 inputs: no longer use systematic :via(File::BOM), instead, add
+	  :via(File::BOM) only when BOM is detected. Detection (for UTF-8) is done
+	  manually, using raw file access.
+	  Reason: via(File::BOM) would produce warnings when first line of a UTF-8
+	  encoded file (that has no BOM) would contain non-ascii characters.
+
+1.0.7 2016-09-22 Sébastien Millet <milletseb@laposte.net>
+
+	* lib/Text/AutoCSV.pm: ask for DateTime::Format::Strptime to be >= 1.63
+	                       (credits: SREZIC@cpan.org)
+
+	* lib/Text/AutoCSV.pm: no longer record each input record twice (once as
+	                       an array, once as a hash) when keeping it
+	                       in-memory.  Instead, keep each record only as an
+	                       array and convert it to a hash on-the-fly as
+	                       needed.
+
+	* Add option value_if_found in searches, and corresponding attribute
+	  search_value_if_found. Updates test plan & POD accordingly.
+
+1.0.6 2016-09-21 Sébastien Millet <milletseb@laposte.net>
+
+	* t/10-prepost.t: fix test plan to avoid -(-1) producing '+1' (instead of
+	                  '1') with old versions of perl.
+
+1.0.5 2016-09-20 Sébastien Millet <milletseb@laposte.net>
+
+	* t/10-prepost.t: stop using $+ hash for named regex captures!
+	                  Also workaround print out of date with different results
+	                  depending on system ('avr.' versus 'avr' for April...)
+
+	* t/03-enc.t: avoid fallback from UTF16 to other encoding that seem not
+	              work on many OSes (not an issue as this feature is declared
+	              experimental in the POD).
+
+1.0.4 2016-09-19 Sébastien Millet <milletseb@laposte.net>
+
+	* t/06-exdoc.t: stop using $+ hash for named regex captures (not
+	                compatible with some old perl versions)
+
+	* lib/Text/AutoCSV.pm: re-open the input to detect dates - apparently the
+	                       seek instruction is not stable depending on OS and
+	                       perl version.
+
+1.0.3 2016-09-17 Sébastien Millet <milletseb@laposte.net>
+
+	* t/06-exdoc.t: sets TZ to UTC to solve an issue with tz
+	                (credits: SREZIC@cpan.org).
+	                Also skips the test under Windows (TZ update is ignored
+	                and tzset (POSIX module) is not implemented on strawberry.
+
+	* t/10-prepost.t:
+	  t/05-croak.t:   uses like() instead of intermediate variable that'd make
+	                  test result not visible in fail report.
+
+	* lib/Text/AutoCSV.pm: uses home maid _get_def() instead of // constructs
+	                       to preserve compatibility with old Perls (credits:
+	                       SREZIC@cpan.org).
+
+	* lib/Text/AutoCSV.pm: fixes a bug where an unknown field would produce a
+	                       useless (and not understandable) warning before
+	                       displaying error message or sometimes silently
+	                       continuing with uninitialized values
+
+	* lib/Text/AutoCSV.pm: add join() method, that takes all fields of target
+	                       and avoids chaining numerous field_add_link() when
+	                       all fields of remote are wanted.
+
+	* t/11-bugfix.t: adds tests to ensure bugfix non-regression
+
+1.0.2 2016-09-16 Sébastien Millet <milletseb@laposte.net>
+
+	* t/06-exdoc.t: don't use epoch() and from_epoch() of DateTime, use
+	                Time::Local functions instead.
+	                => add Time::Local to module Pre-reqs
+
+	* lib/Text/AutoCSV.pm: fixes a bug in Windows that caused t/03-enc.t to
+	                       fail.
+
+	* t/10-prepost.t: updated printout of certain tests to have more details
+	                  about failed tests.
+
+1.0.1 2016-09-16 Sébastien Millet <milletseb@laposte.net>
+
+	* Ticket 117845 on rt.cpan.org:
+
+	  t/10-prepost.t:      skips tests that need DateTime::Format::Epoch::JD
+	                       if not available.
+	  lib/Text/AutoCSV.pm: improves and fixes in_map and out_map call chain
+	                       arguments.
+	  lib/Text/AutoCSV.pm: improves object status management in case of croak.
+	                       Before: a croak intercepted by an eval would result
+	                       in a not-well-defined status - now, object resets
+	                       itself and manages correctly files closes and
+	                       one_pass attribute.
+	  lib/Text/AutoCSV.pm: changes the way escape character is detected to
+	                       avoid a bug sometimes seen on some smokers.
+
+	* lib/Text/AutoCSV.pm: adds attribute dates_formats_to_try_supp, to add
+	                       (instead of replacing) formats to the default list.
+
+	* lib/Text/AutoCSV.pm: adds format '%Y%m%d%H%M%S' to default datetime
+	                       format list.
+
+	* utils/csvcopy.pl:    add options --dates and --dates_formats_supp.
+
+1.0 2016-09-14 Sébastien Millet <milletseb@laposte.net>
+
+	* Initial build with Dist::Zilla
+
+	* Initial release
+

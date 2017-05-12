@@ -1,0 +1,596 @@
+=head1 NAME
+
+Tk::JComboBox - Create and manipulate JComboBox widgets
+
+=for category Tk Composite Widgets
+
+=head1 SYNOPSIS
+
+=over 4
+
+I<$jcb> = I<$parent>-E<gt>B<JComboBox>(?I<options>);
+
+=back
+
+=head1 DESCRIPTION
+
+JComboBox is a L<composite widget|Tk::CWidget> that contains a text Label or Entry, a Button, and a popup Listbox. It performs the same sort of tasks that can be accomplished by several L<other Composite widgets|/ALTERNATIVES>. Some such as BrowseEntry and Optionmenu are part of the standard Tk distribution, and there are many others available in CPAN. 
+
+JComboBox borrows features from the Java Swing component bearing the same name, but falls short of being a true clone. Many of the methods and the general look and feel should be familiar to java developers. JComboBox also combines several features offered by many of the other "Combo Box" implementations, and works in two modes: I<editable> and I<readonly>.
+
+In I<readonly> mode, JComboBox offers similar functionality to Optionmenu. It is basically a labeled button that activates a popup list.  An item from the list is displayed on the Button when selected.
+
+When I<editable>, JComboBox somewhat resembles BrowseEntry. That is, the widget is composed of an Entry widget with a Button to the right of it. As in the editable mode, the Button activates a popup Listbox from which a single item can be selected.
+
+For more detailed information on using this widget, refer to the L<JComboBox tutorial|Tk::JComboBox::tutorial>.
+
+=head1 COMPONENTS
+
+You should use caution when configuring JComboBox subwidgets. Extensive configuration changes may result in unexpected or invalid behavior. The subwidgets are advertised to allow for fine tuned configuration of the internal subwidgets, when there no provided options or methods that will do what you need.
+
+=head2 Subwidgets used in I<readonly> mode
+
+=over 4
+
+=item B<Entry, RO_Entry>
+
+Widget: L<B<Label>|Tk::Label>
+
+This Label is used to display the selected item from the popup Listbox. This widget and the Button subwidget form the face of the Button that triggers the popup Listbox.
+
+=back
+
+=head2 Subwidgets used in I<editable> mode
+
+=over 4
+
+=item B<Entry, ED_Entry>
+
+Widget: L<B<Entry>|Tk::Entry>
+
+This Entry is used to display the selected item from the popup Listbox, or can accept input that does not appear within the Listbox.
+
+=back
+
+=head2 Subwidgets used in both modes
+
+=over 4
+
+=item B<Button, ED_Button, RO_Button>
+
+Widget: L<B<Label>|Tk::Label>
+
+This Label is used to trigger the Popup Listbox, and by default displays a bitmap of a filled triangle that points downward. This subwidget only supports Label options.
+
+=item B<Popup>
+
+Widget: L<B<Toplevel>|Tk::Toplevel>
+
+This widget contains the Listbox subwidget that displays one or more entries that can be selected for the JComboBox. This is mostly used a container (and an additional way of configuring the Listbox dimensions).
+
+=item B<Listbox>
+
+Widget: L<B<Listbox>|Tk::Listbox>
+
+Used to contain one or more entries, one of which can be selected and displayed within the Box subwidget. I<Note: use caution when using this Subwidget directly. In 804 versions of Tk, Listbox has a memory leak. It's suggested that you use JComboBox methods for adding/deleting/clearing Listbox elements to avoid the leak.>
+
+=back
+
+=head1 OPTIONS
+
+JComboBox supports a long list of options, so to try and break them up a bit I've grouped them in sections. The Basic section contains options that implement or override standard Tk options. or deal with simple things such as colors. The Callback section contains all the options that can have configured Callbacks. The Miscellaneous section contains options that are unique to this widget. These options provide complex functionality that can alter look and feel or provide for initialization shortcuts.
+
+=head2 Basic options
+
+=over 4
+
+=item B<-background/-bg>  
+
+NAME: background  CLASS: Background
+
+Specifies the normal background color to use when displaying the widget. This color will be applied to all internal widgets as well. For fine-tuned configuration of subwidgets, refer to the L<-subwidgets|Tk::CWidget/item_name_subwidgets> option.
+
+=item B<-bitmap>
+
+Specifies a bitmap to display in the I<Button> subwidget. Defaults to a filled,downward pointing triangle.
+
+=item B<-borderwidth/-bd> 
+
+NAME: borderwidth CLASS: BorderWidth
+
+Specifies a non-negative value indicated the width of the of the 3-D border to draw around the outside of the widget.
+
+=item B<-cursor>
+
+NAME: cursor CLASS: Cursor
+
+Specifies the mouse cursor to be used for the widget. This cursor will be applied to all internal widgets as well.
+
+=item B<-disabledbackground>
+
+Specifies the background color to display when the JComboBox state is set to I<disabled>. This option currently only affects the Entry subwidget, while in I<editable> mode.
+
+=item B<-disabledforeground>
+
+Specifies the foreground color to display when the JComboBox state is set to I<disabled>. This option affects both the Entry and Button subwidgets in either mode.
+
+=item B<-entrybackground>
+
+Specifies the background color used in one or more subwidgets depending on the mode. In both modes, the color is applied to the Entry and Listbox subwidgets. In I<readonly> mode, the background is also applied to the Button subwidget. 
+
+=item B<-entrywidth>
+
+NAME: entryWidth CLASS: EntryWidth
+
+Specifies a value to use for sizing the width of the Entry subwidget. The specified value can fall in one of three categories. If a value greater than 0 is specified, then the Entry will use that width regardless of the contents of the Listbox, or values set to the Listbox. If the value is set to 0, then the Entry will be sized large enough to hold its current text. If set to -1, the Entry will be sized to the longest item currently contained within the Listbox. The value defaults to B<-1>, which works well for when the JComboBox contains a fairly static list. Otherwise, a value greater than 0 is recommended.
+
+=item B<-font>
+
+NAME: font CLASS: Font
+
+Specifies the font to use when drawing text inside the widget. This font will be applied to internal widgets that can display a font.
+
+=item B<-foreground/fg>
+
+NAME: foreground CLASS: Foreground
+
+Specifies the foreground color to use for the Entry and Listbox subwidget in either mode.
+
+=item B<-gap>
+
+NAME: gap CLASS: Gap
+
+Specifies the number of spaces (in characters) between the Entry and the Button subwidgets. Default value is B<0>.
+
+=item B<-highlightbackground>
+
+Specifies the color to display in the highlight region when the widget does not have the input focus.
+
+=item B<-highlightcolor>
+
+Specifies the color to use for the highlight rectangle that is drawn around the widget when it has the input focus.
+
+=item B<-highlightthickness>
+
+Specifies the size of the rectangle surrounding the JComboBox that changes color when it has the focus. The default value is B<0>. I<Note that on Win32 systems, focus is drawn slightly differently than on other systems. JComboBox does not currently account for the difference.>
+
+=item B<-pady>
+
+I<OptionDB> NAME: pady CLASS: PadY
+
+Specifies the width of a rectangular border to insert between the Entry/Button Subwidgets and their container. This can be used to enlarge the height of the JComboBox. It has no default value.
+
+=item B<-relief>
+
+NAME: relief CLASS: Relief
+
+Specifies the border style desired for the widget. Acceptable values are raised, sunken, flat, ridge, solid, and groove. The value indicates how the interior of the widget should appear relative to its exterior; for example, raised means the interior of the widget should appear to protrude from the screen, relative to the exterior of the widget. The default value depends on the mode: B<groove> in I<readonly> mode and B<sunken> in I<editable> mode.
+
+=item B<-selectbackground>
+
+Specifies the background color to use when displaying selected items. This value will be applied to the Listbox in both modes, and to the Entry subwidget in I<editable> mode.
+
+=item B<-selectborderwidth>
+
+Specifies a non-negative value indicating the width of the 3-D border to draw around selected items. The value may have any of the forms acceptable to Tk_GetPixels. This value will be applied to the Listbox subwidget in both modes, and to the Entry subwidget in I<editable> mode.
+
+=item B<-selectforeground>
+
+Specifies the foreground color to use when displaying selected items. This value will be applied to the Listbox subwidget in both modes, and to the Entry subwidget in I<editable> mode.
+
+=item B<-state>
+
+NAME: state CLASS: State
+
+Specifies one of two state values for the JComboBox: I<normal> and I<disabled>. When the state is set to I<disabled>, the event handlers will not respond to user events, and the color of the JComboBox will change depending on the mode. In both modes, -disableforeground will be applied to both the Entry and Button subwidgets' foreground. In I<editable> mode, -disablebackground will be applied to the Entry subwidget's background. The I<disabled> state also causes -takefocus to be set to B<0>. Changing the state back to the default of I<normal> will reverse these changes to the JComboBox.
+
+=item B<-takefocus>
+
+NAME: takeFocus CLASS: TakeFocus
+
+Determines whether or not the JComboBox takes focus or not during keyboard traversal. This setting defaults to B<1> and is crucial to the JComboBox accepting keyboard events. Regardless of mode, it is the Entry subwidget within the JComboBox that receives the focus, and so it should be the target of any key binding. 
+
+=item B<-textvariable>
+
+NAME: textVariable CLASS: Variable
+
+Used to pass a scalar reference into the JComboBox that will provide a way of setting and accessing the selected I<value>. This option can be used as an alternative to using the various widget methods because scalar references that are passed are tied to widget methods. Every time the variable is accessed, it is roughly equivalent to calling: I<getSelectedValue()>, and every time the variable is set, it is like calling: I<setSelected($value, -type => 'value')>. 
+
+Because each Listbox entry in JComboBox could represent two pieces of information, it's important to understand precisely what the -textvariable provides access to. Given the following setup:
+
+   my $value;
+   my $jcb = $mw->JComboBox(
+      -textvariable => \$value,
+      -choices => [
+         {-name => 'one', -value => 1},
+         {-name => 'two', -value => 2},
+         "three"
+      ],
+   )->pack;
+
+The following should be expected:
+
+   $jcb->setSelectedIndex(0);
+   print $value . "\n";    ## prints 1  
+   $jcb->setSelectedIndex(2);
+   print $value . "\n";    ## prints three
+
+And the following would also be expected:
+
+   $this = 2;        ## changes the selection to "two"
+   $this = "three";  ## changes the selection to "three"
+
+Because no value for "three" was specified, the value defaults to "three" for the purpose of both examples. Note that the mode may limit what can be set as well. For example, in "readonly" mode, the only items that can be selected are those that appear within the Listbox. 
+
+Note: Unlike other widgets, -textvariable is tightly controlled within JComboBox and experimentation is recommended if you plan to use it. It can be used as a shortcut for setting/retrieving item values. 
+
+=back
+
+=head2 Callback options
+
+Some of the options have changed names since the previous version. -menucreate/-menumodify, for example are now, -popupcreate/-popupmodify. After having now looked at the code for a year or so, the old names felt wrong. After all, it is not a menu that is displayed, its a Listbox, and the two are very different. Because I had a subwidget called Popup, it seemed to make more sense to me for these options to use "popup" instead of "menu". 
+
+=over 4
+
+=item B<-matchcommand>
+
+Specifies a callback that will be used to determine whether a specified String matches a field within the popup Listbox. This callback will be invoked every time a search for an index is done. This callback will be utilized within the I<getItemIndex> method, and through the Autofind functionality (which uses getItemIndex).
+
+Callbacks are passed at least two parameters: $searchStr and $field. I<searchStr> contains the search string. This will be the search pattern. When the -matchcommand is not set, all special regex patterns are escaped, and the search is generally anchored to the start of any string it will compared to. I<field> is a single item within the list that the searchStr is being checked against. It will either be the name, which is the String that appears in the list, or it's value. The value is non-visible element associated with the visible one. A callback should return 1 if the match succeeds, and 0 otherwise.
+
+Refer to the tutorial for more information on this option.
+
+=item B<-popupcreate/-listcmd>
+
+Specifies a callback that will be invoked prior to showing the Popup Listbox. This callback is the first of two callback options that can be invoked prior to displaying the Popup. The most common use case would be for someone wanting to dynamically populate the contents of the widget prior to displaying it. After this callback is invoked JComboBox will go through it's own internal routine of configuring the height/width and positioning characteristics of the Popup. Some of this is driven by various configuration options. The downside of this is that any configuration of this type done within a popupcreate callback may be overridden.
+
+Note for versions prior to 1.12: In prior versions, this callback could be configured to completely replace the internal positioning/configuration of the Popup. This is a good deal of trouble for soneone to go through, and it didn't seem to be a likely need -- espcially given the presence of the -popupmodify option. Developers using this option in older versions, can call $jcb->PopupCreate within their custom -popupcreate callback to get an aproximation of the functionality in 1.12 and beyond. Also in older versions if the JComboBox contained no items or was already being displayed this callback would not be invoked. This is no longer the case.
+
+=item B<-popupmodify>
+
+Specifies a callback to call immediately before the Popup is shown. This is the second of two callbacks called prior to displaying the Popup. This callback can be used to override any height/width or positional configuration done prior to this callback. It serves as a mechanism for the developer to have the final word in how the Popup should display before it is shown. The expectation is that use of this option will be rare and most developers will prefer the -popupcreate option over this one.
+
+=item B<-selectcommand/-browsecmd>
+
+Specifies a callback to call every time a selection is made within the JComboBox. The specified callback will be passed the following arguments, in this order: $jcbWidget, $selectedIndex, $selectedValue, $selectedName. In cases where a value is not specified for an entry, the value will be the same as for $selectedName. In I<editable> mode, when an entry is displayed that does not appear within the Listbox, the $selectedIndex will be set to -1, and both the selectedName and selectedValue will be the value displayed within the Entry subwidget. The selectcommand CALLBACK will only be called once after each change to the selection. This option is roughly equivalent to the -browsecmd and -browse2cmd found in BrowseEntry.
+
+=item B<-validatecommand>
+
+Specifies a callback to evaluate when you want to validate the input into the entry widget. Setting it to undef disables this feature (the default). This command must return a valid boolean value. If it returns 0 (or the valid boolean equivalent) then it means you reject the new edition and it will not occur and the invalidCommand will be evaluated if it is set. If it returns 1, then the new edition occurs. More details of this option can be found in the L<documentation|Tk::Entry/VALIDATION> for the Entry widget. Also take a look at the -validate option listed later in this document.
+
+=back
+
+=head2 Miscellaneous options
+
+=over 4
+
+=item B<-autofind>
+
+Specifies the configuration parameters for a set of functionality that uses key strokes to quickly locate and/or select entries within the Popup Listbox. This option takes a reference to a hash containing one or more options that each take a boolean value. Some options have no effect depending on the mode. 
+
+The options currently include:
+
+B<-enable> - Specifies whether or not to enable autofind or not. The value defaults to B<1>.
+
+B<-casesensitive> - Specifies whether or not the autofind capability should ignore the case of each keystroke when finding a match in the List. Defaults to B<0>.
+
+B<-complete> - Specifies whether or not to use auto completion when the JComboBox is in I<editable> mode. Auto completion causes the remainder of an entry to be filled in when a matching entry is found, though the entry is not yet selected. Defaults to B<0>. Note, this option is ignored regardless of value when the -select option is enabled.
+
+B<-select> - Selects the first item in the list that matches the keystroke (in I<editable> mode), and entry (in I<readonly> mode). Repeated keys/entries will cause the next matching entry to be selected. Defaults to B<0>. This option takes priority over the -complete option.  
+
+B<-showpopup> - Specifies whether or not to display the Popup Listbox when a matching entry is found within the list. Defaults to B<1>.
+
+More information on this option can be found in the tutorial under L<Using Autofind|Tk::JComboBox::tutorial/The Autofind Option>.
+
+=item B<-listhighlight>
+
+NAME: listHighlight CLASS: ListHighlight
+
+Specifies whether or not list highlighting should be set. List highlighting is typical on Win32 Combo Box implementations. When the mouse is over a Listbox item, the item appears as though it were selected in the Listbox. A value of B<1> enabled the feature, and B<0> deactivates it. The default setting is B<1>.
+
+
+=item B<-listwidth>
+
+NAME: listWidth CLASS: ListWidth
+
+By default, the width of the Popup is sized to fit the width of the JComboBox. This option allows that behavior to be modified. If defined, the listwidth will be applied to the width of the Listbox, and the width of the Listbox will be the primary factor in sizing the Popup (borderwidth of the Popup, and presence of a scrollbar also will figure into sizing). The default value is B<-1>.
+
+=item B<-maxrows>
+
+NAME: maxRows Class: MaxRows
+
+Specifies a maximum number of rows that will be displayed in the Listbox subwidget. If the Listbox contains fewer elements than the specified size, then it will shrink to fit only that number. If there are more elements than the specified maxrows size, then the Listbox will adjust the height to the specified number and use a scrollbar for accessing the other elements. Defaults to B<10>. I<Note: if a specified maxrows value causes the Popup to expand beyond the top and bottom of the screen, then the maxrow setting will be overridden automatically so that the popup can be contained within the screen.>
+
+=item B<-mode>
+
+NAME: mode  CLASS: Mode
+
+Specifies the operating mode of the JComboBox, and can either by I<readonly>, the default, or I<editable>. The mode can currently only be set at Creation time, and cannot be reconfigured. Some options can have subtly different affects depending on the mode. These cases will be noted under the documentation for each option.
+
+=item B<-updownselect>
+
+NAME: updownSelect CLASS: UpDownSelect
+
+When the JComboBox has focus, and the popup is visible, the arrow keys can be used to move the Listbox selection up or down. The Listbox selection is not necessarily equivalent to the JComboBox selection. In Win32 Combo Box implementations, it is common for the up/down keys to also affect the JComboBox selection along with the Listbox selection. This option toggles that behavior. If set to B<1> then the arrow keys will treat the previous or next item in the Listbox as the selected item in the JComboBox, and if set to B<0>, it won't. The default setting is B<1>.
+
+=item B<-validate>
+
+NAME: validate CLASS: Validate
+
+This option is only used when in I<editable> mode, and generally is exactly the same as the same option for the L<Entry Widget|Tk::Entry>. It specifies the mode in which validation should operate: B<none>, B<focus>, B<focusin>, B<focusout>, B<key>, or B<all>. It defaults to B<none>. When you want validation, you must explicitly state which mode you wish to use. 
+
+In addition, there are two other values: B<match> and B<cs-match> that restrict values to entries that are contained within the internal List. cs-match treats case as significant, and match does not. When used, these options effectively negate the B<editable> mode. When these values are configured, the JComboBox automatically configures its own CALLBACK for the B<-validatecommand> option.
+
+=back
+
+=head2 The Choices option
+
+=over 4
+
+=item B<-choices/-options>
+
+Specifies a reference to an array to use to populate the JComboBox with entries. This option is meant to be used when creating the Widget, and reconfiguring this option will first delete any preexisting entries before adding the new ones. The value is expected to be an array reference. Setting the value to an empty string will remove the tie along with any existing entries.
+
+=back
+
+As of version 1.07, setting the -choices option will do more than simply populate the JComboBox Listbox -- it will tie the internal List to the array. This means that as an alternative to using the various public methods, you can use the array as an interface. Changes made to the array will be reflected in the JComboBox, and vice versa. 
+
+As of version 1.08, a single array can be associated with multiple JComboBox instances. However, the precise behavior merits further explanation. Not all associated instances have the same relationship with the array. The first instance to be configured with the array becomes the master instance, and all other instances retain roles as observers. When changes are made to the array, both master and observers will be modified to reflect the change. Changes made to the master through its methods will reflected in the array, and those made to observers will not. If the master is reconfigured to use a different choices array, then all of the other observers will automatically be reconfigured as well. If an observer is reconfigured, then it will be the only one to be changed. If the new array is not already associated with other JComboBox instances, then the observer will become the master instance for the new array, 
+
+For more details on using this option, refer to the section in the tutorial, L<Access Through the Choices Array|Tk::JComboBox::tutorial/Access Through the Choices Array>.
+
+=head1 METHODS
+
+=over 4
+
+=item I<$jcb-E<gt>>B<addItem>(I<string, ?option =E<gt> value>)
+
+Appends a new Listitem to be used in the Popup Listbox. I<string> is a scalar variable that will be displayed in the Listbox. This method takes two options B<-selected> and B<-value>:
+
+B<-selected> => I<selected>
+
+Where I<selected> is a boolean value (B<true/yes/1>) and determines whether or not the list item is the select item within the JComboBox. The default value for this is B<false>. Any subsequent call that uses this option overrides previous ones.
+
+B<-value> => I<value>
+
+Where I<value> is an alternate scalar associated with the List item for times when it's desirable to have a value other than the one displayed (can be useful for database applications).
+
+B<Example:> 
+
+   $jcb->addItem('Alaska', -value => 'AK', -selected => 1);
+
+=item I<$jcb-E<gt>>B<clearSelection>()
+
+Clears the current selected item in the JComboBox, if one is selected.
+
+=item I<$jcb-E<gt>>B<getItemIndex>(I<string, ?option =E<gt> value, ...>)
+
+Searches the JComboBox for the first item that matches the given string and returns that item's index. If no match is found, returns B<-1>. This methods supports the options B<-mode> and B<-type>.
+
+B<-type> => I<type>
+
+Where I<type> is either B<name>, which is the displayed text, or B<value>, which is the alternate value associated with the item. If an item in the JComboBox does not have a value defined, then that item's name will be used. Defaults to B<name>.
+
+B<-mode> => I<mode>
+
+Where I<mode> affects how the given string is compared to a list item. Values include: B<exact>, B<usecase>, and B<ignorecase>. B<exact> means that the I<string> must completely match the list item, including case. B<usecase> means that the I<string> must match the beginning of the list item, including its case. B<ignorecase> means that the I<string> must match the beginning of the list item, regardless of the case. Defaults to B<exact>.
+
+B<Example:>
+
+ ## Finds first matching list item that has a value complete matching AK
+ my $index = $jcb->getItemIndex('AK', -type => 'value');
+ ## Finds the first matching list item that starts with the letter 'a'
+ my $index = $jcb->getItemIndex('a', -mode => 'usecase');
+ ## Finds the first matching list item that starts with 'a' or 'A'
+ my $index = $jcb->getItemIndex('a', -mode => 'ignorecase');
+
+=item I<$jcb-E<gt>>B<getItemCount>()
+
+Returns the number of list items stored in the JComboBox.
+
+=item I<$jcb-E<gt>>B<getSelectedIndex>()
+
+Returns the index of the current selected item or -1, if none of the items is selected.
+
+=item I<$jcb-E<gt>>B<getSelectedValue>()
+
+Returns the value of the current selected value or an B<undef> if there isn't one selected. In I<editable> mode, if there is no item selected, it will return the contents of the Entry widget, if there are any characters there, and an B<undef>.
+
+=item I<$jcb-E<gt>>B<getItemNameAt>(I<index>)
+
+Returns the string displayed in the Listbox at the specified I<index>, or B<undef> if there is no name at the specified I<index> (index out of range).
+
+=item I<$jcb-E<gt>>B<getItemValueAt>(I<index>)
+
+Returns the alternate value associated with the list item at the specified I<index> if it is set. Otherwise, the displayed name will be returned (The same as if I<getItemNameAt> had been called).
+
+=item I<$jcb-E<gt>>B<hidePopup>()
+
+Causes the popup Listbox to the withdrawn from the screen, unmapping it. 
+
+=item I<$jcb-E<gt>>B<index>(I<index>)
+
+Returns the integer value that corresponds to I<index>. If I<index> is B<end> then return value is a count of the number of elements in the Listbox (not the index of the last element).
+
+=item I<$jcb-E<gt>>B<insertItemAt>(I<index, string, ?option =E<gt> value, ...>)
+
+Inserts a new list item into the JComboBox at the specified I<index>. Refer to the section on L<indices|Tk::Listbox/INDICES> in the L<Listbox documentation|Tk::Listbox>. I<string> is a scalar variable that will be displayed in the Listbox (also referred to in this document as the List item I<name>). This method takes two options: B<-selected> and B<-value>. 
+
+B<-selected> => I<selected>
+
+Where I<selected> is a boolean value (B<true/yes/1>) and determines whether or not the list item is the select item within the JComboBox. The default value for this is B<false>. Any subsequent call that uses this option overrides previous ones.
+
+B<-value> => I<value>
+
+Where I<value> is an alternate scalar associated with the List item for times when it's desirable to have a value other than the one displayed (can be useful for database applications).
+
+B<Example:> 
+
+The following example produces the same result as the example given for I<addItem>:
+
+   $jcb->insertItemAt('end', 'ALASKA', -value => 'AK', -selected => 1);
+
+=item I<$jcb-E<gt>>B<popupIsVisible>()
+
+Returns B<1> if the popup is visible (mapped) and B<0> otherwise.
+
+=item I<$jcb-E<gt>>B<removeAllItems>()
+
+Completely removes all list items from the JComboBox, and clears any selected item if present. In I<editable> mode, this will also clear the Entry widget.
+
+=item I<$jcb-E<gt>>B<removeItemAt>(I<index>)
+
+Deletes a single list item from the JComboBox at the specified I<index>.
+
+=item I<$jcb-E<gt>>B<see>(I<index>)
+
+Adjusts the JComboBox so that the list item indicated by the specified I<index> is visible. If the Listbox is hidden, it will be made visible, and the list will shift so that the item is viewable.
+
+=item I<$jcb-E<gt>>B<setSelected>(I<string, ?option =E<gt> value, ...>)
+
+Sets the index of the first element that matches the specified I<string> as selected, and has no effect if there are no matches. Generally, this method is a lot like I<getItemIndex>, and takes the same options: B<-type> and B<-mode>.
+
+B<-type> => I<type>
+
+Where I<type> is either B<name>, which is the displayed text, or B<value>, which is the alternate value associated with the item. If an item in the JComboBox does not have a value defined, then that item's name will be used. Defaults to B<name>.
+
+B<-mode> => I<mode>
+
+Where I<mode> affects how the given string is compared to a list item. Values include: B<exact>, B<usecase>, and B<ignorecase>. B<exact> means that the I<string> must completely match the list item, including case. B<usecase> means that the I<string> must match the beginning of the list item, including its case. B<ignorecase> means that the I<string> must match the beginning of the list item, regardless of the case. Defaults to B<exact>.
+
+=item I<$jcb-E<gt>>B<setSelectedIndex>(I<index>)
+
+Selects the list item at the specified I<index>, and has no effect if the specified I<index> does not exist.
+
+=item I<$jcb-E<gt>>B<showPopup>()
+
+Displays the popup Listbox if hidden (normally triggered by JComboBox button, or one of the key bindings. This method invokes CALLBACK registered to B<-menu create>, which defaults to the I<ShowPopup> method. When this method is called, it will make a global Grab, and will temporarily steal grab from any other window that made a grab. Call "hidePopup" to release the grab and return it to whatever widget had it before this method was called. This is useful when using JComboBox within DialogBox widgets.
+
+=back
+
+=head1 BINDINGS
+
+=head2 Default Keyboard Bindings
+
+Like other Combo Box implementations, JComboBox now has a set of Keyboard bindings that provide access to the entries within the popup Listbox. The precise behavior of some of these bindings will depend on JComboBox options such as B<-autofind>, B<-list highlighting>, and B<-updownselect>.
+
+=over 4
+
+=item Alt-Down 
+
+Toggles the visibility of the Popup. The event handler is I<AltDown>.
+
+=item Alt-Up
+
+Hides the popup. The event handler is I<hidePopup>.
+
+=item Down 
+
+Moves the Listbox selection down by one entry as long as there is an entry for the selection to move to. Refer to documentation on L<-autofind|Tk::JComboBox::tutorial/The Autofind Option> and L<-updownselect|Tk::JComboBox::tutorial/The UpDownSelect Option>. The Event Handler is I<UpDown>.
+
+=item Escape
+
+Hides the popup. The event handler is I<hidePopup>.
+
+=item FocusOut
+
+Sets the displayed entry as selected. Uses the I<Enter> event handler.
+
+=item KeyPress
+
+The precise behavior of a Key press depends on the B<-mode> and the B<-autofind> option. The default behavior for I<readonly> mode is similar to what you might encounter in a Windows environment. The List items will be searched and the first entry that begins with the pressed letter will be selected, regardless of case. If the same key is pressed again, then the search will begin from the previous match. The Listbox will be shown, and the matching entry will be selected and visible.
+
+For the I<editable> mode, the default behavior is identical, except that instead of just the first letter, the entire String within the Entry will be used for the search. Refer to the Tutorial documentation on L<Customizing Interface Behavior|Tk::JComboBox::tutorial/Customizing Interface Behavior> for more information. Uses the I<KeyPress> event handler.
+
+=item Up
+
+Moves the Listbox selection up by one entry as long as there is an entry for the selection to move to. Refer to documentation on L<-updownselect|Tk::JComboBox::tutorial/The UpDownSelect Option>. The Event Handler is I<UpDown>.
+
+=back
+
+=head2 Creating your own bindings
+
+There really isn't much in the way of convention or policy on how composite widgets, such as JComboBox should handle events and binding, so JComboBox tries to strike a balance between between simplicity, flexibility, and functionality. Even so, simplicity sometimes takes a back seat to the other two. Let's say that after checking out the options, you decide that none of the built-in behavior provides quite what you need, and you decide that a binding is necessary.
+
+If the binding is I<not> for a key-related event, then I'd suggest that you bind directly to one of JComboBox's Subwidgets. They are all documented. You might consider passing a variable containing the JComboBox instead to your event handler as well, because the first parameter passed to your subroutine will be the Subwidget being bound. Be aware that some of these Subwidget may already be bound internally by JComboBox.
+
+If you are interested in making a I<key> binding, then my best advice would be to bind to the B<Entry> subwidget, since it is the only widget within JComboBox that has been setup to takefocus. It is important to remember that most of the bindings that are listed in this document, are also bound to B<Entry>, so test any binding you do very carefully to ensure that it does what you wish. Here is an example of how a binding for the <Return> (Enter) key might be done (this should work equally well for either mode): 
+
+   use Tk;
+   use Tk::JComboBox;
+
+   my $variable;
+   my $mw = MainWindow->new;
+   my $jcb = $mw->JComboBox(
+      -choices => [
+         { -name => 'Black',  -value => '#000000' },
+         { -name => 'Blue',   -value => '#0000ff' },
+         { -name => 'Green',  -value => '#008000' },
+         { -name => 'Purple', -value => '#8000ff' },
+         { -name => 'Red',    -value => '#ff0000' },
+         { -name => 'Yellow', -value => '#ffff00' }],
+      -textvariable => \$variable  
+   )->pack;
+   $jcb->Subwidget('Entry')->bind('<Return>', [\&Submit, $jcb]);
+   $jcb->focus;
+
+   MainLoop;
+
+   sub Submit {
+      my ($entry, $jcb) = @_;
+      print "\nSubmit Called\n";
+      my $index = $jcb->getSelectedIndex();
+      print "Index: $index \n";
+      print "value: " . $jcb->getSelectedValue() . "\n";
+      print "name:  " . $jcb->getItemNameAt($index) . "\n";
+      print "textvariable: $variable \n";
+      $done = "done";
+   }
+
+=head1 ALTERNATIVES
+
+=head2 Standard distribution
+
+If JComboBox doesn't fit your needs, you're free to modify the code as you see fit, but before you do, you might consider some of the alternatives that are available on CPAN. Even if none of the others is a perfect fit, it may be closer to what you were looking for, and be easier to modify.
+
+The standard distribution contains two Composites that do some of what JComboBox does: L<Tk::BrowseEntry|Tk::BrowseEntry> and L<Tk::Optionmenu|Tk::Optionmenu>. BrowseEntry visually resembles JComboBox in I<editable> mode to a certain extent, and Optionmenu is a bit like JComboBox in I<readonly> mode. The main difference is that JComboBox more closely resembles a Win32 Combo Box (Pre-Windows XP).
+
+=head2 Available on CPAN
+
+On CPAN, there are a few more choices available:
+
+=over 4
+
+=item JBrowseEntry
+
+JBrowseEntry is maintained by Jim Turner, and began as an enhanced version of BrowseEntry in the main distribution. JBrowseEntry initially tweaked the appearance of the composite, and added key bindings including one to search for List entries corresponding to a key press. JBrowseEntry has since been modified to have a Win32 appearance when used on Windows versions. One of its nice touches is that it has the option of specifying a different bitmap for arrow button for when the widget has focus. It's a nice idea, and one way of working around focus and highlighting issues -- I might keep that in the mind for the future.
+
+I'm not precisely sure how JBrowseEntry currently compares to BrowseEntry, but at one time JBrowseEntry provided key bindings where JComboBox did not, and since it was an enhanced BrowseEntry, someone could replace any instances of BrowseEntry without breaking their existing code, and then take advantage of the enhancements, which is a real advantage for someone looking for a nice upgrade with little to no integration work. The same can <i>not</i> be said for JComboBox.It was never intended as a clone or enhanced BrowseEntry. 
+
+JBrowseEntry's document isn't that current unfortunately. It leads one to believe that JComboBox does not provide key bindings. At one time, this was true, but as of release 1.0, JComboBox also has key bindings and is generally more configurable than JBrowseEntry, and provides more out-of-the-box functionality. To be fair, this does come at price: JComboBox has a larger number of options and methods, and can be more difficult to learn. The hopeful payoff is that less time should be required to implement common Combo Box behavior leaving more time to implement core business requirements. 
+
+=item ComboEntry
+
+ComboEntry is part of distribution (Tk-DKW) created by Damion Wilson. This was one of the first Combo Box-type widgets available on CPAN, outside of the main distribution. Damion's distribution served as a good source of examples when I was first learning Tk, and I have a soft spot for them, but I've found many of the widgets in the distribution to be buggy, and not documented very well. Also, the distribution has not been updated since 1999, so it appears to be unsupported. Having said that, ComboEntry may still serve as a useful starting point for your own customized version. 
+
+=item MenuEntry
+
+MenuEntry is part of Graham Barr's, Tk-GBARR distribution, which is currently maintained by Slaven Rezic. MenuEntry was one of the "unfinished" widgets included in that distribution, and was the widget I used as the initial starting point for this widget (Thanks, Graham!). It is as bare bones an implementation as you're likely to find, plus I liked it's look. I initially made only a few minor modifications, then a few more, and finally it got to the point where it no longer resembled Graham's widget. Like ComboEntry, I think this is a great widget for use as a starting point, when creating your own, if you should decide to go that route.
+
+=item HistEntry
+
+HistEntry is a specialized BrowseEntry widget maintained by Slaven Rezic. It's purpose is to maintain an internal list of items that are added by adding text and then hitting <Return>.
+
+=item MatchEntry
+
+MatchEntry is an Entry/Listbox combination maintained by Wolfgang Hommel that is used to provide a user friendly auto-completion functionality. The Listbox and auto-completion capabilities are key-driven, and provides a large number of options for configuring the widget. Unlike the other widgets mentioned above the Listbox popup is not triggered by a Button, because MatchEntry doesn't have one. Like HistEntry, MatchEntry is intended for a specialized function. JComboBox also provides some limited auto-completion capabilities, but they are not as sophisticated as what MatchEntry provides.
+
+=back
+
+=head1 VERSION
+
+This document covers the 1.14 release of JComboBox.
+
+=head1 AUTHOR
+
+Rob Seegel (RobSeegel@comcast.net)   

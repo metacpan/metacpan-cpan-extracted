@@ -1,0 +1,11 @@
+2.02  Fix documentation
+
+2.01  Further improvements to make test suite less brittle
+
+2.00  Fixed text failures to do with new version of Text::Textile
+      
+      Moved to Module::Install, added standard kwalitee tests, etc
+
+1.01  Altered bug in POD spotted by Tom Insam
+
+1.00  Initial release

@@ -1,0 +1,180 @@
+Revision history for Text-ANSI-Util
+
+0.22    2016-03-11 (PERLANCAR)
+
+        - [Removed features] Remove Text::ANSI::NonWideUtil (ugly name), but
+          remove wide-character supporting functions (ta_mb*()) in
+          Text::ANSI::Util.
+
+
+0.21    2015-08-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add some description and mention Text::ANSI::WideUtil.
+
+
+0.20    2015-08-20 (PERLANCAR)
+
+        - Split Text::ANSI::WideUtil to its own dist.
+
+        - Re-pass tests [RT#106535].
+
+
+0.19    2015-08-13 (PERLANCAR)
+
+        - Adjust abstract and documentation. We now only deal with ANSI color
+          codes (SGR, \e[...m) and ignore non-color ANSI escape codes.
+
+        - [Bugfix] Add pruning of ANSI color codes so multiple replacement using
+          ta_substr() will not become increasingly slower due to proliferation
+          of unpruned color codes (due to ta_trunc()).
+
+        - [Bugfix] Make ta_wrap work without Text::WideChar::Util (previously,
+          ta_wrap always uses regex patterns from Text::WideChar::Util despite
+          $is_mb is 0).
+
+        - [Bugfix] Fix regex pattern for ANSI color codes (previous one was too
+          broad).
+
+        - Add (currently minimal) bench devscript.
+
+
+0.18    2015-08-12 (PERLANCAR)
+
+	- Add functions: ta_substr, ta_mbsubstr.
+
+
+0.17    2015-08-12 (PERLANCAR)
+
+        - Make Text::WideChar::Util an optional prereq.
+
+        - Also provide Text::ANSI::WideUtil and the leaner
+          Text::ANSI::NonWideUtil (the latter doesn't load Unicode modules, use
+          this if you do not have Unicode/wide characters in your text).
+
+
+0.16    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.15    2014-02-11 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - ta_mbwrap(): Fix small wrapping bug (whitespace before line-broken CJK
+          word was omitted).
+
+
+0.14    2014-02-11 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - ta_mbwrap(): Long CJK words were not line-broken exhaustively.
+
+
+0.13    2014-02-11 (SHARYANTO)
+
+        - ta_mbwrap(): Add support for wrapping Chinese/CJK text.
+
+
+0.12    2013-10-29 (SHARYANTO)
+
+        - No functional changes. Rebuild to resolve 'nested encoding' problem
+          causing MetaCPAN to fail to index the dist (thanks Shantanu Bhadoria).
+
+
+0.11    2013-09-10 (SHARYANTO)
+
+        - Replace Text::CharWidth's mbswidth() with Text::WideChar::Util's
+          mbswidth(), which in turn uses Unicode::GCString. It's about 2.5x
+          slower but more proper and builds on my Windows installation.
+
+
+0.10    2013-05-17 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add return_stats option to ta_{mb,}wrap.
+
+
+0.09    2013-05-17 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - ta_{mb,}wrap(): truncated long word did not retain color at the last
+          line.
+
+
+0.08    2013-04-19 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add functions: ta_extract_codes, ta_add_color_resets,
+          ta_length_height.
+
+        - ta_highlight{,all}: $needle can now be a Regexp.
+
+        - ta_{,mb}wrap: Reimplement, now behavior similar to
+          Text::WideChar::Util's {,mb}wrap().
+
+        [INCOMPATIBLE CHANGES]
+
+        - ta_highlight{,_all}: Remove argument $ci, now use qr/foo/i as $needle
+          for case-insensitive highlighting.
+
+
+0.07    2013-04-10 (SHARYANTO)
+
+        - Add functions: ta_split_codes_single, ta_highlight, ta_highlight_all.
+
+
+0.06    2013-04-09 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - ta_mbtrunc(): Use mbtrunc() which is the proper method, instead of
+          substr().
+
+        - ta_mbpad(): Since ta_mbtrunc() might generate text with width of
+          ($width-1) or less, depending on the width of the truncated wide
+          character, we need to pad the truncated text to go to $width.
+
+
+0.05    2013-04-09 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - ta_{,mb}pad() now does not handle multiline text (the implementation
+          was incorrect after all, "" should've been padded to "xxx" and "a\n"
+          should've been padded to "axx\nxxx"). You can now split multiline text
+          by yourself as you see fit.
+
+
+0.04    2013-04-08 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - ta_{,mb}wrap(): Handles multiple paragraph, fix bug where last word of
+          text is sometimes removed, do not remove terminating newline.
+
+
+0.03    2013-04-06 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add functions: ta_split_codes, ta_{,mb}trunc, ta_{,mb}pad.
+
+
+0.02    2013-03-20 (SHARYANTO)
+
+        - Fix failing CT reports by skipping tests on systems without Chinese
+          locale support.
+
+
+0.01    2013-03-13 (SHARYANTO)
+
+        - First release.

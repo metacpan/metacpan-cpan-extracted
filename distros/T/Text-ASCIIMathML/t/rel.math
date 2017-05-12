@@ -1,0 +1,143 @@
+? =
+<math title="=">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>=</mo>
+  </mstyle>
+</math>
+$$=$$
+
+? !=
+<math title="!=">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&ne;</mo>
+  </mstyle>
+</math>
+$$\ne$$
+
+? <
+<math title="&lt;">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&lt;</mo>
+  </mstyle>
+</math>
+$$<$$
+
+? >
+<math title="&gt;">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&gt;</mo>
+  </mstyle>
+</math>
+$$>$$
+
+? <=
+<math title="&lt;=">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&le;</mo>
+  </mstyle>
+</math>
+$$\leq$$
+
+? >=
+<math title="&gt;=">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&ge;</mo>
+  </mstyle>
+</math>
+$$\geq$$
+
+? -<
+<math title="-&lt;">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Precedes;</mo>
+  </mstyle>
+</math>
+$$\prec$$
+
+? >-
+<math title="&gt;-">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&Succeeds;</mo>
+  </mstyle>
+</math>
+$$\succ$$
+
+? in
+<math title="in">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&isin;</mo>
+  </mstyle>
+</math>
+$$\in$$
+
+? notin
+<math title="notin">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&notin;</mo>
+  </mstyle>
+</math>
+$$\notin$$
+
+? sub
+<math title="sub">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&sub;</mo>
+  </mstyle>
+</math>
+$$\subset$$
+
+? sup
+<math title="sup">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&sup;</mo>
+  </mstyle>
+</math>
+$$\supset$$
+
+? sube
+<math title="sube">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&sube;</mo>
+  </mstyle>
+</math>
+$$\subseteq$$
+
+? supe
+<math title="supe">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&supe;</mo>
+  </mstyle>
+</math>
+$$\supseteq$$
+
+? -=
+<math title="-=">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&equiv;</mo>
+  </mstyle>
+</math>
+$$\equiv$$
+
+? ~=
+<math title="~=">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&cong;</mo>
+  </mstyle>
+</math>
+$$\cong$$
+
+? ~~
+<math title="~~">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&asymp;</mo>
+  </mstyle>
+</math>
+$$\approx$$
+
+? prop
+<math title="prop">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&prop;</mo>
+  </mstyle>
+</math>
+$$\propto$$

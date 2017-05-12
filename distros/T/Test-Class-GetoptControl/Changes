@@ -1,0 +1,7 @@
+Revision history for Perl extension Test-Class-GetoptControl
+
+1.100860  2010-03-27 16:48:25 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.01  Mon 2010.02.08 15:33:43 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

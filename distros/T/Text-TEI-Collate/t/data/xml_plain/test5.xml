@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="tools/tei_ms_crit.rng" type="xml"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Ժամանակագրութիւն</title>
+        <author>Մատթէոս Ուռհայեցի</author>
+        <respStmt xml:id="__TRANSCRIBERID__">
+          <resp>Transcription by</resp>
+          <name>__TRANSCRIBER__</name>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>__PUBLICATIONSTMT__</p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc>
+          <msIdentifier>
+            <settlement>Vienna</settlement>
+            <repository>Mekhitarist Library</repository>
+            <idno>574</idno>
+          </msIdentifier>
+          <p>pp. 264բ-276ա</p>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <div>
+<!-- began on p. 250բ -->
+        <p>Արդ ահա՛ մինչև ցայս վարս բազմա՛ջան և աշխատաւ<lb/>
+որ քննութ<ex resp="#tla">եամ</ex>բ գտեալ գրեցաք զշարագրական գրեալս, զ<lb/>
+<num value="100">Ճ</num>ից ամաց, զոր ի <expan>բազում</expan> <expan>ժամանակաց</expan> հետա՛ հասու եղաք <expan>ըստ</expan> այնքա<lb/>
+նեացս տեսողացն և լսողացն, որք էին ի հին ամաց <expan>ծնեալք</expan>, <lb/>
+և ընթերցողսն առաջին պատգամագրացն որք ականա՛տ<lb/>
+<pb n="265ա"/>
+եսք էին լեալք <expan>ամենայն</expan> եղելոցս, և նեղութե<ex resp="#tla">ան</ex>ցս, յայսոցիկ զոր <lb/>
+<expan>վասն</expan> մեղաց տուն հա՛ոց, և ահա՛ որ զայս <expan>բազում</expan> անգամ զմտաւ <lb/>
+ածեալ իմ, <expan>վասն</expan> այս յետին <expan>ժամանակիս</expan> գրել զդառնա՛շունչ <abbr>կտծս</abbr><lb/>
+ն։ </p>
+        <p><hi>Ի</hi>սկ ի լինել <expan>թվականութեանս</expan> հա՛ոց <note type="auth" place="margin">այս նշանս <expan>վասն</expan> հայոց աշխարհաց էր։</note><lb/>
+ի յամս <num value="500">ԵՃ</num> և <num value="2">Բ</num> եղև ահաւոր նշան և սոսկալի և <abbr>կտրծ</abbr> <lb/>
+մեծի բարկութե<ex resp="#tla">ան</ex> երևեալ ի մեծ <expan>քաղաքն</expan> անտիոք, զոր ի ն<lb/>
+երքո՛ արեգականս <expan>գործեցաւ</expan>, այս <expan>սքանչելիս</expan>, որ էր տեսան<lb/>
+ողացն ահաւոր և հրաշալի. և եղև այս նշանս ա՛հ և դ<lb/>
+ողումս <expan>ամենայն</expan> <expan>հաւատացելոց</expan> <expan>քրիստոսի</expan>, զորս այժմ մեծա՛սաստ ս<lb/>
+պառնալեօք յայտնեաց <expan>աստուած</expan> <expan>զդատաստանսն</expan> ահաւոր և <lb/>
+եղև պատճառ բարկութե<ex resp="#tla">ան</ex>ն այսպէս. և արդ <expan>վասն</expan> զի ազգն <lb/>
+ասորոց <expan>բազում</expan> էին ի <expan>քաղաքն</expan> անտիոք, <add>ոսկով և</add> արծաթով, <lb/>
+լցեալ <expan>հարստտութեամբ</expan> և <expan>ամենայն</expan> <expan>փառաւորութեամբ</expan>, և մանկունք <expan>նոցա</expan> <lb/><expan>յորժամ</expan> երթա՛ին <expan>յեկեղեցին</expan> <expan>իւրոց</expan>, տղայք <num value="500">ԵՃ</num> ի ջորոջ նստե<lb/>
+ալ գա՛ին, և ազգն հոռոմոց ոխացեալ էին յոյժ մեծօ՛ <lb/>
+չարութ<ex resp="#tla">եամ</ex>բ. և մի ոմն իշխան ասորոց ազգէն ունէր կապ<lb/>
+եալ <expan>բազում</expan> և յաղագս այսր պատճառանաց լինէր մեծ <lb/>
+<expan>դատաստան</expan> առաջի պատրիարգին հոռոմոց. և սիրա՛բար <expan>վասն</expan> <lb/><pb n="266ա"/><expan>դատաստանին</expan>, <expan>դարձուցին</expan> զնա՛ ի հ<ex resp="#tla">ա</ex>ւ<ex resp="#tla">ա</ex>տոյն իւրո՛, և կնքեցին զնա՛ <lb/>
+հոռոմ իւր <expan>կամաւորութեամբ</expan>, և իշխանն որ զհ<ex resp="#tla">ա</ex>ւ<ex resp="#tla">ա</ex>տսն եթող, եղև <lb/>
+հակառակ մեծ ազգին ասորոց. և <expan>յայնժամ</expan> մատնեցան ասոր<lb/>
+իք ի մեծ նեղութի<ex resp="#tla">ւն</ex>, <expan>վասն</expan> զի սկսան հ<ex resp="#tla">ա</ex>ւ<ex resp="#tla">ա</ex>տո՛ քննութի<ex resp="#tla">ւն</ex> առնել հա<lb/>
+նապազօր. և այնչափ լրբեացալ <subst><del>ելեալ</del><add place="margin">եղեն</add></subst> ազգն հոռոմոց, <lb/>
+որ և <expan>զգործեալն</expan> ոչ կարացին գիտել, <expan>վասն</expan> զի <expan>քրիստոս</expan>ական <expan>աւետարանն</expan> <lb/>
+հրով այրել <expan>հրամայեաց</expan> <expan>պատրիարգն</expan>. և եղև <expan>յորժամ</expan> ի հուրն դրին զ<lb/><expan>աւետարանն</expan> <expan>աստուծոյ</expan> ձայն ելանէր <expan>յաւետարանէ</expan> անտի, և ի կրակէն ի դ<lb/>
+ուրս ելանէր. <lb/></p>
+      </div>
+<!-- ends on p. 295բ -->
+    </body>
+  </text>
+</TEI>

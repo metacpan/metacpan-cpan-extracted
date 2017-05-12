@@ -1,0 +1,16 @@
+Revision history for Perl extension Term::Chart.
+
+0.04  Fri Jan 13 13:57:07 2017
+    - refinements to POD
+    - bug fix for add_values() method
+
+0.03  Thu Jan 12 22:27:14 2017
+    - now with vertical orientation
+
+0.02  Wed Oct 31 22:47:22 2012
+    - changed min perl version from 5.14 to 5.10
+
+0.01  Mon Sep  3 16:51:37 2012
+	- original version; created by h2xs 1.23 with options
+		-XA -n Term::Chart
+

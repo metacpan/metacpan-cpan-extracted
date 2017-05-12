@@ -1,0 +1,4 @@
+name = "Test-UNIXSock"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

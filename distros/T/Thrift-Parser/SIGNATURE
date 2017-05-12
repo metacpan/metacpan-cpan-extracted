@@ -1,0 +1,98 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bcfecd0db38188c599d9b8d9befbe945d99168ca Build.PL
+SHA1 d7ebdaaebd2ff024a187c791cc1135bf81d223b1 Changes
+SHA1 0fec1267a3ffdefb2edea9c7bf69d11547126419 MANIFEST
+SHA1 0ccf659c14e51532a93df89d842506e9cce6a17c META.json
+SHA1 3ffc6b9067fe78302d61f484aa24a001c9f56526 META.yml
+SHA1 84ed757df8b7e0e2bfd98a77ae072d6df4f4f007 Makefile.PL
+SHA1 ab6c8444dce9aed635fa8054000e20ef7d4a613e README
+SHA1 11f660b9463eb905d990ecf3f6afbc88de5832d9 lib/Thrift/IDL.pm
+SHA1 7c57add90af7f8ae61519de198d61899d345ed57 lib/Thrift/IDL/Base.pm
+SHA1 ed2ecaa1a48b63f9ed57f902f40785ae27e7c786 lib/Thrift/IDL/Comment.pm
+SHA1 b9a812c0fc2d06c3157be6355a7203e9614efc3e lib/Thrift/IDL/Constant.pm
+SHA1 de7bb0d2432a391003ded01bb8ca64856ea2086e lib/Thrift/IDL/CppInclude.pm
+SHA1 362e17b1a10b6d25b1a46665e553056bfb5538e9 lib/Thrift/IDL/Definition.pm
+SHA1 f052ead7cf709fe6b284c4eaa6e7dc5dd66bd7e5 lib/Thrift/IDL/Document.pm
+SHA1 768049b7ddad2c2d446cda3292dadddb578f89a4 lib/Thrift/IDL/DocumentHeader.pm
+SHA1 4482ea21d95bf165ee9102a042bc1d833266ba21 lib/Thrift/IDL/Enum.pm
+SHA1 6550846dec98027aba77d39724c8e84cea415ae3 lib/Thrift/IDL/Exception.pm
+SHA1 628a14411d0090f632ea8c7d935ed2613afc0dc6 lib/Thrift/IDL/Field.pm
+SHA1 1a6f93488a50ae20d49a366823b67b0be26981dd lib/Thrift/IDL/Header.pm
+SHA1 7c386295ea2d8d1bd19d5195812cc8c12497781f lib/Thrift/IDL/Include.pm
+SHA1 13764d7f0b8b3e4b28b3038170e6055c498088ba lib/Thrift/IDL/Method.pm
+SHA1 b5f44829a3d69fff8a9d2066c5daae25bfed78d8 lib/Thrift/IDL/Namespace.pm
+SHA1 67da5c9c1043e0d0c6d5a2e4c29bc34f523ff057 lib/Thrift/IDL/Senum.pm
+SHA1 9f982f20a7a1fefb13f314e76cf595c1d0257b6f lib/Thrift/IDL/Service.pm
+SHA1 9b9a360465d14beebfc85527f04c70c00cf7e9be lib/Thrift/IDL/Struct.pm
+SHA1 6f0447dea7b1154e9961a60a8bb3873add692ddc lib/Thrift/IDL/Type.pm
+SHA1 4722a86a37f01abe256de1f984d8d2c1655aa336 lib/Thrift/IDL/Type/Base.pm
+SHA1 f7d417800c7fad03c72d3f431016c19c0be06d68 lib/Thrift/IDL/Type/Custom.pm
+SHA1 01d2ec7c7860da58656e768e6e2eb7f175c9af7b lib/Thrift/IDL/Type/List.pm
+SHA1 3f7e4b09dd4b59364c6d87c045b7630732010a9e lib/Thrift/IDL/Type/Map.pm
+SHA1 b9ecd950bda472c882b5ed19179b0d82fc0fda1e lib/Thrift/IDL/Type/Set.pm
+SHA1 41e9dbc5323dd473f4a251ab6bb281f5c7471323 lib/Thrift/IDL/TypeDef.pm
+SHA1 5743c127a10df42130cbb05a6009819e452d0941 lib/Thrift/JSONProtocol.pm
+SHA1 3f8af053a27c855b8b2dff7aaf116c4799bbac6d lib/Thrift/Parser.pm
+SHA1 b7ce8c21a31d1febaa46ca1d594139da8184aac5 lib/Thrift/Parser/Exceptions.pm
+SHA1 c4bea73b2bc144af1bd5eb0eb3a8485804cd3a1d lib/Thrift/Parser/Field.pm
+SHA1 b155e60dfcd3af1590674e102fdbf9c798eb1035 lib/Thrift/Parser/FieldSet.pm
+SHA1 cdd17b61b4784bd9b23a8aacea54345aaa52f3f1 lib/Thrift/Parser/Message.pm
+SHA1 9b158f6f972a5b825ada9100f8c8fc1dc7f4f814 lib/Thrift/Parser/Method.pm
+SHA1 daf8094dc5b47ba442e3d0b5e581a93048f0b3c0 lib/Thrift/Parser/Type.pm
+SHA1 8e20e7d7616925393257a0ab46ac005d91297c14 lib/Thrift/Parser/Type/Container.pm
+SHA1 c440a6a49467c02c2704a4b7b10cf08af8ebeaa2 lib/Thrift/Parser/Type/Enum.pm
+SHA1 9def03379e42a7d498cec39ae7b78133910ba4c5 lib/Thrift/Parser/Type/Exception.pm
+SHA1 c03ebdc0886015d5061fa0eff0d9931a3602122c lib/Thrift/Parser/Type/Number.pm
+SHA1 c291fad2bb46b722f18152e96d945e2b56168474 lib/Thrift/Parser/Type/Struct.pm
+SHA1 08bdf2b26220e3a11682cf4e52b1d299caaeb540 lib/Thrift/Parser/Type/binary.pm
+SHA1 e3e0dc6b62cea5c9300cdb9660b3c5580ae7513a lib/Thrift/Parser/Type/bool.pm
+SHA1 ac1c1c249f495d4e8f6d9c48ef3e9ebec38fab2a lib/Thrift/Parser/Type/byte.pm
+SHA1 53ff68dca112253c15cced9fbad100acdcdaf52e lib/Thrift/Parser/Type/double.pm
+SHA1 6e30628be731b0ebf8544cdf3267997ac32886ce lib/Thrift/Parser/Type/i16.pm
+SHA1 3cccbcedb40c685fc62f4a2e6df3406fe7d055f1 lib/Thrift/Parser/Type/i32.pm
+SHA1 74cd3603ebcedff7ed8307befdd65996352d7155 lib/Thrift/Parser/Type/i64.pm
+SHA1 7387793f6672e66aae25757a04214b41f6a18f8c lib/Thrift/Parser/Type/list.pm
+SHA1 f1550d07c0ff2e8ac2d86707eea14ddb4fa80d1c lib/Thrift/Parser/Type/map.pm
+SHA1 1afb2e49ee0d50aae688ed696887c04dfbf866cf lib/Thrift/Parser/Type/set.pm
+SHA1 3c4aeb1f5c065b67d1f03fe805d4765071868b91 lib/Thrift/Parser/Type/string.pm
+SHA1 b2a921f11a0479d735b1d5f4475da17e10063eb3 lib/Thrift/Parser/Type/void.pm
+SHA1 17215ca0dcb11c0808c2750ce52d1b4456c23bb6 lib/Thrift/Parser/Types.pm
+SHA1 09fb299988d24b3ba0dcfbda2223b88def679e31 t/001_idl_parse_file.t
+SHA1 554e089ac2085ec5474c0c6e59641904001688a6 t/002_idl_parse_buffer.t
+SHA1 ba6c6e5fe2a786c6880dd6b37c6796d97e23dcdb t/003_parser.t
+SHA1 c56d966bf14a4900e8e5f6ae5cd2bb052059e004 t/004_idl_document.t
+SHA1 660850f5c14a88c72db7db4abe53220ab3b30a22 t/100_parse_type_number.t
+SHA1 c871778f2f4080cfc2094dee131c9094c9fa9118 t/101_parse_fieldset.t
+SHA1 bede7114c0236654d94afd60578f6bfbc00c3a41 t/102_parse_classes.t
+SHA1 8de55fd8ec22731394cce9f135283b74d4970aa2 t/200_jsonprotocol.t
+SHA1 364fe472e066a831e73f49545a67c2057b8c76c4 t/lib/Thrift/IDL/Document/Test.pm
+SHA1 21a8ea33cc04b253ee553b4b9e8aa5e39489df37 t/lib/Thrift/Parser/FieldSet/Test.pm
+SHA1 03c53833182c01347f867ef7cba8746720192be1 t/lib/Thrift/Parser/Test.pm
+SHA1 3fe877bc5841335e8012958f1687e8c21f1749b1 t/lib/Thrift/Parser/TestCommon.pm
+SHA1 ab5fac8d8b68c57705f67aacca37b8b855ae585e t/lib/Thrift/Parser/Type/Container/Test.pm
+SHA1 f75548ee2a5791782e0e6a67f5a6d93788abe7a8 t/lib/Thrift/Parser/Type/Number/Test.pm
+SHA1 54b42b7a9cc35b0180f6193e281215e5017a1713 t/lib/Thrift/Parser/Type/Test.pm
+SHA1 f3e6d8f2a8f58d08f85bf76b147e2134e423fbd5 t/thrift/shared.thrift
+SHA1 aa3b51e21d28d6264370900062fa60248a4f016f t/thrift/tutorial.thrift
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (Darwin)
+
+iEYEARECAAYFAlB06tMACgkQHHIpFH/pKkIw/wCeIWaxb9Wz7ct4kWf7B7p1UXUY
+2CIAnAg6NJrRODN3LydTfyv9qPqYL0dT
+=0ag+
+-----END PGP SIGNATURE-----

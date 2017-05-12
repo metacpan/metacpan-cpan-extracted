@@ -1,0 +1,36 @@
+=head1 NAME
+
+Tangram::Driver::mysql - Orthogonal Object Persistence in Mysql databases
+
+=head1 SYNOPSIS
+
+   use Tangram;
+   use Tangram::Driver::mysql;
+
+   $schema = Tangram::Driver::mysql->schema( $hashref );
+
+   Tangram::Driver::mysql->deploy($schema, $dbh);
+      
+   $storage = Tangram::Driver::mysql->connect( $schema,
+      $data_source, $username, $password );
+
+   $storage->disconnect();
+
+   Tangram::Driver::mysql->retreat($schema, $dbh);
+
+=head1 DESCRIPTION
+
+This is the entry point in the mysql-specific object-relational
+persistence backend.
+
+This backend makes use of Mysql extensions SELECT GET_LOCK, SELECT
+RELEASE_LOCK and LAST_INSERT_ID to safely allocate object ids in the
+absence of transactions.
+
+The vanilla Relational backend may not be used with Mysql databases in
+multiprogramming context.
+
+=head1 METHODS
+
+This backend does not add any methods; for a description of
+available methods, see L<Tangram::Relational>.

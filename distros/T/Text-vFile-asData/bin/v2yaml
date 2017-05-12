@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use lib qw(lib);
+use IO::File;
+use Text::vFile::asData;
+use YAML;
+
+foreach(@ARGV) {
+    print Dump( Text::vFile::asData->new->parse( IO::File->new( $_ ) ) )
+}

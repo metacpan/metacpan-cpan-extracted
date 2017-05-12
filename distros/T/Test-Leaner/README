@@ -1,0 +1,237 @@
+NAME
+    Test::Leaner - A slimmer Test::More for when you favor performance over
+    completeness.
+
+VERSION
+    Version 0.05
+
+SYNOPSIS
+        use Test::Leaner tests => 10_000;
+        for (1 .. 10_000) {
+         ...
+         is $one, 1, "checking situation $_";
+        }
+
+DESCRIPTION
+    When profiling some Test::More-based test script that contained about 10
+    000 unit tests, I realized that 60% of the time was spent in
+    Test::Builder itself, even though every single test actually involved a
+    costly "eval STRING".
+
+    This module aims to be a partial replacement to Test::More in those
+    situations where you want to run a large number of simple tests. Its
+    functions behave the same as their Test::More counterparts, except for
+    the following differences :
+
+    *   Stringification isn't forced on the test operands. However, "ok"
+        honors 'bool' overloading, "is" and "is_deeply" honor 'eq'
+        overloading (and just that one), "isnt" honors 'ne' overloading, and
+        "cmp_ok" honors whichever overloading category corresponds to the
+        specified operator.
+
+    *   "pass", "fail", "ok", "is", "isnt", "like", "unlike", "cmp_ok" and
+        "is_deeply" are all guaranteed to return the truth value of the
+        test.
+
+    *   "isn't" (the sub "t" in package "isn") is not aliased to "isnt".
+
+    *   "like" and "unlike" don't special case regular expressions that are
+        passed as '/.../' strings. A string regexp argument is always
+        treated as the source of the regexp, making "like $text, $rx" and
+        "like $text, qr[$rx]" equivalent to each other and to "cmp_ok $text,
+        '=~', $rx" (and likewise for "unlike").
+
+    *   "cmp_ok" throws an exception if the given operator isn't a valid
+        Perl binary operator (except '=' and variants). It also tests in
+        scalar context, so '..' will be treated as the flip-flop operator
+        and not the range operator.
+
+    *   "is_deeply" doesn't guard for memory cycles. If the two first
+        arguments present parallel memory cycles, the test may result in an
+        infinite loop.
+
+    *   The tests don't output any kind of default diagnostic in case of
+        failure ; the rationale being that if you have a large number of
+        tests and a lot of them are failing, then you don't want to be
+        flooded by diagnostics. Moreover, this allows a much faster variant
+        of "is_deeply".
+
+    *   "use_ok", "require_ok", "can_ok", "isa_ok", "new_ok", "subtest",
+        "explain", "TODO" blocks and "todo_skip" are not implemented.
+
+ENVIRONMENT
+  "PERL_TEST_LEANER_USES_TEST_MORE"
+    If this environment variable is set, Test::Leaner will replace its
+    functions by those from Test::More. Moreover, the symbols that are
+    imported when you "use Test::Leaner" will be those from Test::More, but
+    you can still only import the symbols originally defined in Test::Leaner
+    (hence the functions from Test::More that are not implemented in
+    Test::Leaner will not be imported). If your version of Test::More is too
+    old and doesn't have some symbols (like "note" or "done_testing"), they
+    will be replaced in Test::Leaner by croaking stubs.
+
+    This may be useful if your Test::Leaner-based test script fails and you
+    want extra diagnostics.
+
+FUNCTIONS
+    The following functions from Test::More are implemented and exported by
+    default.
+
+  "plan"
+        plan tests => $count;
+        plan 'no_plan';
+        plan skip_all => $reason;
+
+    See "plan" in Test::More.
+
+  "skip"
+        skip $reason => $count;
+
+    See "skip" in Test::More.
+
+  "done_testing"
+        done_testing;
+        done_testing $count;
+
+    See "done_testing" in Test::More.
+
+  "ok"
+        ok $ok;
+        ok $ok, $desc;
+
+    See "ok" in Test::More.
+
+  "pass"
+        pass;
+        pass $desc;
+
+    See "pass" in Test::More.
+
+  "fail"
+        fail;
+        fail $desc;
+
+    See "fail" in Test::More.
+
+  "is"
+        is $got, $expected;
+        is $got, $expected, $desc;
+
+    See "is" in Test::More.
+
+  "isnt"
+        isnt $got, $expected;
+        isnt $got, $expected, $desc;
+
+    See "isnt" in Test::More.
+
+  "like"
+        like $got, $regexp_expected;
+        like $got, $regexp_expected, $desc;
+
+    See "like" in Test::More.
+
+  "unlike"
+        unlike $got, $regexp_expected;
+        unlike $got, $regexp_expected, $desc;
+
+    See "unlike" in Test::More.
+
+  "cmp_ok"
+        cmp_ok $got, $op, $expected;
+        cmp_ok $got, $op, $expected, $desc;
+
+    See "cmp_ok" in Test::More.
+
+  "is_deeply"
+        is_deeply $got, $expected;
+        is_deeply $got, $expected, $desc;
+
+    See "is_deeply" in Test::More.
+
+  "diag"
+        diag @lines;
+
+    See "diag" in Test::More.
+
+  "note"
+        note @lines;
+
+    See "note" in Test::More.
+
+  "BAIL_OUT"
+        BAIL_OUT;
+        BAIL_OUT $desc;
+
+    See "BAIL_OUT" in Test::More.
+
+    Test::Leaner also provides some functions of its own, which are never
+    exported.
+
+  "tap_stream"
+        my $tap_fh = tap_stream;
+        tap_stream $fh;
+
+    Read/write accessor for the filehandle to which the tests are outputted.
+    On write, it also turns autoflush on onto $fh.
+
+    Note that it can only be used as a write accessor before you start any
+    thread, as threads::shared cannot reliably share filehandles.
+
+    Defaults to "STDOUT".
+
+  "diag_stream"
+        my $diag_fh = diag_stream;
+        diag_stream $fh;
+
+    Read/write accessor for the filehandle to which the diagnostics are
+    printed. On write, it also turns autoflush on onto $fh.
+
+    Just like "tap_stream", it can only be used as a write accessor before
+    you start any thread, as threads::shared cannot reliably share
+    filehandles.
+
+    Defaults to "STDERR".
+
+  "THREADSAFE"
+    This constant evaluates to true if and only if Test::Leaner is
+    thread-safe, i.e. when this version of "perl" is at least 5.8, has been
+    compiled with "useithreads" defined, and threads has been loaded before
+    Test::Leaner. In that case, it also needs a working threads::shared.
+
+DEPENDENCIES
+    perl 5.6.
+
+    Exporter, Test::More.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-test-leaner at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Leaner>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::Leaner
+
+COPYRIGHT & LICENSE
+    Copyright 2010,2011,2013 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Except for the fallback implementation of the internal "_reftype"
+    function, which has been taken from Scalar::Util and is
+
+    Copyright 1997-2007 Graham Barr, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

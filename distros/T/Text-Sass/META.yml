@@ -1,0 +1,48 @@
+---
+abstract: 'Text-Sass - Perl implementation of http://sass-lang.com/'
+author:
+  - 'Roger Pettett <rmp@psyphi.net>'
+build_requires:
+  Test::More: '0.8'
+  Try::Tiny: '0.06'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - Sass
+  - SCSS
+  - CSS
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Sass
+provides:
+  Text::Sass:
+    file: lib/Text/Sass.pm
+    version: v1.0.4
+  Text::Sass::Expr:
+    file: lib/Text/Sass/Expr.pm
+    version: v1.0.4
+  Text::Sass::Functions:
+    file: lib/Text/Sass/Functions.pm
+    version: v1.0.4
+  Text::Sass::Token:
+    file: lib/Text/Sass/Token.pm
+    version: v1.0.4
+recommends:
+  Data::Dumper: '2.125'
+requires:
+  Carp: '1.04'
+  Convert::Color: '0.05'
+  English: '1.02'
+  POSIX: '1.09'
+  Readonly: '1.03'
+  strict: '1.03'
+  warnings: '1.05'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rmp/libtext-sass-perl
+version: v1.0.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,10 @@
+Changes
+lib/Tie/IxHash/FixedSize.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/basic.t
+t/signature.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

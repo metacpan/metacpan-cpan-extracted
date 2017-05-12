@@ -1,0 +1,23 @@
+---
+abstract: 'Tool Bench is a generic framework for running benchmarks.'
+author:
+  - 'Ben Hengst <notbenh@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0.98
+  Test::Most: 0.25
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tool-Bench
+requires:
+  JSON: 2.53
+  List::Util: 1.25
+  Mouse: 1.02
+  Time::HiRes: 1.9725
+version: 0.003

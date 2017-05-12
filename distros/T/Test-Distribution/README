@@ -1,0 +1,244 @@
+NAME
+    Test::Distribution - perform tests on all modules of a distribution
+
+SYNOPSIS
+      $ cat t/01distribution.t
+      use Test::More;
+
+      BEGIN {
+            eval {
+                    require Test::Distribution;
+            };
+            if($@) {
+                    plan skip_all => 'Test::Distribution not installed';
+            }
+            else {
+                    import Test::Distribution;
+            }
+       }
+
+      $ make test
+      ...
+
+DESCRIPTION
+    When using this module in a test script, it goes through all the modules
+    in your distribution, checks their POD, checks that they compile ok and
+    checks that they all define a $VERSION.
+
+    This module also performs a numer of test on the distribution itself. It
+    checks that your files match your SIGNATURE file if you have one. It
+    checks that your distribution isn't missing certain 'core' description
+    files. It checks to see you havent' missed out listing any
+    pre-requisites in Makefile.PL.
+
+    It defines its own testing plan, so you usually don't use it in
+    conjunction with other "Test::*" modules in the same file. It's
+    recommended that you just create a one-line test script as shown in the
+    SYNOPSIS above. However, there are options...
+
+    NOTE If you do not specify any options Test::Distribution will run all
+    test types except signature testing which must always be explicitly
+    switched on.
+
+    In the future I may change the default to run no tests at all as this
+    sounds safer. Mail me if you disagree.
+
+OPTIONS
+    On the line in which you "use()" this module, you can specify named
+    arguments that influence the testing behavior.
+
+    "tests => NUMBER"
+        Specifies that in addition to the tests run by this module, your
+        test script will run additional tests. In other words, this value
+        influences the test plan. For example:
+
+          use Test::Distribution tests => 1;
+          use Test::More;
+          is($foo, $bar, 'baz');
+
+        It is important that you don't specify a "tests" argument when using
+        "Test::More" or other test modules as the plan is handled by
+        "Test::Distribution".
+
+        DEPRECATED FEATURE. I plan to remove this in the future unless I'm
+        contacted by someone that says they find this useful.
+
+    "only => STRING|LIST"
+        Specifies that only certain sets of tests are to be run. Possible
+        values are those mentioned in TEST TYPES below. For example, if you
+        only want to run the POD tests, you could say:
+
+          use Test::Distribution only => 'pod';
+
+        To specify that you only want to run the POD tests and the "use"
+        tests, and also that you are going to run two tests of your own,
+        use:
+
+          use Test::Distribution
+            only  => [ qw/pod use/ ],
+            tests => 2;
+
+        Note that when you specify the "versions" option, the "use" option
+        is automatically added. This is because in order to get a module's
+        $VERSION, it has to be loaded. In this case we might as well run a
+        "use" test.
+
+        The value for "only" can be a string or a reference to a list of
+        strings.
+
+    "not => STRING|LIST"
+        Specifies that certain types of tests should not be run. All tests
+        not mentioned in this argument are run. For example, if you want to
+        test everything except the POD, use:
+
+          use Test::Distribution
+            not => 'pod';
+
+        The value for "not" can be a string or a reference to a list of
+        strings. Although it doesn't seem to make much sense, you can use
+        both "only" and "not". In this case only the tests specified in
+        "only", but not "not" are run (if this makes any sense).
+
+    "distversion"
+        If you test this to a true value, as well as testing that each
+        module has a $VERSION defined, Test::Distribution will also ensure
+        that the $VERSION matches that of the distribution.
+
+    "podcoveropts"
+        You can set this to be a hash reference of options to pass to
+        Test::Pod::Coverage's pod_coverage_ok method (which in turn gets
+        passed to Pod::Coverage.
+
+TEST TYPES
+    Here is a description of the types of tests available.
+
+    "description"
+        Checks that the following files exist:
+
+        Changes or ChangeLog
+        MANIFEST
+        README
+        Build.PL or Makefile.PL
+
+    "prereq"
+        Checks whether all "use()"d modules that aren't in the perl core are
+        also mentioned in Makefile.PL's "PREREQ_PM".
+
+    "pod"
+        Checks for POD errors in files
+
+    "podcover"
+        Checks for Pod Coverage
+
+    "sig"
+        If the distribution has a SIGNATURE file, checks the SIGNATURE
+        matches the files.
+
+    "use"
+        This "use()"s the modules to make sure the load happens ok.
+
+    "versions"
+        Checks that all packages define $VERSION strings.
+
+EXPOSED INTERNALS
+    There are a few subroutines to help you see what this module is doing.
+    Note that these subroutines are neither exported nor exportable, so you
+    have to call them fully qualified.
+
+    "Test::Distribution::packages()"
+        This is a list of packages that have been found. That is, we assume
+        that each file contains a package of the name indicated by the
+        file's relative position. For example, a file in
+        "blib/lib/Foo/Bar.pm" is expected to be available via "use
+        Foo::Bar".
+
+    "Test::Distribution::files()"
+        This is a list of files that tests have been run on. The filenames
+        are relative to the distribution's root directory, so they start
+        with "blib/lib".
+
+    "Test::Distribution::num_tests()"
+        This is the number of tests that this module has run, based on your
+        specifications.
+
+INSTALLATION
+    This module uses Module::Build for its installation. To install this
+    module type the following:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+    If you do not have Module::Build type:
+
+      perl Makefile.PL
+
+    to fetch it. Or use CPAN or CPANPLUS and fetch it "manually".
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+     File::Basename
+     File::Find::Rule
+     File::Spec
+     Test::More
+
+    This module has these optional dependencies:
+
+     Module::CoreList
+     Test::Pod
+     Test::Pod::Coverage
+
+    If "Module::CoreList" is missing, the "prereq" tests are skipped.
+
+    If "Test::Pod" is missing, the "pod" tests are skipped.
+
+TODO
+    Just because these items are in the todo list, does not mean they will
+    actually be done. If you think one of these would be helpful say so -
+    and it will then move up on my priority list.
+
+    *   Module::Build support [currently waiting for a fix on Test::Prereq ]
+
+FEATURE IDEAS
+    "export" test type
+        This would mandate that there should be a test for each exported
+        symbol of each module.
+
+    Let me know what you think of these ideas. Are they necessary?
+    Unnecessary? Do you have feature requests of your own?
+
+BUGS
+    To report a bug or request an enhancement use CPAN's excellent Request
+    Tracker.
+
+SOURCE AVAILABILITY
+    This source is part of a SourceForge project which always has the latest
+    sources in svn.
+
+    http://sourceforge.net/projects/sagar-r-shah/
+
+AUTHORS
+    Marcel Grünauer <marcel@cpan.org>
+
+    Sagar R. Shah
+
+OTHER CREDITS
+    This module was inspired by a use.perl.org journal entry by "brian d
+    foy" (see <http://use.perl.org/~brian_d_foy/journal/7463>) where he
+    describes an idea by Andy Lester.
+
+COPYRIGHT & LICENSE
+    Copyright 2002-2003 Marcel Grünauer. All rights reserved.
+
+    Copyright 2003-2007, Sagar R. Shah, All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), ExtUtils::Manifest(3pm), File::Find::Rule(3pm),
+    Module::CoreList(3pm), Test::More(3pm), Test::Pod(3pm),
+    Test::Pod::Coverage(3pm), Test::Signature(3pm).
+

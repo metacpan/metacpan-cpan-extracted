@@ -1,0 +1,6 @@
+name: Test::FIT
+version: 0.11
+abstract: A FIT Test Framework for Perl
+author: Brian Ingerson
+distribution_type: module
+generated_by: Module::Install version 0.20

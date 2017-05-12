@@ -1,0 +1,67 @@
+Revision History for Task-DataFlow
+==================================
+
+v0.008 2012-06-16
+-----------------
+
+commit 7715efe708b756db51c4bbfb1113d29d1a409f65
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    bump minimal verison for DataFlow
+
+commit d6d13dabb1e4f9bbc291e3935a62a25c22094966
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added scripts
+
+v0.007 2011-07-28
+-----------------
+
+commit 5cef97d9506626be975fdc7eb915a8376e4dca38
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    total bump of the version
+
+v0.006 2011-07-23
+-----------------
+
+commit b491c7b5c2f839de8e8bb35c3448e510d9cdf2a5
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added DPath proc, tweaked dist.ini
+
+v0.005 2011-07-10
+-----------------
+
+commit cc01ff1aa2cc13535e289d714b790de3792f33a6
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added DataFlow::Proc::DBF, version++
+
+v0.004 2011-07-04
+-----------------
+
+commit a42ff11c094e71aecf9d2f6955e64e417b793b31
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    DataFlow version++, version++
+
+v0.003 2011-06-29
+-----------------
+
+commit ba01ad537a1fa9d13990ee1115eaad22dad10b55
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    updated to DataFlow 1.111810 - builders
+
+v0.002 2011-06-29
+-----------------
+
+commit 4854242f4898997bab0f4562686ed281da4a05cf
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    updated with HTMLFilter refactor
+
+===================================
+End of changes in the last 365 days
+===================================

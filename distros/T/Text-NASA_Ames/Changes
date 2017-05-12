@@ -1,0 +1,12 @@
+Revision history for Perl extension Text::NASA_Ames.
+
+0.3  Wed Jun  7 10:57:23 CEST 2006
+	- adding fileName method
+	- improve warnings, include fileName and line-number
+
+0.2  Tue Apr  6 12:20:03 CEST 2004
+	- fixing date / rdate retrieval
+	- allowing multi-line data, in particular for FFI2160
+
+0.1  Fri Jan 30 14:14:25 CET 2004
+	- original version

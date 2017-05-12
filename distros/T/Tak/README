@@ -1,0 +1,81 @@
+NAME
+    Tak - Multi host remote control over ssh (then I wrote Object::Remote)
+
+SYNOPSIS
+      # Curse at mst for doing it again under a different name
+      # Curse at mst some more
+      $ cpanm Object::Remote
+      # Now go use that
+
+    (sorry, I should've done a tombstone release ages back)
+
+      bin/tak -h user1@host1 -h user2@host2 exec cat /etc/hostname
+
+    or
+
+      in Takfile:
+
+      package Tak::MyScript;
+  
+      use Tak::Takfile;
+      use Tak::ObjectClient;
+  
+      sub each_get_homedir {
+        my ($self, $remote) = @_;
+        my $oc = Tak::ObjectClient->new(remote => $remote);
+        my $home = $oc->new_object('Path::Class::Dir')->absolute->stringify;
+        $self->stdout->print(
+          $remote->host.': '.$home."\n"
+        );
+      }
+  
+      1;
+
+    then
+
+      tak -h something get-homedir
+
+WHERE'S THE REST?
+    A drink leaked in my bag on the way back from LPW. My laptop is finally
+    alive again though so I'll try and turn my slides into a vague attempt
+    at documentation while I'm traveling to/from christmas things.
+
+Example
+    $ cat Takfile package Tak::MyScript;
+
+    use strict; use warnings;
+
+    use Tak::Takfile; use Tak::ObjectClient; use lib "./lib";
+
+    sub each_host { my ($self, $remote) = @_;
+
+        my $oc = Tak::ObjectClient->new(remote => $remote);
+        my $name = $oc->new_object('My::Hostname');
+        print "Connected to hostname: " . $name . "\n";
+        }
+
+    1;
+
+    -----
+
+    $cat ./lib/My/Hostname package My::Hostname;
+
+    use Sys::Hostname;
+
+    sub new { my ($self) = @_; my $name = hostname; return $name; }
+
+    1;
+
+AUTHOR
+    mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None required yet. Maybe this module is perfect (hahahahaha ...).
+
+COPYRIGHT
+    Copyright (c) 2011 the Tak "AUTHOR" and "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

@@ -1,0 +1,34 @@
+Test-HTTP-Server-Simple version 0.03
+
+Provides some very basic test functions for HTTP::Server::Simple.
+Currently, just deals with cleanly backgrounding and killing a child
+server process.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

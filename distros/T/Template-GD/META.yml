@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Template-GD
+version:      2.66
+version_from: lib/Template/Plugin/GD.pm
+installdirs:  site
+requires:
+    GD:                            1.14
+    Template:                      2.14
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

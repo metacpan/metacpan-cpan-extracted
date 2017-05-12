@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/0-boilerplate.t
+t/0-manifest.t
+t/0-pod-coverage.t
+t/0-pod.t
+t/00-load.t
+t/01-basic.t
+t/02-advanced-fill.t
+t/03-advanced-delims.t
+t/04-recursive-fill.t
+t/05-tags.t
+t/06-default-content-1.t
+t/07-default-content-2.t
+lib/Template/Plain.pm
+META.yml                                 Module meta-data (added by MakeMaker)

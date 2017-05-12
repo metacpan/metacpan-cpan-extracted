@@ -1,0 +1,10 @@
+Test::Moose::MockObject::Compile
+V0.2
+
+Install:
+perl Makefile.pl
+make
+make install
+
+Author:
+Jeremy Wall <jeremy@marzhillstudios.com>

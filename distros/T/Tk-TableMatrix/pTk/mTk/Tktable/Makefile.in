@@ -1,0 +1,172 @@
+# version info in Makefile and C format
+include @srcdir@/version.h
+
+# This sets the name that tkTable will define for itself when loaded
+# If you change this, then the demos won't work, but it might be necessary
+# for those with another built-in "table" command
+TBL_COMMAND	= table
+TBL_RUNTIME	= tkTable.tcl
+
+SRCDIR		= @srcdir@
+TOPDIR		= @srcdir@/..
+LIBDIR		= $(TOPDIR)/lib
+DOCDIR		= $(TOPDIR)/doc
+
+PACKAGE		= Tktable
+OBJS		= tkTable.o tkTableWin.o tkTableTag.o tkTableEdit.o \
+		  tkTableCell.o tkTableCmds.o cmd.o
+## PostScript is on the drawing board
+#OBJS		+= tkTablePs.o
+MANS		= tkTable.n
+
+#-------------------------------------------------
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+
+TCL_VERSION	= @TCL_VERSION@
+TK_VERSION	= @TK_VERSION@
+WISH		= wish$(TK_VERSION)
+
+TCL_SRC_DIR 	= @TCL_SRC_DIR@
+TK_SRC_DIR 	= @TK_SRC_DIR@
+
+TCL_BUILD_LIB_SPEC	= @TCL_BUILD_LIB_SPEC@
+TK_BUILD_LIB_SPEC	= @TK_BUILD_LIB_SPEC@
+
+TCL_LIB_SPEC	= @TCL_LIB_SPEC@
+TK_LIB_SPEC	= @TK_LIB_SPEC@
+
+TCL_LIBS	= @TCL_LIBS@
+TK_LIBS		= @TK_LIBS@
+
+TBL_CFLAGS	= -O
+
+## NO_EMBEDDED_RUNTIME means that the tkTable.tcl file will not be embedded
+## into the executable, thus the default tkTable.tcl library file will not
+## be available when the library is loaded.
+## If this is defined, the tkTable.tcl file must be available in a
+## predefined set of directories (see docs).
+#TBL_CFLAGS	+= -DNO_EMBEDDED_RUNTIME
+
+## USE_EXIT_HANDLER is necessary for 8.1 before b3 and 8.0
+## It is a work-around for the improper unloading of DLLs when exiting
+#TBL_CFLAGS	+= -DUSE_EXIT_HANDLER
+
+## Experimental, not documented, not complete...
+#TBL_CFLAGS	+= -DPROCS
+
+## I use this for helping hunt down the slightest error
+#TBL_CFLAGS	+= -DDEBUG -g -Wall -Wno-implicit -Wshadow \
+		   -Wpointer-arith -Wmissing-prototypes \
+		   -Wmissing-declarations -Wnested-externs -Winline
+
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+INSTALL_DATA	= @INSTALL_DATA@
+CC		= @CC@
+RM		= rm -f
+RANLIB		= @TCL_RANLIB@
+SHLIB_CFLAGS	= @TCL_SHLIB_CFLAGS@
+SHLIB_SUFFIX	= @TCL_SHLIB_SUFFIX@
+SHLIB_LD	= @TCL_SHLIB_LD@
+TCL_PREFIX	= @TCL_PREFIX@
+## HP cc sometimes requires -Aa for proper ansi compilation
+TCL_CFLAGS	= $(TBL_CFLAGS) @TCL_DEFS@ @TCL_CFLAGS@
+TCL_LD_FLAGS	= @TCL_LD_FLAGS@
+TK_LD_SEARCH_FLAGS = @TK_LD_SEARCH_FLAGS@
+TK_XINCLUDES	= @TK_XINCLUDES@
+
+LIB_RUNTIME_DIR = @libdir@
+
+INCLUDES	= -I@includedir@ $(TK_XINCLUDES)\
+		  -I$(TCL_SRC_DIR)/generic\
+		  -I$(TK_SRC_DIR)/generic
+
+DLL		= $(PACKAGE)$(SHLIB_SUFFIX)
+STATIC_LIB	= $(PACKAGE).a
+PACKAGEDIR	= $(PACKAGE)$(TBL_VERSION)
+STATIC_EXEC	= tablewish
+DLLDIR		= ${exec_prefix}/lib/$(PACKAGEDIR)
+RUNDIR		= ${prefix}/lib/$(PACKAGEDIR)
+
+CFLAGS		= -I. -I$(SRCDIR) $(TCL_CFLAGS) $(SHLIB_CFLAGS) $(INCLUDES)\
+		  -DTBL_VERSION=\"$(TBL_VERSION)\"\
+		  -DTBL_COMMAND=\"$(TBL_COMMAND)\"\
+		  -DTBL_RUNTIME=\"$(TBL_RUNTIME)\"\
+		  -DTBL_RUNTIME_DIR=\"$(RUNDIR)\"
+
+MAN_INSTALL_DIR = @mandir@/mann
+
+#COMPRESS	= tar cvf $(PACKAGEDIR).tar $(PACKAGEDIR); compress $(PACKAGEDIR).tar
+COMPRESS	= gtar zcvf $(PACKAGEDIR).tar.gz $(PACKAGEDIR)
+
+all: $(DLL) pkgIndex.tcl
+
+$(DLL): $(OBJS)
+	$(SHLIB_LD) -o $@ $(OBJS)
+
+static $(STATIC_LIB): $(OBJS) pkgIndex.tcl
+	$(RM) $(STATIC_LIB)
+	ar cr $(STATIC_LIB) $(OBJS)
+	$(RANLIB) $(STATIC_LIB)
+
+tkTable.o:	$(SRCDIR)/tkTable.h $(SRCDIR)/tkTable.c \
+		$(SRCDIR)/tkTableInitScript.h tkTable.tcl.h
+tkTableCmds.o:	$(SRCDIR)/tkTable.h $(SRCDIR)/tkTableCmds.c
+tkTableCell.o:	$(SRCDIR)/tkTable.h $(SRCDIR)/tkTableCell.c
+tkTablePs.o:	$(SRCDIR)/tkTable.h $(SRCDIR)/tkTablePs.c
+tkTableTag.o:	$(SRCDIR)/tkTable.h $(SRCDIR)/tkTableTag.c
+tkTableWin.o:	$(SRCDIR)/tkTable.h $(SRCDIR)/tkTableWin.c
+
+.c.o:
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $(SRCDIR)/$*.c
+
+pkgIndex.tcl:
+	(\
+	echo 'if {[catch {package require Tcl $(TCL_VERSION)}]} return';\
+	echo 'package ifneeded $(PACKAGE) $(TBL_VERSION)\
+	    "package require Tk $(TK_VERSION);\
+	     [list load [file join $$dir $(DLL).$(TBL_VERSION)] $(PACKAGE)]"'\
+	) > pkgIndex.tcl
+
+install: all
+	if test ! -d "$(DLLDIR)"; then mkdir "$(DLLDIR)"; fi
+	if test ! -d "$(RUNDIR)"; then mkdir "$(RUNDIR)"; fi
+	$(INSTALL_PROGRAM) $(DLL) "$(DLLDIR)/$(DLL).$(TBL_VERSION)"
+	$(INSTALL_DATA) pkgIndex.tcl "$(DLLDIR)/pkgIndex.tcl"
+	$(INSTALL_DATA) $(LIBDIR)/tkTable.tcl "$(RUNDIR)/tkTable.tcl"
+	$(INSTALL_DATA) $(DOCDIR)/$(MANS) $(MAN_INSTALL_DIR)/
+
+# Leaves behind created directories
+uninstall:
+	$(RM) "$(DLLDIR)/$(DLL).$(TBL_VERSION)" "$(DLLDIR)/pkgIndex.tcl" "$(RUNDIR)/tkTable.tcl" $(MAN_INSTALL_DIR)/$(MANS)
+
+test: all
+	$(WISH) $(TOPDIR)/demos/basic.tcl
+
+clean: 
+	$(RM) $(OBJS) $(DLL) $(STATIC_LIB) $(STATIC_EXEC) core pkgIndex.tcl tkTable.tcl.h
+
+distclean: clean
+	$(RM) Makefile config.cache config.log config.status
+
+tkTable.tcl.h: $(LIBDIR)/tkTable.tcl
+	sed -e '/^$\#/d' -e '/^$$/d' -e 's/\"/\\"/g' -e 's/^/"/' -e 's/$$/\\n"/' <$(LIBDIR)/tkTable.tcl > $@ || { $(RM) $@; exit 1; }
+
+tablewish: tkAppInit.o $(OBJS)
+wish: tkAppInit.o $(OBJS)
+	$(CC) $(TK_LD_SEARCH_FLAGS) -o $(STATIC_EXEC) tkAppInit.o $(OBJS) \
+	  $(LIBS) $(TK_BUILD_LIB_SPEC) $(TK_LIB_SPEC) $(TCL_BUILD_LIB_SPEC) $(TCL_LIB_SPEC) $(TK_LIBS) $(TCL_LIBS)
+
+distrib-clean:
+	rm -rf ../../$(PACKAGEDIR) ../../$(PACKAGEDIR).tar.*
+
+distrib:
+	$(RM) $(DOCDIR)/tkTable.html
+	nroff -man $(DOCDIR)/tkTable.n | rman -f HTML > $(DOCDIR)/tkTable.html
+	(cd ../..; \
+	cp -r tkTable $(PACKAGEDIR); \
+	cd $(PACKAGEDIR)/src; \
+	make distclean >&1 > /dev/null; \
+	cd ../..; $(COMPRESS); \
+	)

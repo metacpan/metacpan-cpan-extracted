@@ -1,0 +1,251 @@
+@import url(generic.css);
+
+/*
+# Red 2c406d 
+# Dark red 4464ac 4464ac
+# Gray 777777 777777
+# light gray e6e6e6 - e6e6e6
+# 
+*/
+
+* {
+  padding: 0px;
+  margin: 0px;
+  /*border: 1px solid black;*/
+}
+
+body {
+  margin: 1em;
+  background-color: white;
+  color: black;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  padding: 2px;
+  padding-left: 5px;
+}
+
+h1 {
+  margin-bottom: 30px;
+}
+
+h2, h3 {
+  border-bottom: 1px solid #000000;  
+  border-top: 1px solid #000000;  
+  background-color: rgb(235,235,235);
+}
+
+#logo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+#status table {
+  position: relative;
+  margin: 1em;
+  margin-top: 2em;
+}
+
+#menu {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-top: 2px solid black;
+  width: 90%;
+  position: absolute;
+  top: 50px;
+}
+
+#menu ul {
+  margin-top: -10px;
+  width: 100%;
+}
+
+#menu li {
+  display: inline;
+
+  border-top: 3px solid rgb(72,72,72);
+  border-bottom: 3px solid rgb(72,72,72);
+  border-left: 1px solid rgb(72,72,72);
+  border-right: 1px solid rgb(72,72,72);
+  
+  background: rgb(225,225,225);
+  color: rgb(0,0,0);
+  margin-left: 2em;
+  margin-right: 2em;
+  padding: 3px;
+}
+
+#menu a {
+  text-decoration: none;
+  color: black;
+  background-color: transparent;
+  font-size: 1.4em;
+}
+
+#menu a:hover {
+  color: black;
+  background-color: transparent;
+}
+
+#footer {
+  border-top: 2px solid black;
+}
+
+#footer a {
+  color: #000000;
+}
+
+.properties {
+  border: 1px solid black;
+  background-color: #ffffff;
+  color: #000000;
+  vertical-align: bottom;
+  margin: 1em;
+  border-spacing: 0px;
+}
+
+.properties td, #properties th {
+  vertical-align: top;
+  padding: 2px;
+}
+
+.properties th {
+  text-align: right
+}
+
+.data {
+  border: 1px solid black;
+  margin: 1em;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  border-spacing: 0px;
+}
+
+.data thead {
+  background-color: #999999;
+  color: #000000;
+  text-align: left;
+}
+
+.data thead th, .data tbody td {
+  padding: 2px;
+}
+
+.data thead th {
+  border-bottom: 2px solid #333333;
+}
+
+tbody tr th, tbody tr td {
+  valign: top;
+}
+
+tbody tr.odd {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+tbody tr.even {
+  background-color: #e6e6e6;
+  color: #000000;
+}
+
+tbody tr.even td, tbody tr.even th {
+  border-top: 1px solid #a6a6a6;
+  border-bottom: 1px solid #a6a6a6;
+}
+
+#changes td, #changes th {
+  vertical-align: top;
+}
+
+#changes tbody tr td, #changes tbody tr th {
+  border-top: 0px;
+  border-bottom: 0px;
+}
+
+#changes table td, #changes table th{
+  font-size: 0.8em;
+}
+
+#changes .description {
+  white-space: pre;
+}
+
+ul, ol {
+  margin-left: 1em;
+  list-style-position: inside;
+}
+
+ul li, ol li {
+  padding: 3px;
+}
+
+.filename, .md5sum {
+  font-family: courier, monospace;
+}
+
+.failed {
+  color: #000000;
+  background-color: #ff0000;
+}
+
+.skipped {
+  color: #000000;
+  background-color: #ff00ff;
+}
+
+.pending {
+  color: #000000;
+  background-color: #ffff00;
+}
+
+.cached {
+  color: #000000;
+  background-color: #00ff00;
+}
+
+.success {
+  color: #000000;
+  background-color: #00ff00;
+}
+
+
+
+tbody tr.even .failed {
+  border-top: 1px solid #cc0000;
+  border-bottom: 1px solid #cc0000;
+}
+
+tbody tr.even .skipped {
+  border-top: 1px solid #cc00cc;
+  border-bottom: 1px solid #cc00cc;
+}
+
+tbody tr.even .pending {
+  border-top: 1px solid #cccc00;
+  border-bottom: 1px solid #cccc00;
+}
+
+tbody tr.even .cache {
+  border-top: 1px solid #00cc00;
+  border-bottom: 1px solid #00cc00;
+}
+
+tbody tr.even .success {
+  border-top: 1px solid #00cc00;
+  border-bottom: 1px solid #00cc00;
+}
+
+h1,h2,h3,h4 {
+  margin-bottom: 1em;
+}
+
+p {
+  margin: 1em;
+}
+
+
+
+/**************************************************/

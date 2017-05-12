@@ -1,0 +1,219 @@
+Revision history for Perl module Test::File
+
+1.443 2017-04-17T08:41:35Z
+	* Found another relative path require issue thanks to Ryan Voots 
+	http://blogs.perl.org/users/ryan_voots/2017/04/trials-and-troubles-with-changing-inc.html
+	* This is another attempt at avoiding failures from the v5.26
+	removal of . from @INC.
+
+1.442 2016-09-22T15:35:50Z
+	* Update to stable release. This fixes an upcoming Perl @INC
+	issue that removes the current directory from the default list.
+	This affects only the test files which use a private library.
+	If you already have this installed you don't need to update.
+
+1.441_01 2016-09-19T21:44:45Z
+	* Fix for missing . in @INC (Github #14 https://github.com/briandfoy/test-file/issues/14)
+	This relates to CVE-2016-1238
+
+1.44 2015-07-06T00:29:56Z
+	* Fix file_has_* tests to work on Windows (RJBS) GitHub #13
+
+1.43_02 2015-06-24T15:21:57Z
+ * check file_mode_has tests for Windows
+
+1.43 2015-06-22T21:44:37Z
+	* Don't install README.pod
+
+1.42 2015-06-16T17:58:11Z
+	* Fix problem with META* specifying requirements (RT #105210)
+
+1.41 - 2014-09-12
+	* Adjust the UTF-8 and encoding tests to work with older perls
+
+1.40 - 2014-09-12
+	* Fix up tests for UTF-8 checks
+
+1.39 - 2014-09-11
+	* Allow tests to run in parallel (RT #89908 and RT #91862)
+
+1.38 - 2014-09-11
+	* Add xmikew's mtime test functions. GitHub issue #8
+
+1.37 - 2014-09-11
+	* Uncomment accidently commented symlink_target_is_absolute_ok
+
+1.36 - 2014-01-01
+    * Fix RT #89849 - bad line counts on latest dev version of Perl
+
+1.35 - 2013-10-10
+    * Fix RT #89175 - don't distribute MYMETA*
+    * add dir_exists_ok and dir_contains_ok
+    * add file_contains_* functions
+
+1.34 - 2012-06-02
+    * Fixed problem in links.t. (RT #76853)
+        Thanks to Matthew Musgrove (Mr. Muskrat) and
+        Savio Dimatteo (DARKSMO) for the patch(es).
+
+1.33 - 2012-02-19
+    * Fixed problem in MANIFEST file. (RT #37676)
+
+1.32 - 2012-02-17
+    * Fixed qr//mx patterns to work with older Perls. (RT #74365)
+        Thanks to Paul Howarth <paul@city-fan.org> for the patch.
+    * Fixed incorrect spelling of "privileges" in SKIP blocks. (RT #74483)
+    * Skip testing of symlinks on Windows. (RT #57682)
+    * Fixed automatically generated test name for owner_isnt. (RT #37676)
+
+1.31 - 2012-01-24
+    * Added some SKIP blocks to avoid test failures
+    when running as root.  (D'oh!)
+
+1.30 - 2012-01-23
+    * Added dir_exists_ok and dir_contains_ok
+    * Added file_contains_like and file_contains_unlike
+    * Fixed a few grammatical errors in POD
+
+1.28_01 - 2011-08-11
+    * Fixes some Windows tests, I think. RT #57682
+
+1.28 - 2009-05-31
+    * Make the man pages after all
+
+1.27 - 2009-05-21
+    * Fix to the tests for 1.26 which didn't account for an
+    extra setup test.
+
+1.26 - 2009-05-15
+    Don't create man pages for the module (RT #45977)
+
+1.25_001 - 2008-07-15
+    * Adding some symlink features, more later
+    * Refactoring and separating many tests - test coverage at 90% now
+    * This is really a test release for my new Module::Release
+
+1.25 - 2008-06-10
+    * Same as 1.24_03, but with a user release version number. The
+    new features are the ones in 1.24, but this time the tests
+    should all pass :)
+
+1.24_03 - 2008-05-25
+    * Make some adjustments in checking the error messages in
+    test_files.t to make them work across platforms
+    * Remove links.t from the distribution. It doesn't really
+    test anything yet.
+
+1.24_02 - 2008-05-25
+    * Add a binmode before writing to files so they come out right
+    on Windows. Stupid rookie mistake. :(
+
+1.24_01 - 2008-05-24
+    * Trial version to fix test ordering problem in 1.24
+    * Removed setup.t, which turned into setup_common but wasn't updated
+    for the new features in 1.24 (so files were missing in other test
+    files)
+
+1.24 - 2008-05-20
+    * David Wheeler sent a patch to add file_line_count_is, so
+    I also added file_line_count_isnt and file_line_count_between.
+    * There aren't any other improvements, so you don't need to
+    upgrade unless you want the new functions.
+
+1.23 - 2008-04-23
+    * [BUG FIX] owner_is and group_is now fail if the owner or
+    group does not exist.
+
+1.22_01 - 2008-04-20
+    * [BUG FIX] owner_is and group_is were passing with non-existent
+    users and groups. Now I check the arguments to see if they
+    actually exist before I test. This is a developer release to let
+    CPAN Testers take a whack at it first.
+
+1.22 - 2007-10-31
+    * fixed problem with file path separators in t/rt/30346.t
+    * no need to upgrade if you were already able to install this
+
+1.21 - 2007-10-30
+    * Fix RT #30346 ( file_not_empty_ok passes if file doesn't exist)
+    * require 5.006 from now on
+
+1.19 - 2007-10-27
+    * distro cleanups after moving from CVS to SVN
+
+1.18 - 2007-01-09
+    * updated copyright and license info
+    * no code changes, so no need to upgrade
+
+1.17 - 2006-11-24
+    * Updated tests for Test::More 0.65's change in error reporting
+    * Added LICENSE field to docs
+    * No need to upgrade it you already have this installed
+
+1.16 - 2006-07-08
+    * updated the plan for links.t to have the right number of tests
+    * no need to upgrade if you already have this installed.
+
+1.15 - 2006-05-17
+    * Updated the distro for copyright and kwalitee. No need to upgrade.
+
+1.14 - 2006-03-08
+    * Added Dylan Martin's test for group_is and group_isnt
+    * No need to upgrade unless you need these features
+
+1.13 - 2005-12-31
+    * You need the latest Test::Builder::Tester (0.32 right now) to get
+    the owner.t test to pass. I've noted that in the PREREQ_PM.
+    * You don't need to upgrade if you already have Test::File
+    installed. If you run into a test problem, ensure you have
+    the latest Test::Builder::Tester and try again.
+
+1.12 - 2005-12-25
+    * Added the tests owner_is() and owner_isnt() from Dylan Martin
+
+1.11 - 2005-10-02
+    * Some strings were mistakenly single-quoted. I meant to interpolate but
+    didn't use double quotes. Should I lose my Perl license? :)
+	* Upgrade to get the interpolated error messages.
+
+1.10 - 2005-06-05
+    * Fixed Windows testing with patch from Tom Metro. Now that I have a
+    Windows box, I don't need to guess on some of this stuff.
+    * There is a minor code change, but you don't need to rush to upgrade
+    if you already have an installed version.
+
+1.09 - 2005-03-08
+    * Added POD coverage tests: no need to upgrade
+
+1.08 - 2005-01-06
+    * added a patch from David Wheeler to canonicalize paths for the
+    platform.  If the paths look like unix paths, I split them on /
+    and reconstruct them with File::Spec->catdir.
+
+    * Some functions don't work with Win32, so I detect that inside
+    those functions and automatically skip the test if I think I'm
+    on a Windows machine.
+
+1.07 - 2005-01-03
+    Shawn Sorichetti <ssoriche@coloredblocks.net> contributed two new
+    funtions: file_mode_is() and file_mode_isnt().  We can now test
+    files by their mode.
+
+1.06 - 2004-09-05
+    * Fixed tests that failed if you ran them with root privileges, which
+    don't actually completely depend on file permissions
+
+1.05 - 2004-09-02
+    * fixed a documentation bug dealing with file sizes
+    * cleaned up the distribution a bit
+    * You don't need to upgrade if you already have this module
+
+0.9 - 2004-07-04
+    * ported tests to Test::More
+    * cleaned up dist files, especially Makefile.PL
+    * fixed up some doc issues in File.pm
+    * no change in functionality
+
+0.05 - 2002-09-23
+	* initial version
+

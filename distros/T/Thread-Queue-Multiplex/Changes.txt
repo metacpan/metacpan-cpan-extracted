@@ -1,0 +1,16 @@
+Changes for Thread::Queue::Multiplex
+
+0.92	2006-Mar-19 D. Arnold
+
+	- added subscriber ID parameter to subscribe()
+	
+	- changed to Academic Free License
+	
+	- refactored test suite
+	
+	- require TQD 0.92
+
+0.90	2006-Jan-29 D. Arnold
+
+	- coded
+

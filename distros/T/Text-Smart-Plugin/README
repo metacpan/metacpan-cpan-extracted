@@ -1,0 +1,14 @@
+Text::Smart::Plugin - Simple text markup processing
+---------------------------------------------------
+
+The Text::Smart::Plugin module provides a Template
+Toolkit plugin for the Text::Smart module.
+
+Feedback, bug reports, patches
+------------------------------
+
+Please send patches in unified diff format to:
+
+	Daniel Berrange <dan@berrange.com>
+
+-- End

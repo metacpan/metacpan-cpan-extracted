@@ -1,0 +1,45 @@
+ ... 
+ ... SOLVE THE [A^TA]   EIGENPROBLEM
+ ... NO. OF EQUATIONS          =   12
+ ... MAX. NO. OF LANCZOS STEPS =   12
+ ... MAX. NO. OF EIGENPAIRS    =   12
+ ... LEFT  END OF THE INTERVAL = -1.00E-30
+ ... RIGHT END OF THE INTERVAL =  1.00E-30
+ ... WANT S-VECTORS?   [T/F]   =   T
+ ... KAPPA                     =  1.00E-06
+ matrix                                                                  Þ
+           'harbomat'
+ ... NO. OF TERMS     (ROWS)   =        7
+ ... NO. OF DOCUMENTS (COLS)   =       12
+ ... ORDER OF MATRIX A         =       12
+ ... 
+
+ ...... ALLOCATED MEMORY (BYTES)=   5.27E+03
+ ...... LANSO EXECUTION TIME=  0.00E+00
+ ...... 
+ ...... NUMBER OF LANCZOS STEPS =   7       NEIG =   7
+ ...... 
+ ......         COMPUTED RITZ VALUES  (ERROR BNDS)
+ ...... 
+ ......   1     1.43168582047559E+01  (   0.00E+00)
+ ......   2     2.76021001093504E+01  (   0.00E+00)
+ ......   3     5.51792696778341E+01  (   0.00E+00)
+ ......   4     6.13388473636098E+01  (   0.00E+00)
+ ......   5     1.12013369392293E+02  (   0.00E+00)
+ ......   6     1.76570553255899E+02  (   0.00E+00)
+ ......   7     2.80468479799626E+03  (   0.00E+00)
+ ...... 
+ ...... NO. MULTIPLICATIONS BY A  =        23
+ ...... NO. MULT. BY TRANSPOSE(A) =        16
+
+ ...... LASVD EXECUTION TIME=  0.00E+00
+ ...... 
+ ......        NSIG =    7
+ ...... 
+ ......         COMPUTED S-VALUES     (RES. NORMS)
+ ...... 
+ ......   1     3.43930160532362E+00  (   2.05E+00)
+ ......   2     2.56913420319142E+00  (   3.57E+00)
+ ......   3     7.83825576006117E+00  (   2.81E+00)
+ ......   4     9.10183513676147E+00  (   5.31E+00)
+ ......   5     1.05908615733155E+01  (   1.68E-01)

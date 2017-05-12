@@ -1,0 +1,65 @@
+0.11 - 2011-11-20
+- Fix t/cookbook.t because UNIVERSAL's methods are part of the MOP in Moose
+  2.0300 (doy)
+
+0.10 - 2010-11-20
+ - Fixed to use new Moose::Util::MetaRole API.
+ - Upgraded Moose dep to v0.94.
+ - Removed $_ where not necessary.
+
+0.09 - 2009-05-30
+ - Added method ordering.
+ - Minor doc updates.
+
+0.08 - 2009-05-23
+ - Bugfix for planning in a role (RT 46290).
+
+0.07 - 2009-05-11
+ - Doc updates
+ - Kwalitee improvements
+
+0.06 - 2009-04-21
+ - Namespaced types.
+ - Added exception handling.
+ - More documentation.
+ - Automatically set builder->no_plan if appropriate.
+ - Added Test::Able::Helpers.
+ - Added Test::Able::Role.
+
+0.05 - 2009-03-09
+ - Made Synopsis more interesting and put it in t/synopsis.t.
+ - Added plan failure handling at the method level.
+ - Fixed meta->current_method bug.
+ - Fixed various planning bugs.
+ - TEST_VERBOSE is now used to toggle meta->log.
+ - Fixed t/methods.t failure with respect to evaling BUILD into existence.
+ - Put Cookbook entries in t/cookbook.t and fixed resultant bugs.
+ - Various doc changes.
+
+0.04 - 2009-03-03
+ - Added moose-like method declaration.
+ - Dumped sub attrs and sub name method decoration.
+ - Split Test::Able into the sugar package (Test::Able)
+   and the base class (Test::Able::Object).  Moved
+   Test::Able::Object/Method to Test::Able::Role::Meta::Class/Method
+   to accommodate.
+ - Other minor fixes and cleanups.
+
+0.03 - 2009-02-02
+ - Fixed META.yaml.
+
+0.02 - 2009-02-02
+ - Started using git for version control and put on github.com.
+ - Overloaded %{} on method lists for convenience.
+ - Changed default plan on test methods from no_plan to 0.
+ - Renamed master_plan and last_master_plan to runner_plan and
+   last_runner_plan.
+ - Added ability to skip implicit setup and/or teardown method
+   list execution.
+ - Cookbook rework.
+ - Added Test::Able::Object::current_method.
+ - Smaller code, documentation, and whitespace fixups.
+ - Initial CPAN release.
+
+0.01 - 2008-12-06
+ - Initial version in tarball form only.  No revision control.

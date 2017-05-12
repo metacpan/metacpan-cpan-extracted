@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    :tabSize=2:indentSize=2:wrap=hard:
+    The schema for this namespace may be found at the following URL:
+
+    http://www.blackperl.com/XML/ChangeLog/ChangeLogML.xsd
+
+    $Id: ChangeLog.xml 10 2008-10-22 09:57:04Z rjray $
+-->
+<changelog xmlns="http://www.blackperl.com/XML/ChangeLog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.blackperl.com/XML/ChangeLog etc/ChangeLogML.xsd">
+  <description>
+    Revision history for the Perl extension module Test::Formats. This is
+    a test-harness implementation that provides users with easy methods for
+    testing text data that adheres to regular, validatable formats.
+  </description>
+  <release version="0.12" tag="v0_12" date="2008-10-22T03:00:00-07:00">
+    <change>
+      <fileset revision="8">
+        <file path="lib/Test/Formats/XML.pm" />
+        <file path="t/10_xml/10_sgmldtd.t" />
+        <file path="t/10_xml/20_xmlschema.t" />
+        <file path="t/10_xml/30_relaxng.t" />
+        <file path="t/90_integration/10_with_xml.t" />
+        <file path="t/90_integration/90_empty_subclass.t" />
+      </fileset>
+      <description>
+        Per suggestions from Schwern, added &lt;type&gt;_ok aliases for the
+        tests, and also swapped the order of the $document and $schema
+        arguments to all the tests. While at it, added tests for each of the
+        three schema-types to test the aliases directly.
+      </description>
+    </change>
+    <change>
+      <file path="lib/Test/Formats/XML.pm" revision="9" />
+      <description>
+        Follow-up the previous with carrying over the argument-ordering change
+        to the is_valid_against() subroutine. Also fleshed out some overlooked
+        (i.e., forgotten) documentation for is_well_formed_xml().
+      </description>
+    </change>
+  </release>
+  <release version="0.11" tag="v0_11" date="2008-10-21T04:07:00-07:00">
+    <change>
+      <fileset revision="4">
+        <file path="MANIFEST" />
+        <file path="lib/Test/Formats/XML.pm" />
+        <file action="ADD" path="t/10_xml/05_xml_parsing.t" />
+      </fileset>
+      <description>
+        Added testing routines to Test::Formats::XML to simple test that XML
+        content is well-formed. Tests only the parsing, no validation. Added
+        test suite for this, and added the suite file to MANIFEST.
+      </description>
+    </change>
+    <change>
+      <fileset revision="5">
+        <file path="Build.PL" />
+        <file path="Makefile.PL" />
+      </fileset>
+      <description>
+        Besides bumping the version number, added some clean-up to the
+        overall meta-information so that pre-reqs, etc., are better
+        spelled-out.
+      </description>
+    </change>
+  </release>
+  <release version="0.10" tag="v0_10" date="2008-10-20T02:00:00-07:00">
+    <change>
+      <fileset revision="2">
+        <file action="ADD" path="Build.PL" />
+        <file action="ADD" path="ChangeLog" />
+        <file action="ADD" path="ChangeLog.xml" />
+        <file action="ADD" path="MANIFEST" />
+        <file action="ADD" path="MANIFEST.SKIP" />
+        <file action="ADD" path="Makefile.PL" />
+        <file action="ADD" path="README" />
+        <file action="ADD" path="etc/ChangeLogML.xsd" />
+        <file action="ADD" path="lib/Test/Formats.pm" />
+        <file action="ADD" path="lib/Test/Formats/XML.pm" />
+        <file action="ADD" path="t/00_load.t" />
+        <file action="ADD" path="t/01_pod.t" />
+        <file action="ADD" path="t/02_pod_coverage.t" />
+        <file action="ADD" path="t/10_xml/10_sgmldtd.t" />
+        <file action="ADD" path="t/10_xml/20_xmlschema.t" />
+        <file action="ADD" path="t/10_xml/30_relaxng.t" />
+        <file action="ADD" path="t/90_integration/10_with_xml.t" />
+        <file action="ADD" path="t/90_integration/90_empty_subclass.t" />
+        <file action="ADD" path="t/90_integration/MyTestFormats.pm" />
+      </fileset>
+      <description>
+        Initial release. All basic functionality for the Test::Formats::XML
+        specialization is in place, but test coverage is embarrassing.
+      </description>
+    </change>
+  </release>
+</changelog>

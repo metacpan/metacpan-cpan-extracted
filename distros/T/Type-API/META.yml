@@ -1,0 +1,34 @@
+---
+abstract: 'a common interface for type constraints, based on observed patterns (documentation only)'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Type-API
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Type::API:
+    file: lib/Type/API.pm
+    version: '0.002'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Type-API/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Type-API
+  homepage: https://metacpan.org/release/Type-API
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/docs-type-api.git
+version: '0.002'

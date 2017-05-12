@@ -1,0 +1,20 @@
+NAME
+    Task::Math::Symbolic - Math::Symbolic with lots of plugins
+
+SYNOPSIS
+    "perl -MCPAN -e 'install Task::Math::Symbolic'"
+
+DESCRIPTION
+
+This installs Math::Symbolic and a load of easily installable (i.e. pure Perl)
+plugins that make the module so much more powerful.
+
+Please have a look at the POD documentation for a list of included modules.
+
+AUTHOR
+    Steffen Mueller, <symbolic-module at steffen-mueller dot net>
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

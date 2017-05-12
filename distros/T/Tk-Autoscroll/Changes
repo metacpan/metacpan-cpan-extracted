@@ -1,0 +1,14 @@
+Revision history for Perl distribution Tk-Autoscroll
+
+1.14
+	- make sure tests are non-interactive
+
+1.13
+	- hide Tk::Widget package from PAUSE indexer
+
+1.12
+	- new option -stoptrigger
+	- new global variable @default_args
+
+1.11
+	- moved from Tk-SREZIC 0.04

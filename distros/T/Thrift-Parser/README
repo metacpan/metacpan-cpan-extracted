@@ -1,0 +1,113 @@
+NAME
+    Thrift::Parser - A Thrift message (de)serialization OO representation
+
+SYNOPSIS
+      use Thrift;
+      use Thrift::Parser;
+      use Thrift::IDL;
+
+      my $parser = Thrift::Parser->new(
+          idl => Thrift::IDL->parse_thrift_file('tutorial.thrift'),
+          service => 'Calculator',
+      );
+
+      ## Parse a payload
+
+      # Obtain a Thrift::Protocol subclass somehow with a loaded buffer
+      my $buffer   = ...;
+      my $protocol = Thrift::BinaryProtocol->new($buffer);
+
+      my $message = $parser->parse_message($protocol);
+
+      print "Received method call " . $message->method->name . "\n";
+
+      ## Use the auto-generated classes to create request/responses
+
+      my $request = tutorial::Calculator::add->compose_message_call(
+        num1 => 15,
+        num2 => 33,
+      );
+
+      my $response = $request->compose_reply(48);
+
+DESCRIPTION
+    This module provides strict typing and full object orientation of all
+    the Thrift types. It allows you, with a Thrift::IDL object, to create a
+    parser which can parse any Thrift::Protocol object into a message
+    object, and creates dynamic classes according to the IDL specification,
+    allowing you to create method calls, objects, and responses.
+
+METHODS
+  new
+      my $parser = Thrift::Parser->new(
+        idl => Thrift::IDL->parse_thrift_file('..'),
+        service => 'myServiceName',
+      )
+
+    Creates the Parser object and dynamic classes from the IDL file.
+
+  parse_message
+      my $message = $parser->parse_message($transport);
+
+    Given a Thrift::Transport object, the parser will create a
+    Thrift::Parser::Message object.
+
+  full_docs_to_dir
+      $parser->full_docs_to_dir($dir, $format);
+
+    Using the dynamically generated classes, this will create 'pod' or 'pm'
+    files in the target directory in the following format:
+
+      $dir/tutorial::Calculator::testVars.pod
+      (or with format 'pm')
+      $dir/tutorial/Calculator/testVars.pm
+
+    The directory will be created if it doesn't exist.
+
+INTERNAL METHODS
+  parse_structure
+      my $fieldset = $parser->parse_structure($transport, $thrift_idl_method->arguments);
+
+    Returns a Thrift::Parser::FieldSet. Attempts to read a structure off the
+    transport, using an array of Thrift::IDL::Field objects to define the
+    specification of the structure.
+
+  parse_type
+      my $typed_value = $parser->parse_type($transport, { idl => $thrift_idl_type_object || type => 4 });
+
+    Reads a single value off the transport and returns it as an object in a
+    Thrift::Parser::Type subclass.
+
+  idl_type_class
+      my $parser_type_class = $parser->idl_type_class($thrift_idl_type_object);
+
+    Maps the given Thrift::IDL::Type object to one in my parser namespace.
+    If it's a custom type, it'll map into a dynamic class.
+
+  resolve_idl_type
+      my $thrift_idl_type_object = $parser->resolve_idl_type($thrift_idl_custom_type_object);
+
+    Returns the base Thrift::IDL::Type object from the given
+    Thrift::IDL::Type::Custom object
+
+SEE ALSO
+    Thrift, Thrift::IDL
+
+DEVELOPMENT
+    This module is being developed via a git repository publicly available
+    at <http://github.com/ewaters/thrift-parser>. I encourage anyone who is
+    interested to fork my code and contribute bug fixes or new features, or
+    just have fun and be creative.
+
+COPYRIGHT
+    Copyright (c) 2009 Eric Waters and XMission LLC
+    (http://www.xmission.com/). All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+AUTHOR
+    Eric Waters <ewaters@gmail.com>
+

@@ -1,0 +1,50 @@
+Revision history for Teng-Plugin-SearchBySQLAbstractMore
+
+0.12 2013-09-05T16:45:32Z
+	use Minilla as CPAN authoring tool.
+        fix some tests.
+        fix typo in pod.
+
+0.11	2012/12/30 07:29
+	use execute instead of _execute according to Teng 0.17 change.
+
+0.10	2012/12/25 03:32
+	fix bug: search method must return array of row objects in list context (reported by dokechin).
+	fix SYNOPSIS.
+
+0.09    2012/12/08 20:09
+        add hint_columns option to Pager::Count module.
+	add order by null to count sql when using Pager::Count and db is MySQL and query has group by.
+        add create_sql_by_sql_abstract_more just to create SQL with SQL::Abstract::More.
+
+0.08    2012/08/16 19:54
+	fix bug: not existing/wrong method name in EXPORT
+	allow whitespace around '|' used for join
+
+0.07	2012/02/04 12:08
+	use _execute method of Teng. error message is improved.
+
+0.06	2012/01/11 0045:
+	improve Pager::Count
+	add Pager::CountOrMySQLFoundRows
+
+0.05    2012/01/07 17:20
+	*NOTE THAT* change install_sql_abstract_more.
+	            now, alias is default. replace is optional.
+	*NOTE THAT* Teng::Plugin::SearchBySQLAbstractMore->new_option is now YourClass->sql_abstract_more_new_option.
+	fix bug of caching SQL::Abstract::More object .
+
+0.04    2012/01/07 13:56
+	fix Makefile.PL.
+
+0.03    2012/01/07 03:14
+	cache SQL::Abstract::More object
+	add Teng::Plugin::SearchBySQLAbstractMore::Pager::Count.
+	add new_option class method
+	*NOTE THAT* change install_sql_abstract_more's pager argument value.
+
+0.02    2012/01/06 13:10
+	skip some test when Teng version < 0.14_01
+
+0.01    2012/01/06 00:03
+        First version.

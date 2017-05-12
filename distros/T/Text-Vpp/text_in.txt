@@ -1,0 +1,25 @@
+Sample text for Text::Vpp
+@INCLUDE   inc_text.txt
+#
+@EVAL $var2 = 1
+#
+@IF $var2
+We should see this line
+@ELSE
+But not this one
+@ENDIF
+
+@if ($var1 =~ /was set/)
+We should see this line if var1 was set by perl
+var 1 is: $var1.
+@else
+perl did not set var1 ($var1)
+@endif
+
+# This line is a comment to explain that $var1 comes from perl test script
+@IF ($var1 eq 'toto')
+Should never see this line
+@ELSE
+Should see this one.
+@ENDIF
+

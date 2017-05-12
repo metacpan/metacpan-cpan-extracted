@@ -1,0 +1,24 @@
+---
+abstract: 'Replaces actual time with simulated time '
+author:
+  - 'David Dick <ddick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-MockTime
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+  Time::Local: '0'
+  Time::Piece: '1.08'
+version: '0.15'

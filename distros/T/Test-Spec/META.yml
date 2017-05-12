@@ -1,0 +1,20 @@
+---
+abstract: 'Write tests in a declarative specification style'
+author:
+  - 'Philip Garrett <philip.garrett@icainformatics.com>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Spec
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  bugtracker: https://github.com/kingpong/perl-Test-Spec/issues
+  repository: https://github.com/kingpong/perl-Test-Spec
+version: 0.51

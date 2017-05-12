@@ -1,0 +1,11 @@
+Yet another ASP/JSP - like templating mechanism for perl.
+
+Read the documentation for why and how.
+
+Installation instructions:
+
+perl Makefile.PL
+make
+make test
+[sudo] make install
+

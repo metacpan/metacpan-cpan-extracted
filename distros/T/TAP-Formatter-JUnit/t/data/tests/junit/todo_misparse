@@ -1,0 +1,15 @@
+<testsuites>
+  <testsuite failures="1"
+             errors="0"
+             tests="1"
+             name="data_tests_todo_misparse">
+    <testcase name="1 Hamlette # TODOORNOTTODO">
+      <failure type="TestFailed"
+               message="not ok 1 Hamlette # TODOORNOTTODO"><![CDATA[not ok 1 Hamlette # TODOORNOTTODO]]></failure>
+    </testcase>
+    <system-out><![CDATA[1..1
+not ok 1 Hamlette # TODOORNOTTODO
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

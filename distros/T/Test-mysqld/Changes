@@ -1,0 +1,63 @@
+Revision history for Perl extension Test::mysqld.
+
+0.21 2017-04-13T04:50:01Z
+	- Suppress noisy warnings (hirose31)
+
+0.20 2016-12-20T07:30:45Z
+	- fix dist name
+
+0.18 2016-12-20T06:28:12Z
+
+	- add impl of Test::mysqld::Multi (shogo82148)
+	- support MySQL 5.7.6 or later (karupanerura ywatase)
+
+0.17
+	- introduce "copy_data_from", to start-up MySQL with prefilled tables
+	- add "read_log" function that returns the contents of mysqld log
+
+0.16
+	- fix compatibility issue when trying to use mysqld of homebrew (songmu)
+
+0.15
+	- only issue the "already running" error when we ask to start the database and not all the time.  Solves a bug when you try to connect to an already running test mysql database.  (jjnapiork)
+
+0.14
+	- added "sbin" to mysql subdirs (masaki)
+	- set tmpdir (lecstor)
+
+0.13
+	- keep $? in tact after calling stop()
+
+0.12  Mon Feb 14 13:37:00 2011
+	- now compatible with MySQL 5.0.x (by hiratara)
+
+0.11  Fri Oct 16 13:12:00 2009
+	- test_requires Test::SharedFork 0.06
+
+0.10  Fri Oct 16 13:05:00 2009
+	- do not destroy mysqld when child process exits
+
+0.09  Thu Oct 15 15:15:00 2009
+	- always set "host" attribute in dsn if "port" exists (or will fail to connect)
+
+0.07  Thu Oct 15 09:20:00 2009
+	- add dsn generator
+	- create "test" database if not exists
+
+0.06  Fri Aug 07 09:33:00 2009
+	- fix misdetection of mysql programs on Solaris
+
+0.05  Thu Aug 06 05:00:00 2009
+	- pass --basedir to mysql_install_db (or would not work if mysql was installed into a different directory than that specified as build option)
+
+0.04  Wed Aug 05 06:00:00 2009
+	- return undef from new() and set $errsrt if necessary programs were not found
+
+0.03  Wed Aug 05 00:00:02 2009
+	- fix bug that causes somewhat strange behaviour in I/O (see svn)
+
+0.02  Wed Aug 05 00:00:01 2009
+	- permit mysqld to run under root privileges
+
+0.01  Wed Aug 05 00:00:00 2009
+	- initial release

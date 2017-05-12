@@ -1,0 +1,33 @@
+---
+abstract: 'Conquer hosts with a camel'
+author:
+  - 'G. Casati <fibo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.64
+  Test::Compile: v1.2.1
+  Test::More: 1.001009
+  Test::Pod: 1.48
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Viral
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CPAN: 2.10
+  CPAN::Mini::Inject: 0.33
+  CPAN::Mirror::Server::HTTP: 0.04
+  perl: 5.008000
+resources:
+  bugtracker: https://github.com/fibo/Task-Viral-pm/issues
+  homepage: https://metacpan.org/pod/Task::Viral
+  license: http://g14n.info/artistic-license
+  repository: https://github.com/fibo/Task-Viral-pm
+version: v0.02.1

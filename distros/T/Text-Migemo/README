@@ -1,0 +1,45 @@
+NAME
+       Text::Migemo - Migemo library module for Perl
+
+SYNOPSIS
+           use Text::Migemo;
+
+           my $migemo = Text::Migemo->new;
+           $migemo->load(MIGEMO_DICTID_MIGEMO, $dict);
+           # or my $migemo = Text::Migemo->new($dict);
+           my $result = $migemo->query($query);
+
+DESCRIPTION
+       This module is an interface for C/Migemo library.  It is available at:
+       http://www.kaoriya.net/#CMIGEMO
+
+METHODS
+       new Returns new Migemo object.
+
+       open
+           This is an alias to new.
+
+       load
+           Load dictionary.
+
+       query
+           Convert to regex.
+
+       is_enable
+           Returns Migemo object is enable or disable.
+
+       set_operator
+           Set operator.
+
+       get_operator
+           Get operator.
+
+AUTHOR
+       Jiro Nishiguchi <jiro@cpan.org>
+
+       This library is free software; you can redistribute it and/or modify it under the same
+       terms as Perl itself.
+
+SEE ALSO
+       http://www.kaoriya.net/#CMIGEMO
+

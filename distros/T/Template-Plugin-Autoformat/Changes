@@ -1,0 +1,29 @@
+Revision history for Template-Plugin-Autoformat
+
+2.77 2015-02-27
+ - merge a series of doc and test cleanup patches from Breno G. de Oliveira (garu)
+
+2.76 2015-01-05
+ - tests patched to fix some locales (https://rt.cpan.org/Ticket/Display.html?id=99972)
+
+2.75 2014-05-09
+ - official release, no code change from 2.74_04
+
+2.74_04 2014-05-07
+ - tweek tests to reflect sprintf rounding differences on some machines
+
+2.74_03 2014-05-06
+ - port tests to Test::More to get better diagnostics from cpantesters
+
+2.74_02 2014-05-02
+ - attempt to address failing test 10 on some cpantesters
+
+2.74_01 2014-05-01
+ - Peter Karman took over maintenance.
+ - repo started at https://github.com/karpet/template-plugin-autoformat
+ - fixed failing tests, switching to standard initial-cap for plugin name
+   before: USE autoformat
+   after : USE Autoformat
+
+2.71 2008-12-15
+ - split out of core into its own distribution. No Changes file in this release or prior.

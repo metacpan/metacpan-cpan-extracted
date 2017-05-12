@@ -1,0 +1,15 @@
+0.03 2015-11-03T23:07:46+01:00
+ - Update Graph::Reader::OID to 0.03 version.
+ - Update Graph::Reader::TGF to 0.03 version.
+ - Update Graph::Reader::TGF::CSV to 0.02 version.
+
+0.02 2015-09-28T20:56:39+02:00
+ - Add another classes to SEE ALSO section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Graph::Reader to 2.07 version.
+ - Update Graph::Reader::UnicodeTree to 0.02 version.
+ - Update Module::Install to 1.16 version.
+
+0.01 2015-01-22T18:38:52+01:00
+ - First version

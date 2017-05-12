@@ -1,0 +1,26 @@
+Changelog for Type-Tiny-Signatures
+
+0.06 2015-09-27T11:56:22
+ - Updated build.
+ - Updated build requirements.
+
+0.05 2015-07-04T04:28:30
+ - v0.05
+ - Refactored import.
+
+0.04 2015-07-04T01:06:53
+ - v0.04
+ - Refactored import.
+
+0.03 2015-06-21T09:54:47
+ - v0.03
+ - Added support for Function::Parameters strict mode and customization.
+ - Updated POD.
+
+0.02 2015-06-15T00:00:50
+ - v0.02
+ - Minor updates to code and POD.
+
+0.01 2015-06-14T13:38:27
+ - v0.01
+ - Initial commit.

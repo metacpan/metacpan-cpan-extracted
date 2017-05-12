@@ -1,0 +1,27 @@
+---
+abstract: 'Just another HTML calendar generator.'
+author:
+  - 'jeffa <info+cpan@unlocalhost.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Calendar-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Calendar::Simple: 1.04
+  Template: 2.00
+  perl: 5.006
+resources:
+  homepage: https://github.com/jeffa/Template-Plugin-Calendar-Simple
+  repository: https://github.com/jeffa/Template-Plugin-Calendar-Simple.git
+version: 1.00

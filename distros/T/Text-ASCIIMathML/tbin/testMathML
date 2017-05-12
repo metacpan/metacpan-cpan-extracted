@@ -1,0 +1,10 @@
+#!/usr/local/bin/perl
+
+use lib 'blib/lib';
+use Text::ASCIIMathML;
+
+my $parser = new Text::ASCIIMathML;
+$parser->SetAttribute(ForMoz=>1);
+while (<STDIN>) {
+    print $parser->TextToMathML($_, [title=>$_, xmlns=>"&mathml;"], \@ARGV),"\n";
+}

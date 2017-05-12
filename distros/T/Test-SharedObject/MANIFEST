@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/SharedObject.pm
+lib/Test/SharedObject/Lock.pm
+minil.toml
+t/00_compile.t
+t/01_synopsys.t
+t/02_deep.t
+t/03_concurenct.t
+META.yml
+MANIFEST

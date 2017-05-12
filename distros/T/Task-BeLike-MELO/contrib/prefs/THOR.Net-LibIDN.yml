@@ -1,0 +1,5 @@
+---
+match:
+  distribution: '^THOR/Net-LibIDN-\d'
+pl:
+  args: ["--with-libidn", "/usr/local/lib", "--with-libidn-inc", "/usr/local/include" ]

@@ -1,0 +1,41 @@
+Spec for the Template Toolkit Preprocessor
+------------------------------------------
+
+1. Motivation:
+--------------
+
+The purpose of this module is to provide a standalone command line
+preprocessor for pre-processing files using the Template Toolkit. Its
+primary purpose is to be a CSS preprocessor for use in Latemp.
+
+2. Invocation and Flags
+-----------------------
+
+$ ttml [flags] input.file.
+
+Flags:
+
+* -o $output_file
+
+    Outputs to $output_file (defaults to STDOUT)
+
+* -I"$PATH", -I "$PATH", --include="$PATH"
+
+    Adds a directory to the include path (Placed in INCLUDE_PATH in the
+    Template object config)
+
+* -D"$VAR"="$VALUE", --define="$VAR"="$VALUE"
+
+    Defines a variable "$VAR" as "$VALUE".
+
+    Note: $VALUE is a simple Perl string.
+
+* --includefile="$MYFILE"
+
+    includes a file to the top of the template.
+
+* -V --version
+    Gives the version and exits.
+
+* -h --help
+    Prints the usage summary page.

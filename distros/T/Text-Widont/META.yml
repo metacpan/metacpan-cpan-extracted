@@ -1,0 +1,21 @@
+---
+name: Text-Widont
+version: 0.01
+author:
+  - 'Dave Cardwell <dcardwell@cpan.org>'
+abstract: Suppress typographic widows
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+build_requires:
+  Test::More: 0
+provides:
+  Text::Widont:
+    file: lib/Text/Widont.pm
+    version: 0.01
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

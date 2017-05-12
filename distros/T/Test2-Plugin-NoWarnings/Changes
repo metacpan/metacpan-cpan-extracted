@@ -1,0 +1,44 @@
+0.05     2016-11-07
+
+- Skip compile.t on Windows. This test uses IPC::Run3 which doesn't seem to
+  work well on that platform. Fixed RT #118443. Reported by Alexandr Ciornii.
+
+
+0.04     2016-10-23
+
+- Load Test2::Event::Warning in the plugin instead of relying on Test2 to do
+  it for us. This should avoid the bug reported by Todd Rinaldo and eliminates
+  the need for the INIT block, which caused it's own problems.
+
+
+0.03     2016-10-17
+
+- Add the $SIG{__WARN__} hook in an INIT block. We really don't want to
+  trigger this because of a compile-time warning, and because of a bug in
+  Test::Builder, this can actually cause the warning to be lost
+  entirely. Reported by Todd Rinaldo in
+  https://github.com/Test-More/test-more/issues/729.
+
+- The Test2::Event::Warning event now returns true for increments_count. That
+  means that the test failure caused by a warning will not be output as a TAP
+  test line. Previously this was just seen as a diag line, which could be
+  quite confusing. Reported by Todd Rinaldo in
+  https://github.com/Test-More/test-more/issues/728
+
+
+0.02     2016-05-23
+
+- Make the event return false for increments_count, so warnings-related
+  failures don't cause test count issues.
+
+- Make the plugin add a prefix to the warning message rather than adding it in
+  the event class's summary method.
+
+- Make causes_fail an attribute in the event. It defaults to to true, but can
+  be set to false if you'd like to repurpose the event object for something
+  else.
+
+
+0.01     2016-05-22
+
+- First release upon an unsuspecting world.

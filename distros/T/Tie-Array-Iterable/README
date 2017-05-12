@@ -1,0 +1,36 @@
+Tie/Array/Iterable version 0.01
+===============================
+
+Tie::Array::Iterable is a implementation of iterators for perl
+lists and arrays; while mimicing the C++ STL counterpart, it's
+not a complete clone of them.  Iterators allow one to progress
+through lists without having to worry about changes to the list
+that may occur (specifically operations like splice, pop/push,
+and shift/unshift), as well as to 'save' one's position in
+a iteration of an array.  While perl's builtin iteration
+functions (for/foreach) work well, they cannot handle these
+situations easily.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Tie::Array::Iterable extends from the standard library 
+Tie::Array.  Testing of the module uses Test::More.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2001 by Michael K. Neylon <mneylon-pm@masemware.comE>.
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+

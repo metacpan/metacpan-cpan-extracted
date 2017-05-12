@@ -1,0 +1,98 @@
+README for Text::Shoebox
+                                        Time-stamp: "2004-03-24 15:43:30 AST"
+
+			    Text::Shoebox
+	Read and write SIL Shoebox Standard Format (.sf) files
+
+---------------------------------------------------------------------------
+
+[Partially excerpted from the POD.]
+
+The Summer Institute of Linguistics (C<http://www.sil.org/>) makes a
+piece of free software called "the Linguist's Shoebox", or just
+"Shoebox" for short.  It's a simple database program generally used
+for making lexicon databases (altho it can also be used for databases
+of field notes, etc.).
+
+Shoebox can export its databases to SF (Standard Format) files, a
+simple text format.
+
+Reading and writing those SF files is what this Perl module,
+Text::Shoebox, is for.  (I have heard that Standard Format predates
+Shoebox quite a bit, and is used by other programs.  If you use SF
+files with something other than Shoebox, I'd be interested in hearing
+about it, particularly about whether such files and Text::Shoebox are
+happily compatible.)
+
+
+See also the tidier, object-oriented interface presented by
+Text::Shoebox::Lexicon.
+
+[end POD excerpt]
+
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Text::Shoebox doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Text::Shoebox and its classes Text::Shoebox::Lexicon and
+Text::Shoebox::Entry, as you would install any perl module library, by
+running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Text::Shoebox in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+Then you may need something like
+  setenv PERLLIB "$HOME/perl"
+in your shell initialization file (e.g., ~/.cshrc).
+
+For more info, see perldoc perlmodinstall.
+
+
+DOCUMENTATION
+
+POD-format documentation is included in the .pm files.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Text::Shoebox should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Text::Shoebox is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+
+COPYRIGHT
+
+Copyright 2000-, Sean M. Burke <sburke@cpan.org>, all rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHOR
+
+Sean M. Burke <sburke@cpan.org>
+
+I hasten to point out, incidentally, that I am not in any way
+affiliated with the Summer Institute of Linguistics.
+

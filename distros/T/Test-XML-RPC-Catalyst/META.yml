@@ -1,0 +1,23 @@
+--- 
+abstract: Testing of Catalyst based XMLRPC applications
+author: 
+  - Anders Nor Berle <berle@cpan.org>
+build_requires: 
+  Catalyst::Plugin::Server: 0.24
+  Catalyst::Runtime: 5.7012
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Test-XML-RPC-Catalyst
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Test::Simple: 0.72
+  Test::WWW::Mechanize::Catalyst: 0.41
+  XML::RPC: 0.6
+version: 0.01

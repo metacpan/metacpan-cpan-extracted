@@ -1,0 +1,76 @@
+{
+   "abstract" : "Template-Toolkit virtual methods and filters for Xslate (deprecated)",
+   "author" : [
+      "Fuji, Goro (gfx) <gfuji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.0.56",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Xslate-Bridge-TT2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.0.16"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Template" : "2",
+            "Text::Xslate" : "0.1045",
+            "parent" : "0.2",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Xslate::Bridge::TT2" : {
+         "file" : "lib/Text/Xslate/Bridge/TT2.pm",
+         "version" : "1.0003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xslate/p5-Text-Xslate-Bridge-TT2/issues"
+      },
+      "homepage" : "https://github.com/xslate/p5-Text-Xslate-Bridge-TT2",
+      "repository" : {
+         "url" : "git://github.com/xslate/p5-Text-Xslate-Bridge-TT2.git",
+         "web" : "https://github.com/xslate/p5-Text-Xslate-Bridge-TT2"
+      }
+   },
+   "version" : "1.0003",
+   "x_contributors" : [
+      "Fuji, Goro <g.psy.va@gmail.com>"
+   ]
+}

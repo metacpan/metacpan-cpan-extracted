@@ -1,0 +1,10 @@
+<corpus lang='english'>
+<lexelt item="art.n">
+<instance id="art.40001">
+<answer	instance="art.40001"senseid="pop_art~1:06:00::"/>
+<context>
+ <s> this is a work of <head>art</head> <.> </s> <s> i love this work of art <.> </s> <s> do you <?> </s> 
+</context>
+</instance>
+</lexelt>
+</corpus>

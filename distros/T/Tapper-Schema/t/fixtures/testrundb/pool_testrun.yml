@@ -1,0 +1,72 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: tapper
+  data:
+    id: 12
+    name: The Tapper User
+    login: tapper
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# ==================== "scheduling"
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+
+# --- ccc2 ---
+
+- schema: Testrun
+  name: ccc2-kernel
+  data:
+    id: 3002
+    owner_id: 12
+    shortname: ccc2-kernel
+    notes: ccc2
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Kernel-ccc2
+  data:
+    id: 302
+    testrun_id: 3002            # ccc2
+    queue_id: 3                 # Kernel
+    status: schedule
+
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: pool_iring
+  data:
+    id: 5
+    name: pool_iring
+    free: 1
+    active: 1
+    pool_free: 2
+# -------------------- scenarios --------------------
+
+- schema: Host
+  name: elem_pool_iring
+  data:
+    id: 6
+    name: iring
+    free: 1
+    active: 1
+    pool_id: 5
+# -------------------- scenarios --------------------

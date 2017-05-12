@@ -1,0 +1,11 @@
+/\s(<[^>]*>)*period <p="NN"\/>(<[^>]*>)*\s/ @name = period <p="NN"/>
+/\s(<[^>]*>)*yields <p="NNS"\/>(<[^>]*>)*\s/ @name = yields <p="NNS"/>
+/\s(<[^>]*>)*money <p="NN"\/>(<[^>]*>)*\s/ @name = money <p="NN"/>
+/\s(<[^>]*>)*market <p="JJ"\/>(<[^>]*>)*\s/ @name = market <p="JJ"/>
+/\s(<[^>]*>)*company <p="NN"\/>(<[^>]*>)*\s/ @name = company <p="NN"/>
+/\s(<[^>]*>)*portfolio <p="NN"\/>(<[^>]*>)*\s/ @name = portfolio <p="NN"/>
+/\s(<[^>]*>)*managers <p="NNS"\/>(<[^>]*>)*\s/ @name = managers <p="NNS"/>
+/\s(<[^>]*>)*rate <p="NNS"\/>(<[^>]*>)*\s/ @name = rate <p="NNS"/>
+/\s(<[^>]*>)*million <p="CD"\/>(<[^>]*>)*\s/ @name = million <p="CD"/>
+/\s(<[^>]*>)*funds <p="NN"\/>(<[^>]*>)*\s/ @name = funds <p="NN"/>
+/\s(<[^>]*>)*property <p="NN"\/>(<[^>]*>)*\s/ @name = property <p="NN"/>

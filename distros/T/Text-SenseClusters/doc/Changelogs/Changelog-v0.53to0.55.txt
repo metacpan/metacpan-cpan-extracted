@@ -1,0 +1,11 @@
+
+Changes made in Sense-Clusters version 0.53 during version 0.55
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+	Updated cgi-bin during AAAI demo
+
+(Changelog-v0.53to0.55 Last Updated on 07/18/2004 by Amruta)

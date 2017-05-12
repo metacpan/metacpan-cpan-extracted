@@ -1,0 +1,32 @@
+INSTALL for Taint.pm
+
+For most systems, the usual routine will work. First unpack the
+distribution, then cd into the new directory and issue these
+commands.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If your system doesn't have MakeMaker support, you may need to
+manually run the tests and then install. But, if you don't have
+MakeMaker, you should be used to that by now.
+
+INSTALLER'S OPTION
+
+If you wish to disable the allegedly-useful but potentially
+easy-to-abuse unconditional_untaint function, you may do that before
+you install this module. Use this command to make the makefile:
+
+    perl Makefile.PL ALLOW_UU=0
+
+If, on the other hand, you've disabled the function and now you've
+decided to relent, use this command to re-enable it:
+
+    perl Makefile.PL ALLOW_UU=1
+
+After either of those commands, use the same make sequence as above.
+(Alternatively, you might manually edit Taint.pm, before or after
+installing, but doing that shows that you're lacking Laziness, or
+at least Impatience.)

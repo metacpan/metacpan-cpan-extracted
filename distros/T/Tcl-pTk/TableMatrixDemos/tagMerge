@@ -1,0 +1,37 @@
+# Script show tag merging behavior with an option set in the 
+#  option database. 
+#
+#   Should display with one row hightlighted red and a cell in the row left-justified
+
+use Tcl::pTk qw/:perlTk/;
+use Tcl::pTk::TableMatrix;
+
+use strict;
+
+my $mw = MainWindow->new;
+
+#$mw->optionAdd('*background', 'blue', 'interactive');
+$mw->optionAdd('*tablematrix*background', 'skyblue');
+
+my $table = $mw->TableMatrix(-rows => 5,
+                            -cols => 8,
+                            -cache => 1,
+			    #-bg => 'blue',
+			    );                
+$table->pack(-expand => 1, -fill => 'both');
+
+$table->tagConfigure("invalid", -background => 'red');
+$table->tagConfigure("left", -anchor => 'w');
+
+foreach my $row (0..4) {
+     #$table->tagRow('invalid', $row);                # swap
+     foreach my $column (0..7) {
+       $table->set("$row,$column", "hello");
+             #$table->tagCell('left', "$row,$column");    # swap
+   }
+}
+
+$table->tagCell('left', '2,3');
+$table->tagRow('invalid', 2);
+
+MainLoop;

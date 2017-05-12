@@ -1,0 +1,8 @@
+Revision history for Test-Deep-URI
+
+0.02  2016-02-14 18:57:43 PST
+        - Require at least version 0.005 of Test::Warnings for the
+          "warnings" function.
+
+0.01  2016-02-01 19:51:21 PST
+        - Initial release

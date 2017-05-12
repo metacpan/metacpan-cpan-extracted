@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00-Tk-FcyEntry-load.t
+t/01-fcyentry.t
+lib/Tk/FcyEntry.pm
+example/fcyentry.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

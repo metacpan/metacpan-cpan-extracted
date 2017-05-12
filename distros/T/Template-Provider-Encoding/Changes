@@ -1,0 +1,38 @@
+Revision history for Perl extension Template::Provider::Encoding
+
+0.10  Tue Jul 31 23:53:58 PDT 2007
+        - Fixed warning issue. RT 27645
+
+0.09  Wed Apr 18 14:49:48 PDT 2007
+        - Added Encode.pm to prereq
+
+0.08  Tue Apr 17 13:52:41 PDT 2007
+        - Applied patch http://www.cpanforum.com/posts/2177 so the
+          default encoding other than 'utf-8' can be set
+          (Thanks to Nobuaki ITO)
+
+0.07  Sun Oct 22 21:41:03 JST 2006
+        - Added dependency for Template-Toolkit
+          (Thanks to Andreas Koenig)
+
+0.06  Sun Oct 22 21:11:38 JST 2006
+        - Skip obj.t test if Template::Stash::XS is not available
+
+0.05  2006-02-05T01:10:24Z
+        - Packaging bug caused test errors
+
+0.04  2006-01-26T18:50:22Z
+        - Do nothing when template is BOMed
+          (Thanks to Bill Moseley)
+
+0.03  2006-01-16T22:38:37Z
+        - Use $Template::Stash::Config as a base class to support
+          XS based object variable correctly
+
+0.02  Sat Jan 14 15:01:49 UTC 2006
+        - Added Template::Stash::ForceUTF8 and now this module works magically
+          (you can mix Unicode flagged and UTF-8 bytes in stash!)
+        - Now no_unicode mode is unnecessary since we have magical stash
+
+0.01  Tue Jan 10 14:39:56 2006
+	- original version

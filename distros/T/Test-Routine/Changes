@@ -1,0 +1,113 @@
+Revision history for Test-Routine
+
+0.025     2017-04-13 17:43:19-04:00 America/New_York
+        - remove fresh_instance; it wasn't documented, and it probably was not
+          going to work out
+        - the Runner no longer caches the test_instance, so its BUILD and
+          DEMOLISH should now be called usefully
+        - Test::Routine::Common now adds stub BUILD and DEMOLISH so you can use
+          method modifiers on them
+
+0.024     2017-01-16 13:03:18-05:00 America/New_York
+        - tests are now run with Test::Abortable's subtest() instead of
+          Test2::API directly; this means they can be safely aborted with
+          exceptions that conform to the Test::Abortable rules; see its docs
+          for more information
+
+0.023     2016-11-28 17:41:32+11:00 Australia/Melbourne
+        - When running subtests, use Test2::API rather than Test::More.
+          This means that Test::Routine tests that never use Test::Builder for
+          their own testing won't load it at all, but it also means that you'll
+          need to be on a pretty recent Test-Simple distribution.
+        - (no code changes from 0.022, just a non-trial release)
+
+0.022     2016-07-18 20:13:38-04:00 America/New_York (TRIAL RELEASE)
+        - fix the mxms.t tests for Test2 changes (really, we should update the
+          tests to use an event-intercepting hub for our tests)
+
+0.021     2016-07-18 12:45:57-04:00 America/New_York (TRIAL RELEASE)
+        - When running subtests, use Test2::API rather than Test::More.
+          This means that Test::Routine tests that never use Test::Builder for
+          their own testing won't load it at all, but it also means that you'll
+          need to be on a pretty recent Test-Simple distribution.
+
+0.020     2014-09-01 22:02:27-04:00 America/New_York
+        - generation of Test::Routine::Manual::Demo is fixed
+        - notice another possible case of name conflict; we may change how this
+          works in the future, but only safely
+
+0.019     2014-07-04 09:54:01-04:00 America/New_York
+        - cope with alternate indenting of subtest leader
+
+0.018     2014-01-11 14:13:19-05:00 America/New_York
+        - avoid an uninitialized warning on 5.8 from new TEST_METHOD code
+
+0.017     2013-12-03 21:38:07 America/New_York
+        - add TEST_METHOD env var to limit tests run (thanks,
+          Dagfinn Ilmari Mannsåker!)
+
+0.016     2013-10-25 22:33:15 America/New_York
+          update mxms.t to handle Test::Builder 0.99
+
+          replace use of Class::MOP::load_class with Class::Load
+
+0.015     2012-03-16 16:37:21 America/New_York
+          correct run_me to work with a single hashref argument
+
+0.014     2011-09-11 08:47:21 America/New_York
+          fix a nit in the SYNOPSIS: the runner is run_me not test_me (thanks,
+          Alex White!)
+
+0.013     2011-09-08 16:46:01 America/New_York
+
+          MooseX::Method::Signatures is not a prereq, it's optionally used in
+          some tests; the dist prereqs have been corrected to reflect this
+
+0.012     2011-06-01 22:09:50 America/New_York
+
+          reject test names that conflict with Moose::Object methods
+
+0.011     2011-05-31 10:49:59 America/New_York
+
+          install tests with package separators in their name under munged
+          names (bug reported by Piers Cawley)
+
+0.010     2011-04-07 23:06:32 America/New_York
+
+          interoperate with MooseX::Method::Signatures (thanks, Jesse Luehrs)
+
+0.009     2011-02-06 21:24:22 America/New_York
+
+          eliminate the 5.12-only ... operator
+
+0.008     2011-02-03 21:02:08 America/New_York
+
+          eliminate a bogus prereq; sorry about that; thanks Glenn Fowler
+
+0.007     2011-02-03 16:21:44 America/New_York
+
+          We now forbid two tests with the same name.  This may seem to be
+          backwards incompatible, but the previous behavior was to silently
+          replace each test in turn, so that tests written would simply not
+          run.  To allow safer routine composition, we have made duplicate
+          names fatal, rather than adding arbitrary distinguishing suffixes.
+
+0.006     2011-01-26 15:27:00 America/New_York
+          correctly generate the Demo.pod (thanks, Yanick Champoux)
+
+0.005     2010-12-19 21:53:36 America/New_York
+          tiny but critical bug in synopsis (thanks, Piers Cawley)
+
+0.004     2010-10-27 19:46:19 America/New_York
+          correct a bug in test execution order
+
+0.003     2010-10-18 23:02:32 America/New_York
+          PLEASE UPDATE YOUR CODE:  run_* now come from Test::Runner::Util
+
+0.002     2010-09-30 09:26:43 America/New_York
+          lower required perl to 5.8.x
+
+          raise required Test::More to 0.96
+
+0.001     2010-09-29 11:25:57 America/New_York
+          first release

@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Test::Presenter;
+use Data::Dumper;
+
+my $re = new Test::Presenter;
+
+my $opt_debug = 0;
+
+$re->set_debug($opt_debug);
+$re->open_db("./", "dbench.dbxml");
+
+$re->add_doc("./trpi", "1202.trpi", "1202");
+$re->add_doc("./trpi", "1203.trpi", "1203");
+$re->add_doc("./trpi", "1601.trpi", "1601");
+$re->add_doc("./trpi", "1699.trpi", "1699");
+
+$re->open_template("xyplot");
+$re->open_config("./configs", "dbench.config");
+$re->process();
+
+$re->save_query("./", "dbench.save_query");
+
+$re->query_with_template("1202");
+
+$re->query_with_template("1203");
+
+$re->query_with_template("1601");
+
+$re->query_with_template("1699");
+
+$re->dump();
+
+$re->to_plot('test.xy.lp.png');
+$re->to_plot('test.xy.p.png', 'points');

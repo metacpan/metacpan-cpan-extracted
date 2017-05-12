@@ -1,0 +1,8 @@
+#title Odd table
+
+ head || head2 || head3
+ body |
+ body | |
+ foot |||
+
+

@@ -1,0 +1,7 @@
+lib/Text/Unicode/Equivalents.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+readme.txt
+t/tests.t
+META.yml                                 Module meta-data (added by MakeMaker)

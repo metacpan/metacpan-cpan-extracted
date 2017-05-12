@@ -1,0 +1,34 @@
+/*@import url("http::/fonts.googleapis.com/css?family=Inconsolata:regular");*/
+/*@import url("http::/fonts.googleapis.com/css?family=Raleway:100");*/
+                                                                                                   
+body {
+   font-size:250%;
+   font-weight:bolder;
+   /*font-family: 'Raleway', serif;*/
+   /*letter-spacing: 0.084em;*/
+   margin: 0px;
+   padding: 10px;
+}
+/*
+   text-align:center;
+div.slide {
+   margin-left: auto;
+   margin-right: auto;
+   position: relative;
+}
+div.slide div.cell{
+   width: 100%; 
+   width: 100%; 
+}
+*/
+
+
+pre {
+   background-color: #F2F2F2;
+   border: 1px solid #747474;
+   padding: 5px;
+}
+code {
+  /*font-family: 'Inconsolata', Monospace;*/
+}
+

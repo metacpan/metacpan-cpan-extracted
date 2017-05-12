@@ -1,0 +1,133 @@
+Text/Beautify version 0.08
+==========================
+
+Text::Beautify - Beautifies text
+
+=head1 SYNOPSIS
+
+  use Text::Beautify;
+
+  $text = "badly written text ,,you know ?"
+
+  $new_text = beautify($text);
+  # $new_text now holds "Badly written text, you know?"
+
+  # or
+
+  $text = Text::Beautify->new("badly written text ,,you know ?");
+  $new_text = $text->beautify;
+
+  # and also
+
+  enable_feature('repeated_punctuation'); # enables the feature
+  disable_feature('trailing_space');      # disables the feature
+
+  @features_enables = enabled_features();
+
+  @all_features = features();
+
+  enable_all();
+  disable_all();
+
+=head1 DESCRIPTION
+
+Beautifies text. This involves operations like squeezing double spaces,
+removing spaces from the beginning and end of lines, upper casing the
+first character in a string, etc.
+
+You can enable / disable features with I<enable_feature> /
+I<disable_feature>. These commands return a true value if they
+are successful.
+
+To know which features are beautified, see FEATURES
+
+=head1 FEATURES
+
+All features are enabled by default
+
+=over 4
+
+=item * heading_space
+
+	Removes heading spaces
+
+=item * trailing_space
+
+	Removes trailing spaces
+
+=item * double_spaces
+
+	Squeezes double spaces
+
+=item * repeated_punctuation
+
+	Squeezes repeated punctuation
+
+=item * space_in_front_of_punctuation
+
+	Removes spaces in front of punctuation
+
+=item * space_after_punctuation
+
+	Puts a spaces after punctuation
+
+=item * uppercase_first
+
+	Uppercases the first character in the string
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+Creates a new Text::Beautify object
+
+=head2 beautify
+
+Applies all the enabled features
+
+=head2 enabled_features
+
+Returns a list with the enabled features
+
+=head2 features
+
+Returns a list containing all the features
+
+=head2 enable_feature
+
+Enables a feature
+
+=head2 disable_feature
+
+Disables a feature
+
+=head2 enable_all
+
+Enables all features
+
+=head2 disable_all
+
+Disables all features
+
+=head1 TO DO
+
+=over 6
+
+=item * Allow the user to select the order in which features are applied
+
+=item * Allow creation of new features
+
+=back
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog@cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004 Jose Castro, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

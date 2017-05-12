@@ -1,0 +1,9 @@
+Revision history for Perl extension Term::WinConsole.
+
+0.01  Tue Jul  2 08:55:01 2002
+	- original version; created by h2xs 1.21 with options
+		-AX Term::WinConsole
+
+0.02  Tue Jul 16 14:37:00 CEST 2002
+	- Fix the package name problem 
+	  (Term::WinConsole now used instead of WinConsole)

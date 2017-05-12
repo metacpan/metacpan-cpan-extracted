@@ -1,0 +1,31 @@
+After you have installed the module you will be able to use it by writing your own script or downloading the three official scripts. For more help type "man TXTCOD"
+
+HELP ABOUT ALGORITHMS :
+	Writing an algorithm is simple : create a file ended by ".alc". This file will contain one-line commands who will tell the module the way to encode and decode your files.
+	1) encoding
+			The first part of the file will contain the encoding algorithm.
+			This algorithm will have a few variables :
+				- X, each encoded letter
+				- A,B,C,D,E,F,G,H,I,J, script-defined variables.
+				- T,M,P  more secured variables
+			There are many operators :
+				- addition: "+"
+				- subtraction: "-"
+				- multiplication: "*"
+				- division: "/"
+				- power: "**"
+			For example, we'll use the line : "X*(A+2)" in order to multiply the variable by (A+2). The compilation will be done internally by the module
+		
+	2) decoding
+			After the encoding part of the file, we will put a line containing only the word "end" without any blank or invisible character. After this word there is the decoding part. The variables of this part are the same thn in the first part. 
+			For example, if in the first part you put "X*(M+2)" you will type in the second part "X/(M+2)" in order to make the X variable becoming what she were before the encoding
+			The root is done by this operation : for a "X**A" in the first part you will put "X**(1/A)" in the second.
+		
+	3) comments
+		You can comment your algorithm by any line beginning with a sharp #.
+	4) Notes
+		You should not do operations who will make mubers (initial numbers up to 255) becoming too small or too big : perl will round the final numbers and the decoded letter will be very approximative.
+
+
+
+NOTE : For any bug in my translation, please visit http://txtcod.sourceforge.net

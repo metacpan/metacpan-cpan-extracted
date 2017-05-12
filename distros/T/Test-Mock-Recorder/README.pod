@@ -1,0 +1,13 @@
+=pod
+
+=head1 Test::Mock::Recorder
+
+Test::Mock::Recorder is record-and-verify style mock library for Perl 5.
+
+You can download "released" version from
+L<http://search.cpan.org/dist/Test-Mock-Recorder/>.
+
+And you can see in-development version from
+L<https://github.com/kzys/test-mock-recorder>.
+
+=cut

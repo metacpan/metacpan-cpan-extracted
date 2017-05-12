@@ -1,0 +1,33 @@
+Tk::Canvas::Point
+-----------------
+
+This module introduces a new canvas item type: points. This is nothing
+useful, as points may be expressed as lines in the Canvas
+implementation. It's merely a small educational example.
+
+0.03 was tested on FreeBSD-6.1 with various Perl and Tk combinations
+(e.g. perl5.8.8+Tk804.027_500).
+
+0.02 was tested with FreeBSD-4.6+perl-5.8.0+Tk-800.024,
+FreeBSD-4.9+perl-5.8.3+Tk-804.027 and
+Linux-2.2.x+perl-5.00503+Tk-800.xxx. It won't work with cygwin; it
+compiles, but the linker complains about unresolved symbols.
+
+
+INSTALLATION
+------------
+
+With modern CPAN.pm:
+
+	cpan .
+
+The old-fashioned way:
+
+	perl Makefile.PL
+	make all test install
+
+AUTHOR
+------
+
+Slaven Rezic <slaven@rezic.de>
+

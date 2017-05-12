@@ -1,0 +1,5 @@
+Hello world.
+
+This is an error at runtime
+<% call_unknown_subroutine(); %>
+

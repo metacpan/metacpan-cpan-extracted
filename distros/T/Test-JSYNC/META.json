@@ -1,0 +1,58 @@
+{
+   "abstract" : "Test JSYNC data",
+   "author" : [
+      "Nick Patch <patch@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-JSYNC",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Tester" : "0.107"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSYNC" : 0,
+            "Test::Differences" : "0.47",
+            "Test::Simple" : "0.62",
+            "parent" : 0,
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::JSYNC" : {
+         "file" : "lib/Test/JSYNC.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/patch/test-jsync-pm5/issues"
+      },
+      "homepage" : "http://github.com/patch/test-jsync-pm5",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/patch/test-jsync-pm5.git"
+      }
+   },
+   "version" : "0.02"
+}

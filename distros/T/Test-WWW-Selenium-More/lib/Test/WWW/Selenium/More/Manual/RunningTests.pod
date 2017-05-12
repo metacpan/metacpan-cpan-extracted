@@ -1,0 +1,99 @@
+package Test::WWW::Selenium::More::Manual::RunningTests;
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::RunningTests
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::RunningTests
+
+=head1 RUNNING SELENIUM TESTS
+
+This section describes setting up and running Selenium Perl tests on the command
+line.  There are 3 steps to making this work:
+
+=over 4
+
+=item 1. Start your web application
+
+=item 2. Start the Selenium server
+
+=item 3. Run your Perl tests
+
+=back
+
+Each of these components may or may not run on the same computer depending on
+how you want to set it up.  The only tricky part is configuring the right
+servers and ports so all 3 components talk to each other.  This is done either
+with the options you pass to Test::WWW::Selenium::More->new() (see L<WWW::Selenium>)
+or with the environment variables described in L<Test::WWW::Selenium::More>.
+
+=head1 EXAMPLES
+
+These examples assume the web application you want to test is running on
+localhost, port 5000.  
+
+Basic setup
+
+    # Start the Selenium server
+    java -jar selenium-server.jar -port 4444 -trustAllSSLCertificates -browserSessionReuse
+
+    # Run your tests against your web app running on localhost, port 80
+    prove -lrv t/test.t
+
+Headless server setup
+
+    # Start Xvfb so you can run a web browser without X Windows
+    Xvfb :99
+
+    # Start the Selenium server
+    DISPLAY=:99 java -jar selenium-server.jar -port 4444 -trustAllSSLCertificates -browserSessionReuse
+
+    # Run your tests 
+    prove -lrv t/test.t
+
+Run Selenium tests against a remote website
+
+    SELENIUM_BROWSER_URL=http://example.com prove -lrv t/test.t
+
+Run tests against a remote Selenium server
+
+    # Start the Selenium server on the remote host (lets say 99.99.99.99).  
+    # Then run your tests locally like this:
+    SELENIUM_HOST=99.99.99.99 prove -lrv t/test.t
+
+Running tests slowly
+
+    # Tests fly by too fast sometimes when you are watching them in the
+    # browser.  This slows things down.  It basically calls sleep after every
+    # call to the Selenium server
+    SELENIUM_SLEEP=1 prove -lrv t/test.t
+
+=head1 SEE ALSO 
+
+The ENVIRONMENT VARIABLES section of l<Test::WWW::Selenium::More> documentation.  
+
+The command line options for the Selenium server
+
+    java -jar selenium-server.jar -h
+
+=head1 AUTHOR
+
+Eric Johnson <kablamo at iijo dot nospamthanks dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Eric Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

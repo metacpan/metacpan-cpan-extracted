@@ -1,0 +1,43 @@
+{
+   "abstract" : "Sortable Multicolumn HListbox (allowing icons, along with text) with arrows in headers indicating sort order.",
+   "author" : [
+      "Jim Turner"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-HMListbox",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Tk" : "0",
+            "Tk::HListbox" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "3.00"
+}

@@ -1,0 +1,160 @@
+#!/usr/bin/perl
+package  # Hide from PAUSE
+   transalert_ctl;
+
+# PODNAME:  transalert_ctl
+# ABSTRACT: Command line daemon for Transform::Alert
+our $VERSION = '1.00'; # VERSION
+
+use sanity;
+use Transform::Alert;
+
+use Log::Log4perl ':levels';
+use App::Daemon 'daemonize';
+use Config::General;
+use Time::HiRes 'sleep';  # (for once we're needing something else besides time...)
+use POSIX;
+use Path::Class;
+
+use namespace::clean;
+
+# check to see if we have a l4p option
+my $l4p = App::Daemon::find_option( '-l4p', 1 );
+push @ARGV, '-l4p', $l4p if ($l4p);  # put it back
+
+# check for -vv option
+my $vv = App::Daemon::find_option( '-vv', 0 );
+
+# make sure we're starting before demanding a -c conf option
+daemonize;
+
+# steal App::Daemon's logger...
+my $log = Log::Log4perl->get_logger('App::Daemon');
+
+# ...and start using it immediately
+$SIG{__DIE__} = sub {
+   # We're in an eval {} and don't want log
+   # this message but catch it later
+   return if ($^S);
+
+   local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
+   $log->logdie(@_);
+};
+
+# change the layout if we're using defaults
+unless ($l4p) {
+   $log->level($TRACE) if ($vv);
+
+   # (Log4Perl doesn't make this easy to change...)
+   my $appender = $Log::Log4perl::Logger::APPENDER_BY_NAME{'FileApp'};
+   $appender->layout(
+      Log::Log4perl::Layout::PatternLayout::Multiline->new("[%d{ISO8601}] [%-5p] {%-25M{2}} %m%n")
+   );
+
+   # Need to make sure it's watching for log moves
+   $appender->{appender}{recreate} = 1;
+   $appender->{appender}{recreate_check_signal} = 'HUP';
+   # (force a re-open)
+   $appender->file_close;
+   $appender->file_open;
+}
+
+# config file loading
+my $conf_file = App::Daemon::find_option('-c', 1) ||
+   $log->logdie("Configuration (-c) required!");
+
+my $conf = {
+   Config::General->new(
+      -ConfigFile     => $conf_file,
+      -LowerCaseNames => 1,
+   )->getall
+};
+
+# change the working directory to the configuration file,
+# so that BaseDir can use relative paths
+chdir file($conf_file)->dir->stringify;
+
+# wait for it...
+my $ta = Transform::Alert->new(
+   config => $conf,
+   log    => $log,
+);
+
+# (signal handling before we start)
+$SIG{TERM} = sub {
+   $log->logwarn("SIGTERM received... shutting down!");
+   $ta->close_all;
+   $log->warn("Fin.");
+   exit 0;
+};
+
+# GO!
+while (1) {
+   my $wait = $ta->heartbeat;
+   sleep $wait if ($wait > 0);
+};
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+transalert_ctl - Command line daemon for Transform::Alert
+
+=head1 SYNOPSIS
+
+    transalert_ctl {start|stop|status}? [OPTION]...
+ 
+    Controls the Transform::Alert daemon.
+ 
+    Control commands:
+       start      Start up the daemon.  Default action if not specified.
+       stop       Stop the daemon.  Typically requires a -p option.
+       status     Print out diagnostics on what the status of the daemon is.  Typically requires a -p option.
+ 
+    Options:
+       -c FILE    Loads FILE for configuration.  Required to start the daemon.
+       -X         Foreground mode.  Log messages go to the screen.
+       -l FILE    Sends Log4perl messages to FILE in background mode.  Defaults to ./transalert_ctl.log.
+       -p FILE    Writes PID to FILE.  Defaults to ./transalert_ctl.pid.
+       -u USER    Run as USER.  Only applies if running as root.  Defaults to 'nobody'.
+       -l4p FILE  Loads FILE for Log4perl configuration.
+       -v         Debug mode.  Ignored if -l4p option is specified.
+       -vv        Trace mode.  Ignored if -l4p option is specified.
+
+=head1 DESCRIPTION
+
+Most of this stuff is pretty obvious.  L<App::Daemon> also has some useful information about the CLI options.
+
+=encoding utf-8
+
+=head1 CAVEATS
+
+The C<<< -l >>> and C<<< -p >>> options should really have config file equivalents...
+
+Double C<<< -v >>> options don't combine into C<<< -vv >>>.
+
+=head1 AVAILABILITY
+
+The project homepage is L<https://github.com/SineSwiper/Transform-Alert/wiki>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/Transform::Alert/>.
+
+=head1 AUTHOR
+
+Brendan Byrd <BBYRD@CPAN.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Brendan Byrd.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

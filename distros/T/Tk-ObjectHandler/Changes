@@ -1,0 +1,10 @@
+Revision history for Perl extension Tk::ObjectHandler.
+
+0.03
+	- General tidy of code
+	- snake.pl example added
+0.02
+	- Report writer added
+0.01
+	- original version; created
+

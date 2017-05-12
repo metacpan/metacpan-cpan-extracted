@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/Task/Bot/Training.pm
+t/00-compile.t
+t/release-pod-syntax.t

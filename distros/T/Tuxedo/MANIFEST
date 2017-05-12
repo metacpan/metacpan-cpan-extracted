@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+mainexit.h
+Tuxedo.pm
+Tuxedo.xs
+TuxedoConstants.c
+README
+tpadm.pm
+testflds.pm
+testflds
+test.pl
+typemap
+mkfldpm32.pl
+genubbconfig.pl
+ubbconfig.template
+META.yml                                 Module meta-data (added by MakeMaker)
+perlsvr.pl

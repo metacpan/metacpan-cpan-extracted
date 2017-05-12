@@ -1,0 +1,8 @@
+lib/POD2/EO/Time/Decimal.pm
+lib/Time/Decimal.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/use.t
+
+META.yml			Module meta-data (added by MakeMaker)

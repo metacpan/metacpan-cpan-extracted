@@ -1,0 +1,72 @@
+{
+   "abstract" : "Interface to the online arrival/departure",
+   "author" : [
+      "Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Travel-Status-DE-DeutscheBahn",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0.16",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "POSIX" : "0",
+            "XML::LibXML" : "1.70",
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "provides" : {
+      "Travel::Status::DE::DeutscheBahn" : {
+         "file" : "lib/Travel/Status/DE/DeutscheBahn.pm",
+         "version" : "2.02"
+      },
+      "Travel::Status::DE::HAFAS" : {
+         "file" : "lib/Travel/Status/DE/HAFAS.pm",
+         "version" : "2.02"
+      },
+      "Travel::Status::DE::HAFAS::Result" : {
+         "file" : "lib/Travel/Status/DE/HAFAS/Result.pm",
+         "version" : "2.02"
+      },
+      "Travel::Status::DE::HAFAS::StopFinder" : {
+         "file" : "lib/Travel/Status/DE/HAFAS/StopFinder.pm",
+         "version" : "2.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

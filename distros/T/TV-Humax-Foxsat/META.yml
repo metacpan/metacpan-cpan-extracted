@@ -1,0 +1,40 @@
+---
+abstract: 'Parse metadata files from your Humax satellite TV receiver.'
+author:
+  - "spudsoup\" <\"spudsoup@cpan.org"
+build_requires:
+  FindBin: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TV-Humax-Foxsat
+provides:
+  TV::Humax::Foxsat:
+    file: lib/TV/Humax/Foxsat.pm
+    version: 0.06
+  TV::Humax::Foxsat::epg_data:
+    file: lib/TV/Humax/Foxsat/epg_data.pm
+    version: 0.06
+  TV::Humax::Foxsat::hmt_data:
+    file: lib/TV/Humax/Foxsat/hmt_data.pm
+    version: 0.06
+requires:
+  DateTime: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  Trait::Attribute::Derived: 0
+  namespace::autoclean: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/chrestomanci/TV-Humax-Foxsat/issues
+  repository: git://github.com/chrestomanci/TV-Humax-Foxsat.git
+version: 0.06

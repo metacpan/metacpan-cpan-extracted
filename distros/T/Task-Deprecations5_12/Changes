@@ -1,0 +1,9 @@
+Revision history for Task-Deprecations5_12
+
+1.002     2011-02-26 08:08:27 America/New_York
+
+1.001     2011-02-25 22:36:15 America/New_York
+          add versions so that non-perl-core versions are required
+
+1.000     2010-03-31 16:36:44 America/New_York
+          first release

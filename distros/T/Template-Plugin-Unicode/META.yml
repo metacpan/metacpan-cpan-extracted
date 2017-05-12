@@ -1,0 +1,22 @@
+---
+abstract: 'insert characters via unicode codepoints.'
+author:
+  - 'David Schmidt <davewood@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-Unicode
+requires:
+  Template: '0'
+resources:
+  bugtracker: https://github.com/davewood/template-plugin-unicode/issues
+  homepage: https://github.com/davewood/template-plugin-unicode
+  repository: https://github.com/davewood/template-plugin-unicode.git
+version: '0.03'

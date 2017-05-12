@@ -1,0 +1,42 @@
+Test-WWW-Mechanize-JSON version 0.01
+====================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+NAME
+    Test::WWW::Mechanize::JSON - Adds a JSON method to WWW::Mechanize::Test
+
+DESCRIPTION
+    Extends Test::WWW::Mechanize to test JSON responses are valid.
+
+DEPENDENCIES
+    Test::WWW::Mechanize
+    JSON
+
+METHODS: HTTP VERBS
+  $mech->json_ok($desc)
+    Tests that the last received resopnse is valid JSON.
+
+    A default description of "Got JSON from $url" or "Not JSON from $url" is
+    used if none if provided.
+
+    Returns the JSON object, that you may perform further tests upon it.
+
+  $mech->diag_json
+    Like diag, but renders the JSON of the last request with indentation.
+
+AUTHOR AND COPYRIGHT
+    Copyright (C) Lee Goddard, 2009.
+
+    Available under the same terms as Perl itself.
+
+
+

@@ -1,0 +1,9 @@
+Revision history for Perl-Tags
+0.02    2014-05-19
+        count min/max 
+        out subref
+        iterate
+        testing failure cases
+
+0.01    2014-05-18
+        Initial release

@@ -1,0 +1,45 @@
+Tickit::Event::Key   T_PTROBJ
+Tickit::Event::Mouse T_PTROBJ
+Tickit::Pen          T_PTROBJ_OR_NULL
+Tickit::Rect         T_PTROBJ
+Tickit::Rect_MAYBE   T_PTROBJ_MAYBE
+Tickit::RectSet      T_PTROBJ
+Tickit::RenderBuffer T_PTROBJ
+Tickit::StringPos    T_PTROBJ_OR_NULL
+Tickit::Term         T_PTROBJ
+Tickit::Window       T_PTROBJ
+
+INPUT
+T_PTROBJ_MAYBE
+        if (!SvOK($arg)) {
+            $var = NULL;
+        }
+        else if (SvROK($arg) && sv_derived_from($arg, \"${\do { my $tmp = $ntype; $tmp =~ s/_MAYBE$//; $tmp }}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"${\do{ my $tmp = $ntype; $tmp =~ s/_MAYBE$//; $tmp }}\")
+
+INPUT
+T_PTROBJ_OR_NULL
+        if (!SvOK($arg)) {
+            $var = NULL;
+        }
+        else if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"$ntype\")
+
+OUTPUT
+T_PTROBJ_OR_NULL
+        if ($var)
+            sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+        else
+            sv_setsv($arg, &PL_sv_undef);

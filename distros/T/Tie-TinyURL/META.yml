@@ -1,0 +1,20 @@
+---
+name: Tie-TinyURL
+version: 0.02
+author:
+  - Nicola Worthington <nicolaw@cpan.org>
+abstract: Tied interface to TinyURL.com
+license: open_source
+requires:
+  Carp: 0
+  LWP::UserAgent: 0
+recommends:
+  Test: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Tie::TinyURL:
+    file: lib/Tie/TinyURL.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

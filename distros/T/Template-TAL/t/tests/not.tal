@@ -1,0 +1,6 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+
+  <div tal:define="foo string:0" tal:condition="not:foo">0</div>
+  <div tal:define="foo string:1" tal:condition="not:foo">1</div>
+  
+</html>

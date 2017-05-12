@@ -1,0 +1,33 @@
+---
+abstract: 'Examine perl files and report dependency metadata'
+author:
+  - 'Petr Šabata <contyk@redhat.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tangerine
+recommends:
+  List::Util: '1.33'
+requires:
+  Exporter: '0'
+  List::MoreUtils: '0'
+  PPI: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  homepage: https://github.com/contyk/tangerine.pm
+  repository: https://github.com/contyk/tangerine.pm.git
+version: '0.23'
+x_serialization_backend: 'YAML::Tiny version 1.69'

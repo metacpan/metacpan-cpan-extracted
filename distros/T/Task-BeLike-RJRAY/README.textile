@@ -1,0 +1,17 @@
+h1. Task::BeLike::RJRAY - My frequently-used and favorite modules
+
+Version: 0.009 (See CHANGES below)
+
+h2. WHAT IS IT
+
+This is my entry in the "simplify my new Perl bootstrap process" bandwagon. I don't actually think anyone wants to BE like me, but if this proves to be helpful or inspirational to someone else, I can live with that.
+
+h2. CHANGES
+
+* lib/Task/BeLike/RJRAY.pm
+
+p{margin-bottom:2em}. Comment-out Bundle::CPAN due to issues.
+
+* lib/Task/BeLike/RJRAY.pm
+
+p{margin-bottom:2em}. New additions.

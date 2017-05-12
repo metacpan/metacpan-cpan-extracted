@@ -1,0 +1,12 @@
+Revision history for Perl extension Test::DeepFile.
+
+0.003  Tue Feb  8 21:54:00 2011
+	- cleaned up Makefile.PL
+
+0.002  Sat Feb  5 10:45:00 2011
+	- added requires fields to Makefile.PL to improve test passage.
+
+0.001  Wed Jan 12 10:35:04 2011
+	- original version; created by h2xs 1.23 with options
+		-Afn Test::DeepFile
+

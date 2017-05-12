@@ -1,0 +1,54 @@
+=head1 NAME
+
+README.Flowcharts - Word and Context Clustering Flowcharts
+
+=head1 DESCRIPTION
+
+The /doc/Flowcharts directory contains sequence diagrams for  
+SenseClusters in .ai and .pdf format :
+
+Using SenseClusters to cluster contexts: 
+
+=over 4
+
+=item 
+L<http://search.cpan.org/src/TPEDERSE/Text-SenseClusters-1.01/doc/Flowcharts/SenseClusters-ContextClustering.pdf>
+
+=back
+
+Using SenseClusers to cluster words/features :
+
+=over 4
+ 
+=item 
+L<http://search.cpan.org/src/TPEDERSE/Text-SenseClusters-1.01/doc/Flowcharts/SenseClusters-ContextClustering.pdf>
+
+=back
+
+The above files show the sequence of commands to run a complete experiment
+and possible variations in feature, context and clustering type.
+
+=head1 AUTHORS
+
+ Anagha Kulkarni, Carnegie-Mellon University
+
+ Mahesh Joshi, Carnegie-Mellon University
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2008 Ted Pedersen, Anagha Kukarni, Mahesh Joshi
+
+Permission is granted to copy, distribute and/or modify this  document
+under the terms of the GNU Free Documentation License, Version 1.2 or  
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+Note: a copy of the GNU Free Documentation License is available on the 
+web at L<http://www.gnu.org/copyleft/fdl.html> and is included in this
+distribution as FDL.txt.
+
+=cut
+

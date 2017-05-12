@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                TAP-Filter
+version:             0.04
+abstract:            Filter TAP stream within TAP::Harness
+license:             perl
+author:              
+    - Andy Armstrong <andy.armstrong@messagesystems.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Data::Dumper:                  0
+    File::Spec:                    0
+    List::Util:                    0
+    Storable:                      0
+    TAP::Harness:                  3.12
+    TAP::Parser:                   3.12
+    TAP::Parser::Aggregator:       3.12
+    TAP::Parser::Result:           3.12
+    Test::Deep:                    0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

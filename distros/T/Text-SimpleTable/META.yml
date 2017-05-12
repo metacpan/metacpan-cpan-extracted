@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Text-SimpleTable
+version:            2.03
+abstract:           Simple eyecandy ASCII tables
+author:
+    - Sebastian Riedel <sri@cpan.org>
+license:            artistic_2
+distribution_type:  module
+configure_requires:  {}
+build_requires:  {}
+requires:
+    ExtUtils::MakeMaker:  0
+    perl:                 5.008001
+    Test::More:           0
+resources:
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/kraih/text-simpletable/tree/master
+no_index:
+    directory:
+        - t
+        - inc
+        - t
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

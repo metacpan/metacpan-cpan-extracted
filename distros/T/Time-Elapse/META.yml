@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Time-Elapse
+version:      1.2402
+version_from: Elapse.pm
+installdirs:  site
+requires:
+    Time::HiRes:                   1.5
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

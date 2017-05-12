@@ -1,0 +1,84 @@
+use Tk;
+use warnings;
+use Tk::CaptureRelease;
+
+use Data::Dumper (Dumper);
+
+my $mw = MainWindow->new;
+my $f = $mw->Frame->pack(-fill => 'both',
+                          -expand => 1,
+                          -anchor => 'nw',
+                          -side => 'top');
+my $l = $mw->Label(-text => 'Main Widget has been "popped"');
+my $sf = $f->Frame;
+my $e = $sf->Entry->pack(-fill => 'x',
+                          -expand => 1);
+my $b = $mw->Button(-command => 'main::popup',
+                     -text => 'Pop-Up')->pack;
+
+my $popped = 0;
+$sf->pack(-fill => 'both',
+           -expand => 1);
+          
+	   
+#$sf->can('_wmRelease') && print ("can _wmRelease\n");
+#$sf->can('wmRelease') &&  print ("can wmRelease\n");
+
+*Tk::Widget::wmRelease = \&Tk::_wmRelease;
+#$sf->wmRelease;
+#$mw->wm('tracing', 1);
+
+sub popup {
+   print "sf is mapped ".$sf->ismapped."\n";
+   if ($popped) {
+     #$l->packForget;
+     #$sf->packForget;
+     
+     print "Capturing\n";
+     $sf->wmCapture;
+     print "Captured\n";
+     $sf->pack(-in => $f,
+               -fill => 'both',
+               -expand => 1);
+     print "Packed\n";
+     print "sf is mapped ".$sf->ismapped()."\n";
+     print "sf geometry ".$sf->geometry()."\n";
+     print "sf id".$sf->id()."\n";
+     print "sf Exists ".$sf->Exists()."\n";
+     $mw->update;
+     $popped = 0;
+   } else {
+     print "Before Release toplevel = ".$sf->toplevel()."\n";
+     print "Before Release toplevel id = ".$sf->toplevel()->id."\n";
+     
+     my $wrapper = $sf->toplevel()->wrapper;
+     if( ref($wrapper)){ # dump to string, if ref
+     	$wrapper = Dumper($wrapper);
+     }
+     print "Before Release toplevel wrapper = ".$wrapper."\n";
+ 
+     $sf->packForget;
+     $sf->wmRelease;
+     $sf->raise;
+     $sf->MainWindow::deiconify; # ARGH!
+     
+     print $sf."\n";
+     print "toplevel = ".$sf->toplevel()."\n";
+     print "toplevel id = ".$sf->toplevel()->id."\n";
+     print "sf is mapped ".$sf->ismapped()."\n";
+     print "sf geometry ".$sf->geometry()."\n";
+     print "sf id".$sf->id()."\n";
+     print "sf state ".$sf->MainWindow::state()."\n";
+
+     $wrapper = $sf->MainWindow::wrapper;
+     if( ref($wrapper)){ # dump to string, if ref
+     	$wrapper = Dumper($wrapper);
+     }
+     print "sf wrapper = ".$wrapper."\n";
+ 
+     #$sf->pack;
+     $popped = 1;
+   }
+} 
+
+MainLoop;

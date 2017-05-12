@@ -1,0 +1,19 @@
+---
+abstract: "Test sources for presence/absence of particular modules\r"
+author:
+  - 'Stuart Watt <stuart@morungos.com>'
+build_requires:
+  Test::Tester: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102160'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Uses
+requires:
+  PPI: 1.205
+  Test::Builder: 0
+version: 0.01

@@ -1,0 +1,8 @@
+META.yml
+Makefile.PL
+README
+Build.PL
+lib/Tie/Hash/Constant.pm
+MANIFEST
+MANIFEST.SKIP
+t/constant.t

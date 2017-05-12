@@ -1,0 +1,39 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Putting a Job on Hold</div>
+
+  <p>
+    When you put a job on hold, it will not run duringthe current day even if all its
+    dependencies are met.  It will only be run after the hold is released.
+    Even after the hold is released, its dependencies need to be met (or
+    you need to force a run by <a href="release.html">releasing all dependencies</a>).  To hold a
+    job, enter the following command:
+  </p>
+
+  <div class="code"><pre><code>release --log_dir=l_d --job=Ff::Jj --family_dir=f_d [--log_date=date]</code></pre></div>
+
+  <p>
+  <p>
+    where <code>l_d</code> is the log directory and <code>Ff</code> is the
+    family name and <code>Jj</code> is the job name and <code>f_d</code>
+    is the family_directory.  The log_date is an optional date in the
+    YYYYMMDD format. If specified, that date's data will be used, instead
+    of the current date's.  A job will only be put on hold if it is in the
+    'Waiting' state.
+  </p>
+
+  <div class="new_section_header">Putting a Job on Hold Via the Web Site</div>
+
+  <p>
+    You can use the "Hold" button on the 'Status' or 'View Logs' page.
+  </p>
+
+
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

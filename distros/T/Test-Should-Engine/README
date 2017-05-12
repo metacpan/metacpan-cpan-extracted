@@ -1,0 +1,142 @@
+NAME
+    Test::Should::Engine - Should it be OK?
+
+SYNOPSIS
+        use Test::Should::Engine;
+
+        Test::Should::Engine->run('should_be_ok', 1);
+
+DESCRIPTION
+    Test::Should::Engine is yet another assertion library for Perl5.
+
+    You don't need to use this module directly. This module may include to
+    other testing libraries.
+
+    This module is currently under development. API MAY change WITHOUT
+    notice.
+
+METHOD
+    Test::Should::Engine->run($pattern, $subject, @args);
+        This method checks the $subject by $pattern with @args and return
+        boolean value.
+
+RULES
+    In this section, the code uses Test::Should.
+
+    should_be_ok
+            1->should_be_ok()
+
+        Assert truthfulness.
+
+    should_be_empty
+            []->should_be_empty()
+            ''->should_be_empty()
+
+        On ArrayRef, it doesn't have a elements.
+
+        On String, the length is zero.
+
+    should_be_equal
+            [1,2,3]->should_be_equal([1,2,3])
+
+        strict equality.
+
+    should_be_a / should_be_an
+            MyObj->new()->should_be_a('MyObj');
+            MyObj->new()->should_be_an('ARRAY');
+
+        Checks type.
+
+    should_be_above
+            9->should_be_above(4)
+
+        Assert numeric value above the given value.
+
+    should_be_below
+            2->should_be_below(4)
+
+        Assert numeric value below the given value.
+
+    should_match
+            'hoge'->should_match(qr/h.ge/);
+
+        Assert regexp match.
+
+    should_have_length
+            'hoge'->should_have_length(4);
+            [1,2,3]->should_have_length(3);
+
+        Assert the length has a value of the given number.
+
+    should_include
+            # array
+            [1,2,3]->should_include(3)
+            [1,2,3]->should_not_include(4)
+
+            # string
+            'foo bar baz'.should.include('foo')
+
+        Assert the subject includes a value.
+
+    should_throw
+        Assert an exception is thrown:
+
+            (sub { die })->should_throw();
+
+        Assert an exception is not thrown:
+
+            (sub { 1 })->should_not_throw();
+
+        Assert exception message matches regexp:
+
+            (sub { die "Foo" })->should_throw(qr/F/);
+
+    should_not_*
+        Invert the result.
+
+USAGE
+    You can embed this module to your code by following style :)
+
+    I'll be release this style module named by Test::Should.
+
+    You can see more details in t/01_autobox.t.
+
+        use Test::Should::Engine;
+        use Test::More;
+
+        {
+            package UNIVERSAL;
+            sub DESTROY { }
+            our $AUTOLOAD;
+            sub AUTOLOAD {
+                $AUTOLOAD =~ s/.*:://;
+                my $test = Test::Should::Engine->run($AUTOLOAD, @_);
+                Test::More->builder->ok($test);
+            }
+        }
+
+        # and test code
+        (bless [], 'Foo')->should_be_ok();
+        (bless [], 'Foo')->should_be_a('Foo');
+        (bless [], 'Foo')->should_not_be_a('Bar');
+
+        done_testing;
+
+FAQ
+    Why do you split a distribution from Test::Should?
+        Test::Should depends to autobox. autobox is not needed by some
+        users.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+    Most part of features are ported from
+    <https://github.com/visionmedia/should.js>, thanks!
+
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

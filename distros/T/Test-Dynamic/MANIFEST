@@ -1,0 +1,16 @@
+SIGNATURE
+Dynamic.pm
+Dynamic.pm.html
+README
+LICENSE
+META.yml
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+.perlcriticrc
+t/01dynamic.t
+t/02perlcritic.t
+t/03testfile.t
+t/bucardo.testfile
+t/bucardo.testfile.2
+t/bucardo.testfile.3

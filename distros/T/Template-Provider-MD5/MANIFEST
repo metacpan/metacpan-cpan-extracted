@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/local.t
+lib/Template/Provider/MD5.pm
+META.yml                                 Module meta-data (added by MakeMaker)

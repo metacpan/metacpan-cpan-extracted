@@ -1,0 +1,8 @@
+Revision history for Time::Date
+
+0.01  Mon Sep 14 15:38:58 CDT 2015
+    - Rename to Time::Date since TimeDate name already taken.
+
+0.01  Mon Sep 14 15:26:46 CDT 2015
+    - Initial idea for TimeDate
+

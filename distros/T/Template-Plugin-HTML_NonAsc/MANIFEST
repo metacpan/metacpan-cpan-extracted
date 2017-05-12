@@ -1,0 +1,9 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Template/Plugin/HTML_NonAsc.pm
+t/00-load.t
+t/10-basic.t
+Makefile.PL
+META.yml

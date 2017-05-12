@@ -1,0 +1,64 @@
+Revision history for Text-Parts
+
+0.16 2013-09-05T16:58:51Z
+	fix typo in pod.
+	use Minilla instead of Module::Install & ShipIt.
+
+0.15	2012/04/24 10:01
+	change method name. max_number -> last_number.
+
+0.14	2012/04/24 02:50
+	add max_num option to split method.
+	add max_number option to write_files method.
+
+0.13	2012/03/10 11:38
+	fix code for MSWin to pass all tests.
+
+0.12	2012/03/09 11:44
+	fix write_files, it was totally buggy.
+	fix eol. it was no use.
+        add test to check md5_hex for write_files.
+	fix document(fix many typo).
+
+0.11	2012/03/06 20:39:00
+	add start_number option for write_files.
+	fix document.
+
+0.10	2012/03/06 17:50:00
+	add code option for write_files.
+
+0.09	2012/02/22 14:37:00
+	no_open is not inherited to Text::Parts::Part object.
+        now, write_file checks no_open option.
+	write note about OS's open file limit.
+
+0.08	2011/12/21 12:55:00
+	improve write_files.
+	add no_open option for Text::Parts::Part constructor.
+
+0.07    2011/12/15 04:03:00
+	change write_files interface.
+	check argument(s) of write_file/write_files.
+	add document.
+
+0.06	2011/12/15 02:50:00
+	skip test when perl version < 5.8
+	add all and write_file method to Text::Parts::Part.
+	add write_files method to Text::Parts.
+
+0.05    2011/10/27 14:52:00
+        fix test (failed if no Text::CSV_XS)
+
+0.04    2011/10/24 13:01:00
+        fix test (failed on 32bit env)
+        add sample to synopsis.
+
+0.03    2011/10/13 13:57:00
+        fix Makefile.PL. add test_requires.
+
+0.02    2011/10/05 09:18:00
+        fix document.
+
+0.01    2011/10/01 20:49:00
+        First version.
+

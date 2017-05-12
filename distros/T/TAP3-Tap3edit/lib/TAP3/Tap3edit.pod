@@ -1,0 +1,221 @@
+=head1 NAME
+
+  TAP3::Tap3edit - TAP3, RAP and NRTRDE files Encode/Decode library
+  http://www.tap3edit.com
+
+=head1 SYNOPSYS
+
+  use TAP3::Tap3edit;
+
+
+  $tap3 = TAP3::Tap3edit->new;
+  $tap3->decode("CDOPER1OPER200001")  or  die $tap3->error; 
+
+  $struct=$tap3->structure;
+  # $struct is a hash which can be now changed to modify the TAP file structure.
+
+  # After modifying the hash, it can be written into a new file
+  $tap3->encode("CDOPER1OPER200001.new")  or  die $tap3->error;
+
+
+  $tap3 = TAP3::Tap3edit->new;
+  $tap3->get_info("CDOPER1OPER200002");
+
+  $version=$tap3->version;
+  $release=$tap3->release;
+
+  $taptype=$tap3->file_type;
+
+=head1 DESCRIPTION
+
+TAP3::Tap3edit decodes and encodes TAP, RAP and NRTRDE files using ASN.1 format, storing its tree information into a hash.
+
+=head1 METHODS
+
+=over 4
+
+=item new:
+
+Constructor, creates a new object.
+
+=item error:
+
+Returns the last error.
+
+=item decode:
+
+Decodes the tree structure of a TAP/RAP/NRT file into a HASH.
+
+=item encode:
+
+Encodes the structure opened by "decode" into a new TAP/RAP/NRT file.
+
+=item structure:
+
+Returns the Hash with the decoded ASN.1 tree of the file, for further edition.
+
+=item get_info:
+
+Gets only the basic information of the TAP/RAP/NRT file such as its version, release and file type.
+
+=item spec_file:
+
+Normaly the ASN.1 specifications files are stored in the "Spec" directory from the installation directory, but this method allows to use a certain specification file to decode our TAP/RAP/NRT file. 
+
+=item supl_spec_file:
+
+The same as "spec_file" but in case of a RAP file sets the specification of its TAP version. Only used for RAP files.
+
+=item version:
+
+Returns the main version of the TAP/RAP/NRT file.
+
+=item release:
+
+Returns the main release of the TAP/RAP/NRT file.
+
+=item supl_version:
+
+Returns the suplementary version of the RAP file (version of its TAP file).
+
+=item supl_release:
+
+Returns the suplementery release of the RAP file (release of its TAP file).
+
+=item file_type:
+
+Returns the type of the file, TAP for CD and TD files, RAP for RC and RT files, ACK for AC files and NRT for NRTRDE Files (NR).
+
+=back
+
+=head1 VARIABLES
+
+=over 4
+
+=item spec_path
+
+Contains the default directories where to look for the specification files. It is disired to look somewhere else, add simply the new path to this array.
+
+=back
+
+=head1 DECODING, EDITING AND ENCODING A TAP FILE
+
+Decoding a TAP file.
+
+  use TAP3::Tap3edit;
+
+  $tap3 = TAP3::Tap3edit->new;
+  $tap3->decode("CDOPER1OPER200001")  or  die $tap3->error; # Remember to check the return values
+
+
+
+Changing the structure of the TAP file
+
+  $struct=$tap3->structure;
+  # This will change the UtcTimeOffset of the AuditControlInfo.
+  $struct->{transferBatch}->{auditControlInfo}->{earliestCallTimeStamp}->{utcTimeOffset}="+0300";
+
+
+
+Encoding and saving the TAP file
+
+  # Encode and save the new structure with change of Utc Offset into a new file
+  $tap3->encode("CDOPER1OPER200001.new")  or  die $tap3->error; # Remember to check the return values
+
+
+
+Getting just the version and release of a tap file
+
+  $tap3 = TAP3::Tap3edit->new;
+  $filename="CDOPER1OPER200002";
+  $tap3->get_info($filename)  or  die $tap3->error; # Remember to check the return values
+
+  print "$filename->Version: ".$tap3->version."\n";
+  print "$filename->Release: ".$tap3->release."\n";
+
+
+
+A RAP file is a file containing rejected information of a certain TAP file. This TAP file could be of any release of TAP3. That is why a RAP file has inside two versions: its own one and the version of the affected TAP file. Therefore we need here a main version and a suplementary one (supl_version) for the TAP.
+
+  $tap3 = TAP3::Tap3edit->new;
+  $filename="RCOPER2OPER100001";
+  $tap3->get_info($filename)  or  die $tap3->error; # Remember to check the return values
+
+  print "$filename->RAP Version: ".$tap3->version."\n";           # E.g. 1
+  print "$filename->RAP Release: ".$tap3->release."\n";           # E.g. 2
+
+  print "$filename->TAP Version: ".$tap3->supl_version."\n";      # E.g. 3
+  print "$filename->TAP Release: ".$tap3->supl_release."\n";      # E.g. 9
+
+
+
+Decode a TAP file with a certain specification file
+
+  $tap3 = TAP3::Tap3edit->new;
+
+  $tap3->spec_file("/home/javier/MySpec/TAP0304.asn");
+
+  # Will decode the test TAP file with the specification of TAP3 release 4.
+  $tap3->decode("TDOPER3OPER400003")  or  die $tap3->error; # Remember to check the return values
+
+
+
+Delete all the Camel Attachments of a TAP file.
+
+  $tap3 = TAP3::Tap3edit->new();
+  $tap3->decode("CDOPER4OPER900028")  or  die $tap3->error;
+
+  $struct=$tap3->structure;
+
+  my $key;
+
+  # Will scan all the calls for Camel attachments.
+  foreach $key ( @{$struct->{'transferBatch'}->{'callEventDetails'} } ) {
+
+        foreach ( keys %{$key} ) {
+
+                if ( defined $key->{$_}->{'camelServiceUsed'} ) {
+                        $key->{$_}->{'camelServiceUsed'} = ();
+                }
+
+        }
+  }
+
+  $tap3->encode("CDOPER4OPER900028")  or  die $tap3->error;
+
+
+
+Dump the tree of the complete TAP file. You can see the complete structure of the TAP file
+
+  use TAP3::Tap3edit;
+  use Data::Dumper;
+
+  $tap3 = TAP3::Tap3edit->new();
+  $tap3->decode("CDOPER6OPER700111")  or  die $tap3->error;
+
+  print Dumper ($tap3->structure); 
+
+
+=head1 REQUIRED MODULES
+
+L<Convert::ASN1>. A patched version fixing a problem with files with indefinite length can be found here: http://www.tap3edit.com/en_0_2_download.php
+
+=head1 SEE ALSO
+
+Examples: http://www.tap3edit.com/en_3_1_examples.php
+Other TAP3 tools: http://www.tap3edit.com/en_4_1_tools.php
+
+=head1 AUTHOR
+
+Javier Gutierrez <jgutierrez at tap3edit dot com> or http://www.tap3edit.com/en_0_3_contact.html
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004-2012 Javier Gutierrez. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+This program contains TAP and RAP ASN.1 Specifications. The ownership of the TAP/RAP ASN.1 Specifications belongs to the GSM MoU Association (http://www.gsm.org) and should be used under following conditions:
+
+Copyright (c) 2000 GSM MoU Association. Restricted - Confidential Information.  Access to and distribution of this document is restricted to the persons listed under the heading Security Classification Category*. This document is confidential to the Association and is subject to copyright protection.  This document is to be used only for the purposes for which it has been supplied and information contained in it must not be disclosed or in any other way made available, in whole or in part, to persons other than those listed under Security Classification Category* without the prior written approval of the Association. The GSM MoU Association (“Association”) makes no representation, warranty or undertaking (express or implied) with respect to and does not accept any responsibility for, and hereby disclaims liability for the accuracy or completeness or timeliness of the information contained in this document. The information contained in this document may be subject to change without prior notice.
+
+=cut
+

@@ -1,0 +1,408 @@
+NAME
+    metapage - perl 5 utility for processing files using MetaText
+    module.
+
+USAGE
+        metapage [@cmdfile] [-vqdrafmth] file [ file [...] ]
+
+        -v   verbose mode
+        -q   quiet mode - shut up about missing files
+        -d   debug mode 
+        -n   non-execute mode 
+        -r   recurse into sub-directories
+        -a   make all files (implicit -r)
+        -f   force pages to be rebuilt even if source is not modified
+        -m   file modification date sets FILETIME variable (default)
+        -t   today's date/time sets FILETIME variable
+        -h   this help
+
+DESCRIPTION
+    The metapage utility uses the Text::MetaText module to process
+    files. It acts like the Unix make(1S) utility, traversing a
+    document tree and attempting to determine which files have been
+    updated (by comparing the date stamp of the source file with its
+    corresponding processed destination file). Files that are
+    identified in this way, or explicitly specified by name or by
+    using the `-f' (force) flag, are processed using a
+    Text::MetaText object and the resulting output is written to
+    each corresponding destination file.
+
+CONFIGURATION
+    The metapage utility first looks for a `.metapagerc' file in the
+    user's home directory. The `sample.metapagerc' file in the `bin'
+    sub-directory of the MetaText distribution can be used as a
+    basis for your own configuration file. Copy this file to your
+    home directory, name it `.metapagerc' and edit accordingly. e.g
+    (from MetaText distribution directory)
+
+        cp bin/sample.metapagerc ~/.metapagerc
+
+    The configuration file can contain (up to) four distinct blocks
+    which each determine the required configuration for an aspect of
+    metapage's use. Each block commences in the configuration file
+    with a line indicating the block name in square brackets (e.g.
+    "[file]"). Any lines following this block definition (up to any
+    subsequent block definition) are considered part of the block.
+    Block names and configuration items may be specified case
+    insensitively.
+
+    A typical `.metapagerc' file is shown here:
+
+        [file]
+        src         = ~/websrc/docs
+        lib         = ~/websrc/lib
+        dest        = ~/web
+        ignore      = \b(CVS|RCS)\b
+        ignore      = \.gif$
+
+        [profile]
+        dir         = ~/etc/metapage
+        default     = abw
+
+        [config]
+        delimiter   = ,
+        debuglevel  = info,process,data
+
+        [define]
+        images      = /images
+        cgibin      = /cgi-bin
+        home        = /index.html
+        abw         = "Andy Wardley"
+
+    Note that quoted values, such as that in the last line of the
+    example above, will have the surrounding quotes removed (the
+    same applies for single quotes "'"). It is not obligatory to
+    quote values with embedded whitespace in this manner as the
+    parser will treat the entire line after the '=' as the
+    configuration value (apart from any extraneous whitespace after
+    the '=' or at the end of line).
+
+    The configuration blocks and their associated values are as
+    follows:
+
+  FILE
+
+    The [file] block include items which specify the various
+    directory trees on which metapage should work. Note that any
+    directories specified in metapage configuration files may start
+    with a "~" or "~<uid>" to represent the current user's, or the
+    named user's home directory respectively. The sample
+    configuration above demonstrates this.
+
+    SRC `src' defines the root directory under which all source
+        ("template") files should reside. Thus the command `metapage
+        foo/bar.html' instructs metapage to process the file
+        "foo/bar.html" relative to the `src' directory.
+
+    DEST
+        `dest' defines the root directory of the "destination" tree
+        where processed files are output to. Specifically, for a
+        given <file>, metapage processes the file <src>/<file> and
+        saves the output to <dest>/<file>.
+
+    LIB `lib' lists the root directory (or directories - each separated
+        by a colon ':') where INCLUDE'd files are to be found. This
+        is the equivalent to setting the LIB configuration option
+        directly in the Text::MetaText object
+
+    ACCEPT
+        The `accept' and `ignore' options are used to specify which
+        files in the source directory should or shouldn't be
+        processed. By default, all files are considered (but may not
+        actually be processed if the source file is older than the
+        corresponding destination file). If one or more `accept'
+        values are specified, the only files considered will be
+        those that match one of the `accept' patterns. The value
+        should be a perl-like regular expression. Multiple `accept'
+        options may be specified.
+
+    IGNORE
+        Like the `accept' option described above, the `ignore'
+        option is used to specify a file pattern or patterns. In
+        this case, the patterns are used to determine which files
+        should *not* be processed. This is useful to tell metapage
+        to ignore images, source control directories (RCS, CVS, etc)
+        and so on. The value should be a perl-like regular
+        expression. Multiple `ignore' options may be specified.
+
+        Note that `accept' and `ignore' patterns are applied to file
+        names *relative* to the `src' directory. e.g.
+        `public/foo.html' rather than
+        `/user/abw/websrc/public/foo.html'
+
+    Example:
+
+        [file]
+        src    = ~/websrc/docs
+        dest   = ~/public_html
+        lib    = ~/websrc/lib
+        accept = ^public\/
+        accept = ^shared\/           
+        ignore = \b(RCS|CVS)\b
+        ignore = \.gif$
+
+  PROFILE
+
+    The <metapage> utility allows multiple configuration profiles to
+    be defined and loaded from the command line (prefixed by an '@'
+    symbol). e.g.
+
+        metapage @profile ...
+
+    Each "profile" is a configuration file which can contain any of
+    the valid metapage items described in this section.
+
+    The [profile] block defines the location of these additional
+    configuration files (`dir') and the default profile, if any, to
+    use (`default').
+
+    DIR `dir' specifies the location of any additional configuration
+        "profile" files. Profiles specified on the metapage command
+        line are read from this directory.
+
+    DEFAULT
+        `default' names a default profile (in the directory
+        specified above) which should be loaded regardless of any
+        other command line profiles specified. Configuration files
+        are processed in this order:
+
+            ~/.metapagerc
+            ~/<profile-dir>/<default-profile>     # e.g. default = abw
+            ~/<profile-dir>/<specific-profile>    # e.g. @web
+
+    Example:
+
+        [profile]
+        dir     = ~/etc/metapage
+        default = abw
+
+  CONFIG
+
+    The `[config]' section allows variables to be defined that
+    relate directly to the configuration of the Text::MetaText
+    object. See `perldoc Text::MetaText' for details of the
+    configuration items available. Note that there is no facility to
+    specify multiple values, code blocks, etc., from within the
+    configuration file and as such, only those configuration items
+    that take simple scalars can be specified.
+
+    The `lib' configuration value specified in the `[file]' block is
+    also passed to the Text::MetaText configuration and does not
+    need to be explicitly added to the `[config]' section.
+
+    Example:
+
+        [config]
+        case    = 1
+        chomp   = 1
+        execute = 2
+        rogue   = warn,delete
+
+  DEFINE
+
+    The `[define]' sections allows variables to be pre-defined for
+    evaluation in all files subsequently processed by metapage. This
+    is useful for defining common elements (such as email address,
+    default author name, copyright message, etc) that may be
+    scattered throughout many documents but can be updated en masse.
+
+    Example:
+
+        [define]
+        email   = abw@kfs.org
+        name    = "Andy Wardley"
+        imgurl  = "/~abw/images"
+        homeurl = "/~abw/"
+
+    metapage, without any further variable definitions, will then
+    correctly process the file:
+
+        <a href="%% homeurl %%/index.html">
+        <img src="%% imgurl %%/misc/abw.gif" alt="%% name %%">
+        </a>
+
+    generating the output:
+
+        <a href="/~abw/index.html">
+        <img src="/~abw/images/misc/abw.gif" alt="Andy Wardley">
+        </a>
+
+    Note that it is possible to embed variable names (prefixed by
+    '$') within variable definitions. These are then pre-expanded by
+    metapage before being passed to Text::MetaText for the
+    processing phase. Variables that are not explicitly separated
+    from other text by non-word characters can be enclosed in braces
+    to disambiguate them.
+
+    Examples:
+
+        [define]
+        server   = www.kfs.org
+        docs     = /~abw       
+        index    = index.html
+        homepage = $docs/$index
+        images   = $docs/images
+        homeurl  = http://${server}${docs}/$index
+
+COMMAND LINE OPTIONS
+    The default behaviour for metapage is to process all and any
+    files specified on the command line. All files are considered
+    relative to the `src' option in the `[file]' block of the
+    configuration file.
+
+    Example:
+
+        metapage index.html manual.html about.html
+
+    The following command line options affect how metapage works:
+
+    -v (Verbose Mode)
+        In verbose mode, metapage generates informational messages
+        about the files it is processing.
+
+    -q (Quiet Mode)
+        In quiet mode, metapage ignores any "File not found"
+        messages which are normally generated when a specified file
+        does not exist or cannot be read.
+
+    -d (Debug Mode)
+        Additional debug messages are generated in debug mode. This
+        can be useful for testing the correctness of metapage and
+        the Text::MetaText module and also to trace any formatting
+        problems that may be caused by an incorrect directive in the
+        source text.
+
+    -n (No Execution Mode)
+        In no execution mode, metapage examines the source tree to
+        determine which files should be processed but does not
+        actually process them. Verbose mode (`-v') is automatically
+        set to print the file names and summary statistics. This is
+        equivalent to the non-execute mode (also `-n') of the
+        make(1S) utility.
+
+    -r (Recurse)
+        With the recurse option specified, it is possible to name a
+        directory on the command line and have metapage recurse into
+        the directory and process all modified files within.
+
+    -a (All Files)
+        When the "all files" option is specified, metapage traverse
+        the entire document source tree and processes any updated
+        files contain within. The "Recurse" (`-r') option is
+        implicitly set.
+
+    -f (Force Update)
+        In normal usage, metapage only processes files whose source
+        file has been modified more recently than the destination
+        file (or indeed, if there is no destination file). In
+        "force" mode, all specified files are updated regardless.
+
+    -m (Modification Time)
+        By default, metapage examines the file modification time of
+        each source file and sets the Text::MetaText variable
+        FILETIME to represent this value (in seconds since the
+        epoch, 00:00:00 Jan 1 1970 - see time(2)). See the TIME
+        variable in the SUBST section of the section on "METATEXT
+        DIRECTIVES" in the Text::MetaText documentation (`perldoc
+        Text::MetaText') for information on formatting time-based
+        values.
+
+        This is useful for adding a line such as:
+
+            File last modified: %% FILETIME format="%d-%b-%y" %%
+
+    -t (Today Time)
+        The `-t' option overrides the above behaviour and sets the
+        FILETIME variable to the current system time. In this case,
+        the previous example would be more accurate to read:
+
+            File processed on %% FILETIME format="%d-%b-%y" %% 
+
+    -h (Help)
+        This option displays a help message indicating the command
+        line options for metapage.
+
+    In addition to command line options, one or more "profile"
+    configuration files can be specifed (each prefixed by '@'). Each
+    configuration file named will be examined and acted upon in turn
+    (after the .metapagerc and any `default' profile). The
+    configuration files should reside in a directory named by the
+    `dir' element in the `[profile]' block of the `.metapagerc'
+    file.
+
+    Example:
+
+        metapage -vaf @abw @kfs  # force (-f) process all files (-a) verbosely
+                                 # (-v) using profiles 'abw' and 'kfs' (as well
+                                 # as .metapagerc and any default profile)
+
+  PRE-DEFINED VARIABLES
+
+    As mentioned in the section above, the FILETIME variable is set
+    by metapage to indicate the source file modification time
+    (default option - or explicitly set with `-m') or the current
+    system time (`-t').
+
+    Any files processed by metapage can include a SUBST directive
+    (see `perldoc Text::MetaText') to substitute the appropriate
+    value:
+
+       File last modified: %% SUBST FILETIME format="%d-%b-%y" %%
+
+    or, more succinctly:
+
+       File last modified: %% FILETIME format="%d-%b-%y" %%
+
+    Note that the FILETIME and other variables listed below should
+    always be specified in UPPER CASE, even when case sensitivity is
+    disabled (CASE == 0), as it is by default. Metapage uses the
+    CASEVARS configuration item of Text::MetaText to identify these
+    variables as special case-sensitive system variables. They
+    cannot be re-defined (i.e. they're read-only) and should not
+    conflict with any other user-defined variables of the same name
+    (i.e. 'FILETIME' is entirely separate from some other 'filetime'
+    variable). This behaviour only applies to the variables listed
+    below. The following variables are set for each file metapage
+    processes:
+
+    FILEPATH
+        The path (directory) of the current file relative to the
+        source directory. e.g. "graphics/index.html"
+
+    FILENAME
+        The name of the file being processed. e.g. "index.html"
+
+    FULLPATH
+        The full destination path of the file, irrespective of the
+        destination tree root. e.g.
+        "/user/abw/public_html/home/index.html"
+
+    FILEMOD
+        The source file modification time in seconds since the epock
+        (see time(2)). e.g. "886518480"
+
+    FILETIME
+        The source file modification time as per FILEMOD (default)
+        or the current system time if `-t' specified.
+
+AUTHOR
+    Andy Wardley <abw@kfs.org> See also:
+
+        http://www.kfs.org/~abw/
+        http://www.kfs.org/~abw/perl/metatext/
+
+    The metapage utility is distributed as part of the
+    Text::MetaText package. See the appropriate documentation
+    (`perldoc Text::MetaText') for more information on MetaText.
+
+REVISION
+    $Revision: 1.11 $
+
+COPYRIGHT
+    Copyright (c) 1996-1998 Andy Wardley. All Rights Reserved. This
+    program is free software; you can redistribute it and/or modify
+    it under the terms of the Perl Artistic Licence.
+
+SEE ALSO
+    The Text::MetaText module.
+

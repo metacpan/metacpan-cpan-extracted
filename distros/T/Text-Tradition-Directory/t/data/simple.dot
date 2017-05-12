@@ -1,0 +1,11 @@
+digraph Stemma {
+	1 [ class="hypothetical" ];
+	2 [ class="hypothetical" ];
+	A [ class="extant" ];
+	B [ class="extant" ];
+	C [ class="extant" ];
+	1 -> A;
+	1 -> 2;
+	2 -> B;
+	2 -> C;
+}

@@ -1,0 +1,4 @@
+00-load.t
+boilerplate.t
+pod-coverage.t
+pod.t

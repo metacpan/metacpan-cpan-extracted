@@ -1,0 +1,53 @@
+=over 4
+
+=item Freer test naming
+
+  test $thing->method should do something {
+    ..
+  }
+
+should simply add a test called 'thing_method_should_do_something' to the test
+class.
+
+Meanwhile
+
+  foreach my $method (qw/subject body/) {
+    test "responds to $method" {
+      ok $self->{instance}->$method();
+    }
+  }
+
+should generate a couple of tests in the obvious way. Variables should be
+interpolated in double quoted strings, not otherwise.
+
+=item Policy stuff
+
+  use Test::Class::Sugar (
+    -default_prefix => 'MyTest::Suite::',
+    -test_instance  => '$self',
+  );
+
+  testclass exercises SomeClass {
+    test policy changes {
+      ok $self->isa('MyTest::Suite::SomeClass');
+    }
+  }
+
+=item Anonymous tests
+
+Sometimes assertion comments are enough:
+
+  test {
+    ok 1, "I prefer to name my tests like this";
+  }
+
+=item Better diagnostics
+
+Right now, when things fail, they fail spectacularly. Okay if you don't fuck
+up, not so okay otherwise. Make the parser fail gracefully.
+
+=item Preserve the correct linenumber
+
+No idea how to do this yet...
+
+=back

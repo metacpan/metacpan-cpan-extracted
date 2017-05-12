@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 34d0ebb4b7213c41afe838e3545361e4e661decf Build.PL
+SHA1 f2021e989fd3da23f9eb9d4751bffada960dad36 ChangeLog
+SHA1 d02c897a29f6cfb53a13ddca4401992c8a8aaf5d ChangeLog.xml
+SHA1 7e6fe8e4c45d823348e107a67d34eeea4b151b5a MANIFEST
+SHA1 f438e7898b9bf33cb5798e82488210223e627c8c MANIFEST.SKIP
+SHA1 4b296e9de7d4ff27766649d742dd05c97c286f3a META.yml
+SHA1 1709477da40f2f59cf7a18ffa9b85d71d2be663c Makefile.PL
+SHA1 13778837fc29bb8f815a10522ea9271855986106 README.textile
+SHA1 0f9c1b59d181dcf47f017655eaa725b175317f0e bin/textile2x
+SHA1 8385faaace3c4e0eee9fe475a04f30c5c58683eb etc/ChangeLogML.xsd
+SHA1 37a6c54b24739f8c34f05b4308fe18eb0a7ee5b4 lib/App/Textile2x.pm
+SHA1 22e93a39da46c07ed7d74a3a453b4792e10552f3 lib/Text/Textile/Plaintext.pm
+SHA1 0b9ee8f0608106a3c9c88c9ea4b768c1a33243c2 lib/Text/Textile/PostScript.pm
+SHA1 55e93b5d580e5f27d39c8de26493acddb7b9cbd1 lib/Text/Textile/RTF.pm
+SHA1 186b842464535cc150e8e8ae681f228c12d543c3 t/00_load.t
+SHA1 9f09733cd3cb1f3bd151637039e62fd4dcd8e844 t/01_pod.t
+SHA1 d495b5ef939096adae32c6f8705e76504a820c8d t/02_pod_coverage.t
+SHA1 84d4f71c70f1dd008cf1d280006c10037405fdfd t/03_meta.t
+SHA1 5bba71a1423280579ef47d22da2b01f3b599ce1f t/04_minimumversion.t
+SHA1 a37b65833b8bf151831eb2c98da9bb7665cb8689 t/05_critic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkqJr2MACgkQ3Cp33jjp81W0MwCfZqFEF6zhRu4asznUdO+eQB0e
+2wAAn3oeKPnW04vRsMiC31RvpT2fUfjq
+=KESN
+-----END PGP SIGNATURE-----

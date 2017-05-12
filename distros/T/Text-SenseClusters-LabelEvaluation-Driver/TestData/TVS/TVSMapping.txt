@@ -1,0 +1,3 @@
+Cluster0:::Tony Blair  
+Cluster1:::Vladimir Putin 
+Cluster2:::Saddam Hussein

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Simple Perl Structure Dumping Tag (Functioning Custom Tag Example)",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-LiquidX-Tag-Dump",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::Dump" : "0"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Template::Liquid" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Template::LiquidX::Tag::Dump" : {
+         "file" : "lib/Template/LiquidX/Tag/Dump.pm",
+         "version" : "v1.0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/Template-LiquidX-Tag-Dump/issues"
+      },
+      "homepage" : "https://github.com/sanko/Template-LiquidX-Tag-Dump",
+      "repository" : {
+         "url" : "git://github.com/sanko/Template-LiquidX-Tag-Dump.git",
+         "web" : "https://github.com/sanko/Template-LiquidX-Tag-Dump"
+      }
+   },
+   "version" : "1.0.6",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

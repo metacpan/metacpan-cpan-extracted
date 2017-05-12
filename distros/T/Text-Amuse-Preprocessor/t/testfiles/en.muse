@@ -1,0 +1,61 @@
+#lang en
+
+common: fi fl ffi ffl ff fi fl ffi ffl ff
+
+This is “my quotation” and ‘this’ and that’s all This is “my
+quotation” and ‘this’ and that’s all
+
+10–15 and 100000–150000,10–15
+ - a list
+
+12<sup>th</sup> 13<sup>th</sup> 1<sup>st</sup> 2<sup>nd</sup> 3<sup>rd</sup> (1<sup>st</sup> and 2<sup>nd</sup> and 19<sup>th</sup>)
+
+In the ’80 and ’90
+
+— not a list — not really — no
+
+‘this’ and ‘this.’
+
+“this” and “this.”
+
+“this” and “this”
+
+“this“ and “this“
+
+‘this‘ and ‘this‘
+
+“my” “quote”
+
+4–5,56–18 4-5-6
+
+[[http://www.sociology.ox.ac.uk/papers/dunn73-93.doc][www.sociology.ox.ac.uk]]
+
+[[http://www.omnipresence.mahost.org/wd-v2-1-6.htm][www.omnipresence.mahost.org]]
+
+and — here we are — the — ósecondÓ — example
+
+hello.” hell’o”
+
+“?hello?” “?hello?” “l’amour” ‘amour’
+
+This is “ómy quotationÓ” and ‘Óthisó’ and that’s all
+
+“This is a ‘quotation’”.
+
+“This is a ‘quotation’.”
+
+sólo Sólo sólobla blasólo sólobla blasólo blasólobla
+
+l’“amore” l’“amore” l’ardore
+
+“хотите присоединиться “к” ‘ордену’ Библиотекарей”
+‘хотите присоединиться “к” ‘ордену’ Библиотекарей’
+“‘хотите’” ‘“хотите”’ ‘“хотите”’
+‘“хотите”’ “‘хотите’” “‘хотите’”
+
+This was -not not-here nor-here-x all. —
+This was all. —
+This is not-
+ -
+ -
+ - —

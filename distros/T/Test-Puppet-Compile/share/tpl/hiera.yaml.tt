@@ -1,0 +1,18 @@
+---
+:backends:
+  - yaml
+
+:logger: console
+
+:hierarchy:
+  - env/%{environment}/hosts/%{fqdn}
+  - env/%{environment}/roles/%{role}
+  - env/%{environment}
+  - role/%{role}
+  - common
+
+:yaml:
+  :datadir: '[% tempdir %]/hieradata'
+
+:merge_behavior: deeper
+

@@ -1,0 +1,12 @@
+Makefile.PL
+MANIFEST
+License.txt
+lib/Thread/Queue/Multiplex.pm
+t/01onesub.t
+t/02twosubs.t
+t/03foursubs.t
+t/04eightsubs.t
+t/TestCommon.pm
+t/Qable.pm
+t/SharedQable.pm
+Changes.txt

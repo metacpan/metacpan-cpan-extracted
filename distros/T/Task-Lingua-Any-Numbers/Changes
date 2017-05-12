@@ -1,0 +1,29 @@
+Revision history for Perl extension Task::Lingua::Any::Numbers.
+
+0.19 Tue Jul  5 01:26:55 2016
+    => Bump version.
+
+0.18 Sun Sep  9 05:19:55 2012
+    => Distro fix.
+
+0.17 Thu Feb 10 00:32:54 2011
+   => Require new Lingua::Any::Numbers.
+
+0.16 Wed Oct  6 00:24:48 2010
+   => Use Lingua::SV::Numbers for SV.
+   => Also use Lingua::PT::Nums2Ords since Lingua::Any::Numbers now supports it.
+
+0.14 Fri May 15 13:09:59 2009
+   => Fix SPEC for Lingua::PT::Nums2Words. RT#45899 (ferreira).
+
+0.13 Thu Apr 23 15:05:06 2009
+   => Update builder.
+
+0.12 Sat Apr 18 07:11:11 2009
+   => Update distro tools.
+
+0.11 Mon Feb  9 05:12:17 2009
+   => Re-package.
+
+0.10 Mon Feb  9 04:50:45 2009
+   => First release.

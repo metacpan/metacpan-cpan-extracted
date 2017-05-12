@@ -1,0 +1,9 @@
+Revision history for Perl extension Template::Plugin::Data::HTMLDumper.
+
+0.10  Mon Aug 23 2004
+  - Initial release.
+
+0.01  Wed Aug 18 15:55:35 2004
+	- original version; created by h2xs 1.23 with options
+		-AX Template::Plugin::Data::HTMLDumper
+

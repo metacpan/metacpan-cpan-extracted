@@ -1,0 +1,17 @@
+#!/usr/local/bin/perl -w
+
+use Text::FillIn;
+use Text::Structured;
+
+$page = q{foo bar
+baz quux};
+$st = new Text::Structured($page);
+# set delimiters
+Text::FillIn->Ldelim('(:');
+Text::FillIn->Rdelim(':)');
+$template = new Text::FillIn;
+$template->object($st);
+$template->hook('&','do_method');
+$template->set_text(q{Oh (:&get_text_at(0,0,3):), it's a (:&get_text_re(1,(\w+)$):)!});
+$foo = $template->interpret;
+print "$foo\n";

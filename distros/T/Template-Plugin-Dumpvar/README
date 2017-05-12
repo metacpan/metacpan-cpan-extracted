@@ -1,0 +1,52 @@
+NAME
+    Template::Plugin::Dumpvar - Dump template data in the same style as the
+    debugger
+
+SYNOPSIS
+      [% USE Dumpvar %]
+  
+      [% Dumpvar.dump(this) %]
+      [% Dumpvar.dump_html(theother) %]
+
+DESCRIPTION
+    When dumping data in templates, the obvious first choice is to use the
+    Data::Dumper plugin Template::Plugin::Dumper. But personally, I think
+    the layout is ugly and hard to read. It's designed to be parsed back in
+    by perl, not to necesarily be easy on the eye.
+
+    The dump style used in the debugger, however, IS designed to be easier
+    on the eye. The dumpvar.pl script it uses to do this has been cloned for
+    general use as Devel::Dumpvar. This module is a drop in replacement for
+    Template::Plugin::Dumper that uses Devel::Dumpvar in place of
+    Data::Dumper.
+
+    The only difference is that this module only dumps one scalar,
+    reference, or object at a time.
+
+METHODS
+  dump $something
+    Dumps a single structure via Devel::Dumpvar. Does not escape for HTML.
+
+  dump_html $something
+    As above, but also escapes and formats for HTML
+
+SUPPORT
+    Bugs should be submitted via the CPAN bug tracker, located at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-Dumpvar>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2004 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

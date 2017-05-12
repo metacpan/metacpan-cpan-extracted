@@ -1,0 +1,9 @@
+serial --unit=0 --speed=115200
+terminal serial
+timeout 3
+default 0
+
+
+title Test run unknown
+root (hd0,1)
+kernel /boot/vmlinuz root=/dev/sda2 console=ttyS0,115200 ip=dhcp noapic

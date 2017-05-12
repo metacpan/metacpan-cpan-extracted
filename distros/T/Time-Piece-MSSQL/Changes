@@ -1,0 +1,14 @@
+Revision history for Time-Piece-MSSQL
+
+0.022     2013-12-14 11:06:18-0500 America/New_York
+          require Time::Piece 1.17 to get consistent strptime behavior
+
+0.021     2013-12-13 08:07:55 America/New_York
+          update packaging and metadata
+
+0.020     2006-11-13
+          packaging improvements
+
+0.01      2004-10-26 13:00
+          first release, works on basic test cases for autoinflation
+

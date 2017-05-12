@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Test-Image
+version: 0.02
+author:
+  - Mark Fowler <mark@twoshortplanks.com>
+abstract: test an image
+license: perl
+generated_by: Module::Build version 0.2609, without YAML.pm

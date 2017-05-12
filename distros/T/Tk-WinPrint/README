@@ -1,0 +1,13 @@
+README
+
+This is a port of the tkwinprint package for Tcl/Tk on Windows
+systems. It provides methods for printing from Tk::Text and Tk::Canvas
+widgets.
+
+Works only with gcc (mingw32 or cygwin)!
+
+Since I don't have a Windows system anymore and really do not do
+Windows hacking, I would like to see this module adopted by a
+"champion". Making this work for ActiveState Perl would be task no. 1.
+
+Slaven Rezic - srezic@cpan.org

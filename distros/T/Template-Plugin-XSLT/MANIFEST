@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+XSLT.pm
+t/1.t
+t/test
+t/test.xsl
+META.yml                                Module meta-data (added by MakeMaker)

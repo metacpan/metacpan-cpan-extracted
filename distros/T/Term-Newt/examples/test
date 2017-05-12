@@ -1,0 +1,103 @@
+#!/usr/bin/perl -w
+
+# $Id: test,v 1.1 1998/11/09 02:29:51 daniel Exp daniel $
+
+use strict;
+use ExtUtils::testlib;
+use Term::Newt;
+
+my $n = Term::Newt->new;
+
+$n->init;
+$n->cls;
+
+$n->newtSetSuspendCallback(sub {
+	$n->suspend;
+	kill 20, $$;
+	$n->resume;
+});
+
+my $form = 0;
+
+$n->draw_root_text(0, 0, "Newt test program");
+$n->push_help_line('');
+
+$n->open_window(2, 2, 30, 10, "first window");
+$n->open_window(10, 5, 65, 16, "window 2");
+
+my $f = $n->form(\$form,'', NEWT_FLAG_RETURNEXIT);
+my $chklist = $n->form(\$form,'', 0);
+
+my $b1 = $n->button(3, 1, "Exit");
+my $b2 = $n->button(18, 1, "Update");
+my $r1 = $n->radiobutton(20, 10, "Choice 1", 0);
+my $r2 = $n->radiobutton(20, 11, "Choice 2", 1, $r1);
+my $r3 = $n->radiobutton(20, 12, "Choice 3", 0, $r2);
+my $rsf = $n->form(\$form,'',0);
+
+$n->form_add_components($rsf, $r1, $r2, $r3);
+$n->form_set_background($rsf, NEWT_COLORSET_CHECKBOX);
+
+my (@cs,@results) = ();
+for (0..9) {
+	$cs[$_] = $n->checkbox(3, 10 + $_, sprintf("Check %d", $_),' ',' X',\$results[$_]);
+	$n->form_add_component($chklist, $cs[$_]);
+}
+
+my ($scaleVal,$enr2,$enr3);
+my $l1 = $n->label(3, 6, "Scale:");
+my $l2 = $n->label(3, 7, "Scrolls:");
+my $l3 = $n->label(3, 8, "Hidden:");
+my $e1 = $n->entry(12, 6, "", 20, \$scaleVal, 0);
+my $e2 = $n->entry(12, 7, "Default", 20, \$enr2, NEWT_FLAG_SCROLL);
+my $e3 = $n->entry(12, 8, '', 20, \$enr3, NEWT_FLAG_HIDDEN);
+
+my %cbis = ();
+
+#cbis[0].state = &results[0];
+#cbis[0].en = e1;
+#newtComponentAddCallback(cs[0], disableCallback, &cbis[0]);
+
+my $scale = $n->scale(3, 14, 32, 100);
+
+$n->form_set_height($chklist, 3);
+
+$n->form_add_components($f, $b1, $b2, $l1, $l2, $l3, $e1, $e2, $e3, $chklist);
+$n->form_add_components($f, $rsf, $scale);
+
+my $lb = $n->listbox(45, 1, 4, NEWT_FLAG_MULTIPLE | NEWT_FLAG_DOBORDER);
+$n->listbox_add_entry($lb, "First",   1);
+$n->listbox_add_entry($lb, "Second",  2);
+$n->listbox_add_entry($lb, "Third",   3);
+$n->listbox_add_entry($lb, "Fourth",  4);
+$n->listbox_add_entry($lb, "Sixth",   6);
+$n->listbox_add_entry($lb, "Seventh", 7);
+$n->listbox_add_entry($lb, "Eighth",  8);
+$n->listbox_add_entry($lb, "Ninth",   9);
+$n->listbox_add_entry($lb, "Tenth",  10);
+
+$n->listbox_insert_entry($lb, "Fifth", 5, 4);
+$n->listbox_insert_entry($lb, "Eleventh", 11, 10);
+$n->listbox_delete_entry($lb, 11);
+
+my $t = $n->textbox(45, 10, 17, 5, NEWT_FLAG_WRAP);
+$n->textbox_set_text($t, 
+	"This is some text does it look okay?\nThis should be alone.\nThis shouldn't be printed");
+
+$n->form_add_components($f, $lb, $t);
+$n->refresh;
+
+while(defined(my $answer = $n->run_form($f))) {
+	if ($answer == $b2) {
+		$n->scale_set($scale, $scaleVal);
+		$n->refresh;
+	}
+} 
+
+#my $selectedList = $n->ListboxGetSelection($lb, &numsel);
+
+$n->form_destroy($f);
+
+$n->pop_window;
+$n->pop_window;
+$n->finished;

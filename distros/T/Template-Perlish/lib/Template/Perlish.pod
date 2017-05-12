@@ -1,0 +1,1207 @@
+=encoding utf8
+
+=head1 NAME
+
+Template::Perlish - Yet Another Templating system for Perl
+
+=head1 VERSION
+
+This document describes Template::Perlish version 1.52.
+
+
+=head1 SYNOPSIS
+
+   use Template::Perlish;
+
+   my $tp = Template::Perlish->new();
+
+   # A complex template, including some logic as Perl code
+   my $tmpl = <<END_OF_TEMPLATE
+   Dear [% name %],
+
+      we are pleased to present you the following items:
+   [%
+      my $items = $variables{items}; # Available %variables
+      my $counter = 0;
+      for my $item (@$items) {
+   %]
+      [%= ++$counter %]. [% $item %]
+   [%
+      }
+   %]
+
+   Please consult our complete catalog at [% uris.2.catalog %].
+
+   Yours,
+
+      [% director.name %] [% director.surname %].
+   END_OF_TEMPLATE
+
+   my $processed = $tt->process($template, {
+      name => 'Ciccio Riccio',
+      items => [ qw< ciao a tutti quanti > ],
+      uris => [
+         'http://whatever/',
+         undef,
+         {
+            catalog => 'http://whateeeeever/',
+         }
+      ],
+      director => { surname => 'Poletti' },
+   });
+
+The above prints:
+
+   Dear Ciccio Riccio,
+
+      we are pleased to present you the following items:
+
+      1. ciao
+      2. a
+      3. tutti
+      4. quanti
+
+   Please consult our complete catalog at http://whateeeeever/.
+
+   Yours,
+
+         Poletti.
+
+There is also a convenience function for one-shot templates:
+
+   use Template::Perlish qw< render >;
+   my $rendered = render($template, \%variables);
+
+There are also two functions that expose the I<path> splitting
+algorithm and the variable traversal, in case you need them:
+
+   use Template::Perlish qw< crumble traverse >;
+   my $array_ref = crumble("some.'-1'.'comp-lex'.path");
+   # returns [ 'some', '-1', 'comp-lex', 'path' ]
+
+   my $var;
+   my $ref_to_value = traverse(\$var, "some.0.'comp-lex'.path");
+   $$ref_to_value = 42; # note double sigil for indirection
+   # now we have that $some_variable is equal to:
+   # { some => [ { 'comp-lex' => { path => 42 } } ] }
+
+
+=head1 SHOULD YOU USE THIS?
+
+You're probably looking at the tons and tons of templating systems
+available around - should you use this?
+
+This system is quite basic and useful for simple situations. Say you
+have a bunch of templates in which you want to put some variables - then
+it's ok. On top of this, say that you want to add some simple logic -
+like a couple of IF's or iterating over an array - then it's ok again.
+For everything more complicated you should probably look elsewhere.
+
+As a summary:
+
+=over
+
+=item PRO
+
+=over
+
+=item *
+
+lightweight, a single-file module with minimal requirements that you can
+easily embed in your script;
+
+=item *
+
+simple approach to variable substitution, following
+L<Template::Toolkit|Template::Toolkit> to cope with scalars, hashes and
+arrays;
+
+=back
+
+=item PRO/CON
+
+=over
+
+=item *
+
+Perl code to handle all logic. This can be regarded as a PRO if you're a
+Perl programmer, because you already know the syntax; this is probably
+(definitively?) a CON in all other cases;
+
+=back
+
+=item CON
+
+=over
+
+=item *
+
+you have to explicitly code everything that goes beyond simple variable
+stuffing into a template.
+
+=item *
+
+if you care about security, you MUST look elsewhere. There are I<string>
+C<eval>s inside Template::Perlish, so you must be 100% or more sure that
+you trust your templates. Don't trust them if you don't write them
+yourself, and even in that case be suspicious.
+
+=back
+
+=back
+
+If you think that this module does not fit your requirements, my
+personal suggestion for a templating system is
+L<Template::Toolkit|Template::Toolkit>: it's complete, easy to use and
+extensible, has excellent documentation (including a book and a quick
+reference guide) and support. Do you need anything more?
+
+But don't trust me! Take a look at I<Choosing a Templating System> at
+L<http://perl.apache.org/docs/tutorials/tmpl/comparison/comparison.html>,
+where you can find a fairly complete comparison about the I<streamline>
+templating systems in Perl, and decide by yourself!
+
+=head1 DESCRIPTION
+
+You bet, this is another templating system for Perl. Yes, because it's
+the dream of every Perl programmer, me included. I needed something
+that's easily portable, with no dependencies apart a recent Perl version
+(but with some tweaking this should be solved), much in the spirit of
+the ::Tiny modules.
+
+Wherever possible I try to mimic Template::Toolkit, but I stop quite
+early. If you only have to fill a template with a bunch of variables,
+chances are that TT2 templates are good for Template::Perlish as well.
+If you need even the slightest bit of logic, you'll have to part from
+TT2 - and get full Perl power.
+
+A template is simply a text (even if not necessarily) with some
+particular markup to embed commands. In particular, all the stuff
+included between C<[%> and C<%]> is considered as some sort of
+I<command>, and treated specially. All the rest is treated as simple
+text. Of course, you can modify the start and stop delimiter for a
+command.
+
+I<Commands> can be of four different types:
+
+=over
+
+=item B<variable embedding>
+
+that are expanded with the particular value for a given C<variable>,
+where C<variable>s are passed as a hash reference. A variable can be
+defined as a sequence of alphanumeric (actually C<\w>) tokens, separated
+by dots (or anything described in L</Templates> as of version 1.40). The
+variables hash is visited considering each token as a subkey, in order
+to let you visit complex data structures. You can also put arrays in,
+just use the index as a key in this case.
+
+=item B<scalar Perl variable>
+
+that is expanded with the value of the given scalar variable;
+
+=item B<Perl expression>
+
+this MUST have a C<=> equal sign immediately after the opener, and
+contain a valid Perl expression. This expression is evaluated in scalar
+context and the result is printed;
+
+=item B<code>
+
+good old Perl code, in order to provide you with control structures,
+modules, etc etc. This the most lazy approach I could think about, and
+it's also why this module is called C<Perlish>.
+
+=back
+
+Take a look at the example in the L</SYNOPSYS>, it actually contains all
+that this module provides.
+
+To start, you'll need a C<Template::Perlish> object and, of course, a
+template. Templates are provided as text strings; if you have them into
+files, you are in charge of loading them first.
+
+   # get a Template::Perlish object
+   my $tp = Template::Perlish->new();
+
+   # get the template (yes, it's your duty)
+   my $tmpl = do { open my $fh, '<', 'filename'; local $/; <$fh> };
+
+The basic operation mode is via the L</process> method, which works much
+like in TT2. Anyway, this method will always give you back the generated
+stuff, and won't print anything. This can probably be less memory
+efficient when big templates are involved, but in this case you should
+probably head somewhere else. Or not.
+
+   # print out the template filled with some variables
+   print $tp->process($tmpl, { key => 'value' });
+
+Each template is transformed into Pure Perl code, then the code is
+evaluated in order to get the output. Thus, if you want to operate on
+the same template many times, a typical usage is:
+
+   # compile the template with something like:
+   my $compiled = $tp->compile($template);
+
+   # use the compiled template multiple times with different data
+   for my $dataset (@available_data) {
+      print "DATASET\n", $tp->evaluate($compiled, $dataset), "\n\n";
+   }
+
+There is also a facility - namely L</compile_as_sub> - that returns an
+anonymous sub that encapsulates the L</evaluate> call above:
+
+   my $sub = $tp->compile_as_sub($template)
+      or die "template did not compile: $EVAL_ERROR";
+   for my $dataset (@available_data) {
+      print {*STDOUT} "DATASET\n", $sub->($dataset), "\n\n";
+   }
+
+As of release 1.2 the error reporting facility has been improved to
+provide feedback if there are issues with the provided template, e.g.
+when there is a syntax error in the Perl code inside. When an error
+arises, the module will C<die()> with a meaningful message about where
+the error is. This happens with all the provided facilities.
+
+Error checking is turned on automatically on all facilities. You can
+avoid doing it in the L</compile> method, although the check will kick
+in at the first usage of the compiled form. To avoid the check upon the
+compilation, pass the C<no_check> option to L</compile>:
+
+   my $compiled = $tp->compile($template, no_check => 1);
+
+=head1 INTERFACE 
+
+=head2 One Shot Templates
+
+The following convenience function can be used to quickly render a
+template:
+
+=over
+
+=item B<render>
+
+   use Template::Perlish qw< render >;
+   my $rendered = render($template);              # OR
+   my $rendered = render($template, %variables);  # OR
+   my $rendered = render($template, $var_referEnce);
+
+if you already have a template and the variables to fill it in, this is
+probably the quickest thing to do.
+
+You can pass the template alone, or you can pass the variables as well,
+either as a flat list (that will be converted back to a hash) or as a
+single reference.
+
+Returns the rendered template, i.e. the same output as L</process>. Note
+that it assumes the default values for options explained in L</new>.
+
+=back
+
+=head2 Constructor
+
+=over
+
+=item B<new>
+
+   $tp = Template::Perlish->new(@opts); # OR
+   $tp = Template::Perlish->new(\%opts);
+
+constructor, does exactly what you think. You can provide any parameter,
+but only the following will make sense:
+
+=over
+
+=item I<method_over_keys>
+
+boolean flag used for traversal, see L</traverse>.
+
+Defaults to I<false>;
+
+=item I<start>
+
+delimiter for the start of a I<command> (as opposed to plain text/data).
+
+Defaults to C<[%>;
+
+=item I<stdout>
+
+boolean value, allows to I<clobber> C<STDOUT> for collecting the
+expansion of a template, or to leave C<STDOUT> untouched.
+
+New option as of release 1.52. Until the previous stable release, this
+behaviour was the norm: inside a template, whatever C<print> to
+C<STDOUT> is trapped and put in the template expansion. For this reason,
+this option defaults to a true value (C<1>) in order to keep backwards
+compatibility.
+
+If you set this flag to a false value, C<STDOUT> will not be modified
+and will be accessible from within the templates. In this case, if you
+still want to I<print> inside the template you can use function L</P>.
+
+Defaults to I<true>;
+
+=item I<stop>
+
+delimiter for the end of a I<command>.
+
+Defaults to C<%]>;
+
+=item I<strict_blessed>
+
+boolean flag used for traversal, see L</traverse>.
+
+Defaults to I<false>;
+
+=item I<traverse_methods>
+
+boolean flag used for traversal, see L</traverse>.
+
+Defaults to I<false>;
+
+=item I<variables>
+
+variables that will be passed to all invocations of L</process> and/or
+L</evaluate>. It MUST be a reference to a hash.
+
+Defaults to an empty hash reference.
+
+=item I<-preset>
+
+this is a I<meta>-option and is available only when the constructor is
+called with a list of key/value pairs, not with a hash reference.
+
+This allows you to load canned sequences of presets that will be exposed
+for different releases and allow you to quickly tune the usage of
+Template::Perlish, while still keeping backwards compatibility.
+
+Each preset is overlaid on the configuration as soon as it is
+encountered in the arguments list, so order matters. Here are the
+available presets:
+
+=over
+
+=item C<default>
+
+sets defaults values written above;
+
+=item C<1.52>
+
+overrides C<stdout> to a I<false> value, while setting
+C<traverse_method> and C<method_over_key> to a I<true> one. As a matter
+of fact, it enables all new options available in release 1.52 in one
+single shot.
+
+=back
+
+As an example, if you want to use the new features in 1.52 but you would
+like keys in a hash to take precedence over methods, you can do either
+of the following:
+
+    $o = Template::Perlish->new(
+        -preset => '1.52',
+        method_over_key => 0,
+    );
+
+    # OR
+
+    $o = Template::Perlish->new(
+        stdout => 1,
+        traverse_methods => 0,
+    );
+
+=back
+
+Parameters can be given directly as key-value pairs or via a hash
+reference. In the former case, you can provide the same option multiple
+times and also use meta-option C<-preset> described above.
+
+By default, the delimiters are the same as TT2, i.e. C<[%> and C<%]>,
+and the variables hash is empty.
+
+The return value is a reference to an anonymous hash, whose elements are
+the ones described above. You can modify them at will, there are no
+accessors for this simple object.
+
+=back
+
+=head2 Template Handling
+
+=over
+
+=item B<compile>
+
+   $compiled = $tp->compile($template);
+   $compiled = $tp->compile($template, no_check => $boolean);
+
+compile a template generating the relevant Perl code. Using this method
+is useful when the same template has to be used multiple times, so the
+compilation can be done one time only.
+
+You can turn off checking using the C<no_check> optional parameter and
+passing a true value. The check will be performed upon the first usage
+of the compiled form though.
+
+Returns a hash containing, among the rest, a text version of the
+template transformed into Perl code.
+
+=item B<compile_as_sub>
+
+   $sub_reference = $tp->compile_as_sub($template);
+
+Much like L</compile>, this method does exactly the same compilation,
+but returns a reference to an anonymous subroutine that can be used each
+time you want to "explode" the template.
+
+The anonymous sub that is returned accepts a single, optional parameter,
+namely a reference with the same role as C<$reference> in L</evaluate>.
+
+Note that if you add/change/remove values using the C<variables> member
+of the Template::Perlish object, these changes will reflect on the
+anonymous sub, so you end up using different values in two subsequent
+invocations of the sub. This is consistent with the behaviuor of the
+L</evaluate> method.
+
+=item B<evaluate>
+
+   $final_text = $tp->evaluate($compiled); # OR
+   $final_text = $tp->evaluate($compiled, $reference);
+
+evaluate a template (in its compiled form, see L</compile>) with the
+available variables. In the former form, only the already configured
+variables are used (see L</Constructor>; in the latter, the given
+C<$reference> is considered.
+
+If C<$reference> is a hash reference, the variables set in the
+constructor (if any) are merged with the ones in C<$reference> and
+eventually passed for expansion of the C<$compiled> template. Keys from
+C<$reference> override those from the constructor and they also end up
+in the C<%variables> lexical hash that is visible in the template's
+scope.
+
+As of release 1.50, C<$reference> can also be something else (most
+probably, an array reference), it is used as the variables entry point
+instead. In this case, the C<%variables> lexical hash that is visible in
+the template's scope is shaped like this:
+
+   %variables = (
+      HASH => { variables from the constructor... },
+      REF  => $reference,
+   );
+
+so you have in any way the chance to access the variables set in the
+constructor.
+
+Returns the processed text as a string.
+
+=item B<process>
+
+   $final_text = $tp->process($template); # OR
+   $final_text = $tp->process($template, $variables);
+
+this method included L</compile> and L</evaluate> into a single step.
+
+=back
+
+=head2 Templates
+
+There's really very little to say: write your document/text/whatever,
+and embed special parts with the delimiters of your choice (or stick to
+the defaults). If you have to print stuff, just print to C<STDOUT>, it
+will be automatically catpured (unless you're calling the generated code
+by yourself).
+
+As of version 1.52, the new boolean option C<stdout> has been
+introduced, allowing to keep the old behaviour (i.e. printing to
+C<STDOUT> is captured in the expanded template) described above, or to
+use the new one where C<STDOUT> is not clobbered. This parameter
+defaults to C<1> (i.e. a I<true> value, in Perl sense) for backwards
+compatibility. If you still want to I<print> out, though, you can use
+the new function L</P>. As a matter of fact, you're encouraged to always
+use C<P>, because it will work both in the old and in the new setup.
+
+Anything inside these "special" parts matching the regular expression
+C<< /^\s*\w+(?:\.\w+)*\s*$/ >>, i.e. consisting only of a sequence of
+alphanumeric tokens separated by dots, are considered to be variables
+and processed accordingly. Thus, available variables can be accessed in
+two ways: using the dotted notation, as in
+
+   [% some.value.3.lastkey %]
+
+or explicitly using the C<%variables> hash:
+
+   [% print $variables{some}{value}[3]{lastkey} %]
+
+The former is cleaner, but the latter is more powerful of course.
+
+As of release 1.50, Template::Perlish does not assume that the input
+data structure is a hash reference any more. Hence, C<%variables> might
+not actually contain your input; see L<Variables Accessors> for a robust
+way to get the right value instead. Or you can use C<$V> if you feel
+brave (it's a reference to either C<%variables> or is whatever else was
+provided as input, so it alwasy points to the I<right> data). See
+L</evaluate> for additional information about the provided parameters
+and C<%variables>.
+
+As of release 1.40, Template::Perlish also allows you to use more
+complex variable names in your data structure and your template, without
+having to resort to the second form. It will suffice to quote the
+relevant parts where you want to put non-alphanumeric keys, e.g.:
+
+   '$whatever'.'...'."with '\" quotes"
+
+The quoting rules for this feature added in 1.40 are the following:
+
+=over
+
+=item * B<< single quotes >>
+
+are paired and can contain any character inside, except a single quote.
+Use double quotes if you need to put single quotes. The quotes
+themselves are stripped away before figuring out what the key is;
+
+=item * B<< double quotes >>
+
+are paired and can contain any character inside, with some care. If you
+need to put double quotes inside, you have to escape with a backslash.
+Also, if you want to insert a literal backslash, you have to prepend it
+with another backslash. In general, every time you put a backslash, the
+following character is taken as-is and the escaping backslash is tossed
+away. So the following:
+
+   "\'\a\ \v\e\r\y\ \s\t\r\a\n\g\e\ \k\e\y\'"
+
+is interpreted as:
+
+   'a very strange key'
+
+(including the single quotes).
+
+=item * B<< the rest >>
+
+must be alphanumeric only, like it was before.
+
+=back
+
+If you happen to have a value you want to print inside a simple scalar
+variable, instead of:
+
+   [% print $variable; %]
+
+you can also use the short form:
+
+  [% $variable %]
+
+Note: only the scalar variable name, nothing else apart optional spaces.
+If you have something fancier, i.e. a Perl expression, you can use a
+shortcut to evaluate it and print all in one single command:
+
+  [%= my $value = 100; "*** $variable -> $value ***" %]
+
+Note that there is an equal sign (C<=>) immediately after the command
+opener C<[%>. The Perl expression is evaluated in scalar context, and
+the result is printed (if defined, otherwise it's skipped). This sort of
+makes the previous short form for simple scalars a bit outdated, but you
+spare a character in any case and it's just DWIM.
+
+If you know Perl, you should not have problems using the control
+structures.  Just intersperse the code with the templates as you would
+normally do in any other templating system:
+
+   [%
+      if ($variables{this}) {
+   %]
+        blah blah [% this %], foo bar!
+   [%
+      }
+      else {
+   %]
+        yak yak that!
+   [%
+      }
+   %]
+
+Take care to always terminate your commands with a C<;> each time you
+would do it in actual code.
+
+As of version 1.40, there are also a few functions that will make your
+life easy if you want to access the variables, namely L</V> to access a
+variable provided its dotted-path representation, L</A> for expanding
+the variable as an array, L</H> to expand it as a hash, and L</HK> and
+L</HV> to get the keys and values of a hash, respectively.
+
+There's no escaping mechanism, so if you want to include literal C<[%>
+or C<%]> you either have to change delimiters, or you have to resort to
+tricks. In particular, a stray closing inside a textual part won't be a
+problem, e.g.:
+
+   [% print "variable"; %] %] [% print "another"; %]
+
+prints:
+
+   variable %] another
+
+The tricky part is including the closing in the Perl code, but there can
+be many tricks:
+
+   [% print '>>>%'.']<<<' %]
+
+prints
+
+   >>>%]<<<
+
+To include a starter in the text just print it inside a Perl block:
+
+   here it comes [%= '[%' %] the delimiter
+
+prints:
+
+   here it comes [% the delimiter
+
+Another trick is to separate the two chars with an empty block:
+
+   here it comes [[%%]% the delimiter
+
+Including the starter in the Perl code is not a problem, of course.
+
+So the bottom line is: who needs escaping?
+
+=head2 Variables Accessors
+
+The following variable accessors can be used from within the templates.
+All variable accessors accept three forms:
+
+=over
+
+=item *
+
+without parameters. In this case, the root of the data is selected, then
+the operation of the accessor is applied;
+
+=item *
+
+with one parameter. In this case, the parameter is the path in the data
+structure;
+
+=item *
+
+with two parameters. In this case, the first parameter is the path in
+the data structure, while the second one is the data structure to be
+traversed.
+
+=back
+
+The third alternative is useful when you want to take advantage of the
+accessors on a sub-structure, like in the following example:
+
+   # suppose $item is a hash of hashes at each iteration...
+   for my $item (A 'some.array') {
+      my $wanted = V 'data.inside.item', $item;
+      # ... do something with $wanted...
+   }
+
+Here are the accessors:
+
+=over
+
+=item B<< A >>
+
+   A
+   A 'path.to.arrayref'
+   A 'path.to.arrayref', $root
+
+get the variable at the specific path and expand it as array. This can
+be useful if you want to iterate over a variable that you know is an
+array reference:
+
+   [% for my $item (A 'my.array') { ... } %]
+
+is equivalent to:
+
+   [% for my $item (@{$variables{my}{array}}) { ... } %]
+
+but more concise and a little more readable.
+
+When no path is passed, the root of the input data is assumed to be a
+reference to an array and that will be expanded.
+
+You can optionally pass a second parameter with a data structure. That
+will be used instead of the one provided to the template.
+
+=item B<< H >>
+
+   H
+   H 'path.to.hashref'
+   H 'path.to.hashref', $root
+
+get the variable at the specific path and expand it as hash.
+
+When no path is passed, the root of the input data is assumed to be a
+reference to a hash and that will be expanded.
+
+You can optionally pass a second parameter with a data structure. That
+will be used instead of the one provided to the template.
+
+=item B<< HK >>
+
+   HK
+   HK 'path.to.hashref'
+   HK 'path.to.hashref', $root
+
+get the variable at the specific path, expand it as hash and get its
+keys. This can be useful if you want to iterate over the keys of a
+variable that you know is an hash reference:
+
+   [% for my $key (HK 'my.hash') { ... } %]
+
+is equivalent to:
+
+   [% for my $key (keys %{$variables{my}{hash}}) { ... } %]
+
+but more concise and a bit more readable.
+
+When no path is passed, the root of the input data is assumed to be a
+reference to a hash and that will be expanded.
+
+You can optionally pass a second parameter with a data structure. That
+will be used instead of the one provided to the template.
+
+=item B<< HV >>
+
+   HV
+   HV 'path.to.hashref'
+   HV 'path.to.hashref', $root
+
+similar to L</HK>, but provides values instead of keys.
+
+=item B<< V >>
+
+   V
+   V 'path.to.variable'
+   V 'path.to.variable', $root
+
+get the variable at the specific path. The following:
+
+   [%= V('path.to.variable') + 1 %]
+
+is the same as:
+
+   [%= $variables{path}{to}{variable} + 1 %]
+
+but shorter and more readable.
+
+When no path is passed, the root of the input data is assumed to be a
+scalar and that will be returned.
+
+You can optionally pass a second parameter with a data structure. That
+will be used instead of the one provided to the template.
+
+You can look at this accessor as an alternate form for L</traverse>,
+only with a slightly different input interface (e.g. defaulting to the
+template variables and swapped parameter positions).
+
+=back
+
+=head2 Direct Printing
+
+Up to version 1.50, if you C<print>ed (to C<STDOUT>, which would be the
+selected filehandle) your text would end up directly in the expanded
+text. This was (and is still) meant as a feature.
+
+As of version 1.52, this behaviour can change depending on the value of
+option C<stdout> (see L</new>). By default, its value is such that the
+old behaviour is preserved: prints to C<STDOUT> are trapped and put in
+the template's expansion.
+
+In case the new option C<stdout> is set to a false value, though, any
+C<print> will use the currently selected filehandle before entering the
+template, i.e. C<STDOUT> (the I<real> one, not the one set within the
+template) by default. This allows your code to actually communicate with
+the external world, if you need to.
+
+The following function allows you to still use a C<print>-like interface
+from within the template:
+
+=over
+
+=item B<< P >>
+
+   Hey [% P('foo-bar-baz') %], how are you?
+
+Print an expression directly to the template's expansion. Whatever the
+value of option C<stdout> (see L</new>), this function will always put
+its argument inside the template.
+
+In case C<stdout> is I<true> (which is the default value for backwards
+compatibility), C<P> and C<print> to C<STDOUT> are equivalent (as a
+matter of fact, C<P> just calls C<print> to C<STDOUT> behind the
+scenes).
+
+In case C<stdout> is I<false>, instead, C<P> will send its output to the
+template, while C<print> will send it to whatever handle is currently
+selectd, and C<print> to C<STDOUT> will use the C<STDOUT> available at
+the time of template compilation.
+
+As an example, consider the following template:
+
+   Hey '[% print 'foo' %]'
+   I spoke with '[% print {*STDOUT} 'bar' %]'
+   Do you know '[% P 'baz' %]'?
+
+If C<stdout> is I<true>, it will be expanded to:
+
+   Hey 'foo'
+   I spoke with 'bar'
+   Do you know 'baz'?
+
+If C<stdout> is I<false>, it will be expanded to:
+
+   Hey ''
+   I spoke with ''
+   Do you know 'baz'?
+
+while the string C<foo> will be printed to the currently selected
+filehandle (which is usually C<STDOUT>, but you might have something
+different in your program), and the string C<bar> is printed to
+C<STDOUT> as you know it.
+
+=back
+
+=head2 External Path Handling
+
+The following functions can be exported and expose the algorithms
+implemented by Template::Perlish for breaking a string into a path for
+accessing a data structure, and a traversal function to go into a data
+structure according to a path.
+
+They can be useful in case you need to build the data structure to pass
+to Template::Perlish before expanding a template. A typical case might
+be that you have a command line option to set the value of variables in
+the data structure to be expanded in the template:
+
+   $ my-command --define path.to.1.variable=blah
+
+and you want to apply the same algorithm as Template::Perlish, i.e. set
+your data structure like this:
+
+   $data->{path}{to}[1]{variable} = 'blah';
+
+This will provide consistency when expanding the template, because using
+the same path will provide the right value:
+
+   [% path.to.1.variable %] expands to blah
+
+=over
+
+=item B<< crumble >>
+
+   my $array_ref = crumble($path);
+
+split the input C<$path> into I<crumbs> that should be followed into
+some data structure (you can use L</traverse> to do the actual
+traversal). Returns a reference to an array with the crumbs, in order.
+Returns C<undef> if the provided C<$path> cannot be broken down. See
+L</Templates> for the rules of breaking a path into pieces, this is the
+actual function used to do that.
+
+=item B<< traverse >>
+
+   my $x = traverse($data); # OR
+   my $x = traverse($data \%opts); # OR
+   my $x = traverse($data, $path); # OR
+   my $x = traverse($data, $path, \%opts);
+
+traverse an input data structure and return I<something> (depending on
+the C<$data>).
+
+The first argument C<$data> is mandatory and can be:
+
+=over
+
+=item *
+
+I<a HASH or ARRAY reference>, in which case a normal traversal will take
+place, and missing keys/indexes will stop the traversal;
+
+=item *
+
+I<a reference to a SCALAR or to another REF>, in which case
+auto-vivification in traversal will be enabled (see below for details);
+
+=item *
+
+I<anything else>, in which case it's better to either avoid C<$path> or
+to provide an empty one to get it back, or it is likely to give an error
+(because you can't traverse it actually).
+
+=back
+
+When provided, C<$path> is the path to follow inside C<data>. It can be
+either a plain string that will be split using L</crumble>, or an array
+reference containing the different I<crumbs> to follow. When missing, it
+is the same as providing the empty path (i.e. an empty string or a
+reference to an empty array).
+
+Depending on what is held in C<$data>, you will get either a value back
+(if auto-vivification is NOT active) or a reference to it (if it is
+active). This also changes how the traversal is done in case of missing
+parts.
+
+In particular, you will want to pass a reference to a hash or array if
+you want to just I<read> from C<data>. In this case, the first missing
+crumb will make the function return immediately an empty string value;
+moreover, if all crumbs are successfully found, the value will be
+returned. This is what is actually used by the functions described in
+L</Variables Accessors>.
+
+If you pass a reference to a scalar or to another reference instead, you
+will get back a reference to a value. In this case, any missing parts
+will trigger auto-vivification of the data structure, i.e. the missing
+parts will be created automatically for you. This comes handy when you
+want to I<write> into the data structure, like in the following example:
+
+   my $empty_data;
+   my $ref_to_v = traverse(\$empty_data, "some.0.'comp-lex'.path");
+   $$ref_to_v = 42; # note double sigil for indirection
+   # now we have that $empty_data is equal to:
+   # { some => [ { 'comp-lex' => { path => 42 } } ] }
+
+You can e.g. want to use this approach to provide a consistent way to
+set variables and expand them into templates:
+
+   my $vars;
+   ${traverse(\$vars, 'one.two.3')} = 42;
+   my $text = render('It is as simple as [% one.two.3 %]', $vars);
+
+Of course variable values might come from the command line or some other
+source in the real world!
+
+When something goes wrong in the traversal, C<undef> is returned if
+auto-vivification is enabled, an empty string is returned otherwise.
+
+If C<$path> is a reference to an array, its components can be plain
+scalars or references themselves. When they are plain scalars, they are
+used directly to access C<data> or its descendants; otherwise,
+C<traverse> enforces that the current descendant in C<data> is a
+reference of the same type as the specific crumb. Consider this example:
+
+   my $data = { one => { two => [ qw< ciao a tutti quanti > ] } }
+   my $path1 = [ qw< one two 3 > ];           # good
+   my $path2 = [ 'one', { two => 1 }, 3 ];    # good
+   my $path3 = [ 'one', { two => 1 }, [3] ];  # good
+   my $path4 = [ qw< one two >, { 3 => 1 } ]; # fails if !ref
+
+To get the C<quanti> string, you have to traverse (in order) one hash,
+one hash and one array. The first path C<$path1> is good to this regard,
+because it does not ask for any check and the last element is a good one
+to be used as an array index.
+
+C<$path2> and C<$path3> are good as well, because the required checks
+are fine: after passing C<one> we end up with a hash, that is the same
+reference as C<< { two => 1} >> and gets us to the array reference.
+C<$path3> asks for a further check that we are actually dealing with an
+array reference at this stage.
+
+C<$path4> is not good because after traversing C<one> and C<two> we end
+up with an array reference. At this point, the next crumb is an hash
+reference instead (whose key is C<3>), so the matching fails.
+
+As you have seen, if you are forcing a match on the reference type, the
+actual key used to dive into the relevant descendant of C<data> is
+either the (only) element of an array reference (as in C<[3]> that
+becomes C<3>), or the (only) key of a hash reference (as in
+C<< { two => 1 } >> that becomes C<two>).
+
+When auto-vivification is active, a reference in the C<path> will also
+force a specific auto-vivification type, i.e. the automatic creation of
+either an array or a hash reference. If the crumb in C<path> is not a
+reference, a guess is taken in that non-negative integers are considered
+indexes of an array, otherwise a hash is assumed. So, let's take
+C<$path4> again, and let's see what happens when C<ref> is true:
+
+   my $path4 = [ qw< one two >, { 3 => 1 } ];
+   my $data = {}; # start e.g. with an empty hash
+   ${traverse(\$data, $path4)} = 42;
+
+will auto-vivify C<$data> completely and leave it as follows:
+
+   $data = {
+      one => {        # "one" is not a non-negative integer => HASH
+         two => {     # "two" is not a non-negative integer => HASH
+            3 => 42   # { 3 => 1 } is a hash reference      => HASH
+         }
+      }
+   }
+
+As of version 1.52, you can also pass an extra hash reference with some
+additional options for traversal. For example, consider the following
+setup:
+
+    sub what { return 'hey' };
+    sub urgh { return 'gaah!' }
+    my $object = bless {what => 'ever', foo => 'bar'}, __PACKAGE__;
+
+Object C<$object> is a blessed hash reference with two keys, two methods
+and one method that has the same name of one of the keys. The different
+available options will help you decide what to do in this situation:
+
+=over
+
+=item C<method_over_key>
+
+when traversal by method is enabled (see C<traverse_methods> below),
+this option allows controlling whether the key or the method win when
+both are present.
+
+In the example above, if this option is set to a I<true> value the path
+C<what> triggers a method call; otherwise, the value in the hash is
+considered (i.e. C<ever> in the example). When a key is not present, the
+method is called as a fallback.
+
+Defaults to a I<false> value.
+
+=item C<strict_blessed>
+
+when traversal by method is enabled (see below), whenever a blessed
+object is hit in the traversal only method calls are allowed. This
+disables I<peeking> inside the object in case a method is not available
+but a key exists.
+
+In the example above, using path C<what> always triggers the method call
+(returning C<hey>), using path C<urgh> calls the method call, using path
+C<foo> returns the empty string.
+
+This option hides option C<method_over_key>.
+
+Defaults to a I<false> value.
+
+=item C<traverse_methods>
+
+boolean flag to enable traversal of blessed objects using method calls
+instead of direct inspection by key. When this is false, the other two
+options above are ignored.
+
+In the example object, if this parameter is set to a I<false> value the
+object will be considered just a plain hash. Otherwise, what a visit for
+keys C<what>, C<urgh> and C<foo> returns depends on the options above.
+
+Defaults to a false value for backwards compatibility.
+
+=back
+
+The following scheme attempts to explain what happens in the different
+cases:
+
+    traverse_methods = false (default)
+      strict_blessed = whatever
+    method_over_keys = whatever
+        what -> 'ever'      # key is used, method is ignored
+        foo  -> 'bar'       # key is used
+        urgh -> ''          # method is ignored
+
+    traverse_methods = true
+      strict_blessed = false (default)
+    method_over_keys = false (default)
+        what -> 'ever'      # key wins over method
+        foo  -> 'bar'       # key is used
+        urgh -> 'gaah!'     # no key, method is called
+
+    traverse_methods = true
+      strict_blessed = false (default)
+    method_over_keys = true
+        what -> 'hey'       # method wins over key
+        foo  -> 'bar'       # key is used
+        urgh -> 'gaah!'     # method is called
+
+    traverse_methods = true
+      strict_blessed = true
+    method_over_keys = whatever
+        what -> 'hey'       # method wins over key
+        foo  -> ''          # key is ignored
+        urgh -> 'gaah!'     # method is called
+
+=back
+
+=head1 DIAGNOSTICS
+
+Diagnostics have been improved in release 1.2 with respect to previous
+versions, although there might still be some hiccups here and there.
+Errors related to the template, in particular, will show you the
+surrounding context of where the error has been detected, although the
+exact line indication might be slightly wrong. You should be able to
+find it anyway.
+
+=over
+
+=item C<< open(): %s >>
+
+the only C<perlfunc/open> is done to print stuff to a string. If you get
+this error, you're probably using a version of Perl that's too old.
+
+=item C<< unclosed %s at position %d >>
+
+a Perl block was opened but not closed.
+
+=back
+
+Other errors are generated as part of the Perl compilation, so they will
+reflect the particular compile-time error encountered at that time.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Template::Perlish requires no configuration files or environment
+variables.
+
+
+=head1 DEPENDENCIES
+
+None, apart a fairly recent version of Perl.
+
+
+=head1 INCOMPATIBILITIES
+
+As of version 1.52, providing an empty template will give you back an
+empty string, as opposed to C<undef> that is the old behaviour.
+
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through http://rt.cpan.org/
+
+Due to the fact that Perl code is embedded directly into the template,
+you have to take into consideration all the possible security
+implications.  In particular, you should avoid taking templates from
+outside, because in this case you'll be evaluating Perl code that you
+haven't checked.  CAVEAT EMPTOR.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008-2016 by Flavio Poletti C<polettix@cpan.org>.
+
+This module is free software.  You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=head1 SEE ALSO
+
+The best templating system in the world is undoubtfully
+L<Template::Toolkit>.
+
+See
+L<http://perl.apache.org/docs/tutorials/tmpl/comparison/comparison.html>
+for a comparison (and a fairly complete list) of different templating
+modules.
+
+=cut
+

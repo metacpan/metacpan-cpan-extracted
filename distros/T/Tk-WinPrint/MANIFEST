@@ -1,0 +1,13 @@
+MANIFEST
+Makefile.PL
+README
+WinPrint.c
+WinPrint.pm
+test.pl
+tkWinPrint.h
+tkWinPrint.m
+tkWinPrint.t
+tkWinPrintCanvas.c
+tkWinPrint_f.c
+tkWinPrint_f.h
+Changes

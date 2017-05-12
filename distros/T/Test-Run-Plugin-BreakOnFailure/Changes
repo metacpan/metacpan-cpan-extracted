@@ -1,0 +1,22 @@
+Revision history for Test::Run::Plugin::AlternateInterpreters
+
+0.0.5   2015-05-31
+        - Replace links with metacpan.org.
+        - Add VCS repository to the META.yml/META.json.
+        - Remove or replaceold links.
+
+0.0.4   2014-04-29
+        - Minimum version of perl - in requires this time. (CPANTS) .
+
+0.0.3   2014-01-31
+        - Add t/cpan-changes.t and t/style-trailing-space.t .
+        - Add LICENSE (CPANTS).
+        - Minimum version of perl.
+
+0.0.2   2012-11-17
+        - Add Dist/tag-release.pl to tag a release.
+        - Fix the tests on some versions (due to a stray "END:" label):
+            - http://www.cpantesters.org/cpan/report/1b2066a2-243b-11e2-b162-b0ec0f99f9b5
+
+0.0.1   2007-03-16
+        First version, released on an unsuspecting world.

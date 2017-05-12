@@ -1,0 +1,10 @@
+Revision history for Tickit-Widget-Term
+
+0.002     2015-03-07 14:40:59+00:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Added missing deps to cpanfile
+
+0.001     2015-03-04 16:46:32+00:00 Europe/London
+	Initial CPAN release

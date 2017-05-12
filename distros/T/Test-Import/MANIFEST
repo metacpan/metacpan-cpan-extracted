@@ -1,0 +1,10 @@
+Build.PL
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Test/Import.pm
+t/00_compile.t

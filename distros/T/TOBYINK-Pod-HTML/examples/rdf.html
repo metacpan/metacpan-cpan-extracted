@@ -1,0 +1,38 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>RDF Syntax Highlighting Examples</title>
+		<meta charset="utf-8" />
+	</head>
+	<body class="pod">
+		<span id="___top"></span>
+		<h1><span id="NAME">NAME</span></h1>
+		<p>RDF Syntax Highlighting Examples</p>
+		<h1><span id="EXAMPLES">EXAMPLES</span></h1>
+		<p>Here is some Turtle for syntax highlighting...</p>
+		<!-- for highlighter language=Turtle -->
+		<pre class="highlighting-turtle">   <span class="rdf_prefixdefinition_start" data-rdf-prefix="foaf" data-rdf-uri="http://xmlns.com/foaf/0.1/"><span class="rdf_atrule" style="color:#000000;font-weight:bold">@prefix</span> <span class="rdf_curie" data-rdf-prefix="foaf" data-rdf-uri="http://xmlns.com/foaf/0.1/" style="color:#000099;font-weight:bold">foaf:</span> <span class="rdf_uriref" data-rdf-uri="http://xmlns.com/foaf/0.1/" style="color:#0000cc">&lt;http://xmlns.com/foaf/0.1/&gt;</span><span class="rdf_punctuation" style="color:#990000;font-weight:bold">.</span></span>
+   
+   <span class="rdf_uriref" data-rdf-uri="http://tobyinkster.co.uk/#i" style="color:#0000cc">&lt;http://tobyinkster.co.uk/#i&gt;</span>
+      <span class="rdf_shorthand" style="color:#000099;font-weight:bold;font-style:italic">a</span> <span class="rdf_curie" data-rdf-prefix="foaf" data-rdf-suffix="Person" data-rdf-uri="http://xmlns.com/foaf/0.1/Person" style="color:#000099;font-weight:bold">foaf:Person</span><span class="rdf_punctuation" style="color:#990000;font-weight:bold">;</span>
+      <span class="rdf_curie" data-rdf-prefix="foaf" data-rdf-suffix="name" data-rdf-uri="http://xmlns.com/foaf/0.1/name" style="color:#000099;font-weight:bold">foaf:name</span> <span class="rdf_shortstring" style="color:#cc00cc">"Toby Inkster"</span><span class="rdf_punctuation" style="color:#990000;font-weight:bold">.</span></pre>
+		<p>And here's how you might query it using SPARQL...</p>
+		<!-- for highlighter language=SPARQL -->
+		<pre class="highlighting-sparql">   <span class="rdf_sparql_keyword" style="color:#000000;font-weight:bold;font-style:italic">PREFIX</span> <span class="rdf_curie" data-rdf-prefix="foaf" style="color:#000099;font-weight:bold">foaf:</span> <span class="rdf_uriref" data-rdf-uri="http://xmlns.com/foaf/0.1/" style="color:#0000cc">&lt;http://xmlns.com/foaf/0.1/&gt;</span>
+   <span class="rdf_sparql_keyword" style="color:#000000;font-weight:bold;font-style:italic">SELECT</span> <span class="rdf_variable" style="color:#009900;font-weight:bold;font-style:italic">?name</span>
+   <span class="rdf_sparql_keyword" style="color:#000000;font-weight:bold;font-style:italic">WHERE</span> <span class="rdf_brace" style="color:#990000;font-weight:bold">{</span>
+      <span class="rdf_uriref" data-rdf-uri="http://tobyinkster.co.uk/#i" style="color:#0000cc">&lt;http://tobyinkster.co.uk/#i&gt;</span> <span class="rdf_curie" data-rdf-prefix="foaf" data-rdf-suffix="name" style="color:#000099;font-weight:bold">foaf:name</span> <span class="rdf_variable" style="color:#009900;font-weight:bold;font-style:italic">?name</span><span class="rdf_punctuation" style="color:#990000;font-weight:bold">.</span>
+   <span class="rdf_brace" style="color:#990000;font-weight:bold">}</span></pre>
+		<p>And this is the result set you might get:</p>
+		<!-- for highlighter language=JSON -->
+		<pre class="highlighting-json">   <span class="json_brace" style="color:#990000;font-weight:bold">{</span>
+      <span class="json_string" style="color:#cc00cc">"head"</span><span class="json_punctuation" style="color:#990000;font-weight:bold">:</span> <span class="json_brace" style="color:#990000;font-weight:bold">{</span> <span class="json_string" style="color:#cc00cc">"vars"</span><span class="json_punctuation" style="color:#990000;font-weight:bold">:</span> <span class="json_bracket" style="color:#990000;font-weight:bold">[</span><span class="json_string" style="color:#cc00cc">"name"</span><span class="json_bracket" style="color:#990000;font-weight:bold">]</span> <span class="json_brace" style="color:#990000;font-weight:bold">}</span><span class="json_punctuation" style="color:#990000;font-weight:bold">,</span>
+      <span class="json_string" style="color:#cc00cc">"results"</span><span class="json_punctuation" style="color:#990000;font-weight:bold">:</span> <span class="json_brace" style="color:#990000;font-weight:bold">{</span> 
+         <span class="json_string" style="color:#cc00cc">"bindings"</span><span class="json_punctuation" style="color:#990000;font-weight:bold">:</span> <span class="json_bracket" style="color:#990000;font-weight:bold">[</span>
+            <span class="json_brace" style="color:#990000;font-weight:bold">{</span>
+               <span class="json_string" style="color:#cc00cc">"title"</span><span class="json_punctuation" style="color:#990000;font-weight:bold">:</span> <span class="json_brace" style="color:#990000;font-weight:bold">{</span> <span class="json_string" style="color:#cc00cc">"type"</span><span class="json_punctuation" style="color:#990000;font-weight:bold">:</span> <span class="json_string" style="color:#cc00cc">"literal"</span><span class="json_punctuation" style="color:#990000;font-weight:bold">,</span> <span class="json_string" style="color:#cc00cc">"value"</span><span class="json_punctuation" style="color:#990000;font-weight:bold">:</span> <span class="json_string" style="color:#cc00cc">"Toby Inkster"</span> <span class="json_brace" style="color:#990000;font-weight:bold">}</span>
+            <span class="json_brace" style="color:#990000;font-weight:bold">}</span>
+         <span class="json_bracket" style="color:#990000;font-weight:bold">]</span>
+      <span class="json_brace" style="color:#990000;font-weight:bold">}</span>
+   <span class="json_brace" style="color:#990000;font-weight:bold">}</span></pre>
+	</body>
+</html>

@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+use Text::RewriteRules;
+use strict;
+Text::RewriteRules::_compiler();
+
+=head1 NAME
+
+textrr - rewrite rules compiler
+
+=head1 SYNOPSIS
+
+   $ textrr file.rr > file.pl
+
+=head1 DESCRIPTION
+
+L<Text::RewriteRules> converts rules into Perl on the fly. For
+efficiency purposes, you can compile the rules into Perl code,
+removing the overhead of parsing them when starting the script, and
+removing the dependency to this module.
+
+=head1 SEE ALSO
+
+Text::RewriteRules
+
+=cut

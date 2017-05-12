@@ -1,0 +1,26 @@
+---
+
+- schema: Owner
+  name: the_affe_user
+  data:
+    id: 1
+    name: affe
+    login: zomtec
+    password: verysecret
+
+- schema: Owner
+  name: ss5
+  data:
+    id: 2
+    name: Steffen Schwigon@bascha
+    login: ss5
+    password: verysecret
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 3
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+

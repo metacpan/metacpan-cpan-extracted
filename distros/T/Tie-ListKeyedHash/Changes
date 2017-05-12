@@ -1,0 +1,24 @@
+ 1.02 17 Sep 2005 - Extended tests to 100% coverage. Fixed bugs in 'exists'.
+                    Fixed returned value for undefined values and handling
+                    of setting undefined values. Miscellaneous code cleanups
+                    and streamlining. Added examples to clarify what the
+                    module actually does and why it is useful.
+
+                    Extended the 'new' method to permit the efficient importing
+                    of a pre-existing hash or hash reference.
+
+ 1.01 16 Sep 2005 - Restoring POD was that went missing from 1.00 upload.
+                    Added META.yml to MANIFEST.
+ 
+ 1.00 15 Sep 2005 - Reorganized and clarified documentation, added build tests.
+                    Fixed bug in 'exists' support.
+
+ 0.41 09 Jun 1999 - Minor documentation changes.
+
+ 0.40 04 May 1999 - Renamed to 'Tie::ListKeyedHash' after discussion on
+                    comp.lang.perl.module and added (on the suggestion of
+                    Ilya Zakharevich, <ilya@math.ohio-state.edu>) support
+                    for using the tie hash as $hash{'key1','key2','key3'}
+                    as well as its native mode of $hash{['key1','key2','key3']}
+
+ 0.20 30 Apr 1999 - Initial public release as 'Tie::ArrayHash'

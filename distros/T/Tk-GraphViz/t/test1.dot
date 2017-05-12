@@ -1,0 +1,14 @@
+digraph test123 {
+        a -> b -> c [style=dotted];
+        a -> {x y};
+        b [shape=box,style="setlinewidth(5),dotted"];
+        c [label="hello\nworld",color=blue,fontsize=24,
+           fontname="Palatino-Italic",fontcolor=red,style=filled];
+        a -> z [label="hi", weight=100, color=orange, style="setlinewidth(4),dashed"];
+        x -> z [label="multi-line\nlabel"];
+        edge [style=dashed,color=red];
+        b -> x;
+        {rank=same; b x}
+
+	d -> e -> f -> g -> h -> i -> j -> k -> l;
+}

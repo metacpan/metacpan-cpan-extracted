@@ -1,0 +1,105 @@
+[%#- -*- mode: tt -*- %]
+[%- PROCESS 'include/defaults' -%]
+[% USE env = EnvHash %]
+[% USE Autoformat %]
+[%- IF machine           != '' %][% THROW LEGACY "Use '-Dmachines=...' (plural).\n" %][% END -%]
+[%- IF queue             == '' %][% queue           = 'AdHoc' %][% END -%]
+[%- IF topic             == '' %][% topic           = 'Misc' %][% END -%]
+[%- IF tests_host        == '' %][% tests_host      = '/PATH/TO/STARTSCRIPT.sh' %][% END -%]
+[%- IF test_timeout      == '' %][% test_timeout    = '10800' %][% END -%]
+[%- IF machines          == '' %][% machines        = 'einstein,hawking,turing' %][% END -%]
+[%- IF producer          == '' %][% producer        = '' %][% END -%]
+[%- IF producer_params   == '' %][% producer_params = '' %][% END -%]
+[%- IF producer_env      == '' %][% producer_env    = '' %][% END -%]
+[%- IF shorttitle_test_host  == '' %][% shorttitle_test_host    = '' %][% END -%]
+[%- IF shorttitle_test_guest == '' %][% shorttitle_test_guest   = '' %][% END -%]
+[%- shorttitle_test_host = BLOCK %][% IF tests_host.match(',') %]MULTI[% ELSE %][% tests_host.replace('.*/([^/]+)$', '$1').replace('^(xen|kvm|any)-','').replace('\.sh$','').replace('\.t$','').replace('[-_]','') %][% END %][% END -%]
+[%- IF title             == ''    %][% title          = BLOCK %]Starter[%- IF shorttitle_test_host != '' %]-[% shorttitle_test_host %][% ELSE %][% END %][%- IF shorttitle_test_guest != '' %]-[% shorttitle_test_guest %][% END %][% END %][% END -%]
+[%- IF titlesuffix       == ''    %][% titlesuffix = BLOCK %][%- IF shorttitle_benchmark_guest != '' %][% shorttitle_benchmark_guest %][% END %][% END %][% END -%]
+[%- AllMachines       = machines.split(',')      || [] -%]
+[%- AllTestsHost      = tests_host.split(',')    || [] -%]
+[%- AllProducerEnv    = producer_env.split(';')  || [] -%]
+[% fullname = BLOCK %][% title %][% IF titlesuffix %]-[% titlesuffix %][% END %][% END %]
+###
+### Start a local program to initiate a testrun.
+### [topic.any.generic.local]
+###
+###
+### Name   : [% fullname %]
+###
+### Optional params:
+###
+###   -Dtests_host=<testname>    Starter scripts, comma separated;                          default: /PATH/TO/STARTSCRIPT.sh
+###   -Dtest_timeout=<seconds>   Timeout for tests;                                         default: 10800 (3h)
+###   -Dmachines=<machine>       Machine names, comma separated;                            default: einstein,hawking,turing
+###   -Dqueue=<queue>            Queue to use;                                              default: AdHoc
+###   -Dtitlesuffix=<string>     Suffix to be used in testplan and testrun names;           default: <empty>
+###   -Dproducer=<programname>   Program to produce preconditions;                          default: <empty>
+###   -Dproducer_params=<paramlist> Parameter line to producer program;                     default: <empty>
+###   -Dproducer_env=<varlist>   Env vars to producer; semicolon-separated key=value pairs; default: <empty>
+###
+###
+### Available values:
+###
+###   machines:
+[%- FILTER Autoformat(all => 1) %]
+###      [% FOREACH m = machine_list -%][% m %], [% END %]
+[% END %]
+##   tests (tests_host, tests_guest):
+##      - non-path words are interpreted as Autotest subtests:
+##
+[%- FILTER Autoformat(all => 1) %]
+##          [% FOREACH t = useful_autotest_tests -%][% t %], [% END %]
+[%- END -%]
+##      - absolute path names, like "/data/tapper/autoreport/mytest.t"
+##        are interpreted as script to execute (and every file inside
+##        that path/* will also be copied)
+##
+###   producer:
+###      SYNOPSIS:
+###        -Dproducer=build.sh
+###        -Dproducer_params="-Dcc=gcc -Dprefix=/usr/local"
+###        -Dproducer_env="CFLAGS='-O2 -march=k6 -mcpu=k6';TARGETNAME=example-kernel-file'"
+###
+###
+### Typical command lines (User tapper@tapper):
+###
+###   $ tapper testplan-new --file [% env.HOME %]/.tapper/testplans/topic/any/generic/local
+###   $ tapper testplan-new --file [% env.HOME %]/.tapper/testplans/topic/any/generic/local -Dmachines=machine1,machine2
+###   $ tapper testplan-new --file [% env.HOME %]/.tapper/testplans/topic/any/generic/local -Dmachines=lemure -Dtests_host=/PATH/TO/STARTSCRIPT1.sh,/PATH/TO/STARTSCRIPT2.sh
+###
+[%- FOREACH machine = AllMachines %]
+---
+type: multitest
+description:
+   shortname: "[% title %] - [% kernelpkg %]"
+   topic: [% topic %]
+   queue: [% queue %]
+   requested_hosts_all:
+        - [% machine %]
+   preconditions:
+[%- IF producer != '' %]
+        - precondition_type: produce
+          producer: ExternalProgram
+          program: [% producer %]
+[%-    IF producer_params != '' %]
+          parameters:
+            - [% producer_params %]
+[%     END -%][%# IF producer_params -%]
+[%-    IF producer_env != '' %]
+          environment:
+[%-       FOREACH env = AllProducerEnv %][% env_entry = env.split('=') %][%# beware of values containing "=" %]
+            [% env_entry.0 %]: [% env_entry.slice(1,env_entry.max).join("=") %]
+[%-       END -%]
+[%     END -%]
+[% END -%][%# IF producer %]
+[%- FOREACH test0 = AllTestsHost %]
+        - precondition_type: testprogram
+          program: [% test0 %]
+          timeout: [% test_timeout %]
+          capture: tap
+[% END -%][%# FOREACH AllTestsHost testprograms %]
+        - precondition_type: hint
+          skip_install: 1
+          local: 1
+[%- END %][%# FOREACH AllMachines %]

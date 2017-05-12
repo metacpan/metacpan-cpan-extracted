@@ -1,0 +1,13 @@
+# UserExec Mode - Show Commands
+# Last updated 2011-04-25
+<fr>
+    history_d = FRENCH Print history
+    history_h = <<EO-HISTORY
+            FRENCH This will print the history and has a command syntax of history [INT]
+            EO-HISTORY
+            
+    show_interface_d = FRENCH Show interface details
+    show_interface_h = <<EO-SHOW-INTERFACE
+            FRENCH This is the help details for show interfaces
+            EO-SHOW-INTERFACE
+</fr>

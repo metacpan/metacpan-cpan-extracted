@@ -1,0 +1,73 @@
+0.000018  2016-06-24 06:00:04-07:00 America/Los_Angeles
+
+    - No changes since last trial
+
+0.000017  2016-06-22 11:32:15-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make our hub inherit pre_filters properly
+
+0.000016  2016-05-30 07:36:39-07:00 America/Los_Angeles
+
+    - Fix bug where subtest results were repeated
+
+0.000015  2016-05-09 08:03:51-07:00 America/Los_Angeles
+
+0.000014  2016-04-14 09:40:01-07:00 America/Los_Angeles
+
+    - Support custom formatters
+    - Add subtest info to events
+
+0.000013  2016-03-20 13:47:39-07:00 America/Los_Angeles
+
+    - Add subtest name to pending warning
+
+0.000012  2016-03-18 17:52:46-07:00 America/Los_Angeles
+
+    - Fix trigger conditions for pending warning
+
+0.000011  2016-03-18 08:12:05-07:00 America/Los_Angeles
+
+    - Inherit listeners and filters (make TODO work)
+    - Add 'todo' option to finish()
+
+0.000010  2016-03-17 23:21:58-07:00 America/Los_Angeles
+
+    - Fix bug in 'skip' option when nesting
+
+0.000009  2016-03-17 11:51:08-07:00 America/Los_Angeles
+
+    - Add 'skip' option for finish()
+
+0.000008  2016-03-10 16:53:55-08:00 America/Los_Angeles
+
+    - Add 'silent', 'no_plan' and 'collapse' options for finish()
+
+0.000007  2016-03-09 10:07:53-08:00 America/Los_Angeles
+
+    - Fix tests for some perl+thread combos
+
+0.000006  2016-03-08 08:47:22-08:00 America/Los_Angeles
+
+    - Fix #6, make tools more argument aware
+
+0.000005  2016-03-07 12:21:28-08:00 America/Los_Angeles
+
+    - Add ability to bypass subtest skip_all flow control
+
+0.000004  2016-03-06 20:19:02-08:00 America/Los_Angeles
+
+    - Require newer Test2
+    - Add extended skip_all tests
+    - Add version to all modules (autarch)
+
+0.000003  2016-03-05 17:33:15-08:00 America/Los_Angeles
+
+    - Update for min threads version
+
+0.000002  2016-03-02 13:49:22-08:00 America/Los_Angeles
+
+    - Complete Rewrite
+
+0.000001  2016-02-23 15:35:07-08:00 America/Los_Angeles
+
+    - Initial Release

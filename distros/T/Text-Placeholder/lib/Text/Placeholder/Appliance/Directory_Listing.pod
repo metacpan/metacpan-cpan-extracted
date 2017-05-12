@@ -1,0 +1,35 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Appliance::Directory_Listing - generate a directory listing
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder::Appliance::Directory_Listing;
+
+	my $listing = Text::Placeholder::Appliance::Directory_Listing->new(
+		'[=counter=]. [=file_name_full=] [=file_mode_rwx=]');
+	my $rows = $listing->generate('/');
+	print join("\n", @$rows), "\n";
+
+=head1 DESCRIPTION
+
+Text::Placeholder::Appliance::Directory_Listing takes a format and a directory name and produces a directory listing from it. It's an example how to build an appliance from placeholder groups.
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

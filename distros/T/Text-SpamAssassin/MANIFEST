@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+examples/comment_spam_prefs.cf
+lib/Text/SpamAssassin.pm
+t/1.t

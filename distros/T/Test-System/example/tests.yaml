@@ -1,0 +1,8 @@
+ping:
+    description: Test the ping and do foo and make bar
+    code: tests/ping.pl
+    params:
+        -
+            name: ping_count
+            description: Number of pings we will send
+    

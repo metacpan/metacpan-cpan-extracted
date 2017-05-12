@@ -1,0 +1,87 @@
+NAME
+    Test::Fatal::matchfor - match exceptions by class name or regexp
+
+SYNOPSIS
+    Let's say you're testing the following Moose class...
+
+       package Goose {
+          use Moose;
+          has feather_count => (is => 'rw', isa => 'Int');
+       }
+
+    In Moose 2.1102 and above, exception objects are thrown, but in earlier
+    versions of Moose, only string errors are given.
+
+    So we might want to test it something like this:
+
+       use Test::More;
+       use Test::Fatal;
+   
+       use Goose;
+   
+       my $e = exception {
+          Goose->new(feather_count => 3.1)
+       };
+   
+       ref($e)
+          ? isa_ok($e, 'Moose::Exception::ValidationFailedForTypeConstraint')
+          : like($e, qr{does not pass the type constraint})
+
+    This module provides a small shortcut for that pattern:
+
+       use Test::More;
+       use Test::Fatal;
+       use Test::Fatal::matchfor;
+   
+       use Goose;
+   
+       my $e = exception {
+          Goose->new(feather_count => 3.1)
+       };
+   
+       is(
+          $e,
+          matchfor(
+             'Moose::Exception::ValidationFailedForTypeConstraint',
+             qr{does not pass the type constraint},
+          ),
+       );
+
+DESCRIPTION
+    Test::Fatal::matchfor exports the `matchfor` function which accepts a list
+    of class/role names and regular expressions, and constructs an object
+    overloading `==` and `eq` to return true if compared for equality against
+    a string that matches one of those regular expressions, or an object that
+    isa/does one of those class/role names.
+
+    So for example, to check a type constraint error in Moose, you might use:
+
+       my $tc_err = matchfor(
+          'Moose::Exception::ValidationFailedForTypeConstraint',
+          'Moose::Exception::ValidationFailedForInlinedTypeConstraint',
+          qr{does not pass the type constraint},
+       ),
+   
+       is($exception, $tc_err, "encountered error as expected");
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Test-Fatal-matchfor>.
+
+SEE ALSO
+    Test::Fatal, Moose::Exception.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

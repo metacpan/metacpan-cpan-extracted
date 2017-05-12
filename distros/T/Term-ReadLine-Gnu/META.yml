@@ -1,0 +1,27 @@
+---
+abstract: 'Perl extension for the GNU Readline/History Library'
+author:
+  - 'Hiroo HAYASHI <hiroo.hayashi@computer.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-ReadLine-Gnu
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Term-ReadLine-Gnu
+  homepage: http://sourceforge.net/projects/perl-trg/
+  license: http://dev.perl.org/licenses/
+  repository: https://sourceforge.net/p/perl-trg/code/HEAD/tree/
+version: '1.35'

@@ -1,0 +1,46 @@
+
+
+Working Directory = /scratch/my_design
+QoS Summary for my_design
+========================================================================================
+Metric                  elab       generic    map        map_incr   final     
+========================================================================================
+Slack (ps):                 39.5       74.0      -34.8        0.0        0.0
+  R2R (ps):                479.6      482.6       28.9        0.0        0.0
+  I2R (ps):                 39.5       74.0      -34.8        0.0        0.0
+  R2O (ps):                866.3      866.3      809.4      810.0      810.0
+  I2O (ps):             no_value   no_value   no_value   no_value   no_value
+  CG  (ps):             no_value   no_value      951.5      951.5      951.5
+TNS (ps):                      0          0         65          0          0
+  R2R (ps):                  0.0        0.0        0.0        0.0        0.0
+  I2R (ps):                  0.0        0.0       65.0        0.0        0.0
+  R2O (ps):                  0.0        0.0        0.0        0.0        0.0
+  I2O (ps):             no_value   no_value   no_value   no_value   no_value
+  CG  (ps):             no_value   no_value        0.0        0.0        0.0
+Failing Paths:                 0          0          2          0          0
+Area:                       5000       4711       2693       2545       2545
+Instances:                  2431       2351       1368       1225       1225
+Utilization (%):            0.00       0.00       0.00       0.00       0.00
+Tot. Net Length (um):   no_value   no_value   no_value   no_value   no_value
+Avg. Net Length (um):   no_value   no_value   no_value   no_value   no_value
+Total Overflow H:              0          0          0          0          0
+Total Overflow V:              0          0          0          0          0
+Route Overflow H (%):   no_value   no_value   no_value   no_value   no_value
+Route Overflow V (%):   no_value   no_value   no_value   no_value   no_value
+========================================================================================
+CPU  Runtime (m:s):        00:15      00:02      00:05      00:06      00:03
+Real Runtime (m:s):        00:18      00:01      00:45      00:07      00:03
+CPU  Elapsed (m:s):        00:18      00:20      00:25      00:31      00:34
+Real Elapsed (m:s):        00:19      00:20      01:05      01:12      01:15
+Memory (MB):              242.00     244.00     250.00     255.00     256.00
+========================================================================================
+
+========================================================================================
+Flow Settings:
+========================================================================================
+Total Runtime (m:s): 01:14
+Total Memory (MB):   256.00
+Executable Version:  12.20
+========================================================================================
+
+

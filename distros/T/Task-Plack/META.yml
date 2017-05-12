@@ -1,0 +1,97 @@
+---
+abstract: 'Plack bundle'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: 0.019
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Plack
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+optional_features:
+  catalyst_engine:
+    description: 'Catalyst Engine'
+    requires:
+      Catalyst::Engine::PSGI: 0.13
+  cgi_application_psgi:
+    description: CGI::Application::PSGI
+    requires:
+      CGI::Application::PSGI: 1.00
+  extra_middleware_components:
+    description: 'Extra Middleware Components'
+    requires:
+      Plack::Middleware::AutoRefresh: 0.08
+      Plack::Middleware::File::Sass: 0.03
+      Plack::Middleware::JSConcat: 0.29
+      Plack::Middleware::Status: 1.101150
+      Plack::Middleware::Throttle: 0.01
+  extra_psgi_servers_and_plack_handlers:
+    description: 'Extra PSGI servers and Plack handlers'
+    requires:
+      Perlbal::Plugin::PSGI: 0.03
+      Plack::Handler::AnyEvent::HTTPD: 0.03
+      Plack::Handler::AnyEvent::ReverseHTTP: 0.04
+      Plack::Handler::AnyEvent::SCGI: 0.02
+      Plack::Handler::SCGI: 0.02
+  in_development_psgi_servers:
+    description: 'In-Development PSGI Servers'
+  mason_psgi_handler:
+    description: 'Mason PSGI handler'
+  maypole_psgi:
+    description: Maypole::PSGI
+  sledge:
+    description: Sledge
+  squatting_on:
+    description: Squatting::On
+    requires:
+      Squatting::On::PSGI: 0.06
+  stacktrace_with_lexical_variables:
+    description: 'Stacktrace with lexical variables'
+    requires:
+      Devel::StackTrace::WithLexicals: 0.10
+  tools:
+    description: Tools
+    requires:
+      Flea: 0.04
+      Test::WWW::Mechanize::PSGI: 0.35
+requires:
+  CGI::Compile: 0.16
+  CGI::Emulate::PSGI: 0.15
+  CGI::PSGI: 0.15
+  Corona: 0.1004
+  FCGI: 0.74
+  FCGI::Client: 0.08
+  FCGI::ProcManager: 0.24
+  HTTP::Server::Simple::PSGI: 0.14
+  IO::Handle::Util: 0.01
+  Net::FastCGI: 0.14
+  PSGI: 1.101
+  Plack: 1.0023
+  Plack::App::Proxy: 0.27
+  Plack::Middleware::Auth::Digest: 0.04
+  Plack::Middleware::ConsoleLogger: 0.04
+  Plack::Middleware::Debug: 0.14
+  Plack::Middleware::Deflater: 0.08
+  Plack::Middleware::Header: 0.04
+  Plack::Middleware::ReverseProxy: 0.15
+  Plack::Middleware::Session: 0.18
+  Starlet: 0.18
+  Starman: 0.3011
+  Twiggy: 0.1021
+resources:
+  bugtracker: https://github.com/miyagawa/Task-Plack/issues
+  homepage: https://github.com/miyagawa/Task-Plack
+  repository: https://github.com/miyagawa/Task-Plack.git
+version: 0.28

@@ -1,0 +1,38 @@
+---
+abstract: 'Load templates using DBIx::Class with per-context resultsets'
+author:
+  - 'Charlie Garrison <garrison@zeta.org.au>'
+build_requires:
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  DBIx::Class::Schema::RestrictWithObject: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Template: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Provider-PerContextDBIC
+requires:
+  Carp: '0'
+  Date::Parse: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Template::Provider: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cngarrison/Template-Provider-PerContextDBIC/issues
+  homepage: https://github.com/cngarrison/Template-Provider-PerContextDBIC
+  repository: https://github.com/cngarrison/Template-Provider-PerContextDBIC.git
+version: '0.000002'

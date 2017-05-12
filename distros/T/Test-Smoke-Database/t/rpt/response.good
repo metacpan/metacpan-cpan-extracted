@@ -1,0 +1,59 @@
+Newsgroups: perl.daily-build.reports,perl.perl5.porters
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:3910 perl.perl5.porters:74317
+Return-Path: <h.m.brand@hccnet.nl>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 31553 invoked by uid 1005); 16 Apr 2003 12:56:18 -0000
+Delivered-To: perlmail-smokers-reports@onion.perl.org
+Received: (qmail 31548 invoked by uid 76); 16 Apr 2003 12:56:18 -0000
+Received: from qmailr@one.develooper.com (HELO ran-out.mx.develooper.com) (64.81.84.115) by onion.perl.org (qpsmtpd/0.25) with SMTP; Wed, 16 Apr 2003 05:56:18 -0700
+Received: (qmail 1386 invoked by uid 225); 16 Apr 2003 12:56:15 -0000
+Delivered-To: smokers-reports@perl.org
+Received: (qmail 1377 invoked by uid 507); 16 Apr 2003 12:56:15 -0000
+Received: from smtpzilla2.xs4all.nl (HELO smtpzilla2.xs4all.nl) (194.109.127.138) by one.develooper.com (qpsmtpd/0.25) with SMTP; Wed, 16 Apr 2003 05:55:44 -0700
+Received: from [127.0.0.1] (procura.xs4all.nl [213.84.163.145])	by smtpzilla2.xs4all.nl (8.12.9/8.12.9) with ESMTP id h3GCtch3071513;	Wed, 16 Apr 2003 14:55:39 +0200 (CEST)
+Date: Wed, 16 Apr 2003 14:55:38 +0200
+To: Abe Timmerman <abe@ztreet.demon.nl>
+Subject: Re: Smoke [5.9.0] 19228 FAIL(F) linux 2.4.18-3 (i686/1 cpu)
+Cc: Jarkko Hietaniemi <jhi@iki.fi>, smokers-reports@perl.org,   perl5-porters@perl.org
+In-Reply-To: <200304161443.58410.abe@ztreet.demon.nl>
+References: <SRV401ha5VmZP4baH4w0000454a@smtp.inholland.nl> <200304161443.58410.abe@ztreet.demon.nl>
+Message-ID: <20030416145408.6E67.H.M.BRAND@hccnet.nl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Becky! ver. 2.05.10
+X-SMTPD: qpsmtpd/0.25, http://develooper.com/code/qpsmtpd/
+X-Spam-Check-By: one.develooper.com
+X-Spam-Status: No, hits=-1.0 required=7.0 tests=CARRIAGE_RETURNS,IN_REP_TO,QUOTED_EMAIL_TEXT,REFERENCES,SPAM_PHRASE_00_01 version=2.44
+X-SMTPD: qpsmtpd/0.25, http://develooper.com/code/qpsmtpd/
+Approved: news@nntp.perl.org
+From: h.m.brand@hccnet.nl (H.Merijn Brand)
+
+On Wed 16 Apr 2003 14:43, Abe Timmerman <abe@ztreet.demon.nl> wrote:
+> > linux       [locale:nl_NL]-DDEBUGGING -Duseithreads
+> >     t/io/layers..........................FAILED at test 2
+> 
+> Leaving out the PERLIO= setting makes it pass the tests.
+> Should I change(fix) Test::Smoke or is this a genuine failure?
+> 
+> ~/bleadperl/perl-current/t$ PERLIO= PERL_UNICODE= LC_ALL=nl_NL.utf8 ./perl harness io/layers.t
+> io/layers....# Failed at io/layers.t line 38
+> #      got 'utf8'
+> # expected ''
+> # Failed at io/layers.t line 38
+> #      got 'crlf'
+> # expected ''
+
+fix the new io/layers.t :)
+but it is work in progress. Cygwin also fails across the line.
+
+-- 
+H.Merijn Brand        Amsterdam Perl Mongers (http://amsterdam.pm.org/)
+using perl-5.6.1, 5.8.0 & 633 on HP-UX 10.20 & 11.00, AIX 4.2, AIX 4.3,
+  WinNT 4, Win2K pro & WinCE 2.11.  Smoking perl CORE: smokers@perl.org
+http://archives.develooper.com/daily-build@perl.org/   perl-qa@perl.org
+send smoke reports to: smokers-reports@perl.org, QA: http://qa.perl.org
+
+

@@ -1,0 +1,148 @@
+#!/pro/bin/perl
+
+# csv-check: Check validity of CSV file and report
+#	   (m)'15 [19 Nov 2015] Copyright H.M.Brand 2007-2017
+
+# This code requires the defined-or feature and PerlIO
+
+use strict;
+use warnings;
+
+use Data::Peek;
+use Encode qw( decode );
+
+our $VERSION = "1.7";	# 2015-11-19
+
+sub usage
+{
+    my $err = shift and select STDERR;
+    print <<EOU;
+usage: csv-check [-s <sep>] [-q <quot>] [-e <esc>] [-u] [--pp] [file.csv]
+       -s <sep>   use <sep>   as seperator char. Auto-detect, default = ','
+                  The string "tab" is allowed.
+       -e <esc>   use <sep>   as seperator char. Auto-detect, default = ','
+                  The string "undef" is allowed.
+       -q <quot>  use <quot>  as quotation char. Default = '"'
+                  The string "undef" will disable quotation.
+       -u         check if all fields are valid unicode
+
+       --pp       use Text::CSV_PP instead (cross-check)
+EOU
+    exit $err;
+    } # usage
+
+use Getopt::Long qw(:config bundling nopermute passthrough);
+my $sep;	# Set after reading first line in a flurry attempt to auto-detect
+my $quo = '"';
+my $esc = '"';
+my $opt_u = 0;
+my $opt_p = 0;
+GetOptions (
+    "help|?"	=> sub { usage (0); },
+
+    "c|s=s"	=> \$sep,
+    "q=s"	=> \$quo,
+    "e=s"	=> \$esc,
+    "u"		=> \$opt_u,
+
+    "pp!"	=> \$opt_p,
+    ) or usage (1);
+
+my  $csvmod = "Text::CSV_XS";
+if ($opt_p) {
+    require Text::CSV_PP;
+    $csvmod = "Text::CSV_PP";
+    }
+else {
+    require Text::CSV_XS;
+    }
+$csvmod->import ();
+
+my $fn   = $ARGV[0] // "-";
+my $data = do { local $/; <> } or die "No data to analyze\n";
+
+my ($bin, $rows, $eol, %cols) = (0, 0, undef);
+unless ($sep) { # No sep char passed, try to auto-detect;
+    $sep = $data =~ m/["\d],["\d,]/ ? ","  :
+	   $data =~ m/["\d];["\d;]/ ? ";"  :
+	   $data =~ m/["\d]\t["\d]/ ? "\t" :
+	   # If neither, then for unquoted strings
+	   $data =~ m/\w,[\w,]/     ? ","  :
+	   $data =~ m/\w;[\w;]/     ? ";"  :
+	   $data =~ m/\w\t[\w]/     ? "\t" : ",";
+    $data =~ m/([\r\n]+)\Z/ and $eol = DDisplay "$1";
+    }
+
+my $csv = $csvmod->new ({
+    sep_char       => $sep eq "tab"   ? "\t"  : $sep,
+    quote_char     => $quo eq "undef" ? undef : $quo,
+    escape_char    => $esc eq "undef" ? undef : $esc,
+    binary         => 1,
+    keep_meta_info => 1,
+    auto_diag      => 1,
+    });
+
+sub done
+{
+    (my $file = $ARGV // "") =~ s{(\S)$}{$1 };
+    (my $prog = $0) =~ s{.*/}{};
+    print "Checked $file with $prog $VERSION using $csvmod @{[$csvmod->VERSION]}\n";
+    my @diag = $csv->error_diag;
+    if ($diag[0] == 2012 && $csv->eof) {
+	my @coll = sort { $a <=> $b } keys %cols;
+	local $" = ", ";
+	my $cols = @coll == 1 ? $coll[0] : "(@coll)";
+	$eol //= $csv->eol || "--unknown--";
+	print "OK: rows: $rows, columns: $cols\n";
+	print "    sep = <$sep>, quo = <$quo>, bin = <$bin>, eol = <$eol>\n";
+	if (@coll > 1) {
+	    print "WARN: multiple column lengths:\n";
+	    printf " %6d line%s with %4d field%s\n",
+		$cols{$_}, $cols{$_} == 1 ? " " : "s",
+		$_,        $_        == 1 ? ""  : "s"
+		    for @coll;
+	    }
+	exit 0;
+	}
+
+    if ($diag[2]) {
+	print "$ARGV record $diag[3] at line $./$diag[2] - $diag[0] - $diag[1]\n";
+	my $ep  = $diag[2] - 1; # diag[2] is 1-based
+	my $err = $csv->error_input . "         ";
+	substr $err, $ep + 1, 0, "*";
+	substr $err, $ep,     0, "*";
+	($err = substr $err, $ep - 5, 12) =~ s/ +$//;
+	print "    |$err|\n";
+	}
+    else {
+	print "$ARGV line $. - $diag[1]\n";
+	}
+    exit $diag[0];
+    } # done
+
+sub stats
+{
+    my $r = shift;
+    $cols{scalar @$r}++;
+    grep { $_ & 0x0002 } $csv->meta_info and $bin = 1;
+    if ($opt_u) {
+	my @r = @$r;
+	foreach my $x (0 .. $#r) {
+	    utf8::is_utf8 ($r[$x]) and next;
+
+	    local $SIG{__WARN__} = sub {
+		(my $msg = shift) =~ s{ at /\S+Encode.pm.*}{};
+		printf STDERR "Field %3d:%3d - '%s'\t- %s",
+		    $rows, $x, DPeek ($r[$x]), $msg;
+		};
+	    my $oct = decode ("utf-8", $r[$x], Encode::FB_WARN);
+	    }
+	}
+    } # stats
+
+open my $fh, "<", \$data or die "$fn: $!\n";
+while (my $row = $csv->getline ($fh)) {
+    $rows++;
+    stats $row;
+    }
+done;

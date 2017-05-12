@@ -1,0 +1,15 @@
+Revision history for Task-CPAN-Reporter
+
+0.003     2016-03-01 22:55:32-05:00 America/New_York
+
+    - Changed to reflect Metabase::Client::Simple switch to HTTP::Tiny;
+      pulls in deps needed for TLS support.
+
+0.002     2015-10-30 23:29:36-04:00 America/New_York
+
+    - Added CPAN::Meta::YAML
+
+0.001     2011-06-29 15:22:17 America/New_York
+
+    - First release
+

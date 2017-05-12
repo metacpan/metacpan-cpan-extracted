@@ -1,0 +1,15 @@
+<%args>
+$form
+$preconditions => undef
+</%args>
+
+%use YAML::Syck;
+
+% if ($preconditions){
+<h1>New Precondition IDs: <% join ', ',@$preconditions %></h1>
+% } else {
+<fieldset>
+<% $form|n %>
+</fieldset>
+% }
+<p><a href="/tapper/preconditions/">Return to Precondition list</a></p>

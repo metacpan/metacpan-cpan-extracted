@@ -1,0 +1,55 @@
+{
+   "abstract" : "Replace sequences of characters with typographic ligatures",
+   "author" : [
+      "Nick Patch <patch@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Ligature",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.41",
+            "Test::Warn" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "parent" : 0,
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Ligature" : {
+         "file" : "lib/Text/Ligature.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/patch/text-ligature-pm5/issues"
+      },
+      "homepage" : "https://github.com/patch/text-ligature-pm5",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/patch/text-ligature-pm5.git"
+      }
+   },
+   "version" : "0.02"
+}

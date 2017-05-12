@@ -1,0 +1,6 @@
+#define cursor_width 1
+#define cursor_height 1
+#define canv_cur_x_hot 0
+#define canv_cur_y_hot 0
+static unsigned char cursor_bits[] = {
+  0x00, };

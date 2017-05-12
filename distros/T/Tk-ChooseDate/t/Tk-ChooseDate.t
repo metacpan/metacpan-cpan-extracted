@@ -1,0 +1,27 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl Tk-ChooseDate.t'
+
+#########################
+
+# change 'tests => 1' to 'tests => last_test_to_print';
+
+use Test;
+BEGIN { plan tests => 3 };
+use Tk;
+use Tk::ChooseDate;
+
+ok(1); # If we made it this far, we're ok.
+
+#########################
+
+# Insert your test code below, the Test::More module is use()ed here so read
+# its man page ( perldoc Test::More ) for help writing this test script.
+
+my $mw = tkinit;
+my $cd = $mw->ChooseDate->pack;
+$cd->set('y'=>2005,'m'=>5,'d'=>5);
+ok(2);
+my $date = $cd->get;
+if ($date eq "2005/05/05") {
+  ok(3);
+}

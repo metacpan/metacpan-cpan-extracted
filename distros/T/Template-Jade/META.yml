@@ -1,0 +1,37 @@
+---
+abstract: 'A port of Jade to Perl'
+author:
+  - 'Evan Carroll, C<< <me at evancarroll.com> >>'
+  - 'Evan Carroll <me@evancarroll.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: artistic2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Jade
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  DateTime: 0
+  HTML::Escape: 0
+  Moose: 0
+  Sub::Exporter: 0
+  Text::Markdown::Discount: 0
+  perl: 5.6.0
+resources:
+  bugtracker: https://github.com/EvanCarroll/perl-template-jade/issues
+  homepage: http://jade-lang.com/
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: 'git://github.com/Evan Carroll/Template-Jade.git'
+version: 0.05

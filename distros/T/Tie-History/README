@@ -1,0 +1,34 @@
+Tie-History version 0.03
+========================
+
+Tie::History will allow you to keep a history of previous versions of 
+a variable, by means of committed the changes. As this is all stored 
+in memory, it is not for use in a production system, but best kept for 
+debugging.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Nothing outside of the core of Perl.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and license information here.
+
+Copyright (C) 2004 by A. U. Thor
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

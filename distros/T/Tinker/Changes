@@ -1,0 +1,9 @@
+0.0.3 Sat Jun  6 13:53:48 PDT 2015
+ - Dep on Cog 0.09
+
+0.0.2 Sat Jun  6 13:17:44 PDT 2015
+ - Move YAML stuff downstream to Tinker::App::YAMLTesting
+
+0.0.1 Fri Apr 10 15:34:56 CEST 2015
+ - Initial release.
+

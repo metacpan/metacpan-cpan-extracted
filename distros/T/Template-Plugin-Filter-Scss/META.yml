@@ -1,0 +1,41 @@
+---
+abstract: 'CSS::Sass filter for Template Toolkit '
+author:
+  - 'bbon <bbon@mail.ru>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-Filter-Scss
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Template::Plugin::Filter::Scss:
+    file: lib/Template/Plugin/Filter/Scss.pm
+    version: '0.01'
+requires:
+  CSS::Sass: '0'
+  Template: '0'
+  Template::Plugin::Filter: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/bbon/Template-Plugin-Filter-Scss/issues
+  homepage: https://github.com/bbon/Template-Plugin-Filter-Scss
+  repository: git://github.com/bbon/Template-Plugin-Filter-Scss.git
+version: '0.01'
+x_contributors:
+  - 'mr.bbon <nu@nu-nu.ru>'

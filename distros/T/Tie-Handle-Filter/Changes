@@ -1,0 +1,59 @@
+Revision history for perl distribution Tie-Handle-Filter
+
+0.011     2016-10-12 10:30:58-05:00 America/Chicago
+
+- Deprecate and link to other solutions on CPAN in documentation
+
+0.010     2016-10-08 22:46:13-05:00 America/Chicago (TRIAL RELEASE)
+
+- Do better Perl version checking for correct newline regular expression
+  in THF::Output::Timestamp::EveryLine
+- Specify sufficient Test::More dependency for subtests
+
+0.009     2016-10-08 17:30:37-05:00 America/Chicago (TRIAL RELEASE)
+
+- Remove dependency on non-core Test::Most module and its dependencies,
+  but added Time::Fake dependency for testing the new modules below
+- Add ::Output::Timestamp and ::Output::Timestamp::EveryLine modules
+  to cover common use cases
+- Handle version updates with Dist::Zilla::Plugin::RewriteVersion and
+  DZP::BumpVersionAfterRelease
+
+0.008     2016-10-04 10:15:41-05:00 America/Chicago
+
+- Automate documentation of dependencies
+
+0.007     2016-10-03 16:07:49-05:00 America/Chicago (TRIAL RELEASE)
+
+- Conserve file descriptors by doing the equivalent of C's fdopen(3)
+  rather than duplicating file handles
+- Deal with Perl 5.8's lack of a \R escape in regexps in the multi-line
+  prefix test and SYNOPSIS example
+- Remove dependency on Fcntl to support Microsoft Windows
+
+0.006     2016-10-02 00:23:06-05:00 America/Chicago
+
+- Add example to SYNOPSIS which prefixes every output line (PERLANCAR++)
+- Fix unimplemented methods to actually do and say the right thing
+
+0.005     2016-09-29 21:57:47-05:00 America/Chicago
+
+- Only require perl 5.8 and above
+- Note stopwords in author POD spelling tests
+
+0.004     2016-09-29 14:09:48-07:00 America/Los_Angeles
+
+- Another doc bug slipped between the cracks
+
+0.003     2016-09-29 14:01:03-07:00 America/Los_Angeles
+
+- More documentation fixes
+
+0.002     2016-09-29 12:41:55-07:00 America/Los_Angeles
+
+- Minor documentation re-arrangement
+- Added test to make sure called method names are actually retrievable
+
+0.001     2016-09-29 11:49:11-07:00 America/Los_Angeles
+
+- Initial release

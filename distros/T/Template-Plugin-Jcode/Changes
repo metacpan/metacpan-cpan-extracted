@@ -1,0 +1,9 @@
+Revision history for Perl extension Template::Plugin::Jcode
+
+0.01  Mon Mar 10 21:48:13 2003
+        - fixed bug in case that it stops processing
+          when the given value is 0.
+          thanks to tanimoto and yamamoto.
+
+0.01  Fri Sep 27 13:46:20 2002
+	- original version

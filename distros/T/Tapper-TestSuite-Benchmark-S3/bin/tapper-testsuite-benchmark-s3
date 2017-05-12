@@ -1,0 +1,171 @@
+#! /usr/bin/perl
+# PODNAME: tapper-testsuite-benchmark-s3
+# ABSTRACT: Measure suspend/resume cycle with external Arduino box
+
+use 5.010;
+use strict;
+use warnings;
+
+my $FLOOD_CONSOLE = 0;
+my $TIMEOUT = 120;
+my $pid;
+
+# Make sure all output is captured.
+BEGIN {
+        open (STDERR, ">&STDOUT")
+         or die "Can not open STDERR to STDOUT: $!\n";
+}
+
+use YAML::Syck;
+use Sys::Hostname;
+use WWW::Mechanize;
+use Test::TAPv13 ':all';
+use Test::More tests => 5;
+use Data::Dumper;
+
+# --- flood console which is watched by the Arduino box to recognize when the system stops ---
+
+if ($FLOOD_CONSOLE) {
+        # open needs to be outside the fork so we see the error message
+        open my $fh, ">", '/dev/ttyUSB0' or die "Can not open serial device: $!";
+        $pid = fork;
+        die "Can not fork:$!" if not defined $pid;
+        if ($pid == 0) {
+                while (1) {
+                        print $fh 0xff;
+                }
+        }
+}
+
+my $reportgroup = $ENV{TAPPER_REPORT_GROUP};
+my $testrun     = $ENV{TAPPER_TESTRUN};
+
+my $hostname = "taylor"; # Sys::Hostname::hostname;
+diag "Tapper-suite-name: benchmark-s3";
+diag "Tapper-machine-name: $hostname";
+diag "Tapper-section: results";
+diag "Tapper-wiki-url: https://osrc.amd.com/wiki/Tapper/TestSuite/BenchmarkS3";
+diag "Tapper-moreinfo-url: http://url.amd.com/0ea";
+diag "Tapper-reportgroup-arbitrary: $reportgroup" if $reportgroup;
+diag "Tapper-reportgroup-testrun: $testrun"       if $testrun;
+
+my $mech = WWW::Mechanize->new;
+my (%s3values, $content);
+eval {
+        $SIG{ALRM} = sub {
+                          die "Timeout of ${TIMEOUT}s hit. Suspend/Resume did not work."
+                         };
+        alarm $TIMEOUT;
+        my $target_host = $ENV{BENCHMARK_HOSTNAME} || 'uran';
+        my $url         = "http://$target_host/s3";
+        $content        = $mech->get($url)->content;
+        isnt($content, '', 'Getting content');
+        # diag $content; # too risky to influence our TAP with this
+        %s3values = %{YAML::Syck::Load($content)};
+        $content = YAML::Syck::Dump(\%s3values);
+};
+alarm(0);
+
+if ($@) {
+        ok(0, 'Getting content');
+        diag $@;
+}
+
+my $i = 0;
+my %sorted_time_data;
+for my $k (qw( send_to_s3
+               com_down led_down
+               delay_before_resume resume_from_s3
+               led_resume com_resume
+               machine_alive
+            ))
+{
+        my $new_k = sprintf("%02d-%s", $i++, $k);
+        $sorted_time_data{$new_k} = $s3values{$k};
+}
+
+ok(1, "raw values");
+tap13_yaml(\%s3values);
+ok(1, "sorted time data");
+tap13_yaml(\%sorted_time_data);
+
+# only get time once to make sure suspend and resume report the same time
+my @time = localtime;
+my $now = sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+                  1900+$time[5],
+                  1+$time[4],
+                  reverse(@time[0..3]),
+                 );
+
+my $commitid   = time; # currently just something unique
+my $project    = "Linux-S3";
+my $executable = "s3-ubuntu-12.04-x86_64";
+my $branch     = "default";
+
+my $codespeed_data = {
+                      codespeed => [
+                                    {
+                                     benchmark    => "01-suspend",
+                                     branch       => $branch,
+                                     commitid     => $commitid,
+                                     date         => $now,
+                                     environment  => $hostname,
+                                     executable   => $executable,
+                                     project      => $project,
+                                     result_value => $s3values{led_down},
+                                    },
+                                    {
+                                     benchmark    => "02-resume",
+                                     branch       => $branch,
+                                     commitid     => $commitid,
+                                     date         => $now,
+                                     environment  => $hostname,
+                                     executable   => $executable,
+                                     project      => $project,
+                                     result_value => ($s3values{com_resume} - $s3values{resume_from_s3}),
+                                    },
+                                   ],
+                     };
+
+ok(1, 'benchmarks');
+tap13_yaml($codespeed_data);
+
+if ($FLOOD_CONSOLE) {
+        kill 9, $pid;
+}
+
+ok(1, 'successfully finished cycle');
+
+
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+tapper-testsuite-benchmark-s3 - Measure suspend/resume cycle with external Arduino box
+
+=head1 ABOUT
+
+This testsuite triggers suspend resume cycle with an external Arduino
+box and reports values into Tapper suiting automatic passthrough to
+Codespeed graph rendering application.
+
+=head1 AUTHOR
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut
+
+
+__END__
+

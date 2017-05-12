@@ -1,0 +1,17 @@
+Template::Plugin::File::StaticURL
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2009 Stig Palmquist <stig@palmquist.fr>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

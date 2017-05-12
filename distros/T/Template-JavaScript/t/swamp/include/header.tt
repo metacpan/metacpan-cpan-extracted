@@ -1,0 +1,3 @@
+I am a header
+
+[% INCLUDE include/footer.tt %]

@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+ex.pl
+lib/Turtle/Writer.pm
+t/turtle.t

@@ -1,0 +1,7 @@
+Text::WikiFormat converts text in a simple Wiki markup language to whatever
+your little heart desires, provided you can describe it accurately in a
+semi-regular tag language.
+
+This program is Free Software, provided without warranty or implied
+merchantability, but available under the same terms as Perl itself.  What a
+deal!  It's copyrighted and copylefted 2002 - 2006, chromatic.

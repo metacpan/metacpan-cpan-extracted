@@ -1,0 +1,11 @@
+0.02  Fri Jun 22 19:41:38 2012
+    - Fixed syntax errors in Perls < 5.14
+
+    - Tests are now skipped when no Selenium server is found
+
+    - Updated documentation a bit
+
+0.01  Wed Jun 20 21:28:20 2012
+	- Original version; code runs and tests pass but needs a lot of work
+      and loads more documentation to become really useful
+

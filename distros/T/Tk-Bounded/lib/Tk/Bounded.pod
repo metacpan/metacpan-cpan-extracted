@@ -1,0 +1,131 @@
+# -*-mode: text; fill-column: 80; comment-column: 80; -*-
+
+# Tk::Bounded --
+#
+#	This file provides out of bounds mechanics.
+#
+# Copyright (c) 2000-2007 Meccanomania
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# svn: @(#) $Id: Bounded.pod 59 2008-01-10 23:29:59Z meccanomania $
+#-------------------------------------------------------------------------------
+
+
+=head1 NAME
+
+Tk::Bounded - Base class for widgets derived and bound binded from others
+
+=for pm Tk/Bounded.pm
+
+=for category Derived Widgets
+
+=head1 SYNOPSIS
+
+    package Tk::MyNewWidget;
+
+    use Tk::widgets qw/BaseWidget, list of Tk widgets/;
+    use base qw/Tk::Bounded Tk::BaseWidget/;
+
+    Construct Tk::Widget 'MyNewWidget';
+
+    sub ClassInit {
+        my( $class, $mw ) = @_;
+        #... e.g., class bindings here ...
+        $class->SUPER::ClassInit( $mw );
+
+	$mw -> bound( $class, '<Left>', [ qw/keybounds 0/ ], 
+		[ 'testbEv', bEv('m'), bEv('t'), bEv('s'), bEv('c') ] );
+    }
+
+    sub Populate {
+        my( $self, $args ) = @_;
+
+        my $flag = delete $args->{-flag};
+        if( defined $flag ) {
+            # handle -flag => xxx which can only be done at create
+            # time the delete above ensures that new() does not try
+            # and do  $self->configure( -flag => xxx );
+        }
+
+        $self->SUPER::Populate( $args );
+
+        $self = $self->Component( ... );
+
+        $self->Delegates( ... );
+
+        $self->ConfigSpecs(
+            '-cursor'    => [ SELF, 'cursor', 'Cursor',   undef ],
+            '-something' => [ METHOD, dbName,  dbClass, default ],
+            '-text'      => [ $label, dbName,  dbClass, default ],
+            '-heading'   => [ {-text => $head},
+                                heading, Heading,  'My Heading' ],
+       );
+   }
+
+   sub something {
+       my( $self, $value) = @_;
+       if ( @_ > 1 ) {
+          # set it
+       }
+       return # current value
+   }
+
+   sub keybounds {
+  	my( $self, $limit ) = @_;
+
+	return $self -> index( 'insert' ) == $self -> index( $limit ) ?
+		nP : Np;
+   }	
+
+   sub testbEv {
+  	my( $self, $m, $t, $s, $c ) = @_;
+	print "$m, $t, $s, $c\n";
+	my $bev = $self -> bXEvent;
+	$m = $bev -> m;
+	print "$m\n";
+	$bev = $Tk::bevent;
+	$m = $bev -> m;
+	print "$m\n";
+
+	my $w = $Tk::bwidget;
+	print "$w\n";
+  }
+
+
+=head1 DESCRIPTION
+
+Tk::Bounded is used with Perl's multiple inheritance to override some methods
+normally inherited from Tk::Derived and Tk::Widget. It also specifies level 1
+bound tags for caller class.
+
+Tk::Bounded should precede any Tk widgets in the class's base class definition.
+
+Tk::Bounded's main purpose is to apply wrappers to C<configure> and C<cget>
+methods of widgets to allow the derived widget to add to or modify behaviour
+of the configure options supported by the base widget.
+
+The bounded class should normally override the C<Populate> method provided by
+Tk::Bounded and call C<ConfigSpecs> to declare configure options.
+
+The public methods provided by Tk::Bounded are as follows:
+
+=over 4
+
+=item -E<gt>ConfigSpecs(-I<key> =E<gt> [I<kind>, I<name>, I<Class>, I<default>],
+...) 
+
+=back
+
+=head1 SEE ALSO
+
+L<Tk::Derived|Tk::Derived>
+L<Tk::ConfigSpecs|Tk::ConfigSpecs>
+L<Tk::mega|Tk::mega>
+L<Tk::composite|Tk::composite>
+L<Tk::bound|Tk::bound>
+L<Tk::boundtags|Tk::boundtags>
+
+
+=cut

@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+mk_README.sh
+t/001.t
+t/002.t
+t/003.t
+t/004.t
+t/005.t
+t/tmpl/t1.tmpl
+t/tmpl/lib.tmpl
+lib/TX.pm
+lib/TX/Escape.pm
+perl-TX.spec
+META.yml                                 Module meta-data (added by MakeMaker)

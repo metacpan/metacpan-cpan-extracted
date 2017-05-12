@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 624a48eb81140521bcc42560f1e2b6c54be53607 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 2dfae5414d6e4a97b18dd0b2bae36f5b78b7939f MANIFEST
+SHA1 fe4f122a72856049673023b82eee629fc720edcd META.json
+SHA1 336154782b7c028fd8dbdddc90f10530096332fe META.yml
+SHA1 81e54af164246fcaca62929ef389557fb13e2208 Makefile.PL
+SHA1 332b4d466fe44b15b16a2df68f6e2c5214bb20fc README
+SHA1 fdb90525d23d302656d9266f6631a5355c14a319 TtyWrite.xs
+SHA1 3ebd005966f100bdd406b1781d4054e02712cbbc lib/Term/TtyWrite.pm
+SHA1 0025c5090a867751df3b1c964fd8de7e5cdcf474 ppport.h
+SHA1 9794df737c91f0f07aa3ad208a48ffe11f52bf3c t/00-load.t
+SHA1 005a66d1cb111b7fbdbd388cdf37c1c30ddc3289 t/01-object.t
+SHA1 d26cbdfbfafaae73cb54ee9fde617d224bbcbe1e t/10-author.t
+SHA1 74f231713ee14772a166b02eebb58bc94d59e73f t/pod-coverage.t
+SHA1 6d6ee1e914426c6c5e16f4487578c610f0cdbce6 t/pod.t
+SHA1 1679f2f7de3f8f2ecc890b0c1e14bb867aa2d96f typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXx3ANAAoJEKSYBH5dablgr9IH/RL4aOMTicAwFTeZr/kyymmg
+raWGlNe/00Usn3SnFeaL38hPHT2DJTkkMOLg9v+xgS0tFKbgrkpGlOS8nOz8pgPe
+fVesTnudXgzHRgHnf6uqbnmY5ttFhAyoNAdRsb6WovMSPqbhTeRe0nZVuDaIH7fK
+zz2iGmh1fB/TzShS0iPOOQDXjnkuRvc7d9YbhIAb/x6BTrKvSEaF5H61BQv5rRCL
+R43jN0dRQhplF2qmLaz3omxWrMd52bz0jnhrX3137vGTcvau8B0pyCGGxZxb+jL0
+cXdmJAEItbxHmh5BDnMxU0xAVa07Yd23xpt091ETgm9U6cynT1KCMcP9QNDvdAg=
+=NQ7K
+-----END PGP SIGNATURE-----

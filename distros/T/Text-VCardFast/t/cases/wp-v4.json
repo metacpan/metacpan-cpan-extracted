@@ -1,0 +1,140 @@
+{
+   "objects" : [
+      {
+         "type" : "vcard",
+         "properties" : {
+            "n" : [
+               {
+                  "name" : "n",
+                  "values" : [
+                     "Gump",
+                     "Forrest",
+                     "",
+                     "",
+                     ""
+                  ]
+               }
+            ],
+            "org" : [
+               {
+                  "name" : "org",
+                  "values" : [
+                     "Bubba Gump Shrimp Co."
+                  ]
+               }
+            ],
+            "photo" : [
+               {
+                  "params" : {
+                     "mediatype" : [
+                        "image/gif"
+                     ]
+                  },
+                  "value" : "http://www.example.com/dir_photos/my_photo.gif",
+                  "name" : "photo"
+               }
+            ],
+            "version" : [
+               {
+                  "value" : "4.0",
+                  "name" : "version"
+               }
+            ],
+            "email" : [
+               {
+                  "value" : "forrestgump@example.com",
+                  "name" : "email"
+               }
+            ],
+            "tel" : [
+               {
+                  "params" : {
+                     "value" : [
+                        "uri"
+                     ],
+                     "type" : [
+                        "work",
+                        "voice"
+                     ]
+                  },
+                  "value" : "tel:+1-111-555-1212",
+                  "name" : "tel"
+               },
+               {
+                  "params" : {
+                     "value" : [
+                        "uri"
+                     ],
+                     "type" : [
+                        "home",
+                        "voice"
+                     ]
+                  },
+                  "value" : "tel:+1-404-555-1212",
+                  "name" : "tel"
+               }
+            ],
+            "rev" : [
+               {
+                  "value" : "20080424T195243Z",
+                  "name" : "rev"
+               }
+            ],
+            "title" : [
+               {
+                  "value" : "Shrimp Man",
+                  "name" : "title"
+               }
+            ],
+            "adr" : [
+               {
+                  "params" : {
+                     "label" : [
+                        "100 Waters Edge\nBaytown, LA 30314\nUnited States of America"
+                     ],
+                     "type" : [
+                        "work"
+                     ]
+                  },
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "100 Waters Edge",
+                     "Baytown",
+                     "LA",
+                     "30314",
+                     "United States of America"
+                  ]
+               },
+               {
+                  "params" : {
+                     "label" : [
+                        "42 Plantation St.\nBaytown, LA 30314\nUnited States of America"
+                     ],
+                     "type" : [
+                        "home"
+                     ]
+                  },
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "42 Plantation St.",
+                     "Baytown",
+                     "LA",
+                     "30314",
+                     "United States of America"
+                  ]
+               }
+            ],
+            "fn" : [
+               {
+                  "value" : "Forrest Gump",
+                  "name" : "fn"
+               }
+            ]
+         }
+      }
+   ]
+}

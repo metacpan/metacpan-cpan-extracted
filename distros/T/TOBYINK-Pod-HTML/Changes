@@ -1,0 +1,37 @@
+TOBYINK-Pod-HTML
+================
+
+Created:      2013-01-18
+Home page:    <https://metacpan.org/release/TOBYINK-Pod-HTML>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=TOBYINK-Pod-HTML>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-03-03
+
+ - Updated: Update links to use https://metacpan.org/pod/ instead of
+   https://metacpan.org/module/.
+
+0.004	2013-11-18
+
+ [ Bug Fixes ]
+ - Don't need to use <br> within <pre>...</pre>.
+
+ [ Packaging ]
+ - use Dist::Inkt
+
+0.003	2013-04-10
+
+ [ Bug Fixes ]
+ - Switching syntax highlight language in documents that have no NAME
+   section was broken due to Pod::Simple::PullParser's look-ahead feature.
+   This should now work.
+
+ [ Other ]
+ - Added: Syntax highlighting for Semantic Web related languages using
+   Syntax::Highlight::RDF.
+
+0.002	2013-03-21
+
+ - Added: Allow non-Perl languages to be syntax highlighted too.
+
+0.001	2013-02-26	Initial release

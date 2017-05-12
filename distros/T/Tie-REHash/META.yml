@@ -1,0 +1,23 @@
+---
+abstract: "the tie()d implementation of hash that allows using regular expression \"keys\" along with plain keys (plus some more)."
+author:
+  - 'Alexandr Kononoff (F<parsels@mail.ru>)'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-REHash
+provides:
+  Tie::REHash:
+    file: lib/Tie/REHash.pm
+    version: 1.05
+  Tie::REHash::StringrefBug:
+    file: lib/Tie/REHash.pm
+requires:
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.05

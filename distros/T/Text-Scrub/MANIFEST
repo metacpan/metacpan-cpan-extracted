@@ -1,0 +1,14 @@
+lib/Docs/Site_SVD/Text_Scrub.pm
+MANIFEST
+Makefile.PL
+README
+lib/Text/Scrub.pm
+t/Text/Scrub.d
+t/Text/Scrub.pm
+t/Text/Scrub.t
+t/Text/File/Package.pm
+t/Text/Test/Tech.pm
+t/Text/Data/Secs2.pm
+t/Text/File/SmartNL.pm
+t/Text/Data/Str2Num.pm
+t/Text/Data/Startup.pm

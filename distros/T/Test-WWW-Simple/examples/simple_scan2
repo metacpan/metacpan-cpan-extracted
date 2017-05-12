@@ -1,0 +1,242 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+use Regexp::Common;
+use WWW::Mechanize;
+use Test::WWW::Simple;
+
+use constant SHEBANG => '#!/usr/bin/env perl';
+my($generate, $run);
+
+GetOptions('generate' => \$generate,
+           'run'      => \$run);
+
+# Assume run if no flags at all.
+$run++ unless $run or $generate;
+
+my @tests;
+my @countries;
+my $agent = "Windows IE 6";
+my $number_of_tests;
+my @lines = <>;
+while(@lines) {
+  $_ = shift @lines;
+  chomp;
+  # Discard comments.
+  /^#/ and next;
+
+  # Discard blank lines.
+  /^\s*$/ and next;
+
+  # First, look for any of our pragmas.
+  # These all start with %% and a pragma name.
+
+  # %xx: es de au ..
+  # This pragma lets us define a list of country IDs
+  # to be substituted into the URLs following it. We look for ">xx<"
+  # in the URLs to find the characters we'll replace.
+  /^%%xx:/ and do {
+    if (/^%%xx: (([a-z1-9]{2,}(\s+|$))+)/) {
+      my $countries = $1;
+      @countries = split(/\s+/, $countries);
+    }
+    else {
+      die "Invalid '%%xx:' pragma: must be '%%xx: ' followed by two (or more) character country IDs.\n";
+    }
+    next;
+  };
+
+  # %agent: agent_alias
+  # This pragma tells us to switch the user agent to the one specified.
+  # if it's not a valid user agent, we die.
+  /%%agent: (.*)/ and do {
+    $agent = $1;
+    my @aliases = WWW::Mechanize::known_agent_aliases(); 
+    unless (grep {/$agent/} @aliases) {
+      die "$agent is an invalid user agent alias/";
+    }
+    push @tests, qq!Test::WWW::Simple::user_agent("$agent");\n!;
+    next;
+  };
+
+  # if an xx: pragma is in effect, substitute the country for ">xx<" 
+  # everywhere in the input record (so we can include the country in the
+  # comment!).
+  if (@countries) {
+    my @localized;
+    for my $country (@countries) {
+      my $localized;
+      # don't create localized tests if the test is not localizable.
+      unless (/>xx</) {
+        emit_a_test($_); 
+        last;
+      }
+      # Localize.
+      ($localized = $_) =~ s/>xx</$country/g;
+      push @localized, $localized;
+    }
+    emit_a_test(@localized);
+
+    # Discard the unlocalized line.
+    next;
+  }
+
+  # No localization in effect. Just make a test.
+  else {
+    emit_a_test($_);
+  }
+
+}
+
+if (defined $number_of_tests) {
+  unshift @tests, 
+    "@{[SHEBANG]}\nuse Test::WWW::Simple tests=>$number_of_tests;\n";
+  print @tests if $generate;
+  eval(join '',@tests) if $run;
+  $@ and warn $@,"\n";
+} 
+else {
+  warn "# No tests were found in your input file.\n";
+}
+
+sub emit_a_test {
+  my (@input) = @_;
+  # All these extra undefs are the result of using Regexp::Common to 
+  # capture the first two fields. Less confusing and error-prone than
+  # actually coding the regexes oneself.
+  local $_;
+  for (@input) {
+    s/>agent</$agent/;
+    my($url,   undef, undef, undef, undef, undef, undef, undef,
+       undef, undef, $regex, undef, 
+       $which, 
+       @comment) =
+      m[$RE{URI}{HTTP}{-keep}\s+              # a URL
+        $RE{delimited}{-delim=>'/'}{-keep}\s+ # a regex, in slashes
+        (Y|N)\s+                              # should/shoudn't match
+        (.*)$]x;                              # test comment
+
+    @comment = qw(No comment supplied) unless @comment;
+    push @comment, "[$url]" if defined $url;
+    next unless defined $url and defined $regex and defined $which;
+
+    push @tests, qq!page_@{[$which eq 'Y' ? "" : "un"]}! .
+                 qq!like("$url", qr/$regex/, "@{[join " ",@comment]}");\n!;
+    $number_of_tests++;
+  }
+}
+__END__
+
+=head1 NAME
+
+simple_scan - scan a set of Web pages for strings present/absent
+
+=head1 SYNOPSIS
+
+  simple_scan [--generate] [--run] {file file file ...}
+
+=head1 USAGE
+
+  # Run the tests in the files supplied on the command line.
+  # --run (or -run; we're flexible) is assumed if you give no switches.
+  % simple_scan file1 file2 file3
+
+  # Generate a set of tests and save them, then run them.
+  % <complex pipe> | simple_scan --generate > pipe_scan.t
+
+  # Run one simple test
+  % echo "http://yahoo.com yahoo Y Look for yahoo.com"  | simple_scan -run
+
+=head1 DESCRIPTION
+
+C<simple_scan> reads either files supplied on the command line, or standard
+input. It creates and runs, or prints, or even both, a L<Test::WWW::Simple>
+test for the criteria supplied to it.
+
+C<simple_scan>'s input should be in the following format:
+
+  <URL> <pattern> <Y|N> <comment>
+
+The I<URL> is any URL; I<pattern> is a Perl regular expression, delimited by
+slashes; I<Y|N> is C<Y> if the pattern should match, or C<N> if the pattern 
+should B<not> match; and I<comment> is any arbitrary text you like (as long as it's all on the same line as everything else).
+
+=head1 COMMAND-LINE SWITCHES
+
+We use L<Getopt::Long> to get the command-line options, so we're really very
+flexible as to how they're entered. You can use either one dash (as in
+C<-foo>) or two (as in C<--bar>). You only need to enter the minimum number
+or characters to match a given switch.
+
+=over 4
+
+=item C<--run>
+
+C<--run> tells C<simple_scan> to immediately run the tests it's created. Can
+be abbreviated to C<-r>.
+
+This option is mosst useful for one-shot tests that you're not planning to
+run repeatedly.
+
+=item C<--generate>
+
+C<--generate> tells C<simple_scan> to print the test it's generated on the
+standard output.
+
+This option is useful to build up a test suite to be reused later.
+
+=back
+
+Both C<-r> and C<-g> can be specified at the same time to run a test and print 
+it simultaneously; this is useful when you want to save a test to be run later 
+as well as right now without having to regenerate the test.
+
+=head1 PRAGMAS
+
+Pragmas are ways to influence what C<simple_scan> does when generating tests.
+They don't output anything themselves.
+
+Pragmas are specified with C<%%> in column 1 and the pragma name immediately
+following. Any arguments aer supplied after a colon, like this:
+
+   %%foo: bar baz
+
+This invokes the C<foo> pragma with the argument C<bar baz>.
+
+=head2 xx
+
+The C<xx> pragma allows for very simple-minded internationalization. It assumes
+that you want to substitute each of a list of two-character country codes into
+a string (most likely somewhere in the URL, but possibly in the comment too). 
+C<simple_scan> will do this for you, creating a test for each country code
+you specify. For instance:
+
+   %%xx: es au my jp
+   http://>xx<.mysite.com/     /blargh/  Y  look for blargh (>xx<)
+
+This would generate 4 tests, for C<es.mysite.com>, C<au.mysite.com>, 
+c<my.mysite.com>, and C<jp.mysite.com>, all looking to match C<blargh> 
+somewhere on the page.
+
+=head2 agent
+
+The C<agent> pragma allows you to switch user agents during the test. 
+C<Test::WWW::Simple>'s default is C<Windows IE 6>, but you can switch it
+to any of the other user agents supported by C<WWW::Mechanize>.
+
+   http://gemal.dk/browserspy/basic.html /Explorer/ Y Should be Explorer
+   %%agent: Mac Safari
+   http://gemal.dk/browserspy/basic.html /Safari/ Y Should be Safari
+
+=head1 AUTHOR
+
+Joe McMahon E<lt>mcmahon@yahoo-inc.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2005 by Yahoo!
+
+This script is free software; you can redistribute it or modify it under the
+same terms as Perl itself, either Perl version 5.6.1 or, at your option, any
+later version of Perl 5 you may have available.

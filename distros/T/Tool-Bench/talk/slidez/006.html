@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html><head><title>slidez</title><meta http-equiv="Content-Type" content="text/html;charset=utf-8" /><meta http-equiv="Content-Style-Type" content="text/css" /><link rel="stylesheet" href="style.css" type="text/css" /><script type="text/javascript">var next="007.html"
+var down=0; document.onmousedown=function(e) { down=1 }
+           document.onmousemove=function(e) { down=0; }
+document.onmouseup=function(e) {
+if(down == 1) {window.location = next;}; }
+var prev="005.html"
+var first="001.html"
+var last="023.html"
+  document.onkeypress=function(e) {
+    var e=window.event || e
+    var n=e.keyCode || e.which
+    switch (n) {
+      case 32 : window.location = next; break;
+case 8  : window.location = prev; break;
+case 36 : window.location = first; break;
+case 35 : window.location = last; break;
+    }
+  }
+</script></head><body><div class="slide"><div class="cell"><div><h3>Example 1</h3></div><div class="auto left " style="width: 19.375em"><pre><code>use Tool::Bench;
+my $bench = Tool::Bench->new();
+$bench->add_items( true => sub{1} );
+$bench->run;
+print $bench->report;
+</code></pre></div></div></div></body></html>

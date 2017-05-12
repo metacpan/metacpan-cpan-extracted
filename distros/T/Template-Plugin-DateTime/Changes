@@ -1,0 +1,31 @@
+Changes
+=======
+
+0.06002 - 04 Aug 2011
+  - Fix rt#70001, 5.14 deprecations.
+  - Moved to github
+
+0.06001 - 31 Aug 2008
+  - ??? 
+
+0.06000 - 31 Aug 2008
+  - Apply Jeff Lanza's patch, and add a from_string mode, where it makes it
+    possible to create a DateTime object from a string.
+
+0.05 - 29 May 2007
+  - Migrate to Module::Install
+
+0.04 - Never Released
+  - No code change.
+  - Add POD tests.
+
+0.03 - 28 Aug 2005
+  - Very slight modification to work better with Devel::Cover
+
+0.02 - 11 Jan 2004
+  - Actually add it to datetime CVS
+  - minor house cleaning
+  - use traditional Makefile.PL
+
+0.01 - 03 Apr 2004
+  - Initial release

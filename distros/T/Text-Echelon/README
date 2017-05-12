@@ -1,0 +1,83 @@
+Text::Echelon README
+16th December 2001
+Russell Matbouli <text-echelon-spam@russell.matbouli.org>
+
+This is Text::Echelon. It provides random Echelon "spook words".
+
+Also included in this distribution is echelon.pl - a small script that can
+be used to generate X-Echelon headers for your mail. 
+
+To use it with mutt, put the following line in your .muttrc:
+my_hdr `/path/to/echelon.pl`
+
+If you know how to set it up for use with other mail clients, please let me
+know and I shall add your instructions to this distribution.
+
+Below is the pod documentation for this module.
+-----------------------------------------------
+
+NAME
+    Text::Echelon - get random Echelon related words.
+
+SYNOPSIS
+      use Text::Echelon;
+      my $te = Text::Echelon->new();
+      print $te->get();
+      print $te->getmany($num); #or $te->getmany($num, $delimiter);
+      print $te->makeheader();
+      print $te->makecustom($pre, $num, $post, $delim);
+
+  new
+
+    Creates a new instance of Text::Echelon
+
+  get
+
+    Returns one random spook word or phrase as a scalar
+
+  getmany
+
+    Takes a number of spook words or phrases to be returned and the
+    delimiter between words as parameters. Returns a scalar string of
+    spookwords.
+
+  makecustom
+
+    Takes four parameters - the prefix to use, the number of words or
+    phrases to include, the postfix to use and the delimiter between words.
+    Returns a scalar string.
+
+  makeheader
+
+    Creates a header suitable for putting in your outgoing email. The scalar
+    returned is in the format:
+
+    `X-Echelon: smuggle, CIA, indigo'
+
+DESCRIPTION
+    Text::Echelon is a small program that will return Echelon '*spook
+    words*', as per
+
+    http://www.attrition.org/attrition/keywords.html
+
+    If you don't know why you might want this, look at:
+
+    http://www.echelon.wiretapped.net/
+
+    http://www.echelonwatch.org/
+
+AVAILABILITY
+    It should be available for download from
+    http://russell.matbouli.org/code/text-echelon/ or from CPAN
+
+AUTHOR
+    Russell Matbouli <text-echelon-spam@russell.matbouli.org>
+
+    http://russell.matbouli.org/
+
+LICENSE
+    Distributed under GPL v2. See COPYING included with this distibution.
+
+SEE ALSO
+    perl(1).
+

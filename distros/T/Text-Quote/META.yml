@@ -1,0 +1,29 @@
+---
+abstract: 'Quotes strings as required for perl to eval them back correctly '
+author:
+  - 'Yves Orton <yves@cpan.org>'
+build_requires:
+  Test::More: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Quote
+requires:
+  Carp: '0'
+  Carp::Assert: '0'
+  Compress::Zlib: '0'
+  MIME::Base64: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+  warnings::register: '0'
+resources:
+  homepage: https://github.com/neilbowers/Text-Quote
+  repository: https://github.com/neilbowers/Text-Quote.git
+version: '0.32'

@@ -1,0 +1,192 @@
+NAME
+
+    Task::BeLike::RSRCHBOY - Modules RSRCHBOY uses!
+
+VERSION
+
+    version 0.007
+
+TASK CONTENTS
+
+ CPAN/GitHub Tools
+
+  local::lib
+
+  App::cpanminus::reporter
+
+  App::cpanoutdated
+
+  App::gh
+
+  CPAN::Mini
+
+  CPAN::Mini::Inject
+
+  OrePAN2
+
+  Pod::Cpandoc
+
+  Task::CPAN::Reporter
+
+ DB bits
+
+  App::AltSQL
+
+  DBD::SQLite 1.31
+
+  DBIx::Class 0.08192
+
+  DBIx::Class::Schema::Loader 0.07010
+
+  DBIx::Class::Migration
+
+ Date/Time handling
+
+  DateTime
+
+  DateTime::Format::DB2
+
+  DateTime::Format::DBI
+
+  DateTime::Format::MySQL
+
+  DateTime::Format::Pg
+
+ Hygiene
+
+  common::sense
+
+  namespace::autoclean 0.24
+
+  strictures
+
+  Perl::Tidy
+
+  Perl::Critic
+
+ Class bits
+
+  Class::Method::Modifiers::Fast
+
+  Class::Method::Modifiers
+
+  Reindeer 0.016
+
+  MooseX::App::Cmd
+
+  MooseX::AlwaysCoerce
+
+  MooseX::AttributeShortcuts
+
+  MooseX::AutoDestruct 0.007
+
+  MooseX::RelatedClasses
+
+  MooseX::Types::Perl
+
+  MooseX::Types::LoadableClass
+
+  MooseX::Types::Path::Class
+
+  MooseX::Types::Path::Tiny
+
+  Moo
+
+  MooX::Types::MooseLike
+
+  MooX::Cmd
+
+ Testing
+
+  TAP::Harness::Restricted
+
+  Test::Moose::More 0.017
+
+  Test::Routine 0.015
+
+  Test::TempDir::Tiny
+
+ autobox
+
+  autodie 2.22
+
+  autobox::Core
+
+  autobox::dump
+
+  autobox::JSON
+
+  autobox::Colors
+
+ Other Libraries I Use
+
+  aliased
+
+  lib::if::dev
+
+  opts 0.05
+
+  App::Cmd
+
+  Capture::Tiny
+
+  Carp::Always
+
+  Carp::Always::Color
+
+  Config::JFDI
+
+  File::chdir
+
+  Path::Tiny
+
+  Path::Class
+
+  Smart::Args
+
+  Smart::Comments
+
+  Sub::Install
+
+  Sub::Exporter
+
+  Try::Tiny
+
+ Helpers
+
+  Regexp::Debugger
+
+  L
+
+  V
+
+ CPAN-ish Development
+
+  Devel::Confess
+
+  Dist::Zilla::App::Command::cover
+
+  Dist::Zilla::App::Command::issues
+
+  Dist::Zilla::App::Command::gh
+
+  Dist::Zilla::App::Command::dumpwith
+
+  Dist::Zilla::PluginBundle::RSRCHBOY
+
+SEE ALSO
+
+    Task::BeLike::RSRCHBOY::Web
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

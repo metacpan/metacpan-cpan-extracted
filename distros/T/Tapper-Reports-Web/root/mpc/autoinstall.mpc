@@ -1,0 +1,79 @@
+# tapper-config-file: autoinstall.yml
+# tapper-description: Kickstart installation with requested workload
+---
+precondition_type: autoinstall
+name: Fedora13 
+timeout: 10000
+grub_text: |
+   timeout 2
+
+   title Fedora13
+   kernel /tftpboot/stable/fedora/13/x86_64/vmlinuz  console=ttyS0,115200 ks=http://bancroft/autoinstall/stable/fedora/13/x86_64/kvm.ks ksdevice=eth0 noapic $TAPPER_OPTIONS
+   initrd /tftpboot/stable/fedora/13/x86_64/initrd.img
+---
+[% IF Tests.CTCS %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_ctcs
+timeout: 10800
+---
+[% END %]
+[% IF Tests.LMBench %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_lmbench
+timeout: 10800
+---
+[% END %]
+[% IF Tests.LTP %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_ltp
+timeout: 10800
+---
+[% END %]
+[% IF Tests.Kernbench %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_kernbench
+timeout: 10800
+---
+[% END %]
+[% IF Tests.Aim %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_aim
+timeout: 10800
+---
+[% END %]
+[% IF Tests.HTS %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_hts
+timeout: 10800
+---
+[% END %]
+[% IF Tests.LLC %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_llc
+timeout: 10800
+---
+[% END %]
+[% IF Tests.Parselog %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_parselog
+timeout: 10800
+---
+[% END %]
+[% IF Tests.ReAim %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_reaim
+timeout: 10800
+---
+[% END %]
+[% IF Tests.RHv7 %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_rhv7
+timeout: 10800
+---
+[% END %]
+[% IF Tests.Phoronix %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_phoronix
+timeout: 10800
+---
+[% END %]

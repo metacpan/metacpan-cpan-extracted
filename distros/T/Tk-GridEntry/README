@@ -1,0 +1,13 @@
+GridEntry is a composite widget similar to Tk::Table. 
+It can be used to associate data with a set of widgets in
+a gridform.
+
+It has no dependancy on any widget/module not in default install.
+
+To Install do
+
+$ perl Makefile.PL
+$ make 
+$ make install
+
+Send bug reports, comments and suggestions to raamanp@yahoo.co.in.

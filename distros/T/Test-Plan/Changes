@@ -1,0 +1,15 @@
+Revision history for Perl extension Test::Plan
+
+0.01  03.14.2005
+  - original version
+
+0.02  03.18.2005
+  - doc fix to make Test::Plan and Test::More syntax
+    equivalent (and tests to make sure it won't happen again)
+    thanks to Thomas Shinnick for the spot
+  - don't pass a skip reason to skip_all if one wasn't provided
+
+0.03  12.01.2005
+  - fix %Config overrides in a few tests.  note that I couldn't
+    get ExtUtils::MakeMaker::Config to work the way I need it to...
+  - let tests run on win32, thanks to Carl Franks

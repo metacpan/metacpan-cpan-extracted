@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tree-Parser
+version:      0.15
+version_from: lib/Tree/Parser.pm
+installdirs:  site
+requires:
+    Array::Iterator:               0.04
+    Scalar::Util:                  1.1
+    Test::Exception:               0.15
+    Test::More:                    0.47
+    Tree::Simple:                  1.03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

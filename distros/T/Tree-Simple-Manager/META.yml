@@ -1,0 +1,36 @@
+---
+name: Tree-Simple-Manager
+version: 0.07
+author:
+  - 'stevan little, E<lt>stevan@iinteractive.comE<gt>'
+abstract: A class for managing multiple Tree::Simple hierarchies
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Throwable: 0.1
+  File::stat: 0
+  Storable: 0
+  Tree::Parser: 0.15
+  Tree::Simple: 1.14
+  Tree::Simple::View: 0.11
+build_requires:
+  Test::Exception: 0.21
+  Test::More: 0.47
+provides:
+  Tree::Simple::Manager:
+    file: lib/Tree/Simple/Manager.pm
+    version: 0.07
+  Tree::Simple::Manager::Exceptions:
+    file: lib/Tree/Simple/Manager/Exceptions.pm
+    version: 0.02
+  Tree::Simple::Manager::Index:
+    file: lib/Tree/Simple/Manager/Index.pm
+    version: 0.04
+  Tree::Simple::WithMetaData:
+    file: lib/Tree/Simple/WithMetaData.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

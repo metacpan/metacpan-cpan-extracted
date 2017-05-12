@@ -1,0 +1,121 @@
+<config>
+  <pattern name="Nashville-RDC_SERVICE-csc">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.csc\.</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_SERVICE-mso">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.mso\.</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_SERVICE-npa">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.npa\.</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_SERVICE-pas">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.pas\.</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_SERVICE-aas">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.aas\.</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_SERVICE-asd">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.asd\.\w{2}</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_SERVICE-msc">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.msc\.\w{2}</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_RDC-corp">
+    <inclusion>^corp-.*</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Philadelphia-PA-DisasterDC-DRC">
+    <inclusion>^nasun-.*</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</exclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="FortWorth-RDC">
+    <inclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</inclusion>
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(fdc|ara|arb|cob|ksd|lab|lae|lai|txb|txg|txk|txo|txq|azb|ksb|laa|lac|lah|nvc|txd|txh|txm|txp|txr)\.\w{2}</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_MARKET-All">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(alc|alf|tna|tn(e|f|h|j|x)|tnk|ald|gaa|msa|tnb|vae|vaf|scb)\.\w{2}</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Orlando-RDC">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(odc|ale|flb|irl|fld|flf|flh|flj|fll|fla|flc|fle|flg|fli|flk|fln)\.\w{2}</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</exclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Phoenix-RDC">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(pdc|aza|azd|cab|coa|nma|nmc|nva|ora|utb|wya|azc|caa|cac|ida|idb|nmb|nmd|nvb|uta|waa)\.\w{2}</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</exclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Columbus-RDC">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(cdc|nha|vaa|vac|wva|wve|ksa|vab|vad|wvb)\.\w{2}</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</exclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Alaska-RDC">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(aka)\.\w{2}</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</exclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Louisville-RDC">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(ldc|ina|kyi|kyh|tng|kyd|oka|sca|kyb|kyc|ncb|okb|wvl)\.\w{2}</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</exclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="SanAntonio-RDC">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(sdc|lad|txe|txi|txl|txa|txf|txj|txn)\.\w{2}</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</exclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Nashville-RDC_RDC-ndc">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.(ndc)\.\w{2}</inclusion>
+    <exclusion>^\S+-\w{4}-\d+-\w-d\.\w{3}\.\w{2}</exclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+
+  <pattern name="Allen-TX-CoLocation-RDC">
+    <inclusion>^atclo-\w{4}-\d+-\w-\w\.clo</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+  <pattern name="Orlando-FL-CoLocation-RDC">
+    <inclusion>^ofclo-\w{4}-\d+-\w-\w\.clo</inclusion>
+    <tag>datacenter</tag>
+  </pattern> 
+
+  <pattern name="Nashville-RDC_SPECIAL-nsm">
+    <inclusion>-SH</inclusion>
+    <inclusion>-AP</inclusion>
+    <inclusion>-RS</inclusion>
+    <inclusion>-RD</inclusion>
+    <tag>datacenter</tag>
+  </pattern>
+
+
+</config>

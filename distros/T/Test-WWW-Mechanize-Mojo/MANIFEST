@@ -1,0 +1,27 @@
+Build.PL
+Changes
+Changes.old-Catalyst.txt
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+Makefile.PL
+README
+buildlib/Test/Run/Builder.pm
+lib/Test/WWW/Mechanize/Mojo.pm
+scripts/tag-release.pl
+t/auth-test.t
+t/cookies.t
+t/cpan-changes.t
+t/form_submit.t
+t/lib/Catty.pm
+t/lib/CattySession.pm
+t/lib/ExternalCatty.pm
+t/lib/MyMojjy.pm
+t/pod-coverage.t
+t/pod.t
+t/redirect.t
+t/simple.t
+t/style-trailing-space.t
+t/useragent.t
+t/white_label.t

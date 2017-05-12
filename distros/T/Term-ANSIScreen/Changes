@@ -1,0 +1,57 @@
+[Changes for 1.50 - 2011-01-08]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the nullary CC0 1.0 Universal terms:
+
+  To the extent possible under law, 唐鳳 has waived all copyright and
+  related or neighboring rights to Term-ANSIScreen.
+
+* Fix an uninitialized warning during "make test".
+
+* Documentation change: Add missing "white" and "cyan" functions, and
+  reorder the color listing with a more logical arrangement.
+
+  Contributed by: Meir Guttman
+
+[Changes for 1.42 - 2004-03-22]
+
+* Two new :screen commands, "clup" and "cldown", contributed
+  by Benno Puetz.
+
+[Changes for 1.41 - 2004-02-20]
+
+* Added tests equivalant of Term::ANSIColor 1.08.
+
+* Avoid warnings during DESTROY and tests.
+
+[Changes for 1.40 - 2002-10-02]
+
+* Added functions equivalant of Term::ANSIColor 1.04.
+
+* $ENV{ANSI_COLOR_DISABLED} and uncolor() are supported.
+
+* Added setscroll(), contributed by Cory Johns.
+
+* Exceptions are now handled by croak() instead of die().
+
+* Documented the Win32::Console emulation mode.
+  It now does not take a ($flag) anymore -- on Win32 it will
+  always spawn a Win32::Console object instead and the
+  constructor arguments are passed to that module verbatim.
+
+* Numerous test fixes.
+
+[Changes for 1.30 - 2002-08-14]
+
+* Massive style changes.  No functional difference.
+
+[Changes for 1.20 - 2001-02-01]
+
+* Added the functionality to double as Win32::Console
+  object; simply pass a Term::ANSIScreen->new($flag)
+  to create it. If $flag is true and the OS is Win32,
+  it will spawn an Win32::Console object instead.
+
+[Changes for 1.00 - 2001-01-11]
+
+* The Initial release of version 1.00.

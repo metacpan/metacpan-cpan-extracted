@@ -1,0 +1,6 @@
+Revision history for Perl extension TemplateRex.
+
+0.01  Wed Nov 11 16:47:51 2015
+	- original version; created by h2xs 1.23 with options
+		-XAn TemplateRex
+

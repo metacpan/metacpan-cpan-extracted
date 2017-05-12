@@ -1,0 +1,41 @@
+NAME
+    Test::Sah - Test data against Sah schema
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+     use Test::More;
+     use Test::Sah; # exports is_valid() and is_invalid()
+
+     is_valid  ({}, [hash => keys=>{a=>"int", b=>"str"}]); # ok
+     is_invalid([], [array => {min_len=>1}]);              # ok
+     done_testing;
+
+DESCRIPTION
+    This module is a proof of concept. It provides "is_valid()" and
+    "is_invalid()" to test data structure against Sah schema.
+
+FUNCTIONS
+    All these functions are exported by default.
+
+  is_valid($data, $schema[, $msg]) => BOOL
+    Test that $data validates to $schema.
+
+  is_invalid($data, $schema[, $msg]) => BOOL
+    Test that $data does not validate to $schema.
+
+SEE ALSO
+    Sah
+
+    Data::Sah
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

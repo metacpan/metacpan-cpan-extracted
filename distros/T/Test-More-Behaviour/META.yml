@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Test-More-Behaviour
+version:            1.0.1
+abstract:           BDD module for Perl
+author:
+    - Matthew Boston <matthew.boston@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::More:  0.93
+requires:
+    IO::Capture::Stdout:  0
+    Term::ANSIColor:      0
+    version:              0.77
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

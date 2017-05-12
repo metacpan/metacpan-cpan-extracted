@@ -1,0 +1,12 @@
+Revision history for Perl extension Template-Plugin-DataRandom-0.03.
+
+0.00_03  Tue Feb 23 15:12:43 2010
+	- Added required packages rule into Makefile.PL
+
+0.00_02  Tue Feb 23 11:39:32 2010
+	- Fix some pod documentation
+
+0.00_01  Fri Feb 19 10:37:02 2010
+	- original version; created by h2xs 1.23 with options
+		-B Template-Plugin-DataRandom-0.01 --use-new-tests -X
+

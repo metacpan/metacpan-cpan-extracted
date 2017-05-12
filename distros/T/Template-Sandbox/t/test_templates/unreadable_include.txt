@@ -1,0 +1,2 @@
+This file can be read, but the included one can't:
+<: include unreadable.txt :>

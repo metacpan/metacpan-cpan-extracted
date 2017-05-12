@@ -1,0 +1,25 @@
+Tk::ContextHelp
+
+Tk::ContextHelp provides context-sensitive help for perl/Tk widgets.
+You can attach help topics to widgets, similar to Tk::Balloon. Help
+topics may be short messages or a link to a pod file.
+
+Note that this module needs the Tk::InputO extension, which does not
+work with Win32.
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make install
+
+To start an sample script, type
+
+	$ env BATCH=0 make test
+
+Additional requirements (it's not essential, but recommended):
+Tk-Pod-0.11.tar.gz or better.
+
+Send bug reports, comments and suggestions to slaven@rezic.de
+

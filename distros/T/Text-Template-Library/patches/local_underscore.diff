@@ -1,0 +1,10 @@
+--- lib/Text/Template.pm~	2008-07-06 17:01:41.000000000 +0200
++++ lib/Text/Template.pm	2008-07-08 12:06:52.000000000 +0200
+@@ -434,6 +434,7 @@
+ }
+ 
+ sub _unconditionally_untaint {
++  local $_;
+   for (@_) {
+     ($_) = /(.*)/s;
+   }

@@ -1,0 +1,307 @@
+Revision history for Perl module Text::BibTeX
+
+0.80 2017-03-25
+ * Fix tests in order to work without dot in @INC (thanks Kent Fredric for the bug report)
+
+0.79 2017-03-13
+ * Further fixes to allow the parse of multiple files (Karl Wette).
+
+0.78 2017-01-10
+ * Fixed some issues with uninitialized arrays and s390
+ * Fixed test with fileno (thanks to Karl Wette).
+ * Allow state of btparse parser to be reset, for parsing multiple files (Karl Wette):
+   - bt_parse_entry(): reset parser state if infile == NULL
+   - BibTeX.xs: add _reset_parse(), _reset_parse_s() methods to Text::BibTeX::Entry
+   - Text::BibTeX::Entry: allow new() or parse() with undefined filehandle; calls _reset_parse()
+   - Text::BibTeX::Entry: allow new() or parse_s() with undefined text; calls _reset_parse_s()
+   - Text::BibTeX::File: close() calls Text::BibTeX::Entry->new($filename, undef) to reset parser
+
+0.77 2016-09-20
+ * Fixes for testing and installing on Darwin (install_name issues).
+   Thanks to Nuno "smash" Carvalho for the report and debug help.
+
+0.76 2016-07-06
+ * Added 'reset_macros' option to Text::BibTeX::File, in order
+   to remove all defined macros (except months)
+
+0.76_02 2016-07-05
+ * Fix issue with binmode not being copied in Clone method.
+ * Make month abbreviations available always, and not only when
+   using Text::BibTeX::Bib.
+ * Added docs to supported options for Text::BibTeX::Entry.
+
+0.76_01 2016-07-04
+ * Solved nasty bug when using lvalues as parameters (substr).
+ * Added tests.
+
+0.75 2016-07-03
+ * Stable version with bytes/utf-8 support.
+
+0.75_05 2016-07-02
+ * Get 5.8.x back aboard;
+
+0.75_04 2016-07-01
+ * Fixed reference to empty function name;
+
+0.75_03 2016-06-30
+ * Rename split_list to isplit_list, and creaed split_list wrapper;
+ * Added normalization option;
+
+0.75_02 2016-06-25
+ * Minor fix for some perl version parsing problems.
+
+0.75_01 2016-06-24
+ * Added binmode option. Should allow unicode handling directly.
+
+0.74 2016-06-15
+ * Get perl 5.8.x back.
+
+0.73 2016-06-14
+ * Change some documentation in order to use ->new method, instead
+   of older 'new Class()' approach;
+ * Add sensible default values to Text::BibTeX::NameFormat to reduce
+   the amount of segmentation faults for users forgetting arguments.
+
+0.72 2016-04-19
+ * Added clone() method to Text::BibTeX::Entry
+
+0.71 2015-05-28
+ * Fix segmentation fault when btparse fails parsing a long
+   entry. Thanks to Dale Evans.
+ * Stop using UNIVERSAL (5.21.3 requirement).
+   Thanks to Jitka Plesnikova
+
+0.70 2014-09-01
+ * Added metadata for metacpan.
+
+0.69 2013-02-27
+ * Fixes in the distribution, namely adding versions to unversioned packages.
+
+0.68 2013-02-27
+ * Replacement for islower() which understands all Unicode 6.2.0
+   chars with "LOWERCASE" property. Now we can detect prefices
+   not just in ASCII ... this also seems to have fixed the strange
+   windows XP test failures, probably due to undefined islower(). See RT #92864
+ * Fixed strange problem with Solaris coredumping due to 0.67 changes.
+
+0.67 2013-02-20
+ * Reformatted changelog (thanks to Sergey Romanov)
+ * Remove accents from C source file for Sun compiler probs.
+ * Add 'gnu' as a system name.
+ * Fixes for UTF-8 handling of combining marks 
+
+0.66 2012-10-29
+ * Fix a segmentation fault with strcat and no string limit.
+
+0.65 2012-09-26
+ * Patch to support @ and ~ in names (thanks to Philip Kime)
+
+0.64 2012-07-08
+ * Patch to expand macro size limit (thanks to Philip Kime)
+
+0.63 2012-05-12
+ * Patch on what to consider whitespaces (thanks to Philip Kime)
+
+0.62 2012-01-11
+ * Releasing stable
+
+0.62_01 2012-01-07
+ * Better installation under Windows, and specifically, Win 7.
+
+0.61 2011-10-20
+ * Thanks to Philip Kime (again), we have STDERR working on Windows
+   (hopefully)
+ * Make Windows tests no longer ignored.
+
+0.60 2011-07-31
+ * Fix test in t/output.t
+
+0.59 2011-07-28
+ * Add comma at the end of each and any line in BibTeX record
+   as all modern parsers support them.
+ * Rewrote some tests in t/output.t
+
+0.58 2011-06-21
+ * Remove some old documentation about btparse.
+ * Warn users when installing on non standard library path.
+
+0.57 2011-06-17
+ * Mark two tests that fail from time to time as TODO for now.
+
+0.56 2011-06-08
+ * Use File::Temp instead of POSIX. Fixes some Win32 builds.
+   Thanks to Alex Gough for reporting this build problem.
+
+0.55 2011-04-25
+ * Added some extra checks for lib64 dir.
+ * Rewrote some code on MyBuilder.pm
+ * Add soname to library build.
+
+0.54 2011-04-17
+ * Applied patch to work under lib64 archs (hopefuly)
+  (Guillaume Rousse)
+
+0.53 2011-03-10
+ * Working under Cygwin (Philip Kime)
+ * Changed Windows testing mode (based on Cygwin approach)
+   - getting rid of 00_ and zz_ test files. Great!
+
+0.52 2011-02-15
+ * More name abbreviation tweeks (Philip Kime)
+
+0.51 2011-02-01
+ * Fixed environment during Linux/Unix testing
+
+0.50 2011-02-01
+ * Fixed name abbreviation when name has hiffens (Philip Kime)
+
+0.49 2011-01-27
+ * Small patch by Philip Kime to enlarge macros buffer size.
+ * Fixed Build.PL to clean some object files.
+
+0.48 2010-09-23
+ * depend on ExtUtils::LibBuilder for library compilation.
+
+0.47 2010-09-18
+ * fixed a problem with 160 char being considered whitespace on many unixes.
+   Thanks, again, to Philip Kime :)
+
+0.46 2010-08-24
+ * support entry keys in unicode. Thanks to Philip Kime.
+
+0.45 2010-06-08
+ * fixed ldconfig call under linux, now only if the user is root.
+ * fixed library installation path when user specifies different
+   installbase during install action.
+   (thanks to François for both fixes)
+
+0.44 2010-05-09
+ * RPath information on link - Thanks to Jens Rehsack
+ * removed dependency on 'UNIVERSAL' as it is now built-in
+   (change for perl 5.12 deprecation)
+
+0.43 2010-03-18
+ * small fix on warnings issue
+ * run ldconfig after installing the .so file under linux
+
+0.42 2010-03-16
+ * names with more than two commas are left untouched if protected by
+   braces.
+ * can now deal with names with hyphens and generate the correct BibTeX
+   compatible abbreviations.
+ * can generate initials for protected name parts, like BibTeX can.
+ * can deal with generating initials for names which contains Unicode
+   characters.
+ * fixed compilation on machines needing alloca.h
+ * added new README file with more up-to-date information.
+
+0.41 2010-03-14
+ * tested under Solaris and FreeBSD.
+ * fixed compilation/installation under Mac OS X.
+ * fixed some C code on format-security (thanks to Jerome Quelin).
+ * fixed build system to check for dependencies.
+ * added patch from Philip Kime to fix names with commas handling.
+
+0.40 2010-03-07
+ * this release is very similar to 0.40_3, but now indexable by cpan.
+
+0.40_3 2010-02-18
+ * fixed Build.PL with correct build_requirements;
+ * fixed test to use still not installed library;
+
+0.40_2 2010-02-15
+ * merged btparse library into Text::BibTeX code. I am sorry for all
+   other languages that might be using this library. For them my
+   suggestion is that they make Text::BibTeX as a dependency.
+ * ported compilation and configuration tools from ExtUtils::MakeMaker
+   to Module::Build.
+ * back on track, trying to make Text::BibTeX work and compile easily
+   on main platforms (sorry, for main platforms I assume Linux, Mac OS
+   X and Windows running Strawberry Perl).
+ * Thanks to Philip Kime for continuous poke so I work on this!!
+   Created a THANKS file for this purpose.
+
+0.38 2008-03-08
+ * fixed problem when creating an empty Entry.
+   Thanks to Frank Wiegand.
+
+0.37 2006-09-21
+ * added support for 'conference' key (alias for inproceedings)
+
+0.36 2005-07-24
+ * fixed url where btparse should be downloaded from. (stupid bug)
+
+0.35 2005-07-23
+ * changed from 0.33 to 0.35 to maintain relation with btparse.
+ * some tests now use Test::More (more tests will change soon)
+ * the way the module initializes changed. Now the module can be
+   included to check its version.
+
+0.33 2000-03-22
+ * fixed long-standing bug with import/inheritance code; should fix the
+   mysterious "method redefined" and "can't locate object method" errors
+   that various people have seen on various platforms over the years.
+   Thanks to Nikolay Pelov <Nikolay.Pelov@cs.kuleuven.ac.be> for
+   fixing the bug!
+ * fixed some small bugs spotted by Horst Tellioglu
+   <telliogl@h2hobel.phl.univie.ac.at> that messed up creating a brand-
+   new entry from scratch
+ * fixed even smaller bug spotted by Horst Tellioglu in the BibTeX 0.99
+   emulation code
+
+0.32 1999-11-28
+ * made Makefile.PL able to download and configure btparse, instead
+   of leaving it up to the user
+ * fixed entry output method (print_s) so strings are wrapped in braces,
+   not quotes -- that way we don't generate bogus BibTeX files if there
+   are quotes at top-level in a string
+
+0.31 1999-10-28
+ * fixed small bug in Text::BibTeX::BibFormat
+ * better documentation for Text::BibTeX::Name example
+ * better adherence to POD standard
+
+0.30 1999-03-12
+ * the "structure module" system is in place -- lets you write classes
+   analogous to BibTeX style files, but with all the advantages of
+   object-oriented programming in Perl (see Text::BibTeX::Structure
+   man page)
+ * the Bib structure, meant to emulate the standard style files of
+   BibTeX 0.99, is partially complete: can generate sort keys for
+   any of the 13 standard entry types, and format 'article' and 'book'
+   entries -- no support for crossrefs or alphabetic labels yet though
+ * can now (optionally) access the data in more "raw" form, ie. with
+   macros not expanded, strings not concatenated, whitespace not collapsed)
+   (see Text::BibTeX::Value man page)
+ * moved support for parsing individual names to the Text::BibTeX::Name class
+ * added support for name-formatting via Text::BibTeX::NameFormat class
+   (parallels work in btparse -- see also bt_format_names man page)
+ * added BibTeX-style string purificaction
+ * added three example programs: btcheck, btsort, and btformat (btformat
+   is *very* preliminary!)
+ * lots of documentation added/revised in the existing modules
+
+0.21 1997-10-20
+ * companion to btparse 0.21 -- mainly due to bug fixes and one
+   minor interface change (bt_cite_key -> bt_entry_key) in btparse
+ * documentation/portability/warning fixes
+ * fixed XS code to not make an accidental second "strip quote
+   characters" pass
+ * fixed Entry 'print_s' method to handle all entry metatypes
+ * changed Entry 'delete' method to handle a list of fields
+ * started introducing changes to support the new way of
+   doing 'structure modules' -- nothing documented yet, though
+ * deprecated old Structure module
+
+0.2 1997-09-08
+ * fixed a bunch of little memory leaks in the btparse C library
+ * rationalized the Text::BibTeX::Entry method names
+ * added (incomplete) Text::BibTeX::Structure module
+ * completely overhauled the parser and the interface to it;
+   this necessitated many small changes to BibTeX.xs
+ * greatly expanded the test suite and fixed a few little bugs
+   found in the process
+ * fixed the XS code to handle comment and preamble entries
+
+0.1 1997-03-08
+ * initial release

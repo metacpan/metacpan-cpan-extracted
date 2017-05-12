@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a98d1ca04e2cb5b88e9a945ce3fdef1a7b315b82 CArray.pm
+SHA1 7cf55a5c6cc767f0f1ee5be1ff0cd25c21ab9735 CArray.xs
+SHA1 d6d36c863d8f5d2bad5fea6e8ce6ab342575dfe3 Changes
+SHA1 01933c61af7bf9d13948aef19ce0cf8e4d8e3a87 MANIFEST
+SHA1 bc40b9cf1c74b28c8e2b63f263b7a2bfd1eb0f29 META.yml
+SHA1 29c0410170544a18499cc17767551d530ad133bd Makefile.PL
+SHA1 c43434510b579a72a36f280cdba785e3a051bbbe README
+SHA1 6805827f65f32c8cb31132f9b2c850377df421e8 t/00intarr.t
+SHA1 595f99fc385e1a5adfcc4a7415840ca88b25bf8f t/01dblarr.t
+SHA1 283a4dd8e3006f94c780519ae9973f47d018748b t/02strarr.t
+SHA1 0b04bead0cc3f117fb67ba2ef94624c796ac9b35 t/03intcvt.t
+SHA1 23db8c0c6b070325b7fd84ec85313a1c9d07bdc5 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Cygwin)
+
+iEYEARECAAYFAkuDBscACgkQ7YMwHlv2uoomBQCePKG/T8fPLo79ZM9G73PszTMs
+n/oAniWWXfsRJ8YtK+MhLX8MWU4YHXs4
+=/d2B
+-----END PGP SIGNATURE-----

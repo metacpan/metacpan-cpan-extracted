@@ -1,0 +1,26 @@
+<html>
+<title>Headless Clustering (LSA) </title>
+<body>
+<h1>Headless Clustering (LSA) </h1>
+</body>
+</html>
+
+Headless clustering takes as input contexts that do not contain a target  
+or head word. The entire context must be considered during clustering, as 
+there is no target word around which to adjust the test or training 
+scope, for example. (These are options in discriminate.pl) 
+<br><br>
+Typical examples of headless contexts include email or other short 
+messages or documents, where the goal is to cluster them based on topic. 
+Note that in addition to test_scope and target_scope, target co-occurrence 
+(tco) features are not supported since there are no target words in the 
+contexts. 
+<br><br>
+When using LSA to carry out headless context clustering, each feature will 
+be represented as a vector that shows the contexts in which it occurs. 
+Each context will be represented as the average of the vectors associated 
+with the features that occur within that context. The premise is that 
+contexts that are made up of features that occur in some of the same  
+contexts should be similar to each other. 
+
+

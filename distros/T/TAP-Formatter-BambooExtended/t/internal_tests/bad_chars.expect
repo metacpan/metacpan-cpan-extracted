@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-bad_chars_test" errors="0" failures="0" tests="3" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/bad_chars.test"/>
+  <testcase name="- Control chars &amp;#2;&amp;#3;"/>
+  <testcase name="- Weird control chars &amp;#127;&amp;#31;&amp;#29;&amp;#30;"/>
+  <testcase name="- Unicode &amp;THORN;&amp;#x3F4;&amp;#xC307;"/>
+</testsuite>

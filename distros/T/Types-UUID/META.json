@@ -1,0 +1,73 @@
+{
+   "abstract" : "type constraints for UUIDs",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Types-UUID",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Type::Tiny" : "1.000000",
+            "UUID::Tiny" : "1.02",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "URI" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::TypeTiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Types::UUID" : {
+         "file" : "lib/Types/UUID.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Types-UUID"
+      },
+      "homepage" : "https://metacpan.org/release/Types-UUID",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-types-uuid.git",
+         "web" : "https://github.com/tobyink/p5-types-uuid"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-UUID/project"
+   },
+   "version" : "0.004"
+}

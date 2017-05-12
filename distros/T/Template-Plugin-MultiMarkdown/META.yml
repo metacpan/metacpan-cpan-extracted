@@ -1,0 +1,50 @@
+--- #YAML:1.0
+name:                     Template-Plugin-MultiMarkdown
+version:                  0.12
+abstract:                 TT plugin for Text::MultiMarkdown
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+dynamic_config:           1
+
+configure_requires:
+  ExtUtils::MakeMaker:      0
+build_requires:
+  ExtUtils::MakeMaker:      0
+  FindBin:                  0
+  IO::File:                 0
+  Test::More:               0.70
+requires:
+  perl:                     5.006
+  parent:                   0
+  Template:                 2.16
+  Template::Plugin::Filter: 1.38
+  Text::MultiMarkdown:      1.000035
+recommends:
+  Test::CPAN::Meta:         0
+  Test::CPAN::Meta::JSON:   0
+  Test::Pod:                1.00
+  Test::Pod::Coverage:      0.08
+  Text::MultiMarkdown::XS:  0.001_03
+
+provides:
+  Template::Plugin::MultiMarkdown:
+    file:     lib/Template/Plugin/MultiMarkdown.pm
+    version:  0.12
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-MultiMarkdown
+  repository: http://github.com/barbie/template-plugin-multimarkdown
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

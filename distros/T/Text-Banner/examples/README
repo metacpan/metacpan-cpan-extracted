@@ -1,0 +1,12 @@
+
+
+The file 'horizontal.txt' gives some examples of different size
+output strings that are available in horizontal mode.  The 
+'vertical.txt' file does the same for vertical scaling.
+
+'Documentation.txt' is a text file of the pod documentation
+embedded within the module.
+
+Please send questions/comments/bug reports to stuart@onyx.ch
+
+

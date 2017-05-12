@@ -1,0 +1,24 @@
+---
+abstract: 'Filehandle tie that captures, splits and stores output into files in a given path.'
+author:
+  - 'Gonzalo Barco <gbarco@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-FileHandle-Split
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 1.22
+  File::Temp: 0.16
+  Tie::FileHandle::Base: 0.1
+version: 0.95

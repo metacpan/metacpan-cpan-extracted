@@ -1,0 +1,48 @@
+{
+   "abstract" : "SenseClusters - Clustering similar written contexts",
+   "author" : [
+      "Ted Pedersen <tpederse at d.umn.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-SenseClusters",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Munkres" : "0.07",
+            "Algorithm::RandomMatrixGeneration" : "0.06",
+            "Bit::Vector" : "6.3",
+            "Math::SparseMatrix" : "0.02",
+            "Math::SparseVector" : "0.03",
+            "PDL" : "2.006",
+            "Set::Scalar" : "1.19",
+            "Text::NSP" : "1.09"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.05"
+}

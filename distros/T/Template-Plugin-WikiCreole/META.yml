@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Template-Plugin-WikiCreole
+version:             0.03
+abstract:            TT wrapper for Text::WikiCreole
+license:             perl
+author:              
+    - Martin Elliss (@cpan.org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Template:                      2
+    Template::Plugin::Filter:      0
+    Template::Test:                0
+    Test::Simple:                  0.44
+    Text::WikiCreole:              0.07
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

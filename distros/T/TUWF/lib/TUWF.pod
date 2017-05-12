@@ -1,0 +1,621 @@
+=head1 NAME
+
+TUWF - The Ultimate Website Framework
+
+=head1 DESCRIPTION
+
+TUWF is a small framework designed for writing websites. It provides an
+abstraction layer to various environment-specific tasks and has common
+functions to ease the creation of both small and large websites.
+
+
+=head2 Main features and limitations
+
+TUWF may be The Ultimate Website Framework, but it is not the perfect solution
+to every problem. This section introduces you to some main features and
+limitations you will want to know about before using TUWF.
+
+=over
+
+=item TUWF is small.
+
+I have seen many frameworks being advertised as "small" or "minimal", yet they
+either require loads of dependencies or are not small at all. TUWF, on the
+other hand, B<is> quite small. Its total codebase is significantly smaller than
+the primary code of CGI.pm, and TUWF requires absolutely no extra dependencies
+to run.
+
+Some optional features, however, do require extra modules. In order to run TUWF
+in a FastCGI environment, the L<FCGI|FCGI> module is required. The
+L<TUWF::DB|TUWF::DB> methods require L<DBI|DBI>, and
+L<PerlIO::gzip|PerlIO::gzip> is required when you want to enable content
+encoding.
+
+=item The generated response is buffered.
+
+This allows you to change the response completely while generating an other
+one, which is extremely useful if your code decides to throw an error while a
+part of the response has already been generated. In such a case your visitor
+will properly see your error page and not some messed up page that does not
+make sense. Thanks to this buffering, you will also be able to set cookies and
+send other headers B<after> generating the contents of the page.  And as an
+added bonus, your pages will be compressed more efficiently when output
+compression is enabled.
+
+On the other hand, this means that you can't use TUWF for applications that
+require streaming dynamic content (e.g. a chat application), and you may get
+into memory issues when sending large files.
+
+=item Everything is UTF-8.
+
+All TUWF functions (with some exceptions) will only accept and return Unicode
+strings in Perls native encoding. All incoming data is assumed to be encoded in
+UTF-8 and all outgoing data will be encoded in UTF-8. This is generally what
+you want when developing new applications. If, for some very strange reason,
+you want all I/O with the browser to be in anything other than UTF-8, you won't
+be able to use TUWF. It B<is> possible to use external resources which use
+other encodings, but you will have to C<decode()> that into Perls native
+encoding before passing it to any TUWF function.
+
+=item Designed for CGI and FastCGI environments.
+
+TUWF is designed to be run in CGI and FastCGI environments, and has been
+optimized for FastCGI. That is, all modules will be pre-loaded at
+initialization.
+
+Due to the singleton design of TUWF, you should avoid running TUWF websites in
+persistent environments that allow multiple websites to share the same process,
+such as mod_perl.
+
+=item One (sub)domain is one website.
+
+TUWF assumes that the website you are working on resides directly under a
+(sub)domain. That is, the homepage of your website has a URI like
+I<http://example.com/>, and all sub-pages are directly beneath it. (e.g.
+I<http://example.com/about> would be your "about" page).
+
+While it B<is> possible to run a TUWF website in a subdirectory (i.e. the
+homepage of the site would be I<http://example.com/mysite/>), you will have to
+prefix all HTML links and registered URIs with the name of the subdirectory.
+This is neither productive, nor will it be fun when you wish to rename that
+directory later on.
+
+=item One website is one (sub)domain.
+
+In the same way as the previous point, TUWF is not made to handle websites that
+span multiple (sub)domains and have different behaviour for each one. It is
+possible - quite simple, even - to have a different subdomain affect some
+configuration parameter while keeping the structure and behaviour of the
+website the same as for the other domains. An example of this could be a
+language setting embedded in a subdomain: I<en.example.com> could show to the
+English version of your site, while I<de.example.com> will have the German
+translation.
+
+Things will become messy as soon as you want (sub)domains to behave
+differently. If you want I<forum.example.com> to host a forum and
+I<wiki.example.com> to be a wiki, you will want to avoid programming both
+subdomains in the same TUWF script. A common solution is to write a separate
+script for each subdomain. It is still possible to share code among both sites
+by means of modules.
+
+=item Backward compatibility is not guaranteed.
+
+TUWF is the result of years of evolution, from one implementation to another
+and from one design to another. The reason TUWF has become what it is now is
+because of this unconstrained evolution. Providing backward compatibility in
+many cases complicates the implementation of new ideas and may add unwanted
+bloat to the framework. For this reason, future versions of TUWF may work
+differently from older versions, and may not be backward compatible with code
+written for an older version.
+
+When using TUWF for your project, it is adviced to get one version of TUWF and
+stick to that, until you have time to check out a later version and update your
+code to work with that one.
+
+=back
+
+
+
+=head2 General structure of a TUWF website
+
+A website written using TUWF consists of a single Perl script, optionally
+accompanied by several modules. The script is responsible for loading,
+initializing and running TUWF, and can be used as a CGI or FastCGI script. For
+small and simple websites, this script may contain the code for the entire
+website. Usually, however, the actual implementation of the website is spread
+among the various modules.
+
+The script can load the modules by calling C<TUWF::load()> or
+C<TUWF::load_recursive()>. TUWF configuration variables can be set using
+C<TUWF::set()>, and URIs can be mapped to functions using C<TUWF::register()>.
+These functions can also be called by the loaded modules. In fact, for larger
+websites it is common for the script to only initialize TUWF and load the
+modules, while all calls to C<TUWF::register()> are done from the modules.
+
+The framework is based on callbacks: At initialization, your code registers
+callbacks to the framework and then passes the control to TUWF using
+C<TUWF::run()>. TUWF will then handle requests and call the appropriate
+functions you registered.
+
+
+=head2 The TUWF Object
+
+While TUWF can not really be called I<object oriented>, it does use B<one>
+major object, called the I<TUWF object>. This object can be accessed from
+C<$TUWF::OBJ> and is passed as the first argument to all callback functions.
+Even though it is an "instance" of C<TUWF::Object>, you are encouraged to use
+it as if it is the main object for your website: You can use it to store global
+configuration settings and other shared data.
+
+All modules loaded using C<TUWF::load()> and its recursive counterpart can
+export functions; These functions are automatically imported in the
+C<TUWF::Object> namespace and can be used as methods of the TUWF object. This
+allows for an easy method to split the functionality of your website among
+different functions and files, without having to constantly load and import
+your utility modules in each file that uses them.
+
+Of course, with all exported functions being imported into a single namespace,
+this does call for some function naming conventions to avoid name conflicts and
+other confusing issues. The main TUWF methods use camelCase and are often
+prefixed with a short identifier to indicate to which module or section they
+belong. For example, the L<TUWF::Request|TUWF::Request> methods all start with
+C<req> and L<TUWF::Response|TUWF::Response> with C<res>. It is a good idea to
+adopt this style when you write your own methods.
+
+Be warned that the data in the TUWF object may or may not persist among
+multiple requests, depending on whether your script is running in FastCGI or
+CGI mode, respectively. In particular, it is a bad idea to store session data
+in this object, assuming it to be available on the next request. Storing data
+specific to a single request in the object is fine, as long as you make sure to
+reset or re-initialize the data at the beginning of the request. The
+C<pre_request_handler> is useful for such practice.
+
+
+=head2 Utility functions
+
+Besides the above mentioned methods, TUWF also provides various handy
+functions. These functions are implemented in the TUWF submodules (e.g.
+L<TUWF::Misc|TUWF::Misc>) and can be imported manually through these modules.
+Check out the L<SEE ALSO|/"SEE ALSO"> below for the list of submodules.
+
+An alternative, and more convenient, approach to importing these functions into
+your code is also available: you can import functions from multiple submodules
+at once by adding their names and/or tags to the C<use TUWF;> line.
+
+The following two examples are equivalent:
+
+  # the simple approach
+  use TUWF ':xml', 'uri_escape', 'sqlprint';
+
+  # the classic approach
+  use TUWF;
+  use TUWF::XML ':xml';
+  use TUWF::Misc 'uri_escape';
+  use TUWF::DB 'sqlprint';
+
+The first C<use TUWF;> line of the classic approach is not required if all you
+need is to import the functions. Omitting this line from your main website
+script, however, will cause the main TUWF code to not be loaded into memory,
+and the global functions (listed below) will then not be available. The simple
+approach does not suffer from this problem and is therefore recommended.
+
+
+
+
+=head1 GLOBAL FUNCTIONS
+
+The main TUWF namespace contains several functions used to initialize the
+framework and register the callbacks for your website.
+
+=head2 TUWF::load(@modules)
+
+Loads the listed module names and imports their exported functions to the
+C<TUWF::Object> namespace. The modules must be available in any subdirectory in
+C<@INC>.
+
+  # make sure the website modules are available from @INC
+  use lib 'mylib';
+  
+  # load mylib/MyWebsite/HomePage.pm
+  TUWF::load('MyWebsite::HomePage');
+  
+  # load two other modules
+  TUWF::load('MyWebsite::Forum', 'MyUtilities');
+
+Note that your modules must be proper Perl modules. That is, they should return
+a true value (usually done by adding C<1;> to the end of the file) and they
+should have the correct namespace definition.
+
+=head2 TUWF::load_recursive(@modules)
+
+Works the same as C<TUWF::load()>, but this also loads all submodules.
+
+  # the following will load MyWebsite.pm (if it exists) and all modules below
+  # the MyWebsite/ directory (if any).
+  TUWF::load_recursive('MyWebsite');
+
+Note that all submodules must be in the same parent directory in C<@INC>.
+
+=head2 TUWF::register(regex => subroutine, ..)
+
+Maps a URI to a function. The I<regex> is matched to L<reqPath()|TUWF::Request>
+and must match the path from the begin to the end.  (That is, the regex is used
+between C<^> and C<$> marks). The leading slash of the path is removed before
+matching, so these should be omitted in the regexes. It is common to use the
+C<qr{}> operator to quote the regex, which prevents you from having to escape
+slashes in the path as would be required with C<qr//>.
+
+All registered regexes are matched against any incoming URI, and the subroutine
+corresponding to the first matched regex will be called to handle the request.
+The first argument to the subroutine will be the main TUWF object. If the
+regular expression has capture buffers, these will also be provided as
+additional arguments.
+
+  TUWF::register(
+    # empty regex = root URI (/)
+    # myhomepage() will be called with the main TUWF object
+    qr{}  => \&myhomepage,
+  
+    # The following will match on any /user/<numeric-id> URI.
+    # userpage() will be called with
+    # - the TUWF object and
+    # - the id-part of the URI ($1 in the regular expression)
+    qr{user/(\d+)} => \&userpage,
+  );
+
+=head2 TUWF::set(key => value, ..)
+
+Get or set TUWF configuration variables. When called with only one argument,
+will return the configuration variable with that key. Otherwise the number of
+arguments must be a multiple of 2, setting the configuration parameters.
+
+=over
+
+=item content_encoding
+
+Set the default output encoding. Supported values are I<none>, I<gzip>,
+I<deflate>, I<auto>. See L<TUWF::Response|TUWF::Response> for more information.
+Default: auto.
+
+=item cookie_defaults
+
+When set to a hashref, will be used as the default options to
+L<resCookie()|TUWF::Response>. These options can still be overruled by each
+individual call to C<resCookie()>. This can be useful when globally setting the
+cookie domain:
+
+  $self->set(cookie_defaults => { domain => '.example.org' });
+  $self->resCookie(foo => 'bar');
+  
+  # is equivalent to:
+  $self->resCookie(foo => 'bar', domain => '.example.org');
+  # for each call to resCookie()
+
+Default: undef (disabled).
+
+=item cookie_prefix
+
+When set to a non-empty string, its value will be used as prefix to all cookie
+names used by C<reqCookie()> and C<resCookie()>. C<reqCookie()> will act as if
+all cookies not having the configured prefix never existed, and removes the
+prefix when used in list context. C<resCookie()> will simply add the prefix to
+all outgoing cookies. Default: undef (disabled).
+
+=item db_login
+
+Sets the login information for the L<TUWF::DB|TUWF::DB> functions. Can be set
+to either an arrayref or a subroutine reference.
+
+In the case of an arrayref, the array should have three elements, containing
+the first three arguments to C<DBI::connect()>. Do not include the last options
+argument, TUWF will set the appropriate options itself. When necessary,
+however, it is still possible to set options using the DSN string itself, see
+the L<DBI|DBI> documentation for more information. C<TUWF::DB> will
+automatically enable the unicode/utf8 flag for C<DBD::mysql>, C<DBD::Pg> and
+C<DBD::SQLite>.
+
+When setting this to a subroutine reference, the subroutine will be called when
+connecting to the database, with the main TUWF object as only argument. The
+subroutine is expected to return a DBI instance. It is the responsibility of
+the subroutine to set the correct DBI options. In particular, it is important
+to have I<RaiseError> enabled and I<AutoCommit> disabled. It is also
+recommended to enable unicode support if your database driver has such an
+option.
+
+Default: undef (disabled).
+
+=item debug
+
+Set to a true value to enable debug mode. When debug mode is enabled and
+I<logfile> is specified, TUWF will log page generation times for each request.
+This flag can be easily read through the C<debug()> method, so you can also use
+is in your own code. Default: 0 (disabled).
+
+=item error_400_handler
+
+Similar to I<error_404_handler>, but is called when something in the request
+data did not make sense to TUWF. In the current implementation, this only
+happens when the request data contains non-UTF8-encoded text. A warning is
+written to the log file when this happens.
+
+=item error_404_handler
+
+Set this to a subroutine reference if you want to write your own 404 error
+page. The subroutine will be called with TUWF object as only argument, and is
+expected to generate a response.
+
+=item error_405_handler
+
+Similar to I<error_404_handler>, but is called when the HTTP request method is
+something other than HEAD, GET or POST. These requests are usually generated by
+bots or applications which don't actually read the response contents, so
+overriding the default 405 error page makes little sense in most situations. If
+you do override it, do not forget to add an C<Allow> HTTP header to the
+response, as required by the HTTP standard.
+
+=item error_413_handler
+
+Similar to I<error_404_handler>, but is called when the POST body exceeds the
+configured I<max_post_body>.
+
+=item error_500_handler
+
+Set this to a subroutine reference if you want to write your own 500 error
+page. The subroutine will be called with the TUWF object as first argument and
+the error message as second argument. When I<logfile> is set, a detailed error
+report will be written to the log. It is recommended to ignore the error
+message passed to your subroutine and to enable the log file, so you won't risk
+sending sensitive information to your visitors.
+
+=item logfile
+
+To enable logging, set this to a string that indicates the path to your log
+file. The file must of course be writable by your script. TUWF automatically
+logs all Perl warnings, and when one of your callbacks throws an exception a
+full request dump with useful information will be logged, allowing you to
+easily locate and fix the problem. You can also write information to the log
+yourself using the C<log()> method. Default: undef (disabled).
+
+=item log_format
+
+Set to a subroutine reference to influence the default log format. The
+subroutine is passed three arguments: the main TUWF object, the URI of the
+current request (or '[init]' if C<log()> was called outside of a request), and
+the log message. The subroutine should return the string to be written to the
+log, including trailing newline.
+
+Be warned that your subroutine can be called even when no request is being
+processed or before some resources have been initialized, so you should avoid
+using such resources. In paticular, do not call any database functions from
+this subroutine, as the database connection may not be in a defined state. Any
+Perl warnings generated by this subroutine will not be logged in order to avoid
+infinite recursion.
+
+=item log_slow_pages
+
+Setting this to a number will log all pages that took longer to generate than
+the time indicated in the number, in milliseconds. The format of the log line
+is the same as used when the I<debug> option is enabled. This option is ignored
+when I<debug> is enabled, since in that case all pages will be logged anyway.
+Default: 0 (disabled).
+
+=item log_queries
+
+Setting this to a true value will write all database queries to the log file.
+Useful when debugging queries, but can generate a lot of data. Default: 0
+(disabled).
+
+=item mail_from
+
+The default value of the C<From:> header of mail sent using
+L<mail()|TUWF::Misc>. Default: C<E<lt>noreply-yawf@blicky.netE<gt>>.
+
+=item mail_sendmail
+
+The path to the C<sendmail> command, used by L<mail()|TUWF::Misc>. Default:
+C</usr/sbin/sendmail>.
+
+=item max_post_body
+
+Maximum length of the contents of POST requests, in bytes. This disallows
+people to upload large files and potentially cause your script to run out of
+memory. Set to 0 to disable this limit. Default: 10MB.
+
+=item pre_request_handler
+
+Set to a subroutine reference if you want to perform some actions before TUWF
+calls your URI handling function. The subroutine B<must> return a true value to
+indicate that TUWF can continue processing the request as usual. If the
+subroutine returns false, TUWF will assume the subroutine has generated a
+response and will halt any further processing. This callback is often used
+for initializing or resetting request-specific data, and parsing cookies or
+other request data to set preferences or session information.
+
+=item post_request_handler
+
+Similar to I<post_request_handler>, except it will be called after the request
+has been processed but before it has been sent to the client. This callback
+will not be called if any of the functions before threw an exception.
+
+=item validate_templates
+
+Hashref, templates for the L<kv_validate()|TUWF::Misc> function when called
+using L<formValidate()|TUWF::Misc>. The recommended way to add new templates is
+to call C<TUWF::set()> with a single argument:
+
+  TUWF::set('validate_templates')->{$key} = \%validate_options;
+
+=item xml_pretty
+
+Passed to the I<pretty> option of C<TUWF::XML-E<gt>new()>. See
+L<TUWF::XML|TUWF::XML>. Default: 0 (disabled).
+
+=back
+
+=head2 TUWF::run()
+
+After TUWF has been initialized, all modules have been loaded and all URIs have
+been registered, the last thing that remains is to execute C<TUWF::run()>. This
+function will start processing requests and calls the appropriate callbacks at
+the appropriate stages.
+
+Whether this function ever returns or not depends on the environment your
+script is running in; if you're running your script in a CGI environment,
+C<TUWF::run()> will return as soon as the request has been processed. If, on
+the other hand, you are running the script as a FastCGI script, it will keep
+waiting for new incoming requests and will therefore never return. It is a bad
+idea to assume either way, so you want to avoid putting any run-time code after
+calling C<TUWF::run()>.
+
+
+
+=head1 BASIC METHODS
+
+This section documents the basic TUWF object methods provided by TUWF.pm. The
+TUWF object provides many other methods as well, which are implemented and
+documented in the various sub-modules. See the documentation of each sub-module
+for the methods it provides.
+
+=head2 debug()
+
+Returns the value of the I<debug> setting.
+
+=head2 log(message)
+
+Writes a message to the log file configured with I<logfile>. When no log file
+is configured, C<log()> will do nothing. The I<message> argument may contain
+newlines, which will be nicely (re-)formatted before logging, in order to avoid
+ambiguity with other log entries. By default the log message will be prefixed
+with the date and URI of the request, but this can be changed with the
+L<log_format|/log_format> setting.
+
+This function is not used very often in practice, since it is easier to simply
+use Perl's C<warn()> function instead. TUWF automatically writes all warnings
+to the log file.
+
+
+
+=head1 SERVER CONFIGURATION
+
+Since a website written using TUWF consists of a single Perl script that acts
+as the main script for your site, the only thing you have to do is tell your
+webserver to run it. There are generally two things you should take care of:
+
+=over
+
+=item 1.
+
+You can run the script as CGI or FastCGI script. In the case of FastCGI, you
+will need the L<FCGI|FCGI> module.
+
+=item 2.
+
+You have to make sure all requests to non-existing files are passed to your
+script, in order for the URI rewriting in TUWF to work.
+
+=back
+
+The following examples show how to configure your server to run the
+C<examples/singlefile.pl> script from the TUWF distribution. I assume the TUWF
+distribution is unpacked in C</tuwf> and the site runs on the hostname
+C<test.example.com>.
+
+=head2 Examples for Apache (2.2)
+
+CGI mode:
+
+  <VirtualHost *:*>
+    ServerName test.example.com
+    DocumentRoot /tuwf/examples
+    AddHandler cgi-script .pl
+
+    # %{REQUEST_FILENAME} does not seem to always work inside a <VirtualHost>
+    # But it should be equivalent to "%{DOCUMENT_ROOT}/%{REQUEST_URI}"
+    RewriteEngine On
+    RewriteCond "%{DOCUMENT_ROOT}/%{REQUEST_URI}" !-s
+    RewriteRule ^/ /singlefile.pl
+  </VirtualHost>
+
+It is possible to move the mod_rewrite statements into a .htaccess file, in
+which case you can remove the C<Rewrite*> lines in the above example and put
+the following in your .htaccess file:
+
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-s
+  RewriteRule ^/ /singlefile.pl
+
+FastCGI mode, using C<mod_fcgid>. With this configuration it is possible to
+have the documentroot point to a different directory than where the TUWF script
+resides, which could improve security.
+
+  <VirtualHost *:*>
+    ServerName test.example.com
+    DocumentRoot /whatever/you/want
+    AddHandler fcgid-script .pl
+    FcgidWrapper /tuwf/examples/singlefile.pl virtual
+
+    # same as above example, except 'singlefile.pl' can be anything,
+    # as long as it ends with '.pl'
+    RewriteEngine On
+    RewriteCond "%{DOCUMENT_ROOT}/%{REQUEST_URI}" !-s
+    RewriteRule ^/ /singlefile.pl
+  </VirtualHost>
+
+Again, it is possible to move the rewrites into a .htaccess. All of the above
+examples assume the referenced directories have the appropriate options set
+using a C<E<lt>DirectoryE<gt>> clause.
+
+
+=head2 Examples for lighttpd (1.4)
+
+CGI mode:
+
+  $HTTP["host"] == "test.example.com" {
+    server.document-root = "/tuwf/examples"
+    cgi.assign = ( ".cgi" => "" )
+    server.error-handler-404 = "/singlefile.pl"
+  }
+
+FastCGI:
+
+  fastcgi.server = (
+    ".singlefile" => ((
+      "socket"            => "/tmp/perl-tuwf-singlefile.socket",
+      "bin-path"          => "/tuwf/examples/singlefile.pl",
+      "check-local"       => "disable"
+    ))
+  )
+
+  $HTTP["host"] == "test.example.com" {
+    server.document-root = "/whatever/you/want"
+    cgi.assign = ( ".cgi" => "" )
+    server.error-handler-404 = "/something.singlefile"
+  }
+
+
+=head1 SEE ALSO
+
+L<TUWF::DB>, L<TUWF::Misc>, L<TUWF::Request>, L<TUWF::Response>, L<TUWF::XML>.
+
+The homepage of TUWF can be found at
+L<http://dev.yorhel.nl/tuwf|http://dev.yorhel.nl/tuwf>.
+
+TUWF is available on a git repository at
+L<http://g.blicky.net/tuwf.git/|http://g.blicky.net/tuwf.git/>.
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008-2015 Yoran Heling.
+
+This module is part of the TUWF framework and is free software available under
+the liberal MIT license. See the COPYING file in the TUWF distribution for the
+details.
+
+
+=head1 AUTHOR
+
+Yoran Heling <projects@yorhel.nl>
+
+=cut
+

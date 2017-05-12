@@ -1,0 +1,38 @@
+SYNOPSIS
+
+     use Text::Table::TinyWide qw/ generate_table /;
+    
+     my $rows = [
+         # header row
+         ['Name', 'Rank', 'Serial'],
+         # rows
+         ["\x{7231}\x{4E3D}\x{4E1D}", 'pvt', '123456'],
+         ['bob',   'cpl', '98765321'],
+         ['carol', 'brig gen', '8745'],
+     ];
+     binmode('STDOUT', ':utf8');
+     print generate_table(rows => $rows, header_row => 1);
+
+DESCRIPTION
+
+    This module is like Text::Table::Tiny (0.04) with added support for
+    wide characters. With this module, text with wide characters will still
+    line up.
+
+    Interface, options, and format variables are the same as in
+    Text::Table::Tiny.
+
+SEE ALSO
+
+    Text::Table::Tiny
+
+    Text::Table::TinyColor for table with colored text support.
+
+    Text::Table::TinyColorWide for table with colored text and wide
+    character support.
+
+    Text::Table::Any
+
+    Text::ANSITable for more formatting options and colored text support,
+    but with larger footprint and slower rendering speed.
+

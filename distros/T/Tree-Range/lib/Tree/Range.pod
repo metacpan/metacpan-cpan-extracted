@@ -1,0 +1,76 @@
+### Range.pod --- Document Tree::Range  -*- POD -*-
+
+### Ivan Shmakov, 2013
+
+## To the extent possible under law, the author(s) have dedicated all
+## copyright and related and neighboring rights to this software to the
+## public domain worldwide.  This software is distributed without any
+## warranty.
+
+## You should have received a copy of the CC0 Public Domain Dedication
+## along with this software.  If not, see
+## <http://creativecommons.org/publicdomain/zero/1.0/>.
+
+### Code:
+
+=head1 NAME
+
+Tree::Range E<ndash> create range tree objects
+
+=head1 SYNOPSIS
+
+    require Tree::Range;
+    require Tree::Range::Foo;
+
+    my $rat
+        = Tree::Range->new ("Foo", @args);
+
+=head1 DESCRIPTION
+
+This package provides a trivial wrapper around individual
+I<range tree> classesE<rsquo> constructors.
+
+Please refer to the L<Tree::Range::base> documentation for more
+information on range trees.
+
+=head1 INTERFACE
+
+=over 4
+
+=item C<< my $rat = Tree::Range->new ($variety, @args); >>
+
+Create and return a new range tree object of the I<variety>
+specified.
+
+This call is effectively synonymous to:
+
+    my $rat
+        = ("Tree::Range::" . ${variety})->new (@args);
+
+Please refer to the documentation for the variety chosen for
+more information.
+
+=back
+
+=head1 SEE ALSO
+
+L<Tree::Range::RB>,
+L<Tree::Range::RB::Conflict>,
+L<Tree::Range::base>,
+L<Tree::Range::conflict>.
+
+=head1 AUTHOR
+
+Ivan Shmakov <oneingray@gmail.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the 3-clause BSD license, as
+included within the code.
+
+=cut
+
+### Emacs trailer
+## Local variables:
+## coding: us-ascii
+## End:
+### Range.pod ends here

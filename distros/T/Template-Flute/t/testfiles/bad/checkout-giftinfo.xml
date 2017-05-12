@@ -1,0 +1,20 @@
+<specification>
+<container name="errors" value="errors" class="alert"/>
+<value name="first_name" scope="errors" id="error-first-name" op="toggle" args="static"/>
+<value name="last_name" scope="errors" id="error-last-name" op="toggle" args="static"/>
+<value name="zip_city" scope="errors" id="error-zip-city" op="toggle" args="static"/>
+<form name="giftinfo" link="name">
+<field name="gender"/>
+<field name="first_name"/>
+<field name="last_name"/>
+<field name="street_address_xxxx"/>
+<field name="zip"/>
+<field name="city"/>
+<field name="country" iterator="countries" iterator_value_key="country_iso_code" iterator_name_key="name"/>
+<field name="message"/>
+<field name="dayzzz" iterator="days"/>
+<field name="month" iterator="months"/>
+<field name="time"/>
+<field name="phone"/>
+</form>
+</specification>

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Text/Shinobi.pm
+t/00_compile.t
+t/01_shinobi.t
+t/02_code.t
+t/03_normalize.t
+t/04_romaji.t
+t/05_reading.t
+META.yml
+MANIFEST

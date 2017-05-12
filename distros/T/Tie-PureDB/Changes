@@ -1,0 +1,10 @@
+Revision history for Perl extension Tie::PureDB.
+
+0.02  Thu Apr 10 12:04:06 2003
+    - after some hints by tye/diotalevi, finally created a working interface
+    - completed api, wrote tests, pod, ... released on CPAN
+
+0.01  Thu Apr  3 23:45:51 2003
+	- original version; created by h2xs 1.21 with options
+		-Af Tie::PureDB
+

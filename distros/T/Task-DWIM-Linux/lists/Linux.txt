@@ -1,0 +1,334 @@
+[Web::Feed]
+version = 0.02
+tags = Web
+comment = Experimental: used by Perl::Maven, szabgab.com
+
+[LWP::Simple]
+version = 6.00
+tags = Web
+comment = szabgab.com,  Task-Kensho-WebCrawling-0.2
+8description = simple procedural interface to LWP
+# libwww-perl-6.06
+
+[Plack]
+version = 1.0030
+description = Perl Superglue for Web frameworks and Web Servers (PSGI toolkit)
+tags = Web
+
+[Plack::Request]
+version = 1.0030
+description = Portable HTTP request object from PSGI env hash
+tags = Web
+comment = Perl::Maven, szabgab.com
+
+[Encode]
+version = 2.59
+description = character encodings in Perl
+tags = Web, Text
+comment = used by szabgab.com
+
+[HTML::Template]
+version = 2.95
+description = Perl module to use HTML-like templating language
+tags = Web
+comment = used by szabgab.com
+
+[Config::Tiny]
+version = 2.20
+description = Read/Write .ini style files with as little code as possible
+comment = Very handy for configuration files
+tags = Configuration
+
+[Starman]
+version = 0.4009
+description = High-performance preforking PSGI/Plack web server
+tags = Web
+comment = IMHO not planned to run on Windows
+
+[Dancer]
+version = 1.3123
+description = lightweight yet powerful web application framework
+tags = Web
+comment = used by Perl::Maven
+
+[Acme::MetaSyntactic]
+version = 1.012
+description = Themed metasyntactic variables names
+comment = used by Perl::Maven
+# or even Task::MetaSyntactic
+
+[Business::PayPal]
+version = 0.11
+description = Perl extension for automating PayPal transactions
+tags = Web
+comment = used by Perl::Maven
+
+[Code::Explain]
+version = 0.02
+description = Try to explain what $ @ % & * and the rest mean
+comment = used by Perl::Maven
+
+[DateTime::Tiny]
+version = 1.04
+description = A date object, with as little code as possible
+comment = used by Perl::Maven
+# Task-Kensho-Dates-0.28
+
+[DBD::SQLite]
+version = 1.42
+description = Self-contained RDBMS in a DBI Driver
+tags = Database
+comment = used by Perl::Maven
+
+[DBI]
+version = 1.631
+description = Database independent interface for Perl
+tags = Database
+comment = used by Perl::Maven
+
+[DBIx::RunSQL]
+version = 0.12
+description = run SQL from a file
+tags = Database
+comment = used by Perl::Maven
+
+[Email::Valid]
+version = 1.193
+description = Check validity of Internet email addresses
+tags = Email, Web
+comment = used by Perl::Maven
+
+[Hash::Merge::Simple]
+version = 0.051
+description = Recursively merge two or more hashes, simply
+comment = used by Perl::Maven
+
+[Geo::IP]
+version = 1.43
+description = Look up location and network information by IP Address
+comment = used by Perl::Maven
+
+[MIME::Lite]
+version = 3.030
+description = low-calorie MIME generator
+comment = used by Perl::Maven, not recommended any more, but lots of applications still use it
+tags = Email
+
+[Moo]
+version = 1.004002
+description =  Minimalist Object Orientation (with Moose compatibility)
+comment = used by Perl::Maven
+tags = OOP
+
+[Storable]
+version = 2.45
+description = persistence for Perl data structures
+tags = Serialization
+comment = used by Perl::Maven
+
+[Template]
+version = 2.25
+description = Front-end module to the Template Toolkit
+tags = Web
+comment = used by Perl::Maven
+# from Task-Kensho-WebDev-0.29
+
+[Test::WWW::Mechanize]
+version = 1.44
+description = Testing-specific WWW::Mechanize subclass
+comment = used by Perl::Maven
+tags = Web, Test
+
+[Test::More]
+version = 1.001003
+description = yet another framework for writing test scripts
+tags = Test
+comment = used by Perl::Maven
+
+[YAML]
+version = 0.90
+description = YAML Ain't Markup Language (tm)
+tags = Serialization
+comment = used by Perl::Maven
+
+[CGI]
+version = 3.65
+description = Handle Common Gateway Interface requests and responses
+comment = Good old CGI, not recomended to new apps, but people still use it and it is being removed from core Perl
+
+[Daemon::Control]
+version = 0.001005
+description = Create init scripts in Perl
+comment = used by Perl::Maven
+tags = Web, Sysadmin
+# test fails on Windows and probably this modules never will run on Windows
+
+
+# [Catalyst::Runtime]
+# version = 5.90062
+# descriptin = The Catalyst Framework Runtime
+# comment = MetaCPAN web uses it
+#
+# [CatalystX::RoleApplicator]
+# version = 0.005
+# description = apply roles to your Catalyst application-related classes
+# comment = MetaCPAN web uses it
+#
+# [Plack::Session]
+# version = 0.21
+# descriptin = Middleware for session management
+# comment = MetaCPAN web uses it
+#
+#
+# [Catalyst::TraitFor::Request::REST::ForBrowsers]
+# version = 1.14
+# description = A request trait for REST and browsers
+# comment = MetaCPAN web
+#
+# [DateTime::Format::HTTP]
+# version = 0.40
+# description = Date conversion routines
+# comment = MetaCPAN web
+#
+# [Regexp::Common::time]
+# version = 0.05
+# description = Date and time regexps
+# comment = MetaCPAN web
+#
+# [Catalyst::Plugin::Authentication]
+# version = 0.10023
+# description = Infrastructure plugin for the Catalyst authentication framework.
+# comment = MetaCPAN web
+#
+# [Catalyst::Plugin::Static::Simple]
+# version = 0.31
+# description = Make serving static pages painless.
+# comment = MetaCPAN Web
+#
+# [Catalyst::Plugin::ConfigLoader]
+# version = 0.33
+# description = Load config files of various types
+# comment = MetaCPAN Web
+#
+# [Config::General]
+# version = 2.52
+# description = Generic Config Module
+# comment = MetaCPAN Web,  Task-Kensho-Config-0.28
+#
+# [Catalyst::Authentication::Store::Proxy]
+# version = 0.0.1
+# description = Delegates authentication logic to the user object
+# comment  MetaCPAN Web
+#
+# [Hash::AsObject]
+# version = 0.13
+# description = treat hashes as objects, with arbitrary accessors/mutators
+# comment = MetaCPAN web
+#
+# [Catalyst::View::TT::Alloy]
+# version = 0.00003
+# description = Template::Alloy (TT) View Class
+# comment = MetaCPAN Web
+#
+# [Template::Plugin::DateTime]
+# version = 0.06002
+# description = A Template Plugin To Use DateTime Objects
+# comment = MetaCPAN Web
+#
+# [Template::Plugin::JSON]
+# version = 0.06
+# description = Adds a .json vmethod for all TT values.
+# comment = MetaCPAN Web
+#
+# [Template::Plugin::Markdown]
+# version = 0.02
+# description = TT plugin for Text::Markdown
+# comment = MetaCPAN Web
+#
+# [Template::Plugin::Number::Format]
+# version = 1.02
+# description = Plugin/filter interface to Number::Format
+# comment = MetaCPAN Web
+#
+# [Template::Plugin::Page]
+# version =  0.10
+# description = a plugin to help when paging through sets of results
+# comment = MetaCPAN Web
+#
+# [AnyEvent::Curl::Multi]
+# version = 1.1
+# description = a fast event-driven HTTP client
+# comment = MetaCPAN Web
+#
+#
+# [MooseX::ClassAttribute]
+# version = 0.27
+# description = Declare class attributes Moose-style
+# comment = MetaCPAN Web
+#
+# [Catalyst::View::JSON]
+# version = 0.33
+# description = JSON view for your data
+# comment = MetaCPAN Web
+#
+# [HTML::Restrict]
+# version = 2.1.9
+# description = Strip unwanted HTML tags and attributes
+# comment = MetaCPAN Web
+#
+# [XML::Feed]
+# version = 0.52
+# description = Syndication feed parser and auto-discovery
+# comment = MetaCPAN Web
+#
+# [HTML::Escape]
+# version = 1.09
+# description = Extremely fast HTML escape
+# comment = MetaCPAN Web
+#
+# [DateTime::Format::ISO8601]
+# version = 0.08
+# description = Parses ISO8601 formats
+# comment = MetaCPAN Web
+#
+# [Data::Pageset]
+# version = 1.06
+# description = Page numbering and page sets
+# comment = MetaCPAN Web
+#
+# [Hash::Merge]
+# version = 0.200
+# description = Merges arbitrarily deep hashes into a single hash
+# comment = MetaCPAN Web
+
+[CPAN::Changes]
+version = 0.27
+description = Read and write Changes files
+comment = MetaCPAN Web, http://changes.cpanhq.org/
+
+# [Captcha::reCAPTCHA]
+# version = 0.97
+# description = A Perl implementation of the reCAPTCHA API
+# comment = MetaCPAN Web
+#
+#
+# [Catalyst::Action::RenderView]
+# version = 0.16
+# description = Sensible default end action
+# comment = MetaCPAN Web
+#
+# [Plack::Middleware::Assets]
+# version =  1.0.0
+# description = Concatenate and minify JavaScript and CSS files
+# comment = MetaCPAN Web
+#
+# [Plack::Middleware::ServerStatus::Lite]
+# version = 0.33
+# description = show server status like Apache's mod_status
+# comment = MetaCPAN Web
+#
+# [CHI]
+# version =  0.58
+# description = Unified cache handling interface
+# comment = MetaCPAN Web
+#

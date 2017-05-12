@@ -1,0 +1,27 @@
+---
+abstract: 'Test for valid YAML'
+author:
+  - 'Jonathan Rockway <jrockway@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0
+  Test::Builder::Tester: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: Perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-YAML-Valid
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Exporter: 0
+  Test::Builder: 0
+  YAML: 0.60
+version: 0.04

@@ -1,0 +1,14 @@
+---
+name: Test-Unix-Group
+version: 0.01
+author:
+  - Nik Clayton <nik@FreeBSD.org>
+abstract: Test::Builder based tests for Unix groups
+license: bsd
+requires:
+  Test::More: 0
+provides:
+  Test::Unix::Group:
+    file: lib/Test/Unix/Group.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

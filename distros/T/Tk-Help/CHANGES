@@ -1,0 +1,9 @@
+0.3 Tue Fed 22 12:00:00 CST 2011
+	- Fixed HASHREF error in populatedetails
+
+0.2 Tue Nov 23 13:00:00 CST 2004
+	- Fixed Makefile to require Tk.
+	- Made corrections in documentation.
+
+0.1 Mon Nov 22 12:00:00 CST 2004
+	- Initial release.

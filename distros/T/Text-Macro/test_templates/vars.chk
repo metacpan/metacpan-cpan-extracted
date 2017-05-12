@@ -1,0 +1,6 @@
+value=dog.
+my_array[0] = zero.
+my_array[2] = two.
+my_hash{key2} = val2.
+my_hash{complex}[1] = 1.
+value=dog.

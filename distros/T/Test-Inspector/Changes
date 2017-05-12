@@ -1,0 +1,10 @@
+Revision history for Perl extension Test::Inspector.
+
+0.01  Sat Feb  3 16:41:42 2007
+	- original version; created
+
+0.02 Mon Feb  5 12:00:00 2007
+        - Only show methods if the module is 'use'd in the test script
+
+0.03 Mon Feb  5 12:10:00 2007
+        - Include the Test::Foo file

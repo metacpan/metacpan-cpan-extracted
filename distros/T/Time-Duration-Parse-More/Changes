@@ -1,0 +1,26 @@
+Revision history for Time-Duration-Parse-More
+ 
+0.008     2016-09-19T13:59:11Z
+        * Allow the use of midnight on complex expressions
+
+0.007     2013-02-04T01:40:17Z
+        * Deal with even more strange clocks found by cpantesters
+
+0.006     2013-02-01T12:18:13Z
+        * Tweak midnight tests to cope with strange clocks on some
+          cpantesters setups
+
+0.005     2013-01-28T17:02:17Z
+        * Add support for XhYmZs expression types
+
+0.004     2013-01-26T12:15:30Z
+        * Added the 'midnight' expression
+
+0.003     2013-01-06T19:06:32Z
+        * Packaging changes to make Travis-CI happy
+
+0.002     2013-01-05T21:16:36Z
+        * Doh! forgot the module abstract
+
+0.001     2013-01-05T21:08:07Z
+        * Initial release

@@ -1,0 +1,26 @@
+---
+name: Text-Password-Pronounceable-Harden
+version: 0.01
+author:
+  - 'Mario Domgoergen <mdom@cpan.org>'
+abstract: harden your pronounceable passwords
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mdom/text-password-pronounceable-harden
+build_requires:
+  Test::More: 0
+requires:
+  Moose: 0
+  Text::Password::Pronounceable: 0
+  Text::Pipe: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Text::Password::Pronounceable::Harden:
+    file: lib/Text/Password/Pronounceable/Harden.pm
+    version: 0.01
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

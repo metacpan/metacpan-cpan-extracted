@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Teamspeak
+version:             0.6
+abstract:            Interface to administrate Teamspeak-Server.
+license:             ~
+author:              
+    - Martin von Oertzen <maletin@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBI:                           0
+    Module::Signature:             0.22
+    Net::Telnet:                   0
+    Test::More:                    0
+    Test::Signature:               1.04
+    WWW::Mechanize:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,33 @@
+---
+abstract: 'Template::Parser::RemoteInclude'
+author:
+  - 'mr.Rico'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: 'Template::Parser::RemoteInclude'
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  namespace::autoclean: 0
+  AnyEvent: 0
+  AnyEvent::Curl::Multi: 1.1
+  Template: 0
+  HTTP::Request: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  Sub::Install: 0
+  perl: 5.10
+resources:
+  license: 'http://dev.perl.org/licenses/'
+  repository: 'git@github.com:mrRico/Template-Parser-RemoteInclude.git'
+version: 5.010001

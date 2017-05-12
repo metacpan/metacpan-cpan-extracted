@@ -1,0 +1,38 @@
+<? read_starfish_conf(); echo &readme_line(); !>
+#+
+Text::Starfish version 1.24
+===========================
+#-
+
+The Text::Starfish module supports processing of embedded Perl code in
+an arbitrary text.  Documentation is part of the file Starfish.pm
+using the pod format.  To convert it into manual page format, type
+something like the following:
+
+	  pod2html Starfish.pm
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you do not have permissions to install the module in the
+system-wide module repository, you can install it locally; e.g.,
+perl Makefile.PL PREFIX=/home/mydir
+
+DEPENDENCIES
+
+No significant dependecies, as far as I know.  Let me know if you find
+something important to add.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2001-2017 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
+
+This script is provided "as is" without express or implied warranty.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

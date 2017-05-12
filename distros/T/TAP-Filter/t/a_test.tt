@@ -1,0 +1,8 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+
+ok 1, 'one';
+ok 1, 'two';
+ok 1, 'three';
+

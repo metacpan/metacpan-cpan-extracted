@@ -1,0 +1,115 @@
+Revision history for TAP::Harness::Junit
+Format inspired by WWW::Mechanize's revision log
+
+See Git history for more detailed listing:
+https://github.com/jlavallee/tap-harness-junit.git
+
+0.42	Sun Feb  8 12:12:00 2015 -0800
+======================================
+[ENHANCEMENTS]
+Skip support from Toby Broyles
+[FIXES]
+RT98582 - escape null in XML output
+RT99597 - see also TAP::Formatter::JUnit
+
+0.41	Thu Feb  7 21:16:24 2013 -0800
+======================================
+[ENHANCEMENTS]
+Expose namemangle option as environment variable by Finn Smith
+Documentation & whitespace cleanup by Finn Smith
+
+0.40	Sun Jan 27 12:35:00 2013 -0800
+======================================
+[FIXES]
+Fix for RT78933 by Malcolm Parsons
+
+0.39	Sun Jan 27 00:52:07 2013 -0800
+======================================
+[FIXES]
+Relax time test regex a bit for Windows
+
+0.38	Wed Nov  7 22:45:34 2012 -0800
+======================================
+[FIXES]
+Added Time::HiRes prereq added by David E. Wheeler
+
+0.37	Sun Aug  5 16:05:52 2012 -0800
+======================================
+[ENHANCEMENTS]
+JUNIT_PACKAGE prefix setting added by Richard Huxton
+See RT78642
+
+0.36	Tue Jun 14 14:49:18 2011 +0200
+======================================
+[ENHANCEMENTS]
+Per-assert timing info is now much more accurate.
+
+0.35 	Wed Mar  2 21:05:13 2011 -0800
+======================================
+[FIXES]
+Fix for RT66256
+
+0.34    Sun Feb 27 15:48:05 2011 -0800
+======================================
+[ENHANCEMENTS]
+The name of the JUnit output file can now be set using the
+environment variable $JUNIT_OUTPUT_FILE - see RT60063
+[FIXES]
+The tests no longer rely on "cat", and should pass on Windows
+
+0.33	Sat Feb 26 11:15:45 2011 -0800
+======================================
+[FIXES]
+If an output of test was of length zero, TAP::Parser would not
+recognize it as TAP output and would panic. We help it by adding
+a single line break.
+RT49307 - system-out content is not escaped
+RT56521 - Catching no_plan errors
+RT53657 - Error using namemangle option with ::newA
+RT53730 - test output takes forever on lots of unnamed tests
+[DOCUMENTATION]
+git repository location changed
+
+0.32	Mon Jul 13 17:31:25 2009 +0200
+======================================
+[FIXES]
+Tests were timed not time separately, but aggregated duration
+of the whole test run was used.
+
+[DOCUMENTATION]
+Recommend using the perl name mangling
+
+0.31	Mon Jul 13 08:59:27 2009 +0200
+======================================
+[ENHANCEMENTS]
+Make test name mangling configurable
+More recent Hudson versions cope with this well, we don't want to
+arbitrarily change the test names now, to retain compatibility.
+
+Make up timing information for tests
+Hudson ignores the testcase duration, computes it as sum of
+test times.
+
+0.30	Thu Apr 16 17:46:03 2009 +0200
+======================================
+[ENHANCEMENTS]
+Use TAP::Harness::Aggregator->elapsed to set the elapsed time for testcases
+
+Added "notimes" paramter that prevents timing of test cases
+made use of that parameter in t/outputs.t
+
+Remove SPEC file from here -- master copy is Fedora devel
+
+0.26	Sat Jan 3 00:53:44 2009 +0100
+======================================
+[FIXES]
+Do not call /bin/cat to get TAP output into parser (rt#41344)
+
+Make 'xmlfile' optional (rt#42069)
+
+Ensure valid UTF-8 output
+Do not report failed plain and bad return value as two failures
+
+[ENHANCEMENTS]
+Iteratively choose name for tests with ambigious names to prevent deep recursion warnings for long tests
+Improve the output for tests with broken plan a bit

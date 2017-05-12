@@ -1,0 +1,31 @@
+2.009 2014-08-03
+
+    * fix nb of test skipped when Tk window cannot be created
+
+2.008 2014-07-31
+
+    * refreshed the code and tests. No other functional changes
+
+2.005 2007-10-05
+ 
+	* ObjEditor.pm (edit_object): new function so that obj_editor can
+	be invoked from non Tk program with one line.
+
+2.004 2004-07-30
+
+	* ChangeLog, MANIFEST: Changed Changes to ChangeLog
+
+	* Makefile.PL: Require Tk::ObjScanner v2.010
+
+	* ObjEditor.pm: Disable display of internal tied data
+	Fix incorrect label update after 'add element' (fix rt ticket 6832)
+
+2.003 2003-12-01
+
+	* Adapted tests for Tk804.
+
+2.002 2003-02-14
+
+    * doc update
+    * better test with tied stuff
+

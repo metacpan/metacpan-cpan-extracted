@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Imager;
+
+my $factor = 1.5; #  above 1 will lighten, 
+                #  between 0 and 1 it with darken
+
+my $file = shift or die "Need a file $!\n";
+
+my $newtype = 'jpg';
+
+( my $basename) = $file  =~ /(.*)\.(\w+)$/;
+
+my $img = Imager->new();
+$img->open(file=>$file) or die $img->errstr();
+
+my $newimg = $img->copy();
+
+my @map = map {  int( $factor * $_)  } 0..255;
+
+$newimg->map(all=> \@map);
+
+my $newname = $basename.'-light'.'.jpg';
+print "$newname\n";
+
+$newimg->write(file =>  $newname );

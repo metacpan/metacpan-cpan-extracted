@@ -1,0 +1,44 @@
+---
+abstract: 'Dump mysql data directory for Test::mysqld'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-mysqld-DatadirDumper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::mysqld::DatadirDumper:
+    file: lib/Test/mysqld/DatadirDumper.pm
+    version: '0.01'
+  Test::mysqld::DatadirDumper::CLI:
+    file: lib/Test/mysqld/DatadirDumper/CLI.pm
+requires:
+  Class::Accessor::Lite: '0'
+  DBI: '0'
+  DBIx::FixtureLoader: '0'
+  Test::mysqld: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-Test-mysqld-DatadirDumper/issues
+  homepage: https://github.com/Songmu/p5-Test-mysqld-DatadirDumper
+  repository: git://github.com/Songmu/p5-Test-mysqld-DatadirDumper.git
+version: '0.01'
+x_authority: cpan:SONGMU

@@ -1,0 +1,23 @@
+Revision history for Perl extension Time::Profiler
+
+1.30  2015-12-14 CADE
+
+  - time calculation done in nanoseconds, converted on report
+  - fixed cumulative and single scope names logic and processing
+  - docs improved and cleanups
+
+1.02  2013-05-24 CADE
+
+  - changed github urls
+
+1.01  2013-03-24 CADE
+
+  - fixed docs
+  - added github info
+
+1.00  2013-03-20 CADE
+
+  - history lost, initial CPAN release
+
+    
+    

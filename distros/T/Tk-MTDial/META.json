@@ -1,0 +1,48 @@
+{
+   "abstract" : "A MTDial Tk widget that can turn indefinitely in any direction.",
+   "author" : [
+      "W. Luis Mochan <mochan@fis.unam.mx>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-MTDial",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tk" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tk::MTDial" : {
+         "file" : "lib/Tk/MTDial.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

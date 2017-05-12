@@ -1,0 +1,19 @@
+0.04 - 8th March 2012
+
+- Added missing import in t/3-forms.t
+
+0.03 - 29th May 2011
+
+- Removed filtering for (, <, and > -- reported by Damien Gourbiere
+- Added partial testing for the object interface
+
+0.02 - 16th October 2010
+
+- Moved to github and Dist::Zilla
+- Added object-based interface
+- Corrected issues with character positioning, so document segments can be handled
+- Initial support for textual form fields/bookmarks
+
+0.01 - 6th April 2010
+
+- Initial release

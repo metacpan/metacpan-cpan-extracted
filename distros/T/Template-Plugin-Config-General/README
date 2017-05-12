@@ -1,0 +1,28 @@
+Template-Plugin-Config-General version 0.01
+===========================================
+
+Template::Plugin::Config::General - Template Toolkit plugin which
+implements wrapper around Config::General module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Template
+   Config::General
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Igor Lobanov. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

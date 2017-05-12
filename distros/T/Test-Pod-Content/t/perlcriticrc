@@ -1,0 +1,14 @@
+# Disable checking for automatic exports, as it is part of
+# Test:: module's API...
+[-Perl::Critic::Policy::Modules::ProhibitAutomaticExportation]
+
+# Disable requiring to croak, as we always catch, or re-throw
+[-ErrorHandling::RequireCarping]
+
+# allow_messages_ending_with_newlines = 0
+[Variables::ProhibitPunctuationVars]
+allow = $@
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | DEPENDENCIES | BUGS AND LIMITATIONS | LICENSE AND COPYRIGHT | AUTHOR
+script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR

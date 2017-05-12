@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test::More;
+
+use Term::VTerm;
+
+my $pos = Term::VTerm::Pos->new( row => 10, col => 20 );
+
+isa_ok( $pos, "Term::VTerm::Pos", '$pos' );
+
+is( $pos->row, 10, '$pos->row' );
+is( $pos->col, 20, '$pos->col' );
+
+done_testing;

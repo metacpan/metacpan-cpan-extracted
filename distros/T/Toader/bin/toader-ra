@@ -1,0 +1,372 @@
+#!/usr/bin/perl
+#Copyright (c) 2013, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Cwd;
+use Toader::Render;
+use Toader;
+use Toader::findToaderDirs;
+use Toader::Page::Manage;
+use Toader::Entry::Manage;
+use Toader::AutoDoc;
+use Toader::Render::CSS;
+use Toader::Gallery;
+use Toader::Render::Page;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "toader-ra 0.1.2\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"Environmental Variables:\n".
+		"Toader_outputdir - The output directory to use.\n";
+}
+
+#gets the options
+my %opts=();
+getopts('', \%opts);
+
+#makes sure that the output dir is specified
+if ( ! defined( $ENV{'Toader_outputdir'} ) ){
+	warn('toader-ra: $ENV{"Toader_outputdir"} is not defined');
+	exit 254;
+}
+
+#initiates the toader object
+my $toader=Toader->new({ dir=>getcwd, outputdir=>$ENV{'Toader_outputdir'} });
+if ( $toader->error ){
+	warn('toader-ra: Failed to initialize Toader. error="'.
+		 $toader->error.'" errorString="'.$toader->errorString.'"');
+	exit $toader->error;
+}
+
+#finds all the directories
+my $finddirs=Toader::findToaderDirs->new;
+my $root=$toader->getRootDir;
+my @dirs=$finddirs->findToaderDirs($root);
+if ( $finddirs->error ){
+	warn('toader-find: findToaderDirs failed');
+	exit $finddirs->error;
+}
+
+#initates the reusable 
+my $dir=$toader->getDirObj;
+my $pm=Toader::Page::Manage->new( $toader );
+my $em=Toader::Entry::Manage->new( $toader );
+my $render=Toader::Render->new( $toader );
+if ( $render->error ){
+	warn('toader-ra: Failed to initialize the renderer. error="'
+		 .$render->error.'" errorString="'.$render->errorString.'"');
+	exit $render->error;
+}
+
+#renders the CSS stuff
+my $css=Toader::Render::CSS->new( $toader );
+if ( $css->error ){
+	warn('toader-ra: Failed to initialize the CSS renderer. error="'.
+		 $css->error.'" errorString="'.$css->errorString.'"');
+	exit $css->error;
+}
+$css->render;
+
+
+#processes each found directory
+my $int=0;
+while ( defined( $dirs[$int] ) ){
+
+	#sets the directory for the directory object
+	$dir->dirSet( $dirs[$int] );
+	if ( $dir->error ){
+		#prints a warning and continues on
+		warn('toader-ra: Failed to set the directory to "'.
+			 $dirs[$int].'" error="'.$dir->error.'" errorString="'
+			 .$dir->errorString.'"');
+
+	}else{
+		#processes the directory
+		print 'rendering directory "'.$dir->dirGet.'"'."\n";
+
+		#renders the directory
+		$render->renderObj( $dir );
+		if ( $render->error ){
+			warn('toader-ra: Failed to render the directory, "'.
+				 $dirs[$int].'". error="'.$render->error.
+				 '" errorString="'.$render->errorString.'"');
+			exit $render->error;
+		}
+
+	}
+
+	#renders the gallery stuff if needed
+	if ( -f $dirs[$int].'/.toader/gallery.ini'){
+		my $gallery=Toader::Gallery->new;
+		$gallery->dirSet( $dirs[$int] );
+		if ( $gallery->error ){
+			warn('toader-ra: Failed to set the directory for Toader::Gallery to "'.$dirs[$int]
+				 .'". error="'.$gallery->error.'" errorString="'.$gallery->errorString.'"');
+		}else{
+			$render->renderObj( $gallery );
+			if ( $render->error ){
+				warn('toader-ra: Failed to render the gallery for "'.
+					 $dirs[$int].'". error="'.$render->error.
+					 '" errorString="'.$render->errorString.'"');
+			}
+		}
+	}
+
+    #renders the gallery stuff if needed
+    if ( -d $dirs[$int].'/.toader/autodoc/'){
+        my $ad=Toader::AutoDoc->new( $toader );
+        $ad->dirSet( $dirs[$int] );
+        if ( $ad->error ){
+            warn('toader-ra: Failed to set the directory for Toader::AutoDoc to "'.$dirs[$int]
+                 .'". error="'.$ad->error.'" errorString="'.$ad->errorString.'"');
+        }else{
+            $render->renderObj( $ad );
+			if ( $render->error ){
+				warn('toader-ra: Failed to render documentation for "'.
+					 $dirs[$int].'". error="'.$render->error.
+					 '" errorString="'.$render->errorString.'"');
+			}
+        }
+    }
+
+	#sets the directory for the entry manage object
+	$em->setDir( $dirs[$int] );
+	if ( $em->error ){
+		#prints a warning and continues on
+		warn('toader-ra: Failed to set the directory to "'.
+			 $dirs[$int].'" for the entry manager. error="'.$dir->error.'" errorString="'
+			 .$dir->errorString.'"');
+	}else{
+		#get a list of entries
+		my @entries=$em->published;
+		if( $em->error ){
+			#prints a warning and continues on`
+			warn('toader-ra: Failed to list the directories for "'.$dirs[$int].
+				 '". error="'.$em->error.'" errorString="'.$em->errorString.'"');
+		}else{
+			#only process it if there are entries
+			if ( defined( $entries[0] ) ){
+				#get a entry for rendering the index and last
+				my $entry=$em->read( $entries[0] );
+				if ( $em->error ){
+					warn('toader-ra: Failed to read entry "'.$entries[0].'" in "'.
+						 $dirs[$int].'". error="'.$em->error.'" errorString="'.
+						 $em->errorString.'"');
+				}else{
+					#create the render for the purpose of rendering the index and last
+					my $er=Toader::Render::Entry->new({
+						obj=>$entry,
+						toader=>$toader,
+						toDir=>'../',
+													  });
+					if ( $er->error ){
+						warn('toader-ra: Failed to initiate Toader::Render::Entry for "'.
+							 $entries[0].'" in "'.$dirs[$int].'". error="'.$er->error.
+							 '" errorString="'.$er->errorString.'"');
+					}else{
+						$er->index;
+						if ( $er->error ){
+							warn('toader-ra: Failed render the entry index via "'.
+								 $entries[0].'" in "'.$dirs[$int].'". error="'.$er->error.
+								 '" errorString="'.$er->errorString.'"');
+						}
+						$er->archive;
+						if ( $er->error ){
+						warn('toader-ra: Failed render the entry archive via "'.
+							 $entries[0].'" in "'.$dirs[$int].'". error="'.$er->error.
+							 '" errorString="'.$er->errorString.'"');
+						}
+					}
+				}
+				
+				#renders each entry
+				my $eint=0;
+				while( defined( $entries[$eint] ) ){
+					#get a entry for rendering
+					my $entry=$em->read( $entries[$eint] );
+					if ( $em->error ){
+						warn('toader-ra: Failed to read entry "'.$entries[$eint].'" in "'.
+							 $dirs[$int].'". error="'.$em->error.'" errorString="'.
+							 $em->errorString.'"');
+					}else{
+						#create the render for the purpose of rendering the entry
+						my $er=Toader::Render::Entry->new({
+							obj=>$entry,
+							toader=>$toader,
+														  });
+						if ( $er->error ){
+							warn('toader-ra: Failed to initiate Toader::Render::Entry for "'.
+								 $entries[0].'" in "'.$dirs[$int].'". error="'.$er->error.
+								 '" errorString="'.$er->errorString.'"');
+						}else{
+							$er->render;
+						}
+					}					
+					
+					$eint++;
+				}
+
+			}
+		}
+	}
+
+	#sets the directory for the entry manage object
+	$pm->setDir( $dirs[$int] );
+	if ( $pm->error ){
+		#prints a warning and continues on
+		warn('toader-ra: Failed to set the directory to "'.
+			 $dirs[$int].'" for the page manager. error="'.$dir->error.'" errorString="'
+			 .$dir->errorString.'"');
+	}else{
+		#gets a list of pages
+		my @pages=$pm->published;
+		if ( $pm->error ){
+			warn('toader-ra: Failed to list the pages for "'.
+				 $dirs[$int].'". error="'.$dir->error.'" errorString="'
+				 .$dir->errorString.'"');
+		}else{
+			#process it all if we have pages
+			if ( defined( $pages[0] ) ){
+				#read the pages
+				my $page=$pm->read( $pages[0] );
+				if ( $pm->error ){
+					warn('toader-ra: Failed to read page "'.$pages[0].'" for "'.
+						 $dirs[$int].'". error="'.$dir->error.'" errorString="'
+						 .$dir->errorString.'"');
+				}else{
+					my $pr=Toader::Render::Page->new({
+						obj=>$page,
+						toader=>$toader,
+						toDir=>'../',
+													 });
+					if ( $pr->error ){
+						warn('toader-ra: Failed to initialize the render for "'.$pages[0].
+							 '" in "'.$dirs[$int].'". error="'.$dir->error.'" errorString="'
+							 .$dir->errorString.'"');
+					}else{
+						$pr->summary;
+						if ( $pr->error ){
+							warn('toader-ra: Failed to render the page summary for "'.$pages[0].
+								 '" in "'.$dirs[$int].'". error="'.$dir->error.'" errorString="'
+								 .$dir->errorString.'"');
+						}
+					}
+
+				}
+
+				#renders each page
+				my $pint=0;
+				while ( defined( $pages[$pint] ) ){
+					#read the pages
+					my $page=$pm->read( $pages[$pint] );
+					if ( $pm->error ){
+						warn('toader-ra: Failed to read page "'.$pages[$pint].'" for "'.
+							 $dirs[$int].'". error="'.$dir->error.'" errorString="'
+							 .$dir->errorString.'"');
+					}else{
+						#initiates the page renderer
+						my $pr=Toader::Render::Page->new({
+							obj=>$page,
+							toader=>$toader,
+														 });
+						if ( $pr->error ){
+							warn('toader-ra: Failed to initialize the render for "'.$pages[$pint].
+								 '" in "'.$dirs[$int].'". error="'.$dir->error.'" errorString="'
+								 .$dir->errorString.'"');
+						}else{
+							$pr->render;
+						}
+					}
+
+					$pint++;
+				}
+				
+			}
+		}
+	}
+
+	$int++;
+}
+
+exit 0;
+
+   
+=head1 NAME
+
+toader-ra - Renders everything in the current Toader tree.
+
+=head1 SYNOPSIS
+
+toader-ra
+
+=head1 Environmental Variables:
+
+=head2 Toader_outputdir
+
+The output directory to use.
+
+=head1 AUTHOR
+
+Copyright (c) 2013, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+unix
+
+=head1 README
+
+toader-ra - Renders everything in the current Toader tree.
+
+=cut

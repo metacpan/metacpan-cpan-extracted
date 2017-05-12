@@ -1,0 +1,17 @@
+=== basic
+--- wiki
+----
+--- html
+<hr size="1" noshade="noshade" />
+=== with text 
+--- wiki
+---- %%hoge%% hoge
+--- html
+<hr size="1" noshade="noshade" /> <del>hoge</del> hoge
+=== multi line
+--- wiki
+---- %%hoge%% hoge
+---- %%hoge%% hoge
+--- html
+<hr size="1" noshade="noshade" /> <del>hoge</del> hoge
+<hr size="1" noshade="noshade" /> <del>hoge</del> hoge

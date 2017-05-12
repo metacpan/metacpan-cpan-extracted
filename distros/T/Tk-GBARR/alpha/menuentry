@@ -1,0 +1,15 @@
+#!/usr/local/bin/perl
+
+use Tk;
+use lib 'alpha';
+use Tk::MenuEntry;
+
+$mw = new MainWindow;
+
+$menue = $mw->MenuEntry();
+
+$menue->pack(-side => 'top', -fill => 'x');
+
+$menue->listInsert(0,qw(One Two Three));
+
+Tk::MainLoop;

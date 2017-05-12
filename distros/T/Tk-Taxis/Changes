@@ -1,0 +1,54 @@
+Revision history for Perl extension Tk::Taxis.
+
+0.01  Mon Jul 28 18:21:50 2003
+	- original version; created by h2xs 1.22 with options -AXn Tk::Taxis
+
+1.00  Mon Aug  4 19:28:20 2003
+	- First released version, all basic functionality implemented such that
+	  woodlice script ran without memory leaks
+
+1.01  Tue Aug  5 10:28:50 2003
+	- Updated POD
+	- Fixed bug in image size allocation in Tk::Taxis::Critter
+	- Made images configurable and moved woodlice into subdirectory
+	- Made width and height configurable, and mended return values for cget
+	- Add logging to woodlice.pl
+	- Added tests
+
+1.02 Thu Aug 28 09:39:25 2003
+	- Updated POD
+	- Fixed Delegate bug in Tk::Taxis
+	
+1.03 Fri Aug 29 13:11:13 2003
+	- Updated POD
+	- Made left and right fill colours in Tk::Taxis configurable
+	
+1.04 Tue Sep  9 19:42:17 2003
+	- Fixed numerous typos
+	- Changed event loop in woodlice.pl so it didn't run insanely fast for small
+	  populations
+
+1.05 Fri Oct 17 10:32:07 2003
+	- Improvements to simulator script: dry/wet option, scalable GUI settings,
+	  disable option for preference slider
+	- Changed stochastic test in 1.t
+
+2.00 Wed Nov 19 10:14:06 2003
+	- New internals for Tk::Critter and Tk::Taxis to allow a 2D choice chamber
+	- Changes to API for 2D selection, all but population backward compatible.
+	  Calls to population now return a hash in list context, not a two item list
+	- left_fill and right_fill deprecated
+	- Removed preference slider from simulator
+	- Allows users to enter their own tumble calculation code 
+	- Complete overhaul of simulator script: dry/damp can be combined with 
+	  dark/light option
+	- Many more tests
+
+2.01 Fri Dec 19 17:47:03 2003
+	- Warnings bug fixes, discovered when running under 5.8.2. 
+
+2.02 Sun Dec 21 11:15:05 2003
+	- Minor test bug fixes discovered when running under 5.8.1. 
+
+2.03  Wed Sep  7 21:44:20 2005
+	- Release for perl 5.8.6.

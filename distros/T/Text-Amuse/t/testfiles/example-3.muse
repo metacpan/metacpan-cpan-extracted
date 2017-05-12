@@ -1,0 +1,8 @@
+#title example
+
+<example>
+<script>alert("a")</script>
+
+Hello
+  There <em></em> '<>' \emph | \emph
+</example>

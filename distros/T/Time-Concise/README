@@ -1,0 +1,56 @@
+NAME
+    Time::Concise - Convert to and from concise duration formats.
+
+SYNOPSIS
+      use Time::Concise;
+      my $seconds = from_concise "5y4d3h2m1s"; # 158141171
+      my $concise =   to_concise 158141171;    # 5y4d3h2m1s
+
+DESCRIPTION
+    Time::Concise exports two functions by default, "from_concise" and
+    "to_concise".
+
+    The term *concise* was borrowed from Time::Duration.
+
+  Concise Format
+    The format is an integer followed immediatley by its duration
+    identifier. White-space will be ignored.
+
+    The following table explains the format.
+
+      identifier   duration
+      ----------   --------
+               y   year
+               d   day
+               h   hour
+               m   minute
+               s   second
+
+  Functions
+    to_concise *$seconds*
+            This function requires one argument, an integer number of
+            seconds, and returns a concise string representation of the
+            duration.
+
+            If the input is not an integer this function returns "undef".
+
+    from_concise *$concise*
+            This function requires one argument, a concise string
+            representation of the duration, and returns the number of
+            seconds in the duration.
+
+            If the concise string contains characters outside those
+            represented in a concise duration string this function will
+            return "undef".
+
+SEE ALSO
+    Time::Duration, Time::Seconds, perl.
+
+AUTHOR
+    Casey West, <casey@geeknest.com>.
+
+COPYRIGHT
+    Copyright (c) 2004 Casey West. All rights reserved. This module is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+

@@ -1,0 +1,7 @@
+id,ssn,first_name,last_name,address,city,state,zip
+1,999-99-9999,Alice,Zoltan,"360 5 Avenue, Suite 1299","New York","NY",10001
+2,999-99-9998,Bobby,Youngblood,"1600 Pennsylvania Avenue","Washington","DC",20001
+3,999-99-9997,Carla,Xenia,"79 Nancy Street","Norfolk","Virginia",21212
+4,999-99-9996,Dennis,Waterstone,"870 Oliver Alley, #5B","Oklahoma City",OK,77777
+4,999-99-9995,Enrique,Victor,"929 Milltown Manor","Milwaukee","WI",53707
+6,999-99-9994,Felicia,Ulster,"9029 Lovers Lane","Lewiston","LA",70117

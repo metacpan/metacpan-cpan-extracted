@@ -1,0 +1,35 @@
+STROGGIFY POPULATION CENTERS ..
+ok 1 - STROGGIFY POPULATION CENTERS
+not ok 2 - STROGGIFY POPULATION CENTERS
+
+#   Failed test 'waa'
+#   at test.t line 4.
+# Looks like you failed 1 test of 2.
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/2 subtests
+
+Test Summary Report
+-------------------
+test.t (Wstat: 256 Tests: 2 Failed: 1)
+  Failed test:  2
+    Non-zero exit status: 1
+    Files=1, Tests=2,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.01 cusr  0.00 csys =  0.03 CPU)
+    Result: FAIL
+
+STROGGIFY POPULATION CENTERS ......
+ok 1 - STROGGIFY POPULATION CENTERS
+not ok 2 - STROGGIFY POPULATION CENTERS
+
+#   Failed test 'waa'
+#   at test.t line 4.
+# Looks like you failed 1 test of 2.
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/2 subtests
+
+Test Summary Report
+-------------------
+test.t (Wstat: 256 Tests: 2 Failed: 1)
+  Failed test:  2
+    Non-zero exit status: 1
+    Files=1, Tests=2,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.01 cusr  0.00 csys =  0.03 CPU)
+    Result: FAIL

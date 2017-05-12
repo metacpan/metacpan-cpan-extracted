@@ -1,0 +1,13 @@
+Revision history for Test-Net-Connect
+
+0.03	2005-07-14
+
+	Implement connect_not_ok().
+
+0.02	2005-07-13
+
+	Remove dependency on Net::DNS.
+
+0.01    2005-07-08
+        First version, released on an unsuspecting world.
+

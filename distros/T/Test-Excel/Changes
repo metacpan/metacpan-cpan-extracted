@@ -1,0 +1,214 @@
+Revision history for Perl extension Test::Excel.
+
+1.39  Mon Aug 22 10:45:00 2016
+      - Added unit test script t/00-load.t
+      - Tidied up unit test scripts (t/meta-json.t and t/meta-yml.t).
+      - Updated copyright year information in the README file.
+
+1.38  Sat Aug 06 20:00:00 2016
+      - Updated Copyright year information.
+
+1.37  Tue Feb 17 11:20:00 2015
+      - Removed BOM from the following test scripts:
+        - t/30_compare_excel.t
+        - t/40_unit_test.t
+        - t/50_spec_test.t
+
+1.36  Sun Feb 15 10:50:00 2015
+      - Fixed the code in the pod document.
+
+1.35  Sun Feb 15 10:35:00 2015
+      - Disabled warning 'Use of uninitialized ...' thrown by Spreadsheet::ParseExcel.
+      - Added SYNOPSIS to the pod document.
+      - Documented the use of environment variable DEBUG.
+
+1.34  Sun Feb 15 02:10:00 2015
+      - Tidied up pod document to reflect the current state of the code.
+
+1.33  Sun Feb 15 00:15:00 2015
+      - Added 2 new methods cmp_excel_ok() and cmp_excel_not_ok().
+      - Updated test script to reflect the above changes.
+
+1.32  Sat Feb 14 23:40:18 2015
+      - Tidied up pod document with regard to the change in interface.
+
+1.31  Sat Feb 14 23:05:18 2015
+      - Made the DEBUG parameter as environment variable.
+
+1.30  Sat Feb 14 22:15:18 2015
+      - Patched the code to resolve the issue raised by Alexander Pletnev (RusAlex) in GitHub.
+      - Added unit test for the use case.
+
+1.29  Mon Jan 12 11:25:18 2015
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Removed SIGNATURE file.
+      - Removed t/00-signature.t file.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+1.28  Sat Sep 27 01:09:10 2014
+      - Fixed typo in the README file.
+
+1.27  Sun Sep 14 10:05:00 2014
+      - Updated @EXPORT list.
+
+1.26  Sun Sep 14 09:55:40 2014
+      - Tidied up pod documentation.
+      - Hide helper methods.
+
+1.25  Sat Sep 13 03:29:20 2014
+      - Deleted Build.PL file.
+      - Removed dependency of Readonly.pm and Carp.pm.
+      - Added section "REPOSITORY" to the pod
+      - Added key "META_MERGE" to Makefile.PL
+
+1.24  Mon Aug 08 10:16:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+1.23  Thu Apr 14 09:48:00 2011
+      - Removed SYNOPSIS section from the pod.
+      - Added example pod for method cmp_excel().
+      - Added example pod for method compare_excel().
+
+1.22  Wed Apr 13 18:53:20 2011
+      - Corrected/Updated pod.
+      - Cosmetics changes to the pod.
+
+1.21  Mon Mar 28 13:14:15 2011
+      - Updated Copyright information.
+
+1.20  Fri Mar 11 10:03:00 2011
+      - Added Spreadsheet::ParseExcel v0.58 as pre-requisite.
+
+1.19  Thu Mar 10 12:21:20 2011
+      - One last time, promise, changed the description of the module.
+
+1.18  Wed Mar 09 17:42:39 2011
+      - Changed the description of the module to match with the registered module.
+
+1.17  Wed Mar 02 11:52:22 2011
+      - Added 'clean' key to the Makefile.PL.
+      - Removed "-T" from the first line of pod.t, manifest.t and 00-signature.t. It appears to me that Mac OS X doesn't like it, for some reason.
+
+1.16  Mon Feb 28 11:55:10 2011
+      - Added DISCLAIMER section to the pod.
+      - Added "add_to_cleanup" to the Build.PL.
+
+1.15  Mon Feb 14 12:02:19 2011
+      - Added MYMETA.json to MANIFEST.SKIP as one CPAN Tester is not happy on GNU/Linux OS Version 2.6.33-arch, Perl version (5.12.1) as reported on Monday, 14th February 2011 (3.12am) UK TIME.
+
+1.14  Fri Jan 28 17:31:48 2011
+      - Creates Test::Builder object only when required.
+
+1.13  Wed Nov 24 09:57:15 2010
+      - Removed all internal method details from the pod.
+
+1.12  Wed Nov 24 09:51:23 2010
+      - Added SIGNATURE to the distribution.
+      - Added unit test for SIGNATURE.
+
+1.11  Sun Nov 21 15:12:44 2010
+      - Renamed method is_swapping() to internal method _is_swapping().
+      - Documented the internal method _is_swapping().
+
+1.10  Sun Nov 21 14:19:01 2010
+      - Updated error message for method _validate_rule().
+      - Added unit test for number of keys in the rule definitions.
+
+1.09  Sat Nov 20 20:32:59 2010
+      - Documented method compare_excel(), got removed by mistake in the last release.
+
+1.08  Sat Nov 20 07:41:24 2010
+      - Fixed the code for non-windows platform.
+
+1.07  Wed Nov 17 16:18:49 2010
+      - Updated pod about the "Famous Software Award" given by Download.FamousWhy.com.
+
+1.06  Wed Nov 17 09:58:35 2010
+      - Fixed the unit test that causing too much of trouble.
+
+1.05  Mon Nov 15 20:13:11 2010
+      - Fixed the error_limit typo.
+      - Added unit test for error_limit key in the rule.
+      - Used 'prove -v' to fix the some of the test cases in the 30_compare_excel.t. Although I am not sure why 'Build test' and 'prove' give two different outputs.
+
+1.04  Mon Nov 15 10:25:21 2010
+      - Renamed method cmp() back to original cmp_excel() to avoid any conflicts.
+      - Renamed method compare() back to original compare_excel() to avoid any conflicts.
+      - Fixed all the unit tests affected by this change.
+
+1.03  Fri Nov 12 18:11:10 2010
+      - Added two new keys 'swap_check' and 'error_limit' to the rule definitions.
+      - Updated method _validate_rule() to handle the new keys in the rule defintions.
+      - Updated method cmp() and compare() to handle the new key appropriately.
+      - Added unit test to test the functionality of the new keys.
+
+1.02  Fri Nov 12 10:51:22 2010
+      - Renamed method cmp_excel() to cmp().
+      - Renamed method compare_excel() to compare().
+      - Updated all the affected unit test.
+      - Added spec-3.txt with buggy data for unit test.
+      - Added unit test to validate spec data.
+
+1.01  Fri Nov 12 09:57:43 2010
+      - Renamed internal method _dump_error() to _log_message().
+      - Added one debug line to the method compare_excel().
+
+0.09  Thu Nov 11 15:33:19 2010
+      - Updated the rule definitions one more time, silly me :-(
+      - Fixed unit test 30_compare_excel.t and 40_unit_test.t and 50_spec_test.t to reflect the change in rule definitions.
+      - Updated method _validate_rule() to reflect the change in rule definitions.
+
+0.08  Thu Nov 11 09:53:01 2010
+      - Renamed the key 'sheet' to 'ignore' in the rule definitions.
+      - Handling correctly when more than one sheets are specified in the rule definitions.
+      - Added unit test to check multiple sheets specified by ignore key in the rule definitions.
+      - Added test data file exp-6.xls and got-6.xls.
+      - Fixed unit test 30_compare_excel.t and 50_spec_test.t regarding change in rule definitions.
+      - Updated pod about change in rule definitions.
+      - Updated method _validate_rule() to reflect the change in rule definitions.
+
+0.07  Wed Nov 10 20:08:15 2010
+      - Added local method _validate_rule().
+      - Fixed unit test 30_compare_excel.t
+      - Added more unit test to 40_unit_test.t about data validations.
+      - Added more unit test to 50_spec_test.t about ingorerange field of spec file.
+      - Corrected the definition of rules in the pod.
+      - Updated method cmp_excel() and method compare_excel() to test the file first.
+
+0.06  Wed Nov 10 11:13:01 2010
+      - Added Readonly module to the pre-requisite list.
+      - Added unit test for ignore range in the spec.
+      - Changed the interface of method cmp_excel() and method compare_excel() to accomodate the error message.
+      - Fixed unit test for cmp_excel() to reflect the changes in interface.
+      - Updated pod about the interface changes.
+      - Updated pod about DEBUGGING feature.
+      - Updated pod about rule definitions.
+
+0.05  Tue Nov 09 20:05:11 2010
+      - Added unit test for spec file.
+      - Added unit test for helper method.
+      - Organised pod for the module.
+      - Fixed unit test 20_cmp_excel.t as the signature has changed.
+      - Fixed unit test 30_compare_excel.t as the error message has changed.
+      - Importing module Spreadsheet::ParseExcel::Utility for method int2col() and col2int().
+
+0.04  Tue Nov 09 09:42:49 2010
+      - Added manifest.t to the test suite.
+      - Added MANIFEST.SKIP to the MANIFEST file.
+      - Updated MANIFEST to include sample test data.
+      - Replaced die() with croak() and fixed the unit test for method compare_excel().
+      - Removed test code from method compare_excel().
+
+0.03  Mon Nov 08 19:58:19 2010
+      - Added unit test.
+      - Updated the method cmp_excel() and compare_excel() signature to allow the rule definition.
+      - Added STRING and NUMBER comparison.
+
+0.02  Thu Oct 14 09:10:11 2010
+      - Fixed the build regarding file permission exception threw by CPAN.
+
+0.01  Fri Aug 13 16:15:49 2010
+      - module created

@@ -1,0 +1,22 @@
+1..2
+# Running under perl version 5.006001 for MSWin32
+# Win32::BuildNumber 635
+# Current time local: Sun May 23 12:14:56 2004
+# Current time GMT:   Sun May 23 16:14:56 2004
+# Using Test.pm version 1.24
+# Test::Tech     : 1.26
+# Data::Secs2    : 1.26
+# Data::Startup  : 0.07
+# Data::Str2Num  : 0.08
+# Number of tests: 2
+# =cut 
+ok 1
+not ok 2
+# Test 2 got: 'U1[1] 80
+N[2] 5 1
+' (tgB1.t at line 134)
+#   Expected: 'U1[1] 80
+N[2] 5 2
+'
+# Failed : 2
+# Passed : 1/2 50%

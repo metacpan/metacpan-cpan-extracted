@@ -1,0 +1,118 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords superset
+
+=head1 NAME
+
+Type::API::Constraint - a rule that a value can be checked against, to determine whether it passes or fails
+
+=head1 INTERFACE
+
+Implementations of this interface are objects and B<MUST> provide the
+following methods:
+
+=over
+
+=item C<< $constraint->check($value) >>
+
+Checks that the value meets the constraint. Under normal operation should
+return true or false to indicate a pass or failure.
+
+Exceptions should not be thrown when a value simply fails the constraint,
+but may be used for other exceptional conditions. (For example, if the
+check requires a database lookup to determine pass or failure, but the
+database is unavailable.)
+
+=item C<< $constraint->get_message($value) >>
+
+Generates an message explaining that the value has failed the type
+constraint, and returns this messages as a string. This method does not
+need to check whether the value genuinely fails the constraint; it can
+assume that the check method has already been called.
+
+=back
+
+Implementations B<MAY> advertise that they support this interface by
+returning true for C<< $constraint->DOES("Type::API::Constraint") >>.
+
+=head1 SEE ALSO
+
+=head2 Implementations
+
+The following CPAN classes are known to implement Type::API::Constraint:
+
+=over
+
+=item *
+
+L<Moose::Meta::TypeConstraint> (and its subclasses)
+
+=item *
+
+L<MooseX::Meta::TypeDecorator>
+
+=item *
+
+L<Mouse::Meta::TypeConstraint>
+
+=item *
+
+L<MouseX::Meta::TypeDecorator>
+
+=item *
+
+L<Specio::Constraint::Simple> (and several other classes in the Specio distribution)
+
+=item *
+
+L<Type::Tiny> (and its subclasses)
+
+=back
+
+=head2 Consumers
+
+Some tools can make use of objects implementing Type::API::Constraint:
+
+=over
+
+=item *
+
+L<Data::Validator>
+
+=item *
+
+L<Function::Parameters/Experimental experimental feature: Type expressions>
+
+=item *
+
+L<Scalar::Does>
+
+=item *
+
+L<Type::Tie>
+
+=back
+
+Others, such as L<Moose> and L<Mouse> require type constraints that implement
+a superset of this functionality.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

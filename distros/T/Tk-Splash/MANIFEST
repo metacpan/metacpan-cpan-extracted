@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/Tk/Splash.pm
+lib/Tk/FastSplash.pm
+lib/Tk/ProgressSplash.pm
+t/00splash.t
+t/01fastsplash.t
+t/02fastsplash.t
+t/03progress.t
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

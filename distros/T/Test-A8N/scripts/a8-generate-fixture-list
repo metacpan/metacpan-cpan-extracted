@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::Syck;
+use File::Find;
+use Getopt::Long;
+use lib qw( t/lib lib );
+
+my $verbose = 0;
+GetOptions(
+    "verbose" => \$verbose,
+);
+
+our $config = {};
+my $home = $ENV{HOME};
+if (-f "$home/.a8rc") {
+    $config = LoadFile("$home/.a8rc");
+}
+
+my $fixture_base = $config->{fixture_base};
+die "Must provide fixture_base in ~/.a8rc!\n" unless $fixture_base;
+my $fixture_base_path = $fixture_base;
+$fixture_base_path =~ s#::#/#g;
+
+my @INC_DIRECTORIES = grep { -d $_ } ($config->{fixture_root}, @INC);
+my %PROCESSED_PACKAGES = ();
+my @FILES = ();
+my %METHODS = ();
+my @PACKAGES = ($fixture_base);
+
+warn "Looking for packages in:\n" . join("\n", @INC_DIRECTORIES) . "\n" if ($verbose);
+
+my $want_child_classes = sub {
+    my $filename = $File::Find::name;
+    if ($filename =~ /\/$fixture_base_path\/.*\.pm$/) {
+        my ($class_file) = $filename =~ /($fixture_base_path\/.*)\.pm$/;
+        $class_file =~ s#/#::#g;
+        return if (exists($PROCESSED_PACKAGES{$class_file}) or grep(/^$class_file$/, @PACKAGES));
+        push @PACKAGES, $class_file;
+    }
+};
+find($want_child_classes, @INC_DIRECTORIES);
+
+while (my $package = shift @PACKAGES) {
+    next if (exists($PROCESSED_PACKAGES{$package}));
+    my $package_file = join("/", split(/::/, $package)) . ".pm";
+    DIR: foreach my $directory (@INC_DIRECTORIES) {
+        my $filename = "$directory/$package_file";
+        $PROCESSED_PACKAGES{$package}++;
+        if (-f $filename) {
+            push @FILES, $filename;
+            process_module($package, $filename);
+            last DIR;
+        }
+    }
+}
+
+warn "Methods: \n" . join("\n", keys %METHODS) . "\n"
+    if ($verbose);
+
+sub process_module {
+    my ($package, $path) = @_;
+    no strict 'refs';
+    warn "Processing $package\n" if ($verbose);
+    eval "use $package;";
+
+    open my $fh, "ctags -x $path |" or die "Can't open $path with ctags\n";
+    my @ctags_output = <$fh>;
+    close $fh;
+
+    my ($col_type, $col_name) = (3, 0);
+    if (`ctags --version` =~ /Exuberant Ctags/i) {
+        ($col_type, $col_name) = (1, 0);
+    }
+
+    foreach my $line (@ctags_output) {
+        my @columns = split(/\s+/, $line);
+        next if ($columns[$col_type] !~ 'sub');
+        my ($sub) = $columns[$col_name] =~ /([^:]+)$/;
+        next if ($sub =~ /^_/);
+        next if ($sub =~ /[A-Z]/);
+        next if (grep /\b$sub\b/, @{$package . "::EXCLUDE_METHODS"});
+        my $type = "action";
+        $type = "test" if ($line =~ /$sub\s*:\s*Test/);
+        $METHODS{$sub} = $type;
+    }
+    return if ($package eq 'Test::A8N::Fixture');
+    my @isa = @{$package . "::ISA"};
+    foreach my $base (@isa) {
+        next if (exists($PROCESSED_PACKAGES{$base}));
+        warn "Following inheritance tree to $base\n" if ($verbose);
+        push @PACKAGES, $base;
+    }
+}
+
+open my $of, ">$home/.fixtures" or die "Can't open ~/.fixtures for writing: $@\n";
+
+foreach my $method (keys %METHODS) {
+    my $method_name = $method;
+    $method_name =~ s/_/ /g;
+    printf $of qq{syn match fixture_%s "- %s[: ]"\n}, $METHODS{$method}, $method_name;
+    printf $of qq{syn match fixture_%s "- %s\$"\n}, $METHODS{$method}, $method_name;
+}
+
+close $of or die "Can't close output file: $@\n";

@@ -1,0 +1,38 @@
+
+Changes from NSP version 0.53 to 0.55
+-------------------------------------
+
+Amruta Purandare, pura0010@umn.edu
+Ted Pedersen, tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+Measures
+--------
+
+(1)	Added tmi3.pm, a 3-D (trigram) implementation of true mutual 
+        information.
+
+
+Utils
+-----
+
+(1)	socs.pl and kocos.pl now include options 
+	--literal WORD => to specify target WORD directly on a command line
+	--regex FILE => to use a Perl Regex for specifying target word and its 
+	morphological variants from a FILE 
+
+Testing
+-------	
+
+(1)     Added test cases for ll3 and tmi that were inadvertently left out
+	of v0.53. 
+
+(2)     Added test cases for the new module tmi3.
+
+(3)     Changed test cases to use the new options --literal and --regex.
+        The test cases were not changed in any other way.
+
+[Amruta - 03/31/2003]
+
+

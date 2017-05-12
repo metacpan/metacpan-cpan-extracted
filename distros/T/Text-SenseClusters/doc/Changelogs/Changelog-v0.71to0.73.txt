@@ -1,0 +1,20 @@
+
+Changes made in Sense-Clusters version 0.71 during version 0.73
+
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+
+1. Added check for empty token file.					     -Anagha
+
+2. Added check to identify unknown/misspelled options and 
+to abort after giving relevant message.					     -Anagha
+
+3. Added rowmodel and colmodel options supported by Cluto.   -Anagha 
+
+4. Modified clusterlabeling.pl to create the temp files in
+current-working-directory instead of the installation dir.   -Anagha
+
+5. Fixed the problem of uploading external stoplist file 
+for the web-interface.						                 -Anagha	
+
+(Changelog-v0.71to0.73 Last Updated on 01/23/2006 by Anagha)

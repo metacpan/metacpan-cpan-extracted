@@ -1,0 +1,20 @@
+&lt;pre&gt;
+START  [% date.format(summary.meta.start_time, '%Y-%m-%dT%H:%M:%S') %]
+FINISH [% date.format(summary.meta.stop_time, '%Y-%m-%dT%H:%M:%S') %]
+[% summary.elapsed_timestr.0 %]
+
+[% FOREACH fail IN summary.failed; -%]
+FAIL [% fail %]
+[% END; -%]
+[% FOREACH todo IN summary.todo_passed; -%]
+OK TODO PASSED [% todo %]
+[% END; -%]
+[% FOREACH skip IN summary.skipped; -%]
+SKIP [% skip %]
+[% END; -%]
+[% FOREACH pass IN summary.passed; -%]
+OK [% pass %]
+[% END; -%]
+
+TOTAL TESTS [% summary.total.0 %]
+&lt;/pre&gt;

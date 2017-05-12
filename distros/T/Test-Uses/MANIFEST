@@ -1,0 +1,16 @@
+INSTALL
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+changes.txt
+lib/Test/Uses.pm
+t/00-notabs.t
+t/00-pod.t
+t/00-podcoverage.t
+t/01-basic.t
+t/02-files.t
+t/03-tester.t
+t/data/test1.pmd
+xt/release/pod-syntax.t

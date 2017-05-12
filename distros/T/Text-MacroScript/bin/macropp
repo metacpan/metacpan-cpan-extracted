@@ -1,0 +1,688 @@
+#!/usr/bin/perl
+
+# Copyright (c) 1999-2000 Mark Summerfield. All Rights Reserved.
+# May be used/distributed under the GPL.
+
+use strict;
+use warnings;
+
+use Getopt::Long ;
+use Text::MacroScript ;
+
+use vars qw( $VERSION ) ; 
+$VERSION = '2.11';
+
+my %Opt ;
+
+&getoptions ;
+
+my $Macro = Text::MacroScript->new( 
+                    -file       => $Opt{'file'}, 
+                    -comment    => $Opt{'comment'}, 
+                    -opendelim  => $Opt{'opendelim'}, 
+                    -closedelim => $Opt{'closedelim'}, 
+                    -embedded   => $Opt{'embedded'},
+                    ) ;
+
+if( $Opt{'macro'} or $Opt{'script'} or $Opt{'variable'} ) { 
+    $Macro->list( -macro,    $Opt{'name'} ) if $Opt{'macro'} ; 
+    $Macro->list( -script,   $Opt{'name'} ) if $Opt{'script'} ; 
+    $Macro->list( -variable, $Opt{'name'} ) if $Opt{'variable'} ; 
+} 
+else { 
+    while( <> ) {
+		print $Macro->expand( $_, $ARGV, $. ); 
+    } 
+}
+
+sub getoptions {
+
+    # Defaults.
+    $Opt{'closedelim'} = '' ; 
+    $Opt{'comment'}    = 0 ; 
+    $Opt{'emacro'}     = 0 ;
+    $Opt{'files'}      = [] ; 
+    $Opt{'macro'}      = 0 ;
+    $Opt{'name'}       = 0 ; 
+    $Opt{'opendelim'}  = '' ; 
+    $Opt{'script'}     = 0 ; 
+    $Opt{'variable'}   = 0 ;
+
+    &help if defined $ARGV[0] and $ARGV[0] =~ /^(-h|--help)$/o ;
+
+    Getopt::Long::config 'no_ignore_case' ; 
+    GetOptions( \%Opt,
+        'closedelim|c=s', 
+        'comment|C', 
+        'emacro|e', 
+        'file|f=s@', 
+        'macro|m',
+        'opendelim|o=s', 
+        'name|n', 
+        'script|s', 
+        'variable|v',
+        ) or &help ;
+
+    if( $Opt{'name'} and 
+        ( not $Opt{'macro'} )  and 
+        ( not $Opt{'script'} ) and 
+        ( not $Opt{'variable'} ) 
+        ) { 
+        $Opt{'macro'}    = 1 ; 
+        $Opt{'script'}   = 1 ;
+        $Opt{'variable'} = 1 ; 
+    }
+
+    # Don't die if no delimiters are specified - Text::MacroScript.pm will
+    # default them to <: and :> if needed.
+
+    $Opt{'opendelim'}  = undef unless $Opt{'opendelim'} ; 
+    $Opt{'closedelim'} = undef unless $Opt{'closedelim'} ; 
+    $Opt{'embedded'}   = $Opt{'emacro'} ; 
+}
+
+sub help {
+
+    print STDERR <<__EOT__ ;
+
+macropp v $VERSION. Copyright (c) Mark Summerfield 1999-2000. 
+All rights reserved. May be used/distributed under the GPL.
+
+usage: macropp [options] infile(s) > outfile
+
+options: (use the short or long name followed by the parameter where req'd) 
+-C --comment      add the %%[] comment macro 
+-f --file       s macro/script file to read (repeat for multiple files) 
+-m --macro        just list macros [$Opt{'macro'}] 
+-n --name         just list the names of macros/scripts [$Opt{'name'}] 
+                  (if no -m or -s or v are specified this sets them all) 
+-s --script       just list scripts [$Opt{'script'}] 
+-v --variable     just list variables [$Opt{'variable'}]
+
+-e --emacro       operate as embedded perl processor [$Opt{'emacro'}] 
+-o --opendelim  s closing delimiter for embedded processor [$Opt{'opendelim'}] 
+-c --closedelim s closing delimiter for embedded processor [$Opt{'closedelim'}]
+
+b = boolean 1 = true, 0 = false; i = integer; s = string e.g. filename
+
+See macrodir for a different approach.
+__EOT__
+
+    exit ; 
+}
+
+__END__
+
+=head1 NAME
+
+macropp - A macro pre-processor with embedded perl capability 
+
+=head1 DESCRIPTION
+
+See Text::MacroScript.pm for the most complete and up-to-date documentation.
+
+See macrodir for a different approach.
+
+These commands may appear in separate `macro' files, and/or in the body of
+files. Wherever a macroname or scriptname is encountered it will be replaced
+by the body of the macro or the result of the evaluation of the script using
+any parameters that are given. 
+
+If we choose the embedded perl style, then all definitions and macro names
+must be enclosed in the delimiters (C<<:> and C<:>> by default, but
+user-definable). The documentation assumes a macro approach, but simply by
+using the delimiters around all macros, scripts, variables and their names
+(and parameters if any) in the body text we can use the embedded perl
+approach.
+
+    %DEFINE macroname [macro body]
+
+    %DEFINE macroname
+    multi-line macro body #0, #1 are the first and second parameters if any
+    used
+    %END_DEFINE
+
+    %UNDEFINE macroname
+
+    %UNDEFINE_ALL   # Undefine all macros
+
+    %DEFINE_SCRIPT scriptname [script body]
+
+    %DEFINE_SCRIPT scriptname
+    multi-line script body arbitrary perl optional parameters are in @Param,
+    although #0, etc may be used any variables are in %Var, although #varname
+    may be used
+    %END_DEFINE
+
+    %UNDEFINE scriptname
+
+    %UNDEFINE_ALL_SCRIPT
+
+    %DEFINE_VARIABLE variablename [variable value]
+
+    %UNDEFINE variablename
+
+    %UNDEFINE_ALL_VARIABLE
+
+    %LOAD[path/filename]    # Instantiate macros/scripts/variables in this
+                            # file, but discard the text
+
+    %INCLUDE[path/filename] # Instantiate macros/scripts/variables in this
+                            # file and output the resultant text at the point
+                            # where this command appears
+
+ 
+    %CASE [condition]       # Provides #ifdef-type functionality, so we can
+    %END_CASE               # skip selected parts of the text depending on the
+                            # condition. The condition is usually dependent on
+                            # some previously defined variable
+
+    %REQUIRE[macroutil.pl]  # Load in the named Perl library
+
+Thus, in the body of a file we may have, for example:
+
+    %DEFINE &B [Billericky Rickety Builders]
+    Some arbitrary text. We are writing to complain to the &B about the shoddy
+    work they did.
+
+Or, in the case of using the C<-e> option for
+embedded style processing our files might look like this:
+
+    <:
+    %CASE[0]
+    We keep our definitions etc as embedded commands - they will be
+    instantiated but not output.
+    %END_CASE DEFINE BB [Billericky Rickety Builders]
+    :> Some arbitrary text. We are writing to complain to the <:BB:> about the
+    shoddy work they did.
+
+Note how we must enclose the definition in the body text between embedded
+delimiters, C<<:> and C<:>> (these are user-definable). Processing using this
+second approach should be a lot faster (since we only seek to expand text
+between the delimiters).
+
+=head2 Macro systems vs embedded systems
+
+Macro systems read all the text, substituting anything which matches a macro
+name with the macro's body (or script name with the result of the execution of
+the script). This makes macro systems slower (they have to check for
+macro/script names everywhere, not just in a delimited section) and more risky
+(if we choose a macro/script name that normally occurs in the text we'll end
+up with a mess) than embedded systems. On the other hand because they work on
+the whole text not just delimited bits, macro systems can perform processing
+that embedded systems can't. Macro systems are used extensively, for example
+the CPP, C pre-processor, with its #DEFINE's, etc.
+
+Essentially, embedded systems print all text until they hit an opening
+delimiter. They then execute any code up until the closing delimiter. The text
+that results replaces everything between and including the delimeters. They
+then carry on printing text until they hit an opening delimeter and so on
+until they've finished processing all the text. This script provides a macro
+approach by default, but if called as C<macro> with C<-e> set
+then it behaves as an embedded perl processor and only performs macro
+operations on text between the delimiters.
+
+=head2 Defining Macros with C<%DEFINE> 
+
+In files we would write:
+
+    %DEFINE MAC [The Mackintosh Macro]
+
+or using the embedded style:
+
+    <:%DEFINE MAC [The Mackintosh Macro]:>
+
+We can call our macro anything, excluding white-space characters and [,
+although [ is not advised. So a name like C<%*&!> is fine - indeed names which
+could not normally appear in the text are recommended to avoid having the
+wrong thing substituted. We should also avoid calling macros, scripts or
+variables names beginning with #. All names are case-sensitive.
+
+Note that if we define a macro and then a script with the same name the script
+will effectively replace the macro.
+
+We can have parameters:
+
+    %DEFINE *P [The forename is #0 and the surname is #1]
+
+or using the embedded style:
+
+    <:%DEFINE *P [The forename is #0 and the surname is #1]:>
+
+Parameters can contain square brackets since macro will grab up to the last
+square bracket on the line. The only thing we can't pass are `|'s since these
+are used to separate parameters. White-space between the macro name and the [
+is optional.
+
+Parameters are named #0, #1, etc. There is no limit, although we must use all
+those we specify. In the example above we I<must> use *P[param1|param2], e.g.
+*P[Jim|Hendrix]; if we don't C<Text::MacroScript.pm> will croak. 
+
+Because we use # to signify parameters if you require text that consists of a
+# followed by digits then you should escape the #, e.g.
+
+    %DEFINE *GRAY[<font color="\#121212">#0</font>]
+
+On the other hand we can use as many I<more> than we need, for example add a
+third to document: *P[Jim|Hendrix|Musician] will become `The forename is Jim
+and the surname is Hendrix', just as in the previous example; the third
+parameter, `Musician', will simply be thrown away.
+
+If we define a macro, script or variable and later define the same name the
+later definition will replace the earlier one. This is useful for making local
+macro definitions over-ride global ones, simply by loading the global ones
+first.
+
+Although macros can have plain textual names like this:
+
+    %DEFINE MAX_INT [32767]
+
+It is generally wise to use a prefix and/or suffix to make sure we don't
+expand something unintentionally, e.g.
+
+    %DEFINE $MAX_INT [65535]
+
+B<Macro expansion is no respector of quoted strings or anything else> - B<if
+the name matches the expansion will take place!>
+
+Multi-line definitions are permitted (here's an example I use with the lout
+typesetting language):
+
+    %DEFINE SCENE
+    @Section @Title {#0} @Begin @PP @Include {#1} @End @Section
+    %END_DEFINE
+
+Multi-line definitions are available using the embedded style:
+
+    <:
+    %DEFINE SCENE
+    @Section @Title {#0} @Begin @PP @Include {#1} @End @Section
+    %END_DEFINE
+    :>
+
+This allows us to write the following in our lout files:
+
+    SCENE[ The title of the scene | scene1.lt ]
+
+If using the embedded style we must use the delimiters:
+
+    <:SCENE[ The title of the scene | scene1.lt ]:>
+
+either of which is a lot shorter than the definition.
+
+=head2 Defining Scripts with C<%DEFINE_SCRIPT> 
+
+Instead of straight textual substitution, we can have some perl executed
+(after any parameters have been replaced in the perl text):
+
+    %DEFINE_SCRIPT *ADD ["#0 + #1 = " . (#0 + #1)]
+
+These would be used as *ADD[5|11] in the text which would be output as:
+
+    These would be used as 5 + 11 = 16 in the text...
+
+In script definitions we can use an alternative way of passing parameters
+instead of or in addition to the #0 syntax.
+
+This is particularly useful if we want to take a variable number of parameters
+since the #0 etc syntax does not provide for this. An array called C<@Param>
+is available to our perl code that has any parameters. This allows things like
+the following to be achieved:
+
+    %DEFINE_SCRIPT ^PEOPLE
+    # We don't use the name hash number params but read straight from the
+    # array:
+    my $a = "friends and relatives are " ; $a .= join ", ", @Param ; $a ;
+    %END_DEFINE
+
+The above would expand in the following text:
+
+    Her ^PEOPLE[Anna|John|Zebadiah].
+
+to Her friends and relatives are Anna, John, Zebadiah.
+
+Macro names can be any length and consist of any characters (including
+non-printable which is probably only useful within code), except [, although ]
+is not recommended.
+
+Here's a simple date-stamp using the macro approach:
+
+    %DEFINE_SCRIPT *DATESTAMP
+    { my( $d, $m, $y ) = (localtime( time ))[3..5] ; $m++ ; $m = "0$m" if $m <
+    10 ; $d = "0$d" if $d < 10 ; $y += 1900 ; "#0 on $y/$m/$d" ; }
+    %END_DEFINE
+
+Here's (a somewhat contrived example of) how the above would be used:
+
+    <HTML> <HEAD><TITLE>Test Page</TITLE></HEAD> <BODY> *DATESTAMP[Last
+    Updated]<P> This page is up-to-date and will remain valid until
+    *DATESTAMP[midnight] </BODY> </HTML>
+
+Thus we could have a file, C<test.html.m> containing:
+
+    %DEFINE_SCRIPT *DATESTAMP
+    { my( $d, $m, $y ) = (localtime( time ))[3..5] ; $m++ ; $m = "0$m" if $m <
+    10 ; $d = "0$d" if $d < 10 ; $y += 1900 ; "#0 on $y/$m/$d" ; }
+    %END_DEFINE
+    <HTML> <HEAD><TITLE>Test Page</TITLE></HEAD> <BODY> *DATESTAMP[Last
+    Updated]<P> This page is up-to-date and will remain valid until
+    *DATESTAMP[midnight] </BODY> </HTML>
+
+or a real embedded perl file, C<test.html.e>:
+
+    <:
+    %CASE[0]
+    Notice we don't need to delimit macro or script names using embedded style
+    since we must use delimiters in the body text anyway
+    %END_CASE
+
+    %DEFINE_SCRIPT DATESTAMP
+    { my( $d, $m, $y ) = (localtime( time ))[3..5] ; $m++ ; $m = "0$m" if $m <
+    10 ; $d = "0$d" if $d < 10 ; $y += 1900 ; "#0 on $y/$m/$d" ; }
+    %END_DEFINE
+    :> <HTML> <HEAD><TITLE>Test Page</TITLE></HEAD> <BODY> <!-- Note how the
+    parameter must be within the delimiters. --> <:DATESTAMP[Last
+    Updated]:><P> This page is up-to-date and will remain valid until
+    <:DATESTAMP[midnight]:> </BODY> </HTML>
+
+either of which when expanded, either in code using C<$Macro->expand()>, or
+using the simple C<macropp> utility supplied with C<Text::MacroScript.pm>:
+
+    [1]% macropp test.html.m > test.html
+
+or
+
+    [1]% macropp -e test.html.e > test.html
+
+C<test.html> will contain just this:
+
+    <HTML> <HEAD><TITLE>Test Page</TITLE></HEAD> <BODY> Last Updated on
+    1999/08/21<P> This page is up-to-date and will remain valid until midnight
+    on 1999/08/21 </BODY> </HTML>
+
+Of course in practice we wouldn't want to define everything in-line like this.
+See C<%LOAD> later for an alternative.
+
+=head2 Defining Variables with C<%DEFINE_VARIABLE> 
+
+We can also define variables:
+
+    %DEFINE_VARIABLE &*! [89.1232]
+
+Note that there is no multi-line version of C<%DEFINE_VARIABLE>.
+
+All current variables are available inside C<%DEFINE_SCRIPT> scripts in the
+C<%Var> hash:
+
+    %DEFINE_SCRIPT *TEST1
+    $a = '' ; while( my( $k, $v ) each( %Var ) ) { $a .= "$key = $v\n" ; } $a
+    ;
+    %END_DEFINE
+
+Variables are also used with C<%CASE> (covered later).
+
+=head2 Loading and including files with C<%LOAD> and C<%INCLUDE>
+
+Although we can define macros directly in the files that require them it is
+often more useful to define them separately and include them in all those that
+need them.
+
+From the command line it would be achieved thus:
+
+    [2]% macropp -f ~/.macro/html.macros test.html.m > test.html
+
+One disadvantage of this approach, especially if we have lots of macro files,
+is that we can easily forget which macro files are required by which text
+files. One solution to this is to go back to C<%DEFINE>ing in the text files
+themselves, but this would lose reusability. The answer to both these problems
+is to use the C<%LOAD> command which loads the definitions from the named file
+at the point it appears in the text file:
+
+    %LOAD[~/.macro/html.macros]
+    <HTML> <HEAD><TITLE>Test Page Again</TITLE></HEAD> <BODY> *DATESTAMP[Last
+    Updated]<P> This page will remain valid until *DATESTAMP[midnight] </BODY>
+    </HTML>
+
+The above text has the same output but we don't have to remember or explicitly
+load the macros so our command line becomes: 
+
+    [3]% macropp test.html.m > test.html
+
+    At the beginning of our lout typesetting files we might put this line:
+
+    %LOAD[local.macros]
+
+The first line of the C<local.macros> file is:
+
+    %LOAD[~/.macro/lout.macros]
+
+So this loads both global macros then local ones (which if they have the same
+name will of course over-ride).
+
+This saves repeating the C<%DEFINE> definitions in all the files and makes
+maintenance easier.
+
+C<%LOAD> loads perl scripts and macros, but ignores any other text. Thus we
+can use C<%LOAD>, or its method equivalent C<load_file()>, on I<any> file, and
+it will only ever instantiate macros and scripts and produce no output.
+
+If we want to include the entire contents of another file, and perform macro
+expansion on that file then use C<%INCLUDE>, e.g.
+
+    %INCLUDE[/path/to/file/with/scripts-and-macros-and-text]
+
+The C<%INCLUDE> command will instantiate any macros and scripts it encounters
+and include all other lines of text (with macro/script expansion) in the
+output stream.
+
+Macros and scripts are expanded in the following order: 1. scripts (longest
+named first, shortest named last) 2. macros  (longest named first, shortest
+named last)
+
+=head2 Skipping text using C<%CASE> and C<%END_CASE> 
+
+It is possible to selectively skip parts of the text.
+
+    %CASE[0]
+    All the text here will be discarded. No matter how much there is.
+    %END_CASE
+
+The above is useful for multi-line comments.
+
+We can also skip selectively. Here's an if...then:
+
+    %CASE[#OS eq 'Linux']
+    Skipped if the condition is FALSE. 
+    %END_CASE
+
+The condition can be any perl fragment. We can use previously defined
+variables either using the #variable syntax as shown above or using the
+exported perl name, in this case either C<#OS>, or C<%Var{'OS'}> whichever we
+prefer.
+
+If the condition is true the text is output with macro/script expansion as
+normal; if the condition is false the text is skipped.
+
+The if...then...else structure:
+
+    %DEFINE_VARIABLE OS[Linux]
+
+    %CASE[$Var{'OS'} eq 'Linux']
+    Linux specific stuff.
+    %CASE[#OS ne 'Linux']
+    Non-linux stuff - note that both references to the OS variable are
+    identical in the expression (#OS is converted internally to $Var{'0S'} so
+    the eval sees the same code in both cases
+    %END_CASE
+
+Although nested C<%CASE>s are not supported we can get the same functionality
+(and indeed more versatility because we can use full perl expressions), e.g.:
+
+    %DEFINE_VARIABLE TARGET[Linux]
+
+    %CASE[#TARGET eq 'Win32' or #TARGET eq 'DOS']
+    Win32/DOS stuff.
+    %CASE[#TARGET eq 'Win32']
+    Win32 only stuff.
+    %CASE[#TARGET eq 'DOS']
+    DOS only stuff.
+    %CASE[#TARGET eq 'Win32' or #TARGET eq 'DOS']
+    More Win32/DOS stuff.
+    %END_CASE
+
+The expressions can be simple [1] (always true always use the text); or any
+arbitrary perl. Perl uses the following comparison operators:
+
+These operators treat each argument as ASCII case sensitive strings: eq  Equal
+ne  Not equal lt  Less than le  Less than or equal gt  Greather than ge
+Greater than or equal
+
+To get case-insentitive comparisons use, C<lc #VAR1 eq lc #VAR2>, etc. (C<lc>
+is the perl lower-case operator.)
+
+To perform compare numbers use these: ==  Equal !=  Not equal <   Less than <=
+Less than or equal
+    >   Greather than 
+    <=  Greater than or equal
+
+Perl has the following logical operators which can be used with the comparison
+operators in our expressions:
+
+    and Both are true or  At least one is true not Negate the expression
+
+Although C<macropp> doesn't support nested C<%CASE>'s we can still represent
+logic like this:
+
+    if cond1 then if cond2 do cond1 + cond2 stuff else do cond1 stuff end if
+    else do other stuff end if
+
+By `unrolling' the expression and writing something like this:
+
+    %CASE[#cond1 and #cond2]
+        do cond1 + cond2 stuff
+    %CASE[#cond1 and (not #cond2)]
+        do cond1 stuff
+    %CASE[(not #cond1) and (not #cond2)]
+        do other stuff
+    %END_CASE
+
+In other words we must fully specify the conditions for each case.
+
+We can use any other macro/script command within C<%CASE> commands, e.g.
+C<%DEFINE>s, etc., as well as have any text that will be macro/script expanded
+as normal.
+
+=head2 Undefining with C<%UNDEFINE> 
+
+Macros and scripts may be undefined in files:
+
+    %UNDEFINE *P UNDEFINE_SCRIPT *DATESTAMP UNDEFINE_VARIABLE &*!
+
+All macros, scripts and variables can be undefined:
+
+    %UNDEFINE_ALL UNDEFINE_ALL_SCRIPT UNDEFINE_ALL_VARIABLE
+
+One use of undefining everything is to ensure we get a clean start. We might
+head up our files thus:
+
+    %UNDEFINE_ALL UNDEFINE_ALL_SCRIPT UNDEFINE_ALL_VARIABLE LOAD[mymacros]
+    text goes here
+
+=head2 Loading Perl libraries with C<%REQUIRE>
+
+We often want our scripts to have access to a bundle of functions that we have
+created or that are in other modules. This can now be achieved by:
+
+    %REQUIRE[/path/to/mylibrary.pl]
+
+An example library C<macroutil.pl> is provided with examples of usage in
+C<html.macro>.
+
+=head2 Commenting
+
+Generally the text files that we process are in formats that support
+commenting, e.g. HTML:
+
+    <!-- This is a comment -->
+
+Sometimes however we want to put comments in our macro source files that won't
+end up in the output files. One simple way of achieving this is to define a
+macro whose body is empty; when its called with any number of parameters (our
+comments), their text is thrown away:
+
+    %DEFINE %%[]
+
+which is used like this in texts:
+
+    The comment comes %%[Here | [anything] put here will disappear]here!
+
+The output of the above will be:
+
+    The comment comes here!
+
+However the easiest way to comment is to use C<%CASE>:
+
+    %CASE[0]
+    This unconditionally skips text up until the end marker since the
+    condition is always false.
+    %END_CASE
+
+=head2 C<Text::MacroScript.pm>
+
+C<Text::MacroScript.pm> provides the underlying code for C<macropp>, and for
+perl programmers it provides the ability to create and manipulate Macro
+objects in code similarly to how we can create and manipulate them through
+embedding them in files. See C<Text::MacroScript.pm>'s documentation for
+further details.
+
+=head1 BUGS
+
+Lousy error reporting for embedded perl in most cases.
+
+=head1 CHANGES
+
+1999/08/18  Created.
+
+1999/08/23  Version 1.00.
+
+1999/09/01  Minor documentation corrections. 
+
+1999/09/07  Took out embedded processing code - this is now taken care of by
+            Text::MacroScript.pm, so we just need to call that with the right 
+            options.
+
+1999/09/10  Renamed package Text::MacroScript.pm as per John Porter's (CPAN)
+            suggestion.
+
+2000/02/01  Minor documentation updates.
+
+=head1 AUTHOR
+
+Mark Summerfield. I can be contacted as <summer@perlpress.com> -
+please include the word 'macro' in the subject line.
+
+=head1 COPYRIGHT
+
+Copyright (c) Mark Summerfield 1999-2000. All Rights Reserved.
+
+This module may be used/distributed/modified under the GPL. 
+
+=head1 PREREQUISITES
+
+C<strict>
+
+C<Getopt::Long>
+C<Text::MacroScript>
+
+=head1 COREQUISITES
+
+=head1 OSNAMES
+
+any
+
+=head1 SCRIPT CATEGORIES
+
+Text-processing
+Macros
+
+=cut

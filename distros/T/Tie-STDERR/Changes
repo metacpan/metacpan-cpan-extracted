@@ -1,0 +1,31 @@
+
+This is a ChangeLog for the Tie::STDERR module.
+
+0.25 Wed Dec 23 11:19:56 MET 1998
+	Added $run_function and $append_scalar possibilities,
+	suggested by William R. Ward.
+
+0.23 Wed Dec 23 11:03:32 MET 1998
+	Some more fixes for mod_perl. The import function is only
+	called during the compilation, so new function
+	Tie::STDERR::register_apache_cleanup is added. I call it in
+	the new CGI::MyExtToCGI method.
+
+0.21 Wed Dec  9 11:10:44 MET 1998
+	Fix for mod_perl, now re-registers correctly for subsequent
+	handlers.
+
+0.20 Sun Nov 29 20:28:57 MET 1998
+	Under mod_perl/Apache::Registry, Tie::STDERR now uses
+	register_cleanup, so that you get the error messages after each
+	script's run.
+
+0.12 Tue May  5 14:46:36 MET DST 1998
+	The tieness can now be switched off using use Tie::STDERR undef;
+
+0.11 Mon Apr 27 17:38:40 MET DST 1998
+	Added check for tty. Remove unnecessary BEGIN block.
+
+0.10 Sat Apr 25 19:21:35 MET DST 1998
+	Original release.
+

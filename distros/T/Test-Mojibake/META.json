@@ -1,0 +1,93 @@
+{
+   "abstract" : "check your source for encoding misbehavior.",
+   "author" : [
+      "Stanislaw Pusep <stas@sysd.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Mojibake",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Unicode::CheckUTF8" : "0",
+            "Unicode::CheckUTF8::PP" : "0"
+         },
+         "requires" : {
+            "File::Spec::Functions" : "0",
+            "Pod::Usage" : "0",
+            "Test::Builder" : "0",
+            "bytes" : "0",
+            "integer" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Builder::Tester" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/creaktive/Test-Mojibake/issues"
+      },
+      "homepage" : "https://github.com/creaktive/Test-Mojibake",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/creaktive/Test-Mojibake.git",
+         "web" : "https://github.com/creaktive/Test-Mojibake"
+      }
+   },
+   "version" : "1.3",
+   "x_contributors" : [
+      "Dave Rolsky <autarch@urth.org>",
+      "Hunter McMillen <mcmillhj@gmail.com>",
+      "John SJ Anderson <john@genehack.org>",
+      "Karen Etheridge <ether@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -1,0 +1,38 @@
+Revision history for Perl extension Tie::Scalar::Sticky.
+
+1.13
+    - update copyright date
+
+1.12
+    - update copyright date
+    - fix bug tracker location
+
+1.11
+    - updated slug
+
+1.10
+    - require Scalar::Util (old perls)
+    - moved non-dist tests out of dist
+    - updated meta data (license, contact, etc.)
+
+1.09
+    - corrected perl-5.8.9 reference count "got screwed up"
+    - tabs to spaces
+
+1.08 
+    - built with Module::Starter
+    - added to github
+
+1.06 
+    - doc updates
+
+1.04
+    - applied broquaint's patch
+    - rejects user supplied strings
+
+1.02 
+    - can't be set empty string now
+
+1.00  
+    - Aug 12 2003 - first version
+

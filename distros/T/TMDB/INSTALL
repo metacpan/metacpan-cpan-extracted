@@ -1,0 +1,31 @@
+Installing TMDB
+Mithun Ayachit
+
+
+
+DISTRIBUTION PAGE
+
+
+The latest and all previous releases for TMDB can be downloaded from
+https://metacpan.org/release/TMDB
+
+
+
+INSTALL USING cpanm
+
+
+TMDB can be installed with cpanm using the following command
+
+    cpanm .
+
+
+
+INSTALL USING Module::Build
+
+
+TMDB can be installed with Module::Build using the following commands
+
+    perl ./Build.PL
+    ./Build
+    ./Build test
+    ./Build install

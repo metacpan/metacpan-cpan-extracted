@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="tools/tei_ms_crit.rng" type="xml"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Ժամանակագրութիւն</title>
+        <author>Մատթէոս Ուռհայեցի</author>
+        <respStmt xml:id="tla">
+          <resp>Transcription by</resp>
+          <name>Tara L Andrews</name>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>Unpublished manuscript</p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc xml:id="D">
+          <msIdentifier>
+            <settlement>Venice</settlement>
+            <repository>Mekhitarist Library</repository>
+            <idno>887</idno>
+          </msIdentifier>
+          <p>pp. 160-177</p>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <p xmlns="http://www.tei-c.org/ns/1.0">
+<!-- began on p.159 -->
+        <pb n="160"/>
+        <w>Արդ՝</w>
+        <w>մինչև</w>
+        <w>ցայս</w>
+        <w>վայ՛րս</w>
+        <seg type="word"><expan>բազմ</expan>աջան</seg>
+        <w>և</w>
+        <seg type="word">աշխատ<ex resp="#tla">ա</ex>ւ<ex resp="#tla">ո</ex>ր</seg>
+        <lb/>
+        <seg type="word">քնն<expan>ութեամբ</expan></seg>
+        <seg type="word">գտե<ex resp="#tla">ա</ex>լ</seg>
+        <seg type="word">գրեց<ex resp="#tla">ա</ex>ք</seg>
+        <seg type="word">զշարագր<ex resp="#tla">ա</ex>կ<ex resp="#tla">ա</ex>ն</seg>
+        <seg type="word">գրե<ex resp="#tla">ա</ex>լս</seg>
+        <seg type="word">զ<num value="100">Ճ</num>ից</seg>
+        <w>ամաց`</w>
+        <w>զորս</w>
+        <w>ի</w>
+        <seg type="word">
+          <expan>բազում</expan>
+        </seg>
+        <lb/>
+        <pb n="161"/>
+        <seg type="word">
+          <expan>ժամանակաց</expan>
+        </seg>
+        <seg type="word">հետաքննե<ex resp="#tla">ա</ex>լ</seg>
+        <w>հասու</w>
+        <w>եղա՞ք։</w>
+        <w>Ընդ</w>
+        <seg type="word">այնքանե<ex resp="#tla">ա</ex>ց</seg>
+        <w>տեսողացն</w>
+        <w>և</w>
+        <seg type="word">լս<lb/>ողացն</seg>
+        <w>որք</w>
+        <w>էին</w>
+        <w>ի</w>
+        <w>հին</w>
+        <w>ամաց</w>
+        <seg type="word">ծնե<ex resp="#tla">ա</ex>լք,</seg>
+        <w>և</w>
+        <seg type="word">
+          <expan>ընդ</expan>
+        </seg>
+        <w>ընթերցողսն</w>
+        <seg type="word">
+          <expan>յառաջին</expan>
+        </seg>
+        <seg type="word">պատմագր<lb/>ացն</seg>
+        <w>որք</w>
+        <w>ականատեսք</w>
+        <w>էին</w>
+        <w>լեա՛լք</w>
+        <seg type="word">
+          <expan>ամենայն</expan>
+        </seg>
+        <w>եղելոցս,</w>
+        <w>և</w>
+        <seg type="word">նեղ<expan>ութեանցս</expan></seg>
+        <w>այսոցիկ</w>
+        <lb/>
+        <w>զոր</w>
+        <seg type="word">
+          <expan>վասն</expan>
+        </seg>
+        <seg type="word">մեղ<ex resp="#tla">ա</ex>ց</seg>
+        <seg type="word">կրե<ex resp="#tla">ա</ex>ց</seg>
+        <w>տունն</w>
+        <w>հայո՛ց</w>
+        <w>և</w>
+        <seg type="word">ահ<ex resp="#tla">ա</ex>ւ<ex resp="#tla">ո</ex>ր</seg>
+        <w>զայս</w>
+        <seg type="word">
+          <expan>բազում</expan>
+        </seg>
+        <seg type="word">
+          <expan>անգամ</expan>
+        </seg>
+        <w>զմտաւ</w>
+        <lb/>
+        <seg type="word">ածե<ex resp="#tla">ա</ex>լ</seg>
+        <w>եմ</w>
+        <seg type="word">
+          <expan>վասն</expan>
+        </seg>
+        <w>այս</w>
+        <w>յետին</w>
+        <seg type="word">
+          <expan>ժամանակին</expan>
+        </seg>
+        <w>գրել</w>
+        <w>զդառնաշունչ</w>
+        <seg type="word"><abbr>կտրծսն</abbr>։</seg>
+        <lb/>
+      </p>
+      <p xmlns="http://www.tei-c.org/ns/1.0">
+        <hi>
+          <w>Իսկ</w>
+          <w>ի</w>
+          <w>լինել</w>
+          <seg type="word">թվական<expan>ութեանս</expan></seg>
+          <w>հայոց</w>
+          <w>ի</w>
+          <w>յամս</w>
+          <seg type="word">
+            <num value="502">ԵՃԲ</num>
+          </seg>
+          <w>եղև</w>
+        </hi>
+        <seg type="word"><hi>ահ</hi><lb/>աւոր</seg>
+        <w>նշան</w>
+        <w>և</w>
+        <seg type="word">սոսկ<ex resp="#tla">ա</ex>լի,</seg>
+        <w>և</w>
+        <seg type="word">
+          <abbr>կտրծ</abbr>
+        </seg>
+        <w>մեծ</w>
+        <w>ի</w>
+        <seg type="word">բ<ex resp="#tla">ա</ex>րկութենէ,</seg>
+        <seg type="word">երևե<ex resp="#tla">ա</ex>լ</seg>
+        <w>ի</w>
+        <w>մեծ</w>
+        <lb/>
+        <seg type="word">
+          <expan>քաղաքն</expan>
+        </seg>
+        <w>անտիոք,</w>
+        <w>զոր</w>
+        <w>ի</w>
+        <w>ներքոյ</w>
+        <seg type="word">
+          <expan>արեգականն</expan>
+        </seg>
+        <seg type="word">
+          <expan>գործեցաւ՛</expan>
+        </seg>
+        <w>այս</w>
+        <w>սքանչելիս</w>
+        <w>որ</w>
+        <w>է՛ր</w>
+        <seg type="word">տես<lb/>ողացն</seg>
+        <w>ահաւոր</w>
+        <w>և</w>
+        <seg type="word"><expan>հրաշալի</expan>.</seg>
+        <w>և</w>
+        <w>եղև</w>
+        <w>այս</w>
+        <seg type="word"><subst><del>իշխ</del><add place="above">նշ</add></subst>անս</seg>
+        <w>ա՛հ</w>
+        <w>և</w>
+        <w>դողումն</w>
+        <seg type="word">
+          <expan>ամենայն</expan>
+        </seg>
+        <seg type="word"><expan>հաւատաց</expan><lb/>ելոց</seg>
+        <seg type="word"><expan>քրիստոսի</expan>,</seg>
+        <w>զորս</w>
+        <seg type="word"><del>յ</del>այ<del>ն</del>ժ<del>ա</del>մ</seg>
+        <w>մեծասաստ</w>
+        <w>սպառնալեօք</w>
+        <seg type="word">յայտնե<ex resp="#tla">ա</ex>ց</seg>
+        <seg type="word">
+          <expan>աստուած</expan>
+        </seg>
+        <seg type="word">
+          <expan>զդատաստան</expan>
+        </seg>
+        <lb/>
+        <w>իւր</w>
+        <w>զահաւոր.</w>
+        <w>և</w>
+        <seg type="word">իշխ<lb/>անն</seg>
+        <seg type="word">
+          <expan>զհաւատսն</expan>
+        </seg>
+        <w>եթո՛ղ,</w>
+        <w>և</w>
+        <w>եղև</w>
+        <seg type="word">
+          <expan>հակառակ</expan>
+        </seg>
+        <w>մեծ</w>
+        <w>ազգին</w>
+        <w>ասորո՛ց.</w>
+        <w>և</w>
+        <w>յայնժամ</w>
+        <seg type="word">մատն<lb/>եցան</seg>
+        <w>ասորիքն</w>
+        <w>ի</w>
+        <w>մեծ</w>
+        <seg type="word">նեղ<expan>ութիւն</expan>,</seg>
+        <seg type="word">
+          <expan>վասն</expan>
+        </seg>
+        <w>սկսան</w>
+        <seg type="word">
+          <expan>հաւատոյ</expan>
+        </seg>
+        <seg type="word">քնն<expan>ութիւն</expan></seg>
+        <w>առնե՛լ</w>
+        <seg type="word"><expan>հանապազօր</expan>.</seg>
+        <lb/>
+        <w>և</w>
+        <w>յայնժամ</w>
+        <seg type="word">լրբե<ex resp="#tla">ա</ex>լ</seg>
+        <w>եղեն</w>
+        <w>ազգն</w>
+        <w>հոռոմո՛ց,</w>
+        <w>որ</w>
+        <w>և</w>
+        <seg type="word">
+          <expan>զգործեալն</expan>
+        </seg>
+        <w>ոչ</w>
+        <w>գիտե՛լ,</w>
+        <seg type="word">
+          <expan>վասն</expan>
+        </seg>
+        <w>զի</w>
+        <seg type="word">զ<expan>քրիստոս</expan><lb/>ակ<ex resp="#tla">ա</ex>ն</seg>
+        <seg type="word">աւետ<ex resp="#tla">ա</ex>ր<ex resp="#tla">ա</ex>նն</seg>
+        <w>հրով</w>
+        <w>այրե՛լ</w>
+        <seg type="word">
+          <expan>հրամայեաց</expan>
+        </seg>
+        <w>պատրիարգն.</w>
+        <w>և</w>
+        <w>եղև</w>
+        <seg type="word">
+          <expan>յորժամ</expan>
+        </seg>
+        <w>ի</w>
+        <w>հուրն</w>
+        <lb/>
+        <w>դրին</w>
+        <w>զաւետարանն</w>
+        <seg type="word"><expan>աստուծոյ</expan>,</seg>
+        <w>ձայն</w>
+        <w>ելանէ՛ր</w>
+        <seg type="word">յաւետ<ex resp="#tla">ա</ex>ր<ex resp="#tla">ա</ex>նէն</seg>
+        <w>անտի</w>
+        <w>և</w>
+        <w>ի</w>
+        <w>կրակէն</w>
+        <lb/>
+        <w>ի</w>
+        <w>դուրս</w>
+        <w>ելանէ՛ր.</w>
+        <lb/>
+      </p>
+    </body>
+  </text>
+</TEI>

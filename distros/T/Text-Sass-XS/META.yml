@@ -1,0 +1,45 @@
+---
+abstract: 'Perl Binding for libsass'
+author:
+  - 'Yoshihiro Sasaki.'
+build_requires:
+  Devel::PPPort: 3.20
+  ExtUtils::CBuilder: 0.28
+  Test::More: 0.98
+  Test::Name::FromLine: 0.10
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Devel::PPPort: 3.20
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Sass-XS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - builder
+    - libsass
+    - author_scripts
+provides:
+  Text::Sass::XS:
+    file: lib/Text/Sass/XS.pm
+    version: 0.11
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/ysasaki/Text-Sass-XS/issues
+  homepage: https://github.com/ysasaki/Text-Sass-XS
+  repository: git://github.com/ysasaki/Text-Sass-XS.git
+version: 0.11
+x_contributors:
+  - 'ysasaki <ysasaki@cpan.org>'
+  - 'ysasaki <aloelight@gmail.com>'

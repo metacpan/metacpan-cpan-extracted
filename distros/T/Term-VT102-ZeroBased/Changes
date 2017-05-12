@@ -1,0 +1,20 @@
+Revision history for Term-VT102-ZeroBased
+
+1.02    Fri Jun  5 00:22:29 2009
+        Modernize the dist
+
+1.01    Tue Dec 11 01:40:36 2007
+        Fix mishandling of startcol and endcol in row_attr, row_plaintext, etc
+
+1.00    Sat Sep 15 18:35:04 2007
+        Ack, the synopsis was very wrong
+
+0.82    Sun Sep  2 00:06:56 2007
+        Fix bug with constant row indices to row_(attr|text|plaintext)
+        Documentation updates
+        Test coverage
+        Bump version to match Term::VT102's
+
+0.01    Sat Sep  1 23:14:35 2007
+        First version, released on an unsuspecting world.
+

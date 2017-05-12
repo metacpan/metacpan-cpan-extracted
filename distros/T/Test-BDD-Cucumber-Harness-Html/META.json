@@ -1,0 +1,63 @@
+{
+   "abstract" : "html output for Test::BDD::Cucumber",
+   "author" : [
+      "Markus Benning <ich@markusbenning.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-BDD-Cucumber-Harness-Html",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "Moose" : "0",
+            "Sys::Hostname" : "0",
+            "Template" : "0",
+            "Test::BDD::Cucumber::Harness::Data" : "0",
+            "Time::HiRes" : "0",
+            "Time::Piece" : "0",
+            "perl" : "v5.8.5"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Test-BDD-Cucumber-Harness-Html@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-BDD-Cucumber-Harness-Html"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/Test-BDD-Cucumber-Harness-Html",
+         "web" : "https://github.com/benningm/Test-BDD-Cucumber-Harness-Html.git"
+      }
+   },
+   "version" : "1.006"
+}
+

@@ -1,0 +1,31 @@
+Revision history for Test-Mini
+
+v1.1.3  2011-02-12
+        Found a bug causing erroneous behavior for skipped tests in Perl 5.13+.
+
+v1.1.2  2011-02-10
+        Fixed a bug in Makefile.PL that caused failures with older versions of
+        ExtUtils::MakeMaker.
+
+        Added a proper $VERSION to the Test::Mini package.
+
+v1.1.1  2010-10-14
+        Fixed a bug w.r.t. mro::get_isarev behavior.  Test::Mini would always
+        try to run tests in any package that had ever been a subclass of
+        Test::Mini::TestCase; this prevented Test::Mini::Unit's tests from
+        passing under any Perl >= 5.9.5.  Few users will have seen this bug.
+
+        Made another pass at making t/Test/Mini/Logger.t pass on the smokers.
+
+v1.1.0  2010-09-30
+        Implemented respect for the TEST_MINI_NO_AUTORUN environment variable
+
+        Fixed a bug where invalid TAP was output when running multiple test
+        cases in a single process
+
+        Attempted once again to fix an intermittent failure in
+        t/Test/Mini/Logger.t related to timings
+
+v1.0.0  2010-09-16
+        First Major Version
+

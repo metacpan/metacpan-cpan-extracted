@@ -1,0 +1,20 @@
+.shipit
+lib/Test/Bot.pm
+lib/Test/Bot/Commit.pm
+lib/Test/Bot/GitHub.pm
+lib/Test/Bot/Notify.pm
+lib/Test/Bot/Notify/IRC.pm
+lib/Test/Bot/Notify/Print.pm
+lib/Test/Bot/Source.pm
+lib/Test/Bot/Source/GitHub.pm
+lib/Test/Bot/TestHarness.pm
+lib/Test/Bot/TestHarness/Aggregate.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+sample_tests/all_good/good1.t
+sample_tests/all_good/good2.t
+sample_tests/mixed/mixed1.t
+sample_tests/mixed/mixed2.t
+t/test_aggregation.t

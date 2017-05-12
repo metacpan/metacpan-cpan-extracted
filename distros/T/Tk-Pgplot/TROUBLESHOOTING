@@ -1,0 +1,65 @@
+Unfortunately, compiling this module is not straight forward. The
+following are some things to check if you have problems compiling
+or running.
+
+*PGPLOT PATCH*
+
+- Is the Perl/Tk module installed? 
+
+- Is PTK_INCL set correctly in the appropriate .conf file?
+
+    The correct value should be found automatically by the .conf
+    file but it may make a mistake (such as using the wrong version
+    of perl). Try directly entering the value of PTK_INCL, or using
+    the simple one liner. Note that some Linux distributions don't
+    install Tk in the site_perl directory, so you will have to hunt
+    around for the pTk directory by hand.
+
+- If compiling on Linux you must compile pgplot using g77_gcc.conf 
+  NOT g77_aout.conf
+
+- If you are using Tk800.022, you need to define -DOLDTK in the .conf file
+
+- If you a compilation warning like 
+    ptkpgplot.c:613: warning: implicit declaration of function `LangWidgetObj'
+  then you are compiling for the wrong versipn of Tk. See PGPLOT.patch
+
+PGPLOT
+
+- Is the Perl PGPLOT module linked against the patched pgplot installation? You
+  can do a check using something like:
+
+      find . -name PGPLOT.so -exec ldd \{} \;
+
+*Tk::Pgplot*
+
+- Is Makefile.PL configured correctly?
+  If $PGPLOT_DIR cannot be used to locate the pgplot directories and
+  include files you must use the IDIR and LDIR command-line options on
+  Makefile.PL
+
+- If Makefile.PL cannot find ptkpgplot.h check the value of 
+  IDIRS in Makefile.PL.
+
+- If Makefile.PL cannot find libptkpgplot.a check the value of 
+  LDIRS in Makefile.PL.
+
+- If "make test" fails with something like "undefined symbol: LangWidgetObj"
+  then you have compiled pgplot for the wrong Tk version. See PGPLOT.patch
+
+- Is Tk.pm installed? 
+  This module has been developed using Tk804.027. Some earlier versions
+  before 800.015 are known to not be compatible.
+
+- Is PGPLOT.pm installed? 
+   You also need ExtUtils::F77, which PGPLOT.pm also requires.
+
+- Is Makefile.PL really linking you with the patched version of Pgplot?
+  If you are using a private version of pgplot with the ptk patch, make
+  sure you really are linking with it. You can also do a check using
+  something like:
+
+      find . -name Pgplot.so -exec ldd \{} \;
+
+- Have you upgraded Tk since you compiled pgplot?
+

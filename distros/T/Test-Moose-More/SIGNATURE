@@ -1,0 +1,91 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 eff9f68b50236691e3ad77b98776b1295a387cc7 Changes
+SHA1 bf2d713ceca5b8ad3d680ed15baba1b89df7e149 LICENSE
+SHA1 e626b3ad4a73b369a1bfdc5be42690b5df6999d9 MANIFEST
+SHA1 19a22bfca8082d8905c064f6b7ef0c6633a4c7e6 META.json
+SHA1 d72088998d72dccbf6f5621e3509e3de6af51174 META.yml
+SHA1 e970e55af83695fe2b59389d43822f19fa8acb02 Makefile.PL
+SHA1 700c8ae2290348d5205124c89344b3205e65ea1c README
+SHA1 72867a297b77fb2f73f58a1d7e4b21b148ab8cf9 cpanfile
+SHA1 b916e5e22dce319b385382dbb6694a1d4b7ac634 dist.ini
+SHA1 29288eeaa3dc087ebd4a76f0c525c83016c04d5e lib/Test/Moose/More.pm
+SHA1 ee0bc9ae30f9a5c898722061cc6f7d382fdcee80 lib/Test/Moose/More/Utils.pm
+SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
+SHA1 c28a0d7bbf0c35aff4bcb4ed5adafd4cc85ba941 t/00-compile.t
+SHA1 ab2f071a8457fbab3e15532d83fc1041b46ed4a8 t/00-report-prereqs.dd
+SHA1 c9a5c84a8b383374bf4133d0cef54ef9ccd610b5 t/00-report-prereqs.t
+SHA1 7110de92a946d29acba283fbbf24357bbfe7989c t/attribute_options_ok/basic.t
+SHA1 cac1fe5cef9be4307c57fea3d7fdc59cfb0dc649 t/attribute_options_ok/subtest-wrapper.t
+SHA1 184cd396cdd45481169f5248992011f8ec90392d t/check_sugar.t
+SHA1 84cff043ca5c580be332fffbc682731fe33b2def t/does_metaroles_ok.t
+SHA1 b8e1677fb22d9d5189211ad953222c298ffb915c t/does_not_metaroles_ok.t
+SHA1 f6a969d81a454a61db04670596743b885dce57b1 t/does_not_ok.t
+SHA1 3db63d1b2a94bf5a85a5c33e68f10d97f384de48 t/does_ok.t
+SHA1 6d28f78d54ce90d525713095c5b350cee4b3d7f5 t/has_attribute_ok.t
+SHA1 0d0fc1e01444cf49baa6c54ecfeba70ce7a734de t/is_anon_ok.t
+SHA1 fea5000217091f970afcb7a566754b63dd27b7be t/is_class_ok/basic.t
+SHA1 865ac31f6af1d36702f1c6564593c0e3ade22a2d t/is_class_ok/moose-meta-attribute-should-be-moosey.t
+SHA1 d77cb1e5a70d3db21d7ee5b5bed3c53468c6b71f t/is_immutable_ok.t
+SHA1 5bbd08043c6ffe760da4f0e22fdbb3f2bb112d77 t/is_not_anon_ok.t
+SHA1 ef4337fc54ee2dc9d829fa1a9dd01566a156be96 t/is_role_ok.t
+SHA1 4e15b688710f882cf42c2453db1b4b0827c64f4f t/meta_ok.t
+SHA1 7848e9c1869f12fb657388e1fe12c18fd7197452 t/method_from_pkg_ok.t
+SHA1 133970d038e0500b954c1e7324cf4e64df6241d0 t/method_not_from_pkg_ok.t
+SHA1 5e8af5ef04bff311f488caf9f509545e2b96f6fb t/method_ok.t
+SHA1 fc226a89f533b01605f87079aafe49b3dacc04ea t/pristine_ok.t
+SHA1 2880954e42f74822063b2fd16d8c9385cd053c19 t/requires_method_ok.t
+SHA1 89032c090c1832ed2dd5d71df99dbcfdd3cae72b t/subtest-1.t
+SHA1 2917b04306f49bde951d184ad03e6be50c2fd2eb t/validate_attribute/basic.t
+SHA1 ed11a2cc0ea7e872c7a290ea1a64ca6d91407e57 t/validate_attribute/coerce.t
+SHA1 356f0b95ac1fe9a28c0152f934ed402bd8b1eb9b t/validate_attribute/in_roles.t
+SHA1 7b7d0aa491374ff42fa77a4d4f6f48514ad06466 t/validate_attribute/lazy.t
+SHA1 4fc9aca3361572938b60c19b90a83355eea78079 t/validate_attribute/required.t
+SHA1 9d1728683c4ade164467402c53392c0218f32925 t/validate_class/basic.t
+SHA1 ae7e2baf030390c298c1808c93fa33793b870724 t/validate_class/metaclasses.t
+SHA1 e4ee89a5767d00f94ae9401fa2ad0c666f09a3fe t/validate_class/metaroles.t
+SHA1 1665cd46eaa0e0afc6672a3aa22116cd96bbbfad t/validate_class/methods.t
+SHA1 d347de6d163478b3a0ab6ef7907f383f314d872a t/validate_role/basic.t
+SHA1 8536203d2f13c1e0699459ad6d3898a4b0dde568 t/validate_role/compose.t
+SHA1 f58b7417deafed81483f2b524d99045b023b6673 t/validate_role/metaclasses.t
+SHA1 7d033573ad27d4f46cbe0b311c31623a108581eb t/validate_role/metaroles.t
+SHA1 84a651676182892ea97083d6899237eec5b9b03f t/validate_thing/metaclasses.t
+SHA1 c80c4bf667c9df1aee10436347351fb13564f85c t/validate_thing/methods.t
+SHA1 a95c37eb417623ad7a8bf92889eaec1236a1b7a9 t/validate_thing/sugar.t
+SHA1 37f0fc8d581bfbc8c4c958871c6f7bc1718e94ec t/wrapped/in_roles.t
+SHA1 918b085128de71ce1732482905f9dee02ee52203 xt/author/eol.t
+SHA1 8039f891bcd745693501afd72fae9d9406dde0ea xt/author/no-tabs.t
+SHA1 9b9533b39ea716aaccb533a2ae28478471f8383a xt/author/pod-coverage.t
+SHA1 50482a8f925d46bc72e0998f8dc240aeb61b98d3 xt/author/pod-spell.t
+SHA1 df7123c703c4daaea7635951ae8567eda4e26866 xt/author/pod-syntax.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 9a21b3840753f6223630c9eda458e91085174ece xt/release/has-version.t
+SHA1 e91052db2912055e66889853bc5cb1f38db60665 xt/release/minimum-version.t
+SHA1 a0cdc04d45715c9c1cb10480d84be76dcadd7e86 xt/release/no-smart-comments.t
+SHA1 fd53f1ea2ac5884abce47c17a77545c05e47bc2f xt/release/pod-linkcheck.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJY/sc3AAoJEJP6zjPp4XX4V4gH/36DFEwbqGDpgVnFMMx1tvZA
+P4MXfLkNPLMI98TXe4ro16q1VYbpUJJFCanRN+j8qebmav5aSJ6OdE7nM4KFW2c5
+uUWtYaqg6wmXFLexL8krXa4/Ct350kaUqNPW+AmKQMlOlxlXn3QfkCDe6S5IfJda
+yPcN+7/cYJ4igsGP1MwBnRa5Hb7eegzXUk1pNmrJyxjEfCzWNZXVWDNaY41r1gsV
+rJwEGuaJD686ISpKSN3XOhqeD3X8uTIfYMAJLWZGt5qby0s7sxB4N2Nnvq5xm8zL
+yI0qeoXULj9Qp9Uu86ZQG5efatZMDDi1EfOtFD9OqScTiCcH2gjWtIp1kMplKe8=
+=mYUc
+-----END PGP SIGNATURE-----

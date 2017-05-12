@@ -1,0 +1,50 @@
+{
+   "abstract" : "allow a single child widget to be scrolled",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tickit-Widget-ScrollBox",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Refcount" : "0",
+            "Tickit::Test" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tickit::SingleChildWidget" : "0.36",
+            "Tickit::Style" : "0.35",
+            "Tickit::Window" : "0.39"
+         }
+      }
+   },
+   "provides" : {
+      "Tickit::Widget::ScrollBox" : {
+         "file" : "lib/Tickit/Widget/ScrollBox.pm",
+         "version" : "0.07"
+      },
+      "Tickit::Widget::ScrollBox::Extent" : {
+         "file" : "lib/Tickit/Widget/ScrollBox/Extent.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.freenode.net/#tickit"
+   },
+   "version" : "0.07"
+}

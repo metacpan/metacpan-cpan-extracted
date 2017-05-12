@@ -1,0 +1,12 @@
+Short example for installing DBD-SearchServer-0.21:
+
+export FULCRUM_HOME=/opt/fulcrum3.5
+perl Makefile.PL
+export FULCREATE=`pwd`/fultest
+export FULSEARCH=$FULCRUM_HOME/fultext:`pwd`/fultest
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$FULCRUM_HOME/lib
+export PATH=$PATH:$FULCRUM_HOME/bin
+./build-dir.sh /opt/fulcrum3.5 fultest
+execsql -0 test.fte
+make test
+make install

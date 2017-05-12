@@ -1,0 +1,23 @@
+Revision history for Tickit-Widget-SegmentDisplay
+
+0.04    2015/10/26 01:04:18
+        [CHANGES]
+         * Support rendering using Unicode block-drawing characters
+         * Allow rendering at half-line resolution
+         * Controllable line thickness
+         * Added more symbols - F H s G n p
+
+        [BUGFIXES]
+         * Fix geometry of 'm' symbol
+
+0.03    2014/10/19 18:36:52
+        [CHANGES]
+         * Allow seven segments with decimal point
+         * Added support for displaying some 'symbol' markers; useful
+           electronics units
+
+0.02    CHANGES:
+         * Updated for Tickit 0.36 - use RenderBuffer and ->render_to_rb
+
+0.01    First version, released on an unsuspecting world.
+

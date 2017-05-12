@@ -1,0 +1,8 @@
+\.git(ignore|/)
+tags
+\.swp$
+pm_to_blib
+blib/
+cover_db/
+Makefile
+MYMETA\.

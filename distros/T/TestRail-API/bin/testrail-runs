@@ -1,0 +1,169 @@
+#!/usr/bin/env perl
+# ABSTRACT: List runs in a TestRail project matching the provided filters
+# PODNAME: TestRail::Bin::Runs
+
+package TestRail::Bin::Runs;
+$TestRail::Bin::Runs::VERSION = '0.039';
+use strict;
+use warnings;
+use utf8;
+
+use TestRail::API;
+use TestRail::Utils;
+use TestRail::Utils::Find;
+
+use Getopt::Long qw{GetOptionsFromArray};
+use File::HomeDir qw{my_home};
+
+if ( !caller() ) {
+    my ( $out, $code ) = run( 'args' => \@ARGV );
+    print $out;
+    exit $code;
+}
+
+sub run {
+    my %params = @_;
+    my $opts   = {};
+
+    # Parse config file
+    my $homedir = my_home() || '.';
+    if ( -e $homedir . '/.testrailrc' ) {
+        $opts = TestRail::Utils::parseConfig($homedir);
+    }
+
+    GetOptionsFromArray(
+        $params{'args'},
+        'apiurl=s'     => \$opts->{'apiurl'},
+        'password=s'   => \$opts->{'password'},
+        'user=s'       => \$opts->{'user'},
+        'j|project=s'  => \$opts->{'project'},
+        'c|config=s@'  => \$opts->{'configs'},
+        's|status=s@'  => \$opts->{'statuses'},
+        'e|encoding=s' => \$opts->{'encoding'},
+        'l|lifo'       => \$opts->{'lifo'},
+        'm|milesort'   => \$opts->{'milesort'},
+        'h|help'       => \$opts->{'help'},
+    );
+
+    if ( $opts->{help} ) { return ( '', TestRail::Utils::help() ); }
+
+    $opts->{'browser'} = $params{'browser'};
+
+    TestRail::Utils::interrogateUser( $opts, qw{apiurl user password project} );
+
+    my $tr = TestRail::Utils::getHandle($opts);
+    my $runs = TestRail::Utils::Find::findRuns( $opts, $tr );
+
+    @$runs = map { $_->{name} } @$runs;
+    return ( join( "\n", @$runs ) . "\n", 0 ) if scalar(@$runs);
+    return ( "No runs found matching your criterion.\n", 255 );
+}
+
+1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+TestRail::Bin::Runs - List runs in a TestRail project matching the provided filters
+
+=head1 VERSION
+
+version 0.039
+
+=head1 SYNOPSIS
+
+  testrail-runs [OPTIONS] | xargs prove -PTestrail=...
+
+  require `which testrail-runs`;
+  TestRail::Bin::Run::run('args' => \@args);
+
+=head1 DESCRIPTION
+
+testrail-runs - list runs in a TestRail project matching the provided filters.
+Groups by plan for runs which are children of a plan.
+
+Can be used as the modulino TestRail::Bin::Runs.
+Has a single 'run' function which accepts a hash with the 'args' parameter being the array of arguments.
+
+=head1 PARAMETERS:
+
+=head2 MANDATORY PARAMETERS
+
+=over 4
+
+--apiurl     : full URL to get to TestRail index document
+
+--password   : Your TestRail Password, or a valid API key (TestRail 4.2 and above).
+
+--user       : Your TestRail User Name.
+
+-j --project : desired project name.
+
+=back
+
+All mandatory options not passed with the above switches, or in your ~/.testrailrc will be prompted for.
+
+=head2 OPTIONAL PARAMETERS
+
+=over 4
+
+-c --config   : configuration name to filter runs.  Can be passed multiple times.
+
+-s --status   : only list runs with one or more tests having [status] in testrail.  Can be passed multiple times.
+
+-e --encoding : Character encoding of arguments.  Defaults to UTF-8. See L<Encode::Supported> for supported encodings.
+
+-l --lifo     : LIFO sorting of results.  Defaults to FIFO sort if not passed.
+
+-m --milesort : Sort by milestone due time.  Defaults to sorting by run creation time if not passed.
+
+Be aware that when sorting by milestone, if a run has no milestone set, it is considered "earlier" than anything else by perl's comparison routines.
+Ergo if they are the lowest priority, you should consider running LIFO.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+In your \$HOME, (or the current directory, if your system has no concept of a home directory) put a file called .testrailrc with key=value syntax separated by newlines.
+Valid Keys are the same as documented by L<App::Prove::Plugin::TestRail>.
+All options specified thereby are overridden by passing the command-line switches above.
+
+=head1 MISCELLANEOUS OPTIONS:
+
+=over 4
+
+--help : show this output
+
+=back
+
+=head1 SPECIAL THANKS
+
+Thanks to cPanel Inc, for graciously funding the creation of this distribution.
+
+=head1 AUTHOR
+
+George S. Baugh <teodesian@cpan.org>
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by George S. Baugh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+L<TestRail::API>
+
+L<File::HomeDir> for the finding of .testrailrc
+

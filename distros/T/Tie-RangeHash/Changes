@@ -1,0 +1,54 @@
+Revision history for Perl extension Tie::RangeHash.  (Note: significant
+changes marked with '*' may not be compatible with previous versions.)
+
+1.05   Fri Mar 26 1010
+	- re-uploaded version accidentally deleted from CPAN
+
+1.04   Fri Jan  4 2008
+	- re-uploaded version accidentally deleted from CPAN
+	- minor changes to Build.PL
+
+1.03   Wed Jan  4 2005
+	- redid POD, corrected typos
+	- added fetch_overlap to fetch overlapping ranges
+
+1.02   Mon Dec 20 2004
+	- fixed SIGNATURE issue
+
+1.01   Fri Dec 17 2004
+	- uses base
+	- added SIGNATURE
+	- updated to use Algorithm::SkipList
+	- uses Exporter
+	* List::SkipList v0.65 is required
+	* removed validate_key() methods from node types (for now)
+	- commented out Carp::Assert
+	- added reset method
+	- version conforms to proper Perl style
+	- added size method
+	- modified tests
+	- added stub for autosplit in Build.PL
+
+1.00_2 Fri Mar 19 2004
+	- added Build.PL to distribution
+	- new method accepts a hash reference with attributes as well
+	- META.yml added to distribution
+	* List::SkipList v0.40 is required
+	- changed version number to properly be treated as a beta by CPAN
+	- fixed typo in README
+
+1.00_b1 Nov 22 2003
+	- test cases rewritten
+	* testing against overlapping ranges (e.g. '2,3' when '1,4' defined)
+	  is fatal
+	* nodes can be redefined
+	* array references cannot be keys
+	* open-ended ranges are allowed
+	* removed warnings registration
+	* only a separator of ',' is supported
+        * customization of separator or comparison method done through 
+	  defining a custom node class
+	* overlapping ranges is now a fatal error instead of warning
+	- added first_key, next_key methods
+	- requires Carp::Assert
+	- complete rewrite using List::SkipList instead of trees

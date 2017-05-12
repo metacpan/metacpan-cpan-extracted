@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Term-Chart/basic.t
+t/Term-Chart/custom.t
+t/Term-Chart/elaborate.t
+util/ansi2html
+lib/Term/Chart.pm
+lib/Term/Chart.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

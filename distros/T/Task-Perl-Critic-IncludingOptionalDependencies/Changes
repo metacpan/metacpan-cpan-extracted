@@ -1,0 +1,34 @@
+[1.005] Released on 2010-06-26
+
+    Replace Regexp::Parser with PPIx::Regexp.
+
+[1.004] Released on 2008-07-06
+
+    "use 5.006001" in Makefile.PL and Build.PL.
+
+    Add Readonly::XS.
+
+[1.003] Released on 2008-06-08.
+
+    Documentation updates.
+
+    Replace use of Module::Install with Module::Build.
+
+[1.002] Released on 2008-03-15.
+
+    Add new optional dependencies in Perl::Critic 1.082.
+
+[1.001] Released on 2007-09-23.
+
+    Fix the distribution name.  Whoops.
+
+    Update Task::Perl::Critic dependency version.
+
+[1.000] Released on 2007-07-30.
+
+    Initial version.
+
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Task-Perl-Critic-IncludingOptionalDependencies/Changes $
+#     $Date: 2010-06-26 15:52:08 -0500 (Sat, 26 Jun 2010) $
+#   $Author: clonezone $
+# $Revision: 3857 $

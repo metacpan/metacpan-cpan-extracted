@@ -1,0 +1,71 @@
+# Changes for Task-BeLike-MELO
+
+0.011     2013-07-13 19:05:26 Europe/Lisbon
+       * MooseX::AttributeHelpers is deprecated (RT86648, thx ether@cpan.org)
+       * Remove some ecosystems I no longer use: Catalyst, Module::Install...
+       * ... Notifo, FCGI, HTML::Template, local::lib ...
+       * ... several template systems including Template Toolkit ...
+       * ... XML::Compile and old ZMQ modules, IO::All insanity
+       * use Method::Signatures::Simple for all my method needs
+       * Settle on TOML for prefered config format, PBKDF2 for passwords
+       * MSSQL is needed at work now
+       * Used DBIx::Class as document store, InflateColumn::Serializer++
+       * lib::tiny::findbin is gold
+       * all SpreadSheet::* replaced with XLSX versions
+
+0.010     2012-08-22 23:55:38 Europe/Lisbon
+       * Added Moo, making sure we use a version that works properly
+         with Moose
+       * Make sure our ZMQ::LibZMQ2 is the most recent one, with the
+         nasty fork() bug solved
+
+0.009     2012-08-22 11:18:04 Europe/Lisbon
+       * Code::TidyAll and friends
+       * Message::Passing and friends
+       * Improve Devel::Cover deps
+       * Best ZeroMQ dependencies
+       * other assorted tidbits
+
+0.008     2012-06-06 11:33:48 Europe/Lisbon
+       * several deps of a project I'm maintained
+       * Mason, my new darling
+       * Added old favorites: Try::Tiny, Sub::Name, Time::HiRes, Plack
+
+0.007     2012-06-05 11:10:31 Europe/Lisbon
+       * Moved Dist::Zilla deps to my new PluginBundle::Author::MELO
+         distribution
+       * Added Unicode magic from tchrist
+       * Added several App:: I like a lot, including cpandoc
+       * Forced to work with SOAP/WSDL, added deps for that too
+       * Added Carton, to manage deps on my larger projects
+
+0.006     2011-06-24 10:08:35 Europe/Lisbon
+       * A fine CPAN module grepper command line tool
+       * Make sure we have our SSL and HTTPS functions covered
+       * Config::GitLike - my second choice for config files, after JSON
+       * Cmd line tool uni - greps Unicode characters table
+       * whiff - returns first available executable from a list
+       * Remove perlbrew from our list: chicken and egg problem
+
+0.005     2011-05-25 15:55:38 Europe/Lisbon
+       * Cleanup module list: remove deprecated ones, added new ones
+       * Tweak Dist::Zilla metadata
+
+0.004 Tue Oct 19 20:15:17 UTC 2010
+       * Added Throwable::X
+       * Added Notifo.com modules
+       * Replace plugin BumpVersionFromGit with Git::NextVersion
+       * EOL tests are broken with POD sections
+       * Make sure Pod::Elemental is up-to-date, required for Pod::Weaver
+       * dzil plugin BumpVersionFromGit is deprecated, use Git::NextVersion now
+
+0.003 Tue Sep 28 13:36:24 UTC 2010
+      * Added deps to build the modern perl book
+      * Prepare for Dist::Zilla v5
+
+0.002 Sun Aug  1 20:42:28 UTC 2010
+      * Added more modules
+      * Fix .gitignore, wrong directory excluded
+
+0.001 Sun Aug  1 20:34:15 UTC 2010
+      * Initial release to CPAN

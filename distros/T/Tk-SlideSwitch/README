@@ -1,0 +1,11 @@
+
+=head1 DESCRIPTION
+
+Tk::SlideSwitch is a Frame based composite mega-widget featuring a binary Scale
+widget surrounded by two Label widgets.  The Scale's value can be either 0 or
+1. The Labels are positioned to the left and right of the Scale if its
+orientation is horizontal, else on the top and bottom of the Scale.
+
+Steve Lidie
+2003/03/10
+sol0@lehigh.edu

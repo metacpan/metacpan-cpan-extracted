@@ -1,0 +1,104 @@
+================================================================================
+
+CHANGES for Text::TagTemplate
+
+$Id: CHANGES,v 1.12 2006/07/15 20:13:02 matisse Exp $
+
+================================================================================
+
+Version 1.83
+
+Switched to using Carp::cluck() and Carp::confess() instead of
+warn() and die().
+
+Removed unneeded   test.pl  file.
+
+--------------------------------------------------------------------------------
+Version 1.82
+
+Added ability to set the regular expression used to find tags.
+
+--------------------------------------------------------------------------------
+
+Version 1.81
+
+Supressed warnings when replacement string empty.
+
+--------------------------------------------------------------------------------
+
+Version 1.8
+
+Minor tweak to how I handle the case where the replacement value for the tag
+is empty. The previous method had a bug where replacement values of 0 (zero)
+got removed.
+
+--------------------------------------------------------------------------------
+
+Version 1.7
+
+Changed version number to 1.7 because CPAN doesn't handle
+'dot releases' properly. This version is idential to 1.6.1
+
+--------------------------------------------------------------------------------
+
+Version 1.6.1
+
+Fixed bug in parse() where attribute values containing the = character
+were not handled properly in embedded tags. So
+    <#MYTAG SETTING="<#OTHERTAG FOO="3x4=12">">
+was is now handled properly.
+Added META.yml file.
+
+--------------------------------------------------------------------------------
+
+Version 1.5
+
+Matisse Enzer (that's me) takes over maintenance of module.
+Tags can now be embedded inside other tags, e.g.
+    <#address city="<#city>" phone="<#phone type="<#work>">
+
+--------------------------------------------------------------------------------
+
+Version 1.4
+
+More docs changes.
+
+--------------------------------------------------------------------------------
+
+Version 1.3
+
+Renamed to Text::TagTemplate, revision history starts again on this file,
+about ready to upload to CPAN.
+
+--------------------------------------------------------------------------------
+From the Text::SimpleTemplate days:
+
+Version 1.25
+
+Many documentation changes, hashes-for-hashrefs added, test harness added.
+
+--------------------------------------------------------------------------------
+
+Version 1.16
+
+Template-searching all gone, HTML and URL escaping added, example app fixed,
+seems good for release.
+
+--------------------------------------------------------------------------------
+
+Version 1.3
+
+Added template-searching, documentation, example application, fixed a few bugs.
+
+--------------------------------------------------------------------------------
+
+Version 1.2
+
+First usable OO version.  Lacking some of the things it needs, but it works OK.
+
+--------------------------------------------------------------------------------
+
+Pre-Version 1.2
+
+Was a library called SFI::Parser that was hacked up and sewn back together
+again into an OO module.

@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Tk-Date
+version:            0.44
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Tk:                 402.002
+    Tk::FireButton:     0.05
+    Tk::NumEntry:       1.08
+    Tk::NumEntryPlain:  0.02
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

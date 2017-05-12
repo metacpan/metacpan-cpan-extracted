@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-skip_nomsg_test" errors="0" failures="0" tests="1" time="TEST_TIME" skipped="1">
+  <testcase name="t/internal_tests/skip_nomsg.test"/>
+  <testcase name="test 1"/>
+</testsuite>

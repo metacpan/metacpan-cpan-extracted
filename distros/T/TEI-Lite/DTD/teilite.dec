@@ -1,0 +1,20 @@
+<!DOCTYPE TEI.2 PUBLIC "-//TEI P4//DTD Main DTD Driver File//EN"
+       'tei2.dtd' [
+<!ENTITY % TEI.prose    'INCLUDE' >
+<!ENTITY % TEI.linking  'INCLUDE' >
+<!ENTITY % TEI.analysis 'INCLUDE' >
+<!ENTITY % TEI.figures  'INCLUDE' >
+>>>> ORIGINAL teilite.dec#4
+<!ENTITY % TEI.XML      'INCLUDE' >
+<!ENTITY % TEI.extensions.ent SYSTEM 'teilite.ent' >
+==== THEIRS teilite.dec#5
+<!ENTITY % TEI.XML      'IGNORE' >
+<!ENTITY % TEI.extensions.ent SYSTEM 'teilitex.ent' >
+==== YOURS teilite.dec
+<!ENTITY % TEI.XML      'IGNORE' >
+<!ENTITY % TEI.extensions.ent SYSTEM 'teilite.ent' >
+<<<<
+<!ENTITY % TEI.extensions.dtd SYSTEM 'teilitex.dtd' >
+]>
+
+

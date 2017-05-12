@@ -1,0 +1,6 @@
+Revision history for Perl extension Tk::Playlist.
+
+0.01  Thu Nov 25 20:37:10 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.5.0 -X Tk::Playlist
+

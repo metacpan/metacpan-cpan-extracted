@@ -1,0 +1,3 @@
+ERROR(bitsimat.pl):
+        Index <13> at line <4> in VECTOR file <test-B22.vec>
+        exceeds #cols = <12> specified in the header line.

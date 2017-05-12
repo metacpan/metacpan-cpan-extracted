@@ -1,0 +1,64 @@
+
+   Tasks - module & application for the tasks / projects and time tracking
+   =======================================================================
+
+ This archive contains:
+ - Tasks.pm - Perl module
+ - application/* - Perl/Tk application which uses Tasks module
+
+ Module to track the tasks / projects and time spend on
+ each task.  This module allows to keep the hierarchical
+ list of the tasks, including the time logs for every task.
+
+ All information is saved in XML file.
+
+Installation
+============
+    The installation of Tasks module is the same as you would install
+ any perl module library, by running these commands:
+
+perl Makefile.PL
+make
+make test
+make install
+
+    To install the application, just copy the content of application/
+ directory (e.g. to directory 'tasks') and run tasks.pl.
+ Application saves the task list in file .tasks.xml in user's home
+ directory, so before running it, please ether copy an example file
+ 'example.tasks.xml' as: cp application/example.tasks.xml ~/.tasks.xml
+  or create a file with the following:
+<tasklist name="example" version="1.0">
+</tasklist>
+
+
+ Note, that tasks.pl uses some files from this directory, so if you want
+ to copy this application to some standard directory you can ether just create
+ a symbolic link or (if you insist on copying it) edit $BASEDIR in the begin
+ of tasks.pl file
+
+Required
+========
+
+ Tasks.pm require XML::Parser module to be installed
+
+ Application (tasks.pl) require Tk and Getopt::Std modules.
+
+
+Documentation
+=============
+See POD doumentation in Tasks.pm (after installation, just use perldoc Tasks).
+
+Questions, bug reports, useful code bits, and suggestions 
+should just be sent to me at sergey@sergey.com
+
+
+Availability
+============
+The latest version can be found on http://www.sergey.com/soft/Tasks/
+
+
+Copyright
+=========
+Copyright 2001 by Sergey Gribov <sergey@sergey.com>, all rights reserved.
+

@@ -1,0 +1,56 @@
+This makes fileevents work again, and posts menus without a fancy frame.
+
+
+--- ./pTk/mTk/tclUnix/tclUnixNotfy.c~	Fri Jun 26 09:57:40 1998
++++ ./pTk/mTk/tclUnix/tclUnixNotfy.c	Thu Oct  8 22:37:42 1998
+@@ -18,6 +18,11 @@
+ #include "Lang.h"
+ #include <signal.h> 
+ 
++#ifdef __EMX__
++#  include <sys/ioctl.h>
++#  include <sys/termio.h>
++#endif 
++
+ /*
+  * This structure is used to keep track of the notifier info for a 
+  * a registered file.
+@@ -242,6 +247,25 @@ Tcl_CreateFileHandler(fd, mask, proc, cl
+     if (notifier.numFdBits <= fd) {
+ 	notifier.numFdBits = fd+1;
+     }
++#ifdef __EMX__
++    {
++	/* TTY under EMX are always ready for input, unless ~IDEFAULT.
++	   ICANON is put off, otherwise you cannot read() 1 char - it
++	   will wait until the whole line is read  ===> blocking.
++	   This does not help if in fileevent() one reads by lines
++	   instead of by chars - but that's life.
++	 */
++	int type;
++	struct termio tio;
++
++	if (!isatty(fd)) 
++	    return;
++	ioctl(fd, TCGETA, &tio);
++	tio.c_lflag &= ~(IDEFAULT | ICANON);
++	
++	ioctl(fd, TCSETA, &tio);
++    }
++#endif 
+ }
+ 
+ /*
+--- ./pTk/mTk/unix/tkUnixMenu.c~	Wed Feb 11 12:36:30 1998
++++ ./pTk/mTk/unix/tkUnixMenu.c	Tue Oct  6 13:30:00 1998
+@@ -803,6 +803,10 @@ TkpPostMenu(interp, menuPtr, x, y)
+     int x;
+     int y;
+ {
++#ifdef __PM__
++    if (menuPtr->tkwin)
++	((TkWindow *)menuPtr->tkwin)->atts.override_redirect = 1;
++#endif
+     return TkPostTearoffMenu(interp, menuPtr, x, y);
+ }
+ 

@@ -1,0 +1,10 @@
+Revision history for Perl extension Text::Toalpha.
+
+0.02  Thu May 05 16:22:50 2005
+	- version 0.02 released
+	- improved docs
+
+0.01  Fri Apr 29 20:15:17 2005
+	- original version; created by h2xs 1.22 with options
+		-AXn Text::Toalpha
+

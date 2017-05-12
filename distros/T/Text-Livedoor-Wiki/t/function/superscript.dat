@@ -1,0 +1,10 @@
+=== basic
+--- wiki
+abc &sup(){hoge}
+--- html
+abc <sup>hoge</sup>
+=== mix 
+--- wiki
+abc &sup(){hoge__hoge__}
+--- html
+abc <sup>hoge<sub>hoge</sub></sup>

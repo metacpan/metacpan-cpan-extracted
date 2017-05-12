@@ -1,0 +1,61 @@
+{
+   "abstract" : "Choose items from a list interactively.",
+   "author" : [
+      "Matthaeus Kiem <cuer2s@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-Choose_HAE",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Parse::ANSIColor::Tiny" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::Choose" : "1.505",
+            "Term::Choose::Constants" : "1.505",
+            "Term::Choose::LineFold" : "1.505",
+            "Text::ANSI::WideUtil" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kuerbis/Term-Choose_HAE.git",
+         "web" : "https://github.com/kuerbis/Term-Choose_HAE"
+      }
+   },
+   "version" : "0.051",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

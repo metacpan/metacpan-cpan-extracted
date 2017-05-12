@@ -1,0 +1,420 @@
+=head1 NAME
+
+Tk::TM::wApp - Tk Transaction Manager Application Window.
+See Tk::TM::Lib for main descriptions and principles.
+
+=cut
+***********************************************************************
+=pod
+
+=head1 SYNOPSIS
+
+ use Tk::TM::wApp;
+ use DBI;
+
+ my $mw  =new Tk::TM::wApp;
+
+ $mw->setscr(0,'Login');
+ $mw->setscr(0,'Screen 1',   \&Screen1);
+ $mw->setscr(1,'Screen 1.1', \&Screen1_1);
+ $mw->setscr(0,'Screen 2',   \&Screen2);
+ $mw->Start();
+
+ Tk::MainLoop;
+
+ ..............................
+
+ sub Screen1_1 { # two subs - for screen and for data object
+  my ($self, $cmd, $opt, $mst) =@_;
+  return(1) if $cmd =~/stop/;
+
+  my $wgt=$self->{-wgscr}->tmTable(
+           -rowcount=>10
+          ,-colspecs=>[['Col1' ,'Entry']
+                      ,['Col2' ,'Entry']
+                      ,['Col3' ,'Entry']
+                      ,['Col4' ,'Entry']]
+          )->pack;
+
+  my $do;
+  if (!$self->{-dos}) {
+     $do =new Tk::TM::DataObject();
+     $self->{-dos} =[$do];
+  }
+  else {
+     $do =$self->{-dos}->[0];
+  }
+
+  my $rwm =$mst->{-dos}->[0]->dsRowDta();
+  my $flt =$rwm->[0];
+  $self->{-title} =$flt;
+
+  $do->set(-wgtbl=>$wgt
+          ,-mdedt=>0
+          ,-cbdbRead=>
+              sub{$_[0]->DBICmd("select * from table where field=?",$flt)}
+          );
+ 
+  $do->Retrieve('#reread')
+ }
+
+ ..............................
+
+ sub Screen1_2 { # unified sub for screen with single data object
+  my ($self, $cmd, $opt, $row, $fld, $wg, $dta, $new) =(shift, shift, @_);
+ 
+  if    ($cmd eq 'stop')   {
+        return(1)
+  }
+  elsif ($cmd eq 'start')  {
+
+        my $wgt=$self->{-wgscr}->tmTable(
+             -rowcount=>10
+            ,-colspecs=>[['Name','Entry']]
+            )->pack;
+
+        my $do;
+        if (!$self->{-dos}) {
+           $do =new Tk::TM::DataObject();
+           $self->{-dos} =[$do];
+        }
+        else {
+           $do =$self->{-dos}->[0];
+        }
+
+        my $rwm =$row->{-dos}->[0]->dsRowDta();
+        $do->{-parm}->{XXX} =$rwm->[0];
+        $self->{-title} =$do->{-parm}->{dsn};
+
+        $do->set(-wgtbl=>$wgt
+                ,-mdedt=>0
+                ,-cbcmd=>\&DataSources
+                );
+        $do->Retrieve('#reread')
+  }
+  elsif ($cmd eq 'dbRead') {
+        $self->DBICmd("select...", $self->{-parm}->{XXX})
+  }
+  else  {return $self->doDefault($cmd, @_)}
+ }
+
+ ..............................
+
+=cut
+***********************************************************************
+=pod
+
+=head1 DESCRIPTION
+
+=over
+
+This module implements application window with Tk Transaction Manager
+features.
+C<Tk::TM::wApp> is level above C<Tk::TM::Lib>, see there other descriptions
+and principles.
+There is no need to call 'use' for C<Tk::TM::Lib>, 
+this is done by using C<Tk::TM::wApp>.
+
+The components of application window are:
+
+Data editing bar menu with toolbar, implemented with C<Tk::TM::wgMenu> 
+(C<tmMenu> widget).
+
+Navigation pane with list of screen names to open, implemented with
+C<Tk::Tree>.
+
+Screen pane for widgets of application screens, implemented with C<Tk::Frame>.
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 PARAMETERS
+
+=over
+
+Tk parameters of C<Tk::TM::wApp> window may be set via C<configure> 
+C<Tk> method. They may be all parameters of C<Tk::MainWindow>.
+
+TM parameters may be accessed via C<set> method of C<Tk::TM>. They are:
+C<-wgmnu>, C<-wgnav>, C<-wgscr>, C<-title>,
+C<-mdnav>,
+C<-parm>
+
+
+=item -mdnav = 'treee' || 'tree' || 'lst'
+
+Mode of navigation between application screens.
+Default is 'treee' ('tree exact'), that means that detail screen may be opened
+only if it`s master screen is current; this mode may be excluded in future.
+Mode 'tree' means that detail screen should be opened
+for it`s master screen and if master was previously used.
+Mode 'lst' means that screens are using C<-parm> values filled in
+'stop' command of screen`s sub or C<doEnd> event of data object.
+
+
+=item -parm = {}
+
+Programmer`s parameters. This hash is also accessible via parameter C<-parm>
+of C<tmMenu> widget (C<Tk::TM::wgMenu>), accessible via C<-wgmnu>.
+
+
+=item -title = $mw->cget(-title)
+
+Title of application, the first part of window`s title.
+Other parts are combined for current application`s screen.
+Default value is title of the window.
+
+
+=item -wgnav
+
+Widget with list of all available application screens.
+This is navigation pane of application.
+C<Tk::Tree> is used.
+
+
+=item -wgmnu
+
+Menu and toolbar for data editing. 
+C<tmMenu> widget (C<Tk::TM::wgMenu>) is used.
+
+
+=item -wgscr
+
+Widget for application screens, to create application widgets inside it.
+C<Tk::Frame> widget is used.
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 METHODS
+
+=over
+
+Common object methods as C<new>, C<initialize>, C<set> are described under
+C<Tk::TM::Lib>.
+
+Special methods are C<setscr>, C<Start>.
+
+
+=item setscr (level, label, ?sub, ?parm, ?opt)
+
+Defines screen of application.
+Level is number of nest of screen in tree, where 0 is top level.
+Label of the screen will be displayed at the navigation pane and as part
+of the title of the window. 
+Special label 'Login' is used for predefined login screen.
+Sub is code to create widgets and data objects of screen.
+Sub may also be filename relative to $0 path, it will be executed with C<do> to
+obtain code.
+Parm is hash reference with parameters of the screen to use inside sub.
+Opt is hash reference with screen options, available via screen description, see C<\&callback>.
+
+
+=item Start
+
+Opens the first screen of application.
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 CALLBACK INTERFACE
+
+=over
+
+=item \&callback (self, command, opt, parent)
+
+C<setscr> method defines callback to start and stop application screen.
+Parameters are description of this screen, command ('start' or 'stop'), 
+option string, description of parent screen.
+
+The command is string 'start' or 'stop'.
+
+The descriptions are hash references with entries
+C<-cbcmd>, C<-cbnme>, C<-do>, C<-dos>, 
+C<-wgapp>, C<-wgmnu>, C<-wgscr>,
+C<-label>, C<-title>,
+C<-parm>, C<-parmc>,
+C<-reread>, C<-rereadc>
+
+
+=item start
+
+Start performance of screen. 
+If C<-dos> is not defined, this is the first open of screen.
+
+
+=item stop
+
+Stop performance of screen.
+The operation may be declared with 'return(1)' only.
+
+
+=item -cbcmd
+
+
+Reference to this callback sub.
+
+
+=item -cbnme
+
+Name of this callback sub for dynamic loading.
+
+
+=item -do
+
+Reference to first data object in C<-dos> list, to shorten access from outside.
+
+
+=item -dos
+
+Reference to list of data objects of screen. Callback should set it.
+At the first open of the screen this is not defined.
+
+
+=item -label
+
+Label of the screen as displayed in C<-wgnav>.
+Title of application window is combined with title of application, 
+label of the screen,
+title of the screen (described below at C<-title>)
+
+
+=item -parm
+
+Programmer`s parameters of the screen, defined with C<setscr> hash ref.
+It is not the same as '-parm' in C<Tk::TM::wApp> or C<Tk::TM::wgMenu>.
+
+
+=item -parmc
+
+Common to C<Tk::TM::wApp> or C<Tk::TM::wgMenu> object programmer`s parameters.
+This is also available via C<-wgapp> or C<-wgmnu>.
+
+
+=item -reread
+
+Reread this master screen internally before it's detail open.
+
+
+=item -rereadc
+
+Reread this master screen internally before it's detail open 
+and turn off this toggle.
+
+
+=item -title
+
+Title of the screen, represents data displayed on screen.
+Title of application window is combined with title of application, 
+label of the screen (described above at C<-label>),
+title of the screen.
+
+
+=item -wgapp
+
+Application window, provided by C<Tk::TM::wApp>.
+
+
+=item -wgmnu
+
+Application`s menu bar, provided by C<Tk::TM::wApp>.
+
+
+=item -wgscr
+
+Widget for application screen, to create application widgets inside it.
+Provided by C<Tk::TM::wApp>.
+C<Tk::Frame> widget is used.
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 VERSION
+
+=over
+
+=item "16-18/11/2000"
+
+Status Line implemented.
+
+
+=item "22-25/10/2000"
+
+C<exit> calls replaced with C<Tk::exit> calls to avoid abnormal program 
+terminations.
+
+C<Tk::TM::Common::DBILogin> used for login screen.
+
+C<setscr> - Sub may be filename relative to $0 path, it will be executed with C<do> to
+obtain code. Opt parameter added.
+
+Master's DataObject data is not retrieved when it's detail opening, 
+as in 'tree' mode was. Application supposes now that only current row of master data
+is needed and this is unchanged in database by other screens.
+To do internal reread C<-reread> and C<-rereadc> screen descriptions may be used.
+
+Error processing for callbacks added.
+
+C<-do> screen description created.
+
+C<-opt> screen description removed, C<-parm> should be used instead.
+
+C<-parmc> screen description created.
+
+C<-wglst> parameter of C<Tk::TM::wApp> renamed to C<-wgnav>.
+
+C<-mdlst> parameter of C<Tk::TM::wApp> renamed to C<-mdnav>. 
+New value 'treee' ('tree exact') is set as default.
+
+
+=item "06/02/2000"
+
+TO DO:
+
+- Approve
+
+- Debug and Test
+
+
+
+=item "31/01/2000"
+
+Created.
+
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 AUTHOR
+
+=over
+
+Andrew V Makarow <makarow@mail.com>, Denis E Medvedyuk <demed@mail.com>
+
+=back
+
+=cut

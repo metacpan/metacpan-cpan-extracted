@@ -1,0 +1,75 @@
+Revision history for Perl extension Time::Elapse.
+
+1.24_02 Fri Dec 12 16:05:17 EST 2003
+    - patched MANIFEST and added MANIFEST.SKIP to
+    account for changes in ExtUtils::MakeMaker 
+    that now create blibdirs, etc. Shoot me now.
+    
+1.24_01	Sun Nov 30 13:34:26 EST 2003
+	- Second verse, same as the first, and start-
+	ing to wonder if gpg is broken somehow on RH9
+	- also fixed a slight glitch in the signature
+	test, and renumbered the tests to make more
+	sense
+
+1.24	Thu Aug 28 01:45:22 EDT 2003
+	- *sigh* had to recreate my signature because
+	for some really silly reason I couldn't remem-
+	ber the original passphrase. :-)
+
+1.23	Fri Aug  8 01:13:27 EDT 2003
+	- added a SIGNATURE file to the distribution.
+	- added a t/0-signature.t test (basic) that I 
+	may update further once I understand this 
+	stuff a little better. :-)
+
+1.22	Sat Aug  2 15:04:08 EDT 2003
+	- bumped requirement of Time::HiRes to include
+	the numerous bugfixes in it since the 1.2 rel-
+	ease, to 1.50.
+
+1.21	Sat Aug  2 14:33:49 EDT 2003
+	- slight tweak to code to fix apparent bug with 
+	here-doc not being processed quite correctly in
+	for _DEBUG... the syntax was masking the my() 
+	after it. 
+	- additional tests.
+
+1.20  (never released, and I can no longer remember
+	what it was I'd changed or when I'd changed it. :) 
+
+
+1.19	Sun Jan 19 06:57:18 EST 2003
+	- further code revisions when it was discovered 
+	that somehow the scoping of local $ENV{TZ} = 'UTC'
+	was not propagating to the subroutines within the
+	same scope. *puzzled headscratching* Added it to 
+	each of the subs individually. *shrug* Works now.
+
+	Frankly I still don't see why this should even be 
+	necessary. 
+
+1.18	Sun Jan 19 03:52:48 EST 2003
+	- minor tweaks to code for debugging purposes
+	and cleanup, and changes to Pod output format
+	for Perl 5.8.0 and newer XHTML-compliant 
+	Pod::HTML module output.
+
+1.17	Wed Aug 28 20:13:35 EDT 2002
+	- minor documentation tweaks to fix visual 
+	glitches in the pod conversion to html format
+	- fixed the 'last revised' date to be correct.
+
+1.16	Wed Aug 28 03:18:14 EDT 2002
+	- small bugfix for apparent reversal of 
+	localtime() and gmtime() across disparate
+	systems.
+
+1.15	Tue Aug 27 23:14:06 2002
+	- completed release  version; created by h2xs 1.21 
+	with options  -XA -n Time::Elapse
+	- i.e. I finally got around to it :-)
+
+1.14	Sun Dec 02 00:00:00 2001
+	- final releasable version, full documentation 
+	completed, testing completed.

@@ -1,0 +1,84 @@
+Revision history for Perl extension Text::Scan.
+
+0.01  Mon Jul 16 04:14:30 2001
+	- original version; created by h2xs 1.20 with options
+		-PAXn Scan
+
+
+0.04  Mon Jul 23 02:48:08 PDT 2001
+	- fixed darwin implicit decl. bug and '_cleanup' symbol conflict.
+
+0.05  Tue Aug 14 20:10:19 PDT 2001
+	- Major revision. Prompted by segfault whenever keys in tree < found items in text.
+
+
+0.09  Wed Mar 20 13:55:03 PST 2002
+	- Added wildcard functionality with usewild()
+	- Reduced memory by eliminating separate nodes for null-termination
+	- increased speed 30%
+
+0.10  Thu Mar 21 13:45:59 PST 2002
+	- Reduced memory by no longer storing keys explicitly. Now returns matched string in place of key, which is the same except in wildcard matching.
+
+0.11  Mon Apr  1 17:50:35 PST 2002
+	- Fixed bug causing spurious text-skipping when using wildcards.
+	- Fixed memory leak when using wildcards
+
+0.12  Wed Apr 10 17:43:57 PDT 2002
+	- Fixed *another* bug causing spurious text-skipping
+	- Fixed a much smaller memory leak
+	- added diagnostic function btrees(), count of used eqkid links.
+
+0.13  Fri May 31 18:51:47 PDT 2002
+	- Rewrote basic data structure to be a Finite State Machine rather than Ternary Trie. Speed savings 10%, memory savings 20%, simpler to grasp/debug.
+
+0.14 Thu Aug 29 16:04:07 PDT 2002
+	- Added new serialize()/restore() functions for saving dicts
+	- Added more accurate diagnostic functions states(), transitions(), terminals()
+
+0.15 Wed Oct 30 15:35:32 PST 2002
+	- Replaced 'lround' call with more common 'ceil', unbreaking solaris
+
+0.16 Tue Sep 30 15:09:23 PDT 2003
+	- Now longer patterns do not clobber shorter patterns having the same prefix.
+
+0.17 Wed Oct  1 14:30:06 PDT 2003
+	- Uses character classes "charclass()" and thus case-insensitivity "ignorecase()"
+
+0.18 Wed Oct  1 19:39:09 PDT 2003
+	- Uses global ignore char class "ignore()"
+
+0.19 Thu Oct  9 19:02:22 PDT 2003
+	- Uses global boundary char class "boundary()" to define match delimiters
+
+0.21 Wed Mar 10 11:28:26 PST 2004
+	- Changed wildcard code to test for single space equivalent within a wild match, rather than boundary char. Boundary chars inside wildcard matches botched the match.
+0.22 Fri Mar 12 11:47:53 PST 2004
+	- Fixed bug causing wildcards at eof to continue reading past string.
+
+0.23 Tue Apr  6 13:29:22 PDT 2004
+	- Scanning code major rewrite. New functions: multiscan(), dump().
+
+0.24 Fri Jun 18 13:50:21 PDT 2004
+	- changed 'getc' to 'fgetc' for Windows compatibility.
+
+0.25 Wed Jan  5 18:18:28 PST 2005
+	- added squeezeblanks() option to treat contiguous space-equivalents as one.
+
+0.25 Thu Jan 19 17:42:29 PST 2006
+	- changed file operations in _serialize and _restore to PerlIO counterparts for ActiveState 5.8.x compatibility
+
+0.27 Wed Jul  5 15:54:21 PDT 2006
+	- changed state machine invocation conditions, calling _cue() first to prevent pathological backtracking in cases where spaces are squeezed and there are massive space-equivalents in the document string.
+
+0.28 Tue Aug 29 19:01:33 PDT 2006
+	- added limit of 256 to number of chars counted in a wildcard; this prevents some pathological cases when a binary file is scanned.
+
+0.29 Wed Sep  5 13:09:14 BST 2007
+    - added val() method to retrieve the value associated to a key
+
+0.30 Wed Sep 26 15:23:24 BST 2007
+    - applied Jerome Eteve's patch that adds the inclboundary class
+
+0.31 Thu Sep  2 18:05:24 UTC 2010
+    - removed Inline::C dependency

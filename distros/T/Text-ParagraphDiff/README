@@ -1,0 +1,23 @@
+Text/ParagraphDiff version 2.70
+======================
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Algorithm::Diff
+    HTML::Entities
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Joseph F. Ryan <ryan.311@osu.edu>
+Available for use under the same terms as Perl itself.

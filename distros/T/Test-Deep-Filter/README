@@ -1,0 +1,54 @@
+Test::Deep::Filter
+
+This module exists so that one can apply some kind of transform of the
+content of some node, before applying a deep testing structure against
+it.
+
+This is especially the kind of domain Test::Deep::YAML and
+Test::Deep::JSON are targeted at, but implemented in a more generic way.
+
+  cmp_deeply( $got, { payload => filter(\&decode_json, { x => 1 }) } )
+
+This would perform matching against a "Perl" data structure called $got,
+and find its key called "payload", and, if existing, filter the key via
+&decode_json, and then compare the resulting structure with "{ x => 1
+}".
+
+This would in theory be equivalent to:
+
+  cmp_deeply( $got, { payload => json({ x => 1 }) } )
+
+Except may be tailored for what ever local decoding scheme you may
+require, e.g.:
+
+  cmp_deeply( $got, {
+      payload => filter(sub {
+        my ( $got ) = @_;
+        return parse_ini( $got );
+      }, { x => 1 })
+  });
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

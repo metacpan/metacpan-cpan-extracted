@@ -1,0 +1,23 @@
+Changes
+examples/README
+lib/Test/Manifest.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00load.t
+t/01get_test_files.t
+t/01make_test_manifest.t
+t/99pod.t
+t/include.t
+t/include_in_manifest.txt
+t/leading_space.t
+t/pod_coverage.t
+t/test_manifest
+t/trailing_space.t
+test_manifest
+test_manifest_levels
+test_manifest_with_include

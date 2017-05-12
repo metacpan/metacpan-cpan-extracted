@@ -1,0 +1,142 @@
+# Arabic translations for Time-Ago package.
+# Copyright (C) 2015 Abdurrahman Aborazmeh
+# This file is distributed under the same license as the Time-Ago package.
+# Automatically generated, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Time-Ago 0.06\n"
+"Report-Msgid-Bugs-To: maurice.aubrey@gmail.com\n"
+"POT-Creation-Date: 2015-07-07 23:32-0700\n"
+"PO-Revision-Date: 2015-09-17 05:20+0300\n"
+"Last-Translator: Abdurrahman Aborazmeh <aborazmeh@yahoo.com>\n"
+"Language-Team: none\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+"X-Generator: Poedit 1.8.4\n"
+
+#: lib/Time/Ago.pm:47
+#, perl-brace-format
+msgid "about {count} hour"
+msgid_plural "about {count} hours"
+msgstr[0] "placeholder"
+msgstr[1] "حوالي ساعة"
+msgstr[2] "حوالي ساعتين"
+msgstr[3] "حوالي {count} ساعات"
+msgstr[4] "حوالي {count} ساعةً"
+msgstr[5] "حوالي {count} ساعة"
+
+#: lib/Time/Ago.pm:51
+#, perl-brace-format
+msgid "about {count} month"
+msgid_plural "about {count} months"
+msgstr[0] "placeholder"
+msgstr[1] "حوالي شهر"
+msgstr[2] "حوالي شهرين"
+msgstr[3] "حوالي {count} أشهر"
+msgstr[4] "حوالي {count} شهراً"
+msgstr[5] "حوالي {count} شهر"
+
+#: lib/Time/Ago.pm:55
+#, perl-brace-format
+msgid "about {count} year"
+msgid_plural "about {count} years"
+msgstr[0] "placeholder"
+msgstr[1] "حوالي عام"
+msgstr[2] "حوالي عامين"
+msgstr[3] "حوالي {count} أعوام"
+msgstr[4] "حوالي {count} عاماً"
+msgstr[5] "حوالي {count} عام"
+
+#: lib/Time/Ago.pm:59
+#, perl-brace-format
+msgid "almost {count} year"
+msgid_plural "almost {count} years"
+msgstr[0] "placeholder"
+msgstr[1] "عام تقريباً"
+msgstr[2] "عامين تقريباً"
+msgstr[3] "{count} أعوام تقريباً"
+msgstr[4] "{count} عاماً تقريباً"
+msgstr[5] "{count} عام تقريباً"
+
+#: lib/Time/Ago.pm:62
+msgid "half a minute"
+msgstr "نصف دقيقة"
+
+#: lib/Time/Ago.pm:65
+#, perl-brace-format
+msgid "less than a minute"
+msgid_plural "less than {count} minutes"
+msgstr[0] "placeholder"
+msgstr[1] "أقل من ثانية"
+msgstr[2] "أقل من دقيقتين"
+msgstr[3] "أقل من {count} دقائق"
+msgstr[4] "أقل من {count} دقيقةً"
+msgstr[5] "أقل من {count} دقيقة"
+
+#: lib/Time/Ago.pm:70
+#, perl-brace-format
+msgid "less than {count} second"
+msgid_plural "less than {count} seconds"
+msgstr[0] "placeholder"
+msgstr[1] "أقل من ثانية"
+msgstr[2] "أقل من ثانيتين"
+msgstr[3] "أقل من {count} ثوان"
+msgstr[4] "أقل من {count} ثانيةً"
+msgstr[5] "أقل من {count} ثانية"
+
+#: lib/Time/Ago.pm:78
+#, perl-brace-format
+msgid "over {count} year"
+msgid_plural "over {count} years"
+msgstr[0] "placeholder"
+msgstr[1] "أكثر من عام"
+msgstr[2] "أكثر من عامين"
+msgstr[3] "أكثر من {count} أعوام"
+msgstr[4] "أكثر من {count} عاماً"
+msgstr[5] "أكثر من {count} عام"
+
+#: lib/Time/Ago.pm:82
+#, perl-brace-format
+msgid "{count} day"
+msgid_plural "{count} days"
+msgstr[0] "placeholder"
+msgstr[1] "يوم"
+msgstr[2] "يومين"
+msgstr[3] "{count} أيام"
+msgstr[4] "{count} يوماً"
+msgstr[5] "{count} يوم"
+
+#: lib/Time/Ago.pm:86
+#, perl-brace-format
+msgid "{count} minute"
+msgid_plural "{count} minutes"
+msgstr[0] "placeholder"
+msgstr[1] "دقيقة"
+msgstr[2] "دقيقتين"
+msgstr[3] "{count} دقائق"
+msgstr[4] "{count} دقيقةً"
+msgstr[5] "{count} دقيقة"
+
+#: lib/Time/Ago.pm:90
+#, perl-brace-format
+msgid "{count} month"
+msgid_plural "{count} months"
+msgstr[0] "placeholder"
+msgstr[1] "شهر"
+msgstr[2] "شهرين"
+msgstr[3] "{count} أشهر"
+msgstr[4] "{count} شهراً"
+msgstr[5] "{count} شهر"
+
+msgid "{count} second"
+msgid_plural "{count} seconds"
+msgstr[0] "placeholder"
+msgstr[1] "ثانية"
+msgstr[2] "ثانيتين"
+msgstr[3] "{count} ثوان"
+msgstr[4] "{count} ثانيةً"
+msgstr[5] "{count} ثانية"

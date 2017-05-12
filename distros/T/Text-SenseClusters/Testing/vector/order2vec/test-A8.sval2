@@ -1,0 +1,34 @@
+<corpus lang="english">
+<lexelt item="LEXELT">
+<instance id="hard-a.sjm-098_3:">
+<answer instance="hard-a.sjm-098_3:" senseid="HARD1"/>
+<context>
+someone has to kill him to defeat him and that s <head>HARD</head> to do
+</context>
+</instance>
+<instance id="hard-a.w8_038:">
+<answer instance="hard-a.w8_038:" senseid="HARD3"/>
+<context>
+I find it <head>HARD</head> to believe that you don't believe me 
+</context>
+</instance>
+<instance id="hard-a.sjm-255_13:">
+<answer instance="hard-a.sjm-255_13:" senseid="HARD3"/>
+<context>
+when you get bad credit data or are confused with another person your life gets  <head>HARD</head> 
+</context>
+</instance>
+<instance id="hard-a.sjm-231_3:">
+<answer instance="hard-a.sjm-231_3:" senseid="HARD2"/>
+<context>
+Our life is <head>HARDER</head> now yes but it is better to live hungry and free life
+</context>
+</instance>
+<instance id="hard-a.sjm-096_2:">
+<answer instance="hard-a.sjm-096_2:" senseid="HARD1"/>
+<context>
+Ray who told his colleagues We have to face the <head>HARD</head> facts of life due to bad credit
+</context>
+</instance>
+</lexelt>
+</corpus>

@@ -1,0 +1,44 @@
+Revision history for Perl extension Tk::TIFF.
+
+0.11
+	- stable release
+
+0.10_53
+	- fixed some Makefile problems
+
+0.10_52
+	- modernized distribution
+
+0.10_51
+	- fixed call to Devel::CheckLib
+
+0.10_50
+	- added configure_requires to META.yml
+	- added experimental Devel::CheckLib check
+
+0.10
+	- added ability to read 32-bit float tiffs with 1 sample/pixel
+	  (thanks to Richard Balint)
+	- some warning fixes
+
+0.09
+	- compatibility fix for Tk 804.025
+
+0.08
+	- compatibility fix for Tk 800.023 (thanks to Brad Rosser)
+
+0.06
+	- changed test no. 7 to compare the monochrome image
+
+0.05
+	- now builds (hopefully) with Linux
+
+0.04
+	- version for Tk800.014
+
+0.02
+	- version for Tk800.005
+
+0.01
+	- version for Tk402.*
+

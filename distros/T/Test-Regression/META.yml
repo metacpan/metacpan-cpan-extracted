@@ -1,0 +1,35 @@
+---
+abstract: 'Test library that can be run in two modes; one to generate outputs and a second to compare against them'
+author:
+  - 'Nicholas Bamber <nicholas@periapt.co.uk>'
+build_requires:
+  DirHandle: '0'
+  File::Spec: '0'
+  Test::MockObject: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Test
+  - Regression
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Regression
+provides:
+  Test::Regression:
+    file: lib/Test/Regression.pm
+    version: '0.08'
+requires:
+  Algorithm::Diff: '0'
+  FileHandle: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Text::Diff: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/periapt/test-regression
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

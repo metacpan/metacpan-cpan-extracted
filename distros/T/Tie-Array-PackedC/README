@@ -1,0 +1,29 @@
+Tie/PackedArray version 0.01
+============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+INFO
+
+Provides a perl array interface into a string containing a C style array. In
+other words the string is equivelent to the string that would be returned from
+the equivelent pack command (defaulting to pack type "l!") using a normal array
+of the same values.
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Yves Orton
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

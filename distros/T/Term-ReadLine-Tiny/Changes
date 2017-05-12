@@ -1,0 +1,31 @@
+1.07	2017-05-09
+		- Bug fix: Cursor appearance at end of terminal line
+		- Line auto completion by Tab
+
+1.06	2017-05-08
+		- Bug #121555 'Still does not work with the CPAN shell' fix
+
+1.05	2017-05-05
+		- ^A & ^E keys (Unix-y Home & End) #6
+
+1.04	2017-05-04
+		- Bug fix: Character appearance at end of terminal line
+		- Bug #121519 fix: Added void implementation of ornaments()
+		- Added AddHistory(), synonym of addhistory()
+		- Removed history()
+		- Added gethistory(), sethistory()
+		- Improved UTF-8 support
+
+1.03	2017-05-02
+		- Fix for 'Bug #121293 for Term-ReadLine-Tiny: Experimental pop on scalar is now forbidden'
+
+1.02	2017-05-02
+		- POD changes
+		- Little fixes
+
+1.01	2017-04-24
+		- POD fixes and changes
+		- autohistory feature by minline
+
+1.00	2017-04-22
+		- First release

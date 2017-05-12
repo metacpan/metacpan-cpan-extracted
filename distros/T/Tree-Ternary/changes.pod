@@ -1,0 +1,84 @@
+=pod
+
+=head1 Revision history for Perl extension Tree::Ternary.
+
+=head2 0.04 (13 Aug 2013)
+
+=over 4
+
+=item Fixed:
+
+Corrected links in the README and POD.
+
+=item Added:
+
+Replaced Changes with changes.pod.
+
+Added META.json.
+
+=back
+
+=head2 0.03	(23 Sep 1999)
+
+=over 4
+
+=item Fixed:
+
+Reduced ATTRIBUTES setup to a single eval using code suggested by 
+Tom Phoenix, should speed up the compile time a wee bit.
+
+Removed extraneous #! line and labels.
+
+Miscellaneous changes to the POD.
+
+=item Added:
+
+Checks for Test.pm 1.14 in Makefile.PL.
+
+More comments relating to design decisions.
+
+=back
+
+=head2 0.02 (22 Sep 1999)
+
+=over 4
+
+=item Fixed:
+
+Corrected order of use() statements.
+
+Carp is now required at runtime to reduce compile time.
+
+Removed extraneous returns, relies on implicit return value where applicable.
+
+=item Added:
+
+Underscores added to ATTRIBUTES members to enhance readability.
+
+Replaced hard-coded '00' with TERM_CHAR constant.
+
+Used a faster method for defining constants.
+
+Clarified variable names in recursive methods.
+
+Minimized use of $char[0], replaced with lexically scoped $char.
+
+Perform pre-checks for branch terminals to reduce method call overhead 
+in recursive methods.
+
+Cleaned up appearance of code, now readable (more or less) on an 80 
+column display.
+
+Modified license to mirror Perl license.
+
+Install includes a check for Test.pm
+
+Fixed up POD.
+
+=back
+
+=head2 0.01 (23 Aug 1999)
+
+Initial version.
+
+=cut

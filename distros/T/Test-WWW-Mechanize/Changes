@@ -1,0 +1,430 @@
+Revision history for Test-WWW-Mechanize
+
+WWW::Mechanize and Test::WWW::Mechanize do not use rt.cpan.org for
+bug tracking.  They are now being tracked via GitHub at
+https://github.com/petdance/test-www-mechanize/issues
+
+
+1.48 Thu Dec 29 22:45:29 CST 2016
+------------------------------------
+[FIXES]
+The linting method html_lint_ok() was not calling the HTML::Lint API
+correctly, so may have missed some HTML errors at the end of a page.
+This also applies to get, post, etc if you have the autolint argument on.
+
+
+1.46
+------------------------------------
+[ENHANCEMENTS]
+Added header_exists_ok(), lacks_header(), header_is() and header_like()
+methods.  Thanks to Eric A. Zarko for the original patches.
+
+The scraped_id_is() method used to assign a description for the test if
+one was not passed.  Now it does not.
+
+scraped_id_is() now gives proper diagnostics if an ID is not found in
+the HTML.
+
+Added a delete_ok() method.  Thanks, moznion.
+
+content_contains() now fails if it's called with a regex.  content_like()
+now fails if it's not called with a regex.
+
+[FIXES]
+The test server run during the test suite allowed URLs outside of the
+document tree, which could potentially be a security problem.  This has
+been fixed.  Thanks, Tynovsky.
+https://github.com/petdance/test-www-mechanize/issues/33
+
+Fixed an overly-restrictive optimization in scrape_text_by_id(), plus
+scraped_id_is() and scraped_id_like() which wrap it.
+
+The method checks to make sure that it doesn't bother looking for an ID
+on the page if the ID doesn't exist.  It did this by looking for the text
+
+    id="foo"
+
+where foo is the ID being searched for.  However, that would mean that
+tags like
+
+    <p id='foo'>
+    <p id=foo>
+    <p id = "foo">
+    <p id=
+        "foo">
+    <p id
+    =
+            "foo"
+                    >
+
+would be seen as not existing.  This has been fixed by making
+scrape_text_by_id() search for the string "foo" anywhere on the page.
+
+
+1.44    Sat Jun 30 20:32:04 CDT 2012
+------------------------------------
+There is no new functionality in this release.
+
+[FIXES]
+Fixed test failures on Win32.  Thanks, Jerry Gay.
+
+
+1.42    Thu May 31 11:35:26 CDT 2012
+------------------------------------
+If you want to use the autolint functionality, you'll have to have
+HTML::Lint 2.20.
+
+[FIXES]
+Custom lint objects don't get reset before they get used, making
+autolint with a custom lint object practically useless.
+https://github.com/petdance/test-www-mechanize/issues/25
+
+
+1.40    Fri Apr 13 15:14:39 CDT 2012
+------------------------------------
+[ENHANCEMENTS]
+Added a $mech->autolint() method so you can turn autolinting on and off
+in mid-program.  Thanks, Mike O'Regan.
+
+New functions $mech->scrape_text_by_id() and $mech->scrape_text_by_attr()
+let you extract text from your pages.  Convenience function
+$mech->scraped_id_is() makes it easy to scrape and compare in one
+function.
+
+    <h1 id="pagetitle">My Awesome Page!</h1>
+
+    # Verify that HTML is there with:
+    $mech->scraped_id_is( 'pagetitle', 'My Awesome Page!' );
+
+[FIXES]
+$mech->has_tag() now handles nested tags more sensibly.  This fixes
+Google Code ticket #1.
+
+
+[INTERNALS]
+Explicitly requires Test::Simple 0.94 or higher.
+
+Brought over t/TestServer.pm from WWW::Mechanize which fixes a number
+of problems.
+
+
+1.38    Fri Oct 28 10:12:48 CDT 2011
+------------------------------------
+[FIXES]
+Now passes tests even if HTML::Lint is not installed.
+
+There are no other changes in 1.38.
+
+
+1.36    Thu Oct 27 00:09:21 CDT 2011
+------------------------------------
+[ENHANCEMENTS]
+The $mech object autolint argument can now take an HTML::Lint object.
+This lets you pass your own HTML::Lint object that does less stringent
+checking than the one T:W:M creates.
+
+
+1.34    Tue Jul  5 16:23:24 CDT 2011
+------------------------------------
+[ENHANCEMENTS]
+Added $mech->lacks_uncapped_inputs() to check for <input> tags that
+don't have a maxlength attribute.  We've been using this for years at
+work, and I'm just now moving it into Test::WWW::Mechanize.
+
+Added $mech->grep_inputs() and $mech->grep_submits() to easily pull
+input fields from the page.  I'd like to get this moved up to base
+WWW::Mechanize, because it has use outside of the Test:: world.
+
+$mech->followable_links() now finds file: URLs, too.
+
+$mech->content_contains(), $mech->content_lacks(), $mech->text_contains(0
+and $mech->text_lacks() all fail if a reference is passed instead of
+a string.
+
+[FIXES]
+$mech->text_contains() was not calling $mech->text(), so was not taking
+advantage of the caching of the parsed text.
+
+[INTERNALS]
+Most tests no longer use TestServer.pm class.
+
+All tests now run under -T and have plan counts.
+
+
+1.32    Wed May 11 10:12:25 CDT 2011
+------------------------------------
+No changes from 1.31_01.
+
+
+1.31_01 Wed May  4 16:07:31 CDT 2011
+------------------------------------
+[ENHANCEMENTS]
+The methods that look at the text of the page, ->text_like() and
+->text_unlike(), now use the WWW::Mechanize method ->text() which caches
+the text.  This will be a big speedup if you call these methods more
+than once.
+
+[FIXED]
+Normalized the use of single vs. double quotes in the default descriptions.
+
+Fixed tests that fail under newer versions of LWP.
+
+Fixed tests that fail if http_proxy or HTTP_PROXY are set.
+
+Fixed tests that fail on Perl 5.14.
+
+
+1.30    Wed Jun  9 12:23:48 CDT 2010
+------------------------------------
+[ENHANCEMENTS]
+autolint used to only work on get_ok() calls.  Now it works with
+post_ok(), submit_form_ok(), follow_link_ok() and click_ok().
+
+Added $mech->text_contains(), $mech->text_like() and $mech->text_unlike()
+methods.  These check the text of an HTML page separate from the
+HTML markup.  Thanks to Ashley Pond V.
+
+[FIXED]
+t/head_ok.t should no longer fail if your ISP "helpfully" returns
+an IP address for non-existent DNS records.  Thanks, Schwern.
+
+
+1.28    Tue Apr 13 00:44:27 CDT 2010
+------------------------------------
+[FIXED]
+t/put_ok.t finally passes.
+
+
+1.26    Mon Apr  5 00:54:46 CDT 2010
+------------------------------------
+[FIXED]
+Description of error in $mech->content_unlike() was wrong.
+
+Now requires Test::LongString 0.12.
+
+t/put_ok.t now passes, but with a handful of warnings.  Help in figuring
+out why would be appreciated.
+
+[INTERNALS]
+Hoisted common code out of get_ok, post_ok, etc.
+
+[DOCUMENTATION]
+Updated copyright and licensing information.
+
+
+
+1.24    Sat Jan 17 13:26:47 CST 2009
+------------------------------------
+Tests run on port 13432 instead of 8080.  It should really be a
+random open port, but for now, something other than 8080 will do.
+
+
+1.23_01 Mon Dec 22 17:43:46 CST 2008
+------------------------------------
+[FIXED]
+Tests would fail because we weren't unsetting http_proxy.
+
+Fixed many failed tests.  Overhauled the test server setup.
+
+
+[ENHANCEMENTS]
+Added autolinting capability, so you can do this:
+
+    my $mech = Test::WWW::Mechanize->new( autolint => 1 );
+    $mech->get_ok( $url );
+
+and the get_ok() will fail if the page is fetched, but the resultant HTML
+(if it is indeed text/html) does not pass HTML::Lint.
+
+Added $mech->click_ok().
+
+The user agent is now "Test-WWW-Mechanize/version" by default.
+
+
+1.22    Thu Nov 20 00:33:36 CST 2008
+------------------------------------
+[ENHANCEMENTS]
+Added $mech->head_ok() and $mech->put_ok() methods.  Thanks to
+Jaldhar Vyas.
+
+
+1.20    Wed Mar 12 23:56:11 CDT 2008
+------------------------------------
+[FIXES]
+stuff_inputs() used to do nothing.  Now it works.
+http://code.google.com/p/www-mechanize/issues/detail?id=9
+
+Fixed punctuation in some error messages.
+
+Fixed compatibility with WWW::Mechanize 1.36.
+
+
+1.18    Thu Dec  6 10:12:14 CST 2007
+------------------------------------
+[ENHANCEMENTS]
+Added default descriptions for most test assertions.
+
+[FIXES]
+HTML::Lint is now properly optional.
+
+Added delays in all the tests that use HTTP::Server::Simple to give
+it time to correctly fire up.
+
+
+1.16    Mon Oct 29 15:34:21 CDT 2007
+------------------------------------
+[ENHANCEMENTS]
+Added $mech->post_ok().  Thanks, Greg Sheard.
+
+Added $mech->submit_form_ok().  Thanks, Mark Stosberg.
+
+Added $mech->html_lint_ok()
+
+[FIXES]
+Fixed some bugs that were causing test failures.
+
+
+1.14    Fri May 11 16:22:02 CDT 2007
+------------------------------------
+[FIXES]
+Fixes test failures.  Thanks to Mark Blackman for RT #26602:
+
+The module tests currently spawn a server (based on
+HTTP::Server::Simple::CGI) which is killed when a __DIE__
+signal is received, normally only when the invoking
+perl dies. However, as perlvar makes clear, the __DIE__
+signal is received when eval blocks die as well. The
+new version (1.22) of WWW::Mechanize now calles
+HTTP::Message::decoded_content which calls Encode.pm
+which has a eval block that require's Encode::ConfigLocal
+which is usually not present, so the eval dies and the
+HTTP server is killed as soon as the $mech object tries
+to do a 'get'. It's simple to use a system variable,
+$^S to find out if the __DIE__ signal is being called
+for an eval so we ignore that case with the patch
+attached.
+
+
+[DOCUMENTATION]
+*   Made the synopsis show that T:W:M doesn't take the tests=>$x
+like other Test::* modules.  It'd be nice if it did, though.
+
+
+1.12    Thu Jul  6 23:47:59 CDT 2006
+------------------------------------
+[ENHANCEMENTS]
+Added followable_links() method to return only those links
+that your mech can actually follow.
+
+
+1.10    Sun Jun 18 22:58:41 CDT 2006
+------------------------------------
+[FIXES]
+RT #19147: Tests turn off the http_proxy environment variable before
+starting.  Thanks to Matt Trout.
+
+RT #18779: makes stuff_inputs() conform to the documentation,
+changing the implementation to expect an arrayref for $options->{ignore},
+as opposed to a hashref.  Thanks to Mike O'Regan.
+
+[ENHANCEMENTS]
+Added base_is, base_like and base_unlike.  Thanks to MATSUNO Tokuhiro.
+
+
+1.08    Mon Nov 21 10:35:23 CST 2005
+------------------------------------
+[FIXES]
+has_tag_like()'s regex was reversed, so would match when it shouldn't.
+Thanks to Chris Dolan.
+
+[DOCUMENTATION]
+Added links to support sites.
+
+
+1.06    Jun 29 2005
+------------------------------------
+[INTERNALS]
+Updated test suite to use HTTP::Server::Simple.  Thanks to Shawn
+Sorichetti for it.
+
+
+1.05_02 Sun Apr  3 12:19:05 CDT 2005
+------------------------------------
+[ENHANCEMENTS]
+Added has_tag() and has_tag_like().  Thanks RJBS.
+
+
+1.05_01 Tue Mar  8 16:24:36 CST 2005
+------------------------------------
+[ENHANCEMENTS]
+get_ok() now shows the status line for the mech if the test fails.
+
+get_ok() now returns true/false, not an HTTP::Response.
+
+
+1.04    Fri Mar  4 00:08:42 CST 2005
+------------------------------------
+[ENHANCEMENTS]
+Added follow_link_ok().  Thanks to Mike O'Regan.
+
+Added get_ok().  Thanks to Dan Friedman.
+
+
+1.02    Wed Dec 15 17:35:23 CST 2004
+------------------------------------
+[ENHANCEMENTS]
+Added content_lacks()
+
+[DOCUMENTATION]
+Fixed some documentation bugs.  Thanks to Drew Taylor.
+
+
+1.00    Thu Dec  9 11:41:50 CST 2004
+------------------------------------
+[ENHANCEMENTS]
+Added content_contains()
+
+Fixed diagnostic errors to work the same way regardless of which
+version of Test::Builder you have.
+
+
+0.99    Sun Oct 24 11:17:59 CDT 2004
+------------------------------------
+[ENHANCEMENTS]
+Added $mech->content_unlike and $mech->title_unlike
+
+Made the reporting of where the error happened reflect the caller's
+code.
+
+
+0.06    Thu Sep 30 21:49:08 CDT 2004
+------------------------------------
+[ENHANCEMENTS]
+New funcs
+    - page_links_content_like()
+    - page_links_content_unlike()
+    - link_content_like()
+    - link_content_unlike()
+    - link_status_isnt()
+
+
+0.04    Mon Jul 12 22:16:10 CDT 2004
+------------------------------------
+[THINGS THAT MAY BREAK YOUR CODE]
+Renamed link_status() to link_status_is().
+
+[FIXES]
+Fixed a bug in link_status_is().
+
+
+0.02    July 4 2004
+------------------------------------
+[ENHANCEMENTS]
+Added links_ok() and page_links_ok() methods.  Thanks to Shawn
+Sorichetti.
+
+
+0.01    Mon Jun 28 16:38:45 CDT 2004
+------------------------------------
+First version, released on an unsuspecting world.
+

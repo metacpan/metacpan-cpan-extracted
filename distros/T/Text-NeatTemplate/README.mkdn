@@ -1,0 +1,425 @@
+# NAME
+
+Text::NeatTemplate - a fast, middleweight template engine.
+
+# VERSION
+
+version 0.1101
+
+# SYNOPSIS
+
+    use Text::NeatTemplate;
+
+    my $tobj = Text::NeatTemplate->new();
+
+    $result = $tobj->fill_in(data_hash=>\%data,
+                             show_names=>\%names,
+                             template=>$text);
+
+# DESCRIPTION
+
+This module provides a simple, middleweight but fast template engine,
+for when you need speed rather than complex features, yet need more features
+than simple variable substitution.
+
+## Markup Format
+
+The markup format is as follows:
+
+- {$varname}
+
+    A variable; will display the value of the variable, or nothing if
+    that value is empty.
+
+- {$varname:format}
+
+    A formatted variable; will apply the formatting directive(s) to
+    the value before displaying it.
+
+- {?varname stuff \[$varname\] more stuff}
+
+    A conditional.  If the value of 'varname' is not empty, this will
+    display "stuff value-of-variable more stuff"; otherwise it displays
+    nothing.
+
+        {?var1 stuff [$var1] thing [$var2]}
+
+    This would use both the values of var1 and var2 if var1 is not
+    empty.
+
+- {?varname stuff \[$varname\] more stuff!!other stuff}
+
+    A conditional with "else".  If the value of 'varname' is not empty, this
+    will display "stuff value-of-variable more stuff"; otherwise it displays
+    "other stuff".
+
+    This version can likewise use multiple variables in its display parts.
+
+        {?var1 stuff [$var1] thing [$var2]!![$var3]}
+
+- {&funcname(arg1,...,argN)}
+
+    Call a function with the given args; the return value of the
+    function will be what is put in its place.
+
+        {&MyPackage::myfunc(stuff,[$var1])}
+
+    This would call the function myfunc in the package MyPackage, with the
+    arguments "stuff", and the value of var1.
+
+    Note, of course, that if you have a more complicated function and
+    are processing much data, this will slow things down.
+
+## Limitations
+
+To make the parsing simpler (and therefore faster) there are certain
+restrictions in what this module can do:
+
+- One cannot escape '{' '}' '\[' or '\]' characters.  However, the substitution
+is clever enough so that you may be able to use them inside conditional
+constructs, provided the use does not resemble a variable.
+
+    For example, to get a value surrounded by {}, the following
+    will not work:
+
+    {{$Var1}}
+
+    However, this will:
+
+    {?Var1 {\[$Var1\]}}
+
+- One cannot have nested variables.
+- Conditionals are limited to testing whether or not the variable
+has a value.  If you want more elaborate tests, or tests on more
+than one value, you'll have to write a function to do it, and
+use the {&function()} construct.
+- Function arguments (as given with the {&funcname(arg1,arg2...)} format)
+cannot have commas in them, since commas are used to separate the
+arguments.
+
+## Justification For Existence
+
+When I was writing SQLite::Work, I originally tried using [Text::Template](https://metacpan.org/pod/Text::Template)
+(my favourite template engine) and also tried [Text::FillIn](https://metacpan.org/pod/Text::FillIn).  Both
+of them had some lovely, powerful features.  Unfortunately, they were
+also relatively slow.  In testing them with a 700-row table, using
+Text::Template took about 15 seconds to generate the report, and using
+Text::FillIn took 45 seconds!  Rolling my own very simple template
+engine cut the time down to about 7 seconds.
+
+The reasons for this aren't that surprising.  Because Text::Template
+is basically an embedded Perl engine, it has to run the interpreter
+on each substitution.  And Text::FillIn has a lot to do, what with being
+very generic and very recursive.
+
+The trade-off for the speed-gain of Text::NeatTemplate is that
+it is quite simple.  There is no nesting or recursion, there are
+no loops.  But I do think I've managed to grab some of the nicer features
+of other template engines, such as limited conditionals, and formatting,
+and, the most powerful of all, calling external functions.
+
+This is a middleweight engine rather than a lightweight one, because
+I needed more than just simple variable substitution, such as one
+has with [Template::Trivial](https://metacpan.org/pod/Template::Trivial).  I consider the trade-off worth it,
+and others might also, so I made this a separate module.
+
+# FORMATTING
+
+As well as simple substitution, this module can apply formatting
+to values before they are displayed.
+
+For example:
+
+{$Money:dollars}
+
+will give the value of the _Money_ variable formatted as a dollar value.
+
+Formatting directives are:
+
+- alpha
+
+    Convert to a string containing only alphanumeric characters
+    (useful for anchors or filenames)
+
+- alphadash
+
+    Convert to a string containing alphanumeric characters, dashes
+    and underscores; spaces are converted to underscores.
+    (useful for anchors or filenames)
+
+- comma\_front
+
+    Put anything after the last comma at the front (as with an author name)
+    For example, "Smith,Sarah Jane" becomes "Sarah Jane Smith".
+
+- dollars
+
+    Return as a dollar value (float of precision 2)
+
+- email
+
+    Convert to a HTML mailto link.
+
+- float
+
+    Convert to float.
+
+- hmail
+
+    Convert to a "humanized" version of the email, with the @ and '.'
+    replaced with "at" and "dot".  This is useful to prevent spambots
+    harvesting email addresses.
+
+- html
+
+    Convert to simple HTML (simple formatting)
+
+- int
+
+    Convert to integer
+
+- item_num_
+
+    Assume that the value is multiple values separated by the "pipe" symbol (|) and
+    select the item with an index of _num_ (starting at zero)
+
+- items\__directive_
+
+    Assume that the value is multiple values separated by the "pipe" symbol (|) and
+    split the values into an array, apply the _directive_ directive to them, and
+    join them together with a space.
+
+- itemsjslash\__directive_
+
+    Like items\__directive_, but the results are joined together with a slash between them.
+
+- itemslash_num_
+
+    Assume that the value is multiple values separated by the "slash" symbol (/) and
+    select the item with an index of _num_ (starting at zero)
+    Good for selecting out components of pathnames.
+
+- lower
+
+    Convert to lower case.
+
+- month
+
+    Convert the number value to an English month name.
+
+- namedalpha
+
+    Similar to 'alpha', but prepends the 'name' of the value.
+    Assumes that the name is only alphanumeric.
+
+- nth
+
+    Convert the number value to a N-th value.  Numbers ending with 1 have 'st'
+    appended, 2 have 'nd' appended, 3 have 'rd' appended, and everything
+    else has 'th' appended.
+
+- percent
+
+    Show as if the value is a percentage.
+
+- pipetocomma
+
+    Assume that the value is multiple values separated by the "pipe" symbol (|) and replace
+    those with a comma and space.
+
+- pipetoslash
+
+    Assume that the value is multiple values separated by the "pipe" symbol (|) and replace
+    those with a forward slash (/).
+
+- proper
+
+    Convert to a Proper Noun.
+
+- string
+
+    Return the value with no change.
+
+- title
+
+    Put any trailing ",The" ",A" or ",An" at the front (as this is a title)
+
+- truncate_num_
+
+    Truncate to _num_ length.
+
+- upper
+
+    Convert to upper case.
+
+- url
+
+    Convert to a HTML href link.
+
+- wikilink
+
+    Format the value as the most common kind of wikilink, that is \[\[_value_\]\]
+
+- words_num_
+
+    Give the first _num_ words of the value.
+
+# CLASS METHODS
+
+## new
+
+my $tobj = Text::NeatTemplate->new();
+
+Make a new template object.
+
+# METHODS
+
+## fill\_in
+
+Fill in the given values.
+
+    $result = $tobj->fill_in(data_hash=>\%data,
+                             show_names=>\%names,
+                             template=>$text);
+
+The 'data\_hash' is a hash containing names and values.
+
+The 'show\_names' is a hash saying which of these "variable names"
+ought to be displayed, and which suppressed.  This can be useful
+if you want to use a more generic template, and then dynamically
+suppress certain values at runtime.
+
+The 'template' is the text of the template.
+
+## get\_varnames
+
+Find variable names inside the given template.
+
+    @varnames = $tobj->get_varnames(template=>$text);
+
+## do\_replace
+
+Replace the given value.
+
+    $val = $tobj->do_replace(targ=>$targ,
+                             data_hash=>$data_hashref,
+                             show_names=>\%show_names);
+
+Where 'targ' is the target value, which is either a variable target,
+or a conditional target.
+
+The 'data\_hash' is a hash containing names and values.
+
+The 'show\_names' is a hash saying which of these "variable names"
+ought to be displayed, and which suppressed.
+
+This can do templating by using the exec ability of substitution, for
+example:
+
+    $out =~ s/{([^}]+)}/$tobj->do_replace(data_hash=>$data_hash,targ=>$1)/eg;
+
+## get\_value
+
+$val = $tobj->get\_value(val\_id=>$val\_id,
+			data\_hash=>$data\_hashref,
+			show\_names=>\\%show\_names);
+
+Get and format the given value.
+
+## convert\_value
+
+    my $val = $tobj->convert_value(value=>$val,
+                                   format=>$format,
+                                   name=>$name);
+
+Convert a value according to the given formatting directive.
+
+See ["FORMATTING"](#formatting) for details of all the formatting directives.
+
+## simple\_html
+
+$val = $tobj->simple\_html($val);
+
+Do a simple HTML conversion of the value.
+bold, italic, <br>
+
+# Callable Functions
+
+## safe\_backtick
+
+{&safe\_backtick(myprog,arg1,arg2...argN)}
+
+Return the results of a program, without risking evil shell calls.
+This requires that the program and the arguments to that program
+be given separately.
+
+## format\_items
+
+{&format\_items(fieldname,value,delim,outdelim,format,prefix,suffix)}
+
+Format a field made of multiple items.
+
+# REQUIRES
+
+    Test::More
+
+# INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the
+"./" notation, you can do this:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+In order to install somewhere other than the default, such as
+in a directory under your home directory, like "/home/fred/perl"
+go
+
+    perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will then need to make sure that you alter the PERL5LIB variable to
+find the module.
+
+Therefore you will need to change the PERL5LIB variable to add
+/home/fred/perl/lib
+
+        PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+# SEE ALSO
+
+[Text::Template](https://metacpan.org/pod/Text::Template)
+[Text::FillIn](https://metacpan.org/pod/Text::FillIn)
+[Text::QuickTemplate](https://metacpan.org/pod/Text::QuickTemplate)
+[Template::Trivial](https://metacpan.org/pod/Template::Trivial)
+[Template::Toolkit](https://metacpan.org/pod/Template::Toolkit)
+[HTML::Template](https://metacpan.org/pod/HTML::Template)
+
+# BUGS
+
+Please report any bugs or feature requests to the author.
+
+# AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.org/tools
+
+# COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

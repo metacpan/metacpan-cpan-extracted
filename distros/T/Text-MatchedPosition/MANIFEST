@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Text/MatchedPosition.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+README.pod
+t/00_compile.t
+t/01_basic.t
+t/02_exception.t
+xt/01_perlcritic.t
+xt/02_pod-coverage.t
+xt/03_pod.t
+xt/04_notabs.t
+xt/05_code_metrics.t
+META.yml

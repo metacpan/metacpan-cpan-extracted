@@ -1,0 +1,12 @@
+Revision history for Template-Plugin-Num2Word
+
+0.30:
+* Fix dependencies
+
+0.0.2  Mon Aug  6 16:37:12 CST 2007
+* Lingua::EN::Number is now required, because Lingua::Number
+  will failed without any warning if Lingua::EN::Number is not installed.
+
+0.0.1  Tue Jul 31 13:55:08 2007
+       Initial release.
+

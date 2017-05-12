@@ -1,0 +1,8 @@
+Tree-Walker
+
+Tree::Walker provides a convenient framework for walking the filesystem,
+and is written for ease of subclassing for other hierarchical things,
+like FTP servers or XML trees.
+
+It also provides a couple of useful syntactic sugar items for quick file walkers
+in just a couple of lines.

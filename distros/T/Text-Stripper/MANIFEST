@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_load_stripper.t
+t/02_strip_text.t
+t/03_special_breaks.t
+lib/Text/Stripper.pm
+META.yml                                 Module meta-data (added by MakeMaker)

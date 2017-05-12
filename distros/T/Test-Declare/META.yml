@@ -1,0 +1,39 @@
+---
+abstract: 'declarative testing'
+author:
+  - 'Atsushi Kobayashi  C<< <nekokak __at__ gmail.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Builder: 0
+  Test::More: 0
+  Test::Tester: 0
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Declare
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Exporter: 0
+  Filter::Util::Call: 0
+  IO::Scalar: 0
+  PPI: 0
+  Scalar::Util: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Output: 0
+  Test::Warn: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.coderepos.org/share/lang/perl/Test-Declare
+version: 0.06

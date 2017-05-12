@@ -1,0 +1,289 @@
+package Text::PO::Parser;
+
+use warnings;
+use strict;
+use Carp;
+use Class::Std::Utils;
+
+use IO::File;
+
+use version; our $VERSION = qv('0.0.1');
+
+
+my $pofile; 
+my $open_file;
+
+my $msgid;
+my $comment;
+my $msgstr;
+my $line;
+my $msgid_line;
+my $current;
+my $buf_comment;
+use Data::Dumper;
+sub new
+    {
+	my ($class,$ref_arg) = @_;
+
+	my $obj = bless anon_scalar(), $class;
+
+#	$pofile = $$ref_arg{PO_FILE};
+
+	$pofile = $ref_arg;
+	
+	$open_file = new IO::File ($pofile,'<') or croak "can't open $_ : $!";
+
+	$line = 0;
+	$msgid_line =0;
+	
+	return  $obj;
+    }
+
+sub DESTROY
+    {
+	$open_file->close;
+    }
+
+sub end_file
+    {
+	return not(<$open_file>);
+    }
+
+sub next
+    {
+	my $continue = 1;
+
+	$msgid="";
+	$msgstr="";
+	$comment=$buf_comment;
+	my $current = "";
+
+
+	while ((<$open_file> ))#and $continue))
+	       {
+		   $line++;
+
+		   if(/^#/ and ($msgid eq ""))
+		       {
+			   $comment = $comment . $_;
+		       }
+		   elsif (/^#/ and not ($msgid eq ""))
+		       {
+			   $buf_comment = $_;
+			   return;
+		       }
+		   elsif (/^msgid/)
+		       {
+			   $_ =~ s/^msgid//;
+			   $_ =~ s/^ \"//;
+			   $_ =~ s/\"$//;
+			   
+			   $msgid = $msgid . $_;
+			   $msgid_line = $line;
+			   
+			   $current = "msgid";
+		       }
+		   elsif (/^msgstr/)
+		       {
+			   $_ =~ s/^msgstr//;
+			   $_ =~ s/^ \"//;
+			   $_ =~ s/\"$//;
+			   $msgstr = $msgstr . $_;
+
+			   $current = "msgstr";
+		       }
+		   else
+		       {
+			   unless (/^$/)
+			       {
+				   $_ =~ s/^ \"//;
+				   $_ =~ s/\"$//;
+				   
+				   if ($current eq "msgid")
+				       {
+					   $msgid = $msgid . $_;
+				       }
+				   elsif ($current eq "msgstr")
+				       {
+					   $msgstr = $msgstr . $_;
+				       }
+				   else
+				       {
+					   carp "there is probably a bug in the module code here at line $line of file $pofile";
+				       }
+			       }
+		   
+		       }
+	       }
+	return;
+	}
+
+sub get_comment
+    {
+	return $comment;
+    }
+
+sub get_msgid
+    {
+	return $msgid;
+    }
+
+sub get_msgid_line
+    {
+	return $msgid_line;
+    }
+
+sub get_msgstr
+    {
+	return $msgstr;
+    }
+
+1; # Magic true value required at end of module
+__END__
+
+=head1 NAME
+
+Text::PO::Parser - parse PO file.
+
+
+=head1 VERSION
+
+This document describes Text::PO::Parser version 0.0.1
+
+
+=head1 SYNOPSIS
+
+    use Text::PO::Parser;
+
+    $pofile = new Text::Po::Parser (PO_FILE => "/path/to/file.po");
+
+    while(not($pofile->end_file))
+    {
+      $pofile->next;
+
+      print $pofile->comment,"\n";
+      print $pofile->msgid,"\n";
+      print $pofile->msgstr,"\n";
+   }
+
+  
+  
+=head1 DESCRIPTION
+
+Text::PO::Parser is use to parse po file for extract group of comments, msgid and msgstr.
+
+
+=head1 Constructor 
+
+=over 1 
+
+=item new
+
+new take one argument : the name of po file.
+
+eg :  $pofile = new Text::Po::Parser (PO_FILE => "/path/to/file.po");
+
+die on error.
+
+=back
+
+=head1 Methods
+
+=over 6
+
+=item end_file
+
+return true if the parser hit EOF
+
+
+
+=item next
+
+jump to next string group.
+
+
+=item get_comment
+
+return current comment string.
+
+=item get_msgid
+
+return current msgid string.
+
+=item get_msgid_line
+
+return current msgid line.
+
+=item get_msgstr
+
+return cuurent msgstr string
+
+=back
+
+
+
+=head1 DIAGNOSTICS
+
+die if po file doesn't exist.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Text::PO::Parser requires no configuration files or environment variables.
+
+
+=head1 DEPENDENCIES
+
+
+Text::PO::Parser depends of Class::Std::Utils and IO::File.
+
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+
+=head1 BUGS AND LIMITATIONS
+
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<cyplp@free.fr>.
+
+=head1 AUTHOR
+
+Cyprien Le Pannérer  C<< <cyplp@free.fr> >>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2006, Cyprien Le Pannérer C<< <cyplp@free.fr> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

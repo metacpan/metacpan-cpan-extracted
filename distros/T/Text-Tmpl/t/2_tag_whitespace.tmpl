@@ -1,0 +1,23 @@
+simple tag:
+  no extra whitespace           <!--#echo $var1-->
+  whitespace after open delim   <!--#	 
+echo $var1-->
+  whitespace before close delim <!--#echo $var1 	
+-->
+  whitespace after command      <!--#echo 	
+$var1-->
+
+tag pair:
+  no extra whitespace             <!--#loop "loop1"--><!--#echo $var1--><!--#endloop-->
+  open tag:
+    whitespace after open delim   <!--# 	
+loop "loop1"--><!--#echo $var1--><!--#endloop-->
+    whitespace before close delim <!--#loop "loop1" 	
+--><!--#echo $var1--><!--#endloop-->
+    whitespace after command      <!--#loop 	
+"loop1"--><!--#echo $var1--><!--#endloop-->
+  close tag:
+    whitespace after open delim   <!--#loop "loop1"--><!--#echo $var1--><!--# 	
+endloop-->
+    whitespace before close delim <!--#loop "loop1"--><!--#echo $var1--><!--#endloop 	
+-->

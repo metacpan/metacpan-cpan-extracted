@@ -1,0 +1,6 @@
+--- #YAML:1.0
+name: Tree::PseudoIncLib
+license: perl
+distribution_type: module
+author: Slava Bizyayev <slava@cpan.org>
+

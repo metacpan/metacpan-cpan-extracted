@@ -1,0 +1,44 @@
+<p><b>Template::TT2Site</b> needs to be installed before it can be
+used. You can do this by unpacking the kit it in an arbitrary
+location, and issue the following commands:
+
+<pre>  perl Build.PL
+  Build
+  Build install
+</pre>
+
+<p>Note that the last command requires write access to your local Perl
+installtion.
+
+<p>Alternatively, you can use the <tt>CPAN</tt> or <tt>CPANPLUS</tt>
+tools to install <b>Template::TT2Site</b> for you.
+
+<p>When <b>Template::TT2Site</b> is installed, it will put the
+following information in your perl install tree:
+
+<pre>  Template/TT2Site.pm  -- the module
+  Template/TT2Site/    -- the <b>TT2Site</b> library
+</pre>
+
+<p>When the <code>tt2site</code> tool is run, it will use the standard
+perl search path <code>@INC</code> to locate this information.
+
+<p>Should it be necessary to install or use multiple versions of
+<b>Template::TT2Site</b>, you can move the <b>TT2Site</b> module and
+library to an arbitrary location, and set the environment variable
+<b>TT2SITE_LIB</b> to this location.
+
+<p>For example, the following Bash shell commands will move your
+current <b>Template::TT2Site</b> kit to location
+<code>/opt/tt2site-1.01</code>:
+
+<pre>  $ mkdir /opt/mytt2site-1.01
+  $ export TT2SITE_LIB=/opt/mytt2site-1.01
+  $ mkdir $TT2SITE_LIB/Template
+  $ mv Template/TT2Site* $TT2SITE_LIB/Template
+</pre>
+
+<p>The <b>tt2site</b> tool is intended to be independent of the actual
+version of <b>Template::TT2Site</b> used.
+
+

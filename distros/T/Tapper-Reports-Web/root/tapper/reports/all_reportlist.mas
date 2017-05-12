@@ -1,0 +1,31 @@
+<%args>
+        $reportlist
+</%args>
+
+% my $count_all     = 0;
+% my $count_pass    = 0;
+% my $count_fail    = 0;
+% my $count_unknown = 0;
+% $count_all += @{$reportlist->{reports}};
+% my $reports = $reportlist->{reports};
+% foreach my $report (@$reports) {
+%    if    ($report->{successgrade} eq 'PASS') { $count_pass++    }
+%    elsif ($report->{successgrade} eq 'FAIL') { $count_fail++    }
+%    else                                      { $count_unknown++ }
+% }
+
+        <ul class="post_info">
+		<li class="comments">        <% $count_all     %> reports</li>
+		<li class="comments pass">   <% $count_pass    %> pass</li>
+		<li class="comments fail">   <% $count_fail    %> fail</li>
+		<li class="comments unknown"><% $count_unknown %> unknown</li>
+	</ul>
+
+%#        <h4><% $day->day_abbr %> <% $day->month_abbr %> <% $day->day %>, <% $day->year %></h4>
+        <h4>All reports</h4>
+<& /tapper/reports/reportlist.mas, reportlist => $reportlist &>
+
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

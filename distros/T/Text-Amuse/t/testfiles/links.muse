@@ -1,0 +1,10 @@
+#title Links!
+
+So, the home of this project is
+[[http://theanarchistlibrary.org][The Anarchist Library]], which can be found at [[http://theanarchistlibrary.org]] Bare links will not get the hyperlinking.
+So http://thisisspam.org won't get the hyperlinking. But this yes: [[http://theanarchistlibrary.org][The Anarchist Library]],which can be found at [[http://theanarchistlibrary.org]]
+
+[[myimage.png][This is our banner]]
+
+[[myimage.png]]
+

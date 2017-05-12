@@ -1,0 +1,19 @@
+Revision history for Perl extension Tk::TOTD.
+
+0.5 2015-09-18
+  - Add dependency on Tk modules.
+
+0.4 2013-11-11
+  - Add the destroy() method to allow for a workaround to a bug in
+    Tk::DialogBox.
+
+0.3 2013-11-01
+  - Fix a bug where the "Close" button on the dialog wouldn't dismiss the
+    dialog properly, and the program would never exit gracefully again.
+
+0.2 2005-01-16
+  - Module now behaves as a DialogBox
+
+0.1 2005-10-16
+  - original version; created by h2xs 1.23 with options
+    -X -n Tk::TOTD

@@ -1,0 +1,16 @@
+.travis.yml
+bin/timecode
+Changes
+INSTALL.SKIP
+lib/Time/Timecode.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/01calculations.t
+t/02parsing.t
+t/03to_string.t
+t/04conversions.t
+t/05defaults.t
+t/TestHelper.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+Revision history for Perl extension Template::Plugin::StripScripts
+
+[Changes for 0.02  2008-03-11]
+
+* Fixed a bug in Makefile.PL (#33896)
+
+[Changes for 0.01  2007-08-02]
+
+* original version

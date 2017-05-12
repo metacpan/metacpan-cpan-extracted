@@ -1,0 +1,23 @@
+Tk-LabPopEntry-0.03
+
+The LabPopEntry (short for Labeled PopEntry, in case you were wondering), is
+simply a labeled version of my PopEntry widget.
+
+It is quite a bit different internally from PopEntry, however.  It is derived
+from the LabEntry widget, which is itself a frame based widget.  PopEntry was
+derived from the Entry widget.
+
+First, I had to dig out the subwidget references for the Entry widget,
+and in some cases, test to make sure that I had the parent and not the Entry
+widget itself.
+
+Second, I decided to bind the Entry widget to the 'Key' event descriptor,
+rather than overload the 'insert' method, as I did with PopEntry.  This saved
+time and energy in the long run, and the effect was the same.
+
+Third, I changed some method names to my liking, and made a slight 
+modification to the configuration of the 'Sel. All' button.
+
+Last, I Advertise()'d the toplevel popup menu so that it could be configured
+directly.  I will ultimately include this in PopEntry as well, but it was
+much easier the way I did it here.

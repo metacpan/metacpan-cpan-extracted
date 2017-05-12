@@ -1,0 +1,9 @@
+Barrier.pm
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/init.t
+t/load.t
+t/wait.t

@@ -1,0 +1,45 @@
+Revision history for Perl extension Text::CSV::Encoded.
+
+0.23  Sun Oct 4 12:44 2015
+        - Apply patch from https://rt.cpan.org/Ticket/Display.html?id=93438
+        - Doc fixes as per https://rt.cpan.org/Ticket/Display.html?id=89599
+        - Make dist metadata point to github and zarquon's fork
+
+0.22
+	- Text::CSV 1.31 requierd in Makefile.PL (even works in minor version)
+
+0.21  Thu Jun 13 14:31:12 2013
+	- Text::CSV 1.30 requierd in Makefile.PL (even works in minor version)
+
+0.20  Wed Jun 12 13:18:02 2013
+	- update modules and test for Text::CSV_XS 0.99 and Text::CSV_PP 1.30
+
+0.10  Mon Apr 26 17:41:12 2010
+	[Text::CSV::Encoded::Coder::*]
+	- coder class can accept check value.
+	  ex. $csv->coder->encode_check_value( Encode::FB_PERLQQ );
+	      $csv->coder->decode_check_value( Encode::FB_PERLQQ );
+
+0.09  Fri Oct  9 16:56:43 2009
+	- requires Text::CSV 1.12 or later.
+
+	[Text::CSV::Encoded]
+	- A construction fail returns undef (rt#46077)
+	- improved new() section in the document
+
+	[Text::CSV::Encoded::Coder::Encod]
+	[Text::CSV::Encoded::Coder::EncodeGuess]
+	- attr 'blank_is_undef' was not effective (reported by Zsombor Welker)
+
+0.08  Thu Apr 23 15:23:42 2009
+	[Text::CSV::Encoded::Coder::EncodeGuess]
+	- undef check before encode/decode (rt#45078)
+
+0.07  Wed Oct 22 02:10:21 2008
+	- first release version
+
+	[Text::CSV::Encoded]
+	[Text::CSV::Encoded::Coder::Base]
+	[Text::CSV::Encoded::Coder::Encode]
+	[Text::CSV::Encoded::Coder::EncodeGuess]
+

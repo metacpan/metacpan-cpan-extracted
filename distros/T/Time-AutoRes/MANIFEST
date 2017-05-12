@@ -1,0 +1,9 @@
+Changes
+lib/Time/AutoRes.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-fallback.t
+t/02-hires.t
+t/03-exports.t
+t/99-pod.t

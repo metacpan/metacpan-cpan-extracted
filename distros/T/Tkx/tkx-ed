@@ -1,0 +1,290 @@
+#!/usr/bin/perl -w
+
+# tkx-ed - Simple text editor
+
+use strict;
+
+use Tkx;
+use File::Basename qw(basename);
+
+(my $PROGNAME = $0) =~ s,.*[\\/],,;
+my $IS_AQUA = Tkx::tk_windowingsystem() eq "aqua";
+
+if ($IS_AQUA) {
+    $PROGNAME = "Tkx Editor";
+
+    # when invoked directly via "open 'Tkx Editor.app'" it will be passed
+    # something like "-psn_0_5154026" which we don't really care about.
+    shift(@ARGV) if @ARGV && $ARGV[0] =~ /-psn/;
+
+    # The console can pop up unexpectedly from the tkkit
+    Tkx::catch("console hide");
+
+    # Set the process name that is displayed in the Activity Monitor
+    # and the Force Quit dialog
+    eval {
+        Tkx::package_require('tclCarbonProcesses');
+        my $psn = Tkx::carbon__getCurrentProcess();
+        Tkx::carbon__setFrontProcess($psn);
+        Tkx::carbon__setProcessName($psn, $PROGNAME);
+    };
+    warn $@ if $@;
+
+    Tkx::interp_alias("", "::tk::mac::OpenDocument", "", [\&load]);
+}
+
+Tkx::package_require("BWidget");
+
+eval {
+    Tkx::package_require("style");
+    Tkx::style__use("as", -priority => 70);
+};
+if ($@) {
+    $@ =~ s/ at .*//;
+    warn "Using plain look: $@";
+}
+
+# state
+my $file = "";
+
+# set up main window
+my $mw = Tkx::widget->new(".");
+my $sw = $mw->new_ScrolledWindow();
+$sw->g_pack(
+    -fill => "both",
+    -expand => 1,
+);
+
+my($t, $tw);
+eval {
+    Tkx::package_require("ctext");
+    # A ctext's true text widget is a subwidget
+    $t = $sw->new_ctext();
+    $tw = $t->_kid("t");
+};
+if ($@) {
+    # fallback is the standard widget
+    $@ =~ s/ at .*//;
+    warn "Using plain text: $@";
+    $t = $sw->new_text();
+    $tw = $t;
+}
+$t->configure(
+    -bd => 1,
+    -undo => 1,
+    -wrap => "none",
+);
+
+$sw->setwidget($t);
+
+$mw->configure(-menu => mk_menu($mw));
+
+if (@ARGV) {
+    Tkx::after_idle([\&load, $ARGV[0]])
+}
+else {
+    new();
+}
+
+Tkx::MainLoop();
+exit;
+
+sub mk_menu {
+    my $mw = shift;
+    Tkx::option_add("*Menu.tearOff", 0);
+    my $m = $mw->new_menu();
+    my $fm = $m->new_menu();
+    my $em = $m->new_menu();
+    my $hm = $m->new_menu();
+
+    my $control = ($^O eq "darwin") ? "Command" : "Control";
+    my $ctrl    = ($^O eq "darwin") ? "Command-" : "Ctrl+";
+
+    $m->add_cascade(
+	-label => "File",
+	-menu => $fm,
+    );
+    $m->add_cascade(
+	-label => "Edit",
+	-menu => $em,
+    );
+    $m->add_cascade(
+	-label => "Help",
+	-menu => $hm,
+    );
+
+    # File menu
+    $fm->add_command(
+        -label => "New",
+	-accelerator => $ctrl . "N",
+        -command => \&new,
+    );
+    Tkx::bind("all", "<$control-n>", \&new);
+    $fm->add_command(
+        -label => "Open...",
+	-accelerator => $ctrl . "O",
+        -command => \&my_open,
+    );
+    Tkx::bind("all", "<$control-o>", \&my_open);
+    $fm->add_command(
+        -label => "Save",
+	-accelerator => $ctrl . "S",
+        -command => \&save,
+    );
+    Tkx::bind("all", "<$control-s>", \&save);
+    $fm->add_command(
+        -label => "Save As...",
+        -command => \&save_as,
+    );
+    unless ($IS_AQUA) {
+	$fm->add_command(
+	    -label => "Exit",
+	    -underline => 1,
+	    -accelerator => $ctrl . "Q",
+	    -command => [\&Tkx::destroy, $mw],
+	    );
+	Tkx::bind("all", "<$control-q>", [\&Tkx::destroy, $mw]);
+    }
+
+    # Edit menu
+    $em->add_command(
+	-label => "Cut",
+	-command => [\&Tkx::event_generate, $tw, "<<Cut>>"]
+    );
+    $em->add_command(
+	-label => "Copy",
+	-command => [\&Tkx::event_generate, $tw, "<<Copy>>"],
+    );
+    $em->add_command(
+	-label => "Paste",
+	-command => [\&Tkx::event_generate, $tw, "<<Paste>>"],
+    );
+
+    # Help menu
+
+    $hm->add_command(
+        -label => "View $PROGNAME source",
+        -command => sub { load(__FILE__) },
+    );
+
+    my $about_menu = $hm;
+    if ($IS_AQUA) {
+	# On Mac OS we want about box to appear in the application
+	# menu.  Anything added to a menu with the name "apple" will
+	# appear in this menu.
+    	$about_menu = $m->new_menu(
+	    -name => "apple",
+    	);
+    	$m->add_cascade(
+    	     -menu => $about_menu,
+    	);
+    }
+    $about_menu->add_command(
+	-label => "About $PROGNAME",
+        -command => sub {
+	    Tkx::tk___messageBox(
+	        -parent => $mw,
+                -title => "About \u$PROGNAME",
+                -type => "ok",
+                -icon => "info",
+                -message => "$PROGNAME v$Tkx::VERSION\n" .
+                            "Copyright 2005 ActiveState. " .
+                            "All rights reserved.",
+            );
+        },
+    );
+
+    return $m;
+}
+
+sub new {
+    $t->delete("1.0", "end");
+    set_file("");
+}
+
+sub my_open {
+    my $f = Tkx::tk___getOpenFile(
+        -parent => $mw,
+    );
+    load($f) if length $f;
+}
+
+sub load {
+    my $f = shift;
+    open(my $fh, "<:utf8", $f) || die "Can't open '$f': $!";
+    $t->delete("1.0", "end");
+    $t->insert("end", scalar do { local $/; <$fh> });
+    set_file($f);
+}
+
+sub set_file {
+    $file = shift;
+    update_title();
+}
+
+sub save {
+    return save_as() unless length $file;
+    _save($file);
+}
+
+sub save_as {
+    my $f = Tkx::tk___getSaveFile(
+        -parent => $mw,
+    );
+    if (length $f) {
+        _save($f);
+        set_file($f);
+    }
+}
+
+sub _save {
+    my $f = shift;
+    open(my $fh, ">", $f) || die "Can't open '$file': $!";
+    print $fh $t->get("1.0", "end - 1 char");
+    close($fh) || die "Can't write '$file': $!";
+}
+
+sub update_title {
+    my $title;
+    if (length $file) {
+	$title = basename($file);
+    }
+    else {
+	$title = "<no name>";
+    }
+    $title .= " - " . $PROGNAME unless $IS_AQUA;
+    $mw->g_wm_title($title);
+}
+
+__END__
+
+=head1 NAME
+
+tkx-ed - Simple editor
+
+=head1 SYNOPSIS
+
+ tkx-ed [<file>]
+
+=head1 DESCRIPTION
+
+The F<tkx-ed> program is a simple text editor implemented with the
+C<Tkx> toolkit.  Its main purpose is to demonstrate how this kind of
+application is written, so please take a look at its source code.
+
+When the editor starts up it shows a blank page where you can start
+entering text directly.
+
+If a file name is passed on the command line then the editor will
+visit this file initially.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Copyright 2005 ActiveState.  All rights reserved.
+
+=head1 SEE ALSO
+
+L<Tkx>

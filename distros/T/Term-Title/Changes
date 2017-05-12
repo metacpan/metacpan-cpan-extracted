@@ -1,0 +1,44 @@
+Revision history for Term-Title
+
+0.08      2014-03-14 15:40:03+01:00 Europe/Paris
+
+    [FIXED]
+
+    - Tests now skip when NONINTERACTIVE|AUTOMATED_TESTING is set
+
+0.07      2013-02-02 20:29:07 America/New_York
+
+    - Fix for MSWin32 broken in 0.04 (CHORNY)
+
+0.06      2013-01-27 12:26:47 America/New_York
+
+    - Fix missing import in SYNOPSIS (MELO)
+
+0.05      2013-01-26 23:10:52 America/New_York
+
+    - Make Win32::Console a prereq only on Win32 (again)
+
+0.04      2013-01-26 15:59:42 America/New_York
+
+    - Mention iTerm2.app support (MELO)
+
+    - Support Windows builds that set $^O to lower-case mswin32 (MELO)
+
+    - Extract core logic of set_titlebar() into _set() (MELO)
+
+    - Add set_tab_title() (MELO)
+
+    - Distribution management converted to Dist::Zilla
+
+0.03 Wed Mar 19 09:48:44 EDT 2008
+
+    - Added: support for 'screen' terminals (RT#34236 from David Precious)
+
+0.02 Sat Mar 15 07:48:08 EDT 2008
+
+    - Changed: tests requiring manual verification won't fail on a buffered
+      newline; now requires "y" or "n" explictly
+    
+0.01 Sun Mar  9 18:23:03 2008
+
+    - initial release

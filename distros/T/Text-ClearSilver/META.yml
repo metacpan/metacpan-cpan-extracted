@@ -1,0 +1,37 @@
+---
+abstract: 'Perl interface to the ClearSilver template engine'
+author:
+  - 'Craftworks <craftwork(at)cpan.org>'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::ParseXS: 2.21
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Text::ClearSilver
+name: Text-ClearSilver
+no_index:
+  directory:
+    - cs
+    - example
+    - inc
+    - patch
+    - t
+    - tool
+    - xt
+requires:
+  XSLoader: 0.1
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Craftworks/Text-ClearSilver.git
+version: 0.10.5.4

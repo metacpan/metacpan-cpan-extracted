@@ -1,0 +1,31 @@
+bt_name *               T_NAME
+bt_name_format *        T_NAME_FORMAT
+bt_namepart             T_IV
+bt_joinmethod           T_IV
+boolean                 T_BOOL
+
+# ----------------------------------------------------------------------
+INPUT
+
+# this is needed so we can pass 'undef' for the filename to
+# Text::BibTeX::Entry::parse and have it wind up as NULL
+# in bt_parse_entry()
+T_PV
+        SvGETMAGIC($arg);
+        $var = SvOK ($arg) ? ($type) SvPV_nomg($arg, PL_na) : NULL;
+
+T_NAME
+        $var = (bt_name *) SvIV ($arg)
+
+T_NAME_FORMAT
+        $var = (bt_name_format *) SvIV ($arg)
+
+T_BOOL
+        $var = (SvOK ($arg)) ? (int) SvIV ($arg) : 0
+
+
+# ----------------------------------------------------------------------
+OUTPUT
+
+#T_NAME_FORMAT
+#        $arg = (IV) $var

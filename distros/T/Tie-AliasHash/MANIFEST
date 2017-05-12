@@ -1,0 +1,9 @@
+lib/Tie/AliasHash.pm
+Build.PL
+MANIFEST
+README
+Changes
+t/AliasHash.t
+Makefile.PL
+META.yml
+META.json

@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Tie-Hash-Method
+version:             0.02
+abstract:            Tied hash with specific methods overriden by callbacks
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Yves Orton <yves@cpan.org>

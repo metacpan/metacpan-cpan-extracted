@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Template/Directive/XSSAudit.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+script/ttxsscheck
+t/001_load.t
+t/event_parameter_to_string.t
+t/good_filters.t
+t/improperly_filtered.t
+t/on_error.t
+t/on_filtered.t
+t/properly_filtered.t
+util/benchmark

@@ -1,0 +1,18 @@
+Revision history for Perl extension Tkx::TclTk::Bind.
+================================================================================
+
+1.0.00  Mon 17.Dez.2012 - 14:31
+        Initial CPAN release.
+
+1.1.00  Fri 15.Mar.2013 - 15:00
+       - Bugfix for 32/64-Bit-System
+
+1.2.00  Sam. 15.Jun.2013 - 20:00
+        - Error-Message auf 'BWidgets' switched
+        - Revised erase routine
+
+1.300   Son. 20.Dez.2015 - 16:00
+        - Revised documentation and testing
+
+1.400   Son. 14.Feb.2016 - 16:20
+        - Module 'Perl::Modern::Perl' replace by 'Modern::PBP::Perl'

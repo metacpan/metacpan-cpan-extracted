@@ -1,0 +1,165 @@
+NAME
+    *Term::Menus::FromFile*
+
+SYNOPSIS
+    Lets you store *Term::Menu* menu definitions in a file.
+
+DESCRIPTION
+    *Term::Menus::FromFile* reads a file (in a specific format), an uses
+    that to create a menu with *Term::Menu*. The menus can either just
+    return their selection (like *Term::Menu*) or can call other
+    scripts/programs on your system. In the latter case
+    *Term::Menu::FromFile* will run the program for you, and return the
+    output of the program.
+
+    There are seperate functions for if you have an open filehandle, or just
+    the path to the file. If you want multiple return values, there are
+    functions wrapping *Term::Menu*'s menu function as well. (Note: The
+    'call the chosen script' ablity does not exist for multiple return value
+    menus.)
+
+USAGE
+    No functions are imported by default: you'll have to import them
+    yourself. Avalible functions are listed below.
+
+  Menu File Format
+    The file format is fairly straightforward: At the top of the file is a
+    'Title' line, followed by menu entry lines. Menu entries have three
+    fields, seperated by semicolons. The fields are: 'Order', 'Menu_text'
+    and 'Command'. The 'Command' field is only relevant if you want to call
+    a script on selection. Title lines must start with "#TITLE:".
+
+    Example file:
+
+            #TITLE:Menu 1
+            1;Item 1;
+            2;Item 2;perl test_data/test_command.pl
+            3;Item 3;fiddledo
+
+    In the example, 'Item 1' has no command, 'Item 2' uses "perl" to run a
+    script and 'Item 3' runs the "fiddledo" command directly. (I wonder what
+    that does...)
+
+  Functions
+   Possible Exports
+            pick_from_filename   pick_command_from_filename 
+            pick_from_file       pick_command_from_file
+            menu_from_filename   menu_from_file
+
+   pick_from_filename
+    Arguments
+        One argument: The name of the menu file.
+
+    Return Value
+        Returns the menu item picked. (By text, as in *Term::Menu*'s "pick"
+        function.)
+
+    Opens a menu file, reads it, displays a menu to the user, and returns
+    the user-picked value to the program. It will "croak" if it can't find
+    or open the menu file, or if the file parses to an empty menu.
+
+   pick_command_from_filename
+    Arguments
+        One argument: The name of the menu file.
+
+    Return Value
+        Returns the output of the command that was run.
+
+    Opens a menu file, reads it, displays a menu to the user, and runs the
+    command specifed in the menu file for the menu time the user picked. The
+    output of the command is returned in a scalar. (Note that the return
+    value will be in $?, also called $CHILD_ERROR.)
+
+    It will "croak" if it can't find or open the menu file, or if the file
+    parses to an empty menu.
+
+   pick_from_file
+    Arguments
+        One argument: An open filehandle.
+
+    Return Value
+        Returns the menu item picked. (By text, as in *Term::Menu*'s "pick"
+        function.)
+
+    Reads an already opened menu file, displays the menu to the user, and
+    returns the user-picked value to the program. It will "croak" if it
+    can't find or open the menu file, or if the file parses to an empty
+    menu.
+
+   pick_command_from_file
+    Arguments
+        One argument: An open filehandle.
+
+    Return Value
+        Returns the output of the command that was run.
+
+    Reads an already open menu file, displays the menu to the user, and runs
+    the command specifed in the menu file for the menu time the user picked.
+    The output of the command is returned in a scalar. (Note that the return
+    value will be in $?, also called $CHILD_ERROR.)
+
+    It will "croak" if it can't find or open the menu file, or if the file
+    parses to an empty menu.
+
+   menu_from_filename
+    Arguments
+        One argument: The name of the menu file.
+
+    Return Value
+        Returns the menu items picked. (By text in an array reference, as in
+        *Term::Menu*'s "Menu" function.)
+
+    Opens a menu file, reads it, displays a menu to the user, and returns
+    the user-picked values to the caller. It will "croak" if it can't find
+    or open the menu file, or if the file parses to an empty menu.
+
+    * !-- Currently this does not work. --! *
+
+   menu_from_file
+    Arguments
+        One argument: An open filehandle.
+
+    Return Value
+        Returns the menu items picked. (By text in an array reference, as in
+        *Term::Menu*'s "Menu" function.)
+
+    Reads an open menu file, displays a menu to the user, and returns the
+    user-picked values to the caller. It will "croak" if it can't find or
+    open the menu file, or if the file parses to an empty menu.
+
+    * !-- Currently this does not work. --! *
+
+CAVEATS
+    The menu file is basically assumed to be valid, if we managed to parse
+    any lines. We probably shouldn't do that.
+
+    Also, the title is required, when it really should be optional.
+
+    And comments. We don't allow comments.
+
+    There are some forms of menus that *Term::Menus* supports that we don't.
+
+    The 'menu' functions don't work, until I figure out what format
+    *Term::Menus* actually does support.
+
+REQUIRES
+    Perl 5.6
+
+    Term::Menus
+
+AUTHOR
+    Daniel T. Staal
+
+    DStaal@usa.net
+
+SEE ALSO
+    Term::Menus
+
+COPYRIGHT and LICENSE
+    Copyright (c) 2008 Daniel T. Staal. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    This copyright will expire in 30 years, or 5 years after the author's
+    death, whichever is longer.
+

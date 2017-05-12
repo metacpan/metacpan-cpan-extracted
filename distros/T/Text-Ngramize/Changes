@@ -1,0 +1,18 @@
+Revision history for Perl module Text::Ngramize
+
+1.00 30 Oct 2009
+    - Version 1.0 uploaded to CPAN.
+
+1.01 2 Nov 2009
+    - Replaced {Alphabetic} with {IsAlphabetic} in regular expressions for
+      compatibility with Perl 5.6.2.
+
+    - Minor improvements to the documentation.
+
+1.02 3 Nov 2009
+  - Changed required perl version to 5.8.0 or greater (from 5.6.2); could
+      not get code to compile in 5.6.2 due to use of parsing of unicode
+      characters in regular expressions.
+
+1.03 6 March 2010
+  - Made some minor changes for better speed.

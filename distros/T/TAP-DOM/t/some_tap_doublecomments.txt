@@ -1,0 +1,25 @@
+TAP Version 13
+1..2
+## first chunk of comments I do not want to see in TAP-DOM
+## Apr 13 18:47:54 ss5-netbook kernel: [103586.251753] usb usb2: root hub lost power or was reset
+## Apr 13 18:47:54 ss5-netbook kernel: [103586.251807] usb usb3: root hub lost power or was reset
+## Apr 13 18:47:54 ss5-netbook kernel: [103586.251859] usb usb4: root hub lost power or was reset
+## Apr 13 18:47:54 ss5-netbook kernel: [103586.251911] usb usb5: root hub lost power or was reset
+ok 1 - affe
+## second chunk of comments I do not want to see in TAP-DOM
+## Apr 13 18:47:54 ss5-netbook kernel: [103587.405631] Restarting tasks ... done.
+## Apr 13 18:47:54 ss5-netbook kernel: [103587.406557] usb 1-7: USB disconnect, address 34
+## Apr 13 18:47:55 ss5-netbook kernel: [103587.694016] ADDRCONF(NETDEV_UP): wlan0: link is not ready
+ok 2 - zomtec
+## third chunk of comments I do not want to see in TAP-DOM
+## Apr 14 08:17:17 ss5-netbook kernel: [104435.093187] Disabling non-boot CPUs ...
+## Apr 14 08:17:17 ss5-netbook kernel: [104435.196034] CPU 1 is now offline
+## Apr 14 08:17:17 ss5-netbook kernel: [104435.196040] SMP alternatives: switching to UP code
+## Apr 14 08:17:17 ss5-netbook kernel: [104435.202229] CPU1 is down
+   ---
+     - name: 'Hash one'
+       value: 1
+     - name: 'Hash two'
+       value: 2
+   ...
+# A comment I want to see in TAP-DOM

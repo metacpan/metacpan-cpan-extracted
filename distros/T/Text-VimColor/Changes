@@ -1,0 +1,257 @@
+Revision history for Text-VimColor
+
+0.26      2015-03-21T04:14:25Z
+
+  - Fix test failures for vim 6.
+  - Use Test::File::ShareDir to simplify testing.
+
+0.25      2015-02-28T23:41:39Z
+
+  - Add 'all_syntax_groups' option to enable additional syntax groups
+    instead of just the primary ones.  Thanks Hinrik Örn Sigurðsson!
+
+0.24      2014-04-13T18:16:06Z
+
+  - Simplify encoding tests and mark a few as TODO
+    while the library undergoes some refactoring.
+
+0.23      2013-02-02T16:28:57Z
+
+  - Attempt to do the right thing with character strings:
+    Encode them in UTF-8, tell vim the file encoding (UTF-8),
+    and return a (decoded) character string.
+    Thanks to Ricardo Signes for the very helpful report (gh-1).
+
+0.22      2012-10-29T23:36:29Z
+
+  - The included 'text-vimcolor' script will attempt to load
+    Win32::Console::ANSI on windows when printing ANSI to STDOUT
+    in an attempt to make the output more useful.
+  - Add a basic test to ensure the script still operates
+
+0.21      2012-09-07T00:02:48Z
+
+  - Add 'extra_vim_options' to be able to append options to the defaults
+
+0.20      2012-08-11T02:05:18Z
+
+  - Releasing as stable.
+
+0.19-TRIAL 2012-07-28T03:44:54Z
+
+  - Use IPC::Open3 for portability instead of doing fork/exec manually.
+  - Various other fixes to attempt to make this usable on Windows.
+    Thanks to Yasuhiro Matsumoto (mattn) for helping to port to Windows (gh-5).
+
+0.18      2012-07-21T02:22:55Z
+
+  [Bug Fix]
+  - bin/text-vimcolor: Exit after printing usage when --help is specified
+    (previous version continued to wait for STDIN).
+    Thanks to Vyacheslav Matyukhin for the pull req (gh-6).
+
+  [Installaion]
+  - Try to show any available version information before aborting Makefile.PL
+
+0.17      2012-03-22T02:49:27Z
+
+  - Minor installation and test fixes for older systems
+
+0.16      2012-03-21T17:38:45Z
+
+  [Installation]
+  - Simplify version detection using vim script
+
+  [Testing]
+  - Mark encoding tests as TODO tests for now (still under development)
+
+0.15      2012-03-18T23:43:36Z
+
+  [Performance]
+  - Remove extraneous vim statement that caused delays on
+    some files.  Thanks to Joe Mullally (jhackworth)
+    for finding this and for the vim profiling tips (gh-2).
+
+  [Installation]
+  - Abort Makefile.PL before writing Makefile if minimum vim not found
+  - Try not to hang the installation if an old vim is found
+  - Lower Term::ANSIColor requirement to 1.03
+    and make bright colors normal if Term::ANSIColor version < 3
+
+  [Documentation]
+  - Document that the minimum vim version is 6.
+    (It has been that way since 2003.)
+
+  [Testing]
+  - Allow debugging based on TEXT_VIMCOLOR_DEBUG env var
+  - Attempt to make tests more portable across vim versions
+    (addressing rt-75829 and a few sparse smoke reports).
+  - Reorganize the test suite increasing coverage and number.
+
+0.14      2011-10-20T17:09:53Z
+
+  - Add test to confirm fix of rt-50646.
+  - Silence 'untie' warnings.
+
+0.13      2011-08-15T23:10:00Z
+
+  [Prereqs]
+  - Exit Makefile.PL early if `vim` fails to execute.
+    (Nothing else will work after that.)
+  - Bump required version of Term::ANSIColor to 3.0.
+    (Please let me know if this causes problems for anyone.)
+
+  [Dist Meta Changes]
+  - Convert to Dist::Zilla for releasing
+  - Use File::ShareDir to manage included files consistently
+  - Simplify and organize documentation and tests
+
+0.12     2011-08-09T19:33:16Z
+
+  [Enhancements]
+  - Add Term::ANSIColor support
+    Closes RT #69338.
+  - Add '-n' (no swapfile) option (thanks hinrik.sig).
+    Closes RT #45623.
+
+  [Bug Fixes]
+  - Set $ENV{HOME} to keep user-customized syntax files from
+    breaking tests.  Closes RT #68513.
+  - Untie STD(IN|OUT|ERR) in child process (thanks shiar).
+    Closes RT #50646.
+
+  [Maintenance Status Change]
+  - Co-maintenance granted to Randy Stauner (RWSTAUNER) by PAUSE admins.
+    Much appreciation to Geoff Richards (GEOFFR) for his initial work.
+
+0.11     2006-02-19T19:32:27Z
+
+  * No code changes, just packaging fixes.
+
+0.10     2006-02-19T00:22:35Z
+
+  * Be more careful about how 'exec' is called (belt & braces)
+
+  * Improve error reporting.  Errors printed by the 'vim' command,
+    as well as problems reported from 'exec' (like not being able
+    to find the program) will now be reported (by getting passed
+    through a temporary file).  Also, some 'die' calls were changed
+    to 'croak'.
+
+  * Allow the 'filetype' option to be overridden for each file
+    processed, so that an object can be reused for multiple files
+    of different types.
+
+  * Provide a help/usage message in the text-vimcolor program.
+
+  * Document which other CPAN modules use Text::VimColor, since
+    you might find one of them be more useful than using it
+    directly.
+
+  * Various small corrections to the documentation.
+
+0.09     2005-02-19T13:28:28Z
+
+  * Allow Vim options to be set with ':let' and provide a default
+    option to make shell scripts be interpretted as Bash syntax,
+    since it's a superset of Bourne shell.  Added corresponding
+    options to 'text-vimcolor' script.
+
+  * Added "+set nomodeline" option to Vim for belt-and-braces
+    security.  Vim shouldn't read modelines with the default
+    configuration enforced by the other options, but there's
+    no harm being extra cautious.  Suggested by Ian Langworth.
+
+  * If the 'vim' command fails, print the correct exit code in
+    the error message.  Thanks to Smylers for the fix, and for
+    reporting all the following bugs.
+    (closes CPAN bug #11556).
+
+  * Add documentation for the 'filetype' option to 'new()'.
+    (closes CPAN bug #11558).
+
+  * Document and test for using a reference to a scalar rather
+    than just a plain scalar as the 'string' argument to 'new()'
+    and the argument to 'syntax_mark_string()'.  It was already
+    implemented but was mistakenly documented as a TODO.
+    (closes CPAN bug #11557).
+
+  * Document potential problem from CPAN bug #11555.
+
+0.08     2004-02-25T22:03:17Z
+
+  * Tab characters weren't comming out right (you get "^I" instead
+    of a literal tab).  Added ":set isprint+=9" to mark.vim to fix
+    that.  Spotted and patched by Mario Xerri.
+
+  * For some reason the filetype wasn't getting set right, so I've
+    changed mark.vim to do ":filetype detect" when it wasn't already
+    detected, and that seems to make it work.
+
+  * The XML output sometimes produced an extra '>' after the start
+    tag of the root element.  Fixed.
+
+  * Added new file 05xml.t to the test suite and changed most of
+    the tests to use Test::More instead of Test.
+
+0.07     2003-12-09T19:40:11Z
+
+  * Now much faster!  By using the '-s' option when Vim is run, we
+    avoid a 2 second delay while it tells us about the stdout not
+    being connected to a terminal.  This only has an effect in Vim
+    version 6.2 or later (behaviour changed in patch 6.1.191).
+
+  * Fixed a bug reported by Giuseppe Maxia.  When Vim was run, it
+    didn't do ":filetype on", so passing in a filetype explicitly
+    didn't work.  It only worked if it could auto-detect the filetype.
+    Added a test in 't/10cmp.t' which checks this, by using a string
+    as input (so that there's no filename to guess the file type from).
+
+0.06     2003-12-01T18:43:13Z
+
+  * The files which were in the 'shared' directory (XSLT and CSS
+    stylesheets and the Vim script) are now in 'lib/Text/VimColor/'
+    so that they get installed in a place the module can discover.
+    Thanks to Giuseppe Maxia and Slaven Rezic for the tips.
+
+  * Path::Class is now used (and is therefore a new dependency) to
+    construct paths to files more portably.
+
+  * Less confusing one-line description of text-vimcolor script.
+  * Added the 'MANIFEST' file to itself, so that it gets shipped.
+  * Distribute this ChangeLog (for my unofficial Debian package)
+    rather than one generated out of CVS.
+
+0.05     2003-11-26T21:59:38Z
+
+  * Include README file in distribution.
+
+0.04     2003-11-26T19:54:43Z
+
+  * Fixed bug in the feature which allows us to override where the
+    Vim script is installed.
+
+0.03     2003-11-26T19:40:20Z
+
+  * Changed the namespace of the XML output.  This is definitely the
+    final one.
+  * Tweaked the behaviour of the 'input_filename()' method.
+  * Minor adjustments to the documentation.
+  * Added --debug option to the text-vimcolor program.
+
+0.02     2003-09-27T18:28:16Z
+
+  * Added a test suite, although it's not finished yet.
+  * Deal with unexpected syntax types.
+  * Throw an error if the input file doesn't exist.
+  * Brought the documentation up to date.
+  * Install the output of 'cvs2cl' as an upstream changelog.
+
+0.0102   2003-03-13T22:26:41Z
+
+  * Corrected 'Build-Depends' to not depend on Perl 5.8.
+  * Changed 'Build-Depends' to 'Build-Depends-Indep' to keep Lintian happy.
+
+0.0101   2003-01-04T18:44:11Z
+
+  * Initial Release.

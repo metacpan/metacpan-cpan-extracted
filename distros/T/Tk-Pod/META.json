@@ -1,0 +1,104 @@
+{
+   "abstract" : "Pod browser widget for Tk",
+   "author" : [
+      "Slaven Rezic <srezic@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-Pod",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "optional_features" : {
+      "debugging" : {
+         "description" : "Debugging and development helper",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Devel::Hide" : "0",
+                  "Module::Refresh" : "0",
+                  "Tk::WidgetDump" : "0"
+               }
+            }
+         }
+      },
+      "external_links" : {
+         "description" : "support for links using an external browser",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "URI::Escape" : "0"
+               }
+            }
+         }
+      },
+      "fulltext_search" : {
+         "description" : "Enable the full-text search",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Text::English" : "0"
+               }
+            }
+         }
+      },
+      "gzip_support" : {
+         "description" : "gzip support in tkmore",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "PerlIO::gzip" : "0"
+               }
+            }
+         }
+      },
+      "nicer_gui" : {
+         "description" : "Provide a nicer GUI",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Tk::HistEntry" : "0.4",
+                  "Tk::ToolBar" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Pod::Simple" : "2.05",
+            "Tk" : "800.004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://github.com/eserte/tk-pod.git"
+      }
+   },
+   "version" : "0.9943"
+}

@@ -1,0 +1,188 @@
+NAME
+    Task::Tickit::Widget - Install the Tickit::Widget modules.
+
+SYNOPSIS
+     cpanm Task::Tickit::Widget
+
+SEE ALSO
+    Tickit::Widget
+        Abstract base class for on-screen widgets.
+
+    Tickit::Widget::Border
+        Draw a fixed-size border around a widget.
+
+    Tickit::Widget::Box
+        Apply spacing and positioning to a widget.
+
+    Tickit::Widget::Breadcrumb
+        Render a breadcrumb trail.
+
+    Tickit::Widget::Button
+        A widget displaying a clickable button.
+
+    Tickit::Widget::Calendar::MonthView
+        ?
+
+    Tickit::Widget::CheckButton
+        A widget allowing a toggle true/false.
+
+    Tickit::Widget::Choice
+        A widget giving a choice from a list.
+
+    Tickit::Widget::Decoration
+        Do nothing, in a visually-appealing way.
+
+    Tickit::Widget::Entry
+        A widget for entering text.
+
+    Tickit::Widget::Figlet
+        Trivial wrapper around Text::FIGlet for banner rendering.
+
+    Tickit::Widget::FileViewer
+        Support for viewing files in Tickit.
+
+    Tickit::Widget::Fill
+        Fill an area with repeated text.
+
+    Tickit::Widget::FloatBox
+        Manage a collection of floating widgets.
+
+    Tickit::Widget::Frame
+        Draw a frame around another widget.
+
+    Tickit::Widget::GridBox
+        Lay out a set of child widgets in a grid.
+
+    Tickit::Widget::HBox
+        Distribute child widgets in a horizontal row.
+
+    Tickit::Widget::HSplit
+        An adjustable horizontal split between two widgets.
+
+    Tickit::Widget::Layout::Desktop
+        Provides a holder for "desktop-like" widget behaviour.
+
+    Tickit::Widget::Layout::Relative
+        Apply sizing to a group of Tickit widgets.
+
+    Tickit::Widget::LinearBox
+        Abstract base class for "HBox" and "VBox".
+
+    Tickit::Widget::LinearSplit
+        ?
+
+    Tickit::Widget::LogAny
+        Log message rendering.
+
+    Tickit::Widget::Menu
+        Display a menu of choices.
+
+    Tickit::Widget::MenuBar
+        Display a menu horizontally.
+
+    Tickit::Widget::Menu::Item
+        An item to display in a "Tickit::Widget::Menu".
+
+    Tickit::Widget::Placegrid
+        A placeholder grid display.
+
+    Tickit::Widget::Progressbar
+        Simple progressbar implementation for Tickit.
+
+    Tickit::Widget::Progressbar::Horizontal
+        Simple progressbar implementation for Tickit.
+
+    Tickit::Widget::Progressbar::Vertical
+        Simple progressbar implementation for Tickit.
+
+    Tickit::Widget::RadioButton
+        A widget allowing a selection from multiple options.
+
+    Tickit::Widget::ScrollBox
+        Allow a single child widget to be scrolled.
+
+    Tickit::Widget::ScrollBox::Extent
+        Represents the range of scrolling extent.
+
+    Tickit::Widget::Scroller
+        A widget displaying a scrollable collection of items.
+
+    Tickit::Widget::Scroller::Item
+        Interface for renderable scroller items.
+
+    Tickit::Widget::Scroller::Item::RichText
+        Static text with render attributes.
+
+    Tickit::Widget::Scroller::Item::Text
+        Add static text to a Scroller.
+
+    Tickit::Widget::SegmentDisplay
+        Show a single character like a segmented display.
+
+    Tickit::Widget::SparkLine
+        Minimal graph implementation for Tickit.
+
+    Tickit::Widget::Spinner
+        A widget displaying a small text animation.
+
+    Tickit::Widget::Static
+        A widget displaying static text.
+
+    Tickit::Widget::Statusbar
+        Provides a simple status bar implementation.
+
+    Tickit::Widget::Statusbar::Clock
+        A simple clock implementation.
+
+    Tickit::Widget::Statusbar::CPU
+        CPU usage.
+
+    Tickit::Widget::Statusbar::Memory
+        Memory usage.
+
+    Tickit::Widget::Statusbar::WidgetList
+        ?
+
+    Tickit::Widget::Tabbed
+        Provide tabbed window support.
+
+    Tickit::Widget::Tabbed::Ribbon
+        Base class for "Tickit::Widget::Tabbed" control ribbon.
+
+    Tickit::Widget::Table
+        Table widget with support for scrolling/paging.
+
+    Tickit::Widget::Table::Paged
+        Table widget with support for scrolling/paging.
+
+    Tickit::Widget::Tree
+        Tree widget implementation for Tickit.
+
+    Tickit::Widget::VBox
+        Distribute child widgets in a vertical column.
+
+    Tickit::Widget::VHBox
+        Distribute child widgets vertically or horizontally.
+
+    Tickit::Widget::VSplit
+        An adjustable vertical split between two widgets.
+
+    Tickit::Widgets
+        Load several Tickit::Widget classes at once.
+
+REPOSITORY
+    <https://github.com/tupinek/Task-Tickit-Widget>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.05
+

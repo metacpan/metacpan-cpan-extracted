@@ -1,0 +1,47 @@
+# Script show tag merging behavior with an option set in the 
+#  option database. 
+#
+#   Should display with one row hightlighted red and a cell in the row left-justified
+
+use Tcl::pTk qw/:perlTk/;
+use Tcl::pTk::TableMatrix;
+
+use strict;
+
+my $mw = MainWindow->new;
+
+#$mw->optionAdd('*background', 'blue', 'interactive');
+$mw->optionAdd('*tablematrix*background', 'skyblue');
+
+my $table = $mw->TableMatrix(-rows => 5,
+                            -cols => 8,
+                            -cache => 1,
+			    #-bg => 'blue',
+			    );                
+$table->pack(-expand => 1, -fill => 'both');
+
+
+foreach my $row (0..4) {
+     #$table->tagRow('invalid', $row);                # swap
+     foreach my $column (0..7) {
+       $table->set("$row,$column", "hello");
+             #$table->tagCell('left', "$row,$column");    # swap
+   }
+}
+
+# 'invalid' tag takes priority of 'left' tag, because it is created first, 
+#     so the cell 2,3 should be red and center anchored, but see below...
+$table->tagConfigure("invalid", -background => 'red', -anchor => 'center');
+$table->tagConfigure("left",    -background => 'green', -anchor => 'w');
+
+
+$table->tagCell('left', '2,3');
+$table->tagRow('invalid', 2);
+
+#  The tag priority is changed, so the cell 2,3 will be gree and 'w' achored.
+$table->tagRaise('left', 'invalid');
+
+# This would have the same effect as the above tagRaise
+#$table->tagLower('invalid', 'left');
+
+MainLoop;

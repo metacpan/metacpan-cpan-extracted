@@ -1,0 +1,56 @@
+---
+version: 1.11
+date:    Sat Feb 11 18:36:35 EST 2006
+changes:
+    - Fixed bug where "\A=== heading\Z" wouldn't become a heading
+
+---
+version: 1.10
+date:    Sun Nov 13 23:54:47 EST 2005
+changes:
+    - Formalized subclassing measures
+    - Corrected documentation
+    - Improving Kwalitee
+
+---
+version: 1.02
+date:    Wed Feb 25 02:56:42 EST 2004
+changes:
+    - Added Jesse Vincent's patch to make the process order easily subclassable
+    - Wrote up some quick docs on subclassing
+    - Properly accredited Ingy in the AUTHOR section
+    - Headings now html_escape (req #7161)
+    - Switched Makefile.pl to use Module::Install
+
+---
+version: 1.01
+date:    Fri Feb 13 09:57:37 EST 2004
+changes:
+    - Small fixes to documenation
+    - Fixed bug where some <img> tags weren't closed
+
+---
+version: 1.00
+date:    Wed Feb  4 21:41:37 EST 2004
+changes:
+    - Decided we're ready for a 1.0 release, nothing else
+
+---
+version: 0.03
+date:    Mon Feb  2 22:36:56 EST 2004
+changes:
+    - Added mdash markup
+    - Email address change
+
+---
+version: 0.02
+date:    Thu Jan  8 20:09:35 EST 2004
+changes:
+    - Initial release to CPAN
+
+---
+version: 0.01
+date:    Thu Jan  7 12:00:00 EST 2004
+changes:
+    - Preview release
+

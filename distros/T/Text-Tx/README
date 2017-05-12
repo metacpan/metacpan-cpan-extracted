@@ -1,0 +1,62 @@
+NAME
+    Text::Tx - Perl interface to Tx by OKANOHARA Daisuke
+
+SYNOPSIS
+      use Text::Tx; 
+      my $td     = Text::Tx->open("words.tx");
+      my $newstr = $td->gsub($str, sub{ 
+         qq(<a href="http://dictionary.com/browse/$_[0]">$_[0]</a>)
+      }); # link'em all!
+
+DESCRIPTION
+    Tx is a library for a compact trie data structure by OKANOHARA Daisuke.
+    Tx requires 1/4 - 1/10 of the memory usage compared to the previous
+    implementations, and can therefore handle quite a large number of keys
+    (e.g. 1 billion) efficiently.
+
+    Suppose words.tx is a pre-built tx by txbuild command which contains
+    foo, bar, and baz,
+
+      $newstr = $td->gsub($str, sub{"<$_[0]>"});
+
+    is equivalent to
+
+      my $newstr = $str;
+      $newstr = s{ (foo|bar|baz) }{ "<<$1>" }msgex;
+
+    Sounds less convenient? But what happens if the alteration contains
+    thousands of words? It takes a whole lot of time and memory just to
+    compile the regexp. Tx and Text::Tx does just that.
+
+REQUIREMENT
+    Tx 0.04 or above. Available at
+
+    <http://www-tsujii.is.s.u-tokyo.ac.jp/~hillbig/tx.htm>
+
+    To install, just
+
+      fetch http://www-tsujii.is.s.u-tokyo.ac.jp/~hillbig/software/tx-0.04.tar.gz
+      tar zxvf tx-0.04.tar.gz
+      cd tx-0.04
+      configure
+      make
+      sudo make install
+
+  EXPORT
+    None.
+
+SEE ALSO
+    <http://www-tsujii.is.s.u-tokyo.ac.jp/~hillbig/tx.htm>
+
+    Regexp::Assemble
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,36 @@
+0.10      2012-11-14 00:27:12 EST5EDT
+  * Release Marpa-based version; it's now decisively better
+    than the MGC parser.
+
+0.07_991  2012-11-13 02:21:52 America/New_York
+  * Upgrade to Marpa::R2
+  * Now with more BNF-like grammar definition.
+
+0.07_99   2012-04-18 12:35:00 America/New_York
+  * Changed parser backend from Parser::MGC to Marpa::XS.
+  * Updated dist.ini.
+
+0.07      2011-08-17 08:26:22 America/New_York
+  * Revised "junk line" handling for more robust parsing, and to match
+    the way that Test::Harness behaves.
+    http://testanything.org/pipermail/tap-l/2011-June/000384.html
+
+0.06      2011-03-25 21:25:51 CST6CDT
+  * Fix a missing prerequisite.
+  * Remove dependency on MouseX::Foreign
+  * Improved documentation.
+
+0.05      2011-03-20 12:58:42 CST6CDT
+  * Change to a new parser using Parser::MGC.
+  * All other TAP::Spec::* objects remain the same.
+
+0.04      2010-09-24 03:40:46 CST6CDT
+  * That was a failure. Require YAML::XS for tests instead.
+
+0.03      2010-09-20 20:57:31 CST6CDT
+  * Fix spectests to work if the user has YAML.pm
+
+0.02      2010-09-19 22:41:54 CST6CDT
+  * Initial release to CPAN
+  * Handles many real-world test files with minimal segfaults.
+  * Example scripts, but not much in the way of tests.

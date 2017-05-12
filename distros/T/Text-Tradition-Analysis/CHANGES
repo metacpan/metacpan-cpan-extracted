@@ -1,0 +1,22 @@
+=== Version 2.0.2 ===
+Update default IDP solver URL; fixes module tests
+
+=== Version 2.0.0 ===
+
+Support for the specification of an IDP solver URL
+Support for the specification of a local path to the 'pars' executable
+Support for integration with Stemweb phylogenetic analysis
+Allow stemmata to have meaningful names
+Handle the existence of undirected stemma graphs
+Catch bad Dot input for new / edited stemma graphs
+Return extra information in Analysis data structure
+Various and sundry bugfixes and improvements
+
+=== Version 1.2 ===
+
+Adopt more generalized relationship scheme in Text::Tradition 1.2
+Tweaks to analysis routines
+
+=== Version 1.1 ===
+
+Initial release

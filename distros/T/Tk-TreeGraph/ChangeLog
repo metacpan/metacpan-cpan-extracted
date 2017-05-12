@@ -1,0 +1,96 @@
+2007-04-06  Dominique Dumont <ddumont at cpan dot org> v1.030
+
+	* TreeGraph.pm (draw_tree_from_ref): New method to draw a tree
+	from an array ref. Courtesy by Alexander Becker (thanks)
+
+2004-10-14  Dominique Dumont  <domi at komarr dot grenoble dot hp dot com> v1.029
+
+	* TreeGraph.pm (setArrow): fix bug related to Canvas find method
+	which returns now an array ref in scalar context. I do not know
+	which version of Tk broke TreeGraph, but this new version was
+	tested with Tk 804.027
+	(getCurrentNodeId): ditto. Thanks to Thomas Flasche for the patch.
+
+2003-12-11  Dominique Dumont  <domi at komarr dot grenoble dot hp dot com>
+
+	* TreeGraph.pm: accept leading dash in method parameter
+	Works with Tk804
+
+2003-10-31  Dominique Dumont  <domi at komarr dot grenoble dot hp dot com>
+
+	* TreeGraph.pm (addAllShortcuts): 
+	- start and tip of shorcut arrows are now in the correct direction
+
+2001-04-02  Dominique Dumont  <domi at komarr dot grenoble dot hp dot com> v1.024
+
+	* TreeGraph.pm :
+ 	- added viewNode method
+	- added -animation option
+        - added demo for Tk widget program
+        - test run now in batch mode
+
+2000-05-15  Dominique Dumont  <domi at ispserv.grenoble.hp.com> v1.023
+
+	* TreeGraph.pm : 
+	- added flashNode method
+	- changed computing of text size in addNode to use bbox. This way, you
+	  can use other fonts.
+	- added modifyNode
+	- fixed re-draw bug
+	- addNode accepts strings or usual arrayref.
+	- added scroll adjusting in SYNOPSIS
+
+2000-01-25  Dominique Dumont  <domi at ispserv.grenoble.hp.com> v1.016
+
+	* TreeGraph.pm: 
+	- fix redrawing bugs
+	- removed setting of -scrollregion
+	- added small explanations related to scrolling
+	- added a dash to pack parameter (needed for Tk800.017)
+
+1999-08-12  Dominique Dumont  <domi at barrayar.grenoble.hp.com> v1.015
+
+	* TreeGraph.pm (addAllShortcuts): 
+	- splined shortcut arrow
+	- bug fix: can now have more than one shortcut starting from a node
+
+1999-07-23  Dominique Dumont  <domi at barrayar.grenoble.hp.com>
+
+	* TreeGraph.pm :
+	- can draw more compact trees (big changes in the code)
+
+1999-04-21  Dominique Dumont  <domi at barrayar.grenoble.hp.com> v1.011
+
+	* TreeGraph.pm : 
+	- added nodeTag option
+	- relaxed rules about shortcuts
+	- some bug fixes provided by Bernard Weiler (Thanks !)
+
+1999-02-12  Dominique Dumont  <domi at barrayar.grenoble.hp.com>
+
+	* TreeGraph.pm (addNode): Added 'after' parameters so addNode can
+	draw itself the arrows.
+
+1999-02-11  Dominique Dumont  <domi at barrayar.grenoble.hp.com>
+
+	* TreeGraph.pm (addNode): coordinate are now handled by the 
+	object
+
+1999-01-25  Dominique Dumont  <domi at barrayar.grenoble.hp.com>
+
+	* TreeGraph.pm : fixed shortCut and unselectNodes problems
+	  added comments on internal data structures
+
+1999-01-22  Dominique Dumont  <domi at barrayar.grenoble.hp.com>
+
+	* TreeGraph.pm : better doc
+
+1999-01-15  Dominique Dumont  <domi at barrayar.grenoble.hp.com>
+
+	* TreeGraph.pm : doc update 
+
+1999-01-11  Dominique Dumont  <domi at barrayar.grenoble.hp.com>
+
+	* TreeGraph.pm: first version
+	
+

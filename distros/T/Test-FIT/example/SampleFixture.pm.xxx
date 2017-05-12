@@ -1,0 +1,28 @@
+package SampleFixture;
+use base 'Test::FIT::ColumnFixture';
+use Test::FIT;
+
+attribute 'first';
+attribute 'last';
+
+sub perl_hacker {
+    my $self = shift;
+    my $name = join ' ', $self->first, $self->last;
+    if ($name =~ /(Ward|Brian)/) {
+        $self->pass("Oh yes");
+    }
+    else {
+        $self->fail("No way!");
+        $self->stop;
+    }
+}
+
+sub last_backwards {
+    my $self = shift;
+    $backwards = join '', reverse split '', $self->last;
+    $self->eq_str($backwards);
+}
+
+1;
+
+# vim: set ft=perl:

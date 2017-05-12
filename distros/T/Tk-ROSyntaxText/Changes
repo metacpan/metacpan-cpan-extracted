@@ -1,0 +1,16 @@
+Revision history for Tk-ROSyntaxText
+
+1.000   10-Aug-2010
+        Initial release.
+
+1.001   11-Aug-2010
+        No changes to module code (except for the version number).
+
+        Changes required to most regression tests (t/*.t) to stop incorrect
+        reports from automated testing software that the module doesn't build.
+        The reason for the incorrect reports is documented on the CPAN
+        Testers Wiki (http://wiki.cpantesters.org/wiki/CPANAuthorNotes) under
+        the heading:
+        "Why are you testing (and failing) my Tk-ish module without an X server?"
+
+

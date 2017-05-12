@@ -1,0 +1,16 @@
+.cvsignore
+Build.PL
+Changes
+lib/Test/More/Behaviours.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01.behaviours.t
+t/caller.t
+t/kwalitee.t
+t/login_recipe.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

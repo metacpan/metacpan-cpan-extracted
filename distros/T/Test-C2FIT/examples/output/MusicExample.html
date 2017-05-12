@@ -1,0 +1,246 @@
+<html>
+<head>
+	<title>Wiki: Music Example</title>
+<head>
+<body bgcolor=#FFFFFF link=#d06040 vlink=#806040>
+	<h1>Music Example</h1>
+	<wiki>In this example we describe a music player as if we were operating it. We will see two kinds of tables in use, action and row. The action tables list things actions to be performed, step-by-step, one row at a time. Some actions will involve searching for music. We will check to be sure we've found the right music using a second kind of table, a row table. In the row table we will simply list each song, one per row, with columns showing different attributes of each song. We'll use these fixtures.
+<p>We'll write the remainder of this page as if it were describing stories for the music library/player. We'll use italics when we want to point out features of the framework. You might as well run the example now before you continue reading.
+<p><UL>
+<li> <a href="run.cgi">http:run.cgi</a>
+<p></UL>
+This is our most realistic example short of the SampleApplications. See the MusicExampleObjectModel to understand all of the objects in play here.
+<p><hr>
+<p><strong>Browsing Music</strong>
+<p>The music browser starts up looking at the whole library of songs. We specify the library (an advanced feature) so that we know what we are talking about in this document.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=3> fit.ActionFixture </td></tr>
+<tr><td> start </td><td> eg.music.Browser </td><td>&nbsp;</td></tr>
+<tr><td> enter </td><td> library </td><td> examples/music/Music.txt </td></tr>
+<tr><td> check </td><td> total songs </td><td bgcolor="#cfffcf"> 37 </td></tr>
+</table>
+<p><em>This is a the file that library reads. It is tab separated text. Try downloading it and looking at it with a spreadsheet. <a href="Release/Source/eg/music/Music.txt">http:Release/Source/eg/music/Music.txt</a></em>
+<p>We can pick songs and see details of our selection as we go.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=3> fit.ActionFixture </td></tr>
+<tr><td> enter </td><td> select </td><td> 1 </td></tr>
+<tr><td> check </td><td> title </td><td bgcolor="#cfffcf"> Akila </td></tr>
+<tr><td> check </td><td> artist </td><td bgcolor="#cfffcf"> Toure Kunda </td></tr>
+<tr><td> enter </td><td> select </td><td> 2 </td></tr>
+<tr><td> check </td><td> title </td><td bgcolor="#cfffcf"> American Tango </td></tr>
+<tr><td> check </td><td> artist </td><td bgcolor="#cfffcf"> Weather Report </td></tr>
+<tr><td> check </td><td> album </td><td bgcolor="#cfffcf"> Mysterious Traveller </td></tr>
+<tr><td> check </td><td> year </td><td bgcolor="#cfffcf"> 1974 </td></tr>
+<tr><td> check </td><td> time </td><td bgcolor="#cfffcf"> 3.70 </td></tr>
+<tr><td> check </td><td> track </td><td bgcolor="#cfffcf"> 2 of 7 </td></tr>
+</table>
+<p><em>ActionFixture interprets the words in the first column. The actions operate on fields and buttons on the </em>Browser<em> screen we started in the first table. The Browser (or what ever other Fixtures we start) interprets the names in the second column. Each name maps to a method of the Browser. The third column provides data that are pass as arguments to Browser methods or compared with Browser method results. See MusicExampleWithErrors to see how errors are reported.</em>
+<p><hr>
+<p><strong>Playing Music</strong>
+<p>Once we've picked a song, we can play it. We can continue operating the Brower while music is playing. Since this sequence is long, we'll explain what we are doing in an unused column.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=4> eg.music.Realtime </td>
+<td> <font color="#808080">time</font></td>
+<td> <font color="#808080">split</font></td></tr>
+<tr><td> press </td><td> play </td><td>&nbsp;</td><td> play this song </td>
+<td> <font color="#808080">18:10:54</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#cfffcf"> loading </td><td>&nbsp;</td>
+<td> <font color="#808080">18:10:55</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> pause </td><td> 2 </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:10:55</font></td>
+<td> <font color="#808080">2</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#cfffcf"> loading </td><td> watch it load </td>
+<td> <font color="#808080">18:10:57</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> pause </td><td> 2 </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:10:57</font></td>
+<td> <font color="#808080">2</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#cfffcf"> playing </td><td>&nbsp;</td>
+<td> <font color="#808080">18:10:59</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> check </td><td> playing </td><td bgcolor="#cfffcf"> American Tango </td><td>&nbsp;</td>
+<td> <font color="#808080">18:10:59</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> check </td><td> time </td><td bgcolor="#cfffcf"> 3.70 </td><td>&nbsp;</td>
+<td> <font color="#808080">18:10:59</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> press </td><td> pause </td><td>&nbsp;</td><td> make it stop </td>
+<td> <font color="#808080">18:10:59</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#cfffcf"> pause </td><td>&nbsp;</td>
+<td> <font color="#808080">18:11:00</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> check </td><td> remaining </td><td bgcolor="#ffcfcf">3.66 <font size=-1 color="#c08080"><i>expected</i></font><hr>3.67 <font size=-1 color="#c08080"><i>actual</i></font></td><td>&nbsp;</td>
+<td> <font color="#808080">18:11:00</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> pause </td><td> 60 </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:11:00</font></td>
+<td> <font color="#808080">60</font></td></tr>
+<tr><td> check </td><td> remaining </td><td bgcolor="#ffcfcf">3.66 <font size=-1 color="#c08080"><i>expected</i></font><hr>3.67 <font size=-1 color="#c08080"><i>actual</i></font></td><td>&nbsp;</td>
+<td> <font color="#808080">18:12:00</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> press </td><td> play </td><td>&nbsp;</td><td> make it go </td>
+<td> <font color="#808080">18:12:00</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#cfffcf"> playing </td><td>&nbsp;</td>
+<td> <font color="#808080">18:12:01</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> pause </td><td> 60 </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:12:01</font></td>
+<td> <font color="#808080">60</font></td></tr>
+<tr><td> check </td><td> remaining </td><td bgcolor="#ffcfcf">2.66 <font size=-1 color="#c08080"><i>expected</i></font><hr>2.67 <font size=-1 color="#c08080"><i>actual</i></font></td><td>&nbsp;</td>
+<td> <font color="#808080">18:13:01</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> await </td><td> play complete </td><td>&nbsp;</td><td> enjoy the music </td>
+<td> <font color="#808080">18:13:01</font></td>
+<td> <font color="#808080">160</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#cfffcf"> ready </td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:41</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> enter </td><td> select </td><td> 4 </td><td> try another </td>
+<td> <font color="#808080">18:15:41</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> press </td><td> play </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:42</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> pause </td><td> 1 </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:43</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> fail </td><td> load jam </td><td>&nbsp;</td><td> uh oh </td>
+<td> <font color="#808080">18:15:44</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> check </td><td> message </td><td bgcolor="#cfffcf"> load jamed </td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:44</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> press </td><td> ok </td><td>&nbsp;</td><td> dispatch the notifier </td>
+<td> <font color="#808080">18:15:44</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#cfffcf"> ready </td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:45</font></td>
+<td> <font color="#808080">0</font></td></tr>
+</table>
+<p><p><em>This table is interpreted by Realtime, a Fixture that adds actions having to do with realtime operation of the music player. This fixture calls on a simulator to keep track of system events. We do so here only because the application we are testing isn't a real music player. Our toy application cooperates with the simulator to keep track of time. A real player would do things that take real time and it would use the computer's realtime clock to keep track of time. We could still use a fixture with actions like </em>pause<em> and </em>await<em> but there wouldn't need to be a simulator too.</em>
+<p><hr>
+<p><strong>Searching for Music</strong>
+<p>There are buttons on the browser to find more songs like the one we have picked.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=4> eg.music.Realtime </td>
+<td> <font color="#808080">time</font></td>
+<td> <font color="#808080">split</font></td></tr>
+<tr><td> enter </td><td> select </td><td> 2 </td><td> pick an album </td>
+<td> <font color="#808080">18:15:45</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> press </td><td> same album </td><td>&nbsp;</td><td> find more like it </td>
+<td> <font color="#808080">18:15:46</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#ffcfcf">searching <font size=-1 color="#c08080"><i>expected</i></font><hr>ready <font size=-1 color="#c08080"><i>actual</i></font></td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:47</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> await </td><td> search complete </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:47</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> check </td><td> status </td><td bgcolor="#cfffcf"> ready </td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:48</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> check </td><td> selected songs </td><td bgcolor="#cfffcf"> 2 </td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:48</font></td>
+<td> <font color="#808080">0</font></td></tr>
+</table>
+<p><em>Our searches take a few seconds to complete. Eventually we will want to try mashing buttons faster than the computer can respond. For now we will be polite and </em>await<em> completion of our searches.</em>
+<p>The selected songs are displayed in a table.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=6> eg.music.Display </td></tr>
+<tr><td> title </td><td> artist </td><td> album </td><td> year </td><td> time() </td><td> track() </td></tr>
+<tr><td bgcolor="#cfffcf"> Scarlet Woman </td><td bgcolor="#cfffcf"> Weather Report </td><td bgcolor="#cfffcf"> Mysterious Traveller </td><td bgcolor="#cfffcf"> 1974 </td><td bgcolor="#cfffcf"> 5.72 </td><td bgcolor="#cfffcf"> 6 of 7 </td></tr>
+<tr><td bgcolor="#cfffcf"> American Tango </td><td bgcolor="#cfffcf"> Weather Report </td><td bgcolor="#cfffcf"> Mysterious Traveller </td><td bgcolor="#cfffcf"> 1974 </td><td bgcolor="#cfffcf">3.70 </td><td bgcolor="#cfffcf"> 2 of 7 </td></tr>
+</table>
+<p><em>Here we use Display (a RowFixture) to directly examine the Music object found by our search. Things like </em>artist<em> and </em>track()<em> are fields and methods of the domain objects.</em>
+<p>We can find songs related in different ways. Each new way produces a (possibly) different list of songs. <em>Show all</em> restores the display to the initial conditions.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=4> eg.music.Realtime </td>
+<td> <font color="#808080">time</font></td>
+<td> <font color="#808080">split</font></td></tr>
+<tr><td> press </td><td> show all </td><td>&nbsp;</td><td> recall all the songs </td>
+<td> <font color="#808080">18:15:48</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> await </td><td> search complete </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:49</font></td>
+<td> <font color="#808080">3</font></td></tr>
+<tr><td> check </td><td> selected songs </td><td bgcolor="#cfffcf"> 37 </td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:52</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> enter </td><td> select </td><td> 3 </td><td> pick a James Taylor song</td>
+<td> <font color="#808080">18:15:52</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> check </td><td> artist </td><td bgcolor="#cfffcf"> James Taylor </td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:53</font></td>
+<td> <font color="#808080">0</font></td></tr>
+<tr><td> press </td><td> same artist </td><td>&nbsp;</td><td> find more by him </td>
+<td> <font color="#808080">18:15:53</font></td>
+<td> <font color="#808080">1</font></td></tr>
+<tr><td> await </td><td> search complete </td><td>&nbsp;</td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:54</font></td>
+<td> <font color="#808080">2</font></td></tr>
+<tr><td> check </td><td> selected songs </td><td bgcolor="#cfffcf"> 5 </td><td>&nbsp;</td>
+<td> <font color="#808080">18:15:56</font></td>
+<td> <font color="#808080">0</font></td></tr>
+</table>
+<p>Yielding the display:
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=6> eg.music.Display </td></tr>
+<tr><td> title </td><td> artist </td><td> album </td><td> year </td><td> time() </td><td> track() </td></tr>
+<tr><td bgcolor="#cfffcf"> Handy Man </td><td bgcolor="#cfffcf"> James Taylor </td><td bgcolor="#cfffcf"> JT </td><td bgcolor="#cfffcf"> 1977 </td><td bgcolor="#cfffcf"> 3.30 </td><td bgcolor="#cfffcf"> 7 of 12 </td></tr>
+<tr><td bgcolor="#cfffcf"> Sailing To Philadelphia </td><td bgcolor="#cfffcf"> James Taylor </td><td bgcolor="#cfffcf"> October Rose </td><td bgcolor="#cfffcf"> 2001 </td><td bgcolor="#cfffcf"> 5.47 </td><td bgcolor="#cfffcf"> 3 of 3 </td></tr>
+<tr><td bgcolor="#cfffcf"> Ananas </td><td bgcolor="#cfffcf"> James Taylor </td><td bgcolor="#cfffcf"> Hourglass </td><td bgcolor="#cfffcf"> 1997 </td><td bgcolor="#cfffcf"> 5.73 </td><td bgcolor="#cfffcf"> 5 of 13 </td></tr>
+<tr><td bgcolor="#cfffcf"> Another Grey Morning </td><td bgcolor="#cfffcf"> James Taylor </td><td bgcolor="#cfffcf"> JT </td><td bgcolor="#cfffcf"> 1977 </td><td bgcolor="#cfffcf"> 2.73 </td><td bgcolor="#cfffcf"> 4 of 12 </td></tr>
+<tr><td bgcolor="#cfffcf"> Copperline </td><td bgcolor="#cfffcf"> James Taylor </td><td bgcolor="#cfffcf"> New Moon Shine </td><td bgcolor="#cfffcf"> 1991 </td><td bgcolor="#cfffcf"> 4.37</td><td bgcolor="#cfffcf"> 1 of 12 </td></tr>
+</table>
+<p><em>Domain objects typically have lots more fields and methods than we can conveniently look at in a single table. We compose a table specific to our needs by choosing column headings of interest. Here is another look at the results of the previous search.</em>
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=6> eg.music.Display </td></tr>
+<tr><td> title </td><td> album </td><td> genre </td><td> size </td><td> date </td></tr>
+<tr><td bgcolor="#cfffcf"> Another Grey Morning </td><td bgcolor="#cfffcf"> JT </td><td bgcolor="#cfffcf"> Pop </td><td bgcolor="#cfffcf"> 3284199 </td><td bgcolor="#cfffcf"> 9/7/02 11:32 PM </td></tr>
+<tr><td bgcolor="#cfffcf"> Ananas </td><td bgcolor="#cfffcf"> Hourglass </td><td bgcolor="#cfffcf"> Pop </td><td bgcolor="#cfffcf"> 6897450 </td><td bgcolor="#cfffcf"> 9/7/02 11:47 PM </td></tr>
+<tr><td bgcolor="#cfffcf"> Copperline </td><td bgcolor="#cfffcf"> New Moon Shine </td><td bgcolor="#cfffcf"> Pop </td><td bgcolor="#cfffcf"> 5248087 </td><td bgcolor="#cfffcf"> 9/7/02 9:52 PM </td></tr>
+<tr><td bgcolor="#cfffcf"> Handy Man </td><td bgcolor="#cfffcf"> JT </td><td bgcolor="#cfffcf"> Pop </td><td bgcolor="#cfffcf"> 3976956 </td><td bgcolor="#cfffcf"> 9/7/02 11:36 PM </td></tr>
+<tr><td bgcolor="#cfffcf"> Sailing To Philadelphia </td><td bgcolor="#cfffcf"> October Rose </td><td bgcolor="#cfffcf"> Pop </td><td bgcolor="#cfffcf"> 6581911 </td><td bgcolor="#cfffcf"> 9/7/02 10:45 PM </td></tr>
+</table>
+<p><em>Notice that the songs in the two tables are not in the same order. That is because we didn't type the tables in the same order, and the order we type is preserved. RowFixture(s) use the left hand columns to line up the search results with the table values.  Check out MusicExampleWithErrors to see how this works when the rows don't match up.</em>
+<p><em>The kaffe jvm/library has trouble with date formatting so you may see errors when running this from wiki.</em>
+<p><em>This completes the MusicExample.</em>
+<p><hr>
+<p>We've run quite a few test. We'll call up one more Fixture that will add a summary to the end of our document.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=2> fit.Summary </td></tr>
+<tr bgcolor="#ffcfcf">
+<td> <font color="#808080">counts</font></td>
+<td> <font color="#808080">91 right, 4 wrong, 0 ignores, 0 exceptions</font></td></tr>
+<tr>
+<td> <font color="#808080">input file</font></td>
+<td> <font color="#808080">input/MusicExample.html</font></td></tr>
+<tr>
+<td> <font color="#808080">input update</font></td>
+<td> <font color="#808080">Sat Apr 22 22:26:16 2006</font></td></tr>
+<tr>
+<td> <font color="#808080">output file</font></td>
+<td> <font color="#808080">output/MusicExample.html</font></td></tr>
+<tr>
+<td> <font color="#808080">run date</font></td>
+<td> <font color="#808080">Wed May &nbsp;3 18:10:54 2006</font></td></tr>
+<tr>
+<td> <font color="#808080">run elapsed time</font></td>
+<td> <font color="#808080"> 0 wallclock secs ( 0.07 usr + &nbsp;0.01 sys = &nbsp;0.08 CPU)</font></td></tr></table>
+<p><hr>
+<p>This is our most complete standard example. You can run it against more than one fit implementation by choosing any one of these specialized RunScript.
+<p><UL>
+<li> <a href="files/LispPlatform/runScheme.cgi">http:files/LispPlatform/runScheme.cgi</a>
+<li> <a href="files/LispPlatform/runLisp.cgi">http:files/LispPlatform/runLisp.cgi</a>
+<p></UL>
+(Caution: these scripts can't login. Run them from the public wiki pages.)</wiki>
+<hr>
+	Last edited May 28, 2003
+</body>
+</html>
+

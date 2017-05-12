@@ -1,0 +1,13 @@
+Changes
+Elapse.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/0-signature.t
+t/1-basics.t
+t/2-UTC.t
+t/3-pod.t
+othertest/lapsetest.pl
+META.yml                                Module meta-data (added by MakeMaker)
+SIGNATURE

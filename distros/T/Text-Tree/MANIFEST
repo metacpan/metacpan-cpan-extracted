@@ -1,0 +1,6 @@
+CHANGELOG
+Makefile.PL
+MANIFEST
+README
+t/Text-Tree.t
+lib/Text/Tree.pm

@@ -1,0 +1,14 @@
+Changes
+examples/simple.pl
+lib/Text/SimpleTable.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+t/04tables.t
+Text-SimpleTable-2.03/META.yml
+META.yml                                 Module meta-data (added by MakeMaker)

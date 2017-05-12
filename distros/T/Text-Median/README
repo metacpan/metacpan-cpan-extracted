@@ -1,0 +1,111 @@
+Text-Median version 0.01
+========================
+
+
+NAME
+    Text::Median - Perl extension for determining the set median of a set of
+    strings
+
+SYNOPSIS
+      use Text::Median;
+      my $medianobj = new Text::Median(module=>"StringDistanceModule",method=>"distancemethod");
+      $medianobj->add_data(\@data);
+      print $medianobj->find_median();
+
+DESCRIPTION
+    The median of a set of strings is defined as the string that minimizes
+    the sum of all distances between that string and all other strings
+    within the set. The true median is not necessarily a member of the set
+    of strings. It as been shown that finding the median of a set of strings
+    is an NP comilete problem in: "Topology of Strings: Median String is NP
+    Complete", C. de la Higuera, F. Casacuberta, Theoretical Computer
+    Science Vol. 230 Issue 1-2, January 2000
+
+    This module is concerned with calculating the set median, which is the
+    member of the set which minimize the sum of distances. There are a
+    myriad of string distance algorithms, including the string edit
+    distance, the keyboard distance and the algorithm used by
+    String::Similarity. This module is designed to allow the programmer to
+    choose the algorithm for distance. It should also be noted that the
+    method associated with the module used to calculate distance should take
+    two arguments. The programmer of this module assumes that you, the user,
+    will give the appropriate method and does not double check that the
+    method exists.
+
+    The algorithm used in this module is O(N**2).
+
+Methods
+  new(module=>'module name', method=>'method', max=>0);
+    Creates and instantiates a Text::Median object. The module and method
+    arguments are required. The module argument is used to pass in the
+    distance module that the Text::Median object will use and the method
+    argument is the particular method within the distance module that
+    calculates the distance. The module must be a valid module.
+
+    The max argument is slightly different. Most string distance modules
+    give a larger number for a larger distance. However, in the
+    String::Similarity module (and potentially other modules) the similarity
+    of a string is calculated and the higher the result, the more similar
+    the strings are. Therefore, the set median is the string with the
+    largest sum of similarities rather than the string with the smallest sum
+    of distance. If you are going to use String::Similarity (or similar
+    modules) you must use the max argument in order to derive the set
+    median.
+
+  add_data(@data)
+    Adds a set of data to the module. If a set of data already exists within
+    the module, appends the new set of data to the old set of data.
+
+  find_median()
+    Determines the set median of the given set of strings and returns it.
+    This is where the main calculation occurs, so this might take time
+    depending on the size of the data set. One thing to note: the distance
+    matrix required for the calculation is held in memory, so if additional
+    data is added to the set the calculation is faster. Also, since it is
+    held in memory, it can have a large memory footprint.
+
+  EXPORT
+    None by default.
+
+SEE ALSO
+    Any perl modules relating to string distance, including the Levenshtein
+    distance, String::Similarity, and String::KeyboardDistance
+
+AUTHOR
+    Leigh Metcalf, <leigh@fprime.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Leigh Metcalf
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.9 or, at
+    your option, any later version of Perl 5 you may have available.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Module::Runtime
+	Test::Warn
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by Leigh  Metcalf
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

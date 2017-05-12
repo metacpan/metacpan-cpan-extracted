@@ -1,0 +1,14 @@
+digraph if {
+	graph [rankdir=LR];
+	node [label="\N"];
+	graph [bb="0,0,274,128"];
+	{
+		graph [rank=same];
+		graph [bb=""];
+		b [pos="239,18", width="0.75", height="0.50"];
+		c [pos="239,110", width="0.75", height="0.50"];
+	}
+	a [pos="35,18", width="0.75", height="0.50"];
+	a -> b [pos="e,212,18 62,18 98,18 162,18 202,18"];
+	c -> b [label="long long long", pos="s,239,36 239,46 239,61 239,76 239,92", lp="137,64"];
+}

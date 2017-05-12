@@ -1,0 +1,25 @@
+Changes
+lib/Text/TemplateLite/Standard.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-misc.t
+t/02-logical.t
+t/03-conditional.t
+t/04-iteration.t
+t/05-character.t
+t/06-string.t
+t/07-numeric.t
+t/08-bitwise.t
+t/09-template.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+examples/degrees.pl
+examples/en_nth.pl
+examples/query_matches.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

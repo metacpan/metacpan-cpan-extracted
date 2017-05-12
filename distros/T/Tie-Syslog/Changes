@@ -1,0 +1,60 @@
+Revision history for Perl extension Tie::Syslog.
+
+2.04.02 Fri Jan 25 15:05:07 CET 2013
+    - PRINT must interpolate @_ into string or only the first element of
+      the list will be printed. Added "" around @_ in PRINT.
+
+2.04.01 Tue Jan  8 14:08:49 CET 2013
+    - Explicitly added dependency from Sys::Syslog v0.11, where :macros
+      should be a valid export tag.
+
+2.04.00 Fri Jan  4 11:34:25 CET 2013
+    - Changed versioning scheme, so that I have a minor number to take
+      minor changes into account. Had to change version to 2.04 since
+      CPAN rejects 2.03.01 as being lower than 2.03. 
+
+2.03.01 Fri Jan  4 11:34:25 CET 2013
+    - Fixed an error in documentation.
+
+2.03  Update to this file and to Makefile.PL, including modules Carp and 
+      Sys::Syslog as prerequisites.
+
+2.02  Wed Jan  2 13:52:41 CET 2013
+    - Rewritten, intorduced a new syntax but still supporting the old one. 
+      setlogsock() is simply not called anymore, as Sys::Syslog should be 
+      able to handle all the stuff internally. 
+
+1.07  Sun Jan 20 22:17:12 EST 2002
+    - Got some good input from M. Darwin about how this tied FH behaved
+      w/ GnuPG. There are a number of functions, e.g. 'fileno' that needed
+      to be implemented for things like open3, etc. However, in this case,
+      I really just needed to know the original FH that was tied.
+      Unfortunately, perl does not give you access to the original tied
+      object. So a work-around was created where you just pass a ref to a
+      glob of your filehandle as a first arg to tie. Then all these special
+      fns like 'fileno' can refer to the original filehandle.
+
+1.05  Tue Jun 12 10:53:58 EST 2001
+    - Added some notes to docs about Linux possibly prefering 'err'
+      rather than 'error' as a syslog "priority" as Jost Krieger pointed
+      out. The example in the perldoc uses 'error'. Didn't change code
+      to do anything different yet.
+
+1.04  Thu Nov  9 16:43:49 EST 2000
+    - Seems that you cannot undef $SIG{__DIE__}, nor assign undef
+      to it without a warning. I could not figure out how to address
+      this short of simply suppressing warnings in a little block.
+    - I use $^S inside the $SIG{__DIE__} handler rather than poking
+      back thru the stack looking for "(eval)".
+
+1.03  Sun Aug 29 20:37:23 EST 1999
+    - Per Dustin Harris, allow setlogsock() options to be optionally
+      passed to the tie() instead of hardwired to 'inet'.
+    - Minor docs cleanup.
+
+1.01  Fri Mar 12 17:21:46 EST 1999
+    - put together pieces to make first distributable version.
+
+0.01  Wed Mar 10 15:50:38 1999
+	- original version; created by h2xs 1.18
+

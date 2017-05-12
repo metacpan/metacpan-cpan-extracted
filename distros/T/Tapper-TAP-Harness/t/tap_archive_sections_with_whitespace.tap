@@ -1,0 +1,179 @@
+1..1
+# Tapper-suite-version: 0.2
+# Tapper-starttime-test-program: 20081029T163911
+# Tapper-machine-name: rhel5u2.64bit
+# Tapper-suite-name: Tapper-CTCS
+# Tapper-reportgroup-arbitrary: None
+# Tapper-section: tapper-meta-information
+# Tapper-reportgroup-testrun: None
+ok 1 - tapper-meta-data
+1..1
+# Tapper-Section: stats-proc-interrupts-before
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 630982653
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 904
+    linetail: IO-APIC-edge  i8042
+  6:
+    CPU0: 2
+    linetail: IO-APIC-edge  floppy
+  7:
+    CPU0: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 111
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 58856922
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 11971029
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  177:
+    CPU0: 9625617
+    linetail: IO-APIC-level  xen-platform-pci
+  NMI:
+    CPU0: 0
+    linetail:
+  LOC:
+    CPU0: 630885621
+    linetail:
+  ERR:
+    CPU0: 0
+    linetail:
+  MIS:
+    CPU0: 0
+    linetail:
+  ...
+1..1
+ok 1 - untar of testsuite succeeded.
+1..1
+ok 1 - untar of kernel succeeded.
+1..1
+# Tapper-section: ctcs-build
+ok 1 - Build took ntp: 0s, hwclock: 0s
+1..1
+# Tapper-section: ctcs-testrun
+not ok 1 -  Run of ctcs test suite failed. Run took ntp: 1s, hwclock: 0s
+1..1
+ok 1 - Got results
+1..13
+# Tapper-section: CTCS results
+not ok 1 - BBhdaN3
+  ---
+  expected: 3
+  got: 0
+  ...
+not ok 2 - BBhdaN0
+  ---
+  expected: 3
+  got: 0
+  ...
+not ok 3 - KCOMPILE
+  ---
+  expected: 3
+  got: 0
+  ...
+not ok 4 - BBhdaN4
+  ---
+  expected: 3
+  got: 0
+  ...
+not ok 5 - BBhdaN5
+  ---
+  expected: 3
+  got: 0
+  ...
+not ok 6 - BBhdaN6
+  ---
+  expected: 3
+  got: 0
+  ...
+ok 7 - HEARTBEAT
+ok 8 - DMESG
+not ok 9 - BBhdaN1
+  ---
+  expected: 3
+  got: 0
+  ...
+ok 10 - MEMORY
+not ok 11 - BBhdaN7
+  ---
+  expected: 3
+  got: 0
+  ...
+ok 12 - SYSLOG
+not ok 13 - BBhdaN2
+  ---
+  expected: 3
+  got: 0
+  ...
+1..1
+# Tapper-Section: stats-proc-interrupts-after
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 630997527
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 904
+    linetail: IO-APIC-edge  i8042
+  6:
+    CPU0: 2
+    linetail: IO-APIC-edge  floppy
+  7:
+    CPU0: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 111
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 58858469
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 11971509
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  177:
+    CPU0: 9627087
+    linetail: IO-APIC-level  xen-platform-pci
+  NMI:
+    CPU0: 0
+    linetail:
+  LOC:
+    CPU0: 630900493
+    linetail:
+  ERR:
+    CPU0: 0
+    linetail:
+  MIS:
+    CPU0: 0
+    linetail:
+  ...
+1..1
+# Tapper-section: clocksource
+ok 1 - Clocksource
+  ---
+  jiffies
+  ...
+1..1
+# Tapper-section: uptime
+ok 1 - got uptime
+  ---
+  uptime: 633661s
+  idletime: 538045s
+  ...

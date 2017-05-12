@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Template-Plugin-VMethods
+version: 0.03
+license: perl
+distribution_type: module
+requires:
+  Template: 2.06
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Template::Plugin::VMethods:
+    file: lib/Template/Plugin/VMethods.pm
+    version: 0.03
+  Template::Plugin::VMethods::VMethodContainer:
+    file: lib/Template/Plugin/VMethods/VMethodContainer.pm
+generated_by: Module::Build version 0.20

@@ -1,0 +1,9 @@
+Revision history for Test-CPAN-README
+
+0.2  2013-09-29 11:20:38
+    - make NS arg optional
+    - add encoding and version tests
+
+0.1  2013-09-22 10:55:58
+       Initial release.
+

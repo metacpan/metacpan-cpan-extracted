@@ -1,0 +1,20 @@
+0.000005  2017-05-03 21:12:24-07:00 America/Los_Angeles
+
+    - Make sure mux file is written to first
+
+0.000004  2017-05-03 10:15:53-07:00 America/Los_Angeles
+
+    - Remove dependancy on 'parent'
+    - Stop leaving temp files behind
+
+0.000003  2017-05-02 14:17:13-07:00 America/Los_Angeles
+
+    - Metadata updates
+
+0.000002  2017-05-02 13:16:54-07:00 America/Los_Angeles
+
+    - Make tests less fragile to shell quoting issues
+
+0.000001  2017-05-01 20:08:14-07:00 America/Los_Angeles
+
+    - Initial Release

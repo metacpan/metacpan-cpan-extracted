@@ -1,0 +1,15 @@
+examples
+========
+
+This directory contains three simple programs.  These programs all do
+exactly the same thing, but they are implemented in C, C++ and Perl,
+respectively.  There is also a template, and a sample Makefile with which
+you can (possibly with some modifications) build the applications.  You
+will need to build libtmpl.a in the parent directory (make libtmpl.a) before
+you can do so.
+
+Eventually I hope to add some interesting and/or useful example applications
+here, as well as at least some test code for the C and C++ language support.
+
+Everything in this directory is not officially supported, and it will almost
+certainly take a little tweaking to get it to work on your system.

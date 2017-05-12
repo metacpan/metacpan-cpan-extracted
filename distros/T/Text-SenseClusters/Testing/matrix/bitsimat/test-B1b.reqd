@@ -1,0 +1,4 @@
+<keyfile name="key"/>
+ERROR(bitsimat.pl):
+        Line 2 in Vector file <test-B1b.vec> should show the number of rows
+        and columns.

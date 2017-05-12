@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4d4b9fe7a9836ea619fbc68874efa7d7e6d60cd2 Build.PL
+SHA1 3b29b365a4cdf942f0eab9d537c0d93dd2007611 Changes
+SHA1 fb110d0098fa623a2d6566e86a6d630110f60d23 INSTALL
+SHA1 3170f39a524774094b99997ef580a9760a3d7757 MANIFEST
+SHA1 b42c7cde42d44221603a84f6bdfeb4a6005604e5 MANIFEST.SKIP
+SHA1 2df76dbe03a63cc8164fb816b328cf0235239e5e META.yml
+SHA1 d2f3d11e9f7f0fd886b47f9257352eb8b71bf4a8 check_max.c
+SHA1 21842315e5b12aac383ea48aa10a41a7ab95787d inc/Local/Module/Build.pm
+SHA1 f2cee8c7a7fd7e6422c19727ec5258e359b09803 lib/Time/y2038.pm
+SHA1 ddd3ef1934b37a4fe1644f8045a775a30278df72 lib/Time/y2038.xs
+SHA1 ad65a95fd786d4c53c453ee42055175a63dc080c lib/Time/y2038/Everywhere.pm
+SHA1 6c52173a196e81890474ea47f31ba2aeb3b7939c munge_config
+SHA1 1fa62ec9022c346fa26bf94652114e38b5efc5f0 t/everywhere.t
+SHA1 76efef2e7c55a7e351c62e44820f0f87b64d85a1 t/localtimetz.t
+SHA1 53f53a00f22f19b5f16d7801e730e57c173f61c7 t/time.t
+SHA1 851b9264b863b168ed07d17720e0176a0fe67d7c t/timegm.t
+SHA1 a915486e0da8713dead77ca21d041c8ae6b6676e typemap
+SHA1 b84518ded0b1ab0d30107cb4d4002bfa64757bff y2038/time64.c
+SHA1 0d7cf54304f41d3dbfd803d597c29d62b845ce2a y2038/time64.h
+SHA1 015c751b69ae7971c626034ad2b27eaabe5a76a7 y2038/time64_config.h.in
+SHA1 95314ecad677f573bf33bbb3c4b70d8880f15975 y2038/time64_limits.h.in
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.13 (Darwin)
+
+iEYEARECAAYFAku4BwEACgkQWMohlhD1QydTmgCg0dkZK9ux6iP9/KLwbhW+G2AA
+9pUAn2dkAgtjHD2DN/UQSjAvPnLY6o5a
+=cNQs
+-----END PGP SIGNATURE-----

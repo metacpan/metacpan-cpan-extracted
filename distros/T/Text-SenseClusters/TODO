@@ -1,0 +1,257 @@
+NAME
+    TODO - List of things TODO for SenseClusters
+
+SYNOPSIS
+    Plans for future versions of SenseClusters
+
+DESCRIPTION
+  Version 1.05 Todo
+    *   Add support for ngram cluster labeling to web interface?
+
+    *   Resolve Testing error in wordvec.pl, and also deprecated use of
+        defined in keyconvert.pl. These are known issues in 1.03.
+
+    *   Consider the use of SVDLIBC rather than SVDPACKC for SVD, however,
+        have been having problems compiling SVDLIBC on 64 bit platforms.
+
+    *   Testing of SVDPACK remains problematic, since results can vary from
+        platform to platform. At present we are simply testing to see if
+        output is created.
+
+    *   Introduction of CPAN style 'make test' option. Can be coded even for
+        command line interfaces, but can be a little messy, especially when
+        a program is not producing a single value but rather tables of
+        values or formatted text (which is often what we do). Must also do
+        this in such a way that it handles different file system (via
+        File::Spec probably).
+
+    *   Improve order 1 efficiency. Rather than matching each context
+        against every feature (regular expression), match each possible
+        feature in context with the features. The simple approach for
+        invoking count.pl for each context by creating a temporary file for
+        each context suffers from file and process creation overhead. Need
+        to investigate NSP APIs and use them so that features can be
+        identified from contexts in memory instead of having to create
+        temporary files.
+
+    *   Provide simple tools that allow a user to visualize more complicated
+        data structures like the 2nd order context vectors. For example,
+        right now a user can see the word vectors associated that will be
+        averaged together (in the .wordvec file), but they are purely
+        numeric. It would be nice to see what words are associated with
+        these values.
+
+    *   Make discriminate.pl more modular in its organization, possibly
+        through the use of subroutines. Reduce reliance on system calls
+        which can lead to portability problems.
+
+    *   Fix --showargs option on discriminate.pl. Has not been working for
+        many versions now.
+
+    *   Check to see if checking return values from vcluster and scluster in
+        discriminate.pl is really accomplishing anything. Do they return
+        error codes and success codes reliably? Any chance for false
+        positive or false negative?
+
+    *   Replace default stoplist with a program that automatically generates
+        stoplists from a given corpus.
+
+    *   Add version information to SenseClusters web interface, including
+        version of SenseClusters and modules it is using.
+
+    *   There are various small utility programs whose return codes are
+        checked by discriminate. These programs seem to always return via
+        exit, suggesting that their return codes are always for success. May
+        want to return a different value for failures so the discriminate.pl
+        checks are meaningful.
+
+    *   Reduce the number of regular expressions used in the regex file
+        provided to order2vec.pl for feature identification during LSA style
+        context clustering. This is required if we adhere to the
+        nsp2regex.pl approach for feature identification. Right now regexes
+        are generated from training data based on all the features found in
+        the training data. These are given as input to order1vec.pl to
+        identify features from test data. The number of features identified
+        form test data can be less than the number of regexes created from
+        training data (i.e. some regexes may not match anything in the test
+        data). Currently this same regex file is given as input to
+        order2vec.pl in LSA context clustering mode. So we also need to
+        additionally provide a feature file to order2vec.pl specifying what
+        features were actually found in test data
+        ($PREFIX.features_in_testdata file created by discriminate.pl). If
+        we create a regex file corresponding to just the regexes that
+        matched at least once in the test data, then just this new regex
+        file can be provided as input to order2vec.pl --featregex option.
+        This change needs to be done in order1vec.pl (just as currently it
+        prints clabels selectively for only those features that were found
+        in the test data, it can create a new regex file containing just the
+        regexes that matched at least once in the test data). An additional
+        FEATURE file will then no more be required by order2vec.pl in LSA
+        context clustering mode (the FEATURE file will still be required in
+        SC native word or context clustering).
+
+    *   Wherever possible and appropriate, add the error checks from
+        discriminate.pl to the actual programs that require that error
+        check. For example: Check for 0 zero features in order1vec.pl,
+        wordvec.pl and order2vec.pl
+
+    *   Check why the criterion function values as different across platform
+        (Linux vs. Solaris). Currently the test cases for clusterstopping.pl
+        used platform dependent checking - can it be made platform
+        independent?
+
+    *   The idea of global training data is to have one large file of plain
+        text that is used as a source of training data for multiple target
+        word discrimination problems. maketarget.pl used to produce regexes
+        of the form /(line)/, presumably to be used to identify target words
+        in plain corpora (where no head tags have been inserted). Does
+        SenseClusters support the identification of target word features
+        under these circumstances (where there is no head tag)? If so, we
+        should adjust maketarget.pl so that it continues to produce target
+        regexes of this form. As of 0.95 it only produces them with the head
+        tag. Right now discriminate.pl insists that training data have a
+        head tag in it to find tco. It seems like you should still be able
+        to try and find tco features if you have specified a plain text
+        regex such as we have above.
+
+    *   The gap statistic generates expected values for randomly created
+        matrices that have the same marginal totals as the observed data. In
+        some cases the expected values (for a criterion function) are
+        actually greater than the observed, which suggests that the random
+        data is in fact benefiting more from the clustering than the
+        observed data. It isn't clear why the expected values aren't always
+        less than the observed, since random data when clustered should not
+        really get better and better criterion function scores as the number
+        of clusters increases, or at least these should not be greater or
+        better than the observed values.
+
+  Version 0.98 and 1.00
+    Reorganize package, move to CPAN, make installation easier via a Bundle,
+    general clean up releases. (good start made)
+
+  Version 0.95 ToDo
+    1. Introduce LSA support for context discrimination. (Done)
+
+  Version 0.93 ToDo
+    1. Introducing feature_by_context/LSA support for word clustering (done)
+
+  Version 0.83 ToDo
+    1. Integrating Cluster Stopping (done)
+
+  Version 0.67 ToDo
+    1. Integrating gcluto (not done, on hold)
+
+  Version 0.65 ToDo
+    1. Taint flag (done)
+        Implement the taint mode.
+
+  Version 0.63 ToDo
+    *   Web Interface (done)
+
+        1. Time outs (done)
+            Currently if the given data or combinations of options leads to
+            longer than usual processing time then the web-interface just
+            hangs and does not give back any links to the results even if
+            the process has finished. Investigate if the problem is with
+            request time-out and find the solution for this problem.
+
+        2. Scope Options (done)
+            The current version of web-interface does not support the
+            scope_train and scope_test options. Implement the same.
+
+        3. Format option (done)
+            Also the format option is not available. Implement the same.
+
+        4. Taint flag (done)
+            Understand and implement the taint mode.
+
+  Version 0.61 Todo
+    *   Labeling Clusters (done)
+
+        Discovered clusters will be labeled with their most discriminating
+        features or with the actual dictionary glosses. This will indicate
+        which clusters represent which word senses.
+
+    *   svdpackout (continuing issue)
+
+        There remain problems with svdpackout test cases A1g, A1h, and A2 on
+        Solaris. These are due to precision issues with 64 bit CPUs, and
+        related issues, I think.
+
+    *   SVD on Order1 Type vectors (done)
+
+        Omit null columns from the order1 context vectors as created by
+        order1vec. This is causing a problem for mat2harbo.pl. Hence, SVD
+        fails on order1 type vectors at present.
+
+    *   Order1 Efficiency (continuing issue)
+
+        Order1 in its current form is way too slow even for few thousand
+        contexts and features. It needs to be improved speed wise.
+
+    *   Warnings in Demo (done)
+
+        Demo script makedata.sh shows Malformed UTF-8 warnings. Senseval-2
+        data needs to be cleaned or programs preprocess.pl and
+        prepare_sval2.pl need to be modified to avoid these encoding
+        warnings.
+
+    *   Multi-Lexelt (on hold)
+
+        preprocess.pl (and setup.pl that uses preprocess.pl) currently
+        splits given DATA on lexelts. Allow multiple lexelt functionality by
+        modifying preprocess.pl or using some other techniques ...
+
+        Amruta has some mixml scripts that can be made distributable to
+        handle this multi-lexelt issue. These scripts concatenate two xml
+        files and create a single xml file. These are useful to combine the
+        split lexelt results from setup/preprocess into a single
+        multi-lexelt file and also for supporting experiments on
+        multiple-lexelts as done in CONLL 2004.
+
+    *   Installation (on hold)
+
+        Update Makefile to check if SVDPACK, CLUTO are installed. If not,
+        warn users that options like --svd or cluto can't be used.
+        Auto-download and install CPAN modules like PDL, Bit::Vector.
+
+        One idea would be to bundle and redistribute all the required
+        modules and programs from other packages into SenseClusters' tarball
+        and install them like regular SenseClusters' code.
+
+    *   FAQs (ongoing)
+
+        Include questions that would be interesting to general user
+        community.
+
+  For later versions
+    *   Fuzzy Feature matching (still a good idea)
+
+        Perl supports fuzzy pattern matching ... might be useful in our
+        feature regex matching !
+
+    *   Technical report for SenseClusters - once the sparse matrix support
+        is available. (great idea)
+
+AUTHORS
+     Ted Pedersen, University of Minnesota, Duluth
+     tpederse at d.umn.edu
+
+     Amruta Purandare 
+     University of Pittsburgh
+
+     Anagha Kulkarni 
+     Carnegie-Mellon University
+
+COPYRIGHT
+    Copyright (C) 2005-2008 Ted Pedersen, Amruta Purandare, Anagha Kulkarni
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

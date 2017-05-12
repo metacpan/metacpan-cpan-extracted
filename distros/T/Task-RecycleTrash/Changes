@@ -1,0 +1,7 @@
+Changes for Perl extension Task-RecycleTrash
+
+1.01 Wed 14 Nov 2007
+	- Updating to Module::Install 0.68
+
+1.00 Fri 29 Jun 2007
+	- Creating first version

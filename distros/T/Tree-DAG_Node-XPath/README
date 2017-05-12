@@ -1,0 +1,33 @@
+Tree-DAG_Node-XPath version 0.06
+================================
+$Id: README,v 1.3 2006/01/24 17:47:14 mrodrigu Exp $
+
+Tree::DAG_NODE::XPath adds XPath support to Tree::DAG_Node trees
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tree::DAG_Node
+  Tree::XPathEngine
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Michel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

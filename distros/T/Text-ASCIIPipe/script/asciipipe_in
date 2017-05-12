@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+# Default to work from the repo, use the binary dir for libs.
+# I refrain from adding $HOME/lib/perl again ... use PERL5LIB.
+use FindBin qw($Bin);
+use File::Spec;
+use lib File::Spec->catfile($Bin,'..','lib');
+use Text::ASCIIPipe;
+
+use strict;
+
+if(@ARGV)
+{
+	for my $f (@ARGV)
+	{
+		print STDERR "Pushing '$f' to pipe.\n";
+		open(my $fh, '<', $f) or die "Cannot open $f! ($!)\n";
+		Text::ASCIIPipe::push_file($fh, undef);
+		print STDERR "Push done.\n";
+	}
+	# Be nice: Tell about end explicitly.
+	Text::ASCIIPipe::done();
+}
+else
+{
+	print STDERR "Please provide a set of files to push to STDOUT with ASCIIPipe separators.\n";
+}

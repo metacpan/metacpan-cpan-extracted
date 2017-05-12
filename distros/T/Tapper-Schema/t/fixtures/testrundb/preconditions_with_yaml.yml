@@ -1,0 +1,151 @@
+---
+
+# -------------------- testruns "lmbench"
+
+- schema: Testrun
+  name: lmbench
+  data:
+    id: 24
+    owner_id: 12
+    shortname: lmbench
+    notes: tapper test suite lmbench wrapper
+    topic_name: Distribution
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: tapper-tools
+  data:
+    id: 7
+    shortname: tapper-tools
+    precondition: |
+                name: foobar
+                precondition_type: subdir
+                subdir: foobar
+
+- schema: Precondition
+  name: perl-5.10
+  data:
+    id: 8
+    shortname: perl-5.10
+    precondition: |
+                name: foobar
+                precondition_type: package
+                subdir: foobar
+
+- schema: Precondition
+  name: gcc
+  data:
+    id: 9
+    shortname: gcc-4.2
+    precondition: |
+                name: foobar
+                precondition_type: package
+                subdir: foobar
+
+- schema: Precondition
+  name: glibc
+  data:
+    id: 10
+    shortname: glibc-2.1
+    precondition: |
+                name: foobar
+                precondition_type: package
+                subdir: foobar
+
+- schema: Precondition
+  name: mysql
+  data:
+    id: 11
+    shortname: mysql-5.1
+    precondition: |
+                name: foobar
+                precondition_type: package
+                subdir: foobar
+
+- schema: Precondition
+  name: sqlite3
+  data:
+    id: 12
+    shortname: sqlite-3.1.2
+    precondition: |
+                name: foobar
+                precondition_type: package
+                subdir: foobar
+
+# -------------------- "lmbench" <== "perl", "tapper-tools", "gcc", "glibc"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 8
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 7
+    succession: 2
+
+- schema: TestrunPrecondition
+  name: 3rd preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 9
+    succession: 3
+
+- schema: TestrunPrecondition
+  name: 4th preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 10
+    succession: 4
+
+# -------------------- "perl" <== "gcc", "glibc"
+
+- schema: PrePrecondition
+  name: 1st precondition for perl
+  data:
+    parent_precondition_id: 8
+    child_precondition_id: 9
+    succession: 1
+
+- schema: PrePrecondition
+  name: 2nd precondition for perl
+  data:
+    parent_precondition_id: 8
+    child_precondition_id: 10
+    succession: 2
+
+# -------------------- "tapper-tools" <== "gcc", "perl", "mysql", "sqlite3"
+
+- schema: PrePrecondition
+  name: make tapper-tools a parent for gcc
+  data:
+    parent_precondition_id: 7
+    child_precondition_id: 9
+    succession: 1
+
+- schema: PrePrecondition
+  name: make tapper-tools a parent for perl
+  data:
+    parent_precondition_id: 7
+    child_precondition_id: 8
+    succession: 2
+
+- schema: PrePrecondition
+  name: make tapper-tools a parent for mysql
+  data:
+    parent_precondition_id: 7
+    child_precondition_id: 11
+    succession: 3
+
+- schema: PrePrecondition
+  name: make tapper-tools a parent for sqlite3
+  data:
+    parent_precondition_id: 7
+    child_precondition_id: 12
+    succession: 4
+

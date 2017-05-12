@@ -1,0 +1,11 @@
+2004-12-07  Dominique Dumont  <domi@komarr.grenoble.hp.com> v1.002
+
+	* Hash/CustomStorage.pm (FETCH): initialize the storage value if
+	it's not defined (not only if it does not exist).
+
+2004-11-04  Dominique Dumont  <domi@komarr.grenoble.hp.com> v1.001
+
+	* Array/CustomStorage.pm : first version
+
+	* Hash/CustomStorage.pm: first version
+

@@ -1,0 +1,20 @@
+Revision history for Text-Identify-BoilerPlate
+
+0.3.1  18.08.2005
+        * _really_ removed dependency on Hash::Merge    
+
+0.3    18.08.2005
+        * Removed dependency on non-standard Hash::Merge
+        * min_dupl can be percentage of number of files
+        * rem-boilerplate-text configurable with command line
+          options
+
+0.2    16.08.2005
+        * Expanded documentation
+        * Added options for digest-mode, logfile and limiting 
+          search to headers and footers
+        * Bug in tests 
+
+0.1    14.08.2005
+        First version
+

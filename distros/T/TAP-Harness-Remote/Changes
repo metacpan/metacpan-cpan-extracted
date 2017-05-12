@@ -1,0 +1,18 @@
+Revision history for TAP-Harness-Remote
+
+1.10  Thu Jan 15 14:27:17 2009
+       Added support for remote environment variables
+       Fixed a bug that could cause continual $ENV{PERL5LIB} growth
+
+1.05  Mon Jan 12 23:58:04 2009
+       Add 'rsync_args' configuration
+
+1.00  Tue Sep 30 17:23:10 2008
+       Support multiple local testing roots
+
+0.02  Thu May 15 12:58:08 2008
+       Include missing YAML dep
+
+0.01  Fri Nov 30 14:11:58 2007
+       Initial release.
+

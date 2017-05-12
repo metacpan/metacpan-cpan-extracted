@@ -1,0 +1,40 @@
+---
+abstract: 'provides from_unixtime() and unix_timestamp()'
+author:
+  - 'Hiroki Honda <cside.story@gmail.com>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.3, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Time-Format-MySQL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Time::Format::MySQL:
+    file: lib/Time/Format/MySQL.pm
+    version: 0.03
+requires:
+  Time::Piece: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/Cside/Time-Format-MySQL/issues
+  homepage: https://github.com/Cside/Time-Format-MySQL
+  repository: git://github.com/Cside/Time-Format-MySQL.git
+version: 0.03

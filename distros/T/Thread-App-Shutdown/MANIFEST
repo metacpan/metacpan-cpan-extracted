@@ -1,0 +1,8 @@
+Build.PL
+ChangeLog
+ChangeLog.xml
+lib/Thread/App/Shutdown.pm
+MANIFEST			This list of files
+META.yml
+t/01_inline.t
+t/02_pod.t

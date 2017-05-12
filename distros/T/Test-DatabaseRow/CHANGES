@@ -1,0 +1,103 @@
+2.04  Add support to dump out the results from the database as
+      diagnosics with verbose_data / TEST_DBROW_VERBOSE_DATA
+
+2.03  Wrap qw() with () in foreach loops (thus avoiding deprecation
+      warnings on 5.14.  (Thanks to Gabor Szabo for pull request)
+
+      Fix tests to delete sqlite test database on Windows (Thanks
+      to Gabor Szabo for pull request)
+
+2.02  Changed "label" to "diagnostic" (but kept backwards compatible
+      accepting of old object.)
+
+      Fix bug where an invalid comparison operator would cause test
+      failure rather than throwing an exception (bad input should
+      create exceptions, not fail tests)
+
+      Added better error messages when passing invalid tests in.
+
+      Improved commenting and flow control for better maintainability.
+
+2.01  Add tests that use DBD::SQLite to test a real database
+
+      Fix the bugs with the DBI interface (thanks to ilmari for pointing
+      these out)
+
+2.00  Added Test::DatabaseRow::Object and Test::DatabaseRow::Result.
+      
+      Rewrote Test::DatabaseRow to use these classes to do everything
+
+      Added "all_rows_ok" function and ability to check all database rows
+      returned
+
+      improved test coverage.
+
+      Fix for bug where 
+         tests => [ "time" => "2011-11-11 11:32:26" ]
+      would have been interpreted as 
+         tests => { '==' => { "time" => "2011-11-11 11:32:26" } }
+      not
+         tests => { 'eq' => { "time" => "2011-11-11 11:32:26" } } 
+
+1.05  fix for 5.13.6+ new regualar expression stringification breaking our own
+      test suite
+
+      Moved to Module::Install instead of Module::Build.
+
+      Add standard Kwalitee tests and make them pass.
+
+      Fixed the eval statements to cope with resetting of $@ in a DESTROY
+      block (an issue in Perl 5.12 and below)
+
+      Addressed a bug that could leave fatal errors enabled on on the passed
+      database handle after an exception had been raised
+
+      Addresses a bug where the arrayref passed as the "sql" argument
+      would be altered
+
+      Improved the documentation
+
+      Refactored a lot of code;  Switch bracing convention.  Removed the
+      sub package.
+
+      Disabled "use warnings" making this compatible with 5.004
+
+      (this release never made it to the CPAN)
+
+1.04  added utf8 hack to allow data from the database to be marked as utf8
+      before it's compared to anything
+
+1.03  added the ability to get at the results after you've run row_ok
+
+1.02  Added Build.PL to the MANIFEST (oops)
+
+      Patches from Andy Lester to mean:
+
+      Fixed docs on not_row_ok.
+
+      results, max_results and min_results now show the actual
+      incorrect values, instead of hardcoded leftovers.
+
+1.01  added negative assertions, due to request from pudge and
+      Andy reminding me about it.
+
+1.00  finally fixed warnings problem with Leon Brocard's help
+      added bind parameters with arrayref being passsed to sql
+      added documentation of how to use with SQL::Abstract
+
+0.06  allowed test without 'tests' to just check for existance
+      of rows
+
+0.05  added Test::Warn based tests
+
+0.04  verbose mode added
+      WHERE 1 = 1 removed due to Richard Clamp's nagging
+
+0.03  NULL behavior added
+      Proper error messages for missing columns
+      check die on problem with the SQL
+
+0.02  Documentation typos patched by Kate L Pugh
+
+0.01  Inital Release
+      

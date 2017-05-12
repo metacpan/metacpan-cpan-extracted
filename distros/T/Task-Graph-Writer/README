@@ -1,0 +1,65 @@
+NAME
+    Task::Graph::Writer - Install the Graph::Writer modules.
+
+SYNOPSIS
+     cpanm Task::Graph::Writer
+
+SEE ALSO
+    Graph::Writer
+        base class for Graph file format writers
+
+    Graph::Writer::Cytoscape
+        Write a directed graph out as Cytoscape competible input file
+
+    Graph::Writer::DSM
+        draw graph as a DSM matrix
+
+    Graph::Writer::DSM::HTML
+        draw graph as a DSM matrix in HTML format
+
+    Graph::Writer::daVinci
+        write out directed graph in daVinci format
+
+    Graph::Writer::Dot
+        write out directed graph in Dot format
+
+    Graph::Writer::DrGeo
+        Save the graph output DrGeo scheme script.
+
+    Graph::Writer::Graph6
+        write Graph in graph6 format
+
+    Graph::Writer::GraphViz
+        GraphViz Writer for Graph object
+
+    Graph::Writer::HTK
+        write a perl Graph out as an HTK lattice file
+
+    Graph::Writer::Sparse6
+        write Graph in sparse6 format
+
+    Graph::Writer::TGXML
+        write out directed graph as TouchGraph LinkBrowser XML
+
+    Graph::Writer::VCG
+        write out directed graph in VCG format
+
+    Graph::Writer::XML
+        write out directed graph as XML
+
+REPOSITORY
+    <https://github.com/tupinek/Task-Graph-Writer>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

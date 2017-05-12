@@ -1,0 +1,19 @@
+0.0.5
+- added kwalitee tests to MANIFEST
+- fixed version string error
+
+0.0.4
+- added kwalitee tests
+- fixed a POD error
+
+0.0.3
+- added "version" to prereqs
+- added .perlcriticrc
+- updated docs and code to allow perlcritic -1 to pass (with .perlcriticrc)
+
+0.0.2 - Dec 25 2007
+- updated tests
+- updated docs
+
+0.0.1 - Dec 22 2007
+- first (unreleased) version

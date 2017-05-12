@@ -1,0 +1,74 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Types-LoadableClass
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Types-LoadableClass
+
+Files: t/all_imports.t
+ t/basic.t
+ t/clobber_dollerunderscore.t
+ t/lib/ClobberDollarUnderscore.pm
+ t/lib/FooBarTestClass.pm
+ t/lib/FooBarTestRole.pm
+ t/no_moose.t
+Copyright: This software is copyright (c) 2010 by Infinity Interactive, Inc.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/lib/FooBarTestClassMoo.pm
+ t/lib/FooBarTestClassPlain.pm
+ t/lib/FooBarTestRoleMoo.pm
+ t/lib/FooBarTestRolePlain.pm
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+ dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Types/LoadableClass.pm
+Copyright: This software is copyright (c) 2013-2014 by Dagfinn Ilmari MannsÃ¥ker,.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/expand-prefix.t
+Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/basic-moo.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+ This software is copyright (c) 2010 by Infinity Interactive, Inc.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

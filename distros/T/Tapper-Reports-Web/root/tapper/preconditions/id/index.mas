@@ -1,0 +1,18 @@
+<%args>
+$precondition
+</%args>
+
+% use YAML::Syck;
+
+<h3>Precondition <% $precondition->{id} %></h3>
+
+% delete $precondition->{id};
+<pre>
+<% Dump $precondition %>
+</pre>
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+
+
+

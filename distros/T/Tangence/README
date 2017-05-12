@@ -1,0 +1,19 @@
+NAME
+
+    Tangence - attribute-oriented server/client object remoting framework
+
+DESCRIPTION
+
+    Like CORBA only much smaller, lighter, and with heavy emphasis on
+    attributes of remoted objects, including notifications of modification
+    and atomic update operations.
+
+TODO
+
+    Docs. Other languages. Static metadata. Other metadata backend
+    generation - Moose?
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

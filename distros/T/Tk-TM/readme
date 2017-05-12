@@ -1,0 +1,74 @@
+DESCRIPTION
+
+	Tk::TM - User interface for database applications.
+	Tk::TM - Tk Transaction Manager - screen transactions with user.
+
+	This module is something like 'Transaction Manager' in JYACC JAM RAD.
+	It releases user interface for database applications - 
+	screen transactions with user.
+	It contains data manipulation object (Tk::TM::DataObject),
+	data widgets (tmTable, tmBlank),
+	menu and action bar widgets (tmMenu, tmActionBar, 
+	based on Tk::TM::DataObjSet).
+
+	Tk::TM::wApp - Tk Transaction Manager Application Window.
+	This is level above Tk::TM::Lib.
+
+	Tk::TM::Try - Tk Transaction Manager Error processing functions.
+	Implements error processing functions may be used (or not be used)
+	in application.
+
+SYNOPSIS
+
+	use Tk::TM::Lib;
+	Tk::TM::Common::DBILogin('dsn', 'user', '');
+	my $mw =new Tk::MainWindow;
+	my $mnu =$mw->tmMenu;
+	my $tbl =$mw->tmTable(-rowcount=>3, -colspecs=>
+			[['col1','Entry']
+			,['col2','Entry']
+			,['col3','Entry']
+			])->form(-t=>$mnu);
+	my $bln =$mw->tmBlank(-wgspecs=>
+			[['col1','Entry']
+			,['col2','Entry']
+			,['col3','Entry',-width=>30]
+			])->form(-t=>$tbl);
+	my $sub =sub{ my $self =shift;
+		if    ($_[0] eq 'dbRead') {$self->DBICmd('select * from table')}
+		elsif ($_[0] eq 'dbIns')  {$self->DBICmd('insert...')}
+		elsif ($_[0] eq 'dbUpd')  {$self->DBICmd('update...')}
+		elsif ($_[0] eq 'dbDel')  {$self->DBICmd('delete from table...')}
+		else                      {$self->doDefault(@_)}
+		};
+	new Tk::TM::DataObject(-cbcmd=>$sub, -wgtbl=>$tbl, -wgbln=>$bln);
+	$mnu->Retrieve;
+	Tk::MainLoop;
+
+
+AUTHOR
+
+	Andrew V Makarow <makarow@mail.com>, Denis E Medveduyk <demed@mail.com>
+	
+COPYRIGHT
+	
+	This program is free software; you can redistribute it and/or modify 
+	it under the same terms as Perl itself.
+	
+PREREQUISITES
+
+	Developed and tested with
+		Active Perl 5.005 builds 508, 509, 522;
+		Tk 800.012, 800.013, 800.019;
+		DBI 1.02, 1.06, 1.13
+
+HOW TO BUILD AND INSTALL
+
+	Just type:
+	
+		perl Makefile.PL
+		make
+		make test	# you may run ./examples also
+		make install
+	Or:
+		copy ./lib/Tk/TM/* into perl/site/lib/Tk/TM

@@ -1,0 +1,55 @@
+NAME
+    Text::ResusciAnneparser - Parser for XML logfiles of the Resusci Anne
+    Skills Station software
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+    my $certificates = Text::ResusciAnneparser->new(infile =>
+    'certificates.xml');
+
+DESCRIPTION
+    The Resusci Anne Skills Station is a basic life support training station
+    used by people involved in first-line support in healthcare. The
+    training station keeps track of who trained when. This module enables
+    parsing the xml output file to be able to process the data.
+
+METHODS
+  "new(%parameters)"
+    This constructor returns a new Text::ResusciAnneparser object. Supported
+    parameters are listed below
+
+    infile
+        The input file containing the raw data log of the skill station
+        software
+
+  "certified"
+    Returns a hash of people who received a valid training certificate. The
+    hash contains keys with the training dates in the format YYYY-MM-DD. The
+    value attached to a date key in the hash is an array of people.
+
+    A single person entry is a hash containing the givenname and the
+    familiname of a person.
+
+    E.g. '2013-04-07' => [ { 'givenname' => 'Piet', 'familyname' => 'Konijn'
+    } ], '2013-03-25' => [ { 'givenname' => 'Zjuul', 'familyname' => 'Cesar'
+    }, { 'givenname' => 'Pette', 'familyname' => 'Sjiekke' } ]
+
+  "in_training"
+    Returns an array of people who started the exercise but who did not
+    completed it and hence have not received a certificate yet
+
+  BUILD
+    Helper function to run custome code after the object has been created by
+    Moose.
+
+AUTHOR
+    Lieven Hollevoet <hollie@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Lieven Hollevoet.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

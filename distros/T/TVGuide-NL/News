@@ -1,0 +1,9 @@
+0.14:
+ - Fixed the whats_on() and whats_next() functions to also work around
+   midnight
+ - Removed obsoleted code
+ - Fixed a few typos
+0.13:
+ - Fixed typos to fix function calls
+0.12: 
+ - Initial release to CPAN

@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Text/Filter/Chain.pm
+t/simple.t

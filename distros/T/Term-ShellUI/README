@@ -1,0 +1,73 @@
+
+
+                       Term::ShellUI
+
+
+Term::ShellUI makes it easy to implement a comprehensive Bash or
+GDB-like command line user interface.  It supports history,
+autocompletion, quoting, escaping, pretty much everything you would
+expect of a decent shell.
+
+Homepage:   http://github.com/bronson/Term-ShellUI
+CPAN:       http://search.cpan.org/search?query=Term%3A%3AShellUI
+
+
+CODE
+
+Git: git clone git://github.com/bronson/Term-ShellUI.git
+Svn: svn co http://svn.github.com/bronson/Term-ShellUI.git Term-ShellUI
+
+
+PREREQUISITES
+
+None!  It runs just fine with Perl's default Term::ReadLine.  However,
+unless you install Term::ReadLine::GNU, basic functionality like
+completion, line editing, and history will not work.
+
+If you're on Windows then Term::ReadLine::Perl will be easier to install
+and work almost as well.  The only limitation is that it can't print
+hints for the user during completion (the completemsg call).
+
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+USAGE
+
+Run examples/synopsis-big.  Type 'help' to display the available commands
+or 'help exists' to show detailed help for the exists command.  Notice how
+everything can be tab-completed.  Try passing the wrong number of
+arguments to a command.  Scroll back through history using the up arrow
+or Control-R.  Also try using the history command.
+
+Run 'perldoc lib/Term/ShellUI.pm' to see the API documentation.
+
+Report bugs and submit patches via GitHub.
+
+
+ALTERNATIVES
+
+Term::CiscoCLI         http://ciscocli.sourceforge.net/
+  A fork/rewrite to make the command line feel like a Cisco
+  (Stanford) style CLI.  Also adds a bunch of useful features.
+
+Term::TUI
+  Presents a hierarchical command line interface.
+
+
+LICENSE
+
+Copyright (c) 2003-2011 Scott Bronson, all rights reserved.
+All the code in this archive is covered by the MIT license.
+
+
+AUTHOR
+
+Scott Bronson
+bronson@rinspin.com
+

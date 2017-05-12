@@ -1,0 +1,355 @@
+=head1 NAME
+
+Tk::QuickTk::details - precise definition of usage details
+
+=head1 SYNOPSIS
+
+  use Tk;
+  use Tk::QuickTk
+
+  # need to set $filename, e.g.:  my $filename='miniapp.qtk';
+
+  my $app=Tk::QuickTk->new($filename);
+  die "QuickTk constructor unable to read GUI spec: $filename\n"
+    unless defined $app;
+
+  MainLoop;die "QuickTk fell through past MainLoop\n";
+
+or, alternatively, make a QuickTk script directly executable (in
+the case of a unix-lookalike operating system) with the following
+first line (see full demo script in EXAMPLES, below):
+
+  exec /usr/bin/perl -M'Tk::QuickTk=app' -e app $0;exit
+
+=head1 DESCRIPTION
+
+This document gives precise and exhaustive usage details for the
+B<TK::QuickTk> module.  It describes the variables available to
+script code, and the constructor and other user-callable functions
+available.
+
+=head1 GLOBAL VARIABLES: B<$gl>
+
+A hash of variables that are made available everywhere, is often
+referred-to by the name, I<$gl>.  The name, I<$w>, is also made
+available as a shorter synonym for I<$$gl{widgets}> because it is
+so often useful.
+
+=head2 B<$$gl{inicode}>:
+
+This variable is where initialization code for the application will
+be stored, taken from the "ini" configuration option for the MainWindow
+widget in an application.
+
+=head2 B<$$gl{widgets}>:
+
+This variable is also available to callback code via the name, I<$w>,
+for short, because it is so often useful.  It is a hash containing
+references to all the widgets of the application, with keys that are
+the (full) names of each (as the concatenation of all the names given
+in the specification for the parents and the widget in question).
+
+=head2 B<$$gl{genonly}>:
+
+This variable is boolean, and indicates whether the specification
+requested code generation only and, thus, no execution of the program.
+
+=head2 B<$$gl{menutypes}>:
+
+This variable is a list of the known types for menus.
+
+=head2 B<$$gl{lname}>:
+
+This variable is the name of the file to which code generation is to
+be written, if requested.
+
+=head2 B<$$gl{lfh}>:
+
+This variable contains the filehandle of the file to which code
+generation is to be written, if requested.
+
+=head2 B<$$gl{_prop}>:
+
+This variable contains a reference to the original prototype for the
+global variables hash, before its contents are copied to the blessed
+hash for the module itself.
+
+
+=head1 FUNCTION: B<new> [ I<spec>, [ I<codeout>, [ I<genonly> ] ] ]
+
+The constructor (function "B<new>") for module B<Tk::QuickTk>
+can be invoked with zero, one, two or three parameters.  The first
+is a GUI specification, which can take several forms, as below,
+under L<"spec">; the second, a filename for logging generated code;
+and the third, a generate-only flag.  If no parameters are specified,
+an object (a blessed reference to a hash) will be returned with
+only the prototype entries present.  In this case one might create
+a GUI spec by other external means and put it into the hash.
+
+=head2 Parameter: I<spec>
+
+If at least one parameter is specified, the first will be taken
+to be the specification for a GUI based application.  This spec
+may be in one of three forms:  (1) a filename, (2) a reference blessed
+into the B<Text::TreeFile> class, or (3) a reference to a tree of text
+strings, like the one B<Text::TreeFile> would produce.
+
+=over 4
+
+=item B<spec> parameter: as filename
+
+If the spec parameter is a scalar, but not a reference, it will
+be interpreted as a filename and passed to module B<Text::TreeFile>
+to create a tree of strings.  This tree will be used as the GUI
+specification for further processing.
+
+=item B<spec> parameter: as B<Text:TreeFile> ref
+
+If the I<spec> parameter is a reference that has been blessed into
+the B<Text::TreeFile> class, the resulting tree of strings will be
+used as the GUI specification for further processing.
+
+=item B<spec> parameter: as tree of strings
+
+If the spec parameter is a reference to an array of the correct
+form to be a string tree node, it will be interpreted as the GUI
+specification for further processing.
+
+=back
+
+=head2 Parameter: I<codeout>
+
+If at least two parameters are specified in the call to B<new()>, the
+second will be interpreted as a filename for output logging of the
+generated B<perl-tk> code.  If the I<undef> value is specified, then logging
+will not occur.  If this parameter is not specified, the default is
+not to log generated code to a file at all.
+
+=head2 Parameter: I<genonly>
+
+If three parameters are specified in the call to B<new()>, the third
+will be interpreted as a flag indicating whether to execute the B<perl-tk>
+code generated.  If the I<undef> value is specified or this parameter is
+not specified, the default is to execute the code generated.  If a
+value is specified, then no generated B<perl-tk> code will be executed.
+
+=head2 Throws: Exceptions and other anomolies
+
+=over 4
+
+=item "can't read QuickTk spec file: I<filename>"
+
+Croaks if a file is indicated for the GUI specification, but a file can't
+be read, with the name given.
+
+=item "can't make a new Tk::QuickTk from spec: I<spec>"
+
+Croaks if the I<spec> parameter can't be interpreted as one of the known
+types of specification (I<filename>, I<Text::TreeFile ref>,
+I<tree of strings, like Text::Treefile produces>).
+
+=item "failed to execute initialization code"
+
+Croaks if initialization code is specified with an I<"ini"> option to the
+(top-vevel) MainWindow widget, but the code can't be executed.
+
+=back
+
+=head2 See Also:
+
+(nothing written, yet.)
+
+
+=head1 FUNCTION: B<app> [ [ I<genonly> ] I<gfilename> ]
+
+This function is most frequently the only one directly called for an
+application.  It reads a script file, optionally generates Tk code to
+an output file, and enters the Tk MainLoop which should never return.
+Thus this function should not produce a return value.
+
+When it is invoked, a commandline parameter must be present, to indicate
+a filename from which a specification file is to be read by companion
+module I<Text::TreeFile>.
+
+It can be invoked with zero, one or two parameters.  If the first is
+present, it indicates whether to generate code output for the Tk module
+to a file.
+
+=head2 (Commandline) Parameter: I<input spec filename>
+
+A filename must be specified on the commandline, for a specification
+file to be read by the I<Text::TreeFile> companion module, to use
+this function.  Most frequently, this is the name of the script file
+that invoked the I<app()> function (see the second example in SYNOPSIS,
+above -- the line that begins with "exec ").
+
+=head2 Parameter: I<gen> (optional)
+
+If a first parameter is specified in calling I<app()>, it may be 'nogen'
+or any other value (e.g. 'gen').  If 'nogen' is specified, I<app()> will
+not generate code to a file (the default behavior).
+
+  Otherwise, I<app()> will generate Tk code to a file for later perusal
+or execution.  In the latter case, if no output filename is specified
+in a second parameter, the (commandline) input filename -- with '.pl'
+appended -- will be used as the filename for the generated code file
+to be output.
+
+=head2 Parameter: I<gname> (optional)
+
+If two parameters are specified, and the first isn't 'nogen', the second
+will be taken as the name -- with '.pl' appended -- for the generated
+code file to be output, 
+
+=head2 Throws: Exceptions and other anomolies
+
+=over 4
+
+=item "Tk::QuickTk::app() found no filename on the command line"
+
+Carps if the commandline has no arguments specified when this function
+is called.
+
+=item (Unresolved issue)
+
+It looks as if when the function carps (as above) because no filename
+was provided on the commandline, it still enters the Tk MainLoop.
+
+=back
+
+=head2 See Also:
+
+(Nothing written yet.)
+
+
+=head1 FUNCTION: B<createwidget> I<args> I<specname>
+
+Creates and packs a widget specified earlier, but with the 'nocreate'
+packing option.  It's called by a callback function, on the fly,
+during execution of the application, at the time the widget is to be
+created and packed to show up on the screen.  The B<createwidget()>
+method takes two parameters:
+
+=head2 Parameter: I<args>
+
+A reference to an array containing values to which the B<QuickTk>
+script widget specification refers, by names B<$0>, B<$1>, ...,
+
+=head2 Parameter: I<specname>
+
+The name of the widget specified earlier in the script, with the
+'nocreate' packing option set.  This would normally be called by a
+callback function specified somewhere in the script, to create a
+widget previously specified but not yet created.  The description
+of the widget to create had been saved, at 'nocreate' time, in an
+array with eight elements:
+
+=over 4
+
+=item 1. I<$level>
+
+The hierarchical nesting level, from the MainWindow as level 0.
+
+=item 2. I<$momname>
+
+The name of the parent of the widget to create.
+
+=item 3. I<$momidx>
+
+If this widget is a menuitem,
+the sequential index of the item in the parent menu.
+
+=item 4. I<$name>
+
+The name of the widget to create.
+
+=item 5. I<$type>
+
+The Tk widget type of the widget to create.
+
+=item 6. I<$cfg>
+
+The configuration options for the widget.
+
+=item 7. I<$pak>
+
+The packing options for the widget.
+
+=item 8. I<$children>
+
+The children to create nested within this widget.
+
+=back
+
+=head2 Returns: None
+
+=head2 Throws: Exceptions and other anomolies
+
+=over 4
+
+=item "couldn't find "<widgetname>" widget to create"
+
+croaks if there's no widget by the name given.
+
+=item "failed to create menu item I<menuitem name>"
+
+croaks if 
+
+=item "failed to configure I<menuitem name>"
+
+croaks if 
+
+=item "failed to create Menu: i<menu name>"
+
+croaks if 
+
+=item "failed to configure menu item I<menu name>"
+
+croaks if 
+
+=item "failed to create I<widgetname>: I<parent name>/I<widget type>"
+
+croaks if 
+
+=item "failed to create I<menu name> for Menubutton I<menubutton name>"
+
+croaks if 
+
+=item "failed to configure Menubutton I<menubutton name>"
+
+croaks if 
+
+=item "failed to pack I<widget name>"
+
+croaks if 
+
+=back
+
+=head2 See Also:
+
+(Nothing written, yet.)
+
+
+=head1 TEST SCRIPT: B<test.pl>
+
+(Not written yet.)
+
+=head1 EXPORTS
+
+Nothing is exported by default.  Functions B<app()> and B<createwidget()>,
+may be imported on request.  The module's B<new()> function returns a
+blessed reference to a hash which contains a number of data items. (Refer
+to L<Tk::QuickTk::internals> for details, if you want them.)  This hash
+acts as a global repository for variables accessible to the application.
+See L<Tk::QuickTk::scripts> for instruction and sample uses of this
+facility.
+
+=head1 EXCEPTIONS
+
+(Not written yet.)
+
+=head1 BUGS
+
+(Not written yet.)
+
+=cut

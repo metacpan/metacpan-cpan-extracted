@@ -1,0 +1,507 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use TV::Mediathek;
+use Getopt::Long;
+use Log::Log4perl;
+use YAML::Any qw/Dump LoadFile DumpFile/;
+use Encode;
+use File::Util;
+use Data::Dumper;
+use File::HomeDir;
+use File::Spec::Functions qw/catfile/;
+use Pod::Usage;
+
+$SIG{'INT'}  = 'cleanup';
+$SIG{'QUIT'} = 'cleanup';
+
+my %params;
+my $result = GetOptions(
+    \%params,
+    'agent=s',
+    'cache_dir=s',
+    'cache_time=i',
+    'cookie_jar=s',
+    'timeout=i',
+    'flvstreamer=s',
+    'proxy=s',
+    'socks=s',
+    'config=s',
+    'test',
+    'tries=i',
+
+    # Filters
+    'channel=s',
+    'theme=s',
+    'title=s',
+    'date=s',
+    'id=i',
+
+    # Required for downloading
+    'target_dir=s',
+
+    # Actions: refresh_media, download, count, list,
+    # add_abo, del_abo, run_abo, list_abos
+    'action=s',
+
+    # Help
+    'help',
+);
+
+
+if ( !$result ) {
+    pod2usage( 
+	-message    => "Illegal arguments...",
+	-verbose    => 1,
+	-exitval    => 1,
+	);
+}
+
+if ( $params{help} ) {
+    pod2usage(
+	-verbose => 1,
+	);
+}
+
+# Default params
+%params = (
+    config  => catfile( File::HomeDir->my_home(), '.mediathekp', 'config' ),
+    %params
+    );
+
+if ( $params{config} && -f $params{config} ) {
+    eval {
+        my $load_params = LoadFile( $params{config} );
+        foreach ( keys( %$load_params ) ) {
+            $params{$_} = $load_params->{$_};
+        }
+    };
+    if ( $@ ) {
+        die( "Could not load config from $params{config}: $@\n" );
+    }
+}
+
+my $f = File::Util->new();
+%params = (
+    agent       => 'Mediathek-PL/0.2',
+    cache_dir   => catfile( File::HomeDir->my_home(), '.mediathekp', 'cache' ),
+    cache_time  => 0,
+    timeout     => 10,
+    cookie_jar  => catfile( $params{cache_dir}, 'cookie_jar.dat' ),
+    %params,
+    );
+
+if ( ! -d $params{cache_dir} ) {
+    pod2usage( 
+	-message    => sprintf( "cache_dir (%s) must exist\n", $params{cache_dir} ),
+	-exitval    => 2,
+	);
+}
+
+# Pass the memory usage monitor to Mediathek
+my $downloader = TV::Mediathek->new( %params );
+my $logger     = Log::Log4perl->get_logger();
+
+$logger->debug( "Created Mediathek" );
+if ( $params{action} ) {
+    if ( $params{action} eq 'refresh_media' ) {
+
+        # Refresh the media listing?
+        $downloader->refresh_media();
+    } elsif ( $params{action} eq 'download' ) {
+
+        # Download videos
+        $downloader->get_videos(
+            {
+                channel  => $params{channel},
+                theme    => $params{theme},
+                title    => $params{title},
+                date     => $params{date},
+                media_id => $params{id},
+                test     => $params{test},
+            }
+        );
+    } elsif ( $params{action} eq 'count' ) {
+
+        # Count the number of videos
+        my $count_videos = $downloader->count_videos(
+            {
+                channel  => $params{channel},
+                theme    => $params{theme},
+                title    => $params{title},
+                date     => $params{date},
+                media_id => $params{id},
+            }
+        );
+        print "Number of videos matching: $count_videos\n";
+    } elsif ( $params{action} eq 'list' ) {
+        print list( $downloader );
+    } elsif ( $params{action} eq 'init_db' ) {
+        $downloader->init_db();
+    } elsif ( $params{action} =~ /^add_abo,(\w+),(\d+)/ ) {
+        $downloader->add_abo(
+            {
+                name    => $1,
+                expires => $2,
+                channel => $params{channel},
+                theme   => $params{theme},
+                title   => $params{title},
+            }
+        );
+    } elsif ( $params{action} =~ /^del_abo,(\w+)/ ) {
+        $downloader->del_abo( { name => $1 } );
+    } elsif ( $params{action} =~ /^run_abo,(\w+)/ ) {
+        $downloader->run_abo( { name => $1 } );
+    } elsif ( $params{action} eq 'list_abos' ) {
+        print list_abos( $downloader );
+    } elsif ( $params{action} eq 'list_downloads' ) {
+        print list_downloads( $downloader );
+    } elsif ( $params{action} =~ /^del_download,(\d+)/ ) {
+        $downloader->del_downloaded( { id => $1 } );
+    } else {
+        die( "Unknown action: $params{action}" );
+    }
+}
+
+$logger->debug( "Just before natural exit" );
+
+exit( 0 );
+
+sub get_log_filename {
+    return $params{cache_dir} . $f->SL() . 'debug.log';
+}
+
+sub cleanup {
+    my ( $sig ) = @_;
+    $logger->warn( "Caught a SIG$sig--shutting down" );
+    exit( 0 );
+}
+
+sub list {
+    my ( $downloader ) = @_;
+    my $list = $downloader->list(
+        {
+            channel  => $params{channel},
+            theme    => $params{theme},
+            title    => $params{title},
+            date     => $params{date},
+            media_id => $params{id},
+        }
+    );
+    if ( !$list or !$list->{channels} ) {
+        return "No matches found\n";
+    }
+
+    if ( !$list->{themes} ) {
+        return list_channels( $list );
+    } elsif ( !$list->{media} and $list->{themes} ) {
+        return list_themes( $list );
+    } elsif ( $list->{media} and $list->{themes} ) {
+        return list_titles( $list );
+    } else {
+        return "No suitable list to print...\n" . Dumper( $list ) . "\n";
+    }
+}
+
+sub list_channels {
+    my $list = shift;
+
+    my $fmt = ( ' ' x 4 ) . "%s\n";
+    my $rtn = sprintf( $fmt, 'Channel' );
+    $rtn .= sprintf( $fmt, '=======' );
+    foreach ( sort ( values( %{ $list->{channels} } ) ) ) {
+        $rtn .= sprintf $fmt, $_;
+    }
+    return $rtn;
+}
+
+sub list_themes {
+    my $list = shift;
+
+    # Find length of longest channel name
+    my $max_channel = length( "Channel" );
+    foreach ( keys( %{ $list->{channels} } ) ) {
+        if ( !$max_channel || length( $list->{channels}->{$_} ) > $max_channel ) {
+            $max_channel = length( $list->{channels}->{$_} );
+        }
+    }
+
+    my $fmt = ( ' ' x 4 ) . '%-' . $max_channel . "s || %s\n";
+    my $rtn = sprintf( $fmt, 'Channel', 'Theme' );
+    $rtn .= sprintf( $fmt, '=======', '=====' );
+    foreach my $channel_id ( sort { $list->{channels}->{$a} cmp $list->{channels}->{$b} } ( keys( %{ $list->{channels} } ) ) ) {
+        foreach my $theme_id ( sort { $list->{themes}->{$a}->{theme} cmp $list->{themes}->{$b}->{theme} } ( keys( %{ $list->{themes} } ) ) )
+        {
+            $rtn .= sprintf( $fmt, $list->{channels}->{$channel_id}, $list->{themes}->{$theme_id}->{theme} );
+        }
+    }
+    return $rtn;
+}
+
+sub list_titles {
+    my $list = shift;
+
+    # Find length of longest channel name
+    my $max_channel = length( 'Channel' );
+    foreach ( keys( %{ $list->{channels} } ) ) {
+        if ( !$max_channel || length( $list->{channels}->{$_} ) > $max_channel ) {
+            $max_channel = length( $list->{channels}->{$_} );
+        }
+    }
+
+    # Find length of longest theme
+    my $max_theme = length( 'Theme' );
+    foreach ( keys( %{ $list->{themes} } ) ) {
+        if ( !$max_theme || length( $list->{themes}->{$_}->{theme} ) > $max_theme ) {
+            $max_theme = length( $list->{themes}->{$_}->{theme} );
+        }
+    }
+
+    my $fmt = ( ' ' x 4 ) . '%-5s || %-' . $max_channel . "s || %-" . $max_theme . "s || %-10s || %s\n";
+    my $rtn = sprintf( $fmt, 'ID', 'Channel', 'Theme', 'Date', 'Title' );
+    $rtn .= sprintf( $fmt, '==', '=======', '=====', '====', '=====' );
+    foreach my $channel_id ( sort { $list->{channels}->{$a} cmp $list->{channels}->{$b} } ( keys( %{ $list->{channels} } ) ) ) {
+        foreach my $theme_id ( sort { $list->{themes}->{$a}->{theme} cmp $list->{themes}->{$b}->{theme} } ( keys( %{ $list->{themes} } ) ) )
+        {
+            if ( $list->{themes}->{$theme_id}->{channel_id} eq $channel_id ) {
+                foreach
+                  my $media_id ( sort { $list->{media}->{$a}->{title} cmp $list->{media}->{$b}->{title} } ( keys( %{ $list->{media} } ) ) )
+                {
+                    if ( $list->{media}->{$media_id}->{theme_id} eq $theme_id ) {
+                        $rtn .= sprintf( $fmt,
+                            $media_id,
+                            $list->{channels}->{$channel_id},
+                            $list->{themes}->{$theme_id}->{theme},
+                            $list->{media}->{$media_id}->{date},
+                            $list->{media}->{$media_id}->{title} );
+                    }
+                }
+            }
+        }
+    }
+    return $rtn;
+}
+
+sub list_abos {
+    my ( $downloader ) = @_;
+    my @list = $downloader->get_abos();
+
+    my $rtn = "Abo name\n========\n";
+    for ( @list ) {
+        $rtn .= "@{$_}\n";
+    }
+
+    return $rtn;
+}
+
+sub list_downloads {
+    my ( $downloader ) = @_;
+    my @list = $downloader->get_downloaded_media();
+
+    # find length of longest abo name
+    my $max_abo = length( 'Abo' );
+    foreach my $download ( @list ) {
+        my $name_length = length( $download->{name} ) || 0;
+        if ( $name_length > $max_abo ) {
+            $max_abo = $name_length;
+        }
+    }
+
+    my $fmt = ( ' ' x 4 ) . '%-5s || %-' . $max_abo . "s || %-19s || %s\n";
+    my $rtn = sprintf( $fmt, 'ID', 'Abo', 'Download time', 'Path' );
+    $rtn .= sprintf( $fmt, '==', '===', '===================', '=====================' );
+    foreach my $row ( @list ) {
+        $rtn .= sprintf( $fmt, $row->{media_id}, $row->{name} || "N/A", $row->{time}, $row->{path} );
+    }
+
+    $rtn .= "\n" . scalar( @list ) . " downloaded videos.\n\n";
+
+    return $rtn;
+}
+
+=head1 NAME
+
+mediathkep - Mediathek search/download tool
+
+=head1 SYNOPSIS
+
+  mediathekp [options]
+
+=head1 OPTIONS
+
+=head2 Required
+
+=over 4
+  
+=item --cache_dir
+
+Cache directory to keep downloaded XMLs, zip files and database
+
+=item --target_dir
+
+If you use the action --download, where videos are downloaded to
+
+=back
+
+=head2 Optional
+
+=over 4
+
+=item --agent
+
+User agent I should pretend to be. (Default Mediathek-PL/0.2)
+
+=item --cache_time
+
+Time for which downloaded files should be cached. (Default: 0)
+
+=item --cookie_jar
+
+Store your cookies somewhere else (Default in cache_dir)
+
+=item --timeout
+
+Seconds timeout for flvstreamer.  (Default: 10)
+
+=item --flvstreamer
+
+Location of your flvstreamer binary (Default: /usr/bin/flvstreamer)
+
+=item --proxy
+
+http Proxy to use (e.g. http://proxy:8080) !!But!! flvstreamer can only work through a socks proxy!
+
+=item --socks
+
+Socks proxy to use for flvstreamer
+
+=item --config
+
+Load settings from a config file:
+you can put all the options listed here in a config file!
+
+=item --tries
+
+The number of tries Video::Flvstreamer should make per video
+There are often interruptions during a download, so a high number
+like 50 is pretty safe.  Default is 10
+
+=item --help
+
+Print this help out
+
+=item --action
+
+Action options (I<--action ACTION>)
+
+=over 4
+
+=item count
+
+Count number of videos matching your search
+
+=item list
+
+List the videos matching your search
+
+=item list_downloads
+
+List the videos previously downloaded
+
+=item download
+
+Download the videos matching your search
+
+=item del_download,$i
+
+Deletes the video with id $i from target_dir
+
+=item add_abo,$n,$d
+
+Create a new abo with name $n that expires after $d days.
+Specify search options (see below) to define the media
+belonging to an abo. To keep downloads forever, specify 0 days
+
+=item del_abo,$n
+
+Delete an abo with name $n
+
+=item list_abos
+
+Shows all abo names
+
+=item run_abo,$name
+
+Runs the specified abo, downloading all media that is not
+yet in target_dir and that has not expired yet. Checks also
+if media has expired and removes it from the target
+
+=item refresh_media
+
+Refresh your database from the internet
+
+=item init_db
+
+(re)initialise your database (!!delete everything in DB!!)
+
+=back
+
+=back
+
+=head2 Search options
+
+One or more search options can be given
+
+B<!! WARNING !!> If you use the action --download, and no search
+options, you will download B<ALL> the videos...
+
+Search options can be explicit: "Arte.DE" or contain wildcards: "Doku*"
+
+=over 4
+
+=item --id
+
+Limit action to the media entry with this id
+
+=item --channel
+
+Limit action to this channel
+
+=item --theme
+
+Limit action to this theme
+
+=item --title
+
+Limit action to this title
+
+=item --date
+
+Limit action to the media entry with given air date. 
+
+Possible Modifiers are:
+
+=over 4 
+
+=item E<lt>
+
+earlier than the given date
+
+=item E<gt>
+
+later than the given date
+
+=item =
+
+on the given date
+
+The format is [Modifier]YYYY-MM-DD. 
+Example (double quotes are needed!):
+
+    --date ">2011-09-25"
+
+=back
+
+=back
+
+=cut

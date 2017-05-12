@@ -1,0 +1,1218 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="./MusicExampleWithErrors-Dateien/filelist.xml">
+<link rel=Edit-Time-Data href="./MusicExampleWithErrors-Dateien/editdata.mso">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]-->
+<title>Wiki: Music Example With Errors</title>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Martin Busik</o:Author>
+  <o:LastAuthor>Martin Busik</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:Created>2006-04-30T00:42:00Z</o:Created>
+  <o:LastSaved>2006-04-30T00:44:00Z</o:LastSaved>
+  <o:Pages>4</o:Pages>
+  <o:Words>799</o:Words>
+  <o:Characters>4559</o:Characters>
+  <o:Company>Hogwarts</o:Company>
+  <o:Lines>37</o:Lines>
+  <o:Paragraphs>9</o:Paragraphs>
+  <o:CharactersWithSpaces>5598</o:CharactersWithSpaces>
+  <o:Version>9.3821</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:2;
+	mso-generic-font-family:auto;
+	mso-font-pitch:variable;
+	mso-font-signature:0 268435456 0 0 -2147483648 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:#D06040;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:#806040;
+	text-decoration:underline;
+	text-underline:single;}
+p
+	{font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 70.85pt 2.0cm 70.85pt;
+	mso-header-margin:35.4pt;
+	mso-footer-margin:35.4pt;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+@list l0
+	{mso-list-id:1255699523;
+	mso-list-type:hybrid;
+	mso-list-template-ids:331350062 1058153648 -617977386 -1289345750 -22528842 1631613874 -605020384 1536076786 268840384 -1837363328;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1
+	{mso-list-id:2080861951;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-80429564 872057306 168701018 -335751390 -888474232 -52536612 378056232 -846937184 1688344190 1716411278;}
+@list l1:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="1027"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1"/>
+ </o:shapelayout></xml><![endif]-->
+</head>
+
+<body bgcolor=white lang=EN-GB link="#d06040" vlink="#806040" style='tab-interval:
+36.0pt'>
+
+<div class=Section1>
+
+<h1>Music Example With Errors<o:p></o:p></h1>
+
+<p class=MsoNormal><wiki>In this example we describe a music player as if we
+were operating it. This is an intentionally corrupted version of the
+MusicExample that shows how various errors are reported. </p>
+
+<p>We'll write the remainder of this page as if it were describing stories for
+the music player. We'll use italics when we want to point out features of the
+framework. You might as well run the example now before you continue reading. </p>
+
+<ul type=disc>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l0 level1 lfo1;tab-stops:list 36.0pt'><a href="run.cgi">http:run.cgi</a>
+     </li>
+</ul>
+
+
+<div class=MsoNormal align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p><strong>Browsing Music</strong> </p>
+
+<p>The music browser starts up looking at the whole library of songs. We
+specify the library (an advanced feature) so that we know what we are talking
+about in this document. </p>
+
+<table border=1 cellspacing=0 cellpadding=0 style='mso-cellspacing:0cm;
+ mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>
+ <tr>
+  <td colspan=3 style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>fit.ActionFixture </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>start </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>eg.music.Browser </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>enter </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>library </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>eg/music/Music.txt </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>total songs </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">36 <font size=-1 color="#c08080"><i>expected</i></font><hr>37 <font size=-1 color="#c08080"><i>actual</i></font></td>
+ </tr>
+</table>
+
+<p><em>This is a the file that library reads. It is tab separated text. Try
+downloading it and looking at it with a spreadsheet. <a
+href="Release\Source\eg\music\Music.txt">http:Release/Source/eg/music/Music.txt</a></em>
+</p>
+
+<p>We can pick songs and see details of our selection as we go. </p>
+
+<table border=1 cellspacing=0 cellpadding=0 style='mso-cellspacing:0cm;
+ mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>
+ <tr>
+  <td colspan=3 style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><span lang=FR style='mso-ansi-language:FR'>fit.ActionFixture
+  <o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><span lang=FR style='mso-ansi-language:FR'>enter <o:p></o:p></span></p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>select </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>1 </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>title </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Akila </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>artist </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Toure Kunda </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>enter </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>select </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>2 </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>title </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>American Tango </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>artist </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Weather Report </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>album </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Mysterious Traveller </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>year </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">1975 <font size=-1 color="#c08080"><i>expected</i></font><hr>1974 <font size=-1 color="#c08080"><i>actual</i></font></td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>time </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>3.70 </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>track </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>2 of 7 </p>
+  </td>
+ </tr>
+</table>
+
+<p><em>ActionFixture interprets the words in the first column. The </em>check<em>
+action leads to a comparison of </em>expected<em> values from the table with </em>actual<em>
+values from the music program.</em> </p>
+
+
+<div class=MsoNormal align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p><strong>Playing Music</strong> </p>
+
+<p>Once we've picked a song, we can play it. We can continue operating the
+Brower while music is playing. </p>
+
+<table border=1 cellspacing=0 cellpadding=0 style='mso-cellspacing:0cm;
+ mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>
+ <tr>
+  <td colspan=3 style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>eg.music.Realtime </p>
+  </td>
+<td> <font color="#808080">time</font></td>
+<td> <font color="#808080">split</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>press </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>play </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:10:54</font></td>
+<td> <font color="#808080">1</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>status </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>loading </p>
+  </td>
+<td> <font color="#808080">18:10:55</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>pause </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>2 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:10:55</font></td>
+<td> <font color="#808080">2</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>status </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">playing <font size=-1 color="#c08080"><i>expected</i></font><hr>loading <font size=-1 color="#c08080"><i>actual</i></font></td>
+<td> <font color="#808080">18:10:57</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>pause </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>2 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:10:57</font></td>
+<td> <font color="#808080">2</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>status </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>playing </p>
+  </td>
+<td> <font color="#808080">18:10:59</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>time </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>3.70 </p>
+  </td>
+<td> <font color="#808080">18:10:59</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>press </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>pause </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:10:59</font></td>
+<td> <font color="#808080">1</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>status </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>pause </p>
+  </td>
+<td> <font color="#808080">18:11:00</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>remaining </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">3.66 <font size=-1 color="#c08080"><i>expected</i></font><hr>3.67 <font size=-1 color="#c08080"><i>actual</i></font></td>
+<td> <font color="#808080">18:11:00</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>pause </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>60 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:11:00</font></td>
+<td> <font color="#808080">60</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>remaining </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">3.66 <font size=-1 color="#c08080"><i>expected</i></font><hr>3.67 <font size=-1 color="#c08080"><i>actual</i></font></td>
+<td> <font color="#808080">18:12:00</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>press </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>play </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:12:00</font></td>
+<td> <font color="#808080">1</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>status </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>playing </p>
+  </td>
+<td> <font color="#808080">18:12:01</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>pause </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>60 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:12:01</font></td>
+<td> <font color="#808080">60</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>remaining </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">2.66 <font size=-1 color="#c08080"><i>expected</i></font><hr>2.67 <font size=-1 color="#c08080"><i>actual</i></font></td>
+<td> <font color="#808080">18:13:01</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>await </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>play complete </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:13:01</font></td>
+<td> <font color="#808080">160</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>status </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>ready </p>
+  </td>
+<td> <font color="#808080">18:15:41</font></td>
+<td> <font color="#808080">0</font></td></tr>
+</table>
+
+<p><em>The RealtimeActionFixture is a Fixture that adds actions having to do
+with realtime operation of the music player. We start by pressing </em>play<em>
+and then waiting for the </em>status<em> to show that it is playing. This music
+takes 2.5 seconds to start playing so it still says </em>loading<em> after our
+2 second pause.</em> </p>
+
+<p><em>Warning: Don't confuse the </em>pause<em> action with the </em>pause<em>
+button. The pause action appears in column one where it is interpreted by the
+Simulator as if the user hesitates for a specified number of seconds. The pause
+button is a button on the music player part of the Browser screen. The </em>press<em>
+action activates the pause button which causes the currently playing song to
+stop temporarily.</em> </p>
+
+
+<div class=MsoNormal align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p><strong>Searching for Music</strong> </p>
+
+<p>There are buttons on the browser to find more songs like the one we have
+picked. </p>
+
+<p>We can find songs related in different ways. Each new way produces a
+(possibly) different list of songs. <em>Show all</em> restores the display to
+the initial conditions. </p>
+
+<table border=1 cellspacing=0 cellpadding=0 style='mso-cellspacing:0cm;
+ mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>
+ <tr>
+  <td colspan=3 style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>eg.music.Realtime </p>
+  </td>
+<td> <font color="#808080">time</font></td>
+<td> <font color="#808080">split</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>press </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>show all </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:15:41</font></td>
+<td> <font color="#808080">1</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>selected songs </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>37 </p>
+  </td>
+<td> <font color="#808080">18:15:42</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>enter </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>select </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>3 </p>
+  </td>
+<td> <font color="#808080">18:15:42</font></td>
+<td> <font color="#808080">1</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>artist </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>James Taylor </p>
+  </td>
+<td> <font color="#808080">18:15:43</font></td>
+<td> <font color="#808080">0</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>press </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>same artist </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>&nbsp;</p>
+  </td>
+<td> <font color="#808080">18:15:43</font></td>
+<td> <font color="#808080">1</font></td></tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>check </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>selected songs </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>5 </p>
+  </td>
+<td> <font color="#808080">18:15:44</font></td>
+<td> <font color="#808080">0</font></td></tr>
+</table>
+
+<p><em>We left out the </em>await<em> actions so we are mashing buttons every
+second or so, faster than the searches complete. We're still getting the music
+we wanted because the search routines don't yet do a very good job of
+simulating being slow.</em> </p>
+
+<p>Yielding the display: </p>
+
+<table border=1 cellspacing=0 cellpadding=0 style='mso-cellspacing:0cm;
+ mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>
+ <tr>
+  <td colspan=6 style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>eg.music.Display </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>title </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>artist </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>album </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>year </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>time() </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>track() </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Handy Man </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>James Taylor </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>JT </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>1977 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>3.30 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>7 of 12 </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">Scarlet Woman <font size=-1 color="#c08080"><i>missing</i></font></td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>Weather Report </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>Mysterious Traveller </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>1974 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>5.72 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>6 of 7 </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Sailing To Philadelphia </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>James Taylor </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>October Rose </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">2000 <font size=-1 color="#c08080"><i>expected</i></font><hr>2001 <font size=-1 color="#c08080"><i>actual</i></font></td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>5.47 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>3 of 3 </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Ananas </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>James Taylor </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Hourglass </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>1997 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>5.73 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>5 of 13 </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">Another Gray Morning <font size=-1 color="#c08080"><i>missing</i></font></td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>James Taylor </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>JT </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>1977 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>2.73 </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>4 of 12 </p>
+  </td>
+ </tr>
+<tr>
+<td bgcolor="#ffcfcf">Another Grey Morning <font size=-1 color="#c08080"><i>surplus</i></font></td>
+<td>&nbsp; <font color="#808080">James Taylor</font></td>
+<td>&nbsp; <font color="#808080">JT</font></td>
+<td>&nbsp; <font color="#808080">1977</font></td>
+<td>&nbsp; <font color="#808080">2.73</font></td>
+<td>&nbsp; <font color="#808080">4 of 12</font></td></tr>
+<tr>
+<td bgcolor="#ffcfcf">Copperline <font size=-1 color="#c08080"><i>surplus</i></font></td>
+<td>&nbsp; <font color="#808080">James Taylor</font></td>
+<td>&nbsp; <font color="#808080">New Moon Shine</font></td>
+<td>&nbsp; <font color="#808080">1991</font></td>
+<td>&nbsp; <font color="#808080">4.37</font></td>
+<td>&nbsp; <font color="#808080">1 of 12</font></td></tr></table>
+
+<p><em>The song Scarlet Woman is marked as missing because our search did not
+return this row. It really is missing, and rightfully so, because it isn't a
+James Taylor song.</em> </p>
+
+<p><em>The song Another Gray Morning is marked as missing because there is no
+song spelt that way in the result set. When left hand columns (the keys)
+disagree then we don't get a chance to compare the remaining columns.</em> </p>
+
+<p><em>The song Copperline wasn't expected in the result set so it is marked as
+</em>surplus.<em> The framework adds all the surplus songs to the table so that
+they can be seen. The show up with printing in light gray as a reminder that
+they are not a part of the original document.</em> </p>
+
+<p><em>This completes the MusicExample.</em> </p>
+
+
+<div class=MsoNormal align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p>Now we consider some degenerate cases just to be sure that they work.
+Suppose we did not uniquely identify rows. We have two songs from JT. What
+happens when there are surplus (only one expected) ? When there are missing
+(three expelcted)? </p>
+
+<table border=1 cellspacing=0 cellpadding=0 style='mso-cellspacing:0cm;
+ mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>
+ <tr>
+  <td colspan=6 style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>eg.music.Display </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>album </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>genre </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>October Rose </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Hourglass </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>New Moon Shine </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>JT </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+<tr>
+<td bgcolor="#ffcfcf">JT <font size=-1 color="#c08080"><i>surplus</i></font></td>
+<td>&nbsp; <font color="#808080">Pop</font></td>
+<td bgcolor="#efefef">&nbsp;</td>
+<td bgcolor="#efefef">&nbsp;</td>
+<td bgcolor="#efefef">&nbsp;</td>
+<td bgcolor="#efefef">&nbsp;</td></tr></table>
+
+<p style='margin:0cm;margin-bottom:.0001pt'><span style='display:none;
+mso-hide:all'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<table border=1 cellspacing=0 cellpadding=0 style='mso-cellspacing:0cm;
+ mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>
+ <tr>
+  <td colspan=6 style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>eg.music.Display </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>album </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>genre </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>JT </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>October Rose </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>JT </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Hourglass </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#ffcfcf">JT <font size=-1 color="#c08080"><i>missing</i></font></td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>New Moon Shine </p>
+  </td>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt' bgcolor="#cfffcf">
+  <p class=MsoNormal>Pop </p>
+  </td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+  <td style='border:none;padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><span
+  style='font-size:10.0pt'><o:p></o:p></span></p>
+   <font color="#808080">error</font></td>
+ </tr>
+</table>
+
+
+<div class=MsoNormal align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p>We've run quite a few test. We'll call up one more Fixture that will add a
+summary to the end of our document. </p>
+
+<table border=1 cellspacing=0 cellpadding=0 style='mso-cellspacing:0cm;
+ mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>
+ <tr>
+  <td style='padding:2.25pt 2.25pt 2.25pt 2.25pt'>
+  <p class=MsoNormal>fit.Summary </p>
+  </td>
+ </tr>
+<tr bgcolor="#ffcfcf">
+<td> <font color="#808080">counts</font></td>
+<td> <font color="#808080">51 right, 13 wrong, 4 ignores, 0 exceptions</font></td></tr>
+<tr>
+<td> <font color="#808080">input file</font></td>
+<td> <font color="#808080">input/MusicExampleWithErrors.html</font></td></tr>
+<tr>
+<td> <font color="#808080">input update</font></td>
+<td> <font color="#808080">Sun Apr 30 03:58:36 2006</font></td></tr>
+<tr>
+<td> <font color="#808080">output file</font></td>
+<td> <font color="#808080">output/MusicExampleWithErrors.html</font></td></tr>
+<tr>
+<td> <font color="#808080">run date</font></td>
+<td> <font color="#808080">Wed May &nbsp;3 18:10:54 2006</font></td></tr>
+<tr>
+<td> <font color="#808080">run elapsed time</font></td>
+<td> <font color="#808080"> 0 wallclock secs ( 0.07 usr + &nbsp;0.01 sys = &nbsp;0.08 CPU)</font></td></tr></table>
+
+<p>This is our most complete standard example. You can run it against more than
+one fit implementation by choosing any one of these specialized RunScript. </p>
+
+<ul type=disc>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo2;tab-stops:list 36.0pt'><a
+     href="files\LispPlatform\runScheme.cgi">http:files/LispPlatform/runScheme.cgi</a>
+     </li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo2;tab-stops:list 36.0pt'><a
+     href="files\LispPlatform\runLisp.cgi">http:files/LispPlatform/runLisp.cgi</a>
+     </li>
+</ul>
+
+<p class=MsoNormal>(Caution: these scripts can't login. Run them from the
+public wiki pages.) </p>
+
+<p>&nbsp; </wiki></p>
+
+
+<div class=MsoNormal align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p class=MsoNormal>Last edited April 21, 2003 </p>
+
+</div>
+
+</body>
+
+</html>

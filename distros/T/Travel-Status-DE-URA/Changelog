@@ -1,0 +1,87 @@
+Travel::Status::DE::URA 2.01 - Tue Jan 17 2017
+
+    * Add support for departures in Mainz supplied by the local URA service
+     (MvgMainz)
+    * ura-m: Show stop-specific messages (if present)
+    * New module: Travel::Status::DE::MvgMainz
+    * Travel::Status::DE::URA->new: add option with_messages
+    * Travel::Status::DE::URA: add ->messages_by_stop_id and
+      ->messages_by_stop_name
+
+Travel::Status::DE::URA 2.00 - Wed Sep 07 2016
+
+    * Add support for bus departures in London supplied by the TfL URA
+      service
+    * New module: Travel::Status::GB::TFL
+    * Rename aseag-m to ura-m
+    * Rename short option -s (corresponding to --strftime) to -f
+    * Rename short option -S (corresponding to --strfrel) to -F
+    * New options:
+      -s / --service selects a backend service (defaults to ASEAG),
+      --list lists supported backend services,
+      --ura-base sets a backend service by URL, and
+      --ura-version sets the backend service version
+    * Travel::Status::DE::URA::Result: Add ->platform accessor (shortcut for
+      ->stop_indicator)
+
+Travel::Status::DE::URA 1.02 - Sat Apr 16 2016
+
+    * Result: Add stop_indicator accessor
+    * aseag-m: New option -oi (show stop point indicators)
+
+Travel::Status::DE::URA 1.01 - Sat Apr 09 2016
+
+    * URA->results: Add via_id, stop_id and line_id parameters
+    * URA->new: Add circle and with_stops parameters
+    * URA: Add get_stops accessor
+
+Travel::Status::DE::URA 1.00 - Sat Oct 31 2015
+
+    * Reduce memory footprint
+    * aseag-m: -of: Show delimiter between route before and after the
+      requseted stop
+    * aseag-m: Do not erroneously reverse stop list when combining -oa and -ob
+
+Travel::Status::DE::URA 0.05 - Mon Oct 12 2015
+
+    * aseag-m: Rename -a / -b / -f / -r to -oa / -ob / -of / -oT
+    * aseag-m: New option -or (show partial route)
+    * URA->new: Rename full_routes option to calculate_routes. The before/after
+      parameters are no longer supported, instead any true parameter causes
+      all routes to be calculated
+    * URA::Result: Remove route_timetable accessor. Use route_pre / route_post
+      instead
+    * Ura::Result: Add route_pre, route_post and route_interesting accessors
+    * new module: Travel::Status::DE::URA::Stop (describes a stop as a part
+      of a departure's route)
+
+Travel::Status::DE::URA 0.04 - Thu Mar 12 2015
+
+    * New dependency: Text::CSV
+    * Fix ASEAG parser (was fragile and broken by changes in the backend output)
+    * TRavel::Status::DE::URA::Result: Add ->type accessor for compatibility
+      with other TRavel::Status modules (always returns "Bus" at the moment)
+    * Encoding is hard - it may be broken if your LWP::UserAgent or perl is
+      too old
+
+Travel::Status::DE::URA 0.03 - Thu Jan 23 2014
+
+    * Result: Relative times (countdown, countdown_sec) are now computed
+      relative to the creation of their Travel::Status::DE::URA object. They
+      used to be relative to the call of the "results" function.
+    * Result: Fix countdown_sec accessor
+    * Result: Do DateTime math on demand, not when
+      creating the object. Halves the average runtime, though this depends
+      on the amount of results used by the application (the more results
+      are used, the less notable the performance gain will be)
+
+Travel::Status::DE::URA 0.02 - Thu Dec 26 2013
+
+    * aseag-m: Fix spaces in stop names (they didn't match anything)
+    * Remove fuzzy matching from constructor / ->results API. Use
+      the new get_stop_by_name function instead (returns all matching stops).
+      Update aseag-m accordingly
+
+Travel::Status::DE::URA 0.01 - Sun Dec 22 2013
+
+    * Initial release

@@ -1,0 +1,39 @@
+0.000008  2016-06-16 07:36:12-07:00 America/Los_Angeles
+
+    - Update for newer Test2/Test2-Suite/Test-Workflow
+
+0.000007  2016-02-12 06:51:19-08:00 America/Los_Angeles
+
+    - Introduce pause
+    - Make 'stop' a hard stop
+    - Switch to Test2
+
+0.000006  2015-11-01 00:10:26-07:00 America/Los_Angeles
+
+    - Fix Carp test for new Test::Stream
+
+0.000005  2015-10-28 20:39:54-07:00 America/Los_Angeles
+
+    - Add 'lock' to emulatre the specials
+    - Use lock under the hood for specials.
+
+0.000004  2015-10-26 23:53:53-07:00 America/Los_Angeles
+
+    - Rules for 'special' stack frames
+
+0.000003  2015-10-26 17:01:50-07:00 America/Los_Angeles
+
+    - Meta-data fixes
+
+0.000002  2015-10-26 16:53:28-07:00 America/Los_Angeles
+
+    - Finish Trace::Mask::Carp for Carp traces
+    - Add Trace::Mask::TryTiny for Try::Tiny masking
+    - Min Carp version is 1.03
+    - Min Try::Tiny supported is 0.03
+    - Misc Fixes
+    - Depend on a newer Test::Stream for some needed features
+
+0.000001  2015-10-24 05:47:55-07:00 America/Los_Angeles
+
+    - Initial Release

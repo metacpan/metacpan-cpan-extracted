@@ -1,0 +1,55 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use Text::DeSupercite qw(desupercite);
+
+my $harsh = (scalar @ARGV>1)?pop @ARGV: 0;
+print desupercite((join "", <>), $harsh);
+
+
+=pod 
+
+=head1 NAME
+
+desupercite - a program for stripping superciting and other irregular email quoting from text
+
+=head1 USAGE
+
+    desupercite <file> [harsh]
+
+Pass in a filename and the file will be read, stripped and then printed on STDOUT. 
+
+Passing in an optional true value (i.e '1') as a second argument will
+also strip out any other irregular quoting turning
+
+    | Somename> some quoted text
+
+    Some unquoted text
+
+into 
+
+    > > some quoted text
+
+    Some unquoted text
+
+
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+    
+=head1 COPYRIGHT
+    
+(c)opyright Simon Wistow, 2003
+    
+Distributed under the same terms as Perl itself.
+
+This software is under no warranty and will probably ruin your life, kill your friends, burn your house and bring about the apocalypse
+  
+=head1 SEE ALSO
+    
+L<Text::Quoted>, L<Text::DeSupercite>
+    
+=cut
+    
+

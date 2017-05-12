@@ -1,0 +1,3 @@
+ERROR(order2vec.pl):
+        Index 11 found at line <16> in WORDVEC file <test-B5.wordvec>
+        exceeds the total number of columns 10 shown on the 1st line.

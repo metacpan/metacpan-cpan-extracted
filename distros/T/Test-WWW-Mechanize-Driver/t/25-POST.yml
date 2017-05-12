@@ -1,0 +1,14 @@
+---
+- uri: home.html
+  method: POST
+  title_is: 'Serenevy: Home'
+  contains:
+    - Serenevy family homepage
+
+- uri: home.html
+  method: POST
+  parameters:
+    foo: 1+1=2
+  title_is: 'About dean.serenevy.net - Dean Serenevy'
+  contains:
+    - home-built AMD Phenom 9600

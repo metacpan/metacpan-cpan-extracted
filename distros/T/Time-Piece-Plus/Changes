@@ -1,0 +1,19 @@
+Revision history for Perl extension Time::Piece::Plus
+
+0.05    Sun May  5 18:02:22 2013
+        - switch to Module::Build
+        - remove patch feature and depends Time::Piece 1.20
+
+0.04    Tue Mar 13 17:05:12 2013
+        - fix epoch bug
+
+0.03    Wed Feb 13 06:05:00 2013
+        - override add/subtract method for providing interface like DateTime
+
+0.02    Fri Dec 10 01:17:50 2011
+        - Add today method
+        - yesterday and tommorow method more faster
+        - Add instance creation bug fix patch for before than Time::Piece 0.16
+
+0.01    Sun Nov 27 01:24:38 2011
+        - original version

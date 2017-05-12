@@ -1,0 +1,53 @@
+---
+abstract: 'A Task module for Litmus L<https://litmus.mozilla.org/>'
+author:
+  - 'Gabor Szabo <szabgab@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Litmus
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CGI: 0
+  Class::DBI: 0
+  Class::DBI::Pager: 0
+  Class::DBI::Plugin::RetrieveAll: 0
+  Class::DBI::Search::Basic: 0
+  Class::DBI::mysql: 0
+  DBIx::ContextualFetch: 0
+  Data::Dumper: 0
+  Data::JavaScript: 0
+  Date::Manip: 0
+  Encode: 0
+  File::Find: 0
+  Getopt::Long: 0
+  HTML::StripScripts: 0
+  HTML::StripScripts::Parser: 0
+  JSON: 2.0
+  JSON::PP: 0
+  JSON::XS: 0
+  Sys::Hostname: 0
+  Template: 0
+  Test::Harness: 0
+  Text::Markdown: 0
+  Time::HiRes: 0
+  Time::Piece: 0
+  Time::Piece::MySQL: 0
+  Time::Seconds: 0
+  XML::XPath: 0
+  perl: 5.008
+  utf8: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/szabgab/Task-Litmus
+version: 0.01

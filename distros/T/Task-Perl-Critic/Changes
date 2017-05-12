@@ -1,0 +1,47 @@
+[1.008] Released on 2012-01-04.
+
+    Add Perl::Critic::Dynamic, Perl::Critic::Itch, and Perl::Critic::Moose.
+
+[1.007] Released on 2008-08-11.
+
+    Add Perl::Critic::Storable.
+
+[1.006] Released on 2008-07-06.
+
+    Add Perl::Critic::PetPeeves::JTRAMMELL.
+
+    "use 5.006001" in Makefile.PL and Build.PL.
+
+[1.005] Released on 2008-06-08.
+
+    Add Perl::Critic::Compatibility.
+
+    Replace use of Module::Install with Module::Build.
+
+[1.004] Released on 2008-03-15.
+
+    Up Perl::Critic prerequisite to 1.082 and specify revisions for
+    all the other distros.
+
+[1.003] Released on 2007-09-15.
+
+    Add Perl::Critic::Nits.
+
+[1.002] Released on 2007-07-30.
+
+    Add Perl::Critic::Tics.
+    Update distribution versions.
+
+[1.001] Released on 2007-07-08.
+
+    Add Test::Perl::Critic::Progressive.
+    Update distribution versions.
+
+[1.000] Released on 2007-06-03.
+
+    Initial version.
+
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Task-Perl-Critic-1.008/Changes $
+#     $Date: 2012-01-04 10:40:44 -0800 (Wed, 04 Jan 2012) $
+#   $Author: thaljef $
+# $Revision: 4112 $

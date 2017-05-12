@@ -1,0 +1,19 @@
+Changes
+lib/TAP/Filter.pm
+lib/TAP/Filter/Iterator.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/a_test.tt
+t/b_test.tt
+t/filter.t
+t/harness.t
+t/lib/DeepStuff.pm
+t/lib/FakeFilter.pm
+t/misc.t
+t/parser.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

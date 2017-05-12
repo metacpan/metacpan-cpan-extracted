@@ -1,0 +1,14 @@
+Revision history for Perl extension Term::Slang.
+
+0.07  - Redid constants to use newCONSTSUB
+	hack around SLsmg_write_char brokenness.
+	Removed autoloader dependency in Slang.pm
+
+0.06  - Fixed cvs problem, constants.
+
+0.05  - Added patches from Joey Hess.
+
+0.03  - Changed API to mirror slang API, lost OO stuff.
+
+0.01  - original version; created by h2xs 1.18
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::Lorem::Moretext.
+
+0.01  Sat Sep 20 18:28:14 2014
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Text::Lorem::Moretext
+

@@ -1,0 +1,62 @@
+{
+   "abstract" : "A library of SQL types",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Types-SQL",
+   "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "PerlX::Maybe::XS" : "0",
+            "Type::Tiny::XS" : "0"
+         },
+         "requires" : {
+            "PerlX::Maybe" : "0",
+            "Ref::Util" : "0",
+            "Type::Library" : "0",
+            "Type::Utils" : "0.44",
+            "Types::Standard" : "0",
+            "perl" : "v5.8.8",
+            "strictures" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::EOL" : "0",
+            "Test::MinimmumVersion" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Warnings" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/Types-SQL/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Types-SQL.git",
+         "web" : "https://github.com/robrwo/Types-SQL"
+      }
+   },
+   "version" : "v0.0.3"
+}
+

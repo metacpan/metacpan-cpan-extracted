@@ -1,0 +1,21 @@
+---
+abstract: 'TAP source handler for validating HTML via W3C validator'
+author:
+  - 'Mike Eldridge <diz@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAP-Parser-SourceHandler-Validator-W3C-HTML
+requires:
+  Test::Builder: 0.98
+  Test::Harness: 3.18
+  WWW::Robot: 0.026
+  WebService::Validator::HTML::W3C: 0.28
+  XML::XPath: 1.13
+version: 0.02

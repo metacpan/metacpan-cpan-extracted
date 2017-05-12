@@ -1,0 +1,19 @@
+Revision history for TV-Humax-Foxsat
+
+0.01    2013-02-03
+        First version.
+
+0.02    2013-02-03
+        Resolve missing dependencies
+
+0.03    2013-02-13
+        Fix a byte order bug. 16 and 32 bit fields are in network byte order.
+
+0.04    2015-05-16
+        Update POD docs. Tidy up package manifest etc.
+
+0.05    2015-05-20
+        Switch to Dist::Zilla packaging. Add links to github
+
+0.06    2015-05-27
+        Tweaks to Dist::Zilla packaging & metadata to fix Kwalitee issues

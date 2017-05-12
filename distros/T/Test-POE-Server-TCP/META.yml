@@ -1,0 +1,31 @@
+---
+abstract: 'A POE Component providing TCP server services for test cases'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+  Text::ParseWords: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.045, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-POE-Server-TCP
+requires:
+  POE: '1.004'
+  POE::Filter: '0'
+  POE::Filter::Line: '0'
+  POE::Wheel::ReadWrite: '0'
+  POE::Wheel::SocketFactory: '0'
+  Socket: '2.0'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/test-poe-server-tcp
+  repository: https://github.com/bingos/test-poe-server-tcp.git
+version: '1.20'

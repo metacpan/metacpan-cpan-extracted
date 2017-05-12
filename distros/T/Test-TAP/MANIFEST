@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Test/TAP.pm
+MANIFEST
+README
+t/00-load.t
+t/tap.t
+xt/boilerplate.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml

@@ -1,0 +1,110 @@
+NAME
+    Text::Sequence - spot one-dimensional sequences in patterns of text
+
+INSTALL
+    The usual Perl style
+    
+    % perl Build.PL
+    % ./Build 
+    % ./Build test
+    % sudo ./Build install
+
+or
+
+    % perl Makefile.PL
+    % make
+    % make test
+    % sudo make install
+
+depending on whether you have Module::Build or not.
+
+SYNOPSIS
+        use Text::Sequence;
+    
+        my @list      = get_files_in_dir();
+        my @sequences = Text::Sequence::find(@list);
+
+        my $sequence  = @sequences[0];
+        print $sequence->template();
+
+        my $num = 0;    
+        foreach my ($element) ($sequence->members()) {
+            ++$num;
+            print "$num) $filename\n";
+        }
+    
+DESCRIPTION
+    A sequence could be a list of files like
+
+        00001.jpg
+        00002.jpg
+        00003.jpg
+        ...
+        05000.jpg
+    
+    or
+
+        raw.0001.txt
+        ...
+        raw.0093.txt
+
+    or
+
+        foo3a.html
+        foo3b.html
+        foo3c.html
+
+    or even
+
+        1.mp3
+        100.mp3
+    
+    in which case their templates would be
+
+        %.5d.tif
+    
+        raw.%.4d.txt
+
+        foo3%s.html
+    
+        %d.mp3
+    
+    respectively.
+
+    This library will attempt to
+
+    find all sequences in a given list
+    tell you which elements are missing from a sequence
+    be able to cope with non padded numbers in sequences
+
+    It does not spot multi-dimensional sequences, e.g. "foo-%d-%d.jpg".
+
+METHODS
+  find( @elements )
+    A static method to find all the sequences in a list of elements.
+
+  new( $template, @member_nums )
+    Creates a new sequence object.
+
+  template( $number_or_letter )
+    Tell you the template of the sequence, in "printf"-like formats.
+
+    If you pass in a number or letter then it will substitute it in to
+    return an actual sequence element.
+
+  members()
+    Returns a list describing the members of the sequence. Each item in the
+    list is a letter or (non-padded) number which can be substituted into
+    the template to obtain the original element
+
+    For members of the same width, order is preserved from the original call
+    to "find()".
+
+AUTHOR
+    Simon Wistow <simon@thegestalt.org> Adam Spiers <cpan@adamspiers.org>
+
+COPYRIGHT
+    Copyright (c) 2004 - Simon Wistow
+
+BUGS
+SEE ALSO

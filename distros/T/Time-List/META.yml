@@ -1,0 +1,50 @@
+---
+abstract: 'Perl extention to output time list'
+author:
+  - '<<Shinichiro Sato>> <<<s2otsa59@gmail.com>>>'
+build_requires:
+  Class::Accessor::Lite: '0'
+  Data::Util: '0'
+  Test::More: '0.98'
+  Time::Piece: '1.24'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-List
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Time::List:
+    file: lib/Time/List.pm
+    version: '0.13'
+  Time::List::Constant:
+    file: lib/Time/List/Constant.pm
+  Time::List::Rows:
+    file: lib/Time/List/Rows.pm
+    version: '0.13'
+  Time::List::Rows::Row:
+    file: lib/Time/List/Rows/Row.pm
+    version: '0.13'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/S2/p5-Time-List/issues
+  homepage: https://github.com/S2/p5-Time-List
+  repository: git://github.com/S2/p5-Time-List.git
+version: '0.13'
+x_contributors:
+  - 'sato sin <shinichiro@wano.co.jp>'
+  - 'shinichiro <shinichiro@shinichiro-no-MacBook-Air.local>'

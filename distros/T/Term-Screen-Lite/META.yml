@@ -1,0 +1,36 @@
+---
+abstract: 'Platform independent interface to terminal screen.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Screen-Lite
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Term::Screen::Lite:
+    file: lib/Term/Screen/Lite.pm
+    version: '0.03'
+  Term::Screen::Lite::Generic:
+    file: lib/Term/Screen/Lite/Generic.pm
+    version: '0.03'
+  Term::Screen::Lite::Win32:
+    file: lib/Term/Screen/Lite/Win32.pm
+    version: '0.03'
+requires:
+  Moo: '2.000000'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/Manwar/Term-Screen-Lite.git
+version: '0.03'

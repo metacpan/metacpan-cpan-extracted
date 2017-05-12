@@ -1,0 +1,18 @@
+Revision history for TRD-Velocity
+
+0.0.8   2010-08-09
+		bug fix.
+0.0.7   2008/08/04
+        parameter xss supported.
+		add name after .escape() or .unescape()
+        default .escape()
+        ex) ${item}.escape()
+            ${item}.unescape()
+0.0.6   2008/08/02
+        dump() fix.
+        add t/test_Velocity.t
+0.0.5   2008/08/01
+0.0.4   2008/07/30
+0.0.3   2008/07/29
+        First version, released on an unsuspecting world.
+

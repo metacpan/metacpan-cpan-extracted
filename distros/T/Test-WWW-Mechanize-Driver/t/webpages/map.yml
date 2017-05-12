@@ -1,0 +1,31 @@
+---
+uri: http://test/map.html
+
+--- |
+HTTP/1.1 200 OK
+Connection: close
+Date: Fri, 13 Mar 2009 20:21:09 GMT
+Server: Apache/2
+Vary: Accept-Encoding
+Content-Length: 1445
+Content-Type: text/html; charset=utf-8
+Content-Type: text/html; charset=UTF-8
+Client-Date: Fri, 13 Mar 2009 20:21:09 GMT
+Client-Peer: 206.212.243.242:80
+Client-Response-Num: 1
+Link: <http://dean.serenevy.net/styles/main.css>; /="/"; rel="stylesheet"; type="text/css"
+Link: <http://dean.serenevy.net/images/bob-16x16.png>; /="/"; rel="icon"; type="image/png"
+Title: Dean Serenevy
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><title>Fake Map</title></head>
+<body>
+
+<a href="http://test/map.html">Site Map</a>
+<a href="http://test/home.html">Home</a>
+<a href="http://test/tutors.html">Tutors</a>
+
+</body>
+</html>

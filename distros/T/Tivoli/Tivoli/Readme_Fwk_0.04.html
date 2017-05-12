@@ -1,0 +1,250 @@
+<HTML>
+<HEAD>
+<TITLE>Tivoli::Fwk - Perl Extension for Tivoli</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#details">DETAILS</A></LI>
+		<LI><A HREF="#routines">ROUTINES</A></LI>
+		<UL>
+
+			<LI><A HREF="#executesys">ExecuteSys</A></LI>
+			<LI><A HREF="#crtpr">CrtPR</A></LI>
+			<LI><A HREF="#crtdatalesspm">CrtDatalessPM</A></LI>
+			<LI><A HREF="#noresource">NoResource</A></LI>
+			<LI><A HREF="#wlookup_pm">Wlookup_pm</A></LI>
+			<LI><A HREF="#wlsendpts_searchpms">Wlsendpts_SearchPms</A></LI>
+			<LI><A HREF="#wgetsub_pm">Wgetsub_pm</A></LI>
+		</UL>
+
+		<LI><A HREF="#plattforms and requirements">Plattforms and Requirements</A></LI>
+		<LI><A HREF="#history">HISTORY</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+        Tivoli::Fwk - Perl Extension for Tivoli</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Tivoli::Fwk;</PRE>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<PRE>
+        v0.04</PRE>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<PRE>
+        Copyright (c) 2001 Robert Hase.
+        All rights reserved.
+        This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+        This Package will handle about everything you may need for Framework.
+        If anything has been left out, please contact me at
+        tivoli.rhase@muc-net.de
+        so it can be added.</PRE>
+<P>
+<H2><A NAME="details">DETAILS</A></H2>
+<PRE>
+        still in work</PRE>
+<P>
+<H2><A NAME="routines">ROUTINES</A></H2>
+<PRE>
+        Description of Routines</PRE>
+<P>
+<H3><A NAME="executesys">ExecuteSys</A></H3>
+<UL>
+<LI><STRONG><A NAME="item_DESCRIPTION">DESCRIPTION</A></STRONG><BR>
+
+<PRE>
+        Execute Unix Command with system</PRE>
+<LI><STRONG><A NAME="item_CALL">CALL</A></STRONG><BR>
+
+<PRE>
+        $Var = &amp;ExecuteSys(&lt;Command&gt;);</PRE>
+<LI><STRONG><A NAME="item_SAMPLE">SAMPLE</A></STRONG><BR>
+
+<PRE>
+        $Var = &amp;ExecuteSys('ls');
+        $Var = returncode from the Command</PRE>
+</UL>
+<P>
+<H3><A NAME="crtpr">CrtPR</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Create PolicyRegion</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;CrtPR(&lt;TopPolicyRegion, PolicyRegion&gt;);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;CrtPR(&quot;top-Company_Europe_pr&quot;, &quot;all-Clients_Europe-pr&quot;);
+        $Var = 1 = ok, 0 = Failure</PRE>
+</UL>
+<P>
+<H3><A NAME="crtdatalesspm">CrtDatalessPM</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Create Dataless ProfileManager</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;CrtDatalessPM(&lt;PolicyRegion, ProfileManager&gt;);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;CrtDatalessPM(&quot;all-Sample-pr&quot;, &quot;all-inv-SW-tmr-pm&quot;);
+        $Var = 1 = ok, 0 = Failure</PRE>
+</UL>
+<P>
+<H3><A NAME="noresource">NoResource</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Check Tivoli Resource with wlookup</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;NoResource(&lt;Typ, Resource&gt;);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;NoResource(&quot;RIM&quot;, &quot;inv40&quot;);
+        $Var = 1 = ok, 0 = Failure</PRE>
+</UL>
+<P>
+<H3><A NAME="wlookup_pm">Wlookup_pm</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        looks for ProfileManagers which includes the given String</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;Wlookup_pm(&lt;String&gt;);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        @Arr = &amp;Wlookup_pm(&quot;-New_EP-&quot;);
+        @Arr = Array with ProfileManagers</PRE>
+</UL>
+<P>
+<H3><A NAME="wlsendpts_searchpms">Wlsendpts_SearchPms</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Lists all the endpoints directly or indirectly subscribed to the given ProfileManager</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;Wlsendpts_SearchPms(&lt;Name of the ProfileManager&gt;);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        @Arr = &amp;Wlsendpts_SearchPms(&quot;all-Server-pm&quot;);
+        @Arr = Array with Endpoints</PRE>
+</UL>
+<P>
+<H3><A NAME="wgetsub_pm">Wgetsub_pm</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        gets the Subscribers of a given ProfileManager</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;Wgetsub_pm(&lt;ProfileManager&gt;);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        @Arr = &amp;Wgetsub_pm(&quot;all-Clients-pm&quot;);
+        @Arr = Array with Subscribers</PRE>
+</UL>
+<P>
+<H2><A NAME="plattforms and requirements">Plattforms and Requirements</A></H2>
+<PRE>
+        Supported Plattforms and Requirements</PRE>
+<UL>
+<LI><STRONG><A NAME="item_Plattforms">Plattforms</A></STRONG><BR>
+
+<PRE>
+        tested on:</PRE>
+<PRE>
+        - aix4-r1 (AIX 4.3)</PRE>
+</UL>
+<UL>
+<LI><STRONG><A NAME="item_Requirements">Requirements</A></STRONG><BR>
+
+<PRE>
+        requires Perl v5 or higher</PRE>
+</UL>
+<P>
+<H2><A NAME="history">HISTORY</A></H2>
+<PRE>
+        VERSION         DATE            AUTHOR          WORK
+        ----------------------------------------------------
+        0.01            2001-07-06      RHase           created
+        0.01            2001-07-06      RHase           Wlsendpts_SearchPms
+        0.01            2001-07-06      RHase           Wlookup_pm
+        0.02            2001-07-09      RMahner         NoResource
+        0.02            2001-07-09      RMahner         CrtDatalessPM
+        0.02            2001-07-09      RMahner         CrtPR
+        0.02            2001-07-09      RMahner         ExecuteSys
+        0.03            2001-07-13      RHase           Wgetsub_pm
+        0.04            2001-08-04      RHase           POD-Doku added</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+        Robert Hase
+        ID      : RHASE
+        eMail   : Tivoli.RHase@Muc-Net.de
+        Web     : <A HREF="http://www.Muc-Net.de">http://www.Muc-Net.de</A></PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<PRE>
+        CPAN
+        <A HREF="http://www.perl.com">http://www.perl.com</A></PRE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,28 @@
+---
+name: TreeFromFile
+
+TreePath:
+  debug: 0
+  backend:
+    name: File
+    args:
+      file: t/conf/treepath.yml
+      load_order:
+        - File
+        - Page
+        - Comment
+      sources_name:
+        File:
+          columns:
+            - file
+        Page:
+          columns:
+            - name
+            - parent
+            - files
+          search_key: name
+          parent_key: parent
+        Comment:
+          columns:
+            - page
+          parent_key: page

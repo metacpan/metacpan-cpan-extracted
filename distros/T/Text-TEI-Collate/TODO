@@ -1,0 +1,3 @@
+- Handle 2-word glommed matching
+- Revisit gap detection
+- Handle transposition properly

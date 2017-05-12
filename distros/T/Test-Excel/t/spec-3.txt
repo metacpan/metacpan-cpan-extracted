@@ -1,0 +1,7 @@
+sheet MySheet1
+range B3:B5
+sheet MySheet2
+xyz A1-A2
+range B5:B6
+sheet Mysheet3
+ignorerange B3:B5

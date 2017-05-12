@@ -1,0 +1,38 @@
+---
+abstract: 'More functionality for Term::Shell'
+author:
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+build_requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.100960'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-Shell-Enhanced
+provides:
+  Term::Shell::Enhanced:
+    file: lib/Term/Shell/Enhanced.pm
+    version: 1.101420
+recommends: {}
+requires:
+  Class::Accessor::Complex: 0
+  Cwd: 0
+  Data::Inherited: 0
+  Getopt::Long: 0
+  Sys::Hostname: 0
+  Term::Shell: 0
+  parent: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Term-Shell-Enhanced
+  homepage: http://search.cpan.org/dist/Term-Shell-Enhanced/
+  repository: http://github.com/hanekomu/Term-Shell-Enhanced
+version: 1.101420

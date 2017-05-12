@@ -1,0 +1,35 @@
+Test::POE::Client::TCP
+======================
+
+1.10  Wed Jun 29 10:37:32 BST 2011
+  - Explicitly shutdown socket in/out on destruction under Cygwin/MSWin32
+
+1.08  Wed Apr 28 15:30:13 BST 2010
+  - The 'oh fuck' I deleted it from CPAN release
+
+1.06  Mon Oct 26 23:22:03 GMT 2009
+  - Amended tests and bumped required POE version
+
+1.04	Wed Jun 17 23:39:16 BST 2009
+	- Added accessor for alias.
+
+1.02	Tue Apr  7 21:06:02 BST 2009
+	- Make auto_set_repository() only run at author-time
+
+1.00	Mon Apr  6 22:52:02 BST 2009
+	- Bump to 'stable' version
+	- add auto_set_repository to Makefile.PL
+
+0.10	Tue Jan 20 12:27:34 GMT 2009
+	- Added 'wheel' method to get the POE::Wheel::ReadWrite object.
+
+0.08	Thu Jan 15 10:33:50 GMT 2009
+	- Enabled event 'prefix' to be specified.
+
+0.06	Tue Jul  1 10:28:19 BST 2008
+	- Managed to delete distro from CPAN, restoring.
+
+0.04	Tue May 20 18:02:45 BST 2008
+	- added server_info() method.
+0.02
+	- Initial CPAN release

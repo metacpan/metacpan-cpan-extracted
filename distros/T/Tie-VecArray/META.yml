@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Tie-VecArray
+version:             0.03
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.37_01
+distribution_type:   module
+requires:     
+    base:                          0
+    fields:                        0
+    POSIX:                         0
+    Test::More:                    0.62
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

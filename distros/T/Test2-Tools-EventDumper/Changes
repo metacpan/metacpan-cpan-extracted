@@ -1,0 +1,30 @@
+0.000007  2016-05-09 07:58:16-07:00 America/Los_Angeles
+
+0.000006  2016-04-11 19:58:21-07:00 America/Los_Angeles
+
+    - Support for newer Test2
+
+0.000005  2016-03-23 09:50:46-07:00 America/Los_Angeles
+
+    - More testing
+    - Fix dump_event, it was removing empty lines
+
+0.000004  2016-03-22 22:04:55-07:00 America/Los_Angeles
+
+    - add shorten_single_field option
+    - add clean_fail_messages option
+    - Refactor code to make it more sane
+    - Safer adjust_filename logic
+    - Improved testing
+
+0.000003  2016-03-22 06:26:58-07:00 America/Los_Angeles
+
+    - Fix errors and warnings from perls <5.14
+
+0.000002  2016-03-21 21:36:08-07:00 America/Los_Angeles
+
+    - Minor doc fixes
+
+0.000001  2016-03-21 21:22:54-07:00 America/Los_Angeles
+
+    - Initial Release

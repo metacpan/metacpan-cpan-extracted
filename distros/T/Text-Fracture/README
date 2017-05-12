@@ -1,0 +1,45 @@
+Text-Fracture version 0.01
+==========================
+
+Please see perldoc Text::Fracture and test.pl
+for usage details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEBUGGING
+
+$ perl Makefile.PL
+$ vi Makefile
+OPTIMIZE = -O0 ...
+ZZ
+$ make
+$ gdb -x go
+$ gdb --args /usr/bin/perl "-Iblib/lib" "-Iblib/arch" test.pl foo
+(gdb) break XS_Text__Fracture_do_fract
+Function "XS_Text__Fracture_do_fract" not defined.
+Make breakpoint pending on future shared library load? (y or [n]) y
+(gdb) run
+(gdb) p *f@6
+
+
+DEPENDENCIES
+
+This module was started by running h2xs -A -n Text-Fracture
+It has no dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007,2008 by Juergen Weigert (jw@suse.de), Novell Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

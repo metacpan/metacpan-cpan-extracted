@@ -1,0 +1,31 @@
+Revision history for Task-Smoke
+
+0.19    2008-08-01
+        Aaargh, a stale META.yml was keeping the version at 0.16.
+
+0.18    2008-08-01
+        Require Test::Harness::Results.
+
+0.17    2008-08-01
+        Require Time::Out.
+
+0.16    2007-04-22
+        Require YAML::Syck 0.85 when can_cc and YAML is too old.
+
+0.15    2007-01-30
+        Require Test::TAP::Model 0.08 or higher, which works with the
+        new incompatible API of Test::Harness 2.64. Since the incompatibility
+        is bidirectional, this eventually also requires that version of
+        Test::Harness.
+
+0.14    2006-09-21
+        Fix order of requires() and auto_install() to actually do
+        something. Reported by rodi++ and fixed by audreyt++.
+
+0.13    2006-07-09
+        Include inc/ in distribution (closes
+        http://rt.cpan.org/Public/Bug/Display.html?id=20372)
+
+0.10    2006-07-05
+        First version, superseding Bundle::Pugs::SmokeKit
+

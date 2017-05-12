@@ -1,0 +1,198 @@
+
+=head1 NAME
+
+Tie::DB_File::SplitHash - Divides a DB_File hash across multiple files
+
+=head1 SYNOPSIS
+
+   use Tie::DB_File::SplitHash;
+
+   [$X =] tie %hash,  'Tie::DB_File::SplitHash', $filename, $flags, $mode, $DB_HASH, $multi_n;
+
+   $status = $X->del($key [, $flags]) ;
+   $status = $X->put($key, $value [, $flags]) ;
+   $status = $X->get($key, $value [, $flags]) ;
+   $status = $X->seq($key, $value, $flags) ;
+   $status = $X->sync([$flags]) ;
+   $status = $X->fd ;
+
+   $hash{'this'} = 'that';
+   my $entry     = $hash{'this'};
+
+   undef $X;  # See the 'untie() Gotcha' in the DB_File documentation
+   untie %hash;
+
+$multi_n determines the 'spread out' or number of files the hash will be
+split between. The larger the number, the larger the final hash can be.
+
+The other parameters are as defined in L<DB_File>.
+
+=head1 DESCRIPTION
+
+Transparently splits a Berkeley DB_File database into
+multiple files to allow the exceeding of file system
+limits on file size. From the outside, it behaves identically
+with Berkeley DB L<DB_File> hash support in general with the exception
+of 'seq' in object oriented mode. This has the potential
+to greatly expand the amount of data that can be stored on a file
+size limited file system.
+
+It does so by taking a hash of the key to be stored, folding
+the resulting hash into a value from 0 to X and storing the data
+to a db file selected by the value 0 to X. The randomizing behavior
+of the hash and subsequent fold down distribute the records essentially
+randomly between the X+1 database files, raising the capacity of the
+database to X+1 times the capacity of a single file database on
+the average.
+
+In other words: If your filesystem is limited to (for example) 2 gigabyte files,
+but you need to store B<more> than that much data in a Berkeley hash,
+you can use this module to efficiently do so.
+
+NOTE: Using an 'in-memory' database is not supported by this.
+Use L<DB_File> directly if you want to do that.
+
+BTREE and RECNO databases are not supported by this module either.
+
+The module by default exports the following constants and variables from DB_File
+(see L<DB_File> for full details on what they are for):
+
+ $DB_HASH       DB_LOCK         DB_SHMEM        DB_TXN      HASHMAGIC
+ HASHVERSION    MAX_PAGE_NUMBER MAX_PAGE_OFFSET MAX_REC_NUMBER
+ RET_ERROR      RET_SPECIAL     RET_SUCCESS     R_CURSOR
+ R_DUP          R_FIRST         R_FIXEDLEN      R_IAFTER
+ R_IBEFORE      R_LAST          R_NEXT          R_NOKEY
+ R_NOOVERWRITE  R_PREV          R_RECNOSYNC     R_SETCURSOR
+ R_SNAPSHOT __R_UNUSED
+
+We also export the Fcntl O_xxxx constants.
+
+You can suppress those exports by 'use'ing the module with an empty parameter list:
+
+  use Tie::DB_File::SplitHash ();
+
+For documentation on the methods and features of a DB_File hash - see the documentation
+for L<DB_File>. This module is essentially a wrapper around DB_File that layers on
+the additional functionality of using multiple files to store the data.
+
+B<WARNING> - changing the 'split' factor on an existing database will result in
+data loss. I<Don't do it.>
+
+=head1 CHANGES
+
+ 1.05 2005.11.18 - Added version requirement for Pod::Coverage in build tests
+
+ 1.04 2005.10.03 - Fixed build test failures under MSWindows.
+                   Merged db creation tests with newer tests.
+
+ 1.03 2005.09.29 - Fixed build test failure caused by root being able
+                   to create directories and files even in 'forbidden'
+                   directories. No functional changes.
+
+ 1.02 2005.09.28 - Added Build.PL support, META.yml and Changes. Revised
+                   documentation, Extended build test coverage to 100%
+                   code coverage. Removed unneeded usage of 'Tie::Hash'.
+                   Fixed bug in NEXTKEY causing CLEAR to throw errors.
+                   Added LICENSES, GPL_License.txt and
+                   Artistic_License.txt.
+
+ 1.01 2000.03.06 - Removed 'dependancies' on built-ins that caused
+                   'make' failures and added install tests.
+
+=head1 METHODS
+
+The object methods only apply if you are using the object oriented interface instead of the
+tied hash interface. There is the significant limitation that 'seq' does not
+work correctly in a split database.
+
+=over 4
+
+=item $status = $X-E<gt>get($key, $value [, $flags]) ;
+
+See L<DB_File>.
+
+=item $status = $X-E<gt>put($key, $value [, $flags]);
+
+See L<DB_File>.
+
+=item $status = $X-E<gt>del($key [, $flags]);
+
+See L<DB_File>.
+
+=item $status = $X-E<gt>fd;
+
+See L<DB_File>. Note - since multiple databases are actually open, only the
+file descriptor for the '1st' underlaying database is returned.
+
+=item $status = $X-E<gt>seq($key, $value, $flags);
+
+'seq' B<DOES NOT WORK. DO NOT USE IT.> This DB_File method is difficult to make
+work correctly in a split database.
+
+=item $status = $X-E<gt>sync([$flags]);
+
+See L<DB_File>.
+
+=item $result = $X-E<gt>exists($key);
+
+Returns true if the specified key exists in the database.
+
+=item $result = $X-E<gt>clear;
+
+Clears (removes all keys and values) the entire hash.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 1999-2005, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
+FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
+This software may be copied or redistributed under the same terms as Perl itelf.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify it under
+either the terms the GNU Public License (GPL) version 1 or later, or under the
+Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=head1 AUTHOR
+
+Benjamin Franz
+
+=head1 TODO
+
+'seq' functionality
+
+=head1 VERSION
+
+1.05 - 2005.11.18
+
+=head1 SEE ALSO
+
+L<DB_File>
+
+=cut

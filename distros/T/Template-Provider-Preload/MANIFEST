@@ -1,0 +1,27 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Template/Provider/Preload.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_compile.t
+t/02_concept.t
+t/03_precache.t
+t/97_meta.t
+t/98_pod.t
+t/99_pmv.t
+t/template/a/b/c/hello.tt
+t/template/bar.tt
+t/template/foo.tt
+t/template/one.tt
+t/template/three.tt
+t/template/two.tt

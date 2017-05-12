@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- :tabSize=2:indentSize=2:wrap=hard: -->
+<changelog xmlns="http://www.blackperl.com/2009/01/ChangeLogML"
+    xmlns:sc="http://www.blackperl.com/2009/01/ChangeLogML/source-control"
+    xmlns:git="http://www.blackperl.com/2009/01/ChangeLogML/source-control/git"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.blackperl.com/2009/01/ChangeLogML etc/ChangeLogML.xsd">
+  <project>Test::Without</project>
+  <title>Perl Module Test::Without Change History</title>
+  <description>
+    A Perl module to run unit tests while hiding modules and/or directories
+    from the block of code being tested.
+  </description>
+  <release version="0.100" sc:tag="0.100" date="2009-09-19T20:15:00-07:00">
+    <change git:commit="397017ca38dad51fbe9c6be853933894f421f42b">
+      <fileset>
+        <file path="lib/Test/Without.pm" action="ADD" />
+        <file path="t/01_pod.t" action="ADD" />
+        <file path="t/02_pod_coverage.t" action="ADD" />
+        <file path="t/03_meta.t" action="ADD" />
+        <file path="t/04_minimumversion.t" action="ADD" />
+        <file path="t/05_critic.t" action="ADD" />
+      </fileset>
+      <description>
+        Initial commit.
+      </description>
+    </change>
+    <change git:commit="b6e0de5fa2e4e20a2e74fffa04f179369d893ca6">
+      <fileset>
+        <file path="t/01_pod.t" />
+        <file path="t/02_pod_coverage.t" />
+        <file path="t/03_meta.t" />
+        <file path="t/04_minimumversion.t" />
+        <file path="t/05_critic.t" />
+      </fileset>
+      <description>
+        Changed the checked-for environment var for author tests.
+      </description>
+    </change>
+  </release>
+</changelog>

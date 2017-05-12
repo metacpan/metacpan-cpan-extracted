@@ -1,0 +1,25 @@
+[% # $Id$
+
+# Language information.
+
+site.languages = [ 'en', 'nl' ]
+
+site.image.flags.en = {
+    src    = "$site.url.images/flag_en.png"
+    alt    = "En"
+    width  = 35
+    height = 18
+    align  = "middle"
+    descr  = "Information in English"
+}
+
+site.image.flags.nl = {
+    src    = "$site.url.images/flag_nl.png"
+    alt    = "Nl"
+    width  = 35
+    height = 18
+    align  = "middle"
+    descr  = "Informatie in het Nederlands"
+}
+
+-%]

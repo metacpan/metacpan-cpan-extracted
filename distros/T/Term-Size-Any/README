@@ -1,0 +1,78 @@
+NAME
+    Term::Size::Any - Retrieve terminal size
+
+SYNOPSIS
+        # the traditional way
+        use Term::Size::Any qw( chars pixels );
+
+        ($columns, $rows) = chars *STDOUT{IO};
+        ($x, $y) = pixels;
+
+DESCRIPTION
+    This is a unified interface to retrieve terminal size. It loads one
+    module of a list of known alternatives, each implementing some way to
+    get the desired terminal information. This loaded module will actually
+    do the job on behalf of `Term::Size::Any'.
+
+    Thus, `Term::Size::Any' depends on the availability of one of these
+    modules:
+
+        Term::Size           (soon to be supported)
+        Term::Size::Perl
+        Term::Size::ReadKey  (soon to be supported)
+        Term::Size::Win32
+
+    This release fallbacks to Term::Size::Win32 if running in Windows 32
+    systems. For other platforms, it uses the first of Term::Size::Perl,
+    Term::Size or Term::Size::ReadKey which loads successfully. (To be
+    honest, I disabled the fallback to Term::Size and Term::Size::ReadKey
+    which are buggy by now.)
+
+  FUNCTIONS
+
+    The traditional interface is by importing functions `chars' and `pixels'
+    into the caller's space.
+
+    chars
+            ($columns, $rows) = chars($h);
+            $columns = chars($h);
+
+        `chars' returns the terminal size in units of characters
+        corresponding to the given filehandle `$h'. If the argument is
+        ommitted, `*STDIN{IO}' is used. In scalar context, it returns the
+        terminal width.
+
+    pixels
+            ($x, $y) = pixels($h);
+            $x = pixels($h);
+
+        `pixels' returns the terminal size in units of pixels corresponding
+        to the given filehandle `$h'. If the argument is ommitted,
+        `*STDIN{IO}' is used. In scalar context, it returns the terminal
+        width.
+
+        Many systems with character-only terminals will return `(0, 0)'.
+
+SEE ALSO
+    It all began with Term::Size by Tim Goodwin. You may want to have a look
+    at:
+
+        Term::Size
+        Term::Size::Perl
+        Term::Size::Win32
+        Term::Size::ReadKey
+
+BUGS
+    Please reports bugs via CPAN RT, via web
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Term-Size-Any or e-mail to
+    bug-Term-Size-Any@rt.cpan.org.
+
+AUTHOR
+    Adriano R. Ferreira, <ferreira@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008-2012 by Adriano R. Ferreira
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,35 @@
+Tie/Hash/Expire version 0.03
+===============================
+
+Hashes tied to Tie::Hash::Expire behave like normal hashes in all respects except that when a key is added or the value associated with a key is changed, the current time is stored, and after 'expire_seconds' the key and value are removed from the hash.
+
+Resolutions finer than seconds are available if the module finds access to Time::HiRes.  If Time::HiRes is available, you can expect expiration to be accurate to 0.001 seconds.  You may specify 'expire_seconds' to be decimal numbers like 5.12 .  If Time::HiRes is available, this number will be used precisely.  If you specify a decimal number and don't have access to Time::HiRes, a warning is generated and the code will function as though you specified the next higher integer.
+
+The number of seconds specified by 'expire_seconds' is taken to mean an absolute maximum lifespan for the key, at the resolution described above.  In other words, if you set 'expire_seconds' to 1 second, and do not have Time::HiRes, keys could expire as quickly as the next machine instruction, but will not last longer than 1 second.
+
+If you have problems with this module, or even simply find it useful, feel free to send mail to the author, Jeff Yoak, at jeff@yoak.com .
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Test::More (only for testing during installation)
+	POSIX
+	Carp
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 Jeff Yoak <jeff@yoak.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

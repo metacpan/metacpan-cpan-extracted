@@ -1,0 +1,34 @@
+Revision history for Test-WWW-Selenium-Catalyst
+
+0.07 - 2011/09/16
+ - Add repository metadata. Move to catagits
+ - Work with (and require) Catalyst 5.9. RT#70799
+ - Fix documentation errors. RT#64979
+ - Switch shutDown to shutDownSeleniumServer, which is present in all versions of
+   SeleniumRC but is the only shut down command that works from 1.0 on. RT#50880
+
+0.06 - 2009/08/26
+ - Support for external selnium servers (RT 33214)
+ - Fix test. RT#50877
+ - Allow external selenium server to be used. RT#33214
+ - Fix packaging issues. RT#48905
+
+0.05 - 2009/03/07
+ - Use IPC::Cmd::can_run in tests to not have so many spurious failues due to
+   no smoke rigs having java installed
+
+0.04 - 2009/03/05
+ - Un-fark the dist so that the thing installs
+
+0.03 - 2009/03/04
+ - Allow a bit more configurability in selenium invocation and app
+   location
+
+0.02 - 2008/03/06
+ - Don't call $sel->start; this breaks stuff
+
+0.01 - 2007/05/27
+ - Mostly the same... released for wider testing.
+
+0.00_01 - 2006/09/19
+ - First version, released on an unsuspecting world.

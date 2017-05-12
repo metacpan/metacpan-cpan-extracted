@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites>
+  <testsuite name="Indentation of comments" errors="0" failures="1" skipped="0" tests="1" time="0">
+    <system-out># abcd
+#     abcd
+#         abcd
+# &lt;&lt;&lt; &gt;&gt;      abcd
+not ok 1 - This is not ok
+# &lt;&lt;&lt; &gt;&gt;      abcd
+# &lt;&lt;&lt; &gt;&gt;      abcd
+#         abcd
+1..1
+</system-out>
+    <testcase name="This is not ok" classname="Indentation of comments" time="0">
+      <failure message="not ok 1 - This is not ok" type="TAP::Parser::Result::Test">abcd
+    abcd
+        abcd
+&lt;&lt;&lt; &gt;&gt;      abcd
+</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

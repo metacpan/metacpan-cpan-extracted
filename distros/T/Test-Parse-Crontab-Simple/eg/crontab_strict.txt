@@ -1,0 +1,8 @@
+*/30 * * * * perl /path/to/cron_lib/some_worker1
+###sample 2014-12-31 00:00:00
+
+0 23 * * * perl /path/to/cron_lib/some_worker2
+###sample 2014-12-31 23:00:00
+
+0 15 * * * perl /path/to/cron_lib/some_worker3
+###sample 2014-12-31 15:00:00

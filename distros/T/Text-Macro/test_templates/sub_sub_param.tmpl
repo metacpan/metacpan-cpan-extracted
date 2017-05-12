@@ -1,0 +1,15 @@
+#sub foo
+
+argv0=##ARGV[0]##.
+
+#endsub
+
+#sub bar
+
+argv0=##ARGV[0]##.
+#callsub foo "two"
+argv0=##ARGV[0]##.
+
+#endsub
+
+#callsub bar "one"

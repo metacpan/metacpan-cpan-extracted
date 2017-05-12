@@ -1,0 +1,17 @@
+=head1 NAME
+
+Teamspeak::Player - Teamspeak::Server have multiple Users.
+
+=head1 SYNOPSIS
+
+There are Admins, Serveradmins, Registered Users and connected Users at a
+L<"Teamspeak"> Instance.
+
+=head1  CLASS METHODS
+
+=head2 new
+  
+  This creates a Teamspeak::Player Object.
+
+=cut
+

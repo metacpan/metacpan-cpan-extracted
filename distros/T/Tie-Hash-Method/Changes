@@ -1,0 +1,14 @@
+Revision history for Tie-Hash-Method
+
+0.01    2008-07-24T21:59:18 CEST 
+        Initial release
+        
+0.02    2008-07-25T00:04:22 CEST 
+        Fixup release. Liz made some points which were compelling enough
+        I rewrote a chunk of the code. Some of the previous interface 
+        changes, but hopefully for the better. And considering its only
+        been released for a few hours i think it shouldnt matter anyway.
+        :-)
+        
+        
+

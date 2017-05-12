@@ -1,0 +1,16 @@
+@count.Ngram=2
+@count.WindowSize=5
+@count.FrequencyCut=0
+@count.InputFilePath=train/art.n.count
+58
+<head>line</head><>of<>10 20 15
+to<>of<>8 12 15
+of<>the<>7 14 8
+of<><head>line</head><>6 14 10
+u<>s<>6 7 8
+to<><head>line</head><>5 12 10
+of<>to<>5 14 10
+on<>of<>4 7 15
+<head>line</head><>to<>3 20 10
+of<>computers<>2 14 5
+of<>new<>2 14 8

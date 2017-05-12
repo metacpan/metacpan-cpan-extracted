@@ -1,0 +1,6 @@
+Revision history for perl module Text::Playlist
+
+0.02  2015-05-12
+
+  - First public release
+  - Basic parse/dump capabilities for m3u/pls formats

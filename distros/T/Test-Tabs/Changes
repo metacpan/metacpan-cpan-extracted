@@ -1,0 +1,42 @@
+Test-Tabs
+=========
+
+Created:      2012-09-20
+Home page:    <https://metacpan.org/release/Test-Tabs>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Test-Tabs>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-16
+
+ [ Test Suite ]
+ - Fix test case so it no longer attempts to test our own Makefile.PL
+   (which has a space-indented portion).
+
+ [ Packaging ]
+ - Add repo link.
+
+0.004	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.003	2013-05-24
+
+ [ Bug Fixes ]
+ - Properly report the line number of test failures.
+
+ [ Other ]
+ - Added: Also test files named *.psgi.
+ - Added: Implement `## no Test::Tabs` and `## use Test::Tabs` comments to
+   ignore whitespace rules for a block of lines.
+ - Added: Implement `## skip Test::Tabs` to skip whitespace tests for a
+   file.
+ - Added: Implement `##WS` comment to ignore whitespace rules for one line.
+ - Report all whitespace problems in a file; not just the first.
+
+0.002	2012-09-26
+
+ - Allow lines to jump *down* indent, as this is occasionlly useful for
+   statement modifiers.
+
+0.001	2012-09-20	Initial release

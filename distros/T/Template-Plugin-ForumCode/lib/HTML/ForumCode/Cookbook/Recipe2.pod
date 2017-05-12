@@ -1,0 +1,98 @@
+=pod
+
+=head1 NAME
+
+HTML::ForumCode::Cookbook::Recipe2 - HTML, JavaScript and CSS
+
+=head1 SYNOPSIS
+
+=head2 Include MessagePreview.js
+
+    <script type="text/javascript"
+        src="[%c.uri_for('/static/script/MessagePreview.js')%]"></script>
+
+=head2 Add CSS style for formatted preview
+
+    .message-preview-overlay {
+        border:             1px dashed #ccc;
+        text-align:         left;
+        padding:            0px;
+    }
+
+=head2 Using an input button
+
+    <textarea name="text_stuff" id="text_stuff_entry" cols="45" rows="5"></textarea>
+    <input type="button"
+        id="text_preview_button"
+        value="Preview Message"
+        accesskey="P"
+        name="post_reply"
+        class="input_button"
+    />
+
+    <!-- message preview majick -->
+    <script type="text/javascript">
+        var MessagePreview = new ForumMessagePreview();
+
+        MessagePreview.config.label_preview = 'Preview Message';
+        MessagePreview.config.label_edit    = 'Edit Message';
+        MessagePreview.config.icon_preview  = '/static/images/icons/layout_content.png';
+        MessagePreview.config.icon_edit     = '/static/images/icons/layout_edit.png';
+        MessagePreview.config.post_url      = "[%c.uri_for('/forumcode/preview')%]",
+        MessagePreview.config.trigger       = 'text_preview_button';
+        MessagePreview.config.user_input    = 'text_stuff_entry';
+
+        MessagePreview.init();
+    </script>
+    <!-- (end) message preview majick -->
+
+=head2 Using an icon
+
+    <textarea name="some_text" id="some_text_entry" cols="45" rows="5"></textarea>
+    <img id="text_preview_icon"
+        src="[%c.uri_for('/static/images/icons/layout_content.png')%]"
+        alt="Preview Message"
+        title="Preview Message"
+        width="16"
+        height="16"
+    />
+
+    <!-- message preview majick -->
+    <script type="text/javascript">
+        var MessagePreview = new ForumMessagePreview();
+
+        MessagePreview.config.label_preview = 'Preview Message';
+        MessagePreview.config.label_edit    = 'Edit Message';
+        MessagePreview.config.icon_preview  = '/static/images/icons/layout_content.png';
+        MessagePreview.config.icon_edit     = '/static/images/icons/layout_edit.png';
+        MessagePreview.config.post_url      = "[%c.uri_for('/forumcode/preview')%]",
+        MessagePreview.config.trigger       = 'text_preview_icon';
+        MessagePreview.config.user_input    = 'some_text_entry';
+
+        MessagePreview.init();
+    </script>
+    <!-- (end) message preview majick -->
+
+=head1 DESCRIPTION
+
+This recipe provides the HTML, JavaScript and CSS markup required to implement
+a message preview text area on a page.
+
+I<MessagePreview.js> will be required to perform the preview actions. This
+script requires YUI.
+
+=head1 MessagePreview.js
+
+Until a more sensible solution can be arrived at MessagePreview.js can be
+found in the examples directory of this distribution.
+
+=head1 AUTHOR
+
+Chisel Wright C<< <chiselwright@users.berlios.de> >>
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

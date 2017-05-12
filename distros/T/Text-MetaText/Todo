@@ -1,0 +1,313 @@
+#========================================================================
+#
+# Text::MetaText 
+#
+#   Version 0.22
+# 
+#   Copyright (C) 1996-1998 Andy Wardley <abw@kfs.org>.  
+#   All Rights Reserved.
+#
+#------------------------------------------------------------------------
+#
+# Todo
+#
+#   The following represents a list of known bugs or limitations in
+#   Text::MetaText, Text::MetaText::Directive and/or metapage or ideas
+#   about ways in which they might be improved in the future.
+#
+#   The items are in no particular order and in many cases are abstract 
+#   thoughts that drifted momentarily through my transem.  Most of those
+#   points that indicate known bugs are due to be fixed some time soon.
+#   The other ideas may or may not be implemented or re-worked in the 
+#   fullness of time.
+#
+#========================================================================
+
+
+#------------------------------------------------------------------------
+# EVALUATE
+#------------------------------------------------------------------------
+
+* Check (and fix, if necessary) the evalutation code which uses string
+  equalitites to compare variables.  This may fail in certain cases
+  (e.g. "000123" > "45")
+
+* _evaluate() uses a 2-step regex to strip surrounding quotes for rhs
+  value (~ line 1489).  This may cause problems (false positive) when 
+  quotes are mis-matched (e.g. 'foo")
+
+* Enhance _evaluate() to understand "not" or "!"
+
+* Make _evaluate() better, stronger and faster altogether.  It's 
+  currently none of those (this is probably the next big task, BTW)
+
+
+#------------------------------------------------------------------------
+# NEW/IMPROVED DIRECTIVES
+#------------------------------------------------------------------------
+
+* Add conditional blocks:
+
+  %% IF <condition> %% 
+     ... 
+  %% ELSE %% 
+     ... 
+  %% ENDIF %% 
+
+* ...which may be more useful as %% SWITCH blocks %%
+
+  %% SWITCH <var> %%
+     -- <var> is true --
+  %% CASE <value1> %%
+     -- <var> == <value1> --
+  %% CASE <value1> %%
+     ...
+  %% ENDSWITCH %%
+
+  (might get really horrid if you wanted to do %% BREAK %% as well....
+
+* Add for-loop blocks
+
+  %% FOR <variable> = <start> to <end> step <step> %%
+     ...
+  %% ENDFOR %%
+
+  Perhaps with a list of options, rather than a range:
+
+  %% FOR <variable> = "<val1>, <val2>, <val3>, ... " %%
+     ...
+  %% ENDFOR %%
+
+  or:
+
+  %% FOR <variable> in "<val1>, <val2>, <val3>, ..." %%
+     ...
+  %% ENDFOR %%
+
+* Add INDEX directive to build a list of existing INCLUDE (and others?)
+  directives within a given document/block.  This should be available
+  for use by the loop constructs.  Useful for making tables of contents/
+  indices.
+
+* Allow configuration items to be specified in directives
+  e.g. %% CONFIGURE rogue="warn"     %%
+       %% CONFIGURE magic="++"       %%
+       ++ CONFIGURE delimiter="#"    ++ 
+       ++ CONFIGURE magic="<!--#-->" ++ # uses DELIMITER
+
+  This may have horrible security ramifications:
+
+       %% CONFIGURE execute=all %%
+       %% my_rogue_script("system -rf *") %%
+
+* Add a facility to DEFINE global variables (global flag?) that persist 
+  for the execution lifetime.  The namespace idea was a good one 
+  (implemented internally, but removed for public release) but I 
+  couldn't implement it well in the limited time I had available.
+
+* Have failed INCLUDE directives warn/delete/rebuild directive like 
+  SUBST does.
+
+* Add "blockformat" parameter for formatting a block without splitting
+  into lines and subsequently rejoining.
+
+
+#------------------------------------------------------------------------
+# VARIABLES AND CASE HANDLING
+#------------------------------------------------------------------------
+
+* System variables, such as "ELEMENT_NAME" that are set before, and cleared
+  after process().  Currently, the only "system variable" is "TIME".
+
+* Have a default (or user-defined) namespace which is searched for 
+  variables as another SUBST option (as per EXECUTE).
+
+
+#------------------------------------------------------------------------
+# DOCUMENTATION
+#------------------------------------------------------------------------
+
+* update documentation to note that pre-defined (i.e. passed in the 
+  process() variable hash) variables that resolve to code blocks 
+  execute the code block in substitution.
+
+* add a "tutorial" section to the docs, covering metapage in particular
+
+* Update documentation to reflect any other new changes not listed above
+  (there must be some kicking about)
+
+* Add sections describing the use of ERROR and DEBUG.
+
+
+
+#------------------------------------------------------------------------
+# PARSE AND PROCESS METHODS
+#------------------------------------------------------------------------
+
+* process should also allow FileHandles to be passed.  Something like this 
+  should do the trick for passing a filename, a GLOB or a FileHandle 
+  reference.
+
+	unless (ref($file) =~ /^(GLOB|FileHandle)$/) {
+		$thingy = new FileHandle $file or return undef;
+	}
+
+	while (<$file>) {
+	}
+
+* Allow post-process methods to work on block text rather than line-by-line.
+
+* _parse() and _process() should support _pre_parse(), _post_parse(),
+  _pre_process() and _post_process() (not to be confused with the current 
+  _post_process()) which can be hooks for derived classes.
+
+* _push_process() and _pull_process() methods would make this runtime 
+  configurable rather than requiring class derivation.
+
+* Implement the base class with a _register_process() method which the
+  constructor calls. 
+
+  sub _register_processes {
+      my $self = shift;
+      $self->_push_process("if", PRE_PROCESS, 
+             sub { $self->_evaluate(@_) });
+      $self->_push_process("default", POST_PROCESS, 
+             sub { $self->_default(@_) });
+      # ...etc...
+  }
+
+* Derived classes can overload _register_processes() and call
+  $self::SUPER->_register_processes() if they want to include 
+  default processing capabilities.
+
+  Or... if you wanted to provide a different default() method, you could 
+  leave _register_processes() as it is and just overload _default().
+
+* Things like default(), format() and filter() could be implemented as 
+  _post_process() stages.  Perhaps if() could be implemented as a 
+  _pre_process() stage.
+
+  These should return 
+    COMPLETE   - the process has handled the request in entirety
+    CONTINUE   - the process may have done something but want to
+                 pass control down the chain of responsibility
+    CANCEL     - stop the request and return an empty result
+    ERROR      - an error occurred.
+
+* Add a Directive type, NULLOP, which is guaranteed to to nothing.  It
+  escapes me at the moment why I wanted this, but it was going to be useful 
+  for something or other.
+
+* process_file() and process_text() currently return undef if the process
+  fails.  This should be configurable (STRICT?) to allow the much simpler
+  "print $mt->process_file(...)" rather than having to explicitly check
+  the return value for undef before printing.
+
+
+#------------------------------------------------------------------------
+# ASSOCIATED PACKAGES
+#------------------------------------------------------------------------
+
+* Test ($ERROR) reporting in base class works effectively in derived
+  classes.
+
+
+#------------------------------------------------------------------------
+# METAPAGE
+#------------------------------------------------------------------------
+
+* Add "alias" functionality to metapage (in [alias] config block?) which 
+  defines an alias for one or more metapage configurations that should be 
+  executed in turn.  e.g.
+
+  .metapagerc
+      [alias]
+      kfs: kfs.text kfs.logfx kfs.higfx kfs.dhtml
+
+  command line:
+      metapage @kfs 
+  ==> 
+      metapage @kfs.text
+      metapage @kfs.logfx
+      metapage @kfs.higfx
+      metapage @kfs.dhtml
+
+* Add an execution option to metapage as per original mkpage utility.  This
+  should be configurable to avert security issues.
+
+  .metapagerc
+
+      [file]
+      bin = ~/metapage/bin
+
+      [define]
+      do_something = exec(script_name)
+
+  Source file:
+      %% do_something ... %% 
+  ==>
+      ~/metapage/bin/script_name ...
+
+* Add a default "image" (or "img") block to metapage to facilitate:
+
+  Source file:
+      %% img foo/bar.gif
+         alt = "My Image" 
+      %% 
+  ==>
+      <img src="%%images%%/foo/bar.gif" 
+      width="..." height="..." alt="My Image">
+
+  Or:
+      %% IMG $images/foo/bar.gif
+         alt = "My Image"
+      %%
+
+* Implement metapage config management with App::Config?
+
+* Extend config parsing capabilities to allow multiple options to be 
+  specified (e.g. CASEVARS).
+
+* Add a 'copy' option to config [file] block which specified a file pattern
+  for files to be copied rather than processed.
+
+* Implement the core metapage functionality as a module.  
+  
+
+
+#------------------------------------------------------------------------
+# INSTANTIATION AND CONFIGURATION
+#------------------------------------------------------------------------
+
+* Is it necessary/worthwhile to allow instantiation via new() as an 
+  object method as well as a class method?
+
+* Add a CACHE configuration option which determines if symbol table 
+  entries should be cached or not.  Add a corresponding reset(), 
+  clear_cache(), reset_globals(), or whatever method to clean down the 
+  MetaText instantiation.  This is particularly relevant to persistant 
+  Text::MetaText objects such as you might use in mod_perl.
+
+* On that note, create a mod_perl module.
+
+
+#------------------------------------------------------------------------
+# MISC INTERNALS
+#------------------------------------------------------------------------
+
+* Implement DEBUG better.  One idea is to alias the DEBUG function to 
+  a nullop constant function (e.g. \*DEBUG = \&NULLOP;) which would 
+  avoid the overhead of calling the DEBUG function and evaluating the 
+  DEBUGLEVEL when DEBUG is turned off.  
+
+* The sprintf in the DEBUG method gets confused by embedded '%' (line ~1507)
+
+* It would be convenient for DEBUG and ERROR (and anthing else) to be
+  shared between Text::MetaText and Text::MetaText::Directive, rather
+  than having one report the other and so on.  These could be implemented
+  as separate objects and passed from one to the other, perhaps.
+  
+* Fix _all_ variable test bugs of the form "$foo = $2 || 'default'" which 
+  will give a false negative when ($2 eq "0")
+
+

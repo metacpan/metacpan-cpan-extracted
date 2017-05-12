@@ -1,0 +1,143 @@
+0.13	19 September 2010
+	Checking out the tool chain with perl 5.13.5.
+
+	28 January 2004
+	Made sure the test-suite cleans up on multi-versioned systems.
+
+0.12	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.11	27 September 2003
+	Added dependency on load.pm, version 0.11, as that has some more fixes,
+	particularly relating to running under taint.
+
+	18 September 2003
+	Increased dependency on Thread::Serialize 0.07, which in turn
+	should get at least load 0.09, which contains several fixes.
+
+	Removed warning from test-suite as the strange warnings seems to
+	have disappeared with the new version of load.
+
+0.10	13 August 2003
+	Fixed strange error that would sometimes cause an execution error
+	during global destruction.  I guess it's just another case of
+	fake objects being presented for destruction ;-(
+
+	Tweaked the message in the test-suite a little.
+
+0.09	11 August 2003
+	Fixed some typos in the Makefile.PL.  Adapted some areas in the
+	test-suite to allow for better testing.  Made sure that the tests
+	run with strict and warnings.
+
+0.08	30 September 2002
+	Use "load" instead of "AutoLoader" in all but Thread::Tie itself.
+	Increased dependency of Thread::Serialize to 0.05.
+
+	27 September 2002
+	Removed "our" from $VERSION and @ISA, should shave off some bytes in
+	memory usage, as found from testing with Benchmark::Thread::Size.
+
+	5 September 2002
+	Adapted MANIFEST: the 2nd test-file of the test-suite was missing ;-(
+	so nobody but me did the stress test.
+
+0.07	1 September 2002
+	Removed shutdown test from Tie02.t: default thread should close down
+	on its own now, you shouldn't get a "Threads were running" error
+	anymore.
+
+	Added END {} to take care of shutdown of default thread: apparently
+	the going out of scope of the main thread object doesn't cause the
+	DESTROY method to be called.  So this is really a workaround for a
+	bug in Perl.
+
+	Increased dependency on Thread::Serialize to 0.02, to ensure that
+	the most efficient one is always used.
+
+0.06	31 August 2002
+	Added OPTIMIZATIONS section to pod of T::T::Thread.
+
+        Changed T::T::Thread to use AutoLoader to defer loading of necessary
+	subroutines to when they are actually needed.  This should save
+	memory and CPU for larger programs, or with large numbers of threads.
+	The test-suite takes 1% less memory and uses 5% less CPU: the
+	overhead of compiling is levelled out with the overhead of cloning
+	pre-compiled routines.
+
+0.05	20 August 2002
+	Dave Mitchell showed me the error of my ways with regards to client
+	server thread programming.  Fixed the main handler so that no yield()s
+	are necessary anymore.  The whole thing now gets through the test
+	suite more than 10% faster.  Scalability to many more threads should
+	now be a lot better too.
+
+0.04	15 August 2002
+	Added CAVEATS section about limitations of what can be transported
+	between threads.
+
+	Removed custom freeze and thaw operations from Thread::Tie::Thread.
+	Replaced by Thread::Serialize's versions.  Added depenendency on
+	Thread::Serialize.
+
+0.03	13 August 2002
+	Fixed problem with DESTROYing of tied variables after the thread
+	was shut down.  Added error message when trying to do things other
+	than DESTROYing or UNTIEing after the thread was shut down.
+
+	Completed first version of documentation of Thread::Tie and
+	Thread::Tie::Thread.
+
+	Added "hammering" test-suite for tied file handles.
+
+	12 August 2002
+	Added "hammering" test-suite.  This now tests the array and hash
+	implementation as well as the capability to lock using a semaphore.
+
+	Streamlined the thread dispatcher further, succeeding in a 9%
+	gain in CPU usage.
+
+	Removed the DESTROY method from the default implementation of
+	tied variables in the thread (Thread::Tie::(Array|Hash|Scalar))
+	as they are not necessary anymore since we have untie() support
+	now.
+
+	Added support for untie().  Untieing a variable will cause the
+	DESTROY method to be called inside the thread before being untied
+	there as well.  Any subsequent DESTROY's (after the variable was
+	untied) will be ignored (thereby averting the untie GOTCHA).  This
+	can save significant amounts of memory.
+
+	Added method "shutdown" to Thread::Tie (as class method, to shut
+	down the default thread) and as object method to Thread::Tie::Thread.
+
+	Added support for "eval" field for evaluating arbitrary perl code
+	inside the thread when tie()ing the variable.
+
+0.02	10 August 2002
+	Added support for "use" field for using extra modules inside the
+	thread when tie()ing the variable.
+
+	Added documentation for the TIEHANDLE implementation.
+
+	Fixed up the default TIEHANDLE implementation.  Should now work
+	except for readline() in list context: because the context is not
+	(yet) passed to the thread correctly, reading lines from a file
+	in list context doesn't work.
+
+	Added BEGIN section to Thread::Tie, causing the default thread
+	to be started during compilation.  This can make the thread as
+	lightweight as possible, especially if it is the first module used.
+
+	Added some intelligence to Thread::Tie::Thread's _freeze and _thaw
+	so that they will not use Storable unless it is really needed.  This
+	should be a performance boost for the simple cases.
+
+	Removed mention of being truly shared because Arthur Bergman pointed
+	out that the current tie() implementation _always_ saves the values
+	in the (thread local) SV.  Although this has nothing to do with
+	shared variables, it _does_ cause the values to actually be copied
+	into thread local space everytime they are fetched.
+
+0.01	9 August 2002
+	First version of Thread::Tie.

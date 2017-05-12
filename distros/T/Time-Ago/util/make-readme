@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# There's a plugin for this but not sure how to append travis code 
+
+readme=README.md
+
+set -e
+
+
+dzil build
+pod2markdown < Time-Ago-*/lib/Time/Ago.pm > $readme
+
+cat << EOT >> $readme
+
+[![Build Status](https://travis-ci.org/mla/time-ago.svg?branch=master)](https://travis-ci.org/mla/time-ago)
+EOT

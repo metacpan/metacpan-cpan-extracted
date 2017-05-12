@@ -1,0 +1,48 @@
+NAME
+    Test::Unit::Runner::XML - Generate XML reports from unit test results
+
+SYNOPSIS
+        use Test::Unit::Runner::XML;
+
+        mkdir("test_reports");
+        my $runner = Test::Unit::Runner::XML->new("test-reports");
+        $runner->start($test);
+        exit(!$runner->all_tests_passed());
+
+DESCRIPTION
+    Test::Unit::Runner::XML generates XML reports from unit test results.
+    The reports are in the same format as those produced by Ant's JUnit
+    task, allowing them to be used with Java continuous integration and
+    reporting tools.
+
+CONSTRUCTOR
+        Test::Unit::Runner::XML->new($directory)
+
+    Construct a new runner that will write XML reports into $directory
+
+METHODS
+  start
+        $runner->start($test);
+
+    Run the Test::Unit::Test $test and generate XML reports from the
+    results.
+
+  all_tests_passed
+        exit(!$runner->all_tests_passed());
+
+    Return true if all tests executed by $runner since it was constructed
+    passed.
+
+AUTHOR
+    Copyright (c) 2004 Andrew Eland, <andrew@andreweland.org>.
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+    *   Test::Unit
+
+    *   Test::Unit::TestRunner
+
+    *   The Ant JUnit task, http://ant.apache.org/
+

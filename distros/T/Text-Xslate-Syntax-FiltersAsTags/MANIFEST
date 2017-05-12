@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Text/Xslate/Syntax/FiltersAsTags.pm
+t/00-compile.t
+t/1tl-tag.t

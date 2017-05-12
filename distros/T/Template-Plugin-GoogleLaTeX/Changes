@@ -1,0 +1,15 @@
+Revision history for Template-Plugin-GoogleLaTeX
+
+0.03    2010/08/27 13:59:36 UTC 
+
+        Added dependencies on Template::Plugin::Filter and URI::Escape to
+        Makefile.PL
+
+0.02    2010/08/26 15:39:18 UTC
+
+        OMG. Forgot to replace the stock README.
+
+0.01    2010/08/25 17:31:53 UTC
+
+        First version.
+

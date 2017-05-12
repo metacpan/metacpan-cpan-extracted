@@ -1,0 +1,15 @@
+[%# vim: set syntax=java: %]
+
+public class	$class
+[% IF parent %]
+extends		$parent
+[% END %]
+implements
+[%- IF sax2 -%]
+	ContentHandler
+[%- ELSE -%]
+	DocumentHandler
+[%- END -%]
+		[% FOREACH i = interface %]
+		,$i
+		[% END %]

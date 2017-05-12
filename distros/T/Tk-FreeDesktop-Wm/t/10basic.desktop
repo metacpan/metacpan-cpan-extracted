@@ -1,0 +1,11 @@
+[Desktop Entry]
+Comment=A sample for Tk::FreeDesktop::Wm
+Comment[de]=Ein Beispiel für Tk::FreeDesktop::Wm
+Encoding=UTF-8
+Exec=perl 10basic.t
+Icon=srtbike48.png
+Name=Tk::FreeDesktop::Wm
+Path=
+Terminal=true
+TerminalOptions=
+Type=Application

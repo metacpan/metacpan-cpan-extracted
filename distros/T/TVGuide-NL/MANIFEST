@@ -1,0 +1,25 @@
+Artistic.txt
+examples/films.rss
+examples/pics/down.png
+examples/pics/left.png
+examples/pics/right.png
+examples/pics/up.png
+examples/prefs.cgi
+examples/prefs.css
+examples/prefs.js
+examples/test.pl
+examples/tvgids.cgi
+examples/tvgids.css
+examples/tvgids.js
+GPL2.txt
+lib/TVGuide/NL.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+utils/maketables.pl
+zooi/eerstetest.sh
+zooi/test.pl
+CHANGELOG
+News

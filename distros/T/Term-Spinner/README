@@ -1,0 +1,101 @@
+NAME
+    Term::Spinner - A progress spinner for commandline programs
+
+SYNOPSIS
+      use Term::Spinner;
+
+      my $spinner = Term::Spinner->new();
+      while(... doing something ...) {
+          $spinner->advance();
+          # Do things...
+      }
+      undef $spinner; # clears final spinner output by default.
+
+DESCRIPTION
+    This module provides a simple one-character spinner for commandline
+    programs. You can use this to keep the user from getting bored while
+    your program performs a long operation.
+
+    You can override the array of graphical characters used to draw the
+    spinner (by default, "-, \, |, /," and "x" for "finished").
+
+    It clears the spinner for re-drawing by using a sequence of backspace,
+    space, backspace. I've found this works for me on all of the terminals I
+    use, without having to get into all the $TERM types and various special
+    escape sequences.
+
+    In the future, I may add support for using escape sequences for
+    well-known terminal types, if it can be done reliably.
+
+    Try "perl examples/various.pl" in this distribution to see some sample
+    spinners in action.
+
+ATTRIBUTES
+    These can be used as options to "new", or modified at any time by
+    calling them as accessors on an object.
+
+  spin_chars
+    An arrayref of characters used to draw the spinner. The default is "-,
+    \, |, /, x". The final character of this array is not used during the
+    normal spin cycle, it is used when you call "finish", to indicate the
+    spinner is done spinning.
+
+  output_handle
+    The filehandle to use when drawing the spinner. Defaults to "STDERR".
+
+  clear_on_destruct
+    Boolean setting for whether the spinner should "clear" itself when the
+    object is destructed. Defaults to true.
+
+  finish_on_destruct
+    Boolean setting for whether the spinner should "finish" itself when the
+    object is destructed. Defaults to true. Has little noticeable effect if
+    "clear_on_destruct" is also enabled, as the finish character will be
+    cleared immediately.
+
+METHODS
+  new
+    Provided by Moose. Accepts the attributes above as a simple hash.
+    Example:
+
+      my $sp = Term::Spinner->new(
+        clear_on_destruct => 0,
+        output_handle => \*STDOUT,
+      );
+
+  clear
+    Clears the spinner's output, if any.
+
+      $sp->clear();
+
+  draw
+    Draws the spinner in its current state, clearing first. This is done
+    automatically on "advance" and "finish"
+
+      $sp->draw();
+
+  advance
+    Advance the spinner by one character and redraw.
+
+      $sp->advance();
+
+  finish
+    Set the spinner to the finish character and redraw
+
+      $sp->finish();
+
+  DEMOLISH
+    Our Moose destructor, handles finish/clear on destruct, if not disabled.
+
+  meta
+    Moose meta info.
+
+AUTHOR
+    Brandon L. Black, <blblack@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 Brandon L. Black
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

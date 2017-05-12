@@ -1,0 +1,39 @@
+---
+abstract: 'Common out-of-band collectd plugin test suite'
+author:
+  - 'Fabien Wernli, C<< <wernli_workingat_in2p3.fr> >>'
+  - 'Fabien Wernli <wernli_workingat_in2p3.fr>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Find: 0
+  Parse::Yapp::Driver: '0.22'
+  Test::File::ShareDir: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Collectd-Plugins
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+  package:
+    - FakeCollectd
+recommends:
+  File::ShareDir: 0
+requires:
+  Package::Alias: 0
+  Parse::Lex: 0
+  Test::Builder: '0.90'
+  namespace::autoclean: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.1009'

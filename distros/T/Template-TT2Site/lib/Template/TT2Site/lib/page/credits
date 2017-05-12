@@ -1,0 +1,10 @@
+[% # $Id: credits,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+[% IF site.image.credits -%]
+[% IF site.image.credits.url -%]
+<a href="[% site.image.credits.url %]">
+[%- END -%]
+[%- INCLUDE util/image image=site.image.credits | trim -%]
+[% IF site.image.credits.url -%]
+</a>
+[% END -%]
+[% END -%]

@@ -1,0 +1,6 @@
+sub {
+    my $self = shift;
+    head {
+        title { print 'YarnLine' };
+    };
+}

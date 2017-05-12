@@ -1,0 +1,907 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">The RESTful Web Service Version 1.0</div>
+
+  <p>
+    The <a href="/docs/runningTaskForestd.html"><code>taskforestd</code>
+    webserver</a> hosts one or more RESTful Web Services. The web service
+    allows you to write, in any programming language, your own client
+    software that integrates with TaskForest.
+  </p>
+
+  <p>
+    For an introduction to RESTful web services, you can look at
+    Wikipedia: <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer">http://en.wikipedia.org/wiki/Representational_State_Transfer</a>
+  </p>
+
+  <p>
+    All of the service's URIs for version 1.0 are in
+    the <code>/rest/1.0/</code> hierarchy. If the service upgrades to a
+    newer version, 1.0 will be preserved, and the new service will be in,
+    for example, the <code>/rest/2.0/</code> hierarchy. This way, backward
+    compatability is preserved while clients migrate to the new interface.
+  </p>
+
+  <p>
+    The documentation that follows describes the common 'header' and
+    'footer' XHTML. This is followed by a list of all the URIs and
+    families of URIs supported by the web service, the HTTP methods that
+    each URI supports, and a description of the service for the client
+    software developer.
+  </p>
+
+  <div class="new_section_header">A Note About URI Notation</div>
+
+  <p>
+    For the purposes of this document we will denote variable parts of
+    URIs using braces. For example, in the URI
+    <code>/foo/bar.html/{variable_name}</code> the value of the variable
+    <code>variable_name</code> will replace the string <code>{variable_name}</code>.
+  </p>
+
+
+</div>
+<div class="clear_both"></div>
+
+<div class="width2">&nbsp;</div>
+<div class="width10 last">
+<div class="new_section_header"><a name="headers_and_footers">Headers and Footers</a></div>
+<p>Every page with an HTTP Status code of 200-207 served by version 1.0
+of the web service will start with the html shown below.</p>
+<div class="code"><code><pre>
+
+01 | &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;<a href="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd</a>&quot;&gt;
+02 | &lt;html xmlns=&quot;<a href="http://www.w3.org/1999/xhtml&quot">http://www.w3.org/1999/xhtml&quot</a>; xml:lang=&quot;en&quot;&gt;
+03 |  &lt;head&gt;
+04 |   &lt;title&gt;&#036;title&lt;/title&gt;
+05 |  &lt;/head&gt;
+06 |  &lt;body&gt;
+07 |
+08 |    &lt;div class=&quot;header_navigation&quot;&gt;
+09 |      &lt;a href=&quot;/rest/1.0/familyList.html&quot;&gt;Family List&lt;/a&gt;
+10 |      &lt;a href=&quot;/rest/1.0/jobList.html&quot;&gt;Job List&lt;/a&gt;
+11 |      &lt;a href=&quot;/rest/1.0/status.html&quot;&gt;Status&lt;/a&gt;
+12 |    &lt;/div&gt;
+13 |
+14 |    &lt;form id=&quot;rerun&quot; class=&quot;request&quot; method=&quot;POST&quot; action=&quot;/rest/1.0/request.html&quot;&gt;
+15 |      &lt;label for=&quot;rerun_family&quot;&gt;Family&lt;/label&gt;&lt;input id=&quot;rerun_family&quot; name=&quot;family&quot; /&gt;&lt;br /&gt;
+16 |      &lt;label for=&quot;rerun_job&quot;&gt;Job&lt;/label&gt;&lt;input id=&quot;rerun_job&quot; name=&quot;job&quot; /&gt;&lt;br /&gt;
+17 |      &lt;label for=&quot;rerun_log_date&quot;&gt;Log Date&lt;/label&gt;&lt;input id=&quot;rerun_log_date&quot; name=&quot;log_date&quot; /&gt;&lt;br /&gt;
+18 |      &lt;label for=&quot;rerun_options&quot;&gt;Options&lt;/label&gt;&lt;select id=&quot;rerun_options&quot; name=&quot;options&quot;&gt;
+19 |        &lt;option value=&quot;&quot;&gt;None&lt;/option&gt;
+20 |        &lt;option value=&quot;cascade&quot;&gt;Cascade&lt;/option&gt;
+21 |        &lt;option value=&quot;dependents_only&quot;&gt;Dependents Only&lt;/option&gt;
+22 |      &lt;/select&gt;
+23 |      &lt;input type=submit name=submit  value=&quot;Rerun&quot;/&gt;
+24 |    &lt;/form&gt;
+25 |
+26 |    &lt;form id=&quot;mark&quot; class=&quot;request&quot; method=&quot;POST&quot; action=&quot;/rest/1.0/request.html&quot;&gt;
+27 |      &lt;label for=&quot;mark_family&quot;&gt;Family&lt;/label&gt;&lt;input id=&quot;mark_family&quot; name=&quot;family&quot; /&gt;&lt;br /&gt;
+28 |      &lt;label for=&quot;mark_job&quot;&gt;Job&lt;/label&gt;&lt;input id=&quot;mark_job&quot; name=&quot;job&quot; /&gt;&lt;br /&gt;
+29 |      &lt;label for=&quot;mark_log_date&quot;&gt;Log Date&lt;/label&gt;&lt;input id=&quot;mark_log_date&quot; name=&quot;log_date&quot; /&gt;&lt;br /&gt;
+30 |      &lt;label for=&quot;mark_options&quot;&gt;Options&lt;/label&gt;&lt;select id=&quot;mark_options&quot; name=&quot;options&quot;&gt;
+31 |        &lt;option value=&quot;&quot;&gt;None&lt;/option&gt;
+32 |        &lt;option value=&quot;cascade&quot;&gt;Cascade&lt;/option&gt;
+33 |        &lt;option value=&quot;dependents_only&quot;&gt;Dependents Only&lt;/option&gt;
+34 |      &lt;/select&gt;
+35 |      &lt;label for=&quot;mark_status&quot;&gt;Status&lt;/label&gt;&lt;select id=&quot;mark_status&quot; name=&quot;status&quot;&gt;
+36 |        &lt;option value=&quot;Success&quot;&gt;Success&lt;/option&gt;
+37 |        &lt;option value=&quot;Failure&quot;&gt;Failure&lt;/option&gt;
+38 |      &lt;/select&gt;
+39 |      &lt;input type=submit name=submit  value=&quot;Mark&quot;/&gt;
+40 |    &lt;/form&gt;
+41 |
+42 |    &lt;form id=&quot;logs&quot; class=&quot;request&quot; method=&quot;GET&quot; action=&quot;/rest/1.0/logs.html&quot;&gt;
+43 |      &lt;label for=&quot;logs_date&quot;&gt;Date&lt;/label&gt;&lt;input id=&quot;logs_date&quot; name=&quot;date&quot; size=8 maxlength=8/&gt;&lt;br /&gt;
+44 |      &lt;input type=submit name=submit  value=&quot;View Logs&quot;/&gt;
+45 |    &lt;/form&gt;
+46 |
+47 |    &lt;form id=&quot;release&quot; class=&quot;request&quot; method=&quot;POST&quot; action=&quot;/rest/1.0/request.html&quot;&gt;
+48 |      &lt;label for=&quot;release_family&quot;&gt;Family&lt;/label&gt;&lt;input id=&quot;release_family&quot; name=&quot;family&quot; /&gt;&lt;br /&gt;
+49 |      &lt;label for=&quot;release_job&quot;&gt;Job&lt;/label&gt;&lt;input id=&quot;release_job&quot; name=&quot;job&quot; /&gt;&lt;br /&gt;
+50 |      &lt;label for=&quot;release_log_date&quot;&gt;Log Date&lt;/label&gt;&lt;input id=&quot;release_log_date&quot; name=&quot;log_date&quot; /&gt;&lt;br /&gt;
+51 |      &lt;input type=submit name=submit  value=&quot;Release&quot;/&gt;
+52 |    &lt;/form&gt;
+53 |
+54 |    &lt;form id=&quot;hold&quot; class=&quot;request&quot; method=&quot;POST&quot; action=&quot;/rest/1.0/request.html&quot;&gt;
+55 |      &lt;label for=&quot;hold_family&quot;&gt;Family&lt;/label&gt;&lt;input id=&quot;hold_family&quot; name=&quot;family&quot; /&gt;&lt;br /&gt;
+56 |      &lt;label for=&quot;hold_job&quot;&gt;Job&lt;/label&gt;&lt;input id=&quot;hold_job&quot; name=&quot;job&quot; /&gt;&lt;br /&gt;
+57 |      &lt;label for=&quot;hold_log_date&quot;&gt;Log Date&lt;/label&gt;&lt;input id=&quot;hold_log_date&quot; name=&quot;log_date&quot; /&gt;&lt;br /&gt;
+58 |      &lt;input type=submit name=submit  value=&quot;Hold&quot;/&gt;
+59 |    &lt;/form&gt;
+60 |
+61 |    &lt;form id=&quot;hold&quot; class=&quot;request&quot; method=&quot;POST&quot; action=&quot;/rest/1.0/request.html&quot;&gt;
+62 |      &lt;label for=&quot;release_hold_family&quot;&gt;Family&lt;/label&gt;&lt;input id=&quot;release_hold_family&quot; name=&quot;family&quot; /&gt;&lt;br /&gt;
+63 |      &lt;label for=&quot;release_hold_job&quot;&gt;Job&lt;/label&gt;&lt;input id=&quot;release_hold_job&quot; name=&quot;job&quot; /&gt;&lt;br /&gt;
+64 |      &lt;label for=&quot;release_hold_log_date&quot;&gt;Log Date&lt;/label&gt;&lt;input id=&quot;release_hold_log_date&quot; name=&quot;log_date&quot; /&gt;&lt;br /&gt;
+65 |      &lt;input type=submit name=submit  value=&quot;Release Hold&quot;/&gt;
+66 |    &lt;/form&gt;
+    </pre></code></div>
+<p>Lines 01-02 describe the file as an XHTML file.  I chose XHTML because
+the output can be viewed by any web browser.  If you would like
+another format, drop me an email.</p>
+<p>Line 04 will display the value of the title for that page.  The <code>&#036;</code>
+sign is an artifact of the web development framework I'm using.</p>
+<p>Lines 08-12 are the main navigation hyperlinks.</p>
+<p>Lines 14-66 are the six forms that show up on every page.
+These forms allow you to <a href="rerun.html">rerun</a> jobs, <a href="mark.html">mark</a> jobs, <a href="status.html">view logs</a>, <a href="release.html">release</a> jobs, <a href="hold.html">hold</a> jobs and <a href="releaseHold.html">release holds</a>, respectively.
+They're essentially interfaces to the 'rerun' and 'mark', 'status', 'release', 'hold' and 'releaseHold' commands.  The
+  log_date form variable is a date formatted like YYYYMMDD and is used to
+  determine which day's job should be rerun.  If left blank, the system
+  uses today's date. </p>
+<p>Every page with an HTTP Status code of 200-207 served by version 1.0
+of the web service will end with the html shown below.</p>
+<div class="code"><code><pre>
+  &lt;/body&gt;
+ &lt;/html&gt;</pre></code></div>
+<p>
+</p>
+<div class="new_section_header"><a name="_rest_1_0_familylist_html">/rest/1.0/familyList.html</a></div>
+<div class="code"><code><pre>
+ HEAD
+ ====
+       This URI does not support this method.
+
+ GET
+ ===
+       DESCRIPTION
+       ...........
+       Use this URI to retrieve a list of all Families.  These are all the
+       files in the directory specified by the family_dir option in the
+       taskforestd configuration file.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The client should not send any content to this URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In a typical case, the server will send the header and footer, and
+       the 'real' content in between.  The content will look like this:
+
+       01 | &lt;ul class=family_list&gt;
+       02 |     &lt;li class=family_name&gt;&lt;a href=&quot;/rest/1.0/families.html/&#036;file_name&quot;&gt;&#036;file_name&lt;/a&gt;&lt;/li&gt;
+       03 | &lt;/ul&gt;
+
+       Line 02 will appear 0 or more times, depending on how many Families
+       are present.
+
+       HTTP STATUS CODES
+       .................
+       200 - Everything's OK
+       304 - The resource has not been modified since the time
+             specified in the request If-Modified-Since header,
+             OR
+             The calculated Etag of the resource is the same as that
+             specified in the request If-None-Match header.
+       404 - The resource was not found
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ PUT
+ ===
+       This URI does not support this method.
+
+ POST
+ ====
+       This URI does not support this method.
+
+ DELETE
+ ======
+       This URI does not support this method.</pre></code></div>
+<p>
+</p>
+<div class="new_section_header"><a name="_rest_1_0_families_html__family_name_">/rest/1.0/families.html/{family_name}</a></div>
+<div class="code"><code><pre>
+ HEAD
+ ====
+       DESCRIPTION
+       ...........
+       Send this URI the HEAD method to see if the family specified within
+       the URI has changed recently.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The family name is represented by {family_name} and is part
+       of the URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       The HTTP content is empty.
+
+       HTTP STATUS CODES
+       .................
+       200 - Everything's OK
+       304 - The resource has not been modified since the time
+             specified in the request If-Modified-Since header,
+             OR
+             The calculated Etag of the resource is the same as that
+             specified in the request If-None-Match header.
+       404 - The resource was not found
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ GET
+ ===
+       DESCRIPTION
+       ...........
+       Send this URI the GET method to retrieve the contents of the family
+       file whose name is specified within the URI.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The family name is represented by {family_name} and is part
+       of the URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In a typical case, the server will send the header and footer, and
+       the 'real' content in between.  The content will look like this:
+
+       01 | &lt;div class=&quot;family_title&quot;&gt;Viewing family &#036;file_name&lt;/div&gt;
+       02 | &lt;div id=&quot;family_contents_div&quot; class=&quot;file_contents&quot;&gt;&lt;pre&gt;&#036;file_contents&lt;/pre&gt;&lt;/div&gt;
+       03 | &lt;form name=&quot;family_form&quot; action=&quot;/rest/1.0/families.html/&#036;file_name&quot; method=&quot;POST&quot;&gt;
+       04 |   &lt;input type=hidden name=&quot;_method&quot; value=&quot;PUT&quot;&gt;
+       05 |   &lt;textarea name=&quot;file_contents&quot; rows=20 cols=100&gt;&#036;file_contents&lt;/textarea&gt;
+       06 |   &lt;br&gt;
+       07 |   &lt;input type=submit value=&quot;Update Family&quot; name=update /&gt;
+       08 | &lt;/form&gt;
+
+       Line 01 displays the family name.  Line 02 displays the
+       contents of the family file in its own div.  Line 03-08 are a
+       form that can be used to update the family file.  Note here
+       that the method is POST, but there is a form variable called
+       &quot;_method&quot; whose value is &quot;PUT&quot;.  This is a common idiom in
+       RESTful service development because most web browsers only
+       support GET and POST.  This is called overloaded POST.
+
+       With the taskforestd web service, whenever you need to use the
+       HEAD, PUT or DELETE methods, you can use POST and define the
+       'real' method with the _method form variable.
+
+       HTTP STATUS CODES
+       .................
+       200 - Everything's OK
+       304 - The resource has not been modified since the time
+             specified in the request If-Modified-Since header,
+             OR
+             The calculated Etag of the resource is the same as that
+             specified in the request If-None-Match header.
+       404 - The resource was not found
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ PUT
+ ===
+       DESCRIPTION
+       ...........
+       Send this URI the PUT method to create a new family file or to
+       change the contents of an existing family file.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       If your client is really using the PUT method, the contents of
+       the family file should be sent in the contents of the HTTP
+       request.
+
+       If, however, your client is using overloaded POST, then the
+       content that you would have sent with the PUT must be in the
+       file_contents form variable.  Overloaded POST is explained in
+       the description of the GET method, above.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In the typical case, after creating the new family file, or
+       changing the contents of the existing family file, the server will
+       return the  same contents as in the case of the GET method.
+
+       HTTP STATUS CODES
+       .................
+       200 - OK
+       400 - The file_contents form variable was missing, in the case of
+             Overloaded POST
+       500 - The file could not be written - likely a permission issue
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ POST
+ ====
+       This URI does not support this method.
+
+ DELETE
+ ======
+       DESCRIPTION
+       ...........
+       Send this URI the DELETE method to delete the family file named in
+       the URI.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The family name is represented by {family_name} and is part
+       of the URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In the case of DELETE, the server will never return any content.
+
+       HTTP STATUS CODES
+       .................
+       204 - Delete was successful and the client should not expect any
+             content
+       500 - The file could not be deleted - likely a permission issue
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Content-Length
+       o Content-Type</pre></code></div>
+<p>
+</p>
+<div class="new_section_header"><a name="_rest_1_0_joblist_html">/rest/1.0/jobList.html</a></div>
+<div class="code"><code><pre>
+ HEAD
+ ====
+       This URI does not support this method.
+
+ GET
+ ===
+       DESCRIPTION
+       ...........
+       Use this URI to retrieve a list of all Jobs.  These are all the
+       files in the directory specified by the job_dir option in the
+       taskforestd configuration file.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The client should not send any content to this URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In a typical case, the server will send the header and footer, and
+       the 'real' content in between.  The content will look like this:
+
+       01 | &lt;ul class=job_list&gt;
+       02 |     &lt;li class=job_name&gt;&lt;a href=&quot;/rest/1.0/jobs.html/&#036;file_name&quot;&gt;&#036;file_name&lt;/a&gt;&lt;/li&gt;
+       03 | &lt;/ul&gt;
+
+       Line 02 will appear 0 or more times, depending on how many Jobs
+       are present.
+
+       HTTP STATUS CODES
+       .................
+       200 - Everything's OK
+       304 - The resource has not been modified since the time
+             specified in the request If-Modified-Since header,
+             OR
+             The calculated Etag of the resource is the same as that
+             specified in the request If-None-Match header.
+       404 - The resource was not found
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ PUT
+ ===
+       This URI does not support this method.
+
+ POST
+ ====
+       This URI does not support this method.
+
+ DELETE
+ ======
+       This URI does not support this method.</pre></code></div>
+<p>
+</p>
+<div class="new_section_header"><a name="_rest_1_0_jobs_html__job_name_">/rest/1.0/jobs.html/{job_name}</a></div>
+<div class="code"><code><pre>
+ HEAD
+ ====
+       DESCRIPTION
+       ...........
+       Send this URI the HEAD method to see if the job specified within
+       the URI has changed recently.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The job name is represented by {job_name} and is part
+       of the URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       The HTTP content is empty.
+
+       HTTP STATUS CODES
+       .................
+       200 - Everything's OK
+       304 - The resource has not been modified since the time
+             specified in the request If-Modified-Since header,
+             OR
+             The calculated Etag of the resource is the same as that
+             specified in the request If-None-Match header.
+       404 - The resource was not found
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ GET
+ ===
+       DESCRIPTION
+       ...........
+       Send this URI the GET method to retrieve the contents of the job
+       file whose name is specified within the URI.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The job name is represented by {job_name} and is part
+       of the URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In a typical case, the server will send the header and footer, and
+       the 'real' content in between.  The content will look like this:
+
+       01 | &lt;div class=&quot;job_title&quot;&gt;Viewing job &#036;file_name&lt;/div&gt;
+       02 | &lt;div id=&quot;job_contents_div&quot; class=&quot;file_contents&quot;&gt;&lt;pre&gt;&#036;file_contents&lt;/pre&gt;&lt;/div&gt;
+       03 | &lt;form name=&quot;job_form&quot; action=&quot;/rest/1.0/jobs.html/&#036;file_name&quot; method=&quot;POST&quot;&gt;
+       04 |   &lt;input type=hidden name=&quot;_method&quot; value=&quot;PUT&quot;&gt;
+       05 |   &lt;textarea name=&quot;file_contents&quot; rows=20 cols=100&gt;&#036;file_contents&lt;/textarea&gt;
+       06 |   &lt;br&gt;
+       07 |   &lt;input type=submit value=&quot;Update Job&quot; name=update /&gt;
+       08 | &lt;/form&gt;
+
+       Line 01 displays the job name.  Line 02 displays the contents of
+       the job file in its own div.  Line 03-08 are a form that can be
+       used to update the job file.  Note here that the method is POST,
+       but there is a form variable called &quot;_method&quot; whose value is &quot;PUT&quot;.
+       This is a common idiom in RESTful service development because most
+       web browsers only support GET and POST.  This is called overloaded
+       POST.
+
+       With the taskforestd web service, whenever you need to use the
+       HEAD, PUT or DELETE methods, you can use POST and define the 'real'
+       method with the _method form variable.
+
+       HTTP STATUS CODES
+       .................
+       200 - Everything's OK
+       304 - The resource has not been modified since the time
+             specified in the request If-Modified-Since header,
+             OR
+             The calculated Etag of the resource is the same as that
+             specified in the request If-None-Match header.
+       404 - The resource was not found
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ PUT
+ ===
+       DESCRIPTION
+       ...........
+       Send this URI the PUT method to create a new job file or to
+       change the contents of an existing job file.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       If your client is really using the PUT method, the contents of the
+       job file should be sent in the contents of the HTTP request.
+
+       If, however, your client is using overloaded POST, then the content
+       that you would have sent with the PUT must be in the file_contents
+       form variable.  Overloaded POST is explained in the description of
+       the GET method, above.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In the typical case, after creating the new job file, or changing
+       the contents of the existing job file, the server will return the
+       same contents as in the case of the GET method.
+
+       HTTP STATUS CODES
+       .................
+       200 - OK
+       400 - The file_contents form variable was missing, in the case of
+             Overloaded POST
+       500 - The file could not be written - likely a permission issue
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ POST
+ ====
+       This URI does not support this method.
+
+ DELETE
+ ======
+       DESCRIPTION
+       ...........
+       Send this URI the DELETE method to delete the job file named in the
+       URI.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The job name is represented by {job_name} and is part of the URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In the case of DELETE, the server will never return any content.
+
+       HTTP STATUS CODES
+       .................
+       204 - Delete was successful and the client should not expect any
+             content
+       500 - The file could not be deleted - likely a permission issue
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Content-Length
+       o Content-Type</pre></code></div>
+<p>
+</p>
+<div class="new_section_header"><a name="_rest_1_0_status_html">/rest/1.0/status.html</a></div>
+<div class="code"><code><pre>
+ HEAD
+ ====
+       This URI does not support this method.
+
+ GET
+ ===
+       DESCRIPTION
+       ...........
+       Send this URI the GET method to get the status of today's jobs.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       None - no additional information is needed.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In a typical case, the server will send the header and footer, and
+       the 'real' content in between.  The content will look like this:
+
+       01 | &lt;div class=status&gt;
+       02 |     &lt;dl class=job&gt;
+       03 |       &lt;dt&gt;Family Name&lt;/dt&gt;
+       04 |       &lt;dd&gt;&lt;a href=&quot;/rest/1.0/families.html/&#036;family_name&quot;&gt;&#036;family_name&lt;/a&gt;&lt;/dd&gt;
+       05 |       &lt;dt&gt;Job Name&lt;/dt&gt;
+       06 |       &lt;dd&gt;&lt;a href=&quot;/rest/1.0/jobs.html/&#036;base_name&quot;&gt;&#036;name&lt;/a&gt;&lt;/dd&gt;
+       07 |       &lt;dt&gt;Status&lt;/dt&gt;
+       08 |       &lt;dd&gt;&#036;status&lt;/dd&gt;
+       09 |       &lt;dt&gt;Return Code&lt;/dt&gt;
+       10 |       &lt;dd&gt;&#036;rc&lt;/dd&gt;
+       11 |       &lt;dt&gt;Time Zone&lt;/dt&gt;
+       12 |       &lt;dd&gt;&#036;tz&lt;/dd&gt;
+       13 |       &lt;dt&gt;Scheduled Start Time&lt;/dt&gt;
+       14 |       &lt;dd&gt;&#036;start&lt;/dd&gt;
+       15 |       &lt;dt&gt;Actual Start Time&lt;/dt&gt;
+       16 |       &lt;dd&gt;&#036;actual_start&lt;/dd&gt;
+       17 |       &lt;dt&gt;Stop Time&lt;/dt&gt;
+       18 |       &lt;dd&gt;&#036;stop&lt;/dd&gt;
+       19 |     &lt;/dl&gt;
+       20 | &lt;/div&gt;
+
+       Lines 02-19 will appear 0 or more times, once for every job that
+       appears in the output of the status command.  The --collapse option
+       is implied in the web service; pending repeat jobs are not
+       displayed.
+
+       If the job has an associated log file (in other words: if the
+       wrapper script that ran it was run_with_log, and the status is
+       either Running, Success or Failure) then line 08 will look like
+       this:
+
+       08 |       &lt;dd&gt;&lt;a href=&quot;/logFile.html/&#036;output_file&quot;&gt;&#036;status&lt;/a&gt;&lt;/dd&gt;
+
+       HTTP STATUS CODES
+       .................
+       200 - OK
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Content-Length
+       o Content-Type
+
+ PUT
+ ===
+       This URI does not support this method.
+
+ POST
+ ====
+       This URI does not support this method.
+
+ DELETE
+ ======
+       This URI does not support this method.</pre></code></div>
+<p>
+</p>
+<div class="new_section_header"><a name="_rest_1_0_logs_htmldate__date_">/rest/1.0/logs.html?date={date}</a></div>
+<div class="code"><code><pre>
+ HEAD
+ ====
+       This URI does not support this method.
+
+ GET
+ ===
+       DESCRIPTION
+       ...........
+       Send this URI the GET method to browse the log directory for a
+       particular date - to see which jobs ran on that day, and when, and
+       what the exit codes were.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The date is specified as a query parameter.  The date must be in
+       the YYYYMMDD format.  If the date is omitted, then the date will
+       default to the current date, and jobs with a status of 'Ready' or
+       'Waiting' will also be displayed.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In a typical case, the server will send the header and footer, and
+       the 'real' content in between.  The content will look like this:
+
+       01 | &lt;div class=status&gt;
+       02 |     &lt;dl class=job&gt;
+       03 |       &lt;dt&gt;Family Name&lt;/dt&gt;
+       04 |       &lt;dd&gt;&lt;a href=&quot;/rest/1.0/families.html/&#036;family_name&quot;&gt;&#036;family_name&lt;/a&gt;&lt;/dd&gt;
+       05 |       &lt;dt&gt;Job Name&lt;/dt&gt;
+       06 |       &lt;dd&gt;&lt;a href=&quot;/rest/1.0/jobs.html/&#036;base_name&quot;&gt;&#036;name&lt;/a&gt;&lt;/dd&gt;
+       07 |       &lt;dt&gt;Status&lt;/dt&gt;
+       08 |       &lt;dd&gt;&#036;status&lt;/dd&gt;
+       09 |       &lt;dt&gt;Return Code&lt;/dt&gt;
+       10 |       &lt;dd&gt;&#036;rc&lt;/dd&gt;
+       11 |       &lt;dt&gt;Time Zone&lt;/dt&gt;
+       12 |       &lt;dd&gt;&#036;tz&lt;/dd&gt;
+       13 |       &lt;dt&gt;Actual Start Time&lt;/dt&gt;
+       14 |       &lt;dd&gt;&#036;actual_start_dt&lt;/dd&gt;
+       15 |       &lt;dt&gt;Stop Time&lt;/dt&gt;
+       16 |       &lt;dd&gt;&#036;stop_dt&lt;/dd&gt;
+       17 |     &lt;/dl&gt;
+       18 | &lt;/div&gt;
+
+       Lines 02-17 will appear 0 or more times, once for every job that
+       appears in the output of the status command.
+
+       If the job has an associated log file (in other words: if the
+       wrapper script that ran it was run_with_log, and the status is
+       either Running, Success or Failure) then line 08 will look like
+       this:
+
+       08 |       &lt;dd&gt;&lt;a href=&quot;/logFile.html/&#036;output_file&quot;&gt;&#036;status&lt;/a&gt;&lt;/dd&gt;
+
+       HTTP STATUS CODES
+       .................
+       200 - OK
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Content-Length
+       o Content-Type
+
+ PUT
+ ===
+       This URI does not support this method.
+
+ POST
+ ====
+       This URI does not support this method.
+
+ DELETE
+ ======
+       This URI does not support this method.</pre></code></div>
+<p>
+</p>
+<div class="new_section_header"><a name="_rest_1_0_logfile_html__file_">/rest/1.0/logFile.html/{file}</a></div>
+<div class="code"><code><pre>
+ HEAD
+ ====
+       DESCRIPTION
+       ...........
+       Send this URI the HEAD method to see if the log file specified
+       within the URI has changed recently.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The name of the log file is represented by {file} and is part
+       of the URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       The HTTP content is empty.
+
+       HTTP STATUS CODES
+       .................
+       200 - Everything's OK
+       304 - The resource has not been modified since the time
+             specified in the request If-Modified-Since header,
+             OR
+             The calculated Etag of the resource is the same as that
+             specified in the request If-None-Match header.
+       404 - The resource was not found
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ GET
+ ===
+       DESCRIPTION
+       ...........
+       Send this URI the HEAD method to browse the log file specified
+       within the URI.
+
+       Send this URI the GET method to browse the log directory for a
+       particular date - to see which jobs ran on that day, and when, and
+       what the exit codes were.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       The name of the log file is represented by {file} and is part
+       of the URI.
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In a typical case, the server will send the header and footer,
+       and the 'real' content in between.  The content will look like
+       this:
+
+       01 | &lt;div class=&quot;title&quot;&gt;Viewing log file &#036;file_name&lt;/div&gt;
+       02 |
+       03 | &lt;div id=&quot;file_contents_div&quot; class=&quot;file_contents&quot;&gt;&lt;pre&gt;&#036;file_contents&lt;/pre&gt;&lt;/div&gt;
+
+       HTTP STATUS CODES
+       .................
+       200 - Everything's OK
+       304 - The resource has not been modified since the time
+             specified in the request If-Modified-Since header,
+             OR
+             The calculated Etag of the resource is the same as that
+             specified in the request If-None-Match header.
+       404 - The resource was not found
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Last-Modified
+       o ETag
+       o Content-Length
+       o Content-Type
+
+ PUT
+ ===
+       This URI does not support this method.
+
+ POST
+ ====
+       This URI does not support this method.
+
+ DELETE
+ ======
+       This URI does not support this method.</pre></code></div>
+<p>
+</p>
+<div class="new_section_header"><a name="_rest_1_0_request_html">/rest/1.0/request.html</a></div>
+<div class="code"><code><pre>
+ HEAD
+ ====
+       This URI does not support this method.
+
+ GET
+ ===
+       This URI does not support this method.
+
+ PUT
+ ===
+       This URI does not support this method.
+
+ POST
+ ====
+       DESCRIPTION
+       ...........
+       Send a POST to this URI to request a job be marked as success or
+       failure, or be rerun.
+
+       REPRESENTATION SENT BY CLIENT TO SERVER
+       .......................................
+       There are three required form variables: &quot;family&quot;, &quot;job&quot;, and
+       &quot;submit&quot;.  The first is the name of the family, and the second is
+       the name of the job.  If the value of the &quot;submit&quot; variable is
+       &quot;Rerun&quot;, then that job is rerun.  If the value is &quot;Mark&quot;, then the
+       job will be marked based on the value of the form variable
+       &quot;status&quot;, which can take a value of &quot;Success&quot; or &quot;Failure&quot;.
+
+       In either case, mark or rerun, the optional variable &quot;options&quot; is
+       also permitted.  If it has a value, its value can be either
+       &quot;cascade&quot; or &quot;dependents_only&quot;.  These are treated the same way as
+       the command line options to the 'rerun' and 'mark' commands.
+
+       Other values for the &quot;submit&quot; variable are &quot;View Logs&quot;, &quot;Release&quot;,
+       &quot;Hold&quot; and &quot;Release Hold&quot;.  For details on the fields they can 
+       accept, please see their respective pages and the forms in the
+       Headers above. 
+
+       REPRESENTATION SENT BY SERVER TO CLIENT
+       .......................................
+       In every case, the server will send the header and footer, and
+       the 'real' content in between.  The content will look like this:
+
+       01 | Request accepted.
+
+       HTTP STATUS CODES
+       .................
+       200 - OK
+       500 - The request could not be honored.
+
+       HTTP RESPONSE HEADERS
+       .....................
+       o Date
+       o Content-Length
+       o Content-Type
+
+ DELETE
+ ======
+       This URI does not support this method.</pre></code></div>
+<p>
+</p>
+
+</div>
+<div class="clear_both"></div>
+
+
+
+<include TaskForest::REST::PassThrough /foot.html />

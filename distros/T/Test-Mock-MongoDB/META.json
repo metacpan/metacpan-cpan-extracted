@@ -1,0 +1,43 @@
+{
+   "abstract" : "Test mock module for MongoDB class.",
+   "author" : [
+      "cono <cono@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mock-MongoDB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MongoDB" : "v0.704.4.0",
+            "Test::Mock::Signature" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cono/p5-test-mock-mongodb/issues"
+      },
+      "homepage" : "https://github.com/cono/p5-test-mock-mongodb",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cono/p5-test-mock-mongodb.git",
+         "web" : "https://github.com/cono/p5-test-mock-mongodb"
+      }
+   },
+   "version" : "0.01"
+}
+

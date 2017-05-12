@@ -1,0 +1,70 @@
+[% # This is a TT comment.  The '-' at the end "chomps" the newline.  You won't -%]
+[% # see this "chomping" in your browser because HTML ignores blank lines, but  -%]
+[% # it WILL eliminate a blank line if you view the HTML source.  It's purely   -%]
+[%- # optional, but both the beginning and the ending TT tags support chomping. -%]
+
+[% # Provide a title to root/lib/site/header -%]
+[% META title = 'Book List' -%]
+
+<table>
+<tr><th>Title</th><th>Rating</th><th>Author(s)</th><th>Links</th></tr>
+[% # Display each book in a table row %]
+[% FOREACH book IN books -%]
+  <tr>
+    <td>[% book.title %]</td>
+    <td>[% book.rating %]</td>
+    <td>
+      [% # First initialize a TT variable to hold a list.  Then use a TT FOREACH -%]
+      [% # loop in 'side effect notation' to load just the last names of the     -%]
+      [% # authors into the list.  Note that the 'push' TT vmethod does not      -%]
+      [% # a value, so nothing will be printed here.  But, if you have something -%]
+      [% # in TT that does return a method and you don't want it printed, you    -%]
+      [% # can: 1) assign it to a bogus value, or 2) use the CALL keyword to     -%]
+      [% # call it and discard the return value.                                 -%]
+      [% tt_authors = [ ];
+         tt_authors.push(author.last_name) FOREACH author = book.authors %]
+      [% # Now use a TT 'virtual method' to display the author count in parens   -%]
+      ([% tt_authors.size %])
+      [% # Use another TT vmethod to join & print the names & comma separators   -%]
+      [% tt_authors.join(', ') %]
+    </td>
+    <td>
+      [% # Add a link to delete a book %]
+      <a href="[% Catalyst.uri_for('delete/') _ book.id %]">Delete</a>
+    </td>
+  </tr>
+[% END -%]
+</table>
+
+<p>
+  <a href="[% Catalyst.uri_for('/login') %]">Login</a>
+  <a href="[% Catalyst.uri_for('form_create') %]">Create</a>
+</p>
+
+<p>Hello [% Catalyst.user.username %], you have the following roles:</p>
+
+<ul>
+  [% # Dump list of roles -%]
+  [% FOR role = Catalyst.user.roles %]<li>[% role %]</li>[% END %]
+</ul>
+
+<p>
+[% # Add some simple role-specific logic to template %]
+[% # Use $c->check_user_roles() to check authz -%]
+[% IF Catalyst.check_user_roles('user') %]
+  [% # Give normal users a link for 'logout' %]
+  <a href="[% Catalyst.uri_for('/logout') %]">Logout</a>
+[% END %]
+
+[% # Can also use $c->user->check_roles() to check authz -%]
+[% IF Catalyst.check_user_roles('admin') %]
+  [% # Give admin users a link for 'create' %]
+  <a href="[% Catalyst.uri_for('form_create') %]">Create</a>
+[% END %]
+</p>
+
+<p>
+  HTML::Widget:
+  <a href="[% Catalyst.uri_for('hw_create') %]">Create</a>
+  <a href="[% Catalyst.uri_for('hw_update') %]">Update</a>
+</p>

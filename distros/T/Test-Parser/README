@@ -1,0 +1,42 @@
+Test::Parser is a collection of parsers for different test output file
+formats. These parse the data into a general purpose data structure that
+can then be used to create reports, do post-processing analysis, etc. It
+can also export tests in SpikeSource's TRPI test description XML language.
+
+Every test seems to have its own unique output format.  This isn't a
+problem if you only need to deal with results from one or two tests, but
+the more tests you want to work with, the more tiresome it gets to
+create parsers for the formats.  This package aims to solve this problem
+by providing a collection point for test parsers, and implementing a
+standardized output format that can be relied on for creation of test
+reports.  We hope to gain the following benefits:
+
+   - Uniformity in dealing with test parsing
+   - Easier, more flexible and professional reports, eventually including
+        - Analysis
+        - Plotting
+        - Diffs/Comparisons
+        - Easy unit conversions
+        - Ease of dealing with complex data
+        - Searching/Querying
+   - Easier data exchange between testing organisations
+
+
+For more information on how to use the script, see the pod documentation
+via the command 
+  perldoc Test-Parser
+or, after installation, view the man pages with
+  man Test-Parser
+
+For instructions on how to install the script, see the
+file INSTALL.
+
+Problems, questions, etc. may be sent to bryce@bryceharrington.org.
+
+Test-Parser is Copyright (c) 2006, by Bryce Harrington. 
+All rights reserved. You may distribute this code under the terms 
+of either the GNU General Public License or the Artistic License, 
+as specified in the Perl README file.
+
+
+

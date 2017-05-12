@@ -1,0 +1,77 @@
+Revision history for Perl extension Tk::XMLViewer.
+
+0.21
+	- default comment color is now a little bit darker
+	- tests check for existing DISPLAY
+
+0.20
+	- fix: XPath To Selection menu item seemed to work only once
+	- fix: XPath To Selection menu item works also from the normal
+	  menu, not only from the popup menu
+
+0.19
+	- just made the changes in 0.18_xx official
+
+0.18_92
+	- fixed closing tag indentation (bug introduced in 0.18_91)
+	- fixed "make demo"
+
+0.18_91
+	- massive speed improvement from large files by defering
+	  tagAdd calls
+
+0.18
+	- -showxpath option for tkxmlview
+	- BalloonInfo showing XPath information
+	- new menu item: XPath to Selection
+	- tkxmlview has now a standard menu
+	- file history in tkxmlview (for now the history is lost when
+	  quitting the application)
+
+0.17
+	- -loaddtd option for tkxmlview
+	- Pod for tkxmlview
+	- -xmlparserargs option for insertXML
+	- fix for Tk804.026
+
+0.16
+	- tkxmlview uses Tk::HistEntry if available
+	- Win32 compat fix for tkxmlview
+	- can handle unicode with Tk804
+	- fix for -elide/-state confusion
+
+0.15
+	- revert usage of ProtocolEncoding => 'UTF-8'
+	- Open URL feature in tkxmlview
+
+0.14
+	- using ProtocolEncoding => 'UTF-8'
+	- new options -tagcolor, -attrkeycolor, -attrvalcolor, -commentcolor
+	- documented use of tagConfigure
+
+0.13
+	- unicode compatibility with perl 5.7.0 and perl 5.6.1
+	  NOTE: older versions of Tk::XMLViewer will not work with perl 5.6.1
+                or newer!
+
+0.12
+	- pod additions
+	- bug fixes
+	- GetInfo method
+
+0.11
+	- fixed call order of MainWindow and GetOptions in tkxmlview
+
+0.10
+	- Unicode handling on older perls with Unicode::String enabled
+	- new Info dialog with DTD and other information
+	- comments are also shown
+
+0.09
+	- limited Unicode handling
+	- fixed numerous bugs
+	- new methods: DumpXML, ShowToDepth, XMLMenu, OpenDepth
+
+0.01  Tue Jan 18 13:19:26 2000
+	- original version; created by h2xs 1.19
+

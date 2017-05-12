@@ -1,0 +1,66 @@
+{
+   "abstract" : "adds is_<day of week> method to Time::Piece ",
+   "author" : [
+      "Jesse Shy <jshy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-Piece-DayOfWeek",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.023"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::Piece" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jshy/Time-Piece-DayOfWeek/issues"
+      },
+      "homepage" : "https://github.com/jshy/Time-Piece-DayOfWeek",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jshy/Time-Piece-DayOfWeek.git",
+         "web" : "https://github.com/jshy/Time-Piece-DayOfWeek"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "jshy <finn.cool@yahoo.com>"
+   ]
+}
+

@@ -1,0 +1,47 @@
+Revision history for Perl extension Text::VCardFast.
+
+0.11  2016-11-21
+	- don't override CFLAGS
+
+0.10  2016-11-21
+	- move bench.pl into a sub directory so it doesn't install
+	- handle files with only \r and no \n for line endings
+
+0.09  2016-11-11
+	- remove test/cases from MANIFEST file
+
+0.08  2016-06-26
+	- check that we have an open card before strcasecmping the type
+
+0.07  2016-04-27
+	- use strcmpsafe rather than strcmp in multivalue handling
+
+0.06  2014-07-29
+	- add 'only_one' option to stop parsing after the first card
+	  (avoids breaking on trailing disclaimers)
+
+0.05  2014-07-28
+	- require JSON::XS so tests don't fail on platforms without it
+	- update README
+
+0.04  2014-06-28
+	- hash2vcard - don't modify input hash while generating output
+	- handle \n split over a line wrap, i.e. "line 1\\\n nline2"
+	  becomes "line 1\nline2"
+
+0.03  2014-02-13
+	- breaking API change: params are a hash, not a hashref
+	- checks is_utf8 flag and passes it down, so output is only UTF8
+	  if the input was.  This should allow arbitrary encodings to work.
+	- add documentation
+	- faster buffer implementation (taken from recent Cyrus optimisation)
+
+0.02  2014-01-10
+	- group support for VCard - entry name foo.bar will have
+	  name "bar" and group "foo".
+	- multival key 'values' rather than 'value'
+
+0.01  2014-01-08
+	- original version; created by h2xs 1.23 with options
+		-A -n Text::VCardFast
+

@@ -1,0 +1,60 @@
+CHANGES file for Test::Verbose
+
+0.010 NOT RELEASED YET
+    - tv now globs on Win32
+    - nmake now used on Win32
+    - --verbose no longer require to show which test script is being run
+    - --verbose now merely undoes any preceding -q, -qq, or -qqq options
+    - .tvrc files may now do:
+
+        $tv->pure_perl = 1;
+        $tv->quiet     = 1;
+
+    - No more whinging about duplicate "pod|POD" options spec
+      (Paul Hoffman <nkuitse a t nkuitse com>)
+    - Return a 0, not an undef, if no tests should be run
+      (Paul Hoffman <nkuitse a t nkuitse com>)
+
+0.009 Fri Apr  4 09:29:39 EST 2003
+    - Remove spurious debugging noise.
+    - Added --pod, --no-pod, --compile, --no-compile, --source, --no-source
+    - Added -q, -qq and -qqq (experimental)
+    - Added tv.log support
+    - Removed odd little rare and small optimization that called exec()
+      if there is only one command to run.
+
+0.007 Tue Feb 11 09:26:21 EST 2003
+    - Runs a .tvrc file in the project's root directory before any tests
+      are run.  This allows you to set env. vars, for instance.
+
+0.006 Thu Nov 14 13:38:38 EST 2002
+    - Added John Fetkovich's elisp code to map the tv command to a key
+      in a .emacs file.
+    - Don't chdir to the project dir until running make test so that
+      podchecker and perl -cw can find files.
+    - Don't prepend t/ to absolute test script paths
+    - Only run POD checks in a source file if POD detected (/^=/ matches)
+    - look for t/ or lib/ when scanning up, to handle projects with
+      no t/.  Ideally, this would search for t/ because lib/Foo/lib/...
+      might be present, but hey, this is BALGE for now.
+    - Prevent infinite looping if no project dir found.
+    - tolerate \s before ; in packages decls
+    - Don't examine $project_dir/lib/..., $project_dir unless a package
+      name is supplied.
+
+0.000_4 Wed Sep 25 07:30:54 EDT 2002
+    - source code files and .pod files are run through podchecker
+      by default.
+    - -dd, --debug-stop runs the scripts in the debugger
+    - -d, --debug runs the test scripts in the debugger in NonStop mode
+    - -v, --verbose prints the commands out before they are run
+    - --debug-tv now debugs the tv command (instead of --debug).
+
+0.000_3 Tue Sep 17 22:43:29 EDT 2002
+    - Add --ext-utils option for <khampton@totalcinema.com>
+
+0.000_2
+    - make tests actually pass
+
+0.000_1
+    - Initial release

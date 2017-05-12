@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+# Generate gnuplot graphs using iozone data file
+
+template=iozone.dem
+file_name=$1
+
+# combo 2d & 3d template
+#
+do_template() {
+  echo "
+set terminal png
+set output '$file_name.png'
+set size 1.5,1.0
+set title 'Iozone Performance'
+set multiplot
+set logscale x 2
+set xtics 0,10
+set xlabel 'File Size mB'
+
+set size 0.75,0.75
+set origin 0.0,0.0
+set yrange [1:120]
+set ylabel 'mB/s'
+#set key right bottom
+set data style lines
+plot '2d.gnuplot' using (\$1/1024):(\$3/1024) title 'Write' lt 1, \
+     '2d.gnuplot' using (\$1/1024):(\$5/1024) title 'Read' lt 2, \
+     '2d.gnuplot' using (\$1/1024):(\$4/1024) title 'Re-Write' lt 3, \
+     '2d.gnuplot' using (\$1/1024):(\$6/1024) title 'Re-Read' lt 4
+
+set size 0.75,0.75
+set origin 0.75,0.0
+set grid lt 2 lw 1
+#set ytics autofreq
+set key
+set logscale x 2
+set logscale y 2
+set yrange [4:16384]
+set ylabel 'Rec Size kB'
+set zrange [0:120]
+set zlabel 'mB/s'
+set title 'Iozone Performance'
+set dgrid3d 40,40,3
+set hidden3d
+set data style lines
+splot '3d.gnuplot' using (\$1/1024):2:(\$3/1024) title 'Write' lt 1, \
+      '3d.gnuplot' using (\$1/1024):2:(\$5/1024) title 'Read' lt 2
+" > $template
+}
+
+if ( [ $file_name ] && [ -f $file_name ] ); then
+    do_template
+    awk '$1 ~ /^[0-9]+/ && $2 ~ /64/ { print  $1 " " $2 " " $3 " " $4 " " $5 " " $6 }' < $file_name > 2d.gnuplot
+    awk '$1 ~ /^[0-9]+/ { print  $1 " " $2 " " $3 " " $4 " " $5 " " $6 }' < $file_name > 3d.gnuplot
+    gnuplot $template
+    [ -f iozone.dem ] && rm iozone.dem
+    [ -f 2d.gnuplot ] && rm 2d.gnuplot
+    [ -f 3d.gnuplot ] && rm 3d.gnuplot
+else
+    echo "Usage : $0 <filename>"
+fi
+

@@ -1,0 +1,739 @@
+Revision history for Term::Choose
+
+
+1.506   2017-04-26
+        - Code refactoring.
+        - Update year copyright.
+
+1.505   2016-08-14
+        - Don't hide "Term::Choose::Constants" on Pause [https://github.com/kuerbis/Term-Choose_HAE/issues/2 stesachse].
+
+1.504   2016-03-21
+        - If ll is set, choose returns always indexes.
+        - If ll is set and the window size has changed, choose returns immediately -1.
+
+1.503   2016-03-11
+        - Announcement of future new behavior of the option "ll".
+
+1.502   2016-02-29
+        - Don't hide "Term::Choose::LineFold" from Pause [https://github.com/kuerbis/Term-Choose-Util/issues/2 stepht].
+        - Code refactoring.
+
+1.501   2016-02-22
+        - Bugfix in "idx_to_marked".
+
+1.500   2016-02-21
+        - Update "line_fold".
+        - Bugfix in "cut_to_printwidth".
+
+1.209_02   2016-02-15
+        - Bugfix in "line_fold" - handle trailing newlines.
+
+1.209_01   2016-02-14
+        - New module "Term::Choose::LineLineFold".
+
+1.209   2016-01-30
+        - "mark" and "no_spacebar" - indexes out of range: now dies with an appropriate error message.
+        - Bugfix: with only one row a string can still be to long if there is only one string.
+        - If the option "ll" is enabled: empty strings are no longer replaced.
+        - Code refactoring
+        - Code cleanup.
+        - Update documentation.
+
+1.208   2015-10-21
+        - Update documentation.
+
+1.207   2015-10-05
+        - Make "Term::Choose::Constants" visible, so it is available for "Term::Choose_HAE".
+
+1.206   2015-10-02
+        - Stable release - no changes.
+
+1.205_04   2015-09-26
+        - Code refactoring.
+
+1.205_03   2015-09-22
+        - Bugfix "i_col".
+        - Code refactoring.
+
+1.205_02   2015-09-19
+        - Code refactoring.
+
+1.205_01   2015-09-18
+        - Code refactoring.
+
+1.205   2015-09-09
+        - Code refactoring.
+
+1.204   2015-09-09
+        - Code refactoring.
+
+1.203   2015-09-09
+        - Reserve one space for the (hidden) terminal cursor: Terminalwidth - 1.
+
+1.202   2015-07-02
+        - Removed redundant documentation.
+
+1.201   2015-04-27
+        - Moved "Expect"-tests to the "xt"-folder.
+
+1.200_01   2015-04-25
+        - One new test and one test modified.
+
+1.200   2015-03-27
+        - "Ctrl-SpaceBar": all if cursor on first row else current page.
+
+1.120   2015-03-11
+        - Bugfix in Win32 "__clear_screen".
+
+1.119   2015-02-05
+        - use constant.
+        - Update year copyright.
+
+1.118   2014-12-08
+        - Perl minimum version: "5.8.3".
+        - Update build requirements.
+
+1.117   2014-11-20
+        - Stable release.
+        - Make tests which use "Expect" optional.
+
+1.116_03   2014-11-03
+        - Bugfix "marked".
+
+1.116_02   2014-11-02
+        - Keep the cursor position when the screen is resized.
+        - Code refactoring.
+
+1.116_01   2014-10-30
+        - New option "mark".
+        - Don't reset the marked items if the screen is resized.
+        - Update documentation.
+
+1.116   2014-09-06
+        - Stable release - no changes.
+
+1.115_01   2014-09-05
+        - Perl minimum version from "5.10.0" to "5.8.0".
+        - Update documentation.
+
+1.115   2014-09-03
+        - Stable release - no changes.
+
+1.114_04   2014-08-24
+        - Bugfix in reset screen.
+
+1.114_03   2014-08-19
+        - Modified tests.
+
+1.114_02   2014-08-19
+        - Modified test.
+
+1.114_01   2014-08-14
+        - Update tests.
+        - Removed option "limit".
+        - Update documentation.
+
+1.114   2014-08-13
+        - Re-enabled "limit".
+        - Announcement: "limit will be removed".
+        - Removed developer tests.
+        - Update documentation.
+
+1.113_10   2014-08-12
+        - Removed option "limit".
+        - Update tests.
+
+1.113_09   2014-08-11
+        - Update tests.
+
+1.113_08   2014-08-09
+        - Update tests.
+
+1.113_07   2014-08-07
+        - Update tests.
+        - Perl minimum version "5.10.0".
+        - Removed warning: empty list.
+
+1.113_06   2014-08-06
+        - Update tests.
+        - Removed "Build.PL".
+
+1.113_05   2014-08-05
+        - Update tests.
+
+1.113_04   2014-08-05
+        - Update tests.
+
+1.113_03   2014-08-03
+        - Update keycodes.
+        - Update tests.
+
+1.113_02   2014-08-03
+        - Developer test.
+
+1.113_01   2014-08-02
+        - Added developer tests.
+        - Invalid options are now fatal.
+        - Removed "Win32::Console::ANSI".
+        - Update documentation.
+        - Removed POD from "Term::Choose::Linux", "Term::Choose::Win32" and "Term::Choose::Constants".
+
+1.113   2014-08-02
+        - Announcement: invalid options will become fatal.
+        - Announcement: "Win32::Console::ANSI" will be removed.
+        - Code refactoring: prepare the announced changes.
+        - Removed developer tests.
+        - Update documentation.
+
+1.112_03   2014-08-01
+        - Code refactoring.
+        - Replaced test.
+
+1.112_02   2014-07-31
+        - Bugfix: argument checking if "choose" is called as function.
+        - Modified test.
+
+1.112_01   2014-07-31
+        - New test.
+
+1.112   2014-07-29
+        - Removed undocumented behavior.
+        - Update documentation.
+
+1.111   2014-07-15
+        - It is now possible to disable the 'print "\e(U"' with the TC_KEEP_WINDOWS_MAPPING environment variable.
+        - Announcement: "\e(U" will be removed in a future release.
+        - Update documentation.
+
+1.110   2014-06-28
+        - Improved argument validation: don't allow references as values for the options "prompt", "empty" and "undef".
+        - Changed the workaround concerning the "\e(U" escape sequence in "Term::Choose::Win32".
+        - Renamed variables and hash keys.
+
+1.109   2014-05-22
+        - Bugfix warning "invalid option name".
+        - Bugfix option "max_width / improvement layout.
+        - Removed the period at the end of the error messages.
+        - Improved documentation.
+
+1.108   2014-04-17
+        - Fixed error in variable name in "Term::Choose::Win32".
+
+1.107   2014-04-09
+        - Documentation: update and bugfix.
+
+1.106   2014-04-09
+        - Use "Win32::Console" directly to get the terminal size.
+        - Update documentation.
+        - Update Makefile.PL.
+
+1.105   2014-03-18
+        - Code refactoring and cleanup.
+
+1.104   2014-03-13
+        - Bugfix cleanup.
+
+1.103   2014-03-08
+        - Added experimental option "no_spacebar".
+        - Update documentation.
+
+1.102   2014-03-07
+        - Bugfix option "limit".
+        - Code refactoring.
+
+1.101   2014-03-06
+        - Change behavior of layout 2.
+        - Fixed documentation.
+
+1.100   2014-03-06
+        - Rewritten in OO.
+        - OS specific code: plugins "Term::Choose::Linux" and "Term::Choose::Win32".
+
+1.075_01   2014-02-27
+        - Increased version number to get "prerequisite" warning.
+
+1.074_01   2014-02-26
+        - Rewritten in OO.
+        - Outsourced OS specific code to "Term::Choose::Linux" and "Term::Choose::Win32".
+
+1.074   2014-02-13
+        - Added "use warnings;".
+        - Added LICENSE file.
+        - Added release test "year_copyright.t"
+        - Update documentation.
+
+1.073   2014-01-26
+        - Update release test "compare_Choose_Win32.t" to sync with Term::Choose::Win32 version 0.020.
+
+1.072   2014-01-24
+        - Prevent references from breaking the output.
+        - Update README.
+        - Update license.
+
+1.071   2014-01-21
+        - Keep track of the terminal size instead of using "SIGWINCH".
+        - Update documentation.
+
+1.070   2014-01-18
+        - Default value for option "limit" from 100_000 to not set (undef).
+        - Removed the artificial general upper limit for options with no specific upper limit.
+        - Update documentation.
+
+1.069   2014-01-04
+        - Update copyright.
+        - Removed example. A bugfixed version of the example-script is now located in the "App::DBBrowser" distribution and is called "db-browser".
+
+1.068   2013-12-25
+        - Increased the minimum required Perl version from "5.10.0" to "5.10.1".
+        - Update documentation.
+        - Update example.
+
+1.067   2013-12-23
+        - Bugfix documentation.
+        - Update example.
+
+1.066   2013-12-18
+        - Update documentation.
+        - Example: bugfix and update.
+
+1.065   2013-12-13
+        - Removed the deprecated option name "screen_width".
+        - Modified behavior "relative position".
+        - The minimum required version of "Unicode::GCString" is now "2013.10".
+        - Replaced "s/\P{Print}/\x{fffd}/g" with "s/\p{C}//g".
+        - Added "no warnings utf8".
+        - Updated documentation.
+        - Example: bugfixes, updates and refactoring.
+        - Example: Removed the option "Length".
+
+1.064   2013-09-24
+        - Update/bugfix in: keep relative position when moving page-wise.
+
+1.063   2013-09-23
+        - Keep the relative row position when moving page-wise.
+
+1.062   2013-09-18
+        - Code refactoring.
+
+1.061   2013-09-07
+        - Added option "max_height".
+        - Renamed option "screen_width" to "max_width".
+        - Updated documentation.
+
+1.060   2013-09-06
+        - Allow installation on Win32 - Term::Choose::Win32 now depends on Term::Choose.
+        - Bugfix example.
+
+1.059   2013-09-04
+        - Code refactoring.
+        - Updated documentation.
+        - Bugfix example.
+
+1.058   2013-08-25
+        - Code refactoring.
+        - Imporved documentation.
+        - Updated example.
+
+1.057   2013-08-10
+        - Example: fixed bug.
+
+1.056   2013-08-10
+        - Example: update and bug fix.
+
+1.055   2013-06-21
+        - Example: bug fix.
+
+1.054   2013-06-21
+        - Removed "experimental" from option "lf" and from option "ll".
+        - Updated documentation.
+        - Example: bug fixes.
+
+1.053   2013-06-17
+        - Fixed bug: replaced "\N{LINE FEED}" with "\n" (in "_prepare_promptline").
+          Before Perl v5.16 an occurrence of \N{CHARNAME} doesn't load "charnames" module automatically.
+
+1.052   2013-06-14
+        - Modified experimental option "lf".
+        - Update documentation.
+
+1.051   2013-06-10
+        - Fixed bug (size_changed).
+        - Added option "keep".
+        - Removed experimental option "st".
+        - Added experimental option "lf".
+        - Update documentation.
+
+1.050   2013-06-05
+        - Removed experimental option "head".
+        - Update documentation.
+        - Example: changed local_readline.
+        - Example: bugfix.
+
+1.049   2013-06-03
+        - Announcements.
+        - Code refactoring.
+        - Update documentation.
+        - Update example.
+
+1.048   2013-05-29
+        - Code refactoring: reuse the length of strings calculated in "_length_longest".
+        - Removed deprecated option name "keep".
+        - Update documentation.
+        - Removed option "max-depth" from the example.
+        - Update example.
+
+1.047   2013-05-26
+        - Added experimental option "st".
+        - Code cleanup.
+        - Update documentation.
+        - Update example.
+
+1.046   2013-05-25
+        - Added support for multi-line prompt.
+        - Added "Text::LineFold" as a required module.
+        - Keep at least 4 list lines.
+        - Code cleanup.
+        - Update documentation.
+        - Example: update and bug fix.
+
+1.045   2013-05-24
+        - Added extended SGR mouse mode (1006) support.
+        - The mouse wheel scrolls now page-wise instead of line-wise.
+        - Updated documentation.
+        - Updated example.
+
+1.044   2013-05-23
+        - Experimental option "keep" is now called "head".
+        - Updated documentation.
+        - Example: update and bug bixes.
+
+1.043   2013-05-20
+        - Replaced "given/when".
+        - Updated documentation.
+        - Example: update and bug fix.
+
+1.042   2013-05-16
+        - Added the experimental option "keep".
+        - Non printable characters are replaced with "\x{fffd}" instead of a dot.
+        - Buildin "ref" is used instead of "Scalar::Util::reftype" to check arguments.
+        - Removed deprecated option name "length_longest".
+        - Code refactoring.
+        - Example: update and bug fixes.
+
+1.041   2013-05-12
+        -"_init_scr" is now OO, so that DESTROY does the cleanup.
+        - Added $SIG{'INT'} handler.
+        - Code cleanup.
+        - Fixed bug in example (stringify gcstring).
+
+1.040   2013-05-10
+        - Removed experimental option "cp_list".
+        -"s/\p{Cntrl}//g;" --> "s/\P{Print}/./g;"
+        - Refactoring "_unicode_cut" (now called "_unicode_trim").
+        - Strings trimmed with "_unicode_sprintf" don't end with "...".
+        - Code refactoring.
+        - Update documentation.
+        - Update example.
+
+1.039   2013-05-05
+        - Switched from "Text::CharWidth" back to "Unicode::GCString" ("Unicode::GCString" supports Unicode Version 6.2).
+        - The minimum required version of "Unicode::GCString" is now "2012.10".
+        - Example: update.
+        - Example: adaption to work again with "Unicode::GCString".
+
+1.038   2013-05-02
+        -Added experimental option "cp_list".
+        -Updated documentation.
+
+1.037   2013-04-29
+        - Example: fixed bugs.
+        - Example: added progess bar threshold (option).
+        - Example: changed the "binary filter"/ removed the option "Binary filter".
+
+1.036   2013-04-24
+        - Switched from "Unicode::GCString/columns" to "Text::CharWidth::mbswidth" to determine print columns (faster).
+        - Update documentation.
+
+1.035   2013-04-23
+        - Refactoring "_unicode_cut" (Text::WideChar::Util::mbtrunc).
+        - Refactoring "_unicode_sprintf" (truncated strings end with "...").
+
+1.034   2013-04-23
+        - Code refactoring.
+        - Code cleanup.
+        - Update documentation.
+
+1.033   2013-04-17
+        - Bugfix (KEY_END).
+        - Bugfix and code cleanup in "_getch".
+        - Reset "$|" before leaving "choose".
+        - Updated documentation.
+        - Example: update.
+        - Example: "binary filter" disabled by default
+
+1.032   2013-04-11
+        - Removed "autodie" from the tests - perl 5.10.0 doesn't provide autodie.
+        - Fixed "prompt" bug in "_wr_screen".
+
+1.031   2013-04-09
+        - Option "prompt": the value '' (empty string) means now no promptline.
+        - Skip checking string-length in layout "3" if "length_longest" <= "maxcols".
+        - The opton "length_longest" is now called also "ll".
+        - Changed mininum Perl version from "5.10.1" to "5.10.0".
+        - Code cleanup.
+        - Updated documentation.
+        - Updated example.
+
+1.030   2013-04-04
+        - Removed the undocumented appending of "(multiple choice ...)" to the promptstring in listcontext.
+        - Code cleanup.
+        - Updated documentation.
+        - Example: Added option "expand".
+
+1.029   2013-04-01
+        - Added experimental feature: "Ctrl-SpaceBar" inverts the choices.
+        - "choose": set "$\" and "$," to "undef".
+        - Code refactoring.
+        - Removed deprecated options from documentation.
+        - Example: Modified "binary filter".
+
+1.028   2013-03-07
+        - Fixed bug in "_handle_mouse" (all_in_one_row).
+        - Updated "_handle_mouse".
+        - Options: replaced "mouse_mode" with "mouse".
+        - Options: replaced "empty_string" with "empty".
+        - Code refactoring.
+        - Code cleanup.
+        - Imporved documentation.
+        - Example: bug fixes.
+        - Example: updated function "choose_a_number".
+
+1.027   2013-03-05
+        - Removed "utf8" pragma: only ASCII sourcecode and "utf8::upgrade" does not need "use utf8".
+        - Example: added option "sssc_mode".
+
+1.026   2013-03-02
+        - Code refactoring.
+        - Improved documentation.
+        - Example: update.
+
+1.025   2013-02-19
+        - Option "pad_one_row" defaults to the value of the option "pad".
+        - Modified "croak" messages.
+        - Code refactoring.
+        - Updated documentation.
+        - Updated example.
+
+1.024   2013-02-09
+        - "Home-key" and "End-key": removed status "experimental".
+        - Updated documentation.
+        - Example: bug fixes.
+        - Example: code refactoring.
+
+1.023   2013-02-06
+        - Added support for the "Home-key" and the "End-key" (experimental).
+        - Updated documentation.
+        - Example: code refactoring.
+
+1.022   2013-01-31
+        - Example: update and bug fixes.
+
+1.021   2013-01-28
+        - Removed deprecated options "right_justify" and "vertical".
+        - Updated documentation.
+        - Updated copyright.
+        - Example: switched back to "File::Find".
+        - Example: added postgres.
+
+1.020   2013-01-02
+        - Added option "index".
+        - Updated documentation.
+        - Updated example.
+
+1.019   2012-12-26
+        - The "layout" "1" starts more broadly now (if more than one row).
+        - Options: replaced "right_justify" with "justify" (with new value "centered").
+        - Options: replaced "vertical" with "order".
+        - Updated documentation.
+        - Updated example.
+
+1.018   2012-11-28
+        - warn "EOT" if "_getch" returns "undef".
+        - Example: added "Union".
+        - Example: update and bug fixes.
+
+1.017   2012-11-15
+        - Fixed bug in "if size_changed".
+        - Added: Check "ReadKey"/"_getch" if return value is defined.
+        - Added: "Ctrl+D" behaves as the "q" key.
+        - Code cleanup.
+        - Build.PL/Makefile.PL: "die 'No support for OS' if $^O eq 'MSWin32';".
+        - Example: updated and reduced dependencies.
+
+1.016   2012-11-11
+        - Code refactoring (clear_screen).
+        - Removed "Choose/GC.pm".
+        - Code cleanup.
+        - Improved documentation.
+        - Example: added "Join Tables".
+        - Example: update and bug fixes.
+
+1.015   2012-10-22
+        - Code cleanup.
+        - Improved documentation.
+        - Example: update and bug fixes.
+
+1.014   2012-10-10
+        - Code cleanup.
+        - Updated example.
+
+1.013   2012-10-08
+        - Unicode::GCString: moved from "eval" to "utf8::upgrade".
+        - Improved documentation.
+        - Updated example.
+
+1.012   2012-10-04
+        - Term::Choose with Unicode support and Term::Choose::GC removed.
+        - Changed "eval" bracketing.
+        - Example: removed "delete" option.
+        - Example: fixed bugs.
+
+1.011   2012-10-02
+        - Removed/replaced "smartmatch" operators.
+        - Improved documentation.
+        - Example: update and bug fixes.
+        - Example: from "File::Find" to "File::Find::Rule".
+
+1.010   2012-09-26
+        - Example: update and bug fixes.
+
+1.009   2012-09-25
+        - Removed deprecated option names "max_list" and "cursor".
+        - Updated documentation.
+        - Example: bug fix and update.
+
+1.008   2012-09-24
+        - Option "page" now enabled by default.
+        - Option "cursor" is now called "default".
+        - Option "max_list" is now called "limit".
+        - Improved documentation.
+        - Updated example.
+
+1.007   2012-09-07
+        - Fixed bug in "_size_and_layout" (if "vertical" == 0).
+        - Fixed bug in "_write_first_screen" (condition for calling "_set_this_cell").
+        - Code refactoring.
+        - Some changes of the allowed option values.
+        - Updated example.
+        - Updated documentation.
+
+1.006   2012-09-06
+        - Added option "page".
+        - Code refactoring.
+        - Fixed bugs and updated example.
+        - Updated documentation.
+
+1.005   2012-09-01
+        - Added option "cursor".
+        - Fixed mouse_mode bugs.
+        - Updated documentation.
+
+1.004   2012-08-29
+        - "_size_and_layout" back to the old position after "_print_promptline".
+        - Code refactoring.
+        - Improved documentation.
+
+1.003   2012-08-28
+        - Check for existing SIGWINCH handler.
+        - Code refactoring.
+        - Removed $arg->{step} from "_print_promptline" (GC) ("_print_promptline" not available if $arg->{prompt} == 0).
+        - Updated example.
+        - Improved documentation.
+
+1.002   2012-08-23
+        - Updated Example.
+        - Code refactoring.
+        - Improved documentation.
+
+1.001   2012-08-12
+        - $VERSION: switched from dotted-integers to decimal numbers ("0.7.16" -> "1.001").
+        - Changed the maximal allowed value for the option "length_longest" from 999_999_999 to 999.
+        - Updated documentation.
+
+0.7.16  2012-08-12
+        - From "$XSIG{WINCH}[4]" (Signals::XSIG) to "local $SIG{WINCH}".
+        - Updated "Page Up"/"Page Down".
+        - Removed option "extra_key".
+        - Updated documentation.
+
+0.7.15  2012-08-09
+        - Added "Page Up" and "Page Down" keys (experimental).
+
+0.7.14  2012-08-08
+        - Added option "length_longest".
+        - Updated documentation.
+        - Code refactoring.
+
+0.7.13  2012-08-05
+        - Removed option "length_longest".
+
+0.7.12  2012-08-05
+        - Code refactoring - "_size_and_layout": don't copy the list but use indexes.
+        - Added option "length_longest".
+        - Changed "_unicode_cut" and "_unicode_sprintf"
+        - Changed optionname "vertical_order" to "vertical".
+        - Changed the order of the values from the option "layout".
+        - Updated example.
+        - Improved documentation.
+
+0.7.11  2012-07-31
+        - "_size_and_layout": back to version 0.7.9.
+
+0.7.10  2012-07-30
+        - Code refactoring - "_size_and_layout": don't copy the list.
+        - Fixed bug in example.
+        - Improved documentation.
+
+0.7.9   2012-07-29
+        - Form "and,or,not" to "&&,||,!".
+        - Minor code changes.
+        - Updated example.
+        - Improved documentation.
+
+0.7.8   2012-07-27
+        - Added example.
+        - Minor code changes.
+
+0.7.7   2012-07-24
+        - Fixed bug in _unicode_cut.
+        - Improved documentation.
+
+0.7.6   2012-07-23
+        - Added Term::Choose::GC.
+        - Code refactoring.
+        - Improved documentation.
+
+0.7.5   2012-07-21
+        - Don't print control characters.
+        - Improved Documentation.
+
+0.7.4   2012-07-19
+        - Minor code changes.
+        - Improved Documentation.
+
+0.7.3   2012-07-17
+        - Make calling "choose" in void context more normal.
+        - Modified error messages.
+        - "max_list": exceeding "max_list" now warns and cuts the used list to max_list instead of dying.
+        - Added bug section.
+        - Improved documentation.
+
+0.7.2   2012-07-14
+        - Press a key after warnings "not a valid value for option" or "no such option" to continue.
+        - Consideration of the case of calling "choose" in a void context.
+        - Code cleanup.
+        - Documentation cleanup.
+
+0.7.1   2012-07-13
+        - First release on cpan.

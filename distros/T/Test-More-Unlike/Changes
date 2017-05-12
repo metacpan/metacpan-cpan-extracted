@@ -1,0 +1,10 @@
+Revision history for Perl extension Test::More::Unlike
+
+0.03    Sat Sep  7 18:13:23 JST 2013
+        - specified version of dependency: Text::MatchedPosition
+
+0.02    Mon Sep  2 21:28:45 JST 2013
+        - changed the implementation and fixed POD
+
+0.01    Sun Sep  1 13:13:13 JST 2013
+        - original version

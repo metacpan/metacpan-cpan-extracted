@@ -1,0 +1,11 @@
+Revision history for Text-SpellChecker-GUI
+
+0.0.2	2010-06-26/07:30
+		-Minor update to 'Makefile.PL'.
+
+0.0.1	2009-07-19/18:40
+		-Misc pod corrections.
+		-Misc warning corrections.
+
+0.0.0   2009-07-16/01:10
+		-Initial release.

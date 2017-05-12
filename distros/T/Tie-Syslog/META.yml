@@ -1,0 +1,24 @@
+---
+abstract: 'Tie a filehandle to Syslog.'
+author:
+  - 'Giacomo Montagner <kromg@entirelyunlike.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Syslog
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Sys::Syslog: '0.11'
+  Test::More: '0'
+version: v2.04.03

@@ -1,0 +1,61 @@
+---
+uri: 'http://test2/debian.html?repo=perl-5.10'
+
+request: 'http://debian.serenevy.net/'
+--- |
+HTTP/1.1 200 OK
+Connection: close
+Date: Sat, 20 Jun 2009 17:19:50 GMT
+Accept-Ranges: bytes
+ETag: "5f0024-755e-467a10094f400"
+Server: Apache/2
+Vary: Accept-Encoding
+Content-Length: 3354
+Content-Type: text/html
+Content-Type: text/html; charset=ISO-8859-1
+Last-Modified: Thu, 16 Apr 2009 00:18:24 GMT
+Client-Date: Sat, 20 Jun 2009 17:19:50 GMT
+Client-Peer: 206.212.243.242:80
+Client-Response-Num: 1
+Link: <http://dean.serenevy.net/styles/main.css>; /="/"; rel="stylesheet"; type="text/css"
+Link: <http://dean.serenevy.net/styles/fancy.css>; /="/"; rel="stylesheet"; type="text/css"
+Link: <http://dean.serenevy.net/site-images/smile-16x16.png>; /="/"; rel="icon"; type="image/gif"
+Link: <http://serenevy.net/>; /="/"; rel="top"
+Title: Serenevy: .deb Repository
+X-Meta-Author: Dean Serenevy
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+ <title>Serenevy: .deb Repository</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+ <link rel="stylesheet" href="http://dean.serenevy.net/styles/main.css" type="text/css" />
+ <link rel="stylesheet" href="http://dean.serenevy.net/styles/fancy.css" type="text/css" />
+ <meta name="author" content="Dean Serenevy" />
+ <link href="http://dean.serenevy.net/site-images/smile-16x16.png" type="image/gif" rel="icon" />
+ <link href="http://serenevy.net/" rel="top" />
+<style type="text/css">
+<!--
+  .source { color: #888880; }
+  .source a[href] { color: #888880; }
+  .old { color: #a03; }
+  img[src="source.gif"] { vertical-align: middle; }
+-->
+</style>
+</head>
+<body>
+
+<h1>The Serenevy .deb Repository</h1>
+
+<h3><a name="perl-5.10">The perl-5.10 directory</a></h3>
+<p><code>sources.list</code> entry:<br> &nbsp; &nbsp; deb http://serenevy.net/debian perl-5.10/<br/> &nbsp; &nbsp; deb-src http://serenevy.net/debian perl-5.10/<br/></p><dl><dt><b>libclass-mop-perl</b> [0.77-1] <img src="source.gif" alt="(source package available)" /><span class="source"> From: <a href="http://search.cpan.org/search?query=class-mop&mode=dist">CPAN</a></span></dt><dd>A Meta Object Protocol for Perl 5</dd></li>
+<dt><b>libdbm-deep-perl</b> [1.0014-1] <img src="source.gif" alt="(source package available)" /><span class="source"> From: <a href="http://search.cpan.org/search?query=dbm-deep&mode=dist">CPAN</a></span></dt><dd>A pure perl multi-level hash/array DBM that supports transactions</dd></li>
+<dt><b>libdevel-globaldestruction-perl</b> [0.02-1] <img src="source.gif" alt="(source package available)" /><span class="source"> From: <a href="http://search.cpan.org/search?query=devel-globaldestruction&mode=dist">CPAN</a></span></dt><dd>Expose PL_dirty, the flag which marks global</dd></li>
+<dt><b>libdevice-usb-perl</b> [0.29-1] <img src="source.gif" alt="(source package available)" /><span class="source"> From: <a href="http://search.cpan.org/search?query=device-usb&mode=dist">CPAN</a></span></dt><dd>Use libusb to access USB devices</dd></li>
+<dt><b>libfilehandle-fmode-perl</b> [0.11-1] <img src="source.gif" alt="(source package available)" /><span class="source"> From: <a href="http://search.cpan.org/search?query=filehandle-fmode&mode=dist">CPAN</a></span></dt><dd>determine whether a filehandle is opened for reading, writing, or both.</dd></li>
+<dt><b>libmoose-perl</b> [0.71-1] <img src="source.gif" alt="(source package available)" /><span class="source"> From: <a href="http://search.cpan.org/search?query=moose&mode=dist">CPAN</a></span></dt><dd>A postmodern object system for Perl 5</dd></li>
+<dt><b>libperlio-gzip-perl</b> [0.18-1] <img src="source.gif" alt="(source package available)" /><span class="source"> From: <a href="http://search.cpan.org/search?query=perlio-gzip&mode=dist">CPAN</a></span></dt><dd>Perl extension to provide a PerlIO layer to gzip/gunzip</dd></li>
+<dt><b>libx11-idletime-perl</b> [0.08-2] <img src="source.gif" alt="(source package available)" /><span class="source"> From: <a href="http://search.cpan.org/search?query=x11-idletime&mode=dist">CPAN</a></span></dt><dd>Get the idle time of X11</dd></li>
+</dl>
+
+</body></html>

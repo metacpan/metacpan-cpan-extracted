@@ -1,0 +1,35 @@
+Revision history for Text-CSV-Easy
+
+0.54    2016-05-10
+        Fix bug when 0 is the value of the last field and has a trailing newline (RT#114297).
+
+0.53    2014-01-22
+        Fixes an issue with 0 being treated as undef
+
+0.52    2013-02-09
+        POD documentation updates.
+
+0.51    2013-02-09
+        Slightly optimizes the regexp for CSV parsing.
+        Properly handles CRLF.
+        Improved documentation.
+
+0.50    2013-02-09
+        Supports RFC 4180.
+
+0.05    2013-02-08
+        Update metadata
+
+0.04    2013-02-08
+        Fixes an issue when a comman follows an escaped quote.
+        Adds TCE_VERSION numbering which will only load XS if TCE_VERSION matches.
+
+0.03    2013-02-07
+        Better handles empty strings and undef values. 
+        Adds tests to ensure XS and PP compatability.
+
+0.02    2013-02-06
+        Minor changes.
+
+0.01    2013-02-06
+        First version, released on an unsuspecting world.

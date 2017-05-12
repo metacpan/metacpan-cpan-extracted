@@ -1,0 +1,41 @@
+Tk/Taxis version 2.03
+=====================
+
+This module is a composite widget: a framed canvas with critter images that 
+perform bacterial taxis within a choice chamber. Taxis is a form of movement 
+found in simple organisms such as bacteria. Bacteria cannot sense differential
+gradients of e.g. light or food along the length of their cells, so they cannot
+simply swim toward the light or food, as they are unable to tell which direction
+this would require. Instead they measure e.g. the concentration of food where
+they are, swim a little, then measure the concentration again. If they find the 
+concentration has increased, they reduce their tumbling frequency, i.e the 
+probability they will make a random change in direction. This allows them to 
+follow a biased random walk toward the source of food/light/etc.
+
+The module requires Tk and its dependencies installed. In addition to the module
+itself, a script called 'woodlice.pl' will be installed in perl's executable 
+directory that demonstrates the use of the module. If you do not want this,
+edit Makefile.PL to remove the EXE_FILES line.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Steve Cook
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.

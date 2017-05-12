@@ -1,0 +1,36 @@
+You need Perl 5.002 or later.
+
+1. Create a Makefile.
+
+    perl Makefile.PL
+
+2. Build the Term::Size extension.
+
+    make
+
+3. Test it (please don't omit this step).
+
+    make test
+
+You should see `ok 1' through to `ok 6', followed by a description of
+the size of the terminal you are using.
+
+If any tests fail, please get in touch so we can sort out the problem.
+
+4. Install the extension.
+
+If you have built Term::Size as a dynamic extension, it's as simple as
+this.
+
+    make install
+
+If you have built Term::Size as a static extension, follow the
+instructions given during the build process.
+
+5. If you have any problems, questions, or ideas for future
+enhancements, please contact me.  I'm particularly keen to hear from
+people who can help me make Term::Size work on systems other than Unix.
+
+Tim Goodwin
+<tim@uunet.pipex.com>
+1997-05-13

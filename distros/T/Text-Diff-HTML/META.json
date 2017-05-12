@@ -1,0 +1,58 @@
+{
+   "abstract" : "XHTML format for Text::Diff::Unified",
+   "author" : [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Diff-HTML",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.2701",
+            "Test::More" : "0.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.2701"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "1.41"
+         },
+         "requires" : {
+            "HTML::Entities" : 0,
+            "Text::Diff" : "0.11"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Diff::HTML" : {
+         "file" : "lib/Text/Diff/HTML.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/theory/text-diff-html/issues/"
+      },
+      "homepage" : "http://search.cpan.org/dist/Text-Diff-HTML/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/theory/text-diff-html/"
+      }
+   },
+   "version" : "0.07"
+}

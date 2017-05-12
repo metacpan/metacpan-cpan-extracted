@@ -1,0 +1,11 @@
+Revision history for Test-Dirs
+
+0.03    30 Jun 2010
+    - require File::Path 2.07 that has the remove_tree command
+
+0.02    25 Jun 2010
+    - added dir_cleanup_ok()
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

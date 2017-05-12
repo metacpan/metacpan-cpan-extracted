@@ -1,0 +1,27 @@
+Test-U32 version 0.01
+=====================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+MORE DETAILS
+
+Read the POD or the HTML in html/
+
+LICENSE
+
+This package is free software and is provided "as is" without express or
+implied warranty. It may be used, redistributed and/or modified under the
+terms of the Artistic License 2.0. A copy is include in this distribution.
+
+

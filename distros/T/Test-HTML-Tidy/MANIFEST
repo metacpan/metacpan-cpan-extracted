@@ -1,0 +1,11 @@
+Changes
+Tidy.pm
+MANIFEST
+META.yml
+Makefile.PL
+t/00.load.t
+t/clean.html
+t/pod-coverage.t
+t/pod.t
+t/test-builder.t
+t/tidy-overload.t

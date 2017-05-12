@@ -1,0 +1,23 @@
+---
+abstract: 'Base class for mocking with ability to mock methods with defined signatures'
+author:
+  - 'cono <cono@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mock-Signature
+requires:
+  Class::Load: '0'
+  Data::PatternCompare: '0.03'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/cono/p5-test-mock-signature/issues
+  homepage: https://github.com/cono/p5-test-mock-signature
+  repository: https://github.com/cono/p5-test-mock-signature.git
+version: '0.03'

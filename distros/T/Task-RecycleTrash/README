@@ -1,0 +1,45 @@
+NAME
+    Task::RecycleTrash - Check/install the dependencies for
+    File::Remove::trash
+
+DESCRIPTION
+    The trash function was added to File::Remove to provide access to
+    various operating system's native "holding area" for deleted files.
+
+    On Mac OS X this is known as the "trash" bin, on Windows this is known
+    as the "recycle" bin.
+
+    Unfortunately, the dependencies needed to interact with this
+    functionality can be quite difficult in several cases, most notably on
+    Mac OS X where the Mac::Glue (and thus Mac::Carbon) module is needed.
+
+    This created the rediculous situation in which a Mac OS X machine would
+    need to install and (audibly) test a voice synthesis engine in order to
+    add the capability to reliably delete a file.
+
+    To resolve this problem, the "trash" functionality in File::Remove will
+    ultimately be moved to a seperate distribution, but in the short term
+    the dependencies for the trash function will simply not be declared.
+
+    Task::RecycleTrash provides a replacement dependency for people that
+    genuinely do need to use the trash function in File::Remove.
+
+    It will install the dependencies needed on each platform, and then run
+    some simple tests to ensure that the trash function is working as
+    intended.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Task, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2007 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

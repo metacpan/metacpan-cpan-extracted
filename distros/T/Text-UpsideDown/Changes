@@ -1,0 +1,47 @@
+Revision history for Perl extension Text-UpsideDown
+
+1.22      2013-08-02
+  - Fix Win32 test failures, hopefully
+
+1.21      2013-02-21
+  - / upside down is still / [kedmon, GH #3]
+
+1.20_1    2011-12-24
+  - Fix test suite for Windows
+
+1.20      2011-07-18
+  - Better use of tr///, thanks to Aristotle again
+
+1.11_3    2011-07-17
+  - Speed enhancements [Aristotle Pagaltzis]
+  - More speed enhancement
+
+1.11_2    2011-07-15
+  - Use W/M as inversions to avoid bumping perl version required
+
+1.11_1    2011-07-07
+  - Added a simple command line script
+  - Added a couple better upside-down conversions
+
+1.100820    2010-03-03
+  - converted the distribution to Dist::Zilla-style
+
+0.03        2010-01-10
+   - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+   - Added standard test files; this will also help with CPANTS.
+
+0.02        2008-05-29
+   - Converted Changes file to YAML style
+   - .shipit: added Twitter step
+   - Makefile.PL: added auto_install() and process_templates()
+   - lib/*: converted to template
+   - updated MANIFEST
+   - updated t/perlcriticrc
+   - Makefile.PL now requires perl_version 5.008 - charname 'TURNED
+       AMPERSAND' doesn't exist in 5.6.2
+   - .shipit: fixed svk.tagpattern
+   - tags: NEWFEATURE
+
+0.01        2007-11-02
+   - original version

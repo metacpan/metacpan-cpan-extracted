@@ -1,0 +1,56 @@
+use Test::Magic tests => 20;
+
+Test::More->builder->failure_output(\*STDOUT);
+
+test '== fail',
+  is 1 == 2,
+  is 3 == 7;
+
+test '== pass',
+  is 2 == 2,
+  is 3 == 3;
+
+test '< fail',
+  is 2 < 1;
+
+test '< pass',
+  is 0 < 1;
+
+test 'regex pass',
+  is 'str' == qr/t/;
+
+test 'regex fail',
+  is 'str' == qr/tt/;
+
+test 'not; pass',
+  isnt 2 <= 1,
+  isnt 'str' == qr/tt/;
+
+test 'not; fail',
+  isnt 0 < 1,
+  isnt 'str' == qr/t/;
+
+test 'complex pass' => do {
+  my $var = 'x';
+  is $var == qr/x/,
+  is $var lt 'z'
+};
+
+test 'complex fail' => do {
+  my $var = 'x';
+  is $var == qr/y/,
+  is $var gt 'z'
+};
+
+test 'deep, pass',
+  is [1, 2, 3] == [1 .. 3];
+
+test 'deep, fail',
+  is [1, 2, 3] == [2 .. 4];
+
+test 'deep mix, fail',
+  is '1 2 3' == [1, 2, 3];
+
+test 'deep hash, fail',
+  is {a => 1, b => 2} == {a => 1, b => 3};
+

@@ -1,0 +1,29 @@
+Changelog.ini
+Changes
+data/nationalgeographic.01.clad
+data/nationalgeographic.01.png
+data/nationalgeographic.02.png
+data/test.image.magick.png
+data/wikipedia.01.clad
+data/wikipedia.01.png
+data/wikipedia.02.png
+lib/Tree/Cladogram.pm
+lib/Tree/Cladogram/ImageMagick.pm
+lib/Tree/Cladogram/Imager.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/Debian.font.list.pl
+scripts/image.magick.pl
+scripts/image.magick.sh
+scripts/imager.pl
+scripts/imager.sh
+scripts/pod2html.sh
+scripts/test.image.magick.pl
+scripts/test.image.magick.sh
+t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

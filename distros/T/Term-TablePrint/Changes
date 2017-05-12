@@ -1,0 +1,137 @@
+Revision history for Term::TablePrint
+
+
+0.053   2017-04-21
+        - New option "grid".
+        - Update documentation.
+
+0.052   2017-03-01
+        - Bugfix: return if too many columns.
+        - Too many columns: update notification text.
+        - Update year copyright.
+
+0.051   2016-03-21
+        - "Term::Choose": minimum version "1.504".
+        - Rewrite the screen if the window size has changed.
+
+0.050   2016-02-21
+        - Bugfix prompt.
+        - "Term::Choose": minimum version "1.500".
+        - "Term::Choose::Util": minimum version "0.050".
+
+0.026_01   2016-02-14
+        - Bugfix: don't change the passed table-data.
+        - Bugfix prompt.
+        - Code refactoring.
+        - Requires "Term::Choose::LineFold".
+        - "Term::Choose": minimum verson "1.209_01".
+        - "Term::Choose::Util": minimum version "0.030_01".
+
+0.026   2016-02-07
+        - Code cleanup.
+        - Update year copyright.
+
+0.025   2015-11-27
+        - New option "prompt".
+
+0.024   2015-08-17
+        - Bugfix "table_expand".
+
+0.023   2015-08-17
+        - Use constant.
+        - The option "table_expand" has now 3 different settings. The default behavior of this option has changed.
+
+0.022   2015-01-25
+        - Code refactoring.
+        - Update year copyright.
+
+0.021   2014-12-08
+        - Perl minimum version: "5.8.3".
+        - Replaced "\v" ("v" not yet available in Perl 5.8.3).
+        - "Term::Choose::Util": minimum version "0.019".
+
+0.020   2014-12-05
+        - Replaced "\R" ("\R" not yet available in Perl 5.8.0).
+        - "Term::Choose::Util": minimum version "0.018".
+
+0.019   2014-09-24
+        - Removed the feature added in the last developer release.
+        - Update documentation.
+
+0.018_01   2014-09-24
+        - "print_table": if not called in void context returns the indexes of the chosen rows.
+        - Update documentation.
+
+0.018   2014-09-20
+        - Show more progressbar if items > threshold * 2.
+
+0.017   2014-09-06
+        - Perl minimum version from "5.10.0" to "5.8.0".
+        - Update documentation.
+
+0.016   2014-08-16
+        - Perl minimum version from "5.10.1" to "5.10.0".
+
+0.015   2014-07-21
+        - Update documentation.
+
+0.014   2014-07-03
+        - Keep also the old hash key name for a while.
+
+0.013   2014-07-03
+        - Renamed a hash key.
+
+0.012   2014-05-30
+        - Changed the behavior when "table_expand" and "keep_header" are enabled.
+        - Update documentation.
+
+0.011   2014-05-28
+        - Changed behavior when "table_expand" and "keep_header" are enabled.
+        - Update documentation.
+
+0.010_01   2014-05-21
+        - Added option "keep_header".
+        - Update documentation.
+
+0.010   2014-05-04
+        - Update documentation.
+
+0.009   2014-05-03
+        - Improved documentation.
+
+0.008   2014-04-22
+        - Removed deprecated option "header_row".
+        - Improved documentation.
+
+0.007   2014-04-12
+        - The option "add_header" replaces the option "header_row".
+        - Update documentation.
+
+0.006   2014-04-09
+        - Update documentation.
+
+0.005   2014-03-24
+        - Bugfix in "max_rows".
+        - Added the second "choose_columns" method to the documentation.
+        - Update Makefile.PL.
+        - Improved documentation.
+
+0.004   2014-03-21
+        - Fixed "max_rows".
+        - Added option "choose_columns".
+        - Added option "header_row".
+        - Improved documentation.
+
+0.003   2014-03-06
+        - First stable release
+
+0.002_01   2014-03-02
+        - Added OO style.
+        - Code refactoring.
+        - Update documentation.
+
+0.001_02   2014-03-02
+        - Bugfix documentation.
+
+0.001_01   2014-03-02
+        - First release on CPAN.

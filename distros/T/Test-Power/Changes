@@ -1,0 +1,80 @@
+Revision history for Perl extension Test-Power
+
+0.14 2014-03-12T00:02:17Z
+
+    - use Devel::CodeObserver
+      (tokuhirom)
+
+0.13 2014-03-09T03:28:59Z
+
+    - Do not catch the exception in the code.
+      I can't remember the reason to catch exception.
+      (tokuhirom)
+    - Suppress warnings for pp_padrange.
+      (tokuhirom)
+    - Use Try::Tiny for better `local $@` implementation.
+      (tokuhirom)
+
+0.12 2013-11-05T07:58:30Z
+
+    - Depended on latest B::Tap, again.
+      (tokuhirom)
+
+0.11 2013-11-05T07:13:44Z
+
+    - Depended on latest B::Tap, again.
+      (tokuhirom)
+
+0.10 2013-11-02T02:52:05Z
+
+    - Depended on latest B::Tap. Because old one has a bug.
+      (tokuhirom)
+
+0.09 2013-10-16T02:33:14Z
+
+    - tap helem, aelem.
+      (tokuhirom)
+
+0.08 2013-09-18T05:06:33Z
+
+    - tap rv2cv, padsv.
+      (tokuhirom)
+
+0.07 2013-09-15T03:14:10Z
+
+    - Depended on B::Tap 0.04
+      (tokuhirom)
+
+0.06 2013-09-14T06:59:43Z
+
+    - Depend on B::Tap 0.02
+      (tokuhirom)
+
+0.05 2013-09-14T05:52:24Z
+
+    - Hook all entersubs.
+    - Fixed usage of B::Deparse
+
+0.04 2013-09-14T03:44:48Z
+
+    - Use B::Tap!
+      (tokuhirom)
+    - Support ithreads!
+      (tokuhirom)
+
+0.03 2013-09-12T21:02:28Z
+
+    - use B::GVOP for generating OP_GV. It makes more portable.
+      (tokuhirom)
+    - Die under the ithreads.
+      I will support it again...!
+      (tokuhirom)
+
+0.02 2013-09-12T10:17:55Z
+
+    - s/ok/expect/
+
+0.01 2013-09-12T05:48:54Z
+
+    - original version
+

@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Thread-App-Shutdown
+version: 0.10
+license: perl
+distribution_type: module
+requires:
+  perl: 5.8.0
+recommends: {}
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+conflicts: {}
+provides:
+  Thread::App::Shutdown:
+    file: lib/Thread/App/Shutdown.pm
+    version: 0.01
+generated_by: Module::Build version 0.21

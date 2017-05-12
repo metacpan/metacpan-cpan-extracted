@@ -1,0 +1,9 @@
+HISTORY
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+Makefile.PL
+MinMaxScale.pm
+README
+t/fromto.t
+t/minmaxval.t
+t/twomms.t

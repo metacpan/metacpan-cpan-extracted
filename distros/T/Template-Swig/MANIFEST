@@ -1,0 +1,18 @@
+lib/Template/Swig.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/boilerplate.t
+t/inheritance.t
+t/layout.html
+t/manifest.t
+t/negative.t
+t/page.html
+t/perl-callback-inheritance.t
+t/pod-coverage.t
+t/pod.t
+t/template.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

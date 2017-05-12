@@ -1,0 +1,56 @@
+NAME
+    Task::Tags - Install the Tags modules.
+
+SYNOPSIS
+     cpanm Task::Tags
+
+SEE ALSO
+    Tags
+        Structure oriented SGML/XML/HTML/etc. elements manipulation.
+
+    Tags::Element
+        Element utilities for 'Tags'.
+
+    Tags::Output
+        Base class for Tags::Output::*.
+
+    Tags::Output::Indent
+        Indent class for Tags.
+
+    Tags::Output::LibXML
+        LibXML output for Tags.
+
+    Tags::Output::PYX
+        PYX class for line oriented output for 'Tags'.
+
+    Tags::Output::Raw
+        Raw printing 'Tags' structure to tags code.
+
+    Tags::Output::Structure
+        Structure class for 'Tags' output.
+
+    Tags::Output::LibXML
+        Printing 'Tags' structure by LibXML library.
+
+    Tags::Utils
+        Utils module for Tags.
+
+    Tags::Utils::Preserve
+        Class to check if content in element is preserved?
+
+REPOSITORY
+    <https://github.com/tupinek/Task-Tags>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.06
+

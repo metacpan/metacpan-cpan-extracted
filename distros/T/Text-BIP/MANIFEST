@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/Text/BIP.pm
+test.pl
+META.yml                                Module meta-data (added by MakeMaker)

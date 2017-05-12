@@ -1,0 +1,39 @@
+---
+abstract: 'Everything you need to follow the Catalyst Tutorial'
+author: ~
+build_requires:
+  ExtUtils::MakeMaker: 6.11
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Catalyst-Tutorial
+no_index:
+  directory:
+    - examples
+    - examples
+    - inc
+    - t
+    - examples
+requires:
+  Catalyst::Authentication::Store::DBIx::Class: 0.07
+  Catalyst::Controller::HTML::FormFu: 0.03004
+  Catalyst::Devel: 1.08
+  Catalyst::Manual: 5.7014
+  Catalyst::Model::DBIC::Schema: 0.21
+  Catalyst::Plugin::Authentication: 0.10008
+  Catalyst::Plugin::Authorization::ACL: 0.1
+  Catalyst::Plugin::Authorization::Roles: 0.07
+  Catalyst::Plugin::Session: 0.19
+  Catalyst::Plugin::Session::State::Cookie: 0.09
+  Catalyst::Plugin::Session::Store::FastMmap: 0.05
+  Catalyst::Plugin::StackTrace: 0.09
+  Catalyst::Runtime: 5.7015
+  Catalyst::View::TT: 0.27
+  DBIx::Class: 0.0801
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

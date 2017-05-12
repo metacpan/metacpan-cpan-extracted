@@ -1,0 +1,7 @@
+Revision history for Perl extension Template::Plugin::Meta::Interpolate.
+
+0.02  Tir Jan 05 07:51:48 2015 - Runar Buvik
+    - Fixes so it can be added to CAPN 
+0.01  ?
+    - original version created Jonas Liljegren
+

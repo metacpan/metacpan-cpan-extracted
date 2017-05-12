@@ -1,0 +1,57 @@
+What is Tk::CursorControl ?
+
+This module offers a Tk programmer the functionality of
+warping, moving, confining or hiding a mouse cursor.
+
+For those of you who think this is a  scary thought. At ease!
+Have a look at some of the suggested uses in the POD.
+
+If you use Windows, I can guarantee that your cursor has
+been 'confined' and 'warped' numerous times...and you likely
+didn't even know it or think twice about it. 
+
+Subtle use is the key !!
+
+Install like you would any other perl module (where X.X is
+the version number you have downloaded):
+
+   gzip -d Tk-CursorControl-X.X.tar.gz
+   tar -xvf Tk-CursorControl-X.X.tar
+   cd Tk-CursorControl-X.X
+   perl Makefile.PL
+   make
+   make test    #see NOTE below
+   make install
+
+
+
+For Windows and ActiveState Perl, replace "make" with "nmake". If
+you do not have the Visual C++ compiler available or have nmake
+installed on your system then just copy the following files to
+C:\Perl\lib\site\Tk :
+
+CursorControl.pm
+trans_cur.xbm
+trans_cur.mask
+
+NOTE: This distribution comes with a 'widget' demonstration which
+should be available after a make install. If you wish to view this
+demo during the install stage, do a:
+
+make demo
+
+..after 'make test'.
+
+To view the demonstration after final installation, run the 'widget'
+demonstration which should already be in your PATH. Just invoke
+the command by typing 'widget' (without the quotes) at a command
+prompt. Under the "User Contributed Demonstration" list you should
+see a CursorControl entry. Click on this to view the demo.
+
+Send bug reports, comments and suggestions to dunniganj@cpan.org.
+
+Enjoy!
+
+Copyright (c) 2002-2004 Jack Dunnigan. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

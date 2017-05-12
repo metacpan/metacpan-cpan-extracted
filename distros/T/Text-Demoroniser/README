@@ -1,0 +1,66 @@
+Text::Demoroniser
+=================
+
+DESCRIPTION
+
+A text filter that allows you to convert Microsoft "smart" characters into 
+more normal characters within a given string.
+
+DEPENDENCIES
+
+  Encode::ZapCP1252
+
+For testing purposes, the following modules are required:
+
+  Test::More
+
+For testing purposes, the following modules are desireable, but not essential:
+
+  Pod::Coverage
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+For more detailed installation instructions, see INSTALL.
+
+USAGE
+
+Read the pod documentation in the distribution files.
+
+CHANGES
+
+For a complete list of changes, see the Changes file.
+
+SUPPORT
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please send an email to barbie@cpan.org or submit a bug to the
+RT system (http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Demoroniser). 
+However, it would help greatly if you are able to pinpoint problems or even 
+supply a patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+AUTHOR
+
+Barbie <barbie@cpan.org>
+for Miss Barbell Productions http://www.missbarbell.co.uk.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009-2015 Barbie for Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic License v2.

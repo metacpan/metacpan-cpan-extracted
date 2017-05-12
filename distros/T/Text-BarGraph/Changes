@@ -1,0 +1,24 @@
+Revision history for Perl extension Text::BarGraph
+
+Version 1.1 (2011/03/30)
+	- Accept configuration parameters in the constructor
+
+Version 1.0 (2005/11/02)
+	- Use Term::ANSIColor if it's available
+	- Renamed poorly named methods:
+		xsize  -> columns
+		sort   -> sortvalue
+		color  -> enable_color
+	- Updated documentation
+
+Version 0.3 (2003/02/16)
+	- Added numeric sort option
+
+Version 0.2
+	- Added color
+	- Silently revert to default screen size if Term::ReadKey
+	  is unavailable or STDOUT is not a terminal.
+
+Version 0.1
+	- Initial version
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension Text::Bayon
+
+0.00002  2010/11/19
+        - clean up temporary file ( set 'tempdir( CLEANUP => 1)' )
+
+0.00001  2009/12/8
+        - original version

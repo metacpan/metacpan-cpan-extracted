@@ -1,0 +1,13 @@
+Release history for Task::MojoliciousPlugins::PerlAcademy
+=========================================================
+
+0.02 2015-01-03
+
+    [IMPROVEMENTS]
+    * download latest 02packages.details.txt.gz
+    * update required plugins
+
+0.01 2014-05-29
+
+     * initial release
+

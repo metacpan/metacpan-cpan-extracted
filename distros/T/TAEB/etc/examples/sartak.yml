@@ -1,0 +1,25 @@
+---
+ai: Behavioral::Personality::Explorer
+
+display: Curses
+
+interface: Telnet
+interface_options:
+    Telnet:
+        account: TAEB
+    SSH:
+        account: taeb
+    Local:
+        read_iterations: 2
+        args: ['-D']
+
+character:
+    role: Valkyrie
+    race: Dwarf
+    gender: Female
+    align: Lawful
+
+other_config:
+    - pass_config.yml
+    - temp_config.yml
+

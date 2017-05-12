@@ -1,0 +1,25 @@
+---
+abstract: 'Video timecode class'
+author:
+  - 'Skye Shaw <sshaw AT lucas.cis.temple.edu>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Timecode
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: http://github.com/sshaw/Time-Timecode/issues
+  homepage: http://github.com/sshaw
+version: '0.30'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

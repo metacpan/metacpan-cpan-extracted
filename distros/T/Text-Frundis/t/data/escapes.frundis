@@ -1,0 +1,33 @@
+.X set -f xhtml nbsp " "
+.X set dmark —\~
+A backslash `\e' is written `\ee'. To begin a line with a period you can
+\&. use a zero-width `\e&' character. {}
+.Ch \&"title
+A `~'character
+A non-breaking space\~!
+[bla]
+<bla>
+^bla#$%"'
+.D
+A dialogue starts with a mark.
+Two backslashes \e\e.
+.\" Comment line followed by two empty lines
+.
+.Bd -t literal
+Text \e\e*
+Text \e\e.
+Text \e\e
+normal text
+Text. \e%\~#'"&\&$
+.Ed
+.P strange title:\e%$#
+Text.
+.Im %«\&\e».png
+.Im %«\&\e».png \&«»
+.Im %«\&\e».png \&&<
+.Lk \&«»#\e
+.Lk \&«»#\e ).
+.Sx -name \elolailo \&"title
+\$
+.Sm "Some     Text
+.Sm "Some     ""Text

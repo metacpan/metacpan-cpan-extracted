@@ -1,0 +1,5 @@
+=== basic
+--- wiki
+hoge@livedoor.jp
+--- html
+<a href="mailto:hoge@livedoor.jp">hoge@livedoor.jp</a>

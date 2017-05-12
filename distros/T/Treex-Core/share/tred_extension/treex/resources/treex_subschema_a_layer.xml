@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pml_schema xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/"  version="1.1">
+  <revision>1.0.0</revision>
+  <description>Subschema for a-layer trees</description>
+
+  <import type="iset.type" schema="treex_subschema_interset.xml"/>
+
+ <!--  a-layer representation (merged with m-layer) -->
+
+  <type name="a-root.type">
+    <structure role="#NODE" name="a-root">
+      <member name="id" role="#ID" as_attribute="1"  required="1"><cdata format="ID"/></member>
+      
+      <member name="giza_scores">
+        <structure>
+           <member name="counterpart.rf">
+              <cdata format="PMLREF"/>
+           </member>
+           <member name="therevalue">
+              <cdata format="any"/>
+           </member>
+           <member name="backvalue">
+              <cdata format="any"/>
+           </member>
+        </structure>
+      </member>
+      <member name="ptree.rf"><cdata format="PMLREF"/></member>
+      <member name="s.rf"><cdata format="PMLREF"/></member>
+      <member name="afun"><constant>AuxS</constant></member>
+      <member name="ord" role="#ORDER" required="1"><cdata format="nonNegativeInteger"/></member>
+      <member name="children" role="#CHILDNODES"><list type="a-node.type" ordered="1"/></member>
+      <!-- Should the sentence be parsed once again?
+           This is useful when tags has been fixed (with the knowledge of the parse). Popel 23.5.2009 -->
+      <member name="reparse" type="bool.type"/>
+      <member name="wild_dump"><cdata format="any"/></member>
+    </structure>
+  </type>
+
+
+  <type name="a-node.type">
+    <structure role="#NODE" name="a-node">
+      <member name="children" role="#CHILDNODES"><list type="a-node.type" ordered="1"/></member>
+
+      <!--**************  COVERED BY TREEX API METHODS ************-->
+      <member name="id" role="#ID" as_attribute="1" required="1"><cdata format="ID"/></member>
+
+      <!-- former m-layer attributes (reduced) -->
+      <member name="form"><cdata format="any"/></member>
+      <member name="lemma"><cdata format="any"/></member>
+      <member name="tag"><cdata format="any"/></member>
+      <!-- detailed list of morphosyntactic features (may correspond to the tag attribute) -->
+      <member name="iset" type="iset.type"/>
+      <member name="no_space_after" type="bool.type"/>
+      <member name="translit"><cdata format="any"/></member>
+      <member name="gloss"><cdata format="any"/></member>
+
+      <!-- former a-layer attributes -->
+      <member name="ord" role="#ORDER" required="1"><cdata format="nonNegativeInteger"/></member>
+      <!-- Since we started working with the Universal Dependencies, deprel became our main attribute for the dependency relation label.
+           Its usage is not restricted to UD though. It is just a general label. UD restrictions apply only if it is used in the UD context.
+           In contrast, afun is a special case of deprel, useful only for the Prague-style trees. Its value range is pre-determined and
+           some values imply specific treatment of the trees even in the Treex API.
+           Finally, conll/deprel is a predecessor of deprel. Its name refers to one particular file format, CoNLL-X. It is deprecated. -->
+      <member name="deprel"><cdata format="any"/></member>
+      <member name="afun" type="afun.type" />
+      <member name="is_member" type="bool.type"/>
+
+      <!-- CoNLL shared task attributes (deprel, pos, cpos, feat) are grouped in one structure -->
+      <member name="conll" type="a-conll.type"/>
+
+      <!-- Shared modifiers of coordinations can be distinguished in PDT style
+           just based on the fact they are hanged on the conjunction (coord. head).
+           However, in other styles (e.g. Stanford) this attribute might be useful. -->
+      <member name="is_shared_modifier" type="bool.type"/>
+
+      <!-- attributes for conversion to t-tree -->
+      <member name="edge_to_collapse" type="bool.type"/>
+      <member name="is_auxiliary" type="bool.type"/>
+
+      <!-- ??? -->
+      <member name="is_parenthesis_root" type="bool.type" />
+
+      <!-- clause segmentation -->
+      <member name="clause_number"><cdata format="any"/></member>
+      <member name="is_clause_head" type="bool.type"/> <!-- We mean finite clause head, but that's the same as with is_clause_head on t-layer!!! --> 
+
+      <!--**************  NOT YET COVERED BY TREEX API METHODS ************-->
+      <member name="morphcat" type="czech_morphcat.type"/> <!-- This should be in Treex API, i.e. not redundant with tag -->
+
+      <!-- surface coreference -->
+      <member name="coref" type="a_coreference.type"/>
+
+      <!-- link to p-layer -->
+      <member name="p_terminal.rf"><cdata format="PMLREF"/></member>
+
+      <member name="alignment">
+          <list ordered="0" type="align-links.type"/>
+      </member>
+
+      <!-- tentative -->
+      <member name="chunks"><list ordered="0"><cdata format="any"/></list>
+      </member>  
+
+      <member name="wild_dump"><cdata format="any"/></member>
+      <member name="iset_dump"><cdata format="any"/></member>
+
+    </structure>
+  </type>
+
+  <type name="a-conll.type">
+    <structure>
+      <member name="deprel"><cdata format="any"/></member> <!--dependency relation-->
+      <member name="cpos"><cdata format="any"/></member>   <!--coarse-grained part-of-speech tag-->
+      <member name="pos"><cdata format="any"/></member>    <!--fine-grained part-of-speech tag-->
+      <member name="feat"><cdata format="any"/></member>   <!--various other features separated by |-->
+    </structure>
+  </type>
+      
+
+
+  <type name="a_coreference.type"> <!-- analytická koreference pro Jirku Mírovského -->
+    <structure>
+       <member name="markable" type="bool.type"/> <!-- a token to be considered as anaphor/antecedent -->
+       <member name="introduction" type="bool.type"/> <!-- first introduction of the entity to the discourse -->
+       <member name="anaphor_type"> <cdata format="any"/> </member> <!-- the type of the anaphor - pronoun, proper_noun, demonstrative_noun_phrase, common_noun -->
+       <member name="target-node.rf"> <cdata format="PMLREF"/> </member>
+       <member name="type"> <cdata format="any"/> </member>
+       <member name="src"> <cdata format="any"/> </member>
+    </structure>
+  </type>
+
+  <type name="afun.type">
+    <choice>
+      <value>Pred</value>
+      <value>Pnom</value>
+      <value>AuxV</value>
+      <value>Sb</value>
+      <value>Obj</value>
+      <value>Atr</value>
+      <value>Adv</value>
+      <value>AtrAdv</value>
+      <value>AdvAtr</value>
+      <value>Coord</value>
+      <value>AtrObj</value>
+      <value>ObjAtr</value>
+      <value>AtrAtr</value>
+      <value>AuxT</value>
+      <value>AuxR</value>
+      <value>AuxP</value>
+      <value>Apos</value>
+      <value>ExD</value>
+      <value>AuxC</value>
+      <value>Atv</value>
+      <value>AtvV</value>
+      <value>AuxO</value>
+      <value>AuxZ</value>
+      <value>AuxY</value>
+      <value>AuxG</value>
+      <value>AuxK</value>
+      <value>AuxX</value>
+      <!-- afun for articles/determiners used in en_generate. ptacek 2008 -->
+      <value>Det</value>
+      <!-- afun for English articles "a", "an", "the" (used in SEnglishM_to_SEnglishA).
+           Other determiners (this,each,any,some,every,no... PennTag=DT) have usually afun Atr. Popel 9.5.2009 -->
+      <value>AuxA</value>
+      <!-- afun for english negation "not". On PDT-like t-layer it should be #Neg node, so it's not auxiliary, I think. Popel 9.5.2009 -->
+      <value>Neg</value>
+      <!-- values added because of Prague Arabic Dependency Treebank -->
+      <value>AuxM</value>
+      <value>AuxE</value>
+      <value>Ante</value>
+      <value>PredE</value>
+      <value>PredC</value>
+      <value>PredM</value>
+      <value>PredP</value>
+      <!-- values added because of Tamil Dependency Treebank (TamilTB.v0.1) by Loganathan Ramasamy -->
+      <value>AAdjn</value>
+      <value>AComp</value>
+      <value>AdjAtr</value>
+      <value>CC</value>
+      <value>Comp</value>
+      <!-- values added because of Ancient Greek Dependency Treebank -->
+      <value>OComp</value> <!--object complement-->
+      <!-- values added because of other annotation styles -->
+      <!-- In PDT, apposition is treated as a paratactic structure (similarly to coordinations) governed by a comma with afun=Apos.
+           In HamleDT, the first member of apposition governs the second member which has afun=Apposition and governs the (optional) comma.
+           We cannot reuse afun=Apos for HamleDT because it would break several tests and assumptions. Martin Popel 11.10.2012 -->
+      <value>Apposition</value> 
+      <!-- The following values are needed for non-Prague coordination styles, non-Prague PPs (no AuxP, afun of the whole PP labeled there) etc. -->
+      <value>CoordArg</value><!-- conjunct, not the first one -->
+      <value>PrepArg</value><!-- argument of preposition, if preposition has afun of the whole PP, instead of AuxP -->
+      <value>SubArg</value><!-- argument of subordinating conjunction, if it has afun of the whole clause, instead of AuxC -->
+      <value>DetArg</value><!-- argument of determiner, if the style dictates that determiners are heads -->
+      <value>NumArg</value><!-- argument of number, if the style dictates that numbers are heads -->
+      <value>PossArg</value><!-- argument of possessive expression (indicating the possessor, i.e. the argument is the possessed thing) -->
+      <value>AdjArg</value><!-- argument of adjective, i.e. this is the modified noun, if the style dictates that adjectives shall govern -->
+      <!-- afun for unrecognized value -->
+      <value>NR</value>
+    </choice>
+  </type>
+
+  <type name="czech_morphcat.type">
+    <structure>
+        <member name="pos"><cdata format="any"/></member>
+        <member name="subpos"><cdata format="any"/></member>
+        <member name="synpos"><cdata format="any"/></member>
+        <member name="gender"><cdata format="any"/></member>
+        <member name="number"><cdata format="any"/></member>
+        <member name="case"><cdata format="any"/></member>
+        <member name="possgender"><cdata format="any"/></member>
+        <member name="possnumber"><cdata format="any"/></member>
+        <member name="person"><cdata format="any"/></member>
+        <member name="tense"><cdata format="any"/></member>
+        <member name="grade"><cdata format="any"/></member>
+        <member name="negation"><cdata format="any"/></member>
+        <member name="voice"><cdata format="any"/></member>
+        <member name="reserve1"><cdata format="any"/></member>
+        <member name="reserve2"><cdata format="any"/></member>
+        <!-- ptacek 5.8.2008 for en/cz_generate -->
+        <member name="compound_person"><cdata format="any"/></member>
+        <member name="compound_number"><cdata format="any"/></member>
+        <member name="compound_gender"><cdata format="any"/></member>
+        <member name="ordering_type"><cdata format="any"/></member>
+        <!-- zabokrtsky because of Arabic -->
+        <member name="definiteness"><cdata format="any"/></member>
+        <member name="mood"><cdata format="any"/></member>
+    </structure>
+  </type>
+
+  <type name="align-links.type">
+    <structure>
+       <member name="counterpart.rf">
+          <cdata format="PMLREF"/>
+       </member>
+       <member name="type">
+          <cdata format="any"/>
+       </member>
+    </structure>
+ </type>
+
+
+  <type name="m-form_change.type">
+    <choice>
+      <value>ctcd</value>
+      <value>spell</value>
+      <value>insert</value>
+      <value>num_normalization</value>
+    </choice>
+  </type>
+
+
+
+<!-- radeji do common -->
+  <type name="bool.type">
+    <choice>
+      <value>0</value>
+      <value>1</value>
+    </choice>
+  </type>
+
+
+</pml_schema>

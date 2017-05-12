@@ -1,0 +1,102 @@
+0.56 -- Addition. If HASPREVIOUS is defined for a screen (HASPREVIOUS => 1),
+        if this screen is the first screen to be displayed by the wizard and
+        the user touches F3, the wizard is closed, values are saved and
+        previous is returned.
+
+0.55 -- BUG fix. After a cancel the values of {NEWVALUE} for all used
+        prompts should have been undef'ed. This has been done now.
+     -- Added sub system() that executes commands (with system), and also
+        resets the terminal to normal input/output.
+
+0.54 -- Hmm, I've been really hacking here. Added a possibility to
+        have fields not been used (NIL option) for input, the cursor
+        won't touch these fields. Added a field an option READY also, 
+        to let the wizard take the next screen if this field is passed.
+        
+        You can use this with option (READY) together with option 
+        NOCOMMIT to have a sort of menu.
+        
+        I think the code should now be unscrambled sometime. No time
+        for that though.
+
+0.53 -- Detected a bug in Term::Screen v1.01 (for solaris). Waiting
+        for a patch. 
+        
+Line 290-297
+
+  if ($r == 0 || $c == 0) # try getting rows and cols some other way
+    {
+       if (exists $ENV{'LINES'}) { $r = $ENV{'LINES'}; }
+       else { $r = $this->{TERM}{'_li'}; } # this is often wrong
+##!!
+       if (exists $ENV{'COLUMNS'}) { $r = $ENV{'COLUMNS'}; }
+       else { $r = $this->{TERM}{'_co'}; }
+##!!
+    }
+
+should read
+
+  if ($r == 0 || $c == 0) # try getting rows and cols some other way
+    {
+       if (exists $ENV{'LINES'}) { $r = $ENV{'LINES'}; }
+       else { $r = $this->{TERM}{'_li'}; } # this is often wrong
+###!!
+       if (exists $ENV{'COLUMNS'}) { $c = $ENV{'COLUMNS'}; }
+       else { $c = $this->{TERM}{'_co'}; }
+###!!
+    }
+    
+        As solaris doesn't support stty -size, and the Term::Screen
+        v1.01 code has a little bug here, Term::Sceen::Wizard 0.52
+        does not work. Term::Screen::Wizard 0.53 dies on COLS and ROWS
+        having a wrong value.
+
+0.52 -- use strict in again, no strict 'refs' added. Thanks to Andreas
+        Marcel Riechert.
+
+0.51 -- As I don't know how to remove 'strict refs', I commented out
+        use strict.
+        
+0.49 -- Fixed a bug. Makefile.PL should now require Term::Screen::ReadLine
+        to be at least version 0.33.
+
+0.48 -- Fixed a bug. The Esc, F1, F3 (previous screen) key should work; 
+        also when the validator function returns 'false'.
+
+0.47 -- Added an extra parameter to the VALIDATOR function, namely
+        $self. So the wizard is given to the validator function as
+        the first argument and the inputted line as the second.
+
+0.46 -- Removed a bug. When the user inputs a password, after the
+        user leaves the field, the password isn't starred out.
+     -- A validator function has been added to validate a field().
+     -- A readonly option has been added to a screen.
+
+0.45 -- Removed a bug. When the wizard was called with specific screens,
+        all variables were cleared. This has been corrected.
+     -- Removed function get_screen() (this has become an internal 
+        function).
+     -- Added a function set() to set keywords of a screen, or to set
+        values of prompts.
+
+0.41 -- Made some changes to the wizard() and get_keys() functions.
+        Extended them with the possibility to ask a number of screens.
+        This makes it possible to use a selection of all possible
+        screens from the wizard.
+
+0.33 -- Enhanced documentation of wizard() function.
+     -- Little bug fix. wizard() function now also returns "next", if
+        the last prompt of the wizard() has option NOFINISH set.
+
+0.32 -- Converted all files to UNIX format.
+
+0.31 -- Forgot to include the dependencies in Makefile.PL, added them.
+
+0.30 -- Structured the tests in test.pl
+     -- Debugged Wizard.pm according to test results.
+     -- Extended Makefile.PL to have dependencies.
+     -- Added ChangeLog
+     -- Added MANIFEST
+
+0.20 -- Initial upload
+

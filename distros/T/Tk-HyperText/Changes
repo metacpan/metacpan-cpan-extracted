@@ -1,0 +1,61 @@
+Revision history for Perl module Tk::HyperText
+
+0.12 Feb 25, 2016
+  - Add more dependencies to get CPANTS to pass.
+
+0.11 Feb 23, 2016
+  - Add dependency on HTML::TokeParser.
+
+0.10 Sep 18, 2015
+  - Add dependency on Tk::Derived.
+
+0.09 2013-11-11
+  - Reformatted as per CPAN::Changes::Spec -neilbowers
+
+0.08 2013-11-01
+  - Use hex() instead of eval() to convert hex strings into numbers.
+  - Set default values for body colors.
+  - Stop demo.pl from being installed; rename it to eg/example.
+
+0.06 2008-07-14
+  - The module uses HTML::TokeParser now and does "real" HTML parsing.
+  - Badly broke backwards compatibility.
+
+0.05 2007-07-11
+  - Added support for "tag permissions", so that you can allow/deny specific
+    tags from being rendered (i.e. say you're making a chat client which uses
+    HTML and you don't want people inserting images into their messages,
+    or style sheets, etc)
+  - Added the tags <address>, <var>, <cite>, and <def>.
+  - Added the <hr> tag.
+  - Added two "default images" that are displayed when an <img> tag tries to
+    show an image that couldn't be found, or was found but is a file type
+    that isn't supported (e.g. <img src="index.html"> would show
+    an "invalid image" icon).
+  - Bug fix: every opened tag that modifies your style will now copy
+    all the other stacks. As a result, opening <font back="yellow">,
+    then <font color="red">, and then closing the red font,
+    will still apply the yellow background to the following text.
+    The same is true for every tag.
+  - Added some support for Cascading StyleSheets.
+  - Added some actual use for the "active link color": it's used as the
+    hover color on links (using it as a true active color is mostly useless,
+    since most of the time the page won't remain very long when clicking
+    on a link to even see it)
+
+0.04 2007-06-23
+  - Added support for the <basefont> tag.
+  - Added support for <ul>, <ol>, and <li>. I've even extended the HTML specs a
+    little and added "diamonds" as a shape for <ul>, and allowed <ul> to
+    specify a decimal escape code (<ul type="#0164">)
+  - Added a "page history", so that the "visited link color"
+    on pages can actually be applied to the links.
+  - Fixed the <blockquote> so that the margin applies to the right side as well.
+
+0.02 2007-06-20
+  - Bugfix: on consecutive insert() commands (without clearing it in between),
+    the entire content of the HTML already in the widget would be inserted
+    again, in addition to the new content. This has been fixed.
+
+0.01 2007-06-20
+  - Initial release.

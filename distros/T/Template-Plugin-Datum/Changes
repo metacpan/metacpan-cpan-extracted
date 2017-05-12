@@ -1,0 +1,6 @@
+Revision history for Perl extension Template::Plugin::Datum
+
+0.01 - first version
+
+0.02 - added support for dates without separation (8 digits) and
+       timestamp-values (14 digits date and time)

@@ -1,0 +1,18 @@
+=head1 NAME
+
+Template::Plugin::React - Plugin for Facebook React
+
+=head1 DESCRIPTION
+
+This is a Template Toolkit plugin to render L<React|http://facebook.github.io/react/> components. The current version is C<0.008>. You must use React version C<0.9.0> or higher with this plugin.
+
+=head1 REQUIREMENTS
+
+Mozilla's L<SpiderMonkey|http://www.mozilla.org/js/spidermonkey/> and L<SWIG|http://www.swig.org> must be installed. SpiderMonkey 24 was used to build this module; if you use a different version, your mileage may vary. The C<Makefile.PL> script uses C<js-config> to learn about the compilation flags to use, so make sure that is in your C<PATH>.
+
+=head1 USAGE
+
+This plugin only exposes a single function: C<React.render(component, data)>. C<component> must be a string representing the component name, and C<data>, if passed, must be a hash ref representing the data to provide to the component during rendering. JavaScript exceptions are propagated up and sent to an invocation of C<die>.
+
+  [% USE React %]
+  [% React.render('Component', data) %]

@@ -1,0 +1,67 @@
+Revision history for Perl extension Time::Duration::Parse
+
+0.13 2015-10-25 NEILB
+    - Added additional abbrevations for 'months': 'mo', 'mon', 'mons'.
+      Thanks to PERLANCAR.
+    - Rewrote the main testsuite to be data driven, to make it easy to
+      add test cases, as for the above change.
+    - Updated github repo URL after changing my github username
+
+0.12 2015-07-02 NEILB
+    - Added [MetaJSON] to dist.ini, so the dist will get a META.json file.
+      RT#105627 from ETHER.
+
+0.11 2014-03-26
+    - Min perl version now set to 5.6.0
+    - Added description of DateTime::Format::Duration to SEE ALSO
+
+0.10 2014-03-24
+    - Switched to Dist::Zilla. The Module::Install Makefile.PL was resulting
+      in dependency problems and CPAN Testers fails, and I'm not familiar with
+      it. Easier to switch. Thanks to ZEFRAM for pointing out the problem.
+
+0.09 2014-03-23
+    - Test::More and Time::Duration were listed as build_requires;
+      changed them to test_requires, with versions. Wonder if this was
+      the cause of the small number of CPAN Testers fails?
+    - Added more more modules to the SEE ALSO section in the pod.
+
+0.08 2014-03-23
+    - Can now have a leading '+', as in '+2h'.
+      Suggested by MSCHWERN in RT#66572
+    - Added github repo to metadata (thanks dsteinbrunner)
+    - Added github repo to pod
+    - Added Time::Duration::Parse::More to SEE ALSO
+
+0.07 2014-03-21
+    - Added 'use warnings'
+    - Specified min perl version as 5.6.0 in Makefile.PL
+    - Fixed pod error reported in RT#86904
+    - Added license type 'perl' to metadata via Makefile.PL
+    - Reformatted this file as per CPAN::Changes::Spec
+
+0.06  2008-05-30
+    - Accept 1.5h (Thanks to Thomas Sibley)
+
+0.05  2008-01-10
+    - Accept hh:mm(:ss) as a format.
+    - Relaxed to handle trailing spaces.
+      (Thanks to Thomas Sibley)
+
+0.04 2008-01-04
+    - Compatible to Time::Duration's concise. RT:32078
+      (Thanks to Thomas Sibley)
+
+0.03  2007-11-05
+    - Accept 'hr' for hours (Ricardo SIGNES)
+    - Do not require space between digits and units (1hr) (Ricaldo SIGNES)
+    - Accept a simple integer as a number of seconds (Jonathan Swartz)
+    - Accept negative durations like "-30 minutes" (Jonathan Swartz)
+
+0.02  2006-07-18
+    - Accept upper-case timespec like '3 Seconds' as well.
+    - Unified exception format
+
+0.01  2006-07-17
+    - original version
+

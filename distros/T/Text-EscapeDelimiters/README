@@ -1,0 +1,17 @@
+
+Text::EscapeDelimiters v1.004
+
+(c) John Alden 2005. This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+QUICK START:
+
+Install Text::EscapeDelimiters by unpacking the tarball and running the following
+commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+    run 'perldoc Text::EscapeDelimiters' to read the full documentation.

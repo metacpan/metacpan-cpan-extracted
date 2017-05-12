@@ -1,0 +1,71 @@
+SYNOPSIS
+
+     use Time::Duration::Parse::AsHash;
+    
+     my $res = parse_duration("2 minutes and 3 seconds");    # => {minutes=>2, seconds=>3}
+        $res = parse_duration("2m3.2s", 1); # => 123.2
+    
+        $res = parse_duration("01:02:03", 1); # => 3723
+
+DESCRIPTION
+
+    Time::Duration::Parse::AsHash is like Time::Duration::Parse except:
+
+      * By default it returns a hashref of parsed duration elements instead
+      of number of seconds
+
+      There are some circumstances when you want this, e.g. when feeding
+      into DateTime::Duration and you want to count for leap seconds.
+
+      To return number of seconds like Time::Duration::Parse, pass a true
+      value as the second argument.
+
+      * By default seconds are not rounded
+
+      For example: "0.1s" or 100ms will return result { seconds => 0.1 },
+      and "2.3s" will return { seconds => 2.3 }.
+
+      Also, <01:02:03> being recognized as 1h2min3s, 01:02:03.4567 will
+      also be recognized as 1h2min3.4567s.
+
+      * It recognizes more duration units
+
+      milliseconds (ms), which will be returned in the seconds key, for
+      example "400ms" returns { seconds => 0.4 }.
+
+      microseconds. This will also be returned in seconds key.
+
+      nanoseconds (ns). This will also be returned in seconds key.
+
+      decades. This will be returned in years key, for example "1.5
+      decades" will return { years => 15 }.
+
+      * It has a lower startup overhead
+
+      By avoiding modules like Carp and Exporter::Lite, even strict and
+      warnings (starts up in ~3m vs ~9ms on my computer).
+
+FUNCTIONS
+
+ parse_duration($str [, $as_secs ]) => hash
+
+    Parses duration string and returns hash (unless when the second
+    argument is true, in which case will return the number of seconds).
+    Dies on parse failure.
+
+    Currently two forms of string are recognized: the first is a series of
+    number and time units (e.g. "2 days, 3 hours, 4.5 minutes" or "2h3m4s")
+    and the second is time in the format of hh:mm:ss (the seconds can
+    contain decimal numbers) or hh:mm.
+
+    This function is exported by default.
+
+    Note that if the function is instructed to return number of seconds,
+    the result is an approximation: leap seconds are not regarded (so a
+    minute is always 60 seconds), a month is always 30 days, a year is
+    always 365 days.
+
+SEE ALSO
+
+    Time::Duration::Parse
+

@@ -1,0 +1,20 @@
+Revision history for Text-Dice
+
+0.06  Wed Aug 12 05:48:32 UTC 2015
+    - Fixed pod formatting of benchmark results.
+
+0.05  Tue Aug 11 16:45:54 UTC 2015
+    - Update benchmark results.
+
+0.04  Tue Aug 11 16:39:46 UTC 2015
+    - Add more modules to the benchmark script.
+
+0.03  Sun Jul  8 06:24:47 UTC 2012
+    - Prevented division by zero error when both strings contained no tokens.
+    - Fixed example script.
+
+0.02  Sun Jul  8 03:29:58 UTC 2012
+    - Accepted array references as inputs to permit custom tokenization.
+
+0.01  Mon Jan 16 20:25:16 UTC 2012
+    - Initial distribution.

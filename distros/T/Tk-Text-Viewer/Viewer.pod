@@ -1,0 +1,143 @@
+#  Copyright (c) 2003-2004 RAZ Information Systems LTD.
+#You may distribute under the terms of either the GNU General Public
+#License or the Artistic License, as specified in the Perl README file
+#
+#
+
+=head1 NAME
+
+Tk::Text::Viewer - Simple Text Viewer
+
+=head1 SYNOPSIS
+
+    use Tk;
+    use Tk::Text::Viewer;
+    .....
+    my $mw = MainWindow->new;
+    my $t1 = $mw->Scrolled('Viewer', -wrap => 'none'......);
+    $t1->LabelText("Search:");# Change label text
+    or:
+    my $t1 = $mw->Viewer()->pack();
+    .....
+    $t1->Load($filename)); 
+Also:
+    viewer.pl [TextFile]
+
+
+=head1 DESCRIPTION
+
+Tk::Text::Viewer B<IS A> text widget that can display text files under TK.
+It enable the user to search text and navigate in a Text widget.
+The reason for creating this module is that it doesn't require
+downloading of modules other that Tk;
+Look for widget options in L<Tk::Text>. 
+
+A separate F<viewer.pl> program is included that can be used as a stand alone
+file browser.
+
+=head1 WIDGET METHODS
+
+The B<Viewer >widget also inherits all the methods provided by the generic
+ Tk::Widget and Tk::Text classes.
+
+The following additional method is available for viewer widgets:
+
+=over 4
+
+
+=item I<$text_view>-E<gt>B<Load>(I<$filename>)
+
+Load file into the text widget.
+
+=item I<$text_view>-E<gt>B<LabelConfig>(string or hash ref)
+
+=over  4
+
+=item * C<$text_view>-E<gt>C<LabelConfig>(I<"Search:">)
+
+Change label for the search entry field. You might want to change
+this label if the widget is used in a non English application.
+
+
+=item * C<$text_view>-E<gt>C<LabelConfig>(I<"-cursor=E<gt> 'dot'">)
+
+Change one label widget option (for example cursor).
+
+=item * C<$text_view>-E<gt>C<LabelConfig>(I<{text=E<gt>'Find:',-cursor=E<gt>'dot',...}>)
+
+Replace label widget options with your own set of options.
+B<Do not>  change the 'Name' option of the label widget.
+See L<Tk::Label> for valid options
+
+=back
+
+
+=item I<$text_view>-E<gt>B<EntryConfig>(string or hash ref)
+
+Change the entry widget options. Read C<LabelConfig> for information
+about parameters. See L<Tk::Entry> for valid options.
+
+
+=back
+
+=head1 BINDINGS
+
+For inherited bindings look L<Tk::Text>.
+Following are class specific bindings.
+
+=over 4
+
+=item "Space"
+
+Clicking Space will move text one page ahead.
+
+=item "BackSpace"
+
+Clicking BackSpace will move text one page up.
+
+=item "Slash"
+
+Clicking "/" will open text search window.
+
+=item "n"
+
+Clicking "n" will move to next search match.
+
+=item "N"
+
+Clicking "N" will move to next previous match.
+
+=item "Control-A"
+
+Find all occurrences of searched item.
+
+
+=back
+
+
+=head1 UNICODE 
+
+If B<$ENV{LANG}> is a 'UTF-8' locale, file load will assume "utf8" characters in file.
+
+=head1 SEE ALSO
+
+L<viewer.pl|> - A utility using C<Tk::Text::Viewer> included with this package.
+
+L<Tk::Text|Tk::Text>, L<Tk::Widget|Tk::Widget>, L<Tk::More|Tk::More>, Tk documentation.
+
+=head1 AUTHOR
+
+=over 4
+
+
+C<Tk::Text::Viewer> was written by Oded S. Resnik E<lt>raz@raz.co.ilE<gt> in 2003.
+
+B<Copyright (c) 2003-2004 RAZ Information Systems All rights reserved>.
+I<http://www.raz.co.il/>
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file
+
+=back
+
+=cut

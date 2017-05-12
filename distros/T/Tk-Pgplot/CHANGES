@@ -1,0 +1,16 @@
+18-Jan-2000 0.001 Original Release
+05-Mar-2000 0.1   Minor bugfixes and inclusion of demo program
+                  Addition of -name option
+26-Mar-2000 0.12  Minor tweaks to Makefile.PL and .conf files
+		  Tested using HP-UX
+31-Mar-2000 0.13  Change to makemake detection of pTk include directory
+27-Apr-2001 0.2   Include simple script to apply pgplot patches
+		  Minor fixes to demo.pl
+31-Jan-2002 0.3   Updated for pgplot-5.2.2 (and Tk800.023). This includes
+                  minor changes to the widget options and demo program
+01-Nov-2007 0.4   Updated for Tk804.027. The most significant changes
+                  were to ptkpgplot.c, to adapt it to the Tk changes. Also,
+                  minor changes to Pgplot.xs, Makefile.PL, and demo.pl. POD
+                  added to Pgplot.pm. Minor updates to other documentation.
+                  PGPLOT.patch file renamed to PGPLOT-patch to avoid a name
+                  conflict with pgplot.patch directory on Mac OSX.

@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Text/SimpleVaddrbook.pm
+t/00-load.t
+t/vaddrbook.t 
+t/std1.vcf
+t/std2.vcf
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,83 @@
+Revision history for Perl module Test::WWW::Mechanize::Mojo :
+
+v0.0.17  2016-04-09
+    - Fix the tests in the upcomig perl-5.26.0 with the removal of "." from
+    @INC .
+        - For an example of a broken test, see:
+        - http://www.cpantesters.org/cpan/report/c1f4ee94-16a3-11e7-8dda-ce31a02b686a
+        - Thanks to DCOLLINS and other CPAN testers.
+
+v0.0.16  2014-02-02
+    - Fix the tests (and the code) on recent Mojoliciouses.
+        - For an example of a broken test, see:
+        - http://www.cpantesters.org/cpan/report/8fa17a8a-77ed-1014-a0c9-79c63567e6ce
+        - Now requiring Mojolicious-4.75.
+
+v0.0.15  2014-02-01
+    - Add separate "LICENSE" file (CPANTS).
+    - Specify minimum version of perl (CPANTS).
+    - Rename "CHANGES" to "Changes" and moved the old
+    Test::WWW::Mechanize::Catalyst changes to a different file.
+    - Add t/cpan-changes.t .
+
+v0.0.14 2013-11-29
+    - Remove some old PODded-out code.
+        - Caused a false positive at:
+        - https://rt.cpan.org/Public/Bug/Display.html?id=91042
+
+v0.0.13 2013-05-25
+    - Fix the tests for Mojolicious 4.07.
+
+v0.0.12 2013-05-21
+    - Add t/style-trailing-space.t and get rid of trailing space.
+
+v0.0.11 2012-08-01
+    - Got the POD coverage ( t/pod-coverage.t ) to pass again.
+
+v0.0.10 2012-05-13
+    - Update the module for recent versions of Mojolicious where
+    $t->max_redirects() was removed (after being deprecated).
+        - Thanks to tempire on #mojo on irc.perl.org for shedding some
+        light on this issue.
+    - This release coincides with the birthday of Sebastian Riedel
+    ( https://metacpan.org/author/SRI ), the creator and maintainer
+    of Mojolicious (and Catalyst previously). Happy birthday, Sebastian!
+
+v0.0.9  2011-05-19
+    - Got rid of warnings by switching from $t->client to $t->ua.
+        - Thanks to Mirko Westermeier
+
+v0.0.8  2011-01-26
+    - Convert the mentioning of CATALYST_SERVER to MOJO_SERVER.
+        - thanks to Insurgent Software.
+
+v0.0.7  2011-01-17
+    - Fixed mojjy.pl and the lib/Test/WWW/Mechanize/Mojo.pm code in recent
+    Mojo versions.
+        - app->start instead of shagadelic.
+        - some tweaks to the ->$method->res.
+
+v0.0.6  2010-09-03
+    - Fixed mojjy.pl to avoid double encoding in recent Mojo versions.
+
+v0.0.5  2010-06-14
+    - Removed the call to Test::Mojo->redirect() which is no longer
+    implemented in recent Mojos.
+
+v0.0.4  2010-03-17
+    - Now evaluating the GET parameters in requests by using URI.pm's
+    ->path_query() instead of ->path().
+
+v0.0.3  2010-03-04
+    - Fix submit_form_ok on the contemporary Mojo::Client . (with a test).
+
+v0.0.2  2010-03-02
+    - Add a missing empty line before an "=end". Without it, the POD
+    was not displayed properly by perldoc and by http://search.cpan.org/ .
+    - Add a t/pod-coverage.t test.
+
+v0.0.1  2010-03-02
+    - Ported to Mojo from Test::WWW::Mechanize::Catalyst
+    - Convert from Module::Install to Module::Build .
+    - All rights disclaimed.
+

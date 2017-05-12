@@ -1,0 +1,24 @@
+Changes
+lib/Test/UseAllModules.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_load.t
+t/02_no_pm.t
+t/03_no_manifest.t
+t/04_under.t
+t/04_under_files.t
+t/05_except.t
+t/06_require.t
+t/07_extra_tests.t
+t/99_pod.t
+t/99_podcoverage.t
+t/MANIFESTed/lib/TestUseAllModulesTest.pm
+t/MANIFESTed/lib/TestUseAllModulesTestFoo.pm
+t/MANIFESTed/MANIFEST
+t/MANIFESTed/t/lib/TestUseAllModulesTestTest.pm
+t/MANIFESTed/under/TestUseAllModulesUnder.pm
+t/NoMANIFEST/lib/NeverTested.pm
+t/NoPM/MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

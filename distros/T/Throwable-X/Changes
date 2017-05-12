@@ -1,0 +1,25 @@
+Revision history for Throwable-X
+
+0.007     2013-10-18 11:47:39 America/New_York
+          add repo and bugtracker metadata
+
+0.006     2010-10-29 12:06:58 America/New_York
+          add nondetected prereqs
+
+0.005     2010-10-28 15:30:43 America/New_York
+          spin out most of the subroles into Role-* packages for re-use without
+          Throwable baggage
+
+0.004     2010-10-20 11:38:07 America/New_York
+          replace [\v] with [\x0d\x0a] to support antiquated perl 5 version 8
+
+0.003     2010-10-19 21:59:07 America/New_York
+          another missing prereq; I think that's the last one...
+
+0.002     2010-10-19 14:26:28 America/New_York
+          add missing prereq for Throwable
+
+0.001     2010-10-18 21:44:13 America/New_York
+
+          first release
+

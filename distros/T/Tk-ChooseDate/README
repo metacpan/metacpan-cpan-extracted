@@ -1,0 +1,40 @@
+Tk-ChooseDate version 0.4
+=========================
+
+ChooseDate is a popup calendar widget used for choosing dates. It
+has support for using dates prior to 1970 - something with no
+other Tk popup calendar does at time of writing.
+
+This widget uses a Tk::Canvas to ensure a crisp looking widget with
+many color options. The authors opinion is that it is the best
+calendar-like widget for Perl/Tk - with similar functionality of
+DateEntry - but much more user friendly as dates can be chosen
+quickly and easily.
+
+Various languages are supported since v0.4.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+  Date::Calc
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Jack Dunnigan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

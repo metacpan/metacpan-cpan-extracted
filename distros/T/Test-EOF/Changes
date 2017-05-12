@@ -1,0 +1,61 @@
+Revision history for Test-EOF
+
+0.0803 2015-11-25T21:52:37Z UTC
+ [Documentation]
+ - Removed duplicated POD sections.
+
+ [Other Changes]
+ - Can't test on Travis with less than Perl 5.14.
+ - Regenerated dist.ini, weaver.ini from iller.yaml/Dist::Iller.
+
+ [Requirements]
+ - Test::POD is now a develop requirement, rather than a (missing) build
+   requirement (MANWAR++).
+
+0.0802 2015-02-11T12:42:46Z CET
+ [Enhancements]
+ - Let cpan testers on windows test if the test file has at least one empty
+   line (instead of three).
+
+0.0801 2015-02-05T13:22:01Z CET
+ [Revision]
+ - Trying to make tests succeed on windows.
+
+0.0800 2015-01-17T17:44:42Z CET
+ [Enhancements]
+ - Use \v instead of \n.
+
+0.0700 2015-01-15T19:32:20Z CET
+ [Documentation]
+ - Minor improvements.
+
+ [Enhancements]
+ - Removed unused prereq.
+
+ [Meta]
+ - Converted to new dzil settings.
+
+0.0610 2014-09-18T21:26:55Z CEST
+ [Meta]
+ - Fix missing build prereqs.
+
+0.060 2014-09-14T20:42:27Z CEST
+ - Added Travis status
+ - Removed faulty deprecation notice
+
+0.050 2014-09-06T15:17:49Z CEST
+ - Important typo
+
+0.04 2014-09-06T08:21:56Z CEST
+ - maximum_newlines can't be less than minimum_newlines
+ - Added strict option
+
+0.03 2014-09-06T07:40:03Z CEST
+ - Renamed and deprecated
+
+0.02 2014-09-05T15:08:31Z CEST
+ - Add dependencies
+
+0.01 2014-09-05T15:02:32Z CEST
+ - Initial release
+

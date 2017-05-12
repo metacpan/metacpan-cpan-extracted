@@ -1,0 +1,40 @@
+NAME
+    Tie::TinyURL - Tied interface to TinyURL.com
+
+SYNOPSIS
+     use strict;
+     use Tie::TinyURL;
+     
+ my %url;
+     tie %url, "Tie::TinyURL";
+     
+ ## Explicitly set an HTTP timeout of 3 seconds
+     # tie %url, "Tie::TinyURL", "timeout" => 3;
+     
+ my $tinyurl = $url{"http://www.bbc.co.uk"};
+     my $url = $url{$tinyurl};
+     print "$tinyurl => $url\n";
+
+DESCRIPTION
+    This module provides a very basic tied interface to the TinyURL.com web
+    service.
+
+SEE ALSO
+    WWW::Shorten::TinyURL, <http://www.tinyurl.com>
+
+VERSION
+    $Id: TinyURL.pm 566 2006-06-01 18:38:40Z nicolaw $
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+COPYRIGHT
+    Copyright 2006 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

@@ -1,0 +1,19 @@
+Revision history for Test-mongod
+
+0.05  2014-03-05 00:50:32 UTC
+	- removed Data::Printer (leftover from dev)
+	- made cascading config work; defaults, config file, config args, args. Presidence in that order lowest to highest.
+	
+0.04  2014-02-28 13:34:04 UTC
+	- Fixed test failure if mongod not installed skip tests
+	- Added Alexandr Ciornii <alexchorny[at]gmail.com> to Authors list - made work on M$
+
+0.03  2014-02-27 20:02:52 UTC
+	- Now ms windows enabled. Patch from Alexandr Ciornii (https://github.com/chorny)
+
+0.02  2014-02-27 02:55:58 UTC
+	- Removed MooseX::AutoImmute requirement
+	- Added config or config_file capacity
+
+0.01  2014-02-24 15:22:18 UTC
+        - Initial release

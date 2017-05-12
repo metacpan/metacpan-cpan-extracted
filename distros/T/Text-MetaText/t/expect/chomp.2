@@ -1,0 +1,25 @@
+# check that chomp works...
+
+
+# this comment line should immediately proceed the previous one when 
+# CHOMP is enabled (chomp.1).  With CHOMP disabled (chomp.2), there 
+# should be 2 blank lines between them which are the newlines trailing
+# after the DEFINE directives above.  
+
+# These examples have extraneous characters and whitespace between the
+# end of the directive and EOL which should over-ride the CHOMPer
+   
+  .
+# that's it for CHOMP
+
+
+# now let's INCLUDE a block that has been TRIMmed (default)...
+-->foo/1  This is block foo
+foo/2  This block is trimmed (default)<-- 
+# ...and one that hasn't been trimmed by explicitly stating "trim=0"
+-->
+bar/1  This is block bar
+bar/2  This block is not trimmed
+<--
+# that's it for trim
+

@@ -1,0 +1,40 @@
+Revision history for perl module Test::MonkeyMock
+
+0.09 2015-12-01T09:12:45Z
+
+ - fix class names when mocking
+
+0.08 2014-12-18T22:36:28Z
+
+ - support when and frame options
+ - more documentation
+
+0.07 2014-01-07T08:07:19Z
+
+ - Just meta files update
+
+0.06 2013-11-07T09:07:10Z
+
+ - Mock not hash based classes too
+
+0.05 2013-11-01T14:46:45Z
+
+ - Remember return values
+
+0.04 2013-10-29T15:12:26Z
+
+ - Magic needed not mocked method sniffing
+
+0.03 2013-10-28T14:11:31Z
+
+ - Copy internal object state to mock object too
+
+0.02 2013-10-28T13:41:18Z
+
+ - 'can' returns sub ref
+ - No more class magic
+ - Original class gets always a mocked instance
+
+0.01 2013-10-08T12:15:58Z
+
+ - Initial release

@@ -1,0 +1,850 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Text::Fuzzy - Partial string matching using edit distances
+
+=head1 SYNOPSIS
+
+    
+    use Text::Fuzzy;
+    my $tf = Text::Fuzzy->new ('boboon');
+    print "Distance is ", $tf->distance ('babboon'), "\n";
+    # Prints "Distance is 2"
+    my @words = qw/the quick brown fox jumped over the lazy dog/;
+    my $nearest = $tf->nearestv (\@words);
+    print "Nearest array entry is $nearest\n";
+    # Prints "Nearest array entry is brown"
+    
+
+
+=head1 VERSION
+
+This documents version 0.25 of Text::Fuzzy corresponding
+to git commit L<c5377c01525e8ae5cd2659fb2b752b7e9cb894b7|https://github.com/benkasminbullock/Text-Fuzzy/commit/c5377c01525e8ae5cd2659fb2b752b7e9cb894b7> released on Wed Dec 7 11:26:30 2016 +0900.
+
+=head1 DESCRIPTION
+
+This module calculates edit distances between words, and searches
+arrays and files to find the nearest entry by edit distance. It
+handles both byte strings and character strings (strings containing
+Unicode), treating each Unicode character as a single entity.
+
+    
+    use Text::Fuzzy;
+    use utf8;
+    my $tf = Text::Fuzzy->new ('あいうえお☺');
+    print $tf->distance ('うえお☺'), "\n";
+    # prints "2".
+    
+
+
+The default edit distance is the Levenshtein one, which counts each
+addition (C<cat> -> C<cart>), substitution (C<cat> -> C<cut>), and
+deletion (C<carp> -> C<cap>) as one unit. The Damerau-Levenshtein edit
+distance, which also allows transpositions (C<salt> -> C<slat>) may
+also be selected with the L</transpositions_ok> method or the
+L</trans> option.
+
+This module is particularly suited to searching for the nearest match
+to a term over a list of words, using the L</nearestv> or L</nearest>
+methods.
+
+=head1 METHODS
+
+=head2 new
+
+    my $tf = Text::Fuzzy->new ('bibbety bobbety boo');
+
+Create a new Text::Fuzzy object from the supplied word.
+
+The following parameters may be supplied to new:
+
+=over
+
+=item max
+
+    my $tf = Text::Fuzzy->new ('Cinderella', max => 3);
+
+This option affects the behaviour of L</nearestv> and L</nearest>
+methods. When searching over an array, this sets the maximum edit
+distance allowed for a word to be considered a "near match". For
+example, with
+
+    my $tf = Text::Fuzzy->new ('Cinderella');
+    $tf->set_max_distance (3);
+
+when using L</nearest>, 'Cinder' will not be considered a match, but
+'derella' will.
+
+To switch off the maximum distance, and allow all words to be
+considered, you can set C<max> to be a negative value:
+
+    my $tf = Text::Fuzzy->new ('Cinderella', max => -1);
+
+Note that this is the default, so there is hardly any point specifying
+it, except if you want to make self-documenting code, or you're
+worried that the module's default behaviour may suddenly change.
+
+Setting C<max> to zero makes C<$tf> only match exactly, which is also
+pointless, but you're very welcome to do it.
+
+The method L</set_max_distance> also does the same thing as this
+parameter.
+
+=item no_exact
+
+    my $tf = Text::Fuzzy->new ('slipper', no_exact => 1);
+
+This parameter switches on rejection of exact matches, in the same way
+as the method L</no_exact>:
+
+    my $tf = Text::Fuzzy->new ('slipper');
+    $tf->no_exact (1);
+
+This is useful for the case of scanning an array which contains the
+search term itself, when we are interested in near matches only. For
+example, if we have a dictionary of words and we need to find near
+matches for a word which is in the dictionary.
+
+=item trans
+
+    my $tf = Text::Fuzzy->new ('glass', trans => 1);
+
+This switches on transpositions, in other words it uses the
+Damerau-Levenshtein edit distance rather than the Levenshtein edit
+distance. The method L</transpositions_ok> has the same effect as
+this.
+
+=back
+
+=head2 distance
+
+    my $dist = $tf->distance ($word);
+
+This method's return value is the edit distance to C<$word> from the
+word used to create the object in L</new>.
+
+    
+    use Text::Fuzzy;
+    my $cat = Text::Fuzzy->new ('cat');
+    print $cat->distance ('cut'), "\n";
+    # Prints 1
+    print $cat->distance ('cart'), "\n";
+    # Prints 1
+    print $cat->distance ('catamaran'), "\n";
+    # Prints 6
+    use utf8;
+    print $cat->distance ('γάτος'), "\n";
+    # Prints 5
+
+
+To know which edits are used to convert the words, use
+L</distance_edits>.
+
+=head2 nearestv
+
+    my $nearest_word = $tf->nearestv (\@words);
+    my @nearest_words = $tf->nearestv (\@words);
+
+Returns the value in C<@words> which has the nearest distance to the
+value given to C<$tf> in L</new>. In array context, it returns a list
+of the nearest values.
+
+    
+    use Text::Fuzzy;
+    my @words = (qw/who where what when why/);
+    my $tf = Text::Fuzzy->new ('whammo');
+    my @nearest = $tf->nearestv (\@words);
+    print "@nearest\n";
+    # Prints "who what"
+
+
+The behaviour of the match can be controlled with L</no_exact> and
+L</set_max_distance> in exactly the same way as L</nearest>.
+
+This is a convenient wrapper around the L</nearest>
+function. L</nearest> is annoying to use, because it only returns
+array offsets, and also error-prone due to having to check to
+distinguish the first element of the array from an undefined value
+using C<defined>.
+
+This method was added in version 0.18 of Text::Fuzzy.
+
+=head2 nearest
+
+    my $index = $tf->nearest (\@words);
+    my $nearest_word = $words[$index];
+
+Given an array reference, this returns a number, the index of the
+nearest element in the array C<@words> to the argument to
+L</new>. Having found the nearest match you then need to look up the
+value in the array, as in C<$nearest_word> above.
+
+It is possible to set a maximum edit distance, beyond which entries
+are rejected, using L</set_max_distance> or the C<max> parameter to
+L</new>.  In this case, if none of the elements of C<@words> are less
+than the maximum distance away from the word, C<$index> is the
+undefined value, so when setting a maximum distance, it is necessary
+to check the return value of index using C<defined>.
+
+    
+    use Text::Fuzzy;
+    my $tf = Text::Fuzzy->new ('calamari', max => 1);
+    my @words = qw/Have you ever kissed in the moonlight
+                   In the grand and glorious
+                   Gay notorious
+                   South American Way?/;
+    my $index = $tf->nearest (\@words);
+    if (defined $index) {
+        printf "Found at $index, distance was %d.\n",
+        $tf->last_distance ();
+    }
+    else {
+        print "Not found anywhere.\n";
+    }
+    
+    
+
+
+If there is more than one word with the same edit distance in
+C<@words>, this returns the last one found, unless it is an exact
+match, in which case it returns the first one found. To get all
+matches, call it in array context:
+
+    my @nearest = $tf->nearest (\@words);
+
+In array context, if there are no matches within the minimum distance,
+C<nearest> returns an empty list. If there is one or more match, it
+returns the array offset of it or them, not the value itself.
+
+    
+    use Text::Fuzzy;
+    
+    my @funky_words = qw/nice funky rice gibbon lice graeme garden/;
+    my $tf = Text::Fuzzy->new ('dice');
+    my @nearest = $tf->nearest (\@funky_words);
+    
+    print "The nearest words are ";
+    print join ", ", (map {$funky_words[$_]} @nearest);
+    printf ", distance %d.\n", $tf->last_distance ();
+    
+    # Prints out "The nearest words are nice, rice, lice."
+    
+    
+
+
+=head2 last_distance
+
+    my $last_distance = $tf->last_distance ();
+
+The distance from the previous match's closest match. This is used in
+conjunction with L</nearest> or L</nearestv> to find the edit distance
+to the previous match.
+
+    
+    use Text::Fuzzy;
+    my @words = (qw/who where what when why/);
+    my $tf = Text::Fuzzy->new ('whammo');
+    my @nearest = $tf->nearestv (\@words);
+    print "@nearest\n";
+    # Prints "who what"
+    print $tf->last_distance (), "\n";
+    # Prints 3, the number of edits needed to turn "whammo" into "who"
+    # (delete a, m, m) or into "what" (replace m with t, delete m, delete
+    # o).
+    
+
+
+=head2 set_max_distance
+
+    # Set the max distance.
+    $tf->set_max_distance (3);
+
+Set the maximum edit distance of C<$tf>. Set the maximum distance to a
+low value to improve the speed of searches over lists with
+L</nearest>, or to reject unlikely matches. When searching for a near
+match, anything with an edit distance of a value over the maximum is
+rejected without computing the exact distance. To compute exact
+distances, call this method without an argument:
+
+    $tf->set_max_distance ();
+
+The maximum edit distance is switched off, and whatever the nearest
+match is is accepted. A negative value also switches it off:
+
+    $tf->set_max_distance (-1);
+
+The object created by L</new> has no maximum distance unless specified
+by the user.
+
+    
+    use Text::Fuzzy;
+    my $tf = Text::Fuzzy->new ('nopqrstuvwxyz');
+    # Prints 13, the correct value.
+    print $tf->distance ('abcdefghijklm'), "\n";
+    $tf->set_max_distance (10);
+    # Prints 11, one more than the maximum distance, because the search
+    # stopped when the distance was exceeded.
+    print $tf->distance ('abcdefghijklm'), "\n";
+
+
+Setting the maximum distance is a way to make a search more rapid. For
+example if you are searching over a dictionary of 100,000 or a million
+words, and only need close matches, you can more rapidly reject
+unwanted matches by setting the maximum distance to a lower
+value. Calculating Levenshtein distance is an O(n^2) algorithm in the
+lengths of the words, so even a small increase in the maximum
+permitted distance means a much larger amount of work for the computer
+to do. With the maximum distance set, the computer can give up
+calculating more quickly with bad matches.
+
+=head2 transpositions_ok
+
+    $tf->transpositions_ok (1);
+
+A true value in the argument changes the type of edit distance used to
+allow transpositions, such as C<clam> and C<calm>. Initially
+transpositions are not allowed, giving the Levenshtein edit
+distance. If transpositions are used, the edit distance becomes the
+Damerau-Levenshtein edit distance. A false value disallows
+transpositions:
+
+    $tf->transpositions_ok (0);
+
+=head2 no_exact
+
+    $tf->no_exact (1);
+
+This is a flag to L</nearest> which makes it ignore exact matches. For
+example,
+
+    
+    use Text::Fuzzy;
+    
+    my @words = qw/bibbity bobbity boo/;
+    for my $word (@words) {
+        my $tf = Text::Fuzzy->new ($word);
+        $tf->no_exact (0);
+        my $nearest = $tf->nearest (\@words);
+        print "With exact, nearest to $word is $words[$nearest]\n";
+        # Make "$word" not match itself.
+        $tf->no_exact (1);
+        my $nearest = $tf->nearest (\@words);
+        print "Without exact, nearest to $word is $words[$nearest]\n";
+    }
+
+
+This prints
+
+    With exact, nearest to bibbity is bibbity
+    Without exact, nearest to bibbity is bobbity
+    With exact, nearest to bobbity is bobbity
+    Without exact, nearest to bobbity is bibbity
+    With exact, nearest to boo is boo
+    Without exact, nearest to boo is bobbity
+
+
+This is for the case of searching over an array which contains the
+searched-for item itself.
+
+=head2 scan_file
+
+    my $nearest = $tf->scan_file ('/usr/share/dict/words');
+
+Scan a file to find the nearest match to the word used in
+L</new>. This assumes that the file contains lines of text separated
+by newlines, and finds the closest match in the file. Its return value
+is a string rather than a line number. It cannot return an array of
+values. It does not currently support Unicode-encoded files.
+
+=head1 FUNCTIONS
+
+These functions do not require a C<Text::Fuzzy> object.
+
+=head2 distance_edits
+
+    my ($distance, $edits) = distance_edits ('before', 'after');
+
+This returns the edit distance between the two arguments, and the
+edits necessary to transform the first one into the second
+one. C<$Edits> is a string containing the four letters I<k>, I<r>,
+I<d>, and I<i>, for "keep", "replace", "delete", and "insert"
+respectively. For example, for "piece" and "peace", C<$edits> contains
+"krrkk" for "keep, replace, replace, keep, keep".
+
+    
+    use Text::Fuzzy 'distance_edits';
+    my @words = (qw/who where what when why/);
+    my $tf = Text::Fuzzy->new ('whammo');
+    my @nearest = $tf->nearestv (\@words);
+    print "@nearest\n";
+    # Prints "who what"
+    print $tf->last_distance (), "\n";
+    # Prints 3, the number of edits needed to turn "whammo" into "who"
+    # (delete a, m, m) or into "what" (replace m with t, delete m, delete
+    # o).
+    my ($distance, $edits) = distance_edits ('whammo', 'who');
+    print "$edits\n";
+    # Prints kkdddk, keep w, keep h, delete a, delete m, delete m, keep o.
+    
+
+
+This does not handle transpositions. Unlike the rest of the module,
+this is pure Perl rather than XS, and not optimized for speed. The
+edit distance search within L</nearest> is optimized for speed, and
+hence discards its record of edits used to get the result.
+
+=head2 fuzzy_index
+
+    my ($offset, $edits, $distance) = fuzzy_index ($needle, $haystack);
+
+Searches for SUBSTR in STR using fuzzy matching.
+
+Return value is the offest of the closest match found, the edits
+necessary on C<$needle> to make it into the matching text, and the
+Levenshtein edit distance between the matching part of C<$haystack>
+and C<$needle>.
+
+For the algorithm used, see
+
+L<http://ginstrom.com/scribbles/2007/12/01/fuzzy-substring-matching-with-levenshtein-distance-in-python/>
+
+This is implemented in Perl not C, and it's slow due to lots of
+debugging code. Please expect the interface and internals to change.
+
+=head1 EXAMPLES
+
+=head2 misspelt-web-page.cgi
+
+The file F<examples/misspelt-web-page.cgi> is an example of a CGI
+script which does something similar to the Apache mod_speling module,
+offering spelling corrections for mistyped URLs and sending the user
+to a correct page.
+
+    
+    use Text::Fuzzy;
+    
+    # The directory of files served by the web server.
+    
+    my $web_root = '/usr/local/www/data';
+    
+    # If the query is "http://www.example.com/abc/xyz.html", $path_info is
+    # "abc/xyz.html".
+    
+    my $path_info = $ENV{REQUEST_URI};
+    
+    if (! defined $path_info) {
+        fail ("No path info");
+    }
+    
+    if ($0 =~ /$path_info/) {
+        fail ("Don't redirect to self");
+    }
+    
+    # This is the list of files under the main page.
+    
+    my @allfiles = get_all_files ($web_root, '');
+    
+    # This is our spelling search engine.
+    
+    my $tf = Text::Fuzzy->new ($path_info);
+    
+    my $nearest = $tf->nearest (\@allfiles, max => 5);
+    
+    if (defined $nearest) {
+        redirect ($allfiles[$nearest]);
+    }
+    else {
+        fail ("Nothing like $path_info was found");
+    }
+    exit;
+    
+    # Read all the files under "$root/$dir". This is recursive. The return
+    # value is an array containing all files found.
+    
+    sub get_all_files
+    {
+        my ($root, $dir) = @_;
+        my @allfiles;
+        my $full_dir = "$root/$dir";
+        if (! -d $full_dir) {
+            fail ("$full_dir is not a directory");
+        }
+        opendir DIR, $full_dir or fail ("Can't open directory $full_dir: $!");
+        my @files = grep !/^\./, readdir DIR;
+        closedir DIR or fail ("Can't close $full_dir: $!");
+        for my $file (@files) {
+            my $dir_file = "$dir/$file";
+            my $full_file = "$root/$dir_file";
+            if (-d $full_file) {
+                push @allfiles, get_all_files ($root, $dir_file);
+            }
+            else {
+                push @allfiles, $dir_file;
+            }
+        }
+        return @allfiles;
+    }
+    
+    # Print a "permanent redirect" to the respelt name, then exit.
+    
+    sub redirect
+    {
+        my ($url) = @_;
+        print <<EOF;
+    Status: 301
+    Location: $url
+    
+    EOF
+        exit;
+    }
+    
+    # Print an error message for the sake of the requester, and print a
+    # message to the error log, then exit.
+    
+    sub fail
+    {
+        my ($error) = @_;
+        print <<EOF;
+    Content-Type: text/plain
+    
+    $error
+    EOF
+        # Add the name of the program and the time to the error message,
+        # otherwise the error log will get awfully confusing-looking.
+        my $time = scalar gmtime ();
+        print STDERR "$0: $time: $error\n";
+        exit;
+    }
+
+
+See also L<http://www.lemoda.net/perl/perl-mod-speling/> for how to
+set up F<.htaccess> to use the script.
+
+=head2 spell-check.pl
+
+The file F<examples/spell-check.pl> is a spell checker. It uses a
+dictionary of words specified by a command-line option "-d":
+
+    spell-check.pl -d /usr/dict/words file1.txt file2.txt
+
+It prints out any words which look like spelling mistakes, using the
+dictionary.
+
+    
+    use Getopt::Long;
+    use Text::Fuzzy;
+    use Lingua::EN::PluralToSingular 'to_singular';
+    
+    # The location of the Unix dictionary.
+    my $dict = '/usr/share/dict/words';
+    
+    # Default maximum edit distance. Five is quite a big number for a
+    # spelling mistake.
+    my $max = 5;
+    
+    GetOptions (
+        "dict=s" => \$dict,
+        "max=i" => \$max,
+    );
+    
+    my @words;
+    my %words;
+    my $min_length = 4;
+    read_dictionary ($dict, \@words, \%words);
+    # Known mistakes, don't repeat.
+    my %known;
+    # Spell-check each file on the command line.
+    for my $file (@ARGV) {
+        open my $input, "<", $file or die "Can't open $file: $!";
+        while (<$input>) {
+            my @line = split /[^a-z']+/i, $_;
+            for my $word (@line) {
+                # Remove leading/trailing apostrophes.
+                $word =~ s/^'|'$//g;
+                my $clean_word = to_singular (lc $word);
+                $clean_word =~ s/'s$//;
+                if ($words{$clean_word} || $words{$word}) {
+                    # It is in the dictionary.
+                    next;
+                }
+                if (length $word < $min_length) {
+                    # Very short words are ignored.
+                    next;
+                }
+                if ($word eq uc $word) {
+                    # Acronym like BBC, IRA, etc.
+                    next;
+                }
+                if ($known{$clean_word}) {
+                    # This word was already given to the user.
+                    next;
+                }
+                if ($clean_word =~ /(.*)ed$/ || $clean_word =~ /(.*)ing/) {
+                    my $stem = $1;
+                    if ($words{$stem} || $words{"${stem}e"}) {
+                        # Past/gerund of $stem/${stem}e
+                        next;
+                    }
+                    # Test for doubled end consonants,
+                    # e.g. "submitted"/"submit".
+                    if ($stem =~ /([bcdfghjklmnpqrstvwxz])\1/) {
+                        $stem =~ s/$1$//;
+                        if ($words{$stem}) {
+                            # Past/gerund of $stem/${stem}e
+                            next;
+                        }
+                    }
+                }
+                my $tf = Text::Fuzzy->new ($clean_word, max => $max);
+                my $nearest = $tf->nearest (\@words);
+                # We have set a maximum distance to search for, so we need
+                # to check whether $nearest is defined.
+                if (defined $nearest) {
+                    my $correction = $words[$nearest];
+                    print "$file:$.: '$word' may be '$correction'.\n";
+                    $known{$clean_word} = $correction;
+                }
+                else {
+                    print "$file:$.: $word may be a spelling mistake.\n";
+                    $known{$clean_word} = 1;
+                }
+            }
+        }
+        close $input or die $!;
+    }
+    
+    exit;
+    
+    sub read_dictionary
+    {
+        my ($dict, $words_array, $words_hash) = @_;    
+        open my $din, "<", $dict or die "Can't open dictionary $dict: $!";
+        my @words;
+        while (<$din>) {
+            chomp;
+            push @words, $_;
+        }
+        close $din or die $!;
+        # Apostrophe words
+    
+        my @apo = qw/
+    
+                        let's I'll you'll he'll she'll they'll we'll I'm
+                        you're he's she's it's we're they're I've they've
+                        you've we've one's isn't aren't doesn't don't
+                        won't wouldn't I'd you'd he'd we'd they'd
+                        shouldn't couldn't didn't can't
+    
+                    /;
+    
+        # Irregular past participles.
+        my @pp = qw/became/;
+    
+        push @words, @apo, @pp;
+        for (@words) {
+            push @$words_array, lc $_;
+            $words_hash->{$_} = 1;
+            $words_hash->{lc $_} = 1;
+        }
+    }
+
+
+Because the usual Unix dictionary doesn't have plurals, it uses
+L<Lingua::EN::PluralToSingular>, to convert nouns into singular
+forms. Unfortunately it still misses past participles and past tenses
+of verbs.
+
+=head2 extract-kana.pl
+
+The file F<examples/extract-kana.pl> extracts the kana entries from
+"edict", a freely-available Japanese to English electronic dictionary,
+and does some fuzzy searches on them. It requires a local copy of the
+file to run. This script demonstrates the use of Unicode searches with
+Text::Fuzzy.
+
+    
+    use Lingua::JA::Moji ':all';
+    use Text::Fuzzy;
+    use utf8;
+    binmode STDOUT, ":utf8";
+    my $infile = '/home/ben/data/edrdg/edict';
+    open my $in, "<:encoding(EUC-JP)", $infile or die $!;
+    my @kana;
+    while (<$in>) {
+        my $kana;
+        if (/\[(\p{InKana}+)\]/) {
+            $kana = $1;
+        }
+        elsif (/^(\p{InKana}+)/) {
+            $kana = $1;
+        }
+        if ($kana) {
+            $kana = kana2katakana ($kana);
+            push @kana, $kana;
+        }
+    }
+    printf "Starting fuzzy searches over %d lines.\n", scalar @kana;
+    search ('ウオソウコ');
+    search ('アイウエオカキクケコバビブベボハヒフヘホ');
+    search ('アルベルトアインシュタイン');
+    search ('バババブ');
+    search ('バババブアルベルト');
+    exit;
+    
+    sub search
+    {
+        my ($silly) = @_;
+        my $max = 10;
+        my $search = Text::Fuzzy->new ($silly, max => $max);
+        my $n = $search->nearest (\@kana);
+        if (defined $n) {
+            printf "$silly nearest is $kana[$n] (distance %d)\n",
+                $search->last_distance ();
+        }
+        else {
+            printf "Nothing like '$silly' was found within $max edits.\n";
+        }
+    }
+    
+
+
+=head1 SUPPORT
+
+=head2 Reporting a bug
+
+There is a bug tracker for the module at L<https://github.com/benkasminbullock/Text-Fuzzy/issues>.
+
+=head2 Testing
+
+The CPAN tester results are at
+L<http://www.cpantesters.org/distro/T/Text-Fuzzy.html>. The
+ActiveState tester results are at
+L<http://code.activestate.com/ppm/Text-Fuzzy/>.
+
+=head1 PRIVATE METHODS
+
+You probably do not need any of these methods. They are for
+benchmarking the module and checking its correctness.
+
+=head2 no_alphabet
+
+    $tf->no_alphabet (1);
+
+This turns off alphabetizing of the string. Alphabetizing is a filter
+where the intersection of all the characters in the two strings is
+computed, and if the alphabetical difference of the two strings is
+greater than the maximum distance, the match is rejected without
+applying the dynamic programming algorithm. This increases speed,
+because the dynamic programming algorithm is slow.
+
+The alphabetizing should not ever reject anything which is a
+legitimate match, and it should make the program run faster in almost
+every case. The only envisaged uses of switching this off are checking
+that the algorithm is working correctly, and benchmarking performance.
+
+=head2 get_trans
+
+    my $trans_ok = $tf->get_trans ();
+
+This returns the value set by L</transpositions_ok>.
+
+=head2 unicode_length
+
+    my $length = $tf->unicode_length ();
+
+This returns the length in characters (not bytes) of the string used
+in L</new>. If the string is not marked as Unicode, it returns the
+undefined value. In the following, C<$l1> should be equal to C<$l2>.
+
+    use utf8;
+    my $word = 'ⅅⅆⅇⅈⅉ';
+    my $l1 = length $word;
+    my $tf = Text::Fuzzy->new ($word);
+    my $l2 = $tf->unicode_length ();
+
+=head2 ualphabet_rejections
+
+    my $rejected = $tf->ualphabet_rejections ();
+
+After running L</nearest> over an array, this returns the number of
+entries of the array which were rejected using only the Unicode
+alphabet. Its value is reset to zero each time L</nearest> is called.
+
+=head2 alphabet_rejections
+
+    my $rejected = $tf->alphabet_rejections ();
+
+After running L</nearest> over an array, this returns the number of
+entries of the array which were rejected using only the non-Unicode
+alphabet. Its value is reset to zero each time L</nearest> is called.
+
+=head2 length_rejections
+
+    my $rejected = $tf->length_rejections ();
+
+After running L</nearest> over an array, this returns the number of
+entries of the array which were rejected because the length difference
+between them and the target string was larger than the maximum
+distance allowed.
+
+=head2 get_max_distance
+
+    # Get the maximum edit distance.
+    print "The max distance is ", $tf->get_max_distance (), "\n";
+
+Get the maximum edit distance of C<$tf>. The maximum distance may be
+set with L</set_max_distance>.
+
+=head1 SEE ALSO
+
+Similar modules on CPAN include the following.
+
+=over
+
+=item L<String::Approx>
+
+=item L<Text::Fuzzy::PP>
+
+This is Nick Logan's Pure Perl version of this module.
+
+=item L<Text::Levenshtein::Damerau>
+
+This implements the Levenshtein-Damerau edit distance.
+
+=item L<Text::Levenshtein>
+
+=item L<Text::Levenshtein::Flexible>
+
+=item L<Text::Levenshtein::XS>
+
+This is an XS implementation of the Levenshtein edit distance.
+
+=item L<Text::LevenshteinXS>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+The edit distance including transpositions was contributed by Nick
+Logan (UGEXE). Some of the tests in F<t/trans.t> are taken from the
+L<Text::Levenshtein::Damerau::XS> module.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

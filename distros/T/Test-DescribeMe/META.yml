@@ -1,0 +1,23 @@
+---
+abstract: 'Tell test runners what kind of test you are'
+author:
+  - 'Matthew Horsfall (alh) <WolfSage@gmail.com>'
+build_requires:
+  File::Temp: 0.00
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-DescribeMe
+requires:
+  Test::More: 0.88
+  Test::Settings: 0.001
+resources:
+  homepage: https://github.com/wolfsage/Test-DescribeMe
+  repository: git://github.com/wolfsage/Test-DescribeMe.git
+version: 0.004

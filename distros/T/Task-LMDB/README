@@ -1,0 +1,56 @@
+NAME
+    Task::LMDB - Stub module to depend on Alien::LMDB and LMDB_File
+
+SYNOPSIS
+    In your module's "Makefile.PL", depend on Task::LMDB instead of
+    LMDB_File:
+
+        PREREQ_PM => {
+            'Task::LMDB' => 0,  ## provides LMDB_File
+        },
+
+    Same goes for "Build.PL":
+
+        requires => {
+            'Task::LMDB' => 0,  ## provides LMDB_File
+        },
+
+DESCRIPTION
+    Since LMDB_File stopped bundling the LMDB
+    <https://symas.com/products/lightning-memory-mapped-database/> source
+    code, you must provide your own copy of "liblmdb.so" and its header
+    files. Keeping them de-coupled allows the development of LMDB_File to
+    not be tied to LMDB releases.
+
+    Because LMDB_File needs to compile and link against LMDB, you must
+    provide a working LMDB installation prior to installing LMDB_File. This
+    can be accomplished by compiling LMDB from source code, using your
+    operating system's package manager, or by installing the Alien::LMDB
+    package. Alien::LMDB will attempt to use a system LMDB if it is
+    installed, otherwise will compile its own bundled copy.
+
+    Task::LMDB is just a stub module that depends on Alien::LMDB as a
+    configure time dependency, and on LMDB_File as a regular dependency.
+    This ordering ensures that Alien::LMDB will be installed prior to
+    compiling LMDB_File. In this way, CPAN modules that don't care where the
+    LMDB library comes from can depend on LMDB_File purely by adding a CPAN
+    dependency on Task::LMDB.
+
+SEE ALSO
+    Task::LMDB github repo <https://github.com/hoytech/Task-LMDB>
+
+    Symas Lightning Memory-mapped Database
+    <https://symas.com/products/lightning-memory-mapped-database/>
+
+    LMDB_File
+
+    Alien::LMDB
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2016 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

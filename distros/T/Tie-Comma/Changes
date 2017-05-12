@@ -1,0 +1,13 @@
+Revision history for Perl extension Tie::Comma.
+
+0.01  2005 January 3
+    - First version
+
+0.02  2005 January 4
+    - Added locale support.
+
+0.03  2005 January 7
+    - N/A.  This was the deprecation of Comma.pm.
+
+0.04  2005 January 7
+    - Renamed from Comma.pm

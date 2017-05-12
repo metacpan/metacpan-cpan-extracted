@@ -1,0 +1,3 @@
+ERROR(simat.pl):
+	#rows = 8 specified in the header line of the VECTOR file <test-B3b.vec>
+	does not match the actual #rows = 6 found in the file.

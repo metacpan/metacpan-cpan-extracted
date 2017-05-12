@@ -1,0 +1,5 @@
+Revision history for Perl extension Thesaurus::DBI.
+
+0.01  Mon May 29 17:59:04 2006
+	- initial version; created by h2xs 1.23 with options -A -X -n Thesaurus::DBI
+

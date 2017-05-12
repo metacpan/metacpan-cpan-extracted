@@ -1,0 +1,142 @@
+Revision history for Perl extension Test-Kantan
+
+0.40 2014-09-22T10:17:28Z
+
+    commit f3c9a3a77dc17d6d09c1719f95ad4c317b91f0ba
+    Author: Kuniwak <orga.chem.job@gmail.com>
+    Date:   Sun Sep 21 20:06:26 2014 +0900
+
+        Fix caller level for to_be_a_bag_of family
+
+0.39 2014-09-19T11:15:40Z
+
+    - Add to_be_a_bag family
+      (Kuniwak)
+
+0.38 2014-09-15T02:04:19Z
+
+    - Added documentation(moznion)
+
+0.37 2014-08-31T19:31:16Z
+
+    - fixed bdd style dsl.
+
+0.36 2014-08-26T21:08:55Z
+
+    - suppress UUV
+
+0.35 2014-08-26T20:53:11Z
+
+    - First CPAN release
+
+0.34 2014-03-26T08:39:58Z
+
+    - show new line after skip_all message.
+
+0.33 2014-03-26T08:35:30Z
+
+    - skip_all function should exit after printing.
+
+0.32 2014-03-26T08:33:22Z
+
+    - Added 'skip_all' function.
+
+0.31 2014-03-26T06:23:11Z
+
+    - filtering test cases
+
+0.30 2014-03-25T00:27:23Z
+
+    - Given/When/Then No longer takes the code.
+
+0.29 2014-03-17T04:50:38Z
+
+    - Documentation updated.
+
+0.28 2014-03-14T01:51:59Z
+
+    - internal refactoring
+
+0.27 2014-03-13T14:05:49Z
+
+    - root safe
+    - fork safe
+
+0.26 2014-03-12T20:45:40Z
+
+    - remove TEST_ prefix from the environment variables.
+
+0.25 2014-03-12T10:28:50Z
+
+    - Added stub for Test::Builder.
+
+0.24 2014-03-12T10:02:48Z
+
+    - Documentation update
+
+0.23 2014-03-10T01:54:36Z
+
+    - use Devel::CodeObserver 0.11
+
+0.22 2014-03-10T01:18:39Z
+
+    - use Devel::CodeObserver
+
+0.21 2014-03-09T13:41:43Z
+
+    - Change message group title display format in Reporter::Spec.
+      (tokuhirom)
+
+0.20 2014-03-09T13:07:43Z
+
+    - Refactor interface.
+
+0.19 2014-03-07T03:56:19Z
+
+    - use Module::Spy 0.03 interface.
+      It makes spy() renamed to spy_on()
+
+0.18 2014-03-07T00:53:28Z
+
+    - Show message if tests failed in the suites
+
+0.17 2014-03-06T07:08:27Z
+
+    - Show exception, for now.
+
+0.16 2014-03-06T05:05:53Z
+
+    - Expect#should_be_true, Expect#should_be_false
+
+0.15 2014-03-06T02:48:38Z
+
+    - Added TAP reporter
+
+0.14 2014-03-05T07:41:14Z
+
+    - Dependency fix.
+
+0.13 2014-03-05T04:52:55Z
+
+    - use Module::Spy.
+
+0.12 2014-03-04T11:51:00Z
+
+    - Better diag for Expect#is
+
+0.11 2014-03-04T11:09:30Z
+
+    - Added Expect#isnt method
+
+0.10 2014-03-04T10:59:35Z
+
+    - Added stub_guard
+
+0.09 2014-03-04T10:49:58Z
+
+    - fixed Power
+
+0.08 2014-03-04T10:22:23Z
+
+    - original version
+

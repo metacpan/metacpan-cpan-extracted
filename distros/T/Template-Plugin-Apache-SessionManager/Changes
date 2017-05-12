@@ -1,0 +1,11 @@
+Revision history for Perl extension Template::Plugin::Apache::SessionManager.
+
+0.01  Wed Jun 18 22:06:55 2003
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Template::Plugin::Apache::SessionManager
+	+ Update get|delete interface to accept array ref parameter 
+	  (suggestest by darren chamberlain 
+
+0.02  Tue Aug 05 18:00:00 2003
+	+ Added howto documentation into pod
+	- Tested to work under Template Toolkit 2.10 

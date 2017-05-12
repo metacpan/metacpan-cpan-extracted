@@ -1,0 +1,12 @@
+Revision history for Perl extension Tk::FilterEntry.
+
+0.02  Mon Mar  3 12:30:00 2003
+	- adds closure
+
+0.01  Fri Feb 28 18:30:00 2003
+	- first release
+
+      Fri Feb 28 13:52:16 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Tk::FilterEntry
+

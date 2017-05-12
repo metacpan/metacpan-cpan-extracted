@@ -1,0 +1,9 @@
+0.03
+    We require LWP::UserAgent::Paranoid version 0.97
+
+0.02
+    Switch to LWP::UserAgent::Paranoid for cleaner internals and better
+    future-proofing
+
+0.01
+    First release

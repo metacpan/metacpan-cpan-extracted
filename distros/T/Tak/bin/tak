@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+
+use strictures 1;
+use App::Tak;
+
+App::Tak->new_from_environment->run;

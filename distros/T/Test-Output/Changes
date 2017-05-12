@@ -1,0 +1,107 @@
+Revision history for Perl module Test::Output
+
+1.031 2017-03-29T21:30:57Z
+	* Get rid of Sub::Exporter. That module has nice features that this
+	module doesn't use and the prereq is causing problems with CPAN
+	Testers. CPAN Grep didn't show anyone using advanced features for
+	exports.
+
+1.03 - 2014-01-03
+	* Get rid of MYMETA
+
+1.02_01 - 2013-12-17
+	* Get rid of MYMETA
+
+1.02 - 2013-07-08
+	* Bump to stable release
+
+1.01_02 - 2012-07-19
+	* Remove the ::Tie stuff. It should be fully Capture::Tiny
+	now.
+
+1.01_01 - 2012-05-14
+	* David Golden re-did everything with Capture::Tiny
+	to get around the odd output paths that we coudn't
+	handle with a tie.
+
+1.01 - 2011-04-22
+	* Bump to a full release. This fixes the tests that failed
+	in the new 5.14 regex stringification
+
+0.16_03 - 2010-10-25
+	* Fix cat-o with handling $,
+
+0.16_02 - 2010-10-19
+	* Update tests with hardcoded regex stringification for
+	Perl's new (?^:) stuff
+
+0.16_01 - 2009-06-09
+	* Added META_MERGE features from chorny
+
+0.13 - 2009-03-08
+	* brian d foy (bdfoy@cpan.org) is the new maintainer
+	* Updated docs for source code location, license, etc
+
+0.12 - 2008-10-25
+	* Repacking to remove OS X extended attribute files that were causing tests to fail.
+
+0.11    2008-21-10
+	* Fixes for STDERR handling under Perl 5.6. Thanks to
+	brian d foy for the patch with tests.
+
+0.10    2005-18-07
+	* Migrated from Exporter to Sub::Exporter
+
+0.09    2005-09-11
+	* New version of Test::Tester added a depth test which was causing
+          tests to fail. Thanks to neildp for the patch.
+	* Fixed warning messages during perl Makefile.PL caused by Test::Tester
+          not being loaded first.
+
+0.08    2005-19-07
+	* Supressed most warnings caused by newer versions of Test::Tester
+
+0.07    2005-26-03
+	* Added methods: combined_is, combined_isnt, combined_like and
+          combined_unlike. This combine STDOUT and STDERR into one
+          filehandle and capture their output for testing.
+
+0.06    2005-07-03
+	* Applied patch from David Wheeler to support code blocks within
+          tests as well as coderefs.
+
+0.05    2005-04-03
+	* Added chromatic's patch fixing diag messages printing even when
+          tests pass.
+	* Updated stdout_unlike.t to test for success.
+	* Updated all tests for successful tests to include diag => ''.
+
+0.04    2005-02-03
+	* Added methods: output_like, output_unlike
+	* Moved output_from stdout_from and stderr_from out of @EXPORT
+          and into @EXPORT_OK.
+	* Reworked diag messages for output_is and output_isnt to only show
+          the output that doesn't match.
+	* replaced "comment" with "description"
+	* More tests
+	* Much refactoring
+
+0.03    2005-16-02
+	* Reworked entire POD. Thanks to rjbs for his suggestions.
+	* Additional POD fixes (date to data thanks to everyone who caught
+          that).
+	* New methods: stderr_like, stderr_unlike, stdout_like, stdout_unlike
+	* Updated README from the default one created by Module::Starter.
+	* Moved private methods _err,_out, and _errandout to stderr_from
+          stdout_from and output_from respectively. Allowing access from
+          the test file. Thanks to rjbs for this suggestion.
+
+0.02    2005-12-02
+	* New methods: output_isnt, stderr_inst, stdout_isnt
+	* Removed requirement for Filehandle
+	* Removed errant leftover Test::Builder::Tester::Color from tests
+	* Migrated all tests to Test::Tester (Test::Tester now a prereq)
+
+0.01    2005-12-02
+	* First version, released on an unsuspecting world.
+

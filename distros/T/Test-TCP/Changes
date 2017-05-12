@@ -1,0 +1,390 @@
+Revision history for Perl module Test::TCP
+
+2.18 2017-04-24T06:00:25Z
+    - let the kernel select an empty port #59
+      https://github.com/tokuhirom/Test-TCP/pull/59
+      (i110)
+
+2.17 2016-08-18T14:42:56Z
+    - check_port can take 'host' argument(#55)
+    - Fix test on Windows issue(#55)
+
+2.16 2016-04-13T02:27:43Z
+
+    commit 3ae73a349f70f06c60de3f635916929bc8643429
+    Author: Alex Vandiver <alex@chmrr.net>
+    Date:   Tue Apr 12 00:33:21 2016 -0700
+
+        Ensure that IO::Socket::IP is DESTROY'd before can_bind returns
+        
+        be316f1f worked around a core perl bug[1] which causes Perl < 5.24.0
+        to DESTROY the IO::Socket::IP object too late, causing the empty port
+        to not actually be empty if it was used immediately.
+        
+        Unfortunately, this change was lost in ba745fd1, which again put the
+        return of `can_bind` on the stack along with the actual return value,
+        re-instating the bug.
+        
+        Split the statement across two statements again, and add a comment on
+        the importance of preserving it.
+        
+        [1] https://rt.perl.org/Public/Bug/Display.html?id=124248
+
+2.15 2016-03-15T00:25:52Z
+
+    - Add listen_socket function and listen option for race-free operation
+
+2.14 2015-09-29T22:36:44Z
+
+    - Fix race condition in t/10_oo.t(exodist)
+
+2.13 2015-07-24T02:30:17Z
+
+    - check whether the OS implements IPV6_V6ONLY before using it
+
+2.12 2015-05-18T08:14:30Z
+
+    - Fixed spelling mistake
+      (Reported by gregor herrmann)
+
+2.11 2015-04-07T00:07:25Z
+    - declare IO::Socket::IP as dependency #36
+
+2.10 2015-04-06T19:23:43Z
+    - ensure the test object is DESTROYed when Net::EmptyPort::empty_port exits https://rt.cpan.org/Public/Bug/Display.html?id=103299
+
+2.09 2015-04-02T21:55:18Z
+    - fix tests running for a long time on systems that do not support IPv6 #35
+
+2.08 2015-04-02T04:04:33Z
+    - add `host` argument to various functions for binding to arbitrary address (incl. IPv6) #33
+    - add function `Net::EmptyPort::can_bind` #34
+
+2.07 2015-01-22T10:44:21Z
+
+    Old versions of Test::SharedFork are incompatibles with the new Test::Builder: I had "missing TB2::History" errors.
+    It would be helpful to upgrade the Test::SharedFork dependency to help the user to avoid to encounter such hard to track deep errors.
+    (Reported by dolmen++)
+
+
+2.06 2014-07-01T10:01:44Z
+
+    commit 8259d5eb28919bc766c8b500151d5be7e944b7f2
+    Author: Petr Písař <ppisar@redhat.com>
+    Date:   Fri Jun 27 13:37:20 2014 +0200
+
+        Wait infinitely if max_wait is negative
+
+        The t/12_pass_wait_port_options.t will fail if the server process does not
+        start listening in max_wait limit. This can happen if the host is
+        loaded or just if the scheduler decides to postpone the process.
+
+        This patch adds possibility to wait infitely by passing a negative
+        max_wait value to the Test::TCP object and it changes the
+        t/12_pass_wait_port_options.t test to use this feature.
+
+        https://github.com/tokuhirom/Test-TCP/issues/28
+        Signed-off-by: Petr Písař <ppisar@redhat.com>
+
+2.05 2014-06-24T00:49:45Z
+
+    - Release again with latest minil.
+
+2.04 2014-06-23T23:42:28Z
+
+    - Release.
+
+2.03_02 2014-06-23T23:37:07Z
+
+    - Release to CPAN.
+
+2.03_01 2014-06-23T23:34:38Z
+
+    - Switch to ExtUtils::MakeMaker.
+
+2.03 2014-06-23T10:18:53Z
+
+    - Re-packaging with Minilla v2.0.0-TRIAL
+
+2.02 2013-10-30T03:22:39Z
+
+    - Fixed fork(2) error handling.
+      (tokuhirom)
+
+2.01 2013-09-22T04:13:53Z
+
+    [Changes from MITHALDU (Christian Walde)]
+    - test waitport argument by running full code-chain, not with partial mocking
+        
+    - The partial mocks cause stuck forks on win32 at times, causing the test to
+      hang. With the full code chain present the test runs reliably
+
+2.00 2013-06-11T04:41:43Z
+
+    [INCOMPATIBLE CHANGES]
+    - Change wait_port() API to take max_wait seconds, and wait exponentially.
+      Dropped wait_port_retry argument introduced at 1.27.
+      (miyagawa)
+
+1.30 2013-06-03T05:06:28Z
+
+    - Increase the default sleep and retry: 0.01 sec and 1000 times
+      (miyagawa)
+
+1.29 2013-05-29T01:12:47Z
+
+    - Care the `test_tcp(port => undef)` case.
+      https://github.com/tokuhirom/Test-TCP/issues/13
+
+1.28 2013-05-28T11:14:27Z
+
+    - Added wait_port_sleep and wait_port_retry option for
+      Test::TCP::wait_port, Test::TCP#new, test_tcp().
+      (tokuhirom)
+
+1.27 2013-05-15T10:13:18Z
+
+    - export wait_port from Net::EmptyPort
+      (Pavel Shaydo)
+    - Make default wait_port() sleeping time shorter.
+      0.1sec => 0.0001sec.
+      (tokuhirom)
+
+1.26 2013-03-29T08:46:20Z
+
+    - Remove unused deps from cpanfile.
+
+1.25 2013-03-29T08:07:24Z
+
+    - re packaging, again & again
+
+1.24 2013-03-28T02:49:32Z
+
+    - re-packing, again.
+
+1.23 2013-03-27T01:37:08Z
+
+    - Just re-packaging
+
+1.22 2013-03-27T01:17:38Z
+
+    - Add doc for Test::TCP::CheckPort
+      (Tatsuhiko Miyagawa)
+    - revert b4fc237697648234c960f6714d995210d4250e42 to fix Win32 breakage
+      Test::TCP::CheckPort must be used on win32 because it prints to STDOUT
+      (Christian Walde)
+    - Add UDP support to Net::EmptyPort
+      (Brendan Byrd)
+
+1.21 2013-03-03T12:33:49
+
+    - Added Net::EmptyPort::wait_port()
+      (tokuhirom)
+
+1.20 2013-03-02T18:30:25
+
+    - bump up version
+
+1.19 2013-02-27T14:02:13
+
+    - Split empty_port() function to Net::EmptyPort
+      (Thomas Klausner)
+
+1.18 2012-10-25
+
+    - Added more documentation about empty_port()
+
+1.17 2012-07-27
+
+    [Changes from MITHALDU (Christian Walde)]
+
+    - fix port checking on Win32 by performing it in another process
+        
+    - On Win32 fork is emulating by creating another thread in the same process.
+      This leads to a possible bug/race condition when a server tries to open a
+      port and listen on it, while in the same process a client tries to connect
+      to the same port. This manifests by the accept call of the server failing
+      with an error of "Bad file descriptor".
+
+      This is easily fixed by having another process perform the port checking,
+      since that will not interfere with the internals.
+
+1.16 2012-06-30
+
+    [TEST FIX]
+    - 1.15 breaks AIX fix on 1.14.
+      t/05_sigint.t skips on perl <= 5.8.8.
+
+1.15 2012-01-31
+
+    [TEST FIX]
+    - ${^CHILD_ERROR_NATIVE} is only available in perl 5.8.9 and later.
+      (kazeburo++)
+
+1.14 2011-11-29
+
+    - Fixed testing issue on AIX.
+      https://rt.cpan.org/Public/Bug/Display.html?id=72779
+      (w.phillip.moore)
+    - depend to Test::SharedFork 0.19 for better TB2 support
+      (tokuhirom)
+
+1.13 2011-05-31
+
+    - RT#67292: Tests are blocking in Windows 7.
+      https://rt.cpan.org/Ticket/Display.html?id=67292
+    - change port number range from 10000 .. 11000 to 50000 .. 60000 to respect IANA.
+      https://rt.cpan.org/Ticket/Display.html?id=64012
+
+1.12 2011-03-03
+
+    - workaround for win32 test fails.
+      https://rt.cpan.org/Ticket/Display.html?id=66016
+    - more diagnostic messages
+
+1.11 2010-12-20
+
+    - localize $@ in Test::TCP::DESTROY
+
+1.10 2010-12-18
+
+    - added Test::TCP->stop method
+
+1.09 2010-12-18
+
+    - added document in FAQ section
+
+1.08 2010-12-16
+
+    - no feature changes
+
+1.07_01 2010-12-16
+
+    - new OO interface!
+
+1.07 2010-11-11
+
+    - allow forking in the client(lestrrat)
+
+1.06 2010-09-11
+
+    - depend to Test::SharedFork 0.14. It fixes issue with Test::Builder2.
+
+1.05 2010-09-10
+
+    - workaround for $@ issue in test case.
+      Data::Util's method modifier clears $@.
+
+1.04 2010-08-24
+
+    - fixed local $@ issue. this happens on some version of perl5.
+
+1.03 2010-08-23
+
+    - release to cpan
+    - fixed win32 issue(charsbar)
+
+1.02_02 2010-08-23
+
+    - use randomness on finding empty port(suggested by kazuhooku)
+    - try to connect the port before bind(Tatsuhiko Miyagawa)
+
+1.02_01 2010-08-23
+
+    - better cleanup code by RAII pattern.
+      https://rt.cpan.org/Ticket/Display.html?id=60657
+      (reported by dgl)
+
+1.02 2010-08-17
+
+    - lazy loading issue was fixed at Test::SharedFork 0.12.
+      Depend to it.
+      https://rt.cpan.org/Public/Bug/Display.html?id=60426
+      (reported by J.)
+
+1.01 2010-08-15
+
+    - remove unused deps for use_test_base().
+
+1.00 2010-08-08
+
+    - bump up version!
+
+0.16_02 2010-02-20
+
+    - oops. packaging miss.
+
+0.16_01 2010-02-20
+
+    - Do not depend to IO::Socket::INET 1.31.
+      Test::TCP works well with older IO, I hope.
+      (suggested by mst)
+
+0.16 2010-01-04
+
+    - check port asap(suggested by Hideki YAMAMURA)
+
+0.15 2009-11-28
+
+    - fixed win32 issue(by charsbar++)
+
+0.14 2009-10-18
+
+    - support win32
+
+0.13 2009-10-14
+
+    - handle sigint(reported by kazuho++)
+
+0.12 2009-10-04
+
+    - fixed broken test on solaris
+
+0.11 2009-09-17
+
+    - fixed broken test, reported by drangon3++
+
+0.10 2009-09-17
+
+    - don't leak the process when get a SIGDIE
+    - diag when get SIGPIPE
+
+0.09 2009-09-15
+
+    - don't leak the control by SIGTERM, some tcp server return the control by SIGTERM.
+      (reported by kazuho++)
+
+0.08 2009-09-14
+
+    - oops. I forget to remove 'use Params::Validate' statement.
+
+0.07 2009-09-13
+
+    - diag when get a SIGABRT
+
+0.06 2009-09-08
+
+    - pass the pid to client(kazuho)
+    - remove deps for Params::Validate(tokuhirom)
+
+0.05 2009-06-22
+
+    - updated docs
+    - set ReuseAddr as true
+
+0.04 2009-03-25
+
+    - Test::SharedFork 0.03 has a bug. depend to 0.04
+
+0.03 2009-03-25
+
+    - do not depend to Sub::Exporter
+    - use Test::SharedFork
+
+0.02 2008-08-28
+
+    - fixed deps for Sub::Exporter(by yappo++)
+
+0.01 2008-08-17
+    - original version
+

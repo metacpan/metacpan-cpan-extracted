@@ -1,0 +1,24 @@
+TYPEMAP
+struct aa_context*              T_AA_CONTEXT
+struct aa_renderparams          T_AA_RENDERPARAMS
+
+INPUT
+T_AA_CONTEXT
+    {
+        $var = INT2PTR(struct aa_context*, SvIV($arg));
+    }
+
+T_AA_RENDERPARAMS
+    {
+        HV *_hv = (HV*)SvRV($arg);
+        struct aa_renderparams _ar;
+
+        _ar.bright    = SvIV(*hv_fetchs(_hv, \"bright\", 0));
+        _ar.contrast  = SvIV(*hv_fetchs(_hv, \"contrast\", 0));
+        _ar.gamma     = SvNV(*hv_fetchs(_hv, \"gamma\", 0));
+        _ar.dither    = SvIV(*hv_fetchs(_hv, \"dither\", 0));
+        _ar.inversion = SvIV(*hv_fetchs(_hv, \"inversion\", 0));
+        _ar.randomval = SvIV(*hv_fetchs(_hv, \"randomval\", 0));
+
+        $var = _ar;
+    }

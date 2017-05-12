@@ -1,0 +1,56 @@
+Tie::Array::BoundedIndex
+------------------------
+
+0.04 - Fri Dec 28 08:05:17 2007
+0.03 - Tue Jun 21 17:16:50 2005
+0.02 - Tue Dec 16 10:12:32 2003
+0.01 - Fri Oct 10 21:07:38 2003
+
+
+PURPOSE
+-------
+
+Tie::Array::BoundedIndex lets you create arrays whose indices have
+limited ranges.  To find out more, either install the module and use
+the command:
+
+	$ perldoc Tie::Array::BoundedIndex
+
+or, if you haven't installed it yet,type
+
+	$ perldoc lib/Tie/Array/BoundedIndex.pm
+
+This module is an expanded version of an example developed in the book
+"Perl Medic: Transforming Legacy Code". See http://www.perlmedic.com/.
+
+INSTALLATION
+------------
+
+Use Module::Build:
+
+	$ perl Build.PL
+	$ ./Build
+	$ ./Build test
+	$ ./Build install
+
+but if you happen to do it the old way:
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make install
+
+well then, the magic of Module::Build will make it work anyway.
+
+COPYRIGHT
+---------
+
+Copyright (c) 2003 Peter J. Scott.  This program is licensed under the
+same terms as Perl itself.  That means there's no warranty. You can
+report problems and I might fix them; if you send in a fix yourself
+that makes it very likely that I will apply it.
+
+AUTHOR
+------
+
+Peter Scott, pjs-cpan@PSDT.com

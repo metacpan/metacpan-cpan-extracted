@@ -1,0 +1,60 @@
+Text::Lossy
+===========
+
+This is a Perl 5 module which implements lossy text compression.
+Specifically, it implements the "lossy" part to transform any text to a
+form which is better compressible by standard entropy-based compression
+algorithms.
+
+Several different lossy text filters are supplied.
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+The module 'Text::Lossy' will be installed in your Perl library path.
+An executable Perl script, 'text-lossy', will also be installed.
+
+For more control over install locations, as well as additional commands,
+try 'make help'.
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::Lossy
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Lossy
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-Lossy
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-Lossy
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-Lossy/
+
+
+LICENSE AND COPYRIGHT
+---------------------
+
+Copyright (C) 2012-2013 Ben Deutsch
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

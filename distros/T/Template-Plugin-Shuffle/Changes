@@ -1,0 +1,8 @@
+Revision history for Perl extension Template::Plugin::Shuffle
+
+0.02  Fri Oct 26 13:30:57 PDT 2007
+        - Use define_vmethod API so it works with Template::Alloy
+          (Thanks to Paul Seamons)
+
+0.01  Fri Apr 18 16:17:01 2003
+	- original version

@@ -1,0 +1,30 @@
+---
+abstract: 'do some tests for modules in search path'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-AllModules
+provides:
+  Test::AllModules:
+    file: lib/Test/AllModules.pm
+    version: '0.15'
+requires:
+  Module::Pluggable::Object: '0'
+  Test::More: '0.88'
+  Test::SharedFork: '0'
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Test-AllModules
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

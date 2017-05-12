@@ -1,0 +1,30 @@
+---
+abstract: 'compare two XML files for equivalency, in an ordered fashion.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Builder::Tester: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142060'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-XML-Ordered
+requires:
+  Exporter: '0'
+  Test::More: '0'
+  XML::LibXML: '2.0014'
+  XML::LibXML::Reader: '2.0014'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  repository: ssh://hg@bitbucket.org/shlomif/test-xml-ordered
+version: 0.0.9

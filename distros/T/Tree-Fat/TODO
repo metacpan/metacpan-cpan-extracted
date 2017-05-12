@@ -1,0 +1,27 @@
+memory management barfs 5.005_56+
+
+tvgen.pl
+  copy tvcommon.[ch] only if newer
+
+avoid installing .so stuff?
+
+
+*** SCALING UP
+
+allow treefill/depth updates to be switched off temporarily?
+  reduce the need for write locks == parallel insert mode...?
+
+optimized arrays ops: tc_splice(...) !!
+
+perl interface -> separate extension
+  REFCNT!
+  push/unshift & pop/shift flags
+  transient hash-ref indices?
+  tied array API & glue
+  array: mapkeys / mapvalues?
+
+OPTIMIZE!
+
+tc_delete
+  try 2-level rotations?
+  try to coalesce nodes before they are completely empty

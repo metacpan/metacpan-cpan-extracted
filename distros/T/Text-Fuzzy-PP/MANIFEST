@@ -1,0 +1,18 @@
+Changes
+lib/Text/Fuzzy/PP.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_compile.t
+t/01_imports.t
+t/compatability/distance.t
+t/compatability/nearest.t
+t/text-fuzzy/compatability.t
+t/text-fuzzy/private-functions.t
+t/text-fuzzy/Text-Fuzzy.t
+t/text-fuzzy/trans.t
+t/text-fuzzy/unicode-alphabet.t
+t/text-fuzzy/unicode-nearest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

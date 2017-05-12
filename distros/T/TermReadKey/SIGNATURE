@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bb7d6b7e31c5942098089d8d83dbfd55acaef4bb Changes
+SHA1 87c9015c9692363397e1b5a8895db403bb6b24ad Configure.pm
+SHA1 8cac43eb82ead0273a0094355053dffe10ab3f50 MANIFEST
+SHA1 9bc08cea258bfe3fb880b2a5c7dd941a55d7860c MANIFEST.SKIP
+SHA1 74e40fe7f356632bb25cc5738c6ed647b67df474 META.json
+SHA1 abd297816a4a68a3986256ebec054b69ff7aa9da META.yml
+SHA1 b6676976826d70dd33d528e6d71886d7f0a3d36f Makefile.PL
+SHA1 86fe91551c70c1899796cda79bb5c8d265d987aa README
+SHA1 27134d3e92be93aec1df3289983a196e94d04b4a ReadKey.xs
+SHA1 4dd0d1072abc8e7aa0898c6a4074cf4af78797a4 ReadKey_pm.PL
+SHA1 c009e9a2bbd000588fbcba9a9ae08dfdaa1e8ad1 example/test.pl
+SHA1 f2e7df00c08c34872cedcce1746cc71d642c1d80 genchars.pl
+SHA1 58a50d6a9276b38cb76fae60561c2e1e9f95801b ppport.h
+SHA1 a4ac8dc9eee6dbc7f1522c733068c7ac1c31db61 t/01_basic.t
+SHA1 671ec7870b03ccff5802abd71f29d53d75400b45 t/02_terminal_functions.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJX961DAAoJECBWhy2NZBIA6mEH/23jT1cRoW46X4xyNh/40OG4
+yTs7EX51gfMn4yKDvBOu8wGSekd0QZ1KScb4zaT0w4r7tpDHPbZPRFMeYyfmB3EG
+Z5XJrHdRWf0A5HW3prGUVv1lm1hcSEZyCUnoYV40hzqZ+2tVXXeKk4WlT/WgOqxT
+c3nTEHQnbLVe2724PTXmPXpC1DKn5RbNfHFAb1RPuEqs1FdX/jxVeuSct7WHFKJv
+fehx01Qp2Hj/x8nE7SXhpzvZIo64WynnmN2mT4dOKCXzt9BiBqOkPLljvPzvAlyJ
+7eBb8a259xyHpC8AMFNNje0eKPZJaDUozUPswEHDE18OhMoZMO1HXfYx6nE8foY=
+=rBio
+-----END PGP SIGNATURE-----

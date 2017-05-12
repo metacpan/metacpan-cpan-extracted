@@ -1,0 +1,46 @@
+Revision history for Perl extension Test::XPath.
+
+0.16  2011-11-23T05:24:03Z
+      - Bumped Test::Pod requirement up to 1.41 to support L<text|scheme:...>
+        directives. Thanks to Fitz Elliott for the report.
+
+0.15  2011-07-17T02:40:11
+      - Require XML::LibXML 1.70, as that seems to be the first version to
+        offer `set_option()`.
+      - Make sure that HTML::Selector::XPath 0.06 or higher is installed
+        before allowing use of CSS selectors. Should fix some test failures
+        from cpan-testers.
+
+0.14  2011-06-29T18:31:39
+      - The constructor now croaks instead of carping when no XML or HTML
+        parameter has been pased to it. Thanks to GitHub user "sshaw" for the
+        spot.
+      - Added the `find_value()` method to provide easy access to values in
+        the document relative to the current node. Suggested by Moritz Onken.
+      - XPaths generated via the `css_selector` filter are now properly
+        created relative to th current node. That means you can use CSS
+        expressions in the recursive block passed to `ok()`.
+
+0.13  2010-06-01T18:39:28
+      - Added the `filter` option, which allows custom filtering of XPath
+        expressions and the use of CSS selectors instead of XPath expresions.
+        Based on a patch from Oliver Charles.
+      - Fixed bug that prevented Test::XPath from being subclassable.
+        Patch from Michael Schout (with tests, huzzah!).
+      - Added support for XML::LibXML options, such as "suppress_errors", that
+        aren't set by accessors. Thanks to Michael S. Fischer for the report.
+      - Fixed test failures on Windows.
+
+0.12  2009-09-05T23:30:05
+      - Added support for PerlX::MethodCallWithBlock.
+      - Added Test::HTML::Content to the "See Also" section of the docs.
+
+0.11  2009-09-04T22:16:11
+      - Edited the documentation for accuracy, grammar, etc.
+      - Added `not_ok()`.
+      - Updated minimum Test::More requirement to 0.70. Sometime between 0.64
+        and 0.70, the format of diagnostics changed, so older versions make
+        Test::XPath tests fail.
+
+0.10  2009-08-31T21:34:37
+      - Initial version.

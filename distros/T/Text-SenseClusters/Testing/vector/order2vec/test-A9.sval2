@@ -1,0 +1,104 @@
+<corpus lang="en">
+
+<lexelt item="interest-n">
+
+<instance id="interest-n.int1">
+
+<answer instance="interest-n.int1" senseid="interest_6"/>
+
+<context>
+
+yields <p="NNS"/> on <p="IN"/> money <p="NN"/> market <p="JJ"/> mutual <p="JJ"/> funds <p="NN"/> continued <p="VBD"/> to <p="TO"/> slide <p="VB"/> , <p=","/> amid <p="IN"/> signs <p="VBZ"/> that <p="IN"/> portfolio <p="NN"/> managers <p="NNS"/> expect <p="VBP"/> further <p="JJ"/> declines <p="NNS"/> in <p="IN"/> <head>interest <p="NN"/></head> rate <p="NNS"/> . <p="."/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int2">
+
+<answer instance="interest-n.int2" senseid="interest_6"/>
+
+<context>
+
+longer <p="RB"/> maturities <p="NNS"/> are <p="VBP"/> thought <p="VBN"/> to <p="TO"/> indicate <p="VB"/> declining <p="VBG"/> <head>interest <p="NN"/></head> rate <p="NNS"/> because <p="IN"/> they <p="PRP"/> permit <p="VBP"/> portfolio <p="NN"/> managers <p="NNS"/> to <p="TO"/> retain <p="VB"/> relatively <p="RB"/> higher <p="JJR"/> rate <p="NNS"/> for <p="IN"/> a <p="DT"/> longer <p="RB"/> period <p="NN"/> . <p="."/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int3">
+
+<answer instance="interest-n.int3" senseid="interest_6"/>
+
+<context>
+
+nevertheless <p="RB"/> , <p=","/> said <p="VBD"/> brenda <p="NN"/> malizia <p="NN"/> negus <p="JJ"/> , <p=","/> editor <p="NN"/> of <p="IN"/> money <p="NN"/> funds <p="NN"/> report <p="NN"/> , <p=","/> yields <p="NNS"/> `` <p="``"/> may <p="MD"/> blip <p="VB"/> up <p="IN"/> again <p="RB"/> before <p="IN"/> they <p="PRP"/> blip <p="VBP"/> down <p="RB"/> '' <p="''"/> because <p="IN"/> of <p="IN"/> recent <p="JJ"/> rises <p="NNS"/> in <p="IN"/> short-term <p="JJ"/> <head>interest <p="NN"/></head> rate <p="NNS"/> . <p="."/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int4">
+
+<answer instance="interest-n.int4" senseid="interest_5"/>
+
+<context>
+
+j <p="NN"/> . <p="."/> p <p="NN"/> . <p="."/> bolduc <p="NN"/> , <p=","/> vice <p="NN"/> chairman <p="NN"/> of <p="IN"/> w <p="IN"/> . <p="."/> r <p="NN"/> . <p="."/> grace <p="NN"/> & <p="CC"/> co <p="VB"/> . <p="."/> , <p=","/> which <p="WDT"/> holds <p="VBZ"/> a <p="DT"/> 83 <p="CD"/> . <p="."/> 4 <p="CD"/> % <p="NN"/> <head>interest <p="NN"/></head> in <p="IN"/> this <p="DT"/> energy-services <p="NNS"/> company <p="NN"/> , <p=","/> was <p="VBD"/> elected <p="VBN"/> a <p="DT"/> director <p="NN"/> . <p="."/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int5">
+
+<answer instance="interest-n.int5" senseid="interest_5"/>
+
+<context>
+
+finmeccanica <p="NN"/> is <p="VBZ"/> an <p="DT"/> italian <p="NN"/> state-owned <p="JJ"/> holding <p="NN"/> company <p="NN"/> with <p="IN"/> <head>interests <p="NNS"/></head> in <p="IN"/> the <p="DT"/> mechanical <p="JJ"/> engineering <p="NN"/> industry <p="NN"/> . <p="."/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int6">
+
+<answer instance="interest-n.int6" senseid="interest_6"/>
+
+<context>
+
+in <p="IN"/> august <p="JJ"/> , <p=","/> the <p="DT"/> commission <p="NN"/> ruled <p="VBD"/> that <p="IN"/> between <p="IN"/> $ <p="$"/> 190 <p="CD"/> million <p="CD"/> and <p="CC"/> $ <p="$"/> 195 <p="CD"/> million <p="CD"/> of <p="IN"/> the <p="DT"/> plant <p="NN"/> 's <p="POS"/> construction <p="NN"/> cost <p="NN"/> was <p="VBD"/> unreasonable <p="JJ"/> and <p="CC"/> should <p="MD"/> be <p="VB"/> funds <p="NN"/> , <p=","/> plus <p="CC"/> <head>interest <p="NN"/></head> . <p="."/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int7">
+
+<answer instance="interest-n.int7" senseid="interest_6"/>
+
+<context>
+
+last <p="JJ"/> month <p="NN"/> , <p=","/> judge <p="NN"/> curry <p="NN"/> set <p="VBN"/> the <p="DT"/> <head>interest <p="NN"/></head> rate <p="NNS"/> on <p="IN"/> the <p="DT"/> funds <p="NN"/> at <p="IN"/> 9 <p="CD"/> % <p="NN"/> . <p="."/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int8">
+
+<answer instance="interest-n.int8" senseid="interest_4"/>
+
+<context>
+
+gary <p="JJ"/> hoffman <p="NN"/> , <p=","/> a <p="DT"/> washington <p="NN"/> lawyer <p="NN"/> specializing <p="VBG"/> in <p="IN"/> intellectual <p="JJ"/> property <p="NN"/> cases <p="NNS"/> , <p=","/> said <p="VBD"/> the <p="DT"/> threat <p="NN"/> of <p="IN"/> u <p="PRP"/> . <p="."/> s <p="PRP"/> . <p="."/> retaliation <p="NN"/> , <p=","/> combined <p="VBN"/> with <p="IN"/> a <p="DT"/> growing <p="VBG"/> recognition <p="NN"/> that <p="IN"/> protecting <p="VBG"/> intellectual <p="JJ"/> property <p="NN"/> is <p="VBZ"/> in <p="IN"/> a <p="DT"/> country <p="NN"/> 's <p="POS"/> own <p="JJ"/> <head>interest <p="NN"/></head> , <p=","/> prompted <p="VBD"/> the <p="DT"/> improvements <p="NNS"/> made <p="VBN"/> by <p="IN"/> south <p="JJ"/> korea <p="NN"/> , <p=","/> taiwan <p="NN"/> and <p="CC"/> saudi <p="NN"/> arabia <p="NN"/> . <p="."/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int9">
+
+<answer instance="interest-n.int9" senseid="interest_6"/>
+
+<context>
+
+mr <p="NN"/> . <p="."/> rapanelli <p="NN"/> recently <p="RB"/> has <p="VBZ"/> said <p="VBD"/> the <p="DT"/> government <p="NN"/> of <p="IN"/> president <p="NN"/> carlos <p="NNS"/> menem <p="VBP"/> , <p=","/> who <p="WP"/> took <p="VBD"/> office <p="NN"/> july <p="RB"/> 8 <p="CD"/> , <p=","/> feels <p="VBZ"/> a <p="DT"/> significant <p="JJ"/> reduction <p="NN"/> of <p="IN"/> principal <p="NN"/> and <p="CC"/> <head>interest <p="NN"/></head> is <p="VBZ"/> the <p="DT"/> only <p="JJ"/> way <p="NN"/> the <p="DT"/> debt <p="NN"/> problem <p="NN"/> may <p="MD"/> be <p="VB"/> solved <p="VBN"/> . <p="."/> 
+</context>
+
+</instance>
+</lexelt>
+</corpus>

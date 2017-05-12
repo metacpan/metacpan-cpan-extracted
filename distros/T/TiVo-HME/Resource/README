@@ -1,0 +1,27 @@
+TiVo/HME/Resource version 1.x
+==============================
+
+Encapsulates a TiVo HME Resource object.  Resources can be bounds to
+views to be displayed/heard by your TiVo.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Digest::MD5
+TiVo::HME::Application
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Mark Ethan Trostler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,23 @@
+/* Be careful to only edit the *.tmpl file.  It's -*-C-*- source. */
+
+/* Tree node size.  Cannot be set at runtime since field offsets must
+   be compile time for performance.  Should be >= 4. */
+#define TnWIDTH		19
+
+/* Either use real keys or implied index locations. */
+#define TV_KEYD /**/
+
+#define NEW_TN(ret, near)	ret = (TN*) safemalloc(sizeof(TN))
+
+#define TnDATA_T		SV*
+#define TV_PLANT_DAT(d)		*d = newSVsv(*d)
+#define TV_UPROOT_DAT(d)	SvREFCNT_dec(d)
+#define TV_DAT_2STRING(d)	SvPV(d, PL_na)
+
+#define TnKEY_T			char*
+#define TV_KEYCMP(cmp,a,b) \
+	cmp = strcmp(a,b)
+#define TV_PLANT_KEY(k)		k=strdup(k)
+#define TV_UPROOT_KEY(k)	safefree(k)
+
+#include "tv.public"

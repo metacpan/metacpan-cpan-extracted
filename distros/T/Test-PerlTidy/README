@@ -1,0 +1,16 @@
+Test::PerlTidy
+
+To install please follow the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+During the tests the code checks that all the perl files included with
+the distribution are tidy. If you make any changes please remember to
+tidy them.
+
+Any problems let me know: evdb@ecclestoad.co.uk
+
+

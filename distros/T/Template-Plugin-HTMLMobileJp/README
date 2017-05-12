@@ -1,0 +1,23 @@
+NAME
+    Template::Plugin::HTMLMobileJp - HTML::MobileJp plugin for
+    Template-Toolkit
+
+SYNOPSIS
+        [% USE HTMLMobileJp %]
+        [% HTMLMobileJp.gps_a({carrier => 'E', is_gps => 0, callback_url => 'http://example.com/'}) %]
+
+DESCRIPTION
+    Template::Plugin::HTMLMobileJp is a wrapper of HTML::MobileJp.
+
+    You can call all method of HTML::MobileJp.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom@gmail.com>
+
+SEE ALSO
+    Template, HTML::MobileJp
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

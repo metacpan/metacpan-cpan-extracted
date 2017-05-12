@@ -1,0 +1,231 @@
+------------------------------------------------------------------------
+0.1202  2012-12-15      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* RT #81879: hash key randomization after 5.17.5
+
+------------------------------------------------------------------------
+0.1201  2012-03-25      Piotr Roszatycki <dexter@cpan.org>
+
+* Repackaged with newer Module::Builder.
+
+------------------------------------------------------------------------
+0.12    2009-02-12      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* Method "list_tests" returns methods from own class and base classes.
+* Method "tear_down" is called if "set_up" failed too.
+
+------------------------------------------------------------------------
+0.1101  2008-12-30      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* Code was slightly reformatted.
+
+------------------------------------------------------------------------
+0.11    2008-12-16      Piotr Roszatycki <dexter@cpan.org>
+
+New:
+
+* New type of test status "failure" is set if the test unit fails.
+* Old type of test status "error" is set if error was occured in "set_up" or
+  "tear_down" method.
+* Error on "set_up" or "tear_down" doesn't stop whole test runner.
+
+Fixes:
+
+* Fix for tainted mode.
+
+------------------------------------------------------------------------
+0.1003  2008-12-08      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* Stringify eval error explicity in case that exception object doesn't
+  support "eq" operator.
+  
+* Does not use Symbol::stash sub.
+
+------------------------------------------------------------------------
+0.1002  2008-10-13      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* Propagate die in the right way.
+
+* Do not put empty line before "not ok" message.
+
+------------------------------------------------------------------------
+0.1001  2008-10-08      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* Fixed some warnings.
+
+------------------------------------------------------------------------
+0.10    2008-10-08      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* The failures are more verbose and dumps stack trace via Carp::confess.
+
+------------------------------------------------------------------------
+0.0904  2008-04-15      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Be more paranoid in taint mode.
+
+------------------------------------------------------------------------
+0.0903  2008-04-12      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Rebuild README with Pod::Readme.
+
+------------------------------------------------------------------------
+0.0902  2008-04-12      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Fix incompatibility with Perl v5.6.
+
+------------------------------------------------------------------------
+0.0901  2008-02-05      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Drop accidental dependency on Exception::Base.
+
+------------------------------------------------------------------------
+0.09    2008-02-05      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Fix Windows compatibility problem in Test::Unit::TestSuite::suite.
+  RT #32936.
+* Fix inconsistent type for $self->{units} in Test::Unit::TestSuite::new.
+  RT #32934, #32935.
+
+Changes:
+
+* Support for tainted mode.
+
+------------------------------------------------------------------------
+0.08    2008-01-10      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* set_up and tear_down are called before/after each test unit, not just
+  before/after test suite. Closes: #32185.
+
+------------------------------------------------------------------------
+0.0701  2007-10-30      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Check if expected value is defined for assert_matches and
+  assert_not_matches.
+* Fix test scripts after cpan-testers report.
+
+Changes:
+
+* Updated POD documentation.
+
+------------------------------------------------------------------------
+0.07    2007-10-29      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* Report is printed immediately (non-buffered output): Runner object is
+  passed to Suite object for run method.
+* Warnings are fatal for own test units.
+
+------------------------------------------------------------------------
+0.0601  2007-10-13      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Replace Symbol::fetch_glob with Symbol::stash for Kurila compatibility.
+* Ignore modules which are not based on Test::Unit::TestCase.
+
+------------------------------------------------------------------------
+0.06    2007-10-13      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* Use warnings.
+* Compatibility with Kurila 1.4.
+* New test units for bad suites.
+* Test::Unit::TestRunner prints text statistics.
+* Test::Unit::HarnessUnit outputs TAP stream.
+* Do not test POD errors unless $ENV{PERL_TEST_POD} is true.
+
+------------------------------------------------------------------------
+0.05    2007-10-05      Piotr Roszatycki <dexter@cpan.org>
+
+Changes:
+
+* Print Class::Name::test_sub in TAP output.
+
+Fixes:
+
+* Reformat whitespaces in source code.
+
+------------------------------------------------------------------------
+0.0402  2007-09-27      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Remove test unit which compares numerically hex value.  It works differently
+  on several Perl versions.
+
+------------------------------------------------------------------------
+0.0401  2007-09-23      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Fix incompatibility with 5.006 (Exporter, numerification for "0xF00"
+  string).
+
+------------------------------------------------------------------------
+0.04    2007-09-23      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Redirect error messages to STDERR.
+* Autoflush STDOUT and STDERR.
+* The error messages are prefixed with "# " string.
+
+Changes:
+
+* Switched to Module::Build.
+* Documentation of API.
+* Ported some test units from Test::Unit package.
+* The error messages are more compatible with Test::Unit.
+* Added Test::Unit::TestCase->fail method.
+* Added Test::Unit::TestSuite->name and units accessors.
+
+------------------------------------------------------------------------
+0.03    2007-05-22      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Added "Boolean assertion failed" message on failed assert() check.
+* Removed "undefined value" warning if message is empty.
+
+------------------------------------------------------------------------
+0.02    2007-05-11      Piotr Roszatycki <dexter@cpan.org>
+
+* Fix incompatibility with 5.006.
+* Try to fix syntax error on 5.009.
+
+------------------------------------------------------------------------
+0.01    2007-05-09      Piotr Roszatycki <dexter@cpan.org>
+
+* Development release.
+
+------------------------------------------------------------------------

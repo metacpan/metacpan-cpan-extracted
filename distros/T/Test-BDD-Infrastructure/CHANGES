@@ -1,0 +1,76 @@
+==================================================
+Changes from 2015-09-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.005 at 2016-09-06 15:09:31 +0000
+------------------------------------------
+
+  Change: 2df6387a0bb4ae4bd4ae9fa7c5f221fb9843f86a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-09-06 17:08:35 +0000
+
+    Added new step definitions Logfile, SystemUser 
+
+------------------------------------------
+version 1.004 at 2016-04-12 07:28:39 +0000
+------------------------------------------
+
+  Change: 01524f7fc724b2fefd8ced4596f25c8df7b53c93
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-04-12 09:28:39 +0000
+
+    fix code before strictness in Config.pm 
+
+  Change: 05741ae757090e12665020db9ae87c375d1109a9
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-04-12 09:27:32 +0000
+
+    Merge branch 'master' of
+    https://github.com/benningm/Test-BDD-Infrastructure 
+
+  Change: b2983ff03c63590a5d217e7d3df195265194c10d
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-04-12 09:27:12 +0000
+
+    dont include README.pod in dist 
+
+  Change: 40036e1d2e451902b65791f3bcb33397e1a5171e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 17:04:56 +0000
+
+    write oct(7777) instead of 07777 (perl critic) 
+
+  Change: d51fbed16f49b969f993d8ade7298ecfa5739a8a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 15:50:31 +0000
+
+    try with system perl and dpkg augeas 
+
+  Change: 3fda3dbcc738cfb58bee9cba01e18e4c1b801ee8
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 14:55:35 +0000
+
+    apt-get update and sudo in travis 
+
+  Change: 1888ba84b833ab7e179cf042b580deb44bc2f164
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 10:06:12 +0000
+
+    install libaugeas-dev in travis builds 
+
+  Change: d3e7cd860c209c0880d0533e794c03472f0f36e8
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 09:03:37 +0000
+
+    added minimum perl version 
+
+  Change: f393c4cd9296ec092b0c0e37641520369d87debf
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-07-24 13:03:36 +0000
+
+    use travis CI 
+
+================================================
+Plus 4 releases after 2015-09-07 00:00:00 +0000.
+================================================

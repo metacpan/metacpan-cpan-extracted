@@ -1,0 +1,13 @@
+Changes
+Chump.pm
+MANIFEST
+Makefile.PL
+README
+t/01simple.t 
+t/02border.t 
+t/03nolink.t 
+t/04nourl.t 
+t/05noimage.t 
+t/06target.t 
+t/07nothing.t 
+t/08install.t

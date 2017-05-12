@@ -1,0 +1,48 @@
+0.14 Thu Nov 6 EST 2014
+    - Added set_option.
+
+0.13 Wed Nov 5 2014
+    - Fixed tests : some dictionaries apparently have coördinator 
+
+0.12 Mon Nov 3 2014
+    - Fixes for unicode letters (thanks, Chankey Pathak)
+
+0.11 Fri Jun 24 2011
+    - pod fixes and pod test
+
+0.09  Thu Jun 23 2011
+    - Better tests, use of LANG
+    - Compile time check for at least one speller.
+
+0.08
+    - Allow aspell to be missing
+
+0.07  Wed Sep 15 2010
+    - optional hunspell support
+
+0.06  Tue Sep 14 2010
+    - made deserialization accept non-blessed refs 
+
+0.05  Mon Dec 15 2008
+    - skip some tests when missing English dictionary
+    - added license
+
+0.04  Sun Dec 14 2008
+    - patch by Yanick Champoux with three changes : 
+    - lang option
+    - cached Text::Aspell object
+    - made suggestions() context-aware
+
+0.03  Tue May 3 2005
+    - update regex to include apostrophes
+
+0.02  Thu Nov 4 2004
+    - changed regex for words to [a-zA-Z]+
+    - added ignore_all
+    - added replace_all
+    - added reset
+
+0.01  Mon Nov 1 2004
+	- original version
+
+

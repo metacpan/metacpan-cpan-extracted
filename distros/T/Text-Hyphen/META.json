@@ -1,0 +1,78 @@
+{
+   "abstract" : "determine positions for hyphens inside words",
+   "author" : [
+      "Alex Kapranoff, C<< <kappa at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Hyphen",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Hyphen" : {
+         "file" : "lib/Text/Hyphen.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kappa/Text-Hyphen/issues"
+      },
+      "homepage" : "https://github.com/kappa/Text-Hyphen",
+      "repository" : {
+         "url" : "git://github.com/kappa/Text-Hyphen.git",
+         "web" : "https://github.com/kappa/Text-Hyphen"
+      }
+   },
+   "version" : "0.2",
+   "x_contributors" : [
+      "Alex Kapranoff <kappa@rambler-co.ru>",
+      "Alex Kapranoff <alex@kapranoff.ru>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

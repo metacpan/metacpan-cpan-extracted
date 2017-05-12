@@ -1,0 +1,39 @@
+Text/MessageLibrary version 0.15
+==========================
+
+Text::MessageLibrary creates objects with methods you can call to generate both
+static and dynamic status, error, or other messages. It's particularly useful
+in larger projects, where it can be used to create centralized collections of 
+messages that are easier to maintain and document than string literals
+scattered throughout the code.
+
+Full documentation is provided in the embedded POD.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Requires Carp.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 John Clyman. All Rights Reserved.
+
+This module is released under the Artistic License (see 
+http://www.perl.com/language/misc/Artistic.htmlZ).
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+

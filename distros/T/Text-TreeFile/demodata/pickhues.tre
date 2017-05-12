@@ -1,0 +1,45 @@
+#                                    file: pickhues.tre
+
+m MainWindow           title:'pickhues:  QuickTk Color Picker Demo'
+                         ... ini:$$gl{layermode}='Multiple';
+                         ...     $$gl{labelmode}='Nolabel';
+  mmb Frame            side:top fill:x : relief:raised borderwidth:3
+    mmbf Menubutton    side:left : text:File
+      c Clear          sub:$$w{mc}->delete('all');
+      c 'Dark Cube'    sub:map { my $i=15-$_;
+                              ...layer($gl,$i);print "layer: $i\n"; } (5..15);
+      c 'Light Cube'   sub:map { layer($gl,$_);print "layer: $_\n"; } (5..15);
+      -
+      c Quit           sub:exit;
+    mmbl Menubutton    side:left : text:Layers
+      c black(c)       sub:c_layer $gl,0;
+      c lyr01          sub:c_layer $gl,1;
+      c lyr02          sub:c_layer $gl,2;
+      c lyr03(c)       sub:c_layer $gl,3;
+      c lyr04          sub:c_layer $gl,4;
+      c lyr05          sub:c_layer $gl,5;
+      -
+      c lyr06(c)       sub:c_layer $gl,6;
+      c lyr07          sub:c_layer $gl,7;
+      c lyr08          sub:c_layer $gl,8;
+      c lyr09(c)       sub:c_layer $gl,9;
+      -
+      c lyr10          sub:c_layer $gl,10;
+      c lyr11          sub:c_layer $gl,11;
+      c lyr12(c)       sub:c_layer $gl,12;
+      c lyr13          sub:c_layer $gl,13;
+      c lyr14          sub:c_layer $gl,14;
+      c white(c)       sub:c_layer $gl,15;
+    mmbo Button        side:left : relief:flat textvariable:\$$gl{layermode}
+                         ... sub:$$gl{layermode}=
+                         ...   ($$gl{layermode} ne 'Multiple')?'Multiple':'Single';
+    mmbo Button        side:left : relief:flat textvariable:\$$gl{labelmode}
+                         ... sub:$$gl{labelmode}=
+                         ...     ($$gl{labelmode} ne 'Nolabel')?'Nolabel':'Label';
+                         ...   clabel $gl;
+    mmbe Menubutton    side:left : text:Edit
+    mmbh Menubutton    side:right : text:Help
+      c About          sub:my ($wid)=@_;my $out=$$w{mcs};my $tf=$$w{tf};
+                         ... print "About called\n";
+  mc Canvas            side:top fill:both expand:1 : width:640 height:480
+    mcs createRectangle nopack : 70: 0: 570: 480: tags:screen

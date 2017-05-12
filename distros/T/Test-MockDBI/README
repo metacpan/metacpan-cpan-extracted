@@ -1,0 +1,87 @@
+Test/MockDBI version 0.70
+=========================
+
+Test::MockDBI lets you test DBI interfaces by mocking-up the
+DBI interface with Test::MockObject in any way you choose.
+Standard output of the resulting program can then be
+examined as to whether your program correctly uses the DBI.
+Mock DBI interfaces like Test::MockDBI improve upon DBI
+tracing facilities like DBI::trace() and DBD::Mock, as you
+can modify the behavior of the DBI at the interface in
+(nearly) any way you choose.
+
+There are 3 basic ways to change DBI behavior with
+Test::MockDBI:
+
+    bad_method
+        Force a DBI method to fail when the current SQL
+        matches the supplied pattern.
+
+    bad_param
+        Force a DBI method to fail when the current input
+        parameters match the supplied pattern.
+
+    set retval
+        Force specific return values when the current SQL
+        matches the supplied pattern.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Makefile.PL will ask you for DBI configuration parameters,
+placing them into ./DBI.cfg.  This DBI.cfg is not removed
+even by "make distclean", which should make repeated testing
+a little easier.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  Test::MockObject
+  Scalar::Util
+  Carp
+  Test::Warn
+  Test::More
+
+Test::MockDBI has been tested with Test::MockObject
+v0.14 on Linux.
+
+WHY CHOOSE Test::MockDBI OVER DBI::trace() OR DBD::Mock?
+
+Test::MockDBI has a major advantage over DBI::trace()
+or DBD::Mock -- Test::MockDBI lets you change how the
+mocked DBI functions behave, along with modifying
+what data is returned by the mocked DBI functions.
+These changes and modifications can be made specific
+to particular SQL statement patterns.
+
+This ability to modify DBI function behavior and
+DBI-returned data makes it easier to test code that has
+different branches for different DBI behaviors -- you
+can test that a failure within DBI or returned DB data
+that is different than normal is processed correctly by
+your module or program.  If you are taking over a large
+code base, Test::MockDBI will help in understanding the
+code by allowing you to safely check how the code behaves
+under different database conditions without modifying any
+databases (production or otherwise).
+
+AUTHOR
+
+Mark Leighton Fisher, mark-fisher@fisherscreek.com.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Fisher's Creek Consulting, LLC.
+Copyright (C) 2004-2005 DeepData, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

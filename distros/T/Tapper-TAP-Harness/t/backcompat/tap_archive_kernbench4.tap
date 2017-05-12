@@ -1,0 +1,322 @@
+1..1
+# Artemis-suite-version: 0.020016
+# Artemis-starttime-test-program: 20091229T225300
+# Artemis-machine-name: localhost
+# Artemis-suite-name: KernBench
+# Artemis-reportgroup-arbitrary: 
+# Artemis-section: artemis-meta-information
+# Artemis-reportgroup-testrun: 3126
+ok 1 - artemis-meta-data
+1..1
+# Artemis-Section: stats-proc-interrupts-before
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 116478
+    CPU1: 0
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 4
+    CPU1: 4
+    linetail: IO-APIC-edge  i8042
+  6:
+    CPU0: 1
+    CPU1: 1
+    linetail: IO-APIC-edge  floppy
+  7:
+    CPU0: 0
+    CPU1: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 1
+    CPU1: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    CPU1: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 55
+    CPU1: 25
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 1839
+    CPU1: 1839
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 23
+    CPU1: 24
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  177:
+    CPU0: 352
+    CPU1: 350
+    linetail: IO-APIC-level  xen-platform-pci
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    linetail:
+  LOC:
+    CPU0: 111486
+    CPU1: 111426
+    linetail:
+  ERR:
+    CPU0: 0
+    CPU1:
+    linetail:
+  MIS:
+    CPU0: 0
+    CPU1:
+    linetail:
+  ...
+1..1
+# Artemis-section: kernel-untar
+ok 1 - untar of kernel succeeded.
+1..1
+# Artemis-section: kernbench-untar
+ok 1 - untar of testsuite succeeded.
+1..1
+# Artemis-section: kernbench-testrun
+ok 1 - Run took ntp: 1488s, system: 1487s
+1..1
+ok 1 - KernBench
+  ---
+  Tue Dec 29 23:00:26 CET 2009
+  2.6.18-92.1.10.el5
+  Average Optimal load -j 8 Run (std deviation):
+  Elapsed Time 217.206 (10.9687)
+  User Time 313.746 (14.1243)
+  System Time 111.514 (9.93677)
+  Percent CPU 195.2 (1.92354)
+  Context Switches 27946 (332.146)
+  Sleeps 24493.8 (514.825)
+  ...
+1..1
+# Artemis-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Tue Dec 29 23:00:26 CET 2009
+  2.6.18-92.1.10.el5
+  Average Optimal load -j 8 Run (std deviation):
+  Elapsed Time 217.206 (10.9687)
+  User Time 313.746 (14.1243)
+  System Time 111.514 (9.93677)
+  Percent CPU 195.2 (1.92354)
+  Context Switches 27946 (332.146)
+  Sleeps 24493.8 (514.825)
+  ...
+1..1
+# Artemis-section: kernbench-testrun
+ok 1 - Run took ntp: 1480s, system: 1479s
+1..1
+ok 1 - KernBench
+  ---
+  Tue Dec 29 23:25:28 CET 2009
+  2.6.18-92.1.10.el5
+  Average Optimal load -j 8 Run (std deviation):
+  Elapsed Time 213.772 (4.27727)
+  User Time 314.316 (4.6094)
+  System Time 107.688 (4.3261)
+  Percent CPU 196.8 (0.447214)
+  Context Switches 28137.4 (203.036)
+  Sleeps 24591.8 (127.58)
+  ...
+1..1
+# Artemis-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Tue Dec 29 23:25:28 CET 2009
+  2.6.18-92.1.10.el5
+  Average Optimal load -j 8 Run (std deviation):
+  Elapsed Time 213.772 (4.27727)
+  User Time 314.316 (4.6094)
+  System Time 107.688 (4.3261)
+  Percent CPU 196.8 (0.447214)
+  Context Switches 28137.4 (203.036)
+  Sleeps 24591.8 (127.58)
+  ...
+1..1
+# Artemis-section: kernbench-testrun
+ok 1 - Run took ntp: 1493s, system: 1492s
+1..1
+ok 1 - KernBench
+  ---
+  Tue Dec 29 23:50:17 CET 2009
+  2.6.18-92.1.10.el5
+  Average Optimal load -j 8 Run (std deviation):
+  Elapsed Time 211.556 (1.76797)
+  User Time 304.896 (3.59491)
+  System Time 108.14 (1.77532)
+  Percent CPU 194.6 (1.51658)
+  Context Switches 28028.4 (244.081)
+  Sleeps 24329 (268.935)
+  ...
+1..2
+# Artemis-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Tue Dec 29 23:50:17 CET 2009
+  2.6.18-92.1.10.el5
+  Average Optimal load -j 8 Run (std deviation):
+  Elapsed Time 211.556 (1.76797)
+  User Time 304.896 (3.59491)
+  System Time 108.14 (1.77532)
+  Percent CPU 194.6 (1.51658)
+  Context Switches 28028.4 (244.081)
+  Sleeps 24329 (268.935)
+  ...
+1..8
+# Artemis-Section: dmesg
+ok 1 - dmesg parsed (307 lines)
+not ok 2 -  # TODO okay for us
+# Memory for crash kernel (0x0 to 0x0) notwithin permissible range
+not ok 3 - 
+# disabling kdump
+not ok 4 - apm # TODO okay for us
+# disabled - APM is not SMP safe.
+not ok 5 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 6 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 7 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 8 - ibm_acpi # TODO okay for us
+# ec object not found
+# false positves ignored: 14
+1..15
+# Artemis-Section: var_log_messages
+ok 1 - /var/log/messages parsed (318 lines)
+not ok 2 -  # TODO okay for us
+# Memory for crash kernel (0x0 to 0x0) notwithin permissible range
+not ok 3 - 
+# disabling kdump
+not ok 4 - apm # TODO okay for us
+# disabled - APM is not SMP safe.
+not ok 5 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 6 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 7 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 8 - ibm_acpi # TODO okay for us
+# ec object not found
+not ok 9 - kernel # TODO okay for us
+# Dec 29 22:52:05 Memory for crash kernel (0x0 to 0x0) notwithin permissible range
+not ok 10 - 05 rhel5u2 kernel
+# disabling kdump
+not ok 11 - kernel # TODO okay for us
+# Dec 29 22:52:20 apm: disabled - APM is not SMP safe.
+not ok 12 - kernel # TODO okay for us
+# Dec 29 22:52:32 register_blkdev: cannot get major 3 for ide
+not ok 13 - kernel # TODO okay for us
+# Dec 29 22:52:32 register_blkdev: cannot get major 3 for ide
+not ok 14 - kernel # TODO okay for us
+# Dec 29 22:52:32 register_blkdev: cannot get major 3 for ide
+not ok 15 - kernel # TODO okay for us
+# Dec 29 22:52:35 ibm_acpi: ec object not found
+# false positves ignored: 14
+1..1
+# Artemis-Section: stats-proc-interrupts-after
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 4695517
+    CPU1: 0
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 4
+    CPU1: 4
+    linetail: IO-APIC-edge  i8042
+  6:
+    CPU0: 1
+    CPU1: 1
+    linetail: IO-APIC-edge  floppy
+  7:
+    CPU0: 0
+    CPU1: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 1
+    CPU1: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    CPU1: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 55
+    CPU1: 25
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 34454
+    CPU1: 34437
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 23
+    CPU1: 24
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  177:
+    CPU0: 9779
+    CPU1: 9795
+    linetail: IO-APIC-level  xen-platform-pci
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    linetail:
+  LOC:
+    CPU0: 4690557
+    CPU1: 4690496
+    linetail:
+  ERR:
+    CPU0: 0
+    CPU1:
+    linetail:
+  MIS:
+    CPU0: 0
+    CPU1:
+    linetail:
+  ...
+1..1
+# Artemis-section: clocksource
+ok 1 - Clocksource
+  ---
+  acpi_pm
+  ...
+1..1
+# Artemis-section: uptime
+ok 1 - got uptime
+  ---
+  uptime: 4692s
+  idletime: 551s
+  ...
+1..2
+# Artemis-section: kernbench-results-2
+ok 1 - KernBench
+  ---
+  Fri Oct  7 12:47:54 CEST 2011
+  2.6.9-89.ELhugemem
+  Average Optimal load -j 8 Run (std deviation):
+  Elapsed Time 596.242 (6.49765)
+  User Time 816.746 (8.70691)
+  System Time 357.476 (0.664853)
+  Percent CPU 196.6 (0.894427)
+  Context Switches 38078.6 (494.467)
+  Sleeps 25499.6 (195.756)
+  ...
+ok 2 - KernBench
+  ---
+  Wed Sep 15 07:48:24 EDT 2010
+  2.6.36-rc4-9c03f162-simnow+
+  Average Half load -j 3 Run (std deviation):
+  Elapsed Time 0 (0)
+  User Time 0 (0)
+  System Time 0 (0)
+  Percent CPU 0 (0)
+  Context Switches 0 (0)
+  Sleeps 2 (0)
+  ...
+1..1
+# Artemis-section: clocksource-2
+ok 1 - Clocksource
+  ---
+  Cannot determine clocksource
+  ...

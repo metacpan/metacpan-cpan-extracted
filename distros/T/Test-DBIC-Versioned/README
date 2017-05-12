@@ -1,0 +1,71 @@
+Test-DBIC-Versioned
+
+NAME
+    Test::DBIC::Versioned - Test upgrade scripts for
+    DBIx::Class::Schema::Versioned
+
+SYNOPSIS
+      use Test::More;
+      use Test::DBIC::Versioned;
+      use Test::DBIC::Versioned::MySQL;
+
+      my $old_DB = Test::DBIC::Versioned::MySQL->new();
+      my $new_DB = Test::DBIC::Versioned::MySQL->new();
+
+      is $old_DB->run_sql('sql/DB-21-MySQL.sql'), '',
+        'No errors deploying at version 21';
+      is $new_DB->run_sql('sql/DB-22-MySQL.sql'), '',
+        'No errors deploying at version 22';
+
+      my $errors = $old_DB->run_sql('upgrades/RL-DB-21-22-MySQL.sql';
+      is $errors, '', 'No errors upgrading from 21 to 22';
+
+      is_deeply $old_DB->describe_tables, $new_DB->describe_tables,
+        'Upgrade of version 21 to 22 matches a fresh deploy of 22';
+
+      done_testing();
+
+DESCRIPTION
+    This module provides helpful a wrapper for testing the correctness of
+    DBIx::Class::Schema::Versioned upgrade scripts. Currently only MySQL is
+    supported.
+
+METHODS
+  new
+    A standard Moose constructor. Takes no arguments. A temporary database
+    of the appropriate type will be lazy built when needed.
+
+  run_sql
+    Runs some SQL commands on the database. Normally this will be the
+    deployment script to set-up the database schema, or an upgrade script to
+    modify the schema.
+
+    The commands can be in a file, file-handle, or be supplied in a scalar
+    reference.
+
+    Returns any errors as a string, or an empty string if there where none.
+
+  describe_tables
+    Probes all tables in the database and returns a data structure
+    describing the schema (columns and indexes) on each table. The structure
+    is intended to be passed to is_deeply for comparison.
+
+FIELDS
+  dsn
+    The database dsn string. It can be used to connect to the database.
+
+  dbh
+    The database dbh handle. It contains a connection to the database.
+
+  test_db
+    The test database. The details of it are dependent on the database
+    specific subclass. For example in Test::DBIC::Versioned::MySQL it is an
+    instance of Test::mysqld.
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 "spudsoup"
+
+This program is released under the Artistic License version 2.0
+

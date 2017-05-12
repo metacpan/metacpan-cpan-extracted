@@ -1,0 +1,52 @@
+Revision history for Test-DNS
+
+0.13    03.09.11
+        - only run tests if got $ENV{'AUTHOR_TESTING'} because I'm sick
+        of releases like 0.10 - 0.13.
+
+0.12    24.08.11
+        - updating dns records information, no functional changes
+
+0.11    29.06.11
+        - updating dns records information, no functional changes
+
+0.10    18.05.11
+        - updating dns records information, no functional changes
+
+0.09    15.03.11
+        - moving to dzil
+        - updating dns records information, no functional changes
+
+0.08    12.06.10
+        - adding is_txt
+        - switched to dzil, hope it works out
+
+0.07    29.01.10
+        - forgot another test to change to perl.com
+
+0.06    26.01.10
+        - cleanups for tests: changing NS test to perl.com, removing old ones
+
+0.05    18.01.10
+        - added trigger to nameservers attribute to set the nameserver of the
+          resolver object while working
+
+0.04    16.01.10
+        - adding hash option, documentation and testing for it as well
+        - adding buffing up POD
+
+0.03    14.01.10
+        - using perl.org instead of google.com for cname tests
+
+0.02    12.01.10
+        - adding is_mx method
+        - adding is_cname method
+        - adding warnings attribute
+        - adding follow_cname attribute
+        - started using Set::Object, added dependency
+        - adding more docs
+        - making get_method private (_get_method)
+
+0.01    11.01.10
+        First version!
+

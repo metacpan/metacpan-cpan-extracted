@@ -1,0 +1,35 @@
+Revision history for Text::TEI::Collate
+
+2.1	 Thu 20 Oct 2011
+* Turned all warnings and 'die' statements into Throwable exceptions.
+* Began to integrate CollateX use cases
+* Fixed several bugs to do with variant matching, begin-end marking, etc.
+* Fixed a bug when parsing TEI files without pretty-printing.
+* Added CSV export option.
+* Added explicit language module support.
+* Allowed for TEI source files that declare no namespace. (RT #71711)
+* Converted main collation module to use Moose.
+
+2.0	 Mon 25 Jul 2011
+
+* Rewrote core diff algorithm - collation is now a lot slower but
+  rather more accurate, or at least it should be.
+* Fixed use of default canonizer / comparator for manuscript words
+* Fixed testing dependency on Graph::Easy, for real this time. (RT #69639)
+
+1.2	 Mon 18 Jul 2011
+
+* Fixed testing dependency on Graph::Easy
+* Fixed SVG generation where dot string too long for perl / dot to handle
+
+1.1	 Sat 16 Jul 2011
+
+And here I thought I would never return to this software.
+
+* Changed API to separate manuscript / word source parsing from word
+  alignment.  See Text::TEI::Collate docs for new usage.
+* Converted ::Manuscript and ::Word modules to use Moose.
+* Added output methods for alignment display as JSON, TEI XML,
+  GraphML, and SVG.
+* Added default word comparator / normalizer from Unicode::Normalize.
+* Added some more tests.

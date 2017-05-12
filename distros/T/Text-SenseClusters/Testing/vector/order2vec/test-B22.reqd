@@ -1,0 +1,2 @@
+ERROR(order2vec.pl):
+        Line1 in WORDVEC file <test-B22.wordvec> should show #rows #cols #nnz.

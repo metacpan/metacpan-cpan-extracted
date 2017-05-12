@@ -1,0 +1,8 @@
+Revision history for Tickit-Widget-Choice
+
+0.02    [BUGFIXES]
+         * Set WIDGET_PEN_FROM_STYLE to keep Tickit 0.50 happy (RT103397)
+
+0.01    2014/12/02 00:04:11
+        First version, released on an unsuspecting world.
+

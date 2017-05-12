@@ -1,0 +1,19 @@
+20130427  Sat Apr 27 19:52:10 PDT 2013
+  Test Fix
+  * Fix t/no_plan_but_tests.t for bug fix in Test::More 0.98_05.
+
+
+20130414  Sun Apr 14 11:14:00 BST 2013
+  Bug Fix
+  * Guarantee that TEST_RANDOM_SEED will display as an
+    integer and not scientific notation
+  * Adapt for Test::Builder 1.5 alpha 6.
+
+
+20100119.173355  Tue Jan 19 17:33:55 PST 2010
+  Bug Fix
+  * Improved the seed used by Test::Random
+
+
+20100119  Tue Jan 19 17:18:03 PST 2010
+  * Initial release made generic from Test::Sims

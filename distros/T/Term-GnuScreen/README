@@ -1,0 +1,126 @@
+NAME
+    Term::GnuScreen - control GNU screen
+
+VERSION
+    Version 0.05
+
+SYNOPSIS
+    Term::GnuScreen provides a simple interface to control a GNU screen
+    session via its command line interface.
+
+        use Term::GnuScreen;
+
+        my $screen = Term::GnuScreen->new();
+        $screen->windowlist;
+        $screen->hardcopy('/tmp/my_hardcopy');
+
+CONSTRUCTION
+    session
+        Sets the name of the screen session to which commands are send. If
+        you also set "create" to a true value, this will become the new name
+        of your screen session. See *-S* option for screen for a further
+        discussion of this argument.
+
+    create
+        If create is set to a true value, a new screen session is created
+        and detached automatically. If you do not provide a session name via
+        *session*, this module generates one by calling ""term_gnuscreen" .
+        $$ . int(rand(10000))". Settings this value after object creation
+        has no effect at the moment.
+
+        The newly created session will not be terminated after program
+        execution.
+
+    window
+        Preselects a window. Defaults to 0. See *-p* option of screen for a
+        further discussion of this argument.
+
+    executable
+        Return or set the screen binary to call. Defaults to the binary
+        found by "File::Which::which("screen")".
+
+    debugging
+        If debugging is set to a true value, all commands are printed to
+        STDERR.
+
+METHODS
+    Term::GnuScreen implements all commands as stated in the texinfo
+    document shipped with GNU screen. Whenever you call a command it is send
+    via GNU screens -X parameter to the first running screen session and its
+    current window. You can change session and window with the according
+    object methods and construction parameters. Unless listed here, all
+    remaining arguments are handed over to screen without further
+    modification.
+
+    The five commands bind, kill, meta, chdir, exec and umask are prefixed
+    with a *s* (sbind, smeta, schdir, sexec and sumask) to distinguish them
+    from the built-ins with the same name.
+
+  call_screen
+    This command is the working horse of Term::GnuScreen. It simply builds
+    the command line to call and execute it.
+
+  send_command
+    Calls call_screen with the *-X* and all supplied parameters. Most
+    functions are implemented by this method.
+
+  hardcopy
+    Write a hardcopy of the current window to a temporary file and returns
+    the filename unless the filename is supplied as first argument. If the
+    supplied filename is not absolute, the file is written relative to
+    "hardcopydir".
+
+ERROR HANDLING
+    Simple dies in case screen -X did not return with a return value of
+    zero. Either $!, STDERR or STDOUT (which seems to be more helpful most
+    times) are provided as error message for further investigation.
+
+AUTHOR
+    Mario Domgoergen <mdom@cpan.org>
+
+BUGS AND LIMITATIONS
+    It seems not to be possible to question a specific screen session about
+    its state, so this module basically just sends commands to a screen
+    session without knowing if the command succeeded or was even
+    syntactically correct.
+
+    This module needs a lot more testing.
+
+    Please report any bugs or feature requests to "bug-term-gnuscreen at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Term-GnuScreen>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Term::GnuScreen
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Term-GnuScreen>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Term-GnuScreen>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Term-GnuScreen>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Term-GnuScreen>
+
+ACKNOWLEDGEMENTS
+    screen
+
+COPYRIGHT & LICENSE
+    Copyright 2013 Mario Domgoergen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

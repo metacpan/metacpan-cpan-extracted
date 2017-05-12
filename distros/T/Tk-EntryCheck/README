@@ -1,0 +1,55 @@
+Tk-EntryCheck version 0.04
+==========================
+
+Since I sometimes develop Perl/Tk-Applications, I often need to check
+which characters and how many of them can be inserted into a Textfield
+called Tk-Entry. Well, you can do everything this module contains with
+the Tk::Entry-options -validate and -validatecmd, but this way it is
+easier by just providing one or two very simple options, e.g.
+
+  use Tk;
+  use Tk::EntryCheck;
+
+  my $mw = MainWindow->new();
+
+  my $entry = $mw->EntryCheck(
+
+    # some standard Entry-Options which are forwarded to Tk::Entry
+    -width => 20,
+
+    # and now the new options
+    -maxlength => 10,     # will accept a maximum of 10 chars as content
+    -pattern   => qr/\d/, # will accept only \d, nothing else
+  )
+  ->pack();
+
+  MainLoop();
+
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Perl >= 5.5
+  Tk >= 8.0
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Martin Fabiani
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

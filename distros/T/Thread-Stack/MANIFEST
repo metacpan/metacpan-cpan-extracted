@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/Thread-Stack.t
+lib/Thread/Stack.pm

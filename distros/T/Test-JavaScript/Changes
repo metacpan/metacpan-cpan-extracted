@@ -1,0 +1,18 @@
+0.6 2007-02-11
+    * Add Changes
+    * Fix pod problems
+    * Add missing Changes, Copyright, Author, License
+
+0.5 2007-02-09
+    * Don't clobber Test-Simple functions
+	- renamed ok to js_ok, etc...
+
+0.4 2006-06-25
+    * Made $js and $Test our variables 
+    * Added diag() from javascript
+
+0.3 2006-05-11
+    * Added missing information
+
+0.2 2006-05-11
+    * Initial release

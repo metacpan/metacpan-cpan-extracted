@@ -1,0 +1,14 @@
+Test::Wait is a tool for use in conjunction with test libraries such as Test::More for manual testing purposes.
+
+It was initially designed for use in Selenium based tests however it can be used in any test script.
+
+Test::Wait provides functions that allow you to pause test scripts at any given point, allowing you to inspect the test output
+in a browser or terminal OR use the test-created data to run manual tests against an application.
+
+Calls to Test::Wait functions are ignored if running under prove or make test.
+
+For more information please see the module itself:
+
+$ perldoc lib/Test/Wait.pm
+
+Ben Hare <ben@benhare.com>, 2014

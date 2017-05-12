@@ -1,0 +1,4 @@
+meta_blah: {% blah %}
+blah: [% blah %]
+meta_bar: {% bar %}
+bar: [% bar %]

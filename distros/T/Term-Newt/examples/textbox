@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+
+# $Id: textbox,v 1.1 1998/11/09 02:29:51 daniel Exp daniel $
+
+use strict;
+use ExtUtils::testlib;
+use Term::Newt;
+
+my $n = Term::Newt->new;
+
+$n->init;
+$n->cls;
+
+my $message = <<EOF;
+This is a pretty long message. It will be displayed
+in a newt textbox, and illustrates how to construct
+a textbox from arbitrary text which may not have
+very good line breaks.
+
+
+Notice how literal \\n characters are respected, and
+may be used to force line breaks and blank lines.
+EOF
+
+my $text = $n->textbox_reflowed(1,1,$message,30,5,5,0);
+my $num_lines = $n->textbox_get_num_lines($text);
+
+my $ref = 0;
+my $form = $n->form(\$ref,'', 0);
+my $button = $n->button(12, $num_lines + 2, "Ok");
+
+$n->open_window(10, 5, 37, $num_lines + 7, "Textboxes");
+$n->form_add_components($form, $text, $button);
+
+$n->run_form($form);
+$n->form_destroy($form);
+$n->finished;

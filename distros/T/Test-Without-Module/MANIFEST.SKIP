@@ -1,0 +1,14 @@
+^.cvsignore
+^.lwpcookies
+^.releaserc
+^blib/
+^Test-Without-Module-.*
+CVS/
+^pm_to_blib
+.tar.gz$
+.old$
+^Makefile$
+^Releases/
+^MANIFEST.bak$
+^MYMETA.*
+^.git

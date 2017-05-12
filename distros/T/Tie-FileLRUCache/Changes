@@ -1,0 +1,21 @@
+1.05 2005.09.13  - Changes to pod tests to make them more CPANTS friendly.
+                   No functional changes.
+
+1.04 2005.09.13  - Removed use of lexical warnings pragma to fix compatibility
+                   with Perl 5.005.
+
+                   Fixed minor typographical errors in documentation.
+
+1.03 2005.09.10 - Changed build test to handle difference in treatment of hashes
+                  in scalar context between 5.6.x and 5.8.x versions of Perl that
+                  caused a test failure under Perl 5.6.x.
+
+1.02 2005.09.08 - Added build tests. Major code cleanup. Improved platform portability.
+                  Added and documented 'cache_dir', 'keep_last' and 'number_of_entries'
+                  methods. Added Module::Build support.
+
+
+
+1.01 1999.12.09 - Added detainting in internal cache maintaining
+                  functions to evade Taint's tainting
+                  of filenames read via readdir().

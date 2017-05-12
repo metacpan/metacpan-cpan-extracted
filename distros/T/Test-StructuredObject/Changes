@@ -1,0 +1,63 @@
+﻿Revision history for Test-StructuredObject
+
+0.01000010 2013-02-05T07:55:44Z
+ - Maintenance Release
+
+ [Dependencies::Changed / build_requires]
+ - Module::Build 0.3601 -> 0.4003
+
+ [Dependencies::Changed / configure_requires]
+ - Module::Build 0.3601 -> 0.4003
+
+ [Dependencies::Changed / runtime_requires]
+ - Test::More 0 -> 0.98
+
+ [Dependencies::Changed / test_requires]
+ - Test::More 0.88 -> 0.98
+
+ [Dependencies::New / develop_recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.3.0
+
+ [Dependencies::New / develop_requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite  0
+ - Pod::Coverage::TrustPod  0
+ - Test::CPAN::Meta  0
+ - Test::Pod  1.41
+ - Test::Pod::Coverage	1.08
+ - version  0.9901
+
+ [Dependencies::New / develop_suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.0
+
+ [Dependencies::New / runtime_requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Dependencies::Removed / test_requires]
+ - Test::Perl::Critic
+
+ [Documentation]
+ - Changelog normalised to CPAN::Changes form
+ - Copyright updated to 2013
+ - License file reindented
+ - FSF Address updated
+
+ [Internals]
+ - All packages declare $AUTHORITY
+ - $VERSION assignment moved out of BEGIN
+
+ [Meta]
+ - All Github URLs pointing to https
+ - bug tracker set to github issues
+ - declare x_authority
+
+ [Packaging]
+ - update to @Author::KENTNL
+ - ship .perltidyrc
+ - rename perlcriticrc -> perlcritic.rc
+ - remove developer tests from t/
+
+0.01000009 2010-07-23T06:35:25Z
+ - First version.
+

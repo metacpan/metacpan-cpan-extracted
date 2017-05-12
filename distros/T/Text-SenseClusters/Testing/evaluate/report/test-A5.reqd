@@ -1,0 +1,14 @@
+            S3	      S0	      S1#	      S2#	   TOTAL	
+  C0:        5	       2	       3	       4	      14	(45.16)
+  C1:        3	       5	       4	       5	      17	(54.84)
+ TOTAL       8	       7	       7	       9	      31
+         (25.81)   (22.58)   (22.58)   (29.03)
+Precision = 32.26(10/31)
+Recall = 32.26(10/31+0)
+F-Measure = 32.26
+
+Legend of Sense Tags
+S0 = S1
+S1 = S2
+S2 = S3
+S3 = S4

@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Test::FIT - A FIT Test Framework for Perl</title>
+<link rev="made" href="mailto:ingy@macingy.nonet" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#setup">SETUP</a></li>
+	<ul>
+
+		<li><a href="#creating_a_fit_directory">Creating a FIT directory</a></li>
+		<li><a href="#installing_the_example_code">Installing the example code</a></li>
+		<li><a href="#apache_configuration">Apache Configuration</a></li>
+		<li><a href="#trying_it_out">Trying it out</a></li>
+	</ul>
+
+	<li><a href="#the_test_document">The Test Document</a></li>
+	<li><a href="#creating_fixture_modules">Creating Fixture Modules</a></li>
+	<li><a href="#the_cgi_program">The CGI program</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs_&_deficiencies">BUGS &amp; DEFICIENCIES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_note">COPYRIGHT NOTE</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Test::FIT - A FIT Test Framework for Perl</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    <a href="http://fit.c2.com">http://fit.c2.com</a></pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>FIT stands for ``Framework for Interactive Testing''. It is a testing
+methodology invented by Ward Cunningham, and is fully described at
+<a href="http://fit.c2.com.">http://fit.c2.com.</a></p>
+<p>Test::FIT is a Perl implementation of this methodology. It provides a
+web based test harness that lets you run FIT test pages against Test
+Fixture Classes which you write as simple Perl modules. The Fixture
+modules are generally simple to write because they inherit functionality
+from Test::FIT::Fixture.</p>
+<p>
+</p>
+<hr />
+<h1><a name="setup">SETUP</a></h1>
+<p>Test::FIT requires a web server. For the purposes of this explanation,
+I'll assume you want to install your FIT tests in <code>/usr/local/fit</code> and
+that you are using the Apache web server. We'll also assume you are
+running on a Unix variant operating system.</p>
+<p>
+</p>
+<h2><a name="creating_a_fit_directory">Creating a FIT directory</a></h2>
+<p>To make the FIT web directory, do this:</p>
+<pre>
+    mkdir /usr/local/fit</pre>
+<p>You can put your various FIT test suites into various subdirectories
+under this directory. For simplicity, FIT-Test comes with an example FIT
+test directory. We'll install this as:</p>
+<pre>
+    /usr/local/fit/example/</pre>
+<p>
+</p>
+<h2><a name="installing_the_example_code">Installing the example code</a></h2>
+<p>After installing Test-FIT follow these steps:</p>
+<pre>
+    # You should have already done the first two steps :)
+    # tar xvzf Test-FIT-#.##.tar.gz
+    # cd Test-FIT-#.##
+    cp -r example /usr/local/fit
+    cd /usr/local/fit/example
+    mv MathFixture.pm.xxx MathFixture.pm
+    mv SampleFixture.pm.xxx SampleFixture.pm 
+    fit-run.cgi --setup</pre>
+<p>
+</p>
+<h2><a name="apache_configuration">Apache Configuration</a></h2>
+<p>Put this block into your <code>httpd.conf</code> and (re)start your Apache server:</p>
+<pre>
+    Alias /fit/ /usr/local/fit/
+    &lt;Directory /usr/local/fit/&gt;
+        Order allow,deny
+        Allow from all
+        Options ExecCGI FollowSymLinks Indexes
+        AddHandler cgi-script .cgi
+        DirectoryIndex index.html
+    &lt;/Directory&gt;</pre>
+<p>
+</p>
+<h2><a name="trying_it_out">Trying it out</a></h2>
+<p>Point you browser at <a href="http://your-domain-name/fit/example/">http://your-domain-name/fit/example/</a></p>
+<p>You should see the test page with the fixture tables. Click on the
+hyperlink to run the tests. You should see the table cells turn
+different colors depending on the test results.</p>
+<p>If you are having trouble installing the example and just want to see what
+it really should look like, I have the example installed at:</p>
+<p><a href="http://fit.freepan.org/Test-FIT/example/">http://fit.freepan.org/Test-FIT/example/</a></p>
+<p>NOTE: I am providing this link as a convenience. I may decide not to run
+      it at some point. This link may not exist anymore by the time you
+      read this. Please do NOT email me if it doesn't work!</p>
+<p>
+</p>
+<hr />
+<h1><a name="the_test_document">The Test Document</a></h1>
+<p>FIT Tests are specified in HTML tables. You can create them with any
+program that can produce HTML with tables (including, of course, a plain
+text editor). I personally use the Mozilla Composer wysiwyg editor that
+comes for free with Mozilla. You can also create Test Documents in
+spreadsheet applications that export to HTML.</p>
+<p>Possibly, the simplest way to do this is to use wiki software that
+allows you to create simple html tables. I plan on writing something to
+do this soon. Ward Cunningham has also set up <a href="http://fit.c2.com">http://fit.c2.com</a> to do
+this, but it is currently a password protected site.</p>
+<p>There is plenty of information on how to set up Test Documents at
+<a href="http://fit.c2.com">http://fit.c2.com</a>.</p>
+<p>The file &lt;example/index.html&gt; is a sample Test Document to get you started.</p>
+<p>
+</p>
+<hr />
+<h1><a name="creating_fixture_modules">Creating Fixture Modules</a></h1>
+<p>A Fixture is just FIT terminology for a Perl class (or module). The
+Fixture is designed to perform certain tests. The Fixture must be a
+subclass of Test::FIT::Fixture.</p>
+<p>Generally a Fixture will contain a method for each named test in a Test
+Document table.</p>
+<p>Here is a sample HTML table (in a wiki/ascii representation):</p>
+<pre>
+    == My Simple Math Test ==
+    
+    | MathFixture          |
+    | x  | y  | sum | diff |
+    | 1  | 2  | 3   | -1   |
+    | -8 | 12 | 4   | -4   |
+    
+    Click [[fit-run.cgi here]] to run the tests.</pre>
+<p>The first row names the Fixture to be used. In this case,
+<code>MathFixture</code>. The second row lists all of the methods that will be
+called. The implementation of <code>MathFixture.pm</code> might look like this:</p>
+<pre>
+    package MathFixture;
+    use base 'Test::FIT::ColumnFixture';
+    use Test::FIT;
+ 
+    attribute('x');
+    attribute('y');
+ 
+    sub sum {
+        my $self = shift;
+        $self-&gt;eq_num($self-&gt;x + $self-&gt;y);
+    }
+ 
+    sub diff {
+        my $self = shift;
+        $self-&gt;eq_num($self-&gt;x - $self-&gt;y);
+    }
+ 
+    1;</pre>
+<p>If you were to run this test, you would see that three of the table
+cells would turn green (passed), and one would turn red (failed). The
+cells under <code>x</code> and <code>y</code> would remain white, because they are just
+data values.</p>
+<p>
+</p>
+<hr />
+<h1><a name="the_cgi_program">The CGI program</a></h1>
+<p>When you installed Test::FIT you also installed a small perl script
+called <a href="#item_fit%2drun%2ecgi"><code>fit-run.cgi</code></a>. This script should be in your Perl <code>sitebin</code>
+directory, which should be in your path.</p>
+<p>Generally you will symlink to this script from whatever test directory you are using. The easy way is:</p>
+<pre>
+    cd /usr/local/fit/mytest
+    fit-run.cgi --setup</pre>
+<p>The <code>--setup</code> option will create the symlink for you. If this doesn't
+work properly just do:</p>
+<pre>
+    cd /usr/local/fit/mytest
+    ln -s `which fit-run.cgi` fit-run.cgi</pre>
+<p>All you need to do to run this CGI is to link to it from your HTML Test
+Document. <a href="#item_fit%2drun%2ecgi"><code>fit-run.cgi</code></a> will look at the <code>referer</code> and read in the
+Test Document, process it against the fixtures, and markup the original
+HTML with colors and possibly error messages.</p>
+<p>Simply brilliant, Mr. Cunningham!</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>See Also:</p>
+<ul>
+<li><strong><a name="item_fit%2drun%2ecgi">fit-run.cgi</a></strong><br />
+</li>
+The cgi program for running fit tests.
+<p></p>
+<li><strong><a name="item_test%3a%3afit%3a%3afixture">Test::FIT::Fixture</a></strong><br />
+</li>
+The base class for all Fixture classes. This documentation explains all
+of the methods that you inherit into your Fixture Class.
+<p></p>
+<li><strong><a name="item_test%3a%3afit%3a%3acolumnfixture">Test::FIT::ColumnFixture</a></strong><br />
+</li>
+The base class for your column oriented test fixtures. Inherits from
+Text::FIT::Fixture. This documentation will show you how to create a
+Column Fixture Class.
+<p></p>
+<li><strong><a name="item_http%3a%2f%2ffit%2ec2%2ecom"><a href="http://fit.c2.com">http://fit.c2.com</a></a></strong><br />
+</li>
+The FIT homepage.
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="bugs_&_deficiencies">BUGS &amp; DEFICIENCIES</a></h1>
+<p>This is the maiden voyage of Test::FIT. Use it. Have fun. Look at the
+pretty colors. But EXPECT CHANGE. FIT itself is still being designed.
+THINGS WILL CHANGE.</p>
+<p>This version of Test::FIT only has a ColumnFixture. The RowFixture and
+ActionFixture will be added soon.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Brian Ingerson &lt;<a href="mailto:ingy@cpan.org">ingy@cpan.org</a>&gt;</p>
+<p>The FIT architecture was invented by Ward Cunningham &lt;<a href="mailto:ward@c2.com">ward@c2.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_note">COPYRIGHT NOTE</a></h1>
+<p>The FIT project requests that all implementations be licensed under the
+GPL version 2 or higher. Test-FIT respects that request by shipping
+under ``The same terms as Perl itself'' which includes your choice of
+either the Artistic or GPL licenses.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2003. Brian Ingerson. All rights reserved.</p>
+<p>This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</p>
+<p>See <a href="http://www.gnu.org/licenses/gpl.html">http://www.gnu.org/licenses/gpl.html</a></p>
+<p>See <a href="http://www.perl.com/perl/misc/Artistic.html">http://www.perl.com/perl/misc/Artistic.html</a></p>
+
+</body>
+
+</html>

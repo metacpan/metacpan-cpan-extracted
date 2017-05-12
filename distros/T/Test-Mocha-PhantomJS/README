@@ -1,0 +1,56 @@
+NAME
+    Test::Mocha::PhantomJS - test your server code using mocha
+
+SYNOPSIS
+      use Test::Mocha::PhantomJS;
+
+      test_mocha_phantomjs(
+          server => sub {
+              my $port = shift;
+              # start server at $port that returns the test code
+              # for mocha-phantomjs
+              ...
+          },
+      );
+
+DESCRIPTION
+    Test::Mocha::PhantomJS is a wrapper of mocha-phantomjs. By using the
+    module, it is easy to automatically test your server-side logic simply
+    by writing the tests written using mocha.
+
+USAGE
+  test_mocha_phantomjs(%args)
+    This is the only function exposed by the module. When called, the
+    function invokes the "server" callback, and when the server starts up,
+    invokes mocha-phantomjs to run the test scripts. Note that the function
+    never returns.
+
+    The arguments accepted by the function is as follows.
+
+   server (mandatory)
+    A callback to start the server. The callback should start a server
+    running at the specilied port (notified as the only argument to the
+    callback) that should keep on running until a SIGTERM is being received.
+
+   build_uri (optional)
+    A callback for building the URL that is opened by mocha-phantomjs. If
+    omitted, mocha-phantomjs will open http://127.0.0.1:$port/index.html.
+
+   max_wait (optional)
+    Will wait for at most given seconds before checking port. See also:
+    Net::EmptyPort. The default value is 10 (seconds).
+
+   auto_skip (optional)
+    A boolean value indicating if the test should be skipped in case
+    mocha-phantomjs cannot be found. The default value is false (i.e. do not
+    skip).
+
+AUTHOR
+    Kazuho Oku
+
+    Copyright (c) 2013 DeNA Co., Ltd.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

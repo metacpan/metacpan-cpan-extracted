@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Template/Plugin/PerlTidy.pm
+t/00basic.t
+t/01html_output.t
+t/02quiet.t

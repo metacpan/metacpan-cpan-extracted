@@ -1,0 +1,84 @@
+NAME
+    Template::Flute::Style::CSS - CSS parser class for Template::Flute
+
+VERSION
+    Version 0.0081
+
+CONSTRUCTOR
+  new
+    Create Template::Flute::Style::CSS object with the following parameters:
+
+    template
+        Template::Flute::HTML object.
+
+    prepend_directory
+        Directory which is prepended to the CSS path when the template
+        doesn't reside in a file.
+
+METHODS
+  properties
+    Builds CSS properties based on the following parameters:
+
+    selector
+        CSS selector.
+
+    class
+        CSS class.
+
+    id  CSS id.
+
+    tag HTML tag.
+
+    inherit
+        CSS properties to inherit from.
+
+  descendant_properties
+    Builds descendant CSS properties based on the following parameters:
+
+    parent
+        Parent properties.
+
+    class
+        CSS class.
+
+    id  CSS id.
+
+    tag HTML tag.
+
+AUTHOR
+    Stefan Hornburg (Racke), <racke@linuxia.de>
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-template-flute-style-css at rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Flute-Style-CSS.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Template::Flute::Style::CSS
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Flute-Style-CSS
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Template-Flute-Style-CSS
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Template-Flute-Style-CSS
+
+    * Search CPAN
+        http://search.cpan.org/dist/Template-Flute-Style-CSS/
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2012 Stefan Hornburg (Racke) <racke@linuxia.de>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

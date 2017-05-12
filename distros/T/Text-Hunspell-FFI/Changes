@@ -1,0 +1,8 @@
+Revision history for Text-Hunspell-FFI
+
+0.02      2016-04-25 07:02:20 -0400
+  - remove spanish files in t folder in tarball to save space
+  - remove dependency on Test::Stream
+
+0.01      2015-12-29 08:35:20 -0500
+  - initial version

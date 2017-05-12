@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tie-NumericRange.t
+lib/Tie/NumericRange.pm
+META.yml                                 Module meta-data (added by MakeMaker)

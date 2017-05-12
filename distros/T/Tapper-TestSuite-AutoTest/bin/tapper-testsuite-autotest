@@ -1,0 +1,56 @@
+#! /usr/bin/perl
+# PODNAME: tapper-testsuite-autotest
+# ABSTRACT: cmdline frontend to Tapper::TestSuite::AutoTest
+
+use Log::Log4perl;
+
+my $string = "
+log4perl.rootLogger                               = DEBUG, root
+log4perl.appender.root                            = Log::Log4perl::Appender::Screen
+log4perl.appender.root.layout                     = SimpleLayout";
+Log::Log4perl->init(\$string);
+
+use Tapper::TestSuite::AutoTest;
+
+my $wrapper = Tapper::TestSuite::AutoTest->new();
+my $args = $wrapper->parse_args();
+$args = $wrapper->install($args);
+$args = $wrapper->run($args);
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+tapper-testsuite-autotest - cmdline frontend to Tapper::TestSuite::AutoTest
+
+=head1 SYNOPSIS
+
+Run an autotest subtest and report results to Tapper:
+
+  $ tapper-testsuite-autotest -t hackbench
+
+Run multiple autotest subtests and report results to Tapper:
+
+  $ tapper-testsuite-autotest -t hackbench -t hwclock
+
+For more information see the Perl module
+L<Tapper::TestSuite::AutoTest|Tapper::TestSuite::AutoTest>.
+
+=head1 AUTHOR
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut
+

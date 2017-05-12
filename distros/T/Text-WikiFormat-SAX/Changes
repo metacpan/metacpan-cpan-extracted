@@ -1,0 +1,11 @@
+Text::WikiFormat::SAX Changes
+=============================
+
+0.03
+    - Fixed loop causing 100% cpu usage and crash
+
+0.02
+    - Fixed line parsing
+    
+0.01
+    - Initial Release

@@ -1,0 +1,13 @@
+Revision history for Template-Plugin-Filter-VisualTruncate
+
+0.04    2007-09-12 02:32:00
+	fixed and added test utf8 flag problem in Template::Plugin::Filter::VisualTruncate::UTF8::trim().
+
+0.03    2007-08-29 15:45:00
+	add Encode-2.23 to PREREQ_PM.
+
+0.02    2007/05/13 23:30:23 JST +0900
+        fix MANIFEST.
+
+0.01    2007/05/13 17:04:02 JST +0900
+        First version.

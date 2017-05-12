@@ -1,0 +1,33 @@
+1.01  Mon Jun 23 17:57:48 2014
+    - Fixed the tests failing with updated Client
+
+1.00  Thu Jun 12 23:20:54 2014
+    - Released as version 1.00 along with the major refactor of the whole
+      RPC::ExtDirect suite of modules.
+    - Added lots of documentation
+    - Dropped Clone dependency
+    - Tested and deemed compatible with Perl 5.6.2
+
+0.24  Wed Mar 29 18:46:33 2013
+    - Bumped RPC::ExtDirect::Client dependency to 0.22; no code changes.
+
+0.23  Wed Mar 27 22:40:31 2013
+    - Added get_extdirect_api subroutine. Bumped RPC::ExtDirect::Client
+      version dependency to 0.21.
+
+0.22  Sat Nov 10 23:25:14 2012
+    - Forgot to include two test classes in MANIFEST. No code changes.
+
+0.21  Sat Nov 10 23:03:29 2012
+    - It is now possible to specify custom server and client classes
+      instead of default RPC::ExtDirect::Server and RPC::ExtDirect::Client,
+      respectively.
+    - Added some more documentation.
+
+0.2   Sat Nov 10 20:26:51 2012
+    - Updated to support cookies handling in RPC::ExtDirect::Client
+    - Bumped RPC::ExtDirect::Client dependency to 0.2
+
+0.01  Thu Aug  2 21:27:07 2012
+	- Initial CPAN release
+

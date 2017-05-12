@@ -1,0 +1,8 @@
+Revision history for Tie::Cache::Autoupdater
+
+0.10
+        First version, released on an unsuspecting world.
+0.20
+        Added new attribute - "clone". Delete unnecessary warn message when key doesn't exist
+0.21
+        Bugfix. Check data type before returned dclone reference

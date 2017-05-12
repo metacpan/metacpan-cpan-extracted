@@ -1,0 +1,92 @@
+Newsgroups: perl.daily-build.reports
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:7636
+Return-Path: <ek9635@sbc.com>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 43225 invoked by uid 1005); 14 Aug 2003 15:17:15 -0000
+Delivered-To: perlmail-smokers-reports@onion.perl.org
+Received: (qmail 43222 invoked by uid 76); 14 Aug 2003 15:17:15 -0000
+Received: from qmailr@one.develooper.com (HELO ran-out.mx.develooper.com) (64.81.84.115) by onion.perl.org (qpsmtpd/0.26) with SMTP; Thu, 14 Aug 2003 08:17:15 -0700
+Received: (qmail 5484 invoked by uid 225); 14 Aug 2003 15:17:14 -0000
+Delivered-To: smokers-reports@perl.org
+Received: (qmail 5479 invoked by uid 507); 14 Aug 2003 15:17:13 -0000
+Received-SPF: unknown (domain of sender ek9635@sbc.com does not designate mailers: NOERROR)
+Received: from sbcsmtp6.sbc.com (HELO sbcsmtp6.sbc.com) (144.160.20.36) by one.develooper.com (qpsmtpd/0.27-dev) with SMTP; Thu, 14 Aug 2003 08:17:10 -0700
+Received: from sbc.com (localhost [127.0.0.1])	by sbcsmtp6.sbc.com (8.12.5/8.12.5) with ESMTP id h7EFH7fQ006292	for <smokers-reports@perl.org>; Thu, 14 Aug 2003 11:17:07 -0400 (EDT)
+Received: from misout7msghub01.ITServices.sbc.com (misout7msghub01.itservices.sbc.com [144.155.106.21])	by sbcsmtp6.sbc.com (8.12.5/8.12.5) with ESMTP id h7EFH3EM006281	for <smokers-reports@perl.org>; Thu, 14 Aug 2003 11:17:04 -0400 (EDT)
+Received: by misout7msghub01.itservices.sbc.com with Internet Mail Service (5.5.2654.52)	id <Q70C5Q0C>; Thu, 14 Aug 2003 11:17:03 -0400
+Message-ID: <B0A5D86FE2A73B41AD597E8A7DB08C633CD761@misout7msgusr05.itservices.sbc.com>
+To: smokers-reports@perl.org
+Subject: Smoke [5.8.1] 18667 FAIL(F) hpux 11.00 (PA-RISC2.0)
+Date: Thu, 14 Aug 2003 11:16:52 -0400
+MIME-Version: 1.0
+X-Mailer: Internet Mail Service (5.5.2654.52)
+Content-Type: text/plain
+X-SMTPD: qpsmtpd/0.27-dev, http://develooper.com/code/qpsmtpd/
+X-Spam-Check-By: one.develooper.com
+X-Spam-Status: No, hits=1.9 required=7.0 tests=CARRIAGE_RETURNS,EXCHANGE_SERVER,FROM_ENDS_IN_NUMS,GAPPY_TEXT,SPAM_PHRASE_00_01 version=2.44
+X-SMTPD: qpsmtpd/0.26, http://develooper.com/code/qpsmtpd/
+Approved: news@nntp.perl.org
+
+Automated smoke report for 5.8.1 patch 18667 on hpux - 11.00 (PA-RISC2.0)
+(chd4) using gcc version 3.2
+Report by Test::Smoke v1.18 (perl 5.6.1) [5 hours 55 minutes]
+
+O = OK  F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown or N/A
+c = Configure, m = make, M = make (after miniperl), t = make test-prep
+
+   18667     Configuration (common) -Dcc=gcc -Dprefix=/appl/cpc/perl/smoke
+------------
+----------------------------------------------------------------
+F - F -      -Uuseperlio
+F F F F
+F - F -      -Uuseshrplib -Uuseperlio
+F F F F      -Uuseshrplib
+F F F F      -Duseithreads
+F F F F      -Duseithreads -Uuseshrplib
+| | | +----- PERLIO = perlio -DDEBUGGING
+| | +------- PERLIO = stdio  -DDEBUGGING
+| +--------- PERLIO = perlio
++----------- PERLIO = stdio
+
+Summary: FAIL(F)
+
+
+Failures:
+
+hpux        [stdio       ]-Dcc=gcc -Dprefix=/appl/cpc/perl/smoke
+              (cont) -Uuseperlio
+hpux        [stdio       ]-DDEBUGGING -Dcc=gcc
+              (cont) -Dprefix=/appl/cpc/perl/smoke -Uuseperlio
+    ../lib/Net/Ping/t/450_service.tFAILED 9 18
+    ../lib/Net/Ping/t/510_ping_udp.tFAILED 2
+
+hpux        [stdio/perlio]-Dcc=gcc -Dprefix=/appl/cpc/perl/smoke
+hpux        [stdio/perlio]-DDEBUGGING -Dcc=gcc
+              (cont) -Dprefix=/appl/cpc/perl/smoke
+hpux        [stdio       ]-Dcc=gcc -Dprefix=/appl/cpc/perl/smoke
+              (cont) -Uuseshrplib -Uuseperlio
+hpux        [stdio       ]-DDEBUGGING -Dcc=gcc
+              (cont) -Dprefix=/appl/cpc/perl/smoke -Uuseshrplib
+              (cont) -Uuseperlio
+    ../lib/Net/Ping/t/450_service.tFAILED 9 18
+    ../lib/Net/Ping/t/510_ping_udp.tFAILED 2
+
+hpux        [stdio/perlio]-Dcc=gcc -Dprefix=/appl/cpc/perl/smoke
+              (cont) -Uuseshrplib
+hpux        [stdio/perlio]-DDEBUGGING -Dcc=gcc
+              (cont) -Dprefix=/appl/cpc/perl/smoke -Uuseshrplib
+hpux        [stdio/perlio]-Dcc=gcc -Dprefix=/appl/cpc/perl/smoke
+              (cont) -Duseithreads
+hpux        [stdio/perlio]-DDEBUGGING -Dcc=gcc
+              (cont) -Dprefix=/appl/cpc/perl/smoke -Duseithreads
+hpux        [stdio/perlio]-Dcc=gcc -Dprefix=/appl/cpc/perl/smoke
+              (cont) -Duseithreads -Uuseshrplib
+hpux        [stdio/perlio]-DDEBUGGING -Dcc=gcc
+              (cont) -Dprefix=/appl/cpc/perl/smoke -Duseithreads
+              (cont) -Uuseshrplib
+    ../lib/Net/Ping/t/450_service.tFAILED 9 18
+    ../lib/Net/Ping/t/510_ping_udp.tFAILED 2

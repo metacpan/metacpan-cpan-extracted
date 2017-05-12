@@ -1,0 +1,20 @@
+Revision history for Test-Deep-DateTime-RFC3339
+
+0.04  2014-07-29 12:53:28 PDT
+        - Gracefully handle formatting $got when it's not a parseable string
+        - Better tests of failure diagnostics
+
+0.03  2014-07-24 15:17:12 PDT
+        - Minor POD fix for link
+
+0.02  2014-07-24 15:14:22 PDT
+        [INCOMPATIBLE CHANGE (not that anyone is using this yet...)]
+
+        - Tolerance strings are now of the style 5s, 1h 5m, 2d, etc instead of
+          HH:MM:SS.  This replaces DateTime::Format::Duration with
+          DateTime::Format::Duration::DurationString since the former's implementation is
+          insane and not as useful anyway.  The latter does bring in
+          Any::Moose, but I'm hoping to submit a patching switching to Moo soon.
+
+0.01  2014-07-24 14:37:03 PDT
+        - Initial release

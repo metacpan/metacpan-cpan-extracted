@@ -1,0 +1,7 @@
+TODO list for Perl module Tie::Hash::Array
+
+* Pin down and document the inner life of these modules
+  in order to make them subclassable.
+
+Please <mailto:perl@sluka.de> if you have further
+feature requests concerning these modules!

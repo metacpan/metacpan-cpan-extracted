@@ -1,0 +1,30 @@
+---
+abstract: 'generate a test database for App::CPANIDX'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '6.42'
+  File::Spec: '0'
+  File::Temp: '0.22'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '6.42'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-App-CPANIDX-Database
+requires:
+  App::CPANIDX::Tables: '0.18'
+  DBD::SQLite: '1.29'
+  DBI: '1.609'
+  perl: v5.8.0
+resources:
+  homepage: https://github.com/bingos/test-app-cpanidx-database
+  repository: https://github.com/bingos/test-app-cpanidx-database.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.70'

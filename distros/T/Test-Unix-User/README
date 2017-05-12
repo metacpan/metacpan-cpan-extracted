@@ -1,0 +1,137 @@
+NAME
+    Test::Unix::User - Test::Builder based tests for Unix users and home
+    directories
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+        use Test::Unix::User tests => 2;
+
+        user_ok({ name => 'nik', uid => 1000, ... },
+                "Verify nik's account");
+
+        homedir_ok({ name => 'nik', perm => 0755, ... },
+                   "Verify nik's home directory");
+
+    Test::Unix::User automatically exports "user_ok()" and "homedir_ok()" to
+    make it easier to test whether or not the Unix users and home
+    directories on the system have been correctly configured.
+
+    Test::Unix::User uses Test::Builder, so plays nicely with Test::Simple,
+    Test::More, and other Test::Builder based modules.
+
+FUNCTIONS
+  user_ok($spec, [ $test_name ]);
+    user_ok() tests that an account exists that matches the given
+    specification.
+
+    The specification is a hashref that consists of one or more keys. Keys
+    are taken from the User::pwent module, and are "name", "passwd", "uid",
+    "gid", "change", "age", "quota", "comment", "class", "gecos", "dir",
+    "shell", and "expire". Some of these may not be supported on your
+    platform. See User::pwent for more details.
+
+    Each value associated with a key is the value that that entry is
+    supposed to have.
+
+    Only the "name" key is mandatory, the others are optional. If they are
+    not present in the specification then they are not checked.
+
+    The $test_name is optional. If it is not present then a sensible one is
+    generated following the form
+
+        Checking user '$user' ($key, $key, $key, ...)
+
+  homedir_ok($spec, [ $test_name ]);
+    "homedir_ok()" checks that the home directory for a given user exists
+    and matches the specification.
+
+    The specification is a hashref that consists of one or more keys. Valid
+    keys are "name", "uid", "gid", "owner", "group", and "perm".
+
+    The "name" key is mandatory, the other keys are optional.
+
+    The $test_name is optional. If it is not present then a sensible one is
+    generated following the form.
+
+        Home directory for user '$user' ($key, $key, $key, ...)
+
+    Use "uid" when you want to check the numeric user id assigned to the
+    directory, irrespective of the user name that is assigned to that uid.
+    Use "owner" when you are interested in the name of the owner, without
+    being concerned about the numeric UID. Use both of these together to
+    ensure that the UID and the owner name match.
+
+    "gid" is to "group" as "uid" is to "owner".
+
+EXAMPLES
+    Verify that an account exists
+
+        user_ok({ name => 'nik' }, "'nik' exists as a user");
+
+    Verify that the account exists, that it has a given UID, and that the
+    home directory and shell match. Omit the test name, rely on the default.
+
+        user_ok({ name => 'nik', uid => 1001, dir => '/home/nik', 
+                  shell => '/bin/sh');
+
+    Check that the home directory for 'nik' exists. Use an automatically
+    generated test name.
+
+        homedir_ok({ name => 'nik' });
+
+    Test that nik's home directory is owned by the 'nik' user, without
+    worrying what UID is assigned to that user.
+
+        homedir_ok({ name => 'nik', owner => 'nik' });
+
+    Ensure that nik's home directory is owned by uid 1000, and that uid 1000
+    maps back to the 'nik' user
+
+        homedir_ok({ name => 'nik', uid => 1000, owner => 'nik');
+
+    Check the permissions on the home directory, and supply our own test
+    name.
+
+        homedir_ok({ name => 'nik', perm => 0755 },
+                   "Nik's home directory is correctly set");
+
+SEE ALSO
+    Test::Simple, Test::Builder, User::pwent.
+
+AUTHOR
+    Nik Clayton, "nik@FreeBSD.org"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-test-unix-user@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Unix-User>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2005 Nik Clayton All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+     1. Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+    THE POSSIBILITY OF SUCH DAMAGE.
+

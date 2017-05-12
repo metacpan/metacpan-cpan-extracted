@@ -1,0 +1,26 @@
+Most patches in this directory are preserved only to simplify merge
+with Illya Vaes (possible) improvements to his port.  Even patches
+related to the latest release may be already applied if they fix
+the OS2-related files from this distribution.
+
+Apply only those patches which relate to the current distribution (see
+below) and only if it is marked as not applied yet.
+
+With 800.012 you will need diff_Tk800.012_newer only.
+
+Patch similar to
+	gnupatch -p1 < ...../..../diff_tk_os2_800_02a
+in directory Tk800.05.
+
+File					Last needed	Applied to files here
+~~~~					~~~~~~~~~~~     ~~~~~~~~~~~~~~~~~~~~~
+diff_Tk800.012_newer			800.012		n/a
+diff_font				n/a		Yes
+diff_keys				n/a		Yes
+diff_tk_fileevent_423_0			402.003		n/a
+diff_tk_os2_800.012_ess			800.012		Yes
+diff_tk_os2_800_02a			800.005		n/a
+diff_tk_os2build_8011			800.011		n/a
+diff_tkos2_800_05a			n/a		Yes
+diff_tkos2_fileevent_menu_80011		800.011		n/a
+patch_ptk_generic			n/a		Yes

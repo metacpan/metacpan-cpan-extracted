@@ -1,0 +1,6 @@
+Build.PL
+lib/Text/Numbers/100.pm
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

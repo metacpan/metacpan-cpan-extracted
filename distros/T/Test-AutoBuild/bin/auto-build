@@ -1,0 +1,606 @@
+#!/usr/bin/perl -w
+
+# Test-AutoBuild: Continuous, unattended, automated software builds
+#
+# By Daniel P. Berrange <dan@berrange.com>
+# Copyright (C) 2002-2006 Daniel P. Berrange
+#
+# Based on Rolling builds version 2.0
+#
+#   By Richard W.M. Jones <rich@annexia.org>
+#     http://annexia.org/freeware/rollingbuild/
+
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+# $Id$
+
+use strict;
+use warnings;
+
+use Carp qw(confess cluck);
+use Data::Dumper;
+use File::Spec;
+use Getopt::Long;
+use Date::Manip;
+use Test::AutoBuild;
+use Test::AutoBuild::ErrorReport;
+
+my $config_file = File::Spec->catfile($ENV{HOME}, "auto-build.conf");
+my $verbose = 0;
+my $debug = 0;
+my $help = 0;
+my $timestamp = time;
+
+# Handle command line arguments
+if (!GetOptions ('config=s' => \$config_file,
+		 'timestamp=s' => \$timestamp,
+		 'help+' => \$help,
+		 'debug+' => \$debug,
+		 'verbose+' => \$verbose) || $help) {
+    &show_help($help ? \*STDOUT : \*STDERR);
+    exit ($help ? 0 : 3);
+}
+
+# If timestamp is not an integer, then assume its a textual
+# date representation & convert it into a timestamp
+if ($timestamp !~ /^\d+$/) {
+    my $date = ParseDate($timestamp);
+    if (!$date) {
+	print STDERR "Cannot parse timestamp string '$timestamp'\n";
+	&show_help(\*STDERR);
+	exit 4;
+    }
+    $timestamp = UnixDate($date, "%s");
+}
+
+# Validate the config file actually exists, and can be read!
+if (!-f $config_file) {
+    print STDERR "Configuration file '$config_file' does not exist\n";
+    &show_help(\*STDERR);
+    exit 4;
+} elsif (!-r _) {
+    print STDERR "Configuration file '$config_file' cannot be read\n";
+    &show_help(\*STDERR);
+    exit 4;
+}
+
+# Hook in some custom signal handlers for doing
+# random useful stuff
+$SIG{__DIE__} = sub { 
+    if (UNIVERSAL::isa($_[0], "Template::Exception")) {
+        die $_[0];
+    } else {
+        die Test::AutoBuild::ErrorReport->new(message => $_[0]);
+    }
+};
+
+if ($verbose) {
+    $SIG{__WARN__} = sub { cluck $@ };
+    $Carp::MaxArgLen = 0; # Unlimited!
+} else {
+    $Carp::MaxArgLen = 300; # Defaults to 64 which is lame with long filenames
+}
+$SIG{USR1} = sub { print STDERR Carp::longmess("Got SIG-USR1, generating stack trace"); };
+
+# Finally run the build
+my $auto_build = Test::AutoBuild->new(config => $config_file,
+				      verbose => $verbose,
+				      debug => $debug);
+# Replace the original handler, so we can pull in $auto_build state
+$SIG{__DIE__} = sub {
+    if (UNIVERSAL::isa($_[0], "Template::Exception")) { 
+        die $_[0]; 
+    } else { 
+        die Test::AutoBuild::ErrorReport->new(message => $_[0], engine => $auto_build);
+    }
+};
+
+# Another handy signal handler
+$SIG{USR2} = sub {
+    print STDERR Carp::longmess("Got SIG-USR2, dumping runtime");
+    print STDERR Dumper($auto_build);
+};
+
+$auto_build->run($timestamp);
+
+if ($auto_build->failed()) {
+    if ($verbose) {
+	print STDOUT "Build failed: ", $auto_build->log, "\n";
+    }
+    exit 1;
+} elsif ($auto_build->aborted()) {
+    my $error = $auto_build->log;
+    print STDERR "\n";
+    print STDERR "A fatal error caused the build engine to abort:\n";
+    print STDERR "\n";
+    print STDERR "  ", $error, "\n";
+    print STDERR "\n";
+    if (UNIVERSAL::isa($error, "Test::AutoBuild::ErrorReport")) {
+	$error = $error->root_cause();
+	my $file = $error->log();
+
+	print STDERR "A full report of the problem has been saved in $file\n";
+	print STDERR "Please attach this file when filing a bug report\n";
+	print STDERR "\n";
+    }
+    exit 2;
+}
+exit 0;
+
+sub show_help {
+    my $fh = shift;
+
+    print $fh <<EOF;
+
+syntax: $0 [OPTION]...
+
+  eg  $0 --config /etc/auto-build.d/auto-build.conf
+
+Options:
+
+  --config=FILE       Path to configuration file
+  --timestamp=DATE    Checkout code version not newer than DATE
+  --verbose           Output verbose progress and error messages
+  --debug             Output debugging messages
+  --help              Display this help message
+
+EOF
+}
+
+=pod
+
+=head1 NAME
+
+auto-build - run automated, unattended software build processes
+
+=head1 SYNOPSIS
+
+# auto-build [OPTION]...
+
+=over 4
+
+=item Run build using latest code currently in source control
+
+ # auto-build --config /etc/auto-build.d/auto-build.conf
+
+=item Run build using code committed prior to 12:30 on Dec 12th 2004
+
+ # auto-build --timestamp '12:30:00 Dec 12th 2004' \
+	      --config /etc/auto-build.d/auto-build.conf
+
+=back
+
+=head1 SUMMARY
+
+C<auto-build> is the command used to execute the Test-AutoBuild
+software build automation framework. It is intended to execute
+a single iteration of the build engine and then quit with its
+exit status providing an indication of the build success / fail
+status (see the C<EXIT STATUS> section later in this manual page).
+To perform a continous automated build this command would be
+launched on a frequent basis from cron. Locking will ensure that
+two instances do not execute concurrently, so it can safely be
+triggered every 5 minutes.
+
+=head1 OPTIONS
+
+The following command line options are valid:
+
+=over 4
+
+=item --config=FILE
+
+Specify an alternative path to the configuration file for the
+build process. If ommitted, will default to looking for the file
+$HOME/auto-build.conf. The configuration data is loaded by the
+L<Config::Record> module, so refer to that module's manual page for
+details of permitted syntax. The file will also be pre-processed
+by the L<Template> module allowing dynamic generation of complex
+configuration files
+
+=item --log4perl=FILE
+
+Specify an alternative file containing configuration settings for
+the L<Log::Log4perl> logging system. If ommitted, log4perl settings
+will be loaded from the master autobuild configuration file.
+
+=item --timestamp=DATE
+
+Specify the timestamp to use when checking code out of the source
+control repositories. For repository modules supporting timestamps
+it is guarenteed that the code checked out will be the latest version
+not newer than this timestamp. If ommitted, the timestamp will default
+to the current timestamp. The argument can be either an plain integer
+specifying number of seconds since the epoch, or any of the text
+representations handled by the L<Date::Manip> module
+
+      'today'
+      '1st thursday in June 1992'
+      '05/10/93'
+      '12:30 Dec 12th 1880'
+      '8:00pm december tenth'
+
+=item --verbose
+
+Increase the verbosity of warning messages and errors. This will
+ensure that if the builder unexpectedly crashes, a complete stack
+trace will be dumped along will full arguments.It will also cause
+the post-processed configuration file to be dumped.
+
+=item --help
+
+Display a summary of the command line help options
+
+=back
+
+=head1 SIGNALS
+
+The build process provides special handlers for a couple of signals
+to assist in debugging problems.
+
+=over 4
+
+=item USR1
+
+When receiving this signal the build process will send a stack
+trace to STDERR, providing an indication of the current task being
+performed. The build process will continue to run after receiving
+and handling this signal.
+
+=item USR2
+
+When receiving this signal the build process will use L<Data::Dumper>
+to dump the entire runtime state of the builder to STDERR. The
+build process will continue to run after receiving and handling this
+signal
+
+=back
+
+=head1 EXIT STATUS
+
+The exit status codes of the build have the following meanings
+
+=over 4
+
+=item 0
+
+The build process completed succesfully with no failures in any
+module
+
+=item 1
+
+The build process failed on one of more modules, but ran through
+to completion of all stages
+
+=item 2
+
+The build process aborted during processing, and did not complete
+execution of all stages.
+
+=item 3
+
+An invalid/unknown command line option was provided
+
+=item 4
+
+The argument to one of the command line options was malformed
+or invalid.
+
+=back
+
+=head1 USER GUIDE
+
+The notes which follow assume the software itself has been installed
+into the /usr hierarchy with all common commands available within the
+default C<$PATH>. Some minor alterations may be neccessary if this is
+not the case.
+
+=head2 HOST SETUP
+
+Before using the build engine a handful of things must be configured
+on the host machine. This shouldn't take more than a few minutes to
+accomplish if the example configurations are followed.
+
+=head3 BUILD AREA CREATION
+
+The first step after software installation is to create an area where
+builds can be performed. The build engine expects that the build area
+be populated with a small set of top level directories. To aid in this
+setup, the command C<auto-build-make-root(1)> can be run passing the
+build area path as a command line parameter. The example configuration
+file expects that the build area is at C</var/lib/builder>, so assuming
+this is the case, run the command:
+
+  # auto-build-make-root /var/lib/builder
+
+NB, if the software was installed from RPM, this directory may have been
+created on your behalf.
+
+=head3 USER ACCOUNT CREATION
+
+It is highly recommended that the build engine be run as an unprivileged
+user. This is primarily intended to protect the host machine against both
+delibrate and accidental flaws in a module's build script. By convention
+the user to run the build as will be called C<builder>. If only a single
+instance of the build engine is to be run on a host, it is convenient to
+make this user's home directory would point to the build area root. So to
+add a user to run the build engine run the command:
+
+  # groupadd builder
+  # useradd -d /var/lib/builder -g builder builder
+  # passwd builder
+
+=head3 WEB STATUS PAGE SETUP
+
+The build engine will generate HTML status pages at the end of every run
+summarizing the status of the build. There are 3 example configuration
+files suitable for use with Apache located in C</etc/auto-build.d/httpd>.
+The standard C<auto-build.conf> file assumes that virtual hosting will be
+used on the web server, with a suitable Apache config being the file
+C<vhost.conf>. Copy it to /etc/httpd/conf.d, and edit it to set the server
+name of your build host. If virtual hosting is not suitable, then the status
+pages can be made to appear at a fixed URL C</builder>, or as a user directory
+under C</~builder>. The sample config files C<aliased.conf> or C<user.conf>
+can be used instead of C<vhost.conf>, although it will also be neccessary to
+edit the C<auto-build.conf> file to change the C<httpPrefix> option.
+
+=head3 AUTOMATION
+
+As mentioned earlier, executing C<auto-build> just runs a single iteration
+of the build engine. To achieve continuous integration, this command should
+be scheduled to run on a periodic (frequent) basis. On UNIX, cron is perfectly
+designed to provide build scheduling, so 3 example crontabs are provided in
+the directory C</etc/auto-build.d/cron>. To run the build engine continous
+24x7, copy the C<continuous.conf> file into C</etc/cron.d>. There are also
+examples for running an hourly, or daily build cycle.
+
+NB. before setting up a scheduled build in cron it is a good idea to run a
+cycle manually to ensure that your installation & configuration is operating
+normally.
+
+=head2 BASIC CONFIGURATION
+
+The following notes describe how to add simple modules to the build engine.
+
+=head3 MODULE CONTROL FILES
+
+To achieve complete independance from the language and tools used for
+a project, the build stage of the autobuild cycle is considered a black
+box. To perform the build, autobuild merely invokes an opaque "control
+file" provided by the developer. This shell script will typically perform
+four tasks - configure, build, install and package. The autobuild will
+capture the standard output and error streams, saving to the modules
+build log files. In common with standard UNIX behaviour, an exit status
+of zero indicates a successful build, while non-zero indicates failure.
+
+By convention, the script should be called C<autobuild.sh> and be placed
+in the top level directory of the module's source. When invoked a number
+of environment variables will be set for use by the control file.
+
+=over 4
+
+=item AUTOBUILD_MODULE
+
+The name of the module which is being built
+
+=item AUTOBUILD_INSTALL_ROOT
+
+The path to a virtual root directory where software should be
+installed. When a module is built, it is guarenteed that the installed
+files from any dependant modules will be present in this directory.
+This enables a module to depend on the output of another module.
+The contents of this directory, however, are not preserved across runs
+of the build.
+
+=item AUTOBUILD_PACKAGE_ROOT
+
+The path to a directory in which a module's build process will create any
+binary packages it generates, for example RPMs, or Debian packages.
+The packages are typically placed into a package type specific
+sub-directory.Consider, for example, a module which generates an RPM, of itself.
+The $AUTOBUILD_PACKAGE_ROOT directory would be used to set the
+'_topdir' macro for the RPM build process
+
+  rpmbuild --define '_topdir $AUTOBUILD_PACKAGE_ROOT/rpm' -ta foo.tar.gz
+
+=item AUTOBUILD_SOURCE_ROOT
+
+The path to the directory in which modules are checked out. This can be
+used in conjunction with $AUTOBUILD_MODULE to identify the root directory
+for the module
+
+=item AUTOBUILD_COUNTER
+
+A counter identifying the current run of the build. Typically this
+will be the number of seconds since the UNIX at the time the current
+build cycle began, but may alternatively be a version control changelist.
+
+=item AUTOBUILD_TIMESTAMP
+
+A counter identifying the timestamp taken at the start of the build
+cycle. When checking out code, all version control systems are synchronized
+to no later than this timestamp. For a given value of $AUTOBUILD_TIMESTAMP
+the source code being built will always be identical, thus this is suitable
+for use as a unique identifier for a build.
+
+=back
+
+The overall goal of the control file is to build the software, run unit
+tests and then install the software into the autobuild install root. The
+location of the latter is given by the C<AUTOBUILD_INSTALL_ROOT>, and
+would typically be used to set the C<prefix> when running C<configure>
+or an equivalent script. The control file should exit when a non-zero
+exit status if an error occurs at any time. An exit status of zero, indicates
+a successful build & install.
+
+For example of creating a script for GNU AutoTools refer to latter part of
+this manual page.
+
+=head3 MODULE CONFIGURATION
+
+=head2 ADVANCED TOPICS
+
+=head3 MODULE DEPENDANCIES
+
+=head3 PUBLISHING UNIT TEST RESULTS
+
+As well as a number of environment variables, the control file is also
+passed a single command line argument. This argument contains the name
+of a file into which unit test results should be stored. There are (currently)
+no requirements on what data format should be used when writing to this
+file, so at its simplest one can just capture the output from a 'make check'
+command. So, taking the control file written earlier, one would add
+
+  test -n "$1" && TEST_RESULTS_FILE=$1 || TEST_RESULTS_FILE=results.log
+  rm -f $TEST_RESULTS_FILE
+
+  make check | tee $TEST_RESULTS_FILE
+
+There are a couple of things to note here. First, if no argument is given
+we default to writing results to a file called C<results.log>. While this
+is not neccessary if running within the build engine, it does make it
+easy for a developer to execute the control file (C<autobuild.sh>) manually.
+Second, rather than just redirecting output into the results file, it is
+piped through the C<tee(1)> command. This simple lets one monitor the progress
+of tests when running the control file manually.
+
+When the HTML status pages are generated for a module, the contest of the
+unit test results log will be made available for download.
+
+=head2 CONTROL FILE EXAMPLES
+
+=head3 A control file using GNU AutoTools (autoconf/automake)
+
+With a few notable exceptions (Perl & Apache), C and C++
+programmers have been increasingly converging on GNU Auto
+Tools for configuring and building their software. As
+with MakeMaker, the key task is to set the installation
+prefix when running the configure script:
+
+  ./configure --prefix=$AUTOBUILD_INSTALL_ROOT
+
+The task of resolving inter-module build dependancies is
+somewhat less well defined. There are a number of approaches
+that may work - some programs may even need a combination of
+all of them!
+
+=head4 Helper scripts (aka pkg-config)
+
+Some libraries install a small shell script to the bin
+directory that programs can use to determine the correct
+compiler and linker flags. For example, the C<pkg-config>
+script can print out the compiler flags required when building
+against most libraries. It is usually just sufficient to set
+the PKG_CONFIG_PATH environment variable to point to the builder
+install root
+
+  PKG_CONFIG_PATH=$AUTOBUILD_INSTALL_ROOT/lib/pkgconfig
+
+=head4 Configure flags
+
+Another common approach to locating pre-requisite libraries
+is for the program's configure script to have command line
+options for specifying include and library search paths. For
+example, when building the Resin Java servlet container, the
+configure script has --with-openssl-lib and --with-openssl-include
+options. Thus when configuring Resin, as well as setting the
+prefix, we'd set these two options:
+
+
+  ./configure --prefix=$AUTOBUILD_INSTALL_ROOT \
+    --with-openssl-lib=$AUTOBUILD_INSTALL_ROOT/lib
+    --with-openssl-include=$AUTOBUILD_INSTALL_ROOT/include
+
+
+An alternative to specifying both library and include search
+paths is to just tell the configure script the installation
+prefix of the library:
+
+  ./configure --prefix=$AUTOBUILD_INSTALL_ROOT \
+    --with-openssl=$AUTOBUILD_INSTALL_ROOT
+
+=head4 Compiler / linker environment variables
+
+If there is no explicit support for specifying the location
+of pre-requisite libraries then the final approach is to try
+setting compiler environment variables. The two important
+ones being <code>CFLAGS</code> and <code>LDFLAGS</code>:
+
+  CFLAGS=-I$AUTOBUILD_INSTALL_ROOT/include
+  LDFLAGS=-L$AUTOBUILD_INSTALL_ROOT/lib
+
+=head3 Complete AutoTools example
+
+  #!/bin/sh
+
+  set -e
+
+  # Pull in config scripts
+  PATH=$AUTOBUILD_INSTALL_ROOT/bin:$PATH
+  export PATH
+
+  # Clean up build area
+  [ -f Makefile ] && make -k maintainer-clean ||:
+
+  # Re-generate autotools scripts
+  autoconf
+  automake -a
+
+  # Configure the build
+  ./configure --prefix=$AUTOBUILD_INSTALL_ROOT \
+    --with-openssl=$AUTOBUILD_INSTALL_ROOT
+
+  # Make & install
+  make
+  make install
+
+  # Create source code dist
+  make dist
+
+
+=head1 AUTHORS
+
+Written by Daniel P. Berrange and Dennis Gregorovic, with
+contributions from Richard W.M. Jones.
+
+=head1 REPORTING BUGS
+
+Report bugs to the bug tracker provided on the GNA! project
+site linked from L<http://www.autobuild.org>.
+
+=head1 LICENSE
+
+Copyright (C) 2002-2006 Daniel P. Berrange, Dennis Gregorovic,
+Red Hat. Refer to individual source files for further details of
+copyright holders.
+
+Parts of this software are derived from Rolling builds version 2.0
+Copyright (C) Richard W.M. Jones <rich@annexia.org>
+
+Test-AutoBuild is distributed under the terms of the GNU GPL v2+.
+This is free software; see the source for copying conditions.  There is
+NO warranty; not even for MERCHANTABILITY or FITNESS FOR  A  PARTICULAR
+PURPOSE.
+
+=head1 SEE ALSO
+
+For configuration information L<auto-build.conf(5)>;
+for setting up a build root L<auto-build-make-root(1)>;
+for developers wishing to extend the build framework L<Test::AutoBuild(3pm)>;
+for further project information C<http://www.autobuild.org>;
+for developer questions C<mailto:testautobuild-devel@gna.org>.
+
+=cut

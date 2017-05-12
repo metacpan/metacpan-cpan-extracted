@@ -1,0 +1,181 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib qw( t/lib blib lib );
+use Test::A8N;
+use Getopt::Long;
+use Pod::Usage;
+use YAML::Syck;
+
+our $config = {};
+my $home = $ENV{HOME};
+my $config_path;
+
+our @allowed_extensions;
+our $verbose;
+our $version = 0;
+our $help = 0;
+our $list = 0;
+our $fixture_base;
+our $file_root;
+our $test_id;
+our @tags = ();
+GetOptions(
+    'version'          => \$version,
+    'v|verbose+'       => \$verbose,
+    'help'             => \$help,
+    'list'             => \$list,
+    'b|fixture_base=s' => \$fixture_base,
+    'r|file_root=s'    => \$file_root,
+    'config=s'         => \$config_path,
+    'tag=s'            => \@tags,
+    'extension=s'      => \@allowed_extensions,
+    'id=s'             => \$test_id,
+) or usage();
+usage() if $help;
+version() if $version;
+
+if (defined($config_path) and !-f $config_path) {
+    warn "Can't find specified config file \"$config_path\"\n";
+    usage();
+}
+$config_path ||= glob("$home/.a8rc");
+if (defined($config_path) and -r $config_path) {
+    $config = LoadFile($config_path);
+}
+
+if ($config->{fixture_root}) {
+    lib->import($config->{fixture_root});
+}
+@tags = split(/,/, join(',', @tags));
+our @exclude_tags = map  { $_ =~ /^!(.*)/ }
+                    grep { $_ =~ /^!/ }
+                    @tags;
+our @include_tags = grep { $_ !~ /^!/ }
+                    @tags;
+
+$config->{allowed_extensions} = \@allowed_extensions if @allowed_extensions;
+$config->{fixture_base}       = $fixture_base if defined $fixture_base;
+$config->{file_root}          = $file_root if defined $file_root;
+$config->{verbose}            = $verbose if defined $verbose;
+$config->{filenames}          = \@ARGV if @ARGV;
+$config->{testcase_id}        = $test_id if defined $test_id;
+$config->{tags} = {
+    include => \@include_tags,
+    exclude => \@exclude_tags,
+};
+
+my $a8n = Test::A8N->new({ config => $config });
+if ($list) {
+    my @cases = map { @{ $_->filtered_cases($test_id) } }
+                @{ $a8n->files };
+    foreach my $case (@cases) {
+        print $case->filename . " => " . $case->id . "\n";
+    }
+    exit;
+}
+$a8n->run_tests();
+
+sub usage {
+    pod2usage();
+}
+
+sub version {
+    print "a8it version " . $Test::A8N::VERSION . "\n";
+    exit 2;
+}
+
+__END__
+
+=head1 NAME
+
+a8it - Story-test testcase script automation runner
+
+=head1 SYNOPSIS
+
+ a8it [-c <config>] [-b <base fixture class>] [-r <test root>] [<file>...]
+
+ Use `perldoc a8it' for more help documentation.
+
+=head1 DESCRIPTION
+
+a8it is the command-line utility for L<Test::A8N>, which allows you to run automated story test cases to perform system and live-site automation checks for
+quality assurance and test purposes.
+
+This utility can be run in a number of fashions, each targeted at your specific use
+
+=head1 OPTIONS
+
+=over 4
+
+=item -c | --config E<lt>filenameE<gt>
+
+The filename where your automation configuration data is stored.  Defaults to F<~/.a8rc>.
+
+=item -b | --fixture_base E<lt>baseE<gt>
+
+The Perl base class to use for your test case fixtures
+
+=item -r | --file_root E<lt>pathE<gt>
+
+The path or directory where your test cases live under.
+
+=item -t | --tag E<lt>tagE<gt>
+
+The name of a tag that you wish to search for to limit which test cases you run.  You
+can specify this command multiple times to indicate multiple tags, or you can separate
+them by commas.  For instance:
+
+    a8it -t smoke -t email
+    a8it -t smoke,email
+
+Additionally, if a tag begins with a bang (!) then it is considered a tag exclusion.  In
+this case, only cases that do not contain the tag will be run.  For example:
+
+    a8it -t smoke -t !manual
+
+will run all smoke tests that do not have the "manual" tag.
+
+=item -i | --id E<lt>testcase id<gt>
+
+If you wish to run a single testcase within a test file, you can specify its ID on this argument, and only tests with that ID in the test file will be run.
+If multiple files are specified, it will only search in the first filename for this ID.
+
+=item -e | --extension E<lt>extensionE<gt>
+
+This permits you to customize which extension, or extensions, you wish to run within the C<file_root>.  It defaults to C<st> and C<tc>.
+
+=item -l | --list 
+
+List the test files and case IDs that will be run, but don't actually run the tests.
+
+=item -v | --verbose
+
+Enable verbose mode
+
+=item -h | --help
+
+Basic help usage
+
+=back
+
+=head1 SEE ALSO
+
+L<Test::A8N>, L<Test::FITesque>
+
+=head1 AUTHOR
+
+Michael Nachbaur E<lt>mike@nachbaur.comE<gt>,
+Scott McWhirter E<lt>konobi@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008 Sophos, Plc.
+
+=cut

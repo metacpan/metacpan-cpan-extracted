@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Tree/Easy.pm
+lib/Tree/Easy.pod
+t/00-load.t
+t/01-simple.t
+t/pod-coverage.t
+t/pod.t
+examples/dumptree.pl
+examples/benchmark.pl
+Makefile.PL
+META.yml

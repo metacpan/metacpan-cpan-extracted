@@ -1,0 +1,76 @@
+NAME
+    Test::JSYNC - Test JSYNC data
+
+VERSION
+    This document describes Test::JSYNC version 0.02.
+
+SYNOPSIS
+       use Test::JSYNC;
+
+       jsync_ok $jsync,                  'jsync is well formed';
+       jsync_is $jsync, $expected_jsync, 'jsync matches what we expected';
+
+DESCRIPTION
+    JSON YAML Notation Coding (JSYNC) is an extension of JSON that can
+    serialize any data objects. Test::JSYNC makes it easy to verify that you
+    have built valid JSYNC and that it matches your expected output.
+
+    This module uses the JSYNC module, which is currently the only CPAN
+    module to support JSYNC; however, the module itself states that it "is a
+    very early release of JSYNC, and should not be used at all unless you
+    know what you are doing."
+
+EXPORTED TESTS
+  jsync_ok
+    Test passes if the string passed is valid JSYNC.
+
+       jsync_ok $jsync, 'jsync is well formed';
+
+    "is_valid_jsync" is provided as an alternative to "jsync_ok" using the
+    same naming convention as Test::JSON but is not exported by default.
+
+  jsync_is
+    Test passes if the two JSYNC strings are valid JSYNC and evaluate to the
+    same data structure.
+
+       jsync_is $jsync, $expected_jsync, 'jsync matches what we expected';
+
+    Test::Differences is used to provide easy diagnostics of why the JSYNC
+    structures did not match. For example:
+
+          Failed test 'jsync matches what we expected'
+          in t/jsync.t at line 10.
+        +----+---------------------------+---------------------------+
+        | Elt|Got                        |Expected                   |
+        +----+---------------------------+---------------------------+
+        |   0|{                          |{                          |
+        |   1|  bool => '1',             |  bool => '1',             |
+        |   2|  description => bless( {  |  description => bless( {  |
+        |   3|    value => undef         |    value => undef         |
+        |   4|  }, 'Foo' ),              |  }, 'Foo' ),              |
+        |   5|  id => '1',               |  id => '1',               |
+        *   6|  name => 'foo'            |  name => 'fo'             *
+        |   7|}                          |}                          |
+        +----+---------------------------+---------------------------+
+
+    "is_jsync" is provided as an alternative to "jsync_is" using the same
+    naming convention as Test::JSON but is not exported by default.
+
+SEE ALSO
+    This module uses JSYNC and Test::Differences, and is based on
+    Test::JSON.
+
+AUTHOR
+    Nick Patch <patch@cpan.org>
+
+ACKNOWLEDGEMENTS
+    This module was forked from Test::JSON by Curtis "Ovid" Poe.
+
+COPYRIGHT & LICENSE
+    Copyright 2011 Nick Patch
+
+    Copyright 2005-2007 Curtis "Ovid" Poe. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

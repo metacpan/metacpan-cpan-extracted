@@ -1,0 +1,42 @@
+NAME
+    Template::Plugin::StringDump - String::Dump filter for TT
+
+VERSION
+    This document describes Template::Plugin::StringDump version 0.05.
+
+SYNOPSIS
+    Template:
+
+        [% USE StringDump %]
+
+        [% SET msg = 'Ĝis! ☺' %]
+
+        hex: [% msg | dump_hex %]
+        dec: [% msg | dump_dec %]
+        oct: [% msg | dump_oct %]
+        bin: [% msg | dump_bin %]
+
+    Output:
+
+        hex: C4 9C 69 73 21 20 E2 98 BA
+        dec: 196 156 105 115 33 32 226 152 186
+        oct: 304 234 151 163 41 40 342 230 272
+        bin: 11000100 10011100 1101001 1110011 100001 100000 11100010 10011000 10111010
+
+DESCRIPTION
+    This Template::Toolkit plugin adds six filters for dumping strings for
+    display and debugging: "dump_hex", "dump_dec", "dump_oct", "dump_bin",
+    "dump_names", and "dump_codes". Each byte is dumped for byte strings and
+    each code point for Unicode strings. These filters are simple wrappers
+    around the functions of the same names from String::Dump. See that
+    module for details.
+
+AUTHOR
+    Nick Patch <patch@cpan.org>
+
+COPYRIGHT AND LICENSE
+    © 2011–2012 Nick Patch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

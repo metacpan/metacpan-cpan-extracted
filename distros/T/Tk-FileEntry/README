@@ -1,0 +1,39 @@
+Tk-FileEntry
+============
+
+This Perl/Tk widget provides an Entry widget with a button. Clicking
+the button will open a choose file dialog. The path of the chosen file
+will be inserted into the Entry widget.
+
+This is useful if you want to provide a convenient way to select a
+file path. Otherwise, you would have to code this feature over and
+over again.
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/Tk::FileEntry
+
+
+INSTALLATION
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+
+DEPENDENCIES
+
+This module requires some other modules and libraries.
+See Makefile.PL for a detailled list. If you are going to install
+via cpan shell or PPM, you don't have to care about.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Alex Becker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.

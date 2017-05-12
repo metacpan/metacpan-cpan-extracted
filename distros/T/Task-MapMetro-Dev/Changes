@@ -1,0 +1,24 @@
+Revision history for Task-MapMetro-Dev
+
+0.1201 2016-01-30T00:15:02Z UTC
+ [Other Changes]
+ - Rebuilt with dzil plugins in Dist::Iller::Config::Author::CSSON.
+
+ [Task Contents]
+ - Bumped Map::Metro to 0.2300.
+
+0.1200 2015-01-30T23:16:33Z CET
+ [Enhancements]
+ - Bumped Map::Metro 0.2203 -> 0.2206
+ - Bumped Dist::Zilla::MintingProfile::MapMetro::Map 0.1401 -> 0.1402
+ - Bumped Dist::Zilla::Plugin::MapMetro::MakeGraphViz 0.1100 -> 0.1101
+ - Bumped Dist::Zilla::Plugin::MapMetro::MakeLinePod 0.1200 -> 0.1201
+
+0.1100 2015-01-13T15:37:06Z CET
+ [Enhancements]
+ - Added Dist::Zilla::Plugin::MapMetro::MakeLinePod
+ - Bump included versions
+
+0.1000 2015-01-04T19:06:00Z CET
+ - Initial release
+

@@ -1,0 +1,32 @@
+Revision history for TSQL::SplitStatement
+
+0.01    Date/time
+        First version, released on an unsuspecting world.  Broken.
+0.02    12/12/12
+        Perlcritic warnings reduced at levels 5,4, and 3.
+0.03    13/12/12
+        Corrected POD typos.
+0.04    14/12/12
+        Corrected missing dependency.
+0.05    14/12/12
+        Labels now split separately rather than being included in the previous 'text chunk'.
+0.06    15/12/12
+        Fixed invalid POD references. Made 'tokeniser' a cached value for efficiency reasons.  Altered sample script.
+0.07    20/12/12
+        Updated to use TSQL::Common::Regexp.
+0.08    21/12/12
+        Dependencies fixed.
+0.09    09/01/13
+        Tokeniser now guards against temporary tables as well as variables having the same name as a 
+        statement leading edge 'token'.
+0.10    09/01/13
+        Made Alter consistent with Create.  Added some extra context to Create/Alter.
+0.11    09/01/13
+        Made basic test from sample script.
+0.12    10/01/13
+        Work around to broken(?) ${^PREMATCH} logic in perl 5.17.
+0.13    09/09/13
+        Added greptsql.pl utility
+0.14    09/09/13
+        Added support for hints against target table in insert statements.
+

@@ -1,0 +1,12 @@
+Revision history for Test-Exec
+
+0.03      2017-03-24 10:19:07 -0400
+
+0.02_01   2016-04-29 11:42:24 -0400
+  - Added some optional Test2 tests
+
+0.02      2015-12-13 12:47:56 -0500
+  - Fixed uncaptured exec
+
+0.01      2015-12-13 04:38:55 -0500
+  - initial version

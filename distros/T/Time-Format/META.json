@@ -1,0 +1,49 @@
+{
+   "abstract" : "Easy-to-use date/time formatting.",
+   "author" : [
+      "Eric J. Roode <roode@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-Format",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Simple" : "0.40"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Date::Manip" : 0,
+            "DateTime" : 0,
+            "I18N::Langinfo" : 0,
+            "Module::Signature" : 0,
+            "POSIX" : 0,
+            "Time::HiRes" : 0
+         },
+         "requires" : {
+            "Time::Local" : "1.07"
+         }
+      }
+   },
+   "provides" : {
+      "Time::Format" : {
+         "file" : "lib/Time/Format.pm",
+         "version" : "1.12"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.12"
+}

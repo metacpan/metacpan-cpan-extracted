@@ -1,0 +1,8 @@
+<html>
+<head>
+<title>FIXME</title>
+<link rel="alternate" type="application/atom+xml" title="All tests" href="rss.xml" />
+<link rel="alternate" type="application/atom+xml" title="FAILED tests" href="rss-fail.xml" />
+</head>
+
+<body>

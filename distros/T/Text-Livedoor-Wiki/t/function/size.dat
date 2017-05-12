@@ -1,0 +1,31 @@
+=== func_size
+--- wiki
+&size(30){&color(red){ほげ}}
+--- html 
+<span class="fsize" style="font-size:30px;"><span style="color:red;">ほげ</span></span>
+=== func_size
+--- wiki
+ほげほげ&size(30){ホゲホゲほげhごえほあdぽふぃj} ほげほげ&size(30){ホゲホゲほげhごえほあdぽふぃj}
+--- html 
+ほげほげ<span class="fsize" style="font-size:30px;">ホゲホゲほげhごえほあdぽふぃj</span> ほげほげ<span class="fsize" style="font-size:30px;">ホゲホゲほげhごえほあdぽふぃj</span>
+=== 
+--- wiki
+ほげほげ&size(30){ホゲホゲほげhごえほあdぽふぃj} ほげほげ&size(30){ホゲホゲほげhごえほあdぽふぃj}
+--- html 
+ほげほげ<span class="fsize" style="font-size:30px;">ホゲホゲほげhごえほあdぽふぃj</span> ほげほげ<span class="fsize" style="font-size:30px;">ホゲホゲほげhごえほあdぽふぃj</span>
+=== func_size
+--- wiki
+ほげほげ#size(30){ホゲホゲほげhごえほあdぽふぃj} ほげほげ#size(30){ホゲホゲほげhごえほあdぽふぃj}
+--- html 
+ほげほげ<span class="fsize" style="font-size:30px;">ホゲホゲほげhごえほあdぽふぃj</span> ほげほげ<span class="fsize" style="font-size:30px;">ホゲホゲほげhごえほあdぽふぃj</span>
+=== no args
+--- wiki
+&size(){hoge}
+--- html
+&amp;size(){hoge}
+=== not number
+--- wiki
+&size(hage){hoge}
+--- html
+&amp;size(hage){hoge}
+

@@ -1,0 +1,31 @@
+Template-Magic-Pager Latest Versions Changes
+
+Version 1.15
+- Removed the internal use of lvalue assigments incompatible with
+  the perl-bug #17663 (Perl 5 Debugger doesn't handle properly lvalue
+  sub assignment)
+  
+Version 1.14
+- Maintainance release. A few minor changes
+
+Version 1.13
+- Removed the - now outdated - note in the Makefile.PL
+- Minor change in the deprecated Template::Magic::Slicer
+
+Version 1.12
+- Added a note in the Makefile.PL
+
+Version 1.11
+- Eliminated version check and installation feedback system
+  ("phone home" opt-out) from Makefile.PL to make Randal L Schwartz happy :-)
+  and sad the author :-(
+
+Version 1.1
+- WARNING! The page_rows MUST be passed as an argument to the new() method!
+  This could break your old code, although it is extremely simple to modify
+  it. Sorry for the change (needed to reduce the two modules to just one).
+- Deprecated template::Magic::Slicer. You should use Template::Magic::Pager
+  instead
+
+Version 1.0
+- First release

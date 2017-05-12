@@ -1,0 +1,21 @@
+bin/test_prereqs_version
+Changes
+lib/Test/LatestPrereqs.pm
+lib/Test/LatestPrereqs/Config.pm
+lib/Test/LatestPrereqs/MakeMaker.pm
+lib/Test/LatestPrereqs/ModuleBuild.pm
+lib/Test/LatestPrereqs/ModuleInstall.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_basic.t
+t/20_eumm.t
+t/20_mbuild.t
+t/20_minstall.t
+t/99_pod.t
+t/99_podcoverage.t
+t/MakeMaker/Makefile.PL
+t/ModuleBuild/Build.PL
+t/ModuleInstall/Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

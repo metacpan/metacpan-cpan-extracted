@@ -1,0 +1,34 @@
+Telephony::CountryDialingCodes
+==============================
+
+Description
+-----------
+This class exports a method for determining a country's international dialing
+access code, and another method for doing the reverse: i.e. determining the
+country code(s) that belong(s) to a given international dialing access code.
+
+You can call these methods in both class and object context. The difference is
+that if you call them in object context that the internal lookup tables are
+destroyed along with the object itself when it is destroyed, otherwise if you
+call these methods in class context, then the internal lookup tables become
+globals and will persist for the lifespan of the executing process. It's not
+really a big deal which approach you choose, so for the sake of style, use the
+object context approach if you have no clue which is better.
+
+Copyright
+---------
+Copyright (C) 2004 Craig Manley. All rights reserved.
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. There is NO warranty; not even for
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Installation
+------------
+perl Makefile.PL
+make
+make install
+perldoc Telephony::CountryDialingCodes
+
+Author
+------
+Craig Manley

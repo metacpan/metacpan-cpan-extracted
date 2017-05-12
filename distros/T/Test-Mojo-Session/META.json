@@ -1,0 +1,77 @@
+{
+   "abstract" : "Testing session in Mojolicious applications",
+   "author" : [
+      "Andrey Khozov, C<avkhozov@googlemail.com>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mojo-Session",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "4.82"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Mojo::Session" : {
+         "file" : "lib/Test/Mojo/Session.pm",
+         "version" : "1.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/avkhozov/Test-Mojo-Session/issues"
+      },
+      "homepage" : "https://github.com/avkhozov/Test-Mojo-Session",
+      "repository" : {
+         "url" : "git://github.com/avkhozov/Test-Mojo-Session.git",
+         "web" : "https://github.com/avkhozov/Test-Mojo-Session"
+      }
+   },
+   "version" : "1.04",
+   "x_authority" : "cpan:AVKHOZOV",
+   "x_contributors" : [
+      "Renee <reb@perl-services.de>",
+      "Andrey Khozov <avkhozov@gmail.com>"
+   ]
+}

@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 ff19c4fba1a29c27b69b58dd47bbc41af2a7fc19 Build.PL
+SHA1 fa9a9a0ae03824abbb93bbc28625a670862f89b8 COPYING
+SHA1 d9125a4511cd4e114fe361e68ac69ccd8a12bede Changelog
+SHA1 4486eeff054362db78619b63834d33875dbccfb9 MANIFEST
+SHA1 03fb9303393b32547443ce1b6075d1c17a49d5af META.json
+SHA1 93e227fbcdb42104b6de032a2654b5c294997aa2 META.yml
+SHA1 a987aff2f69a9275c3c3896b78e611494bf4e51b README
+SHA1 fff0055e63ef030140924442027e1326093a6ce1 bin/efa-m
+SHA1 25cb6b8deb1f13ca97f020b1a29e78ef2a90be32 lib/Travel/Status/DE/EFA.pm
+SHA1 8ac62c811c5d552916abbb15aa262d29411db6e8 lib/Travel/Status/DE/EFA/Line.pm
+SHA1 621982a2d3e2a1170192f63347ef42775c53e2ea lib/Travel/Status/DE/EFA/Result.pm
+SHA1 2b627d22f2e82a222888ac45bfb5bec4d0284fcc lib/Travel/Status/DE/EFA/Stop.pm
+SHA1 fce0ed2c0acf34052299b21498fc2726d0d68da7 lib/Travel/Status/DE/VRR.pm
+SHA1 fd251ffc56ca6e52020c906b61158f78b035679d t/10-pod-coverage.t
+SHA1 76f6ad074b8ae312ecb46335c1e5282bdda82a7e t/20-vrr.t
+SHA1 4126f358c518d140df2ed6c3c78e59e9fa490c52 t/21-vrr-ambig.t
+SHA1 dd583dd00693927d0a14937ba6c5db386d5078ff t/in/essen_alfredusbad_ambiguous.xml
+SHA1 fc746d261b59bd57eef01270228aa8adc4f34083 t/in/essen_bp.html
+SHA1 38b90abfe5233270093c1f042bf3a341303d9158 t/in/essen_hb.xml
+SHA1 2cafe2eb3057914e8ced624543bef13341c563d2 t/in/essen_hb_invalid.xml
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJX+Up8AAoJEBANW/tRZuAFnLAP/1aq1DaUbG6yEdS5myysusFO
+TjQpB+B3mxgHgZnn24J6SSzYPJVmOBwB6qDCRC2tLxRGCgxUck0ot+LRCJZZ2xSy
+BDdtnFyqneFqL9JfnFefYr8H5xy7pf5iuTQk2v57fP11qa7pxMw40diM12lYcqUV
+KHKEyVopPS/8PbMgihcss4TQNFzcHRMCe0PXLK49XKeIjr2RWBTAbpdq16xdFsvl
+NDU0WbTIMvI5Em3j97vgFf5Pq2y3FH3b5AklLaGGqwVy8HNoWtrIxr6SPYbFF4fX
+48GwBdl7BF1aVI9p16ZURUyqufRBStfCVADMV2qaEgaQgdNue98uc3+qbShRL19w
+PnPvA0PvN9PM1lFOEigbXd4fmXoluhBGycUWKwUTDT78EJst5oP/GcCIWwtrL1oY
+H90jLV3aVcP14/c1W2SdMkLftYazUDXEolcOhp6RbIp0/IvC00wSrziTDq5OSRYV
+0o2B/wCW8wRPt5VG6xrC8nJV1V+JTp66dEWJvAz9fuHwHAQgF8QY7q669OpBOkjN
+ai21FNDbKIBkSFlwDxUamnqsePJA24dDnw6cx/keTzZIs4jfCdNPPUzlm2ohkncE
+/WjjPmn2tjku8hQG8mdTBQYaIGa9yYEN5aU4MZHQQqnCixEWXl9hEGOP/fkiHenk
+rSrge8FEJiqgDxte/6Nl
+=8ohj
+-----END PGP SIGNATURE-----

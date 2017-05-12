@@ -1,0 +1,23 @@
+Revision history for Perl extension Time::Out.
+
+0.11  Tue Jan 15 11:36:27 EST 2008
+    - Applied patch by Jens Heunemann to fix a race condition as well as some errors
+      related to exception handling
+
+0.10  Thu Sep 13 22:53:28 EDT 2007
+    - Added support for nested timeouts (thanks to chocolateboy for the patch)
+    - Removed the useless 'affects' syntax
+    - 'timeout' now exported via @EXPORT_OK instead of @EXPORT
+
+0.05  Fri Jan  7 13:33:31 EST 2005
+    - Updated documentation
+
+0.04  Thu Jan  6 13:33:31 EST 2005
+    - Added tests for blocking I/O
+	- Added support for Time::HiRes
+
+0.01  Tue Jan  4 10:18:55 2005
+	- original version; created by h2xs 1.22 with options
+		-AX Time::Out
+	
+

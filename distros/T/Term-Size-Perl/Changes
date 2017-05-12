@@ -1,0 +1,24 @@
+Revision history for Perl extension Term-Size-Perl.
+
+0.029 Tue Mar 11 2007
+        - major rewrite of t/01_basic.t
+          * added SKIP if tested globs are not tty
+          * removed wrong assumption that STDIN
+            would always match STDERR
+          * test implicit argument, *STDIN, *STDERR
+            e *STDOUT
+        - tuned the answers for non-tty arguments:
+          tests are still missing
+
+0.0201 Tue Nov 7 2006
+        - section BUGS on Perl.pm
+        - no code changes
+
+0.02  Wed Jun 14 2006
+        - use strict
+        - tweaked POD
+        - introduced a POD coverage test
+
+0.01  Mon May 29 2006
+        - first release to CPAN
+

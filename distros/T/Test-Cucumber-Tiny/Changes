@@ -1,0 +1,44 @@
+0.64 2014-02-13
+    + extended function ->ScenariosFromYML that can append new cases from YML, So you can
+      split your large scenarios into small parts
+
+0.63 2014-02-11
+    - Tidy code
+
+0.62 2014-02-11
+    - Spelling in POD
+
+0.61 2014-02-11
+    - Show code syntax in POD
+
+0.6 2014-02-11
+    + Update POD
+    + Added Logging in $c
+
+0.5 2014-02-09
+    + Load scenarios from YAML file
+    - Bugfix
+
+0.4 2014-02-09
+    + Added Before and After for scenario
+    + Added Any to set condition for all steps
+    + Added "debugger" any of your step, the debugger will fired when reached to the point.
+    + Added NextStep to jump to next step
+    + Added NextExample, if you have examples, just jump to the next one
+    + Added NextScenario just ignore the current one and jump to the next scenario
+    + Use Test::More is less dependancy the Test::Most
+    + Define verbose mode using ENVIRONMENT variable CUCUMBER_VERBOSE, use diag, explain or note etc...
+    + or set the verbose mode when create a new cucumber.
+
+0.31 2014-02-06
+    - Bugfix
+
+0.3 2014-02-06
+    - Apply example value to the Scenario string
+    - Use Mo for a simply oo system
+
+0.2 2014-02-04
+   - Update POD
+ 
+0.1 2014-02-04
+   - First Version of Test::Cucumber::Tiny

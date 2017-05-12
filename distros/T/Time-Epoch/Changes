@@ -1,0 +1,7 @@
+* v0.02, May 21, 2003
+
+   Forgot to add Test::More to PREREQ_PM.
+
+* v0.01, May 20, 2003
+
+   First release, about three years after writing it ...

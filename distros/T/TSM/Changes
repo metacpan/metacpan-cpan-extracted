@@ -1,0 +1,22 @@
+Revision history for Perl extension TSM.
+
+0.60  Wed Jul 18
+	- Extracting duplicate code and putting it into 
+	  seperate functions
+
+0.50  Mon Jul 10 10:25:00 CET 2001
+	- Implementation of the select_single function
+
+0.40  Mon Jul 3  15:48:00 CET 2001
+	- Implementation of the select_hash() function
+
+0.30  Tue May 15 13:05:00 CET 2001
+	- Implementation of the select() and the
+	  get_columns() functions 
+
+0.20  Mon Mar 5  18:23:00 CET 2001
+	- Implementation of the dsmadmc() function
+
+0.10  Tue Feb 13 11:35:00 CET 2001
+	- Implementation of the constructor new()
+

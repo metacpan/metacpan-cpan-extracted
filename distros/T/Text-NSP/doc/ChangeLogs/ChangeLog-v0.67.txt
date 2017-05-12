@@ -1,0 +1,56 @@
+
+Changes from NSP version 0.65 to 0.67
+-------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+March 3, 2004
+
+Measures
+--------
+	
+	Created measure2d.pm and measure3d.pm to allow for
+	considerable simplification in the coding of the individual
+	measure modules found in /Measures like tmi.pm, ll.pm, etc. 
+	(Bridget)
+
+statistic.pl
+------------
+	
+	Modified the data structure such that bigram strings
+	are stored by scores (Amruta)
+
+Utils 
+-------
+
+	Added the following programs to be able to run count.pl 
+	for bigrams on corpora with more +10,000,000 tokens. 
+
+huge-count.pl
+-------------
+
+	Runs count.pl efficiently on a large data, by breaking it
+	into smaller pieces and recombining with huge-combine.pl (Amruta)
+
+huge-combine.pl
+---------------
+
+	Combines two count output files of which the second file
+	can be a huge file (Amruta)
+
+split-data.pl
+-------------
+
+	Breaks large files into small pieces (Amruta)
+
+sort-bigrams.pl
+-------------
+
+	Sorts a bigram file in the descending order of their counts (Amruta)
+	
+Makefile.PL
+-----------
+
+	Changes necessary to incorporate new programs made. (Ted)
+
+

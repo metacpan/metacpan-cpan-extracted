@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Test-XML-Valid
+version: 0.04
+license: perl
+distribution_type: module
+requires:
+  Test::Builder::Tester: 0
+  Test::More: 0
+  XML::LibXML: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Test::XML::Valid:
+    file: lib/Test/XML/Valid.pm
+    version: 0.04
+generated_by: Module::Build version 0.21

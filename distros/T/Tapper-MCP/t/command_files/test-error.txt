@@ -1,0 +1,1 @@
+prc_number:0,error-testprogram:Can't start xen guest described in /xen/images/001.svm,prc_count:1

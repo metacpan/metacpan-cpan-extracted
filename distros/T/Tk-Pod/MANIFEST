@@ -1,0 +1,34 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+More.pm
+Pod.pm
+Pod/Cache.pm
+Pod/FindPods.pm
+Pod/Search.pm
+Pod/Search_db.pm		# should be in perlindex dist after cleanup
+Pod/SimpleBridge.pm
+Pod/Styles.pm
+Pod/Text.pm
+Pod/Tree.pm
+Pod/Util.pm
+Pod/WWWBrowser.pm		# inofficial module for accessing web browser
+Pod_usage.pod
+README
+t/basic.t
+t/cmdline.t
+t/more.t
+t/optionalmods.t
+t/pods.t
+t/podtree.t
+t/subclass.t
+t/testdata/latin1.txt
+t/testdata/utf8.txt
+t/testdata/utf8.txt.gz
+t/TkTest.pm
+tkmore
+tkpod
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

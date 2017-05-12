@@ -1,0 +1,18 @@
+Revision History for Types-CLike
+================================
+
+v0.91 2014-04-09
+----------------
+
+[9209210]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-04-09 01:35:09 -0400 (2 minutes ago)
+
+Fix fatal error on export tags
+
+Also, clarify documentation on use of tags
+
+
+===================================
+End of changes in the last 365 days
+===================================

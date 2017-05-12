@@ -1,0 +1,37 @@
+NAME
+    Test::XML::Element - Test the properties a single XML element in
+    isolation.
+
+VERSION
+    0.01
+
+SYNOPSIS
+        use Test::XML::Element tests => 4;
+        element_is('<foobar />', "foobar")
+        has_attribute('<foobar color="red" />', 'color');
+        attribute_has_value('<foobar color="red">', color => 'red');
+
+DESCRIPTION
+    This module allows you to test the properties of a single XML element on
+    it's own, which may be useful if your module does XML generation.
+
+TESTS
+  element_is $element, $name, [$message]
+    Test that an element is of the correct type.
+
+  has_attribute $element, $attribute, [$message]
+    Check that an element has a certain attribute
+
+  attribute_has_value $element, $attribute, $value, [$message]
+    Check that an attribute has a certain attribute, and it is set to a
+    certain value.
+
+AUTHOR
+    Oliver Charles "oliver.g.charles@googlemail.com"
+
+COPYRIGHT
+    Copyright 2009 Oliver Charles
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

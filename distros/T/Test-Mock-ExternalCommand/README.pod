@@ -1,0 +1,78 @@
+=head1 NAME
+
+Test::Mock::ExternalCommand - Create mock external-command easily
+
+=head1 SYNOPSIS
+
+  use Test::Mock::ExternalCommand;
+  my $m = Test::Mock::ExternalCommand->new();
+  $m->set_command( 'my-command-aaa', 'command-output', 0);
+  # use 'my-command-aaa' in your test.
+
+=head1 DESCRIPTION
+
+Test::Mock::ExternalCommand enable to make mock-external command in easy way.
+
+=head1 Methods
+
+
+=cut
+
+=head2 new()
+
+
+=cut
+
+=head2 set_command( $command_name,  $command_output_string, $command_exit_status )
+
+set mock external command command.
+
+
+=cut
+
+=head2 set_command_by_coderef( $command_name,  $command_behavior_subref )
+
+set mock external command command using subroutine reference(coderef).
+
+
+=cut
+
+=head2 history()
+
+return command history.
+
+
+=cut
+
+=head2 reset_history()
+
+reset command history.
+
+
+=cut
+
+=head2 commands()
+
+return overridden command names
+
+
+=cut
+
+=head1 AUTHOR
+
+Takuya Tsuchida E<lt>tsucchi@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+=head1 Copyright
+
+Copyright (c) 2010-2013 Takuya Tsuchida
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+

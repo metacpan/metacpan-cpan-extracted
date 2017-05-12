@@ -1,0 +1,33 @@
+Tk::Getopt
+
+Tk::Getopt is an option editor for Perl/Tk. It also provides an
+interface to Getopt::Long, so options may be entered at command line,
+saved to an options file, or set in the option editor.
+
+To install, type
+
+	cpan .
+
+if you have a modern CPAN.pm, otherwise
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+For a demonstration you can type
+
+	make demo
+
+after the "make" phase.
+
+For Windows NT and ActiveState Perl, replace "make" with "nmake", if
+you have the Visual C++ compiler available. Otherwise, just copy
+Getopt.pm to C:\Perl\lib\site\Tk.
+
+For Strawberry or Vanilla Perl, replace "make" with "dmake".
+
+Additional requirements besides Tk are listed in the META.yml. (Even
+Tk is not really a prerequisite, but it's highly recommended)
+
+Send bug reports, comments and suggestions to srezic@cpan.org

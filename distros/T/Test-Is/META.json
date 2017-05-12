@@ -1,0 +1,58 @@
+{
+   "abstract" : "Skip test in a declarative way, following the Lancaster Consensus",
+   "author" : [
+      "Olivier Mengué <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Is",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "perl" : "5"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "TAP::Formatter::File" : "0",
+            "TAP::Harness" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dolmen/p5-Test-Is",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dolmen/p5-Test-Is.git",
+         "web" : "https://github.com/dolmen/p5-Test-Is"
+      }
+   },
+   "version" : "20140823.1"
+}
+

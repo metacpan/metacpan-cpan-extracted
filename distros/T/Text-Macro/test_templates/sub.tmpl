@@ -1,0 +1,22 @@
+pre subs
+#sub sub1
+inside sub1
+more
+#endsub ignore
+#sub sub2
+inside sub2
+even more
+#endsub
+
+before call sub1
+#callsub sub1
+
+between sub1, sub2
+
+#callsub sub2
+
+between sub2, sub1
+
+#callsub sub1
+
+done

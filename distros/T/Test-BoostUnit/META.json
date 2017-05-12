@@ -1,0 +1,40 @@
+{
+   "abstract" : "Allow Tests to output Boost C++ XML format test reports",
+   "author" : [
+      "q{Robert Haxton <robert.haxton@gmail.com>}"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-BoostUnit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "File::Find" : "0",
+            "Getopt::CommandLineExports" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::BoostUnit" : {
+         "file" : "lib/Test/BoostUnit.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

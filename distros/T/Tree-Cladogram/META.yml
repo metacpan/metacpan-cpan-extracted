@@ -1,0 +1,41 @@
+---
+abstract: 'Render a cladogram using Imager or Image::Magick'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::Pod: '1.51'
+  Test::Simple: '1.302052'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tree-Cladogram
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Slurper: '0.008'
+  Getopt::Long: '0'
+  Imager: '1.004'
+  Imager::Fill: '1.012'
+  Moo: '2.000002'
+  Pod::Usage: '1.67'
+  Tree::DAG_Node: '1.27'
+  Types::Standard: '1'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-Cladogram
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Tree-Cladogram.git
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

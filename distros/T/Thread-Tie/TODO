@@ -1,0 +1,5 @@
+Reading lines in list context only reads first line.  Need some way to
+correctly propegate the context to the actual read routine.  First attempt
+at this screwed up so many things I undid the changes.
+
+Maybe a rogue DESTROY test should be added to the DESTROY subs?

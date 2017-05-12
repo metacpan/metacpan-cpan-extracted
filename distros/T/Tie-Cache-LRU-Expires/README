@@ -1,0 +1,8 @@
+This is a module to have an expiring (LRU) cache in your
+system. Comes very handy if you want both to limit the
+usage of memory (LRU) and expire the cached entries.
+
+Enjoy,
+
+Hans Oesterholt-Dijkema <oesterhol@cpan.org>
+

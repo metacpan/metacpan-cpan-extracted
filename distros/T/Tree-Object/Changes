@@ -1,0 +1,57 @@
+Revision history for Tree-Object
+
+0.07    2016-04-14 (PERLANCAR)
+
+	- Add Tree::Object::InsideOut.
+
+
+0.06    2016-03-30 (PERLANCAR)
+
+	- Add class: TO:Hash::ChildrenAsList.
+
+
+0.05    2016-03-29 (PERLANCAR)
+
+        - [Incompatible change] Tree::Object::Array now uses
+          Class::Accessor::Array instead of Class::Build::Array::Glob (object
+          storage layout changed).
+
+        - Add Tree::Object::Array::Glob which uses Class::Accessor::Array::Glob
+          which uses the same object storage layout like the old
+          Tree::Object::Array.
+
+
+0.04    2016-03-29 (PERLANCAR)
+
+	- [dist] Add missing dep to Class::Build::Array::Glob [RT#113409].
+
+
+0.03    2016-03-26 (PERLANCAR)
+
+        - This distribution now includes more than one implementation of tree
+          objects.
+
+        - [Incompatible change] Rename module Tree::Object to
+          Tree::Object::Hash. Parent and children are now stored in '_parent'
+          and '_children' keys respectively instead of 'parent' and 'children',
+          to denote that they are internal and to reduce chance of clash. To set
+          children, an arrayref must now be passed to children() instead of
+          list. This is because passing a list to set an arrayref attribute is
+          incompatible with accessor generators.
+
+        - The main module Tree::Object now becomes empty and contains just a
+          link to all the available implementations.
+
+        - Add Tree::Object::Array.
+
+
+0.02    2016-03-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention some other tree modules on CPAN.
+
+
+0.01    2016-03-24 (PERLANCAR)
+
+        - First release.

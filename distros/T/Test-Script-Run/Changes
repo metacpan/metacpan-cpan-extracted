@@ -1,0 +1,29 @@
+Revision history for Test-Script-Run
+
+0.08 Sun Oct 20 20:14:17 2013 +0800
+
+    doc updates only(copyright years, changes, etc)
+
+0.07 Sun Oct 20 20:03:50 2013 +0800
+
+    quote arguments in test names(requires String::ShellQuote or Win32::ShellQuote)
+
+0.05 Fri Jan  7 15:17:34 CST 2011
+
+    add '.' to the default bin dirs
+    set exit code to 127 if the script can't be found
+
+0.04 Fri Jun 25 12:01:30 CST 2010
+
+    allow customization of bin dir names.
+
+0.03 Tue Nov 17 01:50:40 GMT 2009
+    Make get_perl_cmd public API
+    Strip references from @INC when generating a perl command
+
+0.02 Tue Jun  2 18:26:50 CST 2009
+    add last_script_stdout, last_script_stderr and last_script_exit_code subs
+
+0.01  Tue Feb 17 16:56:11 2009
+       Initial release.
+

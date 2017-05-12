@@ -1,0 +1,1343 @@
+
+=head1 NAME
+
+Teamspeak::Telnet - Telnet-Interface to administrate
+                    Teamspeak-Voice-Server
+
+=head1 CLASS METHODS
+
+=head2 connect()
+
+Connects to the Teamspeak-Server.
+
+=head2 new( host => 'localhost', port => 51234, timeout => 4 )
+
+Creates the object and set a Telnet timeout.
+
+=head2 add_user( user => 'username', pwd => 'password', [ admin => 1 ] )
+
+Adds a user to the server database.
+Optionally with Admin rights.
+
+=head2 delete_user ( $player_id )
+
+Removes the user from the user database.
+
+=head2 banplayer( $player_id, $time )
+
+Bans the L<"Teamspeak::Player"> for $time seconds.
+
+=head2 removeclient ( $player_id )
+
+Disconnects the Player from the TS-Server.
+
+=head2 msg ( 'Hello all' )
+
+Sends a Text Message to the selected server.
+
+=head2  msgu ( $database_user_id, 'Text message' )
+
+Sends a Text Message to a User.
+
+=head2 disconnect
+
+Disconnects from the TS-Server.
+
+=head2 my_die( 'error message' )
+
+Calls Teamspeak::_croak to croak.
+
+=head2 logged_in()
+
+Returns 2 if superadmin is logged in.
+Returns 1 if a normal user is logged in.
+Returns 0 otherwise.
+
+=head2 channels()
+
+Returns a list of channels at the selected server.
+
+=head1 COMMAND OVERVIEW
+
+  banadd              : add ip ban
+  banclear            : clear banlist
+  bandel              : del ip ban
+  banlist             : show banlist
+  banplayer           : bans a player
+  checkserverok       : checks if server hangs
+  ci                  : display channel info
+  cl                  : channellist
+  dbci                : display db channel info
+  dbfp                : db find player
+  dbpi                : display db infos about a player
+  dbserverlist        : list all servers from db
+  dbsuseradd          : adds a superadmin to server
+  dbsuserchangepw     : changes password of a superadmin
+  dbsuserdel          : deletes a superadmin from server
+  dbsuserlist         : display superadmin serverlist
+  dbuseradd           : adds a user to server
+  dbuserchangeattribs : changes rights of a user
+  dbuserchangepw      : changes password of a user
+  dbuserdel           : deletes a user from server
+  dbuserid            : display dbid from loginname
+  dbuserlist          : display server user list
+  dccl                : channel client list
+  fc                  : finds a channel
+  fp                  : finds a player
+  gapl                : get average packet loss
+  gi                  : global information
+  globalset           : set a global variable
+  help                : this helpfile
+  kick                : kick player
+  ki                  : kick idlers
+  lc                  : list all open tcpquery connections
+  logfind             : search serverlog
+  login               : login to server
+  logmark             : add a line to serverlog
+  log                 : show serverlog
+  mptc                : move player to channel
+  msgall              : message to all servers
+  msg                 : message to server
+  msgu                : message to user
+  pi                  : display infos about a player
+  pl                  : playerlist
+  quit                : close connection
+  rehash              : reload server settings
+  removeclient        : remove client
+  sel                 : select
+  serveradd           : adds a server
+  serverdel           : deletes a server
+  serverset           : set a server variable
+  serverstart         : start server
+  serverstop          : stop server
+  si                  : server information
+  slogin              : superlogin to server
+  sl                  : serverlist
+  sppriv              : set user privilege
+  ver                 : version
+
+=head2 globalset <attribute> <value>
+
+set global attributes
+
+globalset will change the <attribute> of the teamspeak instance and
+set it to <value>.
+These are the currently available attributes and their values:
+
+  attribute                               value
+  hoster_gfx_url                          text
+Note: This is a URL to a image to be displayed to connected
+clients, changes to it will only be visible to clients
+connecting after you changed it - and the changes will not be
+saved to the server.ini, meaning will not be permanent over a
+server restart.
+  allowedclientnamechars                  text
+Note: This restricts what characters you will allow in
+nicknames. Users with disallowed characters will get a message
+when they connect.
+  disallowedclientnamechars               text
+Note: This is the little brother of allowedclientnamechars -
+characters you set here will not be allowed in nicknames,
+clients will be informed what characters they are using that
+are not allowed on this server. The default setting for this
+will be "()[]{}" to prevent flag faking.
+
+=head3 Example
+
+  globalset hoster_gfx_url http://kerneltrap.org/themes/kt/images/logo.jpg
+  >OK
+
+=head2 banplayer <player_id>
+
+=head2 banplayer <player_id> <time>
+
+bans the IP of a currently connected player
+
+This is handy if you dont want to look up the IP of somebody connected
+to your server, but just want to ban him. The IP of player corresponding
+to the ID is banned. Note: This is ban only, no kick occurs.
+banplayer can also be used to place "time bans", that is bans that only
+last for a certain amount of time. The option <time> is measured in
+minutes.
+
+=head3 Example
+
+  fp dark
+  >p_id    p_dbid  c_id    nickname        loginname       ip
+  >1741    0       4259    "DarkArchai"    ""      "62.46.89.111"
+  >OK
+  banplayer 1741
+  >OK
+  banlist
+  >b_id    ip      created mins    by
+  >70      62.46.89.111    23-10-2003 01:42:36     0       "SSA_Account9"
+  >OK
+
+=head2 banclear (no parameters)
+
+deletes all bans from the banlist
+
+Is used to delete all bans that your banlist contains,
+maybe useful if you gave the wrong guy Admin and want to clean-up your
+messed up banlist.
+
+=head3 Example
+
+  banlist
+  >b_id  ip            created             mins by
+  >69    111.222.333.* 23-10-2003 01:31:41 0    "SSA_Account9"
+  >OK
+  banclear
+  >OK
+  banlist
+  >ERROR, no data avaible
+
+=head2 banlist (no parameters)
+
+lists all bans on this server
+
+This will print out all bans that are currently
+enforced on the selected server. It will also display you with lots of
+useful information about these bans.
+Lets look what the colums mean:
+  b_id    the ban ID, usefull for bandel for example
+  ip      the IP (with possible wildcards) that is banned
+          created the time this ban was created
+  mins    if this is a timeban, howlong it was created for, else
+          its zero
+  by      information about who set the ban.
+
+=head3 Example
+
+  banlist
+  >b_id ip             created             mins  by
+  >24   217.82.239.253 23-09-2003 00:16:52 54000 "SSA_Account9"
+  >OK
+
+=head2 bandel <ban_id>
+
+deletes a ban from the banlist
+
+This will delete the ban specified by ban_id (->banlist) out of the
+banlist of the selected server.
+
+=head3 Example
+
+  banlist
+  >b_id    ip      created mins    by
+  >69      111.222.333.*   23-10-2003 01:31:41     0       "SSA_Account9"
+  >70      333.222.111.*   23-10-2003 01:31:57     10      "SSA_Account9"
+  >OK
+  bandel 70
+  >OK
+  banlist
+  >b_id    ip      created mins    by
+  >69      111.222.333.*   23-10-2003 01:31:41     0       "SSA_Account9"
+  >OK
+
+=head2 banadd <ip>
+
+=head2 banadd <ip> <time>
+
+adds an IP ban to the banlist
+
+This will put the IP you specified on the banlist of the currently
+selected server. Also note that the IP may contain wildcards, just like
+known from the client banlist. So, you could use the wildcard "*" to ban
+more than only one guy, or to ban whole netmasks/providers.
+You can also specify a time after the IP, measured in minutes, which
+will make your ban become a "time ban", meaning it will only last for as
+long as you specified.
+
+=head3 Example
+
+  banlist
+  >ERROR, no data avaible
+  banadd 111.222.333.*
+  >OK
+  banadd 333.222.111.* 10
+  >OK
+  banlist
+  >b_id    ip              created                 mins    by
+  >69      111.222.333.*   23-10-2003 01:31:41     0       "SSA_Account9"
+  >70      333.222.111.*   23-10-2003 01:31:57     10      "SSA_Account9"
+  >OK
+
+=head2 ki <IdleTime> <Target> <Reason>
+
+Kicks idle players off the server
+
+After selecting a virtual server (-> sel) you can use this command
+to kick people who are idle for "IdleTime" minutes.
+"Target" is a parameter that specifies who gets kicked. Sum up:
+  1: unregistered clients
+  2: registered clients
+  4: kick only if client is on unregistered channel
+  8: kick only if client is on registered channel
+"Reason" is the reason for the kick that every kicked player will get.
+After executing this command the server will return a number of all
+players kicked.
+
+=head3 Example
+
+  sel 8767
+  > OK
+  ki 30 7 don't idle on this server
+  > kicked=38
+  > OK
+
+=head2 lc (no parameters)
+
+lists current connections with the tcpquery-port
+
+lc will return a lists current connections with the
+tcpquery-port, so that you can see other Admins / SuperAdmins who are
+logged in with telnet. Notice that only SSAs can execute this command.
+  login_name    The user's login-name
+  server_id     The server which is currently selected
+                (-> dbserverlist).
+  ssa           1: user is SuperServerAdmin; 0: user is not
+  sa            1: user is ServerAdmin; 0: user is not
+  ip            user's ip
+  last_command  the last command by this user
+
+=head3 Example
+
+  lc
+  > login_name    server_id  ssa  sa  ip                last_command
+  > "SatanClaus"  1          1    1   "217.225.70.105"  "lc"
+  > OK
+
+=head2 dbuserchangepw <DBUserID> <Password> <Password>
+
+Changes the password of a registered user.
+
+After selecting a virtual server (-> sel) you can use this command
+to change a registered user's password. To get the DBUserID use
+dbuserlist (-> dbuserlist) or dbuserid (-> dbuserid). The new pass-
+word is entered twice to ensure correct writing.
+
+=head3 Example
+
+  dbuserid ralf
+  > 1234
+  > OK
+  dbuserchangepw 1234 mypasswordispassword mypasswordispassword
+  > OK
+
+=head2 dbuseradd <LoginName> <Password> <Password> <ServerAdminStatus>
+
+Adds a registered useraccount to your database
+
+After selecting a virtual server (-> sel) you can use this command
+to add a registered useraccount to your selected server's database.
+To make sure you typed in the password correctly it's entered twice.
+The "ServerAdminStatus" is 1 or 0, 1: user is SA, 0: user isn't.
+
+=head3 Example
+
+  dbuseradd Hallo hardtoguesspassword hardtoguesspassword 1
+  > OK
+
+=head2 dbuserlist (no parameters)
+
+Gives a list of all registered users
+
+After selecting a virtual server (-> sel) this command
+will print a whole list of all registered users, sorted by the DBUserID.
+The first column is the DBUserID, the second one is the SAStatus
+(0 means user is no SA, -1 means user is SA). The third column tells
+you when the user registered with the server, the forth tells you when
+the most recent login with this account occured and the fifth and last
+one is the LoginName.
+
+=head3 Example
+
+  dbuserlist
+  > id      sa     created                 lastonline              name
+  > 11      -1     06-03-2003 00:35:58     19-01-2004 20:10:07     "nick"
+  > 16      0      13-03-2003 18:44:31     20-01-2004 12:03:57     "name"
+  > OK
+
+=head2 dbuserdel
+
+Deletes a registered user out of the database
+
+=head3 dbuserdel <DBUserID>
+
+
+After you selected a virtual server (-> sel) you can delete registered
+users out of your database with this command. To get the DBUserID use
+the dbuserlist (-> dbuserlist) or dbuserid (-> dbuserid) command.
+
+=head3 Example
+
+  dbuserid Fearless
+  > 2121
+  > OK
+  dbuserdel 2121
+  > OK
+
+=head2 dbuserid
+
+Prints out the DBUserID belonging to the specified name.
+
+=head3 dbuserid <LoginName>
+
+
+After selecting a virtual server (-> sel) this command allows you to
+find the DBUserID which belongs to a certain registered user's
+LoginName. The command only will find a DBUserID if the LoginName is
+entered completely, correctly and case-sensitive.
+
+=head3 Example
+
+  dbuserid Satan
+  > ERROR, no data avaible
+  dbuserid satanclaus
+  > ERROR, no data avaible
+  dbuserid SatanClaus
+  > 2155
+  > OK
+
+=head2 dbuserchangeattribs
+
+Changes the SA-Status of a registered user
+
+=head3 dbuserchangeattribs <DBUserID> <ServerAdminStatus>
+
+
+After selecting a virtual server (-> sel) you can use this command to
+change the ServerAdminStatus of a registered user. To get the
+DBUserID use dbuserlist (-> dbuserlist) or dbuserid (-> dbuserid).
+The ServerAdminStatus can be 1 or 0, 1: user is SA, 0: user isn't.
+
+=head3 Example
+
+  dbuserid SatanClaus
+  > 1234
+  > OK
+  dbuserchangeattribs 1234 1
+  > OK
+
+=head2 dbsuseradd
+
+Adds a SuperAdmin to your server instance
+
+=head3 dbsuseradd <LoginName> <Password> <Password>
+
+
+You can use the dbsuseradd command to add a new SuperAdmin to your
+server instance. To make sure you typed in the password correctly
+it's entered twice.
+
+=head3 Example
+
+  dbsuserlist
+  > id      created name
+  > 1864    09-07-2003 23:38:38     "SantaClaus"
+  > OK
+  dbsuseradd Hallo veryhardtoguesspassword veryhardtoguesspassword
+  > OK
+  dbsuserlist
+  > id      created name
+  > 1864    09-07-2003 23:38:38     "SantaClaus"
+  > 31337   17-07-2003 03:03:03     "Hallo"
+  > OK
+
+=head2 dbsuserdel
+
+Deletes a SuperAdmin
+
+=head3 dbsuserdel <DBSUserID>
+
+
+With this command you can delete SuperAdmin accounts.
+To get the DBSUserID use the dbsuserlist (-> dbsuserlist) command.
+
+=head3 Example
+
+  dbsuserlist
+  > id      created name
+  > 1869    09-07-2003 23:38:38     "SantaClaus"
+  > 1337    09-07-2003 23:40:11     "DeleteMe"
+  > OK
+  dbsuserdel 1337
+  > OK
+  dbsuserlist
+  > id      created name
+  > 1869    09-07-2003 23:38:38     "SantaClaus"
+  > OK
+
+=head2 dbsuserchangepw
+
+Changes the password of a SuperAdmin.
+
+=head3 dbsuserchangepw <DBSUserID> <Password> <Password>
+
+
+You can use this command to change a SuperAdmin's password. To get
+the DBSUserID use dbsuserlist (-> dbsuserlist). The new password is
+entered twice to ensure correct writing.
+
+=head3 Example
+
+  dbsuserlist
+  > id      created name
+  > 1864    09-07-2003 23:38:38     "SantaClaus"
+  > 1878    09-07-2003 23:40:11     "SA_Account99"
+  > OK
+  dbsuserchangepw 1864 mypasswordisnotpassword mypasswordisnotpassword
+  > OK
+
+=head2 rehash
+
+reloads the database (without restarting the server)
+
+This will reload the entries in the database - possibly useful if you
+have written a tool that manipulates the server database, then it might
+be sensible to rehash the database in order for the server to *notice*
+the changes.
+
+=head3 Example
+
+  rehash
+  > OK
+
+=head2 checkserverok (no parameters)
+
+check if a server process is still functional
+
+checkserverok will return "OK" if the server is running
+fine, else "error" if this server isnt working properly anymore, has
+*hung*.
+
+=head3 Example
+
+  sel 8767
+  >OK
+  checkserverok
+  >OK
+
+=head2 dbserverlist (no parameters)
+
+prints all virtual servers
+
+dbserverlist will print a list of all virtual servers
+running on this server instance. It will print their database ID, the
+port they run on, their name and finaly if they are running or not.
+
+=head3 Example
+
+  dbserverlist
+  >id      udpport name                     status
+  >1       8767    "TeamSpeak Public  -1-"  1
+  >2       10050   "TeamSpeak Public  -2-"  1
+  >3       10060   "TeamSpeak Public  -3-"  1
+  >OK
+
+=head2 serveradd <port>
+
+adds a new virtual server
+
+serveradd will add a new virtual server to run on <port>. You can
+configure it either with tcpquery (-> serverset), or via webadmin interface.
+
+=head3 Example
+
+  serveradd 8768
+  >OK
+  dbserverlist
+  >id      udpport name
+  >1       8767    "TeamSpeak Public  -1-"
+  >2       8768    "TeamSpeak Server"
+  >OK
+
+=head2 serverdel
+
+delete a virtual server
+
+=head3 serverdel <server_database_ID>
+
+
+serverdel will delete the virtual server specified by
+<server_database_ID>.
+
+=head3 Example
+
+  dbserverlist
+  >id      udpport name
+  >1       8767    "TeamSpeak Public  -1-"
+  >2       8768    "TeamSpeak Server"
+  >OK
+  serverdel 2
+  >OK
+  dbserverlist
+  >id      udpport name
+  >1       8767    "TeamSpeak Public  -1-"
+  >OK
+
+=head2 serverstart
+
+start up a virtual server
+
+=head3 serverstart <server_database_id>
+
+
+serverstart will start the, previously stopped (-> dbserverstop) virtual
+server specified by <server_database_id>. To obtain a such an ID, list
+the servers in the database (-> dbserverlist).
+
+=head3 Example
+
+  dbserverlist
+  >id      udpport name
+  >1       8767    "TeamSpeak Public  -1-"
+  sel 8767
+  >OK
+  serverstop
+  >OK
+  serverstart 1
+  >OK
+
+=head2 serverstop (no parameters)
+
+stop a virtual server
+
+serverstop will stop the selected virtual server
+(-> sel). To be able to use the server again, you have to start it
+(-> serverstart).
+
+=head3 Example
+
+  dbserverlist
+  >id      udpport name
+  >1       8767    "TeamSpeak Public  -1-"
+  sel 8767
+  >OK
+  serverstop
+  >OK
+  serverstart 1
+  >OK
+
+=head2 serverset <attribute> <value>
+
+set attributes of virtual servers
+
+serverset will change the <attribute> of the selected virtual server
+(-> sel) to <value>. There are various attributes avaliable to be set,
+among them are possibilities to modify clanserver vs publicserver, allow
+or disallow different voice codecs, set maximum users, server password,
+server name, welcome message and the post and link url, which are both
+needed for webpost.
+Now lets have a look at the names of the attibutes, and their possible
+values:
+
+  attribute                               value
+  server_clan_server                      0/1
+  server_allow_codec_windowscelp52        0/1
+  server_allow_codec_gsm164               0/1
+  server_allow_codec_gsm148               0/1
+  server_allow_codec_celp63               0/1
+  server_allow_codec_celp51               0/1
+  server_allow_codec_speex2150            0/1
+  server_allow_codec_speex3950            0/1
+  server_allow_codec_speex5950            0/1
+  server_allow_codec_speex8000            0/1
+  server_allow_codec_speex11000           0/1
+  server_allow_codec_speex15000           0/1
+  server_allow_codec_speex18200           0/1
+  server_allow_codec_speex24600           0/1
+  server_maxusers                         0-32000
+  server_password                         text
+  server_name                             text
+  server_welcomemessage                   text
+  server_webpost_posturl                  text
+  server_webpost_linkurl                  text
+
+=head3 Example
+
+  serveradd 12123
+  >OK
+  dbserverlist
+  >id      udpport name
+  >1       8767    "TeamSpeak Public  -1-"
+  >2       12123   "TeamSpeak Server"
+  >OK
+  sel 12123
+  >OK
+  serverset server_name Quoark Clan United
+  >OK
+  dbserverlist
+  >id      udpport name
+  >1       8767    "TeamSpeak Public  -1-"
+  >2       12123   "Quoark Clan United"
+  >OK
+
+=head2 dccl
+
+Debug Client Channel List
+
+After you selected a virtual Server (-> sel), the dccl command prints
+out a list of all clients, sorted by the channels they are in. The first
+column displays the Channel ID, the second the Channel Name, the third
+the Player ID and the fourth the Player Name. If a Channel is empty, the
+Player ID will be -1.
+
+=head3 Example
+
+  dccl
+  > c_id    c_name  p_id    p_name
+  > 1       "Echo / Spam Channel"   -1
+  > 2       "Default Channel"       -1
+  > 3       "Talk Channel, Choose language" -1
+  > 4       "Admins-Island" 5956    "pwk.linuxfan"
+  > 4       "Admins-Island" 5975    "SatanClaus"
+  > 5       "Public Talk -1-"       -1
+  > 6       "Public Talk -2-"       -1
+  > 7       "Public Talk -3-"       -1
+  [...]
+
+=head2 logmark
+
+write a remark into the logfile
+
+=head3 logmark <string>
+
+
+This is used to set a remark in the serverlog. It is useful if you
+want to find a specific place in the log file later. For example if
+you notice a problem and want to look at the log closer some time to
+find out what was up.
+
+=head3 Example
+
+  logmark jim_SA?
+  >OK
+  logfind remark
+  >01-08-03 08:48:03,ALL,Info,Info,       *remark by SSA_Account9* jim_SA?
+  >OK
+
+=head2 logfind <string>
+
+finds lines in the serverlog
+
+Displays all the lines in the serverlog that contain <string>, making it
+easy to find things in the log if you know what you are looking for.
+
+=head3 Example
+
+  logfind remark
+  >01-08-03 08:30:24,ALL,Info,Info,        *remark by SSA_Account9* testing
+  >OK
+
+=head2 log <line_amount>
+
+display last lines from the serverlog
+
+The log command will print the last 30 lines of server log, if invoked
+without a parameter, else it will print as many lines as you specify,
+always starting from the end of the log.
+
+=head3 Example
+
+  log 120
+  [...]
+  our log is too sensitive for your eyes :P, try yourself
+
+=head2 gapl <server_port>
+
+Gets the average packet loss
+
+gapl will display the average packet loss of the virtual server that is
+either currently selected (-> sel), or that is specified in <serverport>.
+This value is a good indication to see if something is going wrong on
+the server side (e.g. the bandwidth the server has doesnt suffice).
+On a good server with mostly users from close-by (e.g. European users
+on an European server) the value should be under 1%. If it rises to 5%
+or more you will have major problems using this server to talk.
+
+=head3 Example
+
+  gapl
+  >average_packet_loss=0.81%
+  >OK
+
+=head2 mptc <channelID> <playerID>
+
+move a player to a channel
+
+Moves the user with the <playerID> to the channel specified in
+<channelID>. Works like the "drag & drop" functionality of the client,
+so it basicly overrules passwords, userlimits and sticky flags.
+
+=head3 Example
+
+  fp claus
+  >p_id    c_id    nickname        loginname
+  >5975    4       "SatanClaus"    "SatanClaus"
+  >OK
+  fc german
+  >c_id    c_name
+  >10      German Talk
+  >OK
+  mptc 10 5975
+  >OK
+
+=head2 removeclient <playerID>
+
+disconnect a user from the server
+
+this will remove a client from the server without the noise of a kick
+- especially usefull for scripting I guess.
+
+=head3 Example
+
+  fp pwk
+  >p_id    p_dbid  c_id    nickname        loginname       ip
+  >9807    14582   15      "pwk.linuxfan"  "SA_Account9"   "80.132.25.140"
+  >OK
+  removeclient 9807
+  >OK
+
+=head2 kick <playerID>
+
+kick a player of the server
+
+kick will kick the player with the playerID of the server.
+
+=head3 Example
+
+  fp 7!r
+  >p_id    c_id    nickname        loginname
+  >17      10      "$7!RB"         "STiRB"
+  >OK
+  kick 17
+  >OK
+
+=head2 sppriv <playerID> <property> <value>
+
+sets player privileges
+
+sppriv will set the property of a player to a new value. The properties
+that are avaliable are:
+  property                        possible value
+  privilege_serveradmin           1/0
+  privilege_canregister           1/0
+  privilege_channelsticky         1/0
+
+channelsticky means this user is not allowed to switch channels
+anymore. He is *glued* to the channel he is in - note that this doesnt
+work on server admins.
+
+=head3 Example
+
+  fp wouter
+  >p_id    c_id    nickname        loginname
+  >631     10      "[TS]Wouter"    "wouter"
+  >OK
+  sppriv 631 privilege_serveradmin 0
+  >OK
+  sppriv 631 privilege_channelsticky 1
+  >OK
+
+=head2 dbpi <databaseID>
+
+print information about a player in the database
+
+This command is useful to find out information about users that are
+currently not connected to your server, but that have a registered
+account. As pi (->pi), it will list some information about the player
+specified by the database ID (-> pi) (-> fp) (-> dbuserid). The command will
+also display the last time the account was used, and the time it was made.
+Note: This is a good way of finding out what rights a player has in the
+channels.
+
+=head3 Example
+
+  dbuserid crashlady
+  >8233
+  >OK
+  dbpi 8233
+  >p_dbid  loginname       sa      created                 lastonline
+  >8233    crashlady       0       13-09-2003 00:07:34     19-01-2004 20:14:14
+  >c_dbid  c_dbpid c_name          ca      ao      av
+  >292     106     "German Talk"   0       1       0
+  >OK
+
+=head2 pi <playerID>
+
+Gives info about a player
+
+pi will list some information about the player with the <playerID>. It
+contains the ID of the channel he is in, if he is SA, and if he is
+sticky (-> sppriv). It also lists the channel-specific rights this
+player has, and in which channels.
+
+=head3 Example
+
+  fp dan
+  >p_id    p_dbid  c_id    nickname        loginname       ip
+  >14902   3619    14      "dante696"      "dante696"      "12.13.54.58"
+  >14970   0       2589    "Fistdantiluss" ""              "55.144.33.22"
+  >OK
+  pi 14902
+  >p_id    p_dbid  c_id    nickname        loginname  sa st ip
+  >14902   3619    14      "dante696"      "dante696" 0  0  "12.13.54.58"
+  >
+  >c_id    name            ca      o       ao      v       av
+  >11      "German Talk"   1       0       0       0       0
+  >12      "English Talk"  1       0       0       0       0
+  >13      "Dutch Talk"    0       1       1       0       0
+  >14      "French Talk"   0       1       1       0       0
+  >15      "Spanish Talk"  0       1       1       0       0
+  >16      "Turkish Talk"  0       1       1       0       0
+  >OK
+
+Here we can see: Dante is currently in channel with ID 10 (German
+Talk), has no Server Admin, and isnt sticky. His channel
+rights are: CA in German Talk and English Talk, Auto-Ops and Ops in the
+other talk channels.
+
+=head2 dbfp <login_substring>
+
+finds a player in the database
+
+This command will find all the login-accounts that contain the specified
+string. It will also display their database ID, and if they have SA or
+not. Useful if you dont know the exact name, else see dbuserid (-> dbuserid).
+Additionaly it will display when this account was created, and what time it
+was last used to login.
+
+=head3 Example
+
+  dbfp subi
+  >p_dbid  loginname  sa   created              lastonline
+  >23322   "Subi"     0    19-01-2004 23:15:30  20-01-2004 00:02:54
+  >OK
+
+=head2 fp <name_substring>
+
+finds a player based on a string
+
+fp will find all players that have nicks that have <name_substring> in
+their nick-name or in their login-name.
+  p_id    is the playerID, needed for most player manipulations
+  p_dbid  is the databaseID, zero for unregistered players
+  c_id    is the channelID in which this user is currently in.
+  ip      is the IP address of the user, good for banning
+
+=head3 Example
+
+  fp unky
+  >p_id  p_dbid  c_id    nickname        loginname       ip
+  >9114  0       1979    "FunkyFreak"    ""              "80.184.142.72"
+  >9432  0       1848    "fresh&funky"   ""              "217.82.132.218"
+  >OK
+
+=head2 dbci <channel_database_ID>
+
+lists database information about a channel
+
+This command is used to print the database information about a channel.
+This includes the rights that are saved in the database, but arent
+currently used (e.g. rights of users that arent in the channel). Its a
+useful tool to check on how the rights in your channels are distributed
+currently. The information is similar to ci, just look there if you want
+to know what the weird shortcuts mean :P.
+
+=head3 Example
+
+  fc default
+  >c_id    c_dbid  c_name
+  >2       87      Default Channel
+  >OK
+  dbci 87
+  [some  information that is too long for the 80 char lines :) ]
+  >p_dbid  loginname       ca      ao      av
+  >190     ProVidencE      1       0       0
+  >203     toxic   1       0       0
+  >1599    MapE    1       0       0
+  >OK
+
+=head2 ci <channelID>
+
+display informations about a channel
+
+ci will display information on the channel specified with <channelID>.
+Lets have a look at its output:
+  c_id    is the channel ID
+  c_pid   if this channel is a subchannel, this is the ID of the parent
+  channel - else its -1
+  c_dbid  this is the database ID, zero for unregistered channels
+  c_name  the name of the channel
+  c_fU    is this channel unregistered ? 0=false 1=true
+  c_fM    is this channel moderated ? (0/1)
+  c_fP    is this channel passworded ? (0/1)
+  c_fH    is the channel a subchannel ? (0/1)
+  c_fD    is this channel the default channel ? (0/1)
+  c_codec is the channel codec, from this table:
+  0       CELP 5.2
+  1       CELP 6.3
+  2       GSM 14.8
+  3       GSM 16.4
+  4       Windows CELP 5.2
+  5       Speex 3.4
+  6       Speex 5.2
+  7       Speex 7.2
+  8       Speex 9.3
+  9       Speex 12.3
+  10      Speex 16.3
+  11      Speex 19.5
+  12      Speex 25.9
+  c_order         the value that was entered as channel "order", default 3200
+  c_maxusers      maximum users allowed to this channel
+  c_created       time and date of channel creation
+  c_topic         the channel topic
+  c_description   the channel description
+
+Following this output is the list of all players currently in the
+channel, with their channel rights. Most of the flags are obviouse,
+except:
+  st      is 1 if the user is sticky (-> sppriv)
+
+=head3 Example
+
+  No example, as the output is too long for these 80 character lines :o)
+
+=head2 fc <name_substring>
+
+finds a channel based on a string
+
+fc will find all channels on the selected virtual server (->sel), that
+have names containing <name_substring>.
+  c_id    is the channelID of this channel
+  c_dbid  the ID this channel has in the database, only > 0 for registered
+          channels
+  c_name  is the name of the channel
+
+=head3 Example
+
+  fc default
+  >c_id    c_dbid  c_name
+  >2       87      Default Channel
+  >OK
+
+=head2 slogin <username> <password>
+
+login as superadmin
+
+slogin will log into your superadmin account. This gives you all
+permissions possible - be careful with your commands :).
+
+=head3 Example
+
+  slogin superadmin g7bni
+  >OK
+
+=head2 login <username> <password>
+
+login with your account data
+
+login will log a regular TS account. What you will be able to do depends
+on the permission settings... Logging in is necessary for all advanced
+commands. If you want to log in as superadmin (-> slogin).
+
+=head3 Example
+
+  login SA_Account9 3rnie&b3rt
+
+=head2 msgall <text>
+
+send a text to every virtual server
+
+Sends a textmessage to all users on this server instance (no matter on
+which virtual server they are are hanging out). Like with all msg
+commands (->msg, ->msgu), it is possible to strip the "telnet.loginname"
+thats usualy displayed infront of all messages you send via telnet by
+putting a "@" infront of your message.
+
+=head3 Example
+
+  msgall Hello Universe :)
+  >OK
+
+=head2 msgu <user_id> <some text here>
+
+send a textmessage to a user
+
+This is used to send a textmessage to a certain user that is currently
+connected to your server. Like with all msg commands (->msg, ->msgall),
+it is possible to strip the "telnet.loginname" thats usualy displayed
+infront of all messages you send via telnet by putting a "@" infront of
+your message.
+
+=head3 Example
+
+  fp wotan
+  >p_id    p_dbid  c_id    nickname        loginname       ip
+  >8540    3954    15      "wotan" "wodan" "213.103.139.105"
+  >OK
+  msgu 8540 @Now you are famous, you are in the tcpquery docs :)
+  >OK
+
+=head2 msg <text>
+
+Send a message to a virtual server
+
+Sends the text as a text message to all users connected to the
+currently selected (-> sel) server instance. Like with all msg commands
+(->msgall, ->msgu), it is possible to strip the "telnet.loginname" thats
+usualy displayed infront of all messages you send via telnet by putting
+a "@" infront of your message.
+
+=head3 Example
+
+  sel 8767
+  >OK
+  msg Hello World
+  >OK
+
+=head2 si (no parameters)
+
+gives information about a virtual server
+
+si will list lots of information about the currently
+selected virtual server (-> sel). Most of the output is
+self-explanatory, lets have a look at the less intuitve ones:
+
+  total_bwoutlastmin      is the amount of bytes sent in the last minute
+  total_bwoutlastsec      is the amount of bytes sent in the last second
+  total_bwinlastmin       is the amount of bytes recieved in the last min
+  total_bwinlastsec       is the amount of bytes recieved in the last min
+  isp_ispname             the name of the provider of this service
+  isp_linkurl             the URL of the provider, linked in the banner
+                          on the client too...
+  isp_adminemail          the email of the server admin
+  isp_countrynumber       A number that specifies which country the
+                          server is in - dunno how to resolve
+                          number->country, if anybody does - tell me :o).
+
+=head3 Example
+
+  si
+  >server_id=1
+  >server_name=TeamSpeak Public  -1-
+  >server_platform=Linux
+  >server_welcomemessage=We want to meet @ irc. Please idle in #TeamSpeak on quakenet
+  [...]
+
+=head2 sel <serverport>
+
+select a virtual server
+
+Chooses the server specified with <serverport>, important for many
+following commands, that manipulate the selected server.
+
+=head3 Example
+
+  sel 8767
+  >OK
+
+=head2 gi (no parameters)
+
+gives general info about the server
+
+gi will list lots of general (read: non virtual server
+specific) information. Most of the output is self-explanatory, lets
+have a look at the less intuitve ones:
+  total_bwoutlastmin      is the amount of bytes sent in the last minute
+  total_bwoutlastsec      is the amount of bytes sent in the last second
+  total_bwinlastmin       is the amount of bytes recieved in the last min
+  total_bwinlastsec       is the amount of bytes recieved in the last min
+  isp_ispname             the name of the provider of this service
+  isp_linkurl             the URL of the provider, linked in the banner
+                          on the client too...
+  isp_adminemail          the email of the server admin
+  isp_countrynumber       A number that specifies which country the
+                          server is in - dunno how to resolve
+                          number->country, if anybody does - tell me :o).
+
+=head3 Example
+
+  gi
+  >total_server_uptime=17:48:19
+  >total_server_version=2.0.19.43
+  >total_server_platform=Linux
+  >total_servers=16
+  >total_users_online=579
+  >total_users_maximal=37957
+  [...]
+
+=head2 ver (no parameters)
+
+print the version
+
+ver will output the exact server version string, tell
+you the operating system and also if this is a commercial build or not.
+
+=head3 Example
+
+  ver
+  >2.0.19.50 Linux Commercial
+  >OK
+
+=head2 cl (no parameters)
+
+lists the channels on a virtual server
+
+cl will list all channels that are currently set up
+on the virtual server. It will also display some info on the channels
+it list, lets have a look at the output.
+  id        is the channel ID, used for channel manipulating commands
+  codec     is the Codec the channel uses, from this table:
+            0       CELP 5.2
+            1       CELP 6.3
+            2       GSM 14.8
+            3       GSM 16.4
+            4       Windows CELP 5.2
+            5       Speex 3.4
+            6       Speex 5.2
+            7       Speex 7.2
+            8       Speex 9.3
+            9       Speex 12.3
+            10      Speex 16.3
+            11      Speex 19.5
+            12      Speex 25.9
+  parent    if this channel is a subchannel, parent will be the
+            channel ID of the parent channel.
+  order     This displays the order value, determining the way to
+            order channels
+  maxusers  The maximum amound of users that may join the channels
+  name      the name of the channels
+  flags     the channel flags, add up from this table:
+            Unregistered:   1
+            Moderated:      2
+            Password:       4
+            Hierarchical:   8
+            Default:        16
+  password  has this channel got a password set ? 1=true, 0=false
+  topic     the channel topic
+
+=head3 Example
+
+  Well, just try it, the output is just too long for this help file :P.
+
+=head2 pl (no parameters)
+
+lists the players on a virtual server
+
+pl will return a lists of all users connected
+to the virtual server currently selected (-> sel).
+It also gives lots of interesting data on the players it lists.
+Lets have a look at the output format:
+  p_id    is the player ID, needed for many other commands to manipulate
+  a player.
+  c_id    is the channel ID of the channel the player is currently in.
+  ps      is the amount of packets this user has sent to the server
+  bs      is the amount of bytes this user has sent to the server
+  pr      is the amount of packets this user has recieved from the
+  server
+  br      is the amount of bytes this user has recieved from the server
+  pl      is the amount of lost packets the user-server connection
+  produced
+  ping    is the latency time from user to server, in milliseconds
+  logintime       is the time in seconds since this user connected to
+  the server
+  idletime        is the time in seconds since the last user interaction
+  with the server
+  cprivs  a value determining the current channel privileges, add up
+  until you get the value from this table:
+  CA:     1
+  O:      2
+  V:      4
+  AO:     8
+  AV:     16
+  pprivs  a value determining the current player privileges, add up until
+  you get the value from this table:
+  SA:                     1
+  Allow_Registration:     2
+  Registered:             4
+  Internal Use:           8
+  Stickey:                16
+  pflags  a value determining the current player flags, add up until you
+  get the value from this table:
+  Channel Commander:      1
+  Voice Request:          2
+  Doesnt Accept Whispers: 4
+  Away:                   8
+  Microphone Muted:       16
+  Sound Muted:            32
+  Recording:              64
+  ip      is the IP of this player
+  nick    is the nickname the player has selected
+  loginname       is the name of the account the user has logged in with
+
+=head3 Example
+
+  Well, no example as the output is much to long for one of these 80
+  character lines :o)
+
+=head2 sl (no parameters)
+
+lists all servers
+
+sl will return a list of ports on which there
+are virtual server instances running.
+
+=head3 Example
+
+  sl
+  >8767
+  >OK
+
+=head2 help <command>
+
+Displays general or specific help
+
+Without an argument help will give a list of available commands, each
+with a short description.
+If you specify a command as argument, help will display specific
+information on the command.
+
+=head3 Example
+
+  help
+  command overview:
+  help                : this helpfile
+  sl                  : serverlist
+  pl                  : playerlist
+  cl                  : channellist
+  ver                 : version
+  gi                  : global information
+  [...]
+
+=head1 INSTALLATION
+
+It's all pure Perl, so just put the .pm file in its appropriate
+local Perl subdirectory.
+
+=head1 AUTHOR
+
+Martin von Oertzen (maletin@cpan.org)
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005-2007, Martin von Oertzen. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.
+
+=head1 AVAILABILITY
+
+=over
+
+=item Teamspeak::Telnet has been uploaded to the CPAN.
+
+=item $Id: Telnet.pod 35 2007-10-21 22:23:54Z maletin $
+
+=item $URL: http://svn.berlios.de/svnroot/repos/cpan-teamspeak/cpan/trunk/lib/Teamspeak/Telnet.pod $
+
+=back
+
+=cut
+

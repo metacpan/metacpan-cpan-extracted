@@ -1,0 +1,172 @@
+=encoding utf-8
+
+=head1 NAME
+
+security セキュリティ
+
+=head1 DESCRIPTION
+
+このドキュメントは、TripletaiL を利用する際、どのようなセキュリティ上の問題に配慮すべきかについて記述しています。
+
+
+
+
+=head2 Cross Site Scripting (クロスサイトスクリプティング、XSS)
+
+
+=head3 タグ文字が差し込まれるのを防ぐ
+
+ユーザの入力を画面に表示する際に、"E<lt>" や "E<gt>" などのHTMLタグがそのまま表示されないように注意します。
+
+=over 4
+
+=item Template クラスを使用します。
+
+TripletaiL の Template クラスを使用し、ユーザ入力の展開に expand や add メソッドを利用します。
+
+これらのメソッドは、デフォルトで "E<lt>" や "E<gt>" を "&lt;" や "&gt;" に置き換えます。
+これらの置き換えを行いたくない場合は、setAttr メソッドで動作を変更できます。
+
+ただし、_raw などを使用する際には、十分注意して下さい。
+ユーザの入力に対して、一部のタグだけを許可したり、URLのリンクだけを許可したい場合は、TagCheck クラスが利用できます。
+
+=item C<< E<lt>scriptE<gt>E<lt>&DATAE<gt>E<lt>/scriptE<gt> >> や C<< E<lt>a href="" E<lt>&DATAE<gt>E<gt> >> のような部分に展開しないようにします
+
+テンプレートで展開する場所が安全かどうかを確認します。
+
+setAttr メソッドで "E<lt>" や "E<gt>" を安全に置き換えても、script タグの中に文字列を出力したり、タグの中に文字列を出力してしまうと、
+スクリプトの実行が可能になってしまいます。
+
+=back
+
+=head3 URLの指定に注意します
+
+C<< E<lt>a href="javascript:XXX"E<gt> >>などにならないように、URL が「http://」や「https:://」から開始されていることを確認してから、差し込んで下さい。
+
+
+
+=head2 SQL Injection (SQLインジェクション)
+
+SQLを組み立てる際に入力パラメータをそのままSQL文の中に入れてしまうと、条件を回避したり、任意のクエリを実行できることがあります。
+
+SQLを発行する際は、動的にSQLを組み立てる場合も含め、必ずパラメータをプレースホルダ "C<?>" 経由で引き渡すようにします。
+TripletaiL では、拡張プレースホルダ "C<??>" を利用することで、LIMIT句などにも簡単に変数経由で値を渡すことが出来ます。
+
+テーブル名等をパラメータで指定しなければならない場合は、余計な文字が入らないことを十分に確認してから、SQL文の中に差し込んで下さい。
+
+
+=head2 Cross Site Request Forgeries (クロスサイトリクエストフォージェリ、CSRF)
+
+認証済みのユーザに特定のアクセスをさせることで、意図しない操作（記事の書き込み・削除等）をさせる手法です。
+
+重要な操作をする場合は、その前の確認画面で Template クラスの C<< L<addSessionCheck| Tripletail::Template/addSessionCheck> >> メソッドを利用して、セッションIDを利用したキーを埋め込みます。
+確認画面をクリックした後、フォームデータを受け取った側では、C<<< L<< $CGI->haveSessionCheck | Tripletail::Form/haveSessionCheck >> >>> メソッドを利用して、正しい利用者のキーが埋め込まれているかを確認します。
+
+
+=head2 Session Hijacking / Replay (セッション・ハイジャック／リプレイ)
+
+
+セッションを読み取り、ユーザになりすます手法です。
+
+特に、HTTP領域では、通信内容を第三者に閲覧される可能性があるため、セッションハイジャックの可能性が残ります。
+
+サイトを設計する際は、重要な機能は全て HTTPS領域に配置し、L< セッションのmode | Tripletail::Session/mode > を C<double> または C<https> モードにする必要があります。
+C<http> モードはセッションハイジャックに対して安全ではないので、重要な情報を取り扱う場合は利用しないで下さい。
+
+TripletaiL のセッションは、C<double> モードであれば、HTTP領域、HTTPS領域にまたがってセッションを利用しても、
+httpで閲覧した内容を用いて、HTTPS領域のセッションをハイジャックすることが出来ないようになっています。
+このため、HTTP領域では差し支えのない範囲でセッションを利用し、重要な機能をHTTPS領域で安全に提供することができます。
+
+=head3 携帯でのセッション利用における注意事項
+
+携帯用に L<Tripletail::Filter::MobileHTML> を利用している場合は、
+セッション情報がフォームに出力されるため、セッション情報の
+漏洩に関して特に注意する必要があります。
+
+外部サイトにリンクをする際に、セッションで管理されているページから
+直接リンクをたどれるようにしてしまうと、外部サイトに対し、
+ブラウザが Referer ヘッダで直前の（セッション情報が入った）URLを
+送ってしまうため、セッション情報が漏洩します。
+
+外部へリンクする際は、一度セッション情報を付けずに自サイトの
+別ページに遷移してから、目的の外部ページへ遷移させます。
+
+L<Tripletail::Form> の
+L<toExtLink()|Tripletail::Form/toExtLink> を利用してリンクを作成するか、
+C<"INT"> キーを含まないURLを直接HTMLに書くことで、
+セッション情報を付けずにページを遷移させることが出来ます。
+
+また、HTTP領域とHTTPS領域の行き来を安全に行うことも出来ません。
+
+=head2 Forceful Browsing (強制的ブラウズ)
+
+直接若しくは間接的に公開する意図のないファイルを、
+その位置を直接指定することで参照する手法です。
+
+F<ini> ファイル等は外部から参照できる場所(C<DocumentRoot>以下など)には
+おかないようにしてください。
+
+=head2 Path Traversal (パスの乗り越え)
+
+CGIに渡されるパラメータをパスに指定している際に、本来アクセスできない位置のファイルを読まれてしまう問題です。
+
+open関数など、通常のファイル操作を避けて、テンプレートは全てテンプレートクラスを利用するようにして下さい。
+
+テンプレートクラスは、L<basepath|Tripletail::Template/basepath>、
+L<rootpath|Tripletail::Template/rootpath> で、アクセスするディレクトリを指定・制限することが出来ます。
+この機能を利用し、テンプレートは他のファイルと別のディレクトリに配置するようにして下さい。
+
+
+=head2 OS Command Injection (OS コマンドの挿入)
+
+パラメータに渡されたデータをC<open>等に渡す場合に、OSコマンドを実行されてしまう問題です。
+
+C<open>関数など、通常のファイル操作を避けて、テンプレートは全てテンプレートクラスを利用するようにして下さい。
+
+
+
+=head2 Session Fixation 攻撃 (セッション固定攻撃)
+
+攻撃者が生成したセッションIDをユーザに使用させ、そのユーザになりすます手法です。
+
+TripletaiL では、デフォルトでは Sessionクラスの L<setValue|Tripletail::Session/setValue> で値を変更した場合、セッションIDは自動的に更新されるので安全です。
+
+Session クラスの ini 設定で、L<setvaluewithrenew|Tripletail::Session/setvaluewithrenew> を C<0> に指定すると更新されなくなるため、C<0> に指定する場合は、適宜 L<renew|Tripletail::Session/renew> メソッドでセッションIDを更新する必要があります。
+
+また、L<setValue|Tripletail::Session/setValue> より多くのデータを扱うために、独自にテーブルにセッションIDに関連した情報を保持している場合は、L<renew|Tripletail::Session/renew> の動作に注意して下さい。
+
+L<setValue|Tripletail::Session/setValue> で認証のための情報をセットするような設計にしておき、認証情報が変わった場合は自動的にL<renew|Tripletail::Session/renew>されるような構成にすることを推奨します。
+
+
+=head2 C<dispatch> による意図しない関数呼び出し
+
+C<< L<dispatch|Tripletail/dispatch> >> メソッドは、
+"C<Do>" + "C<与えられた引数>" という名前に一致した
+関数を呼び出します。
+
+パッケージ内に "C<Do>" から始まる関数があると
+意図せずに呼び出される可能性があるので注意してください。
+
+バージョン 0.30以降では、引数に渡せる名前は大文字始まりに
+制限されていますが、0.29 以前ではこの制限がないため、
+他の単語の一部に "C<Do>" が含まれる関数も呼び出される可能性があります。
+(例: C<DoneXxx>, C<DomainCheck>, C<DocumentCreate>, C<Download>)
+
+
+=head1 AUTHOR INFORMATION
+
+=over 4
+
+Copyright 2007 YMIRLINK Inc.
+
+This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+Address bug reports and comments to: tl@tripletail.jp
+
+HP : http://tripletail.jp/
+
+=back
+
+=cut

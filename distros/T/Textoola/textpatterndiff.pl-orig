@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use v5.14;
+
+#
+# Compare frequency of texts based patterns
+#
+
+sub parse_file {
+    my $path = shift;
+    open(my $fh,"<",$path) or die "File $path not found";
+
+    my %patstats;
+    while(my $line=<$fh>) {
+	chomp $line;
+	$line =~ s/\t/ /g;
+	$line =~ s/^\s+//g;
+	$line =~ s/\s+$//g;
+	$line =~ s/\s+/ /g;
+	my $pattern;
+	my @items = split /\s/,$line;
+	while (scalar(@items)) {
+	    $pattern //= shift @items;
+	    $patstats{$pattern}++;
+	    
+	    while (scalar(@items)) {
+		$pattern .= " ".shift @items;
+		$patstats{$pattern}++;
+	    }
+	}
+    }
+    close $fh;
+    return \%patstats;
+}
+
+my $patstats1  = parse_file($ARGV[0]);
+my $patstats2  = parse_file($ARGV[1]);
+my $threshhold = $ARGV[2] || 5; # 5%
+$threshhold    = $threshhold / 100;
+my $upperlimit = $threshhold;
+my $lowerlimit = -$threshhold;
+
+my %result;
+
+for my $pat1 (keys %$patstats1) {
+    if (exists $patstats2->{$pat1}) {
+	my $base   = $patstats1->{$pat1};
+	my $new    = $patstats2->{$pat1};
+	my $change = ($new - $base) / $base;
+	if (($change <= $lowerlimit)) {
+	    $result{$pat1} = (100*$change);
+	} elsif (($change >= $upperlimit)) {
+	    $result{$pat1} = (100*$change);
+	}
+	
+	delete $patstats2->{$pat1};
+    } else {
+	# only on left side
+	$result{$pat1} = -100;
+    }
+}
+# for the rest of right side
+for my $pat2 (keys %$patstats2) {
+    $result{$pat2} = '*';
+}
+
+# reduce partial patterns with same change-rate
+my @patterns = sort keys %result;
+while (scalar(@patterns)-1) {
+    my $cur_pattern  = shift @patterns;
+    my $size         = length($cur_pattern);
+#  say $cur_pattern.'#-#'.$patterns[0];
+    my $next_pattern = substr($patterns[0],0,$size);
+#  say $cur_pattern.'#!#'.$next_pattern;
+    if ($cur_pattern eq $next_pattern) {
+	if (($result{$cur_pattern} ne '*') and ($result{$next_pattern} ne '*')) {
+	    if ($result{$cur_pattern} == $result{$next_pattern}) {
+		delete $result{$cur_pattern};
+	    }
+	} elsif (($result{$cur_pattern} eq '*') and ($result{$next_pattern} eq '*')) {
+	    delete $result{$cur_pattern};
+	}
+    } 
+}
+
+
+for my $pattern (sort keys %result) {
+    if ($result{$pattern} eq '*') {
+	say "   *%".": ".$pattern;
+    } else {
+	say sprintf("%4d%%",$result{$pattern}).": ".$pattern;
+    }
+}
+

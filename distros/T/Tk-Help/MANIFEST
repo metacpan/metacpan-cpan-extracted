@@ -1,0 +1,7 @@
+CHANGES
+demo/helpdemo.pl
+lib/Tk/Help.pm
+Makefile.PL
+MANIFEST
+README
+t/Tk-Help.t

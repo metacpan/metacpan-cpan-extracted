@@ -1,0 +1,55 @@
+[%# vim: set syntax=java: %]
+
+public String toString()
+{
+	return	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n"+
+		"<$tag>\n"+toString(1)+"</$tag>\n";
+}
+
+public String toString(int depth)
+{
+	StringBuffer result = new StringBuffer();
+
+	for (int i = 0; i < depth; i++) {
+		result.append("\t");
+	}
+
+	String tabs = result.toString();
+
+	result = new StringBuffer();
+
+[% SET enum = 1 %]
+[% FOREACH Java.variables %]
+[%	IF Java.scalar %]
+[%		IF Java.string %]
+	if ($name != null && ! ${name}.equals("")) {
+		result.append (tabs+"<$name>"+$name+"</$name>\n");
+	}
+[%		ELSE %]
+	if ($name != [% initializer || "null" %]) {
+		result.append (tabs+"<$name>"+$name+"</$name>\n");
+	}
+[%		END %]
+[%	ELSIF Java.array %]
+	Enumeration e$enum = ${name}.elements();
+	while (e${enum}.hasMoreElements()) {
+		result.append (
+			tabs+"<$name>\n"+
+			e${enum}.nextElement().toString(depth+1)+
+			tabs+"</$name>\n"
+		);
+	}
+[%		SET enum = enum + 1 %]
+[%	ELSE # Container %]
+	if ($name != null) {
+		result.append (
+			tabs+"<$name>\n"+
+			${name}.toString(depth+1)+
+			tabs+"</$name>\n"
+		);
+	}
+[%	END %]
+[% END %]
+
+	return result.toString();
+}

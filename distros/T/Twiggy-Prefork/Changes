@@ -1,0 +1,32 @@
+Revision history for Perl extension Twiggy::Prefork
+
+0.08 2013-12-20T07:08:59Z
+
+        - If max_reqs_per_child => 0, child process is not existed by number of requests (Thanks soh335)
+
+0.07 2013-09-24T00:17:14Z
+
+        - fixed typo in POD
+
+0.06 2013-09-02T05:54:12Z
+
+        - fixed not working TERM signal (Thanks nhayashi)
+          https://github.com/kazeburo/Twiggy-Prefork/pull/1
+
+0.05 2013-08-30T07:11:25Z
+
+        - fixed requires
+
+0.04 2013-06-13T07:16:44Z
+
+        - cleanup test and test_requires
+
+0.03 2013-06-13T06:49:33Z
+
+        - re-packaging with Minilla
+
+0.02    Wed Jun 13 18:33:08 2012
+        - fixed tests, suppress Test::TCP warnings. no code changing
+
+0.01    Wed May 30 18:45:30 2012
+        - original version

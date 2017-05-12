@@ -1,0 +1,6 @@
+name = "Term-GnuScreen-WindowArrayLike"
+# badges = ["travis"]
+authority="cpan:TOKUBASS"
+
+module_maker="ModuleBuildTiny"
+

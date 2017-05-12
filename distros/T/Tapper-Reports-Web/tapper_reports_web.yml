@@ -1,0 +1,14 @@
+---
+name: Tapper::Reports::Web
+
+# override special configs for live mode here
+live:
+  dummy_value:     live
+
+# override special configs for development mode here
+development:
+  dummy_value:     development
+
+# override special configs for test mode here
+test:
+  dummy_value:     test

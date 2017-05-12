@@ -1,0 +1,3 @@
+ERROR(simat.pl):
+        Index <12> at line <6> in Vector file <test-B2b.vec>
+        exceeds #cols = <10> specified in the header line.

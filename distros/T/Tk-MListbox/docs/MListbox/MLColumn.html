@@ -1,0 +1,710 @@
+<!doctype html public '-//w3c//dtd html 3.2//en'>
+<html>
+<head>
+  <title>Tk::MListbox::MLColumn</title>
+  <link rel='stylesheet' type='text/css' href='../ptkdocs.css'>
+  <meta name='Version' content='0.01'>
+ </head>
+ <body background="bg.gif">
+
+<table cellpadding=4 width='100%'>
+<tr valign=middle>
+  <td class='header'>&nbsp; MLColumn</td>
+  <th class='subheader' width = '10%'>Package Info</th>
+</tr>
+<tr>
+  <td><a  href="tutorial.html">Tutorial</a> <b>|</b> 
+         <a href=""></a>FAQ <b>|</b> 
+         <a href="change.html">Changes/Bug fixes</a>
+  </td>
+  <td valign="top" width ="30%" height='100%' rowspan=2>
+    <table width="100%" >
+      <tr valign=top><th align=right>Version:</th><td>1.10</td></tr>
+      <tr valign=top><th align=right>DSLIP:</th><td>bdpOp</td></tr>
+      <tr valign=top><th align=right>Author:</th><td nowrap>Hans J. Helgesen</td></tr>
+      <tr valign=top><th align=right>Maintainer:</th><td nowrap><a href="mailto:robseegel@aol.com">Rob Seegel</a></td></tr>
+      <tr valign=top><th align=right>Package:</b></td><td><a href="../MListbox.html">MListbox</a></td></tr>
+      <tr valign=top><th align=right>Platforms:</th><td>Linux<br>Unix<br>Windows</td>
+    </table>      
+  </td>
+</tr>
+<tr><td>
+<!-- Table of contents -->
+<ul>
+    <li><a href='#heirarchy'>Heirarchy</a></li>
+    <li><a href='#description'>Description</a></li>
+    <li><a href='#components'>Components</a></li>
+    <li><a href='#options'>Options</a></li>
+    <ul>
+        <li><a href='#inhoptions'>Inherited</a></li>
+    </ul>
+    <li><a href='#methods'>Methods</a></li>
+</ul>
+</td></tr>
+</table>
+<hr>
+
+<a name='heirarchy'><h3>HEIRARCHY</h3></a>
+<p class='pMargin'>
+<a href='Widget.html'></a>Widget // <a href='Frame.html'></a>Frame // <b>MLColumn</b><br>
+</p>
+<hr>
+
+<a name='description'><h3>DESCRIPTION</h3></a>
+<p class='pMargin'>
+  MLColumn is a composite widget used to display the contents of one column of data (including
+  the header) within the <a href="../MListbox.html">MListbox</a> widget.  This widget is <b>not</b>
+  meant to be used outside of the MListbox widget, and it should never be instatiated by itself. 
+  The tight coupling between the two prevents it from being useful in any other capacity. It is
+  documented here only because it can be accessed and returned by some MListbox's methods, 
+  and it and it's subwidgets can be configured directly if necessary.
+</p>
+  
+<hr>
+<a name='components'><h3>COMPONENTS</h3></a>
+   
+<table width='95%' border=2 cellpadding=2>
+<tr><td colspan=2 class='subheader'><a name='wsoptions'></a>
+   &nbsp; Subwidgets:</td></TR>
+
+<!-- frame -->
+<tr valign=top><td width='25%'><a name='height'></a>
+    <table border=0>
+        <tr><th align=right>Name:</th><td>frame</td></tr>
+        <tr><th align=right>Class:</th><td><a href="Frame.html"></a>Frame</td></tr>
+    </table></td>
+    <td>
+   </td>
+</tr>
+
+<!-- heading -->
+<tr valign=top><td width='25%'><a name='height'></a>
+    <table border=0>
+        <tr><th align=right>Name:</th><td>heading</td></tr>
+        <tr><th align=right>Class:</th><td><a href="HButton.html">HButton</a></td></tr>
+    </table></td>
+    <td>
+   </td>
+</tr>
+
+<!-- listbox -->
+<tr valign=top><td width='25%'><a name='height'></a>
+    <table border=0>
+        <tr><th align=right>Name:</th><td>listbox</td></tr>
+        <tr><th align=right>Class:</th><td><a href="CListboxl">CListbox</a></td></tr>
+    </table></td>
+    <td>&nbsp;
+   </td>
+</tr>
+
+<!-- separator -->
+<tr valign=top><td width='25%'><a name='height'></a>
+    <table border=0>
+        <tr><th align=right>Name:</th><td>separator</td></tr>
+        <tr><th align=right>Class:</th><td><a href="Frame.html"></a>Frame</td></tr>
+    </table></td>
+    <td>
+   </td>
+</tr>
+</table>
+<br>
+
+<hr>
+<a name='options'><h3>OPTIONS</h3></a>
+<table width='95%' border=2 cellpadding=3>
+<tr><td colspan=2 class='subheader'><a name='wsoptions'></a>
+   &nbsp; MListbox defined:</td></tr>
+<tr><td colspan=2>
+<table width='100%'>
+<tr valign=top><td width="25%" NOWRAP>
+  -<a href='#bg'>background</a><br>
+  -<a href='#columns'>columns</a><br>
+  -<a href='#configurecommand'>configurecommand</a><br>
+  -<a href='#font'>font</a><br>
+</td>
+<td width="25%" NOWRAP>
+  -<a href='#fg'>foreground</a><br>
+  -<a href='#moveable'>moveable</a><br>
+  -<a href='#resizable'>resizeable</a><br>
+  -<a href='#selectbg'>selectbackground</a><br>
+</td>
+<td width="25%" NOWRAP>
+  -<a href='#selectfg'>selectforeground</a><br>
+  -<a href='#selectmode'>selectmode</a><br>
+  -<a href='#separatorcolor'>separatorcolor</a><br>
+  -<a href='#separatorwidth'>separatorwidth</a><br>
+</td>
+<td width="25%" NOWRAP>
+  -<a href='#sortable'>sortable</a><br>
+  -<a href='#takefocus'>takefocus</a><br>
+  -<a href='#yscrollcomand'>yscrollcommand</a><br>
+</td>
+</tr>
+</table></td></tr>
+</table>
+<br>
+
+<table width='95%' border=2 cellpadding=3>
+<tr><td colspan=2 class='subheader'><a name='wsoptions'></a>
+   &nbsp; Inherited from Frame:</td></tr>
+<tr><td colspan=2>
+<table width='100%' >
+<tr valign=top><td width="25%" NOWRAP>
+  -<a href='Frame.html#borderwidth'></a>borderwidth<br>
+  -<a href='Frame.html#height'></a>height<br>
+</td>
+<td NOWRAP width="25%">
+  -<a href='Frame.html#highlightbackground'></a>highlightbackground<br>
+  -<a href='Frame.html#highlightcolor'></a>highlightcolor<br>
+</td>
+<td NOWRAP width="25%">
+  -<a href='Frame.html#highlightthickness'></a>highlightthickness<br>
+  -<a href='Frame.html#relief'></a>relief<br>
+</td>
+<td NOWRAP width="25%">
+  -<a href='Frame.html#width'></a>width<br>
+</td>
+</tr>
+</table></td></tr>
+</table>
+<br>
+
+<table width='95%' border=2 cellpadding=3>
+<!-- background-->
+<tr valign=top><td width='10%'><a name='bg'></a>
+  <table cellpadding=0 cellspacing=1>
+        <tr><th align=right>Name:</th><td nowrap>background</td></tr>
+        <tr><th align=right>Class:</th><td nowrap>Background</td></tr>
+        <tr><th align=right>Switch:</th><td nowrap>-background</td></tr>
+        <tr><th align=right>Alias:</th><td nowrap>-bg</td></tr>  
+    </table>
+</td>
+<td width = '75%'>Sets the background color for the base widget, the internal Pane, and 
+    the default background color for all columns. If configured after initial construction, this option will
+    override the background options for all columns.
+</td></tr>         
+
+<!-- columns-->
+<tr valign=top><td width='25%'><a name='columns'></a>
+    <table cellspacing=0 cellpadding=1> 
+        <tr><th align=right>Switch:</th><td nowrap>-columns</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top>
+        <td>Defines the columns in the widget. This option takes an <i>array reference</i> as
+           its value and can only be used during widget creation. After creation, methods can
+           be used to modify each columns' configuration. Refer to the 
+          <a  href="MListbox/tutorial.html#addingcolumns">adding columns</a> section in the tutorial.
+        </td></tr>         
+    </table>
+</td></tr>
+
+<!-- configurecommand-->
+<tr valign=top><td width='25%'><a name='configurecommand'></a> 
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Switch:</th><td nowrap>-configurecommand</td></tr> 
+        <tr><th align=right>Alias:</th><td nowrap>-configcmd</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top>
+        <td>The <i>callback</i> which is passed to this option will be called whenever the layout of the
+               widget has changed due to user interaction (ie. a user resizing a column by dragging 
+               separator or moving a column by dragging a column header would trigger this callback
+        </td></tr>         
+    </table>
+</td></tr>
+
+<!-- font -->
+<tr valign=top><td width='25%'><a name='font'></a> 
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Switch:</th><td NOWRAP>-font</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top>
+        <td>sets the default font to be used throughout the MListbox. This font is
+            used as a default at creation time and can be overridden. If set after 
+            creation, then this value overrides all other fonts used within MListbox. 
+        </td></tr>         
+    </table>
+</td></tr>
+
+<!-- foreground-->
+<tr valign=top><td width='25%'><a name='fg'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Switch:</th><td nowrap>-foreground</td></tr> 
+        <tr><th align=right>Aliases:</th><td nowrap>-foreground</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top>
+        <td>
+	    Sets the default foreground (font) color for MListbox and all the columns when
+          set at creation time. When set after creation time, it overrides any variant 
+          settings within any of the columns.
+        </td></tr>         
+    </table>
+</td></tr>
+
+<!-- moveable-->
+<tr valign=top><td width='25%'><a name='moveable'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td nowrap>moveable</td></tr>
+        <tr><th align=right>Class:</th><td nowrap>Moveable</td></tr>
+        <tr><th align=right>Switch:</th><td nowrap>-moveable</td></tr>
+    </table>
+<td>
+    <table><tr><td>
+ 	     <i>Boolean</i> value which enables or disables moveable columns.
+           A value of <b>1</b> enables all columns to be reordered by allowing
+           drag-and-drop of column headers. A value of <b>0</b> disables this
+           feature.	     
+     </td></tr></table>
+</td></tr>
+
+<!-- resizeable -->
+<tr valign=top><td width='25%'><a name='resizeable'></a> 
+    <table cellspacing=0 cellpadding=1>
+       <tr ><th align=right>Name:</th><td nowrap>resizeable</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>Resizeable</th></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-resizeable</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr><td>
+       <i>Boolean</i> value that determines whether or not individual columns can 
+       be resized by dragging on their separator.  A setting of <b>1</b> enables resizing
+       for all columns, and setting of <b>0</b> disables it.  
+    </td></tr></table>
+</td></tr>
+
+<!-- selectbackground -->
+<tr valign=top><td width='25%'><a name='selectbg'></a>
+    <table cellspacing=0 cellpadding=1>
+         <tr><th align=right>Name:</th><td nowrap>selectBackground</td></tr> 
+         <tr><th align=right>Class:</th><td nowrap>SelectBackground</td></tr>        
+         <tr><th align=right>Switch:</th><td nowrap>-selectbackground</td></tr> 
+         <tr><th align=right>Alias:</th><td nowrap>-selectbg</td></tr>  
+   </table>
+<td valign=top>
+   <table><tr valign=top><td>
+      Specifies background color used for rows that have been selected.
+   </td></tr></table>
+</td></tr>
+
+<!-- selectforeground-->
+<tr valign=top><td width='25%'><a name='selectfg'></a>
+    <table cellspacing=0 cellpadding=1>
+       <tr><th align=right>Name:</th><td nowrap>selectForeground</td></tr> 
+       <tr><th align=right>Class:</th><td nowrap>SelectForeground</td></tr> 
+       <tr><th align=right>Switch:</th><td nowrap>-selectforeground</td></tr> 
+       <tr><th align=right>Alias:</th><td nowrap>-selectfg</td></tr>  
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+    Sets a foreground (font) color used for rows that have been selected.
+    Defaults to <b>Black</b> for Unix and <b>SystemHighlightText</b> for Win32.
+    </td></tr></table>
+</td></tr>
+
+<!-- selectmode -->
+<tr valign=top><td width='25%'><a name='selectmode'></a>
+    <table cellspacing=0 cellpadding=1>
+       <tr><th align=right>Name:</th><td nowrap>selectMode</td></tr> 
+       <tr><th align=right>Class:</th><td nowrap>SelectMode</td></tr> 
+       <tr><th align=right>Switch:</th><td nowrap>-selectmode</td></tr>
+    </table>
+<td valign=top>
+   <table><tr valign=top><td>
+      Determines the type of selection allowed within MListbox. Valid choices
+      include: single, browse, multiple, and extended. To get a description of
+      each of these modes, refer to the <a href="Listbox.html#selectmode"></a>
+      Tk::Listbox documentation. The default setting is <b>browse</b>.
+   </td></tr></table>
+</td></tr>
+
+<!-- separatorcolor -->
+<tr valign=top><td width='25%'><a name='separatorcolor'></a>
+    <table cellspacing=0 cellspadding=1>        
+        <tr><th align=right>Name:</th><td nowrap>separatorColor</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>SeparatorColor</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-separatorcolor</td></tr> 
+    </table>
+<td valign=top>
+   <table><tr valign=top><td>
+      Sets the default color to be used for the separator bar (the bar that is dragged by
+      the user to resize a column) when set at widget creation time. If set after creation
+       time, it will replace the separator color for all columns.  
+   </td></tr></table>
+</td></tr>
+
+<!-- separatorwidth-->
+<tr valign=top><td width='25%'><a name='separatorwidth'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td nowrap>separatorWidth</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>SeparatorWidth</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-separatorwidth</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top></td>
+    </td></tr></table>         
+</td></tr>
+
+<!-- sortable -->
+<tr valign=top><td width='25%'><a name='sortable'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td nowrap>sortable</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>Sortable</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-sortable</td></tr> 
+    </table>
+<td valign=top>
+   <table><tr valign=top><td>
+   </td></tr></table>         
+</td></tr>
+
+<!-- takefocus-->
+<tr valign=top><td width='25%'><a name='takefocus'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td>takeFocus</td></tr> 
+        <tr><th align=right>Class:</th><td>TakeFocus</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-takefocus</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+    </td></tr></table>
+</td></tr>
+
+<!-- yscrollcommand -->
+<tr valign=top><td width='25%'><a name='yscrollcommand'></a>
+    <table cellspacing=0 cellpadding=1>
+        <tr><th align=right>Name:</th><td nowrap>yScrollCommand</td></tr> 
+        <tr><th align=right>Class:</th><td nowrap>ScrollCommand</td></tr> 
+        <tr><th align=right>Switch:</th><td nowrap>-yscrollcommand</td></tr> 
+    </table>
+<td valign=top>
+    <table><tr valign=top><td>
+    </td></tr></table>         
+</td></tr>
+</table><br>
+
+
+<hr>
+<a name='methods'><h3>METHODS</h3></a>
+
+<table width='95%' border=2 cellpadding=3>
+<tr><td colspan=2 class='subheader'><a name='wsoptions'></a>
+   &nbsp; MListbox defined:</td></tr>
+<tr valign=top>
+  <td width='15%' nowrap><i>void</i></td>
+  <td><a href='#activate'><b>activate</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%' nowrap><i>void</i></td>
+  <td><a href='#bindColumns'><b>bindColumns</b></a>( <i>sequence</i>, <i>callback</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#bindRows'><b>bindRows</b></a>( <i>sequence</i>, <i>callback</i> ) </td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#bindSeparators'><b>bindSeparators</b></a>( <i>sequence</i>, <i>callback</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>arrayref</i></td>
+  <td><a href='#columnConfigure'><b>columnConfigure</b></a>( <i>index</i>, <i>?option =&gt; value</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><a href="MListbox/MLColumn.html"><i>(MLColumn)</i></a></td>
+  <td><a href='#columnGet'><b>columnGet</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#columnHide'><b>columnHide</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>integer</i></td>
+  <td><a href='#columnIndex'><b>columnIndex</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><a href="Mlistbox/MLColumn.html"><i>MLColumn</i></a></td>
+  <td><a href='#columnInsert'><b>columnInsert</b></a>( <i>index</i>, <i>?option =&gt; value</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#columnPack'><b>columnPack</b></a>( <i>array</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>array</i></td>
+  <td><a href='#columnPackInfo'><b>columnPackInfo</b></a>()</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#columnShow'><b>columnShow</b></a>( <i>index</i>, <i>?option =&gt; value</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>array</i></td>
+  <td><a href='#curselection'><b>curselection</b></a>()</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#delete'><b>delete</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>arrayref</i></td>
+  <td><a href='#get'><b>get</b></a>( <i>first</i>, <i>?last</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>arrayref</i></td>
+  <td><a href='#getRow'><b>getRow</b></a>( <i>index</i> )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#sort'><b>index</b></a>( <i>descending</i>, <i>index</i>, ... )</td>
+</tr>
+<tr valign=top>
+  <td width='15%'><i>void</i></td>
+  <td><a href='#sort'><b>sort</b></a>( <i>descending</i>, <i>index</i>, ... )</td>
+</tr>
+</table>
+<br>
+
+<hr width='75%' align=left>
+<a name='addItem'></a>
+<p><b>addItem</b>( <i>string</i>, <i>?option =&gt; value</i>, ... )</p>
+<p class='pMargin'>
+  Appends a new List item to be used in the Popup Listbox. <i>string</i>
+  is a scalar variable that is displayed in the Listbox. This method 
+  takes two options: <b>-selected</b> and <b>-value</b>.
+</p>
+
+<p>Options:
+<dl class='pMargin'>
+  <dt><b>-selected</b> =&gt; <i>selected</i></dt>
+  <dd style='list-item-indent: .5in'>
+    Where <i>selected</i> is a boolean value (<b>true/yes/1</b>) and determines whether or not
+    the list item is the select item within the JComboBox. The default value for this is false
+    and any subsequent call that uses this option, overrides previous ones.<br><br>
+  </dd>
+  <dt><b>-value</b> =&gt; <i>value</i></dt>
+  <dd style='list-item-indent: .5in'>
+    where <i>value</i> is an alternate string associated with the List Item for times
+    when it's desirable to have a value other than the one displayed (I find
+    it to be useful for database applications)
+  </dd>
+</dl>
+</p>
+
+<p>Example:
+<pre>$jcb->addItem('ALASKA', -value => 'AK', -selected => 1);</pre>
+</p>
+
+<hr width='75%' align=left>
+<!-- clearSelection Entry -->
+<a name='clearSelection'></a>
+<p><b>clearSelection</b>()</p>
+<p class='pMargin'>
+  Clears the currently selected item in the JComboBox if one is selected
+</p>
+
+
+<hr width='75%' align=left>
+<!-- getItemIndex Entry -->
+<a name='getItemIndex'></a>
+<p><b>getItemIndex</b>( <i>string</i>, <i>?option =&gt; value</i>, ... )</p>
+<p class='pMargin'>
+  Searches the JCombobox for the first item that matches the given string 
+  and returns that item's index. If no match is found, the method returns
+  <b>undef</b>. This method has two optional parameters: <b>-mode</b> and 
+  <b>-type</b>.
+
+<p>Options:
+<dl class='pMargin'>
+  <dt><b>-type</b> =&gt; <i>type</i></dt>
+  <dd style='list-item-indent: .5in'>
+    Where <i>type</i> is either <b>name</b>, the displayed text, or <b>value</b>,
+    the alternate value associated with the item. If an item in the JComboBox does
+    not have a value defined, then that item's name is used. The default
+    type is <b>name</b>.<br><br>
+  </dd>
+
+  <dt><b>-mode</b> =&gt; <i>mode</i></dt>
+  <dd style='list-item-indent: .5in'>
+    where <i>mode</i> affects the how the given string is compared to a list item. 
+    Values include: <b>exact</b>, <b>usecase</b>, and <b>ignorecase</b>. In 
+    the <b>exact</b> mode, the string must completely match a list item, including
+    it's case. In <b>usecase</b> mode, the string must match the beginning of the list
+    item, including it's case, and in <b>ignorecase</b> mode, the string must match
+    the beginning of the list item, but doesn't care about the case. The default 
+    mode is <b>exact</b>.
+  </dd>
+</dl>
+</p>
+
+<p>Example:
+<div class='pMargin'>
+  The following would return the index of the first matching list item where <b>AK</b>
+  completely matched that item's value.
+</div>
+<pre>my $index = $jcb->getItemIndex('AK', -type => 'value');</pre>
+</p>
+<hr width='75%' align=left>
+
+
+<!-- getItemCount Entry -->
+<a name='getItemCount'></a>
+<p><b>getItemCount</b>()</p>
+<p class='pMargin'>
+  Returns the number of list items stored in the JComboBox.
+</p>
+<hr width='75%' align=left>
+
+<!-- getSelectedIndex Entry -->
+<a name='getSelectedIndex'></a>
+<p><b>getSelectedIndex</b>()</p>
+<p class='pMargin'>
+  Returns the index of the current selected item or <b>undef</b> if there
+  isn't one selected.
+</p>
+<hr width='75%' align=left>
+
+<!-- getSelectedValue -->
+<a name='getSelectedValue'></a>
+<p><b>getSelectedValue</b>()</p>
+<p class='pMargin'>
+  Returns the value of the current selected item or <b>undef</b> if there
+  isn't one selected. In the case of an editable JComboBox, if no items
+  are selected, then the text in the entry is returned.
+</p>
+<hr width='75%' align=left>
+
+<!-- getItemNameAt -->
+<a name='getItemNameAt'></a>
+<p><b>getItemNameAt</b>( <i>index</i> )</p>
+<p class='pMargin'>
+  Returns the string displayed in the listbox at the given index.
+</p>
+<hr width='75%' align=left>
+
+<!-- getItemValueAt -->
+<a name='getItemValueAt'></a>
+<p><b>getItemValueAt</b>( <i>index</i> )</p>
+<p class='pMargin'>
+  Returns the alternate text associated with the list item at the given <i>index</i> if it's set. 
+  Otherwise, will return the the displayed item.
+</p>
+<hr width='75%' align=left>
+
+<!-- hidePopup -->
+<a name='hidePopup'>
+<p><b>hidePopup</b>()</p>
+<p class='pMargin'>
+Causes the popup listbox to be withdrawn from the screen, unmapping it. Hiding and
+showing the popup listbox is generally handled by various event handlers, but is
+available for use in custom handlers or other use.
+</p>
+<hr width='75%' align=left>
+
+<!-- index -->
+<a name='index'></a>
+<p><b>index</b>( <i>index</i> )</p>
+<p class='pMargin'>
+  Returns the integer index value that corresponds to <i>index</i>. If <i>index</i> is 
+  <b>end</b> then return value is a count of the number of elements in the listbox
+  (not the index of the last element).
+</p>
+<hr width='75%' align=left>
+
+<!-- insertItemAt -->
+<a name='insertItemAt'></a>
+<p><b>insertItemAt</b>( <i>index</i>, <i>string</i>, <i>?option =&gt; value</i>, ... )</p>
+<p class='pMargin'>
+  Inserts a new list item into the JComboBox at the specified <i>index</i>. 
+ <i>string</i> is a scalar variable that is displayed in the Listbox. This method 
+  takes two options: <b>-selected</b> and <b>-value</b>. Refer to this section on
+  indices in the Listbox documention.
+</p>
+
+<p>Options:
+<dl class='pMargin'>
+  <dt><b>-selected</b> =&gt; <i>selected</i></dt>
+  <dd style='list-item-indent: .5in'>
+    Where <i>selected</i> is a boolean value (<b>true/yes/1</b>) and determines whether or not
+    the list item is the select item within the JComboBox. The default value for this is false
+    and any subsequent call that uses this option, overrides previous ones.<br><br>
+  </dd>
+  <dt><b>-value</b> =&gt; <i>value</i></dt>
+  <dd style='list-item-indent: .5in'>
+    where <i>value</i> is an alternate string associated with the List Item for times
+    when it's desirable to have a value other than the one displayed (I find
+    it to be useful for database applications)
+  </dd>
+</dl>
+</p>
+<p>Example:</p>
+<div class='pMargin'>
+  The following example produces exactly the same result as the example given
+  for <a href='#addItem'>addItem</a>
+</div>
+<pre>$jcb->insertItemAt('end', 'ALASKA', -value => 'AK', -selected => 1);</pre>
+<hr width='75%' align=left>
+
+<!-- popupIsVisible -->
+<a name='popupIsVisible'></a>
+<p><b>popupIsVisible</b>()</p>
+<p class='pMargin'>
+  Returns 1 if the popup is mapped, 0 if it isn't
+</p>
+<hr width='75%' align=left>
+
+<!-- removeAllItems -->
+<a name='removeAllItems'></a>
+<p><b>removeAllItems</b>()</p>
+<p class='pMargin'>
+  Completely  removes all list items from the JComboBox, and clears 
+  any selected item if present.
+</p>
+<hr width='75%' align=left>
+
+<!-- removeItemAt -->
+<a name='removeItemAt'></a>
+<p><b>removeItemAt</b>( <i>index</i> )</p>
+<p class='pMargin'>Deletes a single list item from the JCombobox at the specified
+  index.
+</p>
+<hr width='75%' align=left>
+
+<!-- see -->
+<a name='see'></a>
+<p><b>see</b>( <i>index</i> )</p>
+<p class="pMargin">
+  Adjusts the JComboBox so that the list item indicated by the given <i>index</i>
+  is visible. If the Listbox is hidden, it will be made visible, and the the list will shift
+  so that the item is viewable as necessary.
+</p>
+<hr width='75%' align=left>
+
+<!-- setSelectedIndex -->
+<a name='setSelectedIndex'></a>
+<p><b>setSelectedIndex</b>( <i>index</i> )</p>
+<p class='pMargin'>
+  Selects the list item that exists at the given index. <font color=#000080></font>
+<hr width='75%' align=left>
+
+<!-- showPopup -->
+<a name='showPopup'></a>
+<p><b>showPopup</b>()</p>
+<p class='pMargin'>
+  Displays the popup listbox ( normally triggered by the
+  JComboBox button )
+</p>
+<hr>
+</td>
+</tr>
+</table>
+
+
+
+<Address>
+This document was updated by Rob Seegel on 2 Jun 2001
+</Address>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+---
+name: Text-Typography
+version: 0.01
+author:
+  - 'Thomas Sibley, http://zulutango.org:82/'
+abstract: Markup ASCII text with correct typography for HTML
+license: unknown
+requires: {}
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Text::Typography:
+    file: lib/Text/Typography.pm
+    version: 0.01
+generated_by: Module::Build version 0.22

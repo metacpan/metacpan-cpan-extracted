@@ -1,0 +1,30 @@
+severity = 5
+verbose = 8
+
+[Variables::ProhibitPunctuationVars]
+allow = $@ $!
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[Variables::ProhibitEvilVariables]
+variables = $DB::single
+
+# Turn these off
+[-BuiltinFunctions::ProhibitStringyEval]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::RequirePodSections]
+[-InputOutput::ProhibitInteractiveTest]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::RequireExtendedFormatting]
+[-InputOutput::ProhibitTwoArgOpen]
+[-Modules::ProhibitEvilModules]
+
+# Customize
+[-Lax::ProhibitStringyEval::ExceptForRequire]
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = diagnostics feature perlversion strict warnings strictures
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = strictures

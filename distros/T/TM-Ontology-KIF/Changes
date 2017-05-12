@@ -1,0 +1,10 @@
+Revision history for Perl extension TM::Ontology::KIF.
+
+0.02  Mon Jul 26 16:14:20 EST 2004
+	- added a META.yml
+
+0.01  Sat Jul 24 19:31:37 2004
+	- original version; created by h2xs 1.23 with options
+		-n TM::Ontology::KIF -X
+	- first cut with ad-hoc transformation in TMs (kif2atm)
+

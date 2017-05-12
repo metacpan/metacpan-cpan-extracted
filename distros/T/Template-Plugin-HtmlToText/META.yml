@@ -1,0 +1,22 @@
+---
+name: Template-Plugin-HtmlToText
+version: 0.03
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: Plugin interface to HTML::FormatText
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  HTML::FormatText: 0
+  HTML::TreeBuilder: 0
+  Template: 0
+  Test::More: 0
+provides:
+  Template::Plugin::HtmlToText:
+    file: lib/Template/Plugin/HtmlToText.pm
+    version: 0.03
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

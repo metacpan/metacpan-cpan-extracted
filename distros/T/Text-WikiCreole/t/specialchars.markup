@@ -1,0 +1,18 @@
+there are several special chars you can use, 
+such as \\ line breaks,\\
+trademark symbols (TM),\\
+registered trademark symbols (R),\\
+copyright symbols (C),\\
+elipsis ...,\\
+dashes, --, or string them together: ------
+
+* use them \\ in lists
+## trademark (TM)
+
+| in tables | column\\2
+| dash -- | elipsis...
+
+{{{
+  anywhere but nowiki: (TM), (R), \\
+}}}
+

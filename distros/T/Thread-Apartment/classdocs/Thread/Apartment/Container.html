@@ -1,0 +1,378 @@
+
+<html>
+<head>
+<title>Thread::Apartment::Container</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;<A HREF='#constructor_summary'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;<A HREF='#constructor_detail'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Thread::Apartment::Container</h2>
+
+<p>
+<dl>
+<dt><b>Inherits from:</b>
+<dd><a href='../../Thread/Queue/Queueable.html'>Thread::Queue::Queueable</a></dd>
+</dt>
+</dl>
+
+<hr>
+
+Provides a non-threads::shared container proxy class for
+installed objects.
+<p>
+Licensed under the Academic Free License version 2.1, as specified in the
+License.txt file included in this software package, or at
+<a href="http://www.opensource.org/licenses/afl-2.1.php">OpenSource.org</a>.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.50</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2005-12-01
+</dd>
+
+<p>
+<i>Unless otherwise noted, <code>$self
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Constructor Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Thread::Apartment::Container'>new</a>($id, $tac)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates a container for an object's ID and TAC
+</td></tr>
+</table><p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#can'>can</a>($method)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overload UNIVERSAL::can() to test the available methods of the proxied object
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#curse'>curse</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overrides TQQ curse() to return the contained TAC
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#debug'>debug</a>($level)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set debug level
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_queue'>get_queue</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return the TQD for the proxied object
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_timeout'>get_timeout</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return current TQD timeout
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#isa'>isa</a>($class)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overload UNIVERSAL::isa() to test the class hierarchy of the proxied object
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#join'>join</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait for the proxied object's apartment thread to exit
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#onEnqueue'>onEnqueue</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overrides TQQ onEnqueue() to curse() the contained TAC
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#run'>run</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Invoke thread governor for installed MuxServer objects
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#set_timeout'>set_timeout</a>($timeout)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set TQD timeout
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#stop'>stop</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stop the proxied object's apartment thread
+</td></tr>
+</table>
+<p>
+
+<a name='constructor_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Constructor Details</font></th>
+</tr>
+</table>
+
+<a name='new'></a>
+<h3>new</h3>
+<pre>
+new($id, $tac)
+</pre><p>
+<dl>
+<dd>Creates a container for an object's ID and TAC.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - ID of proxied object
+</dd>
+<dd><code>$tac</code> - TAC of proxied object
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Apartment::Container object
+</dd>
+</dl></dd></dl><hr>
+
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='can'></a>
+<h3>can</h3>
+<pre>
+can($method)
+</pre><p>
+<dl>
+<dd>Overload UNIVERSAL::can() to test the available methods of the proxied object.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$method</code> - method to check if implemented by the proxied object
+
+</dd>
+<dt><b>Returns:</b><dd>if the proxied object exports $method (or exports AUTOLOAD),
+the can() result of the proxied object.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='curse'></a>
+<h3>curse</h3>
+<pre>
+curse()
+</pre><p>
+<dl>
+<dd>Overrides TQQ curse() to return the contained TAC.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>contained TAC
+</dd>
+</dl></dd></dl><hr>
+
+<a name='debug'></a>
+<h3>debug</h3>
+<pre>
+debug($level)
+</pre><p>
+<dl>
+<dd>Set debug level. When set to a "true" value, causes the TAC to emit
+diagnostic information.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$level</code> - debug level. zero or undef turns off debugging; all other values enable debugging
+
+</dd>
+<dt><b>Returns:</b><dd>the new level
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_queue'></a>
+<h3>get_queue</h3>
+<pre>
+get_queue()
+</pre><p>
+<dl>
+<dd>Return the TQD for the proxied object.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>TQD object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_timeout'></a>
+<h3>get_timeout</h3>
+<pre>
+get_timeout()
+</pre><p>
+<dl>
+<dd>Return current TQD timeout
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>TQD timeout in seconds
+</dd>
+</dl></dd></dl><hr>
+
+<a name='isa'></a>
+<h3>isa</h3>
+<pre>
+isa($class)
+</pre><p>
+<dl>
+<dd>Overload UNIVERSAL::isa() to test the class hierarchy of the proxied object.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$class</code> - class to check if implemented by the proxied object
+
+</dd>
+<dt><b>Returns:</b><dd>1 if the proxied object implements $class; undef otherwise
+</dd>
+</dl></dd></dl><hr>
+
+<a name='join'></a>
+<h3>join</h3>
+<pre>
+join()
+</pre><p>
+<dl>
+<dd>Wait for the proxied object's apartment thread to exit.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>1
+</dd>
+</dl></dd></dl><hr>
+
+<a name='onEnqueue'></a>
+<h3>onEnqueue</h3>
+<pre>
+onEnqueue()
+</pre><p>
+<dl>
+<dd>Overrides TQQ onEnqueue() to curse() the contained TAC.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>((contained TAC class, contained TAC)
+)</dd>
+</dl></dd></dl><hr>
+
+<a name='run'></a>
+<h3>run</h3>
+<pre>
+run()
+</pre><p>
+<dl>
+<dd>Invoke thread governor for installed MuxServer objects.
+Note that this method will not return until the proxied
+object exits the apartment thread.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>1
+</dd>
+</dl></dd></dl><hr>
+
+<a name='set_timeout'></a>
+<h3>set_timeout</h3>
+<pre>
+set_timeout($timeout)
+</pre><p>
+<dl>
+<dd>Set TQD timeout
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - max. number of seconds to wait for TQD responses.
+
+</dd>
+<dt><b>Returns:</b><dd>previous timeout value
+</dd>
+</dl></dd></dl><hr>
+
+<a name='stop'></a>
+<h3>stop</h3>
+<pre>
+stop()
+</pre><p>
+<dl>
+<dd>Stop the proxied object's apartment thread.
+<p>
+Note that this is only useful after an object has been
+installed, but before its run() method has been called.
+
+<p>
+<dd><dl>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Mon Mar 27 08:51:36 2006</i>
+</center>
+</small>
+</body>
+</html>

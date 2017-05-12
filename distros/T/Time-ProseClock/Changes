@@ -1,0 +1,8 @@
+Revision history for Perl extension Time::ProseClock.
+
+1.01  put distribution in its own named directory
+
+1.00  Sun Jun 13 01:10:02 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -n Time::ProseClock
+

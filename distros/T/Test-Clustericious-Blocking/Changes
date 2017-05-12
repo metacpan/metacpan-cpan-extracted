@@ -1,0 +1,12 @@
+Revision history for Test-Clustericious-Blocking
+
+0.04      2017-04-27 08:35:02 -0400
+  - Tests require Test::Clustericious 0.35, Clustericious 1.24, Mojolicious 7.31
+
+0.03      2016-04-23 11:21:55 -0400
+
+0.02      2016-01-14 14:03:47 -0500
+  - First CPAN release
+
+0.01      2015-12-01 10:03:07 -0500
+  - initial version

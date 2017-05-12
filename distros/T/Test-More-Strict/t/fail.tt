@@ -1,0 +1,16 @@
+use strict;
+use warnings;
+use Test::More tests => 4;
+
+# Enforce non-blank test description
+use lib qw( blib/lib );
+use Test::More::Strict description => sub {
+    my $desc = shift;
+    return defined $desc and $desc =~ /\S/;
+};
+
+ok 1;
+ok 1, 'this has a message';
+ok 1, 'this also has a message';
+ok 0;
+

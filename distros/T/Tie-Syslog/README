@@ -1,0 +1,134 @@
+Tie::Syslog
+===========
+
+SYNOPSIS
+========
+
+    use Tie::Syslog;
+
+    $Tie::Syslog::ident  = "my logging tag";
+    $Tie::Syslog::logopt = "pid,ndelay';
+
+    # Tie STDOUT to Syslog, so that every print()ed message will be logged
+    tie *STDOUT, 'Tie::Syslog', {
+        facility => 'LOG_LOCAL0',
+        priority => 'LOG_INFO',
+    };
+
+    # Now tie STDERR also, getting parameters from the tied STDOUT
+    tie *STDERR, { tied *STDOUT };
+
+    # ...or...
+
+    # tie STDERR with defaults from tied STDOUT, but override priority:
+    tie *STDERR, { tied *STDOUT }, {
+        priority => 'LOG_ERR',
+    };
+
+    ###### 
+    # Compatibility with old configuration style:
+
+    tie *STDOUT, 'Tie::Syslog', 
+        'local0.debug',         # facility.loglevel
+        'myname',               # identity 
+        'pid,ndelay',           # Other Sys::Syslog options, comma-separated
+        'unix';                 # setlogsock socket type: unix or inet
+
+    tie *STDERR, 'Tie::Syslog', 
+        'local0.warning',       # facility.loglevel
+        'myname',               # USE THE SAME AS ABOVE!
+        'pid,ndelay',           # USE THE SAME AS ABOVE!
+        'unix';                 # USE THE SAME AS ABOVE!
+
+    # Tying by copying from another tied handle is not supported in 
+    # old-compatibility-mode
+
+    # old-compatibility-mode defaults to 'local0.error'
+
+    # socket type is IGNORED
+
+
+
+DESCRIPTION 
+===========
+
+From the original README: 
+    This module allows you to tie a filehandle (output only) to
+    syslog. This becomes useful in general when you want to
+    capture any activity that happens on STDERR and see that it
+    is syslogged for later perusal. You can also create an arbitrary
+    filehandle, say LOG, and send stuff to syslog by printing to
+    this filehandle. This module depends on the Sys::Syslog module
+    to actually get info to syslog.
+    
+    When used with STDERR, combined with the good habit of using
+    the perl -w switch, this module happens to be useful in
+    catching unexpected errors in any of your code, or team's
+    code. Tie::Syslog is pretty brain-dead. However, it can
+    become quite flexible if you investigate your options with
+    the actual syslog daemon. Syslog has a variety of options
+    available, including notifying console, logging to other
+    machines running syslog, or email support in the event of
+    Bad Things. Consult your syslog documentation to get
+    /etc/syslog.conf setup by your sysadmin and use Tie::Syslog
+    to get information into those channels.
+
+Tie::Syslog v2.00 is a complete rewrite of the original Tie::Syslog v1.x, 
+trying to preserve as much as possible the old syntax and the original 
+philosophy. All the dirty work has been moved to Sys::Syslog.
+
+
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tie::Syslog
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Syslog
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tie-Syslog
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tie-Syslog
+
+    Search CPAN
+        http://search.cpan.org/dist/Tie-Syslog/
+
+
+
+LICENSE AND COPYRIGHT
+=====================
+
+Copyright (c) 1999-2002 Broc Seib. All rights reserved. 
+
+Copyright (C) 2012 Giacomo Montagner <kromg@entirelyunlike.net>
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+BUGS AND FEATURES
+=================
+
+Please report any bugs or feature requests to <bug-tie-syslog at rt.cpan.org>, or through
+the web interface at http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tie-Syslog.

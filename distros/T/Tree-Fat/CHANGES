@@ -1,0 +1,81 @@
+** 11-04-98 RELEASE 1.05
+
+- Tweaks for MIN_PERL_DEFINE.
+
+- Renamed tvseek.ch -> tvseek.h to avoid confusing dumb compilers.
+
+- Switched tvgen.pl to use 'cp -f'.
+
+
+** 07-11-98 RELEASE 1.04
+
+- Tweaks to improve diagnostics.
+
+- Fixed minor hiccups noticed by cpan-testers.
+
+- tvgen.pl now checks modification times of tvcommon.[ch].
+
+
+** 07-07-98 RELEASE 1.03
+
+- Changed allocation macros to include the return value in deference
+to the C++ new operator.
+
+- Tweaks to make TV_TEST work for more -Dmacro configurations.
+
+- There are still REFCNT problems in the test suite.  Just ignore the
+warnings.  They are harmless.
+
+
+** 03-04-98 RELEASE 1.02
+
+- Fixed an obscure bug in the insertion algorithm.  Tightened
+assertion constraints.
+
+
+** 02-21-98 RELEASE 1.01
+
+- Hide tv_testmalloc unless TV_TEST is defined.
+
+- Migrated test scripts to the latest version of Test.pm.
+
+
+** 02-08-98 RELEASE 1.00
+
+- Clarified documentation.  Bumped version number.
+
+
+** 02-03-98 RELEASE 0.09
+
+- Fixed a serious bug in seek (when unique=1).  Expanded regression
+tests.
+
+- Minor tweaks.
+
+
+** 01-23-98 RELEASE 0.07
+
+- Factored out code that isn't sensitive to key/data layout.
+Unfortunately, this change necessitated tweaking the memory layout.
+
+- tc_insert has much better overall performance.  tc_seek now does a
+full binary search.  tc_delete is re-implemented with rotations.
+Asymptotic performance is now respectable.
+
+- tv_compress, tv_balance added.
+
+- memmove & memcpy of slots used throughout (instead of assignment).
+Added more hooks for C++.  Fixed cpp (re)directives.
+
+
+** EARLIER RELEASES
+
+- Purified.
+
+- Compiles with C++.
+
+- Attempted to optimize the fill ratio.  tc_insert version 0.01 only
+used about 35% of the available slots!  After adding a bunch of
+kludges, I got it up to 65%.  Hm.  Need to re-think this.
+
+- Tightened constraints for cursor boundry conditions.

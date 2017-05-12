@@ -1,0 +1,113 @@
+# NAME
+
+Try::Tiny::Warnings - extension to Try::Tiny to also catch warnings
+
+# VERSION
+
+version 0.1.0
+
+# SYNOPSIS
+
+    use Try::Tiny::Warnings ':all';
+
+    {
+        package Foo;
+
+        use warnings;
+
+        sub bar { 1 + shift }
+    }
+
+    Foo::bar();  # warn
+
+    # makes 'warn' behave like 'die'
+    try_fatal_warnings {
+        Foo::bar();
+    }
+    catch {
+        print "tsk, got $_";
+    };
+
+    # warnings are captured and passed
+    # to 'catch_warnings'
+    try_warnings {
+        Foo::bar();
+        warn "some more";
+    }
+    catch {
+        print "won't be printed\n";
+    }
+    catch_warnings {
+        print "we warned with: $_" for @_;
+    };
+
+# DESCRIPTION
+
+`Try::Tiny::Warnings` adds a few keywords to [Try::Tiny](https://metacpan.org/pod/Try::Tiny) 
+to deal with warnings.
+
+The first keyword, `try_fatal_warnings`, behaves like
+`try`, excepts that it also makes any `warn()` within its block
+behave like `die()`. If the block dies because of such a fatalized 
+warn, it'll be `catch`ed in the usual way.
+
+    try_fatal_warnings {
+        warn "uh oh";
+    }
+    catch {
+        print $_; # prints 'uh oh'
+    };
+
+The two other keywords are meant to be used together.
+`try_warnings` also behaves like `try`, but also capture
+all warnings issued within the block. The captured
+warnings will be passed to `catch_warnings`, which is a 
+specialized `finally` block. Just like regular `finally` blocks, 
+many `catch_warnings` 
+blocks can be used if you so desire.
+
+    try_warnings {
+        warn "oops!";
+        $x = 4;
+    }
+    finally {
+        $y = $x + 3;
+    }
+    catch_warnings {
+            # percolate up non-silly warnings
+        warn for grep { !/oops/ } @_;    
+    };
+
+Note that using `catch_warnings` with `try_fatal_warnings` is pointless.
+
+Also, because `catch_warnings` is a `finally` in disguise, it has to come after
+the regular `catch` clause.
+
+## Export
+
+By default, `Try::Tiny::Warnings` exports `try_fatal_warnings`, `try_warnings`
+and `catch_warnings`. For convenience, 
+[Try::Tiny](https://metacpan.org/pod/Try::Tiny)'s `try`, `catch` and `finally` can also 
+be imported via this module.
+
+    use Try::Tiny;
+    use Try::Tiny::Warnings;
+
+    # equivalent to 
+
+    use Try::Tiny::Warnings ':all';
+
+    # can be picky too
+
+    use Try::Tiny::Warnings qw/ try catch catch_warnings /;
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

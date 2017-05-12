@@ -1,0 +1,32 @@
+/* tables */
+table.tablesorter {
+	margin:10px 0pt 15px;
+	text-align: left;
+}
+table.tablesorter thead tr th,
+table.tablesorter tfoot tr th {
+    vertical-align: middle;
+    background-color: #B0B0B0;
+	font-size: 8pt;
+	padding: 4px;
+    color: white;
+}
+table.tablesorter thead tr .header {
+	background-image: url(/tapper/static/images/jquery-plugins/jquery.tablesorter.bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(/tapper/static/images/jquery-plugins/jquery.tablesorter.asc.gif);
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(/tapper/static/images/jquery-plugins/jquery.tablesorter.desc.gif);
+}
+table.tablesorter thead tr .headerSortDown,
+table.tablesorter thead tr .headerSortUp {
+    background-color: #9D9D9D;
+}
+table.tablesorter thead tr th {
+    padding-right: 20px;
+}

@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+#
+# btsort
+#
+# Reads an entire BibTeX file, sorts the entries, and spits them back out
+# again.
+#
+# $Id$
+#
+
+use strict;
+use Text::BibTeX (':metatypes');
+
+my ($filename, $structure, @options, $bibfile, $entry, %sortkey, @entries);
+die "usage: btcheck file [structure [options]]\n" unless @ARGV >= 1;
+($filename, $structure, @options) = @ARGV;
+$structure ||= 'Bib';
+
+$bibfile =  Text::BibTeX::File->new( $filename) or die "$filename: $!\n";
+$bibfile->set_structure ('Bib', @options);
+
+while ($entry =  Text::BibTeX::Entry->new( $bibfile))
+{
+   next unless $entry->parse_ok && $entry->metatype == BTE_REGULAR;
+   $entry->check;
+   $sortkey{$entry} = $entry->sort_key;
+   push (@entries, $entry);
+}
+$bibfile->close;
+
+@entries = sort { $sortkey{$a} cmp $sortkey{$b} } @entries;
+$entry->print while $entry = shift @entries;

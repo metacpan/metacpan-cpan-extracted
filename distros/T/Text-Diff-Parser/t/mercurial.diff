@@ -1,0 +1,75 @@
+
+# HG changeset patch
+# User Torsten Irlaender <torsten@irlaender.de>
+# Date 1179481225 -7200
+# Node ID 9ac3672df4eeb02bb9891eb873f7fe19e0abc452
+# Parent 4368bb294c547185cda94dd55a67c373b3668058# Parent 952deb45ae7b29527967bab3ab407d0d7a1e8a5a
+Merged branch
+
+--- a/config.ini	Tue May 08 17:36:03 2007 +0200
++++ b/config.ini	Fri May 18 11:40:25 2007 +0200
+@@ -32,7 +32,7 @@ static_files =
+ 
+ # Email address that roundup will complain to if it runs into trouble.
+ # Default: roundup-admin
+-admin_email = roundup-admin 
++admin_email = roundup-admin
+ 
+ # The 'dispatcher' is a role that can get notified
+ # of new items to the database.
+--- a/extensions/timelogs/timelog.py	Tue May 08 17:36:03 2007 +0200
++++ b/extensions/timelogs/timelog.py	Fri May 18 11:40:25 2007 +0200
+@@ -274,7 +274,7 @@ class Issue:
+                 tp.freeze()
+ 
+ class Workpackage(Issue):
+-    '''A Workpackage is a Container for messages to normal Workpackages in the roundup database.'''
++    '''A Workpackage is a Container for messages in normal Workpackages in the roundup database.'''
+     def __init__(self, id, db):
+         Issue.__init__(self, id, db)
+         # Load all messages
+@@ -301,7 +301,7 @@ class Workpackage(Issue):
+         tpid = newtp.create(wp, p, issue=self.id, remote_event=None)
+ 
+ class PureIssue(Issue):
+-    '''A PureIssue is a Container for messages to normal Issue in the roundup database.'''
++    '''A PureIssue is a Container for messages in normal Issue in the roundup database.'''
+     def __init__(self, id, db):
+         Issue.__init__(self, id, db)
+         # Load all messages
+--- a/extensions/timelogs/timeloglist.py	Tue May 08 17:36:03 2007 +0200
++++ b/extensions/timelogs/timeloglist.py	Fri May 18 11:40:25 2007 +0200
+@@ -178,16 +178,22 @@ class TimelogList:
+         # print "creating message_timelog for %s" % id
+         self.check_db()
+         tmp = []
++        # Does this message belong to an issue?
+         issue = self.db.issue.filter(None, {'messages':id})
+         if len(issue) > 0:
+             tmp = timelog.PureIssue(issue[-1], self.db)
++        # Does this message belong to an remote event?
+         remote_event = self.db.remote_event.filter(None, {'messages':id})
+         if len(remote_event) > 0:
+             tmp = timelog.RemoteEvent(remote_event[-1], self.db)
++        # Does this message belong to an workpackage?
+         workpackages = self.db.workpackage.filter(None, {'messages':id})
+         if len(workpackages) > 0:
+             # Handle Workpackages in the same way like Pure Issues
+             tmp = timelog.Workpackage(workpackages[-1], self.db)
++
++        # After we created the dummy objekt holing the message, we will search
++        # for it and set the message as "issue"        
+         for m in tmp.get_messages():
+             # print "searching... %s"  % m.id
+             if m.id == id:
+--- a/html/issue.item.html	Tue May 08 17:36:03 2007 +0200
++++ b/html/issue.item.html	Fri May 18 11:40:25 2007 +0200
+@@ -157,7 +157,7 @@ python:db.remote_event.classhelp('id,con
+  <th i18n:translate="">Timelog</th>
+  <td colspan=3 tal:define="empty_time string:">
+     <input type="text" name="timelog-1@time" tal:attributes="value string:${request/form/timelog-1@time/value | empty_time}"/>
+-  <br /><span i18n:translate="">timelog_example</span>
++  <span i18n:translate="">timelog_example</span>
+   <input type="hidden" name="msg-1@link@timelog" value="timelog-1" />
+  </td>
+ </tr>

@@ -1,0 +1,6 @@
+[%# vim: set syntax=java: %]
+[% IF sax2 # Using the SAX 2.0 API %]
+[%	PROCESS ParseFromXML_SAX2 %]
+[% ELSE # Using the SAX 1.0 API %]
+[%	PROCESS ParseFromXML_SAX1 %]
+[% END %]

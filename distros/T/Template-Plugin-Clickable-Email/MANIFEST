@@ -1,0 +1,9 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Template/Plugin/Clickable/Email.pm
+t/00-load.t
+t/01-filter.t
+t/pod.t

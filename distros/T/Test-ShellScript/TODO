@@ -1,0 +1,12 @@
+To Do
+=====
+
+- Let the test pass when it's known that it will file. Similar to isnt() in Test::More
+  The basis fir this is in command_validation.t because with the current implementation
+  can't simple say "it's OK that run_ok fails !!!" or for anything else.
+
+- use -n switch for some shells that allow syntax checking
+  Thanks Matias Palomec from CaFe PM (http://cafe.pm.org)
+
+- use -x switch to generate testing output 
+  (http://www.cyberciti.biz/tips/debugging-shell-script.html)

@@ -1,0 +1,123 @@
+{
+   "objects" : [
+      {
+         "type" : "vcard",
+         "properties" : {
+            "source" : [
+               {
+                  "value" : "ldap://cn=Meister%20Berger,o=Universitaet%20Goerlitz,c=DE",
+                  "name" : "source"
+               }
+            ],
+            "n" : [
+               {
+                  "name" : "n",
+                  "values" : [
+                     "Berger",
+                     "Meister"
+                  ]
+               }
+            ],
+            "name" : [
+               {
+                  "value" : "Meister Berger",
+                  "name" : "name"
+               }
+            ],
+            "bday" : [
+               {
+                  "params" : {
+                     "value" : [
+                        "date"
+                     ]
+                  },
+                  "value" : "1963-09-21",
+                  "name" : "bday"
+               }
+            ],
+            "key" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "X509"
+                     ],
+                     "encoding" : [
+                        "b"
+                     ]
+                  },
+                  "value" : "MIICajCCAdOgAwIBAgICBEUwDQYJKoZIhvcNAQEEBQAwdzELMAkGA1UEBhMCVVMxLDAqBgNVBAoTI05ldHNjYXBlIENvbW11bmljYXRpb25zIENvcnBvcmF0aW9uMRwwGgYDVQQLExNJbmZvcm1hdGlvbiBTeXN0ZW1zMRwwGgYDVQQDExNyb290Y2EubmV0c2NhcGUuY29tMB4XDTk3MDYwNjE5NDc1OVoXDTk3MTIwMzE5NDc1OVowgYkxCzAJBgNVBAYTAlVTMSYwJAYDVQQKEx1OZXRzY2FwZSBDb21tdW5pY2F0aW9ucyBDb3JwLjEYMBYGA1UEAxMPVGltb3RoeSBBIEhvd2VzMSEwHwYJKoZIhvcNAQkBFhJob3dlc0BuZXRzY2FwZS5jb20xFTATBgoJkiaJk/IsZAEBEwVob3dlczBcMA0GCSqGSIb3DQEBAQUAA0sAMEgCQQC0JZf6wkg8pLMXHHCUvMfL5H6zjSk4vTTXZpYyrdN2dXcoX49LKiOmgeJSzoiFKHtLOIboyludF90CgqcxtwKnAgMBAAGjNjA0MBEGCWCGSAGG+EIBAQQEAwIAoDAfBgNVHSMEGDAWgBT84FToB/GV3jr3mcau+hUMbsQukjANBgkqhkiG9w0BAQQFAAOBgQBexv7o7mi3PLXadkmNP9LcIPmx93HGp0Kgyx1jIVMyNgsemeAwBM+MSlhMfcpbTrONwNjZYW8vJDSoi//yrZlVt9bJbs7MNYZVsyF1unsqaln4/vy6Uawfg8VUMk1U7jt8LYpo4YULU7UZHPYVUaSgVttImOHZIKi4hlPXBOhcUQ==",
+                  "name" : "key"
+               }
+            ],
+            "note" : [
+               {
+                  "value" : "The Mayor of the great city of Goerlitz in the great country of Germany.",
+                  "name" : "note"
+               }
+            ],
+            "email" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "internet"
+                     ]
+                  },
+                  "value" : "mb@goerlitz.de",
+                  "name" : "email"
+               }
+            ],
+            "tel" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "fax",
+                        "voice",
+                        "msg"
+                     ]
+                  },
+                  "group" : "home",
+                  "value" : "+49 3581 123456",
+                  "name" : "tel"
+               }
+            ],
+            "label" : [
+               {
+                  "group" : "home",
+                  "value" : "Hufenshlagel 1234\n02828 Goerlitz\nDeutschland",
+                  "name" : "label"
+               }
+            ],
+            "title" : [
+               {
+                  "value" : "Mayor",
+                  "name" : "title"
+               },
+               {
+                  "params" : {
+                     "language" : [
+                        "de"
+                     ],
+                     "value" : [
+                        "text"
+                     ]
+                  },
+                  "value" : "Burgermeister",
+                  "name" : "title"
+               }
+            ],
+            "fn" : [
+               {
+                  "value" : "Meister Berger",
+                  "name" : "fn"
+               }
+            ],
+            "o" : [
+               {
+                  "value" : "Universitaet Goerlitz",
+                  "name" : "o"
+               }
+            ]
+         }
+      }
+   ]
+}

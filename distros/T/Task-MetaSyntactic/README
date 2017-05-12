@@ -1,0 +1,32 @@
+Task-MetaSyntactic
+
+DESCRIPTION
+
+Acme::MetaSyntactic is a module designed to fill all your metasyntactic
+needs. There was a weekly update with new themes on CPAN between January
+15, 2005 and November 6, 2006.
+
+On May 7, 2012, after a hiatus of five and a half years,
+Acme::MetaSyntactic came back, in a shiny version 1.000.
+The main "Acme-MetaSyntactic" distribution contains the core modules
+and a single theme, while all "historical" themes now live in the
+"Acme-MetaSyntactic-Themes" distribution.
+
+The Test::MetaSyntactic module included in the main distribution aims at
+simplifying the test and distribution of new themes by individual authors.
+
+This Task installs all the official and not-so-official
+Acme::MetaSyntactic themes.
+
+AUTHOR
+
+Philippe Bruhat (BooK), <book@cpan.org>
+
+COPYRIGHT
+
+Copyright 2005-2013 Philippe Bruhat (BooK), All Rights Reserved.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

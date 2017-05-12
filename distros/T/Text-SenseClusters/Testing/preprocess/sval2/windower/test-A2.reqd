@@ -1,0 +1,95 @@
+<corpus lang="en">
+
+<lexelt item="interest-n">
+
+<instance id="interest-n.int1">
+
+<answer instance="interest-n.int1" senseid="interest_6"/>
+
+<context>
+managers <p="NNS"/> expect <p="VBP"/> further <p="JJ"/> declines <p="NNS"/> in <p="IN"/> <head>interest <p="NN"/></head> rates <p="NNS"/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int2">
+
+<answer instance="interest-n.int2" senseid="interest_6"/>
+
+<context>
+are <p="VBP"/> thought <p="VBN"/> to <p="TO"/> indicate <p="VB"/> declining <p="VBG"/> <head>interest <p="NN"/></head> rates <p="NNS"/> because <p="IN"/> they <p="PRP"/> permit <p="VBP"/> portfolio <p="NN"/> 
+</context>
+
+</instance>
+
+<instance id="interest-n.int3">
+
+<answer instance="interest-n.int3" senseid="interest_6"/>
+
+<context>
+of <p="IN"/> recent <p="JJ"/> rises <p="NNS"/> in <p="IN"/> short-term <p="JJ"/> <head>interest <p="NN"/></head> rates <p="NNS"/>
+</context>
+
+</instance>
+
+<instance id="interest-n.int4">
+
+<answer instance="interest-n.int4" senseid="interest_5"/>
+
+<context>
+which <p="WDT"/> holds <p="VBZ"/> a <p="DT"/> 83 <p="CD"/> 4 <p="CD"/> <head>interest <p="NN"/></head> in <p="IN"/> this <p="DT"/> energy-services <p="NNS"/> company <p="NN"/> was <p="VBD"/>
+</context>
+
+</instance>
+
+<instance id="interest-n.int5">
+
+<answer instance="interest-n.int5" senseid="interest_5"/>
+
+<context>
+italian <p="NN"/> state-owned <p="JJ"/> holding <p="NN"/> company <p="NN"/> with <p="IN"/> <head>interests <p="NNS"/></head> in <p="IN"/> the <p="DT"/> mechanical <p="JJ"/> engineering <p="NN"/> industry <p="NN"/>
+</context>
+
+</instance>
+
+<instance id="interest-n.int6">
+
+<answer instance="interest-n.int6" senseid="interest_6"/>
+
+<context>
+and <p="CC"/> should <p="MD"/> be <p="VB"/> refunded <p="VBN"/> plus <p="CC"/> <head>interest <p="NN"/></head>
+</context>
+
+</instance>
+
+<instance id="interest-n.int7">
+
+<answer instance="interest-n.int7" senseid="interest_6"/>
+
+<context>
+month <p="NN"/> judge <p="NN"/> curry <p="NN"/> set <p="VBN"/> the <p="DT"/> <head>interest <p="NN"/></head> rate <p="NN"/> on <p="IN"/> the <p="DT"/> refund <p="NN"/> at <p="IN"/>
+</context>
+
+</instance>
+
+<instance id="interest-n.int8">
+
+<answer instance="interest-n.int8" senseid="interest_4"/>
+
+<context>
+in <p="IN"/> a <p="DT"/> country <p="NN"/> 's <p="POS"/> own <p="JJ"/> <head>interest <p="NN"/></head> prompted <p="VBD"/> the <p="DT"/> improvements <p="NNS"/> made <p="VBN"/> by <p="IN"/>
+</context>
+
+</instance>
+
+<instance id="interest-n.int9">
+
+<answer instance="interest-n.int9" senseid="interest_6"/>
+
+<context>
+significant <p="JJ"/> reduction <p="NN"/> of <p="IN"/> principal <p="NN"/> and <p="CC"/> <head>interest <p="NN"/></head> is <p="VBZ"/> the <p="DT"/> only <p="JJ"/> way <p="NN"/> the <p="DT"/>
+</context>
+
+</instance>
+</lexelt>
+</corpus>

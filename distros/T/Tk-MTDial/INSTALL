@@ -1,0 +1,18 @@
+Install the package automatically using
+
+$ cpanm Tk::MTDial
+
+Otherwise you can download the package and unpack it to any directory,
+change to it and give the commands:
+
+  $ perl Build.PL
+  $ ./Build
+  $ ./Build test
+  $ ./Build install
+
+Alternatively you may try
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ make install

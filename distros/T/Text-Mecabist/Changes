@@ -1,0 +1,9 @@
+Revision history for Perl extension Text-Mecabist
+
+0.02 2016-09-11T07:55:43Z
+    - added strigify()
+
+0.01 2016-09-10T15:02:40Z
+
+    - original version
+

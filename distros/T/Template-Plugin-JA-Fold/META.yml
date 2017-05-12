@@ -1,0 +1,38 @@
+---
+abstract: 'Template plugin that interface to Lingua::JA::Fold'
+author:
+  - 'Hideaki Ohno<hide.o.j55@gmail.com>'
+build_requires:
+  Template::Test: 0
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+keywords:
+  - template
+  - fold
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-JA-Fold
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - eg
+provides:
+  Template::Plugin::JA::Fold:
+    file: lib/Template/Plugin/JA/Fold.pm
+    version: 0.03
+requires:
+  Lingua::JA::Fold: 0.08
+  Template: 2.00
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/hideo55/p5-Template-Plugin-JA-Fold/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hideo55/p5-Template-Plugin-JA-Fold.git
+version: 0.03

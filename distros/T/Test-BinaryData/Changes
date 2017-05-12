@@ -1,0 +1,45 @@
+Revision history for Test-BinaryData
+
+0.014     2013-10-18 11:29:49 America/New_York
+          update bugtracker and repo metadata
+
+0.013     2010-12-09 11:31:54 America/New_York
+          fix for perl 5.8, which did not default unpack to use $_
+
+0.012     2010-12-07 12:10:39 America/New_York
+          allow arrayref-of-hexy-strings as wanted data
+
+0.011     2010-01-28
+          require a newer Test::Tester to build with test framework changes
+
+0.010     2010-01-16
+          update prereqs to match changes from 0.009
+
+0.009     2010-01-08
+          replace wrong-minded use of bytes.pm; replace with Encode
+
+0.008     2009-06-29
+          change where we call Test::Builder->new to get along with nested TAP
+
+0.007     2008-04-09
+          packaging improvements
+
+0.006     2007-07-28
+          AHA!  bytes::substr fails, but substr itself with use bytes is okay
+
+0.005     2007-07-28
+          it seems like bytes::substr is TOTALLY NUTS on 5.6; worked around it
+
+0.004     2007-07-27
+          properly require Carp
+          avoid an undef warning when checking $COLUMNS (Thanks, Geoff Young!)
+
+0.003     2007-07-20
+          use bytes to get at bytes for sure
+
+0.002     2007-07-20
+          fix version indicators
+
+0.001     2007-07-20
+          happy birthday, rjbs.  you get a new module
+

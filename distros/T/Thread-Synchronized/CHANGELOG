@@ -1,0 +1,17 @@
+0.03	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.02	30 September 2003
+	Changed name to Thread/Synchronized to be more in line with the
+	original "locked" attribute, per suggestion of Mike Pomraning.
+
+	29 September 2003
+	Added support for the "method" attribute: when specified, will lock
+	on the first parameter passed to the subroutine.  Added tests for
+	this new feature.
+
+	Added some more tests, specifically about fully qualified sub names
+	as well as package changes in the source.
+
+0.01	29 September 2003
+	First version of Thread::Synchronize.

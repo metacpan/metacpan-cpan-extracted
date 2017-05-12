@@ -1,0 +1,7 @@
+#! mason <<EOTEMPLATE
+Planned tests:
+% my @res = reportdata '{ "suite.name" => "example-03-benchmarks" } :: //tap/summary/planned';
+% foreach (@res) {
+   <% $_ %>
+% }
+EOTEMPLATE

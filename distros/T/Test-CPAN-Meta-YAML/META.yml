@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name:                     Test-CPAN-Meta-YAML
+version:                  0.25
+abstract:                 Validate your CPAN META.yml files
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                   5.006
+  Test::YAML::Valid:      0.03
+  Test::Builder:          0
+recommends:
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    0.08
+  YAML:                   0
+  YAML::Syck:             0
+build_requires:
+  IO::File:               0
+  Test::More:             0.70
+  Test::Builder::Tester:  0
+
+provides:
+  Test::CPAN::Meta::YAML:
+    file:     lib/Test/CPAN/Meta/YAML.pm
+    version:  0.25
+  Test::CPAN::Meta::YAML::Version:
+    file:     lib/Test/CPAN/Meta/YAML/Version.pm
+    version:  0.25
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-CPAN-Meta-YAML
+  repository: http://github.com/barbie/Test-CPAN-Meta-YAML
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

@@ -1,0 +1,74 @@
+VERSION 1.04 works only with "newer" Tk (tested with 800.023 only).
+Use older versions for older Tk.  A lot of manual intervention is still
+needed.  See INSTALL.
+
+The only target of this distribution is to deliver the additional files
+needed for non-X Tk on OS/2 via CPAN.pm.
+
+Note that tkOS2GC.c is not included in Illya Vaes's tk-os2 distribution 
+any more.
+
+The Illya's port includes also files
+
+default.h		- modified patch
+tkCanvPs.c		- included as patch
+tkImgPhoto.c		- not needed
+tkMain.c		- not needed
+tkOption.c
+tkPort.h		- not needed
+tkSend.c		- modified patch
+tkWindow.c		- modified patch
+
+I do not know what is the tkOption.c fix for, the rest is handled by patching.
+
+Original TCL/TK sources are at
+
+  ftp://ftp.neosoft.com/pub/tcl/sorted/distrib/tkos2-4.1s.tar.gz (source)
+  ftp://ftp.neosoft.com/pub/tcl/sorted/distrib/tkos2-4.1x.tar.gz (exes)
+  ftp://hobbes.nmsu.edu/pub/incoming/tk41os2s.zip (source)
+  ftp://hobbes.nmsu.edu/pub/incoming/tk41os2x.zip (exes)
+
+(should be moved to 
+
+  ftp://hobbes.nmsu.edu/pub/os2/dev/tcl/ 
+
+shortly)
+
+CHANGES:
+1.02:	Started the Tk800 port (a lot of rough edges with menubars, menus,
+	coords. of balloons).  
+	(Only residual support of new features of Tk800.)
+	One needs to manually disable build of InputO.
+
+1.03:	Make addres.cmd pick up a correct DLL (names differ now for different 
+	perls.)
+	Do not show switch-entry for withdrawn-from-the-start windows.
+	Let PM walk new windows.
+	Make transient windows have close buttons.
+	Root coordinates calculated OK now (menus posted in a correct place).
+	Menu accelerators work.
+	Fileevents work again.
+	"Real" menubars are height-resized, and post menus in a right
+	position.
+  Bugs:
+	  menus can work even if one releases the button before choosing 
+		the menu item - just put ! in Menubutton.pm:271.)
+	  but with this basic_demo shows problems with popdown selection boxes.
+	  Even without this a combobox is posted below the window.
+	  "Real" menubars post menus with bad sensitivity, like comboboxes.
+	  $Foo->Icon() hangs
+1.04:
+	Support new font selection API.
+	Rework the logic of font selection.
+	Rework the calculation of a rendered text string length.  Now the
+	characters "flow" at most by one pixel when the insertion point moves.
+	[This looks hardly avoidable.  Fonts are rendered usings units of 1/256
+	 of a pixel.  If A is 6.3 pixels wide, then the chars in AAA are placed
+	 at x-offsets of 0, 6, 13 - I assume usual rounding, I do not know which
+	 rounding algo is actually used.  If the insertion point is put after the
+	 first A, then AAA is rendered as A - of width 6, then AA at offset 6.
+	 When AA is rendered at offset 6, the chars are put at offsets 6 and 12.
+	 Thus moving the insertion point by one char moves the third A from offset
+	 13 to offset 12.]
+	Use inter-module communication to reset the event-loop-handler of Tk::Event
+	when Tk creates a first window.

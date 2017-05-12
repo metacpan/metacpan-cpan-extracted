@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Test-Mimic
+version:             0.009007
+abstract:            Perl module for automatic package and object mocking via recorded data.
+license:             ~
+author:              
+    - Brendan Roof
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::Mimic::Generator:        0
+    Test::Mimic::Library:          0
+    Test::Mimic::Recorder:         0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

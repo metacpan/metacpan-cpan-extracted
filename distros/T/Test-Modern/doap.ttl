@@ -1,0 +1,446 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-suggestion [
+		doap-deps:on "Dist::Inkt::Profile::TOBYINK 0.023"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-recommendation [
+		doap-deps:on "Test::LongString 0.15"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [
+		doap-deps:on "Exporter::Tiny 0.030"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Import::Into 1.002000"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.006001"^^doap-deps:CpanId ], [
+		doap-deps:on "Module::Runtime 0.012"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal 0.007"^^doap-deps:CpanId ], [ doap-deps:on "Test::API 0.004"^^doap-deps:CpanId ], [ doap-deps:on "Test::Deep 0.111"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Warnings 0.009"^^doap-deps:CpanId;
+	], [ doap-deps:on "Try::Tiny 0.15"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [ doap-deps:on "Test::Pod"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Pod::Coverage"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::Version"^^doap-deps:CpanId ];
+	doap-deps:test-conflict [
+		doap-deps:on "Local::This::Probably::Does::Not::Exist"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Local::I::Doubt::This::Exists::Either"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Moose::This::Should::Not::Be::A::Real::Package"^^doap-deps:CpanId;
+	];
+	doap-deps:test-recommendation [ doap-deps:on "Moose"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Test-Modern>;
+	doap:created         "2014-03-07"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Test-Modern>;
+	doap:homepage        <https://metacpan.org/release/Test-Modern>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Test-Modern";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_06>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_07>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_08>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_09>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-013>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-test-modern>;
+	];
+	doap:shortdesc       "precision testing for modern perl".
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_01"^^xsd:string;
+	dc:issued            "2014-03-07"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_02"^^xsd:string;
+	dc:issued            "2014-03-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Also export functions from Test::LongString.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_02.tar.gz>;
+	doap:revision        "0.000_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_03"^^xsd:string;
+	dc:issued            "2014-03-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Also export functions from Test::Deep.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_03.tar.gz>;
+	doap:revision        "0.000_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_04>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_04"^^xsd:string;
+	dc:issued            "2014-03-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix error messages related to Test::Modern::_TD::DESTROY getting called in global cleanup.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_04.tar.gz>;
+	doap:revision        "0.000_04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_05>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_05"^^xsd:string;
+	dc:issued            "2014-03-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Added an object_ok test function.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_05.tar.gz>;
+	doap:revision        "0.000_05"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_06>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_06"^^xsd:string;
+	dc:issued            "2014-03-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Help Perl 5.8 pass the t/08object-ok.t test case.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_06.tar.gz>;
+	doap:revision        "0.000_06"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_07>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_07"^^xsd:string;
+	dc:issued            "2014-03-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "object_ok now has a `more` test.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "object_ok will now BAIL_OUT(!!) if you pass unknown hash keys in %tests.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_07.tar.gz>;
+	doap:revision        "0.000_07"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_08>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_08"^^xsd:string;
+	dc:issued            "2014-03-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "object_ok now has a `clean` test.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "-requires => { perl => $version }";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use superclass.pm.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "namespaces_clean, inspired by Test::CleanNamespaces";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_08.tar.gz>;
+	doap:revision        "0.000_08"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-000_09>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview";
+	dc:identifier        "Test-Modern-0.000_09"^^xsd:string;
+	dc:issued            "2014-03-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor formatting improvements.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Add introductory paragraphs to several sections.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Add SEE ALSO link to Test::CleanNamespaces.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.000_09.tar.gz>;
+	doap:revision        "0.000_09"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Test-Modern-0.001"^^xsd:string;
+	dc:issued            "2014-03-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Update SEE ALSO links.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Change module abstract.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.002"^^xsd:string;
+	dc:issued            "2014-03-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Test::API 0.004 which provides its own copy of class_api_ok(), so Test::Modern no longer has to provide it.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "No longer use superclass.pm.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.003"^^xsd:string;
+	dc:issued            "2014-03-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Load IO::File and IO::Handle like Modern::Perl does.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Provide a Test::Without::Module-like feature (-without).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.004"^^xsd:string;
+	dc:issued            "2014-03-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Improve the implementation of -without, including better compatibility with pre-5.12 versions of Perl.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "EXPERIMENTALLY provide Test::Pod functions.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "EXPERIMENTALLY provide Test::Pod::Coverage functions.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "EXPERIMENTALLY provide Test::Version functions.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Mention -without in the EXPORT section of the pod.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.005"^^xsd:string;
+	dc:issued            "2014-03-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Support Perl 5.6.1+.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.006"^^xsd:string;
+	dc:issued            "2014-04-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "EXPERIMENTALLY provide Test::Lib-like behaviour, and a related -lib export tag.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support an environment variable PERL_TEST_MODERN_ALLOW_WARNINGS to allow end-users to skip running end warnings tests.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "shouldnt_warn function.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.007"^^xsd:string;
+	dc:issued            "2014-04-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for warnings being generated deep in the bowels of File::Spec.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/94383>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/voegelas>, <urn:uuid:75b48b1f-55fe-4bfe-ae0f-0319863d27fd>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.008"^^xsd:string;
+	dc:issued            "2014-06-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Package with a newer Dist::Inkt to provide a better Makefile.PL (copes better with missing CPAN::Meta::Requirements).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.009"^^xsd:string;
+	dc:issued            "2014-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Implement an `-internet` feature allowing test scripts to declare they need access to the Internet. This honours the NO_NETWORK_TESTS environment variable.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Improved `namespaces_clean` implementation along the same lines as recent changes to Test::CleanNamespaces.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Precautionary bypassing of prototype for internal calls to `Test::More::subtest`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.010"^^xsd:string;
+	dc:issued            "2014-07-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix the behaviour of the BAIL_OUT called within object_ok.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.011"^^xsd:string;
+	dc:issued            "2014-09-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "version_all_same now copes better with undef versions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.012"^^xsd:string;
+	dc:issued            "2014-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "does_ok no longer calls the internal Test::Builder `_try` method.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-Modern/v_0-013>
+	a                    doap:Version;
+	dc:identifier        "Test-Modern-0.013"^^xsd:string;
+	dc:issued            "2014-10-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add 'test recommends' dependencies on a few modules.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Test-Modern-0.013.tar.gz>;
+	doap:revision        "0.013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/person/voegelas>
+	a                    foaf:Person;
+	foaf:name            "Andreas Vögele";
+	foaf:nick            "VOEGELAS";
+	foaf:page            <http://www.andreasvoegele.com/>, <https://metacpan.org/author/VOEGELAS>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/94383>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "94383"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=94383>.
+
+<urn:uuid:75b48b1f-55fe-4bfe-ae0f-0319863d27fd>
+	foaf:mbox            <mailto:paul@city-fan.org>;
+	foaf:name            "Paul Howarth";
+	foaf:page            <http://www.city-fan.org/>.
+

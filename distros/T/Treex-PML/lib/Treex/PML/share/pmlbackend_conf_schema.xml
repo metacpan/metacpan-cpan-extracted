@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pml_schema xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/" version="1.1">
+  <revision>1.0.1</revision>
+  <description>Treex::PML::Instance I/O configuration</description>
+  <root name="pmlbackend" type="pmlbackend.type"/>
+  <type name="pmlbackend.type">
+    <structure>
+      <!-- parsing/serialization options -->
+      <member name="options" type="options.type"/>
+      <!-- pre- and post-processing rules -->
+      <member name="transform_map" type="transform_map.type"/>
+    </structure>
+  </type>
+  <type name="options.type">
+    <structure>
+      <!-- level of generated debugging messages -->
+      <member name="debug">
+	<cdata format="integer"/>
+      </member>
+      <!-- global parsing options -->
+      <member name="load" type="options.load.type"/>
+      <!-- global serialization options -->
+      <member name="save" type="options.save.type"/>
+    </structure>
+  </type>
+  <type name="options.load.type">
+    <structure>
+      <!-- validate the format of character data types -->
+      <member name="validate_cdata" type="bool.type"/>
+      <!-- ignore the #KNIT role -->
+      <member name="no_knit" type="bool.type"/>
+      <!-- do not load any external references -->
+      <member name="no_references" type="bool.type"/>
+      <!-- locate files related in Treex::PML resource paths  -->
+      <member name="use_resources" type="bool.type"/>
+    </structure>
+  </type>
+  <type name="options.save.type">
+    <structure>
+      <!-- serialize the embedded data from #KNIT into the referring instance (the result may be an invalid PML instance) -->
+      <member name="keep_knit" type="bool.type"/>
+      <!-- do not fold singleton lists -->
+      <member name="write_single_LM" type="bool.type"/>
+      <!-- decorate the instance with names of the corresponding PML types, not implemented  -->
+      <member name="decorate" type="bool.type"/>
+      <!-- validate the format of character data -->
+      <member name="validate_cdata" type="bool.type"/>
+      <!-- amount of indentation; use -1 to turn off generating any extraneous white space  -->
+      <member name="indent"><cdata format="integer"/></member>
+    </structure>
+  </type>
+  <type name="transform_map.type">
+    <sequence>
+      <!-- pre- and post-processing transformation rules -->
+      <element name="transform" type="transform.type"/>
+    </sequence>
+  </type>
+  <type name="transform.type">
+    <!-- a transformation rule -->
+    <structure>
+      <!-- rule ID -->
+      <member name="id" role="#ID" as_attribute="1" required="1">
+	<cdata format="ID"/>
+      </member>
+      <!-- match name of the root-element of the input document  -->
+      <member name="root" as_attribute="1">
+	<cdata format="NCName"/>
+      </member>
+      <!-- match namespace of the root-element of the input document  -->
+      <member name="ns" as_attribute="1">
+	<cdata format="anyURI"/>
+      </member>
+      <!-- match input document using an XPath expression  -->
+      <member name="test" as_attribute="1">
+	<cdata format="string"/>
+      </member>
+      <!-- input transformation (if rule matched)  -->
+      <member name="in" type="transf.type"/>
+      <!-- outptu transformation (if rule matched)  -->
+      <member name="out" type="transf.type"/>
+    </structure>
+  </type>
+  <type name="transf.type">
+    <container>
+      <!-- tranformation method -->      
+      <attribute name="type" required="1" type="transf_types.type"/>
+      <!-- href for XSLT transformation -->      
+      <attribute name="href" required="0">
+	<cdata format="anyURI"/>
+      </attribute>
+      <!-- command for Perl, shell, or pipe -->
+      <attribute name="command" required="0">
+	<cdata format="string"/>
+      </attribute>
+      <!-- transformation parameters -->
+      <sequence>
+	<element name="param" type="param.type"/>
+      </sequence>
+    </container>
+  </type>
+  <type name="transf_types.type">
+    <choice>
+      <value>identity</value> <!-- no transformation -->
+      <value>xslt</value> <!-- XSLT 1.0 based transformation -->
+      <value>perl</value> <!-- Perl-based transformation of an input DOM -->
+      <value>pipe</value> <!-- transform XML via a pipe to external command -->
+      <value>shell</value> <!-- transform XML via an external command, obtaining the input URI as an argument -->
+    </choice>
+  </type>
+  <type name="param.type">
+    <container>
+      <attribute name="name"> <!-- name of a transformation parameter -->
+	<cdata format="Name"/>
+      </attribute>
+      <cdata format="string"/>  <!-- value of a transformation parameter -->
+    </container>
+  </type>
+  <type name="bool.type">
+    <choice>
+      <value>0</value>
+      <value>1</value>
+    </choice>
+  </type>
+</pml_schema>

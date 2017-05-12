@@ -1,0 +1,100 @@
+NAME
+    Test::Daily - daily testing reports
+
+SYNOPSIS
+        use Test::Daily;
+        my $td = Test::Daily->new();
+        $td->extract_tarball('my-test-tap-archive_version_arch.tar.gz');
+        $td->update_site_makefile;
+        $td->update_project_makefile($folder);
+        $td->update_test_makefile($folder);
+        $td->update_test_summary();
+        $td->update_project_summary();
+        $td->update_site_summary();
+
+    See `test-daily` script.
+
+DESCRIPTION
+USAGE
+  TAP::Harness::Archive
+
+    Use TAP::Harness::Archive to create tarball of the test output. Simply
+    install it and run prove with `--archive' option.
+
+        prove --archive name_version_arch.tar.gz
+        prove --archive test-project-name_20090927_i386.tar.gz
+
+  Create pages with test output
+
+    On server where the pages will be hosted (generated):
+
+        test-daily tarball test-project-name_20090927_i386.tar.gz
+        test-daily site-makefile
+        test-daily make
+
+METHODS
+  new()
+
+    Object constructor.
+
+  extract_tarball($tarball)
+
+    Extract TAP::Harness::Archive.
+
+  update_site_makefile
+
+  update_project_makefile($folder)
+
+  update_test_makefile($folder)
+
+  update_test_summary
+
+  update_project_summary
+
+  update_site_summary
+
+  run_make($target)
+
+  summary2rssfeed
+
+  aggregatefeeds
+
+AUTHOR
+    Jozef Kutej
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-test-daily at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Daily. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::Daily
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Daily
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Daily
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Daily
+
+    * Search CPAN
+        http://search.cpan.org/dist/Test-Daily
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

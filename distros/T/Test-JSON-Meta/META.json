@@ -1,0 +1,63 @@
+{
+    "name": "Test-JSON-Meta",
+    "version": "0.14",
+    "abstract": "Validate your CPAN META.json files",
+    "author": ["Barbie <barbie@cpan.org>"],
+
+    "x_deprecated": "1",
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "qa",
+        "cpan",
+        "testing"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Test::CPAN::Meta::JSON": "0.10"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Test::JSON::Meta": {
+            "file": "lib/Test/JSON/Meta.pm",
+            "version": "0.14"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Test-JSON-Meta" },
+        "repository": {
+            "url": "git://github.com/barbie/Test-JSON-Meta.git",
+            "web": "http://github.com/barbie/Test-JSON-Meta",
+            "type": "git"
+        }
+    }
+}

@@ -1,0 +1,19 @@
+abstract: An IRQ bot that announces test failures (and unexpected passes)
+author: Zev Benjamin, C<< <zev at cpan.org> >>
+build_requires: 
+  Test::Dependencies: 0
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Test-Chimps-Anna
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Bot::BasicBot: 0
+  Jifty::DBI::Handle: 0
+  Test::Chimps::Report: 0
+  Test::Chimps::ReportCollection: 0
+  YAML::Syck: 0
+version: 0.04

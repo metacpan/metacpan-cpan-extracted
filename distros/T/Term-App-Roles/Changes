@@ -1,0 +1,6 @@
+Revision history for Term-App-Roles
+
+0.01    2014-12-10 (PERLANCAR)
+
+        - First release, split from dist SHARYANTO-Roles and renamed module from
+          SHARYANTO::Role::TermAttrs to Term::App::Role.

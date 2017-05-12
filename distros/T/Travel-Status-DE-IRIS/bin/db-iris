@@ -1,0 +1,758 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.014;
+use utf8;
+
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+our $VERSION = '1.14';
+
+use DateTime;
+use DateTime::Format::Strptime;
+use Encode qw(decode);
+use Getopt::Long qw(:config no_ignore_case bundling);
+use List::Util qw(first max);
+use List::MoreUtils qw(none);
+use Travel::Status::DE::IRIS;
+use Travel::Status::DE::IRIS::Stations;
+
+my ( $date, $time );
+my $datetime       = DateTime->now( time_zone => 'Europe/Berlin' );
+my $developer_mode = 0;
+my $lookahead      = 3 * 60;
+my $realtime       = 0;
+my $with_related   = 1;
+my ( $filter_via, $track_via, $status_via );
+my ( @grep_class, @grep_type, @grep_platform );
+my ( %edata,      @edata_pre );
+
+my @output;
+
+binmode( STDOUT, ':encoding(utf-8)' );
+
+@ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
+
+GetOptions(
+	'c|class=s@'         => \@grep_class,
+	'd|date=s'           => \$date,
+	'h|help'             => sub { show_help(0) },
+	'l|lookahead=i'      => \$lookahead,
+	'o|output=s@'        => \@edata_pre,
+	'p|platform=s@'      => \@grep_platform,
+	'r|realtime'         => \$realtime,
+	't|time=s'           => \$time,
+	'T|type=s'           => \@grep_type,
+	'v|via=s'            => \$filter_via,
+	'V|track-via=s'      => \$track_via,
+	'x|exact|no-related' => sub { $with_related = 0 },
+	'devmode'            => \$developer_mode,
+	'version'            => \&show_version,
+
+) or show_help(1);
+
+if ( @ARGV != 1 ) {
+	show_help(1);
+}
+
+# opt=foo,bar support
+@edata_pre     = split( qr{,}, join( q{,}, @edata_pre ) );
+@grep_class    = split( qr{,}, join( q{,}, @grep_class ) );
+@grep_platform = split( qr{,}, join( q{,}, @grep_platform ) );
+@grep_type     = split( qr{,}, join( q{,}, @grep_type ) );
+
+my ($station) = @ARGV;
+$station = get_station($station);
+
+if ($track_via) {
+	$track_via = get_station($track_via);
+}
+
+if ($date) {
+	my ( $day, $month, $year ) = split( qr{ [.] }x, $date );
+
+	if (   not( defined $day and defined $month )
+		or ( $day < 1 )
+		or ( $day > 31 )
+		or ( $month < 1 )
+		or ( $month > 12 ) )
+	{
+		say STDERR "-d/--date: Please specify a valid date";
+		exit(3);
+	}
+
+	$datetime->set(
+		day   => $day,
+		month => $month,
+		year  => $year || $datetime->year,
+	);
+}
+if ($time) {
+	my ( $hour, $minute, $second ) = split( qr{ : }x, $time );
+
+	if (   not defined $hour
+		or not defined $minute
+		or ( $hour < 0 )
+		or ( $hour > 23 )
+		or ( $minute < 0 )
+		or ( $minute > 59 )
+		or ( defined $second and ( ( $second < 0 ) or ( $second > 59 ) ) ) )
+	{
+		say STDERR "-t/--time: Please specify a valid time";
+		exit(3);
+	}
+
+	$datetime->set(
+		hour   => $hour,
+		minute => $minute,
+		second => $second || $datetime->second,
+	);
+}
+
+for my $efield (@edata_pre) {
+	given ($efield) {
+		when ('a') { $edata{additional}   = 1 }
+		when ('c') { $edata{canceled}     = 1 }
+		when ('d') { $edata{delay}        = 1 }
+		when ('D') { $edata{delays}       = 1 }
+		when ('f') { $edata{fullroute}    = 1 }
+		when ('m') { $edata{messages}     = 1 }
+		when ('q') { $edata{qos}          = 1 }
+		when ('r') { $edata{route}        = 1 }
+		when ('R') { $edata{replacements} = 1 }
+		when ('t') { $edata{times}        = 1 }
+		when ('!') { $edata{debug}        = 1 }
+		default    { $edata{$efield}      = 1 }
+	}
+}
+
+my $status = Travel::Status::DE::IRIS->new(
+	datetime       => $datetime,
+	developer_mode => $developer_mode,
+	lookahead      => $lookahead,
+	station        => $station,
+	with_related   => $with_related,
+);
+if ($track_via) {
+	$status_via = Travel::Status::DE::IRIS->new(
+		datetime  => $datetime,
+		station   => $track_via,
+		lookahead => $lookahead + 3 * 60,
+	);
+}
+
+sub get_arrival {
+	my ( $result, $fmt ) = @_;
+
+	my $dt_arrival = $realtime ? $result->arrival : $result->sched_arrival;
+
+	if ($fmt) {
+		return $dt_arrival ? $dt_arrival->strftime($fmt) : q{};
+	}
+	return $dt_arrival;
+}
+
+sub get_departure {
+	my ( $result, $fmt ) = @_;
+
+	my $dt_dep = $realtime ? $result->departure : $result->sched_departure;
+
+	if ($fmt) {
+		return $dt_dep ? $dt_dep->strftime($fmt) : q{};
+	}
+	return $dt_dep;
+}
+
+sub get_station {
+	my ($input_name) = @_;
+
+	if ( $input_name =~ m{ ^ [[:digit:]]+ $ }x ) {
+		return $input_name;
+	}
+
+	if ( $input_name
+		=~ m{ ^ (?<lon> [[:digit:].]+ ) , (?<lat> [[:digit:].]+ ) }x )
+	{
+		my @candidates
+		  = Travel::Status::DE::IRIS::Stations::get_station_by_location(
+			$+{lon}, $+{lat} );
+
+		if ( not @candidates ) {
+			say STDERR
+			  "Found no stations inside a 70km radius around $+{lon},$+{lat}";
+			exit(1);
+		}
+
+		say STDERR "Geolocation candidates for $+{lon},$+{lat} are:";
+		say STDERR join(
+			"\n",
+			map {
+				sprintf( "%-30s %-5s  %4.1fkm",
+					$_->[0][1], $_->[0][0], $_->[1] )
+			} @candidates
+		);
+		exit(1);
+	}
+
+	my @stations = Travel::Status::DE::IRIS::Stations::get_station($input_name);
+
+	if ( @stations == 0 ) {
+		say STDERR "No station matches '$input_name'";
+		exit(1);
+	}
+	elsif ( @stations == 1 ) {
+		return $stations[0][0];
+	}
+	else {
+		say STDERR "The input '$input_name' is ambiguous. Please choose one "
+		  . 'of the following:';
+		say STDERR
+		  join( "\n", map { $_->[1] . ' (' . $_->[0] . ')' } @stations );
+		exit(1);
+	}
+}
+
+sub show_help {
+	my ($code) = @_;
+
+	print 'Usage: db-iris [-r] [-c <classlist>] [-d <date>] '
+	  . '[-o <output-flags>] [-p <platforms>] [-t <time>] '
+	  . '[-T <typelist>] [-v|-V <via>] <station>' . "\n"
+	  . "See also: man db-iris\n";
+
+	exit $code;
+}
+
+sub show_version {
+	say "db-iris version ${VERSION}";
+
+	exit 0;
+}
+
+sub sanitize_options {
+	if ( $track_via and $edata{times} ) {
+		say STDERR 'Note: --track-via cannot be combined with --output=times';
+		say STDERR 'Disabling option --output=times';
+		delete $edata{times};
+	}
+	if ( $realtime and $edata{times} ) {
+		say STDERR 'Note: --realtime cannot be combined with --output=times';
+		say STDERR 'Disabling option --realtime';
+		$realtime = 0;
+	}
+	return;
+}
+
+sub format_delay {
+	my ($d) = @_;
+	my $delay = q{};
+
+	if ( $d->delay ) {
+		$delay = ( $d->delay > 0 ? ' +' : q{ } ) . $d->delay;
+	}
+	if ( $d->is_cancelled ) {
+		$delay = ' CANCELED';
+	}
+
+	return $delay;
+}
+
+sub display_result {
+	my (@lines) = @_;
+
+	my @line_length;
+
+	if ( not @lines ) {
+		die("Nothing to show\n");
+	}
+
+	# the " !" suffixes might change a column's maximum line length, so we
+	# need to add them before calculating it
+	for my $line (@lines) {
+		my $d = $line->[5];
+
+		if ( not $edata{canceled} and $d->canceled_stops ) {
+			$line->[3] .= q{ !};
+		}
+
+		if ( ( $d->platform // q{} ) ne ( $d->sched_platform // q{} ) ) {
+			$line->[4] .= q{ !};
+		}
+	}
+
+	for my $i ( 0 .. 4 ) {
+		$line_length[$i] = max map { length( $_->[$i] ) } @lines;
+	}
+
+	for my $line (@lines) {
+
+		my $d = $line->[5];
+
+		printf(
+			join( q{  }, ( map { "%-${_}s" } @line_length ) ),
+			@{$line}[ 0 .. 4 ]
+		);
+
+		if (    $edata{delays}
+			and $d->delay_messages )
+		{
+			printf( '  %s', join( q{  }, map { $_->[1] } $d->delay_messages ) );
+		}
+		if (    $edata{delay}
+			and ( $d->delay or $d->is_cancelled )
+			and $d->delay_messages )
+		{
+			printf( '  %s', ( $d->delay_messages )[-1]->[1] );
+		}
+		if ( $edata{qos} and $d->qos_messages ) {
+			printf( '  %s', join( q{  }, map { $_->[1] } $d->qos_messages ) );
+		}
+		print "\n";
+
+		if ( $edata{times} ) {
+			if ( not defined $d->delay ) {
+				print "\n";
+			}
+			elsif ( $d->delay == 0 ) {
+				printf( "%s+0\n", q{ } x 15 );
+			}
+			else {
+				printf(
+					"%5s → %5s  %+d\n",
+					$d->arrival   ? $d->arrival->strftime('%H:%M')   : q{},
+					$d->departure ? $d->departure->strftime('%H:%M') : q{},
+					$d->delay,
+				);
+			}
+
+		}
+
+		if ( $edata{debug} ) {
+			if ( $d->{unk_ar_hi} ) {
+				say "[DEBUG] arr:hi = $d->{unk_ar_hi}";
+			}
+			if ( $d->{unk_dp_hi} ) {
+				say "[DEBUG] dep:hi = $d->{unk_dp_hi}";
+			}
+		}
+
+		if ( $edata{messages} ) {
+			for my $message ( $d->messages ) {
+
+				# leading spaces to align with regular output
+				printf( " %s  %s\n",
+					$message->[0]->strftime('%d.%m. %H:%M'),
+					$message->[1] );
+			}
+			print "\n";
+		}
+
+		if ( $edata{replacements} ) {
+			for my $e ( $d->replaced_by ) {
+				printf(
+					"Ersatzzug: %s%s %s\n",
+					$e->type, $e->line_no // q{},
+					$e->train_no
+				);
+			}
+			for my $e ( $d->replacement_for ) {
+				printf(
+					"Ersatzzug für: %s%s %s\n",
+					$e->type, $e->line_no // q{},
+					$e->train_no
+				);
+			}
+		}
+
+		if ( $edata{additional} and $d->additional_stops ) {
+			printf( "Zusätzlicher Halt in: %s\n",
+				join( q{, }, $d->additional_stops ) );
+		}
+
+		if ( $edata{canceled} and $d->canceled_stops ) {
+			printf( "Ohne Halt in: %s\n", join( q{, }, $d->canceled_stops ) );
+		}
+
+		if ( $edata{fullroute} ) {
+			print "\n"
+			  . join( "\n", $d->route_pre )
+			  . "\n - - - -\n"
+			  . join( "\n", $d->route_post ) . "\n\n";
+		}
+	}
+
+	return;
+}
+
+if ( my $err = $status->errstr ) {
+	say STDERR "Request error: ${err}";
+	exit 2;
+}
+if ( my $warning = $status->warnstr ) {
+	say STDERR "Request warning: ${warning}";
+	say STDERR '                 Information may be incomplete';
+}
+
+if ( $status_via and $status_via->errstr ) {
+	my $err = $status_via->errstr;
+	say STDERR "Request error in --via : ${err}";
+	exit 2;
+}
+if ( $status_via and $status_via->warnstr ) {
+	my $warning = $status_via->warnstr;
+	say STDERR "Request warning in --via : ${warning}";
+	say STDERR '                           Information may be incomplete';
+}
+
+sanitize_options();
+
+for my $d ( $status->results() ) {
+
+	my @via;
+
+	# route may be incomplete, so check route_end as well
+	@via = ( $d->route_post, $d->route_end );
+
+	if (   ( $filter_via and not( first { $_ =~ m{$filter_via}io } @via ) )
+		or ( @grep_class and none { $_ ~~ \@grep_class } $d->classes )
+		or ( @grep_platform and not( $d->platform ~~ \@grep_platform ) )
+		or ( @grep_type     and not( $d->type     ~~ \@grep_type ) )
+		or $d->is_wing )
+	{
+		next;
+	}
+
+	my $delay = format_delay($d);
+
+	my $platformstr = $d->platform // q{};
+	my $timestr;
+	if ($track_via) {
+		$timestr = get_departure( $d, '%H:%M' ) || get_arrival( $d, '%H:%M' );
+		if ( not $d->departure ) {
+			next;
+		}
+		my $d_via = first {
+			$_->train_id eq $d->train_id
+			  or ( $_->old_train_id and $_->old_train_id eq $d->train_id );
+		}
+		$status_via->results;
+		if (   not $d_via
+			or not $d_via->sched_arrival
+			or $d_via->sched_arrival < $d->departure )
+		{
+			next;
+		}
+		my $timestr_via = get_arrival( $d_via, '%H:%M' ) . $delay;
+		$timestr .= ' → ' . $timestr_via;
+		$platformstr = sprintf( '%2s → %2s', $d->platform // q{},
+			$d_via->platform // q{} );
+	}
+	elsif ( $edata{times} ) {
+		$timestr = sprintf( '%5s → %5s',
+			$d->sched_arrival   ? $d->sched_arrival->strftime('%H:%M')   : q{},
+			$d->sched_departure ? $d->sched_departure->strftime('%H:%M') : q{},
+		);
+	}
+	else {
+		$timestr
+		  = ( get_departure( $d, '%H:%M' ) || get_arrival( $d, '%H:%M' ) )
+		  . $delay;
+	}
+
+	push(
+		@output,
+		[
+			$timestr, $d->train,
+			$edata{route} ? join( q{  }, $d->route_interesting ) : q{},
+			$d->route_end, $platformstr // q{}, $d
+		]
+	);
+
+	my @processed_wings;
+	for my $wing ( $d->departure_wings ) {
+		my $wingdelay = format_delay($wing);
+		push(
+			@output,
+			[
+				'├'
+				  . '─' x ( length($timestr) - 1 - length($delay) )
+				  . $wingdelay,
+				$wing->train,
+				$edata{route} ? join( q{  }, $wing->route_interesting ) : q{},
+				$wing->route_end,
+				$platformstr // q{},
+				$wing
+			]
+		);
+		push( @processed_wings, $wing->wing_id );
+	}
+	for my $wing ( $d->arrival_wings ) {
+		if ( not $wing->wing_id ~~ \@processed_wings ) {
+			my $wingdelay = format_delay($wing);
+			push(
+				@output,
+				[
+					'├'
+					  . '─' x ( length($timestr) - 1 - length($delay) )
+					  . $wingdelay,
+					$wing->train,
+					$edata{route}
+					? join( q{  }, $wing->route_interesting )
+					: q{},
+					$wing->route_end,
+					$platformstr // q{},
+					$wing
+				]
+			);
+		}
+	}
+	if ( $d->departure_wings or $d->arrival_wings ) {
+		substr( $output[-1][0], 0, 1 ) = '└';
+	}
+}
+
+display_result(@output);
+
+__END__
+
+=head1 NAME
+
+db-iris - Interface to the DeutscheBahn online departure monitor
+
+=head1 SYNOPSIS
+
+B<db-iris> [B<-r>] [B<-c> I<classlist>] [B<-d> I<date>] [B<-o> I<output-flags>]
+[B<-p> I<platforms>] [B<-t> I<time>] [B<-T> I<typelist>] [B<-v>|B<-V> I<via>]
+I<station>
+
+=head1 VERSION
+
+version 1.14
+
+=head1 DESCRIPTION
+
+db-iris is an interface to the DeutscheBahn departure monitor
+available at L<https://iris.noncd.db.de/wbt/js/index.html>.
+
+It requests all departures at I<station> and lists them on stdout, similar to
+the big departure screens installed at most main stations. I<station> can be
+either a DS100 station code (such as "EE"), a normal station name
+(such as "Essen Hbf" or "Dortmund UniversitE<auml>t"), or an IBNR / european station
+number (such as 8000098). If no exact match is found, B<db-iris> will try to
+find station names similar to I<station>.
+
+An exclamation mark (C<< ! >>) next to a destination indicates that at least
+one stop on the train's route has been canceled. Use B<-oc> to see the canceled
+stops.  An exclamation mark next to a platform indicates that it is not the
+scheduled one.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-c>, B<--class> I<classlist>
+
+Comma-separated list of train classes to filter by. Using this option
+causes all trains whose class is not in I<classlist> to be discarded.
+
+Valid classes are:
+
+    D    Non-DB train. Usually local transport
+    F    "Fernverkehr", long-distance transport
+    N    "Nahverkehr", local and regional transport
+    S    S-Bahn, rather slow local/regional transport
+
+=item B<-d>, B<--date> I<date>
+
+Request results for I<date> in dd.mm. or dd.mm.YYYY format. Note that only
+slight (a few hours max) deviations from the current time are supported by the
+IRIS backend, larger ones will not return data.
+
+=item B<-l>, B<--lookahead> I<int>
+
+Return only those results which are less than I<int> minutes in the future.
+Defaults to 240 (4 hours).
+
+Note that this is only an upper limit, not a guarantee to get every train
+with a departure in less than I<int> minutes. This guarantee holds only for
+I<int> below 120. However, any non-negative number is accepted for this
+option.
+
+=item B<-o>, B<--output> I<outputtypes>
+
+For each result, output I<outputtypes> in addition to the normal time, delay,
+line and destination information. I<outputtypes> is a comma-separated list,
+this option may be repeated. Each output type has both a short and long form,
+so both C<< -ot,d >> and C<< --output=times,delay >> are valid.
+
+Valid output types are:
+
+=over
+
+=item a / additional
+
+If a train's route deviates from its schedule: Print a list of additional
+(unscheduled) stops it will serve.
+
+=item c / canceled
+
+If a train's route deviates from its schedule: Print a list of canceled
+stops (scheduled stops which will not be served).
+
+=item d / delay
+
+If a train is delayed, show the most recent reason for this delay.
+
+=item D / delays
+
+List all delay reasons entered into the IRIS for each train, even if the
+particular train is on time by now.
+
+=item f / fullroute
+
+Show the entire route (both before and after I<station>).
+
+=item m / messages
+
+List all messages (delay and qos) entered into the IRIS with timestamps.
+
+=item q / qos
+
+List all quality of service messages entered into the IRIS. These contain
+information like "Missing carriage" or "Broken air conditioning".
+
+Note that some qos messages may supersede older ones. superseded messages are
+omitted, use the m / messages type to see those as well.
+
+=item r / route
+
+Show up to three stops between I<station> and the train's destination.
+
+=item R / replacements
+
+For cancelled trains: Print their replacement train(s), if present.
+For unplanned trains: Print the train(s) they replace, if present.
+
+=item t / times
+
+Show both scheduled and expected arrival and departure times.
+
+=back
+
+=item B<-p>, B<--platforms> I<platforms>
+
+Only show arrivals/departures at I<platforms> (comma-separated list, option may
+be repeated).  This applies to actual departures, not schedules.
+
+=item B<-r>, B<--realtime>
+
+Show estimated instead of scheduled time where available. Cannot be combined
+with C<< --output=times >>.
+
+=item B<-t>, B<--time> I<time>
+
+Request results for I<time> in HH:MM or HH:MM:SS format. Note that only
+slight deviations (a few hours max) from the current time are supported by the
+IRIS backend, larger ones will not return data.
+
+=item B<-T>, B<--type> I<typelist>
+
+Comma-separated list of train types to filter by. Using this option
+causes all arrivals/departures whose type is not in I<typelist> to be discarded.
+
+The following valid values are known:
+
+    local transport:
+    IRE  Inter-Regio Express (rare)
+    RB   Regionalbahn (slower than RE)
+    RE   Regional-Express
+    S    S-Bahn
+
+    regional/interregional transport:
+    D    "Schnellzug" (generic fast train, rare)
+    EC   Eurocity
+    IC   Intercity
+    IR   Inter-Regio (rare in Germany, mostly used in Switzerland)
+    ICE  Intercity-Express
+    THA  Thalys
+
+Depending on the city and country, other types may be used as well. Examples
+include "ABR" / "NWB" (private trains included in the local transport tariff
+system), "HKX" (private train not included in any DB tariffs) and
+"SBB" (unknown swiss train class)
+
+=item B<-v>, B<--via> I<viastation>
+
+Only show trains serving I<viastation> after I<station>. In this case,
+I<viastation> must match the station as contained in the train's route
+(see B<-of>), DS100 codes are not supported.
+
+=item B<-V>, B<--track-via> I<viastation>
+
+Only show trains serving I<viastation> after I<station>. Show result
+timestamps as "HH:MM -> HH:MM +x", where the first time is the scheduled
+departure (without delay) at I<station> and the second the scheduled arrival
+(also without delay) at I<viastation>. If a delay is known, it will be indicated
+by +x.
+
+Note that here, I<viastation> must be a regular station name or DS100 code.
+
+Caveat: Some trains may change their identity along the route. B<track-via> is
+not able to handle those and will miss trains changing their identifier between
+I<station> and I<viastation>
+
+=item B<-x>, B<--exact>, B<--no-related>
+
+Sometimes, Deutsche Bahn splits up major stations in their IRIS interface.
+For instance, "KE<ouml>ln Messe/Deutz" actually consists of
+"KE<ouml>ln Messe/Deutz" (KKDZ), "KE<ouml>ln Messe/Deutz Gl. 9-10"
+(KKDZB) and "KE<ouml>ln Messe/Deutz (tief)" (KKDT).
+
+By default, B<db-iris> will show departures for all of these stations when
+queried for any of them. When this option is set, only the departures for the
+station part specified on the commandline are shown.
+
+=item B<--version>
+
+Show version information.
+
+=back
+
+=head1 EXIT STATUS
+
+Zero unless things went wrong.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * Class::Accessor(3pm)
+
+=item * DateTime(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=item * XML::LibXML(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Unknown.
+
+=head1 AUTHOR
+
+Copyright (C) 2013-2016 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+The station data used by this script is provided by DB
+Station&Service AG, Europaplatz 1, 10557 Berlin, Germany and also available
+under a CC-BY 4.0 license on
+L<http://data.deutschebahn.com/dataset/data-haltestellen>.
+
+=head1 LICENSE
+
+This program is licensed under the same terms as Perl itself.

@@ -1,0 +1,64 @@
+CPU:        0
+LOOPS:      1
+LHCS_PATH:  /root/lhcs_regression
+Name:   hotplug01
+Date:   Mon May  1 22:46:03 UTC 2006
+Desc:   What happens to disk controller interrupts when offlining CPUs?
+
+CPU is 0
+Error: cpu0 not found
+hotplug01      FAIL: cpu0 not found!
+Mon May  1 22:46:03 UTC 2006
+Name:   hotplug02
+Date:   Mon May  1 22:46:03 UTC 2006
+Desc:   What happens to a process when its CPU is offlined?
+
+CPU is 0
+Error: cpu0 not found
+hotplug02      FAIL: cpu0 not found!
+Mon May  1 22:46:03 UTC 2006
+Name:   hotplug03
+Date:   Mon May  1 22:46:04 UTC 2006
+Desc:   Do tasks get scheduled to a newly on-lined CPU?
+
+CPU is 0
+Error: CPU0 not found
+hotplug03      FAIL: CPU0 not found!
+Mon May  1 22:46:04 UTC 2006
+Name:   hotplug04
+Date:   Mon May  1 22:46:04 UTC 2006
+Desc:   Does it prevent us from offlining the last CPU?
+
+cpu1
+/root/lhcs_regression/include/hotplug.fns: line 70: /sys/devices/system/cpu/cpu0/online: Permission denied
+cpu0
+/root/lhcs_regression/include/hotplug.fns: line 85: /sys/devices/system/cpu/cpu0/online: Permission denied
+hotplug04      PASS: Could not shutdown cpu0
+/root/lhcs_regression/include/hotplug.fns: line 70: /sys/devices/system/cpu/cpu0/online: Permission denied
+/root/lhcs_regression/include/hotplug.fns: line 70: /sys/devices/system/cpu/cpu0/online: Permission denied
+Mon May  1 22:46:04 UTC 2006
+Name:   Hotplug Test - Test Case 6
+Date:   Mon May  1 22:46:04 UTC 2006
+Desc:   Verify user tools can handle adding and removing CPUs.
+
+Name:   hotplug06.top
+Date:   Mon May  1 22:46:04 UTC 2006
+Desc:   Does top work properly when CPU hotplug events occur?
+
+CPU is 0
+Error: CPU0 not found
+hotplug06.top      FAIL: CPU0 not found!
+Mon May  1 22:46:04 UTC 2006
+
+
+Name:   hotplug06.sar
+Date:   Mon May  1 22:46:04 UTC 2006
+Desc:   Does sar behave properly during CPU hotplug events?
+
+CPU is 0
+Error: CPU0 not found
+hotplug06.sar      FAIL: CPU0 not found!
+Mon May  1 22:46:04 UTC 2006
+
+functional/hotplug07.sh: line 9: testsuite.fns: No such file or directory
+Error:  Command '040-lhcs_regression' exited with code '1'

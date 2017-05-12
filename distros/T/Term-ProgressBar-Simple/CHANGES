@@ -1,0 +1,10 @@
+Revision history for Perl module Term::ProgressBar::Simple:
+
+0.03 2009-02-20
+     - added message
+
+0.02 2008-10-17
+     - added +=
+
+0.01 2008-08-15
+     - initial release

@@ -1,0 +1,52 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Group::Perl_Inlined - execute Perl code
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder;
+	my $placeholder = Text::Placeholder->new(
+		my $counter = '::Perl_Inlined');
+	$placeholder->compile('Result: [= return("Hello World.") =]');
+
+	print ${$placeholder->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+Adding this placeholder group may be a security risk depending on the actual use. It's only a proof-of-concept module.
+
+Text::Placeholder::Group::Perl_Inlined provides no specific placeholders. Instead any placeholder is treated as perl code.
+
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item clear
+
+Clears the three generic lexicals $data, @data and %data.
+
+=item subject($code)
+
+Sets or gets the code to be executed.
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

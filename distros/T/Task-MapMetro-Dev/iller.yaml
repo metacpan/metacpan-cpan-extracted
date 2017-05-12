@@ -1,0 +1,42 @@
+---
+doctype: dist
+
+header:
+  name: Task-MapMetro-Dev
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.016000
+
+plugins:
+  - +config: Author::CSSON
+    is_task: 1
+    travis_perl_min: 16
+
+  - +extend_plugin: TravisYML
+    post_before_install:
+     - cpanm Test::NoTabs
+     - cpanm Pod::Spell
+     - cpanm Test::Spelling
+     - cpanm Pod::Coverage::TrustPod --verbose --force
+     - cpanm autobox::Junctions --verbose --force
+     - cpanm XML::Bare --verbose --force
+     - cpanm Test::Modern --verbose --force
+     - cpanm Test::Stream --verbose --force
+     - cpanm File::Slurp --verbose --force
+     - sudo apt-get update -qq
+     - sudo apt-get install -y graphviz
+    pre_install:
+     - cpanm GraphViz2
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+  - +replace_plugin: Badges
+    formats: html, markdown
+    badge:
+     - perl

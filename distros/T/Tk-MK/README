@@ -1,0 +1,190 @@
+Tk-MK version 0.23
+==================
+
+Files in Tk-MK are my personal favorite Tk-add-ons. developed in the
+past as a side effect of several huge perl projects.
+
+
+INCLUDED WIDGETS
+	Tk::Treeplus        - a Tk::Tree (HList) replacement that supports Sorting,
+                          Filtering and Resizing of columns and other gimmicks (e.g. selection history,...)
+
+	Tk::Optionbox       - a nice alternative to the default MenuButton (multi-level selection)
+	Tk::PopUpSelectBox  - a dialog based selectionlist alternative to Tk::Optionbox (multi-level selection)
+	Tk::Checkbox        - a nice alternative to the standard check-button widget
+	Tk::Statusbox       - a view-a-status-by-colors widget with flashing ,...
+	Tk::CompoundButton  - extended Tk::Button with ability to show a bitmap/image AND a text label
+	Tk::BootSplash      - an improved Splash screen based on Stephen.O.Lidie's Splashscreen.pm
+
+
+ Implicitely used widgets:
+	Tk::HdrResizeButton - an reworked alternative HList-Header-Button (based on Tk::ResizeButton) for resizing
+	Tk::ProgressBarPlus - A clone of the std. Progressbar that supports percentage display (was send to Nick-Ing S.,
+						  but for time reasons he did not manage to put it in the Tk 805.027 release.
+						  Thus as a work-around we have here a renamed clone to avoid namespace conflicts.
+
+ Deprecated/outdated widgets:
+	Tk::Buttonplus      - extended Tk::Button with ability to show a bitmap/image AND a text label
+	Tk::HListplus       - extended Tk::HList with movable columns based on ResizeButton.pm
+	Tk::DHList          - extended Tk::HList with data column and ability of sorting, ...  
+	Tk::DTree           - extended Tk::Tree widget with data column and ability of sorting, ... 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires Tk800.x preferable Tk804.027
+
+
+COPYRIGHT AND LICENCE
+
+This package is free software and is provided "as is"
+without expressed or implied warranty.  It may be used,
+redistributed and/or modified under the terms of the Perl
+(see Perls Artistic License for details).
+
+Copyright (C) 2002 - 2014 Michael Krause KrauseM_AT_gmx_DOT_net
+
+
+
+HISTORY:
+
+ Version 0.01 Initial release
+
+	o modules are running, initial pod is done
+
+ Version 0.02 Update release
+
+	o 2 new modules added Tk::ExtTree, Tk::ExtHList
+	
+
+ Version 0.03 Update release
+
+	o renamed Tk::ExtTree -> Tk::DTree, Tk::ExtHList -> Tk::DHList
+	  for making the names more intuitive
+	  
+	o added 2 new modules added Tk::HListplus, Tk::BootSplash,
+	   (and the stand-alone Tk::ResizeButton for completeness)
+	
+
+ Version 0.04 Update release
+
+	o 1 new module added Tk::Buttonplus - Button with Text AND Image
+
+
+ Version 0.05 Update release
+
+	o enhanced Tk::Checkbox to support user-customizable size
+
+
+ Version 0.06 Update release
+
+	o enhanced Tk::Optionbox - added second hierarchy for the options
+
+
+ Version 0.07 Bugfix release
+
+	o fixed Tk::HListplus - was complaining with Tk 804.xxx
+	o fixed inconsistency in buttonplus-demo
+
+
+ Version 0.08 Update release
+
+	o Update the POD docs
+
+
+ Version 0.09 Update release
+
+	o Update Tk::Optionbox - added TRUE multilevel-selection and validating support
+
+
+ Version 0.10 Update release
+
+	o Update Tk::Optionbox - added loop invocation detection to avoid segviolations
+	o Update Tk::HListplus - based on feedback from Rob Seegel (Thx a lot!) added 'auto-blank last column'
+	o Update Tk::BootSplash - see note below
+
+	o Added the ProgressBarPlus Widget to make 'BootSplash' work for users not using a patched Tk 804 ProgressBar
+
+
+ Version 0.11 Update release
+	 
+	o resolved some CPAN issues
+	o enhanced Tk::Buttonplus - added side default based on option-database	
+
+ Version 0.12 Update release
+	 
+	o enhanced Tk::Optionbox - added quick-popup for non-changed options
+	o 1 new module added Tk::PopUpSelectBox - A scrolled pop-up selection-widget (with MULTI-level selections)
+		useful where a Tk::Optionbox would have too many entries
+
+ Version 0.13 Update release
+	 
+	o Renamed DataHList and DataTree to DHList and DHTree to avoid name-space conflicts in CPAN
+	o Bugfix for Tk::DHList - Deleting the FIRST entry in a DHList messed up the reverse function.
+
+
+ Version 0.14 Update release
+	 
+	o resolved some CPAN checker issues
+
+
+ Version 0.15 Update release
+	 
+	o resolved issue on ListHeader-Bttn: Double-Click for column resizing should NOT invoke Single-Click-CB
+
+ Version 0.16 Update release
+
+	o replacement release for 0.15 (which was incomplete)
+
+ Version 0.17 Update release
+
+	o update release - added configuration option for ClosedColumnWidth and ResizerAreaWidth
+
+ Version 0.18 Update release
+
+	o Rewritten DHList megawidget to support mutiple columns and auto-generated headers
+
+ Version 0.19 Update release
+
+	o  internal version
+	
+ Version 0.20 Update release
+
+	o Completely rewritten Tk::Buttonplus Widget and renamed it to Tk::CompoundButton to honor the fact that it
+	  is based on the Tk::Compound methods
+	  This rewrite resolves some minor graphical flaws happening at Buttonplus under certain circumstances
+	  
+	o Fixed a problem in DHList: '-bg'/'-background' did not automatically influence the "data-field-area background"
+	  ( A problem for list that change their background dynamically during operation )
+	  As a work-around solution '-bg' now will set the main background AND the data-field background, while
+	  '-background' changes only the main area BG.
+	  
+	  
+ Version 0.21 Update release
+
+	o Modified t/* tests to comply with new Tk w/o X11 env behavior (see http://wiki.cpantesters.org/wiki/CPANAuthorNotes)
+
+ Version 0.22 Update release
+
+	o New created widget Tk::Treeplus Widget
+		Treeplus is a Tree (and/or HList) replacement that supports Sorting,
+        Filtering and Resizing of columns and other gimmicks (e.g. selection history, ...)
+
+ Version 0.23 Update release
+
+	o Improved widget Tk::Optionbox - Widget now supports a automatically created 'dummy' entry at the top
+		of the selection list, that will 'clear the value of the attached variable.
+		(Usable to clear also an attached label in case of emulating a combobox...
+	
+	  
+__END__

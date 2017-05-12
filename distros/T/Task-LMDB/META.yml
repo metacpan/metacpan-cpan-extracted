@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Alien::LMDB: '0'
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-LMDB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LMDB_File: '0.10'
+resources:
+  bugtracker: https://github.com/hoytech/Task-LMDB/issues
+  repository: git://github.com/hoytech/Task-LMDB.git
+version: '0.100'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,15 @@
+ChangeLog			GNU-style change log of package changes
+Makefile.PL			ExtUtils::MakeMaker build and install driver
+MANIFEST			This list of files
+README				General package documentation
+ShadowHash.pm			The Tie::ShadowHash module
+t/basic.t			Basic test suite for Tie::ShadowHash
+t/data/first.txt		Test data for t/basic.t
+t/data/full			Test data for t/basic.t
+t/data/pairs.txt		Test data for t/basic.t
+t/data/second.txt		Test data for t/basic.t
+t/data/triples.txt		Test data for t/basic.t
+t/pod-spelling.t		Test spelling in POD documentation
+t/pod.t				Test POD syntax in documentation
+TODO				General package to-do list
+META.yml                                 Module meta-data (added by MakeMaker)

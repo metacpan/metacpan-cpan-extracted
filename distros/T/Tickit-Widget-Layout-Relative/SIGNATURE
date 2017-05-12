@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 25c9fbb5cff17920b676b95772b0cd3c6505e1ed Changes
+SHA1 97c2e1700a2026b437c0826f269b9d67e5922189 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 19203e94bb04e766e57894e3e1430be29eb89800 MANIFEST
+SHA1 c0f3e2771d9cbf504c6ade5f32aaff2a69ce684e META.json
+SHA1 3ea0876393e722cffb125aaf216b7a508d27a3be META.yml
+SHA1 70e031de05a3e7afeeaa92bd45956373de46a787 Makefile.PL
+SHA1 df19ef66006b817eba4de2273852e4b392127245 README
+SHA1 3970e4b93349b576b94347071c0e15436891b135 cpanfile
+SHA1 102c81f6561742400d829c733d0a16aa76919021 dist.ini
+SHA1 545964b8590dd72bd1e9eac9c98ca647cefbb966 examples/base.pl
+SHA1 54f15f86091bca673070aa10005793926ee934f5 examples/demo.pl
+SHA1 1aaecd8ce4b0f1219ccbd69c58ed8de43c86fd05 examples/dsl.pl
+SHA1 3334b0ea6d7119e726f3c633162ad7b208cdc943 examples/synopsis.pl
+SHA1 50b5d712a3f2cd1ab2bbe63a1da2bdd261b3830c lib/Tickit/Layout/Relative.pm
+SHA1 855a6534d159b04e5ff7d243c7240cc1f7f3ddbb lib/Tickit/Widget/Layout/Relative.pm
+SHA1 8b91f455056efe419cc462bd4a8c6915b13a5fb2 lib/Tickit/Widget/Layout/Relative.pod
+SHA1 fb02eb25df861f5acab61f7133d76281e35cb727 screenshots/tickit-widget-layout-relative1.png
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 45ec5ac00849e251125326f56aae00c26db7f443 t/00-compile.t
+SHA1 f242e380d897f0430a668ea3f2938df75c0bef55 xt/author/test-eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 fd1fa776fca35fc8f1bdd24ee3fbaa1eca755a44 xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJTl2RTAAoJEFKElMNpjtyDm0gIANs+TvIq8TWzV+rhsBZpBd/S
+B+Vezf44E3vpOILOpH+qTphlMvX1407956EKwxrji/dsrxM8pCw0JmuXu04uBFEz
+I/ySp5OYxDdN8B0/t/GFWWgX20kvKIlg5V9/sOiEBu1kuMp+ZNYqEhFsLHERmcLi
+Yhq16v+Lekhla77h7k0Ct8m4X1umy8R09tiIbM5lsNGZ8bTOycxXpPrFmVzx9WCa
+AmVGXWUqsCQrz/NOAcun1npb/KHiIO/VY+BIKJLCJAzRYwx9ShwibMaBi7hjd3no
+UlUi+Jkvex+JYYio7F06HOFTHkoQ6W/rhfRMHtI1awXuh2oEy0E8wvGpAMyK1Jo=
+=6U4A
+-----END PGP SIGNATURE-----

@@ -1,0 +1,102 @@
+NAME
+    `Term::TermKey::Async' - terminal key input using `libtermkey' with
+    `IO::Async'
+
+SYNOPSIS
+     use Term::TermKey::Async qw( FORMAT_VIM KEYMOD_CTRL );
+     use IO::Async::Loop;
+ 
+     my $loop = IO::Async::Loop->new();
+ 
+     my $tka = Term::TermKey::Async->new(
+        term => \*STDIN,
+
+        on_key => sub {
+           my ( $self, $key ) = @_;
+ 
+           print "Got key: ".$self->format_key( $key, FORMAT_VIM )."\n";
+ 
+           $loop->loop_stop if $key->type_is_unicode and
+                               $key->utf8 eq "C" and
+                               $key->modifiers & KEYMOD_CTRL;
+        },
+     );
+ 
+     $loop->add( $tka );
+ 
+     $loop->loop_forever;
+
+DESCRIPTION
+    This class implements an asynchronous perl wrapper around the
+    `libtermkey' library, which provides an abstract way to read keypress
+    events in terminal-based programs. It yields structures that describe
+    keys, rather than simply returning raw bytes as read from the TTY
+    device.
+
+    This class is a subclass of `IO::Async::Handle', allowing it to be put
+    in an `IO::Async::Loop' object and used alongside other objects in an
+    `IO::Async' program. It internally uses an instance of Term::TermKey to
+    access the underlying C library. For details on general operation,
+    including the representation of keypress events as objects, see the
+    documentation on that class.
+
+    Proxy methods exist for normal accessors of `Term::TermKey', and the
+    usual behaviour of the `getkey' or other methods is instead replaced by
+    the `on_key' event.
+
+EVENTS
+    The following events are invoked, either using subclass methods or CODE
+    references in parameters:
+
+  on_key $key
+    Invoked when a key press is received from the terminal. The `$key'
+    parameter will contain an instance of `Term::TermKey::Key' representing
+    the keypress event.
+
+CONSTRUCTOR
+  $tka = Term::TermKey::Async->new( %args )
+    This function returns a new instance of a `Term::TermKey::Async' object.
+    It takes the following named arguments:
+
+    term => IO or INT
+            Optional. File handle or POSIX file descriptor number for the
+            file handle to use as the connection to the terminal. If not
+            supplied `STDIN' will be used.
+
+PARAMETERS
+    The following named parameters may be passed to `new' or `configure':
+
+    flags => INT
+            `libtermkey' flags to pass to constructor or `set_flags'.
+
+    on_key => CODE
+            CODE reference for the `on_key' event.
+
+METHODS
+  $tk = $tka->termkey
+    Returns the `Term::TermKey' object being used to access the `libtermkey'
+    library. Normally should not be required; the proxy methods should be
+    used instead. See below.
+
+  $flags = $tka->get_flags
+  $tka->set_flags( $flags )
+  $canonflags = $tka->get_canonflags
+  $tka->set_canonflags( $canonflags )
+  $msec = $tka->get_waittime
+  $tka->set_waittime( $msec )
+  $str = $tka->get_keyname( $sym )
+  $sym = $tka->keyname2sym( $keyname )
+  ( $ev, $button, $line, $col ) = $tka->interpret_mouse( $key )
+  $str = $tka->format_key( $key, $format )
+  $key = $tka->parse_key( $str, $format )
+  $key = $tka->parse_key_at_pos( $str, $format )
+  $cmp = $tka->keycmp( $key1, $key2 )
+    These methods all proxy to the `Term::TermKey' object, and allow
+    transparent use of the `Term::TermKey::Async' object as if it was a
+    subclass. Their arguments, behaviour and return value are therefore
+    those provided by that class. For more detail, see the Term::TermKey
+    documentation.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

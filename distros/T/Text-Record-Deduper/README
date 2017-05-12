@@ -1,0 +1,78 @@
+NAME
+
+Text::Record::Deduper - Separate complete, partial and near duplicate text records
+
+SYNOPSIS
+
+    use Text::Record::Deduper;
+
+    my $deduper = new Text::Record::Deduper;
+
+    # Find and remove entire lines that are duplicated
+    $deduper->dedupe_file("orig.txt");
+
+    # Dedupe comma separated records, duplicates defined by several fields
+    $deduper->field_separator(',');
+    $deduper->add_key(field_number => 1, ignore_case => 1 );
+    $deduper->add_key(field_number => 2, ignore_whitespace => 1);
+    # unique records go to file names_uniqs.csv, dupes to names_dupes.csv
+    $deduper->dedupe_file('names.csv');
+
+    # Find 'near' dupes by allowing for given name aliases
+    my %nick_names = (Bob => 'Robert',Rob => 'Robert');
+    my $near_deduper = new Text::Record::Deduper();
+    $near_deduper->add_key(field_number => 2, alias => \%nick_names) or die;
+    $near_deduper->dedupe_file('names.txt');
+
+    # Create a text report, names_report.txt to identify all duplicates
+    $near_deduper->report_file('names.txt',all_records => 1);
+
+    # Find 'near' dupes in an array of records, returning references 
+    # to a unique and a duplicate array
+    my ($uniqs,$dupes) = $near_deduper->dedupe_array(\@some_records);
+
+    # Create a report on unique and duplicate records
+    $deduper->report_file("orig.txt",all_records => 0);
+
+
+DESCRIPTION
+
+This module allows you to take a text file of records and split it into 
+a file of unique and a file of duplicate records. Deduping of arrays is
+also possible.
+
+Records are defined as a set of fields. Fields may be sepearted by spaces, 
+commas, tabs or any other delimiter. Records are separated by a new line.
+
+If no options are specifed, a duplicate will be created only when an entire
+record is duplicated.
+
+By specifying options a duplicate record is defined by which fields or partial 
+fields must not occur more than once per record. There are also options to 
+ignore case sensitivity, leading and trailing white space.
+
+Additionally 'near' or 'fuzzy' duplicates can be defined. This is done by creating
+aliases, such as Bob => Robert.
+
+This module is useful for finding duplicates that have been created by
+multiple data entry, or merging of similar records
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by Kim Ryan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

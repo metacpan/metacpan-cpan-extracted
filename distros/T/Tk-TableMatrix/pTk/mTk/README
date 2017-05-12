@@ -1,0 +1,11 @@
+Similar to the perl/tk's build structure, this 'mTk' directory 
+contains _complete_ sources of Tktable in their minimally modified forms.
+
+This is because 'munging' to pTk directory from either modified form
+or original Tk becomes very complex now Tk is split unix/generic.
+
+It should also makes merging changes less error prone.
+
+# Note that as for Tk800 and Tk804 compatibility, there are two directories here
+Tktable: Main-line TableMatrix code for Tk804 and above
+Tktable800: Tablematrix code compatible with the older Tk800-series.

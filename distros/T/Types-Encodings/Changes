@@ -1,0 +1,18 @@
+Types-Encodings
+===============
+
+Created:      2013-05-14
+Home page:    <https://metacpan.org/release/Types-Encodings>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-Encodings>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-03-23
+
+ [ Packaging ]
+ - use Dist::Inkt
+
+ [ Other ]
+ - Updated: Don't use overloaded addition in examples or test cases;
+   Type::Tiny no longer supports it.
+
+0.001	2013-05-14	Initial release

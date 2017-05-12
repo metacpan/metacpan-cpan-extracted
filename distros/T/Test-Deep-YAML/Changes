@@ -1,0 +1,17 @@
+Revision history for Test-Deep-YAML
+
+0.004     2015-04-24 16:02:08Z
+          - fix tests so they keep working with older YAML.pm too :)
+
+0.003     2015-04-24 03:56:55Z
+          - fix tests that no longer behave the same under newer YAML.pm
+
+0.002     2014-02-23 00:05:10Z
+          - warnings tests bypassed during installation, to prevent
+            installation issues in the presence of deprecation warnings from
+            upstream dependencies
+          - properly support nesting other Test::Deep plugins inside yaml()
+
+0.001     2013-05-29 02:28:20Z
+          - Initial release.
+

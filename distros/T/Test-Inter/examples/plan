@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Test::Inter;
+
+my $o = new Test::Inter;
+
+print "The following script will fail due to multiple plans\n\n";
+
+$o->plan(2);
+$o->plan(5);
+$o->done_testing();
+

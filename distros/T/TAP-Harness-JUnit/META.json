@@ -1,0 +1,62 @@
+{
+   "abstract" : "Generate JUnit compatible output from TAP results",
+   "author" : [
+      "Lubomir Rintel (GoodData) <lubo.rintel@gooddata.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4208",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TAP-Harness-JUnit",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "File::Temp" : "0",
+            "Scalar::Util" : "0",
+            "TAP::Harness" : "3.05",
+            "TAP::Parser" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "TAP::Harness::JUnit" : {
+         "file" : "lib/TAP/Harness/JUnit.pm",
+         "version" : "0.42"
+      },
+      "TAP::Harness::JUnit::Parser" : {
+         "file" : "lib/TAP/Harness/JUnit.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=TAP-Harness-JUnit"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jlavallee/tap-harness-junit"
+      }
+   },
+   "version" : "0.42"
+}

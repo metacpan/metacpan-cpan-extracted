@@ -1,0 +1,58 @@
+{
+   "abstract" : "Simple text template engine",
+   "author" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Template-Simple",
+   "no_index" : {
+      "directory" : [
+         "monolithic_version",
+         "builder",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0.12",
+            "Test::More" : "0.40"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Devel::Size" : "0.77",
+            "Perl::Tidy" : "0",
+            "Text::Table" : "1.107"
+         },
+         "requires" : {
+            "Digest::MD5" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/burak/cpan-text-template-simple/"
+      }
+   },
+   "version" : "0.90",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

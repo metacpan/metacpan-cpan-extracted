@@ -1,0 +1,97 @@
+NAME
+    Tie::Autotie - Automatically ties underlying references
+
+SYNOPSIS
+      use Tie::Autotie
+        'Tie::Module',      # the module to autotie
+        [ 'use', 'args' ],  # arguments to 'use Tie::Module'
+        [ 'tie', 'args' ];  # arguments to tie() for Tie::Module
+
+      # then use Tie::Module as usual
+
+DESCRIPTION
+    This module allows you to automatically tie data structures contained in
+    a tied data structure. As an example:
+
+      use Tie::Autotie 'Tie::IxHash';
+
+      tie my(%hash), 'Tie::IxHash';
+
+      $hash{jeff}{age} = 22;
+      $hash{jeff}{lang} = 'Perl';
+      $hash{jeff}{brothers} = 3;
+      $hash{jeff}{sisters} = 4;
+
+      $hash{kristin}{age} = 22;
+      $hash{kristin}{lang} = 'Latin';
+      $hash{kristin}{brothers} = 1;
+      $hash{kristin}{sisters} = 0;
+
+      for my $who (keys %hash) {
+        print "$who:\n";
+        for my $what (keys %{ $hash{$who} }) {
+          print "  $what = $hash{$who}{$what}\n";
+        }
+      }
+
+    This program outputs:
+
+      jeff:
+        age = 22
+        lang = Perl
+        brothers = 3
+        sisters = 4
+      kristin:
+        age = 22
+        lang = Latin
+        brothers = 1
+        sisters = 0
+
+    You can see that the keys of %hash are returned in the order in which
+    they were created, *as well* as the keys of the sub-hashes.
+
+BUGS
+    * A non-autotied layer
+        It only works if each layer is being autotied. As soon as there's a
+        layer that is not being autotied, all layers inside it will also be
+        ignored:
+
+          use Tie::Autotie 'Tie::IxHash';
+  
+          tie my(%hash), 'Tie::IxHash';
+  
+          $hash{a}{b} = 1;  # %{ $hash{a} } is autotied
+          $hash{a}{c} = 2;  # so keys %{ $hash{a} } returns ('b', 'c')
+  
+          $hash{d}[0]{a}{y} = 3;  # %{ $hash{d} } is autotied, but Tie::IxHash has
+          $hash{d}[0]{a}{x} = 4;  # no control over $hash{d}[0], so $hash{d}[0]{a}
+                                  # is not autotied
+
+        At the moment, there's no way to get around this. Please stick to
+        using data structures that your tying module can handle.
+
+    * Assigning a reference
+        In the Tie::IxHash example, you cannot do:
+
+          $hash{jeff} = {
+            age => 22,
+            lang => 'Perl',
+            brothers => 3,
+            sisters => 4,
+          };
+
+        because that creates a hash reference, not an object of Tie::IxHash.
+        This hash reference ends up being destroyed anyway, and replaced
+        with a Tie::IxHash object that points to an empty hash.
+
+AUTHOR
+        Jeff "japhy" Pinyan, <japhy@pobox.com>
+
+COPYRIGHT AND LICENSE
+        Copyright (C) 2004 by japhy
+
+        This library is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself, either Perl version 5.8.3
+        or, at your option, any later version of Perl 5 you may have
+        available.
+

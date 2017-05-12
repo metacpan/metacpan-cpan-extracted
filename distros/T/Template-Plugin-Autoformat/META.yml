@@ -1,0 +1,29 @@
+---
+abstract: 'TT plugin for Text::Autoformat'
+author:
+  - 'Andy Wardley <abw@wardley.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-Autoformat
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Template: '2.2'
+  Text::Autoformat: '1.13'
+  perl: '5.006000'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Plugin-Autoformat
+  homepage: https://github.com/karpet/template-plugin-autoformat
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/karpet/template-plugin-autoformat
+version: '2.77'

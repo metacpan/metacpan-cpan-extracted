@@ -1,0 +1,13 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Text/Corpus/VoiceOfAmerica.pm
+lib/Text/Corpus/VoiceOfAmerica/Document.pm
+scripts/update_Text_Corpus_VoiceOfAmerica.pl
+scripts/update_Text_Corpus_VoiceOfAmerica.sh
+scripts/examples_Text_Corpus_VoiceOfAmerica.pl
+t/001_test.t
+META.yml                                 Module meta-data (added by MakeMaker)

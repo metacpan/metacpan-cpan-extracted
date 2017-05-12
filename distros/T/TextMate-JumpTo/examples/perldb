@@ -1,0 +1,28 @@
+# Example .perldb that makes TextMate track the current debugger
+# location.
+
+use TextMate::JumpTo qw(jumpto);
+use File::Spec;
+
+sub afterinit {
+    $trace |= 4;    # Enable watchfunction
+
+    # Needed to work out where filenames are relative to
+    chomp( $base_dir = `pwd` );
+
+    $option{animate} = 0;
+    push @options, 'animate';
+}
+
+sub watchfunction {
+    my ( $package, $file, $line ) = @_;
+    return unless $DB::single || $option{animate};
+    local $trace = 0;
+    if ( $file =~ /^\(eval\s+\d+\)\[(.+?):(\d+)\]/ ) {
+        $file = $1;
+        $line += $2 - 1;
+    }
+    $file = File::Spec->rel2abs( $file, $base_dir );
+    jumpto( file => $file, line => $line, bg => 1 );
+    return 1;
+}

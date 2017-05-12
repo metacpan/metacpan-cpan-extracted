@@ -1,0 +1,72 @@
+[2016-03-27 16:41:58.331][info][Test::BrewBuild] in _create_log()
+[2016-03-27 16:41:58.331][info][Test::BrewBuild] in new(), constructing Test::BrewBuild object
+[2016-03-27 16:41:58.332][info][Test::BrewBuild.Test::BrewBuild::BrewCommands] constructing new Test::BrewBuild::BrewCommands object
+[2016-03-27 16:41:58.332][notice][Test::BrewBuild] 
+[2016-03-27 16:41:58.333][warning][Test::BrewBuild] successfully loaded Test::BrewBuild::Plugin::DefaultExec plugin
+[2016-03-27 16:41:58.333][notice][Test::BrewBuild.run] commencing run()
+[2016-03-27 16:41:58.333][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.available] generating available
+[2016-03-27 16:41:58.727][info][Test::BrewBuild.brew_info] brew info set to:
+  perl-5.23.9
+i perl-5.22.1
+  perl-5.20.3
+  perl-5.18.4
+  perl-5.16.3
+  perl-5.14.4
+  perl-5.12.5
+  perl-5.10.1
+  perl-5.8.9
+  perl-5.6.2
+  perl5.005_04
+  perl5.004_05
+  perl5.003_07
+
+[2016-03-27 16:41:58.729][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.available] determining available perls
+[2016-03-27 16:41:58.730][info][Test::BrewBuild.perls_available] perls available: perl-5.23.9, perl-5.22.1, perl-5.20.3, perl-5.18.4, perl-5.16.3, perl-5.14.4, perl-5.12.5, perl-5.10.1, perl-5.8.9, perl-5.6.2
+[2016-03-27 16:41:58.731][info][Test::BrewBuild.perls_installed] checking perls installed
+[2016-03-27 16:41:58.732][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.installed] cleaning up perls installed
+[2016-03-27 16:41:58.733][warning][Test::BrewBuild.run] installed perls: perl-5.22.1
+[2016-03-27 16:41:58.734][info][Test::BrewBuild.perls_installed] checking perls installed
+[2016-03-27 16:41:58.734][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.installed] cleaning up perls installed
+[2016-03-27 16:41:58.735][info][Test::BrewBuild.results] warnings trapped locally
+[2016-03-27 16:41:58.735][info][Test::BrewBuild.exec] creating temp file
+[2016-03-27 16:41:58.737][info][Test::BrewBuild.exec] temp filename: /tmp/hrpUm4UL6B
+[2016-03-27 16:41:58.737][info][Test::BrewBuild] Test::BrewBuild class/obj retrieving a log object
+[2016-03-27 16:41:58.738][info][Test::BrewBuild.Test::BrewBuild::Plugin::DefaultExec::brewbuild_exec] performing plugin duties
+[2016-03-27 16:41:58.738][info][Test::BrewBuild.exec] instructions to be executed:
+system "cpanm --installdeps . && cpanm -v --test-only .";
+
+[2016-03-27 16:41:58.739][info][Test::BrewBuild.exec] system "cpanm --installdeps . && cpanm -v --test-only .";
+
+[2016-03-27 16:41:58.739][info][Test::BrewBuild.exec] temp file handle closed
+[2016-03-27 16:41:58.740][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.brew] *brew cmd is: perlbrew
+[2016-03-27 16:41:58.740][notice][Test::BrewBuild.exec] exec'ing: perlbrew exec perl /tmp/hrpUm4UL6B
+[2016-03-27 16:42:01.082][debug][Test::BrewBuild.results] 
+*****
+perl-5.22.1
+==========
+--> Working on .
+Configuring /home/spek/devel/repos/p5-test-brewbuild/BB-Pass ... OK
+<== Installed dependencies for .. Finishing.
+--> Working on .
+Configuring /home/spek/devel/repos/p5-test-brewbuild/BB-Pass ... Generating a Unix-style Makefile
+Writing Makefile for BB::Pass
+Writing MYMETA.yml and MYMETA.json
+OK
+Building and testing BB-Pass-0.01 ... Skip blib/lib/BB/Pass.pm (unchanged)
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/home/spek/perl5/perlbrew/perls/perl-5.22.1/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00-load.t .. ok
+All tests successful.
+Files=1, Tests=1,  1 wallclock secs ( 0.04 usr  0.00 sys +  0.04 cusr  0.00 csys =  0.08 CPU)
+Result: PASS
+OK
+Successfully tested BB-Pass-0.01
+
+
+
+*****
+[2016-03-27 16:42:01.082][notice][Test::BrewBuild.results] got 1 results
+[2016-03-27 16:42:01.082][info][Test::BrewBuild.results] 5.22.1 PASSED...
+
+5.22.1 :: PASS
+[2016-03-27 16:42:01.083][notice][Test::BrewBuild.results] Test::BrewBuild run finished

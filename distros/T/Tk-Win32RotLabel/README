@@ -1,0 +1,108 @@
+NAME
+    Tk::Win32RotLabel - A widget that allows rotated labels on the Win32
+    platform.
+
+SYNOPSIS
+      use Tk::Win32RotLabel;
+      $top->Win32RotLabel(-text  => 'Anything you want',
+                          -angle => 45)->pack;
+
+DESCRIPTION
+    This widget extends a simple Label to allow rotated text. It is
+    Win32-specific since a solution already exists on *nix systems (search
+    for Tk::CanvasRottext and Tk::RotX11Font by Slaven Rezic). Please see
+    the the section on "BUGS" section below.
+
+PREREQUISITES
+    This module requires the Win32::API module, which is available from your
+    local mirror.
+
+WIDGET-SPECIFIC OPTIONS
+    This widget accepts all options that a Tk::Label accepts, but adds one
+    more option to specify the angle of the text. Some options are ignored.
+    See the the section on "LIMITATIONS" section for more information.
+
+    -angle
+        This option specifies the angle (in degrees) of the text measured in
+        a counter-clockwise fashion. Valid values are 0 to 360 inclusive.
+        Values below 0 will be treated as 0, and values above 360 are
+        treated as 360. Defaults to 0 degrees which means no rotation.
+
+LIMITATIONS
+    I am no expert in Win32-specific graphics. This module was implemented
+    by trial and error, and there is some behaviour that I do not understand
+    fully. As a result, there are some limitations:
+
+    Text Position
+        The text will ALWAYS be displayed flushed along either the left edge
+        or the right edge of label, depending on the angle.
+
+    Label Size
+        The size of the label will always be computed and forced onto the
+        label such that it creates the smallest possible bounding box around
+        the text.
+
+    The combination of the above two limitations implies that the label will
+    always be as small as possible, and the text centered in the label.
+    Options such as *-padx|pady*, *-anchor*, *-justify*, etc, are ignored.
+    But, options given to the layout manager (pack/place/grid/form) are NOT
+    ignored, which can lead to non-intuitive results.
+
+    For example, this:
+
+      $top->Label(-text => 'test')->pack(qw/-fill x/);
+
+    will center the text in the label. While this:
+
+      $top->Win32RotLabel(-text => 'test')->pack(qw/-fill x/);
+
+    will have the text flushed to the left. It is easy to rectify this
+    problem though by placing the Win32RotLabel in a Frame:
+
+      my $f = $top->Frame->pack(qw/-fill x/);
+      $f->Win32RotLabel(-text => 'test')->pack;
+
+    Important: Not all fonts support rotation. Please see the the section on
+    "BUGS" section for more information.
+
+BUGS
+    Through my trials I found out that not all fonts support rotation. It
+    seems that only True-Type fonts support this. So, if you try to use a
+    font and get weird results, try a different font. Times New Roman, the
+    default, should work fine.
+
+    If you set the size of your MainWindow, via a call to geometry() for
+    example, and then create a Win32RotLabel widget as a child of your
+    MainWindow, then the label will appear empty until you move or resize
+    the MainWindow. As a workaround, either resize the MainWindow *after*
+    creating the Win32RotLabel object, or create a Frame, and make it the
+    parent of your Win32RotLabel object.
+
+    Sometimes, when resizing the toplevel, the text might appear to flicker.
+    That is normal. In some cases though, the text disappears. I do not
+    understand why this happens. To fix this, you can simply minimize and
+    re-maximize the window, or resize it again, and all should be fine.
+
+    I wrote this, and tested it on two WindowsXP machines (with SP-1 and the
+    latest security patches). It works. I did not test on any other
+    platform, but I got reports that it fails on Win2k. I'm investigating.
+
+    If you can comment on any of the bugs above, then I would be happy to
+    hear from you (especially if you know how to fix things ;)
+
+INSTALLATION
+    Either the usual:
+
+    perl Makefile.PL make make install
+
+    or just stick it somewhere in @INC where perl can find it. It's in pure
+    Perl.
+
+AUTHOR
+    Ala Qumsieh *aqumsieh@cpan.org*
+
+COPYRIGHTS
+    Copyright (c) 2008 Ala Qumsieh. All rights reserved. This module is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+

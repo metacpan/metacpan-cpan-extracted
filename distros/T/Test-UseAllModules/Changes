@@ -1,0 +1,65 @@
+Revision history for Perl extension Test::UseAllModules.
+
+0.17 2014/11/13
+  - oops, forgot to update MANIFEST...
+
+0.16 2014/11/13
+  - dropped cpanfile support, as it forced users of this module
+    to update too many modules, especially while testing backward
+    compatibility with older perls.
+
+0.15 2014/07/13
+  - dropped (experimental) Test::More 1.5/2.0 support
+
+0.14 2012/08/03
+  - Test::More version 1.5 support
+
+0.13 2011/03/18
+  - Test::More version 2 support
+
+0.12 2009/05/27
+  - silenced a warnings on require (reported by Kevin Ryde #46389)
+  - now you can do extra tests like Test::NoWarnings with all_uses_ok
+
+0.11 2009/05/08
+  - Modules under arbitrary directories can be tested now.
+
+0.10 2009/02/26
+  - no significant code changes
+  - updated SEE ALSO to include Test::Compile and
+    Test::LoadAllModules
+
+0.09_01 2008/10/01
+  - this is a dev release to see how PAUSE changed
+    (by the recent security/permission issue)
+  - minor pod tweak
+
+0.09  2007/11/28
+  - added ExtUtils::Manifest dependency
+
+0.08  2007/05/27
+  - maintenance release: no significant code changes
+  - added license info to Makefile.PL
+  - updated META.yml version
+
+0.07  2006/07/27
+  - skip_all if no MANIFEST should be found.
+  - added two tests to see if all_uses_ok skips properly.
+
+0.06  2006/07/27
+  - skip_all if no .pm files should be found under the lib directory. (Tatsuhiko Miyagawa's advice)
+
+0.05  2006/07/27
+  - now parses MANIFEST properly on *nix. (Tatsuhiko Miyagawa's report)
+
+0.04  2006/07/26
+  - renamed from Test::Use (brian d foy's advice)
+
+0.03  2006/07/25
+  - now tests will be bailed out if Test::Use test should fail.
+
+0.02  2006/07/24
+  - oops. forgot to modify Makefile.PL
+
+0.01  2006/07/24
+  - initial release

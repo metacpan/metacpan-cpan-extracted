@@ -1,0 +1,63 @@
+{
+   "abstract" : "PostgreSQL runner for tests",
+   "author" : [
+      "Toby Corkindale, Kazuho Oku, Peter Mottram, plus various contributors."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-PostgreSQL",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::Pg" : "0",
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::SharedFork" : "0.06"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::Pg" : "0",
+            "DBI" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "Function::Parameters" : "0",
+            "Moo" : "0",
+            "POSIX" : "0",
+            "Tie::Hash::Method" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0",
+            "User::pwent" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/TJC/Test-postgresql"
+      }
+   },
+   "version" : "1.23",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

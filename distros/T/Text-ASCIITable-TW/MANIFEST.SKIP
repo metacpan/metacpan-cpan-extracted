@@ -1,0 +1,10 @@
+^MYMETA\.yml$
+^MYMETA\.json$
+\.bak$
+^\.git
+^_build
+\.swp$
+^blib
+^Makefile$
+^Build$
+pm_to_blib

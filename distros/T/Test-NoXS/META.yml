@@ -1,0 +1,48 @@
+---
+abstract: 'Prevent a module from loading its XS code'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Class::Load::XS: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec::Functions: 0
+  List::Util: 0
+  Module::Implementation: 0
+  Test::More: 0
+  version: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-NoXS
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Test::NoXS:
+    file: lib/Test/NoXS.pm
+    version: 1.03
+requires:
+  DynaLoader: 0
+  Module::CoreList: 3.00
+  XSLoader: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/Test-NoXS/issues
+  homepage: https://github.com/dagolden/Test-NoXS
+  repository: https://github.com/dagolden/Test-NoXS.git
+version: 1.03
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Sam Kaufman <sam@socialflow.com>'

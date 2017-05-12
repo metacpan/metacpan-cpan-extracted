@@ -1,0 +1,368 @@
+#!/usr/bin/perl -w
+# $Id$
+#
+# Copyright 2006, Philip Gwyn.
+#
+# This script will compare a diff against a coverage.  The idea is to
+# make sure that changes you have made are verified by your unit tests.  
+#
+# This script was the original motivation behind Text::Diff::Parser.  
+#
+# To use it, install ExtUtils::MakeMaker::Coverage.  Then add the following
+# to your Makefile.PL.  It will silently ignore failure, so that you don't
+# annoy people who don't have ExtUtils::MM::Coverage installed
+# eval q{
+#    use ExtUtils::MakeMaker::Coverage;
+#    # I keep many modules outside of /usr/lib/perl5
+#    my $config = ExtUtils::MakeMaker::Coverage->config;
+#    $config->ignore( ['site_perl'] );
+# };
+#
+# Then generate a coverage report :
+#   make testcover
+#
+# Create a diff of your recent changes :
+#   cvs diff >changes.diff
+#   svn diff >changes.diff
+#
+# Then run this script on those changes :
+#   cover-diff --cover-db=cover_db --diff=changes.diff --strip=1
+#
+# The report is in cover_db/diff.html :
+#   htmlview cover_db/diff.html
+#
+# Note that perl's definition of an executable line is some times different
+# from what you expect.  This means that the conditionals if()s will often
+# not be marked as run, even if they have been.  This is a limit of 
+# ExtUtils::MM::Coverage.
+#
+
+use strict;
+
+use Devel::Cover::DB;
+use Text::Diff::Parser;
+use POSIX qw(strftime);
+
+use Getopt::Long;
+
+my $DIFF = 'diff';
+my $COVER_DB = 'cover_db';
+my @PREFIX;
+my $SIMPLIFY=0;
+my $HELP=0;
+my $STRIP=0;
+
+my $ret = GetOptions( 'diff=s'      => \$DIFF, 
+                      'cover-db=s'  => \$COVER_DB,
+                      'prefix=s'    => \@PREFIX,
+                      'simplify'    => \$SIMPLIFY,
+                      'strip=i'     => \$STRIP,
+                      'help'        => \$HELP
+                    );
+
+unless( $ret ) {
+    usage();
+    exit 3;
+}
+
+if( $HELP ) {
+    usage();
+    exit 0;
+}
+
+my $OUTPUT = "$COVER_DB/diff.html";
+
+#########################################################
+my $diff = Text::Diff::Parser->new( File     => $DIFF, 
+                                    Simplify => $SIMPLIFY, 
+                                    Strip    => $STRIP );
+my $db = Devel::Cover::DB->new( db=>$COVER_DB );
+
+my $cover = $db->cover;
+
+my $currentfile = '';
+my %LAST;
+my %WARNED;
+my $lastline;
+my $href;
+my $totals;
+my @report;
+
+foreach my $change ( $diff->changes ) {
+
+    my( $file, $c );
+    ($file, $c)= ( '', '');
+    PREFIX:
+    foreach my $dir ( '', @PREFIX ) {
+        foreach my $tf ( join( '/', $dir, $change->filename2 ), 
+                         join( '/', 'blib', $dir, $change->filename2 ), 
+                         join( '/', 'blib', 'lib', $dir, $change->filename2 )
+                       ) {
+            $tf =~ s(//)(/)g;
+            $c = $cover->file( $tf );
+            next unless $c;
+            $file = $tf;
+            last PREFIX;
+        }
+    }
+
+
+    unless( $c ) {
+        my $file = $change->filename2;
+        warn "$file not in cover_db\n" if $file =~ /\.p[ml]$/
+                                            and not $WARNED{$file}++;
+        next;
+    }
+
+    my $crit = $c->criterion( 'statement' );
+
+    my $last = $LAST{ $file } ||= ( sort { $b<=>$a } $crit->items )[0];
+
+    if( $currentfile ne $file ) {
+        $href = $file;
+        $href =~ s/\W/-/g;
+        $href .= ".html";
+
+        push @report, ['html_newfile', $file, $href ];
+        $currentfile = $file;
+        undef( $lastline );
+    }
+
+    my $line = $change->line2;
+    my $size = $change->size;
+
+    if( $lastline and not ($line <= $lastline+1 and 
+                                    $lastline <= $line+$size)) {
+        push @report, ['html_newchunk'];
+    }
+
+    for( my $n =0; $n < $size ; $n++ ) {
+        push @report, ['html_line', {href=>$href, line=>$line+$n}];
+
+        my $text = $change->text( $n );
+
+        my $check = $line+$n;
+        $check = 0 if $line + $n > $last;   # past end of coverage -> POD?
+        $check = 0 unless $text =~ /\S/;    # empty line
+        $check = 0 if $text =~ /^\s*#/;     # comments
+        # we can't have run a line that was removed, so we just make sure
+        # that the equiv of the first line that currently exists was run.
+        $check = $change->line2             
+                if $change->type eq 'REMOVE';
+        # Better : if line2 isn't present, check to see if line2-1 and 
+        # line2+1 are presente.  Give c1 or c2 class if not, or if they are
+        # covered+not covered.
+
+        my $class = '';
+
+        if( $check ) {
+            my $l = $crit->location( $check );
+            if( $l ) {
+                if( $l->[0]->covered ) {
+                    $class = 'c3';
+                    $totals->{$file}{good}++;
+                }
+                else {
+                    $class = 'c0';
+                    $totals->{$file}{bad}++;
+                }
+            }
+        }
+        $report[-1][1]{class2} = $class;
+        $class = '' unless $change->type;    # null operation
+
+        $report[-1][1]{text} = $text;
+        $report[-1][1]{class} = $class;
+        $report[-1][1]{type} = $change->type;
+    }
+    $lastline = $line+$size;
+}
+
+#########################################################
+open OUT, ">$OUTPUT" or die "Unable to create $OUTPUT: $!\n";
+
+print OUT html_preamble();
+
+print OUT html_report( $totals );
+
+print OUT qq(<table cellpadding="0" cellspacing="0">\n);
+foreach my $line ( @report ) {
+    my( $func, @args ) = @$line;
+    print OUT 'main'->can($func)->( @args );
+}
+print OUT qq(</table>\n);
+
+print OUT html_postamble();
+
+close OUT;
+
+patch_css();
+
+print "Report created in $OUTPUT\n";
+
+
+#########################################################
+sub html_preamble
+{
+    my $diff_age = strftime "%Y/%m/%d %H:%M:%S %Z", 
+                            localtime((stat $DIFF)[9]);
+    my $db_age = strftime "%Y/%m/%d %H:%M:%S %Z", 
+                            localtime((stat "$COVER_DB/cover.12")[9]);
+
+    return <<HTML;
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></meta>
+<meta http-equiv="Content-Language" content="en-us"></meta>
+<link rel="stylesheet" type="text/css" href="cover.css"></link>
+<title>Change Coverage: $DIFF</title>
+</head>
+<body>
+
+<h1>Change Coverage</h1>
+
+<table>
+<tr><td class="h" align="right">Database:</td>
+    <td align="left">$COVER_DB</td>
+    <td align="left">Generated $db_age</td></tr>
+<tr><td class="h" align="right">DIFF:</td>
+    <td align="left">$DIFF</td>
+    <td align="left">Generated $diff_age</td></tr>
+</table><br />
+
+HTML
+}
+
+#########################################################
+sub html_report
+{
+    my( $totals ) = @_;
+    my @ret;
+
+    my $total = 0;
+    my $covered = 0;
+    push @ret, qq(<table><tr><th>file</th><th>covered</th></tr>\n);
+
+    foreach my $file ( sort keys %$totals ) {
+
+        $totals->{$file}{good} ||= 0;
+        my $stotal = $totals->{$file}{good} + ($totals->{$file}{bad}||0);
+
+        $covered += $totals->{$file}{good};
+        $total += $stotal;
+
+        push @ret, qq(<tr><td align="left"><a href="#$file">$file</a></td>), 
+                        html_percent( $totals->{$file}{good} / $stotal ), 
+                   qq(</tr>\n);
+    }
+    push @ret, qq(<tr><td align="left">Total</td>), 
+                html_percent( $total ? ($covered / $total) : 0 ),
+                 qq(</tr></table>\n<br />\n);
+
+    return @ret;
+}
+
+#########################################################
+sub html_percent
+{
+    my( $percent ) = @_;
+    $percent = sprintf "%.1f", $percent*100;
+    my $class = 'c0';
+    $class = 'c1' if $percent > 75;
+    $class = 'c2' if $percent > 90;
+    $class = 'c3' if $percent > 99;
+    return qq(<td class="$class">$percent</td>);
+}
+
+#########################################################
+sub html_newfile
+{
+    my( $filename, $href ) = @_;
+    return <<HTML;
+    <tr><th colspan="3"><a name="$filename" href="$href">$filename</a></th></tr>
+HTML
+}
+
+#########################################################
+sub html_newchunk
+{
+    return qq(   <tr><td colspan="3" style="border: none;"><hr /></td></tr>\n);
+}
+
+#########################################################
+sub html_line 
+{
+    my( $bits ) = @_;
+    $bits->{text} =~ s/</&lt;/g;
+#    <tr><th><a href="$bits->{href}#L$bits->{line}">$bits->{line}</a></th>
+    return <<HTML;
+    <tr><th class="$bits->{class2}">$bits->{line}</th>
+        <td class="$bits->{class}" style="font-size: 70%;">$bits->{type}</td>
+        <td class="s $bits->{type}">$bits->{text}</td></tr>
+HTML
+}
+
+
+#########################################################
+sub html_postamble
+{
+    return <<HTML;
+</body>
+</html>
+HTML
+}
+
+#########################################################
+sub patch_css
+{
+    local @ARGV = join '/', $COVER_DB, 'cover.css';
+    local $^I = '.bk';
+    my $once;
+    while( <> ) {   
+        unless( $once ) {
+            $once = 1;
+            print <<CSS;
+
+td.s:hover {
+    background-color: #dddddd;
+}
+td.s {
+    border: none;
+}
+
+.REMOVE {
+    text-decoration: line-through;
+}
+
+CSS
+        }
+
+        s/^(table {)/X.$1/;
+        print;
+    }
+}
+
+    
+#########################################################
+sub usage
+{
+    print <<USAGE;
+Compare a diff against a coverage report to see if a given set of changes
+have been verified by your unit tests.
+
+Usage: $0 [options]
+    --diff=file.diff Use this diff file (Default $DIFF)
+    --cover-db=dir   Use this coverage database (Default $COVER_DB)
+    --prefix=dir     Prefix filenames in the diff with this directory to 
+                     find the relevant data in the coverage DB.  This is
+                     necessary because your patch and Devel::Cover won't
+                     find packages in the same place.  blib/lib is also
+                     checked.  May be used multiple times.
+    --strip=N        Strip N directories from file names in the diff file.
+    --simplify       Simplify the output.   Removes blank lines and converts
+                     ADD/REMOVE pairs into a MODIFY.
+    --help           Show this help message
+USAGE
+}

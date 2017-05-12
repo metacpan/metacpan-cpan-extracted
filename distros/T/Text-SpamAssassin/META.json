@@ -1,0 +1,51 @@
+{
+   "abstract" : "Detects spamminess of arbitrary text, suitable for wiki and blog defense",
+   "author" : [
+      "Robert Norris <rob@eatenbyagrue.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102343, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-SpamAssassin",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Random" : 0,
+            "Mail::Address" : 0,
+            "Mail::Header" : 0,
+            "Mail::Internet" : 0,
+            "Mail::SpamAssassin" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-text-spamassassin@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-SpamAssassin"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robn/Text-SpamAssassin.git",
+         "web" : "http://github.com/robn/Text-SpamAssassin"
+      }
+   },
+   "version" : "2.001"
+}
+

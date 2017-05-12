@@ -1,0 +1,29 @@
+---
+abstract: 'Quickly define fixture data for unit tests'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  DBD::SQLite: 1.40
+  Fennec: 2.013
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-FixtureBuilder
+provides:
+  Test::FixtureBuilder:
+    file: lib/Test/FixtureBuilder.pm
+    version: 0.001
+requires:
+  Carp: 0
+  Exporter::Declare: 0
+  Scalar::Util: 0
+resources:
+  bugtracker: http://github.com/exodist/Test-FixtureBuilder/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Test-FixtureBuilder
+version: 0.001

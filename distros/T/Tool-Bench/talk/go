@@ -1,0 +1,2 @@
+#!/bin/sh
+./yaml2hbml.pl slidez.yaml  > slidez.hbml && slidez -i slidez.hbml -d slidez 

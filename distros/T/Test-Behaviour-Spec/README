@@ -1,0 +1,27 @@
+Test-Behaviour-Spec version 0.02
+
+Let's play believe that we are the Behaviour Driven Developers,
+putting some additional interiors in our tests. This module
+provides you such interiors of three subroutines: 'describe', 'it',
+and 'spec'.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, MIZUTANI Tociyuki
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

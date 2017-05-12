@@ -1,0 +1,31 @@
+Revision history for Perl extension Test::Httpd::Apache2
+
+0.09
+	- fix incompatibility with RHEL5 (and variants that do not return os name by httpd -v)
+
+0.08
+	- compatibility improvements on various platforms including MSWin32
+
+0.07
+	- print the contents of error_log when httpd fails to start
+	- check the existence of httpd.exe on win32 (in tests)
+
+0.06
+	- check the existence of apxs before running tests (to reduce false-positive failures on cpantesters)
+
+0.05
+	- detect libphp5.so (does not use the standard mod_foo.so naming convention)
+
+0.04
+	- add Win32 support (thanks to mattn)
+	- detect "apache2" and "apxs2" for Debian / Ubuntu compatibility
+	- automatically translate "mod_authz_host" to "mod_access" for Apache/2.0.x
+
+0.03
+	- skip tests when httpd cannot be located
+
+0.02
+	- autoload the specified modules
+
+0.01
+	- initial release

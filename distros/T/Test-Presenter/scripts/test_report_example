@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Test::Presenter;
+use Data::Dumper;
+
+my $re = new Test::Presenter;
+
+my $opt_debug = 0;
+
+$re->set_debug($opt_debug);
+$re->open_db("/home/jdaiker/results", "combo.dbxml");
+
+$re->add_doc("/home/jdaiker/results", "iozone.trpi", "500");
+$re->open_template("/usr/share/Test-Presenter/templates", "xyplot.tmpl");
+$re->open_config("/home/jdaiker/projects/crucible/Test-Presenter/tm", "xy.config");
+$re->process();
+$re->query_with_template("500");
+#$re->query_with_template();
+
+#$re->remove_doc("500");
+
+$re->add_doc("/home/jdaiker/results", "ltp.trpi", "R2d2");
+$re->open_template("/usr/share/Test-Presenter/templates", "histogram.tmpl");
+$re->open_config("/home/jdaiker/projects/crucible/Test-Presenter/tm", "histo.config");
+$re->process();
+
+$re->save_query("/home/jdaiker", "query.test");
+
+$re->query_with_template();
+
+#$re->query_header("500");
+
+#my @elements = ('test');
+#my @attributes = ('log-filename', 'path');
+#$re->_query_spec( \@elements, \@attributes, "500" );
+
+#@elements = ('url');
+#@attributes = ('');
+#$re->_query_spec( \@elements, \@attributes, "500" );
+
+#@elements = ('');
+#@attributes = ('');
+#$re->_query_spec( \@elements, \@attributes, "500" );
+
+#$re->_query_build("500");
+
+#$re->_query_coverage_report("500");
+#$re->_query_code_convention_report("500");
+#$re->_query_test("500");
+$re->query_all("500");
+
+$re->dump();
+
+$re->close();

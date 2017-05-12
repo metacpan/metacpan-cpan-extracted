@@ -1,0 +1,52 @@
+NAME
+    Template::Plugin::Clickable - Make URLs clickable in HTML
+
+SYNOPSIS
+      [% USE Clickable %]
+      [% FILTER clickable %]
+      URL is http://www.tt2.org/
+      [% END %]
+
+    this will become:
+
+      URL is <a href="http://www.tt2.org/">http://www.tt2.org/</a>
+
+DESCRIPTION
+    Template::Plugin::Clickable is a plugin for TT, which allows you to
+    filter HTMLs clickable.
+
+OPTIONS
+    target
+          [% FILTER clickable target => '_blank' %]
+          [% message.body | html %]
+          [% END %]
+
+        "target" option enables you to set target attribute in A links. none
+        by default.
+
+    finder_class
+        "finder_class" option enables you to set other URI finder class
+        rather than URI::Find (default). For example,
+
+          [% FILTER clickable finder_class => 'URU::Find::Schemeless' %]
+          Visit www.example.com/join right now!
+          [% END %]
+
+        this will become:
+
+          Visit <a href="http://www.example.com/join">www.example.com/join</a> right now!
+
+NOTE
+    If you use this module with "html" filter, you should set this
+    "clickable" module after the "html" filter. Otherwise links will be also
+    escaped and thus broken.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Template, URI::Find
+

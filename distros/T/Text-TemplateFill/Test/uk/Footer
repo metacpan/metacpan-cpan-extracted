@@ -1,0 +1,14 @@
+${#} This is printed at the end of each page
+${#} SCCS: @(#)Footer 1.1 03/27/03 09:11:28
+${#}
+${#} Set that this is the default end of page footer
+${Opt EndPage }
+${Opt BlanksAfter }
+${Opt EndPageTag Footer }
+${#}
+${#} Print the # item paragraphs on the page and the total units on the page:
+
+ PAGE TOTALS:     ${ItemPO.ParaOnPage%4d}                                           ${PageTotal%5d}
+${#}
+${Calc PageTotalLastPage := $PageTotal }
+${#} End

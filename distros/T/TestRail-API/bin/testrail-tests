@@ -1,0 +1,196 @@
+#!/usr/bin/env perl
+# ABSTRACT: List tests in a TestRail run matching the provided filters
+# PODNAME: TestRail::Bin::Tests
+
+package TestRail::Bin::Tests;
+$TestRail::Bin::Tests::VERSION = '0.039';
+use strict;
+use warnings;
+use utf8;
+
+use TestRail::API;
+use TestRail::Utils;
+use TestRail::Utils::Find;
+
+use Getopt::Long qw{GetOptionsFromArray};
+use File::HomeDir qw{my_home};
+
+if ( !caller() ) {
+    my ( $out, $code ) = run( 'args' => \@ARGV );
+    print $out;
+    exit $code;
+}
+
+sub run {
+    my %params = @_;
+    my $opts   = {};
+
+    #Parse config file if we are missing api url/key or user
+    my $homedir = my_home() || '.';
+    if ( -e $homedir . '/.testrailrc' ) {
+        $opts = TestRail::Utils::parseConfig($homedir);
+    }
+
+    GetOptionsFromArray(
+        $params{'args'},
+        'apiurl=s'        => \$opts->{'apiurl'},
+        'password=s'      => \$opts->{'password'},
+        'user=s'          => \$opts->{'user'},
+        'j|project=s'     => \$opts->{'project'},
+        'p|plan=s'        => \$opts->{'plan'},
+        'r|run=s'         => \$opts->{'run'},
+        'c|config=s@'     => \$opts->{'configs'},
+        's|status=s@'     => \$opts->{'statuses'},
+        'a|assignedto=s@' => \$opts->{'users'},
+        'm|match=s'       => \$opts->{'match'},
+        'no-match=s'      => \$opts->{'no-match'},
+        'orphans=s'       => \$opts->{'orphans'},
+        'n|no-recurse'    => \$opts->{'no-recurse'},
+        'e|encoding=s'    => \$opts->{'encoding'},
+        'extension=s'     => \$opts->{'extension'},
+        'h|help'          => \$opts->{'help'},
+    );
+
+    if ( $opts->{help} ) { return ( '', TestRail::Utils::help() ); }
+
+    $opts->{'browser'} = $params{'browser'};
+
+    TestRail::Utils::interrogateUser( $opts,
+        qw{apiurl user password project run} );
+
+    my $tr = TestRail::Utils::getHandle($opts);
+
+    my ($cases) = TestRail::Utils::Find::getTests( $opts, $tr );
+    die "No cases in TestRail!\n" unless $cases;
+
+    $opts->{'names-only'} = 1;
+    my @tests = TestRail::Utils::Find::findTests( $opts, @$cases );
+
+    return ( join( "\n", @tests ) . "\n", 0 ) if scalar(@tests);
+    return ( '', 255 );
+}
+
+1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+TestRail::Bin::Tests - List tests in a TestRail run matching the provided filters
+
+=head1 VERSION
+
+version 0.039
+
+=head1 SYNOPSIS
+
+  testrail-tests [OPTIONS] | xargs prove -PTestrail=...
+
+  require `which testrail-tests`;
+  TestRail::Bin::Test::run('args' => \@args);
+
+=head1 DESCRIPTION
+
+testrail-tests - list tests in a run matching the provided filters.
+
+Can be used as the modulino TestRail::Bin::Tests.
+Has a single 'run' function which accepts a hash with the 'args' parameter being the array of arguments.
+
+=head1 PARAMETERS:
+
+=head2 MANDATORY PARAMETERS
+
+=over 4
+
+--apiurl     : full URL to get to TestRail index document
+
+--password   : Your TestRail Password, or a valid API key (TestRail 4.2 and above).
+
+--user       : Your TestRail User Name.
+
+-j --project : desired project name.
+
+-r --run     : desired run name.
+
+=back
+
+All mandatory options not passed with the above switches, or in your ~/.testrailrc will be prompted for.
+
+=head2 SEMI-OPTIONAL PARAMETERS
+
+=over 4
+
+-p --plan       : desired plan name.  Required if the run passed is a child of a plan.
+
+-m --match      : attempt to find filenames matching the test names in the provided directory.
+
+--no-match      : attempt to find filenames that do not match test names in the provided directory.
+
+--orphans       : attempt to find tests in TestRail which aren't in the provided directory.
+
+The three above options are mutually exclusive.
+
+-n --no-recurse : if match (or no-match) passed, do not recurse subdirectories.
+
+-e --encoding   : Character encoding of arguments.  Defaults to UTF-8. See L<Encode::Supported> for supported encodings.
+
+=back
+
+=head2 OPTIONAL PARAMETERS
+
+=over 4
+
+-c --config     : configuration name to filter plans in run.  Can be passed multiple times.
+
+-s --status     : only list tests marked as [status] in testrail.  Can be passed multiple times.
+
+-a --assignedto : only list tests assigned to user. Can be passed multiple times.
+
+--extension     : only list files ending in the provided string (e.g. .pl, .pm, .t, .test)
+
+=back
+
+=head1 CONFIGURATION FILE
+
+In your \$HOME, (or the current directory, if your system has no concept of a home directory) put a file called .testrailrc with key=value syntax separated by newlines.
+Valid Keys are the same as documented by L<App::Prove::Plugin::TestRail>.
+All options specified thereby are overridden by passing the command-line switches above.
+
+=head1 MISCELLANEOUS OPTIONS:
+
+=over 4
+
+--help : show this output
+
+=back
+
+=head1 SPECIAL THANKS
+
+Thanks to cPanel Inc, for graciously funding the creation of this distribution.
+
+=head1 AUTHOR
+
+George S. Baugh <teodesian@cpan.org>
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by George S. Baugh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+L<TestRail::API>
+
+L<File::HomeDir> for the finding of .testrailrc
+

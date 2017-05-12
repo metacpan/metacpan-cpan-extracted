@@ -1,0 +1,14 @@
+Revision history for Perl extension Text::Emoticon
+
+0.04  2006-02-23T01:33:54Z
+        - Make the regexp greedy, so that it can parse partially
+          duplicated patterns in GoogleTalk :( vs. :(|)
+
+0.03  Wed Jan 11 10:21:14 UTC 2006
+        - Fixed new so it doesn't break the direct invocation of subclasses
+
+0.02  Wed Jan 11 10:15:39 UTC 2006
+        - redesigned Text::Emoticon framework for easy subclass creation
+
+0.01  Tue Jan 10 09:25:28 2006
+	- original version

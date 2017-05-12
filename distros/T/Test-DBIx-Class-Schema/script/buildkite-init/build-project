@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# override these (by export the variables in your shell)
+BUILDKITE_USER=${BUILDKITE_USER:-chisel@chizography.net};
+BUILDKITE_ORGSLUG=${BUILDKITE_ORGSLUG:-chizography};
+
+# derived from https://buildkite.com/docs/api/projects#create-a-project
+curl -u "$BUILDKITE_USER" \
+     https://api.buildkite.com/v1/organizations/$BUILDKITE_ORGSLUG/projects/test-dbix-class-schema/builds \
+  -X POST \
+  -F "commit=HEAD" \
+  -F "branch=master" \
+  -F "message=Script triggered build :rocket:"

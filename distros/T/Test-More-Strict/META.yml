@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Test-More-Strict
+version:             0.02
+abstract:            Enforce policies on test results
+license:             perl
+author:              
+    - Andy Armstrong <andy.armstrong@messagesystems.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    TAP::Harness:                  3.11
+    TAP::Parser:                   3.11
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

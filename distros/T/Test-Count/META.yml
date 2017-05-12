@@ -1,0 +1,66 @@
+---
+abstract: 'A Module to keep track of the number of tests in a script.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Scalar: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921'
+keywords:
+  - annotations
+  - assertions
+  - count
+  - interpreter
+  - number
+  - qa
+  - sanity
+  - tap
+  - tap
+  - TAP
+  - test
+  - Test::More
+  - tests
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Count
+provides:
+  Test::Count:
+    file: lib/Test/Count.pm
+    version: 0.0901
+  Test::Count::Base:
+    file: lib/Test/Count/Base.pm
+    version: 0
+  Test::Count::FileMutator:
+    file: lib/Test/Count/FileMutator.pm
+    version: 0.0901
+  Test::Count::FileMutator::ByFileType::App:
+    file: lib/Test/Count/FileMutator/ByFileType/App.pm
+    version: 0
+  Test::Count::Filter:
+    file: lib/Test/Count/Filter.pm
+    version: 0.0901
+  Test::Count::Filter::ByFileType::App:
+    file: lib/Test/Count/Filter/ByFileType/App.pm
+    version: 0
+  Test::Count::Lib:
+    file: lib/Test/Count/Lib.pm
+    version: 0
+  Test::Count::Parser:
+    file: lib/Test/Count/Parser.pm
+    version: 0.0901
+requires:
+  Parse::RecDescent: 0
+  base: 0
+  perl: 5.006
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/shlomif/perl-test-count
+version: 0.0901

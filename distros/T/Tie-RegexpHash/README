@@ -1,0 +1,116 @@
+NAME
+    Tie::RegexpHash - Use regular expressions as hash keys
+
+SYNOPSIS
+      use Tie::RegexpHash;
+
+      my %hash;
+
+      tie %hash, 'Tie::RegexpHash';
+
+      $hash{ qr/^5(\s+|-)?gal(\.|lons?)?/i } = '5-GAL';
+
+      $hash{'5 gal'};     # returns "5-GAL"
+      $hash{'5GAL'};      # returns "5-GAL"
+      $hash{'5  gallon'}; # also returns "5-GAL"
+
+      my $rehash = Tie::RegexpHash->new();
+
+      $rehash->add( qr/\d+(\.\d+)?/, "contains a number" );
+      $rehash->add( qr/s$/,          "ends with an \`s\'" );
+
+      $rehash->match( "foo 123" );  # returns "contains a number"
+      $rehash->match( "examples" ); # returns "ends with an `s'"
+
+DESCRIPTION
+    This module allows one to use regular expressions for hash keys, so that
+    values can be associated with anything that matches the key.
+
+    Hashes can be operated on using the standard tied hash interface in
+    Perl, as described in the SYNOPSIS, or using an object-oriented
+    interface described below.
+
+  Methods
+    new
+          my $obj = Tie::RegexpHash->new()
+
+        Creates a new "RegexpHash" (Regular Expression Hash) object.
+
+    add
+          $obj->add( $key, $value );
+
+        Adds a new key/value pair to the hash. *$key* can be a Regexp or a
+        string (which is compiled into a Regexp).
+
+        If *$key* is already defined, the value will be changed. If $key
+        matches an existing key (but is not the same), a warning will be
+        shown if warnings are enabled.
+
+    match
+          $value = $obj->match( $quasikey );
+
+        Returns the value associated with *$quasikey*. (*$quasikey* can be a
+        string which matches an existing Regexp or an actual Regexp.)
+        Returns 'undef' if there is no match.
+
+        Regexps are matched in the order they are defined.
+
+    match_exists
+          if ($obj->match_exists( $quasikey )) ...
+
+        Returns a true value if there exists a matching key.
+
+    remove
+          $value = $obj->remove( $quasikey );
+
+        Deletes the key associated with *$quasikey*. If *$quasikey* matches
+        an existing key (but is not the same), a warning will be shown.
+
+        Returns the value associated with the key.
+
+    clear
+          $obj->clear();
+
+        Removes all key/value pairs.
+
+AUTHOR
+    Alastair McGowan-Douglas <altreus@cpan.org>
+
+  Acknowledgments
+    Robert Rothenberg <rrwo at cpan.org>, previous maintainer.
+
+    Russell Harrison <rch at cpan.org> for patches adding support for
+    serialization.
+
+    Simon Hanmer <sch at scubaplus.co.uk> & Bart Vetters <robartes at
+    nirya.eb> for pointing out a bug in the logic of the _find() routine in
+    v0.10
+
+BUGS
+    Please report bugs on the github issues tracker
+    <https://github.com/Altreus/Tie-RegexpHash/issues>. Request Tracker
+    tickets will probably go unseen.
+
+LICENSE
+    Copyright (c) 2014-2015 Alastair McGowan-Douglas.
+
+    Copyright (c) 2001-2002, 2005-2006 Robert Rothenberg. All rights
+    reserved.
+
+    Portions Copyright (c) 2006 Russell Harrison. All rights reserved.
+
+    This program is free software. You can redistribute it under the same
+    terms as Perl itself; specifically the Artistic Licence
+    <http://dev.perl.org/licenses/artistic.html> or GPL
+    <http://dev.perl.org/licenses/gpl1.html>.
+
+SEE ALSO
+    Tie::Hash::Regex is a module with a complementary function. Rather than
+    a hash with Regexps as keys that match against fetches, it has standard
+    keys that are matched by Regexps in fetches.
+
+    Regexp::Match::Any matches many Regexps against a variable.
+
+    Regexp::Match::List is similar, but supports callbacks and various
+    optimizations.
+

@@ -1,0 +1,16 @@
+This is the README file for Tk::WaitBox
+
+Tk::WaitBox is a perl5 package which implements a very flexible
+WaitBox widget.  To use Tk::FileDialog, you will need Perl version
+5.002 or better, and Tk.
+
+To build this extension, simply enter:
+
+	perl Makefile.PL
+	make
+	make install
+
+There are no test routines for Tk::WaitBox.  A sample program is
+included within the WaitBox.pm pod section.
+
+

@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use lib 'lib';
+use TiddlyWeb::Resting::Getopt qw/get_rester rester_usage/;
+use TiddlyWeb::Wikrad;
+use Getopt::Long;
+
+my $r = get_rester(); # reads @ARGV and ~/.wikeditrc
+$r->server('http://tiddlyweb.peermore.com/wiki') unless $r->server;
+$r->workspace('open') unless $r->workspace;
+
+my %opts;
+GetOptions(
+    'd|download' => \$opts{download},
+) or usage();
+usage() unless $r->username and $r->password;
+
+my $app = TiddlyWeb::Wikrad->new(rester => $r);
+$app->set_page(shift);
+
+if ($opts{download}) {
+    $app->download;
+    exit;
+}
+
+$app->run;
+exit;
+
+sub usage {
+    my $rester_usage = rester_usage();
+    die <<EOT;
+USAGE: twikrad [<rester options>] ['Page Name']
+
+Wikrad options:
+  -d or --download      Download content and attahcments then exit
+
+$rester_usage
+EOT
+}

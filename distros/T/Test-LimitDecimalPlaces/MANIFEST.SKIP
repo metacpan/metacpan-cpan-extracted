@@ -1,0 +1,9 @@
+.git/
+^.gitignore$
+^.shipit$
+^MYMETA\.yml$
+^MYMETA\.json$
+\.bak$
+_build/
+^Build$
+blib/

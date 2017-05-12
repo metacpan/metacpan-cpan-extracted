@@ -1,0 +1,25 @@
+---
+abstract: 'rounded or exact English expression of durations'
+author:
+  - 'Sean M Burke <sburke@cpan.org>'
+build_requires:
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Duration
+requires:
+  Exporter: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/Time-Duration
+  repository: https://github.com/neilbowers/Time-Duration.git
+version: '1.20'

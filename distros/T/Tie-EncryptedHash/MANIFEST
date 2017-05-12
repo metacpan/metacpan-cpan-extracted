@@ -1,0 +1,15 @@
+Makefile.PL
+lib/Tie/EncryptedHash.pm
+MANIFEST
+LICENSE
+TODO
+README.html
+Changes
+t/assignopaque.t
+t/construction.t
+t/emptysubclass.t
+t/hide.t
+t/opertations.t
+t/ref.t
+t/reforgy.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,335 @@
+#!/usr/bin/perl
+
+use strict;
+
+use vars qw($VERSION);
+$VERSION = "0.1";
+
+
+=pod
+
+=head1 NAME
+
+kif2atm - KIF to AsTMa= converter
+
+=head1 SYNOPSIS
+
+  cat ontology.kif | kif2atm <command line switch>... > ontology.atm
+
+=head1 DESCRIPTION
+
+This program reads the taxonomy definitions provided in KIF and returns
+a topic map in AsTMa= format.
+
+ http://astma.bond.edu.au/
+
+All concepts and their subclass-superclass relations will be output in topic
+map form on STDOUT.
+
+All other information (first order logic rules) is currently ignored.
+All conversion problems and warnings will go to STDERR.
+
+=head1 OPTIONS
+
+=over
+
+=item B<help>
+
+...does hopefully what you would expect.
+
+=cut
+
+my $help;
+
+=pod
+
+=item B<warn>
+
+Writes out warnings onto STDERR.
+
+=cut
+
+my $warn;
+
+=pod
+
+=item B<stats>
+
+Writes out statistical information at the end of the run to STDERR.
+
+=cut
+
+my $stats;
+
+=pod
+
+=item B<limit> (number)
+
+If provided, limits the number of processed KIF sentences.
+
+=cut
+
+my $limit;
+
+=pod
+
+=item B<start_line> (number)
+
+If provided all lines will be skipped in the KIF file and parsing will begin
+at this line number.
+
+=cut
+
+my $start_line_nr;
+
+=pod
+
+=back
+
+=head1 KIF Notation
+
+The full notation is documented at L<http://logic.stanford.edu/kif/dpans.html>
+
+=head1 AsTMa (Asymptotic Topic Map), the Notation
+
+Please refer to the online documentation L<http://astma.it.bond.edu.au/>
+
+=head1 AUTHOR INFORMATION
+
+Copyright 200[4], Robert Barta <rho@bigpond.net.au>, All rights reserved.
+
+=cut
+
+use Data::Dumper;
+
+use Getopt::Long;
+if (!GetOptions ('help|?|man'            => \$help,
+                 'warn'                  => \$warn,
+                 'stats'                 => \$stats,
+                 'start:i'               => \$start_line_nr,
+		 'limit:i'               => \$limit,
+		 ) || $help) {
+    use Pod::Usage;
+    pod2usage(-exitstatus => 0, -verbose => 2);
+}
+
+my %stats = (nr_sent     => 0,
+	     nr_sent_ign => 0,
+	     nr_sent_unh => 0);  # for statistics
+
+#-- this is necessary as some concepts have non-id characters in it
+my %trans = ('=>'     => 'sumo-implies',
+	     '<=>'    => 'sumo-equiv',
+	     '?THING' => 'Thing');
+sub _cleanse {
+    my $t = shift;
+    return $trans{$t} ? $trans{$t} : $t;
+}
+
+# here we collect our information
+my %topics; # all information about one topic
+my @topics; # just to know the sequence (makes it easier to compare with original KIF
+my @inverses;
+
+use TM::Ontology::KIF;
+my $kif = new TM::Ontology::KIF (defined $start_line_nr ? (start_line_nr  => $start_line_nr) : (),
+				 defined $limit         ? (sentence_limit => $limit)         : (),
+				 sentence       => sub {
+				     my $s = shift;
+				     my $t = _cleanse ($s->[1]->[0]);
+				     
+				     $stats{nr_sent}++;
+				     warn "sentence: $stats{nr_sent} ($t)" if $warn;
+				     
+				     $topics{$t}->{name} = '=>'  if $t eq 'sumo-implies';
+				     $topics{$t}->{name} = '<=>' if $t eq 'sumo-equiv';
+				     
+				     if ($s->[0] eq 'instance') {
+					 push @topics, $t unless $topics{$t};
+					 push @{$topics{$t}->{'is-a'}}, _cleanse ($s->[1]->[1]);
+				     } elsif ($s->[0] eq 'subAttribute') {
+					 push @topics, $t unless $topics{$t};
+					 push @{$topics{$t}->{subclasses}}, _cleanse ($s->[1]->[1]);
+				     } elsif ($s->[0] eq 'contraryAttribute') {
+					 push @topics, $t unless $topics{$t};
+					 $topics{$t}->{contrary} = _cleanse ($s->[1]->[1]);
+				     } elsif ($s->[0] eq 'exhaustiveAttribute') {
+					 push @topics, $t unless $topics{$t};
+					 $topics{$t}->{exhaustive} = $s->[1];
+				     } elsif ($s->[0] eq 'disjointDecomposition') {
+					 push @topics, $t unless $topics{$t};	
+					 $topics{$t}->{'disjointDecomposition'} = $s->[1];
+				     } elsif ($s->[0] eq 'disjoint') {
+					 push @topics, $t unless $topics{$t};	
+					 $topics{$t}->{'disjoint'} = _cleanse ($s->[1]->[1]);
+				     } elsif ($s->[0] eq 'inverse') {
+					 push @topics, $t unless $topics{$t};	
+					 $topics{$t}->{'inverse'} = _cleanse ($s->[1]->[1]);
+				     } elsif ($s->[0] eq 'domain') {
+					 push @topics, $t unless $topics{$t};
+					 do {
+					     warn "cannot handle expressions as domains";
+					     return;
+					 } if ref ($s->[1]->[2]);
+					 push @{$topics{$t}->{'domains'}}, _cleanse ($s->[1]->[2]);
+#					 push @{$topics{$t}->{'domains'}}, ref($s->[1]->[2]) eq 'ARRAY' ? @{$s->[1]->[2]} : _cleanse ($s->[1]->[2]);
+				     } elsif ($s->[0] eq 'range') {
+					 push @topics, $t unless $topics{$t};
+					 $topics{$t}->{'range'} = _cleanse ($s->[1]->[2]);
+				     } elsif ($s->[0] eq 'documentation') {
+					 push @topics, $t unless $topics{$t};
+					 $topics{$t}->{'documentation'} = $s->[1]->[1];
+				     } elsif ($s->[0] eq 'rangeSubclass') {
+					 push @topics, $t unless $topics{$t};
+					 push @{$topics{$t}->{subclasses}}, _cleanse ($s->[1]->[1]);
+				     } elsif ($s->[0] eq 'subrelation') {
+					 push @topics, $t unless $topics{$t};
+					 push @{$topics{$t}->{subclasses}}, _cleanse ($s->[1]->[1]);
+				     } elsif ($s->[0] eq 'subclass') {
+					 push @topics, $t unless $topics{$t};
+					 push @{$topics{$t}->{subclasses}}, _cleanse ($s->[1]->[1]);
+				     } elsif ($s->[0] eq 'disjointRelation') {
+					 warn "ignored $s->[0]" if $warn;
+					 $stats{nr_sent_ign}++;
+				     } elsif (grep ($s->[0] eq $_, qw(trichotomizingOn initialList equal exists relatedInternalConcept domainSubclass partition => <=> and or not identityElement))) {
+					 warn "ignored $s->[0]" if $warn;
+					 $stats{nr_sent_ign}++;
+				     } else {
+					 use Data::Dumper;
+					 warn "unhandled sentence: ". Data::Dumper::Dumper ($s) if $warn; 
+					 $stats{nr_sent_unh}++;
+				     }
+				 },
+				 );
+		       
+use IO::Handle;
+my $input = new IO::Handle;
+$input->fdopen(fileno(STDIN),"r") || die "Cannot process STDIN";
+eval {
+    $kif->parse ($input);
+}; warn $@ if $@;
+$input->close;
+
+
+use POSIX qw(strftime);
+print "#--
+#
+#  SUMO (Suggested Upper Merged Ontology)
+#
+#  Converted to Topic Maps by kif2atm ($VERSION)
+#
+#  ".(strftime "%a %b %e %H:%M:%S %Y", localtime)."
+";
+
+foreach my $t (@topics) {
+    print "
+#--
+
+$t ".($topics{$t}->{'is-a'} ? "(".join (" ", @{$topics{$t}->{'is-a'}}).")" : '');
+    print "
+bn: "._clean ($topics{$t}->{'name'})          if $topics{$t}->{'name'};
+    print "
+in: "._clean ($topics{$t}->{'documentation'}) if $topics{$t}->{'documentation'};
+
+    foreach my $s (@{$topics{$t}->{'subclasses'}}) {
+	print "
+
+(is-subclass-of)
+superclass : $s
+subclass   : $t
+";
+    $stats{nr_assocs}++;
+    }
+
+    if ($topics{$t}->{'domains'}) {
+        if ($topics{$t}->{'range'}) {                      # oh, a function
+	  print "
+
+(function-has-domains)
+function : $t
+range    : $topics{$t}->{'range'}
+domain   : ".join (" ", @{$topics{$t}->{'domains'}})."
+";
+        } else {                                           # a relation
+	  print "
+
+(relation-has-domains)
+relation : $t
+domain   : ".join (" ", @{$topics{$t}->{'domains'}})."
+";
+        }
+    $stats{nr_assocs}++;
+    }
+
+    if ($topics{$t}->{'inverse'}) {
+print "
+
+(are-inverse)
+relations : $t $topics{$t}->{'inverse'}
+";
+    $stats{nr_assocs}++;
+    }
+
+   if ($topics{$t}->{'disjointDecomposition'}) {
+      shift @{$topics{$t}->{'disjointDecomposition'}}; # we do not need the topic itself
+print "
+
+(is-disjointly-decomposed)
+whole     : $t
+component : ".join (" ", @{$topics{$t}->{'disjointDecomposition'}})."
+";
+    $stats{nr_assocs}++;
+   }
+
+   if ($topics{$t}->{'disjoint'}) {
+print "
+
+(are-disjoint)
+objects   : $t $topics{$t}->{'disjoint'}
+";
+    $stats{nr_assocs}++;
+   }
+
+   if ($topics{$t}->{'contrary'}) {
+print "
+
+(are-contrary-attributes)
+attributes : $t $topics{$t}->{'contrary'}
+";
+    $stats{nr_assocs}++;
+   }
+
+   if ($topics{$t}->{'exhaustive'}) {
+      shift @{$topics{$t}->{'exhaustive'}}; # we do not need the topic itself
+print "
+
+(are-exhaustive-attributes-for)
+attribute : $t
+values    : ".join (" ", @{$topics{$t}->{'exhaustive'}})."
+";
+    $stats{nr_assocs}++;
+   }
+
+}
+
+if ($stats) {
+    print STDERR "
+---
+Nr of sentences processed: $stats{nr_sent} ($stats{nr_sent_ign} ignored, $stats{nr_sent_unh} not handled)
+Nr of topics:              ".@topics."
+Nr of associations:        $stats{nr_assocs}
+";
+}
+
+
+sub _clean {
+    my $s = shift;
+    $s =~ s/\n/\\\n/g;
+    $s =~ s/^"//;
+    $s =~ s/"$//;
+    $s =~ s/&%//g;
+    return $s;
+}
+
+__END__
+

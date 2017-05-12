@@ -1,0 +1,22 @@
+Revision history for Text-Distill
+
+0.01    2016-04-15/00:00
+        First version, released on an unsuspecting world.
+
+0.02    2016-04-19/20:00
+        Added function GemsValidate()
+
+0.03    2016-04-25/18:00
+        use File::Temp for working with temporary files
+
+0.04    2016-04-26/15:00
+        Some changes to documentation
+
+0.05    2016-04-27/13:00
+        DecodeUtf8() added and used in the module
+
+0.06    2016-04-27/20:00
+        Fix some regexp bugs
+
+0.08    2016-05-11/19:00
+        script/plagiarism_check.pl support zip-packed file

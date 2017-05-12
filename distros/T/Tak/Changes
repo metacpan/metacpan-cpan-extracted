@@ -1,0 +1,15 @@
+0.001004 - 2016-01-08
+  - declare dead
+  - fix Ssyshere to Shere after re-reading UUCP protocol docs
+  - Added example on use - pixie79
+
+0.001003 - 2011-12-23
+  - fix mk-fat to not miss anything else
+
+0.001002 - 2011-12-23
+  - add Tak->loop_upgrade
+  - Provide a $client in repl objects
+  - Support for -l/--local in Tak::Script
+
+0.001001 - 2011-11-15
+  - Initial release

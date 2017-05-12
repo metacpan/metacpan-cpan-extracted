@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/tapper-testsuite-benchmark-perlformance
+dist.ini
+eg/run.t
+lib/Tapper/TestSuite/Benchmark/Perl/Formance.pm
+t/00-load.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

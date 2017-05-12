@@ -1,0 +1,17 @@
+=head1 NAME
+
+Tanker::Config - description of the config file format for Tanker
+
+=head1 DESCRIPTION
+
+Nothing to see here, move along.
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 SEE ALSO
+
+L<Tanker>,  L<Tanker::RequestGenerator>, L<Tanker::Plugin>, L<Tanker::ResponseHandler>, L<Tanker::Request>;
+
+=cut

@@ -1,0 +1,87 @@
+{
+   "abstract" : "stubbing on LWP request",
+   "author" : [
+      "NAKAGAWA Masaki <masaki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mock-LWP-Conditional",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fake::HTTPD" : "0.03",
+            "Test::More" : "0.98",
+            "Test::UseAllModules" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "0",
+            "LWP::UserAgent" : "0",
+            "Math::Random::Secure" : "0",
+            "Scalar::Util" : "1.14",
+            "Sub::Install" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Mock::LWP::Conditional" : {
+         "file" : "lib/Test/Mock/LWP/Conditional.pm",
+         "version" : "0.04"
+      },
+      "Test::Mock::LWP::Conditional::Stubs" : {
+         "file" : "lib/Test/Mock/LWP/Conditional/Stubs.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/masaki/Test-Mock-LWP-Conditional/issues"
+      },
+      "homepage" : "https://github.com/masaki/Test-Mock-LWP-Conditional",
+      "repository" : {
+         "url" : "git://github.com/masaki/Test-Mock-LWP-Conditional.git",
+         "web" : "https://github.com/masaki/Test-Mock-LWP-Conditional"
+      }
+   },
+   "version" : "0.04",
+   "x_authority" : "cpan:MASAKI",
+   "x_contributors" : [
+      "Michael Scragg <scraggm@mindbrix.com>",
+      "ikasam_a <masaki.nakagawa@gmail.com>"
+   ]
+}

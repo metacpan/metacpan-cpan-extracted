@@ -1,0 +1,62 @@
+---
+abstract: 'shortcuts for writing Tickit apps'
+author:
+  - 'Tom Molesworth <cpan@perlsite.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.98'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tickit-DSL
+provides:
+  Tickit::DSL:
+    file: lib/Tickit/DSL.pm
+    version: '0.031'
+recommends:
+  Tickit::Async: '0'
+requires:
+  Exporter: '0'
+  List::UtilsBy: '0'
+  Tickit: '0.60'
+  Tickit::Console: '0.06'
+  Tickit::Widget::Breadcrumb: '0.003'
+  Tickit::Widget::Calendars: '0.001'
+  Tickit::Widget::Choice: '0.02'
+  Tickit::Widget::Decoration: '0.004'
+  Tickit::Widget::Figlet: '0.003'
+  Tickit::Widget::FileViewer: '0.004'
+  Tickit::Widget::FloatBox: '0.02'
+  Tickit::Widget::Layout::Desktop: '0.010'
+  Tickit::Widget::Layout::Relative: '0.005'
+  Tickit::Widget::LogAny: '0.005'
+  Tickit::Widget::Menu: '0.08'
+  Tickit::Widget::Progressbar: '0.101'
+  Tickit::Widget::ScrollBox: '0.07'
+  Tickit::Widget::Scroller: '0.22'
+  Tickit::Widget::SegmentDisplay: '0.02'
+  Tickit::Widget::SparkLine: '0.104'
+  Tickit::Widget::Statusbar: '0.004'
+  Tickit::Widget::Tabbed: '0.018'
+  Tickit::Widget::Table: '0.216'
+  Tickit::Widget::Term: '0.002'
+  Tickit::Widget::Tree: '0.114'
+  Tickit::Widget::VHBox: '0.001'
+  Tickit::Widgets: '0.19'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/team-at-cpan/Tickit-DSL/issues
+  homepage: http://search.cpan.org/perldoc?Tickit-DSL
+  repository: git://github.com/team-at-cpan/Tickit-DSL.git
+version: '0.031'
+x_serialization_backend: 'YAML::Tiny version 1.69'

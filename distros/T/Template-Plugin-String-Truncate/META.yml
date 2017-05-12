@@ -1,0 +1,22 @@
+---
+abstract: 'String::Truncate functions for Template Toolkit'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Template: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-String-Truncate
+requires:
+  String::Truncate: 0
+  Template::Plugin: 0
+resources:
+  repository: https://github.com/gphat/template-plugin-string-truncate
+version: 0.02

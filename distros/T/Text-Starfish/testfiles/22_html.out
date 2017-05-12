@@ -1,0 +1,19 @@
+<? use CGI qw/:standard/;
+   echo comment('AUTOMATICALLY GENERATED - DO NOT EDIT');
+?>
+<!-- + -->
+<!-- AUTOMATICALLY GENERATED - DO NOT EDIT -->
+<!-- - -->
+
+<HTML><HEAD>
+<TITLE>Some title</TITLE>
+</HEAD>
+<BODY>
+<? echo "Some generated text..." ?>
+<!-- + -->
+Some generated text...
+<!-- - -->
+
+
+</BODY>
+</HTML>

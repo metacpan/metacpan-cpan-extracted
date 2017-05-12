@@ -1,0 +1,113 @@
+0.14 	19 September 2010
+	Fixed problem in test-suite.  Apparently newer Test::Harness versions
+	dont't really cope that well with testing inside threads.  Apparently
+	tghe previous version never made it to CPAN.  :-(
+
+0.13    3 October 2007
+	Hopefully fixed test-suite for none thread enabled Perls.  Updated
+	to use new VERSION feature of Devel::Required.
+
+	28 January 2004
+	Made sure the test-suite cleans up on multi-versioned systems.
+
+0.12    28 December 2003
+        Added automatic required modules update using Devel::Required.
+
+	Added dependency to load.pm, it was missing!
+
+0.11	9 November 2003
+	Increased dependency on Thread::Conveyor to 0.15 because of problem
+	fix for 5.8.2.
+
+0.10	11 August 2003
+	Cleaned up Makefile.PL and updated copyright.  Made sure the tests
+	run with warnings and on 5.8.1.  Increased dependency on
+	Thread::Conveyor to 0.14.
+
+0.09	29 September 2002
+	Use "load.pm" instead of AutoLoader.  Increased dependency on
+	Thread::Conveyor to 0.13, which also uses "load.pm".
+
+        Removed "our" from $VERSION, should shave off some bytes in
+        memory usage, as found from testing with Benchmark::Thread::Size.
+
+0.08	30 August 2002
+	Changed all modules to use AutoLoader to defer loading of necessary
+	subroutines to when they are actually needed.  This should save
+	memory and CPU for larger programs, or with large numbers of threads.
+	The test-suite only marginally takes more memory and uses less CPU:
+	overhead of compiling is levelled out with the overhead of cloning
+	pre-compiled routines.
+
+0.07	27 August 2002
+	Added support for checkpoint routine with the "checkpoint" and
+	"frequency" fields and the "frequency" method.  Added test-suite
+	and documentation for it.
+
+0.06	20 August 2002
+	No actual changes to the code, just an upgrade to require the newly
+	fixed Thread::Conveyor 0.08 version.
+
+0.05	13 August 2002
+	Checked compatibility with Thread::Conveyor 0.06.  It is.
+
+	7 August 2002
+	Fixed problem in test-suite cause by some thread inertia that did
+	not show up on my own sllow development machine.
+
+0.04	7 August 2002
+	Added "private" default optimization setting, instead of the one
+	from Thread::Conveyor.
+
+	6 August 2002
+	Fixed problem in shutdown which would cause deadlocks when using
+	belts optimized for memory.
+
+	5 August 2002
+	Added many more test-cases to the test-suite.
+
+	Added DESTROY method and clone sensing logic, because a shutdown
+	method is now available.
+
+	Added method "shutdown" for an orderly shutdown of the monitoring
+	thread.  You should now not call method "put" with the exit value
+	anymore.  Instead you should call method "shutdown".
+
+	Added method "tid" to obtain the thread id of the monitoring thread.
+
+	The "new" method now only returns the instantiated object.  If you
+	want access to the monitoring thread, you should obtain that with
+	the new "thread" routine.
+
+	Made the Thread::Conveyor::Monitored object stand-alone with a
+	Thread::Conveyor::xxx object in its belly.  Added access methods
+	so that they apply to the belt rather than the object itself.  This
+	makes the Thread::Conveyor::Monitored::Throttled module obsolete:
+	it is now removed from the distribution.  Added documentation for
+	all of these new features.
+
+	Upgraded to be able to use (and required) newest Thread::Conveyor.
+
+0.03    1 August 2002
+	Changed required version of Thread::Conveyor to 0.04.
+
+	Fixed problem in "new" when using an existing, unthrottled belt.
+
+	Fixed problem in test-suite cause by the new ::Throttled sub-class
+	of Thread::Conveyor.
+
+0.02	31 July 2002
+	Added Thread::Conveyor::Monitored::Throttled almost empty sub-class 
+	for handling throttled monitored conveyors.
+
+	Adapted documentation to reflect the new "maxboxes" and "minboxes"
+	fields and modules.  Adapted test-suite as well.
+
+	Adapted makefile.PL to require Thread::Conveyor 0.03.
+
+	Adapted "new" to allow for "maxboxes" and "minboxes" settings now that
+	Thread::Conveyor can be throttled.
+
+0.01	25 July 2002
+	First version of Thread::Conveyor::Monitored, which started life as
+	Thread::Queue::Any::Monitored.

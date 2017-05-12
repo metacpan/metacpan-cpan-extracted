@@ -1,0 +1,89 @@
+1..1
+ok perlformance
+  ---
+  codespeed:
+    -
+      benchmark: Rx.regexes.fieldsplit1
+      commitid: 1b1a3d2a
+      environment: renormalist
+      executable: perl-5.12.1-foo
+      project: perl
+      result_value: 2.58451795578003
+    -
+      benchmark: Rx.regexes.fieldsplit2
+      commitid: 1b1a3d2b
+      environment: renormalist
+      executable: perl-5.12.1-foo
+      project: perl
+      result_value: 1.04680895805359
+    -
+      benchmark: Rx.regexes.pathological
+      commitid: 1b1a3d2c
+      environment: renormalist
+      executable: perl-5.12.1-foo
+      project: perl
+      result_value: 1.27560496330261
+    -
+      benchmark: Shootout.regexdna
+      commitid: 1b1a3d2d
+      environment: renormalist
+      executable: perl-5.12.1-foo
+      project: perl
+      result_value: 2.42221188545227
+  perlformance:
+    config:
+      fastmode: 1
+      use_forks: 0
+    overall_runtime: 8.4202241897583
+  results:
+    Rx:
+      PLUGIN_VERSION: 0.002
+      regexes:
+        fieldsplit1:
+          Benchmark:
+            - 2.58451795578003
+            - 2.53
+            - 0.06
+            - 0
+            - 0
+            - 5
+          count: 5
+          goal: 20
+        fieldsplit2:
+          Benchmark:
+            - 1.04680895805359
+            - 0.98
+            - 0.06
+            - 0
+            - 0
+            - 5
+          count: 5
+          goal: 20
+        fieldsplitratio: 2.5816
+        pathological:
+          Benchmark:
+            - 1.27560496330261
+            - 1.27
+            - 0
+            - 0
+            - 0
+            - 5
+          count: 5
+          goal: 20
+    Shootout:
+      regexdna:
+        Benchmark:
+          - 2.42221188545227
+          - 0.26
+          - 0.03
+          - 4
+          - 0.08
+          - 1
+        PLUGIN_VERSION: 0.002
+        count: 1
+        goal: fasta-100000.txt
+        result:
+          length_code: 1000000
+          length_content: 1336326
+          length_file: 1016745
+  ...

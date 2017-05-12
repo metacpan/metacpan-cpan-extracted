@@ -1,0 +1,105 @@
+NAME
+    Text::DSV - DSV parser and serializer.
+
+SYNOPSIS
+     my $obj = Text::DSV->new;
+     my @data_lines = $obj->parse($data);
+     my @data_line = $obj->parse_line($line);
+     my $string = $obj->serialize(@data_lines);
+     my $line_string = $obj->serialize_line(@data_line);
+
+METHODS
+    "new"
+             Constructor.
+
+    "parse($data)"
+             Parse all data.
+             Returns array of arrays of data.
+
+    "parse_line($line)"
+             Parse one line.
+             Returns array of data.
+
+    "serialize(@data_lines)"
+             Serialize all data.
+             Returns string.
+
+    "serialize_line(@data_line)"
+             Serialize one line.
+             Returns line string.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Dumpvalue;
+     use Text::DSV;
+
+     # Object.
+     my $dsv = Text::DSV->new;
+
+     # Parse data.
+     my @datas = $dsv->parse(<<'END');
+     1:2:3
+     # Comment
+ 
+     4:5:6
+     END
+
+     # Dump data.
+     my $dump = Dumpvalue->new;
+     $dump->dumpValues(\@datas);
+
+     # Output like this:
+     # 0  ARRAY(0x8fcb6c8)
+     #    0  ARRAY(0x8fd31a0)
+     #       0  1
+     #       1  2
+     #       2  3
+     #    1  ARRAY(0x8fd3170)
+     #       0  4
+     #       1  5
+     #       2  6
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Text::DSV;
+
+     # Object.
+     my $dsv = Text::DSV->new;
+
+     # Serialize.
+     print $dsv->serialize(
+            [1, 2, 3],
+            [4, 5, 6],
+     );
+
+     # Output:
+     # 1:2:3
+     # 4:5:6
+
+SEE ALSO
+    Text::CSV
+        comma-separated values manipulator (using XS or PurePerl)
+
+REPOSITORY
+    <https://github.com/tupinek/Text-DSV>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.10
+

@@ -1,0 +1,53 @@
+NAME
+
+Time::UTC::Now - determine current time in UTC correctly
+
+DESCRIPTION
+
+This module is one answer to the question "what time is it?".
+It determines the current time on the UTC scale, handling leap seconds
+correctly, and puts a bound on how inaccurate it could be.  It is the
+rigorously correct approach to determining civil time.  It is designed
+to interoperate with Time::UTC, which knows all about the UTC time scale.
+
+UTC (Coordinated Universal Time) is a time scale derived from
+International Atomic Time (TAI).  UTC divides time up into days, and
+each day into seconds.  The seconds are atomically-realised SI seconds,
+of uniform length.  Most UTC days are exactly 86400 seconds long,
+but occasionally there is a day of length 86401 s or (theoretically)
+86399 s.  These leap seconds are used to keep the UTC day approximately
+synchronised with the non-uniform rotation of the Earth.  (Prior to 1972
+a different mechanism was used for UTC, but that's not an issue here.)
+
+Because UTC days have differing lengths, instants on the UTC scale
+are identified here by the combination of a day number and a number
+of seconds since midnight within the day.  In this module the day
+number is the integral number of days since 1958-01-01, which is the
+epoch of the TAI scale which underlies UTC.  This is the convention
+used by the "Time::UTC" module.  That module has some functions to
+format these numbers for display.  For a more general solution, use the
+"utc_day_to_mjdn" function to translate to a standard Modified Julian
+Day Number or the "utc_day_to_cjdn" function to translate to a standard
+Chronological Julian Day Number, which can be used as input to a calendar
+module.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2009, 2010, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

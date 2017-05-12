@@ -1,0 +1,6 @@
+Sun Mar 20 23:12:04 2005 - 1.004
+    Improved test coverage and input checking.  Added kwalitee POD tests.
+
+Mon Jan 10 20:36:58 2005 - 1.003
+    Initial release to CPAN
+

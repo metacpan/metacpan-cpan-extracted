@@ -1,0 +1,44 @@
+<%args>
+$testrun
+$preconditions
+</%args>
+
+% use Data::Dumper;
+
+<h1>All Preconditions for Testrun <% $testrun->id %></h1>
+
+<table class="reportsectionmeta">
+  <tbody>
+%   foreach my $precondition(@$preconditions){
+%        if ($precondition->{type} eq 'virt' or $precondition->{type} =~ /^xen|kvm$/ ) {
+%                for(my $i = 0; $i <= $#{$preconditions->{guests}}; $i++) {
+%                        my $guest = $preconditions->{guests}->[$i];
+      <td colspan="2"><h5>Guest number <% $i+1 %></h5></td>
+      <tr>
+        <th>Architecture</th>
+        <td><% $guest->{arch} %></td>
+      </tr>
+      <tr>
+        <th>Root image</th>
+        <td><% $guest->{image} %></td>
+      </tr>
+      <tr>
+        <th>Test</th>
+        <td><% $guest->{test} ? join "<br/>",@{$guest->{test}} : '' %></td>
+      </tr>
+%                }
+%        } else {
+%            foreach my $key(keys %$precondition){
+      <tr>
+        <th><% $key %></th>
+        <td><% $precondition->{$key} %></td>
+      </tr>
+%            }
+%     }
+%}
+  </tbody>
+</table>
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+

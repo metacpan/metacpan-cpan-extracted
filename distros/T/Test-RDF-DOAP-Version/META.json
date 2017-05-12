@@ -1,0 +1,71 @@
+{
+   "abstract" : "tests 'meta/changes.ttl' is up to date",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::10 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-RDF-DOAP-Version",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "RDF::TriN3" : "0.202",
+            "RDF::Trine" : "0.135",
+            "Test::More" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "Test::RDF::DOAP::Version" : {
+         "file" : "lib/Test/RDF/DOAP/Version.pm",
+         "version" : "0.010"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Test-RDF-DOAP-Version/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Test-RDF-DOAP-Version"
+      },
+      "homepage" : "https://metacpan.org/release/Test-RDF-DOAP-Version",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-test-rdf-doap-version.git",
+         "web" : "https://github.com/tobyink/p5-test-rdf-doap-version"
+      }
+   },
+   "version" : "0.010"
+}

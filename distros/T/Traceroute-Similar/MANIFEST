@@ -1,0 +1,15 @@
+Changes
+examples/get_last_common_hop.pl
+lib/Traceroute/Similar.pm
+Makefile.PL
+MANIFEST
+README
+t/01-Basic.t
+t/02-Internals.t
+t/20-Backend-Net-Traceroute.t
+t/21-Backend-Net-Traceroute-PurePerl.t
+t/22-Backend-Traceroute.t
+t/98-Pod-Coverage.t
+t/99-Perl-Critic.t
+t/perlcriticrc
+META.yml                                 Module meta-data (added by MakeMaker)

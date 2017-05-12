@@ -1,0 +1,39 @@
+Text-Levenshtein-Flexible version 0.05
+======================================
+
+Yet another Levenshtein module written in C, but a tad more flexible than the rest.
+
+This module uses code from PostgreSQL's levenshtein distance function to provide the following features on top of plain distance calculation as it is done by Levenshtein::XS and others:
+
+* Distance-limited calculation: if a certain maximum distance is exceeded,
+the algorithm aborts without result. This helps performance in situations where
+it is clear that results over a certain maximum are not useful.
+
+*  Configurable costs for insert, delete ans substitute operations. The
+traditional Levenshtein algorithm assumes equal cost for insertion and deletion
+but modifying these allows preferential correction of certain errors.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Matthias Bethke
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.14.2 or, at your option,
+any later version of Perl 5 you may have available. Significant portions of the
+code are (C) PostgreSQL Global Development Group and The Regents of the
+University of California. All modified versions must retain the file COPYRIGHT
+included in the distribution.
+

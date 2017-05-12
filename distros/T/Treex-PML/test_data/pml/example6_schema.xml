@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<pml_schema version="1.1" xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/">
+  <revision>0.2</revision>
+  <description>Example of tokenization layer</description>
+  <root name="tokenization">
+    <structure>
+      <member name="sentences">
+	<list ordered="1" type="sentence.type"/>
+      </member>
+    </structure>
+  </root>
+  <type name="sentence.type">
+    <structure>
+      <member name="id" role="#ID" type="ID.type"
+	required="1" as_attribute="1"/>
+      <member name="tokens"> <!-- words (tokens) -->
+        <sequence>
+          <element name="w" type="w.type"/>
+        </sequence>
+      </member>
+    </structure>
+  </type>
+  <type name="w.type">
+    <container>
+      <attribute name="id" role="#ID" type="ID.type"
+	required="1"/>
+      <cdata format="any"/>
+    </container>
+  </type>
+  <type name="ID.type">
+    <cdata format="ID"/>
+  </type>
+</pml_schema>

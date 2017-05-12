@@ -1,0 +1,277 @@
+#!/usr/bin/env perl
+
+# Integration into the usual framework is not so straightforward here.
+# This tool optionally operates on a given list of file names instead of data
+# from a pipe.
+
+my $infostring = 'some information on textual data
+
+Usage: txdinfo < file.dat
+
+...gives some stats about file.dat.';
+
+use FindBin qw($Bin);
+use File::Spec;
+use lib File::Spec->catfile($Bin,'..','lib');
+
+use Config::Param;
+use Text::NumericData;
+use Text::ASCIIPipe;
+
+my $default = \%Text::NumericData::defaults;
+my $help =  \%Text::NumericData::help;
+my $param = {};
+my @pars = 
+(
+  'strict', $default->{strict},'S', $help->{strict}
+, 'text',   $default->{text},  'T', $help->{text}
+, 'black',  $default->{black}, 'B', $help->{black}
+, 'findcol','','c','find a column by name'
+, 'cols',0,'','print number of columns only'
+, 'coltitles',0,'','extract the column title line'
+, 'coltitle',0,'','print title of specified column'
+);
+
+
+$param = Config::Param::get(
+{
+  info=>$infostring
+, version=>$Text::NumericData::version,
+, author=>'Thomas Orgis <thomas@orgis.org>'
+, copyright=>'Copyright (c) 2005-2013 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10'
+},\@pars);
+
+if($param->{black}){ $param->{strict} = 0; }
+
+binmode(STDIN);
+
+my $data = 0;
+my $justhead = ($param->{fincdol} ne '' or $param->{coltitles} or $param->{coltitle});
+my $c;
+my $i;
+my @values;
+
+sub Init
+{
+	$_[0] = '';
+	$data = 0;
+	$c = new Text::NumericData
+	({
+		 'text',   $param->{text}
+		,'strict', $param->{strict}
+		,'black',  $param->{black}
+	});
+	$i = 0;
+	@values = ();
+	$cols = 0;
+}
+
+# TODO: Push it through the pipe! Or not?
+if(@ARGV)
+{
+	for my $f (@ARGV)
+	{
+		print "==> $f <==\n" unless @ARGV == 1;
+		open(DAT, '<', $f) or die "Cannot open $f ($!)!\n";
+		Init();
+		while(<DAT>)
+		{
+			line($_);
+			last if($justhead and $data); # no need to parse more
+		}
+		Result();
+	}
+}
+else
+{
+	Text::ASCIIPipe::process(begin=>\&Init, line=>\&line, end=>\&Result);
+}
+
+sub line
+{
+	++$i;		
+	if(!$data and $c->line_check(\$_[0])){$data = $i;}
+
+	if($data)
+	{
+		my $d = $c->line_data(\$_[0]);
+		push(@values, $#{$d}+1) if(defined $d and @{$d});
+	}
+	$_[0] = '';
+}
+
+sub Result
+{
+	$_[0] = ''; # TODO: actually do give output here
+
+	if($param->{findcol} ne '')
+	{
+		for my $i (0..$#{$c->{titles}})
+		{
+			if($c->{titles}[$i] eq $param->{findcol})
+			{
+				# Need to prepend "" to make the line end appear ...
+				print "".($i+1)."\n";
+			}
+		}
+		return;
+	}
+
+	if($param->{coltitle})
+	{
+		print STDOUT $c->{titles}[$param->{coltitle}-1],"\n";
+		return;
+	}
+
+	if($param->{coltitles})
+	{
+		print STDOUT ${$c->title_line()};
+		return;
+	}
+
+	my $mic = @{$txd->{titles}};
+	my $mac = $mic;
+	if($data)
+	{
+		$mac = $values[0];
+		$mic = $values[0];
+		for(@values){ $mac = $_ if($_ > $mac); $mic = $_ if($_ < $mic); }
+	}
+
+	if($param->{cols})
+	{
+		print "$mac\n";
+		return;
+	}
+
+	print "==== text data info ====\n";
+
+	#MAC isn't really supposed to work on non-Macs... or is it?
+	print "line end: ", defined $c->{config}->{lineend} ? ($c->{config}->{lineend} eq "\012" ? "UNIX" : ($c->{config}->{lineend} eq "\015\012" ? "DOS" : ($c->{config}->{lineend} eq "\015" ? "MAC" : "???" ) ) ) : "unknown","\n"; 
+
+	print "separator: \"$c->{config}->{separator}\"\n" if defined $c->{config}->{separator};
+
+	if($data)
+	{
+		print "columns: ".($mic==$mac ? $mic : "$mac max, $mic min")."\n";
+		print "first data line: $data.\ndata sets: ",$#values+1,"\n";
+	}
+
+	if(defined $c->{title}){ print "title: \"$c->{title}\"\n"; }
+
+	my $z = 0;
+	foreach my $k (@{$c->{comments}})
+	{
+		print "comment ",++$z,": \"$k\"\n";
+	}
+
+	$z = 0;
+	foreach my $t (@{$c->{titles}})
+	{
+		print "column title ",++$z,": \"$t\"\n";
+	}
+}
+
+__END__
+
+=head1 NAME
+
+txdinfo - some information on textual data
+
+
+=head1 SYNOPSIS
+
+	...gives some stats about file.dat.
+=head1 PARAMETERS
+
+These are the general rules for specifying parameters to this program:
+
+	txdinfo -s -xyz -s=value --long --long=value [--] [files/stuff]
+
+You mention the parameters/switches you want to change in any order or even multiple times (they are processed in the oder given, later operations overriding/extending earlier settings.
+An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
+Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
+
+There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value".
+
+
+The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
+
+=over 2
+
+=item B<black>, B<B> (scalar)
+
+	0
+
+ignore whitespace at beginning and end of line (non-strict mode)
+
+=item B<cols> (scalar)
+
+	0
+
+print number of columns only
+
+=item B<coltitle> (scalar)
+
+	0
+
+print title of specified column
+
+=item B<coltitles> (scalar)
+
+	0
+
+extract the column title line
+
+=item B<config>, B<I> (array)
+
+	[]
+
+Which configfile(s) to use (overriding automatic search in likely paths);
+special: just -I or --config causes printing a current config file to STDOUT
+
+=item B<findcol>, B<c> (scalar)
+
+	''
+
+find a column by name
+
+=item B<help>, B<h> (scalar)
+
+	0
+
+show the help message; 1: normal help, >1: more help; "par": help for paramter "par" only
+
+
+Additional fun with negative values, optionally followed by comma-separated list of parameter names:
+-1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
+
+=item B<strict>, B<S> (scalar)
+
+	1
+
+use strict syntax (also faster)
+
+=item B<text>, B<T> (scalar)
+
+	1
+
+allow some text as data
+
+=item B<version> (scalar)
+
+	0
+
+print out the program version
+
+=back
+
+=head1 AUTHOR
+
+Thomas Orgis <thomas@orgis.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2005-2013 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+
+=cut

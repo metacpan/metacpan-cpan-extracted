@@ -1,0 +1,70 @@
+=head1 Toader AutoDoc Documentation
+
+This copies over documentation from under
+a Toader directory.
+
+=head1 AutoDoc Storage
+
+The directory $toaderDir.'/autodoc/' under a L<Toader> directory is used
+for storing AutoDoc settings for that L<Toader> directory.
+
+The file $toaderDir.'/autodoc/dirs' is to store the paths
+under the that Toader that should be searched for
+documentation. The paths in the file is are relative to
+the L<Toader> directory in question and may not match any
+of the  of the regular expressions below.
+
+    ^\.\.
+    \.\.$
+    \/\.\.\/
+
+Files are considered to be documentation if they match any of the regular
+expressions below.
+
+    /\/README$/
+    /\/Changes$/
+    /\/TODO$/
+    /\.pm$/
+    /\.[Pp][Oo][Dd]$/
+    /\.[Tt][Xx][Tt]$/
+
+=head1 Rendering
+
+=head2 Content
+
+The content for the AutoDoc page is rendered via L<Toader::Render::AutoDoc>->content.
+
+The default template is as below.
+
+    [== $g->autodocList ==]
+
+The pass variables are as below.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> object containing the L<Toader> config.
+
+=head2 Output Rendering
+
+The output directory used is $outputDir.'/'.$r2r.'/.autodoc' .
+
+The index file, $outputDir.'/'.$r2r.'/.autodoc/index.html' , contains
+rendered page. The rendered page is the page template filled in with
+the variables below.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> object containing the L<Toader> config.
+    content - The output from the 'renderContent' method.
+
+Once that is written out, the files are copied to
+$outputDir.'/'.$r2r.'/.autodoc/.files/', with the page used the relative
+path of copied documentation in regards to the L<Toader> directory in
+question. POD files and Perl modules are passed through a POD to HTML
+converter and have '.html' appended to the file name.
+
+=cut

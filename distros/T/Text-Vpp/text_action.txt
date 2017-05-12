@@ -1,0 +1,8 @@
+^if $foo
+included text
+^else
+excluded test
+^endif
+
+Some more text
+

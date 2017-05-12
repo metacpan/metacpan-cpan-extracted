@@ -1,0 +1,28 @@
+Revision history for Perl extension Test-WWW-Stub
+
+0.07 2017-03-14T01:52:26Z
+    - Fix a bug where handler would not override (#18, thanks to akiym)
+    - Fix missing prereqs as reported by CPANTS. (#15, thanks to manwar)
+
+0.06 2016-03-13T16:00:45Z
+    - Declare dependency on Guard. (#14, thanks to eserte)
+
+0.05 2016-01-23T14:13:37Z
+    - Prefer warn instead of diag when notice unexpected external access. (#12, thanks to aereal)
+
+0.04 2015-12-16T09:32:08Z
+    - Fix a bug that #unstub doesn't work with older LWP::Protocol::PSGI. (#11, thanks to aereal)
+
+0.03 2015-12-14T10:41:54Z
+    - Add #last_request_for. (#10)
+    - Move LWP::Protocol::PSGI->register to import. (#8)
+    - Declare requirement of perl 5.10. (Maybe this module has never worked with 5.8)
+
+0.02 2015-05-17T10:38:01Z
+    - Fix typo in README. (wrong module name, #7)
+    - Add #clear_requests (#6).
+
+0.01 2015-04-17T04:43:19Z
+
+    - Initial release
+

@@ -1,0 +1,179 @@
+Revision history for Perl module Text::Autoformat
+
+1.74 2015-11-28 NEILB
+    - On Perl 5.22+ you could get "Negative repeat count does nothing"
+      warnings. Thanks to SREZIC for RT#109838.
+    - Made the mention of Text::Reform in SEE ALSO be a link.
+      Thanks to MANWAR for the PR doing this.
+    - Added some more entries to SEE ALSO.
+
+1.73 2015-11-08 NEILB
+    - Fixed warnings about uninitialized values in Hang.pm GH#4.
+      Thanks to Jeremy Mates for the PR.
+    - Changed github repo URL after changing my github username
+
+1.72 2015-06-14 NEILB
+    - Switched to Dist::Zilla, dropping both Build.PL and Makefile.PL -- phew!
+    - Refactored the two cuckoo packages into separate modules,
+      Text::Autoformat::Hang and Text::Autoformat::NullHang.
+
+1.71_01 2015-06-06 NEILB
+    - The changes released in 1.72 (above) were first done in a
+      developer release.
+
+1.71 2015-05-04 NEILB
+    - Previous release had a problem with PAUSE, caused by the two internal
+      packages not having a $VERSION. Identified and reported as PAUSE
+      issue GH#170 by KENTNL++. Added $VERSION to internal packages.
+
+1.70 2015-05-01 NEILB
+    - Removed useless loading of utf8 and Data::Dumper. RJBS++
+    - Only renumber ASCII-digit lists, don't touch other \d things. RJBS++
+
+1.69_01 2015-04-25 NEILB
+    - This was a developer release containing the changes subsequently
+      released in 1.70 (see above).
+
+1.69 2015-02-15 NEILB
+    - Changed the internal packages Hang and NullHang to
+      Text::Autoformat::Hang and Text::Autoformat::NullHang respectively.
+
+1.68 2015-02-15 NEILB
+    - Was failing on input of an empty string RT#101994. Fix from DCONWAY.
+      Apologies for the confusion caused by Damian and I both releasing,
+      this release should straighten things up.
+    - Fixed syntax errors in Quoting section of doc. DCONWAY++
+
+1.67 2015-01-08 NEILB
+    - Got co-maint from Damian so I could put the dist on github.
+      Thanks Damian!
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Added github repo to metadata and doc
+
+1.669006 2014-10-03 DCONWAY
+    - Improved 'quoter' option to allow augmenting quoter regex,
+      rather than just replacing it (thanks Peter)
+
+1.669005 2014-10-03 DCONWAY
+    - Added Lisp-style leading ; as a quoter (thanks Roland)
+    - Added 'quoter' option to allow user to specify a regex
+      to be used to recognize quoters (thanks Peter)
+
+1.669004 2013-07-31 DCONWAY
+    - Tweaked widow handling to avoid a nasty edge case (thanks Michael!)
+
+1.669003 2013-05-13 DCONWAY
+    - Unknown changes
+
+1.669002 2010-06-22 DCONWAY
+    - Patched missing case in 'ignore' option handling (thanks Alan)
+
+1.669001 2010-05-30 DCONWAY
+    - Added major improvements to the 'ignore' option (thanks Dan!)
+
+1.668001 2010-04-03 DCONWAY
+    - Removed spurious debugging statement in bad Pod. (Thanks Chris)
+
+1.666.0 2009-04-16 DCONWAY
+    - No changes logged
+
+1.14.0 2007-09-29 DCONWAY
+    - Fixed bug in handling empty mail messages
+    - Fixed bug in handling sig delimiters
+    - Fixed bug in paragraph ignoring code (thanks Rob)
+    - Fixed bug in handling whitespace-only input (thanks Ed)
+    - Fixed bug in Roman numerals (thanks Suresh)
+    - Fixed overeager autocentering (thanks Suresh)
+    - Enhanced 'lists' option to allow only specific types of lists
+      to be recognized (thanks Rob)
+    - Fixed bug in numbered hangs (thanks Rob)
+    - Fixed bug in Roman numeraled hangs (thanks Rob)
+    - Fixed misidentification of 8:20-style times as leading numbers (thanks
+      Rob)
+    - Fixed sentence mode (thanks Eric)
+    - Changed licence to "same terms as Perl itself" to improve Fedora
+      compatibility
+
+1.13 2005-05-04 DCONWAY
+    - Added sample config files for emacs and vim
+    - Extended allows "Name>" quoters to "Name_1>" (thanks Simon)
+    - Fixed weird behaviour of "(e.g. at start of line" (thanks Tim)
+    - Fixed handling of mail headers by adding "mail" option
+      (thanks Struan)
+    - Fixed bug in quoters (thanks Steve)
+    - Added a C<lists> option to turn off special treatment of apparent
+      lists (thanks Ingvar)
+
+1.12 2003-05-27 DCONWAY
+    - Now honours -- mail sig introducer
+      (stops formatting that that point)
+    - Now ignores mail headers
+    - Added exportable &ignore_headers for 
+      when using in user-defined "ignore" subs
+    - Now handles of embedded HTML entities 
+      (thanks David)
+    - Added call to C<use utf8> for 5.6 compatibility
+      (thanks Paolo)
+    - Restricted normal numbering to the range 0-999
+      to prevent false numbering caused by a year (like
+      1999) at the start of a line (like this)
+    - Fixed subtle bug with words starting with "ps-"
+      being treated as post scripts (thanks Rashid!)
+
+1.11 2003-05-07 DCONWAY
+    - Enhanced "highlight" casing mode (thanks Tom)
+    - Made hyphenation smarter (thanks Raj)
+
+1.10 2003-04-09 DCONWAY
+    - Fixed test.pl again!!!
+
+1.08 2003-04-02 DCONWAY
+    - Simplified test.pl
+
+1.07 2003-04-02 DCONWAY
+    - Tweaked pod to remove invalid markup
+    - Fixed left justification of last line of fully justified text
+      (thanks Elias)
+    - Devolved &from and &tag to Text::Reform
+    - Fixed incorrect handling of stringifiable objects (thanks dLux)
+    - Fixed bugs on null input (now short-circuits)
+    - Fixed unwarranted trimming of trailing newlines (thanks Mark)
+    - Added C<renumber> option to control renumbering
+    - Preserved capitalization of abbreviations under case changes
+      (thanks Alex)
+    - Added "autocentre" flag to switch off auto-centring of paras
+    - Added "ignore" flag to control which paragraphs are reformatted
+      (thanks Tony)
+
+1.04 2000-12-04 DCONWAY
+    - Limited numerical bullets to 3 digits.
+      This stops autoformat from misclassifying orphaned years such as 2001.
+    - Added new abbreviations
+    - Doc patch on numerical formatting (thanks Andy)
+    - Major bug fixes to renumbering mechanism
+    - Turned off renumbering in quoted text.
+    - Added correct autostringification of autostringifying objects
+      passed to &form. (Thanks Leon)
+    - Cleaned up "evil" exporting code left over from testing
+      (Thanks Rick)
+
+1.03 2000-10-25 DCONWAY
+    - Tweaked test.pl and POD
+    - required 5.005
+      (module uses funky stuff that's broken in earlier perls - sorry Dave)
+    - added break_TeX subroutine to take advantage of TeX::Hyphen
+      if it's installed.
+    - documented "sticky" config mode
+    - Changed semantics of footer generation slightly (see doc)
+    - fixed niggle in widow handling under full justification
+    - Added pagenum option to control page numbering
+    - Added three-part hash specification option for headers and footers
+      (thanks Chaim)
+    - Added separator handling to autoformat -- also fixes
+      underlining of heading (thanks very much Simon)
+
+1.02 2000-08-05 DCONWAY
+
+0.01 1997-11-03
+    - original version; created by h2xs 1.18
+

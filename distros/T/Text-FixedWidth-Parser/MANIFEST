@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+README.md
+Changes
+lib/Text/FixedWidth/Parser.pm
+t/Test/Text/FixedWidth/Parser.pm
+t/run.t
+t/test_file.txt
+t/test_file2.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

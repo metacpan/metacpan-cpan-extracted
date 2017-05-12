@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 706276cf7e0c71e2903ca3f4f5a831625b2cc5e5 Changes
+SHA1 5d4f3853cf90166f592dcc4f92e7aec31f07db42 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 1527d11d2d5b0eefc95bf99f2636a57132b3a661 MANIFEST
+SHA1 260784fd87db106eee1e664cc25196e3e8f2ef16 META.json
+SHA1 83c7396f52779099dff8404e99fbcba8eae2aac9 META.yml
+SHA1 1e2e189e143fd54599141af89d604cf6007c0d98 Makefile.PL
+SHA1 15fd5aac776c7c0d605b6d719bac7e7dca9576fa README
+SHA1 dc06dea438f9cb44be2431f4c4b9069149a35821 cpanfile
+SHA1 a5fcd1c003f024bafb3c7ec92e85d189feb48c3d dist.ini
+SHA1 98f90c45a8d8fb7b3480b57802caa3b0c9e6c506 examples/console.pl
+SHA1 7a5dbbc3fefe12d80d0d71f9580e062582d6ff63 examples/desktop.pl
+SHA1 a6ab27f56f1200886138c0111b80162517b2dd66 examples/dsl-menu.pl
+SHA1 bb06ad1ca1b500968cee3e9f406bfe7a1083bf69 examples/dsl.pl
+SHA1 bfe20b356658d4f4ef8caa5c77eab8aab82a9eaf examples/fileview.pl
+SHA1 6c978bcbc63ba3370bb6967809778e5f3ed5141f examples/floatbox.pl
+SHA1 4a061495981806d929225699c871e67b167d92eb examples/table.pl
+SHA1 6b097afcc9a87caa9e254164d94231a47ec4a5f9 examples/two-pane.pl
+SHA1 cb67d9196ad444a70d7718339cab5307a38e958d lib/Tickit/DSL.pm
+SHA1 42fe709ac6aedb4023de0e86e331fa8dd4825f9d lib/Tickit/DSL.pod
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 4b90f65da505bf283faffeb84a1fe7d94f106ac6 t/00-compile.t
+SHA1 15c1201c489f6f191c362b40bcd75ab129db9ca7 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJYZ7Y7AAoJEG2WkcbynxAlEIsP/jCnQ01ufFR7jfPjYeOnUKmB
+0R/SWXkltRHFvPfn3WwNgbQ8gwiVyFUFcVtpQr9Ul1+CwWOC/SeEzU+f5iAexKW6
+qdBFbUsKqFvUJEep91+unKx+FaqWRdzJS9dsOr6evfnNgw3t2RnNHhi3blUDMyg/
+ZCrQlf+jmFRdAAFiuQI5vJYwZnklcoI0lBk1duzdUke5j+anB1yQYTwJZNLm6d7Y
+Gf5yjHED/In2SkC8sZZ96Q2rd3T6vSGKlP9Z0ttuRlblnlja4tD9QvkfXroxmZse
+3d532Mh/T0ZRVeD2gU6SLMwggOhtdKRlbeRn64kJDls3wiBCIOux0u8Kw4ZNS0Ea
+7McqdgTYjelVO6V7L4PcBfIj3XctC0eXjo35hByvLWsOHfP6ZLfCxBxypozXeD10
+CQcA30UZXNV8CEKfR4IRdGbDhRXrK9viC3G8As4dQMJR1azcEUQAmcH+OfbKhlkr
+wdCem7w/2UFbnoEBhxPpFUguEr3ykBD88xtqDzySviTiLki5E/QmudjLpgkGLHrg
+RxsDNUx+shUYuKutVk8RFOBWeciYY2VqRAlwXnT1vtEmSSHk10hYcD4xV9WikzUn
+hT5YngaN62XY/+6uPRKaGiF3PeLfWcZ2Tdrd/KxlD4vfASQprVBmocxfH/anQ7i8
+oKyV6cTNOMWgSIg6tyyH
+=AY1T
+-----END PGP SIGNATURE-----

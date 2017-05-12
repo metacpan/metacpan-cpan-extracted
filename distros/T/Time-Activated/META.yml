@@ -1,0 +1,24 @@
+---
+abstract: 'Syntactic sugar over time activated code supporting DateTime and ISO8601 (a.k.a. "Javascript dates").'
+author:
+  - 'Gonzalo Barco <gbarco uy at gmail.com, no spaces>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Activated
+requires:
+  Carp: '1.38'
+  DateTime: '1.26'
+  DateTime::Format::ISO8601: '0.08'
+  Exporter: '5.57'
+  Sub::Name: '0.08'
+  Test::MockTime: '0.15'
+  Test::More: '1.001002'
+version: '1.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

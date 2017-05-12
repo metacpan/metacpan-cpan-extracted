@@ -1,0 +1,26 @@
+---
+abstract: 'tools for doing daemon-like things with Tak'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tak-Daemon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Async: 0.45
+  Tak: 0.001002
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/scpubgit/Tak-Daemon.git
+version: 0.001001

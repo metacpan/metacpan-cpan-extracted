@@ -1,0 +1,194 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [
+		doap-deps:on "Try::Tiny::ByClass 0"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "Moo 1.000006"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Struct 0.009"^^doap-deps:CpanId ], [
+		doap-deps:on "Throwable::Error 0.200000"^^doap-deps:CpanId;
+	], [ doap-deps:on "namespace::clean 0"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.88"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires 0"^^doap-deps:CpanId ], [ doap-deps:on "Try::Tiny 0"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Throwable-Factory>;
+	doap:created         "2012-12-17"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Throwable-Factory>;
+	doap:homepage        <https://metacpan.org/release/Throwable-Factory>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Throwable-Factory";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-007>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-throwable-factory>;
+	];
+	doap:shortdesc       "lightweight Moo-based exception class factory".
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Developer preview";
+	dc:identifier        "Throwable-Factory-0.000_01"^^xsd:string;
+	dc:issued            "2012-12-18"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-000_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Throwable-Factory-0.000_02"^^xsd:string;
+	dc:issued            "2012-12-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use namespace::clean instead of namespace::sweep.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.000_02.tar.gz>;
+	doap:revision        "0.000_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-000_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Throwable-Factory-0.000_03"^^xsd:string;
+	dc:issued            "2012-12-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Move some of responsibility for sane FIELDS list to MooX::Struct (require version 0.009).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.000_03.tar.gz>;
+	doap:revision        "0.000_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "First official release";
+	dc:identifier        "Throwable-Factory-0.001"^^xsd:string;
+	dc:issued            "2012-12-19"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Throwable-Factory-0.002"^^xsd:string;
+	dc:issued            "2012-12-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Don't assume path separator is forward-slash in t/01base.t. Was causing test failures on Windows.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "100% Devel::Cover coverage!";
+	dc:identifier        "Throwable-Factory-0.003"^^xsd:string;
+	dc:issued            "2012-12-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add some test cases for different constructor styles.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-004>
+	a                    doap:Version;
+	rdfs:label           "Boxing Day";
+	dc:identifier        "Throwable-Factory-0.004"^^xsd:string;
+	dc:issued            "2012-12-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Exception taxonomy.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Throwable-Factory-0.005"^^xsd:string;
+	dc:issued            "2013-02-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix typo in code sample.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Exception taxonomy documentation incorrectly stated that there were four built-in categories, when only three were listed. Fixed.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document taxonomy test case.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Give example of usage with Try::Tiny::ByClass.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Throwable-Factory-0.006"^^xsd:string;
+	dc:issued            "2013-05-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Add CAVEATS section to documentation.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/perigrin>;
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=84277>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Throwable-Factory/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Throwable-Factory-0.007"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Throwable-Factory-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/perigrin>
+	a                    foaf:Person;
+	foaf:name            "Chris Prather";
+	foaf:nick            "PERIGRIN";
+	foaf:page            <https://metacpan.org/author/PERIGRIN>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

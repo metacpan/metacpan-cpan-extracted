@@ -1,0 +1,15 @@
+Revision history for Test::NameNote
+
+0.04    2009-12-03
+        Fix failure when Test::Builder::ok() is called with a readonly
+            value for the test name.
+
+0.03    2009-11-23
+        Avoid a segfault under Perl 5.8.4
+
+0.02    2009-10-18
+        Added some missing pod.
+
+0.01    2009-10-17
+        Initial release.
+

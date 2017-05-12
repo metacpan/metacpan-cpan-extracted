@@ -1,0 +1,66 @@
+{
+   "abstract" : "Describe time duration in Polish",
+   "author" : [
+      "Grzegorz Ro\u017cniecki <xaerxess@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-Duration-pl",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Time::Duration" : "0",
+            "base" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "constant" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Time::Duration::pl" : {
+         "file" : "lib/Time/Duration/pl.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "xaerxess@gmail.com",
+         "web" : "http://github.com/Xaerxess/Time-Duration-pl/issues"
+      },
+      "homepage" : "https://github.com/Xaerxess/Time-Duration-pl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Xaerxess/Time-Duration-pl.git",
+         "web" : "https://github.com/Xaerxess/Time-Duration-pl"
+      }
+   },
+   "version" : "0.002"
+}
+

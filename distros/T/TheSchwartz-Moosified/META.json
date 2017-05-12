@@ -1,0 +1,56 @@
+{
+   "abstract" : "TheSchwartz based on Moose!",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TheSchwartz-Moosified",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBI" : "0",
+            "Moose" : "0.79",
+            "Scalar::Util" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "TheSchwartz::Moosified" : {
+         "file" : "lib/TheSchwartz/Moosified.pm",
+         "version" : "0.07"
+      },
+      "TheSchwartz::Moosified::Job" : {
+         "file" : "lib/TheSchwartz/Moosified/Job.pm"
+      },
+      "TheSchwartz::Moosified::JobHandle" : {
+         "file" : "lib/TheSchwartz/Moosified/JobHandle.pm"
+      },
+      "TheSchwartz::Moosified::Utils" : {
+         "file" : "lib/TheSchwartz/Moosified/Utils.pm"
+      },
+      "TheSchwartz::Moosified::Worker" : {
+         "file" : "lib/TheSchwartz/Moosified/Worker.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

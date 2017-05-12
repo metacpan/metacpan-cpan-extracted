@@ -1,0 +1,10 @@
+.cvsignore
+.DS_Store
+errors.err
+tar.gz$
+tar$
+.svn
+.swp
+Makefile$
+.old
+.bak

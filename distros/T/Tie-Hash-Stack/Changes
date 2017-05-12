@@ -1,0 +1,11 @@
+Revision history for Perl extension Tie::Hash::Stack.
+
+0.100	2013-11-04
+    - move code repository to GitHub
+    - update toolchain
+    - add mandatory author tests for distribution quality
+    - taking maintainership (REHSACK)
+
+0.09	2001-06-29
+    - initial release to an unsuspecting world (MNEYLON)
+      based on www.perlmonks.org code with some additional changes

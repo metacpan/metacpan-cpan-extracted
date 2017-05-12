@@ -1,0 +1,20 @@
+Revision history for Perl extension Text::WrapI18N.
+
+0.06  Wed Jun 25 17:28:20 2003
+	- Clearification of the license.
+
+0.05  Sun Jun 22 17:32:30 2003
+	- Added PREREQ_PM for Makefile.PL .
+
+0.04  Sun Jun 22 11:54:32 2003
+	- A bugfix when given string is ended by \n.
+
+0.03  Sun Jun 22 09:19:40 2003
+	- Added test.
+
+0.02  Fri Jun 20 22:59:20 2003
+	- Added EXPORT_TAGS.
+
+0.01  Thu Jun 19 22:03:11 2003
+	- initial version.
+

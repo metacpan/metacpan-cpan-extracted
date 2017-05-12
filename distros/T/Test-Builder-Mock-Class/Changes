@@ -1,0 +1,59 @@
+------------------------------------------------------------------------
+0.0203 | Piotr Roszatycki <dexter@cpan.org> | 2010-05-28
+
+Fixes:
+
+* Moose after version 1.05 calls "BUILDALL" method automatically, so this
+  is one more test to whole plan.
+
+------------------------------------------------------------------------
+0.0202 | Piotr Roszatycki <dexter@cpan.org> | 2010-05-14
+
+Fixes:
+
+* Class::MOP requires IO::* modules explicitly.  Implicit load does not work
+  correctly.
+
+Changes:
+
+* Requires Test::Mock::Class >= 0.0303.
+
+------------------------------------------------------------------------
+0.0201 | Piotr Roszatycki <dexter@cpan.org> | 2009-10-28
+
+Fixes:
+
+* Compatibility with Moose >= 0.89.
+
+Changes:
+
+* Test::Builder::Mock::Class::Role::Object:
+  - Use new Moose "with" keyword syntax.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-18
+
+Changes:
+
+* Function "mock_anon_class" has optional argument.
+
+------------------------------------------------------------------------
+0.0102 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-16
+
+Fixes:
+
+* This module is under LGPL only.
+
+------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-15
+
+Changes:
+
+* Aliased methods from inherited roles are used.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-14
+
+* First CPAN release.
+
+------------------------------------------------------------------------

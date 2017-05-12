@@ -1,0 +1,25 @@
+Template::Plugin::HTML::2Text version 0.01
+========================================
+
+Template::Plugin::HTML::2Text - Template Toolkit plugin to transfer HTML into plain text
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   Template 
+   HTML::FormatText::Html2text 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Dalibor Horinek <dal@travelcook.com>
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

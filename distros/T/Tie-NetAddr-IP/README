@@ -1,0 +1,123 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+Tie::NetAddr::IP
+================
+
+Provides a compact hash representation of a network hierarchy. See
+documentation for examples.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Test::More
+NetAddr::IP
+
+Please insure that all of them are properly installed and working
+before issuing bug reports. Test::More is required for testing.
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution. This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc". This contains a GPG "detached signature" that makes it
+impossible for anybody to alter this distribution. If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+MODULE DOCUMENTATION
+
+NAME
+    Tie::NetAddr::IP - Implements a Hash where the key is a subnet
+
+SYNOPSIS
+      use Tie::NetAddr::IP;
+
+      my %WhereIs;
+  
+      tie %WhereIs, Tie::NetAddr::IP;
+
+      $WhereIs{"10.0.10.0/24"} = "Lab, First Floor";
+      $WhereIs{"10.0.20.0/24"} = "Datacenter, Second Floor";
+      $WhereIs{"10.0.30.0/27"} = "Remote location";
+      $WhereIs{"0.0.0.0/0"} = "God knows where";
+
+      foreach $host ("10.0.10.1", "10.0.20.15", "10.0.32.17", "10.10.0.1") {
+         print "Host $host is in ", $WhereIs{$host}, "\n";
+      }
+
+      foreach $subnet (keys %WhereIs) {
+         print "Network ", $subnet, " is used in ", 
+         $WhereIs{$subnet}, "\n";
+      }
+
+      untie %WhereIs;
+
+DESCRIPTION
+    This module overloads hashes so that the key can be a subnet as in
+    NetAddr::IP. When looking values up, an interpretation will be made to
+    find the given key within the subnets specified in the hash.
+
+    The code sample provided on the SYNOPSIS would print out the locations
+    of every machine in the `foreach' loop.
+
+    Care must be taken, as only strings that can be parsed as an IP address
+    by NetAddr::IP can be used as keys for this hash.
+
+    Iterators on the hash such as `foreach', `each', `keys' and `values'
+    will only see the actual subnets provided as keys to the hash. When
+    looking up a value such as in `$hash{$ipaddress}' this IP address will
+    be looked up among the subnets existing as keys within the hash. The
+    matching subnet with the longest mask (ie, the most specific subnet)
+    will win and its associated value will be returned.
+
+    This code can be distributed freely according to the terms set forth in
+    the PERL license provided that proper credit is maintained. Please send
+    bug reports and feedback to the author for further improvement.
+
+AUTHOR
+    Luis E. Munoz (lem@cantv.net)
+
+SEE ALSO
+    perl(1), NetAddr::IP(3).
+
+COPYRIGHT AND LICENSE
+
+This code comes with no warranty of any kind. The author cannot be
+held liable for anything arising of the use of this code under no
+circumstances.
+
+This code is released under the terms and conditions of the
+GPL. Please see the file LICENSE that accompains this distribution for
+more specific information.
+
+Copyright (C) 2001-2003 Luis E. Muñoz <luismunoz@cpan.org>
+All rights reserved
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (Darwin)
+
+iD8DBQE+Ro9vQyDWGRI/hhARAgtdAKCbHc81UvwUe0/ku3Jfm6FMNtE3iQCgrPPm
+60e8I6EhvrLgDU2MdS9e9TM=
+=Xoiy
+-----END PGP SIGNATURE-----
+
+$Id: README,v 1.2 2003/02/09 18:47:17 lem Exp $

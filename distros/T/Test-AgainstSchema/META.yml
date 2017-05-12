@@ -1,0 +1,34 @@
+---
+abstract: 'Umbrella for test classes that target schema-based data'
+author:
+  - 'Randy J. Ray <rjray@blackperl.com>'
+build_requires:
+  Test::More: 0.80
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-AgainstSchema
+provides:
+  Test::AgainstSchema:
+    file: lib/Test/AgainstSchema.pm
+    version: 0.100
+  Test::AgainstSchema::XML:
+    file: lib/Test/AgainstSchema/XML.pm
+    version: 0.100
+requires:
+  Exporter: 5.57
+  File::Spec: 0.8
+  Try::Tiny: 0.11
+  XML::LibXML: 1.60
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-AgainstSchema
+  homepage: http://search.cpan.org/dist/Test-AgainstSchema
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rjray/test-againstschema
+version: 0.100

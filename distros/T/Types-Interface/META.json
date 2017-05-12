@@ -1,0 +1,82 @@
+{
+   "abstract" : "fuzzy role constraints",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Types-Interface",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Role::Inspector" : "0",
+            "Type::Library" : "0",
+            "Types::LoadableClass" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Tiny" : "0",
+            "Role::Tiny" : "1.000000",
+            "Test::More" : "0.96",
+            "Test::TypeTiny" : "0"
+         },
+         "suggests" : {
+            "UNIVERSAL::DOES" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Types::Interface" : {
+         "file" : "lib/Types/Interface.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-Interface/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Types-Interface"
+      },
+      "homepage" : "https://metacpan.org/release/Types-Interface",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-types-interface.git",
+         "web" : "https://github.com/tobyink/p5-types-interface"
+      }
+   },
+   "version" : "0.002"
+}

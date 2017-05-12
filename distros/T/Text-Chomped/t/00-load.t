@@ -1,0 +1,9 @@
+#!perl
+
+use Test::More tests => 1;
+
+BEGIN {
+	use_ok( 'Text::Chomped' );
+}
+
+diag( "Testing Text::Chomped $Text::Chomped::VERSION, Perl $], $^X" );

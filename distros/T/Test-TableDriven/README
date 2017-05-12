@@ -1,0 +1,8 @@
+See the perldoc.  Install like any CPAN module:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+Report bugs to the author.  Enjoy.

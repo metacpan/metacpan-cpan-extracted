@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+        content="text/html; charset=ISO-8859-1">
+  <title>Auto Build Results</title>
+  <meta name="author" content="Bryce Harrington">
+</head>
+
+[%- MACRO format_result(result) BLOCK %]
+  [% IF (result.state = "OK") %]
+    <td style="background-color: #33cc33">
+      <a href="[% result.url %]">[% result.type %] OK</a>
+      [%- result.detail -%]
+    </td>
+  [% ELSIF (result.state = "FAIL") %]
+    <td style="background-color: #cc0033">
+      <a href="[% result.url %]">[% result.type %] FAIL</a>
+      [%- result.detail -%]
+    </td>
+  [% ELSIF (result.state = "N/A") %]
+    <td style="background-color: #c8c8c8">[% result.type %] NA</td>
+  [% ELSE %]
+    <td>&nbsp;</td>
+  [% END %]
+[% END -%]
+
+<body>
+
+<h1>Analysis Results</h1>
+
+[% FOR run in runs %]
+<table cellpadding="2" cellspacing="0" border="1" style="text-align: center"> 
+ <thead>
+    <tr>
+      <td style="background-color: %c8c8c8" width="200"><b>Build</b></td>
+      <td style="background-color: %c8c8c8">[% run.version %] <a href="[% run.package_retriever_log_url %]">log</a></td>
+      <td colspan="3"><b>Test Run Date:</b> [% run.date %]</td>
+    </tr>
+    <tr>
+      <td><b>Test</b></td>
+      <td><b>Patch</b></td>
+      <td><b>Build</b><br>(Warnings|+/-)</td>
+      <td><b>Boot</b></td>
+      <td><b>Explanation</b></td>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOR test in run.tests %]
+    <tr>
+      <td>[% test.name %]</td>
+      [% format_result(test.patch) or '<td>&nbsp;</td>' %]
+      [% format_result(test.build) or '<td>&nbsp;</td>' %]
+      [% format_result(test.boot) or '<td>&nbsp;</td>' %]
+      <td>[% test.explanation or '&nbsp;' %]</td>
+    </tr>
+    [% END %]
+</table>
+
+[% END %]
+

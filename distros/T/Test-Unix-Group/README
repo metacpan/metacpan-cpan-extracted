@@ -1,0 +1,109 @@
+NAME
+    Test::Unix::Group - Test::Builder based tests for Unix groups
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use Test::Unix::Group tests => 4;
+
+        group_ok({ name => 'wheel' }, "'wheel' must exist");
+        group_ok({ name => 'wheel' }); # Auto-generate test name
+        group_ok({ name => 'wheel',
+                   gid  => 0, }, "'wheel' must have gid 0");
+
+        group_ok({ name => 'wheel', members => [qw(root nik)], }
+                 "'wheel' has the correct members");
+
+    Test::Unix::Group automatically exports "group_ok()" to make it easier
+    to test whether or not Unix groups have been correctly configured.
+
+    Test::Unix::Group uses Test::Builder, so plays nicely with Test::Simple,
+    Test::More, and other Test::Builder based modules.
+
+FUNCTIONS
+  group_ok($spec, [ $test_name ]);
+    group_ok() tests that a group exists and matches the given
+    specification.
+
+    The specification is a hashref that consists of one or more keys. Keys
+    are taken from the User::grent module, and are "name", "passwd", "gid",
+    and "members". See User::grent for more details.
+
+    Each value associated with a key, except "members", is the value that
+    that entry is supposed to have.
+
+    "members" behaves a little differently. The "members" key should have an
+    array ref as a value. This array should contain the user names of all
+    the users who must be members of the group. Note that this is not an
+    exclusive list, and allows for users other than those in the list to be
+    members of the group. This is because it is not practical to test all
+    the accounts on the system to verify that they are not members of the
+    given group via their user account GID.
+
+    User accounts provided to the "members" key are looked for in the list
+    of members explicitly listed in the group. If they are not found there
+    then their account information is obtained and their account GID is
+    examined to see if they are members through that mechanism.
+
+    Only the "name" key is mandatory, the others are optional. If they are
+    not present in the specification then they are not checked.
+
+    The $test_name is optional. If it is not present then a sensible one is
+    generated following the form
+
+        Checking group '$group' ($key, $key, $key, ...)
+
+EXAMPLES
+    Verify that a group exists.
+
+        group_ok({ name => 'wheel' }, "Group 'wheel' exists");
+
+    Verify that a group exists with a given GID. Omit the test name, rely on
+    the default.
+
+        group_ok({ name => 'wheel', gid => 0 });
+
+    Verify that the group exists and contains at least the members "qw(root
+    nik)".
+
+        group_ok({ name => 'wheel', members => [ qw(root nik) ] });
+
+SEE ALSO
+    Test::Unix::User, Test::Simple, Test::Builder, User::grent.
+
+AUTHOR
+    Nik Clayton, "nik@FreeBSD.org">
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-test-unix-group@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Unix-Group>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2005 Nik Clayton All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+     1. Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+    THE POSSIBILITY OF SUCH DAMAGE.
+

@@ -1,0 +1,65 @@
+=head1 NAME
+
+Text::OutputFilter - Filter and modify output
+
+=head1 SYNOPSIS
+
+  use Text::OutputFilter;
+
+  my $bucket = "";
+  tie *STDOUT, "Text::OutputFilter";
+  tie *HANDLE, "Text::OutputFilter", 4;
+  tie *HANDLE, "Text::OutputFilter", 4,  *STDOUT;
+  tie *STDOUT, "Text::OutputFilter", 4, \$bucket;
+  tie *OUTPUT, "Text::OutputFilter", 4,  *STDOUT, sub { "$_[0]" };
+
+=head1 DESCRIPTION
+
+See C<perldoc Text::OutputFilter> or C<pod2man OutputFilter.pm | nroff -man>.
+
+=head1 INSTALLATION
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ make install
+
+Recent changes can be (re)viewed in the public GIT repository at
+https://github.com/Tux/Text-OutputFilter
+
+Feel free to clone your own copy:
+
+ $ git clone https://github.com/Tux/Text-OutputFilter Text-OutputFilter
+
+or get it as a tgz:
+
+ $ wget --output-document=Text-OutputFilter-git.tgz \
+       https://github.com/Tux/Text-OutputFilter/archive/master.tar.gz
+
+=head1 BUGS & TODO
+
+=over 4
+
+=item format
+
+Output from format/write is not caught. This seems to be a bug in
+perl itself, and is unlikely to be fixed by this module.
+
+=item examples
+
+There should be example files with both input and output shown.
+
+=back
+
+=head1 AUTHOR
+
+H.Merijn Brand <h.m.brand@procura.nl>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2016 H.Merijn Brand for PROCURA B.V.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

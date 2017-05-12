@@ -1,0 +1,13 @@
+Revision history for Perl extension Test::Email.
+
+0.04  Jun 9 2007
+    - small, significant fix for CPAN
+
+0.03  Jun 6 2007
+    - first release version    
+
+0.01  Tue May  8 18:37:20 2007
+    - original version; created by h2xs 1.23 with options
+    -AXn Test::Email
+
+

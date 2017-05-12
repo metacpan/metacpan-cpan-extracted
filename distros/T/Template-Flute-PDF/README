@@ -1,0 +1,235 @@
+NAME
+    Template::Flute::PDF - PDF generator for HTML templates
+
+VERSION
+    Version 0.0042
+
+SYNOPSIS
+      $flute = Template::Flute->new (specification_file => 'invoice.xml',
+                                     template_file => 'invoice.html',
+                                     values => \%values);
+      $flute->process();
+
+      $pdf = Template::Flute::PDF->new (template => $flute->template(),
+                                        file => 'invoice.pdf');
+
+      $pdf->process();
+
+DESCRIPTION
+    Template::Flute::PDF is a PDF generator based on Template::Flute and
+    PDF::API2.
+
+  OUTPUT
+    To obtain the PDF as a string instead of writing it to a file, please
+    simply leave out the file parameter when creating the
+    Template::Flute::PDF object:
+
+       $pdf = Template::Flute::PDF->new (template => $flute->template(),
+                                         file => 'invoice.pdf');
+
+       $pdf_as_string = $pdf->process();
+
+  UNITS
+    Template::Flute::PDF uses the pt unit internally.
+
+    In addition, the following units are supported and automatically
+    converted by this module:
+
+    in  An inch converts to 72 pt.
+
+    cm  A centimeter converts to approximately 28.3 pt.
+
+    mm  A millimeter converts to approximately 2.8 pt.
+
+    px  A pixel converts to 1 pt.
+
+CONSTRUCTOR
+  new
+    Create a Template::Flute::PDF object with the following parameters:
+
+    template
+        Template::Flute::HTML object.
+
+    file
+        PDF output file.
+
+    page_size
+        Page size for the PDF (default: A4).
+
+    html_base
+        Base directory for HTML resources like images and stylesheets.
+
+    import
+        Import parameters for Template::Flute::PDF::Import.
+
+    Margin parameters
+    margin_top
+        Top margin, defaults to 20.
+
+    margin_right
+        Right margin, defaults to 20.
+
+    margin_bottom
+        Bottom margin, defaults to 50.
+
+    margin_left
+        Left margin, defaults to 20.
+
+METHODS
+  process
+    Processes HTML template and creates PDF file.
+
+  set_page_size
+    Sets the page size for the PDF.
+
+  select_page PAGE_NUM
+    Selects page with the given PAGE_NUM. Creates new page if necessary.
+
+  content_height
+    Returns the height of the content part of the page.
+
+  content_width
+    Returns the width of the content part of the page.
+
+  bounding
+    Returns the bounding box for the PDF as a hash reference with the
+    following key/value pairs:
+
+    vpos
+        Top vertical position.
+
+    pos Left horizonal position.
+
+    max_w
+        Maximum width.
+
+    max_h
+        Maximum height.
+
+    The bounding box defines the available space without the borders.
+
+  font NAME [weight] [style]
+    Returns PDF::API2 font object for font NAME, WEIGHT and STYLE are
+    optional.
+
+  text_filter TEXT
+    Adjusts whitespace in TEXT for output in PDF.
+
+  setup_text_props ELT SELECTOR [INHERIT]
+    Determines text properties for HTML template element ELT, CSS selector
+    SELECTOR and INHERIT flag.
+
+  calculate ELT [PARAMETERS]
+    Calculates width and height for HTML template element ELT.
+
+  check_out_of_bounds POS DIM
+    Check whether we are out of bounds with position POS and dimensions DIM.
+
+  textbox ELT TEXT PROPS BOX ATTRIBUTES
+    Adds textbox for HTML template element ELT to the PDF.
+
+  hline SPECS HPOS VPOS LENGTH WIDTH
+    Add horizontal line to PDF.
+
+  borders X_LEFT Y_TOP WIDTH HEIGHT
+    Adds borders to the PDF.
+
+  rect X_LEFT Y_TOP X_RIGHT Y_BOTTOM COLOR
+    Adds rectangle to the PDF.
+
+  locate_image
+    Determines location of an image file from the `src' HTML attribute.
+
+        $imgfile = $pdf->locate_image('images/cart.png');
+
+    The location is based on the current directory, or on the `html_base'
+    constructor parameter if the `src' HTML attribute contains a single file
+    name only.
+
+  image OBJECT HPOS VPOS WIDTH HEIGHT
+    Add image OBJECT to the PDF.
+
+  begin_transform
+    Starts transformation of current content object.
+
+  end_transform
+    Ends transformation of current content object.
+
+FUNCTIONS
+  to_points [DEFAULT_UNIT]
+    Converts widths to points, default unit is mm.
+
+SUPPORTED HTML/CSS SYNTAX
+    This is an incomplete list of supported HTML/CSS syntax.
+
+  HTML tags and attributes
+    <i>
+
+    style
+    The HTML attribute "style" is not supported.
+
+  CSS properties
+    display
+    The CSS property "display" is not supported.
+
+    font-weight
+    The values "normal" and "bold" are supported.
+
+    min-height
+    The CSS property "min-height" is supported.
+
+    min-width
+    The CSS property "min-width" is supported.
+
+    text-transformation
+    The CSS property "text-transformation" is supported with the exception
+    of the value "inherit".
+
+AUTHOR
+    Stefan Hornburg (Racke), <racke@linuxia.de>
+
+BUGS
+    Certainly a lot, as converting from HTML to PDF is quite complicated and
+    challenging.
+
+    Please report any unknown bugs or feature requests to
+    `bug-template-flute-pdf at rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Flute-PDF.
+
+  KNOWN BUGS
+    Background color
+        Using background color hides text.
+
+    Vertical align
+        We currently support only aligning to top or bottom of the available
+        space. This is in contradiction to HTML, where the default vertical
+        align is baseline (of the text).
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Template::Flute::PDF
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Flute-PDF
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Template-Flute-PDF
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Template-Flute-PDF
+
+    * Search CPAN
+        http://search.cpan.org/dist/Template-Flute-PDF/
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2012 Stefan Hornburg (Racke) <racke@linuxia.de>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

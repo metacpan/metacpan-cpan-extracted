@@ -1,0 +1,27 @@
+Revision history for Perl extension Thrift::XS.
+
+1.04    2011-07-11
+        - Fixed bug in writeString that would encode certain binary data into
+          UTF-8 bytes.
+        - Fixed errors if you only loaded ::BinaryProtocol instead of ::XS.
+
+1.03    2011-05-15
+        - Fixed writeDouble bug on big-endian platforms.
+        - Worked around test failures due to floating-point precision on some
+          platforms.
+
+1.02    2011-05-06
+        - Fixed several bugs with 64-bit integers on 32-bit platforms.
+        - Large performance boost by using direct buffer operations if
+          also using XS::MemoryBuffer.
+        - Added return values for compatibility for all methods in BinaryProtocol
+          (Wang Lam).
+
+1.01    2011-02-24
+        - Added compact protocol support.
+        - Documented the rest of the XS modules.
+        - Fixed bug in writeBool that caused it to always write a true value.
+        - Fixed bug in readFieldBegin where T_STOP was not handled properly.
+
+1.00    2011-02-22
+        - Initial release.

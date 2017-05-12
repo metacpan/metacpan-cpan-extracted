@@ -1,0 +1,60 @@
+NAME
+    Template::Plugin::VimColor - TT plugin for Text::VimColor
+
+SYNOPSIS
+      // in your template
+      [% USE VimColor %]
+      <pre>
+      [% FILTER vimcolor set_number => 1 -%]
+      #!/usr/local/bin/perl
+      use strict;
+      use warnings;
+
+      print "Hello, World!\n";
+      [% END -%]
+      </pre>
+
+      // for another language
+      <pre>
+      [% FILTER vimcolor filetype => 'ruby' -%]
+      #!/usr/local/bin/ruby
+
+      puts "Hello, World";
+      [% END -%]
+      </pre>
+
+DESCRIPTION
+    This plugin allows you to mark up your code in your document with
+    VimColor style.
+
+    You probably need to define styles for marked strings like this,
+
+      <style type="text/css">
+      pre { color: #fff; background-color: #000; padding: 10px; }
+      span.synComment { color: blue; }
+      span.synConstant { color: red; }
+      span.synIdentifier { color: aqua; }
+      span.synStatement { color: yellow; }
+      span.synPreProc { color: fuchsia; }
+      span.synType { color: lime; }
+      span.synSpecial { color: fuchsia;  }
+      span.synUnderlined { color: fuchsia; text-decoration: underline; }
+      span.synError { background-color: red; color: white; font-weight: bold; }
+      span.synTodo { background-color: yellow; color: black; }
+      span.Linenum { color: yellow; }
+      </style>
+
+SEE ALSO
+    Template, Text::VimColor
+
+TODO
+    Caching the marked output with Cache::Cache like Apache::VimColor.
+    Patches welcome :)
+
+AUTHOR
+    Naoya Ito <naoya@bloghackers.net>
+
+COPYRIGHT AND LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

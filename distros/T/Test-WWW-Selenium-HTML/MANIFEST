@@ -1,0 +1,36 @@
+Changes
+lib/Test/WWW/Selenium/HTML.pm
+Makefile.PL
+MANIFEST
+LICENSE
+t/001basic.t
+t/002pod.t
+t/003pod-coverage.t
+t/100simple.t
+t/101accessors.t
+t/102error.t
+t/103js-vars.t
+t/104events.t
+t/105timeouts.t
+t/106failures.t
+t/107action-died.t
+t/html/accessors.html
+t/html/events.html
+t/html/favicon.ico
+t/html/result.html
+t/html/simple.html
+t/htmltests/accessors.html
+t/htmltests/events.html
+t/htmltests/failures1.html
+t/htmltests/failures2.html
+t/htmltests/failures3.html
+t/htmltests/failures4.html
+t/htmltests/failures5.html
+t/htmltests/failures6.html
+t/htmltests/js-vars.html
+t/htmltests/simple.html
+t/htmltests/timeouts1.html
+t/htmltests/timeouts2.html
+t/lib/TestDaemon.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,15 @@
+Revision history for Template-HTML
+
+0.04    2010-06-05
+        - Abstracted operators to generic factory
+        - More overloaded methods implemented
+
+0.03    2010-06-05
+        - Don't wrap references
+        - More overloaded methods implemented
+
+0.02    2010-01-12
+        - Fixed copyright and licence
+
+0.01    2008-11-02
+        - Initial revision

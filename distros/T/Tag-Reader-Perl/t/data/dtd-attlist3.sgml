@@ -1,0 +1,3 @@
+<!ATTLIST form
+          method  CDATA   #FIXED "POST">
+

@@ -1,0 +1,17 @@
+<%args>
+$form
+$msg
+</%args>
+
+<h3>Build and test a kernel</h3>
+
+% if ($msg) {
+<h4><% $msg %></msg>
+
+% } else {
+
+<fieldset>
+<% $form|n %>
+</fieldset>
+<p><a href="/tapper/start/">Cancel</a></p>
+% }

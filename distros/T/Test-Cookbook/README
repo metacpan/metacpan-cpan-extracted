@@ -1,0 +1,18 @@
+Cookbook
+========
+
+'Write your tests as cookbooks
+'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

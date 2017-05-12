@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Tk-MiniCalendar
+version:             0.14
+abstract:            simple calendar widget for date selection
+license:             ~
+author:              
+    - Lorenz Domke <lorenz.domke\@gmx.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Date::Calc:                    5
+    Tk:                            804.027
+    Tk::XPMs:                      1.03
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,232 @@
+Changes
+=======
+
+0.20016 24 Dec 2013
+  - Update MANIFEST
+
+0.20015 18 Dec 2013
+  - Change how constants are handled so that things work with libmecab < 0.99
+    (https://github.com/lestrrat/Text-MeCab/pull/9)
+  - Allow specifying mecab encoding from environment variable
+    PERL_MECAB_TEXT_ENCODING, so that you can do
+    (https://github.com/lestrrat/Text-MeCab/pull/7)
+ 
+       PERL_MECAB_TEXT_ENCODING=utf-8 carton install
+
+  - Silence some warnings
+
+0.20014 26 Dec 2012
+  - You can now specify the default encpding to be used from command line
+    via --encoding flag (https://github.com/lestrrat/Text-MeCab/pull/6):
+
+       perl Makefile.PL --encoding=utf-8
+
+  - Fix author tests (https://github.com/lestrrat/Text-MeCab/pull/5)
+  - Fix various Module::Install related stuff
+  - Stop generating constants dynamically
+  - Better error checking in XS
+  - Lots of hackery to run tests on Travis-CI
+
+0.20013 19 Sep 2011
+  - tokuhirom + http://kiyotakagoto.blog3.fc2.com/blog-entry-62.html
+    remove auto_include
+  - Use Module::Install::CheckLib
+
+0.20012 09 Jun 2011
+  - Make sure to chdir back to the original directory upon call to
+    Text::MeCab::Dict::rebuild() (nekokak)
+
+0.20011 19 Dec 2010
+  - Make sure to include Devel::CheckLib in inc
+  - Fix typo (tomita)
+  - Fix author tests
+
+0.20010 28 Aug 2010
+  - Remove left over Path::Class(::File) (nipotan)
+  - Fix typo (nipotan)
+
+0.20009 19 May 2010
+  - Make sure to expose all the constants proved by Makefile.PL
+  - Fix author tests
+
+0.20008 10 May 2010
+  - Fixes to work with threaded perl
+  - Add tests for memleak and threads
+  - Since mecab installed via ports and the like tend to come with
+    euc-jp dictionary, change the default encoding in probe_mecab.pl
+
+  Upgrade is strongly recommended if you use threaded perl
+
+0.20007_01 09 May 2010
+  - Work with libmecab >= 0.98
+  - Reorganize file layout
+  - Switch to Module::Install
+  - Moved repository to github.com
+
+0.20007 08 Mar 2008
+  - Now require mecab.h location. This is used to auto-generate constants.
+  - Use Devel::CheckLib on non-Win32 platforms.
+    (Various Win32 related patches by Kenichi Ishigaki)
+  - Makefile.PL tweaks
+
+0.20006 07 Mar 2008
+  - Makefile.PL tweak for Win32. Patched by Kenichi Ishigaki
+  - We've also been reported that older libmecab doesn't work with Text::MeCab.
+    This is a known issue mainly caused by the fact that I have no access to
+    older libmecab in my dev environment. If you know of particular combo
+    (libmecab version against a particular feature) that doesn't work, please
+    send in patches and reports so we can fix them in future releases
+
+0.20005 06 Mar 2008
+  - Now we use sv_setref_pv instead of sv_bless and such. This fixes
+    a major leakage that prevented Text::MeCab::Node objects from being
+    garbage collected until global destruction time. I have no other
+    explanation other than that once I switched to sv_setref_pv, everything
+    just worked.
+  
+    Upgrade from previous 0.2000x versions STRONGLY recommended.
+
+0.20004 10 Jan 2008
+  - Text::MeCab::Dict has now been confirmed working with mecab-ipadic-20070801
+    * tweak the encoding
+    * don't use Text::CSV_XS
+
+0.20003 10 Jan 2008
+  - Of course, it's always a good idea to *actually* include the new
+    module. Yikes. If you downloaded 0.20002 by some odd chance, please 
+    use this release instead.
+
+0.20002 10 Jan 2008
+  - Add Text::MeCab::Dict, which is a simple wrapper to work with 
+    mecab dictionary. Only supports ipadic.
+
+0.20001 09 Jan 2008
+  - Properly use ExtUtils::MakeMaker::prompt() to ask interactive
+    questions. Pointed out by David Cantrell.
+
+0.20000 08 Jan 2008
+  - No code change. Releasing.
+
+0.20000_01 07 Jan 2008
+  - Complete rewrite
+    * work with libmecab 0.96
+    * rework tests
+    * use typemaps wisely
+    * default encoding is now utf-8
+    * now require Encode
+
+0.17 01 May 2007
+  - Fixup stupid Copy() problem.
+
+0.16 16 Apr 2007
+  - Change the internal C structure to be thin wrappers around mecab_node_t
+  - Implement a node->format() method
+
+0.15 29 Jan 2007
+  - 0.14 had upload problems. Repackage.
+
+0.14 28 Jan 2007
+  - Fix argument passing to mecab_new(). Reported by Naoki Tomita.
+
+0.13 08 Aug 2006
+  - Fix tools/probe_mecab.pl so that there are not spurfulous whitespaces
+    around the flags (http://d.hatena.ne.jp/t-tkzw/20060730/p2).
+
+0.12 15 Jul 2006
+  - Apply "Poor Puppy" patch from Kenichi Ishigaki (charsbar)
+  - Properly ask for the dictionary encoding when running perl Build.PL.
+    This will create t/strings.dat with that encoding.
+
+0.11 14 Jul 2006
+  - Silence more warnings
+  - Force use of -Wall at compilation time
+
+0.10 14 Jul 2006
+  - remove spurfuluous parse_wakati.pl
+  - remove debug statements
+  - silence warnings
+
+0.09 12 Jul 2006
+  - "Hey, it's the day before my birthday, but I'm releasing a new module" release
+  - Switch default behavior of Text::MeCab when it goes out of scope.
+    See "Text::MeCab AND SCOPE" section in Text::MeCab POD.
+    This all prompted by post at http://d.hatena.ne.jp/t-tkzw/20060710/p1.
+  - Add new Text::MeCab::Node::Cloned to workaround.
+  - Add warning about not using cloned node when Text::MeCab goes out of
+    scope.
+
+0.08 - 05 Jul 2006
+  - Apply suggestions by charsbar when prompting for compile/link options
+    for Win32
+    (and actually release the changes -- this has been sitting on my SVK
+     client for a month)
+
+0.07 - 09 Jun 2006
+  - The way we were passing arguments to mecab_new() was totally wrong.
+    Fixed.
+
+0.06 - 08 May 2006
+  - Require ExtUtils::MakeMaker >= 6.25 to avoid Build.PL being
+    executed after Makefile.PL
+  - Fix INIT -> PREINIT (reported by charsbar)
+  - Fix how XSRETURN_UNDEF was working (reported by charsbar)
+  - Fix tools/probe_mecab.pl (reported by charsbar)
+  - Use ppport.h.
+
+0.05 - 04 May 2006
+  - Fix typos
+  - Add tests to MANIFEST. argh.
+  - Actually test against libmecab < 0.90. Now tests pass.
+  - Bump up version to 0.05 for historical reasons. There was another
+    version of Text::MeCab that MAKAMAKA had written which went up to
+    0.04.
+
+0.02_03 - 04 May 2006
+  - Correct reference counting for prev().
+  - Add tests for detatched Text::MeCab::Node.
+  - Tweak docs
+
+0.02_02 - 04 May 2006
+  - Fix tools/probe_mecab.pl such that it prompts the user for some
+    required parameters when installing on Windows.
+  - Try fixing Makefile.PL once again.
+  - Explicitly make copies of mecab_node_t in the XS, so that you
+    can now manipulate the nodes even *after* your instance of
+    Text::MeCab has gone away
+
+0.02_01 - 03 May 2006
+  - Hey, I didn't know people were going to jump on to this module,
+    seriously... 
+
+  - Fix building when using Makefile.PL instead of Build.PL
+    (refactor important bits to tools/probe_mecab.pl).
+  - Attempt to work with MeCab < 0.90.
+  - Move benchmark.pl to tools/benchmark.pl.
+  - Fix problem caused by Text::MeCab->new() (no parameters).
+  - Add Text::MeCab::MECAB_VERSION to display the mecab version
+    we compiled against.
+
+  TODO:
+  - Try to at least give out a warning when executing a code like this:
+
+    my $node;
+    {
+        my $mecab = Text::MeCab->new;
+        $mecab->parse("......");
+        $mecab = undef;
+    }
+
+    for(; $node; $node = $node->next) {
+       print $node->surface, "\n";
+    }
+
+    I'm having a hard time detecting when a node is deallocated, though.
+    we shall see.
+    
+0.02 - 02 May 2006
+  - Accept command line arguments as well as the named parameters in hashref
+  - Fixed problem where constants MECAB_ weren't declared int he correct
+    namespace.
+
+0.01 - 02 May 2006
+  - Initial release.

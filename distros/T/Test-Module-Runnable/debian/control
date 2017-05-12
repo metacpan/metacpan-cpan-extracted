@@ -1,0 +1,17 @@
+Source: libtest-module-runnable-perl
+Section: devel
+Priority: extra
+Maintainer: David Duncan Ross Palmer <palmer@overchat.org>
+Build-Depends: debhelper (>= 9),
+Build-Depends-Indep:
+ libmoose-perl,
+Standards-Version: 3.7.3
+Homepage: https://bitbucket.org/2E0EOL/libtest-module-runnable-perl
+
+Package: libtest-module-runnable-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ libmoose-perl,
+Description: Test::Module::Runnable
+ Base class for runnable unit tests using Moose introspection
+ and a user-defined pattern for subtest routines.

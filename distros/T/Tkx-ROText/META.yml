@@ -1,0 +1,22 @@
+---
+name: Tkx-ROText
+version: 0.06
+author:
+  - 'Michael J. Carman <mjcarman@cpan.org>'
+abstract: Tkx text widget that supports a read-only state.
+license: perl
+resources:
+  license: ~
+requires:
+  Carp: 0
+  Tkx: 0
+build_requires:
+  Test::More: 0
+provides:
+  Tkx::ROText:
+    file: lib/Tkx/ROText.pm
+    version: 0.06
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

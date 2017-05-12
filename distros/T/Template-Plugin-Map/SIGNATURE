@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d7caf4e76ff65397ad00a326ab4344975c067ef3 Changes
+SHA1 2beb45dc06997750da3736c02e3f8305bfc286c3 LICENSE
+SHA1 e57ae62a69dde68d4c312ceaa52cc6a8fefb7296 MANIFEST
+SHA1 377150ced6e6074667a91257a1e770016565bc44 META.yml
+SHA1 6485042fe7f0633321fccdcba11d4f14ea8e189a Makefile.PL
+SHA1 b6a0d0057cefa9a485368277465f3da04b9493b6 README
+SHA1 6ff0866442373b1bd4fef18ad98be31d08764521 dist.ini
+SHA1 a198584b682fa34aca4e0e76cd9083f7fab99600 lib/Template/Plugin/Map.pm
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 15832ddabe3acf27ddaaf0b8b19141eeca8fba51 t/smoke.t
+SHA1 dc5577d84d6015589321fed7ab730d17a80d4410 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlM7AysACgkQ+CqvSzp9LOxVrACgio1NI9AioijIwTsGTjqE8Q6T
+SBcAoIV5ON7KvqB7NdYOz3NFxBFMunKe
+=mgR0
+-----END PGP SIGNATURE-----

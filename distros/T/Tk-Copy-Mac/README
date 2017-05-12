@@ -1,0 +1,8 @@
+
+DESCRIPTION
+       This widget simulates a Macintosh Classic copy dialog
+       using Tk::ProgressBar::Mac and CollapsableFrame widgets.
+
+Steve Lidie
+2002/10/01
+sol0@lehigh.edu

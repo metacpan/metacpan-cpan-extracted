@@ -1,0 +1,10 @@
+Parsing ./t/samples/test01.html: PASS
+  PAGES:1
+   PASS:1
+   FAIL:0
+    NET:0
+Parsing ./t/samples/test02.html: PASS
+  PAGES:1
+   PASS:1
+   FAIL:0
+    NET:0

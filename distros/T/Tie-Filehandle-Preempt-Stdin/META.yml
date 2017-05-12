@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Tie-Filehandle-Preempt-Stdin
+version:             0.02
+abstract:            Preempt STDIN during testing.
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - James E Keenan (jkeenan@cpan.org)

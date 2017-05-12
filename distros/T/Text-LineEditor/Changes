@@ -1,0 +1,14 @@
+
+New in 0.03
+   Help text (~h) now works
+   ~x to abandon text, returns undef
+   ~p to print
+   Search for an editor for ~e/~v now goes:
+      $ENV{"VISUAL"} || $ENV{"EDITOR"} || "vim" || "vi" || "pico"
+   Added pod documentation in module
+
+New in 0.02
+   Fixing a rather vital typo in the Makefile (the, erm, module
+      name *blush*)
+   Addition of some Copyright notices.
+

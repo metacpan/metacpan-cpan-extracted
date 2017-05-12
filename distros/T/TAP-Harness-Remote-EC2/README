@@ -1,0 +1,36 @@
+TAP-Harness-Remote-EC2 version 0.01
+
+Based on TAP::Harness::Remote, this module uses your running Amazon
+EC2 instances ( http://amazon.com/ec2 ) to run tests against, instead
+of a preconfigured list of hosts.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+TAP::Harness::Remote, Net::Amazon::EC2
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

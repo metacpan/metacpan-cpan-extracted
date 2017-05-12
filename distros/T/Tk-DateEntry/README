@@ -1,0 +1,21 @@
+Tk::DateEntry Module
+
+Tk::DateEntry is an Entry widget with a drop-down calendar, allowing the
+user to select a date by clicking in the calendar.
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make install
+
+On Windows systems, use dmake or nmake instead of make.
+
+For a demonstration you can use
+
+	$ make demo
+
+DateEntry.pm contains pod documentation.
+
+Send bug reports, comments and suggestions to slaven@rezic.de

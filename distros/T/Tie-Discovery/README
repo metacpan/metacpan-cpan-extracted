@@ -1,0 +1,106 @@
+NAME
+    Tie::Discovery - Lazily evaluated "discovery" hashes
+
+VERSION
+    This document describes version 1.11 of Tie::Discovery, released January
+    28, 2009.
+
+SYNOPSIS
+        use Tie::Discovery;
+        my %info = ();
+        my $obj = tie %info, 'Tie::Discovery';
+
+        sub discover_os { ... }
+        $obj->register(os => \&discover_os);
+
+        print $info{os};
+
+DESCRIPTION
+    A *discovery* hash is a hash that's designed to help you solve the data
+    dependency problem. It's based on the principle of least work; some
+    times, you may spend a lot of time in your program finding out paths,
+    filenames, operating system specifics, network information and so on
+    that you may not end up using. Discovery hashes allow you to get the
+    data when you need it, and only when you need it.
+
+    To use a discovery hash, first tie a hash as shown above. You will want
+    to keep hold of the object returned by "tie". You can then add things to
+    discover by calling the "register" method as shown above. The above code
+    "$obj->register("os", \&discover_os);" means that when (and only when!)
+    the value $info{os} is fetched, the sub &discover_os will be called to
+    find it. The return value of that sub will then be cached to save a
+    look-up next time.
+
+    The real power comes from the fact that you may refer to the tied hash
+    inside of the discovery subroutines. This allows for fast, neat and
+    flexible top-down programming, and helps you avoid hard-coding values.
+    For instance, let us find the OS by calling the uname program:
+
+        $obj->register( os => sub {
+            # Here $self is the same as $obj above
+            my $self = shift;
+            my $uname = $self->FETCH('path_to_uname');
+            return `$uname`;
+        } );
+
+    Alternatively, if the tied %info is still in scope, this will also do:
+
+        $obj->register( os => sub {
+            my $uname = $info{path_to_uname};
+            return `$uname`;
+        } );
+
+    Now we need code to find the program itself:
+
+        use Config;
+        use File::Spec::Functions;
+        $obj->register( path_to_uname => sub {
+            my $self = shift;
+            foreach (split($Config{path_sep}, $ENV{PATH})) {
+                return catfile($_, 'uname') if -x catfile($_, 'uname');
+            }
+            die "Couldn't even find uname";
+        };
+
+    Fetching $info{os} may now need a further call to fetch
+    $info{path_to_uname} unless the path is already cached. And, of course,
+    we needn't stop at two levels.
+
+    Note that, since version 1.10, as long as the discovery function returns
+    a code reference, it will be invoked repeatedly, until a final value is
+    produced.
+
+  METHODS
+    Aside from the usual hash methods, the following are available:
+
+   register($name, \&code)
+    Registers "name" as an entry in the hash, to be discovered by running
+    "sub"
+
+   store($name, $value)
+    Stores "value" directly into the hash under the "name" key. The only
+    time you should need to do this is to set the value of the "debug" key;
+    if set, this shows a trace of the discovery process.
+
+  CAVEATS
+    At present, since a subroutine reference signifies something to look up,
+    you can't usefully return one from your discovery subroutine.
+
+SEE ALSO
+    Scalar::Defer, in particular its "lazy()" function that provides a
+    viable alternative to this module.
+
+    Tie::Hash
+
+AUTHORS
+    Simon Cozens <simon@cpan.org>, Audrey Tang <cpan@audreyt.org>
+
+COPYRIGHT
+    Copyright 2004 by Simon Cozens <simon@cpan.org>, Audrey Tang
+    <cpan@audreyt.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

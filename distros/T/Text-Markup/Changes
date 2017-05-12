@@ -1,0 +1,81 @@
+Revision history for Perl extension Text-Markup.
+
+0.23  2015-05-21T06:23:35Z
+     - Added BBcode and Creole to the module description.
+     - Fixed a failing test for the Mediawiki format due to a change in CGI
+       v4.14. This reverses the workaround required by CGI 4.11, introduced in
+       v0.20. Not that you care. It's just a test change.
+     - Updated the Pod parser to determine the indentation of verbatim blocks
+       by the line with the shortest leading whitespace, rather than the
+       whitespace of just the first line. Inspired by an equivalent approach
+       in Mojolicious by Joel Berger.
+
+0.22  2015-02-20T03:52:36Z
+     - Added support for Creole. Thanks to Lucas Kanashiro for the patch!
+
+0.21  2015-02-17T00:18:20Z
+     - Fixed description of Asciidoc and added it to the README.
+     - Added support for BBcode. Thanks to Lucas Kanashiro for the patch!
+
+0.20   2015-01-22T00:54:50Z
+     - Fixed a failing test for the Mediawiki format due to a change in CGI
+       v4.11. Thanks to Andreas Koenig for the report and diagnosis.
+
+0.19  2014-02-07T04:00:56Z
+     - Fixed Pod markup so that it does not strip text from the first line of
+       verbatim blocks.
+     - Removed the `--safe` option from Asciidoc. It is just borked with the
+       XHTML back end.
+
+0.18  2013-06-08T23:24:09Z
+     - Now require HTML::Tagset, since Text::MediawikiFormat seems to need it
+       but only recommends it.
+     - Removed all Pod tests from the distribution.
+     - Updated reST to support docutils 0.7 - 0.10 and when Pygments is not
+       available. Daniele Varrazzo.
+
+0.17  2012-02-28T04:31:07Z
+     - Added Asciidoc support.
+
+0.16  2012-02-13T17:23:00Z
+     - Rest support now uses its own implementation of `rst2html` so that it
+       can render specialized reST documents, such as Sphinx files, in a more
+       forgiving way: it preserves the content of unknown directives while not
+       emulating specialized rendering. Written by Daniele Varrazzo.
+     - Improved handling of Sphinx directives in Rest output. Most directives
+       are stripped out, although `function` directives now turn out much
+       nicer. Props to Daniele Varrazzo for the work on the Rest parser.
+     - Fixed character encoding issues with the Rest parser.
+     - Fixed a character encoding issue in the test suite.
+
+0.15  2012-01-13T23:04:16Z
+      - Changed the parsers to return `undef` if no content was parsed from a
+        file.
+      - Added reST support, with thanks to Daniele Varrazzo.
+
+0.14  2011-10-09T17:45:28Z
+      - Added option processing to the Pod parser. Thanks to Mark Allen for
+        the pull request.
+
+0.13  2011-05-21T15:33:28
+      - Fixed broken regular expression in the Pod parser that could eat the
+        first line of a verbatim block.
+
+0.12  2011-04-04T23:16:12
+      - Documented that the `file` parameter to `parse()` is required.
+      - Added MultiMarkdown support.
+      - Fixed test failure in `t/formats.t` when no supported markup parser is
+        installed.
+
+0.11  2011-02-22T22:41:15
+      - Added list of supported markups to the README.
+      - Fixed test failures on Perls earlier than 5.12.
+
+0.10  2011-02-22T19:45:27
+      - Initial version. Includes parsers for:
+        + HTML
+        + Markdown
+        + MediaWiki
+        + Pod
+        + Textile
+        + Trac

@@ -1,0 +1,44 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          TAPPER_REPORTS_RECEIVER
+# Required-Start:    $syslog $remote_fs
+# Should-Start: $time ypbind smtp
+# Required-Stop:     $syslog $remote_fs
+# Should-Stop: $time ypbind smtp
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 6
+# Short-Description: TAPPER_REPORTS_RECEIVER daemon providing Tapper reports receiving
+# Description:       Start TAPPER_REPORTS_RECEIVER to allow Tapper reports
+#	to be reported via port 7357 in "TAP" (Test Anything Protocol).
+### END INIT INFO
+
+# Note: Special treatment of stop for LSB conformance
+PERL=/home/tapper/perl510/bin/perl
+TAPPER_REPORTS_RECEIVER_BIN=/home/tapper/perl510/bin/tapper-reports-receiver-daemon
+test -f $TAPPER_REPORTS_RECEIVER_BIN || { echo "$TAPPER_REPORTS_RECEIVER_BIN not installed"; 
+	if [ "$1" = "stop" ]; then exit 0;
+	else exit 5; fi; }
+
+
+case "$1" in
+    start)
+	echo -n "Starting TAPPER_REPORTS_RECEIVER "
+	export TAPPER_LIVE=1
+	$PERL $TAPPER_REPORTS_RECEIVER_BIN start
+	;;
+    stop)
+	echo -n "Shutting down TAPPER_REPORTS_RECEIVER "
+	$PERL $TAPPER_REPORTS_RECEIVER_BIN stop
+	;;
+    restart)
+	echo -n "Restart TAPPER_REPORTS_RECEIVER "
+	$0 stop
+	$0 start
+	;;
+    *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
+esac
+

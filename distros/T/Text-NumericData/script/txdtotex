@@ -1,0 +1,371 @@
+#!/usr/bin/env perl
+
+# Another script that does not bother with the common framework.
+# I don't really use it these days; so I am contemplating how
+# badly it is needed for the world. Anyhow, it is there and it works, sort of.
+
+use strict;
+#the infostring says it all
+my $infostring = 'create a LaTeX table out of some textual data (file)
+
+Usage:
+	pipe | txdtotex >> doc.tex';
+
+use Config::Param;
+use Text::NumericData;
+use Text::NumericData::File;
+
+my $param = {};
+#should have an own kind of numberformat... it's not just sprintf but also 3\cdot 10^{4}
+my @pars = 
+(
+	'text',1,'T','allow text to occur in data fields',
+	'strict',1,'S','use strict syntax',
+	'cfont','','c','font to use in cells, i.e. ttfamily or mathtt with cmath',
+	'numform','','N','format to use for numbers (semicolon-separated list for per-column formats) as sprintf wants it (p.ex. %0.4f) - use this for rounding...',
+	'cmath',0,'m','use math mode for cells (also replacing e+3 with \E macro that should be defined as \cdot 10^{#1})',
+	'align','c','a','alignment of columns (c,r,l)',
+	'convert',0,'r','convert , -> . and . -> ,',
+	'dot','.','','the dot (after convert), "." or ","',
+	'block',0,'','put all the numbers of a colum into a block, including proper formatting for digits (works for one file via stdin)',
+	'placement','','p', 'special wishes for placement (the h in \begin{table}[h])'
+);
+
+$param = Config::Param::get(
+{
+  info=>$infostring
+, version=>$Text::NumericData::version,
+, author=>'Thomas Orgis <thomas@orgis.org>'
+, copyright=>'Copyright (c) 2005-2013 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10'
+},\@pars);
+
+my $c;
+my $data;
+my $cfa = '';
+my $cfb = '';
+my @numform = split(';', $param->{numform});
+
+if($param->{cfont})
+{
+	$cfa = '\\'.$param->{cfont}.'{';
+	$cfb = '}';
+}
+if($param->{cmath})
+{
+	$cfa = '$'.$cfa;
+	$cfb .= '$';
+}
+
+if($param->{block})
+{
+	$c = new Text::NumericData::File({'strict',$param->{strict},'text',$param->{text}});
+	$c->read_all('');
+	header($c);
+	# scan stuff for formatting
+	my @maxdot;
+	my @sign;
+	my $col = -1;
+	foreach my $e (@{$c->{data}})
+	{
+		if(@numform)
+		{
+			for(my $i = 0; $i <= $#numform; ++$i)
+			{
+				$e->[$i] = sprintf($numform[$i], $e->[$i]);
+			}
+		}
+		$col = -1;
+		foreach my $ee (@{$e})
+		{
+			++$col;
+			if($param->{convert})
+			{
+				$ee =~ tr/,/|/;
+				$ee =~ tr/./,/;
+				$ee =~ tr/|/./;
+			}
+			my $o = rindex($ee,$param->{dot});
+			$o = length($ee) if $o < 0;
+			if($ee =~ /^([+-])(.*)$/){ --$o; $sign[$col] = 1; }
+			if($o > $maxdot[$col]){ $maxdot[$col] = $o; }
+		}
+	}
+	# now format the blocks
+	for(my $l = 0; $l <= $col; ++$l)
+	{
+		if($l != 0){ print "\t\t& "; }
+		else{ print "\t\t"; }
+		print '$\begin{array}{l}'."\n";
+		my $first = 1;
+		foreach my $e (@{$c->{data}})
+		{
+			my $ee = $e->[$l];
+			my $o = rindex($ee,$param->{dot});
+			$o = length($ee) if $o < 0;
+			my $pre = '';
+			if($ee =~ /^([+-])(.*)$/){ --$o; $pre = $1; $ee = $2; }
+			elsif($sign[$l]){ $pre = '\phantom{+}'; }
+			for(my $j = 0; $j < $maxdot[$l]-$o; ++$j)
+			{
+				$pre .= '\phantom{0}';
+			}
+			$ee = $pre.$ee;
+			unless($first){ print " \\\\\n"; }
+			else{ $first = 0; }
+			$ee =~ s/[eE](\+|-)(\d+)$/\\E\{$1$2\}/;
+			print "\t\t\t$ee";
+		}
+		print "\n\t\t".'\end{array}$'."\n";
+	}
+	EndIt();
+	exit(0);
+}
+
+Init();
+
+sub Init
+{
+	$c = new Text::NumericData({'strict',$param->{strict},'text',$param->{text}});
+	$data = 0;
+}
+
+my $ended = 0; 
+
+#first variant: we have parseable columns
+
+
+while(<STDIN>)
+{
+	unless(ord() < 5)
+	{
+	
+		if(!$data)
+		{
+			if($c->line_check($_))
+			{
+				$data = 1;
+				header($c);
+			}
+		}
+		if($data)
+		{
+			my $d = $c->line_data($_);
+			if(@numform)
+			{
+				for(my $i = 0; $i <= $#numform; ++$i)
+				{
+					$d->[$i] = sprintf($numform[$i], $d->[$i]);
+				}
+			}
+			if($param->{convert})
+			{
+				foreach my $e (@{$d})
+				{
+					$e =~ tr/,/|/;
+					$e =~ tr/./,/;
+					$e =~ tr/|/./;
+				}
+			}
+			if($param->{cmath})
+			{
+				for(my $i = 0; $i <= $#{$d}; ++$i)
+				{
+					#print STDERR "modding ]".$d->[$i]."[\n";
+					$d->[$i] =~ s/[eE](\+|(-))(\d+)$/\\E\{$2$3\}/;
+				}
+			}
+			print "\t\t";
+			unless($param->{cfont} or $param->{cmath})
+			{
+				print join(' & ', @{$d});
+			}
+			else
+			{
+				my $first = 1;
+				for (@{$d})
+				{
+					unless($first)
+					{
+						print ' & ';
+					}
+					else{ $first = 0; }
+					print $cfa.$_.$cfb;
+				}
+			}
+			print " \\\\\n";
+		}
+
+	}
+	else
+	{
+		print;
+		exit() if ord() ==  4; #end of transmission
+		if(ord() == 2) #turn of buffering when in a TextPipe
+		{
+			select(STDOUT); $| = 1;
+		}
+		if(ord() == 3) #end of text; meaning we prepare for next one
+		{
+			&EndIt();
+			$ended = 1;
+			Init();
+		}
+	}
+
+	
+}
+
+unless($ended){ &EndIt(); }
+
+sub EndIt
+{
+	print "\t",'\end{tabular}',"\n";
+	print "\t",'\caption{',$c->{title},'}',"\n" if defined $c->{title};
+	print '\end{table}',"\n"
+}
+
+sub header
+{
+	my $c = shift;
+	die "No valid column titles found!\n" if $#{$c->{titles}} == -1;
+	if(@numform)
+	{
+		#print STDERR "filling numform\n";
+		# fill up to the end
+		while($#numform < $#{$c->{titles}})
+		{	
+			#print STDERR "pushing ]".$numform[$#numform]."[\n";
+			push(@numform, $numform[$#numform]);
+		}
+	}
+	print '\begin{table}';
+	print '['.$param->{placement}.']' if $param->{placement};
+	print "\n\t",'\centering',"\n";
+	print "\t",'\begin{tabular}{';
+	my $k = '';
+	for(my $i = 0; $i <= $#{$c->{titles}}; ++$i){$k .= $param->{align}.'|';}
+	$k =~ s/\|$//;
+	print $k,'}',"\n\t\t",join(' & ',@{$c->{titles}})," \\\\\n\t\t",'\hline\hline',"\n";
+}
+
+__END__
+
+=head1 NAME
+
+txdtotex - create a LaTeX table out of some textual data (file)
+
+
+=head1 SYNOPSIS
+
+	pipe | txdtotex >> doc.tex
+=head1 PARAMETERS
+
+These are the general rules for specifying parameters to this program:
+
+	txdtotex -s -xyz -s=value --long --long=value [--] [files/stuff]
+
+You mention the parameters/switches you want to change in any order or even multiple times (they are processed in the oder given, later operations overriding/extending earlier settings.
+An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
+Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
+
+There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value".
+
+
+The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
+
+=over 2
+
+=item B<align>, B<a> (scalar)
+
+	'c'
+
+alignment of columns (c,r,l)
+
+=item B<block> (scalar)
+
+	0
+
+put all the numbers of a colum into a block, including proper formatting for digits (works for one file via stdin)
+
+=item B<cfont>, B<c> (scalar)
+
+	''
+
+font to use in cells, i.e. ttfamily or mathtt with cmath
+
+=item B<cmath>, B<m> (scalar)
+
+	0
+
+use math mode for cells (also replacing e+3 with \E macro that should be defined as \cdot 10^{#1})
+
+=item B<config>, B<I> (array)
+
+	[]
+
+Which configfile(s) to use (overriding automatic search in likely paths);
+special: just -I or --config causes printing a current config file to STDOUT
+
+=item B<convert>, B<r> (scalar)
+
+	0
+
+convert , -> . and . -> ,
+
+=item B<dot> (scalar)
+
+	'.'
+
+the dot (after convert), "." or ","
+
+=item B<help>, B<h> (scalar)
+
+	0
+
+show the help message; 1: normal help, >1: more help; "par": help for paramter "par" only
+
+
+Additional fun with negative values, optionally followed by comma-separated list of parameter names:
+-1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
+
+=item B<numform>, B<N> (scalar)
+
+	''
+
+format to use for numbers (semicolon-separated list for per-column formats) as sprintf wants it (p.ex. %0.4f) - use this for rounding...
+
+=item B<placement>, B<p> (scalar)
+
+	''
+
+special wishes for placement (the h in \begin{table}[h])
+
+=item B<strict>, B<S> (scalar)
+
+	1
+
+use strict syntax
+
+=item B<text>, B<T> (scalar)
+
+	1
+
+allow text to occur in data fields
+
+=item B<version> (scalar)
+
+	0
+
+print out the program version
+
+=back
+
+=head1 AUTHOR
+
+Thomas Orgis <thomas@orgis.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2005-2013 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+
+=cut

@@ -1,0 +1,24 @@
+Changes
+lib/Text/ProgressBar.pm
+lib/Text/ProgressBar/Widget.pm
+lib/Text/ProgressBar/FileTransferSpeed.pm
+lib/Text/ProgressBar/Timer.pm
+lib/Text/ProgressBar/ETA.pm
+lib/Text/ProgressBar/Counter.pm
+lib/Text/ProgressBar/BouncingBar.pm
+lib/Text/ProgressBar/Percentage.pm
+lib/Text/ProgressBar/AnimatedMarker.pm
+lib/Text/ProgressBar/WidgetHFill.pm
+lib/Text/ProgressBar/ReverseBar.pm
+lib/Text/ProgressBar/Bar.pm
+lib/Text/ProgressBar/FormatLabel.pm
+lib/Text/ProgressBar/SimpleProgress.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

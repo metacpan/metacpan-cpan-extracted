@@ -1,0 +1,117 @@
+=head1 NAME
+
+     Tk::SlideShow - a Perl Module for building presentation.
+
+=head1 DESCRIPTION
+
+	This module is for building presentation, that will be as
+interactive or good looking as Applix or PowerPoint one. The way of
+using it is complety different on the other hand.
+
+=head1 INSTALL
+
+CPAN Perl standard way of intalling :
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Warning there is a test on font availability that 
+takes a lot of time depending on how many font families you
+have installed on your X11 distribution.
+
+On my P90 linux box it takes about 6 minutes and block my X11 server
+during that time. Actually, I got all freefont and sharefont set.
+
+
+=head1 DOCUMENTATION
+
+There's a pod file C<SlideShow.pod> that is a tutorial as well as a
+reference to this module.
+
+There's also a not yet finished presentation of C<Tk::SlideShow> using
+itself.
+
+=head1 EXAMPLE
+
+You will find examples of scripts using this modules in directories
+ex1, ex2, ...
+
+=head1 CHANGE
+
+=head2 since 0.03
+
+=item parallel shift
+
+add the ability to "shift" several sprites together
+
+=item bugs 
+
+fix some
+
+=item update documentation 
+
+but not yet complete. Ask me for some more explaination if needed.
+
+
+=head2 since 0.02
+
+=over 2
+
+=item html
+
+Add a way to attach html doc to a slide so that you can produce an
+html version of your presentation. Up to now, it use xwd to snapshot
+the presentation. It use imagemagick convert to produce png image
+format file of snapshots. Depends on you browers, but you may have pb
+to visualize png snapshots. 
+
+=item ticker tape
+
+Add a ticker tape Sprite. It is done to attract attention of attendees.
+
+=back
+
+=head2 since 0.01
+
+=over 2
+
+=item Choosers
+
+added a font chooser, a color chooser.  
+
+=item Multipos-sition I<Sprite> 
+
+added a way of defining a path for a B<Sprite> to follow on a slide.
+
+=item Documentation
+
+added a way for producing documentation out of slides. (method
+C<latex>)
+
+=back
+
+=head1 AUTHOR
+
+Olivier Bouteille (bouteille@dial.oleane.com)
+
+=head1 PREREQUISITE
+
+You need to have X11::Protocol and Tk800.012 modules already install,
+
+You need to use X11 (and of course Unix).
+
+You need to already know Perl5.4 and Tk
+
+=head1 MISCELANEOUS
+
+Alpha stage release. API may change.
+
+=cut
+
+
+
+
+
+

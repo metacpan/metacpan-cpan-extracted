@@ -1,0 +1,7 @@
+=== uid test
+--- wiki
+&test(hoge){hoge}
+&test(hoge){hoge}
+--- html
+<TEST-1>hoge</TEST-1>
+<TEST-4>hoge</TEST-4>

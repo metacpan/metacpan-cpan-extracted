@@ -1,0 +1,198 @@
+-*- outline -*-  (this mark tells Emacs to use '*' heading levels)
+
+
+* Comments on the class diagrams
+Diagram is in early stages so
+
+ - there are probably better ways to carve it up
+
+ - there are bugs in it, take it as an overview
+
+Please let me know if it's helpful -- mca1001
+
+
+I've coloured parts of the full diagram, to try to show where to
+start.  And starting may be all you need.
+
+** Classes to interact with directly (yellow)
+These classes have fairly thorough POD and are intended as the main
+interfaces for "the user".
+
+Test::Unit::Procedural is all you need for simple work, but reduces
+flexibility.  You don't need it at all for the explicit object
+oriented approach.
+
+Test::Unit::TestCase is what you inherit you tests from, if you take
+the explicit OO approach.
+
+Test::Unit::TestSuite can be used to put your TestCases together in
+groups or trees, and make it easier to manage more complex OO test
+systems.
+
+** Test runners (green)
+One of these will be used to manage the running of your test suite.
+They all do basically the same thing, but their outputs are different:
+interactive GUI, terminal and Test::Harness linkage.
+
+Generally, an instance will be made for you by whatever script you use
+to kick off the test run, e.g. TestRunner.pl or TkTestRunner.pl
+
+** Things you'll probably see (red)
+If something die()s during your test - any sort of error - this is
+caught and wrapped as a Test::Unit::Error object.
+
+When a test assertion fails, an instance of Test::Unit::Failure is
+created and "thrown".
+
+These objects then percolate into the depths of the mechanism, to be
+collected and reported later.  I'm being vague, to spare you the
+details.
+
+Test::Unit::Assert isn't for use explicitly in your code, but the
+manpage contains a handy breakdown of the various assert methods you
+can use.
+
+
+* Construction of class diagram
+** Generate the bulk of the diagram
+I fired up "autodia" aka. "autodial" with
+
+  cd $PROJDIR
+  autodia.pl -d lib/ -rC
+  dia-gnome autodia.out.xml &
+
+Then I started moving boxes around.  Don't worry, they are joined
+together!  It helps to set the "autoroute" property on the
+connectors...  use the "group properties..." dialog?  I didn't get as
+far as hacking the template to fix this.
+
+...shuffle boxes until they're close to the relevant thing and you
+have a big tangle of class usage.  Time to simplify.  Probably easier
+if you crib my layout.
+
+[later] It doesn't list inheritance outside the codebase...?  Or just
+not for "use base".  And not for Test::Unit::TestSuite,
+Test::Unit::Warning...  argh.
+
+** Remove stuff that isn't helping
+There are dependencies in there which don't need to be graphed.
+
+List of class/what uses it, plus rough notes:
+
+  base
+	used by many classes
+
+  Config
+		Test::Unit::UnitHarness
+
+  Error
+	base class for Test::Unit::Exception, so left on the diagram
+	also used by
+		Test::Unit::Procedural
+		Test::Unit::Assertion::Exception
+		Test::Unit::Assert
+		Test::Unit::Result
+		Test::Unit::TestCase
+
+  File::Basename
+		Test::Unit::TkTestRunner
+
+  Tk, Tk::BrowseEntry
+		Test::Unit::TkTestRunner
+
+
+  Tk::ROText	Tk::ArrayBar		(?) should be TkTestRunner
+  Tk::DialogBox	Tk::ArrayBar		(?)
+  Tk::Derived	Tk::ArrayBar
+  Tk::Canvas	Tk::ArrayBar
+
+  Devel::Symdump
+>	what's this all about, then?
+		Test::Unit::Procedural
+		Test::Unit::TestCase
+
+  Filehandle
+		Test::Unit::Loader
+		Test::Unit::UnitHarness
+
+  Benchmark
+>	candidate for moving to Test::Unit::Runner
+		Test::Unit::TestRunner
+		Test::Unit::TkTestRunner
+
+  Exporter
+>	(list incomplete)
+>	may be useful to know...
+		Test::Unit::Debug
+		Test::Unit::Procedural
+		Test::Unit::UnitHarness
+
+
+  Class::Inner
+>	was split off this project at some point?
+		Test::Unit::Procedural
+		Test::Unit::UnitHarness
+		Test::Unit::TestCase
+
+  Tk:ArrayBar -> is part of Test::Unit::TkTestRunner, interesting in its own right, but not relevant here
+
+
+  Test::Unit::Debug
+	used by many things, but basically dull
+		Test::Unit::Assertion::CodeRef
+		Test::Unit::Assert
+		Test::Unit::Assertion::Exception
+		Test::Unit::TestSuite
+		Test::Unit::Result
+		Test::Unit::Test
+		Test::Unit::TestCase
+		Test::Unit::UnitHarness
+		Test::Unit::Loader
+
+  Test::Unit::Loader
+>	used by many things; headed towards "scary"
+>	looks like it should be used by the Runner instead?
+		Test::Unit::Listener
+		Test::Unit::TestSuite
+		Test::Unit::HarnessUnit
+		Test::Unit::TkTestRunner
+		Test::Unit::TestRunner
+	uses
+		Test::Unit::UnitHarness
+		Test::Unit::TestSuite
+
+  Test::Unit::Warning
+	mundane helper class
+		Test::Unit::TestSuite
+		Test::Unit::Loader
+
+  Test::Unit::Tutorial
+	contains no code
+
+  Test::Unit
+	contains only constants
+		Test::Unit::TestRunner
+		Test::Unit::TkTestRunner
+
+** TO DO
+
+Filter method & members: some detail is obsolete, should be hidden,
+takes up too much space.
+
+Ensure all classes are shown.
+
+Mark presence of/need for docs, level of detail, position on learning
+parabola.
+
+Um, I'm just about to add more stuff.  Doh.
+
+Check uses & inheritance lines are correct and significant.  How
+tedious.
+
+It would be nice to cover all the classes with at least some
+explanation of what they are and how they fit in, but there's no point
+duplicating POD material.  Maybe break out the relevant parts into
+another diagram that shows the examples too?
+
+A similar diagram (sequence diagram?) for how the tests are loaded,
+built into suites, run and reported.

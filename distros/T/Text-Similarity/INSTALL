@@ -1,0 +1,71 @@
+NAME
+    INSTALL - Installation instructions for Text::Similarity
+
+SYNOPSIS
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DESCRIPTION
+  Dependencies
+    None
+
+  Detailed Installation Instructions
+    If you have superuser (root) access, you should be able to install
+    Text::Similarity by following these simple steps:
+
+        perl Makefile.PL
+        make
+        make test  # optional, but recommended
+        su         # or sudo, as the case may be
+        make install
+
+    If you need to install this distribution in your local user account
+    because you lack superuser privileges, then the recommended method on
+    Unix-like systems (Linux, Solaris, Cygwin) is as follows:
+
+        perl Makefile.PL PREFIX=~/Text-Similarity LIB=~/MyPerlLib
+        make
+        make test
+        make install
+
+    This will install the executable scripts into ~/Text-Similarity/bin, the
+    man pages in ~/Text-Similarity/man, and the libraries into ~/MyPerlLib.
+
+    You will need to set your PERL5LIB variable to point to the LIB
+    directory.
+
+    In bash:
+
+        export PERL5LIB=~/MyPerlLib
+
+    In csh or tcsh:
+
+        setenv PERL5LIB ~/MyPerlLib
+
+    Add these lines to your .bashrc, .bash_profile, or .cshrc files as the
+    case may be.
+
+AUTHOR
+     Ted Pedersen, University of Minnesota, Duluth
+     tpederse at d.umn.edu
+
+    This document last modified by : $Id: INSTALL.pod,v 1.2 2015/10/08
+    12:50:10 tpederse Exp $
+
+SEE ALSO
+    <http://text-similarity.sourceforge.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2004-2008, Ted Pedersen
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

@@ -1,0 +1,56 @@
+
+  =================
+   Message Summary
+  =================
+
+Num  Sev      Id                         Message Text                    
+-------------------------------------------------------------------------
+  4 Info DATABASE-105 The database was successfully written.             
+                      The database is now saved to the file.             
+  1 Info GLO-32       Deleting instances not driving any primary         
+                      outputs.                                           
+                      Optimizations such as constant propagation or      
+                      redundancy removal could change the connections    
+                      so an instance does not drive any primary outputs  
+                      anymore. To see the list of deleted instances,     
+                      set the 'information_level' attribute to 2 or      
+                      above.                                             
+  1 Info LBR-415      Library Information.                               
+                      The number of unusable cells that is listed        
+                      depends on the setting of the 'information_level'  
+                      root attribute. If set to a value less than 6,     
+                      the list is limited to 10 unusable cells. If set   
+                      to a value equal to or higher than 6, all          
+                      unusable cells are listed.                         
+  2 Info MM_FE-53     File has been generated.                           
+ 18 Info PHYS-90      Generating design database.                        
+                      The database contains all the files required to    
+                      restore the design in the specified application.   
+  1 Info POPT-51      Could not declone clock-gating instances.          
+                      The design should have 2 or more clock-gating      
+                      instances for decloning.                           
+  4 Info ST-110       Connection established with super-threading        
+                      server.                                            
+                      RC is entering super-threading mode and has        
+                      established a connection with a CPU server         
+                      process.  This is enabled by the root attributes   
+                      'super_thread_servers' or 'auto_super_thread'.     
+  4 Info ST-112       A super-threading server has been shut down        
+                      normally.                                          
+                      A super-threaded optimization is complete and a    
+                      CPU server was successfully shut down.             
+  4 Info ST-120       Launching a super-threading server.                
+                      RC is entering super-threading mode and is         
+                      launching a CPU server process.  This is enabled   
+                      by the root attribute 'super_thread_servers' or    
+                      'auto_super_thread'.                               
+  1 Info TIM-167      An external clock is being defined.                
+                      An external clock does not directly drive any      
+                      points within the design, but is only used as a    
+                      reference for external delays.                     
+  2 Info WDO-600      'Conformal LEC11.1-p100' or later builds is        
+                      recommended for verification.                      
+                      The use of 'Conformal LEC11.1-p100' or later       
+                      builds is recommended to get better verification   
+                      results.                                           
+

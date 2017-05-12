@@ -1,0 +1,34 @@
+---
+abstract: 'Pooled intelligence sharing of realtime hostile internet hosts'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Spec: 0.82
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+module_name: ThreatNet
+name: ThreatNet
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Inspector: 1.06
+  Config::Tiny: 2.00
+  Fcntl: 0
+  File::Basename: 0
+  Getopt::Long: 0
+  Net::IP: 0
+  Net::IP::Match::XS: 0.03
+  POE: 0
+  POE::Component::IRC: 0
+  POE::Component::IRC::Plugin::Connector: 0
+  POE::Wheel::FollowTail: 0
+  Params::Util: 0.05
+  perl: 5.005
+version: 0.20

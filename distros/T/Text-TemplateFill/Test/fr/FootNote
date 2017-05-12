@@ -1,0 +1,56 @@
+${#} This file will be put at the end of Purchase Order Notes that are sent to stores.
+${#} SCCS: @(#)FootNote 1.1 03/27/03 09:12:25
+${#}
+${#}
+${#} If needed a new page will be thrown before this starts
+${#}
+${#} Set that this is a page footer paragraph - ie don't need a footer below it:
+${Opt EndPage }
+${Opt BlanksAfter }
+${#}
+${#} The point about this is that we may throw a page break before this
+${Calc UnreportedPageTotal := $PageTotal - $PageTotalLastPage }
+${#}
+
+ PAGE TOTALS:     ${ItemPO.ParaOnPage%4d}                                           ${UnreportedPageTotal%5d}
+GRAND TOTALS:     ${ItemPO.ParaTotal%4d}                                           ${total_items%5d}
+
+    RECORD DES                                              Ordre #: ${purchase_order_no}
+    ANOMALIES                                         Fournisseur #: ${vendor_number%10.10d}
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+                           Quantitee    Quantitee                           Quantitee    Quantitee
+       SKU / BARCODE       Commandee    Recu            SKU / BARCODE       Commandee    Recu
+     _________________     ________     ________      _________________     ________     ________
+    |                 |   |        |   |        |    |                 |   |        |   |        |
+    |_________________|   |________|   |________|    |_________________|   |________|   |________|
+    |                 |   |        |   |        |    |                 |   |        |   |        |
+    |_________________|   |________|   |________|    |_________________|   |________|   |________|
+    |                 |   |        |   |        |    |                 |   |        |   |        |
+    |_________________|   |________|   |________|    |_________________|   |________|   |________|
+    |                 |   |        |   |        |    |                 |   |        |   |        |
+    |_________________|   |________|   |________|    |_________________|   |________|   |________|
+    |                 |   |        |   |        |    |                 |   |        |   |        |
+    |_________________|   |________|   |________|    |_________________|   |________|   |________|
+    |                 |   |        |   |        |    |                 |   |        |   |        |
+    |_________________|   |________|   |________|    |_________________|   |________|   |________|
+    |                 |   |        |   |        |    |                 |   |        |   |        |
+    |_________________|   |________|   |________|    |_________________|   |________|   |________|
+    |                 |   |        |   |        |    |                 |   |        |   |        |
+    |_________________|   |________|   |________|    |_________________|   |________|   |________|
+
+                                        ________
+    Marker si PAS de ANOMALIES Touvee  |        |
+    dans cet ordre                     |________|
+
+
+    Livraison contrôle par   __________________________  SIGN  ___________________________
+
+
+    DOUBLE contrôle par      __________________________  SIGN  ___________________________
+
+
+    Date                     __________________________
+
+
+${#} END 

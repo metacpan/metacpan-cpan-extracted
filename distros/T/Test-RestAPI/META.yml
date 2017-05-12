@@ -1,0 +1,52 @@
+---
+abstract: 'Real mock of REST API'
+author:
+  - 'Jan Seidl <seidl@avast.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-RestAPI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::RestAPI:
+    file: lib/Test/RestAPI.pm
+    version: v0.1.6
+  Test::RestAPI::Endpoint:
+    file: lib/Test/RestAPI/Endpoint.pm
+  Test::RestAPI::MojoGenerator:
+    file: lib/Test/RestAPI/MojoGenerator.pm
+requires:
+  Mojolicious: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  Port::Selector: '0'
+  Type::Tiny: '0'
+  parent: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/JaSei/Test-RestAPI/issues
+  homepage: https://github.com/JaSei/Test-RestAPI
+  repository: git://github.com/JaSei/Test-RestAPI.git
+version: 0.1.6
+x_authority: cpan:JASEI
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Jan Seidl <janseidl@volny.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

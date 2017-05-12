@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Template;
+use Data::Page;
+
+my %version = (
+	'2' => ['2.1.0', '2.1.1', '2.2.0', '2.3.0', '2.3.2'],
+	'3' => ['3.0.0', '3.3.0'],
+);
+
+my $template_string = <<"EOTEMPLATE";
+[%- USE Bootstrap.Pagination -%]
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Bootstrap [% major %], [% minor %]</title>
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/[% minor %]/css/bootstrap.min.css" type="text/css" />
+	</head>
+	<body>
+		<div class="container">
+			[%- Bootstrap.Pagination.pagination(version = major, pager = pager, uri = uri) -%]
+			[%- Bootstrap.Pagination.pagination(version = major, pager = pager, uri = uri, centered => 1) -%]
+			[%- Bootstrap.Pagination.pagination(version = major, pager = pager, uri = uri, right => 1) -%]
+
+			[%- Bootstrap.Pagination.pagination(version = major, pager = pager, uri = uri, centered => 1, size = 'large') -%]
+			[%- Bootstrap.Pagination.pagination(version = major, pager = pager, uri = uri, centered => 1, size = 'small') -%]
+			[%- Bootstrap.Pagination.pagination(version = major, pager = pager, uri = uri, centered => 1, size = 'mini') -%]
+
+			[%- Bootstrap.Pagination.pager(version = major, pager = pager, uri = uri) -%]
+			[%- Bootstrap.Pagination.pager(version = major, pager = pager, uri = uri, align = 1) -%]
+		</div>
+	</body>
+</html>
+EOTEMPLATE
+
+my $pager = Data::Page->new(42, 5, 2);
+my $uri = 'http://www.example.com/blog/__PAGE__.html';
+
+for my $major (keys %version) {
+	for my $minor (@{$version{$major}}) {
+		my $template = Template->new(STRICT => 1);
+		my $output;
+
+		my $pagination_result = $template->process(\$template_string, {
+			pager   => $pager,
+			uri     => $uri,
+			major   => $major,
+			minor   => $minor,
+		}, 'bootstrap-'.$minor.'.html') or die $template->error();
+	}
+}

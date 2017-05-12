@@ -1,0 +1,27 @@
+---
+name: Test-XML-Deep
+version: 0.07
+author:
+  - 'Jeff Lavallee <jeff@zeroclue.com>'
+abstract: XML::Simple + Test::Deep = Test::XML::Deep
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-XML-Deep
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jlavallee/test-xml-deep/tree/master
+requires:
+  Test::Deep: 0.104
+  XML::Parser: 2.36
+  XML::Simple: 2.18
+  perl: 5.006
+build_requires:
+  Test::NoWarnings: 0
+  Test::Simple: 0.86
+provides:
+  Test::XML::Deep:
+    file: lib/Test/XML/Deep.pm
+    version: 0.07
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

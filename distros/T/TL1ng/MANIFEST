@@ -1,0 +1,17 @@
+Changes
+lib/TL1ng.pm
+lib/TL1ng/Base.pm
+lib/TL1ng/Generic.pm
+lib/TL1ng/Parser.pm
+lib/TL1ng/Source.pm
+lib/TL1ng/Source/Telnet.pm
+Makefile.PL
+MANIFEST
+README
+t/parse_string
+t/simulate_tl1_server.pl
+t/simulator_data/datetime_bug.txt
+t/simulator_data/sample_events.txt
+t/test_simple_auto.pl
+t/TL1ng.t
+META.yml                                 Module meta-data (added by MakeMaker)

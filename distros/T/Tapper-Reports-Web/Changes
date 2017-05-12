@@ -1,0 +1,209 @@
+Revision history for Tapper-Reports-Web
+
+5.0.13    2017-03-07
+        - fix sloppy grouping now needed for stricter MySQL 5.7
+        - deactivate super-slow size info in reports
+        - testrun control: pause/continue/cancel
+
+5.0.12    2016-09-23
+        - report list - fix rounding bugs in success ratio bar length
+
+5.0.11    2016-08-24
+        - report details - failures with machine name
+        - testrun list now based on 'updated at'
+
+5.0.10    2016-04-07
+        - rt#113510 - require higher version of DateTime::Format::Strptime
+          [Kudos to Andreas König]
+
+5.0.9     2016-03-31
+        - some test diagnostics to investigate cpantesters fails
+
+5.0.8     2016-03-30
+        - more explicit deps
+
+5.0.7     2016-03-22
+        - reportlist: fix successgrade column with MySQL backend
+
+5.0.6     2016-03-03
+        - bugfixes and polishing around charts
+
+5.0.5     2016-02-29
+        - edit/resurrect older chart versions as new version
+        - avoid repetition of duplicate test execution context
+        - replace MySQL-specific parts
+        - replace Tapper::Benchmark with BenchmarkAnything
+        - fix minor HTML/CSS glitches
+
+5.0.4     2016-02-18
+        - fix other fields in report list due to missing r. prefix
+
+5.0.3     2016-02-17
+        - fix 'successgrade' in report list
+
+5.0.2     2016-02-16
+        - fix tests
+
+5.0.1     2016-02-15
+        - fix smart match usage
+	- let EU::MM decide about Perl binary paths
+	- no experimental keys on hashref
+
+5.0.0     2016-02-15
+        - big performance scale-up refactoring
+          * use raw sql statements
+          * rework report list
+          * more CSS instead of tables and images
+        - use PSGI
+        - use Starman
+        - continuous testing control page
+        - replaced "metareports" with a new benchmark chart subsystem:
+          * frontend to the Tapper::Benchmark backend store
+          * snapshots datasets into short URLs
+          * organize them with tags
+          * versioned chart configuration
+          * chart legend
+          * mark areas
+          * backlinks from data points to configurable URL
+        - date pager for report list and testrun list
+        - filter refactoring
+        - use quite a bit more Javascript for usability
+          * use jQuery
+        - merge TestrunDB/ReportsDB
+        - update/edit preconditions in Web UI
+        - polishing and tweaks:
+          * different color for TAP parse errors
+          * show preconditions consisting of multiple entries
+          * show motd-like headers (like "under maintenance")
+
+4.1.2     2012-11-20
+        - fix missing deps
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        * PostgreSQL support
+        - [FIX] slow first() usage
+        - take care of nonexistent values
+        - rename USER into OWNER
+
+        * Adapt to upstream upgrades (Catalyst, Perl 5.16, ...)
+        - adapt ShareDir handling for static files, config, view, etc.
+        - catapult BindLex into outer space
+        - get rid of NEXT
+        - fix script/ -> bin/
+        - no "uninitialized value" warnings in templates
+        - migrate view to Catalyst::View::HTML::Mason
+        - more concise config
+
+        * Misc
+        - [FEAT] overviews with filters now
+        - [FEAT] delete testplan
+        - [FEAT] testplan rerun
+        - [FIX] stash variables
+        - [FIX] uninitialized warnings
+        - [FIX] circular dependency error
+        - optional authentication
+        - declare Authentication deps as optional
+        - Add hostname filter
+        - Remove some Javascript, eg. for confirmations
+        - disable excessive Catalyst debug output
+        - Unify navi generation
+        - resort top navi items
+
+4.0.4     2012-06-07
+        - and more deps
+          ("Mühsam ernährt sich das Eichhörnchen")
+
+4.0.3     2012-06-05
+        - more explicit Catalyst plugin deps
+
+4.0.2     2012-06-04
+        - explicit deps
+
+4.0.1     2012-05-16
+        - *lots* of rework, bugfixes, and optical junkfood
+        - new testplan view
+        - allow multiple URLs in report meta info
+        - added login/logout functionality
+        - PAM authentication as optional dependency
+        - timezone GMT everywhere
+        - show actual scheduling status
+        - show status "unfinished" near report_ids
+        - RSS feeds: cleanup + fixes
+        - more details searched from reports
+        - more configurable elements to better personalize webgui
+        - more concise issue summary, covering all reports of group
+        - verbose but more lax error handling
+        - show moreinfo-url
+        - URLs of attachments contain hint to context
+        - allow add/delete of filters (reports, testruns, testplans)
+        - suite overview URLs can use names
+        - ansi2txt/ansi2html rework
+        - CSS now with UNIX line endings
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* rewritable shebang line
+	* showing tap now handles TAP archives
+	* update bundled manual HTML/PDF
+	* distro maintenance
+	* release version++ roundhouse kick
+
+2011-03-25 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.6
+
+	* fix yet another forgotten dependency
+	* update bundled manual
+
+2011-03-24 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.5
+
+	* [FIX] use timeouts from existing usecase files
+	* Adapt kernelbuild use case to autotest
+	* dependencies++
+	* [FIX] do not break layout when removing surplus whitespace
+	* [FIX] make console shorter by removing multiple whitespace
+	* [FIX] filter suite by name
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.2
+
+	* Testplan support rework
+	  - Overview of all testplans
+	  - Add shortname to testplan overview
+	  - template for testplan overview
+	  - Changed link from osrc to TaskJuggler
+	  - Show testplan instances by id
+	  - link to first report if no primary report yet
+	  - filter can now reject forbidden filters
+	  - [RFK] move prepare_testrunlist to util
+	  - [TEST] added scheduling info to fixtures
+	  - [TEST] added reportsdb fixtures
+	  - [TEST] testrun util package
+
+	* Several bugfixes 
+	  - "order_by" statements
+	  - try to force YAML versions
+	  - dependencies++
+	  - Make sure testrun has a scheduling before accessing it
+	  - Make sure host exists before accessing its name
+	
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

@@ -1,0 +1,27 @@
+Revision history for Perl extension Test::Environment.
+
+0.07  Sat, 27 Sep 2015 19:22:31 +0100
+   - added populate_env(), notes(), protocol() and rflush() to Apache2::RequestRec
+
+0.06  Sat, 20 Nov 2010 18:50:14 +0100
+   - Apache2::RequestRec method() added
+   - convert hashes to APR::Table in Apache2::RequestRec new()
+   - added Apache2::Request mock
+
+0.05  Fri Feb 19 2010
+   - removed debian/ folder
+
+0.04  Thu Jun 17 06:52:41 2008
+   - Apache2 plugin added
+
+0.03  Tue Feb 12 09:47:00 2008
+   - fixed env unsetting only when needed
+   - parsing of dbi_dsn
+
+0.02  Tue Feb 12 07:44:00 2008
+   - change dir fix
+   - propper setting and unsetting postgres env variables
+
+0.01  Fri Oct 12 17:31:21 2007
+   - initial version
+

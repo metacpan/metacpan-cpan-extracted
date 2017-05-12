@@ -1,0 +1,3 @@
+
+do('./examples/notes.t');
+

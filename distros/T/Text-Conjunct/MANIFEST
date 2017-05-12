@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-Conjunct.t
+lib/Text/Conjunct.pm
+META.yml                                 Module meta-data (added by MakeMaker)

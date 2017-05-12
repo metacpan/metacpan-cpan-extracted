@@ -1,0 +1,42 @@
+Revision history for Test-Pod-Snippets
+
+0.07 2012-09-09
+ - Change Object::InsideOut for Moose.
+ - Move release maintenance to Dist::Zilla
+
+ [STATISTICS]
+ - code churn: 14 files changed, 458 insertions(+), 555 deletions(-)
+
+0.06 2008-08-05
+ - Add Params::Validate as a dependency.
+ - Add preserve_lines option.
+
+0.05 2008-08-05
+ - Indexer not happy with 0.04.01. :-(
+
+0.04 2008-08-04T18:25:39Z
+ - Added Module::Locate dependency.
+ - Changed the API quite a bit.
+ - Added possibility to use Test::Group.
+ - pod2snippets renamed to podsnippets.
+
+0.03_03 Wed Jul 25, 2007
+ - Added Object::InsideOut dependency.
+
+0.03_02 Tue Jul 24, 2007
+ - Fixed bug with new() munging.
+
+0.03_01 Tue Jul 24, 2007
+ - Added the possibility to extract function and method definitions.
+ - Lots of hacking and cleaning and experimenting.
+
+0.02 Sun Jan 28, 2007
+ - Added mention of Test::Inline in the pod
+ - Added Test::Signature test
+
+0.01 Wed Aug 23, 2006
+ - First version, released on an unsuspecting world.
+
+0.04.01 2008-08-05
+ - removed leftover debugging statement in runtest().
+

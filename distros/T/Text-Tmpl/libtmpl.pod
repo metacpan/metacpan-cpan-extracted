@@ -1,0 +1,252 @@
+=head1 NAME
+
+libtmpl - Templating system C library
+
+=head1 SYNOPSIS
+
+B<#include "template.h">
+
+context_p
+B<template_init>(void)
+
+int
+B<template_set_delimiters>(context_p ctx,
+   char *opentag, char *closetag)
+
+int
+B<template_register_simple>(context_p ctx, char *name,
+   void (*function)(context_p, char **, int, char**))
+
+int
+B<template_register_pair>(context_p ctx,
+   char named_context, char *open_name, char *close_name,
+   void (*function)(context_p, int, char**))
+
+int
+B<template_alias_simple>(context_p ctx, char *old_name,
+   char *new_name)
+
+int
+B<template_alias_pair>(context_p ctx,
+   char *old_open_name, char *old_close_name,
+   char *new_open_name, char *new_close_name)
+
+void
+B<template_remove_simple>(context_p ctx, char *name)
+
+void
+B<template_remove_pair>(context_p ctx, char *open_name)
+
+int
+B<template_set_value>(context_p ctx, char *name,
+   char *value)
+
+void
+B<template_set_debug>(context_p ctx, int debug)
+
+void
+B<template_set_strip>(context_p ctx, int strip)
+
+int
+B<template_set_dir>(context_p ctx, char *directory)
+
+void
+B<template_destroy>(context_p ctx)
+
+context_p
+B<template_loop_iteration>(context_p ctx,
+   char *loop_name)
+
+context_p
+B<template_fetch_loop_iteration>(context_p ctx,
+   char *loop_name, int iteration)
+
+int
+B<template_parse_file>(context_p ctx,
+   char *template_filename, char **output)
+
+int
+B<template_parse_string>(context_p ctx, char *template,
+   char **output)
+
+extern int B<template_errno>
+
+char *
+B<template_strerror>(void)
+
+=head1 DESCRIPTION
+
+=head2 Design goals
+
+simplicity, reusability, speed, complete separation of logic from
+formatting.
+
+=head2 Feature set
+
+variables, loops, conditionals, extensibility of tags, includes,
+arbitrary delimiters.
+
+=head2 Usage
+
+For starters, make sure you #include "template.h" and link against libtmpl.a.
+
+Each function is described below:
+
+=over 3
+
+=item B<template_init>
+
+This function initializes the library.  It allocates and returns the "global"
+context structure, and also configures all of the default tag behavior.
+
+template_init() can fail with TMPL_EMALLOC.
+
+=item B<template_set_delimiters>
+
+This function lets you change the delimiters marking the beginning and end
+of a tag (by default, these are "<!--#" and "-->" in the given context.
+
+template_set_delimiters() can fail with TMPL_ENULLARG.
+
+=item B<template_set_value>
+
+This function stores the name=value pair in the current context.
+
+template_set_value() can fail with TMPL_ENULLARG.
+
+=item B<template_set_debug>
+
+This function turns debugging output on or off.  Note that debugging output
+hasn't been written yet - this is just a placeholder.
+
+=item B<template_set_strip>
+
+This function enables or disables the newline stripping feature.  If enabled,
+the parser removes a single newline (if present) from after any tag.
+
+=item B<template_set_dir>
+
+This function sets the directory where templates will be sought, both by
+parse_file and by the include tag.  Search order is always current directory
+then this searched directory.
+
+This directory must contain all the necessary punctuation so that appending
+a filename to it produces a valid path (On unix systems, you have to include
+the trailing slash on the directory name).
+
+template_set_dir() can fail with TMPL_ENULLARG.
+
+=item B<template_loop_iteration>
+
+This function adds an iteration to the loop named loop_name, and returns
+a unique context for that loop iteration.
+
+template_loop_iteration() can fail with TMPL_ENULLARG or TMPL_EMALLOC.
+
+=item B<template_fetch_loop_iteration>
+
+This function retrieves and returns the context for iteration number
+iteration from the loop named loop_name.
+
+template_fetch_loop_iteration() can fail with TMPL_ENULLARG or TMPL_ENOCTX.
+
+=item B<template_parse_file>
+
+This function opens template_filename, and parses the contents of
+that file as a template, placing the output into *output.  It allocates
+all the memory for you, but it is up to the programmer to free *output!
+
+template_parse_file() can fail with TMPL_ENULLARG, TMPL_ENOTFOUND,
+TMPL_EFOPEN, TMPL_EMALLOC or TMPL_EPARSE.
+
+=item B<template_parse_string>
+
+This function parses template directly, in the same way that
+template_parse_file does.
+
+template_parse_string() can fail with TMPL_ENULLARG, TMPL_EMALLOC or
+TMPL_EPARSE.
+
+=item B<template_register_simple>
+
+This function registers a new simple tag named name, which when encountered
+will cause the parser to call function.  See template_extend(1) for the
+gory details.
+
+template_register_simple() can fail with TMPL_ENULLARG, TMPL_EMALLOC.
+
+=item B<template_register_pair>
+
+This function registers a new tag pair open_name/close_name, which when
+encountered will cause the parser to call function.  See template_extend
+for the gory details.
+
+template_register_pair() can fail with TMPL_ENULLARG, TMPL_EMALLOC.
+
+=item B<template_alias_simple>
+
+This function copies the definition of a simple tag, previously registered as
+old_name, to also be called by new_name.
+
+template_alias_simple() can fail with TMPL_ENULLARG, TMPL_EMALLOC.
+
+=item B<template_alias_pair>
+
+This function copies the definition of a tag pair, previously registered as
+old_open_name/old_close_name, to also be called by
+new_open_name/new_close_name.
+
+template_alias_pair() can fail with TMPL_ENULLARG, TMPL_EMALLOC.
+
+=item B<template_remove_simple>
+
+This function removes the simple tag name.
+
+template_remove_simple() can fail with TMPL_ENULLARG.
+
+=item B<template_remove_pair>
+
+This function removes the tag pair whose open tag is open_name.
+
+template_remove_pair() can fail with TMPL_ENULLARG.
+
+=item B<template_destroy>
+
+This function blows away all of the memory allocated within the given context.
+You should really *only* call this on the context returned by template_init,
+and only at the end of your code.
+
+=item B<template_errno>
+
+This is a global variable containing the error number of the last error -
+see the RETURN VALUES section below.
+
+=item B<template_strerror>
+
+This function returns a string describing the last error - see the RETURN
+VALUES section below.
+
+=back
+
+=head1 RETURN VALUES
+
+All of the above functions which return int values will return 0 if they fail,
+or 1 otherwise.  The ones which return context_p pointers will return NULL if
+they fail, or a valid pointer otherwise.
+
+A function which fails will also set a global error number, which you can
+read or use template_strerror() to describe.
+
+=head1 BUGS
+
+Hopefully none.
+
+=head1 AUTHOR
+
+J. David Lowe, dlowe@saturn5.com
+
+=head1 SEE ALSO
+
+Text::Tmpl(1), template_syntax(1), template_extend(1)
+
+=cut

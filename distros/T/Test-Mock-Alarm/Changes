@@ -1,0 +1,14 @@
+Revision history for Test-Mock-Alarm
+
+0.13    2012-01-17
+        - added extra example to SUBROUTINES/METHODS
+        - fixed minor documentation errors
+        - updated info to reflect brian d foy's Module List text change
+        - added README and README.pod
+
+0.12    2012-01-12
+        - upload to CPAN
+        - add Makefile.PL
+
+0.10    2011-10-30
+        - Initial public release

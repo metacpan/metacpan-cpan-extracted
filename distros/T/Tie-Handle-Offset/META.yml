@@ -1,0 +1,40 @@
+---
+abstract: 'Tied handle that hides the beginning of a file'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Handle-Offset
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Tie::Handle::Offset:
+    file: lib/Tie/Handle/Offset.pm
+    version: 0.003
+  Tie::Handle::SkipHeader:
+    file: lib/Tie/Handle/SkipHeader.pm
+    version: 0.003
+requires:
+  Tie::Handle: 0
+  strict: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Handle-Offset
+  homepage: https://github.com/dagolden/tie-handle-offset
+  repository: https://github.com/dagolden/tie-handle-offset.git
+version: 0.003

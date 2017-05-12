@@ -1,0 +1,56 @@
+#================================================== -*- indented-text -*-
+#
+# TODO
+#
+# DESCRIPTION
+#   TODO list for the Template Latex plugin version 3.x, containing
+#   known bugs, limitations, planned enhancements, long term visions 
+#   and a few whacky ideas.
+#
+# AUTHOR
+#   Andrew Ford   <a.ford@ford-mason.co.uk>
+#
+#------------------------------------------------------------------------
+# $Id: TODO 83 2007-10-12 23:48:30Z ford $
+#========================================================================
+
+#------------------------------------------------------------------------
+# Miscellaneous
+#------------------------------------------------------------------------
+
+* check the mechanism whereby latex (or pdflatex) is re-run if the
+  document contains undefined references after the first run.  Bibtex
+  is re-run if undefined citations are reported by latex, and
+  makeindex is run if the driver detects a ".idx" file.  If bibtex or
+  makeindex are run then latex (or pdflatex) are run up to three more
+  times to allow forward references to stabilize.
+
+  This should all be coped with now but need to check on edge cases
+
+* look at how path variables could be specified to the filter
+  (TEXINPUTS, TEXINPUTS_latex, TEXINPUTS_pdflatex, BIBINPUTS, etc),
+  and how these should interact with the system paths.
+
+* get the filter working on Win32
+
+  how does one set environment variables with command.exe?
+
+* write unit tests for error conditions (invalid .bib file, etc)
+
+* provide a facility for specifying pre- and post-processors,
+  e.g. gnuplot, metapost, tpic or other graphics processors.  May need
+  to copy data files from the source location to the temporary
+  directory.
+
+* benchmark the filter
+
+  Note that the latex filter runs up to eight external programs, so it
+  isn't very fast.  But for modest documents the performance is
+  adequate, even for interactive applications.
+
+* expand the documentation
+
+* review the security implications of allowing templates to specify
+  program paths for latex, pdflatex and dvips.
+
+* add examples

@@ -1,0 +1,210 @@
+NAME
+    Test::Valgrind - Generate suppressions, analyse and test any command
+    with valgrind.
+
+VERSION
+    Version 1.19
+
+SYNOPSIS
+        # From the command-line
+        perl -MTest::Valgrind leaky.pl
+
+        # From the command-line, snippet style
+        perl -MTest::Valgrind -e 'leaky()'
+
+        # In a test file
+        use Test::More;
+        eval 'use Test::Valgrind';
+        plan skip_all => 'Test::Valgrind is required to test your distribution with valgrind' if $@;
+        leaky();
+
+        # In all the test files of a directory
+        prove --exec 'perl -Iblib/lib -Iblib/arch -MTest::Valgrind' t/*.t
+
+DESCRIPTION
+    This module is a front-end to the "Test::Valgrind::*" API that lets you
+    run Perl code through the "memcheck" tool of the "valgrind" memory
+    debugger, to test for memory errors and leaks. If they aren't available
+    yet, it will first generate suppressions for the current "perl"
+    interpreter and store them in the portable flavour of
+    ~/.perl/Test-Valgrind/suppressions/$VERSION. The actual run will then
+    take place, and tests will be passed or failed according to the result
+    of the analysis.
+
+    The complete API is much more versatile than this. By declaring an
+    appropriate Test::Valgrind::Command class, you can run any executable
+    (that is, not only Perl scripts) under valgrind, generate the
+    corresponding suppressions on-the-fly and convert the analysis result to
+    TAP output so that it can be incorporated into your project's testsuite.
+    If you're not interested in producing TAP, you can output the results in
+    whatever format you like (for example HTML pages) by defining your own
+    Test::Valgrind::Action class.
+
+    Due to the nature of perl's memory allocator, this module can't track
+    leaks of Perl objects. This includes non-mortalized scalars and memory
+    cycles. However, it can track leaks of chunks of memory allocated in XS
+    extensions with "Newx" and friends or "malloc". As such, it's
+    complementary to the other very good leak detectors listed in the "SEE
+    ALSO" section.
+
+METHODS
+  "analyse"
+        Test::Valgrind->analyse(%options);
+
+    Run a "valgrind" analysis configured by %options :
+
+    *   "command => $command"
+
+        The Test::Valgrind::Command object (or class name) to use.
+
+        Defaults to Test::Valgrind::Command::PerlScript.
+
+    *   "tool => $tool"
+
+        The Test::Valgrind::Tool object (or class name) to use.
+
+        Defaults to Test::Valgrind::Tool::memcheck.
+
+    *   "action => $action"
+
+        The Test::Valgrind::Action object (or class name) to use.
+
+        Defaults to Test::Valgrind::Action::Test.
+
+    *   "file => $file"
+
+        The file name of the script to analyse.
+
+        Ignored if you supply your own custom "command", but mandatory
+        otherwise.
+
+    *   "callers => $number"
+
+        Specify the maximum stack depth studied when valgrind encounters an
+        error. Raising this number improves granularity.
+
+        Ignored if you supply your own custom "tool", otherwise defaults to
+        24 (the maximum allowed by "valgrind").
+
+    *   "diag => $bool"
+
+        If true, print the output of the test script as diagnostics.
+
+        Ignored if you supply your own custom "action", otherwise defaults
+        to false.
+
+    *   "regen_def_supp => $bool"
+
+        If true, forcefully regenerate the default suppression file.
+
+        Defaults to false.
+
+    *   "no_def_supp => $bool"
+
+        If true, do not use the default suppression file.
+
+        Defaults to false.
+
+    *   "allow_no_supp => $bool"
+
+        If true, force running the analysis even if the suppression files do
+        not refer to any "perl"-related symbol.
+
+        Defaults to false.
+
+    *   "extra_supps => \@files"
+
+        Also use suppressions from @files besides "perl"'s.
+
+        Defaults to empty.
+
+  "import"
+        use Test::Valgrind %options;
+
+    In the parent process, "import" calls "analyse" with the arguments it
+    received itself - except that if no "file" option was supplied, it tries
+    to pick the first caller context that looks like a script. When the
+    analysis ends, it exits with the status returned by the action (for the
+    default TAP-generator action, it's the number of failed tests).
+
+    In the child process, it just "return"s so that the calling code is
+    actually run under "valgrind", albeit two side-effects :
+
+    *   Perl::Destruct::Level is loaded and the destruction level is set to
+        3.
+
+    *   Autoflush on "STDOUT" is turned on.
+
+VARIABLES
+  $dl_unload
+    When set to true, all dynamic extensions that were loaded during the
+    analysis will be unloaded at "END" time by "dl_unload_file" in
+    DynaLoader.
+
+    Since this obfuscates error stack traces, it's disabled by default.
+
+CAVEATS
+    Perl 5.8 is notorious for leaking like there's no tomorrow, so the
+    suppressions are very likely not to be complete on it. You also have a
+    better chance to get more accurate results if your perl is built with
+    debugging enabled. Using the latest "valgrind" available will also help.
+
+    This module is not really secure. It's definitely not taint safe. That
+    shouldn't be a problem for test files.
+
+    What your tests output to "STDOUT" and "STDERR" is eaten unless you pass
+    the "diag" option, in which case it will be reprinted as diagnostics.
+
+DEPENDENCIES
+    XML::Twig, File::HomeDir, Env::Sanctify, Perl::Destruct::Level.
+
+SEE ALSO
+    All the "Test::Valgrind::*" API, including Test::Valgrind::Command,
+    Test::Valgrind::Tool, Test::Valgrind::Action and
+    Test::Valgrind::Session.
+
+    The valgrind(1) man page.
+
+    Test::LeakTrace.
+
+    Devel::Leak, Devel::LeakTrace, Devel::LeakTrace::Fast.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-test-valgrind at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Valgrind>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::Valgrind
+
+ACKNOWLEDGEMENTS
+    Rafaël Garcia-Suarez, for writing and instructing me about the existence
+    of Perl::Destruct::Level (Elizabeth Mattijsen is a close second).
+
+    H.Merijn Brand, for daring to test this thing.
+
+    David Cantrell, for providing shell access to one of his smokers where
+    the tests were failing.
+
+    The Debian-perl team, for offering all the feedback they could regarding
+    the build issues they met.
+
+    All you people that showed interest in this module, which motivated me
+    into completely rewriting it.
+
+COPYRIGHT & LICENSE
+    Copyright 2008,2009,2010,2011,2013,2015,2016 Vincent Pit, all rights
+    reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,23 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  ExtUtils-MakeMaker-CPANfile-0.05
+    pathname: I/IS/ISHIGAKI/ExtUtils-MakeMaker-CPANfile-0.05.tar.gz
+    provides:
+      ExtUtils::MakeMaker::CPANfile 0.05
+    requirements:
+      Cwd 0
+      ExtUtils::MakeMaker 6.17
+      File::Path 0
+      Module::CPANfile 0
+      Test::More 0.88
+      version 0.76
+  Module-CPANfile-1.0002
+    pathname: M/MI/MIYAGAWA/Module-CPANfile-1.0002.tar.gz
+    provides:
+      Module::CPANfile 1.0002
+      Module::CPANfile::Environment undef
+      Module::CPANfile::Result undef
+    requirements:
+      CPAN::Meta 2.12091
+      CPAN::Meta::Prereqs 2.12091
+      ExtUtils::MakeMaker 6.30

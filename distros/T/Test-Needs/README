@@ -1,0 +1,83 @@
+NAME
+    Test::Needs - Skip tests when modules not available
+
+SYNOPSIS
+      # need one module
+      use Test::Needs 'Some::Module';
+
+      # need multiple modules
+      use Test::Needs 'Some::Module', 'Some::Other::Module';
+
+      # need a given version of a module
+      use Test::Needs {
+        'Some::Module' => '1.005',
+      };
+
+      # check later
+      use Test::Needs;
+      test_needs 'Some::Module';
+
+      # skips remainder of subtest
+      use Test::More;
+      use Test::Needs;
+      subtest 'my subtest' => sub {
+        test_needs 'Some::Module';
+        ...
+      };
+
+      # check perl version
+      use Test::Needs { perl => 5.020 };
+
+DESCRIPTION
+    Skip test scripts if modules are not available. The requested modules
+    will be loaded, and optionally have their versions checked. If the
+    module is missing, the test script will be skipped. Modules that are
+    found but fail to compile will exit with an error rather than skip.
+
+    If used in a subtest, the remainder of the subtest will be skipped.
+
+    Skipping will work even if some tests have already been run, or if a
+    plan has been declared.
+
+    Versions are checked via a "$module->VERSION($wanted_version)" call.
+    Versions must be provided in a format that will be accepted. No extra
+    processing is done on them.
+
+    If "perl" is used as a module, the version is checked against the
+    running perl version ($]). The version can be specified as a number,
+    dotted-decimal string, v-string, or version object.
+
+    If the "RELEASE_TESTING" environment variable is set, the tests will
+    fail rather than skip. Subtests will be aborted, but the test script
+    will continue running after that point.
+
+EXPORTS
+  test_needs
+    Has the same interface as when using Test::Needs in a "use".
+
+SEE ALSO
+    Test::Requires
+        A similar module, with some important differences. Test::Requires
+        will act as a "use" statement (despite its name), calling the import
+        sub. Under "RELEASE_TESTING", it will BAIL_OUT if a module fails to
+        load rather than using a normal test fail. It also doesn't
+        distinguish between missing modules and broken modules.
+
+    Test2::Require::Module
+        Part of the Test2 ecosystem. Only supports running as a "use"
+        command to skip an entire plan.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2016 the Test::Needs "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <http://dev.perl.org/licenses/>.
+

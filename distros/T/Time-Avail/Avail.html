@@ -1,0 +1,197 @@
+<HTML>
+<HEAD>
+<TITLE>Time::Avail - A Perl module to calculate time availability.</TITLE>
+<LINK REV="made" HREF="mailto:root@porky.redhat.com">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<UL>
+
+		<LI><A HREF="#EXAMPLES">EXAMPLES</A>
+	</UL>
+
+	<LI><A HREF="#VERSION">VERSION</A>
+	<LI><A HREF="#HISTORY">HISTORY</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#COPYRIGHT">COPYRIGHT</A>
+	<LI><A HREF="#DATE">DATE</A>
+	<LI><A HREF="#SOURCE">SOURCE</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+Time::Avail - A Perl module to calculate time availability.
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<CODE>use Time::Avail;</CODE>
+
+
+
+<P>
+<CODE>$minRemaining = timeAvailable( $timeStartStr, $timeEndStr, $dayMask );</CODE>
+
+
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+The <STRONG>timeAvailable</STRONG> function compares the time interval specified by
+<STRONG>timeStartStr</STRONG>, <STRONG>timeEndStr</STRONG>, and <STRONG>dayMask</STRONG> with the current day and time.
+<STRONG>timeAvailable</STRONG> returns <STRONG>0 </STRONG> if the current day and time do not fall within the specified time interval,
+otherwise the number of minutes remaining is returned.  <STRONG>timeStartStr</STRONG> and <STRONG>timeEndStr</STRONG> are string parameters that must adhere to a <STRONG>HH:MM 24 hour</STRONG> format, where <STRONG>HH</STRONG> represents a two digit hour value and <STRONG>MM</STRONG> represents a two digit minute value.  <STRONG>dayMask</STRONG> is a bitmask which specifies the valid days for the time interval.
+
+<P>
+The <STRONG>dayMask</STRONG> parameter is constructed by OR'ing together one or more of the following
+dayMask constants:
+
+<UL>
+<LI>
+<P>
+Time::Avail::DAY_MONDAY
+
+<LI>
+<P>
+Time::Avail::DAY_TUESDAY
+
+<LI>
+<P>
+Time::Avail::DAY_WEDNESDAY
+
+<LI>
+<P>
+Time::Avail::DAY_THURSDAY
+
+<LI>
+<P>
+Time::Avail::DAY_FRIDAY
+
+<LI>
+<P>
+Time::Avail::DAY_SATURDAY
+
+<LI>
+<P>
+Time::Avail::DAY_SUNDAY
+
+<LI>
+<P>
+Time::Avail::DAY_WEEKDAY
+
+<LI>
+<P>
+Time::Avail::DAY_WEEKEND
+
+<LI>
+<P>
+Time::Avail::DAY_EVERYDAY
+
+</UL>
+<P>
+<HR>
+<H2><A NAME="EXAMPLES">EXAMPLES</A></H2>
+<P>
+To calculate the time remaining given a starting time of 5am and an ending
+time of 5pm for Sunday and Monday, the call to <STRONG>timeAvailable</STRONG> can be coded as follows: 
+
+<P>
+<CODE>$minRemaining = timeAvailable( &quot;05:00&quot;, &quot;17:00&quot;, Time::Avail::DAY_SUNDAY | Time::Avail::DAY_MONDAY );</CODE>
+
+
+
+<P>
+To calculate the time remaining given a starting time of 10:30am and an
+ending time of 7:45pm for Saturday, Sunday, and Monday, the call to <STRONG>timeAvailable</STRONG>
+can be coded as follows: 
+
+<P>
+<CODE>$minRemaining = timeAvailable( &quot;10:30&quot;, &quot;19:45&quot;, Time::Avail::DAY_SATURDAY |  Time::Avail::DAY_SUNDAY |Time::Avail::DAY_MONDAY );</CODE>
+
+
+
+<P>
+or
+
+<P>
+<CODE>$minRemaining = timeAvailable( &quot;10:30&quot;, &quot;19:45&quot;, Time::Avail::DAY_WEEKEND | Time::Avail::DAY_MONDAY );</CODE>
+
+
+
+<P>
+To calculate the time remaining given a starting time of 7am and an ending
+time of 7pm for everyday but Saturday and Sunday, the call to <STRONG>timeAvailable</STRONG> can be coded as follows: 
+
+<P>
+<CODE>$minRemaining = timeAvailable( &quot;07:00&quot;, &quot;19:00&quot;, Time::Avail::DAY_WEEKDAY );</CODE>
+
+
+
+<P>
+To calculate the time remaining given a starting time of 10pm and an ending
+time of 2am for everyday, the call to <STRONG>timeAvailable</STRONG> can be coded as follows: 
+
+<P>
+<CODE>$minRemaining = timeAvailable( &quot;22:00&quot;, &quot;02:00&quot;, Time::Avail::DAY_EVERYDAY );</CODE>
+
+
+
+<P>
+<HR>
+<H1><A NAME="VERSION">VERSION</A></H1>
+<P>
+1.00
+
+<P>
+<HR>
+<H1><A NAME="HISTORY">HISTORY</A></H1>
+<P>
+<PRE>        Version 1.00
+        ------------
+                - Released.
+</PRE>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Peter Santoro <A HREF="mailto:peter@pscomp.com">peter@pscomp.com</A>
+
+<P>
+<HR>
+<H1><A NAME="COPYRIGHT">COPYRIGHT</A></H1>
+<P>
+Copyright (c) 1998 Peter Santoro. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself; however, you must leave this copyright statement intact.
+
+<P>
+<HR>
+<H1><A NAME="DATE">DATE</A></H1>
+<P>
+December 19, 1998
+
+<P>
+<HR>
+<H1><A NAME="SOURCE">SOURCE</A></H1>
+<P>
+This distribution can be also be found at the author's web site:
+
+<P>
+<PRE>        <A HREF="http://www.connix.com/~psantoro/">http://www.connix.com/~psantoro/</A>
+</PRE>
+</BODY>
+
+</HTML>

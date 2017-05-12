@@ -1,0 +1,80 @@
+{
+   "abstract" : "Thrift Transport allowing Kerberos auth/encryption through GSSAPI",
+   "author" : [
+      "David Morel <david.morel@amakuru.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "hadoop",
+      "thrift",
+      "sasl"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Thrift-SASL-Transport",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL::XS" : "0",
+            "Data::Dumper" : "0",
+            "Thrift" : "v0.10.0",
+            "Thrift::BinaryProtocol" : "0",
+            "constant" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perl-Hadoop/Thrift-SASL/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Perl-Hadoop/Thrift-SASL.git",
+         "web" : "https://github.com/Perl-Hadoop/Thrift-SASL"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "Burak Gursoy <burak@cpan.org>",
+      "David Morel <dmor@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.02"
+}
+

@@ -1,0 +1,22 @@
+---
+name: Test-Command
+version: 0.11
+author:
+  - 'Daniel B. Boorstein <danboo@cpan.org>'
+abstract: Test routines for external commands
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Command
+  homepage: https://metacpan.org/release/Test-Command
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/danboo/perl-test-command
+build_requires:
+  Test::Simple: 0.62
+provides:
+  Test::Command:
+    file: lib/Test/Command.pm
+    version: 0.11
+generated_by: Module::Build version 0.280802
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

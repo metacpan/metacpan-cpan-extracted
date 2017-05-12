@@ -1,0 +1,71 @@
+Teradata::SQL
+=============
+
+Teradata::SQL is a Perl interface to Teradata SQL. It does not attempt
+to be a complete interface to Teradata -- for instance, it does not
+allow asynchronous requests or PM/API connections -- but it should
+be sufficient for many applications.  The syntax is similar to that
+of DBI, but this is not a DBI module.  Both BTET and ANSI sessions
+are supported.
+
+A SIMPLE EXAMPLE
+
+   $dbh = Teradata::SQL::connect("dbc/bogart,bacall");
+   $sth = $dbh->open("select * from edw.sales");
+   while ( @row = $sth->fetchrow_list ) {
+      ... process the row ...
+   }
+   $sth->close;
+   $dbh->disconnect;
+
+INSTALLATION
+
+Ordinarily, you will need root access to install this or any Perl
+module.
+
+Before installing, define an environment variable named TDLOGON.
+This should be a user ID on the Teradata server that is able to
+select from DBC views. If you wish, you can also define one named
+TDDB that names a Teradata database in which you are able to create
+and drop tables. This will be used in "make test".
+
+   export TDLOGON=server/user,password
+   export TDDB=my_work_database    # Optional
+
+Then, run the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+   Perl version 5.6.0 or later
+   a C compiler
+   CLIv2
+
+The module has been tested on Solaris, MP-RAS, AIX, Linux (SLES and
+CentOS), Windows 2003 Server, and WinXP. The Windows support is
+incomplete; see WINNOTES.  Those who are able to test it on earlier
+versions of Perl or other platforms are welcome to collaborate.
+
+64-BIT SUPPORT
+
+Version 0.10 of the module includes changes intended to support 64-bit
+operating systems. Testing on 32-bit Linux was successful. On 64-bit
+Linux, most functions work, but parameterized requests (requests with
+"?" in the text of the prepared query) do not; they yielded CLI errors
+of 328 or 350. For now, the only workarounds are to avoid parameterized
+requests or to compile the module on a 32-bit system and transfer the
+binaries to a 64-bit system. Help from anyone for this issue will be
+gladly received.
+
+COPYRIGHT AND LICENSE
+
+This module is placed in the public domain. It can be freely copied and
+redistributed under the same terms as Perl itself.
+
+Copyright © 2005 Geoffrey Rommel

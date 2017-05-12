@@ -1,0 +1,66 @@
+Revision history for Perl extension Text::Wrap::Smart::XS.
+
+0.06  2011-09-12  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.05_01  2011-09-04  <schubiger@cpan.org>
+
+ - Refactor exact_wrap() and fuzzy_wrap().
+
+ - When wrapping text, preprocess it first by substituting
+   newlines with spaces.
+
+ - Validation of arguments is handled by Params::Validate.
+
+ - Use the boolean pragma for true/false values.
+
+ - Test with "Lorem Ipsum" as input text.
+
+ - Test handling of texts with LF, CR and CRLF as line endings.
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Remove the testing diagnostic.
+
+ - Mention that the wrapping length is used to calculate the
+   average one.
+
+ - Reword the abstract.
+
+ - Update broken license link.
+
+0.05 Thu May 22 10:13:30 CEST 2008
+
+ - Use less intendation in XS.xs.
+
+ - Merged development version to stable.
+
+0.04_01 Tue May 20 15:10:28 CEST 2008
+
+ - Avoid a memory leak when no more text is being processed.
+
+ - Reformatted the source code layout of XS.xs.
+
+0.04 Sun Feb 17 20:36:03 CET 2008
+
+ - Fixed the cpantester failures introduced by the greedy
+   wrapping mechanism.
+
+0.03 Fri Feb 15 23:38:20 CET 2008
+
+ - Allow for "greedy" wrapping (implemented in XS.xs).
+
+ - Add ExtUtils::CBuilder to the dependency list in Build.PL.
+
+0.02 Wed Feb  6 18:23:29 CET 2008
+
+ - Fixed installation for Module::Build users.
+
+ - Reformatted XS.xs.
+
+0.01 Wed Feb  6 15:25:44 CET 2008
+
+ - Initial version.

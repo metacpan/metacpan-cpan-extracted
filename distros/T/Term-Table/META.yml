@@ -1,0 +1,31 @@
+---
+abstract: 'Format a header and rows into a table'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::Tools::Tiny: '1.302072'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Table
+recommends:
+  Term::Size::Any: '0.002'
+  Unicode::GCString: '2013.10'
+  Unicode::LineBreak: '2015.06'
+requires:
+  Carp: '0'
+  Importer: '0.024'
+  List::Util: '0'
+  Scalar::Util: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/exodist/Term-Table/issues
+  repository: http://github.com/exodist/Term-Table/
+version: '0.008'
+x_serialization_backend: 'YAML::Tiny version 1.69'

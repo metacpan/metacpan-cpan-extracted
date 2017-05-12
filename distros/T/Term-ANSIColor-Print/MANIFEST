@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Term-ANSIColor-Print.t
+lib/Term/ANSIColor/Print.pm

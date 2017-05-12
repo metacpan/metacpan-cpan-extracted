@@ -1,0 +1,94 @@
+------------------------------------------------------------------------
+0.0504 | Piotr Roszatycki <dexter@cpan.org> | 2009-12-06
+
+Fixes:
+
+* The ":assert" tag imports also "ASSERT" constant.
+
+------------------------------------------------------------------------
+0.0503 | Piotr Roszatycki <dexter@cpan.org> | 2009-11-29
+
+Changes:
+
+* Uses Symbol::Util as exported.  All exported symbols can be removed with
+  "no Test::Assert" statement.
+
+* Minor refactoring of "assert_deep_equals" method and its pivate methods.
+
+* Requires Symbol::Util >= 0.0202 and constant::boolean >= 0.02.
+
+* Build requires Class::Inspector.
+
+------------------------------------------------------------------------
+0.0502 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-19
+
+Fixes:
+
+* Fixed error message for assert_deep_equals.
+
+------------------------------------------------------------------------
+0.0501 | Piotr Roszatycki <dexter@debian.org> | 2009-01-02
+
+Fixes:
+
+* Removed cyclic dependency on Exception::Died.
+
+------------------------------------------------------------------------
+0.05 | Piotr Roszatycki <dexter@debian.org> | 2009-01-01
+
+New:
+
+* New methods "assert_not_isa".
+
+Changes:
+
+* Safe "isa" method is used with eval which doesn't fail if $SIG{__DIE__} is
+  changed.
+* Requires constant::boolean.
+
+------------------------------------------------------------------------
+0.04 | Piotr Roszatycki <dexter@debian.org> | 2008-12-20
+
+New:
+
+* New export tag ':assert' exports all "assert_*" functions and "ASSERT"
+  constant.
+
+Changes:
+
+* Test::Assert::ASSERT replaces Test::Assert::DEBUG.
+* Exception::Assert replaces the "ignore_packages" attribute with own value.
+* Requires Exception::Base >= 0.21.
+
+------------------------------------------------------------------------
+0.03 | Piotr Roszatycki <dexter@debian.org> | 2008-12-10
+
+New:
+
+* Test::Assert::DEBUG is true if Test::Assert is used in main package.
+* DEBUG constant can be exported.
+
+  package My::Class;
+  use Test::Assert ':all', 'DEBUG';
+  assert_true( 0 ) if DEBUG;
+
+* New method "assert_isa".
+
+  my $obj = My::Class->new;
+  assert_isa( 'My::Class', $obj );
+
+* Build requires parent.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@debian.org> | 2008-12-05
+
+Changes:
+
+* Requires Exception::Base >= 0.20.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@debian.org> | 2008-10-13
+
+* Initial release.
+
+------------------------------------------------------------------------

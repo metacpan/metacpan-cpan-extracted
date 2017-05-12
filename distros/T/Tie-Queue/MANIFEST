@@ -1,0 +1,7 @@
+MANIFEST                   	This shipping list
+Makefile.PL                	Generic Makefile template
+lib/Tie/Queue.pm                Is a queue system using a TokyoTyrant DB
+README             	   	Read this first
+test.pl                   	Basic test script
+META.yml                   	Module meta-data (added by MakeMaker)
+CHANGELOG

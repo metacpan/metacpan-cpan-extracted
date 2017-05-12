@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Text/FakeXML.pm
+MANIFEST
+README
+t/00-load.t
+t/10-basic.t
+t/20-indent.t
+t/21-indent.t
+t/22-indent.t
+t/23-indent.t
+t/30-xml.t
+t/40-atts.t
+t/41-atts.t
+t/90-example.t
+Makefile.PL
+META.yml

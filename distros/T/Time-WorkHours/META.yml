@@ -1,0 +1,26 @@
+---
+name: Time-WorkHours
+version: 0.01
+author:
+  - 'Jozef Kutej <jozef@kutej.net>'
+abstract: proportional shift DateTime to a work hours and few work hours routines
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp::Clan: 0
+  Class::Accessor::Fast: 0
+  DateTime: 0
+build_requires:
+  Data::Dumper: 0
+  Test::LectroTest::Compat: 0
+  Test::LectroTest::Generator: 0
+  Test::More: 0
+provides:
+  Time::WorkHours:
+    file: lib/Time/WorkHours.pm
+    version: 0.01
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

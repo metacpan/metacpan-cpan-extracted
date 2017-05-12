@@ -1,0 +1,14 @@
+script/makefile
+license-injector.pl- 
+MAKEFILE$
+Makefile$
+META.yml$
+TODO
+inc/*
+t/save/*
+examples/LICENSE$
+blib/*
+.swp$
+.old$
+.bak$
+.tar.gz$

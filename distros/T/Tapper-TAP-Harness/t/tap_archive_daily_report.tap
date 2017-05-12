@@ -1,0 +1,104 @@
+# Tapper-Suite-Name: Daily-Report
+# Tapper-Suite-version: 0.01
+# Tapper-machine-name: sandschaki
+# Tapper-machine-description: pc-ware
+# Tapper-machine-cpuinfo: 1x AMD Athlon(tm) 64 X2 Dual Core Processor 5000+
+# Tapper-machine-ram: 4031 MB
+# Tapper-xen-version: 3.2.1
+# Tapper-xen-changeset: 16928:f839d3b5706f
+# Tapper-xen-dom0-kernel: 2.6.18.8-xen i686
+# Tapper-xen-base-os-description: SUSE Linux Enterprise Server 10 SP2 RC3 i586
+
+1..3
+# Tapper-section: guest_1_lmbench
+# Tapper-section-xen-guest-description: suse_sles10_32b_up_qcow
+# Tapper-section-xen-guest-test: 046-lmbench
+# Tapper-section-xen-guest-start: 2008-06-12 17:51:20
+# Tapper-section-xen-guest-flags: memory=1024; shadow_memory=10; vcpus=1; acpi=1; apic=1; pae=1; 
+ok 1 mhz
+ok 2 count cores
+ok 3 cpuid
+
+1..2
+# Tapper-section: guest_2_winbench
+# Tapper-section-xen-guest-description: ms_vista_32b_smp_qcow
+# Tapper-section-xen-guest-test: 074-SST
+# Tapper-section-xen-guest-start: 2008-06-12 18:22:45
+# Tapper-section-xen-guest-flags: memory=2048; shadow_memory=20; vcpus=2; acpi=1; apic=1; pae=1; 
+ok 1 count cores
+ok 2 measure freuency
+
+1..1
+# Tapper-section: dom0
+ok 1 sonstiger allgemeiner test auf dom0
+
+
+
+
+============================================================
+
+# Tapper-Suite-Name: Daily-Report
+# Tapper-Suite-version: 0.01
+# Tapper-machine-name: sandschaki
+# Tapper-machine-description: pc-ware
+# Tapper-machine-cpuinfo: 1x AMD Athlon(tm) 64 X2 Dual Core Processor 5000+
+# Tapper-machine-ram: 4031 MB
+# Tapper-xen-version: 3.2.1
+# Tapper-xen-changeset: 16928:f839d3b5706f
+# Tapper-xen-dom0-kernel: 2.6.18.8-xen i686
+# Tapper-xen-base-os-description: SUSE Linux Enterprise Server 10 SP2 RC3 i586
+
+
+============================================================
+
+1..2
+# Tapper-section: guest_2_winbench
+# Tapper-section-xen-guest-description: ms_vista_32b_smp_qcow
+# Tapper-section-xen-guest-test: 074-SST
+# Tapper-section-xen-guest-start: 2008-06-12 18:22:45
+# Tapper-section-xen-guest-flags: memory=2048; shadow_memory=20; vcpus=2; acpi=1; apic=1; pae=1; 
+ok 1 count cores
+ok 2 measure freuency
+
+
+============================================================
+
+# Tapper-Suite-Name: Daily-Report
+# Tapper-Suite-version: 0.01
+# Tapper-machine-name: sandschaki
+# Tapper-machine-description: pc-ware
+# Tapper-machine-cpuinfo: 1x AMD Athlon(tm) 64 X2 Dual Core Processor 5000+
+# Tapper-machine-ram: 4031 MB
+# Tapper-xen-version: 3.2.1
+# Tapper-xen-changeset: 16928:f839d3b5706f
+# Tapper-xen-dom0-kernel: 2.6.18.8-xen i686
+# Tapper-xen-base-os-description: SUSE Linux Enterprise Server 10 SP2 RC3 i586
+
+1..1
+# Tapper-section: dom0
+ok 1 sonstiger allgemeiner test auf dom0
+
+
+============================================================
+
+# Tapper-Suite-Name: Daily-Report
+# Tapper-Suite-version: 0.01
+# Tapper-machine-name: sandschaki
+# Tapper-machine-description: pc-ware
+# Tapper-machine-cpuinfo: 1x AMD Athlon(tm) 64 X2 Dual Core Processor 5000+
+# Tapper-machine-ram: 4031 MB
+# Tapper-xen-version: 3.2.1
+# Tapper-xen-changeset: 16928:f839d3b5706f
+# Tapper-xen-dom0-kernel: 2.6.18.8-xen i686
+# Tapper-xen-base-os-description: SUSE Linux Enterprise Server 10 SP2 RC3 i586
+
+
+1..2
+# Tapper-section: guest_2_winbench
+# Tapper-section-xen-guest-description: ms_vista_32b_smp_qcow
+# Tapper-section-xen-guest-test: 074-SST
+# Tapper-section-xen-guest-start: 2008-06-12 18:22:45
+# Tapper-section-xen-guest-flags: memory=2048; shadow_memory=20; vcpus=2; acpi=1; apic=1; pae=1; 
+ok 1 count cores
+ok 2 measure freuency
+

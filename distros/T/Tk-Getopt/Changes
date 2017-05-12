@@ -1,0 +1,103 @@
+Revision history for Perl extension Tk::Getopt.
+
+0.51    2017-04-23
+	- stable release with all changes in 0.50_50
+
+0.50_50 2017-04-17
+	- fix do() calls with relative paths (PERL_USE_UNSAFE_INC=0)
+	- fix tests for ancient window managers (twm)
+	- use Cwd::getcwd() instead of Cwd::cwd()
+	- META.yml additions, .travis.yml etc.
+
+0.50
+	- new method option_dialog (like option_editor, just modal with
+	  the button pressed as return value). See
+	  https://rt.cpan.org/Ticket/Display.html?id=27647
+	- prefer chooseDirectory over Tk::DirSelect, if available
+	- method varref is official now (formerly private method _varref)
+	- new method optextra
+	- new option -useerrordialog
+	- added "make demo" rule
+	- Pod update
+	- added some missing keys to the Makefile.PL
+	- tests: protect from missing DISPLAY
+
+0.49
+	- new button "oksave"
+	- test for "modern" behaviour (only with Ok, Apply and Cancel
+	  buttons)
+	- bugfixes
+
+0.48
+	- bugfixes (undo and default setting did not work with arrays and
+          hashes)
+	- new POD section COMPATIBILITY
+
+0.47
+	- don't croak on strict=>1 and undefined choices
+
+0.46
+	- using Tk::DirSelect, if installed
+
+0.45
+	- using Tk::PathEntry, if installed
+
+0.44
+	- new subtypes: font and geometry
+
+0.43
+	- new feature: separators
+	- string entries have -length and -maxsize options
+	- better directory selector
+	- new -transient and -delaypagecreate options for option_editor
+	- some layout fixes
+	- new option callback-interactive
+
+0.42
+	- waitVisibility in option_editor caused a warning - fixed
+
+0.41
+	- integer and float entries are validated
+	- file: subtype dir possible
+	- option_editor: new arguments buttons and pack
+	- internal change: using constants where possible
+	- pod cleanup
+
+0.38  Tue Aug 31 12:01:35 CEST 1999
+	- bugfix in filedialog widget
+
+0.37  Sat Aug  7 01:29:23 CEST 1999
+	- allow array and hashes in command line (but not yet in the
+	  gui)
+
+0.36  Wed Jun  9 23:55:51 CEST 1999
+	- some bug fixes, e.g. regarding Tk::Tiler
+
+0.35  Thu Jul  2 23:30:12 CEST 1998
+	- buttons are placed with Tk::Tiler
+	- some bug fixes
+
+0.34  Wed Feb 11 02:24:26 CET 1998  
+	- -opttable variant accepts aliases and is somewhat easier to
+	  handle
+	- subtype => 'file' and choices => ['...'] may be used together
+	- use FileSelect widget if FileDialog is not available
+	- bug fixes
+	- variable $x11_pass_through
+	- buttons ordered in grid
+	- new button apply
+	- limited handling of CODE references in -getopt
+
+0.32  Wed Nov 12 00:10:19 CET 1997
+	- use FileDialog widget (subtype => 'file')
+	- many bug fixes and optimizations
+
+0.30  Wed Mar 12 14:01:56 MET 1997
+	Too many to list. Here are the most important:
+	- renamed to Tk::Getopt (former Tk::Options)
+	- renamed process_options, do_options, options_editor
+	- updated POD
+
+0.10  Sat Feb 15 01:23:07 1997
+	- original version
+

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<pml_schema version="1.1" xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/">
+  <revision>0.7</revision>
+  <description>
+    Example of tree annotation over a tokenization layer
+  </description>
+  <reference name="tokenization" readas="dom"/>
+
+  <import type="w.type" schema="example6_schema.xml" revision="0.2"/>
+
+  <!-- after DOM-knitting, #ID attribute contains a PMLREF -->
+  <derive type="w.type">
+    <container>
+      <attribute name="id" role="#ID" required="1">
+	<cdata format="PMLREF"/>
+      </attribute>
+    </container>
+  </derive>
+
+  <root name="annotation" type="annotation.type"/>
+
+  <type name="annotation.type">
+    <sequence role="#TREES">
+      <element name="S" type="S.type"/>
+    </sequence>
+  </type>
+  <type name="S.type">
+    <container role="#NODE">
+      <attribute name="sentence.rf">
+	<cdata format="PMLREF"/>
+      </attribute>
+      <list ordered="1" role="#CHILDNODES" type="node.type"/>
+    </container>
+  </type>
+  <type name="node.type">
+    <structure role="#NODE">
+      <member as_attribute="1" name="label" type="label.type"/>
+      <member name="w.rf">
+        <list ordered="0" role="#KNIT" type="w.type">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
+      <member name="constituents" role="#CHILDNODES">
+        <list ordered="1" type="node.type"/>
+      </member>
+    </structure>
+  </type>
+  <type name="label.type">
+    <choice>
+      <value>S</value>
+      <value>VP</value>
+      <value>NP</value>
+      <value>PP</value>
+      <value>ADVP</value>
+      <!-- etc. -->
+    </choice>
+  </type>
+</pml_schema>

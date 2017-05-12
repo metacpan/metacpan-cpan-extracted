@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Template-Plugin-Comma
+version:      0.04
+version_from: lib/Template/Plugin/Comma.pm
+installdirs:  site
+requires:
+    Template:                      2.07
+    Test::More:                    0.32
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,41 @@
+Changelog for Text-Roman
+
+3.5 2013-01-28T18:13:55
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - removed Scalar::Util dependency
+
+ - eg/unroman.pl fixed
+
+ - fixes to comply with the new tests
+
+ - better tests
+
+ - better aliases to deprecated functions
+
+ - probable roman2int() typo fix (slow $& instead of plain $_)
+
+ - version bump
+
+ - tests cleanup
+
+ - added usage example
+
+
+v3.4 2013-01-22T20:37:07
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - merge complete
+
+ - merging back with ECALDER fork
+
+
+ [Stanislaw Pusep <stanislav.poussep@buscape-inc.com>]
+ - Changes
+
+
+v3.02 2012-02-01T18:29:16
+ [Stanislaw Pusep <stanislav.poussep@buscape-inc.com>]
+ - CPAN test compliance
+
+ - released at CPAN
+
+

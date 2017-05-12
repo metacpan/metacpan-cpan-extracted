@@ -1,0 +1,22 @@
+---
+name: Tie-Hash-StructKeyed
+version: 0.04
+author:
+  - 'osfameron - osfameron@cpan.org'
+abstract: use structures like hashes and arrays as keys to a hash
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  YAML: 0
+  perl: 5.6.1
+build_requires:
+  Test::More: 0
+provides:
+  Tie::Hash::StructKeyed:
+    file: lib/Tie/Hash/StructKeyed.pm
+    version: 0.04
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

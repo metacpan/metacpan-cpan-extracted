@@ -1,0 +1,6 @@
+name = "Test-Mock-LWP-Conditional"
+# badges = ["travis"]
+authority="cpan:MASAKI"
+
+module_maker="ModuleBuildTiny"
+

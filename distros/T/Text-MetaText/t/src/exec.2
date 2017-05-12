@@ -1,0 +1,30 @@
+# this tests execution of external methods and/or functions
+
+%% DEFINE foo = "This is Foo" %%
+%% DEFINE bar = "This is Bar" %%
+%% DEFINE baz = $foo %%
+------------------------------------------------------------------------
+Calling mt_method(
+    foomsg = %% foo %%,
+    barmsg = %% bar %%,
+    bazmsg = %% baz %%
+)
+
+%% mt_method
+   foomsg = $foo
+   barmsg = $bar
+   bazmsg = $baz
+%%
+------------------------------------------------------------------------
+Calling mt_function(
+    foomsg = %% foo %%,
+    barmsg = %% bar %%,
+    bazmsg = %% baz %%
+)
+
+%% mt_function 
+   foomsg = $foo
+   barmsg = $bar
+   bazmsg = $baz
+%%
+------------------------------------------------------------------------

@@ -1,0 +1,44 @@
+---
+abstract: 'DEPRECATED : now use Tk::Chart.'
+author:
+  - 'Djibril Ousmanou <djibel@cpan.org>'
+build_requires:
+  Test::More: 0
+  Tk: 800
+  Tk::Canvas::GradientColor: 1.02
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-ForDummies-Graph
+provides:
+  Tk::ForDummies::Graph:
+    file: lib/Tk/ForDummies/Graph.pm
+    version: 1.14
+  Tk::ForDummies::Graph::Areas:
+    file: lib/Tk/ForDummies/Graph/Areas.pm
+    version: 1.10
+  Tk::ForDummies::Graph::Bars:
+    file: lib/Tk/ForDummies/Graph/Bars.pm
+    version: 1.10
+  Tk::ForDummies::Graph::Boxplots:
+    file: lib/Tk/ForDummies/Graph/Boxplots.pm
+    version: 1.06
+  Tk::ForDummies::Graph::Lines:
+    file: lib/Tk/ForDummies/Graph/Lines.pm
+    version: 1.11
+  Tk::ForDummies::Graph::Mixed:
+    file: lib/Tk/ForDummies/Graph/Mixed.pm
+    version: 1.03
+  Tk::ForDummies::Graph::Pie:
+    file: lib/Tk/ForDummies/Graph/Pie.pm
+    version: 1.08
+  Tk::ForDummies::Graph::Utils:
+    file: lib/Tk/ForDummies/Graph/Utils.pm
+    version: 1.08
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.14

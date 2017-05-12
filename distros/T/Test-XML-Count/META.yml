@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Test-XML-Count
+version:             0.02
+abstract:            Perl extension for testing element count at a certain depth
+license:             perl
+author:              
+    - Adam J Kaplan <akaplan@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::Simple:                  0
+    XML::LibXML:                   1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

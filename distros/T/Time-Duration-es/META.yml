@@ -1,0 +1,25 @@
+---
+abstract: 'describe time duration in Spanish'
+author:
+  - 'Biafra <biafra@cpan.org>'
+build_requires:
+  Test::More: '0.32'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Duration-es
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Time::Duration: '1.02'
+  perl: '5.006'
+resources:
+  repository: https://github.com/biafra/Time-Duration-es.git
+version: '0.03'

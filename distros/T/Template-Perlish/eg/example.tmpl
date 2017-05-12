@@ -1,0 +1,21 @@
+Dear [% customer %],
+
+    we're still waiting your visit in any of our locations:
+    [%
+      for my $location (@{$variables{locations}}) {
+         my ($name, @facilities) = @$location;
+    %]
+    * [% $name %], in which we have[%
+         for my $facility (@facilities) {
+    %]
+       * [% $facility %][%
+         }
+      }
+    %]
+
+Please come visit us soon, especially to see [% locations.1.2 %] with
+your eyes!
+
+Cheers,
+
+   [% director %]

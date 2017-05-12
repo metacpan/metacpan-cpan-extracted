@@ -1,0 +1,221 @@
+Revision history for Test-Moose-More
+
+0.047     2017-04-24 22:48:33 CDT-0500
+	* Add method_from_pkg_ok(), method_not_from_pkg_ok()
+	* Tests which support subtests (typically validate_*()) now do something
+	  sensible when '-subtest => 1' is given.
+
+0.046     2017-04-14 22:51:08 CDT-0500
+	* Add pristine tests
+	* Add has{,_no}_method_ok() TBT tests
+	* Add:
+		does_not_require_method_ok()
+		has_{,no_}method_from_anywhere_ok()
+
+0.045     2017-03-24 20:34:45 CDT-0500
+	* Fix a POD command error (=func vs =test)
+	* No code changes, just promoting the changes from 0.044 to GA
+
+0.044-TRIAL  2017-03-21 20:34:29 CDT-0500
+	* Add metarole/class options to validate_...()
+	* add has_no_method_ok(), which does exactly what you think it does
+	* add no_methods to validate_thing(), incorporating has_no_method_ok()
+	  into validate_*()
+
+0.043     2017-02-14 11:56:50 CST-0600
+	* Depend on TAP::SimpleOutput 0.009 for our tests; no code changes.
+
+0.042     2017-02-13 09:54:58 CST-0600
+	* Use the subtest bits now in TAP::SimpleOutput
+	* No code changes, just the above test tweak.  Overdue release as GA :)
+
+0.041-TRIAL  2016-11-12 20:09:02 CST-0600
+	* Added a ':validate' export group.
+	* Make -compose subtest messages a little cleaner.
+	* add does_metaroles_ok()!  (Not sure why I waited this long...)
+
+0.040-TRIAL  2016-11-10 11:00:24 CST-0600
+	* Make more things consistent with naming in tests, e.g. "Class's
+	  attribute foo" vs "foo", etc.
+	* does_{,not_}ok() now handles metaclasses that don't do roles
+	* has_attribute_ok now honors -subtest
+
+0.039-TRIAL  2016-10-10 18:38:44 CDT-0500
+	* Use prototypes consistently across our test functions.
+	* Moose metaclasses now pass is_class_ok().  *le sigh*
+	* Role attributes are now validated w.r.t.:
+		+ required
+		+ lazy
+	* Attribute validation checks are now also tested w.r.t.:
+		+ required
+		+ lazy
+
+0.038     2016-06-22 13:46:27 CDT-0500
+	* Eliminate a warning under v5.22+ (github #12)
+
+0.037     2016-01-31 17:02:52 CST-0600
+	* No code changes -- releasing 0.036 as GA
+
+0.036-TRIAL  2016-01-20 20:48:30 CST-0600
+	* More test functions now honor "name" overrides, resulting in more
+	  sensible output when deeply testing using the validate_*() functions.
+
+0.035     2015-08-26 12:40:38 PDT-0700
+	* validate_role() will now perform checks on a role to ensure the role
+	  intends to wrap methods on application.
+
+0.034-TRIAL  2015-07-29 23:22:49 PDT-0700
+	* validate_role(), validate_class(), validate_thing(), and
+	  validate_attribute() now accept '-subtest', causing them to wrap all the
+	  tests they run under a subtest.
+
+0.033     2015-07-29 18:25:51 PDT-0700
+	* validate_role($role, -compose => 1, ...) will now add a sanity test that
+	  the composed subclass actually does $role when composing the arguments
+	  to pass to validate_class().
+
+0.032     2015-07-11 22:47:44 PDT-0700
+	* Better documentation for most of the validate_*() functions.
+	* Add a -compose option to validate_role(), to handle a common pattern
+	  automagically.
+	* When checking attribute traits, we now attempt to resolve them with the
+	  appropriate functions from Moose::Util (so that things like native
+	  traits are found with a minimum of pain).
+
+0.031     2015-06-30 18:30:27 PDT-0700
+	* We now export validate_thing()
+	* Add subroutine parameters to the sugar functions.
+	* Add sugar checking to validate_thing() ('sugar => 0|1')
+
+0.030     2015-06-28 01:01:58 PDT-0700
+	* Add method modifier checks for roles.
+
+0.029     2015-03-29 15:24:40 PDT-0700
+	* No code changes -- 0.028_01 doesn't seem to have broken anything, so
+	  release as non-dev.
+
+0.028_01  2015-03-14 21:03:50 PDT-0700
+	* Sub::Exporter -> Sub::Exporter::Progressive
+	* normalize test names to end with '_ok' (e.g. is_{role,class} ->
+	  is_{role,class}_ok)
+
+0.028     2015-03-12 19:28:22 PDT-0700
+	* Add is_{,not_}immutable_ok tests
+	* Add 'immutable' check to validate_class
+
+0.027     2015-03-10 20:16:38 PDT-0700
+	* Drop autobox usage (thanks, @ether!)
+
+0.026     2015-01-18 15:11:22 PST-0800
+	* **NO CODE CHANGES** Promote 0.025_01 to 0.026.  For realz this time.
+	  *le sigh*
+
+0.025_02  2015-01-18 15:09:18 PST-0800
+	* **NO CODE CHANGES** Promote 0.025_01 to 0.026
+
+0.025_01  2014-12-23 23:48:18 PST-0800
+	* Handle role attributes in a kinder, gentler way
+	* Set our test level correctly when validating attributes
+
+0.025     2014-11-21 11:29:28 PST-0800
+	* Merge pull request #13 to handle the latest Test::More alphas.
+	  Thanks, @exodist!
+
+0.024     2014-05-14 11:58:47 PDT-0700
+	* validate_thing() now does not try to run subtests against attributes it
+	  does not find
+
+0.023     2014-01-21 22:39:47 PST-0800
+	* fix test error with Moose-2.1200 by adding missing coercions
+
+0.022     2013-11-10 23:16:32 PST-0800
+	* ...and add an explicit dependency on TAP::SimpleOutput 0.002
+
+0.021     2013-11-10 23:13:27 PST-0800
+	* Handle Test::More's new output for subtests in 0.98_05+
+	* Dodge isa_ok()'s output change by rolling our own
+
+0.020     2013-08-01 07:33:57 PDT-0700
+	* Drop Perl6::Junction in favor of Syntax::Keyword::Junction Same
+	  thing -- essentially, AFAICT -- except that we don't get 'smartmatch
+	  operator is experimental' warnings in 5.18 :)
+
+0.019     2013-01-21 07:35:07 PST-0800
+	* no code changes, netadata fixup only -- stop requiring
+	  Moose::Deprecated, as it is no longer indexed.
+
+0.018     2013-01-09 07:48:01 PST8PDT
+	* test if an attribute should coerce or not
+
+0.017     2012-10-28 15:38:16 PST8PDT
+	* Instead of failing on "unknown attribute options" when performing
+	  attribute validation checks, first look to see if they're actually an
+	  attribute on the attribute metaclass; this is a fairly common situation
+	  when attribute traits are used.
+	* Check if an attribute is required or not.
+
+0.016     2012-10-21 15:03:32 PST8PDT
+	* add is_anon(), is_not_anon()
+	* allow anonymous => 1|0 in validate_thing() (though not documented)
+	* use validate_class() when checking attributes with validate_class()
+
+0.015     2012-10-20 17:00:59 PST8PDT
+	* NO CODE CHANGES from 0.014.  We should be at a good point where the
+	  newer attribute checking tests are useable and won't need to change in
+	  any incompatible ways (hopefully!).
+
+0.014     2012-10-04 20:28:49 PST8PDT
+	* TRIAL release
+	* better tests for our new validate_attribute and attribute_options_ok
+	* use subtests when checking attributes in validate_class
+	* drop t/funcs.pm in favor of TAP::SimpleOutput
+
+0.013     2012-09-30 13:59:22 PST8PDT
+	* TRIAL release
+	* mark traits as a valid attribute option to test for, but not currently checked
+	  (skipped, that is).
+	* Handle validating an attribute as a "thing" and its options at the same time
+	  by interperting all keys of options to check that start with '-' as a key for
+	  validate_thing().  This should allow the validate_*'s to pass off to
+	  validate_attribute() without much violence.
+
+0.012     2012-09-29 23:18:12 PST8PDT
+	* TRIAL release
+	* add first pass at validate_attribute(), adapted from
+	  MooseX::AttributeShortcuts' test suite
+
+0.011     2012-08-26 22:32:59 America/Los_Angeles
+	* drop AttributeShortcuts req from t/, or we may run into build issues
+
+0.010     2012-08-24 15:01:48 America/Los_Angeles
+	* add has_required_methods_ok()
+	* add required_methods() to validate_role(), and test
+
+0.009     2012-04-26 22:34:16 America/Los_Angeles
+	* initial (undocumented) attribute meta-validation via validate_*().
+	  Undocumented until we settle on a coherent way to do this across the board.
+
+0.008     2012-04-13 13:52:33 America/Los_Angeles
+	* add has_attribute_ok, and extended to deal with attributes in roles, as the
+	  prior method seems to have stopped working.
+
+0.007     2012-04-11 17:52:41 America/Los_Angeles
+	* add does_not_ok()
+	* add 'does_not' option to validate_thing()/etc
+
+0.006     2012-04-07 23:19:40 America/Los_Angeles
+	* fix POD and actually implement more of validate_thing()
+
+0.005     2012-02-05 06:14:58 America/Los_Angeles
+	* export Test::Moose::with_immutable()
+
+0.004     2012-02-02 16:20:01 America/Los_Angeles
+	* add does_ok(), meta_ok()
+
+0.003     2012-01-23 15:15:39 America/Los_Angeles
+
+0.002     2012-01-21 20:07:26 America/Los_Angeles
+	* add check_sugar_ok and check_sugar_removed_ok
+
+0.001     2012-01-21 10:52:14 America/Los_Angeles
+	* initial release

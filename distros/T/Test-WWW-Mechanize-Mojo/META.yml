@@ -1,0 +1,41 @@
+---
+abstract: 'Test::WWW::Mechanize for Mojo / Mojolicious'
+author:
+  - unknown
+build_requires:
+  Test::Exception: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150001'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-WWW-Mechanize-Mojo
+provides:
+  Test::WWW::Mechanize::Mojo:
+    file: lib/Test/WWW/Mechanize/Mojo.pm
+    version: v0.0.17
+requires:
+  Carp: '0'
+  Encode: '0'
+  HTML::Entities: '0'
+  LWP: '5.816'
+  Mojolicious: '4.75'
+  Mojolicious::Lite: '0'
+  Test::WWW::Mechanize: '1.14'
+  WWW::Mechanize: '1.50'
+  base: '0'
+  perl: '5.012'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  homepage: http://web-cpan.berlios.de/modules/Test-WWW-Mechanize-Mojo/
+  license: http://dev.perl.org/licenses/
+  repository: http://bitbucket.org/shlomif/perl-test-www-mechanize-mojo
+version: v0.0.17

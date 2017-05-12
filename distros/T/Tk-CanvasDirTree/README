@@ -1,0 +1,73 @@
+Tk-CanvasDirTree version 0.04
+=============================
+
+zentara <zentara@zentara.net> - The Distribution Maintainer
+
+INCLUDED WIDGETS:
+Tk::CanvasDirTree - a directory browser based on a Derived Tk::Canvas
+
+ADDITIONAL SCRIPTS:
+z-lighten  -  an Imager based script to make "lightened" images for
+              backgrounds used with dark font fills
+	      
+z-charcoal - an ImageMagick based script to make an artistic charcoal	      
+             drawing for backgrounds.
+
+	     
+DESCRIPTION:
+This widget reads a directory tree, in an efficient manner, and provides
+an intuitive graphical interface to selecting them. It only recurses 2 levels
+at a time, so it is efficient on deeply nested trees. 
+It is similar in appearance to the Gtk2 TreeView. Colors and fonts are
+configurable, as well as a background image (with configurable location placement).
+Due to the wide variety of possible color schemes, creating a pleasing 
+background image is left to you. See the perldoc for suggestions.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   run demo (optional)
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Perl/Tk version 804.027 or recent version of ActiveStatePerl
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) April 11, 2006 by Joseph B.Milosch a.k.a zentara
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+HISTORY:
+
+  Version 0.01 
+      o first release
+
+  Version 0.02
+      o made background image scroll automatically to give appearance
+        of a stationary background ( optional with -floatback=>1 ) 
+
+  Version 0.03
+      o small documentation fixes 
+      o added demo for floating background 
+ 
+
+ToDo:
+
+- make configurable blinking indicators
+- make method to open a directory from the program
+
+
+

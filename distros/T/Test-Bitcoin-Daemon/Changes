@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::Bitcoin::Daemon.
+
+0.01  Thu Feb 28 21:43:21 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Test::Bitcoin::Daemon
+

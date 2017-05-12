@@ -1,0 +1,42 @@
+---
+abstract: 'Template Toolkit dumper plugin using Data::Printer'
+author:
+  - 'Stephen Thirlwall <sdt@cpan.org>'
+build_requires:
+  Exporter: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  HTML::Entities: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Template: '0'
+  Term::ANSIColor: '0'
+  Test::Builder: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-DataPrinter
+requires:
+  Data::Printer: '0'
+  HTML::FromANSI::Tiny: '0'
+  Hash::Merge::Simple: '0'
+  Template::Plugin: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-DataPrinter
+  homepage: http://search.cpan.org/dist/Template-Plugin-DataPrinter
+  repository: git://github.com/sdt/template-plugin-dataprinter.git
+version: '0.013'

@@ -1,0 +1,27 @@
+---
+abstract: 'A humane web text generator.'
+author:
+  - 'Brad Choate <brad@bradchoate.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Textile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: 0
+  Test::Harness: 2.5
+  Test::More: 0
+resources:
+  bugtracker: http://github.com/bradchoate/text-textile/issues
+  repository: http://github.com/bradchoate/text-textile/tree/master
+version: 2.13

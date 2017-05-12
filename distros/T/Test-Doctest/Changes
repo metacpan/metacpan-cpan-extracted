@@ -1,0 +1,6 @@
+Revision history for Test::Doctest
+
+0.02    Further development by Andrei Fyodorov: testing in module namespace,
+        expected values as perl literals, deep compare and more
+
+0.01    Original version

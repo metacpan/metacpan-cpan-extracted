@@ -1,0 +1,41 @@
+==================================================
+Changes from 2014-09-01 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.00 at 2015-09-01 12:01:50 +0000
+-----------------------------------------
+
+  Change: 4258311177e124965225661145858dbf7327ca27
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-01 13:59:08 +0000
+
+    fix POD 
+
+  Change: 34c323f5f9b17d035445f86e072279869109e97e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-01 13:56:10 +0000
+
+    run travis cpanm with --notest 
+
+  Change: 8a768be258df0c9031e1a820084a5773c78254a8
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-01 13:51:35 +0000
+
+    added travis file 
+
+  Change: b6feacd58d88215a91e64c6450882bec2895b826
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-01 13:48:09 +0000
+
+    link README.pod to Mail.pm 
+
+  Change: 19938927fb7d00fe69abedea44e9203e4d392146
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-01 13:47:01 +0000
+
+    initial checkin 
+
+================
+End of releases.
+================

@@ -1,0 +1,136 @@
+ Changelog for Perl dist Template-Liquid
+
+1.0.10 2016-09-07T12:02:20Z
+
+  - Add default filter
+
+1.0.9 2016-09-06T20:18:26Z
+
+  - Fix filters clobbering recursive values inside {%for ...%} loops
+  - Fix last filter for strings
+  - Add round, money, stock_price, abs, ceil, and floor filters
+  - Fix handling of bare float values at the top of our context stack
+
+1.0.8 2016-09-06T13:08:49Z
+
+  - plus and minus filters support floating point and negative values
+  - We no longer die() when met with an undefined var
+
+1.0.7 2016-08-10T21:19:10Z
+
+  - Crumb trails can map to bject methods during render
+  - Improve range parser
+
+1.0.6 2016-05-13T14:46:52Z
+
+  - Built-in size filter returns 0 (zero) for undefined vars
+
+1.0.5 2016-05-12T18:25:13Z
+
+  - Moved example extentions to Template::LiquidX::Tag::Dump and
+    Template::LiquidX::Tag::Include
+
+Version 1.0.3 | Late afternoon on January 3rd, 2015 | xxxxxxxx
+
+    Resolved Issues/Bug Fixes:
+     * Merged fixes from Michal Wojciechowski:
+       - Correctly handle filter arguments with empty values (w/ test)
+       - Change quote characters from qr[] to qr{} to prevent warning on newer builds of perl (5.20.x+)
+
+Version 1.0.2 | Around ten on December 6th, 2012 | 2d72415
+
+    Internal/Behavioral Changes:
+     * Context resolve(...[, ...]) split in to get(...) and set(..., ...)
+
+    Documentation/Sample Code/Test Suite:
+     * New context tests
+
+Version 1.0.1 | The morning of of October 10th, 2012 | cd33aa8
+
+    Resolved Issues/Bug Fixes:
+     * Dropped an 's' from Template::Liquid::Filters
+
+    Documentation/Sample Code/Test Suite:
+     * Fix another namespace bug (this time in the include test)
+
+Version 1.0.0 | Evening of October 9th, 2012 | 18123a6
+
+    API Changes/Compatibility Information:
+     * Support {% break %} and {% continue %} tags in for loops (see docs)
+     * New example extentions in lib/Solution/Tag
+
+    Notes:
+     * Project renamed from Solution to Template::Liquid because... oh, who
+       cares
+
+Version 0.9.1 | Round about midnight on July 4th, 2012 | f43dca9
+
+    Resolved Issues/Bug Fixes:
+     * Removing unused and undeclared debugging prereq Data::Dump
+     * Fixing version numbers (I hope)
+
+Version 0.9.0 | Early afternoon on July 3rd, 2012 | 5375280
+
+    API Changes/Compatibility Information:
+     * Support {% else %} tag in for loops (see docs)
+     * Support 'now' and 'today' in date filter: {{ 'now' | date :'%Y' }}
+     * Support split filter
+     * Support {% raw %} tag
+     * Expand strip_html filter to include <script> and <!--comment--> tags
+     * Support modulo filter
+
+    Documentation/Sample Code/Test Suite:
+     * Simple tests for {% assign ... %} tag
+
+Version 0.0004 | 2010-09-20 23:33:25Z (Mon, 20 Sep 2010) | fd2d1b2
+
+    API Changes/Compatibility Information:
+     * Add support for sorting lists and hashes (by key or by value) in
+       {% for ... %} tags with the new 'sorted' keyword. See the section
+       entitled 'Sorting' in Solution::Tag::For
+
+Version 0.000000003 | 2010-09-20 02:25:51Z (Mon, 20 Sep 2010) | 4d4beee
+
+    API Changes/Compatibility Information:
+     * Add support for hashrefs in {% for ... %} tag
+
+    Resolved Issues/Bug Fixes:
+     * Fixing old {% for ... reversed %} regression
+
+    Internal/Behavioral Changes:
+     * Appropriate errors are raised when there are problems rendering
+       {% include ... %} tags
+
+    Documentation/Sample Code/Test Suite:
+     * Correcting bad internal links and some minor reorganization
+
+Version 0.000000002 | 2010-09-19 02:51:25Z (Sun, 19 Sep 2010) | 7f57e32
+
+    API Changes/Compatibility Information:
+     * New {% include file %} tag
+
+    Documentation/Sample Code/Test Suite:
+     * New example for custom tag creation
+
+Version 0.000000001 | 2010-09-19 00:52:32Z (Sun, 19 Sep 2010) | 92a1cb0
+
+    API Changes/Compatibility Information:
+     * ...see below
+
+    Resolved Issues/Bug Fixes:
+     * ...see below
+
+    Internal/Behavioral Changes:
+     * It actually exists
+
+    Documentation/Sample Code/Test Suite:
+     * ...see above
+
+    Notes:
+     * This is based on the Ruby Liquid library. See the sections entitled
+       "Getting Started" and "Ugh! Why a new Top Level Namespace?" in
+       Solution and just about everything in Solution::Tag.
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, see the commit log:
+    http://github.com/sanko/template-liquid/commits/

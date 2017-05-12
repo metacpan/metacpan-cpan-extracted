@@ -1,0 +1,39 @@
+@c chapter2.texi
+
+@node Data Structures, Syntax, Overview, Top
+@chapter Data Structures
+
+This part comes before the menu.
+
+@menu
+* Variable names::              This came from the Top menu
+* Context::                     This came from the Data Structures menu
+* Scalar values::               Scalar values DESC comment
+@end menu
+
+This part comes after the menu.
+
+@node Variable names, Context, Data Structures, Data Structures
+@section Variable names
+
+Variable names defined here.
+
+@node Context, Scalar values, Variable names, Data Structures
+@section Context
+
+Context goes here.
+
+@menu
+* Scalar Context::              Scalar context
+* List Context::                List context DESC comment
+* Void Context::                Void context from the Top menu
+@end menu
+
+@include section22.texi
+
+@node Scalar values, , Context, Data Structures
+@section Scalar values
+
+Scalar values go here.
+
+@c DESC: Scalar values DESC comment

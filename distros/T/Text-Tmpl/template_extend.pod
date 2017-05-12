@@ -1,0 +1,235 @@
+=head1 NAME
+
+template_extend - how to extend the Text::Tmpl template library (with C or Perl).
+
+=head1 SYNOPSIS
+
+Perl:
+
+ $context->register_simple("name", \&simple_handler);
+ sub simple_handler {
+     my($context, $name, @args) = @_;
+     # do stuff to build a return string
+     return "result string!";
+ }
+
+ $context->register_pair($is_named, "open", "close",
+                         \&pair_handler);
+ sub pair_handler {
+     my($context, $name, @args) = @_;
+     # do stuff to the context
+     return;
+ }
+
+ $subctx  = Text::Tmpl::context_get_anonymous_child($ctx);
+ $subctx  = Text::Tmpl::context_get_named_child($ctx, $name);
+ $peerctx = Text::Tmpl::context_add_peer($ctx);
+ $return  = Text::Tmpl::context_set_named_child($ctx, $name);
+ Text::Tmpl::context_output_contents($ctx, $output);
+
+C:
+
+ int template_register_simple(context_p ctx, char *name,
+    void (*function)(context_p, char **, int, char**))
+ void
+ simple_handler(context_p ctx, char **output, int argc, char **argv) {
+     char *returnstring;
+     /* do stuff to build a return string */
+     *output = (char *)calloc(1, strlen(returnstring));
+     strncpy(*output, returnstring, strlen(returnstring));
+     return;
+ }
+
+ int template_register_pair(context_p ctx, char named_context,
+    char *open_name, char *close_name,
+    void (*function)(context_p, int, char**))
+ void
+ pair_handler(context_p ctx, int argc, char **argv) {
+     /* do stuff to the context */
+     return;
+ }
+
+ context_p context_get_anonymous_child(context_p ctx);
+ context_p context_get_named_child(context_p ctx, char *name);
+ int       context_set_named_child(context_p ctx, char *name);
+ context_p context_add_peer(context_p ctx);
+ void      context_output_contents(context_p ctx, char output_contents);
+
+=head1 DESCRIPTION
+
+Creating new tags in this templating system is pretty easy, despite the
+somewhat daunting API.  The perl and C APIs are virtually identical in
+both usage and effects, so I'm going to be discussing the process in a
+(hopefully) language independent way.
+
+Note that tags are global in scope - a tag can be registered at any
+point before the parsing stage and will be visible to the entire template.
+This may change in future versions, if there seems to be a demand for
+scoped tags.
+
+=head2 Tag Argument Passing
+
+Arguments to any tag are passed into the tag function as an argc/argv pair
+in the C API, or a list in the Perl API.  Either way, element 0 of the
+argument list will be the tag name, so the first argument is actually element
+1.
+
+=head2 Simple Tags
+
+Simple tags are lone tags which generate a string for inclusion in the
+parsed output.  A perl simple tag function simply returns a string,
+whereas a C simple tag function has to allocate a new string (which the
+caller will free() after use.)
+
+The echo tag function in C looks like:
+
+ void
+ simple_tag_echo(context_p ctx, char **output, int argc, char **argv)
+ {
+     int size;
+
+     if (argc < 1)
+     {
+         *output = NULL;
+         return;
+     }
+
+     size = strlen(argv[1]);
+     *output = (char *)calloc(1, size + 1);
+     strncpy(*output, argv[1], size);
+     (*output)[size] = '\0';
+
+     return;
+ }
+
+This illustrates a couple of things: errors from simple tags should be
+indicated by making *output a NULL pointer, and don't forget to
+null-terminate *output.
+
+In perl, you would duplicate this by:
+
+ sub simple_tag_echo
+ {
+     my $context = shift || return undef;
+     my $name    = shift || return undef;
+     my $string  = shift || return undef;
+
+     return $string;
+ }
+
+It should also be pointed out that all of the argument parsing, including
+variable interpolation, has already happened by this point.
+
+Simple tags are called with the context in which they are found.  They can
+make changes to the context, but the results may be unexpected - for example,
+attempting to disable the output of the entire surrounding context will not
+work.
+
+The output string from a single tag will (if not NULL) be run through the
+parser.  This means that a simple tag can output a template fragment.  So,
+for example, if you wanted to implement an "else" tag, you could:
+
+ sub simple_tag_else
+ {
+     my $context = shift || return undef;
+     my $name    = shift || return undef;
+
+     return "<!--#endif--><!--#ifn-->";
+ }
+
+=head2 Tag Pairs
+
+Tag pairs are more complicated.  As the name implies, tag pairs have a beginning
+and an end, denoted by two distinct tags.  When a beginning tag is found, the
+parser scans forward to find the matching closing tag, and then parses
+everything in between in the context of the tag function.
+
+There are two kinds of tag pairs - those with named contexts, and those with
+anonymous contexts.  A named context is used for tag pairs which allow the
+programmer to pre-build some (or all) of the context structure before parsing
+takes place, such as the loop tag.  An anonymous context is used when the
+context is constructed completely at parse time, such as the comment tag.
+The actual name of the context, in a named context tag pair, is the first
+argument to the opening tag (for example <!--#loop "foo"--> retrieves the
+named context "foo" from the parent context).
+
+The tag function is called I<before> parsing of the context begins, so it
+gets to completely set up the context beforehand.  So the comment tag, for
+example, simply disables output of the context:
+
+ void
+ tag_pair_comment(context_p ctx, int argc, char **argv)
+ {
+     context_output_contents(ctx, 0);
+     return;
+ }
+
+The contents of the context are never even parsed, since the parser knows that
+it won't be output.
+
+=head2 The context_* functions
+
+This group of functions is used to manipulate context structures in ways the
+main template API doesn't allow.  Before we dive into it, some understanding
+of the context structure will be required.
+
+Contexts are quite simple, really.  They contain a list of variables and a flag
+which determines whether the contents of the context should be output.  Each
+context can also know about a number of other contexts internally: its
+parent, its peer(s) - each peer representing a loop iteration - and its named
+children.  A context may have zero or more of each of these.  For example, the
+initial context returned from template_init has no parent, no peers and no named
+children initially.  If you call template_loop_iteration, the main context
+will gain a single named child context, which in turn will have the main
+context as a parent, no peers (yet) and no named children.  If you call
+template_loop_iteration on the main context with the same name again, the
+named child will gain a peer context.  And so on, and so forth...
+
+In summary: the parent context provides nested scopes, peers represent
+iterations over the same chunk of the template, and named children are contexts
+which can be fetched by name both at preparation time and parse time.
+
+=over 3
+
+=item B<context_get_anonymous_child>
+
+Creates and returns an unnamed context with the parent set to the current
+context (i.e. a new context within the scope of the current context).
+
+=item B<context_get_named_child>
+
+This function returns a named context within the scope of the current context,
+if it exists.
+
+=item B<context_set_named_child>
+
+This function creates a new named context within the scope of the current
+context.
+
+=item B<context_add_peer>
+
+This function adds a peer context to the context passed in, and initializes it.
+
+=item B<context_output_contents>
+
+This function sets the output_contents flag in the current context.
+
+=back
+
+=head1 RETURN VALUES
+
+Functions which return context_p pointers will return NULL if there is any
+problem at all.  Functions which return integers return 0 on failure and 1
+on success.
+
+=head1 BUGS
+
+Hopefully none.
+
+=head1 AUTHOR
+
+J. David Lowe, dlowe@saturn5.com
+
+=head1 SEE ALSO
+
+libtmpl(1), Text::Tmpl(1), template_syntax(1)

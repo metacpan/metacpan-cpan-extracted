@@ -1,0 +1,52 @@
+{
+   "abstract" : "One Mojolicious app to rule them all",
+   "author" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Toadfarm",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "1.00",
+            "Mojolicious" : "7.18"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/toadfarm/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/toadfarm",
+      "repository" : {
+         "url" : "https://github.com/jhthorsen/toadfarm.git"
+      }
+   },
+   "version" : "0.77",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,3 @@
+comp	news.announce.newgroups newsgroups-request@isc.org
+slac	slac.groups		news@news.stanford.edu
+us	us.config		usadmin@wwa.com

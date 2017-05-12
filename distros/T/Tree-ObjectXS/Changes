@@ -1,0 +1,11 @@
+Revision history for Tree-ObjectXS
+
+0.02    2016-03-29 (PERLANCAR)
+
+	- Make Tree::ObjectXS::Array more compatible with the new
+	  Tree::Object::Array, update doc.
+
+
+0.01    2016-03-28 (PERLANCAR)
+
+        - First release.

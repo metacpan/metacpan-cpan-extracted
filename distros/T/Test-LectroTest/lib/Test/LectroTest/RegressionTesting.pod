@@ -1,0 +1,117 @@
+=head1 NAME
+
+Test::LectroTest::RegressionTesting - How to do regression testing (for free!)
+
+=head1 VERSION
+
+version 0.5001
+
+=head1 SYNOPSIS
+
+    use Test::LectroTest
+        regressions => "regressions.txt";
+
+    # -- OR --
+
+    use Test::LectroTest
+        playback_failures => "regression_suite_for_my_module.txt",
+        record_failures   => "failures_in_the_field.txt";
+
+    # -- OR --
+
+    use Test::LectroTest::Compat
+        regressions => "regressions.txt";
+
+    # -- OR --
+
+    use Test::LectroTest::Compat
+        playback_failures => "regression_suite_for_my_module.txt",
+        record_failures   => "failures_in_the_field.txt";
+
+
+=head1 DESCRIPTION
+
+Say that LectroTest uncovers a bug in your software by finding a
+random test case that proves one of your properties to be false.  If
+you apply a fix for the bug, how can you be sure that LectroTest will
+re-test the property using the exact same test case that "broke" it
+before, just to be certain the bug really is fixed?  And how can you
+be sure that future changes to your code will not reintroduce the same
+bug without your knowing it?
+
+For situations like these, LectroTest can record failure-causing test
+cases to a file, and it can play those test cases back as part of its
+normal testing strategy.
+
+The easiest way to take advantage of this feature is to set the
+I<regressions> parameter when you C<use> L<Test::LectroTest>
+or L<Test::LectroTest::Compat>:
+
+    use Test::LectroTest
+        regressions => "regressions.txt";
+
+This tells LectroTest to use the file "regressions.txt" for both
+recording and playing back failures.  If you want to record and
+play back from separate files, use the I<record_failures> and
+I<playback_failures> options:
+
+    use Test::LectroTest::Compat
+        playback_failures => "regression_suite_for_my_module.txt",
+        record_failures   => "failures_in_the_field.txt";
+
+Here is how it works:
+
+=over 4
+
+=item 1
+
+When testing a property named I<N>, LectroTest will check for a
+play-back file.  If the file exists, LectroTest will search it for
+test cases associated with I<N>.  If any such test cases exist,
+LectroTest will play them back I<before> and I<in addition to>
+performing the usual, random testing of the property.
+
+=item 2
+
+When performing the usual, random testing of a property named I<N>,
+if a failure occurs (i.e., LectroTest finds a counterexample),
+LectroTest will record the test case that caused the failure to
+the recording file, associating the test case with the name I<N>.
+
+=back
+
+B<NOTE:> If you pass any of the recording or playback parameters to
+L<Test::LectroTest::Compat>, you must have version 0.3500 or greater
+of Test::LectroTest installed.  (Module authors, update your modules'
+build dependencies accordingly.)  The L<Test::LectroTest> module
+itself, however, has always ignored unfamiliar parameters, and thus
+these options are backward compatible with older versions.
+
+
+=cut
+
+
+=head1 SEE ALSO
+
+L<Test::LectroTest> gives a quick overview of automatic,
+specification-based testing with LectroTest.  This module
+accepts failure recording and play-back options.
+
+L<Test::LectroTest::Compat> lets you mix LectroTest with the
+popular family of L<Test::Builder>-based modules such as
+L<Test::Simple> and L<Test::More>. This module
+accepts failure recording and play-back options.
+
+
+=head1 AUTHOR
+
+Tom Moertel (tom@moertel.com)
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2004-13 by Thomas G Moertel.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,48 @@
+{
+   "abstract" : "Tear down and bring up databases with Mojo::Pg",
+   "author" : [
+      "RICHE"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mojo-Pg",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "Mojo::Base" : "0",
+            "Mojo::Pg" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Mojo::Pg" : {
+         "file" : "lib/Test/Mojo/Pg.pm",
+         "version" : "0.33"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rpcme/Test-Mojo-Pg/issues"
+      },
+      "homepage" : "https://github.com/rpcme/Test-Mojo-Pg",
+      "repository" : {
+         "url" : "https://github.com/rpcme/Test-Mojo-Pg.git"
+      },
+      "x_IRC" : "irc://irc.perl.org/#mojo"
+   },
+   "version" : "0.33"
+}

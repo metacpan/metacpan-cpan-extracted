@@ -1,0 +1,24 @@
+Revision history for Perl module Test::HTTP::Server
+
+0.04 2016-03-07 NEILB
+    - Added LICENSE AND COPYRIGHT, and AUTHOR, sections to the pod
+    - Added echo, cookie, and repeat to the tests. CHOROBA++
+    - Updated README to make clear it's not compatible with Windows.
+      Thanks to Viviparous.
+    - Made the server ignore the GET query_parameters. Merged PR from GETTY++.
+    - Deal with multiple leading /'s at the start of the path part of the URL.
+      Bug report and fix from dzjorz++ RT#95836
+    - Added this file (Changes)
+
+0.03 2011-05-15 SPARKY
+    - use constant compatible with archaic perl
+    - make sure address changes
+    - added port and address methods
+    - avoid "undefined" warning
+
+0.02 2011-05-09 SPARKY
+    - prefix all subpackages with Test::
+
+0.01 2011-05-09 SPARKY
+    - First release to CPAN
+

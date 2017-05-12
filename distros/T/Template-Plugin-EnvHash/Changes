@@ -1,0 +1,28 @@
+Revision history for Perl module Template::Plugin::EnvHash
+
+1.06 - No longer sign dist
+     - Document that env vars starting with _ are not supported and alter tests to filter out this case
+
+1.05 - Pod Updates
+
+1.04 - Remove unused use English which would impose a performance hit (at the
+       very least on older Perls)
+       (thanks to ask for reminding me about this)
+
+1.03 - Added KNOWN ISSUES section to docs
+
+1.02 - Added Test::Distribution tests, removed the 'manual' signature and pod tests,
+       renumbered tests. 003_load.t becomes 02_isa.t as use test is no longer required.
+
+1.01 - Fixed empty README file
+
+1.00 - First release to CPAN.  Has all the features  i intended when i
+       started writing it. Only changes i can think of are bug fixes 
+       (although hopefully nobody will find any bug fixes), a move from
+       a Test::Pod to Test::Distribution (waiting for a bug fix), and
+       implementation of any requested enhancements.
+
+0.01 Sun Sep  7 00:20:12 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

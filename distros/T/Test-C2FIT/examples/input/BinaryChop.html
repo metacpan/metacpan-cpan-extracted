@@ -1,0 +1,89 @@
+<html>
+<head>
+	<title>Wiki: Binary Chop</title>
+<head>
+<body bgcolor=#FFFFFF link=#d06040 vlink=#806040>
+	<h1>Binary Chop</h1>
+	<wiki><em>DaveThomas suggests practicing programming and offers 'Kata' (practice problems) to encourage the activity. Here is a recent Kata.</em>
+<p><UL>
+<li> <a href="//pragprog.com/pragdave/Practices/Kata/KataTwo.rdoc,v">http://pragprog.com/prag ... a/KataTwo.rdoc,v</a>
+<p></UL>
+<em>The Kata is to write a binary chop, often called binary search.  Dave offered the following specification and included test data which I've converted to tables.</em>
+<p><hr>
+<p>Write a binary chop method that takes an integer search target and a sorted array of integers. It should return the integer index of the target in the array, or -1 if the target is not in the array. The signature will logically be:
+<p><p><PRE>
+   chop(int, array_of_int)  -&gt; int
+<p></PRE>
+You can assume that the array has less than 100,000 elements. For the purposes of this Kata, time and memory performance are not issues (assuming the chop terminates before you get bored and kill it, and that you have enough RAM to run it).
+<p>Here is the test data I used when developing my methods. Feel free to add to it. The tests assume that array indices start at zero. 
+<p><em>The table has been modifed to run all of Ward's versions. Try this yourself with <a href="run.cgi">http:run.cgi</a>.</em>
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=7> eg.BinaryChop </td></tr>
+<tr><td> key </td><td> array </td><td> mon() </td><td> tue() </td><td> wed() </td><td> thr() </td><td> fri() </td></tr>
+<tr><td> 3 </td><td>&nbsp;</td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 3 </td><td> 1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 1 </td><td> 1 </td><td> 0 </td><td> 0 </td><td> 0 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> 1 </td><td> 1, 3, 5 </td><td> 0 </td><td> 0 </td><td> 0 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> 3 </td><td> 1, 3, 5 </td><td> 1 </td><td> 1 </td><td> 1 </td><td> 1 </td><td> 1 </td></tr>
+<tr><td> 5 </td><td> 1, 3, 5 </td><td> 2 </td><td> 2 </td><td> 2 </td><td> 2 </td><td> 2 </td></tr>
+<tr><td> 0 </td><td> 1, 3, 5 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 2 </td><td> 1, 3, 5 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 4 </td><td> 1, 3, 5 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 6 </td><td> 1, 3, 5 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 1 </td><td> 1, 3, 5, 7 </td><td> 0 </td><td> 0 </td><td> 0 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> 3 </td><td> 1, 3, 5, 7 </td><td> 1 </td><td> 1 </td><td> 1 </td><td> 1 </td><td> 1 </td></tr>
+<tr><td> 5 </td><td> 1, 3, 5, 7 </td><td> 2 </td><td> 2 </td><td> 2 </td><td> 2 </td><td> 2 </td></tr>
+<tr><td> 7 </td><td> 1, 3, 5, 7 </td><td> 3 </td><td> 3 </td><td> 3 </td><td> 3 </td><td> 3 </td></tr>
+<tr><td> 0 </td><td> 1, 3, 5, 7 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 2 </td><td> 1, 3, 5, 7 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 4 </td><td> 1, 3, 5, 7 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 6 </td><td> 1, 3, 5, 7 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+<tr><td> 8 </td><td> 1, 3, 5, 7 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td><td> -1 </td></tr>
+</table>
+<p><hr>
+<p>Dave suggests writing this program differently every day for a week. For a week. I've done that. He also suggests keeping track of errors, which I did and summarize as follows. 
+<p><p><UL>
+<li> Monday
+<UL>
+<li> off by one 
+<li> sense of test 
+<li>  operator precedence
+<li> leading blanks (in fit)
+<li> null value (in fit)
+</UL>
+<li> Tuesday
+<UL>
+<li> type incompatibility 
+<li> sense of test
+</UL>
+<li> Wednesday 
+<UL>
+<li> off by one 
+<li> offset 
+<li> sense of test 
+<li> case analysis
+</UL>
+<li> Thursday
+<UL>
+<li> interface
+</UL>
+<li> Friday 
+<UL>
+<li> no errors
+<p><p></UL>
+</UL>
+Wednesday was a tough day. Here are the kind of results I was getting while working on my third implementation which was the first to use recursion.
+<p><UL>
+<li> <a href="files/BinaryChop/wednesday.html">http:files/BinaryChop/wednesday.html</a>
+<p></UL>
+Notice that fit kept on running even as I repeatedly exhausted the runtime stack. This allowed me to study the distribution of errors and go directly to the source of my error. Then it worked perfectly.
+<p>See the source.
+<p><UL>
+<li> <a href="Release/Source/eg/BinaryChop.java">http:Release/Source/eg/BinaryChop.java</a>
+</UL>
+</wiki>
+<hr>
+	Last edited April 22, 2003
+</body>
+</html>
+

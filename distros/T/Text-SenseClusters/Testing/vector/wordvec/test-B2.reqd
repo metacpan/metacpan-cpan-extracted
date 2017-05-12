@@ -1,0 +1,2 @@
+ERROR(wordvec.pl):
+        Pair "art<>pattern" is repeated in the WORD_PAIRS file <test-B2.bi>.

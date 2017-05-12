@@ -1,0 +1,100 @@
+NAME
+    Type::Libraries - bundle up multiple type constraint libraries
+
+SYNOPSIS
+       package Contact {
+          use Moo;
+          use MooX::late;
+      
+          use Type::Libraries [qw(
+             Types::Standard
+             MooseX::Types::Common::Numeric
+             MouseX::Types::URI
+          )], qw( ArrayRef NegativeInt PositiveInt Uri );
+      
+          has house_number => (
+             is     => 'ro',
+             isa    => PositiveInt->plus_coercions(NegativeInt, '-$_'),
+             coerce => 1,
+          );
+      
+          has websites => (
+             is     => 'ro',
+             isa    => ArrayRef[Uri],
+             coerce => 1,
+          );
+       }
+
+DESCRIPTION
+    Type::Libraries allows you to import type constraints from multiple type
+    constraint libraries in a single `use` statement.
+
+    Whatsmore, it wraps type constraints using Type::Tiny to ensure that the
+    imported type constraint keywords will work in Moose-, Moo-, and
+    Mouse-based classes and roles. Yes, that's right: you can use
+    MooseX::Types libraries in Moo; MouseX::Types libraries in Moose and so
+    on.
+
+  Using Type::Libraries in classes and roles
+    The example in the "SYNOPSIS" demonstrates how to use Type::Libraries in
+    your class or role. (The example uses the MooX::late extension for Moo to
+    enable `coerce => 1` to work. Without this extension, Moo coercions need
+    to be a coderef, but it by no means necessary to use MooX::late if you're
+    using Type::Libraries.)
+
+    The basic syntax for importing types is:
+
+       use Type::Libraries \@libraries, @types;
+
+    For further information, see:
+
+    *   Type::Tiny::Manual::UsingWithMoose
+
+    *   Type::Tiny::Manual::UsingWithMoo
+
+    *   Type::Tiny::Manual::UsingWithMouse
+
+    *   Type::Tiny::Manual::UsingWithOther
+
+  Using Type::Libraries to create a union type library
+    You can also use Type::Libraries to create your own type constraint
+    library which is the union of several pre-existing one:
+
+       package MyTypes {
+          use Type::Libraries;
+          Type::Libraries->setup_class(
+             __PACKAGE__,   # me
+             qw(
+                Types::Standard
+                MooseX::Types::Common::Numeric
+                MouseX::Types::URI
+             ),
+          );
+       }
+
+    Your union type library can then be imported from:
+
+       use MyTypes qw( ArrayRef NegativeInt PositiveInt Uri );
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Type-Libraries>.
+
+SEE ALSO
+    MooseX::Types::Combine is similar, but only supports MooseX::Types
+    libraries.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

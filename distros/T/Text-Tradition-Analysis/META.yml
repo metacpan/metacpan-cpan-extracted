@@ -1,0 +1,46 @@
+---
+abstract: 'functions for stemma analysis of a tradition'
+author:
+  - 'Tara L Andrews <aurum@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  LWP::Protocol::https: 0
+  Test::More::UTF8: 0
+  Text::Tradition::Directory: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Text::Tradition::Analysis
+name: Text-Tradition-Analysis
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Algorithm::Diff: 0
+  Bio::Phylo::IO: 0
+  Data::Validate::IP: 0
+  Date::Parse: 0
+  File::Which: 0
+  File::chdir: 0
+  Graph: 0
+  Graph::Reader::Dot: 0
+  IPC::Run: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Role: 0
+  Set::Scalar: 0
+  Text::Tradition: 2.0.0
+  Text::Tradition::Error: 0
+  TryCatch: 0
+  perl: 5.12.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.0.4

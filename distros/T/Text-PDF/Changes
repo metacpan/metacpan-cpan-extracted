@@ -1,0 +1,38 @@
+0.31 2016-08-24
+
+* Sort PDF dictionary keys for consistent output
+* Bug fixes
+*    TTF Font objects had null BaseFont (broken at commit afd5b9a)
+*    [rt.cpan.org] #110854: Fix spelling error in manpage
+
+0.30 2016-08-17
+
+* Source repo moved from Subversion to Github
+* Add -p to pdfstamp
+* Add -g, -p, -u to pdfbklt
+* Bug fixes
+*    Wasn't installing on Windows Perl 5.22 and up
+*    [rt.cpan.org] #116492: make install fails under Strawberry Perl
+*    [rt.cpan.org] #110855: Fix pod2man errors
+*    [rt.cpan.org] #86452: Parse error reading array
+*    [rt.cpan.org] #78351: Invalid version format (non-numeric data)
+*    [rt.cpan.org] #41085: ASCII85 decode broken
+*    [rt.cpan.org] #35871: lzw compression fixup
+*    [rt.cpan.org] #32210: pdfstamp patch for use strict
+*    [rt.cpan.org] #31353: adding first test
+*    fix Dict::read_stream() to write long streams to file as intended
+*    fix LZWDecode to handle streams longer than 4096 bytes
+*    close INFILE at start of release()
+*    Fix Dict to allow single stream filters rather than requiring an array
+
+0.29a 2006-09-07
+
+* Bug fixes
+*    [rt.cpan.org] #18574: "make install" doesn't install code
+
+0.29 2006-06-23
+* Add Text::PDF.pm; take version from this file rather than from Text::PDF::File.pm
+* Add debian packaging instructions
+ 
+
+Some previous changes documented in lib/Text/PDF/File.pm and lib/Text/PDF/changes.old

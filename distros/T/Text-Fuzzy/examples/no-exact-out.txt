@@ -1,0 +1,6 @@
+With exact, nearest to bibbity is bibbity
+Without exact, nearest to bibbity is bobbity
+With exact, nearest to bobbity is bobbity
+Without exact, nearest to bobbity is bibbity
+With exact, nearest to boo is boo
+Without exact, nearest to boo is bobbity

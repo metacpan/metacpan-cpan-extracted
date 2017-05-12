@@ -1,0 +1,73 @@
+{
+   "abstract" : "window list is operated like Array",
+   "author" : [
+      "tokubass <tokubass@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.1.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-GnuScreen-WindowArrayLike",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Term::GnuScreen::WindowArrayLike" : {
+         "file" : "lib/Term/GnuScreen/WindowArrayLike.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokubass/p5-Term-GnuScreen-WindowArrayLike/issues"
+      },
+      "homepage" : "https://github.com/tokubass/p5-Term-GnuScreen-WindowArrayLike",
+      "repository" : {
+         "url" : "git://github.com/tokubass/p5-Term-GnuScreen-WindowArrayLike.git",
+         "web" : "https://github.com/tokubass/p5-Term-GnuScreen-WindowArrayLike"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:TOKUBASS"
+}

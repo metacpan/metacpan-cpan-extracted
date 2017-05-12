@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-simple_fail_test" errors="0" failures="2" tests="5" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/simple_fail.test">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Explanation:
+    failed tests (2, 5)
+Test output:
+    not ok - t/internal_tests/simple_fail.test
+]]>
+    </failure>
+  </testcase>
+  <testcase name="test 1"/>
+  <testcase name="test 2">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Test output:
+    not ok 2
+]]>
+    </failure>
+  </testcase>
+  <testcase name="test 3"/>
+  <testcase name="test 4"/>
+  <testcase name="test 5">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Test output:
+    not ok 5
+]]>
+    </failure>
+  </testcase>
+</testsuite>

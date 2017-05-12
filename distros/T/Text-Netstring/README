@@ -1,0 +1,25 @@
+
+Text::Netstring - Perl module for manipulation of netstrings
+
+Copyright (c) 2003 James Raftery <james@now.ie>. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Please submit bug reports, patches and comments to the author.
+Latest information at http://romana.now.ie/
+
+$Id: README,v 1.4 2003/01/30 21:20:21 james Exp $
+
+This module is a collection of functions to make use of netstrings
+in your perl programs.
+
+See the Text::Netstring man page that was installed with this module for
+information on how to use the module.
+
+Text::Netstring installs without any black magic:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+

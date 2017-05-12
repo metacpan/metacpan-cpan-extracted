@@ -1,0 +1,30 @@
+Revision history for Tree-Dump
+
+0.05    2016-11-23 (PERLANCAR)
+
+	- [Incompatible change] Rename children_method option to
+	  get_children_method.
+
+
+0.04    2016-11-21 (PERLANCAR)
+
+	- Accept options (currently known options: indent,
+	  children_method).
+
+
+0.03    2016-04-14 (PERLANCAR)
+
+	- Handle node that is not hash-based nor array-based, e.g.
+	  Class::InsideOut object.
+
+
+0.02    2016-03-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update sample output.
+
+
+0.01    2016-03-31 (PERLANCAR)
+
+        - First release.

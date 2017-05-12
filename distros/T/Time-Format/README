@@ -1,0 +1,96 @@
+Time::Format version 1.12
+=========================
+
+Time::Format provides a very easy way to format dates and times.  The
+formatting functions are tied to hash variables, so they can be used
+inside strings as well as in ordinary expressions.  The formatting
+codes used are meant to be easy to remember, use, and read.  They
+follow a simple, consistent pattern.  If I've done my job right, once
+you learn the codes, you should never have to refer to the
+documentation again.
+A quick-reference page is included, just in case.  ;-)
+
+Time::Format can also format DateTime objects, and strings created
+with Date::Manip.
+
+Also provided is a tied-hash interface to POSIX::strftime and
+Date::Manip::UnixDate.
+
+If the I18N::Langinfo module is available, Time::Format provides
+weekday and month names in a language appropriate for your locale.
+
+A companion module, Time::Format_XS, is also available; if it is
+installed, Time::Format will detect and use it, which will result in a
+significant speed improvement.
+
+
+EXAMPLES
+
+ $time{'Weekday Month d, yyyy'}   Thursday June 5, 2003
+ $time{'Day Mon d, yyyy'}         Thu Jun 5, 2003
+ $time{'DAY MON d, yyyy'}         THU JUN 5, 2003
+ $time{'dd/mm/yyyy'}              05/06/2003
+ $time{yymmdd}                    030605
+ $time{'yymmdd',time-86400}       030604
+
+ $time{'H:mm:ss am'}              1:02:14 pm
+ $time{'hh:mm:ss.uuuuuu'}         13:02:14.171447
+
+ $time{'yyyy/mm/dd hh:mm:ss.mmm'} 2003/06/05 13:02:14.171
+
+ $strftime{'%A %B %d, %Y'}             Thursday June 05, 2003
+ $strftime{'%A %B %d, %Y',time+86400}  Friday June 06, 2003
+
+ $manip{'%m/%d/%Y'}               06/05/2003
+ $manip{'%m/%d/%Y','yesterday'}   06/04/2003
+ $manip{'%m/%d/%Y','first monday in November 2000'}  11/06/2000
+
+There are also corresponding functions for each of these hashes, which
+you can use if you prefer (or need) a function-based interface.
+
+
+INSTALLATION
+
+To install this module, issue the following commands:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you do not have Module::Build, use the old-style commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you're using Strawberry Perl, you may need to use 'dmake' instead of
+'make.  If you're using ActiveState Perl, you may need to use 'nmake'.
+
+
+DEPENDENCIES
+
+This module can use these other modules and libraries:
+
+  Time::Local
+  I18N::Langinfo  (optional)
+  POSIX           (optional)
+  Time::HiRes     (optional)
+  Date::Manip     (optional)
+  Time::Format_XS (optional)
+  Test::More      (used by the test suite only)
+  Module::Signature  (optional) (used by test suite only)
+
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode, roode @ cpan . org
+
+Copyright © 2003-2012 by Eric J. Roode. All Rights Reserved.
+This module is free software; See the copyright notice in the
+module source code for full details.
+
+To avoid my spam filter, please include "Perl", "module", or this
+module's name in the message's subject line, and/or GPG-sign your
+message.

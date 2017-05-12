@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 b6efa2f778c9315095d6ac44ad0df2e5a5468c12 COPYRIGHT
+SHA1 7a0065a9c10b9106cb8129a69861e66f03e33d45 CREDITS
+SHA1 c60f2fa595440e5cde15259c2145d9eae642a4d4 Changes
+SHA1 9b87d50b70b76587f520db274bb691f34410dbb5 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 57d42be1b63b9001cc1dce5ead8e5847742438b5 MANIFEST
+SHA1 0d80226ab9248c3f0c2f9744f672a9b9cc838700 META.json
+SHA1 8a7c7b57d6d4137d35d585623c9967d9e8884dd6 META.yml
+SHA1 0a3ced5fcba3ba27178896c35a9c04fb7cab288d Makefile.PL
+SHA1 93cc2cd297413e99c613d0a952a3ac0e7a664371 NEWS
+SHA1 77b4000ad43e2320135b2b11d57dd7b1e49ca689 README
+SHA1 e2a0ee55faa0c7b17c98c3d56a860c722eede648 dist.ini
+SHA1 dfb02a293d2998dd5556ef2fec7fd3014a1e5523 doap.ttl
+SHA1 042ed290ed9415d9915b39591b3d39083eaead7c lib/Throwable/Factory.pm
+SHA1 3472e00082f6fa11fdf6d08b5d285585fb22565d t/01basic.t
+SHA1 b7dd0bdae7ce0f645fae8d3aee53a70e60f60e35 t/02ecstyle.t
+SHA1 e111f5824403283bdf2be4a38670472d3ab3982d t/03baseclass.t
+SHA1 68641a151758daba6052f74aff0b433e1d65f62f t/04taxonomy.t
+SHA1 7772d0f22f4f656a8ba34f973308332af2c5031f t/05ttbc.t
+SHA1 7769204726ad37b9cb4cb427aaddc7345085a8fd t/ec/basic.t
+SHA1 15772f223f3371775e8b9a9064c3007e59039c56 t/ec/context.t
+SHA1 33a87c86bf0f1002470d326596fe4ee6d3a0f25d t/ec/ecb-standalone.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQyUUACgkQzr+BKGoqfTkTsgCfWgg/LoHMqDnTEMButig0+cJG
+RHQAoJcB8XXtnkhvHu734+PxES0EmzxU
+=ATRs
+-----END PGP SIGNATURE-----

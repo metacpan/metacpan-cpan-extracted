@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Text/GooglewikiFormat.pm
+lib/Text/GooglewikiFormat/Blocks.pm
+MANIFEST
+README
+t/00-load.t
+t/01-test.t
+t/02-prefix.t
+t/03-wholepage.t
+t/pod.t
+Makefile.PL
+META.yml

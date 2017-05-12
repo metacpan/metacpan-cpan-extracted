@@ -1,0 +1,15 @@
+Changes
+lib/Template/Plugin/Lingua/EN/Fractions.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/00use.t
+t/01filter.t
+t/90podtest.t
+t/91podcover.t
+t/94metatest.t
+t/95changedate.t
+t/96metatest.t

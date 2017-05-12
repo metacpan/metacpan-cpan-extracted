@@ -1,0 +1,20 @@
+1..2 todo 1;
+# Running under perl version 5.006001 for MSWin32
+# Win32::BuildNumber 635
+# Current time local: Thu Apr 15 12:57:42 2004
+# Current time GMT:   Thu Apr 15 16:57:42 2004
+# Using Test.pm version 1.24
+# Test::Tech    : 1.18
+# Data::Secs2   : 1.16
+# Data::SecsPack: 0.02
+# =cut 
+ok 1 - Todo test that passes  # (techC0.t at line 51 TODO?!)
+not ok 2 - Test that fails 
+# Test 2 got: 'U1[1] 80
+N[2] 5 6
+' (techC0.t at line 56)
+#   Expected: 'U1[1] 80
+N[2] 6 5
+'
+# Failed : 2
+# Passed : 1/2 50%

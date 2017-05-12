@@ -1,0 +1,95 @@
+{
+   "abstract" : "Detects unused variables in perl modules",
+   "author" : [
+      "Goro Fuji (gfx) <gfuji(at)cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Vars",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Moose::Role" : "0",
+            "Pod::Spelling" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.04",
+            "Test::Spelling" : "0.12",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "List::Util" : "1.33",
+            "parent" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Vars" : {
+         "file" : "lib/Test/Vars.pm",
+         "version" : "0.014"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/houseabsolute/p5-Test-Vars/issues"
+      },
+      "homepage" : "https://github.com/houseabsolute/p5-Test-Vars",
+      "repository" : {
+         "url" : "git://github.com/houseabsolute/p5-Test-Vars.git",
+         "web" : "https://github.com/houseabsolute/p5-Test-Vars"
+      }
+   },
+   "version" : "0.014",
+   "x_contributors" : [
+      "Nicholas Clark <nick@ccl4.org>",
+      "Olivier Mengué <dolmen@cpan.org>",
+      "Fuji, Goro <gfuji@cpan.org>",
+      "Fuji, Goro <g.psy.va@gmail.com>",
+      "Dmitry Matrosov <amidos@amidos.ru>",
+      "Ran Eilam <ran.eilam@gmail.com>",
+      "FUJI Goro <gfx@users.noreply.github.com>",
+      "FUJI Goro <goro.fuji@ebookjapan.co.jp>",
+      "Michael G. Schwern <schwern@pobox.com>",
+      "Gregory Oschwald <goschwald@maxmind.com>",
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

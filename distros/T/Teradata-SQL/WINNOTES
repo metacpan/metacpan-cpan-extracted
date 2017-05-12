@@ -1,0 +1,43 @@
+Notes for Teradata::SQL under Windows
+ 
+The easiest way to run Teradata::SQL under Windows is to download
+the PPM version from CPAN. This works with the ActiveState Perl
+Package Manager.
+ 
+[CPAN mirror]/modules/by-authors/id/G/GR/GROMMEL/
+ 
+If you need to build the module yourself, you can try the following
+steps. Since I do not pretend to be a Windows expert, these steps
+are probably incomplete. Those with more Windows experience are
+invited to tie up the loose ends.
+ 
+1. Install the Teradata CLIv2 libraries (.h and .dll).
+ 
+2. Install .NET Framework (v1.1 is adequate) and Platform SDK (core)
+   if necessary. These are included with recent versions of Windows.
+ 
+3. Unzip and untar the Teradata-SQL package. You may run 'unix2dos' or
+   a similar program to change the line terminations in all files, but
+   that isn't necessary.
+ 
+4. Set PATH, LIB, and INCLUDE to include the 32-bit libraries. The 
+   module has unresolved difficulties with 64-bit CLI. The script I
+   used for Windows Server 2003 is shown below; modify as needed
+   for your server.
+ 
+5. perl Makefile.PL
+ 
+6. nmake, etc., as usual.
+ 
+ 
+<Script to set PATH etc.>
+:: Set up 32-BIT environment for compiling Perl modules
+
+call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat"
+
+path %PATH%;C:\Program Files (x86)\Teradata\Client\14.00\bin
+
+set LIB=%LIB%;C:\Program Files (x86)\Teradata\Client\14.00\CLIv2;C:\Program Files (x86)\Teradata\Client\14.00\CLIv2\lib
+
+set INCLUDE=%INCLUDE%;C:\Program Files (x86)\Teradata\Client\14.00\CLIv2\inc
+

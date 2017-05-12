@@ -1,0 +1,50 @@
+=encoding utf8
+
+This is Perl module B<Text::Chord::Piano>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Text-Chord-Piano"><img src="https://secure.travis-ci.org/bayashi/Text-Chord-Piano.png"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+B<Text::Chord::Piano> installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Text::Chord::Piano
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % sudo make install
+
+
+=head1 DOCUMENTATION
+
+B<Text::Chord::Piano> documentation is available as in POD. So you can do:
+
+    % perldoc Text::Chord::Piano
+
+
+=head1 REPOSITORY
+
+Text::Chord::Piano is hosted on github
+L<http://github.com/bayashi/Text-Chord-Piano>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

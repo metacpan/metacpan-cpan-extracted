@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 48ff1a92e30eb6954bcb9b248df37f6be6db8968 Changes
+SHA1 c6f11f9c433b61f30078455595178bbdd66473e7 MANIFEST
+SHA1 10d41809ae6441ff641c08d5c7f47be39abcf872 META.yml
+SHA1 8e6da5c504e0278f75f846653a6f8f9e0cb27dc2 Makefile.PL
+SHA1 7866362462e7d5ddec536956cd6a4d743764bd82 doc/fancy-sessions.t
+SHA1 8b836389e4bc170eb8d19b7296b2f4978ac36136 inc/Module/Install.pm
+SHA1 85b32a1d5f215d99f411c3dd6113b537fcd5c57d inc/Module/Install/Base.pm
+SHA1 fde745e180861c7c0ba3ee5a767cafdbdb1d3ebd inc/Module/Install/Can.pm
+SHA1 e259400ceb54c34def9c994f52d7091108ce7ffc inc/Module/Install/Fetch.pm
+SHA1 da42b522e5a7ffbae0ceec900f3635ad9990c565 inc/Module/Install/Makefile.pm
+SHA1 ba005818ee9f97146bfa4e14e53c684e9e446902 inc/Module/Install/Metadata.pm
+SHA1 85e6b1cf5b7ca81bfb469a99389fa947d4b8a08e inc/Module/Install/Win32.pm
+SHA1 d32dff9f0d2f02023ca6d79a48d62fd855916351 inc/Module/Install/WriteAll.pm
+SHA1 a9cb74e6c446a303d108ee0712e26c152b44c179 lib/Test/WWW/Declare.pm
+SHA1 3df846aef9eb74f50a4d5b628fd1375cef1c038f lib/Test/WWW/Declare/Tester.pm
+SHA1 9a4d18d8c4fc8a619691f0654738b5e43286ffdf t/00-load.t
+SHA1 162f15a1cdb4f2be0851361562635fe5887e62b7 t/01-basic.t
+SHA1 f9b5f4d041826294222571069fccffbbf4687b14 t/02-skip.t
+SHA1 695cead8c0cf155b179e47f41b5f667057533c73 t/03-mech.t
+SHA1 e605e2688c3e00b29b292ea043e9175f5c586516 t/04-fail.t
+SHA1 29523034edfdf0d6fd127945f8ed8475d9829f2b t/05-forms.t
+SHA1 189a151e3947670846ebe78774f27ab4c99a3168 t/06-title.t
+SHA1 1471f00cc7add721cd515eaf8db7ea8e057bce6c t/07-alt-names.t
+SHA1 c845b24562c68b40b8bb1978aa8592738a64edd3 t/08-error.t
+SHA1 22c10e0718ba1baed0989926d5e5fe7941b121ca t/09-multisession.t
+SHA1 e0628d10300b95dfb52fb01425acf87fd0c2fe62 t/10-nested-flow.t
+SHA1 48eaccf733d518aa37d7f95dc32cffe753af5297 t/11-nested-flow-error.t
+SHA1 34c1bd8496863ee04d83fa4f69e9b9325ac99201 t/12-nested-flow-skip.t
+SHA1 5b4e46b35abb5f2f328d6e19e43d570fc26500c6 t/13-flowless.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFI8oBtsxfQtHhyRPoRAi2xAJ4/zo9RlC5C/zSDUctgVIB0snzB1wCfYKfc
+oGX7pgJ82oqS9+N/EE9oWX4=
+=FXV3
+-----END PGP SIGNATURE-----

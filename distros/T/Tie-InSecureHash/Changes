@@ -1,0 +1,2 @@
+1.07  First round code deletion was a little too agressive.
+1.04  Tie::InSecureHash.  Tie::SecureHash but with no features.

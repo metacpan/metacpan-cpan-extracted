@@ -1,0 +1,239 @@
+Revision history for perl module Text::Amuse
+
+0.82 2017-04-03
+
+ - Support named anchors in sections and verses (and relaxed the
+   matching rule so it can be anywhere, but always on a line by
+   itself).
+
+0.81 2017-03-13
+
+ - Fix <verbatim> inside url formatting
+
+0.80 2017-03-06
+
+ - Add support for <verbatim> tag (GH#8 and GH#7)
+
+0.76 2016-10-20
+
+ - Removed the use of $_ while reading files, which in some (corner)
+   cases can create problems.
+
+0.75 2016-10-09
+
+ - Putting hyperlinks in headings is doomed to break latex, so do not
+   consider them as links in that context.
+
+0.74 2016-08-13
+
+ - Fixed parsing bug on multiline footnotes
+
+0.73 2016-07-22
+
+ - Added language mappings for all the languages polyglossia supports.
+
+0.72 2016-07-19
+
+ - Fixed LaTeX compilation failure when a heading's footnote is
+   multipar.
+
+0.71 2016-07-11
+
+ - Added class text-amuse-link to HTML links (GH#3)
+
+0.70 2016-07-11
+
+ - Implemented internal linking (GH#4)
+   https://www.gnu.org/software/emacs-muse/manual/muse.html#Horizontal-Rules-and-Anchors
+
+0.62 2016-06-21
+
+ - Prevent overflowing of images enforcing the max height.
+ - Translate <br> to \par while in a footnote.
+
+0.61 2016-05-09
+
+ - Removed minimum perl version, which shouldn't be needed
+ - Replaced "start body" in the ToC with the title (if present)
+
+0.60 2016-03-12
+
+ - Added {{{  }}} markup for code blocks.
+
+0.55 2016-02-01
+
+ - Deprecated (and not installed anymore) the executable muse-quick.pl
+ - Added debian directory (not included in the CPAN tarball)
+ - Documentation fixes
+
+0.54 2015-12-05
+
+ - Added methods wants_preamble wants_postamble
+
+0.53 2015-12-05
+
+ - Handle the HTML toc with partials
+
+0.52 2015-12-04
+
+ - Fixed obvious bug with partial index == 0
+
+0.51 2015-12-04
+
+ - Handle the raw_html_toc taking care of the partial option
+
+0.50 2015-12-04
+
+ - Implemented method as_splat_latex
+ - Support partial output with new option partial
+
+0.43 2015-10-13
+
+ - Optionally use Text::Diff in t/output.t
+ - Test the full output of beamer
+ - Be more tolerant when detecting ignored sections in slides
+
+0.42 2015-10-10
+
+ - Fixed warnings on newer perls for unescaped left brace in regex.
+
+0.41 2015-10-03
+
+ - Made all the beamer frames fragile
+ - Doc fixes
+
+0.40 2015-10-03
+
+ - Added as_beamer method
+ - Added description lists (plus fixes to list parsing)
+
+0.33 2015-06-20
+
+ - Added polish support
+
+0.32 2015-05-10
+
+ - Ignore spaces in latex output before <br>. This was causing weird
+   spacing in right and center paragraphs with <br>
+
+0.31 2015-04-08
+
+ - Fixed long-standing bug when a visible new line is appended to the
+   <example> stanzas.
+
+0.30 2015-04-07
+
+ - Refactoring of the element parsing (in context, hence the major
+   version bump)
+
+ - Fixed false positive on list detection because of lists being too
+   greedy
+
+0.22 2015-03-21
+
+ - Minor syntax change (documented in the manual): require indentation
+   to trigger a table.
+
+ - Do not consider footnotes as such if they have no text material
+
+0.21 2015-02-03
+
+ - Added method hyphenation to get a validated string to insert into
+   LaTeX \hyphenation
+
+0.20 2015-01-22
+
+ - Fixed bug where page break marker created a \cleardoublepage
+   instead of simply \clearpage
+
+0.19 2015-01-13
+
+ - Added method header_defined for easier handling in templates
+
+0.18 2014-11-27
+
+ - Fixed crash on page break markers (introduced in 0.15)
+
+0.17 2014-11-20
+
+ - Corrected language code for swedish from se to sv
+
+0.16 2014-11-20
+ - Added swedish language
+
+0.15 2014-10-06
+ - Moved the manual from the example directory into the testfile
+ - The page break marker (* * * * *) is removed from LaTeX output
+
+0.14 2014-07-20
+
+ - Moved test for Devel::Size in its own size (fails with perl 5.20,
+   can't be installed).
+ - Fixed wrong portuges language in the language mapping
+
+0.12 2014-05-24
+
+ - Removed anchors when generating a HTML toc
+
+0.11 2014-03-22
+
+ - Added missing "file" accessor in main module. Not really needed,
+   but nice to have.
+ - Added placeholders for other_language_codes and other_languages.
+
+0.10 2014-02-18
+
+ - Bugfix: Fixed missing macedonian language in the list
+
+0.09 2014-02-16
+
+ - Bugfix: Fixed corner cases with strings "0" which evaluate to false.
+
+0.08 2014-02-16
+
+ - If tables have a caption (\caption[]{text}), they are floats now
+ - Fixed line-breaks in captions
+
+0.07 2014-02-09
+
+ - Fixed LaTeX output for captions and tables
+ - Better error handling on PDF generation (muse-quick.pl)
+ - Changed experimental syntax for image floating and fix
+   for long series of images.
+   http://www.tex.ac.uk/cgi-bin/texfaq2html?label=tmupfl
+ - Added updated manual
+ - Added image syntax to the manual
+
+0.06 2014-01-30
+
+ - New functions in Text::Amuse::Functions: muse_to_tex and muse_to_html
+ - Bugfix: Don't use \bigskip when inside a paragraph
+ - Bugfix: Fixed Changes file
+ - Bugfix: Permit empty directives without packing them in the previous
+   line
+
+0.05 2014-01-19
+
+ - New function Text::Amuse::Utils::muse_fast_scan_header
+
+0.04 2013-12-02
+
+ - Release 0.04
+ - Improved muse-quick.pl: change directory while compiling
+
+0.03 2013-11-27
+
+ - Improved muse-quick.pl output and behaviour. Made EBook::EPUB optional.
+
+0.02 2013-10-14
+
+ - Improved images handling (with hidden experimental features, see
+ - tests in images.t if you're curious).
+ - Improved muse-quick.pl script + doc.
+ - Improved docs.
+
+0.01 2013-06-02
+
+ - Release 0.01
+ - Initial release on CPAN.
+

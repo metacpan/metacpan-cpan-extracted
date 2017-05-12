@@ -1,0 +1,83 @@
+{
+   "abstract" : "Override the LWP::UserAgent to return canned responses for testing",
+   "author" : [
+      "Douglas Christopher Wilson <doug@somethingdoug.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Override-UserAgent",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Request" : 0,
+            "HTTP::Response" : 0,
+            "IO::String" : 0,
+            "LWP::UserAgent" : 0,
+            "Sub::Install" : "0.90",
+            "Test::Fatal" : 0,
+            "Test::More" : "0.88",
+            "Test::Requires" : "0.02"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Clone" : 0,
+            "HTTP::Config" : "5.815",
+            "HTTP::Date" : 0,
+            "HTTP::Headers" : 0,
+            "HTTP::Response" : 0,
+            "HTTP::Status" : "5.817",
+            "LWP::Protocol" : 0,
+            "LWP::UserAgent" : 0,
+            "Scalar::Util" : 0,
+            "Sub::Install" : "0.90",
+            "Sub::Override" : 0,
+            "Try::Tiny" : 0,
+            "URI" : 0,
+            "namespace::clean" : "0.04",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Override::UserAgent" : {
+         "file" : "lib/Test/Override/UserAgent.pm",
+         "version" : "0.004001"
+      },
+      "Test::Override::UserAgent::Scope" : {
+         "file" : "lib/Test/Override/UserAgent/Scope.pm",
+         "version" : "0.004001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/dougwilson/perl5-test-override-useragent/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/dougwilson/perl5-test-override-useragent.git"
+      }
+   },
+   "version" : "0.004001"
+}

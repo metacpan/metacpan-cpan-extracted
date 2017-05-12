@@ -1,0 +1,16 @@
+Build.PL
+Changes
+ignore.txt
+lib/Test/Dist/VersionSync.pm
+lib/Test/Dist/VersionSync/Sample1.pm
+lib/Test/Dist/VersionSync/Sample2.pm
+lib/Test/Dist/VersionSync/SampleTest.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t

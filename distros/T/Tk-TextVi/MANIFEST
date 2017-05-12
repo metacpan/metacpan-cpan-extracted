@@ -1,0 +1,23 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Tk/TextVi.pm
+EditorVi.pm
+t/00-load.t
+t/10-move.t
+t/11-mark.t
+t/13-findchar.t
+t/14-findline.t
+t/15-search.t
+t/20-delete.t
+t/21-replace.t
+t/30-insert.t
+t/32-vchar.t
+t/33-vline.t
+t/40-register.t
+t/41-macro.t
+t/60-info.t
+t/80-setting.t
+bin/TextViDemo.pl
+META.yml                                 Module meta-data (added by MakeMaker)

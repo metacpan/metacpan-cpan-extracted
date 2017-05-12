@@ -1,0 +1,12 @@
+eg/test.pl
+lib/Tk/Text/SuperText.pm
+t/00-load-Tk-Text-Supertext.t
+t/03-pod-coverage.t
+t/90-pod.t
+CHANGES
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README

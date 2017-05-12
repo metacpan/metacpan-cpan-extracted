@@ -1,0 +1,903 @@
+%{
+use Data::Dumper;
+use TM;
+use TM::Literal;
+
+use constant {
+    XSD        => 'http://www.w3.org/2001/XMLSchema',
+    XSD_STRING => 'http://www.w3.org/2001/XMLSchema#string',
+    ASTMA      => 'http://psi.tm.bond.edu.au/astma/2.0/',
+    ONTOLOGY   => 'http://psi.tm.bond.edu.au/astma/2.0/#ontology',
+    TEMPLATE   => 'http://psi.tm.bond.edu.au/astma/2.0/#template'
+    };
+
+sub _expand_template {
+    my $store  = shift;
+    my $ted    = shift;
+    my $params = shift; # they are all strings at this level
+
+#warn "params".Dumper $params;
+
+    my @returns = $store->match (TM->FORALL, type => 'return', irole => 'thing', iplayer => $store->tids ($ted) )
+                  or die "template '$ted' does not have a 'return' characteristic";
+#warn Dumper \@returns;
+    my $return = $returns[0]->[TM->PLAYERS]->[1] and (scalar @returns == 1
+                  or die "ambiguous 'return' characteristics for '$ted'");
+
+    my $value  = $return->[0] and ($return->[1] eq 'http://www.w3.org/2001/XMLSchema#string' 
+		  or die "'return' characteristic of '$ted' is no string");
+#warn "template id '$ted' >>>$value<<<";
+    foreach my $p (keys %$params) {
+	$value =~ s/{\s*\$$p\s*}/$params->{$p}/sg;
+    }
+#warn "after template id '$ted' >>>$value<<<";
+    die "variable '$1' in template '$ted' has no value at expansion" if $value =~ /{\s*(\$\w+)\s*}/;
+    return $value;
+}
+
+%}
+
+%token DUMMY
+
+%token EOL
+%token DOT
+%token BRA
+%token KET
+%token URI
+%token TILDE
+%token EQUAL
+%token COLON
+%token NAME
+%token OCC
+%token VALUE
+%token HAS
+%token DOWNCOMMA
+%token COMMA
+%token WHICH
+%token TED
+%token REIFIES
+%token ISREIFIED
+%token LPAREN
+%token RPAREN
+
+%token SUBCL
+%token ISA
+
+%token LOG
+%token CANCEL
+%token VERSION
+%token INCLUDE
+
+
+%token COMMENT
+%token WILDCARD
+%token DATE
+
+%token BN
+%token OC
+%token IN
+%token SIN
+%token STRING
+%token ID
+%token ISINDICATEDBY
+%token LBRACKET
+%token RBRACKET
+%token AT
+
+%%
+
+
+
+instance            : # empty
+                    | instance EOL
+                    | instance clause
+    ;
+
+clause              :                                     { $_[0]->{USER}->{ctx} = undef; } 
+                      theme DOT
+                    | template_expansion
+                    | directive
+    ;
+
+directive           : CANCEL                              { die "Cancelled"; }
+                    | LOG                                 { warn $_[1]; 1; }              # write message to STDERR
+                    | VERSION                             { die "unsupported version $_[1]" unless $_[1] =~ /^2\./; 1; }
+                    | INCLUDE                             {
+                                                            my $content;
+
+                                                            if ($_[1] =~ /\|\s*$/) { # a pipe | at the end, this is a UNIX pipe
+								my $fh = IO::File->new ($_[1]) || die "unable to open pipe '$_[1]'";
+								local $/ = undef;
+								$content = <$fh>;
+								$fh->close;
+							    } else {
+								use LWP::Simple;
+								$content = get($_[1]) || die "unable to load '$_[1] with LWP'\n";
+							    }
+#warn "new content >>>$content<<<";
+                                                            $_[0]->YYData->{INPUT} = $content . $_[0]->YYData->{INPUT}; # prepend it
+                                                            }
+                    | ENCODING                            {
+                                                            use Encode;
+                                                            Encode::from_to ($_[0]->YYData->{INPUT}, "iso-8859-1", $_[1]);
+                                                            }
+    ;
+
+template_expansion  : TED parameters                      { $_[0]->YYData->{INPUT} .= "\n" . 
+                                                                                      _expand_template ($_[0]->{USER}->{store},
+													$_[1],
+													$_[2])      # compute the expanded version
+                                                                                    . "\n";                         # extend the text at the end;
+                                                           }
+    ;
+
+parameters          : # empty
+                                                          { { } }
+                    | LPAREN bindings RPAREN              { $_[2] }
+    ;
+
+bindings            : binding
+                    | bindings COMMA binding              { $_[1] = { %{$_[1]}, %{$_[3]} }; $_[1]; }                # combine the hashes
+    ;
+
+binding             : ID COLON { $_[0]->{USER}->{value} = 1 } VALUE          { { "$_[1]" => $_[4]->[0] } }          # create a small hash (and use the string)
+    ;
+
+theme               : BRA topic KET
+                    | topic
+    ;
+
+topic               : { unshift @{$_[0]->{USER}->{ctx}}, undef; }                      # push a (yet unknown) topic
+                      attachments
+                      association
+    ;
+
+association         : # empty
+                    | REIFIES          { $_[0]->{USER}->{reifier} = $_[0]->{USER}->{ctx}->[0]; 
+					                            $_[0]->{USER}->{ctx}->[0] = undef;
+				       }
+                      identification   { $_[0]->{USER}->{atype}   = $_[0]->{USER}->{ctx}->[0];
+					 $_[0]->{USER}->{assoc}   = 1;                                 # indicate to lexer that we are in assoc context
+				       }
+                      scope
+                      rolesin roles rolesout
+                      {
+#  warn "roles :". Dumper $_[7];
+			  $_[0]->{USER}->{store}->assert ([ $_[0]->{USER}->{reifier},       # LID
+							    $_[5],                          # SCOPE
+							    $_[0]->{USER}->{atype},         # TYPE
+							    TM->ASSOC,                      # KIND
+							    @{$_[7]},  # ROLES, PLAYERS
+							    undef ] );
+                          $_[0]->{USER}->{implicits}->{'isa-scope'}->{$_[5]}++ if $_[5];
+	                  $_[0]->{USER}->{assoc} = undef;                                 # indicate to lexer that we left assoc context
+		      }
+    ;
+
+rolesin             : LPAREN | EOL
+    ;
+rolesout            : # empty
+                    | RPAREN
+                    | EOL
+    ;
+rolesep             : COMMA | EOL
+    ;
+
+roles               : role
+                    | roles rolesep role         { 
+                                                  push @{$_[1]->[0]}, @{$_[3]->[0]};
+						  push @{$_[1]->[1]}, @{$_[3]->[1]};
+						  $_[1];
+					          }
+    ;
+
+role                : topic { $_[0]->{USER}->{role} = $_[0]->{USER}->{ctx}->[0] }
+                      COLON {                         $_[0]->{USER}->{ctx}->[0] = undef } # clean out context
+                      identifications          {
+			                        [ [ ($_[0]->{USER}->{role}) x scalar @{$_[5]} ], $_[5] ]
+						}
+    ;
+
+identifications     :                 identification { $_[0]->{USER}->{ctx}->[0] = undef }  # clean out context here
+                                                     { [ $_[1] ] }
+                    | identifications identification { $_[0]->{USER}->{ctx}->[0] = undef }
+                                                     { push @{$_[1]}, $_[2]; $_[1]; }
+    ;
+
+attachments         : # empty
+                    | attachments       HAS characteristic
+                    | attachments WHICH HAS characteristic
+                    | attachments           expansion
+                    | attachments WHICH     expansion
+                    | attachments           identification
+                    | attachments EOL       identification
+    ;
+
+relative            : # empty
+                    | DOWNCOMMA attachments upcomma
+    ;
+
+upcomma             : # empty
+                    | COMMA
+    ;
+
+predefined_inlines  : ISA   { 'isa' }
+                    | SUBCL { 'subclasses' }
+                    | TED
+    ;
+
+expansion           : predefined_inlines parameters { unshift @{$_[0]->{USER}->{ctx}}, undef; } identification
+                               {
+#  warn " expand ctx ".Dumper $_[0]->{USER}->{ctx};
+				my $left      = $_[0]->{USER}->{ctx}->[1];
+				my $ted       = $_[1];
+				my $right     = $_[0]->{USER}->{ctx}->[0];
+				my $store     = $_[0]->{USER}->{store};
+                                my $params    = $_[2];
+
+#warn "left $left ted $ted right $right";
+
+				if ($ted eq 'subclasses') {
+				    $store->assert ([ undef,                          # LID
+						      undef,                          # SCOPE
+						      'is-subclass-of',               # TYPE
+						      TM->ASSOC,                      # KIND
+						      [ 'subclass',  'superclass' ],  # ROLES
+						      [ $left,       $right ],        # PLAYERS
+						      undef ] );
+				} elsif ($ted eq 'isa') {
+				    $store->assert ([ undef,                   	      # LID
+						      undef,                   	      # SCOPE
+						      'isa',                  	      # TYPE
+						      TM->ASSOC,        	      # KIND
+						      [ 'instance', 'class' ], 	      # ROLES
+						      [ $left,       $right ],	      # PLAYERS
+						      undef ] );
+				} elsif ($ted eq 'hasa') {                            # same, but other way round
+				    $store->assert ([ undef,                   	      # LID
+						      undef,                   	      # SCOPE
+						      'isa',               	      # TYPE
+						      TM->ASSOC,        	      # KIND
+						      [ 'instance', 'class' ], 	      # ROLES
+						      [ $right,     $left ],	      # PLAYERS
+						      undef ] );
+				} else {
+				    $_[0]->YYData->{INPUT} .= "\n" .
+    					                      _expand_template ($store,
+										$ted,
+										{ %$params,
+										  '_left' => $left,
+										  '_right' => $right})      # compute the expanded version
+                                                            . "\n";                                         # extend the text at the end;
+				}
+			    }
+
+                       relative  { shift @{$_[0]->{USER}->{ctx}}; } # clean out context
+    ;
+
+identification      : tid      {
+#    warn "tid: >>".$_[1]."<<";
+                                 if (! defined $_[1]) {                                                     # wildcard
+				     $_[0]->{USER}->{ctx}->[0] ||= $_[0]->{USER}->{store}->internalize (sprintf "uuid-%010d", $TM::toplet_ctr++);
+				 } elsif (ref ($_[1])) {                                                    # reference means indicator
+                                     $_[0]->{USER}->{ctx}->[0] = $_[0]->{USER}->{store}->internalize ($_[0]->{USER}->{ctx}->[0] => $_[1]);
+				 } elsif ($_[1] =~ /^\w+:.+/) {                                             # URI means subject address
+                                     $_[0]->{USER}->{ctx}->[0] = $_[0]->{USER}->{store}->internalize ($_[0]->{USER}->{ctx}->[0] => $_[1]);
+				 } else {                                                                   # some lousy identifier
+#   warn "checking for context ".Dumper $_[0]->{USER}->{ctx}->[0] ;
+				     die "duplicate ID: $_[1] and $_[0]->{USER}->{ctx}->[0]"
+					 if ($_[0]->{USER}->{ctx}->[0]);                                    # we already have an identifier!
+				     $_[0]->{USER}->{ctx}->[0] = $_[0]->{USER}->{store}->internalize ($_[1]);
+				 }
+                                 $_[1] = $_[0]->{USER}->{ctx}->[0];                                     # whatever that was, that's it
+			     }
+;
+
+characteristic      : tid scope type COLON { $_[0]->{USER}->{value} = 1 } VALUE
+                            {
+				my $ctype = $_[1];
+				my $cclass;                                        # we do not yet know what this will be
+				if ($_[3]) {                                       # there is a type specified
+				    $cclass = $_[3];                               # take this to be the class of what ctype is
+				} elsif ($_[1] =~ /.*name$/) {                     # looks like a name
+				    if ($_[6]->[1] eq XSD_STRING) {                # but we check first what type the value is
+					$cclass = 'name';                          # for a string we allow it to be a name
+				    } else {
+					$cclass = 'occurrence';                    # otherwise, we guess it is an occurrence
+				    }
+				} else {                                           # type does not end with 'name'
+				    $cclass = 'occurrence';                        # this is then an occurrence
+				}
+
+				if ($cclass ne $ctype) { # a new instance was introduced
+				    $store->assert ([ undef,                   	      # LID
+						      undef,                   	      # SCOPE
+						      'is-subclass-of',        	      # TYPE
+						      TM->ASSOC,        	      # KIND
+						      [ 'subclass', 'superclass' ],   # ROLES
+						      [ $ctype,      $cclass ],	      # PLAYERS
+						      undef ] );
+				}
+#  warn "char $_[1] ctx ".Dumper $_[0]->{USER}->{ctx};
+				$_[0]->{USER}->{store}->assert (                                                  #
+								[
+								 undef,                                           # LID
+								 $_[2],                                           # SCOPE (undef is ok)
+								 $_[1],                                           # TYPE
+
+								 $cclass eq 'name'       ? TM->NAME
+                                                                 :
+                                                                ($cclass eq 'occurrence' ? TM->OCC
+                                                                                         : TM->ASSOC),            # KIND
+								 [ 'thing', 'value' ],                            # ROLES
+								 [ $_[0]->{USER}->{ctx}->[0],     $_[6] ],        # PLAYERS
+								 undef
+								 ]
+								);
+			    }
+    ;
+
+scope               : # empty
+                    | AT tid { $_[2]; }
+    ;
+
+type                : # empty
+                    | SUBCL tid { $_[2] }
+    ;
+
+
+ctype               : NAME
+                    | OCC
+    ;
+
+tid                 : ID                           {   $_[1]; }
+                    | WILDCARD                     {   undef; }       # make sure we have an ID
+                    | DATE                         { \ $_[1]; }
+                    | EQUAL URI                    {   $_[2]; }
+                    | TILDE URI                    { \ $_[2]; }
+                    | URI                          {
+                                                     my $baseuri = $_[0]->{USER}->{store}->baseuri;
+                                                     $_[1] =~ /^$baseuri(.+)/ ? $1 : \ $_[1];
+                                                     }
+   ;
+
+
+#-------------------------------------------
+
+xinstance           : # empty
+                    | instance EOL
+                    | instance theme
+    ;
+
+xxxtopic              : identification involvements
+    ;
+
+xinvolvements       : # empty
+                   | involvements involvement
+    ;
+
+involvement        : identification
+                   | AND attachment
+                   | attachment
+                   | LRELATIVE relative RRELATIVE
+    ;
+
+xattachment         : statement
+    ;
+
+statement          : ISA topic
+    ;
+
+
+
+
+
+
+xxtopic              : tid 
+                     {
+			 warn "involve ".Dumper $_[2];
+			 1;
+		      }
+;
+
+tids               : tid                          { [ $_[1] ] } # singleton
+                   | tids tid                     { push @{$_[1]}, $_[2]; $_[1] }
+;
+
+involvements       :                                                               { [] } #empty
+                   | involvements inlined_expansion                                { push @{$_[1]}, $_[2]; $_[1] }
+;
+
+inlined_expansion  : LPAREN tids RPAREN                                            { $_[2] }
+;
+
+#types                      :                                         { [] } # empty
+#                           | types type                              { push @{$_[1]}, @{$_[2]}; $_[1] }
+#;
+#
+#type                       : ISA ID                                  { [ $_[2] ] }
+#                           | LPAREN ids RPAREN                       {   $_[2]   }
+#;
+
+
+
+
+
+xtopic            : ID types reification_indication inline_assocs EOL
+                    {
+			$_[1] = $_[0]->{USER}->{store}->internalize ($_[1]);
+
+			if (ref $_[3]) {                                                   # we have reification info
+			    if (     $_[3]->[0] == 1) {                                    # 1 = REIFIES, means current ID is a shorthand for the other
+				$_[0]->{USER}->{store}->internalize ($_[1] => $_[3]->[1]); 
+			    } elsif ($_[3]->[0] == 0) {                                    # 0 = IS-REIFIED, this must be the other way round
+				$_[0]->{USER}->{store}->internalize ($_[3]->[1] => $_[1]);
+			    } elsif ($_[3]->[0] == 2) {                                    # 2 = ISINDICATEDBY, add the subject indicators
+				$_[0]->{USER}->{store}->internalize ($_[1] => \ $_[3]->[1]);
+			    } else {
+				die "internal fu**up";
+			    }
+			}
+			# assert instance/class
+                        if (@{$_[2]}) {
+			    $_[0]->{USER}->{store}->assert ( map {
+							  [ undef, 
+							    undef, 
+							    'isa', 
+							    undef,
+							    [ 'class', 'instance' ], 
+                                                            [ $_, $_[1] ], 
+							    ]}  
+							     @{$_[2]} );
+			}
+			{                                                                  # memorize that the types should be a 'topic' at the end (see end of parse)
+			    my $implicits = $_[0]->{USER}->{implicits};
+#			    my $s         = $_[0]->{USER}->{store};
+			    map { $implicits->{'isa-thing'}->{$_}++ } 
+			             (@{$_[2]}, $_[1]);                                    # the types and the ID are declared implicitely
+			}
+			
+			if (ref $_[4]) {                                                   # there are inline assocs
+#warn "test for inlines";
+			    foreach (@{$_[4]}) {
+				my $type      = $_->[0];
+				my $player    = $_->[1];
+				my $store     = $_[0]->{USER}->{store};
+				my $templates = $_[0]->{USER}->{templates};
+#warn "found type $type $player";
+				if ($type eq 'is-subclass-of' || $type eq 'subclasses') {
+				    $store->assert ([ undef,                          # LID
+						      undef,                          # SCOPE
+						      'is-subclass-of',               # TYPE
+						      TM->ASSOC,                      # KIND
+						      [ 'subclass',  'superclass' ],  # ROLES
+						      [ $_[1],       $player ],       # PLAYERS
+						      undef ] );
+				} elsif ($type eq 'is-a') {
+				    $store->assert ([ undef,                   	      # LID
+						      undef,                   	      # SCOPE
+						      'isa',                  	      # TYPE
+						      TM->ASSOC,        	      # KIND
+						      [ 'instance', 'class' ], 	      # ROLES
+						      [ $_[1],       $player ],	      # PLAYERS
+						      undef ] );
+				} elsif ($type eq 'has-a') {                          # same, but other way round
+				    $store->assert ([ undef,                   	      # LID
+						      undef,                   	      # SCOPE
+						      'isa',               	      # TYPE
+						      TM->ASSOC,        	      # KIND
+						      [ 'instance', 'class' ], 	      # ROLES
+						      [ $player,     $_[1] ],	      # PLAYERS
+						      undef ] );
+				} elsif ($templates->tids ( $type ) &&
+					 (my @ts    = $templates->match (TM->FORALL, type => $templates->tids ( $type )  ))) {
+#warn "found templates for $type";
+				    warn "duplicate template for '$type' found, taking one" if @ts > 1;
+				    my $t = $ts[0];                                   # I choose one
+
+#warn "YYY cloning ($type)";
+
+				    $store->assert ([ undef,                   	      # LID
+						      undef,                   	      # SCOPE
+						      $type,               	      # TYPE
+						      TM->ASSOC,        	      # KIND
+						      [  	                      # ROLES
+							map {
+							    my $l = $templates->reified_by ($_);
+							    ($l && $l eq LEFT ?
+							           $_[1]
+							     :
+							           ($l && $l eq RIGHT ?
+                                                                          $player
+                                                                    :
+								          $_)
+							     )
+							    } @{$t->[TM->ROLES]} 
+						      ],
+						      [                       	      # PLAYERS
+							map {
+							    my $l = $templates->reified_by ($_);
+							    ($l && $l eq LEFT ?
+							           $_[1]
+							     :
+							           ($l && $l eq RIGHT ?
+                                                                          $player
+                                                                    :
+								          $_)
+							     )
+							    } @{$t->[TM->PLAYERS]} 
+						      ],
+						      undef ] );
+				} else {
+				    die "unknown association type '$type' in inlined association";
+				}
+			    }
+			}
+		    }
+                       characteristics_indication
+                        {
+#warn "char/ind in topic: ".Dumper $_[7];
+                         my $id = $_[1];
+                         # add assertions for every characteristic
+                         $_[0]->{USER}->{store}->assert ( map {[ undef,                                         # LID
+                                                                 $_->[1],                                       # SCOPE
+                                                                 $_->[2] || $TM::CharInfo[$_->[0]]->[0],        # TYPE
+                                                                 $_->[0],                                       # KIND
+                                                                 [ 'thing', $TM::CharInfo[$_->[0]]->[1] ],      # ROLES
+                                                                 [ $id,             $_->[3] ],                  # PLAYERS
+                                                                 undef ] }
+                                                               @{$_[7]->[0]} );
+
+                         map { $store->internalize ($id => $_ ) } @{$_[7]->[1]};         # add the subject indicators
+
+			 {                                                               # memorize basename types and scopes as implicitely defined
+			     my $implicits = $_[0]->{USER}->{implicits};
+			     map { $implicits->{'isa-scope'}->{$_}++ }
+                                   map { $_->[1] } grep ($_->[1], @{$_[7]->[0]});        # get the bloody scopes and tuck them away
+
+			     map { $implicits->{'subclasses'}->{ $TM::CharInfo[$_->[0]]->[0] }->{$_->[2]}++ }
+                                   grep ($_->[2], @{$_[7]->[0]});                        # get all the characteristics with types
+
+#warn "implicits then ".Dumper $implicits;
+			 }
+		         }
+;
+
+reification_indication     : # empty
+                           | REIFIES       ID                        { [ 1, $_[2] ] }            # 0, 1, 2 are just local encoding, nothing relevant 
+                           | ISREIFIED     ID                        { [ 0, $_[2] ] }
+                           | ISINDICATEDBY ID                        { [ 2, $_[2] ] }
+;
+
+types                      :                                         { [] } # empty
+                           | types type                              { push @{$_[1]}, @{$_[2]}; $_[1] }
+;
+
+xtype                       : ISA ID                                  { [ $_[2] ] }
+                           | LPAREN ids RPAREN                       {   $_[2]   }
+;
+
+characteristics_indication : # empty
+                           | characteristics_indication  characteristic_indication
+                                                                     { push @{$_[1]->[ ref($_[2]) eq 'ARRAY' ? 0 : 1 ]}, $_[2]; $_[1] }
+;                                                                    # do not tell me this is not cryptic, it fast, though
+                                                                     # if we get a characteristic back, then it is a list ref, then we add it to $_[1]->[0]
+                                                                     # if we get a subject indication back, then it is a scalar, so we add it to $_[1]->[1]
+xcharacteristic_indication  : characteristic
+                           | indication
+;
+
+indication                 : SIN           { $_[0]->{USER}->{string} ||= "\n" } string            { $_[3] }        # TODO: replace with ID?
+;
+
+
+class                      : BN                                      { TM->KIND_BN  }
+                           | OC                                      { TM->KIND_OC  }
+                           | IN                                      { TM->KIND_IN  }
+;
+
+char_type                  : # empty
+                           | assoc_type
+;
+
+assoc_type                 : LPAREN ID RPAREN                        {   $_[2]   }
+;
+
+
+inline_assocs              : # empty
+                           | inline_assocs inline_assoc              { push @{$_[1]}, $_[2]; $_[1] }
+;
+
+inline_assoc               : ID ID                                   { [ $_[1], $_[2] ] }
+;
+
+template_definition        : LBRACKET 
+                                      { ($_[0]->{USER}->{templates}, $_[0]->{USER}->{store}) = ($_[0]->{USER}->{store}, $_[0]->{USER}->{templates}); }
+                                                                         # flag that we are inside a template
+                             association_definition
+                                      { ($_[0]->{USER}->{templates}, $_[0]->{USER}->{store}) = ($_[0]->{USER}->{store}, $_[0]->{USER}->{templates}); }
+                             #RBRACKET                                   # consumed by members already
+;
+
+association_definition     : LPAREN ID RPAREN scope reification_indication EOL
+                             association_members
+                             {
+##warn "members ".Dumper $_[5];
+## ??? TODO SCOPE ????
+			       my (@roles, @players);
+			       foreach my $m (@{$_[7]}) {                 # one member
+				   my $role = shift @$m;                  # first is role
+				   
+				   while (@$m) {
+				       push @roles, $role;                # roles repeat for every player
+				       my $player = shift @$m;
+				       push @players, $player;
+				   }
+			       }
+			       my ($a) = $_[0]->{USER}->{store}->assert ( [ undef, $_[4], $_[2], TM->ASSOC, \@roles, \@players, undef ] );
+##warn "templates" .Dumper $_[0]->{USER}->{store};
+                              { # reification
+				  my $ms = $_[0]->{USER}->{store};
+				  if (ref $_[5]) {
+				      if ($_[5]->[0] == 1) {                   # 1 = REIFIES, 0 = IS-REIFIED
+					  # (assoc) reifies http://.... means
+					  #     1) the assoc will be addes as thing (is done already)
+					  #     2) the http:// will be used as one subject indicator
+					  die "reifier of association must be a URI" unless $_[5]->[1] =~ /^\w+:.+/;
+					  $ms->internalize ($a->[TM::LID], $_[5]->[1]);
+				      } elsif ($_[5]->[0] == 0) {              # something reifies this assoc
+					  # (assoc) is-reified-by xxx   means
+					  #     1) assoc is added as thing (is done already)
+					  #     2) the local identifier is added as thing with the abs URL of the assoc as subject address
+					  die "reifier must be local identifier" unless $_[5]->[1] =~ /^\w+$/;
+					  $ms->internalize ($_[5]->[1] => $a->[TM::LID]);
+				      } else { # this would be 'indication' but we do not want that here
+					  die "indication for association are undefined";
+				      }
+				  }
+			      }
+
+			       { # memorize that association type subclasses association
+#				   my $implicits = $_[0]->{USER}->{implicits};
+
+# implicit			   $implicits->{'subclasses'}->{'association'}->{$_[2]}++;
+				   $_[0]->{USER}->{implicits}->{'isa-scope'}->{$_[4]}++ if $_[4];
+			       }
+			   }
+;
+
+association_members        : member                           {                       [ $_[1] ] }
+                           | association_members member       { push @{$_[1]}, $_[2];   $_[1]  }
+;
+
+member                     : ID COLON ids1 eom                { [ $_[1], @{$_[3]} ] }
+;
+
+eom                        : EOL                              # normal assoc
+                           | RBRACKET EOL                     # in case we are inside a template
+;
+
+ids1                       : ids ID                           { push @{$_[1]}, $_[2]; $_[1] }
+;
+
+ids                        :                                  { [] } # empty
+                           | ids ID                           { push @{$_[1]}, $_[2]; $_[1] }
+;
+
+string                     : STRING EOL { die "empty string in characteristics" unless $_[1]; \$_[1] }
+;
+
+%%
+
+sub _Error {
+    die "Syntax error: Found ".$_[0]->YYCurtok." but expected ".join (' or ', $_[0]->YYExpect);
+}
+
+sub _Lexer {
+    my $parser = shift;
+    my $refINPUT = \$parser->YYData->{INPUT};
+
+#    study $$refINPUT;
+
+    $$refINPUT                                        or  return ('',              undef);  # this is the end of the world, as we know it
+    $$refINPUT =~ s/^[ \t]+//o;
+
+#warn "lexer ($parser->{USER}->{string}):>>>".$parser->YYData->{INPUT};
+
+    $$refINPUT =~ s/^\n\n//so                         and return ('DOT',       	   undef);
+    $$refINPUT =~ s/^\n$//so                          and return ('DOT',       	   undef);
+    $$refINPUT =~ s/^\.//so                           and return ('DOT',       	   undef);
+    $$refINPUT =~ s/^\~//so                           and return ('TILDE',     	   undef);
+    $$refINPUT =~ s/^=//o                             and return ('EQUAL',   	   undef);
+    $$refINPUT =~ s/^://o                             and return ('COLON',         undef);
+    $$refINPUT =~ s/^,\s*(which|who)\b//o             and return ('DOWNCOMMA',     undef);
+    $$refINPUT =~ s/^,(?!\s*(which|who)\b)//o         and return ('COMMA',         undef);
+
+    $$refINPUT =~ s/^is-?a\b//o                       and return ('ISA',       	   undef);
+#    $$refINPUT =~ s/^has-?a\b//o                      and return ('TED',       	   'hasa');
+    $$refINPUT =~ s/^subclasses\b//o                  and return ('SUBCL',     	   undef);
+
+    $$refINPUT =~ s/^has\b//o                         and return ('HAS',       	   undef);
+
+    unless ($parser->{USER}->{assoc}) {                                                    # in topic context this corresponds to HAS
+	$$refINPUT =~ s/^\n\s*(?=\w+\s*[:<@]\s)//so   and return ('HAS',           undef); # positive look-ahead for things like <CR>bn :<blank>
+    }
+
+    $$refINPUT =~ s/^(which|who)\b//o                 and return ('WHICH',         undef);
+    $$refINPUT =~ s/^and(\s+(which|who))?\b//so       and return ('WHICH',         undef); # (can go over lines)
+
+
+    $$refINPUT =~ s/^\n//so                           and return ('EOL',       	   undef);
+
+    $$refINPUT =~ s/^{//so                            and return ('BRA',     	   undef);
+    $$refINPUT =~ s/^}//so                            and return ('KET',     	   undef);
+    $$refINPUT =~ s/^\(//so                           and return ('LPAREN',        undef);
+    $$refINPUT =~ s/^\)//so                           and return ('RPAREN',        undef);
+
+    $$refINPUT =~ s/^<<//o                            and return ('REIFIES',   	   undef);
+    $$refINPUT =~ s/^<//o                             and return ('SUBCL',   	   undef);
+
+    $$refINPUT =~ s/^>>//o                            and return ('ISREIFIED', 	   undef);
+
+
+    $$refINPUT =~ s/^\*//o                            and return ('WILDCARD',      undef);
+
+    $$refINPUT =~ s/^(\d{4}-\d{1,2}-\d{1,2})(T(\d{1,2}):(\d{2}))?//o
+                                                      and return ('DATE',          sprintf "urn:x-date:%s:%02d:%02d", $1, $3 || 0, $4 || 0); # is a date
+
+    $$refINPUT =~ s/^bn\b//o                          and return ('ID',      	   "name");
+    $$refINPUT =~ s/^oc\b//o                          and return ('ID',       	   "occurrence");
+    $$refINPUT =~ s/^in\b//o                          and return ('ID',       	   "occurrence");
+
+    if ($parser->{USER}->{value}) {  # parser said we should expect a value now
+##warn "expect value >>".$$refINPUT."<<";
+	$$refINPUT =~ s/^\"{3}(.*?)\"{3}(?=\n)//so    and
+#            (warn "returning multi $1" or 1) and
+	    (undef $parser->{USER}->{value}           or  return ('VALUE',         new TM::Literal ($1)));
+	$$refINPUT =~ s/^\"(.*?)\"(^^(\S+))?//o       and
+#            (warn "returning simlg $1" or 1) and
+	    (undef $parser->{USER}->{value}           or  return ('VALUE',         new TM::Literal ($1, $3)));
+	$$refINPUT =~ s/^(\d+\.\d+)//o                and
+#            (warn "returning float $1" or 1) and
+	    (undef $parser->{USER}->{value}           or  return ('VALUE',         new TM::Literal  ($1, TM::Literal->DECIMAL)));
+	$$refINPUT =~ s/^(\d+)//o                     and
+#            (warn "returning int $1" or 1) and
+	    (undef $parser->{USER}->{value}           or  return ('VALUE',         new TM::Literal  ($1, TM::Literal->INTEGER)));
+	$$refINPUT =~ s/^(\w+:\S+)//o                 and
+#            (warn "returning uri $1" or 1) and
+	    (undef $parser->{USER}->{value}           or  return ('VALUE',         new TM::Literal  ($1, TM::Literal->URI)));
+	$$refINPUT =~ s/^(.+?)(?=\s*\n)//o            and
+#            (warn "returning unquo $1" or 1) and
+	    (undef $parser->{USER}->{value}           or  return ('VALUE',         new TM::Literal  ($1)));
+
+##            (warn "returning $1" or 1) and
+##	    (undef $parser->{USER}->{value}           or  return ('VALUE',         new TM::Literal ($1)));
+##warn "no string";
+    }
+
+## unfortunately, this does not what I want:
+##  $$refINPUT =~ s/^([A-Za-z][A-Za-z0-9_-]*)(?!:)//o and return ('ID',        $1); # negative look-ahead
+## tricky optimization: don't ask
+    my $aux;                                                                        # need this to store identifier/uri prefix temporarily (optimization)
+    my $aux2;                                                                       # need this to store ontology URL, if there is one
+    $$refINPUT =~ s/^([A-Za-z][.A-Za-z0-9_-]*)//o     and $aux = $1                 # save this for later
+	                                              and $$refINPUT !~ /^:[\w\/]/
+                                                      and return (_is_template ($parser->{USER}->{store},
+										$aux) 
+                                                               ? 'TED' : 'ID', $aux);
+
+    $$refINPUT =~ s/^(:([^\s\)\(\]\[]+))//o           and return ('URI',       ( $aux2 = _is_ontology ($parser->{USER}->{store},
+												       $parser->{USER}->{prefixes},
+												       $aux)) ? $aux2."#$2" : $aux.$1); # is a URL/URN actually
+
+    $$refINPUT =~ s/^@//so                            and return ('AT',        undef);
+
+
+    $$refINPUT =~ s/^%include\s+(.*?)(?=\n)//so       and return ('INCLUDE',   $1); # positive look-ahead
+    $$refINPUT =~ s/^%log\s+(.*?)(?=\n)//so           and return ('LOG',       $1); # positive look-ahead
+    $$refINPUT =~ s/^%cancel(?=\n)//so                and return ('CANCEL',    $1); # positive look-ahead
+    $$refINPUT =~ s/^%version\s+(\d+\.\d+)(?=\n)//so  and return ('VERSION',   $1); # positive look-ahead
+
+    $$refINPUT =~ s/^%encoding\s+(.*?)(?=\n)//so      and return ('ENCODING',  $1); # positive look-ahead
+
+
+#    $$refINPUT =~ s/^\[//so                           and return ('LBRACKET',  undef);
+#    $$refINPUT =~ s/^\]//so                           and return ('RBRACKET',  undef);
+
+    $$refINPUT =~ s/^(.)//so                          and return ($1,          $1); # should not be an issue except on error
+}
+
+sub _is_template {
+    my $store = shift;
+    my $id    = shift;
+
+    my $t = $store->tids ($id) or return undef;
+    return $store->is_a ($t, $store->tids (\ TEMPLATE));
+}
+
+sub _is_ontology {
+    my $store    = shift;
+    my $prefixes = shift;
+    my $prefix   = shift;
+
+#warn "texting prefix '$prefix' on ".Dumper $prefixes;
+    return $prefixes->{$prefix} if $prefixes->{$prefix};                                  # cache
+
+    if ($prefix eq 'astma') {                                                             # this is one predefined prefix
+	$prefixes->{$prefix} = ASTMA;
+    } elsif ($prefix eq 'xsd') {                                                          # this is the other predefined prefix
+	$prefixes->{$prefix} = XSD;
+    } else {
+	my $p = $store->tids ($prefix);
+	if ($p && $store->is_a ($p, $store->tids (\ ONTOLOGY))) {                         # is the topic an instance of astma:ontology?
+	    $prefixes->{$prefix} = 
+                $store->toplet ($store->tids ($prefix))->[TM->INDICATORS]->[0]            # then take its subject indicator as expanded URI
+		or die "no subject indicator for '$prefix' provided";                     # if there is none, complain
+	}
+    }
+#warn "prefixes now".Dumper $prefixes;
+    return $prefixes->{$prefix};
+}
+
+sub parse {
+    my $self               = shift;
+    $self->YYData->{INPUT} = shift;
+
+#warn "parse";
+
+    $self->YYData->{INPUT} =~ s/\r/\n/sg;
+    $self->YYData->{INPUT} =~ s/(?<!\\)\\\n//sg;   # a \, but not a \\
+    $self->YYData->{INPUT} =~ s/ \+{3} /\n/g;      # replace _+++_ with \n
+    $self->YYData->{INPUT} =~ s/\+{4}/+++/g;       # stuffed ++++ cleanout
+    $self->YYData->{INPUT} =~ s/^\#.*?\n/\n/mg;    # # at there start of every line -> gone
+    $self->YYData->{INPUT} =~ s/\s+\#.*?\n/\n/mg;  # anything which starts with <blank>#, all blanks are ignored
+    $self->YYData->{INPUT} =~ s/\n\n\n+/\n\n/sg;
+    $self->YYData->{INPUT} =~ s/\n\s+\n+/\n\n/sg;  # trimm lines with blanks only
+
+    # we not only capture what is said EXPLICITELY in the map, we also collect implicit knowledge
+    # we could add this immediately into the map at parsing, but it would slow the process down and
+    # it would probably duplicate/complicate things
+    $self->{USER}->{implicits} = {
+	'isa-thing'  => undef,                                          # just let them spring into existence
+	'isa-scope'  => undef,                                          # just let them spring into existence
+	'subclasses' => undef
+	};
+#    $self->{USER}->{topic_count} = 0;
+
+#   $self->{USER}->{templates} = new TM (psis => undef, baseuri => $self->{USER}->{store}->baseuri);
+    $self->{USER}->{prefixes}  = {};
+
+    eval {
+	$self->YYParse ( yylex => \&_Lexer, yyerror => \&_Error); #, yydebug => 0x01 );
+    }; if ($@ =~ /^Cancelled/) {
+	warn $@;                                                         # de-escalate Cancelling to warning
+    } elsif ($@) {
+	die $@;                                                          # otherwise re-raise the exception
+    }
+#warn "in parse end ".Dumper $self->{USER}->{implicits};
+    { # resolving implicit stuff
+	my $implicits = $self->{USER}->{implicits};
+	my $store     = $self->{USER}->{store};
+
+	{ # all super/subclasses
+	    foreach my $superclass (keys %{$implicits->{'subclasses'}}) {
+		$store->assert ( map {
+		    [ undef, undef, 'is-subclass-of', TM->ASSOC, [ 'superclass', 'subclass' ], [ $superclass, $_ ] ] 
+		    }  keys %{$implicits->{'subclasses'}->{$superclass}});
+	    }
+	}
+	{ # all things in isa-things are THINGS, simply add them
+	    $store->internalize (map { $_ => undef } keys %{$implicits->{'isa-thing'}});
+	}
+	{ # establishing the scoping topics
+	    $store->assert (map {
+                                 [ undef, undef, 'isa', TM->ASSOC, [ 'class', 'instance' ], [ 'scope', $_ ] ] 
+				 } keys %{$implicits->{'isa-scope'}});
+	}
+        $store->externalize ( $store->instances ($store->tids (\ TEMPLATE)) );                  # "removing templates now";
+    }
+    return $self->{USER}->{store};
+}
+
+#my $f = new TM::AsTMa::Fact;
+#$f->Run;

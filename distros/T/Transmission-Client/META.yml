@@ -1,0 +1,35 @@
+---
+abstract: 'Interface to Transmission'
+author:
+  - '-2013, Jan Henning Thorsen <jhthorsen@cpan.org> and contributors'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Transmission-Client
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime: 0.5
+  JSON::MaybeXS: 0
+  LWP::UserAgent: 5.8
+  List::MoreUtils: 0
+  MIME::Base64: 3
+  Moose: 0.8
+  MooseX::Types: 0.2
+  Sub::Exporter: 0.95
+resources:
+  bugtracker: https://github.com/olof/Transmission-Client/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/olof/Transmission-Client
+version: '0.0805'

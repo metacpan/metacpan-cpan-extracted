@@ -1,0 +1,16 @@
+[%# $Id: main,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+[%
+
+PROCESS config/page
+      + config/site
+      + config/site.base
+      + config/url
+      + config/col
+      + config/images
+      + config/images.base
+      + config/lang
+      + config/map
+      + config/macros
+      + config/skin
+
+-%]

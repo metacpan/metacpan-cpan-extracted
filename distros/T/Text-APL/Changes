@@ -1,0 +1,29 @@
+Revision history for perl module Text::APL
+
+0.07 2014-12-15T15:54:55Z
+
+ - version fixes
+
+0.06 2014-12-15T12:30:18Z
+
+ - include Build.PL
+
+0.05 2014-12-13T15:11:38Z
+
+ - var should return var
+
+0.04 2014-12-13T15:06:48Z
+
+ - var helper
+
+0.03 2012-06-30
+
+ - Improved caching
+
+0.02 2012-06-02
+
+ - Fixed distribution's manifest
+
+0.01 2012-05-31
+
+ - Initial release

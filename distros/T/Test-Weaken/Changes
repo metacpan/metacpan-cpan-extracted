@@ -1,0 +1,92 @@
+Revision history for Test-Weaken
+
+3.022000 December 2012
+       * tests ignore.t don't depend on proberef order
+
+3.020000 July 2012
+       * new destructor_method option
+
+3.018000 June 2012
+       * new options ignore_preds, ignore_object, ignore_objects
+
+3.016000 May 2012
+       * new ignore_class and ignore_classes options
+
+3.014000 February 2012
+       * tests force Dumper sortkeys
+
+3.012000 February 2012
+       * tests allow for "at line 123." with a "."
+
+3.010000 February 2012
+       * constructor can return multiple values
+
+3.008000 January 2012
+       * Try for Perl 5.6.0 too.
+       * XSUB bits in the main docs.
+       * Slightly more compact SYNOPSIS.
+
+3.007_001 Sun Jan  6 19:58:00 PST 2012
+       * Cope with some tied glob warnings of perl 5.14 and up.
+
+3.007_000 Sun Jan  1 17:29:41 PST 2012
+       * New developer's release
+       * Add Kevin Ryde's XSUB doc
+
+3.006000 Mon Nov 15 20:52:06 2010
+        * Documentation changes
+        * Added Test::Weaken::Gtk2 to SEE ALSO
+
+3.004000 Sun May 16 15:36:51 2010
+        * Ticket 56722:
+          When addition is overloaded, it confuses Test::Weaken.
+
+3.002000 Sat Aug  1 15:40:36 2009
+        Now descends into objects underlying tied objects.
+        Added tracked_types named option.
+        Ticket 44835.
+
+3.000000 Tue Jul  7
+        Added 'contents' option.
+        New major release because, in there are leaks,
+            they may be reported in a different order.
+
+2.002000 Sat Mar 14
+        Added 'ignore' option.
+
+2.000000 Thu Feb 19
+        Complete interface change and
+            code rewrite.
+        Documentation rewrite.
+        Code now perltidy clean.
+        Ticket 42903.
+        Ticket 43608.
+
+1.002000     Wed Jan 28
+        Adding a destructor argument to poof().
+        Adding various developer's utilities.
+        Make code perlcritic clean.
+        Some documentation improvements.
+
+1.000000     Fri Sep 19
+        First official release
+
+0.002006     Mon Sep 15
+        Fixed META.yml
+
+0.002003     Mon Sep 15
+        Added a META.yml
+        Rewrote documentation.
+        No longer change undef's in test data to 42
+           -- that was unnecessary
+
+0.002002    Sun Oct 28
+	Fixed POD
+
+0.002001    Thu Oct 25
+	First beta version
+
+0.001_nnn   Tue Oct  9
+	Various, alpha versions,
+	beginning on the above date
+

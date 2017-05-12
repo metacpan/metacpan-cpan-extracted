@@ -1,0 +1,153 @@
+NAME
+    Task::Dancer2 - Dancer2... in a box!
+
+VERSION
+    Version 0.06
+
+DESCRIPTION
+    This Task installs Dancer2, optional engines, templates and assorted
+    modules that are not included in the Dancer2 core distribution. It is
+    based heavily on the awesome Task::Dancer distribution by Sawyer X and
+    ambs.
+
+    If you've written anything relating to Dancer2, please let us know.
+
+    We try to maintain a list of modules that are maintained and install
+    properly. If any of the modules in "Task::Dancer2" tried to install and
+    failed, please let us know so we can temporarily disable it. Also, tell
+    us if any module that was temporarily disabled is working again.
+
+INCLUDES MODULES
+  Template Engines
+    Dancer2::Template::Caribou (disabled)
+    Dancer2::Template::Haml
+    Dancer2::Template::HTCompiled
+    Dancer2::Template::Mason2
+    Dancer2::Template::MojoTemplate
+    Dancer2::Template::TemplateFlute
+    Dancer2::Template::TextTemplate
+    Dancer2::Template::Xslate (disabled)
+
+  Logging Engines
+    Dancer2::Logger::Console::Colored
+    Dancer2::Logger::File::RotateLogs
+    Dancer2::Logger::Syslog
+
+  Serialization
+    Dancer2::Serializer::CBOR
+
+  Session Engines
+    Dancer2::Session::CGISession
+    Dancer2::Session::Cookie
+    Dancer2::Session::DBIC
+    Dancer2::Session::JSON
+    Dancer2::Session::Memcached
+    Dancer2::Session::MongoDB (disabled)
+    Dancer2::Session::PSGI
+    Dancer2::Session::Redis
+    Dancer2::Session::Sereal (disabled)
+
+  Plugins
+    Dancer2::Plugin::Adapter
+    Dancer2::Plugin::Ajax
+    Dancer2::Plugin::AppRole::Helper
+    Dancer2::Plugin::Articulate
+    Dancer2::Plugin::Auth::Extensible
+    Dancer2::Plugin::Auth::Extensible::Provider::DBIC
+    Dancer2::Plugin::Auth::Extensible::Provider::Usergroup
+    Dancer2::Plugin::Auth::HTTP::Basic::DWIW
+    Dancer2::Plugin::Auth::OAuth
+    Dancer2::Plugin::Auth::Tiny
+    Dancer2::Plugin::Auth::YARBAC (disabled)
+    Dancer2::Plugin::BrowserDetect
+    Dancer2::Plugin::Cache::CHI
+    Dancer2::Plugin::Captcha
+    Dancer2::Plugin::Chain
+    Dancer2::Plugin::ConditionalCaching
+    Dancer2::Plugin::Database
+    Dancer2::Plugin::DataTransposeValidator
+    Dancer2::Plugin::DBIC
+    Dancer2::Plugin::Deferred
+    Dancer2::Plugin::ElasticSearch (disabled)
+    Dancer2::Plugin::Email
+    Dancer2::Plugin::Emailesque
+    Dancer2::Plugin::Feed
+    Dancer2::Plugin::GoogleAnalytics
+    Dancer2::Plugin::Growler
+    Dancer2::Plugin::HTTP::Auth::Extensible (disabled)
+    Dancer2::Plugin::JWT
+    Dancer2::Plugin::Locale (disabled)
+    Dancer2::Plugin::Locale::Wolowitz (disabled)
+    Dancer2::Plugin::LogContextual
+    Dancer2::Plugin::LogReport
+    Dancer2::Plugin::Model
+    Dancer2::Plugin::Multilang
+    Dancer2::Plugin::Negotiate
+    Dancer2::Plugin::ParamKeywords
+    Dancer2::Plugin::Passphrase
+    Dancer2::Plugin::Path::Class
+    Dancer2::Plugin::ProgressStatus
+    Dancer2::Plugin::Queue
+    Dancer2::Plugin::Queue::MongoDB
+    Dancer2::Plugin::reCAPTCHA
+    Dancer2::Plugin::Redis
+    Dancer2::Plugin::Res
+    Dancer2::Plugin::REST
+    Dancer2::Plugin::RootURIFor
+    Dancer2::Plugin::RoutePodCoverage
+    Dancer2::Plugin::Sixpack
+    Dancer2::Plugin::Syntax::GetPost
+    Dancer2::Plugin::UnicodeNormalize
+
+AUTHOR
+    Jason A. Crome " cromedome AT cpan DOT org "
+
+CONTRIBUTORS
+    Rory Zweistra
+
+BUGS
+    Please report any bugs or feature requests to "bug-task-dancer at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-Dancer>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Task::Dancer2
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Dancer2>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Task-Dancer2>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Task-Dancer2>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Task-Dancer2/>
+
+ACKNOWLEDGEMENTS
+    Dancer2 team.
+
+    Sawyer X, "xsawyerx AT cpan DOT org"
+
+    Alberto Simoes, "ambs AT cpan DOT org"
+
+LICENSE AND COPYRIGHT
+    Copyright 2015, Jason A. Crome.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

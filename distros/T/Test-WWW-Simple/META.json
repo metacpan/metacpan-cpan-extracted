@@ -1,0 +1,48 @@
+{
+   "abstract" : "Test Web applications using TAP",
+   "author" : [
+      "Joe McMahon <mcmahon@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-WWW-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Tree" : "0",
+            "Mojolicious::Lite" : "0",
+            "Regexp::Common" : "0",
+            "Test::Builder" : "0",
+            "Test::LongString" : "0",
+            "Test::Tester" : "0",
+            "WWW::Mechanize" : "0",
+            "WWW::Mechanize::Pluggable" : "1.07"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.34"
+}

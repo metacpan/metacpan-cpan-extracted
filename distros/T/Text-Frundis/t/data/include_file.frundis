@@ -1,0 +1,22 @@
+.X ftag -t indented -code "my$self=shift;my$text=$self->text;\
+	$text=~s/^/@@ /;print$text;$self->text('')"
+Some text and
+.If t/data/includes/file_to_include-1.frundis
+.If t/data/includes/file_to_include-2.frundis
+Some more text.
+.If -f latex t/data/includes/file_to_include-1.frundis
+.Bm -t dm
+Things
+.Em
+.\" bug
+.#de titorig
+more things
+.#.
+.Bd
+.If t::data::includes::file_to_include-3
+.Ed
+.If -as-is t/data/includes/file_to_include-3.frundis
+.Bm
+.If t/data/includes/file_to_include-3.frundis
+.Em
+.If -as-is -t indented t/data/includes/file_to_include-3.frundis

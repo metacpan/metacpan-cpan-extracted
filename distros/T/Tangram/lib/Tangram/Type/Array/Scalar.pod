@@ -1,0 +1,76 @@
+=head1 NAME
+
+Tangram::Type::Array::Scalar - map Perl array of strings or numbers
+
+=head1 SYNOPSIS
+
+   use Tangram::Core;
+   use Tangram::Type::Array::Scalar; # always
+
+   $schema = Tangram::Schema->new(
+      classes => { NaturalPerson => { fields => {
+
+      flat_array =>
+      {
+         interests =>
+         {
+            table => 'NP_int',
+            sql => 'VARCHAR(50)',
+         },
+
+         lucky_numbers => 'int', # use defaults
+      }
+
+=head1 DESCRIPTION
+
+Maps references to a Perl array. The persistent fields are grouped in
+a hash under the C<array> key in the field hash.
+
+The array may contain only 'simple' scalars like integers, strings
+or real numbers. It may not contain references. For arrays of
+objects, see L<Tangram::Type::Array::FromMany> and L<Tangram::Type::Array::FromOne>.
+
+Tangram uses a table to save the state of the collection. The table
+has three columns, which contain
+
+=over 4
+
+=item * the id of the container object
+
+=item * the position of the element in the array
+
+=item * the value of the element
+
+=back
+
+The field names are passed in a hash that associates a field name with
+a field descriptor. The field descriptor may be either a hash or a
+string. The hash uses the following fields:
+
+=over 4
+
+=item * type
+
+=item * table
+
+=item * sql
+
+=back
+
+Optional field C<type> specifies the type of the elements. If the type
+is C<string>Tangram quotes the values as they are passed to the
+database.  Not specifying a C<type> is exactly equivalent to
+specifying C<string>.
+
+Optional field C<table> sets the name of the table that contains the
+elements. This defaults to 'C_F', where C is the class of the
+containing object and F is the field name.
+
+Optional field C<sql> specifies the type that deploy() (see
+L<Tangram::Deploy>) should use for the column containing the
+elements. If this field is not present, the SQL type is derived from
+the C<type> field: if C<type> is C<string> (or is absent) VARCHAR(255)
+is used; otherwise, the C<type> field is interpreted as a SQL type.
+
+If the descriptor is a string, it is interpreted as the value of the
+C<type> field and all the other fields take the default value.

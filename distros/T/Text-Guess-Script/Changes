@@ -1,0 +1,10 @@
+Revision history for Text::Guess::Script
+
+0.03  2016-03-14 07:43:56 CET
+        - required perl version 5.8.5
+
+0.02  2016-03-14 00:15:07 CET
+        - doc improvement
+
+0.01  2016-03-14 00:00:30 CET
+        - Initial release

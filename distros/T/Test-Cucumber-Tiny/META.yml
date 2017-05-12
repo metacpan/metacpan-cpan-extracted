@@ -1,0 +1,23 @@
+---
+abstract: 'Cucumber Testing Framework'
+author:
+  - 'Michael Vu <email@michael.vu>'
+build_requires:
+  Digest: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Cucumber-Tiny
+requires:
+  Carp: 0
+  Mo: 0
+  Readonly: 0
+  Test::More: 0
+  Try::Tiny: 0
+  YAML: 0
+version: 0.64

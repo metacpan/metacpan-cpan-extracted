@@ -1,0 +1,9 @@
+
+                   -- B --
+
+       This is sample text B for Text-OutdentEdge.
+    This paragraph is idented by 4 spaces.
+
+     And this one is indented by 2 spaces. Outdenting
+  this file removes only 2 spaces. Previous paragraph
+  still have  2 spaces indent after it.

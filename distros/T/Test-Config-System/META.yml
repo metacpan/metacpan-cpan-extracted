@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Test-Config-System
+version:             0.63
+abstract:            System configuration related unit tests
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    File::Temp:                    0
+    Test::Builder::Module:         0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Ian Kilgore <iank@cpan.org>

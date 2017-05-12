@@ -1,0 +1,31 @@
+This is the Text::Oyster module.
+
+Text::Oyster provides perl token evaluation within the context of a text tempalate. Indeed, another template module.
+
+To install the module:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Changes
+
+0.30
+
+	Removed an errant warn statement.
+	Build distribution using 'make dist'
+
+0.29
+
+	Allow assignment of hash elements with undef values.
+	Uses evaluation package name correctly.
+
+0.27
+
+	Added package data cleanup method, optional autocleaning at DESTROY.
+
+--
+Steve McKay
+steve@colgreen.com
+

@@ -1,0 +1,9 @@
+LICENSE
+Changes
+Interval.pm
+Interval.pod
+Makefile.PL
+MANIFEST
+README
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+Revision history for Perl extension Text::Markdown::XS.
+
+0.11 Fri Nov 15 10:26:19 PST 2013
+	- upgraded Discount to 2.1.7, which fixed an issue generating <em> tags
+	  from _<nonascii>_ and *<nonascii>*
+	- doc typo fix (by @harupong)
+
+0.10 Fri Aug  9 12:49:59 PDT 2013
+	-  added with_html5_tags() to enable html5 block elements support (by @Songmu)
+
+0.09 Mon Aug  5 10:08:05 PDT 2013
+	-  fixed #14 "some files are missing in 0.08"
+
+0.08 Sun Aug  4 23:50:18 PDT 2013
+	- Reverted html5 tags support
+
+0.07 Sun Aug  4 18:44:48 PDT 2013
+	- Removed MYMETA (by @Songmu)
+	- Added html5 tags support (by @Songmu)
+
+0.06 Sat Jul 13 20:35:10 PDT 2013
+	- Documentation improvements by @nailbowers
+	- fixed an issue with is_utf8 boolean casting behavior
+
+0.05 Tue Jul  9 14:40:27 PDT 2013
+	- Support MKD_* flags (by @tokuhirom)
+	- markdown() returns UTF-8 encoded string (by @Songmu)
+	- upgraded Discount to 2.1.6 (by @Songmu)
+
+0.04  Thu Sep 13 11:16:38 PDT 2012
+	- noop to deal with ugly file name
+
+0.03  Thu Sep 13 11:16:38 PDT 2012
+	- upgraded discount to 2.1.5a (RT:79192)
+	- Thanks for the pull request up by https://github.com/hitode909
+
+0.02  Sun Jan  1 22:13:42 PST 2012
+	- upgraded discount to 2.1.2 (RT:66012)
+	- use "CC='cc -fPIC'" as running configure.sh on discount workdir
+	- added test for empty or spaces input (RT:73657) 
+ 
+0.01  Mon Oct 19 15:03:25 PDT 2009
+	- first version with discount-1.3.4
+

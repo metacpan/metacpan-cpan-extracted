@@ -1,0 +1,62 @@
+SYNOPSIS
+
+     use Text::Table::Org;
+    
+     my $rows = [
+         # header row
+         ['Name', 'Rank', 'Serial'],
+         # rows
+         ['alice', 'pvt', '123456'],
+         ['bob',   'cpl', '98765321'],
+         ['carol', 'brig gen', '8745'],
+     ];
+     print Text::Table::Org::table(rows => $rows, header_row => 1);
+
+DESCRIPTION
+
+    This module provides a single function, table, which formats a
+    two-dimensional array of data as an Org text table.
+
+    The example shown in the SYNOPSIS generates the following table:
+
+     | Name  | Rank     | Serial   |
+     |-------+----------+----------|
+     | alice | pvt      | 123456   |
+     | bob   | cpl      | 98765321 |
+     | carol | brig gen | 8745     |
+
+FUNCTIONS
+
+ table(%params) => str
+
+ OPTIONS
+
+    The table function understands these arguments, which are passed as a
+    hash.
+
+      * rows (aoaos)
+
+      Takes an array reference which should contain one or more rows of
+      data, where each row is an array reference.
+
+      * header_row (bool)
+
+      If given a true value, the first row in the data will be interpreted
+      as a header row, and separated from the rest of the table with a
+      ruled line.
+
+SEE ALSO
+
+    This module is currently basically Text::Table::Tiny 0.03 modified to
+    output Org tables instead of its original variant table format.
+
+    The output of this module is very similar to that of
+    Text::MarkdownTable. In fact, Org recognizes its output as a valid Org
+    table (the only difference is that corner marker is | instead of the
+    Org standard of +).
+
+    Some other text table modules: Text::ANSITable, Text::ASCIITable,
+    Text::FormatTable, Text::Table, Text::TabularDisplay.
+
+    See also Bencher::Scenario::TextTableModules.
+

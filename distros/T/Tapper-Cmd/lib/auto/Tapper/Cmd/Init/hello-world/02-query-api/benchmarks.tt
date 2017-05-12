@@ -1,0 +1,6 @@
+#! tt debug=1 <<EOTEMPLATE
+Benchmarks:
+[% FOREACH x IN reportdata('{ "suite.name" => "example-03-benchmarks" } :: //tap//benchmarks/bogomips') -%]
+   [% x %]
+[% END %]
+EOTEMPLATE

@@ -1,0 +1,39 @@
+NAME
+    Text::Ligature - Replace sequences of characters with typographic
+    ligatures
+
+VERSION
+    This document describes Text::Ligature version 0.02.
+
+SYNOPSIS
+        use Text::Ligature qw( :all );
+
+        to_ligatures('offloading floral offices refines effectiveness');
+        # returns: oﬄoading ﬂoral oﬃces reﬁnes eﬀectiveness
+
+        from_ligatures('oﬄoading ﬂoral oﬃces reﬁnes eﬀectiveness');
+        # returns: offloading floral offices refines effectiveness
+
+DESCRIPTION
+    Replaces sequences of characters with corresponding typographic
+    ligatures.
+
+        Characters  Ligature
+        ff          ﬀ
+        fi          ﬁ
+        fl          ﬂ
+        ffi         ﬃ
+        ffl         ﬄ
+
+    This is an early release. Specifying the ligatures to replace will be
+    supported in a future version.
+
+AUTHOR
+    Nick Patch <patch@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2011 Nick Patch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

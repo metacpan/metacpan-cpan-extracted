@@ -1,0 +1,20 @@
+Changes
+ignore.txt
+lib/Test/MockPackages.pm
+lib/Test/MockPackages/Mock.pm
+lib/Test/MockPackages/Package.pm
+lib/Test/MockPackages/Returns.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-mockpackages.t
+t/02-packages.t
+t/03-returns.t
+t/04-mock.t
+t/05-mock_export.t
+t/lib/TMPTestPackage.pm
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

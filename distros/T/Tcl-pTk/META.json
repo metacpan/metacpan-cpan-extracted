@@ -1,0 +1,51 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "keywords" : [
+      "Tk",
+      "Tcl",
+      "Tix",
+      "GUI"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tcl-pTk",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "benchmarks",
+         "TableMatrixDemos",
+         "lib/Tcl/pTk/demos"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::ISA" : "0.36",
+            "Tcl" : "0.9"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.92"
+}

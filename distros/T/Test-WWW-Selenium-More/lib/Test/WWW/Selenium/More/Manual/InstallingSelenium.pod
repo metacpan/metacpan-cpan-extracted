@@ -1,0 +1,52 @@
+package Test::WWW::Selenium::More::Manual::InstallingSelenium;
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::InstallingSelenium
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::InstallingSelenium
+
+=head1 INSTALL THE SELENIUM SERVER
+
+Selenium is written in Java.  So you need Java.  Ubuntu users should already
+have Java installed (C</usr/bin/java>). 
+
+Then download the latest Selenium Server jar file from
+L<http://seleniumhq.org/download>.  Put it anywhere.  You can run the server with
+this command: 
+
+    java -jar selenium-server.jar -h
+
+=head1 INSTALL Xvfb
+
+Xvfb or X virtual frame buffer is an X server that enables you to run X windows
+applications without showing any screen output.  If you run this with a
+Selenium server, you can run your tests on various browsers on a server with no
+monitor and without X windows installed.  See an example of how to do this in
+L<Test::WWW::Selenium::More::Manual::RunningTests>.
+
+To install Xvfb on Ubuntu:
+
+    sudo apt-get install xvfb
+
+=head1 AUTHOR
+
+Eric Johnson <kablamo at iijo dot nospamthanks dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Eric Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IPC::Run: '0'
+  Path::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-ANSIColorx-ColorNicknames
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Term::ANSIColor: '4'
+  Term::Size: '0'
+  Text::Table: '0'
+  common::sense: '0'
+resources:
+  repository: https://github.com/jettero/term--ansicolorx
+version: '2.7191'

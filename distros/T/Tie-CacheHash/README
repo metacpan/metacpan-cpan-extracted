@@ -1,0 +1,49 @@
+                     Tie::CacheHash version 0.50
+           (Maintains sorted lists of its top entries.)
+
+  Copyright 1999 by Jamie McCarthy <jamie@mccarthy.org>.  This program
+  is free software; you may redistribute it and/or modify it under the
+  same terms as Perl itself.
+
+
+INTRODUCTION
+
+  A hash tied with Tie::CacheHash keeps a sorted list of its top entries.
+  You define the sort order.  You also tell it how many entries it should
+  keep track of, minimum and maximum, and the code will do its best to
+  keep memory and CPU usage to a minimum within your guidelines.
+
+  If your program stores 100,000 pieces of data and frequently would
+  like to know what the 500 oldest items are (maybe to purge them),
+  this module is a good way to maintain that information, transparently,
+  without having to call "sort" on a 100,000 item array.
+
+  See the POD documentation for complete details, features, and usage.
+
+  Consider this beta software until its version number reaches 1.0.
+  while (beta) { "It works for me but may not for you."  "I'll try
+  not to change its interface but no guarantees."  "The documentation
+  may not be totally accurate." }
+
+
+INSTALLATION
+
+  Follow the standard installation procedure for Perl modules, which is to
+  type the following commands:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+  You'll probably need to do the last as root.
+
+  If instead you wish to install the module by hand, simply copy it into a directory named Tie in
+  your Perl library directory.
+
+
+CONTACTING ME
+
+  Please send any comments, bug reports, feature requests, or patches to
+  jamie@mccarthy.org.
+

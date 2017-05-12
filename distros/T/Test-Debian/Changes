@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::DebIsInstalled.
+
+0.01  Wed Jul  4 12:52:58 2012
+	- original version; created by h2xs 1.23 with options
+		-X -n Test::DebIsInstalled
+

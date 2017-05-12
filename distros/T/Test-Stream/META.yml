@@ -1,0 +1,42 @@
+---
+abstract: '**DEPRECATED** See Test2-Suite instead'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Stream
+no_index:
+  namespace:
+    - Test::Builder
+    - Test::More
+    - Test::Simple
+    - Test::Tester
+  package:
+    - Test::Builder
+    - Test::More
+    - Test::Simple
+    - Test::Tester
+requires:
+  B: '0'
+  Carp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  List::Util: '0'
+  PerlIO: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Test::Harness: '0'
+  overload: '0'
+  perl: '5.008001'
+  utf8: '0'
+resources:
+  bugtracker: http://github.com/Test-More/Test-Stream/issues
+  repository: http://github.com/Test-More/Test-Stream/
+version: '1.302027'

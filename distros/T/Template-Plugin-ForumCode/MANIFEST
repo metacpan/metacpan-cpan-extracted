@@ -1,0 +1,26 @@
+Changes
+examples/MessagePreview.js
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/HTML/ForumCode.pm
+lib/HTML/ForumCode/Cookbook.pod
+lib/HTML/ForumCode/Cookbook/Recipe1.pod
+lib/HTML/ForumCode/Cookbook/Recipe2.pod
+lib/Template/Plugin/ForumCode.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01.app.t
+t/02.pod.t
+t/03.podcoverage.t
+t/04.template-plugin-forumcode.t
+t/05.html-forumcode.t
+t/testlib/ForumCodeTest.pm

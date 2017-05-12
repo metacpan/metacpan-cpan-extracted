@@ -1,0 +1,32 @@
+---
+abstract: 'A Task to install all POE simple TCP/IP services modules.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-POE-Simple-TCPIP-Services
+requires:
+  POE: '1.0001'
+  POE::Component::Server::Chargen: '1.1'
+  POE::Component::Server::Daytime: '1.1'
+  POE::Component::Server::Discard: '1.1'
+  POE::Component::Server::Echo: '1.6'
+  POE::Component::Server::Qotd: '1.1'
+  POE::Component::Server::Time: '1.1'
+resources:
+  homepage: https://github.com/bingos/task-poe-simple-tcpip-services
+  repository: https://github.com/bingos/task-poe-simple-tcpip-services.git
+version: '1.10'
+x_serialization_backend: 'YAML::Tiny version 1.70'

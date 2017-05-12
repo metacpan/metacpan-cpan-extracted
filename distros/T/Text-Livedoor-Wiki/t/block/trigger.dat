@@ -1,0 +1,127 @@
+=== h4
+--- wiki
+* hehe
+*** hoge
+hoge
+*** hage
+--- html
+<div id="content_block_1" class="wiki-section-1">
+<div class="title-1"><h3 id="content_1"> hehe</h3></div>
+<div id="content_block_1-body" class="wiki-section-body-1">
+</div>
+</div>
+<div id="content_block_3" class="wiki-section-3">
+<div class="title-3"><h5 id="content_1_0_1"> hoge</h5></div>
+<div id="content_block_3-body" class="wiki-section-body-3">
+hoge
+</div>
+</div>
+<div id="content_block_5" class="wiki-section-3">
+<div class="title-3"><h5 id="content_1_0_2"> hage</h5></div>
+<div id="content_block_5-body" class="wiki-section-body-3">
+</div>
+</div>
+=== h4
+--- wiki
+** hoge
+=||
+**hoge
+||=
+hoge
+** hoe
+hoge
+--- html
+<div id="content_block_1" class="wiki-section-2">
+<div class="title-2"><h4 id="content_0_1"> hoge</h4></div>
+<div id="content_block_1-body" class="wiki-section-body-2">
+<pre id="content_block_2" class="PLAIN-BOX">
+**hoge
+</pre>
+hoge
+</div>
+</div>
+<div id="content_block_4" class="wiki-section-2">
+<div class="title-2"><h4 id="content_0_2"> hoe</h4></div>
+<div id="content_block_4-body" class="wiki-section-body-2">
+hoge
+</div>
+</div>
+=== h3/4/5 and copy paste
+--- wiki
+* hoge
+** hoge
+*** hoge
+=||
+%%hoge
+**hoge
+*hoge
+***hoge
+||=
+end
+--- html
+<div id="content_block_1" class="wiki-section-1">
+<div class="title-1"><h3 id="content_1"> hoge</h3></div>
+<div id="content_block_1-body" class="wiki-section-body-1">
+</div>
+</div>
+<div id="content_block_3" class="wiki-section-2">
+<div class="title-2"><h4 id="content_1_1"> hoge</h4></div>
+<div id="content_block_3-body" class="wiki-section-body-2">
+</div>
+</div>
+<div id="content_block_5" class="wiki-section-3">
+<div class="title-3"><h5 id="content_1_1_1"> hoge</h5></div>
+<div id="content_block_5-body" class="wiki-section-body-3">
+<pre id="content_block_6" class="PLAIN-BOX">
+%%hoge
+**hoge
+*hoge
+***hoge
+</pre>
+end
+</div>
+</div>
+=== toggle has toggle has toggle ...
+--- wiki
+[+]1
+1
+[+]2
+2
+[+]3
+3
+=||
+[END]
+[+]
+[-]
+||=
+[END]
+2
+[END]
+1
+[END]
+--- html
+<div id="content_block_1">
+<div class="toggle-title"><a id="content_block_1-label" onClick="if( document.getElementById('content_block_1-inside').style.display =='none' ) {  document.getElementById('content_block_1-inside').style.display ='block' ; document.getElementById('content_block_1-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_1-inside').style.display ='none';document.getElementById('content_block_1-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p>1</p></div>
+<div style="display:none" id="content_block_1-inside" class="toggle-display">
+1<br />
+<div id="content_block_2">
+<div class="toggle-title"><a id="content_block_2-label" onClick="if( document.getElementById('content_block_2-inside').style.display =='none' ) {  document.getElementById('content_block_2-inside').style.display ='block' ; document.getElementById('content_block_2-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_2-inside').style.display ='none';document.getElementById('content_block_2-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p>2</p></div>
+<div style="display:none" id="content_block_2-inside" class="toggle-display">
+2<br />
+<div id="content_block_3">
+<div class="toggle-title"><a id="content_block_3-label" onClick="if( document.getElementById('content_block_3-inside').style.display =='none' ) {  document.getElementById('content_block_3-inside').style.display ='block' ; document.getElementById('content_block_3-label').className = 'toggle-link-close'; } else {  document.getElementById('content_block_3-inside').style.display ='none';document.getElementById('content_block_3-label').className = 'toggle-link-open'; } ;" class="toggle-link-open"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/common/spacer.gif" width="17" height="17" alt="" /></a><p>3</p></div>
+<div style="display:none" id="content_block_3-inside" class="toggle-display">
+3<br />
+<pre id="content_block_4" class="PLAIN-BOX">
+[END]
+[+]
+[-]
+</pre>
+</div>
+</div>
+2
+</div>
+</div>
+1
+</div>
+</div>

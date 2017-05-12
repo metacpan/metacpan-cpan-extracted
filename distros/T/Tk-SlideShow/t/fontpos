@@ -1,0 +1,6 @@
+Tk::SlideShow::Sprite->Get('fontpos/t4')->place(284,629);
+Tk::SlideShow::Sprite->Get('fontpos/t0')->place(271,379);
+Tk::SlideShow::Sprite->Get('fontpos/t1')->place(276,456);
+Tk::SlideShow::Sprite->Get('fontpos/t2')->place(268,289);
+Tk::SlideShow::Sprite->Get('fontpos/warning')->place(468,114);
+Tk::SlideShow::Sprite->Get('fontpos/t3')->place(280,531);

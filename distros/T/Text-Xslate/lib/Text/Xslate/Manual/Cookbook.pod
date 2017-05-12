@@ -1,0 +1,310 @@
+=head1 NAME
+
+Text::Xslate::Manual::Cookbook - How to cook Xslate templates
+
+=head1 DESCRIPTION
+
+The Xslate cookbook is a set of recipes showing Xslate features.
+
+=head1 RECIPES
+
+=head2 How to manage HTML forms
+
+Managing HTML forms is an important issue for web applications.  You're better
+off using modules that manage HTML forms rather than managing this yourself
+in your templates.  This section proposes two basic solutions:
+using FillInForm and HTML form builders.
+
+In both solutions, you should not use the C<mark_raw> filter in templates,
+which easily creates B<security holes>. Instead, application code should be
+responsible for calling the C<mark_raw> function that C<Text::Xslate> can export.
+
+=head3 Using FillInForm
+
+One solution to manage HTML forms is to use FillInForm modules with
+the block filter syntax.
+
+Example code using C<HTML::FillInForm>:
+
+    #!perl -w
+    use strict;
+    use Text::Xslate qw(html_builder);
+
+    use HTML::FillInForm; # HTML::FillInForm::Lite is okay
+
+    sub fillinform {
+        my($q) = @_;
+        my $fif = HTML::FillInForm->new();
+        return html_builder {
+            my($html) = @_;
+            return $fif->fill(\$html, $q);
+        };
+    }
+
+    my $tx = Text::Xslate->new(
+        function => {
+            fillinform => \&fillinform,
+        },
+    );
+
+    my %vars = (
+        q => { foo => "<filled value>" },
+    );
+    print $tx->render_string(<<'T', \%vars);
+    FillInForm:
+    : block form | fillinform($q) -> {
+    <form>
+    <input type="text" name="foo" />
+    </form>
+    : }
+    T
+
+Output:
+
+    FillInForm:
+    <form>
+    <input type="text" name="foo" value="&lt;filled value&gt;" />
+    </form>
+
+Because L<HTML::FillInForm::Lite> provides a C<fillinform> function,
+it becomes even simpler:
+
+    use HTML::FillInForm::Lite qw(fillinform);
+
+    my $tx = Text::Xslate->new(
+        function => { fillinform => html_builder(\&fillinform) },
+    );
+
+From 1.5018 on, C<html_builder_module> is supported for HTML builder modules like C<HTML::FillInForm>. Just import HTML builder functions with C<html_builder_module> option.
+
+    my $tx = Text::Xslate->new(
+        html_builder_module => [ 'HTML::FillInForm::Lite' => [qw(fillinform)] ],
+    );
+
+
+See also L<HTML::FillInForm> or L<HTML::FillInForm::Lite> for details.
+
+=head3 Using HTML form builders
+
+Another solution to manage HTML forms is to use form builders.
+In such cases, all you have to do is to apply C<mark_raw()> to HTML parts.
+
+Here is a PSGI application that uses C<HTML::Shakan>:
+
+    #!psgi
+    use strict;
+    use warnings;
+    use Text::Xslate qw(mark_raw);
+    use HTML::Shakan;
+    use Plack::Request;
+
+    my $tx = Text::Xslate->new();
+
+    sub app {
+        my($env) = @_;
+        my $req  = Plack::Request->new($env);
+
+        my $shakan = HTML::Shakan->new(
+            request => $req,
+            fields  => [ TextField(name => 'name', label => 'Your name: ') ],
+        );
+
+        my $res = $req->new_response(200);
+
+        # do mark_raw here, not in templates
+        my $form = mark_raw($shakan->render());
+        $res->body( $tx->render_string(<<'T', { form => $form }) );
+    <!doctype html>
+    <html>
+    <head><title>Building form</title></head>
+    <body>
+    <form>
+    <p>
+    Form:<br />
+    <: $form :>
+    </p>
+    </body>
+    </html>
+    T
+        return $res->finalize();
+
+    }
+
+    return \&app;
+
+Output:
+
+    <!doctype html>
+    <html>
+    <head><title>Building form</title></head>
+    <body>
+    <form>
+    <p>
+    Form:<br />
+    <label for="id_name">Your name</label>
+    <input id="id_name" name="name" type="text" value="&lt;Xslate&gt;" />
+    </p>
+    </body>
+    </html>
+
+See also L<HTML::Shakan> for details.
+
+=head2 How to use Template Toolkit's WRAPPER feature in Kolon
+
+Use template cascading, which is a super-set of the C<WRAPPER> directive.
+
+F<wrapper.tx>:
+
+    <div class="wrapper">
+    block content -> { }
+    </div>
+
+F<content.tx>
+
+    : cascade wrapper
+
+    : override content -> {
+        Hello, world!
+    : }
+
+Output:
+
+    <div class="wrapper">
+        Hello, world!
+    </div>
+
+=head3 Template cascading
+
+Xslate supports B<template cascading>, which allows you to extend
+templates with block modifiers. It is like traditional template inclusion,
+but is more powerful.
+
+This mechanism is also called as template inheritance.
+
+See also L<Text::Xslate/"Template cascading">.
+
+=head2 How to map __DATA__ sections to the include path
+
+Use C<Data::Section::Simple>, and the C<path> option of C<new()>, which accepts
+HASH references which contain C<< $file_name => $content >> mapping.
+
+    use Text::Xslate;
+    use Data::Section::Simple;
+
+    my $vpath = Data::Section::Simple->new()->get_data_section();
+    my $tx = Text::Xslate->new(
+        path => [$vpath],
+    );
+
+    print $tx->render('child.tx');
+
+    __DATA__
+    @@ base.tx
+    <html>
+    <body><: block body -> { :>default body<: } :></body>
+    </html>
+    @@ child.tx
+    : cascade base;
+    : override body -> {
+    child body
+    : } # endblock body
+
+This feature is directly inspired by Text::MicroTemplate::DataSection,
+and originated from Mojolicious.
+
+See also L<Data::Section::Simple>, L<Text::MicroTemplate::DataSection>,
+and L<Mojolicious>.
+
+=head2 How to interpolate data into JavaScript sections without XSS
+
+Because Xslate escapes only HTML meta characters, you must escape
+JavaScript meta characters by yourself when you put data into
+C<< <script> ... </script> >> sections.
+
+The C<JSON> module is not suitable because it doesn't escape some meta
+characters such as C<< "</script>" >>.
+
+It is better to use utilities proven to be secure for JavaScript escaping
+to avoid XSS.
+L<JavaScript::Value::Escape> helps you in this regard.
+
+    my $tx = Text::Xslate->new(
+        module => ['JavaScript::Value::Escape' => [qw(js)]],
+        );
+
+    my %params = (
+        user_input => '</script><script>alert("XSS")</script>',
+        );
+
+    print $tx->render_string(<<'T', \%params);
+    <script>
+    document.write('<: $user_input | html | js :>');
+    var user_input = '<: $user_input | js :>';
+    </script>
+    T
+
+You'd better to consult the security experts on more complex cases.
+
+=head2 How to interpolate structured texts into HTML without XSS
+
+There's no silver bullet to parse structured texts in secure ways.
+You'd better to consult the security experts to do so.
+
+Some CPAN module might help you. See L<String::Filter> for example.
+
+=head2 How to manage localization in templates
+
+You can register any functions including C<_()>, so no specific techniques are required.
+
+For example:
+
+    use I18N::Handle;
+    # I18N::Handle installs the locale function "_" to the global namespace.
+    # (remember the symbol *_ is global)
+    I18N::Handle->new( ... )->speak('zh_tw');
+
+    my $tx = Text::Xslate->new(
+        function => {
+            _ => \&_,
+        },
+    );
+
+Then in your templates:
+
+    <: _('Hello %1', $john ) :>
+
+See also: L<I18N::Handle>, L<App::I18N>.
+
+=head2 How to load templates before C<fork()>ing?
+
+It is a good idea to load templates in preforking-model applications.
+Here is an example to load all the templates which is in a given path:
+
+    use File::Find;
+
+    my $path = ...;
+    my $tx = Text::Xslate->new(
+        path      => [$path],
+        cache_dir =>  $path,
+    );
+
+    # pre-load files
+    find sub {
+        if(/\.tx$/) {
+            my $file = $File::Find::name;
+            $file =~ s/\Q$path\E .//xsm; # fix path names
+            $tx->load_file($file);
+        }
+    }, $path;
+
+    # fork and render ...
+
+=head1 SEE ALSO
+
+L<Text::Xslate>
+
+L<Text::Xslate::Manual>
+
+L<Text::Xslate::Manual::FAQ>
+
+=cut

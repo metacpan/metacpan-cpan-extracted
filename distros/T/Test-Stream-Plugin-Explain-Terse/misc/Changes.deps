@@ -1,0 +1,9 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.001001
+ [Added / test requires]
+ - Test::Stream::Plugin::Compare
+ - Test::Stream::Plugin::Core
+
+ [Changed / test requires]
+ - Test::Stream 0 → 1.302025

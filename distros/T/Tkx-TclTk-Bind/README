@@ -1,0 +1,49 @@
+Tkx-TclTk-Bind version 1.400
+
+The module is an auxiliary module for:
+
+   Tkx::TclTk::Bind::IWidgets
+   Tkx::TclTk::Bind::ImageLibrary
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+
+DEPENDENCIES
+
+The following pragmas and modules are required:
+
+   Archive::Tar
+   Config
+   Const::Fast
+   English
+   Exporter
+   File::Remove
+   File::Spec
+   Modern::PBP::Perl
+   Tkx
+
+INCOMPATIBILITIES
+
+The module works with PERL 5:12 or higher under MS Win, Linux and Max OS.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, Juergen von Brietzke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

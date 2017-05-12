@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# override these (by export the variables in your shell)
+BUILDKITE_USER=${BUILDKITE_USER:-chisel@chizography.net};
+BUILDKITE_ORGSLUG=${BUILDKITE_ORGSLUG:-chizography};
+
+# derived from https://buildkite.com/docs/api/projects#create-a-project
+curl -X POST "https://api.buildkite.com/v1/organizations/${BUILDKITE_ORGSLUG}/projects" \
+  -u $BUILDKITE_USER \
+  -d '{
+    "name": "test-dbix-class-schema",
+    "repository": "git@github.com:chiselwright/test-dbix-class-schema.git",
+    "steps": [
+      {
+        "type": "script",
+        "name": "perlbrew (install)",
+        "command": "script/buildkite/perlbrew-install",
+        "agent_query_rules": [
+            "org=chizography"
+        ]
+      },
+      {
+        "type": "waiter"
+      },
+
+      {
+        "type": "script",
+        "name": "perlbrew (shell setup)",
+        "command": "script/buildkite/perlbrew-setup",
+        "agent_query_rules": [
+            "org=chizography"
+        ]
+      },
+      {
+        "type": "waiter"
+      },
+
+      {
+        "type": "script",
+        "name": "dzil (install)",
+        "command": "script/buildkite/dzil-install",
+        "agent_query_rules": [
+            "org=chizography"
+        ]
+      },
+      {
+        "type": "waiter"
+      },
+
+      {
+        "type": "script",
+        "name": "dzil (authordeps)",
+        "command": "script/buildkite/dzil-authordeps",
+        "agent_query_rules": [
+            "org=chizography"
+        ]
+      },
+      {
+        "type": "waiter"
+      },
+
+      {
+        "type": "script",
+        "name": "dzil (distrodeps)",
+        "command": "script/buildkite/dzil-distrodeps",
+        "agent_query_rules": [
+            "org=chizography"
+        ]
+      },
+      {
+        "type": "waiter"
+      },
+
+      {
+        "type": "script",
+        "name": "basic tests :wrench:",
+        "command": "script/buildkite/dzil-tests-basic",
+        "agent_query_rules": [
+            "org=chizography"
+        ]
+      },
+      {
+        "type": "waiter"
+      },
+
+
+      {
+        "type": "script",
+        "name": "basic tests :wrench:",
+        "command": "script/buildkite/dzil-tests-full",
+        "agent_query_rules": [
+            "org=chizography"
+        ]
+      }
+    ]
+  }'

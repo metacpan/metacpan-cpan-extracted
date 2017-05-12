@@ -1,0 +1,31 @@
+[% # $Id: prevnext,v 1.4 2005/02/02 19:34:06 jv Exp $ -%]
+<table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+  [% IF page.prev -%]
+    <td align="right">
+      [% INCLUDE menu/text
+           link = {
+             text  = page.prev.name
+             url   = site.topdir _ page.prev.url
+             class = 'menu'
+           };
+     -%]
+    </td>
+    [% IF page.next -%]
+    <td>|</td>
+    [% END -%]
+  [% END %]
+
+  [% IF page.next %]
+    <td align="left">
+      [%- INCLUDE menu/text
+            link = {
+              text  = page.next.name
+              url   = site.topdir _ page.next.url
+              class = 'menu'
+            };
+      %]
+    </td>
+  [% END %]
+  </tr>
+</table>

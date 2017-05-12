@@ -1,0 +1,12 @@
+--- 
+match:
+  distribution: '^CAPTTOFU/DBD-mysql-\d+'
+pl:
+  args: 
+    - --testdb=test
+    - --testuser=root
+depends:
+  configure_requires:
+    DBI: 1.58
+  requires:
+    DBI: 1.58

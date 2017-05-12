@@ -1,0 +1,25 @@
+---
+name: Text-Restructured-Writer-LibXML
+version: 0.01
+author:
+  - 'Gianni Ceccarelli <dakkar@thenautilus.net>'
+abstract: |
+  This module implements a "Writer" for Text::Restructured, that instead
+  of returning a string, returns a LibXML DOM.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Text::Restructured: 0.003031
+  XML::LibXML: 1.61
+build_requires:
+  Test::More: 0
+  XML::LibXML::XPathContext: 1.61
+provides:
+  Text::Restructured::Writer::LibXML:
+    file: lib/Text/Restructured/Writer/LibXML.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

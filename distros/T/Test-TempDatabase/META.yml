@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Test-TempDatabase
+version:             0.16
+abstract:            Creates and destructs temporary database for testing purposes
+license:             ~
+author:              
+    - Boris Sukholitko (boriss@gmail.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBD::Pg:                       0
+    DBI:                           0
+    File::Slurp:                   
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

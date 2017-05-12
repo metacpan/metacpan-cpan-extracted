@@ -1,0 +1,81 @@
+<h1 id="FedoraInstallationInstructions">Fedora Installation Instructions</h1>
+<h2 id="InstallationusingthePackageManager">Installation using the Package Manager</h2>
+<h3 id="Fedora15">Fedora 15</h3>
+<p>
+Provided versions:
+perl-Padre-0.84-1.fc15 with wxGTK-2.8.11-4.fc15 and perl-Alien-wxWidgets-0.51-4.fc15
+<tt>
+# yum install perl-Padre
+</tt>
+</p>
+<h3 id="Fedora14">Fedora 14</h3>
+<p>
+Provided versions:
+perl-Padre-0.64-1.fc14 with wxGTK-2.8.11-3.fc14 and perl-Alien-wxWidgets-0.51-2.fc14
+<tt>
+# yum install perl-Padre
+</tt>
+Apparently, after this padre will still complain
+<tt>
+libwx_gtk2u_stc-2.8.so cannot  open shared object file
+</tt>
+</p>
+<p>
+then also install
+<tt>
+# yum install wxGTK-devel
+</tt>
+</p>
+<p>
+Related bug, which should be fixed in future versions:
+<a  href="https://bugzilla.redhat.com/show_bug.cgi?id=656317"><span ></span>https://bugzilla.redhat.com/show_bug.cgi?id=656317</a>
+</p>
+<p>
+In older releases of Fedora is impossible to update because of Fedora update policy. In case you'd like to have latest Padre, you need update to the latest Fedora or use CPAN installation <a  href="/wiki/DownloadCPAN">install Padre from CPAN</a>.
+</p>
+<p>
+=== Older releases === 
+Older releases are not supported, but if you insist on using them install Padre and wxGTK-devel, which should workaround bugs.
+<tt>
+# yum install perl-Padre wxGTK-devel
+</tt>
+</p>
+<p>
+Fedora-13 includes Padre-0.64 with Wx Version: 0.92 wxWidgets 2.8.11.
+</p>
+<p>
+Fedora-12 includes Padre-0.64 with Wx Version: 0.92 wxWidgets 2.8.11.
+</p>
+<p>
+Fedora-11 includes Padre-0.32 with Wx Version: 0.91. 
+</p>
+<p>
+Fedora-10 includes Padre-0.20 with Wx Version: 0.89.
+</p>
+<p>
+Fedora-9  includes wxGTK-2.8.7 perl-Wx-0.81 perl-Alien-wxWidgets-0.32.
+</p>
+<p>
+Fedora-8  includes Wx Version: 0.74 perl-Alien-wxWidgets-0.31.
+</p>
+<h3 id="Manualrebuild">Manual rebuild</h3>
+<p>
+It is possible rebuild latest Padre source rpm on your computer, but you will need rebuild also _a lot_ of dependencies. It's not recommended and it might be better to use CPAN. If you still like to rebuild it, you can try:
+<tt>
+Download source rpm <a  href="http://koji.fedoraproject.org/koji/packageinfo?packageID=6964"><span ></span>http://koji.fedoraproject.org/koji/packageinfo?packageID=6964</a>
+yum install rpm-build
+rpmbuild --rebuild perl-Padre-yourversion.src.rpm
+</tt>
+</p>
+<h2 id="StillNotWorking?">Still Not Working?</h2>
+<p>
+Following the instructions on this page did not lead to a successful installation?
+</p>
+<p>
+<a  href="http://padre.perlide.org/contact.html"><span ></span>Contact us</a>.
+</p>
+<p>
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.
+</p>

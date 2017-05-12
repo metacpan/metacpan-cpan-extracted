@@ -1,0 +1,80 @@
+=head1 NAME
+
+Tangram::Type::Scalar - map scalar fields
+
+=head1 SYNOPSIS
+
+   use Tangram;
+
+   Tangram::Schema->new(
+      classes => { NaturalPerson => { fields => {
+         string => [ qw( name firstName gender ) ],
+         int => [ qw( age ) ],
+         real => [ qw( height weight ) ],
+
+   $schema = Tangram::Schema->new(
+      classes => { NaturalPerson => { fields => {
+         string =>
+         {
+            name    => { sql => 'VARCHAR(100)' },
+
+            1stname => {
+               col => 'firstName',
+               sql => 'VARCHAR(100) NULL' },
+
+            gender    => undef()
+         },
+
+=head1 DESCRIPTION
+
+Classes Tangram::Type::String, ::Int and ::Real and ::Ref are responsible
+for mapping the various subtypes of scalars. The first three mappings
+are documented here since they differ very little. See L<Tangram::Type::Ref::FromMany>
+for information on mapping references.
+
+Tangram::Type::String uses DBI's quote() method to quote strings if that
+method is available, thus making it possible to store binary objects
+or multiline text in databases that support it (thanks to Marian Kelc
+<marian.kelc@ruhr-uni-bochum.de> for suggesting this improvement).
+
+The three predefined typetags C<string>, C<int> and C<real> are for
+the corresponding Perl scalar subtypes.
+
+Each scalar field is stored in a single column of the table associated
+to the class.
+
+The persistent fields may be specified either as a hash or as an array
+of field names.
+
+In the hash form, each entry consists in a field name and an
+associated option hash. The option hash may contain the following
+fields:
+
+=over 4
+
+=item * col
+
+=item * sql
+
+=item * automatic
+
+=back
+
+C<col> sets the name of the column used to store the field's
+value. This field is optional, it defaults to the persistent field
+name. Override if the field name is not an acceptable SQL column name.
+
+C<sql> sets the SQL type of the column. Used by Schema::deploy() when
+initializing a database. Defaults to 'VARCHAR(255) NULL' for strings,
+'INT NULL' for ints and 'REAL NULL' for reals.
+
+C<automatic>, if set to true, tells Tangram not to save the field to
+storage. This is useful for auto-increment or timestamp columns.
+
+The persistent fields may also be specified as an array of strings, in
+which case the defaults are used.
+
+
+
+
+

@@ -1,0 +1,174 @@
+NAME
+    Tie::Cache - LRU Cache in Memory
+
+SYNOPSIS
+     use Tie::Cache;
+     tie %cache, 'Tie::Cache', 100, { Debug => 1 };   
+     tie %cache2, 'Tie::Cache', { MaxCount => 100, MaxBytes => 50000 };
+     tie %cache3, 'Tie::Cache', 100, { Debug => 1 , WriteSync => 0};   
+
+     # Options ##################################################################
+     #
+     # Debug =>      0 - DEFAULT, no debugging output
+     #               1 - prints cache statistics upon destroying
+     #               2 - prints detailed debugging info
+     #
+     # MaxCount =>   Maximum entries in cache.
+     #
+     # MaxBytes =>   Maximum bytes taken in memory for cache based on approximate 
+     #               size of total cache structure in memory
+     #
+     #               There is approximately 240 bytes used per key/value pair in the cache for 
+     #               the cache data structures, so a cache of 5000 entries would take
+     #               at approximately 1.2M plus the size of the data being cached.
+     #
+     # MaxSize  =>   Maximum size of each cache entry. Larger entries are not cached.
+     #                   This helps prevent much of the cache being flushed when 
+     #                   you set an exceptionally large entry.  Defaults to MaxBytes/10
+     #
+     # WriteSync =>  1 - DEFAULT, write() when data is dirtied for 
+     #                   TRUE CACHE (see below)
+     #               0 - write() dirty data as late as possible, when leaving 
+     #                   cache, or when cache is being DESTROY'd
+     #
+     ############################################################################
+
+     # cache supports normal tied hash functions
+     $cache{1} = 2;       # STORE
+     print "$cache{1}\n"; # FETCH
+
+     # FIRSTKEY, NEXTKEY
+     while(($k, $v) = each %cache) { print "$k: $v\n"; } 
+ 
+     delete $cache{1};    # DELETE
+     %cache = ();         # CLEAR
+
+DESCRIPTION
+    This module implements a least recently used (LRU) cache in memory through a
+    tie interface. Any time data is stored in the tied hash, that key/value pair
+    has an entry time associated with it, and as the cache fills up, those
+    members of the cache that are the oldest are removed to make room for new
+    entries.
+
+    So, the cache only "remembers" the last written entries, up to the size of
+    the cache. This can be especially useful if you access great amounts of
+    data, but only access a minority of the data a majority of the time.
+
+    The implementation is a hash, for quick lookups, overlaying a doubly linked
+    list for quick insertion and deletion. On a WinNT PII 300, writes to the
+    hash were done at a rate 3100 per second, and reads from the hash at 6300
+    per second. Work has been done to optimize refreshing cache entries that are
+    frequently read from, code like $cache{entry}, which moves the entry to the
+    end of the linked list internally.
+
+INSTALLATION
+    Tie::Cache installs easily using the make or nmake commands as shown below.
+    Otherwise, just copy Cache.pm to $PERLLIB/site/Tie
+
+            > perl Makefile.PL
+            > make
+            > make test 
+            > make install
+
+            * use nmake for win32
+            ** you can also just copy Cache.pm to $perllib/Tie
+
+BENCMARKS
+    There is another simpler LRU cache implementation in CPAN, Tie::Cache::LRU,
+    which has the same basic size limiting functionality, and for this
+    functionality, the exact same interface.
+
+    Through healthy competition, Michael G Schwern got Tie::Cache::LRU mostly
+    faster than Tie::Cache on reads & writes:
+
+     Cache Size 5000       Tie::Cache 0.17  Tie::Cache::LRU 20110205.00
+     10000 Writes             0.63 CPU sec          0.47 CPU sec
+     40000 Reads              0.79 CPU sec          0.71 CPU sec
+     10000 Deletes            0.23 CPU sec          0.26 CPU sec
+
+    Unless you are using TRUE CACHE or MaxBytes functionality, using
+    Tie::Cache::LRU could be an easy replacement for Tie::Cache.
+
+    OTOH one nice thing about this module is its lack of external module
+    dependencies!
+
+TRUE CACHE
+    To use class as a true cache, which acts as the sole interface for some data
+    set, subclass the real cache off Tie::Cache, with @ISA = qw( 'Tie::Cache' )
+    notation. Then override the read() method for behavior when there is a cache
+    miss, and the write() method for behavior when the cache's data changes.
+
+    When WriteSync is 1 or TRUE (DEFAULT), write() is called immediately when
+    data in the cache is modified. If set to 0, data that has been modified in
+    the cache gets written out when the entries are deleted or during the
+    DESTROY phase of the cache object, usually at the end of a script.
+
+    To have the dirty data write() periodically while WriteSync is set to 0,
+    there is a flush() cache API call that will flush the dirty writes in this
+    way. Just call the flush() API like:
+
+      my $write_flush_count = tied(%cache)->flush();
+
+    The flush() API was added in the .17 release thanks to Rob Bloodgood.
+
+TRUE CACHE EXAMPLE
+     use Tie::Cache;
+
+     # personalize the Tie::Cache object, by inheriting from it
+     package My::Cache;
+     @ISA = qw(Tie::Cache);
+
+     # override the read() and write() member functions
+     # these tell the cache what to do with a cache miss or flush
+     sub read { 
+        my($self, $key) = @_; 
+        print "cache miss for $key, read() data\n";
+        rand() * $key; 
+     }
+     sub write { 
+        my($self, $key, $value) = @_;
+        print "flushing [$key, $value] from cache, write() data\n";
+     }
+
+     my $cache_size   = $ARGV[0] || 2;
+     my $num_to_cache = $ARGV[1] || 4;   
+     my $Debug = $ARGV[2] || 1;
+
+     tie %cache, 'My::Cache', $cache_size, {Debug => $Debug};   
+
+     # load the cache with new data, each through its contents,
+     # and then reload in reverse order.
+     for(1..$num_to_cache) { print "read data $_: $cache{$_}\n" }
+     while(my($k, $v) = each %cache) { print "each data $k: $v\n"; }
+     for(my $i=$num_to_cache; $i>0; $i--) { print "read data $i: $cache{$i}\n"; }
+
+     # flush writes now, trivial use since will happen in DESTROY() anyway
+     tied(%cache)->flush(); 
+
+     # clear cache in 2 ways, write will flush out to disk
+     %cache = ();
+     undef %cache;
+
+NOTES
+    Many thanks to all those who helped me make this module a reality,
+    including:
+
+            :) Tom Hukins who provided me insight and motivation for
+               finishing this module.
+            :) Jamie McCarthy, for trying to make Tie::Cache be all
+               that it can be.
+            :) Rob Fugina who knows how to "TRULY CACHE".
+            :) Rob Bloodgood, for the TRUE CACHE flush() API
+
+AUTHOR
+    Please send any questions or comments to Joshua Chamas at
+    chamas@alumni.stanford.org
+
+COPYRIGHT
+    Copyright (c) 1999-2012 Joshua Chamas, Chamas Enterprises Inc. Sponsored by
+    development on NodeWorks http://nodeworks.com and Web Test.org
+    http://web-test.org
+
+    All rights reserved. This program is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+

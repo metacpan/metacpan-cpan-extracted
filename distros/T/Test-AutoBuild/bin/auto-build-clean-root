@@ -1,0 +1,155 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2002-2008 Daniel P. Berrange <dan@berrange.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+use strict;
+use warnings;
+
+use File::Path;
+use File::Glob ':glob';
+use File::Spec::Functions qw(catdir catfile rootdir);
+
+my $build_home = catdir(rootdir, "var", "lib", "builder");
+$build_home = shift @ARGV if @ARGV;
+
+sub cleanit {
+    my @dir = @_;
+    my $path = catdir($build_home, @dir);
+    print "Clean $path\n";
+    my $files = catfile($path, "*");
+    my @files = bsd_glob($files);
+    rmtree(\@files, 0, 0);
+}
+
+cleanit "source-root";
+cleanit "install-root";
+cleanit "build-archive";
+cleanit "log-root";
+
+cleanit "public_html";
+cleanit "public_ftp";
+
+cleanit "package-root", "rpm", "BUILD";
+cleanit "package-root", "rpm", "BUILDROOT";
+cleanit "package-root", "rpm", "RPMS", "noarch";
+cleanit "package-root", "rpm", "RPMS", "i386";
+cleanit "package-root", "rpm", "RPMS", "i486";
+cleanit "package-root", "rpm", "RPMS", "i586";
+cleanit "package-root", "rpm", "RPMS", "i686";
+cleanit "package-root", "rpm", "RPMS", "x86_64";
+cleanit "package-root", "rpm", "RPMS", "ia32e";
+cleanit "package-root", "rpm", "RPMS", "ia64";
+cleanit "package-root", "rpm", "RPMS", "sparc";
+cleanit "package-root", "rpm", "SPECS";
+cleanit "package-root", "rpm", "SOURCES";
+cleanit "package-root", "rpm", "SRPMS";
+cleanit "package-root", "pkg";
+cleanit "package-root", "zips";
+cleanit "package-root", "tars";
+cleanit "package-root", "debian";
+
+my $logs = catfile($build_home, "autobuild*.log");
+my @files = bsd_glob($logs);
+push @files, catfile($build_home, ".build.mutex");
+
+print "Clean $_\n" foreach @files;
+rmtree(\@files, 0, 0);
+
+exit 0;
+
+=pod
+
+=head1 NAME
+
+auto-build-clean-root - Clear out a build engine root directory
+
+=head1 SYNOPSIS
+
+# auto-build-clean-root PATH-TO-ROOT
+
+To clean out a build engine root under /var/lib/builder, the location
+expected by the example configuration file, execute:
+
+# auto-build-clean-root /var/lib/builder
+
+=head1 DESCRIPTION
+
+The build engine root contains a number of directories in which state
+is stored, or work performed. In unusual circumstances, some of this
+state can become malformed/corrupt which may cause the build engine
+to fail. The C<auto-build-clean-root> script provides a convenience
+for removing all state from the build root
+
+=head1 STRUCTURE
+
+The following directories are cleaned by the script:
+
+=over 4
+
+=item source-root
+
+The directory into which the modules' source code will be checked
+out of version control.
+
+=item install-root
+
+The virtual root directory in which modules will install files
+during the "make install" part of their build process.
+
+=item log-root
+
+The directory into which build and test log files will be spooled
+during execution of modules' control files.
+
+=item package-root
+
+The directory into which packages (RPMs, Debian packages, ZIPs, etc)
+will be saved by the module's control file. There are subdirectories
+below this for all the various different types of packages.
+
+=item build-archive
+
+The directory used for caching the results of module builds across
+build cycles.
+
+=item public_html
+
+The directory in which the HTML status pages will be generated, and
+build artifacts, packages, and log files published. This directory
+should be exported by an HTTP server
+
+=item public_ftp
+
+The directory in which packages will be published. This directory should
+be exported by an FTP server.
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) 2002-2008 Daniel P. Berrange
+
+Test-AutoBuild is distributed under the terms of the GNU GPL v2+.
+This is free software; see the source for copying conditions.  There is
+NO warranty; not even for MERCHANTABILITY or FITNESS FOR  A  PARTICULAR
+PURPOSE.
+
+=head1 SEE ALSO
+
+L<auto-build(1)>, L<auto-build.conf(5)>
+
+=cut

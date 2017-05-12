@@ -1,0 +1,14 @@
+use warnings;
+use strict;
+
+use Test::More tests => 3;
+
+BEGIN { use_ok "Time::UTC::Segment"; }
+
+eval { Time::UTC::Segment::_use_builtin_knowledge(); };
+is $@, "";
+
+eval { Time::UTC::Segment::_download_tai_utc_dat(); };
+is $@, "";
+
+1;

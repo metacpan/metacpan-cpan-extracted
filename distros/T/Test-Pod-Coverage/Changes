@@ -1,0 +1,88 @@
+Revision history for Perl module Test::Pod::Coverage
+
+1.10 2014-07-17 NEILB
+    - Changed license to Artistic 2.0, at PETDANCE's request.
+    - Added README
+    - Moved Coverage.pm to lib/Test/Pod/Coverage.pm
+    - Min perl version now set to 5.006 in both code and dist metadata.
+      Addresses RT#21564 from ANDK++
+    - Added DESCRIPTION section to pod (RT#28715 JEREMIAH++),
+      and changed to a minimal SYNOPSIS, with everything else moved
+      to the DESCRIPTION.
+    - The "no verbose" tests in t/nosymbols.t weren't ensuring that the
+      tests were running with HARNESS_VERBOSE set to false. You could set
+      that true in your environment and break the test.
+      RT#53947 - thanks to Pete Armstrong.
+    - Makefile.PL: Ensured all prereqs listed in PREREQ_PM,
+      and TEST_REQUIRES set if a recent enough ExtUtils::MakeMaker.
+    - Added github repo to pod and dist metadata
+    - Deleted the old META.yml, so new MYMETA.{yml,json} will be generated.
+    - Reformatted as per CPAN::Changes::Spec
+
+1.09_01 2014-07-08 NEILB
+    - Specified license as 'Perl' in metadata, to match doc.
+    - All of the changes in 1.10 were first done in this developer release,
+      apart from the change to Artistic License 2.0.
+
+1.08 2006-01-26 PETDANCE
+    [FIXES]
+    - File and directory names may now contain periods and hyphens.
+    - Now exports all_modules().
+
+1.07_01 2005-12-29 PETDANCE
+    [ENHANCEMENTS]
+    - Can now use an alternate class that implements the Pod::Coverage
+      interface.  This is mostly useful for avoiding the necessity to
+      redocument or itemize overriden methods in a subclass by using
+      Pod::Coverage::CountParents.  Thanks to Ricardo Signes.
+
+1.06 2004-06-22 PETDANCE
+    [ENHANCEMENTS]
+    - Looks in blib/ if there is one, otherwise looks in lib/
+    - Doesn't report "no public symbols" unless verbose mode is on.
+    - Thanks to David Wheeler and Shawn Sorichetti for nudging.
+      This behavior will be in Test::Pod soon, too.
+
+1.04 2004-05-01 PETDANCE
+    [FIXES]
+    - Now it runs taint-safe.  I was not untainting the filename.
+
+1.02 2004-05-01 PETDANCE
+    [FIXES]
+    - Fixed a warning in all_modules() under 5.8.3
+
+1.00 2004-04-29 PETDANCE
+    [ENHANCEMENTS]
+    - Now runs taint-safe.
+    - No longer uses File::Find.
+
+0.08 2004-02-14 PETDANCE
+    [ENHANCEMENTS]
+    - Added all_pod_coverage_ok(), and all_modules() for support.
+
+0.06 2004-01-27 PETDANCE
+    [ENHANCEMENTS]
+    - Files with all pod and no symbols is no longer an error.
+    - Enhanced some of the error messages.
+
+0.04 2004-01-19 PETDANCE
+    [ENHANCEMENTS]
+    - Now lists the naked subroutines in the error message.
+
+
+0.03 2004-01-17 PETDANCE (not released)
+    [ENHANCEMENTS]
+    - Now says what module has a problem if it can't find any POD.
+      Thanks, Barbie.
+
+    [INTERNALS]
+    - Added a couple more tests to bring my test coverage up
+      to 100%, according to Devel::Cover.  Whoo!
+
+0.02 2004-01-05 PETDANCE
+    - First version with the new reasonable API on pod_coverage_ok().
+      If you got in on 0.01, switch now.
+
+0.01 2004-01-04 PETDANCE
+    - First release to CPAN
+

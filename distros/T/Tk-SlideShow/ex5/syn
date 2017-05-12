@@ -1,0 +1,11 @@
+Tk::SlideShow::Dict->Get('syn/fourn')->place(552,634);
+Tk::SlideShow::Dict->Get('syn/in')->place(804,634);
+Tk::SlideShow::Dict->Get('syn/fourn-syn/in')->ftpos(3,7)->width(9)->shape(13,20,6);
+Tk::SlideShow::Dict->Get('syn/trait')->place(1075,560);
+Tk::SlideShow::Dict->Get('syn/in-syn/trait')->ftpos(3,7)->width(14)->shape(17,30,8);
+Tk::SlideShow::Dict->Get('syn/post')->place(1083,830);
+Tk::SlideShow::Dict->Get('syn/trait-syn/post')->ftpos(5,1)->width(18)->shape(12,39,18);
+Tk::SlideShow::Dict->Get('syn/out')->place(806,767);
+Tk::SlideShow::Dict->Get('syn/post-syn/out')->ftpos(7,3)->width(12)->shape(20,35,13);
+Tk::SlideShow::Dict->Get('syn/client')->place(581,767);
+Tk::SlideShow::Dict->Get('syn/out-syn/client')->ftpos(7,3)->width(9)->shape(17,25,8);

@@ -1,0 +1,34 @@
+# this tests evaluations in INCLUDE directives
+
+# test simple variable values 
+
+Age defined: 30
+Testing: $age > 20 
+<<< block pass=10 >>>
+Testing: $age > 30 
+
+Testing: $age > 40 
+
+Testing: $age < 40 
+<<< block pass=13 >>>
+Testing: $age >= 30 
+<<< block pass=14 >>>
+Testing: $age <= 30 
+<<< block pass=15 >>>
+Testing: $age >= 29 
+<<< block pass=16 >>>
+Testing: $age >= 31 
+
+
+
+ 
+Testing: age < $cutoff
+<<< block pass=21 >>>
+Testing: $age < $cutoff 
+<<< block pass=22 >>>
+Testing: age > $cutoff
+
+Testing: $age > $cutoff 
+
+
+

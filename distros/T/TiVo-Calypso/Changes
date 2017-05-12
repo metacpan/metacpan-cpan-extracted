@@ -1,0 +1,19 @@
+Revision history for TiVo-Calypso
+
+1.3.5
+* Wed Mar 12 2008 Scott Schneider <sschneid@gmail.com>
+- POD clean-up
+- Created/fixed CPAN test errors
+
+1.3.4
+* Fri Feb 22 2008 Scott Schneider <sschneid@gmail.com>
+- Applied patch (per ldwaard@netzero.com) for Toshiba SD-H400 compatability
+
+1.3.3
+* Thu Apr 06 2006 Scott Schneider <sschneid@gmail.com>
+- /Music/Browse/* was being incorrectly returned as a tivo-server object (as opposed to a folder object), overwriting the external cache file for the root service(s)
+
+1.3.2
+* Thu Apr 06 2006 Scott Schneider <sschneid@gmail.com>
+- initial version
+

@@ -1,0 +1,10 @@
+MANIFEST
+Changes
+META.yml
+Makefile.PL
+README
+Build.PL
+LICENSE
+t/test.t
+lib/Tie/Locked.pm
+lib/Tie/Locked.pod

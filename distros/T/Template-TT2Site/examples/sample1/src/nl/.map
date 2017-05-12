@@ -1,0 +1,5 @@
+title Inhoud
+name  TT2Site
+menu "Overzicht" index
+menu "Gebruik" userguide
+menu "Contact"  contact

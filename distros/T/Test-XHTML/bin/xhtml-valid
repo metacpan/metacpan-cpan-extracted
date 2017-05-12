@@ -1,0 +1,283 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+$|++;
+
+my $VERSION = '0.12';
+
+#----------------------------------------------------------------------------
+
+=head1 NAME
+
+xhtml-valid - test web page DTD validation.
+
+=head1 SYNOPSIS
+
+  xhtml-valid \\
+         [-i|ignore file] \\
+         ( [-r|root url]  | [-u|url url]   | [--ulist file] | \\
+           [-p|path path] | [-f|file file] | [--flist file] | ) \\
+         [-h|help] [-v|version]
+
+=head1 DESCRIPTION
+
+Using either URLs or flat files, this program attempts to validate web pages
+according to their own DTD.
+
+=cut
+
+# -------------------------------------
+# Library Modules
+
+use Getopt::Long;
+use Test::XHTML::Valid;
+
+# -------------------------------------
+# Variables
+
+my %options;
+
+my @IGNORE = (
+    qr/^mailto/,
+    qr/\.(xml|txt|pdf)$/i,
+    qr/\.(tar\.gz|zip)$/i,
+    qr/\.(mp4|avi|wmv)$/i,
+    qr/\.(jpg|bmp|gif|png)$/i,
+);
+
+# -------------------------------------
+# Program
+
+##### INITIALISE #####
+
+init_options();
+
+##### MAIN #####
+
+my $txv = Test::XHTML::Valid->new();
+$txv->ignore_list(@IGNORE);
+
+# dynamic pages
+if($options{root}) {
+    $txv->process_root($options{url});
+
+} elsif($options{url}) {
+    $txv->process_link($options{url});
+
+} elsif($options{ulist}) {
+    $txv->process_url_list($options{ulist});
+
+
+# static pages
+} elsif($options{flist}) {
+    $txv->process_file_list($options{flist});
+
+} elsif($options{file}) {
+    $txv->process_file($options{file});
+
+} elsif($options{path}) {
+    $txv->process_path($options{path});
+
+
+# oops!
+} else {
+    help(1);
+}
+
+$txv->process_retries();
+my $results = $txv->process_results();
+
+if($results->{FAIL}) {
+    print $txv->errstr() . "\n";
+    #my @errors = $txv->errors();
+}
+
+printf "%5s: %s\n", $_, ($results->{$_}||0)  for(qw(PAGES PASS FAIL NET));
+
+# -------------------------------------
+# Subroutines
+
+sub init_options {
+    GetOptions( \%options,
+        'path|p=s',
+        'file|f=s',
+        'flist=s',
+        'root|r=s',
+        'url|u=s',
+        'ulist=s',
+        'ignore|i=s',
+        'help|h',
+        'version|v'
+    ) or help(1);
+
+    help(1)    if($options{help});
+    help(0)    if($options{version});
+    if(defined $options{path} && ! -d $options{path}) {
+        print "ERROR: path not found - $options{path}\n";
+        help(1);
+    }
+    for my $file ('file','flist','ulist') {
+        if(defined $options{$file} && ! -f $options{$file}) {
+            print "ERROR: file used in option '$file' not found [$options{$file}]\n";
+            help(1);
+        }
+    }
+
+    if(defined $options{ignore} && ! -f $options{ignore}) {
+        my $fh = IO::File->new($options{ignore},'r') or die "Cannot read file [options{ignore}]: $!\n";
+        while(<$fh>) {
+            chomp;
+            push @IGNORE, qr!$_!;
+        }
+    }
+}
+
+sub help {
+    my $full = shift;
+
+    if($full) {
+        print <<HERE;
+
+Usage: $0 [-h] [-v] \\
+         [-i file]
+         ( [-r url]  | [-u url]  | [--ulist file] \\
+           [-p path] | [-f file] | [--flist file] )
+
+
+  -i file       patterns used to ignore URLs (e.g. user login)
+
+  -r url        root target URL for validating (multiple pages)
+  -u url        target URL for validating (single page)
+  -ulist file   file containing a list of target URLs
+
+  -p path       target directory of XHTML files
+  -f file       single target XHTML file path
+  -flist file   file containing a list of XHTML file paths
+
+  -h            this help screen
+  -v            program version
+
+  Note: The --root|r option acts as a crawler. As such use with care. Testing
+        any such URL will also test any links found in the root page, and any
+        subsequent pages, that match a URL that would be below the given root
+        URL. External links and non-child links of the given root are not 
+        tested.
+
+        The --ulist and --url options will only test the web links listed, and
+        will NOT crawl any links within the page.
+
+HERE
+
+    }
+
+    print "$0 v$VERSION\n\n";
+    exit(0);
+}
+
+__END__
+
+=head1 USAGE
+
+This program can be used in several ways to validate web pages. It will take a
+root URL and crawl the website from the root and validate every page it finds
+below it, it can test named URLs only. Given a root local directory it will
+traverse the directory tree and validate every HTML file it finds, it will test
+a single file or a list of files. In short it tries to validate web pages.
+
+=head2 URL Options
+
+=over
+
+=item * -r|root url
+
+Given a root URL will traverse the website, validating all pages found that
+are below the root URL. Thus external links and those outside of the root URL
+are ignored.
+
+=item * -u|url url
+
+Given a single URL will validating the current page only.
+
+=item * --ulist file
+
+The given file should contain a list of URLs (one per line), which will then be
+validated. Note that only the links listed are validated, no crawling of the
+links within the page is performed.
+
+=back
+
+=head2 File Options
+
+=over
+
+=item * -p|path path
+
+Given a root directory will traverse the directory tree and validate every
+.html or .htm file it finds.
+
+=item * -f|file file
+
+Validates a single file.
+
+=item * -flist file
+
+The given file should contain a list of files (one per line), which will then
+be validated.
+
+=back
+
+=head2 Supporting Options
+
+=over
+
+=item * -i|ignore file
+
+The given file should contain patterns (one per line) used to ignore URLs and
+files (e.g. user login) from validation.
+
+By default mailto links and various document and binary file formats are
+ignored, together with any none 'http' protocol.
+
+=back
+
+=head2 Other Options
+
+=over
+
+=item * -h|help
+
+Provides a help screen.
+
+=item * -v|version
+
+Provides the current program version
+
+=back
+
+=head1 BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties, that is not explained within the POD
+documentation, please send bug reports and patches to barbie@cpan.org.
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+=head1 SEE ALSO
+
+L<XML::LibXML>
+
+=head1 AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+=head1 COPYRIGHT AND LICENSE
+
+  Copyright (C) 2008-2013 by Barbie <barbie@missbarbell.co.uk>
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.
+
+=cut
+

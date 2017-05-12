@@ -1,0 +1,5 @@
+<%args>
+        $message => ''
+</%args>
+
+<h3><% $message %></h3>

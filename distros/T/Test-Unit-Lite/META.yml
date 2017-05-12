@@ -1,0 +1,44 @@
+---
+abstract: 'Unit testing without external dependencies'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Unit-Lite
+provides:
+  Test::Unit::Debug:
+    file: lib/Test/Unit/Lite.pm
+    version: 0
+  Test::Unit::HarnessUnit:
+    file: lib/Test/Unit/Lite.pm
+    version: 0
+  Test::Unit::Lite:
+    file: lib/Test/Unit/Lite.pm
+    version: 0.1202
+  Test::Unit::Lite::AllTests:
+    file: lib/Test/Unit/Lite.pm
+    version: 0
+  Test::Unit::Result:
+    file: lib/Test/Unit/Lite.pm
+    version: 0
+  Test::Unit::TestCase:
+    file: lib/Test/Unit/Lite.pm
+    version: 0
+  Test::Unit::TestRunner:
+    file: lib/Test/Unit/Lite.pm
+    version: 0
+  Test::Unit::TestSuite:
+    file: lib/Test/Unit/Lite.pm
+    version: 0
+requires:
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/dex4er/perl-Test-Unit-Lite/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-Test-Unit-Lite
+version: 0.1202

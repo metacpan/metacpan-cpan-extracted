@@ -1,0 +1,10 @@
+renderer: html
+title: example entry #30
+summary: this is a test entry... #30
+From: foo@bar
+Date: Sat, 3 Sep 2011 7:12:50 -0500
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="1317995172.7bA834F0.64490"; charset="us-ascii"
+
+An entry...

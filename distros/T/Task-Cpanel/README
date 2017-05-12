@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Task-Cpanel,
+version 11.36.001:
+
+  Brings in all Perl modules which are RPM packaged and shipped with B<cPanel & WHM> and B<EasyApache>.
+
+This software is copyright (c) 2012 by cPanel Inc..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

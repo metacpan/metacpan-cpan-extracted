@@ -1,0 +1,14 @@
+Revision history for Template::Direct
+
+1.00    2008-02-07
+        Imported from Rair
+1.12	2008-02-10
+		Fixed numerous bugs and re-released
+1.13	2008-02-20
+		Fixed a bug in the listing process
+1.14	2008-02-29
+		Added Mathamatics capabilities
+		Added sorting options to listing tag
+1.16    2008-03-11
+        Added negative number array functionality to
+		seek from the end of the array.

@@ -1,0 +1,47 @@
+{
+   "abstract" : "assert reference counts on objects",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Refcount",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Builder::Tester" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Devel::MAT" : "0.04"
+         },
+         "requires" : {
+            "B" : "0",
+            "Scalar::Util" : "0",
+            "Test::Builder" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Refcount" : {
+         "file" : "lib/Test/Refcount.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.08"
+}

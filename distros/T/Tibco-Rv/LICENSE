@@ -1,0 +1,21 @@
+Copyright (c) 2003 Paul Sturm.  All rights reserved.  This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+Tibco::Rv will not operate without TIB/Rendezvous, which is not included
+in this distribution.  You must obtain TIB/Rendezvous (and a license to use
+it) from TIBCO, Inc. (http://www.tibco.com).
+
+TIBCO and TIB/Rendezvous are trademarks of TIBCO, Inc.
+
+TIB/Rendezvous copyright notice:
+
+/*
+ * Copyright (c) 1998-2000 TIBCO Software Inc.
+ * All rights reserved.
+ * TIB/Rendezvous is protected under US Patent No. 5,187,787.
+ * For more information, please contact:
+ * TIBCO Software Inc., Palo Alto, California, USA
+ *
+ * @(#)tibrv.h  2.9
+ */

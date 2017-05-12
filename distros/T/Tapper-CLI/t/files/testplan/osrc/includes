@@ -1,0 +1,4 @@
+[% type = 'testrun' %]
+[% requested_hosts_all = '
+  - bullock
+  - dickstone ' %]

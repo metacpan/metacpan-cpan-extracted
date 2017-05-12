@@ -1,0 +1,28 @@
+---
+abstract: 'String::Truncate filter for Template::Toolkit'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  Socket: 0
+  Template::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Filter-String-Truncate
+requires:
+  String::Truncate: 0
+  Template::Plugin::Filter: 0
+  base: 0
+  perl: 5.006
+  strict: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-Filter-String-Truncate
+  homepage: http://search.cpan.org/dist/Template-Plugin-Filter-String-Truncate/
+  repository: git://github.com/mschout/template-plugin-filter-string-truncate.git
+version: 0.03

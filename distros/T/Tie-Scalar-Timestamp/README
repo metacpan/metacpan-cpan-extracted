@@ -1,0 +1,30 @@
+Tie-Scalar-Timestamp version 0.01
+=================================
+
+This is a VERY simple class that creates readonly scalars that
+always return the current timestamp. By default, it uses the format
+'yyyy-mm-ddThh:mm:ss' (or, in strftime notation, '%Y-%m-%dT%H:%M:%S')
+and local time. You can optionally pass a hashref of options to the
+call to tie to specify a pattern and whether to use UTC time instead
+of local time.
+
+A variables tied to this class is readonly, and attempting to assign to it will
+raise an exception.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2005 by Peter Eichman.
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+

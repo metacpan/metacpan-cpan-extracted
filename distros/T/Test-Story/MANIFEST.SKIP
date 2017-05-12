@@ -1,0 +1,15 @@
+\..*\.sw[a-z]$
+\.git
+\.DS_Store
+^Makefile$
+^Test-Story-.*\.tar\.gz$
+~$
+\.old$
+\.\#
+^logs/
+^blib/
+^pm_to_blib$
+^cover_db
+^output/
+^t/testdata/
+^support/

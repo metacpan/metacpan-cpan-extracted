@@ -1,0 +1,190 @@
+Revision history for Template::Sandbox
+
+1.04    Version released at 2010-05-11-10:03.
+        Version started at  2010-05-11-09:56.
+        Released rc 1.03_01 as 1.04 stable.
+
+        Summary of changes since 1.03:
+
+        Additions:
+            No additions.
+
+        Enhancements:
+            Fixed tests for changes in Perl 5.12 core module behaviour.
+
+1.03_01 Version released at 2010-04-30-21:04.  *** Development version. ***
+        Version started at  2010-04-30-21:01.
+        Fixed 88-misc.t to handle altered Data::Dumper behavior in perl 5.12.
+
+1.03    Version released at 2010-03-22-14:56.
+        Version started at  2010-03-22-14:53.
+        Released rc 1.02_02 as 1.03 stable.
+
+        Summary of changes since 1.02:
+
+        Additions:
+            Added open_delimiter and close_delimiter options.
+            Added allow_bare_expr option.
+            Added vmethods option.
+            Added <: end :> synonym for <: endif :> and <: endfor :>.
+            Added template_toolkit_compat option.
+
+        Enhancements:
+            Improved clarity of some error messages.
+            Expanded performance documentation using Template::Benchmark.
+            Made token-parsing case-insensitive.
+
+1.02_02 Version released at 2010-03-16-13:11.  *** Development version. ***
+        Version started at  2010-02-20-20:14.
+        Added vmethods support.
+        Extensive rewrite of variable, function and method parsing.
+        Added better permutations testing of sequential variable subscripts.
+        Replaced most single-point-of-use qr// with hard-coded //o for speed.
+        Performance impact: ~2% regained on compile phase, runtime unaffected.
+
+1.02_01 Version released at 2010-02-16-18:57.  *** Development version. ***
+        Version started at  2010-02-16-12:10.
+        Added open_delimiter and close_delimiter options.
+        Added allow_bare_expr option.
+        Added template_toolkit_compat option.
+        Added <: end :> synonym for <: endif :> or <: endfor :>.
+        Made token parsing case-insensitive.
+        Made "unrecognised token" error message slightly clearer.
+        Updated performance documentation with Template::Benchmark results.
+        Performance impact: ~2% lost on compile phase, runtime unaffected.
+
+1.02    Version released at 2010-02-09-09:39.
+        Version started at  2010-02-09-09:33.
+        Released rc 1.01_11 as 1.02 stable.
+
+        Summary of changes since 1.01:
+
+        COMPAT BUSTERS:
+            $current_dir no-longer defaults to Cwd::cwd() when
+            find_template() is called, instead an undef value will be passed:
+            if you need the cwd you can work it out yourself.
+
+        Additions:
+            clear_vars() method added.
+
+        Enhancements:
+            Improved support for Windows OS.
+            Improved support for localized perls in the test-suite.
+            Optimizatons to performance throughout.
+            Documentation improvements.
+
+1.01_11 Version released at 2010-02-06-15:55.  *** Development version. ***
+        Version started at  2010-02-04-09:21.
+        Added clear_vars().
+        Added tests for clear_vars().
+
+1.01_10 Version released at 2010-02-03-05:44.  *** Development version. ***
+        Version started at  2010-02-03-05:40.
+        Do not discard drive letter when building current_dir for includes
+        on windows platforms. Should fixed recursive include tests.
+
+1.01_09 Version released at 2010-01-28-21:26.  *** Development version. ***
+        Version started at  2010-01-28-21:22.
+        Previous issue was _really_ that $current_dir shouldn't have
+        been undefined in the first place... silly path-finding regexp.
+        Now uses File::Spec for all directory/filename fiddling.
+
+1.01_08 Version released at 2010-01-28-21:07.  *** Development version. ***
+        Version started at  2010-01-28-21:02.
+        get_include_candidates() copes gracefully without $current_dir.
+        Documentation corrections.
+
+1.01_07 Version released at 2010-01-27-22:54.  *** Development version. ***
+        Version started at  2010-01-11-15:03.
+        Test case added for defines messing with line/character positions.
+        Correct line/character numbers for changes from define replacement.
+        Added test cases for multiple function registration in constructor.
+        Retired <: for iterator=x set=y :> syntax.
+        Moved void-wrap of assigns from optimization to compile phase.
+        Preallocate large string to template output string for speed.
+        Tightened main instruction loop in run().
+        Removed unused $total_instr variable.
+        Unroll of top of variable stack into own variable during execution.
+        Evil evil and thrice evil optimizations to _eval_var().
+        Use faster procedural rather than OO interface to Digest::MD5().
+        Push count of program length into compile rather than runtime.
+        Push count of variable segment length into compile from eval.
+
+1.01_06 Version released at 2010-01-04-13:40.  *** Development version. ***
+        Version started at  2009-12-31-17:43.
+        Correction to broken position character counting after newlines.
+        _optimize_template() no longer takes args or returns one.
+        Added clarification to FastMmap caching benchmarks in POD.
+
+1.01_05 Version released at 2009-12-30-10:31.  *** Development version. ***
+        Version started at  2009-12-30-09:55.
+        Typo fixed in the new documentation.
+        Helps if I don't accidentally delete half the benchmark listing too.
+
+1.01_04 Version released at 2009-12-30-07:11.  *** Development version. ***
+        Version started at  2009-12-29-11:14.
+        COMPAT BUSTER: $current_dir no-longer defaults to Cwd::cwd() when
+            find_template() is called, instead an undef value will be passed:
+            if you need the cwd you can work it out yourself. :)
+        Removed dependency on Cwd.
+        Store special loop vars as array rather than hash.
+        Only build special loop vars if any are needed by loop.
+        Added tests for special loop var optimizations.
+        Added tests for subscript access of special vars. (var['__prev__']).
+        Added "case-study" style snippets to caching documentation.
+        Added benchmark dump to performance section.
+
+1.01_03 Version released at 2009-12-09-22:19.  *** Development version. ***
+        Version started at  2009-12-09-20:14.
+        Knew those unixy file paths in the tests' error-match regexps
+        would bite me eventually:
+            made the error text tests properly OS-agnostic.
+        Remembered to update coverage stats this time.
+
+1.01_02 Version released at 2009-12-08-12:38.  *** Development version. ***
+        Version started at  2009-12-08-08:29.
+        Release focus: optimizing the compile and optimization phases.
+        Major optimization to jump target renumbering in template optimization.
+        Only call _delete_instr() when actually needed.  Doh.
+        Prebuild list of jump-targets for speed when merging adjacent literals.
+        Correctly made FUNC_NEEDS_TEMPLATE a constant sub.
+        Use tr/// instead of m// for newline-counting during compile.
+        Replace nasty array munging during compile with splice().
+        Moved a few regexp compiles outside the loops using them.
+
+1.01_01 Version released at 2009-10-07-10:48.  *** Development version. ***
+        Version started at  2009-09-10-13:25.
+        No-longer assumes english-localized perl error text in tests.
+        Unreadable template test: improved check that it really is unreadable.
+
+1.01    Version released at 2009-09-07-11:17.
+        Version started at  2009-09-07-11:17.
+        Released rc 1.00_03 as 1.01 stable.
+
+1.00_03 Version released at 2009-09-04-12:14.  *** Development version. ***
+        Version started at  2009-09-04-11:43.
+        Made Test::Exception a build requirement rather than optional.
+        Fixed @_ vs $@ idiotic cut-n-paste typo in tests.
+
+1.00_02 Version released at 2009-09-01-11:57.  *** Development version. ***
+        Version started at  2009-08-27-09:52.
+        Futher typo fixes and clarification for POD.
+        Added zero-width vs void-context assigns to bugs section.
+        Typo fix in t/10-constructor.t.
+
+1.00_01 Version released at 2009-08-27-08:02.  *** Development version. ***
+        Version started at  2009-08-26-13:51.
+        Corrected string versions for ALL modules.
+        Neaten synospis lines in POD.
+        Numerous typo fixes in POD.
+        Rewrites of some POD sections for clarity and consistency.
+        Corrected 'no cache modules' test skips.
+        Added 0.03 requirement for Log::Any.
+        Suggest Cache::Cache 1.00 as recommendation.
+
+1.00    Version released at 2009-08-26-13:18.
+        Version started at  2009-08-??.
+        Initial CPAN release.
+        Split from internal Application::Template module.
+        Added tests.
+        Added documentation.

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Test/GetVolatileData.pm
+MANIFEST
+README
+LICENSE
+t/00-load.t
+t/01-getdata.t
+xt/pod-coverage.t
+xt/pod.t
+xt/kwalitee.t
+examples/test.pl
+Makefile.PL
+META.yml
+META.json

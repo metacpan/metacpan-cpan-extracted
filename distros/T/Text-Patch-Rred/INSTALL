@@ -1,0 +1,37 @@
+Text::Patch::Rred version 0.06 manual installation instructions
+===============================================================
+
+This program is in pure perl.  You can use the MakeMaker install method
+below or just copy lib/Text/Patch/Rred.pm to somewhere on perls @INC
+path, e.g. /usr/local/perl/site/Text/Patch/Rred.pm AND copy that same
+file or bin/rred.pl to somewhere on your path, e.g.
+/usr/local/bin/rred .
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+For post-install usage information, run perldoc Text::Patch::Rred or
+perldoc -F path/Text/Patch/Rred.pm
+
+DEPENDENCIES
+
+This module requires only core perl packages (Exporter, base, Carp). 
+Perl 5.6 or later is assumed.
+
+BUG REPORTING
+
+Please send bug reports to Jakob Bohm <ehekikkeptiehewdur@jbohm.dk>,
+Always include the full module name (with double colons and all)
+in the subject line to get past my "spam" filters.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2009 by Jakob Bohm.  All Rights Reserved.
+
+This library and program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.

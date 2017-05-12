@@ -1,0 +1,42 @@
+<html>
+<head>
+  <title>TLフレームワークサンプル</title>
+</head>
+<body>
+TLフレームワークのサンプルです．<br>
+Hello, world.<br>
+フォームにデータを入力して，送信ボタンを押すと，送信内容を表示し，フォームを再表示します．<br>
+<br>
+フォームを出力すると，自動的に文字コード判別用の hidden タグが追加されます．<br>
+文字コード判別文字を使用することで，半角カタカナを使用したり，日本語文字列が非常に少なくても，正確に文字コードを判別することが出来ます．<br>
+<br>
+<dl>
+<!begin:formitem>
+<dt><&KEY>
+<dd><&VALUE>
+<!end:formitem>
+</dl>
+<hr>
+<!-- form タグ中の action="" に空の値を指定すると，出力の際に自動的に CGI の名称が補完されます．-->
+<form action="" method="post">
+TEXT: <input type="text" name="text" value=""><br>
+PASSWORD: <input type="password" name="password" value=""><br>
+RADIO: <input type="radio" name="radio" value="1">1
+  <input type="radio" name="radio" value="2">2
+  <input type="radio" name="radio" value="3">3<br>
+CHECKBOX: <input type="checkbox" name="checkbox" value="1">1
+  <input type="checkbox" name="checkbox" value="2">2
+  <input type="checkbox" name="checkbox" value="3">3<br>
+SELECT: <select name="select">
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+</select><br>
+TEXTAREA: <br>
+  <textarea name="textarea" rows=3 cols=40></textarea><br>
+<input type="submit" name="submit" value="submit"><br>
+</form>
+
+</body>
+</html>
+

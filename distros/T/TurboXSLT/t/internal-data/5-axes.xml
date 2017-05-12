@@ -1,0 +1,5 @@
+<test>
+	<sub_test username="1">
+		<sub_test2 param1="1"/>
+	</sub_test>
+</test>

@@ -1,0 +1,8 @@
+Modules like GDBM_File are fraught when you have potentialy many
+readers/writers (like say in a long running forking daemon).  While they
+might handle file locking properly, if any program holds the lock for too
+long, others will not be able to write to the file.
+
+This module solves the problem by doing a tie/operation/untie for each and
+every operation.  NOTE THAT THIS IS ONE HUGE PERFORMANCE HIT.  Only use this
+where all other methods fail.

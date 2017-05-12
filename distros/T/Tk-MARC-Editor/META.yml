@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tk-MARC-Editor
+version:      1.0
+version_from: lib/Tk/MARC/Editor.pm
+installdirs:  site
+requires:
+    MARC::Descriptions:            0
+    MARC::Errorchecks:             0
+    MARC::Lint:                    0
+    MARC::Record:                  1.34
+    Test::More:                    0
+    Tk:                            0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

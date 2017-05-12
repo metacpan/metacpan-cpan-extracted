@@ -1,0 +1,5 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <a tal:attributes="href string:foo; size string:5">foo</a>
+  </body>
+</html>

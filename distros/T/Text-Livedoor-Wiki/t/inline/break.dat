@@ -1,0 +1,10 @@
+=== basic
+--- wiki
+~~
+--- html
+<br />
+=== with text
+--- wiki
+hoge ~~ hoge %%hoge%% ~~ hoge
+--- html
+hoge <br /> hoge <del>hoge</del> <br /> hoge

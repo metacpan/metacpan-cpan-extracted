@@ -1,0 +1,11 @@
+bin/batch-marc-tt
+Changes
+lib/Template/Plugin/MARC.pm
+lib/Template/Plugin/MARC/Field.pm
+lib/Template/Plugin/MARC/Subfield.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/Template-Plugin-MARC.t

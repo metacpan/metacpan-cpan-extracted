@@ -1,0 +1,22 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Joe Bloggs
+N:Bloggs;Joe;;Mr
+NICKNAME:me
+ORG:Company;Department
+TITLE:Position
+ROLE:Position
+BDAY:1912-10-15
+EMAIL;TYPE="INTERNET,HOME";TYPE=PREF:joebloggs@example.com
+TEL;TYPE=HOME;TYPE=PREF:5551234
+TEL;TYPE=WORK;TYPE=PREF:5552345
+TEL;TYPE=CELL;TYPE=PREF:5553456
+TEL;TYPE=FAX;TYPE=PREF:5554567
+EMAIL;TYPE=INTERNET;TYPE=WORK;X-MENOTE="Arbitrary ^'note^' added^nto an email address":joebloggs2@example.com
+EMAIL;TYPE=INTERNET:joeblogss3@example.com
+ADR;TYPE=HOME;LABEL="1 Nowhere Road\nSydney, 2000\nNSW, AUSTRALIA":;;1 Nowhere Road;Sydney;NSW;2000;Australia
+ADR;TYPE=WORK;LABEL="^'1 Work St^'^nMelbourne, 3000^nVic, AUSTRALIA":;;1 Work St;Melbourne;Vic;3000;Australia
+URL;TYPE=HOME:http://personalsite.example.com
+URL:http://www.example.com
+NOTE:This is a fully filled out\ncontact with everything\nexcept custom fields\n~!@#$%^&*()_+`1234567890-=\n[]\\\\{}|\\\;':",./<>?\n
+END:VCARD

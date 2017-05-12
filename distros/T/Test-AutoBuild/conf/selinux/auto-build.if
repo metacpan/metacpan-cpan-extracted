@@ -1,0 +1,57 @@
+## <summary>auto-build policy</summary>
+## <desc>
+##	<p>
+##		More descriptive text about auto-build.  The desc
+##		tag can also use p, ul, and ol
+##		html tags for formatting.
+##	</p>
+##	<p>
+##		This policy supports the following autobuild features:
+##		<ul>
+##		<li>Feature A</li>
+##		<li>Feature B</li>
+##		<li>Feature C</li>
+##		</ul>
+##	</p>
+## </desc>
+
+########################################
+## <summary>
+##	Execute a domain transition to run auto-build.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+
+interface(`autobuild_domtrans',`
+	gen_requires(`
+		type autobuild_t, autobuild_exec_t;
+	')
+
+	domain_auto_trans($1,autobuild_exec_t,autobuild_t)
+
+	allow $1 autobuild_t:fd use;
+	allow $1 autobuild_t:fifo_file rw_file_perms;
+	allow $1 autobuild_t:process sigchld;
+')
+
+########################################
+## <summary>
+##	Read autobuild log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to read the log files.
+##	</summary>
+## </param>
+
+interface(`autobuild_read_log',`
+	gen_requires(`
+		type autobuild_log_t;
+	')
+
+	logging_search_logs($1)
+	allow $1 autobuild_log_t:file r_file_perms;
+')

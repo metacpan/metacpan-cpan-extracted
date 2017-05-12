@@ -1,0 +1,54 @@
+2.006.1: Actually documented changes in 2.006
+
+2.006: Disabled one of the taint tests (t/05-real.pl, test 13), since it
+breaks with perl 5.6.1 and I can't yet think of a good way to retain
+the functionality.
+
+2.005: Fixed an infinite-loop bug affecting the use of parenthesized
+conditionals involving comparisons on metachars.  Actually, I'm surprised
+this didn't show up earlier, since it should have broken all sorts of
+things.  Thanks to Thomas Burholder <burkhold at dogrobber.com> for the
+report.
+
+2.004: Fixed a dumb oversight in test suite where valid comparison
+strings assumed that the iteration order in a hash would be consistent
+and predictable.  Passes make-test under perl5.6 now.
+
+2.0: Major rewrite.  Introduced lexical parsing, nested conditionals,
+list/hash formatting, subroutine references, operator evaluation and
+much other related stuff.
+
+0.9.8: Added subroutine-reference parsing.  This makes it possible to
+bind keys to subroutines which will be called (once per template)
+when needed; this can make things quicker if the template-specific
+informational requirements may not be easily predicted in advance.
+
+0.9.7: Made stripping of lingering keys optional (default off); it
+was causing problems with URI-encoded substitutions, and in
+retrospect probably was not a good idea anyway.  Thanks to Ian Baker
+<ian@sonic.net> for the bug report.
+
+0.9.6.1: Fixed stupid idiotic bug caused by overzealous optimization (some
+things were not meant to be done with references -- setting cache scalars,
+for iinstance).  Renamed from ParsePrint to BasicTemplate for submission to
+CPAN.  Fixed oversight wherein files inserted via simple_ssi #includes were
+having keys stripped, but not parsed first.
+
+First fully public release.  Hooray...
+
+0.9.6: Rewrote argument handling in constructor the same way;
+deprecated old style arg passage.
+
+0.9.5: Rewrote argument handling in parse_push to handle arbitrary
+combinations of different arg types.
+
+0.9.4.1: Fixed nasty bug that set the lvalue in comparison to
+the name of the entitity lvalue, not the value thereof.
+
+0.9.4: Lots of optimizations.  Inlined eval_conditional(),
+introduced caching of condititionals (parse-once, print repeatedly),
+other such changes.  Approximately doubled output speed to about
+3100 conditionals/sec on my i686-200 Linux box.
+
+0.9.3: First stable, releaseable version.  Much documentation.
+

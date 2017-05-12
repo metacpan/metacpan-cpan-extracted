@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Time-Simple.t
+lib/Time/Simple.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,24 @@
+Revision history for Perl module Template::Plugin::PodSimple
+
+1.010 Sat Jan 31 21:00:55 2004
+    - added a way to set Text::Wrap::columns
+
+1.009 Fri Jan 23 14:40:16 2004
+    - pod typo (bug-)
+
+1.008 Tue Jan 20 09:06:53 2004
+    - resolved lame tar perms issue (grrr) by using ptar
+    - changed =head1 LICENSE text
+
+1.007 Thu Jan 15 13:41:37 2004
+    - now correctly overriding Pod::Simple::HTML::do_man_link, and 
+      Pod::Simple::HTML::do_pod_link...
+
+0.02 Tue Dec 23 02:38:37 2003
+	- dropped in source, added version, massaged readme, Makefile.PL :)
+
+
+0.01 Tue Dec 23 02:38:37 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

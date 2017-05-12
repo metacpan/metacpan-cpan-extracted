@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Term/ReadLine.pm
+t/AE.t
+t/AETk.t
+t/ReadLine.t
+t/Tk.t
+t/release-pod-syntax.t

@@ -1,0 +1,16 @@
+This directory contains examples of the framework in use.
+It's a bit out of date now...
+
+tester.png: 
+-----------
+This is a screenshot of the GUI running (view with a PNG viewer, e.g.,
+your favorite web browser).  Also visible on the SF screenshot page.
+
+patch100132*, fail_example.pm
+-----------------------------
+
+Very mysterious.  They get used by 'make test' via t/try_examples.t
+though.  fail_example.pm is supposed to be an example for
+TestDecorator and Setup.  You can run it via:
+
+  perl -I../lib/ ../TestRunner.pl fail_example

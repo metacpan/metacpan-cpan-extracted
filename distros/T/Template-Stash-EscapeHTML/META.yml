@@ -1,0 +1,22 @@
+---
+abstract: 'escape HTML automatically in Template-Toolkit.'
+author:
+  - 'Tomohiro IKEBE <ikebe@shebang.jp>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Stash-EscapeHTML
+provides:
+  Template::Stash::EscapeHTML:
+    file: lib/Template/Stash/EscapeHTML.pm
+    version: 0.02
+requires:
+  Template: 2.13
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

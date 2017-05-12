@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-CSV-BulkData.t
+lib/Text/CSV/BulkData.pm
+META.yml                                 Module meta-data (added by MakeMaker)

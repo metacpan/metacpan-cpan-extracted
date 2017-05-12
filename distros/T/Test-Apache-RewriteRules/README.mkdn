@@ -1,0 +1,169 @@
+# NAME
+
+Test::Apache::RewriteRules - Testing Apache's Rewrite Rules
+
+# SYNOPSIS
+
+  use Test::Apache::RewriteRules;
+
+  my $apache = Test::Apache::RewriteRules->new;
+     $apache->add_backend(name => 'ReverseProxyedHost1');
+     $apache->add_backend(name => 'ReverseProxyedHost2');
+     $apache->rewrite_conf('apache.rewrite.conf');
+     $apache->start_apache;
+
+  # testing rewritten result
+  $apache->is_host_path('/foo/aaa', 'ReverseProxyedHost1', '/aaa',
+                        'Handled by reverse-proxyed host 1');
+  $apache->is_host_path('/bar/bbb', 'ReverseProxyedHost2', '/bbb',
+                        'Handled by reverse-proxyed host 2');
+  $apache->is_host_path('/baz', '', '/baz',
+                        'Handled by the proxy itself');
+
+  # testing redirection
+  $apache->is_redirect('/quux/xxx', 'http://external.test/xxx');
+
+  # rewrite rules in `apache.rewrite.conf' passed in above
+  RewriteEngine on
+  RewriteRule /foo/(.*)  http://%{ENV:ReverseProxyedHost1}/$1 [P,L]
+  RewriteRule /bar/(.*)  http://%{ENV:ReverseProxyedHost2}/$1 [P,L]
+  RewriteRule /quux/(.*) http://external.test/$1 [R,L]
+
+# DESCRIPTION
+
+The `Test::Apache::RewriteRules` module sets up Apache HTTPD server
+for the purpose of testing of a set of `RewriteRule`s in
+`apache.conf` Apache configuration.
+
+# METHODS
+
+## available
+
+  $is_available = Test::Apache::RewriteRules->available;
+
+Returns whether the features provided by this module is available or
+not. At the time of writing, it returns false is no Apache binary is
+found.
+
+## new (I<[%args]>)
+
+  $apache = Test::Apache::RewriteRules->new;
+
+Returns a new instance of the class.
+
+If a ref to hash as a value of `%args` keyed as 'apache_options'
+passed in, it's passed straight into `Test::Httpd::Apache2-`new()>.
+
+## add_backend (I<%backend>)
+
+  $apache->add_backend(name => HOST_NAME);
+
+Registers a backend (i.e. a host that handles HTTP requests). An
+environment variable whose name is `HOST_NAME` will be defined in the
+automatically-generated Apache configuration file such that it can be
+used in rewrite rules.
+
+## copy_config (I<config_file>, \@patterns)
+
+  $apache->copy_config(
+      $config_file, [
+          PATTERN1 => REPLACE1,
+          PATTERN2 => REPLACE2,
+          ...
+      ]
+  )
+
+Copies the file represented by `$config_file` into the temporary
+directory and optionally replaces its content by applying patterns.
+
+Patterns, if specified, must be an array reference containing string
+or regular expression followed by string or code reference. If the
+replaced string is specified as a code reference, its return value is
+used for the replacement. If the pattern is specified as a regular
+expression and the replaced string is specified as a code reference,
+the code reference can use `$1`, `$2`, ... to access to captured
+substrings.
+
+## rewrite_conf (I<$rewrite_conf>)
+
+  $apache->rewrite_conf($rewrite_conf)
+
+Sets `$rewrite_conf` file that represents the path to the
+`RewriteRule`s' part of the Apache configuration to test.
+
+## start_apache
+
+  $apache->start_apache
+
+Boots the Apache process. It should be invoked before any
+`is_host_path` call.
+
+## is_host_path (I<$request_path>, I<$expected_host_name>, I<$expected_path>, [I<$name>])
+
+  $apache->is_host_path($request_path, $expected_host_name, $expected_path, $name);
+
+Checks whether the request for `$request_path` is handled by host
+`$expected_host_name` with path `$expected_path`. The host name
+should be specified by the name registered using `add_backend`
+method, or the empty string if the request would be handled by the
+reverse proxy (i.e. the rewriting host) itself.
+
+This method acts as a test function of [Test::Builder](http://search.cpan.org/perldoc?Test::Builder) or
+[Test::More](http://search.cpan.org/perldoc?Test::More). The argument `$name`, if specified, represents the
+name of the test.
+
+## is_redirect (I<$request_path>, I<$expected_redirect_url>, [I<$name>, %args])
+
+  $apache->is_redirect($request_path, $expected_redirect_url, $name, code => 301);
+
+Checks whether the request for `$request_path` is HTTP-redirected to
+the `$expected_redirect_url`.
+
+This method acts as a test function of [Test::Builder](http://search.cpan.org/perldoc?Test::Builder) or
+[Test::More](http://search.cpan.org/perldoc?Test::More). The argument `$name`, if specified, represents the
+name of the test.
+
+Optionally, you can specify the expected HTTP status code. The default
+status code is `302` (Found).
+
+## stop_apache
+
+  $apache->stop_apache
+
+Shuts down the Apache process.
+
+# DETAILS
+
+You can set the expected client environment used to evaluate
+`is_host_path` and `is_redirect` by using
+[Test::Apache::RewriteRules::ClientEnvs](http://search.cpan.org/perldoc?Test::Apache::RewriteRules::ClientEnvs) module.
+
+Where `$request_path` is expected, the host of the request (used in
+the `Host:` request header field) can be specified by prepending
+`//` followed by host (hostname possibly followed by `:` and port
+number) before the real path.
+
+# EXAMPLES
+
+See `t/*.t` and `t/conf/*.conf`.
+
+# SEE ALSO
+
+- * mod_rewrite <http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html>.
+
+- * [Test::More](http://search.cpan.org/perldoc?Test::More).
+
+- * [Test::Apache::RewriteRules::ClientEnvs](http://search.cpan.org/perldoc?Test::Apache::RewriteRules::ClientEnvs).
+
+# AUTHOR
+
+- * Wakaba (id:wakabatan) <wakabatan@hatena.ne.jp>.
+
+- * Kentaro Kuribayashi (id:antipop) <antipop@hatena.ne.jp>
+
+# LICENSE
+
+Copyright 2010 Hatena <http://www.hatena.ne.jp/>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

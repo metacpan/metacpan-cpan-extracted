@@ -1,0 +1,78 @@
+=head1 NAME
+
+Tangram::Type::Dump::Storable - map any Perl object as scalar dump via Storable
+
+=head1 SYNOPSIS
+
+   use Tangram::Core;
+   use Tangram::Type::Dump::Storable; # always
+
+   $schema = Tangram::Schema->new(
+      classes => { NaturalPerson => { fields => {
+
+      storable =>
+      {
+         diary => # diary is a perl hash 
+         {
+            col => 'diarydata',
+            sql => 'BLOB',
+            indent => 0,
+            terse => 1,
+            purity => 0
+         },
+
+         lucky_numbers => 'int', # use defaults
+      }
+
+=head1 DESCRIPTION
+
+Maps arbitrary Perl data structures by serializing to a string
+representation. The persistent fields are grouped in a hash under the
+C<storable> key in the field hash.
+
+Serialization is done by L<Storable::freeze>, which traverses the Perl
+data structure and creates a binary representation of it. The
+resulting string will be mapped to the DBMS as a scalar value. During
+restore, the scalar value will be restored with L<Storable::thaw> to
+reconstruct the original data structure.
+
+The structure should be able to contain pretty much anything that may
+be safely dumped by Storable.  However, be aware that
+B<Tangram::Type::Dump::flatten()> must be able to find the persistent
+objects in the field.  Unless you're using classes that are
+implemented in C and contain other objects, you should be fine
+(Set::Object has a special work-around).
+
+The field names are passed in a hash that associates a field name with
+a field descriptor. The field descriptor may be either a hash or a
+string. The hash uses the following fields:
+
+=over 4
+
+=item * col
+
+=item * sql
+
+=item * indent
+
+=item * terse
+
+=item * purity
+
+=back
+
+The optional fields C<col> and C<sql> specify the column name and the
+column type for the scalar value in the database. If not present,
+C<col> defaults to the field name and C<sql> defaults to VARCHAR(255).
+Values will be always quoted as they are passed to the database.
+
+The remaining optional fields control the serialization process. They
+will be passed down to L<Data::Dumper> as values to the corresponding
+L<Data::Dumper> options. The default settings are: no indentation
+(C<indent=0>), compact format (C<terse=1>), and quick dump
+(C<purity=0>).
+
+=head1 AUTHOR
+
+This mapping was contributed by Gabor Herr
+<herr@iti.informatik.tu-darmstadt.de>

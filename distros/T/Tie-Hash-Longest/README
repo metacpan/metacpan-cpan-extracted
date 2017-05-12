@@ -1,0 +1,17 @@
+Keeps track of the longest key and value in a hash, letting you
+retrieve them later.  Avoids having to scan the entire hash when
+at all possible.
+
+I wrote this in response to a discussion on perlmonks, which you
+can find here:
+    http://www.perlmonks.com/index.pl?node_id=285305
+
+To install, do the usual dance:
+    less Makefile.PL
+    less lib/Tie/Hash/Longest.pm
+    less test.pl
+those being to ensure that I'm not being evil, then:
+    perl Makefile.PL
+    make
+    make test
+    make install

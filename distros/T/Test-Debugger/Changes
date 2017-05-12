@@ -1,0 +1,57 @@
+Revision history for Perl extension Test::Debugger.
+
+0.14  Thu Jan 16 12:13:41 2003
+	- first version uploaded to CPAN
+	- move 'self' to front of param order when two ARRAYs are concatinated
+
+0.13  Tue Oct 29 06:09:13 2002
+	- prepared for CPAN
+	- changed default order of params to match Test.pm
+
+0.12  Fri Mar  1 12:11:56 2002
+	- added 'start' parameter as alias to 'next_test_number' in 'plan'
+
+0.11  Fri Feb 22 12:15:14 2002
+	- changed 'param_order' to take a value and an ARRAY ref (not an ARRAY)
+	- added 'param_order' as an optional argument to 'plan'
+
+0.10  Mon Feb 18 13:06:18 2002
+	- added TODO support
+
+0.09  Wed Feb 13 14:02:18 2002
+	- code overhaul in preparation for Test.pm compatibility
+	- allow non-object-oriented interface
+	- allow user-defined order of parameters to testing subroutines
+	- introduced 'plan' subroutine (not as forcefully as Test.pm)
+
+0.08  Tue Mar 20 16:10:24 2001
+	- added support for regular expressions
+
+0.07  Wed Mar  7 11:20:35 2001
+	- check to make sure an operator is valid before trying to compare
+	  values
+
+0.06  Wed Feb 28 09:39:33 2001
+	- Changed order of arguments to 'test' and 'skip'.
+	  THIS CHANGE IS NOT BACKWARDS COMPATIBLE.
+
+0.05  Tue Aug 22 12:32:11 2000
+	- added ability to specify which Perl relational operator to use
+	- modified 'ok_<operator>' methods to determine alpha or numeric
+	  comparisons
+	- allow for single parameter calls to 'ok' and 'ok_skip'
+
+0.04  Mon Aug 21 17:36:21 2000
+	- added 'ok_(ne|gt|ge|lt|le)' methods
+	- changed 'test' so that test outcome is always numeric
+
+0.03  Mon Aug 21 12:52:41 2000
+	- added a 'number' method to set the next test number
+
+0.02  Mon Aug 21 11:30:01 2000
+	- moved 'require Note' to a BEGIN block
+
+0.01  Fri Aug 11 11:09:51 2000
+	- original version; created by h2xs 1.20 with options
+		-X -n Test::Debugger
+

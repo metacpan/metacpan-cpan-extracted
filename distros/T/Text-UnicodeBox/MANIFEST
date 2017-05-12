@@ -1,0 +1,25 @@
+Build.PL
+lib/Text/UnicodeBox.pm
+lib/Text/UnicodeBox/Control.pm
+lib/Text/UnicodeBox/Table.pm
+lib/Text/UnicodeBox/Text.pm
+lib/Text/UnicodeBox/Utility.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+SEE_ALSO.md
+t/001_box_drawing_characters.t
+t/002_control.t
+t/003_text.t
+t/010_add_lines.t
+t/011_multirow.t
+t/012_unicode_text.t
+t/013_color_text.t
+t/014_multiple_boxes.t
+t/015_non_unicode_characters.t
+t/021_table.t
+t/022_table_wrap.t
+SIGNATURE    Added here by Module::Build

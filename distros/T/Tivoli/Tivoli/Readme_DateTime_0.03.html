@@ -1,0 +1,516 @@
+<HTML>
+<HEAD>
+<TITLE>Tivoli::DateTime - Perl Extension for Tivoli</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#details">DETAILS</A></LI>
+		<LI><A HREF="#routines">ROUTINES</A></LI>
+		<UL>
+
+			<LI><A HREF="#yyyymmdd">YYYYMMDD</A></LI>
+			<LI><A HREF="#yyyymmddhhmmss">YYYYMMDDHHMMSS</A></LI>
+			<LI><A HREF="#hhdmmdss">HHdMMdSS</A></LI>
+			<LI><A HREF="#yyyymmmmdd">YYYYmMMmDD</A></LI>
+			<LI><A HREF="#dddmmdyyyy">DDdMMdYYYY</A></LI>
+			<LI><A HREF="#ddmmmmyyyy">DDmMMmYYYY</A></LI>
+			<LI><A HREF="#epochess">EpocheSS</A></LI>
+			<LI><A HREF="#epochess2ddmdyyyy">EpocheSS2DdMdYYYY</A></LI>
+			<LI><A HREF="#epochess2ddmdyyyyshdmds">EpocheSS2DdMdYYYYsHdMdS</A></LI>
+			<LI><A HREF="#date_split_dot">date_split_dot</A></LI>
+			<LI><A HREF="#date_split_minus">date_split_minus</A></LI>
+			<LI><A HREF="#slash_date">slash_date</A></LI>
+			<LI><A HREF="#longdatetime">longDateTime</A></LI>
+			<LI><A HREF="#longdate">longDate</A></LI>
+			<LI><A HREF="#abr_mon">abr_mon</A></LI>
+			<LI><A HREF="#abr_day">abr_day</A></LI>
+			<LI><A HREF="#month">month</A></LI>
+			<LI><A HREF="#day">day</A></LI>
+			<LI><A HREF="#month_num">month_num</A></LI>
+			<LI><A HREF="#day_num">day_num</A></LI>
+			<LI><A HREF="#year">year</A></LI>
+			<LI><A HREF="#days_left">days_left</A></LI>
+		</UL>
+
+		<LI><A HREF="#plattforms and requirements">Plattforms and Requirements</A></LI>
+		<LI><A HREF="#history">HISTORY</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+        Tivoli::DateTime - Perl Extension for Tivoli</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Tivoli::DateTime;</PRE>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<PRE>
+        v0.03</PRE>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<PRE>
+        Copyright (c) 2001 Robert Hase.
+        All rights reserved.
+        This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+        This Package will handle about everything you may need for displaying the date / time.
+        If anything has been left out, please contact me at
+        kmeltz@cris.com , tivoli.rhase@muc-net.de
+        so it can be added.</PRE>
+<P>
+<H2><A NAME="details">DETAILS</A></H2>
+<PRE>
+        d = dot, s = slash, m = minus</PRE>
+<P>
+<H2><A NAME="routines">ROUTINES</A></H2>
+<PRE>
+        Description of Routines</PRE>
+<P>
+<H3><A NAME="yyyymmdd">YYYYMMDD</A></H3>
+<UL>
+<LI><STRONG><A NAME="item_DESCRIPTION">DESCRIPTION</A></STRONG><BR>
+
+<PRE>
+        Returns YYYYMMDD</PRE>
+<LI><STRONG><A NAME="item_CALL">CALL</A></STRONG><BR>
+
+<PRE>
+        $Var = &amp;YYYYMMDD;</PRE>
+<LI><STRONG><A NAME="item_SAMPLE">SAMPLE</A></STRONG><BR>
+
+<PRE>
+        $Var = &amp;YYYYMMDD;
+        $Var = 20010804</PRE>
+</UL>
+<P>
+<H3><A NAME="yyyymmddhhmmss">YYYYMMDDHHMMSS</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns YYYYMMDDHHMMSS</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;YYYYMMDDHHMMSS;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;YYYYMMDDHHMMSS;
+        $Var = 20010804134527</PRE>
+</UL>
+<P>
+<H3><A NAME="hhdmmdss">HHdMMdSS</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns HHdMMdSS</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;HHdMMdSS;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;HHdMMdSS;
+        $Var = 13.45.27</PRE>
+</UL>
+<P>
+<H3><A NAME="yyyymmmmdd">YYYYmMMmDD</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns YYYYmMMmDD</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;YYYYmMMmDD;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;YYYYmMMmDD;
+        $Var = 2001-08-04</PRE>
+</UL>
+<P>
+<H3><A NAME="dddmmdyyyy">DDdMMdYYYY</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns DDdMMdYYYY</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;DDdMMdYYYY;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;DDdMMdYYYY;
+        $Var = 04.08.2001</PRE>
+</UL>
+<P>
+<H3><A NAME="ddmmmmyyyy">DDmMMmYYYY</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns DDmMMmYYYY</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;DDmMMmYYYY;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;DDmMMmYYYY;
+        $Var = 04-08-2001</PRE>
+</UL>
+<P>
+<H3><A NAME="epochess">EpocheSS</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns EpocheSS since 1970-01-01 00:00.00</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;EpocheSS;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;EpocheSS;
+        $Var = 78762323109843</PRE>
+</UL>
+<P>
+<H3><A NAME="epochess2ddmdyyyy">EpocheSS2DdMdYYYY</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Converts the given Epoche-Seconds to DdMdYYYY</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;EpocheSS2DdMdYYYY(78762323109843);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;EpocheSS2DdMdYYYY(78762323109843);
+        $Var = 04.08.2001</PRE>
+</UL>
+<P>
+<H3><A NAME="epochess2ddmdyyyyshdmds">EpocheSS2DdMdYYYYsHdMdS</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Converts the given Epoche-Seconds to DdMdYYYYsHdMdS</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;EpocheSS2DdMdYYYYsHdMdS(78762323109843);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;EpocheSS2DdMdYYYYsHdMdS(78762323109843);
+        $Var = 04.08.2001/13.45.27</PRE>
+</UL>
+<P>
+<H3><A NAME="date_split_dot">date_split_dot</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Splits the given Dot-Date 04.08.2001 to 04 08 2001</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;date_split_dot(&quot;04.08.2001&quot;);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        @Arr = &amp;date_split_dot(&quot;04.08.2001&quot;);
+        @Arr = qw(04 08 2001);</PRE>
+</UL>
+<P>
+<H3><A NAME="date_split_minus">date_split_minus</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Splits the given Date 04-08-2001 to 04 08 2001</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;date_split_minus(&quot;04-08-2001&quot;);</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        @Arr = &amp;date_split_minus(&quot;04-08-2001&quot;);
+        @Arr = qw(04 08 2001);</PRE>
+</UL>
+<P>
+<H3><A NAME="slash_date">slash_date</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns MM/DD/YYYY</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;slash_date;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;slash_date;
+        $Var = 04/08/2001;</PRE>
+</UL>
+<P>
+<H3><A NAME="longdatetime">longDateTime</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns long DateTime</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;longDateTime;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;longDateTime;
+        $Var = Saturday, 08 04, 2001 at 13:45:27</PRE>
+</UL>
+<P>
+<H3><A NAME="longdate">longDate</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns long Date</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;longDate;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;longDate;
+        $Var = Saturday, 08 04, 2001</PRE>
+</UL>
+<P>
+<H3><A NAME="abr_mon">abr_mon</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns abbreviation of Month</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;abr_mon;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;abr_mon;
+        $Var = Aug</PRE>
+</UL>
+<P>
+<H3><A NAME="abr_day">abr_day</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns abbreviation of Day</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;abr_day;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;abr_day;
+        $Var = Sat</PRE>
+</UL>
+<P>
+<H3><A NAME="month">month</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns Nr of Month</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;month;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;month;
+        $Var = 08</PRE>
+</UL>
+<P>
+<H3><A NAME="day">day</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns Nr of Day</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;day;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;day;
+        $Var = 6</PRE>
+</UL>
+<P>
+<H3><A NAME="month_num">month_num</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns Nr of Month</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;month_num;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;month_num;
+        $Var = 8</PRE>
+</UL>
+<P>
+<H3><A NAME="day_num">day_num</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns Nr of Day</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;day_num;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;day_num;
+        $Var = 6</PRE>
+</UL>
+<P>
+<H3><A NAME="year">year</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns Year</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;year;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;year;
+        $Var = 2001</PRE>
+</UL>
+<P>
+<H3><A NAME="days_left">days_left</A></H3>
+<UL>
+<LI><STRONG>DESCRIPTION</STRONG><BR>
+
+<PRE>
+        Returns days left in year</PRE>
+<LI><STRONG>CALL</STRONG><BR>
+
+<PRE>
+        $Var = &amp;days_left;</PRE>
+<LI><STRONG>SAMPLE</STRONG><BR>
+
+<PRE>
+        $Var = &amp;days_left;
+        $Var = 236</PRE>
+</UL>
+<P>
+<H2><A NAME="plattforms and requirements">Plattforms and Requirements</A></H2>
+<PRE>
+        Supported Plattforms and Requirements</PRE>
+<UL>
+<LI><STRONG><A NAME="item_Plattforms">Plattforms</A></STRONG><BR>
+
+<PRE>
+        tested on:</PRE>
+<PRE>
+        - w32-ix86 (Win9x, NT4, Windows 2000)
+        - aix4-r1 (AIX 4.3)
+        - Linux (Kernel 2.2.x)</PRE>
+</UL>
+<UL>
+<LI><STRONG><A NAME="item_Requirements">Requirements</A></STRONG><BR>
+
+<PRE>
+        requires Perl v5 or higher</PRE>
+</UL>
+<P>
+<H2><A NAME="history">HISTORY</A></H2>
+<PRE>
+        VERSION         DATE            AUTHOR          WORK
+        ----------------------------------------------------
+        0.01            1999            kmeltz          created
+        0.02            2000-08         RHase           several Date / Time Formats
+        0.03            2001-08-04      RHase           POD-Doku added</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+        kmeltz, Robert Hase
+        ID      : KMELTZ, RHASE
+        eMail   : kmeltz@cris.com, Tivoli.RHase@Muc-Net.de
+        Web     : <A HREF="http://www.Muc-Net.de">http://www.Muc-Net.de</A></PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<PRE>
+        CPAN
+        <A HREF="http://www.perl.com">http://www.perl.com</A></PRE>
+
+</BODY>
+
+</HTML>

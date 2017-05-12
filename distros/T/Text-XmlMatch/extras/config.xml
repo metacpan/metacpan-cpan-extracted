@@ -1,0 +1,114 @@
+<config>
+  <pattern name="RDC-Nashville">
+    <inclusion>^corp-</inclusion>
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.ndc</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-DisasterDC">
+    <inclusion>^nasun-\w{4}-\d+-\w-\w\.sun</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-FortWorth">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.fdc</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Columbus">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.cdc</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Colocation">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.clo</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Louisville">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.ldc</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Orlando">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.odc</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-Phoenix">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.pho</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-SanAntonio">
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.sdc</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-AllenTexasColo">
+    <inclusion>^atclo-\w{4}-\d+-\w-\w\.clo</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="RDC-OrlandoFloridaColo">
+    <inclusion>^ofclo-\w{4}-\d+-\w-\w\.sdc</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="DATACENTER-$2">
+    <inclusion>^(cocdc|ofclo|cocdc|fwfdc|loldc|nandc|orodc|phpdc|sasdc|nasun)-\w{4}-\d+-\w-\w\.(\w{3})</inclusion>
+    <tag>market</tag>
+  </pattern>
+
+  <pattern name="DATACENTER-ndc">
+    <inclusion>^corp-</inclusion>
+    <tag>market</tag>
+  </pattern>
+
+  <pattern name="RDC-Nashville-Non-7204">
+    <inclusion>^corp-</inclusion>
+    <inclusion>^\S+-\w{4}-\d+-\w-\w\.ndc</inclusion>
+    <exclusion>\S+-7204-</exclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="DATACENTER-$1">
+    <inclusion>^cpcs(\w{3})-\w{4}-\d+-\w-\w\.(\w{3})</inclusion>
+    <tag>market</tag>
+  </pattern>
+
+  <pattern name="COID-$1">
+    <inclusion>^(\d{5})(\w{2})?-\w{4}-\d+-\w-\w\.\w{3}</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+   <pattern name="MARKET-$1">
+    <inclusion>^\d{5}[a-z]{0,2}-\w{4}-\d+-\w-\w\.(\w{3})</inclusion>
+    <tag>market</tag>
+  </pattern>
+
+  <pattern name="MARKET-aas">
+    <inclusion>^aasd(\d{2,3})-\w+-\d+-\w-\w\.aas\.</inclusion>
+    <tag>market</tag>
+  </pattern>
+
+  <pattern name="AAS-$1">
+    <inclusion>^aasd(\d{2,3})-\w+-\d+-\w-\w\.aas\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="CPCS-$1">
+    <inclusion>^cpcs\w{3}-\w+-\d+-\w-\w\.(\w{3})\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+
+  <pattern name="MSO-$1">
+    <inclusion>^msod(\d{2,3})-\w+-\d+-\w-\w\.mso\.</inclusion>
+    <tag>facility</tag>
+  </pattern>
+  <pattern name="MARKET-mso">
+    <inclusion>^msod(\d{2,3})-\w+-\d+-\w-\w\.mso\.</inclusion>
+    <tag>market</tag>
+  </pattern>
+
+</config>

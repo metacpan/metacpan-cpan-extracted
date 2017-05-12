@@ -1,0 +1,30 @@
+NAME
+    Template::Plugin::DisableForm - TT plugin for HTML::DisableForm
+
+SYNOPSIS
+      my $template = Template->new;
+      $template->process(\$html, { ... });
+
+      # in your template
+      [% USE DisableForm %]
+      [% disable_form %]
+      <!-- these form controlls will be disabled -->
+      <form method="get">
+      <input type="text" name="foo" />
+      <input type="submit" name="bar" />
+      </form>
+      [% END %]
+
+DESCRIPTION
+    TT plugin for HTML::DisableForm, which allows you to make your HTML form
+    controlls disabled.
+
+AUTHOR
+    Naoya Ito, "<naoya at bloghackers.net>"
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Naoya Ito, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

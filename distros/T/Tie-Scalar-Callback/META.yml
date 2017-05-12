@@ -1,0 +1,30 @@
+---
+abstract: 'a tied scalar which executes a callback everytime it is used'
+author:
+  - 'David Farrell <dfarrell@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Scalar-Callback
+requires:
+  Carp: '0'
+  Tie::Scalar: '0'
+  parent: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/dnmfarrell/Tie-Scalar-Callback
+  repository: https://github.com/dnmfarrell/Tie-Scalar-Callback.git
+version: '0.07'

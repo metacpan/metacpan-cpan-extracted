@@ -1,0 +1,25 @@
+---
+abstract: 'Running tests with options'
+author:
+  - 'Pavel R3VoLuT1OneR Zhytomirsky <r3volut1oner@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAP-Runner
+no_index:
+  file:
+    - README.pod
+requires:
+  Math::Cartesian::Product: 0
+  Moose: 0
+  TAP::Harness: 0
+resources:
+  bugtracker: http://github.com/R3VoLuT1OneR/TAP-Runner/issues
+  repository: http://github.com/R3VoLuT1OneR/TAP-Runner
+version: 0.005

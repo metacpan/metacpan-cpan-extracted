@@ -1,0 +1,73 @@
+NAME
+    Text::Normalize::NACO - Normalize text based on the NACO rules
+
+SYNOPSIS
+        # exported method
+        use Text::Normalize::NACO qw( naco_normalize );
+    
+        $normalized = naco_normalize( $original );
+    
+        # as an object
+        $naco       = Text::Normalize::NACO->new;
+        $normalized = $naco->normalize( $original );
+
+        # normalize to lowercase
+        $naco->case( 'lower' );
+        $normalized = $naco->normalize( $original );
+
+DESCRIPTION
+    In general, normalization is defined as:
+
+        To make (a text or language) regular and consistent, especially with respect to spelling or style.
+
+    It is commonly used for comparative purposes. These particular
+    normalization rules have been set out by the Name Authority Cooperative.
+    The rules are described in detail at:
+    http://www.loc.gov/catdir/pcc/naco/normrule.html
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  new( %options )
+    Creates a new Text::Normalize::NACO object. You explicitly request
+    strings to be normalized in upper or lower-case by setting the "case"
+    option (defaults to "upper").
+
+        my $naco = Text::Normalize::NACO->new( case => 'lower' );
+
+  case( $case )
+    Accessor/Mutator for the case in which the string should be returned.
+
+        # lower-case
+        $naco->case( 'lower' );
+
+        # upper-case
+        $naco->case( 'upper' );
+
+  naco_normalize( $text, { %options } )
+    Exported version of "normalize". You can specify any extra options by
+    passing a hashref after the string to be normalized.
+
+        my $normalized = naco_normalize( $original, { case => 'lower' } );
+
+  normalize( $text )
+    Normalizes $text and returns the new string.
+
+        my $normalized = $naco->normalize( $original );
+
+SEE ALSO
+    *   http://www.loc.gov/catdir/pcc/naco/normrule.html
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2004-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

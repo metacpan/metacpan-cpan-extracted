@@ -1,0 +1,23 @@
+%TestML 0.1.0
+
+Plan = 1
+
+*input.replace_with_dots == *output
+
+=== Allow text looking like --- or === markers
+--- input
+---
+--- &foo
+==
+====
+===foo bar
+\--- foo
+\=== bar
+--- output
+...
+... ....
+..
+....
+...... ...
+... ...
+... ...

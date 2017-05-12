@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4d72f7d63dafbef3dac57a87960d56ca0ed5a963 Changes
+SHA1 8dc90a2fd21a08fab444f240abbb4db6006593c5 INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 40cc7c23d50f2e1db31d5eb7f149281c0c10e9d5 MANIFEST
+SHA1 345dea5a9841bd7e516a54af053896ea905e67cf META.json
+SHA1 6bbc8aadd5df667796ab9a61bd6a2f6f0e61a577 META.yml
+SHA1 b4986f991f1fe5291d57a5cadf8d950138df3fb0 Makefile.PL
+SHA1 da97a11ec1befb63a81f6da3a430f5624979c033 README
+SHA1 71547563d9df64cf65ab3212910453571408cda8 cpanfile
+SHA1 dd1bab174eb1a85d32869d27ed6f446b6458051b dist.ini
+SHA1 bd592683726d5f01d41e19726a4a60aafab66905 lib/Tickit/Widget/VHBox.pm
+SHA1 1ffec0638bd9166400b69151dfb852298b7f3559 lib/Tickit/Widget/VHBox.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 257ff85cbb6e81c6613957ea7906ced39ec082f7 t/00-compile.t
+SHA1 3b8f2026b38013d321c38b3c6b2fd0eca0f3031f t/000-report-versions-tiny.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUxFkzAAoJEFKElMNpjtyDl/IH/2++z3AJhwHCOsXZGZBwaga1
+3Dy16QqwxG789FsHPPizqovSryNIbcUS7mD9tuE1MGtPRYH7a1gF3XxwZiYBFmIV
+0YKzT1aM4qcWXvNkMYk3VYzSuPkM3GDFMBjR+ZgedcYKNJcRtoSNFQbZWyteiAD1
+MNgyvZqiMnXfoVvS1zFgnNJjSFJmCtVWrUQOqkT/AQ8rMl6My82dDrXG34j+V8cR
+cVltvCoZ0ocoHyi5iLvPkkxznv13It4+W4e+eVjT+RSSCHXZiL049AM1wwpJXzjJ
+KplmMkJcLcwGZoZSQxLzgti+4sBJIeD1lrfPJsbLXpGifGB/dRK/O6flc/5XcB8=
+=oKGT
+-----END PGP SIGNATURE-----

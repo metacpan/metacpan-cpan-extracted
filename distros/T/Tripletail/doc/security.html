@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <title>security セキュリティ</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+security セキュリティ
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#Cross_Site_Scripting_(Xe3X82XafXe3X83XadXe3X82Xb9Xe3X82Xb5Xe3X82Xa4Xe3X83X88Xe3X82Xb9Xe3X82XafXe3X83XaaXe3X83X97Xe3X83X86Xe3X82Xa3Xe3X83Xb3Xe3X82Xb0Xe3X80X81XSS)">
+<span class="pod_lang">Cross Site Scripting (クロスサイトスクリプティング、XSS)
+
+</span></a>
+<ul>
+<li><a href="#Xe3X82XbfXe3X82Xb0Xe6X96X87Xe5XadX97Xe3X81X8cXe5Xb7XaeXe3X81X97Xe8XbeXbcXe3X81XbeXe3X82X8cXe3X82X8bXe3X81XaeXe3X82X92Xe9X98Xb2Xe3X81X90">
+<span class="pod_lang">タグ文字が差し込まれるのを防ぐ
+
+</span></a>
+</li>
+<li><a href="#URLXe3X81XaeXe6X8cX87Xe5XaeX9aXe3X81XabXe6Xb3Xa8Xe6X84X8fXe3X81X97Xe3X81XbeXe3X81X99">
+<span class="pod_lang">URLの指定に注意します
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SQL_Injection_(SQLXe3X82Xa4Xe3X83Xb3Xe3X82Xb8Xe3X82Xa7Xe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3)">
+<span class="pod_lang">SQL Injection (SQLインジェクション)
+
+</span></a>
+</li>
+<li><a href="#Cross_Site_Request_Forgeries_(Xe3X82XafXe3X83XadXe3X82Xb9Xe3X82Xb5Xe3X82Xa4Xe3X83X88Xe3X83XaaXe3X82XafXe3X82Xa8Xe3X82Xb9Xe3X83X88Xe3X83X95Xe3X82Xa9Xe3X83XbcXe3X82Xb8Xe3X82Xa7Xe3X83XaaXe3X80X81CSRF)">
+<span class="pod_lang">Cross Site Request Forgeries (クロスサイトリクエストフォージェリ、CSRF)
+
+</span></a>
+</li>
+<li><a href="#Session_Hijacking_/_Replay_(Xe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe3X83XbbXe3X83X8fXe3X82Xa4Xe3X82Xb8Xe3X83Xa3Xe3X83X83Xe3X82XafXefXbcX8fXe3X83XaaXe3X83X97Xe3X83XacXe3X82Xa4)">
+<span class="pod_lang">Session Hijacking / Replay (セッション・ハイジャック／リプレイ)
+
+</span></a>
+<ul>
+<li><a href="#Xe6X90XbaXe5Xb8XafXe3X81Xa7Xe3X81XaeXe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe5X88Xa9Xe7X94Xa8Xe3X81XabXe3X81X8aXe3X81X91Xe3X82X8bXe6Xb3Xa8Xe6X84X8fXe4XbaX8bXe9Xa0X85">
+<span class="pod_lang">携帯でのセッション利用における注意事項
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#Forceful_Browsing_(Xe5XbcXb7Xe5X88Xb6Xe7X9aX84Xe3X83X96Xe3X83Xa9Xe3X82Xa6Xe3X82Xba)">
+<span class="pod_lang">Forceful Browsing (強制的ブラウズ)
+
+</span></a>
+</li>
+<li><a href="#Path_Traversal_(Xe3X83X91Xe3X82Xb9Xe3X81XaeXe4Xb9X97Xe3X82X8aXe8Xb6X8aXe3X81X88)">
+<span class="pod_lang">Path Traversal (パスの乗り越え)
+
+</span></a>
+</li>
+<li><a href="#OS_Command_Injection_(OS_Xe3X82Xb3Xe3X83X9eXe3X83Xb3Xe3X83X89Xe3X81XaeXe6X8cXbfXe5X85Xa5)">
+<span class="pod_lang">OS Command Injection (OS コマンドの挿入)
+
+</span></a>
+</li>
+<li><a href="#Session_Fixation_Xe6X94XbbXe6X92X83_(Xe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe5X9bXbaXe5XaeX9aXe6X94XbbXe6X92X83)">
+<span class="pod_lang">Session Fixation 攻撃 (セッション固定攻撃)
+
+</span></a>
+</li>
+<li><a href="#dispatch_Xe3X81XabXe3X82X88Xe3X82X8bXe6X84X8fXe5X9bXb3Xe3X81X97Xe3X81XaaXe3X81X84Xe9X96Xa2Xe6X95Xb0Xe5X91XbcXe3X81Xb3Xe5X87XbaXe3X81X97">
+<span class="pod_lang"><code class="pod_iseq_C">dispatch</code> による意図しない関数呼び出し
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">security セキュリティ
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">このドキュメントは、TripletaiL を利用する際、どのようなセキュリティ上の問題に配慮すべきかについて記述しています。
+
+</span>
+</p>
+
+<h2><a id="Cross_Site_Scripting_(Xe3X82XafXe3X83XadXe3X82Xb9Xe3X82Xb5Xe3X82Xa4Xe3X83X88Xe3X82Xb9Xe3X82XafXe3X83XaaXe3X83X97Xe3X83X86Xe3X82Xa3Xe3X83Xb3Xe3X82Xb0Xe3X80X81XSS)">
+<span class="pod_lang">Cross Site Scripting (クロスサイトスクリプティング、XSS)
+
+</span></a></h2>
+
+<h3><a id="Xe3X82XbfXe3X82Xb0Xe6X96X87Xe5XadX97Xe3X81X8cXe5Xb7XaeXe3X81X97Xe8XbeXbcXe3X81XbeXe3X82X8cXe3X82X8bXe3X81XaeXe3X82X92Xe9X98Xb2Xe3X81X90">
+<span class="pod_lang">タグ文字が差し込まれるのを防ぐ
+
+</span></a></h3>
+
+<p>
+<span class="pod_lang">ユーザの入力を画面に表示する際に、&quot;&lt;&quot; や &quot;&gt;&quot; などのHTMLタグがそのまま表示されないように注意します。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="Template_Xe3X82XafXe3X83Xa9Xe3X82Xb9Xe3X82X92Xe4XbdXbfXe7X94Xa8Xe3X81X97Xe3X81XbeXe3X81X99Xe3X80X82"><span class="pod_lang">Template クラスを使用します。
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">TripletaiL の Template クラスを使用し、ユーザ入力の展開に expand や add メソッドを利用します。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">これらのメソッドは、デフォルトで &quot;&lt;&quot; や &quot;&gt;&quot; を &quot;&amp;lt;&quot; や &quot;&amp;gt;&quot; に置き換えます。
+これらの置き換えを行いたくない場合は、setAttr メソッドで動作を変更できます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">ただし、_raw などを使用する際には、十分注意して下さい。
+ユーザの入力に対して、一部のタグだけを許可したり、URLのリンクだけを許可したい場合は、TagCheck クラスが利用できます。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X&lt;script&gt;&lt;&DATA&gt;&lt;/script&gt;_Xe3X82X84_&lt;a_href=""_&lt;&DATA&gt;&gt;_Xe3X81XaeXe3X82X88Xe3X81X86Xe3X81XaaXe9X83Xa8Xe5X88X86Xe3X81XabXe5Xb1X95Xe9X96X8bXe3X81X97Xe3X81XaaXe3X81X84Xe3X82X88Xe3X81X86Xe3X81XabXe3X81X97Xe3X81XbeXe3X81X99"><span class="pod_lang"><code class="pod_iseq_C">&lt;script&gt;&lt;&amp;DATA&gt;&lt;/script&gt;</code> や <code class="pod_iseq_C">&lt;a href=&quot;&quot; &lt;&amp;DATA&gt;&gt;</code> のような部分に展開しないようにします
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">テンプレートで展開する場所が安全かどうかを確認します。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">setAttr メソッドで &quot;&lt;&quot; や &quot;&gt;&quot; を安全に置き換えても、script タグの中に文字列を出力したり、タグの中に文字列を出力してしまうと、
+スクリプトの実行が可能になってしまいます。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h3><a id="URLXe3X81XaeXe6X8cX87Xe5XaeX9aXe3X81XabXe6Xb3Xa8Xe6X84X8fXe3X81X97Xe3X81XbeXe3X81X99">
+<span class="pod_lang">URLの指定に注意します
+
+</span></a></h3>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">&lt;a href=&quot;javascript:XXX&quot;&gt;</code>などにならないように、URL が「http://」や「https:://」から開始されていることを確認してから、差し込んで下さい。
+
+</span>
+</p>
+
+<h2><a id="SQL_Injection_(SQLXe3X82Xa4Xe3X83Xb3Xe3X82Xb8Xe3X82Xa7Xe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3)">
+<span class="pod_lang">SQL Injection (SQLインジェクション)
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">SQLを組み立てる際に入力パラメータをそのままSQL文の中に入れてしまうと、条件を回避したり、任意のクエリを実行できることがあります。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">SQLを発行する際は、動的にSQLを組み立てる場合も含め、必ずパラメータをプレースホルダ &quot;<code class="pod_iseq_C">?</code>&quot; 経由で引き渡すようにします。
+TripletaiL では、拡張プレースホルダ &quot;<code class="pod_iseq_C">??</code>&quot; を利用することで、LIMIT句などにも簡単に変数経由で値を渡すことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">テーブル名等をパラメータで指定しなければならない場合は、余計な文字が入らないことを十分に確認してから、SQL文の中に差し込んで下さい。
+
+</span>
+</p>
+
+<h2><a id="Cross_Site_Request_Forgeries_(Xe3X82XafXe3X83XadXe3X82Xb9Xe3X82Xb5Xe3X82Xa4Xe3X83X88Xe3X83XaaXe3X82XafXe3X82Xa8Xe3X82Xb9Xe3X83X88Xe3X83X95Xe3X82Xa9Xe3X83XbcXe3X82Xb8Xe3X82Xa7Xe3X83XaaXe3X80X81CSRF)">
+<span class="pod_lang">Cross Site Request Forgeries (クロスサイトリクエストフォージェリ、CSRF)
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">認証済みのユーザに特定のアクセスをさせることで、意図しない操作（記事の書き込み・削除等）をさせる手法です。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">重要な操作をする場合は、その前の確認画面で Template クラスの <code class="pod_iseq_C"><a href="././Tripletail/Template.html#addSessionCheck">addSessionCheck</a></code> メソッドを利用して、セッションIDを利用したキーを埋め込みます。
+確認画面をクリックした後、フォームデータを受け取った側では、<code class="pod_iseq_C"><a href="././Tripletail/Form.html#haveSessionCheck">$CGI-&gt;haveSessionCheck </a></code> メソッドを利用して、正しい利用者のキーが埋め込まれているかを確認します。
+
+</span>
+</p>
+
+<h2><a id="Session_Hijacking_/_Replay_(Xe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe3X83XbbXe3X83X8fXe3X82Xa4Xe3X82Xb8Xe3X83Xa3Xe3X83X83Xe3X82XafXefXbcX8fXe3X83XaaXe3X83X97Xe3X83XacXe3X82Xa4)">
+<span class="pod_lang">Session Hijacking / Replay (セッション・ハイジャック／リプレイ)
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">セッションを読み取り、ユーザになりすます手法です。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">特に、HTTP領域では、通信内容を第三者に閲覧される可能性があるため、セッションハイジャックの可能性が残ります。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">サイトを設計する際は、重要な機能は全て HTTPS領域に配置し、<a href="././Tripletail/Session.html#mode">セッションのmode </a> を <code class="pod_iseq_C">double</code> または <code class="pod_iseq_C">https</code> モードにする必要があります。
+<code class="pod_iseq_C">http</code> モードはセッションハイジャックに対して安全ではないので、重要な情報を取り扱う場合は利用しないで下さい。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">TripletaiL のセッションは、<code class="pod_iseq_C">double</code> モードであれば、HTTP領域、HTTPS領域にまたがってセッションを利用しても、
+httpで閲覧した内容を用いて、HTTPS領域のセッションをハイジャックすることが出来ないようになっています。
+このため、HTTP領域では差し支えのない範囲でセッションを利用し、重要な機能をHTTPS領域で安全に提供することができます。
+
+</span>
+</p>
+
+<h3><a id="Xe6X90XbaXe5Xb8XafXe3X81Xa7Xe3X81XaeXe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe5X88Xa9Xe7X94Xa8Xe3X81XabXe3X81X8aXe3X81X91Xe3X82X8bXe6Xb3Xa8Xe6X84X8fXe4XbaX8bXe9Xa0X85">
+<span class="pod_lang">携帯でのセッション利用における注意事項
+
+</span></a></h3>
+
+<p>
+<span class="pod_lang">携帯用に <a href="././Tripletail/Filter/MobileHTML.html">Tripletail::Filter::MobileHTML</a> を利用している場合は、
+セッション情報がフォームに出力されるため、セッション情報の
+漏洩に関して特に注意する必要があります。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">外部サイトにリンクをする際に、セッションで管理されているページから
+直接リンクをたどれるようにしてしまうと、外部サイトに対し、
+ブラウザが Referer ヘッダで直前の（セッション情報が入った）URLを
+送ってしまうため、セッション情報が漏洩します。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">外部へリンクする際は、一度セッション情報を付けずに自サイトの
+別ページに遷移してから、目的の外部ページへ遷移させます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="././Tripletail/Form.html">Tripletail::Form</a> の
+<a href="././Tripletail/Form.html#toExtLink">toExtLink()</a> を利用してリンクを作成するか、
+<code class="pod_iseq_C">&quot;INT&quot;</code> キーを含まないURLを直接HTMLに書くことで、
+セッション情報を付けずにページを遷移させることが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">また、HTTP領域とHTTPS領域の行き来を安全に行うことも出来ません。
+
+</span>
+</p>
+
+<h2><a id="Forceful_Browsing_(Xe5XbcXb7Xe5X88Xb6Xe7X9aX84Xe3X83X96Xe3X83Xa9Xe3X82Xa6Xe3X82Xba)">
+<span class="pod_lang">Forceful Browsing (強制的ブラウズ)
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">直接若しくは間接的に公開する意図のないファイルを、
+その位置を直接指定することで参照する手法です。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><em class="pod_iseq_F">ini</em> ファイル等は外部から参照できる場所(<code class="pod_iseq_C">DocumentRoot</code>以下など)には
+おかないようにしてください。
+
+</span>
+</p>
+
+<h2><a id="Path_Traversal_(Xe3X83X91Xe3X82Xb9Xe3X81XaeXe4Xb9X97Xe3X82X8aXe8Xb6X8aXe3X81X88)">
+<span class="pod_lang">Path Traversal (パスの乗り越え)
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">CGIに渡されるパラメータをパスに指定している際に、本来アクセスできない位置のファイルを読まれてしまう問題です。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">open関数など、通常のファイル操作を避けて、テンプレートは全てテンプレートクラスを利用するようにして下さい。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">テンプレートクラスは、<a href="././Tripletail/Template.html#basepath">basepath</a>、
+<a href="././Tripletail/Template.html#rootpath">rootpath</a> で、アクセスするディレクトリを指定・制限することが出来ます。
+この機能を利用し、テンプレートは他のファイルと別のディレクトリに配置するようにして下さい。
+
+</span>
+</p>
+
+<h2><a id="OS_Command_Injection_(OS_Xe3X82Xb3Xe3X83X9eXe3X83Xb3Xe3X83X89Xe3X81XaeXe6X8cXbfXe5X85Xa5)">
+<span class="pod_lang">OS Command Injection (OS コマンドの挿入)
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">パラメータに渡されたデータを<code class="pod_iseq_C">open</code>等に渡す場合に、OSコマンドを実行されてしまう問題です。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">open</code>関数など、通常のファイル操作を避けて、テンプレートは全てテンプレートクラスを利用するようにして下さい。
+
+</span>
+</p>
+
+<h2><a id="Session_Fixation_Xe6X94XbbXe6X92X83_(Xe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe5X9bXbaXe5XaeX9aXe6X94XbbXe6X92X83)">
+<span class="pod_lang">Session Fixation 攻撃 (セッション固定攻撃)
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang">攻撃者が生成したセッションIDをユーザに使用させ、そのユーザになりすます手法です。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">TripletaiL では、デフォルトでは Sessionクラスの <a href="././Tripletail/Session.html#setValue">setValue</a> で値を変更した場合、セッションIDは自動的に更新されるので安全です。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Session クラスの ini 設定で、<a href="././Tripletail/Session.html#setvaluewithrenew">setvaluewithrenew</a> を <code class="pod_iseq_C">0</code> に指定すると更新されなくなるため、<code class="pod_iseq_C">0</code> に指定する場合は、適宜 <a href="././Tripletail/Session.html#renew">renew</a> メソッドでセッションIDを更新する必要があります。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">また、<a href="././Tripletail/Session.html#setValue">setValue</a> より多くのデータを扱うために、独自にテーブルにセッションIDに関連した情報を保持している場合は、<a href="././Tripletail/Session.html#renew">renew</a> の動作に注意して下さい。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="././Tripletail/Session.html#setValue">setValue</a> で認証のための情報をセットするような設計にしておき、認証情報が変わった場合は自動的に<a href="././Tripletail/Session.html#renew">renew</a>されるような構成にすることを推奨します。
+
+</span>
+</p>
+
+<h2><a id="dispatch_Xe3X81XabXe3X82X88Xe3X82X8bXe6X84X8fXe5X9bXb3Xe3X81X97Xe3X81XaaXe3X81X84Xe9X96Xa2Xe6X95Xb0Xe5X91XbcXe3X81Xb3Xe5X87XbaXe3X81X97">
+<span class="pod_lang"><code class="pod_iseq_C">dispatch</code> による意図しない関数呼び出し
+
+</span></a></h2>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C"><a href="././Tripletail.html#dispatch">dispatch</a></code> メソッドは、
+&quot;<code class="pod_iseq_C">Do</code>&quot; + &quot;<code class="pod_iseq_C">与えられた引数</code>&quot; という名前に一致した
+関数を呼び出します。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">パッケージ内に &quot;<code class="pod_iseq_C">Do</code>&quot; から始まる関数があると
+意図せずに呼び出される可能性があるので注意してください。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">バージョン 0.30以降では、引数に渡せる名前は大文字始まりに
+制限されていますが、0.29 以前ではこの制限がないため、
+他の単語の一部に &quot;<code class="pod_iseq_C">Do</code>&quot; が含まれる関数も呼び出される可能性があります。
+(例: <code class="pod_iseq_C">DoneXxx</code>, <code class="pod_iseq_C">DomainCheck</code>, <code class="pod_iseq_C">DocumentCreate</code>, <code class="pod_iseq_C">Download</code>)
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2007 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+security セキュリティ
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X&lt;script&gt;&lt;&DATA&gt;&lt;/script&gt;_Xe3X82X84_&lt;a_href=""_&lt;&DATA&gt;&gt;_Xe3X81XaeXe3X82X88Xe3X81X86Xe3X81XaaXe9X83Xa8Xe5X88X86Xe3X81XabXe5Xb1X95Xe9X96X8bXe3X81X97Xe3X81XaaXe3X81X84Xe3X82X88Xe3X81X86Xe3X81XabXe3X81X97Xe3X81XbeXe3X81X99">&lt;script&gt;&lt;&amp;DATA&gt;&lt;/script&gt; や &lt;a href=&quot;&quot; &lt;&amp;DATA&gt;&gt; のような部分に展開しないようにします</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#Cross_Site_Request_Forgeries_(Xe3X82XafXe3X83XadXe3X82Xb9Xe3X82Xb5Xe3X82Xa4Xe3X83X88Xe3X83XaaXe3X82XafXe3X82Xa8Xe3X82Xb9Xe3X83X88Xe3X83X95Xe3X82Xa9Xe3X83XbcXe3X82Xb8Xe3X82Xa7Xe3X83XaaXe3X80X81CSRF)">Cross Site Request Forgeries (クロスサイトリクエストフォージェリ、CSRF)</a></li>
+<li><a href="#Cross_Site_Scripting_(Xe3X82XafXe3X83XadXe3X82Xb9Xe3X82Xb5Xe3X82Xa4Xe3X83X88Xe3X82Xb9Xe3X82XafXe3X83XaaXe3X83X97Xe3X83X86Xe3X82Xa3Xe3X83Xb3Xe3X82Xb0Xe3X80X81XSS)">Cross Site Scripting (クロスサイトスクリプティング、XSS)</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#Forceful_Browsing_(Xe5XbcXb7Xe5X88Xb6Xe7X9aX84Xe3X83X96Xe3X83Xa9Xe3X82Xa6Xe3X82Xba)">Forceful Browsing (強制的ブラウズ)</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#OS_Command_Injection_(OS_Xe3X82Xb3Xe3X83X9eXe3X83Xb3Xe3X83X89Xe3X81XaeXe6X8cXbfXe5X85Xa5)">OS Command Injection (OS コマンドの挿入)</a></li>
+<li><a href="#Path_Traversal_(Xe3X83X91Xe3X82Xb9Xe3X81XaeXe4Xb9X97Xe3X82X8aXe8Xb6X8aXe3X81X88)">Path Traversal (パスの乗り越え)</a></li>
+<li><a href="#SQL_Injection_(SQLXe3X82Xa4Xe3X83Xb3Xe3X82Xb8Xe3X82Xa7Xe3X82XafXe3X82Xb7Xe3X83Xa7Xe3X83Xb3)">SQL Injection (SQLインジェクション)</a></li>
+<li><a href="#Session_Fixation_Xe6X94XbbXe6X92X83_(Xe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe5X9bXbaXe5XaeX9aXe6X94XbbXe6X92X83)">Session Fixation 攻撃 (セッション固定攻撃)</a></li>
+<li><a href="#Session_Hijacking_/_Replay_(Xe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe3X83XbbXe3X83X8fXe3X82Xa4Xe3X82Xb8Xe3X83Xa3Xe3X83X83Xe3X82XafXefXbcX8fXe3X83XaaXe3X83X97Xe3X83XacXe3X82Xa4)">Session Hijacking / Replay (セッション・ハイジャック／リプレイ)</a></li>
+<li><a href="#Template_Xe3X82XafXe3X83Xa9Xe3X82Xb9Xe3X82X92Xe4XbdXbfXe7X94Xa8Xe3X81X97Xe3X81XbeXe3X81X99Xe3X80X82">Template クラスを使用します。</a></li>
+<li><a href="#URLXe3X81XaeXe6X8cX87Xe5XaeX9aXe3X81XabXe6Xb3Xa8Xe6X84X8fXe3X81X97Xe3X81XbeXe3X81X99">URLの指定に注意します</a></li>
+<li><a href="#dispatch_Xe3X81XabXe3X82X88Xe3X82X8bXe6X84X8fXe5X9bXb3Xe3X81X97Xe3X81XaaXe3X81X84Xe9X96Xa2Xe6X95Xb0Xe5X91XbcXe3X81Xb3Xe5X87XbaXe3X81X97">dispatch による意図しない関数呼び出し</a></li>
+<li><a href="#Xe3X82XbfXe3X82Xb0Xe6X96X87Xe5XadX97Xe3X81X8cXe5Xb7XaeXe3X81X97Xe8XbeXbcXe3X81XbeXe3X82X8cXe3X82X8bXe3X81XaeXe3X82X92Xe9X98Xb2Xe3X81X90">タグ文字が差し込まれるのを防ぐ</a></li>
+<li><a href="#Xe6X90XbaXe5Xb8XafXe3X81Xa7Xe3X81XaeXe3X82XbbXe3X83X83Xe3X82Xb7Xe3X83Xa7Xe3X83Xb3Xe5X88Xa9Xe7X94Xa8Xe3X81XabXe3X81X8aXe3X81X91Xe3X82X8bXe6Xb3Xa8Xe6X84X8fXe4XbaX8bXe9Xa0X85">携帯でのセッション利用における注意事項</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+security セキュリティ
+
+
+</div>
+
+</body>
+</html>

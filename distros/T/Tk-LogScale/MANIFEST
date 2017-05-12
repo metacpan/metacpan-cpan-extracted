@@ -1,0 +1,8 @@
+Changes
+LogScale.pm
+MANIFEST
+Makefile.PL
+t/logscale.t
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

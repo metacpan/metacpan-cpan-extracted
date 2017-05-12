@@ -1,0 +1,49 @@
+Version history for TryCatch perl module:
+
+1.003002 - 2013/03/21
+ - Fix the xml_sax_expat test to check for dependencies correctly. (Who wrote
+   that shoddy... oh wait it was me.)
+
+1.003001 - 2013/03/19
+  - Fix (the test failure in t/invalid where) syntax errors are reported from
+    the wrong location.
+
+1.003000 - 2010/10/13
+  - Fix issues with perl 5.12 (finally!)
+
+1.002000 - 2009/09/13
+  - Fallback to treating str TCs as class names
+
+1.001001_999 - 2009/09/09
+  - Fix for issue with return/unwind when sub is called as a method (vpit)
+
+1.001001_99 - 2009/08/17
+  - Fix a few bugs with nested try statements (return and errors not falling
+    through as expected)
+  - Fix wantarray context of try blocks.
+
+1.001001 - 2009/05/16
+  - Fix bug with nested try+die (Reported by Possum)
+    As a result of this $@ will not have the value of the exception visible
+  - Fix compile issues on 5.8.6 by using ppport.h
+
+1.001000 - 2009/04/26 - 01:01
+  - Fix bug where catch block would get run sometimes when it shouldn't
+  - Better error reporting
+  - Make try 'less reserved' (i.e. so { try => 'foo' } works)
+  - Internal refactoring to use Devel::Declare better
+  - Switch to using XSLoader from DynaLoader
+  - Remove (now redundant) TryCatch::Exception
+  - Make things run about 200x faster.
+
+1.000003 - 2009/03/21 - 10:37
+  - Makefile.PL tweaks
+
+1.000002 - 2009/03/16 - 21:57
+  - Update to more modern Parse::Method::Signatures
+
+1.000001 - 2009/02/14 - 22:16
+  - Attempt to improve installability with old CPAN toolchains
+
+1.000000 - 2009/02/07 18:00
+  - Initial release

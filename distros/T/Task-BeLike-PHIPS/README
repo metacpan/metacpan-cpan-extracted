@@ -1,0 +1,14 @@
+NAME
+    Task::BeLike::PHIPS
+
+DESCRIPTION
+    My favourite and frequently used modules
+
+AUTHOR
+    Mark Phillips <phips@cpan.org>
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2013, Mark Phillips
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

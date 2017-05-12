@@ -1,0 +1,77 @@
+SYNOPSIS
+
+        my $report = Test::Reporter->new(
+            transport => 'Socket',
+            transport_args => [
+              host     => 'metabase.relay.example.com',
+              port     => 58008,
+            ],
+        );
+    
+        # use space-separated in a CPAN::Reporter config.ini
+        transport = Socket host metabase.relay.example.com ...
+
+DESCRIPTION
+
+    This is a Test::Reporter::Transport that sends test report data
+    serialised over a TCP socket.
+
+    The idea is to keep dependencies in the tester perl to a bear minimum
+    and offload the bulk of submission to a Metabase instance to a relay.
+
+USAGE
+
+    See Test::Reporter and Test::Reporter::Transport for general usage
+    information.
+
+ Transport arguments
+
+    Unlike most other Transport classes, this class requires transport
+    arguments to be provided as key-value pairs:
+
+        my $report = Test::Reporter->new(
+            transport => 'Socket',
+            transport_args => [
+              host     => 'metabase.relay.example.com',
+              port     => 58008,
+            ],
+        );
+
+    Arguments include:
+
+    host (required)
+
+      The name or IP address of a host where we want to send our serialised
+      data.
+
+      This may also be an arrayref of the above. A connection will be
+      attempted to each item in turn until a successful connection is made.
+
+    port
+
+      The TCP port on the above host to send our serialised data.
+
+METHODS
+
+    These methods are only for internal use by Test::Reporter.
+
+ new
+
+        my $sender = Test::Reporter::Transport::Socket->new( %params );
+
+    The new method is the object constructor.
+
+ send
+
+        $sender->send( $report );
+
+    The send method transmits the report.
+
+AUTHORS
+
+      David A. Golden (DAGOLDEN)
+      Richard Dawe (RICHDAWE)
+      Chris Williams (BINGOS)
+    
+      This module inlines Config::Perl::V Copyright (C) 2009-2010 H.Merijn Brand
+

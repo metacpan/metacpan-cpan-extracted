@@ -1,0 +1,137 @@
+NAME
+    TBX::XCS - Extract data from an XCS file
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+        use TBX::XCS;
+        my $xcs = TBX::XCS->new(file=>'/path/to/file.xcs');
+
+        my $languages = $xcs->get_languages();
+        my $ref_objects = $xcs->get_ref_objects();
+        my $data_cats = $xcs->get_data_cats();
+
+DESCRIPTION
+    This module allows you to extract and edit the information contained in
+    an XCS file. In the future, it may also be able to serialize the
+    contained information into a new XCS file.
+
+METHODS
+  "new"
+    Creates a new TBX::XCS object.
+
+  "parse"
+    Takes a named argument, either "file" for a filename or "string" for a
+    string pointer.
+
+    This method parses the XCS content given by the specified file or string
+    pointer. The contents of the XCS can then be accessed via
+    "get_ref_objects", "get_languages", and "get_data_cats".
+
+  "get_languages"
+    Returns a pointer to a hash containing the languages allowed in the
+    "langSet xml:lang" attribute, as specified by the XCS "languages"
+    element. The keys are abbreviations, values the full names of the
+    languages.
+
+  "get_ref_objects"
+    Returns a pointer to a hash containing the reference objects specified
+    by the XCS. For example, the XML below:
+
+        <refObjectDef>
+            <refObjectType>Foo</refObjectType>
+                <itemSpecSet type="validItemType">
+                    <itemSpec type="validItemType">data</itemSpec>
+                    <itemSpec type="validItemType">name</itemSpec>
+                </itemSpecSet>
+            </refObjectDef>
+        </refObjectDefSet>
+
+    will yield the following structure:
+
+    { Foo => ['data', 'name'] },
+
+  "get_data_cats"
+    Returns a hash pointer containing the data category specifications. For
+    example, the XML below:
+
+        <datCatSet>
+            <descripSpec name="context" datcatId="ISO12620A-0503">
+                <contents/>
+                <levels>term</levels>
+            </descripSpec>
+            <descripSpec name="descripFoo" datcatId="">
+                <contents/>
+                <levels/>
+            </descripSpec>
+            <termNoteSpec name="animacy" datcatId="ISO12620A-020204">
+                <contents datatype="picklist" forTermComp="yes">animate inanimate
+                otherAnimacy</contents>
+            </termNoteSpec>
+            <xrefSpec name="xrefFoo" datcatId="">
+                <contents targetType="external"/>
+            </xrefSpec>
+
+        </datCatSet>
+
+    would yield the data structure below:
+
+        {
+          'descrip' =>
+          [
+            {
+              'datatype' => 'noteText',
+              'datCatId' => 'ISO12620A-0503',
+              'levels' => ['term'],
+              'name' => 'context'
+            },
+            {
+              'datatype' => 'noteText',
+              'levels' => ['langSet', 'termEntry', 'term'],
+              'name' => 'descripFoo'
+            }
+          ],
+          'termNote' => [{
+              'choices' => ['animate', 'inanimate', 'otherAnimacy'],
+              'datatype' => 'picklist',
+              'datCatId' => 'ISO12620A-020204',
+              'forTermComp' => 'yes',
+              'name' => 'animacy'
+            }],
+          'xref' => [{
+              'datatype' => 'plainText',
+              'name' => 'xrefFoo',
+              'targetType' => 'external'
+            }]
+        };
+
+  "get_title"
+    Returns the title of the document, as contained in the title element.
+
+  "get_name"
+    Returns the name of the XCS file, as found in the TBXXCS element.
+
+FUTURE WORK
+    * extract "datCatDoc"
+
+    * extract "refObjectDefSet"
+
+    * Setter methods for XCS data
+
+    * Print an XCS file
+
+SEE ALSO
+    The XCS and the TBX specification can be found on GitHub
+    <https://github.com/byutrg/TBX-Spec/blob/master/TBX-Default/TBX_spec_OSC
+    AR.pdf>.
+
+AUTHOR
+    Nathan Glenn <garfieldnate@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Alan K. Melby.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

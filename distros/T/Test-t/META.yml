@@ -1,0 +1,19 @@
+---
+abstract: '0 to testing in 1 line'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-t
+recommends: {}
+requires:
+  File::Spec: 0
+  Test::More: 0
+  Test::Most: 0
+version: 0.0031

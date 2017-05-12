@@ -1,0 +1,119 @@
+Revision history for Try-Tiny
+
+0.28      2017-01-09 01:21:33Z
+  - enabled some tests of finally blocks that were disabled on 5.6, now that
+    that functionality works (since 0.13) (Pali, PR#4)
+
+0.27      2016-08-16 01:43:35Z
+  - repository moved to the github p5sagit organization (the primary is on
+    shadowcat, mirrored to github)
+  - no changes since 0.26
+
+0.26      2016-03-15 23:42:02Z (TRIAL RELEASE)
+  - switch from finalizers using an array to a hash, to resolve segfaults when
+    creating a pseudofork on MSWin before perl 5.20 (Graham Knop,
+    karenetheridge/Sub-Name/#3)
+
+0.25      2016-02-22 20:16:51Z (TRIAL RELEASE)
+  - "finally" blocks are now run for all methods of leaving the try block
+    (including via exit, goto)  (Lukas Mai, RT#112099)
+
+0.24      2015-12-11 05:20:09Z
+  - fix prereq errors in 0.23
+
+0.23      2015-12-11 04:04:35Z
+  - fix syntax of example code (Rudolf Leermakers, doy/Sub-Name/#22)
+  - 'perl' removed from prerequisite recommendations, to avoid tripping up
+    CPAN clients (Graham Knop)
+  - Sub::Util is used preferentially to Sub::Name in most cases (Graham Knop,
+    doy/Sub-Name/#27)
+
+0.22  2014-04-29
+  - add optional test deps as recommended prereqs (Karen Etheridge,
+    doy/Sub-Name/#18)
+
+0.21  2014-04-15
+  - also skip the test if Capture::Tiny is too old (Martin Popel,
+    doy/Sub-Name/#17)
+
+0.20  2014-03-21
+  - documentation updates (David Lowe (Flimm), doy/Sub-Name/#15)
+
+0.19  2014-01-22
+  - fix an obscure issue with loading modules during global destruction
+    (Dagfinn Ilmari Mannsåker, doy/Sub-Name/#11)
+  - documentation updates (anaxagoras, doy/Sub-Name/#12)
+
+0.18  2013-08-17
+  - fix tests for pre-Test-More-0.88 (Paul Howarth, doy/Sub-Name/#10)
+
+0.17  2013-08-16
+  - work around [rt.perl #119311] which was causing incorrect error messages in
+    some cases during global destruction (Graham Knop, doy/Sub-Name/#9)
+
+0.16  2013-07-10
+  - remove accidental Sub::Name test dep
+
+0.15  2013-07-08
+  - optionally use Sub::Name to name the try/catch/finally blocks, if available
+    (Mark Fowler)
+
+0.14  2013-07-05
+  - also throw an exception for catch/finally in scalar context (RT#81070)
+
+0.13  2013-07-04
+  - fix tests failing on 5.6.x due to differing DESTROY semantics
+  - excise superfluous local($@) call - 7% speedup
+  - fix (fsvo) broken URLs (RT#55659)
+  - proper exception on erroneous usage of bare catch/finally (RT#81070)
+  - proper exception on erroneous use of multiple catch{} blocks
+  - clarify exception occuring on unterminated try block (RT#75712)
+  - fix the prototypes shown in docs to match code (RT#79590; thanks, Pushtaev
+    Vadim)
+  - warn loudly on exceptions in finally() blocks
+  - dzilify
+
+0.12  2013-01-02
+  - doc fixes
+
+0.11  2011-08-30
+  - fix broken dist
+
+0.10  2011-04-27
+  - clarify some docs
+
+0.09  2010-11-28
+  - don't index Try::Tiny::ScopeGuard
+
+0.08  2010-11-28
+  - fix require vs use issue in blead (RT63410)
+
+0.07  2010-10-21
+  - allow multiple finally blocks
+  - pass the error, if any, to finally blocks when called
+
+0.06  2010-05-27
+  - in t/given_when.t use a plan instead of done_testing for more backwards
+    compatibility
+
+0.05  2010-05-26
+  - Documentation fixes and clarifications
+
+0.04  2010-01-22
+  - Restore list context propagation for catch blocks
+  - Fix a bug where finally blocks weren't always invoked
+
+0.03  2010-01-22
+  - Support for 'finally' blocks (Andy Yates)
+  - More documentation and tests (many people)
+  - Sets $@ to the previous value at the beginning of the eval, to allow
+    the capture of an error stack when calling die.
+
+0.02  2009-09-02
+  - Doc fixes from chromatic
+  - Various minor fixes from Adam Kennedy
+  - Additional documentation and code clarifications
+  - 5.005_04 compatibility
+
+0.01  2009-08-31
+  - Initial release

@@ -1,0 +1,12 @@
+Revision history for Text-Glob-Expand
+0.0.1  2011-10-03       Initial release.
+
+v1.1.0 - Thu Dec  1 15:53:28 2011
+	Expanded the documentation, only very minor code changes.
+	Bumped the version past 1.0 to avoid problems due to Module::Release's
+	earlier buggy tagging of the 0.1.0 release as RELEASE_1_0.  (Patch sent
+	to fix Module::Release RT#72845)
+
+1.00 - Tue Oct 11 11:03:59 2011
+	First public release.
+

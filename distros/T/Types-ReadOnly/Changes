@@ -1,0 +1,33 @@
+Types-ReadOnly
+==============
+
+Created:      2013-08-02
+Home page:    <https://metacpan.org/release/Types-ReadOnly>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-ReadOnly>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2013-11-04
+
+ - Cope with upcoming changes to Dict in Types::Standard.
+
+0.001	2013-08-27	Initial public release
+
+0.000_04	2013-08-07
+
+ [ Packaging ]
+ - Tests for some more complex combinations of types.
+
+0.000_03	2013-08-06
+
+ [ Packaging ]
+ - Include test using Types::ReadOnly with Moo.
+ - Include test using Types::ReadOnly with Moose.
+ - Include test using Types::ReadOnly with Mouse.
+ - Include test using Types::ReadOnly with Type::Params.
+
+0.000_02	2013-08-06
+
+ - The version of Hash::Util bundled with pre-5.18 Perls is crap;
+   workarounds aplenty!
+
+0.000_01	2013-08-06	Developer preview

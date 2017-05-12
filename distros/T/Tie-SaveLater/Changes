@@ -1,0 +1,19 @@
+# Revision history for Perl extension Tie::SaveLater
+#
+# $Id: Changes,v 0.4 2006/03/23 04:36:36 dankogai Exp dankogai $
+#
+
+$Revision: 0.4 $ $Date: 2006/03/23 04:36:36 $
+! lib/Tie/SaveLater.pm
+  -                require Tie\:\:$type;
+  +                require Tie\:\:$Type;
+  Yikes.  Mac OS X's case-insensitive HFS+ was masking this bug!
+
+0.03 2006/03/22 22:10:28
++ *
+  First CPAN Release 
+
+0.01  Wed Mar 22 00:19:05 2006
+	- original version; created by h2xs 1.23 with options
+		-XA Tie::SaveLater
+

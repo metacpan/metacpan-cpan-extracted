@@ -1,0 +1,33 @@
+NAME
+    Term::ProgressBar::Color - Provide a progress meter on a standard
+    terminal (with color)
+
+VERSION
+    version 0.00
+
+SYNOPSIS
+     # use via Progress::Any
+
+     use Progress::Any::Output;
+     Progress::Any::Output->set('TermProgressBarColor',
+                                width=>50, color_theme=>"Default::Foo");
+
+DESCRIPTION
+    There is actually no Term::ProgressBar::Color. The actual package is
+    Progress::Any::Output::TermProgressBarColor. You use it via
+    Progress::Any.
+
+SEE ALSO
+    Term::ProgressBar
+
+    Progress::Any
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

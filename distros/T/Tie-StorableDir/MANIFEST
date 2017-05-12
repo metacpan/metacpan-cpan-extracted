@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Tie/StorableDir.pm
+lib/Tie/StorableDir/BackedArray.pm
+lib/Tie/StorableDir/BackedHash.pm
+lib/Tie/StorableDir/BackedScalar.pm
+lib/Tie/StorableDir/Slot.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02store.t
+t/03backing.t
+t/04errors.t

@@ -1,0 +1,18 @@
+#contact_form_col_1 { 
+/*
+*/
+	float: left;
+	display: inline;
+	width: 485px;
+	padding: 0;
+}
+#contact_form_col_2 { 
+/*
+*/
+	display: inline;
+	float: left;
+	width: 318px;
+	margin: 0 0 0 7px;
+}
+
+

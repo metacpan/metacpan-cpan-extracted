@@ -1,0 +1,26 @@
+Revision history for Tkx-ROText
+
+0.06  (2009-02-06)
+    - Expand text widget to fill parent frame.
+
+0.05  (2009-01-23)
+    - Changed from being text-based to frame-based. This means that 
+      $w->g_winfo_class() now reports 'Tkx_ROText'. More importantly, we 
+      should now have support for class-specific options and bindings.
+
+0.04  (2009-01-19)
+    - Added 'm_*' prefix to public method names to support delgation from
+      other megawidgets. (Requires Tkx v1.06+)
+
+0.03  (2009-01-08)
+    - Changed widget from being fixed as read-only to supporting 'readonly' as 
+      an option for the -state configuration item. The state can now be toggled 
+      between readonly (the default), normal, and disabled.
+
+0.02  (2009-01-05)
+    - Re-release with revised directory permissions in tar archive to make the 
+      CPAN indexer happy.
+      cf. http://use.perl.org/~bart/journal/38127
+
+0.01  (2009-01-05)
+    - First version, released on an unsuspecting world.

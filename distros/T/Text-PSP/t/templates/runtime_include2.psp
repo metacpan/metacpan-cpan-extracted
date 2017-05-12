@@ -1,0 +1,1 @@
+<% my ($self,@args) = @_; %>Runtime include with arguments <%= join(' ',@args) %>

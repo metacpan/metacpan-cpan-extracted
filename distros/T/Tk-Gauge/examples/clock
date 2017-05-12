@@ -1,0 +1,35 @@
+#!/usr/local/bin/perl
+use Tk;
+use Tk::Gauge;
+use strict;
+use warnings;
+
+my $mw = MainWindow->new;
+
+my( $hour, $minute );
+
+my $clock = $mw->Gauge(
+    -extent               => -359.9, # 360 loses outline
+    -from                 => 0,
+    -huboutline           => 'black',
+    -majortickinterval    => 5,
+    -majorticklabelscale  => 12.0 / 60.0,
+    -majorticklabelskip   => [ 0 ],
+    -minortickinterval    => 1,
+    -needles              => [
+		              {
+		                  -radius     => 100,
+		                  -variable   => \$minute,
+		              },
+		              {
+		                  -radius     => 60,
+		                  -variable   => \$hour,
+		              },
+		             ] ,
+    -start                => 90,
+    -to                   => 60,
+)->pack;
+
+$mw->after(200 => sub {$hour = 1.2 * 5; $minute = 12; } );
+
+MainLoop;

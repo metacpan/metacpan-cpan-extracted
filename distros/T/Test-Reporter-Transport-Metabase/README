@@ -1,0 +1,113 @@
+NAME
+    Test::Reporter::Transport::Metabase - Metabase transport for
+    Test::Reporter
+
+VERSION
+    version 1.999010
+
+SYNOPSIS
+        my $report = Test::Reporter->new(
+            transport => 'Metabase',
+            transport_args => [
+              uri     => 'http://metabase.example.com:3000/',
+              id_file => '/home/jdoe/.metabase/metabase_id.json',
+            ],
+        );
+
+        # use space-separated in a CPAN::Reporter config.ini
+        transport = Metabase uri http://metabase.example.com:3000/ ...
+
+DESCRIPTION
+    This module submits a Test::Reporter report to the specified Metabase
+    instance.
+
+    This requires a network connection to the Metabase uri provided. If you
+    wish to save reports during offline operation, see
+    Test::Reporter::Transport::File. (Eventually, you may be able to run a
+    local Metabase instance to queue reports for later transmission, but
+    this feature has not yet been developed.)
+
+USAGE
+    See Test::Reporter and Test::Reporter::Transport for general usage
+    information.
+
+  Transport arguments
+    Unlike most other Transport classes, this class requires transport
+    arguments to be provided as key-value pairs:
+
+        my $report = Test::Reporter->new(
+            transport => 'Metabase',
+            transport_args => [
+              uri     => 'http://metabase.example.com:3000/',
+              id_file => '/home/jdoe/.metabase/metabase_id.json',
+            ],
+        );
+
+    Arguments include:
+
+    "uri" (required)
+        The "uri" argument gives the network location of a Metabase instance
+        to receive reports.
+
+    "id_file" (required)
+        The "id_file" argument must be a path to a Metabase ID file. If you
+        do not already have an ID file, use the metabase-profile program to
+        create one.
+
+          $ metabase-profile
+
+        This creates the file metabase_id.json in the current directory. You
+        can also give an "--output" argument to save the file to a different
+        location or with a different name.
+
+    "client" (optional)
+        The "client" argument is optional and specifies the type of
+        Metabase::Client to use to transmit reports to the target Metabase.
+        It defaults to Metabase::Client::Simple.
+
+METHODS
+    These methods are only for internal use by Test::Reporter.
+
+  new
+        my $sender = Test::Reporter::Transport::File->new( $params );
+
+    The "new" method is the object constructor.
+
+  send
+        $sender->send( $report );
+
+    The "send" method transmits the report.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/cpan-testers/Test-Reporter-Transport-Metabase/issues
+    >. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/cpan-testers/Test-Reporter-Transport-Metabase>
+
+      git clone https://github.com/cpan-testers/Test-Reporter-Transport-Metabase.git
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Richard Dawe <richdawe@cpan.org>
+
+CONTRIBUTORS
+    *   Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+
+    *   David Golden <xdg@xdg.me>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

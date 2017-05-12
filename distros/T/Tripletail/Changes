@@ -1,0 +1,507 @@
+# -*- org -*-
+#+STARTUP: indent
+#+STARTUP: fnprompt
+#+STARTUP: logdone
+#+OPTIONS: ^:nil
+#+TODO: UNRELEASED(u) | RELEASED(r)
+
+Revision history for Tripletail
+
+* RELEASED 0.50
+CLOSED: [2013-03-26 Tue 16:19]
+- [[重要な更新]]
+  - MobileHTML フィルタでのセッション不具合の修正
+  - TL::Ini, デフォルト値もini内定義値もなかった場合は例外を発生させるように変更(互換用パラメータ [Ini]treat_absent_values_as_undef)
+- TL
+  - perl-5.10.1 以降でのコンパイルエラー時内部エラー対策.
+  - TL#logにflagged文字列を渡すと警告が発生していたのを抑制.
+- TL::Cookie
+  - delete 後に get した際、必ずしも結果が undef にならなかった不具合を修正しました。
+  - 生成するクッキーに対して圧縮や暗号化を行う機能を追加しました。
+- TL::DB
+  - DB モジュールに ini パラメータ "autoretry" を追加しました。
+  - 内部コードの大幅な整頓
+  - TL::DB#upsert 関数の追加 (pgsqlのみ)
+  - TL::DB#findTables 関数の追加
+  - TL::DB#escapeLike 関数の追加
+  - TL::DB#getTableColumns 関数の追加
+- TL::Filter
+  - Binary, CSV, HeaderOnly, TEXT も同様に設定されたクッキー（セッションキーも含む）を出力するようになりました。
+- TL::Serializer
+  -  新規追加しました。
+- TL::Session
+  - 内部コードの大幅な整頓
+  - pgsql時のセッションテーブルの自動生成を解除
+- TL::Value
+  - Value#isExistentDay 引数に%optionを指定できるように修正しました。
+  - Value#isExistentTime メソッドを追加しました。
+  - Value#isExistentDateTime メソッドを追加しました。
+  - Value#isExistentDayが正常に動作していなかった不具合(0日を正常扱い,undef以外を偽値として返すことがある)を修正しました。
+  - TL::Value#isMobileEmail, dot始まり/終端のアドレスを許容するように変更
+- TL::Validator
+  - Validator の組み込みcheckフィルタ ExistentDay に引数%optionを指定できるようになりました。
+  - Validator の組み込みcheckフィルタ ExistentTime 及び ExistentDateTime が追加されました。
+
+* RELEASED 0.49
+CLOSED: [2010-02-22 Mon 14:06]
+- Mail#getFilename メソッドを追加．
+- Filter::Binary モジュールで、ファイル名を指定できるように拡張しました。
+
+
+* old logs
+
+0.48 Mon Oct 19 10:35:26 JST 2009
+	- FileSentinel に依存モジュールの watch を自動で行う機能を追加しました。
+	　（Thanks to Haruka Kataoka.）
+	- DB での mysql使用時に、テーブルのエイリアスに対する lock ができる
+	　ように拡張しました。
+	　（Thanks to Haruka Kataoka.）
+
+0.47 Fri Jul 17 16:41:35 JST 2009
+	- Template#existsFile メソッドを追加．
+	- MemCached#setでリファレンスを保存できるように変更．
+	- DBクラスのIniいるにおいて，mysql_read_default_file，mysql_read_default_group を指定することで my.cnf から設定を読み込む機能を追加．
+	- 0.46で追加したDB再接続処理をpreRequestではなくinitRequestで行うように変更.
+	  (preRequestの前に行われるフォームのデコード処理でセッション関連のDBアクセスが発生することがあるため)
+	- InputFilterで文字コードを指定するオプションを追加.
+	  文字コードを指定した場合はCCCパラメータを使用した自動判定は行われない.
+	- Iniで特化指定を使用したときに、Iniファイルの上から順番に設定が使用されていなかった問題の修正
+	- Ini#deleteGroup メソッドで特化指定を含んでいるときに全てのグループが削除されていなかった問題の修正
+	- Ini#set メソッドにraw指定を追加
+
+0.46 Tue May 26 16:56:32 JST 2009
+	- FastCGIで長時間アクセスがない場合に，MySQLとのDB接続が
+	　タイムアウトして切れていると，その後のアクセスでエラーが
+	　出てしまう．この問題を回避するため，リクエストごとに
+	　DB接続状態を確認し，必要に応じて再接続するように修正．
+	- LWPの依存をMakefile.PLに追記．
+	- pagerのテストの実行に失敗するバグを修正．
+	- 出力フィルタとしてMobileHTMLを使用したとき、パラメータにtype => 'xhtml'を指定すると
+	  コンテントタイプがapplication/xhtml+xmlになるように変更.
+	- $TL->dispatchを使用したときにプロセス名に分岐先のコマンドを追加するようにした.
+	  本機能を新しい INI パラメータ [TL]command_add_processnameで使用するかを選択できるようにした.
+	- SessonクラスでPostgreSQLをサポート。(This information wrote at 2009/6/10. Sorry...)
+	- Sessonクラスで生成されるセッションキーを19桁から18桁(64bit整数値の負の数を除いた範囲)へ変更。(This information wrote at 2009/6/10. Sorry...)
+
+0.45 Wed Jan 14 15:22:58 2009 +0900
+	- Validator MultiValues で 0 件は受理するように修正.
+	- $TL->eval() を追加
+	- [[重要:非互換な仕様変更]]
+	　- $TL->escapeJS 及び $TL->unescapeJS が"<"及び">"をそれぞれ"\x3c"及び
+	　  "\x3e" と変換するように変更.
+	　- Form#getFileName() はベース名部分のみを返すように変更.
+	- Value#isPassword() でパラメータ指定をできるように変更.
+	- Pager#setToLink() メソッドの追加.
+
+0.44 Tue Sep 16 16:27:52 JST 2008
+	- outputbuffering 使用時に自動で追加されるContent-Lengthが, ユーザが任意のヘッダを追加してる場合に狂うバグの修正.
+	- TL#dispatchで、第1引数が小文字ではじまる場合にエラーになるケースで、
+	　　onerrorが設定されている場合は、onerrorが呼び出されるが、その後に第1引数によっては関数が実行されてしまう事があったバグの修正。
+	- $TL->dispatch() に args パラメータを追加。
+	- FCGI時のフィルタの再初期化をresetメソッドに分離(内部メソッド_resetもリネーム).
+	- Value#isChar メソッドの追加.
+	- 複値のselectへのsetFormを改善.
+
+0.43 Wed Jun 11 15:50:54 JST 2008
+	- outputbuffering 使用時に自動で追加されるContent-Lengthの計算が間違うことがあるバグの修正.
+
+0.42 Thu Jun  5 11:27:13 JST 2008
+	- Template で, includeされるファイルの文字コードが常に自動認識だったのを, 親で指定されていればそれと同じ文字コードを使うように修正.
+	- Template.rootpath が相対パスで記述されている時に全てが不許可となるのを修正.
+	- DBで接続用グループが存在しなかったときのエラーメッセージを加筆.
+	- stratCgi外でのエラー(含コンパイルエラー)がInternal Server Errorとなっていたのをエラーメッセージを表示するように修正(compat_no_trap_for_cgi_internal_error).
+	- Errorオブジェクトに http_status_line フィールドを追加.
+	- $TL->printでのエラーがデバッグスクリーンにならないバグの修正.
+	- Value#isPcPortable でAUの絵文字が正しく判定されない問題を修正．
+	- enable_debugした際に出力が常にバッファリングされていたバグの修正.
+
+0.41 Mon Jan 28 12:27:55 JST 2008
+	- Makefile.PL がパラメータによって失敗することがあるのを修正.
+
+0.40 Fri Jan 25 10:59:21 JST 2008
+	- allow_mutable_input_cgi_object パラメータを追加.
+	- 新しい INI パラメータ [TL]fcgilog
+	- 新しい INI パラメータ [TL]filelog
+
+0.39 Thu Nov 29 14:03:48 JST 2007
+	- gmake 変数を使っていた箇所を除去.
+	- 環境によってhtml生成に失敗する不具合を修正.
+
+0.38 Fri Nov 23 12:15:01 JST 2007
+	- [[重要:非互換な仕様変更]]
+	　- $TL->CGI 及び $CGI は const 状態になっていなかったが、const 状態にするよ
+	　　うにした。
+	　- TL#dispatchで、第1引数が小文字ではじまる場合にエラーになるケースで、
+	　　onerrorが設定されている場合は、onerrorが呼び出されるようにした。
+	- Value#isDomainName() が正当でないドメイン名に対して 1 を返す場合があった
+	　問題を解決。
+	- Value#isDateTime() を追加。
+	- TL#writeTextFileの文字コード変換が正常に動作していなかった問題の修正。
+	- [TL]outputbuffering が 1 でない場合、$TL->print 等で何らかのデータを出力し
+	　た後にエラーが発生した時に表示が崩れる問題を解決。
+	- 0.35で導入された、Template#getForm, setForm, extForm, addHiddenForm,
+	　addSessionCheck において対象となるノードに未置換の <&タグ> がある場合、
+	　エラーになるように変更された修正を回避するオプションを追加した。
+	　互換性維持の為に使用されるオプションであり、非推奨オプションとなります。
+	- const 状態の Form オブジェクトを変更可能にするオプションを [TL] の ini に追
+	　加した。
+
+0.37 Thu Oct  4 18:09:30 JST 2007
+	- Win32 で動かなくなっていた箇所の修正.
+	- IIS/FastCGI/ActivePerlの対応.
+	- Value に isDomainName() を追加。Validator のフィルタに DomainName を追加。
+	　いずれもドメイン名として正当であるかどうかを確認する。
+	- Value に detectMobileAgent() を追加。User-Agent 名から文字コード名を判別す
+	　る。
+	- Pager#setFormParam の引数が hashref をとることも出来るように修正した。
+	- Tripletail::Sendmail::Smtp でエラーが発生した場合、相手サーバからの
+	　最後の応答をエラーメッセージに含めるように修正した。
+
+0.36 Fri Sep 28 11:03:31 JST 2007
+	- [[重要:非互換な仕様変更]]
+	　- Template#getForm, setForm, extForm, addHiddenForm, addSessionCheck は対象
+	　　となるノードに単に未置換の <&タグ> があるだけではエラーにならないように変
+	　　更された。<foo <&tag>> のように HTML タグの内部に未置換のテンプレートタグ
+	　　がある場合にはエラーになる。<foo <!begin:bar>> 等も同様にエラーになる。
+
+0.35 Thu Sep 27 12:03:15 JST 2007
+	- [[重要:非互換な仕様変更]]
+	　- Template#getForm, setForm, extForm, addHiddenForm, addSessionCheck は対象
+	　　となるノードに未置換の <&タグ> がある場合にはエラーになるように変更された。
+	　- DateTime はこれまで YYYY-M-D H:M:S のように月日時分秒が一桁である形式の日
+	　　付を受け入れなかったが、受け入れるようになった。但し区切り記号が存在する
+	　　場合のみ。
+	- DBのクエリをデバッグする際に、パラメータが記録に残らないバグを修正。
+	- 意味の解り難い英文のエラーメッセージを全面的に見直し。
+	- Tripletail::SMIME を Tripletail フレームワークから独立させ、Crypt::SMIME に
+	　した。$TL->newSMIME は継続して利用可能。
+	- $TL->getCookie と $TL->getRawCookie は $TL->startCgi の外から呼ぶとエラーに
+	　なるようにした。
+	- DB のクエリログを取っている場合、これまでは $TL->startCgi() の内部で実行さ
+	　れたクエリであるかどうかに関係無くデバッグ表示画面に表示する為に内部に全て
+	　のクエリログを保存していたが、$TL->startCgi() 内部で実行されたものでなけれ
+	　ば保存する意味が無いため、保存しないようにした。
+	- FastCGI 環境で動作しているかどうかを判定する方法を、FastCGI の仕様書に定め
+	　られている通りにした。
+	- $TL->startCgi() の -main 関数の外でエラーが発生した場合にそのエラー内容が二
+	　重にログに出力される問題を解決。
+    - Pager の必須ノードであった PageNumLinks は必須でなくなった。
+
+0.34 Fri Sep 14 14:38:19 JST 2007
+	- [[重要:非互換な仕様変更]]
+	　- Value#isHira, isKata で判定をする際、「ー」があると偽を
+	　　返していたが、真を返すように修正。
+	　- Tripletail::Filter::CSV に配列のリファレンスを渡した場合に、
+	　　出力時の改行コードを "\n" から "\r\n" に変更した。
+	　- startCgi内で、不完全なリクエスト
+	　　(POST時にbodyがContent-Lengthよりも短いもの等)
+	　　の場合は、途中で接続が切れたものとして扱い、
+	　　その時はinitRequestのみ実行され、
+	　　pre/postRequestフック及びmainは実行されずに、
+	　　ダミーのコンテンツを返すようにした
+	　　(これはエラー扱いではないので、エラーログ及びエラー通知メールは
+	　　 送られない)
+	　- Tripletail::Filter::MemCachedのmodeオプションのreadが、
+	　　pass-throughに変更されました。
+	　- Tripletail#printCacheUnlessModified, Tripletail#setCacheの、
+	　　引数を変更し、Tripletaik#setCacheFilterを追加した。
+	- errortemplateを指定した場合に正常に機能しない問題を修正した。
+	- Tripletail::Filter::CSV に配列のリファレンスを渡した場合に
+	　どのような改行コードを利用するか指定するオプションを追加。
+
+0.33 Mon Sep 10 16:26:55 JST 2007
+	- [[重要:非互換な仕様変更]]
+	　- DateTimeクラスのtai64フォーマットの処理に問題があり、修正が
+	　　難しいため、tai64フォーマットへの対応を削除。
+	　- Tripletail::Filter::MemCachedのtypeオプションはmodeオプションに
+	　　名称を変更し、引数はin/outからwrite/readに変更されました。
+	- Pagerクラスにて、DBセットを利用する手段が無かった為、
+	　Pager#newPager時にdb_objectを渡せるように変更しました。
+	　今後はこちらの形式が推奨方式になります。
+	　db_groupを渡す方法も継続して利用できますが、非推奨な方法となりました。
+	　あわせて、Pager#setDbGroupも非推奨となりました。
+	- ValueクラスのforcePortable、forcePcPortableの記述間違いを修正。
+	　正しい動作は機種依存文字を削除する。
+	- SessionクラスがSQLの実行に失敗した時の処理が適切でなかったので修正。
+	- $TL->sendError のマニュアルのサンプルの記述ミスを修正。
+	- t/value.t が希に失敗することがある問題を修正。
+	- taint 時に動かない箇所の修正.
+	- TLのoutputbufferingを1にすると2重にフィルタがかかるバグを修正。
+	- TLのoutputbufferingが1の場合は、Content-Lengthヘッダを付与するように修正。
+	- Filter::MobileHTMLクラス利用時に、Content-Lengthヘッダを返すように
+	　outputbufferingを強制的に1にセットするように修正。
+	　（携帯向けにコンテンツを返す場合、Content-Lengthヘッダを必須とする
+	　　キャリアがあるため）
+	- errortemplateを指定した場合、そのテンプレートに対してデバッグ出力などの
+	　ノードを展開しようとしていた問題を修正。指定したテンプレートはそのまま
+	　出力するように修正された。
+	　また、errortemplatecharset の設定を追加した。
+	- Windows環境でmail.tのテストに失敗する問題を(たぶん)修正。
+	- 特定の環境でsmime.tのテストに失敗する問題を修正。
+	- セッション利用時、DBとの接続が切れた場合の再接続処理が正しくなく、
+	　接続が切れた次のリクエストでエラーが生じる問題を修正。
+
+0.32	Fri Aug 31 18:22:56 JST 2007
+	- [[重要:非互換な仕様変更]]
+	　- 出力フィルタとしてMobileHTMLを利用しているときに$TL->locationを利用すると
+	　　セッションが正しく維持されない問題を修正。
+	　　また、この修正に伴い、Tripletail::Filter::Redirectは廃止とし、
+	　　$TL->locationは出力フィルタがHTML、MobileHTML、SEOの
+	　　場合のみ利用できる仕様に変更。
+	　　RedirectフィルタをsetContentFilterで使用したり、出力フィルタとして
+	　　CSV、TEXT、Binary、を利用している場合はエラーとなる。
+	　- 入力フィルタのMobileHTML、出力フィルタのMobileHTMLの仕様を変更し、
+	　　携帯絵文字に対応しました。
+	　　DoCoMo、AU、Softbank、ASTELのそれぞれの端末の絵文字を扱えるように
+	　　なりました。
+	　- 文字コード変換をする部分で、prefer_encode オプションを指定できる
+	　　メソッドが複数ありましたが、実際の動作が反対になっていました。
+	　　Unicode::Japanese は utf8 フラグ付きの文字列でも受け付けますが、
+	　　Encode は受け付けません。
+	　　そのまま修正すると互換性の問題が多く生じる可能性があるため、
+	　　prefer_encode オプション自体を廃止することにしました。
+	　　prefer_encode は指定されても無視されますが、将来的に
+	　　別の引数が追加される可能性があるため、prefer_encode を
+	　　指定しているコードは、修正するようにお願いします。
+	　- $TL->charconv は Unicode::Japanese を常に優先する仕様に変更。
+	　　Unicode::Japanese で変換できない文字コードの場合は、
+	　　Encode を使って変換を行うように修正。
+	　- Tripletail::Filter::Text の charset は、Unicode::Japanese の
+	　　省略形を指定できなくなりました。
+	　　sjis, euc, jis, utf8 はそれぞれ Shift_JIS, EUC-JP, ISO-2022-JP, UTF-8
+	　　へ修正してください。
+	　- $TL->charconv($str, ['EUC-JP', 'Shift_JIS'] => 'UTF-8');
+	　　のように推測する文字コードを一覧で指定する方法を廃止。
+	- Sessionクラスの管理ログはデフォルトで出力されなくなった。
+	　iniパラメータで指定したときのみ出力を行う。
+	- Sessionクラスのsqlite DMLのバグ修正(0.30-)。
+	　iniパラメータで指定したときのみ出力を行う。
+	- TagCheckクラスで、:BR などの指定をした時に自動で閉じタグが付いてしまう
+	　バグを修正。
+	- TagCheckクラスで、自動で閉じタグを追加する際に、追加する順序が逆で
+	　あったため、正しい入れ子関係にならないバグを修正。
+	- TagCheckクラスで、大文字小文字の同一視が正しく行われていなかった
+	　バグを修正。
+	- TagCheckクラスで、行末に開業がない場合でも、line/blockでタグを閉じるように変更。
+	- TagCheckクラスで、xhtmlで <a /> のような形式にした場合に正しく判定
+	　できていなかったバグを修正。
+	- ValueクラスにisPcPortableメソッドを追加。
+	　isPortableメソッドの判定ロジックを一部変更。
+	　forcePortable、forcePcPortableメソッドを追加。 
+	　strCutSjis、strCutUtf8メソッドを追加。
+	- ValidatorクラスにPcPortable、ForcePortable、ForcePcPortableフィルタを追加。
+
+0.31	Tue Aug 28 16:36:03 JST 2007
+	- セッション関係のドキュメントが古かったため、修正．
+	- PagerクラスのSQLに関する記述が古かったため、修正．
+
+0.30	Fri Aug 24 17:38:15 JST 2007
+	- [[重要:非互換な仕様変更]]
+	  - Formにundef若しくは空のリストをsetしたときはキーの削除扱いに変更.
+	  - Formに配列以外のリファレンス, 若しくはリファレンスを含んだ
+	    配列リファレンスをsetしたときはdieするように修正.
+	  - Templateで未展開のタグがあった場合に，flushメソッドを呼び出しても
+	    エラーとならないことがあるバグを修正．
+	    toStrと同様，未展開のタグが残っていた場合はエラーとするのが
+	    本来の仕様だが，エラーが出ないケースがあった．
+	  - $TL->dispatchの第1引数の値は大文字でなければ拒否するように変更.
+	- 空のリストを持つ要素をtextにsetFormできない現象の修正.
+	- tx内でgetDBできない現象の修正.
+	- fault-handler追加.
+	- security.pod, policy.pod, tips.pod のドキュメントを追加．
+	- sessionクラスが作成するテーブルのupdatetimeカラムにインデックスを
+	  張るように修正．
+	  既に作成済みのセッションテーブルに関しては、個別にインデックスの
+	  追加作業を行って下さい．
+	  （古いセッションデータを削除する場合にのみ利用しますので，
+	    不要なら追加しなくてもかまいません．）
+	- sessionクラスをMySQLで利用する場合，MySQLのテーブルタイプを
+	  指定できるiniオプションを追加．
+
+0.29	Tue Jul  3 17:14:00 JST 2007
+	- TagCheck で自動リンクを行う際に，リンクURLがescapeTagではなくencodeURL
+	　されているために，ブラウザが正常にリンクを認識できなくなるバグを修正．
+	- Mail#attach でファイルパスを渡して添付することを可能にした．
+	- Mail クラスでMIMEエンコードする際の処理を改善．
+	- Mail#attach で日本語ファイル名に関する処理の修正.
+    - FCGI 環境で $TL->fork した際、子プロセスの方が先に死んだ時に Internal
+      Server Error になる問題に対処。
+    - $TL->fork した際、$TL->startCgi で自動 connect した DB との接続が切れる問題
+      を解決。
+
+0.28    Fri Jun 15 12:33:46 JST 2007
+	- FCGI動作中は、SIGTERMが流れた時にスタックダンプを出力しないようにする
+	- $TL->fork() を追加。FastCGI 環境で通常の fork を行うと正しく動作しないため。
+	- mod_perl Handler 対応.
+	- 処理の最適化.
+	- HtmlFilterで正規表現マッチが動作しないバグの修正.
+	- Template#getForm，Template#setForm で，空文字列や 0 を値に持つ
+	　option要素を正しく扱えないバグを修正．
+	- tltail.pl(1) を追加.
+	- Validator#correct メソッドを追加．チェックと同時に値の修正を行える
+	　ように機能を拡張．
+	　（Thanks to Haruka Kataoka.）
+
+0.27	Tue Mar 27 22:16:06 JST 2007
+    - xhtml タグ調整追加(option).
+
+0.26	Tue Mar 27 17:42:48 JST 2007
+    - xhtml 出力フィルタ利用時に一部の単一で使うタグが閉じられない不具合の修正. 
+
+0.25	Tue Mar 27 14:40:11 JST 2007
+	- Value#genRandomString メソッドを追加.
+	- Esmtpが正常に動作しなかった問題を修正.
+	- Win32でPOST入力の処理に失敗する不具合の修正.
+
+0.24	Thu Mar  8 16:25:40 JST 2007
+	- Form#existsFile, Form#isUploaded メソッドを追加．
+	- Value#convKanaNallow, Value#convKanaWide メソッドを追加．
+	- SQL Server 対応(experimental).
+
+0.23	Fri Jan 29 17:25:13 JST 2007
+	- charconvのprefer_unijpの挙動が仕様と逆になっていたバグの修正.
+
+0.22	Fri Dec  8 16:23:03 JST 2006
+	- $DB->tx, $DB->inTx メソッドの追加.
+
+0.21	Mon Dec  4 19:14:30 JST 2006
+	- 空白から始まるファイルをアップロードできないバグの修正.
+	- Htmlフィルタで落ちることがあるバグの修正. 
+
+0.20	Tue Nov  7 17:11:07 JST 2006
+	- logのcurrentリンクを相対パスに変更.
+
+0.19	Fri Oct 20 16:05:20 JST 2006
+	- Validator の Integer フィルタで, 値が存在しない場合に通過していたバグの修正.
+	- Validator のユーザ定義フィルタのドキュメントが間違っていたので修正.
+	- logディレクトリにcurrentのリンクを追加.
+
+0.18	Fri Sep 15 10:57:55 JST 2006
+	- [[重要:0.17からの非互換な仕様変更]]
+	 - errorTrapをtrapErrorに変更
+	 - $TL->log() の第1引数は省略可能に。
+	 - $TL->log() の第2引数にリファレンスを渡した場合はダンプ結果を出力するように変更。
+	 - $TL->dump() の第1引数は省略可能に。
+	- DateTime#getCalendarMatrixが正しいデータを返していなかったのを修正.
+	- DateTime#spanXxx,minusXxxが破壊的メソッドになっていたのを修正.
+	- jpholiday.plに0.11_01で変更された内容が反映されていなかった問題を修正
+	- t/datetime.t を JST に固定.
+	- InputFilter::HTML のバグの為、0x0D 0x0A 0x09 のバイト列を含むファイルをアップロードした
+	  時に、それが破壊される場合のある問題を解決。
+	- Debug の表示するデバッグ画面内でエラーが発生する場合のある問題を解決。
+	- その他雑多な修正
+
+0.17	Fri Aug 18 16:32:40 JST 2006
+	- Filter::HTML を使うと <form action=""> の action の部分を xxx.cgi?a=b のようにクエリ付きの
+	URL に設定してしまう事がある問題を修正。
+	- META.ymlの生成を調整.
+
+0.16	Fri Aug 18 13:29:03 JST 2006
+	- [[重要:0.15からの非互換な仕様変更]]
+	　- 度量衡の1月が30日から30.436875日に変更
+	　- Template#setForm は、その引数で言及されていない名前を持つ <textarea> の内容を、常に
+	　空にしていた。この動作は変更され、言及されていない <textarea> は変更されないように
+	なった。
+	- Value#setでNULLをset出来るように修正
+	- 度量衡にyearを追加
+	- 度量衡変更に伴いparsePeriodを変更
+	- Win32対応修正.
+
+0.15	Tue Aug 15 14:22:42 JST 2006
+	- [[重要:0.14からの非互換な仕様変更]]
+	　- Value#isWhitespace、Value#isPrintableAscii、Value#isWideに関して、従来は空白で真を返していたが、
+	　　他との整合性を取るため、空白で偽を返すように変更
+	　- Value#forceWhitespaceをtrimWhitespaceに名称変更
+	　- Value#isUnportableを削除
+	　- Value#isHtmlTag、Validator#HtmlTagを削除
+	　- Value#isTrailingslash、Validator#TrailingSlashを削除
+	　- Value#isIpAddressでIPアドレス形式が正しくなかった場合、dieせずundefを返すように変更
+	- Value#isBlankを追加
+	- Value#isPortableを追加
+	- Value#strCutを追加
+	- Validator#NotBlankを追加
+	- Validator#Blankを追加
+	- Validator#Emptyを追加
+	- Validator#IpAddressを追加
+	- Valueクラスで、改行コードが含まれている場合に正常なチェックが行えないケースがある
+	　問題を修正
+	- Sendmailクラスの送信方法にsendmailを追加。sendmailコマンドを利用して送信する
+	- opensslライブラリが使用できない場合はSMIMEクラスのインストールをスキップするように修正
+
+0.14    Tue Aug  8 10:19:08 JST 2006
+	- デバッグ機能利用時にDBエラーが正しく表示されないことがある問題を修正
+	- <input type="TEXT" ...> のように type 属性が大文字になっている html テンプレートに対する
+	  setForm と getForm メソッドが正しく動作しない問題を修正。
+	- <>の間に改行を含むタグを正しく解析できない問題を修正。
+
+0.13    Wed Aug  2 16:45:37 JST 2006
+	- CustomFilterのサンプルをいったん削除
+
+0.12    Wed Aug  2 10:36:54 JST 2006
+	- フレーム版ドキュメントのリンク切れを修正
+	- 祝日生成モジュールがパッケージ名称変更に未対応だったため修正
+	- Tripletail::InputFilter::Plainを追加
+
+0.11_01 Thu Jul 27 12:05:32 JST 2006
+	- [[重要:0.10_07からの非互換な仕様変更]]
+	  - TLからTripletailにパッケージ名称を変更
+	  - DateTimeクラスのspan系で、(引数) - (this)としていたものを、(this) - (引数)に変更
+	  - DateTimeクラスのspanMonth、spanYearの挙動を実際の期間を、指定された単位で計算するように修正
+	  - DateTimeクラスのadd系に関して、コピーを生成せず破壊的動作をするように修正
+	- DateTimeクラスのspan系で、(引数1) - (引数2)を追加
+	- DateTimeクラスにminusSecond、minusMinute,minusHour,minusDay,minusMonth,minusYearを追加
+	- DateTimeクラスにてユリウス日時から、グレゴリオ暦への変換時に誤差が発生していた問題を修正
+	- $TL->newForm($hashref) 形式でもフォームオブジェクトを作成できるように変更
+	- $TL->addHiddenForm({key => val}, 'formname') 形式でも使用できるように変更
+	- $TL->setForm({key => val}, 'formname') 形式でも使用できるように変更
+	- DBのコネクションのグループ名称の頭文字をCNTからCONに変更
+	- GMT等のタイムゾーンを正常に扱えない問題を修正
+
+0.10_07 Tue Jul 18 16:43:44 JST 2006
+	- [[重要:0.10_06からの非互換な仕様変更]]
+	  - DBクラスのselectRowHash/Arrayで、データが0件の場合の戻り値に関する仕様を変更
+	  - 従来は {} または [] が返っていたが、undef を返すように変更
+	- DBクラスでデッドロック発生時の処理に問題があったため修正
+	- バグ発生時のメール送信でのログ出力の問題を修正
+	- stacktrace=fullでのデバッグ表示が崩れる場合がある問題を修正
+	- stacktrace=fullでソースの表示する時、初期値をTLライブラリ外のフレームに変更
+	- デバッグ時にポップアップウィンドウがブロックされた際、JavaScriptでエラーが発生する問題を修正
+	- Makefile.PLからCache::Memcached::XSを削除
+
+0.10_06 Fri Jul 14 19:02:48 JST 2006
+	- DBのsthクラスに最後のexecute戻り値を取得するretメソッドを追加
+	- テスト時の出力を改善
+	- DateTimeクラスにaddBusinessDayを追加
+	- DateTimeクラスのisHolidayにオプション追加
+	- DateTimeクラスのisHolidayのデフォルトの挙動を変更
+	- READMEファイルにHPへのURLを追加
+	- Makefile.PLでCache::Memcached::XSを追加
+	- Makefile.PLでDigest::MD5を削除
+	- Makefile.PLでDigest::SHA1を削除
+	- ログ出力時にディレクトリまたはファイルが作成できず、かつメール通知の設定がされていて
+	  メール通知できない状況で永久ループするバグを修正
+	- ログの出力フォーマットに関するドキュメントを追加。
+	- $TL->getLogHeader メソッドを追加。
+	- マニュアルの整形ミスを修正。
+	- TL::DB#selectRowHash, selectRowArray を追加。
+
+0.10_05 Mon Jul 10 10:58 JST 2006
+	- ドキュメント修正、make test時にファイルが残る問題の修正
+
+0.10_04 Sat Jul 08 16:56 JST 2006
+	- CPANで文字化け等していたPODの不都合を修正
+
+0.10_03 Sat Jul 08 13:28 JST 2006
+	- DBが利用できないときテストに失敗する問題を修正
+	- templateテストでエラーが出ている問題を修正
+	- PODのNAMEに直接日本語を書くように修正
+
+0.10_02 Fri Jul 07 21:18 JST 2006
+	- encoding指定ミスを修正
+
+0.10_01 Fri Jul 07 16:34 JST 2006
+	- CPAN公開初版
+
+0.09 Tue Jun 13 18:09 JST 2006
+	- 限定公開版
+

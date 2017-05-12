@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e0f586fc3906b1e3c2eea8a7887ee4adeff5095a CONTRIBUTORS
+SHA1 b34b72a5eb650f71348dc15136c1bddfd4df7c85 Changes
+SHA1 ec51b54652836e34dd092b3b3859e9a62fdfcfaa INSTALL
+SHA1 5c07d3a47e5da0e9f6cdb8a1e4dc31624efa8f19 LICENSE
+SHA1 e5ea62775b3f44733f07a6073d1dbbe92e64ab12 MANIFEST
+SHA1 3b84f9bd66624e2cd9a3f626882e28a7639a43ed META.json
+SHA1 e65a17bfffeb29394ac6cee81fa5c31e6406599c META.yml
+SHA1 0fe39cbb939f72b7b8e7b58553bcc1adb01a39fe Makefile.PL
+SHA1 f2ac16929c9643008782d9a8ce2ec0a203106c72 README.md
+SHA1 965695292e1316de2177cb4d2cb2b718a633bca4 README.mkdn
+SHA1 9482c9119982b0864d7088b2f9c9c97955288541 benchmark.pl
+SHA1 59124109baa589ef8923bc693afd7b79b2b34d83 bin/mustache.pl
+SHA1 a528f4da6f1915827e9464ab19628bf1a5b50bdd cpanfile
+SHA1 68fb718895e45c640069496c86e296fe86575be2 dist.ini
+SHA1 f954b9e19e84ef2e69d2ad7f68dbca9de2ef10ae doap.xml
+SHA1 bae809acc26ce7f67dc352f02933a50ba05f5ebe lib/Template/Mustache.pm
+SHA1 dd4fcf8f979cb6980bb815da57a4cbb7f57003c0 t/00-compile.t
+SHA1 48163971681a857c5335382092362fe9988d9211 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 fafa3e336d6303a84d0d1636ddd424256b4c205c t/001_spec_compatibility.t
+SHA1 b1242b5319fd8b0ee442d15df476596f6702201e t/lambdas_receive_render_helper.t
+SHA1 8ef660bc8002722651da3f77f1c54c1dc3722fee t/parse_errors.t
+SHA1 70b429365ac5ce40de47041523934592410d785b t/read_data_from_classes.t
+SHA1 f6e7141a519b6f07a547eb85e117057c6f6a3fc9 t/read_data_from_hashes.t
+SHA1 ab79d0761a72e76ac87b1a45022506003ce87625 t/read_data_from_instances.t
+SHA1 ad3bab3f2714e1457883d5bec5bbbd9b8526d4a9 t/read_data_from_subclass.t
+SHA1 eb64fc6422d235c396c9b3641bc6e6973c6f55f1 t/read_partials_from_file_system.t
+SHA1 ba0941047652a5ee22d89c70579b2cf3dc5ac3e0 t/read_partials_from_hashes.t
+SHA1 1f4ada3c62732a9319788c2785f7f5e61f164096 t/read_partials_from_partial_method.t
+SHA1 9c0f2f55c6af0df83b6bdff4766eacc460592901 t/read_partials_from_subs.t
+SHA1 17d4d15445345702c356645905dee492de0fa0d6 t/read_templates_from_file_system.t
+SHA1 82aaaaef372c0bd8aab3ed4b3f15ee1b871c8431 t/read_templates_from_file_system_with_namespacing.t
+SHA1 0283bcdbbb6fdc3acd7b057cb4ca2817c657db26 t/read_templates_from_subclass.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlguMfYACgkQ34Hwf+GwC4yw+gCgud3T1iwe8KQnNhhYO3g7AWob
+r78AoNPx8hMgL2se711rmHwm71lInxxS
+=37UP
+-----END PGP SIGNATURE-----

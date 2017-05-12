@@ -1,0 +1,23 @@
+---
+abstract: 'serialize data-structures between threads'
+author:
+  - 'Elizabeth Mattijsen (liz@dijkmat.nl)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Thread-Serialize
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Storable: 0
+  Test::More: 0.88
+version: 1.01

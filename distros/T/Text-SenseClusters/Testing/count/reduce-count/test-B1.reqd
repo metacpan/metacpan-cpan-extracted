@@ -1,0 +1,3 @@
+ERROR(reduce-count.pl):
+        UNIGRAM file test-B1.uni is not a valid UNIGRAM output of NSP at line
+        2.

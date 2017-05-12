@@ -1,0 +1,201 @@
+            file:   Text-TreeFile-0.39.readme
+
+  The Perl module, Text::TreeFile supports reading a simple ASCII
+text file format for representing tree structures.  It loads the
+contents of such a file into a tree (or array of several trees)
+of two-element array nodes, where the first element of each node
+is a text string and the second is an array of child nodes.
+
+  It supports comments, continuation lines and include files, and
+uses a strict (two-spaces-per-level) indentation scheme in the
+file to indicate hierarchical nesting.
+
+  This module has been helpful for a dozen applications or so,
+which were simplified by having this functionality abstracted out.
+The most generally useful such application is a tool that simplifies
+the use of perl-tk (modules in the Tk:: namespace) for building
+GUI-based application programs (see an example data file, mentioned
+below).
+
+DOCUMENTATION
+
+  There are man pages for Text::TreeFile(3pm) which introduces the
+functions and use of the modele, Text::TreeFile::details(3pm) which
+gives exhaustive specification of alternatives and features for use,
+and Text::TreeFile::internals(3pm) which documents the code itself.
+Another module: Qtk::QuickTk(3pm) uses TreeFile by default and, thus,
+is a significant application demonstrating TreeFile's features.
+
+AVAILABILITY
+
+  Copyright (c) 2000 John Kirk. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+  The latest version of this module should always be available
+at any CPAN (http://www.cpan.org) mirror, or from the author:
+             http://perl.dystanhays.com/jnk
+
+INSTALLATION
+
+  I usually install modules using the CPAN.pm module, invoked as:
+
+       perl -MCPAN -e shell
+
+It can be run by an ordinary user, or root (to install system-wide),
+and asks a few configuration questions the first ime it's run.
+
+  The *.tar.gz file, after being uncompressed and unarchived, expects
+to be installed with the following commands:
+
+       perl Makefile.PL
+       make
+       make test
+
+  This creates and installs man pages, generated from *.pm and *.pod
+files, among other things.
+
+SYNOPSIS
+
+  use Text::TreeFile;
+  my $filename='treetest.tre';
+  my $treeref=Text::TreeFile->new($filename)
+    or die "TreeFile couldn't read file: $filename\n";
+  my $topref=$treeref->{top};
+  showlines($topref,0);       # see EXAMPLES, for def. of showlines()
+
+REQUIRES
+
+  TreeFile uses modules:  Exporter, Autoloader and FileHandle
+
+CONTENTS
+
+  This distribution provides the following:
+
+TreeFile.pm  -- the code for the module, which your program will
+  access with a "use Text::Treefile;" statement, typically.  Pod
+  documentation is embedded in this file, from which the man page,
+  Text::TreeFile(3pm) is generated.
+
+details.pod  -- plain old documentation exhausively specifying
+  the options for use of the module, from which the man page,
+  Text::TreeFile::details(3pm) is generated.
+
+internals.pod  -- plain old documentation of the module code
+  itself, from which the man page, Text::TreeFile::internals(3pm)
+  is generated.
+
+test.pl  -- a small program which contains hand-coded copies of
+  the data structures that should result from using the module
+  to read the treetest.tre and testfile.tre example files, which
+  are shown below.  The program reads these data files and
+  reports whether the resulting internal tree structure matches
+  the hand-coded versions.
+
+demodata/treetest.tre  -- a small example data file, which has
+  some comment lines, and contains two top-level trees, so that
+  it can be used to test TreeFile's option for reading either
+  a single tree only, or multiple trees (into an array of trees).
+  the content of this file (between the dotted lines) is:
+
+  --------------------------- snip, snip ---------------------------------
+  #  file:  treetst.tre
+
+  # this tree will be read in any case
+  I. Top node in first (or only) tree
+    A. first child of top node in first tree
+      1. first child of first child of top node in first tree
+    B. second child of top node in first tree
+
+  # the first tree has ended, because this next line has zero indentation
+  II. Top node in second tree, if in "mult" mode
+    A. first child of top node in second tree
+    B. second child of top node in second tree
+      1. first child of second child of top node in second tree
+      2. second child of second child of top node in second tree
+    C. third child of top node in second tree
+  --------------------------- snip, snip ---------------------------------
+
+demodata/testfile.tre  -- a second small example data file, which
+  demonstrates the include-file facility and commentary that can
+  appear following the included file's name.  Its content:
+
+  --------------------------- snip, snip ---------------------------------
+  line 01, level 0, yyyyy
+    line 02, level 1, yyyyy
+      line 03, level 2, yyyyy
+      line 04, level 2, yyyyy
+    line 05, level 1, yyyyy
+    line 06, level 1, yyyyy
+      include inclfile.tre all the rest of this line is commentary
+      line 13, level 2, yyyyy
+    line 14, level 1, yyyyy
+  --------------------------- snip, snip ---------------------------------
+
+demodata/inclfile.tre  -- the third file, which is included into
+  the one above.  Note that it contains a complete tree which is
+  at the top level (i.e. no indentation, to begin with) but, that
+  when it gets included in the file above, it will appear three
+  levels deep in that tree's structure.  Its content:
+
+  --------------------------- snip, snip ---------------------------------
+  line 07, level 2, locallevel 0, xxxxx
+    line 08, level 3, locallevel 1, xxxxx
+    line 09, level 3, locallevel 1, xxxxx
+      line 10, level 4, locallevel 2, xxxxx
+      line 11, level 4, locallevel 2, xxxxx
+    line 12, level 3, locallevel 1, xxxxx
+  --------------------------- snip, snip ---------------------------------
+
+pickhues.tre  -- a file specifying a GUI (graphical user interface)
+  from a color-picker program, implemented using the TreeFile module.
+  This file demonstrates a practical application of the module.
+
+demodata/ftp_cpan_org.tre and demodata/cpan_mjd.tre  -- another, even
+  bigger, file which shows use of this module for storing indexes of
+  disk files such as backups on offline media or contents of remote
+  ftp sites.  This one is a partial listing of a CPAN site, in unix's
+  long "ls -aF" format.  It also shows TreeFile's convention for
+  allowing long lines to be broken to accomodate narrower margins,
+  using ellipsis ("...") to mark continuation lines.  The second file
+  is included into the first using TreeFile's include-file facility.
+
+EXAMPLES
+
+  In addition to the test.pl code example and the six files of
+sample data in the demodata directory, the following example of
+a program which reads and prints a treefile, may be helpful:
+
+---------------------- file:  treetest ---------------------------
+#!/usr/bin/perl -w
+
+use strict;
+use Text::TreeFile;
+
+sub showlines;
+
+# set $filename string and $wantmult boolean
+my $filename=(defined $ARGV[1])?$ARGV[1]:'demodata/treetest.tre';
+my $wantmult=(defined $ARGV[0] and $ARGV[0] eq 'mult');
+print "want mult: ",$wantmult?'yes':'no',"\n";
+
+my $treeref;
+$treeref=Text::TreeFile->new($filename) if not $wantmult;
+$treeref=Text::TreeFile->new($filename,'mult') if $wantmult;
+die if not defined $treeref;
+
+my $topref=$treeref->{top};
+showlines($topref,0);
+
+sub showlines { my ($spec,$level)=@_;
+  if(ref($$spec[0]) eq 'ARRAY') {  # want-mult case
+    for my $item (@$spec) {
+      print('  'x$level);print("$$item[0]\n");
+      for(@{$$item[1]}) { showlines $_,$level+1; } } }
+  else {                           # no-want-mult case
+    print('  'x$level);print("$$spec[0]\n");
+    for(@{$$spec[1]}) { showlines $_,$level+1; } } }
+
+1;
+__END__
+------------------- end of file:  treetest -----------------------

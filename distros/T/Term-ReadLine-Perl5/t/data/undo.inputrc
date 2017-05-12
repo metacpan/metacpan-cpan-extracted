@@ -1,0 +1,11 @@
+# Part of test to read_an_init_file
+# We set a range of Undo's to make it clearer where this is going.
+
+"\C-a": Undo
+"\C-b": Undo
+"\C-c": Undo
+"\C-d": Undo
+"\C-e": Undo
+"\C-f": Undo
+"\C-g": Undo
+"\C-h": Undo

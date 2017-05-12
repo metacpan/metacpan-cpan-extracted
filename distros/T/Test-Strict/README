@@ -1,0 +1,11 @@
+This is the README file for Test::Strict, for
+testing strictness in a distribution, by Pierre Denis <pdenis@gmail.com>.
+
+* Installation
+
+Test::Strict uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make test
+make install

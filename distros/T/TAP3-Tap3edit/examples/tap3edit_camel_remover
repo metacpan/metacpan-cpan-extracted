@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+#
+# Copyright (c) 2004 Javier Gutierrez <jgutierrez@tap3edit.com>. 
+# All rights reserved. This program is free software; you can redistribute 
+# it and/or modify it under the same terms as Perl itself.
+# http://www.tap3edit.com
+#  
+# Deletes the Camel attachments of a TAP file.
+#  
+
+use TAP3::Tap3edit;
+
+$filename=shift;
+
+if ( ! $filename ) {
+	die "Usage: $0 tapname\n";
+}
+
+
+$tap3 = TAP3::Tap3edit->new();
+$tap3->decode($filename)  or  die $tap3->error;
+
+$struct=$tap3->structure;
+
+my $key;
+
+# Will scan all the calls for Camel attachments.
+foreach $key ( @{$struct->{'transferBatch'}->{'callEventDetails'} } ) {
+
+	foreach ( keys %{$key} ) {
+
+		if ( defined $key->{$_}->{'camelServiceUsed'} ) {
+			$key->{$_}->{'camelServiceUsed'} = ();
+		}
+
+	}
+}
+
+$tap3->encode($filename.".new")  or  die $tap3->error;

@@ -1,0 +1,140 @@
+= Ubuntu Installation Instructions =
+
+Apparently Ubuntu 11.04 also comes with [https://bugs.launchpad.net/ubuntu/+source/padre/+bug/761782 broken wxWidgets or broken Wx]. 
+[http://ubuntuforums.org/showthread.php?t=1745375 see here too]
+
+Please follow the instructions below to manually install (again) the wx related modules.
+Probably the best way is to use local::lib so your installation won't interfere with the system installation.
+
+=== If you have upgraded to **natty**(11.04) from mavrick(10.10), 
+* to install the wx library files you can
+{{{#!sh
+$sudo apt-get install libwxbase2.8-0 libwxgtk2.8-0 libwxbase2.8-dev libwxgtk2.8-dev libgtk2.0-dev
+}}}
+* Install {{{gtk2-engines-pixbuf}}} to get rid of the annoying warning on Ubuntu 11.10: {{{Gtk-WARNING **: Unable to locate theme engine in module_path: "pixmap"}}}
+  {{{
+sudo apt-get install gtk2-engines-pixbuf
+}}}
+* you can check the library files are installed with
+{{{#!sh
+$ dpkg -l |grep -i libwx |awk '{ print $2 }'
+libwxbase2.8-0
+libwxbase2.8-dev
+libwxgtk2.8-0
+libwxgtk2.8-dev
+
+$ dpkg -l |grep -i libgtk2.0-dev |awk '{ print $2 }'
+libgtk2.0-dev
+}}}
+* you will need to reinstall WX.
+{{{#!sh
+$sudo cpan
+....
+cpan[1]> force install Wx
+Going to read '/root/.cpan/Metadata'
+  Database was generated on Wed, 04 May 2011 04:32:25 GMT
+Running install for module 'Wx'
+Running make for M/MB/MBARBON/Wx-0.98.tar.gz
+Fetching with LWP:
+....
+
+}}}
+
+== Installation using the Package Manager ==
+Ubuntu 10.10 contains Padre 0.63, Ubuntu 10.04 contains Padre 0.50
+
+{{{
+sudo apt-get install padre
+}}}
+
+Because of a packaging error, [https://bugs.launchpad.net/ubuntu/+source/padre/+bug/485012 padre does not work out of the box on Ubuntu 10.10].
+One possible workaround is to install wx-perl from CPAN:
+{{{
+sudo cpan Alien::wxWidgets
+sudo cpan Wx
+}}}
+
+Use {{{apt-cache}}} to find out which plug-ins are available:
+{{{
+apt-cache -n search padre
+}}}
+
+On Ubuntu 10.04, you can install the following plug-ins:
+{{{
+sudo apt-get install libpadre-plugin-css-perl libpadre-plugin-html-perl libpadre-plugin-spellcheck-perl libpadre-plugin-xml-perl libpadre-plugin-autoformat-perl libpadre-plugin-vi-perl libpadre-plugin-nopaste-perl
+}}}
+
+
+== Installation from CPAN ==
+This was checked for Ubuntu 9.04 and 10.10 but it should work for later versions as well.
+
+ * Install required development packages 
+{{{
+sudo apt-get install libwxgtk2.8-0 libwxgtk2.8-dev libwxbase2.8-dev libwxbase2.8-0 libgtk2.0-dev g++
+}}}
+ * download and setup local::lib ( http://search.cpan.org/dist/local-lib/ )
+{{{
+# in your $HOME
+cd $HOME
+
+perl -v
+# This is perl, v5.10.1 (*) built for i686-linux-gnu-thread-multi
+# This is called system perl
+
+# Install local::lib into your $HOME
+wget http://search.cpan.org/CPAN/authors/id/G/GE/GETTY/local-lib-1.006007.tar.gz
+tar xfz local-lib-1.006007.tar.gz
+cd local-lib-1.006007/
+perl Makefile.PL --bootstrap
+make test && make install
+cd $HOME
+
+# Add local::lib to your .bashrc
+echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >>~/.bashrc
+
+# Optional step if you do not want to close your terminal
+eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
+
+# Optional: remove local::lib folder
+rm -rf local-lib-1.006007
+
+}}}
+ * configure the cpan client setting the prerequisite_policy to 'follow' and to add a CPAN server in the urllist:
+  * {{{cpan}}}
+  * {{{conf prerequisites_policy follow}}}
+  * {{{conf urllist http://cpan.yahoo.com/}}}
+  * {{{conf save}}}
+ * {{{cpan App::cpanminus}}}
+ * {{{cpanm Alien::wxWidgets}}}
+ * {{{cpanm Wx}}}
+ * {{{cpanm Padre}}}
+
+There are certain places where CPAN.pm is still asking for confirmation "is just needed temporarily during building or testing. Do you want to install it permanently (y/n) [yes]".
+
+This can be eliminated by setting build_requires_install_policy  to 'yes' in the CPAN client:
+ * {{{conf build_requires_install_policy  yes}}}
+ * {{{conf save}}}
+
+=== If you accidentally tried to install with wx-2.6 libs
+This can happen if you blindly try to install Padre using cpan without checking for library dependencies. In that case, the installation will die at some point during the Wx compilation phase. Alien::wxWidgets will think that you have v 2.6 (even after you install 2.8), so you must remove it before moving forward with the install. To check if Alien::wxWidgets is incorrect, run this at your command line:
+{{{#!sh
+perl -MAlien::wxWidgets -e 'print Alien::wxWidgets->version, "\n"'
+}}}
+If the output says 2.006### then Alien::wxWidgets needs to be fixed. If it says 2.008###, then this is not a problem.
+
+Before doing any of the following steps, ensure that you have the wx-2.8 dev libs installed via apt-get, as detailed above. The steps that I have tried to fix this problem, in increasing levels of severity, are as follows. After you try each one, you can test if Alien::wxWidgets is properly configured by running the one-liner shown above and checking that the output says 2.008###.
+
+* Force-install Alien::wxWidgets. (This didn't work for me for some reason.)
+* Install App::pmuninstall via CPAN and use it to remove Alien::wxWidgets. Then reinstall Alien::wxWidgets.
+* Remove the Alien::wxWidgets files by hand, then re-install Alien::wxWidgets from cpan. If you are using local::lib, you will find these in ~/perl5/lib/perl5/Alien and ~/perl5/lib/perl5/i686-linux-gnu-thread-multi/Alien. If you are installing these into your system perl, you will find these under similar folders at /usr/local/lib/perl5/..., I believe.
+
+
+
+== Still Not Working? ==
+Following the instructions on this page did not lead to a successful installation?
+
+[http://padre.perlide.org/contact.html Contact us].
+
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.

@@ -1,0 +1,29 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-C2FIT
+version:      0.08
+version_from: lib/Test/C2FIT.pm
+installdirs:  site
+requires:
+    Test::Unit:                    0.24
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30
+abstract: A direct Perl port of Ward Cunningham's FIT acceptance test framework for Java
+author: 
+  - Tony Byrne <fit4perl@byrnehq.com>
+no_index:
+  dir:
+    - t
+    - examples
+    - examples-perl
+    - spec
+    - html
+  file:
+    - perltidy_glob.BAT
+    - perltidy.conf
+meta-spec:
+  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+resources:
+  homepage: http://fit.c2.com 

@@ -1,0 +1,57 @@
+NAME
+    Test::XML::Order - Compare the order of XML tags in perl tests
+
+VERSION
+    Version 1.01
+
+SYNOPSIS
+      use Test::XML::Order tests => 3;
+      is_xml_in_order( '<foo /><foo />', '<foo></foo><foo x="a"/>' );   # PASS
+      is_xml_in_order( '<foo /><bar />', '<bar /><foo />' );       # FAIL
+      isnt_xml_in_order( '<foo /><bar />', '<bar /><foo />' );     # PASS
+
+DESCRIPTION
+    This module contains generic XML testing tools. See below for a list of
+    other modules with functions relating to specific XML modules.
+
+FUNCTIONS
+    is_xml_in_order ( GOT, EXPECTED [, TESTNAME ] )
+        This function compares GOT and EXPECTED, both of which are strings
+        of XML. The comparison works only on the order of the tags,
+        attributes are ignored.
+
+        Returns true or false, depending upon test success.
+
+    isnt_xml_in_order( GOT, MUST_NOT_BE [, TESTNAME ] )
+        This function is similar to is_xml_in_order(), except that it will
+        fail if GOT and MUST_NOT_BE have elements in the same order.
+
+NOTES
+    Please note the following about Test::XML::Order.
+
+    *   The package does not check that the input is well formed XML. You
+        should use "Test::XML" or a similar package if you want to make sure
+        the XML is well formed.
+
+    *   Only the order of tags are checked, so
+
+          is_xml_in_order('<a a="b"/>x<b></b>', '<a/><b a="c">asdf</b>');
+
+        passes as the inputs have the same order: '<a/><b/>'.
+
+    *   The tree structure is tested so the the test below passes.
+
+          isnt_xml_in_order('<a><b/></a>', '<a/><b/>');
+
+SEE ALSO
+    Test::More, Test::XML.
+
+AUTHOR
+    G. Allen Morris III, <gam3 (at) gam3.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 by G. Allen Morris III
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

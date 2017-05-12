@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Scalar::Transactional.
+
+0.01  Mon Dec 23 14:55:10 2002
+	- original version; created by h2xs 1.21 with options
+		-AXn Tie::Scalar::Transactional
+

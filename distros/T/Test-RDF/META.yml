@@ -1,0 +1,43 @@
+---
+abstract: 'Test RDF data for validity and equality.'
+author:
+  - 'Kjetil Kjernsmo <kjetilk@cpan.org>'
+build_requires:
+  Test::Tester: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142060'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-RDF
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Test::RDF:
+    file: lib/Test/RDF.pm
+    version: '1.20'
+requires:
+  RDF::Trine: '0.134'
+  Scalar::Util: '1.24'
+  Test::Builder::Module: '0'
+  Test::More: '0'
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  Identifier: http://purl.org/NET/cpan-uri/dist/Test-RDF/project
+  bugtracker: https://github.com/kjetilk/Test-RDF/issues
+  homepage: https://metacpan.org/module/Test::RDF
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/kjetilk/Test-RDF/
+version: '1.20'
+x_contributors:
+  - 'Toby Inkster'

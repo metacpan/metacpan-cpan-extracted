@@ -1,0 +1,80 @@
+---
+abstract: 'Smile Precure!'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  App::Prove: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Pretty
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Prove::Plugin::Pretty:
+    file: lib/App/Prove/Plugin/Pretty.pm
+  App::Prove::Plugin::retty:
+    file: lib/App/Prove/Plugin/retty.pm
+  TAP::Formatter::Pretty::Multi:
+    file: lib/TAP/Formatter/Pretty/Multi.pm
+  TAP::Formatter::Pretty::Multi::Session:
+    file: lib/TAP/Formatter/Pretty/Multi/Session.pm
+  TAP::Formatter::Pretty::Single:
+    file: lib/TAP/Formatter/Pretty/Single.pm
+  TAP::Formatter::Pretty::Single::Session:
+    file: lib/TAP/Formatter/Pretty/Single/Session.pm
+  Test::Pretty:
+    file: lib/Test/Pretty.pm
+    version: '0.32'
+  Test::Pretty::Harness:
+    file: lib/Test/Pretty/Harness.pm
+  Test::Pretty::Parser:
+    file: lib/Test/Pretty/Parser.pm
+requires:
+  Carp: '0'
+  File::Temp: '0'
+  Scope::Guard: '0'
+  TAP::Formatter::Base: '0'
+  TAP::Formatter::Session: '0'
+  TAP::Harness: '0'
+  TAP::Parser: '0'
+  Term::ANSIColor: '3.02'
+  Term::Encoding: '0'
+  Test::Builder: '0.82'
+  Test::More: '0.98'
+  autodie: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Test-Pretty/issues
+  homepage: https://github.com/tokuhirom/Test-Pretty
+  repository: git://github.com/tokuhirom/Test-Pretty.git
+version: '0.32'
+x_contributors:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>'
+  - 'Andreas Marienborg <andreas.marienborg@gmail.com>'
+  - 'Zakariyya Mughal <zaki.mughal@gmail.com>'
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Valcho Nedelchev <vulcho@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'Zoffix Znet <cpan@zoffix.com>'
+  - 'Sean Zellmer <sean@lejeunerenard.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

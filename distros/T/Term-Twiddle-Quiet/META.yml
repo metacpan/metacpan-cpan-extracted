@@ -1,0 +1,31 @@
+---
+abstract: 'Twiddles a thingy while-u-wait if run interactively'
+author:
+  - 'Jerome Quelin'
+build_requires:
+  Module::Build: 0.35
+configure_requires:
+  Module::Build: 0.35
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-Twiddle-Quiet
+provides:
+  Term::Twiddle::Quiet:
+    file: lib/Term/Twiddle/Quiet.pm
+    version: 1.100110
+requires:
+  English: 0
+  File::Find: 0
+  IO::Interactive: 0
+  Module::Build: 0
+  Term::Twiddle: 0
+  Test::MockObject: 0
+  Test::More: 0
+  perl: 5.008
+resources:
+  homepage: http://search.cpan.org/dist/Term-Twiddle-Quiet
+  repository: http://github.com/jquelin/term-twiddle-quiet
+version: 1.100110

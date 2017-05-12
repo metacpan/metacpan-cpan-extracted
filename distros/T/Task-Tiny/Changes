@@ -1,0 +1,14 @@
+Task-Tiny
+=========
+
+Created:      2013-09-08
+Home page:    <https://metacpan.org/release/Task-Tiny>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Task-Tiny>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2013-11-12
+
+ [ Documentation ]
+ - Document which modules are included.
+
+0.001	2013-10-20	Initial release

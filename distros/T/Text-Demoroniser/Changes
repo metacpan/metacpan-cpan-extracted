@@ -1,0 +1,34 @@
+Changes log for Text-Demoroniser
+================================
+
+0.07    2015-01-20
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+        - added cpanminus to INSTALL instructions.
+
+0.06    2013-02-03
+        - change file dates changed to meet W3CDTF standards.
+        - updated test suite.
+
+0.05    2012-04-22
+        - META tests no longer require specific versions.
+        - further spelling fix. (thanks to Florian Schlichting).
+
+0.04    2012-04-16
+        - added use warnings.
+        - spelling fix. (thanks to Florian Schlichting & Gregor Herrmann).
+        - added minimum perl version (5.006).
+
+0.03    2012-04-15
+        - License updated to Artistic License v2.0.
+        - removed Artistic file.
+        - added META.json and test script.
+        - added simple example script.
+        - remove DSLIP info, as its no longer used.
+
+0.02    2010-03-02
+        - implemented a better regex lookup (patched thanks to Yanick Champoux)
+
+0.01    2009-08-11
+        - Initial release.
+        - originally inspired by the demoroniser script

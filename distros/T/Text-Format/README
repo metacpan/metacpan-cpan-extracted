@@ -1,0 +1,31 @@
+Text::Format
+
+format()        Format text into a paragraph.  Text is first broken into
+                words and then joined back together to make up the
+                paragraph.  There are numerous attributes you can set to
+                your liking.
+
+paragraphs()    Treats each element of the array passed in as a separate
+                paragraph and passes them to format() for formatting.
+                The list returned will be then formatted into separate
+                paragraphs.
+
+center()        Centers all the lines that were passed in.
+
+expand()        Expand tabs into spaces.
+
+unexpand()      Turn spaces into tabs.  First calls expand() to expand
+                tabs into spaces and then turns tabstop number of spaces
+                into tabs, you can set tabstop size with tabstop().
+
+To install :
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+Copyright (c) 1998 Gabor Egressy <gabor@vmunix.com>.
+All rights reserved.  All wrongs reversed.  This program is free
+software; you can redistribute and/or modify it under the same terms as
+Perl itself.

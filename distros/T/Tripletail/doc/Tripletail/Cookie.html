@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::Cookie - 独自のクッキー管理を行う</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::Cookie - 独自のクッキー管理を行う
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::Cookie - 独自のクッキー管理を行う
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  my $cookie = $TL-&gt;getCookie;
+
+  my $form = $cookie-&gt;get('Cookie1');
+  my $val = $form-&gt;get('key1');
+
+  $form-&gt;set(key2 =&gt; 100);
+  $cookie-&gt;set('Cookie1' =&gt; $form);</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail/Form.html">Tripletail::Form</a> クラスのインスタンスをクッキーに保存し、
+また、クッキーから <a href=".././Tripletail/Form.html">Tripletail::Form</a> を取り出す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">クッキー有効期限、ドメイン、パス等は、 <a href=".././Tripletail/Ini.html">ini</a> ファイルで指定する。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->getCookie"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;getCookie</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $cookie = $TL-&gt;getCookie($inigroup)
+  $cookie = $TL-&gt;getCookie('Cookie')</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::Cookie オブジェクトを取得。
+引数には Ini で設定したグループ名を渡す。
+引数省略時は 'Cookie' グループが使用される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="get"><span class="pod_lang"><code class="pod_iseq_C">get</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $Form_obj = $cookie-&gt;get($cookiename)</code></pre>
+
+<p>
+<span class="pod_lang">指定された名前のクッキーの内容を <a href=".././Tripletail/Form.html">Tripletail::Form</a> のインスタンスに変換し、返す。
+返された <a href=".././Tripletail/Form.html">Tripletail::Form</a> インスタンスへの変更はクッキーへ反映されない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="set"><span class="pod_lang"><code class="pod_iseq_C">set</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $cookie-&gt;set($cookiename =&gt; $Form_obj)</code></pre>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail/Form.html">Tripletail::Form</a> クラスのインスタンスの内容を、指定された名前のクッキーとしてセットする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="delete"><span class="pod_lang"><code class="pod_iseq_C">delete</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $cookie-&gt;delete($cookiename)</code></pre>
+
+<p>
+<span class="pod_lang">クッキーを消去する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="clear"><span class="pod_lang"><code class="pod_iseq_C">clear</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $cookie-&gt;clear</code></pre>
+
+<p>
+<span class="pod_lang">全てのクッキーを削除する。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<h2><a id="Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">
+<span class="pod_lang">Ini パラメータ
+
+</span></a></h2>
+
+<dl>
+<dt><a id="format"><span class="pod_lang">format
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  format = modern</code></pre>
+
+<p>
+<span class="pod_lang">生成されるクッキーの形式を指定する。<code class="pod_iseq_C">legacy</code> と <code class="pod_iseq_C">modern</code> から選択可能であり、後述の
+<code class="pod_iseq_C">cryptokey</code> が存在すればデフォルトが <code class="pod_iseq_C">modern</code> に、存在すれば <code class="pod_iseq_C">legacy</code> になる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">modern</code> は AES によるクッキーの暗号化や ZLIB
+による圧縮、Adler-32 チェックサムによる誤り検出にも対応した非常にコンパクトな形式であるが、この形式で生成されたクッキーは
+<a href=".././Tripletail.html">Tripletail</a> のバージョン 0.50 以降でなければ読み取る事ができない。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">なお <code class="pod_iseq_C">modern</code> に設定されている場合であっても、<code class="pod_iseq_C">legacy</code> 形式（すなわちバージョン 0.49 以前の形式）のクッキーは読み取り可能である。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="cryptokey"><span class="pod_lang">cryptokey
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  cryptokey = Lorem ipsum dolor sit amet, consectetur adipisicing elit</code></pre>
+
+<p>
+<span class="pod_lang">クッキーの暗号化に使用する鍵であり、省略可能。これを指定した場合には
+<a href="#format">&quot;format&quot;</a> を <code class="pod_iseq_C">modern</code> とするか、もしくは省略しなければならない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="path"><span class="pod_lang">path
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  path = /cgi-bin</code></pre>
+
+<p>
+<span class="pod_lang">クッキーのパス。省略可能。デフォルトは省略した場合と同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="domain"><span class="pod_lang">domain
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  domain = example.org</code></pre>
+
+<p>
+<span class="pod_lang">クッキーのドメイン。省略可能。デフォルトは省略した場合と同様。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="expires"><span class="pod_lang">expires
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  expires = 30 days</code></pre>
+
+<p>
+<span class="pod_lang">クッキー有効期限。 <a href=".././Tripletail.html#Xe5XbaXa6Xe9X87X8fXe8Xa1Xa1">度量衡</a> 参照。省略可能。
+省略時はブラウザが閉じられるまでとなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="secure"><span class="pod_lang">secure
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  secure = 1</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">secure</code>フラグの有無。省略可能。
+1の場合、<code class="pod_iseq_C">secure</code>フラグを付ける。
+0の場合、<code class="pod_iseq_C">secure</code>フラグを付けない。
+デフォルトは0。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="httponly"><span class="pod_lang">httponly
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  httponly = 1</code></pre>
+
+<p>
+<span class="pod_lang"><code class="pod_iseq_C">httponly</code>フラグの有無。省略可能。
+1の場合、<code class="pod_iseq_C">httponly</code>フラグを付ける。
+0の場合、<code class="pod_iseq_C">httponly</code>フラグを付けない。
+デフォルトは0。
+現状では IE でしか意味が無い。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::RawCookie">Tripletail::RawCookie</a>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang"><a href=".././Tripletail/Form.html">Tripletail::Form</a> でなく生の文字列を扱うクッキークラス。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X__01"><span class="pod_lang"><a href=".././Tripletail/Form.html">Tripletail::Form</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::Cookie - 独自のクッキー管理を行う
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->getCookie">$TL-&gt;getCookie</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#Ini_Xe3X83X91Xe3X83Xa9Xe3X83Xa1Xe3X83XbcXe3X82Xbf">Ini パラメータ</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#X_">Tripletail</a></li>
+<li><a href="#X__01">Tripletail::Form</a></li>
+<li><a href="#X__00">Tripletail::RawCookie</a></li>
+<li><a href="#clear">clear</a></li>
+<li><a href="#cryptokey">cryptokey</a></li>
+<li><a href="#delete">delete</a></li>
+<li><a href="#domain">domain</a></li>
+<li><a href="#expires">expires</a></li>
+<li><a href="#format">format</a></li>
+<li><a href="#get">get</a></li>
+<li><a href="#httponly">httponly</a></li>
+<li><a href="#path">path</a></li>
+<li><a href="#secure">secure</a></li>
+<li><a href="#set">set</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::Cookie - 独自のクッキー管理を行う
+
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+DEPENDENCIES
+    Running this module requires these other modules and libraries:
+
+        strict
+        Exporter
+        constant
+        warnings
+        TeX::DVI::Parse
+
+    In addition, building and testing this module requires the following:
+
+        strict
+        Exporter
+        warnings
+        Test::More
+        Text::Diff
+        ExtUtils::MakeMaker
+
+INSTALLATION
+    To install TeX::XDV::Parse type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 by Rick Myers
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.16.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

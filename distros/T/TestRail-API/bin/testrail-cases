@@ -1,0 +1,211 @@
+#!/usr/bin/env perl
+# ABSTRACT: get information about cases inside various testsuites/sections.
+# PODNAME: TestRail::Bin::Cases
+
+package TestRail::Bin::Cases;
+$TestRail::Bin::Cases::VERSION = '0.039';
+use strict;
+use warnings;
+use utf8;
+
+use TestRail::API;
+use TestRail::Utils;
+use TestRail::Utils::Find;
+
+use Getopt::Long qw{GetOptionsFromArray};
+use File::HomeDir qw{my_home};
+
+if ( !caller() ) {
+    my ( $out, $code ) = run( 'args' => \@ARGV );
+    print $out;
+    exit $code;
+}
+
+sub run {
+    my %params = @_;
+    my $opts   = {};
+
+    #Parse config file if we are missing api url/key or user
+    my $homedir = my_home() || '.';
+    if ( -e $homedir . '/.testrailrc' ) {
+        $opts = TestRail::Utils::parseConfig($homedir);
+    }
+
+    GetOptionsFromArray(
+        $params{'args'},
+        'apiurl=s'      => \$opts->{'apiurl'},
+        'password=s'    => \$opts->{'password'},
+        'user=s'        => \$opts->{'user'},
+        'j|project=s'   => \$opts->{'project'},
+        't|testsuite=s' => \$opts->{'testsuite'},
+        'd|directory=s' => \$opts->{'directory'},
+        'm|missing'     => \$opts->{'missing'},
+        'o|orphans'     => \$opts->{'orphans'},
+        'n|no-recurse'  => \$opts->{'no-recurse'},
+        'e|encoding=s'  => \$opts->{'encoding'},
+        'section=s'     => \$opts->{'section'},
+        'type=s@'       => \$opts->{'types'},
+        'extension=s'   => \$opts->{'extension'},
+        'h|help'        => \$opts->{'help'},
+        'test'          => \$opts->{'test'},
+    );
+
+    if ( $opts->{help} ) { return ( '', TestRail::Utils::help() ); }
+
+    $opts->{'browser'} = $params{'browser'};
+
+    #Mutual exclusivity
+    $opts->{'no-missing'} = !$opts->{'missing'};
+    $opts->{'update'} = !( $opts->{'orphans'} || $opts->{'missing'} );
+    die("orphans and mising options are mutually exclusive.")
+      if $opts->{'orphans'} && $opts->{'missing'};
+    delete $opts->{'missing'};
+
+    TestRail::Utils::interrogateUser( $opts,
+        qw{apiurl user password project testsuite directory} );
+
+    my $tr = TestRail::Utils::getHandle($opts);
+
+    my $cases = TestRail::Utils::Find::getCases( $opts, $tr );
+    die "No cases in TestRail!\n" unless $cases;
+
+    my $tests = TestRail::Utils::Find::findCases( $opts, @$cases );
+
+    my ( @update, @add, @orphan );
+    @update = map { $_->{'title'} } @{ $tests->{'update'} }
+      if ref $tests->{'update'} eq 'ARRAY';
+    @add = map { $_->{'title'} } @{ $tests->{'orphans'} }
+      if ref $tests->{'orphans'} eq 'ARRAY';
+    @orphan = @{ $tests->{'missing'} } if ref $tests->{'missing'} eq 'ARRAY';
+
+    my $out = '';
+    $out .= join( "\n", @update );
+    $out .= join( "\n", @add );
+    $out .= join( "\n", @orphan );
+    $out .= "\n";
+
+    return ( $out, 0 );
+}
+
+1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+TestRail::Bin::Cases - get information about cases inside various testsuites/sections.
+
+=head1 VERSION
+
+version 0.039
+
+=head1 SYNOPSIS
+
+  testrail-cases [OPTIONS]
+
+  require `which testrail-cases`;
+  TestRail::Bin::Cases::run('args' => @args);
+
+=head1 DESCRIPTION
+
+testrail-cases - get information about cases inside various testsuites/sections.
+
+By default will tell you which cases are in both the testsuite and directory passed.
+
+Can be used as the modulino TestRail::Bin::Cases.
+Has a single 'run' function which accepts a hash with the 'args' parameter being the array of arguments.
+
+=head1 PARAMETERS:
+
+=head2 MANDATORY PARAMETERS
+
+=over 4
+
+--apiurl     : full URL to get to TestRail index document
+
+--password   : Your TestRail Password, or a valid API key (TestRail 4.2 and above).
+
+--user       : Your TestRail User Name.
+
+-j --project : desired project name.
+
+-t --testsuite  : desired testsuite name to search for cases within.  May be passed multiple times.
+
+-d --directory : directory to search for tests to correlate with TestRail cases.  May be passed multiple times.
+
+=back
+
+All mandatory options not passed with the above switches, or in your ~/.testrailrc will be prompted for.
+
+=head2 SEMI-OPTIONAL PARAMETERS
+
+=over 4
+
+-m --missing : Only show cases which are in the directory passed, but not TestRail.  Mutually exclusive with orphans.
+
+-o --orphans : Only show cases which are in TestRail, but not the directory passed.  Mutually exclusive with missing.
+
+-n --no-recurse : do not recurse subdirectories when considering what tests need adding/updating/pruning.
+
+-e --encoding   : Character encoding of arguments.  Defaults to UTF-8. See L<Encode::Supported> for supported encodings.
+
+=back
+
+=head2 OPTIONAL PARAMETERS
+
+=over 4
+
+--type      : Filter cases to make syncing judgements against type(s).  May be passed multiple times.
+
+--section   : Filter cases to make syncing judgements against a specific section.
+
+--extension : only list files ending in the provided string (e.g. .pl, .pm, .t, .test)
+
+=back
+
+=head1 CONFIGURATION FILE
+
+In your \$HOME, (or the current directory, if your system has no concept of a home directory) put a file called .testrailrc with key=value syntax separated by newlines.
+Valid Keys are the same as documented by L<App::Prove::Plugin::TestRail>.
+All options specified thereby are overridden by passing the command-line switches above.
+
+=head1 MISCELLANEOUS OPTIONS:
+
+=over 4
+
+--help : show this output
+
+--test : print which tests would be added/updated/removed, but don't actually do anything
+
+=back
+
+=head1 SPECIAL THANKS
+
+Thanks to cPanel Inc, for graciously funding the creation of this distribution.
+
+=head1 AUTHOR
+
+George S. Baugh <teodesian@cpan.org>
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by George S. Baugh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+L<TestRail::API>
+
+L<File::HomeDir> for the finding of .testrailrc
+

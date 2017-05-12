@@ -1,0 +1,28 @@
+---
+name: Text-Truncate
+version: 1.06
+author:
+  - 'Robert Rothenberg <rrwo at cpan.org>'
+abstract: Perl module with simple string truncating routine
+license: unrestricted
+build_requires:
+  Test::More: 0
+requires:
+  Carp: 0
+  perl: 5.004
+recommends:
+  Test::Pod: 1
+  Test::Pod::Coverage: 0
+  Test::Prereq: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Text::Truncate:
+    file: lib/Text/Truncate.pm
+    version: 1.06
+generated_by: Module::Build version 0.35
+resources:
+  repository: git://github.com/ileiva/Text-Truncate.git
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

@@ -1,0 +1,14 @@
+Revision history for Perl library Time::Piece::Range
+
+1.2   Tue Sep  6 18:41:35 UTC 2005
+	- Add docs for gap() and abuts()
+
+1.1   Wed Oct 27 2004
+	- add email address for bug reports
+
+1.0   Wed Nov 19 2003
+	- bring tests up to date with new Date::Range tests for abuttal etc.
+
+0.9   Tue Feb 25 2003
+	- initial version
+

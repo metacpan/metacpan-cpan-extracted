@@ -1,0 +1,21 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Text/Query.pm
+lib/Text/Query/Advanced.pm
+lib/Text/Query/Build.pm
+lib/Text/Query/BuildAdvancedString.pm
+lib/Text/Query/BuildSimpleString.pm
+lib/Text/Query/Optimize.pm
+lib/Text/Query/Parse.pm
+lib/Text/Query/ParseAdvanced.pm
+lib/Text/Query/ParseSimple.pm
+lib/Text/Query/Simple.pm
+lib/Text/Query/Solve.pm
+lib/Text/Query/SolveAdvancedString.pm
+lib/Text/Query/SolveSimpleString.pm
+t/01default.t
+t/02string.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

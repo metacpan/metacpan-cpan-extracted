@@ -1,0 +1,39 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="0"
+             tests="5"
+             name="data_tap_simple_yaml">
+    <testcase name="1"></testcase>
+    <testcase name="2"></testcase>
+    <testcase name="3"></testcase>
+    <testcase name="4"></testcase>
+    <testcase name="5"></testcase>
+    <system-out><![CDATA[TAP version 13
+1..5
+ok 1
+ok 2
+  ---
+  -
+    fnurk: skib
+    ponk: gleeb
+  -
+    bar: krup
+    foo: plink
+  ...
+ok 3
+ok 4
+  ---
+  expected:
+    - 1
+    - 2
+    - 4
+  got:
+    - 1
+    - pong
+    - 4
+  ...
+ok 5
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

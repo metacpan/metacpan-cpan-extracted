@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Tie-Array-Pointer
+version: 0.000059
+author:
+  - John BEPPU E<lt>beppu@cpan.orgE<gt>
+abstract: ties a perl array to a C pointer
+license: perl
+requires:
+  DynaLoader: 0
+  Tie::Array: 0
+build_requires:
+  Test::More: 0
+provides:
+  Tie::Array::Pointer:
+    file: lib/Tie/Array/Pointer.pm
+    version: 0.000059
+generated_by: Module::Build version 0.26

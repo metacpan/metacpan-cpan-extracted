@@ -1,0 +1,48 @@
+---
+abstract: 'Aggregate C<*.t> tests to make them run faster.'
+author:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+build_requires:
+  Test::Most: '0.21'
+  Test::Simple: '0.94'
+  Test::Trap: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Aggregate
+provides:
+  Test::Aggregate:
+    file: lib/Test/Aggregate.pm
+    version: '0.375'
+  Test::Aggregate::Base:
+    file: lib/Test/Aggregate/Base.pm
+    version: '0.375'
+  Test::Aggregate::Builder:
+    file: lib/Test/Aggregate/Builder.pm
+    version: '0.375'
+  Test::Aggregate::Nested:
+    file: lib/Test/Aggregate/Nested.pm
+    version: '0.375'
+recommends:
+  Data::Dump::Streamer: '1.11'
+  Perl::Tidy: '20060614'
+  Test::More: '0.94'
+requires:
+  FindBin: '1.47'
+  Test::Harness: '3.09'
+  Test::NoWarnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rwstauner/test-aggregate
+version: '0.375'
+x_contributors:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+  - 'Florian Ragwitz <flora@cpan.org>'
+  - 'Shlomi Fish <shlomif@cpan.org>'
+  - 'Randy Stauner <rwstauner@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

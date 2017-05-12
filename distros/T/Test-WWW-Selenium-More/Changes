@@ -1,0 +1,14 @@
+0.12 Thu May 17 13:17:29 BST 2012
+    * Fixed bad package name in TWSM::Manual::WritingTests
+
+0.11 Wed May 16 21:17:34 BST 2012
+    * Fixed links in TWSM::Manual
+    * POD updates and corrections.
+
+0.10 Tue May  1 19:44:04 BST 2012
+    * Fixed package name for TWSM::Manual
+    * POD updates and corrections.
+
+0.09 Sun Apr 29 13:08:23 BST 2012
+    * Slightly better POD
+    * Slightly more informative errors for download_ok()

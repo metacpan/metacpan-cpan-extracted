@@ -1,0 +1,53 @@
+---
+abstract: 'Specifications for installing all the Test::Run'
+author:
+  - 'Shlomi Fish <shlomif@shlomifish.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - back-end
+  - harness
+  - prove
+  - qa
+  - QA
+  - 'quality assurance'
+  - run
+  - runprove
+  - tap
+  - TAP
+  - TAP::Harness
+  - test
+  - testing
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Test-Run-AllPlugins
+provides:
+  Task::Test::Run::AllPlugins:
+    file: lib/Task/Test/Run/AllPlugins.pm
+    version: '0.0105'
+requires:
+  Test::Run::CmdLine: '0'
+  Test::Run::CmdLine::Plugin::AlternateInterpreters: '0'
+  Test::Run::CmdLine::Plugin::BreakOnFailure: '0'
+  Test::Run::CmdLine::Plugin::ColorFileVerdicts: '0'
+  Test::Run::CmdLine::Plugin::ColorSummary: '0'
+  Test::Run::CmdLine::Plugin::TrimDisplayedFilenames: '0'
+  Test::Run::Core: '0'
+  Test::Run::Plugin::AlternateInterpreters: '0'
+  Test::Run::Plugin::BreakOnFailure: '0'
+  Test::Run::Plugin::ColorFileVerdicts: '0'
+  Test::Run::Plugin::ColorSummary: '0'
+  Test::Run::Plugin::TrimDisplayedFilenames: '0'
+  perl: '5.008'
+resources:
+  homepage: http://web-cpan.shlomifish.org/modules/Test-Run/
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/shlomif/perl-test-run
+version: '0.0105'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

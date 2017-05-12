@@ -1,0 +1,190 @@
+=pod
+
+=head1 NAME
+
+Text::Yats - Yet Another Templete System
+
+=head1 SYNOPSIS
+
+  use Text::Yats;
+
+  my $template = <<ENDHTML;
+<html>
+<head>
+<title>\$title - \$version</title>
+</head>
+<body>
+<form>
+<select name="names"><!--{1}-->
+<option \$selected>\$list</option>
+<!--{2}--></select>
+</form>
+</body>
+</html>
+ENDHTML
+
+  my $result = "";
+  my $tpl = Text::Yats->new(
+                level => 1,
+                text  => $template);
+
+  $result .= $tpl->section->[0]->replace(
+                title      => "Yats",
+                version    => "Development", );
+
+  $result .= $tpl->section->[1]->replace(
+                list       => ['hdias','anita','cubitos'],
+                selected   => { value => "selected",
+                                array => "list",
+                                match => "anita", } );
+
+  $result .= $tpl->section->[2]->text;
+  print $result;
+
+-- Result --
+
+<html>
+<head>
+<title>Yats - Development</title>
+</head>
+<body>
+<form>
+<select name="names">
+<option>hdias</option>
+<option selected>anita</option>
+<option>cubitos</option>
+</select>
+</form>
+</body>
+
+=head1 DESCRIPTION
+
+This is yet another module for template-based text generation. You can
+store a template in a file outside your program. People can modify the
+template without modifying the program.
+
+=head1 CONSTRUCTORS
+
+  use Text::Yats;
+
+  my $tpl = Text::Yats->new(
+                level => 1,
+                file  => "templates/test.txt");
+
+=head1 METHODS
+
+=head2 new()
+
+This method create a new Template object. You must call new() with at
+least one key => value pair.
+
+=over 3
+
+=item file
+
+This is the name of the template to be loaded. It can be an absolute or
+relative pathname.
+
+=item text
+
+This creates a template from in-memory text data
+
+=item level
+
+If the block "<--{x}-->" is found, the template have one or more
+sections. "x" is a number or numbers and points.
+
+B<level 0> (only text no sections, default option)
+
+text1
+
+$tpl->text();
+    this return text1
+
+B<level 1> (text with separator of level 1)
+
+text1<!--{1}-->text2<!--{2}-->text3
+
+$tpl->section->[0]->text();
+    this return text1
+
+$tpl->section->[1]->text();
+    this return text2
+
+$tpl->section->[2]->text();
+    this return text3
+
+B<level 2> (text with separator of level 2)
+
+text1<!--{1}-->text2<!--{1.1}-->text3<!--{2}-->text4
+
+$tpl->section->[0]->text();
+    this return text1
+
+$tpl->section->[1]->section->[0]->text();
+    this return text2
+
+$tpl->section->[1]->section->[1]->text();
+    this return text3
+
+$tpl->section->[2]->text();
+    this return text4
+
+B<level n> (n is a number)
+
+=back
+
+=head2 section()
+
+The section is a array ref that contains all the parts of the
+templates and sub templates (template->section->[n]).
+
+=head2 replace()
+
+This method substitutes all the variables which are defined in the
+template ($var) with producing output. You can provide substitution
+parameters in three forms (you can mix them if you want):
+
+=over 3
+
+=item array reference
+
+var_a => ["a","b","c","d","e"],
+
+=item scalar value
+
+var_b => "e",
+
+=item hash reference
+
+var_c => { value => "selected",
+           array => "var_a",
+           match => "c", }
+
+Replace var_c with "selected" when it finds "c"
+
+var_c => { value => "selected",
+           array => "var_a",
+           match => ["b","d"], }
+
+Replace var_c with "selected" when it finds "b" or "d"
+
+=back
+
+=head2 text()
+
+This method return only the text, not replace anything.
+
+=head1 AUTHOR
+
+Henrique Dias <hdias@esb.ucp.pt>
+
+=head1 VERSION
+
+version 0.03
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

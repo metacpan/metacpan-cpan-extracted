@@ -1,0 +1,147 @@
+Tk::TextHighlight module changes log
+
+04 august 2007
+	Initial release - adding following new features to Tk::CodeText
+	(no longer maintained, afaik):
+	
+	1)  Tk::Text::SuperText - like bracket highlighting / matching with vi-like 
+	jump-to-matching bracket (Ctrl-p).
+
+	2)  Added feature to auto-change rules-colors for rules whose color is the same as 
+	the background color of the widget (to avoid invisible text).  The color is set to 
+	either black or white depending on the brightness of the background color.
+
+	3)  Fixed TextUndo-related bug to allow user to see text as he types past right-edge 
+	of screen.
+
+	4)  Added "setRule()" method to allow altering of individual rules by the programmer.
+
+	5)  Modified right-click menu to allow saving of modified rules.
+
+	6)  Added new options:  -noRulesMenu (dont show rules-menu in right-click menu), 
+	-noSyntaxMenu, -noRulesEditMenu, -noSaveRulesMenu to prevent the corresponding items 
+	from appearing in the right-click menu.  -noPlugInit - disables new feature #8 and 
+	behaves as original CodeText.
+
+	7) Fixed small bug w/auto-indenting.
+
+	8) Fixed small bug w/rules-initialization when no .rules file present.
+
+Tk::CodeText module changes log
+
+27 march 2004
+	removed -headerbackground bug from RulesEditor
+	renamed test.pl to demo.pl so testing without a connection to an
+	X-server will not fail.
+
+17 march 2004
+	Update to version 0.3.2
+	Added a decent test suite.
+	Added support for bash.
+	Modified Tk::CodeText::Template.pm to support a more structured approach
+	for writing plugins. Things are backwards compatible. Plugins that inherit
+	Tk::CodeText::Template also don't need to specify a 'syntax' method any more.
+	Rewrote the rules editor, put it in a separate module.
+	Numerous small changes and additions
+	
+22 April 2003
+	Update to version 0.3.1
+	Added slant option to rules editor.
+	Corrected couple of mistakes in the documentation.
+
+17 April 2003
+	Update to version 0.3.0
+	Modified clipboard handling.
+	Added support for Pod and Xresources files
+	Modified plugin protocol
+	Modified highlighting algorithm
+	Added '-updatecall' option.
+	Fixed bug in rules editor.
+	
+03 March 2003
+	Update to version 0.2.0.
+	Updated documentation.
+	Renamed a number of methods so they make sense.
+	Added test.pl.
+	Improved Makefile.PL.
+	Fixed bug in selectionModify.
+	-rules option now also available at create time.
+	Added support for HTML.
+	Created rules editor and provided methods for storing and retrieving rules.
+	Added Syntax option to the View-menu.
+	Switching syntax on the fly now possible.
+	Scanning now also checked with highlighting.
+	-matchoptions can now also be specified as space separated string.
+		Now you can also specify it in your Xresources file.
+
+09 February 2003
+	Update to version 0.1.2
+	Fixed yview bug.
+	Removed unneccessary keybinding <KeyRelease>
+	Added capabilities for matching curlies/braces/brackets
+
+07 February 2003
+	Update to version 0.1.1
+	Fixed bug that made highlighting fail in overstrike mode.
+	Improved documentation.
+
+02 February 2003
+	First alpha version 0.1
+
+30 August 2007
+	Initial v 1.0.0 release as "TextHighlight" by Jim Turner, now supporting 
+	the Syntax::Highlight::Engine::Kate highlighting engine as well as the 
+	current legacy CodeText highlighters.  Numerous other enhancements and 
+	fixes have been made - see the README file for details.
+
+02 September 2007
+	Update to version 1.0.1
+	1)  Fixed optional addition of Kate languages to the Syntax.View menus 
+	to replace the "Kate" entry rather than just appending them to the end.
+	2)  Fixed bug that caused infinite recursion when trying to start up 
+	with the "None" highlight option.  See TextHighlight.pm and 
+	ROTextHighlight.pm (line 244).
+
+05 September 2007
+	Update to version 1.0.2
+	1)  Fix all internal packages to be under Tk::TextHighlight::*" to 
+	fix "Unauthorized" Package namespace trespassing in CPAN.
+	2)  Improve POD documentation.
+
+December 2007
+	Update to version 1.0.3
+	Now will do highlighting somewhat in background freeing up most mouse 
+	and keyboard actions while highlighting.  Also eliminated some redundant 
+	re-highlighting.
+
+06 February 2008
+	Update to version 1.0.4
+	Added binding to <Tab> to cause tab key to insert whatever string 
+	"-indentchar" is set to (default is "\t").  Previously always 
+	inserted "\t".
+
+28 October 2008
+	Update to version 1.0.5
+	Added configure() function to first check for background changes and 
+	change black, white, and matching rule colors to white or black to 
+	prevent color contrast from making text illegable.
+
+19 January 2016
+	Update to version 1.1.0
+	1) Fixed test failure when Syntax::Highlight::Perl was not installed  
+	even when Syntax::Highlight::Perl::Improved was.  This module can use 
+	either.  However, the TEST now requires that 
+	Syntax::Highlight::Perl::Improved be installed as a prerequisite, since, 
+	as of this writing, Syntax::Highlight::Perl is failing to build.
+	2) Removed "Kate" from the [View].[Syntax] menu choices when 
+	Syntax::Highlight::Engine::Kate is not installed.  This should prevent 
+	some test failures and user program errors.  NOTE:  Kate is NOT 
+	required to use this module, but provides highlighting for many more 
+	languages.  Without Kate, this modules provides full highlighting for 
+	Perl, Bash, Pod, and Xresources files.
+	3) Other than that, just a few minor optimizations and cleanups.
+19 January 2016
+	Update to version 1.1.1
+	Re-fix all internal packages to be under Tk::TextHighlight::*" to 
+	fix "Unauthorized" Package namespace trespassing in CPAN.  Not sure 
+	WHY this got undone somewhere.

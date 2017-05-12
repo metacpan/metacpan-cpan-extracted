@@ -1,0 +1,37 @@
+USAGE
+
+For module usage instructions, please see the POD documentation in the
+file.
+
+ $ perldoc lib/Text/TEI/Markup.pm
+
+
+PREREQUISITES
+
+Text::TEI::Markup requires:
+
+* perl >= 5.8.3
+* XML::LibXML
+
+
+INSTALL
+
+From the command shell, run:
+
+ $ perl -MCPAN -e "install Text::TEI::Markup"
+
+or uncompress the package and run the standard sequence:
+
+ $ perl Makefile.PL && make && make test && make install
+
+
+LICENSE
+
+This package is free software and is provided "as is" without express
+or implied warranty.  You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+
+AUTHOR
+
+Tara L Andrews, L<aurum@cpan.org>

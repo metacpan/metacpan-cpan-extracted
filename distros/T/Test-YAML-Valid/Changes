@@ -1,0 +1,16 @@
+Revision history for Test-YAML-Valid
+
+0.04	9 January 2010
+        Add support for YAML::<Anything>, including ::Tiny and ::XS
+
+0.03	31 January 2007
+	Add Win32 support
+	Fix tests (different messages with different Test::Builder versions)
+
+0.02    30 January 2007
+        Add support for YAML::Syck
+	Add &yaml_files_ok()
+
+0.01    29 January 2007
+        First version, released on an unsuspecting world.
+

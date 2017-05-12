@@ -1,0 +1,14 @@
+MANIFEST
+Changes.txt
+TODO.txt
+Makefile.PL
+lib/Tk/StyledButton.pm
+lib/Tk/StyledButton.pod
+demo/btnstudio.pl
+demo/onebtn.pl
+demo/dialog.pl
+t/01loadbtn.t
+t/02empty.t
+t/03textonly.t
+t/04imageonly.t
+t/05imagetext.t

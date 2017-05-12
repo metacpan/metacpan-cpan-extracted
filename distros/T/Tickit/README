@@ -1,0 +1,188 @@
+NAME
+
+    Tickit - Terminal Interface Construction KIT
+
+SYNOPSIS
+
+     use Tickit;
+     use Tickit::Widget::Box;
+     use Tickit::Widget::Static;
+    
+     my $box = Tickit::Widget::Box->new(
+        h_border => 4,
+        v_border => 2,
+        bg       => "green",
+        child    => Tickit::Widget::Static->new(
+           text     => "Hello, world!",
+           bg       => "black",
+           align    => "centre",
+           valign   => "middle",
+        ),
+     );
+    
+     Tickit->new( root => $box )->run;
+
+DESCRIPTION
+
+    Tickit is a high-level toolkit for creating full-screen terminal-based
+    interactive programs. It allows programs to be written in an abstracted
+    way, working with a tree of widget objects, to represent the layout of
+    the interface and implement its behaviours.
+
+    Its supported terminal features includes a rich set of rendering
+    attributes (bold, underline, italic, 256-colours, etc), support for
+    mouse including wheel and position events above the 224th column and
+    arbitrary modified key input via libtermkey (all of these will require
+    a supporting terminal as well). It also supports having multiple
+    instances and non-blocking or asynchronous control.
+
+    At the current version, this is a Perl distribution which contains and
+    XS and C implementation of the lower levels (Tickit::Term and
+    Tickit::Pen), and implements the higher levels (Tickit::Window and
+    Tickit::Widget) in pure perl. The XS parts are supported by libtickit,
+    either from the installed library, or using a bundled copy compiled at
+    build time. It is intended that eventually the Window layer will be
+    rewritten in XS and C instead.
+
+CONSTRUCTOR
+
+ new
+
+       $tickit = Tickit->new( %args )
+
+    Constructs a new Tickit framework container object.
+
+    Takes the following named arguments at construction time:
+
+    term_in => IO
+
+      IO handle for terminal input. Will default to STDIN.
+
+    term_out => IO
+
+      IO handle for terminal output. Will default to STDOUT.
+
+    UTF8 => BOOL
+
+      If defined, overrides locale detection to enable or disable UTF-8
+      mode. If not defined then this will be detected from the locale by
+      using Perl's ${^UTF8LOCALE} variable.
+
+    root => Tickit::Widget
+
+      If defined, sets the root widget using set_root_widget to the one
+      specified.
+
+    use_altscreen => BOOL
+
+      If defined but false, disables the use of altscreen, even if
+      supported by the terminal. This will mean that the screen contents
+      are stll available after the program has finished.
+
+METHODS
+
+ later
+
+       $tickit->later( $code )
+
+    Runs the given CODE reference at some time soon in the future. It will
+    not be invoked yet, but will be invoked at some point before the next
+    round of input events are processed.
+
+ timer
+
+     $tickit->timer( at => $epoch, $code )
+    
+     $tickit->timer( after => $delay, $code )
+
+    Runs the given CODE reference at some fixed point in time in the
+    future. The first argmuent must be either the string at, or after; and
+    specifies that second argument gives either the absolute epoch time
+    ($epoch), or the delay relative to now ($delay), respectively.
+    Fractions are supported to a resolution of microseconds.
+
+ term
+
+       $term = $tickit->term
+
+    Returns the underlying Tickit::Term object.
+
+ cols
+
+ lines
+
+       $cols = $tickit->cols
+    
+       $lines = $tickit->lines
+
+    Query the current size of the terminal. Will be cached and updated on
+    receipt of SIGWINCH signals.
+
+ bind_key
+
+       $tickit->bind_key( $key, $code )
+
+    Installs a callback to invoke if the given key is pressed, overwriting
+    any previous callback for the same key. The code block is invoked as
+
+     $code->( $tickit, $key )
+
+    If $code is missing or undef, any existing callback is removed.
+
+    As a convenience for the common application use case, the Ctrl-C key is
+    bound to the stop method.
+
+    To remove this binding, simply bind another callback, or remove the
+    binding entirely by setting undef.
+
+ rootwin
+
+       $tickit->rootwin
+
+    Returns the root Tickit::Window.
+
+ set_root_widget
+
+       $tickit->set_root_widget( $widget )
+
+    Sets the root widget for the application's display. This must be a
+    subclass of Tickit::Widget.
+
+ setup_term
+
+       $tickit->setup_term
+
+    Set up the screen and generally prepare to start running
+
+ teardown_term
+
+       $tickit->teardown_term
+
+    Shut down the screen after running
+
+ tick
+
+       $tickit->tick
+
+    Run a single round of IO events. Does not call setup_term or
+    teardown_term.
+
+ run
+
+       $tickit->run
+
+    Calls the setup_term method, then processes IO events until stopped, by
+    the stop method, SIGINT, SIGTERM or the Ctrl-C key. Then runs the
+    teardown_term method, and returns.
+
+ stop
+
+       $tickit->stop
+
+    Causes a currently-running run method to stop processing events and
+    return.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

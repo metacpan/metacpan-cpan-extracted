@@ -1,0 +1,21 @@
+NAME
+    Task::App::Physics::ParticleMotion - All modules required for the tk-motion application
+
+SYNOPSIS
+    "perl -MCPAN -e 'install Task::App::Physics::ParticleMotion'"
+
+DESCRIPTION
+
+This installs all modules required for the operation of the
+tk-motion.pl executable which is provided by the App::Physics::ParticleMotion
+package.
+
+Please have a look at the POD documentation for a list of included modules.
+
+AUTHOR
+    Steffen Mueller, <modules at steffen-mueller dot net>
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

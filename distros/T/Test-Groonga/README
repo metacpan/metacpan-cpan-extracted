@@ -1,0 +1,31 @@
+NAME
+
+    Test::Groonga - Test::Groonga provides you temporary groonga server. 
+
+SYNOPSIS
+
+    use Test::Groonga;
+
+    {
+        my $server = Test::Groonga->create(protocol=>'http');
+        # testing
+    }
+
+    {
+        my $server = Test::Groonga->create(protocol=>'gqtp');
+        # testing
+    }
+
+    {
+        my $server = Test::Groonga->create(protocol=>'http', preload => 'foo.grn');
+        # testing
+    }
+
+AUTHOR
+
+    Okamura <okamuuu at gmail dot com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

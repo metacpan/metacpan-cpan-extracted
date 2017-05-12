@@ -1,0 +1,205 @@
+{
+   "objects" : [
+      {
+         "type" : "vcard",
+         "properties" : {
+            "n" : [
+               {
+                  "name" : "n",
+                  "values" : [
+                     "Bloggs",
+                     "Joe",
+                     "",
+                     "Mr"
+                  ]
+               }
+            ],
+            "org" : [
+               {
+                  "name" : "org",
+                  "values" : [
+                     "Company",
+                     "Department"
+                  ]
+               }
+            ],
+            "nickname" : [
+               {
+                  "value" : "me",
+                  "name" : "nickname"
+               }
+            ],
+            "version" : [
+               {
+                  "value" : "3.0",
+                  "name" : "version"
+               }
+            ],
+            "bday" : [
+               {
+                  "value" : "1912-10-15",
+                  "name" : "bday"
+               }
+            ],
+            "note" : [
+               {
+                  "value" : "This is a fully filled out\ncontact with everything\nexcept custom fields\n~!@#$%^&*()_+`1234567890-=\n[]\\\\{}|\\;':\",./<>?\n",
+                  "name" : "note"
+               }
+            ],
+            "email" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "INTERNET",
+                        "HOME",
+                        "PREF"
+                     ]
+                  },
+                  "value" : "joebloggs@example.com",
+                  "name" : "email"
+               },
+               {
+                  "params" : {
+                     "x-menote" : [
+                        "Arbitrary \"note\" added\nto an email address"
+                     ],
+                     "type" : [
+                        "INTERNET",
+                        "WORK"
+                     ]
+                  },
+                  "value" : "joebloggs2@example.com",
+                  "name" : "email"
+               },
+               {
+                  "params" : {
+                     "type" : [
+                        "INTERNET"
+                     ]
+                  },
+                  "value" : "joeblogss3@example.com",
+                  "name" : "email"
+               }
+            ],
+            "tel" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "HOME",
+                        "PREF"
+                     ]
+                  },
+                  "value" : "5551234",
+                  "name" : "tel"
+               },
+               {
+                  "params" : {
+                     "type" : [
+                        "WORK",
+                        "PREF"
+                     ]
+                  },
+                  "value" : "5552345",
+                  "name" : "tel"
+               },
+               {
+                  "params" : {
+                     "type" : [
+                        "CELL",
+                        "PREF"
+                     ]
+                  },
+                  "value" : "5553456",
+                  "name" : "tel"
+               },
+               {
+                  "params" : {
+                     "type" : [
+                        "FAX",
+                        "PREF"
+                     ]
+                  },
+                  "value" : "5554567",
+                  "name" : "tel"
+               }
+            ],
+            "url" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "HOME"
+                     ]
+                  },
+                  "value" : "http://personalsite.example.com",
+                  "name" : "url"
+               },
+               {
+                  "value" : "http://www.example.com",
+                  "name" : "url"
+               }
+            ],
+            "adr" : [
+               {
+                  "params" : {
+                     "label" : [
+                        "1 Nowhere Road\nSydney, 2000\nNSW, AUSTRALIA"
+                     ],
+                     "type" : [
+                        "HOME"
+                     ]
+                  },
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "1 Nowhere Road",
+                     "Sydney",
+                     "NSW",
+                     "2000",
+                     "Australia"
+                  ]
+               },
+               {
+                  "params" : {
+                     "label" : [
+                        "\"1 Work St\"\nMelbourne, 3000\nVic, AUSTRALIA"
+                     ],
+                     "type" : [
+                        "WORK"
+                     ]
+                  },
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "1 Work St",
+                     "Melbourne",
+                     "Vic",
+                     "3000",
+                     "Australia"
+                  ]
+               }
+            ],
+            "title" : [
+               {
+                  "value" : "Position",
+                  "name" : "title"
+               }
+            ],
+            "role" : [
+               {
+                  "value" : "Position",
+                  "name" : "role"
+               }
+            ],
+            "fn" : [
+               {
+                  "value" : "Joe Bloggs",
+                  "name" : "fn"
+               }
+            ]
+         }
+      }
+   ]
+}

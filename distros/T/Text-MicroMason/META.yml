@@ -1,0 +1,27 @@
+---
+abstract: 'Simple and Extensible Templating'
+author:
+  - 'Alan Ferrency <ferrency@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-MicroMason
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::MixinFactory: '0.9'
+  Cwd: '2.21'
+  File::Spec: '0.9'
+  Safe: '0'
+  Test::More: '0.48'
+  perl: '5.006'
+version: '2.21'

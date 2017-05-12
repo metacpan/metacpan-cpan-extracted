@@ -1,0 +1,43 @@
+#!/usr/local/bin/perl5
+# Date de création : Sat Oct  3 11:51:12 1998
+# par : Olivier Bouteille (oli@localhost.oleane.com)
+
+$if = shift;
+$if =~ s/\.tex$//g;
+$hsize = shift || 100;
+
+$of = "$if.gif";
+
+$cmd = "latex $if"; system($cmd);
+$cmd = "dvips $if.dvi -D 600 -E -o $if.eps";
+system $cmd;
+
+open(IN,"$if.eps") or die;
+
+my ($x1,$y1,$x2,$y2);
+while(<IN>) {
+  /\%\%BoundingBox: (\d+) (\d+) (\d+) (\d+)/ and do {
+    ($x1,$y1,$x2,$y2) = ($1,$2,$3,$4);
+    $h = $y2-$y1;
+    $w = $x2-$x1;
+    print "h=$h w=$w\n";
+    last;
+  }
+}
+close (IN);
+$H = $hsize || 100 ;
+$W = int($w/$h*$H);
+$scale = 72*$H/$h;
+$cmd =  "gs -sDEVICE=ppm -sOutputFile='| ppmtogif -transparent white > $of' -g${W}x$H -r$scalex$scale -q - $if.eps";
+print "cmd=$cmd\n";
+open(OUT,"| $cmd") or die;
+
+print OUT "$x1 neg $y1 neg translate\n";
+
+close OUT;
+
+
+
+# Local Variables: ***
+# mode: perl ***
+# End: ***

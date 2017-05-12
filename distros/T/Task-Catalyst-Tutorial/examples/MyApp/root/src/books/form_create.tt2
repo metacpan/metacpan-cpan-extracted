@@ -1,0 +1,10 @@
+[% META title = 'Manual Form Book Create' -%]
+
+<form method="post" action="[% Catalyst.uri_for('form_create_do') %]">
+<table>
+  <tr><td>Title:</td><td><input type="text" name="title"></td></tr>
+  <tr><td>Rating:</td><td><input type="text" name="rating"></td></tr>
+  <tr><td>Author ID:</td><td><input type="text" name="author_id"></td></tr>
+</table>
+<input type="submit" name="Submit" value="Submit">
+</form>

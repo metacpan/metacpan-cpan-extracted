@@ -1,0 +1,459 @@
+? sum_(i=1)^ni^3=((n(n+1))/2)^2
+<math title="sum_(i=1)^ni^3=((n(n+1))/2)^2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <munderover>
+        <mo>&sum;</mo>
+        <mrow>
+          <mi>i</mi>
+          <mo>=</mo>
+          <mn>1</mn>
+        </mrow>
+        <mi>n</mi>
+      </munderover>
+    </mrow>
+    <msup>
+      <mi>i</mi>
+      <mn>3</mn>
+    </msup>
+    <mo>=</mo>
+    <msup>
+      <mrow>
+        <mo>(</mo>
+        <mfrac>
+          <mrow>
+            <mi>n</mi>
+            <mrow>
+              <mo>(</mo>
+              <mi>n</mi>
+              <mo>+</mo>
+              <mn>1</mn>
+              <mo>)</mo>
+            </mrow>
+          </mrow>
+          <mn>2</mn>
+        </mfrac>
+        <mo>)</mo>
+      </mrow>
+      <mn>2</mn>
+    </msup>
+  </mstyle>
+</math>
+$$\sum_{i = 1}^n i^3 = \left( \frac{n ( n + 1 )}{2} \right)^2$$
+
+? int_-1^1 sqrt(1-x^2)dx = pi/2
+<math title="int_-1^1 sqrt(1-x^2)dx = pi/2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <msubsup>
+        <mo>&int;</mo>
+        <mrow>
+          <mo>-</mo>
+          <mn>1</mn>
+        </mrow>
+        <mn>1</mn>
+      </msubsup>
+    </mrow>
+    <msqrt>
+      <mrow>
+        <mn>1</mn>
+        <mo>-</mo>
+        <msup>
+          <mi>x</mi>
+          <mn>2</mn>
+        </msup>
+      </mrow>
+    </msqrt>
+    <mrow>
+      <mi>d</mi>
+      <mi>x</mi>
+    </mrow>
+    <mo>=</mo>
+    <mfrac>
+      <mi>&pi;</mi>
+      <mn>2</mn>
+    </mfrac>
+  </mstyle>
+</math>
+$$\int_{- 1}^1 \sqrt{1 - x^2} d x = \frac{\pi}{2}$$
+
+? x^2+b/ax+c/a=0
+<math title="x^2+b/ax+c/a=0">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <mfrac>
+      <mi>b</mi>
+      <mi>a</mi>
+    </mfrac>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mfrac>
+      <mi>c</mi>
+      <mi>a</mi>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0</mn>
+  </mstyle>
+</math>
+$$x^2 + \frac{b}{a} x + \frac{c}{a} = 0$$
+
+? x^2+b/ax+(b/(2a))^2-(b/(2a))^2+c/a=0
+<math title="x^2+b/ax+(b/(2a))^2-(b/(2a))^2+c/a=0">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <mfrac>
+      <mi>b</mi>
+      <mi>a</mi>
+    </mfrac>
+    <mi>x</mi>
+    <mo>+</mo>
+    <msup>
+      <mrow>
+        <mo>(</mo>
+        <mfrac>
+          <mi>b</mi>
+          <mrow>
+            <mn>2</mn>
+            <mi>a</mi>
+          </mrow>
+        </mfrac>
+        <mo>)</mo>
+      </mrow>
+      <mn>2</mn>
+    </msup>
+    <mo>-</mo>
+    <msup>
+      <mrow>
+        <mo>(</mo>
+        <mfrac>
+          <mi>b</mi>
+          <mrow>
+            <mn>2</mn>
+            <mi>a</mi>
+          </mrow>
+        </mfrac>
+        <mo>)</mo>
+      </mrow>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <mfrac>
+      <mi>c</mi>
+      <mi>a</mi>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0</mn>
+  </mstyle>
+</math>
+$$x^2 + \frac{b}{a} x + \left( \frac{b}{2 a} \right)^2 - \left( \frac{b}{2 a} \right)^2 + \frac{c}{a} = 0$$
+
+? (x+b/(2a))^2=(b^2)/(4a^2)-c/a
+<math title="(x+b/(2a))^2=(b^2)/(4a^2)-c/a">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>+</mo>
+        <mfrac>
+          <mi>b</mi>
+          <mrow>
+            <mn>2</mn>
+            <mi>a</mi>
+          </mrow>
+        </mfrac>
+        <mo>)</mo>
+      </mrow>
+      <mn>2</mn>
+    </msup>
+    <mo>=</mo>
+    <mfrac>
+      <mrow>
+        <msup>
+          <mi>b</mi>
+          <mn>2</mn>
+        </msup>
+      </mrow>
+      <mrow>
+        <mn>4</mn>
+        <msup>
+          <mi>a</mi>
+          <mn>2</mn>
+        </msup>
+      </mrow>
+    </mfrac>
+    <mo>-</mo>
+    <mfrac>
+      <mi>c</mi>
+      <mi>a</mi>
+    </mfrac>
+  </mstyle>
+</math>
+$$\left( x + \frac{b}{2 a} \right)^2 = \frac{b^2}{4 a^2} - \frac{c}{a}$$
+
+? x+b/(2a)=+-sqrt((b^2)/(4a^2)-c/a)
+<math title="x+b/(2a)=+-sqrt((b^2)/(4a^2)-c/a)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>x</mi>
+    <mo>+</mo>
+    <mfrac>
+      <mi>b</mi>
+      <mrow>
+        <mn>2</mn>
+        <mi>a</mi>
+      </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mo>&plusmn;</mo>
+    <msqrt>
+      <mrow>
+        <mfrac>
+          <mrow>
+            <msup>
+              <mi>b</mi>
+              <mn>2</mn>
+            </msup>
+          </mrow>
+          <mrow>
+            <mn>4</mn>
+            <msup>
+              <mi>a</mi>
+              <mn>2</mn>
+            </msup>
+          </mrow>
+        </mfrac>
+        <mo>-</mo>
+        <mfrac>
+          <mi>c</mi>
+          <mi>a</mi>
+        </mfrac>
+      </mrow>
+    </msqrt>
+  </mstyle>
+</math>
+$$x + \frac{b}{2 a} = \pm \sqrt{\frac{b^2}{4 a^2} - \frac{c}{a}}$$
+
+? b/(2a)
+<math title="b/(2a)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mi>b</mi>
+      <mrow>
+        <mn>2</mn>
+        <mi>a</mi>
+      </mrow>
+    </mfrac>
+  </mstyle>
+</math>
+$$\frac{b}{2 a}$$
+
+? x_(1,2)=(-b+-sqrt(b^2 - 4ac))/(2a)
+<math title="x_(1,2)=(-b+-sqrt(b^2 - 4ac))/(2a)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msub>
+      <mi>x</mi>
+      <mrow>
+        <mn>1</mn>
+        <mo>,</mo>
+        <mn>2</mn>
+      </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+      <mrow>
+        <mo>-</mo>
+        <mi>b</mi>
+        <mo>&plusmn;</mo>
+        <msqrt>
+          <mrow>
+            <msup>
+              <mi>b</mi>
+              <mn>2</mn>
+            </msup>
+            <mo>-</mo>
+            <mn>4</mn>
+            <mi>a</mi>
+            <mi>c</mi>
+          </mrow>
+        </msqrt>
+      </mrow>
+      <mrow>
+        <mn>2</mn>
+        <mi>a</mi>
+      </mrow>
+    </mfrac>
+  </mstyle>
+</math>
+$$x_{1 , 2} = \frac{- b \pm \sqrt{b^2 - 4 a c}}{2 a}$$
+
+? f(x)=sum_(n=0)^oo(f^((n))(a))/(n!)(x-a)^n
+<math title="f(x)=sum_(n=0)^oo(f^((n))(a))/(n!)(x-a)^n">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mi>f</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <munderover>
+        <mo>&sum;</mo>
+        <mrow>
+          <mi>n</mi>
+          <mo>=</mo>
+          <mn>0</mn>
+        </mrow>
+        <mo>&infin;</mo>
+      </munderover>
+    </mrow>
+    <mfrac>
+      <mrow>
+        <msup>
+          <mi>f</mi>
+          <mrow>
+            <mrow>
+              <mo>(</mo>
+              <mi>n</mi>
+              <mo>)</mo>
+            </mrow>
+          </mrow>
+        </msup>
+        <mrow>
+          <mo>(</mo>
+          <mi>a</mi>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+      <mrow>
+        <mi>n</mi>
+        <mo>!</mo>
+      </mrow>
+    </mfrac>
+    <msup>
+      <mrow>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>-</mo>
+        <mi>a</mi>
+        <mo>)</mo>
+      </mrow>
+      <mi>n</mi>
+    </msup>
+  </mstyle>
+</math>
+$$f ( x ) = \sum_{n = 0}^{\infty} \frac{f^{( n )} ( a )}{n !} ( x - a )^n$$
+
+? (a/b)/(c/d)
+<math title="(a/b)/(c/d)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mrow>
+        <mfrac>
+          <mi>a</mi>
+          <mi>b</mi>
+        </mfrac>
+      </mrow>
+      <mrow>
+        <mfrac>
+          <mi>c</mi>
+          <mi>d</mi>
+        </mfrac>
+      </mrow>
+    </mfrac>
+  </mstyle>
+</math>
+$$\frac{\frac{a}{b}}{\frac{c}{d}}$$
+
+? a/b/c/d
+<math title="a/b/c/d">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mi>a</mi>
+      <mi>b</mi>
+    </mfrac>
+    <mo>/</mo>
+    <mfrac>
+      <mi>c</mi>
+      <mi>d</mi>
+    </mfrac>
+  </mstyle>
+</math>
+$$\frac{a}{b} / \frac{c}{d}$$
+
+? ((a*b))/c
+<math title="((a*b))/c">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mrow>
+        <mrow>
+          <mo>(</mo>
+          <mi>a</mi>
+          <mo>&sdot;</mo>
+          <mi>b</mi>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+      <mi>c</mi>
+    </mfrac>
+  </mstyle>
+</math>
+$$\frac{( a \cdot b )}{c}$$
+
+? sum_(i=1)^n i=(n(n+1))/2
+<math title="sum_(i=1)^n i=(n(n+1))/2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <munderover>
+        <mo>&sum;</mo>
+        <mrow>
+          <mi>i</mi>
+          <mo>=</mo>
+          <mn>1</mn>
+        </mrow>
+        <mi>n</mi>
+      </munderover>
+    </mrow>
+    <mi>i</mi>
+    <mo>=</mo>
+    <mfrac>
+      <mrow>
+        <mi>n</mi>
+        <mrow>
+          <mo>(</mo>
+          <mi>n</mi>
+          <mo>+</mo>
+          <mn>1</mn>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+      <mn>2</mn>
+    </mfrac>
+  </mstyle>
+</math>
+$$\sum_{i = 1}^n i = \frac{n ( n + 1 )}{2}$$
+
+? (x+1)/y
+<math title="(x+1)/y">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mfrac>
+      <mrow>
+        <mi>x</mi>
+        <mo>+</mo>
+        <mn>1</mn>
+      </mrow>
+      <mi>y</mi>
+    </mfrac>
+  </mstyle>
+</math>
+$$\frac{x + 1}{y}$$

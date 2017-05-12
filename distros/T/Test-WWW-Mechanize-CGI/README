@@ -1,0 +1,42 @@
+NAME
+    Test::WWW::Mechanize::CGI - Test CGI applications with
+    Test::WWW::Mechanize
+
+SYNOPSIS
+        use Test::More tests => 3;
+
+        use CGI;
+        use Test::WWW::Mechanize::CGI;
+
+        my $mech = Test::WWW::Mechanize::CGI->new;
+        $mech->cgi( sub {
+
+            my $q = CGI->new;
+
+            print $q->header,
+                  $q->start_html('Hello World'),
+                  $q->h1('Hello World'),
+                  $q->end_html;
+        });
+
+        $mech->get_ok('http://localhost/');
+        $mech->title_is('Hello World');
+        $mech->content_contains('Hello World');
+
+DESCRIPTION
+    Provides a convenient way of testing CGI applications without a external
+    daemon.
+
+SEE ALSO
+    WWW::Mechanize::CGI
+    WWW::Mechanize
+    LWP::UserAgent
+    HTTP::Request::AsCGI
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com"
+
+LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

@@ -1,0 +1,76 @@
+{
+   "abstract" : "Check syntax, presence of use strict; and test coverage",
+   "author" : [
+      "Pierre Denis <pdenis@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Strict",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Cover" : "0.43",
+            "File::Find" : "0.01",
+            "File::Spec" : "0.01",
+            "File::Temp" : "0.01",
+            "FindBin" : "0.01",
+            "Test::Builder" : "0.01",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0.01",
+            "IO::Scalar" : "0",
+            "Test::More" : "1.00"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Strict" : {
+         "file" : "lib/Test/Strict.pm",
+         "version" : "0.39"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/manwar/Test-Strict"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/manwar/Test-Strict.git",
+         "web" : "http://github.com/manwar/Test-Strict",
+         "x_license" : "http://dev.perl.org/licenses/"
+      }
+   },
+   "version" : "0.39",
+   "x_contributors" : [
+      "Gabor Szabo <szabgab@cpan.org>",
+      "Peter Vereshagin <veresc@cpan.org>",
+      "Graham Knop <haarg@cpan.org>",
+      "Mohammad S Anwar <manwar@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

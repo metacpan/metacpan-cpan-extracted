@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2012 by C & P Bibliography Services
+#
+# Template::Plugin::MARC is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.  
+
+=head1 NAME
+
+batch-marc-tt - script to process a MARC file with Template::Toolkit
+
+=head1 SYNOPSIS
+
+batch-marc-tt -i records.mrc -t template.tt -o output.html
+
+=head1 DESCRIPTION
+
+This script will run a MARC file through MARC::Batch and pass the results
+to a Template::Toolkit template for processing, presumably with
+Template::Plugin::MARC. The MARC::Record objects are passed in in a T::T
+variable named "marcrecords".
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--input, -i>
+
+The MARC file(s) to process.
+
+=item B<--output, -o>
+
+The file to write the output to. If no output file is specified, the
+results will be written to STDOUT.
+
+=item B<--template, -t>
+
+The template to use for processing the records. If no template is
+specified, a default template that pretty-prints the MARC.
+
+=item B<--verbose, -v>
+
+Report the progress of the script.
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Prints the manual page and exit.
+
+=item B<--xml, -x>
+
+Load the input as MARCXML.
+
+=item B<--format>
+
+Specifies which MARC format MARCXML should be interpreted as
+(USMARC/MARC21, UNIMARC, or UNIMARCAUTH).
+
+=back
+
+=head1 SEE ALSO
+
+Template::Plugin::MARC
+
+=head1 AUTHOR
+
+Jared Camins-Esakov, C & P Bibliography Services <jcamins@cpbibliography.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by C & P Bibliography Services
+
+Template::Plugin::MARC is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.  
+
+=cut
+
+use strict;
+use warnings;
+use utf8;
+use Getopt::Long;
+use Template;
+use MARC::Batch;
+use MARC::File::XML;
+use Pod::Usage;
+
+binmode (STDOUT, ":encoding(UTF-8)");
+
+my (@inputfile, $outputfile, $templatefile);
+my ($verbose, $help, $man);
+my ($xml, $format);
+
+my $opts = GetOptions(
+    'i|input=s'      => \@inputfile,
+    'o|output=s'     => \$outputfile,
+    't|template=s'   => \$templatefile,
+    'v|verbose'      => \$verbose,
+    'h|help|?'       => \$help,
+    'man'            => \$man,
+    'x|xml'          => \$xml,
+    'format=s'       => \$format,
+) or pod2usage(2);
+pod2usage(1) if ($help || ! @inputfile);
+pod2usage( -verbose => 2 ) if $man;;
+
+my $template = Template->new(
+    {   EVAL_PERL    => 1,
+        ABSOLUTE     => 1,
+        ENCODING => 'utf8',
+        FILTERS => {},
+    }
+) or die Template->error();
+
+if ($xml) {
+    $format = uc($format);
+    $format = 'USMARC' unless ($format =~ m/(MARC21|USMARC|UNIMARC|UNIMARCAUTH)/);
+    MARC::File::XML->default_record_format($format);
+    $format = 'XML';
+} else {
+    $format = 'USMARC';
+}
+my $batch = MARC::Batch->new( $format, @inputfile );
+my @records;
+
+while (my $record = $batch->next) {
+    push @records, $record;
+}
+
+my %vars;
+$vars{'marcrecords'} = \@records;
+
+my $output;
+$template->process((defined $templatefile && -f $templatefile ? $templatefile : *::DATA), \%vars, \$output, { binmode => ':encoding(UTF-8)' }) 
+      || die "Template process failed: ", $template->error();
+
+my $outputfh;
+if ($outputfile && open($outputfh, '>:encoding(UTF-8)', $outputfile)) {
+    select $outputfh;
+}
+print $output;
+close($outputfh) if $outputfh;
+
+__DATA__
+[% FOREACH mymarc IN marcrecords %]
+
+Record [% loop.index() %]
+    [%- USE record = MARC(mymarc) %]
+    [%- FOREACH field IN record.fields %]
+        [% field.tag %]
+        [%- FOREACH subf IN field.subfields %]
+            [%- %]$[% subf.code %][% subf.value %]
+        [%- END %]
+    [%- END %]
+[%- END %]

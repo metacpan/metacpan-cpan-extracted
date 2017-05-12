@@ -1,0 +1,6 @@
+[% # $Id: text,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+<a href="[% link.url %]"
+[%- " class=\"$link.class\""
+        IF link.class
+-%]
+>[%- link.text -%]</a>

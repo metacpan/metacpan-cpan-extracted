@@ -1,0 +1,62 @@
+{
+   "abstract" : "Enable template toolkit to use Amazon's S3 service as a provier of templates.",
+   "author" : [
+      "Gautam Dey <gdey@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Provider-Amazon-S3",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0.50",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "JSON" : "0",
+            "List::MoreUtils" : "0",
+            "Net::Amazon::S3::Client" : "0",
+            "Template::Provider" : "0",
+            "Try::Tiny" : "0",
+            "base" : "0",
+            "feature" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::SHA1" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Template-Provider-Amazon-S3@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Template-Provider-Amazon-S3"
+      },
+      "homepage" : "https://github.com/gdey/Template-Provider-Amazon-S3-/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gdey/template-provider-amazon-s3.git",
+         "web" : "https://github.com/gdey/template-provider-amazon-s3"
+      }
+   },
+   "version" : "0.009"
+}
+

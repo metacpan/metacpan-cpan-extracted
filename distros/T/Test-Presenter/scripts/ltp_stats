@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use File::Basename;
+use File::Copy;
+use File::Find;
+use File::Path;
+use File::Spec::Functions;
+use LWP::Simple;
+
+use vars qw($VERSION);
+$VERSION = '1.00';
+
+#------------------------------------------------------------------------
+# Cmdline options
+#------------------------------------------------------------------------
+our $opt_version      = 0;
+our $opt_help         = 0;
+our $opt_man          = 0;
+our $opt_debug        = 1;
+
+sub main {
+    my $content = get("http://www.osdl.org/lab_activities/kernel_testing/stp/display_test_requests?step=100&d_status%3Astring%3Aignore_empty=Complete&d_distro_tag%3Astring%3Aignore_empty=&d_patch_name%3Astring%3Aignore_empty=&d_patch_id%3Astring%3Aignore_empty=&d_test%3Astring%3Aignore_empty=LTP&d_host%3Astring%3Aignore_empty=&d_project%3Astring%3Aignore_empty=&d_username%3Astring%3Aignore_empty=&op=Search");
+
+    die "Couldn't get LTP Results page!\n" 
+        unless defined $content;
+
+    my $Results;
+    foreach my $line (split "<tr", $content) {
+        next unless $line =~ m|http://khack\.osdl\.org/stp/(\d+)|;
+
+        my $id = $1;
+        $Results->{$id} = ltp_page_to_data($id);
+    }
+    print report_ltp_results($Results);
+
+    graph_ltp_results($Results, "ltp_results.svg");
+    return 0;
+}
+
+# This routine takes an LTP result ID number, downloads the page,
+# parses it, and returns the numerical results data for it.
+sub ltp_page_to_data {
+    my $id = shift || return undef;
+
+    my $results = {
+        test_request_uid => $id,
+    };
+
+    my $content = get("http://khack.osdl.org/stp/$id/");
+    
+    die "Couldn't get LTP Results page!\n" 
+        unless defined $content;
+
+    ($results->{patch}, $results->{patch_id}, $results->{host})
+        = ($content =~ m|Request ID\:\s*\d+\s*ran on\s*(.*?)\s*\[PLM\: (\d+)\] On Node\: ([\w\-]+)</h2>|);
+    ($results->{distro})   
+        =  ($content =~ m|Distro: (.*?)</h3>|);
+    ($results->{kernel_append})
+        = ($content =~ m|Kernel append: (.*?)</h3>|);
+    ($results->{script_params})
+        = ($content =~ m|Script Params: (.*?)</h3>|);
+    ($results->{ltp_version}) 
+        = ($content =~ m|LTP-(\d+)|);
+    ($results->{total_tests_executed}) 
+        = ($content =~ m|Total Tests Executed: (\d+)|);
+    ($results->{num_tests_passed}) 
+        = ($content =~ m|Number Tests Passed: (\d+)|);
+    ($results->{num_tests_failed}) 
+        = ($content =~ m|Number Tests Failed: (\d+)|);
+    ($results->{num_tests_warnings}) 
+        = ($content =~ m|Number Tests Warnings: (\d+)|);
+    ($results->{num_tests_broken}) 
+        = ($content =~ m|Number Tests Broken: (\d+)|);
+    ($results->{execution_time}) 
+        = ($content =~ m|Execution Time of Test: (\d+\.*\d*) minutes|i);
+    $results->{sort} = $results->{patch};
+    $results->{cpu} = '?';
+    if ($results->{host} =~ m|^stp(\d)|) {
+        $results->{cpu} = "$1-way";
+    }
+
+    # Misc. data cleanup...
+    if ($results->{script_params} =~ m/^\s*:\s*$/) {
+        $results->{script_params} = undef;
+    }
+    $results->{sort} =~ s|^patch|linux|;
+    if ($results->{sort} =~ m|^\d|) {
+        # Looks like a rev number only, so probably for linux kernel...
+        $results->{sort} = 'linux-'.$results->{sort};
+    }
+    if ($results->{sort} =~ m|[a-z](\d)$|) {
+        # Looks like a patch of the sort rc2, mm3, so we need to
+        # change them to rc02, mm03, etc. for sorting purposes.
+        my $i = $1;
+        $results->{sort} =~ s/$i$/0$i/;
+    } 
+
+    return $results;
+}
+
+sub report_ltp_results {
+    my $r = shift;
+
+    printf("%-20s %8s %10s %6s %12s %5s %5s %5s %5s %5s %8s\n", 
+           "Patch Name",
+           "TestReq#",
+           "LTP Ver",
+           "CPU",
+           "Distro",
+           "PASS",
+           "FAIL",
+           "WARN",
+           "BROK",
+           "RunTime");
+    foreach my $id (sort {$r->{$a}->{sort} cmp $r->{$b}->{sort}} keys %{$r}) {
+        next if ($r->{$id}->{num_tests_passed} == 0);
+        printf("%-20s %8d %10s %6s %12s %5d %5d %5d %5d %7.1f\n", 
+               $r->{$id}->{patch},
+               $id,
+               $r->{$id}->{ltp_version},
+               $r->{$id}->{cpu},
+               $r->{$id}->{distro},
+               $r->{$id}->{num_tests_passed},
+               $r->{$id}->{num_tests_failed},
+               $r->{$id}->{num_tests_warnings},
+               $r->{$id}->{num_tests_broken},
+               $r->{$id}->{execution_time});
+   }
+}
+
+sub graph_ltp_results {
+    my $r = shift;
+    my $svgfile = shift;
+
+#    my $SVGGraph = new SVGGraph;
+
+    open(SVGFILE, ">$svgfile") or die "Could not open '$svgfile' for writing:  $!\n";
+
+    my @versions = sort {$r->{$a}->{sort} cmp $r->{$b}->{sort}} keys %{$r};
+    my $ylinepos = 0;
+    my $ytextpos = 2;
+    foreach my $key (@versions) {
+        my $pass = $r->{$key}->{num_tests_passed}   * 10;
+        my $fail = $r->{$key}->{num_tests_failed}   * 10;
+        my $warn = $r->{$key}->{num_tests_warnings} * 10;
+        my $brok = $r->{$key}->{num_tests_broken}   * 10;
+        my $kernel = $r->{$key}->{patch};
+        $ylinepos -= 20;
+        $ytextpos -= 20;
+
+        print SVGFILE qq|<line x1="0" y1="$ylinepos" x2="$pass" y2="$ylinepos" class="g"/>\n|;
+        print SVGFILE qq|<text x="-5" y="$ytextpos" class="ny">$kernel</text>\n|;
+
+
+    }
+
+    close (SVGFILE) or warn "Could not close '$svgfile': $!\n";
+
+}
+
+exit main();

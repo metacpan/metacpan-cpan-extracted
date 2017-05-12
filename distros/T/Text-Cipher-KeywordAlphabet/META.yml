@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Text-Cipher-KeywordAlphabet
+version:      1.005
+version_from: lib/Text/Cipher/KeywordAlphabet.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Test::More:                    0
+    Text::Cipher:                  0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.25

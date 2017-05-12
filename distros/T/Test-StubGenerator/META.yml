@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Test-StubGenerator
+version:            0.9.6
+abstract:           A simple module that analyzes a given source file and
+author:
+    - Kent Cowgill <kent@c2group.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Perl::Tidy:  0
+    PPI:         1.118
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

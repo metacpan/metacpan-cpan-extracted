@@ -1,0 +1,32 @@
+This directory contains some example scripts that use the TL1 Toolkit.
+
+You need to edit the "username" and "password" information in the
+beginning of the scripts.
+
+get_version.pl
+--------------
+Very simple script to show the use of the TL1 Toolkit. It accepts
+one argument: the device name to connect to and get the software
+version it is running. The script prints the version number on
+standard output. You MUST edit the script and fill in the username
+and password in the local configuration section.
+
+mrtg.pl
+-------
+Another simple script. It reads the inoctets and outoctets of an
+Ethernet port and prints them in a form that can be used by MRTG.
+It accepts three command line arguments: the device name, the slot
+and the port. You MUST edit the script and fill in the username and
+password in the local configuration section.
+
+get_alarms.pl
+-------------
+Script that prints existing alarms on the device that was given to
+the script as command line argument. You MUST edit the script and
+fill in the username and password in the local configuration section.
+
+get_crossconnects.pl
+--------------------
+This scripts reads crossconnect information from a network device
+and prints some information. You MUST edit the script and fill in
+the username and password in the local configuration section.

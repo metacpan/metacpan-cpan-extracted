@@ -1,0 +1,795 @@
+<html>
+	<head>
+		<title>Test Report</title>
+		<script type="text/javascript" src="jquery-1.2.3.pack.js"></script>
+		<style type="text/css">
+/******************************************************************************
+ * TAP-Formatter-HTML: default report stylesheet
+ * Copyright (c) 2008 Steve Purkis.  All rights reserved.
+ * Released under the same terms as Perl itself.
+ *****************************************************************************/
+
+html {
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	font-family: Helvetica, Verdana, Arial, Tahoma;
+	font-size: small;
+	background-color: #efefef;
+}
+
+
+/******************************************************************************
+/* The summary bar
+ */
+#summary {
+	position: relative;
+	padding: 2px 0 2 0;
+	width: 90%;
+	font-size: x-large;
+	text-align: center;
+}
+
+#summary.passed {
+	background-color: #99ff66;
+	border: 1px solid #00ff00;
+}
+
+#summary.failed {
+	background-color: #ff6450;
+	border: 1px solid #ff0000;
+}
+
+#summary a {
+	width: 100%;
+	display: block;
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+	color: #000000;
+}
+
+#summary a:hover {
+	text-decoration: none;
+	color: #6666aa;
+}
+
+
+
+/******************************************************************************
+ * The report detail section
+ */
+#detail {
+	margin-top: 5px;
+	width: 90%;
+}
+
+table.detail {
+	width: 100%;
+	border: 1px solid #3333ee;
+	padding: 2px;
+	border-spacing: 0px;
+
+}
+
+table.detail th {
+	border-bottom: 2px solid #3333ee;
+	padding-top: 2px;
+}
+
+table.detail tfoot tr td {
+	border-top: 2px solid #3333ee;
+	padding-top: 2px;
+}
+
+table.detail td {
+	position: relative;
+	top: 0px;
+	left: 0px;
+	border-top: 1px solid #aaaaaa;
+	margin: 0;
+	padding: 2px 0 2 0;
+	vertical-align: top;
+}
+
+/******************************************************************************
+ * The file column
+ */
+table.detail td.file {
+	width: 10%;
+	padding-left: 2px;
+	padding-right: 4px;
+}
+
+a.file {
+	display: block;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	text-decoration: none;
+	color: #3333cc;
+}
+
+a.file:hover {
+	text-decoration: none;
+	color: #6666ee;
+}
+
+a.file:visited {
+	text-decoration: none;
+	color: #3333cc;
+}
+
+/******************************************************************************
+ * The time column
+ */
+table.detail td.time {
+	width: 2%;
+	border-left: 1px solid #ddddff;
+	text-align: center;
+	font-size: small;
+}
+
+/******************************************************************************
+ * The percentage column
+ */
+table.detail td.percent {
+	padding-left: 2px;
+	padding-right: 2px;
+	width: 2%;
+	text-align: center;
+	font-size: small;
+	vertical-align: middle;
+}
+
+table.detail td.passed {
+	border: 1px solid #99cc99;
+	background-color: #99ff66;
+}
+
+table.detail td.todo-passed {
+	border: 1px solid #99cc99;
+	background-color: #ddffbb;
+}
+
+table.detail td.severity-very-low {
+	border: 1px solid #ffee33;
+	background-color: #ffffaa;
+}
+
+table.detail td.severity-low {
+	border: 1px solid #eecc33;
+	background-color: #ffdd99;
+}
+
+table.detail td.severity-med {
+	border: 1px solid #dd6633;
+	background-color: #ffaa77;
+}
+
+table.detail td.severity-high {
+	border: 1px solid #ff3333;
+	background-color: #ff8866;
+}
+
+table.detail td.severity-very-high {
+	border: 1px solid #ff0000;
+	background-color: #ff6450;
+}
+
+/******************************************************************************
+ * The test run column
+ */
+
+/******************************************************************************
+ * Test summaries
+ */
+
+table.test-summary {
+	clear: both;
+	width: 100%;
+	height: 10px;
+	font-size: 8px; /* safari wants this less than 10px */
+	margin: 0px;
+	margin-bottom: 4px;
+	padding: 0;
+	border-spacing: 1px;
+}
+
+table.test-summary td {
+	margin: 0;
+	padding: 0;
+	height: 10px;
+}
+
+table.test-summary td a {
+	display: block;
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+	width: 100%;
+	height: 100%;
+}
+
+/* base for passed/failed (should always be lower precedent in class list!) */
+table.test-summary td.passed {
+	border: 1px solid #66cc33;
+	background-color: #99ff66;
+}
+
+table.test-summary td.failed {
+	border: 1px solid #ff0000;
+	background-color: #ff6450;
+}
+
+/* overrides for specific outcomes */
+table.test-summary td.ok {
+	border: 1px solid #66cc33;
+}
+
+table.test-summary td.not-ok {
+	border: 1px solid #ff0000;
+}
+
+table.test-summary td.todo-ok {
+	border: 1px solid #eeaa00;
+	background-color: #ffcc00;
+}
+
+table.test-summary td.skip-ok {
+	border: 1px solid #99d999;
+	background-color: #99cc66;
+}
+
+table.test-summary td.todo-not-ok {
+	border: 1px solid #99cc99;
+	background-color: #ddffbb;
+}
+
+/******************************************************************************
+ * Test detail
+ */
+div.test-detail {
+	margin: 0;
+	padding: 0;
+/*	display: none; /* let JS handle this... */
+}
+
+/******************************************************************************
+ * Test parse errors
+ */
+ul.parse-errors {
+	margin: 0;
+	padding: 0;
+	clear: left;
+}
+
+ul.parse-errors li {
+	margin-left: 4px;
+	list-style: none;
+	color: red;
+}
+
+/******************************************************************************
+ * Test output
+ */
+ul.test-out {
+	margin: 0;
+	padding: 0;
+	clear: left;
+}
+
+ul.test-out li {
+	margin-left: 4;
+	border-left: none;
+	list-style: none;
+}
+
+ul.test-out li.test {
+	;
+}
+
+ul.test-out li.comment {
+	color: #666666;
+	font-family: monospace;
+}
+
+ul.test-out li.plan {
+	color: blue;
+}
+
+ul.test-out li.ok {
+	;
+}
+
+ul.test-out li.todo-ok {
+	color: #cc3333;
+}
+
+ul.test-out li.todo-not-ok {
+	color: #773322;
+}
+
+ul.test-out li.not-ok {
+	color: #ff0000;
+}
+
+ul.test-out li.unplanned {
+	color: #ff0000;
+}
+
+ul.test-out li.skip {
+	color: #001111;
+}
+
+ul.test-out li.unknown {
+	color: #996600;
+	font-family: monospace;
+}
+
+ul.test-out li.exit-status {
+	color: #ff0000;
+}
+
+		</style>
+
+		<script type="text/javascript">
+// temporary hack, move external
+jQuery.fn.extend({
+  scrollTo : function(speed, easing) {
+    return this.each(function() {
+      var targetOffset = $(this).offset().top;
+      $('html,body').animate({scrollTop: targetOffset}, speed, easing);
+    });
+  }
+});
+
+$(document).ready(function(){
+	$("div.test-detail").hide();
+	$("div.summary").find("a").click(function(){return false;});
+
+	// expand test detail when user clicks on a test file
+	$("a.file").click(function(){
+		// go all the way to the tr incase table structure changes:
+		$(this).parents("tr:first").find("div.test-detail").slideToggle();
+		return false;
+	});
+
+	// expand test detail when user clicks on an individual test
+	$("a.test-summary").click(function(){
+		var testId = $(this).attr("href")
+		// go all the way to the tr incase table structure changes:
+		var $detail = $(this).parents("td.results").parents("tr:first").find("div.test-detail");
+		$detail.filter(":hidden").slideDown();
+		var $testElem = $detail.find(testId);
+		$testElem.show().scrollTo(1000);
+		var bgColor = $testElem.css("background-color");
+		$testElem.css({ backgroundColor: "yellow" });
+		// shame you can't animate bg color w/o a plugin...
+		setTimeout(function(){$testElem.css({ backgroundColor: bgColor })}, 3000);
+		return false;
+	});
+});
+		</script>
+
+	</head>
+	<body>
+				<div id="summary" class="failed">
+			<a href="#" title="Test Summary (91.7% ok)
+	severity: med
+	passed 31/36 tests in 10 files
+	total time: 0.62s
+	1 wallclock secs ( 0.10 usr  0.08 sys +  0.58 cusr  0.18 csys =  0.94 CPU)">FAILED</a>
+		</div>
+
+		<div id="detail">
+			<table class="detail">
+				<thead>
+					<tr>
+						<th class="file">Test file</th>
+						<th class="results">Test results</th>
+						<th class="time">Time</th>
+						<th class="percent">%</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	9 planned, 9 run
+	9 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/data/01_pass.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-01-pass-pl-1" title="ok 1 - im ok">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-01-pass-pl-2" title="ok 2 - one is one">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-01-pass-pl-3" title="ok 3 - contains b">&nbsp;</a></td>
+									  <td class="test todo-not-ok passed"><a class="test-summary" href="#t-data-01-pass-pl-4" title="not ok 4 - one is two? # TODO just cant get these working?">&nbsp;</a></td>
+									  <td class="test todo-not-ok passed"><a class="test-summary" href="#t-data-01-pass-pl-5" title="not ok 5 - contains d? # TODO just cant get these working?">&nbsp;</a></td>
+									  <td class="test skip-ok passed"><a class="test-summary" href="#t-data-01-pass-pl-6" title="ok 6 # skip to the loo">&nbsp;</a></td>
+									  <td class="test skip-ok passed"><a class="test-summary" href="#t-data-01-pass-pl-7" title="ok 7 # skip to the loo">&nbsp;</a></td>
+									  <td class="test todo-not-ok passed"><a class="test-summary" href="#t-data-01-pass-pl-8" title="not ok 8 # TODO &amp; SKIP to the loo again">&nbsp;</a></td>
+									  <td class="test todo-not-ok passed"><a class="test-summary" href="#t-data-01-pass-pl-9" title="not ok 9 # TODO &amp; SKIP to the loo again">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li id="t-data-01-pass-pl-1"											class="test ok">ok 1 - im ok</li>
+									<li id="t-data-01-pass-pl-2"											class="test ok">ok 2 - one is one</li>
+									<li id="t-data-01-pass-pl-3"											class="test ok">ok 3 - contains b</li>
+									<li id="t-data-01-pass-pl-4"											class="test todo-not-ok">not ok 4 - one is two? # TODO just cant get these working?</li>
+									<li 											class="unknown"></li>
+									<li 											class="comment">#   Failed (TODO) test 'one is two?'</li>
+									<li 											class="comment">#   at t/data/01_pass.pl line 12.</li>
+									<li 											class="comment">#          got: '1'</li>
+									<li 											class="comment">#     expected: '2'</li>
+									<li id="t-data-01-pass-pl-5"											class="test todo-not-ok">not ok 5 - contains d? # TODO just cant get these working?</li>
+									<li 											class="unknown"></li>
+									<li 											class="comment">#   Failed (TODO) test 'contains d?'</li>
+									<li 											class="comment">#   at t/data/01_pass.pl line 13.</li>
+									<li 											class="comment">#                   'abc'</li>
+									<li 											class="comment">#     doesn't match '(?-xism:d)'</li>
+									<li id="t-data-01-pass-pl-6"											class="test skip-ok">ok 6 # skip to the loo</li>
+									<li id="t-data-01-pass-pl-7"											class="test skip-ok">ok 7 # skip to the loo</li>
+									<li id="t-data-01-pass-pl-8"											class="test todo-not-ok">not ok 8 # TODO &amp; SKIP to the loo again</li>
+									<li id="t-data-01-pass-pl-9"											class="test todo-not-ok">not ok 9 # TODO &amp; SKIP to the loo again</li>
+									<li 											class="plan">1..9</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.06s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run failed">
+						<td class="file">
+							<a class="file" href="#" title="Test failed!
+	did not exit cleanly!
+	7 planned, 7 run
+	4 ok, 3 failed
+	0 todo, 0 skipped
+	exit status: 3
+	wait status: 768">t/data/02_fail.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-02-fail-pl-1" title="ok 1 - im ok">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-02-fail-pl-2" title="ok 2 - one is one">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-02-fail-pl-3" title="ok 3 - contains b">&nbsp;</a></td>
+									  <td class="test not-ok failed"><a class="test-summary" href="#t-data-02-fail-pl-4" title="not ok 4 - one is two?">&nbsp;</a></td>
+									  <td class="test not-ok failed"><a class="test-summary" href="#t-data-02-fail-pl-5" title="not ok 5 - contains d?">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-02-fail-pl-6" title="ok 6 - youre ok">&nbsp;</a></td>
+									  <td class="test not-ok failed"><a class="test-summary" href="#t-data-02-fail-pl-7" title="not ok 7 - dont run me">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li id="t-data-02-fail-pl-1"											class="test ok">ok 1 - im ok</li>
+									<li id="t-data-02-fail-pl-2"											class="test ok">ok 2 - one is one</li>
+									<li id="t-data-02-fail-pl-3"											class="test ok">ok 3 - contains b</li>
+									<li id="t-data-02-fail-pl-4"											class="test not-ok">not ok 4 - one is two?</li>
+									<li 											class="unknown"></li>
+									<li 											class="comment">#   Failed test 'one is two?'</li>
+									<li 											class="comment">#   at t/data/02_fail.pl line 11.</li>
+									<li 											class="comment">#          got: '1'</li>
+									<li 											class="comment">#     expected: '2'</li>
+									<li id="t-data-02-fail-pl-5"											class="test not-ok">not ok 5 - contains d?</li>
+									<li 											class="unknown"></li>
+									<li 											class="comment">#   Failed test 'contains d?'</li>
+									<li 											class="comment">#   at t/data/02_fail.pl line 12.</li>
+									<li 											class="comment">#                   'abc'</li>
+									<li 											class="comment">#     doesn't match '(?-xism:d)'</li>
+									<li id="t-data-02-fail-pl-6"											class="test ok">ok 6 - youre ok</li>
+									<li id="t-data-02-fail-pl-7"											class="test not-ok">not ok 7 - dont run me</li>
+									<li 											class="unknown"></li>
+									<li 											class="comment">#   Failed test 'dont run me'</li>
+									<li 											class="comment">#   at t/data/02_fail.pl line 17.</li>
+									<li 											class="plan">1..7</li>
+									<li 											class="comment"># Looks like you failed 3 tests of 7.</li>									<li class="exit-status">exit status: 3, wait status: 768</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.11s</td>
+						<td class="percent failed severity-med">57.1%</td>
+					</tr>
+					<tr id="" class="test-run failed">
+						<td class="file">
+							<a class="file" href="#" title="Test failed!
+	1 parse error(s)!
+	did not exit cleanly!
+	2 planned, 3 run
+	2 ok, 1 failed
+	0 todo, 0 skipped
+	exit status: 255
+	wait status: 65280">t/data/03_plan_fail.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-03-plan-fail-pl-1" title="ok 1 - im ok">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-03-plan-fail-pl-2" title="ok 2 - one is one">&nbsp;</a></td>
+									  <td class="test ok failed"><a class="test-summary" href="#t-data-03-plan-fail-pl-3" title="ok 3 - contains b">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+									<li>Parse error: Bad plan.  You planned 2 tests but ran 3.</li>
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..2</li>
+									<li id="t-data-03-plan-fail-pl-1"											class="test ok">ok 1 - im ok</li>
+									<li id="t-data-03-plan-fail-pl-2"											class="test ok">ok 2 - one is one</li>
+									<li id="t-data-03-plan-fail-pl-3"											class="test ok unplanned">ok 3 - contains b<em> (unplanned!)</em></li>
+									<li 											class="comment"># Looks like you planned 2 tests but ran 1 extra.</li>									<li class="exit-status">exit status: 255, wait status: 65280</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.04s</td>
+						<td class="percent failed severity-very-low">150.0%</td>
+					</tr>
+					<tr id="" class="test-run failed">
+						<td class="file">
+							<a class="file" href="#" title="Test failed!
+	did not exit cleanly!
+	3 planned, 3 run
+	3 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 255
+	wait status: 65280">t/data/04_die_fail.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-04-die-fail-pl-1" title="ok 1 - im ok">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-04-die-fail-pl-2" title="ok 2 - one is one">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-04-die-fail-pl-3" title="ok 3 - contains b">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..3</li>
+									<li id="t-data-04-die-fail-pl-1"											class="test ok">ok 1 - im ok</li>
+									<li id="t-data-04-die-fail-pl-2"											class="test ok">ok 2 - one is one</li>
+									<li id="t-data-04-die-fail-pl-3"											class="test ok">ok 3 - contains b</li>
+									<li 											class="unknown">this is an error test, not some horrible error at t/data/04_die_fail.pl line 10.</li>
+									<li 											class="comment"># Looks like your test died just after 3.</li>									<li class="exit-status">exit status: 255, wait status: 65280</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.11s</td>
+						<td class="percent failed severity-very-high">100.0%</td>
+					</tr>
+					<tr id="" class="test-run failed">
+						<td class="file">
+							<a class="file" href="#" title="Test failed!
+	1 parse error(s)!
+	did not exit cleanly!
+	0 planned, 0 run
+	0 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 255
+	wait status: 65280">t/data/05_compile_fail.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>									<td class="stub not-ok" width="100%"><a href="#" title="No tests run!">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+									<li>Parse error: No plan found in TAP output</li>
+								</ul>
+								<ul class="test-out">
+									<li 											class="unknown">Bareword found where operator expected at t/data/05_compile_fail.pl line 6, near &quot;be ok&quot;</li>
+									<li 											class="unknown">	(Do you need to predeclare be?)</li>
+									<li 											class="unknown">Semicolon seems to be missing at t/data/05_compile_fail.pl line 8.</li>
+									<li 											class="unknown">syntax error at t/data/05_compile_fail.pl line 6, near &quot;be ok&quot;</li>
+									<li 											class="unknown">Execution of t/data/05_compile_fail.pl aborted due to compilation errors.</li>
+									<li 											class="comment"># Looks like your test died before it could output anything.</li>									<li class="exit-status">exit status: 255, wait status: 65280</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.05s</td>
+						<td class="percent failed severity-very-high">n/a</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	skipped all
+	exit status: 0
+	wait status: 0">t/data/06_skip_all.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>									<td class="skip-ok" width="100%"><a href="#" title="1..0 # Skip likity skipity">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..0 # Skip likity skipity</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.03s</td>
+						<td class="percent passed">n/a</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	some todo tests unexpectedly passed!
+	7 planned, 7 run
+	7 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/data/07_todo_pass.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-07-todo-pass-pl-1" title="ok 1 - im ok">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-07-todo-pass-pl-2" title="ok 2 - one is one">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-07-todo-pass-pl-3" title="ok 3 - contains b">&nbsp;</a></td>
+									  <td class="test todo-ok passed"><a class="test-summary" href="#t-data-07-todo-pass-pl-4" title="ok 4 - one is one! # TODO just cant get these working?">&nbsp;</a></td>
+									  <td class="test todo-ok passed"><a class="test-summary" href="#t-data-07-todo-pass-pl-5" title="ok 5 - contains c? # TODO just cant get these working?">&nbsp;</a></td>
+									  <td class="test todo-not-ok passed"><a class="test-summary" href="#t-data-07-todo-pass-pl-6" title="not ok 6 # TODO &amp; SKIP to the loo">&nbsp;</a></td>
+									  <td class="test todo-not-ok passed"><a class="test-summary" href="#t-data-07-todo-pass-pl-7" title="not ok 7 # TODO &amp; SKIP to the loo">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..7</li>
+									<li id="t-data-07-todo-pass-pl-1"											class="test ok">ok 1 - im ok</li>
+									<li id="t-data-07-todo-pass-pl-2"											class="test ok">ok 2 - one is one</li>
+									<li id="t-data-07-todo-pass-pl-3"											class="test ok">ok 3 - contains b</li>
+									<li id="t-data-07-todo-pass-pl-4"											class="test todo-ok">ok 4 - one is one! # TODO just cant get these working?<em> (unexpectedly succeeded!)</em></li>
+									<li id="t-data-07-todo-pass-pl-5"											class="test todo-ok">ok 5 - contains c? # TODO just cant get these working?<em> (unexpectedly succeeded!)</em></li>
+									<li id="t-data-07-todo-pass-pl-6"											class="test todo-not-ok">not ok 6 # TODO &amp; SKIP to the loo</li>
+									<li id="t-data-07-todo-pass-pl-7"											class="test todo-not-ok">not ok 7 # TODO &amp; SKIP to the loo</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.09s</td>
+						<td class="percent passed todo-passed">100.0%</td>
+					</tr>
+					<tr id="" class="test-run failed">
+						<td class="file">
+							<a class="file" href="#" title="Test failed!
+	did not exit cleanly!
+	3 planned, 3 run
+	2 ok, 1 failed
+	0 todo, 0 skipped
+	exit status: 1
+	wait status: 256">t/data/08_html_in_output.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-08-html-in-output-pl-1" title="ok 1 - escape some of these chars: !@\#$%^++_)(*&amp;^%$\#@!&gt;&lt;">&nbsp;</a></td>
+									  <td class="test ok passed"><a class="test-summary" href="#t-data-08-html-in-output-pl-2" title="ok 2 - contains &lt;b&gt; in the &lt;output&gt;">&nbsp;</a></td>
+									  <td class="test not-ok failed"><a class="test-summary" href="#t-data-08-html-in-output-pl-3" title="not ok 3 - &lt;html&gt; in the diag messages..">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li id="t-data-08-html-in-output-pl-1"											class="test ok">ok 1 - escape some of these chars: !@\#$%^++_)(*&amp;^%$\#@!&gt;&lt;</li>
+									<li id="t-data-08-html-in-output-pl-2"											class="test ok">ok 2 - contains &lt;b&gt; in the &lt;output&gt;</li>
+									<li id="t-data-08-html-in-output-pl-3"											class="test not-ok">not ok 3 - &lt;html&gt; in the diag messages..</li>
+									<li 											class="unknown"></li>
+									<li 											class="comment">#   Failed test '&lt;html&gt; in the diag messages..'</li>
+									<li 											class="comment">#   at t/data/08_html_in_output.pl line 8.</li>
+									<li 											class="comment">#          got: 'a&lt;b&gt;c'</li>
+									<li 											class="comment">#     expected: '&lt;html&gt;&lt;body&gt;&lt;h1&gt;eeek&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;'</li>
+									<li 											class="plan">1..3</li>
+									<li 											class="comment"># Looks like you failed 1 test of 3.</li>									<li class="exit-status">exit status: 1, wait status: 256</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.02s</td>
+						<td class="percent failed severity-med">66.7%</td>
+					</tr>
+					<tr id="" class="test-run failed">
+						<td class="file">
+							<a class="file" href="#" title="Test failed!
+	did not exit cleanly!
+	2 planned, 2 run
+	2 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 255
+	wait status: 65280">t/data/09_skip_error.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test skip-ok passed"><a class="test-summary" href="#t-data-09-skip-error-pl-1" title="ok 1 # skip to the loo">&nbsp;</a></td>
+									  <td class="test skip-ok passed"><a class="test-summary" href="#t-data-09-skip-error-pl-2" title="ok 2 # skip to the loo">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li id="t-data-09-skip-error-pl-1"											class="test skip-ok">ok 1 # skip to the loo</li>
+									<li id="t-data-09-skip-error-pl-2"											class="test skip-ok">ok 2 # skip to the loo</li>
+									<li 											class="unknown">Label not found for &quot;last SKIP&quot; at /usr/local/lib/perl5/5.8.4/Test/More.pm line 1023.</li>
+									<li 											class="plan">1..2</li>
+									<li 											class="comment"># Looks like your test died just after 2.</li>									<li class="exit-status">exit status: 255, wait status: 65280</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.01s</td>
+						<td class="percent failed severity-very-high">100.0%</td>
+					</tr>
+					<tr id="" class="test-run passed">
+						<td class="file">
+							<a class="file" href="#" title="Test ok.
+	2 planned, 2 run
+	2 ok, 0 failed
+	0 todo, 0 skipped
+	exit status: 0
+	wait status: 0">t/data/10_todo_skip.pl</a>
+						</td>
+						<td class="results">
+							<table class="test-summary">
+								<tr>
+									  <td class="test todo-not-ok passed"><a class="test-summary" href="#t-data-10-todo-skip-pl-1" title="not ok 1 # TODO &amp; SKIP to the loo">&nbsp;</a></td>
+									  <td class="test todo-not-ok passed"><a class="test-summary" href="#t-data-10-todo-skip-pl-2" title="not ok 2 # TODO &amp; SKIP to the loo">&nbsp;</a></td>
+								</tr>
+							</table>
+							<div class="test-detail">
+								<ul class="parse-errors">
+								</ul>
+								<ul class="test-out">
+									<li 											class="plan">1..2</li>
+									<li id="t-data-10-todo-skip-pl-1"											class="test todo-not-ok">not ok 1 # TODO &amp; SKIP to the loo</li>
+									<li id="t-data-10-todo-skip-pl-2"											class="test todo-not-ok">not ok 2 # TODO &amp; SKIP to the loo</li>
+								</ul>
+							</div>
+						</td>
+						<td class="time">0.10s</td>
+						<td class="percent passed">100.0%</td>
+					</tr>
+				</tbody>
+	
+				<tfoot>
+					<tr>
+						<td class="file">10 files</td>
+						<td class="results">
+							36 tests,
+							31 ok,
+							5 failed,
+							10 todo,
+							4 skipped,
+							2 parse errors<br/>
+							exit status: 1024,
+							wait status: 262144<br/>
+							elapsed time: 1 wallclock secs ( 0.10 usr  0.08 sys +  0.58 cusr  0.18 csys =  0.94 CPU)</td>
+						<td class="time">0.62s</td>
+						<td class="percent  severity-med todo-passed">91.7%</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+
+		<div id="footer">Generated by TAP::Formatter::HTML v0.01 @ 13:15:29 18-May-2008</div>
+
+	</body>
+</html>

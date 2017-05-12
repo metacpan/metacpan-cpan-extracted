@@ -1,0 +1,46 @@
+2009-07-26  Dave Cross  <dave@dave.org.uk>
+
+	* META.yml: Remove unnecessry file.
+
+	* commit 8ea02d922cedec742fcc7e0625b50fa7b9949f54
+
+2009-07-26  Dave Cross  <dave@dave.org.uk>
+
+	* .cvsignore, Makefile.PL: Removed unnecessary files.
+
+	* commit 6220d9c775197b844bc6101725da89f3de4b9f96
+
+2009-07-26  Dave Cross  <dave@dave.org.uk>
+
+	* t/test.rpm, t/test.t: Use a newer RPM. Update test
+	appropriately.
+
+	* commit 1ededbf665d43d43bc04d2c539ce7c6268b91b28
+
+2009-07-26  Dave Cross  <dave@dave.org.uk>
+
+	* lib/Template/Plugin/RPM2.pm: Fixed copyright and author
+	information.
+
+	* commit 6bc08384badc6c591dc009b161fbc15194ef2feb
+
+2009-07-26  Dave Cross  <dave@dave.org.uk>
+
+	* lib/Template/Plugin/RPM2.pm: Switch to manual version number.
+
+	* commit 2cc9d15c25f9be7dcc5a4f5f1ac0b41adf36a40f
+
+2006-06-21  Dave Cross  <dave@dave.org.uk>
+
+	* .cvsignore, Build.PL, MANIFEST, META.yml, Makefile.PL, README,
+	lib/Template/Plugin/RPM2.pm, t/00-load.t, t/pod-coverage.t,
+	t/pod.t, t/test.rpm, t/test.t: Initial revision
+
+	* commit 3a5dcb8635c479f8e44b33f376ca1937a93d8f65
+
+2006-06-21  (no author)  <(no author)@016784d4-2a18-0410-b320-a68cbcce4300>
+
+	* : New repository initialized by cvs2svn.
+
+	* commit 30a1ad9de5ddd3f1254b552e13bc51db83ce86cf
+

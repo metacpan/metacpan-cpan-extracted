@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Time-Piece-Range
+version:      1.2
+version_from: lib/Time/Piece/Range.pm
+installdirs:  site
+requires:
+    Date::Range:                   1.2
+    Time::Piece:                   1.08
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

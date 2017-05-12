@@ -1,0 +1,17 @@
+0.05 - 17 Nov 2012
+    * added support for EXPAND_RELATIVE
+
+0.04 - 23 Nov 2012
+    * Added support for ABSOLUTE => 1 (thanks to Kevin Kane)
+
+0.03 - 21 Nov 2012
+    * moved repo to GitHub (https://github.com/evdb/template-provider-http)
+    * added running of tests on Travis-CI
+    * no code changes
+
+0.02 - 7 Apr 2009
+    * fixes to test suite - no functional changes
+    * added license to makefile
+
+0.01 - 6 Oct 2008
+    * first release to CPAN

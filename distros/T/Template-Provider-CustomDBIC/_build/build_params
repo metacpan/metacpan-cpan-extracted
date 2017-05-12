@@ -1,0 +1,127 @@
+do{ my $x = [
+       {
+         'ARGV' => []
+       },
+       {},
+       {
+         'destdir' => undef,
+         'base_dir' => '/www/modules/Template-Provider-CustomDBIC/.build/T9SSd7sP',
+         'tap_harness_args' => {},
+         'recurse_into' => [],
+         'dist_abstract' => undef,
+         'build_elements' => [
+                               'PL',
+                               'support',
+                               'pm',
+                               'xs',
+                               'share_dir',
+                               'pod',
+                               'script'
+                             ],
+         'build_script' => 'Build',
+         'meta_merge' => {},
+         'use_rcfile' => 1,
+         'needs_compiler' => 1,
+         'metafile' => 'META.yml',
+         'debug' => undef,
+         'install_base' => undef,
+         'c_source' => [],
+         'include_dirs' => [],
+         'mymetafile' => 'MYMETA.yml',
+         'allow_pureperl' => 0,
+         'extra_compiler_flags' => [],
+         'build_class' => 'MyBuilder',
+         'install_sets' => {},
+         'share_dir' => undef,
+         'create_packlist' => 1,
+         'scripts' => undef,
+         'dist_author' => undef,
+         'name' => 'Template-Provider-CustomDBIC',
+         'create_readme' => undef,
+         'original_prefix' => {},
+         'pm_files' => undef,
+         'auto_configure_requires' => 1,
+         'requires' => {},
+         'test_files' => 't/ xt/',
+         'config_dir' => '_build',
+         'bindoc_dirs' => [
+                            'blib/script'
+                          ],
+         'dist_suffix' => undef,
+         'test_file_exts' => [
+                               '.t'
+                             ],
+         'mb_version' => '0.4211',
+         'cpan_client' => 'cpan',
+         'has_config_data' => undef,
+         'html_css' => '',
+         'dist_version' => '0.04',
+         'build_requires' => {
+                               'ExtUtils::CBuilder' => 0
+                             },
+         'PL_files' => {},
+         'extra_manify_args' => undef,
+         'debugger' => undef,
+         'quiet' => undef,
+         'metafile2' => 'META.json',
+         'libdoc_dirs' => [
+                            'blib/lib',
+                            'blib/arch'
+                          ],
+         'verbose' => undef,
+         'create_makefile_pl' => undef,
+         'pureperl_only' => 0,
+         'create_license' => undef,
+         'install_path' => {},
+         'get_options' => {},
+         'dist_version_from' => 'lib/Template/Provider/CustomDBIC.pm',
+         'test_requires' => {},
+         'perl' => '/opt/perl5/perls/perl-5.20.2/bin/perl',
+         'recommends' => {},
+         'extra_linker_flags' => [],
+         '_added_to_INC' => [
+                              '/www/modules/Template-Provider-CustomDBIC/.build/T9SSd7sP/_build/lib'
+                            ],
+         'xs_files' => undef,
+         'pollute' => undef,
+         'sign' => undef,
+         'installdirs' => 'site',
+         'pod_files' => undef,
+         'build_bat' => 0,
+         'prefix' => undef,
+         'conflicts' => {},
+         'program_name' => undef,
+         'config' => undef,
+         'configure_requires' => {
+                                   'Module::Build' => '0.38'
+                                 },
+         'module_name' => 'Template::Provider::CustomDBIC',
+         'dist_name' => 'Template-Provider-CustomDBIC',
+         'prereq_action_types' => [
+                                    'requires',
+                                    'build_requires',
+                                    'test_requires',
+                                    'conflicts',
+                                    'recommends'
+                                  ],
+         'blib' => 'blib',
+         'magic_number' => undef,
+         'release_status' => 'stable',
+         'dynamic_config' => 0,
+         'install_base_relpaths' => {},
+         'bundle_inc_preload' => [],
+         'license' => 'perl',
+         '_have_c_compiler' => 1,
+         'recursive_test_files' => 1,
+         'autosplit' => undef,
+         'orig_dir' => '/www/modules/Template-Provider-CustomDBIC/.build/T9SSd7sP',
+         'meta_add' => {},
+         'script_files' => [],
+         'bundle_inc' => [],
+         'prefix_relpaths' => {},
+         'use_tap_harness' => 0,
+         'allow_mb_mismatch' => 0,
+         'mymetafile2' => 'MYMETA.json'
+       }
+     ];
+$x; }

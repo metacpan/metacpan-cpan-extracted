@@ -1,0 +1,17 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+lib/Task/DataFlow.pm
+scripts/encoding.pl
+scripts/portaltransparencia/ceis.pl
+scripts/simple-deref.pl
+scripts/simple-noref.pl
+scripts/simple.pl
+t/task-bogus.t

@@ -1,0 +1,9 @@
+Revision history for Perl extension TinyMake.
+
+0.01  Fri Sep 16 16:09:29 2005
+	- original version; created by h2xs 1.22 with options
+		-X TinyMake 0.04
+0.06  Tue Oct 03 15:09:00 2005
+	- Code cleanup 
+		
+

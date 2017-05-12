@@ -1,0 +1,29 @@
+---
+abstract: 'a thin wrapper around Try::Tiny'
+author:
+  - 'Torsten Förtsch <torsten.foertsch@gmx.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.027, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Try-Tiny-Except
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+resources:
+  bugtracker: https://github.com/tfoertsch/perl-Try-Tiny-Except/issues
+  homepage: https://github.com/tfoertsch/perl-Try-Tiny-Except
+  repository: https://github.com/tfoertsch/perl-Try-Tiny-Except.git
+version: '0.01'
+x_contributors:
+  - 'Torsten Förtsch <torsten@binary.com>'

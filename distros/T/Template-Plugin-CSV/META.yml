@@ -1,0 +1,16 @@
+abstract: Template plugin to generate CSV
+author: Kang-min Liu <gugod@gugod.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Template-Plugin-CSV
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Template: 0
+  Text::CSV: 0
+version: 0.04

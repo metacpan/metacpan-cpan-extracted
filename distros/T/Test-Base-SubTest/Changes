@@ -1,0 +1,22 @@
+Revision history for Perl extension Test-Base-SubTest
+
+0.5 2014-01-24T12:32:41Z
+
+    - fix POD
+
+0.4 2014-01-16T13:53:24Z
+
+    - variable indentation
+
+0.3 2014-01-16T12:22:29Z
+
+    - add documentation
+
+0.2 2014-01-16T10:19:01Z
+
+    - fix test failure
+
+0.1 2014-01-15T13:11:23Z
+
+    - original version
+

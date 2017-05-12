@@ -1,0 +1,26 @@
+---
+abstract: 'A parser and renderer for spintax formatted text.'
+author:
+  - 'Dale Evans <dale.evans@mycanadapayday.com>'
+build_requires:
+  Test::Kwalitee::Extra: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Spintax
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Parse::Lex: '2.20'
+  perl: '5.006'
+resources:
+  repository: https://github.com/daleevans/Text-Spintax.git
+version: '0.05'

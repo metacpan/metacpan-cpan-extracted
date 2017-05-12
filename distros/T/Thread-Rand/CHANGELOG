@@ -1,0 +1,36 @@
+0.07	1 April 2012
+	Some code refactoring and some code esthetics.  Verified it runs on
+	5.14.2.
+
+0.06	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+	Added dependency on load.pm, it was missing!
+
+0.05	12 August 2003
+	Cleaned up Makefile.PL and updated copyright.  Fixed some warnings
+	in the test-suite.  Increased dependency of Thread::Tie to 0.09.
+
+0.04    29 September 2002
+	Use "load.pm" instead of AutoLoader.  Increased dependency on
+	Thread::Tie to 0.08 in Makefile.PL.
+
+	Removed "our" from $VERSION, should shave off some bytes in
+	memory usage, as found from testing with Benchmark::Thread::Size.
+
+0.03	6 September 2002
+	Added alternate solution to the documentation to circumvent the rand()
+	problem with threads.  Suggested by Benjamin Goldberg.
+
+0.02	5 September 2002
+	Added class method "global" to hijack the rand() and srand() functions
+	globally.  This to circumvent the bug in rand() and threads I found
+	today.  Added documentation and test-suite for this.
+
+	Added support for AutoLoader.
+
+	2 September 2002
+	Fixed tiny nit/optimization in sub and().
+
+0.01	1 September 2002
+	First version of Thread::Rand.

@@ -1,0 +1,21 @@
+---
+abstract: 'Measure the pair-wise Similarity of Files or Strings '
+author:
+  - 'Ted Pedersen <tpederse at d.umn.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Similarity
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 0.13

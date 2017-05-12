@@ -1,0 +1,16 @@
+#!perl
+use strict;
+use warnings;
+use Test::LatestPrereqs;
+use Getopt::Long ();
+
+my $parser = Getopt::Long::Parser->new(
+  config => [qw(bundling pass_through ignore_case)],
+);
+$parser->getoptions(\my %options, qw( update|u ));
+
+my @required = all_prereqs_are_latest();
+
+if ($options{update}) {
+  Test::LatestPrereqs::Config->save(@required);
+}

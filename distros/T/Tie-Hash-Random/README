@@ -1,0 +1,41 @@
+NAME
+       Tie::Hash::Random - Generates random different numbers for different fetched keys
+
+SYNOPSIS
+         use Tie::Hash::Random;
+
+         my %hash;
+         tie %hash, 'Tie::Hash::Random';
+
+         my $a_random_number           = $hash{foo};
+         my $an_other_random_number    = $hash{bar};
+
+         $a_random_number == $hash{foo}; ## True
+
+DESCRIPTION
+       Tie::Hash::Random generates a random number each time a different key is fetched.
+
+   STORE
+       Stores data
+
+   FETCH
+       Fetchs
+
+AUTHOR
+       Matias Alejo Garcia <matiu@cpan.org>
+
+
+UPDATES
+       The latest version of this module will always be available from from CPAN at
+       <http://search.cpan.org/~ematiu>.
+
+COPYRIGHT
+       Copyright (C) 2009, Matias Alejo Garcia
+
+LICENSE
+       This script is free software; you can redistribute it and/or modify it under the same terms as
+       Perl itself.
+
+SEE ALSO
+       perl(1), perltie(1), Tie::StdHash(1), Tie::Hash::Cannabinol
+

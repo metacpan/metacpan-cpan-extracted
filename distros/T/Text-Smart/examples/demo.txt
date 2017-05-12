@@ -1,0 +1,31 @@
+This is some =text= and this is *some*
+more text in the same paragraph
+
+We can have /some/ emphasised text and 1/2
+or 3/4 or 1/4 or (C) and (R) or (TM)
+
+* a list of stuff
+* more items
+* yet more
+
+Or another para
+
+----
+
++ one numbered list
++ here
+
+&title(main heading)
+
+&subtitle(sub heading)
+
+&section(in here)
+
+&subsection(or here)
+
+&subsection(yes here)
+
+&paragraph(final)
+
+Thats all folks apart from \@this link to(nowhere) for a
+final text

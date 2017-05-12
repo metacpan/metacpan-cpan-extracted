@@ -1,0 +1,36 @@
+---
+abstract: 'store events for later analysis.'
+author:
+  - 'Nikolay Martynov, C<< <kolya at cpan.org> >>'
+  - 'Nikolay Martynov <kolya@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::CheckManifest: 0
+  Test::Easy: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Timed-Logger
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  Time::HiRes: 0
+  perl: 5.16.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Timed-Logger
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mar-kolya/Timed-Logger.git
+version: 0.0.6

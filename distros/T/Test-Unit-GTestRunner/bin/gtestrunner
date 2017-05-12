@@ -1,0 +1,185 @@
+#!/usr/bin/perl 
+
+use strict;
+
+use Test::Unit::GTestRunner;
+use POSIX;
+use Locale::Messages qw (LC_MESSAGES);
+
+POSIX::setlocale (LC_MESSAGES, "");
+
+Test::Unit::GTestRunner::main (@ARGV) or exit 1;
+
+=cut
+
+=head1 NAME
+
+gtestrunner - GTk+ based frontend to Perl unit testing
+
+=head1 SYNOPSIS
+
+    gtestrunner Tests/MySuite.pm Tests/OtherSuite.pm
+    gtestrunner Tests::MySuite Tests::OtherSuite
+    gtestrunner
+
+=head1 DESCRIPTION
+
+The program B<gtestrunner> provides a comfortable and intuitive graphical
+user interface for running Perl unit tests.
+
+If you don't know what unit tests or test driven development are,
+please start reading the documentation for Test::Unit(3pm), or search
+the internet for "JUnit" and "test driven development".
+
+The sources for Test-Unit-GTestRunner contain a directory "Suites"
+with several dummy testsuites and test cases.  They can serve as
+an example for you, and allow you to see B<gtestrunner> in action.  Change
+to the source directory and try
+
+    gtestrunner Suites/TS_TopLevel.pm
+
+or 
+
+    gtestrunner Suites::TS_TopLevel
+
+In fact, gtestrunner supports every way of test suite loading, that
+the underlying framework Test::Unit(3pm) supports.  If you don't
+pass an argument to the script, you can load a test suite from within
+the user interface.
+
+The program B<gtestrunner> is actually a script wrapper around
+Test::Unit::GTestRunner(3pm).
+
+=head1 GUI OVERVIEW
+
+The graphical user interface to B<gtestrunner> follows the usual
+scheme of an application window and shouldn't contain any surprises
+to you.
+
+The GUI mainly consists of a drop down menu, a toolbar, a progress
+bar, and a tabbed summary window.  The tabbed summary window provides
+two different views, a flat lists of failures and a tree view of
+all tests, with indicators for success and failure for the individual
+test cases.
+
+In either view you can select individual parts of your test suite.
+In case of test failures, you will see the corresponding error 
+message in the lower window.  You can also click the "Selected"
+button next to the "Run" button in the toolbar in order to re-run
+the corresponding tests.
+
+=head1 TOOLBAR
+
+The toolbar features five buttons:
+
+=over 4
+
+=item B<Open>
+
+A file selection dialog allows you to load a different test suite.
+Please make sure that the selected test suite compiles in the current
+working directory.
+
+You can select multiple suites here.
+
+=item B<Run>
+
+Runs the entire test suite.
+
+=item B<Selected>
+
+Read the label as "(Run) Selected".  Run only the currently selected
+part of the test suite.  In the failures view, you can only select
+individual tests.  In the tree view you can select arbitrary parts
+of your test suite.
+
+=item B<Refresh>
+
+Recompiles the entire test suite, so that changes to the structure
+get visible in the tree view of the tests.
+
+=item B<Refresh suites before every run>
+
+If checked, the test suite will be recompiled before it is run.  If you
+don't recompile a suite, and tests have been removed or added, the
+display gets garbled.  You may see error messages associated with
+the wrong test.
+
+=item B<Cancel>
+
+Tries to terminate the currently running test suite.
+
+=item B<Quit>
+
+Yes, exactly! No, no confirmation dialog.  I knew you would appreciate
+that.
+
+=back
+
+=head1 MENU
+
+The menu bar provides no more functionality than the toolbar.  Please
+see the description of the corresponding toolbar buttons.
+
+=head1 INTERNALS
+
+The program is a classical "dumb" frontend.  It has no knowledge 
+about unit test suites or their structure.  The test suites passed
+as a command-line argument are fed into a subprocess, that loads
+these suites, and returns its structure to the parent process.
+Loading the test suite blocks, and the frontend does not
+repsonsive during this time.
+
+Unless you have unchecked the option "Refresh suite before every
+run", this subprocess is also started before any test run, so that
+changes in the structure of the test suite are visible in the tree
+view of the frontend.  Depending on the complexity of the suite,
+that may significantly increase the start up time for the test.
+
+Every test run spawns a new Perl interpreter as another child process.  
+The child interpreter is invoked with a -I argument (see perl(1)) for
+each member of the @INC array, so that the child process searches
+the same directories as the parent process.
+
+You should keep this in mind, when you do changes to your test suites.
+It is generally safe to add or remove tests, test cases or test suites
+between runs, but only if you reload the suite before every run.
+
+=head1 AUTHOR
+
+Copyright (C) 2004-2006, Guido Flohr E<lt>guido@imperia.netE<gt>, all
+rights reserved.  See the source code for details.
+
+This software is contributed to the Perl community by Imperia 
+ (L<http://www.imperia.net/>).
+
+=head1 ENVIRONMENT
+
+If the environment variable "GFC" is set, B<gtestrunner> will use the 
+Gtk+ FileChooser dialog instead of the Gtk+ FileSelection dialog.
+
+The package is internationalized with libintl-perl, hence the 
+environment variables "LANGUAGE", "LANG", "LC_MESSAGES", and
+"LC_ALL" will influence the language in which the GUI and 
+messages are presented.
+
+=head1 SEE ALSO
+
+Test::Unit::GTestRunner(3pm), Test::Unit::GTestRunner::Worker(3pm),
+Test::Unit::GTestRunner::Lister(3pm), Test::Unit::TestRunner(3pm), 
+Test::Unit(3pm), Locale::Messages(3pm), perl(1)
+
+=cut
+
+#Local Variables:
+#mode: perl
+#perl-indent-level: 4
+#perl-continued-statement-offset: 4
+#perl-continued-brace-offset: 0
+#perl-brace-offset: -4
+#perl-brace-imaginary-offset: 0
+#perl-label-offset: -4
+#cperl-indent-level: 4
+#cperl-continued-statement-offset: 2
+#tab-width: 4
+#End:

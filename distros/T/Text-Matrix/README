@@ -1,0 +1,54 @@
+Text-Matrix
+
+Text::Matrix is a specialist table display module for display of
+matrices of single-character (such as Y/N for yes/no) or short
+multi-character data against row and column labels that are sufficiently
+longer that conventional table layouts distort the layout of the data.
+
+The core aim is to base the layout on the tabular data concisely and
+formated regularly to reflect the terseness of the underlying data,
+without being forced to compensate for the longer length of the
+labels for the columns and rows.
+
+Text::Matrix will also optionally split the matrix into several
+sections based on width of the generated matrix, suitable for display
+in situations where you don't want external line-wrapping to confuse
+the layout.  (Display on an xterm, cut-n-paste into an email, etc.)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::Matrix
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Matrix
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-Matrix
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-Matrix
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-Matrix/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Sam Graham
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

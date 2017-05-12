@@ -1,0 +1,66 @@
+NAME
+    Test::Mock::Class - Simulating other classes
+
+SYNOPSIS
+      use Test::Mock::Class ':all';
+      require Net::FTP;
+
+      # concrete mocked class
+      mock_class 'Net::FTP' => 'Net::FTP::Mock';
+      my $mock_object = Net::FTP::Mock->new;
+
+      # anonymous mocked class
+      my $metamock = mock_anon_class 'Net::FTP';
+      my $mock_object = $metamock->new_object;
+
+      # anonymous class with role applied
+      my $metamock = Test::Mock::Class->create_anon_class(
+          roles => [ 'My::Handler::Role' ],
+      );
+      my $mock_object = $metamock->new_object;
+
+DESCRIPTION
+    In a unit test, mock objects can simulate the behavior of complex, real
+    (non-mock) objects and are therefore useful when a real object is
+    impractical or impossible to incorporate into a unit test.
+
+    The unique features of `Test::Mock::Class':
+
+    * Its API is inspired by PHP SimpleTest framework.
+
+    * It isn't tied with Test::Builder so it can be used standalone or with
+      any xUnit-like framework, i.e. Test::Unit::Lite. Look for
+      Test::Builder::Mock::Class if you want to use it with Test::Builder
+      (Test::More or Test::Simple).
+
+    * The API for creating mock classes is based on Moose and Class::MOP so
+      it doesn't clash with API of original class and is easy expandable.
+
+    * The methods for defining mock object's behavior are prefixed with
+      `mock_' string so they shouldn't clash with original object's methods.
+
+    * Mocks as actors: The mock version of a class has all the methods of
+      the original class. The return value will be `undef', but it can be
+      changed with `mock_returns' method.
+
+    * Mocks as critics: The method of mock version of a class can check its
+      calling arguments and throws an exception if arguments don't match
+      (`mock_expect' method). An exception also can be thrown if the method
+      wasn't called at all (`mock_expect_once' method).
+
+BUGS
+    The API is not stable yet and can be changed in future.
+
+AUTHOR
+    Piotr Roszatycki <dexter@cpan.org>
+
+LICENSE
+    Based on SimpleTest, an open source unit test framework for the PHP
+    programming language, created by Marcus Baker, Jason Sweat, Travis
+    Swicegood, Perrick Penet and Edward Z. Yang.
+
+    Copyright (c) 2009, 2010 Piotr Roszatycki <dexter@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under GNU Lesser General Public License.
+

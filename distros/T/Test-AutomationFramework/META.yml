@@ -1,0 +1,29 @@
+---
+abstract: Test Automation Framework  (TAF)
+author:
+  - 'Yong Wang <ywangperl@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-AutomationFramework
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Manip: 6.23
+  File::Copy: 2.18
+  File::Copy::Recursive: 0.38
+  File::Path: 2.0801
+  Getopt::Long: 2.38
+  HTTP::Server::Simple::CGI: 0.44
+  Regexp::Assemble: 0.35
+  Test::More: 0.96
+version: v0.060.04

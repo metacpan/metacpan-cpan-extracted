@@ -1,0 +1,43 @@
+Text::Annotated::Line is an OO interface for annotating the
+source file and line number to a string of text.
+
+Two special filters derived from Text::Filter are included
+for processing Text::Annotated::Line objects:
+
+* Text::Annotated::Reader reads a file line by line and performs
+  the annotation.
+
+* Text::Annotated::Writer transforms an array of Text::Annotated::Line
+  objects to an output stream, while optionally removing the annotation.
+
+AVAILABILITY
+
+The latest version of this package is available for download from a CPAN
+(Comprehensive Perl Archive Network) site near you at
+
+	http://www.perl.com/CPAN/authors/id/W/WI/WIMV/
+
+or from my FTP site:
+
+	ftp://ftp.esat.kuleuven.ac.be/pub/micas/verhaege/perl/CPAN/WIMV/
+
+INSTALLATION
+
+You install Text::Annotated::Line like you would install any other module,
+by running these commands
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+AUTHOR
+
+Wim Verhaegen <wim.verhaegen@ieee.org>
+
+COPYRIGHT
+
+Copyright (c) 2000-2002 Wim Verhaegen. All rights reserved. 
+This program is free software; you can redistribute
+and/or modify it under the same terms as Perl itself.
+

@@ -1,0 +1,2 @@
+ERROR(bitsimat.pl):
+        Line1 in Vector file <test-B1c.vec> should show #rows #cols #nnz.

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "---
+precondition_type: command
+text: $1
+---
+precondition_type: hostname
+text: $2
+---
+precondition_type: subject
+text: $3
+---
+precondition_type: bitness
+text: $4
+"

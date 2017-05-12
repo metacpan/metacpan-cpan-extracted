@@ -1,0 +1,6 @@
+start => '00:00', tz => 'Europe/London', calendar => 'DST_END_EU'
+
+J2( every=>60, until=>'23:59')
+
+
+ 

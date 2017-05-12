@@ -1,0 +1,11 @@
+Changes
+examples/live-sites
+lib/Test/Varnish.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/analyze-response.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,78 @@
+#!/usr/bin/perl -w
+
+#
+# append_entries
+#
+# Appends entries from a source file to a destination file.  Only regular
+# entries are copied; macro definitions, preambles, and comments are
+# dropped.  User may supply a regex which the entry keys must match to be
+# appended.
+# 
+# Note that a "real" entry appender/database merger would be a lot more
+# complicated than this!  Some things that would have to be handled:
+#  * enforcing the structure of input entries (eg. making sure they
+#    conform to the rules of some database structure such as 'Bib')
+#  * doing any other checks particular to your database, such as ensuring
+#    that journal or conference names come from an approved list of
+#    "known" journals and conferences (to enforce consistent naming
+#    across a large database)
+#  * detecting and resolving key collisions
+#  * adding any preambles in the source file to the destination file
+#  * checking for duplicate macro definitions
+#  * ensuring that macros used in the source file are defined in
+#    the destination file
+# 
+# by Greg Ward, 1998/04/04
+#
+# $Id$
+#
+ 
+# Copyright (c) 1997-2000 by Gregory P. Ward.  All rights reserved.  This file
+# is part of the Text::BibTeX library.  This library is free software; you
+# may redistribute it and/or modify it under the same terms as Perl itself.
+ 
+use strict;
+use Text::BibTeX;
+
+my $usage = <<USAGE;
+usage: $0 dest_file source_file [key_pattern]
+       appends regular entries from <source_file> whose keys match
+       <key_pattern> to <dest_file>; if <key_pattern> not supplied, all
+       entries from <source_file> are taken
+USAGE
+
+die $usage unless @ARGV == 2 || @ARGV == 3;
+my ($dest_filename, $source_filename, $key_pattern) = @ARGV;
+
+# Open the two files: dest_file in append mode (ultimately just using
+# perl's builtin 'open'), and source_file in regular read-only mode.
+my $dest_file = Text::BibTeX::File->new(">>$dest_filename")
+   or die "couldn't open $dest_filename for appending: $!\n";
+my $source_file = Text::BibTeX::File->new($source_filename)
+   or die "couldn't open $source_filename: $!\n";
+
+# Turn on 'value preservation' mode for the input file.  This is mainly so
+# we don't lose the fact that macros are macros and numbers are numbers,
+# but it also frees us from having to worry about predefined macros
+# (such as the month names).
+$source_file->preserve_values (1);
+
+# And loop over all entries in the source file, optionally appending
+# each one to the destination file.
+
+while (my $entry = Text::BibTeX::Entry->new($source_file))
+{
+   # Skip this entry if it's not a regular entry -- that is, we just
+   # drop '@string', '@comment', and '@preamble' entries, probably
+   # unacceptable in the real world.
+   next unless $entry->metatype == BTE_REGULAR;
+
+   # Skip this entry if the user supplied a regex that keys must match
+   # and this entry's key doesn't match.
+   next if defined $key_pattern && $entry->key !~ /$key_pattern/o;
+
+   # Otherwise, write this entry to the destination file.  Since $dest_file
+   # was opened in append mode, $entry will be appended to the end of
+   # $dest_file.
+   $entry->write ($dest_file);
+}  # while $source_file

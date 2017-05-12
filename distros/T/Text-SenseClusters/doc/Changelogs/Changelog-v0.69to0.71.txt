@@ -1,0 +1,33 @@
+
+Changes made in Sense-Clusters version 0.69 during version 0.71
+
+Anagha Kulkarni  kulka020@d.umn.edu
+Ted Pedersen 	 tpederse@d.umn.edu
+
+1. Handled the case of - "no features" after all the feature 
+elimination rule have been applied.							-Anagha
+
+2. The training file if specified needs to be in plain text 
+format - added few checks for the same						-Anagha	
+
+3. format_clusters.pl - Handled the case that sval2 input file
+can be unlabeled/untagged i.e., without answer tag.			 -Anagha
+
+4. Handled the case where --eval option is used for 
+unlabeled/untagged data										 -Anagha
+
+5. Cleaned up the dangling links to files for word clustering
+in the web-interface										 -Anagha
+
+6. Removed the "wupgma" from the allowed list of  option value 
+for the option --crfun (Criterion function) because Cluto does
+not support "wupgma".										 -Anagha
+
+7. Added the preprocessing and splitting functionality to the 
+wrapper (discriminate.pl) and the web-interface 			 -Anagha
+
+8. Moved in preprocess.pl and nsp2regex.pl from SenseTools to
+SenseClusters and thus removed the dependency.				 -Anagha
+
+(Changelog-v0.69to0.71 Last Updated on 09/14/2005 by Anagha)
+

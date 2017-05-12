@@ -1,0 +1,30 @@
+---
+abstract: 'Perl extension for parsing TeX XDV files'
+author:
+  - 'Rick Myers <jrm@cpan.org>'
+build_requires:
+  Exporter: '0'
+  Test::More: '0'
+  Text::Diff: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TeX-XDV-Parse
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  TeX::DVI::Parse: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.04'

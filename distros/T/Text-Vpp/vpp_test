@@ -1,0 +1,14 @@
+#!/bin/sh
+vpp -varFile test1_1.var -prefix '^(' -suffix ')' -substitute '/&{/}/' \
+    -output test1_1.res test1_1.txt
+cat <<EOD >test1_1.got
+Here is pi : 3.14159265358979 !
+  Keep the dollar $ here
+  Guru's address is
+  Sarathy Gurusamy
+  Madison  in  Michigan or in Perl City or in elsewhere
+  008
+EOD
+cmp test1_1.res test1_1.got
+rm test1_1.res test1_1.got
+

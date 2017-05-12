@@ -1,0 +1,28 @@
+---
+name: Test-Group-Foreach
+version: 0.03
+author:
+  - 'Nick Cleaton <nick@cleaton.net>'
+abstract: repeat tests for several values
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Pod::Snippets: 0
+  Test::Builder::Tester: 0
+  Test::Exception: 0
+  Test::More: 0
+requires:
+  Test::Group: 0.16
+  Test::NameNote: 0
+  perl: 5.006001
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Test::Group::Foreach:
+    file: lib/Test/Group/Foreach.pm
+    version: 0.03
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

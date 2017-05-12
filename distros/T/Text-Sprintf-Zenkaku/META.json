@@ -1,0 +1,79 @@
+{
+   "abstract" : "sprintf with zenkaku chars",
+   "author" : [
+      "sago35 <takasago@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Sprintf-Zenkaku",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Term::Encoding" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::Trap" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Sprintf::Zenkaku" : {
+         "file" : "lib/Text/Sprintf/Zenkaku.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sago35/Text-Sprintf-Zenkaku/issues"
+      },
+      "homepage" : "https://github.com/sago35/Text-Sprintf-Zenkaku",
+      "repository" : {
+         "url" : "git://github.com/sago35/Text-Sprintf-Zenkaku.git",
+         "web" : "https://github.com/sago35/Text-Sprintf-Zenkaku"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "sago35 <sago35@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

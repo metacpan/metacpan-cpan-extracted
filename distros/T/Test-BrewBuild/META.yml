@@ -1,0 +1,41 @@
+---
+abstract: 'Perl/Berry brew unit testing automation, with remote tester dispatching capabilities.'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires:
+  Archive::Zip: '0'
+  Mock::Sub: '1.07'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-BrewBuild
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::cpanminus: '0'
+  Archive::Extract: '0'
+  Capture::Tiny: '0'
+  Config::Tiny: '0'
+  File::Copy::Recursive: '0'
+  LWP::Simple: '0'
+  Logging::Simple: '0.07'
+  MetaCPAN::Client: '0'
+  Module::Load: '0'
+  Parallel::ForkManager: '0'
+  Plugin::Simple: '0.06'
+  Proc::Background: '0'
+  Test::BrewBuild::Plugin::TestAgainst: '0.06'
+  perl: '5.01'
+  version: '0'
+resources:
+  bugtracker: https://github.com/stevieb9/p5-test-brewbuild/issues
+  repository: https://github.com/stevieb9/p5-test-brewbuild.git
+version: '2.17'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

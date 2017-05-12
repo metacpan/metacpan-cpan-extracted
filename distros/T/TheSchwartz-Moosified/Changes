@@ -1,0 +1,44 @@
+Revision history for TheSchwartz-Moosified
+
+0.07    2016.9.21
+        Improve performance of find_job_for_workers() by avoiding creating
+        objects that we do not use.
+
+0.06    2011.7.14
+        Fix problem with tests loading old versions of the code.
+        Redo Postgres setup code
+
+0.05_005 2009.6.18
+        replace_with() supports args that are references again (oops)
+
+0.05_004 2009.6.18
+        Fix replace_with() bugs (can't insert same uniqkey, goes to different dbs randomly)
+        Fix some database timestamps for Pg
+
+0.05_003 2009.6.8
+        Fix job prioritization bug
+
+0.05_002 2009.6.4
+        Fix query parameters to list_jobs();
+        Prevent some transient transaction errors and warnings under PostgreSQL
+
+0.05_001 2009.5.21
+        Support prefix (Thanks to Mark Fowler and Tatsuhiko Miyagawa, From TheSchwartz::Simple)
+        Add prefix support for PostgreSQL
+        Remove Socialtext-specific tests for PostgreSQL
+        Add "error_length" option.
+
+0.04    2009.5.11
+        Improve support for PostgreSQL.
+        Fix a retry_after bug that accidentally updated all jobs' run_after time.
+        Fix a bug where retries would insert multiple exitstatus rows.
+
+0.03    2009.2.17
+        borrow some code from TheSchwartz::Simple
+
+0.02    2009.2.14
+        fix _grab_a_job with WHERE grabbed_until = $old_grabbed_until
+
+0.01    2008.11.19
+        rename from MooseX::TheSchwartz
+

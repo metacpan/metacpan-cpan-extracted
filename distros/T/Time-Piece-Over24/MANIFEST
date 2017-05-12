@@ -1,0 +1,10 @@
+Changes
+lib/Time/Piece/Over24.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+MYMETA.json
+MYMETA.yml
+t/00_compile.t
+t/01_usage.t
+t/02_dst.t

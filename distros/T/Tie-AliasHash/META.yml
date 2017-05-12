@@ -1,0 +1,22 @@
+---
+abstract: 'Hash with aliases key (multiple keys, one value)'
+author:
+  - 'Aldo Calpini <dada@perl.it>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-AliasHash
+provides:
+  Tie::AliasHash:
+    file: lib/Tie/AliasHash.pm
+    version: 1.02
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dada/Tie-AliasHash
+version: 1.02

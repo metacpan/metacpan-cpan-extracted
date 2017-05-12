@@ -1,0 +1,9 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/Thread/Synchronized.pm
+t/Synchronized.t
+META.yml                                 Module meta-data (added by MakeMaker)

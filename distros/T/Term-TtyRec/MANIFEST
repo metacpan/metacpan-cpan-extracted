@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/pttyplay
+lib/Term/TtyRec.pm
+lib/Term/TtyRec/Player.pm
+t/00_ttyrec.t
+t/01_player.t
+t/02_peek.t
+t/test.tty

@@ -1,0 +1,53 @@
+NAME
+    Task::Graph::Reader - Install the Graph::Reader modules.
+
+SYNOPSIS
+     cpanm Task::Graph::Reader
+
+SEE ALSO
+    Graph::Reader
+        base class for Graph file format readers
+
+    Graph::Reader::Dot
+        class for reading a Graph instance from Dot format
+
+    Graph::Reader::Graph6
+        read Graph in graph6 or sparse6 format
+
+    Graph::Reader::HTK
+        read an HTK lattice in as an instance of Graph
+
+    Graph::Reader::LoadClassHierarchy
+        load Graphs from class hierarchies
+
+    Graph::Reader::OID
+        Perl class for reading a graph from OID format.
+
+    Graph::Reader::TGF
+        Perl class for reading a graph from TGF format.
+
+    Graph::Reader::TGF::CSV
+        Perl class for reading a graph from TGF format with CSV labeling.
+
+    Graph::Reader::UnicodeTree
+        Perl class for reading a graph from unicode tree text format.
+
+    Graph::Reader::XML
+        class for reading a Graph instance from XML
+
+REPOSITORY
+    <https://github.com/tupinek/Task-Graph-Reader>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

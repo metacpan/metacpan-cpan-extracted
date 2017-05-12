@@ -1,0 +1,82 @@
+########################################################################
+#       $Id: Makefile 87 2010-01-12 10:56:28Z vlado $
+# $Revision: 87 $
+#     $Date: 2010-01-12 06:56:28 -0400 (Tue, 12 Jan 2010) $
+#
+# (c) 1998-2010 Vlado Keselj http://www.cs.dal.ca/~vlado
+
+DCC=gcc -g -ansi -Wall
+CC=gcc -O4 -ansi
+CO=co -l -zLT
+RM=/bin/rm
+
+# <? sub test_m {
+# my $num = shift;
+# my $arg = shift;
+# my $ul  = shift;
+# my $iz  = shift;
+# my $uspj = shift;
+# my $echo_n = "echo -n '$uspj '";
+# if ($uspj =~ /\\n$/) { $echo_n = "echo '$`'" }
+# my $r = <<"EOT";
+#test$num: unis_d
+#	\@echo -n test$num: && ./unis_d $arg < $ul > tmp/tmp && diff tmp/tmp $iz && $echo_n
+#testr$num: unis
+#	\@echo -n test$num: && ./unis $arg < $ul > tmp/tmp && diff tmp/tmp $iz && $echo_n
+#testv$num: unis_d
+#	\@echo test$num (to fix use make mktest$num)
+#	./unis_d $arg < $ul > tmp/tmp && diff tmp/tmp $iz
+#mktest$num: unis_d
+#	./unis_d $arg < $ul > $iz
+#TEST_LIST+=   test$num
+#TESTR_LIST+=  testr$num
+#TESTV_LIST+=  testv$num
+#MKTEST_LIST+= mktest$num
+#EOT
+#  return $r;
+# }
+# !>
+#
+#<?
+# echo &test_m(  '2','-d',              't/html/2.htm',         't/html/2.out',            'ok');
+# echo &test_m(  '3','-h -uipp iso',    't/html/3-ipp.html',    't/html/3.out',            'ok');
+#!>
+#+
+test2: unis_d
+	@echo -n test2: && ./unis_d -d < t/html/2.htm > tmp/tmp && diff tmp/tmp t/html/2.out && echo -n 'ok '
+testr2: unis
+	@echo -n test2: && ./unis -d < t/html/2.htm > tmp/tmp && diff tmp/tmp t/html/2.out && echo -n 'ok '
+testv2: unis_d
+	@echo test2 (to fix use make mktest2)
+	./unis_d -d < t/html/2.htm > tmp/tmp && diff tmp/tmp t/html/2.out
+mktest2: unis_d
+	./unis_d -d < t/html/2.htm > t/html/2.out
+TEST_LIST+=   test2
+TESTR_LIST+=  testr2
+TESTV_LIST+=  testv2
+MKTEST_LIST+= mktest2
+test3: unis_d
+	@echo -n test3: && ./unis_d -h -uipp iso < t/html/3-ipp.html > tmp/tmp && diff tmp/tmp t/html/3.out && echo -n 'ok '
+testr3: unis
+	@echo -n test3: && ./unis -h -uipp iso < t/html/3-ipp.html > tmp/tmp && diff tmp/tmp t/html/3.out && echo -n 'ok '
+testv3: unis_d
+	@echo test3 (to fix use make mktest3)
+	./unis_d -h -uipp iso < t/html/3-ipp.html > tmp/tmp && diff tmp/tmp t/html/3.out
+mktest3: unis_d
+	./unis_d -h -uipp iso < t/html/3-ipp.html > t/html/3.out
+TEST_LIST+=   test3
+TESTR_LIST+=  testr3
+TESTV_LIST+=  testv3
+MKTEST_LIST+= mktest3
+
+#-
+
+.PHONY: test $(TEST_LIST) $(TESTV_LIST) $(MKTEST_LIST)
+
+test: ${TMPDIR} $(TEST_LIST); @echo Done
+testr: $(TESTR_LIST); @echo Done
+testv: $(TESTV_LIST); @echo Done
+mktest: $(MKTEST_LIST); @echo Done
+
+tmp/prevedi.c: prevedi.c.sfish
+	starfish -o=$@ -replace $<

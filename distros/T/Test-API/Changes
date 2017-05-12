@@ -1,0 +1,46 @@
+Revision history for Test-API
+
+0.008     2017-04-02 13:30:12-04:00 America/New_York
+
+    - No changes from 0.007-TRIAL
+
+0.007     2017-02-27 09:50:45-05:00 America/New_York (TRIAL RELEASE)
+
+    [TESTS]
+
+    - Fixed tests for perls without '.' in @INC
+
+0.005     2014-04-24 11:09:01-04:00 America/New_York
+
+    [CHANGED]
+
+    - common methods treated as private (e.g. AUTOLOAD, BUILD) are ignored
+
+0.004     2014-03-14 11:43:54+01:00 Europe/Paris
+
+    [ADDED]
+
+    - class_api_ok function tests methods, which may be provided the
+      module tested or a superclass (Toby Inkster)
+
+    [CHANGED]
+
+    - dropped dependencies on superclass and Devel::Symdump (Toby Inkster)
+
+0.003     2014-02-27 06:19:07-05:00 America/New_York
+
+    [CHANGED]
+
+    - updated distribution metadata, repo and bugtracker
+
+    - switched to Dist::Zilla for managing this distribution
+
+0.002 Mon Mar  9 18:30:20 EDT 2009
+
+    [ADDED]
+
+    - import_ok() function
+
+0.001 Sun Mar  8 16:38:11 EDT 2009
+
+    - Initial release

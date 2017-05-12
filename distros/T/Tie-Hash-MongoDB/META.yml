@@ -1,0 +1,29 @@
+---
+abstract: 'Tie a hash to a MongoDB document'
+author:
+  - 'Sebastian Willing, C<< <sewi at cpan.org> >>'
+  - 'Sebastian Willing <sewi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  IO::Socket: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Hash-MongoDB
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  MongoDB: 0
+  MongoDB::Connection: 0
+  MongoDB::OID: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

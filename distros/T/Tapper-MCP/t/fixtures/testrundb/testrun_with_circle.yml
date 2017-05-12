@@ -1,0 +1,79 @@
+---
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+    active: 1
+
+# -------------------- "test requests" (Testruns)
+
+# ======================= Xen requests =========================
+
+# --- aaa ---
+
+- schema: Testrun
+  name: aaa-xen
+  data:
+    id: 1001
+    owner_id: 12
+    shortname: aaa-xen
+    notes: aaa
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Xen-aaa
+  data:
+    id: 101
+    testrun_id: 1001            # aaa
+    queue_id: 1                 # Xen
+    status: schedule
+    
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 1
+    name: iring
+    free: 1
+    active: 1
+
+
+# iring bound to Xen queue
+- schema: QueueHost
+  name: iring
+  data:
+    id: 1
+    queue_id: 1
+    host_id: 1
+
+- schema: TestrunRequestedHost
+  name: iring_on_Xen
+  data:
+    id: 1
+    testrun_id: 1001
+    host_id: 1
+

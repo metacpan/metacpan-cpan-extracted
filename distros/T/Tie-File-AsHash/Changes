@@ -1,0 +1,48 @@
+Revision history for Perl module Tie::File::AsHash
+
+0.200	2013-11-12
+    - version bump for synchronize with Tie::Array::AsHash
+    - reformat Changes as per CPAN::Changes::Spec
+    - move repository to GitHub
+    - modernize toolchain
+    - add author tests to the repository (not distribution!)
+
+0.09	2008-05-14
+    - Functionality to work on array splitted to Tie::Array::AsHash
+    - Derive from Tie::Array::AsHash
+
+0.08	2005-11-21
+    - Broken test cases fixed. Test failed on older versions of Perl (< 5.8.3) and Windows
+
+0.07	2005-10-27
+    - Fixed small problem in sub STORE.  Thanks
+      Marco Poleggi for the patch!
+
+0.06	2005-02-02
+    - Added META.yml to package
+    - More tests
+
+0.05	2005-02-02
+    - Rather major typo in the module's POD
+    - More tests
+
+0.04	2005-02-02
+    - NEXTKEY wasn't incrementing the index
+
+0.03	2005-01-04
+    - No more global (lexical to file) variables - uses
+      $self for parameters
+    - Renamed parameters (split and join)
+    - Used \Q and \E in regexes where needed
+    - Regexes use the s modifier now, to allow for
+      newlines in strings
+    - Other minor changes to documentation and code
+    - Module is still beta
+
+0.02	2005-01-04
+    - Code cleaned up, numerous modifications
+    - Made some basic tests
+    - Initial release on CPAN
+
+0.01	2001-01-03
+    - Original version, never released

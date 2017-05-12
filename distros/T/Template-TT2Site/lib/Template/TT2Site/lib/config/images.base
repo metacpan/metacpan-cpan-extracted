@@ -1,0 +1,16 @@
+[%# $Id: images.base,v 1.1 2004/12/05 11:57:58 jv Exp $ -%]
+[%
+
+# Postprocessing images used by this site. Please DO NOT override.
+
+# Set the background.
+site.background = site.image.background;
+
+# Calculate width for the left column.
+IF site.image.logo.width < site.image.name.width;
+    site.logowidth = site.image.name.width;
+ELSE;
+    site.logowidth = site.image.logo.width;
+END;
+
+-%]

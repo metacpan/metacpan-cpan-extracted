@@ -1,0 +1,30 @@
+Revision history for Perl extension Tk::Mirror.
+
+0.06 Sat Oct 25 16:34:05 2008
+ 	- check the return value of the MainWindow() call in Tk-Mirror.t
+
+0.05 Sat Oct 18 11:57:41 2008
+ 	- attempt to catch the error "couldn't connect to display" with eval
+
+0.04 Sat Oct 11 17:38:41 2008
+ 	- no tests without a valid screen
+
+0.03 Mon Feb  4 19:51:11 2008
+ 	- renamed methods:
+ 		UpdateUser() to SetParams()
+ 		StoreNewAccess() to StoreParams() 
+ 	- new methods:
+ 		InsertPaths()
+		DeletePaths()
+ 		InsertProperties()
+ 		DeleteProperties()
+ 		InsertRemoteModifiedTimes()
+ 		InsertLocalModifiedTimes()
+ 	- new attribute 'overwrite'
+
+0.01  Mon Jan  9 18:49:21 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Tk::Mirror
+
+
+

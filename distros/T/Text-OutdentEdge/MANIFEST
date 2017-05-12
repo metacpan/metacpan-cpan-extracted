@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+SIGNATURE
+example/outdent.pl
+example/sample-a.txt
+example/sample-b.txt
+example/sample-c.txt
+inc/ExtUtils/MY_Metafile.pm
+lib/Text/OutdentEdge.mlpod
+lib/Text/OutdentEdge.pm
+lib/Text/OutdentEdge_ja.pod
+t/00-load.t
+t/01-basic.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

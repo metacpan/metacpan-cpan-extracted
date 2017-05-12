@@ -1,0 +1,9 @@
+DESCRIPTION
+
+    This distribution contains several modules for convenient showing of
+    tree object structure to text:
+
+    # INSERT_MODULES_LIST -Tree::ToText
+
+SEE ALSO
+

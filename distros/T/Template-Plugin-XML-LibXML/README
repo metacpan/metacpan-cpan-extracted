@@ -1,0 +1,105 @@
+              LibXML Plugin for the Template Toolkit
+
+                            Version 1.04
+
+                           11th June 2003
+
+       Copyright (C) 2002-3 Mark Fowler.  All Rights Reserved
+
+       This is free software; you can redistribute it and/or
+           modify it under the same terms as Perl itself.
+
+
+Hmm, most people will never read this as they'll download with
+CPANPLUS or CPAN.  Here's hoping they click on it from a link from
+http://search.cpan.org/
+
+STOP: Do you want the main documentation by typing
+      "perldoc Template::Plugin::XML::LibXML" ?
+
+DESCRIPTION
+-----------
+
+This is a plugin for XML::LibXML for the template toolkit.  It's not
+that complicated but it does have some interesting features
+
+  - Being able to load XML with a USE statement like the XML.XPath
+    plugin does
+
+  - VIEW support (erk, this took some explaining)
+
+  - Documentation and examples in the main pod that should hopefully
+    mean anyone with an even passing familiarity with XPath should
+    be able to get up and running in minutes
+
+INSTALL
+-------
+
+Just like any other Perl module:
+
+  tar zxf Template-Plugin-XML-LibXML-X.XX.tar.gz
+  cd Template-Plugin-XML-LibXML-X.XX
+  perl Makefile.PL
+  make
+  make test
+  make install      (as root, or with sudo, etc)
+
+Or, if you're using the new Module::Build install method:
+
+  tar zxf Template-Plugin-XML-LibXML-X.XX.tar.gz
+  cd Template-Plugin-XML-LibXML-X.XX
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install   (as root, or with sudo, etc)
+
+This requires
+
+ * The Template Toolkit version 2.06 or later
+ * XML::LibXML 1.52 or later (which itself will require the libxml
+   system library)
+
+It may work with earlier versions of both modules, but it hasn't been
+tested with them.
+
+It also recommends
+
+  * Scalar::Util 1.07
+
+SUPPORT
+-------
+
+Support for this module can be requested in three ways:
+
+  1) Use the CPAN RT.  http://rt.cpan.org/.  This is primarly for
+     bugs and feature requests.
+
+  2) Use the Template Toolkit mailing list.
+     http://www.template-toolkit.org/mailman/listinfo/templates
+     Best for "should I be using XML.XPath instead" type questions
+
+  3) Mailing me directly (mark@twoshortplanks.com)
+
+Problems with the underlying XML::LibXML module probably should be
+addressed to either the perl xml mailing list at
+
+ mailto:perl-xml-request@listserv.ActiveState.com?subject=help
+
+or to the current maintainer of XML::LibXML (Christian Glahn
+christian.glahn@uibk.ac.at), or to the current maintainers of the
+underlying GNOME module libxml2.
+
+AUTHOR
+------
+
+This plugin was written by Mark Fowler <mark@twoshortplanks.com>. It
+uses the XML::LibXML module (written by Matt Sergeant and Christian
+Glahn) and the Template Toolkit (written by Andy Wardly).
+
+COPYRIGHT
+---------
+
+Copyright (C) 2002-3 Mark Fowler.  All Rights Reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

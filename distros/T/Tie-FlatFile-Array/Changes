@@ -1,0 +1,29 @@
+Revision history for Perl extension Tie::FlatFile::Array.
+
+0.05  Fri Mar  6 23:10:26 CST 2009
+	- Allow FETCH to return undef upon out-of-bounds
+	- Add test: undef when out-of-bounds happens
+
+0.04  Fri Feb 27 00:09:58 CST 2009
+	- author email address change
+	- Allow croak to deliver messages that refer to the
+	correct caller's stack frame
+	- Test that out-of-bounds requests result in aborts
+	- Note in the docs that going out-of-bounds is an error
+	- FF_Common.pm: let the programmer know where
+	  /tmp/tfa-test.dir comes from
+
+
+0.03  Thu Mar 15 13:20:00 CDT 2007
+	- minor improvements to the tests
+	- Added dependency information into Makefile.PL. This module
+	depends upon Class::Accessor.
+
+0.02  Sun Mar 11 04:09:34 CDT 2007
+	- changed module name to Tie::FlatFile::Array
+	  at the request of Adam Kennedy.
+
+0.01  Sat Mar  3 13:09:31 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -n Tie::Flatfile::Array
+

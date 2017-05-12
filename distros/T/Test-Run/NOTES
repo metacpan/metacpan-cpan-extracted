@@ -1,0 +1,10 @@
+Test::Harness is backwards compatible with 5.004 and must remain that
+way.  Because of this, you may seem some odd things being done.
+
+    - Because => doesn't quote properly in 5.004, you have to remember
+      to quote the LHS if its 'next' or 'ok' or 'skip', etc...
+
+
+Test::Harness cannot have a dependency on any other testing module because
+of a risk of a circular dependency.  Therefore, we distribute Test::More
+along with it.

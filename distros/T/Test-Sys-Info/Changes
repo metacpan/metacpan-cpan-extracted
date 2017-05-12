@@ -1,0 +1,31 @@
+Revision history for Perl extension Test::Sys::Info.
+
+0.21 Sun Jul  8 01:50:04 2012
+    => Bump version.
+
+0.20 Wed Dec  2 05:59:43 2009
+    => perlcritic refactoring.
+
+0.17 Thu Sep  3 02:31:42 2009
+    => Some problem with PAUSE. RE-releasing 0.16.
+
+0.16 Thu Sep  3 02:04:04 2009
+    => Distro & Pod fix.
+
+0.15 Thu Apr 23 15:14:22 2009
+    => Update builder.
+
+0.14 Sat Apr 18 06:45:17 2009
+    => Update distro tools.
+
+0.13 Mon Mar 16 04:59:31 2009
+    => Fix cpu tests.
+
+0.12 Sat Mar 14 06:07:04 2009
+    => New cpu tests.
+
+0.11 Sat Mar 14 05:12:49 2009
+    => EU::MM bug workaround.
+
+0.10 Thu Mar 12 03:30:39 2009
+    => Initial release.

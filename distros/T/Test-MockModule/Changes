@@ -1,0 +1,36 @@
+Revision history for Test::MockModule
+
+v0.10 2015-05-30
+    - Updated docs for mocking when using exported functions
+
+v0.09 2015-03-15
+    - Ensure LICENSE autogenerates for distribution, fixed license issues in Build.PL
+
+v0.08 2015-03-14
+    - Updated README with correct instructions now that we use Build.PL
+
+v0.07 2015-03-14
+    - Updated docs for more clarity when handling objects of mocked classes.
+
+v0.06 2015-03-07
+    - unmock() on inherited subroutines will dispatch to the parent module,
+      rather than replace the local subroutine with the parent's subroutine
+      from the time of mocking (RT77439)
+
+v0.05 2004-03-24
+    - unmock() accepts a list of subroutines to unmock. Thanks to David Wheeler
+      for the suggestion and patch
+    - Added t/pod_coverage.t
+
+v0.04  2004-12-12
+    - You can now mock a subroutine with a scalar value or a reference
+      (install sub that returns the value). Thanks to Ovid for the suggestion.
+
+v0.03  2004-12-05
+    - Restores subs/methods that previously didn't exist (undefine them)
+
+v0.02  2004-11-28
+    - Fixed restoring inherited methods
+
+v0.01  2004-11-28
+    - Initial revision

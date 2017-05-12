@@ -1,0 +1,8 @@
+MANIFEST                   	This shipping list
+Makefile.PL                	Generic Makefile template
+lib/Tie/Array/QueueExpire.pm    Is a minimalist RPN parser/processor (a little like FORTH)
+README             	   	Read this first
+test.pl                   	Basic test script
+META.yml                   	Module meta-data (added by MakeMaker)
+Changelog
+META.json                                Module JSON meta-data (added by MakeMaker)

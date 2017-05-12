@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 acfe9ff71750dd3a9449f4e20133eb9a02d3488f Build.PL
+SHA1 b3cf7d812a80da23c3406041cf9f5121c7fab612 COPYING
+SHA1 4a61fd9a195804144f58753687af2683d7c93430 Changelog
+SHA1 9b1ee8c628494e82066e850e532032f75e61b84b MANIFEST
+SHA1 14785d130a8d4b172281ed00108eedf3f5a3cecb META.json
+SHA1 44ed52e9f21ad667710ca6e95aa2dc418826f30f META.yml
+SHA1 b8feabc9fb485c6e3ff0e31c4b080532103e01c4 README
+SHA1 eb2218673866fdf78777fd5179f275b306cc3d74 bin/hafas-m
+SHA1 474df67a1ee4170c9ac61433068ac1da7978abf1 lib/Travel/Status/DE/DeutscheBahn.pm
+SHA1 d2a73360a59b6942268c002afb1b7f8350ac350c lib/Travel/Status/DE/HAFAS.pm
+SHA1 4f1843e905a6bda22809cce06e1348098e875e32 lib/Travel/Status/DE/HAFAS/Result.pm
+SHA1 69338868c2618b0c99fc5904e8e88b32ff82513f lib/Travel/Status/DE/HAFAS/StopFinder.pm
+SHA1 6cfaebdb4d57688b8ac50f3e840a99a48c15457b t/00-compile-pm.t
+SHA1 3adfc7da6082f15051da7fbda884723388738b61 t/01-compile-pl.t
+SHA1 fd251ffc56ca6e52020c906b61158f78b035679d t/10-pod-coverage.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeBu3Bxxr9kjq6wihEA1b+1Fm4AUFAlhyFakACgkQEA1b+1Fm
+4AWpoxAAhdLs8hj37VOTnOXj/Y5U2z8hzEPry6mUMJTntm27M4vZeNsFf4mEnwwY
+BZKqUBhJu0lnOQu9LlbVN4iEqK4Rap1IUb6ppkLSo2IS6WtNDWiFyMiPsW2u/yEB
+7q2y+F/1E+yQIq/OQfroL+Gry47Y0tQPYQ0Hq269ulfMkke8Hw7O/f+N2CijT66T
+yWPloYeQHQVbgzZgh3g8wQxQfNgaj7Aac8yGLgBZr++AQtHpNbooUiTiz0jU3ena
+zJlOi0XqF83Lyfpga3MyOcW0eck5kWMx9DJXPLhRaW2PBXA0gluJDBfJyLH9L1xf
+PLmRhC5H00Ir7lyP2/ZmpiRlhgnAW38GYOb+gDGCI6Gm9UqVOhpnCLlgpv9eLdHy
+ClI2EfGtpGYAYFQ133iLeSWhcUAUR4C0oA/IhhKK1l/cTzpCRnJvRwNTE7GZy4ga
+ezf8t9NiNck0BL5gcBpfs1a92NoSCurr8x9/7QbxMdG+k9tAKCjxJZAvvIvX1ZQh
+w+EeJ8474mdffm4hPQx+bHKU2lbDbV0zUkddr44R2o4j/HD2/3Pnh58Eojej+lqF
+vh2AtF5zcrVH/RTkagjWUwFm/z9PY9i0NQin8Df+311v5d+HD+Y4v8YsHkCSI7ot
+q/0J0xWUKvdIEIqXbYnqOhq/9V6Lian69GJNC9UCxTJIIRjOLI4=
+=r8Nf
+-----END PGP SIGNATURE-----

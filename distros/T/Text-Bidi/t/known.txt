@@ -1,0 +1,44 @@
+R ES RLE B;LTR: 1,1,x,0 > 1,0,x,0 % ‏-‫
+R ES RLO B;LTR: 1,1,x,0 > 1,0,x,0 % ‏-‮
+R ET RLE B;LTR: 1,1,x,0 > 1,0,x,0 % א#‫
+
+R ET RLO B;LTR: 1,1,x,0 > 1,0,x,0 % ‏¢‮
+R CS RLE B;LTR: 1,1,x,0 > 1,0,x,0 % א:‫
+
+R CS RLO B;LTR: 1,1,x,0 > 1,0,x,0 % א/‮
+R ON RLE B;LTR: 1,1,x,0 > 1,0,x,0 % ‏'‫
+R ON RLO B;LTR: 1,1,x,0 > 1,0,x,0 % א!‮
+AL ES RLE B;LTR: 1,1,x,0 > 1,0,x,0 % ؜+‫
+
+AL ES RLO B;LTR: 1,1,x,0 > 1,0,x,0 % ا-‮
+AL ET RLE B;LTR: 1,1,x,0 > 1,0,x,0 % ؜$‫
+AL ET RLO B;LTR: 1,1,x,0 > 1,0,x,0 % ؜%‮
+AL CS RLE B;LTR: 1,1,x,0 > 1,0,x,0 % ا:‫
+AL CS RLO B;LTR: 1,1,x,0 > 1,0,x,0 % ؜/‮
+AL ON RLE B;LTR: 1,1,x,0 > 1,0,x,0 % ا&‫
+AL ON RLO B;LTR: 1,1,x,0 > 1,0,x,0 % ؜>‮
+AN ES RLE B;ON: 2,1,x,0 > 2,0,x,0 % ؀+‫
+AN ES RLE B;LTR: 2,1,x,0 > 2,0,x,0 % ؀+‫
+AN ES RLO B;ON: 2,1,x,0 > 2,0,x,0 % ؀-‮
+AN ES RLO B;LTR: 2,1,x,0 > 2,0,x,0 % ؀-‮
+AN ET RLE B;ON: 2,1,x,0 > 2,0,x,0 % ؀#‫
+AN ET RLE B;LTR: 2,1,x,0 > 2,0,x,0 % ؀#‫
+AN ET RLO B;ON: 2,1,x,0 > 2,0,x,0 % ؀¢‮
+AN ET RLO B;LTR: 2,1,x,0 > 2,0,x,0 % ؀¢‮
+AN CS RLE B;ON: 2,1,x,0 > 2,0,x,0 % ؀,‫
+AN CS RLE B;LTR: 2,1,x,0 > 2,0,x,0 % ؀,‫
+AN CS RLO B;ON: 2,1,x,0 > 2,0,x,0 % ؀/‮
+AN CS RLO B;LTR: 2,1,x,0 > 2,0,x,0 % ؀/‮
+AN ON RLE B;ON: 2,1,x,0 > 2,0,x,0 % ؀]‫
+AN ON RLE B;LTR: 2,1,x,0 > 2,0,x,0 % ؀]‫
+AN ON RLO B;ON: 2,1,x,0 > 2,0,x,0 % ؀?‮
+AN ON RLO B;LTR: 2,1,x,0 > 2,0,x,0 % ؀?‮
+L ES LRE B;RTL: 2,2,x,1 > 2,1,x,1 % j+‪
+L ES LRO B;RTL: 2,2,x,1 > 2,1,x,1 % q-‭
+L ET LRE B;RTL: 2,2,x,1 > 2,1,x,1 % z%‪
+L ET LRO B;RTL: 2,2,x,1 > 2,1,x,1 % n¢‭
+L CS LRE B;RTL: 2,2,x,1 > 2,1,x,1 % k:‪
+L CS LRO B;RTL: 2,2,x,1 > 2,1,x,1 % a.‭
+L ON LRE B;RTL: 2,2,x,1 > 2,1,x,1 % M?‪
+L ON LRO B;RTL: 2,2,x,1 > 2,1,x,1 % Z}‭
+ET NSM ET EN;RTL: 1,1,2,2 > 2,2,2,2 % $̀%4

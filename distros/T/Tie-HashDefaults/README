@@ -1,0 +1,68 @@
+
+NAME
+     Tie::HashDefaults - Let a hash have default values
+
+SYNOPSIS
+       use Tie::HashDefaults;
+
+       tie %h, 'Tie::HashDefaults', \%defaults1, \%defaults0;
+
+
+DESCRIPTION
+     This creates a data structure which is essentially	an array
+     of	hashes;	this list contains all the hashes (passed by ref)
+     in	the argument list; but it also contains	a new, internally
+     created, anonymous	hash.  This hash is used to store any
+     insertions	into the tied hash.
+
+     Whenever a	fetch (or an exists) is	done on	the tied hash,
+     the requested key is searched for in each hash in the list,
+     beginning with the	internal "storage" hash; if it is not
+     found in that hash, the key is looked for in the first
+     default hash, then	the next, and so on, until it is found in
+     one of them, or there are none left to search.
+
+     When an iteration (keys or	each) is done on the tied hash,
+     the set of	keys returned is the union of keys from	all of
+     the default hashes, along with the	storage	hash.
+
+     For operations that alter a hash -- store,	delete,	clear --
+     the default hashes	are never touched.  Only the storage hash
+     is	cleared.  One effect of	this is	that if	the tied hash is
+     cleared, e.g. via %h = ();, and immediately following that
+     an	iteration is started (via keys or each), it is likely
+     that some keys will be returned.  (Unless,	of course, there
+     is	no data	in any of the given default hashes.)
+
+     Manipulating the Defaults List
+
+     The list of default hashes	can be manipulated directly.  To
+     do	this, a	special	method on the tied object returns an
+     array, by reference, containing the list of default hashes.
+     Any changes to this array are reflected inside the
+     Tie::HashDefaults object.	For example, to	add another
+     defaults source that takes	precedence over	the others
+     already on	the list:
+
+       unshift @{ tied(%h)->get_defaults_list }, \%new_default_source;
+
+     Or, to reverse the	order in which the defaults are
+     consulted:
+
+       $ar = tied(%h)->get_defaults_list;
+       @$ar = reverse @$ar;
+
+     (Once you have the	array-ref "handle" on the defaults list
+     array, it's good for as long as the tied object stays tied.)
+
+     NOTE: calling get_defaults_list also resets the iterator; so
+     don't call	it within an each loop on a hash tied to this
+     class.
+
+AUTHOR
+     jdporter@min.net (John Porter)
+
+COPYRIGHT
+     This is free software.  This software may be modified and
+     distributed under the same	terms as Perl itself.
+

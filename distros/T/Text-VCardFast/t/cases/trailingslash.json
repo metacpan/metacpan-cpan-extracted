@@ -1,0 +1,104 @@
+{
+   "objects" : [
+      {
+         "properties" : {
+            "version" : [
+               {
+                  "name" : "version",
+                  "value" : "2.0"
+               }
+            ],
+            "calscale" : [
+               {
+                  "value" : "GREGORIAN",
+                  "name" : "calscale"
+               }
+            ],
+            "prodid" : [
+               {
+                  "value" : "-//FastMail/1.0/EN",
+                  "name" : "prodid"
+               }
+            ]
+         },
+         "type" : "vcalendar",
+         "objects" : [
+            {
+               "properties" : {
+                  "sequence" : [
+                     {
+                        "value" : "0",
+                        "name" : "sequence"
+                     }
+                  ],
+                  "created" : [
+                     {
+                        "name" : "created",
+                        "value" : "20120715T204820Z"
+                     }
+                  ],
+                  "transp" : [
+                     {
+                        "name" : "transp",
+                        "value" : "TRANSPARENT"
+                     }
+                  ],
+                  "location" : [
+                     {
+                        "value" : "Home",
+                        "name" : "location"
+                     }
+                  ],
+                  "summary" : [
+                     {
+                        "value" : "New Event",
+                        "name" : "summary"
+                     }
+                  ],
+                  "uid" : [
+                     {
+                        "name" : "uid",
+                        "value" : "123@uid.com"
+                     }
+                  ],
+                  "dtstamp" : [
+                     {
+                        "name" : "dtstamp",
+                        "value" : "20120811T010822Z"
+                     }
+                  ],
+                  "description" : [
+                     {
+                        "name" : "description",
+                        "value" : "Here is an event\nwith some lines\n and split in the middle of words, but worst of all\nsplit in the middle of an endline."
+                     }
+                  ],
+                  "dtend" : [
+                     {
+                        "params" : {
+                           "value" : [
+                              "DATE"
+                           ]
+                        },
+                        "value" : "20120820",
+                        "name" : "dtend"
+                     }
+                  ],
+                  "dtstart" : [
+                     {
+                        "value" : "20120818",
+                        "name" : "dtstart",
+                        "params" : {
+                           "value" : [
+                              "DATE"
+                           ]
+                        }
+                     }
+                  ]
+               },
+               "type" : "vevent"
+            }
+         ]
+      }
+   ]
+}

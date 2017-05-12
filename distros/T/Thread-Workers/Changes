@@ -1,0 +1,50 @@
+Revision history for Perl extension Thread::Workers.
+0.06  Wed Sep  5 21:45:00 2012
+		- Removed semaphore to control worker count, seems pointless if every ++ on count I ->up() the semaphore.
+		- Removed Stop (!!!!) for boss and workers.
+		- Replaced stop_boss/worker with pause_boss and pause_worker. Threads don't die. They just go to sleep. 
+		- *New method* Thread::Workers::set_drain_cb(\&method_deals_with_drained_queue);
+		    - You may not want to lose your queue. You can set a sig INT/KILL hook.
+		    - Thread::Workers::drain() will stop the boss and workers if not stopped, and drain the queue, and feed 
+			the data to the callback you set with set_drain_cb.
+		    - drain() is the preferred way to kill all the threads, it does things in the right order to drain the log and queue.
+		- Fixed a bug where workers weren't reading in the right wakeup value, but it worked on accident. Now It Works for the right reason. ;)
+		- Removed _tid var, implicit in _thread key
+		- Fixed not locking _worker_cmd when stopping workers (same on boss_cmd)
+		- Added in locking to all *reads* of _worker_cmd also. Read someplace this was necessary on older perls.
+		- Even more POD fixes (I'll get POD to work right one day!)
+		- In a sleep state, workers change their interval to 1 sec. After waking, they go back to normal.
+		- Same for the boss on sleep state interval changes
+
+0.05  Tue Sep  4 08:30:00 2012
+		- POD updates and fixes
+
+0.04  Mon Sep  3 21:29:12 2012
+	- kal:	- separated out thread creation sub
+		- simplified worker creation/adding subs
+		- updated POD documentation, including example
+
+
+0.03  Mon Sep  3 15:00:00 2012
+	- kal:	- added worker log and boss callback for log processing
+		- fixed numerous bugs, added semaphores to log the _*_cmd vars when controlling threads
+		- changed thread numbering scheme. totalthreads now includes boss.
+
+0.02  Sun Sep  2 14:25:12 2012
+	- kal:  - fixed version numbers and time stamper
+		- fixed not sharing _cmd signaler to new workers
+		- fixed not sharing _pid to new workers
+		- added boss_sleep() and workers_sleep() methods
+		    - this causes boss/workers to finish their current task, then enter a sleep state until woken or killed
+		- added boss_wake() and workers_wake()
+		    - causes boss/workers to wake from a sleep state. if already awake, does nothing.
+		- added work log
+		    - if worker has a return value, it stores it in a work log. The boss on each cycle will either empty this log
+		      or you can assign an optional callback for the boss to process the data. regardless, this log is deleted
+		      on each boss thread cycle.
+		    - added a semaphor to lock access to this log. probably best if you only return a pass/fail from a worker. ;)
+		- fixed some POD commenting
+
+0.01  Sun Sep  2 08:00:00 2012
+	- kal: original version;
+

@@ -1,0 +1,43 @@
+version 0.003; 2010-10-23
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2009-04-30
+
+  * bugfix: require bugfixed versions of Data::Float, Time::UTC, and
+    Time::UTC::Now (all for $SIG{__DIE__} handling)
+
+  * use simpler "parent" pragma in place of "base"
+
+  * test POD syntax and coverage, and make a small style change in
+    documentation to satisfy the coverage test
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.001; 2006-08-05
+
+  * in now_tai_flt(), when allowing for the rounding error in floating
+    point arithmetic, use the actual parameters of the floating point type
+    (from Data::Float) instead of assuming IEEE 754 double
+
+  * slight clarification to documentation of now_tai_flt()
+
+  * include description in README
+
+version 0.000; 2006-06-13
+
+  * initial released version

@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Test/WWW/Selenium/Sencha.pm
+lib/Test/WWW/Selenium/Sencha/Component.pm

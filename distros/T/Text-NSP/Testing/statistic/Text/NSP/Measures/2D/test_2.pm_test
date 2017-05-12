@@ -1,0 +1,39 @@
+package Text::NSP::Measures::2D::test_2;
+use Text::NSP::Measures::2D;
+use strict;
+use Carp;
+use warnings;
+no warnings 'redefine';
+require Exporter;
+
+our ($VERSION, @EXPORT, @ISA);
+
+@ISA  = qw(Exporter);
+
+@EXPORT = qw(initializeStatistic calculateStatistic
+             getErrorCode getErrorMessage getStatisticName);
+
+sub initializeStatistic {}
+
+sub calculateStatistic
+{
+  my %values = @_;
+  my $number=0;
+  my $NewMeasure=0;
+  my $key;
+
+  foreach $key (keys %values)
+  {
+    if($key !~ /npp/)
+    {
+      $NewMeasure += $values{$key};
+      $number++;
+    }
+  }
+  return($NewMeasure / (2 * $number));
+}
+
+1;
+__END__
+
+

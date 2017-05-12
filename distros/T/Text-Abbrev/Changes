@@ -1,0 +1,9 @@
+1.02  Tue, 11 Sep 2012 10:35:08 -0400
+  * Fix NAME section.
+
+1.01  Sat, 02 Jul 2011 00:12:42 +0200
+  * First release to CPAN
+
+    Previously this module was only part of the Perl core. This release is
+    identical to version 1.01 of Text::Abbrev as shipped with the core as of
+    version 5.8.1.

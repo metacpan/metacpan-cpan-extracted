@@ -1,0 +1,24 @@
+---
+abstract: 'Easily test network connectivity'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-RequiresInternet
+requires:
+  Socket: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-RequiresInternet
+  homepage: https://metacpan.org/dist/Test-RequiresInternet
+  repository: git://github.com/mrallen1/Test-RequiresInternet.git
+version: '0.05'

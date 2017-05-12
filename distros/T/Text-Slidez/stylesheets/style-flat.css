@@ -1,0 +1,42 @@
+body {
+  background-color:#EEEEEE;
+  padding: 0px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
+  font-family: FreeSans, Geneva, Arial, Helvetica;
+}
+.slide {
+  display: table;
+  width: 100%;
+  height: 8em;
+  text-align: center;
+}
+.cell {
+  display: table-cell;
+  vertical-align: middle;
+}
+.auto { margin-left: auto; margin-right: auto; }
+.left { text-align: left }
+
+.title  { font-size:  20pt; }
+.large  { font-size:  18pt; }
+.medium { font-size:  15pt; }
+.small  { font-size:  12pt; }
+.smaller {font-size:  10pt; }
+.wee    { font-size:   9pt; }
+.mini   { font-size:   8pt; }
+.tiny   { font-size:   7pt; }
+
+p {margin-left: 25px; margin-right 25px;}
+
+
+.synComment    { color: #0000FF }
+.synConstant   { color: #FF00FF }
+.synIdentifier { color: #008B8B }
+.synStatement  { color: #A52A2A ; font-weight: bold }
+.synPreProc    { color: #A020F0 }
+.synType       { color: #2E8B57 ; font-weight: bold }
+.synSpecial    { color: #6A5ACD }
+.synUnderlined { color: #000000 ; text-decoration: underline }
+.synError      { color: #FFFFFF ; background: #FF0000 none }
+.synTodo       { color: #0000FF ; background: #FFFF00 none }
+

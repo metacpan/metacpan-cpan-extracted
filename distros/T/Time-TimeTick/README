@@ -1,0 +1,74 @@
+Time/TimeTick version 0.03
+===============================
+
+0.01 - Sat Aug  7 15:01:39 PDT 2004
+0.02 - Thu Aug 12 13:07:39 PDT 2004
+0.03 - Wed Oct 20 09:15:01 PDT 2004
+0.04 - Wed Jun  1 09:18:34 PDT 2005
+
+PURPOSE
+-------
+
+Time::Timetick provides a quick and convenient way of instrumenting a
+program to find out how long it took to reach various points.  Just use
+the module and call the timetick() function whenever you want to mark
+the time at a point in your program.  When the program ends, a report
+will be output giving the times at which each point was reached.
+To find out more, either install the module and use the command:
+
+        $ perldoc Time::TimeTick
+
+or, if you haven't installed it yet, type:
+
+        $ perldoc lib/Time/TimeTick.pm
+
+
+INSTALLATION
+------------
+
+Use Module::Build:
+
+        $ perl Build.PL
+        $ ./Build
+        $ ./Build test
+        $ ./Build install
+
+but if you happen to do it the old way:
+
+        $ perl Makefile.PL
+        $ make
+        $ make test
+        $ make install
+
+well then, the magic of Module::Build will make it work anyway.
+
+
+DEPENDENCIES
+------------
+
+Time::HiRes is highly desirable but not essential.  (There again,
+if you don't have it, just what sort of a hick setup are you
+running, anyway? :-)
+
+It also helps to have IO::Capture::Stdout for testing, but is not
+essential.
+
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (c) 2004 Peter J. Scott.  This program is licensed under the
+same terms as Perl itself.  That means there's no warranty. You can
+report problems and I might fix them; if you send in a fix yourself
+that makes it very likely that I will apply it.
+
+
+AUTHOR
+------
+
+Peter Scott, pjs-cpan@PSDT.com
+
+
+
+
+

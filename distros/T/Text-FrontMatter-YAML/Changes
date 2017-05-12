@@ -1,0 +1,37 @@
+Revision history for Text-FrontMatter-YAML
+
+0.07	2014-05-27
+  - Perl 5.10.1 is now required.
+  - RT#95548: fix 20-basic-init-from-sections.t to deal with the
+    different style of quoted-strings used by YAML::Tiny 1.57 and later.
+  - Misc. improvements to the POD.
+  - Additional CPAN::Meta info is generated if ExtUtils::MakeMaker is
+    new enough to generate version 2 metadata.
+
+0.06    2013-06-02
+  - Actually set the version number. (What a way to start!)
+
+0.05    2013-06-02
+  - You can now pass in a hashref and text data, and pull a complete
+    document with a front matter section back out.
+  - 'from_string' has changed to 'document_string' to match the
+    new getter name.
+
+0.04    2013-06-02 (internal-only)
+  - Removed ability to initialize from a file or a filehandle;
+    this makes the code simpler, and File::Slurp, Path::Class, and the
+    like make that feature more or less superfluous. (Thanks to David
+    Golden for the suggestion.)
+  - The 'string' parameter to new() is now 'from_string'.
+  - The '---' marker lines are no longer returned by 'frontmatter_text'
+  - A better distinction is made between *empty* sections and
+    *undefined* sections. (See perldoc.)
+  - Sped up collection of data section.
+
+0.03    2013-05-27 (internal-only)
+  - Remove get_ from APIs
+  - Assume input is in UTF-8 and set encoding on open()
+
+0.02    2013-05-20
+  - Initial release to PrePAN
+

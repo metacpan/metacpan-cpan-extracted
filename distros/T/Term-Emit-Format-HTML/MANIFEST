@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Term/Emit/Format/HTML.pm
+t/00.load.t
+t/10-internals.t
+t/20-basics.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

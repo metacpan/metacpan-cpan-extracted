@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Term::EditorEdit;
+Term::EditorEdit->edit( document => <<_END_ );
+Xyzzy
+_END_

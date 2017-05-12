@@ -1,0 +1,28 @@
+Changes made in Sense-Clusters version 0.01 during version 0.03
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota at Duluth
+
+(1)	Added similarity measures dice, jaccard, overlap, cosine to matrix.pl
+	program 
+
+(2)	Added program arff2feat.pl to convert ARFF feature vectors to 
+	Sense-Cluster's feature vector format. 
+	This allows use of ngram/co-occurrence features as SenseTools Package 
+	creates ARFF Feature vectors using ngram/co-occurrence features created
+	by Ngram Statistics Package. 
+
+(3)	Allowed Multiple Sense Tags per instance.
+
+(4)	Fixed the bug with sorting of KEY files.
+
+(5)	Allowed repeatition of instance ids having distinct sense ids.
+	Checking for repeatition of instance ids is extended to checking 
+	for repeatition of instance id and sense tag pair together.
+
+(6)	Allowed '<','>' in instance ids and sense ids. 
+
+(Changelog-v0.01to0.03 Last Updated on 01/22/2003 by Amruta)
+

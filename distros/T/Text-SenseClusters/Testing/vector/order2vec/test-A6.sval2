@@ -1,0 +1,52 @@
+<corpus lang="english">
+<lexelt item="LEXELT">
+<instance id="0">
+<answer instance="0" senseid="NOTAG"/>
+<context>
+kaahe koyal shor machaaye re mohe apanaa koii yaad aaye re
+</context>
+</instance>
+<instance id="1">
+<answer instance="1" senseid="NOTAG"/>
+<context>
+kah do kah do koyal se na gaaye re ho mohe apanaa koii yaad aaye re
+</context>
+</instance>
+<instance id="2">
+<answer instance="2" senseid="NOTAG"/>
+<context>
+usane kaahe ko nain phiraaye re, o, koii jaake use samajhaaye re
+</context>
+</instance>
+<instance id="3">
+<answer instance="3" senseid="NOTAG"/>
+<context>
+mere dil se jo nikale haay re koii dosh meraa batalaaye re (2)
+</context>
+</instance>
+<instance id="4">
+<answer instance="4" senseid="NOTAG"/>
+<context>
+more naino.n me.n niir bhar aaye re mohe biite woh din yaad aaye re (2)
+</context>
+</instance>
+<instance id="5">
+<answer instance="5" senseid="NOTAG"/>
+<context>
+haaye aag lagii hR^idaya me.n ho, koii hR^idaya kii aag bhujhaaye re
+</context>
+</instance>
+<instance id="6">
+<answer instance="6" senseid="NOTAG"/>
+<context>
+meraa jiivan pal pal jaaye re rahuu.N kab tak aas lagaaye re (2)
+</context>
+</instance>
+<instance id="7">
+<answer instance="7" senseid="NOTAG"/>
+<context>
+koii jaake use samajhaaye re o, merii maut se pahale aaye re
+</context>
+</instance>
+</lexelt>
+</corpus>

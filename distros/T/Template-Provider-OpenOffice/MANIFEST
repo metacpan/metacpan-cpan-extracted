@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Template-Provider-OpenOffice.t
+lib/Template/Provider/OpenOffice.pm

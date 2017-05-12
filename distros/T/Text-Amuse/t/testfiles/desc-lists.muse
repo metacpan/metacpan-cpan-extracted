@@ -1,0 +1,35 @@
+#title description lists
+
+Normal
+desc :: term
+desc []{}^_%\$# :: []{}^_%\$#
+
+List triggered by white space
+
+ desc :: term
+ desc []{}^_%\$# :: []{}^_%\$#
+
+
+Normal text.
+
+ - Level 1, bullet item one
+   1. Level 2, enum item one
+   2. Level 2, enum item two
+   desc :: term
+   desc []{}^_%\$# :: []{}^_%\$#
+
+ - Level 1, bullet item two
+   1. Level 2, enum item three
+   2. Level 2, enum item four
+      term :: definition
+      term2 :: define
+      term3 ::
+        Blabla   
+
+        Same description
+
+        Same again
+
+      Back to item
+
+      This is another è desc :: Bla bla è

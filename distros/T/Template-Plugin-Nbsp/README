@@ -1,0 +1,30 @@
+NAME
+    Template::Plugin::Nbsp - TT2 plugin that inserts non-breaking space
+    (usefull for empty table cells)
+
+SYNOPSIS
+      [% USE Nbsp %]
+
+      <table>
+        <tr>
+          <td>[% variable | nbsp %]</td>
+        </tr>
+      </table>
+
+DESCRIPTION
+    This plugin helps preventing empty table cells. If the value is undef or
+    empty it returns "&nbsp;".
+
+NOTE
+    If you use cascading style sheets (css), you can use "empty-cells:
+    show;" to get the same results without this plugin.
+
+AUTHOR
+    Uwe Voelker <uwe.voelker@gmx.de>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Template
+

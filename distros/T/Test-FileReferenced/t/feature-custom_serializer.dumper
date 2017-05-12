@@ -1,0 +1,7 @@
+$VAR1 = {
+    'Custom de-serializer' => {
+        foo => 'Foo',
+        bar => 'Bar',
+        baz => 'Baz',
+    },
+};

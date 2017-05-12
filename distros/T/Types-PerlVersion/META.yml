@@ -1,0 +1,28 @@
+---
+abstract: 'L<Perl::Version> type constraint for L<Type::Tiny>'
+author:
+  - 'Peter Mottram (SysPete) <peter@sysnix.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-PerlVersion
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Perl::Version: '0'
+  Type::Tiny: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/Sysnix/p5-Types-PerlVersion/issues
+  repository: https://github.com/Sysnix/p5-Types-PerlVersion.git
+version: '0.002'

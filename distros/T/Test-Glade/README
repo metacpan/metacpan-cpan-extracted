@@ -1,0 +1,86 @@
+NAME
+    Test::Glade - a simple way to test Gtk2::GladeXML-based apps
+
+SYNOPSIS
+      use Test::Glade tests => 2;
+
+      my $glade_xml = 'interface.glade';
+      has_widget( $glade_xml, {
+        name => 'main_window',
+        type => 'GtkWindow',
+        properties => {
+          title => 'Test Application',
+          type => 'GTK_WINDOW_TOPLEVEL',
+          resizable => 1,
+        },
+      } );
+
+      has_widget( $glade_xml, {
+        type => 'GtkButton',
+        properties => {label => 'Press me!'},
+        signals => {clicked => 'button_pressed_handler'},
+      } );
+
+DESCRIPTION
+    GUIs are notoriously difficult to test. Historically this was well
+    deserved as the available perl GUI toolkits did not encourage separation
+    of the view and controller layers. The introduction of the Glade GUI
+    designer and Gtk2::GladeXML changed that by segregating user interface
+    and logical components (into GladeXML and Perl files respectively).
+
+    Users who avoid creating GUI elements from within their application
+    logic can now test each layer separately with appropriate tools. The
+    Perl logic can be verified with standard unit tests and this module
+    provides a way to inspect and verify the GladeXML UI specification. You
+    can confirm that a given widget exists, that it has the correct label
+    and other attributes, that it will be correctly placed in the interface
+    and that it will respond to signals as expected.
+
+TEST METHODS
+    has_widget($glade_file, $widget_desc, $test_name)
+        Search for a widget in a GladeXML file. $widget is a hash reference
+        of widget attributes. See "WIDGET DESCRIPTION" for more information.
+
+OO METHODS
+    If you have large GladeXML files, or want to perform many tests on each
+    one, it might be faster to use the object oriented interface. Files are
+    only parsed once, instead of once for each test.
+
+    Test::Glade->new(file => $gladexml_file)
+        Create a new Test::Glade object, passing in an optional GladeXML
+        file.
+
+    $test->load($gladexml_file)
+        Load in a new GladeXML file.
+
+    $test->widgets
+        Return a list of all widgets in the file. See "WIDGET METHODS" for
+        more information.
+
+    $test->find_widget($widget_desc)
+        Find and return widget. Takes $widget_desc in the same format as
+        has_widget().
+
+WIDGET DESCRIPTION
+    name, type
+        Scalars
+
+    properties
+        A hashref containing other widget properties, name => value
+
+    signals
+        A hashref of registered signal handlers, signal name => handler
+
+    packing
+        A hashref of packing attributes, name => value
+
+    children
+        A listref of child widgets
+
+WIDGET METHODS
+    name, type, properties, children, signals, packing
+        See the widget description section for return values.
+
+AUTHORS
+    Nate Mueller <nate@cs.wisc.edu>
+

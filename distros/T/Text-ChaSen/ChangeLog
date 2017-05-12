@@ -1,0 +1,58 @@
+2000-12-18  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Verison 1.04.
+
+	* ChaSen.pm: Fixed bad pod syntax.
+
+2000-04-07  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 1.03.
+
+	* ChaSen.xs: Fixed incomplete corresponding for old perl.
+
+2000-04-06  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 1.02.
+
+	* ChangeLog: Fixed old version number.
+
+	* ChaSen.xs: Fixed old perl probrem.
+
+2000-03-31  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Verison 1.01.
+
+	* ChaSen.xs (fparse_tostr): Changed to use PL_sv_undef 
+	instead sv_undef.
+
+2000-03-30  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* ChaSen.xs: Changed to use PL_na instead na.
+
+2000-01-11  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* pod 部分の不備を修正
+
+1999-08-19  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* package宣言が間違っていたのを修正
+
+1999-08-18  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* モジュール名をText::ChaSen1からText::ChaSenに変更
+
+1999-05-07  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+	
+	* ChaSen 2.0b6に対応
+	* sparse_tostr_long用のコードを廃止
+	
+1999-02-12  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* sparse_tostr_longを複数回呼ぶ上でのバグを修正
+		(情報を提供して下さった高久さんありがとうございます)
+
+1999-01-13  Nokubi Takatsugu  <knok@daionet.gr.jp>
+
+	* chasen.pmからText::ChaSen1.pmに名称を変更
+	* 著作権表示を適正なものに修正
+	* @EXPORT, %EXPORT_TAGSを定義

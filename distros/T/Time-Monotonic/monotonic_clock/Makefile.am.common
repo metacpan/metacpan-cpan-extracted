@@ -1,0 +1,6 @@
+# -*- Autoconf -*-
+# monotonic_clock/Makefile.am.common
+
+CCFLAGS=-I$(top_srcdir)
+
+DISTCLEANFILES = *~

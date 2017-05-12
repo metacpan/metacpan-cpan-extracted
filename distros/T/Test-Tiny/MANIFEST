@@ -1,0 +1,8 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+README
+test.pl
+test-script.pl
+Tiny.pm
+META.yml                                 Module meta-data (added by MakeMaker)

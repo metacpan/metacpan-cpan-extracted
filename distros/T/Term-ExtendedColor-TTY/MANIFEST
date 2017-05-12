@@ -1,0 +1,11 @@
+lib/Term/ExtendedColor/TTY.pm
+lib/Term/ExtendedColor/TTY/Colorschemes.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-load.t
+t/01-pod.t
+t/02-pod-coverage.t
+t/021-synopsis.t
+t/03-set_tty_color.t
+t/04-get_colorscheme.t
+META.yml                                 Module meta-data (added by MakeMaker)

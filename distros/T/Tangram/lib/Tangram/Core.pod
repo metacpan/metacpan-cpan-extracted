@@ -1,0 +1,24 @@
+=head1 NAME
+
+Tangram::Core - import core Tangram modules
+
+=head1 SYNOPSIS
+
+   use Tangram::Core;
+
+   # use additional types, e.g.:
+   use Tangram::Type::Array::FromMany;
+   use Tangram::Type::Set::FromOne;
+
+=head1 DESCRIPTION
+
+This module imports only the parts of Tangram that are thought to be
+essential to any app. This includes: Schema, Storage, Cursor, Expr,
+Scalar and Ref. None of the modules that map collections (Array, Hash,
+Set and their intrusive variants) are imported. Neither is Deploy.
+
+Tangram::Core allows you to reduce script startup time (and executable
+size when perlcc can handle Tangram) by importing only what you
+really need. It also makes it possible to add new mappings to Tangram
+without penalizing apps that don't need them.
+

@@ -1,0 +1,88 @@
+{
+   "abstract" : "type constraints with coercion to load the class",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Types-LoadableClass",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Module::Runtime" : "0",
+            "Type::Library" : "0.026",
+            "Type::Utils" : "0.026",
+            "Types::Standard" : "0.026",
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Moo" : "1.000000"
+         },
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "Test::Requires" : "0.06"
+         },
+         "suggests" : {
+            "Moose" : "2.0000"
+         }
+      }
+   },
+   "provides" : {
+      "Types::LoadableClass" : {
+         "file" : "lib/Types/LoadableClass.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-LoadableClass/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Types-LoadableClass"
+      },
+      "homepage" : "https://metacpan.org/release/Types-LoadableClass",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-types-loadableclass.git",
+         "web" : "https://github.com/tobyink/p5-types-loadableclass"
+      }
+   },
+   "version" : "0.003",
+   "x_contributors" : [
+      "Dagfinn Ilmari Mannsåker (ILMARI) <ilmari@cpan.org>"
+   ]
+}

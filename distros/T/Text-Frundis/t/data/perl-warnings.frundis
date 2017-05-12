@@ -1,0 +1,10 @@
+.#de -perl error
+my $self = shift;
+print $self->args->[0] if $self->process;
+.#.
+.error arg1 arg2
+.#de -perl warn
+my $self = shift;
+$self->diag_error("Warning!") if $self->process;
+.#.
+.warn

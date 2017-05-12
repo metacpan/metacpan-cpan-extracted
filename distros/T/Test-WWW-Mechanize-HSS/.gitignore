@@ -1,0 +1,9 @@
+blib
+db/
+local/
+Makefile
+Makefile.old
+pm_to_blib
+Test-WWW-Mechanize-HSS-0.01.tar
+Test-WWW-Mechanize-HSS-0.01.tar.gz
+Test-WWW-Mechanize-HSS-0.01

@@ -1,0 +1,17 @@
+Revision history for Perl extension Text::Template::Inline
+
+0.13 2006-09-01 01:19:03 -0700
+    - automatic unindent
+    - allow function name to be specified on import
+
+0.12 2006-08-30 23:58:06 -0700 
+    - refactored traversal code, now supports all types with mixing
+
+0.11 2006-08-30 00:42:14 -0700
+    - renamed to Text::Template::Inline
+    - added hierarchical key traversal for hash and object data
+    - never released
+
+0.10
+    - privately released as Template::Simple
+

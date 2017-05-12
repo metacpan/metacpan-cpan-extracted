@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6c0bb7d2ca2788b7eb7d16fd23d1b05dfb4142e8 Changes
+SHA1 aaf3999526116ebfa40b7569dc57a4f330eb9203 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 fbd5848e3fe7eb1a770e6ef897af0ee9122d72d2 MANIFEST
+SHA1 730af1fb09041acb1e1fd381b41d5d481c3f6da8 META.json
+SHA1 c51ced5df4a55ff8a46fe3b3cd445cc44bace521 META.yml
+SHA1 9c3e3e209bbc5454bd12ebd200613fe0346d21d8 Makefile.PL
+SHA1 aa432482a62b885f3fc6c1a2064a7eb4d7413319 README
+SHA1 36267d9936e3cf7c03507ce6adfd9b02a2d32716 cpanfile
+SHA1 bcf6164b207d19c8ae0129c0ac8935a208eca63f dist.ini
+SHA1 df1ac0f8fed173fbfbf0948352a632b2eaf6ab63 examples/cal.pl
+SHA1 2bd596a8bb53f7380229ee3deffddb3a843d1686 lib/Tickit/Widget/Calendar/MonthView.pm
+SHA1 0637b02a73471b2de9c563fc5b92837f2e4ca944 lib/Tickit/Widget/Calendar/MonthView.pod
+SHA1 f2df167ae9c8eebc5bb554734abc30a4172076dc lib/Tickit/Widget/Calendars.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 7570e81f0428f2c87c4da76008dc9d97a6271d8f t/00-compile.t
+SHA1 85441a9acbf0903bd5bbb210c85f6c71f495e616 t/000-report-versions-tiny.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU0SHkAAoJEFKElMNpjtyDjjoH/iOdOmUmPKmeGS3/YI3U3rAS
+z5ScM8LitKw3ItjixAXWcOsWA11Nx4aJSFbr4a7d33lxpwJxwnKTpCG+uxQikLuB
+QFffNacD3LxkHjm8u0r+LoB0R8Rl9lJjP9Df1hgNjn2jaou5qvYUzezuY5bt4WpQ
+nTxEnTzHPtM+9kgTvUpKR5h3FQ1QUajlmWo/qoppP7Nx8Hyqe95MBlDI2p4q7/fh
+UNPhC+6T8awhtGw+iOqY4mEoqgpkGgMXnprTN3/h+bF8Y4J7Fz7qhTsE1irFZFwh
+U5AbU3GXNYeASRIgD7K8+yGRfg5CUNntiJBgwBGfEgyPrgpSLf0Sq8COXnLPgxc=
+=yCgU
+-----END PGP SIGNATURE-----

@@ -1,0 +1,44 @@
+More tests!
+ * parse the generated output
+ * check the view given to the TT view
+
+Reports from Nadim Khemir:
+   * integrate into build scripts (eg: M::B)
+   * possible to open the test file and show the test itself?
+   * why the need to stop using Test::Harness?
+
+Various bug reports (+ Patch!) by Hemingway:
+   * https://rt.cpan.org/Ticket/Display.html?id=41457
+
+Progress console:
+   * https://rt.cpan.org/Ticket/Display.html?id=40627
+
+Script still running bug
+   * when you navigate away from page
+   * only on big test outputs
+   * jquery cleanup?
+
+Sometimes test details don't collapse properly!
+   * doesn't happen in FireFox 3?
+   * related to the scrollTo?
+   * could hide & show the tr after the slideToggle?
+
+sort by cols
+   * time!
+   * test file
+   * percent
+
+support file output - in progress
+   * prove --html=output.html
+   * allow output to STDOUT
+   * write an App::Prove plugin
+
+wrap unknown test output's in <pre>
+
+expand all tests
+expand failed tests
+
+collapse current test (from halway down big tests, maybe a mouseover file or something)
+
+Give the test suite a title...
+

@@ -1,0 +1,8 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Tie/Hash/Abbrev/BibRefs.pm
+t/1_standard.t
+Makefile.PL

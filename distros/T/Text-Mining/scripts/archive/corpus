@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+
+use Getopt::Long;
+use strict;
+use warnings;
+use Text::Mining;
+use Text::Mining::Corpus;
+
+use version; our $VERSION = qv('0.1.0');
+
+our ( $function, $verbose );
+our $corpus_name = '';
+our $corpus_desc = '';
+our $corpus_path = '';
+
+our $features = { create => \&create_corpus,
+                  show   => \&show_corpus,
+                  update => \&update_corpus,
+                  delete => \&delete_corpus,
+		};
+
+get_options();
+
+$features->{ $function }->();
+
+print "\n";
+
+exit;
+
+
+sub create_corpus {
+	status( "create_corpus $corpus_name" );
+	my $params = { corpus_name => $corpus_name,
+	               corpus_desc => $corpus_desc,
+		       corpus_path => $corpus_path };
+	
+	show_corpus( Text::Mining::Corpus->new( $params ) );
+}
+
+sub update_corpus {
+	status( "update_corpus $corpus_name" );
+	my $params  = { corpus_name => $corpus_name };
+	my $changes = 0;
+	my $corpus  = Text::Mining::Corpus->new( $params );
+	
+	# Update if changes found
+	if ( $corpus_desc ) { $changes++; $params->{corpus_desc} = $corpus_desc; }
+	if ( $corpus_path ) { $changes++; $params->{corpus_path} = $corpus_path; }
+	if ( $changes )     { $corpus->update( $params ); }
+
+	show_corpus( Text::Mining::Corpus->new( $params ) );
+}
+
+sub delete_corpus {
+	status( "delete_corpus $corpus_name" );
+	my $params = { corpus_name => $corpus_name };
+	
+	my $corpus = Text::Mining::Corpus->new( $params );
+	   $corpus->delete();
+}
+
+sub show_corpus {
+	status( "show_corpus $corpus_name" );
+	my $tm        = Text::Mining->new();
+
+	if (! $corpus_name ) {
+		# Show all corpuses
+		my $corpuses = $tm->get_all_corpuses();
+		
+		if ( @{ $corpuses }) { print_corpus_head(); }
+		foreach my $corpus ( @{ $corpuses }) {
+			print_corpus( $corpus );
+		}
+	} else {
+		# Show one corpus
+		my $corpus_id = $tm->get_corpus_id_from_name({ corpus_name => $corpus_name });
+		if ( $corpus_id ) {
+			print_corpus_head();
+			print_corpus( Text::Mining::Corpus->new({ corpus_id => $corpus_id }) );
+		} else {
+			print "  corpus not found ($corpus_name)\n";
+		}
+	}
+}
+
+sub print_corpus_head {
+	print "Corpus\tName\t\tDesc\t\tPath\n";
+}
+
+sub print_corpus {
+	my ( $corpus ) = @_;
+	print $corpus->get_corpus_id(), "\t", 
+	      $corpus->get_name(), "\t", 
+	      $corpus->get_desc(), "\t", 
+	      $corpus->get_path(), "\n";
+}
+
+
+sub get_options {
+	my ( $help, $create, $show, $update, $delete, $name, $desc, $path );
+	my $opts = GetOptions ( "verbose"  => \$verbose,
+				"help"     => \$help, 
+				"show"     => \$show, 
+				"create"   => \$create, 
+				"update"   => \$update, 
+				"delete"   => \$delete, 
+				"name=s"   => \$name,
+				"desc=s"   => \$desc,
+				"path=s"   => \$path,
+			      );
+
+	# Handle "immediate" switches
+	help()  if $help;
+
+	if    ( $desc )   { $corpus_desc = $desc; }
+	if    ( $path )   { $corpus_path = $path; }
+
+	# Handle assigned switches
+	if    ( $show )   { $function = 'show';   if (defined $name) { $corpus_name = $name; } }
+	elsif ( $create ) { $function = 'create'; $corpus_name = $name; }
+	elsif ( $update ) { $function = 'update'; $corpus_name = $name; }
+	elsif ( $delete ) { $function = 'delete'; $corpus_name = $name; }
+	else              { usage(); exit; }
+
+	if ( $verbose ) { print STDERR "  Function '$function' called.\n"; }
+}
+
+sub usage {
+	print STDERR << "EOF";
+
+usage: corpus [-v] -show [-n corpus_name] 
+       corpus [-v] -create -n corpus_name [-desc corpus_desc] [-path corpus_path]
+       corpus [-v] -update -n corpus_name [-desc corpus_desc] [-path corpus_path]
+       corpus [-v] -del -n corpus_name 
+
+EOF
+}
+
+sub help {
+	usage();
+	print STDERR << "EOF";
+ -name or -n          : The short name of the corpus
+ -create or -c        : Create a new corpus
+                      : Requires -n
+                      : Path and Desc not required
+ -show or -s          : Used with -n shows an existing corpus
+                      : Used without shows all corpuses
+ -delete or -del      : Delete an existing corpus
+                      : Requires -n
+ -update or -u        : Updates an existing corpus
+                      : Requires -n but doesn't change it
+                      : Path and Desc not required
+		      : No update without at least one of above
+ -desc corpus_desc    : Corpus description
+ -path corpus_path    : Corpus project file path
+ -verbose or -v       : verbose output (when available)
+ -help or -h          : this (help) message
+
+examples: corpus 
+          corpus -h 
+          corpus -c -n CorpusName -d "My Corpus" -p /my/corpus/path
+          corpus -v -c -n CorpusName -d "My Corpus"
+          corpus -s -n CorpusName
+          corpus -s
+          corpus -del -n CorpusName
+          corpus -u -n CorpusName -p /my/new/path
+
+EOF
+    exit;
+}
+
+sub status {
+	my ( $msg ) = @_;
+	if ( $verbose ) { print STDERR "  STATUS: $msg \n"; }
+}
+
+

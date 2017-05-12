@@ -1,0 +1,24 @@
+=head1 NAME
+
+sample - This is the sample POD
+
+=head1 SYNOPSIS
+
+    my $num;
+    $num = 1; # => 1
+    ++$num;   # => is 2
+
+    use PPI::Tokenizer;
+    my $tokenizer = PPI::Tokenizer->new(\'code'); # => isa 'PPI::Tokenizer'
+
+    my $str = 'Hello, I love you'; # => like qr/ove/
+
+    my $obj = {
+        foo => ["bar", "baz"],
+    }; # => is_deeply { foo => ["bar", "baz"] }
+
+    my $bool = 1; # => success
+
+=head1 AUTHOR
+
+moznion E<lt>moznion@gmail.comE<gt>

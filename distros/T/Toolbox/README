@@ -1,0 +1,23 @@
+Toolbox v0.52
+-------------
+				(c) 2002 Jason Leane <alphamethyl@mac.com>
+
+By default, all the routines in the module are imported into your namespace.
+
+This module should work on any standard Perl distribution (it was even tested
+on MacPerl), since it uses only relatively standard modules (the most exotic one
+it uses is Net::SMTP).
+
+To install, execute the following commands (preferably as root):
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+That should be it.
+
+Documentation is in POD format inside each module (type 'perldoc Toolbox::Simple' 
+or 'perldoc Toolbox::CryptOTP' at the command line to read it).
+
+My PGP public key is included with this distribution as "PGPkey.asc".

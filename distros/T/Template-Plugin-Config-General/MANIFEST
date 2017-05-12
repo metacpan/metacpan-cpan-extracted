@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Template-Plugin-Config-General.t
+lib/Template/Plugin/Config/General.pm
+META.yml                                 Module meta-data (added by MakeMaker)

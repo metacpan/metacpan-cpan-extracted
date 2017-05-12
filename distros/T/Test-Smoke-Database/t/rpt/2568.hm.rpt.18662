@@ -1,0 +1,149 @@
+Newsgroups: perl.daily-build.reports,perl.perl5.porters
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:2568 perl.perl5.porters:71587
+Return-Path: <h.m.brand@hccnet.nl>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 27335 invoked by uid 1005); 7 Feb 2003 16:07:21 -0000
+Delivered-To: perlmail-smokers-reports@onion.perl.org
+Received: (qmail 27281 invoked by uid 76); 7 Feb 2003 16:07:18 -0000
+Received: from qmailr@one.develooper.com (HELO ran-out.mx.develooper.com) (64.81.84.115) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-02-07 16:07:18Z
+Received: (qmail 10813 invoked by uid 225); 7 Feb 2003 16:07:10 -0000
+Delivered-To: smokers-reports@perl.org
+Received: (qmail 10803 invoked by uid 507); 7 Feb 2003 16:07:09 -0000
+Received: from smtpzilla2.xs4all.nl (HELO smtpzilla2.xs4all.nl) (194.109.127.138) by one.develooper.com (qpsmtpd/0.21-dev) with SMTP; 2003-02-07 16:07:08Z
+Received: from [127.0.0.1] (procura.xs4all.nl [213.84.163.145])	by smtpzilla2.xs4all.nl (8.12.0/8.12.0) with ESMTP id h17G6vEX069788;	Fri, 7 Feb 2003 17:06:58 +0100 (CET)
+Date: Fri, 07 Feb 2003 17:06:57 +0100
+To: Perl 5 Porters <perl5-porters@perl.org>
+Subject: Report 18662
+Cc: Daily Build Reports <smokers-reports@perl.org>
+Message-ID: <20030207170536.68C3.H.M.BRAND@hccnet.nl>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="------_3E43D95068E203283068_MULTIPART_MIXED_"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Becky! ver. 2.05.07
+X-SMTPD: qpsmtpd/0.21-dev, http://develooper.com/code/qpsmtpd/
+X-Spam-Check-By: one.develooper.com
+X-Spam-Status: No, hits=0.8 required=7.0 tests=GAPPY_TEXT,SPAM_PHRASE_00_01 version=2.43
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Approved: news@nntp.perl.org
+
+--------_3E43D95068E203283068_MULTIPART_MIXED_
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+
+--------_3E43D95068E203283068_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18662 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1 [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.2.0.1348) id PRCRCA8E1BB0 for merijn@procura.nl; Fri, 07 Feb 2003 06:02:45 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA27829 for merijn@procura.nl; Thu, 6 Feb 2003 22:30:02 +0100 (MET)
+Date: Thu, 6 Feb 2003 22:30:02 +0100 (MET)
+Message-Id: <200302062130.WAA27829@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18662 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18662                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.3
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.20/20030203     3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX    cygwin  
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3   1.3.20s  
+  HPc      gcc      HPc      gcc      vac      gcc      gcc   
+ 18662    18662    18662    18662    18662    18662    18666   Configuration
+-------  -------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+O O O O  O O O O  O O O O  O O O O  O O O O  F F F F  F F F F   
+O O O O  O O O O                    O O O O  F F F F  F F F F  -Duse64bitint
+O O O O  O O O O                                      . . . .  -Duse64bitall
+O O O O  O O O O  O O O O  O O O O  O O O O  F F F F  F F F F  -Duselongdouble
+O O O O  O O O O                    O O O O  F F      F F F ?  -Dusemorebits
+O O O O  O O O O                                      ? ? ? ?  -Duse64bitall -Duselongdouble
+O O O O  O O O O  O O O O  O O O O  O O O O           ? ? ? ?  -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O           ? ? ? ?  -Duse64bitint -Dusethreads -Duseithreads
+O O O O  O O O O                                      ? ? ? ?  -Duse64bitall -Dusethreads -Duseithreads
+O O O O  O O O O  O O O O  O O O O  O O O O           ? ? ? ?  -Duselongdouble -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O           ? ? ? ?  -Dusemorebits -Dusethreads -Duseithreads
+O O O O  O O O O                                      ? ? ? ?  -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+| |                            | |
+| +----- PERLIO = perlio       | +- PERLIO = perlio -DDEBUGGING
++------- PERLIO = stdio        +--- PERLIO = stdio  -DDEBUGGING
+
+Failures:
+
+AIX 4.3 gcc  stdio/perlio      
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING  
+AIX 4.3 gcc  stdio/perlio     -Duse64bitint
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint
+AIX 4.3 gcc  stdio/perlio     -Duselongdouble
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+AIX 4.3 gcc  stdio/perlio     -Dusemorebits
+    ext/Encode/t/Unicode ................ 5
+
+Cygwin 1.3   stdio/perlio      
+Cygwin 1.3   stdio/perlio     -DDEBUGGING  
+Cygwin 1.3   stdio/perlio     -Duse64bitint
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duse64bitint
+Cygwin 1.3   stdio/perlio     -Duselongdouble
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duselongdouble
+Cygwin 1.3   stdio/perlio     -Dusemorebits
+Cygwin 1.3   stdio            -DDEBUGGING -Dusemorebits
+    lib/Test/Harness/t/strap-analyze .... 2
+    lib/warnings ........................ 414-416
+
+--------_3E43D95068E203283068_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18662 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1 [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.2.0.1348) id PRCRCA8E1BAD for merijn@procura.nl; Fri, 07 Feb 2003 06:02:45 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA27836 for merijn@procura.nl; Thu, 6 Feb 2003 22:30:03 +0100 (MET)
+Date: Thu, 6 Feb 2003 22:30:03 +0100 (MET)
+Message-Id: <200302062130.WAA27836@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18662 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18662                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.3
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.20/20030203     3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX    cygwin  
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3   1.3.20s  
+  HPc      gcc      HPc      gcc      vac      gcc      gcc   
+ 18662    18662    18662    18662    18662    18662    18666   Configuration
+-------  -------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+100 100  93  93 | 73  74  74  74 | 62  62  53  53 | 51  49  52  52 | 51  51  44  44 | 47  47  40  40 | 63  65  59  61 | 
+ 85  86  78  79 | 78  77  78  78 |                |                | 50  50  43  43 | 45  46  40  40 | 67  66  62  64 |-Duse64bitint
+ 87  86  79  79 |                |                |                |                |                |                |-Duse64bitall
+                |                |                |                | 50  50  43  43 | 46  46  40  40 | 64  69  62  64 |-Duselongdouble
+                |                |                |                | 48  48  42  42 | 45  47         | 66  64  63     |-Dusemorebits
+                |                |                |                |                |                |                |-Duse64bitall -Duselongdouble
+ 63  65  55  55 | 49  50  53  53 | 33  33  28  29 | 27  27  27  27 | 40  40  35  35 |                |                |-Dusethreads -Duseithreads
+ 58  58  52  53 | 51  51  51  51 |                |                | 38  38  34  34 |                |                |-Duse64bitint -Dusethreads -Duseithreads
+ 38  60  51  52 |                |                |                |                |                |                |-Duse64bitall -Dusethreads -Duseithreads
+                |                |                |                | 39  39  35  35 |                |                |-Duselongdouble -Dusethreads -Duseithreads
+                |                |                |                | 38  38  34  34 |                |                |-Dusemorebits -Dusethreads -Duseithreads
+                |                |                |                |                |                |                |-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+  |   |                    |   |
+  |   +- PERLIO = perlio   |   +- PERLIO = perlio -DDEBUGGING
+  +----- PERLIO = stdio    +----- PERLIO = stdio  -DDEBUGGING
+--------_3E43D95068E203283068_MULTIPART_MIXED_--
+
+

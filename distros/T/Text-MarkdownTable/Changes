@@ -1,0 +1,23 @@
+0.3.1  2015-07-08 12:12:59 CEST
+    - fix minimal dependency on Moo
+    - additional option 'edges' to disable first and last border
+    - public method 'streaming'
+
+0.3.0  2015-07-01 12:02:42 CEST
+    - additional option 'header'
+
+0.2.4  2014-10-23 00:17:08 CEST
+    - fixed undefined $_ in simple.t test (Patrick Hochstenbach)
+
+0.2.3  2014-07-16 09:45:11 CEST
+    - improved performance by using printf
+    - support undefined column names
+
+0.2.2  2014-07-15 15:02:56 CEST
+    - simplify option 'fh' with IO::Handle::Util
+
+0.2.1  2014-07-11 10:14:33 CEST
+    - implemented condense and unbuffered writing 
+
+0.2.0   2014-07-10
+    - inital release, based on Catmandu::Exporter::Table 0.1.2

@@ -1,0 +1,93 @@
+Started smoke at 1074150300
+Smoking patch __PATCHLEVEL__
+MANIFEST did not declare '.config/README'
+MANIFEST did not declare '.config/instruct'
+MANIFEST did not declare 'mktest.log'
+MANIFEST did not declare 'rm.sh'
+MANIFEST did not declare 'rmf.sh'
+Stopped smoke at 1074150305
+Started smoke at 1074150305
+
+Configuration: -Dcc=gcc -Dusedevel
+------------------------------------------------------------------------------
+PERLIO = stdio  u=6.58  s=2.83  cu=681.91  cs=214.24  scripts=807  tests=79894
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+PERLIO = perlio u=6.01  s=2.78  cu=632.33  cs=215.59  scripts=807  tests=79894
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+PERLIO = locale:EN_US.UTF-8     u=7.05  s=2.86  cu=668.21  cs=216.48  scripts=806  tests=79888
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+Stopped smoke at 1074155623
+Started smoke at 1074155623
+
+Configuration: -Dcc=gcc -Dusedevel -DDEBUGGING
+------------------------------------------------------------------------------
+PERLIO = stdio  u=7.10  s=2.64  cu=788.80  cs=219.85  scripts=807  tests=79894
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+PERLIO = perlio u=6.92  s=2.48  cu=737.56  cs=221.66  scripts=807  tests=79894
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+PERLIO = locale:EN_US.UTF-8     u=7.34  s=2.96  cu=780.07  cs=222.55  scripts=806  tests=79888
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+Stopped smoke at 1074161302
+Started smoke at 1074161302
+
+Configuration: -Dcc=gcc -Dusedevel -Duselongdouble
+------------------------------------------------------------------------------
+Unable to configure perl in this configuration
+Stopped smoke at 1074161455
+Started smoke at 1074161455
+
+Configuration: -Dcc=gcc -Dusedevel -Duselongdouble -DDEBUGGING
+------------------------------------------------------------------------------
+Unable to configure perl in this configuration
+Stopped smoke at 1074161576
+Started smoke at 1074161576
+
+Configuration: -Dcc=gcc -Dusedevel -Duse64bitint
+------------------------------------------------------------------------------
+PERLIO = stdio  u=6.94  s=2.62  cu=691.10  cs=221.95  scripts=809  tests=80038
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+PERLIO = perlio u=6.61  s=2.51  cu=638.04  cs=223.01  scripts=809  tests=80038
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+PERLIO = locale:EN_US.UTF-8     u=7.28  s=3.04  cu=668.57  cs=227.36  scripts=808  tests=80032
+
+    ../ext/Encode/t/Unicode.t...............FAILED 5-37
+    ../ext/Encode/t/perlio.t................FAILED 33-38
+    ../lib/Time/Local.t.....................FAILED 102
+
+Stopped smoke at 1074166820
+Started smoke at 1074166820
+
+Configuration: -Dcc=gcc -Dusedevel -Duse64bitint -DDEBUGGING
+------------------------------------------------------------------------------

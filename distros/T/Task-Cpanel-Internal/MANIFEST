@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+ignore.txt
+lib/Task/Cpanel/Internal.pm
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/release-pod-syntax.t

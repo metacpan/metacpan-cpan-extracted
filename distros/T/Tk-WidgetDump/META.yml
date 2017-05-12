@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Tk-WidgetDump
+version:            1.39
+abstract:           ~
+author:
+    - Slaven Rezic (srezic@cpan.org)
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Tk:              800
+    Tk::FontDialog:  0
+    Tk::HistEntry:   0.33
+    Tk::More:        0
+    Tk::NumEntry:    0
+    Tk::ObjScanner:  0
+    Tk::Pod:         0
+resources:
+    repository:  git://github.com/eserte/tk-widgetdump.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

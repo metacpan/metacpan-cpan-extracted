@@ -1,0 +1,197 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Test::Run::CmdLine::Prove::App;
+
+run();
+
+# The POD was taken from the prove of Test::Harness.
+# TODO : Adapt it to runprove.
+__END__
+__DATA__
+
+=head1 NAME
+
+runprove -- A command-line tool for running tests against Test::Run
+
+=head1 SYNOPSIS
+
+runprove [options] [files/directories]
+
+Options:
+
+    -b, --blib      Adds blib/lib to the path for your tests, a la "use blib".
+    -d, --debug     Includes extra debugging information.
+    -D, --dry       Dry run: Show the tests to run, but don't run them.
+        --ext=x     Extensions (defaults to .t)
+    -h, --help      Display this help
+    -H, --man       Longer manpage for runprove
+    -I              Add libraries to @INC, as Perl's -I
+    -l, --lib       Add lib to the path for your tests.
+    -r, --recurse   Recursively descend into directories.
+    -s, --shuffle   Run the tests in a random order.
+    -T              Enable tainting checks
+    -t              Enable tainting warnings
+        --timer     Print elapsed time after each test file
+    -v, --verbose   Display standard output of test scripts while running them.
+    -V, --version   Display version info
+
+Single-character options may be stacked.  Default options may be set by
+specifying the PROVE_SWITCHES environment variable.
+
+=head1 OVERVIEW
+
+F<runprove> is a command-line interface to the test-running functionality
+of C<Test::Run>.  With no arguments, it will run all tests in the
+current directory.
+
+Shell metacharacters may be used with command lines options and will be exanded
+via C<glob>.
+
+=head1 RUNPROVE VS. "MAKE TEST"
+
+F<runprove> has a number of advantages over C<make test> when doing development.
+
+=over 4
+
+=item * F<runprove> is designed as a development tool
+
+Perl users typically run the test harness through a makefile via
+C<make test>.  That's fine for module distributions, but it's
+suboptimal for a test/code/debug development cycle.
+
+=item * F<runprove> is granular
+
+F<runprove> let your run only the files you want to check.
+Running C<runprove t/live/ t/master.t> checks every F<*.t> in F<t/live>,
+plus F<t/master.t>.
+
+=item * F<prove> has an easy verbose mode
+
+F<runprove> has a C<-v> option to see the raw output from the tests.
+To do this with C<make test>, you must set C<HARNESS_VERBOSE=1> in
+the environment.
+
+=item * F<runprove> can run under taint mode
+
+F<runprove>'s C<-T> runs your tests under C<perl -T>, and C<-t> runs them
+under C<perl -t>.
+
+=item * F<runprove> can shuffle tests
+
+You can use F<runprove>'s C<--shuffle> option to try to excite problems
+that don't show up when tests are run in the same order every time.
+
+=item * F<runprove> doesn't rely on a make tool
+
+Not everyone wants to write a makefile, or use L<ExtUtils::MakeMaker>
+to do so.  F<runprove> has no external dependencies.
+
+=item * Not everything is a module
+
+More and more users are using Perl's testing tools outside the
+context of a module distribution, and may not even use a makefile
+at all.
+
+=back
+
+=head1 COMMAND LINE OPTIONS
+
+=head2 -b, --blib
+
+Adds blib/lib to the path for your tests, a la "use blib".
+
+=head2 -d, --debug
+
+Include debug information about how F<runprove> is being run.  This
+option doesn't show the output from the test scripts.  That's handled
+by -v,--verbose.
+
+=head2 -D, --dry
+
+Dry run: Show the tests to run, but don't run them.
+
+=head2 --ext=extension
+
+Specify extensions of the test files to run.  By default, these are .t,
+but you may have other non-.t test files, most likely .sh shell scripts.
+The --ext is repeatable.
+
+=head2 -I
+
+Add libraries to @INC, as Perl's -I.
+
+=head2 -l, --lib
+
+Add C<lib> to @INC.  Equivalent to C<-Ilib>.
+
+=head2 -r, --recurse
+
+Descends into subdirectories of any directories specified, looking for tests.
+
+=head2 -s, --shuffle
+
+Sometimes tests are accidentally dependent on tests that have been
+run before.  This switch will shuffle the tests to be run prior to
+running them, thus ensuring that hidden dependencies in the test
+order are likely to be revealed.  The author hopes the run the
+algorithm on the preceding sentence to see if he can produce something
+slightly less awkward.
+
+=head2 -t
+
+Runs test programs under perl's -t taint warning mode.
+
+=head2 -T
+
+Runs test programs under perl's -T taint mode.
+
+=head2 --timer
+
+Print elapsed time after each test file
+
+=head2 -v, --verbose
+
+Display standard output of test scripts while running them.  Also sets
+TEST_VERBOSE in case your tests rely on them.
+
+=head2 -V, --version
+
+Display version info.
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-test-run-cmdline@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Run-CmdLine>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Shuffled tests must be recreatable
+
+=back
+
+=head1 AUTHORS
+
+Andy Lester C<< <andy@petdance.com> >>
+(Adapted to runprove by Shlomi Fish, L<http://www.shlomifish.org/> ).
+
+=head1 COPYRIGHT
+
+Copyright 2005 by Andy Lester C<< <andy@petdance.com> >>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>.
+
+=cut
+
+

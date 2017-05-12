@@ -1,0 +1,12 @@
+Build.PL
+Changes
+Makefile.PL
+MANIFEST
+LICENSE
+META.yml
+README
+t/01-simple.t
+t/90-pod-coverage.t
+t/90-pod.t
+t/90-prereqs.t
+lib/Text/Truncate.pm

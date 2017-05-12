@@ -1,0 +1,16 @@
+Template::Plugin::Emoticon Installation
+
+# install via cpanminus
+cpanm Template::Plugin::Emoticon
+
+# install via CPAN shell
+cpan Template::Plugin::Emoticon
+
+# install via ActivePerl
+ppm install Template::Plugin::Emoticon
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

@@ -1,0 +1,27 @@
+Revision history for Test-CChecker
+
+0.08      2016-04-25 17:24:46 -0400
+  - Officially deprecating in favor of Test::Alien
+
+0.07      2015-12-23 19:44:32 -0700
+  - Added compile_ok function
+
+0.06      2015-06-22 14:08:07 -0400
+  - Catch exception and ignore if thrown by Alien::*->dist_dir 
+
+0.05      2013-12-15 06:37:53 -0500
+  - compile_run_ok returns true on success, false on failure
+
+0.04      2013-12-12 17:06:12 -0500
+  - first CPAN release!
+  - use ExtUtils::CChecker quiet option to turn on noisyness instead of hacking
+    ExtUtils::CBuilder (thanks Paul Evans for a quick fix on this)
+
+0.03      2013-12-12 16:34:30 -0500
+  - rm dep on File::ShareDir (can't be used before install anyway)
+
+0.02      2013-12-12 16:17:01 -0500
+  - detect and handle when testing an Alien module that hasn't been installed yet
+
+0.01      2013-12-12 12:12:06 -0500
+  - initial version

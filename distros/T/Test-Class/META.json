@@ -1,0 +1,96 @@
+{
+   "abstract" : "Easily create test classes in an xUnit/JUnit style",
+   "author" : [
+      "Adrian Howard <adrianh@quietstars.com>, Curtis \"Ovid\" Poe, <ovid at cpan.org>, Mark Morgan <makk384@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.052, CPAN::Meta::Converter version 2.150004",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Class",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0.77",
+            "Carp" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "MRO::Compat" : "0.11",
+            "Module::Runtime" : "0",
+            "Storable" : "2.04",
+            "Test::Builder" : "0.78",
+            "Test::Builder::Tester" : "1.02",
+            "Test::Simple" : "0.78",
+            "Try::Tiny" : "0",
+            "constant" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Fcntl" : "0",
+            "IO::File" : "1.09",
+            "Test" : "0",
+            "Test::Exception" : "0.25",
+            "Test::More" : "0.78",
+            "base" : "0",
+            "overload" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Test-Class@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Class"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/adrianh/test-class.git",
+         "web" : "https://github.com/adrianh/test-class"
+      }
+   },
+   "version" : "0.50",
+   "x_IRC" : "irc://irc.perl.org/#perl-qa",
+   "x_MailingList" : "http://lists.perl.org/list/perl-qa.html",
+   "x_contributors" : [
+      "Adrian Howard <adrianh@quietstars.com>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Curtis Poe <ovid@cpan.org>",
+      "makk384 <makk384@gmail.com>",
+      "Ricardo Signes <rjbs@cpan.org>",
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Tim Vroom <vroom@blockstackers.com>",
+      "Matthew Horsfall <WolfSage@gmail.com>",
+      "Michael G. Schwern <schwern@pobox.com>",
+      "Chad Granum <exodist7@gmail.com>",
+      "Peter Sergeant <pete@clueball.com>",
+      "Sam Kington <github@illuminated.co.uk>",
+      "Klaus S. Madsen <ksm@jobindex.dk>",
+      "Zefram <zefram@fysh.org>",
+      "Kent Fredric <kentfredric@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}
+

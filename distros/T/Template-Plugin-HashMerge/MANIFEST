@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Template/Plugin/HashMerge.pm
+lib/Template/Plugin/HashMergeVMethods.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/001_load.t
+t/002_objinterface.t
+t/003_vmethods.t
+META.yml

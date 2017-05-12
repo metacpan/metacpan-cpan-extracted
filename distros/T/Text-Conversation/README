@@ -1,0 +1,218 @@
+NAME
+    Text::Conversation - Turn a conversation into threads, one line at a
+    time.
+
+VERSION
+    version 0.053
+
+SYNOPSIS
+            #!perl
+
+            use warnings;
+            use strict;
+            use Text::Conversation;
+
+            my $threader = Text::Conversation->new();
+
+            my %messages;
+
+            while (<STDIN>) {
+                    next unless
+                            my ($speaker_name, $their_text) = /^(\S+)\s+(\S.*?)\s*$/;
+
+                    my ($this_message_id, $referent_message_id) =
+                            $threader->observe($speaker_name, $their_text);
+                    $messages{$this_message_id} = "<$speaker_name> $their_text";
+
+                    print $messages{$this_message_id}, "\n";
+                    if ($referent_message_id) {
+                            print "  refers to: $messages{$referent_message_id}\n";
+                    }
+                    else {
+                            print "  doesn't refer to anything.\n";
+                    }
+            }
+
+DESCRIPTION
+    Text::Conversation attempts to thread conversational text one line at a
+    time. Given a speaker's ID (often a name, screen name, or other
+    relatively unique identifier) and the text of their message, it attempts
+    to find the most likely message they are referring to. It will also
+    indicate times when it cannot find a referent.
+
+    The most common question so far is "How does it work?" That's often
+    followed by the leading "Does it just look for another speaker's ID at
+    the start of the message?" Text::Conversation uses multiple heuristics
+    to determine a message's referent. To be sure, the presence of another
+    speaker's ID counts for a lot, but so do common words between two
+    messages. Consider them similar to quoted text in an e-mail message.
+
+    Text::Conversation also keeps track of people who have spoken to each
+    other, either explicitly or implicitly. Chances are good that an
+    otherwise undirected message is aimed at a person and is part of an
+    ongoing conversation.
+
+    The module also incorporates penalties. The link between two messages is
+    degraded more as the module searches farther back in time. Likewise,
+    there are penalties for referring to messages beyond the speaker's
+    previous message, or the addressee's.
+
+    Text::Conversation is considered by its author to be "beta" quality
+    code. The heuristics are often uncannily accurate... if you steadfastly
+    ignore their shortcomings. I am trapped in a module factory. Please send
+    feedback and patches.
+
+INTERFACE
+    So, like, what are the methods? So far the module only supports these.
+    I'm sure others will emerge as people use the module.
+
+    new NAMED_PARAMETERS
+      Create and return a new Text::Conversation object. The constructor
+      takes a few parameters, specified as name/value pairs. All the
+      parameters are optional.
+
+      Here's a constructor that uses all the parameters. Unfortunately, the
+      coder has sillily used all the default values when writing it.
+
+              my $threader = Text::Conversation->new(
+                      debug         => 0,
+                      thread_buffer => 30,
+              );
+
+      "debug" turns on a lot of warnings that most people won't be
+      interested in to begin with. They may become curious and enable it
+      after they come to realize the module often does a lousy job of
+      threading. Please roll 1d4, and subtract that number from your Sanity
+      if you enable debugging.
+
+      "thread_buffer" sets the number of messages that the module keeps in
+      its short-term memory. These messages are the ones considered when
+      looking for referents. If you're looking for an analogy, consider it
+      the number of messages that fit or your terminal, and you can't scroll
+      back. When someone says something peculiar, and you skim your screen
+      for what the heck they're talking about, there's only "thread_buffer"
+      number of messages visible.
+
+      The thread buffer shouldn't be too large. Messages are penalized the
+      farther back they are in time, so a huge buffer just consumes memory
+      with little or no gain. The default of 30 lines seems sane today.
+
+    observe SPEAKER_ID, SPEAKER_TEXT
+      Ask Text::Conversation to observe a "spoken" message. observe()
+      returns two values: the unique ID of this new message, and the ID of
+      the message the speaker is most likely referring to. If we're lucky,
+      the referent ID is actually meaningful.
+
+      Oh, if Text::Conversation decides they're just spouting into the void
+      (that is, what they've said doesn't refer to anything in its
+      short-term memory), then the referent ID is undefined. I hope the
+      example in the SYNOPSIS adequately portrays this behavior.
+
+              my ($new_message_id, $referent_id) = $threader->observe(
+                      $screen_name, $what_they_said
+              );
+
+              if (defined $referent_id) {
+                      print "They're referring to message '$referent_id'.\n";
+              }
+              else {
+                      print "Uh-oh.  $screen_name is on their soapbox again.\n";
+              }
+
+SEE ALSO
+    The heck if I know. Suggest something.
+
+BUGS
+    Text::Conversation is considered beta code. Thank Ford it's not alpha!
+    The threading heuristics are interesting, and sometimes they are
+    surprisingly effective, but they aren't perfect.
+
+    This module's locale is hardcoded for English. Please send patches to
+    support your native tongue if you cannot read this.
+
+    Consecutive messages by the same author, where the subsequent messages
+    begin with conjunctions, are most likely a monologue. The subsequent
+    messages are more likely to address the same destination as the first
+    one. LotR suggested this. And I believe he's right.
+
+    At least in Perl-related IRC channels there is a convention whereby
+    people "correct" previous messages by stating simple substitutions. For
+    example:
+
+            <bynari> my butt hurts
+            <bynari> s/butt/head/
+
+    The second message states that the previous message was in error, and
+    "butt" should be replaced with "head".
+
+    The module doesn't consider periods of time where a speaker is not
+    present. It will happily link someone's message to a thread they
+    couldn't possibly have known about. Be careful fixing this one: Someone
+    may arrive and immediately refer to a thread that occurred before they
+    left.
+
+    If an unaddressed message matches a message farther back in a thread,
+    perhaps they're referring to something farther along that branch.
+
+            01 <one> A lot of creatures really don't know how to deal with a
+                            glue trap.  They do that tarbaby thing with increasing
+                            desperation.
+            02 <two> yeah.  so, imagine bambi stuck to one.
+            03 <three> I am imagining my neighbors in a glue
+                            trap...frantically rolling around trying to get free yet picking
+                            up various objects in their struggle ... (hey...this sounds
+                            familiar...)
+            04 <two> hee
+            05 <one> Like that game!
+            06 <three> Yeah! But with our NEIGHBORS!
+            07 <three> (comic relief IN MY MIND)
+
+    At the time of this writing, this conversation threaded like this:
+
+            01 <one> A lot of creatures....
+                    02 <two> yeah.  so, ....
+                    03 <three> I am imagining ....
+                    04 <two> hee
+                            05 <one> Like that game!
+                                    07 <three> (comic relief....
+                    06 <three> Yeah! But....
+
+    It should instead thread like this:
+
+            01 <one> A lot of creatures....
+                    02 <two> yeah.  so, ....
+                            03 <three> I am imagining ....
+                                    04 <two> hee
+                                    05 <one> Like that game!
+                                            06 <three> Yeah! But....
+                                            07 <three> (comic relief....
+
+    The problem occurs in the rule where "If a message's referent is by the
+    same speaker, then set the current referent to the referent of the
+    previous message." In the broken case, 06 refers to 03 (by the same
+    person), so it's "fixed" to point to 01 (because 03 refers to that).
+
+    There are probably other things.
+
+BUG TRACKER
+    https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=Text-Conversat
+    ion
+
+REPOSITORY
+    http://github.com/rcaputo/text-conversation
+    http://gitorious.org/text-conversation
+
+OTHER RESOURCES
+    http://search.cpan.org/dist/Text-Conversation/
+
+AUTHORS
+    Rocco Caputo conceived of and created Text::Conversation with initial
+    feedback and coments from the residents of various channels on
+    irc.perl.org.
+
+LICENSE
+    Except where otherwise noted, Text::Conversation is Copyright 2005-2013
+    by Rocco Caputo. All rights are reserved. Text::Conversation is free
+    software. You may modify and/or redistribute it under the same terms as
+    Perl itself.
+

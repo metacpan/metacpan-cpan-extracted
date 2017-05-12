@@ -1,0 +1,306 @@
+
+
+/* Reset default page padding / margins */
+body, html {
+    padding: 0px;
+    margin: 0px;
+}
+
+
+/* These 4 areas must all have no border, padding, margin
+ * to ensure that their widths end up *exactly* 100%
+ * otherwise scrollbars appear
+ */
+#main, #panel, #header, #footer {
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+}
+
+/* Header occupies entire top strip */
+#header {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+}
+
+/* Content takes most of the space */
+#main {
+    width: 75%;
+    margin-top: 180px;
+}
+
+/* Right hand panel takes the remainder, over on right */
+#panel {
+    position: absolute;
+    width: 25%;
+    top: 127px;
+    right: 10px;
+}
+
+/* Footer is lined up with content */
+#footer {
+    width: 75%;
+}
+
+
+/******************** GRAPHICS / COLOURS ************************/
+
+body {
+    background-color: #eee;
+}
+
+#header {
+    height: 119px;
+    background: #000 url(header-bg.png) repeat-x top right;
+}
+
+#header h1 {
+    margin: 0px;
+    background-image: url(header-logo.png);
+    background-repeat: no-repeat;
+    background-position: top right;
+    height: 87px;
+    color: white;
+    padding-top: 30px;
+    padding-left: 30px;
+    border-bottom: 2px solid #7d6621;
+}
+
+#header #tagline {
+    padding: 0px;
+    margin: 0px;
+    width: 75%;
+}
+
+#header #tagline p {
+    padding: 0em;
+    padding-right: 1.5em;
+    color: #666;
+    font-style: italic;
+    font-size: smaller;
+    text-align: right;
+}
+
+body {
+    background-image: url(logo-bg.png);
+    background-repeat: no-repeat;
+    background-position: top right;
+    background-attachment: scroll;
+    height: 463px;
+}
+
+#header h1 a {
+    color: white;
+    text-decoration: none;
+}
+
+
+#footer {
+    color: #888;
+}
+
+#footer a {
+    color: #888;
+    text-decoration: underline;
+}
+
+#content {
+    margin: 2em;
+}
+
+#navigation a, #content a {
+    color: #2c3b5f;
+    text-decoration: underline;
+}
+
+#navigation div.section {
+    border: 2px solid #332a0d;
+    margin: 10px;
+    padding: 1px;
+    background: url(panel-bg.png) repeat top left;
+}
+
+#navigation h3 {
+    margin: 5px;
+    padding-left: 40px;
+    height: 32px;
+    line-height: 32px;
+}
+
+#navigation h3 a {
+    text-decoration: none;
+}
+
+#navigation p, #navigation pre {
+    margin: 5px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+ol.styled li, ul.styled li {
+    line-height: 32px;
+    margin-left: 2em;
+}
+
+dl dt {
+    font-weight: bold;
+}
+
+dl dd {
+    margin-bottom: 2em;
+}
+
+div.screenshot p {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    background: url(panel-bg.png) repeat top left;
+    border: 2px solid #332a0d;
+    padding: 1em;
+    margin-top: 0px;
+}
+
+div.screenshot p.image {
+    margin-top: 2em;
+    background: transparent;
+    border: 0px;
+    margin-bottom: 0px;
+}
+
+div.screenshot p img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border: 0px;
+    width: 300px;
+}
+
+#footer p {
+    margin: 2em;
+    padding: 5px;
+    border-top: 1px solid #7d6621;
+    font-size: smaller;
+}
+
+table.data {
+    width: 100%;
+    border-spacing: 0px;
+}
+
+table.data th, table.data td {
+    padding: 3px;
+}
+
+table.data tbody th {
+    text-align: right;
+}
+
+table.data thead th {
+    text-align: left;
+}
+
+table.data tr.odd {
+    background: rgb(255,255,255);
+    background: rgba(255,255,255,0.5);
+}
+
+table.data tr.even {
+    background: rgb(221,221,221);
+    background: rgba(221,221,221,0.5);
+}
+
+table.data td.big {
+    width: 100%;
+}
+table.data th {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+#content table.data {
+    border: 1px solid #777;
+}
+
+table.data thead th {
+    border-bottom: 1px solid #777;
+}
+
+table.data td.md5sum {
+    font-size: smaller;
+    color: #444;
+}
+
+#content pre {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    background: url(panel-bg.png) repeat top left;
+    border: 1px dotted #332a0d;
+    padding: 1em;
+    margin-top: 0px;
+}
+
+p.diagram {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-size: smaller;
+    font-style: italic;
+}
+
+p.diagram img {
+    margin: 1em;
+    padding: 1em;
+    background: white;
+    border: 1px solid black;
+}
+
+#status {
+    background: url(icon-status.png) no-repeat center left;
+}
+
+#isos {
+    background: url(icon-isos.png) no-repeat center left;
+}
+
+.status_success {
+    background: #070;
+    color: white;
+    font-weight: bold;
+}
+
+.status_failed {
+    background: #700;
+    color: white;
+    font-weight: bold;
+}
+
+.status_skipped {
+    background: #077;
+    color: white;
+    font-weight: bold;
+}
+
+.status_cached {
+    background: #070;
+    color: white;
+    font-weight: bold;
+}
+
+.status_pending {
+    background: #770;
+    color: white;
+    font-weight: bold;
+}
+
+#content p {
+    padding: 1em;
+}
+
+#modules {
+   margin-left: auto;
+   margin-right: auto;
+width: 40%;
+}

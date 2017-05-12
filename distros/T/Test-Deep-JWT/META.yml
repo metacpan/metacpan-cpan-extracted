@@ -1,0 +1,43 @@
+---
+abstract: 'JWT comparison with Test:Deep functionality'
+author:
+  - 'Yuuki Furuyama <addsict@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Tester: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Deep-JWT
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Deep::JWT:
+    file: lib/Test/Deep/JWT.pm
+    version: '0.02'
+requires:
+  JSON: '0'
+  MIME::Base64: '3.11'
+  Test::Deep: '0'
+  Test::Deep::Cmp: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: ssh://git@github.com/addsict/p5-Test-Deep-JWT/issues
+  homepage: ssh://git@github.com/addsict/p5-Test-Deep-JWT
+  repository: ssh://git@github.com/addsict/p5-Test-Deep-JWT.git
+version: '0.02'
+x_contributors:
+  - 'Yuki Furuyama <yuki.furuyama@dena.com>'

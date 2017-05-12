@@ -1,0 +1,134 @@
+NAME
+    Template::Plugin::ScalarUtil - Scalar::Util plugin for Template-Toolkit
+
+VERSION
+    version 1.121160
+
+SYNOPSIS
+        [% USE ScalarUtil %]
+
+        # blessed
+        [% ScalarUtil.blessed(EXPR) ? 'blessed' : 'not blessed' %]
+
+        # dualvar
+        [% SET dv = ScalarUtil.dualvar( 5, "Hello" ) %]
+        [% SET num = dv + 7 %]
+        [% SET string = dv _ " world!" %]
+        [% num == string.length ? "correct" : "ups" %]
+
+        # isvstring
+        [% ScalarUtil.isvstring(vstring) ? 'is vstring' : 'is not vstring' %]
+
+        # looks_like_number
+        [% ScalarUtil.looks_like_number('Infinity') ? 'number' : 'not number' %]
+
+        # openhandle
+        [% ScalarUtil.openhandle(FH) ? "opened" : "not opened" %]
+
+        # refaddr
+        [% ScalarUtil.refaddr(EXPR) %]
+
+        # reftype
+        [% ScalarUtil.reftype(EXPR) %]
+
+        # tainted
+        [% ScalarUtil.tainted(EXPR) %]
+
+DESCRIPTION
+    Use Scalar::Util functions in your templates.
+
+METHODS
+  blessed
+        [%
+            IF ScalarUtil.blessed(EXPR);
+                EXPR.method(args);
+            END;
+        %]
+
+    Returns the name of the package if "EXPR" is a blessed reference.
+
+  dualvar
+        [% SET dv = ScalarUtil.dualvar( num, string ) %]
+
+    Returns a scalar that has the value "num" in a numeric context and the
+    value "string" in a string context.
+
+  isvstring
+        [%
+            USE vstring = format('%vd');
+            USE string = format('%s');
+
+            IF ScalarUtil.isvstring(EXPR);
+                vstring(EXPR);
+            ELSE;
+                string(EXPR);
+            END;
+        %]
+
+    Returns true if "EXPR" was coded as vstring;
+
+  looks_like_number
+        [% IF ScalarUtil.looks_like_number(EXPR) %]
+            [% EXPR %] looks like number
+        [% END %]
+
+    Returns true if perl thinks "EXPR" is a number.
+
+  openhandle
+        [% IF ScalarUtil.openhandle(FH) %]
+            FH is an opened filehandle
+        [% END %]
+
+    Returns "FH" if it is opened filehandle, "undef" otherwise.
+
+  refaddr
+        [% ScalarUtil.refaddr(EXPR) %]
+
+    Returns internal memory address of the "EXPR" if it is a reference,
+    "undef" otherwise.
+
+  reftype
+        [% SWITCH ScalarUtil.reftype(EXPR) %]
+            [% CASE 'ARRAY' %]
+                [% EXPR.size %]
+            [% CASE 'HASH' %]
+                [% EXPR.list.size %]
+        [% END %]
+
+    Returns the type of the "EXPR" if it is a reference, "undef" otherwise.
+
+  tainted
+        [% IF ScalarUtil.tainted(EXPR) %]
+            EXPR is tainted
+        [% END %]
+
+    Returns true if "EXPR" is tainted.
+
+NOTES
+    Please note that following methods were NOT implemented due to the
+    nature of TT's stash.
+
+    *   isweak
+
+    *   readonly
+
+    *   set_prototype
+
+    *   weaken
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Scalar::Util
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

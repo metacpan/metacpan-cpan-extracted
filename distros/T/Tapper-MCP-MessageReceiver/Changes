@@ -1,0 +1,77 @@
+Revision history for Tapper-MCP-MessageReceiver
+
+5.0.0     2016-02-15
+        - version bump for v5
+
+4.1.4     2015-11-27
+        - fix usage of Mojolicious ->secret(s)
+
+4.1.3     2012-11-22
+        - provide 'tapper-mcp-messagereceiver-daemon start|stop'
+          (based on Mojo::Server::Hypnotoad)
+        - but rework API test to use self-made fork instead of hypnotoad
+          (for easier separation and handling)
+        - rework 'tapper-mcp-messagereceiver' to read config file
+
+4.1.2     2012-11-21
+        - undaemonize tapper-mcp-messagereceiver
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        * PostgreSQL support
+        - rename USER into OWNER
+
+4.0.3     2012-06-05
+	- log file handling during test
+
+4.0.2     2012-06-01
+        - explicitely upgrade troublemaker deps
+
+4.0.1     2012-05-16
+        - [FEAT] offer access to current testrun state
+        - [FEAT] handle 'action' requests
+        - [FEAT] accept data also as X-Tapper-$key HTTP header
+        - [FEAT] added type handling for messages
+        - [FEAT] added experimental message receiver using hypnotoad server
+        - [FEAT] message receiver uses HTTP protocol now
+        - [RFK] migrate from AnyEvent to Mojo
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* rewritable shebang line
+	* Substitute MooseX::Daemonize with App::Daemon
+	* adapt tests to App::Daemon
+	* Increase timeout for tests on slow machines.
+	* pid file can be set by ENV variable
+	* release version++ roundhouse kick
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-09 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.3
+
+	* fix dependencies
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.2
+
+	* try to force YAML versions
+
+	* License artefact fix
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

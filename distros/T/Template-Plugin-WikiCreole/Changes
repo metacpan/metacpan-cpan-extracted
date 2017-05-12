@@ -1,0 +1,6 @@
+Revision history for Perl module Template::Plugin::WikiCreole
+
+0.01 Tue Jun 30 08:54:00 2008
+    - original version; created copying Template::Plugin::WikiFormat 0.03
+      Pass params to Text::Wikiformat as tags or options.
+      Basic tests using Template::Test

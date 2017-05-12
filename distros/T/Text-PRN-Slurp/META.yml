@@ -1,0 +1,33 @@
+---
+abstract: 'Parse and read .PRN File Extension'
+author:
+  - 'Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>'
+build_requires:
+  Test::CheckManifest: '0'
+  Test::More: '0'
+  Test::Pod::Coverage: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  IO::File: '0'
+  IO::Scalar: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-PRN-Slurp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+resources:
+  repository: https://github.com/shardiwal/cpan-Text-PRN-Slurp
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

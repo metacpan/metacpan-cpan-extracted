@@ -1,0 +1,11 @@
+=head1 NAME
+
+less - Less! Less!!
+
+=head1 SYNOPSIS
+
+    1; # => 1
+
+=head1 AUTHOR
+
+moznion E<lt>moznion@gmail.comE<gt>

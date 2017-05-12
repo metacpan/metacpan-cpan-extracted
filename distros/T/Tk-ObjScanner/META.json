@@ -1,0 +1,63 @@
+{
+   "abstract" : "a GUI to scan any perl data structure or object",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-ObjScanner",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Deparse" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Scalar::Util" : "1.01",
+            "Tk" : "0",
+            "Tk::Adjuster" : "0",
+            "Tk::Derived" : "0",
+            "Tk::Frame" : "0",
+            "Tk::HList" : "0",
+            "Tk::Menubutton" : "0",
+            "Tk::ROText" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Benchmark" : "0",
+            "FileHandle" : "0",
+            "Math::BigInt" : "0",
+            "Test::More" : "0",
+            "Tie::Hash" : "0",
+            "Tie::Scalar" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-project@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-ObjScanner"
+      },
+      "homepage" : "https://github.com/dod38fr/perl-tk-objscanner",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dod38fr/perl-tk-objscanner.git",
+         "web" : "https://github.com/dod38fr/perl-tk-objscanner"
+      }
+   },
+   "version" : "2.016"
+}
+

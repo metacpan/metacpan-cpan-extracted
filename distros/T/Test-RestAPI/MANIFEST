@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/RestAPI.pm
+lib/Test/RestAPI/Endpoint.pm
+lib/Test/RestAPI/MojoGenerator.pm
+minil.toml
+t/00_compile.t
+t/01_simple_rest.t
+t/02_own_endpoint.t
+t/03_list_of_requests_body.t
+t/04_json_render.t
+META.yml
+MANIFEST

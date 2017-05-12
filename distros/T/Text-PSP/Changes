@@ -1,0 +1,40 @@
+Revision history for Perl extension Text::PSP.
+
+1.013 - Fixed force_reload option to remove generated template 
+        modules from %INC, as per Ticket #12492
+        https://rt.cpan.org/Ticket/Display.html?id=12492
+
+1.012 - Fixed "create_workdir" option to create paths (this caused
+        make test to fail in 1.011 if there wasn't a tmp directory
+        in the current working directory)
+
+        Fixed =head1 NAME header for the syntax manual
+
+1.011 - Added "create_workdir" option
+
+1.010 - Added "force_rebuild" option to Text::PSP->template method
+
+1.000 - Removed taglib handling stubs: I'm not going to implement them
+
+0.056 - Cleaned up error messages and file path reporting
+
+0.054 - Added find_template method to Text:PSP
+
+0.053 - Added find file directive
+
+0.052 - Added normalize_path method to parse file paths
+
+0.051 - Changed taglib behaviour
+
+0.05 - Refactored Text::PSP::Parser again, added parse-time expression syntax,
+	changed @_out to @o in parsed templates
+	removed quoting bugs and added some tests for them
+
+0.04 - Refactored Text::PSP::Parser
+
+0.02 - 0.03 - early trial versions
+
+0.01 - Wed Sep 18 12:32:57 2002
+	- original version; created by h2xs 1.20 with options
+		-X -A -v0.01 -n Text::PSP
+

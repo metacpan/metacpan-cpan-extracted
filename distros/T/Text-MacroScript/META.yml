@@ -1,0 +1,31 @@
+---
+abstract: 'A macro pre-processor with embedded perl capability '
+author:
+  - 'Mark Summerfield <summer@perlpress.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-MacroScript
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.22'
+  Object::Tiny::RW: '1.07'
+  Path::Tiny: '0.068'
+  Test::Differences: '0.61'
+  Test::More: '1.001014'
+  enum: '1.1'
+  perl: '5.01'
+resources:
+  repository: git://github.com/pauloscustodio/Text-MacroScript.git
+version: '2.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

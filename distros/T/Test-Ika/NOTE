@@ -1,0 +1,1 @@
+あーあと ikatest 、外側のスコープの setup / teardown が呼ばれないのが気になりました

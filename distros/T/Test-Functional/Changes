@@ -1,0 +1,27 @@
+Revision history for Test-Functional
+
+0.06  Thu Dec 24 15:19:45 EST 2009
+    - fixed a documentation bug found by Nick Cleaton
+    - disabled output.t until less fragile output testing can be done
+    - manifest fixes
+
+0.05  Fri Aug 21 23:28:32 EDT 2009
+    - fixed win32 test bug
+
+0.04  Sun Aug 16 10:48:15 EDT 2009
+    - improved test coverage
+    - fixed pretest/group bug
+    - added configure() function
+    - found Test::Builder::Tester problem
+
+0.03  Thu Jul  9 11:10:33 EDT 2009
+    - removed boilerplate test
+    - fixed strange version bug
+
+0.02  Thu Jul  9 02:01:57 EDT 2009
+    - documentation bugs
+    - depend on perl >= 5.8.6
+    - fix test issue
+
+0.01  Wed Jul  8 10:35:00 EDT 2009
+    - initial release

@@ -1,0 +1,74 @@
+{
+   "abstract" : "provides an XS boost for some of Type::Tiny's built-in type constraints",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Type-Tiny-XS",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         },
+         "suggests" : {
+            "Type::Parser" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.92"
+         }
+      }
+   },
+   "provides" : {
+      "Type::Tiny::XS" : {
+         "file" : "lib/Type/Tiny/XS.pm",
+         "version" : "0.012"
+      },
+      "Type::Tiny::XS::Util" : {
+         "file" : "lib/Type/Tiny/XS/Util.pm",
+         "version" : "0.012"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS"
+      },
+      "homepage" : "https://metacpan.org/release/Type-Tiny-XS",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-type-tiny-xs.git",
+         "web" : "https://github.com/tobyink/p5-type-tiny-xs"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/project"
+   },
+   "version" : "0.012"
+}

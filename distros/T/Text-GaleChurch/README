@@ -1,0 +1,38 @@
+Text-GaleChurch version 1.00
+============================
+
+This module aligns the sentences of paragraphs in two languages in a way that 
+the aligned sentences are likely translations of each other. This is useful for 
+applications in machine translation and other applications where 
+sentence-aligned parallel corpora are needed. The algorithm used for this is 
+described in the paper "A Program for Aligning Sentences in Bilingual Corpora" 
+by William A. Gale and Kenneth W. Church (Computational Linguistics, 1994). 
+The input to the align function are two arrays with sentences from the source 
+language and target language text. The arrays need to contain one sentence 
+per array element. To split paragraphs into sentences the module 
+Lingua::Sentence can be used.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Digital Silk Road
+
+Portions Copyright (C) 2005 by Philip Koehn and Josh Schroeder (used with 
+permission)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

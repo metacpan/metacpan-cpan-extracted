@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+TUXEDO.pm
+TUXEDO.xs
+test.pl
+README

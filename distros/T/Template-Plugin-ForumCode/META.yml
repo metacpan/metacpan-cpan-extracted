@@ -1,0 +1,25 @@
+---
+abstract: 'TT plugin for BBCode-like markup'
+author:
+  - 'Chisel Wright<chiselwright@users.berlios.de>'
+build_requires:
+  Test::More: 0.72
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Template-Plugin-ForumCode
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - examples
+    - examples
+requires:
+  Template::Plugin: 2.7
+  Template::Plugin::HTML: 2.62
+  version: 0
+version: 0.0.5

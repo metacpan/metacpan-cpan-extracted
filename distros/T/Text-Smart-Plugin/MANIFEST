@@ -1,0 +1,17 @@
+AUTHORS
+autobuild.sh
+CHANGES
+COPYING
+INSTALL
+lib/Text/Smart/Plugin.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/05-pod.t
+t/10-pod-coverage.t
+t/20-smart.t
+Text-Smart-Plugin.spec
+Text-Smart-Plugin.spec.PL
+Text-Smart-Plugin.spec

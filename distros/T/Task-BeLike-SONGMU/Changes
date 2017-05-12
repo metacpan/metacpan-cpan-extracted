@@ -1,0 +1,10 @@
+Revision history for Perl extension Task-BeLike-SONGMU
+
+20140805.000 2014-08-05T05:23:26Z
+
+    - add CPAN::Uploader and Version::Next
+
+20140714.000 2014-07-14T08:50:04Z
+
+    - original version
+

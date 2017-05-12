@@ -1,0 +1,3 @@
+ERROR(text2sval.pl):
+        Line <1> in the KEY file <test-B3.key> should show an <instance>
+        tag.

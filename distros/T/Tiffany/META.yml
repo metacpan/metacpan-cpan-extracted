@@ -1,0 +1,64 @@
+---
+abstract: 'Generic interface for Perl5 template engines.'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tiffany
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Tiffany:
+    file: lib/Tiffany.pm
+    version: 1.01
+  Tiffany::HTML::Template:
+    file: lib/Tiffany/HTML/Template.pm
+  Tiffany::HTML::Template::Pro:
+    file: lib/Tiffany/HTML/Template/Pro.pm
+  Tiffany::TT:
+    file: lib/Tiffany/TT.pm
+  Tiffany::Template::Declare:
+    file: lib/Tiffany/Template/Declare.pm
+  Tiffany::Template::Semantic:
+    file: lib/Tiffany/Template/Semantic.pm
+  Tiffany::Text::ClearSilver:
+    file: lib/Tiffany/Text/ClearSilver.pm
+  Tiffany::Text::MicroMason:
+    file: lib/Tiffany/Text/MicroMason.pm
+  Tiffany::Text::MicroTemplate::Extended:
+    file: lib/Tiffany/Text/MicroTemplate/Extended.pm
+  Tiffany::Text::MicroTemplate::File:
+    file: lib/Tiffany/Text/MicroTemplate/File.pm
+  Tiffany::Text::Xslate:
+    file: lib/Tiffany/Text/Xslate.pm
+  Tiffany::Util:
+    file: lib/Tiffany/Util.pm
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/tokuhirom/Tiffany/issues
+  homepage: https://github.com/tokuhirom/Tiffany
+  repository: git://github.com/tokuhirom/Tiffany.git
+version: 1.01
+x_contributors:
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'gfx <gfuji@cpan.org>'
+  - 'tokuhirom <tokuhirom@gmail.com>'

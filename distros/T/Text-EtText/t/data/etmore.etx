@@ -1,0 +1,89 @@
+
+-----------
+
+A section from format.txt. The ...text... block triggers Text::EtText's link
+detection code incorrectly, which mangles it.  It's actually incorrect markup,
+as the ...text... line should not be using normal square brackets without
+spaces. Still, the failed link lookup should not mangle the &gt; entity.
+
+The sections are specified using XML-/HTML-style notation, e.g.
+
+	&lt;type attribute=val ...&gt;
+	[...text...]
+	&lt;/type&gt;
+
+XML-/HTML-style comments (everything between &lt;!-- and --&gt;) are ignored.
+
+-----------
+
+Next one, from ettext.txt.
+
+The href used in the link is then defined at another point in the document, as
+an indented line like this:
+
+	&etsqi;<em>label</em>&etsqo;: <em>http://url...</em>
+
+Text and markup can be enclosed in the quotes, everything quoted will become
+part of the link text. Single words or HTML tags do not need to be quoted, so
+<strong>&lt;img src=''http://jmason.org/license_plate.jpg'' width=''10''
+height=''10''&gt; &etsqi;homepage&etsqo;</strong> will work correctly.
+
+Balanced tags: b{test}. span.green{foo}. i.green{green italics}
+
+-----------
+
+Another PRE test:
+
+<pre>
+	Bar
+	[foo]
+	Baz
+</pre>
+
+Could you see the square brackets?
+
+-----------
+
+Test of lists right beside one another.
+
+	* a list item
+	* another
+	* and another. This one's a bit longer though... blah blah blah
+	foo blah etc blah
+		* nest 'em!
+		* again
+	* and back.
+
+-----------
+
+Title right at top of page
+==========================
+
+blah
+
+Smaller title at top of page
+----------------------------
+
+blah
+
+----------------------------
+
+That was a HR. so is this:
+
+----------------------------
+
+This is a test of PRE content.
+
+ foo
+
+lovely. How's about this one?
+
+::	<b>this should not be in bold</b>
+
+did that work?
+
+<etleft>Foo</etleft>Bar.
+
+<etright>Foo</etright>Bar.
+
+

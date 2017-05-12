@@ -1,0 +1,108 @@
+20160805  Fri Aug  5 12:00:12 PDT 2016
+    Bug Fixes
+    * Refix the memory allocation problem on Strawberry Perl broken in the
+      last release. (Michael G Schwern)
+
+    Distribution Changes
+    * Start using AppVeyor for CI testing of Strawberry Perl.
+      (Michael G Schwern)
+
+20160804  Thu Aug  4 19:58:49 PDT 2016
+    Bug Fixes
+    * Memory error if the word ends in X. (Michael G Schwern) [rt.cpan.org 73816] [github 1]
+
+    Doc Fixes
+    * Small spelling error from Debian (Nick Morrott) [rt.cpan.org 115468]
+
+    Distribution Changes
+    * Now using Github for bugs.
+    * Now using Github for the repository.
+    * Now using metacpan.org as a homepage.
+
+20081017  Fri Oct 17 10:58:33 PDT 2008
+    Bug Fixes
+    * Fixed freeing of internal string so it will now build on Strawberry.
+      [rt.cpan.org 34448]
+
+
+2.01  Fri Oct 10 08:56:32 EDT 2008
+    Bug Fixes
+    * An allocation bug would cause a crash if your phoned word is the
+      same length as the original word.  (Thanks Dan Markham)
+    - Fixed POD errors
+
+    Docs
+    - Mention some of the other phonetic modules.
+
+    Portability
+    * Fix compilation on VMS [rt.cpan.org 36208]
+
+
+2.00  Sat Jun 30 01:48:07 CDT 2007
+    Bug Fixes
+    * Metaphone() no longer leaks memory. [rt.cpan.org 20901]
+    
+    Performance
+    * Eliminated a Perl function wrapper around the XS code.  Its about
+      twice as fast now.
+
+
+1.96  Thu Mar  4 18:44:02 EST 1999
+    - DumbFS fix, changed metaphone.c to metaphone_c.c so that
+      the XS generated file Metaphone.c does not conflict with
+      it on case-insensitive filesystems. (Thanks Pudge)
+
+
+1.95  Wed Jan 27 15:02:47 EST 1999
+    * Fixed 'CK'->'KK' bug. ('CK' is now 'K')
+    - Added README and INSTALL docs
+    - Moved test.pl to t/metaphone.t
+
+
+1.94  Fri Jan 22 15:26:30 EST 1999
+    - Defined NULL for myself.  Fixes bug on SunOS 4.1.x
+
+
+1.93  Thu Jan 21 21:34:40 EST 1999
+    * Removed empty string asseration.
+    * Fixed "W if followed by a vowel"  (Thanks to Paul Walmsley)
+    * Fixed "Ignore C if SC[IEY]"
+    * Fixed array boundry problems in ENCODE.
+
+
+1.92  Tue Jan  5 21:44:11 EST 1999
+    * Alterations to API
+        removed Text::Soundex emulation layer
+        removed everything but Metaphone()
+    * Alterations to algorithm:
+        CHR -> KR   'Christ', 'tchrist'
+    - Finished POD
+    - First CPAN release since 0.02
+
+
+1.91  Mon Jan 4 21:00:00 EST 1999
+    - Fixed memory leak
+    - Started POD
+
+
+1.90  Mon Jan 4 03:20:00 EST 1999
+    - First working XS
+    - Has memory leak
+    - Fixed Schw bug
+    * Alterations to algorithm:
+        SCHW    -> X    'Schwern', 'Schwartz'
+        SCH     -> SK   'School'
+
+Heh, what happened to 1.00?  Never existed, it was supposed to be the gamma
+release of the pure perl version of the module.  Skipped straight to 1.90, 
+alpha XS version.
+
+BTW  The new XS version is about 40x faster than the old perl version. :)
+
+0.02  Tue Dec  2 10:18:27 EST 1997
+    - First release to CPAN.
+    - Added POD documentation.
+    - MaxPhonemeLen is no longer exported.
+
+0.01  Tue Dec  2 05:15:49 1997
+    - original version; created by h2xs 1.18

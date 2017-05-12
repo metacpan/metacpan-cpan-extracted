@@ -1,0 +1,12 @@
+Task::POE::Filter::Compression
+==============================
+
+1.02	Tue Apr 22 08:46:17 BST 2008
+	- Switched to Task:: namespace.
+	
+Bundle::POE::Filter::Compression
+================================
+
+1.00    Sat Jan  5 12:59:36 GMT 2008
+        - Initial public release.
+

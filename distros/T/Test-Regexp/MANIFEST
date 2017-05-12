@@ -1,0 +1,32 @@
+Makefile.PL
+Changes
+MANIFEST
+README
+TODO
+lib/Test/Regexp.pm
+t/100_use.t
+t/101_import.t
+t/102_import.t
+t/110_pattern.t
+t/120_keep_pattern.t
+t/130_comment.t
+t/140_utf8.t
+t/150_reason.t
+t/160_show_line.t
+t/170_todo.t
+t/180_full_text.t
+t/200_use.t
+t/201_example.t
+t/210_object.t
+t/211_objects.t
+t/212_object_extra_args.t
+t/220_object_comment.t
+t/230_tags.t
+t/950_pod.t
+t/960_pod_coverage.t
+t/980_versions.t
+t/981_permissions.t
+t/982_git.t
+t/Common.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

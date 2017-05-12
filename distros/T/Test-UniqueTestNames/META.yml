@@ -1,0 +1,27 @@
+---
+name: Test-UniqueTestNames
+version: 0.04
+author:
+  - 'Josh Heumann <cpan@joshheumann.com>'
+abstract: Make sure all of your tests have unique names
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Hook::LexWrap: 0
+  Test::Builder: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+provides:
+  Test::UniqueTestNames:
+    file: lib/Test/UniqueTestNames.pm
+    version: 0.04
+  Test::UniqueTestNames::Test:
+    file: lib/Test/UniqueTestNames/Test.pm
+  Test::UniqueTestNames::Tracker:
+    file: lib/Test/UniqueTestNames/Tracker.pm
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

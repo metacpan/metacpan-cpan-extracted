@@ -1,0 +1,30 @@
+---
+abstract: 'Template::Alloy virtual methods for Xslate'
+author:
+  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Text::Xslate::Bridge::Alloy
+name: Text-Xslate-Bridge-Alloy
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Template::Alloy: 1.011
+  Text::Xslate: 0.1029
+  parent: 0.2
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.0001

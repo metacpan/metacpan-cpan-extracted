@@ -1,0 +1,20 @@
+package MathFixture;
+use base 'Test::FIT::ColumnFixture';
+use Test::FIT;
+
+attribute('x');
+attribute('y');
+
+sub sum {
+    my $self = shift;
+    $self->eq_num($self->x + $self->y);
+}
+
+sub diff {
+    my $self = shift;
+    $self->eq_num($self->x - $self->y);
+}
+
+1;
+
+# vim: set ft=perl:

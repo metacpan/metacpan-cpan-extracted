@@ -1,0 +1,10 @@
+Changes for Perl extension Task-CatInABox
+
+0.03 Wed 22 Apr 2009
+	- Incremental release to tie up some Kwalitee loose ends
+
+0.02 Sat 22 Nov 2008
+	- Fixed typo Catalyst::Model::DBIC::File should be Catalyst::Model::DBIC
+
+0.01 Fri 24 Oct 2008
+	- Created the initial release

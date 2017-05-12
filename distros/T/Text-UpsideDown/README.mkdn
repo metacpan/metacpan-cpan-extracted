@@ -1,0 +1,55 @@
+# NAME
+
+Text::UpsideDown - Flip text upside-down using Unicode
+
+# VERSION
+
+version 1.22
+
+# SYNOPSIS
+
+    use Text::UpsideDown;
+    print upside_down("marcel gruenauer");
+
+# DESCRIPTION
+
+This module exports only one function: `upside_down`.
+
+# FUNCTIONS
+
+## upside\_down
+
+Takes a string and returns a string that looks like the characters have been
+turned upside-down and reversed so it could be read by turning your head
+upside-down. It uses special Unicode characters originally intended for
+mathematics and the like.
+
+# AVAILABILITY
+
+The project homepage is [http://metacpan.org/release/Text-UpsideDown/](http://metacpan.org/release/Text-UpsideDown/).
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Text::UpsideDown/](https://metacpan.org/module/Text::UpsideDown/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/Text-UpsideDown](http://github.com/doherty/Text-UpsideDown)
+and may be cloned from [git://github.com/doherty/Text-UpsideDown.git](git://github.com/doherty/Text-UpsideDown.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/Text-UpsideDown/issues](https://github.com/doherty/Text-UpsideDown/issues).
+
+# AUTHORS
+
+- Mike Doherty <doherty@cpan.org>
+- Marcel Grünauer <marcel@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2007 by Marcel Grünauer and Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

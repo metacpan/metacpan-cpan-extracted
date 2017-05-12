@@ -1,0 +1,263 @@
+---
+abstract: 'be like shawn artak'
+author:
+  - 'Shawn M Moore <code@sartak.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-SARTAK
+provides:
+  Task::BeLike::SARTAK:
+    file: lib/Task/BeLike/SARTAK.pm
+    version: '0.06'
+requires:
+  App::ForkProve: '0'
+  App::Nopaste: '0'
+  App::httpstatus: '0'
+  Archive::Tar::Wrapper: '0.15'
+  CPAN::Uploader: '0'
+  Carp::Always::Color: '0'
+  DBD::SQLite: '0'
+  Data::Dump::Streamer: '0'
+  Data::Hash::Totals: '0'
+  Devel::NYTProf: '0'
+  Devel::StackTrace::WithLexicals: '0'
+  Dist::Zilla: '0'
+  Dist::Zilla::PluginBundle::DOY: '0'
+  ExtUtils::MakeMaker::Dist::Zilla::Develop: '0'
+  File::Rename: '0'
+  File::ShareDir: '0'
+  Getopt::Whatever: '0'
+  IO::All: '0'
+  IO::Pty: '0'
+  IPC::System::Simple: '0'
+  Lingua::JA::Moji: '0'
+  Lingua::JA::Romanize::Japanese: '0'
+  Lingua::JP::Kanjidic: '0'
+  Module::Install: '0'
+  Module::Install::AutoManifest: '0'
+  Module::Install::GithubMeta: '0'
+  Module::Install::ManifestSkip: '0'
+  Module::Install::ReadmeFromPod: '0'
+  Module::Versions::Report: '0'
+  Pod::Cpandoc: '0'
+  Signal::StackTrace::CarpLike: '0'
+  Template::Declare: '0'
+  Test::NoTabs: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  Test::Spelling: '0'
+  Test::Without::Module: '0'
+  Text::MeCab: '0'
+  Text::MultiMarkdown: '0'
+  Unicode::Tussle: '0'
+  V: '0'
+  Web::Scraper: '0'
+  autovivification: '0'
+  circular::require: '0'
+  indirect: '0'
+  lib::require::all: '0'
+  utf8::all: '0'
+version: '0.06'
+x_Dist_Zilla:
+  perl:
+    version: '5.022000'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: '0'
+          include_dotfiles: '0'
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: GatherDir
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: PruneCruft
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: ManifestSkip
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: MetaYAML
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: License
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: Readme
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: ShareDir
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: MakeMaker
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: Manifest
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: TestRelease
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: ConfirmRelease
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: UploadToCPAN
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Test::NoTabs
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          filename: xt/author/no-tabs.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+      name: Test::NoTabs
+      version: '0.15'
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+          trailing_whitespace: '1'
+      name: Test::EOL
+      version: '0.18'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: '0'
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: '0'
+          phase: test
+          script_finder:
+            - ':ExecFiles'
+          skips: []
+      name: Test::Compile
+      version: '2.053'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+              version: '5.037'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+      name: MetaProvides::Package
+      version: '2.003001'
+    -
+      class: Dist::Zilla::Plugin::Signature
+      name: Signature
+      version: '1.100930'
+    -
+      class: Dist::Zilla::Plugin::TaskWeaver
+      name: TaskWeaver
+      version: '0.101627'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+      version: '5.037'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.037'

@@ -1,0 +1,50 @@
+Pream	247, i: 2, num: 25400000, den: 473628672, mag: 1000, k: 27
+	` TeX output 1997.07.17:1954'
+Bop	139, id: [1 0 0 0 0 0 0 0 0 0], previous page: -1
+Push	141
+Down	159, value: -917504
+Pop	142
+Down	160, value: 42152922
+Push	141
+Down	160, value: -41497562
+Push	141
+Right	145, value: 1310720
+Fnt def	243, k: 0, name: cmr10
+Fnt num	171, k: 0
+Set ch	74, 74 'J'
+Set ch	117, 117 'u'
+Set ch	115, 115 's'
+Set ch	116, 116 't'
+Move w	150, value: 218453
+Set ch	116, 116 't'
+Set ch	101, 101 'e'
+Set ch	115, 115 's'
+Set ch	116, 116 't'
+Set ch	105, 105 'i'
+Set ch	110, 110 'n'
+Set ch	103, 103 'g'
+Move w	147, value: no_b
+Fnt def	243, k: 23, name: cmbx10
+Fnt num	194, k: 23
+Set ch	40, 40 '('
+Set ch	98, 98 'b'
+Right	144, value: 20935
+Set ch	111, 111 'o'
+Set ch	108, 108 'l'
+Set ch	100, 100 'd'
+Set ch	41, 41 ')'
+Set ch	46, 46 '.'
+Pop	142
+Pop	142
+Down	159, value: 1572864
+Push	141
+Right	146, value: 15229091
+Fnt num	171, k: 0
+Set ch	49, 49 '1'
+Pop	142
+Eop	140
+Post	248, prev: 42, num: 25400000, den: 473628672, mag: 1000, 
+	l: 43725786, u: 30785863, s: 2, t: 1
+Fnt def	243, k: 23, name: cmbx10
+Fnt def	243, k: 0, name: cmr10
+PPost	249, q: 196, i: 2

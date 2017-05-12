@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Text-Lorem
+version: 0.3
+author:
+  - Adeola Awoyemi (adeola@fotango.com)
+abstract: Generate random Latin looking text
+license: perl
+build_requires:
+  Test::More: 0
+provides:
+  Text::Lorem:
+    file: lib/Text/Lorem.pm
+    version: 0.3
+generated_by: Module::Build version 0.24

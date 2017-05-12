@@ -1,0 +1,47 @@
+Test-Email version 0.04
+=======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   # optionally, set environment variables for testing; see below; then...
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+TESTING Test::POP3
+
+If you would like to test Test::POP3 as well as Test::Email, the test scripts
+will need to have access to a POP3 account, as well as SMTP server information.
+You can let it know that you want to run these tests, and also let it know how
+to run the tests, by setting these environment variables:
+
+TEST_POP3_HOST
+TEST_POP3_USER
+TEST_POP3_PASS
+TEST_POP3_SMTP
+TEST_POP3_EMAIL - used as both the from and to address of the test emails
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+MIME::Parser
+MIME::Entity
+Test::Builder
+Mail::POP3Client
+Mail::Sendmail - tests use this to send mail when testing Test::POP3
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by James Tolley <james@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

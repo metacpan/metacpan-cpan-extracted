@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 2df0924457cb94cea42881ec311b5621c7ce5dbc COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 7114ab0086c32574404026181b51291f5440d087 Changes
+SHA1 2311838043c38d8215c506c88c59dbb02b02509e INSTALL
+SHA1 47870123f373f5185d6893cb98bf06a8a05510aa LICENSE
+SHA1 f5be12b7a4599565a075138ca17a864d0bfcdfe9 MANIFEST
+SHA1 4ea53b91d68e5cbf15a46920ec1f25074a553795 META.json
+SHA1 2a0c64c91a99eb5a35306e7bfe206cf208c71976 META.yml
+SHA1 7cfe5ee9d1c020ccab2a93764e59c74190a4a739 Makefile.PL
+SHA1 d53a1d3d145a6a7b4cc018aa8871d919f2c5165b README
+SHA1 8a673248848817d820f9dc7bdcb48c1311cdcfe8 bin/pod2html-tobyink
+SHA1 8da3b9513a57d9e0e5a4bc7b750ef6bd19588046 dist.ini
+SHA1 3b1261ee86e54695d713eb92b87e10b016a74473 doap.ttl
+SHA1 19e4d1a35cb9321938fec4dbc532c370b12be6b7 examples/rdf.html
+SHA1 bacb2ae64dc4c77a03ac2b0e701028fea10e5a87 examples/rdf.pl
+SHA1 c0e28f672618130234dab1fbe80e02c1aa53cfea examples/self.html
+SHA1 8807090834aff36d5e4799b6bd8fed66ee7e8b9c lib/TOBYINK/Pod/HTML.pm
+SHA1 cf2a901805a36c65463dec5446e1428a37a4f28e t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlMU8tAACgkQzr+BKGoqfTnuKgCgqzr7mWhYb3uYCwGzcz8hJK9R
+cqsAnAwyyB9dRwgGdLQjj9cQceOdcyMq
+=u9YC
+-----END PGP SIGNATURE-----

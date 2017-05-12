@@ -1,0 +1,7 @@
+language: perl
+perl:
+  - "5.8"               # normal preinstalled perl
+  - "dev"               # installs latest developer release of perl (e.g. 5.21.8)
+sudo: false             # faster builds as long as you don't need sudo access
+before_install:
+  - eval $(curl https://travis-perl.github.io/init) --auto

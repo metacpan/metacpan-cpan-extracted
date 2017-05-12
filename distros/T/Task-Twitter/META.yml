@@ -1,0 +1,24 @@
+---
+name: Task-Twitter
+version: 0.01
+author:
+  - 'Jonathan Leto <jonathan@leto.net>'
+abstract: Install Twitter-related modules
+license: perl
+resources:
+  license: ~
+build_requires:
+  Log::Dispatch::Twitter: 0
+  Net::PingFM: 0
+  Net::Twitter: 0
+  Test::More: 0
+  Twitter::TagGrep: 0
+  WWW::ItsABot: 0
+provides:
+  Task::Twitter:
+    file: lib/Task/Twitter.pm
+    version: 0.01
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

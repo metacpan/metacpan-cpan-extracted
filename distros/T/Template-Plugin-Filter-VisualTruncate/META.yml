@@ -1,0 +1,28 @@
+--- 
+abstract: Filter Plugin for trimming text by the number of the columns of terminals and mobile phones.
+author: 
+  - bokutin, C<< <bokutin at cpan.org> >>
+build_requires: 
+  Test::Base: 0
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Template-Plugin-Filter-VisualTruncate
+no_index: 
+  directory: 
+    - examples
+    - inc
+    - t
+recommends: 
+  Your::OtherModule: 0.01
+requires: 
+  Encode: 2.23
+  Template: 0
+  Text::CharWidth: 0.04
+  Text::VisualWidth: 0.01
+  UNIVERSAL::require: 0
+version: 0.05

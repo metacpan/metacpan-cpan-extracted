@@ -1,0 +1,76 @@
+NAME
+    Test::Unit::Lite - Unit testing without external dependencies
+
+SYNOPSIS
+    Bundling the Test::Unit::Lite as a part of package distribution:
+
+      perl -MTest::Unit::Lite -e bundle
+
+    Running all test units:
+
+      perl -MTest::Unit::Lite -e all_tests
+
+    Using as a replacement for Test::Unit:
+
+      package FooBarTest;
+      use Test::Unit::Lite;   # unnecessary if module isn't directly used
+      use base 'Test::Unit::TestCase';
+
+      sub new {
+          my $self = shift()->SUPER::new(@_);
+          # your state for fixture here
+          return $self;
+      }
+
+      sub set_up {
+          # provide fixture
+      }
+      sub tear_down {
+          # clean up after test
+      }
+      sub test_foo {
+          my $self = shift;
+          my $obj = ClassUnderTest->new(...);
+          $self->assert_not_null($obj);
+          $self->assert_equals('expected result', $obj->foo);
+          $self->assert(qr/pattern/, $obj->foobar);
+      }
+      sub test_bar {
+          # test the bar feature
+      }
+
+DESCRIPTION
+    This framework provides lighter version of Test::Unit framework. It
+    implements some of the Test::Unit classes and methods needed to run test
+    units. The Test::Unit::Lite tries to be compatible with public API of
+    Test::Unit. It doesn't implement all classes and methods at 100% and
+    only those necessary to run tests are available.
+
+    The Test::Unit::Lite can be distributed as a part of package
+    distribution, so the package can be distributed without dependency on
+    modules outside standard Perl distribution. The Test::Unit::Lite is
+    provided as a single file.
+
+  Bundling the Test::Unit::Lite as a part of package distribution
+    The Test::Unit::Lite framework can be bundled to the package
+    distribution. Then the Test::Unit::Lite module is copied to the inc
+    directory of the source directory for the package distribution.
+
+BUGS
+    If you find the bug or want to implement new features, please report it
+    at https://github.com/dex4er/perl-Test-Unit-Lite/issues
+
+    The code repository is available at
+    http://github.com/dex4er/perl-Test-Unit-Lite
+
+AUTHOR
+    Piotr Roszatycki <dexter@cpan.org>
+
+LICENSE
+    Copyright (c) 2007-2009, 2012 by Piotr Roszatycki <dexter@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

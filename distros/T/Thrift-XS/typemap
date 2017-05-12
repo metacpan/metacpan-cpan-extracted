@@ -1,0 +1,16 @@
+INPUT
+T_PTROBJ_MG
+	$var = ($type)xs_object_magic_get_struct_rv_pretty(aTHX_ $arg, \"$var\");
+
+INPUT
+T_UNSIGNED_INT
+    $var = (uint32_t)SvUV($arg);
+
+TYPEMAP
+TMemoryBuffer * T_PTROBJ_MG
+
+TYPEMAP
+TBinaryProtocol * T_PTROBJ_MG
+
+TYPEMAP
+uint32_t T_UNSIGNED_INT

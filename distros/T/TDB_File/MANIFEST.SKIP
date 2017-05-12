@@ -1,0 +1,15 @@
+^blib
+\.bak$
+~$
+^Makefile(\.old)?$
+^TDB_File-
+^TDB_File-.*\.tar\.gz$
+^testdb(init|break)$
+^test\.tdb$
+\.arch-ids
+^\+\+
+^const-(c|xs)\.inc$
+^pm_to_blib$
+^\.arch-inventory$
+^{arch}
+^TDB_File\.(o|bs|c)$

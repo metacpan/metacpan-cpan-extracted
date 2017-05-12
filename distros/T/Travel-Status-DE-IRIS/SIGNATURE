@@ -1,0 +1,81 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 ad2c445cf3e659b276a3a74c7e8a8026577505ca Build.PL
+SHA1 dad9ba3b92384805a7e15a2aa54932129caed4c2 Changelog
+SHA1 22dde733ff90643a31a6a9bfb6f6c212ad2def7f MANIFEST
+SHA1 962c4d08e7338c882f1cc84d96b9b9f7cfdd6e2b META.json
+SHA1 89817b7235433951fd9223e6d902cbe7725e15c2 META.yml
+SHA1 12f37133de95470f4bd8f1539c2986f3d81681a1 README
+SHA1 8cd0987ac17eefac8232a2d4065d2737d8b46332 bin/db-iris
+SHA1 f5a440ac91a31166ee9606e0421dd4005884c344 lib/Travel/Status/DE/IRIS.pm
+SHA1 d3c0f4967c878f5d8926abec900dcc9cc019c081 lib/Travel/Status/DE/IRIS/Result.pm
+SHA1 7c202a538940995b19fd8500c5f4eb2d76ac183e lib/Travel/Status/DE/IRIS/Stations.pm
+SHA1 da42b7558362796e7d2a8033ba6114bb2110c5c6 scripts/acronyms.pl
+SHA1 dd2fc0e6ebe2dbe90d0db5f52d6acfbe3645a3b3 scripts/acronyms.sh
+SHA1 65c7499f6edef8101392c6e12dfd53333b54ace6 scripts/debug
+SHA1 6cfaebdb4d57688b8ac50f3e840a99a48c15457b t/00-compile-pm.t
+SHA1 3adfc7da6082f15051da7fbda884723388738b61 t/01-compile-pl.t
+SHA1 fd251ffc56ca6e52020c906b61158f78b035679d t/02-compile-pod.t
+SHA1 b079f0837e031bb46eade9c6714dc791dabc023a t/20-iris-class.t
+SHA1 8b9cc9141f7053913c347dde819ca8ee7210b822 t/21-iris-stations.t
+SHA1 f6b4c1105c915e44a7c11dfb63893aa1ee3b339b t/30-iris-const.t
+SHA1 7121d3e243e2315d234ebdabbbde6b5c13448f5e t/31-result-basics.t
+SHA1 a12c1c622437892812c7f1007d190896ab40cacb t/32-result-messages.t
+SHA1 1db22f443196dfeac3f19b379c7f2d8259bcb7ff t/33-result-route.t
+SHA1 2f48e34609a7afde4893ad1b78cbdd7aae0dc534 t/34-result-transfer.t
+SHA1 fce2d932bfd7b65534668d77587ab29d4f600fd0 t/35-result-wings.t
+SHA1 e8ad2fa9a7eedab3f4d014cd45a3fcd363040b8a t/in/fchg/8000041
+SHA1 0aa10e321014d6855f648c4abc6b492e41b63664 t/in/fchg/8000086
+SHA1 3344c7135d43951efafe877140f3944cb5e1c4b3 t/in/fchg/8000098
+SHA1 38600363fd3364f80f401236d2a0ea839c08ca3b t/in/fchg/8000207
+SHA1 6806d9a1ece9b9d4034798639d11bff91ecaa493 t/in/plan/8000041/150520/17
+SHA1 01e688da88ced950dac582589ed82d7fc5a2a9dd t/in/plan/8000041/150520/18
+SHA1 7ef49dbf59074ca91e465d1e3f8a446966fac0a8 t/in/plan/8000041/150520/19
+SHA1 5d12f4130b75d90ae60a684ff021f1339f308744 t/in/plan/8000086/140209/20
+SHA1 c265a9de472c6237c522561548cec51e71e55057 t/in/plan/8000086/140209/21
+SHA1 3c7000995216584d2847d420448bb1e9b740dd74 t/in/plan/8000086/140209/22
+SHA1 d3d52bda649e6bf88288cfc6c7b923ab2fa9cc7b t/in/plan/8000086/140209/23
+SHA1 c5fdd1c9adf93b503bcc2078f02c9e778fc3ec31 t/in/plan/8000086/140210/00
+SHA1 e3b679ac55b9669cf5c088359a75075269ab5119 t/in/plan/8000086/140210/01
+SHA1 62efc9065bec6e0fb9ad0d8d8479c6c97717b4f4 t/in/plan/8000098/140103/20
+SHA1 6f57084f4df5a942052b11dd17bfdd2546038e1e t/in/plan/8000098/140103/21
+SHA1 b988b7ed68de17fa59dbf9e9cee4e41fd2bc683f t/in/plan/8000098/140103/22
+SHA1 3c40f29c7c81a25201fd7797f208dd3119630e34 t/in/plan/8000098/140103/23
+SHA1 7b2cfdacc2732b2a0091dbe6c9269f6c8e73aee2 t/in/plan/8000207/150522/15
+SHA1 b617360298a9128644cc020755bff13c5ae61c92 t/in/plan/8000207/150522/16
+SHA1 757df2bb2506b663b14e39ec965eca82765a496a t/in/plan/8000207/150522/17
+SHA1 4e9a8837768fd373b986f48869bfd52fefb09d35 t/in/station/EBILP
+SHA1 6070fe5e0a60b4bcfe6692724d59799d855af85f t/in/station/EBO
+SHA1 beee36f7e1eb314783f7ecfe1b43b885b40a176f t/in/station/EDG
+SHA1 e2a5e36447b697146055ed814c024185a98cfa6b t/in/station/EE
+SHA1 6359f85221b950235b6c7b40869c6160fce145f0 t/in/station/KK
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeBu3Bxxr9kjq6wihEA1b+1Fm4AUFAliYzaUACgkQEA1b+1Fm
+4AUqig/9GPz7WrQe6KiETQR1/zjcY+pqMAkUOMv5lnI6eW47mJA69MddTyzmUcQG
+bU5CwduUlW07FdOEkPrGyv364elZ4+ZcnaM0xCtHvE8sokAwEiF1bZ/nc74/oPl0
+JkWaWRLGNWwJo3y2z0H++9lSENYvhMg+CsNt2rA8eUsCrpMB4QsBhNfYR6xH0E0m
+YyCwxBol+8r4EAsm3vrH9JsWF3+Lw/KmiodboDy+CHFlgnTQWM+tlshlKLpsGE4a
+/CAiyp8d9SBM16yV5cRo9M2wbyfNr2dMCeUrycp/BgsaNxJqlRNTegSUOHjhtq6r
+vKj5VyjxUDgkRUpvMKiBhMg64MLl0Z/gFRiuQ6c9UOOU1Ff5f8Tg+t9ZeUlc0WmG
+8MTX+J7cGNyQ7skNusjRceIdfORciUfl2/8Y63QUB+UipfwJC1USUX/329+aS4gP
+fLEheR3s9qaIrAfNZxY1aQOdtqxbRBhUw5oQUM1u+v3wpMWUNElVO7PSn2RJFcSM
+cyCActLZ2UOcIRNg2NjLpAXjegMgPJkOjasyS/sxwNyiCn61/8P10YmPPQ3NbFsL
+Uab0wAMGCEtQge2WUjASRSHlZx271Ci6RI2k+eGsdlk69tD/+FPvKhST4gY5uedl
+kx7gM8wm8RAyLJXjkixE0iKkoJOcBBvrnK7CDQ5jXDtpE4JReS4=
+=gcTR
+-----END PGP SIGNATURE-----

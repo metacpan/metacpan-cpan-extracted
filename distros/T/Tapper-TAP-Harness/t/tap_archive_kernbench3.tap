@@ -1,0 +1,391 @@
+1..1
+# Tapper-suite-version: 0.020016
+# Tapper-starttime-test-program: 19330511T155947
+# Tapper-machine-name: sles10-32bit
+# Tapper-suite-name: KernBench
+# Tapper-reportgroup-arbitrary: 
+# Tapper-section: tapper-meta-information
+# Tapper-reportgroup-testrun: 
+ok 1 - tapper-meta-data
+1..1
+# Tapper-Section: stats-proc-interrupts-before
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 26512
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 8
+    linetail: IO-APIC-edge  i8042
+  4:
+    CPU0: 391
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  serial
+  7:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 0
+    CPU1: 2
+    CPU2: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 102
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 3233
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 0
+    CPU1: 327
+    CPU2: 104
+    linetail: IO-APIC-level  xen-platform-pci
+  177:
+    CPU0: 25
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: ~
+  LOC:
+    CPU0: 26113
+    CPU1: 25976
+    CPU2: 25975
+    linetail: ~
+  ERR:
+    CPU0: 0
+    CPU1: ~
+    CPU2: ~
+    linetail: ~
+  MIS:
+    CPU0: 0
+    CPU1: ~
+    CPU2: ~
+    linetail: ~
+  ...
+1..1
+# Tapper-section: kernel-untar
+ok 1 - untar of kernel succeeded.
+1..1
+# Tapper-section: kernbench-untar
+ok 1 - untar of testsuite succeeded.
+1..1
+# Tapper-section: kernbench-testrun
+ok 1 - Run took ntp: 1688s, system: 2195s
+1..1
+ok 1 - KernBench
+  ---
+  Thu May 11 16:13:41 CET 1933
+  2.6.16.60-0.27-smp
+  Average Optimal load -j 12 Run (std deviation):
+  Elapsed Time 261.57 (30.8727)
+  User Time 226.59 (1.33692)
+  System Time 301.29 (8.735)
+  Percent CPU 203 (19.5448)
+  Context Switches 26313.2 (314.936)
+  Sleeps 25000.2 (263.972)
+  ...
+1..1
+# Tapper-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Thu May 11 16:13:41 CET 1933
+  2.6.16.60-0.27-smp
+  Average Optimal load -j 12 Run (std deviation):
+  Elapsed Time 261.57 (30.8727)
+  User Time 226.59 (1.33692)
+  System Time 301.29 (8.735)
+  Percent CPU 203 (19.5448)
+  Context Switches 26313.2 (314.936)
+  Sleeps 25000.2 (263.972)
+  ...
+1..1
+# Tapper-section: kernbench-testrun
+ok 1 - Run took ntp: 1362s, system: 1682s
+1..1
+ok 1 - KernBench
+  ---
+  Thu May 11 16:43:42 CET 1933
+  2.6.16.60-0.27-smp
+  Average Optimal load -j 12 Run (std deviation):
+  Elapsed Time 241.9 (0.690362)
+  User Time 226.234 (0.765167)
+  System Time 298.236 (0.717342)
+  Percent CPU 216.2 (0.83666)
+  Context Switches 26673.8 (154.881)
+  Sleeps 24871.8 (464.301)
+  ...
+1..1
+# Tapper-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Thu May 11 16:43:42 CET 1933
+  2.6.16.60-0.27-smp
+  Average Optimal load -j 12 Run (std deviation):
+  Elapsed Time 241.9 (0.690362)
+  User Time 226.234 (0.765167)
+  System Time 298.236 (0.717342)
+  Percent CPU 216.2 (0.83666)
+  Context Switches 26673.8 (154.881)
+  Sleeps 24871.8 (464.301)
+  ...
+1..1
+# Tapper-section: kernbench-testrun
+ok 1 - Run took ntp: 1367s, system: 1686s
+1..1
+ok 1 - KernBench
+  ---
+  Thu May 11 17:11:40 CET 1933
+  2.6.16.60-0.27-smp
+  Average Optimal load -j 12 Run (std deviation):
+  Elapsed Time 241.626 (0.311737)
+  User Time 226.214 (0.318795)
+  System Time 297.618 (0.748545)
+  Percent CPU 216.2 (0.447214)
+  Context Switches 26861.4 (554.886)
+  Sleeps 25248.2 (284.995)
+  ...
+1..1
+# Tapper-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Thu May 11 17:11:40 CET 1933
+  2.6.16.60-0.27-smp
+  Average Optimal load -j 12 Run (std deviation):
+  Elapsed Time 241.626 (0.311737)
+  User Time 226.214 (0.318795)
+  System Time 297.618 (0.748545)
+  Percent CPU 216.2 (0.447214)
+  Context Switches 26861.4 (554.886)
+  Sleeps 25248.2 (284.995)
+  ...
+1..22
+# Tapper-Section: dmesg
+ok 1 - dmesg parsed (310 lines)
+not ok 2 -  # TODO okay for us
+# not found!
+not ok 3 - apm # TODO okay for us
+# disabled - APM is not SMP safe.
+not ok 4 -  # TODO okay for us
+# Real Time Clock Driver v1.12ac
+not ok 5 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide # TODO fake
+not ok 6 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 7 - xen_balloon # TODO okay for us
+# module not supported by Novell, setting U taint flag.
+not ok 8 - powernow-k8 # TODO okay for us
+# Power state transitions not supported
+not ok 9 - powernow-k8 # TODO okay for us
+# Power state transitions not supported
+not ok 10 - powernow-k8 # TODO okay for us
+# Power state transitions not supported
+not ok 11 - hda # TODO okay for us
+# DMA timeout error
+not ok 12 - hda # TODO okay for us
+# dma timeout error: status=0xd8 { Busy }
+not ok 13 - ide # TODO fake
+# failed opcode was: unknown
+not ok 14 - hda # TODO okay for us
+# DMA timeout error
+not ok 15 - hda # TODO okay for us
+# dma timeout error: status=0xd8 { Busy }
+not ok 16 - ide # TODO fake
+# failed opcode was: unknown
+not ok 17 - hda # TODO okay for us
+# DMA timeout error
+not ok 18 - hda # TODO okay for us
+# dma timeout error: status=0xd8 { Busy }
+not ok 19 - ide # TODO fake
+# failed opcode was: unknown
+not ok 20 - hda # TODO okay for us
+# DMA timeout error
+not ok 21 - hda # TODO okay for us
+# dma timeout error: status=0xd8 { Busy }
+not ok 22 - ide # TODO fake
+# failed opcode was: unknown
+# false positves ignored: 13
+1..37
+# Tapper-Section: var_log_messages
+ok 1 - /var/log/messages parsed (52 lines)
+not ok 2 -  # TODO okay for us
+# not found!
+not ok 3 - apm # TODO okay for us
+# disabled - APM is not SMP safe.
+not ok 4 -  # TODO okay for us
+# Real Time Clock Driver v1.12ac
+not ok 5 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 6 - register_blkdev # TODO okay for us
+# cannot get major 3 for ide
+not ok 7 - xen_balloon # TODO okay for us
+# module not supported by Novell, setting U taint flag.
+not ok 8 - powernow-k8 # TODO okay for us
+# Power state transitions not supported
+not ok 9 - powernow-k8 # TODO okay for us
+# Power state transitions not supported
+not ok 10 - powernow-k8 # TODO okay for us
+# Power state transitions not supported
+not ok 11 - hda # TODO okay for us
+# DMA timeout error
+not ok 12 - hda # TODO okay for us
+# dma timeout error: status=0xd8 { Busy }
+not ok 13 - ide # TODO fake
+# failed opcode was: unknown
+not ok 14 - hda # TODO okay for us
+# DMA timeout error
+not ok 15 - hda # TODO okay for us
+# dma timeout error: status=0xd8 { Busy }
+not ok 16 - ide # TODO fake
+# failed opcode was: unknown
+not ok 17 - hda # TODO okay for us
+# DMA timeout error
+not ok 18 - hda # TODO okay for us
+# dma timeout error: status=0xd8 { Busy }
+not ok 19 - ide # TODO fake
+# failed opcode was: unknown
+not ok 20 - hda # TODO okay for us
+# DMA timeout error
+not ok 21 - hda # TODO okay for us
+# dma timeout error: status=0xd8 { Busy }
+not ok 22 - ide # TODO fake
+# failed opcode was: unknown
+not ok 23 - kernel # TODO okay for us
+# May 11 15:58:39 powernow-k8: Power state transitions not supported
+not ok 24 - kernel # TODO okay for us
+# May 11 15:58:39 powernow-k8: Power state transitions not supported
+not ok 25 - kernel # TODO okay for us
+# May 11 15:58:39 powernow-k8: Power state transitions not supported
+not ok 26 - kernel # TODO okay for us
+# May 11 16:19:56 hda: DMA timeout error
+not ok 27 - kernel # TODO okay for us
+# May 11 16:19:56 hda: dma timeout error: status=0xd8 { Busy }
+not ok 28 - 56 sles10-32bit kernel # TODO fake
+# ide: failed opcode was: unknown
+not ok 29 - kernel # TODO okay for us
+# May 11 16:20:27 hda: DMA timeout error
+not ok 30 - kernel # TODO okay for us
+# May 11 16:20:27 hda: dma timeout error: status=0xd8 { Busy }
+not ok 31 - 27 sles10-32bit kernel # TODO fake
+# ide: failed opcode was: unknown
+not ok 32 - kernel # TODO okay for us
+# May 11 16:21:38 hda: DMA timeout error
+not ok 33 - kernel # TODO okay for us
+# May 11 16:21:39 hda: dma timeout error: status=0xd8 { Busy }
+not ok 34 - 39 sles10-32bit kernel # TODO fake
+# ide: failed opcode was: unknown
+not ok 35 - kernel # TODO okay for us
+# May 11 16:21:39 hda: DMA timeout error
+not ok 36 - kernel # TODO okay for us
+# May 11 16:21:40 hda: dma timeout error: status=0xd8 { Busy }
+not ok 37 - 40 sles10-32bit kernel # TODO fake
+# ide: failed opcode was: unknown
+# false positves ignored: 4
+1..1
+# Tapper-Section: stats-proc-interrupts-after
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 1136556
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 8
+    linetail: IO-APIC-edge  i8042
+  4:
+    CPU0: 391
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  serial
+  7:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 0
+    CPU1: 2
+    CPU2: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 102
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 225207
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 1
+    CPU1: 327
+    CPU2: 8092
+    linetail: IO-APIC-level  xen-platform-pci
+  177:
+    CPU0: 25
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: ~
+  LOC:
+    CPU0: 1136220
+    CPU1: 1136082
+    CPU2: 1136081
+    linetail: ~
+  ERR:
+    CPU0: 0
+    CPU1: ~
+    CPU2: ~
+    linetail: ~
+  MIS:
+    CPU0: 0
+    CPU1: ~
+    CPU2: ~
+    linetail: ~
+  ...
+1..1
+# Tapper-section: clocksource
+ok 1 - Clocksource
+  ---
+  Cannot determine clocksource
+  ...
+1..1
+# Tapper-section: uptime
+ok 1 - got uptime
+  ---
+  uptime: 5715s
+  idletime: 723s
+  ...
+

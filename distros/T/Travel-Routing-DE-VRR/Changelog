@@ -1,0 +1,219 @@
+Travel::Routing::DE::VRR 2.15 - Sat Mar 04 2017
+
+    * Remove support for Vorarlberger Verkehrsverbund (VVV) backend
+      (no longer working, apparently superseded by non-EFA software)
+    * Update EFA URLs for Verkehrsverbund Rhein-Ruhr (VRR2) and
+      Verkehrsverbund Rhein-Neckar (VRN) backends
+    * Add support for Braunschweiger Verkehrs-GmbH (BSVG)
+
+Travel::Routing::DE::VRR 2.14 - Mon Oct 19 2015
+
+    * Remove support for the STV / Verbundlinie Steiermark EFA entry point
+      (returns data with broken encoding)
+    * Add VVO, VRN, VMV, KVV, TLEM and VBL EFA entry points
+
+Travel::Routing::DE::VRR 2.13 - Thu Jul 23 2015
+
+    * efa: Add -a / --accessibility option
+    * efa: Add -B / --bike-info option
+    * efa: Change --ignore-info default to ignore less when -a / -B is set
+    * EFA->new: Add boolean config options with_low_platform, with_wheelchair,
+      without_elevators, without_escalators and without_solid_stairs
+
+Travel::Routing::DE::VRR 2.12 - Thu Jun 25 2015
+
+    * Route::Part: Deprecate ->extra accessor. Use ->regular_notes instead
+    * Route::Part: Add ->regular_notes and ->current_notes accessors.
+      Note that current_notes is NOT STABLE yet. It may be change without
+      further notice.
+    * Route::Part: Add ->footpath_{duration,parts,type} accessors
+    * efa: Show current route information provided by the EFA backend, such
+      as cancelled stops or diversions.
+    * efa -E: Show transfer walking duration when available
+    * efa: Extend --ignore-info default (this option will probably be
+      overhauled or removed in a future release)
+    * Add Travel::Routing::DE::EFA::Route::Message module
+
+Travel::Routing::DE::VRR 2.11 - Sun Jun 14 2015
+
+    * efa: Fix encoding issues when using -w, -t, -d, -a and similar
+    * Travel::Routing::DE::EFA::Route::Part: Add train_product accessor
+    * Improve support for walking connections
+    * Handle "nicht umsteigen" messages and other unusual connection types
+
+Travel::Routing::DE::VRR 2.10 - Fri May 29 2015
+
+    * efa: Changed -p/--proximity default walking time from 8 to 10 minutes
+    * efa: The -p/--proximity option now takes an optional duration argument
+    * EFA: use_near_stops now accepts an integer (interpreted as walking time
+      in minutes) instead of a boolean value
+
+Travel::Routing::DE::VRR 2.09 - Fri Jan 09 2015
+
+    * Travel::Routing::DE::EFA::Exception::Ambiguous: Add post_value accessor
+      which contains the ambiguous input value
+    * Improve error messages
+    * Add VRR2 and DING EFA services
+
+Travel::Routing::DE::VRR 2.08 - Wed Oct 08 2014
+
+    * efa: Add -l / --list option
+    * efa: Add -s / --service option
+    * Travel::Routing::DE::EFA::get_efa_urls() now returns a list of hashrefs
+    * Documentation improvements
+
+Travel::Routing::DE::VRR 2.07 - Fri Aug 08 2014
+
+    * Add URLs for several austrian EFA services
+      (pointed out by Gregor Herrmann)
+    * Support EFA services which do not distinguish between scheduled
+      and realtime data (also pointed out by Gregor Herrmann)
+    * efa: Add -D/--discover option
+    * efa: Add -A/--auto-url option
+    * Travel::Routing::DE::EFA: Add get_efa_urls method
+    * efa: Remove --post option from documentation (it has not been supported
+      since version 1.04)
+
+Travel::Routing::DE::VRR 2.06 - Sat Aug 02 2014
+
+    * Route::Part: Add {arrival,departure}_{route,station}maps accessors
+    * efa: Add -m / --maps option
+    * Fix exclude / --exclude (didn't work at all previously, possibly
+      because of a server-side API change)
+
+Travel::Routing::DE::VRR 2.05 - Mon Mar 03 2014
+
+    * Move all logic to Travel::Routing::DE::EFA and require an EFA url to
+      be set. This way, any EFA service is supported.
+      Travel::Routing::DE::VRR now calls ::EFA with the VRR url, so there are
+      no backwards-incompatible changes
+    * Improve error messages for missing route data and backend errors
+    * Add option to specify maximum number of connections (efa -n)
+    * efa: add -f / --full-route option
+    * efa: add -u / --efa-url option
+
+Travel::Routing::DE::VRR 2.04 - Tue Jan 07 2014
+
+    * efa: Handle UTF8 in place/stop input
+    * Travel::Routing::DE::VRR: Handle decoded input with non-ASCII characters
+
+Travel::Routing::DE::VRR 2.03 - Thu Jul 4 2013
+
+    * Disable smartmatch warnings on perl >= 5.018
+
+Travel::Routing::DE::VRR 2.02 - Wed Apr 10 2013
+
+    * Patch by Roland Hieber: respect proxy environment variables
+
+Travel::Routing::DE::VRR 2.01 - Thu Jan 26 2012
+
+    * Fix bug in departure_stop_and_platform where the arrival_stop was used
+      in case of unknown platforms
+    * Document -E / --extended-info in efa(1)
+
+Travel::Routing::DE::VRR 2.00 - Sun Dec 11 2011
+
+    * Now uses the efa.vrr.de XML interface
+    * properly decode UTF-8 strings
+
+    [Travel::Routing::DE::VRR::Route]
+    * new accessors: duration, ticket_type, fare_adult, fare_child and
+      vehicle_time
+
+    [Travel::Routing::DE::VRR::Route::Part]
+    * arrival_stop and departure_stop no longer include the platform,
+      use arrival_stop_and_platform / departure_stop_and_platform instead
+    * New accessors: arrival_date, arrival_platform, arrival_sdate,
+      arrival_stime, arrival_stop_and_platform, delay, departure_date,
+      departure_platform, departure_sdate, departure_stime,
+      departure_stop_and_platform, via
+    * ->extra no longer contains information about delays, use ->delay instead
+
+    [efa]
+    * New -E / --extended-info option to display travel fares
+
+Travel::Routing::DE::VRR 1.06 - Sat Sep 17 2011
+
+    * Fix dependencies.  We claimed to use WWW::Mechanize but in fact only
+      need LWP::UserAgent
+
+Travel::Routing::DE::VRR 1.05 - Sun Jul 17 2011
+
+    * Documentation fixes (in a few places, the module was prefixed
+      Travel::Status instead of the correct Travel::Routing)
+    * Note that we need perl >= 5.10.1 because of the parent pragma
+
+    [efa]
+    * Fix connection error handler
+
+Travel::Routing::DE::VRR 1.04 - Wed Jun 29 2011
+
+    * efa: Remove --foo-type options, use --to city type:stop etc. instead
+    * Introducing Travel::Routing::DE::VRR
+    * New dependencies: Class::Accessor, Exception::Class
+
+efa 1.3 - Sun Jun 6 2010
+
+    * Rewrite efa parser using XML::LibXML (major performance improvement)
+    * Detect more efa.vrr.de errors (no routes found, invalid input data, etc.)
+
+efa 1.2 - Sat Jun 5 2010
+
+    * Rewrite efa parser using HTML::TreeBuilder::XPath
+    * Fixes information about late trains (was broken by efa.vrr.de changes)
+
+efa 1.1.2 - Wed May 12 2010
+
+    * Fix -v
+    * Fix --date DD.MM. (was incorrectly rejected)
+    * Fix support for empty --ignore-info
+    * Add some more argument verification
+
+efa 1.1.1 - Mon Apr 26 2010
+
+    * Add short options
+
+efa 1.1 - Sun Jan 17 2010
+
+    * Code cleanup and DRY-ing
+    * Add 'addr:foo' and 'poi:foo' as alternative to '--to-type poi' etc.
+
+efa 1.0.3 - Wed Dec 9 2009
+
+    * Further code cleanup
+    * Fixes a minor unicode-related glitch in the output formatting
+
+efa 1.0.2 - Sat Sep 12 2009
+
+    * Code cleanup
+    * --restrict is now --include
+
+efa 1.0.1 - Wed Jul 1 2009
+
+    * Fixed unicode handling (apparently efa.vrr.de got changed)
+    * Added support for some rare connections without timestamps
+    * --date: The year is now optional
+
+efa 1.0 - Sat May 23 2009
+
+    * Various parser improvements, especially for footways.
+    * Added --walk-speed option
+    * Added --bike option (take a bike with you)
+    * Except for "Mobilitätseinstellungen", the efa.vrr.de interface is now
+      completely supported
+
+efa 0.9.1 - Wed May 20 2009
+
+    * Added options:
+    + --exclude    - exclude certain train/transport types
+    + --max-change - limit maximum number of interchanges
+    + --prefer     - prefer connections based on speed/interchanges/walking
+    + --proximity  - take near stops into account for start/stop
+
+efa 0.9 - Sat May 16 2009
+
+    * Accept from, to and via city and stops
+    * Custom arrival/departure date/time
+    * Print extra infos (late trains etc.)
+    * Regex to ignore certain infos
+    * Restrict trains to anything/anything without ICE/local

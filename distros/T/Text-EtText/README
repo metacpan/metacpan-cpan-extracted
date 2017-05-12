@@ -1,0 +1,111 @@
+
+Welcome to EtText!
+------------------
+
+EtText is a simple plain-text format which allows conversion to and from HTML.
+Instead of editing HTML directly, it provides an easy-to-edit, easy-to-read and
+intuitive way to write HTML, based on the plain-text markup conventions we've
+been using for years.
+
+Like most simple text markup formats (POD, setext, etc.), EtText markup handles
+the usual things: insertion of P tags, header recognition and markup. However
+it also adds a powerful link markup system.
+
+EtText markup is simple and effective; it's very similar to WikiWikiWeb
+TextFormattingRules or Zope's StructuredText.
+
+EtText is distributed under the same licensing terms as Perl itself.
+
+Name           DSLI  Description                                  Info
+-------------  ----  -------------------------------------------- -----
+Text::EtText   RmpO  editable-text format for HTML output         JMASON
+
+---------------------------------------------------------------------------
+
+INSTALLATION
+------------
+
+For all UNIX platforms:
+-----------------------
+
+Untar the .tar.gz file, and "cd" into the directory. Then run:
+
+	perl Makefile.PL
+	make
+	make install		(as root)
+
+That will install the Text::EtText modules and the commands "ettext2html" and
+"ethtml2text".
+
+---------------------------------------------------------------------------
+
+For Windows using ActiveState Perl or IndigoPerl:
+-------------------------------------------------
+
+Unzip the .zip distribution, and "cd" into the directory created. Then
+run:
+
+	perl windows_install.pl
+
+This will generate some .bat files which allow you to run the scripts
+from that directory.
+
+If this command fails, you probably do not have Perl installed, or the
+directory it's installed in is not in your PATH.  Check this and try
+again.
+
+---------------------------------------------------------------------------
+
+For Windows using ActiveState Perl, or IndigoPerl, and NMAKE:
+-------------------------------------------------------------
+
+Another way to install WebMake is as a traditional Perl module, using
+"perl Makefile.PL" and Microsoft's NMAKE, included with MS DevStudio.
+Here's what one user has to say on this subject:
+
+    nmake works nicely, and the installation process looks the same as on
+    other platforms.
+
+    My understanding is that nmake.exe is available for free from Redmond.
+    In fact I downloaded it just a few minutes ago, following the
+    suggestion found on the IndigoPerl home page:
+
+      Installing CPAN modules requires that you have Microsoft DevStudio
+      or nmake.exe installed.  If you are installing modules that contain
+      xs files, then you need DevStudio, otherwise you only need
+      nmake.exe.  You can download nmake from [the url below].
+
+      Run the self-extracting exe and copy nmake.exe to the perl\bin
+      directory.
+
+[the URL is:
+http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
+]
+
+    Nmake15.exe expands to nmake.exe (64K) and Nmake.Err (5k) - a text
+    file.  I copied both to C:\perl\bin, then renamed nmake.exe to
+    make.exe and now I can pretend to be on Unix:
+
+        H:\devperl\Text-EtText-0.5>makefile
+        Writing Makefile for Text::EtText
+
+	H:\devperl\Text-EtText-0.5>make ...
+
+        H:\devperl\Text-EtText-0.5>make test
+        ...
+
+The upshot is: if you download NMAKE, rename it to "make.exe", and install
+it in your path, Perl can install modules just fine using the traditional
+perl module install procedure on Windows.  In fact, it may be possible to
+simply use NMAKE as "nmake.exe" instead of "make.exe", from the look of
+it.
+
+---------------------------------------------------------------------------
+
+For Macs using MacPerl:
+-----------------------
+
+(haven't tried yet. TODO)
+
+---------------------------------------------------------------------------
+

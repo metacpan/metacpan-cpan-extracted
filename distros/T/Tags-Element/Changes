@@ -1,0 +1,11 @@
+0.02 2015-10-15T21:46:14+02:00
+ - Add Task::Tags to SEE ALSO section in doc.
+ - Add comments to tests.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Sort modules in EXAMPLE2 section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.01 2014-11-28T23:32:52+01:00
+ - First version.

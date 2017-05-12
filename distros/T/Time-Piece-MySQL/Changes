@@ -1,0 +1,36 @@
+0.06  2008-06-07
+
+- added spaces to the strftime formats, as required by POSIX.  Thanks to Brandt
+  Kurowski for highlighting the problem. Fixes bug #32580.
+- support newer MySQL formats. Fixes bug #23840.
+
+0.05  Jul 21, 2004
+
+- It seems that 0.04 was incorrectly bundled onto CPAN after my Solaris testing.
+
+0.04  Feb 02, 2004
+
+- fixed the test failure on sun4-solaris (and probably others)
+  The problem was a bug (IMO) in strptime on Solaris: if you didn't scan
+  the month-day in the date, it filled the struct tm with 0, which causes
+  mktime to go back to the previous month.
+
+- the constructors now wrap Time::Piece calls in eval so they won't die when
+  you pass invalid dates from MySQL.  Your application should vaidate dates
+  before storing them in MySQL, but (like me) you may have to process data
+  that some less careful programmer has left for you.
+
+0.03  May 02, 2003
+
+- new maintainer: Marty Pauley <marty+perl@kasei.com>
+- added mysql_timestamp method
+- now using Test::More
+
+0.02  Jun 11, 2002
+
+- Forgot to fill in README.  Doh!
+
+0.01  Jun 11, 2002
+
+- First release
+

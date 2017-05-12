@@ -1,0 +1,36 @@
+---
+abstract: 'Print a table to the terminal and browse it interactively.'
+author:
+  - 'Matthaeus Kiem <cuer2s@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-TablePrint
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Term::Choose: '1.504'
+  Term::Choose::LineFold: '1.504'
+  Term::Choose::Util: '0.050'
+  Term::ProgressBar: '0'
+  constant: '0'
+  perl: '5.008003'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/kuerbis/Term-TablePrint.git
+version: '0.053'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

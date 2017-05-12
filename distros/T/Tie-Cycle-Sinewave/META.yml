@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Tie-Cycle-Sinewave
+version:             0.05
+abstract:            Cycle through a series of values on a sinewave
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - David Landgren

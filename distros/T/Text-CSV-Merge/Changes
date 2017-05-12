@@ -1,0 +1,389 @@
+==================================================
+Changes from 2012-09-27 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.05 at 2013-09-27 17:47:10 +0000
+-----------------------------------------
+
+  Change: 4eb67573a21d88e564264664782bd87cf2188855
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-27 10:46:37 +0000
+
+    Merge tag 'vv0.05' into develop
+
+    Released v0.05. 
+
+  Change: 141ade0c5814e99974c7ace640a356171c9e27ff
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-27 10:45:46 +0000
+
+    Merge branch 'release/v0.05' 
+
+  Change: 3d75c481ec0989640dd4b77484473eb92d82200d
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-27 10:44:13 +0000
+
+    * Fix issue with Carp::Croak.
+
+    See: http://www.perlmonks.org/?node_id=587888 
+
+  Change: 86ba06dd6cdb3d4acebf26d58d893cf1e6d2145d
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-26 12:27:09 +0000
+
+    * Pass most critiques found by perlcritic --harsh. 
+
+  Change: 2eb662974bcb3723c0fdc76d686d1eba764fcfae
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-23 16:18:47 +0000
+
+    * Use /x flag per Perlcritic --harsh. 
+
+  Change: aa59b2dee96e5c620bbf7b7f308f9bc9eb6361cb
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-23 16:02:30 +0000
+
+    * Make change to $" local per Perlcritic. 
+
+  Change: 6517bc6352da324c3beb1d842701132074042123
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-23 15:51:30 +0000
+
+    * Add explicit return statements per Perlcritic. 
+
+  Change: 63d6101aadbeea4ae60b8f0200abbd2794eb3ba2
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-23 14:35:38 +0000
+
+    * Fix failing tests. 
+
+  Change: 6dde96619f01d3099a4f454318395b571ecd74f2
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-19 14:54:13 +0000
+
+    * Add "provides" entries to META.YML. 
+
+  Change: cc33583029dc69cee084f23ddfcb0ecffd8da77e
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-11 14:47:05 +0000
+
+    * Need it for dzil and its manifest... 
+
+  Change: ef69d3b728e45be5f5e4b68d01cde26f0ef835d9
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-11 14:22:37 +0000
+
+    Merge tag 'v0.04' into develop
+
+    Release 0.04 v0.04 
+
+-----------------------------------------
+version 0.04 at 2013-09-11 21:21:21 +0000
+-----------------------------------------
+
+  Change: 07a6c46859a7496e4cf6e6580b88352806faa4d6
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-11 14:21:21 +0000
+
+    Merge branch 'release/0.04' 
+
+  Change: 7f04cf42f517f72664195d9488be723184ebc3fc
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-11 14:19:15 +0000
+
+    * Minor formatting. 
+
+  Change: 6060dcb623768498e1b130d87582e2d84cd40b0d
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-11 12:45:15 +0000
+
+    * Fix columns definition in test. 
+
+  Change: dfc06cf542c29ee4dc34ad73c00bb10e158a78c2
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-11 08:16:33 +0000
+
+    * Fix test failures under Perl >= 5.18.
+
+    The smart match operator is now experimental and produces warnings. I
+    replaced it with grep(). 
+
+  Change: f0e53706ee827ea3e5b1ea54feeb2074916c6ca8
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-09-11 07:59:20 +0000
+
+    * Test result CSV file should not be in source code? 
+
+  Change: 04bc71b1031924aceef3b4c36b6d876520120582
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-08-26 10:14:30 +0000
+
+    * Fix overwriting of README.md with POD from main module. 
+
+  Change: 5e9ff77cdb89c70f209b217912222b28a056afb0
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-08-26 10:12:45 +0000
+
+    * Reverted change in which POD overwrote my github README.md.
+
+    This is probably a result of the new build process, which I thought
+    would only replace the generic README in the dist with this one... 
+
+  Change: eab93fbaab26a5ea932d6e8b2fdb44845185f758
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-08-26 10:06:25 +0000
+
+    Merge tag 'v0.03' into develop
+
+    Prepared code for releasing a new, public version. 
+
+-----------------------------------------
+version 0.03 at 2013-08-26 17:05:37 +0000
+-----------------------------------------
+
+  Change: eb37498599ef1ce923334c31e9dfa1873a6245af
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-08-26 10:05:37 +0000
+
+    Merge branch 'release/0.03' 
+
+  Change: f7260543ff9a2e57cb84fed16654e344a3bf6d6c
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-08-26 08:14:05 +0000
+
+    * Improve documentation.
+
+    Fixed mistakes in POD formatting. Added docs for CLI utility. 
+
+  Change: 562ba478cddff238f7d14ff95e25c0bffa874e93
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-08-26 08:12:04 +0000
+
+    * Improved build process!
+
+    Most things seem to work better with no missing items from Metacpan
+    nor build errors nor oddities. 
+
+  Change: 6e1e93dfcae91cfd9c4a1704157dcbe85a42397b
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-25 09:13:50 +0000
+
+    * Fix POD headers. 
+
+  Change: bf714fcd15f2f5660edf934a864e933bdf131502
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 21:52:38 +0000
+
+    Bump version to 0.03 
+
+  Change: 6827602463d5778e45a8dc5854db21f1b188aded
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 21:47:36 +0000
+
+    * Move search field validation out of CLI and into lib. 
+
+  Change: 3a292b255b07fabd61ab8e5d8d986b08a6659fb9
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 18:40:20 +0000
+
+    Merge tag 'v0.002' into develop
+
+    v0.002 
+
+------------------------------------------
+version 0.002 at 2013-07-25 01:37:58 +0000
+------------------------------------------
+
+  Change: 74e79571fb5a05c2c22a5af2f9bcfba23bf5a740
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 18:37:58 +0000
+
+    Merge branch 'release/0.002' 
+
+  Change: 7e13ef73be8c857012608e486ee68b83f4613a10
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 18:36:29 +0000
+
+    * Finalize the build process. 
+
+  Change: 113901164900a11182bdd811815fed4727ec79ea
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 09:30:20 +0000
+
+    * Fix output file name for the MANIFEST. 
+
+  Change: a422d320ea58de89746c3abc6f6b7bddbc29200d
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 09:28:22 +0000
+
+    * Yet another test fix. 
+
+  Change: f898c977cae75d7e102226bf0e6d095342501358
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 09:24:59 +0000
+
+    * Fix next round of failed tests. 
+
+  Change: 6090407ad165242a7d8c2ee617249a3f4d68056b
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 09:21:35 +0000
+
+    * Fix errors in tests. 
+
+  Change: 49fda6c7f8956db035383ee327d6d0be35b51001
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 09:09:25 +0000
+
+    * Add ABSTRACT for Dist::Zilla. 
+
+  Change: 7449c941c067ae059626491c9c51841c2d298092
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 08:40:29 +0000
+
+    Merge branch 'master' into develop 
+
+  Change: 8e80441689ce91ecd3b76c87d4812b85c90f945a
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 08:39:48 +0000
+
+    * Test more extensively.
+
+    Alert: some tests are not complete and do not conform to the intended
+    test plan setting, yet. 
+
+  Change: ff8233e4edcc15f6346b34a648efce3ead577817
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-24 08:38:19 +0000
+
+    * Add installation instructions. 
+
+  Change: 6113083dba97d8a33e342491c6a76f51e7cd04be
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-23 13:35:03 +0000
+
+    Merge tag 'vv0.001' into develop
+
+    Beta release of this module. 
+
+  Change: 86c068c8fa57d4a75e7616b2b2915e7227660a97
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-23 13:34:20 +0000
+
+    Merge branch 'release/v0.001' 
+
+  Change: 2a0b33b326d90e3ad4c42db1c6afa700737b5c5b
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-23 13:26:26 +0000
+
+    Merge branch 'feature/module' into develop 
+
+  Change: 224267bdb1d3df48cd010ae517ed89ed065b4ce5
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-23 13:25:13 +0000
+
+    * Write about Development procedures. 
+
+  Change: dd29de041d62b37d3971bc3f3833a6cfefa39741
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-23 13:19:27 +0000
+
+    * Put into good, working order.
+
+    The module and CLI script now perform exactly as the script alone
+    did, before conversion to a module. 
+
+  Change: d5fed2a16b7f1c566d6463e9dc8dafe75eed5d55
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-23 08:23:59 +0000
+
+    * Better configure building of a CPAN module. 
+
+  Change: 56458f97b46321c424c60277ac22b6ec3611fbc3
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-23 08:22:03 +0000
+
+    * Convert to a module. 
+
+  Change: 9b0df243506fa9f16281825ec8aa1a091a25c90c
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-16 08:52:40 +0000
+
+    * Initial conversion to Module.
+
+    Use Dist::Zilla to better manage Module life cycle. 
+
+  Change: 55d2ef747b662d34bee3780a3976bb4dab9bc057
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-14 10:56:15 +0000
+
+    * Don't deal with column cases. 
+
+  Change: 8e229b941018c0146aaf14ae3b0fdd1911440e19
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-10 14:03:51 +0000
+
+    * Comment the code better and format a few lines better. 
+
+  Change: 5d0fd58e9c50b2b95877c1c6004669289e5847e2
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-09 12:37:39 +0000
+
+    Validate the search parameter as being one of the specified columns 
+
+  Change: 7b69f166d8bbf488a95ac1c6c6ef4d953630baaa
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-09 12:00:47 +0000
+
+    * Configure search parameter for looking up rows in the merge 
+
+  Change: 7d638f696549ada43cdfe806b9a7a11f79f905d4
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-08 16:00:49 +0000
+
+    * Ensure open files as utf8. 
+
+  Change: 910fa9dd5f36919f6ee3e47e3910f2a6e40b8e26
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-08 15:53:17 +0000
+
+    * Don't overwrite the log on each run.
+
+    By default, logging will now append rather than overwrite. 
+
+  Change: b77327d806933010d22aed92f1c272948c776866
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-08 15:50:00 +0000
+
+    * Allow arbitrary columns.
+
+    This is as any software for general use should be. However, the
+    original was written for a very specific use case, thus this commit. 
+
+  Change: ce14f36533fd88788863303728b9e1d0c237d5d7
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-08 15:48:50 +0000
+
+    * Test with both blank fields and fields filled with "NULL". 
+
+  Change: dcaad9c3f95d3e5e7b00952ac464a7e56b1ce3b3
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-07-07 10:24:30 +0000
+
+    * Add generic CSV files for testing. 
+
+  Change: fb15b44d433194e870a31e60f9403fbea92b05c1
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-06-24 10:16:59 +0000
+
+    * Add skeleton test. 
+
+  Change: f6eb9940fde6304898629b27b6639462b46b760c
+  Author: Michael Gatto <mgatto@lisantra.com>
+  Date : 2013-06-24 10:13:39 +0000
+
+    * Initial commit. 
+
+================
+End of releases.
+================

@@ -1,0 +1,40 @@
+---
+abstract: 'Include another file (Functioning Custom Tag Example)'
+author:
+  - 'Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-LiquidX-Tag-Include
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Template::LiquidX::Tag::Include:
+    file: lib/Template/LiquidX/Tag/Include.pm
+    version: v1.0.5
+requires:
+  File::Spec: '0'
+  Template::Liquid: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/sanko/Template-LiquidX-Tag-Include/issues
+  homepage: https://github.com/sanko/Template-LiquidX-Tag-Include
+  repository: git://github.com/sanko/Template-LiquidX-Tag-Include.git
+version: 1.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

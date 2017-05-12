@@ -1,0 +1,13 @@
+lib/Docs/Site_SVD/Text_Replace.pm
+MANIFEST
+Makefile.PL
+README
+lib/Text/Replace.pm
+t/Text/Replace.t
+t/Text/Replace.pm
+t/Text/Replace.d
+t/Text/File/Package.pm
+t/Text/Test/Tech.pm
+t/Text/Data/Secs2.pm
+t/Text/Data/SecsPack.pm
+t/Text/Data/Startup.pm

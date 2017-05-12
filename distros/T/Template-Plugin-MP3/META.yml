@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Template::Plugin::MP3
+version: 1.02
+author: darren chamberlain <darren@cpan.org>
+license: perl
+distribution: module
+requires:
+  MP3::Info: 1.01
+  Template: 2.08
+provides:
+  Template::Plugin::MP3:
+    file: MP3.pm
+    version: 1.02
+generated_by: hand!

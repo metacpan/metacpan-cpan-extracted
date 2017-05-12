@@ -1,0 +1,11 @@
+Revision history for Template-Plugin-Text-Greeking
+
+1.0    2011-12-18T05:26:43+0800
+- No feature updates, just to fix cpan installation.
+
+0.0.2  Tue Jul 31 16:38:27 CST 2007
+* Text.Greeking now has options that delegates to underlying greeking classes.
+
+0.0.1  Tue Jul 31 15:10:38 2007
+       Initial release.
+

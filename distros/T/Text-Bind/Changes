@@ -1,0 +1,15 @@
+Revision history for Perl extension Text::Bind.
+
+0.04  Wed Jul 07 1999
+	- Fixed bug checking for filehandle bindings.  Strings with
+	  "GLOB" in them would be mistaken as filehandles.
+
+0.03  Sat Apr 24 1999
+	- fixed some -w warnings
+
+0.02  Tue Mar 30 1999
+	- add support data site loops
+	- an array can be bound to a data site
+
+0.01  Thu Jan 27 1998
+	- initial bundled release

@@ -1,0 +1,24 @@
+=head1 Notes on Tie::MmapArray
+
+=head2 Extending files
+
+According to W. Richard Stevens (Advanced Programming in the UNIX
+Environment, Addison-Wesley, 1992), ftruncate() may or may not be able
+to extend a file, but if it can the it probably creates a hole.  On
+Linux 2.2 it does seem to be able to extend a file.
+
+If ftruncate() doesn't work, then another option is to write a single
+null byte at the last byte of the required length.  This should extend
+the file, creating a hole between the block containing current end of
+file and the the block containing the new end of file.  Of course if
+the file needs to be extended such that the new end of file is in the
+same block as the current end of file then nothing needs to be done
+(mmap still needs to have mapped in the required address space).
+
+If we need to extend a file and the file is already mmaped then we may
+need to call munmap() and then mmap().
+
+
+=head2 Test Strategy
+
+Need to test normal processing and error handling.

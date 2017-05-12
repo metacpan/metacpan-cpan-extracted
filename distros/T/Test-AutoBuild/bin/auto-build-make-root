@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2002-2008 Daniel P. Berrange <dan@berrange.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+use strict;
+use warnings;
+
+use File::Path;
+use File::Spec::Functions qw(catdir rootdir);
+
+my $build_home = catdir(rootdir, "var", "lib", "builder");
+$build_home = shift @ARGV if @ARGV;
+
+sub makeit {
+    my @dir = @_;
+    my $path = catdir($build_home, @dir);
+    print "Create $path\n";
+    mkpath([$path], 0, 0755);
+}
+
+makeit "source-root";
+makeit "install-root";
+makeit "build-archive";
+makeit "log-root";
+
+makeit "public_html";
+makeit "public_ftp";
+
+makeit "package-root", "rpm", "BUILD";
+makeit "package-root", "rpm", "BUILDROOT";
+makeit "package-root", "rpm", "RPMS", "noarch";
+makeit "package-root", "rpm", "RPMS", "i386";
+makeit "package-root", "rpm", "RPMS", "i486";
+makeit "package-root", "rpm", "RPMS", "i586";
+makeit "package-root", "rpm", "RPMS", "i686";
+makeit "package-root", "rpm", "RPMS", "x86_64";
+makeit "package-root", "rpm", "RPMS", "ia32e";
+makeit "package-root", "rpm", "RPMS", "ia64";
+makeit "package-root", "rpm", "RPMS", "sparc";
+makeit "package-root", "rpm", "SPECS";
+makeit "package-root", "rpm", "SOURCES";
+makeit "package-root", "rpm", "SRPMS";
+makeit "package-root", "pkg";
+makeit "package-root", "zips";
+makeit "package-root", "tars";
+makeit "package-root", "debian";
+
+exit 0;
+
+=pod
+
+=head1 NAME
+
+auto-build-make-root - Create a new build engine root directory
+
+=head1 SYNOPSIS
+
+# auto-build-make-root PATH-TO-NEW-ROOT
+
+To create a build engine root under /var/lib/builder, the location
+expected by the example configuration file, execute:
+
+# auto-build-make-root /var/lib/builder
+
+=head1 DESCRIPTION
+
+The build engine expects a number of stub directories to be created
+within the build root. Since this set of directories may change over
+time, the C<auto-build-make-root> script provides a convenience for
+populating all pre-requisite directories.
+
+=head1 STRUCTURE
+
+The following directories are created by the script:
+
+=over 4
+
+=item source-root
+
+The directory into which the modules' source code will be checked
+out of version control.
+
+=item install-root
+
+The virtual root directory in which modules will install files
+during the "make install" part of their build process.
+
+=item log-root
+
+The directory into which build and test log files will be spooled
+during execution of modules' control files.
+
+=item package-root
+
+The directory into which packages (RPMs, Debian packages, ZIPs, etc)
+will be saved by the module's control file. There are subdirectories
+below this for all the various different types of packages.
+
+=item build-archive
+
+The directory used for caching the results of module builds across
+build cycles.
+
+=item public_html
+
+The directory in which the HTML status pages will be generated, and
+build artifacts, packages, and log files published. This directory
+should be exported by an HTTP server
+
+=item public_ftp
+
+The directory in which packages will be published. This directory should
+be exported by an FTP server.
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) 2002-2006 Daniel P. Berrange
+
+Test-AutoBuild is distributed under the terms of the GNU GPL v2+.
+This is free software; see the source for copying conditions.  There is
+NO warranty; not even for MERCHANTABILITY or FITNESS FOR  A  PARTICULAR
+PURPOSE.
+
+=head1 SEE ALSO
+
+L<auto-build(1)>, L<auto-build.conf(5)>
+
+=cut
+

@@ -1,0 +1,124 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Tk;
+use lib 'lib';
+use Tk::CanvasDirTree;
+
+my $mw = MainWindow->new();
+
+$mw->fontCreate('big',
+          -family=>'arial',
+          -weight=>'bold',
+          -size=>int(-18*18/14));
+
+my $frame = $mw->Frame()->pack(-expand=>1,-fill=>'both');
+
+# base64encoded png 
+my $bunny = $mw->Photo(-data => 
+'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAjEAIAAABcJvHFAAAACXBIWXMAAAsSAAALEgHS3X78AAAD
+F0lEQVR42u1YL+yqUBj1vfcLbhY3C44is8BIREYSG9FoNBqNkok2aFhp2BhJDWyadCZN/ilOGxan
+jRdOuRsPxl/f+23vJKfX7x6+73znu5dK5RviV9QPDMMwDIPP7/f7/X6XTWU0Go1Go06n0+l0PM/z
+PC91CNu2bduWZVmW5bLpjsfj8XgcBEEQBJPJZDKZZAw0n8/n8zkCGYZhGIYgCIIgFEt3OBwOh8OA
+gKZpmqZlDDedTqfTKRnO933f95GVer1er9fz0BVFURRFxCR3QfyMQfv9fr/fDyLgOI7jONmo419k
+JUkMBoPBYJCRNBrxdrvdbrco6qvVarVaIWdFpQO/5tIcFBbE4nQ6nU6nJIpHjlGlEklTFEVRFDIa
+T32/3+/3+3jqHMdxHBcfB2sK6HFFURRFeb1er9crfksoNUrr0GvUfxGfnA+FmX+QALDItGLDA6O2
+pQyCJFkPqxMDK2p9LodOAhQaLRjfoKRGo2wObl3G8PoDsA0Gb5Q5oonjfSNKTh96AOh+u91ut1uS
+FuZrONPJ7bJ06tA9TDDsD6QkCnDltEDRkV1Q9AnENyuk8hcyChkkcZKo5uv1er1er3S6cAPkFXSx
+MQodPrXFg2zTEsVANhO2JNdEmVo80ub7K/lSDHPyLkNaXrVarVar2W46LMuyLFsKaZ7neZ4nvwFR
+NGKeGjYajUajkXz9z+RLn8/n8/ms/ANIQXq5XC6Xy/v9fr/fvw3p9Xq9Xq9VVVVV9fF4PB6Pokhc
+r9fr9Vr6s6Lf4dNpbS6/exQA3BHDt/fkPl3wwT85wlcEcrCHZyHO1tmOSl95iGLcQN80TdM0jTa1
+LMuyLF3XdV03TdM0zWaz2Ww2Xdd1XRenDlDHgTbtvj/ykMZpDm/6LpfL5XLBmGi32+12G6Th5RAA
+Pne73W63iwfGYFosFovF4kOZrtVqtVoN16TD4XA4HPAAKDp5yZUkSZIk1GGz2Ww2m91ut9vt0Mof
+lcfxeDwej7PZbDaboRFbrVar1SJfIsLdYZfn8/l8Pue3y1zyiH9VAMFElb5Yp/+PcvAbH/25ox5S
+PYYAAAAASUVORK5CYII=');
+
+
+my $tux = $mw->Photo(-data =>
+'/9j/4AAQSkZJRgABAQIASABIAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a
+HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy
+MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAA8AEMDASIA
+AhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAQFBwIDCAYB/8QAMBAAAQMCBQMCBQMFAAAAAAAA
+AQIDBAARBQYSITEHUXETYSIyQUKBFTOhI1KRscH/xAAaAQEBAQADAQAAAAAAAAAAAAAAAQIDBQYE
+/8QAIxEAAgEDAwQDAAAAAAAAAAAAAAECAwQREyExBRJBkVFSof/aAAwDAQACEQMRAD8Ap5brjgSF
+uLUEgBIUomwACRb8ADwB2rCl5bymWgU8k2v2oiyPWGk/OP5oBiiilYkbEsanCJhsZ+S8r5Wo6CtR
+97DegGqKZw3LWZpk6RDYwiY69GIS+0WiFNk8A34J+gPNaHW3GHVtPIU242opWhYsUkcgg8GgNa3E
+Nga1AXr6CFC4NxUXKe9Z24+UbCm4CiWSD9DtQE07jmKvurdXiMrUo3Ol0pA8AbAew2FFR9FY0ofV
+F7n8is9N2QexqPQstrCk8ipd1HqNKR3FQ6klKikixFbIS3qhcYuJ/tJ8V7LpFjWV8Pm4rh2aU6Yu
+JMJZD11AJsoK0lSTqAJA3Haq9Ze0sutk7Ebb/WiEtpucwt9OppKwVp7i+9R8A6jVO/UcfmTGMBZm
+YEsxnI6npBaccdZvpeSLG4sQAFEXCQeDVV9a1uzsyJxVjBZUGO6wht5x1KbLdBVc3SSPl0jm/wAN
+WejGn3mmpGH4Yqdh7qApp2K+gK8FKym1uOT+K8x1CzNHiZUmQMSYaRMmJ0sRQ6HFJTt8a7CwII2t
+fgb828pa9avalyoSgmm+E91++POV6OzqWlGNPKb29FA1KQkaI4J+43qOab9V1KO53qZAsABwK9Yd
+YFFZBtZFwhVvFFTKGDGkpse49VPP3Cnaxct6ar8WNUELW+HEkT5bUSK0t191QQ22gXKiTYACtFWR
+0LQ0vqnh/qtayG3Sg2uEq9NW/wDugLEyX0XzHBw0KxDM8jDC4NRiRPj0+VXtfwD5rxHVLpPiOUo/
+64nE14nDccCHXHEkONqPGrc3B7966qqMzBgcPMuAy8HnhRjSkaVaDYixBBHuCAfxWFTgpOSW7K5N
+rBxFAaGlTvJ48U7Tmasrzsi5qfwmbct31NPWsHWz8qh/33BFJ1shaLs7qHiTpmwoOMRoz/8AUbai
+IfDQB3ukEnY882322tRUE9nTMDjzjjeKS46VqKvSYkOIQm+5skKsB7DaigPF0vMVpjH32pik8Q/b
+R5oCPrq3ofktnL+UGsYebviOJoDhUoboa+1I87KPe47VyvHSFyWkngrAP+a71jR24kVmMynS0yhL
+aE9kgWAoDbRRRQFc9ZsnR8zZJkzUpAn4W2qSy59SgC60n2IF/IHvXLkVZcjpJ5GxrrzqfNdgdM8f
+fZ06zFLXxC+yyEH+FGuQIP7Fve9AW9Iw+JIfU7h+TJaoqrFsuy1sqO290FSrb3+p7+1FQKHXEoAW
+UuqAtrW2gqPnaivld3BPGGcmkz//2Q==');
+
+
+my $ztree = $frame->Scrolled('CanvasDirTree',
+            -bg =>'lightblue',
+            -width =>300,  
+	    -height =>300, 
+#	    -backimage => 'bridget-5a.jpg',  #either a file
+	    -backimage => $bunny,  #or Tk::Photo object data
+	    -imx => 200,           # position relative to nw corner
+	    -imy => 10,            # to place nw corner of image
+	    -font => 'big',        # defaults to system
+#	    -fontcolorn => 'cyan', # defaults to black
+#	    -fontcolora => 'lightseagreen', #defaults to red
+#	    -indfilln => 'hotpink',         #defaults to blue   
+#	    -indfilla => 'orange',          #defaults to red
+            -scrollbars =>'osw',
+            )->pack(-side=>'left',-fill=>'both', -expand=>1); 
+
+my $text = $frame->Scrolled('Text',
+                       -bg=>'white',
+		       -width => 40,
+		       -scrollbars =>'osoe',
+	)->pack(-side=>'right',-fill=>'both',-expand=>1);
+
+my $button = $mw->Button(-text=>'Exit',-command=>sub{exit})->pack();
+
+$ztree->bind('<ButtonPress-1>', sub{   
+               my $selected = $ztree->get_selected();
+
+	        if(length $selected){
+	            $text->insert('end',"$selected\n");
+	            $text->see('end');
+	         }
+	   });
+
+
+$mw->after(10000, sub{ $ztree->configure('-indfilla' => 'green' );
+                       $ztree->configure('-indfilln' => 'black'); 
+                       $ztree->configure('-fontcolora' => 'orange');
+		       $ztree->configure('-fontcolorn' => 'purple'); 
+                       $ztree->configure('-bg' => 'white'); 
+		    });
+
+$mw->after(15000, sub{ $ztree->configure('-indfilla' => 'red' );
+                       $ztree->configure('-indfilln' => 'orange'); 
+                       $ztree->configure('-fontcolora' => 'white');
+		       $ztree->configure('-fontcolorn' => 'cyan'); 
+                       $ztree->configure('-bg' => 'black');
+		   });
+
+$mw->after(20000, sub{ 
+                    $ztree->configure('-backimage' => $tux ); 
+                   });
+
+my $y = 10;
+
+$mw->after(21000, sub{ 
+                       $mw->repeat(100,sub{ 
+	                             $ztree->configure('-imy' => $y ); 
+                                     $y += 2 });
+	  });
+
+
+MainLoop;

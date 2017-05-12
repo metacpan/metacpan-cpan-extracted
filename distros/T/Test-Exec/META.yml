@@ -1,0 +1,27 @@
+---
+abstract: 'Test that some code calls exec without terminating testing'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::Suite: '0.000060'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Exec
+requires:
+  Return::MultiLevel: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/Test-Exec/issues
+  homepage: https://metacpan.org/pod/Test::Exec
+  repository: git://github.com/plicease/Test-Exec.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

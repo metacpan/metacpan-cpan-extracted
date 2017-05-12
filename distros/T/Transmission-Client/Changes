@@ -1,0 +1,94 @@
+Revision history for Transmission-Client
+
+0.0805   Sun Jul 31 17:35:16 CEST 2016
+       - Update metadata: bugtracker and VCS repository, pointing to
+         github.
+       - Use JSON::MaybeXS instead of JSON::Any (Fixes rt.cpan.org#102465)
+
+0.0804   Sun Oct 19 18:30:59 CEST 2014
+       - Fix perl precedence warning in Types
+
+0.0803   Mon Sep 16 19:22:46 CEST 2013
+       - Fix POD issues (NAME section syntax)
+       - Add explicit copyright statements
+       - Add .gitignore to MANIFEST.SKIP
+       - Add AUTHORS file
+
+         Thanks to Marius Gavrilescu of the Debian Perl team for
+         reporting the above issues.
+
+0.0802   Wed Aug 21 17:49:02 CEST 2013
+       - Update types of Transmission::Torrent attributes
+
+         With the stricter type coercions introduced with 0.08, types
+         specified in the transmission rpc spec to be doubles were
+         truncated to integers. This is now fixed.
+
+0.0801   Sat Aug 17 10:53:07 CEST 2013
+       - Don't use the defined or operator (//). It's only available
+         since perl 5.10.0. Fixes test failures.
+
+0.08     Fri Aug 16 17:28:12 CEST 2013
+       - Improvements in type coercions for numeric types
+
+         Numeric types that got encoded in JSON as strings were
+         silently ignored by Transmission. Now we make sure that
+         they are converted to numeric types (SVp_IOK | SVp_NOK),
+         regardless of input.
+
+0.0701   Mon Jul 22 19:31:56 CEST 2013
+       - Fix build failure introduced in 0.07
+       - New maintainer: Olof Johansson <olof@cpan.org>
+
+0.07     Sat Jul 20 00:40:58 2013
+       - Fix test failures due to hash randomization (RT #81561)
+         Merge pull request #3 from afresh1/master
+       - Make fields parameter to read_torrents overrideable
+         Merge pull request #5 from olof/topic/override_fields
+
+0.0603   Mon May  7 19:29:53 2012
+       - Use correct var when adding torrent
+         Reference: https://rt.cpan.org/Ticket/Display.html?id=76859
+
+0.0602   Fri Apr 29 22:18:36 CEST 2011
+       - Fix RT#67691: rpc() can now handle ids as hashes
+
+0.0601   Wed Apr 20 12:17:43 CEST 2011
+       - Fix fail to load json, with json-any
+         http://www.cpantesters.org/cpan/report/f1e67256-36b4-11e0-afb0-adca6bb533f3
+
+0.06     Sun Feb  6 18:33:13 CET 2011
+       - Fix RT62805: location to the rpc-spec is updated:
+         https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt
+       - Fix RT62805: methods given to rpc() can contain both
+         underscores and hyphens.
+       - Adding "autodie" to new() will make the module throw
+         exceptions, instead of silently setting "error".
+
+0.05     Sat May 29 22:27:02 CEST 2010
+       - Fix RT57970: username() and password() does not work
+
+0.04     Mon Apr 26 22:35:37 CEST 2010
+       - Fix boolean type was true even when "false"
+       - Fix setting of boolean data in Session attributes
+       - Add Session and Stats attributes can will build
+         its own value. The attributes can also be cleared
+         and rebuilt.
+
+0.03     Mon Apr 26 21:54:28 CEST 2010
+       - Change read_all() returns fetched data in a hash
+       - Add example script
+
+0.02     Sat Dec 19 21:43:19 2009 +0100
+       - Fix file->id bug: id is set
+       - Fix file->key bug: File has no "key"
+       - Add torrent->write_wanted()
+       - Add torrnte->write_priority()
+
+0.01     Mon Okt  5 20:43:19 2009 +0200
+       - can connect to deamon
+       - can retrieve session data/stats
+       - can retrieve torrent data/stats
+       - can retrieve torrent files
+       - can add torrent
+       - can execute actions on a torrent: start/stop/remove/verify

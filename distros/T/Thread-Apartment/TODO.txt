@@ -1,0 +1,19 @@
+TO DO 2/20/06:
+
+Proxied Operator overloading
+
+Proxied lvalue methods
+
+Multiprocess/distributed implementation
+
+Implement AptSimplex and AptUrgent method attributes
+
+Support CLONE_SKIP()
+
+Implement as C/XS or Inline::C
+
+Implement T::A wrappers for commonly useful modules
+
+	E.g., HTTP::Daemon, HTTP::Daemon::SSL, Class::DBI, etc.
+
+Support for Thread::Queue::Multiplex

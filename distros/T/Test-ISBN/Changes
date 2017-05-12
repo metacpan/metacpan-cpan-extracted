@@ -1,0 +1,43 @@
+# Changes for Test-ISBN
+
+2.04 - Wed Oct  8 02:26:50 2014
+	* Get rid of the prereq tests
+
+2.02 - Fri Sep 19 12:02:06 2014
+	* Let test functions take an ISBN object
+	* Update docs and refs to repos (it's been GitHub for years)
+	* Modernize the distribution
+
+2.01 - Sat Oct 27 21:16:50 2007
+	* distro cleanups after moving from CVS to SVN
+	* This version works with Business::ISBN 2.0.
+	* isbn_group_ok is the new name for isbn_country_ok (although
+	isbn_country_ok)
+
+1.09 - Tue Jan  9 22:51:14 2007
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.08 - Thu Nov  9 06:53:22 2006
+	* Minor doc cleanup for formatting
+	* Adjusted Test::Manifest use in Makefile.PL. It's still
+	optional
+	* No need to upgrade if you already have this.
+
+1.07 - Wed May 17 21:51:45 2006
+	* updates for the distribution and quality. No need to upgrade.
+
+1.06 - Tue Mar  8 18:09:43 2005
+	* Added POD Coverage tests: no need to upgrade
+
+1.05 - Wed Sep  8 04:11:04 2004
+	* cleaned up the distro
+	* bumped to a major version number
+	* no code changes, so no need to upgrade unless you want the new
+	version number
+
+0.5_05 - Mon Sep  9 13:18:46 CDT 2002
+	* added Business::ISBN prereq
+	
+0.5_04 - Mon Sep  9 11:13:29 CDT 2002
+    * got rid of Test::Manifest

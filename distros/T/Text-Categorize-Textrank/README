@@ -1,0 +1,125 @@
+NAME
+    "Text::Categorize::Textrank" - Method to rank potential keywords of
+    text.
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use Text::Categorize::Textrank;
+      use Data::Dump qw(dump);
+      my $listOfTokens = [ [qw(This is the first sentence)], [qw(Here is the second sentence)] ];
+      my $hashOfTextrankValues = getTextrankOfListOfTokens(listOfTokens => $listOfTokens);
+      dump $hashOfTextrankValues;
+
+DESCRIPTION
+    "Text::Categorize::Textrank" provides a routine for ranking the words in
+    text as potential keywords. It implements a version of the textrank
+    algorithm from the report *TextRank: Bringing Order into Texts* by R.
+    Mihalcea and P. Tarau.
+
+ROUTINES
+  "getTextrankOfListOfTokens"
+    The routine "getTextrankOfListOfTokens" returns a hash reference
+    containing the textrank value for all the tokens in the lists provided;
+    the textrank values sum to one. The textrank of a token is its pagerank
+    in the graph obtained by joining neighboring tokens with an edge, called
+    the token graph.
+
+    Usually, "listOfTokens" should *not* be applied to all the words of the
+    text. The complete textrank algorithm first filters the words in the
+    text to only the nouns and adjectives. See
+    Text::Categorize::Textrank::En to compute the textrank of English text.
+
+    "listOfTokens"
+          listOfTokens => [[...], [...], ...[...]]
+
+        "listOfTokens" is an array reference containing the list of tokens
+        that are to be ranked using textrank. Each list is also an array
+        reference of tokens that should correspond to the list of tokens in
+        a sentence. For example, "[[qw(This is the first sentence)],
+        [qw(Here is the second sentence)]]".
+
+    "edgeCreationSpan"
+          edgeCreationSpan => 1
+
+        For each token in the "listOfTokens", "edgeCreationSpan" is the
+        number of successive tokens used to make an edge in the token graph.
+        For example, if "edgeCreationSpan" is two, then given the token
+        sequence "apple orange pear" the edges "[apple, orange]" and
+        "[apple, pear]" will be added to the token graph for the token
+        "apple". The default is one.
+
+        Note that loop edges are ignored. For example, if "edgeCreationSpan"
+        is two, then given the token sequence "daba daba doo" the edge
+        "[daba, daba]" is disguarded but the edge "[daba, doo]" is added to
+        the token graph.
+
+    "directedGraph"
+          directedGraph => 0
+
+        If "directedGraph" is true, the textranks are computed from the
+        directed token graph, if false, they are computed from the
+        undirected version of the graph. The default is false.
+
+    "dampeningFactor"
+          dampeningFactor => 0.85
+
+        When computing the textranks of the token graph, the dampening
+        factor specified by "dampeningFactor" will be used; it should range
+        from zero to one. The default is 0.85.
+
+    "addEdgesSpanningLists"
+          addEdgesSpanningLists => 1
+
+        If "addEdgesSpanningLists" is true, then when building the token
+        graph, links between the tokens at the end of a list and the
+        beginning of the next list will be made. For example, for the lists
+        "[[qw(This is the first list)], [qw(Here is the second list)]]" the
+        edge "[list, Here]" will be added to the token graph. The default is
+        true.
+
+    "tokenWeights"
+          tokenWeights => {}
+
+        "tokenWeights" is an optional hash reference that can provide a
+        weight for a subset of the tokens provided by "listOfTokens". If
+        "tokenWeights" is not defined for any token in "listOfTokens", then
+        each token has a weight of one. If "tokenWeights" is defined for at
+        least one node in the graph, then the default weight of any
+        undefined token is zero.
+
+INSTALLATION
+    To install the module run the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    If you are on a windows box you should use 'nmake' rather than 'make'.
+
+BUGS
+    Please email bugs reports or feature requests to
+    "bug-text-categorize-textrank@rt.cpan.org", or through the web interface
+    at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Categorize-Textrank
+    >. The author will be notified and you can be automatically notified of
+    progress on the bug fix or feature request.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    categorize, keywords, keyphrases, nlp, pagerank, textrank
+
+SEE ALSO
+    Graph, Graph::Centrality::Pagerank, Log::Log4perl,
+    Text::Categorize::Textrank::En

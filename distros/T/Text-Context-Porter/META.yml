@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Text-Context-Porter
+version:      1.1
+version_from: Porter.pm
+installdirs:  site
+requires:
+    HTML::Entities:                0
+    Lingua::Stem::En:              0
+    Text::Context:                 3.3
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

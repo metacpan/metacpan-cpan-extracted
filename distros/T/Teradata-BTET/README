@@ -1,0 +1,54 @@
+Teradata/BTET version 0.02
+==========================
+
+Teradata::BTET is a Perl interface to Teradata SQL. It does not attempt
+to be a complete interface to Teradata -- for instance, it does not
+allow multiple sessions, asynchronous requests, or PM/API
+connections -- but it should be sufficient for many applications.
+The syntax is similar to that of DBI, but this is not a DBI module.
+
+A SIMPLE EXAMPLE
+
+   $dbh = Teradata::BTET::connect("dbc/bogart,bacall");
+   $sth = $dbh->prepare("select * from edw.sales");
+   $sth->open;
+   while ( @row = $sth->fetchrow_list ) {
+      ... process the row ...
+   }
+   $sth->close;
+   $dbh->disconnect;
+
+INSTALLATION
+
+Before installing this module, define an environment variable named
+TDLOGON. This should be a user ID on the Teradata server that is able
+to select from DBC views.
+
+   export TDLOGON=[server/]user,password
+
+Then, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+   Perl version 5.6.0 or later
+   a C compiler
+   Teradata Preprocessor2 (PP2) for C
+
+At present, the module has been tested only on Solaris, but it should
+work on MP-RAS or other platforms with relatively few changes. Those who
+are able to test it on MP-RAS, earlier versions of Perl, or other
+platforms are welcome to collaborate.
+
+COPYRIGHT AND LICENSE
+
+This module is placed in the public domain. It can be freely copied and
+redistributed under the same terms as Perl itself.
+
+Copyright © 2005 Geoffrey Rommel

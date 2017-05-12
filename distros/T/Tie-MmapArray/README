@@ -1,0 +1,64 @@
+		   Tie::MmapArray perl module
+
+		 Copyright (c) 1999, Ford & Mason Ltd
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+	a) the GNU General Public License as published by the Free
+	Software Foundation; either version 1, or (at your option) any
+	later version, or
+
+	b) the "Artistic License" which comes with this kit.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+    the GNU General Public License or the Artistic License for more details.
+
+    You should have received a copy of the Artistic License with this kit,
+    in the file named "Artistic".  If not, you can get one from the Perl
+    distribution. You should also have received a copy of the GNU General
+    Public License, in the file named "Copying". If not, you can get one
+    from the Perl distribution or else write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+DESCRIPTION
+
+The Tie::MmapArray module lets you use mmap to map in a file as a perl
+array rather than reading the file into dynamically allocated
+memory. It depends on your operating system supporting UNIX or
+POSIX.1b mmap, of course.  (Code to use the equivalent Win32 functions
+has been contributed but is not yet tested.)
+
+
+INSTALLATION
+
+Prerequisites are perl 5.003 and an operating system that has an
+implementation of mmap(2) with either the traditional or the
+POSIX.1b API.
+
+Type
+    perl Makefile.PL
+to write a personalised Makefile for your system.
+If your platform supports dynamic loading then just type
+    make
+    make test
+and provided you see "All tests successful" you can install it with
+    make install
+
+If you need/want instead to make a statically linked perl which
+contains the module, then type
+    make perl
+    make test
+
+Documentation is included in pod format in MmapArray.pm itself. The
+"make install" step will install an Tie::MmapArray(3) man page or else
+you can use
+    perldoc Tie::MmapArray
+which will find the documentation whether it has been installed or
+if you run it from the Tie::MmapArray distribution directory.
+
+
+Andrew Ford
+27 Dec 1999

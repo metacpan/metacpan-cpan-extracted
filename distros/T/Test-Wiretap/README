@@ -1,0 +1,81 @@
+NAME
+        Test-Wiretap - Listen in on a function
+
+SYNOPSIS
+
+        use Test::More tests => 3;
+        use Test::Wiretap;
+
+        {
+          package InsultOMatic;
+          sub insult {
+            my ($class, $what) = @_;
+            print "$what smells funny.\n";
+            return 'stinky';
+          }
+        }
+
+        my $tap = Test::Wiretap->new({
+          name => 'InsultOMatic::insult',
+          before => sub {
+            print "Preparing for insult...\n";
+          },
+          after => sub {
+            print "Insult complete!\n";
+          },
+        });
+
+        InsultOMatic->insult('Limburger cheese');
+        # prints:
+        #  Preparing for insult...
+        #  Limburger cheese smells funny.
+        #  Insult complete!
+
+        is( $tap->called, 1, "Insulted one thing" );
+        is_deeply( $tap->method_args, [['Limburger cheese']], "Insulted cheese" );
+        is_deeply( $tap->return_values, [['stinky']], "InsultOMatic agrees" );
+
+DESCRIPTION
+        This module allows you to monitor the arguments and return values of a
+        function/method. In addition to automatically capturing the arguments
+        and return values, you can run arbitrary code before the function gets
+        called, after it gets called, or both.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Wiretap
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Wiretap
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Wiretap
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Wiretap
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Wiretap
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Aruba Networks, Inc.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

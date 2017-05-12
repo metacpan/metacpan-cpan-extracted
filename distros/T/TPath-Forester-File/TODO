@@ -1,0 +1,16 @@
+Key
+ . = still to do
+ - = discarded
+ * = completed
+
+* make TPath::Forester::File::Node to represent files
+* make file find utility
+. get encoding detection to work
+. put 'extends' in BEGIN block
+. make the access checking stuff conditional that breaks this for Perls > 5.10
+
+Attic
+-----
+
+Completed TODO items kept around as curios.
+

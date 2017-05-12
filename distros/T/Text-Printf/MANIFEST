@@ -1,0 +1,21 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+SIGNATURE
+lib/Text/Printf.pm
+t/0-signature.t
+t/default.t
+t/doc.t
+t/fill.t
+t/format.t
+t/misc.t
+t/new.t
+t/prefill.t
+t/printf.t
+t/text.t
+SIGNATURE    Added here by Module::Build
+SIGNATURE    Added here by Module::Build

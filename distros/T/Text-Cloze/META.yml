@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Text-Cloze
+version:             v0.0.1
+abstract:            Perform Cloze procedure on some text
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    List::Util:                    0
+    Test::More:                    0
+    Test::use::ok:                 0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - David Romano <unobe@cpan.org>

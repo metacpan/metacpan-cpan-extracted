@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+#
+# Copyright (c) 2004 Javier Gutierrez <jgutierrez@tap3edit.com>.
+# All rights reserved. This program is free software; you can redistribute
+# it and/or modify it under the same terms as Perl itself.
+# http://www.tap3edit.com
+#  
+#  Shows file version and release
+#  
+
+use TAP3::Tap3edit;
+
+$filename=shift;
+
+if ( ! $filename ) {
+	die "Usage: $0 filename\n";
+}
+
+
+$tap3 = TAP3::Tap3edit->new();
+$tap3->get_info($filename) || die $tap3->error;
+
+print "$filename->RAP Version: ".$tap3->version."\n";
+print "$filename->RAP Release: ".$tap3->release."\n";
+
+print "$filename->TAP Version: ".$tap3->supl_version."\n" if $tap3->supl_version;
+print "$filename->TAP Release: ".$tap3->supl_release."\n" if $tap3->supl_release;
+
+

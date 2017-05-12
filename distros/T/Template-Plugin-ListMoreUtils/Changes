@@ -1,0 +1,14 @@
+Revision history for Perl module Template::Plugin::ListMoreUtils
+
+0.03	2015-06-28
+    - move to ExtUtils::MakeMaker and add author tests
+    - rewrite Changes according to CPAN::Changes::Spec
+    - improve standard doc parts in pod
+    - add newly introduced functions in LMU 0.408+
+
+0.02	2009-08-27
+    - Remove unused Params::Util from ListMoreUtils.pm
+    - added author information to Build.PL
+
+0.01	2009-08-26
+    - original version; created using ExtUtils::ModuleMaker 0.51

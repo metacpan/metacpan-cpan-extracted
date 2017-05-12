@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-stdout_stderr_test" errors="0" failures="0" tests="4" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/stdout_stderr.test"/>
+  <testcase name="test 1"/>
+  <testcase name="test 2"/>
+  <testcase name="test 3"/>
+  <testcase name="test 4"/>
+</testsuite>

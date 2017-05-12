@@ -1,0 +1,21 @@
+Text::JaroWinkler
+===========
+
+This module implements the Jaro-Winkler distance in XS.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Please report any bugs/suggestions to Shu-Chun Weng <scw@cpan.org>
+
+Copyright (c) 2009 Shu-Chun Weng. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.

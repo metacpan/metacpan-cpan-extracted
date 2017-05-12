@@ -1,0 +1,54 @@
+Changelog for Test-HTTP-AnyEvent-Server
+
+0.013 2014-07-22T08:33:43
+ - Version bump (Stanislaw Pusep)
+ - ooops (Stanislaw Pusep)
+
+0.012 2014-07-21T08:35:25
+ - Failing test fixes (Stanislaw Pusep)
+
+0.011 2014-07-10T12:41:54
+ - Delay test improved (Stanislaw Pusep)
+ - Added "Contributors" section to POD (Stanislaw Pusep)
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Сергей Романов)
+ - Added Net::SSLeay as a recommended dependency (Stanislaw Pusep)
+
+0.010 2014-06-06T10:02:57
+ - More verbose t/06-custom.t (Stanislaw Pusep)
+ - HTTPS stuff depends on Net::SSLeay; made it optional (Stanislaw Pusep)
+ - In tests, force AnyEvent::HTTP to ignore proxy setting (Stanislaw Pusep)
+ - AnyEvent >= 7.0 is required (Stanislaw Pusep)
+
+0.009 2014-06-04T17:13:53
+ - Not every "ab" build seems to report "Write errors" (Stanislaw Pusep)
+
+0.008 2014-06-04T16:32:28
+ - Cleanup (Stanislaw Pusep)
+ - Implemented custom request handler (Stanislaw Pusep)
+ - Propagate $self down to _reply() (Stanislaw Pusep)
+ - Implemented proxy support (Stanislaw Pusep)
+ - Implemented HTTPS support (Stanislaw Pusep)
+
+0.007 2013-04-22T17:34:28
+ - Perl v5.17.10 compatibility (Stanislaw Pusep)
+ - fixed HTTP protocol version typo in t/01-basic.t (Stanislaw Pusep)
+
+0.006 2013-01-15T18:30:49
+ - s/Any::Moose/Moo/g (Stanislaw Pusep)
+ - Dist::Zilla profile update (Stanislaw Pusep)
+
+0.005 2012-10-17T15:23:29
+ - better /delay/# test (Stanislaw Pusep)
+
+0.004 2012-10-15T23:05:05
+ - fixed on FreeBSD (Stanislaw Pusep)
+
+0.003 2012-10-15T19:47:55
+ - minor fixes (Stanislaw Pusep)
+ - provided usage examples using curl (Stanislaw Pusep)
+ - documented (Stanislaw Pusep)
+ - test suite (Stanislaw Pusep)
+ - completed split from AnyEvent::Net::Curl::Queued (Stanislaw Pusep)
+ - INIT (Stanislaw Pusep)
+

@@ -1,0 +1,6 @@
+SUBDIRS = \
+	src
+
+EXTRA_DIST = \
+	FORMAT_DESCR
+

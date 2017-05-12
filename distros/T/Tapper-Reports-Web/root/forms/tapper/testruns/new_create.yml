@@ -1,0 +1,64 @@
+---
+# indicator is the field that is used to test for form submission
+indicator: submit
+# Start listing the form elements
+elements:
+    - type: Radiogroup
+      name: use_case
+      attributes:
+        class: radiogroup vertical
+      constraints:
+      - Required
+
+    - type: Block
+      tag: br
+
+    - type: Hr
+
+    - type: Block
+      tag: br
+
+    - type: Text
+      name: shortname
+      label: Short name
+      # This is an optional 'mouse over' title pop-up
+      value: Test-in-WebGUI
+      attributes:
+        title: Enter a descriptive name here
+      constraints:
+        - type: Printable
+          message: "Should be readable text"
+
+    - type: Select
+      name: topic
+      label: Topic
+      value: Misc
+      constraints:
+      - type: Required
+        message: Please select a topic
+
+    - type: Select
+      name: owner
+      label: Owner
+
+    - type: Select
+      name: requested_hosts
+      label: Test on these machines
+      attributes:
+        size: 5
+        multiple: 1
+        title: Select one or multiple hosts on which your test will be executed
+
+    # When we add requested features this could be done with a combo box.
+    # This box allows the use to choose a requested feature by clicking or writing
+    # one that is not yet in the database.
+    # - type: ComboBox
+    #   name: answer
+    #   label: 'Select a requested feature or write one down:'
+    #   values:
+    #     - yes
+    #     - no
+
+    - type: Submit
+      name: submit
+      value: Continue

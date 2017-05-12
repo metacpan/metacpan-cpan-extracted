@@ -1,0 +1,100 @@
+README for tv
+
+New! Improved! As Seen On TV!!
+
+ahem.
+
+tv is a command bundled with Test::Verbose that puts an easier, smarter
+interface around the ExtUtils testing system.
+
+Aside from easing debugging access (see below), the main use of tv is to
+run test scripts in verbose mode, either by naming them or by naming a
+source file, like Foo.pm, and letting tv find the appropriate test
+scripts to run.  This means you can run something like
+
+ :!tv %
+ 
+from your vi flavored editor to test the file your currently editing,
+whether it's a test script or a Perl module. (note: gvim, at least,
+replaces the % with the path to the current buffer's filename).
+
+It's been many years since I used emacs much, but
+
+  M-x eval-expression RET
+  (defun tv-buffer() (interactive "*") (shell-command (concat "tv " buffer-file-name)))RET
+  M-x global-set-key
+  C-x t tv-buffer RET
+
+seems to map the Cx-t command to run the tv command appropriately.
+Thanks to Walt Mankowski for helping me figure that out.  John Fetkovich
+contributes this snippet for .emacs files:
+
+    (defun save-and-tv-buffer ()
+      "Save buffer, then run the tv command on the saved file."
+      (interactive)
+      (save-buffer)
+      (shell-command (concat "tv " buffer-file-name))
+      )
+
+    (defun my-cperl-mode-hook ()
+      (local-set-key "\C-ct" 'save-and-tv-buffer)
+      )
+
+    (add-hook 'cperl-mode-hook 'my-cperl-mode-hook)
+
+Similarly, you might want to macro-ize the vim solution and keymap it,
+and you might want to have either of those solutions save the buffer
+first.  If you configure other editors to do this sort of thing, please
+email a description like the above to barries@slaysys.com . 
+
+When passed the name of a perl source module, tv will run it through
+podchecker and    perl -Ilib -cw $module_name   before running the "make
+test" for it.  The former is to prevent POD errors, the latter gives you
+immediate feedback because "make test" can take a while to build blib on
+larger distributions.  Yes, the -Ilib assumes that you keep all modules
+under lib as I do (there are several reasons to do that, tv's just
+adding one more :).  tv can be patched in the future  to make that more
+flexible.
+
+Anyway, tv allows you to run test scripts explicitly:
+
+ $ tv t/foo.t         # make test TEST_VERBOSE=1 TEST_FILES=t/foo.t
+ $ tv t/foo.t t/bar.t # make test TEST_VERBOSE=1 "TEST_FILES=t/foo.t t/bar.t"
+ $ tv t/*             # Run all test scripts in t
+
+or based on a module:
+
+ $ tv lib/Foo.pm  # Run all t/*.t test scripts for Foo.pm
+ $ tv lib         # Test all modules in lib
+
+When passed a name like *.pm or *.pl, tv looks at the "use" and
+"require" lines in the test scripts to figure which to run.  If this
+scanning is insufficient, it also supports a POD directive in the source
+file (Foo.pm, say):
+
+ =for test_scripts t/foo.t
+
+and in the test scripts
+
+ =for file lib/Foo.pm     # in honk.t lets  tv Foo.pm  find honk.t
+
+ =for package Foo::Baz    # in woof.t lets  tv Blah.pm  find woof.t
+                          # if Blah.pm declares package Foo::Baz
+
+So far there's no way to defeat the scan, either by disabling it or
+partially cancelling it out, but that can be added if necessary.
+
+To run things in the debugger:
+ 
+ $ tv -d t/foo.t      # turn on the debugger in NonStop mode
+ $ tv -dd t/foo.t     # turn on the debugger and stop (like perl -d)
+
+(the -d is meant to be used in conjuction with $DB::single=1 or your
+friendly neighborhood interrupt key, since you usually want to stop in
+the code under test, not in the test suite).
+
+If it can't find any tests, 
+
+ $ tv --ext-utils     # Don't use make, use ExtUtils::Command::MM directly
+
+We now return you to your regularly scheduled broadcast.

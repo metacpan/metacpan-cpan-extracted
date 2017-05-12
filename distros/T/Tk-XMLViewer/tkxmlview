@@ -1,0 +1,355 @@
+#!/usr/bin/perl -w
+# -*- perl -*-
+
+#
+# $Id: tkxmlview,v 1.14 2006/09/01 20:14:34 eserte Exp $
+# Author: Slaven Rezic
+#
+# Copyright (C) 2000, 2003, 2004, 2006 Slaven Rezic. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: srezic@cpan.org
+# WWW:  http://www.sourceforge.net/projects/srezic
+#
+
+use Tk;
+use Tk::XMLViewer;
+use Getopt::Long;
+use strict;
+
+my $indent;
+my $mainbg;
+my $ua;
+my $do_loaddtd;
+my $show_xpath;
+
+my $top = new MainWindow;
+
+GetOptions("indent=i" => \$indent,
+	   "mainbg=s" => \$mainbg,
+	   "loaddtd!" => \$do_loaddtd,
+	   "showxpath!" => \$show_xpath,
+	  ) or die <<EOF;
+usage: $0 [-indent level] [-mainbg color] [-[no]loaddtd]
+	  [-showxpath] [X11 options] xmlfile
+EOF
+
+my $string;
+my @url_history;
+my @overall_history;
+my $file = shift;
+my $xmlviewer = $top->Scrolled("XMLViewer", -scrollbars => "osw"
+			      )->pack(-expand => 1, -fill => "both");
+if ($show_xpath) {
+    require Tk::Balloon;
+    my $bln = $top->Balloon(-balloonposition => 'mouse');
+    $bln->attach($xmlviewer->Subwidget("scrolled"));
+}
+$xmlviewer->configure(-background => $mainbg) if defined $mainbg;
+$xmlviewer->SetIndent($indent) if defined $indent;
+$xmlviewer->XMLMenu;
+my $filemenu;
+if ($xmlviewer->can("menu")) {
+    my $textmenu = $xmlviewer->menu;
+    if ($textmenu) {
+	$filemenu = $textmenu->entrycget(0, -menu);
+	# Reverse order, and assume there's no tear-off
+	$filemenu->insert(0, "separator");
+	$filemenu->insert(0, "command",
+			  -label => 'Re-Open',
+			  -command => sub {
+			      if ($xmlviewer->SourceType eq 'file'){
+				  open_file_or_url();
+			      }
+			  });
+	if (eval { require LWP::UserAgent }) {
+	    $filemenu->insert(0, "command",
+			      -label => "Open URL",
+			      -command => sub { guiopenurl() });
+	}
+	$filemenu->insert(0, "command",
+			  -label => 'Open',
+			  -command => sub { openxml(); viewxml() });
+
+	# for the history list:
+	$filemenu->separator;
+
+	my $editmenu = $textmenu->entrycget(1, -menu);
+	$editmenu->separator;
+	$editmenu->command
+	    (-label => 'Edit file...',
+	     -command => sub {
+		 require Tk::TextEdit;
+		 package Tk::TextEdit;
+		 sub Save {
+		     my $self = shift;
+		     my $r = $self->SUPER::Save(@_);
+		     main::viewxml();
+		     $r;
+		 }
+
+		 package main;
+		 my $top_editor = $top->Toplevel;
+		 $top_editor->title("Edit $file");
+		 my $editor = $top_editor->Scrolled
+		     ('TextEdit',
+		      -scrollbars => "osoe",
+		      -wrap => "none",
+		     )->pack(qw(-fill both -expand 1));
+		 # XXX workaround bug in 3.004
+		 $editor->SetGUICallbacks([]);
+		 $editor->FileName($file);
+		 $editor->Load;
+	     });
+
+	my $helpmenu = $textmenu->cascade(-tearoff => 0,
+					  -label => 'Help');
+	$helpmenu->command(-label => 'About',
+			   -command => sub {
+			       $top->messageBox
+				   (-title   => 'About tkxmlview',
+				    -message => "An XML viewer for Perl/Tk\n" .
+				                "(c) 2000, 2003, 2004, 2006 by Slaven Rezic",
+				    -type    => 'OK');
+			   });
+	$helpmenu->command(-label => 'Tk::XMLViewer POD',
+			   -command => sub {
+			       require Tk::Pod;
+			       $top->Pod(-file => 'Tk/XMLViewer',
+					 -title => 'Tk::XMLViewer POD');
+			   });
+    }
+
+    $top->configure(-menu => $textmenu);
+}
+
+if (!defined $file) {
+    openxml(); viewxml();
+} else {
+    open_file_or_url();
+}
+
+MainLoop;
+
+sub open_file_or_url {
+    # guess if it's an URL
+    if ($file =~ /^(http|https|file|ftp):/) {
+	openandviewurl();
+    } else {
+	viewxml();
+    }
+}
+
+sub openxml {
+    my $dir;
+    if(defined $file && (index($file, "/") >= 0) ) {
+	$dir = substr($file, 0, rindex($file, "/"));
+    }
+    $file = $top->getOpenFile
+	(-filetypes => [['Generic XML Files', '*.xml'],
+			['XSLT Files', ['*.xslt','.xsl']],
+			['RSS Files', '*.rss'],
+			['RDF Files', '*.rdf'],
+			['WML Files', '*.wml'],
+			['All Files', '*']],
+	 (defined $dir ? (-initialdir => $dir) : ()),
+	);
+    if (defined $file) {
+	add_overall_history("file://$file");
+    }
+    $file;
+}
+
+sub guiopenurl {
+    # XXX Dialog?
+    my $t = $top->Toplevel(-title => "Open URL");
+    $t->transient($top);
+    my $e;
+    my $continue = 0;
+    my $url;
+    my $Entry = "Entry";
+    eval {
+        # try loading the module, otherwise $Entry is left to the value "Entry"
+        require Tk::HistEntry;
+        $Entry = "SimpleHistEntry";
+    };
+    Tk::grid(
+	     $t->Label(-text => "URL:"),
+	     $e = $t->$Entry(-textvariable => \$url),
+	     $t->Button(-text => "OK",
+			-command => sub { $continue = 1 }),
+	     $t->Button(-text => "Cancel",
+			-command => sub { $continue = -1 }),
+	    );
+    if ($e->can('history')) {
+	$e->history(\@url_history);
+    }
+    $e->bind("<Return>" => sub { $continue = 1 });
+    $e->bind("<Escape>" => sub { $continue = -1 });
+    $e->focus;
+    $t->waitVariable(\$continue);
+    $t->destroy if Tk::Exists($t);
+    if ($continue == 1) {
+	$file = $url;
+	return openandviewurl();
+    } else {
+	0;
+    }
+}
+
+sub viewxml {
+    if (defined $file) {
+	my $fname;
+	if(length $file > 40) {
+	    if(rindex($file, "/") >= 0 ) {
+		$fname = substr($file, rindex($file, "/")+1);
+	    } else {
+		$fname = $file;
+	    }
+	    if (length $fname > 40) {
+		$fname = substr($fname, -38);
+	    }
+	    $fname = "... " .$fname;
+	} else {
+	    $fname = $file;
+	}
+	$top->title("XMLView: ".$fname);
+	$xmlviewer->delete("1.0", "end");
+	$xmlviewer->insertXML(-file => $file,
+			      _add_insertxml_param(),
+			     );
+    }
+}
+
+sub openandviewurl {
+    my($url) = $file;
+
+    push @url_history, $url;
+    add_overall_history($url);
+
+    if (!$ua) {
+	$ua = LWP::UserAgent->new(env_proxy => 1);
+    }
+    my $resp = $ua->get($url);
+    if (!$resp->is_success) {
+	$top->messageBox(-title => "Error",
+			 -message => "GET was not successful: " . $resp->code,
+			 -icon => "error",
+			);
+	return 0;
+    }
+
+    $top->title("XMLView: ".$url);
+    $xmlviewer->delete("1.0", "end");
+    $xmlviewer->insertXML(-text => $resp->content,
+			  _add_insertxml_param(),
+			 );
+
+    1;
+}
+
+sub _add_insertxml_param {
+    (-xmlparserargs => { ParseParamEnt => $do_loaddtd });
+}
+
+sub add_overall_history {
+    my($url) = @_;
+    unshift @overall_history, $url;
+    my @new_overall_history;
+    my %seen;
+    for my $history_element (@overall_history) {
+	next if $seen{$history_element};
+	$seen{$history_element} = 1;
+	push @new_overall_history, $history_element;
+	last if @new_overall_history >= 10;
+    }
+    @overall_history = @new_overall_history;
+
+    create_menu_last_projects();
+}
+
+# taken from tktimex
+sub create_menu_last_projects {
+    return if !$filemenu;
+    # find last separator
+    my $end = $filemenu->index('end');
+    my $i = $end;
+ LOOP: {
+	while ($i >= 0) {
+	    last LOOP if ($filemenu->type($i) eq 'separator');
+	    $i--;
+	}
+	warn "SHOULD NOT HAPPEN: Separator in Menu File not found";
+	return;
+    }
+    # delete anything from the item after the separator to the end
+    if ($i < $end) {
+	$filemenu->delete($i+1, 'end');
+    }
+    # insert last_projects
+    $i = -1;
+    foreach my $url (@overall_history) {
+	$i++;
+	if ($url =~ m{^file://(.*)}) {
+	    my $path = $1;
+	    $filemenu->command(-label => $path,
+			       -command => sub {
+				   $file = $path;
+				   viewxml();
+				   add_overall_history($url);
+			       });
+	} else {
+	    $filemenu->command(-label => $url,
+			       -command => sub {
+				   openandviewurl($url);
+				   add_overall_history($url);
+			       });
+	}
+    }
+}
+
+__END__
+
+=head1 NAME
+
+tkxmlview - a simple Tk based XML viewer
+
+=head1 SYNOPSIS
+
+    tkxmlview [-indent amount] [-mainbg color] [-loaddtd] file_or_url
+
+=head1 DESCRIPTION
+
+B<tkxmlview> displays the XML from the specified file or URL as a tree.
+
+=head2 OPTIONS
+
+=over
+
+=item B<-indent> I<amount>
+
+Set the indentation width in pixels. The default is taken from
+L<Tk::XMLViewer>.
+
+=item B<-mainbg> I<color>
+
+Set the background color of the main window. The I<color> is any valid
+Tk color name.
+
+=item B<-loaddtd>
+
+Causes tkxmlview to load any external DTD specified in the XML file.
+
+=back
+
+=head1 AUTHOR
+
+Slaven Rezic
+
+=head1 SEE ALSO
+
+L<Tk::XMLViewer>.
+
+=cut
+

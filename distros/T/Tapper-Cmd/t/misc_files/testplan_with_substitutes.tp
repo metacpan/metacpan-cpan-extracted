@@ -1,0 +1,40 @@
+[%- PROCESS 'vendors' -%]
+---
+type: multitest
+description:
+  requested_hosts_all:
+[%- FOREACH host = hosts_all %]
+  - [% host %]
+[%- END %]
+  requested_hosts_any:
+[%- FOREACH host = hosts_any %]
+  - [% host %]
+[%- END %]
+  requested_features_all:
+  - mem > 8GB
+  - mem < 64GB
+  requested_features_any:
+  - vendor eq [% VENDOR %]
+  preconditions:
+  - arch: linux64
+    image: suse/suse_sles10_64b_smp_raw.tar.gz
+    mount: /
+    partition: sda2
+    precondition_type: image
+  - precondition_type: copyfile
+    name: /data/bancroft/tapper/live/repository/testprograms/uname_tap/uname_tap.sh
+    dest: /bin/
+    protocol: local
+  - precondition_type: copyfile
+    name: /data/bancroft/tapper/live/repository/packages/tapperutils/kernel/gen_initrd.sh
+    dest: /bin/
+    protocol: local
+  - precondition_type: package
+    filename: kernel/x86_64/linux-2.6.31_rc6.2009-08-14.x86_64.tgz
+  - precondition_type: exec
+    filename: /bin/gen_initrd.sh
+    options:
+      - 2.6.31-rc6
+  - precondition_type: testprogram
+    program: /opt/tapper/bin/tapper-netperf-server
+    timeout: 1000

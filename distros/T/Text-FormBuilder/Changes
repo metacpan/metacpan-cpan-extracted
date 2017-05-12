@@ -1,0 +1,76 @@
+Release history for Text::FormBuilder.
+
+0.14 - 14 Mar 2011
+    * switched from EU::MakeMaker to Module::Build
+    * precompile the Text::FormBuilder::Parser at module build time,
+      so it uses the user's version of Parse::RecDescent
+
+0.13 - 24 Apr 2008
+    * documentation patch from Ron Pero
+    * added shebang line to the fb.pl script
+    * added documentation about field hints
+
+0.12 - 30 Jun 2005
+    * BUGFIX: stopped crosstalk of data from one object to another
+    * added !fb directive to set FB constructor parameters directly;
+      uses YAML to hold strucutred data
+    
+0.11 - 12 May 2005
+    * added support for the 'multiple' attribute on fields
+    * added as_script and as_module methods that just return the
+      Perl code
+    * added a !reset directive to name and include a reset button
+    * added a !submit directive to rename the submit button or to
+      have multiple submit buttons
+    
+0.10 - 25 Mar 2005
+    * added support for fields with 'other' (requires FB 3.02)
+    * added support for limited growth 'growable' fields (requires FB 3.02)
+    * allow end of field line comments in the formspec
+    * addded an external_css option to include external stylesheets
+    * using <fieldset> tags instead of <h2> to mark form sections
+    * group fields can have comments
+    * deprecated the !field directive
+    
+0.09 - 10 Mar 2005
+    * single-line textfields can be given a maxlength
+    * BUGFIX: !note and !description blocks can now
+      contain "unbalanced" quotes (fixed the gramamr)
+    * removed dynamic lists from the grammar
+    
+0.08 - 10 Jan 2005
+    * failure to load Perl::Tidy is no longer fatal
+    * create_form tries to emit tidy code
+    * separated basic parser using code out into a separate
+      Class::ParseText::Base base class
+    
+0.07 - 16 Dec 2004
+    * added a create_form exported method to "do the right
+      thing" in simple cases
+    * added parse_array method to parse an array of lines making
+      up a formspec
+    * inline field groups via the !group and !field directives
+    * added write_script method to write a skeleton CGI
+      script around the FormBuilder object
+    * added external documentation of usage examples
+    * added a !note directive for inserting arbitrary text
+      between lines in the form
+    
+0.06 - 19 Nov 2004
+    * marked Parse::RecDescent as an explicit dependency
+    * added a single-quoted string to the grammar that
+      can be used in the labels and default values to include
+      characters not in [\w\t ]
+    * generated code leaves out overwrriten options
+    * allow option lists to have simple multiword and quoted
+      string values
+    * allow for validated but not required fields
+    * added a !section directive that splits up a form into
+      sub-tables with their own ids and captions
+    * fall through to CGI::FormBuilder builtin option lists
+      if @LIST does not match a list directive
+    * customizable messages similar to CGI::FormBuilder
+    * customizable charset for the generated HTML page
+    
+0.05 -  9 Nov 2004
+    * First CPAN release

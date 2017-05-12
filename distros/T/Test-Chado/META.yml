@@ -1,0 +1,46 @@
+---
+abstract: 'Unit testing for chado database modules and applications'
+author:
+  - 'Siddhartha Basu <biosidd@gmail.com>'
+build_requires:
+  Class::Unload: 0.07
+  Module::Build: 0.3601
+  Test::Exception: 0.31
+  Test::More: 0.94
+  Test::Tester: 0.108
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Chado
+requires:
+  Bio::Chado::Schema: 0.20000
+  DBD::SQLite: 1.37
+  DBIx::Class::Fixtures: 1.001018
+  Data::Random: 0.08
+  File::Path: 2.08
+  File::ShareDir: 1.02
+  Graph: 0.94
+  HTTP::Tiny: 0.029
+  IPC::Cmd: 0.58
+  Module::Path: 0.09
+  Module::Runtime: 0.013
+  Moo: 1.001
+  MooX::ClassAttribute: 0.006
+  MooX::HandlesVia: 0.001000
+  MooX::InsideOut: 0.001002
+  MooX::late: 0.009
+  Path::Class: 0.18
+  Test::DatabaseRow: 2.03
+  Try::Tiny: 0.03
+  XML::Twig: 3.35
+  XML::XPath: 1.13
+  YAML: 0.70
+  namespace::autoclean: 0.11
+  perl: 5.010
+resources: {}
+version: v4.1.1

@@ -1,0 +1,11 @@
+^tkcontrib.prj
+^.tkcontrib
+^blib
+^pm_to_blib
+^Tk-Contrib
+^patch
+Makefile$
+\.old$
+\.bak$
+^obsolete
+^tmpdist

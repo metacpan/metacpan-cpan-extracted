@@ -1,0 +1,4 @@
+name = "Text-Sprintf-Zenkaku"
+badges = ["travis", "codecov"]
+module_maker="ModuleBuildTiny"
+

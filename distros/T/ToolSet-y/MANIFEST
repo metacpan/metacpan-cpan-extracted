@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/ToolSet/y.pm
+t/00-load.t
+t/01-without.t
+t/02-dumper.t
+t/03-filereadbackwards.t
+t/04-filereadbackwards_alias.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

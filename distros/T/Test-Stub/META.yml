@@ -1,0 +1,33 @@
+---
+abstract: 'Stub! Stub! Stub!'
+author:
+  - 'Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Stub
+no_index:
+  directory:
+    - inc
+provides:
+  Test::Stub:
+    file: lib/Test/Stub.pm
+    version: 0.04
+  Test::Stub::Driver:
+    file: lib/Test/Stub.pm
+    version: 0
+requires:
+  Exporter: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

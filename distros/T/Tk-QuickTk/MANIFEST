@@ -1,0 +1,20 @@
+MANIFEST
+README
+LICENSE
+META.yml
+Todo
+Changes
+Build.PL
+lib/Tk/QuickTk.pm
+lib/details.pod
+lib/scripts.pod
+lib/internals.pod
+lib/Tk/QuickTk/WebColor.pm
+bin/miniapp
+bin/qtk15puzzle
+bin/pickhues
+test.pl
+t/001_load.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build
+SIGNATURE    Added here by Module::Build

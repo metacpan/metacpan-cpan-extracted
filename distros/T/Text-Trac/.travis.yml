@@ -1,0 +1,18 @@
+branches:
+  except:
+    - gh-pages
+language: perl
+perl:
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+
+before_install:
+  - cpanm --notest Test::Version
+  - cpanm --notest Test::Pod::Coverage
+  - cpanm --notest Test::Pod
+  - cpanm --notest Test::Code::TidyAll
+  - cpanm --notest Test::Perl::Critic

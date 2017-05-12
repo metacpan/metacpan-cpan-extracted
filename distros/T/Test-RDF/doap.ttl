@@ -1,0 +1,306 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<file:///home/kjetil/dev/Test-RDF/meta/project.ttl>
+	dc:creator           <http://www.kjetil.kjernsmo.net/foaf#me>;
+	dc:subject           <http://purl.org/NET/cpan-uri/dist/Test-RDF/project>;
+	dc:title             "DOAP for Test-RDF"@en.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/project>
+	a                    doap:Project;
+	cpan-uri:x_IRC       <irc://irc.perl.org/#perlrdf>;
+	doap-deps:runtime-requirement [ doap-deps:on "Scalar::Util 1.24"^^doap-deps:CpanId ], [ doap-deps:on "Test::More"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Builder::Module"^^doap-deps:CpanId;
+	], [ doap-deps:on "RDF::Trine 0.134"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Tester"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/Test-RDF/issues>;
+	doap:created         "2010-09-03"^^xsd:date;
+	doap:homepage        <https://metacpan.org/module/Test::RDF>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://www.kjetil.kjernsmo.net/foaf#me>;
+	doap:name            "Test-RDF";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_03>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_10>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_11>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_20>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_22>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_24>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_26>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-16>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-18>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-19>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-20>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_0>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_1>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_11>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_14>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/Test-RDF/>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FTest-RDF%2F&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "Test RDF data for validity and equality."@en;
+	owl:sameAs           <http://packages.qa.debian.org/libtest-rdf-perl#upstream>.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_03>
+	a                    doap:Version;
+	rdfs:label           "Michael Hendricks old release based on RDF::Redland."@en;
+	dc:creator           <http://purl.org/NET/cpan-uri/person/mndrix>;
+	dc:issued            "2006-13-04"^^xsd:date;
+	doap:revision        "0.0.3"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_10>
+	a                    doap:Version;
+	rdfs:label           "Complete rewrite."@en;
+	dc:issued            "2010-11-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "A complete rewrite from scratch using RDF::Trine."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Backwards incompatible with previous releases."@en;
+		];
+	];
+	doap:revision        "0.10"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_11>
+	a                    doap:Version;
+	rdfs:label           "Fix tainting problem."@en;
+	dc:issued            "2010-11-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Fix the tainting problem many cpantesters have."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Small cosmetic changes."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Got authorized!."@en;
+		];
+	];
+	doap:revision        "0.11"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_20>
+	a                    doap:Version;
+	rdfs:label           "Add functions for testing resources and literals."@en;
+	dc:issued            "2010-12-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "has_subject function to test if a URI is present as subject."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "has_predicate function to test if a URI is present as predicate."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "has_object_uri function to test if a URI is present as object."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "has_uri function to test if a URI is present at all in the graph."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "has_literal function to test if a literal is present."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Check Redland error messages in addition to Trine."@en;
+		];
+	];
+	doap:revision        "0.20"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_22>
+	a                    doap:Version;
+	rdfs:label           "Subgraph tests."@en;
+	dc:issued            "2011-04-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Use the RDF::Graph::Trine error function for diagnostics"@en;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Remove the now unneeded dependency on Text::Diff::Table."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add a are_subgraphs function for testing if one graph is a subgraph of another."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "More documentation."@en;
+		];
+	];
+	doap:revision        "0.22"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_24>
+	a                    doap:Version;
+	rdfs:label           "Pattern tests."@en;
+	dc:issued            "2011-10-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Test for empty RDF strings"@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Parser may need an empty sub sometimes."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "New pattern_ok and pattern_target functions."@en;
+			doap-changeset:blame <http://tobyinkster.co.uk/#i>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Minor cosmetics."@en;
+		];
+	];
+	doap:revision        "0.24"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_26>
+	a                    doap:Version;
+	rdfs:label           "New hasnt_uri test."@en;
+	dc:issued            "2012-06-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Reorgnize metadata to exploit new modules"@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use github issue tracker."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add hasnt uri test."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Improve pattern_ok diagnostics."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Minor cosmetics."@en;
+		];
+	];
+	doap:revision        "0.26"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-16>
+	a                    doap:Version;
+	rdfs:label           "Bugfix and hasnt_literal."@en;
+	dc:issued            "2013-06-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add new hasnt_literal test."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "The new Turtle parser reports errors on a different spot."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "With the new URI tests, my tests needs to check."@en;
+		];
+	];
+	doap:revision        "1.16"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-18>
+	a                    doap:Version;
+	rdfs:label           "Cosmetic changes and diagnostics."@en;
+	dc:issued            "2014-10-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Improve diagnostics if a model isn't given."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use Dist::Inkt packaging."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Improve package metadata."@en;
+		];
+	];
+	doap:revision        "1.18"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-19>
+	a                    doap:Version;
+	rdfs:label           "Cosmetic changes and diagnostics."@en;
+	dc:issued            "2014-10-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Old metadata wasn't overwritten, deleted to allow Dist::Inkt to work."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add links to Debian."@en;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Remove inc/"@en;
+		];
+	];
+	doap:revision        "1.19"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-20>
+	a                    doap:Version;
+	rdfs:label           "Fix packaging."@en;
+	dc:issued            "2014-10-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Skip README.pod for CPAN."@en;
+		];
+	];
+	doap:revision        "1.20"^^xsd:string;
+	owl:sameAs           <http://packages.qa.debian.org/libtest-rdf-perl#upstreamsrc_1.20>.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_0>
+	a                    doap:Version;
+	rdfs:label           "Stable release."@en;
+	dc:issued            "2012-06-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add a description to the POD."@en;
+		];
+	];
+	doap:revision        "1.00"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_11>
+	a                    doap:Version;
+	rdfs:label           "Update to RDF::Trine 1.001."@en;
+	dc:issued            "2012-10-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Update test to check the new errors of RDF::Trine::Parser::Turtle 1.001."@en;
+		];
+	];
+	doap:revision        "1.11"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_14>
+	a                    doap:Version;
+	rdfs:label           "Scalar::Util strange bug."@en;
+	dc:issued            "2012-11-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Dependency on Scalar::Util is anything but 1.23, set it to 1.24."@en;
+		];
+	];
+	doap:revision        "1.14"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_1>
+	a                    doap:Version;
+	rdfs:label           "Add pattern_fail."@en;
+	dc:issued            "2012-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use RDF-based packaging."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Function to test if pattern doesn't exist."@en;
+		];
+	];
+	doap:revision        "1.10"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/mndrix>
+	a                    foaf:Person;
+	foaf:name            "Michael Hendricks"@en.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:name            "Toby Inkster".
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FTest-RDF%2F&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
+

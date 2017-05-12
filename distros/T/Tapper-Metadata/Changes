@@ -1,0 +1,9 @@
+Revision history for Tapper-Metadata
+
+5.0.1     2016-02-16
+        - require higher DBD::SQLite version for CPAN testers
+
+5.0.0     2016-02-15
+        - This is a library to provide a schema for
+          storing key/value Tapper metadata
+          in an SQL database

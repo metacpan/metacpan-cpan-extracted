@@ -1,0 +1,21 @@
+Revision history for Perl extension Template::Parser::CET
+
+0.05  Nov 07 2007
+        - Remove "float as array index access" test which is now broken by recent versions of Template::Toolkit
+        - Up version dependency of Template::Alloy (to 1.008)
+
+0.04  Jun 12 2007
+        - Move to using Template::Alloy 1.002
+        - Add LOOP support.
+        - Add EVAL, EVALUATE support.
+        - Add Comment support.
+
+0.03  May 22 2007
+        - Keep changes in sync with CGI::Ex::Template 2.13
+
+0.02  May 10 2007
+        - Fixed erroneous test that was hard coded to look for Template::Stash.  Should
+          now work with default Template::Stash::XS also.  No changes to the module itself.
+
+0.01  May 08 2007
+        - Initial release

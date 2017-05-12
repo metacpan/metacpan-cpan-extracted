@@ -1,0 +1,53 @@
+Text-SenseClusters-LabelEvaluation-LabelEvaluation
+
+Version 0.06
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::SenseClusters::LabelEvaluation::LabelEvaluation
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-SenseClusters-LabelEvaluation-LabelEvaluation
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-SenseClusters-LabelEvaluation-LabelEvaluation
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-SenseClusters-LabelEvaluation-LabelEvaluation
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-SenseClusters-LabelEvaluation-LabelEvaluation/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Ted Pedersen, Anand Jha
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

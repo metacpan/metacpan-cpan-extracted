@@ -1,0 +1,49 @@
+---
+abstract: 'Path::Tiny types and coercions for Moose and Moo'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0.18
+  File::pushd: 0
+  List::Util: 0
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Types-Path-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Types::Path::Tiny:
+    file: lib/Types/Path/Tiny.pm
+    version: 0.005
+requires:
+  Path::Tiny: 0
+  Type::Library: 0.008
+  Type::Utils: 0
+  Types::Standard: 0
+  Types::TypeTiny: 0.004
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/types-path-tiny/issues
+  homepage: https://metacpan.org/release/Types-Path-Tiny
+  repository: git://github.com/dagolden/types-path-tiny.git
+version: 0.005
+x_contributors:
+  - 'Toby Inkster <tobyink@cpan.org>'

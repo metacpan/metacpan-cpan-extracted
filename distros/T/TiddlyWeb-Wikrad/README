@@ -1,0 +1,28 @@
+twikrad is a hack and slash port of wikrad.
+
+wikrad was created by Luke Closs and others at Socialtext
+for access Socialtext Workspaces.
+
+twikrad is for accessing TiddlyWeb in a similar way.
+
+With any luck common ground and can be abstracted out and
+a adaptation layer will be created so wikrad and twikrad can
+share code, but efforts to do that initially proved problematic
+as the code was insufficiently layerd.
+
+This is alpha software and sure to be full of confusion,
+but it can do the job.
+
+See wikrad docs here: 
+  http://www.socialtext.net/stoss/index.cgi?wikrad
+
+And tips on how to use wikrad with OSX here: 
+  http://www.socialtext.net/stoss/index.cgi?wikrad_productivity_using_os_x
+
+TiddlyWeb information here:
+  http://tiddlyweb.com/
+
+Licensed under the same terms as Perl.
+
+Modification for TiddlyWeb
+Copyright 2010, Chris Dent <cdent@peermore.com>

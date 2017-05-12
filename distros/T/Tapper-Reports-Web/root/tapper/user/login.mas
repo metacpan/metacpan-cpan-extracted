@@ -1,0 +1,17 @@
+<%args>
+        $message => ''
+</%args>
+
+<h3><% $message %></h3>
+% if (not $c->user_exists ) {
+<form action="/tapper/user/login" method="post" accept-charset="utf-8">
+      <label for="username">Username</label>
+      <input type="text" name="username" value="" id="username"/>
+      <br/><br/>
+      <label for="password">Password</label>
+      <input type="password" name="password" value="" id="password"/>
+      <p><input type="submit" value="Login"/></p>
+</form>
+% } else {
+<p>You are logged in.</p>
+% }

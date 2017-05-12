@@ -1,0 +1,286 @@
+=head1  NAME 
+
+TODO  Things to do in the Ngram Statistics Package 
+
+=head1 SYNOPSIS
+
+Ngram Statistics Package Todo list
+
+=head1 DESCRIPTION
+
+The following list describes some of the features that we'd like to 
+include in NSP in future. No particular priority is assigned to these 
+items - they are all things we've discussed amongst ourselves or with 
+users and agree would be good to add. 
+
+If you have additional ideas, or would like to comment on something on the 
+current list, please let us know via the ngram mailing list. 
+
+=head2 WEB INTERFACE / WEB SERVER
+
+It would be nice to offer a web interface or web server for users who 
+just want to run a few measures. 
+
+=head2 UNICODE SUPPORT / ENCODING ISSUES
+
+NSP is geared for the Roman alphabet (Latin-1). Perl has increasingly 
+better Unicode support with each passing release, and we will 
+incorporate Unicode support in future. We attempted to use the Unicode 
+features in Perl 5.6, but found them to be incomplete. We have not yet 
+attempted this with Perl 5.8 (the now current version) but it is said to 
+be considerably better.  
+
+Perl support for unicode will include language / alphabet specific   
+definitions of regular expression character classes like \d+ or \w+  
+(digits and non-white space characters). So you should be able to use
+(in theory) the same regular expression definitions with any alphabet
+and have it match in a way that makes sense for that language.
+
+Our expertise in this area is fairly limited, so please let us know if
+we are missing something obvious or misunderstanding what Perl is
+attempting to do. 
+
+In a discussion in Feb 2008, Richard Jelinek suggested the use of the 
+ENCODE module, discussion starts here :
+
+L<http://tech.groups.yahoo.com/group/ngram/message/210>
+
+In that discussion some drawbacks to 'use locale' were pointed out, so 
+for the moment we have made no changes, but it seems like fitting NSP 
+with ENCODE support is a good idea.
+
+=head2 MORE EFFICIENT COUNTING
+
+Right now all the ngrams being counted are stored in memory. Each ngram is 
+an element in a hash. This is ok for up to a few million word corpora,
+but after that things really slow down. We would like to pursue the idea 
+of using suffix trees which would greatly improve space utilization. 
+
+The use of suffix trees for counting term frequencies is based on :
+	
+Yamamoto, M. and Church, K (2001) Using Suffix Arrays to compute Term 
+Frequency and Document Frequency for All Substrings in a Corpus, 
+Computational Linguistics, vol 27:1, pp. 1-30, MIT Press.
+
+Find the article at:
+
+ L<http://acl.ldc.upenn.edu/J/J01/J01-1001.pdf>
+
+ L<http://www.research.att.com/~kwc/CL_suffix_array.pdf>
+
+In fact, they even provide a C implementation:
+
+ L<http://www.milab.is.tsukuba.ac.jp/~myama/tfdf/index.html>
+
+However, we would convert this into Perl and may need to modify it 
+somewhat to fit into NSP. 
+
+Another alternative would be to simply modify the count.pl program such 
+that rather than using memory it used disk space to accumulate counts. 
+This would be very slow but might suffice for certain situations. This
+is what huge-count.pl currently does. 
+
+Another alternative would be to tie the hashes that are used in NSP to 
+a database, and thereby reduce some memory use. 
+
+Regardless of the changes we make to counting,  would continue to support 
+counting in memory, which is perfectly  adequate for smaller amounts of  
+corpora. 
+
+=head2 GET COUNTS FROM WEB
+
+The web is a huge source of text, and we could get counts for words 
+or ngrams from the web (probably using something like Perl LWP module). 
+
+Rather than running count.pl on a particular body of text (as is the case 
+now) we'd probably have to run count.pl such that it looked for counts for 
+a  specific set of words as found on the web. Simply running count.pl on 
+the  entire www wouldn't really make sense. So perhaps we would run count 
+on one sample to get a list of the word types/ngrams that we are  
+interested  in, and then run count on the www to find out their 
+respective counts.
+
+[Our interest in this has been inspired by both Peter Turney (ACL-02 
+paper) and Frank Keller (EMNLP-02 paper).] 
+
+=head2 PARALLEL COUNTING
+
+Counting words and ngrams in large corpora could be parallelized. The 
+trick is not so much in the counting, but in the combining of counts 
+from various sources. 
+
+This is something we might try and implement using MPI (Message Passing 
+Interface).
+
+=head2 PROGRESS METER for count.pl
+
+When processing large files, count.pl gives no indication of how much of 
+the file has been processed, or even if it is still making progress. A 
+"progress meter" could show how much of the file has been proceeded, or
+how many ngrams have been counted, or something to indicate that progress 
+is being made. 
+
+=head2 OVERLY LONG LINE DETECTOR for count.pl
+
+If count.pl encounters a very long line of text (with literally thousands 
+and thousands of words on a single line) it may operate very very slowly. 
+It would be good to let a user know that an overly long line (we'd  
+need to define more precisely what "overly long" is) is being processed 
+(this fits into the progress meter mentioned above) so that a user can 
+decide if they want to continue with this, or possibly terminate 
+processing and reformat the input file.
+
+=head2 GENERALIZE --newLine in count.pl
+
+The --newLine switch tells count.pl that Ngrams may not cross over end of 
+line markers. Presumably this would be used when each line of text 
+consists of a sentence (thus the end of a line also marks the end of
+a sentence). However, if the text is not formatted and there may be 
+multiple sentences per line, or sentences may extend across several lines, 
+we may want to allow --newLine to include other characters that Ngrams
+would not be allowed to cross. 
+
+For example we could have the switch --dontCross "\n\.,;\?" which would  
+prevent ngrams from crossing the newline, the fullstop, the comma, the 
+semicolon and the question mark.
+
+=head2 RECURSE LIKE OPTION THAT CREATES MULTIPLE COUNT FILES
+
+Our current --recurse option creates a single count output file for
+all the words in all the texts found in a directory structure. We might
+want to be able to process all the files in a directory structure such
+that each file is treated separately and a separate count file is
+created for it. 
+
+For example, suppose we have the directory /txts that contains the
+files text1 and text2. 
+
+ count.pl --recurse output txts
+
+output will consist of the combined counts from txts/text1 and txts/text2.
+
+This new option would count these files separately and produce separate 
+count output files. 
+
+=head2 OTHER CUTOFFS FOR count.pl
+
+DONE IN VERSION 1.13! (--uremove option): What about having a frequency 
+cutoff for count.pl that removed any ngrams that occur more than some 
+number of times? The idea here would be to eliminate high frequency 
+ngrams not through the use of a stoplist but rather through a frequency 
+cutoff, based on the presumption that most very high frequent ngrams 
+will be made up of stop words. 
+
+What about a percentage cutoff? In other words, eliminate the least (or 
+most) frequent ngrams? 
+
+=head2 AUTOMATIC CREATION OF STOPLISTS
+
+It would be useful to allow NSP to automatically create a stoplist based 
+on a combination of frequency counts and/or scores like tf/idf. While 
+tf/idf depends on the idea of a document, we would simply chunk up a 
+large corpus into 100 token long pieces, and consider each piece a 
+document, and consider stop words those words that occur in some number of 
+these chunks. 
+
+=head2 SUPPORT FOR STDIN/STDOUT 
+
+Right now count.pl and statistic.pl operate such that the output file
+is designated first, followed by the input file. 
+
+For example,
+
+ count.pl outputfile inputfile
+
+However, there are advantages to allowing a user to redirect input
+and output, particularly in the Unix and MS-DOS world. As Derek Jones
+pointed out to us, if we have Windows users they are probably looking
+for a GUI (and they won't find much will they!!). This would enable the
+use of syntax such as...
+
+ count.pl input > out
+
+ cat input | count.pl > outfile
+
+which would help in building scripts, etc. 
+
+=head2 INSTALL SCRIPT FOR UNIX
+
+Rather than have user set paths, have a script that would ask the users
+questions to set things up properly. This might be especially useful if
+we want to maintain the "old" style of output input file specifications in
+count.pl and statistic.pl (see point above) as well as STDIN STDOUT. 
+(Maybe a user could pick which one?) In addition, there may be other 
+options that a user could specify this way (such as a default token 
+definition, home directory, etc.)
+
+=head2 EXTEND huge-count.pl to Ngrams
+
+At present huge-count.pl is only able to count bigrams. It would be very 
+useful to extend it so that it could count Ngrams in general. Also, there 
+is no support for windowing provided at present, so the bigrams it counts 
+must be adjacent. It would be desirable to support windowing for bigrams 
+and Ngrams generally. 
+
+=head2 ERROR RETURN CODES
+
+At present all programs simply exit when they encounter an error. We will 
+return an error code that can be detected by the calling program, so that
+abnormal termination is clear. This affects count.pl and statistic.pl 
+particularly, but will also be changed in rank.pl, combig.pl and kocos.pl. 
+
+=head2 MODULAR COUNTING
+
+There is a certain amount of redundant code in count.pl, huge-count.pl and 
+kocos.pl. It would be useful to make these more modular, to allow for 
+inheritance and code sharing, as well as the use of objects (potentially). 
+
+=head2 RANK.PL TIE HANDLING
+
+Right now rank.pl does not handle ties in any way other than re-ranking 
+them such that all members of a tie have the same rank, and that the 
+next rank after the ties is incremented by the number of ties. Some 
+sources advocate using Pearson's correlation coefficient on the ranks in 
+case of ties : 
+ 
+L<http://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient>
+
+Other sources prefer the use of Kendall's Tau over Spearman's:
+
+L<http://rsscse.org.uk/ts/bts/noether/text.html>
+
+Our suggestion is that if you have data with numerous ties, you want to 
+look very carefully at alternatives to the methods described in rank.pl
+However, typical collocation data collected from corpora usually doesn't 
+have too many ties, so in general we feel rank.pl remains useful. 
+
+=head2 UPDATE USAGE.pod
+
+USAGE.pod has not been updated since 2001, and is very basic. 
+
+=head1 AUTHOR
+
+Ted Pedersen, tpederse@d.umn.edu
+
+Last Updated : $Id: TODO.pod,v 1.6 2010/03/04 04:08:16 tpederse Exp $
+
+=head1 BUGS
+
+=head1 SEE ALSO
+
+ home page:    L<http://www.d.umn.edu/~tpederse/nsp.html>
+
+ mailing list: L<http://groups.yahoo.com/group/ngram/>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2000-2010 Ted Pedersen
+
+Permission is granted to copy, distribute and/or modify this  document  
+under the terms of the GNU Free Documentation License, Version 1.2 or  any  
+later version published by the Free Software Foundation; with no  
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+Note: a copy of the GNU Free Documentation License is available on the web   
+at L<http://www.gnu.org/copyleft/fdl.html> and is included in this    
+distribution as FDL.txt. 

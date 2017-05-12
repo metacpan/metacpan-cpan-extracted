@@ -1,0 +1,17 @@
+Revision history for Perl extension Text::WrapProp.
+
+0.01  Mon Sep 28 09:02:05 1998
+	- original version; created by h2xs 1.18
+
+0.02  Mon Sep 28 09:02:05 1998
+	- minor cleanup for CPAN public use
+
+0.03  Mon Sep 28 09:02:05 1998
+	- minor cleanup for CPAN public use
+
+0.04  Wed Oct 15 23:40:17 2014
+	- modernize packaging to pass CPAN Testers with h2xs 1.23
+
+0.05  Thu Oct 16 08:07:00 2014
+	- add numeric return status code, update POD and tests
+

@@ -1,0 +1,28 @@
+<corpus lang='english'>
+<lexelt item="word2.n">
+<instance id="word2.1" docsrc="1">
+<answer instance="word2.1" senseid="1"/>
+<context>
+ This is the context for <head>word2</head> instance id 
+</context>
+</instance>
+<instance id="word2.2" docsrc="2">
+<answer instance="word2.2" senseid="2"/>
+<context>
+ This is the context for <head>word2</head> instance id 
+</context>
+</instance>
+<instance id="word2.3" docsrc="3">
+<answer instance="word2.3" senseid="3"/>
+<context>
+ This is the context for <head>word2</head> instance id 
+</context>
+</instance>
+<instance id="word2.4" docsrc="4">
+<answer instance="word2.4" senseid="4"/>
+<context>
+ This is the context for <head>word2</head> instance id 
+</context>
+</instance>
+</lexelt>
+</corpus>

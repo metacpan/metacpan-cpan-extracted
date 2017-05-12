@@ -1,0 +1,97 @@
+# Italian translations for Time-Ago package.
+# Copyright (C) 2015 Maurice Aubrey
+# This file is distributed under the same license as the Time-Ago package.
+# Automatically generated, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Time-Ago 0.06\n"
+"Report-Msgid-Bugs-To: maurice.aubrey@gmail.com\n"
+"POT-Creation-Date: 2015-07-13 01:36-0700\n"
+"PO-Revision-Date: 2015-07-13 01:36-0700\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Time/Ago.pm:47
+#, perl-brace-format
+msgid "about {count} hour"
+msgid_plural "about {count} hours"
+msgstr[0] "circa un'ora"
+msgstr[1] "circa {count} ore"
+
+#: lib/Time/Ago.pm:51
+#, perl-brace-format
+msgid "about {count} month"
+msgid_plural "about {count} months"
+msgstr[0] "circa un mese"
+msgstr[1] "circa {count} mesi"
+
+#: lib/Time/Ago.pm:55
+#, perl-brace-format
+msgid "about {count} year"
+msgid_plural "about {count} years"
+msgstr[0] "circa un anno"
+msgstr[1] "circa {count} anni"
+
+#: lib/Time/Ago.pm:59
+#, perl-brace-format
+msgid "almost {count} year"
+msgid_plural "almost {count} years"
+msgstr[0] "circa 1 anno"
+msgstr[1] "circa {count} anni"
+
+#: lib/Time/Ago.pm:62
+msgid "half a minute"
+msgstr "mezzo minuto"
+
+#: lib/Time/Ago.pm:65
+#, perl-brace-format
+msgid "less than a minute"
+msgid_plural "less than {count} minutes"
+msgstr[0] "meno di un minuto"
+msgstr[1] "meno di {count} minuti"
+
+#: lib/Time/Ago.pm:70
+#, perl-brace-format
+msgid "less than {count} second"
+msgid_plural "less than {count} seconds"
+msgstr[0] "meno di un secondo"
+msgstr[1] "meno di {count} secondi"
+
+#: lib/Time/Ago.pm:78
+#, perl-brace-format
+msgid "over {count} year"
+msgid_plural "over {count} years"
+msgstr[0] "oltre un anno"
+msgstr[1] "oltre {count} anni"
+
+#: lib/Time/Ago.pm:82
+#, perl-brace-format
+msgid "{count} day"
+msgid_plural "{count} days"
+msgstr[0] "{count} giorno"
+msgstr[1] "{count} giorni"
+
+#: lib/Time/Ago.pm:86
+#, perl-brace-format
+msgid "{count} minute"
+msgid_plural "{count} minutes"
+msgstr[0] "{count} minuto"
+msgstr[1] "{count} minuti"
+
+#: lib/Time/Ago.pm:90
+#, perl-brace-format
+msgid "{count} month"
+msgid_plural "{count} months"
+msgstr[0] "{count} mese"
+msgstr[1] "{count} mesi"
+
+msgid "{count} second"
+msgid_plural "{count} seconds"
+msgstr[0] "{count} secondo"
+msgstr[1] "{count} secondi"

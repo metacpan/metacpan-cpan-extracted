@@ -1,0 +1,7 @@
+Revision history for Tie-CacheRedisDB
+
+1.0.1  2016-07-29 20:43:18 UTC
+        - Improve reproducibility of tests
+
+1.0.0  2016-07-28 17:36:26 UTC
+        - Initial release

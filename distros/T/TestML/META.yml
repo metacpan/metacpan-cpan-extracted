@@ -1,0 +1,31 @@
+---
+abstract: 'A Generic Software Testing Meta Language'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TestML
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  Pegex: '0.30'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/testml-pm/issues
+  homepage: https://github.com/ingydotnet/testml-pm
+  repository: https://github.com/ingydotnet/testml-pm.git
+version: '0.54'
+x_serialization_backend: 'YAML::Tiny version 1.69'

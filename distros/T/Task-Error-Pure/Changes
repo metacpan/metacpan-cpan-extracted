@@ -1,0 +1,21 @@
+0.03 2015-10-30T08:49:55+01:00
+ - Add Error::Pure::HTTP::JSON::Advance to SEE ALSO section in doc.
+ - Add Error::Pure::JSON::Advance to SEE ALSO section in doc.
+ - Add Error::Pure::Output::Tags::HTMLCustomPage 0.03 version.
+ - Update Error::Pure::HTTP to 0.14 version.
+ - Update Error::Pure::HTTP::JSON to 0.05 version.
+ - Update Error::Pure::JSON to 0.07 version.
+
+0.02 2015-09-16T21:15:57+02:00
+ - Fix REPOSITORY section in doc.
+ - Improve and fix SEE ALSO section in doc.
+ - Move admin tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update Error::Pure to 0.24 version.
+ - Update Error::Pure::Always to 0.06 version.
+ - Update Error::Pure::NoDie to 0.04 version.
+ - Update Error::Pure::Output::JSON to 0.10 version.
+ - Update Error::Pure::Output::Text to 0.22 version.
+
+0.01 2015-01-14T19:05:15+01:00
+ - First version

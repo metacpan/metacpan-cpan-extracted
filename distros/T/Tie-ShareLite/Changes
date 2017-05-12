@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::ShareLite.
+
+0.03  Tue Aug  3 10:37:03 2004
+	- original version; created by h2xs 1.21 with options
+		-X -v 0.03 -n Tie::ShareLite
+

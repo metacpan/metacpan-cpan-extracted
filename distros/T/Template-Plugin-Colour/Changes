@@ -1,0 +1,6 @@
+Version 0.03 January 2009 (released on CPAN April 2012)
+  * Refactored everything to be built on top of Badger
+  * Moved generic functionality into Template::Colour::* modules and
+    made the plugins thin wrappers.
+  * Added methods to Template::Colour which return scheme entries,
+    e.g. darkest, darker, dark, light, lighter, lightest, etc.

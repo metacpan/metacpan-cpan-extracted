@@ -1,0 +1,91 @@
+{
+   "abstract" : "Template::Toolkit with automatic filtering",
+   "author" : [
+      "Christian Walde <walde.christian@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-AutoFilter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Template" : "0",
+            "Template::Parser" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::InDistDir" : "0",
+            "Test::More" : "0.96",
+            "Test::Most" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Template::AutoFilter" : {
+         "file" : "lib/Template/AutoFilter.pm",
+         "version" : "0.143050"
+      },
+      "Template::AutoFilter::Parser" : {
+         "file" : "lib/Template/AutoFilter/Parser.pm",
+         "version" : "0.143050"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-template-autofilter at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Template-AutoFilter"
+      },
+      "homepage" : "https://github.com/wchristian/Template-AutoFilter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wchristian/Template-AutoFilter.git",
+         "web" : "https://github.com/wchristian/Template-AutoFilter"
+      }
+   },
+   "version" : "0.143050"
+}
+

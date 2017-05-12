@@ -1,0 +1,242 @@
+NAME
+    Text::Lorem::More - Generate formatted nonsense using random Latin
+    words.
+
+VERSION
+    Version 0.13
+
+SYNOPSIS
+    Generate formatted nonsense using random Latin words.
+
+            use Text::Lorem::More;
+
+            my $lorem = Text::Lorem::More->new;
+        
+            # Greet a friend
+            print "Hello, ", $lorem->fullname, "\n";
+
+            # You could also ...
+            print $lorem->process("Hello, +fullname\n");
+
+            ... or you can use the singleton:
+
+            use Text::Lorem::More qw(lorem);
+
+            # Generate a random latin word
+            my $latinwordoftheday = lorem->word;
+
+            # Produce paragaphs in the Text::Lorem compatible manner
+            my $content = lorem->paragraphs(3);
+
+            # Print 4 paragraphs, each separated by a single newline and tab:
+            print "\t", scalar lorem->paragraph(4, "\n\t");
+
+GENERATORS
+    To use a generator, call the method with the same name as the generator,
+    To use the name generator, for example:
+
+            my $name = $lorem->name;
+
+    Alternatively, you can use the "generate" or "process" functions. To use
+    the hostname generator, for example:
+
+            my $hostname = $lorem->hostname;
+
+            # This will do the same thing ...
+            my $otherhostname = $lorem->generate("+hostname");
+
+  word
+    Generates random latin word.
+
+            dicta
+            sed
+            repellat
+
+  sentence
+    Generates between 4 and 9 words, with the first letter of the first word
+    capitalized and a period following the last word.
+
+  paragraph
+    Generates between 3 and 6 sentences,
+
+  words $count
+    A Text::Lorem compatible words generator. Will generate $count words
+    joined by " ".
+
+  sentences $count
+    A Text::Lorem compatible sentences generator. Will generate $count
+    sentences joined by " ". Each sentence contains between 4 and 9 words
+    and ends with a period. Passing in 0 for count will still produce a
+    single period!
+
+  paragraphs $count
+    A Text::Lorem compatible sentences generator. Will generate $count
+    paragraphs joined by "\n\n". Each paragraph contains between 3 and 6
+    sentences.
+
+  name / firstname / lastname
+    Generates a random latin word with the first letter capitalized
+
+            Repellat
+            Sed
+            Ipsum
+
+  fullname
+    Generates a firstname and lastname separated by a space
+
+            Lorem Dicta
+
+  username
+    Generates a random latin word
+
+  title
+    Generates between 1 and 3 words with the first letter of the first word
+    capitalized
+
+  description
+    Generates between 1 and 3 sentences.
+
+  tld / topleveldomain
+    Generates a top level domain. Currently, this will either be "com",
+    "org", or "net".
+
+  domain / domainname
+    Generates a domainname. Currently, this will attach "example" to a tld
+    generator result.
+
+            example.com
+            example.net
+
+  host / hostname
+    Generates a hostname. Currently, this will either return a plain
+    domainname, as above, or attach a latin word to a domainname result.
+
+            et.example.com
+            example.org
+
+  email / mail
+  path
+  httpurl
+  mailto
+EXPORT
+FUNCTIONS
+  new [$source]
+    Construct a new Text::Lorem::More object
+
+  generate $pattern [, $count, $separator]
+    Generate some text using the specified pattern.
+
+    "generate" is faster than "process", as "generate" uses regex to perform
+    substitution.
+
+    In list context, return a list with $count number of "words"
+
+    In scalar context, return $pattern repeated $count times and joined by
+    $separator.
+
+    If you do not specify scalar context on the receiving end, then the
+    separator will simply be discarded. This may change in the future
+
+    The default for $count is 1.
+
+    The default for $separator is " ".
+
+    A pattern will usually contain one or more generator tokens. For
+    example:
+
+            +name
+            +fullname
+            +word+word+word+word
+
+    The pattern can also contain other text:
+
+            +name@+domainname
+            "+firstname +lastname"
+
+    Sometimes you might need to enclose the token identifier between "+{"
+    and "}"
+
+    For example, the following pattern won't work right:
+
+            prefix+namesuffix
+
+    But this will:
+
+            prefix+{name}suffix
+
+    If you need to include a '+' in your pattern, you'll have to use
+    "process" instead.
+
+  process $text
+    Process a block of text, performing pattern substitutions as they're
+    found.
+
+    process is slower than generate, as process uses Parse::RecDescent.
+
+    To escape '+', simply repeat it. For example, to produce "2 + 2" you
+    would submit:
+
+            2 ++ 2
+
+    Please see "generate" for more information.
+
+  source
+    Return the generator source for this instance.
+
+  lorem
+    A Text::Lorem::More singleton.
+
+AUTHOR
+    Robert Krimen, "<robertkrimen at gmail.com>"
+
+SEE ALSO
+    Text::Lorem
+
+    WWW::Lipsum
+
+    <http://lipsum.com/>
+
+SOURCE
+    You can contribute or fork this project via GitHub:
+
+    <http://github.com/robertkrimen/text-lorem-more/tree/master>
+
+        git clone git://github.com/robertkrimen/text-lorem-more.git Text-Lorem-More
+
+ACKNOWLEDGEMENTS
+    Thanks to Adeola Awoyemi for writing Text::Lorem
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    Probaby a lot. Please report them (as below) and I'll take a look.
+
+    Please report any bugs or feature requests to "bug-text-lorem-more at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Lorem-More>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Text::Lorem::More
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Text-Lorem-More>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Text-Lorem-More>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Lorem-More>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Text-Lorem-More>
+

@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+Structured.pm
+StructuredBase.pm
+template
+test.pl

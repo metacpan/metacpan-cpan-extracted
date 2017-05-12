@@ -1,0 +1,140 @@
+---
+abstract: 'Perl extension for updating dual-lived modules'
+author:
+  - 'Kevin W. Henwood <Khen1950fx@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-DualLived
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Archive::Tar: 0
+  Attribute::Handlers: 0
+  AutoLoader: 0
+  B::Debug: 0
+  CPAN: 0
+  CPAN::Meta: 0
+  CPAN::Meta::Requirements: 0
+  CPAN::Meta::YAML: 0
+  Carp: 0
+  Compress::Raw::Bzip2: 0
+  Compress::Raw::Zlib: 0
+  Compress::Zlib: 0
+  Config::Perl::V: 0
+  Cwd: 0
+  DB_File: 0
+  Data::Dumper: 0
+  Devel::PPPort: 0
+  Devel::SelfStubber: 0
+  Digest: 0
+  Digest::MD5: 0
+  Digest::SHA: 0
+  Env: 0
+  Exporter: 0
+  ExtUtils::CBuilder: 0
+  ExtUtils::Command: 0
+  ExtUtils::Constant::Base: 0
+  ExtUtils::Install: 0
+  ExtUtils::MakeMaker: 0
+  ExtUtils::Manifest: 0
+  ExtUtils::ParseXS: 0
+  ExtUtils::Typemaps: 0
+  Fatal: 0
+  File::Fetch: 0
+  File::Path: 0
+  File::Temp: 0
+  Filter::Simple: 0
+  Filter::Util::Call: 0
+  Getopt::Long: 0
+  HTTP::Tiny: 0
+  I18N::Collate: 0
+  I18N::LangTags: 0
+  IO: 0
+  IO::Compress::Base: 0
+  IO::Socket::IP: 0
+  IO::Zlib: 0
+  IPC::Cmd: 0
+  IPC::SysV: 0
+  JSON::PP: 0
+  List::Util: 0
+  Locale::Codes: 0
+  Locale::Maketext: 0
+  Locale::Maketext::Simple: 0
+  MIME::Base64: 0
+  Math::BigInt: 0
+  Math::BigInt::FastCalc: 0
+  Math::BigRat: 0
+  Math::Complex: 0
+  Memoize: 0
+  Module::CoreList: 0
+  Module::Load: 0
+  Module::Load::Conditional: 0
+  Module::Loaded: 0
+  Module::Metadata: 0
+  NEXT: 0
+  Net::Cmd: 0
+  Net::Ping: 0
+  Params::Check: 0
+  Parse::CPAN::Meta: 0
+  Perl::OSType: 0
+  PerlIO::via::QuotedPrint: 0
+  Pod::Checker: 0
+  Pod::Escapes: 0
+  Pod::Man: 0
+  Pod::Perldoc: 0
+  Pod::Simple: 0
+  Pod::Usage: 0
+  Safe: 0
+  Search::Dict: 0
+  SelfLoader: 0
+  Storable: 0
+  Sys::Syslog: 0
+  Term::ANSIColor: 0
+  Term::Cap: 0
+  Term::Complete: 0
+  Term::ReadLine: 0
+  Test: 0
+  Test::Harness: 0
+  Test::Simple: 0
+  Text::Abbrev: 0
+  Text::Balanced: 0
+  Text::ParseWords: 0
+  Text::Tabs: 0
+  Thread::Queue: 0
+  Thread::Semaphore: 0
+  Tie::File: 0
+  Tie::RefHash: 0
+  Time::HiRes: 0
+  Time::Local: 0
+  Time::Piece: 0
+  Unicode::Collate: 0
+  Unicode::Normalize: 0
+  XSLoader: 0
+  autodie: 0
+  base: 0
+  bigint: 0
+  constant: 0
+  encoding: 0
+  encoding::warnings: 0
+  experimental: 0
+  if: 0
+  lib: 0
+  parent: 0
+  perl: '5.005'
+  threads: 0
+  threads::shared: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.05'

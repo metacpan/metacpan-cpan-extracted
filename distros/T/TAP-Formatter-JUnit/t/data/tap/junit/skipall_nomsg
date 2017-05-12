@@ -1,0 +1,10 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="0"
+             tests="0"
+             name="data_tap_skipall_nomsg">
+    <system-out><![CDATA[1..0
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,15 @@
+Revision history for Test-WWW-Mechanize-Object
+
+0.020   2006-08-28
+
+        * refresh Module::Install
+
+0.01_01 Thu Jul 27 16:25:47 EDT 2006
+
+        * moved call to after_request to after cookies are extracted
+        * pass $self into hooks
+
+0.01    Fri Jul 14 20:36:58 EDT 2006
+
+        * first version, released on an unsuspecting world.
+

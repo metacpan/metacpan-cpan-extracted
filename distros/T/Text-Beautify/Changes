@@ -1,0 +1,41 @@
+Revision history for Perl extension Text::Beautify.
+
+0.08  Fri Nov 05 16:41:13 2004
+	- fixed the smiley bug (thanks to Peter Sergeant)
+
+0.07  Wed Nov 03 19:39:00 2004
+	- fixed the newline bug
+	- improved the documentation
+	- added pod.t and pod-coverage.t to the tests directory
+
+0.06  Wed Sep 22 00:11:05 2004
+	- Perl required version is now 5.006 (was 5.008)
+
+0.05  Fri Sep 17 22:28:05 2004
+	- added META.yml
+	- added object interface (hurrah!)
+
+0.04  Mon Jul 12 20:07:08 2004
+	- added a debug feature (useful for development)
+	- uppercase_first no longer turns "(this)" into "(This)"
+	- space_after_punctuation no longer turns "this!!" into "this! !"
+
+0.03  Sat Jun 12 22:33:08 2004
+	- all features are now special (the result is always evaluated with /e)
+	- support for $`, $', $& no longer needed
+
+0.02  Sun May 30 00:27:08 2004
+	- added the possibility for a feature to contain several steps
+	- corrected features space_in_front_of_punctuation,
+	  repeated_punctuation and _space_after_punctuation, _uppercase_first
+	- special features no longer require a heading underscore
+	- _space_after_punctuation becomes space_after_punctuation
+	- _uppercase_first becomes uppercase_first
+
+0.01  Fri May 14 02:29:08 2004
+	- first release ready
+
+0.01  Fri May 14 01:16:08 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn Text::Beautify
+

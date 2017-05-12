@@ -1,0 +1,18 @@
+#use Tk;
+use Tcl::pTk;
+my $mw = MainWindow->new;
+
+my $t0 = time();
+
+my $count = 50000;
+while( $count > 0){
+  $mw->_Button(-text=>"Yep");
+  $count--;
+}
+
+my $t1=time;
+print STDERR "time=".($t1-$t0)."\n";
+
+#DB::finish_profile()
+#MainLoop;
+

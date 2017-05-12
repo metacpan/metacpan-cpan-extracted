@@ -1,0 +1,19 @@
+---
+abstract: 'Limit the magnitude of a number in a scalar'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-BoundedInteger
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/briandfoy/tie-boundedinteger
+version: 1.001

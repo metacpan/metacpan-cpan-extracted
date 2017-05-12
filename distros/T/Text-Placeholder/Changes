@@ -1,0 +1,14 @@
+0.04	28 April 2011
+	- added basic tests
+	- moved placeholder groups to Placeholder::Group
+	- improved documentation
+
+0.03	25 April 2011
+	- documented add_placeholder
+	- added ::Generic
+
+0.02	24 April 2011
+	- streamlined the documentation
+
+0.01	23 April 2011
+	- first public release

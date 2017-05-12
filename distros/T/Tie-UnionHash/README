@@ -1,0 +1,30 @@
+Tie::UnionHash
+========================
+
+Merge multiple hashes into a one hash
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+
+AUTHOR
+
+Zahatski Aliaksandr
+zag@cpan.org
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2007 Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,60 @@
+Key
+ . = still to do
+ - = discarded
+ * = completed
+
+* add usual escapes inside string literals
+. check order of return for various axes against a reliable spec
+. make search order configurable -- parents or children first
+* move expression-attribute linking to compiler
+. allow mathematical expressions as attribute arguments
+* fix index predicates *again* to behave more like xpath
+
+Attic
+-----
+
+Completed TODO items kept around as curios.
+
+* get rid of MooseX::Privacy to speed things up somewhat
+* improve error message when expression is unparsable
+* clean up tests and add more thorough testing
+* allow attribute selectors as well as predicates
+* figure out odd warning being emitted by demo code
+* add wrap method to forester for use in coercion
+* add tag method to forester to reduce coding burden for most adaptations
+* add {x,y} style quantifiers
+* add =~ as an operand in attribute tests
+* create tests for equality measures in attribute tests
+* finish documenting equality measures in attribute tests
+- remove redundant extended attributes
+* make sure there is some cardinality attribute
+* allow multi-line expressions with comments
+* rename TPath::Test::XOR to TPath::Test::One
+* update grammar section of documentation
+* die instead of confessing in grammar and compiler
+* refactor to use a context object instead of a bunch of parameters
+- create a previous context attribute
+- allow qname quoting in literals
+* fix \p{PosixPunct} issue with v5.10 on BSD
+* comb documentation for pre-TPath::Context parameter lists
+* document previous:: axis
+* allow bare paths in attribute tests
+* add math in attribute tests
+* add support for autoloading of attributes
+* add string concatenation operator
+* refactor apply attribute method so that reflection occurs only once
+* create logical attributes @some, @one, @none, @all
+* fix 5.18 experimental warnings -- no if $] >= 5.018, warnings => "experimental";
+* look for and fix stringification bugs
+* update TPath grammar and description of predicates
+* add optional case insensitivity for tags
+* use Dist::Zilla::Plugin::OptionalFeature to suggest Unicode::CaseFolding
+- add some discussion of efficiency to documentation
+* add prioritization of predicates a la xpath, so there's both //*[1] and (//*)[1]
+- add examples
+- simplify axis code in forester
+- put 'extends' in BEGIN block
+* mention Tree::XPathEngine and Class::XPath in SEE ALSO
+- confirm index predicates behave identically in tpath and xpath for all common axes
+* add adjacent:: family of axes (in the end, just adjacent::)
+* add some handling of variables -- @v('foo') or @var('foo')

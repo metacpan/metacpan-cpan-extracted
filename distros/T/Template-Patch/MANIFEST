@@ -1,0 +1,15 @@
+bin/metapatch
+Build.PL
+Changes
+lib/Template/Patch.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-basic.t
+t/basic1.mp
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+SIGNATURE    Added here by Module::Build

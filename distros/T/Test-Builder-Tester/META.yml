@@ -1,0 +1,10 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-Builder-Tester
+version:      1.01
+version_from: lib/Test/Builder/Tester.pm
+installdirs:  site
+requires:
+    Test::Builder:                 0.12
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

@@ -1,0 +1,63 @@
+#title Hyper links
+
+** Begin
+
+#label
+Here the doc start
+#label here blablabla
+A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page. 
+
+** Middle
+
+#label2
+#label2 Continue here
+A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page. 
+A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page. 
+A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page. 
+ #label3 not a label
+
+** Next
+
+#label2
+This is valid.
+
+#1blabla
+Not a label, starts with a number
+
+{{{
+#label3
+This is verbatim
+}}}
+
+  #label5
+  in quotation is not neutralized,
+
+> #label6
+> in verse is not neutralized
+
+<verse>
+#label7
+ in verse again, we have a label
+</verse>
+
+#label9 
+This is a label despite of the trailing whitespace.
+
+ #label9
+This is a label despite of the leading whitespace.
+
+ 1. #label8 not a label
+
+ 2. #lable9
+    This is a label
+
+
+** End
+
+Here we [[#label][go]] and [[#label2]] and [[#label3][dead link]] [[#label4]]
+[[#1][Preserved verbatim]]
+[[#label2 unkown]]
+[[#label][\tryme]]
+
+
+

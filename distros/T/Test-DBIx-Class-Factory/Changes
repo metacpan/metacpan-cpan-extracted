@@ -1,0 +1,12 @@
+Revision history for Perl extension Test::DBIx::Class::Factory
+
+0.03  Wed Apr 9 08:19:55 2014
+        - Now compatible with Perl 5.8.9
+
+0.02  Tue Apr 8 11:13:39 2014
+        - Replaced given/when to remove warnings on perl 5.18+
+        - Added Changes file
+
+0.01  Wed Sep 18 17:27:56 2013
+        - First released version
+

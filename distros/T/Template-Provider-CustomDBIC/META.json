@@ -1,0 +1,71 @@
+{
+   "abstract" : "Load templates using DBIx::Class",
+   "author" : [
+      "Jens Gassmann <jegade@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Provider-CustomDBIC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "1.11",
+            "DBIx::Class" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Parse" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Template::Provider" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Provider::CustomDBIC" : {
+         "file" : "lib/Template/Provider/CustomDBIC.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04",
+   "x_contributors" : [
+      "Dave Cardwell <dcardwell@cpan.org>",
+      "Jens Gassmann <jens.gassmann@atomix.de>"
+   ]
+}

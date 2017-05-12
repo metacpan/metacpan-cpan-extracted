@@ -1,0 +1,27 @@
+---
+name: Test-Fork
+version: 0.02
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+abstract: test code which forks
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Fork
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.schwern.org/repos/CPAN/Test-Fork
+requires:
+  Test::Builder::Module: 0.02
+  perl: 5.6.1
+build_requires:
+  Test::Builder::Tester: 1.02
+  Test::More: 0.62
+provides:
+  Test::Fork:
+    file: lib/Test/Fork.pm
+    version: 0.02
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+configure_requires:
+  Module::Build: 0.2808

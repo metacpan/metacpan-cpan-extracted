@@ -1,0 +1,678 @@
+NAME
+
+    Test::Moose::More - More tools for testing Moose packages
+
+VERSION
+
+    This document describes version 0.047 of Test::Moose::More - released
+    April 24, 2017 as part of Test-Moose-More.
+
+SYNOPSIS
+
+        use Test::Moose::More;
+    
+        is_class_ok 'Some::Class';
+        is_role_ok  'Some::Role';
+        has_method_ok 'Some::Class', 'foo';
+    
+        # ... etc
+
+DESCRIPTION
+
+    This package contains a number of additional tests that can be employed
+    against Moose classes/roles. It is intended to replace Test::Moose in
+    your tests, and re-exports any tests that it has and we do not, yet.
+
+ Export Groups
+
+    By default, this package exports all test functions. You can be more
+    selective, however, and there are a number of export groups (aside from
+    the default ':all') to help you achieve those dreams!
+
+    :all
+
+      All exportable functions.
+
+    :validate
+
+      "validate_attribute", "validate_class", "validate_role",
+      "validate_thing"
+
+TEST FUNCTIONS
+
+ meta_ok $thing
+
+    Tests $thing to see if it has a metaclass; $thing may be the class name
+    or instance of the class you wish to check.
+
+ does_ok $thing, < $role | \@roles >, [ $message ]
+
+    Checks to see if $thing does the given roles. $thing may be the class
+    name or instance of the class you wish to check.
+
+    Note that the message will be taken verbatim unless it contains %s
+    somewhere; this will be replaced with the name of the role being tested
+    for.
+
+ does_not_ok $thing, < $role | \@roles >, [ $message ]
+
+    Checks to see if $thing does not do the given roles. $thing may be the
+    class name or instance of the class you wish to check.
+
+    Note that the message will be taken verbatim unless it contains %s
+    somewhere; this will be replaced with the name of the role being tested
+    for.
+
+ has_attribute_ok $thing, $attribute_name, [ $message ]
+
+    Checks $thing for an attribute named $attribute_name; $thing may be a
+    class name, instance, or role name.
+
+ has_method_ok $thing, @methods
+
+    Queries $thing's metaclass to see if $thing has the methods named in
+    @methods.
+
+    Note: This does not include inherited methods; see "has_method" in
+    Class::MOP::Class.
+
+ has_no_method_ok $thing, @methods
+
+    Queries $thing's metaclass to ensure $thing does not provide the
+    methods named in @methods.
+
+    Note: This does not include inherited methods; see "has_method" in
+    Class::MOP::Class.
+
+ has_method_from_anywhere_ok $thing, @methods
+
+    Queries $thing's metaclass to see if $thing has the methods named in
+    @methods.
+
+    Note: This does include inherited methods; see "find_method_by_name" in
+    Class::MOP::Class.
+
+ has_no_method_from_anywhere_ok $thing, @methods
+
+    Queries $thing's metaclass to ensure $thing does not provide the
+    methods named in @methods.
+
+    Note: This does include inherited methods; see "find_method_by_name" in
+    Class::MOP::Class.
+
+ method_from_pkg_ok $thing, $method, $orig_pkg
+
+    Given a thing (role, class, etc) and a method, test that it originally
+    came from $orig_pkg.
+
+ method_not_from_pkg_ok $thing, $method, $orig_pkg
+
+    Given a thing (role, class, etc) and a method, test that it did not
+    come from $orig_pkg.
+
+ role_wraps_around_method_ok $role, @methods
+
+    Queries $role's metaclass to see if $role wraps the methods named in
+    @methods with an around method modifier.
+
+ role_wraps_before_method_ok $role, @methods
+
+    Queries $role's metaclass to see if $role wraps the methods named in
+    @methods with an before method modifier.
+
+ role_wraps_after_method_ok $role, @methods
+
+    Queries $role's metaclass to see if $role wraps the methods named in
+    @methods with an after method modifier.
+
+ requires_method_ok $thing, @methods
+
+    Queries $thing's metaclass to see if $thing requires the methods named
+    in @methods.
+
+    Note that this really only makes sense if $thing is a role.
+
+ does_not_require_method_ok $thing, @methods
+
+    Queries $thing's metaclass to ensure $thing does not require the
+    methods named in @methods.
+
+    Note that this really only makes sense if $thing is a role.
+
+ is_immutable_ok $thing
+
+    Passes if $thing is immutable.
+
+ is_not_immutable_ok $thing
+
+    Passes if $thing is not immutable; that is, is mutable.
+
+ is_pristine_ok $thing
+
+    Passes if $thing is pristine. See "is_pristine" in Class::MOP::Class.
+
+ is_not_pristine_ok $thing
+
+    Passes if $thing is not pristine. See "is_pristine" in
+    Class::MOP::Class.
+
+ is_role_ok $thing
+
+    Passes if $thing's metaclass is a Moose::Meta::Role.
+
+ is_class_ok $thing
+
+    Passes if $thing's metaclass is a Moose::Meta::Class.
+
+ is_anon_ok $thing
+
+    Passes if $thing is "anonymous".
+
+ is_not_anon_ok $thing
+
+    Passes if $thing is not "anonymous".
+
+ check_sugar_removed_ok $thing
+
+    Ensures that all the standard Moose sugar is no longer directly
+    callable on a given package.
+
+ check_sugar_ok $thing
+
+    Checks and makes sure a class/etc can still do all the standard Moose
+    sugar.
+
+ does_metaroles_ok $thing => { $mop => [ @traits ], ... };
+
+    Validate the metaclasses associated with a class/role metaclass.
+
+    e.g., if I wanted to validate that the attribute trait for
+    MooseX::AttributeShortcuts is actually applied, I could do this:
+
+        { package TestClass; use Moose; use MooseX::AttributeShortcuts; }
+        use Test::Moose::More;
+        use Test::More;
+    
+        does_metaroles_ok TestClass => {
+           attribute => ['MooseX::AttributeShortcuts::Trait::Attribute'],
+        };
+        done_testing;
+
+    This function will accept either class or role metaclasses for $thing.
+
+    The MOPs available for classes (Moose::Meta::Class) are:
+
+    class
+
+    attribute
+
+    method
+
+    wrapped_method
+
+    instance
+
+    constructor
+
+    destructor
+
+    The MOPs available for roles (Moose::Meta::Role) are:
+
+    role
+
+    attribute
+
+    method
+
+    required_method
+
+    wrapped_method
+
+    conflicting_method
+
+    application_to_class
+
+    application_to_role
+
+    application_to_instance
+
+    applied_attribute
+
+    Note! Neither this function nor does_not_metaroles_ok() attempts to
+    validate that the MOP type passed in is a member of the above lists.
+    There's no gain here in implementing such a check, and a negative to be
+    had: specifying an invalid MOP type will result in immediate
+    explosions, while it's entirely possible other MOP types will be added
+    (either to core, via traits, or "let's subclass Moose::Meta::Class/etc
+    and implement something new").
+
+ does_not_metaroles_ok $thing => { $mop => [ @traits ], ... };
+
+    As with "does_metaroles_ok", but test that the metaroles are not
+    consumed, a la "does_not_ok".
+
+ validate_thing
+
+    Runs a bunch of tests against the given $thing, as defined:
+
+        validate_thing $thing => (
+    
+            attributes => [ ... ],
+            methods    => [ ... ],
+            isa        => [ ... ],
+    
+            # ensures sugar is/is-not present
+            sugar      => 0,
+    
+            # ensures $thing does these roles
+            does       => [ ... ],
+    
+            # ensures $thing does not do these roles
+            does_not   => [ ... ],
+        );
+
+    $thing can be the name of a role or class, an object instance, or a
+    metaclass.
+
+      * -subtest => 'subtest name...'
+
+      If set, all tests run will be wrapped in a subtest, the name of which
+      will be whatever -subtest is set to.
+
+      * isa => [ ... ]
+
+      A list of superclasses thing should have.
+
+      * anonymous => 0|1
+
+      Check to see if the class is/isn't anonymous.
+
+      * does => [ ... ]
+
+      A list of roles the thing should do.
+
+      * does_not => [ ... ]
+
+      A list of roles the thing should not do.
+
+      * attributes => [ ... ]
+
+      The attributes list specified here is in the form of a list of names,
+      each optionally followed by a hashref of options to test the
+      attribute for; this hashref takes the same arguments
+      "validate_attribute" does. e.g.:
+
+          validate_thing $thing => (
+      
+              attributes => [
+                  'foo',
+                  'bar',
+                  baz => { is => 'ro', ... },
+                  'bip',
+              ],
+          );
+
+      * methods => [ ... ]
+
+      A list of methods the thing should have; see "has_method_ok".
+
+      * no_methods => [ ... ]
+
+      A list of methods the thing should not have; see "has_no_method_ok".
+
+      * sugar => 0|1
+
+      Ensure that thing can/cannot do the standard Moose sugar.
+
+      * metaclasses => { $mop => { ... }, ... }
+
+      Validates this thing's metaclasses: that is, given a MOP type (e.g.
+      class, attribute, method, ...) and a hashref, find the associated
+      metaclass of the given type and invoke "validate_thing" on it, using
+      the hashref as options for validate_thing().
+
+      e.g.
+
+          validate_thing 'TestClass' => (
+              metaclasses  => {
+                  attribute => {
+                      isa  => [ 'Moose::Meta::Attribute' ],
+                      does => [ 'MetaRole::attribute'    ],
+                  },
+              },
+          );
+
+      ...yields:
+
+          # Subtest: Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
+              ok 1 - TestClass's attribute metaclass has a metaclass
+              ok 2 - TestClass's attribute metaclass is a Moose class
+              ok 3 - TestClass's attribute metaclass isa Moose::Meta::Attribute
+              ok 4 - TestClass's attribute metaclass does MetaRole::attribute
+              1..4
+          ok 1 - Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
+
+      Note that validate_class() and validate_role() implement this using
+      'class_metaclasses' and 'role_metaclasses', respectively.
+
+ validate_role
+
+    The same as validate_thing(), but ensures $thing is a role, and allows
+    for additional role-specific tests.
+
+        validate_role $thing => (
+    
+            required_methods => [ ... ],
+    
+            # ...and all other options from validate_thing()
+        );
+
+      * -compose => 0|1
+
+      When true, attempt to compose the role into an anonymous class, then
+      use it to run "validate_class". The options we're given are passed to
+      validate_class() directly, except that any required_methods entry is
+      removed and its contents pushed onto methods. (A stub method for each
+      entry in required_methods will also be created in the new class.)
+
+      e.g.:
+
+          ok 1 - TestRole has a metaclass
+          ok 2 - TestRole is a Moose role
+          ok 3 - TestRole requires method blargh
+          ok 4 - TestRole does TestRole
+          ok 5 - TestRole does not do TestRole::Two
+          ok 6 - TestRole has method method1
+          ok 7 - TestRole has an attribute named bar
+          # Subtest: role composed into Moose::Meta::Class::__ANON__::SERIAL::1
+              ok 1 - TestRole's composed class has a metaclass
+              ok 2 - TestRole's composed class is a Moose class
+              ok 3 - TestRole's composed class does TestRole
+              ok 4 - TestRole's composed class does not do TestRole::Two
+              ok 5 - TestRole's composed class has method method1
+              ok 6 - TestRole's composed class has method blargh
+              ok 7 - TestRole's composed class has an attribute named bar
+              1..7
+          ok 8 - role composed into Moose::Meta::Class::__ANON__::SERIAL::1
+          1..8
+
+      * -subtest => 'subtest name...'
+
+      If set, all tests run will be wrapped in a subtest, the name of which
+      will be whatever -subtest is set to.
+
+      * required_methods => [ ... ]
+
+      A list of methods the role requires a consuming class to supply.
+
+      * before => [ ... ]
+
+      A list of methods the role expects to wrap before, on application to
+      a class.
+
+      See "before" in Moose for information on before method modifiers.
+
+      * around => [ ... ]
+
+      A list of methods the role expects to wrap around, on application to
+      a class.
+
+      See "around" in Moose for information on around method modifiers.
+
+      * after => [ ... ]
+
+      A list of methods the role expects to wrap after, on application to a
+      class.
+
+      See "after" in Moose for information on after method modifiers.
+
+      * role_metaroles => { $mop => [ $role, ... ], ... }
+
+      Checks metaclasses to ensure the given metaroles are applied. See
+      "does_metaroles_ok".
+
+      * no_role_metaroles => { $mop => [ $role, ... ], ... }
+
+      Checks metaclasses to ensure the given metaroles are applied. See
+      "does_not_metaroles_ok".
+
+      * role_metaclasses => { $mop => { ... }, ... }
+
+      Validates this role's metaclasses: that is, given a MOP type (e.g.
+      role, attribute, method, ...) and a hashref, find the associated
+      metaclass of the given type and invoke "validate_thing" on it, using
+      the hashref as options for validate_thing().
+
+      e.g.
+
+          validate_role 'TestRole' => (
+              metaclasses  => {
+                  attribute => {
+                      isa  => [ 'Moose::Meta::Attribute' ],
+                      does => [ 'MetaRole::attribute'    ],
+                  },
+              },
+          );
+
+      ...yields:
+
+          # Subtest: Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
+              ok 1 - TestRole's attribute metaclass has a metaclass
+              ok 2 - TestRole's attribute metaclass is a Moose class
+              ok 3 - TestRole's attribute metaclass isa Moose::Meta::Attribute
+              ok 4 - TestRole's attribute metaclass does MetaRole::attribute
+              1..4
+          ok 1 - Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
+
+      Note that validate_class() and validate_role() implement this using
+      'class_metaclasses' and 'role_metaclasses', respectively.
+
+      * class_metaclasses => { $mop => { ... }, ... }
+
+      As with role_metaclasses, above, except that this option is only used
+      if -compose is also specified.
+
+ validate_class
+
+    The same as validate_thing(), but ensures $thing is a class, and allows
+    for additional class-specific tests.
+
+        validate_class $thing => (
+    
+            isa  => [ ... ],
+    
+            attributes => [ ... ],
+            methods    => [ ... ],
+    
+            # ensures sugar is/is-not present
+            sugar      => 0,
+    
+            # ensures $thing does these roles
+            does       => [ ... ],
+    
+            # ensures $thing does not do these roles
+            does_not   => [ ... ],
+    
+            # ...and all other options from validate_thing()
+        );
+
+      * -subtest => 'subtest name...'
+
+      If set, all tests run will be wrapped in a subtest, the name of which
+      will be whatever -subtest is set to.
+
+      * immutable => 0|1
+
+      Checks the class to see if it is/isn't immutable.
+
+      * class_metaroles => { $mop => [ $role, ... ], ... }
+
+      Checks metaclasses to ensure the given metaroles are applied. See
+      "does_metaroles_ok".
+
+      * no_class_metaroles => { $mop => [ $role, ... ], ... }
+
+      Checks metaclasses to ensure the given metaroles are applied. See
+      "does_not_metaroles_ok".
+
+      * class_metaclasses => { $mop => { ... }, ... }
+
+      Validates this class' metaclasses: that is, given a MOP type (e.g.
+      role, attribute, method, ...) and a hashref, find the associated
+      metaclass of the given type and invoke "validate_thing" on it, using
+      the hashref as options for validate_thing().
+
+      e.g.
+
+          validate_class 'TestClass' => (
+              metaclasses  => {
+                  attribute => {
+                      isa  => [ 'Moose::Meta::Attribute' ],
+                      does => [ 'MetaRole::attribute'    ],
+                  },
+              },
+          );
+
+      ...yields:
+
+          ok 1 - TestClass has a metaclass
+          ok 2 - TestClass is a Moose class
+          # Subtest: Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
+              ok 1 - TestClass's attribute metaclass has a metaclass
+              ok 2 - TestClass's attribute metaclass is a Moose class
+              ok 3 - TestClass's attribute metaclass isa Moose::Meta::Attribute
+              ok 4 - TestClass's attribute metaclass does MetaRole::attribute
+              1..4
+          ok 3 - Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
+
+ validate_attribute
+
+    validate_attribute() allows you to test how an attribute looks once
+    built and attached to a class.
+
+    Let's say you have an attribute defined like this:
+
+        has foo => (
+            traits  => [ 'TestRole' ],
+            is      => 'ro',
+            isa     => 'Int',
+            builder => '_build_foo',
+            lazy    => 1,
+        );
+
+    You can use validate_attribute() to ensure that it's built out in the
+    way you expect:
+
+        validate_attribute TestClass => foo => (
+    
+            # tests the attribute metaclass instance to ensure it does the roles
+            -does => [ 'TestRole' ],
+            # tests the attribute metaclass instance's inheritance
+            -isa  => [ 'Moose::Meta::Attribute' ], # for demonstration's sake
+    
+            traits   => [ 'TestRole' ],
+            isa      => 'Int',
+            does     => 'Bar',
+            handles  => { },
+            reader   => 'foo',
+            builder  => '_build_foo',
+            default  => undef,
+            init_arg => 'foo',
+            lazy     => 1,
+            required => undef,
+        );
+
+    Options passed to validate_attribute() prefixed with '-' test the
+    attribute's metaclass instance rather than a setting on the attribute;
+    that is, '-does' ensures that the metaclass does a particular role
+    (e.g. MooseX::AttributeShortcuts), while 'does' tests the setting of
+    the attribute to require the value do a given role.
+
+    This function takes all the options "attribute_options_ok" takes, as
+    well as the following:
+
+      * -subtest => 'subtest name...'
+
+      If set, all tests run will be wrapped in a subtest, the name of which
+      will be whatever -subtest is set to.
+
+ attribute_options_ok
+
+    Validates that an attribute is set up as expected; like
+    validate_attribute(), but only concerns itself with attribute options.
+
+    Note that some of these options will skip if used against attributes
+    defined in a role.
+
+      * -subtest => 'subtest name...'
+
+      If set, all tests run (save the first, "does this thing even have
+      this attribute?" test) will be wrapped in a subtest, the name of
+      which will be whatever -subtest is set to.
+
+      * is => ro|rw
+
+      Tests for reader/writer options set as one would expect.
+
+      * isa => ...
+
+      Validates that the attribute requires its value to be a given type.
+
+      * does => ...
+
+      Validates that the attribute requires its value to do a given role.
+
+      * builder => '...'
+
+      Validates that the attribute expects the method name given to be its
+      builder.
+
+      * default => ...
+
+      Validates that the attribute has the given default.
+
+      * init_arg => '...'
+
+      Validates that the attribute has the given initial argument name.
+
+      * lazy => 0|1
+
+      Validates that the attribute is/isn't lazy.
+
+      * required => 0|1
+
+      Validates that setting the attribute's value is/isn't required.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Test::Moose
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/Test-Moose-More/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+CONTRIBUTORS
+
+      * Chad Granum <chad.granum@dreamhost.com>
+
+      * Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

@@ -1,0 +1,27 @@
+---
+abstract: 'Variable ties made much easier: much, much, much easier...'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Simple
+requires:
+  Tie::Array: '0'
+  Tie::Handle: '0'
+  Tie::Hash: '0'
+  Tie::Scalar: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Simple
+  repository: git://github.com/zostay/Tie-Simple.git
+version: '1.04'

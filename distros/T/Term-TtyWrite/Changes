@@ -1,0 +1,7 @@
+Revision history for Term::TtyWrite. See also the git repository.
+
+0.02    September 2016
+        Add write_delay() method. Other tweaks.
+
+0.01    August 2016
+        First version, released on an unsuspecting world.

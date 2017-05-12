@@ -1,0 +1,19 @@
+#!/bin/sh
+
+WEBDIR=/home/jm/ettext.taint.org
+
+VERS=`./build/get_version` ; export VERS
+./build/update_devel
+
+sudo cp $WEBDIR/devel/Text-EtText-$VERS.tar.gz \
+	/usr/src/redhat/SOURCES/Text-EtText-$VERS.tar.gz
+
+sed -e 's/__VERSION__/'"$VERS"'/g' < specfile.raw > EtText.spec
+
+sudo rpm -ba EtText.spec 
+
+cp /usr/src/redhat/RPMS/noarch/EtText-${VERS}-1.noarch.rpm \
+   /usr/src/redhat/SRPMS/EtText-${VERS}-1.src.rpm \
+   .
+
+rm EtText.spec

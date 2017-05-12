@@ -1,0 +1,49 @@
+
+o In 00basic.t:
+
+	..
+	Testing Axis
+	ok 14
+	ok 15
+	ok 16
+	ok 17
+	ok 18
+	Tk::Error: Axis: `Show' method requires xmax and ymax at t/00basic.t line 82
+ 	Carp::croak at /usr/local/perl5.005_01/lib/Carp.pm line 271
+ 	Tk::Axis::ConfigChanged at /data09a/ach/devel/tkcontrib/blib/lib/Tk/Axis.pm line 143
+ 	Idle Callback
+	ok 19
+	..
+
+o add demos for Axis, Dial, OlWm
+
+o add better tests
+
+o Check if contribs also work on win32
+
+o Axis has docs in comments that should be wrapped into POD
+
+o Make TickerTape example into a composite widget
+  or a part of perl/tk widget demo?
+
+o Find new home for removed book-examples 
+
+o use Tk::WidgetDemo for demo(s) (maybe make demo ?)
+
+o Update POD to reflect new status/support?
+
+o Axis: authors lost:  email/http as in POD does both not work:
+
+	   Kris Boulez            (Kris.Boulez@rug.ac.be)
+	   Biomolecular NMR unit  <http://bionmr1.rug.ac.be/~kris>
+
+   Larry Virden thinks it kris@uunet.be. He also tries to get an URL
+
+o Larry Virden suggested:
+
+    I think the README should indicate (and the code as well) what version
+    of pTk IS verified to work with them.  Perhaps even create sub
+    directories by version of perl and/or pTk for them.  Also, the platforms
+    on which they are verified to work would be useful to mention.
+
+

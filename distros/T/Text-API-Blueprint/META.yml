@@ -1,0 +1,43 @@
+---
+abstract: 'Markdown generator for API blueprint format'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Import::Into: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
+  Text::Diff: '0'
+  blib: '1.01'
+  constant: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.013002'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-API-Blueprint
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Exception::Delayed: '0'
+  Exporter: '0'
+  HTTP::Headers::Fancy: '1.001'
+  namespace::clean: '0'
+  perl: '5.014'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/zurborg/libtext-api-blueprint-perl/issues
+  homepage: https://github.com/zurborg/libtext-api-blueprint-perl
+  repository: https://github.com/zurborg/libtext-api-blueprint-perl.git
+version: '0.003'
+x_contributors:
+  - 'David Zurborg <d.zurborg@vcare24.de>'

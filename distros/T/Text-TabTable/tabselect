@@ -1,0 +1,142 @@
+#!/usr/bin/perl
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#   Copyright (c) 2002-2003 Vivendi Universal Net USA
+#
+#   May be copied under the same terms as perl itself.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# this lets you use sql syntax from the shell with tab delimited files
+# using Text::TabTable
+
+
+
+use Text::TabTable ;
+
+my $Usage = <<EOT ;
+Usage: 
+  tabselect <fieldlist> FROM <tablespec> [WHERE <whereclause>] 
+  			[ORDER BY <column>] [INTO filename]
+  
+  <tablespec> can be a filename or
+      <filename1> [LEFT|INNER|RIGHT] JOIN <filename2> ON <column1> = <column2>
+EOT
+
+die $Usage if !@ARGV ;
+
+my $query = join(" ", @ARGV) ;
+
+$query =~ s/^\s*SELECT//i ;
+
+@f = split(/\b(FROM|WHERE|ORDER BY|INTO)\b/i, $query) ;
+$fields = shift @f ;
+while (@f) {
+  my $keyword = shift @f ;
+  if (uc $keyword eq 'FROM') {
+    $tablestr = shift @f ;
+  } elsif (uc $keyword eq 'WHERE') {
+    $where = shift @f ;
+  } elsif (uc $keyword eq 'ORDER BY') {
+    $order = shift @f ;
+  } elsif (uc $keyword eq 'INTO') {
+    $outfile = shift @f ;
+  } else {
+    die "bad keyword $keyword" ;
+  }
+}
+    
+
+@fields = split(',', $fields) ;
+foreach my $field (@fields) {
+  $field =~ s/^\s*(.*?)\s*$/$1/ ;
+  if ($field =~ /(\S+)\s+AS\s+(\S+)/i) {
+    $field = [$1, $2] ;
+  }
+}
+
+if ($where) {
+  $wherefunc = make_wherefunc($where) ;
+} else {
+  $wherefunc = undef ;
+}
+
+
+if ( $tablestr =~ s/^\s*(\S+)\s*$/$1/ ) {
+  # filename
+  $table = MP3Com::TabTable->import_headered($tablestr) || die "$tablestr: $!\n";
+} elsif ( $tablestr =~ /^\s*
+                        (\S+)\s+
+			(JOIN|INNER\sJOIN|LEFT\sJOIN|RIGHT\sJOIN)\s+
+			(\S+)\s+
+			ON\s+(\S+)\s*=\s*(\S+)
+		       /xi)
+{
+  my ($t1, $jointype, $t2, $f1, $f2) = ($1, $2, $3, $4, $5) ;
+  my $table1 = MP3Com::TabTable->import_headered($t1) || die "$t1: $!\n" ;
+  my $table2 = MP3Com::TabTable->import_headered($t2) || die "$t2: $!\n" ;
+
+  $f1 =~ s/.*\.// ;  # strip off table qualifiers
+  $f2 =~ s/.*\.// ;
+
+  $jointype =~ s/\s*JOIN//i ;
+  $jointype = "INNER" if !$jointype ;
+  $jointype = uc $jointype ;
+
+  $table = $table1->join($table2, $f1, $f2, $jointype) ;
+} else {
+  die "bad FROM syntax\n" ;
+}
+
+if (@fields == 1 && $fields[0] eq '*') {
+  $fields = '*' ;
+} else {
+  $fields = \@fields ;
+}
+
+$table = $table->select($fields, $wherefunc) ;
+
+$order =~ s/^\s*(\S*)\s*$/$1/ || die ;
+if ($order) {
+  $table = $table->order($order) ;
+}
+
+$outfile =~ s/^\s*(\S*)\s*$/$1/ || die ;
+if ($outfile eq '') {
+  $outfile = "out.tab" ;
+  warn "Generating output to out.tab\n" ;
+}
+
+$table->export_headered($outfile) ;
+
+
+sub make_wherefunc
+{
+  use strict ;
+  my ($where) = @_ ;
+
+  $where =~ s/\b([A-Za-z]\w*(\.[A-Za-z]\w*)?)\b/whereident($`,$1,$')/ge ;
+  $where =~ s/([^><])=/$1 eq /g ;
+
+  my $sub = "sub { \$row = shift ; return $where }" ;
+#print $sub, "\n" ;
+
+  no strict ;
+  $sub = eval $sub ;
+  die "$sub: $@" if $@ ;
+  return $sub ;
+}
+
+sub whereident
+{
+  use strict ;
+  my ($prematch, $ident, $postmatch) = @_ ;
+  return $ident if $prematch =~ /['"]$/ && $postmatch =~ /^['"]/ ;
+
+  if (uc $ident eq 'AND') {
+    return "&&" ;
+  } elsif (uc $ident eq 'OR') {
+    return "||" ;
+  } else {
+    return '$row->getvalue("' . $ident . '")' ;
+  }
+}

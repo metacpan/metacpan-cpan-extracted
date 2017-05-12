@@ -1,0 +1,56 @@
+NAME
+
+Time::TAI - International Atomic Time and realisations
+
+DESCRIPTION
+
+International Atomic Time (TAI) is a time scale produced by an ensemble
+of atomic clocks around Terra.  It attempts to tick at the rate of proper
+time on the Terran geoid (i.e., at sea level), and thus is the principal
+realisation of Terrestrial Time (TT).  It is the frequency standard
+underlying Coordinated Universal Time (UTC), and so is indirectly the
+basis for Terran civil timekeeping.
+
+This module represents instants on the TAI time scale as a scalar number
+of TAI seconds since an epoch.  This is an appropriate form for all manner
+of calculations.  The TAI scale is defined with a well-known point at UT2
+instant 1958-01-01T00:00:00.0 as calculated by the United States Naval
+Observatory.  That instant is assigned the scalar value zero exactly,
+making it the epoch for this linear seconds count.  This matches the
+convention used by "Time::TT" for instants on the TT scale.
+
+There is also a conventional way to represent TAI instants using day-based
+notations associated with planetary rotation `time' scales.  The `day'
+of TAI is a nominal period of exactly 86400 TAI seconds, which is
+slightly shorter than an actual Terran day.  The well-known point at UT2
+instant 1958-01-01T00:00:00.0 is assigned the label 1958-01-01T00:00:00.0
+(MJD 36204.0).  Because TAI is not connected to Terran rotation, and so
+has no inherent concept of a day, it is somewhat misleading to use such
+day-based notations.  Conversion between this notation and the linear
+count of seconds is supported by this module.  This notation does not
+match the similar day-based notation used for TT.
+
+Because TAI is canonically defined only in retrospect, real-time time
+signals can only approximate it.  To achieve microsecond accuracy it
+is necessary to take account of this process.  This module supports
+conversion of times between different realisations of TAI.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2010 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

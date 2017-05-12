@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Fracture.pm
+Fracture.xs
+t/Text-Fracture.t
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

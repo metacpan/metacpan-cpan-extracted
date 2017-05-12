@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Task/Deprecations/5_12.pm
+t/release-pod-syntax.t
+t/task-bogus.t

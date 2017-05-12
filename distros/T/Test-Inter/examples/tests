@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use Test::Inter;
+$o = new Test::Inter;
+
+print "The following tests test some improperly formed tests\n\n";
+
+sub func1 {
+  my($a,$b) = @_;
+
+  if    ($a eq 'a'  &&  $b eq 'b') { return 1; }
+  elsif ($a eq 'c'  &&  $b eq 'd') { return 2; }
+  elsif ($a eq 'e'  &&  $b eq 'f') { return 3; }
+}
+
+print "The 2nd one fails with 'expected results for some, not others\n\n";
+$o->tests(func  => \&func1,
+          tests => "a b => 1
+
+                    c d
+
+                    e f => 3");
+
+print "\n\nFails with '=>' found twice\n\n";
+$o->tests(func  => \&func1,
+          tests => "a b => 1 => 1");
+
+print "\n\nFails with odd number of elements in hash\n\n";
+$o->tests(func  => \&func1,
+          tests => "{ a b c } => 1");
+
+print "\n\nFails with improper quoting\n\n";
+$o->tests(func  => \&func1,
+          tests => "a 'b => 1");
+
+print "\n\nFails with unable to parse\n\n";
+$o->tests(func  => \&func1,
+          tests => "(a b c");
+
+print "\n\nFails with unexpected token\n\n";
+$o->tests(func  => \&func1,
+          tests => "(a b c)(d e) => 1");

@@ -1,0 +1,26 @@
+---
+abstract: 'a tied hash interface to Moose object attributes'
+author:
+  - 'Scott A. Beck <scottbeck@gmail.com>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101550, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-MooseObject
+requires:
+  Carp: 0
+  List::Util: 1.23
+  Moose::Util::TypeConstraints: 1.03
+  MooseX::Declare: 0.33
+  MooseX::Has::Sugar: 0.0405
+  MooseX::Types::Moose: 0.12
+resources:
+  repository: git://github.com/bline/Tie-MooseObject.git
+version: 0.0001

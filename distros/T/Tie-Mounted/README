@@ -1,0 +1,69 @@
+NAME
+    Tie::Mounted - Tie a mounted node to an array
+
+SYNOPSIS
+     use Tie::Mounted;
+
+     tie @files, 'Tie::Mounted', '/backup', '-v';
+     print $files[-1];
+     untie @files;
+
+DESCRIPTION
+    This module ties files (and directories) of a mount point to an array by
+    invoking the system commands "mount" and "umount"; "mount" is invoked
+    when a former attempt to tie an array is being committed, "umount" when
+    a tied array is to be untied. Suitability is therefore limited and
+    suggests a rarely used node (such as /backup, for example).
+
+    The mandatory parameter consists of the node (or: *mount point*) to be
+    mounted (/backup - as declared in /etc/fstab); optional options to
+    "mount" may be subsequently passed ("-v"). Device names and mount
+    options ("-a,-A,-d") will be discarded in regard of system security.
+
+    Default paths to "mount" and "umount" may be overriden by setting
+    accordingly either $Tie::Mounted::MOUNT_BIN or
+    $Tie::Mounted::UMOUNT_BIN. If either of them doesn't exist at the
+    predefined path, a "which()" will be performed to determine the actual
+    path.
+
+    If $Tie::Mounted::NO_FILES is set to a true value, a bogus array with
+    zero files will be tied.
+
+BUGS & CAVEATS
+  Security
+    "Tie::Mounted" has by default set $APPROVE to an untrue value in order
+    to allow all nodes to be passed. If $APPROVE is set to a true value,
+    @NODES has to contain the nodes that are considered ``approved"; both
+    variables are lexically scoped and adjustable within "_private()". If in
+    approval mode and a node is passed that is considered unapproved,
+    "Tie::Mounted" will throw an exception.
+
+    Such ``security" is rather trivial; instead it is recommended to adjust
+    filesystem permissions to prevent malicious use.
+
+  Portability
+    "Tie::Mounted" is Linux/UNIX centered (due to the fstab file & the
+    "mount/umount" binaries requirements) and will most likely won't work on
+    other platforms.
+
+  Miscellanea
+    The tied array is read-only.
+
+    Files within the tied array are statically tied.
+
+  Lacking tests
+    Tests that test the base functionality are completely missing due to an
+    environment that most likely can't be adequately simulated.
+
+SEE ALSO
+    "tie" in perlfunc, fstab(5), mount(8), umount(8)
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

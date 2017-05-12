@@ -1,0 +1,800 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>discriminate.pl</title>
+<link rev="made" href="mailto:tpederse@marimba.d.umn.edu" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#usage">USAGE</a></li>
+	<li><a href="#input">INPUT</a></li>
+	<ul>
+
+		<li><a href="#required_arguments_">Required Arguments:</a></li>
+		<ul>
+
+			<li><a href="#test">TEST</a></li>
+		</ul>
+
+		<li><a href="#optional_arguments_">Optional Arguments:</a></li>
+		<ul>
+
+			<li><a href="#data_options__">DATA OPTIONS :</a></li>
+			<ul>
+
+				<li><a href="#training_train">-training TRAIN</a></li>
+				<li><a href="#split_n">-split N</a></li>
+				<li><a href="#token_token">-token TOKEN</a></li>
+				<li><a href="#target_target">-target TARGET</a></li>
+				<li><a href="#prefix_pre">-prefix PRE</a></li>
+				<li><a href="#format_f16_xx">-format f16.XX</a></li>
+				<li><a href="#wordclust">-wordclust</a></li>
+				<li><a href="#lsa">-lsa</a></li>
+			</ul>
+
+			<li><a href="#feature_options__">FEATURE OPTIONS :</a></li>
+			<ul>
+
+				<li><a href="#feature_type">-feature TYPE</a></li>
+				<li><a href="#scope_train_s1">-scope_train S1</a></li>
+				<li><a href="#scope_test_s2">-scope_test S2</a></li>
+				<li><a href="#stop_stopfile">-stop STOPFILE</a></li>
+				<li><a href="#remove_f">-remove F</a></li>
+				<li><a href="#window_w">-window W</a></li>
+				<li><a href="#stat_stat">-stat STAT</a></li>
+				<li><a href="#stat_rank_n">-stat_rank N</a></li>
+				<li><a href="#stat_score_s">-stat_score S</a></li>
+			</ul>
+
+			<li><a href="#vector_options__">VECTOR OPTIONS :</a></li>
+			<ul>
+
+				<li><a href="#context_ord">-context ORD</a></li>
+				<li><a href="#binary">-binary</a></li>
+			</ul>
+
+			<li><a href="#svd_options__">SVD OPTIONS :</a></li>
+			<ul>
+
+				<li><a href="#svd">-svd</a></li>
+				<li><a href="#k_k">-k K</a></li>
+				<li><a href="#rf_rf">-rf RF</a></li>
+				<li><a href="#iter_i">-iter I</a></li>
+			</ul>
+
+			<li><a href="#clusterstopping_options_">CLUSTER-STOPPING OPTIONS:</a></li>
+			<ul>
+
+				<li><a href="#cluststop_cs">-cluststop CS</a></li>
+				<li><a href="#delta_int">-delta INT</a></li>
+				<li><a href="#threspk1_num">-threspk1 NUM</a></li>
+			</ul>
+
+			<li><a href="#clusterstopping__adapted_gap_statistic_options_">CLUSTER-STOPPING: ADAPTED GAP STATISTIC OPTIONS:</a></li>
+			<ul>
+
+				<li><a href="#b_num">-B NUM</a></li>
+				<li><a href="#typeref_typ">-typeref TYP</a></li>
+				<li><a href="#percentage_num">-percentage NUM</a></li>
+				<li><a href="#seed_num">-seed NUM</a></li>
+			</ul>
+
+			<li><a href="#clustering_options__">CLUSTERING OPTIONS :</a></li>
+			<ul>
+
+				<li><a href="#clusters_n">-clusters N</a></li>
+				<li><a href="#space_space">-space SPACE</a></li>
+				<li><a href="#clmethod_cl">-clmethod CL</a></li>
+				<li><a href="#crfun_cr">-crfun CR</a></li>
+				<li><a href="#sim_sim">-sim SIM</a></li>
+				<li><a href="#rowmodel_rmod">-rowmodel RMOD</a></li>
+				<li><a href="#colmodel_cmod">-colmodel CMOD</a></li>
+			</ul>
+
+			<li><a href="#labeling_options__">LABELING OPTIONS :</a></li>
+			<ul>
+
+				<li><a href="#label_stop_label_stopfile">-label_stop LABEL_STOPFILE</a></li>
+				<li><a href="#label_remove_label_n">-label_remove LABEL_N</a></li>
+				<li><a href="#label_window_label_w">-label_window LABEL_W</a></li>
+				<li><a href="#label_stat_label_stat">-label_stat LABEL_STAT</a></li>
+				<li><a href="#label_rank_label_r">-label_rank LABEL_R</a></li>
+			</ul>
+
+			<li><a href="#other_options__">Other Options :</a></li>
+			<ul>
+
+				<li><a href="#eval">-eval</a></li>
+				<li><a href="#rank_filter_r">-rank_filter R</a></li>
+				<li><a href="#percent_filter_p">-percent_filter P</a></li>
+				<li><a href="#help">-help</a></li>
+				<li><a href="#version">-version</a></li>
+				<li><a href="#verbose">-verbose</a></li>
+				<li><a href="#showargs">-showargs</a></li>
+			</ul>
+
+		</ul>
+
+	</ul>
+
+	<li><a href="#output">OUTPUT</a></li>
+	<ul>
+
+		<ul>
+
+			<li><a href="#cluster_stopping_related_output_files_">Cluster Stopping related output files:</a></li>
+			<li><a href="#the_following_files_are_created_to_facilitate_creation_of_plots__if_needed_">The following files are created to facilitate creation of plots, if needed:</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#authors">AUTHORS</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>discriminate.pl Wrapper program to run SenseClusters in a single command</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>Discriminates among the given text instances based on their contextual 
+similarities.</p>
+<p>
+</p>
+<hr />
+<h1><a name="usage">USAGE</a></h1>
+<p>discriminate.pl [OPTIONS] TEST</p>
+<p>
+</p>
+<hr />
+<h1><a name="input">INPUT</a></h1>
+<p>
+</p>
+<h2><a name="required_arguments_">Required Arguments:</a></h2>
+<p>
+</p>
+<h3><a name="test">TEST</a></h3>
+<p>Senseval-2 formatted TEST instance file that contains the instances
+to be clustered.</p>
+<p>
+</p>
+<h2><a name="optional_arguments_">Optional Arguments:</a></h2>
+<p>
+</p>
+<h3><a name="data_options__">DATA OPTIONS :</a></h3>
+<p>
+</p>
+<h4><a name="training_train">--training TRAIN</a></h4>
+<p>Training file in plain text format that can be used to select features.
+If this is not specified, features are selected from the given TEST file.</p>
+<p>
+</p>
+<h4><a name="split_n">--split N</a></h4>
+<p>Splits the given TEST file into two portions, N% for the use as the TRAIN 
+data and (100-N)% as the TEST data. The value for N is a percentage and 
+should be an integer between 1 to 99 (inclusive). The instances from the 
+original TEST file are not picked or split in any particular order but are 
+randomly split into the two portions of TRAIN and TEST data while maintaining
+the ratio of N/(100-N).</p>
+<p>Note: This option cannot be used when --training option is also used.</p>
+<p>
+</p>
+<h4><a name="token_token">--token TOKEN</a></h4>
+<p>A file containing Perl regex/s that define the tokenization scheme in TRAIN
+and TEST files. If --token is not specified, default token regex file 
+token.regex is searched in the current directory.</p>
+<p>
+</p>
+<h4><a name="target_target">--target TARGET</a></h4>
+<p>A file containing Perl regex/s for identifying the target word. A sample
+target.regex file containing regex:</p>
+<pre>
+    /&lt;head&gt;\w+&lt;/head&gt;/</pre>
+<p>is provided with this distribution. If --target is not specified, default 
+target regex file target.regex is searched in the current directory. 
+If this file doesn't exist, target.regex is automatically created by finding
+all instances of &lt;head&gt; tags from the TEST data. If there are no instances
+of &lt;head&gt; tags in TEST, the given data is assumed to be global and target
+word is not searched in either TRAIN or TEST.</p>
+<pre>
+ Note: --target cannot be specified with headless input data
+       i.e. test file without head/target word(s).</pre>
+<p>
+</p>
+<h4><a name="prefix_pre">--prefix PRE</a></h4>
+<p>Specify a prefix to be used in all output file names. e.g. context vector
+file will have name 'PRE.vectors', features file will have name 'PRE.features'
+and so on ... By default, a random prefix is created using the time stamp.</p>
+<p>
+</p>
+<h4><a name="format_f16_xx">--format f16.XX</a></h4>
+<p>The default format for floating point numbers is f16.06. This means that
+there is room for 6 digits to the right of the decimal, and 9 to the
+left. You may change XX to any value between 0 and 15, however, the
+format must remain 16 spaces long due to formatting requirements of SVDPACKC.</p>
+<p>
+</p>
+<h4><a name="wordclust">--wordclust</a></h4>
+<p>Discriminates and clusters each word based upon its direct and indirect 
+co-occurrence with other words (when used without the --lsa switch) or
+clusters words or features based upon their occurrences in different contexts
+(when used with the --lsa switch).</p>
+<pre>
+ Note: 1. Separate (--training) TRAIN data should not be used with word 
+          clustering.
+       2. Starting with Version 0.93, word clustering is no longer 
+          restricted to using only headless data. However, options 
+          specific to headed data such as --scope_test and target 
+          co-occurrence features (see below) cannot be used.</pre>
+<p>
+</p>
+<h4><a name="lsa">--lsa</a></h4>
+<p>Uses Latent Semantic Analysis (LSA) style representation for clustering
+features or contexts. LSA representation is the transpose of
+the context-by-feature matrix created using the native SenseClusters
+order1 context representation.</p>
+<p>This option can be used only in the following two combinations of 
+the --context and the --wordclust options:</p>
+<ol>
+<li><strong><a name="item__2d_2dcontext_o1__2d_2dwordclust__2d_2dlsa">--context o1 --wordclust --lsa</a></strong><br />
+</li>
+Performs feature clustering by grouping together features based on the
+contexts that they occur in. Features can be unigrams, bigrams or 
+co-occurrences. Feature vectors are the rows of the transposed
+context-by-feature representation created by order1vec.pl.
+<p></p>
+<li><strong><a name="item__2d_2dcontext_o2__2d_2dlsa">--context o2 --lsa</a></strong><br />
+</li>
+Performs context clustering by creating context vectors by averaging the
+feature vectors from the transposed context-by-feature representation of 
+order1vec.pl.
+<p></p></ol>
+<p>
+</p>
+<h3><a name="feature_options__">FEATURE OPTIONS :</a></h3>
+<p>
+</p>
+<h4><a name="feature_type">--feature TYPE</a></h4>
+<p>Specify the feature type to be used for representing contexts. 
+Possible options for feature type with first order context representation:</p>
+<pre>
+        bi      -   bigrams  [default]
+        tco     -   target co-occurrences       
+        co      -   co-occurrences
+        uni     -   unigrams</pre>
+<p>Possible options for feature type with second order context representation:</p>
+<pre>
+        bi      -   bigrams  [default]
+        co      -   co-occurrences
+        tco     -   target co-occurrences</pre>
+<pre>
+ Note: --tco (target co-occurrences) cannot be used with headless 
+       data i.e. test/train file without head/target word(s).</pre>
+<p>
+</p>
+<h4><a name="scope_train_s1">--scope_train S1</a></h4>
+<p>Limits the scope of the training contexts to S1 words around (on both 
+sides of) the TARGET word. Thus, it allows selection of local features.
+If --scope_train is used, each training instance is expected to include
+the target word as specified by the --target option or default target.regex.</p>
+<pre>
+ Note: --scope_train cannot be used with headless data i.e. train files
+       without head/target word(s).</pre>
+<p>
+</p>
+<h4><a name="scope_test_s2">--scope_test S2</a></h4>
+<p>Limits the scope of the test contexts to S2 words around (on both sides of)
+the TARGET word. Thus, it allows to match and use local features in the 
+context vectors.</p>
+<pre>
+ Note: --scope_test cannot be used with headless data i.e. test files
+       without head/target word(s).</pre>
+<p>
+</p>
+<h4><a name="stop_stopfile">--stop STOPFILE</a></h4>
+<p>A file of Perl regexes that define the stop list of words to be excluded from 
+the features.</p>
+<p>STOPFILE could be specified with two modes -</p>
+<p>AND mode - declared by including '@stop.mode=AND' on the first line of the
+STOPFILE.
+         - ignores word pairs in which both words are stop words.</p>
+<p>OR mode - declared by including '@stop.mode=OR' on the first line of the
+STOPFILE.
+        - ignores word pairs in which either word is a stop word.</p>
+<p>Both modes exclude stop words from unigram features.</p>
+<p>Default is OR mode.</p>
+<p>
+</p>
+<h4><a name="remove_f">--remove F</a></h4>
+<p>Removes features that occur less than F times in the training corpus.</p>
+<p>
+</p>
+<h4><a name="window_w">--window W</a></h4>
+<p>Specifies the window size for bigram/co-occurrence features. Pairs of words 
+that co-occur within the specified window from each other (window W allows at 
+most W-2 intervening words) will form the bigram/co-occurrence features.</p>
+<p>Default window size is 2 which allows only consecutive word pairs.</p>
+<p>Not applicable to unigram features.</p>
+<p>
+</p>
+<h4><a name="stat_stat">--stat STAT</a></h4>
+<p>Bigrams and co-occurrences can be selected based on their statistical scores 
+of association as specified by this option. If --vector = o2 and
+--stat is used, word association matrix will use the scores computed by the 
+specified statistical test instead of simple joint frequency counts of the
+word pairs.</p>
+<p>Available tests of association are :</p>
+<pre>
+        dice            -       Dice Coefficient
+        ll              -       Log Likelihood Ratio
+        odds            -       Odds Ratio
+        phi             -       Phi Coefficient
+        pmi             -       Point-Wise Mutual Information
+        tmi             -       True Mutual Information
+        x2              -       Chi-Squared Test
+        tscore          -       T-Score
+        leftFisher      -       Left Fisher's Test
+        rightFisher     -       Right Fisher's Test</pre>
+<p>By default, features are selected and represented using their frequency 
+counts.</p>
+<p>
+</p>
+<h4><a name="stat_rank_n">--stat_rank N</a></h4>
+<p>Word pairs ranking below N when arranged in descending order of their test 
+scores are ignored.</p>
+<p>--stat_rank has no effect unless --stat is specified.</p>
+<p>
+</p>
+<h4><a name="stat_score_s">--stat_score S</a></h4>
+<p>Selects word pairs with scores greater than S after performing the selected
+test of association. Score could be any real number that will give reasonable 
+number of features for the requested test.</p>
+<p>--stat_score has no effect unless --stat is specified.</p>
+<p>
+</p>
+<h3><a name="vector_options__">VECTOR OPTIONS :</a></h3>
+<p>
+</p>
+<h4><a name="context_ord">--context ORD</a></h4>
+<p>Specifies the context representation to be used. Set ORD to 'o1' to use 
+1st order context vectors, and to 'o2' to select 2nd order context vectors.
+Default context representation is o2.</p>
+<p>
+</p>
+<h4><a name="binary">--binary</a></h4>
+<p>Creates binary feature and context vectors. By default, feature vectors 
+show the joint frequency scores of the associated word pairs while the
+context vectors show the average of the feature vectors of words that occur 
+in the context. With --binary turned ON, feature vectors show mere presence or 
+absence of the particular word pair (co-occurrence/bigram) in TRAIN, 
+while the context vectors will represent a binary 'OR' operation on the
+corresponding vectors of contextual features.</p>
+<p>
+</p>
+<h3><a name="svd_options__">SVD OPTIONS :</a></h3>
+<p>
+</p>
+<h4><a name="svd">--svd</a></h4>
+<p>Reduces the feature space dimensions by performing Singular Value Decomposition
+(SVD). By default, all feature dimensions are retained.</p>
+<p>
+</p>
+<h4><a name="k_k">--k K</a></h4>
+<p>Reduces the dimensions of the feature space to K. Default K = 300</p>
+<p>
+</p>
+<h4><a name="rf_rf">--rf RF</a></h4>
+<p>Specifies the scaling factor for reducing feature space dimensions such that
+feature space with N dimensions is reduced down to N/RF. Default RF = 4.
+RF should be an integer greater than 1.</p>
+<p>If both --k and --rf are specified, dimensions are reduced to min(k,N/RF).</p>
+<pre>
+ Note: If the reduced dimensions ( min(k,N/RF) ) turn-out to be less than 
+       or equal to 10 then svd is not performed.</pre>
+<p>
+</p>
+<h4><a name="iter_i">--iter I</a></h4>
+<p>Specifies the number of iterations of SVD. Recommended value is 3 times 
+the desired K.</p>
+<p>
+</p>
+<h3><a name="clusterstopping_options_">CLUSTER-STOPPING OPTIONS:</a></h3>
+<p>
+</p>
+<h4><a name="cluststop_cs">--cluststop CS</a></h4>
+<p>Specifies the cluster stopping measure to be used to predict the number
+the number of clusters.</p>
+<pre>
+   The possible option values:
+   pk1 - Use PK1 measure [ PK1[m] = (crfun[m] - mean(crfun[1...deltaM]))/std(crfun[1...deltaM])) ]
+   pk2 - Use PK2 measure [ PK2[m] = (crfun[m]/crfun[m-1]) ]
+   pk3 - Use PK3 measure [ PK3[m] = ((2 * crfun[m])/(crfun[m-1] + crfun[m+1])) ]
+   gap - Use Adapted Gap Statistic. 
+   pk  - Use all the PK measures.
+   all - Use all the four cluster stopping measures.</pre>
+<p>More about these measures can be found in the documentation of 
+Toolkit/clusterstop/clusterstopping.pl</p>
+<p>NOTE: Options --cluststop and --clusters (described under Clustering options) cannot be used together.</p>
+<p>
+</p>
+<h4><a name="delta_int">--delta INT</a></h4>
+<p>NOTE: Delta value can only be a positive integer value.</p>
+<p>Specify 0 to stop the iterating clustering process when two consecutive crfun values 
+are exactly equal. This is the default setting when the crfun values are integer/whole numbers.</p>
+<p>Specify non-zero positive integer to stop the iterating clustering process when the difference 
+between two consecutive crfun values is less than or equal to this value. However, note that the
+integer value specified is internally shifted to capture the difference in the least significant 
+digit of the crfun values when these crfun values are fractional.
+ For example: 
+    For crfun = 1.23e-02 &amp; delta = 1 will be transformed to 0.0001
+    For crfun = 2.45e-01 &amp; delta = 5 will be transformed to 0.005
+The default delta value when the crfun values are fractional is 1.</p>
+<p>However if the crfun values are integer/whole numbers (exponent &gt;= 2) then the specified delta 
+value is internally shifted only until the least significant digit in the scientific notation.
+ For example: 
+    For crfun = 1.23e+04 &amp; delta = 2 will be transformed to 200
+    For crfun = 2.45e+02 &amp; delta = 5 will be transformed to 5
+    For crfun = 1.44e+03 &amp; delta = 1 will be transformed to 10</p>
+<p>
+</p>
+<h4><a name="threspk1_num">--threspk1 NUM</a></h4>
+<p>Specifies the threshold value that should be used by the PK1 measure to predict the k value. 
+Default = -0.7</p>
+<p>NOTE: This option should be used only when --cluststop option is also used
+with option value of ``all'' or ``pk1''.</p>
+<p>
+</p>
+<h3><a name="clusterstopping__adapted_gap_statistic_options_">CLUSTER-STOPPING: ADAPTED GAP STATISTIC OPTIONS:</a></h3>
+<p>
+</p>
+<h4><a name="b_num">--B NUM</a></h4>
+<p>The number of replicates/references to be generated.
+Default: 1</p>
+<p>
+</p>
+<h4><a name="typeref_typ">--typeref TYP</a></h4>
+<p>Specifies whether to generate B replicates from a reference or to generate 
+B references.</p>
+<p>The possible option values:
+      rep - replicates [Default]
+      ref - references</p>
+<p>
+</p>
+<h4><a name="percentage_num">--percentage NUM</a></h4>
+<p>Specifies the percentage confidence to be reported in the log file.
+Since Gap Statistic uses parametric bootstrap method for reference distribution
+generation, it is critical to understand the interval around the sample mean that
+could contain the population (``true'') mean and with what certainty.
+Default: 90</p>
+<p>
+</p>
+<h4><a name="seed_num">--seed NUM</a></h4>
+<p>The seed to be used with the random number generator. 
+Default: No seed is set.</p>
+<p>
+</p>
+<h3><a name="clustering_options__">CLUSTERING OPTIONS :</a></h3>
+<p>
+</p>
+<h4><a name="clusters_n">--clusters N</a></h4>
+<p>Specifies number of clusters to be created. Default is set to 2.</p>
+<p>
+</p>
+<h4><a name="space_space">--space SPACE</a></h4>
+<p>Specifies whether clustering is to be performed in vector or similarity space.
+Set the value of SPACE to 'vector' to perform clustering in vector space i.e.
+to cluster the context vectors directly. To cluster in similarity space
+by explicitly finding the pair-wise similarities among the contexts,
+set SPACE to 'similarity'.</p>
+<p>By default, clustering is performed in vector space.</p>
+<p>
+</p>
+<h4><a name="clmethod_cl">--clmethod CL</a></h4>
+<p>Specifies the clustering method.</p>
+<p>Possible option values are :</p>
+<pre>
+        rb - Repeated Bisections [Default]
+        rbr - Repeated Bisections for by k-way refinement
+        direct - Direct k-way clustering
+        agglo  - Agglomerative clustering
+        graph  - Graph partitioning-based clustering
+        bagglo - Partitional biased Agglomerative clustering</pre>
+<p>For large amount of data, 'rb', 'rbr' or 'direct' are recommended.</p>
+<p>
+</p>
+<h4><a name="crfun_cr">--crfun CR</a></h4>
+<p>Selects the criteria function for Clustering. The meanings of these criteria
+functions are explained in Cluto's manual.</p>
+<p>The possible values are:</p>
+<pre>
+        i1      -  I1  Criterion function
+        i2      -  I2  Criterion function [default for partitional]
+        e1      -  E1  Criterion function
+        g1      -  G1  Criterion function
+        g1p     -  G1' Criterion function
+        h1      -  H1  Criterion function
+        h2      -  H2  Criterion function
+        slink   -  Single link merging scheme
+        wslink  -  Single link merging scheme weighted w.r.t. cluster sim
+        clink   -  Complete link merging scheme
+        wclink  -  Complete link merging scheme weighted w.r.t. cluster sim
+        upgma   -  Group average merging scheme [default for agglomerative]</pre>
+<p>Note that for cluster stopping, i1, i2, e1, h1 and h2 criterion functions 
+can only be used. If a crfun other than these is selected then cluster 
+stopping uses the default crfun (i2) while the final clustering of contexts
+is performed using the crfun specified.</p>
+<p>
+</p>
+<h4><a name="sim_sim">--sim SIM</a></h4>
+<p>Specifies the similarity measure to be used for either vector or similarity
+space clustering.</p>
+<p>When --space = vector (or default), possible values of SIM are :</p>
+<pre>
+        cos      -  Cosine [default]
+        corr     -  Correlation Coefficient
+        dist     -  Euclidean distance
+        jacc     -  Extended Jaccard Coefficient</pre>
+<p>When --space = similarity and --binary is ON, possible values of SIM are -</p>
+<pre>
+        cos     - Cosine [default]
+        mat     - Match
+        jac     - Jaccard
+        ovr     - Overlap
+        dic     - Dice</pre>
+<p>Otherwise, only cosine measure is available and is default.</p>
+<p>The following table summarizes availability of similarity measures
+for 2 clustering approaches - <code>vector(vcl)</code> and <code>similarity(scl)</code> and
+on 2 different types of context vectors - binary Vs frequency</p>
+<pre>
+        vcl+bin         vcl+freq        scl+bin         scl+freq
+ cos     Y               Y               Y               Y
+ mat     N               N               Y               N
+ jacc    Y               Y               Y               N
+ dice    N               N               Y               N
+ ovr     N               N               Y               N
+ dist    Y               Y               N               N
+ corr    Y               Y               N               N</pre>
+<p>The reasons are purely implementation issues and in future, we plan to support
+more consistent measures across these combinations.</p>
+<p>
+</p>
+<h4><a name="rowmodel_rmod">--rowmodel RMOD</a></h4>
+<p>The option is used to specify the model to be used to scale every 
+column of each row. (For further details please refer Cluto manual)</p>
+<p>The possible values for RMOD -
+        none  -  no scaling is performed (default setting)
+        maxtf -  post scaling the values are between 0.5 and 1.0
+        sqrt  -  square-root of actual values
+        log   -  log of actual values</p>
+<p>
+</p>
+<h4><a name="colmodel_cmod">--colmodel CMOD</a></h4>
+<p>The option is used to specify the model to be used to (globally) scale each 
+column across all rows. (For further details please refer Cluto manual)</p>
+<p>The possible values for CMOD -
+        none  -  no scaling is performed (default setting)
+        idf   -  scaling according to inverse-document-frequency</p>
+<p>
+</p>
+<h3><a name="labeling_options__">LABELING OPTIONS :</a></h3>
+<p>Note: Labeling options cannot be used with word-clustering (--wordclust).</p>
+<p>
+</p>
+<h4><a name="label_stop_label_stopfile">--label_stop LABEL_STOPFILE</a></h4>
+<p>A file of Perl regexes that define the stop list of words to be 
+excluded from the features.</p>
+<p>LABEL_STOPFILE could be specified with two modes -</p>
+<p>AND mode - declared by including '@stop.mode=AND' on the first line of the
+LABEL_STOPFILE
+         - ignores word pairs in which both words are stop words.</p>
+<p>OR mode - declared by including '@stop.mode=OR' on the first line of the
+LABEL_STOPFILE
+        - ignores word pairs in which either word is a stop word.</p>
+<p>Default is OR.</p>
+<p>
+</p>
+<h4><a name="label_remove_label_n">--label_remove LABEL_N</a></h4>
+<p>Removes bigrams that occur less than LABEL_N times.</p>
+<p>
+</p>
+<h4><a name="label_window_label_w">--label_window LABEL_W</a></h4>
+<p>Specifies the window size for bigrams. Pairs of words that co-occur 
+within the specified window from each other (window LABEL_W allows at most
+LABEL_W-2 intervening words) will form the bigram features. 
+Default window size is 2 which allows only consecutive word pairs.</p>
+<p>
+</p>
+<h4><a name="label_stat_label_stat">--label_stat LABEL_STAT</a></h4>
+<p>Specifies the statistical scores of association.</p>
+<p>Available tests of association are :</p>
+<pre>
+        dice            -       Dice Coefficient
+        ll              -       Log Likelihood Ratio
+        odds            -       Odds Ratio
+        phi             -       Phi Coefficient
+        pmi             -       Point-Wise Mutual Information
+        tmi             -       True Mutual Information
+        x2              -       Chi-Squared Test
+        tscore          -       T-Score
+        leftFisher      -       Left Fisher's Test
+        rightFisher     -       Right Fisher's Test</pre>
+<p>
+</p>
+<h4><a name="label_rank_label_r">--label_rank LABEL_R</a></h4>
+<p>Word pairs ranking below LABEL_R when arranged in descending order of 
+their test scores are ignored.</p>
+<p>
+</p>
+<h3><a name="other_options__">Other Options :</a></h3>
+<p>
+</p>
+<h4><a name="eval">--eval</a></h4>
+<p>Evaluates clustering performance by computing precision and recall for maximally
+accurate assignment of sense tags to clusters. Maximal Assignment is when
+clusters are given sense labels such that maximum number of instances will be
+attached with their true sense tags.</p>
+<p>TEST instances tagged with multiple senses are automatically attached with the 
+single sense-tag that is the most frequent among the attached tags.</p>
+<p>Note: This option can be used only if the answer tags are provided in the TEST file.</p>
+<p>
+</p>
+<h4><a name="rank_filter_r">--rank_filter R</a></h4>
+<p>Allows to remove low frequency senses during evaluation. This will
+remove the senses that rank below R when senses in TEST are arranged
+in the descending order of their frequencies. In other words, it
+selects top R most frequent senses. An instance will be removed if
+it has all sense tags below rank R.</p>
+<p>
+</p>
+<h4><a name="percent_filter_p">--percent_filter P</a></h4>
+<p>Allows to remove low frequency senses based on their percentage
+frequencies. This will remove senses whose frequency is below P%
+in the TEST data.</p>
+<p>If rank or percent filters are specified, they are applied after removing
+the multiple sense tags.</p>
+<p>
+</p>
+<h4><a name="help">--help</a></h4>
+<p>Displays the quick summary of program options.</p>
+<p>
+</p>
+<h4><a name="version">--version</a></h4>
+<p>Displays the version information.</p>
+<p>
+</p>
+<h4><a name="verbose">--verbose</a></h4>
+<p>Displays to STDERR the current program status.</p>
+<p>
+</p>
+<h4><a name="showargs">--showargs</a></h4>
+<p>Displays to STDOUT values of compulsory and required parameters.
+[NOT SUPPORTED IN THIS VERSION]</p>
+<p>
+</p>
+<hr />
+<h1><a name="output">OUTPUT</a></h1>
+<p>discriminate.pl creates several output files. The discrimination of contexts 
+performed by discriminate.pl, (i.e., a cluster assigned to each context) is given
+by the file $PREFIX.clusters if the number of clusters was set manually, otherwise
+by the file $PREFIX.clusters.$CLUSTSTOP where the $CLUSTSTOP specifies the cluster
+stopping measure that was used to predict the number of clusters.</p>
+<p>In addition, discriminate.pl also creates following files:</p>
+<p>NOTE: If a cluster stopping measure was used then it is indicated in the names of
+several output files by appending the cluster stopping measure name with the
+file name. Represented below as filename[.$CLUSTSTOP]</p>
+<ul>
+<li><strong><a name="item__24prefix_2eclusters_context_5b_2e_24cluststop_5d_">$PREFIX.clusters_context[.$CLUSTSTOP] - File containing all the input instances grouped by the cluster-id assigned to them.</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_5b_2e_24cluststop_5d_2ecluster_2ecluster">$PREFIX[.$CLUSTSTOP].cluster.CLUSTERID - All the identified clusters and their instances are separated into different files. The filenames end with the cluster-id. e.g.: File containing instances of cluster 0 will be named as $PREFIX.cluster.0</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2ereport_5b_2e_24cluststop_5d__2d_confus">$PREFIX.report[.$CLUSTSTOP] - Confusion table if --eval is ON</a></strong><br />
+</li>
+<li><strong><a name="item_labels">$PREFIX.cluster_labels[.$CLUSTSTOP] - List of labels (word-pairs) assigned to each cluster.</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_5b_2e_24cluststop_5d_2edendogram_2eps__2">$PREFIX[.$CLUSTSTOP].dendogram.ps - Dendograms + some information.</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2efeatures__2d_features_file">$PREFIX.features - Features file</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2eregex__2d_file_containing_regular_expr">$PREFIX.regex - File containing regular expressions for identifying
+the features listed in $PREFIX.features file.</a></strong><br />
+</li>
+<li><strong><a name="item_mode">$PREFIX.testregex - File containing only those regular expressions from 
+the $PREFIX.regex file above, which match at least once in the test contexts, 
+only created in second order context clustering mode (SC native as well as LSA)
+and LSA feature clustering mode</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2ewordvec__2d_word_vectors_if__2d_2dcont">$PREFIX.wordvec - Word Vectors if --context = o2</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2evectors__2d_context_vectors">$PREFIX.vectors - Context Vectors</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2erlabel__2d_row_labels_of__24prefix_2ev">$PREFIX.rlabel - Row Labels of $PREFIX.vectors</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2eclabel__2d_column_labels_of__24prefix_">$PREFIX.clabel - Column Labels of $PREFIX.vectors</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2erclass__2d_class_ids_of__24prefix_2eve">$PREFIX.rclass - Class Ids of $PREFIX.vectors if --eval is ON</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2ecluster_solution_5b_2e_24cluststop_5d_">$PREFIX.cluster_solution[.$CLUSTSTOP] - Cluster ids of $PREFIX.vectors</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2ecluster_output_5b_2e_24cluststop_5d__2">$PREFIX.cluster_output[.$CLUSTSTOP] - Clustering program output</a></strong><br />
+</li>
+</ul>
+<p>
+</p>
+<h3><a name="cluster_stopping_related_output_files_">Cluster Stopping related output files:</a></h3>
+<ul>
+<li><strong><a name="item__24prefix_2epk1__2d_crfun_5bk_5d_values_2c_delta_v">$PREFIX.pk1 - crfun[k] values, delta values, PK1[k] values and predicted k value</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2epk2__2d_crfun_5bk_5d_values_2c_delta_v">$PREFIX.pk2 - crfun[k] values, delta values, PK2[k] values and predicted k value</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2epk3__2d_crfun_5bk_5d_values_2c_delta_v">$PREFIX.pk3 - crfun[k] values, delta values, PK3[k] values and predicted k value</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2egap__2d_crfun_5bk_5d_values_2c_delta_v">$PREFIX.gap - crfun[k] values, delta values and predicted k value</a></strong><br />
+</li>
+<li><strong><a name="item_gap">$PREFIX.gap.log - Gap(k), Obs(crfun(k)), <a href="#item_exp"><code>Exp(crfun(k))</code></a> values etc.</a></strong><br />
+</li>
+</ul>
+<p>
+</p>
+<h3><a name="the_following_files_are_created_to_facilitate_creation_of_plots__if_needed_">The following files are created to facilitate creation of plots, if needed:</a></h3>
+<ul>
+<li><strong><a name="item__24prefix_2ecr_2edat__2d_value_2dpairs__3a_2d_k_2d">$PREFIX.cr.dat - value-pairs :- k-value crfun-value</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2epk1_2edat__2d_value_2dpairs__3a_2d_k_2">$PREFIX.pk1.dat - value-pairs :- k-value PK1[k] value</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2epk2_2edat__2d_value_2dpairs__3a_2d_k_2">$PREFIX.pk2.dat - value-pairs :- k-value PK2[k] value</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2epk3_2edat__2d_value_2dpairs__3a_2d_k_2">$PREFIX.pk3.dat - value-pairs :- k-value PK3[k] value</a></strong><br />
+</li>
+<li><strong><a name="item__24prefix_2egap_2edat__2d_value_2dpairs__3a_2d_k_2">$PREFIX.gap.dat - value-pairs :- k-value Gap[k] value</a></strong><br />
+</li>
+<li><strong><a name="item_exp">$PREFIX.exp.dat - value-pairs :- k-value <code>Exp(crfun[k])</code> value</a></strong><br />
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<pre>
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu</pre>
+<pre>
+ Amruta Purandare, University of Pittsburgh</pre>
+<pre>
+ Anagha Kulkarni, Carnegie-Mellon University</pre>
+<pre>
+ Mahesh Joshi, Carnegie-Mellon Unversity</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2002-2008, Ted Pedersen, Amruta Purandare, Anagha Kulkarni, Mahesh Joshi</p>
+<p>This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.</p>
+<p>This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License along with
+this program; if not, write to</p>
+<pre>
+ The Free Software Foundation, Inc.,
+ 59 Temple Place - Suite 330,
+ Boston, MA  02111-1307, USA.</pre>
+
+</body>
+
+</html>

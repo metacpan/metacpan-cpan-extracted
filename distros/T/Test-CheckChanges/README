@@ -1,0 +1,96 @@
+NAME
+    Test::CheckChanges - Check that the Changes file matches the
+    distribution.
+
+VERSION
+    Version 0.14
+
+SYNOPSIS
+     use Test::CheckChanges;
+     ok_changes();
+
+    You can make the test optional with
+
+     use Test::More;
+     eval { require Test::CheckChanges };
+
+     if ($@) {
+         plan skip_all => 'Test::CheckChanges required for testing the Changes file';
+     }
+     ok_changes();
+
+DESCRIPTION
+    This module checks that you *Changes* file has an entry for the current
+    version of the Module being tested.
+
+    The version information for the distribution being tested is taken out
+    of the Build data, or if that is not found, out of the Makefile.
+
+    It then attempts to open, in order, a file with the name *Changes* or
+    *CHANGES*.
+
+    The *Changes* file is then parsed for version numbers. If one and only
+    one of the version numbers matches the test passes. Otherwise the test
+    fails.
+
+    A message with the current version is printed if the test passes,
+    otherwise dialog messages are printed to help explain the failure.
+
+    The *examples* directory contains examples of the different formats of
+    *Changes* files that are recognized.
+
+FUNCTIONS
+    All functions listed below are exported to the calling namespace.
+
+  ok_changes( )
+        The ok_changes method takes no arguments and returns no value.
+
+CHANGES FILE FORMAT
+    Currently this package parses 4 different types of `Changes' files. The
+    first is the common, free style, `Changes' file where the version is
+    first item on an unindented line:
+
+     0.01  Fri May  2 15:56:25 EDT 2008
+           - more info  
+
+    The second type of file parsed is the Module::Changes::YAML format
+    changes file.
+
+    The third type of file parsed has the version number proceeded by an *
+    (asterisk).
+
+     Revision history for Perl extension Foo::Bar
+
+     * 1.00
+
+     Is this a bug or a feature
+
+    The fourth type of file parsed starts the line with the word Version
+    followed by the version number.
+
+     Version 6.00  17.02.2008
+      + Oops. Fixed version number. '5.10' is less than '5.9'. I thought
+        CPAN would handle this but apparently not..
+
+    There are examples of these Changes file in the *examples* directory.
+
+    Create an RT if you need a different format file supported. If it is not
+    horrid, I will add it.
+
+    The Debian style `Changes' file will likely be the first new format
+    added.
+
+BUGS
+    Please open an RT if you find a bug.
+
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Test-CheckChanges
+
+AUTHOR
+    "G. Allen Morris III" <gam3@gam3.net>
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2008-2010 G. Allen Morris III, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

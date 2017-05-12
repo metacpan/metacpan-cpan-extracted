@@ -1,0 +1,26 @@
+Revision history for Perl extension Test::Mock::Furl
+
+0.05    Fri Jul 26 22:26:04 JST 2013
+        - added mock test for some http methods
+
+0.04    Sat Jun  8 01:10:08 JST 2013
+    [NO CODE CHANGES]
+        - support Win32
+
+0.03    Thu Jun  6 09:17:35 JST 2013
+    [NO CODE CHANGES]
+        - switched back to Test::AllModules
+        - added deoendent module in Build.PL
+
+0.02    Tue Jun  4 09:47:19 JST 2013
+        - fixed broken tests
+        - Furl has been required
+
+0.01    Sun Jun  2 20:05:14 JST 2013
+        - support to mock Furl::HTTP as $Mock_furl_http
+        - sorted tests
+        - use tricks package for PAUSE
+        - etc
+
+0.000001 Sun Jun  2 14:10:13 JST 2013
+        - original version

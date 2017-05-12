@@ -1,0 +1,24 @@
+Revision history for Perl extension Text-Pipe-HTML
+
+1.100880  2010-03-29 23:39:13 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.03  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.02  Thu, 29 May 2008 12:08:53 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Added documentation
+    - Fixed inheritance
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install()
+    - updated MANIFEST
+    - updated t/perlcriticrc
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+    - tags: BUGFIX
+
+0.01  Sun, 11 Nov 2007 21:22:56 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

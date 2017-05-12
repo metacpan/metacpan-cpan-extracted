@@ -1,0 +1,1 @@
+&~ for (@{ $_{users} }) { ~&#~ render('hello_user.txt', user=>$_) ~#&~ } ~&

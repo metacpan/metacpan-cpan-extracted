@@ -1,0 +1,94 @@
+{
+   "abstract" : "Block and stub specified URL for LWP",
+   "author" : [
+      "Asato Wakisaka <asato.wakisaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-WWW-Stub",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Guard" : "0",
+            "LWP::Protocol::PSGI" : "0",
+            "List::MoreUtils" : "0",
+            "Plack::Request" : "0",
+            "Test::More" : "0.98",
+            "URI" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::UserAgent" : "0",
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::Tester" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::WWW::Stub" : {
+         "file" : "lib/Test/WWW/Stub.pm",
+         "version" : "0.07"
+      },
+      "Test::WWW::Stub::Handler" : {
+         "file" : "lib/Test/WWW/Stub/Handler.pm"
+      },
+      "Test::WWW::Stub::Intercepter" : {
+         "file" : "lib/Test/WWW/Stub/Intercepter.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/astj/p5-Test-WWW-Stub/issues"
+      },
+      "homepage" : "https://github.com/astj/p5-Test-WWW-Stub",
+      "repository" : {
+         "url" : "git://github.com/astj/p5-Test-WWW-Stub.git",
+         "web" : "https://github.com/astj/p5-Test-WWW-Stub"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "aereal <aereal@aereal.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Takumi Akiyama <t.akiym@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

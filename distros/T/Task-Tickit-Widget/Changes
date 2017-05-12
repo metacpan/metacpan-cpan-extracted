@@ -1,0 +1,31 @@
+0.05 2016-02-23T14:23:27+01:00
+ - Update Tickit::Widget::Choice to 0.02 version.
+ - Update Tickit::Widget::ScrollBox to 0.07 version.
+ - Update Tickit::Widget::Scroller to 0.22 version.
+ - Update Tickit::Widgets to 0.22 version.
+
+0.04 2015-10-30T08:48:31+01:00
+ - Move author tests to xt/ directory.
+ - Remove Tickit dependency, there are no widgets now.
+ - Update Tickit::Widget::SegmentDisplay to 0.04 version.
+ - Update Tickit::Widgets to 0.21 version.
+
+0.03 2015-08-25T00:19:59+02:00
+ - Add Tickit::Widget::Scroller 0.19 version.
+ - Improve SEE ALSO section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update Tickit to 0.53 version.
+ - Update Tickit::Widget::FloatBox to 0.03 version.
+ - Update Tickit::Widget::ScrollBox to 0.06 version.
+ - Update Tickit::Widget::SparkLine to 0.105 version.
+ - Update Tickit::Widget::Tabbed to 0.19 version.
+ - Update Tickit::Widgets to 0.20 version.
+
+0.02 2015-04-20T12:34:07+02:00
+ - Add Tickit::Widget::Figlet 0.003 version.
+ - Add Tickit::Widget::Term 0.002 version.
+ - Update Module::Install to 1.15 version.
+ - Update Tickit::Widget::Tabbed to 0.18 version.
+
+0.01 2015-02-12T19:29:24+01:00
+ - First version

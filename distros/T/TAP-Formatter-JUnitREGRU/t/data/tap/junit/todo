@@ -1,0 +1,22 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="1"
+             tests="5"
+             name="data_tap_todo">
+    <testcase name="1"></testcase>
+    <testcase name="2">
+      <error type="TodoTestSucceeded" message=""><![CDATA[ok 2 # TODO ]]></error>
+    </testcase>
+    <testcase name="3"></testcase>
+    <testcase name="4"></testcase>
+    <testcase name="5"></testcase>
+    <system-out><![CDATA[1..5 todo 3 2;
+ok 1
+ok 2
+not ok 3
+ok 4
+ok 5
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

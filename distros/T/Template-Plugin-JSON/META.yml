@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-JSON
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  JSON: '2.12'
+  Moose: '0'
+  Template: '2.20'
+  perl: '5.006'
+resources:
+  repository: https://github.com/neilb/Template-Plugin-JSON.git
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

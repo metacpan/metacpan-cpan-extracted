@@ -1,0 +1,36 @@
+---
+abstract: 'Flexible and prowerful class and object mocking library for perl'
+author:
+  - 'Dave Mueller <dave@perljedi.com>'
+build_requires:
+  Data::Dumper: '0'
+  Test::Fatal: '0'
+  Test::Spec: '0'
+  metaclass: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mock-Wrapper
+requires:
+  Carp: '0'
+  Clone: '0'
+  Exporter: '0'
+  Module::Runtime: '0'
+  Scalar::Util: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  base: '0'
+  lib: '0'
+  perl: v5.18.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/perljedi/test-mock-wrapper
+  repository: https://github.com/perljedi/test-mock-wrapper.git
+version: '0.18'

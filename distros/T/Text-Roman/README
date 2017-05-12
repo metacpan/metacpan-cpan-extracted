@@ -1,0 +1,129 @@
+NAME
+    Text::Roman - Allows conversion between Roman and Arabic algarisms.
+
+VERSION
+    version 3.5
+
+SYNOPSIS
+        #!/usr/bin/env perl
+        use strict;
+        use warnings;
+        use Text::Roman qw(:all);
+
+        print int2roman(123), "\n";
+
+        my $roman = "XXXV";
+        print roman2int($roman), "\n" if isroman($roman);
+
+        my $milhar = 'L_X_XXIII'; # = 60,023
+        print milhar2int($milhar), "\n" if ismilhar($milhar);
+
+DESCRIPTION
+    This package supports both conventional Roman algarisms (which range
+    from *1* to *3999*) and Milhar Romans, a variation which uses a bar
+    across the algarism to indicate multiplication by *1_000*. For the
+    purposes of this module, acceptable syntax consists of an underscore
+    suffixed to the algarism e.g. IV_V = *4_005*. The term Milhar apparently
+    derives from the Portuguese word for "thousands" and the range of this
+    notation extends the range of Roman numbers to *3999 * 1000 + 3999 =
+    4_002_999*.
+
+    Note: the functions in this package treat Roman algarisms in a
+    case-insensitive manner such that "VI" == "vI" == "Vi" == "vi".
+
+    The following functions may be imported into the caller package by name:
+
+FUNCTIONS
+  isroman
+    Tests a string to be a valid Roman algarism. Returns a boolean value.
+
+  int2roman
+    Converts an integer expressed in Arabic numerals, to its corresponding
+    Roman algarism. If the integer provided is out of the range expressible
+    in Roman notation, an *undef* is returned.
+
+  roman2int
+    Does the converse of "int2roman", converting a Roman algarism to its
+    integer value.
+
+  ismilhar
+    Determines whether a string qualifies as a Milhar Roman algarism.
+
+  milhar2int
+    Converts a Milhar Roman algarism to an integer.
+
+  ismroman/mroman2int/roman
+    These functions belong to the module's old interface and are considered
+    deprecated. Do not use them in new code and they will eventually be
+    discontinued; they map as follows:
+
+    *   ismroman => ismilhar
+
+    *   mroman2int => milhar2int
+
+    *   roman => int2roman
+
+CHANGES
+    Some changes worth noting from this module's previous incarnation:
+
+    *namespace imports*
+        The call to use must now explicitly request function names imported
+        into it's namespace.
+
+    *argument defaults/void context*
+        All functions now will operate on $_ when no arguments are passed,
+        and will set $_ when called in a void context. This allows for
+        writing code like:
+
+            @x = qw/V III XI IV/;
+            roman2int() for @x;
+            print join("-", @x);
+
+        instead of the uglier:
+
+            @x = qw/V III XI IV/;
+            $_ = roman2int($_) for @x;
+            print join("-", @x);
+
+SPECIFICATION
+    Roman algarisms may be described using the following BNF-like formula:
+
+        a   = I{1,3}
+        b   = V\a?|IV|\a
+        e   = X{1,3}\b?|X{0,3}IX|\b
+        ee  = IX|\b
+        f   = L\e?|XL\ee?|\e
+        g   = C{1,3}\f?|C{0,3}XC\ee?|\f
+        gg  = XC\ee?|\f
+        h   = D\g?|CD\gg?|\g
+        j   = M{1,3}\h?|M{0,3}CM\gg?|\h
+
+REFERENCES
+    For a description of the Roman numeral system see:
+    <http://www.novaroma.org/via_romana/numbers.html>. A reference to Milhar
+    Roman alagarisms (in Portuguese) may be found at:
+    <http://web.archive.org/web/20020819094718/http://www.estado.com.br/reda
+    c/norn-nro.html>.
+
+ACKNOWLEDGEMENTS
+    This module was originally written by Peter de Padua Krauss and
+    submitted to CPAN by Stanislaw Pusep <https://metacpan.org/author/SYP>
+    who has relinquished control to Erick Calder
+    <https://metacpan.org/author/ECALDER> since the original author has
+    never maintained it and can no longer be reached.
+
+    Erick have completely rewritten the module, implementing simpler
+    algorithms to perform the same functionality, adding a test suite, a
+    Changes file, etc. and providing more comprehensive documentation.
+
+    Ten years later, Stanislaw returned as a maintainer.
+
+AUTHOR
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2003 by Erick Calder <ecalder@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

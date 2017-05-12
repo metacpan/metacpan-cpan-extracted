@@ -1,0 +1,67 @@
+---
+abstract: 'Enables Test::Base to use subtest'
+author:
+  - 'Hiroki Honda <cside.story@gmail.com>'
+build_requires:
+  Test::FailWarnings: 0
+  Test::Memory::Cycle: 0
+  Test::More: 0.98
+  Test::Name::FromLine: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Base-SubTest
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Base::SubTest:
+    file: lib/Test/Base/SubTest.pm
+    version: 0.5
+  Text::TestBase::SubTest:
+    file: lib/Text/TestBase/SubTest.pm
+    version: 0.5
+  Text::TestBase::SubTest::Node:
+    file: lib/Text/TestBase/SubTest/Node.pm
+  Text::TestBase::SubTest::Node::Block:
+    file: lib/Text/TestBase/SubTest/Node/Block.pm
+  Text::TestBase::SubTest::Node::Root:
+    file: lib/Text/TestBase/SubTest/Node/Root.pm
+  Text::TestBase::SubTest::Node::SubTest:
+    file: lib/Text/TestBase/SubTest/Node/SubTest.pm
+requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Carp: 0
+  Class::Accessor::Lite: 0
+  Data::Dumper: 0
+  Digest::MD5: 0
+  Exporter: 0
+  File::Basename: 0
+  File::Spec: 0
+  Module::Build: 0
+  Project::Libs: 0
+  Scalar::Util: 0
+  Test::Base::Less: 0
+  Test::Builder::Module: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/Cside/Test-Base-SubTest/issues
+  homepage: https://github.com/Cside/Test-Base-SubTest
+  repository: git://github.com/Cside/Test-Base-SubTest.git
+version: 0.5

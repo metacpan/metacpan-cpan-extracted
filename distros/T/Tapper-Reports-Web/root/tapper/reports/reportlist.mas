@@ -1,0 +1,127 @@
+<%args>
+    %reportlist
+    $mark_report_id => 0
+</%args>
+% # ----------------------------------------------------------------------
+<%method single_report>
+  <%args>
+  $report
+  $just_group_member => 0
+  $mark_report_id    => 0
+  </%args>
+%               my $full_width   = 50;
+%               my $green_width  = sprintf("%d",        ($report->{success_ratio}||0)  * $full_width / 100);
+%               my $red_width    = sprintf("%d", $full_width - $green_width);
+%               my $successgrade = $report->{successgrade} ? $report->{successgrade} : 'UNKNOWN';
+%               my $class_attr   = $just_group_member ? ' class="justgroupmember"' : '';
+%               if ($mark_report_id == $report->{id}) {
+%                       if ($class_attr) {
+%                               $class_attr =~ s/( class=".*)"/$1 highlight"/;          # "
+%                       } else {
+%                               $class_attr = ' class="highlight"';
+%                       }
+%               }
+%               my $dimmed       = $just_group_member ? '_dimmed' : '';
+                <tr<% $class_attr | n %>>
+                        <td class="reportid">
+%                         if (not $just_group_member) {
+                              <b>
+%                         }
+                          <a title="Click to show details" href="/tapper/reports/id/<% $report->{id} %>">r<% $report->{id} %></a>
+%                         if (not $just_group_member) {
+                              </b>
+%                         }
+%#                          a<% $report->{reportgroup_arbitrary_id} || '' %>
+%#                          t<% $report->{reportgroup_testrun_id} || '' %>
+                        </td>
+                        <td><% $report->{created_at_ymd_hm} %></td>
+                        <td><a title="Add <% $report->{suite_name} %> to filter" href="/<% $c->req->path %>/suite/<% $report->{suite_name} %>">
+                            <img src="/tapper/static/images/plus.png" size="16"></a>
+                            <a title="Click to show reports of suite '<% $report->{suite_name} %>'" href="/tapper/reports/suite/<% $report->{suite_name} %>">
+                            <% $report->{suite_name} %></a>
+                        </td>
+                        <td><a title="Add <% $report->{machine_name} %> to filter" href="/<% $c->req->path %>/host/<% $report->{machine_name} %>">
+                            <img src="/tapper/static/images/plus.png" size="16"></a>
+                            <a title="Click to show reports on '<% $report->{machine_name} %>' <% $report->{peeraddr} ? '(reported from ip '.$report->{peeraddr} .')' : ''%>" href="/tapper/reports/host/<% $report->{machine_name} %>">
+                            <% $report->{machine_name} %></a>
+                        </td>
+                        <td class="<% lc $successgrade %>">
+                          <a title="Add <% $successgrade %> to filter" href="/<% $c->req->path %>/success/<% $successgrade %>">
+                            <img src="/tapper/static/images/plus.png" size="16"></a>
+                          <a href="/tapper/reports/success/<% $successgrade %>"><% $successgrade %></a>
+                        </td>
+                        <td>
+                                  <a href="/tapper/reports/id/<% $report->{id} %>" title="<% $report->{success_ratio} || '' %>% - Click to show details">
+% if ( $report->{parse_errors} ) {
+                                  <img src="/tapper/static/images/grey_bar.png" height="16" width="50">
+% } else {
+                                  <img src="/tapper/static/images/green_bar<% $dimmed %>.png" height="16" width="<% $green_width %>"><img src="/tapper/static/images/red_bar<% $dimmed %>.png" height="16" width="<% $red_width %>">
+% }
+                                  </a>
+                        </td>
+                        <td>
+%                                 if (not $just_group_member) {
+%                                        if ($report->{rga_id}) {
+                                               <% $report->{rga_id} %>
+%                                        }
+%                                        if ($report->{rgt_id}) {
+                                               <a href="/tapper/testruns/id/<% $report->{rgt_id} %>">testrun <% $report->{rgt_id} %></a><% ($report->{testrunscheduling_status} && $report->{testrunscheduling_status} ne 'finished') ? " (".$report->{testrunscheduling_status}.")" : "" %>
+%                                        }
+%                         }
+                        </td>
+                        <td>
+% if ($report->{owner}){
+<a title="Add <% $report->{owner} %> to filter" href="/<% $c->req->path %>/owner/<% $report->{owner} %>">
+                            <img src="/tapper/static/images/plus.png" size="16"></a>
+                            <a title="Click to show reports of owner '<% $report->{owner} %>'" href="/tapper/reports/owner/<% $report->{owner} %>">
+                            <% $report->{owner} %></a>
+% }
+                        </td>
+                </tr>
+</%method>
+% # ----------------------------------------------------------------------
+% my @reports = @{$reportlist{reports}};
+% my @ids = map { $_->{id} } @reports;
+% my %rga = %{$reportlist{rga}};
+% my %rgt = %{$reportlist{rgt}};
+% if (@reports) {
+    <table class="reportlist">
+        <thead>
+                <tr>
+                         <th class="reportid">ID</th>
+                         <th>DateTime (GMT)</th>
+                         <th>Suite</th>
+                         <th>Machine</th>
+                         <th>Success</th>
+                         <th>Ratio</th>
+                         <th>Grouped by</th>
+                         <th>Owner</th>
+                </tr>
+        </thead>
+        <tbody>
+%   foreach my $report (@reports) {
+%       my $rga_id = $report->{rga_id};
+%       my $rgt_id = $report->{rgt_id};
+%       my $rga_primary = $report->{rga_primary};
+%       my $rgt_primary = $report->{rgt_primary};
+%       # the lead report
+        <& SELF:single_report, report => $report, mark_report_id => $mark_report_id &>
+%       # the remaining group reports, if group at all
+%       if ($rga_primary) {
+%             foreach my $subreport (sort { $b->{id} <=> $a->{id} } @{$rga{$rga_id} || []}) {
+                     <& SELF:single_report, report => $subreport, just_group_member => 1, mark_report_id => $mark_report_id &>
+%             }
+%       }
+%       if ($rgt_primary) {
+%             foreach my $subreport (sort { $b->{id} <=> $a->{id} } @{$rgt{$rgt_id} || []}) {
+                     <& SELF:single_report, report => $subreport, just_group_member => 1, mark_report_id => $mark_report_id &>
+%             }
+%       }
+%   }
+        </tbody>
+    </table>
+% }
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

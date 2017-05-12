@@ -1,0 +1,28 @@
+Tree::Simple::View version 0.17
+===========================
+
+See the individual module documentation for more information
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Tree::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2008 Infinity Interactive, Inc.
+
+http://www.iinteractive.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,16 @@
+Changes
+lib/Test/Lib.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/findlib.t
+t/lib/tlib_test.pm
+t/sub1/findlib.t
+t/sub1/sub2/findlib.t
+t/sub1/sub2/sub3/findlib.t
+t/sub1/sub2/sub3/sub4/findlib.t
+t/sub1/sub2/sub3/sub4/sub5/findlib.t
+t/sub1/sub2/sub3/sub4/sub5/sub6/no_findlib.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

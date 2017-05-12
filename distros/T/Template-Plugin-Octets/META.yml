@@ -1,0 +1,40 @@
+---
+abstract: 'TT2 plugin to format numeric values as binary octets'
+author:
+  - 'Anton Gerasimov <chim@cpan.org>'
+build_requires:
+  Test::More: 0.98
+  Test::Pod: 1.22
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Octets
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - examples
+    - corpus
+  namespace:
+    - t::lib
+  package:
+    - DB
+provides:
+  Template::Plugin::Octets:
+    file: lib/Template/Plugin/Octets.pm
+    version: 0.18
+requires:
+  Template: 2.22
+  perl: 5.008009
+resources:
+  bugtracker: https://github.com/Wu-Wu/Template-Plugin-Octets/issues
+  homepage: https://metacpan.org/release/Template-Plugin-Octets
+  repository: git://github.com/Wu-Wu/Template-Plugin-Octets.git
+version: 0.18
+x_authority: cpan:CHIM

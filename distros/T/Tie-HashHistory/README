@@ -1,0 +1,116 @@
+
+HashHistory is a tied hash module that you interpose
+between your program and another tied hash module, usually a DBM
+interface.  Everything looks completely ordinary, but you can also ask
+HashHistory for the history of a key.  It will return a list
+of all the values that the key has ever had, in order.
+
+For updates and other information, visit
+`http://www.plover.com/~mjd/perl/HashHistory/'.
+
+-------------------------------- INSTALLATION INSTRUCTIONS
+
+Unpack the .tar.gz file.
+
+Run:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+-------------------------------- MANUAL
+
+NAME
+    Tie::HashHistory - Track history of all changes to a tied hash
+
+VERSION
+    This file documents `Tie::HashHistory' version 0.03
+
+SYNOPSIS
+            my $hh = tie %hash => Tie::HashHistory, PACKAGE, ARGS...;
+
+            @values = $hh->history(KEY);
+
+
+DESCRIPTION
+    `Tie::HashHistory' interposes itself between your program and another
+    tied hash. Fetching and storing to the hash looks completely normal, but
+    `Tie::HashHistory' is keeping a record of all the changes to the each
+    key, and can Tie::HashHistory will give you a list of all the values the
+    key has ever had, in chronological order.
+
+    The arguments to the `tie' call should be `Tie::HashHistory', and then
+    the arguments that you *would* have given to `tie' to tie the hash
+    without the history feature. For example, suppose you wanted to store
+    your hash data in an NDBM file named `database'. Normally, you would
+    say:
+
+            tie %hash => NDBM_File, 'database', $flags, $mode;
+
+
+    to get this history feature, just add `Tie::HashHistory' before
+    `NDBM_File':
+
+            my $hh = tie %hash => Tie::HashHistory, 
+                    NDBM_File, 'database', $flags, $mode;
+
+
+    The data will still be stored in `database', and it will still be an
+    `NDBM' file. All the fetching and storing will look the same, but the
+    change history of each key will be available.
+
+    The `tie' call will return an object; to find out the history of a key,
+    use the `history' method on this object. It takes one argument, which is
+    a key string. It will return a list of all the values that have ever
+    been associated with the key, in chronological order, starting with the
+    most recent. For example:
+
+            $hash{a} = 'first';
+            $hash{b} = 'second';
+            $hash{a} = 'third';    # Overwrites old value
+
+            # Prints "third second" as you would expect
+            print "$hash{a} $hash{b}\n";  
+
+            @values = $hh->history('a');
+            # @values now contains ('third', 'first')       
+
+            @values = $hh->history('b');
+            # @values now contains ('second')
+
+
+    At present, if called in scalar context, the `history()' method will
+    return the number of items in the history. This behavior may change in
+    future versions. The underlying hash can be any tied hash class at all.
+    To use a regular in-memory hash, use Tie::StdHash (distributed with
+    Perl) as the underlying implementation:
+
+            use Tie::Hash;  # *NOT Tie::StdHash*
+            my $hh = tie %hash => Tie::HashHistory, Tie::StdHash;
+
+
+    This is not as efficient as it could be because fetches and stores on
+    `%hash' still go through two layers of tieing. I may fix this in a
+    future release.
+
+Bugs and Caveats
+    You cannot use `delete' on a `Tie::HashHistory' hash, because it is not
+    clear yet what it should do. It could revert the value to the previous
+    version (this would be easy to implement) or it could record in the
+    history that the key was deleted. (This is more difficult.) A future
+    version of this package may provide subclasses with one or the other
+    functionality.
+
+    This module needs some more test files.
+
+Author
+    Mark-Jason Dominus, Plover Systems
+
+    Please send questions and other remarks about this software to `mjd-
+    perl-hashhistory@pobox.com'
+
+    For updates, visit `http://www.plover.com/~mjd/perl/HashHistory/'.
+
+    Thanks to Randal Schwartz and Chris Nandor for their assistance with the
+    `**!!**' line.
+

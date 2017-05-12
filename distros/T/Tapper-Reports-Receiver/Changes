@@ -1,0 +1,70 @@
+Revision history for Tapper-Reports-Receiver
+
+5.0.1     2016-03-30
+        - declare dependencies more explicit
+
+5.0.0     2016-02-15
+        - merge TestrunDB/ReportsDB
+
+4.1.3     2013-04-06
+        - interpret more mime types as TAP::Archive
+
+4.1.2     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.1     2012-10-21
+        - force dependencies
+
+4.1.0     2012-10-19
+        - [FIX] handle exception in processing report
+        - [FIX] slow first() usage
+        - Log4perl with MX::Daemonize - done right
+        - back at MooseX::Daemonize after Log4perl works
+          and App::Daemon turned out to be wrong
+        - rename USER into OWNER
+
+4.0.2     2012-06-04
+        - log file handling during test
+        - explicitely upgrade troublemaker deps
+
+4.0.1     2012-05-16
+        - [FEAT] SIGUSR1 based debugging help for Receiver
+        - [FEAT] get owner of reportgroups
+        - [FEAT] introduce 'Level 2 receivers'
+        - [FEAT] particular level2 receiver for Codespeed
+        - [FIX] AnyEvent handling
+        - [FIX] fork for report handling
+        - [FIX] extend TAP::Archive recognition to octet-stream
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* release version++ roundhouse kick
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.5
+
+	* rewritable shebang line
+	* distro maintenance
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-09 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.3
+
+	* fix dependencies
+
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

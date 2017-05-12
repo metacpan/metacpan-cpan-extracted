@@ -1,0 +1,21 @@
+NAME
+    Task::Bot::Training - Install all known Bot::Training modules
+
+DESCRIPTION
+    This module installs all the currently known Bot::Training modules:
+
+    *   Bot::Training
+
+    *   Bot::Training::MegaHAL
+
+    *   Bot::Training::StarCraft
+
+AUTHORS
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,73 @@
+{
+    "name": "Task-Labyrinth-Plugin-Music",
+    "version": "1.01",
+    "abstract": "All music related Labyrinth modules all at once",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "music",
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+              "perl": "5.006",
+              "Labyrinth": "5.30",
+              "Labyrinth::Plugin::Articles::Lyrics": "1.02",
+              "Labyrinth::Plugin::Articles::Profiles": "1.02",
+              "Labyrinth::Plugin::Core": "5.18",
+              "Labyrinth::Plugin::Event": "1.06",
+              "Labyrinth::Plugin::Event::Types": "1.06",
+              "Labyrinth::Plugin::Event::Venues": "1.06",
+              "Labyrinth::Plugin::MP3s": "1.01",
+              "Labyrinth::Plugin::Release": "0.03"
+            }
+        }
+    },
+
+    "provides": {
+        "Task::Labyrinth::Plugin::Music": {
+            "file": "lib/Task/Labyrinth/Plugin/Music.pm",
+            "version": "1.01"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","vhost"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "homepage": "http://labyrinth.missbarbell.co.uk",
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Task-Labyrinth-Plugin-Music" },
+        "repository": {
+            "url": "git://github.com/barbie/task-labyrinth-plugin-music.git",
+            "web": "http://github.com/barbie/task-labyrinth-plugin-music",
+            "type": "git"
+        }
+    }
+}

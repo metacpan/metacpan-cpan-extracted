@@ -1,0 +1,27 @@
+---
+abstract: 'A module for generating meaningless Chinese text that creates the illusion of the finished document.'
+author:
+  - 'Lukhnos D. Liu C<< <lukhnos@gmail.com> >>, Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Greeking-zh_TW
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  common::sense: 2.02
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.0

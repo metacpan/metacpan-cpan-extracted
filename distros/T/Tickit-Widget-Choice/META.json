@@ -1,0 +1,45 @@
+{
+   "abstract" : "a widget giving a choice from a list",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tickit-Widget-Choice",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tickit::RenderBuffer" : "0",
+            "Tickit::Style" : "0",
+            "Tickit::Widget" : "0",
+            "Tickit::Widget::Menu" : "0.09"
+         }
+      }
+   },
+   "provides" : {
+      "Tickit::Widget::Choice" : {
+         "file" : "lib/Tickit/Widget/Choice.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.freenode.net/#tickit"
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,7 @@
+real template:        constant string:      poot
+existing variable:    value1
+nonexistent variable: 
+two arg echo:         pootpoot
+three arg echo:       value1pootpoot
+
+nonexistent template: 

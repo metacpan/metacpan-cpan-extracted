@@ -1,0 +1,20 @@
+Revision history for Perl extension Tree::RedBlack.
+
+0.01  Wed Oct 14 13:42:34 1998
+	- original version; created by h2xs 1.18
+
+0.1   Wed Oct 14 16:51:00 1998
+	- first public alpha release; bholzman
+
+0.2   Wed Oct 28 16:07:00 1998
+	- fixed major Makefile.PL mess-up; bholzman
+
+0.3   Tue Jun 29 10:53:00 1999
+	- fixed memory leak; bholzman
+
+0.4   Thu Jul 31 10:33:00 2008
+	- fixed misspelled method name (value instead of val), ID 13482
+	- fix bug when using custom comparator, ID 19431
+
+0.5   Thu Jul 31 14:48:00 2008
+	- added some tests (still more to add)

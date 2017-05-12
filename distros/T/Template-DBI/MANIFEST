@@ -1,0 +1,10 @@
+Changes
+lib/Template/DBI.pod		Plugin entance documentation
+lib/Template/Plugin/DBI.pm	DBI plugin for TT2
+Makefile.PL			The Makefile generator
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/dbi.t
+t/lib.pl			Common routines to for the used database

@@ -1,0 +1,9 @@
+Replace the __END__ section of the minifig.pl that ships with this package
+with your choice of font.
+
+OR
+
+cp -f /path/to/newfont.flf share/mini.flf
+make clean
+perl Makefile.PL
+make

@@ -1,0 +1,25 @@
+[% USE date -%]
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>[% title %]</title> 
+  <link href="[% link %]"/>
+  <updated>[% date.format(date.now, '%Y-%m-%dT%H:%M:%S') %]</updated>
+  <author> 
+    <name>Test::Daily</name>
+  </author> 
+
+[% FOREACH id IN ids -%]
+  <id>[% id %]</id>
+[% END -%]
+
+[% FOREACH entry IN entries -%]
+  <entry>
+    <title>[% entry.title %]</title>
+    <link href="[% entry.link %]"/>
+    <id>[% entry.id %]</id>
+    <updated>[% entry.updated %]</updated>
+    <summary type="html">[% entry.summary %]</summary>
+  </entry>
+[% END -%]
+
+</feed>

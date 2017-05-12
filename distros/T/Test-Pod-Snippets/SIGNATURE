@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 95ec4696d12ce001d0564373f8f2efc4f7783332 AUTHOR_PLEDGE
+SHA1 3fcf3aa5b8ccef8273d84529d870c62dfdeda733 Build.PL
+SHA1 a75408c75d8e302f3d2c71a52b08d770fa6736fc Changes
+SHA1 5b461675fd0037dfe9d6a80c1d7a1d189c563cdf INSTALL
+SHA1 8854c87a3fe497d62f94ee136210382262ef70e3 LICENSE
+SHA1 0f028b7817af59873d9b195df0cb2e6b382e2ae1 MANIFEST
+SHA1 97218969487bbafa3db4b645c9ede010c7d20871 META.json
+SHA1 8e9ab72b240dcedcf6b34637c0e7aa947cd9a7be META.yml
+SHA1 f44a610f611cc4333f9a9b52873bc5a35fb7ffb3 Makefile.PL
+SHA1 c1762e91995bec3de5d19b6e0960e79a71843c92 README
+SHA1 6041d6bebb0fb46059199e62f8bd389fee8b5ce5 README.mkdn
+SHA1 09d5f2fa93a3a855d67d0a4cec56ea5b4289e4e3 lib/Test/Pod/Snippets.pm
+SHA1 9e72986d8a7b9105cfdfe8d979ab9f1c6458b0d0 podsnippets
+SHA1 f407f4942db0f97ae57d90bfeb76ea2ef9e68098 script/test-pod-snippets.PL
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 5504d6f8168370c66547179fe430ae35b10939bc t/00-load.t
+SHA1 473906254ecd96009795d4b7fbc82fac48c03ecd t/000-report-versions.t
+SHA1 8730acf0708fbd707793d410d1e4447424ff5add t/01-general.t
+SHA1 cce430668afd6c8d961bfb8f7db3aa1e1f324e72 t/02-extractions.t
+SHA1 f306c7e8e70337d346dace12900b549fe4cbb0b0 t/generate_test.t
+SHA1 92274a5309d1b9394af94d909ef09d37bcd6e7b4 t/new.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 f15ec5762d271ffe4db461c70acb7925090e8f81 t/preserve_lines.t
+SHA1 d2ac417fcf1225455e0c96476ae549d701782396 t/runtest.t
+SHA1 a690c830c1734fa32ccc47ece9f5951c5f974961 xt/99signature.t
+SHA1 5ec2bb9070adecaea6999148723af48ae51544d1 xt/perl-critic-progressive.t
+SHA1 0db521e6d69e12d7ca8d90467c9a915cf72644d2 xt/pod-coverage.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlBM5bEACgkQ34Hwf+GwC4zzLQCdFaWy2geb3ctnrHJi8vleoHcN
+C1gAoJhRODutAHHK82G4mD9TYDXFnc6z
+=XsCM
+-----END PGP SIGNATURE-----

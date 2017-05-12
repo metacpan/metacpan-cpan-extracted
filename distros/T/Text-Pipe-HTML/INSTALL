@@ -1,0 +1,27 @@
+
+This is the Perl distribution Text-Pipe-HTML.
+
+## Installation
+
+Text-Pipe-HTML installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan Text::Pipe::HTML
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Text-Pipe-HTML documentation is available as in POD.
+So you can do:
+
+    % perldoc Text::Pipe::HTML
+
+to read the documentation with your favorite pager.

@@ -1,0 +1,6 @@
+name = "Test-Requires-Scanner"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+

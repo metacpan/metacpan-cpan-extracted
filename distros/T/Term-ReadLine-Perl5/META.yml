@@ -1,0 +1,67 @@
+---
+abstract: 'Perl5 version of GNU ReadLine.'
+author:
+  - 'Rocky Bernstein <rocky@cpan.org>'
+build_requires:
+  File::HomeDir: '0.81'
+  File::Spec: '0'
+  Term::Cap: '0'
+  Term::ReadKey: '2.3'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4004'
+  perl: '5.008005'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-ReadLine-Perl5
+provides:
+  Term::ReadLine::Perl5:
+    file: lib/Term/ReadLine/Perl5.pm
+    version: '1.43'
+  Term::ReadLine::Perl5::Common:
+    file: lib/Term/ReadLine/Perl5/Common.pm
+  Term::ReadLine::Perl5::Dumb:
+    file: lib/Term/ReadLine/Perl5/Dumb.pm
+  Term::ReadLine::Perl5::History:
+    file: lib/Term/ReadLine/Perl5/History.pm
+  Term::ReadLine::Perl5::Keymap:
+    file: lib/Term/ReadLine/Perl5/Keymap.pm
+  Term::ReadLine::Perl5::OO:
+    file: lib/Term/ReadLine/Perl5/OO.pm
+    version: '0.43'
+  Term::ReadLine::Perl5::OO::History:
+    file: lib/Term/ReadLine/Perl5/OO/History.pm
+  Term::ReadLine::Perl5::OO::Keymap:
+    file: lib/Term/ReadLine/Perl5/OO/Keymap.pm
+  Term::ReadLine::Perl5::OO::State:
+    file: lib/Term/ReadLine/Perl5/OO/State.pm
+  Term::ReadLine::Perl5::TermCap:
+    file: lib/Term/ReadLine/Perl5/TermCap.pm
+  Term::ReadLine::Perl5::Tie:
+    file: lib/Term/ReadLine/Perl5/Tie.pm
+    version: '1.43'
+  Term::ReadLine::Perl5::readline:
+    file: lib/Term/ReadLine/Perl5/readline.pm
+    version: '1.43'
+recommends:
+  rlib: '0.02'
+requires:
+  Class::Accessor::Lite: '0.05'
+  File::HomeDir: '0.81'
+  File::Spec: '0'
+  IO::Handle: '0'
+  POSIX: '0'
+  Term::ReadKey: '2.3'
+  Text::VisualWidth::PP: '0'
+  Unicode::EastAsianWidth::Detect: '0.03'
+  perl: '5.008005'
+  version: '0'
+resources:
+  bugtracker: https://github.com/rocky/p5-Term-ReadLine-Perl5/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/rocky/p5-Term-ReadLine-Perl5
+version: '1.43'

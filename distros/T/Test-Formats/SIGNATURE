@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2db180881c14220a6aeaba7719a8162e910d3f48 Build.PL
+SHA1 c924fe1743662b8186db70455596a3d3eb707478 ChangeLog
+SHA1 fdfa4fb03c1c01871f4f46f3e46a8f2ac7a0d759 ChangeLog.xml
+SHA1 639e90e3c79fa06ededa7e4116b39f2415ac110c MANIFEST
+SHA1 548725eceb701a43211abf9e6ca7d009a770b6ce MANIFEST.SKIP
+SHA1 5cab50e218816491b1774ae0e323fe5b91edbd3c META.yml
+SHA1 2d12f5e5edc310a682b89cbc03411bb0248b9cac Makefile.PL
+SHA1 5456c7ea708c3ba106dc06067ed9cbe239f6445c README
+SHA1 11d5fd3e87f46da3a7e8e9bec3f9f7ce6c344056 etc/ChangeLogML.xsd
+SHA1 5e6583b6cd20321387caa31429d948b684f214ec lib/Test/Formats.pm
+SHA1 c5b307077e220ac81ca5c52531a7e8ca7ebca28d lib/Test/Formats/XML.pm
+SHA1 887ff0cca4be8f2498c9f2bf6c2f31b17e37ed72 t/00_load.t
+SHA1 70cf1eb26301f329620adacbd78c3be33bf5b542 t/01_pod.t
+SHA1 7c570e17720524d94555d5796dc09d5216dd4f5e t/02_pod_coverage.t
+SHA1 d7d2fa6b78062c7712c4c9234bad0fb08789c10c t/10_xml/05_xml_parsing.t
+SHA1 0c7b98f1c24b363261eed6044e0b004a36e1f6e7 t/10_xml/10_sgmldtd.t
+SHA1 854b6673f4e5d2fb7d7610916a07cbdc939981f2 t/10_xml/20_xmlschema.t
+SHA1 135971bbd09b23ac0f782d52a0c004b5103cb3dc t/10_xml/30_relaxng.t
+SHA1 cfb2d5bbc557ddea5de465d5f34bece0d6e197de t/90_integration/10_with_xml.t
+SHA1 8154ecef3a1927cad9a9b0fa1246bfd1282238bb t/90_integration/90_empty_subclass.t
+SHA1 c02b7915a5b61fa86680f3bca0d8a52161b373fe t/90_integration/MyTestFormats.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD4DBQFI/vkoI8xldGuPhcoRAvg5AJYz6PcUUztXhUgBPmKijH6NiMjiAKCKmtmc
+S4Pq/WDJlhLGpqDJDj1TPg==
+=4tIQ
+-----END PGP SIGNATURE-----

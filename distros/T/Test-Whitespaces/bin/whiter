@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+# PODNAME: whiter
+# ABSTRACT: script to fix whitespaces errors in files
+
+
+use strict;
+use warnings;
+
+use Test::Whitespaces { _only_load => 1 };
+
+Test::Whitespaces::_run_script(
+    script => 'whiter',
+    dir => \&Test::Whitespaces::_fix_dir,
+    file => \&Test::Whitespaces::_fix_file,
+);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+whiter - script to fix whitespaces errors in files
+
+=head1 VERSION
+
+version 1.2.1
+
+=head1 SYNOPSIS
+
+whiter [FILEs or DIRs or both]
+
+ Options:
+
+      --verbose         Scrip show filenames that are fixed
+      --help            Show this message
+      --version         Show version number
+
+Script will work on text files that are specified as the parameters or are
+situated in the specified diretories.
+
+Script will check if all the rules are followed. In case if something is wrong
+the script will fix the file.
+
+=over
+
+=item * Each line ends with "\n" (including the last line)
+
+=item * For new lines "\n" is used (not "\r\n")
+
+=item * There are no ending spaces on the lines
+
+=item * 4 spaces are used instead of tabs
+
+=item * No empty lines in the end of file
+
+=back
+
+There is also a script `L<test_whitespaces>` that checks all that ruls and
+there is a Perl module L<Test::Whitespaces> that can be used to test your
+source code.
+
+=encoding UTF-8
+
+=head1 SOURCE CODE
+
+The source code for this script is hosted on GitHub
+L<https://github.com/bessarabov/Test-Whitespaces>
+
+=head1 AUTHOR
+
+Ivan Bessarabov <ivan@bessarabov.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Ivan Bessarabov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

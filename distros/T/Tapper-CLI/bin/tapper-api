@@ -1,0 +1,30 @@
+#! /usr/bin/perl
+# PODNAME: tapper-api
+# ABSTRACT: cmdline frontend to Tapper API access
+
+use Tapper::CLI::API;
+Tapper::CLI::API->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-api - cmdline frontend to Tapper API access
+
+=head1 AUTHOR
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

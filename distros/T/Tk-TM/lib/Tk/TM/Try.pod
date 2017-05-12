@@ -1,0 +1,141 @@
+=head1 NAME
+
+Tk::TM::Try - Tk Transaction Manager Error processing functions.
+See Tk::TM::Lib for main descriptions and principles.
+
+=cut
+***********************************************************************
+=pod
+
+=head1 SYNOPSIS
+
+ use Tk::TM::Try;
+ Try sub{
+      TryHdr('title','stage');
+      TryHdr(undef,'stage1');
+     }
+    ,sub{
+     };
+ Try(sub{...},0);
+ TryDBI $dbh
+       ,sub{ #transaction
+        }
+       ,sub{ #after rollback
+        };
+
+=cut
+***********************************************************************
+=pod
+
+=head1 DESCRIPTION
+
+=over
+
+This module implements error processing functions may be used (or not be used)
+in application.
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 VARIABLES
+
+=over
+
+ use vars qw($ErrorDie $Error);
+
+=item $Tk::TM::Try::ErrorDie
+
+Die if error occurred. Default is false outside C<Try> and true inside.
+
+=item $Tk::TM::Try::Error
+
+Last error occurred. Value is $@.
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 FUNCTIONS
+
+=over
+
+ @EXPORT = qw(Try(@) TryDBI(@) TryHdr);
+
+
+=item Try ( eval {...}, default ) -> result
+
+=item Try ( eval {...}, \&catch ) -> result
+
+=item Try ( sub  {...}, ... ) -> result
+
+Try-Catch construction.
+Function C<Try> returns result of eval on success.
+If error occurred (determined by $@), it returns default value or result of catch evaluation.
+
+
+=item TryDBI ( ?dbh, sub {...}, default ) -> result
+
+=item TryDBI ( ?dbh, sub {...}, \&catch ) -> result
+
+Try-Catch construction for database transaction.
+Default database handle may be given from current data object or $Tk::TM::Common::DBH.
+$dbh->{AutoCommit} and $dbh->{RaiseError} are used inside C<TryDBI>.
+
+
+=item TryHdr (subject, stage)
+
+=item TryHdr (undef, stage)
+
+Declare title and/or stage name of transaction to insert into $@ inside C<Try>.
+May be used only inside C<Try>(sub{},...).
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 VERSION
+
+=over
+
+
+=item "02/04/2000"
+
+Created.
+
+TO DO:
+
+- Approve
+
+- Debug and Test
+
+
+
+=back
+
+
+=cut
+***********************************************************************
+=pod
+
+=head1 AUTHOR
+
+=over
+
+Andrew V Makarow <makarow@mail.com>, Denis E Medvedyuk <demed@mail.com>
+
+=back
+
+=cut

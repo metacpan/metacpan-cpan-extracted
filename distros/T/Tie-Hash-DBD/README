@@ -1,0 +1,56 @@
+=head1 NAME
+
+Tie::Hash::DBD - tie a hash to a database
+
+=head1 SYNOPSIS
+
+    use Tie::Hash::DBD;
+
+    tie my %hash, "Tie::Hash::DBD",   $dbh [, \%options ];
+
+    use Tie::Array::DBD;
+
+    tie my @array, "Tie::Array::DBD", $dbh [, \%options ];
+
+=head1 COPYING
+
+Recent changes can be (re)viewed in the public GIT repository at
+https://github.com/Tux/Tie-Hash-DBD
+Feel free to clone your own copy:
+
+ $ git clone https://github.com/Tux/Tie-Hash-DBD Tie-Hash-DBD
+
+or get it as a tgz:
+
+ $ wget --output-document=Tie-Hash-DBD.tgz \
+       https://github.com/Tux/Tie-Hash-DBD/archive/master.tar.gz
+
+=head1 PREREQUISITES
+
+perl5.8.3 and DBI. Preferably a recent version of DBI and the
+DBD module you are planning to use.
+
+5.8.3 not because of syntax, but because it fails with SQLite
+when used with - the same version of SQLite - under 5.8.2.
+
+=head1 RESTRICTIONS
+
+This module does not (yet) support dynamic changes in deep or
+nested data. Please read the documentation for use of this.
+
+=head1 DESCRIPTION
+
+See C<perldoc Tie::Hash::DBD> and C<perldoc Tie::Array::DBD>
+
+=head1 AUTHOR
+
+H.Merijn Brand <h.m.brand@xs4all.nl>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2015 H.Merijn Brand. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

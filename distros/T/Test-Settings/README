@@ -1,0 +1,13 @@
+Test::Settings - Ask or tell when certain types of tests should be run
+
+See lib/Test/Settings.pm for example usage.
+
+To play with Test::Settings (Uses Dist::Zilla):
+
+  git clone git://github.com/wolfsage/Test-Settings.git
+
+  cd Test-Settings
+
+  dzil build
+
+-- Matthew Horsfall (alh)

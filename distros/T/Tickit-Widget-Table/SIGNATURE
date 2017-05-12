@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 850c8939ae3af08969b39f378e24ec23a146d09c Changes
+SHA1 bf803e2716aedfe555447e54bd57eb4cf44ae164 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 ce72cca109a4a1da03ed1a14ff2dc74990c54276 MANIFEST
+SHA1 77949179243c8988f1d6d1ca434b49f3454f9ec2 META.json
+SHA1 e4cad7b796db5ded14a3cd453f16da41868aadc7 META.yml
+SHA1 3387bb968ffdcf4a44b2aa00562c59f982d37f0e Makefile.PL
+SHA1 a671ca3b9be9c4baa67ffb21d7c09d4301ecb27c README
+SHA1 3ef352879d34cb87c6caa0a7fada1e342425fb66 cpanfile
+SHA1 975309ad1e083bfeb6307f3eb29d4b26c041c9b5 dist.ini
+SHA1 cff5657df2d72e2bd58dff2db3f33672c41b16c6 examples/adapter-array.pl
+SHA1 9225b3de49894711f05183171e18a75e0ca74e12 examples/adapter-deferred-array-styled.pl
+SHA1 802bf7d9b645b449709ba3862748d182d1dd801b examples/adapter-deferred-array.pl
+SHA1 ce4224a58486082a6b4c688dda5d587afa252d0b examples/adapter-transformed-array.pl
+SHA1 fab339f96753fa1effb352b8ab2b9833f5f16457 examples/multi-select.pl
+SHA1 b33f8e38e9ff9418e9141db4b9fcdd2dfee89827 examples/no-header.pl
+SHA1 561249d280bff9c8324cd6671938ba42f88a8a4b examples/synopsis.pl
+SHA1 324b96b4530b8fbc5a131761747ee710f9e42f5a lib/Tickit/Widget/Table.pm
+SHA1 cd0fc7e7b9c9ba75e941a4e38ac96dacfb8d0667 lib/Tickit/Widget/Table.pod
+SHA1 5329e5bb2a9589fc47542931484b35a9a06f3985 lib/Tickit/Widget/Table/FAQ.pod
+SHA1 7c70c5d0eb92848ee827c54bf3f279594cef8c3e screenshots/tickit-widget-table-paged1.gif
+SHA1 bc01479eb39fc22ff5c0ee995b26f6c73e5a509a screenshots/tickit-widget-table-paged2.gif
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 ac7ad80c1c224d16b0411fac7c22241cc896f7f3 t/00-compile.t
+SHA1 4bfc0e6142a8403c5297440bf4f61d9b1eeb7da8 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJYZ5f5AAoJEG2WkcbynxAlQ+IQALf1HYifqR4yfn8xbAeSiHRJ
+QzqInspYF68bCxrkj4l1B8ziUgtRO8ngWoUR6COCq6vWeKq7Ysbe0Iq4P8DTrHaB
+RvzqKfNik2LnEO4qivDWNPNKsGauBnSX1+bFV4tKL082q3RRHx5TUXMvwnj0EZd2
+222oAhm9oRK3dRFYW9x6T/wwm5Xo/hjQMYdseutV95ejT46lquEA2iXejOjwGwwL
+nqCRIxMPyNplCTvFehbQeZOtLrz79nwk8KVQPVwCBiP4dkml/tjNaM7hk65g9Fxp
+SWBATgkj3aHuN/yoAIoVADqbUGOSVi5Ni9cIttgGxgQyPv9QM/57IbGNtFTjRJKa
+I6iZFZQiQQLXBmD7YlGlkwQpSqFXtMpZev4Gn4AgvznPoOz3PDWp3rdfXaBt557+
+/RE1T9LCmXmemU1Bo2hIuBX+AEu5uoUyJFuNyLB3NBk88ybwpNZBJXpBlfUa5Oal
+EFGgxT+PbtGm190yLRDYBz6AViCGoBoB3X4rPQhKShQkPlP2KuGX5Cn1C9oMsFap
+Wkp60IHCZktyVFyKACYqC17I7BhhnRJRhStieGggXU9kvjh76IZih3LE2g9C2xx0
+20B2R889B/r4IvQpfr5lVrrRHNE36MkgaV3P3s6cpSyLSo20hb2fL6m0OAE7p0TJ
+HJ45cbfnUvWDiL1Wkh/l
+=jwam
+-----END PGP SIGNATURE-----

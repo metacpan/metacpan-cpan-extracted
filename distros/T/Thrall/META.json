@@ -1,0 +1,62 @@
+{
+   "abstract" : "a simple PSGI/Plack HTTP server which uses threads",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>",
+      "Jeremy Howard <j+daemonize@howard.fm>",
+      "Paul Seamons <paul@seamons.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Thrall",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "Test::More" : "0.88",
+            "Test::TCP" : "0.15"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0.992",
+            "forks" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Handler::Thrall" : {
+         "file" : "lib/Plack/Handler/Thrall.pm",
+         "version" : "0.0305"
+      },
+      "Thrall" : {
+         "file" : "lib/Thrall.pm",
+         "version" : "0.0305"
+      },
+      "Thrall::Server" : {
+         "file" : "lib/Thrall/Server.pm",
+         "version" : "0.0305"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/Thrall/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/Thrall"
+      }
+   },
+   "version" : "0.0305",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,36 @@
+Build.PL
+Changes
+eg/assert_raises.pl
+eg/assert_test_differences.pl
+lib/Exception/Assertion.pm
+lib/Test/Assert.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/010_debug_enabled.t
+t/020_debug_disabled.t
+t/030_debug_default.t
+t/all_tests.t
+t/test.pl
+t/tlib/Exception/AssertionTest.pm
+t/tlib/Test/AssertTest.pm
+xt/check_changes.t
+xt/consistent_version_numbers.t
+xt/copyright.t
+xt/cover.pl
+xt/distribution.t
+xt/kwalitee.t
+xt/minimumversion.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/pod_spell.t
+xt/pod_spellrc
+xt/pod_syntax.t
+xt/signature.t
+SIGNATURE    Added here by Module::Build
+SIGNATURE    Added here by Module::Build

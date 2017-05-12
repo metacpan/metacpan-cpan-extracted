@@ -1,0 +1,41 @@
+---
+abstract: 'Prefixes and suffixes analysis of text'
+author:
+  - 'Jose Castro, C<< <cog@cpan.org> >>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Affixes
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Affixes:
+    file: lib/Text/Affixes.pm
+    version: '0.09'
+requires:
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/kappa/Text-Affixes/issues
+  homepage: https://github.com/kappa/Text-Affixes
+  repository: git://github.com/kappa/Text-Affixes.git
+version: '0.09'
+x_contributors:
+  - 'José Alves de Castro <cog@cpan.org>'
+  - 'Alex Kapranoff <alex@kapranoff.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

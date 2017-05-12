@@ -1,0 +1,24 @@
+---
+abstract: 'Generate formatted nonsense using random Latin words.'
+author:
+  - 'Robert Krimen, C<< <robertkrimen at gmail.com> >>'
+build_requires:
+  Test::More: 0
+  Test::Most: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.760'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Lorem-More
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Parse::RecDescent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/text-lorem-more/tree/master
+version: 0.13

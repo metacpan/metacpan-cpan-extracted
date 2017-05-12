@@ -1,0 +1,9 @@
+lib/Test/MockClass/MyClass.pm
+lib/Test/MockClass.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00_MockClass.t
+t/00_MyClass.t
+t/01_Import.t

@@ -1,0 +1,41 @@
+TapeChanger::MTX - use 'mtx' to manipulate a tape library
+=========================================================
+
+TapeChanger::MTX is a module to manipulate a tape library using the 'mtx'
+tape library program.  It is meant to work with a simple shell/perl script
+to load and unload tapes as appropriate, and to provide a interface for
+more complicated programs to do the same.  It comes with a few basic
+scripts to exercise much of the functionality of the module.
+
+Prerequisites
+=============
+
+You must have Perl 5.6.0 or greater installed, as well as an installed
+'mtx' binary and a tape changer/drive on your system.  
+
+Installation Notes
+==================
+
+Installing this software is easy:
+
+  perl Makefile.pl
+  make
+  make test
+  make install
+
+Documentation
+=============
+
+All of the documentation is in the manual pages - 'man TapeChanger::MTX'
+after installation, or 'pod2text MTX.pm | less' right now.  'perldoc
+TapeChanger::MTX' probably also works.
+
+Web Page
+========
+
+http://www.ks.uiuc.edu/Development/MDTools/tapechanger-mtx/
+
+                            - Tim Skirvin (tskirvin@ks.uiuc.edu)
+-- 
+   Theoretical and Computational    http://www.ks.uiuc.edu/~tskirvin/
+Biophysics, Beckman Institute, UIUC    Senior Systems Administrator

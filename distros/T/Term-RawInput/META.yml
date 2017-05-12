@@ -1,0 +1,21 @@
+---
+abstract: 'A simple drop-in substitute for <STDIN> that also captures non-standard keys like Home'
+author:
+  - 'Brian M. Kelly <Brian.Kelly@fullautosoftware.net>'
+configure_requires:
+generated_by:
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-RawInput
+provides:
+  Term::RawInput:
+    file: lib/Term/RawInput.pm
+    version: 1.23
+requires:
+  Term::ReadKey: 0
+  IO::Handle: 0
+resources:
+  license: http://www.gnu.org/licenses/agpl.html
+version: 1.23

@@ -1,0 +1,9 @@
+Revision history for Test-Deep-NumberTolerant
+
+0.002     2016-12-03 01:57:05Z
+          - logic is split into two packages, so we do not have a module that
+            both inherits and is an importer
+          - misc distribution packaging improvements
+
+0.001     2014-10-28 01:07:12Z
+          - Initial release.

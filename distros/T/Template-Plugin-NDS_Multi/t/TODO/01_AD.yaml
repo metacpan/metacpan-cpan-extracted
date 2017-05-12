@@ -1,0 +1,23 @@
+sources:
+   source1:
+      type : yaml
+      file : 01_Source1.yaml
+      write: 0
+      default:
+        - [ "_default" ]
+   source2:
+      type : yaml
+      file : 01_Source2.yaml
+      write: 0
+      default:
+        - [ "_default" ]
+
+options:
+   - "ordered      0"
+   - "ordered      1      /o1"
+   - "merge_ul     append"
+
+priority:
+   "/"    : "source1 source2"
+   "/a"   : "source2"
+   "/b"   : "source1"

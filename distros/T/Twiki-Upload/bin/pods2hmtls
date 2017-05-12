@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+
+my ($baseurl, $basedir, $cachedir) = @ARGV;
+
+use IO::File;
+use File::Slurp;
+use Pod::Html;
+use File::Path;
+use File::Basename;
+require Pod::Simple::Wiki::Twiki::Upload;
+
+for my $tops (read_dir(".")) {
+	next unless -d $tops;
+	next if $tops =~ /^\./;
+	next unless -d "$tops/lib";
+
+	chdir($tops) || die;
+
+	my %files = Pod::Simple::Wiki::Twiki::Upload::make_file_list();
+
+	for my $mod (keys %files) {
+		
+		my $op = $mod;
+		$op =~ s{::}{/}g;
+		$op .= ".html";
+
+		print "processing $tops/ $files{$mod} into $op for $mod\n";
+
+		mkpath(dirname("$basedir/$op"));
+
+		pod2html($files{$mod},
+			"--cachedir=$cachedir",
+			"--infile=$files{$mod}",
+			"--outfile=$basedir/$op",
+			"--htmldir=$basedir",
+			"--htmlroot=$baseurl",
+			"--verbose",
+		);
+
+		my $f = read_file("$basedir/$op");
+		$f =~ s{">the (\S+) manpage</a>}{">$1</a>}g;
+		write_file("$basedir/$op", $f);
+		
+	}
+	chdir('..') || die;
+}
+
+__END__
+
+=head1 LICENSE
+
+This package may be used and redistributed under the terms of either
+the Artistic 2.0 or LGPL 2.1 license.
+

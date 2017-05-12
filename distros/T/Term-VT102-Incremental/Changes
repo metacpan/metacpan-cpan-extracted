@@ -1,0 +1,24 @@
+Revision history for Term-VT102-Incremental
+
+0.05  2011-06-04
+    - Overrideable 'vt_class' method
+    - Only iterate through changed rows for
+      incremental updates
+
+0.04  2011-03-10
+    - Make _screen lazy which otherwise breaks
+      when run with Moose 1.99+
+
+0.03  2011-03-07
+    - Re-add lost deps from a toolchain overhaul
+
+0.02  2011-03-06
+    - FIX: '0's don't get returned in the first
+           increment. Added some logic to resolve
+           this.
+    - Tests
+    - Documentation tweaks
+    - Dist::Zilla tweaks
+
+0.01  2011-02-13
+    - Initial release

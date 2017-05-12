@@ -1,0 +1,31 @@
+---
+abstract: 'Skip tests when modules not available'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0.45'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Needs
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#perl-qa
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Needs
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/Test-Needs.git
+version: '0.002005'
+x_cpants:
+  ignore:
+    prereq_matches_use: 'required modules detected incorrectly'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 75649f057c314ca4aeb580f24c1fc470ee50630e Changes
+SHA1 fda23a0b314432c4a81e8d7beb5290e9f0219c73 LICENSE
+SHA1 71c76420fe376ce414a091c6c4b0a939ea61668b MANIFEST
+SHA1 42b9afe4241c98d9c23331b49e6062aef9f0ec47 META.yml
+SHA1 0a835afde6bbb299189bb901e850ddb178aa1da7 Makefile.PL
+SHA1 6d6af5c376ac798a4cce92521dea2d738cad23d9 README
+SHA1 309d936b98057c127834a50d85f5158c212a17b6 Tags.pm
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 a57ca37f20666f3aa1495b072a8fcfb71414300d t/Task-Tags/01-use.t
+SHA1 ec7721c088d0117ea0d462870f2b5590812bfa69 t/Task-Tags/02-version.t
+SHA1 5eb59c2462e427c0472ea6ece025ada4fe987e0d xt/Task-Tags/01-pod_coverage.t
+SHA1 d6af287d935876d2e19dec4c81aef1854423ecd3 xt/Task-Tags/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJW8xcrAAoJEJe+XXKaIuTlDjQH+QFo1MImrd3brAaf5uAjAz0o
+00ZW6zRpzrP34xf9Q2sR03wlET0tLSeQwN+3IVPPZkWf/FAZUCmPJhtLygiVNwVJ
+jTnm07TbBSePXwSXxXDjEkX98P7V0GJ2vtGbvBBUWEweYRRwicyNKLFUADChenkO
+guhBzijJ1ytYrjf9tUpjvNaUQOdoK1jxXqotIxVFu9dvTVXUOOmhi1cJqDBGUFBh
+ZDfVYejCeA10337pvXeW6zgb5PdY2HIhMBjFAE1ttGjIwFO99x+f2sKrqMPnI0uE
++wXlClVtPbPuIoPkUEGFq8Z3h7NuR/SmrESGDGT266v9eZquy5Pt0GvAUAyjjko=
+=wMxH
+-----END PGP SIGNATURE-----

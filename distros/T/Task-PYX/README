@@ -1,0 +1,67 @@
+NAME
+    Task::PYX - Install the PYX modules.
+
+SYNOPSIS
+     cpanm Task::PYX
+
+SEE ALSO
+    App::PYX2XML
+        Perl class for pyx2xml application.
+
+    PYX A perl module for PYX handling.
+
+    PYX::GraphViz
+        GraphViz output for PYX handling.
+
+    PYX::Hist
+        Processing PYX data or file and print histogram.
+
+    PYX::Parser
+        PYX parser.
+
+    PYX::SGML::Raw
+        Processing PYX data or file and write as SGML.
+
+    PYX::SGML::Tags
+        Processing PYX data or file and write as SGML via Tags.
+
+    PYX::Sort
+        Processing PYX data or file and sort element attributes.
+
+    PYX::Stack
+        Processing PYX data or file and process element stack.
+
+    PYX::Utils
+        PYX common utilities for encoding and decoding data.
+
+    PYX::XMLNorm
+        Processing PYX data or file and do XML normalization.
+
+    PYX::XMLSchema::List
+        Processing PYX data or file and print list of XML schemas.
+
+    Tags::Output::PYX
+        Tags output to PYX format.
+
+    XML::MinWriter
+        Perl extension for writing XML in PYX format.
+
+    XML::PYX
+        PYX parser based on XML::Parser.
+
+REPOSITORY
+    <https://github.com/tupinek/Task-PYX>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015-2016 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.09
+

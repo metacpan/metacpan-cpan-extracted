@@ -1,0 +1,12 @@
+Changes
+lib/Test/Subs.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/check_syntax.t
+t/data/Test/Subs/A.pm
+t/data/Test/Subs/B.tt
+t/path_to_lib.t
+t/skip.t
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

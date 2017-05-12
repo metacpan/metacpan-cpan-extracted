@@ -1,0 +1,68 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d53077252f5dc397d9d31696f0e159fe3f30c AUTHORS
+SHA1 00ee4467b591cbd3006a0ae58be7e74a9b305902 Build.PL
+SHA1 dfac199a7539a404407098a2541b9482279f690d COPYING
+SHA1 c1bdc2057ab495960d9039a9b3b3046f0c8922f1 ChangeLog
+SHA1 8b7eeb7921d1f84593106421deed49924b57b556 Credits
+SHA1 135c6e4a3d0d1516999ce58b77ce522295bc8bb1 GTestRunner.pm.in
+SHA1 8118e0bed2017a15aa0f2c6715dc81c9195a63bc MANIFEST
+SHA1 e06e01f40005fb43ed75be2a93d143833e83b2a8 META.yml
+SHA1 1511d2beb74f8743a3e37c8bf76ba3b6d9828f44 Makefile.PL
+SHA1 1b5983ba2f5bbb15574b17068e69460d3b21b093 NEWS
+SHA1 72172720fcc82b398ef16db2775b06ae1e55a973 README
+SHA1 d3eb5d1ba29cbd73d5b4170a9375e6393356c149 README-NLS
+SHA1 f2c6ce7261ec5a0d39ff6bf57b5ee397844f55a9 README-TRANSLATIONS
+SHA1 1b5983ba2f5bbb15574b17068e69460d3b21b093 ReleaseNotes
+SHA1 a82a38ee22183a448b1030d6579eeccba499802c Suites/Customer.pm
+SHA1 58cbd543d3236365831d0640d44a17b6c1acd935 Suites/CustomerTest.pm
+SHA1 6c39e91f96ed585e8c57252797b7aa3d7813aba8 Suites/CustomerTest1.pm
+SHA1 f1bf8dee94b7c330b213e4b79c8357ff869c0fcc Suites/CustomerTest2.pm
+SHA1 627bb2f4a5969f99bb3c783da25a9ba0fdbd07a2 Suites/TS_SubSuite1.pm
+SHA1 31b9db3ca52714a117ecb82b1341ad316176fe7c Suites/TS_SubSuite2.pm
+SHA1 60af6e73a7ea8b7c12e9a0d02e168f18284187d4 Suites/TS_SubSuite3.pm
+SHA1 5c328d30efffe0e7ff76a1aff6cfb765e104a896 Suites/TS_TopLevel.pm
+SHA1 7628e2c954f912185da062a5daa30365d1737313 THANKS
+SHA1 430fb05cb7ae6a29cf3f5fbc96f7b27dbb5a8a94 TODO
+SHA1 6f6d257edcf602784708c17976f6b1e6603c0769 bin/gtestrunner
+SHA1 eefccb13c70489c30416f714ea81fb6d6e6bdbf5 gtestrunner.glade
+SHA1 3c950bb55a2764bf39099be191de6bf59f20fd11 gtestrunner.gladep
+SHA1 579c431c363703c9b17cddbe649c68e957fcd501 lib/LocaleData/bg/LC_MESSAGES/Test-Unit-GTestRunner.mo
+SHA1 2d4c671d56af075123b5530c05a101377d3ee05f lib/LocaleData/de/LC_MESSAGES/Test-Unit-GTestRunner.mo
+SHA1 845d467e4ca070c5fbd54c6ee4c3df850736bdcd lib/LocaleData/en_GB/LC_MESSAGES/Test-Unit-GTestRunner.mo
+SHA1 c489fd1bd6250a0b3b16ddc3a27c98c1c7e35394 lib/Test/Unit/GTestRunner.pm
+SHA1 2085804c832d216d9eaccde022b092d0fd3cb264 lib/Test/Unit/GTestRunner/Lister.pm
+SHA1 a68a13bec40e888329e886db00a1652e204f088c lib/Test/Unit/GTestRunner/Worker.pm
+SHA1 a56952414549fe91961849ef2c933122e80c5302 po/Makefile
+SHA1 f963ddb80680033a35d6fa9286fcd49eccc7545b po/PACKAGE
+SHA1 5dbd71adc0ff7a620a2e6b617b60672992939dcd po/POTFILES.in
+SHA1 b006f94cde7686b227e7619ee7d4240e694e002a po/Test-Unit-GTestRunner.pot
+SHA1 579c431c363703c9b17cddbe649c68e957fcd501 po/bg.mo
+SHA1 6e0291aa0afdc1609b88608f630cfbd4b8798b33 po/bg.po
+SHA1 2d4c671d56af075123b5530c05a101377d3ee05f po/de.mo
+SHA1 e0e37bb815bfcd39a8a58c5ea70e35ef494e06d8 po/de.po
+SHA1 845d467e4ca070c5fbd54c6ee4c3df850736bdcd po/en_GB.mo
+SHA1 64e39838c8a07402baa4ed9f7a7e529adfad6547 po/en_GB.po
+SHA1 e2ecf7b8be7859a98ed1d83c5501b204f650cd7a t/00load.t
+SHA1 c7830512edbb86f3d855285b5e48fa6017f81fa5 t/01signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
+
+iD8DBQFEZILpOo0HNPWNDz0RApeJAKDuVkwhYl6OEh7RWygYZtxDza3lUwCg4Rh4
+Vb9kxZsm8t+W8AyT5xbnv58=
+=u/Jn
+-----END PGP SIGNATURE-----

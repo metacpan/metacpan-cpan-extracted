@@ -1,0 +1,33 @@
+Term-ReadLine-Zoid 0.07
+=======================
+
+ABOUT
+
+  This package provides a set of modules that form an interactive input buffer
+  written in plain perl with minimal dependencies. It features almost all
+  key-bindings described in the posix spec for the sh(1) utility with some
+  extensions like multiline editing; this includes a vi-command mode with a
+  save-buffer (for copy-pasting) and an undo-stack.
+
+  It is compatible with the Term::ReadLine interface, so it
+  can be used with perl programs using this interface.
+
+DEPENDENCIES
+
+  The only real dependencies for this package are Term::ReadKey and AutoLoader
+  which are available from cpan.
+
+  One function in the vi command mode needs File::Temp, but as long as you don't
+  use this function you don't need the module.
+
+  You might also want to consider to install Env::PS1 if you want a fancy prompt.
+
+INSTALL
+
+  Try something like:
+
+    $ perl Build.PL
+    $ ./Build test
+    $ ./Build install
+
+  See the Module::Build documentation for advanced build options.

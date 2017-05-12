@@ -1,0 +1,82 @@
+
+Minimum Requirements
+--------------------
+
+The MINIMUM software requirements used to execute Test::Presenter successfully
+aren't exactly known.  Test::Presenter was designed using the following
+software, however, and any versions future to these should work well:
+
+    perl             v5.8.7
+    perldoc          v3.14
+    berkeley db      v4.3.29
+    berkeley dbxml   v2.2.13
+    gnuplot          v4.0
+
+The dbxml package is needed for some parts of Test::Presenter.  Unfortunately,
+few distros carry this, so you will probably need to install from source
+for now.  The source code is available from here:
+
+    http://dev.sleepycat.com/downloads/releasehistorybdbxml.html
+
+NOTE: The Berkeley DBXml installation must be done with perl support enabled.
+In other words, build it with this command:
+
+    cd dbxml-*
+    ./buildall.sh --enable-perl --enable-dependencies --prefix=/usr
+
+    # On Gentoo, I needed to set CFLAGS, and it installed but did not 
+    # work.:(  It might work on a newer version though.
+    CFLAGS=-fPIC ./buildall.sh --enable-perl --enable-dependencies --prefix=/usr
+
+
+Installation
+------------
+
+To install Test::Presenter, execute the following commands in the Test-Presenter
+folder from the Test-Presenter directory:
+
+ $ perl Makefile.PL
+ $ make
+ $ make test
+
+It will tell you if your system is missing any perl dependencies.
+ # This should probably be done as superuser or root
+ $ make install      
+
+
+If you want to install the script in your own private space, use
+
+ $ perl Makefile.PL PREFIX=/home/joeuser \
+        INSTALLMAN1DIR=/home/joeuser/man/man1 \
+        INSTALLMAN3DIR=/home/joeuser/man/man3      
+ $ make
+ $ make test
+ 
+ # This can be done as joeuser
+ $ make install
+
+
+Note that `make test` does nothing interesting.
+
+
+While doing 'perl Makefile.PL', the package may complain about missing perl
+packages.  It is HIGHLY recommended that you download any and all necessary
+perl modules to ensure that Test::Reporer works properly.
+
+
+Uninstallation
+--------------
+
+Under a user with sufficient permissions and from the program
+distribution directory, execute
+
+  perl Makefile.PL
+
+if there isn't a file called Makefile.  Then execute
+
+  make uninstall
+
+This sometimes works, and sometimes it does not.  If it refuses to work,
+you can simply remove all files by hand.  Look for the .packlist file
+which perl created when installing the software and remove all files you
+find in there.

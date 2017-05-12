@@ -1,0 +1,34 @@
+Revision history for Perl extension Tuxedo::Admin.
+
+0.0.8  Mon Jun 30 00:06:21 BST 2003
+  - Fixed showstopper bug in the _fields() method of a lot of classes - the
+    "exists" field was incorrectly included resulting in an invalid TA_EXISTS
+    field being sent.  Added a debug() method to Admin.pm and ud32.pm that
+    allows tracing of input and output buffers to be turned on and off - very
+    useful for debugging and if you're a bit paranoid (as you should be :-).
+    ImportedResource.pm now works - added some tests for this.  More
+    documentation fixes.
+
+0.0.7  Sun Jun 29 16:26:21 BST 2003
+  - Version 0.07 is a clean-up and documentation release, and more test cases
+    have been added.  It has still only been tested against Tuxedo 8.1, but I
+    plan to ensure that it works against at least Tuxedo 6.5 and up.  There
+    are some examples under the t/ directory and in the documentation.
+
+0.06  Wed Jun 25 23:54:13 2003
+  - The main reason for this release is to have a working 'make test', so that
+    the cpan-testers don't get failed builds.  I'm busy reworking the API so
+    that only the parameters required to do a GET are mandatory for the new
+    function, rather that all the required parameters for creating a new
+    object.  I'm also ensuring that all objects have an exists() method.  More
+    documentation is provided, but it is still incomplete and probably
+    inaccurate in places.
+
+0.05  Mon Jun 21 23:11:53 2003
+  - Version 0.05 is the first public release.  It is not fully-functional, but
+    is useful for some tasks, particularly those involving groups and servers.
+    The API is not stable and is likely to change based on experience using
+    the various modules.  Only tested against Tuxedo 8.1, but I plan to ensure
+    that the library works with at least Tuxedo 6.5 and up.  'make test' does
+    not currently work, but there are some examples under the t/ directory.
+

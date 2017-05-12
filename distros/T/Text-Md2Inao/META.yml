@@ -1,0 +1,44 @@
+---
+abstract: 'Convert markdown text to Inao-format'
+author:
+  - '@naoya_ito'
+  - '@__gfx__'
+build_requires:
+  Devel::Cover: 0
+  ExtUtils::MakeMaker: 0
+  Test::Base: 0
+  Test::LongString: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.74
+  ExtUtils::MakeMaker::CPANfile: 0.05
+  File::ShareDir::Install: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Md2Inao
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor::Fast: 0
+  Exporter::Lite: 0
+  File::ShareDir: 0
+  FindBin::libs: 0
+  HTML::TreeBuilder: 0
+  JSON: 2.55
+  Path::Tiny: 0
+  Pod::Usage: 0
+  Term::ANSIColor: 0
+  Text::Markdown::Hoedown: 0
+  Tie::IxHash: 0
+  Unicode::EastAsianWidth: 0
+  perl: 5.010_000
+resources:
+  bugtracker: https://github.com/naoya/md2inao/issues
+  repository: https://github.com/naoya/md2inao.git
+version: 0.11

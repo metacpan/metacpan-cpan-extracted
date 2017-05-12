@@ -1,0 +1,52 @@
+---
+
+- schema: Report
+  name: dummy 1
+  data:
+    id: 21
+
+- schema: Tap
+  name: tap 1
+  data:
+    id: 1
+    report_id: 21
+    tap: |
+      1..4
+      OK 1 foo
+      OK 2 bar
+      OK 3 affe
+      OK 4 zomtec
+
+- schema: Report
+  name: dummy 2
+  data:
+    id: 22
+
+- schema: Tap
+  name: tap 2
+  data:
+    id: 2
+    report_id: 22
+    tap: |
+      1..3
+      OK 1 berlin
+      OK 2 prag
+      OK 3 warschau
+
+- schema: Report
+  name: dummy 3
+  data:
+    id: 23
+
+- schema: Tap
+  name: tap 3
+  data:
+    id: 3
+    report_id: 23
+    tap: |
+      1..4
+      OK 1 affe
+      OK 2 loewe
+      OK 3 fink
+      OK 4 star
+

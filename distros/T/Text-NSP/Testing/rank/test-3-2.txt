@@ -1,0 +1,6 @@
+ngram<>1<>1
+ngram<>4<>1
+ngram<>6<>3
+ngram<>3<>3
+ngram<>2<>3
+ngram<>5<>6

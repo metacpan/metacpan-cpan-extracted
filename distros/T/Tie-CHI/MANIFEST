@@ -1,0 +1,10 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+lib/Tie/CHI.pm
+t/01-use.t
+t/02-tie-chi.t

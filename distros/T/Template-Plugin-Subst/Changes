@@ -1,0 +1,10 @@
+Revision history for Template-Plugin-Subst
+
+0.02	2005-11-14
+	Use 'defined' instead of '//', so it works with older Perls.
+
+	Include a Makefile.PL.
+
+0.01    2005-11-03
+        First version, released on an unsuspecting world.
+

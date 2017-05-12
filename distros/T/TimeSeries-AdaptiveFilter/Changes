@@ -1,0 +1,14 @@
+0.04      2017-02-27 07:56:13+00:00 UTC
+   Switch to dzil
+
+0.04 2016-06-15 binary.com <perl@binary.com>
+ - Avoid unnecessary inheritance from Exporter.
+
+0.03 2016-06-15 binary.com <perl@binary.com>
+ - Inline MAD-calculation function.
+
+0.02 2016-06-15 binary.com <perl@binary.com>
+ - Rewrite tests for the hard-coded valid random series.
+
+0.01 2016-06-13 binary.com <perl@binary.com>
+ - Initial version.

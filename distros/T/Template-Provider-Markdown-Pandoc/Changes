@@ -1,0 +1,14 @@
+# Change Log
+
+## [0.0.2] - 2017-04-01
+
+### Fixed
+
+- Skip tests if pandoc isn't installed.
+
+## [0.0.1] - 2017-03-23
+
+### Added
+
+- All the things. Release early, release often.
+

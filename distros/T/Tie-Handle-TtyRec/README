@@ -1,0 +1,70 @@
+NAME
+    Tie::Handle::TtyRec - write a ttyrec
+
+VERSION
+    Version 0.03 released ???
+
+SYNOPSIS
+        use Tie::Handle::TtyRec;
+        my $handle = Tie::Handle::TtyRec->new("foo.ttyrec");
+        print $handle "hello", "world";
+
+DESCRIPTION
+    A ttyrec is a format used for recording terminal sessions. Notably,
+    practically all NetHack games are recorded using ttyrecs. ttyrecs
+    include precise timing data and can be a little fiddly. This module lets
+    you focus on your application, instead of making sure your ttyrec
+    headers are perfect.
+
+    The usual way to use this module is through its "new" interface. It will
+    clobber the file you decide to record to. A way of allowing you to
+    instead append will be included in a future version.
+
+    Each argument to print will be put into its own ttyrec frame, using the
+    current time. So, the following will create three separate frames,
+
+        print $handle "foo", "bar", "baz";
+
+    The following will create only one frame,
+
+        print $handle "foo" . "bar" . "baz";
+
+SEE ALSO
+    Term::TtyRec, Term::TtyRec::Plus
+
+AUTHOR
+    Shawn M Moore, "<sartak at gmail.com>"
+
+BUGS
+    No known bugs.
+
+    Please report any bugs through RT: email "bug-tie-handle-ttyrec at
+    rt.cpan.org", or browse
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tie-Handle-TtyRec>.
+
+SUPPORT
+    You can find this documentation for this module with the perldoc
+    command.
+
+        perldoc Tie::Handle::TtyRec
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Tie-Handle-TtyRec>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Tie-Handle-TtyRec>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Handle-TtyRec>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Tie-Handle-TtyRec>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 Shawn M Moore.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

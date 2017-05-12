@@ -1,0 +1,44 @@
+---
+abstract: 'Simply testing module'
+author:
+  - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
+build_requires:
+  Test::Mock::Guard: 0
+  Test::Tester: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Clear
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Clear:
+    file: lib/Test/Clear.pm
+    version: 0.04
+requires:
+  Exporter: 0
+  Scope::Guard: 0
+  Test::Simple: 1.001014
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/hixi-hyi/p5-Test-Clear/issues
+  homepage: https://github.com/hixi-hyi/p5-Test-Clear
+  repository: git://github.com/hixi-hyi/p5-Test-Clear.git
+version: 0.04
+x_contributors:
+  - 'Hiroyoshi HOUCHI <account@hixi-hyi.com>'

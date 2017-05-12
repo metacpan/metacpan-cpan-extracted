@@ -1,0 +1,117 @@
+Revision history for Perl extension Tree::MultiNode.
+
+1.0.13 Fri Feb 19 2010 11:00:00 CST 2010
+  - Pause hung uploading 1.0.12 grr...
+
+
+1.0.12 Fri Feb 19 2010 09:00:00 CST 2010
+  - Tweak to new documentation for CPAN
+
+1.0.11 Fri Feb 19 2010 01:00:00 CST 2010
+  - Convert module to standart treee layout.
+  - Convert to Test::More suite with additional tests
+  - Generat META.yml file from new Build.PL data
+  - RT #5107 - Documentation patch for Tree-MultiNode-1.0.10
+  - RT #1743 - Documentation fix for traverse example to be consistent with code
+  - RT #5435 - New add_child_node sub to merge trees
+  - TODO: Need proper pod documentation for new sub.
+  - TODO: Need tests for the new feature.
+
+1.0.10 Tue May 27 14:06:33 EDT 2003
+  KRB: Markus Maier <maier.m@web.de> found a bug in the tree's destructor
+    that happens when a reference to a handle outlives the tree object.
+    $self->{'top'} is then undefined and _clearrefs should not be called
+    (a second time).
+  KRB: fixed documentaiton bug (set_key/set_value), added use strict and 
+    warnings to the example in the POD.
+
+1.0.9 Tue Oct  8 20:38:52 EDT 2002
+  KRB: Gregg Casillo <gcasillo@ket.org> sent in a fix that now allows
+    keys to store the numeric value 0.
+  KRB: fixed reported bug with traverse not passing the new handle.
+
+1.0.8 Wed May  8 10:06:22 EDT 2002
+  KRB: Papp Zoltan <padre@inf.elte.hu> pointed out a bug in
+    Tree::MultiNode::Node's _clearrefs() where an array ref was
+    not being dereferenced correctly.  The fix has been applied.
+
+1.0.7 Tue Nov 13 09:00:49 EST 2001
+  KRB: "Tunkelo Heikki (extern)" <Heikki.Tunkelo@erln.gepas.de> 
+       subumitted a patch that fixed the select() method.
+
+1.0.6 Wed Dec 13 11:43:11 EST 2000
+  KRB: traverse was created because of comments from
+          Sverrir Jonsson <Sverrir.Jonsson@net-linx-ps.com>
+
+1.0.5 Wed Dec 13 11:32:57 EST 2000
+  KRB: updated traverse so you can pass additional constant arguments
+          to the sub ref.
+
+1.0.4 Wed Dec 13 11:03:17 EST 2000
+  KRB: added Tree::MultiNode::Handle::traverse as a method that takes
+          a sub ref and invokes the subref for each node in the tree.
+
+1.0.3 Thu Sep  7 11:57:14 EDT 2000
+  KRB: added Tree::MultiNode::DESTROY, and Tree::MultiNode::Node::_clearrefs
+          so the refcounts of the nodes, as well as the data will go to
+          zero.  Eric Joanis <joanis@cs.toronto.edu> pointed out this bug,
+          and sent me an example.  The chagnes are based largely on his
+          work, with minor modifications.
+
+1.0.1 Tue Nov 23 11:05:42 EST 1999
+  KRB: added child_keys to the handle object to return the child
+          keys from the current node.
+ 
+1.0.1 Fri Jun  4 08:56:26 EDT 1999
+  KRB: fixed print message in get_child_value() -- it should only print
+          when $debug is defined...the bug was reported by 
+          Kohei Ohta <kohei@cysols.com>
+
+1.0.0 Mon May 17 11:25:51 EDT 1999
+  DXP: Applied patch from Daniel X. Pape dpape@canis.uiuc.edu,
+          which included:
+          - Node, and Handle objects: moved tree() member function from Node 
+            object to Handle object
+          - Handle object:  added functionality, and member function for depth
+            tracking as the Handle object is navigated through the tree.
+          - Documentation for the new code.
+
+        KRB: Added Handle::kv_pairs(), and Handle::remove_child().
+
+        KRB: Made minor changes to the debug statements so they print the
+          package name as well as the member function name - just to make
+          it easier to see these messages when used in conjunction with
+          other objects/packages/debugging code.
+      
+        KRB: Minor changes to the new() member functions, so the objects can
+          be constructed in a larger variety of ways.
+      
+        KRB: It seemed stable enough, and failry feature complete, and there
+          didn't seem like there were any more compelling reasons not to, so I
+           updated the version number to 1.0.0 so it looks stable.
+      
+        KRB:  All previous changes made by KRB...
+      
+0.9.4 Wed Apr 14 12:35:01 EDT 1999
+        Fixed the issue with make test, and re-released it as 0.9.4 - make test
+        wasn't outputting the standard test output ("ok x").  This was sparked
+        by the CPAN testers group.  Thanks.
+
+0.9.3 Wed Nov  4 16:17:49 EST 1998
+        Again, some minor bug fixes.
+
+0.9.2 Wed Nov  4 16:17:49 EST 1998
+        Some minor debugging, and added some (hopefuly useful)
+        member functions.
+
+0.9.1 Wed Oct 28 09:39:17 EST 1998 
+        First release to CPAN -- 0.9.1
+
+0.9.1 Wed Oct 28 09:39:17 EST 1998 
+        Made namespace change as suggested by Andreas J. Koenig, and 
+        created _alot_ more documentation.
+
+0.9.0 Tue Oct 27 10:34:49 EST 1998
+        Created Initial Version (multi_tree.pm)
+
+

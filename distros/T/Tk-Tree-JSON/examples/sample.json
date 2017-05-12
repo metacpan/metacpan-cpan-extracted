@@ -1,0 +1,23 @@
+[
+	"1",
+	1,
+	true,
+	"true",
+	false,
+	"false",
+	null,
+	"null",
+	"loooooooooong value",
+	{
+		"k0": "1",
+		"k1": 1,
+		"k2": true,
+		"k3": "true",
+		"k4": false,
+		"k5": "false",
+		"k6": null,
+		"k7": "null",
+		"k8": "loooooooooong value",
+		"STRING OF 10 CHARACTERS": "ABCDEFGHIJ"
+	}
+]

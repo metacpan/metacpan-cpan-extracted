@@ -1,0 +1,42 @@
+#! /usr/bin/perl
+# PODNAME: tapper-testsuite-benchmark-perlformance
+# ABSTRACT: Tapper - Wrapper for Benchmark::Perl::Formance
+
+use strict;
+use warnings;
+use Tapper::TestSuite::Benchmark::Perl::Formance;
+
+Tapper::TestSuite::Benchmark::Perl::Formance::run;
+
+
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+tapper-testsuite-benchmark-perlformance - Tapper - Wrapper for Benchmark::Perl::Formance
+
+=head1 ABOUT
+
+This is the frontend commandline tool for starting the Perl
+performance benchmark runs.
+
+=head1 AUTHOR
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut
+
+
+__END__
+

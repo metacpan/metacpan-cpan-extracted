@@ -1,0 +1,19 @@
+The module tests are run by *.t files in the t directory. But once you
+have 'make'd the module, you can try these commands to see what
+Test::Usage output actually looks like:
+
+    perl -Mblib -It -MM1_T -e test
+    perl -Mblib -It -MM2_T -e test
+    perl -Mblib -It -MM2_T -e 'test(c => 0)'
+
+    perl -Mblib -It -MFoo_T -e test
+    perl -Mblib -It -MFoo_T -e 'test(v => 0)'
+    perl -Mblib -It -MFoo_T -e 'test(v => 2)'
+    perl -Mblib -It -MFoo_T -e 'test(f => 1)'
+
+    perl -Mblib -MTest::Usage -e 'files(d => "t", i => "t")'
+
+        # These must be run from the 't' directory.
+    perl -Mblib -MTest::Usage -e files
+    perl -Mblib -MTest::Usage -e 'files(t => {v => 2, c => 0})'
+

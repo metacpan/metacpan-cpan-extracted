@@ -1,0 +1,36 @@
+---
+abstract: 'Smarty compatible template engine on Xslate'
+author:
+  - 'Fuji, Goro (gfx) <gfuji(at)cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Text::Clevery
+name: Text-Clevery
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0.13
+  Config::Tiny: 2.12
+  HTML::Entities: 1.35
+  Image::Size: 3.22
+  Plack: 0.9938
+  Text::Xslate: 0.2015
+  Time::Piece: 1.2
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gfx/p5-Text-Clevery.git
+version: 0.0004

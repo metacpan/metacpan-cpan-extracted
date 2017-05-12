@@ -1,0 +1,44 @@
+Newsgroups: perl.daily-build.reports
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:2131
+Return-Path: <easmith@beatrice.rutgers.edu>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 57345 invoked by uid 1005); 13 Jan 2003 09:59:44 -0000
+Delivered-To: perlmail-smokers-reports@perl.org
+Received: (qmail 57342 invoked by uid 76); 13 Jan 2003 09:59:44 -0000
+Received: from [h0IHkAZT5TbDYLufmj6dkGZtEjh3VX0S]@dogberry.rutgers.edu (HELO dogberry.rutgers.edu) (165.230.209.227) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-01-13 09:59:44Z
+Received: from portia.rutgers.edu (portia.rutgers.edu [165.230.209.233])	by dogberry.rutgers.edu (8.11.2/8.11.2) with ESMTP id h0DA1g7172432	for <smokers-reports@perl.org>; Mon, 13 Jan 2003 05:01:42 -0500 (EST)
+Received: (from root@localhost)	by portia.rutgers.edu (8.11.2/8.11.2) id h0DA1bB279351;	Mon, 13 Jan 2003 05:01:37 -0500 (EST)
+Date: Mon, 13 Jan 2003 05:01:37 -0500 (EST)
+Message-ID: <msgid+200301131001.h0DA1bB279351@portia.rutgers.edu>
+To: smokers-reports@perl.org
+Reply-To: allens@cpan.org
+Subject: Smoke 18468 irix 6.5 6.5.16m IP22 r5000 /disk3/cpan-current-portia
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Approved: news@nntp.perl.org
+
+Automated smoke report for patch 18468 on irix
+ - 6.5 6.5.16m IP22
+ r5000
+          v1.14      using  version 
+O = OK
+F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown
+    c = Configure, m = make, t = make test-prep
+
+         Configuration
+-------  --------------------------------------------------------------------
+O O O O -Duseperlio
+O O O O -Duseperlio -Duse64bitint
+O O O O -Duseperlio -Duselongdouble
+O O O O -Duseperlio -Dusemorebits
+O O O O -Dusethreads -Duseithreads -Duseperlio
+O O O O -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+O O O O -Dusethreads -Duseithreads -Duseperlio -Duselongdouble
+O O ? ? -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+| | | +- PERLIO = perlio -DDEBUGGING
+| | +--- PERLIO = stdio  -DDEBUGGING
+| +----- PERLIO = perlio
++------- PERLIO = stdio

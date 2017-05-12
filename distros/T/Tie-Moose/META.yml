@@ -1,0 +1,56 @@
+---
+abstract: 'tie a hash to a Moose object (yeah, like Tie::MooseObject)'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0.007'
+  Test::More: '0.96'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Moose
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Tie::Moose:
+    file: lib/Tie/Moose.pm
+    version: '0.003'
+  Tie::Moose::FallbackHash:
+    file: lib/Tie/Moose/FallbackHash.pm
+    version: '0.003'
+  Tie::Moose::FallbackSlot:
+    file: lib/Tie/Moose/FallbackSlot.pm
+    version: '0.003'
+  Tie::Moose::Forgiving:
+    file: lib/Tie/Moose/Forgiving.pm
+    version: '0.003'
+  Tie::Moose::ReadOnly:
+    file: lib/Tie/Moose/ReadOnly.pm
+    version: '0.003'
+requires:
+  Moose: '2.00'
+  MooseX::Traits: '0.09'
+  Types::Standard: '1.000000'
+  Types::TypeTiny: '1.000000'
+  namespace::autoclean: '0.20'
+  perl: '5.008000'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Tie-Moose/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Tie-Moose
+  homepage: https://metacpan.org/release/Tie-Moose
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-tie-moose.git
+version: '0.003'

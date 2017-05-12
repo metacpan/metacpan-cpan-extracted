@@ -1,0 +1,39 @@
+#	typemap for Term::ReadLine::Gnu
+#
+#	$Id: typemap 541 2016-06-07 14:22:03Z hayashi $
+
+const char *		T_PV
+CONST char *		T_PV
+Keymap			T_PTROBJ
+Function *		T_PTROBJ
+rl_command_func_t *	T_PTROBJ
+readline_state_t *	T_PTROBJ
+HIST_ENTRY *		T_HIST_ENTRY
+HISTORY_STATE *		T_PTROBJ
+t_utf8			T_XSTR
+t_utf8_free		T_XSTR_FREE
+
+########################################################################
+INPUT
+
+########################################################################
+OUTPUT
+T_XSTR
+	if ($var) {
+	  sv_setpv($arg, $var);
+	  if (utf8_mode)
+	    sv_utf8_decode($arg);
+	}
+T_XSTR_FREE
+	if ($var) {
+	  sv_setpv($arg, $var);
+	  if (utf8_mode)
+	    sv_utf8_decode($arg);
+	  xfree($var);
+	}
+T_HIST_ENTRY
+	if ($var && $var->line) {
+	  sv_setpv($arg, $var->line);
+	  if (utf8_mode)
+	    sv_utf8_decode($arg);
+	}

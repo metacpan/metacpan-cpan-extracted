@@ -1,0 +1,276 @@
+#!/usr/bin/perl
+#Copyright (c) 2013, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Toader;
+use Toader::AutoDoc;
+use Cwd;
+use Toader::Render::AutoDoc;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "toader-autodoc 0.0.0\n".
+		"\n".
+		"Switches:\n".
+		"-a <action>   The action to perform.\n".
+		"-p <path>   The path.\n".
+		"\n".
+		"Environmental Variables:\n".
+		"Toader_outputdir - The output directory to use.\n".
+		"\n".
+		"Actions:\n".
+		"find - Finds all the applicable documents.\n".
+		"render - Render it.\n".
+		"pa - Add a search path.\n".
+		"pg - Get the search paths.\n".
+		"pr - Removes the specified path.\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+
+}
+
+#gets the options
+my %opts=();
+getopts('a:p:', \%opts);
+
+if ( ! defined( $opts{a} ) ){
+	warn('toader-autodoc: Nothing action specified via -a');
+	exit 255;
+}
+
+#get the current directory
+my $dir=getcwd;
+
+my $toader=Toader->new({ dir=>$dir });
+if ( $toader->error ){
+	warn('toader-autodoc: Failed to initialize Toader');
+	exit $toader->error;
+}
+
+#set the output directory
+if ( defined( $ENV{'Toader_outputdir'} ) ){
+	$toader->setOutputDir( $ENV{'Toader_outputdir'} );
+	if ( $toader->error ){
+		warn('toader-dir: Failed to set the output directory. error="'.$toader->error.
+			 '" errorString="'.$toader->errorString.'"');
+		exit $toader->error;
+	}
+}
+
+#initialize Toader::AutoDoc
+my $ad=Toader::AutoDoc->new( $toader );
+if ( $ad->error ){
+	warn('toader-autodoc: new errored for Toader::AutoDoc');
+	exit $ad->error;
+}
+
+$ad->dirSet( $dir );
+if ( $ad->error ){
+	warn('toader-autodoc: Failed to set the directory to "'.$dir.'"');
+	exit $ad->error;
+}
+
+#adds a path
+if ( $opts{a} eq 'pa' ){
+	if ( !defined( $opts{p} ) ){
+		warn('toader-autodoc: No path specified via -p');
+		exit 254;
+	}
+
+	$ad->pathAdd( $opts{p} );
+	if ( $ad->error ){
+		warn('toader-autodoc: Failed to add "'.$opts{p}.'" as a path');
+		exit $ad->error;
+	}
+
+	exit 0;
+
+}
+
+#find the documents to process
+if ( $opts{a} eq 'find' ){
+	my @docs=$ad->findDocs;
+	if ( $ad->error ){
+		warn('toader-autodoc: Failed to locate documentation');
+		exit $ad->error;
+	}
+
+	print join( "\n", @docs );
+
+	if ( defined( $docs[0] ) ){
+		print "\n";
+	}
+
+	exit 0;
+}
+
+#gets the paths
+if ( $opts{a} eq 'pg' ){
+	my @paths=$ad->pathsGet;
+	if( $ad->error ){
+		warn('toader-autodoc: Failed to get the paths');
+		exit $ad->error;
+	}
+
+	print join( "\n", @paths );
+
+	if ( defined $paths[0] ){
+		print "\n";
+	}
+
+	exit 0;
+}
+
+#removes a path
+if ( $opts{a} eq 'pr' ){
+    if ( !defined( $opts{p} ) ){
+        warn('toader-autodoc: No path specified via -p');
+        exit 254;
+    }
+
+    $ad->pathRemove( $opts{p} );
+    if ( $ad->error ){
+        warn('toader-autodoc: Failed to remove "'.$opts{p}.'" as a path');
+        exit $ad->error;
+    }
+
+    exit 0;
+
+}
+
+#renders it
+if ( $opts{a} eq 'render' ){
+	my $renderer=Toader::Render::AutoDoc->new({
+		obj=>$ad,
+		toader=>$toader,
+											  });
+	if ( $renderer->error ){
+		warn('toader-autodoc: Failed to initialize Toader::Render::AutoDoc');
+		exit $renderer->error;
+	}
+	$renderer->render;
+	if ( $renderer->error ){
+		warn('toader-autodoc: Rendering failed');
+		exit $renderer->error;
+	}
+
+}
+
+=head1 NAME
+
+toader-autodoc - Manipulates Toader's automatic documentation handling.
+
+=head1 SYNOPSIS
+
+toader-autodoc -a find
+
+toader-autodoc -a pa -p <path>
+
+toader-autodoc -a pg
+
+toader-autodoc -a pr -p <path>
+
+toader-autodoc -a render
+
+=head1 SWICHES
+
+=head2 -a <action>
+
+The action to perform.
+
+=head2 -p <path>
+
+The path to use.
+
+=head1 ACTIONS
+
+=head2 find
+
+This returns the relative paths from the current Toader dir for found
+documentation.
+
+=head2 pa
+
+Add the specified path under the current Toader dir.
+
+=head2 pg
+
+Gets the autodoc path list.
+
+=head2 pr
+
+Removes the specified path under the current Toader dir.
+
+=head2 render
+
+Renders it. This requires the environmental variable "Toader_outputdir"
+be specified.
+
+=head1 Environmental Variables
+
+=head2 Toader_outputdir
+
+The output directory to use.
+
+=head1 AUTHOR
+
+Copyright (c) 2013, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+unix
+
+=head1 README
+
+toader-autodoc -
+
+=cut

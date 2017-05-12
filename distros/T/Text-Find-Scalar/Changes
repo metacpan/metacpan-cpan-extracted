@@ -1,0 +1,22 @@
+Revision history for Perl extension Text::Find::Scalar.
+
+0.06  2016-05-15
+    - fix warning 'Unescaped left brace in regex is deprecated'
+
+0.05  2006-12-08
+    - extra version bump
+
+0.04  2006-08-04
+    - more documentation (thanks to Corion)
+    - more tests
+
+0.03  2006-08-04
+    - added wantarray to find method
+
+0.02  2006-02-11
+    - more documentation
+    - minor bug in documentation fixed
+    
+0.01  2006-02-10
+    - original version; created by h2xs 1.23 with options
+        -b 5.6.1 -XA -n Text::Find::Scalar

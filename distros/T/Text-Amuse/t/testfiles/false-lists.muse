@@ -1,0 +1,32 @@
+#title False lists
+
+                                         A. Carletto
+
+                 A. C. Mill
+
+    B. Test
+
+  Signed.
+
+  A. Prova
+
+     X. Prova
+
+        c. Prova
+
+           - Prova      
+   
+
+        b. Prova
+
+           b. Prova      
+
+In England (not including Scotland and Ireland) the poor-rate was:
+
+ 1801.  | £4,078,891   |  for a population of   | 8,872,980
+ 1818.  | £7,870,801   |   ” ” ” ”             | 11,978,875
+ 1833.  | £8,000,000   |   ” ” ” ”              | 14,000,000
+
+
+                - - -
+

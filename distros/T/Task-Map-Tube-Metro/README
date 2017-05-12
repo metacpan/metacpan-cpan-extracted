@@ -1,0 +1,116 @@
+NAME
+    Task::Map::Tube - Install the Map::Tube concrete metro modules.
+
+SYNOPSIS
+     cpanm Task::Map::Tube::Metro
+
+SEE ALSO
+    Map::Tube::Barcelona
+        Interface to the Barcelona Metro Map.
+
+    Map::Tube::Beijing
+        Interface to the Beijing tube map
+
+    Map::Tube::Berlin
+        Interface to the Berlin S- and U-Bahn map.
+
+    Map::Tube::Bucharest
+        Interface to the Bucharest Metro Map.
+
+    Map::Tube::Budapest
+        Interface to the Budapest Metro Map.
+
+    Map::Tube::Delhi
+        Interface to the Delhi Metro Map.
+
+    Map::Tube::Dnipropetrovsk
+        Interface to the Dnipropetrovsk Metro Map.
+
+    Map::Tube::Glasgow
+        Interface to the Glasgow tube map
+
+    Map::Tube::Kazan
+        Interface to the Kazan Metro Map.
+
+    Map::Tube::Kharkiv
+        Interface to the Kharkiv Metro Map.
+
+    Map::Tube::Kiev
+        Interface to the Kiev Metro Map.
+
+    Map::Tube::KoelnBonn
+        Interface to the Koeln-Bonn U- and S-Bahn and tram maps.
+
+    Map::Tube::KualaLumpur
+        Interface to the KualaLumpur urban monorail system map.
+
+    Map::Tube::London
+        Interface to the London Tube Map.
+
+    Map::Tube::Lyon
+        Interface to the Lyon metro map.
+
+    Map::Tube::Malaga
+        Interface to the Málaga Metro Map.
+
+    Map::Tube::Minsk
+        Interface to the Minsk Metro Map.
+
+    Map::Tube::Moscow
+        Interface to the Moscow Metro Map.
+
+    Map::Tube::NYC
+        Interface to the NYC Subway Map.
+
+    Map::Tube::Nanjing
+        Interface to the Nanjing Metro Map.
+
+    Map::Tube::Novosibirsk
+        Interface to the Novosibirsk Metro Map.
+
+    Map::Tube::Prague
+        Interface to the Prague Metro Map.
+
+    Map::Tube::SaintPetersburg
+        Interface to the Saint Petersburg Metro Map.
+
+    Map::Tube::Samara
+        Interface to the Samara Metro Map.
+
+    Map::Tube::Singapore
+        Interface to the Singapore Metro Map.
+
+    Map::Tube::Sofia
+        Interface to the Sofia Metro Map.
+
+    Map::Tube::Tbilisi
+        Interface to the Tbilisi Metro Map.
+
+    Map::Tube::Tokyo
+        Interface to the Tokyo Subway Map.
+
+    Map::Tube::Vienna
+        Interface to the Vienna U-Bahn Map.
+
+    Map::Tube::Warsaw
+        Interface to the Warsaw Tube Map.
+
+    Map::Tube::Yekaterinburg
+        Interface to the Yekaterinburg Metro Map.
+
+REPOSITORY
+    <https://github.com/tupinek/Task-Map-Tube-Metro>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015-2016 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.12
+

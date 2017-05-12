@@ -1,0 +1,4 @@
+&~ use Filter::CommaEquals; ~&
+&~ @{ $_{users} } ,= 'GHOST' ~&
+&~ for (@{ $_{users} }) { ~&Hello, #~ $_ ~#!
+&~ } ~&

@@ -1,0 +1,22 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+lib/Time/Normalize.pm
+t/0-signature.t
+t/doc.t
+t/hms.t
+t/month.t
+t/rct.t
+t/utils.t
+t/year.t
+t/ym.t
+t/ymd.t
+t/ymd3.t
+t/ymdhms.t
+SIGNATURE    Added here by Module::Build

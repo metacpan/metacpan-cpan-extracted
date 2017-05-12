@@ -1,0 +1,115 @@
+#idx_div_errors {
+    font-weight: bold;
+    color: red;
+}
+#idx_div_save {
+    background-color: #bebebe;
+    border: 1px solid #585858;
+    margin-top: 5px;
+    width: 514px;
+    height: 24px;
+    padding: 2px;
+}
+#idx_div_save input {
+    width: 515px;
+}
+#idx_div_errors ul {
+    list-style-type: disc;
+}
+table {
+    border-collapse: collapse;
+    width: 520px;
+}
+table input {
+    width: 362px;
+}
+table input.half {
+    width: 176px;
+}
+table select {
+    width: 370px;
+}
+table img {
+    border: none;
+    margin-bottom: -3px;
+    cursor: pointer;
+}
+table img.clone_line {
+    margin-bottom : -6px;
+    margin-left   : -8px;
+    margin-right  : -3px;
+}
+table.chart_line,
+table.chart_tags,
+table.chart_marking_add {
+    margin-top: 5px;
+}
+table.chart_marking {
+    margin-top: -1px;
+}
+table tr td:first-child {
+    width: 130px;
+    vertical-align: top;
+}
+td {
+    background-color: #d3d3d3;
+    border: 1px solid #585858;
+    padding: 2px;
+}
+div.column_concat {
+    margin: 2px;
+    text-align: center;
+}
+select.bench_operator {
+    width: 100px;
+}
+img.add_restict_value,
+img.delete_restict_value {
+    margin-right: 3px;
+}
+input.axis_element_input,
+input.restricted_value_input {
+    width: 343px;
+}
+.bold {
+    font-weight: bold;
+}
+.hideit {
+    display: none;
+}
+.header {
+    background-color: #bebebe;
+    font-weight: bold;
+}
+.stext {
+    font-size: 8px;
+    margin-left: 5px;
+}
+.stext.durltext {
+    margin-left: 127px;
+}
+.redborder {
+    border-color: red;
+}
+.redfont {
+    color: red;
+}
+
+input.cl_chart_line_where_template {
+    margin-left  : 16px;
+}
+input.cl_chart_line_where_numeric {
+    margin-left  : 22px;
+    margin-top   : 3px;
+}
+input.cl_chart_line_where_column {
+    margin-left  : 14px;
+    width        : 280px;
+}
+input.chart_tag_input {
+    width        : 475px;
+}
+input.chart_marking_color_input {
+    width        : 344px;
+    border-right :  20px solid green;
+}

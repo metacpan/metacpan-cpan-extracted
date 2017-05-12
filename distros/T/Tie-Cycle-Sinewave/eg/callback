@@ -1,0 +1,32 @@
+#! /usr/local/bin/perl -w
+#
+# callback - demonstrate how callbacks can modify the parameters
+#            of a Tie::Cycle::Sinewave object
+#
+# This file is part of the Tie::Cycle::Sinewave perl extension
+# Copyright (c) 2005 David Landgren. All rights reservered.
+
+use strict;
+use Tie::Cycle::Sinewave;
+
+tie my $c, 'Tie::Cycle::Sinewave', {
+    start_min => 1,
+    min       => 10,
+    max       => 20,
+    period    => 4,
+    at_max    => sub {
+        my $s = shift;
+        $s->min($s->min() - 2);
+        $s->period($s->period() + 1 );
+    },
+    at_min    => sub {
+        my $s = shift;
+        $s->max($s->max() + 5);
+        $s->period($s->period() + 1 );
+    },
+};
+
+while( 1 ) {
+    printf "%10.2f\n", $c;
+    select undef, undef, undef, 0.15;
+}

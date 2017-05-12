@@ -1,0 +1,198 @@
+==================================================
+Changes from 2012-10-31 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.143 at 2013-10-31 08:05:07 +0000
+------------------------------------------
+
+  Change: 924ac4c846a3cd4611e5cc1324b5d95b85b7b0c8
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-10-31 17:04:38 +0000
+
+    update doc/sample little bit. 
+
+  Change: 3986340b96ea7d69d8c764f79e796ae34586e873
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-10-31 16:34:25 +0000
+
+    Update README, enhance test codes 
+
+  Change: dcab9dbde63fa30332e5fb2d79bca414256b99c5
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-10-31 11:28:02 +0000
+
+    adding sample files 
+
+  Change: 6d45aa8af5d7baa3357d724019f2d70fcac0d8ec
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-08 10:36:54 +0000
+
+    update version 
+
+  Change: 4e5082c5eb52364a404014e5206065a668a39d64
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-08 10:35:58 +0000
+
+    fix doc. 
+
+  Change: 47821fb37a91b3e2e2d43eda45d0b18a8534de5f
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-08 10:28:34 +0000
+
+    Issue #2
+
+    * Add converter which converts changable parts to Regexps. * Add a
+    test case. * update version 
+
+  Change: 43a7925e2eae28d0d990abc7ce5dfcb9f4dad5aa
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-08 10:02:48 +0000
+
+    update doc 
+
+  Change: 836261b26108837a530e46f6a4603fa76a9e3a7e
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-08 08:45:32 +0000
+
+    Issue #7
+
+    * Need more tests for tt2 converter * remove the presumption that
+    tokens are splited by white spaces. * update test cases. * update
+    version 
+
+  Change: d90838ba280b5a5c58f561ad0f16fe66f46c3808
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-08 08:04:56 +0000
+
+    fix Moo default value to code ref. 
+
+  Change: 3b826439049c12e18bed63ceccbc6849c0330d28
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-07-07 01:54:07 +0000
+
+    Issue #10
+
+    * Remove document about Parse::Token::Lite::Token. * Update document. 
+
+  Change: dd06f3708da2d6f5044a8fa7ad6c3d80d05f2a42
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-07-07 01:01:50 +0000
+
+    Issue #9
+
+    * _diff should return list based on $a * test case added. 
+
+  Change: 7365797ce4c7f7f0256b24d5b21871dcee83ae64
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-07-07 00:20:56 +0000
+
+    Issue #4
+
+    * Add using object( has as_string() ) input. * Use Wildcard value
+    {bless [],'WILDCARD'} instead of '*'. 
+
+  Change: e8b3a96286923f2703c961ed0f6b8b975f542cae
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-07-06 21:39:11 +0000
+
+    update doc. 
+
+  Change: 6c82d1f8d5e3999e4b3cc44021d0d1ef19d6a334
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-07-06 21:35:37 +0000
+
+    fix mis-typing. 
+
+  Change: e1cc8757772818173b111b93f9b36ebb06b8e878
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-07-06 21:30:55 +0000
+
+    Issue #8
+
+    Change ouput format to OO Remove tests not needed. 
+
+  Change: 3aab8cab5cdd0e2c138fbf2e939b5ac35270dee2
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-05 19:07:47 +0000
+
+    update README 
+
+  Change: 7be35d78ff5e95e11276f520c8c57027d17b3e4a
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-05 10:44:09 +0000
+
+    Change using Any::Moose to Moo 
+
+  Change: 97744ad80905a0cd6a115fa44e676da5b786e830
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-05 10:39:47 +0000
+
+    change version. 
+
+  Change: 716c0996797ae814e26bf66ffae6958669c57927
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-05 10:29:43 +0000
+
+    Issue #1,#3
+
+    - Use arrays intead of string as input. - Remove Spacer and Splitter
+    interface. 
+
+  Change: a662d35639aa0daaa1ab3ec6194af267699e0293
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-05-12 01:47:34 +0000
+
+    for https://metacpan.org/author/AMORETTE 
+
+-----------------------------------------
+version 0.04 at 2013-04-05 02:08:46 +0000
+-----------------------------------------
+
+  Change: fe7ac2f29fc2d98cf7d81814dd4ef00d4ff55ad6
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-04-05 11:08:46 +0000
+
+    fix recovering url bug 
+
+-----------------------------------------
+version 0.02 at 2013-04-05 00:34:57 +0000
+-----------------------------------------
+
+  Change: aefc6d5c8d55431040292f2315d47d1a4b881954
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-04-05 09:34:57 +0000
+
+    add HTML spacer 
+
+-----------------------------------------
+version 0.01 at 2013-04-04 10:45:06 +0000
+-----------------------------------------
+
+  Change: b8a28846de850e15495582050b10599985d7185f
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-04-04 19:45:06 +0000
+
+    add html urlsafe spacer 
+
+  Change: a2200ee5d5a3f34fa326c91defc1e62c35be67d9
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2012-04-27 22:51:55 +0000
+
+    add repo url and homepage in Metadata 
+
+  Change: f9b08740d02bba03ace95f817ce2a9ecfa66640c
+  Author: sng2c <sng2nara@hanmail.net>
+  Date : 2012-04-26 13:16:06 +0000
+
+    Accepting Odd-Even versioning. version to 0.009 
+
+  Change: 0463b164ed717a85ce1eb501f7ff36af7ca6209a
+  Author: sng2c <sng2nara@hanmail.net>
+  Date : 2012-04-26 13:13:01 +0000
+
+    Documentation more. Change version to 0.008 in dist.ini 
+
+================================================
+Plus 5 releases after 2012-10-31 00:00:00 +0000.
+================================================

@@ -1,0 +1,32 @@
+Revision history for Perl extension Tie::Hash::Interpolate.
+
+0.07 Sat Jan 16 16:37:09 2010
+   - added repository to Build.PL
+   - corrected MANIFEST t/ listing
+   - added VERSION info to main pod
+
+0.06 Sun Oct 4 2009
+   - modernized distribution
+
+0.05  Wed Feb 25 2004
+   - documentation fixes
+
+0.04  Tue Feb 24 2004
+   - consider hashes with 1 key as constants
+   - added C<new()> constructor for object-like instantiation
+   - added C<one_key> option to control fetch behavior when the hash has only
+     one key
+
+0.03  Sun Feb  8 2004
+   - added support for C<extrapolate> option
+
+
+0.02  Sat Feb  7 2004
+   - fix example in SYNOPSIS
+   - only sort keys when we C<FETCH()> afer keys have been modified
+
+
+0.01  Thu Feb  5 2004
+     - original version; created by h2xs 1.22 with options
+        -AX -b 5.6.0 -n Tie::Hash::Interpolate
+

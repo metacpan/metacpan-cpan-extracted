@@ -1,0 +1,63 @@
+Revision history for Test-Proto
+
+Unreleased changes
+
+0.027	2013-12-25
+		Added ':all' import option: use Test::Proto ':all';
+		All .pm files now "use 5.008;" and not 5.006
+		Some docs fixes
+
+0.026	2013-11-29
+		Fixed gh #39 (type checking for pArray etc.)
+
+0.025	2013-10-07
+		Fixed gh #42 (using Formatter on validate results)
+
+0.024	2013-10-02
+		Bug causing install fail on 5.16+ fixed (use of defined on array)
+
+0.023	2013-09-26
+		Bug in clone method fixed
+		ref now takes a prototype, as per docs
+		Added methods blessed, array, hash, object, scalar, scalar_ref
+		TestCase attributes are now chainable
+		Small documentation fixes
+		Test coverage improvements
+		Fixed versioning so CPAN installation should work, at expense of duplication.
+
+0.022	2013-09-13
+		Added refaddr, refaddr_of
+		Bugs, including in hash enumerate, fixed
+		Test coverage improved
+		Version history dates corrected(!)
+
+0.021	2013-08-30
+		Various documentation fixes
+		All attributes of Series, Repeatable, and Alternation are chainable
+
+0.020	2013-08-29
+		Near total rewrite. Major non-compatibility changes!
+		* Rewritten the underlying logic of running the tests: this is now done by a TestRunner. 
+		* Pass/Fail objects are now TestRunners. Created more of a DSL for defining prototype classes. 
+		* Formatting logic broken out.
+		* All classes use Moo. 
+		* Value, ArrayRef and HashRef refactored out as roles. Rewritten all of the tests.
+		* Many more features added and fixed
+		* Can tag prototypes
+		* gt, lt, ne, eq, ge, le are string by default
+		* is_like is now called like
+		* is_unlike is now called unlike
+		* is_also is now called also
+		* array_length is now called count_items
+		* key_has_values is now called superhash_of
+
+0.011	2012-06-14
+		Fixed prerequisites.
+
+0.010	2012-06-12
+		First release: Hopefully ready for CPAN!
+		This first release is a usable version of Test::Proto. The main components will be functional enough to write reasonably complex tests for native data structures, run method calls on objects, and execute arbitrary code within the framework. Failure and Exception behaviour is not thoroughly tested. There will no doubt be some API changes later on.
+
+0.001	2012-03-29
+		First commit: proof of concept
+

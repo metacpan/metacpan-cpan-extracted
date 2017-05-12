@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset load_strategy="INSERT_LOAD_STRATEGY">
+    <emp empno="1" ename="Scott" deptno="10" job="project manager" />
+    <emp empno="2" ename="John"  deptno="10" job="engineer" />
+    <emp empno="3" ename="Mark"  deptno="10" job="sales assistant" />
+    <bonus ename="scott" job="project manager" sal="20" />
+</dataset>

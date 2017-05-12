@@ -1,0 +1,56 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Group::SQL::Statement - construct preparable SQL statements
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder;
+	my $placeholder = Text::Placeholder->new(
+		my $sql_statement = '::SQL::Statement');
+	$sql_statement->placeholder_re('some_name');
+	$placeholder->compile('DELETE FROM table WHERE field = [=some_name=]');
+
+	print ${$placeholder->execute()}, "<-\n";
+	print join(', ', @{$sql_statement->fields});
+
+
+=head1 DESCRIPTION
+
+Provides placeholders based on a configurable RE. All placeholders matching the RE are substituted by question marks. A list of matches can be obtained.
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item subject($row)
+
+Sets or gets the retrieved row.
+
+=item fields
+
+Gets the captured placeholder parts.
+
+=item placeholder_re
+
+The regular expression for matching placeholders.
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

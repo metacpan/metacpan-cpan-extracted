@@ -1,0 +1,146 @@
+#!/usr/bin/env perl
+#
+use strict;
+use warnings;
+
+sub do_bv {
+    my $config = shift;
+
+    # output the basic stuff
+    print(
+        "Exim version 4.74 #1 built 25-Jan-2011 22:21:31\n",
+        "Copyright (c) University of Cambridge, 1995 - 2007\n",
+        "Berkeley DB: Sleepycat Software: Berkeley DB 4.3.29: (June 16, 2006)\n",
+        "Support for: crypteq iconv() IPv6 OpenSSL move_frozen_messages Content_Scanning DKIM Old_Demime\n",
+        (
+            "Lookups (built-in): lsearch wildlsearch nwildlsearch iplsearch cdb dbm",
+            " dbmnz dnsdb dsearch ldap ldapdn ldapm mysql nis nis0 passwd\n"
+        ),
+        "Authenticators: cram_md5 dovecot plaintext\n",
+        "Routers: accept dnslookup ipliteral manualroute queryprogram redirect\n",
+        "Transports: appendfile/maildir/mailstore/mbx autoreply lmtp pipe smtp\n",
+        "Size of off_t: 8\n",
+        "OpenSSL compile-time version: OpenSSL 0.9.8a 11 Oct 2005\n",
+        "OpenSSL runtime version: OpenSSL 0.9.8a 11 Oct 2005\n"
+    );
+    if ( $config && ( $config =~ /duff/ ) ) {
+        print( "2009-08-13 14:53:51 Exim configuration error in line 1 of $config:\n", "  main option \"crap\" unknown\n" );
+        exit(1);
+    }
+    else {
+        print( "Configuration file is ", ( $config || '/etc/exim/exim.conf' ), "\n" );
+    }
+    exit(0);
+}
+
+sub do_bp {
+    my $config = shift;
+
+    # output the basic stuff
+    print(<<EOS);
+accept_8bitmime
+acl_not_smtp = 
+acl_not_smtp_mime = 
+acl_not_smtp_start = 
+acl_smtp_auth = 
+acl_smtp_connect = 
+acl_smtp_data = acl_check_data
+acl_smtp_dkim = 
+acl_smtp_etrn = 
+acl_smtp_expn = 
+acl_smtp_helo = 
+acl_smtp_mail = acl_check_mail
+acl_smtp_mailauth = 
+acl_smtp_mime = acl_check_mime
+acl_smtp_notquit = 
+acl_smtp_predata = 
+acl_smtp_quit = 
+acl_smtp_rcpt = acl_check_rcpt
+acl_smtp_starttls = 
+acl_smtp_vrfy = 
+admin_groups =
+no_allow_domain_literals
+no_allow_mx_to_ip
+no_allow_utf8_domains
+auth_advertise_hosts = 
+auto_thaw = 0s
+av_scanner = clamd:/var/run/clamd.exim/clamd.sock
+EOS
+    exit(0);
+}
+
+sub do_be {
+    my $config = shift;
+    my $string = shift;
+
+    if ( $string =~ /lookup{(\w+)}/ ) {
+        print $1 eq 'postmaster' ? "root\n" : "\n";
+    }
+    else {
+	print "$string\n";
+    }
+}
+
+sub do_bt;
+
+sub do_bt {
+    my $config = shift;
+    my $addr   = shift;
+
+    if ( $addr =~ /discard/ ) {
+        print "$addr is discarded\n";
+    }
+    elsif ( $addr =~ /undel/ ) {
+        print "$addr is undeliverable\n";
+    }
+    elsif ( $addr =~ /^multiple(\d+)\@(.*)/ ) {
+        foreach my $num ( 1 .. $1 ) {
+            do_bt( $config, sprintf( 'target%d@%s', $num, $2 ) );
+        }
+    }
+    elsif ( $addr =~ /(.*)\@local/ ) {
+        print "$addr -> $1\n";
+        print "  transport = local_delivery\n";
+    }
+    else {
+        print "$addr\n";
+        print "  router = smart_route, transport = remote_smtp\n";
+        print "  host 192.168.1.1 [192.168.1.1] \n";
+    }
+}
+
+# main
+{
+    my $config;
+    my $addr_mode;
+    foreach (@ARGV) {
+        if (/^-C(.*)/) {
+            $config = $1;
+        }
+        elsif (/^--/) {
+
+            # skip
+        }
+        elsif (/^-bV/) {
+            do_bv($config);
+        }
+        elsif (/^-bP/) {
+            do_bp($config);
+        }
+        elsif (/^-be/) {
+            do_be(@ARGV);
+	    exit;
+        }
+        elsif (/^-bt/) {
+            $addr_mode++;
+        }
+        else {
+            if ($addr_mode) {
+                do_bt( $config, $_ );
+            }
+            else {
+                die "What do I do now???\n";
+            }
+        }
+    }
+}

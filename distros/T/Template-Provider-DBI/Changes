@@ -1,0 +1,14 @@
+0.03 - 2007-01-23:
+Rename _mtime to _modified, cos someone munged my patch to TT and didnt tell me
+(Currently untested as SQLite doesnt have datetime formats)
+
+2007-01-23:
+0.02 - Skip tests if no DBD::SQLite installed.
+
+2007-01-21:
+0.01 - Initial version.
+
+2005-12-18:
+Started
+
+

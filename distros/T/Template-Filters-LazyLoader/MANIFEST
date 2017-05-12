@@ -1,0 +1,15 @@
+MANIFEST
+lib/Template/Filters/LazyLoader.pm
+README
+Makefile.PL
+Changes
+t/lib/CustomFilters.pm
+t/lib/NeverCalled.pm
+t/lib/CustomFilters/Seattle.pm
+t/lib/CustomFilters/Osaka.pm
+t/lib/CustomFilters/USA/Okurahoma.pm
+t/00-compile.t
+t/01-pod-coverage.t
+t/02-template-filters-lazyloader.t
+t/03-pkg.t
+META.yml                                 Module meta-data (added by MakeMaker)

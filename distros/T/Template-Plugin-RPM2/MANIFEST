@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Template/Plugin/RPM2.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/test.t
+t/test.rpm
+Makefile.PL

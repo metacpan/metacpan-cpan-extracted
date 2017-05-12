@@ -1,0 +1,36 @@
+---
+abstract: 'calculate the Levenshtein edit distance between two strings'
+author:
+  - 'Dree Mistrut <dree@friul.it>'
+  - 'Josh Goldberg <jgoldberg@cpan.org>'
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  lib: '0'
+  open: '0'
+  parent: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Levenshtein
+no_index:
+  package:
+    - Text::Levenshtein::TestUtils
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '0'
+  Unicode::Collate: '1.04'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/Text-Levenshtein
+  repository: https://github.com/neilbowers/Text-Levenshtein.git
+version: '0.13'

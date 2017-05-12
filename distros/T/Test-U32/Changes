@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::U32.
+
+0.01  Sat Jun  7 10:04:39 2008
+    - original version; created by h2xs 1.23 with options
+        -An Test::U32
+

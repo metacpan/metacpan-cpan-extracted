@@ -1,0 +1,81 @@
+---
+abstract: 'build a library of syntax-sugared Throwable-based exceptions'
+author:
+  - 'Christian Walde <walde.christian@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Fatal: '0'
+  Test::InDistDir: '0'
+  Test::More: '0'
+  Throwable::Error: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Throwable-SugarFactory
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Constructor::Sugar:
+    file: lib/Constructor/Sugar.pm
+    version: '0.152700'
+  Constructor::SugarLibrary:
+    file: lib/Constructor/SugarLibrary.pm
+    version: '0.152700'
+  MooX::BuildClass:
+    file: lib/MooX/BuildClass.pm
+    version: '0.152700'
+  MooX::BuildClass::Utils:
+    file: lib/MooX/BuildClass/Utils.pm
+    version: '0.152700'
+  MooX::BuildRole:
+    file: lib/MooX/BuildRole.pm
+    version: '0.152700'
+  MooX::SugarFactory:
+    file: lib/MooX/SugarFactory.pm
+    version: '0.152700'
+  Throwable::SugarFactory:
+    file: lib/Throwable/SugarFactory.pm
+    version: '0.152700'
+  Throwable::SugarFactory::Hashable:
+    file: lib/Throwable/SugarFactory/Hashable.pm
+    version: '0.152700'
+  Throwable::SugarFactory::Utils:
+    file: lib/Throwable/SugarFactory/Utils.pm
+    version: '0.152700'
+requires:
+  Class::Inspector: '0'
+  Exporter: '0'
+  Import::Into: '0'
+  Module::Runtime: '0'
+  Moo: '1.004000'
+  Moo::Role: '1.004000'
+  Package::Variant: '1.003002'
+  String::CamelCase: '0'
+  Throwable: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  strictures: '2'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Throwable-SugarFactory
+  homepage: https://github.com/wchristian/Throwable-SugarFactory
+  repository: https://github.com/wchristian/Throwable-SugarFactory.git
+version: '0.152700'

@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 af753bab1ecf5442ba67e4f6bf6bca5605b29d3c ChangeLog
+SHA1 62647027745e394450492878f8d8730548d83fa2 LICENSE
+SHA1 a4678731be8107e6c9a7fab8b003eb4bc9a14a7f MANIFEST
+SHA1 52e8daf52cf515cc41feb8f98fb98da001757b51 META.yml
+SHA1 77657320885ae8e886f09294d10d707bbaf15738 Makefile.PL
+SHA1 665e6dcfd394a88a91713bb4b4f53193a951f7af README
+SHA1 20c73697e1713638140c719d8eaa19a275ed43a5 inc/Module/AutoInstall.pm
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 ca13d9875e1249f6e84f7070be8152c34837955e inc/Module/Install/AutoInstall.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b501b0df59a5cd235cca473889f82c3d3429f39e inc/Module/Install/Include.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 dd5d33a9cd4f49af0b0134f41768e748e8c5bc58 lib/Term/RawInput.pm
+SHA1 7f2e13f5f6a798d52ea897d24d07b49af4039341 t/0-signature.t
+SHA1 278628f14e26a24ce744a5163362aad19b69a55e t/test.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXKlPkAAoJEBa/9Pad787EuUQIANA+UJ0MqY40IC0hvxlq+mmJ
+k8lfWaxrfIanKCrz6jhuuyblqVHM4V/l4VPI8EYZtag3wa4hKOyP9DbZffc+bAxu
+JhoYmDGmt+QfjdtJ6PPSa3gXDy0JB202jLZtX5pDUvars/soN4gKyRGz936u0G55
+JMAiP/ul03kPIHo6LMp5hFygizK2nKf8wyFgVKbCmIKK0p0OEyGkT7C5WVzNi5jC
+ncladIZQAfW+JmEwGuEZ1wUnrOF9ymFCgRrE5VJN7qxo8Hx4kfkfJl44PRfjBhkC
+q6Q4O2auyN1YV9r9F1qUY/DZiiDbDCnuiGnou9PVQiMj2EELwtE5xt2ZnZ+sskk=
+=yMbu
+-----END PGP SIGNATURE-----

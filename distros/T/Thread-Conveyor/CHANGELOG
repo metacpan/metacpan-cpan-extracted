@@ -1,0 +1,179 @@
+0.19    20 September 2010
+	Checking tool chain with perl.5.13.5.
+
+0.18	3 October 2007
+	Hopefully fixed test-suite for none thread enabled Perls.  Updated
+	to use new VERSION feature of Devel::Required.
+
+0.17	7 January 2004
+	Fixed some documentation inconsistencies.  Added documentation on what
+	is different from Thread::Queue::Any.
+
+	Made default optimization dependent on the version of Perl used.
+	Added test for it.
+
+	Removed mention of Storable: replaced it with Thread::Serialize.
+	Added Thread::Serialize as a dependency, just for documentation sake
+	really.
+
+0.16	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+	Added dependency to load.pm.
+
+0.15	9 November 2003
+	A problem in (threaded) 5.8.2 made Thread::Conveyor segfault in the
+	test-suite.  The problem was fortunately easy to circumvent: just don't
+	use subroutines consisting of {} as an object method (in the case of
+	Thread::Conveyor, the shutdown() method).
+
+0.14	11 August 2003
+	Cleaned up Makefile.PL and updated copyright info.  Verified everything
+	works with 5.8.1.  Updated dependency of Thread::Tie.
+
+0.13	30 September 2002
+	Use "load.pm" instead of AutoLoader.  Changed dependency on Thread::Tie
+	to version 0.08 (which also uses load.pm).
+
+	Added check for availability of methods again: load.pm does support
+	that, whereas AutoLoader does not.
+
+0.12	27 September 2002
+	Ask found another problem in T::C::Tied::clean_dontwait.  Fixed.
+
+	Also left warnings enabled in the test-suite last time, which caused
+	warnings in the make test.  Changed code so that the warnings are not
+	emitted anymore.
+
+0.11	26 September 2002
+	Fixed some warnings in T::C::Throttled, spotted by Ask Bjoern Hansen.
+
+	Removed "our" from $VERSION and @ISA, should shave off some bytes in
+	memory usage, as found from testing with Benchmark::Thread::Size.
+
+0.10	1 September 2002
+	Replaced dependency on Thread::Serialize by dependency on Thread::Tie
+	as the default, memory optimized implementation, now uses Thread::Tie.
+
+	Changed Thread::Conveyor so that it uses T::C::Tied for unthrottled
+	belts when optimizing for memory.
+
+	Changed T::C::Throttled so that it makes its own decision on which
+	belt implementation to be used, either T::C::Array (optimized for
+	CPU) or T::C::Tied (optimized for memory).
+
+	Added "semaphore" object method to T::C::Array for obtaining the
+	lock() semaphore, needed by T::C::Throttled.
+
+	Removed T::C::Thread from the distribution.  This shaves about 1200
+	bytes off of the distribution package.
+
+	Replaced Thread::Conveyor::Thread by Thread::Conveyor::Tied, which
+	uses Thread::Tie as its shared array implementation.  This has the
+	side-effect to being almost twice as slow but saving 18% of
+	memory (at least in the test-suite).  So there is now a true CPU
+	versus memory trade-off.  Main difference in CPU is caused by the
+	fact that whole array fetches aren't possible using the tie()
+	interface (this is a loop with FETCH()), wherease T::C::Thread was
+	optimized to deal with that case).  Main difference in memory is
+	caused by the fact that only one thread (the Thread::Tie default
+	thread) is used for all belts, whereas before each belt had its own
+	thread.  So the savings in memory could in real world situations, be
+	quite a lot more than the 18% seen in the test-suite.
+
+0.09	30 August 2002
+	Changed all modules to use AutoLoader to defer loading of necessary
+	subroutines to when they are actually needed.  This should save
+	memory and CPU for larger programs, or with large numbers of threads.
+	The test-suite only marginally takes more memory at the same CPU
+	usage: overhead of compiling is levelled out with the overhead of
+	cloning pre-compiled routines.
+
+0.08	20 August 2002
+	Dave Mitchell showed me the error of my ways with regards to client
+	server thread programming.  Fixed the handler optimized for memory so
+	that no yield()s are necessary anymore.  The whole thing now gets
+	through the test suite more than 25% faster for that part.
+	Scalability to many more threads should now be a lot better too.
+
+0.07	14 August 2002
+	Removed (possibly premature) optimization from T::C::Thread
+	_handler: it now doesn't zap the local threadspace anymore.
+
+0.06	13 August 2002
+	Handed over freezing and thawing operations to Thread::Serialize.
+	Added dependency to Thread::Serialize in Makefile.PL.
+
+0.05	6 August 2002
+	Fixed "onbelt" in T::C::Thread so that it won't hang if the belt is
+	shut down.  Needed for Thread::Pool and in general useful.
+
+	5 August 2002
+	Added index functionality to "peek" and "peek_dontwait" to all
+	sub-classes and added documentation for it.  Needed for Thread::Pool.
+
+	Finally got the T::C::Thread implementation getting through the
+	test-suite reliably.  Problem was caused by my misconception that
+	cond_wait would always regain the lock() after being signalled.  It
+	does not.  This should have been in big red letters in the
+	threads::shared pod.
+
+	Added methods "shutdown", "thread" and "tid" plus documentation.
+
+	3 August 2002
+	Adapted test-suite to use many more combinations of possible
+	settings.
+
+	2 August 2002
+	Added new "optimize" field parameter to allow you to select an
+	implementation optimized for speed (T::C::Array and T::C::Throttled)
+	or for memory (T::C::Thread).
+
+	Added new implementation of Thread::Conveyor based on using a
+	seperate thread for keeping the belt: Thread::Conveyor::Thread.
+
+	Move basic parts of Thread::Conveyor to Thread::Conveyor::Array.
+	Which should allow for other implementations of the conveyor
+	metaphor.
+
+0.04    1 August 2002
+	Added internal method "_belt" to get at the actual belt, for both
+	the normal and the throttled belt.
+
+0.03	31 July 2002
+	Added internal methods "_freeze" and "_thaw" so that we can move
+	to a different serialization scheme or other optimizations without
+	having to change all the sub-classes as well.  First user is
+	Thread::Conveyor::Monitored.
+
+	Added "maxjobs" and "minjobs" method in Thread::Conveyor that will
+	die when they're called (throttling only takes place in
+	Thread::Conveyor::Throttled).
+
+	Fixed problem that would cause throttling to not be switched off
+	when the "maxjobs" method was specified with an undef value.
+
+	Added methods "clean" and "clean_dontwait" for cleaning the belt
+	to both Thread::Conveyor and Thread::Conveyor::Throttled.  Also
+	added documentation for it.
+
+	Added internal method "_clean" for obtaining frozen contents of
+	the belt to both Thread::Conveyor and Thread::Conveyor::Throttled.
+	This was needed for Thread::Conveyor::Monitored.
+
+0.02	30 July 2002
+	Adapted Thread::Conveyor to default to a throttled conveyor belt
+	automatically if no specific parameters specified.  Now allows for
+	specification of throttling settings in a parameter hash reference.
+	If unthrottling is specifically specified, returns to the old
+	unthrottled behaviour (where the object is just an array reference),
+	thus keeping the old execution speed.
+
+	Added helper class Thread::Conveyor::Throttled to allow for throttled
+	conveyor belts that block if there are too many boxes on the belt.
+
+	Fixed some documentation nits.
+
+0.01	25 July 2002
+	First version of Thread::Conveyor, which started life as
+	Thread::Queue::Any.

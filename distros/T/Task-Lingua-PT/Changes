@@ -1,0 +1,8 @@
+Revision history for Task-Lingua-PT
+
+0.02    Sun Oct 17 20:44:10 WEST 2010
+        - Removed the t/ dir. No tests for the Task.
+
+0.01    Sun Oct 17 19:55:10 WEST 2010
+        First release with Bundle::Lingua::PT contents;
+

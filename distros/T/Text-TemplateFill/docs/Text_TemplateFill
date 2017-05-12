@@ -1,0 +1,229 @@
+.k perl report_writer
+.d Perl report_writer module
+.t Perl report_writer module
+
+.# SCCS: @(#)Text_TemplateFill 1.1 03/27/03 09:13:35
+
+Perl module
+.B Text:: "" TemplateFill
+
+This perl module can be used to easily write human language reports.
+In order to create report templates you need to understand how this module works, and how the
+program that uses this module works - ie what variables it exports, what paragraphs it uses, etc.
+
+.t How to Write a Template file
+
+You should glance at the next section. This section gives explains by example.
+
+Here is a template called 'Header':
+.code
+${#} This file contains a header paragraph
+${#}
+${Opt StartPage }
+${Opt StartPageTag Header } This is the default page header
+${#}
+${Opt Locale en_GB.ISO8859-1}
+${Opt PageLen 86 }
+${#}
+${#} Reset the page totals of units:
+${Calc PageQuantity = 0 }
+${Calc PageValue = 0 }
+${Now@time<%Y/%b/%d>}     Report for Something or another     PAGE ${PageNo}
+
+Line   SKU       Item Name                  Price  Quantity
+./code
+
+And another called 'Item':
+
+.code
+${#} This paragraph is used for every item that is output
+${#}
+${#} Total the number of items and the total value
+${Calc PageQuantity = PageQuantity + Quantity }
+${Calc LineValue = Price * Quantity }
+${Calc PageValue = PageValue + LineValue }
+${#}
+
+${ParaOnPage%2d}   ${SKU%6.6d} ${ProductDescription%-20s}            ${Price%8.2f}  ${Quantity%4d}
+./code
+
+And another called 'Footer'.
+
+.code
+${#} This paragraph is printed at the bottom of every page
+${#}
+${Opt EndPage} This line registers it as an end of page paragraph - there is no other so it is THE eop paragraph
+
+Total number of different items: ${Item.ParaOnPage}
+          Total number of boxes: ${PageQuantity}
+          Total value this page: ${PageValue%.2f}
+./code
+
+Notes:
+.AL 1
+.LI
+.B Locale
+.br
+This is the language_territory.CharacterSet
+You can use:
+.br
+.CW en_GB.ISO8859-1
+- England
+.br
+.CW en_US.ISO8859-1
+- USA
+.br
+.CW fr_FR.ISO8859-1
+- France
+.br
+.CW sv_SE.ISO8859-1
+- Sweden
+.br
+
+.LI
+A variable will be output in the minimum width unless there is special formatting, this is after a
+.B % .
+Immediately after the
+.B %
+come flags:
+.code
+ space   prefix positive number with a space
+ +       prefix positive number with a plus sign
+ -       left-justify within the field
+ 0       use zeros, not spaces, to right-justify
+ #       prefix non-zero octal with "0", non-zero hex with "0x"
+ number  minimum field width
+ .number "precision": digits after decimal point for
+         floating-point, max length for string, minimum length for integer
+./code
+
+This is followed by a conversion code:
+
+.code
+ s   a string
+ d   a signed integer, in decimal
+ u   an unsigned integer, in decimal
+ e   a floating-point number, in scientific notation
+ f   a floating-point number, in fixed decimal notation
+ g   a floating-point number, in %e or %f notation
+./code
+
+Examples:
+
+.code
+ Value      Format          Result
+   4        >%d<             >4<
+   4        >%2d<            > 4<
+   4        >%-2d<           >4 <
+   4        >%.2d<           >04<
+  12        >% 3.3d<         > 012<
+ -12        >% 3.3d<         >-012<
+  12.34     >%f<             >12.340000<
+  12.34     >%.2f<           >12.34<
+  12.34     >%8.2f<          >   12.34<
+  12.34     >%-8.2f<         >12.34   <
+ -12.34     >%8.2f<          >  -12.34<
+  12.34     >%+8.2f<         >  +12.34<
+ -12.34     >%+8.2f<         >  -12.34<
+  12.34     >% 3.3f<         > 12.340<
+ -12.34     >% 3.3f<         >-12.340<
+  fred      >%s<             >fred<
+  fred      >%10s<           >      fred<
+  fred      >%-10s<          >fred      <
+  fred      >%.2s<           >fr<
+  fred      >%2s<            >fred<
+./code
+
+You may center something like this:
+
+.code
+  Value     Format                 Result
+  fred      >${Name@center<10>}<   >   fred   <
+./code
+
+.LI
+.B Now
+is the time that the report is generated, it is formatted in the
+.B time
+special conversion, the
+.B %
+codes are:
+.code
+  %%   a literal %
+  %a   locale's abbreviated weekday name (Sun..Sat)
+  %A   locale's full weekday name, variable length (Sunday..Saturday)
+  %b   locale's abbreviated month name (Jan..Dec)
+  %B   locale's full month name, variable length (January..December)
+  %c   locale's date and time (Sat Nov 04 12:02:33 EST 1989)
+  %d   day of month (01..31)
+  %D   date (mm/dd/yy)
+  %e   day of month, blank padded ( 1..31)
+  %h   same as %b
+  %H   hour (00..23)
+  %I   hour (01..12)
+  %j   day of year (001..366)
+  %k   hour ( 0..23)
+  %l   hour ( 1..12)
+  %m   month (01..12)
+  %M   minute (00..59)
+  %n   a newline
+  %p   locale's AM or PM
+  %r   time, 12-hour (hh:mm:ss [AP]M)
+  %s   seconds since 00:00:00, Jan 1, 1970 (a GNU extension)
+  %S   second (00..60)
+  %t   a horizontal tab
+  %T   time, 24-hour (hh:mm:ss)
+  %U   week number of year with Sunday as first day of week (00..53)
+  %V   week number of year with Monday as first day of week (01..52)
+  %w   day of week (0..6);  0 represents Sunday
+  %W   week number of year with Monday as first day of week (00..53)
+  %x   locale's date representation (mm/dd/yy)
+  %X   locale's time representation (%H:%M:%S)
+  %y   last two digits of year (00..99)
+  %Y   year (1970...)
+  %z   RFC-822 style numeric timezone (-0500) (a nonstandard extension)
+  %Z   time zone (e.g., EDT), or nothing if no time zone is determinable
+./code
+
+.LI
+.B ParaOnPage
+is one of a set of auto generated variables, you will find them described in the section AUTOMATIC VARIABLES below.
+
+Note how the
+.CW Footer
+refers to
+.CW Item.ParaOnPage
+to get
+.CW ParaOnPage
+in the paragraph
+.CW Item .
+
+.LI
+Note how the number of items and the total value is accumulated in the
+.CW Item
+calculation, and used in the
+.CW Footer .
+You may use the five standard arithmetic operators:
+.B +
+.B -
+.B *
+.B /
+.B %
+(modulus or remainder)
+and
+.B .
+(concatenation or joining strings), plus conditionals.
+
+See full documentation at the end of this page.
+
+.LE
+
+.t Programming Documentation
+
+The programming documentation follows:
+
+.! perldoc $( echo Text\::TemplateFill )
+
+.t Documentation for Expression evaluation
+
+.! perldoc $( echo Math\::Expression )

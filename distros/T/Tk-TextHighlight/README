@@ -1,0 +1,73 @@
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Tk::TextHighlight.pm is a modified / derived version of the no longer maintained 
+Tk::CodeText module, by Hans Jeuken.  Thank you Hans for doing the hard work in 
+creating a really cool module.  CodeText was built on the Tk::TextUndo 
+widget with capabilities of syntax highlighting.  Several formats are supported, namely 
+Perl, HTML, Javascript, and Bash.  I (Jim Turner), have added several features:
+
+1)  Added ability to also use the Syntax::Highlight::Engine::Kate highlighing 
+engine and thus now supporting the many, many languages it supports.
+
+2)  Tk::Text::SuperText - like bracket highlighting / matching with vi-like 
+jump-to-matching bracket (Ctrl-p).
+
+3)  Added feature to auto-change rules-colors for rules whose color is the same as 
+the background color of the widget (to avoid invisible text).  The color is set to 
+either black or white depending on the brightness of the background color.
+
+4)  Fixed TextUndo-related bug to allow user to see text as he types past right-edge 
+of screen.
+
+5)  Added "setRule()" method to allow altering of individual rules by the programmer.
+
+6)  Modified right-click menu to allow saving of modified rules.
+
+7)  Added new options:  -noRulesMenu (dont show rules-menu in right-click menu), 
+-noSyntaxMenu, -noRulesEditMenu, -noSaveRulesMenu to prevent the corresponding items 
+from appearing in the right-click menu.  -noPlugInit - disables new feature #8 and 
+behaves as original CodeText.
+
+8) Fixed small bug w/auto-indenting.
+
+9) Fixed small bug w/rules-initialization when no .rules file present.
+
+10) Created a "Readonly" version called ROTextHighlight that works the same way but 
+is based on Tk::ROText and is read-only.
+
+The highlight mechanism however, is of a plugin-type. Adding additional 
+languages should be a matter of writing Tk::TextHighlight::MyLanguage modules.
+
+The perl syntax module is based on and requires either 
+Syntax::Highlight::Perl or Syntax::Highlight::Perl::Improved.  It will attempt 
+to use Perl::Improved first if it is available, failing that, 
+Syntax::Highlight::Perl will be used.
+
+The PerlCool module was written by Jim Turner and is derived from the Perl 
+syntax module, but uses mustly "cool" colors, ie. blues, greens, violets, etc.
+instead of the "warm" colors that the "Perl" syntax module uses.
+
+This is the initial release. It has been written and tested on a
+linux machine, though I have used it on some earlier versions on some 
+m$-based machines.  Please try it out on those machines and report your 
+findings back to me.
+
+Not that you didn't know, but you install it like this:
+
+	perl Makefile.PL
+	make
+	make test
+	
+and then as root
+
+	make install
+
+
+This software comes with no warranty whatsoever.
+
+Original CodeText:  February 2003,
+Hans Jeuken (haje@toneel.demon.nl)
+
+TextHighlight:  August 2007
+turnerjw784@yahoo.com

@@ -1,0 +1,30 @@
+#title Second file
+#subtitle Second file subtitle
+#notes This is the second file's note
+#author Pallone Ponchi
+#lang en
+
+Second file *text*
+
+[[logo-1.png]]
+
+[[logo.png]]
+
+[[logo.png]]
+
+[[logo-1.png]]
+
+
+
+#internal
+This is linked
+
+** Another chap
+
+#other
+
+** Chap
+
+#same
+
+[[#internal][Internal link]] [[#internal]] [[#same]] [[#other]] [[#other][other with desc]]

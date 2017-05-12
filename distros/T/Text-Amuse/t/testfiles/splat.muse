@@ -1,0 +1,34 @@
+#title splat
+
+* Here
+
+Here there is the body [1]
+
+** chapter
+
+Here we go [2]
+
+*** section [3]
+
+section [4]
+
+End of the game
+
+**** subsection [5]
+
+subsection
+
+***** subsub section [6]
+
+
+[1] First
+
+[2] Second
+
+[3] Third
+
+[4] Fourth
+
+[5] Fifth
+
+[6] Sixth

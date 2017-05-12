@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+
+#
+# Films.rss - example cgi script for TVGuide::NL
+# Copyright (c) 2004-2006 by Bas Zoetekouw <bas@debian.org>
+# $Id: NL.pm 60 2006-04-22 12:10:59Z bas $
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of either the Artistic license, or
+# version 2 of the GNU General Public License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+
+
+use strict;
+use warnings;
+
+use utf8;
+use encoding 'utf8';
+
+use lib '../blib/lib/';
+
+use CGI;
+use XML::RSS;
+use Encode;
+
+use TVGuide::NL;
+use Time::Local qw{ timelocal };
+use POSIX;
+
+# set locale to english
+POSIX::setlocale( &POSIX::LC_TIME, 'C' );
+
+
+sub thisMorning;
+sub today;
+sub Expiry;
+sub lastBuild;
+
+my @stations = (
+'ned1', 'ned2', 'ned3', 'rtl4', 'rtl5', 'yorin', 'sbs6', 'vero',
+'net5', 'bbc1', 'bbc2', 'vrt1', 'vrt2',
+'bbcw', 'disc', 'ngc', 'animal', 'mtv', 'nick', 'cartoon',
+);
+
+
+my $g = TVGuide::NL->new();
+$g->update_movies;
+
+my $rss = new XML::RSS (version => '2.0', encoding => 'utf-8');
+$rss->channel(
+	title		=>	'Films op TV vandaag',
+	link		=>	'http://www.zoetekouw.net/tvgids/tvgids.cgi',
+	language	=>	'nl',
+	description =>  'Overzicht van films die vandaag in Nederland op tv te zien zijn',
+	pubDate     =>  thisMorning,
+	lastBuildDate => lastBuild($g),
+	managingEditor => 'tvgids@zoetekouw.net',
+	webMaster      => 'tvgids@zoetekouw.net',
+);
+		
+foreach my $mov ($g->movies_today(1,@stations))
+{
+	my $stat = $g->station_abbr( $mov->{station} );
+	my $tit = "$mov->{title} ($mov->{time},$stat)";
+	my $tit_enc = encode('iso-8859-1',$mov->{title});
+	$tit_enc =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
+	$rss->add_item(
+		title => $tit,
+		#link => 'http://gids.omroep.nl/' . $mov->{info},
+		guid => today . '-' . $mov->{station} . '-' . $mov->{time},
+		link => 'http://www.imdb.com/find?tt=on;nm=off;mx=20;q=' . $tit_enc,
+		description => $mov->{desc}, 
+	);
+}
+
+my $q = new CGI;
+print $q->header( { 
+	-type => 'application/rss+xml',
+	-charset => 'utf-8', 
+	-expires => Expiry,
+	'-cache-control' => 'public',
+} );
+print $rss->as_string;
+
+exit 0;
+
+###########################################################
+
+# returns the time the tvgids data was changed 
+# (i.e. at 6am Amsterdam time)
+sub thisMorning
+{
+	# this is the POSIX compliant way of saying 'Europe/Amsterdam'
+	local $ENV{TZ} = 'CET-1CEST,M3.5.0/2,M10.5.0/2';
+	
+    # get (in local time) the start of today and tomorrow in .nl
+    # offset is to make sure days start at 6am
+    my @now = localtime(time()-6*3600);
+    # today started at 6am this morning, Amsterdam time
+	@now[0,1,2] = (0,0,6);
+
+	return POSIX::strftime('%a, %d %b %Y %H:%M:%S %z', @now); 
+}
+
+# returns the current day
+sub today
+{
+	# this is the POSIX compliant way of saying 'Europe/Amsterdam'
+	local $ENV{TZ} = 'CET-1CEST,M3.5.0/2,M10.5.0/2';
+	
+    # get (in local time) the start of today and tomorrow in .nl
+    # offset is to make sure days start at 6am
+    my @now = localtime(time()-6*3600);
+    # today started at 6am this morning, Amsterdam time
+	@now[0,1,2] = (0,0,6);
+
+	return POSIX::strftime('%Y%m%d', @now); 
+}
+
+# returns the time the feed will expire 
+# (i.e. at 6am tomorrow, Amsterdam time)
+sub Expiry
+{
+	# this is the POSIX compliant way of saying 'Europe/Amsterdam'
+	local $ENV{TZ} = 'CET-1CEST,M3.5.0/2,M10.5.0/2';
+
+    # get (in local time) the start of tomorrow in .nl
+    # offset is to make sure days start at 6am
+    my @now = localtime(time()+(24-6)*3600);
+    # today started at 6am, Amsterdam time
+	@now[0,1,2] = (0,0,6);
+	# now convert to GMT 
+	@now = gmtime mktime @now;
+
+	# HTTP/1.1 specs says GMT only!
+	local $ENV{TZ} = 'GMT';
+	return POSIX::strftime('%a, %d %b %Y %H:%M:%S %Z', @now); 
+}
+
+# returns the time the feed was last build 
+# (i.e. the time we got the data from gids.omroep.nl)
+sub lastBuild
+{
+	my $guide = shift;
+	my @now = localtime $guide->timestamp('Z0');
+	return POSIX::strftime('%a, %d %b %Y %H:%M:%S %z', @now); 
+}
+

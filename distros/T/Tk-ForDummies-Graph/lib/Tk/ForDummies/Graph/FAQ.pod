@@ -1,0 +1,199 @@
+=head1 NAME
+
+Tk::ForDummies::Graph::FAQ - DEPRECATED : now use Tk::Chart.
+
+=head1 DEPRECATED
+
+DEPRECATED : please does not use this module, but use now L<Tk::Chart>.
+
+=head1 SYNOPSIS
+
+This is the Frequently Asked Questions list for Tk::ForDummies::Graph. 
+
+=head1 DESCRIPTION
+
+=head2 How to scrolled Tk::ForDummies::Graph Widget ?
+
+Tk::ForDummies::Graph is an extension of Canvas widget. That is an idea to scrolled your widget if you use 
+Tk::ForDummies::Graph::Lines :
+
+  my $LineGraph = $mw->Scrolled('Lines')->pack;
+
+You can also use B<Scrollbar> method or use scrolled frame as Pane widget like this example :
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use Tk;
+  use Tk::ForDummies::Graph::Mixed;
+  use Tk::Pane;
+  
+  my $mw = new MainWindow(
+    -title      => 'Scrolled Graph',
+    -background => 'white',
+  );
+  
+  my $pane = $mw->Scrolled(
+    'Pane',
+    -scrollbars => 'osoe',
+    -sticky     => 'nswe',
+    -width      => 300,
+    -height     => 300,
+  );
+  $pane->Frame;
+  $pane->pack(qw / -fill both -expand 1 /);
+  
+  my @types        = qw/ areas bars lines points bars linespoints/;
+  my $GraphDummies = $pane->Mixed(
+    -title      => 'My graph title',
+    -xlabel     => 'X Label',
+    -ylabel     => 'Y Label',
+    -background => '#D0D0FF',
+    -linewidth  => 2,
+    -width      => 600,
+    -height     => 600,
+    -spacingbar => 0,
+    -typemixed  => \@types,
+    -markers    => [ 3, 5, 6 ],
+  )->pack(qw / -fill both -expand 1 /);
+  
+  my @data = (
+    [ '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th' ],
+    [ 90,    29,    25,    6,     -20,   1,     1,     3,     4 ],
+    [ 15,    10,    5,     2,     3,     5,     7,     9,     12 ],
+    [ 1,     2,     12,    6,     3,     5,     1,     23,    5 ],
+    [ 15,    12,    24,    33,    19,    8,     6,     15,    21 ],
+    [ 15,    2,     52,    6,     3,     17.5,  1,     43,    10 ],
+    [ 30,    2,     5,     6,     3,     1.5,   1,     3,     4 ],
+    [ 24,    12,    35,    20,    13,    31.5,  41,    6,     25 ],
+  
+  );
+  
+  # Add a legend to the graph
+  my @Legends = @types;
+  $GraphDummies->set_legend(
+    -title       => "Title legend",
+    -data        => [ 'legend 1', 'legend 2', 'legend 3', 'legend 4', 'legend 5', 'legend 6', 'legend 7', ],
+    -titlecolors => "blue",
+  );
+  
+  # Add help identification
+  $GraphDummies->set_balloon();
+  
+  # Create the graph
+  $GraphDummies->plot( \@data );
+  
+  MainLoop();
+
+B<NB:> The graph have a minimum size (by default 400x400). Then if you want to reduce this size, configure 
+-width and -height option at the creation of the graph.
+
+=head2 How to save graph in postscript, jpeg, png, gif format file ?
+
+You can use the postscript method canvas (see L<Tk::Canvas>) to create postscript file of your image.
+
+  $GraphDummies->postscript( -file => "MyFile.ps");
+
+If you want to convert it in gif, jpeg format file for example, you can install L<Image::Magick> module 
+and Ghostscript (L<http://pages.cs.wisc.edu/~ghost/>).
+
+Example code for postscript file conversion:
+  
+  use Image::Magick;
+  my $Magick = new Image::Magick;
+  $Magick->Read("MyFile.ps");
+  $Magick->Write("MyFile.png");
+
+=head2 How to zoom the graph in canvas widget ?
+
+To zoom your graph, use zoom, zoomx or zoomy methods. You can create a menu zoom on the canvas.
+You have an example code in L<Tk::ForDummies::Graph::Lines/EXAMPLES> 
+
+=head2 Warning or fatal error messages
+
+
+=head3 You must have at least 2 arrays
+
+  eg:
+  my @data = (
+       [ '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th' ],
+  );
+  $PieGraphDummies->plot(\@data);
+  # => you will get warning message
+
+=head3 You must have 2 arrays in data array
+
+You will have this warning if you use L<Tk::ForDummies::Graph::Pie> and if you use plot 
+method with bad data.
+
+  eg:
+  my @data = (
+       [ '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th' ],
+       [     1,     2,    52,    6,      3,  17.5,     1,    43,    10 ],
+       [    11,    20,     2,    5,      3,     1,    12,     3,     0 ], 
+  );
+  $PieGraphDummies->plot(\@data);
+  
+  # => you will get warning message
+
+  my @data = (
+       [ '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th' ],
+       [     1,     2,    52,    6,      3,  17.5,     1,    43,    10 ], 
+  );
+  $PieGraphDummies->plot(\@data);
+  # OK
+
+=head3 Make sure that every array has the same size in plot data method
+
+  eg:
+  my @data = (
+    [ 'Europe', 'Asia', 'Africa', 'Oceania', 'Americas' ], # <= 5 data 
+    [ 97,       33,     3,        6,         61, 1100 ],   # <= 6 data , wrong
+  );
+  $PieGraphDummies->plot(\@data);
+
+=head3 Data not defined
+
+  $PieGraphDummies->plot(); # wrong
+
+=head3 Can't set -data in set_legend method. May be you forgot to set the value
+
+  $GraphDummies->set_legend(
+    -data        => undef,     # wrong
+  );
+
+  $GraphDummies->set_legend(); # wrong
+
+  $GraphDummies->set_legend(
+    -data        => \@Legends,     # OK
+  );
+
+=head3 Legend and array size data are different
+
+  my @data = (
+    [ '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th' ],
+    [ 1,     2,     5,     6,     3,     1,     1,     3,     4 ],  # legend 1
+    [ 4,     2,     5,     2,     3,     5,     7,     9,     12 ], # legend 2
+    [ 1,     2,     12,    6,     3,     5,     1,     23,    5 ]   # legend 3
+  );
+  
+  my @Legends = ( 'legend 1', 'legend 2', 'legend 3', 'legend 4' ); # Wrong, 
+  # too much legend
+
+  my @Legends = ( 'legend 1', 'legend 2' ); # Wrong, not enough  legend
+
+  my @Legends = ( 'legend 1', 'legend 2', 'legend 3' ); # OK
+
+=head1 SEE ALSO
+
+L<Tk::ForDummies::Graph>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Djibril Ousmanou, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut

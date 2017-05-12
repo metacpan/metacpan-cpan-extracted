@@ -1,0 +1,14 @@
+Build.PL
+Changes.pod
+lib/Test/Distribution.pm
+MANIFEST			This list of files
+META.yml
+README
+t/01distribution.t
+t/02extra.t
+t/03only_versions.t
+t/04only_pod_extra.t
+t/05only_pod_use_extra.t
+t/06only_pod_versions_extra.t
+t/07prereq.t
+t/08only_podcover.t

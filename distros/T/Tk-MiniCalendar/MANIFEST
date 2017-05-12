@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test_mc.pl
+t/basic.t
+t/basic2.t
+t/colors.t
+t/configure.t
+t/date_error.t
+t/english.t
+t/handler.t
+t/select.t
+t/use2.t
+lib/Tk/MiniCalendar.pm
+META.yml                                 Module meta-data (added by MakeMaker)

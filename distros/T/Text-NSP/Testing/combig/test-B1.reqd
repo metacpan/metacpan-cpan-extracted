@@ -1,0 +1,3 @@
+ERROR(combig.pl):
+        Line <2> in Bigram file <test-B1.big> is not formatted like the
+        bigram output of count.pl in NSP.

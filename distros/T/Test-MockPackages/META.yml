@@ -1,0 +1,30 @@
+---
+abstract: 'Mock external dependencies in tests'
+author:
+  - 'Tom Peters <tpeters@synacor.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-MockPackages
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Const::Fast: 0
+  Lingua::EN::Inflect: 0
+  Sub::Metadata: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Pod: 1.22
+  Test::Pod::Coverage: 1.08
+  Test::Tester: 0
+version: 1.01

@@ -1,0 +1,48 @@
+
+Text::WagnerFischer is an implementation of the Wagner-Fischer edit distance in Perl.
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I tested it only under Perl 5.6.
+
+Text::WagnerFischer does not use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Text::WagnerFischer by running these commands in the *nix environment:
+
+   perl Makefile.PL
+   make
+   make test (optional)
+   make install
+
+To install Text::WagnerFischer in the Win32 environment, use nmake instead of make.
+nmake is available for free (in a self extracting executable):
+<http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe>
+After download and inflate, put nmake.exe and nmake.err somewhere in your path.
+
+
+DOCUMENTATION
+
+POD format documentation is included in WagnerFischer.pm.
+POD is readable with the command:
+
+  perldoc Text::WagnerFischer
+
+
+AVAILABILITY
+
+The latest version of Text::WagnerFischer is available from the
+CPAN <http://search.cpan.org/> 
+
+
+COPYRIGHT
+
+Copyright 2002,2003 Dree Mistrut <dree@friul.it>
+
+This package is free software and is provided "as is" without express
+or implied warranty.  You can redistribute it and/or modify it under 
+the same terms as Perl itself.
+

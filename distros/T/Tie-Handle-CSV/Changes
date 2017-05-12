@@ -1,0 +1,82 @@
+Revision history for Perl extension Tie::Handle::CSV.
+
+0.15  Mon Jul 22 2013
+     - make tied HASH and ARRAY interfaces faster by moving the initial
+       slice operations from the tied object to the underlying raw data
+       structure
+
+0.14  Sat Jan 21 2012
+     - fix issue in Tie::Handle::CSV::Hash performing lc() on an undef value
+
+0.13  Thu Dec 02 2010
+     - in READLINE() use Text::CSV_XS->getline() instead of parse(). This gives
+       a slight speedup and allows reading CSV files with newline-embedded
+       fields.
+
+0.12  Fri Jan 22 2010
+     - (internal) Array/Hash objects no longer store a reference to the parent
+       Tie::Handle::CSV object (facilitates Storable::dclone() use)
+     - 'file' option in constructor can be a GLOB reference
+
+0.11  Sat Jan 16 2010
+     - header() now returns a Tie::Handle::CSV::Array instance so it can be
+       treated as a CSV string or as an array
+
+0.10  Sat Jan 16 2010
+     - added repository info to Build.PL
+     - changed implementation to allow directly invoking methos on the returned
+       object. fully backwards compatible unless you had used tied() to get the
+       underlying object.
+     - added header() method for getting the header CSV string
+
+0.09  Fri May 17 2007
+     - added support for 'key_case' => 'any' option (case-insensitive hash keys)
+     - setting an invalid 'csv_parser' is fatal
+     - testcover: 98.3%
+
+0.08  Tue May 15 2007
+     - added 'key_case' option in-place of 'force_lower', currently supports
+       'lower', 'upper' and default
+     - added t/key_case.t for new 'key_case' option
+     - 'force_lower' option was removed from docs and is now an alias for
+       key_case => 'lower'
+     - added 'simple_reads' option to control whether line reads return tied
+       data structures or not
+     - the 'stringify' option now sets 'simple_reads' to the appropriate value
+     - testcover: 88.8%
+
+0.07  Thu May 10 2007
+     - added 'force_lower' option for forcing header keys to lowercase in line
+       read hashes
+     - renamed 'openmode' option to 'open_mode' in docs and code, but retained
+       'openmode' as an alias
+
+0.06  Sun May 06 2007
+     - added 'stringify' option to control whether line reads return objects
+       that stringify to CSV format or just basic hash or array references
+     - rewrote portions of documentation
+     - fixed mismatch between file names and package names for
+       Tie/Handle/CSV/Array.pm and Tie/Handle/CSV/Hash.pm
+
+0.05  Sat Apr 03 2004
+     - documented auto-croak behavior properly
+     - when 'READLINE' is called and 'wantarray' is true, call 'READLINE'
+       repeatedly in scalar context. this will allow proper behavior in
+       inherited classes.  previously we just looped over the filehandle
+       internally.
+
+0.04  Thu Mar 25 2004
+     - croak if open fails during instantiation
+     - allow a 'sep_char' option as a short-cut to creating a Text::CSV_XS
+       object with a given separator
+
+0.03  Thu Mar 15 2004
+     - changed default behavior to assume file has a header row
+     - clarified docs regarding headers and arrays vs hashes
+
+0.02  Thu Mar 11 2004
+     - test fix for t/tell.t on win32
+
+0.01  Thu Mar 04 2004
+     - original version; created by h2xs 1.23 with options
+        -AX -b 5.6.0 -n Tie::Handle::CSV

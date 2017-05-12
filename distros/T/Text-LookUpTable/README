@@ -1,0 +1,246 @@
+Generated from the Text::LookUpTable documentation:
+
+  perldoc -t lib/Text/LookUpTable.pm > README
+
+NAME
+    Text::LookUpTable - Perl5 module for text based look up table operations
+
+SYNOPSIS
+      $tbl = Text::LookUpTable->load_file('my_table.tbl');
+      $tbl = Text::LookUpTable->load($str_tbl);
+      $tbl = Text::LookUpTable->load_blank($x_size, $y_size, $x_title, $y_title);
+
+      print $tbl;
+      $str_tbl = "$tbl";
+
+      $tbl->save_file();
+      $tbl->save_file('my_table.tbl');
+
+      $tbl->set($x, $y, $val);
+
+      @diff_coords = $tbl->diff($tbl2);
+      $diffp = $tbl->diff($tbl2, 1);  # true/false no coordinates
+
+      @xdiffs = $tb1->diff_x_coords($tb2);
+      @ydiffs = $tb1->diff_y_coords($tb2);
+
+      @x_coords = $tbl->get_x_coords();
+      @y_coords = $tbl->get_y_coords();
+
+      $res = $tbl->set_x_coords(@x_coords);
+      $res = $tbl->set_y_coords(@y_coords);
+
+      @ys = $tbl->get_y_vals($x_offset);
+      @xs = $tbl->get_x_vals($y_offset);
+
+      $str_plot = $tbl->as_plot('R');
+      print FILE $str_plot;
+
+DESCRIPTION
+    Text::LookUpTable provides operations for creating, storing, displaying,
+    plotting, loading, and querying a *look up table* structure. The format
+    of the stored structure is designed to be visually easy to understand so
+    that it can be easily edited using a text editor.
+
+    The authors inteded use of this library is to allow a user to edit a
+    text file representation of a look up table which can then be loaded in
+    to an embedded controller such as MegaSquirt [http://www.msextra.com].
+    Additional code would be needed to convert this generic structure to
+    whatever application specific format is required.
+
+    What is a *look up table* and how is it different than a *table*? A
+    *look up table* is commonly used in embedded controllers to avoid the
+    use of costly floating pointing operations by looking up a value based
+    on the input coordiantes. A function with two inputs (f(x, y)) which
+    would use floating point operations can be represented (with some loss
+    in precsion) as a table.
+
+    In contrast a *table* (or spreadsheet) has any number of columns/rows.
+    The columns can be of different types. And a table does not try to
+    represent any sort of function, it just stores data.
+
+STRING FORMAT
+    The format of the look up table when stored to a string or file should
+    look like the example below.
+
+                            rpm
+ 
+                  [1000]   [1500]  [2000]  [2500]
+           [100]  14.0     15.5    16.4    17.9
+      map  [90]   13.0     14.5    15.3    16.8
+           [80]   12.0     13.5    14.2    15.7
+
+    The x (across top) and y (left column) coordinates have there values
+    enclosed in square brackets. All values must be present. And the titles
+    can only span one line. There can be any number of lines and spaces as
+    long as the values can be discerned. When saving and restoring a table
+    the original spacing will not be preserved.
+
+    The x values start at offset 0 at the left and increase towards the
+    right. The y values start at offset 0 at the bottom and increase upward.
+
+OPERATIONS
+  Text::LookUpTable->load($string);
+      Returns: a new table object on success, FALSE on error
+
+    Creates a new look up table object by parsing the given string. See the
+    section *STRING FORMAT* for details on format it expects.
+
+    If you want to load a table from a *file* see *load_file*.
+
+  Text::LookUpTable->load_file($file)
+      Returns: new object on success, FALSE on error
+
+    Works like *load* but obtains the text from the $file first.
+
+    Stores the name of file so that save_file can be used without having to
+    specify the file again.
+
+  Text::LookUpTable->load_blank($x_size, $y_size, $x_title, $y_title)
+      Returns: new object on success, FALSE on error
+
+    Creates a blank object with all values initialized to zero and
+    dimensions of $x_size and $y_size.
+
+  $tbl->as_string();
+      Returns string on success, FALSE on error.
+
+    Convert the object to a string representation.
+
+    This operation is used to overload the string operation so the shorthand
+    form can be used.
+
+      print $tbl;         # print the object as a string
+
+      $to_save = "$tbl";  # get the string format to be saved
+
+    The long hand form $tbl->as_string(); should not normally be needed.
+
+  $tbl->save_file($file);
+      Returns TRUE on success, FALSE on error
+
+    Optional argument $file, can specify the file to save to. If ommitted it
+    will save to the last file that was used. If no last file is stored it
+    will produce an error.
+
+  $tbl->get_*_coords();
+      Returns list of all x/y coordinates on success, FALSE on error
+
+    Offset 0 for the X coordinates start at the LEFT of the displayed table
+    and increases RIGHTWARD.
+
+    Offset 0 for the Y coordinates start at the TOP of the displayed table
+    and increases DOWNWARD.
+
+      @xs = $tbl->get_x_coords();
+      @ys = $tbl->get_y_coords();
+
+  $tbl->set_*_coords(@new_coords);
+      Returns TRUE on success, FALSE on error
+
+    Assigns the x/y coordinates to the values given in the list.
+
+      $res = $tbl->set_x_coords(@new_x_coords);
+      $res = $tbl->set_y_coords(@new_y_coords);
+
+  $tbl->get_*_vals($offset);
+      Returns list of values on success OR FALSE on error
+
+    Retrives all values for a given offset.
+
+     @xs = get_x_vals($y_offset);
+     @ys = get_y_vals($x_offset);
+
+    The 0 offset of the returned list will correspond to the 0 offset of the
+    displayed table.
+
+  $tbl->set($x, $y, $val);
+      Returns TRUE on success OR FALSE on error
+
+    Set the value to $val at the given $x and $y coordinate offset.
+
+  $tbl->get($x, $y);
+      Returns $value on success, FALSE on error
+
+    Get the value at the given $x and $y coordinate offset.
+
+  $tb1->diff($tb2, $break);
+      Returns TRUE if different, FALSE otherwise.
+
+      If $break is FALSE it returns a list of positions that are different.
+
+    Determines whether the VALUES two tables are different. Does not check
+    if the coordinates or the titles are different.
+
+    If $brake is FALSE return a complete list of coordinates that are
+    different. If $brake is TRUE it breaks out and returns as soon it is
+    found that they are different for a slight performance improvement.
+
+  $tb1->diff_*_coords($tb2)
+      Returns list of differences on success, FALSE on error
+
+     @xdiffs = $tb1->diff_x_coords($tb2);
+     @ydiffs = $tb1->diff_y_coords($tb2);
+
+  $tbl->as_plot('plot type', [type specific args ...] );
+      Returns TRUE on success, FALSE on error.
+
+    Convert the table to a representation suitable for plotting. The string
+    may need to be output to a file depending on how the plotting program is
+    called.
+
+    See below for the various plot types.
+
+   R  [www.r-project.org]
+      Returns: string on success, FALSE on error
+
+    The string can be output to a file and then the file can be sourced to
+    produce a plot. It depends upon the rgl library
+    [http://cran.r-project.org/web/packages/rgl/index.html].
+
+     $tbl->as_plot('R');
+
+     user$ a.out > file.R
+     user$ R
+
+     > source('file.R')
+
+     (plot displayed)
+
+   WANTED: more plot types: gnuplot, etc
+PREREQUISITES
+     Module                Version
+     ------                -------
+     Text::Aligner         0.03
+     File::Slurp           9999.13
+  
+     The version numbers given have been tested and shown to work
+     but other versions may work as well.
+
+VERSION
+    This document refers to Text::LookUpTable version 0.05.
+
+REFERENCES
+      [1]  MegaSquirt Engine Management System
+           http://www.msextra.com/
+
+      [2]  R Project
+           http://www.r-project.org/
+
+      [3]  rgl: 3D visualization device system (OpenGL)
+           http://cran.r-project.org/web/packages/rgl/index.html
+
+      [4]  Gnuplot
+           http://www.gnuplot.info/
+
+AUTHOR
+        Jeremiah Mahler
+        CPAN ID: JERI
+        jmmahler@gmail.com
+        http://www.google.com/profiles/jmmahler#about
+
+COPYRIGHT
+    Copyright (c) 2010, Jeremiah Mahler. All Rights Reserved. This module is
+    free software. It may be used, redistributed and/or modified under the
+    same terms as Perl itself.
+

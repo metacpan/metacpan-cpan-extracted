@@ -1,0 +1,21 @@
+TAP Version 13
+# Key/Value pairs using different word characters
+# (underscore, dash, dot, ...) and whitespace, scattered
+# all over the document.
+#
+# Test-cpu-model: Intel(R) Core(TM) i7-3667U CPU @ 2.00GHz
+1..2
+# Test-cpu family : 6
+ok 1 - affe
+# Test-vendor_id: GenuineIntel
+ok 2 - zomtec
+   ---
+     - name: 'Hash one'
+       value: 1
+     - name: 'Hash two'
+       value: 2
+   ...
+# Test-cpuinfo:flags.fpu: 1
+# Test-flags.fpu: 1
+# Test-elapsed-time[ms]: 13
+# Test-cpuinfo/processor: 3

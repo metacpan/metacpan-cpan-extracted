@@ -1,0 +1,42 @@
+---
+abstract: 'Displays a graph in the terminal'
+author:
+  - 'Eric Johnson (kablamo)'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Vspark
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Term::Vspark:
+    file: lib/Term/Vspark.pm
+    version: '0.34'
+requires:
+  Exporter::Shiny: '0'
+resources:
+  bugtracker: https://github.com/kablamo/Term-Vspark/issues
+  homepage: https://github.com/kablamo/Term-Vspark
+  repository: git://github.com/kablamo/Term-Vspark.git
+version: '0.34'
+x_contributors:
+  - 'Gil Gonçalves <lursty@gmail.com>'
+  - 'Gil Gonçalves <lurst@cpan.org>'
+  - 'Marcos Marado <mindboosternoori@gmail.com>'
+  - 'Eric Johnson <github@iijo.org>'
+  - 'Eric Johnson <eric.git@iijo.org>'

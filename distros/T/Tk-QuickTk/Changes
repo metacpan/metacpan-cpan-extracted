@@ -1,0 +1,16 @@
+Revision history for Perl module Tk::QuickTk
+
+0.88  Wed Jul 12 10:11:25 2000
+    - original version; created by h2xs 1.19; first cut at working module
+
+0.89      Jul 26          2000
+    - bug fixes
+
+0.90      Aug 20          2000
+    - bug fixes
+
+0.91  Sun Jan 30 18:49:11 2011
+    - original version; created by ExtUtils::ModuleMaker 0.51;
+      updating for newer Perl CPAN best practices
+      improved documentation
+      including demo scripts

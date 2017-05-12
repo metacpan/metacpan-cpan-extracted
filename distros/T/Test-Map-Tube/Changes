@@ -1,0 +1,98 @@
+Revision history for Perl extension Test::Map::Tube.
+
+0.26  Mon Mar 27 12:40:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
+0.25  Mon Mar 13 10:55:00 2017
+      - Upgraded to use Map::Tube v3.28.
+
+0.24  Sat Feb 11 07:20:00 2017
+      - Removed dependency on XML::Twig.
+      - Updated pod document with regard to changes to Map::Tube v3.22.
+
+0.23  Wed Feb 08 14:10:00 2017
+      - Upgraded to use Map::Tube v3.22.
+
+0.22  Sat Feb 04 19:20:00 2017
+      - Added method not_ok_map().
+      - Added unit test for the new added method.
+      - Updated method ok_map_functions() and ok_map_routes() to check map data first.
+
+0.21  Sat Oct 22 19:20:00 2016
+      - Upgraded to use Map::Tube v3.21.
+
+0.20  Thu Sep 08 13:50:00 2016
+      - Updated test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.19  Sat Aug 28 02:30:00 2016
+      - Upgraded to use Map::Tube v3.18.
+
+0.18  Tue Jul 05 10:35:00 2016
+      - Upgraded to use Map::Tube v3.16.
+      - Addressed issue raised in the CPAN Tester Report.
+        http://www.cpantesters.org/cpan/report/3b6f14c0-3f1d-11e6-a514-8183992ad5f0
+
+0.17  Wed Jun 22 09:45:00 2016
+      - Updated method ok_map_routes() to handle duplicate node name.
+
+0.16  Mon Apr 18 12:20:00 2016
+      - Documented newly added method ok_map_routes().
+
+0.15  Fri Apr 15 11:10:00 2016
+      - Added new method ok_map_routes().
+      - Added unit test for the newly added method.
+      - Updated copyright year information.
+
+0.14  Mon Nov 02 11:10:00 2015
+      - Updated method ok_map_functions() to return reasonable error message on failure.
+
+0.13  Sun Nov 01 08:20:00 2015
+      - Added unit test for Map::Tue::Line::add_station().
+      - Upgraded to use Map::Tube v3.12.
+      - Tidied up error message.
+
+0.12  Thu Oct 22 11:15:00 2015
+      - Added relevant error message to the test cases.
+
+0.11  Wed Oct 21 11:30:00 2015
+      - Upgraded to use Map::Tube v3.09.
+      - Fixed minor typo in the pod document.
+
+0.10  Sat Oct 17 10:40:00 2015
+      - Updated code in the pod section 'SYNOPSIS'.
+      - Added unit test t/00-load.t
+      - Updated MANIFEST file.
+      - Removed minimum version check for Test::More from Makefile.PL script.
+
+0.09  Fri Oct 16 10:30:00 2015
+      - Upgraded to use Map::Tube v3.06.
+      - Added new method ok_map_functions() to test standard functions of Map::Tube.
+      - Added test script t/ok_map_functions.t
+      - Renamed test script  t/map.t -> t/ok_map.t
+
+0.08  Sat Sep 26 19:40:00 2015
+      - Upgraded to use Map::Tube v3.01.
+
+0.07  Tue Mar 10 13:00:00 2015
+      - Upgraded to use Map::Tube v2.88.
+      - Resolved issue RT: 102664.
+
+0.06  Mon Mar 02 11:00:00 2015
+      - Upadted unit test map.t and moved package Sample to its own file,
+        as some CPAN Testers were unhappy about it.
+
+0.05  Sun Mar 01 10:55:00 2015
+      - Added unit test for method ok_map().
+
+0.04  Mon Feb 23 18:40:00 2015
+      - Tidied up pod document.
+
+0.03  Mon Feb 23 17:40:00 2015
+      - Upgraded to use Map::Tube v2.87.
+      - Tidied up the example code in the pod document.
+
+0.02  Fri Feb 20 16:25:00 2015
+      - Fixed the typo in the README file.
+
+0.01  Fri Feb 20 16:20:00 2015
+      - Module created.

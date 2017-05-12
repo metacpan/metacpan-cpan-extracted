@@ -1,0 +1,63 @@
+0.08    Monday 28th January, 2013
+        Merge fix from Ashley Willis - Only " should get special
+        treatment as a quote character.
+        https://github.com/richardc/perl-text-vfile-asdata/pull/1
+
+0.07    Wednesday 25th August, 2010
+        Switch to ExtUtils::MakeMaker as Module::Build got
+        uppity and started generating bad Makefile.PL files
+
+0.06	Friday 20th August, 2010
+	Fix case with ' in entities (Richard Russo)
+
+0.05	Saturday 25th June, 2005
+	Removed a leftover C<use YAML;> from t/parse_line.t (spotted by Leo)
+
+0.04	Tuesday 31st May, 2005
+
+	Removed the paragraph about rt.cpan.org from the docs as it's just
+	not fitting the way I want to deal with stuff.
+
+	Make the parsing of blocks case-insenitive as the RFCs call for
+	(they just happen to always use upper-case identifiers)
+	Closes #12381 (JC with some modifications)
+	Also uncovered a bunch of other block-related bugs.
+
+	Will now die if a BEGIN occurs without a matching END
+
+	generate_lines now wraps
+
+	Tightened the logic for unfolding.  The RFC states the folding
+	sequence is exactly \r\n[ \t], where before we were looking
+	for \r\n\s.  Since \s can match unicode whitespace this was wrong.
+
+
+0.03	Thursday 26th May, 2005
+
+	Moved CRLF removing logic down a bit lower into _unwrap_lines.
+
+	Elminate Text::ParseWords by writing our own more C-like version,
+	fixes the vCard image segfault issue.
+
+
+0.02	Wednesday 6th October, 2004
+
+	Moved non-vFile files from examples/ to bin/ as it was mightily
+	confusing the round-trip test.
+
+	Added bin/holidays_ical
+
+	Added bin/wgo
+
+	Fixed module name in bin/v2yaml
+
+	Deleted the Encode cargo.  Checking for a BOM on each and
+	every line is batshit.
+
+	Added ->preserve_params option to create a new structure which
+	preserves the order of the params.
+
+
+0.01	Thursday 19th February, 2003
+	Initial CPAN release
+

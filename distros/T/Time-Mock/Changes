@@ -1,0 +1,14 @@
+Revision history for Time-Mock
+
+v0.0.2 2009-07-14
+
+  * added set() and `set => $timestring` option for import()
+
+v0.0.1 2008-05-09
+
+  * first public release - alpha interface
+
+See the source code repository for more detail.
+  http://svn.scratchcomputing.com/Time-Mock/trunk
+
+vim:ts=2:sw=2:et:sta

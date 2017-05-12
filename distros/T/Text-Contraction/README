@@ -1,0 +1,28 @@
+Text::Contraction version 0.02
+==============================
+
+Text::Contraction finds possible expansions for contractions.  For example,
+
+	use Text::Contraction;
+
+	my $cntrctn = Text::Contraction->new();
+	my @matches = $cntrctn->match('abcde');
+
+On my system this produces 'ambuscade' and 'absconded'.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Benjamin Holzman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,79 @@
+0.16	- 10 Oct 2015, H.Merijn Brand
+    * Add CONTRIBUTING.md
+    * Testing tables include test number
+    * META changes from QAH
+
+0.15	- 12 Feb 2015, H.Merijn Brand
+    * Test used pack format "L>", wich is supported only in perl-5.10+
+
+0.14	- 11 Feb 2015, H.Merijn Brand
+    * SQLite does not like begin_work with trh => 1
+    * Support other database field types from tie
+    * Test more binary data (without Storable)
+    * Note I gave up on Firebird
+    * Up copyright to 2015
+    * Move repo to github
+    * Make utf8/data test for CSV reliable
+
+0.13	- 02 May 2014, H.Merijn Brand
+    * Shorten connect failure messages in test
+    * Only skip SQLite/RV test if mismatch under Windows (Storable's fault)
+    * Do not use getpwuid on Windows
+    * Rename the test files for Tie::Array::DBD
+    * Skip the slow bulk tests on Firebird for now
+    * Document that deep changes are not working
+    * Require perl-5.8.3
+    * Ignore unsupported streamers by just returning the data (was undef)
+
+0.12	- 30 Apr 2014, H.Merijn Brand
+    * Amend tests to not fail when not an error
+    * Amend tests to show driver version
+    * Skip Firebird tests unless local or ISC_USER is set
+
+0.11	- 29 Apr 2014, H.Merijn Brand
+    * Up copyright to 2012
+    * Up copyright to 2013
+    * Fix some META issues
+    * Up copyright to 2014
+    * Add support for Firebird (not fully functional)
+
+0.10	- 07 Sep 2011, H.Merijn Brand
+    * NAME / DISTNAME in Makefile.PL
+
+0.09	- 07 Sep 2011, H.Merijn Brand
+    * Up copyright to 2011
+    * More cross-checks for META data
+
+0.08	- 25 Jan 2011, H.Merijn Brand
+    * Use Storable's nfreeze () instead of freeze ()
+    * Add transaction support in Tie::Hash::DBD
+
+0.07	- 06 Sep 2010, H.Merijn Brand
+    * More tests
+    * Implementation of Tie::Array::DBD
+
+0.06	- 10 Aug 2010, H.Merijn Brand
+    * Shorten skip messages for failing DBD's
+    * Small fixes from CPANTESTERS
+
+0.05	- 10 Aug 2010, H.Merijn Brand
+    * More speed
+    * Make Unify work
+
+0.04	- 09 Aug 2010, H.Merijn Brand
+    * Documentation
+    * Raise Oracle BLOB read length
+    * Implement and test persistence
+
+0.03	- 09 Aug 2010, H.Merijn Brand
+    * Documentation
+    * Make Oracle work (with restrictions)
+    * Implement streaming (persistence)
+
+0.02	- 05 Aug 2010, H.Merijn Brand
+    * Documentation
+    * More database support
+    * Tests for each database
+
+0.01	- 04 Aug 2010, H.Merijn Brand
+    * Initial release

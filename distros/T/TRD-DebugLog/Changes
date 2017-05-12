@@ -1,0 +1,13 @@
+Revision history for TRD-DebugLog
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.07    Support set parameter for 'use'.
+        add 'getTimeStr' sub.
+
+0.08	dlog return LogMessage.
+		package name cut support.
+
+0.09	add 'Exception' sub.
+		exception log

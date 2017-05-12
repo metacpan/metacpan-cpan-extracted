@@ -1,0 +1,25 @@
+Tie::LogFile version 0.1
+====================
+Tie::LogFile gives a easy interface for maintaining a well formated log.  Using
+user tweakable sprintf like tags, Tie::LogFile is flexible, and probably a
+little overkill for keeping a log.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   None.  Though Date::Format is recommened.
+
+COPYRIGHT AND LICENCE
+
+This module is released under the same terms as perl.
+
+Copyright (C) 2001-2002 Chris Reinhardt
+

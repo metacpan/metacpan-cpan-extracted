@@ -1,0 +1,28 @@
+#title Footnotes
+#lang en
+
+A [1] another [2] piece [3] of [4] text [5] and [6] [7] [8] [9] [10] [11] [12]
+
+[1] Those of you who have never read any of our texts in English, could check the following links: http://www.tapaidiatisgalarias.org/?page_id=105 and www.libcom.org/tptg
+
+[2] From now on this scientific gang will be referred to as Drury and Co.
+
+[3] See: http://libcom.org/library/aufheben-behind-the-twenty-first-century-intifada-treason-pamphlet
+
+[4] See: http://www.sussex.ac.uk/profiles/92858
+
+[5] See the official website: http://www.oxfordjournals.org/our_journals/policing/about.html
+
+[6] All quotes followed by a page number are taken from the afore-mentioned article, which is attached to this open letter, so that a more thorough discussion hopefully be initiated.
+
+[7] For example check: http://www.guardian.co.uk/uk/2011/sep/05/reading-riots-study-guardian-lse
+
+[8] Of course, we do not simply and naively claim that from now on police will restructure its policing strategy solely according to Drury’s and Co. guidelines. Police tactics have always been rather diverse, ranging from the “divide and rule” and “graded policing” dogma to “zero tolerance” and indiscriminate exercise of brutal force, depending on the balance of power that exists at a given moment.
+
+[9] This term refers to those using hoods in the violent clashes with the cops so as to hide their facial characteristics and avoid arrests.
+
+[10] For a first account of the events see our text Preliminary notes towards an account of the «movement of popular assemblies» which can be downloaded at: http://www.tapaidiatisgalarias.org/?page_id=105
+
+[11] See: http://www.guardian.co.uk/uk/2011/sep/07/england-riots-researchers-wanted
+
+[12] test

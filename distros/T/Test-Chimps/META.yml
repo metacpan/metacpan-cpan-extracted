@@ -1,0 +1,27 @@
+abstract: Collaborative Heterogeneous Infinite Monkey Perfectionification Service
+author: Zev Benjamin, C<< <zev at cpan.org> >>
+build_requires: 
+  Test::Dependencies: 0
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Test-Chimps
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Algorithm::TokenBucket: 0
+  Class::Accessor: 0
+  DateTime: 0
+  HTML::Mason: 0
+  Jifty::DBI::Collection: 0
+  Jifty::DBI::Handle: 0
+  Jifty::DBI::Record: 0
+  Jifty::DBI::Schema: 0
+  Jifty::DBI::SchemaGenerator: 0
+  Params::Validate: 0
+  Test::TAP::HTMLMatrix: 0
+  Test::TAP::Model::Visual: 0
+  YAML::Syck: 0
+version: 0.07

@@ -1,0 +1,44 @@
+Revision history for Perl extension Text::HikiDoc.
+
+1.023 2016-10-29T03:43:56Z
+    - fix unescaped brace
+
+1.022 2016-10-16T06:01:18Z
+    - fix unescaped brace
+
+1.021 2013-05-19T02:34:11Z
+    - required Test::Base for test
+
+1.020 2013-05-18T08:01:12Z
+    - minillize
+    - fixed t/36_lib-Text-HikiDoc-Plugin-vimcolor.t
+    - add Text::HikiDoc::Plugin::syntaxhighlighter
+
+1.019 Fri jul 17 12:07:00 2009
+    - fixed Text::HikiDoc::Plugin::texthighlight
+    - fixed Text::HikiDoc::Plugin::vimcolor
+    - change Text::HikiDoc::Plugin::br
+
+1.018 Mon Mar 19 21:07:00 2007
+    - remove Build.PL and add Makefile.PL
+    - fixed inavlid POD
+
+1.017 Wed Feb 17 14:14:00 2007
+    - refactor texthighlight.pm and vimcolor.pm
+    - fixed version_string in this file ( s/1.015/1.016/ )
+
+1.016 Wed Nov 15 22:32:00 2006
+    - add pluggable logic, and some plug-in method.
+    - change testcase to Test::Base;
+
+1.010 Fri Jul 28 17:55:00 2006
+    - Now to_html can override all parameters.
+    - Renamed HikiDoc to Text::HikiDoc
+    - fixed _parse_modifier (nested modifier)
+
+1.006 Wed Jun 07 12:38:00 2006
+    - fixed _parse_link (two or more links to one line)
+
+1.005 Wed May 24 21:32:24 2006
+    - First Release.
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::CHM.
+
+0.01  Mon Mar  7 14:23:22 2005
+	- original version; created by h2xs 1.23 with options
+		-A -n Text::CHM -b 5.6.0
+

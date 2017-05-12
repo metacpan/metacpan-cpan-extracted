@@ -1,0 +1,67 @@
+Revision history for Perl extension Text::Delimited.
+
+2.11  2014/04/30
+
+	Using GNU TAR now. The previous release had PAX headers in the tar file.
+	Build scripts now automatically configure minium perl version.
+
+2.10  2014/03/26
+
+	Including credit for the RT on the 2.00 change info
+
+2.09  2014/03/07
+
+	Now using warnings.
+
+2.08  2014/03/03
+
+	Automated build, now properly constructing meta data.
+
+	Corrected POD errors
+
+	Adding a POD test
+
+2.07  2014/02/24
+
+	Meta information updated
+	
+	Added LICENSE file to distribution
+
+	Tests updated to Test::Simple.
+
+	Version leap to match automated build numbers.
+        
+2.00  2006/07/31
+
+	Provided non-capitalized method names to match Perl style as suggested
+         by CPAN rating comments. Historic "Java-style" method names still
+	 function.
+
+	Corrected POD and docs for new method names, version changes, other 
+	 grammatical errors and removed accidental references to TabFile.pm
+
+	Added initialization checks on exported methods to avoid superfluous
+	 warnings generated when -w is used.
+
+	Handle blank lines at the end of a file gracefully as per RT #12006
+
+	Added credit to PetBlvd (http://www.petblvd.com) for the sponsorship
+	 of further development.
+
+1.93  2004/07/21
+
+	Removed autovivification of the internal filehandle. Now using the
+	 Symbol::gensym() to be backwards compatible to earlier versions
+	 of Perl 5. Thanks to Shrinivas Potnuru for the bug report.
+
+1.92  2004/04/02
+
+	Full copyright and license information.
+
+1.91  2004/01/15
+
+	Derived from HMS tool Util::TabFile (1.9 2003/11/05)
+
+	Support for changing delimiter added.
+
+	Module made to pass strict.

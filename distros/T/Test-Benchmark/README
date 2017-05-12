@@ -1,0 +1,111 @@
+NAME
+    Test::Benchmark - Make sure something really is faster
+
+SYNOPSIS
+      use Test::More test => 17;
+      use Test::Benchmark;
+
+      is_faster(-10, sub {...}, sub {...}, "this is faster than that")
+      is_faster(5, -10, sub {...}, sub {...}, "this is 5 times faster than that")
+      is_n_times_faster(5, -10, sub {...}, sub {...}, "this is 5 times faster than that")
+
+      is_faster(-10, $bench1, $bench2, "res1 was faster than res2");
+
+            is_fastest("c", -1, {a => sub {...}, b => sub {...}, c => sub {...},);
+
+DESCRIPTION
+    Sometimes you want to make sure that your "faster" algorithm really is
+    faster than the old way. This lets you check. It might also be useful to
+    check that your super whizzo XS or Inline::C version is actually faster.
+
+    This module is based on the standard Benchmark module. If you have lots of
+    timings to compare and you don't want to keep running the same benchmarks
+    all the time, you can pass in a result object from "Benchmark::timethis()"
+    instead of sub routine reference.
+
+USAGE
+    There are 3 functions exported: "is_faster()", "is_n_times_faster()" and
+    "is_fastest()". Actually "is_faster()" is redundant because
+    "is_n_times_faster()" can do the same thing just by setting n to 1.
+
+    Anywhere you can pass a subroutine reference you can also pass in a
+    Benchmark object.
+
+      # call as
+      # is_faster($times, $sub1, $sub2, $name)
+      # is_faster($faster, $times, $sub1, $sub2, $name)
+
+    If you leave the number of iterations blank then it will use Benchmark's
+    default.
+
+  is_faster()
+    is_faster($times, $sub1, $sub2, $name)
+
+    is_faster($factor, $times, $sub1, $sub2, $name)
+
+    This runs each subroutine reference $times times and then compares the
+    results. Instead of either subroutine reference you can pass in a Benchmark
+    object. If you pass in 2 Benchmark objects then $times is irrelevant.
+
+    If $times is negative then that specifies a minimum duration for the
+    benchmark rather than a number of iterations (see Benchmark for more
+    details). I strongly recommend you use this feature if you want your modules
+    to still pass tests reliably on machines that are much faster than your own.
+    10000 iterations may be enough for a reliable benchmark on your home PC but
+    it be just a twinkling in the eye of somebody else's super computer.
+
+    If the test fails, you will get a diagnostic output showing the benchmark
+    results in the standard Benchmark format.
+
+  is_n_times_faster()
+    is_n_times_faster($factor, $times, $sub1, $sub2, $name)
+
+    This is exactly the same as the second form of is_faster but it's just
+    explicit about the "n times" part.
+
+  is_fastest()
+    is_fastest($bname, $times, $bhash, $name)
+
+    This takes a hash reference containing benchmark subroutines as values and
+    their names as keys. It times each subroutine and checks that the one named
+    in $bname was the fastest. If the test fails, it will print out a sorted
+    list of the timings of all the subroutines.
+
+VARIABLES
+    If you set "$Test::Benchmark::VERBOSE = 1" then the benchmark results will
+    be printed out as diagnostics whether the tests pass or fail.
+
+DANGERS
+    Benchmarking can be slow so please consider leaving out the benchmark tests
+    from your default test suite, perhaps only running them if the user has set
+    a particular environment variable.
+
+    Some benchmarks are inherently unreliable and should not be part of an
+    automated test suite.
+
+BUGS
+    None that I know of but I said that last time too.
+
+DEPENDENCIES
+    Benchmark, Test::Builder but they come with most Perls.
+
+HISTORY
+    This came up on the perl-qa mailing list, when Jim Cromie wanted to display
+    benchmark results in tests.
+
+SEE ALSO
+    Test::Builder, Benchmark
+
+AUTHOR
+    Written by Fergal Daly <fergal@esatclear.ie>.
+
+COPYRIGHT
+    Copyright 2003 by Fergal Daly <fergal@esatclear.ie>.
+
+    This program is free software and comes with no warranty. It is distributed
+    under the LGPL license. You do not have to accept this license but nothing
+    else gives you the right to use this software.
+
+    See the file LGPL included in this distribution or
+    http://www.fsf.org/licenses/licenses.html.
+

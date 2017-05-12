@@ -1,0 +1,5 @@
+$VAR1 = {
+          'fname' => 'Fred',
+          'lname' => 'Flintrock',
+          'ssn' => 'ABC123'
+        };

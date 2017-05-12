@@ -1,0 +1,15 @@
+Revision history for Perl extension Tie::Persistent.
+
+1.0	Tue May  6 12:14:18 MET 2002
+	- Benjamin Liberman <beanjamman@yahoo.com> added autosyncing;
+	  also fixed problem with scalar refs and splice.
+	- fixed a bug with numbered backupfiles
+        - Storable is now optional, a warning is issued if '-w' is active.
+        - removed Sys::Hostname due to portability problems
+
+0.902	Tue Jul  4 15:51:17 MET DST 2000
+	- updated documentation; added test; first sourceforge.net release
+
+0.9 	Thu Jun 10 16:08:14 MET DST 1999
+	- first release; beta status; tie @array not yet tested.
+

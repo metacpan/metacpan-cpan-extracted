@@ -1,0 +1,137 @@
+[Changes for 0.41 - 2007-10-16]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.
+
+* Tidied up source code and test files.
+
+[Changes for 0.40 - 2005-09-17]
+
+* Support for capturing matched regular expressions into variables,
+  Contributed by "woremacx".  For example, this captures an nonempty
+  header text into the "heading" variable:
+
+    <h2>[% heading =~ /((?!<\/h2).+?)/ %]</h2>
+
+[Changes for 0.39 - 2005-07-15]
+
+* Allow passing Template::Parser options directly into
+  Template::Extract->new().  Suggested by brian d foy.
+
+* Factored out the parser into Template::Extract::Parser to
+  allow use of alternate parsers with the PARSE_CLASS class method.
+
+[Changes for 0.38 - 2004-10-25]
+
+* Fix test failure with pre-5.8.4's regex optimizer.
+  Reported by CPAN testers.
+
+[Changes for 0.37 - 2004-10-20]
+
+* Move under SVK for version management.
+* If the template ends with a capturing variable, make it
+  greedy instead of nongreedy, so it won't always match the
+  empty string.  Reported by LTJake on IRC.
+
+[Changes for 0.36 - 2004-02-16]
+
+* Separate the compilation and run parts into two
+  modules, for ease of deployment (::Run may be put
+  on a machine without TT2) and marginally faster
+  execution.  Suggested by Bruno De Fraine.
+
+[Changes for 0.35 - 2004-01-09]
+
+* Fixes regression caused by newer TT2 versions,
+  which adds the extra "#line" directives into the
+  regular expressions.  Spotted by Yi-Ming Cao
+  and Sam Smith.
+
+* Implement suggestion from Luis Oliveira: embedded
+  non-capturing regexes, such as [% /\s*/ %].
+
+* Add implicit optional newlines around [% FOREACH %]
+  blocks, so it can intuitively work.
+
+[Changes for 0.33 - 2003-12-13]
+
+* Adds MANIFEST.SKIP that takes care of Module::Build
+  files, so older versions of Module::Build/MakeMaker
+  won't trip Module::Signature over.  Thanks to CPAN
+  smoker Jost Krieger for the report.
+
+[Changes for 0.32 - 2003-12-13]
+
+* Improved build intrastructure, suggested by Mark Fowler,
+  to automatically check and download nmake.exe on Windows,
+  as well as supporting a Module::Build-compatible Build.PL.
+
+* Clarify documents; add links to Simon and Mark's articles.
+
+[Changes for 0.31 - 2003-10-21]
+
+* New flag $EXACT to control whether partial documents
+  should match. (defaults to 0 for backward compatibility)
+
+* Tatsuhiko Miyagawa pointed out that [% FOREACH %] blocks
+  fail to match prematurely because it can match zero times.
+  Now outermost foreach blocks must match at least once.
+
+[Changes for 0.30 - 2003-10-20]
+
+* This module is no longer experimental. :)
+* Russell Matbouli reports that extract did not properly
+  set \%values.  Fixed.
+* [% SET key = "value" %] now works inside FOREACHs.
+* [% SET nested.key = "value" %] now works.
+* Much more robust validating code inside FOREACHs.
+* Refactored the common context walking code from "get",
+  "set" and "validate" into _ext, and improved readability.
+
+[Changes for 0.25 - 2003-09-06]
+
+* Kate L Pugh pointed out the _enter_loop construct
+  was failing if there are more than one loops inside
+  another loop, because the loop counter of the first
+  loop inside was inadvertently reset to 0.  Fixed.
+
+[Changes for 0.24 - 2003-09-02]
+
+* Now Template::Generate is released, modify relevant PODs.
+* Unify nomenclature: ($data, $template, $document).
+* Some more style cleanup.
+
+[Changes for 0.23 - 2003-09-02]
+
+* No API changes, but seriously tidied up the internals.
+
+[Changes for 0.22 - 2003-09-01]
+
+* Properly handles backtracking, so two [% var %]s are
+  guaranteed to match the same sequence.
+* Much more robust post-matching handlers, so the same variable
+  matched at the same location (but are of different length)
+  will not create a new item in the enclosing FOREACH array.
+
+[Changes for 0.21 - 2003-09-01]
+
+* Oops, left debug statements and "use YAML" in.
+
+[Changes for 0.20 - 2003-08-31]
+
+* [% nested.variable.name %] now works.
+* Nested [% FOREACH %] blocks now work.
+* Much more robust and readable DEBUG output.
+* Commented the code somewhat so it's at least grokkable.
+* Allow [%...%], [%  ...  %], or any other combination of
+  \s characters (or lack thereof).
+
+[Changes for 0.11 - 2003-08-30]
+
+* Fix typo, documentation, tabs, spelling, tests, etc...
+
+[Changes for 0.10 - 2003-08-30]
+
+* Add manifest.
+* Refactored, cleaned up template extractor.
+

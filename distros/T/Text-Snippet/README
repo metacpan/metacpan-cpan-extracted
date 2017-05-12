@@ -1,0 +1,202 @@
+NAME
+    Text::Snippet - TextMate-like snippet functionality
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+    This module provides TextMate-like snippet functionality via an
+    editor-agnostic API. The snippet syntax is modeled after the snippets
+    provided by TextMate.
+
+        use Text::Snippet;
+
+        my $snippet = Text::Snippet->parse($snippet_content);
+
+            my @tabstops = $snippet->tab_stops;
+            foreach my $t (@tabstops) {
+                    my $replacement = get_user_input();    # get user input somehow
+                    $t->replace($replacement) if ($user_input);
+            }
+            print $snippet;                           # stringify and write to STDOUT
+            
+        # alternate "cursor" interface
+
+            my $cursor = $snippet->cursor;
+            while ( my $direction = get_user_tab_direction() ) {    # forward or backward
+                    my $t;
+                    if ( $direction == 1 ) {          # tab
+                            $t = $cursor->next;
+                    } elsif ( $direction == -1 ) {    # shift-tab
+                            $t = $cursor->prev;
+                    } else {
+                            last;                         # bail
+                    }
+                    next if ( !$t );
+
+                    # get (zero-based) cursor position relative to the beginning of the snippet
+                    my($line, $column) = $cursor->current_position;
+
+                    my $replacement = get_user_input();
+                    $t->replace($replacement);
+            }
+            print $snippet; # stringify snippet and write to STDOUT
+
+SUPPORTED SNIPPET SYNTAX
+    *   Plain text
+
+        The simplest snippet is just plain text with no tab stops and is
+        returned verbatim to the caller.
+
+    *   Simple tab stops
+
+        Tab stops are indications for where the cursor should be placed
+        after the user inserts a snippet. Simple tab stops are simply a
+        dollar sign followed by a digit. The special $0 tab stop is terminal
+        and is where the cursor will end up when the user has progressed
+        through all other tab stops defined by the snippet. If no $0 tab
+        stop is indicated, one is added by default right after the final
+        character of the snippet. A simple "if" snippet (two explicit tab
+        stops plus an implicit terminal after the closing brace of the "if"
+        block):
+
+                if ($1) {
+                        $2
+                }
+
+    *   Tab stops with defaults
+
+        Sometimes a snippet may provide a default value to the user to make
+        the snippet easier to flesh out. These types of tab stops look like
+        so:
+
+                while( my(\$${1:key}, \$${2:value}) = each(%${3:hash}) {
+                        $0
+                }
+
+        While navigating through the tab stops, the first three positions
+        will provide default values ("key", "value" and "hash"
+        respectively). The terminal tab stop will leave the cursor in the
+        body of the "while" block.
+
+    *   Tab stops with mirroring
+
+        Sometimes you may want the value the user entered in one tab stop to
+        be copied to another. This (in TextMate lingo) is called mirroring.
+        This is very simple to do, just use the same index on more than one
+        tab stop and the content entered in the first will automatically be
+        used in the others. A rather contrived example:
+
+                foreach my \$${1:item} (@${2:array}) {
+                        print "$${1}\n";
+                }
+
+        All occurences of the first tab stop (the loop variable and in the
+        "print" statement) will have the same value (defaulting to "item").
+
+    *   Transforming tab stops
+
+        The most advanced type of tab stop allows you to modify the entered
+        value on the fly using a regular expression. For instance, if you
+        like to use "getFoo" and "setFoo" accessors with Moose, you might
+        use the following snippet:
+
+                has ${1:propertyName} => (
+                        is => '${2:rw}',
+                        isa => '${3:Str}',
+                        reader => 'get${1/./\u$0/}),
+                        writer => 'set${1/./\u$0}),
+                );
+
+        If the user leaves all the defaults, the output of this snippet
+        would be:
+
+                has propertyName => (
+                        is => 'rw',
+                        isa => 'Str',
+                        reader => 'getPropertyName',
+                        writer => 'setPropertyName'
+                );
+
+        Another example would be a helper snippet for creating simple HTML
+        tags:
+
+                <${1:a}>${2}</${1/\s.*//}>
+
+        The transformer on the mirrored tab stop essentially will truncate
+        anything starting with the first whitespace character entered by the
+        user. If the user enters "a href="http://search.cpan.org"" as the
+        first replacement value, the mirrored tab stop will have a
+        replacement of just "a".
+
+CLASS METHODS
+  parse
+    This is the main entry point into this module's functionality. It takes
+    a single argument, the content of the snippet that conforms to the
+    syntax described above.
+
+INSTANCE METHODS
+  to_string
+    Obviously, gets the full content of the snippet as it currently exists.
+    This object is overloaded as well so simply printing the object or
+    including it inside double quotes will have the same effect.
+
+  chunks
+    Returns an ArrayRef that makes up the entire content of the snippet.
+    Depending on the source of the snippet, some of these items may be
+    literal scalars (representing static content) and others may be
+    Text::Snippet::TabStop objects that represent the user-enterable
+    portions of the snippet.
+
+  src
+    This returns the original source as it was passed to "parse"
+
+  tab_stops
+    This returns an ArrayRef of Text::Snippet::TabStop objects that
+    represent the user-enterable portions of the snippet. These are ordered
+    by the tab stop's index with the zero-th index coming last.
+
+  cursor
+    This method creates a Text::Snippet::TabStop::Cursor object for you
+    which allows the caller to traverse a series of tab stops in a
+    convenient fashion.
+
+BUGS
+    Please report any bugs or feature requests to "bug-text-snippet at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Snippet>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Text::Snippet
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Snippet>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Text-Snippet>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Text-Snippet>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Text-Snippet/>
+
+AUTHOR
+      Brian Phillips <bphillips@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Brian Phillips.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

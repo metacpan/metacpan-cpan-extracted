@@ -1,0 +1,41 @@
+---
+abstract: 'object interface for the frundis markup language'
+author:
+  - unknown
+build_requires:
+  File::DirCompare: '0'
+  File::Path: '0'
+  Test::Differences: '0'
+  Text::Diff: '0'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Frundis
+provides:
+  Text::Frundis:
+    file: lib/Text/Frundis.pm
+    version: '2.16'
+  Text::Frundis::Object:
+    file: lib/Text/Frundis/Object.pm
+  Text::Frundis::PerlEval:
+    file: lib/Text/Frundis/PerlEval.pm
+  Text::Frundis::Processing:
+    file: lib/Text/Frundis/Processing.pm
+recommends:
+  Data::UUID: '0'
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  URI: '0'
+  perl: '5.012'
+version: '2.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

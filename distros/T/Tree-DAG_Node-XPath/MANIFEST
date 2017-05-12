@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/pod_coverage.t
+t/pod.t
+t/test_redefine_name.t
+t/Tree-DAG_Node-XPath.t
+lib/Tree/DAG_Node/XPath.pm
+examples/01_simple
+examples/02_simple_with_atts
+examples/03_simple_redefine_tokens
+META.yml                                 Module meta-data (added by MakeMaker)

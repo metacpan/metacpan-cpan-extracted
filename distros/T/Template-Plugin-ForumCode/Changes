@@ -1,0 +1,20 @@
+This file documents the revision history for Template::Plugin::ForumCode
+
+0.0.5   Wed Dec 10 20:25:22 GMT 2008
+    - fixed POD coverage, now passes tests with TEST_POD=1
+
+0.0.4   Wed Dec  3 19:38:56 GMT 2008
+    - added missing dependency for "version"
+    - factored out core functionality into HTML::ForumCode
+    - factored out test information into separate test-lib
+    - added Cookbook recipes
+
+0.0.3   Wed Oct 22 07:36:11 BST 2008
+
+    - separated from Parley project
+    - correctly handle 'attr="foo"' in [img] markup (with tests)
+    - extended POD to better describe markup
+
+0.0.2 and before:
+
+    - see http://developer.berlios.de/projects/parley

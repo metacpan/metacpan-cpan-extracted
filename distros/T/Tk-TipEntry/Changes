@@ -1,0 +1,28 @@
+Revision history for Perl extension Tk::TipEntry.
+
+0.06 2016-03-27
+	- fix RT #113361 (Slaven Rezić)
+
+0.05 2016-03-26
+	- new contact details
+	- changed date format in Changes file
+	- moved author tests to xt folder
+
+0.04  2016-08-16
+	- fixed wrong date in CHANGES
+	- fixed copy 'n paste error in POD coverage test
+	- lowered Perl requirement to Perl 5.8.8
+	- untabified Makefile.PL
+
+0.03  2014-08-01
+	- improved MakeFile.PL
+	- added github repo info
+	- added POD::Coverage test
+
+0.02  2012-08-25
+	- fixed minor typo in POD
+
+0.01  2012-07-30
+	- original version; created by h2xs 1.23 with options
+		-b 5.12.2 -XA -n Tk::TipEntry
+

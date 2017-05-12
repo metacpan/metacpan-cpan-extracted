@@ -1,0 +1,13 @@
+Revision history for TAP-DOM-Waivers
+
+0.002     2015-10-07
+        - fix dependency declaration
+
+0.001     2014-03-16
+        - experimental prove plugin
+        - Exceptions (waivers) for TAP::DOM-like data
+
+2011-01-10  Steffen Schwigon  <ss5@renormalist.net>
+
+	* initial version
+

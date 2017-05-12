@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Tie/Tk/Text.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-load.t
+t/Tcl-Tk.t
+t/Tie-Tk-Text.pl
+t/Tk.t
+t/Tkx.t

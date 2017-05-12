@@ -1,0 +1,11 @@
+0.03 2015-09-24T00:23:10+02:00
+ - Move author tests to xt/ directory.
+ - Update Lego::Part to 0.03 version.
+ - Update Lego::Part::Image to 0.05 version.
+
+0.02 2015-08-25T23:06:42+02:00
+ - Fix Makefile.PL and META.yml files.
+ - Update Lego::Part::Image to 0.04 version.
+
+0.01 2015-08-24T11:33:29+02:00
+ - First version

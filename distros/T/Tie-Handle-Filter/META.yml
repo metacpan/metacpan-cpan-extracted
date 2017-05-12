@@ -1,0 +1,38 @@
+---
+abstract: '[DEPRECATED] filters filehandle output through a coderef'
+author:
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  Fcntl: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.94'
+  Time::Fake: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Handle-Filter
+requires:
+  Carp: '0'
+  English: '0'
+  FileHandle::Fmode: '0'
+  POSIX: '0'
+  Tie::Handle: '0'
+  base: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mjgardner/Tie-Handle-Filter/issues
+  homepage: http://metacpan.org/release/Tie-Handle-Filter/
+  repository: git://github.com/mjgardner/Tie-Handle-Filter.git
+version: '0.011'
+x_deprecated: 1
+x_serialization_backend: 'YAML::Tiny version 1.69'

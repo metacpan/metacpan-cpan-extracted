@@ -1,0 +1,16 @@
+---
+# indicator is the field that is used to test for form submission
+indicator: submit
+# Start listing the form elements
+elements:
+    - type: File
+      name: precondition
+      label: Precondition file
+      # This is an optional 'mouse over' title pop-up
+      attributes:
+        title: Precondition file may contain more than one precondition.
+
+    # The submit button
+    - type: Submit
+      name: submit
+      value: Create Precondition

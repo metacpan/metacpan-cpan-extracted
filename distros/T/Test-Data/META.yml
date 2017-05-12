@@ -1,0 +1,33 @@
+---
+abstract: 'test functions for particular variable types'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::Builder: '0'
+  Test::Builder::Tester: '0'
+  Test::More: '0.95'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Data
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  perl: '5.008'
+  strict: '0'
+resources:
+  bugtracker: https://github.com/briandfoy/test-data/issues
+  homepage: https://github.com/briandfoy/test-data
+  repository: https://github.com/briandfoy/test-data.git
+version: '1.241'

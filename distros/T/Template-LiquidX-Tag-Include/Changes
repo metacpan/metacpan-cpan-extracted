@@ -1,0 +1,5 @@
+Revision history for Perl extension Template-LiquidX-Tag-Include
+
+1.0.5 2016-05-12T18:27:51Z
+
+    - Split from main Template::Liquid dist

@@ -1,0 +1,32 @@
+Text-FormBuilder version 0.14
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::FormBuilder 3.x
+  Text::Template 1.44
+  Parse::RecDescent
+
+Optional:
+
+  Perl::Tidy
+  YAML
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Peter Eichman
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

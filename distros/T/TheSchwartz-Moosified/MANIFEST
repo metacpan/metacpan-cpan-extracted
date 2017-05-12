@@ -1,0 +1,31 @@
+Build.PL
+Changes
+lib/TheSchwartz/Moosified.pm
+lib/TheSchwartz/Moosified/Job.pm
+lib/TheSchwartz/Moosified/JobHandle.pm
+lib/TheSchwartz/Moosified/Utils.pm
+lib/TheSchwartz/Moosified/Worker.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP			List of files to ignore
+META.yml
+README
+t/00-load.t
+t/001-debug.t
+t/002_funcname_to_id.t
+t/003_insert.t
+t/004_list_jobs.t
+t/005_unique.t
+t/006_worker.t
+t/007_error_log.t
+t/008_replace_with.t
+t/010_cleanup.t
+t/011_retry-delay.t
+t/012_scoreboard.t
+t/013_coalesce.t
+t/999_postgres.t
+t/pod.t
+t/Utils.pm
+schema/Pg.sql
+schema/SQLite.sql
+META.json

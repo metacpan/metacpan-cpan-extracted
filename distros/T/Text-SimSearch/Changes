@@ -1,0 +1,13 @@
+Revision history for Perl extension Text::SimSearch
+
+0.02        2012/05/18 
+    - refine sample codes.
+
+
+0.01_002    2012/05/14
+    - I refined the logic of similarities. 
+    - I removed some code which showed "top-k-query", because I had been misunderstanding it.
+    - DEVELOPPER RELAEASE.
+
+0.01_001    2012/05/07
+    - DEVELOPPER RELAEASE

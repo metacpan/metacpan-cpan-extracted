@@ -1,0 +1,9 @@
+Short example for installing DBD-Pg-0.93 (assuming your installed
+postgres under /usr/local/pgsql).
+
+export POSTGRES_INCLUDE=/usr/local/pgsql/include
+export POSTGRES_LIB=/usr/local/pgsql/lib
+export DBI_DB=Pg DBI_DSN=dbi:Og:dbname=test DBI_USER=test DBI_PASS=toto55
+perl Makefile.PL
+make all
+make install

@@ -1,0 +1,45 @@
+CONTENTS
+
+  This distribution is my contribution to the ever growing collection
+  of Tk Widgets, currently it includes
+
+	Tk::Cloth       - An OO interface to Tk::Canvas
+	Tk::TFrame      - A frame with a title
+	Tk::NumEntry    - An entry widget that accepts numbers and has up/down
+			  buttons for in/decrement.
+	Tk::FireButton  - Button that keeps invoking command when pressed
+
+  Tk::Pane and Tk::ProgressBar are no longer part of this
+  distribution, becase they are included in standard Perl/Tk since
+  800.016. For older perl/Tk's, you can still grab the old 1.0401
+  Tk-GBARR distribution from CPAN.
+
+REQUIREMENTS
+
+  o To use this distribution Tk402.002 or better is required.
+    (there are no know problem with latest Tk800 releases)
+  o Some regression test use the Test.pm module (included in
+    perl 5.005).  If it's not installed the tests are skipped.
+
+CHANGES
+
+A complete list of changes is in the Changes file.
+
+The documentation is minimal (or even non-existant) but I was
+requested to release them before my life enters a stage of
+turmoil.  I hope the examples/ directory is sufficient to
+understand how to use the widgets.
+
+Please send all bugs/comments/patches directly to the ptk mailing list
+
+	ptk@lists.stanford.edu
+
+or to the current maintainer
+
+	Slaven Rezic <slaven@rezic.de>
+
+Copyright (c) 1997-1998 Graham Barr <gbarr@pobox.com>. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Share and Enjoy !

@@ -1,0 +1,7 @@
+---
+- uri: http://test/home.html
+  fields:
+    foo: 12
+    myfile:  !!perl/scalar:FileContents t/test-file.txt
+    stacked: !!perl/array:Stacked [ t/test-file.tt, FileContents, ApplyTemplate ]
+  title_is: Dean Serenevy

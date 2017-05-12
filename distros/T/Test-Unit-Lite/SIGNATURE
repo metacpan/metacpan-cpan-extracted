@@ -1,0 +1,86 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7dc055218487765395c1a8415ecbf25ab517a37c Build.PL
+SHA1 34d79ff76eb6636e04ab993f0430a80e4f80fe36 Changes
+SHA1 39d4369e877ca8afd2c5736d89d21b67976f2d07 LICENSE
+SHA1 4c18133ec80e16285b1234c1bed250d47394d9b4 MANIFEST
+SHA1 86fb54c8932787c88ad623cf4792182853eeca85 MANIFEST.SKIP
+SHA1 8aab8f89ceba94073824fa450619ed8d2c1b8a6c META.json
+SHA1 e66ab7cf1ed00ca8aaadc5720dab331f53aafec5 META.yml
+SHA1 1a38f93a68e9d314816d72919f9b1d00dd25eb8e Makefile.PL
+SHA1 3273e0334093e77b9a6acac853acb4f9dc4df95e README
+SHA1 d0aa7c9fd60efc67d1545810a8eb6d2dca5e50b0 README.md
+SHA1 a5b42c5616211189572a48935a55eca59a75c742 examples/README
+SHA1 3fb96e7808087ca3bc410548183095ed74ea1d52 lib/Test/Unit/Lite.pm
+SHA1 65196ddb7d86fa6b392f6e711ddc6326bd6decef t/all_tests.t
+SHA1 2a6a6d60e637568de03f4b4c0d22cf544eb955a6 t/all_tests_tainted.t
+SHA1 0b65fef81698ca3ecb87c27aebe02ba593243372 t/test.pl
+SHA1 53a6b9c1e9d2d505e3f26ff07f7175c4cf5b103c t/test_tainted.pl
+SHA1 e50f7a48a4c3edf225764704483ee6c4cc63fe66 t/tlib/AssertTest.pm
+SHA1 e894ae8d9cf8d6d82c7880567171075ec26c5b27 t/tlib/BadSuite/BadUse.pm
+SHA1 82248fdc31ebd203472218151be2eb081abf8c52 t/tlib/BadSuite/SyntaxError.pm
+SHA1 34093bc61042f53f8d20f935ad7cae236bf74eb6 t/tlib/BadSuitesTest.pm
+SHA1 a5525fad9989342fa84024cf0d79ff207ee5f0f5 t/tlib/BadUnits/WithErrorOnSetUp.pm
+SHA1 7798765a8acc72c090d0bc9f44007c4566ca388e t/tlib/BadUnits/WithErrorOnSetUpSuite.pm
+SHA1 6ac2602be0b234cf9185104627701e48ee3c60e9 t/tlib/BadUnits/WithErrorOnTearDown.pm
+SHA1 4ddf587d98727de6adcb627f99c232b7d37259e9 t/tlib/BadUnits/WithErrorOnTearDownSuite.pm
+SHA1 0a47eb147686621d3703bce8ae9dcdb5445c8f7c t/tlib/BadUnits/WithFailure.pm
+SHA1 d9aa2ee64ce3c76ffaeccdec5be634236d62f042 t/tlib/BadUnits/WithFailureSuite.pm
+SHA1 c3b6297fcb1583a0532700798f76041491eee000 t/tlib/BadUnitsTest.pm
+SHA1 813a98c1f39ff8db5658a21099234c46bec35663 t/tlib/ExceptionChecker.pm
+SHA1 f4298c9d98fa850d1a627e8f0562732c76b463b2 t/tlib/InheritedSuite/BaseTest.pm
+SHA1 5606f240763732eb1a6229f5361d3c1456ba369c t/tlib/InheritedSuite/DerivedDerivedTest.pm
+SHA1 9ef52e4cbc1d56e9e9f067d867911c4f9165f435 t/tlib/InheritedSuite/DerivedTest.pm
+SHA1 cdf316da142b2d640dde4fadc2622b27d9b027ec t/tlib/InheritedSuite/OverrideNew.pm
+SHA1 a47ceb772f28d9fc045eaf296625bf85266d670b t/tlib/InheritedSuite/OverrideNewName.pm
+SHA1 db48b82d3aacc1885e930a8c3a3bda8f8b16d346 t/tlib/InheritedSuite/Simple.pm
+SHA1 dd0101d63d4b34351019e364ff7afe6e4ea33dd0 t/tlib/InheritedSuite/TestNamesTest.pm
+SHA1 25c11db8cd4dc89fae1ea0f559632a0169422eb3 t/tlib/NoTestCaseClassTest.pm
+SHA1 d3f0f4312dfa2b384a71d13db70417259f37a92e t/tlib/NoTestCasesTest.pm
+SHA1 ae79b05bc34717675b5e1125991bb3d61aa4efb7 t/tlib/OneTestCaseTest.pm
+SHA1 966d19c49e3e4936c9c1c44a9cd4c7238e286791 t/tlib/OverrideTestCaseTest.pm
+SHA1 40708ff1aca3c273aa5761210c08f3f6103dabad t/tlib/SetUpTearDownTest.pm
+SHA1 b3199eaa21558d84ec984eab05dee5ec5e73bdc9 t/tlib/SuccessTest.pm
+SHA1 f7e14bf098983eef41850124fd27015be52a39e7 t/tlib/TestObject.pm
+SHA1 50bb1ccaa6d868e4ae05d7b4bd6052b008fa37b2 t/tlib/WillDie.pm
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 1c27e5840b0154e44120bc2edc02fbb507c76819 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 e6cd4b4bbadcfddd26f7f2fa3c6b48339be8343f xt/cpan_changes.t
+SHA1 4f8f90e1c421bfd592e6806ec4d0a75f3d56406a xt/cpan_meta.t
+SHA1 48a67f01c35122165bb633264cba72d984d7a89e xt/dist_manifest.t
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 af47b82dbac975ba494dfe6849d17d1e02941ac6 xt/eol.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 1a1cd76027c4cc73ec56beadaf56680bbac1fd4a xt/no_tabs.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 2b45f0037f75c190f535b3aa90a9b38b7f021c2c xt/perlcriticrc
+SHA1 46aa111935ff192343c30b72d28da1a71ef4abf0 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 75608fc5a8bc9c71e64c4586584c1da08f1775a5 xt/pod_spellrc
+SHA1 87cb53d4ad0162a872d5c70013fc41719e030555 xt/pod_syntax.t
+SHA1 f2dd15ffc2836703f46f2622702e1676891eed21 xt/portability_files.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlDTOL4ACgkQhMHHe8CxClsaOwCdGG1xCdvrIW6+VCgSFvg1dZqq
+pz4AoOXZSAt+OeJA7JmQe8q5DXMMdd89
+=0RbF
+-----END PGP SIGNATURE-----

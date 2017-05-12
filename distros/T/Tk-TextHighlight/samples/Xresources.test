@@ -1,0 +1,41 @@
+! ===========================================================================
+!  OpenWindows Olwm Olvwn
+! ===========================================================================
+!
+OpenWindows.AutoRaise:	false
+OpenWindows.AutoReReadMenuFile:	true
+OpenWindows.Beep:	never
+OpenWindows.ClickMoveThreshold:	5
+!OpenWindows.WindowColor:	#b2b2b2
+!OpenWindows.WorkspaceColor:	gray
+
+*printCommand: lpr
+
+Mwm.interactivePlacement:	false
+
+grok*ColSheet: black
+
+xterm*background:	LightYellow2
+xterm.eightBitInput:	true
+xterm*multiScroll:	on
+xterm*jumpScroll:	on
+! xterm*font:	-adobe-courier-bold-r-normal--14-140-75-75-m-90-iso8859-1
+xterm*ScrollBar: on
+xterm*SaveLines: 2000
+! xterm*VisualBell: true
+xterm.eightBitOutput:	true
+
+Scrollbar.JumpCursor:	True
+
+
+Ghostview.pageMedia:  A4
+
+*XConsole*text.scrollHorizontal:         False
+*XConsole*text.wrap: line
+
+!
+! XSysinfo 
+!
+XSysinfo*.font:                 fixed
+XSysinfo*.title.label:          Linx System Info
+XSysinfo*.title.width:          200

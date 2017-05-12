@@ -1,0 +1,27 @@
+---
+abstract: 'Perl extension for creating hashes that forget things'
+author:
+  - 'Dave Cross <dave@mag-sol.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Hash-Cannabinol
+provides:
+  Tie::Hash::Cannabinol:
+    file: lib/Tie/Hash/Cannabinol.pm
+    version: 1.1
+requires:
+  Attribute::Handlers: 0
+  Tie::Hash: 0
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/davorg/tie-hash-cannabinol
+version: 1.11

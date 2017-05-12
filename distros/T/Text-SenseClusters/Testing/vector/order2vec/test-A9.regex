@@ -1,0 +1,9 @@
+/\s(<[^>]*>)*funds <p="NN"\/>(<[^>]*>)*\s/ @name = funds <p="NN"/>
+/\s(<[^>]*>)*rate <p="NNS"\/>(<[^>]*>)*\s/ @name = rate <p="NNS"/>
+/\s(<[^>]*>)*period <p="NN"\/>(<[^>]*>)*\s/ @name = period <p="NN"/>
+/\s(<[^>]*>)*company <p="NN"\/>(<[^>]*>)*\s/ @name = company <p="NN"/>
+/\s(<[^>]*>)*debt <p="NN"\/>(<[^>]*>)*\s/ @name = debt <p="NN"/>
+/\s(<[^>]*>)*property <p="NN"\/>(<[^>]*>)*\s/ @name = property <p="NN"/>
+/\s(<[^>]*>)*retaliation <p="NN"\/>(<[^>]*>)*\s/ @name = retaliation <p="NN"/>
+/\s(<[^>]*>)*commission <p="NN"\/>(<[^>]*>)*\s/ @name = commission <p="NN"/>
+/\s(<[^>]*>)*million <p="CD"\/>(<[^>]*>)*\s/ @name = million <p="CD"/>

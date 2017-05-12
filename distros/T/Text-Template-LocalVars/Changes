@@ -1,0 +1,26 @@
+Revision history for Text-Template-LocalVars
+
+0.04	 Mon 22 Sep 2014 10:53:59 AM EDT
+
+  No code changes.
+
+  [BUILD]
+
+    * fix packaging problem w/ self-patched version of
+      Module::Install::ReadmeFromPod
+
+0.03	2014-09-21T09:28:34-0400
+
+  [DOCUMENTATION]
+
+    * simplify docs; don't use undocumented behavior of
+      Text::Template::fill_in_string in documentation.
+
+0.02	2014-09-20T17:42:48-0400
+
+  [MISC]
+    * fix typo in module name in repo & RT URLs
+
+0.01    2014-09-20T17:15:00-0400
+        First version, released on an unsuspecting world.
+

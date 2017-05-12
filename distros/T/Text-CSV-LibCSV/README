@@ -1,0 +1,77 @@
+NAME
+    Text::CSV::LibCSV - comma-separated values manipulation routines (using
+    libcsv)
+
+SYNOPSIS
+      use Text::CSV::LibCSV;
+
+      my $callback = sub {
+           my @fields = @_;
+           print(join(',', @fields), "\n");
+      };
+      csv_parse($data, $callback) or die;
+      # or using OO interface
+      my $parser = Text::CSV::LibCSV->new;
+      $parser->parse($data, $callback) or die $parser->strerror;
+
+DESCRIPTION
+    This module is an interface for libcsv. It is available at:
+    http://sourceforge.net/projects/libcsv/
+
+    WARNING: Please note that this module is primarily targetted for libcsv
+    >= 1.0.0, so if things seem to be broken and your libcsv version is
+    below 1.0.0, then you might want to consider upgrading libcsv first.
+
+METHODS
+    new([$opts])
+        Initialize parser object.
+
+        Option can be set CSV_STRICT or CSV_REPALL_NL. Read libcsv's
+        documentation for details.
+
+        Returns an instance of this module.
+
+    opts($opts)
+        Set options.
+
+    parse($data, $callback)
+        Parse a CSV string.
+
+        Callback function is called at the end of every row.
+
+        Returns true on success or undef on failure.
+
+        You can get error message by strerror.
+
+    parse_file($file, $callback)
+        Parse a CSV string from file.
+
+    parse_fh($fh, $callback)
+        Parse a CSV string from file handle.
+
+        You can use "parse()" in the same way.
+
+        NOTE: "parse_file()" and "parse_fh()" read all data to memory once.
+        It is not necessarily the case that they work faster than parse.
+
+    strerror
+        Returns error message.
+
+FUNCTIONS
+    csv_parse($data, $callback [, $option])
+        Parse a CSV string.
+
+        Callback function is called at the end of every row.
+
+EXPORT
+    csv_parse, CSV_STRICT, CSV_REPALL_NL
+
+AUTHOR
+    Jiro Nishiguchi <jiro@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    <http://sourceforge.net/projects/libcsv/>
+

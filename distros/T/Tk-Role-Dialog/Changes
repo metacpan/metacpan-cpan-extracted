@@ -1,0 +1,24 @@
+Revision history for Tk::Role::Dialog.
+
+1.112380  2011-08-26 17:52:50 Europe/Paris
+ - using tk::role::haswidgets to prevent duplication
+
+1.101480  2010-05-28 15:05:55 Europe/Paris
+ - new attribute "hidden"
+ - support for "hide" action
+ - support path::class objects for icon attr
+
+1.101392  2010-05-19 16:42:42 Europe/Paris
+ - support for transparent icons
+
+1.101391  2010-05-19 14:56:53 Europe/Paris
+ - support for simple dialog boxes (text + image)
+
+1.101390  2010-05-19 10:19:06 Europe/Paris
+ - provide a frame to hold alien widgets
+
+1.101381  2010-05-18 19:15:51 Europe/Paris
+ - pod update
+
+1.101380  2010-05-18 19:11:38 Europe/Paris
+ - original version

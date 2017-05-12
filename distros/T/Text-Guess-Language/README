@@ -1,0 +1,61 @@
+NAME
+
+    Text::Guess::Language - Guess language from text using top 1000 words
+
+SYNOPSIS
+
+      use Text::Guess::Language;
+      my $guessed_language = Text::Guess::Language->guess($text);
+
+DESCRIPTION
+
+    Text::Guess::Language matches the words in the text against lists of
+    the top 1000 words in each of 58 different languages.
+
+ CONSTRUCTOR
+
+    new()
+
+      Creates a new object which maintains internal storage areas for the
+      Text::Guess::Language computation. Use one of these per concurrent
+      Text::Guess::Language->guess() call.
+
+ METHODS
+
+    guess($text)
+
+      Returns the language code with the most words found.
+
+ EXPORT
+
+    None by design.
+
+STABILITY
+
+    Until release of version 1.00 the included methods, names of methods
+    and their interfaces are subject to change.
+
+    Beginning with version 1.00 the specification will be stable, i.e. not
+    changed between major versions.
+
+SOURCE REPOSITORY
+
+    http://github.com/wollmers/Text-Guess-Language
+
+AUTHOR
+
+    Helmut Wollmersdorfer <helmut.wollmersdorfer@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2016- Helmut Wollmersdorfer
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Text::Language::Guess
+

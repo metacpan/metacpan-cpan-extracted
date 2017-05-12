@@ -1,0 +1,13 @@
+#
+# $Id: Changes,v 0.2 2006/12/22 03:20:22 dankogai Exp $
+#
+Revision history for Perl extension Tie::Array::Pack.
+$Revision: 0.2 $ $Date: 2006/12/22 03:20:22 $
+! lib/Tie/Array/Pack.pm
+  * Refactored - 10% speed gain
+  * Pod slightly fixed
+
+0.01  Thu Dec 21 22:25:25 2006
+	- original version; created by h2xs 1.23 with options
+		-XA Tie::Array::Pack
+

@@ -1,0 +1,28 @@
+Revision history for Perl extension Template::Process.
+
+0.0006 Mon Mar 26 2007
+        - included an example at eg/ directory
+        - data structures written as Perl code may be
+          read as well
+        - by now, YAML is a dependency - so Makefile.PL
+          must include it
+
+0.0005 Tue Mar 21 2007
+        - no need for updating
+        - exposed more docs
+        - added a test for POD coverage
+
+0.0004 Wed Nov 1 2006
+        - provide some docs to 'tt' script
+
+0.0003 Wed Nov 1 2006
+        - tt now deals with an empty list of data files
+          without warning
+
+0.0002 Tue Sep 26 2006
+        - now with a pod test
+
+0.00_01  Wed Sep 13 16:14:18 2006
+        - original version; created by h2xs 1.23 with options
+                -ABX -n Template::Process
+

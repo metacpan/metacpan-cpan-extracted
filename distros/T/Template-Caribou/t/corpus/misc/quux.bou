@@ -1,0 +1,3 @@
+sub($self) {
+    print "quux";
+}

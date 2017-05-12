@@ -1,0 +1,19 @@
+.gitignore
+Changes
+MANIFEST
+Makefile.PL
+Getopt.pm
+README
+t/error.t
+t/getopt.t
+t/getopt2.t
+t/gui.t
+t/gui2.t
+t/linkage2.t
+t/opttest
+t/simple.t
+t/simple2.t
+t/modern.t
+demos/tk-getopt.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

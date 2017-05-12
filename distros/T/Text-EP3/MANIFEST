@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Text/EP3.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/tests1.t
+t/tests2.t
+t/ep3.tst
+t/tests2a.tst
+t/tests2b.tst
+t/tests2c.tst
+bin/ep3

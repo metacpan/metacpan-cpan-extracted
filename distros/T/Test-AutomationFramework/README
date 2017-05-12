@@ -1,0 +1,50 @@
+Test-AutomationFramework version 0.058.0
+=====================================
+
+Test::AutomaitonFramework (TAF) is a Perl Win32/64 module to assist Test Automation by:
+
+	1. Test Case Management: list, report, log, run test cases	(View test latest and historical result; run TC and Test suite)
+	2. Simplicity          : No programming is required. No Manul to read            (perl -MTest::AutomationFramework -e "install") 
+	3. MultiPurpose        : TC scripts, Perf, Lab setup etc  			                    (Perl, C, C#, java ....... )
+	4. User Friendly       : IE-based web UI                          (TC list, reporting, execution are done by *ONE* mouse click )
+	5. Open Sourc Software : Google key word: CPAN TAF
+
+TAF 3-steps Installation: 
+
+	1. Strawberry Perl Installation from Internet
+
+	2. TAF Module Installation from Internet by executing the following command 2 times 
+			perl -MCPAN -e "install Test::AutomationFramework"
+	   	
+	   [Manual installation if the above step doesn't work 
+	   Download the Test-AutomationFramework.n.tar.gz file from CPAN and unzip 
+	   perl -MCPAN -e "install Date::Manip" (for Strawberry Perl) or ppm install Date::Manip (for ActivePerl)
+	   perl Makefile.PL
+	   dmake
+	   dmake test
+	   dmake install]
+
+	3. TAF Testbed installation: perl -MCPAN -e "install Test::AutomationFramework"
+
+Non-programming Usage:
+
+	1. Modify c:\_TAF\taf.bat 
+	2. Execut c:\_TAF\taf.bat 
+	3. Modify c:\_TAF\_testsuit_\_testcase_\tc.pl (Automated TC hook)
+	4. Modify c:\_TAF\_testsuit_\tsProperty.txt   (WebUI's Test Case Description )
+	5. Modify c:\_TAF\tsProperty.txt              (WebUI's Test Suite Description )
+	6. Open   c:\_TAF\_testsuit_\index.htm with IE  (WebUI to dispsplay, Start TC, record TC historical result/logs) 
+	7. Have fun with the TAF
+
+DEPENDENCIES
+
+	[FYI: TAF module requires the following modules and libraries, which should be installed by CPAN with TAF Module installaton:
+	Date::Manip 	File::Path      Test::More       Getopt::Long          File::Copy         File::Find         Cwd::getcwd  HTTP::Server::Simple.CGI]
+
+Copyright 2012 by Yong Wang (ywangperl@gmail.com) 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

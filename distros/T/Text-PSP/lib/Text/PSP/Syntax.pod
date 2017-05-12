@@ -1,0 +1,115 @@
+=pod
+
+=head1 NAME
+
+Text::PSP::Syntax - The Text::PSP template syntax manual.
+
+=head1 INTRODUCTION
+
+=head1 BASIC MODES
+
+=head2 Text mode
+
+Text mode is the default mode for a template. Everything in text mode will be returned when the compiled template's run() method is called.
+
+The only way to exit text mode is to use a construct starting with C<< <% >>. You will then enter one of the other basic modes, or issue a L<directive|/DIRECTIVES>.
+
+If you ever want to use a literal C<< <% >> in text mode, you can to use C<< <\% >>, or return a string from a statement like this:
+
+	The only way to exit text mode is to use
+		a construct starting with '<\%'.
+
+	The only way to exit text mode is to use
+		a construct starting with '<%= "<%" %>'.
+
+=head2 Expression mode
+
+In expression mode, you can enter any valid perl expression, which will be evaluated in list context, and the return value will be pasted in the output of the compiled template's run() method.
+
+Expression mode starts with C<< <%= >> and ends with C<< %> >>.
+
+	On the next line are the numbers from one to ten:
+	<%= join(", ",(1 .. 10)) %>
+
+
+You cannot use a literal C<< %> >> in your expression, but you can always fake one if you really need to:
+
+	You can still return '%>' from an expression like this:
+	<%= "%".">" %>
+
+=head2 Control mode
+
+In control mode you can put loop control, open database connections and generally misbehave, and no output will be generated. Any scope changes (like loops) can also be ended in a following control block.
+
+Control mode starts with C<< <% >> and ends with C<< %> >>.
+
+	On the next lines there are the numbers from one to ten:
+	<% for my $count (1 .. 10) { %>
+		<%= $count %><%
+	} %>
+
+Please note that you should not C<use> modules, or define subroutines inside a code block unless you really have a very good reason to do so (defining a closure might be one). Normally you are better off using L</Define mode>.
+
+=head2 Define mode
+
+In define mode you can define subroutines, C<use> modules or put any other code that you need or want to be declared globally.
+
+Define mode differs from the above modes because the code in it will be put in a different scope from the rest (at the top of the compiled module in fact), so any (non-global) variables that are defined in the other blocks are not in scope in the define block. 
+
+Define mode starts with C<< <%! >> and ends (as always) with C<< %> >>.
+
+	<%!
+		use CGI;
+		my $q = CGI->new();
+	%>
+	Input from form element 'element1' was:
+	<%= $q->param('element1') %>.
+
+=head2 Parse mode
+
+Parse mode is at this time still experimental, and it's behaviour may change in the future. The idea is that parse mode is like L</Expression mode> except that the expression is only run once: at the time the template is parsed and translated into a perl module. The return value of the expression is put as text (in text mode) in the resulting module.
+
+This feature might turn out to be useful for someone, but it's mostly in now because I<it seemed like a good idea at the time>.
+
+=head1 DIRECTIVES
+
+At the moment there are just a few directives, most of which are handled when the template is translated to a perl module.
+
+All directives have the same syntax: C<< <%@ directivename attribute="value" attribute2="value" .. %> >>.
+
+=head2 include
+
+The C<include> directive will include another template file into the main template at translation time;
+the text, code and expression blocks of the included template will be inserted in place of the C<include> directive.
+Any define blocks will be added to the define block of the calling template.
+
+The C<include> directive has only one attribute: C<file>, which specifies the relative path to the template
+to be included.
+
+	<%@ include file="some/file.psp" %>
+
+Please note that you cannot include files from outside the template root.
+
+=head2 find
+
+The C<find> directive works similar to the L</include> directive, but it will search for the file to be included,
+starting from the directory the B<main template> is in, and working its way up to the template root until the
+file is found.
+
+This makes for a reasonably flexible templating technique, for instance when you have a structured
+website in which you want to include a standard header, and all C<index.psp> templates start with C<< <%@ find file="header.psp" %> >>:
+
+	/index.psp		includes /header.psp
+	/header.psp
+	/section1/index.psp	includes /header.psp
+	/section2/header.psp
+	/section2/index.psp	includes /section2/header.psp
+
+=head1 COPYRIGHT
+
+Copyright 2002 - 2005 Joost Diepenmaat, jdiepen@cpan.org. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+

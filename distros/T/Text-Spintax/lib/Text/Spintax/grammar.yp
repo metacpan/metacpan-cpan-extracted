@@ -1,0 +1,38 @@
+%{
+# header code goes here
+%}
+
+%start elements
+%token OBRACE
+%token EBRACE
+%token PIPE
+
+%%
+
+text: TEXT { $_[0]->YYData->{tree}->add_child("text",$_[0]->YYData->{DATA}[1],$_[0]->YYData->{DATA}[2]); } ;
+
+element: text | parser_spin { };
+
+elementpipe: elements pipe { } ;
+
+ebrace: EBRACE { $_[0]->YYData->{tree}->ebrace; } ;
+
+obrace: OBRACE { $_[0]->YYData->{tree}->obrace; } ;
+
+pipe: PIPE { $_[0]->YYData->{tree}->add_child("pipe") } ;
+
+elementpipes:
+   |
+   elementpipes elementpipe { } 
+   ;
+
+parser_spin: obrace elementpipes elements ebrace { $_[0]->YYData->{tree}->last_child->{type} = "spin"; } ;
+
+elements: /* empty */
+   |
+   elements element
+   ;
+
+%%
+
+

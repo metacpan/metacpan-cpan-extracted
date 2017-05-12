@@ -1,0 +1,119 @@
+Revision history for Perl extension Text::Aspell.
+
+0.09  Fri Sep 21 00:02:55 UTC 2007
+      - Updated test due to changes in Test::More v0.71
+
+0.08  Thu May  3 04:59:31 UTC 2007
+      - Added explicit set_lang for en_US
+      - TODO fix Makefile.PL to make sure aspell installed
+      and en_US installed.
+
+0.07  Tue Apr  3 20:18:11 UTC 2007
+
+      - Added patch provided by Peter Karman:
+      "Here's a patch to skip that funny test in 05-core.t if the sug-split-char
+       feature is not present."
+
+
+0.06  Wed May 31 13:51:58 UTC 2006
+
+      - Replaced the PUSHs with XPUSHs as suggested by AWKAY in bug #15060
+
+      - Removed a comment that was left in the O_OBJECT typemap.
+        Alex Kapranoff reported that it was confusing xsubpp on some versions
+        of perl.
+
+      - Changed from testing return values to calling aspell_*_error.
+        In some cases the Aspell API was inconsistent with the code.
+        http://lists.gnu.org/archive/html/aspell-devel/2005-07/msg00028.html
+
+
+
+0.05  Wed Jul 27 10:34:55 PDT 2005
+
+      - Removed a number of const * casts.  Also changed a few int returns to
+        void to prevent XS creating RETVAL when not needed -- clears up all
+        warnings when compiling the module with -Wall (on gcc 3.3.6).
+
+      - Fixed get_option_as_list() to fetch the error message from the config object
+        instead of the speller object.  Reported by Gary Setter.
+
+      - Made _create_speller() static - closes 8635
+        Thanks to Alexey Tourbin
+
+      - gt_option_as_list now checks for valid speller object
+        and generates internal message if not valid - closes 8633
+        Thanks to Alexey Tourbin
+
+      - replaced the config list test from 'sgml-extension' to 
+        'sug-split-char'.  smgl-extension seems to not be available
+        anymore as a number of people reported this test failing.
+
+      - Ignore the return value in store_replacement() -- seems the
+        return value cannot be trusted from aspell.
+
+      - Updated typemap to use INT2PTR to quiet the following:
+
+            cast to pointer from integer of different size
+
+      - Updated the README file to included suggestions for building on various
+        platforms.
+
+      - Moved to using Test::More.  Sorry if that causes you pain.  Just trying
+        to keep up with the times.
+
+
+0.04  Sat Nov  1 22:10:03 UTC 2003
+
+      - Updated README for Windows instructions
+
+0.03  Sun Aug  3 00:45:32 UTC 2003
+
+      - Fixed a bug reported in Debian bug 203467
+        An invalid config setting (such as Lang = "xx") was
+        causing a segfault.
+        Was freeing the config option between creating the speller
+        and checking for errors.  The free was clearing the error status.
+
+      - Fixed Debian bug 203516
+        Was not correctly extending arg stack when pusing suggesions onto
+        an array.
+
+      - Closed Debian bug 203517
+        User was trying to modify the config settings (specifically the
+        "lang" setting) after creating a speller object.  That doesn't
+        work because creating a speller object is what maps the config
+        options to a given dictionary file.
+        Documentation updated to clear up this point.
+
+
+
+0.02  Sat Aug 31 14:58:31 UTC 2002
+
+      - Added new method:
+         @dicts = $speller->dictionary_info;
+         returns hash ref instead of a : joined string
+
+      - Added new method:
+        @option_list = $speller->get_option_as_list( $option_name );
+        returns the option setting as a list (since some options are lists)
+
+      - Added new method:
+        $options = $speller->fetch_option_keys;
+        returns the available config options and their defaults
+
+      - Removed option_list array.
+
+
+0.01  Thu Aug 29 19:49:51 UTC 2002
+
+      - Updated and renamed from Text::Pspell to use GNU Aspell 0.50.
+        Update to GNU Aspell provided by T.J. Mather, Aug 24, 2002.
+
+      - Updated config options displayed in print_config() method.
+
+      - Added list_dictionaries() method to list available dictionaries
+        and added test.
+
+
+

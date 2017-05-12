@@ -1,0 +1,16 @@
+ChangeLog
+dump-zones
+dump-zones-merged
+lib/TinyDNS/Reader.pm
+lib/TinyDNS/Reader/Merged.pm
+lib/TinyDNS/Record.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README.md
+t/00-load.t
+t/10-test-strict.t
+t/20-dns-records.t
+t/30-test-merging.t
+META.json                                Module JSON meta-data (added by MakeMaker)

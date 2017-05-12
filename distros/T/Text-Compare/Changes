@@ -1,0 +1,13 @@
+Revision history for Text-Compare
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+# 2007/06/22 stro v1.02
+#                 Fixed bug 15329 (https://rt.cpan.org/Ticket/Display.html?id=15329)
+#                 Fixed bug 21587 (https://rt.cpan.org/Ticket/Display.html?id=21587)
+#                 Fixed bug 21588 (https://rt.cpan.org/Ticket/Display.html?id=21588)
+
+# 2007/06/23 stro v1.03
+#                 Fixed POD
+#                 License added to meta.yml

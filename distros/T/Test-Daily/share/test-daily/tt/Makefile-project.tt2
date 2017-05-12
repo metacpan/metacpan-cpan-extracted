@@ -1,0 +1,29 @@
+all: index.html
+
+# index file + summary
+index.html: summary.json rss.xml
+	touch index.html    # index.html is created together with summary.json
+
+summary.json: [% ttdir %]/project.tt2 [% FOREACH test IN folders; "$test/index.html "; END; %]
+	test-daily project-summary
+
+rss.xml: [% ttlibdir %]/atom.tt2 [% FOREACH test IN folders; "$test/rss.xml "; END; %]
+	test-daily aggregatefeeds [% curfolder %]
+
+[% FOREACH test IN folders; %]
+# make Makefile for test
+[% test %]/Makefile: [% ttdir %]/Makefile-test.tt2
+	test-daily test-makefile [% test %] [% curfolder %]
+
+# make index.html
+[% test %]/index.html: [% test %]/Makefile
+	cd [% test %] && make
+
+[%- END; -%]
+
+# clean up the mess
+clean:
+	rm -f index.html rss.xml rss-fail.xml
+[% FOREACH test IN folders; -%]
+	cd [% test %] && make clean
+[% END; -%]

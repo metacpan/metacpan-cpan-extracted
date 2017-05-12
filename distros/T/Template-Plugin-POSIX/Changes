@@ -1,0 +1,19 @@
+Revision history for Perl extension Template::Plugin::POSIX.
+
+0.05  2007-03-12
+* removed Test::Base from the dependency list
+* degraded the perl version we require here
+
+0.04  2007-03-05
+* minor fix in POD
+
+0.03  2007-03-05
+* merged in the changes from Template::Plugin::Perl.
+
+0.02  2005-07-20
+* added some links to the POD doc, and fixed a broken one.
+
+0.01  Sun Jul 17 12:26:13 2005
+* original version; created by h2xs 1.23 with options
+    -X -b 5.6.1 Template::Plugin::POSIX
+

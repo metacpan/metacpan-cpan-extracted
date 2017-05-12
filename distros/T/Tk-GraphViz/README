@@ -1,0 +1,24 @@
+Tk/GraphViz
+===========
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the 'dot' program that is a part of 'graphviz'(http://www.graphviz.org/).  It may also be used in conjuction with the GraphViz module by Leon Brocard.  Being a Tk widget, Tk is required as well.  GraphViz and Tk are can be found at CPAN (http://www.cpan.org/).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Jeremy Slade
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

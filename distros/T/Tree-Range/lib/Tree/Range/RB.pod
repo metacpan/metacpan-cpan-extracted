@@ -1,0 +1,249 @@
+### RB.pod --- Document Tree::Range::RB  -*- POD -*-
+
+### Copyright (C) 2013 Ivan Shmakov
+
+## Permission to copy this software, to modify it, to redistribute it,
+## to distribute modified versions, and to use it for any purpose is
+## granted, subject to the following restrictions and understandings.
+
+## 1.  Any copy made of this software must include this copyright notice
+## in full.
+
+## 2.  I have made no warranty or representation that the operation of
+## this software will be error-free, and I am under no obligation to
+## provide any services, by way of maintenance, update, or otherwise.
+
+## 3.  In conjunction with products arising from the use of this
+## material, there shall be no use of my name in any advertising,
+## promotional, or sales literature without prior written consent in
+## each case.
+
+### Code:
+
+=head1 NAME
+
+Tree::Range::RB E<ndash> range tree implemented on top of
+L<Tree::RB>
+
+=head1 SYNOPSIS
+
+    require Tree::Range::RB;
+
+    sub ncmp { $_[0] <=> $_[1]; }
+    my $nrt
+        = Tree::Range::RB->new ({ "cmp" => \&ncmp });
+    $nrt->range_set (100, 200, "foo");
+    $nrt->range_set (200, 300, "bar");
+    $nrt->range_set (150, 250, "baz");
+    $nrt->range_set (400, 500, "qux");
+    my $r100 = $nrt->get_range (100);
+    ## now $r100 is  "foo"
+    my @r200 = $nrt->get_range (200);
+    ## now @r200 is ("baz", 150, 250)
+    my @r300 = $nrt->get_range (300);
+    ## now @r300 is (undef, 300, 400)
+    my $free_p = $nrt->range_free_p (200, 300);
+    ## now $free_p is a false value
+    my ($ic)
+        = $nrt->range_iter_closure (450);
+    my @ri1 = $ic->();
+    ## now @ri1 is ("qux", 400, 500)
+    my @ri2 = $ic->();
+    ## now @ri2 is (undef, 500, undef)
+    my @ri3 = $ic->();
+    ## now @ri3 is ()
+
+    sub cmp { $_[0] cmp $_[1]; }
+    my $srt
+        = Tree::Range::RB->new ({ "cmp" => \&cmp });
+    $srt->range_set (qw (apple  peach   1));
+    $srt->range_set (qw (banana cherry  2));
+    my @rmango = $srt->get_range ("mango");
+    ## now @rmango is (1, "cherry", "peach")
+
+=head1 DESCRIPTION
+
+This class implements a I<range tree>
+(as described in L<Tree::Range::base>)
+on top of the L<Tree::RB> red-black tree implementation.
+It inherits from L<Tree::Range::base>.
+
+=head1 INTERFACE
+
+=over 4
+
+=item C<< my $rat = Tree::Range::RB->new (\%options); >>
+
+Create and return a new range tree object.
+
+Available options are as follows.
+
+=over 4
+
+=item C<cmp>
+
+Specifies the I<comparison> function for the range tree.
+Possible values include
+C<< sub { $_[0] cmp $_[1]; } >>
+and C<< sub { $_[0] <=> $_[1]; } >>.
+
+If not given, the C<cmp>
+string comparison
+operator will be used.
+
+=item C<equal-p>
+
+Specifies the optional I<value equality predicate.>
+
+See the C<range_set> method description
+in L<Tree::Range::base>
+for more information.
+
+=item C<leftmost>
+
+Specifies the value the keys lower than the lowest bound are
+mapped to.  If left unspecified, C<undef> will be used.
+
+=back
+
+=back
+
+The following methods are inherited from L<Tree::Range::base>.
+See the L<Tree::Range::base> documentation for more information.
+
+=over 4
+
+=item C<< my $v = $rat->get_range ($key) >>
+
+=item C<< my ($v, $lower, $upper) = $rat->get_range ($key) >>
+
+Return the value associated with the range C<$key> lies within.
+
+In the list context, return also the rangeZ<>E<rsquo>s lower and
+upper bounds.
+
+=item C<< my $free_p = $rat->range_free_p ($lower, $upper) >>
+
+Return a true value if the range specified is either
+unassociated, or associated with the I<leftmost> value
+(as determined by the I<value equality predicate.>)
+Return a false value otherwise.
+
+=item C<< $rat->range_set ($lower, $upper, $value); >>
+
+Associate the keys lying between C<$lower> (inclusive) and
+C<$upper> (exclusive) with C<$value>.
+
+Raise an exception (S<i. e.,> I<die>) unless the upper bound is
+greater than the lower one, as determined by the I<comparison>
+function.
+
+All the overlapping range associations, if any, are overwritten.
+(But see also the L<Tree::Range::RB::Conflict> documentation.)
+
+=item C<< $rat->range_set_over ($lower, $upper, $value); >>
+
+This method is defined in L<Tree::Range::base> as an alias to
+C<range_set>.
+
+=item C<< my $ic = $rat->range_iter_closure (); >>
+
+=item C<< my $ic = $rat->range_iter_closure ($key); >>
+
+=item C<< my $ic = $rat->range_iter_closure ($key, $descending_p); >>
+
+=item C<< while ((my ($v, $lower, $upper) = $ic->())) { E<hellip> } >>
+
+=item C<< while ((my $v = $ic->())) { E<hellip> } >>
+
+Return a I<range iterator closure.>
+
+If C<$descending_p> is given and true, the closure will return
+ranges so that the respective keys are in descending order
+(as defined by the I<comparison> function.)
+The ascending order will be used otherwise.
+
+The first range returned by the closure will be the one
+containing the key specified, if any,
+or the first range of the tree for the order chosen.
+
+Either way, the first range will be determined at the time of
+the first call to the iterator closure.
+
+=back
+
+The following methods are implemented in order to inherit from
+L<Tree::Range::base>.
+See the L<Tree::Range::base> documentation for more information.
+
+=over 4
+
+=item C<< my $cmp_fn      = $rat->cmp_fn (); >>
+
+=item C<< my $equal_p_fn  = $rat->value_equal_p_fn (); >>
+
+=item C<< my $leftmost    = $rat->leftmost_value (); >>
+
+Return
+the I<comparison> function,
+the I<value equality predicate,>
+or the value the keys lower than the lowest bound are mapped to,
+respectively.
+
+These values are the same as specified at the object creation
+time, or the respective defaults.
+
+=item C<< $rat->put ($key, $value) >>
+
+=item C<< my $node = $rat->min_node ($key) >>
+
+=item C<< my $node = $rat->max_node ($key) >>
+
+=item C<< my $node = $rat->lookup_leq ($key) >>
+
+=item C<< my $node = $rat->lookup_geq ($key) >>
+
+=item C<< my $okay = $put->delete ($key) >>
+
+Associate a (key, value) pair with the value of C<$key>,
+return the I<node> object
+having the minimum or the maximum key in the tree,
+perform a less-than-or-equal or greater-than-or-equal lookup
+(returning a I<node> object),
+or remove any such association, respectively.
+
+The C<delete> method will return a true value upon
+successful completion.
+
+These methods are mapped to the
+C<put>, C<min>, C<max>, C<lookup> and C<delete>
+methods
+of the underlying L<Tree::RB> object.
+
+=back
+
+=head1 SEE ALSO
+
+L<Tree::Interval>,
+L<Tree::RB>,
+L<Tree::Range::base>
+L<Tree::Range::RB::Conflict>
+
+=head1 AUTHOR
+
+Ivan Shmakov <oneingray@gmail.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the 3-clause BSD license, as
+included within the code.
+
+=cut
+
+### Emacs trailer
+## Local variables:
+## coding: us-ascii
+## fill-column: 64
+## indent-tabs-mode: nil
+## ispell-local-dictionary: "american"
+## End:
+### RB.pod ends here

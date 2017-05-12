@@ -1,0 +1,76 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Running TaskForest</div>
+  <p>
+    To run the <code>taskforest</code> you must let it know where it can
+    find the necessary files and directories. This can be done by
+    environment variables, via the command line, or via the configuration
+    file:
+  </p>
+
+  <div class="code"><pre><code>
+export TF_JOB_DIR=/foo/jobs
+export TF_LOG_DIR=/foo/logs
+export TF_FAMILY_DIR=/foo/families
+export TF_RUN_WRAPPER=/foo/bin/run_with_log
+taskforest
+
+OR
+
+taskforest <a href="/docs/configuring/options.html#run_wrapper">--run_wrapper</a>=/foo/bin/run_with_log \
+ <a href="/docs/configuring/options.html#log_dir">--log_dir</a>=/foo/logs \
+ <a href="/docs/configuring/options.html#job_dir">--job_dir</a>=/foo/jobs \
+ <a href="/docs/configuring/options.html#family_dir">--family_dir</a>=/foo/families
+
+OR
+
+taskforest <a href="/docs/configuring/options.html#config_file">--config_file</a>=/foo/config/taskforest.cfg
+  </code></pre></div>
+
+  <div class="new_section_header"><a name="main_loop">The <code>taskforest</code> main loop</a></div>
+  <p>
+    By default, the program will run the same code in a loop continuously
+    until 23:55 (11:55 pm).  At the end of each iteration of the loop it
+    will wait for 60 seconds (by default) before starting the next
+    iteration of the loop. Within each loop, the program will do the
+    following:
+  </p>
+
+  <ul class=bullet>
+    <li>
+      Examine <b>ALL</b> the Family files and determine whether a Family
+      should run today or not, based only on the days of the week for
+      which the Family is configured to run.
+    </li>
+    <li>
+      For each Family that should be run today,
+    </li>
+    <ul class=bullet>
+      <li>
+        the status all jobs in the Family is determined - this is called 'getting the Family current.'
+      </li>
+      <li>
+        every job that is in the <a href="/docs/configuring/families.html#job_status">Ready state</a> in will be run - this is called 'cycling the Family.'
+      </li>
+    </ul>
+  </ul>
+
+  <p>
+    If <code>taskforest</code> is run with
+    the <a href="/docs/configuring/options.html#once_only"><code>--once_only</code></a>
+    option, then the main loop will be executed once and then program will
+    terminate immediately, instead of waiting until 23:55.
+  </p>
+
+  <p>
+    All jobs will run as the user who invoked <code>taskforest</code>.
+  </p>
+  
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

@@ -1,0 +1,52 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Marking a Job as Success or Failure</div>
+
+  <p>
+    To mark a previously-run job as success or failure, enter the following command:
+  </p>
+
+  <div class="code"><pre><code>mark --log_dir=l_d --job=Ff::Jj --status=s</code></pre></div>
+
+  <p>
+    where l_d is the log directory and Ff is the family name, Jj is the job name, and s is 'Success' or 'Failure'.
+  </p>
+
+  <p>
+    If you run the command like this:
+  </p>
+
+  <div class="code"><pre><code>mark --log_dir=l_d --job=Ff::Jj --status=s \
+--cascade --family_dir=f_d</code></pre></div>
+
+  <p>
+    then all the jobs that are directly or indirectly dependent on job Jj
+    in family Ff will also be marked.
+  </p>
+
+  <p>
+    If you run the command like this:
+  </p>
+
+  <div class="code"><pre><code>mark --log_dir=l_d --job=Ff::Jj --status=s \
+--dependents_only --family_dir=f_d</code></pre></div>
+
+  <p>
+    then only those jobs that are directly or indirectly dependent on job
+    Jj in family Ff will be marked. Job Jj will be unaffected.
+  </p>
+
+  <div class="new_section_header">Marking a Job Via the Web Site</div>
+
+  <p>
+    You can use the "Mark" button on the 'Status' or 'View Logs' page.
+  </p>
+
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

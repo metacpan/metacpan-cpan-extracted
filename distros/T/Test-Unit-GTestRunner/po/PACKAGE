@@ -1,0 +1,17 @@
+# Makefile snippet that holds all package-dependent information.
+
+# Add more languages here!  Beware that this is a makefile snippet and
+# you have to adhere to make syntax.
+LINGUAS = de \
+	bg \
+	en_GB \
+
+# Textdomain for our package.
+
+TEXTDOMAIN = Test-Unit-GTestRunner
+
+# Initial copyright holder added to pot and po files.
+COPYRIGHT_HOLDER = Guido Flohr <guido@imperia.net>.
+
+# Where to send msgid bugs?  
+MSGID_BUGS_ADDRESS = Guido Flohr <guido@imperia.net>

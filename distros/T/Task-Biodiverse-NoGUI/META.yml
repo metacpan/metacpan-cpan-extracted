@@ -1,0 +1,78 @@
+---
+abstract: 'Task for Biodiverse dependencies for non-GUI use'
+author:
+  - 'Shawn Laffan (shawn.laffan@unsw.edu.au)'
+build_requires:
+  Data::Section::Simple: '0'
+  Devel::Symdump: '0'
+  File::Compare: '0'
+  Perl::Tidy: '0'
+  Scalar::Util::Numeric: '0'
+  Test::Deep: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Biodiverse-NoGUI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Inspector: '0'
+  Clone: '0.35'
+  Cpanel::JSON::XS: '3'
+  DBD::XBase: '0'
+  Data::Compare: '0'
+  Data::DumpXML: '0'
+  Data::Structure::Util: '0'
+  Exception::Class: '0'
+  Exporter::Easy: '0'
+  File::BOM: '0'
+  Geo::Converter::dms2dd: '0.05'
+  Geo::ShapeFile: '2.60'
+  Geo::Shapefile::Writer: '0'
+  Getopt::Long::Descriptive: '0'
+  HTML::QuickTable: '0'
+  JSON::MaybeXS: '1.003'
+  List::BinarySearch: '0.25'
+  List::BinarySearch::XS: '0.09'
+  List::MoreUtils: '0.410'
+  List::Util: '1.45'
+  Math::Polygon: '0'
+  Math::Random::MT::Auto: '6.21'
+  Path::Class: '0'
+  Readonly: '0'
+  Ref::Util: '0.101'
+  Regexp::Common: '0'
+  Sereal: '3'
+  Sort::Naturally: '0'
+  Spreadsheet::ParseExcel: '0'
+  Spreadsheet::ParseXLSX: '0'
+  Spreadsheet::Read: '0.60'
+  Spreadsheet::ReadSXC: '0'
+  Statistics::Descriptive: '3.0608'
+  Statistics::Sampler::Multinomial: '0'
+  Test::Lib: '0'
+  Test::TempDir::Tiny: '0.016'
+  Text::CSV_XS: '1.04'
+  Text::Fuzzy: '0'
+  Text::Levenshtein: '0'
+  Text::Wrapper: '0'
+  Tree::R: '0'
+  URI::Escape::XS: '0'
+  YAML::Syck: '1.29'
+  autovivification: '0.16'
+  parent: '0'
+  rlib: '0'
+resources:
+  bugtracker: https://github.com/shawnlaffan/biodiverse/issues/
+  repository: https://github.com/shawnlaffan/biodiverse.git
+version: '1.990074'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

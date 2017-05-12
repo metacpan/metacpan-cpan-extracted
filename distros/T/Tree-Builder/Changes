@@ -1,0 +1,9 @@
+Revision history for Tree-Builder
+
+0.1.0	2011-07-01/04:40
+		-Add error and errorString methods.
+		-POD cleanup.
+
+0.0.0	2009-05-24/
+        -Initial release.
+

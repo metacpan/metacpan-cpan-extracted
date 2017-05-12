@@ -1,0 +1,310 @@
+#!/usr/local/bin/perl
+#
+# $Id: fileman 454 2014-03-02 14:28:30Z hayashi $
+#
+# This is a sample program of Term::ReadLine::Gnu perl module.  The
+# origin is a C program in the GNU Readline Libarary manual Edition
+# 2.1, "2.5.4 A Short Completion Example".  This program is under GPL.
+#
+# Copyright (C) 1989, 1991 Free Software Foundation, Inc.
+#	Original C version
+# Copyright (C) 1998 Hiroo Hayashi
+#	Perl version
+
+# fileman.c -- A tiny application which demonstrates how to use the
+# GNU Readline library.  This application interactively allows users
+# to manipulate files and their modes.
+
+use strict;
+use warnings;
+use Term::ReadLine;
+
+# A structure which contains information on the commands this program
+# can understand.
+
+my %commands =
+    ('cd'     => { func => \&com_cd,     doc => "Change to directory DIR" },
+     'delete' => { func => \&com_delete, doc => "Delete FILE" },
+     'help'   => { func => \&com_help,   doc => "Display this text" },
+     '?'      => { func => \&com_help,   doc => "Synonym for `help'" },
+     'list'   => { func => \&com_list,   doc => "List files in DIR" },
+     'ls'     => { func => \&com_list,   doc => "Synonym for `list'" },
+     'pwd'    => { func => \&com_pwd,
+		   doc  => "Print the current working directory" },
+     'quit'   => { func => \&com_quit,   doc => "Quit using Fileman" },
+     'rename' => { func => \&com_rename, doc => "Rename FILE to NEWNAME" },
+     'stat'   => { func => \&com_stat, doc => "Print out statistics on FILE" },
+     'view'   => { func => \&com_view, doc => "View the contents of FILE" },
+    );
+
+# The name of this program, as taken from argv[0].
+my $progname = $0;
+
+# When non-zero, this global means the user is done using this program.
+my $done = 0;
+
+my $term = initialize_readline();		# Bind our completer.
+$term->MinLine(0);		## disable implict call of add_history()
+
+# Loop reading and executing lines until the user quits.
+while ($done == 0) {
+    my $line = $term->readline ("FileMan: ");
+    
+    last unless defined $line;
+    
+    # Remove leading and trailing whitespace from the line.  Then, if
+    # there is anything left, add it to the history list and execute
+    # it.
+    my $s = stripwhite($line);
+    
+    if ($s) {
+	$term->AddHistory($s);	## normally this is done implictly
+	execute_line($s);
+    }
+}
+
+exit 0;
+
+# Execute a command line.
+sub execute_line {
+    my $line = shift;
+
+    my ($word, $arg) = split(' ', $line);
+
+    my $command = find_command ($word);
+
+    unless ($command) {
+	printf STDERR "$word: No such command for FileMan.\n";
+	return (-1);
+    }
+
+    # Call the function.
+    return (&{$command->{func}}($arg));
+}
+
+# Look up NAME as the name of a command, and return a pointer to that
+# command.  Return a NULL pointer if NAME isn't a command name.
+sub find_command {
+    my $name = shift;
+
+    return $commands{$name};
+}
+
+# Strip whitespace from the start and end of STRING.  Return a pointer
+# into STRING.
+sub stripwhite {
+    my $string = shift;
+    $string =~ s/^\s*//;
+    $string =~ s/\s*$//;
+    return $string;
+}
+
+#/* **************************************************************** */
+#/*                                                                  */
+#/*                  Interface to Readline Completion                */
+#/*                                                                  */
+#/* **************************************************************** */
+
+# Tell the GNU Readline library how to complete.  We want to try to
+# complete on command names if this is the first word in the line, or
+# on filenames if not.
+sub initialize_readline
+{
+    # Allow conditional parsing of the ~/.inputrc file.
+    my $term = new Term::ReadLine 'FileMan';
+
+    # Tell the completer that we want a crack first.
+    $term->Attribs->{attempted_completion_function} = \&fileman_completion;
+
+    return $term;
+}
+
+# Attempt to complete on the contents of TEXT.  START and END bound
+# the region of rl_line_buffer that contains the word to complete.
+# TEXT is the word to complete.  We can use the entire contents of
+# rl_line_buffer in case we want to do some simple parsing.  Return
+# the array of matches, or NULL if there aren't any.
+sub fileman_completion {
+    my ($text, $line, $start, $end) = @_;
+
+    my @matches = ();
+
+    # If this word is at the start of the line, then it is a command
+    # to complete.  Otherwise it is the name of a file in the current
+    # directory.
+    @matches = $term->completion_matches ($text, \&command_generator)
+	if ($start == 0);
+
+    return @matches;
+}
+
+# Generator function for command completion.  STATE lets us know
+# whether to start from scratch; without any state (i.e. STATE == 0),
+# then we start at the top of the list.
+
+## Term::ReadLine::Gnu has list_completion_function similar with this
+## function.  I defined new one to be compared with original C version.
+{
+    my $list_index;
+    my @name;
+
+    sub command_generator {
+	my ($text, $state) = @_;
+
+	# If this is a new word to complete, initialize now.  This
+	# includes saving the length of TEXT for efficiency, and
+	# initializing the index variable to 0.
+	unless ($state) {
+	    $list_index = 0;
+	    @name = keys(%commands);
+	}
+
+	# Return the next name which partially matches from the
+	# command list.
+	while ($list_index <= $#name) {
+	    $list_index++;
+	    return $name[$list_index - 1]
+		if ($name[$list_index - 1] =~ /^$text/);
+	}
+	# If no names matched, then return NULL.
+	return undef;
+    }
+}
+
+#/* **************************************************************** */
+#/*                                                                  */
+#/*                       FileMan Commands                           */
+#/*                                                                  */
+#/* **************************************************************** */
+
+
+# List the file(s) named in arg.
+sub com_list {
+    my $arg = shift;
+    no warnings 'uninitialized';
+    return (system ("ls -FClg $arg"));
+}
+
+sub com_view {
+    my $arg = shift;
+    return 1 unless (valid_argument ("view", $arg));
+
+    return (system "more $arg");
+}
+
+sub com_rename {
+    too_dangerous ("rename");
+    return (1);
+}
+
+sub com_stat {
+    my $arg = shift;
+
+    return (1) unless valid_argument ("stat", $arg);
+
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+	$atime,$mtime,$ctime,$blksize,$blocks);
+
+    unless (($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+	     $atime,$mtime,$ctime,$blksize,$blocks) = stat($arg)) {
+	print STDERR "$arg: $!\n";
+	return (1);
+    }
+
+    printf("Statistics for \`$arg\':\n");
+
+    printf("%s has %d link%s, and is %d byte%s in length.\n", $arg,
+	   $nlink, ($nlink == 1) ? "" : "s",
+	   $size,  ($size == 1) ? "" : "s");
+    printf("Inode Last Change at: %s\n", scalar localtime ($ctime));
+    printf("      Last access at: %s\n", scalar localtime ($atime));
+    printf("    Last modified at: %s\n", scalar localtime ($mtime));
+    return (0);
+}
+
+sub com_delete {
+    too_dangerous("delete");
+    return (1);
+}
+
+# Print out help for ARG, or for all of the commands if ARG is not
+# present.
+sub com_help {
+    my $arg = shift;
+    my $printed = 0;
+
+    if (defined $arg && $commands{$arg}) {
+	printf ("%s\t\t%s.\n", $arg, $commands{$arg}->{doc});
+	$printed++;
+    }
+
+    unless ($printed) {
+	defined $arg && print "No commands match \`$arg\'.  Possibilties are:\n";
+
+	foreach (sort keys(%commands)) {
+	    # Print in six columns.
+	    if ($printed == 6) {
+		$printed = 0;
+		print "\n";
+            }
+
+	    print "$_\t";
+	    $printed++;
+        }
+
+	print "\n" if ($printed);
+
+    }
+    return (0);
+}
+
+# Change to the directory ARG.
+sub com_cd {
+    my $arg = shift;
+    unless (chdir ($arg)) {
+	print STDERR "$arg: $!\n";
+	return 1;
+    }
+
+    com_pwd();
+    return (0);
+}
+
+# Print out the current working directory.
+sub com_pwd {
+    my $dir = $ENV{PWD} || `pwd`;
+
+    unless ($dir) {
+	print ("Error getting pwd: $dir\n");
+	return 1;
+    }
+
+    print ("Current directory is $dir\n");
+    return 0;
+}
+
+# The user wishes to quit using this program.  Just set DONE non-zero.
+sub com_quit {
+    $done = 1;
+    0;
+}
+
+# Function which tells you that you can't do this.
+sub too_dangerous {
+    my $caller = shift;
+    printf STDERR
+	("%s: Too dangerous for me to distribute.  Write it yourself.\n",
+	 $caller);
+}
+
+# Return non-zero if ARG is a valid argument for CALLER, else print an
+# error message and return zero.
+sub valid_argument {
+    my ($caller, $arg) = @_;
+    if (! $arg) {
+      printf STDERR ("%s: Argument required.\n", $caller);
+      return (0);
+    }
+
+    return (1);
+}

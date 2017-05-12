@@ -1,0 +1,8 @@
+Revision history for Test-MemoryGrowth
+
+0.02    2014/02/20 16:05:05
+        [CHANGES]
+         * Optionally invoke Devel::MAT::Dumper if a growth test fails
+
+0.01    First version, released on an unsuspecting world.
+

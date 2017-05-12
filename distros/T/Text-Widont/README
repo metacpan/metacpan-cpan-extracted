@@ -1,0 +1,132 @@
+NAME
+    Text::Widont - Suppress typographic widows
+
+SYNOPSIS
+        use Text::Widont;
+
+        # For a single string...
+        my $string = 'Look behind you, a Three-Headed Monkey!';
+        print widont($string, nbsp->{html});  # "...a Three-Headed&nbsp;Monkey!"
+
+        # For a number of strings...
+        my $strings = [
+            'You fight like a dairy farmer.',
+            'How appropriate. You fight like a cow.',
+        ];
+        print join "\n", @{ widont( $strings, nbsp->{html} ) };
+
+    Or the object oriented way:
+
+        use Text::Widont qw( nbsp );
+
+        my $tw = Text::Widont->new( nbsp => nbsp->{html} );
+
+        my $string = "I'm selling these fine leather jackets.";
+        print $tw->widont($string);  # "...fine leather&nbsp;jackets."
+
+DESCRIPTION
+    Collins English Dictionary defines a "widow" in typesetting as:
+
+        A short line at the end of a paragraph, especially one that occurs as the
+        top line of a page or column.
+
+    For example, in the text...
+
+        How much wood could a woodchuck
+        chuck if a woodchuck could chuck
+        wood?
+
+    ...the word "wood" at the end is considered a widow. Using
+    "Text::Widont", that sentence would instead appear as...
+
+        How much wood could a woodchuck
+        chuck if a woodchuck could
+        chuck wood?
+
+NON-BREAKING SPACE TYPES
+    "Text::Widont" exports a hash ref, "nbsp", that contains the following
+    representations of a non-breaking space to be used with the widont
+    function:
+
+    html
+        The "&nbsp;" HTML character entity.
+
+    html_hex
+        The "&#xA0;" HTML character entity.
+
+    html_dec
+        The "&#160;" HTML character entity.
+
+    unicode
+        Unicode's "No-Break Space" character.
+
+FUNCTIONS
+  widont( $string, $nbsp )
+    The "widont" function takes a string and returns a copy with the space
+    between the final two words replaced with the given $nbsp. $string can
+    optionally be a reference to an array of strings to transform. In this
+    case strings will be modified in place as well as a copy returned.
+
+    In the absence of an explicit $nbsp, Unicode's No-Break Space character
+    will be used.
+
+METHODS
+    "Text::Widont" also provides an object oriented interface.
+
+  ->new( nbsp => $nbsp )
+    Instantiates a new "Text::Widont" object. "nbsp" is an optional argument
+    that will be used when performing the substitution. It defaults to
+    Unicode's No-Break Space character.
+
+  ->widont( $string )
+    Performs the substitution described above, using the object's "nbsp"
+    property and the given string.
+
+DEPENDENCIES
+    "Text::Widont" requires the following modules:
+
+    *   Carp
+
+BUGS
+    Please report any bugs or feature requests to "bug-text-widont at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Widont>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Text::Widont
+
+    You may also look for information at:
+
+    *   Text::Widont
+
+        <http://perlprogrammer.co.uk/modules/Text::Widont/>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Text-Widont/>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Widont>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Text-Widont/>
+
+AUTHOR
+    Dave Cardwell <dcardwell@cpan.org>
+
+ACKNOWLEDGEMENTS
+    I was first introduced to the concept of typesetting widows and how they
+    might be solved programatically by Shaun Inman.
+
+    <http://www.shauninman.com/archive/2006/08/22/widont_wordpress_plugin>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Dave Cardwell. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

@@ -1,0 +1,188 @@
+NAME
+    TL1::Toolkit - Utility functions for interacting with TL1 equipment
+
+VERSION
+    0.0.1
+
+DESCRIPTION
+    This Perl module is intended to hide the difficult TL1 syntax from the
+    user. It executes TL1 commands and returns the results in Perl data
+    structures. For example, if you work with different types and/or vendors
+    of devices the TL1 syntax might be different as well as the output. This
+    TL1 module retrieves information from different types and/or vendors of
+    devices without having to know the exact details. There is also a cmd()
+    function to execute any TL1 function. In this case the user has to parse
+    the returned results. This module is known to work on Nortel OME6500,
+    Nortel DWDM CPL, Nortel HDXc, Nortel OM5200, Cisco ONS15454 and Adva
+    FSP3000; but it should work on any TL1 capable device.
+
+SYNOPSIS
+  my $tl1 = TL1::Toolkit->new("node", "name", "secret");
+    Create a TL1::Toolkit object that holds information about a TL1 session.
+    Its arguments are:
+
+    *   hostname: network element to connect to
+
+    *   username: login name
+
+    *   password: password
+
+    *   type (optional): device type (OME6500, HDXc)
+
+    *   verbose (optional): debug level (0..9)
+
+  $tl1->open()
+    Connect to the TL1 device and login. Returns 1 on success, 0 on failure.
+
+  $tl1->close()
+    Logout and disconnect from the TL1 device.
+
+  my $output = $tl1->cmd($command);
+    The string variable $command contains a TL1 command string that will be
+    sent to the TL1 device as is. It returns the results as ASCII text to
+    the string variable $output.
+
+  my $type = $tl1->get_cardtype(1, 12);
+    Return the type of card in the shelf given as first argument and the
+    slot given as second argument. Returns a string.
+
+  my $version = $tl1->get_swversion();
+    Returns the currently active firmware version on the TL1 device. Returns
+    a string.
+
+  my $octets = $tl1->get_inoctets(1, 3);
+    Returns the Ethernet input octets on the slot given as first argument
+    and the port given as second argument. Returns an integer.
+
+  my $octets = $tl1->get_outoctets(7, 2);
+    Returns the Ethernet output octets on the slot given as first argument
+    and the port given as second argument. Returns an integer.
+
+  my @alarms = $tl1->get_alarms();
+    Returns an array of hashes containing information about active alarms on
+    the TL1 device. Each entry in the array conatains information about one
+    alarm. The keys of each alarm are:
+
+    *   interface
+
+    *   severity
+
+    *   impact
+
+    *   day
+
+    *   time
+
+    *   alarm
+
+    *   year
+
+    *   date
+
+    *   slot
+
+    *   subslot
+
+    *   port
+
+    *   fromfirststs
+
+    Some of the keys can have an "undef" value.
+
+  my @crossconnects = $tl1->get_crossconnects();
+    Retrieve information about crossconnects on the TL1 device. The
+    information is returned as an array of hashes. Each entry in the array
+    is information about one crossconnect. The crossconnect information
+    consists of a hash with these keys:
+
+    *   ckid: crossconnect ID
+
+    *   nr_timeslots: total amount of timeslots
+
+    *   from_slot: slot of "from" interface
+
+    *   from_subslot: subslot of "from" interface
+
+    *   from_port: port of "from" interface
+
+    *   from_first_ts: first timeslot on "from" interface
+
+    *   from_last_ts: last timeslot on "from" interface
+
+    *   to_slot: slot of "to" interface
+
+    *   to_subslot: subslot of "to" interface
+
+    *   to_port: port of "to" interface
+
+    *   to_first_ts: first timeslot on "to" interface
+
+    *   to_last_ts: last timeslot on "to" interface
+
+    *   swmate_slot: slot of "switchmate" interface
+
+    *   swmate_subslot: subslot of "switchmate" interface
+
+    *   swmate_port: port of "switchmate" interface
+
+    *   swmate_first_ts: first timeslot on "switchmate" interface
+
+    *   swmate_last_ts: last timeslot on "switchmate" interface
+
+  my $trace = $tl1->get_section_trace(1, 12, 1);
+    Return the received section trace on the port given as arguments. The
+    first argument is the shelf number, the second argument is the slot
+    number and the third argument is the port number. This function returns
+    a string.
+
+  $tl1->print_resp($output);
+    This function prints the output returned by the cmd() function on
+    STDOUT.
+
+AUTHORS
+    Ronald van der Pol, SARA High Performance Networking, Amsterdam, 2005 -
+    2008.
+
+    Andree Toonk, SARA High Performance Networking, Amsterdam, 2005 - 2007.
+
+ACKNOWLEDGEMENTS
+    This work is funded by SURFnet and GigaPort:
+
+    http://www.surfnet.nl/
+
+    http://www.gigaport.nl/
+
+    This module is based on a module by Arien Vijn, AMS-IX B.V. (2005).
+
+COPYRIGHT
+      +------------------------------------------------------------------+
+      | Licensed under the Apache License, Version 2.0 (the "License");  |
+      | you may not use this file except in compliance with the License. |
+      | You may obtain a copy of the License at                          |
+      |                                                                  |
+      |     http://www.apache.org/licenses/LICENSE-2.0                   |
+      |                                                                  |
+      | Unless required by applicable law or agreed to in writing,       |
+      | software distributed under the License is distributed on an      |
+      | "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     |
+      | either express or implied. See the License for the specific      |
+      | language governing permissions and limitations under the         |
+      | License.                                                         |
+      +------------------------------------------------------------------+
+
+REQUIRES
+    threads;
+
+    threads::shared;
+
+    Thread::Queue::Any;
+
+    Net::Telnet;
+
+    Time::localtime;
+
+    Date::Manip;
+
+RELEASED
+    December 2008
+

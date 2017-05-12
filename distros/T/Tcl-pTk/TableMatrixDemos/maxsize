@@ -1,0 +1,75 @@
+## maxsize.tcl
+##
+## This demo uses a really big table.  The big startup time is in
+## filling the table's Tcl array var.
+##
+## jeff.hobbs@acm.org
+## Converted to perl/tk by John Cerney 7/24/00
+
+
+use Tcl::pTk qw/:perlTk/;
+use Tcl::pTk::TableMatrix;
+
+my $top = MainWindow->new;
+
+my $arrayVar = {};
+
+print "Filling Array...\n";
+my ($rows,$cols) = (40000, 10);
+foreach my $row  (0..($rows-1)){
+	foreach my $col (0..($cols-1)){
+		$arrayVar->{"$row,$col"} = "$row,$col";
+	}
+}
+
+print "Creating Table...\n";
+## Test out the use of a callback to define tags on rows and columns
+sub colSub{
+	my $col = shift;
+	return "OddCol" if( $col > 0 && $col%2) ;
+}
+
+my $label = $top->Label(-text => "TableMatrix v2 Example");
+
+my $t = $top->Scrolled('TableMatrix', -rows => $rows, -cols => $cols, 
+                              -width => 6, -height => 6,
+			       -titlerows => 1, -titlecols => 1,
+			      -variable => $arrayVar,
+			      -coltagcommand => \&colSub,
+			      -colstretchmode => 'last',
+			      -rowstretchmode => 'last',
+			      -selectmode => 'extended',
+			      -selecttitles => 0,
+			      -drawmode => 'slow',
+                    );
+
+my $button = $top->Button( -text => "Exit", -command => sub{ $top->destroy});		    
+
+# hideous Color definitions here:
+$t->tagConfigure('OddCol', -bg => 'brown', -fg => 'pink');
+$t->tagConfigure('title', -bg => 'red', -fg => 'blue', -relief => 'sunken');
+$t->tagConfigure('dis', -state => 'disabled');
+
+my $i = -1;
+my $first = $t->cget(-colorigin);
+my $anchor;
+foreach $anchor( qw/ n s e w nw ne sw se c /){
+	$t->tagConfigure($anchor, -anchor => $anchor);
+	$t->tagRow($anchor, ++$i);
+	$t->set( "$i,$first",$anchor);
+}
+$top->fontCreate('courier', -family => 'courier', -size => 10);
+$t->tagConfigure('s', -font => 'courier', -justify => 'center');
+
+
+$t->colWidth( -2 => 8, -1 => 9, 0=> 12,  4=> 14);
+
+$label->pack( -expand => 1, -fill => 'both');
+
+$t->pack(-expand => 1, -fill => 'both');
+$button->pack(-expand => 1, -fill => 'both');
+
+
+
+
+MainLoop;

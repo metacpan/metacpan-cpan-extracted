@@ -1,0 +1,16 @@
+=pod
+
+=head1 Test::Synchronized
+
+Test::Synchronized provides simple (and giant) lock for your tests.
+
+If you want to run your tests in parallel, the lock makes your tests slow.
+But it will be better than unstable.
+
+You can download the released version from
+L<http://search.cpan.org/dist/Test-Synchronized/>.
+
+And you can clone the respository from
+L<https://github.com/kzys/test-synchronized>.
+
+=cut

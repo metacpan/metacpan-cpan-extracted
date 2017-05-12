@@ -1,0 +1,15 @@
+
+Revision history for the Text::BSV distribution:
+
+    Version    Date          Description
+    -------    ----          -----------
+
+    1.01       2010-09-11    Initial upload
+
+    1.02       2010-09-13    Added Text::BSV::Exception
+
+    1.03       2010-10-09    Fixed a documentation (POD) bug
+
+    1.04       2010-10-13    Improved the cross-platform handling of
+                             line endings.  Also improved the wording
+                             of some portions of bsv_format.txt

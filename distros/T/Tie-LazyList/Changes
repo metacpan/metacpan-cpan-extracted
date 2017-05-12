@@ -1,0 +1,26 @@
+Revision history for Perl extension Tie::LazyList.
+
+0.01  Thu Jun 14 17:03:17 2001
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Tie::LazyList
+
+0.02  Sun Jul 01 15:09 2001
+   - code abbreviations added :
+     APROG
+     GPROG
+     APROG_SUM
+     GPROG_SUM
+     FIBON
+
+0.03  Sun Jul 08 02:23 2001
+   - code abbreviations added :
+     FACT
+     POW
+   - POD written
+
+0.04  Tue Jul 10 00:17 2001
+	- POD fixed a bit
+
+0.05  Sat Jul 14 21:16 2001
+	- Added option to create tied array from another array already tied to Tie::LazyList
+	- POD fixed

@@ -1,0 +1,106 @@
+{
+   "abstract" : "minimal mocking framework for perl",
+   "author" : [
+      "ePages GmbH"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.8",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mockify",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::Cover" : "1.23",
+            "Devel::Cover::Report::Clover" : "1.01",
+            "Minilla" : "v3.0.0",
+            "Module::Build::Tiny" : "0.039",
+            "Perl::Critic" : "1.123",
+            "TAP::Harness::Archive" : "0.18"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Compare" : "0",
+            "Module::Load" : "0",
+            "Test::MockObject::Extends" : "0",
+            "experimental" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Mockify" : {
+         "file" : "lib/Test/Mockify.pm",
+         "version" : "0.9"
+      },
+      "Test::Mockify::MethodCallCounter" : {
+         "file" : "lib/Test/Mockify/MethodCallCounter.pm"
+      },
+      "Test::Mockify::Tools" : {
+         "file" : "lib/Test/Mockify/Tools.pm"
+      },
+      "Test::Mockify::TypeTests" : {
+         "file" : "lib/Test/Mockify/TypeTests.pm"
+      },
+      "Test::Mockify::Verify" : {
+         "file" : "lib/Test/Mockify/Verify.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ePages-de/Mockify/issues"
+      },
+      "homepage" : "https://github.com/ePages-de/Mockify",
+      "repository" : {
+         "url" : "git://github.com/ePages-de/Mockify.git",
+         "web" : "https://github.com/ePages-de/Mockify"
+      }
+   },
+   "version" : "0.9",
+   "x_authority" : "cpan:CHRISBR",
+   "x_contributors" : [
+      "Christian Breitkreutz <c.breitkreutz@epages.com>",
+      "Alexander Sandau <a.sandau@epages.com>",
+      "Birgit Bader <b.bader@epages.com>",
+      "Christian Breitkreutz <cbreitkreutz@epages.com>",
+      "Oliver Trosien <otrosien@epages.com>"
+   ]
+}

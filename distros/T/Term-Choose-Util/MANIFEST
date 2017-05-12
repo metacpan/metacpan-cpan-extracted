@@ -1,0 +1,21 @@
+Changes
+lib/Term/Choose/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+xt/cntr_table.t
+xt/manifest.t
+xt/perl_minimum_version.t
+xt/pod-coverage.t
+xt/pod.t
+xt/prereqs.t
+xt/spelling.t
+xt/synopsis.t
+xt/version1.t
+xt/version2.t
+xt/whitespaces.t
+xt/year_copyright.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

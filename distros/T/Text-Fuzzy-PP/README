@@ -1,0 +1,188 @@
+NAME
+    Text::Fuzzy::PP - partial or fuzzy string matching using edit distances
+    (Pure Perl)
+
+SYNOPSIS
+        use Text::Fuzzy::PP;
+        my $tf = Text::Fuzzy::PP->new ('boboon');
+        print "Distance is ", $tf->distance ('babboon'), "\n";
+        # Prints "Distance is 2"
+        my @words = qw/the quick brown fox jumped over the lazy dog/;
+        my $nearest = $tf->nearest (\@words);
+        print "Nearest array entry is ", $words[$nearest], "\n";
+        # Prints "Nearest array entry is brown"
+
+DESCRIPTION
+    This module is a drop in, pure perl, substitute for Text::Fuzzy. All
+    documentation is taken directly from Text::Fuzzy.
+
+    This module calculates the Levenshtein edit distance between words, and
+    does edit-distance-based searching of arrays and files to find the
+    nearest entry. It can handle either byte strings or character strings
+    (strings containing Unicode), treating each Unicode character as a
+    single entity.
+
+    It is designed for high performance in searching for the nearest to a
+    particular search term over an array of words or a file, by reducing the
+    number of calculations which needs to be performed.
+
+    It supports either bytewise edit distances or Unicode-based edit
+    distances:
+
+        use utf8;
+        my $tf = Text::Fuzzy::PP->new ('あいうえお☺');
+        print $tf->distance ('うえお☺'), "\n";
+        # prints "2".
+
+    The default edit distance is the Levenshtein edit distance, which
+    applies an equal weight of one to additions (`cat' -> `cart'),
+    substitutions (`cat' -> `cut'), and deletions (`carp' -> `cap').
+    Optionally, the Damerau-Levenshtein edit distance, which additionally
+    allows transpositions (`salt' -> `slat') may be selected using the
+    method transpositions_ok.
+
+METHODS
+  new
+        my $tf = Text::Fuzzy::PP->new ('bibbety bobbety boo');
+
+    Create a new Text::Fuzzy::PP object from the supplied word.
+
+  distance
+        my $dist = $tf->distance ($word);
+
+    Return the edit distance to `$word' from the word used to create the
+    object in new.
+
+  nearest
+        my $index = $tf->nearest (\@words);
+
+    This returns the index of the nearest element in the array to the
+    argument to new. If none of the elements are less than the maximum
+    distance away from the word, `$index' is -1.
+
+        if ($index >= 0) {
+            printf "Found at $index, distance was %d.\n",
+                $tf->last_distance ();
+        }
+
+    Use set_max_distance to alter the maximum distance used.
+
+    If there is more than one word with the same distance in `@words', this
+    returns the first of them.
+
+  last_distance
+        my $last_distance = $tf->last_distance ();
+
+    The distance from the previous match closest match. This is used in
+    conjunction with nearest to find the edit distance to the previous
+    match.
+
+  set_max_distance
+        # Set the max distance.
+        $tf->set_max_distance (3);
+
+    Set the maximum edit distance of `$tf'. The default maximum distance is
+    10. Set the maximum distance to a low value to improve the speed of
+    searches over lists with nearest, or to reject unlikely matches. When
+    searching for a near match, anything with an edit distance of a value at
+    least as high as the maximum is rejected without computing the exact
+    distance. To compute exact distances, call this method with zero or
+    undefined, the maximum edit distance is switched off, and whatever the
+    nearest match is is accepted.
+
+  get_max_distance
+        # Get the maximum edit distance.
+        print "The max distance is ", $tf->get_max_distance (), "\n";
+
+    Get the maximum edit distance of `$tf'. The default is set to 10. The
+    maximum distance may be set with set_max_distance.
+
+  scan_file
+        $tf->scan_file ('/usr/share/dict/words');
+
+    Scan a file to find the nearest match to the word used in new. This
+    assumes that the file contains lines of text separated by newlines and
+    finds the closest match in the file.
+
+    This does not currently support Unicode-encoded files.
+
+  transpositions_ok
+        $tf->transpositions_ok (1);
+
+    A true value in the argument changes the type of edit distance used to
+    allow transpositions, such as `clam' and `calm'. Initially
+    transpositions are not allowed, giving the Levenshtein edit distance. If
+    transpositions are used, the edit distance becomes the
+    Damerau-Levenshtein edit distance. A false value disallows
+    transpositions:
+
+        $tf->transpositions_ok (0);
+
+PRIVATE METHODS
+    These methods are not expected to be useful for the general user. They
+    may be useful in benchmarking the module and checking its correctness.
+
+  no_alphabet
+        $tf->no_alphabet (1);
+
+    This turns off alphabetizing of the string. Alphabetizing is a filter
+    used in nearest where the intersection of all the characters in the two
+    strings is computed, and if the alphabetical difference of the two
+    strings is greater than the maximum distance, the match is rejected
+    without applying the dynamic programming algorithm. This increases
+    speed, because the dynamic programming algorithm is slow.
+
+    The alphabetizing should not ever reject anything which is a legitimate
+    match, and it should make the program run faster in almost every case.
+    The only envisaged uses of switching this off are checking that the
+    algorithm is working correctly, and benchmarking performance.
+
+  get_trans
+        my $trans_ok = $tf->get_trans ();
+
+    This returns the value set by transpositions_ok.
+
+  unicode_length
+        my $length = $tf->unicode_length ();
+
+    This returns the length in characters (not bytes) of the string used in
+    new. If the string is not marked as Unicode, it returns the undefined
+    value. In the following, `$l1' should be equal to `$l2'.
+
+        use utf8;
+        my $word = 'ⅅⅆⅇⅈⅉ';
+        my $l1 = length $word;
+        my $tf = Text::Fuzzy::PP->new ($word);
+        my $l2 = $tf->unicode_length ();
+
+  ualphabet_rejections
+        my $rejected = $tf->ualphabet_rejections ();
+
+    After running nearest over an array, this returns the number of entries
+    of the array which were rejected using only the alphabet. Its value is
+    reset to zero each time nearest is called.
+
+  length_rejections
+        my $rejected = $tf->length_rejections ();
+
+    After running nearest over an array, this returns the number of entries
+    of the array which were rejected because the length difference between
+    them and the target string was larger than the maximum distance allowed.
+
+ACKNOWLEDGEMENTS
+    Text::Fuzzy is authored by Ben Bullock (BKB). The levenshtein algorithm,
+    the documentation, and Text::Fuzzy's tests were taken directly from
+    Text::Fuzzy.
+
+BUGS
+    Please report bugs to:
+
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Fuzzy-PP
+
+AUTHOR
+    Nick Logan <ugexe@cpan.org>
+
+LICENSE AND COPYRIGHT
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

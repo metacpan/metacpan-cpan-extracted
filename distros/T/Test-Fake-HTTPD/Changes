@@ -1,0 +1,28 @@
+Revision history for Perl extension Test::Fake::HTTPD
+
+0.08 2017-03-01T05:47:27Z
+    - repackage with Minilla
+    - added extra_daemon_args DSL (for almost HTTP::Daemon::SSL)
+
+0.07 2015-01-25T16:33:49Z
+    - Add an explicit dependency on Test::SharedFork to avoid issues with the new Test::Builder.
+    (Reported by dolmen++)
+
+0.06
+    - add unexported enable_ssl() helper
+
+0.05
+    - check if SSL is enable
+
+0.04
+    - support HTTPS server
+
+0.03
+    - added inc/ to package
+
+0.02
+    - added host_port() and endpoint() accessors
+    - memory tests are moved to xt/
+
+0.01
+    - original version

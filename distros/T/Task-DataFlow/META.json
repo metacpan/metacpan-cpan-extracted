@@ -1,0 +1,53 @@
+{
+   "abstract" : "The DataFlow Module Collection (new flavor)",
+   "author" : [
+      "Alexei Znamensky <russoz@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-DataFlow",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DataFlow" : "1.121690",
+            "DataFlow::Proc::DBF" : "0",
+            "DataFlow::Proc::DPath" : "1.112100",
+            "DataFlow::Proc::HTMLFilter" : "1.112100",
+            "DataFlow::Proc::JSON" : "1.112100",
+            "DataFlow::Proc::MessagePack" : "1.112100",
+            "DataFlow::Proc::URLRetriever" : "1.112100",
+            "DataFlow::Proc::YAML" : "1.112100",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/russoz/Task-DataFlow",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/russoz/Task-DataFlow.git",
+         "web" : "https://github.com/russoz/Task-DataFlow"
+      }
+   },
+   "version" : "0.008"
+}
+

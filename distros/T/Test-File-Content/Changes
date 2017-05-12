@@ -1,0 +1,8 @@
+1.0.2 - 2012-11-24
+  - make test output deterministic
+
+1.0.1 - 2011-01-21
+  - sort files, fixes test failures
+
+1.0.0 - 2011-01-21
+  - initial release

@@ -1,0 +1,124 @@
+TODO
+Changes		changes file
+ChangeLog	detailed ChangeLog file
+test-for-tk.tcl	check if existing Tcl/Tk installation fits
+MANIFEST	This list of files
+Makefile.PL	Tcl::Tk extension makefile writer
+README		Introduction to the Tcl::Tk extension
+lib/Tcl/Tk.pm	Tcl::Tk extension module
+lib/Tcl/Tk/Widget/Balloon.pm	Balloon Tix widget perlTk compatibility
+lib/Tcl/Tk/Widget/Text.pm	some Text widget methods for perlTk compatibility
+META.yml
+t/after.t
+t/optmenu.t	adopted file from perlTk suite
+t/photo.t
+t/geomgr.t	adopted file from perlTk suite
+t/folder.xpm
+t/ptk-compat.t	file to check for perlTk compatibility 
+t/Tk.xbm
+t/tk-mw.t
+t/Xcamel.gif
+t/text.t
+t/canvas.t
+t/unicode.t		some unicode tests
+t/zzPhoto.t
+demos/wcolors.pl	demo script with syntax very similar to perlTk
+demos/activex.pl	demo script for Windows that uses ActiveX
+demos/tcltkdb.pm	very alpha but working debugger ptkdb adopted for usage with Tcl::Tk
+demos/blt-tabnbook.pl	example of using Tcl/Tk widget, never mentioned in Tcl::Tk
+tk-demos/images/earth.gif            
+tk-demos/images/earthris.gif         
+tk-demos/images/face.bmp             
+tk-demos/images/flagdown.bmp         
+tk-demos/images/flagup.bmp           
+tk-demos/images/gray25.bmp           
+tk-demos/images/letters.bmp          
+tk-demos/images/noletter.bmp         
+tk-demos/images/pattern.bmp          
+tk-demos/images/tcllogo.gif          
+tk-demos/images/teapot.ppm           
+tk-demos/widget                      
+tk-demos/widget_lib/arrows.pl        
+tk-demos/widget_lib/Ball.pm          
+tk-demos/widget_lib/bind.pl          
+tk-demos/widget_lib/bitmaps.pl       
+tk-demos/widget_lib/bounce.pl        
+tk-demos/widget_lib/button.pl        
+tk-demos/widget_lib/check.pl         
+tk-demos/widget_lib/clrpick.pl       
+tk-demos/widget_lib/colors.pl        
+tk-demos/widget_lib/cscroll.pl       
+tk-demos/widget_lib/ctext.pl         
+tk-demos/widget_lib/dialog1.pl       
+tk-demos/widget_lib/dialog2.pl       
+tk-demos/widget_lib/entry1.pl        
+tk-demos/widget_lib/entry2.pl        
+tk-demos/widget_lib/filebox.pl       
+tk-demos/widget_lib/floor.pl         
+tk-demos/widget_lib/form.pl          
+tk-demos/widget_lib/hscale.pl        
+tk-demos/widget_lib/icon.pl          
+tk-demos/widget_lib/image1.pl        
+tk-demos/widget_lib/image2.pl        
+tk-demos/widget_lib/items.pl         
+tk-demos/widget_lib/labels.pl        
+tk-demos/widget_lib/menbut.pl        
+tk-demos/widget_lib/menus.pl         
+tk-demos/widget_lib/menus2.pl        
+tk-demos/widget_lib/mkArrow.pl       
+tk-demos/widget_lib/mkBasic.pl       
+tk-demos/widget_lib/mkBitmaps.pl     
+tk-demos/widget_lib/mkButton.pl      
+tk-demos/widget_lib/mkCanvText.pl    
+tk-demos/widget_lib/mkCheck.pl       
+tk-demos/widget_lib/mkEntry.pl       
+tk-demos/widget_lib/mkEntry2.pl      
+tk-demos/widget_lib/mkFloor.pl       
+tk-demos/widget_lib/mkForm.pl        
+tk-demos/widget_lib/mkHScale.pl      
+tk-demos/widget_lib/mkIcon.pl        
+tk-demos/widget_lib/mkItems.pl       
+tk-demos/widget_lib/mkLabel.pl       
+tk-demos/widget_lib/mkListbox.pl     
+tk-demos/widget_lib/mkListbox2.pl    
+tk-demos/widget_lib/mkListbox3.pl    
+tk-demos/widget_lib/mkPlot.pl        
+tk-demos/widget_lib/mkPuzzle.pl      
+tk-demos/widget_lib/mkRadio.pl       
+tk-demos/widget_lib/mkRuler.pl       
+tk-demos/widget_lib/mkScroll.pl      
+tk-demos/widget_lib/mkStyles.pl      
+tk-demos/widget_lib/mkTextBind.pl    
+tk-demos/widget_lib/mkTextWind.pl    
+tk-demos/widget_lib/mkTxtSearch.pl   
+tk-demos/widget_lib/mkVScale.pl      
+tk-demos/widget_lib/msgBox.pl        
+tk-demos/widget_lib/plot.pl          
+tk-demos/widget_lib/puzzle.pl        
+tk-demos/widget_lib/radio.pl         
+tk-demos/widget_lib/ruler.pl         
+tk-demos/widget_lib/sayings.pl       
+tk-demos/widget_lib/search.pl        
+tk-demos/widget_lib/showVars.pl      
+tk-demos/widget_lib/states.pl        
+tk-demos/widget_lib/style.pl         
+tk-demos/widget_lib/texts.pl         
+tk-demos/widget_lib/transtile.pl     
+tk-demos/widget_lib/twind.pl         
+tk-demos/widget_lib/vscale.pl        
+tk-demos/widtrib/balloon.pl          
+tk-demos/widtrib/browseentry.pl      
+tk-demos/widtrib/browseentry2.pl     
+tk-demos/widtrib/dirtree.pl          
+tk-demos/widtrib/form_mgr.pl         
+tk-demos/widtrib/Gedi.pl             
+tk-demos/widtrib/HList.pl            
+tk-demos/widtrib/HList2.pl           
+tk-demos/widtrib/labframe.pl         
+tk-demos/widtrib/lib/npuz/Xcamel.npuz
+tk-demos/widtrib/notebook.pl         
+tk-demos/widtrib/npuz.pl             
+tk-demos/widtrib/plop.pl             
+tk-demos/widtrib/progress.pl         
+tk-demos/widtrib/TEMPLATE.pl         
+tk-demos/widtrib/Tiler.pl            

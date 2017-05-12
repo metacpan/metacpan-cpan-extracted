@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pml_schema xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/" version="1.1">
+  <root name="doc" type="phrase.type"/>
+  <type name="phrase.type">
+    <sequence>
+      <element name="S" type="phrase.type"/>
+      <element name="NP" type="phrase.type"/>
+      <element name="VP" type="phrase.type"/>
+      <text/>
+    </sequence>
+  </type>
+</pml_schema>

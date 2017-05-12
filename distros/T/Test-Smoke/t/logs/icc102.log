@@ -1,0 +1,39 @@
+`sh  cflags "optimize='-O3'" mg.o`  mg.c
+	  CCCMD =  icc -DPERL_CORE -c -we147 -mp -no-gcc -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -O3  
+mg.c(628): warning #1011: missing return statement at end of non-void function "Perl_magic_regdatum_set"
+  }
+  ^
+
+mg.c(675): warning #191: type qualifier is meaningless on cast type
+          i = CALLREG_NUMBUF_LENGTH((REGEXP * const)rx, sv, paren);
+              ^
+
+mg.c(675): warning #191: type qualifier is meaningless on cast type
+          i = CALLREG_NUMBUF_LENGTH((REGEXP * const)rx, sv, paren);
+              ^
+
+mg.c(2314): warning #191: type qualifier is meaningless on cast type
+              CALLREG_NUMBUF_STORE((REGEXP * const)rx,paren,sv);
+              ^
+
+mg.c(2314): warning #191: type qualifier is meaningless on cast type
+              CALLREG_NUMBUF_STORE((REGEXP * const)rx,paren,sv);
+              ^
+
+mg.c(2454): (col. 7) remark: LOOP WAS VECTORIZED.
+`sh  cflags "optimize='-O3'" pp_sys.o`  pp_sys.c
+	  CCCMD =  icc -DPERL_CORE -c -we147 -mp -no-gcc -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -O3  
+pp_sys.c(4412): warning #188: enumerated type mixed with another type
+      SETi( getpriority(which, who) );
+      ^
+
+pp_sys.c(4428): warning #188: enumerated type mixed with another type
+      SETi( setpriority(which, who, niceval) >= 0 );
+      ^
+
+pp_sys.c(5704): error: expected an identifier
+
+pp_sys.c(5704): error: expected a ";"
+
+compilation aborted for pp_sys.c (code 2)
+make: *** [pp_sys.o] Error 2

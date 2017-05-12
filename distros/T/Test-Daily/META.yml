@@ -1,0 +1,46 @@
+---
+name: Test-Daily
+version: 0.02
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+abstract: daily testing reports
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  File::Temp: 0
+  Module::Build::SysPath: 0.08
+  Test::Differences: 0
+  Test::More: 0
+requires:
+  Archive::Extract: 0
+  Carp: 0
+  Config::Tiny: 0
+  File::Basename: 0
+  File::Path: 0
+  Getopt::Long: 0
+  HTML::Entities: 0
+  JSON::Util: 0
+  Moose: 0
+  Path::Class: 0
+  Pod::Usage: 0
+  TAP::Formatter::HTML: 0
+  TAP::Harness: 0
+  Template: 0
+  Template::Constants: 0
+  XML::LibXML: 0
+  YAML::Syck: 0
+configure_requires:
+  Module::Build: 0.35
+  Module::Build::SysPath: 0.08
+provides:
+  Test::Daily:
+    file: lib/Test/Daily.pm
+    version: 0.02
+  Test::Daily::SPc:
+    file: lib/Test/Daily/SPc.pm
+    version: 0.02
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

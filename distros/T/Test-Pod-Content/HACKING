@@ -1,0 +1,46 @@
+HACKING Test::Pod::Content
+--------------------------
+
+VCS
+---
+
+Test::Pod::Content uses a Subversion repository at 
+
+http://svn.hyper-framework.org/Hyper/Test-Pod-Content/
+
+Developer (commit) SVN access is restricted, but you may use the SVN version
+for generating patches.
+
+Patches should be generated as unified diff (svn can do this for you - try
+svn help diff or just say 'svn diff --old .' in your Test::Pod::Content
+working dir. You'll have to say 'svn add FILENAME' for new files before,
+and 'svn revert FILENAME' afterwards).
+
+CODING STYLE
+------------
+
+Test modules require a high quality coding style, so Test::Pod::Content does
+it's best to comply to the style laid out in Perl Best Practices by Damian
+Conway.
+
+As always, there's a few exceptions:
+
+   * The use of $@ is allowed for simplicity
+   "use English" can induce subtle misbehaviours, and $@ really is a well-known
+   variable.
+
+   * The use of "die" is allowed, because Test::Pod::Content never dies to 
+   signal errors, but only to (reliably) terminate a Pod Parser run.
+   It's pretty useless to croak on an exception that get's caught anyway.
+   There are some die statements which might not get caught, but these are just 
+   re-throwing previously-throwed exceptions.
+
+The exceptions are configured in t/perlcriticrc.
+
+The module may be criticised via
+
+ perlcritic -profile t/perlcriticrc lib
+
+December 2007 
+
+Martin Kutter

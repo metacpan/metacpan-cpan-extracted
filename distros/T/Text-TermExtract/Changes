@@ -1,0 +1,9 @@
+######################################################################
+Revision history for Perl extension Text::TermExtract
+
+0.02  2008/03/09
+    (ms) Sort equally scoring words alphabetically to allow for consistent
+         results even with different hashing algorithms.
+
+0.01  2008/02/10
+    (ms) Where it all began.

@@ -1,0 +1,15 @@
+Revision history for Perl extension Tie::Tk::Listbox.
+
+1.02  Fri Jun 30 21:21:41 2006
+	- Reordered distribution:
+	--> Added t/ directory.
+	--> Added POD tests.
+
+1.01  Fri Mar 28 16:27:12 2003
+	- Changed namespaces to Tie::Tk::Listbox
+
+1.00  Tue Mar 25 21:33:33 2003
+	- original version as uploaded to CPAN
+
+
+

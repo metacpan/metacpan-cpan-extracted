@@ -1,0 +1,8 @@
+Revision history for Perl extension Term::Locale
+
+0.02  Fri Jul 14 17:59:31 JST 2006
+        - Fixed test failure and warnings
+          (Thanks to cmarcelo and Masayoshi Sekimura)
+
+0.01  Wed Jul 12 14:45:49 2006
+	- original version

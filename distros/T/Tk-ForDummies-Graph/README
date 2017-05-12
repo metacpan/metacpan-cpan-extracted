@@ -1,0 +1,70 @@
+Tk-ForDummies-Graph
+
+This is Tk::ForDummies::Graph, a package to generate charts lines, pie and bars.
+See the documentation for histories and more informations.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDANCIES
+
+    Tk::ForDummies::Graph needs Tk installed
+   
+- On Debian, you can install Tk via CPAN or apt-get
+
+  apt-get install perl-tk
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tk::ForDummies::Graph
+    perldoc Tk::ForDummies::Graph::Lines
+    perldoc Tk::ForDummies::Graph::Splines
+    perldoc Tk::ForDummies::Graph::Bars
+    perldoc Tk::ForDummies::Graph::Areas
+    perldoc Tk::ForDummies::Graph::Pie
+    perldoc Tk::ForDummies::Graph::Points
+    perldoc Tk::ForDummies::Graph::Boxplots
+    perldoc Tk::ForDummies::Graph::Miwed
+    perldoc Tk::ForDummies::Graph::FAQ
+
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-ForDummies-Graph
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tk-ForDummies-Graph
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tk-ForDummies-Graph
+
+    Search CPAN
+        http://search.cpan.org/dist/Tk-ForDummies-Graph/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Djibril Ousmanou
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

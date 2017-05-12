@@ -1,0 +1,34 @@
+Changes
+fastq-lib.cpp
+fastq-lib.h
+lib/Text/Tidx.pm
+Makefile.PL
+MANIFEST			This list of files
+perlobject.map
+ppport.h
+README
+t/annot.txt
+t/res1.txt
+t/res2.txt
+t/Text-Tidx.t
+tidx.cpp
+tidx-lib.cpp
+tidx.h
+Tidx.xs
+typemap
+utils.cpp
+utils.h
+sparsehash/template_util.h
+sparsehash/sparse_hash_map
+sparsehash/sparsetable
+sparsehash/sparse_hash_set
+sparsehash/internal/densehashtable.h
+sparsehash/internal/sparseconfig.h
+sparsehash/internal/hashtable-common.h
+sparsehash/internal/sparsehashtable.h
+sparsehash/internal/libc_allocator_with_realloc.h
+sparsehash/type_traits.h
+sparsehash/dense_hash_set
+sparsehash/dense_hash_map
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+1.1
+	- fixed a couple of bugs in search and indexing
+
+1.0
+	- fixed a few small bugs in tie implementation
+	- added experimental new search and indexing features
+
+0.1
+        - initial release

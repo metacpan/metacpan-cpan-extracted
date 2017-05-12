@@ -1,0 +1,16 @@
+COPYING			COPYING
+ChangeLog.1		Changes till version 1.05
+Changes			Changes since version 2.00
+Kakasi.pm		Perl Module
+Kakasi.xs		XS for Text::Kaksi
+MANIFEST		This list of files
+META.yml		metafile
+Makefile.PL		for perl Makefile.PL
+README			README
+README.jp		README in Japanese (euc-jp)
+lib/Text/Kakasi/JP.pod	Japanese POD for Text::Kakasi (euc-jp)
+t/01-func.t		test
+t/02-obj.t		test
+t/03-encode.t		test
+t/MyTestUtils.pm	Utility module for tests
+t/test-1.05.pl		old test

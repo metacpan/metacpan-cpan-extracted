@@ -1,0 +1,37 @@
+---
+abstract: 'A set of classes for viewing Tree::Simple hierarchies'
+author:
+  - 'Mario Zieschang <mziescha@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0.15'
+  Test::LongString: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tree-Simple-View
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Throwable: '0.1'
+  Scalar::Util: '1.18'
+  Tree::Simple: '1.31'
+  constant: '0'
+  parent: '0'
+  perl: '5.006000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-Simple-View
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rsavage/Tree-Simple-View.git
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

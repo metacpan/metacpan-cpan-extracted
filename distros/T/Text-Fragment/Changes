@@ -1,0 +1,68 @@
+Revision history for Text-Fragment
+
+0.09    2016-01-29 (PERLANCAR)
+
+	- Support quoted value in attributes, so we can have values that
+	  contain whitespaces.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.08    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.07    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.06    2014-11-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak error messages (include the missing/invalid ID/parameter
+	  name).
+
+
+0.05    2014-11-16 (PERLANCAR)
+
+	- [Bugfix] Missed a space before attributes when replacing
+	  fragment.
+
+
+0.04    2014-11-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove debugging print statement.
+
+
+0.03    2014-10-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Inserting at the bottom of empty string should add
+	  ending newline.
+
+
+0.02    2014-10-31 (PERLANCAR)
+
+	- [Bugfix] fragment with longer ID e.g. foo-bar will match shorter
+	  ID (e.g. foo).
+
+	- Relax ID so it can contain dashes, underscores, dots, commas,
+	  colons (I happen to want to use program names as ID's).
+
+
+0.01    2012-09-12 (SHARYANTO)
+
+        - First release, extracted/renamed from Setup-Text-Snippet because
+          Text::Snippet was already taken.

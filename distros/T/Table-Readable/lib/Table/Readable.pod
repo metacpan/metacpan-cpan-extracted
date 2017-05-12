@@ -1,0 +1,361 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Table::Readable - minimalistic human-editable tables of data
+
+=head1 SYNOPSIS
+
+    use FindBin '$Bin';
+    use Table::Readable qw/read_table/;
+    my @list = read_table ("$Bin/file.txt");
+    for my $entry (@list) {
+        for my $k (keys %$entry) {
+            print "$k $entry->{$k}\n";
+        }
+    }
+    
+
+
+produces output
+
+    en Residual Current Device
+    ja 配線用遮断器
+    de Fehlerstrom-Schutzschalter
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Table-Readable-0.02/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Table::Readable version 0.02
+corresponding to git commit L<f0071dae7a70ea6ce9ac7a03641975ca3abcb328|https://github.com/benkasminbullock/Table-Readable/commit/f0071dae7a70ea6ce9ac7a03641975ca3abcb328> released on Tue Feb 28 15:30:27 2017 +0900.
+
+=head1 DESCRIPTION
+
+Table::Readable provides a format for human-editable tables of
+information which a computer can read. By design, the format does not
+support any kind of nesting, and can only be text in UTF-8 encoding.
+
+=head1 FUNCTIONS
+
+=head2 read_table
+
+    my @table = read_table ("list_file.txt");
+
+Read one table of information from the specified file. Each row of
+information is stored as an anonymous hash. The return value is an
+array. It dies if not called in array context.
+
+Each row of the table consists of key/value pairs. The key/value pairs
+are given in the form
+
+    key: value
+
+If the key has spaces
+
+    key with spaces: value
+
+then it is turned into C<key_with_spaces> in the anonymous hash.
+
+Rows are separated by a blank line.
+
+So, for example
+
+    row: first
+    data: some information
+
+    row: second
+    data: more information
+    gubbins: guff here
+
+defines two rows, the first one gets a hash reference with entries
+C<row> and C<data>, and the second one is a hash reference with
+entries C<row> and C<data> and C<gubbins>, each containing the
+information on the right of the colon.
+
+If the key begins with two percentage symbols,
+
+    %%key:
+
+then it marks the beginning of a multiline value which continues until
+the next line which begins with two percentage symbols. Thus
+
+    %%key:
+
+    this is the value
+
+    %%
+
+assigns "this is the value" to "key".
+
+If the key contains spaces, these are replaced by underscores. For example,
+
+    this key: value
+
+becomes C<this_key> in the output. Whitespace before the colon is also
+converted, so
+
+    this key : value
+
+becomes C<this_key_> in the output, with an underscore at the end.
+
+Comments can be added to the table using lines with # as the first
+character.
+
+The file is assumed to be in the UTF-8 encoding.
+
+=head3 Read from a scalar
+
+    my @table = read_table ($stuff, scalar => 1);
+
+Read from a scalar in C<$stuff>.
+
+=head2 write_table
+
+    write_table (\@table, 'file.txt');
+
+Write the table in C<@table> to F<file.txt>. It insists on an array
+reference containing hash references, each of which has simple scalars
+as values.
+
+This does not convert underscores in the keys into spaces.
+
+=head1 TABLE FORMAT
+
+This section gives exact details of the format of the tables.
+
+The table takes the format
+
+    key1: value
+    key2: value
+
+    key1: another value
+    key2: yet more values
+
+where rows of the table are separated by a blank line, and the columns
+of each row are defined by giving the name of the column, followed by
+a colon, followed by the value.
+
+=head2 Blank lines
+
+A blank line may contain spaces (something which matches C<\s>).
+
+=head2 Multiline entries
+
+    %%key1:
+
+    value goes here.
+
+    %%
+
+Multiline entries begin and end with two percent characters at the
+beginning of the line. Between the two percent characters there may be
+any number of blank lines. Whitespace (anything matching C<\s>) is
+stripped from the beginning and end of the value. There is no way to
+have double percent characters at the beginning of a line within a
+multiline value, so if you need double percents, you must use a
+different syntax and then post-process the entry to convert your
+syntax to double percent characters.
+
+=head2 Comments
+
+Lines containing a hash character '#' at the beginning of the line are
+ignored. However, lines containing a hash character '#' within
+multiline entries are considered part of the entry, not comments. Hash
+characters at positions other than the start of a line are not
+considered comments, and are not ignored.
+
+Comments are not considered blank lines for the purpose of separating
+table rows.
+
+    
+    use Table::Readable 'read_table';
+    my $table = <<EOF;
+    row: 1
+    # comment
+    some: thing
+    
+    row: 2
+    EOF
+    my @rows = read_table ($table, scalar => 1);
+    print scalar (@rows), "\n";
+    
+
+
+produces output
+
+    2
+
+
+(This example is included as L<F<comment-not-row.pl>|https://api.metacpan.org/source/BKB/Table-Readable-0.02/examples/comment-not-row.pl> in the distribution.)
+
+
+=head2 Encoding
+
+The file must be encoded in the UTF-8 encoding.
+
+=head2 Whitespace
+
+Whitespace (anything matching C<\s>) is stripped from the beginning
+and end of the value. To preserve whitespace, use your own syntax such
+as the following.
+
+    
+    use Table::Readable 'read_table';
+    my $table =<<EOF;
+    a: b     
+    %%c:
+    
+    d
+    
+    %%
+    %%e:
+    
+    f
+    
+    !
+    %%
+    EOF
+    my @entries = read_table ($table, scalar => 1);
+    for my $k (keys %{$entries[0]}) {
+        my $v = $entries[0]{$k};
+        $v =~ s/!$//;
+        print "'$k' = '$v'\n";
+    }
+    
+
+
+produces output
+
+    'e' = 'f
+    
+    '
+    'c' = 'd'
+    'a' = 'b'
+
+
+(This example is included as L<F<whitespace.pl>|https://api.metacpan.org/source/BKB/Table-Readable-0.02/examples/whitespace.pl> in the distribution.)
+
+
+=head2 Empty values
+
+Keys without values, like
+
+    key:
+
+are permitted within the table. A key with no value results in the
+value for that key being an empty string, rather than the undefined
+value.
+
+=head2 Key syntax
+
+A key is a series of one or more of any characters whatsoever except
+for colons. In regular expression language, a key matches $2 in the
+following:
+
+    ^(%%)?([^:]+)
+
+Keys cannot contain colons, so if you need to have colons in your
+keys, invent your own escape sequence, such as substituting semicolons
+or @ marks for colons.
+
+=head2 Consistency of keys
+
+There is no requirement that the keys in one row of the table have to
+be the same as the keys in the subsequent row. Each row of the table
+may have completely inconsistent keys. If you need consistent keys,
+add a post-processor of your own.
+
+=head2 Uniqueness of keys
+
+Keys within a single row must be unique. A duplicate key within a row
+causes a fatal error.
+
+=head2 Unparseable lines
+
+Lines which are not part of a multiline value, are not comments, and
+do not contain a key, are discarded and a warning is printed.
+
+=head2 Design and motivation
+
+This module and the associated format were born out of exasperation
+with various complicated file formats, and the associated complicated
+parser software. In particular I originally made this module and
+format as an alternative to using the TMX format for translation
+memory files, and also out of frustration with the L<AppConfig>
+module. I currently use this to store translations, such as
+L<http://kanji.sljfaq.org/translations.txt>, and files of tabular
+information, such as
+L<https://www.lemoda.net/unix/troff-dictionary/dictionary.txt>.
+
+This format is deliberately designed to reduce the amount of mental
+effort necessary to type in a machine-readable table of
+information. By design, it adds only the most minimal possible
+interpretations to characters. There are only four significant
+characters, the newline, the colon, the hash character #, and the
+percent character %. The hash character and the percent character are
+only significant either when they come immediately after a new line or
+when they are the first byte in the file. The multiline escape
+sequence is two percents at the beginning of a line, a sequence which
+rarely occurs in normal text.
+
+The minimalism of this module is intentional; I will never, ever, add
+new syntax, extra escape characters, comments not at the end of lines,
+nested tables, or multiple tables in one file to this format, and I
+would gladly remove anything from it, if there was anything that could
+possibly be removed. The reason for that is that every time one adds a
+new facility, it adds yet another meaning to some sequence of
+characters, which not only has to be remembered, but also has to be
+programmed around by adding yet another escape. Let's say that I added
+comments like this:
+
+     key: value # this is a comment
+
+then I would have to add yet another escape for the case where I
+actually wanted to put a hash character inside a value, yet another
+annoying bit of syntax to remember like
+
+     key: value \# not a comment
+
+The more one adds these kinds of meaningful characters, the more the
+complexity, the more the bugs, the more the workarounds, the more the
+fixes, and the more the number of things to remember, and the more the
+headaches. No thanks!
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Carp
+
+L<Carp> is used for printing error messages.
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default. All functions can be exported on
+request. A tag ":all" exports all the functions:
+
+    use Table::Readable ':all';
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2010-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

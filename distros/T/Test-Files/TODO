@@ -1,0 +1,62 @@
+A user pointed out an error (in his opinion):
+  compare_dirs_ok does not work properly on second level directories
+  I have not verified that this error occurs
+
+  compare_dirs_ok does not make sure that the first dir has all the
+  files that appear in the second.  It should call dir_contains_only_ok.
+
+The same user said that once compare_dirs_ok is fixed, there should
+be an option like --exclude in the standard diff.
+
+#-----------------------------------------------------
+
+Functions Schwern suggested which are not implemented yet:
+
+#-----------------------------------------------------
+
+dir_ok( "some/dir", {
+        "foo"       => "some/dir/foo would contain this",
+        "bar"       => "some/dir/bar would contain this",
+        "baz/biff"  => "some/dir/baz/biff would contain this"
+ });
+# I suggested using undef for the values here to request a check of structure
+# only, that is only file names would be examined, not contents.  Yet,
+# Schwern had already suggested dir_contains_ok, which is probably more
+# directly intelligiable.
+
+#-----------------------------------------------------
+
+find_ok( "some/dir", sub { which will be run against all files in some/dir
+                           and returns true if they pass } );
+
+#-----------------------------------------------------
+
+I suggested:
+
+dirs_agree("dir1", "dir2")
+
+Schwern suggested a new name for dirs_agree:
+
+compare_dirs_ok instead of dirs_agree (implemented in 0.03)
+
+(I'm extrapolating, he didn't make a direct suggestion, but his earlier
+suggestions point to something like this.)
+
+#-----------------------------------------------------
+
+After trying compare_dirs_ok I immediately wanted to be able to exclude
+some lines from the comparison.  Namely, in my example, dates were the
+only differences.  So, I still wanted the files to count as the same, even
+though the dates differed.  That led to:
+
+compare_dirs_filter_ok($dir1, $dir2, \&filter, $name) (implemented in 0.04)
+
+filter is called for all lines of input, it must return the line with
+any needed changes.  If the line should be omitted, it should return "".
+(implemented in 0.04)
+
+#-----------------------------------------------------
+
+I want compare_filer_ok($file1, $file2, $filter) to work like
+compare_dirs_filter but one file at a time
+(implemented in 0.06)

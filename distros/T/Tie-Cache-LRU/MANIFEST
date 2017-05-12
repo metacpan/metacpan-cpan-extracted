@@ -1,0 +1,20 @@
+bench/big_test_data
+bench/read
+bench/time
+Changes
+INSTALL
+lib/Tie/Cache/LRU.pm
+lib/Tie/Cache/LRU/Array.pm
+lib/Tie/Cache/LRU/LinkedList.pm
+lib/Tie/Cache/LRU/Virtual.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/0_Array.t
+t/0_LinkedList.t
+t/each_loop.t
+t/LRU.t
+t/Virtual.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,104 @@
+SYNOPSIS
+
+     use Term::Detect::Software qw(detect_terminal detect_terminal_cached);
+     my $res = detect_terminal();
+     die "Not running under terminal!" unless $res->{emulator_engine};
+     say "Emulator engine: ", $res->{emulator_engine};
+     say "Emulator software: ", $res->{emulator_software};
+     say "Unicode support? ", $res->{unicode} ? "yes":"no";
+     say "Boxchars support? ", $res->{box_chars} ? "yes":"no";
+     say "Color depth: ", $res->{color_depth};
+     say "Inside emacs? ", $res->{inside_emacs} ? "yes":"no";
+
+DESCRIPTION
+
+    This module uses several heuristics to find out what terminal
+    (emulator) software the current process is running in, and its
+    capabilities/settings. This module complements other modules such as
+    Term::Terminfo and Term::Encoding.
+
+FUNCTIONS
+
+ detect_terminal() => HASHREF
+
+    Return a hashref containing information about running terminal
+    (emulator) software and its capabilities/settings.
+
+    Detection method is tried from the easiest/cheapest (e.g. checking
+    environment variables) or by looking at known process names in the
+    process tree. Terminal capabilities is determined using heuristics.
+
+    Currently Konsole and Konsole-based terminals (like Yakuake) can be
+    detected through existence of environment variables
+    KONSOLE_DBUS_SERVICE or KONSOLE_DBUS_SESSION. xterm is detected through
+    XTERM_VERSION. XFCE's Terminal is detected using COLORTERM. The other
+    software are detected via known process names.
+
+    Terminal capabilities and settings are currently determined via
+    heuristics. Probing terminal configuration files might be performed in
+    the future.
+
+    Result:
+
+      * emulator_engine => STR
+
+      Possible values: konsole, xterm, gnome-terminal, rxvt, pterm (PuTTY),
+      xvt, windows (CMD.EXE), cygwin, or empty string (if not detected
+      running under terminal).
+
+      * emulator_software => STR
+
+      Either: xfce4-terminal, guake, gnome-terminal, mlterm, lxterminal,
+      rxvt, mrxvt, putty, xvt, windows (CMD.EXE), or empty string (if not
+      detected running under terminal).
+
+      w=item * color_depth => INT
+
+      Either 0 (does not support ANSI color codes), 16, 256, or 16777216
+      (2**24).
+
+      * default_bgcolor => STR (6-hexdigit RGB)
+
+      For example, any xterm is assumed to have white background (ffffff)
+      by default, while Konsole is assumed to have black (000000). Better
+      heuristics will be done in the future.
+
+      * unicode => BOOL
+
+      Whether terminal software supports Unicode/wide characters. Note that
+      you should also check encoding, e.g. using Term::Encoding.
+
+      * box_chars => BOOL
+
+      Whether terminal supports box-drawing characters.
+
+ detect_terminal_cached([$flag]) => ANY
+
+    Just like detect_terminal() but will cache the result. Can be used by
+    applications or modules to avoid repeating detection process.
+
+FAQ
+
+ What is this module for? Why not Term::Terminfo or Term::Encoding?
+
+    This module is first written for Text::ANSITable so that the module can
+    provide good defaults when displaying formatted and colored tables,
+    especially on popular terminal emulation software like Konsole (KDE's
+    default terminal), gnome-terminal (GNOME's default), Terminal (XFCE's
+    default), xterm, rxvt.
+
+    The module works by trying to figure out the terminal emulation
+    software because the information provided by Term::Terminfo and
+    Term::Encoding are sometimes not specific enough. For example,
+    Term::Encoding can return utf-8 when running under rxvt, but since the
+    software currently lacks Unicode support we shouldn't display Unicode
+    characters. Another example is color depth: Term::Terminfo currently
+    doesn't recognize Konsole's 24bit color support and only gives
+    max_colors 256.
+
+SEE ALSO
+
+    Term::Terminfo
+
+    Term::Encoding
+

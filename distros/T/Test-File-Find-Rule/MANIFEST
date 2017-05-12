@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Test-File-Find-Rule.t
+lib/Test/File/Find/Rule.pm
+lib/Test/File/Find/Rule/Helper.pm
+META.yml                                 Module meta-data (added by MakeMaker)

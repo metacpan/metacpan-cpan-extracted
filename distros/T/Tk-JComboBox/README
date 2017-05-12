@@ -1,0 +1,74 @@
+Tk/JComboBox version 1.14
+=========================
+
+CHANGES OVERVIEW: (details below)
+
+  Maintenance release to correct memory leak, and minor documentation
+  problems.
+ 
+OVERVIEW:
+
+JComboBox is a Combo Box implementation that combines several features of the various Combo Box implementations available for Perl/Tk and attempts to provide a solution that should cover the majority of your Combo Box needs. The implementation tends to skew somewhat towards the Java and Win32 implementation of a Combo Box more than the Motif one.
+
+ Thanks to everyone who has contributed suggestions, code, and any other feedback. I'm not always able to incorporate that feedback, but I've always found it to be helpful. I hope this widget continues to be useful.
+
+CHANGES for 1.14 RELEASE: (Full Change history in Changes file)
+
+1.14 Maintenance/Bug Fixes: (No new features)
+
+   - Issue: bdz (on clptk) reported a problem when choices 
+     arrayref contained a selected param for one of the 
+     entries (in editable mode). The problem was due to 
+     choices method being called prior to the widget 
+     options being defined in ConfigSpecs within the 
+     Populate method.
+
+     - Resolution: Moved choices call to after the 
+        ConfigSpecs definition; tested. Seems fine.
+
+   - Issue: Benoît Vincente reported obscure problem that
+     indicated problems with JComboBox::Tie. After 
+     investigation, it appears that when the master
+     JComboBox is destroyed, it is not automatically
+     removed the tie. This problem is trickier than 
+     it appears, partly because of the implementation
+     of Tk::JComboBox::Tie and partly because of how
+     widget destruction is done in Perl/Tk. 
+
+     - Resolution: Added a few lines to check all 
+     JComboBox listeners, to see if they still existed prior
+     to sending event notification to each. If a listener
+     no longer exists, it is removed, and the reference 
+     is undef'd. This appears to fix the case Benoît 
+     reported (which should rarely occur in any case).
+
+   - Minor revisions to JComboBox pod.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+  Tie::Array
+  Tie::Watch
+
+Optional dependencies (for testing):
+
+  Test::Pod
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2006 Rob Seegel (RobSeegel[at]comcast.net)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

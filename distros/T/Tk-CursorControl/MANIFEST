@@ -1,0 +1,9 @@
+README
+Changes
+CursorControl.pm
+MANIFEST
+Makefile.PL
+demos/cursor.pl
+test.pl
+trans_cur.xbm
+trans_cur.mask

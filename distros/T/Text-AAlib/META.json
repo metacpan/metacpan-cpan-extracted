@@ -1,0 +1,77 @@
+{
+   "abstract" : "Perl Binding for AAlib",
+   "author" : [
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.5",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-AAlib",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "benchmark",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Devel::CheckLib" : "0",
+            "File::Which" : "0",
+            "Module::Build" : "0.38",
+            "Module::Build::XSUtil" : "0.02"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::ANSIColor" : "0",
+            "XSLoader" : "0.02",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Text::AAlib" : {
+         "file" : "lib/Text/AAlib.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/syohex/p5-Text-AAlib/issues"
+      },
+      "homepage" : "https://github.com/syohex/p5-Text-AAlib",
+      "repository" : {
+         "url" : "git://github.com/syohex/p5-Text-AAlib.git",
+         "web" : "https://github.com/syohex/p5-Text-AAlib"
+      }
+   },
+   "version" : "0.06"
+}

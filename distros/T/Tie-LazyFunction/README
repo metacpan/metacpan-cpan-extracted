@@ -1,0 +1,26 @@
+Tie/LazyFunction version 0.01
+===========================
+
+Syntactic sugar for deferring function evaluations to FETCH time.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  the perl 5 TIEHASH interface
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 david nicol davidnico@cpan.org
+released under your choice of the GNU Public or Artistic licenses
+

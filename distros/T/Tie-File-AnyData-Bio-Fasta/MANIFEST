@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+#META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Tie/File/AnyData/Bio/Fasta.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/fasta.t
+t/Data/ex2.fa
+t/Data/ex_bad.fa
+META.yml                                 Module meta-data (added by MakeMaker)

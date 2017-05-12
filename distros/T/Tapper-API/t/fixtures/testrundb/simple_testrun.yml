@@ -1,0 +1,360 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "perfmon", "lmbench"
+
+- schema: Testrun
+  name: perfmon
+  data:
+    id: 23
+    owner_id: 12
+    shortname: perfmon
+    notes: perfmon
+    topic_name: Software
+
+- schema: Testrun
+  name: lmbench
+  data:
+    id: 24
+    owner_id: 12
+    shortname: lmbench
+    notes: tapper test suite lmbench wrapper
+    topic_name: Distribution
+
+- schema: Testrun
+  name: foobar
+  data:
+    id: 4
+    owner_id: 12
+    shortname: foobar
+    topic_name: Software
+    wait_after_tests: 5
+
+- schema: Testrun
+  name: foobar
+  data:
+    id: 100
+    owner_id: 12
+    shortname: autoinstall
+    notes: this testrun only exists to test autoinstall preconditions
+    topic_name: Software
+    wait_after_tests: ~
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: tapper-tools
+  data:
+    id: 7
+    shortname: tapper-tools
+    precondition: some yaml here 1
+
+- schema: Precondition
+  name: perl-5.10
+  data:
+    id: 8
+    shortname: perl-5.10
+    precondition: some yaml here 2
+
+- schema: Precondition
+  name: gcc
+  data:
+    id: 9
+    shortname: gcc-4.2
+    precondition: some yaml here 3
+
+- schema: Precondition
+  name: glibc
+  data:
+    id: 10
+    shortname: glibc-2.1
+    precondition: some yaml here 4
+
+- schema: Precondition
+  name: gcc
+  data:
+    id: 11
+    shortname: gcc-4.2
+    precondition: some yaml here 5
+
+
+- schema: Precondition
+  name: autoinstall
+  data:
+    id: 101
+    shortname: auto_auto
+    precondition: |
+      ---
+      precondition_type: autoinstall
+      timeout: 10800
+      filename: suse/SLES10SP3_x86_64.lst
+
+- schema: Precondition
+  name: Config for autoinstall
+  data:
+    id: 102
+    shortname: auto_prc
+    precondition: |
+      ---
+      precondition_type: testprogram
+      runtime: 30
+      program: /bin/uname_tap.sh
+      timeout: 90
+
+
+# -------------------- "perfmon" <== "perl", "tapper-tools"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for perfmon
+  data:
+    testrun_id: 23
+    precondition_id: 8
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd preconditions for perfmon
+  data:
+    testrun_id: 23
+    precondition_id: 7
+    succession: 2
+
+# -------------------- "lmbench" <== "perl", "tapper-tools", "gcc", "glibc"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 8
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 7
+    succession: 2
+
+- schema: TestrunPrecondition
+  name: 3rd preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 9
+    succession: 3
+
+- schema: TestrunPrecondition
+  name: 4th preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 10
+    succession: 4
+
+# -------------------- "perl" <== "gcc(9)", "glibc"
+
+- schema: PrePrecondition
+  name: 1st precondition for perl
+  data:
+    parent_precondition_id: 8
+    child_precondition_id: 9
+    succession: 1
+
+- schema: PrePrecondition
+  name: 2nd precondition for perl
+  data:
+    parent_precondition_id: 8
+    child_precondition_id: 10
+    succession: 2
+
+# -------------------- "tapper-tools" <== "gcc(11)"
+
+- schema: PrePrecondition
+  name: make tapper-tools a parent for another gcc-4.2
+  data:
+    parent_precondition_id: 7
+    child_precondition_id: 11
+    succession: 1
+
+# -------------------- "autoinstall"
+
+- schema: TestrunPrecondition
+  name: First precondition for autoinstall
+  data:
+    testrun_id: 100
+    precondition_id: 101
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: Second precondition for autoinstall
+  data:
+    testrun_id: 100
+    precondition_id: 102
+    succession: 2
+
+# ==================== "scheduling"
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+
+- schema: Queue
+  name: KVM Queue
+  data:
+    id: 2
+    name: KVM
+    priority: 200
+
+- schema: Queue
+  name: Kernel Queue
+  data:
+    id: 3
+    name: Kernel
+    priority: 10
+
+# -------------------- "test requests" (Testruns)
+
+# ======================= Xen requests =========================
+
+# ======================= Kernel requests =========================
+
+# --- ccc ---
+    
+- schema: Testrun
+  name: ccc-kernel
+  data:
+    id: 3001
+    owner_id: 12
+    shortname: ccc-kernel
+    notes: ccc
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: ccc-mem-8000
+  data:
+    id: 301
+    testrun_id: 3001            # ccc
+    host_id: 5                  # iring
+
+- schema: TestrunScheduling
+  name: Kernel-ccc
+  data:
+    id: 301
+    testrun_id: 3001            # ccc
+    queue_id: 3                 # Kernel
+    auto_rerun: 1
+    status: schedule
+
+# --- ccc2 ---
+
+- schema: Testrun
+  name: ccc2-kernel
+  data:
+    id: 3002
+    owner_id: 12
+    shortname: ccc2-kernel
+    notes: ccc2
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: ccc2-host-iring
+  data:
+    id: 302
+    testrun_id: 3002            # ccc2
+    host_id: 5                  # iring
+
+- schema: TestrunScheduling
+  name: Kernel-ccc2
+  data:
+    id: 302
+    testrun_id: 3002            # ccc2
+    queue_id: 3                 # Kernel
+    status: schedule
+
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 5
+    name: iring
+    free: 1
+
+- schema: Host
+  name: bullock
+  data:
+    id: 6
+    name: bullock
+    free: 1
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 7
+    name: dickstone
+    free: 1
+
+- schema: Host
+  name: athene
+  data:
+    id: 8
+    name: athene
+    free: 1
+
+- schema: Host
+  name: bascha
+  data:
+    id: 9
+    name: bascha
+    free: 1
+# -------------------- scenarios --------------------
+
+- schema: Scenario
+  name: interdep
+  data:
+    id: 1
+    type: interdep
+
+- schema: ScenarioElement
+  name: aaa_interdep
+  data:
+    id: 1
+    scenario_id: 1
+    testrun_id: 1001
+    is_fitted: 0
+
+- schema: ScenarioElement
+  name: aaa2_interdep
+  data:
+    id: 2
+    scenario_id: 1
+    testrun_id: 1002
+    is_fitted: 0
+
+- schema: Message
+  name: message1
+  data:
+    id: 1
+    testrun_id: 3001
+    message: "state: start-install\ntestrun_id: 3001\n"

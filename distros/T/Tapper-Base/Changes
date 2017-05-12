@@ -1,0 +1,73 @@
+Revision history for Tapper-Base
+
+5.0.0     2015-12-18
+        - use dzil pluginbundle TAPPER
+        - [FIX] add Perl boilerplate
+        - [FIX] add error logging to OSRC resume
+        - [FIX] never return from run function
+        - [FIX] delete message when handled
+        - [FIX] initialise Log4perl
+        - [FEAT] resume now respects "after"
+        - [FEAT] scripts that use Tapper::Action
+        - [TEST] Perl::Critic
+        - [TEST] unit test for Tapper::Action
+        - [TEST] activate log4perl in test
+        - [TEST] faster poll time during test
+
+4.1.4     2012-10-19
+        - fix decreasing version number (*sigh*)
+
+4.1.1     2012-10-19
+        - upload again
+
+4.1.0     2012-10-19
+        - No log_and_exec testing on Windows
+
+4.0.5     2012-07-05
+        - assert OS = Unix
+
+4.0.4     2012-06-11
+        - fix wrong version tags again
+
+4.1.3     2012-06-07
+	- explicit deps
+
+4.0.3     2012-05-25
+	- Retry after Upload Bummer!
+
+4.0.1     2012-05-16
+	- sync version with release
+
+4.1.2     2012-05-15
+        - experimenting around dzil release, just to be sure
+
+4.001.001 2012-05-15
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* [FIX] author in Makefile.PL
+	* release version++ roundhouse kick
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.5
+
+	* don't expect 'true' in /bin/
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* repository and bugtracker urls
+	* more overviewish README
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.1
+
+	* cpan release
+	
+	

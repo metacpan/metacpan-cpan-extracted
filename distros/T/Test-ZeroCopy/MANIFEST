@@ -1,0 +1,9 @@
+Changes
+lib/Test/ZeroCopy.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/basic.t
+ZeroCopy.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

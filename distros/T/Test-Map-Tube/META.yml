@@ -1,0 +1,32 @@
+---
+abstract: 'Interface to test Map::Tube features.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Map-Tube
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Test::Map::Tube:
+    file: lib/Test/Map/Tube.pm
+    version: '0.26'
+requires:
+  Data::Compare: '1.25'
+  Map::Tube: '3.28'
+  Test::Builder: '1.001014'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Test-Map-Tube.git
+version: '0.26'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,79 @@
+{
+   "abstract" : "Pager using DataPageset",
+   "author" : [
+      "tokubass <tokubass {at} cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.1.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Teng-Plugin-Pager-DataPageset",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Pageset" : "0",
+            "Teng" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Teng::Plugin::Pager::DataPageset" : {
+         "file" : "lib/Teng/Plugin/Pager/DataPageset.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokubass/p5-Teng-Plugin-Pager-DataPageset/issues"
+      },
+      "homepage" : "https://github.com/tokubass/p5-Teng-Plugin-Pager-DataPageset",
+      "repository" : {
+         "url" : "git://github.com/tokubass/p5-Teng-Plugin-Pager-DataPageset.git",
+         "web" : "https://github.com/tokubass/p5-Teng-Plugin-Pager-DataPageset"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "tokubass <tokubass@cpan.org>"
+   ]
+}

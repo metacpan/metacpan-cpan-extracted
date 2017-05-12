@@ -1,0 +1,8 @@
+print<>text<>
+print<>line<>
+print<>word<>
+line<>word<>
+line<>text<>
+line<>file<>
+word<>file<>
+file<>text<>

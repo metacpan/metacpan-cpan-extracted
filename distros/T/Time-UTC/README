@@ -1,0 +1,34 @@
+NAME
+
+Time::UTC - manipulation of UTC in terms of TAI
+
+DESCRIPTION
+
+This module encapsulates knowledge about the structure of the UTC time
+scale, including the leap seconds of the current incarnation.  This
+information is useful in manipulating times stored in a UTC-based format,
+or in converting between UTC and TAI (the underlying atomic time scale).
+It automatically downloads new UTC data as required to keep up to date.
+This is a low-level module, intended for use by other modules that need
+to know about UTC.  This module aims to be comprehensive and rigorous.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2005, 2006, 2007, 2009, 2010, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

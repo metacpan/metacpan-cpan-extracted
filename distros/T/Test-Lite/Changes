@@ -1,0 +1,35 @@
+Revision history for Test-Lite
+
+0.008   02/Dec/2011
+        Test::Lite and Goose requiring each other was NOT a good idea
+
+0.007   02/Dec/2011
+        Looks like Test::Lite itself was failing tests. Hopefully fixed this issue, with any luck.
+
+0.006   29/Nov/2011
+        "has" changed to "has_key". Was getting annoying when testing with Goose, Moose, Mouse, etc.
+
+0.005   28/Nov/2011
+        Changed syntax for can_ok. Please use 'can_ok "Module", qw/array of methods/' or simply 
+            can_ok "Module", "method";
+        Added 'extended' method to search deeply for "extended" modules. ie: use base 'Blah';
+
+0.004   25/Nov/2011
+        You can now switch on 'strict' and 'warnings' at the same time just by importing ':strict'
+            use Test::Lite ':strict';
+        Added count method. Counts the number of keys from a hashref, or elements from an arrayref
+            count { name => 'World' }, 1 => 'Count number of keys';
+        Added note method. Just displays text to output(), so only available during verbose
+
+0.003   25/Nov/2011
+        New method 'plan' added to plan the number of tests.
+        Added is_passing, level and finfo.
+
+0.002   25/Nov/2011
+        Added support for subtests. Use "subtest 'name' => sub { ... };"
+        New 'has' method can search hashrefs deeply for a specific key, or an arrayref for a
+            particular element.
+
+0.001   24/Nov/2011
+        First version, released on an unsuspecting world.
+

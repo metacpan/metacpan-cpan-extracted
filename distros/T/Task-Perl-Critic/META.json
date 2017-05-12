@@ -1,0 +1,68 @@
+{
+   "abstract" : "Install everything Perl::Critic.",
+   "author" : [
+      "Elliot Shank <perl@galumph.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Perl-Critic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic" : "1.117",
+            "Perl::Critic::Bangs" : "1.00",
+            "Perl::Critic::Compatibility" : "1.000",
+            "Perl::Critic::Dynamic" : "0.05",
+            "Perl::Critic::Itch" : "0",
+            "Perl::Critic::Lax" : "0.007",
+            "Perl::Critic::Moose" : "0",
+            "Perl::Critic::More" : "1.000",
+            "Perl::Critic::Nits" : "1.000000",
+            "Perl::Critic::PetPeeves::JTRAMMELL" : "0.01",
+            "Perl::Critic::Pulp" : "3",
+            "Perl::Critic::Storable" : "0",
+            "Perl::Critic::StricterSubs" : "0.03",
+            "Perl::Critic::Swift" : "1.000003",
+            "Perl::Critic::Tics" : "0.005",
+            "Test::Perl::Critic" : "1.02",
+            "Test::Perl::Critic::Progressive" : "0.03",
+            "criticism" : "1.02"
+         }
+      }
+   },
+   "provides" : {
+      "Task::Perl::Critic" : {
+         "file" : "lib/Task/Perl/Critic.pm",
+         "version" : "1.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://perlcritic.com",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://guest@perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Task-Perl-Critic/"
+      },
+      "x_MailingList" : "http://perlcritic.tigris.org/servlets/SummarizeList?listName=users"
+   },
+   "version" : "1.008"
+}

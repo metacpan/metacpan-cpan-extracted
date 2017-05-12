@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- :tabSize=2:indentSize=2:wrap=hard: -->
+<changelog xmlns="http://www.blackperl.com/2009/01/ChangeLogML"
+    xmlns:sc="http://www.blackperl.com/2009/01/ChangeLogML/source-control"
+    xmlns:git="http://www.blackperl.com/2009/01/ChangeLogML/source-control/git"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.blackperl.com/2009/01/ChangeLogML etc/ChangeLogML.xsd">
+  <project>Text::Textile::Plaintext</project>
+  <title>Perl Module Text::Textile::Plaintext Change History</title>
+  <description>
+    A Perl module to convert Textile markup to plain-text output, using
+    the Text::Textile, HTML::TreeBuilder and HTML::FormatText modules.
+  </description>
+  <release version="0.100" sc:tag="0.100" date="2009-08-17T10:10:00-07:00">
+    <change git:commit="2437132793fcec71689450b3b53089de8b1b32d5">
+      <fileset>
+        <file path="bin/textile2x" action="ADD" />
+        <file path="lib/App/Textile2x.pm" action="ADD" />
+        <file path="lib/Text/Textile/Plaintext.pm" action="ADD" />
+        <file path="lib/Text/Textile/PostScript.pm" action="ADD" />
+        <file path="lib/Text/Textile/RTF.pm" action="ADD" />
+        <file path="t/00_load.t" action="ADD" />
+        <file path="t/01_pod.t" action="ADD" />
+        <file path="t/02_pod_coverage.t" action="ADD" />
+        <file path="t/03_meta.t" action="ADD" />
+        <file path="t/04_minimumversion.t" action="ADD" />
+        <file path="t/05_critic.t" action="ADD" />
+      </fileset>
+      <description>
+        Initial commit of Text::Textile::Plaintext core files.
+      </description>
+    </change>
+  </release>
+  <release version="0.101" sc:tag="0.101" date="2009-08-17T12:25:00-07:00">
+    <change git:commit="b2b757e6385fbe5baf0a5c1ca249292b7b6633ab">
+      <fileset>
+        <file path="lib/App/Textile2x.pm" />
+        <file path="lib/Text/Textile/Plaintext.pm" />
+        <file path="lib/Text/Textile/PostScript.pm" />
+        <file path="lib/Text/Textile/RTF.pm" />
+      </fileset>
+      <description>
+        Forgot warnings pragma in modules.
+      </description>
+    </change>
+  </release>
+</changelog>

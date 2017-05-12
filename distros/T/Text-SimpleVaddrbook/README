@@ -1,0 +1,48 @@
+DESCRIPTION
+
+Text::SimplevAddrbook - This package provides an API for reading multiple
+vCards from addressbooks. A vcard is an electronic business card. You will find
+that many applications (KDE-Address book, Apple Address book, MS Outlook,
+Evolution, etc.) can export and import vCards.
+
+It depends on Text::SimpleVcard which provides functions for extracting infos
+from a singel vcard.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::SimpleVaddrbook
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-SimpleVaddrbook
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-SimpleVaddrbook
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-SimpleVaddrbook
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-SimpleVaddrbook
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Michael Tomuschat
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

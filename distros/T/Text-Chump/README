@@ -1,0 +1,89 @@
+README for Text::Chump 1.02
+
+=head1 NAME
+
+Text::Chump - a module for parsing Chump like syntax
+
+
+=head1 SYNOPSIS
+
+	use Text::Chump;
+
+	my $tc = Text::Chump->new();
+
+	$tc->chump('[all mine!|http://thegestalt.org]');
+	# returns <a href='http://thegestalt.org'>all mine!</a>
+
+	$tc->chump('+[all mine!|http://thegestalt.org]');
+	# returns <img src='http://thegestalt.org' alt='all mine!'>
+
+	$tc->chump('http://thegestalt.org');
+	# returns <a href='http://thegestalt.org'>http;//thegestalt.org</a>
+
+	my $tc = Text::Chump->new({images=>0});
+
+	$tc->chump('+[all mine!|http://thegestalt.org]');
+	# returns '+[all mine!|http://thegestalt.org]'
+
+
+	sub foo {
+		my ($url, $label) = @_;
+
+		return "$label ($url)";
+	}
+
+	$tc->install('link',\&foo);
+	$tc->chump('[foo|http://bar.com]');
+	# returns 'foo (http://bar.com)'
+
+	sub quirka {
+		my ($opts, $match, $label) = @_;
+
+		return "<a href="blog.cgi?entry=$match">$label</a>";
+
+	}
+
+
+
+	$tc->install('link',\$quirka,'\d+');
+	$tc->chump('[stuff|4444]');
+	# returns "<a href="blog.cgi?entry=4444">stuff</a>"
+
+
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Test::More
+ Text::DelimMatch
+ Tie::IxHash
+ URI::Find
+
+=head1 INSTALLATION
+
+ perl Makefile.PL
+ make test
+
+and if all goes well
+
+ make install
+
+=head1 HISTORY
+
+
+v1.02 - Fixing some potential undef warnings
+
+	Found by Tom insam
+
+=head1 AUTHOR
+
+Copyright 2003, Simon Wistow <simon@thegestalt.org>
+
+=head1 SEE ALSO
+
+B<http://usefulinc.com/chump/>, L<Bot::Basic::Pluggable::Blog>, 
+L<Template::Plugin::Chump>, L<Text::WikiFormat>, L<HTML::FromText>,
+L<Tie::IxHash>
+

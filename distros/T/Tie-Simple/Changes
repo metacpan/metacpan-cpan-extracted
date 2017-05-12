@@ -1,0 +1,21 @@
+1.04      2015-11-28 11:23:48-06:00 America/Chicago
+
+    * Re-established a public git repository.
+    * Cleaned up the repo and switched to Dist::Zilla for development support.
+    * [RT#108096] The EXTEND method is no longer available for tied arrays. 
+      (HT: Slaven Rezic for the fix / Dave Mitchell for finding the problem /
+      ANDK for reporting it)
+    * Fixed a type in the DESTROY method in Tie::Simple::Handle
+
+2006-01-09  Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+    * Fixed a typo in Tie::Simple::Hash.
+
+2004-06-04  Andrew Sterling Hanenkamp <hanenkamp@users.sourceforge.net>
+
+	* Fixed a compile bug that I somehow let into the 1.01 distro.
+
+2004-06-02  Andrew Sterling Hanenkamp <hanenkamp@users.sourceforge.net>
+
+	* Initial release with basic scalar, array, hash, and handle simplified
+	  tie functionality.

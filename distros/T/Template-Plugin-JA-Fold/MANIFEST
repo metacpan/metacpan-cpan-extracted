@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Template/Plugin/JA/Fold.pm
+MANIFEST			This list of files
+README
+t/00_compile.t
+t/01_fold.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_pod_coverage.t
+xt/perlcriticrc
+META.yml
+META.json

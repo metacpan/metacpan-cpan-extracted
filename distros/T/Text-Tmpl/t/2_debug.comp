@@ -1,0 +1,7 @@
+Namespace dump:
+var2 => value2
+var1 => value1
+loop1: 
+iter => 1
+loop1: 
+iter => 2

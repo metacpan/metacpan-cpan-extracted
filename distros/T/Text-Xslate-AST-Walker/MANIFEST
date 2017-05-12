@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/undeclared_var.pl
+eg/undeclared_var.tx
+lib/Text/Xslate/AST/Walker.pm
+t/010_walker.t
+META.yml
+MANIFEST

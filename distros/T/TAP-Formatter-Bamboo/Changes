@@ -1,0 +1,8 @@
+Revision history for TAP-Formatter-Bamboo
+
+0.04
+	Allow specifying file for output XML
+        Switch from Module::Build to ExtUtils::MakeMaker
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

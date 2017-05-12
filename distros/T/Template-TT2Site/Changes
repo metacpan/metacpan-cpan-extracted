@@ -1,0 +1,64 @@
+* 0.95
+
+   - util/image: can take a partial image object, or an image name.
+     Missing data (e.g. image dimensions) will be automatically filled
+     in (Ticket #11245).
+   - util/image: add optional title attribute (Ticket #11246).
+   - Eliminate chown warnings on setup (Ticket #11204).
+
+* 0.94 Jan 16, 2005
+
+   - Add site.design (in page/footer).
+   - Add XML heading (page/html).
+   - Monir bug fixes.
+
+* 0.93 Jan 14, 2005
+
+   - Withdraw .html suffix for page/ files.
+   - Several corrections and updates to the documentation.
+
+* 0.92 Jan 05, 2005
+
+   - Add missing examples/sample0/src/download.html.
+   - Add missing examples/sample1/src/en/download.html.
+   - Add missing examples/sample1/src/nl/download.html.
+   - Correct filenames in examples/sample0/src/userguide/struct.html.
+   - Add Makefile.PL, as demanded by Randal Schwartz.
+
+* 0.91 Jan 04, 2005
+
+   - Many documentation changes and enhancements.
+   - Fix the missing _usage() function.
+   - Rename most page/* files to *.html to reflect their HTML nature.
+   - Other bug fixes.
+   - Several changes were suggested by Mark Stosberg.
+
+* 0.90 Dec 29, 2004
+
+   - Approaching maturity.
+   - All code from the tt2site tool has been moved to
+     Template/TT2Site.pm.
+   - tt2site is now a very simple wrapper.
+   - Multiple installations can be maintained using the TT2SITE_LIB
+     environment variable.
+   - All documentation is moved to the sample0 site.
+   - Example sites are moved from src to examples.
+   - Several changes were suggested by Mark Stosberg.
+
+* 0.22 Dec 12, 2004
+
+   - Small fixes, not worth mentioning.
+   - Change CHANGES to Changes.
+   - Several changes were suggested by Mark Stosberg
+
+* 0.21 Dec 11, 2004
+
+   - Mainly cosmetic changes in documentation.
+
+* 0.20 Dec 10, 2004
+
+   - First beta release in the new structure.
+
+* 0.01 Dec 05, 2004
+
+   - First alpha release.

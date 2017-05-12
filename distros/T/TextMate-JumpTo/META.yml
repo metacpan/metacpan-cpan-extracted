@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                TextMate-JumpTo
+version:             0.07
+abstract:            Tell TextMate to jump to a particular file, line
+license:             perl
+author:              
+    - Andy Armstrong <andy@hexten.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    File::Spec:                    0
+    HTML::Tiny:                    1.01
+    Test::Differences:             0.47
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

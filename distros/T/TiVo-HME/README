@@ -1,0 +1,39 @@
+Pure Perl HME SDK
+
+Before doing ANYTHING check out http://tivohme.sourceforge.net/ so
+we're all on the same page.  Download the SDK.  Untar it.  Get ready.
+
+To run these examples you either need to run the Simulator that comes
+with the SDK from sourceforge or have a real-live updated Series 2 TiVo.
+
+The Sourceforge tells ya how to set up your TiVo so listen to them.
+I'll just talk about the Simulator.  Run it like so:
+
+% java -cp <path/to/>/simulator.jar com.tivo.hme.sim.Simulator
+
+Now run a perl example:
+
+use TiVo::HME;
+
+my $path_to_my_tivo_hme_app = '/home/mark/perl_stuff/TiVo/HME/examples';
+TiVo::HME->start( [ $path_to_my_tivo_hme_app ] );
+
+Now go to Simulator & in the URL box type:
+
+http://localhost/animate/
+
+& hit return - if you see boxes moving around YOU DID IT!!
+
+If not...  welp... something is horribly, horribly wrong.
+Make sure you didn't see any error messages when starting the simulator
+or 'start.pl'.
+
+Sorry that's all I got for ya - perldoc TiVo::HME::Application for details
+about how to write HME apps.
+
+Lemmie know how it goes!!
+
+mark@zzo.com
+
+
+

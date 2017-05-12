@@ -1,0 +1,10 @@
+Build.PL
+ChangeLog
+lib/Task/BeLike/RJRAY.pm
+MANIFEST			This list of files
+README
+README.textile
+t/task-bogus.t
+Makefile.PL
+META.yml
+META.json

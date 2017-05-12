@@ -1,0 +1,97 @@
+=== Version 1.0.1 / 2013-07-26
+
+* Enhancements
+  * Add the license agreement to the manifest
+  * fix misdocumentation in the POD format
+
+=== Version 1.0.0 / 2013-02-26
+
+* Enhancements
+  * Added the MIT License
+  * Updated documentation
+
+=== Version 0.4.8 / 2012-11-30
+
+* Bug Fixes
+  * Fixed bug that caused tests to fail while installing the module
+
+=== Version 0.4.7 / 2011-12-15
+
+* Bug Fixes
+  * Fixed bug for perl 5.8 not having qw
+  * Test::More required version 0.87
+
+* Enhancements
+  * Improved documentation
+  * Extracted private subroutines into Helper
+  * Remove Perl required version
+  * Test::More as a build prereq rather than run prereq
+
+=== Version 0.4.3 / 2011-08-17
+
+* Enhancements
+  * Improved documentation
+  * Added ABSTRACT_FROM in Makefile.PL
+
+=== Version 0.4.2 / 2011-08-16
+
+* Enhancements
+  * Added tests to distribution tar.gz
+  * Added a whole slew of tests
+  * Added documentation for CPAN
+  * Minor refactorings
+
+=== Version 0.4.1 / 2011-08-09
+
+* Enhancements
+  * before_each is a replacement of set_up
+  * after_each is a replacement of tear_down
+  * before_all will get run at the beginning of each describe block
+  * after_all will get run at the end of each describe block
+  * Added Changes file
+
+* Deprecations
+  * set_up (use before_each)
+  * tear_down (use after_each)
+
+=== Version 0.4.0 / 2011-08-09
+
+* Enhancements
+  * Test descriptions now printed in color
+    * green : passed
+    * red   : failed
+  * Added the link to Test::More::Behaviour on CPAN in README
+
+=== Version 0.3.2 / 2011-08-08
+
+* Enhancements
+  * Added the README for distribution
+
+* Bug fixes
+  * Context description is now reset outside of the context
+  * Describe description is not reset outside of the describe
+
+=== Version 0.3.1 / 2011-08-08
+
+* Enhancements
+  * Various updates to README
+  * Makefile.PL distributes package as Test-More-Behaviour-<version>.tar.gz
+
+=== Version 0.3.0 / 2011-08-08
+
+* Enhancements
+  * Context is added
+
+=== Version 0.2.0 / 2011-08-08
+
+* Rebranding project to Test::More::Behaviour
+
+=== Version 0.1.1 / 2011-08-07
+
+* Enhancements
+  * Use Perl 5.010000
+
+=== Version 0.1.0 / 2011-08-06
+
+* This is the original release of PerlSpec, a Behaviour-Driven Development library for Perl
+

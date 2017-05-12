@@ -1,0 +1,20 @@
+NAME
+    Task::BeLike::ABHIISNOT - Be like ABHIISNOT
+
+SYNOPSIS
+      use Task::BeLike::ABHIISNOT;
+
+DESCRIPTION
+    Be Like ABHIISNOT as much as possible
+
+AUTHOR
+    Abhishek Shende <abhishekisnot@gmail.com>
+
+COPYRIGHT
+    Copyright 2013- Abhishek Shende
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

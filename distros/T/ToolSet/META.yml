@@ -1,0 +1,51 @@
+---
+abstract: 'Load your commonly-used modules in a single import'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ToolSet
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  ToolSet:
+    file: lib/ToolSet.pm
+    version: '1.03'
+  ToolSet::SWC:
+    file: lib/ToolSet/SWC.pm
+    version: '1.03'
+requires:
+  Carp: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/ToolSet/issues
+  homepage: https://github.com/dagolden/ToolSet
+  repository: https://github.com/dagolden/ToolSet.git
+version: '1.03'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Haakon Haegland <Hakon.Hagland@uni.no>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

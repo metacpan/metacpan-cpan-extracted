@@ -1,0 +1,139 @@
+NAME
+    Text::NLP::Stanford::EntityExtract - Talks to a stanford-ner socket
+    server to get named entities back
+
+VERSION
+    Version 0.02
+
+Quick Start:
+    *   Grab the Stanford Named Entity recogniser from
+        http://nlp.stanford.edu/ner/index.shtml.
+
+    *   Run the server, something like as follows:
+
+         java -server -mx400m -cp stanford-ner.jar edu.stanford.nlp.ie.NERServer -loadClassifier classifiers/ner-eng-ie.crf-4-conll-distsim.ser.gz 1234
+
+    *   Wrte a script to extract the named entities from the text, like the
+        following:
+
+         #!/usr/bin/env perl -w
+         use strict;
+         use Text::NLP::Stanford::EntityExtract;
+         my $ner = Text::NLP::Stanford::EntityExtract->new;
+         my $server = $ner->server;
+         my @txt = ("Some text\n\n", "Treated as \\n\\n delimieted paragraphs");
+         my @tagged_text = $ner->get_entities(@txt);
+         my $entities = $ner->entities_list($txt[0]); # rather complicated
+                                                      # @AOA based data
+                                                      # structure for further
+                                                      # processing
+
+  METHODS
+  new ( host => '127.0.0.1', port => '1234');
+  server
+    Gets the socket connection. I think that the ner server will only do one
+    line per connection, so you want a new connection for every line of
+    text.
+
+  get_entities(@txt)
+    Grabs the tagged text for an arbitrary number of paragraphs of text, and
+    returns as the ner tagged text.
+
+  _process_line ($line)
+    processes a single line of text to tagged text
+
+  entities_list($tagged_line)
+    returns a rater arcane data structure of the entities from the text. the
+    position of the word in the line is recorded as is the entity type, so
+    that the line of text can be recovered in full from the data structure.
+
+    TODO: This needs some utility subs around it to make it more useful.
+
+  list_entities($self->entities_list($line)
+    Lists the entities contained within a line based from the data structure
+    provided by entities_list($line).
+
+    If passed a list of entities it adds to that list, including counts of
+    the numbes of each entity already found.
+
+    The data structure returns looks like this:
+
+     $list_data = {
+        'LOCATION' => {
+            'Outer Mongolia' => 1,
+            'Location Location Location' => 1,
+            'Chinese Mainland' => 1,
+            'Britney' => 1
+        },
+        'O' => {
+            'may have returned from the' => 1,
+            'said from his home in' => 1,
+            '. Test a three word entity' => 1,
+            'faith that she follows . Now she is attempting , for a second time , to persuade' => 1,
+            '. There is a question that' => 1,
+            'blah blah' => 1,
+            'to the controversial' => 1,
+            '.' => 1,
+            'to follow suit , reports said .' => 1
+        },
+        'PERSON' => {
+            'Bruce Lee' => 1,
+            'Gwyneth Paltrow' => 1,
+            'Lord Lucan' => 1
+        },
+        'MISC' => {
+            'Jewish-based' => 1
+        }
+     };
+
+AUTHOR
+    Kieren Diment, "<zarquon at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-text-nlp-stanford-entityextract at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-NLP-Stanford-Entity
+    Extract>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+SUPPORT
+    The git repository for this code is available from
+    git://github.com/singingfish/text-nlp-stanford-entityextract.git
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Text::NLP::Stanford::EntityExtract
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-NLP-Stanford-EntityEx
+        tract>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Text-NLP-Stanford-EntityExtract>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Text-NLP-Stanford-EntityExtract>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Text-NLP-Stanford-EntityExtract/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2008 Kieren Diment, all rights reserved.
+
+    This program is released under the following license: GPL
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 53:
+        You forgot a '=back' before '=head2'
+

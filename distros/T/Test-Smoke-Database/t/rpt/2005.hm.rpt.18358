@@ -1,0 +1,470 @@
+Newsgroups: perl.daily-build.reports
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:2005
+Return-Path: <h.m.brand@hccnet.nl>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 92232 invoked by uid 1005); 31 Dec 2002 14:32:54 -0000
+Delivered-To: perlmail-smokers-reports@perl.org
+Received: (qmail 92228 invoked by uid 76); 31 Dec 2002 14:32:54 -0000
+Received: from smtpzilla1.xs4all.nl (HELO smtpzilla1.xs4all.nl) (194.109.127.137) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2002-12-31 14:32:54Z
+Received: from [127.0.0.1] (procura.xs4all.nl [213.84.163.145])	by smtpzilla1.xs4all.nl (8.12.0/8.12.0) with ESMTP id gBVEWm5V021591	for <smokers-reports@perl.org>; Tue, 31 Dec 2002 15:32:49 +0100 (CET)
+Date: Tue, 31 Dec 2002 15:32:48 +0100
+To: Daily Build Reports <smokers-reports@perl.org>
+Subject: Smokes
+Message-ID: <20021231153149.3903.H.M.BRAND@hccnet.nl>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="------_3E11AA553993028F4030_MULTIPART_MIXED_"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Becky! ver. 2.05.06
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Approved: news@nntp.perl.org
+
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18358 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC6E63A79 for merijn@procura.nl; Mon, 30 Dec 2002 06:01:28 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA14806 for merijn@procura.nl; Sun, 29 Dec 2002 22:30:06 +0100 (MET)
+Date: Sun, 29 Dec 2002 22:30:06 +0100 (MET)
+Message-Id: <200212292130.WAA14806@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18358 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18358                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18358    18358    18358    18358    18358    18358   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O   
+O O O O  O O O O                    O O O O  O O O O  -Duse64bitint
+O O O O  O O O O                                      -Duse64bitall
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  -Duselongdouble
+O O O O  O O O O                    O O O O           -Dusemorebits
+O O O O  O O O O                                      -Duse64bitall -Duselongdouble
+O O O O  O O O O  O O O O  O O O O  O O O O  O O      -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O           -Duse64bitint -Dusethreads -Duseithreads
+O O O O  O O O O                                      -Duse64bitall -Dusethreads -Duseithreads
+O O O O  O O O O  O O O O  O O O O  O O O O           -Duselongdouble -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O           -Dusemorebits -Dusethreads -Duseithreads
+O O O O  O O O O                                      -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+| |                            | |
+| +----- PERLIO = perlio       | +- PERLIO = perlio -DDEBUGGING
++------- PERLIO = stdio        +--- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18358 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC6E63A7C for merijn@procura.nl; Mon, 30 Dec 2002 06:01:28 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA14813 for merijn@procura.nl; Sun, 29 Dec 2002 22:30:07 +0100 (MET)
+Date: Sun, 29 Dec 2002 22:30:07 +0100 (MET)
+Message-Id: <200212292130.WAA14813@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18358 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18358                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18358    18358    18358    18358    18358    18358   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+100 101  94  90 | 74  75  75  74 | 60  60  55  54 | 53  52  52  51 | 52  52  44  44 | 46  47  41  41 | 
+ 86  87  77  78 | 78  78  78  77 |                |                | 50  50  43  43 | 46  46  40  40 |-Duse64bitint
+ 86  87  76  78 |                |                |                |                |                |-Duse64bitall
+                |                |                |                | 50  50  44  44 | 46  46  41  40 |-Duselongdouble
+                |                |                |                | 48  49  43  43 |                |-Dusemorebits
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble
+ 64  65  56  56 | 53  53  54  53 | 33  33  29  29 | 27  28  27  27 | 40  40  35  35 | 37  40         |-Dusethreads -Duseithreads
+ 55  57  50  49 | 49  50  51  51 |                |                | 39  39  35  35 |                |-Duse64bitint -Dusethreads -Duseithreads
+ 58  49  51  51 |                |                |                |                |                |-Duse64bitall -Dusethreads -Duseithreads
+                |                |                |                | 40  39  35  35 |                |-Duselongdouble -Dusethreads -Duseithreads
+                |                |                |                | 38  38  35  35 |                |-Dusemorebits -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+  |   |                    |   |
+  |   +- PERLIO = perlio   |   +- PERLIO = perlio -DDEBUGGING
+  +----- PERLIO = stdio    +----- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18354 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC6B62F8A for merijn@procura.nl; Sat, 28 Dec 2002 06:29:27 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA26116 for merijn@procura.nl; Fri, 27 Dec 2002 22:30:06 +0100 (MET)
+Date: Fri, 27 Dec 2002 22:30:06 +0100 (MET)
+Message-Id: <200212272130.WAA26116@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18354 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18354                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18354    18354    18354    18354    18354    18354   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O   
+O O O O  O O O O                    O O O O  O O O O  -Duse64bitint
+O O O O  O O O O                                      -Duse64bitall
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  -Duselongdouble
+O O O O  O O O O                    O O O O           -Dusemorebits
+O O O O  O O O O                                      -Duse64bitall -Duselongdouble
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O ?  -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O  ? ? ? ?  -Duse64bitint -Dusethreads -Duseithreads
+O O O O  O O O O                             ? ? ? ?  -Duse64bitall -Dusethreads -Duseithreads
+O O O O  O O O O  O O O O  O O O O  O O O O  ? ? ? ?  -Duselongdouble -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O  ? ? ? ?  -Dusemorebits -Dusethreads -Duseithreads
+O O O O  O O O O                             ? ? ? ?  -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+| |                            | |
+| +----- PERLIO = perlio       | +- PERLIO = perlio -DDEBUGGING
++------- PERLIO = stdio        +--- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18354 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC6B62F8D for merijn@procura.nl; Sat, 28 Dec 2002 06:29:27 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA26123 for merijn@procura.nl; Fri, 27 Dec 2002 22:30:07 +0100 (MET)
+Date: Fri, 27 Dec 2002 22:30:07 +0100 (MET)
+Message-Id: <200212272130.WAA26123@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18354 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18354                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18354    18354    18354    18354    18354    18354   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+100 100  91  92 | 73  73  73  72 | 59  58  54  54 | 50  51  48  50 | 50  50  43  43 | 45  45  40  40 | 
+ 86  85  77  76 | 77  76  75  76 |                |                | 48  48  42  42 | 44  45  39  39 |-Duse64bitint
+ 85  86  76  76 |                |                |                |                |                |-Duse64bitall
+                |                |                |                | 49  49  43  42 | 45  45  40  40 |-Duselongdouble
+                |                |                |                | 47  47  42  41 |                |-Dusemorebits
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble
+ 54  63  56  55 | 52  52  50  49 | 32  33  28  28 | 26  27  27  27 | 39  39  34  34 | 37  37  35     |-Dusethreads -Duseithreads
+ 58  57  50  51 | 46  45  49  48 |                |                | 38  37  34  34 |                |-Duse64bitint -Dusethreads -Duseithreads
+ 57  54  49  48 |                |                |                |                |                |-Duse64bitall -Dusethreads -Duseithreads
+                |                |                |                | 38  38  34  34 |                |-Duselongdouble -Dusethreads -Duseithreads
+                |                |                |                | 37  37  33  33 |                |-Dusemorebits -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+  |   |                    |   |
+  |   +- PERLIO = perlio   |   +- PERLIO = perlio -DDEBUGGING
+  +----- PERLIO = stdio    +----- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18351 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC69E222F for merijn@procura.nl; Fri, 27 Dec 2002 06:12:26 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA16321 for merijn@procura.nl; Thu, 26 Dec 2002 22:30:06 +0100 (MET)
+Date: Thu, 26 Dec 2002 22:30:06 +0100 (MET)
+Message-Id: <200212262130.WAA16321@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18351 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18351                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18351    18351    18351    18351    18351    18351   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O   
+O O O O  O O O O                    O O O O  O O O O  -Duse64bitint
+O O O O  O O O O                                      -Duse64bitall
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  -Duselongdouble
+O O O O  O O O O                    O O O O           -Dusemorebits
+O O O O  O O O O                                      -Duse64bitall -Duselongdouble
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O ?  -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O  ? ? ? ?  -Duse64bitint -Dusethreads -Duseithreads
+O O O O  O O O O                             ? ? ? ?  -Duse64bitall -Dusethreads -Duseithreads
+O O O O  O O O O  O O O O  O O O O  O O O O  ? ? ? ?  -Duselongdouble -Dusethreads -Duseithreads
+O O O O  O O O O                    O O O O  ? ? ? ?  -Dusemorebits -Dusethreads -Duseithreads
+O O O O  O O O O                             ? ? ? ?  -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+| |                            | |
+| +----- PERLIO = perlio       | +- PERLIO = perlio -DDEBUGGING
++------- PERLIO = stdio        +--- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18351 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC69E2232 for merijn@procura.nl; Fri, 27 Dec 2002 06:12:26 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA16328 for merijn@procura.nl; Thu, 26 Dec 2002 22:30:06 +0100 (MET)
+Date: Thu, 26 Dec 2002 22:30:06 +0100 (MET)
+Message-Id: <200212262130.WAA16328@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18351 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18351                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18351    18351    18351    18351    18351    18351   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+100  99  93  93 | 74  73  72  73 | 61  61  55  53 | 50  50  51  51 | 51  51  43  43 | 46  46  41  41 | 
+ 87  87  79  78 | 77  77  77  76 |                |                | 49  49  43  42 | 45  45  40  40 |-Duse64bitint
+ 87  87  77  77 |                |                |                |                |                |-Duse64bitall
+                |                |                |                | 49  49  43  43 | 45  45  40  40 |-Duselongdouble
+                |                |                |                | 48  48  42  41 |                |-Dusemorebits
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble
+ 63  64  56  56 | 52  53  53  51 | 33  33  28  28 | 27  27  26  27 | 39  39  35  34 | 37  37  36     |-Dusethreads -Duseithreads
+ 58  58  35  48 | 50  50  50  51 |                |                | 38  38  34  34 |                |-Duse64bitint -Dusethreads -Duseithreads
+ 59  56  52  51 |                |                |                |                |                |-Duse64bitall -Dusethreads -Duseithreads
+                |                |                |                | 39  39  34  34 |                |-Duselongdouble -Dusethreads -Duseithreads
+                |                |                |                | 37  37  34  34 |                |-Dusemorebits -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+  |   |                    |   |
+  |   +- PERLIO = perlio   |   +- PERLIO = perlio -DDEBUGGING
+  +----- PERLIO = stdio    +----- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18350 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC6861DBD for merijn@procura.nl; Thu, 26 Dec 2002 06:26:27 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA23619 for merijn@procura.nl; Wed, 25 Dec 2002 22:30:05 +0100 (MET)
+Date: Wed, 25 Dec 2002 22:30:05 +0100 (MET)
+Message-Id: <200212252130.WAA23619@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18350 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18350                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18350    18350    18350    18350    18350    18350   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O   
+O O O O  O O O O                    O O O O  O O O O  -Duse64bitint
+O O O O  O O O O                                      -Duse64bitall
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  -Duselongdouble
+O O O O  O O O O                    O O O O           -Dusemorebits
+O O O O  O O O O                                      -Duse64bitall -Duselongdouble
+m m m m  m m m m  m m m m  m m m m  m m m m  m m m m  -Dusethreads -Duseithreads
+m m m m  m m m m                    m m m m  m m m m  -Duse64bitint -Dusethreads -Duseithreads
+m m m m  m m m m                                      -Duse64bitall -Dusethreads -Duseithreads
+m m m m  m m m m  m m m m  m m m m  m m m m  m m m m  -Duselongdouble -Dusethreads -Duseithreads
+m m m m  m m m m                    m m m m           -Dusemorebits -Dusethreads -Duseithreads
+m m m m  m m m m                                      -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+| |                            | |
+| +----- PERLIO = perlio       | +- PERLIO = perlio -DDEBUGGING
++------- PERLIO = stdio        +--- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18350 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC6861DC0 for merijn@procura.nl; Thu, 26 Dec 2002 06:26:27 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA23626 for merijn@procura.nl; Wed, 25 Dec 2002 22:30:06 +0100 (MET)
+Date: Wed, 25 Dec 2002 22:30:06 +0100 (MET)
+Message-Id: <200212252130.WAA23626@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18350 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18350                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18350    18350    18350    18350    18350    18350   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+100 100  93  94 | 74  74  74  74 | 58  57  54  55 | 51  52  51  50 | 51  50  44  44 | 48  47  42  42 | 
+ 87  87  78  77 | 76  77  77  77 |                |                | 49  48  43  43 | 47  46  41  41 |-Duse64bitint
+ 87  87  78  78 |                |                |                |                |                |-Duse64bitall
+                |                |                |                | 50  50  43  43 | 47  47  42  41 |-Duselongdouble
+                |                |                |                | 48  48  42  42 |                |-Dusemorebits
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble
+                |                |                |                |                |                |-Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitint -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitall -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duselongdouble -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Dusemorebits -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+  |   |                    |   |
+  |   +- PERLIO = perlio   |   +- PERLIO = perlio -DDEBUGGING
+  +----- PERLIO = stdio    +----- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18346 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC66E19CC for merijn@procura.nl; Wed, 25 Dec 2002 06:09:24 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA04301 for merijn@procura.nl; Tue, 24 Dec 2002 22:30:06 +0100 (MET)
+Date: Tue, 24 Dec 2002 22:30:06 +0100 (MET)
+Message-Id: <200212242130.WAA04301@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18346 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18346                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18346    18346    18346    18346    18346    18346   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O   
+O O O O  O O O O                    O O O O  O O O O  -Duse64bitint
+O O O O  O O O O                                      -Duse64bitall
+O O O O  O O O O  O O O O  O O O O  O O O O  O O O O  -Duselongdouble
+O O O O  O O O O                    O O O O           -Dusemorebits
+O O O O  O O O O                                      -Duse64bitall -Duselongdouble
+m m m m  m m m m  m m m m  m m m m  m m m m  m m m m  -Dusethreads -Duseithreads
+m m m m  m m m m                    m m m m  m m m m  -Duse64bitint -Dusethreads -Duseithreads
+m m m m  m m m m                                      -Duse64bitall -Dusethreads -Duseithreads
+m m m m  m m m m  m m m m  m m m m  m m m m  m m m m  -Duselongdouble -Dusethreads -Duseithreads
+m m m m  m m m m                    m m m m           -Dusemorebits -Dusethreads -Duseithreads
+m m m m  m m m m                                      -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+| |                            | |
+| +----- PERLIO = perlio       | +- PERLIO = perlio -DDEBUGGING
++------- PERLIO = stdio        +--- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18346 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1.procura.nl [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC66E19CF for merijn@procura.nl; Wed, 25 Dec 2002 06:09:24 +0100
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_24419)/8.9.3) id WAA04308 for merijn@procura.nl; Tue, 24 Dec 2002 22:30:07 +0100 (MET)
+Date: Tue, 24 Dec 2002 22:30:07 +0100 (MET)
+Message-Id: <200212242130.WAA04308@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18346 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18346                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.3   32-bit
+O = OK                                                |                            3.3   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.6   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.17              3.2-3
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX   
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3  
+  HPc      gcc      HPc      gcc      vac      gcc   
+ 18346    18346    18346    18346    18346    18346   Configuration
+-------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+100 102  90  90 | 71  71  72  71 | 59  60  53  52 | 51  51  47  49 | 50  50  43  43 | 44  46  41  41 | 
+ 83  85  76  75 | 73  74  74  73 |                |                | 48  48  42  42 | 46  46  40  40 |-Duse64bitint
+ 85  84  76  73 |                |                |                |                |                |-Duse64bitall
+                |                |                |                | 49  49  42  42 | 46  46  41  40 |-Duselongdouble
+                |                |                |                | 45  46  41  41 |                |-Dusemorebits
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble
+                |                |                |                |                |                |-Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitint -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitall -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duselongdouble -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Dusemorebits -Dusethreads -Duseithreads
+                |                |                |                |                |                |-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+  |   |                    |   |
+  |   +- PERLIO = perlio   |   +- PERLIO = perlio -DDEBUGGING
+  +----- PERLIO = stdio    +----- PERLIO = stdio  -DDEBUGGING
+--------_3E11AA553993028F4030_MULTIPART_MIXED_--
+
+

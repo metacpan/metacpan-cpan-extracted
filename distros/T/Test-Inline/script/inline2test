@@ -1,0 +1,169 @@
+#!/usr/bin/perl
+
+=pod
+
+=head1 NAME
+
+inline2test - The Test::Inline 2 Test Compiler
+
+=head1 SYNOPIS
+
+  > inline2test ./inline2test.conf
+  
+  # In your inline2test.conf
+  input=lib
+  output=t
+  execute=0
+  verbose=1
+  readonly=1
+  header=inline2text.txt
+
+=head1 DESCRIPTION
+
+C<inline2test> is the L<Test::Inline> 2 test compiler.
+
+It's job is to scan through an arbitrary tree of Perl source code files,
+locate inline test sections, extract them, convert them to test scripts,
+and write them to an output path.
+
+=cut
+
+use strict;
+use File::Spec::Functions  ':ALL';
+use Getopt::Long           ();
+use Config::Tiny           ();
+use Test::Inline           ();
+use File::Slurp            ();
+use Test::Inline::IO::File ();
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '2.213';
+}
+
+# Predeclare things
+sub stop ($);
+
+
+
+
+
+#####################################################################
+# Process Options, Input and Config
+
+my $execute  = '';
+my $changed  = '';
+my $verbose  = '';
+my $readonly = '';
+my $rv = Getopt::Long::GetOptions(
+	execute  => \$execute,
+	changed  => \$changed,
+	verbose  => \$verbose,
+	readonly => \$readonly,
+	);
+exit(0) unless $rv;
+
+# Get the config file
+my $config    = shift @ARGV;
+my $configdir = 1;
+unless ( $config ) {
+	# Use a default inline2test.conf in the current directory if it exists
+	my $default = catfile( curdir(), 'inline2test.conf' );
+	if ( -f $default ) {
+		$config = curdir();
+	} else {
+		stop("You did not provide an config file name");
+	}
+}
+if ( -d $config ) {
+	# They point to a directory, not a file
+	$configdir = $config;
+	my $file = catfile( $config, 'inline2test.conf' );
+	if ( -f $file ) {
+		$config = $file;
+	} else {
+		stop("The directory $config does not contain an inline2test.conf file");
+	}
+}
+my $Config = Config::Tiny->read($config) or stop("Failed to load config file");
+my %args = %{$Config->{_}}               or stop("No config entries found");
+
+# Add any forced options
+$args{execute}  = 1 if $execute;
+$args{changed}  = 1 if $changed;
+$args{verbose}  = 1 if $verbose;
+$args{readonly} = 1 if $readonly;
+
+# Automatically use an inline2test.tpl file if it exists
+if ( $configdir and ! $args{template} ) {
+	my $file = catfile( $configdir, 'inline2test.tpl' );
+	$args{template} = $file if -f $file;
+}
+
+# Create ContentHandler if needed
+if ( $args{template} ) {
+	# Convert to a proper contenthandler
+	my $template = delete $args{template};
+	$args{ContentHandler} = Test::Inline::Content::Simple->new( $template )
+		or stop("Failed to create ContentHandler for $template");
+}
+
+# Create InputHandler
+if ( $args{input} ) {
+	# Convert to a proper inputhandler
+	my $input = delete $args{input};
+	$args{InputHandler} = Test::Inline::IO::File->new( $input )
+		or stop("Failed to create InputHandle for $input");
+}
+
+# We need an output
+unless ( $args{output} ) {
+	stop "No output path specified";
+}
+
+
+
+
+
+#####################################################################
+# Generate the Test Scripts
+
+my $Inline = Test::Inline->new( %args )
+	or stop "Error creating Test::Inline object";
+defined $Inline->add_all or stop "Error during ->add_all()";
+defined $Inline->save    or stop "Error while saving scripts";
+
+exit(0) unless $args{execute};
+
+
+
+
+
+#####################################################################
+# Execute Scripts
+
+my $schedule = $Inline->schedule;
+unless ( defined $schedule ) {
+	stop "Error getting schedule to execute scripts";
+}
+unless ( $schedule ) {
+	stop "Nothing to execute";
+}
+
+eval "use ExtUtils::Command::MM;";
+die $@ if $@;
+
+@ARGV = map { catfile($args{output}, $_) } @$schedule;
+test_harness(0);
+
+
+
+
+
+#####################################################################
+# Support Functions
+
+sub stop ($) {
+	print "$_[0]\n";
+	exit(1);
+}

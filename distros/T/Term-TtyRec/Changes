@@ -1,0 +1,13 @@
+Revision history for Perl extension Term::TtyRec.
+
+0.03  Thu Oct 18 04:32:40 JST 2001
+	- Fixed bug of Term::TtyRec::Player syntax error
+	- untie STDOUT in t/*.t
+
+0.02  Sat Sep 29 16:27:32 JST 2001
+	- improved document
+	- onto CPAN
+
+0.01  Thu Sep 27 00:18:11 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,59 @@
+41  2010
+De Rudder, Anne
+Rutherford Appleton Laboratory, Chilton OX11 0QX, UK - Tel.: +44 (0) 1235 445837
+Anemometer measurements averaged over longitude
+NERC Data Grid (NDG) project
+6  13
+1969 01 01  2002 10 31
+0  10
+9
+9
+0 10 20 40 50 60 70 80 90
+Latitude (degrees North)
+Altitude (km)
+1
+1
+200
+Mean zonal wind (m/s)
+1
+1
+2000
+Pressure (hPa)
+7
+Example of FFI 2010 (a).
+This example illustrating NASA Ames file format index 2010 is based on results
+from Murgatroyd (1969) as displayed in Brasseur and Solomon, Aeronomy of the
+Middle Atmosphere, Reidel, 1984 (p.36). It is representative of the mean zonal
+wind distribution in the winter hemisphere. The first date on line 7 (1st of
+January 1969) is fictitious. Note that the latitude grid is irregular in this
+example, which is reflected by the fact that DX1 = 0 (see line 8).
+11
+The files included in this data set illustrate each of the 9 NASA Ames file
+format indices (FFI). A detailed description of the NASA Ames format can be
+found on the Web site of the British Atmospheric Data Centre (BADC) at
+http://www.badc.rl.ac.uk/help/formats/NASA-Ames/
+E-mail contact: badc@rl.ac.uk
+Reference: S. E. Gaines and R. S. Hipskind, Format Specification for Data
+Exchange, Version 1.3, 1998. This work can be found at
+http://cloud1.arc.nasa.gov/solve/archiv/archive.tutorial.html
+and a copy of it at
+http://www.badc.rl.ac.uk/help/formats/NASA-Ames/G-and-H-June-1998.html
+
+        0   1013.3
+     -3.0     -2.6     -2.3      2.0      4.6      4.5      3.0     -0.9    200.0
+       10   265.00
+     -1.0      5.5     21.7     31.5     21.6     14.9      7.5      3.0    200.0
+       20    55.30
+    -15.1     -4.2      6.9     12.8     20.0     21.5     18.0      8.2    200.0
+       30    12.00
+    -29.1     20.0     -9.3     -6.8     22.0     22.7     18.2     12.0    200.0
+       40     2.30
+    -29.0    -15.2      3.4     28.2     39.1     17.9      8.0      0.1    200.0
+       50     0.80
+    -21.9     -4.0     19.9     40.8     50.1     25.0      8.1      0.0    200.0
+       60     0.22
+    -10.0      8.4     31.2     59.9     77.7     47.0     17.6     16.0    200.0
+       70     0.05
+      1.2     17.6     39.9     63.3     74.1     61.2     35.0     15.3    200.0
+       80     0.01
+    200.0    200.0    200.0    200.0    200.0    200.0    200.0    200.0    200.0

@@ -1,0 +1,30 @@
+
+  Time::Stopwatch -- version 0.03
+
+The Time::Stopwatch module provides a convenient interface to timing
+functions through tied scalars.  From the point of view of the user,
+scalars tied to the module simply increase their value by one every
+second.
+
+Installing the Time::HiRes module lets Time::Stopwatch timers provide
+sub-second accuracy.  This feature will be automatically enabled if
+Time::HiRes is present.
+
+To install, just do:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If Time::HiRes is not installed, some tests will be skipped.
+
+Alternatively you may simply put Stopwatch.pm in a subdirectory Time
+wherever you like to keep your perl modules.
+
+Copyright (c) 2000-2001 Ilmari Karonen.  All rights reserved.  This
+library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Address bug reports and comments to: perl@itz.pp.sci.fi
+

@@ -1,0 +1,16 @@
+strict digraph Perl {
+	graph [compound=1, concentrate=1, overlap=false, rankdir=LR, ranksep=1, smoothing=triangle, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	"Class::Tiny::Object" [label="Class::Tiny::Object"];
+	"Test::File::ShareDir" [label="Test::File::ShareDir"];
+	"Test::File::ShareDir::Dist" [label="Test::File::ShareDir::Dist"];
+	"Test::File::ShareDir::Module" [label="Test::File::ShareDir::Module"];
+	"Test::File::ShareDir::Object::Dist" [label="Test::File::ShareDir::Object::Dist", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Test::File::ShareDir::Object::Inc" [label="Test::File::ShareDir::Object::Inc", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Test::File::ShareDir::Object::Module" [label="Test::File::ShareDir::Object::Module", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Test::File::ShareDir::TempDirObject" [label="Test::File::ShareDir::TempDirObject", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Class::Tiny::Object" -> "Test::File::ShareDir::Object::Dist" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Class::Tiny::Object" -> "Test::File::ShareDir::Object::Inc" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Class::Tiny::Object" -> "Test::File::ShareDir::Object::Module" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+}

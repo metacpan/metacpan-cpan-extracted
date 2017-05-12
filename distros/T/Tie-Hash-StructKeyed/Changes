@@ -1,0 +1,6 @@
+
+    2008-07-06
+    0.04 fix to test, sorting output of keys (as this is not guaranteed)
+
+    2006
+    0.03 initial release to CPAN

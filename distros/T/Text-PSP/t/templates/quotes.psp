@@ -1,0 +1,4 @@
+Text with some 'quotes' and \backslashes\
+<%= "Expression returning some 'quotes' and \\blackslashes\\" %>
+<%| "Parsetime code returning some 'quotes' and \\blackslashes\\" %>
+

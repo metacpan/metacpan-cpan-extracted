@@ -1,0 +1,7 @@
+Task-Latemp
+
+This is a Task:: module for installing all the plugins of Test::Run:
+
+    * http://web-cpan.shlomifish.org/modules/Test-Run/
+
+    * https://metacpan.org/pod/Test::Run

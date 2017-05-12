@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 46c5a099bc08b73901be87fe86d583fd783422f8 Build.PL
+SHA1 1466d75503d99662925643fe3e6adb9ddb4f921f Changes
+SHA1 1cc08186ad294893bf8e2e95c7229df17e2cf00a MANIFEST
+SHA1 6c6e6a570079e7e497c74de43c73d33f40e415f9 META.yml
+SHA1 a8860e9e1725e6235f051f18c93923eb80f98454 Makefile.PL
+SHA1 6520c571f9651fc76702011aea0eac541e32de2e README
+SHA1 ca14d9c8367765e0ad4f411413f0d35bbdb6b164 lib/Template/Plugin/ASCIITable.pm
+SHA1 746f2c0dbc80718b91ecac6c2183e41d6b6ba5d5 t/01use.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iD8DBQFGyrJMQOqYg3UZP4gRAuk4AJ98w4ABOxKistoUC7VABVD7vJeSQwCfexT9
+r3Aqvi9cbv6+q4SojXySlb8=
+=ALii
+-----END PGP SIGNATURE-----

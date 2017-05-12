@@ -1,0 +1,5 @@
+.*.sw?
+blib
+_build
+Build
+Makefile

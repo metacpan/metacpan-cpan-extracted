@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      EtText: Documentation: Text::EtText::EtText2HTML
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      // OL,UL,P,BODY,TD,TR,TH,FORM {
+       // font-family: verdana,lucida,helvetica,sans-serif;
+       // font-size: medium;
+       // color: #000000;
+      }
+      code, samp, pre
+      {
+       font-family: monospace;
+      }
+      H1 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/EtTextTitle.png" width="489" height="113" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://ettext.taint.org/">EtText</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="DefaultGlossary.pm.html">Back</a> | <a href="HTML2EtText.pm.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h2>Text::EtText::EtText2HTML</h2><!-- INDEX BEGIN -->
+                        <ul>
+                          <li>
+                            <a href="#NAME">NAME</a><li>
+                              <a href="#SYNOPSIS">SYNOPSIS</a><li>
+                                <a href="#DESCRIPTION">DESCRIPTION</a><li>
+                                  <a href="#METHODS">METHODS</a><li>
+                                    <a href="#MORE_DOCUMENTATION">MORE DOCUMENTATION</a><li>
+                                      <a href="#SEE_ALSO">SEE ALSO</a><li>
+                                        <a href="#AUTHOR">AUTHOR</a><li>
+                                          <a href="#COPYRIGHT">COPYRIGHT</a><li>
+                                            <a href="#AVAILABILITY">AVAILABILITY</a>
+                                          </ul>
+<!-- INDEX END -->
+                                                                                    <hr />
+                                           <h1><a name="NAME">NAME</a></h1><p>
+                                            
+                                            Text::EtText::EtText2HTML - convert from the simple EtText editable-text
+                                            format into HTML
+                                            <hr />
+                                             <h1><a name="SYNOPSIS">SYNOPSIS</a></h1><p>
+                                              <pre>  my $t = new Text::EtText::EtText2HTML;
+  print $t-&gt;text2html ($text);
+</pre><p>
+                                                
+                                                or
+                                                <p>
+                                                  <pre>  my $t = new Text::EtText::EtText2HTML;
+  print $t-&gt;text2html ();               # from STDIN
+</pre><hr />
+                                                   <h1><a name="DESCRIPTION">DESCRIPTION</a></h1><p>
+                                                    
+                                                    ettext2html will convert a text file in the EtText editable-text format
+                                                    into HTML.
+                                                    <p>
+                                                      
+                                                      For more information on the EtText format, check the WebMake documentation
+                                                      on the web at <a href="http://webmake.taint.org/">http://webmake.taint.org/</a> .
+                                                      <hr />
+                                                       <h1><a name="METHODS">METHODS</a></h1><dl>
+                                                        <dt>
+                                                          <strong><a name="item__f">$f = new Text::EtText::EtText2HTML</a></strong>
+                                                        </dt>
+                                                        <dd>
+                                                          <p>
+                                                            
+                                                            Constructs a new <code>Text::EtText::EtText2HTML</code> object.
+                                                            
+                                                          </dd>
+                                                          <dt>
+                                                            <strong><a name="item__f_set_option">$f-&gt;set_option ($optname, $optval);</a></strong>
+                                                          </dt>
+                                                          <dd>
+                                                            <p>
+                                                              
+                                                              Set an EtText option. (Options can also be set on the WebMake object
+                                                              itself, or from inside the WebMake file.) Currently supported options are:
+                                                              <dl>
+                                                                
+                                                              </dd>
+                                                              <dt>
+                                                                <strong><a name="item_EtTextOneCharMarkup">EtTextOneCharMarkup (default: 0)</a></strong>
+                                                              </dt>
+                                                              <dd>
+                                                                <p>
+                                                                  
+                                                                  Allow one-character sets of asterisks etc. to mark up as strong, emphasis
+                                                                  etc., instead of the default two-character markup.
+                                                                  
+                                                                </dd>
+                                                                <dt>
+                                                                  <strong><a name="item_EtTextOldLinkStyle">EtTextOldLinkStyle (default: 1)</a></strong>
+                                                                </dt>
+                                                                <dd>
+                                                                  <p>
+                                                                    
+                                                                    Use the older EtText link-markup style, with quote characters and single
+                                                                    square brackets. This is easy to type, but if you're using text from other
+                                                                    people, it can easily destroy formatting; so the new link-markup style,
+                                                                    with double square brackets, can be used instead.
+                                                                    
+                                                                  </dd>
+                                                                  <dt>
+                                                                    <strong><a name="item_EtTextBaseHref">EtTextBaseHref (default: '')</a></strong>
+                                                                  </dt>
+                                                                  <dd>
+                                                                    <p>
+                                                                      
+                                                                      The base HREF to use for relative links. If set, all relative links in tags
+                                                                      with HREF attributes will be rewritten as absolute links, making the output
+                                                                      HTML independent of the URL tree structure.
+                                                                      
+                                                                    </dd>
+                                                                    <dt>
+                                                                      <strong><a name="item_EtTextHrefsRelativeToTop">EtTextHrefsRelativeToTop (default: 0)</a></strong>
+                                                                    </dt>
+                                                                    <dd>
+                                                                      <p>
+                                                                        
+                                                                        Indicates that all EtText links are relative to the top of the WebMake
+                                                                        document tree. This (obviously) is only relevant if you are using EtText in
+                                                                        conjunction with WebMake, and WebMake sets it by default. If set, all
+                                                                        relative links in tags with HREF attributes will be rewritten as relative
+                                                                        to the ''top'' of the WebMake site, making the output HTML independent of
+                                                                        the URL tree structure.
+                                                                        
+                                                                      </dd>
+                                                                    </dl>
+                                                                  </dd>
+                                                                  <dt>
+                                                                    <strong><a name="item__html">$html = $f-&gt;set_glossary ($glosobj)</a></strong>
+                                                                  </dt>
+                                                                  <dd>
+                                                                    <p>
+                                                                      
+                                                                      Provide a glossary for shared link definitions, allowing link definitions
+                                                                      to be shared and reused across multiple EtText files. <code>$glosobj</code> must implement the interface defined by <code>Text::EtText::LinkGlossary</code>.
+                                                                      <p>
+                                                                        
+                                                                        See below for more information on this interface.
+                                                                        
+                                                                      </dd>
+                                                                      <dt>
+                                                                        <strong>$html = $f-&gt;text2html( [$text] )</strong>
+                                                                      </dt>
+                                                                      <dd>
+                                                                        <p>
+                                                                          
+                                                                          Convert text, either from the argument or from STDIN, into HTML.
+                                                                          
+                                                                        </dd>
+                                                                      </dl>
+                                                                      <hr />
+                                                                       <h1><a name="MORE_DOCUMENTATION">MORE DOCUMENTATION</a></h1><p>
+                                                                        
+                                                                        See also <a href="http://webmake.taint.org/">http://webmake.taint.org/</a>
+                                                                        for more information.
+                                                                        <hr />
+                                                                         <h1><a name="SEE_ALSO">SEE ALSO</a></h1><p>
+                                                                           <code>webmake</code> <code>ettext2html</code> <code>ethtml2text</code> <code>HTML::WebMake</code> <code>Text::EtText::EtText2HTML</code> <code>Text::EtText::HTML2EtText</code> <code>Text::EtText::LinkGlossary</code> <code>Text::EtText::DefaultGlossary</code><hr />
+                                                                           <h1><a name="AUTHOR">AUTHOR</a></h1><p>
+                                                                            
+                                                                            Justin Mason &lt;jm /at/ jmason.org&gt;
+                                                                            <hr />
+                                                                             <h1><a name="COPYRIGHT">COPYRIGHT</a></h1><p>
+                                                                              
+                                                                              WebMake is distributed under the terms of the GNU Public License.
+                                                                              <hr />
+                                                                               <h1><a name="AVAILABILITY">AVAILABILITY</a></h1><p>
+                                                                                
+                                                                                The latest version of this library is likely to be available from CPAN as
+                                                                                well as:
+                                                                                <p>
+                                                                                  <pre>  <a href="http://webmake.taint.org/">http://webmake.taint.org/</a>
+</pre>
+                                                                                </td>
+                                                                              </tr>
+                                                                            </table>
+                                                                          </td>
+                                                                        </tr>
+                                                                      </table>
+                                                                    </td>
+                                                                  </tr>
+                                                                </table>
+                                                                <table width="100%">
+                                                                  <tr>
+                                                                    <td valign="top">
+                                                                       <strong><a href="http://ettext.taint.org/">EtText</a>
+                                                                       Documentation</strong> (version 2.2)
+                                                                       
+                                                                    </td>
+                                                                    <td valign="top">
+                                                                      <div align="right">
+                                                                        
+                                                                         [ <a href="DefaultGlossary.pm.html">Back</a> | <a href="HTML2EtText.pm.html">Forward</a> | <a href="index.html">Index</a>
+                                                                         | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+                                                                         
+                                                                      </div>
+                                                                    </td>
+                                                                  </tr>
+                                                                </table>
+                                                                <div align="right">
+                                                                   <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" border="0" width="88" height="31" /></a>
+                                                                </div>
+                                                              </font>
+                                                            </body>
+                                                          </html>

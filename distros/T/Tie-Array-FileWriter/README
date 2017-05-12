@@ -1,0 +1,38 @@
+Tie/Array/FileWriter version 0.1
+================================
+
+Tie::Array::FileWriter is a Perl module for writing records to files as array reference records are
+pushed onto a virtual array. This can be handy if you have existing code that expects to push data
+onto an array, but you'd rather redirect that output to a file. For example, you may have existing
+database access code that behaves in this way, but you want to redirect the output of a large
+query directly to a file instead of having to store it all in memory in an array first. Using
+Tie::Array::FileWriter, you can accomplish this without modifying the existing database access
+code. You just have to arrange to have it push its records onto an appropriately tied array.
+
+Tie::Array::FileWriter arrays ignore anything pushed onto them that is not an array reference.
+Elements of array references are joined by the delimiter and written to the output file.
+
+Any other action on the tied array besides push will result in an error.
+
+The default delimiter is the vertical bar ('|', also known as 'pipe').
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT
+
+Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+
+
+LICENSE
+
+This program is free software. It is subject to the same license as Perl itself.
+

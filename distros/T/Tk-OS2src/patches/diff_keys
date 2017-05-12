@@ -1,0 +1,172 @@
+This patch is already applied to files in Tk-OS2 distribution!
+
+
+--- tkOS2X.c.prekey	Tue Dec 23 15:29:28 1997
++++ tkOS2X.c	Sat Feb  7 15:05:42 1998
+@@ -706,6 +706,30 @@ TkOS2ChildProc(hwnd, message, param1, pa
+ 	    TranslateEvent(hwnd, message, param1, param2);
+ 	    /* Do not pass on to PM */
+ 	    return 0;
++        case WM_TRANSLATEACCEL:
++        {
++	    PQMSG pqmsg = PVOIDFROMMP (param1);
++	    USHORT flags = (USHORT)SHORT1FROMMP (pqmsg->mp1);
++	    USHORT charcode = (USHORT)SHORT1FROMMP (pqmsg->mp2);
++	    USHORT vkeycode = (USHORT)SHORT2FROMMP (pqmsg->mp2);
++#ifdef DEBUG
++	    printf("WM_TRANSLATEACCEL: flags=%#x char=%#x vk=%#x\n",
++		   flags, charcode, vkeycode);
++#endif 
++	    if (flags & KC_VIRTUALKEY)
++		switch (vkeycode) {
++		case VK_F1:
++		case VK_F10:
++		case VK_SPACE:
++		    /* Do not consider as a shortcut: */
++		    return 0;
++		}
++	    else if (charcode == ' ') {	/* Alt-Space */
++		    /* Do not consider as a shortcut: */
++		    return 0;
++	    }	    
++	    break;
++	}
+     }
+ 
+     return WinDefWindowProc(hwnd, message, param1, param2);
+@@ -994,9 +1018,18 @@ TranslateEvent(hwnd, message, param1, pa
+ 		    if ( flags & KC_KEYUP ) {
+ 		    	/* Key Up */
+ #ifdef DEBUG
+-                        printf("KeyUp\n");
++                        printf("KeyUp charcode %#x\n", charcode);
+ #endif
+ 		    	event.type = KeyRelease;
++			/* KeyRelease for alphanums gets ORed with 0x*00.  */
++			if ( ! (flags & KC_VIRTUALKEY) ) {
++			    charcode = charcode & 0xFF;
++			    if (charcode && charcode <= 0x1f 
++				&& flags & KC_CTRL)
++				charcode += ((flags & KC_SHIFT) 
++					     ? 'A' - 1
++					     : 'a' - 1);
++			}
+ 		    } else {
+ 		    	/* Key Down */
+ #ifdef DEBUG
+@@ -1005,13 +1038,17 @@ TranslateEvent(hwnd, message, param1, pa
+ 		    	event.type = KeyPress;
+ 		    }
+ 		    if ( flags & KC_VIRTUALKEY ) {
++			if ( flags & KC_SHIFT && vkeycode == VK_BACKTAB )
++			    vkeycode = VK_TAB;
+ 		    	/* vkeycode is valid, should be given precedence */
+ 		    	event.xkey.keycode = vkeycode;
+ #ifdef DEBUG
+                         printf("virtual keycode %x\n", vkeycode);
+ #endif
++				
+ 		    } else {
+-		    	event.xkey.keycode = 0;
++			 /* Move to VK_USER range */
++		    	event.xkey.keycode = (charcode & 0xff) + 0x100;
+ 		    }
+ 		    if ( flags & KC_CHAR ) {
+ 		    	/* charcode is valid */
+@@ -1031,12 +1068,11 @@ TranslateEvent(hwnd, message, param1, pa
+                         printf("no KC_CHAR\n");
+ #endif
+ 		    	if ( (flags & KC_ALT || flags & KC_CTRL)
+-		    	     && charcode != 0) {
++		    	     && charcode != 0 && !(flags & KC_VIRTUALKEY)) {
+ #ifdef DEBUG
+                             printf("KC_ALT/KC_CTRL and non-0 char %c (%x)\n",
+                                    charcode, charcode);
+ #endif
+-		    	    event.xkey.keycode = charcode;
+ 		    	}
+ 		    	event.xkey.nchars = 0;
+ 		   	event.xkey.trans_chars[0] = 0;
+@@ -1165,13 +1201,13 @@ TkOS2GetModifierState(message, flags, pa
+     }
+     /* Do NOT handle ALTGRAF specially, since that will ignore its char */
+     if (isKeyEvent && (vkeycode == VK_ALT)) {
+-	state |= prevState ? (AnyModifier << 2) : 0;
++	state |= prevState ? Mod4Mask : 0;
+     } else {
+ 	/*
+ 	state |= (WinGetKeyState(HWND_DESKTOP, VK_ALT) & 0x8000)
+ 	*/
+ 	state |= (flags & KC_ALT)
+-	         ? (AnyModifier << 2) : 0;
++	         ? Mod4Mask : 0;
+     }
+     if (isKeyEvent && (vkeycode == VK_MENU)) {
+ 	state |= prevState ? Mod2Mask : 0;
+@@ -1182,7 +1218,7 @@ TkOS2GetModifierState(message, flags, pa
+ #ifdef DEBUG
+     if (state & ShiftMask) printf("ShiftMask\n");
+     if (state & ControlMask) printf("ControlMask\n");
+-    if (state & (AnyModifier << 2)) printf("AltMask\n");
++    if (state & Mod4Mask) printf("AltMask\n");
+ #endif
+ 
+     /*
+--- tkOS2Key.c.prekey	Sun Oct 26 16:05:34 1997
++++ tkOS2Key.c	Sat Feb  7 03:07:18 1998
+@@ -156,24 +156,16 @@ XKeycodeToKeysym(display, keycode, index
+     int index;
+ {
+     Keys* key;
+-    BYTE keys[256];
+-    int result;
+-
+-    memset(keys, 0, 256);
+-    if (index & 0x02) {
+-	keys[VK_NUMLOCK] = 1;
+-    }
+-    if (index & 0x01) {
+-	keys[VK_SHIFT] = 0x80;
+-    }
+-    result = keycode > 32 && keycode < 255;
++    /* VK_USER range: */
++    int result = keycode > 0x120 && keycode < 0x200;
+ 
+     /*
+      * Keycode mapped to a valid Latin-1 character.  Since the keysyms
+      * for alphanumeric characters map onto Latin-1, we just return it.
+      */
+ 
+-    if (result == 1 && keycode >= 0x20) {
++    if (result) {
++	keycode -= 0x100;
+ #ifdef DEBUG
+         printf("XKeycodeToKeysym returning char %x (%c)\n", keycode, keycode);
+ #endif
+@@ -225,15 +217,8 @@ XKeysymToKeycode(display, keysym)
+     printf("XKeysymToKeycode\n");
+ #endif
+ 
+-    if (keysym >= 0x20) {
+-/*
+-	result = VkKeyScan(keysym);
+-*/
+-result= (SHORT)keysym;
+-	if (result != -1) {
+-	    return (KeyCode) (result & 0xff);
+-	}
+-    }
++    if (keysym >= 0x20 && keysym <= 0xff)
++	return (SHORT)(keysym + 0x100);
+ 
+     /*
+      * Couldn't map the character to a virtual keycode, so do a
+@@ -282,7 +267,7 @@ XGetModifierMapping(display)
+     map->modifiermap[Mod1MapIndex] = VK_NUMLOCK;
+     map->modifiermap[Mod2MapIndex] = VK_MENU;
+     map->modifiermap[Mod3MapIndex] = VK_SCRLLOCK;
+-    map->modifiermap[Mod4MapIndex] = 0;
++    map->modifiermap[Mod4MapIndex] = VK_ALT;
+     map->modifiermap[Mod5MapIndex] = 0;
+     return map;
+ }

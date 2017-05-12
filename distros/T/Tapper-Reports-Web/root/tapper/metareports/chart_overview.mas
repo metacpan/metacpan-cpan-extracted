@@ -1,0 +1,121 @@
+<%args>
+    $charts
+</%args>
+
+<form action="/tapper/metareports">
+    <input type="hidden" id="idx_chart_tag" value="<% $c->req->params->{chart_tag} || '' %>" />
+    <select name="chart_tag">
+        <option value="0">all</option>
+        <& /tapper/metareports/chart_tags.mas, chart_tag => $c->req->params->{chart_tag} &>
+    </select>
+    <input type="submit" />
+</form>
+
+%   if ( defined $c->req->params->{chart_tag} ) {
+%       if ( @{$charts} > 0 ) {
+%           for my $or_chart ( @{$charts} ) {
+%               my $or_chart_version = $or_chart->chart_versions->first;
+                <div class="chart_boxs" chart="<% $or_chart_version->chart_id() %>">
+                    <div class="chart_headers">
+                        <div class="text">
+                            <font class="title"><% $or_chart_version->chart_name() %></font>
+                        </div>
+                        <div class="icons">
+                            <img src="/tapper/static/images/json.png" title="json" class="imgjson" />
+                            <img src="/tapper/static/images/edit.small.png" title="edit" class="imgedit" />
+                            <img src="/tapper/static/images/clone.small.png" title="edit as new" class="imgeditasnew" />
+                            <img src="/tapper/static/images/delete.small.png" title="delete" class="imgdel" />
+                        </div>
+                    </div>
+                    <a href="/tapper/metareports/detail?chart_tag=<% $c->req->params->{chart_tag} || 0 %>&amp;chart_id=<% $or_chart_version->chart_id() %>">
+                    <div class="charts" id="mainchart_<% $or_chart_version->chart_id() %>">
+%                       my @a_template_value;
+%                       for my $or_chart_line ( $or_chart_version->chart_lines ) {
+%                           if ( $or_chart_line->chart_line_restrictions ) {
+%                               for my $or_restriction ( $or_chart_line->chart_line_restrictions ) {
+%                                   if ( $or_restriction->is_template_restriction ) {
+%                                       push @a_template_value, ($or_restriction->chart_line_restriction_values)[0]->chart_line_restriction_value;
+%                                   }
+%                               }
+%                           }
+%                       }
+%                       if ( @a_template_value ) {
+                            <div class="font">
+%                               for my $s_template_value ( @a_template_value ) {
+                                    <% $s_template_value %>: <input type="name" class="template_values" name="<% $s_template_value %>" /><br />
+%                               }
+                                <input type="button" class="template_call" value="Load Chart" />
+                            </div>
+%                       }
+%                       else {
+                            <img class="loaderimage" src="/tapper/static/images_red/loader.gif" />
+%                       }
+                    </div>
+                    </a>
+                </div>
+%           }
+%       }
+
+        <div class="chart_boxs">
+            <div class="chart_headers">
+                <div class="text">add new chart</div>
+            </div>
+            <div class="charts">
+                <img class="newimage" src="/tapper/static/images_red/plus_big.png" />
+            </div>
+        </div>
+%   }
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+
+        $("div.charts")
+            .filter(function(){
+                return $(this).find("img.newimage").length > 0
+            })
+                .click(function(){
+                    location.href = '/tapper/metareports/edit_chart?chart_tag='+$('#idx_chart_tag');
+                })
+                .end()
+            .filter(function(){
+                return $(this).find("img.loaderimage").length > 0
+            })
+                .each(function(){
+                    get_chart_points( $(this), {detail : false} );
+                })
+        ;
+
+        $('input.template_call').click(function(){
+
+            var errors       = 0;
+            var location_url = '/tapper/metareports/detail?'
+                +     'chart_tag=' + $('#idx_chart_tag').val()
+                + "&amp;chart_id=" + $(this).closest('.chart_boxs').attr('chart')
+            ;
+
+            $(this).parent().find('input.template_values').each(function(){
+                if ( (/^\s*$/).test( $(this).val() ) ) {
+                    $(this).addClass('missing_value');
+                    alert('Missing value "'+$(this).attr('name')+'"');
+                    errors = errors + 1;
+                }
+                else {
+                    $(this).removeClass('missing_value');
+                    location_url = location_url + '&amp;' + $(this).attr('name') + '=' + $(this).val();
+                }
+            });
+
+            if ( errors == 0 ) {
+                location.href = location_url;
+            }
+
+        });
+
+    });
+
+</script>
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

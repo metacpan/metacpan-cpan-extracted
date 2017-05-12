@@ -1,0 +1,171 @@
+This is an older variant of patch to Tk distribution.  It is included into
+the newer distribution.
+
+diff -pu ./pTk/mTk/generic/default.h H:\get\illya.vaes.beta5\os2/default.h
+--- ./pTk/mTk/generic/default.h	Fri Feb  9 08:14:30 1996
++++ illya.vaes.beta5/os2/default.h	Thu Sep 11 22:38:44 1997
+@@ -22,7 +23,11 @@
+ #   if defined(MAC_TCL)
+ #	include "tkMacDefault.h"
+ #   else
+-#	include "tkUnixDefault.h"
++#      ifdef __PM__
++#         include "tkOS2Default.h"
++#      else
++#         include "tkUnixDefault.h"
++#      endif
+ #   endif
+ #endif
+ 
+diff -pu ./pTk/mTk/generic/tkCanvPs.c H:\get\illya.vaes.beta5\os2/tkCanvPs.c
+--- ./pTk/mTk/generic/tkCanvPs.c	Fri Apr 12 09:15:48 1996
++++ illya.vaes.beta5/os2/tkCanvPs.c	Wed Sep 10 21:43:00 1997
+@@ -150,7 +150,7 @@ TkCanvPostscriptCmd(canvasPtr, interp, a
+ #define STRING_LENGTH 400
+     char string[STRING_LENGTH+1], *p;
+     time_t now;
+-#if !(defined(__WIN32__) || defined(MAC_TCL))
++#if !(defined(__WIN32__) || defined(MAC_TCL) || defined(__EMX__))
+     struct passwd *pwPtr;
+ #endif /* __WIN32__ || MAC_TCL */
+     FILE *f;
+@@ -353,7 +353,7 @@ TkCanvPostscriptCmd(canvasPtr, interp, a
+ 
+     Tcl_AppendResult(canvasPtr->interp, "%!PS-Adobe-3.0 EPSF-3.0\n",
+ 	    "%%Creator: Tk Canvas Widget\n", (char *) NULL);
+-#if !(1 || defined(__WIN32__) || defined(MAC_TCL))
++#if !(1 || defined(__WIN32__) || defined(MAC_TCL) || defined(__EMX__))
+     pwPtr = getpwuid(getuid());
+     Tcl_AppendResult(canvasPtr->interp, "%%For: ",
+ 	    (pwPtr != NULL) ? pwPtr->pw_gecos : "Unknown", "\n",
+diff -pu ./pTk/mTk/generic/tkSend.c H:\get\illya.vaes.beta5\os2/tkSend.c
+--- ./pTk/mTk/generic/tkSend.c	Mon Apr  8 12:26:28 1996
++++ illya.vaes.beta5/os2/tkSend.c	Wed Sep 10 21:42:20 1997
+@@ -734,7 +734,7 @@ Tk_SetAppName(tkwin, name)
+     Tcl_DString dString;
+     int offset, i;
+ 
+-#ifdef __WIN32__
++#if (defined(__WIN32__) || defined(__PM__))
+     return name;
+ #endif /* __WIN32__ */
+ 
+diff -pu ./pTk/mTk/generic/tkWindow.c H:\get\illya.vaes.beta5\os2/tkWindow.c
+--- ./pTk/mTk/generic/tkWindow.c	Mon Apr  8 12:26:34 1996
++++ illya.vaes.beta5/os2/tkWindow.c	Thu Sep 11 18:23:28 1997
+@@ -1075,7 +1075,7 @@ Tk_DestroyWindow(tkwin)
+ 	TkWmRemoveFromColormapWindows(winPtr);
+     }
+     if (winPtr->window != None) {
+-#if defined(MAC_TCL) || defined(__WIN32__)
++#if defined(MAC_TCL) || defined(__WIN32__) || defined(__PM__)
+ 	XDestroyWindow(winPtr->display, winPtr->window);
+ #else
+ 	if ((winPtr->flags & TK_TOP_LEVEL)
+--- Tk402.003/Makefile.PL	Sat Aug  2 07:41:02 1997
++++ Tk402.003.prev/Makefile.PL	Sun Nov 30 01:26:56 1997
+@@ -2,13 +2,63 @@ use Cwd;
+ use Config;
+ no  lib '.';
+ require 5.004;
++
++sub OS2_massage {		# Need to put before BEGIN
++  if (@ARGV) {
++    die <<EOD;
++
++Please start me as one of
++	perl $0 x
++	perl $0 open32
++	perl $0 pm
++EOD
++  }
++  if (not defined $win_arch) {
++      $win_arch = 'pm';
++      print STDERR <<EOP;
++
++No Window architecture specified, building for PM.
++
++Please start me as one of
++	perl $0 x
++	perl $0 open32
++	perl $0 pm
++if you want to specify architecture explicitely.
++
++EOP
++  }
++  if ($win_arch ne 'x' and not -r 'pTk/mTk/open32/tkWinOS2.c' ) {
++    my @zips = <../Tk-OS2-*/perltk_os2_common.zip>;
++    
++    die <<EOD unless @zips;
++
++Cannot find pTk/mTk/open32/tkWinOS2.c, did you read README.os2?
++
++EOD
++    system 'unzip', $zips[-1] and die "Unzip: $!";
++  }
++  if ($win_arch eq 'pm' and not -r 'pTk/mTk/os2/tkOS2Int.h') {
++    my @zips = <../Tk-OS2-*/perltk_os2_pm.zip>;
++    
++    die <<EOD unless @zips;
++
++Cannot find pTk/mTk/os2/tkOS2Int.h, did you read README.os2?
++
++EOD
++    system 'unzip', $zips[-1] and die "Unzip: $!";
++  }
++  $test_perl = 'perl__.exe' if $win_arch ne 'x';
++}
++
+ BEGIN 
+  {
+   $IsWin32   = $^O eq 'MSWin32';
+   $VERSION = '402.003';
+ 
+-  $win_arch = ($IsWin32) ? $^O : 'x';		# Currently 'x' and 'open32' supported
+-
++  $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
++  OS2_massage() if $^O eq 'os2';
++  $win_arch = ($IsWin32) ? $^O : 'x'
++    if not defined $win_arch; # Currently 'x', 'pm', 'open32', 'MSWin32'
+   require "./myConfig";
+   use lib ($Tk::MMutil::dir=getcwd);
+  }
+@@ -39,7 +89,7 @@ Tk::MMutil::TkExtMakefile(
+     'VERSION'  => $VERSION,
+     'NAME'     => 'Tk',
+     'DISTNAME' => "Tk",
+-    'MYEXTLIB' => 'pTk/libpTk$(LIB_EXT)' . ($win_arch eq 'open32'
++    'MYEXTLIB' => 'pTk/libpTk$(LIB_EXT)' . ($win_arch =~ /^(open32|pm)$/
+ 					    ? ' pTk/dllInit$(LIB_EXT)'
+ 					    : ''),
+     'LIBS'    => \@libs,
+--- ./pTk/mTk/tixWin/tixWinDraw.c~	Sat Aug  2 07:42:42 1997
++++ ./pTk/mTk/tixWin/tixWinDraw.c	Wed Feb  4 02:36:10 1998
+@@ -72,6 +72,7 @@ TixpDrawTmpLine(x1, y1, x2, y2, tkwin)
+  *----------------------------------------------------------------------
+  */
+ 
++#ifndef __PM__
+ void
+ TixpDrawAnchorLines(display, drawable, gc, x, y, w, h)
+     Display *display;
+@@ -82,9 +83,6 @@ TixpDrawAnchorLines(display, drawable, g
+     int w;
+     int h;
+ {
+-#ifdef __PM__
+-    panic("Not implemented: TixpDrawAnchorLines");
+-#else
+     HDC hdc;
+     TkWinDCState state;
+     HPEN hpen;
+@@ -104,8 +102,8 @@ TixpDrawAnchorLines(display, drawable, g
+     DeleteObject(hpen);
+ 
+     TkWinReleaseDrawableDC(drawable, hdc, &state);
+-#endif
+ }
++#endif
+ 
+ /*----------------------------------------------------------------------
+  * TixpStartSubRegionDraw --

@@ -1,0 +1,99 @@
+THE Test::Cmd MODULE
+
+The Test::Cmd module provides a framework for portable automated testing
+of executable commands and scripts (in any language, not just Perl),
+especially commands and scripts that interace with the file system.
+
+In addition to running tests and evaluating conditions, the Test::Cmd
+module manages and cleans up one or more temporary workspace directories,
+and provides methods for creating files and directories in those workspace
+directories from in-line data (that is, here-documents), allowing tests
+to be completely self-contained.
+
+The Test::Cmd module inherits File::Spec methods (file_name_is_absolute(),
+catfile(), etc.) to support writing tests portably across a variety of
+operating and file systems.
+
+The Test::Cmd module may be used with the Test module to report test
+results for use with the Test::Harness module.  Alternatively, the
+Test::Cmd module provides pass(), fail(), and no_result() methods that
+report test results for use with the Aegis change management system.
+It is not a good idea to intermix these two reporting models.
+
+
+
+INSTALLATION
+
+Installation is via the usual incantation:
+
+	# perl Makefile.PL
+	# make
+	# make test
+	# make install
+
+Let me know if you have any problems.
+
+
+
+RESOURCES
+
+A rudimentary page for the Test::Cmd module is available at:
+
+	http://www.baldmt.com/Test-Cmd/
+
+The most involved example of using the Test::Cmd package to test
+a real-world application is the "cons-test" testing suite for the
+Cons software construction utility.  The suite sub-classes Test::Cmd
+to provide common, application-specific infrastructure across a
+large number of end-to-end application tests.  The suite, and other
+information about Cons, is available at:
+
+	http://www.dsmit.com/cons
+
+
+
+TO DO
+
+The t/run.t test jumps through some complicated (but reasonably
+documented) hoops to generate an executable Perl script on Windows
+NT systems.  I have no doubt that someone with a better knowledge of NT
+than mine could do this more simply, and would love to hear of a better
+solution than what I came up with.
+
+Adding a timeout() method would provide better test automation for
+applications that run the risk of hanging.
+
+A feature to time tests would be good.
+
+
+
+COPYRIGHT
+
+Copyright 1999-2001 Steven Knight.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+
+
+ACKNOWLEDGEMENTS
+
+Thanks to Greg Spencer for the inspiration to create this package and
+the initial draft of its implementation as a specific testing package
+for the Cons software construction utility.  Information about Cons
+is available at:
+
+	http://www.dsmit.com/cons/
+
+The general idea of managing temporary working directories in this way,
+as well as the test reporting of the pass(), fail() and no_result()
+methods, come from the testing framework invented by Peter Miller for
+his Aegis project change supervisor.  Aegis is an excellent bit of work
+which integrates creation and execution of regression tests into the
+software development process.  Information about Aegis is available at:
+
+	http://aegis.sourceforge.net/
+
+
+AUTHOR
+
+Steven Knight, knight@baldmt.com

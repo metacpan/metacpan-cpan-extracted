@@ -1,0 +1,131 @@
+---
+abstract: 'modules I use'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-SONGMU
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Task::BeLike::SONGMU:
+    file: lib/Task/BeLike/SONGMU.pm
+    version: '20140805.000'
+requires:
+  AnyEvent: '0'
+  AnyEvent::HTTP: '0'
+  App::cpanminus: '0'
+  App::scan_prereqs_cpanfile: '0'
+  App::watcher: '0'
+  CPAN::Uploader: '0'
+  Cache::Memcached::Fast: '0'
+  Carton: '0'
+  Class::Accessor::Lite: '0'
+  Class::Accessor::Lite::Lazy: '0'
+  Class::Method::Modifiers: '0'
+  Clone: '0'
+  Config::PL: '0'
+  Config::Pit: '0'
+  Coro: '0'
+  DBD::SQLite: '0'
+  DBD::mysql: '0'
+  DBI: '0'
+  DBIx::QueryLog: '0'
+  DBIx::Schema::DSL: '0'
+  DBIx::Sunny: '0'
+  DBIx::TransactionManager: '0'
+  DBIx::TransactionManager::EndHook: '0'
+  Daiku: '0'
+  Data::MessagePack: '0'
+  Data::Section::Simple: '0'
+  Data::Validator: '0'
+  Devel::KYTProf: '0'
+  Devel::NYTProf: '0'
+  Exception::Tiny: '0'
+  File::Copy::Recursive: '0'
+  File::pushd: '0'
+  FindBin::libs: '0'
+  Fluent::Logger: '0'
+  Furl: '0'
+  GitDDL::Migrator: '0'
+  HTTP::Date: '0'
+  HTTP::Parser::XS: '0'
+  IO::Prompt::Simple: '0'
+  JSON::XS: '0'
+  L: '0'
+  List::MoreUtils: '0'
+  List::UtilsBy: '0'
+  Log::Minimal: '0'
+  Minilla: '0'
+  Moo: '0'
+  Mouse: '0'
+  Number::Format: '0'
+  POSIX::AtFork: '0'
+  Parallel::ForkManager: '0'
+  Path::Tiny: '0'
+  Perl::Build: '0'
+  Plack: '0'
+  Plack::Middleware::ReverseProxy: '0'
+  Proclet: '0'
+  Puncheur: '0'
+  Redis::Fast: '0'
+  Reply: '0'
+  Riji: '0'
+  SQL::Translator: '0'
+  SQL::Translator::Producer::Teng: '0'
+  Server::Starter: '0'
+  Spellunker: '0'
+  Starlet: '0'
+  String::CamelCase: '0'
+  String::IRC: '0'
+  String::Random: '0'
+  TOML: '0'
+  Teng: '0'
+  Teng::Plugin::ResultSet: '0'
+  Teng::Plugin::SearchJoined: '0'
+  Test::Base::Less: '0'
+  Test::Deep: '0'
+  Test::Deep::Cond: '0'
+  Test::Deep::Matcher: '0'
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+  Test::Pretty: '0'
+  Test::SharedFork: '0'
+  Test::mysqld: '0'
+  Text::CSV: '0'
+  Text::Markdown::Discount: '0'
+  Text::Markdown::Slidy: '0'
+  Text::MicroTemplate: '0'
+  Text::Xslate: '0'
+  Time::Moment: '0'
+  Time::Piece::Plus: '0'
+  Twiggy: '0'
+  Version::Next: '0'
+  WWW::Mechanize: '0'
+  Web::Query: '0'
+  XML::LibXML: '0'
+  XML::TreePP: '0'
+  YAML: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-Task-BeLike-SONGMU/issues
+  homepage: https://github.com/Songmu/p5-Task-BeLike-SONGMU
+  repository: git://github.com/Songmu/p5-Task-BeLike-SONGMU.git
+version: '20140805.000'
+x_authority: cpan:SONGMU

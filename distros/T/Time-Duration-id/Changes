@@ -1,0 +1,26 @@
+Revision history for Time-Duration-id
+
+0.04     2013-04-17 (SHARYANTO)
+
+         No functional changes. Remove mention of
+         Time::Duration::Patch::Millisecond, require Time::Duration 1.1 (which
+         now has millisecond support).
+
+
+0.03     2013-04-03 (SHARYANTO)
+
+         No functional changes. Give credit to Time::Duration::fr. Show example
+         result and how to use with Time::Duration::Patch::Millisecond in
+         Synopsis.
+
+
+0.02     2012-12-14 (SHARYANTO)
+
+         Support millisecond (if used together with
+         Time::Duration::Patch::Millisecond).
+
+
+0.01     2012-12-14 (SHARYANTO)
+
+         First release.
+

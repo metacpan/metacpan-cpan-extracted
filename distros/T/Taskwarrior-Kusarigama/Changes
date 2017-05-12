@@ -1,0 +1,55 @@
+Revision history for Taskwarrior-Hooks
+
+0.3.1 2017-03-24
+  [ BUG FIXES ]
+    - Don't try to compile GitCommit plugin, as we don't hard-require
+      Git::Repository to be installed. (RT#120704)
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 21 insertions(+), 5 deletions(-)
+
+0.3.0 2017-03-10
+  [ BUG FIXES ]
+    - GitCommit: Extend `Plugin` rather than just `Hook`. (GH#12, Paul
+      Fenwick)
+
+  [ DOCUMENTATION ]
+    - Hook.pm: Fixed missing backslash in documentation. (GH#11, Paul
+      Fenwick)
+
+  [ ENHANCEMENTS ]
+    - GitCommit: Use the command-line as the git commit message. (GH#13,
+      Paul Fenwick)
+    - Added Taskwarrior::Kusarigama::Task, applying
+      Taskwarrior::Kusarigama::Wrapper per task (GH#10).
+
+  [ STATISTICS ]
+    - code churn: 8 files changed, 157 insertions(+), 12 deletions(-)
+
+0.2.0 2017-03-07
+  [ BUG FIXES ]
+    - No hard-requirement on Git::Repository. (GH#6)
+
+  [ ENHANCEMENTS ]
+    - Added Taskwarrior::Kusarigama::Wrapper.
+    - Rework for the Progress plugin.
+    - Add functionality to the ::Core role.
+
+  [ STATISTICS ]
+    - code churn: 11 files changed, 365 insertions(+), 19 deletions(-)
+
+0.1.0 2017-02-20
+  [ BUG FIXES ]
+    - Distro name is Taskwarrior-Kusarigama, not TW-Hooks (GH#1)
+
+  [ ENHANCEMENTS ]
+    - Adding 'Progress' plugin.
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 119 insertions(+), 5 deletions(-)
+
+0.0.1 2017-02-20
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 24 insertions(+), 24 deletions(-)

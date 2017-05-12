@@ -1,0 +1,51 @@
+TM-Ontology-KIF
+===============
+
+This package provides a simplistic (but slow) parser for the KIF
+(knowledge interchange format). I have no idea how complete this
+implementation is as I am mainly interested in converting the KIF
+version of SUMO (Suggested Upper Merged Ontology) into TopicMaps.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+HOW TO USE
+
+The TM::Ontology::KIF package only provides a parser for KIF (or a
+subset of it). It will read a stream provided and will invoke a
+subroutine whenever it has successfully parsed a KIF
+sentence. Applications are supposed to provide this function.
+
+In the bin directory there is a utility which converts a KIF stream into
+an AsTMa= instance. Invoke it with
+
+  kif2atm --help
+
+for more information. The example directory contains a Makefile with
+some suggested use.
+
+CAVEATS
+
+Please read the man page of TM::Ontology::KIF.
+
+TODO
+
+Support all of KIF. Something for long winter evenings. And more speed.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Robert Barta
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

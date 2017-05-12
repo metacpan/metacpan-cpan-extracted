@@ -1,0 +1,131 @@
+Revision history for Perl extension Text::Table.
+
+1.132   2016-11-28
+    - Fix a syntax error in the POD.
+        - https://rt.cpan.org/Ticket/Display.html?id=118852
+        - Thanks to Rihards for the report.
+    - Convert to Dist-Zilla and Pod::Weaver
+        - See https://rt.cpan.org/Ticket/Display.html?id=118923
+        - Thanks to coolo from OpenSUSE.
+        - In the process, change the license in the META files to ISC.
+
+1.131   2016-07-29
+    - Merge pull-request from Zac Bentley to speed up boolean tests.
+        - https://github.com/shlomif/Text-Table/pull/4
+        - Closes https://github.com/shlomif/Text-Table/issues/3
+
+1.130   2014-04-12
+    - Minimum perl version in 'requires' this time in META.yml (CPANTS).
+    - Change the META.yml license indicator to 'mit' - it is the ISC
+    license, which is MIT in effect. (CPANTS).
+
+1.129   2014-02-01
+    - Add minimum perl version to META.yml (CPANTS).
+
+1.128   2013-10-25
+    - Typo fixes thanks to David Steinbrunner.
+        - https://github.com/shlomif/Text-Table/pull/1
+
+1.127   2013-05-21
+    - Add t/style-trailing-space.t.
+        - Remove trailing space.
+
+1.126   2012-09-23
+    - Fix handling of regular expression aligners.
+        - Thanks to Ilya for the report.
+        - Fixes https://rt.cpan.org/Ticket/Display.html?id=79803
+
+1.125   2012-09-01
+    - Add examples/Text-Table-UTF8-example.pl
+        - Thanks to Lady_Aleena for inspiring it.
+
+1.124   2011-09-02
+    - Fix handling whitespace in column separators when the callback-based
+    rule is invoked.
+        - Thanks to Cary Millsap for the bug report.
+
+1.123   2011-06-10
+    - Add ./Build to MANIFEST.SKIP so it won't be packaged.
+        - Thanks to Zed Pobre.
+
+1.122   2011-06-03
+    - Fix https://rt.cpan.org/Public/Bug/Display.html?id=68631 - passing
+    hashrefs as separators.
+    - Many refactorings.
+
+1.121   2011-05-26
+    - Convert t/10_Table.t to Test-Count.
+    - Refactored t/10_Table.t .
+    - Refactored lib/Text/Table.pm
+
+1.120   2011-05-14
+    - Convert the build system to Module::Build :
+        - Build.PL and inc/Test/Run/Builder.pm .
+    - Made the README more meaningful and concise (instead of a copy-and-paste
+    from the documentation.)
+    - Convert t/10_Table.t to Test::More.
+
+1.119   2011-05-14
+    - Fix the Copyright to say Anno first and Shlomi Fish later.
+        - thanks to Zed Pobre.
+
+1.118       2011-05-05
+    - Convert to the ISC license.
+
+    1.117       2011-04-10
+    - add the callback ("sub { ... }")-based ->rule() method to render each
+    section in a rule differently.
+    - Add SHLOMIF as the maintainer.
+    - Add t/pod.t and t/pod-coverage.t . Documented $table->stringify() and
+    $table->table_height().
+
+1.116   2010-08-08
+    - added color support
+
+1.115   2010-05-13
+    - Bug when $/ is set to undef
+
+1.114   2008-02-16
+    - Changed the documentation to reflect the possibility of multiline
+      data (by daotoad).
+          Sun May 11 13:37:44 CEST 2008
+    - Fixed spurious warning with ->load([])
+    - Released
+
+1.107   2004-09-21
+    - Added a feature where rows with embedded newlines are expanded
+      into following rows. (by Josh Jore)
+    - Added a feature where ->add and ->load return the table object
+      enabling chained method calls. (by Josh Jore)
+    - Added auto-initialisation.  An unspecified table creates the
+      requisite number of title-less columns on first data entry.
+
+1.102   2003-09-12
+    - Added features align_title and align_title_lines
+    - fixed a bug with samples, which weren't honored in title alignment in
+      a table with no data
+    - planned for release 6
+
+1.100   2003-09-12
+    - Version jump to make module version and cvs version equal (and compatible)
+
+0.05    2003-02-16
+    - added method colrange (see bug id 2053)
+
+0.04    2003-02-09
+    - see bug ids 2052, 2053
+    - pod changed to reflect the implementation concerning rule() and
+      body_rule(). (It described rule() wrongly and listed non-existent
+      title_rule() instead of body_rule())
+    - Added test for body_rule().
+
+0.03    2002-12-29
+    - another spurious warning from _parse_spec fixed, test added
+
+0.02    2002-12-03
+    - minor bug fixes concerning spurious warnings
+    - released to CPAN Thu Dec  5 01:42:11 CET 2002
+
+0.01    2002-11-19
+    - initial release to CPAN Tue Dec 3 07:59
+

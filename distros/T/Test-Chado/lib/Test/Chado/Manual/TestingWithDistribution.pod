@@ -1,0 +1,130 @@
+#PODNAME: bobby_tables2.pl
+
+__END__
+
+=pod
+
+=head1 NAME
+
+bobby_tables2.pl
+
+=head1 VERSION
+
+version v4.1.1
+
+=head2 Integrating Test::Chado with existing or new distribution
+
+It assumes you to have or to create a new perl distribution with standard folder structure. 
+Minimally, it should have a B<lib> and B<t> folders. For a new distribution, create one with B<module-starter>. 
+
+    module-starter --module=TestChado::WithMakeFile --author="Siddhartha Basu" --email=sidd.basu@gmail.com                                                              rbenv:system 
+    Added to MANIFEST: Changes
+    Added to MANIFEST: ignore.txt
+    Added to MANIFEST: lib/TestChado/WithMakeFile.pm
+    Added to MANIFEST: Makefile.PL
+    Added to MANIFEST: MANIFEST
+    Added to MANIFEST: README
+    Added to MANIFEST: t/00-load.t
+    Added to MANIFEST: t/boilerplate.t
+    Added to MANIFEST: t/manifest.t
+    Added to MANIFEST: t/pod-coverage.t
+    Added to MANIFEST: t/pod.t
+    Created starter directories and files
+
+The distribution will look like the following ...
+
+    TestChado-WithMakeFile
+    |-- Changes
+    |--ignore.txt
+    |-- lib
+    |   |-- TestChado
+    │       |-- WithMakeFile.pm
+    |-- Makefile.PL
+    |-- MANIFEST
+    |-- README
+    |-- t
+        |-- 00-load.t
+        |-- boilerplate.t
+        |-- manifest.t
+        |-- pod-coverage.t
+        |-- pod.t
+
+=head3 Using with Makefile.PL distribution
+
+Create or edit an existing Makefile and add the L<Test::Chado> dependency.
+
+=head4 Makefile.PL
+
+    use strict;
+    use warnings;
+    use ExtUtils::MakeMaker;
+
+    WriteMakefile(
+        NAME                => 'TestChado::WithMakeFile',
+        AUTHOR              => q{Siddhartha Basu <sidd.basu@gmail.com>},
+        VERSION_FROM        => 'lib/TestChado/WithMakeFile.pm',
+        ABSTRACT_FROM       => 'lib/TestChado/WithMakeFile.pm',
+            ($ExtUtils::MakeMaker::VERSION >= 6.3002
+                ? ('LICENSE'=> 'perl')
+                : ()),
+        PL_FILES            => {},
+        PREREQ_PM => {
+            'Test::Chado' => '1.0.0'
+        },
+        dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+        clean               => { FILES => 'TestChado-WithMakeFile-*' },
+    );
+
+Install dependencies using B<cpanm> or any other standard installer
+
+    cpanm --installdeps .
+
+Then write your tests in B<t/> folder as usual run it with make
+
+    perl Makefile.PL && make test
+
+=head3 Using with Build.PL distribution
+
+Create or edit an existing B<Build.PL> and add the L<Test::Chado> dependency.
+
+=head4 Build.PL
+
+    use strict;
+    use warnings;
+    use Module::Build;
+
+
+    my %module_build_args = (
+        "configure_requires" => {
+            "Module::Build" => "0.3601"
+         },
+        "dist_abstract" => "Toy distribution with Build.PL",
+        "dist_author" => [
+                "Siddhartha Basu <biosidd\@gmail.com>"
+            ],
+        "dist_name" => "TestChado-WithBuildPL",
+        "dist_version" => "1.0.0",
+        "license" => "perl",
+        "module_name" => "TestChado::WithBuildPL",
+        "requires" => { 'Test::Chado' => '1.0.0'}
+    );
+
+    my $build = Module::Build->new(%module_build_args);
+    $build->create_build_script;
+
+Install dependencies with B<cpanm>, write tests and run as usual
+
+    perl Build.PL && ./Build test
+
+=head1 AUTHOR
+
+Siddhartha Basu <biosidd@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Siddhartha Basu.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

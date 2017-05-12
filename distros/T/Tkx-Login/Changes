@@ -1,0 +1,37 @@
+Revision history for Perl extension Tkx::Login.
+
+1.11  2014/04/29
+
+        Using GNU TAR now. The previous release had PAX headers in the tar file.
+        Build scripts now automatically configure minium perl version.
+
+1.10  2014/04/13
+
+	Adding the NAME block to the POD with synopsis.
+
+1.09  2014/03/20
+
+	Correcting META not having perl version.
+
+1.08  2014/03/17
+
+	Moving to Test::Simple
+
+1.07  2014/03/14
+
+	Now using "warnings"
+
+1.06  2014/03/08
+
+	Meta information now automatically generated
+	Adding a POD test
+
+1.05  2014/02/25
+
+	Added a "Cancel" button option.
+	Updated meta information
+	Including a LICENSE file
+
+1.04  2012/03/28
+
+	Initial module creation.

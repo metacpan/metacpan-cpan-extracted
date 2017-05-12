@@ -1,0 +1,294 @@
+NAME
+
+    Tickit::Widget::Scroller - a widget displaying a scrollable collection
+    of items
+
+SYNOPSIS
+
+     use Tickit;
+     use Tickit::Widget::Scroller;
+     use Tickit::Widget::Scroller::Item::Text;
+     
+     my $tickit = Tickit->new;
+     
+     my $scroller = Tickit::Widget::Scroller->new;
+    
+     $scroller->push(
+        Tickit::Widget::Scroller::Item::Text->new( "Hello world" ),
+        Tickit::Widget::Scroller::Item::Text->new( "Here are some lines" ),
+        map { Tickit::Widget::Scroller::Item::Text->new( "<Line $_>" ) } 1 .. 50,
+     );
+     
+     $tickit->set_root_widget( $scroller );
+     
+     $tickit->run
+
+DESCRIPTION
+
+    This class provides a widget which displays a scrollable list of items.
+    The view of the items is scrollable, able to display only a part of the
+    list.
+
+    A Scroller widget stores a list of instances implementing the
+    Tickit::Widget::Scroller::Item interface.
+
+STYLE
+
+    The default style pen is used as the widget pen.
+
+    The following style pen prefixes are used:
+
+    indicator => PEN
+
+      The pen used for the scroll position indicators at the top or bottom
+      of the display
+
+KEYBINDINGS
+
+    The following keys are bound
+
+      * Down
+
+      Scroll one line down
+
+      * Up
+
+      Scroll one line up
+
+      * PageDown
+
+      Scroll half a window down
+
+      * PageUp
+
+      Scroll half a window up
+
+      * Ctrl-Home
+
+      Scroll to the top
+
+      * Ctrl-End
+
+      Scroll to the bottom
+
+CONSTRUCTOR
+
+ new
+
+       $scroller = Tickit::Widget::Scroller->new( %args )
+
+    Constructs a new Tickit::Widget::Scroller object. The new object will
+    start with an empty list of items.
+
+    Takes the following named arguments:
+
+    gravity => STRING
+
+      Optional. If given the value bottom, resize events and the push
+      method will attempt to preserve the item at the bottom of the screen.
+      Otherwise, will preserve the top.
+
+    gen_top_indicator => CODE
+
+    gen_bottom_indicator => CODE
+
+      Optional. Generator functions for the top and bottom indicators. See
+      also set_gen_top_indicator and set_gen_bottom_indicator.
+
+METHODS
+
+ on_scrolled
+
+ set_on_scrolled
+
+       $on_scrolled = $scroller->on_scrolled
+    
+       $scroller->set_on_scrolled( $on_scrolled )
+
+    Return or set the CODE reference to be called when the scroll position
+    is adjusted.
+
+       $on_scrolled->( $scroller, $delta )
+
+    This is invoked by the scroll method, including the scroll_to,
+    scroll_to_top and scroll_to_bottom. In normal cases it will be given
+    the delta offset that scroll itself was invoked with, though this may
+    be clipped if this would scroll past the beginning or end of the
+    display.
+
+ push
+
+       $scroller->push( @items )
+
+    Append the given items to the end of the list.
+
+    If the Scroller is already at the tail (that is, the last line of the
+    last item is on display) and the gravity mode is bottom, the newly
+    added items will be displayed, possibly by scrolling downward if
+    required. While the scroller isn't adjusted by using any of the scroll
+    methods, it will remain following the tail of the items, scrolling
+    itself downwards as more are added.
+
+ unshift
+
+       $scroller->unshift( @items )
+
+    Prepend the given items to the beginning of the list.
+
+    If the Scroller is already at the head (that is, the first line of the
+    first item is on display) and the gravity mode is top, the newly added
+    items will be displayed, possibly by scrolling upward if required.
+    While the scroller isn't adjusted by using any of the scroll methods,
+    it will remain following the head of the items, scrolling itself
+    upwards as more are added.
+
+ shift
+
+       @items = $scroller->shift( $count )
+
+    Remove the given number of items from the start of the list and returns
+    them.
+
+    If any of the items are on display, the Scroller will be scrolled
+    upwards an amount sufficient to close the gap, ensuring the first
+    remaining item is now at the top of the display.
+
+    The returned items may be re-used by adding them back into the scroller
+    again either by push or unshift, or may be discarded.
+
+ pop
+
+       @items = $scroller->pop( $count )
+
+    Remove the given number of items from the end of the list and returns
+    them.
+
+    If any of the items are on display, the Scroller will be scrolled
+    downwards an amount sufficient to close the gap, ensuring the last
+    remaining item is now at the bottom of the display.
+
+    The returned items may be re-used by adding them back into the scroller
+    again either by push or unshift, or may be discarded.
+
+ scroll
+
+       $scroller->scroll( $delta )
+
+    Move the display up or down by the given $delta amount; with positive
+    moving down. This will be a physical count of displayed lines; if some
+    items occupy multiple lines, then fewer items may be scrolled than
+    lines.
+
+ scroll_to
+
+       $scroller->scroll_to( $line, $itemidx, $itemline )
+
+    Moves the display up or down so that display line $line contains line
+    $itemline of item $itemidx. Any of these counts may be negative to
+    count backwards from the display lines, items, or lines within the
+    item.
+
+ scroll_to_top
+
+       $scroller->scroll_to_top( $itemidx, $itemline )
+
+    Shortcut for scroll_to to set the top line of display; where $line is
+    0. If $itemline is undefined, it will be passed as 0. If $itemidx is
+    also undefined, it will be passed as 0. Calling this method with no
+    arguments, therefore scrolls to the very top of the display.
+
+ scroll_to_bottom
+
+       $scroller->scroll_to_bottom( $itemidx, $itemline )
+
+    Shortcut for scroll_to to set the bottom line of display; where $line
+    is -1. If $itemline is undefined, it will be passed as -1. If $itemidx
+    is also undefined, it will be passed as -1. Calling this method with no
+    arguments, therefore scrolls to the very bottom of the display.
+
+ line2item
+
+       $itemidx = $scroller->line2item( $line )
+    
+       ( $itemidx, $itemline ) = $scroller->line2item( $line )
+
+    Returns the item index currently on display at the given line of the
+    window. In list context, also returns the line number within item. If
+    no window has been set, or there is no item on display at that line,
+    undef or an empty list are returned. $line may be negative to count
+    backward from the last line on display; the last line taking -1.
+
+ item2line
+
+       $line = $scroller->item2line( $itemidx, $itemline )
+    
+       ( $line, $offscreen ) = $scroller->item2line( $itemidx, $itemline, $count_offscreen )
+
+    Returns the display line in the window of the given line of the item at
+    the given index. $itemidx may be given negative, to count backwards
+    from the last item. $itemline may be negative to count backward from
+    the last line of the item.
+
+    In list context, also returns a value describing the offscreen nature
+    of the item. For items fully on display, this value is undef. If the
+    given line of the given item is not on display because it is scrolled
+    off either the top or bottom of the window, this value will be either
+    "above" or "below" respectively. If $count_offscreen is true, then the
+    returned $line value will always be defined, even if the item line is
+    offscreen. This will be negative for items "above", and a value equal
+    or greater than the number of lines in the scroller's window for items
+    "below".
+
+ lines_above
+
+       $count = $scroller->lines_above
+
+    Returns the number of lines of content above the scrolled display.
+
+ lines_below
+
+       $count = $scroller->lines_below
+
+    Returns the number of lines of content below the scrolled display.
+
+ set_gen_top_indicator
+
+ set_gen_bottom_indicator
+
+       $scroller->set_gen_top_indicator( $method )
+    
+       $scroller->set_gen_bottom_indicator( $method )
+
+    Accessors for the generators for the top and bottom indicator text. If
+    set, each should be a CODE reference or method name on the scroller
+    which will be invoked after any operation that changes the contents of
+    the window, such as scrolling or adding or removing items. It should
+    return a text string which, if defined and non-empty, will be displayed
+    in an indicator window. This will be a small one-line window displayed
+    at the top right or bottom right corner of the Scroller's window.
+
+       $text = $scroller->$method()
+
+    The ability to pass method names allows subclasses to easily implement
+    custom logic as methods without having to capture a closure.
+
+ update_indicators
+
+       $scroller->update_indicators
+
+    Calls any defined generators for indicator text, and updates the
+    indicator windows with the returned text. This may be useful if the
+    functions would return different text now.
+
+TODO
+
+      * Abstract away the "item storage model" out of the actual widget.
+      Implement more storage models, such as database-driven ones.. more
+      dynamic.
+
+      * Keybindings
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

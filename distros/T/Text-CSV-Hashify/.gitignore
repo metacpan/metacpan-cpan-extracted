@@ -1,0 +1,10 @@
+# .gitignore for Text-CSV-Hashify
+/MANIFEST.bak
+/Makefile
+/Makefile.old
+/Text-CSV-Hashify-*.tar.gz
+/MYMETA.yml
+/blib
+/pm_to_blib
+/cover_db/
+/MYMETA.json

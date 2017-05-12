@@ -1,0 +1,28 @@
+---
+abstract: 'does your code require newer perl than you think?'
+author:
+  - 'Ricardo Signes'
+build_requires:
+  Test::More: 0
+  Test::Tester: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101040'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-MinimumVersion
+recommends: {}
+requires:
+  Exporter: 0
+  File::Find::Rule: 0
+  File::Find::Rule::Perl: 0
+  Perl::MinimumVersion: 1.20
+  Test::Builder: 0
+  YAML::Tiny: 1.40
+  perl: 5.021
+  version: 0.70
+resources:
+  repository: git://git.codesimply.com/Test-MinimumVersion.git
+version: 0.101080

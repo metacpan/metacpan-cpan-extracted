@@ -1,0 +1,140 @@
+NAME
+    "Text::Corpus::Inspec" - Interface to Inspec abstracts corpus.
+
+SYNOPSIS
+      use Text::Corpus::Inspec;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::Inspec->new (corpusDirectory => $corpusDirectory);
+      dump $corpus->getTotalDocuments;
+
+DESCRIPTION
+    "Text::Corpus::Inspec" provides a simple interface for accessing the
+    documents in the Inspec corpus.
+
+    The categories, description, title, etc... of a specified document are
+    accessed using Text::Corpus::Inspec::Document. Also, all errors and
+    warnings are logged using Log::Log4perl, which should be initialized.
+
+CONSTRUCTOR
+  "new"
+    The method "new" creates an instance of the "Text::Corpus::Inspec" class
+    with the following parameters:
+
+    "corpusDirectory"
+         corpusDirectory => '...'
+
+        "corpusDirectory" is the path to the top most directory of the
+        corpus documents. It is the path to the directory containing the
+        sub-directories named "Test", "Training", and "Validation" of the
+        corpus and is needed to locate all the documents in the corpus. If
+        it is not defined, then the enviroment variable
+        "TEXT_CORPUS_INSPEC_CORPUSDIRECTORY" is used if it is defined. A
+        message is logged and an exception is thrown if no directory is
+        specified.
+
+METHODS
+  "getDocument"
+      getDocument (index => $index, subsetType => $subsetType)
+
+    "getDocument" returns a Text::Corpus::Inspec::Document object of the
+    document with the specified "index" and "subsetType", which is either
+    'all', 'test', 'training', or 'validation'; the default is 'all'.
+
+      getDocument (uri => $uri)
+
+    "getDocument" returns a Text::Corpus::Inspec::Document object of the
+    document with specified "uri".
+
+  "getTotalDocuments"
+      getTotalDocuments (subsetType => 'all')
+
+    "getTotalDocuments" returns the total number of documents in the
+    specified subset-type of the corpus; which is either 'all', 'test',
+    'training', or 'validation'; the default is 'all'. The index to the
+    documents in each subset ranges from zero to
+    "getTotalDocuments(subsetType => $subsetType) - 1".
+
+  "test"
+     test ()
+
+    "test" does tests to ensure the documents in the corpus are accessible
+    and can be parsed. It returns true if all tests pass, otherwise a
+    description of the test that failed is logged using Log::Log4perl and
+    false is returned.
+
+    For example:
+
+      use Text::Corpus::Inspec;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::Inspec->new (corpusDirectory => $corpusDirectory);
+      dump $corpus->test;
+
+EXAMPLES
+    The example below will print out all the information for each document
+    in the corpus.
+
+      use Text::Corpus::Inspec;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::Inspec->new (corpusDirectory => $corpusDirectory);
+      my $totalDocuments = $corpus->getTotalDocuments ();
+      for (my $i = 0; $i < $totalDocuments; $i++)
+      {
+        eval
+        {
+          my $document = $corpus->getDocument (index => $i);
+          my %documentInfo;
+          $documentInfo{title} = $document->getTitle ();
+          $documentInfo{body} = $document->getBody ();
+          $documentInfo{content} = $document->getContent ();
+          $documentInfo{categories} = $document->getCategories ();
+          $documentInfo{uri} = $document->getUri ();
+          dump \%documentInfo;
+        };
+      }
+
+INSTALLATION
+    To install the module set the environment variable
+    "TEXT_CORPUS_INSPEC_CORPUSDIRECTORY" to the path of the Inspec corpus
+    and run the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    If you are on a windows box you should use 'nmake' rather than 'make'.
+
+    The module will install if "TEXT_CORPUS_INSPEC_CORPUSDIRECTORY" is not
+    defined, but little testing will be performed. After the Inspec corpus
+    is installed testing of the module can be performed by running:
+
+      use Text::Corpus::Inspec;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::Inspec->new (corpusDirectory => $corpusDirectory);
+      dump $corpus->test;
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    inspec, english corpus, information processing
+
+SEE ALSO
+    Text::Corpus::Inspec::Document, Log::Log4perl
+

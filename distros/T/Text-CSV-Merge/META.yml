@@ -1,0 +1,36 @@
+---
+abstract: "Fill in gaps in a CSV file from another CSV file\r"
+author:
+  - 'Michael Gatto <mgatto@lisantra.com>'
+build_requires:
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-CSV-Merge
+provides:
+  Text::CSV::Merge:
+    file: lib/Text/CSV/Merge.pm
+    version: 0.05
+requires:
+  Carp: 0
+  DBD::CSV: 0
+  DBI: 0
+  Getopt::Long: 0
+  IO::File: 0
+  Log::Dispatch: 0
+  Modern::Perl: 0
+  Moo: 1.001000
+  Text::CSV_XS: 0
+  perl: 5.008
+resources:
+  repository: https://github.com/mgatto/Text--CSV--Merge.git
+version: 0.05

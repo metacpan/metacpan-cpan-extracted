@@ -1,0 +1,189 @@
+Revision history for Perl module Test::Pretty
+
+0.32 2015-09-08T22:45:39Z
+
+    commit 174ff4d0093bd69bbdc6b151253a2df6f324194a
+    Author: Sean Zellmer <sean@lejeunerenard.com>
+    Date:   Wed Sep 2 16:43:17 2015 -0500
+
+        Conditionally load Win32::Console::ANSI
+
+    commit f6545400905e8f5b1797cf13047b2bac3598cc61
+    Author: Sean Zellmer <sean@lejeunerenard.com>
+    Date:   Wed Aug 19 14:11:15 2015 -0500
+
+        Print skip_all plan using _print() to include indents
+
+        This means the SKIP wont affect the exit code of the test if multiple
+        SKIPs are found.
+
+0.31 2015-04-13T04:12:57Z
+
+    commit 35ea62941bbc827cd6695088cacdf8ad5fef4dcd
+    Author: Zoffix Znet <cpan@zoffix.com>
+    Date:   Sun Apr 12 00:37:23 2015 -0400
+
+        Skip on Windows to avoid a segfault
+
+        This is an issue deep in perl itself, due to encoding+fork. See Issue #2
+
+0.30 2014-09-19T11:21:17Z
+
+    commit c479caa313b5c32f969685ca974d63f0efbfdf65
+    Author: Sean Zellmer <sean@lejeunerenard.com>
+    Date:   Sat Sep 13 18:12:03 2014 -0500
+
+        Revamp subtests to use Test::Builder::subtest while remaining pretty
+
+        Decided to overwrite Test::Builder::note instead of writing our own
+        subtest sub without Test::Builder's planning features.
+
+        Also made a design decision to include 'not ok's for subtests but not 'ok's.
+
+0.29 2014-08-28T00:13:07Z
+
+    commit 119e7f99047360eedbd84e9a85b79d4cb16a9c18
+    Author: moznion <moznion@gmail.com>
+    Date:   Wed Aug 27 13:54:20 2014 +0900
+
+        Change the position to reset color
+
+        If we look the result of test with `tail -f` or similar command,
+        then protrude the setting of color to next line. Like so;
+        http://i.gyazo.com/4301e1f57fe02998b13d45bbafc5970e.png
+
+        So I fix this.
+        http://i.gyazo.com/c24cb7c795a6693d51ea9bf7a0f421eb.png
+
+    commit 9a641b8544daa89c1754f9d53bbf04ccf2cb6082
+    Author: Valcho Nedelchev <vulcho@gmail.com>
+    Date:   Fri May 23 01:01:28 2014 +0200
+
+        care the eval
+
+        Fix for error Can't use string ("") as an ARRAY ref while "strict refs"
+        in use … Test/Pretty.pm line 41.
+
+0.28 2014-03-03T07:02:32Z
+
+    - Added experimental $NO_ENDING
+
+0.27 2013-07-26T04:48:44Z
+
+    - localize $@
+      (Reported by doy++, Fixed by akiym++)
+
+0.26 2013-06-28T10:01:17Z
+
+    - Care the fork(2)
+      (tokuhirom)
+
+0.25 2013-04-12T01:49:16Z
+
+    - Test fail when pass() receives arguments inside of subtest block
+      (Reported by sunaot++)
+      https://github.com/tokuhirom/Test-Pretty/issues/13
+
+0.24 2013-02-16T22:43:03
+
+    - Do not colorize on non terminal output.
+
+0.23 2013-02-15T19:52:51
+
+    - Do not pass when unexpected exit
+
+0.22 2012-12-19
+
+    - do not fail with no_plan(gunyarakun++)
+
+0.21 2012-12-13
+
+    - test case fix for mswin32
+
+0.20 2012-12-06
+
+    - fixed exit code on non-prove.
+      https://rt.cpan.org/Public/Bug/Display.html?id=81661
+
+0.19 2012-11-15
+
+    - Bad plan should be fail.
+      (Reporeted by Norbert Gruener)
+
+0.18 2012-11-14
+
+    - no feature changes, fixed typester.t
+
+0.17 2012-11-14
+
+    - [master 18673b0] Fail the test case when subtest does not have
+      test case https://github.com/tokuhirom/Test-Pretty/issues/7
+      (reported by soh335++)
+
+0.16 2012-11-14
+
+    - required minimum version of Perl is now 5.8.1
+
+0.15 2012-11-08
+
+    - do not use PERL5OPT, PERl5OPT affects to child processes.
+
+0.13 2012-11-08
+
+    - do not fail on plan in subtest
+
+0.12 2012-11-08
+
+    - fixed support for Test::Requires
+
+0.11 2012-11-08
+
+    - decode source code as utf-8 by default
+      (reported by typester++)
+    - fixed handling die-ing in subtest
+      (reported by typester++)
+    - handle skipping corectlly
+      (reported by miyagawa++)
+
+0.10 2012-11-06
+
+    - added -Pretty module
+
+0.09 2012-11-06
+
+    - removed code using Test::More.
+    - support skip_all
+
+0.08 2012-11-06
+
+    - prove support
+
+0.07 2012-10-26
+
+    - fixed deps. latest Term::ANSIColor is required.
+
+0.06 2012-10-23
+
+    - Display better diag for bad $Test::Builder::Level
+
+0.05 2012-10-22
+
+    - prettify the TAP for prove users.
+
+0.04 2012-10-22
+
+    - doc fix
+
+0.03 2012-10-22
+
+    - docs
+    - do not prettify under the win32
+
+0.02 2012-10-22
+
+    - fixed deps
+
+0.01 2012-10-22
+
+    - original version
+

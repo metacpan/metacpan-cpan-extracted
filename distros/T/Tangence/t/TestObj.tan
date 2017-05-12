@@ -1,0 +1,24 @@
+class t.TestObj {
+  method method(int i, str s) -> str;
+  method noreturn();
+
+  event event(int i, str s);
+
+  prop scalar =          int;
+  prop hash   = hash  of int;
+  prop queue  = queue of int;
+  prop array  = array of int;
+  prop objset = objset of obj;
+  prop items  = list(obj);
+
+  smashed prop s_scalar = int;
+  smashed prop s_array  = array of int;
+}
+
+struct t.TestStruct {
+  field b = bool;
+  field i = int;
+  field f = float;
+  field s = str;
+  field o = obj;
+}

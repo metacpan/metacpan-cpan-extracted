@@ -1,0 +1,32 @@
+2012-11-15  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: Version 0.1005
+	* Changes: add %htp_compatible_function.
+
+2012-07-27  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: Version 0.1004
+	* Changes: add input_filter
+	* Changes: change build-include-ast code to support Text::Xslate 1.5012.
+
+2011-07-07  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: Version 0.1003
+	* Changes: add is_escaped_var
+	* Changes: fix test.
+
+2011-07-04  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: Version 0.1002
+	* Changes: support path-like-variable-scope.
+
+2011-07-01  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: Version 0.1001
+	* Changes: add __counter__ support
+	* Changes: add requirement HTML::Template::Pro.
+
+2011-06-30  Shigeki Morimoto  <shigeki@Morimo.to>
+
+	* Changes: version 0.1 release.
+

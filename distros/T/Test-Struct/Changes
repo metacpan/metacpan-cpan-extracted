@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::Struct.
+
+0.01  Sat Jul  2 20:36:28 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n Test::Struct --use-new-tests -v 0.01
+

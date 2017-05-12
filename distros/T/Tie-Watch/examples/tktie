@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl -w
+#
+# Show how to set a watchpoint on a Tk Entry variable.  Using this technique
+# you can do data verification on the user's input.  SOL
+
+use Tk;
+use Tie::Watch;
+
+my $MW = MainWindow->new;
+my $foo='cow';
+my $e = $MW->Entry(-textvariable => \$foo)->pack;
+$e->icursor('end');
+$e->focus;
+
+sub store_callback {
+    print "In store_callback, self=$_[0], new_value=$_[1].\n";
+    $_[0]->Store($_[1]);
+}
+my $w = Tie::Watch->new(-variable => \$foo, -store => \&store_callback);
+
+my $u = $MW->Button(-text => 'UnWatch $foo', -command => sub {
+    $w->Unwatch;
+    print "Unwatch() value=$foo.\n";
+})->pack;
+
+my $l = $MW->Button(-text => 'Quit', -command => sub {
+    print "Final value=$foo.\n";
+    exit;
+})->pack;
+
+MainLoop;

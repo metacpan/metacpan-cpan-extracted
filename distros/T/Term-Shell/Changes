@@ -1,0 +1,76 @@
+0.09    2016-04-13
+    - Fix the copyright holder, license and year in dist.ini/meta-data.
+        - It should be Neil Watkiss / Perl 5 / 2001
+        - https://rt.cpan.org/Ticket/Display.html?id=113735
+        - Thanks to KENTNL for the report.
+
+0.08    2016-04-13
+    - Remove stray Build/_build artifacts from the distribution:
+        - https://rt.cpan.org/Ticket/Display.html?id=113730
+        - Thanks to KENTNL
+    - Fix the link to the bugtracker, add META.json, and supply a meta-data
+    "Provides" section.
+        - https://rt.cpan.org/Ticket/Display.html?id=113731
+        - Thanks to KENTNL
+
+0.07    2015-12-30
+    - Convert to Dist-Zilla.
+    - Add scripts/tag-release.pl
+    - Skip a failing test file ( t/03catchsmry.t ) on Windows:
+        - https://rt.cpan.org/Ticket/Display.html?id=40771
+        - https://rt.cpan.org/Ticket/Display.html?id=110555
+
+0.06    2014-04-10
+    - Consistent versioning (CPANTS).
+
+0.05    2014-01-31
+    - Minimum version of perl (CPANTS).
+    - Add a LICENSE file (CPANTS).
+    - Add t/style-trailing-space.t and remove trailing whitespace.
+
+0.04    2013-06-03
+    - Add an explicit version to Term::Shell::OnScopeLeave.
+        - to settle the PAUSE indexer.
+    - Convert t/01require.t to Test::More and strict/warnings.
+    - Convert t/02default.t to Test::More and strict/warnings.
+    - Add "use warnings;" to t/03catchsmry.t .
+
+0.03    2012-10-14
+    - Moved test.pl under examples so it won't interfere with the building
+    and testing.
+        - See https://rt.cpan.org/Public/Bug/Display.html?id=40771
+        - Thanks to CHORNY and praveenkumar for the reports.
+    - Correct the POD.
+        - Add t/pod.t .
+    - Convert the distribution to Build.PL .
+
+0.02    2007-02-24
+	- Fix CPAN bug id 2463: help now unconditionally calls $o->summary()
+
+0.01    2002-01-25
+	- Documentation updates
+	- Read the README
+	- Added cmd_prefix() and cmd_suffix()
+	- Reorganized the handlers to make more sense, given the above
+	- Preparing for initial release
+	- Lots of documentation additions
+	- Added a README
+	- Access to the Term::ReadLine object
+	- Added precmd(), postcmd(), preloop(), postloop(), init(), and fini()
+	  callbacks.
+	- Added a cmd() method, which parses and runs the command-line you
+	  pass in. Used internally by cmdloop().
+	- Added some more documentation and features to Term::Shell
+	- Remove 'quit' alias for 'exit' in Term::Shell. Smaller is better.
+	- Changed default prompt to 'shell> '.
+	- Added and documented the prompt_user() method.
+	- Added the prompt_user() method to the interactive test.
+	- Added the comp_() sub, to override the top-level command-completion
+	  routine.
+	- Fixed a bug which prevented completion from working
+	- Added catch_*() methods to catch missing handlers.
+	- Added an example called psh.pl (Perl SHell)
+	- Fixed order of comp_*() handlers to match Term::ReadLine::Perl
+	- Added tests and documentation. Needs more doc.
+	- Adding initial version of Term::Shell to the repository. Needs
+	  documentation.

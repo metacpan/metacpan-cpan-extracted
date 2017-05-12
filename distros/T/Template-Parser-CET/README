@@ -1,0 +1,477 @@
+NAME
+    Template::Parser::CET - Template::Alloy based parser for the TT2 engine
+
+SYNOPSIS
+        use Template;
+        use Template::Parser::CET;
+
+        my $t = Template->new(
+            PARSER => Template::Parser::CET->new
+        );
+
+        # you can override all instances of TT
+        # by any of the following methods
+        use Template::Parser::CET activate => 1;
+
+        # OR
+        use Template::Parser::CET;
+        Template::Parser::CET->activate;
+
+        # OR
+        use Template::Config;
+        $Template::Config::PARSER = 'Template::Parser::CET';
+
+        my $t = Template->new;
+
+DESCRIPTION
+    Template::Parser::CET provides much or most of the TT3 syntax and runs
+    on the current TT2 engine.
+
+    Template::Alloy which was formerly known as CGI::Ex::Template (CET)
+    provides a fast implementation of TT2 and TT3. There are some cases
+    where Template::Toolkit is faster. There are also some cases where shops
+    have custom providers, or custom stashes that require the use of the
+    current TT2 engine. In these cases, Template::Parser::CET provides the
+    best of both worlds - offering TT2 AND TT3 syntax and running on the
+    existing platform making use of all of your current work (In many cases
+    CET should be able to do this anyway).
+
+    This module may eventually be made obsolete when the final real
+    Template::Toolkit 3 engine by Andy Wardley is released. But that would
+    only be a good thing. If the TT3 engine doesn't provide full backward
+    compatibility this module will.
+
+    CET has provided TT3 features since Spring of 2006 but there has been
+    little reported uptake. The TT3 features/extended syntax are very
+    compelling. For various reasons people chose not to use CET. Now people
+    can use TT2 and get the features of TT3 (through CET) today.
+
+    Hopefully Template::Parser::CET and Template::Alloy can be used in the
+    same spirit as Pugs is used for Perl 6. All of the code from CET and
+    Template::Parser::CET are free for use in TT3.
+
+SPEED
+    All speed is relative and varies tremendously depending upon the size
+    and content of your template.
+
+    Template::Parser::CET generally compiles documents a little faster than
+    Template::Parser and Template::Grammar. Template::Alloy compiles
+    documents to its AST (abastract syntax tree) very quickly, but
+    Template::Paser::CET then has to emit a TT2 style compiled
+    Template::Document perl document. So even though Template::Alloy has a
+    speed advantage, the advantage is lost in Template::Parser::CET.
+
+    If you use compiled in memory templates - they will execute as quickly
+    as the normal TT2 documents. In all other cases Template::Parser::CET
+    will prepare the documents at about the same speed (usually a little
+    faster).
+
+SYNTAXES
+    Template::Alloy supports TT2 and TT3. It also supports Text::Tmpl,
+    Velocity (VTL), HTML::Template and HTML::Template::Expr. It is now
+    possible to run HTML::Template templates on your TT2 engine.
+
+    Template::Alloy allows you to use any of the interfaces of any of the
+    major template engines. Template::Parser::CET, because it is used
+    through Template, only supports the Template interface (perl calling
+    methods). However by setting the SYNTAX during startup, you can use
+    templates from the other major engines.
+
+    The Template::Alloy documentation will have more examples of using
+    different syntaxes.
+
+  Template::Toolkit style usage (tt3)
+        use Template;
+        use Template::Parser::CET;
+        Template::Parser::CET->activate;
+
+        my $t = Template->new(SYNTAX => 'tt3');
+
+        # OR
+        my $t = Template->new(SYNTAX => 'tt2'); # syntax that is more TT2 friendly
+
+        $t->process(\"[% foo %]", {foo => 'bar'});
+
+  HTML::Template::Expr style usage (hte)
+        use Template;
+        use Template::Parser::CET;
+        Template::Parser::CET->activate;
+
+        my $t = Template->new(SYNTAX => 'hte');
+
+        # or
+        my $t = Template->new(SYNTAX => 'ht'); # HTML::Template
+
+        $t->process(\"<TMPL_VAR NAME=foo>", {foo => 'bar'});
+
+  Text::Tmpl style usage (tmpl)
+        use Template;
+        use Template::Parser::CET;
+        Template::Parser::CET->activate;
+
+        my $t = Template->new(SYNTAX => 'tmpl');
+
+        $t->process(\"[% echo $foo %]", {foo => 'bar'});
+
+  Velocity (VTL) style usage
+        use Template;
+        use Template::Parser::CET;
+        Template::Parser::CET->activate;
+
+        my $t = Template->new(SYNTAX => 'velocity');
+
+        $t->process(\"#set($foo 1 + 3) ($foo)");
+
+FEATURES
+    So what exactly are the features and syntax that Template::Parser::CET
+    provides? The following is a list of most of the features that will be
+    in TT3 and are in Template::Parser::CET. All of the listed features are
+    in addition to those provided natively by Template::Toolkit.
+
+    Grammar
+        Template::Alloy provides Template::Parser::CET with a recursive
+        grammar. This provides a range of benefits including speed, better
+        error reporting, more consistent syntax, and more possibilities for
+        extending the grammar.
+
+    Syntax
+        As part of the grammar, Template::Parser::CET supports the SYNTAX
+        configuration item which can be one of tt2 (Template::Toolkit v2),
+        tt3 (Template::Toolkit v3), ht (HTML::Template), hte
+        (HTML::Template::Expr), tmpl (Text::Tmpl), or velocity (Velocity
+        VTL). This means you can use any of your templates from any of the
+        major mini-language based template engines and run them on your
+        stock TT2 engine.
+
+    Numerical hash keys work
+            [% a = {1 => 2} %]
+
+        All hash key parsing is a little more sane. Not entirely more since
+        CET needs to be backwards compatible.
+
+    Quoted hash key interpolation is fine
+            [% a = {"$foo" => 1} %]
+
+    Multiple ranges in same array constructor
+            [% a = [1..10, 21..30] %]
+
+    Constructor types can call virtual methods. (TT3)
+            [% a = [1..10].reverse %]
+
+            [% "$foo".length %]
+
+            [% 123.length %]   # = 3
+
+            [% 123.4.length %]  # = 5
+
+            [% -123.4.length %] # = -5 ("." binds more tightly than "-")
+
+            [% (a ~ b).length %]
+
+            [% "hi".repeat(3) %] # = hihihi
+
+            [% {a => b}.size %] # = 1
+
+    The "${" and "}" variable interpolators can contain expressions, not
+    just variables.
+            [% [0..10].${ 1 + 2 } %] # = 4
+
+            [% {ab => 'AB'}.${ 'a' ~ 'b' } %] # = AB
+
+            [% color = qw/Red Blue/; FOR [1..4] ; color.${ loop.index % color.size } ; END %]
+              # = RedBlueRedBlue
+
+    You can use regular expression quoting.
+            [% "foo".match( /(F\w+)/i ).0 %] # = foo
+
+            [% a = /a b c . e/xs %]
+
+    Tags can be nested.
+            [% f = "[% (1 + 2) %]" %][% f | eval %] # = 3
+
+    Reserved names are less reserved.
+            [% GET GET %] # gets the variable named "GET"
+
+            [% GET $GET %] # gets the variable who's name is stored in "GET"
+
+    Pipe "|" can be used anywhere dot "." can be and means to call the
+    virtual method.
+            [% a = {size => "foo"} %][% a.size %] # = foo
+
+            [% a = {size => "foo"} %][% a|size %] # = 1 (size of hash)
+
+    Added V2PIPE configuration item
+        Restores the behavior of the pipe operator to be compatible with
+        TT2.
+
+        With V2PIPE = 1
+
+            [% PROCESS a | repeat(2) %] # = value of block or file a repeated twice
+
+        With V2PIPE = 0 (default)
+
+            [% PROCESS a | repeat(2) %] # = process block or file named a ~ a
+
+    Added "fmt" scalar, list, and hash virtual methods which work similar to
+    the Perl 6 methods.
+            [% text.fmt("%s") %]
+
+            [% list.fmt("%s", ", ") %]
+
+            [% hash.fmt("%s => %s", "\n") %]
+
+    Added "pick" list virtual method which picks a random value.
+            [% ["a".."z"].pick(8).join %]
+
+    Added "rand" text virtual method which gives a random number between 0
+    and the item.
+            [% 20.rand %]
+
+    Added "0" text virtual method which returns the item itself. This blurs
+    the line between list and text items.
+            [% a = "20" %][% a.0 IF a.size %]
+
+    Added "int" text virtual method which returns the integer portion of a
+    value.
+            [% "2.3343".int %]
+
+    Whitespace is less meaningful.
+            [% 2-1 %] # = 1 (fails in TT2)
+
+    Added pow operator.
+            [% 2 ** 3 %] [% 2 pow 3 %] # = 8 8
+
+    Added self modifiers (+=, -=, *=, /=, %=, **=, ~=).
+            [% a = 2;  a *= 3  ; a %] # = 6
+            [% a = 2; (a *= 3) ; a %] # = 66
+
+    Added pre and post increment and decrement (++ --).
+            [% ++a ; ++a %] # = 12
+            [% a-- ; a-- %] # = 0-1
+
+    Added qw// contructor.
+            [% a = qw(a b c); a.1 %] # = b
+
+            [% qw/a b c/.2 %] # = c
+
+    Added regex contructor.
+            [% "FOO".match(/(foo)/i).0 %] # = FOO
+
+            [% a = /(foo)/i; "FOO".match(a).0 %] # = FOO
+
+    Allow for scientific notation. (TT3)
+            [% a = 1.2e-20 %]
+
+            [% 123.fmt('%.3e') %] # = 1.230e+02
+
+    Allow for hexidecimal input.
+            [% a = 0xff0000 %][% a %] # = 16711680
+
+            [% a = 0xff2 / 0xd; a.fmt('%x') %] # = 13a
+
+    Post operative directives can be nested.
+        Andy Wardley calls this side-by-side effect notation.
+
+            [% one IF two IF three %]
+
+            same as
+
+            [% IF three %][% IF two %][% one %][% END %][% END %]
+
+            [% a = [[1..3], [5..7]] %][% i FOREACH i = j FOREACH j = a %] # = 123567
+
+    Semi-colons on directives in the same tag are optional.
+            [% SET a = 1
+               GET a
+             %]
+
+            [% FOREACH i = [1 .. 10]
+                 i
+               END %]
+
+        Note: a semi-colon is still required in front of any block directive
+        that can be used as a post-operative directive.
+
+            [% 1 IF 0
+               2 %]   # prints 2
+
+            [% 1; IF 0
+               2
+               END %] # prints 1
+
+    Added a DUMP directive.
+        Used for Data::Dumpering the passed variable or expression.
+
+           [% DUMP a.a %] # dumps contents of a.a
+
+           [% DUMP %] # dumps entire stash
+
+        The Dumping is configurable via a DUMP configuration item.
+
+    Added CONFIG directive.
+           [% CONFIG
+                ANYCASE   => 1
+                PRE_CHOMP => '-'
+           %]
+
+    There is better line information
+        When debug dirs is on, directives on different lines separated by
+        colons show the line they are on rather than a general line range.
+
+        Parse errors actually know what line and character they occured at
+        and tell you about it.
+
+USING Template::Parser::CET
+    There are several ways to get TT to use Template::Parser::CET.
+
+    Pass in object during configuration.
+            use Template;
+            use Template::Parser::CET;
+
+            my $t = Template->new(
+                PARSER => Template::Parser::CET->new(\%config),
+            );
+
+    Override the current program (option 1).
+            use Template::Parser::CET activate => 1;
+
+    Override the current program (option 2).
+            use Template::Parser::CET;
+            Template::Parser::CET->activate;
+
+        You can then deactivate if youy want to use the normal parser by
+        using:
+
+            Template::Parser::CET->deactivate;
+
+    Override the current program (option 3).
+            use Template::Parser::CET;
+            use Template::Config;
+            local $Template::Config::PARSER = 'Template:Parser::CET';
+
+    Override all default instances.
+            Modify the $PARSER value in Template/Config.pm
+            to be 'Template::Parser::CET' rather than 'Template::Parser'.
+
+DOCUMENTATION
+    Template::Toolkit and Template::Alloy already cover everything that
+    would be covered here. If you are running Template::Parser::CET then you
+    already have both Template::Toolkit and Template::Alloy installed.
+    Please refer to their documentation for complete configuration and
+    syntax examples.
+
+    For any of the items in the FEATURES section you will need to refer to
+    the Template::Alloy documentation.
+
+BUGS / TODO
+    *   Template::Parser::CET is as non-invasive as it can be. It does no
+        modification to the existing TT2 install. In order to provide
+        features such as inline filters, self modifying operators, pre and
+        post decrement and increment, and CONFIG and DUMP directive support,
+        the abstraction to Template::Directive was broken. This means that
+        projects such as Jemplate can't use these extended features directly
+        (but projects such as Jemplate could write faster smaller templates
+        if they used Template::Alloy's compiled AST directly).
+
+    *   Cleanup compiled document output.
+
+    *   Add more line numbers to the compiled output.
+
+    *   Actually add the VObjects to the compile phase to get the compile
+        time speed benefit.
+
+    *   Override filter generation code to allow for fall back to the
+        SCALAR_OPS methods if a filter can't be found by the passed name.
+
+TT2 SYNTAX THAT WILL BREAK
+    Pipe (FILTER alias) operators in ambiguous places.
+        Under TT2 the following line:
+
+            [% BLOCK a %]b is [% b %][% END %][% PROCESS a b => 234 | repeat(2) %]
+
+        Would print:
+
+            b is 234b is 234
+
+        Under CET and TT3 that line will print
+
+            b is 234234
+
+        This is because the "|" has been used to allow for filter operations
+        to be used inline on variables and also to call vmethods.
+
+        The configuration option V2PIPE can be used to restore the old
+        behavior. When V2PIPE is set to true (default is false), then CET
+        will parse the block the same as TT2. When false it will parse the
+        same as CET or TT3.
+
+        You can use the CONFIG directive to set the option around some
+        chunks of code that use the old syntax.
+
+            [% CONFIG V2PIPE 1 -%]
+            [% BLOCK a %]b is [% b %][% END %][% PROCESS a b => 234 | repeat(2) %]
+            [%- CONFIG V2PIPE 0 %]
+
+        Would print
+
+            b is 234b is 234
+
+    Inline comments that end with the tag and not a newline.
+        Because of the way the TT2 engine matches tags, the following works
+        in TT2:
+
+            [% a # GET THE value of a %]
+
+        Because CET is recursive in nature, the closing tag has not been
+        matched by the time the comment is removed. You will get a parse
+        error saying not sure how to handle the tag.
+
+        Simply change the previous example to the following:
+
+            [% a # GET THE value of a
+            %]
+
+        All other commenting constructs parse just fine.
+
+    The qw variable parse error
+        If your template had a variable named qw - there will most likely be
+        a parse error.
+
+        In TT2 there was no qw() construct but there is in CET and TT3.
+
+            [% a = qw %]          Works fine in TT2 but is a parse error in TT3
+            [% a = qw(Foo Bar) %] Works fine in TT3 but is a parse error in TT2
+
+TT2 TESTS THAT FAIL
+    The following is a list of tests that will fail as of the TT2.19 test
+    suite. All of the failed tests are caused by behavior that will be
+    obsoleted by TT3.
+
+    t/compile3.t - Fails 1 test
+        Both CET and TT2 return the same error - but the error isn't
+        formatted the same.
+
+    t/debug.t - Fails 1 test
+        CET debugs INTERPOLATED GETS - TT2 doesn't. There is an INTERPOLATED
+        value that TT2 doesn't debug.
+
+    t/fileline.t - Fails 4 tests
+        CET is warn clean - even when performing numeric operations on
+        non-numeric data - TT2 isn't and is testing for warnings.
+
+    t/filter.t - Fails 1 test
+        CET parses { 1 2 3 } as a hashref just fine - TT2 doesn't and
+        expects an error.
+
+    t/vars.t - Fails 8 tests (4 really, but parsing is failing)
+        TT2 is allowing inline comments with closing tag on the same line.
+        CET is recursive, the closing tag isn't matched before the closing
+        tag - changing the closing tag to be on a separate line fixes the
+        issue.
+
+AUTHOR
+    Paul Seamons <paul at seamons dot com>
+
+LICENSE
+    This module may be distributed under the same terms as Perl itself.
+

@@ -1,0 +1,22 @@
+---
+name: Template-Plugin-LinkTarget
+version: 0.02
+author:
+  - Graham TerMarsch (cpan@howlingfrog.com)
+abstract: TT filter to add "target" attribute to all HTML links
+license: perl
+resources:
+  license: ~
+requires:
+  HTML::Parser: 0
+  Template: 2
+build_requires:
+  Test::More: 0
+provides:
+  Template::Plugin::LinkTarget:
+    file: lib/Template/Plugin/LinkTarget.pm
+    version: 0.02
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

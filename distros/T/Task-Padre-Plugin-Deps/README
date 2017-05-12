@@ -1,0 +1,20 @@
+Task-Padre-Plugin-Deps
+
+Just a bunch of prereqs used by some of the plugins of Padre.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Gabor Szabo
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

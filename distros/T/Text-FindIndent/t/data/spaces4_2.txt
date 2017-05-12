@@ -1,0 +1,9 @@
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    PREREQ_PM => {
+                  'Test::More' => 0,
+                  'Yahoo::Search::XML' => '20060729.004',
+                  'LWP::UserAgent' => 0,
+    },
+);

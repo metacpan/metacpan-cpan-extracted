@@ -1,0 +1,21 @@
+Tree-Authz
+
+Class for inheritable, role-based permissions system (Role Based Access
+Control - RBAC).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 David Baird
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

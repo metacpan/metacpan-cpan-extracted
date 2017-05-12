@@ -1,0 +1,143 @@
+Revision history for Perl module Test::Prereq
+
+2.002 2016-11-23T22:03:31Z
+	* Support test_requires in Module::Build (Sam Brightman, GitHub #15)
+
+2.001_002 2016-10-28T00:42:22Z
+	* Fix postderef. I specified v5.22, but it was still experimental then.
+	Identified by Slaven ReziÄ (https://github.com/briandfoy/test-prereq/issues/14)
+
+2.001_001 2016-10-24T04:12:51Z
+	* Big changes:
+	+ No more filtering out core modules (some things are ejected from core!)
+	+ Switched from Module::Info to Module::Extract::Use
+	+ Switched from old Test::Builder to Test::Builder::Module from the
+	new Test::Simple stuff.
+
+1.039 2015-08-08T07:39:45Z
+	* Bump to stable version
+
+1.038_07 2015-06-22T21:41:25Z
+	* Don't install README.pod
+
+1.038_06 2015-06-22T18:06:54Z
+	* Adjust default list for v5.20 kicking out Module::Build
+	https://bugs.debian.org/789479
+	RT #105398
+
+1.38_05 - 2014-01-17
+	* More adjustments for 5.8 tests.
+
+1.38_04 - 2014-01-16
+	Refactor some tests, with more exploration for 5.8 failures.
+
+1.38_03 - 2014-01-15
+	* Add some diag messages in tests to investigate
+	some test failures
+
+1.38_02 - 2014-01-06
+	* Fixup for CONFIGURE_REQUIRES (GitHub Issue #2)
+
+1.38_01 - 2014-01-03
+	* Handle TEST_REQUIRES
+	* Fixes for v5.8, which doesn't include Module::Build
+
+1.38 - 2014-01-02
+	* Use Makefile.PL instead of Build.PL since Module::Build
+	is likely to be deprecated
+	* Fix up Pod encoding issues
+
+1.037 - 2009-06-01
+	* Fix #46335: qualify calls to find() so Module::Install
+	doesn't intercept them.
+
+1.035 - 2008-08-02
+	* Cleaning up the Makefile a bit. No need to upgrade.
+
+1.034 - 2008-07-12
+	* Various minor cleanups. No big whoop.
+
+1.033 - 2007-03-16
+	* Fixed load test to not complain when trying to import the same
+	symbol twice
+	* No code fixes otherwise. No need to upgrade.
+
+1.032 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.031 - 2006-05-17
+	* updates to distro and kwalitee. No need to upgrade
+
+1.030 - 2006-05-17
+	* Updates to distro and kwalitee. No need to upgrade.
+
+1.030 - 2006-01-11
+	* Tests should now work even if there is nothing in PREREQ_PM. In the
+	previous version, an empty PREREQ_PM made the module think Makefile.PL
+	didn't exit cleanly.
+	* Everyone should upgrade.
+
+1.029 - 2005-12-25
+	* Updated some tests that had some problems. No need to upgrade.
+
+1.028 - 2005-07-13
+	* Simple doc fixes. No need to upgrade.
+
+1.027 - 2005-03-08
+	* fixed up the bits that deal with the plan, to make things
+	consistent. prereq_ok will create the plan if it doesn't
+	exist, or leave it alone if it does.
+	* You don't need to use Test::More (and you didn't need
+	to previously, despite the docs)
+
+1.026 - 2005-03-04
+	* Documentation fix for command line invocation: Test::Prereq
+	calls plan() for you, so you don't have to.
+
+1.025 - 2004-09-08
+	* get rid of the 'redefine' warning when we read the Makefile.PL
+
+1.024 - 2004-09-07
+	* cleaned up distro
+	* bumped version to a full release (the interface is pretty much set)
+	* no need to upgrade really (although some modules might require a
+	version number above 1.x
+
+0.23 - 2004-08-24
+	* Changed a few things for demo talk
+
+0.23 - 2004-02-20
+	* got rid of the File::Find::Rule dependency
+
+0.19 - 2002-12-20
+	* stripped bad whitespace from Pod, no code changes
+
+0.18 - 2002-11-04
+	* skip CPANPLUS modules by default.  still haven't
+	figured this out.
+
+0.17 - 2002-10-23
+	* removed extra call to CPAN.pm.  this should make
+	things run faster.
+
+0.16 - 2002-10-11
+	* add MAN3PODS to WriteMakefile to make man
+	pages show up in the right place
+
+0.15 - 2002-10-10
+	* more changes to get around CPANPLUS
+
+0.14 - 2002-10-10
+	* test suite gives better error output (so i can
+	figure out what's up with CPANPLUS)
+
+0.13 - 2002-10-09
+	* expands distributions in PREREQ_PM to look for
+	modules implicitly declared
+
+0.10 - 2002-10-04
+	* added support for Module::Build
+
+0.07 - 2002-09-30
+	* cleaned up Makefile.PL for perl5.8.0 weirdness

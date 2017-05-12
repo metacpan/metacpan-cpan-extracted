@@ -1,0 +1,12 @@
+# @(#) typemap -- typemap for Tie::MmapArray module
+# @(#) $Id: typemap,v 1.2 1999/12/24 16:34:52 andrew Exp $
+# 
+# Copyright (C) 1999, Ford & Mason Ltd.  All rights reserved.
+#
+# You may distribute under the terms of either the GNU General Public
+# License or the Artistic License, as specified in the README file.
+
+
+Tie::MmapArray *		T_PTROBJ
+Tie::MmapArray::SubArray *	T_PTROBJ
+Tie::MmapArray::SubHash *	T_PTROBJ

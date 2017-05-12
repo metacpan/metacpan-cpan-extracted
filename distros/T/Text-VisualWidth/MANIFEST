@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+VisualWidth.xs
+t/Text-VisualWidth.t
+t/Text-VisualWidth-EUC_JP.t
+t/Text-VisualWidth-UTF8.t
+lib/Text/VisualWidth.pm
+lib/Text/VisualWidth/EUC_JP.pm
+lib/Text/VisualWidth/UTF8.pm
+META.yml                                 Module meta-data (added by MakeMaker)

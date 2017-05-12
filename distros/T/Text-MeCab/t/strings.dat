@@ -1,0 +1,7 @@
+do {
+  require MIME::Base64;
+  {
+    sumomo => pack("H*","e38199e38282e38282e38282e38282e38282e38282e38282e38282e381aee38186e381a1e38082"),
+    taro   => MIME::Base64::decode("5aSq6YOO44Gv5qyh6YOO44GM5oyB44Gj44Gm44GE44KL5pys44KS6Iqx5a2Q44Gr5rih44GX44Gf44CC"),
+  };
+}

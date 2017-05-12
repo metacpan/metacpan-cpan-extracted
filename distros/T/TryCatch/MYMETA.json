@@ -1,0 +1,75 @@
+{
+   "abstract" : "first class try catch semantics for Perl, without source filters.",
+   "author" : [
+      "Ash Berlin <ash@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TryCatch",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "B::Hooks::OP::Check" : "0.18",
+            "B::Hooks::OP::PPAddr" : "0.03",
+            "ExtUtils::Depends" : "0.302",
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "B::Hooks::OP::Check" : "0.18",
+            "B::Hooks::OP::PPAddr" : "0.03",
+            "ExtUtils::Depends" : "0.302",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0.12",
+            "B::Hooks::OP::Check" : "0.18",
+            "B::Hooks::OP::PPAddr" : "0.03",
+            "Devel::Declare" : "0.005007",
+            "Moose" : "0",
+            "MooseX::Types" : "0",
+            "Parse::Method::Signatures" : "1.003012",
+            "Scope::Upper" : "0.06",
+            "Sub::Exporter" : "0.979",
+            "Variable::Magic" : "0.28",
+            "XSLoader" : "0",
+            "namespace::clean" : "0.20",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "TryCatch" : {
+         "file" : "lib/TryCatch.pm",
+         "version" : "1.003002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ashb/trycatch/tree/master"
+      }
+   },
+   "version" : "1.003002"
+}

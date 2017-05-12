@@ -1,0 +1,21 @@
+abstract: Thoroughly testing objects via registered handlers
+author: Adam Kennedy <cpan@ali.as>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Test-Object
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+  Exporter: 0
+  File::Spec: 0.80
+  Scalar::Util: 1.16
+  Test::Builder: 0.33
+  Test::Builder::Tester: 1.02
+  Test::More: 0.42
+  overload: 0
+  perl: 5.005
+version: 0.07

@@ -1,0 +1,44 @@
+Release of 0.43 is mainly motivated to support both vector and similarity
+space clustering methods on first order and second order context vectors 
+
+Changes made in Sense-Clusters version 0.41 during version 0.43
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Modified simat.pl 
+	a. by computing byte offsets of vectors once before starting the main
+	loops and reading entire row instead of each element separately
+	b. by removing the tail call by counting the length of header info	
+	c. adding mmap support via PDL's mapfraw
+	
+2.	Added --rowonly option to pdlsvd 
+
+3.	Used PDL vector for storing singular values in svdpackout in 
+	rowonly part instead of Perl array
+
+4.	Changed Organization by moving program/s
+	svdpackout, pdlsvd and mat2harbo to Toolkit/svd
+	toscluster, tovcluster, cluto2label to Toolkit/cluto
+	windower to Toolkit/preprocess
+	simat to Toolkit/matrix
+	wordvec.pl to Toolkit/vector
+	contextvec.pl to Toolkit/vector/order2vec.pl	
+
+5.	Added new program bitsimat in Toolkit/matrix to find similarity
+	matrix for binary vectors using efficient Bit::Vector calls
+
+6.	Added new program order1vec.pl in Toolkit/vector that creates 
+	first order context vectors 
+	
+7.	Modified order2vec by removing tail system call instead, used byte
+	offset calculations 
+
+8.	Added --binary option to order2vec and wordvec
+
+9.	Modify Senseval-2 demo input file by converting to Unicode and then
+	back to iso-8859-1 format to remove the Malformed-UTF8 warnings.
+ 
+(Changelog-v0.41to0.43 Last Updated on 10/21/2003 by Amruta)

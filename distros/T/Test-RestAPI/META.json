@@ -1,0 +1,94 @@
+{
+   "abstract" : "Real mock of REST API",
+   "author" : [
+      "Jan Seidl <seidl@avast.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-RestAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Minilla" : "0",
+            "Module::Build::Tiny" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "0",
+            "Moo" : "0",
+            "Path::Tiny" : "0",
+            "Port::Selector" : "0",
+            "Type::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Test::RestAPI" : {
+         "file" : "lib/Test/RestAPI.pm",
+         "version" : "v0.1.6"
+      },
+      "Test::RestAPI::Endpoint" : {
+         "file" : "lib/Test/RestAPI/Endpoint.pm"
+      },
+      "Test::RestAPI::MojoGenerator" : {
+         "file" : "lib/Test/RestAPI/MojoGenerator.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JaSei/Test-RestAPI/issues"
+      },
+      "homepage" : "https://github.com/JaSei/Test-RestAPI",
+      "repository" : {
+         "url" : "git://github.com/JaSei/Test-RestAPI.git",
+         "web" : "https://github.com/JaSei/Test-RestAPI"
+      }
+   },
+   "version" : "0.1.6",
+   "x_authority" : "cpan:JASEI",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Jan Seidl <janseidl@volny.cz>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

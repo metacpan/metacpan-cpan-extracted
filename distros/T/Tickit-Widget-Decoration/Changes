@@ -1,0 +1,23 @@
+Revision history for Tickit-Widget-Decoration
+
+0.004     2013-09-28 20:06:14 Europe/London
+	No new features
+
+	Bug fixes:
+	* Updated Dist::Zilla::Plugin::Test::Compile for RT88783
+
+0.003     2013-09-15 02:22:37 Europe/London
+	Features:
+	* Support gradient direction
+
+	Dependency fixes:
+	* Remove unnecessary deps from cpanfile, add Tickit
+
+0.002     2013-09-14 21:36:54 Europe/London
+	No new features
+
+	Documentation:
+	* Include screenshot
+
+0.001     2013-09-14 21:28:51 Europe/London
+	Initial CPAN release

@@ -1,0 +1,15 @@
+---
+name: Test-Net-Connect
+version: 0.03
+author:
+  - Nik Clayton <nik@FreeBSD.org>
+abstract: Test::Builder based tests for network connectivity
+license: bsd
+requires:
+  IO::Socket::INET: 0
+  Test::More: 0
+provides:
+  Test::Net::Connect:
+    file: lib/Test/Net/Connect.pm
+    version: 0.03
+generated_by: Module::Build version 0.2611

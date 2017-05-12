@@ -1,0 +1,40 @@
+
+libtext-lookuptable-perl (0.05-1) unstable; urgency=low
+
+  [Jeremiah Mahler]
+  * 0.04-1 -> 0.05-1, see Changes
+
+ -- Jeremiah Mahler <jmmahler@gmail.com>  Wed, 04 Aug 2010 17:30:14 -0700
+
+libtext-lookuptable-perl (0.04-1) unstable; urgency=low
+
+  [Jeremiah Mahler]
+  * fixed some typos
+
+ -- Jeremiah Mahler <jmmahler@gmail.com>  Thu, 29 Jul 2010 21:37:14 -0700
+
+libtext-lookuptable-perl (0.03-1) unstable; urgency=low
+
+  [Jeremiah Mahler]
+  * converted to inc::ModuleInstall
+
+ -- Jeremiah Mahler <jmmahler@gmail.com>  Thu, 29 Jul 2010 15:58:21 -0700
+
+libtext-lookuptable-perl (0.02-1) unstable; urgency=low
+
+  [Jeremiah Mahler]
+  * Fixed erroneous inclusion of README.pod in to library directory.
+    Having README.pod in the main directory results in nice output
+    when uploaded to github.com.  But it is erroneously included by
+    ExtUtils::MakeMaker in to the lib directory.
+    No easy way of overcoming this fault was found.
+    See /usr/share/perl/5.10.1/ExtUtils/MM_Unix.pm line 1265
+  
+ -- Jeremiah Mahler <jmmahler@gmail.com>  Wed, 28 Jul 2010 15:45:51 -0700
+
+libtext-lookuptable-perl (0.01-1) unstable; urgency=low
+  
+  * Initial release
+
+ -- Jeremiah Mahler <jmmahler@gmail.com>  Wed, 28 Jul 2010 13:01:55 -0700
+

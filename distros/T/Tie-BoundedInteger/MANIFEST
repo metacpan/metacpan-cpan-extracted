@@ -1,0 +1,16 @@
+Changes
+examples/README
+lib/Tie/BoundedInteger.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META_new.yml
+MYMETA.json
+MYMETA.yml
+README.md
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

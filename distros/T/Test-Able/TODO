@@ -1,0 +1,22 @@
+# items are unordered
+
+l.  Skip and todo support.
+
+2.  Add option to stop whatever is running and run teardown and shutdown
+    methods on first SIGINT.  This would get us a graceful kill.
+
+3.  Ability to run a test suite without hand coding .t files.
+
+4.  Ability to have seperate TAP results for test objects without having
+    to manually code .t files.  Requires discovery.
+
+4.1.  Maybe run multiple test objects in the same program as if they were
+      seperate programs.  Can probably do this by subclassing TAP::Harness
+      and/or TAP::Parser.  But unsure if this could be made to work with
+      existing CPAN toolchain.  Also unsure of sidestepping the wisdom of
+      using seperate programs.
+
+4.2.  See hmtest at $work for way to find and run all test classes seperately
+      (creates .t files in temp dir) and not as one huge run.
+
+5.  Get someone to do Devel::Declare part for method metadata.  rafl?

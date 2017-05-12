@@ -1,0 +1,17 @@
+BEGIN OUTPUT BY Text::Ngrams version 1.8
+
+1-GRAMS (total count: 8)
+FIRST N-GRAM: quick
+ LAST N-GRAM: text
+------------------------
+brown	4
+fox	4
+
+2-GRAMS (total count: 7)
+FIRST N-GRAM: quick brown
+ LAST N-GRAM: more text
+------------------------
+brown fox	4
+fox brown	3
+
+END OUTPUT BY Text::Ngrams

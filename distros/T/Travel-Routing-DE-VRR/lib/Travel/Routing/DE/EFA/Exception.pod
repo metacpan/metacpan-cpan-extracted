@@ -1,0 +1,57 @@
+=head1 NAME
+
+Travel::Routing::DE::EFA::Exception - Travel::Routing::DE::EFA Exceptions
+
+=head1 DESCRIPTION
+
+All Exceptions thrown by Travel::Routing::DE::EFA are
+Travel::Routing::DE::EFA::Exception objects created by Exception::Class(3pm).
+
+See Exception::Class::Base(3pm) for their common methods.
+
+=head1 LIST OF EXCEPTIONS
+
+=head2 Travel::Routing::DE::EFA::Exception::Setup
+
+An argument to B<new> had an invalid format.
+
+Additional methods:
+
+=over
+
+=item $exception->option
+
+The option in which the error occured.
+
+=item $exception->have
+
+The argument we got.
+
+=item $exception->want
+
+What kind of argument we want.
+
+=back
+
+=head2 Travel::Routing::DE::EFA::Exception::Net
+
+The HTTP request to the efa interface failed. Contains an HTTP::Response(3pm)
+object describing the error in B<http_response>.
+
+=head2 Travel::Routing::DE::EFA::Exception::NoData
+
+We got no parsable data from the EFA service
+
+=head2 Travel::Routing::DE::EFA::Exception::Ambiguous
+
+Our request contained ambiguous data. B<post_key> contains the relevant POST
+key and B<post_value> the corresponding input value.  B<possibilities> is a
+pipe-separated string of acceptable values reported by the EFA service.
+
+=head2 Travel::Routing::DE::EFA::Exception::NoConnections
+
+The EFA service found no connections for our request.
+
+=head1 SEE ALSO
+
+Travel::Routing::DE::EFA(3pm)

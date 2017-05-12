@@ -1,0 +1,11 @@
+Revision history for Text-Table-Paragraph
+
+0.002   2017-01-01 (PERLANCAR)
+
+	- Add options: wrap, wrap_width (also observes
+	  TEXT_TABLE_PARAGRAPH_{WRAP,WRAP_WIDTH} envs).
+
+
+0.001   2017-01-01 (PERLANCAR)
+
+        - First release.

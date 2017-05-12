@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: TV-Anytime
+version: 0.31
+author:
+  - Leon Brocard C<acme@astray.com>
+abstract: Parse TV-AnyTime bundles of TV and Radio listings
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

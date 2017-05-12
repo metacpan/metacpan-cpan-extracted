@@ -1,0 +1,58 @@
+---
+abstract: 'A Task module for DWIM Perl L<http://dwimperl.com/>'
+author:
+  - 'Gabor Szabo L<http://szabgab.com>'
+build_requires:
+  Config::Tiny: 2.20
+  ExtUtils::MakeMaker: 6.59
+  Perl::Version: 1.011
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-DWIM-Linux
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Acme::MetaSyntactic: 1.012
+  Business::PayPal: 0.11
+  CGI: 3.65
+  CPAN::Changes: 0.27
+  Code::Explain: 0.02
+  Config::Tiny: 2.20
+  DBD::SQLite: 1.42
+  DBI: 1.631
+  DBIx::RunSQL: 0.12
+  Daemon::Control: 0.001005
+  Dancer: 1.3123
+  DateTime::Tiny: 1.04
+  Email::Valid: 1.193
+  Encode: 2.59
+  Geo::IP: 1.43
+  HTML::Template: 2.95
+  Hash::Merge::Simple: 0.051
+  LWP::Simple: 6.00
+  MIME::Lite: 3.030
+  Moo: 1.004002
+  Plack: 1.0030
+  Plack::Request: 1.0030
+  Starman: 0.4009
+  Storable: 2.45
+  Template: 2.25
+  Test::More: 1.001003
+  Test::WWW::Mechanize: 1.44
+  Web::Feed: 0.02
+  YAML: 0.90
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dwimperl/Task-DWIM
+version: 0.10

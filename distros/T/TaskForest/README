@@ -1,0 +1,101 @@
+NAME
+    TaskForest - A simple but expressive job scheduler that allows you to
+    chain jobs/tasks and create time dependencies. Uses text config files to
+    specify task dependencies.
+
+VERSION
+    This is version 1.36.
+
+EXECUTIVE SUMMARY
+    With the TaskForest Job Scheduler you can:
+
+    *   schedule jobs run at predetermined times
+
+    *   have jobs be dependent on each other
+
+    *   rerun failed jobs
+
+    *   mark jobs as succeeded or failed
+
+    *   put jobs on hold and release the holds
+
+    *   release all dependencies on a job
+
+    *   check the status of all jobs scheduled to run today
+
+    *   interact with the included web service using your own client code
+
+    *   interact with the included web server using your default browser
+
+    *   express the relationships between jobs using a simple text-based
+        format (a big advantage if you like using 'grep')
+
+SYNOPSIS
+    Over the years TaskForest has migrated from a collection of simple perl
+    modules to a full-fledged system. I have found that putting the
+    documentation in a single POD is getting much more difficult. You can
+    now find the latest documetation on the TaskForest website located at
+
+     http://www.taskforest.com
+
+    If you run the included web server, you will also find a complete copy
+    of the documentation on the included web site.
+
+BUGS
+    For an up-to-date bug listing and to submit a bug report, please send an
+    email to the TaskForest Discussion Mailing List at "taskforest-discuss
+    at lists dot sourceforge dot net"
+
+SUPPORT
+    For support, please visit our website at http://www.taskforest.com/ or
+    send an email to the TaskForest Discussion Mailing List at
+    "taskforest-discuss at lists dot sourceforge dot net"
+
+AUTHORS
+    Aijaz A. Ansari http://www.taskforest.com/
+
+    The following developers have graciously contributed patches to enhance
+    TaskForest:
+
+    *   Steve Hulet
+
+    Please see the 'Changes' file for details. If you have contributed code,
+    and your name is not on the above list, please accept my apologies and
+    let me know, so that I may give you credit.
+
+    If you're using this program, I would love to hear from you. Please send
+    an email to the TaskForest Discussion Mailing List at
+    "taskforest-discuss at lists dot sourceforge dot net" and let me know
+    what you think of it.
+
+ACKNOWLEDGEMENTS
+    Many thanks to the following for their help and support:
+
+    *   SourceForge
+
+    *   Rosco Rouse
+
+    *   Svetlana Lemeshov
+
+    *   Teresia Arthur
+
+    *   Steve Hulet
+
+    I would also like to thank Randal L. Schwartz for teaching the readers
+    of the Feb 1999 issue of Web Techniques how to write a pre-forking web
+    server, the code upon which the TaskForest Web server is built.
+
+    I would also like to thank the fine developers at Yahoo! for providing
+    yui to the open source community.
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself - specifically, the Artistic
+    License.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

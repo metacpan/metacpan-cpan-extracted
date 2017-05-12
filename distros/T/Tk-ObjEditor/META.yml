@@ -1,0 +1,34 @@
+---
+abstract: 'Tk composite widget Obj editor'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '0'
+  Tie::Hash: '0'
+  Tie::Scalar: '0'
+  Tk::ROText: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-ObjEditor
+requires:
+  Carp: '0'
+  Scalar::Util: '1.01'
+  Storable: '0'
+  Tk: '0'
+  Tk::Derived: '0'
+  Tk::Dialog: '0'
+  Tk::DialogBox: '0'
+  Tk::Frame: '0'
+  Tk::ObjScanner: '2.010'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-ObjEditor
+  homepage: https://github.com/dod38fr/perl-tk-objeditor
+  repository: https://github.com/dod38fr/perl-tk-objeditor.git
+version: '2.009'

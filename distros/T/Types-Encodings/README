@@ -1,0 +1,57 @@
+NAME
+    Types::Encodings - type constraints for Bytes and Chars
+
+DESCRIPTION
+    Additional type constraints and coercions to complement Types::Standard.
+
+  Type constraints
+    `Str`
+        Alias for Types::Standard type constraint of the same name.
+
+    `Bytes`
+        Strings where `utf8::is_utf8()` is false.
+
+    `Chars`
+        Strings where either `utf8::is_utf8()` is true, or each byte is below
+        0x7F.
+
+  Coercions
+    `Encode[`a]`
+        Coercion to encode a character string to a byte string using
+        `Encode::encode()`. This is a parameterized type coercion, which
+        expects a character set:
+
+           use Types::Standard qw( Bytes Encode );
+   
+           has filename => (
+              is     => "ro",
+              isa    => Bytes->plus_coercions( Encode["utf-8"] ),
+              coerce => 1,
+           );
+
+    `Decode[`a]`
+        Coercion to decode a byte string to a character string using
+        `Encode::decode()`. This is a parameterized type coercion, which
+        expects a character set.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-Encodings>.
+
+SEE ALSO
+    Types::Standard.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

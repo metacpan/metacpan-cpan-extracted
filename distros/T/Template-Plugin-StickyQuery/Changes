@@ -1,0 +1,7 @@
+Revision history for Perl extension Template::Plugin::StickyQuery
+
+0.02  Fri Sep 20 16:09:00 2002
+	- Fixed t/01_sticky.t
+	
+0.01  Wed Sep 18 13:04:35 2002
+	- original version

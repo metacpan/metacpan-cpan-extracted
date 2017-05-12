@@ -1,0 +1,12 @@
+
+Changes made in Sense-Clusters version 0.87 during version 0.89
+
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+
+1. Modified the Makefile.PL and INSTALL document to require v0.04 of Algorithm::RandomMatrixGeneration 
+instead of 0.03																									-Anagha
+
+2. Changed the default precision from 4 to 6 in discriminate.pl and /Web/SC-cgi/first.cgi						-Anagha	
+
+(Changelog-v0.87to0.89 Last Updated on 05/27/2006 by Anagha)

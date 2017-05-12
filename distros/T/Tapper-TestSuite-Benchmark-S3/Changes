@@ -1,0 +1,7 @@
+Revision history for Tapper-TestSuite-Benchmark-S3
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        - initial testsuite for suspend/resume measurements

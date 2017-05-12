@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - 'Fergal Daly <fergal@esatclear.ie>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  Test::Tester: '0.04'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Deep
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  List::Util: '1.09'
+  Scalar::Util: '1.09'
+  Test::Builder: '0'
+resources:
+  IRC: irc://irc.perl.org/#perl-qa
+  MailingList: http://lists.perl.org/list/perl-qa.html
+  bugtracker: http://github.com/rjbs/Test-Deep/issues
+  homepage: http://github.com/rjbs/Test-Deep/
+  repository: https://github.com/rjbs/Test-Deep.git
+version: '1.127'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

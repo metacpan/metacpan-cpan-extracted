@@ -1,0 +1,532 @@
+NAME
+    INSTALL Installation instructions for SenseClusters
+
+SYNOPSIS
+    If you have su or sudo access, you should be able to install and test
+    the installation of SenseClusters via automatic download from CPAN as
+    follows:
+
+      # install SenseClusters and all dependent CPAN modules
+      perl -MCPAN -e 'install Bundle::Text::SenseClusters';
+
+      # install cluto and SVDPACKC (included in SenseClusters)
+      cd ~/.cpan/build/Text-SenseClusters-[insert_version]
+      cd External
+      csh ./install.sh /usr/local/bin
+      cd ~
+
+      # run SC test cases (note that location of cpan build 
+      # directory might vary on your system. 
+
+      cd ~/.cpan/build/Text-SenseClusters-[insert_version]
+      cd Testing
+      csh ./ALL-TESTS.sh
+      cd ~
+
+    This assumes that /usr/local/bin is in your PATH and is your preferred
+    location for user installed executable scripts. If it is not, substitute
+    your preferred directory here.
+
+INSTALLATION OVERVIEW
+    SenseClusters consists of the core SenseClusters programs (primarily .pl
+    programs found in this distribution), Perl modules available from CPAN,
+    and two external programs (SVDPACKC and Cluto). SenseClusters requires
+    Perl 5.6.0 or better.
+
+    SVDPACKC is distributed as C source code, and Cluto is distributed in
+    binary form for Linux and Solaris. This dependence on CLUTO limits
+    SenseClusters to running on Linux or Solaris. There is a Windows version
+    of CLUTO available, but we have not tested how well this integrates into
+    SenseClusters.
+
+    Please note that SenseClusters uses the csh - this is an artifact of it
+    originally being developed on Solaris/Sun systems (which used csh as a
+    default). Many Linux distributions do not include csh, so you will want
+    to install that if you don't already have it. On Ubuntu and Debian
+    systems, this can be done simply via :
+
+     sudo apt-get install csh
+
+    Also note that the default behavior of Ubuntu distributions to use dash
+    as the system shell causes some problems, so you may want to reset this
+    to use bash. See <https://wiki.ubuntu.com/DashAsBinSh> for more details.
+
+AUTOMATIC INSTALLATION
+    You may be able to download and install the SenseClusters core,
+    dependent CPAN modules, and External programs via a single command using
+    the CPAN module.
+
+    If you have sudo or su access, then installation of the CPAN modules and
+    the core SenseClusters programs can be achieved as follows:
+
+      perl -MCPAN -e 'install Bundle::Text::SenseClusters';
+
+    This command will install SenseClusters and all dependent CPAN modules.
+    SenseClusters includes a script that will help you install the External
+    code as well. You may be able to install the external programs Cluto and
+    SVDPACKC via the following :
+
+      cd ~/.cpan/build/Text-SenseClusters-[insert_version]
+      cd External
+      csh ./install.sh INSTALLDIR
+      cd ~
+
+    If you have sudo or su access, INSTALLDIR should be a directory in your
+    PATH, such as /usr/local/bin. If you do not, you will need to install
+    into a directory you have read and write access to, and then include in
+    your path. If install.sh fails for some reason, you will need to install
+    Cluto and SVDPATH manually, as described below.
+
+    At present SenseClusters does not utilize 'make test', so testing must
+    be done via scripts found in the /Testing directory. Please make certain
+    to run these tests after the installation of the External programs, CPAN
+    modules, and SenseClusters core has concluded.
+
+      cd ~/.cpan/build/Text-SenseClusters-[insert_version]
+      cd Testing
+      csh ./ALL-TESTS.sh
+      cd ~
+
+    If this automatic install does not work, you can download SenseClusters
+    manually from CPAN <http://search.cpan.org/dist/Text-SenseClusters> or
+    Sourceforge <http://senseclusters.sourceforge.net> and install as
+    described in the rest of this document.
+
+SENSECLUSTERS COMPONENTS
+  CPAN Modules
+    SenseClusters depends on a number of different CPAN modules. These are
+    all included in the Bundle above, and can be installed via the Bundle
+    (recommended) or individually (described below).
+
+    *   PDL (Perl Data Language, version 2.4.1 or better)
+
+    *   Algorithm::Munkres (version 0.07 or better)
+
+    *   Algorithm::RandomMatrixGeneration (version 0.06 or better)
+
+    *   Bit::Vector (version 6.3 or better)
+
+    *   Math::SparseMatrix (version 0.02 or better)
+
+    *   Math::SparseVector (version 0.04 or better)
+
+    *   Set::Scalar (version 1.19 or better)
+
+    *   Text::NSP (version 1.09 or better)
+
+  EXTERNAL PACKAGES (/External)
+    The following packages are not written in Perl and are developed outside
+    of the SenseClusters project. SVDPACKC is distributed as C source code,
+    and Cluto is distributed as pre-complied binaries for Linux and Solaris.
+
+    Please note that SVDPACK is optional - SenseClusters will run without it
+    (just don't use the --svd option). However, Cluto is mandatory,
+    SenseClusters will not be able to perform clustering without it.
+
+    *   CLUTO (version 2.1.1 or better)
+
+    *   SVDPACKC (Feb 2004 version or better, compiled with gcc 3.2.2,
+        3.2.3, or 3.3.0)
+
+MANUAL INSTALLATION OF CPAN MODULES
+    If the Bundle install does not succeed, you will need to install the
+    following modules manually:
+
+    *   PDL (version 2.4.1 or better)
+
+        SenseClusters uses the Perl Data Language for efficient computations
+        and storage of high dimensional data structures.
+
+        It is available at: <http://search.cpan.org/dist/PDL/>
+
+        Note that if you have supervisor access on your machine, and have
+        the MCPAN Perl module available, you can install PDL automatically
+        via:
+
+        "perl -MCPAN -e 'install PDL';"
+
+        If you do not have supervisor access, you will need to install this
+        module locally. Note that you can configure the CPAN module to
+        install locally by setting PREFIX and LIB options to directories you
+        have read write authority over.
+
+        Note that PDL has quite a few dependencies, and can be tricky to
+        install. You may want to check with your system administrator and
+        see if they can install on your behalf before you tackle the local
+        install of PDL. All the other code mentioned here can be locally
+        installed quite routinely.
+
+        This is a good description of how to do local installs of Perl
+        modules: <http://www.perl.com/pub/a/2002/04/10/mod_perl.html>
+
+    *   Bit::Vector (version 6.3 or better)
+
+        The Bit::Vector module is used with binary context vectors (via
+        --binary option in wrappers or program bitsimat.pl). This can be
+        downloaded from:
+
+        <http://search.cpan.org/dist/Bit-Vector/>
+
+         Note that the following installation instructions apply to all of the
+         CPAN modules, and will not be repeated in detail for each module.
+
+        If you have supervisor access, or have configured MCPAN for local
+        install, you can install via:
+
+        "perl -MCPAN -e 'install Bit::Vector';"
+
+        If not, you can, "manually" install by downloading the *.tar.gz
+        file, unpacking, and executing the following commands.
+
+         perl Makefile.PL PREFIX=/space/kulka020/Bit-Vector LIB=/space/kulka020/MyPerlLib
+         make
+         make test
+         make install
+
+        Note that the PREFIX and LIB settings are just examples to help you
+        create a local install, if you do not have supervisor (su) access.
+
+        You must include /space/kulka020/MyPerlLib in your PERL5LIB
+        environment variable to access this module when running.
+
+    *   Text::NSP (version 1.09 or better)
+
+        SenseClusters uses the Ngram Statistics Package to select a variety
+        of lexical features.
+
+        Text::NSP is available at <http://search.cpan.org/dist/Text-NSP/>
+
+        "perl -MCPAN -e 'install Text::NSP';"
+
+        or manual installation.
+
+    *   Set::Scalar (version 1.19 or better)
+
+        It is available at: <http://search.cpan.org/dist/Set-Scalar/>
+
+        "perl -MCPAN -e 'install Set::Scalar';"
+
+        or manual installation.
+
+    *   Math::SparseVector (version 0.04 or better)
+
+        This is a Perl module that implements sparse vector operations.
+
+        It is available at: <http://search.cpan.org/dist/Math-SparseVector/>
+
+        "perl -MCPAN -e 'install Math::SparseVector';"
+
+        or manual installation.
+
+    *   Math::SparseMatrix (version 0.02 or better)
+
+        This is a Perl module that implements sparse matrix operations, in
+        particular the sparse matrix transpose operation.
+
+        It is available at: <http://search.cpan.org/dist/Math-SparseMatrix/>
+
+        "perl -MCPAN -e 'install Math::SparseMatrix'";
+
+        or manual installation.
+
+    *   Algorithm::Munkres (version 0.07 or better)
+
+        This is a Perl module that implements Munkres' solution to classical
+        Assignment Problem. This is used when carrying out evaluation of
+        discovered clusters with a provided gold standard.
+
+        It is available at: <http://search.cpan.org/dist/Algorithm-Munkres/>
+
+        "perl -MCPAN -e 'install Algorithm::Munkres';"
+
+        or manual installation.
+
+    *   Algorithm::RandomMatrixGeneration (version 0.06 or better)
+
+        This is a Perl module that generates random matrix given the row and
+        column marginals. This is required for SenseClusters to run the
+        Adapted Gap Statistic in clusterstopping.pl.
+
+        It is available at:
+        <http://search.cpan.org/dist/Algorithm-RandomMatrixGeneration/>
+
+        "perl -MCPAN -e 'install Algorithm::RandomMatrixGeneration';"
+
+        or manual installation.
+
+MANUAL INSTALLATION OF EXTERNAL PACKAGES
+    Please note that we provide a modified version of SVDPACK in
+    /External/SVDPACKC that makes all the changes described below. You
+    should be able to compile and install this code via the
+    External/install.sh script. If that fails you can follow the steps
+    described in the install script manually. If for some reason you would
+    prefer to start with a fresh copy of SVDPACKC, you can follow the
+    directions below (which also explain the changes we have made and
+    included in SenseClusters /External/SVDPACKC).
+
+  SVDPACKC (Feb 2004 version or better)
+    SVDPACKC is a C program that performs SVD. It is available for download
+    from <http://www.netlib.org/svdpack>. SVDPACKC does not have a version
+    number associated with it, but check the files in your download to make
+    sure they are dated from at least Feb 2004. The version we include and
+    modify in /External/SVDPACKC is the Feb 2004 version.
+
+    Please note that you should use version 3.2.2, 3.2.3, or 3.3.0 of the
+    gcc compiler. Segmentation faults results if you use version 4 or
+    better. We are currently investigating the use of SVDLIBC as an
+    alternative for our SVD processing.
+
+    While installing SVDPACKC, you need to modify the following files
+    (already done in /External) :
+
+       1.   In las2.c, uncomment the following line 
+
+            /*      #define  UNIX_CREAT     */
+
+            if you are running on a Unix or Linux platform.
+
+       2.   In las2.h, modify the default values of constants LMTNW, NMAX and  
+            NZMAX to some larger numbers such that -
+
+            NMAX    = Maximum size of the feature space before reduction 
+                      (we set this to 30,000)
+            NZMAX   = Maximum possible number of Non-zero entries 
+                      (we assume our 30,000 x 30,000 matrix is at most 1% dense
+                      and hence NZMAX = 30,000 x 30,000 / 100 = 9,000,000)
+            LMTNW   = Maximum Work Space Area required 
+                    = 6*NMAX + 4*NMAX + 1 + NMAX*NMAX
+                      (we set LMTNW = 900300001 for a 
+                      1% dense 30,000 x 30,000 matrix)
+
+       3.   Modify the file makefile so that ANSI C is used. 
+
+            CC = gcc -ansi
+
+            [Please use gcc version 3.2.2, 3.2.3, or 3.3.0 when compiling SVDPACKC.
+            gcc versions 4.0.0 and above appear to result in segmentation faults.] 
+
+       4.   Run 'make las2' after the above modifications are done in las2.h,
+            las2.c, and makefile.
+
+   Testing SVDPACKC
+    The following steps will will help you check that SVDPACKC is installed
+    correctly.
+
+     # unzip the sample belladit.gz data file that comes with SVDPACKC
+     gunzip belladit.gz
+
+     # copy this as the input matrix to SVDPACKC
+     cp belladit matrix
+
+     # run las2 to test if everything is ok
+     las2
+
+     # this will not produce any output to STDOUT, but it should create 2  
+     # output files - lav2 (binary) and lao2 (text)
+
+  CLUTO (version 2.1.1 or better)
+    The script External/install.sh will attempt to retrieve and install
+    Cluto automatically. If that fails, you can follow the steps outline in
+    the install script, or the instructions below.
+
+    SenseClusters uses CLUTO to support extensive clustering options,
+    analysis and visualization. CLUTO is freely available from
+    <http://www-users.cs.umn.edu/~karypis/cluto/>
+
+    If you run on both Linux and Solaris platforms, you will need to set
+    your path slightly differently each time to allow SenseClusters to run.
+    The following code in your .cshrc file will take care of this.
+
+     set OSNAME=`uname -s`
+
+     if ($OSNAME == "SunOS") then
+            set path = (PATH_2_CLUTO/Sun $path)
+     else if ($OSNAME == "Linux") then
+            set path = (PATH_2_CLUTO/Linux $path)
+     else echo "lost"
+     endif
+
+    where, PATH_2_CLUTO is a complete path to the directory where CLUTO is
+    downloaded and unpacked. If you only run on Solaris or Linux, then of
+    course you can just set the path with the appropriate statement from
+    above.
+
+   GCLUTO [optional]
+    Users interested in graphical visualization of clusters are encouraged
+    to try GCLUTO which is also freely down-loadable from
+    <http://www-users.cs.umn.edu/~karypis/cluto/gcluto/index.html>
+
+    To use GCLUTO, you will require the libglut.so.3 library installed on
+    your system. These can be downloaded from -
+    <http://at.rpmfind.net/opsys/linux/RPM/libglut.so.3.html>
+
+CORE SENSECLUSTERS INSTALLATION
+    Note that SenseClusters can be installed via the Bundle command
+    described in the SYNOPSIS. If for some reason that fails, you can
+    proceed as follows:
+
+    To install the core of SenseClusters, if you have su or sudo access
+    (root user), then you can install via :
+
+    "perl -MCPAN -e 'install Text::SenseClusters';"
+
+    Or you can install manually as follows:
+
+        perl Makefile.PL
+        make
+        make install 
+        cd Testing
+        csh ./testall.sh
+        cd ..
+
+    Note that the testall.sh scripts will not be run via automatic
+    installation. If you do not install manually, you should go back and run
+    the test scripts just to verify that everything is working as expected.
+
+    The exact location where SenseClusters will be installed depends on your
+    system configuration. A message will be printed out after 'make install'
+    telling you exactly where it was installed.
+
+  Local Installation of Core SenseClusters programs
+    If you are not able to log in as su or sudo (to be the root user), then
+    you may need to install SenseClusters in a local directory that you own
+    and have permissions to read and write into. You can proceed as above,
+    except that you will need to provide PREFIX and LIB options for your
+    Makefile.PL command, as in:
+
+    "perl Makefile.PL PREFIX = /YOUR/DIR LIB=/YOUR/DIR/lib"
+
+    This will set up a Makefile that will install the core SenseClusters
+    programs (*.pl) into "/YOUR/DIR/bin/". You will need to set your path to
+    specifically include this directory.
+
+    The Sensecluster.pm module will be installed into "/YOUR/DIR/lib". You
+    will need to set your PERL5LIB environment variable to have this
+    directory included in your @INC array (which defines the directories
+    that Perl searches for modules).
+
+    You man pages will be installed in directories like
+    "/YOUR/DIR/share/man/" (Linux) or "/YOUR/DIR/man/" (Solaris). You will
+    need to set your MANPATH to include these.
+
+    Note that the exact locations will be shown after executing 'make
+    install' command. Please double check the recommended settings for PATH
+    and MANPATH there as those will be tailored to your system.
+
+C SHELL (csh) SETUP
+    If you install without root or superuser access, you will need to set
+    the paths of the dependent packages mentioned previously. The following
+    is an example of how you might set your paths before using SenseClusters
+    if you are using the C shell (csh). If you use another shell then you
+    will need to modify this accordingly.
+
+    This assumes that Perl and PDL have been installed by your system
+    administrator and you do not need to set paths to find them. In general
+    we would recommend that Perl and PDL be installed with root access as
+    it's more simple that way.
+
+    Assume that all of the external C packages (SVDPACKC, Cluto) have been
+    installed in directories beneath /space/kulka020 (our home directory for
+    this example). It also assumes that all of the CPAN modules have been
+    installed in /space/kulka020/MyPerlLib. In other words, it is assumed
+    that all CPAN modules were installed via the following command:
+
+    "perl Makefile.PL PREFIX=/space/kulka020/Text-SenseClusters-1.00
+    LIB=/space/kulka020/MyPerlLib"
+
+     #######################################################################
+     #    insert the following into ~/.cshrc and modify HOMEDIR and LIBHOME
+     #######################################################################
+ 
+     # local directory where we are installing everything
+ 
+     setenv HOMEDIR /space/kulka020
+ 
+     # library name extension used by Perl on our system
+
+     setenv LIBDIR /space/kulka020/MyPerlLib
+ 
+     # UMD developed code, we need to set their /bin directories in the PATH
+ 
+     setenv SENSECLUSTERS $HOMEDIR/Text-SenseClusters-1.00
+     setenv NSP $HOMEDIR/Text-NSP-1.09
+
+     # externally developed C code, directories contain executable code so must 
+     # be included in PATH
+ 
+     setenv SVDPACK $HOMEDIR/SVDPACKC
+     setenv CLUTO $HOMEDIR/cluto-2.1.1
+ 
+     # pick the right version of Cluto (Solaris or Linux)
+ 
+     set OSNAME=`uname -s`
+ 
+     if ($OSNAME == "SunOS") then
+            setenv MYCLUTO $CLUTO/Sun
+     else if ($OSNAME == "Linux") then
+            setenv MYCLUTO $CLUTO/Linux
+     else echo "lost"
+     endif
+ 
+     # set the path that Perl searches for CPAN modules
+ 
+     setenv PERL5LIB $LIBDIR
+
+     # set the path that is searched for executables
+ 
+     set AKPATH = ($SVDPACK $NSP/bin $MYCLUTO $SENSECLUSTERS/bin .)
+ 
+     set path = ($AKPATH $path)
+
+INSTALLING SenseClusters' Web-interface:
+    If you would like to setup the SenseClusters' web-interface locally
+    please refer to README.Web.pod for installation instructions.
+
+SEE ALSO
+    The SenseClusters web page provides links to downloads, the web
+    interface, documentation, and CVS directories:
+
+     L<http://senseclusters.sourceforge.net>
+
+    We have three mailing lists available for SenseClusters:
+
+    *   senseclusters-news provides announcements of new versions:
+        <http://lists.sourceforge.net/lists/listinfo/senseclusters-news>
+
+    *   senseclusters-users allows users to post questions or bug reports:
+        <http://lists.sourceforge.net/lists/listinfo/senseclusters-users>
+
+    *   senseclusters-developers is for implementation related questions:
+        <http://lists.sourceforge.net/lists/listinfo/senseclusters-developer
+        s>
+
+AUTHORS
+     Ted Pedersen, University of Minnesota, Duluth
+     tpederse at d.umn.edu
+
+     Anagha Kulkarni, Carnegie Mellon University
+
+     Amruta Purandare, University of Pittsburgh
+
+    This document last modified by : $Id: INSTALL.pod,v 1.16 2013/06/27
+    14:34:06 tpederse Exp $
+
+COPYRIGHT
+    Copyright (c) 2004-2008, Ted Pedersen
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 283:
+        You forgot a '=back' before '=head1'
+

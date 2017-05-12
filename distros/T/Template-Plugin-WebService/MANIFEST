@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+WebService.xs
+t/Template-Plugin-WebService.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Template/Plugin/WebService.pm
+META.yml                                 Module meta-data (added by MakeMaker)

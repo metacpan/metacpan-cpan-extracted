@@ -1,0 +1,472 @@
+#!/usr/bin/perl
+#Copyright (c) 2013, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Cwd;
+use Toader;
+use Toader::Gallery;
+use Toader::Render::Gallery;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "toader-gallery 0.1.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"Switches:\n".
+		"-a <action>   The action to perform.\n".
+		"-p <path>  The path to use.\n".
+		"-r <resolution>  The resolution to use.\n".
+		"-u <url>  The URL to use.\n".
+		"\n".
+		"Actions:\n".
+		"dc - Deletes the gallery config for this directory.\n".
+		"opg - Gets the output path.\n".
+		"ops - Sets the output path.\n".
+		"oug - Gets the output URL.\n".
+		"ous - Sets the output URL.\n".
+		"rsg - Gets the small resolution.\n".
+		"rss - Sets the samll resolution.\n".
+		"rlg - Gets the large resolution.\n".
+		"rls - Sets the large resolution.\n".
+		"gs - Get settings.\n".
+		"spg - Gets the source path.\n".
+		"sps - Sets the source path.\n".
+		"sug - Gets the source URL.\n".
+		"sus - Sets the source URL.\n".
+		"ud - Update the image detail pages.\n".
+		"ui - Updates the indexes.\n".
+		"us - Updates the scaled images.\n";
+		
+}
+
+#gets the options
+my %opts=();
+getopts('a:p:r:u:', \%opts);
+
+if ( ! defined( $opts{a} ) ){
+	warn('toader-gallery: No action specified');
+	exit 254;
+}
+
+#get the current directory
+my $dir=getcwd;
+
+my $toader=Toader->new({ dir=>$dir });
+if ( $toader->error ){
+	warn('toader-gallery: Failed to initialize Toader');
+	exit $toader->error;
+}
+
+#initialize Toader::Gallery
+my $tg=Toader::Gallery->new( $toader );
+if ( $tg->error ){
+	warn('toader-gallery: Failed to initialize Toader::Gallery');
+	exit $tg->error;
+}
+$tg->dirSet( $dir );
+if ( $tg->error ){
+	warn('toader-gallery: Failed to set the directory for Toader::Gallery');
+	exit $tg->error;
+}
+
+#handles a request to show the various settings
+if ( $opts{a} eq 'gs' ){
+	my $outputPath=$tg->outputPathGet;
+	my $outputURL=$tg->outputURLget;
+	my $srcPath=$tg->srcPathGet;
+	my $srcURL=$tg->srcURLget;
+	my $resolutionSmall=$tg->resolutionSmallGet;
+	my $resolutionLarge=$tg->resolutionLargeGet;
+
+	if ( defined( $outputURL )){
+		print "outputURL=".$outputURL."\n";
+	}
+    if ( defined( $outputPath )){
+        print "outputPath=".$outputPath."\n";
+    }
+	if ( defined( $srcURL )){
+        print "srcURL=".$srcURL."\n";
+    }
+    if ( defined( $srcPath )){
+        print "srcPath=".$srcPath."\n";
+    }
+    if ( defined( $resolutionSmall )){
+        print "resolutionSmall=".$resolutionSmall."\n";
+    }
+    if ( defined( $resolutionLarge )){
+        print "resolutionLarge=".$resolutionLarge."\n";
+    }
+
+	exit 0;
+}
+
+#deletes the 
+if ( $opts{a} eq 'dc' ){
+	$tg->delConfig;
+	if ( $tg->error ){
+		warn('toader-gallery: Failed to delete the config for this Toader directory');
+		exit $tg->error;
+	}	
+	exit 0;
+}
+
+
+#gets the output path
+if ( $opts{a} eq 'opg' ){
+	my $outputPath=$tg->outputPathGet;
+    if ( defined( $outputPath )){
+        print $outputPath."\n";
+    }
+	exit 0;
+}
+
+#sets the output path
+if ( $opts{a} eq 'ops' ){
+    $tg->outputPathSet( $opts{p} );
+	if ( $tg->error ){
+		warn('toader-gallery: Failed to set the output path');
+		exit $tg->error;
+	}
+
+	exit 0;
+}
+
+#gets the output URL
+if ( $opts{a} eq 'oug' ){
+    my $outputURL=$tg->outputURLget;
+    if ( defined( $outputURL )){
+        print $outputURL."\n";
+    }
+    exit 0;
+}
+
+#sets the output URL
+if ( $opts{a} eq 'ous' ){
+    $tg->outputURLset( $opts{u} );
+    if ( $tg->error ){
+        warn('toader-gallery: Failed to set the output URL');
+        exit $tg->error;
+    }
+
+    exit 0;
+}
+
+#gets the source path
+if ( $opts{a} eq 'spg' ){
+    my $srcPath=$tg->srcPathGet;
+    if ( defined( $srcPath )){
+        print $srcPath."\n";
+    }
+    exit 0;
+}
+
+#sets the source path
+if ( $opts{a} eq 'sps' ){
+    $tg->srcPathSet( $opts{p} );
+    if ( $tg->error ){
+        warn('toader-gallery: Failed to set the source path');
+        exit $tg->error;
+    }
+
+    exit 0;
+}
+
+#gets the source URL
+if ( $opts{a} eq 'sug' ){
+    my $srcPath=$tg->srcURLget;
+    if ( defined( $srcPath )){
+        print $srcPath."\n";
+    }
+    exit 0;
+}
+
+#sets the source URL
+if ( $opts{a} eq 'sus' ){
+    $tg->srcURLset( $opts{u} );
+    if ( $tg->error ){
+        warn('toader-gallery: Failed to set the source path');
+        exit $tg->error;
+    }
+
+    exit 0;
+}
+
+#gets the large resolution
+if ( $opts{a} eq 'rlg' ){
+    my $largeRes=$tg->resolutionLargeGet;
+    if ( defined( $largeRes )){
+        print $largeRes."\n";
+    }
+    exit 0;
+}
+
+#sets the large resolution
+if ( $opts{a} eq 'rls' ){
+    my $largeRes=$tg->resolutionLargeSet( $opts{r} );
+    if ( $tg->error ){
+        warn('toader-gallery: Failed to set the large resolution');
+        exit $tg->error;
+    }
+
+    exit 0;
+}
+
+#gets the small resolution
+if ( $opts{a} eq 'rsg' ){
+    my $smallRes=$tg->resolutionSmallGet;
+    if ( defined( $smallRes )){
+        print $smallRes."\n";
+    }
+    exit 0;
+}
+
+#sets the small resolution
+if ( $opts{a} eq 'rss' ){
+    $tg->resolutionSmallSet( $opts{r} );
+    if ( $tg->error ){
+        warn('toader-gallery: Failed to set the small resolution');
+        exit $tg->error;
+    }
+
+    exit 0;
+}
+
+#updates the scaled images
+if ( $opts{a} eq 'ud' ){
+    my $tgr=Toader::Render::Gallery->new({ toader=>$toader, obj=>$tg });
+    if ( $tgr->error ){
+        warn('toader-gallery: Failed to initialize Toader::Render::Gallery');
+        exit $tgr->error;
+    }
+    $tgr->updateDetails( undef, 1);
+    if ( $tgr->error ){
+        warn('toader-gallery: updateDetails errored');
+        exit $tgr->error;
+    }
+    exit 0;
+}
+
+#updates the scaled images
+if ( $opts{a} eq 'ui' ){
+	my $tgr=Toader::Render::Gallery->new({ toader=>$toader, obj=>$tg });
+	if ( $tgr->error ){
+		warn('toader-gallery: Failed to initialize Toader::Render::Gallery');
+		exit $tgr->error;
+	}
+	$tgr->updateIndexes( undef, 1);
+	if ( $tgr->error ){
+        warn('toader-gallery: updateIndexes errored');
+        exit $tgr->error;
+    }
+	exit 0;
+}
+
+
+#updates the scaled images
+if ( $opts{a} eq 'us' ){
+	my $tgr=Toader::Render::Gallery->new({ toader=>$toader, obj=>$tg });
+	if ( $tgr->error ){
+		warn('toader-gallery: Failed to initialize Toader::Render::Gallery');
+		exit $tgr->error;
+	}
+	$tgr->updateScaled( undef, 1);
+	if ( $tgr->error ){
+        warn('toader-gallery: updateScaled errored');
+        exit $tgr->error;
+    }
+	exit 0;
+}
+
+exit 254;
+
+=head1 NAME
+
+toader-gallery - Handles gallery related work for Toader.
+
+=head1 SYNOPSIS
+
+toader-gallery -a dc
+
+toader-gallery -a opg
+
+toader-gallery -a ops -p <output path>
+
+toader-gallery -a oug
+
+toader-gallery -a ous -u <output URL>
+
+toader-gallery -a rsg
+
+toader-gallery -a rss -r <small thumbnail resolution>
+
+toader-gallery -a rlg
+
+toader-gallery -a rls -r <small thumbnail resolution>
+
+toader-gallery -a gs
+
+toader-gallery -a spg
+
+toader-gallery -a sps -p <source path>
+
+toader-gallery -a sug
+
+toader-gallery -a sus -p <source URL>
+
+toader-gallery -a ud
+
+toader-gallery -a ui
+
+toader-gallery -a us
+
+=head1 SWITCHES
+
+=head2 -a <action>
+
+This is the action to perform.
+
+=head2 -p <path>
+
+A path to use.
+
+=head2 -r <resolution>
+
+A resolution to use.
+
+=head2 -u <url>
+
+A URL to use.
+
+=head1 ACTIONS
+
+=head2 dc
+
+Deletes the gallery config from the Toader directory.
+
+=head2 opg
+
+Gets the output path.
+
+=head2 ops
+
+Sets the output path.
+
+=head2 oug
+
+Gets the output URL.
+
+=head2 ous
+
+Sets the output URL.
+
+=head2 rsg
+
+Gets the resolution for the small thumbnail.
+
+=head2 rss
+
+Sets the resolution for the small thumbnail.
+
+=head2 rlg
+
+Gets the resolution for the large thumbnail.
+
+=head2 rls
+
+Sets the resolution for the large thumbnail.
+
+=head2 gs
+
+This shows current config settings.
+
+=head2 spg
+
+This gets the source path.
+
+=head2 sps
+
+This sets the source path.
+
+=head2 sug
+
+Gets the source URL.
+
+=head2 sus
+
+Set the source URL.
+
+=head2 ud
+
+Update the image detail pages.
+
+=head2 ui
+
+Update the indexes.
+
+=head2 us
+
+Updates the scaled images.
+
+=head1 AUTHOR
+
+Copyright (c) 2013, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+unix
+
+=head1 README
+
+toader-gallery - Handles gallery related work for Toader.
+
+=cut

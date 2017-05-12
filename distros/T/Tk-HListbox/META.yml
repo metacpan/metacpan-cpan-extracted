@@ -1,0 +1,23 @@
+---
+abstract: 'Tk Listbox widget supporting images and text entries, Tk::HList based drop-in replacement for Tk::Listbox.'
+author:
+  - 'Jim Turner'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-HListbox
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+  Tk: '0'
+version: '1.0'

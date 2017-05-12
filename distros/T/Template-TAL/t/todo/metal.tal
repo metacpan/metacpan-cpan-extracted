@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:tal="http://xml.zope.org/namespaces/tal" xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <body>
+    <span metal:define-macro="foo">macro body here</span>
+    <div>spacer here</div>
+    <div metal:use-macro="foo" />
+  </body>
+</html>

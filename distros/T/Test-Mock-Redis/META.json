@@ -1,0 +1,84 @@
+{
+   "abstract" : "use Redis; without redis",
+   "author" : [
+      "Jeff Lavallee <jeff@zeroclue.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mock-Redis",
+   "no_index" : {
+      "package" : [
+         "Test::Mock::Redis::PossiblyVolatile",
+         "Test::Mock::Redis::List",
+         "Test::Mock::Redis::Hash",
+         "Test::Mock::Redis::ZSet",
+         "Test::Mock::Redis::Set"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Deep::UnorderedPairs" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "0",
+            "Package::Stash" : "0.34",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Mock::Redis" : {
+         "file" : "lib/Test/Mock/Redis.pm",
+         "version" : "0.20"
+      },
+      "Test::Mock::Redis::Hash" : {
+         "file" : "lib/Test/Mock/Redis.pm"
+      },
+      "Test::Mock::Redis::List" : {
+         "file" : "lib/Test/Mock/Redis.pm"
+      },
+      "Test::Mock::Redis::PossiblyVolatile" : {
+         "file" : "lib/Test/Mock/Redis.pm"
+      },
+      "Test::Mock::Redis::Set" : {
+         "file" : "lib/Test/Mock/Redis.pm"
+      },
+      "Test::Mock::Redis::ZSet" : {
+         "file" : "lib/Test/Mock/Redis.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Mock-Redis"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jlavallee/Test-Mock-Redis/"
+      }
+   },
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

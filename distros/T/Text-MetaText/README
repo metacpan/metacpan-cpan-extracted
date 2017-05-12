@@ -1,0 +1,290 @@
+#========================================================================
+#
+# Text::MetaText
+#
+#   Version 0.22
+# 
+#   Copyright (C) 1996-1998 Andy Wardley <abw@kfs.org>.  
+#   All Rights Reserved.
+#
+#------------------------------------------------------------------------
+#
+# README
+#
+#   This file is contains relevant extracts from the MetaText documentation
+#   to provide an overview of MetaText and in particular, the installation
+#   process.
+#
+#   For more information, see the full MetaText documentation and
+#   support files:
+#
+#      Changes   Somewhat verbose list of per-version changes.
+#      Todo      Known bugs and possible future enhancements.
+#      Features  A summary of MetaText features and brief comparison to 
+#                other perl 'template' modules.
+#
+#========================================================================
+
+#------------------------------------------------------------------------
+# QUICK START
+#------------------------------------------------------------------------
+
+    CPAN: /modules/by-authors/Andy_Wardley/Text-MetaText-<ver>.tar.gz
+
+    gunzip Text-MetaText-<ver>.tar.gz
+    tar xvf Text-MetaText-<ver>.tar
+    cd Text-MetaText-<ver>
+    
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+    #!/usr/bin/perl -w
+    use Text::MetaText;
+
+    my $mt = Text::MetaText->new();
+    print $mt->process_file($myfile);
+    print $mt->process_text($mytext);
+
+
+#------------------------------------------------------------------------
+# DOCUMENTATION EXTRACTS
+#------------------------------------------------------------------------
+
+NAME
+    Text::MetaText - Perl extension implementing meta-language for
+    processing "template" text files.
+
+SYNOPSIS
+        use Text::MetaText;
+
+        my $mt = Text::MetaText->new();
+
+        # process file content or text string 
+        print $mt->process_file($filename, \%vardefs);
+        print $mt->process_text($textstring, \%vardefs);
+
+        # pre-declare a BLOCK for subsequent INCLUDE
+        $mt->declare($textstring, $blockname);
+        $mt->declare(\@content, $blockname);
+
+SUMMARY OF METATEXT DIRECTIVES
+        %% DEFINE 
+           variable1 = value          # define variable(s)
+           variable2 = "quoted value"  
+        %%
+
+        %% SUBST variable  %%         # insert variable value
+        %% variable %%                # short form of above
+
+        %% BLOCK blockname %%         # define a block 'blockname'
+           block text... 
+        %% ENDBLOCK %%
+
+        %% INCLUDE blockname %%       # include 'blockname' block text
+        %% INCLUDE filename  %%       # include external file 'filename'
+
+        %% INCLUDE file_or_block      # a more complete example...
+           variable = value           # additional variable definition(s)
+           if       = condition       # conditional inclusion
+           unless   = condition       # conditional exclusion
+           format   = format_string   # printf-like format string with '%s'
+           filter   = fltname(params) # post-process filter 
+        %%
+
+        %% TIME                       # current system time, as per time(2)
+           format   = format_string   # display format, as per strftime(3C) 
+        %%
+
+DESCRIPTION
+    MetaText is a text processing and markup meta-language which can
+    be used for processing "template" files. This module is a Perl 5
+    extension implementing a MetaText object class which processes
+    text files, interpreting and acting on the embedded MetaText
+    directives within.
+
+    Like a glorified pre-processor, MetaText can; include files,
+    define and substitute variable values, execute conditional
+    actions based on variables, call other perl functions or object
+    methods and capture the resulting output back into the document,
+    and more. It can format the resulting output of any of these
+    operations in a number of ways. The objects, and inherently, the
+    format and symantics of the MetaText langauge itself, are highly
+    configurable.
+
+    MetaText was originally designed to aid in the creation of html
+    documents in a large web site. It remains well suited for this
+    and similar tasks, being able to create web pages (dynamically
+    or statically) that are consistent with each other, yet easily
+    customisable:
+
+    *   standard headers, footers and other elements can be defined in
+        separate files and then inserted into web documents:
+
+            %% INCLUDE header %%
+
+    *   variables can be defined externally or from within a document,
+        then can be substituted back into the text. This is useful
+        for including your %% name %% or %% email %% address or any
+        other variable, and for encoding URL's or file paths that
+        can then be changed en masse. e.g.
+
+            <img src="%% imgroot %%/foo/bar.gif">
+
+    *   conditional actions can be made based on variable definitions,
+        allowing easily and instantly customisable web pages. e.g
+
+            %% INCLUDE higraphics/header if="higfx && userid != abw" %%
+
+    *   blocks of text can be internally defined simplifying the
+        creation of repetitive elements. e.g.
+
+            %% BLOCK table_row %%
+            <tr> <td>%% userid %%</td> <td>%% name %%</td> </tr>
+            %% ENDBLOCK %%
+
+            %% INCLUDE table_row userid=lwall  name="Larry Wall"         %%
+            %% INCLUDE table_row userid=tomc   name="Tom Christiansen"   %%
+            %% INCLUDE table_row userid=merlyn name="Randal L. Schwartz" %%
+
+    *   in addition, the metapage utility is a script which can
+        automatically traverse document trees, processing updated
+        files to assist in web document management and other similar
+        tasks.
+
+PREREQUISITES
+    MetaText requires Perl 5.004 or later. The Date::Format module
+    should also be installed. This is available from CPAN (in the
+    "TimeDate" distribution) as described in the following section.
+    The metapage utility also requires the File::Recurse module,
+    distributed in the "File-Tools" bundle, also available from
+    CPAN.
+
+OBTAINING AND INSTALLING THE METATEXT MODULE
+    The MetaText module is available from CPAN. As the 'perlmod' man
+    page explains:
+
+        CPAN stands for the Comprehensive Perl Archive Network.
+        This is a globally replicated collection of all known Perl
+        materials, including hundreds of unbunded modules.  
+
+        [...]
+
+        For an up-to-date listing of CPAN sites, see
+        http://www.perl.com/perl/ or ftp://ftp.perl.com/perl/ .
+
+    Within the CPAN archive, MetaText is in the "Text::" group which
+    forms part of the the category:
+
+      *) String Processing, Language Text Processing, 
+         Parsing and Searching
+
+    The module is available in the following directories:
+
+        /modules/by-module/Text/Text-MetaText-<version>.tar.gz
+        /authors/id/ABW/Text-MetaText-<version>.tar.gz
+
+    For the latest information on MetaText or to download the latest
+    pre-release/beta version of the module, consult the definitive
+    reference, the MetaText Home Page:
+
+        http://www.kfs.org/~abw/perl/metatext/
+
+    MetaText is distributed as a single gzipped tar archive file:
+
+        Text-MetaText-<version>.tar.gz
+
+    Note that "<version>" represents the current MetaText Revision
+    number, of the form "0.18". See the REVISION manpage below to
+    determine the current version number for Text::MetaText.
+
+    Unpack the archive to create a MetaText installation directory:
+
+        gunzip Text-MetaText-<version>.tar.gz
+        tar xvf Text-MetaText-<version>.tar
+
+    'cd' into that directory, make, test and install the MetaText
+    module:
+
+        cd Text-MetaText-<version>
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    The 't' sub-directory contains a number of small sample files
+    which are processed by the test script (called by 'make test').
+    See the README file in that directory for more information. A
+    logfile (test.log) is generated to report any errors that occur
+    during this process. Please note that the test suite is
+    incomplete and very much in an 'alpha' state. Any further
+    contributions here are welcome.
+
+    The 'make install' will install the module on your system. You
+    may need root access to perform this task. If you install the
+    module in a local directory (for example, by executing "perl
+    Makefile.PL LIB=~/lib" in the above - see `perldoc MakeMaker'
+    for full details), you will need to ensure that the PERL5LIB
+    environment variable is set to include the location, or add a
+    line to your scripts explicitly naming the library location:
+
+        use lib '/local/path/to/lib';
+
+    The metapage utility is a script designed to automate MetaText
+    processing of files. It can traverse directory trees, identify
+    modified files (by comparing the time stamp of the equivalent
+    file in both "source" and "destination" directories), process
+    them and direct the resulting output to the appropriate file
+    location in the destination tree. One can think of metapage as
+    the MetaText equivalent of the Unix make(1S) utility.
+
+    The installation process detailed above should install metapage
+    in your system's perl 'installbin' directory (try `perl '-
+    V:installbin'' to check this location). See the metapage
+    documentation (`perldoc metapage') for more information on
+    configuring and using metapage.
+
+AUTHOR
+    Andy Wardley <abw@kfs.org>
+
+    See also:
+
+        http://www.kfs.org/~abw/
+
+REVISION
+    $Revision: 0.22 $
+
+COPYRIGHT
+    Copyright (c) 1996-1998 Andy Wardley. All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the Perl Artistic License.
+
+SEE ALSO
+    For more information, see the accompanying documentation and
+    support files:
+
+        README    Text based version of this module documentation.
+        Changes   Somewhat verbose list of per-version changes.
+        Todo      Known bugs and possible future enhancements.
+        Features  A summary of MetaText features and brief comparison to 
+                  other perl 'template' modules.
+
+    For information about the metapage utility, consult the specific
+    documentation:
+
+        perldoc metapage
+      or 
+        man metapage
+        
+    For more information about the author and other Perl development work:
+
+        http://www.kfs.org/~abw/
+        http://www.kfs.org/~abw/perl/
+        http://www.cre.canon.co.uk/perl/
+
+    For more information about Perl in general:
+
+        http://www.perl.com/
+

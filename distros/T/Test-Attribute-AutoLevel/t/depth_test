@@ -1,0 +1,22 @@
+use strict;
+use warnings;
+use Test::More;
+use t::SomeTest;
+
+sub test_normal : AutoLevel {
+    fail 'test_normal: failed! check test failed report line';
+}
+
+sub test_nest2 : AutoLevel {
+    fail 'test_nest2: failed! check test failed report line. at nest code';
+}
+
+sub test_nest1 : AutoLevel {
+    fail 'test_nest1: failed! check test failed report line. at nest code';
+    test_nest2();
+}
+
+test_normal();
+test_nest1();
+
+done_testing;

@@ -1,0 +1,228 @@
+NAME
+
+    TAP::SimpleOutput - Simple closure-driven TAP generator
+
+VERSION
+
+    This document describes version 0.009 of TAP::SimpleOutput - released
+    February 14, 2017 as part of TAP-SimpleOutput.
+
+SYNOPSIS
+
+        use TAP::SimpleOutput 'counter';
+    
+        my ($_ok, $_nok, $_skip, $_plan) = counters();
+        say $_ok->('TestClass has a metaclass');
+        say $_ok->('TestClass is a Moose class');
+        say $_ok->('TestClass has an attribute named bar');
+        say $_ok->('TestClass has an attribute named baz');
+        do {
+            my ($_ok, $_nok, $_skip, $_plan) = counters(1);
+            say $_ok->(q{TestClass's attribute baz does TestRole::Two});
+            say $_ok->(q{TestClass's attribute baz has a reader});
+            say $_ok->(q{TestClass's attribute baz option reader correct});
+            say $_plan->();
+        };
+        say $_ok->(q{[subtest] checking TestClass's attribute baz});
+        say $_ok->('TestClass has an attribute named foo');
+    
+        # STDOUT looks like:
+        ok 1 - TestClass has a metaclass
+        ok 2 - TestClass is a Moose class
+        ok 3 - TestClass has an attribute named bar
+        ok 4 - TestClass has an attribute named baz
+            ok 1 - TestClass's attribute baz does TestRole::Two
+            ok 2 - TestClass's attribute baz has a reader
+            ok 3 - TestClass's attribute baz option reader correct
+            1..3
+        ok 5 - [subtest] checking TestClass's attribute baz
+        ok 6 - TestClass has an attribute named foo
+
+DESCRIPTION
+
+    We provide one function, counters(), that returns a number of simple
+    closures designed to help output TAP easily and correctly, with a
+    minimum of fuss.
+
+FUNCTIONS
+
+ counters($level)
+
+    When called in list context, this function returns a number of closures
+    that each generate a different type of TAP output. It takes an optional
+    $level that determines the indentation level (e.g. for subtests). These
+    coderefs are all closed over the same counter variable that keeps track
+    of how many test have been run so far; this allows them to always
+    output the correct test number.
+
+        my ($_ok, $_nok, $_skip, $_plan, $_todo, $_freeform) = counters();
+    
+        $_ok->('whee');                    # returns "ok 1 - whee"
+        $_nok->('boo');                    # returns "not ok 2 - boo"
+        $_skip->('baz');                   # returns "ok 3 # skip baz"
+        $_todo->($_ok->('bip'), 'daleks'); # returns "ok 4 - bip # TODO daleks"
+        $_plan->();                        # returns "1..4"
+        $_freeform->('yay');               # returns "yay"
+
+    Alternatively, when called in scalar context this function returns a
+    hashref of coderefs:
+
+        my $tap = counters();
+    
+        $tap->{ok}->('whee');                          # returns "ok 1 - whee"
+        $tap->{nok}->('boo');                          # returns "not ok 2 - boo"
+        $tap->{skip}->('baz');                         # returns "ok 3 # skip baz"
+        $tap->{todo}->($tap->{ok}->('bip'), 'daleks'); # returns "ok 4 - bip # TODO daleks"
+        $tap->{plan}->();                              # returns "1..4"
+        $tap->{freeform}->('yay');                     # returns "yay"
+
+    Note that calling the $_plan coderef only returns an intelligible
+    response when called after all the output has been generated; this is
+    analogous to using Test::More without a declared plan and
+    done_testing() at the end. If you need or want to specify the plan
+    prior to running tests, you'll need to do that manually.
+
+  subtests
+
+    When counter() is passed an integer, the generated closures all indent
+    themselves appropriately to indicate to the test harness / TAP parser
+    that a subtest is being run. (Namely, each statement returned is
+    prefaced with $level * 4 spaces.) It's recommended that you use
+    distinct lexical scopes for subtests to allow the usage of the same
+    variable names (why make things difficult?) without clobbering any
+    existing ones and to ensure that the subtest closures are not
+    inadvertently used at an upper level.
+
+        my ($_ok, $_nok) = counters();
+        $_ok->('yay!');
+        $_nok->('boo :(');
+        do {
+            my ($_ok, $_nok, $_skip, $_plan) = counters(1);
+            $_ok->('thing 1 good');
+            $_ok->('thing 2 good');
+            $_ok->('thing 3 good');
+            $_skip->('over there');
+            $_plan->();
+        };
+        $_ok->('subtest passed');
+    
+        # returns
+        ok 1 - yay!
+        not ok 2 - boo :(
+            ok 1 - thing 1 good
+            ok 2 - thing 2 good
+            ok 3 - thing 3 good
+            ok 4 # skip over there
+            1..4
+        ok 3 - subtest passed
+
+ counters_as_hashref
+
+    Same as counters(), except that we return a hashref rather than a list,
+    where the keys are "ok", "nok", "skip", "plan", "todo", and "freeform",
+    and the values are the corresponding coderefs.
+
+ counters_and_levelset($level)
+
+    Acts as counters(), except returns an additional coderef that can be
+    used to adjust the level of the counters.
+
+    This is not something you're likely to need.
+
+ subtest_header_needed()
+
+    Returns true if the level of Test::More available will output a subtest
+    header.
+
+    Note that this function will attempt to load Test::More and
+    Perl::Version. If either of these packages are unavailable, it will
+    "croak" in Carp.
+
+ subtest_header()
+
+    Given an output coderef (e.g. the 'freeform' from counters() or
+    counters_as_hashref()) and a subtest name (that is, a string), we
+    return a subtest header appropriately indented for the level of
+    Test::More available.
+
+    e.g.
+
+        my $out = counters_as_hashref();
+    
+        say subtest_header $out->{freeform} => 'Our subtest name!';
+    
+        # given a hashref, look for the coderef in the 'freeform' slot
+        say subtest_header $out => 'Our subtest name!';
+    
+        # or with the reviled Test::Builder::Tester:
+        test_out subtest_header($out => 'Our subtest name!')
+            if subtest_header_needed;
+
+    Returns true if the level of Test::More available will output a subtest
+    header.
+
+    Note that this function will attempt to load Test::More and
+    Perl::Version. If either of these packages are unavailable, it will
+    "croak" in Carp.
+
+USAGE WITH Test::Builder::Tester
+
+    This package was created from code I was using to make it easier to
+    test my test packages with Test::Builder::Tester:
+
+        test_out $_ok->('TestClass has a metaclass');
+        test_out $_ok->('TestClass is a Moose class');
+        test_out $_ok->('TestClass has an attribute named bar');
+        test_out $_ok->('TestClass has an attribute named baz');
+
+    Once I realized I was using the exact same code (perhaps at different
+    points in time) in multiple packages, the decision to break it out
+    became pretty easy to make.
+
+SUBTESTS
+
+    Subtest formatting can be done by passing an integer "level" parameter
+    to counter(); see the function's documentation for details.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Test::Builder::Tester
+
+      * TAP::Harness
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/tap-simpleoutput/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Ftap-simpleoutput&title=RsrchBoy's%20CPAN%20TAP-SimpleOutput&tags=%22RsrchBoy's%20TAP-SimpleOutput%20in%20the%20CPAN%22>,
+    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
+    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
+    desire.
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

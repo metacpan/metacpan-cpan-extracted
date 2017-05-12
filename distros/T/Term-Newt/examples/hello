@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+
+# $Id: hello,v 1.1 1998/11/09 02:29:51 daniel Exp daniel $
+
+use strict;
+use ExtUtils::testlib;
+use Term::Newt;
+
+my $n = Term::Newt->new;
+
+$n->init;
+$n->cls;
+
+$n->draw_root_text(0,1,'Hello World');
+$n->open_window(20, 2, 50, 19, "Hello World");
+
+my $ref = 0;
+my $form = $n->form(\$ref,'', 0);
+my $okay = $n->button(10, 15, "Ok");
+
+$n->form_add_components($form, $n->label(4, 1, "This is a label"), $okay);
+
+my $answer = $n->run_form($form);
+
+$n->form_destroy($form);
+$n->finished;

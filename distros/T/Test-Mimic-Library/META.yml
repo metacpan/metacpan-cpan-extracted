@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Test-Mimic-Library
+version:             0.012006
+abstract:            Perl library supporting the Test::Mimic suite. 
+license:             ~
+author:              
+    - Brendan Roof <broof@>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Dumper:                  0
+    Scalar::Util:                  0
+    Tie::Array:                    0
+    Tie::Hash:                     0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

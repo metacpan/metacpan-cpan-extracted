@@ -1,0 +1,41 @@
+Libscws - 0.0.1 安装说明
+
+$Id: README.install,v 1.1 2007/06/08 06:32:24 hightman Exp $
+
+详细情况请参见论坛 http://www.hightman.cn/bbs/
+
+--------
+1. 取得 libscws-0.0.x 的代码
+
+wget http://www.hightman.cn/down/logged/libscws-0.0.1.tgz
+
+2. 解开压缩并改名放到合适的位置去
+
+[hightman@d1 ~]$ pwd
+/home/hightman
+[hightman@d1 ~]$ tar xzf libscws-0.0.1.tgz
+[hightman@d1 ~]$ mv libscws-0.0.1 libscws
+
+3. 进入目录编译
+[hightman@d1 ~]$ cd libscws
+[hightman@d1 ~]$ make
+
+4. 顺利的话已经生成 libscws.a 了
+[hightman@d1 ~]$ ls -al | grep libscws.a
+
+5. 写个小程序测试一下
+[hightman@d1 ~]$ cat > test.c
+#include <scws.h>
+main()
+{
+  scws_t s;
+  s = scws_new();
+  scws_free(s);
+  printf("test ok!\n");
+}
+
+6. 编译测试程序
+gcc -o test -I/home/hightman/libscws -L/home/hightman/libscws test.c -lscws
+./test
+
+7. 好了，就可以用这套API了

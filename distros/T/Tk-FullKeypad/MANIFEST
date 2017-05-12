@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+FullKeypad.pm
+test.pl
+fullkeypadtest.pl
+META.yml                                 Module meta-data (added by MakeMaker)

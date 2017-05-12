@@ -1,0 +1,43 @@
+<html>
+<head>
+	<title>Wiki: Example Tests</title>
+<head>
+<body bgcolor=#FFFFFF link=#d06040 vlink=#806040>
+	<h1>Example Tests</h1>
+	<wiki>These are examples that you can view and run from this site right now.
+<p><UL>
+<li> SimpleExample -- Start here. This test checks floating-point division using a five-line fixture.
+<p><li> CalculatorExample -- This test checks an HP-35 calculator simulator with assorted tables, all using the same column fixture. This includes a model based test generator.
+<p><li> MusicExample -- Iinspired by Apple's iTunes, we test browsing of a music library using a combination of ActionFixture and RowFixture.
+<p><li> WebPageExample -- We use a fixture to browse the web. The Page fixture hosts actions for ActionFixture and produces rows as a RowFixture.
+<p><li> AllPairsExample -- These fixtures find and run other tests. Wildcard searches produce lists which are run in order, run in all combinations and run in all pair-wise combinations.
+<p></UL>
+These are examples that are still in development.
+<p><UL>
+<li> NetworkExample -- This tests a simulated radio network using action fixtures.
+<p><li> TimeClockJobStatusExample -- This tests a GUI application with action and row fixtures. Compare this with ruby script tests for the same application.
+<p></UL>
+<hr>
+<p>We use these examples for testing new implementations. Here is an example that runs the other examples.  Click <a href="run.cgi">http:run.cgi</a> to perform this test.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=6> eg.ExampleTests </td></tr>
+<tr><td> file </td><td> wiki </td><td> right() </td><td> wrong() </td><td> ignores() </td><td> exceptions() </td></tr>
+<tr><td> arithmetic.html </td><td> false </td><td> 37 </td><td> 10 </td><td> 0 </td><td> 2 </td></tr>
+<tr><td> CalculatorExample.html </td><td> true </td><td> 75 </td><td> 9 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> MusicExample.html </td><td> true </td><td> 95 </td><td> 0 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> MusicExampleWithErrors.html </td><td> true </td><td> 54 </td><td> 10 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> NetworkExample.html </td><td> true </td><td> 5 </td><td> 0 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> AllFiles.html </td><td> true </td><td> 9 </td><td> 3 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> AllCombinations.html </td><td> true </td><td> 80 </td><td> 6 </td><td> 0 </td><td> 0 </td></tr>
+<tr><td> AllPairs.html </td><td> true </td><td> 45 </td><td> 3 </td><td> 0 </td><td> 0 </td></tr>
+</table>
+<p>We are only testing that we get the expected counts of right and wrong. There are twenty of these count comparisions above. But there are actually many more tests preformed. This fixture adds an extra line to the summary so that we can feel good even though LessonsLearned advises us not to base our confidence on test counts which are easily inflated.
+<p><table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr><td ColSpan=2> fit.Summary </td></tr>
+</table>
+<p>See the fixture: <a href="Release/Source/eg/ExampleTests.java">http:Release/Source/eg/ExampleTests.java</a></wiki>
+<hr>
+	Last edited April 20, 2003
+</body>
+</html>
+

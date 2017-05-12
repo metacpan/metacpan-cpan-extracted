@@ -1,0 +1,19 @@
+Revision history for Geo-Shapefile-Writer
+
+0.004   December 28, 2012
+        documentation and tests improvement
+
+0.003   December 28, 2012
+        eval'ing workers
+        workers can return multiple values
+        working with old Thread::Queue::Any
+
+0.002   December 26, 2012
+        Simplified pipeline description
+        'post_sub' and 'need_finalize' worker options
+        tests
+
+
+0.001   December 25, 2012
+        Initial release.
+

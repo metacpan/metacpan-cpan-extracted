@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 663e1c1c7bd99a68b115354d488e9115687566a2 Build.PL
+SHA1 0827601f804545a67ad494412d5316f3818b7e16 Changes
+SHA1 37423a0162695b1b322cf40eebdcc829de70b4ad MANIFEST
+SHA1 c29cdc4594b7e2ac05ff92a8c0a23aa338c916ab META.yml
+SHA1 64a60c636f0ea5d35f2efc47f8fa23f26f9da43b Makefile.PL
+SHA1 fba915edd13532ea9e579ea6fa142df6eb7e2eab README
+SHA1 dab6902a9cc46f44cf16e58969c5a9114cc0e04d ignore.txt
+SHA1 13fab389d1aa08cbb7be6f7300b735a36ce44b42 lib/TeX/AutoTeX.pm
+SHA1 131ef4a2a640046911ee5a9f9cacb44138ccf319 lib/TeX/AutoTeX/ConcatPDF.pm
+SHA1 86bd2f52a577189166d7ad3e6807cca626dd3ec1 lib/TeX/AutoTeX/Config.pm
+SHA1 73737ef40d7e6fde1222c3e7295efe7411aa3369 lib/TeX/AutoTeX/Exception.pm
+SHA1 ea891d568a6b82f58199f5341427a8ea6862c7ee lib/TeX/AutoTeX/File.pm
+SHA1 602e95b442a542aebdbdff7716a89b7c5b73e221 lib/TeX/AutoTeX/Fileset.pm
+SHA1 b8d74c50a2f7759c03df238619f25428b85f2bfb lib/TeX/AutoTeX/HyperTeX.pm
+SHA1 935a5d5952606cbb0ada9d5fd457c12dfa442deb lib/TeX/AutoTeX/Log.pm
+SHA1 52356323f95eeb5923aa2fc31f195c026b406deb lib/TeX/AutoTeX/Mail.pm
+SHA1 9c4bf3a4fa55d0a58f989c6cf3d42ef96cf66cd4 lib/TeX/AutoTeX/PostScript.pm
+SHA1 bcd8838c5a66725b378259eacee50a871d7d3208 lib/TeX/AutoTeX/Process.pm
+SHA1 3b09716460ee22660da4d22e928deaed9e2b44ba lib/TeX/AutoTeX/StampPDF.pm
+SHA1 33f861e98bbb2fc042a87462901182ca74bd9551 t/00-load.t
+SHA1 a4fd0291714033eff922600174072e47920eeee0 t/boilerplate.t
+SHA1 0e1c671134b9405b438dd6b1eae5097cb5ae233d t/manifest.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 f584270e42683281ab0f117976d95fb43762cbe5 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOgA+aAAoJEG4sZ/z9xSqURNkQAKSTY18wc4AaiMsy+sDwId4V
+3Y+Dcv/A9Sp2IVNCVQkJzUaJ08DW27EklaFDy94ahGkPtGs0fm0R+sJDQZOACvxh
+urBV089zlwpBjm/PCBKEpvGjxOJzZ0IK6eNj04XjqZIL8KE6OJzSK9A9Sbl7J3BD
+P+sVmoVQm7Wz1nx0pcg7TujhfMt1jbmcU2O1kJMMgyh9ClP8dsqlZhQLX9R0OlDP
+f/WR+JrqCJlJtur54EVk2MsLsEPfkh1e912c7XL6Gbk4pPWwIWTcoH5dPprIGiB+
+6X17ypqZI7hGJ3IRVOJ0WY1xZyltLsmtzM9NZhu3IJJm90wLt40TiXLBmUnEGoRh
+2xtclIMyYKp6748xDxVIwqL3nyvZ6o6yPXIwLg27mkpgrqnmjmkya3I71Blxel+v
+UQJu3luWIXVbtG+aLd1QQxr4ACmfb+NHGzfuohFBttUE2WzyfjIoO0RV7iUe23Ut
+T8vODhdkcwjcWZbqMobmVrfWOIrZK493lzsuOa8XkvFDvwk8b2rr/RF8pTGC42+e
+k76n+jWH2REnn/qVNDdo/iXddhEnZ92oBtbVrpx7YkQwbEOYQPtbVqZMy3FqM5wc
+A2/tx8zE9HV/qlk0/hBOvZjEOJLfoXJDLqeKQLZyPPXnY0k0PQSavHr89KHeXPg5
+w+XkpS4y52WQO2UlLar5
+=bzd5
+-----END PGP SIGNATURE-----

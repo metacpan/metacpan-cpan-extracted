@@ -1,0 +1,51 @@
+
+BEGIN {
+  unless ($ENV{AUTHOR_TESTING}) {
+    require Test::More;
+    Test::More::plan(skip_all => 'these tests are for testing by the author');
+  }
+}
+
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'lib/TAP/DOM.pm',
+    'lib/TAP/DOM/Archive.pm',
+    'lib/TAP/DOM/Config.pm',
+    'lib/TAP/DOM/DocumentData.pm',
+    'lib/TAP/DOM/Entry.pm',
+    'lib/TAP/DOM/Summary.pm',
+    't/00-compile.t',
+    't/00-load.t',
+    't/author-eol.t',
+    't/author-no-tabs.t',
+    't/author-pod-syntax.t',
+    't/dom2tap.t',
+    't/release-pod-coverage.t',
+    't/some_tap.dom',
+    't/some_tap.txt',
+    't/some_tap2.txt',
+    't/some_tap3.txt',
+    't/some_tap5_usebitsets.txt',
+    't/some_tap6_autotapversion.txt',
+    't/some_tap_doublecomments.txt',
+    't/some_tap_with_key_values.tap',
+    't/tap_archive.t',
+    't/tap_dom.t',
+    't/tap_dom2.t',
+    't/tap_dom3.t',
+    't/tap_dom4.t',
+    't/tap_dom5_usebitsets.t',
+    't/tap_dom6_autotapversion.t',
+    't/tap_dom_ignore_lines.t',
+    't/tap_dom_key_values.t'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

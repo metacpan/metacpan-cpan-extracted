@@ -1,0 +1,44 @@
+#!/opt/tapper/bin/perl
+# PODNAME: tapper-testsuite-hwtrack
+# ABSTRACT: cmdline frontend to Tapper::TestSuite::HWTrack
+
+use Tapper::TestSuite::HWTrack;
+use Log::Log4perl;
+
+my $string = "
+log4perl.rootLogger                               = INFO, root
+log4perl.appender.root                            = Log::Log4perl::Appender::Screen
+log4perl.appender.root.layout                     = SimpleLayout";
+Log::Log4perl->init(\$string);
+
+eval {
+        my $track  = Tapper::TestSuite::HWTrack->new;
+        $report = $track->generate();
+        $track->send($report);
+};
+
+exit 0;
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+tapper-testsuite-hwtrack - cmdline frontend to Tapper::TestSuite::HWTrack
+
+=head1 AUTHOR
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut
+

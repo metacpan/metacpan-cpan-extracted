@@ -1,0 +1,6 @@
+^Makefile$
+^Makefile.old$
+.shipit
+.*\.bak
+^.git/
+^.gitignore

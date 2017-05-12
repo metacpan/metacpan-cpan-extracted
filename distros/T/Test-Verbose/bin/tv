@@ -1,0 +1,359 @@
+#!/usr/local/bin/perl -w
+
+=head1 NAME
+
+tv - Run 'make TEST_VERBOSE=1' on one or more test files
+
+=head1 SYNOPSIS
+
+   $ tv t/foo.t         # make test TEST_VERBOSE=1 TEST_FILES=t/foo.t
+   $ tv -d t/foo.t      # similar, but turn on the debugger
+   $ tv Foo.pm          # Run all t/*.t test scripts for Foo.pm
+   $ tv t/foo.t t/bar.t # make TEST_VERBOSE=1 "TEST_FILES=t/foo.t t/bar.t"
+   $ tv t/*             # Run all test scripts in t
+   $ tv lib             # Test all modules in lib
+
+   $ tv --pure-perl ... # No make test, use perl -Ilib t/foo.t
+   $ tv --perl          # No make test; make pm_to_blib and perl -Iblib/lib...
+   $ tv --pod ...       # Test the POD
+   $ tv --compile ...   # Compile the source
+   $ tv --tests ...     # Run the tests
+
+=head1 DESCRIPTION
+
+Given one or more test scripts, Perl source code files, directories
+containing them, or Perl package names, tv tries to select and run the
+appropriate test scripts using "make test TEST_VERBOSE=1 TEST_FILES=..."
+where the "..." are the selected test scripts.
+
+This is especially useful in an editor when mapped to a key that saves
+and runs tv on the current file or just as shorthand for a frequent but
+laborious make incantation.
+
+=head2 Test scripts
+
+Test scripts are filenames that end in ".t".
+
+Passing C<tv> the names of test scripts selects them and runs them:
+
+    tv t/foo.t
+
+and
+
+    tv t/*.t
+
+select and run t/foo.t and t/*.t, repsectively.
+
+For parameters that do not end in ".t", C<tv> scans the source code for
+them and for all test scripts in t/*.t to select the test scripts
+that apply.  There are two other parameter types: source files and
+Perl package (class) names.
+
+=head2 Source Files
+
+If a source file name (or directory hierarchy of them) is given, then
+those files and all test scripts are scanned, and any test scripts
+pertaining to the named source files and any packages it defines are
+selected.  This allows
+
+    tv Foo.pm
+    tv lib/Bar/Bash.pm
+    cd lib/Bar; tv Bash.pm
+
+to DWIM (see the upcoming description of how tv finds the main project
+directory to see how that last one DWIMs).
+
+Source files are also run through L<C<podchecker>|podchecker> unless the
+--no-podchecker option is passed.  Source files ending in ".pod" are not
+considered testable except by C<podchecker>.
+
+=head2 Directories
+
+If a directory name is passed, it is scanned for .t, .pm, .pod, and .pl
+files and these are treated as though they were mentioned on the command
+line.  This can go goofy if you run it on a test directory that contains
+.pm file that are used in the test suite--a private copy of
+L<Test::Differences|Test::Differences>, perhaps--that you don't want to
+test.  This is a bug that should be fixed.
+
+=head2 Packages
+
+If a package name is given, then all source files and test scripts
+mentioned are scanned as well as all source files in the main project
+directory and its lib/ and t/ subdirectories are scanned, then any test
+scripts pertaining to the named packages are selected.  This allows
+
+    tv Foo
+
+to work.
+
+=head2 Untestable items
+
+It is a fatal error if a named item cannot be tested.  In this case,
+nothing is tested and tv prints a messages to STDERR and exits with a
+non-zero exit code.
+
+=head2 Finding the main project directory
+
+The main project directory is found by looking for "./t", "../t",
+"../../t" and so on until a directory containing a "t" directory is
+found.
+
+=head2 The .tvrc file (EXPERIMENTAL)
+
+If a .tvrc file is found in a project's root directory, it is run just
+before any tests.  This allows you to set important env. vars:
+
+    $ENV{DBI_USER}="barries";
+    $ENV{DBI_PASS}="yuck";
+    1;
+
+The trailing "1;" is to ensure that this file returns a TRUE (in the
+sense of Perl truth) value, otherwise a fatar error will be reported.
+
+Don't mess with Test-Verbose internals in this file, otherwise you
+may run any Perl code you like here.  If you ship a .tvrc file in
+your module, you should take great pains to make it portable.
+
+use strict is in effect, so you need to use C<my> for any variables,
+etc.
+
+=head2 Code Scanner Details
+
+In source files, things that look like C<package> statements and some
+special POD are used to infer what test scripts to run.  In test
+scripts, some other special POD and things that look like C<use> or
+C<require> statements are used to infer what files and packages are
+being tested.  This is only performed if something other than a test
+script (or directory hierarchy containing test scripts and no source
+files) are given.
+
+The special POD to be used in source files is:
+
+    =for test_script foo.t bar.t
+
+and for test scripts is
+
+    =for file Foo.pm lib/Bar.pm
+
+and
+
+    =for package Foo
+
+The C<=for> paragraphs may span more than one line and define whitespace
+separated lists of items.  The filenames in the C<=for file> directive
+must be relative to the main project directory and not contain ".."
+names.
+
+The scanning for C<use>, C<require>, and C<package> statements is quite
+naive, but usually sufficient.  Things like POD documentation and
+multiline strings can fool the scanners, but this is not usually a
+problem.
+
+=head1 OPTIONS
+
+--pod, --compile and --tests select each type of tests only,
+turning the other types off unless they also are selected.
+
+--no-pod, --no-compile and --no-tests turn off each type of testing
+no matter what.
+
+=over
+
+=item --compile, -c
+
+Compile the source code (using perl -cw) the POD or run the test scripts
+unless --pod or --tests is specified, respectively.
+
+--no-compile overrides this option.
+
+=item -d, --debug
+
+Run test script(s) in NonStop debugging mode using perl -d.  The inline
+breakpoint C<$DB::single=1;> for the debugger is very useful with this option,
+as in the interrupt (often ^C) key.  See L<perldebug>.
+
+NOTE: this runs the test scripts directly using C<perl -d>, since
+L<ExtUtils::Command::MM|ExtUtils::Command::MM> does not offer the ability.
+Overrides --extutils.  Best used with a single test script.
+
+=item --dd, --debug-stop
+
+Like -d but in "normal" debug mode so the debugger stops at the first
+line of the test script.
+
+Most useful when running a single script.
+
+=item -h, -?, --help
+
+Print out full help text (this page).
+
+=item -n, --dry-run, --just-print, --recon
+
+Print out the make command but don't run it.
+
+=item --extutils (EXPERIMENTAL)
+
+Invokes 
+
+    perl '-MExtUtils::Command::MM' -e 'test_harness(1,\'lib\')' @scripts
+
+instead of the default "make test" incantation.  Useful if you don't
+have a Makefile.PL.  Ignored if -d is used.  TODO: This is not
+compatible across perl and MakeMaker versions; tv needs to check to see
+what version of MakeMaker it is faced with.
+
+=item --no-pod, --no-podchecker
+
+Do not run C<podchecker>.  Overrides --pod.
+
+=item --no-compile
+
+Don't test compile the source.  Overrides --source.
+
+=item --no-tests
+
+Don't run test scripts.  Overrides --tests.
+
+=item --pod, --POD
+
+Test the POD; don't test the source or run the test scripts
+unless --compile or --tests is also specified, respectively.
+
+=item --pure-perl
+
+Instead of using make(1) or ExtUtils, run perl -Ilib t/foo.t.  This is
+the fastest way to run tests, but ASSumes that you place all modules
+under lib/ (which is often a good idea for other reasons)
+and that your distribution is pure perl.
+
+=item --quiet, -q (EXPERIMENTAL)
+
+Only emit "not ok"s for failing tests, don't emit other info.
+
+Using -v will enable printing of the commands being run, so you won't
+get lonely waiting for output.
+
+TODO: Allow logging to be disabled
+
+TODO: Allow the log file to be renamed
+
+TODO: Print progress thermometers
+
+=item -qq (EXPERIMENTAL)
+
+Like -q, but prints nothing except output after the last test.  This
+is usually a report summary emitted by "make test", but may be error
+text caused by situations so fatal that they don't allow the tests
+to be run.
+
+Note that the result code of the first command that does not exit
+with a C<0> value is returned from tv, so
+
+    tv -qq t/foo.t || less -S tv.log "+/^not ok"
+
+is a useful idiom.  And, as with -q, -v may also be used to print out
+what command is being run.
+
+=item -qqq (EXPERIMENTAL)
+
+Emit nothing; use the return code to guage test success (assuming the
+underlying test harness returns sensible return codes as make test does).
+
+=item --tests
+
+Skip testing the POD or the source unless --pod or --source is
+specified, respectively.
+
+=item -v, --verbose
+
+Disable any -q, -qq or -qqq options that occur before the -v option on
+the command line (notably any that are set in a .tvrc file).  Has no
+effect unless one of those options is passed.  May be overridden by -q,
+-qq or -qqq occuring later on the command line.  Not settable from a
+.tvrc file for now.
+
+=item --debug-tv
+
+Turn on tv's internal debugging output (does not affect the test
+scripts, see the C<-d> option).
+
+=back
+
+See L<Test::Verbose|Test::Verbose> for more details.
+
+=head1 LOGGING
+
+All child stdout and stderr is capture to tv.log.
+
+=head1 LIMITATIONS
+
+Folds all test stderr and stdout on to stdout.  Yuck.
+
+=head1 COPYRIGHT
+
+    Copyright 2002, R. Barrie Slaymaker, Jr.  All Rights Reserved.
+
+=head1 LICENSE
+
+You may use this under the terms of any of the BSD, Artistic, or GPL
+licenses.
+
+=head1 AUTHOR
+
+    Barrie Slaymaker <barries@slaysys.com>
+
+=cut
+
+use Getopt::Long;
+use strict;
+
+sub usage {
+    my $message = shift;
+
+    my ( $verbosity, $output, $result ) =
+        defined $message ? ( 1, \*STDERR, 1 )
+                         : ( 2, \*STDOUT, 0 );
+
+    require Pod::Usage;
+    Pod::Usage::pod2usage( 
+        defined $message
+            ? ( -message    => $message )
+            : (),
+        -verbose    => $verbosity,
+        -exitstatus => $result, 
+        -output     => $output,
+    );
+}
+
+my %options;
+GetOptions(
+    "n|dry-run|recon|just-print!"       => \$options{JustPrint},
+    "compile|c!"                        => \$options{Compile},
+#    "no-compile!"                       => \$options{NoCompile},
+    "dd|debug-stop!"                    => \$options{Debug},
+    "d|debug!"                          => \$options{DebugRun},
+    "debug-tv!"                         => sub { $ENV{TVDEBUG} = 1 },
+    "extutils|ext-utils!"               => \$options{ExtUtils},
+    "no-log!"                           => \$options{NoLog},
+    "no-pod|no-podchecker!"             => \$options{NoPOD},
+    "pod|test-pod!"                     => \$options{TestPOD},
+    "pure-perl!"                        => \$options{PurePerl},
+    "quiet|q!"                          => \$options{Quiet},
+    "qq!"                               => \$options{DoubleQuiet},
+    "qqq!"                              => \$options{TripleQuiet},
+    "tests!"                            => \$options{RunTests},
+#    "no-tests!"                         => \$options{NoTests},
+    "h|help|?" => sub { usage },
+    "v|verbose!"                         => sub {
+        $options{Quiet} = $options{DoubleQuiet} = $options{TripleQuiet} = 0
+            if $_[1];
+    },
+) or usage "";
+
+use Test::Verbose qw( is_win32 test_verbose );
+
+@ARGV = map glob, @ARGV if is_win32;
+
+exit test_verbose @ARGV, \%options;
+

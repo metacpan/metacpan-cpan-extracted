@@ -1,0 +1,15 @@
+Changes
+======
+
+0.00004 24 Feb 2010
+    * Make errors more verbose (now uses diag() to show them)
+
+0.00003 04 Feb 2010
+    * Fix timing issues
+    * add kill_proc() to safely kill processes
+
+0.00002 03 Feb 2010
+    * Check for defined-ness when checking for ports
+
+0.00001 03 Feb 2010
+    * Initial release

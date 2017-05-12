@@ -1,0 +1,58 @@
+{
+   "abstract" : "Set of Perl classes for creation of interactive and dynamic Telegram bots. Now bots can only process text, but work in progress :)",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Telegram-BotKit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::MoreUtils" : "0",
+            "Module::Load" : "0",
+            "WWW::Telegram::BotAPI" : "0",
+            "base" : "0",
+            "common::sense" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Inspector" : "0",
+            "Config::JSON" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pavelsr/Telegram-BotKit/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pavelsr/Telegram-BotKit.git",
+         "web" : "https://github.com/pavelsr/Telegram-BotKit"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

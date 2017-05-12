@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Template-Provider-Amazon-S3,
+version 0.009:
+
+  Enable template toolkit to use Amazon's S3 service as a provier of templates.
+
+This software is copyright (c) 2012 by Gautam Dey <gdey@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

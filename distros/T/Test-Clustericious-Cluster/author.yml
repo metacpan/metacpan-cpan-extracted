@@ -1,0 +1,28 @@
+---
+pod_spelling_system:
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - Clustericious
+    - beowulf
+    - url
+    - urls
+    - FooApp
+    - BarApp
+    - MyApp
+    - PlugAuth
+    - ua
+    - auth
+    - authz
+    - LDAP
+    - PlugAuthLite
+    - conf
+    - customizable
+    - app
+    - apps
+
+pod_coverage:
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private:
+    - PlugAuth::Lite#startup

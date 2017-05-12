@@ -1,0 +1,195 @@
+NAME
+    Test::Perl::Critic::Progressive - Gradually enforce coding standards.
+
+SYNOPSIS
+    To test one or more files, and/or all files in one or more directories:
+
+      use Test::Perl::Critic::Progressive qw( progressive_critic_ok );
+      progressive_critic_ok($file1, $file2, $dir1, $dir2);
+
+    To test all Perl files in a distribution:
+
+      use Test::Perl::Critic::Progressive qw( progressive_critic_ok );
+      progressive_critic_ok();
+
+    Recommended usage for public CPAN distributions:
+
+      use strict;
+      use warnings;
+      use Test::More;
+
+      eval { require Test::Perl::Critic::Progressive };
+      plan skip_all => 'T::P::C::Progressive required for this test' if $@;
+
+      Test::Perl::Critic::Progressive::progressive_critic_ok();
+
+DESCRIPTION
+    Applying coding standards to large amounts of legacy code is a daunting
+    task. Often times, legacy code is so non-compliant that it seems
+    downright impossible. But, if you consistently chip away at the problem,
+    you will eventually succeed! Test::Perl::Critic::Progressive uses the
+    Perl::Critic engine to prevent further deterioration of your code and
+    gradually steer it towards conforming with your chosen coding standards.
+
+    The most effective way to use Test::Perl::Critic::Progressive is as a
+    unit test that is run under a continuous-integration system like
+    CruiseControl or AntHill. Each time a developer commits changes to the
+    code, this test will fail and the build will break unless it has the
+    same (or fewer) Perl::Critic violations than the last successful test.
+
+    See the "NOTES" for more details about how this test works.
+
+SUBROUTINES
+    All of the following subroutines can be exported upon request. Or you
+    can export all of them at once using the ':all' tag.
+
+    " progressive_critic_ok(@FILES [, @DIRECTORIES ]) "
+    " progressive_critic_ok() "
+        Uses Perl::Critic to analyze each of the given @FILES, and/or all
+        Perl files beneath the given list of @DIRECTORIES. If no arguments
+        are given, it analyzes all the Perl files in the blib/ directory. If
+        the blib/ directory does not exist, then it tries the lib/, bin/,
+        script/, and scripts/ directory. The results of the analysis will be
+        stored as .perlcritic-history in the same directory where your test
+        script is located.
+
+        The first time you run this test, it will always pass. But on each
+        subsequent run, the test will pass only if the number of violations
+        found is less than or equal to the number of violations found during
+        the last passing test. If it does pass, then the history file will
+        be updated with the new analysis results. Once all the violations
+        are removed from the code, this test will always pass, unless a new
+        violation is introduced.
+
+        This subroutine emits its own Test::More plan, so you do not need to
+        specify an expected number of tests yourself.
+
+    " get_history_file() "
+    " set_history_file($FILE) "
+        These functions get or set the full path to the history file. This
+        is where Test::Perl::Critic::Progressive will store the results of
+        each passing analysis. If the $FILE does not exist, it will be
+        created anew. The default is "$Bin/.perlcritic-history" where $Bin
+        is the directory that the calling test script is located in.
+
+    " get_total_step_size() "
+    " set_total_step_size($INTEGER) "
+        These functions get or set the minimum acceptable decrease in the
+        total number of violations between each test. The default value is
+        zero, which means that you are not required to remove any
+        violations, but you are also not allowed to add any. If you set the
+        step size to a positive number, the test will require you to remove
+        $INTEGER violations each time the test is run. In this case, the
+        particular type of violation that you eliminate doesn't matter. The
+        larger the step size, the faster you'll have to eliminate
+        violations.
+
+    " get_step_size_per_policy() "
+    " set_step_size_per_policy(%ARGS) "
+        These functions get or set the minimum acceptable decrease in the
+        number of violations of a specific policy between each test. The
+        %ARGS should be "$POLICY_NAME => $INTEGER" pairs, like this:
+
+          my %step_sizes = (
+             'ValuesAndExpressions::ProhibitLeadingZeros'  =>  2,
+             'Variables::ProhibitConditionalDeclarations'  =>  1,
+             'InputOutput::ProhibitTwoArgOpen'             =>  3,
+          );
+
+          set_step_size_per_policy( %step_sizes );
+          progressive_critic_ok();
+
+        The default step size for any given Policy is zero, which means that
+        you are not required to remove any violations, but you are also not
+        allowed to add any. But if you wish to focus on eliminating certain
+        types of violations, then increasing the per-policy step size will
+        force you to decrease the number of violations of that particular
+        Policy, while ignoring other types of violations. The larger the
+        step size, the faster you'll have to eliminate violations.
+
+    " get_critic_args() "
+    " set_critic_args(%ARGS) "
+        These functions get or set the arguments given to Perl::Critic. By
+        default, Test::Perl::Critic::Progressive invokes Perl::Critic with
+        its default configuration. But if you have developed your code
+        against a custom Perl::Critic configuration, you will want to
+        configure this test to do the same.
+
+        Any %ARGS given to "set_critic_args" will be passed directly into
+        the Perl::Critic constructor. So if you have developed your code
+        using a custom .perlcriticrc file, you can direct
+        Test::Perl::Critic::Progressive to use a custom file too.
+
+          use Test::Perl::Critic::Progressive ( ':all' );
+
+          set_critic_args(-profile => 't/perlcriticrc);
+          progressive_critic_ok();
+
+        Now place a copy of your own .perlcriticrc file in the distribution
+        as t/perlcriticrc. Now, "progressive_critic_ok" will use this same
+        Perl::Critic configuration. See the Perl::Critic documentation for
+        details on the .perlcriticrc file format.
+
+        Any argument that is supported by the Perl::Critic constructor can
+        be passed through this interface. For example, you can also set the
+        minimum severity level, or include & exclude specific policies like
+        this:
+
+          use Test::Perl::Critic::Progressive ( ':all' );
+
+          set_critic_args( -severity => 2, -exclude => ['MixedCaseVars'] );
+          progressive_critic_ok();
+
+        See the Perl::Critic documentation for complete details on its
+        options and arguments.
+
+NOTES
+    The test is evaluated in two ways. First, the number of violations for
+    each Policy must be less than or equal to the number of the violations
+    found during the last passing test, minus the step size for that Policy.
+    Second, the total number of violations must be less than or equal the
+    total number of violations found during the last passing test, minus the
+    total step size. This prevents you from simply substituting one kind of
+    violation for another.
+
+    You can use the total step size and the per-policy step size at the same
+    time. For example, you can set the total step size to 5, and set the
+    per-policy step size for the "TestingAndDebugging::RequireStrictures"
+    Policy to 3. In which case, you'll have to remove 5 violations between
+    each test, but 3 of them must be violations of
+    "TestingAndDebugging::RequireStrictures".
+
+    Over time, you'll probably add new Policies to your Perl::Critic setup.
+    When Test::Perl::Critic::Progressive uses a Policy for the first time,
+    any newly discovered violations of that Policy will not be considered in
+    the test. However, they will be considered in subsequent tests.
+
+    If you are building a CPAN distribution, you'll want to add
+    ^t/.perlcritic-history$ to the MANIFEST.SKIP file. And if you are using
+    a revision control system like CVS or Subversion, you'll probably want
+    to configure it to ignore the t/.perlcritic-history file as well.
+
+BUGS
+    If you find any bugs, please submit them to
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Perl-Critic-Progressive>.
+    Thanks.
+
+SEE ALSO
+    criticism
+
+    Perl::Critic
+
+    Test::Perl::Critic
+
+    <http://www.perlcritic.com>
+
+AUTHOR
+    Jeffrey Ryan Thalhammer <thaljef@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2007-2008 Jeffrey Ryan Thalhammer. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. The full text of this license can
+    be found in the LICENSE file included with this module.
+

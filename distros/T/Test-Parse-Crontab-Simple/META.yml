@@ -1,0 +1,38 @@
+---
+abstract: 'Simple Test Tool of Crontab by Parse::Crontab'
+author:
+  - 'masartz <masartz@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Parse-Crontab-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Parse::Crontab::Simple:
+    file: lib/Test/Parse/Crontab/Simple.pm
+    version: '0.01'
+requires:
+  Data::Util: '0.63'
+  Parse::Crontab: '0.05'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/masartz/p5-Test-Parse-Crontab-Simple/issues
+  homepage: https://github.com/masartz/p5-Test-Parse-Crontab-Simple
+  repository: git://github.com/masartz/p5-Test-Parse-Crontab-Simple.git
+version: '0.01'

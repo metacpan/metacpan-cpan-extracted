@@ -1,0 +1,51 @@
+{
+   "abstract" : "provide case switching using Test::Proto",
+   "author" : [
+      "Daniel Perrett <perrettdl@googlemail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Proto-Where",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Proto::Base" : "0.020"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/pdl/Test-Proto-Where/issues"
+      },
+      "homepage" : "http://github.com/pdl/Test-Proto-Where",
+      "repository" : {
+         "url" : "http://github.com/pdl/Test-Proto-Where"
+      }
+   },
+   "version" : "0.001"
+}

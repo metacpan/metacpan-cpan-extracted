@@ -1,0 +1,42 @@
+h1. Test::Class::Sugar
+
+h2. Synopsis
+
+@Test::Class::Sugar@ is a declarative wrapper around Adrian Howard's
+"@Test::Class@":http://search.cpan.org/dist/Test-Class xUnit style Perl
+testing library.
+
+The idea is that, instead of writing:
+
+<pre><code>
+package Test::Something;
+use base qw/Test::Class/;
+
+use Test::Most;
+
+sub subject {
+  'Something'
+}
+
+sub test_something : Test(3) {
+  my $test = shift;
+  is $test->current_method, 'test_something';
+  is $test->subject, 'Something';
+  isa_ok $test, 'Test::Something';
+}
+</code></pre>
+
+You will be able to write:
+
+<pre><code>
+use Test::Class::Sugar;
+
+testclass exercises Something {
+  test something >> 3 {
+    is $test->current_method, 'test_something';
+    is $test->subject, 'Something';
+    isa_ok $test, 'Test::Something';
+  }
+}
+</code></pre>
+

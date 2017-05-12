@@ -1,0 +1,44 @@
+{
+   "abstract" : "Perl extension for using an embedding WebKit engine for Catalyst tests",
+   "author" : [
+      "Stefan Seifert <nine@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-WWW-WebKit-Catalyst",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::EngineLoader" : "0",
+            "IO::Socket::INET" : "0",
+            "Test::More" : "0",
+            "Test::WWW::WebKit" : "0.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

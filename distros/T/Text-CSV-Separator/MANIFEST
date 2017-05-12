@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+examples/separator.pl
+examples/separator_lucky.pl
+lib/Text/CSV/Separator.pm
+t/00_load.t
+t/01_pod_valid.t
+t/02_pod_coverage.t
+t/03_get_separator.t
+t/04_get_separator_lucky.t
+t/commacolon.csv
+t/commacolonpipe.csv
+t/commasep.csv
+t/semicolon_commasep.csv
+t/tabsep.csv
+t/tabsep_timecol.csv
+META.yml                                 Module meta-data (added by MakeMaker)

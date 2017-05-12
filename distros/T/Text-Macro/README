@@ -1,0 +1,233 @@
+TITLE
+    Text::Macro 0.06
+
+FORWARD
+    This module is template facility who's focus is on generating code such
+    as c, java or sql. While generating perl code is also possible, there is
+    a potential conflict between the control-symbol and the perl comment
+    symbol.
+
+    Perl is excelent at manipulating text, and it begs the question why one
+    would need such a tool. The answer is that good code design should be
+    such that applications should not have to be modified so as to make
+    configuration changes. Thus external configuration files/data is used.
+    However, if these files are read in as perl-code, then simple errors
+    could crash the whole application (or provide subtle security risks).
+    Further, it is often desired to invert the control flow and text-data
+    (namely, make the embedded strings primary, and control-flow secondary).
+    This is the ASP model, and for 90% HTML, 10% code, this works great.
+
+    This module supports many control facilities which directly translate
+    into perl-control facilities (e.g. inverting the ASP-style code back
+    into perl-style behind the scenes). The inversion process is cached in a
+    simple user object.
+
+    The module was initially inspired by Text::FastTemplate by Robert Lehr,
+    who's module didn't completely fullfill my needs.
+
+FEATURES
+     * fast, simple, robust
+     * code-generating-centric feature-set
+     * substitutions stand-out from template
+     * macro-code embedded in text
+     * OOP
+     * external and internal includes (for clearifying complex control-flow)
+     * scoped variable-substitutions
+     * line-based processing (like cpp)
+     * usable error messages
+
+SYNOPSIS
+  Sample code
+
+     use Text::Macro;
+ 
+     my $parser = new Text::Macro path => "templates", file => "sql.template";
+  
+     # print macro substitutions
+     $parser->print( { var1 => 'val1', var2 => 'val2' } );
+ 
+     use IO::File;
+     my $fh = new IO::File ">out.file";
+ 
+     # direct the output to the given file
+     $parse->pipe( 
+        { 
+          table_name => $table_name,
+          f_primary_key => 1,
+          primary_key => 'id',
+          col_fields => 
+            [
+               {
+                  col_name => 'colName1',
+                  col_type => 'colType1'
+               },
+               {
+                  col_name => 'colName2',
+                  col_type => 'colType2'
+               }
+            ]
+        }, $fh );
+
+      my $str = $parse->toString( { .. } );
+
+  Sample macro
+
+     #sub pk_block
+      #if ##primary_key##
+       primary key ##primary_key##,
+      #elsif ##f_define_id##
+       primary key id,
+      #endif
+     #endsub
+     #comment --------------
+
+     #include licence_agreement.template
+
+     create table ##table_name## (
+
+     #callsub pk_block
+
+     #comment Produce the appropriate fields
+     #for ##col_fields##; sep=",\n"
+       ##col_name## ##col_type##; ' \
+       IDX = ##col_fields_IDX## of ##col_fields_SIZE##\
+     #endfor
+
+     );
+
+DESCRIPTION METHODS
+  new( path => 'path-to-files', file => 'particular template-name' )
+
+    This creates a new optimized parser.. This actually generates perl code
+    to run the data so invocations should be speedy.
+
+    This throws an exception if the file can't be found.
+
+  $obj->print( { subs vals } )
+
+    This runs the macro, substituting the values specified in the input hash
+    parameter. Note that it must be a hash-ref or an exception will be
+    thrown. It's possible that the rendered code could throw an exception,
+    but this would be considered a bug in the parser.
+
+  $obj->pipe( { subs vals }, $file_handle )
+
+    This is identical to print($) but redirects the output to the
+    file-handle. It is assumed that IO::File is used.
+
+  $obj->toString( { subs vals } )
+
+    This method allows the rendered text to be directly captured.
+
+DESCRIPTION MACRO format
+    Text is passed unmodified except for '#' pre-processor directives. The
+    easiest format is the "##var_name##" directive which searches for a
+    context hash-value with the appropriate hash-key name. In the outer
+    scope, the context is the passed hash-ref keys/values. Within a
+    for-loop, the context changes as described below.
+
+    Lines in the macro-file that begin with a '#directive' are flow-control
+    statements. Valid statements are ( #if ##cond_var## | #else | #elsif
+    ##cond_var## | #endif | #for ##list_var## | #endfor | #include file_name
+    | #comment | #sub sub_name | #endsub | #callsub sub_name | #pre |
+    #endpre | #switch ##var_name## | #case "value1", "value2".. | #default |
+    #endswitch | #set ). Some of the flow-control directives take a variable
+    and process on it. Non-recognized statements are passed as-is.
+
+    The if/elsif/else/endif statements simply insert the contents of the
+    hash-value into a perl "if ( $context->{$var_name} ) {" block, so
+    potentially complex statements can be achieved. In general, however, the
+    logic-computation should be pre-computed and simply provide a boolean
+    flag.
+
+    For "for"/"endfor" directives, the variable should be an array of hashes
+    (technically an array-ref of hash-refs). It will iterate over the array
+    and update an index of the name "varname_IDX" (which can be used as a
+    regular insertion variable). Other custom variables are "varname_SIZE"
+    (which contains the max IDX value). The context of the insertion
+    variables will change to be the contents of the sub-hash PLUS the
+    contents of the enclosing hash.
+
+    The include directive simply replaces that line with the contents of the
+    file_name (exception if not found). This is a recursive process.
+
+    The 'comment' directive simply ignores that line
+
+    The 'xxsub' routines are a sort of local include. They are good for
+    extracting complex pieces out into separate blocks of
+    code/template-data. You can append parameter data such as '#callsub foo
+    "val1", "val2"' which will set vars '##ARGV[0]""', etc. The format is to
+    declare a block with #sub {sub-name} / #endsub block, then invoke it
+    with #callsub {sub-name} just like an include statement. Note that
+    subroutines are not considered an independent context. For example:
+
+     #sub foo
+      test ##val##, ##ARGV[0]##
+     #end foo
+
+     #callsub foo "neat"
+
+    The 'set' statement allows the setting of substituion variables. The
+    format is "var=val....". The "var=" can not have space, but everything
+    after the '=' will be accepted until the end-of-line.. The value is
+    escaped and inserted into perl-quotes, so no code can be run from here.
+    Note, however, that setting a var affects the entire context. Example:
+
+     #set my_var=Today is a good day
+
+    The 'pre' block passes values exactly as is (with no hash-substution).
+    The only thing that it can't pass is #endpre. This could be good to pass
+    perl-comments.
+
+    The 'switch' / 'case' / 'default' blocks are merely for convinience and
+    deviate from the c-language style. In function they are readibility
+    structures which get expanded out to:
+
+     if ( ##cond_var## eq "case_value" ) {
+     } elsif ( .. ) {
+     } else {
+     }
+
+    Because of this, c-style break-statements and fall-throughs don't exist.
+    Further, in c, the comparison is between integers. Here it is between
+    strings (which _can_ work for numbers, so long as there's no
+    stringification ambiguity. Here is an example:
+
+     #switch ##data_type##
+     #case "boolean"
+       Do somethign with boolean
+     #case "int", "integer"
+       Do something with type integer
+     #default
+       If neither of the above special cases, then do this
+     #endswitch
+
+    If a line ends with "\\\n" (meaning back-slash followed by a carrage
+    return), then the carrage return is stripped. This is useful for
+    hash-commands that would otherwise require carriage returns to be
+    displayed. For example:
+
+     pre-text \
+     #for ##var##
+      data ##val##\
+     #endfor
+     post-text
+
+BUGS / NOTES
+    you can't declare a sub within a sub (and this includes an include).
+    There are currently no plans to rectify this.
+
+    #for ##var##, and #switch ##var## can not make use of indexing/hashing.
+
+TODO
+    Provide better error handling (getting there)
+
+    For performance enhancement, extract the hash-values into local
+    variables when more than one instance is used. Since this slows down the
+    parsing stage, this might be considered an input parameter flag to new.
+
+SEE ALSO
+AUTHOR
+     Artistic License
+     Copyright (C) 2002 Michael Maraist <maraist@udel.edu>
+

@@ -1,0 +1,13 @@
+Revision history for Template-Plugin-Filter-ANSIColor
+
+0.03	12.08.2011/11:00
+		- Set the correct versions of the dependencies
+		- Fixed the requirements for build action
+
+0.02	04.08.2011/21:00
+		Obvious bugs in the build process are fixed
+
+0.01    04.08.2011/20:04
+        First version
+		
+

@@ -1,0 +1,11 @@
+MANIFEST
+Changes
+META.yml
+LICENSE
+README
+Build.PL
+Makefile.PL
+t/myfile.txt
+t/tests.t
+lib/Test/Toolbox.pm
+lib/Test/Toolbox.pod

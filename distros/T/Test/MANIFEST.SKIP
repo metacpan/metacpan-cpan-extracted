@@ -1,0 +1,10 @@
+^MANIFEST\.bak$
+Makefile(\.old)?$
+\.rej$
+\.git/
+noinc
+CVS
+blib
+.gitignore
+.shipit
+~

@@ -1,0 +1,5 @@
+Revision history for Term::Form
+
+
+0.310   2016-08-30
+        - Renamed "Term::ReadLine::Simple" to "Term::Form".

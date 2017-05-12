@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Template-Plugin-HTML-BBCode.t
+lib/Template/Plugin/HTML/BBCode.pm
+META.yml                                 Module meta-data (added by MakeMaker)

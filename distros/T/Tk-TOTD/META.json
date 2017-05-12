@@ -1,0 +1,44 @@
+{
+   "abstract" : "Tip Of The Day dialog for Perl/Tk.",
+   "author" : [
+      "Noah Petherbridge <kirsle@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-TOTD",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tk" : "0",
+            "Tk::DialogBox" : "0",
+            "Tk::ROText" : "0",
+            "Tk::Widget" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.5"
+}

@@ -1,0 +1,24 @@
+Revision history for Test-MobileAgent
+
+0.06 2012/02/17
+  - smartphone support (for HTTP::MobileAgent::Plugin::SmartPhone)
+
+0.05 2011/01/14
+  - doc patch by tokuhirom++
+
+0.04 2010/09/20
+  - nothing is changed; just to fix manifest mismatch
+
+0.03 2010/03/22
+  - docomo guid should be able to be empty
+  - added more docomo/jphone/vodafone/softbank agents
+  - fixed _headers which didn't contain proper headers
+  - added serial_number/card_id attributes support
+
+0.02 2009/12/16
+  - added docomo serial number support
+  - fixed user agent detection
+  - fixed a pod
+
+0.01 2009/12/05
+  - initial release

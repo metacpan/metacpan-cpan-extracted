@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-Format-Screenplay.t
+t/example.sp
+lib/Text/Format/Screenplay.pm
+META.yml                                 Module meta-data (added by MakeMaker)

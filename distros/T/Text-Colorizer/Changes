@@ -1,0 +1,17 @@
+commit d430eb4cb2e47a6f49f8f363789a78ae45fca85b (HEAD -> master, origin/master, origin/HEAD)
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Oct 6 18:26:11 2016 +0200
+
+    ADDED: provide default colors
+
+commit 501bb0fc2956fdf92b477ba6193b9380d36d35ec
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Oct 6 14:03:13 2016 +0200
+
+    ADDED: 256 colors support for ANSI
+
+commit 4829d4719db0f7a7dbe11f3dfca6a08e47946255
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Sep 16 23:01:54 2012 +0200
+
+    ADDED: initial commit at version 0.02

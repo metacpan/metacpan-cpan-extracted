@@ -1,0 +1,21 @@
+---
+name: Text-Template-Inline
+version: 0.13
+author:
+abstract: Easy formatting of hierarchical data
+license: perl
+requires:
+  Scalar::Util: 0
+  Test::Exception: 0
+  Test::Simple: 0
+  perl: 5.6.1
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Text::Template::Inline:
+    file: lib/Text/Template/Inline.pm
+    version: 0.13
+resources:
+  license: http://dev.perl.org/licenses/

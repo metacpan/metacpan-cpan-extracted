@@ -1,0 +1,3 @@
+Test file for Text::FromAny
+
+TXT version

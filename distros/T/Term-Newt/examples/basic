@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+
+# $Id: basic,v 1.1 1998/11/09 02:29:51 daniel Exp daniel $
+
+use strict;
+use ExtUtils::testlib;
+use Term::Newt;
+
+my $n = Term::Newt->new;
+
+$n->init;
+$n->cls;
+$n->newtSetSuspendCallback(sub {});
+
+$n->draw_root_text(0,0, "Some root text");
+$n->draw_root_text(-25,-2, "Root text in the other corner");
+$n->push_help_line('');
+$n->refresh;
+sleep 1;
+
+$n->push_help_line("A help line");
+$n->refresh;
+sleep 1;
+
+$n->pop_help_line;
+$n->refresh;
+sleep 1;
+
+$n->finished;

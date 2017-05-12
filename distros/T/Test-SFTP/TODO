@@ -1,0 +1,22 @@
+Organized according to how soon I think I will implement these.
+
+** REWRITE **
+    - Next Net::SFTP::Foreign will support either redirecting output to
+      /dev/null or a "quiet" option. This should be used.
+
+* Upcoming versions:
+    - Add testing for can_get and cannot_get using $remote_path as well
+    - Check if we're uploading a file to where it really is right now, if so -
+      prevent it
+    - Add SKIP {} for connection-requiring methods
+    - Check on functions that need the object is the object exists, fail
+      automatically if it doesn't, with proper diag()
+
+* Not any time soon, if at all:
+    - Add tests for every possible connection success or fail (wrong host,
+      missing attributes, timeout, etc.)
+    - Allow different SFTP engines (Net::OpenSSH?)
+    - Use an SSH server to be able to test the module in a more controlled
+      manner
+
+

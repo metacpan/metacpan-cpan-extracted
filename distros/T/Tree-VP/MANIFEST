@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+examples/spelling.pl
+examples/spelling_store.pl
+lib/Tree/VP.pm
+t/simple.t
+META.yml
+MANIFEST

@@ -1,0 +1,119 @@
+Revision history for Perl extension Tie::CSV_File.
+
+0.21  Mon May 12, 2003
+       - implemented exists operation
+       - added Test::ManyParams to the (test) requirements 
+       - fixed a bug from the documentation
+
+0.20  Tue May 08, 2003
+       - fixed bug,
+         rows with exactly one column containing an empty space
+         wasn't handled right,
+         because the written row in the file
+         is was just empty and could not be distinguished from
+         an empty row without any column
+         now it is distinguished as a row with one column is written as
+         "" (including with quotes)
+       - fixed bug
+         if some csv options were 0 or another defined false value
+         they confused some routines
+       - implemented STORESIZE and thus enabling splices (like shift, pop) 
+         from a csv file
+       - removed many bugs from the documentation
+       - implemented a better cleaning up of files used by the test scripts
+
+0.19  Mon Sep 09, 2002
+       - implemented internal fields-cache for a Tie::CSV_File::Line
+	
+0.18  Fri Sep 06, 2002
+       - fixed bug that occured in Perl <= 5.6.1
+         the predefined file type constants are created in a loop with eval statements
+         seems that Perl <= 5.6.1 needs help to
+         find out that the so exported, but dynamic created statements aren't barewords
+         I enclosed the (dynamic) constant creation with a BEGIN { ... } block.
+
+0.17  Fri Sep 06, 2002
+       - implemented warning, if the sep_char isn't matched with a specified sep_re
+
+0.16  Thu Sep 05, 2002
+       - fixed problems with special character like 'ä','ö','ü'
+         these lines were skipped, as they were treated as binary data,
+         but the CSV module didn't expect to get "binary" data!
+
+0.15  Wed Sep 04, 2002
+       - fixed bug,
+         forgot to export the *_SEPARATED file types
+                                   ^
+         (reason was that I wanted even with and without mispelled forms to export,
+          but the routine for "mispelling" also changed the original word)
+0.14  Wed Sep 04, 2002
+       - fixed forgotten dependency:
+         added Test::Warn to the (test) requirements
+
+0.13  Tue Sep 03, 2002
+       - implemented warning,
+         if sep_char contains of more than one character
+       - refacturing of the code
+       - removed sleeping bug,
+         the sep_char '0' (zero) wouldn't have worked
+
+0.12  Mon Aug 26, 2002
+       - fixed typos: *_SEPERATED  => *_SEPARATED
+                           ^               ^
+0.11  Mon Aug 19, 2002
+       - added constand defining pipe seperated data
+         * PIPE_SEPERATED
+
+0.10  Fri Aug 16, 2002
+       - added constant defining semicolon-seperated data
+         * SEMICOLON_SEPERATED
+
+0.09  Mon Aug 12, 2002
+       - implemented delete possibility
+         * delete $data[5]
+         * delete $data[5][5]
+       - added Data::Compare to the requirements for testing
+
+0.08  Thu Aug 08, 2002
+       - added constants defining tabular-, white-space- and colon-seperated data
+         * TAB_SEPERATED
+         * COLON_SEPERATED
+         * WHITE_SPACE_SEPERATED
+       - fixed some typos,
+         where I wrote Tie::File instead of Tie::CSV_File
+
+0.07  Fri Aug 02, 2002
+       - implemened STORE possibility to @data
+         $data[$line] = ["last name", "first name", "CPAN-ID", "address"];
+         push @data, ["Schleicher", "Janek", "BIGJ", "Germany"];
+
+
+0.06  Thu Aug 01, 2002
+       - implemented STORE possibility
+         $data[$line][$column] = $something
+
+0.05  Wed Jul 31, 2002
+       - implemented option
+         sep_re     => ...
+
+0.04  Wed Jul 31, 2002
+       - changed code to avoid bug in 5.6.1,
+         instead of returning an anonymous [] from a tied array
+         in the first dimension,
+         I return something like my @fields; return \@fields;
+
+0.03  Tue Jul 30, 2002
+       - fixed bug: removed 'use Test::Warn' from a test script as I didn't need it
+                    but forced an error
+
+0.02  Tue Jul 30, 2002
+       - implemented CSV options
+         quote_char   => ...
+         eol          => ...
+         escape_char  => ...
+         always_quote => ...
+       - removed dependancy of Perl 5.8.0 of the Makefile.PL
+
+0.01  Mon Jul 29, 2002 
+       - implemented read-only tied Tie::CSV_File without any options
+

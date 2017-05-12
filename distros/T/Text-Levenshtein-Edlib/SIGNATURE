@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 8f650e0086e285bb0e7ec4bdd6beae7f0d1dc44d Changes
+SHA1 6812d24e241afd26826cd95672906a50d6c7c38f Edlib.xs
+SHA1 4effbfd150d3973cdd9aa676b5789b50b4b252d2 MANIFEST
+SHA1 f6663b5577e602e716d7010496fdd5f10f5b74b8 META.json
+SHA1 8881b4653c00b066cdf140441d146431d5828e7f META.yml
+SHA1 1e3070501b4db30efa2f49d43ba9f922c495d622 Makefile.PL
+SHA1 ffc599cbd638f86da2f95b0b85515c0ddfc12960 README
+SHA1 fab5d45ae4001d09b41e736026235c3b9d0c271b fallback/const-c.inc
+SHA1 b9bc6499db69274c0ed46492c27a432a9f1940fe fallback/const-xs.inc
+SHA1 b5f35de7b85a09f7a40e13ab7cc960fff1dc9a45 lib/Text/Levenshtein/Edlib.pm
+SHA1 25a511794eb95673dfb67fb7862acaedc6d56e98 ppport.h
+SHA1 fa4124b96984677e151a400da1ace0326b489a64 t/Text-Levenshtein-Edlib.t
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAljEfC4QHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYhPqD/4uiQWNj/h9VALKyW0rM7s26ko3PGbUlpYr
+o/bEfOFyo3lA/t+kVHpAEP2YLXadufxj9eMHkulUzZp8nSlZ6gVDsa2J9OIfDWcb
+iYTJdHPNqwoeGoQcdcdGQlKJ9bnk9ySiibqcAiD1V9r4h7hZPHQGP9cnlMZ2JglR
+LcqtkZJg/Wlp5qC1HXueZVqRbMWFpKYToY2DbZsnqxLibfxFkpVHHVS3gXTmzv8X
+/6OtN8b9nUHCQchwKzJvbzw6klWH2Ma6DSi1tchRjvhCGjbw8eaMheHuIVhygcd3
+SBedC9mDf3dG8KVsDUdkAv7UglkFK+hxn669O4PS2FeKQUiRQZ/OLzpOKbh8eAb7
+sO3MM+NGAZP17idz473wivEzt/aURyc/PPYDJRVDsn7jUIlN7uf/cgd1p/x09zZM
+y7fnS9a33asemgDPtA/kxBFFxTrmbR9K+6CkM46CVwg+80MQf/FaRTYIujFYyqdQ
+gdqFy4AfXpTBdChUngG03XoIce3ECQaNJ7+FFm2RpZN27qctcH8a5K8rRIXlN+x4
+Nz81PnVFlybGdyCTqnuBNM51qtRJIpVhJib3W2LncUvOu4xDrXLbZcpeIKGUob98
+0Lf7BTOOGXSdm4MAaxGX6c6anfxeb0OIKgo/NI/z9TLWFAPPDQsU/Zv3bekgEj7E
+JJ/c6u3UoA==
+=SmzT
+-----END PGP SIGNATURE-----

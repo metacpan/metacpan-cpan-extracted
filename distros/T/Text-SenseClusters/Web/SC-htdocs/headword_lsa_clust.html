@@ -1,0 +1,22 @@
+<html>
+<title>Target Word Clustering (LSA)</title>
+<body>
+<h1>Target Word Clustering (LSA) </h1>
+</body>
+</html>
+
+Target word clustering takes as input multiple contexts, each of which 
+includes a single target word that is marked with a special XML tag 
+called "head". The object is to cluster those contexts to discover the 
+different meanings of the target word. When using LSA, the premise is 
+that contexts that contain words that have occurred in similar contexts 
+should be clustered together. 
+<br><br>
+
+When using LSA to carry out target word context clustering, each feature  
+will be represented as a vector that shows the contexts in which it 
+occurs. Each context will be represented as the average of the vectors  
+associated with the features that occur around the target word in that  
+context. The premise is that contexts that are made up of features that  
+occur in some of the same contexts should be similar to each other. 
+

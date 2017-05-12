@@ -1,0 +1,10 @@
+Revision history for Perl module Tie::JCR
+
+0.02 Thu Sep 20 21:30:00 2007
+    - Moving to Module::Install for builds.
+    - Adding Java::JCR to the requirements.
+
+0.01 Fri Jul 28 13:01:45 2006
+    - original version; created by ExtUtils::ModuleMaker 0.47
+
+

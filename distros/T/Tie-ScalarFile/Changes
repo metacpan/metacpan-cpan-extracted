@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::ScalarFile.
+
+0.01  Mon Aug 15 18:41:13 2005
+	- original version; created by h2xs 1.23 with options
+		-aXn Tie::ScalarFile
+

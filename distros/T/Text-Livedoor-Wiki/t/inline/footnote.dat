@@ -1,0 +1,5 @@
+=== basic
+--- wiki
+wiki((livedoor wiki)) livedoor((livedoor rock))
+--- html
+wiki<a href="#footer-footnote1" name="footnote1">*1</a> livedoor<a href="#footer-footnote2" name="footnote2">*2</a>

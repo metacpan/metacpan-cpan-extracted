@@ -1,0 +1,8 @@
+Revision history for Test-Behaviour-Spec
+
+0.02   Fri Feb 13 18:31:06 2009 JST
+       correct missing semicolon error in SYNOPSIS of the pod.
+
+0.01   Thu Feb 12 12:40:04 2009 JST
+       Initial release.
+

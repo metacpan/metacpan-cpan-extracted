@@ -1,0 +1,25 @@
+---
+name: Text-Patch-Rred
+version: 0.06
+author:
+  - 'Jakob Bohm, E<lt>ehekikkeptiehewdur@jbohm.dkE<gt>'
+abstract: Safely apply diff --ed style patches
+license: perl
+resources:
+  license: ~
+requires:
+  perl: 5.6.0
+build_requires:
+  File::Spec: 0
+  Test::More: 0
+  Test::Pod: 1
+  Test::Pod::Coverage: 1
+dynamic_config: 0
+provides:
+  Text::Patch::Rred:
+    file: lib/Text/Patch/Rred.pm
+    version: 0.06
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

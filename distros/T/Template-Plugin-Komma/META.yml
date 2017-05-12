@@ -1,0 +1,10 @@
+--- 
+abstract: TT2 plugin to commify numbers (German format)
+author: 
+  - Uwe Voelker <uwe.voelker@gmx.de>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.003
+license: perl
+name: Template-Plugin-Komma
+requires: 
+  Template: 2.0
+version: 0.07

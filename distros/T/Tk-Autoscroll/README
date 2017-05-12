@@ -1,0 +1,18 @@
+Tk::Autoscroll
+--------------
+Enables scrolling by pressing middle button and freely moving cursor
+around the widget.
+
+Installation:
+
+	perl Makefile.PL
+	make
+	make install
+
+For a demo use (before installation, but after make):
+
+	perl -Mblib examples/autoscroll.pl
+
+
+Slaven Rezic <srezic@cpan.org>
+

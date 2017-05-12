@@ -1,0 +1,140 @@
+NAME
+    Task::Curses::UI - Install the Curses::UI modules.
+
+SYNOPSIS
+     cpanm Task::Curses::UI
+
+SEE ALSO
+    Curses::UI
+        A curses based OO user interface framework
+
+    Curses::UI::Buttonbox
+        Create and manipulate button widgets
+
+    Curses::UI::Calendar
+        Create and manipulate calendar widgets
+
+    Curses::UI::Checkbox
+        Create and manipulate checkbox widgets
+
+    Curses::UI::Color
+        Color support module
+
+    Curses::UI::Common
+        Common methods for Curses::UI
+
+    Curses::UI::Container
+        Create and manipulate container widgets
+
+    Curses::UI::DelimitedTextViewer
+        Displays delimited files as fixed width.
+
+    Curses::UI::Dialog::Basic
+        Create and manipulate basic dialogs
+
+    Curses::UI::Dialog::Calendar
+        Create and manipulate calendar dialogs
+
+    Curses::UI::Dialog::Dirbrowser
+        Create and manipulate filebrowser dialogs
+
+    Curses::UI::Dialog::Error
+        Create and manipulate error dialogs
+
+    Curses::UI::Dialog::Filebrowser
+        Create and manipulate filebrowser dialogs
+
+    Curses::UI::Dialog::Progress
+        Create and manipulate progress dialogs
+
+    Curses::UI::Dialog::Question
+        Pose a simple question to the user
+
+    Curses::UI::Dialog::Status
+        Create and manipulate status dialogs
+
+    Curses::UI::Grid
+        Create and manipulate data in grid model
+
+    Curses::UI::Grid::Cell
+        Create and manipulate cell in grid model.
+
+    Curses::UI::Grid::Row
+        Create and manipulate row in grid model.
+
+    Curses::UI::Label
+        Create and manipulate label widgets
+
+    Curses::UI::Listbox
+        Create and manipulate listbox widgets
+
+    Curses::UI::Menubar
+        Create and manipulate menubar widgets
+
+    Curses::UI::Notebook
+        Create and manipulate notebook widgets.
+
+    Curses::UI::Mousehandler::GPM
+        Curses::UI GPM Bindings
+
+    Curses::UI::Number
+        Create and manipulate number widgets.
+
+    Curses::UI::PasswordEntry
+        Create and manipulate passwordentry widgets
+
+    Curses::UI::POE
+        A subclass makes Curses::UI POE Friendly.
+
+    Curses::UI::Popupmenu
+        Create and manipulate popupbox widgets
+
+    Curses::UI::Progressbar
+        Create and manipulate progressbar widgets
+
+    Curses::UI::Radiobuttonbox
+        Create and manipulate radiobuttonbox widgets
+
+    Curses::UI::Searchable
+        Add 'less'-like search abilities to a widget
+
+    Curses::UI::TextEditor
+        Create and manipulate texteditor widgets
+
+    Curses::UI::TextEntry
+        Create and manipulate textentry widgets
+
+    Curses::UI::TextViewer
+        Create and manipulate textviewer widgets
+
+    Curses::UI::Time
+        Create and manipulate time widgets.
+
+    Curses::UI::Tutorial
+        Tutorial for the Curses::UI framework
+
+    Curses::UI::Volume
+        Create and manipulate volume widgets.
+
+    Curses::UI::Widget
+        The base class for all widgets
+
+    Curses::UI::Window
+        Create and manipulate Window widgets
+
+REPOSITORY
+    <https://github.com/tupinek/Task-Curses-UI>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

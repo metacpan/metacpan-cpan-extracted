@@ -1,0 +1,9 @@
+Revision history for Perl extension Text::Header.
+
+1.02  Wed Sep 27 18:22:59 2000
+	- original version; created by h2xs 1.16
+
+1.03  Mon Oct  2 10:20:29 PDT 2000
+	- Egads! Original one was so broken I can't
+	  believe I posted it on CPAN. This includes
+	  numerous bug fixes and feature enhancements.

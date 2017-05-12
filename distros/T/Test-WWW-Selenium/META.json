@@ -1,0 +1,102 @@
+{
+   "abstract" : "Perl Client for the Selenium Remote Control test tool",
+   "author" : [
+      "Maintained by: Matt Phillips <mattp@cpan.org>, Luke Closs <lukec@cpan.org>",
+      "Originally by Mattia Barbon <mbarbon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-WWW-Selenium",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "util"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request" : "0",
+            "IO::Socket" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::Builder" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "URI::Escape" : "0",
+            "base" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::Builder::Tester" : "0",
+            "Test::Exception" : "0",
+            "Test::Mock::LWP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::REPL::Plugin::Selenium" : {
+         "file" : "lib/Devel/REPL/Plugin/Selenium.pm",
+         "version" : "1.36"
+      },
+      "Test::WWW::Selenium" : {
+         "file" : "lib/Test/WWW/Selenium.pm",
+         "version" : "1.36"
+      },
+      "WWW::Selenium" : {
+         "file" : "lib/WWW/Selenium.pm",
+         "version" : "1.36"
+      },
+      "WWW::Selenium::Util" : {
+         "file" : "lib/WWW/Selenium/Util.pm",
+         "version" : "1.36"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-test-www-selenium at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Test-WWW-Selenium"
+      },
+      "homepage" : "https://github.com/lukec/cpan-selenium-rc-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lukec/cpan-selenium-rc-perl.git",
+         "web" : "https://github.com/lukec/cpan-selenium-rc-perl"
+      }
+   },
+   "version" : "1.36"
+}
+

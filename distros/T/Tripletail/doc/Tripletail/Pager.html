@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::Pager - ページング処理</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::Pager - ページング処理
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#Xe3X83X86Xe3X83Xb3Xe3X83X97Xe3X83XacXe3X83XbcXe3X83X88Xe5XbdXa2Xe5XbcX8f">
+<span class="pod_lang">テンプレート形式
+
+</span></a>
+</li>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::Pager - ページング処理
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  my $DB = $TL-&gt;getDB('DB');
+  my $pager = $TL-&gt;newPager($DB);
+  $pager-&gt;setCurrentPage($CGI-&gt;get('pageid'));
+
+  my $t = $TL-&gt;newTemplate('template.html');
+  if($pager-&gt;paging($t-&gt;node('paging'), 'SELECT * FROM foo WHERE a = ?', 999)) {
+    $t-&gt;node('paging')-&gt;add;
+  } else {
+    $t-&gt;node('nodata')-&gt;add;
+  }</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">ページング処理を行う。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">決められた形式のTripletail::Templateノードに展開する。
+
+</span>
+</p>
+
+<h2><a id="Xe3X83X86Xe3X83Xb3Xe3X83X97Xe3X83XacXe3X83XbcXe3X83X88Xe5XbdXa2Xe5XbcX8f">
+<span class="pod_lang">テンプレート形式
+
+</span></a></h2>
+
+<pre class="pod_verbatim"><code>  &lt;!begin:paging&gt;
+    &lt;!begin:PrevLink&gt;&lt;a href=&quot;&lt;&amp;PREVLINK&gt;&quot;&gt;←前ページ&lt;/a&gt;&lt;!end:PrevLink&gt;
+    &lt;!begin:NoPrevLink&gt;←前ページ&lt;!end:NoPrevLink&gt;
+    &lt;!begin:PageNumLinks&gt;
+      &lt;!begin:ThisPage&gt;&lt;&amp;PAGENUM&gt;&lt;!end:ThisPage&gt;
+      &lt;!begin:OtherPage&gt;
+        &lt;a href=&quot;&lt;&amp;PAGELINK&gt;&quot;&gt;&lt;&amp;PAGENUM&gt;&lt;/a&gt;
+      &lt;!end:OtherPage&gt;
+    &lt;!end:PageNumLinks&gt;
+    &lt;!begin:NextLink&gt;&lt;a href=&quot;&lt;&amp;NEXTLINK&gt;&quot;&gt;次ページ→&lt;/a&gt;&lt;!end:NextLink&gt;
+    &lt;!begin:NoNextLink&gt;次ページ→&lt;!end:NoNextLink&gt;
+    ...
+    &lt;!begin:MaxRows&gt;全&lt;&amp;MAXROWS&gt;件&lt;!end:MaxRows&gt;
+    &lt;!begin:FirstRow&gt;&lt;&amp;FIRSTROW&gt;件目から&lt;!end:FirstRow&gt;
+    &lt;!begin:LastRow&gt;&lt;&amp;LASTROW&gt;件目までを表示中&lt;!end:LastRow&gt;
+    &lt;!begin:MaxPages&gt;全&lt;&amp;MAXPAGES&gt;ページ&lt;!end:MaxPages&gt;
+    &lt;!begin:CurPage&gt;現在&lt;&amp;CURPAGE&gt;ページ目&lt;!end:CurPage&gt;
+    ...
+    &lt;!begin:Row&gt;
+      &lt;!-- 行データを展開する ＜＆ＸＸＸ＞ タグを半角で記述する --&gt;
+    &lt;!end:Row&gt;
+    ...
+  &lt;!end:paging&gt;
+  &lt;!-- 以下は Pager クラスの処理とは関係ないため、無くても良い --&gt;
+  &lt;!begin:nodata&gt;
+    一件もありません
+  &lt;!end:nodata&gt;</code></pre>
+
+<p>
+<span class="pod_lang">必須でないノードは次の通り:
+  
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  PageNumLinks, MaxRows, FirstRow, LastRow, MaxPages, CurPage</code></pre>
+
+<p>
+<span class="pod_lang">これらのノードが存在しない場合は、単に無視される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Rowノードは <a href="#paging">&quot;paging&quot;</a> メソッドを利用する場合のみ使用される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang"><a href="#pagingArray">&quot;pagingArray&quot;</a> や <a href="#pagingHash">&quot;pagingHash&quot;</a> メソッドを利用する場合、
+メソッド実行によって paging ノードが展開されるため、
+その外側にデータ用のノードをおかなければならないことに注意する必要がある。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例えば以下のようなテンプレートとなり、メソッドの戻値を
+ループの中で Rowノードに展開するような形となる。
+
+</span>
+</p>
+
+<pre class="pod_verbatim"><code>  &lt;!begin:paging&gt;
+    &lt;!begin:PrevLink&gt;&lt;a href=&quot;&lt;&amp;PREVLINK&gt;&quot;&gt;←前ページ&lt;/a&gt;&lt;!end:PrevLink&gt;
+    &lt;!begin:NoPrevLink&gt;←前ページ&lt;!end:NoPrevLink&gt;
+    &lt;!begin:PageNumLinks&gt;
+      &lt;!begin:ThisPage&gt;&lt;&amp;PAGENUM&gt;&lt;!end:ThisPage&gt;
+      &lt;!begin:OtherPage&gt;
+        &lt;a href=&quot;&lt;&amp;PAGELINK&gt;&quot;&gt;&lt;&amp;PAGENUM&gt;&lt;/a&gt;
+      &lt;!end:OtherPage&gt;
+    &lt;!end:PageNumLinks&gt;
+    &lt;!begin:NextLink&gt;&lt;a href=&quot;&lt;&amp;NEXTLINK&gt;&quot;&gt;次ページ→&lt;/a&gt;&lt;!end:NextLink&gt;
+    &lt;!begin:NoNextLink&gt;次ページ→&lt;!end:NoNextLink&gt;
+    ...
+    &lt;!begin:MaxRows&gt;全&lt;&amp;MAXROWS&gt;件&lt;!end:MaxRows&gt;
+    &lt;!begin:FirstRow&gt;&lt;&amp;FIRSTROW&gt;件目から&lt;!end:FirstRow&gt;
+    &lt;!begin:LastRow&gt;&lt;&amp;LASTROW&gt;件目までを表示中&lt;!end:LastRow&gt;
+    &lt;!begin:MaxPages&gt;全&lt;&amp;MAXPAGES&gt;ページ&lt;!end:MaxPages&gt;
+    &lt;!begin:CurPage&gt;現在&lt;&amp;CURPAGE&gt;ページ目&lt;!end:CurPage&gt;
+    ...
+    ...
+  &lt;!end:paging&gt;
+  &lt;!begin:Row&gt;
+    &lt;!-- 行データを展開する ＜＆ＸＸＸ＞ タグを半角で記述する --&gt;
+  &lt;!end:Row&gt;
+  &lt;!-- 以下は Pager クラスの処理とは関係ないため、無くても良い --&gt;
+  &lt;!begin:nodata&gt;
+    一件もありません
+  &lt;!end:nodata&gt;</code></pre>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->newPager"><span class="pod_lang">$TL-&gt;newPager
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager = $TL-&gt;newPager($db_object)</code></pre>
+
+<p>
+<span class="pod_lang">Pagerオブジェクトを作成。
+DBオブジェクトを渡す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">DBのグループ名を渡すこともできるが、この指定方法は今後削除される可能性がある。(obsolute)
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">引数を指定しなかった場合、デフォルトのDBグループが使用されるが、将来はエラーに変更される可能性がある。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setDbGroup"><span class="pod_lang">setDbGroup
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;setDbGroup($db_group)</code></pre>
+
+<p>
+<span class="pod_lang">非推奨。DBのオブジェクトをnewPagerで渡すことを推奨する。
+使用するDBのグループ名を指定する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setPageSize"><span class="pod_lang">setPageSize
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;setPageSize($line)</code></pre>
+
+<p>
+<span class="pod_lang">1ページに表示する行数を指定する。デフォルトは30。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setCurrentPage"><span class="pod_lang">setCurrentPage
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;setCurrentPage($nowpage)</code></pre>
+
+<p>
+<span class="pod_lang">現在のページ番号を指定する。デフォルトは1。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setMaxLinks"><span class="pod_lang">setMaxLinks
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;setMaxLinks($maxlinks)</code></pre>
+
+<p>
+<span class="pod_lang">各ページへのリンクを最大幾つ表示するかを指定する。デフォルトは10。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setFormKey"><span class="pod_lang">setFormKey
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;setFormKey('PAGE')</code></pre>
+
+<p>
+<span class="pod_lang">ページ移動リンクに挿入される、ページ番号キーを指定する。デフォルトは&quot;pageid&quot;。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setFormParam"><span class="pod_lang">setFormParam
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;setFormParam($form_obj)
+  $pager-&gt;setFormParam($hashref)</code></pre>
+
+<p>
+<span class="pod_lang">ページ移動リンクに追加されるフォームを指定する。デフォルトでは何も追加されない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setToLink"><span class="pod_lang">setToLink
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;setToLink($url)</code></pre>
+
+<p>
+<span class="pod_lang">ページ移動リンクに使用されるURLを指定する。デフォルトでは自分自身へのリンクを使用する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setPagingType"><span class="pod_lang">setPagingType
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;setPagingType($type)</code></pre>
+
+<p>
+<span class="pod_lang">ページングの種類を選ぶ。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">0の場合、最終ページを超えたページを指定した場合、undefが返る。
+1の場合、最終ページを超えたページを指定した場合、最終ページが返る。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">設定しなかった場合は0が設定される。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">但し、1を選択した場合で、最終ページを超えるページを指定した場合、SQLを再度発行するため、通常より遅くなる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getPagingInfo"><span class="pod_lang">getPagingInfo
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  my $info = $pager-&gt;getPagingInfo</code></pre>
+
+<p>
+<span class="pod_lang">各種パラメータを返す。パラメータの内容は以下の通り。セットされてない場合はundefがセットされている。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="X$info->X7bdbX7d"><span class="pod_lang">$info-&gt;{db}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">DBオブジェクト。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">または、使用するグループ名。（obsolute）
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bpagesizeX7d"><span class="pod_lang">$info-&gt;{pagesize}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">1ページに表示する行数
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bcurrentX7d"><span class="pod_lang">$info-&gt;{current}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">表示する（された）ページ番号
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bmaxlinksX7d"><span class="pod_lang">$info-&gt;{maxlinks}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">リンクの最大数
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bformkeyX7d"><span class="pod_lang">$info-&gt;{formkey}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">ページ移動リンクに挿入される、ページ番号キー
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bformparamX7d"><span class="pod_lang">$info-&gt;{formparam}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">ページ移動リンクに追加されるフォーム。Tripletail::Formクラス
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bpagingtypeX7d"><span class="pod_lang">$info-&gt;{pagingtype}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">ページングの種類
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bmaxpagesX7d"><span class="pod_lang">$info-&gt;{maxpages}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">存在している最大ページ
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7blinkstartX7d"><span class="pod_lang">$info-&gt;{linkstart}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">リンクの開始ページ数
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7blinkendX7d"><span class="pod_lang">$info-&gt;{linkend}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">リンクの終了ページ数
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bmaxrowsX7d"><span class="pod_lang">$info-&gt;{maxrows}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">全体の件数
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7bbeginrowX7d"><span class="pod_lang">$info-&gt;{beginrow}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">取得を開始した箇所
+
+</span>
+</p>
+
+</dd>
+<dt><a id="X$info->X7browsX7d"><span class="pod_lang">$info-&gt;{rows}
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">取得した件数
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt><a id="paging"><span class="pod_lang">paging
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $pager-&gt;paging($t-&gt;node('pagingblock'), $sql, @param)
+  $pager-&gt;paging($t-&gt;node('pagingblock'), [$sql, $maxrows], @param)</code></pre>
+
+<p>
+<span class="pod_lang">指定したノードに、指定したSQLを実行してページングする。
+展開するデータが1件も無い場合は 0 を、表示できるページ数を超えたページ数を指定
+された場合は、setPagingTypeで設定されている値が0（デフォルト）であれば、undefが、
+1であれば最終ページのデータ件数、それ以外の場合はデータ件数を返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$maxrows で件数のカウントを別途指定できる。
+指定を省略した場合、SQL 文の先頭部分を SELECT SQL_CALC_FOUND_ROWS ～ に書き換えたもの
+を使用して、自動的に SELECT FOUND_ROWS() を実行し件数をカウントする。
+UNION を使用した場合は正常に動作しない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="pagingArray"><span class="pod_lang">pagingArray
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $result = $pager-&gt;pagingArray($t-&gt;node('pagingblock'), $sql, @param)
+  $result = $pager-&gt;pagingArray($t-&gt;node('pagingblock'), [$sql, $maxrows], @param)</code></pre>
+
+<p>
+<span class="pod_lang">指定したノードに、指定したSQLを実行してページングする。
+Row ノードは展開せずに、ページング対象のデータを配列の配列へのリファレンスで返す。
+展開するデータが1件も無い場合は 0 を、表示できるページ数を超えたページ数を指定
+された場合は、setPagingTypeで設定されている値が0（デフォルト）であれば、undefが、
+1であれば最終ページのデータを返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">その他は <a href="#paging">&quot;paging&quot;</a> と同じ。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="pagingHash"><span class="pod_lang">pagingHash
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $result = $pager-&gt;pagingHash($t-&gt;node('pagingblock'), $sql, @param)
+  $result = $pager-&gt;pagingHash($t-&gt;node('pagingblock'), [$sql, $maxrows], @param)</code></pre>
+
+<p>
+<span class="pod_lang">指定したノードに、指定したSQLを実行してページングする。
+Row ノードは展開せずに、ページング対象のデータをハッシュの配列へのリファレンスで返す。
+展開するデータが1件も無い場合は 0 を、表示できるページ数を超えたページ数を指定
+された場合は、setPagingTypeで設定されている値が0（デフォルト）であれば、undefが、
+1であれば最終ページのデータを返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">その他は <a href="#paging">&quot;paging&quot;</a> と同じ。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::DB">Tripletail::DB</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::Pager - ページング処理
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->newPager">$TL-&gt;newPager</a></li>
+<li><a href="#X$info->X7bbeginrowX7d">$info-&gt;{beginrow}</a></li>
+<li><a href="#X$info->X7bcurrentX7d">$info-&gt;{current}</a></li>
+<li><a href="#X$info->X7bdbX7d">$info-&gt;{db}</a></li>
+<li><a href="#X$info->X7bformkeyX7d">$info-&gt;{formkey}</a></li>
+<li><a href="#X$info->X7bformparamX7d">$info-&gt;{formparam}</a></li>
+<li><a href="#X$info->X7blinkendX7d">$info-&gt;{linkend}</a></li>
+<li><a href="#X$info->X7blinkstartX7d">$info-&gt;{linkstart}</a></li>
+<li><a href="#X$info->X7bmaxlinksX7d">$info-&gt;{maxlinks}</a></li>
+<li><a href="#X$info->X7bmaxpagesX7d">$info-&gt;{maxpages}</a></li>
+<li><a href="#X$info->X7bmaxrowsX7d">$info-&gt;{maxrows}</a></li>
+<li><a href="#X$info->X7bpagesizeX7d">$info-&gt;{pagesize}</a></li>
+<li><a href="#X$info->X7bpagingtypeX7d">$info-&gt;{pagingtype}</a></li>
+<li><a href="#X$info->X7browsX7d">$info-&gt;{rows}</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#X_">Tripletail</a></li>
+<li><a href="#X__00">Tripletail::DB</a></li>
+<li><a href="#getPagingInfo">getPagingInfo</a></li>
+<li><a href="#paging">paging</a></li>
+<li><a href="#pagingArray">pagingArray</a></li>
+<li><a href="#pagingHash">pagingHash</a></li>
+<li><a href="#setCurrentPage">setCurrentPage</a></li>
+<li><a href="#setDbGroup">setDbGroup</a></li>
+<li><a href="#setFormKey">setFormKey</a></li>
+<li><a href="#setFormParam">setFormParam</a></li>
+<li><a href="#setMaxLinks">setMaxLinks</a></li>
+<li><a href="#setPageSize">setPageSize</a></li>
+<li><a href="#setPagingType">setPagingType</a></li>
+<li><a href="#setToLink">setToLink</a></li>
+<li><a href="#Xe3X83X86Xe3X83Xb3Xe3X83X97Xe3X83XacXe3X83XbcXe3X83X88Xe5XbdXa2Xe5XbcX8f">テンプレート形式</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::Pager - ページング処理
+
+
+</div>
+
+</body>
+</html>

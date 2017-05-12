@@ -1,0 +1,99 @@
+0.31 Tue Dec  9 08:39:08 PST 2014
+ - Remove "use lib 'lib';". GitHub Issue
+
+0.30 Sat Aug 16 16:47:08 PDT 2014
+ - Change testdir to t
+
+0.29 Sat Aug 16 14:24:12 PDT 2014
+ - Remove =travis section
+
+0.28 Sat Aug 16 12:29:34 PDT 2014
+ - Meta 0.0.2
+
+0.27 Sat Aug 16 04:08:54 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.26 Fri Aug 15 21:31:26 PDT 2014
+ - Remove t/use_ok.t
+
+0.25 Fri Aug 15 20:48:08 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.24 Fri Aug  8 19:03:02 PDT 2014
+ - Fix bug of using a bad TestMLIncluder.
+
+0.23 Fri Aug  8 12:58:46 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.22 Tue Aug  5 11:23:13 PDT 2014
+ - Change IRC channel to irc.freenode.net#pkg
+
+0.21 Tue Aug  5 10:14:59 PDT 2014
+ - Add badges to doc
+
+0.20 Mon Aug  4 00:35:28 PDT 2014
+ - Remove (c) from Copyright
+ - Move doc to swim
+ - Fix Meta and add Contributing
+
+0.19 Wed Jun 18 11:23:29 PDT 2014
+ - Tests using TestML needed 'inc'
+
+0.18 Mon Jun 16 15:46:07 PDT 2014
+ - Switch to manual versioning
+
+0.17 Sun Jun 15 12:04:29 PDT 2014
+ - Move to Zilla::Dist
+
+0.16 Mon Nov  7 18:49:56 PST 2011
+ - Anthony Cornehl++ implemented JSON and XML support. \o/
+
+0.15 Sat Nov  5 01:09:40 PDT 2011
+ - Use fixed TestML
+
+0.14 Fri Oct 21 18:31:56 PDT 2011
+ - Use Module::Package
+ - Add strict support
+
+0.13 Sun May 15 17:08:56 EST 2011
+ - Use Stardoc
+ - use Package
+
+0.12 Sun May 15 12:46:44 EST 2011
+ - Forgot to 'use Encode'. doh!
+
+0.11 Sun May 15 12:11:50 EST 2011
+ - Finally works with utf8 templates and yaml. \o/
+
+0.10 Mon Nov 29 09:58:35 EST 2010
+ - Skip tests if YAML::XS not installed.
+
+0.08 Wed Sep 15 00:08:41 PDT 2010
+ - Remove old Test::Base subclass
+ - Update copyright dates
+
+0.07 Tue Sep 14 23:06:07 PDT 2010
+ - Switched testing from Test::Base to TestML
+ - 0.04 - 0.06 never made it to CPAN :\
+ - Added new toys to Makefile.PL
+
+0.06 Mon Apr 27 16:57:55 PDT 2009
+ - Encode stuff was a mistake. Reverting.
+
+0.05 Sun Apr 26 19:06:13 PDT 2009
+ - Add usage text for command line help.
+ - Fixed utf8 encoding. Hopefully.
+
+0.04 Fri Nov  7 14:44:23 PST 2008
+ - Support start_tag and end_tag.
+
+0.03 Mon Oct 27 17:02:25 PDT 2008
+ - Make api tt->(template, data, output);
+
+0.02 Sat Oct 25 17:47:04 PDT 2008
+ - Make all TT options work.
+ - Support path//template shorcut syntax.
+
+0.01 Fri Sep 26 01:40:13 PDT 2008
+ - First Release
+

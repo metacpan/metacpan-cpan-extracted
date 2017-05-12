@@ -1,0 +1,29 @@
+[% # $Id: lang,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+[%#
+
+# Sample Language information.
+# Note that this is commented out completely.
+
+site.languages = [ 'en', 'nl' ]
+
+# If you use languges, please include the flags.
+
+site.image.flags.en = {
+    src    = "$site.url.images/flag_en.png"
+    alt    = "En"
+    width  = 35
+    height = 18
+    align  = "middle"
+    descr  = "Information in English"
+}
+
+site.image.flags.nl = {
+    src    = "$site.url.images/flag_nl.png"
+    alt    = "Nl"
+    width  = 35
+    height = 18
+    align  = "middle"
+    descr  = "Informatie in het Nederlands"
+}
+
+-%]

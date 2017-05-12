@@ -1,0 +1,211 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Ward Cunningham">
+   <meta name="GENERATOR" content="Mozilla/4.5 [en]C-CCK-MCD compaq  (Win98; U) [Netscape]">
+   <title>Arithmetic</title>
+</head>
+<body>
+
+<h1>
+Integer Arithmetic</h1>
+
+<p>The computer relies on arithmetic. Here we test a variety of arithmetic
+operations expressed as 32 bit two's complement binary numbers (Java's
+int).
+<br>&nbsp;
+<table BORDER COLS=6 CELLSPACING=0 CELLPADDING=3 >
+<tr>
+<td COLSPAN="6">eg.ArithmeticFixture</td>
+</tr>
+
+<tr>
+<td>x</td>
+
+<td>y</td>
+
+<td>+</td>
+
+<td>-</td>
+
+<td>*</td>
+
+<td>/</td>
+</tr>
+
+<tr>
+<td>0</td>
+
+<td>0</td>
+
+<td>0</td>
+
+<td>0</td>
+
+<td>0</td>
+
+<td>0</td>
+</tr>
+
+
+<tr>
+<td>1</td>
+
+<td>2</td>
+
+<td>3</td>
+
+<td>-1</td>
+
+<td>2</td>
+
+<td>0.5</td>
+</tr>
+
+<tr>
+<td>1</td>
+
+<td>-1</td>
+
+<td>0</td>
+
+<td>2</td>
+
+<td>-1</td>
+
+<td>-1</td>
+</tr>
+
+<tr>
+<td>10000</td>
+
+<td>10000</td>
+
+<td>20000</td>
+
+<td>0</td>
+
+<td>100000000</td>
+
+<td>1</td>
+</tr>
+
+<tr>
+<td>100000</td>
+
+<td>100000</td>
+
+<td>200000</td>
+
+<td>0</td>
+
+<td>10000000000</td>
+
+<td>1</td>
+</tr>
+
+<tr>
+<td>1000000</td>
+
+<td>1000000</td>
+
+<td>2000000</td>
+
+<td>0</td>
+
+<td>1000000000000</td>
+
+<td>1</td>
+</tr>
+</table>
+
+<br><br>
+Now we try something similar using automatic type conversion offered by ColumnFixtures (BFL1).
+<br><br>
+
+<table BORDER CELLSPACING=0 CELLPADDING=3>
+    <tr>
+        <td colspan=5>eg.ArithmeticColumnFixture</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>y</td>
+        <td>plus()</td>
+        <td>times()</td>
+        <td>divide()</td>
+        <td>floating()</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>3</td>
+        <td>5</td>
+        <td>6</td>
+        <td>0</td>
+        <td>0.6666667</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>error</td>
+        <td>error</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>200</td>
+        <td>300</td>
+        <td>500</td>
+        <td>60000</td>
+        <td>0</td>
+        <td>0.6666667</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>3</td>
+        <td>10</td>
+        <td>10</td>
+        <td>10</td>
+    </tr>
+    <tr>
+        <td>200</td>
+        <td>3</td>
+        <td>5</td>
+        <td>6</td>
+        <td>0</td>
+        <td>0.6666667</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>-3</td>
+        <td>-1</td>
+        <td>-6</td>
+        <td>-0</td>
+        <td>-0.6666667</td>
+    </tr>
+</table>
+
+<br><br>
+
+
+<table BORDER CELLSPACING=0 CELLPADDING=3>
+<tr>
+<td COLSPAN="2">fit.Summary</td>
+</tr>
+</table>
+
+
+
+<p>Document prepaired by Ward Cunningham
+<br>First Version July 11, 2002
+<br>Last Update August 17, 2002
+</body>
+</html>

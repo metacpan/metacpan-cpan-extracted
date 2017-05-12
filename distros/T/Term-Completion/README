@@ -1,0 +1,48 @@
+Term-Completion version 1.00
+============================
+
+Term::Completion - read one line of user input, with convenience functions
+
+Term::Completion is an extensible, highly configurable replacement for the
+venerable L<Term::Complete> package. It is object-oriented and thus allows
+subclassing. See the POD in lib/Term/Completion.pm for details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Term::ReadKey - this is the most robust way to read single keys
+  Term::Size - to get the terminal size (rows, columns) if Term::ReadKey is missing
+  IO::String - for testing this package
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008-2013 by Marek Rouchal
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+TODO
+====
+
+- get_choices() should use a cache (in T:C:Path), which is invalidated by 
+  typing of BS or ordinary characters
+
+- write a T:C:MultiPath, allowing entry or several paths (separated by blanks)
+  ...and figure out how to efficiently implement CTRL-W in that situation
+
+- works on Windows with Term::ReadKey?
+  No, it doesn't. Need to investigate how to do single key reads on Win.
+

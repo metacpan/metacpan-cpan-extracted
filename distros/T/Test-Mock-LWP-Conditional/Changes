@@ -1,0 +1,14 @@
+Revision history for Perl module Test::Mock::LWP::Conditional
+
+0.04 2016-05-20T09:54:10Z
+    - accepts regex stub key (seminull)
+    - Minilla-ize
+
+0.03
+    - write POD abstract ...
+
+0.02
+    - require Test::Fake::HTTPD for tests
+
+0.01
+    - original version

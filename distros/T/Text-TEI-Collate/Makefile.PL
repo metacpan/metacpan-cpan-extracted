@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+use 5.008003;
+use inc::Module::Install;
+author( 'Tara L Andrews <aurum@cpan.org>' );
+license( 'perl' );
+all_from( 'lib/Text/TEI/Collate.pm' );
+requires( 'perl' => '5.008003' );
+requires( 'Graph::Easy' );
+requires( 'IO::String' );
+requires( 'IPC::Run' );
+requires( 'JSON' );
+requires( 'Module::Load' );
+requires( 'Moose' );
+requires( 'Moose::Util::TypeConstraints' );
+requires( 'Text::CSV_XS' );
+requires( 'Text::WagnerFischer' );
+requires( 'Text::WagnerFischer::Armenian' );
+requires( 'Throwable::X' );
+requires( 'TryCatch' );
+requires( 'XML::Easy::Syntax' );
+requires( 'XML::LibXML' );
+requires( 'XML::LibXML::XPathContext' );
+build_requires( 'Test::More::UTF8' );
+&WriteAll;

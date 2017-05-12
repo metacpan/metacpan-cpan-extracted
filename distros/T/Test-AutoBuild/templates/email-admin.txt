@@ -1,0 +1,17 @@
+To:[% to %]
+From: [% from %]
+Subject: [% subject %]
+
+Overall status: [% status %]
+Start date: [% cycle_start_date %]
+Start time: [% cycle_start_time_utc %] / [% cycle_start_time_local %]
+Build counter: [% build_counter %]
+Build timestamp: [% build_timestamp %]
+URL: http://[% hostname %][% http_prefix %]/index.html
+
+[% FOREACH modules %]
+Module: [% label %]
+Status: [% status %]
+URL: [% hostname %][% http_prefix %]/module-[% name %].html
+
+[% END %]

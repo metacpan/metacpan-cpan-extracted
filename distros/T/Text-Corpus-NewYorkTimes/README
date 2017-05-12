@@ -1,0 +1,171 @@
+NAME
+    "Text::Corpus::NewYorkTimes" - Interface to New York Times corpus.
+
+SYNOPSIS
+      use Text::Corpus::NewYorkTimes;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::NewYorkTimes->new (fileList => $fileList, corpusDirectory => $corpusDirectory);
+      dump $corpus->getTotalDocuments;
+
+DESCRIPTION
+    "Text::Corpus::NewYorkTimes" provides an interface for accessing the
+    documents in the New York Times corpus from Linguistic Data Consortium.
+    The categories, description, title, etc... of a specified document are
+    accessed using Text::Corpus::NewYorkTimes::Document. Also, all errors
+    and warnings are logged using Log::Log4perl, which should be
+    initialized.
+
+CONSTRUCTOR
+  "new"
+    The method "new" creates an instance of the "Text::Corpus::NewYorkTimes"
+    class with the following parameters:
+
+    "corpusDirectory"
+         corpusDirectory => '...'
+
+        "corpusDirectory" is the path to the top most directory of the
+        corpus; it usually is the path to the directory named "nyt_corpus".
+        It is needed to locate all the documents in the corpus. If it is not
+        defined, then the enviroment variable
+        "TEXT_CORPUS_NEWYORKTIMES_CORPUSDIRECTORY" is used if it is defined;
+        if neither of these are defined then all the paths in the file
+        specified by "fileList" are assumed to be full path names.
+        "corpusDirectory" and "fileList" can both be defined to locate the
+        documents in the corpus by having the path names in "fileList" be
+        defined relative to "corpusDirectory".
+
+    "fileList"
+         fileList => '...'
+
+        "fileList" is an optional parameter that can be used to save time
+        when creating the list of documents in the corpus; each line in the
+        file must be the path to an XML document in the corpus. If
+        "fileList" is not defined, then the environment variable
+        "TEXT_CORPUS_NEWYORKTIMES_FILELIST" is used if it is defined;
+        otherwise all the XML documents in the corpus are located by
+        searching the directory specified by "corpusDirectory". If the file
+        defined by "fileList" or "TEXT_CORPUS_NEWYORKTIMES_FILELIST" does
+        not exist, it will be created and the path to each XML document in
+        the corpus, relative to "corpusDirectory", will be written to it.
+        This is done to speed-up subsequent invocations of the object.
+
+METHODS
+  "getDocument"
+     getDocument (index => $documentIndex)
+     getDocument (uri => $uri)
+
+    "getDocument" returns a Text::Corpus::NewYorkTimes::Document object for
+    the document with index $documentIndex or uri $uri. The document indices
+    range from zero to "getTotalDocument()-1"; "getDocument" returns "undef"
+    if any errors occurred and logs them using Log::Log4perl.
+
+    For example:
+
+      use Text::Corpus::NewYorkTimes;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::NewYorkTimes->new (fileList => $fileList, corpusDirectory => $corpusDirectory);
+      my $document = $corpus->getDocument (index => 0);
+      dump $document->getBody;
+      dump $document->getCategories;
+      dump $document->getContent;
+      dump $document->getDate;
+      dump $document->getTitle;
+      dump $document->getUri;
+
+  "getTotalDocuments"
+     getTotalDocuments ()
+
+    "getTotalDocuments" returns the total number of documents in the corpus.
+    The index to the documents in the corpus ranges from zero to
+    "getTotalDocuments() - 1".
+
+  "test"
+     test ()
+
+    "test" does tests to ensure the documents in the corpus are accessible
+    and can be parsed. It returns true if all tests pass, otherwise a
+    description of the test that failed is logged using Log::Log4perl and
+    false is returned.
+
+    For example:
+
+      use Text::Corpus::NewYorkTimes;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::NewYorkTimes->new (fileList => $fileList, corpusDirectory => $corpusDirectory);
+      dump $corpus->test;
+
+EXAMPLES
+    The example below will print out all the information for each document
+    in the corpus.
+
+      use Text::Corpus::NewYorkTimes;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::NewYorkTimes->new (fileList => $fileList, corpusDirectory => $corpusDirectory);
+      my $totalDocuments = $corpus->getTotalDocuments;
+
+      for (my $i = 0; $i < $totalDocuments; $i++)
+      {
+        eval
+          {
+            my $document = $corpus->getDocument(index => $i);
+            next unless defined $document;
+            my %documentInfo;
+            $documentInfo{title} = $document->getTitle();
+            $documentInfo{body} = $document->getBody();
+            $documentInfo{content} = $document->getContent();
+            $documentInfo{categories} = $document->getCategories();
+            $documentInfo{description} = $document->getDescription();
+            $documentInfo{uri} = $document->getUri();
+            dump \%documentInfo;
+          };
+      }
+
+INSTALLATION
+    To install the module set the environment variable
+    "TEXT_CORPUS_NEWYORKTIMES_CORPUSDIRECTORY" to the path of the New York
+    Times corpus and run the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    If you are on a windows box you should use 'nmake' rather than 'make'.
+
+    The module will install if "TEXT_CORPUS_NEWYORKTIMES_CORPUSDIRECTORY" is
+    not defined, but less testing will be performed. After the New York
+    Times corpus is installed testing of the module can be performed by
+    running:
+
+      use Text::Corpus::NewYorkTimes;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpus = Text::Corpus::NewYorkTimes->new (corpusDirectory => $corpusDirectory);
+      dump $corpus->test;
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    nyt, new york times, english corpus, information processing
+
+SEE ALSO
+    Log::Log4perl, Text::Corpus::NewYorkTimes::Document
+

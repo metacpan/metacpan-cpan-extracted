@@ -1,0 +1,12 @@
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE family [
+  <!ELEMENT family (parent|child)*>
+  <!ELEMENT parent (#PCDATA)>
+  <!ELEMENT child (#PCDATA)>
+]>
+<family>
+  <parent>Judy</parent>
+  <parent>Layard</parent>
+  <child>Jennifer</child>
+  <child>Brendan</child>
+</family>

@@ -1,0 +1,70 @@
+{
+    "name": "Test-CPAN-Meta",
+    "version": "0.25",
+    "abstract": "Validate your CPAN META.json files",
+    "author": ["Barbie <barbie@cpan.org>"],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "qa",
+        "cpan",
+        "testing",
+        "meta",
+        "yaml"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "IO::File": "0",
+                "Parse::CPAN::Meta": "0.02",
+                "Test::More": "0.62",
+                "Test::Builder": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "Test::More": "0.62",
+                "Test::Builder": "0"
+            },
+            "recommends": {
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::More": "0.70",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Test::CPAN::Meta": {
+            "file": "lib/Test/CPAN/Meta.pm",
+            "version": "0.25"
+        },
+        "Test::CPAN::Meta::Version": {
+            "file": "lib/Test/CPAN/Meta/Version.pm",
+            "version": "0.25"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Test-CPAN-Meta" },
+        "repository": {
+            "url": "git://github.com/barbie/Test-CPAN-Meta.git",
+            "web": "http://github.com/barbie/Test-CPAN-Meta",
+            "type": "git"
+        }
+    }
+}

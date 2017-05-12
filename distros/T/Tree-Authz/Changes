@@ -1,0 +1,18 @@
+Revision history for Tree-Authz
+
+0.03    21 Aug 2005, 01:45
+    - no change, been using for ages without problems
+
+0.02_2   2 Dec 2004, 22:22 GMT
+    - removed a couple of tests of the database API, which is still
+      very experimental. 
+
+0.02_1  30 Nov 2004, 17:00 GMT
+    - changed terminology to talk about 'roles' instead of 'groups'
+    - renamed some methods to reflect new terminology
+    - old methods should still work, but will complain via carp
+    - added a new class to represent roles - Tree::Authz::Role
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

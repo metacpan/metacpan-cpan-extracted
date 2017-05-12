@@ -1,0 +1,23 @@
+---
+name: Template-Multilingual
+version: 1.00
+author:
+  - 'Eric Cholet <cholet@logilune.com>'
+abstract: Multilingual templates for Template Toolkit
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Template: 2
+  Test::More: 0
+provides:
+  Template::Multilingual:
+    file: lib/Template/Multilingual.pm
+    version: 1.00
+  Template::Multilingual::Parser:
+    file: lib/Template/Multilingual/Parser.pm
+    version: 1.00
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

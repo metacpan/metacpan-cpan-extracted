@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Test/Out.pm
+MANIFEST
+Makefile.PL
+README
+META.yml
+t/0000_use.t
+t/0001_is_output.t
+t/0002_isnt_output.t
+t/0003_like_output.t
+t/0004_unlike_output.t

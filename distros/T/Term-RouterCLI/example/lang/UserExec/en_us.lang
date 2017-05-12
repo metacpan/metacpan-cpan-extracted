@@ -1,0 +1,33 @@
+# UserExec Mode
+# Last updated 2011-04-01
+<en_us>
+    enable_d = Enter enable mode
+    enable_h = <<EO-ENABLE
+            This command will allow the user to enter privileged 
+            user exec \"enable\" mode.  This command takes no arguments.
+            EO-ENABLE
+
+    exit_d = Exit user exec mode
+    exit_h = <<EO-EXIT
+            This will exit user exec mode and log 
+            the user out of the RouterCLI
+            EO-EXIT
+
+    help_d = Print help about a command
+    help_h = <<EO-HELP
+            This will print detailed help information 
+            about a specific command or print a list 
+            command summary. The syntax of this 
+            command is help <command>.
+            EO-HELP
+
+    show_d = Show system configuration
+    show_h = <<EO-SHOW
+            Show system configuration
+            EO-SHOW
+            
+    support_d = Support menu
+    support_h = <<EO-SUPPORT
+            Support hidden menu
+            EO-SUPPORT
+</en_us>

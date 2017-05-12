@@ -1,0 +1,7 @@
+Revision history for Perl extension Tie::DirHandle
+
+1.10  Thu Apr  8  9:16:34 1999
+	- remove PRINT method (not reasonable)
+	- corrected directory structure upon tar -xvf
+	- added Changes file (it went missing)
+

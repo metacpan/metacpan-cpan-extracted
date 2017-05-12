@@ -1,0 +1,10 @@
+@EVAL $List= ['Michigan','Perl City','elsewhere'];
+@EVAL ${self}->setActionChar('!');
+Here is pi : &{4*atan2(1,1)} !
+!QUOTE ('~',/ or in /)
+  Keep the dollar $ here
+  ^(pumpkin)->{nick}'s address is
+  ^(pumpkin)->{name}
+  ^(pumpkin)->{address}{state}  in  ~{^(List)}
+  ^(pumpkin)->{address}{zip}
+!ENDQUOTE

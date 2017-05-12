@@ -1,0 +1,14 @@
+.git
+Makefile$
+MYMETA.json
+MYMETA.yml
+
+bench
+
+t/internal-data/30-order-attributes.*
+t/internal-data/31-new-litres.*
+
+t/internal-data/unimplemented
+t/internal-data/litres
+t/internal-data/wrapper
+

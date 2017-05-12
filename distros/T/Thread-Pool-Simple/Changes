@@ -1,0 +1,52 @@
+Revision history for Perl extension Thread::Pool::Simple.
+
+0.25  23 SEP 2010
+        - fixd [rt.cpan.org #61557] "add" method randomly fails to fire on Win32
+          (thanks Aaron Wirtz for reporting and providing a fix)  
+
+0.24  3 SEP 2009
+      	- used a workaround to avoid a rare problem when running under
+	  perl debuger (thanks to Kevin Brintnall)
+	- removed redundant ``:locked method'' 
+
+0.23  24 MAY 2007
+        - only calling ``sleep'' when not busy to avoid 1 sec delay
+          during thread creation
+
+0.22  10 MAY 2007
+        - corrected a race condition where cancelled jobs may slip
+          into the done queue
+        - added ``init'' handler
+        - calling ``sleep'' instead of ``yield'' in main thread to
+          reduce the number of besy() tests
+
+0.21  9 MAY 2007
+        - fixed two defects found by Dominik Gehl
+        - 1. always call pre_handler() before creating the thread
+        - 2. do not count ``fake'' job in busy()
+
+0.20  29 MAR 2007
+        - reworked some code
+
+0.10  14 MAR 2007
+        - added job cancelation support
+
+0.05  8 MAR 2007
+        - re-added lifespan
+        - fixed a `more than max worker' bug
+
+0.04  7 MAR 2007
+        - remove lifespan, pause, and resume
+        - add `passid' config option
+
+0.03  6 MAR 2007
+        - fixed a bug that passes wrong arguments to the handler
+
+0.02  6 MAR 2007
+        - pass default parameters to the handler
+
+0.01  27 FEB 2007
+        - imitial version  
+	- original version; created by h2xs 1.22 with options
+		-XA Thread::Pool::Simple
+

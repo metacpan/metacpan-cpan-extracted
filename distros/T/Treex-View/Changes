@@ -1,0 +1,10 @@
+Revision history for Treex-View
+
+1.0.0
+ - Released: 2015-11-10 18:59:50 UTC
+
+ [API CHANGES]
+ - Initial support for viewing Treex files using Electron shell
+
+ [STATISTICS]
+ - code churn: 12 files changed, 856 insertions(+), 1 deletion(-)

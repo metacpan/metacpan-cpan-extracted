@@ -1,0 +1,64 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Test-Modern
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Test-Modern
+
+Files: README
+ lib/Test/Modern.pm
+ t/01basic.t
+ t/02exporting.t
+ t/03extended.t
+ t/04requires.t
+ t/05warnings.t
+ t/06class-api-ok.t
+ t/07deep.t
+ t/08object-ok.t
+ t/09requires-perl.t
+ t/10namespaces-clean.t
+ t/11without.t
+ t/12pod.t
+ t/13versions.t
+ t/14shouldntwarn.t
+ t/15tlib.t
+ t/16bench.t
+ t/lib/Local/Foo.pm
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

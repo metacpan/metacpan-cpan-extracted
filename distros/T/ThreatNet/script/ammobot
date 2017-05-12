@@ -1,0 +1,304 @@
+#!/usr/bin/perl
+
+=pod
+
+=head1 NAME
+
+ammobot - Tail threat messages to ThreatNet from log files
+
+=head1 SYNOPIS
+
+  > ammobot path/to/ammobot.conf
+  
+  # In your ammobot.conf
+  Version=0.09
+  Nick=ammobot
+  Server=irc.freenode.org
+  # ServerPassword=optional
+  Channel=#threatnet
+  # Uncomment the following to allow flooding.
+  # (Needed for bots that burst over 1/second to prevent state-damaging queues)
+  # Flood=1
+  
+  [ /full/path/to/file/to/tail.log ]
+  # If no options, just looks for valid threat messages
+  
+  [ /another/full/path/to/tail.log ]
+  # Use a filter to convert to valid threat messages.
+  # The dir the config file is in will be added to the
+  # @INC module search path.
+  Filter=MyModule
+
+=head1 DESCRIPTION
+
+C<ammobot> is the basic foot soldier of the ThreatNet bot eco-system,
+fetching ammunition and bringing it to the channel.
+
+It connects to a single ThreatNet channel, and then tails one or more
+files scanning for threat messages while following the basic channel
+rules.
+
+When it sees a L<ThreatNet::Message::IPv4>-compatible message appear
+at the end of the file, it will report it to the channel (subject to
+the appropriate channel rules).
+
+Its main purpose is to make it as easy as possible to connect any system
+capable of writing a log file to ThreatNet. If an application can be
+configured or coded to spit out the appropriately formatted messages to
+a file, then C<ammobot> will patiently watch for them and then haul them
+off to the channel for you (so you don't have to).
+
+It the data can be extracted from an existing file format, then a
+C<Filter> property can be set which will specify a class to be used
+as a customer L<POE::Filter> for the event stream.
+
+=head2 Writing Filter Modules
+
+Here is an example of a custom filter module I use to get threats from my
+mail log.
+
+It lives at MyMailFilter.pm, in the same directory as my C<ammobot.conf> file.
+
+  package MyMailFilter;
+  
+  use base 'POE::Filter::Line';
+  
+  use POE::Filter::Line ();
+  
+  sub get {
+      my $self  = shift;
+      my $array = $self->SUPER::get( @_ );
+      
+      # Filter
+      my @out = ();
+      foreach ( @$array ) {
+          s/^.+\bpostfix\/smtpd\[\d+\]\:\s+// or next;
+          s/^NOQUEUE\:\s+reject\:\s+//        or next;
+          if ( s/^RCPT\s[^:]+?\[([\d\.]+)\]\:\s+// ) {
+              push @out, "$1 - $_";
+          } else {
+              next;
+          }
+      }
+      
+      return \@out;
+  }
+  
+  # Because for some reason POE::Filter::Grep->isa('POE::Filter')
+  # returns false, fake it.
+  # This should be fixed in a future version of POE.
+  sub isa {
+          my $either = shift;
+          return 1 if $_[0] eq 'POE::Filter';
+          $either->SUPER::isa(@_);
+  }
+  
+  1;
+
+=head2 Configuring With Cron
+
+IRC is a somewhat unstable medium, and sometimes the bots fall off for
+various reasons.
+
+To get past this, C<ammobot> is designed to be extremely cron-friendly.
+
+It has an internal check for duplicates that is completely safe and will
+never leave stale locks around.
+
+It is recommended that you simple add something like the following to cron.
+
+  # Taken from Adam K's crontab
+  0,10,20,30,40,50 * * * *  cd /home/adam/ammobot; nohup /usr/local/bin/ammobot /home/adam/ammobot/bot.conf &
+
+=cut
+
+use strict;
+use Fcntl                   ();
+use Getopt::Long            ();
+use Config::Tiny            ();
+use File::Basename          ();
+use Class::Inspector        ();
+use ThreatNet::Bot::AmmoBot ();
+use Params::Util '_INSTANCE',
+                 '_CLASS';
+
+use vars qw{$VERSION $RUNONCE};
+BEGIN {
+	$VERSION = '0.10';
+
+	# Only one copy can run per system (for now)
+	$RUNONCE = Fcntl::LOCK_EX() | Fcntl::LOCK_NB();
+}
+
+exit(0) unless flock DATA, $RUNONCE;
+
+
+
+
+
+#####################################################################
+# Load the Config File
+
+my $config_file = $ARGV[0];
+unless ( -f $config_file ) {
+	error( "Failed to find config file '$config_file'" );
+}
+my $Config = Config::Tiny->read( $config_file )
+	or error( "Failed to load config file: "
+		. Config::Tiny->errstr );
+push @INC, File::Basename::dirname( $config_file );
+
+
+
+
+
+#####################################################################
+# Bot Configuration
+
+# Check the main part of the config
+my $main = delete $Config->{_} || {};
+unless ( $main->{Version} ) {
+	error( "Config file does not specify a Version" );
+}
+unless ( $main->{Version} == $ThreatNet::Bot::AmmoBot::VERSION ) {
+	error( "Config version '$main->{Version}' does not match \$ThreatNet::Bot::AmmoBot::VERSION '$ThreatNet::Bot::AmmoBot::VERSION'" );
+}
+unless ( $main->{Nick} ) {
+	error( "Config file does not specific a Nick" );
+}
+unless ( $main->{Server} ) {
+	error( "Config file does not specific a Server" );
+}
+unless ( $main->{Channel} ) {
+	error( "Config file does not specific a Channel" );
+}
+
+# Create the bot object
+my $AmmoBot = ThreatNet::Bot::AmmoBot->new(
+	Nick    => $main->{Nick},
+	Channel => $main->{Channel},
+	Server  => $main->{Server},
+	$main->{ServerPassword}
+		? (ServerPassword => $main->{ServerPassword})
+		: (),
+	$main->{Port}
+		? (Port => $main->{Port})
+		: (),
+	)
+	or error("Failed to create ThreatNet::Bot::AmmoBot object");
+
+
+
+
+
+#####################################################################
+# File Configuration
+
+foreach my $file ( sort keys %$Config ) {
+	my $section = $Config->{$file};
+	my %params  = ();
+
+	# Check the file
+	$file =~ s/^\s+//;
+	$file =~ s/\s+$//;
+	unless ( $file and ( -p $file or -f $file ) and -r $file ) {
+		error( "File '$file' does not exist" );
+	}
+
+	# Check for a custom driver
+	if ( _CLASS($section->{Driver}) ) {
+		$params{Driver} = _new($section->{Driver})
+			or error("Failed to create driver $section->{Driver}");
+		unless ( _INSTANCE($params{Driver}, 'POE::Driver') ) {
+			error("$section->{Driver} is not a POE::Driver object");
+		}
+	} elsif ( $section->{Driver} ) {
+		error("Driver '$section->{Driver}' is not a class name");
+	}
+
+	# Check for a custom filter
+	if ( _CLASS($section->{Filter}) ) {
+		$params{Filter} = _new($section->{Filter})
+			or error("Failed to create driver $section->{Filter}");
+		unless ( _INSTANCE($params{Filter}, 'POE::Filter') ) {
+			error("$section->{Filter} is not a POE::Filter object");
+		}
+	} elsif ( $section->{Filter} ) {
+		error("Driver '$section->{Filter}' is not a class name");
+	}
+
+	# Add the file
+	$AmmoBot->add_file( $file, %params );
+}
+
+
+
+
+
+#####################################################################
+# Execute
+
+$AmmoBot->run;
+
+
+
+
+
+#####################################################################
+# Support Functions
+
+sub _new {
+	my $class = shift;
+	unless ( Class::Inspector->loaded($class) ) {
+		my $file = Class::Inspector->resolved_filename($class);
+		require $file;
+	}
+	$class->new;
+}
+
+sub error {
+	my $msg = shift;
+	print $msg . "\n";
+	exit(255);
+}
+
+1;
+
+=pod
+
+=head1 TO DO
+
+- Add support for additional outbound filters
+
+=head1 SUPPORT
+
+All bugs should be filed via the bug tracker at
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ThreatNet-Bot-AmmoBot>
+
+For other issues, or commercial enhancement and support, contact the author
+
+=head1 AUTHORS
+
+Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+
+=head1 SEE ALSO
+
+L<http://ali.as/devel/threatnetwork.html>, L<POE>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Adam Kennedy. All rights reserved.
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut
+
+__DATA__
+
+Do not delete.
+
+This delete segment is used as part of the process lock.

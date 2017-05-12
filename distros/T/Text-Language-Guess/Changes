@@ -1,0 +1,9 @@
+######################################################################
+Revision history for Perl extension Text::Language::Guess
+
+0.02  2005/11/19
+    (ms) Added L4p dependency to Makefile.PL, as suggested by 
+         Stephane Lavergne.
+
+0.01  2005/07/31
+    (ms) Where it all began.

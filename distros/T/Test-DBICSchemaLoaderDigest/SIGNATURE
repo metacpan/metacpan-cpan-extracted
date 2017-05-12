@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bbd64159d983f6cf5b7a92b42592016808898bd0 Changes
+SHA1 b812a7ce94a480ef58c9cfc39f0968cdfab73fd6 INSTALL
+SHA1 ab7e1849f507330719cdafba0ddd7356e5a0d900 MANIFEST
+SHA1 0e05f1c6747b14d4429830027b9ca86d7fc54e69 META.json
+SHA1 9f65dc0dd5f69aa072ef3671323df77695fef157 META.yml
+SHA1 d73753ff6e488c41def64bfacb8406f148da12c0 Makefile.PL
+SHA1 5ebc2783ae5e5eea21eeceab9e8f914ae8c42b39 README
+SHA1 1b86a9ceed211e04c8861b5632a8546ab8c73151 dist.ini
+SHA1 ef5bd5c6d5e6a55c4cdf4fea44536237b4a0580d lib/Test/DBICSchemaLoaderDigest.pm
+SHA1 3552622bf8c1e5c4553f3dc160cc271762b86391 t/00-compile.t
+SHA1 3324a4f25de56f5e41679c739f0b6869c9f5b215 t/000-report-versions-tiny.t
+SHA1 3ebf0126cac24978571b02f87ddf874e6d11a087 t/00_compile.t
+SHA1 f53968d9c84409a7126f4450c689d16c67c0db5f t/01_simple.t
+SHA1 d33a584054b780a882ba1ae8be360e99de687d2b t/02_fail.t
+SHA1 a19dc48a6f2b840b790172c97c24d3b1ff52b6b0 t/03_file_not_found.t
+SHA1 30c1adc59a9d03682ba158736206163b625559b0 t/04_missing_md5.t
+SHA1 630ef093ca138f8adb73f2ccccad10010f331cbc t/author-pod-spell.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 3713c10df48fb378505a8c4f3bc92de0c8028df5 t/release-has-version.t
+SHA1 2f61f31021729a15e0172517cbb56780dc7adb18 t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9537798920701431df2b670a0deb90725cd5a378 t/release-pod-coverage.t
+SHA1 edaa51baa5b5fe46ffb2da13bf861b442e4f778b t/release-pod-syntax.t
+SHA1 afa78689d051fe0491f49683a40040224b2d5e25 t/release-portability.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJP70l5AAoJEOd5N1CvIgQk5WoIAKBa65fMXNuzowyQJ6q/guSL
+EtqvadHCNzfhWPsv82sFlfdC/Jhi2DhWgE7ltB2Ajdj11RHOWxeX1b4oTZbZu2Ul
+2xNDKC75hwONGi3TnBJmsLUc/6qfxzP/RI8ctb+Cr45lM/imwIWarOiMWr/zt0tB
+WHW34UU1U1bAKLXqksXYV1isv3tFDSRlVPpYJDGC4HIPxRP29YKN+QguPYnGKBPv
+Hj3WiC4744VunG3FdPzip5idihkA90rgfMq9BXFpQlYR7qbfDafVoL8XSnZKRCGe
+ba7eA4pT7mKLJTLXd4o5Mpu9/8Na8LLry/r/dAd3WyKt9BRqqz6eOsmag9chh20=
+=fEZp
+-----END PGP SIGNATURE-----

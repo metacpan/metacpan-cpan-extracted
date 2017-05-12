@@ -1,0 +1,42 @@
+Revision history for Perl extension Text::Unaccent::PurePerl.
+
+0.05
+
+    * Added "=encoding utf8" to the POD.
+
+    * Fixed an error in the documentation.
+
+    * Added more documentation.
+
+    * Added more comments in the code.
+
+0.04  Thu Apr 24 14:50:33     2008
+
+    * Changed syntax for faster loop.
+
+    * Switched to UTF-8 in module file, since both CPAN and 'pod2html' use the
+      UTF-8 encoding for HTML files.
+
+    * Giving up support for Perl < 5.8, since UTF-8 support is rotten.
+
+    * Better user feedback during signature testing.
+
+0.03  Wed Apr 23 16:01:27     2008
+
+    * Modified nice_string() function in test scripts to become compatible with
+      Perl < 5.8 (although Perl >= 5.6 is required).
+
+    * Included code testing the utf8 flag of strings. This code is only run under
+      Perl >= 5.8.
+
+    * Included signature testing. This requires that the TEST_SIGNATURE environment
+      variable is set.
+
+0.02  Mon Apr 21 08:27:40 WEDT 2008
+
+    * Removed stuff accidentally left over from development. This stuff required
+      the Text::Unaccent module.
+
+0.01  Fri Apr  4 09:40:49 2008
+
+    * First version, released on an unsuspecting world.

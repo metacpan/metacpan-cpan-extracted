@@ -1,0 +1,41 @@
+---
+abstract: 'a collation program for variant manuscript texts'
+author:
+  - 'Tara L Andrews <aurum@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More::UTF8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Text::TEI::Collate
+name: Text-TEI-Collate
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Graph::Easy: 0
+  IO::String: 0
+  IPC::Run: 0
+  JSON: 0
+  Module::Load: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  Text::CSV_XS: 0
+  Text::WagnerFischer: 0
+  Text::WagnerFischer::Armenian: 0
+  Throwable::X: 0
+  TryCatch: 0
+  XML::Easy::Syntax: 0
+  XML::LibXML: 0
+  XML::LibXML::XPathContext: 0
+  perl: 5.008003
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.1

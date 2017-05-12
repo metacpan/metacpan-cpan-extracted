@@ -1,0 +1,12 @@
+#sub foo
+
+arg0 = ##ARGV[0]##.
+arg1 = ##ARGV[1]##.
+
+#endsub
+
+before foo
+#callsub foo
+between foo
+#callsub foo "one", "two"
+after foo

@@ -1,0 +1,31 @@
+---
+# indicator is the field that is used to test for form submission
+indicator: submit
+# Start listing the form elements
+elements:
+
+    - type: Select
+      name: repo
+      label: Repository
+      constraints:
+      - type: Required
+        message: Repository must be choosen
+      values: 
+        - tip
+        - andreas
+        - boris
+        - robert
+        - stable-32
+        - stable-33
+        - stable-34
+        - stable-35
+
+    - type: ComboBox
+      name: changeset
+      label: 'Select or specify changeset:'
+      values:
+        - HEAD
+
+    - type: Submit
+      name: submit
+      value: Build kernel and create testrun

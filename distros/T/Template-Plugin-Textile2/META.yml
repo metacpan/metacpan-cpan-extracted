@@ -1,0 +1,20 @@
+---
+name: Template-Plugin-Textile2
+version: 1.21
+author:
+  - Michele Beltrame C<mb@italpro.net>.
+abstract: Use Textile formatting with Template Toolkit
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Template: 2.15
+  Text::Textile: 2.03
+provides:
+  Template::Plugin::Textile2:
+    file: lib/Template/Plugin/Textile2.pm
+    version: 1.21
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

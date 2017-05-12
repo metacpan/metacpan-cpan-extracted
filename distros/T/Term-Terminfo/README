@@ -1,0 +1,85 @@
+NAME
+    `Term::Terminfo' - access the terminfo database
+
+SYNOPSIS
+     use Term::Terminfo;
+
+     my $ti = Term::Terminfo->new;
+
+     printf "This terminal %s do overstrike\n",
+        $ti->getflag('os') ? "can" : "cannot";
+
+     printf "Tabs on this terminal are initially every %d columns\n",
+        $ti->getnum('it');
+
+     printf "This terminal %s do overstrike\n",
+        $ti->flag_by_varname('over_strike') ? "can" : "cannot";
+
+     printf "Tabs on this terminal are initially every %d columns\n",
+        $ti->num_by_varname('init_tabs');
+
+DESCRIPTION
+    Objects in this class provide access to terminfo database entires.
+
+    This database provides information about a terminal, in three separate
+    sets of capabilities. Flag capabilities indicate the presence of a
+    particular ability, feature, or bug simply by their presence. Number
+    capabilities give the size, count or other numeric detail of some
+    feature of the terminal. String capabilities are usually control strings
+    that the terminal will recognise, or send.
+
+    Capabilities each have two names; a short name called the capname, and a
+    longer name called the varname. This class provides two sets of methods,
+    one that works on capnames, one that work on varnames.
+
+    This module optionally uses unibilium to access the terminfo(5)
+    database, if it is available at compile-time. If not, it will use
+    <term.h> and -lcurses. For more detail, see the SEE ALSO section below.
+
+CONSTRUCTOR
+  $ti = Term::Terminfo->new( $termtype )
+    Constructs a new `Term::Terminfo' object representing the given
+    termtype. If `$termtype' is not defined, `$ENV{TERM}' will be used
+    instead. If that variable is empty, `vt100' will be used.
+
+METHODS
+  $bool = $ti->getflag( $capname )
+  $num = $ti->getnum( $capname )
+  $str = $ti->getstr( $capname )
+    Returns the value of the flag, number or string capability of the given
+    capname.
+
+  $bool = $ti->flag_by_varname( $varname )
+  $num = $ti->num_by_varname( $varname )
+  $str = $ti->str_by_varname( $varname )
+    Returns the value of the flag, number or string capability of the given
+    varname.
+
+  @capnames = $ti->flag_capnames
+  @capnames = $ti->num_capnames
+  @capnames = $ti->str_capnames
+    Return lists of the capnames of the supported flags, numbers, and
+    strings
+
+  @varnames = $ti->flag_varnames
+  @varnames = $ti->num_varnames
+  @varnames = $ti->str_varnames
+    Return lists of the varnames of the supported flags, numbers, and
+    strings
+
+TODO
+    This distribution provides a small accessor interface onto terminfo. It
+    was originally created simply so I can get at the `bce' capability flag
+    of the current terminal, because screen unlike every other terminal
+    ever, doesn't do this. Grrr.
+
+    It probably also wants more accessors for things like `tparm' and
+    `tputs'. I may at some point consider them.
+
+SEE ALSO
+    *   `unibilium' - a terminfo parsing library -
+        <https://github.com/mauke/unibilium>
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,35 @@
+---
+abstract: 'Implements similar functionality to SQL::SplitStatement, but for TSQL.  '
+author:
+  - 'Ded MedVed <dedmedved@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TSQL-SplitStatement
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Clone: 0
+  Data::Dump: 0
+  Data::Dumper: 0
+  IPC::System::Simple: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  TSQL::Common::Regexp: 0.05
+  Test::Deep: 0
+  Test::More: 0
+  autodie: 0
+  indirect: 0
+  perl: 5.010000
+  version: 0
+version: 0.15

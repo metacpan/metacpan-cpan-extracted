@@ -1,0 +1,72 @@
+{
+   "abstract" : "Installs all number to word modules.",
+   "author" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Lingua-Any-Numbers",
+   "no_index" : {
+      "directory" : [
+         "monolithic_version",
+         "builder",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.40"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::AF::Numbers" : "0",
+            "Lingua::Any::Numbers" : "0.41",
+            "Lingua::BG::Numbers" : "0",
+            "Lingua::CS::Num2Word" : "0",
+            "Lingua::DE::Num2Word" : "0",
+            "Lingua::EN::Numbers" : "0",
+            "Lingua::ES::Numeros" : "0",
+            "Lingua::EU::Numbers" : "0",
+            "Lingua::FR::Numbers" : "0",
+            "Lingua::HU::Numbers" : "0",
+            "Lingua::ID::Nums2Words" : "0",
+            "Lingua::IT::Numbers" : "0",
+            "Lingua::JA::Numbers" : "0",
+            "Lingua::NL::Numbers" : "0",
+            "Lingua::NO::Num2Word" : "0",
+            "Lingua::PL::Numbers" : "0",
+            "Lingua::PT::Nums2Ords" : "0",
+            "Lingua::PT::Nums2Words" : "0",
+            "Lingua::SV::Numbers" : "0",
+            "Lingua::TR::Numbers" : "0",
+            "Lingua::ZH::Numbers" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/burak/cpan-task-lingua-any-numbers/"
+      }
+   },
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

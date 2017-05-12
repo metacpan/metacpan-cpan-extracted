@@ -1,0 +1,38 @@
+Text/NumericList version 0.01
+=============================
+
+This module converts strings into arrays of positive integers and
+vice-versa.  Sequential integers in the input array are replaced by a
+range in the output string.  This is best illustrated by an example.
+
+ ===================================================
+ Input string	Resulting array	    Resulting string	    
+ ---------------------------------------------------
+ '3,2,1,3,5-7'	1,2,3,5,6,7	    '1-3,5-7'
+ ===================================================
+
+Output array is always sorted and unique.  Text::NumericList module is
+useful for applications where a user is required to enter large arrays
+of integers.  For example, instead of making the user select 50
+check-boxes or list 50 numbers, the user can just type '1-50' in a
+text input field.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None other than Perl itself.
+
+COPYRIGHT AND LICENCE
+
+This module is distributed under the same license agreement as Perl itself.
+
+Copyright (C) 2004 Arkady Grudzinsky. 
+

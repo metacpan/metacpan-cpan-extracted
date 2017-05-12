@@ -1,0 +1,32 @@
+---
+abstract: 'Make simple task pocessing simple'
+author:
+  - 'Joachim Bargsten <cpan at bargsten dot org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Thread-Task-Concurrent
+provides:
+  Thread::Task::Concurrent:
+    file: lib/Thread/Task/Concurrent.pm
+    version: 0.0105
+  Thread::Task::Concurrent::Util:
+    file: lib/Thread/Task/Concurrent/Util.pm
+    version: 0.01
+requires:
+  Mouse: 0
+  Mouse::Exporter: 0
+  Thread::Queue: 0
+  perl: 5.010
+  threads: 0
+  threads::shared: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0105

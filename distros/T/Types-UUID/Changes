@@ -1,0 +1,24 @@
+Types-UUID
+==========
+
+Created:      2014-03-15
+Home page:    <https://metacpan.org/release/Types-UUID>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-UUID>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-27
+
+ [ Documentation ]
+ - Update example.
+
+0.003	2014-09-27
+
+ - Added: Provide `Uuid->generator` and `Uuid->generate` convenience
+   methods.
+
+0.002	2014-03-15
+
+ [ Documentation ]
+ - Fix minor pod formatting issue.
+
+0.001	2014-03-15	Initial release

@@ -1,0 +1,63 @@
+
+Text::Levenshtein is an implementation of the Levenshtein edit distance in Perl.
+If you're not familiar with this algorithm, a good place to start is
+the wikipedia page:
+
+    http://en.wikipedia.org/wiki/Levenshtein_distance
+
+The SEE ALSO section in the documentation for this module lists
+other modules on CPAN that calculate edit distances for two strings.
+
+
+PREREQUISITES
+
+This suite requires Perl 5.6 or later, and only uses core modules.
+
+
+INSTALLATION
+
+You install Text::Levenshtein by running these commands in the *nix environment:
+
+   perl Makefile.PL
+   make
+   make test (optional)
+   make install
+
+To install Text::Levenshtein in the Win32 environment, use nmake instead of make.
+nmake is available for free (in a self extracting executable):
+<http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe>
+After download and inflate, put nmake.exe and nmake.err in c:\windows\command .
+
+
+DOCUMENTATION
+
+POD format documentation is included in Levenshtein.pm.  
+You can read the documentation online:
+
+    https://metacpan.org/pod/Text::Levenshtein
+
+Or read it on your terminal, using the perldoc command:
+
+  perldoc Text::Levenshtein
+
+
+
+AVAILABILITY
+
+The latest version of Text::Levenshtein is available from CPAN
+
+    http://search.cpan.org/
+    https://metacpan.org/pod/Text::Levenshtein
+
+
+COPYRIGHT
+
+Copyright 2002 Dree Mistrut <dree@friul.it>
+Copyright (C) 2004-2014 Josh Goldberg.
+Copyright (C) 2014- Neil Bowers.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  You can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+This module is now maintained by Neil Bowers <neilb@cpan.org>

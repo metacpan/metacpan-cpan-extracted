@@ -1,0 +1,24 @@
+--- 
+abstract: Access tree-like groups of strings naturally in code and Templates
+author: 
+  - Adam Kennedy <adamk@cpan.org>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.680
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Template-Plugin-StringTree
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  File::Spec: 0.80
+  List::Util: 1.11
+  Scalar::Util: 0
+  Template: 0
+  perl: 5.005
+version: 0.08

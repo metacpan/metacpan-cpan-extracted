@@ -1,0 +1,16 @@
+Test::BSON Installation
+
+# install via cpanminus
+cpanm Test::BSON
+
+# install via CPAN shell
+cpan Test::BSON
+
+# install via ActivePerl
+ppm install Test::BSON
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

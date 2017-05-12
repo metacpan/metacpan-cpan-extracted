@@ -1,0 +1,61 @@
+Revision history for Test-MonitorSites
+
+0.15   Fri Jun 20 06:52:38 EDT 2008
+       removed dependency on File::Util, 
+       now use glob (built-in) in Makefile.PL, 
+       instead.  Smoke Testers reported frequent 
+       install failures due to missing module.
+
+0.14   Fri Jun 6 13:03:11 EDT 2008
+       busting bug in Makefile which fails on File/Util 
+       requirement before WriteMakefile() loads 
+       pre-requisites
+
+0.13   Mon Mar 26 14:12:30 2007
+       busted the test suite's ET phone home bug
+
+0.12   Mon Mar 26 10:51:06 2007
+       added two missing t/*.ini files used by 
+	testsuite t/*.t scripts
+
+0.11   Sun Mar 25 16:43:40 2007
+       added missing test scripts to MANIFEST
+
+0.10   Sun Mar 25 13:32:07 2007
+       adds t/16_monitor_quietly.t, exercising 
+	new conditionals around use of ->email()
+	to permit quiet periodic monitoring, 
+	except when faced with critical failures.
+
+0.09   Sat Mar 24 17:50:25 2007
+       tighten up test suite to better cover 
+	and test new code.  
+
+0.08   Sat Mar 24 01:24:05 2007
+       bug busting, no longer bombs out with an 
+	https:// url, restored working statistics, 
+	added report_success code to ->sms()
+
+0.07   Wed Mar 21 14:06:26 2007
+       added logic to support report_success 
+	variable added to configuration
+
+0.06   Fri Mar 16 00:45:00 2007
+       tightened up test suite so it begins to 
+	cover, reasonably well, the new features.
+
+0.05   Thu Mar 15 11:37:00 2007
+       ->sms() method now reports count of both 
+	critical errors and domains with such errors
+	->email() method reports module version 
+
+0.04   Mon Mar 12 12:00:00 2007
+       ->sms() method now supports report_by_ip
+	configuration variable
+
+0.03   
+       First version deployed on gpca servers
+
+0.01   Tue Feb  6 14:58:06 2007
+       Initial release.
+

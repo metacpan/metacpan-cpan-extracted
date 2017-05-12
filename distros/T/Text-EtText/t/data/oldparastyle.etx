@@ -1,0 +1,17 @@
+This text should give an
+example of line breaking.
+Hopefully.
+
+
+  What about paragraphs that start with a few spaces? They should work fine, if
+things are OK. work fine, if things are OK work fine, if things are OK work
+fine, if things are OK work fine, if things are OK.
+  This should really be counted as a second paragraph as well. Hmm, well,
+let's hope that works.
+
+- another nasty is lists
+
+that start at char 0
+
+- that line should not be part of the list
+

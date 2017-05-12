@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name                : Test-Dynamic
+version             : 1.3.3
+abstract            : Advanced automatic test counting for Test::More
+author:              
+  - Greg Sabino Mullane <greg@endpoint.com>
+
+license             : bsd
+dynamic_config      : 1
+distribution_type: module
+
+requires:
+  Test::More        : 0.61
+
+provides:
+  Test::Dynamic:
+    file            : Dynamic.pm
+    version         : 1.3.3
+
+resources:
+  homepage          : http://bucardo.org/test-dynamic/index.html
+  MailingList       : http://bucardo.org/test-dynamic/list.html
+  bugtracker        : http://bucardo.org/test-dynamic/bugs.html
+  repository        : http://bucardo.org/test-dynamic/repo.html
+  license           : http://bucardo.org/test-dynamic/license.html
+meta-spec:
+  version           : 1.3
+  url               : http://module-build.sourceforge.net/META-spec-v1.3.html
+generated_by        : emacs 22.1.1

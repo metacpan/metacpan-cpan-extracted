@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/Test/LimitDecimalPlaces.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.pod
+t/00.load.t
+t/01.check_setting_option.t
+t/02.limit_ok_by_default.t
+t/03.limit_ok.t
+t/04.limit_by.t
+t/05.limit_not_ok_by_default.t
+t/06.limit_not_ok.t
+t/07.limit_not_ok_by.t
+t/08.limit_ok_array.t
+t/09.limit_not_ok_array.t
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+xt/podspell.t
+LICENSE
+META.yml
+META.json

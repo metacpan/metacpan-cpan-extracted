@@ -1,0 +1,17 @@
+Revision history for Text-Naming-Convention
+
+0.06   Wed Nov  4 06:08:34 GMT 2009
+       version tweak
+
+0.0.6  Wed Jan  7 15:37:14 CST 2009
+       renaming $_ if without arguments
+0.0.5  Mon Jul 28 08:51:57 CST 2008
+       removed perlcritic.t, because it weirdly bit some testers
+0.0.4  Sun Jul 27 21:06:57 CST 2008
+       try to make perlcritic happier
+0.0.3  Sun Jul 27 13:38:53 CST 2008
+       bug fixes version
+0.0.2  Sun Jul 27 13:38:53 CST 2008
+       bug fixes for renaming sub
+0.0.1  Sat Jul 26 15:13:13 2008
+       Initial release.

@@ -1,0 +1,7 @@
+2011-02-13  Sean O'Rourke  <seano@cpan.org>
+	* VERSION 0.02.
+	* done_testing: new function.
+	* test.pl: more tests.
+
+2010-10-8  Sean O'Rourke <seano@cpan.org>
+	* original version; created by newmod.pl Test::Tiny

@@ -1,0 +1,119 @@
+Travel::Status::DE::VRR 1.14 - Sat Oct 08 2016
+
+    * efa-m: Fix broken encoding in --list output
+
+Travel::Status::DE::VRR 1.13 - Sun Mar 06 2016
+
+    * EFA: Add accessors name_candidates and place_candidates
+    * EFA: errstr: in cases of ambiguous input, the name/place
+      candidates list is no longer encoded in the errstr accessor. Use the
+      new name_candidates / place_candidates accessors instead.
+
+Travel::Status::DE::VRR 1.12 - Tue Aug 04 2015
+
+    * EFA: Add static method get_efa_urls
+    * Line: Add mot and mot_name accessors
+    * Result: Add mot and mot_name accessors
+    * efa-m: Add -A / --auto-url / --discover-and-print option
+    * efa-m: Add -D / --discover option
+    * efa-m: Add --list option
+    * efa-m: Add -m / --mot option
+    * efa-m: Add -s / --service option
+
+Travel::Status::DE::VRR 1.11 - Tue Jun 30 2015
+
+    * efa-m: Remove -V alias for --version
+    * efa-m: Add -V / --track-via option
+    * efa-m: Add -O / --output option with outputtypes
+      route_after, route_before, fullroute and route
+    * efa-m: Always output schedule data when absolute times are requested.
+      As before, delays are indicated by a +xyz mark next to the time
+
+Travel::Status::DE::VRR 1.10 - Thu Jun 25 2015
+
+    * Result->delay: return undef when no data is available. This allows to
+      distinguish between on-time departures (delay 0) and departures without
+      realtime data (delay undef)
+    * EFA->new: Add full_routes config option
+    * EFA: Add identified_data accessor
+    * Result: Add route_pre, route_post and route_interesting accessors
+    * Add Travel::Status::DE::EFA::Stop module
+    * efa-m: Add -v / --via option
+
+Travel::Status::DE::VRR 1.09 - Thu Apr 30 2015
+
+    * EFA: Fix crash when ->results is called after a network error occured
+    * EFA: Add timeout parameter to constructor (default: 10 seconds)
+    * efa-m: Add --timeeout option
+
+Travel::Status::DE::VRR 1.08 - Mon Mar 03 2014
+
+    * efa-m: Add -o, --offset option
+    * Fix ->platform and ->platform_db accessors (the EFA API was changed)
+
+Travel::Status::DE::VRR 1.07 - Tue Jan 07 2014
+
+    * efa-m: Add previously undocumented -L option to manual
+    * efa-m: Handle UTF8 in place/stop input
+    * Travel::Status::DE::EFA: Handle decoded input with non-ASCII characters
+
+Travel::Status::DE::VRR 1.06 - Thu Jan 02 2014
+
+    * Add Travel::Status::DE::EFA module, move ::Result and ::Line to
+      Travel::Status::DE::EFA. Travel::Status::DE::VRR now inherits from
+      ::EFA, no API changes were made.
+    * Travel::Status::DE::EFA has a mandatory efa_url parameter to set the
+      entry point to an EFA service
+
+Travel::Status::DE::VRR 1.05 - Wed Dec 18 2013
+
+    * Add -r, --relative option to use relative times
+    * Support lines without Operator field (e.g. Aachen / ASEAG)
+
+Travel::Status::DE::VRR 1.04 - Wed Oct 16 2013
+
+    * Add ->key accessor to Travel::Status::DE::VRR::Line
+      (meaning is unknown)
+    * Add ->is_cancelled accessor to Travel::Status::DE::VRR::Result
+    * Travel::Status::DE::VRR::Result->delay will no longer return '-9999'
+      for cancelled departures, check ->is_cancelled instead
+    * Allow Travel::Status::DE::VRR::Line and TraveL::Status::DE::VRR::Result
+      to be serialized to JSON (via TO_JSON method)
+
+Travel::Status::DE::VRR 1.03 - Tue Sep 17 2013
+
+    * Disable smartmatch warnings on perl >= 5.018
+
+Travel::Status::DE::VRR 1.02 - Wed Apr 10 2013
+
+    * Patch by Roland Hieber: respect proxy environment variables
+
+Travel::Status::DE::VRR 1.01 - Mon Nov 26 2012
+
+    * Properly parse "tram canceled" information (EVAG, maybe also VRR)
+
+Travel::Status::DE::VRR 1.00 - Sat Dec 03 2011
+
+    * switch to efa.vrr.de XML interface
+    * properly decode UTF-8 strings
+    * Switch from WWW::Mechanize to LWP::UserAgent
+    * Add ->lines and Travel::Status::DE::VRR::Line describing all lines
+      serving the given stop
+
+    [Travel::Status::DE::VRR::Result]
+    * Add countdown, date, delay, lineref, platform_db, sched_date, sched_time
+      and type accessors
+
+    [efa-m]
+    * Add -L / --linelist option
+
+Travel::Status::DE::VRR 0.02 - Sat Oct 01 2011
+
+    [efa-m]
+    * Add --platform / --line options to filter output
+    * Align times properly if departure list contains a daychange
+    * Make --date and --time actually work
+
+Travel::Status::DE::VRR 0.01 - Sun Sep 11 2011
+
+    * Initial release

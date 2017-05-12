@@ -1,0 +1,43 @@
+---
+abstract: 'Replaces random number generation with non-random number generation'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  Test::More: '0'
+  lib: '0'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-MockRandom
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Test::MockRandom:
+    file: lib/Test/MockRandom.pm
+    version: '1.01'
+requires:
+  Carp: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Test-MockRandom/issues
+  homepage: https://github.com/dagolden/Test-MockRandom
+  repository: https://github.com/dagolden/Test-MockRandom.git
+version: '1.01'
+x_authority: cpan:DAGOLDEN

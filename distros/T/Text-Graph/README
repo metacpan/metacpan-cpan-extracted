@@ -1,0 +1,37 @@
+   Text::Graph
+
+The Text::Graph package supports text-based bar and line graphs. I originally
+created the package for scripts that provided a quick summary of log files. In
+that application, a fancy, graphical graphing solution would have been overkill.
+
+I used the earlier version of this module for years before deciding to add it
+to CPAN. The new version has been rewritten to support an OO interface.
+
+PREREQUISITES
+
+Text::Graph only depends on Perl 5.
+
+INSTALLATION
+
+You can install Text::Graph using the normal perl module installation commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DOCUMENTATION
+
+Each module in the package has its own POD documentation. The Graph.pm module
+also contains some example code showing several different formatting scenarios.
+
+SUPPORT
+
+The Text::Graph module is only supported by me <wade@anomaly.org>.
+
+COPYRIGHT
+
+  Copyright 2002-2004 G. Wade Johnson. Some rights reserved.
+
+This module is free software; you can distribute it and/or modify it under
+the same terms as Perl itself.

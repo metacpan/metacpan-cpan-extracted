@@ -1,0 +1,16 @@
+Template::Plugin::Ligature Installation
+
+# install via cpanminus
+cpanm Template::Plugin::Ligature
+
+# install via CPAN shell
+cpan Template::Plugin::Ligature
+
+# install via ActivePerl
+ppm install Template::Plugin::Ligature
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

@@ -1,0 +1,32 @@
+---
+abstract: 'tests module permissions in your distribution'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  Test::UseAllModules: '0.10'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.07'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-PAUSE-Permissions
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::Identity: '0'
+  Exporter: '0'
+  PAUSE::Permissions: '0.09'
+  Parse::CPAN::Meta: '0'
+  Parse::LocalDistribution: '0.08'
+  Parse::PMFile: '0.15'
+  parent: '0'
+resources:
+  repository: https://github.com/charsbar/Test-PAUSE-Permissions
+version: '0.06'

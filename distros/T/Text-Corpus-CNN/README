@@ -1,0 +1,221 @@
+NAME
+    "Text::Corpus::CNN" - Make a corpus of CNN documents for research.
+
+SYNOPSIS
+      use Cwd;
+      use File::Spec;
+      use Text::Corpus::CNN;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpusDirectory = File::Spec->catfile (getcwd(), 'corpus_cnn');
+      my $corpus = Text::Corpus::CNN->new (corpusDirectory => $corpusDirectory);
+      $corpus->update (verbose => 1);
+      dump $corpus->getTotalDocuments;
+
+DESCRIPTION
+    "Text::Corpus::CNN" can be used to create a temporary corpus of CNN news
+    documents for personal research and testing of information processing
+    methods. Read the CNN Interactive Service Agreement to ensure you abide
+    by it when using this module.
+
+    The categories, description, title, etc... of a specified document are
+    accessed using Text::Corpus::CNN::Document. Also, all errors and
+    warnings are logged using Log::Log4perl, which should be initialized.
+
+CONSTRUCTOR
+  "new"
+    The constructor "new" creates an instance of the "Text::Corpus::CNN"
+    class with the following parameters:
+
+    "corpusDirectory"
+         corpusDirectory => '...'
+
+        "corpusDirectory" is the directory that documents are cached into
+        using CHI. If "corpusDirectory" is not defined, then the path
+        specified in the environment variable
+        "TEXT_CORPUS_CNN_CORPUSDIRECTORY" is used if it is defined. If the
+        directory defined does not exist, it will be created. A message is
+        logged and an exception is thrown if no directory is specified.
+
+METHODS
+  "getDocument"
+     getDocument (index => $index)
+     getDocument (uri => $uri)
+
+    "getDocument" returns a Text::Corpus::CNN::Document object for the
+    document with index $index or uri $uri. The document indices range from
+    zero to "getTotalDocument()-1"; "getDocument" returns "undef" if any
+    errors occurred and logs them using Log::Log4perl.
+
+    For example:
+
+      use Cwd;
+      use File::Spec;
+      use Text::Corpus::CNN;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpusDirectory = File::Spec->catfile (getcwd(), 'corpus_cnn');
+      my $corpus = Text::Corpus::CNN->new (corpusDirectory => $corpusDirectory);
+      $corpus->update (verbose => 1);
+      my $document = $corpus->getDocument (index => 0);
+      dump $document->getBody;
+      dump $document->getCategories;
+      dump $document->getContent;
+      dump $document->getDate;
+      dump $document->getDescription;
+      dump $document->getHighlights;
+      dump $document->getTitle;
+      dump $document->getUri;
+
+  "getTotalDocuments"
+      getTotalDocuments ()
+
+    "getTotalDocuments" returns the total number of documents in the corpus.
+    The index to the documents in the corpus ranges from zero to
+    "getTotalDocuments() - 1".
+
+  "getURIsInCorpus"
+     getURIsInCorpus ()
+
+    "getURIsInCorpus" returns an array reference of all the URIs in the
+    corpus.
+
+    For example:
+
+      use Cwd;
+      use File::Spec;
+      use Text::Corpus::CNN;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpusDirectory = File::Spec->catfile (getcwd(), 'corpus_cnn');
+      my $corpus = Text::Corpus::CNN->new (corpusDirectory => $corpusDirectory);
+      dump $corpus->getURIsInCorpus;
+
+  "update"
+      update (verbose => 0)
+
+    This method updates the set of documents in the corpus by fetching any
+    newly listed documents in the "sitemap_news.xml" file.
+
+    "verbose"
+          verbose => 0
+
+        If "verbose" is positive, then after each new document is fetched a
+        message is logged stating the number of documents remaining to fetch
+        and the approximate time to completion. "update" returns the number
+        of documents fetched.
+
+    For example:
+
+      use Cwd;
+      use File::Spec;
+      use Text::Corpus::CNN;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpusDirectory = File::Spec->catfile (getcwd(), 'corpus_cnn');
+      my $corpus = Text::Corpus::CNN->new (corpusDirectory => $corpusDirectory);
+      $corpus->update (verbose => 1);
+      dump $corpus->getTotalDocuments;
+
+EXAMPLES
+    The example below will print out all the information for each document
+    in the corpus.
+
+      use Cwd;
+      use File::Spec;
+      use Text::Corpus::CNN;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpusDirectory = File::Spec->catfile (getcwd(), 'corpus_cnn');
+      my $corpus = Text::Corpus::CNN->new (corpusDirectory => $corpusDirectory);
+      my $totalDocuments = $corpus->getTotalDocuments;
+      for (my $i = 0; $i < $totalDocuments; $i++)
+      {
+        eval
+          {
+            my $document = $corpus->getDocument(index => $i);
+            next unless defined $document;
+            my %documentInfo;
+            $documentInfo{title} = $document->getTitle();
+            $documentInfo{body} = $document->getBody();
+            $documentInfo{content} = $document->getContent();
+            $documentInfo{categories} = $document->getCategories();
+            $documentInfo{description} = $document->getDescription();
+            $documentInfo{highlights} = $document->getHighlights();
+            $documentInfo{uri} = $document->getUri();
+            dump \%documentInfo;
+          };
+      }
+
+    The example below will print some of the most frequent categories of all
+    the articles in the corpus.
+
+      use Cwd;
+      use File::Spec;
+      use Text::Corpus::CNN;
+      use Data::Dump qw(dump);
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init ($INFO);
+      my $corpusDirectory = File::Spec->catfile (getcwd(), 'corpus_cnn');
+      my $corpus = Text::Corpus::CNN->new (corpusDirectory => $corpusDirectory);
+      my $totalDocuments = $corpus->getTotalDocuments;
+      my %allCategories;
+      for (my $i = 0; $i < $totalDocuments; $i++)
+      {
+        eval
+          {
+            my $document = $corpus->getDocument(index => $i);
+            next unless defined $document;
+            my $categories = $document->getCategories();
+            foreach my $category (@$categories)
+            {
+              my $categoryNormalized = lc $category;
+              $allCategories{$categoryNormalized} = [0, $category] unless exists $allCategories{$categoryNormalized};
+              $allCategories{$categoryNormalized}->[0]++;
+            }
+          };
+      }
+      my @allCategories = sort {$b->[0] <=> $a->[0]} values %allCategories;
+      my $topCategories = 10;
+      $topCategories = @allCategories if (@allCategories < $topCategories);
+      for (my $i = 0; $i < $topCategories; $i++)
+      {
+        print join (' ', @{$allCategories[$i]}) . "\n";
+      }
+
+INSTALLATION
+    To install the module set "TEXT_CORPUS_CNN_FULL_TESTING" to true and run
+    the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    If you are on a windows box you should use 'nmake' rather than 'make'.
+
+    The module will install if "TEXT_CORPUS_CNN_FULL_TESTING" is not defined
+    or false, but little testing will be performed.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    cnn, cable news network, english corpus, information processing
+
+SEE ALSO
+    CHI, Log::Log4perl, Text::Corpus::CNN::Document
+

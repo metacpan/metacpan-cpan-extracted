@@ -1,0 +1,16 @@
+/MANIFEST
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Time-OlsonTZ-Data-*
+/lib/Time/OlsonTZ/Data.pm
+/lib/Time/OlsonTZ/Data
+/tzsrc
+/tzsrc.meta

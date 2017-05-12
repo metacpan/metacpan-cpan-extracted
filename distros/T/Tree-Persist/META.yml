@@ -1,0 +1,43 @@
+---
+abstract: 'A transparent persistence layer for Tree and its children'
+author:
+  - 'Rob Kinyin <rkinyon@cpan.org>'
+build_requires:
+  DBD::SQLite: '1.39'
+  DBI: '1.627'
+  ExtUtils::MakeMaker: '0'
+  File::Slurp: '9999.19'
+  File::Spec: '0.01'
+  File::Spec::Functions: '0.01'
+  File::Temp: '0.01'
+  Test::File: '1.1'
+  Test::File::Contents: '0.02'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.1'
+  Tree: '1.05'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tree-Persist
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Module::Runtime: '0.013'
+  Scalar::Util: '1.1'
+  XML::Parser: '2.41'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Tree-Persist.git
+version: '1.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

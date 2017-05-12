@@ -1,0 +1,8 @@
+Revision history for Tree-XPathEngine
+$Id: /tree-xpathengine/trunk/Changes 26 2006-02-15T15:46:06.515200Z mrodrigu  $
+
+0.05    2006-02-12
+        Fixed installation problems (extra includes and missing files in MANIFEST)
+
+0.04    2006-02-12
+        First version, released on CPAN

@@ -1,0 +1,14 @@
+Revision history for Perl extension Text::EP3.
+
+1.1   Wed Mar 1, 2006
+	- repackaged using module-starter
+    - fixed some warnings
+    - added 'delimiter' synonyms for 'delimeter'
+    - added sync-lines output option
+    - fixed ep3_delimeter
+
+1.0   Sat Mar 7, 04:45:00 1998
+	- release version; Modified old code to be method based for a module.
+
+0.01  Wed Feb 18 15:38:50 1998
+	- original version; created by h2xs 1.18

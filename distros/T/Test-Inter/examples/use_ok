@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our($o);
+
+BEGIN {
+  print "The first test will fail, all others will be skipped.\n\n";
+  use Test::Inter;
+  $o = new Test::Inter;
+}
+
+BEGIN { $o->use_ok('Xxx::Yyy'); }
+
+$o->ok();
+$o->ok( 1 == 1 );
+$o->ok( 1 == 2 );
+
+$o->done_testing();
+

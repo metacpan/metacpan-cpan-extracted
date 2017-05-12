@@ -1,0 +1,30 @@
+---
+abstract: 'format DateTime objects from inside TT with DateTime::Format-style formatters'
+author:
+  - 'Jonathan Rockway <jrockway@cpan.org>'
+build_requires:
+  Template: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  ok: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-DateTime-Format
+requires:
+  Class::Load: '0'
+  DateTime: '0'
+  Template::Plugin: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/Template-Plugin-DateTime-Format
+  repository: https://github.com/neilbowers/Template-Plugin-DateTime-Format.git
+version: '0.03'

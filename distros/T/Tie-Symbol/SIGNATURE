@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 86857f3321ff936d30446e52d96391f5c8266edc CONTRIBUTORS
+SHA1 a66ba82ec0af54bd091f181bff5235ec8612eb21 Changes
+SHA1 21696e04788daf443832163be15c96a621ae5381 LICENSE
+SHA1 5d0a216381cf48afd021136858b35a251ca28789 MANIFEST
+SHA1 9d62cb4bc6bc28b616068f67a412959a898640ba META.yml
+SHA1 2dfe7c98d031c6b83b12b450c44aa5157b768abf Makefile.PL
+SHA1 8345fee8604b4a37484c3653075d0760544aee24 README
+SHA1 56dbf3f0a8d80b989b6877a634d93491ecbf8ed8 cpanfile
+SHA1 bf1b5a0c8df51fc8b02336bf7326ac5e0ec0f9c5 dist.ini
+SHA1 e91906c575cc2ed73d545ceecd7f2ddde7a43ed4 lib/Tie/Symbol.pm
+SHA1 a688f9aaba4f322cfbeb5bb31a7ab87c0639b14b t/00-check-deps.t
+SHA1 551bed5ac26a832ec18eed90b1ebe8a8446cdb5e t/00-compile.t
+SHA1 094b54614349b07680335febcae7f3cb3bac49c2 t/100-tie.t
+SHA1 dbbe0dec3b3765092340ed0a0ef361c2e8d0064c t/101-fetch.t
+SHA1 de9560f14e9fe59f349483dddd42418e95969242 t/102-namespace.t
+SHA1 eb527355a18db06be4f88b062156c60924ca83d2 t/103-examine.t
+SHA1 74a738ffa97265141da44d07f376102ee74762b0 t/104-store.t
+SHA1 dc3807f496f055a9804f5a2e4f0446b10d7b6aa4 t/105-erase.t
+SHA1 148ae4adea5506911ffce6cbb67e67dc2d65dca8 t/106-clear.t
+SHA1 b1508ad06409c9655110f33318863ec558c61dd9 t/200-new.t
+SHA1 0f9701155e2d6bff6c4e96d109f2247208bbb3e7 t/203-examine.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 49d3954ec0eab9104bb802954951096faf964f82 t/author-eol.t
+SHA1 7dcb19eaf7cc26439e6ec84075e52ed4ae0bcfa8 t/author-no-tabs.t
+SHA1 1bf69b71b924777ef46b198af9435e8381149fc7 t/release-cpan-changes.t
+SHA1 04b1520e9a9c757e2af3ff47779d5968bfd29206 t/release-fixme.t
+SHA1 bdd52baa1a968cc0e1a577a7b073f046d563a317 t/release-kwalitee.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJWsb0VAAoJEJVzeMw4kNooKZUP/RDCb2lLZDfu+7K8bGaUnd0a
+98hheFd1cuf4ty8bEiSx/jnXQQVIST83QSyuUByXGtUU+VYel/W3IsE6Tdukv58J
+ZVH7ZjJhWcWvIw6gp5LIal2JrfVvEZZq5h27Ykigy6dkRWQdoNJHlq12WYCJPksX
+zQp32JB4jJsnWW6fw9lCjQLmaJD+WAxvUFmL7Fh82+mZvxovzWqE9w8cuVZpzNSE
+O71oDVya/H9hgGWkvtkasR44JE0Y1hGEQ6+1S9a3+XoRFIQaUqRf9GLp5oXoSsAn
+FZx8B8o2seVSunnXuR7InjZWfTNdIJfPuJ0QFnZ9Jre4oe1BiZDHiKixNrM88+25
+h7OBRIWd/vutZEHActb/oniuS+fFf0KDbDeJMQ8zEyHU+pF/cOGo2mJDOe5NfgpV
+VHrcbVCk0wqAjFwrsAYXOvmEwGKpx5JZdBjIFeUY0ZW0lIgh239u5lIGIYwXcFUQ
+sqWco0xIyDN9N501VSIv/8mf4XxTSD4SKydM0APj9QrRrQTCbovXPeGzgWf8Cp/5
+q0Xww3s2jVQIk7IUXYwwTe44gDOMIr+fDOR3LqNxE81To8BvQ3cPy5ksJSF+UCTl
+Ss7hyglScHe+oYPcs7SDbzC9BVRxFAFFyfcGrvWw/c5XAtPqQdJ/M3mtTBpG7drb
+uAPL2E8aylN0R84hcJ3T
+=JCXf
+-----END PGP SIGNATURE-----

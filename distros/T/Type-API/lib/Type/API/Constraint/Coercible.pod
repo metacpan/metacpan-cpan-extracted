@@ -1,0 +1,107 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords superset
+
+=head1 NAME
+
+Type::API::Constraint::Coercible - allows values failing the type constraint to be converted to another value that passes
+
+=head1 INTERFACE
+
+Implementations of Type::API::Constraint::Coercible B<MUST> also implement
+L<Type::API::Constraint>.
+
+Implementations B<MUST> provide the following methods:
+
+=over
+
+=item C<< $constraint->has_coercion >> 
+
+Returns a boolean indicating whether a coercion is available for this type
+constraint.
+
+=item C<< $constraint->coerce($value) >>
+
+Attempts to coerce the value into a value that would pass the type constraint;
+this method returns the new value. This method offers no guarantee that the
+returned value passes the constraint; that must be checked with C<check>.
+
+=back
+
+Implementations B<MAY> advertise that they support this interface by returning
+true for C<< $constraint->DOES("Type::API::Constraint::Coercible") >>.
+
+=head1 SEE ALSO
+
+=head2 Implementations
+
+The following CPAN classes are known to implement
+Type::API::Constraint::Coercible:
+
+=over
+
+=item *
+
+L<Moose::Meta::TypeConstraint> (and its subclasses)
+
+=item *
+
+L<MooseX::Meta::TypeDecorator>
+
+=item *
+
+L<Mouse::Meta::TypeConstraint>
+
+=item *
+
+L<MouseX::Meta::TypeDecorator>
+
+=item *
+
+L<Specio::Constraint::Simple> (and several other classes in the Specio distribution)
+
+=item *
+
+L<Type::Tiny> (and its subclasses)
+
+=back
+
+=head2 Consumers
+
+Some tools can make use of objects implementing Type::API::Constraint::Coercible:
+
+=over
+
+=item *
+
+L<Smart::Args>
+
+=item *
+
+L<Type::Tie>
+
+=back
+
+Others, such as L<Moose> and L<Mouse> require type constraints that implement
+a superset of this functionality.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

@@ -1,0 +1,32 @@
+Revision history for Perl extension Template-Plugin-Tooltip
+
+1.08 Sat 16 Aug 2008
+	- No functional changes
+	- Updated Module::Install to 0.77
+
+0.07 Thu 29 Jun 2007
+	- No functional changes
+	- Updated Module::Install to 0.65
+
+0.06 Sat 25 Feb 2006
+	- No functional changes
+	- Updated Module::Install to 0.57
+	- Resolved #17512: Incorrect docs (NIKC)
+	- Moved from old CVS to new SVN repository
+	- Updated test to match the change
+
+0.05 Fri Dec 30 2005
+	- More POD corrections (sigh)
+	- Updated Module::Install
+
+0.04 Mon May 23 2005
+	- Minor POD corrections
+
+0.03 Sun Apr 17 2005
+	- Minor POD corrections
+
+0.02 Tue Feb 15 2005
+	- Removing braindead Build.PL
+
+0.01 Wed Dec  1 2004
+	- Created the initial version of the file

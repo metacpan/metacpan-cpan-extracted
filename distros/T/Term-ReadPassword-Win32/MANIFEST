@@ -1,0 +1,11 @@
+Changes
+lib/POD2/JA/Term/ReadPassword/Win32.pod
+lib/Term/ReadPassword/Win32.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+README.ja
+t/1_loadtest.t
+META.json                                Module JSON meta-data (added by MakeMaker)

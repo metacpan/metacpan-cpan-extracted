@@ -1,0 +1,31 @@
+## Installing from CPAN
+
+Mockify has not been released on CPAN yet. Please hold the line...
+
+## Building Mockify
+
+Mockify is using [Minilla](https://metacpan.org/pod/Minilla) and
+`Build::Module::Tiny` as build tools.
+
+Here is how you can run an build the project.
+
+* Install dependencies:
+
+  cpanm --installdeps --notest .
+
+* Run tests
+
+  minil test
+
+* Create distribution tarball
+
+  minil dist
+
+* Install locally
+
+  minil install
+
+* Create a release on CPAN
+
+  minil release
+

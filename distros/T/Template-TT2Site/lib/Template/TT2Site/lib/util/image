@@ -1,0 +1,51 @@
+[% # $Id: image,v 1.4 2005/02/02 19:34:06 jv Exp $ -%]
+[%
+
+# Image, without borders.
+
+# This template either takes a preprocessed image object (see
+# config/images), an (partial) image object, or the name of a (local)
+# image file.
+#
+# E.g. INCLUDE util/image image = site.logo
+#      INCLUDE util/image image = { src => "logo.jpg", alt => "Site Logo" }
+#      INCLUDE util/image image = "picture.png"
+#
+# Note that the title and alt attributes are not HTML escaped.
+
+UNLESS image.src.defined;
+  image = { src => image };
+END;
+
+UNLESS image.alt.defined;
+  image.alt = image.src;
+END;
+
+UNLESS image.width.defined && image.height.defined;
+  # Try name 'as is'.
+  USE Image(name = image.src);
+  TRY;
+    # Check if we succeeded.
+    image.width  = Image.width;
+  CATCH Image;
+    # No, preprend template dir and source dir.
+    USE File(page.file, noid = 1, nostat = 1);
+    image.prefix = tmplsrc _ "/";
+    image.prefix = image.prefix _ File.dir _ "/" IF File.dir;
+    USE Image(name = image.prefix _ image.src);
+    image.width  = Image.width;
+  END;
+  image.height = Image.height;
+END;
+
+'<img src="' _ image.src _ '" alt="' _ image.alt _ '"';
+' align="' _ image.align _ '"' IF image.align;
+' title="' _ image.title _ '"' IF image.title;
+IF image.border.defined;
+  ' border="' _ image.border _ '"';
+ELSE;
+  ' border="0"';
+END;
+' width="' _ image.width _ '" height="' _ image.height _ '" />';
+
+%]

@@ -1,0 +1,28 @@
+NAME
+    Task::WWW::Search::Antiquarian::Czech - Install the WWW::Search modules
+    for Czech antiquarian bookstores.
+
+SYNOPSIS
+     cpanm Task::WWW::Search::Antiquarian::Czech
+
+SEE ALSO
+    WWW::Search::Antikvariat11CZ, WWW::Search::AntikvariatJudaicaCZ,
+    WWW::Search::GalerieIlonkaCZ, WWW::Search::KacurCZ,
+    WWW::Search::MelcerCZ, WWW::Search::ValentinskaCZ.
+
+REPOSITORY
+    <https://github.com/tupinek/Task-WWW-Search-Antiquarian-Czech>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.01
+

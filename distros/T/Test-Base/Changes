@@ -1,0 +1,307 @@
+0.88 Sun Aug 24 08:09:16 PDT 2014
+ - Remove a debugging line.
+
+0.87 Tue Aug 19 16:35:34 PDT 2014
+ - Replace tabs with spaces
+
+0.86 Mon Aug 18 08:29:20 PDT 2014
+ - Fix for issue/15
+
+0.85 Mon Aug 18 08:07:52 PDT 2014
+ - Pull Module::Install::TestBase out of Test::Base
+ - It will be released in separate dist
+ - Was causing Test::Base to fail tests
+
+0.84 Sat Aug 16 15:08:32 PDT 2014
+ - Remove .gitignore
+ - Fix Meta error. s/zild/=zild/
+
+0.83 Sat Aug 16 12:31:00 PDT 2014
+ - Meta 0.0.2
+
+0.82 Sat Aug 16 04:14:25 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.81 Sat Aug 16 02:52:12 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.80 Fri Aug 15 20:49:55 PDT 2014
+ - Add t/000-require-modules.t
+
+0.79 Sat Aug  9 00:55:07 PDT 2014
+ - Dep on EU::MM 6.52
+
+0.78 Sat Aug  9 00:23:58 PDT 2014
+ - Fix swim errors
+
+0.77 Fri Aug  8 12:39:43 PDT 2014
+ - Change Provider test to use string eval, keeping it out of the eyes of
+   Perl::Prereqs.
+
+0.76 Thu Aug  7 00:29:39 PDT 2014
+ - Fix bad encoding in Pod
+
+0.75 Wed Aug  6 22:04:50 PDT 2014
+ - Use PR/14 which makes old and new Test::Builders work. exodist++
+
+0.74 Wed Aug  6 13:36:29 PDT 2014
+ - Add dependency on Filter::Util::Call just to be sure
+ - Spiffy requires it and we already require Spiffy
+
+0.73 Wed Aug  6 13:24:45 PDT 2014
+ - Doc fix. Thanks @Perlover++
+
+0.72 Wed Aug  6 10:31:52 PDT 2014
+ - Dep on new Spiffy-0.40 to get rid of warnings on blead 5.21.x
+
+0.71 Wed Aug  6 09:50:04 PDT 2014
+ - Applied PR/4 from schwern++
+
+0.70 Wed Aug  6 09:30:03 PDT 2014
+ - Fixed doc typo
+
+0.69 Wed Aug  6 09:09:34 PDT 2014
+ - Add $VERSION back into Test::Base
+
+0.68 Wed Aug  6 08:56:09 PDT 2014
+ - PR/11 and fixes
+
+0.67 Tue Aug  5 10:16:09 PDT 2014
+ - Add badges to doc
+
+0.66 Mon Aug  4 00:39:44 PDT 2014
+ - Remove (c) from Copyright
+ - Ginish doc to Swim
+
+0.65 Sat Aug  2 23:48:34 PDT 2014
+ - Fix copyright years.
+
+0.64 Fri Aug  1 23:16:11 PDT 2014
+ - Add Algorithm::Diff and Text::Diff to test.requires
+
+0.63 Fri Aug  1 23:04:30 PDT 2014
+ - Switch to Zilla-Dist
+
+0.62 Mon Feb 10 14:45:04 PST 2014
+ - Bad plan in a test
+
+0.61 Sat Feb  8 11:08:00 PST 2014
+ - Switch to dzil
+
+0.60 Mon Apr  4 15:51:09 CST 2011
+ - Applied patch by andk++
+ - Make regexp test skip on 5.14 for now.
+
+0.59 Thu Aug 20 14:56:36 PDT 2009
+ - Fixed test dep bug reported by Alias++.
+
+0.58 Thu Mar 26 17:26:13 PDT 2009
+ - Another undef filtering change.
+
+0.57 Thu Mar 26 16:42:03 PDT 2009
+ - Allow value of undef to be filtered without warnings.
+
+0.56 Sat Mar  7 12:13:32 PST 2009
+ - Add Test::Deep support with is_deep and run_is_deep
+
+0.55 Thu Dec  4 01:10:11 PST 2008
+ - Module::Install::TestBase::use_test_base require 'Filter::Util::Call'
+   now.
+
+0.54 Wed Nov 29 15:21:02 PST 2006
+ - Make dependency on Filter::Util::Call explicit in Makefile.PL Thanks to
+   Adriano Ferreira
+
+0.53 Wed Nov 29 15:21:02 PST 2006
+ - Changes from miyagawa and crew
+
+0.52 Mon Jun 19 10:44:53 PDT 2006
+ - Add use_ok to exports
+
+0.51 Fri Jun 16 13:05:22 PDT 2006
+ - Remove build-requires dep of Spiffy for Module::Install::TestBase
+ - Add in a patch from the good folk at Socialtext.
+
+0.50 Mon Jan 30 10:52:52 PST 2006
+ - No change. 0.49 got borked on the way to CPAN
+
+0.49 Mon Jan 30 10:52:48 PST 2006
+ - Added Module::Install::TestBase
+
+0.48 Sun Jan 29 10:19:46 PST 2006
+ - Fixed test failures on windows
+
+0.47 Thu Jan 19 10:59:37 PST 2006
+ - Depend on newer Spiffy 0.29
+
+0.46 Sat Jan 14 05:46:31 PST 2006
+ - Don't sign the distribution tarball
+ - Don't require the diffing stuff
+
+0.45 Mon Jan  9 20:58:04 PST 2006
+ - Let multilevel inheritance work!
+ - no_diff function turns off diffing.
+
+0.44 Fri Jul 22 23:38:04 PDT 2005
+ - Bug fix in is_diff from rking
+ - Allow Test::Base to be required without trying to run tests
+ - allow ONLY|LAST|SKIP with run_* implicit names.
+
+0.43 Sun Jun 19 03:14:40 PDT 2005
+ - change Test::Base::Filter::block to current_block.
+ - change Test::Base::Filter::arguments to current_arguments.
+ - add split and Split filters
+ - add join and Join filters
+ - add reverse and Reverse filters
+ - add hash filter
+ - allow (parens) around a data section name for readability.
+ - allow regexps on split
+ - allow for compact, one-line data sections
+ - allow for repeated filters
+ - detect sections names automatically
+ - import XXX stuff into Filter class
+ - add run_compare
+ - automatically set no_plan sometimes
+ - automatically run run_compare if no plan set at END
+ - massive refactoring of all tests
+
+0.42 Tue Jun 14 09:31:25 PDT 2005
+ - Make any block method callable with a dummy AUTOLOAD
+
+0.41 Sun Jun 12 15:49:15 PDT 2005
+ - Add first_block() function
+ - Split Test::Base::Filter into a separate module
+
+0.40 Sat Jun 11 20:55:42 PDT 2005
+ - Change name from Test::Chunks to more lofty Test::Base
+ - Change concept of "chunks" to "blocks"
+
+0.38 Wed Jun  8 00:33:00 PDT 2005
+ - Allow simple substitutions on $_ in filters defined in `main::`
+ - Add a filter_arguments() function
+ - Fixed a undef warning in `is()`
+
+0.37 Tue Jun  7 11:04:07 PDT 2005
+ - Implement rking style diff_is
+ - Add filters `exec_perl_stdout`
+
+0.36 Sun Jun  5 11:49:54 PDT 2005
+ - add tie_output support
+ - suppress warning in accessor
+ - support backslash escapes in filter arguments
+ - New filters `unchomp chop append eval_stdout eval_stderr eval_all`
+ - Add join string to join filter
+ - Add a Test-Less index
+
+0.35 Thu Jun  2 17:46:30 PDT 2005
+ - Subtle filter bug fixed
+
+0.34 Sat May 28 23:55:49 PDT 2005
+ - Allow "late" call of `filters`.
+ - Allow for appending filters that are predefined.
+
+0.33 Sat May 28 23:55:41 PDT 2005
+ - Support `next_chunk` iterator.
+
+0.32 Tue May 24 08:03:57 PDT 2005
+ - Add a method to access filter arguments
+ - Curry `use` args to Test::More
+ - Change base64 filter to base64_decode base64_encode
+ - Apply filter just before dispatch in run()
+ - Apply filters in order
+ - Default to Test::Chunks inline classes for subclassing modules (for
+   Filter and Chunks)
+
+0.31 Mon May 23 20:48:28 PDT 2005
+ - Guess names for chunk_class and filter_class. Easier subclassing.
+
+0.30 Mon May 23 16:39:23 PDT 2005
+ - Further delay filtering by no running filters when chunks is called in
+   scalar context.
+
+0.29 Sun May 22 21:30:02 PDT 2005
+ - add filters_delay function
+ - add run_filters method to Test::Chunks::Chunk
+ - Refactor many methods into Test::Chunks::Chunk
+ - Expose internals to the filter methods by providing a `chunk` method to
+   the Filter object.
+
+0.28 Wed May 11 17:13:19 PDT 2005
+ - Make running of the filters be lazy to avoid undesired side effects when
+   not running all tests. May want to be even lazier in the future...
+
+0.27 Tue May 10 17:01:18 PDT 2005
+ - Added run_unlike
+
+0.26 Mon May  9 07:57:58 PDT 2005
+ - Embed perl code in a test specification. This is still experimental and
+   undocumented.
+
+0.25 Sat May   7 01:02:03 PDT 2005
+ - Add `LAST` special section name to stop at a certain test.
+ - Add test for strict/warnings filter.
+ - Change 'description' method to 'name'.
+ - Add a description method for the multiline description.
+
+0.24 Thu May  5 01:54:29 PDT 2005
+ - Refactored delimiter default handling
+
+0.23 Thu May  5 00:33:32 PDT 2005
+ - Make Test::Chunks more subclassable
+ - Add join filter
+ - General Refactorings
+
+0.22 Tue May  3 12:32:39 PDT 2005
+ - Support a grepping feature for `chunks()`
+ - Ignore chunks that don't contain a specified data section for `run_*`
+   functions.
+
+0.21 Mon May  2 12:29:48 PDT 2005
+ - Deprecate filters_map and just use filters with a map.
+
+0.20 Mon May  2 00:08:17 PDT 2005
+ - Added list context to filters. Very powerful stuff.
+
+0.19 Sat Apr 30 17:27:09 PDT 2005
+ - Add regexp flag tests
+ - Change -XXX to :XXX and use better Spiffy 0.24
+
+0.18 Sat Apr 30 17:27:09 PDT 2005
+ - Support run_is_deeply
+
+0.17 Sat Apr 30 12:16:03 PDT 2005
+ - Allow user filters to be plain functions
+ - Add run_like
+ - Add regexp and get_url filters
+ - Allow run* functions to work as methods
+ - Remove diff_is() until implemented
+
+0.16 Fri Apr 29 20:04:24 PDT 2005
+ - added run_is for common equality tests
+ - strict and dumper filters
+ - Can't use `Spiffy -XXX` until Spiffy exporting is fixed.
+
+0.15 Wed Apr 27 23:50:50 PDT 2005
+ - export everything Test::More does.
+ - croak if things get called in the wrong order.
+
+0.14 Wed Apr 27 12:22:45 PDT 2005
+ - Move filters into the Test::Chunks::Filter class
+
+0.13 Mon Apr 25 11:14:27 PDT 2005
+ - add eval, yaml, list and lines filters
+ - support a filter_map for more flexibility
+
+0.12 Fri Apr 22 00:12:21 PDT 2005
+ - finished the tests
+ - automagically add strict and warnings to every test script
+
+0.11 Thu Apr 21 11:26:32 PDT 2005
+ - added delimiters() spec_file() spec_string() filters() functions
+ - implemented nice filters system
+ - lots more tests
+ - finished the doc
+
+0.10 Wed Apr 20 18:05:42 PDT 2005
+ - Initial version of Test::Chunks
+

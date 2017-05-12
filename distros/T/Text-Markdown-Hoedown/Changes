@@ -1,0 +1,53 @@
+Revision history for Perl extension Text-Markdown-Hoedown
+
+1.01 2013-11-24T10:17:40Z
+
+    - Fixed memory allocation related bug.
+      (It affects under the -Dusemymalloc=y environments)
+      (supported by bingos++)
+
+1.00 2013-11-20T11:38:19Z
+
+    [INCOMPATIBLE CHANGES]
+    - Switch to hoedown 2.0.0.
+      Modified low level APIs. If you are using undocumented low level APIs,
+      your application may not work correctly!
+      (tokuhirom)
+
+0.07 2013-10-02T00:38:28Z
+
+    - Documented low level API.
+      (tokuhirom)
+
+0.06 2013-10-01T13:11:59Z
+
+    - set __USE_MINGW_ANSI_STDIO=1 to let vsnprintf in mingw
+      (charsbar)
+    - specify the correct ret value.
+
+0.05 2013-10-01T02:15:31Z
+
+    - MSVC fix comes from hoedown upstream.
+      (Reported by charsbar++)
+
+0.04 2013-09-30T11:03:15Z
+
+    - CONST() macro conflict with MinGW.
+      (reported by mattn++)
+
+0.03 2013-09-30T09:19:31Z
+
+    - Custom handler support(Not documented yet).
+      (tokuhirom)
+
+0.02 2013-09-28T09:53:42Z
+
+    [Incompatible Changes]
+    - All APIs are modified!
+    - Constants are exported.
+    - Supported TOC!
+
+0.01 2013-09-28T02:45:39Z
+
+    - original version
+

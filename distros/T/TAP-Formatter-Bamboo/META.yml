@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Slurp: 0
+  File::Temp: 0
+  Test::Harness: 0
+  Test::More: 0
+  Test::XML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.64
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAP-Formatter-Bamboo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: 2.42
+  Moose: 2
+  MooseX::NonMoose: 0.20
+  Test::Harness: 3.2
+  XML::LibXML: 2
+version: 0.04

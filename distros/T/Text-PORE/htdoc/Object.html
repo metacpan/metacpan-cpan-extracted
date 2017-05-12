@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Text::PORE::Object - PORE Objects</title>
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Text::PORE::Object - PORE Objects</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        $obj = new Text::PORE::Object('name'=&gt;'Joe Smith');
+        @chilren = (
+                new Text::PORE::Object('name'=&gt;'John Smith', 'age'=&gt;10, 'gender'=&gt;'M'),
+                new Text::PORE::Object('name'=&gt;'Jack Smith', 'age'=&gt;15, 'gender'=&gt;'M'),
+                new Text::PORE::Object('name'=&gt;'Joan Smith', 'age'=&gt;20, 'gender'=&gt;'F'),
+                new Text::PORE::Object('name'=&gt;'Jim Smith', 'age'=&gt;25, 'gender'=&gt;'M'),
+        );
+        $obj-&gt;{'children'} = \@chilren;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>PORE::Object is the superclass of all renderable objects. That is, if you want to render an object, the
+object must be an instance of PORE::Object or an instance of its subclass.</p>
+<p>The purpose of this class is to provide methods to create and access attributes. Attributes can be
+created via the constructor <a href="#item_new"><code>new</code></a> and setters <a href="#item_setattribute"><code>setAttribute()</code></a> and <a href="#item_setattributes"><code>setAttributes()</code></a>. Attributes can be 
+retrieve via the getter <a href="#item_getattribute"><code>getAttribute()</code></a>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_new">new</a></strong><br />
+</dt>
+<dd>
+Usage:
+</dd>
+<dd>
+<pre>
+        new Text::PORE::Object();
+        new Text::PORE::Object($name1=&gt;$value1, $name2=&gt;$value2, ..., $nameN=&gt;$valueN);</pre>
+</dd>
+<dd>
+<p>The constructor can take no argument or a list of name-value pairs. If a list of name-value pairs is
+provided, the object is created with the given attributes.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_getattribute"><code>getAttribute()</code></a></strong><br />
+</dt>
+<dd>
+Usage:
+</dd>
+<dd>
+<pre>
+        $obj-&gt;getAttribute($name);</pre>
+</dd>
+<dd>
+<p>This method retrieves the value of the given attribute. If the attribute is an object, its reference is
+returned.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_setattribute"><code>setAttribute()</code></a></strong><br />
+</dt>
+<dd>
+Usage:
+</dd>
+<dd>
+<pre>
+        $obj-&gt;setAttribute($name=&gt;$value);</pre>
+</dd>
+<dd>
+<p>This method takes a name-value pair. It sets the attribute for the given name to the given value.
+If the attribute previously has an old value, the new value overrides the old one.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_setattributes"><code>setAttributes()</code></a></strong><br />
+</dt>
+<dd>
+Usage:
+</dd>
+<dd>
+<pre>
+        $obj-&gt;setAttributes($name1=&gt;$value1, $name2=&gt;$value2, ..., $nameN=&gt;$valueN);</pre>
+</dd>
+<dd>
+<p>This method takes a list of name-value pairs. It sets the attribute for each given name to its
+corresponding value.
+If the attribute previously has an old value, the new value overrides the old one.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Zhengrong Tang, <a href="mailto:ztang@cpan.org">ztang@cpan.org</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright 2004 by Zhengrong Tang
+
+</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+</p>
+
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+Changes
+lib/Tk/Panel.pm
+lib/Tk/StrfClock.pm
+lib/Tk/Month.pm
+lib/Tk/Year.pm
+bin/StrfClock
+bin/TkMonth
+MANIFEST
+Makefile.PL
+README
+INSTALL
+t/demo
+t/strfclock.t
+t/month.t
+t/year.t
+t/panel.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

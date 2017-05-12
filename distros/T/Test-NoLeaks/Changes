@@ -1,0 +1,23 @@
+0.05      2017-02-21 01:12:20+00:00 UTC
+ - switch to dzil
+
+0.05 2016-04-13 binary.com <perl@binary.com>
+ - Avoid testing via Test::TCP v2.15, as it has file-descriptors leak
+
+
+0.04 2016-01-01 binary.com <perl@binary.com>
+ - Added link to similar module (gh#1)
+ - Improved documentation.
+
+
+0.03 2016-01-04 binary.com <perl@binary.com>
+ - Dropped Devel::CheckOS build time dependency;
+ - Improved documentation.
+
+0.02 2015-12-31 binary.com <perl@binary.com>
+ - Fix leaks on pass details;
+ - Produce detailed report only on passes with leaks.
+
+
+0.01 2015-12-31 binary.com <perl@binary.com>
+ - Initial version, works on Linux only.

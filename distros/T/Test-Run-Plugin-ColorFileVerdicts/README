@@ -1,0 +1,13 @@
+Test-Run-Plugin-ColorFileVerdicts
+
+This is a Test-Run ( http://web-cpan.berlios.de/modules/Test-Run/ ) plugin
+that allows one to color the verdicts of the individual test files
+("ok" and "NOT OK") in terminal colors. If you want to color the summary line
+look at Test-Run-Plugin-ColorSummary and Test-Run-CmdLine-Plugin-ColorSummary.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Shlomi Fish
+
+This program is released under the following license: MIT X11.
+

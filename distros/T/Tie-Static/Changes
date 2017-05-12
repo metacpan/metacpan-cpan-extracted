@@ -1,0 +1,12 @@
+Revision history for Perl extension Tie::Static.
+
+0.01  Sat Jul 14 20:00:00 EDT 2001
+	- Original version
+
+0.03  Fri Sep 26 21:45:00 PDT 2003
+	- Apply improvements from Perlmonks
+	- Switch to Module::Build
+
+0.04  Sat Apr  9 23:20 PDT 2003
+        - Change email address.
+	- Switch from passthrough to traditional.

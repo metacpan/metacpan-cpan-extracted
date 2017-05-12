@@ -1,0 +1,59 @@
+{
+   "abstract" : "Tripletail, Framework for Japanese Web Application",
+   "author" : [
+      "Ymirlink <tl@tripletail.jp>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tripletail",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "sample"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : 0,
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Zlib" : 0,
+            "Crypt::CBC" : 0,
+            "Crypt::Rijndael" : 0,
+            "DBI" : 0,
+            "Digest::SHA" : 0,
+            "IO::Scalar" : 0,
+            "LWP::UserAgent" : 0,
+            "List::MoreUtils" : 0,
+            "MIME::Body" : 0,
+            "MIME::Decoder" : 0,
+            "MIME::Entity" : 0,
+            "MIME::Parser" : 0,
+            "MIME::Words" : "5.411",
+            "Scalar::Lazy" : "0.03",
+            "Sub::Install" : 0,
+            "Unicode::Japanese" : "0.43",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.50"
+}

@@ -1,0 +1,9 @@
+release 0.5 az  Fri Nov 27 11:33:55 2009
+  
+  added support for displaying typed basenames
+
+release 0.4 az Thu Sep 18 14:35:20 2008
+
+ added compat mode: tm::view can now operate on views generated
+ with TM versions <1.31.
+

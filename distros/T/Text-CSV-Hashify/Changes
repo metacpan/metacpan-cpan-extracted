@@ -1,0 +1,30 @@
+Revision history for Perl module Text::CSV::Hashify
+
+0.08 Wed Mar 15 16:36:02 EDT 2017
+    - Add BUGS and SUPPORT to documentation.
+
+0.07 Fri Jun  5 21:50:41 EDT 2015
+    - Add an acknowledgement.
+
+0.06 Sat Feb 15 17:22:10 EST 2014
+    - Documentation change only.  Clarify requirement for a field to serve
+      as a primary key.
+
+0.05 Fri Feb 08 20:39:00 EST 2013
+    - Code and documentation revisions in response to tickets 83168 and 83169
+      at https://rt.cpan.org/Dist/Display.html?Queue=Text-CSV-Hashify
+
+0.04 Mon Feb 04 19:39:00 EST 2013
+    - Use 'use open' pragma per Nick Patch++ code review.
+
+0.03 Sun Dec 23 12:23:42 EST 2012
+    - Get "format => 'aoh'" option working and tested.
+
+0.02 Sat Dec 22 21:10:15 EST 2012
+    - Get options, including those passed through to Text::CSV::new(),
+      working.
+
+0.01 Fri Dec 21 22:32:58 2012
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

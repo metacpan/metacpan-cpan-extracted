@@ -1,0 +1,46 @@
+exec /usr/bin/perl -M'Tk::QuickTk::WebColor=app' -e app $0;exit
+#                                                               file: pickhues
+
+m MainWindow           title:'pickhues:  QuickTk Color Picker Demo'
+                         ... ini:$$gl{layermode}='Multiple';
+                         ...     $$gl{labelmode}='Nolabel';
+  m Frame              side:top fill:x : relief:raised borderwidth:3
+    f Menubutton       side:left : text:File
+      c c              label:Clear sub:$$w{mc}->delete('all');
+      l c              label:'Light Cube'
+                         ... sub:map { layer($gl,$_); } (5..15);
+      d c              label:'Dark Cube'
+                         ... sub:map { my $i=15-$_;layer($gl,$i); } (5..15);
+      x -
+      q c              label:Quit sub:exit;
+    l Menubutton       side:left : text:Layers
+      bla c            label:black(c) sub:c_layer $gl,0;
+      l01 c            label:lyr01    sub:c_layer $gl,1;
+      l02 c            label:lyr02    sub:c_layer $gl,2;
+      l03 c            label:lyr03(c) sub:c_layer $gl,3;
+      l04 c            label:lyr04    sub:c_layer $gl,4;
+      lo5 c            label:lyr05    sub:c_layer $gl,5;
+      x -
+      l06 c            label:lyr06(c) sub:c_layer $gl,6;
+      l07 c            label:lyr07    sub:c_layer $gl,7;
+      l08 c            label:lyr08    sub:c_layer $gl,8;
+      l09 c            label:lyr09(c) sub:c_layer $gl,9;
+      y -
+      l10 c            label:lyr10    sub:c_layer $gl,10;
+      l11 c            label:lyr11    sub:c_layer $gl,11;
+      l12 c            label:lyr12(c) sub:c_layer $gl,12;
+      l13 c            label:lyr13    sub:c_layer $gl,13;
+      l14 c            label:lyr14    sub:c_layer $gl,14;
+      l15 c            label:white(c) sub:c_layer $gl,15;
+    y Button           side:left : relief:flat textvariable:\$$gl{layermode}
+                         ... sub:$$gl{layermode}=
+                         ...   ($$gl{layermode} ne 'Multiple')?'Multiple':'Single';
+    b Button           side:left : relief:flat textvariable:\$$gl{labelmode}
+                         ... sub:$$gl{labelmode}=
+                         ...     ($$gl{labelmode} ne 'Nolabel')?'Nolabel':'Label';
+                         ...   clabel $gl;
+    e Menubutton       side:left : text:Edit
+    h Menubutton       side:right : text:Help
+      a c              label:About sub:my $out=$$w{mc};print "About called\n";
+  c Canvas             side:top fill:both expand:1 : width:640 height:480
+    s createRectangle  nopack : 70: 0: 570: 480: tags:screen

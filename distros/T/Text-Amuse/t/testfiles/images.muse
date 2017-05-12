@@ -1,0 +1,11 @@
+#title Images!
+
+Test [[myimage.png]] [[myimage.png]] [[myimage.png]] [[myimage.png]] 
+
+[[myimage.png]] 
+
+[[myimage.png]] 
+
+[[myimage.png][with a desc]]] 
+
+[[other.png][with a desc]]

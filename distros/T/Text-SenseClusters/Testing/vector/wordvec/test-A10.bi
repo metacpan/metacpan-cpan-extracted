@@ -1,0 +1,12 @@
+stir<>soup<>5 21 64
+soup<>plate<>8 70 14
+hot<>soup<>12 173 64
+hot<>plate<>9 173 29
+salt<>pepper<>42 124 121
+taste<>salt<>18 83 84
+add<>salt<>12 157 84
+stir<>lemon<>2 21 53
+lemon<>juice<>2 10 2
+add<>lemon<>3 157 53
+lemon<>pepper<>3 67 120
+stir<>juice<>2 21 27

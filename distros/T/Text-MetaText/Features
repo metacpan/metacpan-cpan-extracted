@@ -1,0 +1,363 @@
+#========================================================================
+#
+# Text::MetaText 
+#
+#   Version 0.22
+# 
+#   Copyright (C) 1996-1998 Andy Wardley <abw@kfs.org>.  
+#   All Rights Reserved.
+#
+#------------------------------------------------------------------------
+#
+# Features
+#
+#   This file gives a general overview of the features of Text::MetaText.
+#   Considering, in particular, the number of various text/template 
+#   processing modules available in CPAN, this file should help the 
+#   potential user determine if the module is suitable for their needs.
+#
+#   A brief description of some of the other text/template processing 
+#   modules available follows the Text::MetaText features list.
+#
+#========================================================================
+
+MetaText is a (yet another) text processing and markup meta-language 
+which can be used for processing "template" files. 
+
+Like a glorified pre-processor, MetaText can; include files, define 
+and substitute variable values, execute conditional actions based on 
+variables, call other perl functions or object methods and capture the 
+resulting output back into the document, and more. It can format the 
+output of any of these operations in a number of ways. The 
+objects, and inherently, the format and semantics of the MetaText 
+langauge itself, are highly configurable.
+
+MetaText does *not* evaluate any code using perl's 'eval' function.
+This makes it safe to use in an environment where the input cannot
+be verified or trusted.  The implications of a malicious (or possibly 
+accidental) directive in a document are serious:
+
+    Some document, blah, blah, blah
+    %% system('rm -fr *') %%       # not a problem with MetaText
+    more generic document stuff, blah, blah
+  
+On the other hand, a text processing system that allows embedded perl 
+programs to be executed is naturally far more powerful.  MetaText is not 
+that beast.  There are several other modules which perform that task 
+admirably, as described in the final section below.
+
+What MetaText benefits from this approach is that the syntax is greatly
+simplified.  Web Designers, for example, who have no knowledge of perl
+or desire to learn (shame on them!) can quite happily use MetaText to 
+markup template documents and rely on its limited but powerful range of 
+features to get the job done quickly and well.  MetaText supports a 
+number of directives that have functionality "built in" such as 
+INCLUDE which processes and inserts the contents of an external file.
+
+When the default MetaText command set simply isn't enough, an EXECUTE 
+configuration flag can be set to allow externally defined functions or 
+class methods to become part of the syntax.  In this way, it is possible
+to extend MetaText quickly and easily to execute any arbitrary perl in a 
+safe and restricted manner.
+
+
+#------------------------------------------------------------------------
+# About MetaText
+#------------------------------------------------------------------------
+
+* MetaText is written entirely in Perl 5.
+
+* MetaText is free software.  You are free to use, distribute and modify
+  it under the terms of the Perl Artistic License.
+
+* MetaText is fully object-oriented and does not pollute the caller's
+  namespace.
+
+* MetaText is well documented and the code is thoroughly commented.
+  An ever-growing test suite is included to test the processor and 
+  provide user examples.
+
+* MetaText is beta-test software but is reliable and roadworthy.  
+  It has been developed and tested over a number of years and is now 
+  generally very stable.  
+  
+* The interface _may_ change in future versions.  It is for this reason 
+  that MetaText is still "in beta".  Every effort has, and will be made
+  to maintain backwards compatibility.  No major interface changes are
+  planned that will not be backwardly compatible.
+
+* MetaText is '-w' and 'use strict' compliant.
+
+* MetaText is Y2k compliant, however nonsensical that notion may be.
+
+
+#------------------------------------------------------------------------
+# Feature Summary
+#------------------------------------------------------------------------
+
+* Text files and strings can be processed and any embedded directives 
+  are expanded.
+
+* Directives may be placed anywhere in a text file or string and are
+  enclosed in 'magic' tokens which may be user-defined tokens 
+  (default: '%%'):
+
+    some text, blah, blah, %% INCLUDE some/file %% yah, yah, yah
+    with user-defined tokens:  <!-- INCLUDE some/file --> etc., etc
+
+* Directives may contain any whitespace, including blank lines:
+
+    %%
+        INCLUDE foo/bar
+
+        var1 = valA
+        var3 = valB
+        no_space=no_problem
+    %%
+
+* Significant whitespace should be quoted
+
+    %% INCLUDE me
+       name = "Andy Wardley"
+    %%
+
+* Directive names may be specified in either case (although UPPER CASE
+  is recommended for clarity)
+
+    %% INCLUDE foo %%
+    %% include bar %%
+
+* Variables can be defined in the calling perl code or within a 
+  template document itself:
+
+    %% DEFINE foo=bar baz="A string" %%
+
+* Variables can be interpolated into the document:
+
+    %% foo %%   (the verbose version is '%% SUBST foo %%')
+
+* Variables can be interpolated into other variables:
+
+    %% DEFINE rootpath=/home/abw       %%
+    %% DEFINE imgpath=$rootpath/images %%
+
+* Variable names can be treated case sensitively or insensitively 
+  (default).
+
+    %% DEFINE config="-vaf" %%
+    %% config %%  %% CONFIG %%  %% Config %%   # all OK by default
+
+* The INCLUDE directive can be used to import (and process) other files:
+
+    %% INCLUDE header %%
+
+* Directives (including INCLUDE) can be nested inside other files.
+
+* Variables can be used to specify the INCLUDE filename:
+
+    %% DEFINE header=abw/graphics/header %%
+    %% INCLUDE $header %%
+
+* A 'LIB' configuration variable specifies one or more directories where
+  included (via INCLUDE) files are to be found.  Absolute file paths can 
+  also be specified.
+
+* Additional variable definitions can be added to an INCLUDE directive.
+  All variable values are inherited by sub-documents (as per SGML/XML, 
+  etc) and changes are locally scoped.
+
+    %% INCLUDE my_html_header
+       title   = "My Home Page"
+       bgcolor = "#ffffff"
+    %%
+
+* BLOCK elements can be defined within a document to avoid having to 
+  INCLUDE a separate file:
+
+    <table>
+    %% INCLUDE table_line id=tom name="Thomas Trumpton" %%
+    %% INCLUDE table_line id=dic name="Richard Chigley" %%
+    </table>
+
+    %% BLOCK table_line %%
+    <tr>
+        <td>%% id %%</td>
+        <td>%% name %%</td>
+    </tr>
+    %% ENDBLOCK %%
+
+* All variable specification and interpolation options apply equally to 
+  '%% INCLUDE <block> %%' directives as to '%% INCLUDE <file> %%'.
+
+* The parsed contents of include files and defined blocks are cached
+  internally to increase the speed of repetitive processing.  This gives 
+  a significant performance boost, particularly when processing multiple 
+  files or when using a persitant MetaText object (as you might with 
+  mod_perl, for example).
+
+* the content of blocks can be pre-declared by a calling script (i.e. 
+  pre-caching).
+
+* Complex conditional statements can be specified in INCLUDE directives
+  to specify (at 'run-time') if the file or block should be included or
+  ignored:
+
+    %% INCLUDE myfile 
+       if = "xyz < $max && (name =~ /Wardley/ || id in 'tom,dick,harry')" 
+    %%
+
+* 'unless' is similar, but negates the evaluation:
+
+    %% INCLUDE higfx/header unless=textmode %%
+
+* Standard and user-definable filters can be used to post-process the 
+  contents of included files or blocks:
+
+    %% INCLUDE myfile
+       filter = escape(['])
+    %%
+
+    %% INCLUDE myblock
+       filter = my_own_filter(param1, param2, etc)
+    %%
+
+* printf-like formats may also be specified for post-processing
+
+    %% INCLUDE myfile
+       format = "## %72s ##"
+    %%
+
+* An __END__ or __MTEND__ marker can be placed in the input text to mark
+  the point at which processing should stop.  Certain MetaText directives
+  (such as BLOCK...ENDBLOCK definitions) can be specified after this 
+  point and incorporated into the document proper.
+
+    %% INCLUDE myblock %%
+
+    __MTEND__
+    %% BLOCK myblock %% This is my block %% ENDBLOCK %%
+
+* The EXECUTE configuration options allows class methods and perl 
+  functions to be executed as directives.  Variables can be defined 
+  in the normal way and get passed to the function as a hash reference:
+
+    %% my_function 
+       name = Fred
+       age  = 42
+    %%
+  
+* MetaText has user-definable error reporting and a comprehensive
+  debug facility.
+
+* MetaText is ideally suited to web content creation for both 
+  static (processed off-line) and dynamically generated web pages, as 
+  well as many other tasks.  
+
+
+#------------------------------------------------------------------------
+# The 'metapage' Processor.
+#------------------------------------------------------------------------
+
+The 'metapage' processor is a utility script that is distributed as part
+of the Text::MetaText package (in the distribution 'bin' directory and 
+installed to your perl bin directory when you 'make install').  
+
+It may be convenient to think of metapage as the MetaText equivalent of 
+make(1S), but nicer.  :-)
+
+* Versatile configuration allows multiple profiles to be defined and 
+  incorporated easily.
+
+* MetaText configuration items and pre-defined variables can be specified
+  in metapage config files.
+
+* Numerous command-line options are available to tailor behaviour.
+
+* Can traverse document trees examining time stamps to determine which 
+  files should be processed.
+
+
+
+#========================================================================
+#
+# Other Text/Template Processing Modules
+#
+#   This section lists some of the other text/template processing 
+#   modules available from CPAN.  This list is not comprehensive either 
+#   in the number of modules included, or in the detail in which they are 
+#   described.  
+#
+#   As the author of Text::MetaText, I am naturally enamoured to my own 
+#   solution and as such, my opinion is likely to be biased.  I have 
+#   tried to briefly summarise the key features of each module as I 
+#   understand them, but I would urge the reader to examine the 
+#   relevant documentation in detail to get the full picture.
+#
+#   I welcome corrections and additions from the modules' authors or 
+#   indeed anyone else who has a more comprehensive understanding of 
+#   these packages than I.
+#
+#========================================================================
+
+#------------------------------------------------------------------------
+# Parse::ePerl by Ralf S. Engelschall <rse@engelschall.com>
+#------------------------------------------------------------------------
+
+ePerl interprets an ASCII file bristled with Perl 5 program
+statements by evaluating the Perl 5 code while passing through
+the plain ASCII data.  ePerl is an ANSI C program that actually
+embedds a perl processor within itself.  Code within '<: ... :>'
+blocks is evaluated and all other text is passed through.
+
+Example:
+    #!/path/to/eperl
+    foo bar
+    baz quux
+    <: for ($i = 0; $i < 10; $i++) { print "foo #${i}\n"; } :>
+    foo bar
+    baz quux
+
+See:
+    http://www.engelschall.com/sw/eperl/
+
+
+#------------------------------------------------------------------------
+# Text::Vpp by Dominique Dumont <Dominique_Dumont@grenoble.hp.com>
+#------------------------------------------------------------------------
+
+A fast and lightweight pre-processor which is a suitable replacement
+for cpp or m4.  Supports @INCLUDE, @EVAL, @IF, @ELSIF and @ENDIF 
+statements.  Statements must be placed at the start of a line but may
+be prefixed with any user-defined character.  Includes a 'vpp' 
+script which encapsulates the module for processing files directly
+from the command line.
+
+Example:
+
+    @INCLUDE inc_text.txt
+    @EVAL $var2 = 1
+    @IF $var2
+    We should see this line
+    @ELSE
+    But not this one
+    @ENDIF
+     
+
+#------------------------------------------------------------------------
+# Text::Template by Mark-Jason Dominus <mjd@pobox.com>
+#------------------------------------------------------------------------
+
+A generic template processing module which allows tiny perl programs
+to be embedded in text files.  When a template is filled in, the perl
+programs are evaluated, and replaced with their values.  Simple and 
+fast yet versatile.
+
+Example:
+ 
+    Dear {$title} {$lastname},
+      
+    It has come to our attention that you are delinquent 
+    in your {$last_paid_month} payment.  Please remit 
+    ${sprintf("%.2f", $amount)} immediately, or your patellae 
+    may be needlessly endangered.
+   

@@ -1,0 +1,4 @@
+Wenn heute irgendwo Daten bereitstehen, dann oft in XML. Perl bietet eine
+Unzahl von Methoden, XML zu bearbeiten. Um die Auswahl des am besten
+geeigneten Verfahrens zu erleichtern, stellt der Perl-Snapshot heute 
+die gängigsten mit ihren Vor- und Nachteilen vor.

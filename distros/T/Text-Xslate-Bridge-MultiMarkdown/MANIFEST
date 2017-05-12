@@ -1,0 +1,9 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+README.pod
+dist.ini
+lib/Text/Xslate/Bridge/MultiMarkdown.pm

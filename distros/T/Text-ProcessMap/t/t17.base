@@ -1,0 +1,37 @@
+----------------------------------------------------------------
+                             Lorem                              
+                          Lorem Ipsum                           
+                       Diagram Number 17                        
+----------------------------------------------------------------
+   Lorem Ipsum dolor sit amet, consectetuer adipiscing elit.    
+----------------------------------------------------------------
+      COLUMN1       ||      COLUMN2       ||      COLUMN3       
+----------------------------------------------------------------
+
++------------------.                        +------------------.
+|      HEADER      |    This is an Arrow    |      [O01]       |
+|------------------|   with a fairly long   |      Lorem       |
+|      [I01]       |          name          |   Lorem Ipsum    |
+|      Lorem       |  ------------------->  | dolor sit amet,  |
+|   Lorem Ipsum    |                        |   consectetuer   |
+| dolor sit amet,  |  +------------------.  | adipiscing elit. |
+|   consectetuer   |  |  This is a big   |  `------------------'
+| adipiscing elit. |  | header thank you |                      
+`------------------'  |------------------|                      
+                      |      [P01]       |                      
++------------------.  |      Lorem       |                      
+|      [I02]       |  |   Lorem Ipsum    |                      
+|      Lorem       |  | dolor sit amet,  |                      
+|   Lorem Ipsum    |  |   consectetuer   |                      
+| dolor sit amet,  |  | adipiscing elit. |                      
+|   consectetuer   |  |------------------|                      
+| adipiscing elit. |  |  This is a big   |                      
+|------------------|  | footer thank you |                      
+|      FOOTER      |  `------------------'                      
+`------------------'                                            
+
+   Lorem Ipsum dolor sit amet, consectetuer adipiscing elit.    
+
+----------------------------------------------------------------
+lorem_ipsum                                           00/00/0000
+----------------------------------------------------------------

@@ -1,0 +1,19 @@
+Revision history for Test-Mini
+
+v1.0.3  2011-02-12
+        Bumped required version of Test::Mini.  Fixes test failures on Perl >=
+        5.13.
+
+v1.0.2  2011-02-10
+        Fixed a bug in Makefile.PL that caused failures with older versions of
+        ExtUtils::MakeMaker.
+
+        Added a proper $VERSION to the Test::Mini::Unit package.
+
+v1.0.1  2010-10-14
+        Bumped required version of Test::Mini.  Fixes test failures on Perl >=
+        5.9.5.
+
+v1.0.0  2010-09-30
+        First Major Version
+

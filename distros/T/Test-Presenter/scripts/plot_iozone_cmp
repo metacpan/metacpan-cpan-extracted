@@ -1,0 +1,71 @@
+#!/bin/sh
+#
+# Generate gnuplot graphs using iozone data file
+
+file_name1=${1:-iozone.sys.log}
+file_name2=${2:-iozone.nfsv3.log}
+file_name3=${3:-iozone.smb.log}
+
+#echo "Usage : $0 <nfsv4_iozone_file> <nfsv3_iozone_file> <samba_iozone_file>"
+
+template=iozone.dem
+
+# 2d template
+#
+do_template() {
+  echo "
+set terminal png
+set output '$file_name1.cmp.png'
+set size 1.5,1.0
+set title 'Iozone Read Performance'
+set multiplot
+set logscale x 2
+set xtics 0,10
+set xlabel 'File Size mB'
+
+set size 0.75,0.75
+set origin 0.0,0.0
+set yrange [1:120]
+set ylabel 'mB/s'
+set data style lines
+plot 'file1.gnuplot' using (\$1/1024):(\$4/1024) title 'NFSv4' lt 1, \
+     'file2.gnuplot' using (\$1/1024):(\$4/1024) title 'NFSv3' lt 2, \
+     'file3.gnuplot' using (\$1/1024):(\$4/1024) title 'Samba/CIFS' lt 3
+
+set size 0.75,0.75
+set origin 0.75,0.0
+set grid lt 2 lw 1
+#set ytics autofreq
+set key
+set logscale x 2
+set logscale y 2
+set yrange [4:16384]
+set ylabel 'Rec Size kB'
+set zrange [0:120]
+set zlabel 'mB/s'
+set title 'Iozone Read Performance'
+set dgrid3d 40,40,3
+set hidden3d
+set data style lines
+splot 'file1.3d.gnuplot' using (\$1/1024):2:(\$4/1024) title 'NFSv4' lt 1, \
+      'file2.3d.gnuplot' using (\$1/1024):2:(\$4/1024) title 'NFSv3' lt 2, \
+      'file3.3d.gnuplot' using (\$1/1024):2:(\$4/1024) title 'Samba/CIFS' lt 3
+" > $template
+}
+
+do_template
+
+count=0
+for file in $file_name1 $file_name2 $file_name3; do
+    let count=$count+1
+    if [ ! -f $file ] || ! grep complete $file >/dev/null; then
+        file=iozone.blank
+    fi
+    awk '$1 ~ /^[0-9]+/ && $2 ~ /64/ { print  $1 " " $2 " " $3 " " $5 }' < $file > file${count}.gnuplot
+    awk '$1 ~ /^[0-9]+/ { print  $1 " " $2 " " $3 " " $5 }' < $file > file${count}.3d.gnuplot
+done
+
+gnuplot $template
+[ -f iozone.dem ] && rm iozone.dem
+rm *.gnuplot
+

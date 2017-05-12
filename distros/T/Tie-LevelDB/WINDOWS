@@ -1,0 +1,19 @@
+Tie-LevelDB can be build under Windows by meeting the following conditions:
+
+1. Install Microsoft Visual Studio 2010 Express Edition (cl, link, nmake).
+2. Install Microsoft Visual Studio 2010 Service Pack 1.
+3. Install Microsoft Windows SDK for Windows 7 and .NET Framework 4 (windows headers).
+2. Merge Boost C++ v1.47 (already done in the windows port of that module).
+3. Deploy required DLLs (already done in the windows port of that module).
+
+To build the module open "Visual Studio Command Prompt (2010)" and
+type the following commands:
+
+cd Tie-LevelDB-x.xx
+perl Makefile.PL
+nmake
+nmake test
+nmake install
+
+Last command will install the module system wide and also deploy the
+required extra DLLs.

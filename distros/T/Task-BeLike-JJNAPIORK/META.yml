@@ -1,0 +1,39 @@
+---
+abstract: 'Stuff I use to start or maintain a CPAN project'
+author:
+  - 'John Napiorkowski C< <<jjnapiork@cpan.org>> >'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Task::BeLike::JJNAPIORK
+name: Task-BeLike-JJNAPIORK
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  App::cpanminus: 1.4004
+  App::local::lib::helper: 0.04
+  Module::Install: 1.00
+  Module::Install::AutoLicense: 0.08
+  Module::Install::AutoManifest: 0.003
+  Module::Install::Homepage: 0.01
+  Module::Install::ManifestSkip: 0.14
+  Module::Install::ReadmeMarkdownFromPod: 0.03
+  Module::Install::Repository: 0.06
+  Module::Setup: 0.09
+  Module::Setup::Flavor::JJNAPIORK: 0.05
+  perl: 5.8.5
+resources:
+  homepage: http://search.cpan.org/dist/Task-BeLike-JJNAPIORK/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jjn1056/Task-BeLike-JJNAPIORK.git
+version: 0.09

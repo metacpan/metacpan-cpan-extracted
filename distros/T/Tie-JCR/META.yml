@@ -1,0 +1,13 @@
+abstract: A tied hash interface for Java::JCR::Node
+author: Andrew Sterling Hanenkamp, <hanenkamp@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Tie-JCR
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Java::JCR: 0
+version: 0.02

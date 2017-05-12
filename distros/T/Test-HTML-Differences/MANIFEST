@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test/HTML/Differences.pm
+minil.toml
+t/00_compile.t
+t/01_normalize_html.t
+t/02_test.t
+xt/98_perlcritic.t
+xt/perlcriticrc
+META.yml
+MANIFEST

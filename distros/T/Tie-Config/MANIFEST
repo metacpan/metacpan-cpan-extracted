@@ -1,0 +1,12 @@
+Changes
+INSTALL
+MANIFEST
+README
+Makefile.PL
+Config.pm
+t/00load.t
+t/01read.t
+t/02write.t
+t/03afterwrite.t
+t/04rdonly.t
+t/05clear.t

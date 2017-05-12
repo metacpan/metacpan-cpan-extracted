@@ -1,0 +1,141 @@
+Revision history for Test-Mojo-Trim
+
+0.1000 2016-07-22 12:46:21 UTC
+ [Meta]
+ - Updated iller.yaml to current syntax.
+
+ [Testing]
+ - Added a real test.
+
+ [Bug Fixes]
+ - Fixed Mojolicious 7.0 compatibility (fixes #2).
+
+ [Stats & Dependency Changes]
+ - 5 files changed, 50 insertions(+), 28 deletions(-)
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (test req) + ExtUtils::MakeMaker (any)
+ - (test req) + File::Spec (any)
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (test rec) + CPAN::Meta 2.120900
+ - (conf req) + ExtUtils::MakeMaker (any)
+ - (conf req) - Module::Build::Tiny
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::DistIller::MetaGeneratedBy (any)
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Contributors 0.017
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::MakeMaker (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.054
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::ReportPrereqs 0.021
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Pod::Weaver::Section::Badges 0.0401
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::ContributorsFromGit
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::ModuleBuildTiny
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0310
+
+0.0904 2015-02-12T21:55:01Z CET
+ [Requirements]
+ - Removed an unused Pod::Weaver plugin from prereqs.
+
+0.0903 2015-02-12T18:18:19Z CET
+ [Meta]
+ - Removed cpanfile, now prereqs are set in dist.ini.
+
+ [Enhancements]
+ - Updated usage of deprecated syntax to current api.
+
+0.0902 2015-02-06T23:23:26Z CET
+ [Revision]
+ - Bump version number to pass tests.
+
+0.0901 2015-02-06T23:16:29Z CET
+ [Meta]
+ - No functional changes.
+ - Changed versioning to x.yyyy.
+ - Now uses @Author::CSSON dist zilla bundle, expanded.
+ - Removed the last traces of Dist::Milla.
+
+ [Documentation]
+ - Rebuilt with Podweaver.
+
+0.0900 2014-12-04T15:30:57Z CET
+ - Better use of Mojo::DOM api.
+
+0.08 2014-09-18T21:19:44Z CEST
+ - In case of request failer (ie status 500) the result is parsed and
+   output in a more readable style.
+ - Fix missing build prereqs.
+
+0.07 2014-09-06T15:31:51Z CEST
+ - Added Travis build status.
+ - Added [Test::EOL] and [Test::EOF]
+
+0.06 2014-09-06T07:29:03Z CEST
+ - Fixed faulty Perl version requirement
+
+0.05 2014-09-04T20:44:07Z CEST
+ - Fixed a cosmetic problem related to last release where it would think
+   that a request error had occured
+
+0.04 2014-09-04T16:44:56Z CEST
+ - If the request fails it dumps the Mojolicious error page, which is hard
+   ro read. This release extracts the specific action and adds it to the
+   test description.
+
+0.03 2014-08-31T18:06:32Z CEST
+ - Improved test message
+
+0.02 2014-08-31T11:23:53Z CEST
+ - Added missing dependency
+
+0.01 2014-08-31T10:46:14Z CEST
+ - Initial release.

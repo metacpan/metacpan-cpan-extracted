@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+README
+Readme.md
+dist.ini
+lib/Task/BeLike/Cebjyre.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/task-bogus.t

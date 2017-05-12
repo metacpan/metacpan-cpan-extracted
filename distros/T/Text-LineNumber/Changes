@@ -1,0 +1,5 @@
+Revision history for Text-LineNumber
+
+0.02    Sun Jul  6 01:42:08 CEST 2008
+        Ripped from Search.WuManber/demo.pl and wrapped in an own module.
+	Does not really belong to WuManber. It is completly independant.

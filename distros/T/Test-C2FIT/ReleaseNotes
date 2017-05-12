@@ -1,0 +1,118 @@
+Revision history for Perl extension Test::C2FIT.
+
+0.08  Wed Jan 24 2008
+    - Reimplemented isnumber to using code fragment from Perl Cookbook.
+    - Christophe Hermier submitted Bug Fix to TypeAdapter's isnumber method.
+
+0.07  Sun Jun 04 2006   Martin Busik <martin.busik@busik.de>
+    - all calls to subs in Test::C2FIT-Packages is now done in the
+      "method" style, e.g. pkg->subname and not pkg::subname
+      (as only this style allows usage of static methods in subclasses)
+    - all constructor calls now pkg->new instead of new pkg()
+    - error handling in all Test::C2FIT classes now consistently
+      try/catch/otherwise
+    - unicode-characters handling in the spec (esp. nbsp (&#0160;))
+      modified. Perl creates internally (at least under 5.8.8) utf8
+      byte sequences. Input files are expected to be in iso-8859-* or
+      windows-1252 so these characters may be encoded by a single byte.
+      Therefore, a bit unpretty handling was implemented
+    - new makefile-target my_tidy - formats
+    - further tests in the t directory added
+0.06  Sat May 13 2006   Martin Busik <martin.busik@busik.de>
+    - Makefile.PL regarding META.yml modified
+    - fit_shell, an interactive shell for easy running the tests
+      added.
+    - startet with pod documentation
+    - filtering of diagnostic messages a la (java) commonLogging
+      implemented.
+
+0.05  Wed May 10 2006
+	- Rebuild of MANIFEST - some newly added files were missing.
+
+0.04  Fri May 5 2006	Tony Byrne
+	- Added an 'abstract' for search.cpan.org
+
+0.03  Tue May 2 2006	Tony Byrne
+	- Release to include missing files which had been submitted by Martin.
+
+0.02  Mon May 1 2006    Martin Busik <martin.busik@busik.de>
+	- simple entry point for FileRunner and WikiRunner
+		perl -MTest::C2FIT -e file_runner <input-file> <output-file>
+	- Output and result code of FileRunner and WikiRunner identical to
+		the reference implementation (java implementation, version 1.1).
+	- loading of Fixtures/Packages modified.
+		The specification requires the usage of java-style package
+		separators ("." instead of the perl-style "::"). Further, the
+		(input) documents shall use fully qualified package names. In
+		order to allow the usage of at least the specification documents
+		without change, special care is taken of the "fit.*" names.
+		Similar rules apply to "eg.*" and "fat.*" names.
+		The loader does not require each referenced package to be in a
+		separate file now.
+	- Added better support for TypeAdapters.
+		Test::C2FIT::Fixture implements the following methods which,
+		given a field or method name, returns the (fully qualified) package
+		name of the appropriate TypeAdapter:
+		suggestFieldType - used in ColumnFixture an RowFixture
+		suggestMethodResultType - used in ColumnFixture, RowFixture and 
+			ActionFixture
+		suggestMethodParamType - used in ActionFixture
+		by default, these methods make a lookup in an instance's hash. So 
+		either these methods are to overload or the appropriate hashes 
+		are to be filled.
+	- ActionFixture
+		loading of fixtures (see above)
+		added TypeAdapter-support in do_enter
+	- ColumnFixture
+		Bug in check() fixed. When execute() was called within the check()
+		method and execute() raised an exception, further handling ignored
+		this. (This bug is still exists in V1.1 of the java implementation)
+	- Fixture
+		TypeAdapter support (see above)
+		Bug in doRows fixed. Wrong iterator implementation, causing endless
+		loops if doRow() added further rows to the output.
+		implementation of exception() now identical to the java impl.
+		Implementation of check() regarding empty cells modified, behavior
+		now identical to the java impl.
+		Error text in loadFixture() modified according to the specification
+		(less verbose)
+	- GenericArrayAdapter
+		implementation of equals modified.
+	- Parse
+		Empty tags, e.g. "<td/>" will be now correctly parsed. Until yet,
+		there were an exeption (same problem occurs in the V1.1 of the
+		reference implementation)
+		Added dummy implementation of footnote()
+	- RowFixture
+		Printout of surplus rows corrected.
+	- TimedActionFixture
+		Time is printed in human readable form now
+	- TypeAdapter
+		Added better support for (specific) TypeAdapters
+		Implmenentation of equals() changed. In java, equals() is a method
+		of Object, it can be generally used. This is not required in perl,
+		but needed, when (propably) blessed objects are in place (e.g.
+	    { a => 1, b => 2 } eq { a => 1, b => 2} is not true).
+		The current implementation accomodates this.
+		For numeric comparison, the ScientificDouble is used
+		(as this is the lesser evil than abs($a - b) < 0.00001 :)
+		Given an undef, toString return now "null" (as in the V1.1 of
+		the reference implementation)
+	- Generally: Behavior checked against the version 1.1 of the java
+	  	implementation. 
+	- All examples of the reference implementation now also included.
+		The results are as identical to the reference implementation as
+		possible (e.g. "integer overflow")
+	- MINOR changes in the examples/input/*.html files.
+		Some files contained path specifiations with wildcards
+		(e.g. "Documents/AllFiles/magnitude/*.html) In order to get these
+		running, "Documents" was replaced by "input".
+		The WebPageExample refers now to URLs which (at present: 2006-05-01)
+		exist.
+	- examples-perl added
+		Contains an example which uses the above mentioned TypeAdapter 
+		features.
+
+0.01  Wed Apr 27 17:10:52 2005
+	- Initial version.
+

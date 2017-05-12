@@ -1,0 +1,9 @@
+Changes
+lib/Tie/Array/Packed/Auto.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/1_default_backend.t
+t/2_force_perl_backend.t
+t/pods.t

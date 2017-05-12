@@ -1,0 +1,98 @@
+Revision history for Perl extension TAP::Parser::SourceHandler::pgTAP.
+
+3.33  2017-03-04T23:40:01Z
+     - Added trigger-testing functions to the output of `pg_tapgen`, thanks to
+       Rodolphe Quiédeville (PR #11).
+     - Added enum- and extension-testing functions to the output of
+       `pg_tapgen`, thanks to Rodolphe Quiédeville (PR #13, PR #14).
+     - Explicitly set the `psql` `pager` variable to `off`, instead of not
+       setting it, to ensure it is always off. Thanks to Keith Fiske for the
+       report (theory/pgtap#135).
+
+3.32  2016-05-11T23:37:30Z
+     - Fixed quoting of default values output by `pg_tapgen`, thanks to a pull
+       request from Rodolphe Quiédeville (#7).
+     - Various fixes and improvements to `pg_tapgen`, including:
+         - Added `--create-extension` and `--no-create-extension` options to
+           include or exclude the `CREATE EXTENSION pgtap` statement in the
+           generated test files.
+         - Fixed a bug that threw an error when no database connection options
+           were specified.
+         - Added support for the `$PGPASSWORD` environment variable.
+         - The emitted test scripts now include an appropriate plan that
+           counts assertions, rather than `no_plan`, thanks to @slaught.
+         - Added a number of additional tests to the emitted tests scripts,
+           again thanks to @slaught, including:
+             * Foreign table tests
+             * Materialized view tests
+             * Object ownership tests
+         - Column tests now explicitly specify the table schema and test
+           descriptions, thanks to @slaught.
+         - The column default tests now work properly with default values that
+           include strings inside function calls, such as
+           `nextval(''artist_id_seq'')`.
+     - Refactored `pg_prove` to better follow the interface provided by
+       App::Prove. This improves option processing, notably single-letter
+       option bundling now works properly.
+
+3.31  2015-06-19T23:41:19Z
+     - The `--ext` option to `pg_prove` now always identifies pgTAP tests. Use
+       `prove` with the `--pgtap-option suffix=.foo` option to mix pgTAP tests
+       with other tests.
+
+3.30  2014-01-31T21:10:54Z
+     - Removed markup from preformatted text in the `pg_prove` documentation.
+     - Updated copyright dates.
+     - Added note to the docs mentioning that `pg_prove`-specific options are
+       not supported in `.proverc`, unfortunately.
+     - Removed `ON_ERROR_ROLLBACK=1`, as it does not work well with scripts,
+       anyway.
+     - Removed the Pod tests from the distribution.
+
+3.29  2013-01-09T00:15:34Z
+     - Restored the `-t` alias for the the `--timer` option, thanks to Norman
+       Yamada.
+     - Fixed the documentation for the alias of `--color`, which is `-c`, not
+       `-t`.
+
+3.28  2012-05-07T22:01:02Z
+     - Simplified handling of `--runtests` in `pg_prove` to be a bit less
+       fragile. Based on a report from Giorgio Valoti.
+     - Added a bunch of table-testing functionality to `pg_tapgen`. It now
+       writes files for each table to a specified `--directory`.
+
+3.27  2011-08-03T18:41:29
+     - Eliminated "Use of qw(...) as parentheses is deprecated" on Perl 5.14.
+     - Updated copyright dates.
+     - Updated email address in `pg_tapgen`.
+
+3.26 2011-03-30T18:22:25
+     - Fixed exit code in `pg_prove`. It no longer returns 0 on fail and 1 on
+       pass. Thanks to Rod Taylor for the report!
+
+3.25 2011-02-08T17:42:21
+     - Fixed shebang line in `pg_prove` so that it will be properly rewritten
+       upon installation.
+     - The `-S/--set` option added in 3.24 is now properly passed to `psql`.
+       Norman Yamada.
+
+3.24  2011-01-13T22:26:47
+     - Added -S/--set option to pg_prove to allow the setting of psql
+       variables. Patch by Norman Yamada.
+
+3.23  2010-09-08T22:32:05
+      - Disable --failures by default.
+      - Enable --comments by default. This is so that failure diagnostics will
+        appear even when not in verbose mode. This is how the `pg_prove`
+        distributed with pgTAP works. Use --no-comments or --quiet to disable
+        them.
+
+3.22  2010-08-15T01:06:08
+      - Moved from the Test::Harness distribution to its own distribution.
+      - No assume that a test string starting with "pgtap:" and is not a file
+        name is SQL to be executed.
+      - Moved `pg_prove` from the pgTAP distribution and rewrote it to use
+        App::Prove and pgTAP.
+      - Rewrote `pg_prove` to use App::Prove, thus gaining most of its
+        features.
+        

@@ -1,0 +1,6 @@
+This file just is here to be patched!
+After a patch a line with the new version should be appended.
+VERSION == 19000
+VERSION == 20000
+VERSION == 20001
+VERSION == 20003

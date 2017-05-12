@@ -1,0 +1,14 @@
+Revision history for Tree-Base
+
+v0.10.2 2009-08-11
+
+  * optimization: don't stringify parent when checking in root()
+
+v0.10.1 2009-01-31
+
+  * first public release
+
+See the source code repository for more detail.
+  http://svn.scratchcomputing.com/Tree-Base/trunk
+
+vim:ts=2:sw=2:et:sta

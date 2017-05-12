@@ -1,0 +1,29 @@
+Tk-MARC::Editor
+===============
+
+This is a widget for free-form editing MARC::Record objects.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Tk
+ MARC::Record
+ MARC::Descriptions
+ Test::More
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by David A. Christensen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

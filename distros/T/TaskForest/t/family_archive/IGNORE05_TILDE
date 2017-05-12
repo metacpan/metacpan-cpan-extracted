@@ -1,0 +1,3 @@
+start => '00:00', tz => 'America/Chicago', days => 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
+
+J5()

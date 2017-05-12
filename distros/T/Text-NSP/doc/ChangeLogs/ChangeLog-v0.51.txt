@@ -1,0 +1,18 @@
+Change from NSP version 0.5 to version 0.51
+------------------------------------------
+
+Satanjeev Banerjee, bane0025@d.umn.edu
+Ted Pedersen, tpederse@d.umn.edu
+
+University of Minnesota, Duluth
+
+count.pl
+--------
+
+Fixed bug in count.pl that prevented frequencies from being printed
+for unigrams. Also added test 2e to Testing/count/normal-op.sh to
+check for the correct output of switch --ngram 1. This bug discovered
+by Patrick Ruch patrick.ruch@dim.hcuge.ch.
+
+[Bano 6/21/02]
+

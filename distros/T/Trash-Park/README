@@ -1,0 +1,114 @@
+######################################################################
+    Trash::Park 0.03
+######################################################################
+
+NAME
+    Trash::Park - Store deleted files safely with querying capability
+
+SYNOPSIS
+          # Command line:
+        $ trashpark some/file/somewhere.dat
+        $ trashpark -l
+
+          # API
+        use Trash::Park;
+
+        my $trasher = Trash::Park->new();
+
+          # Move foo.dat to trash can
+        $trasher->trash("foo.dat");
+
+          # List content of trashcan
+        for my $item (@{$trasher->history()}) {
+            print $item->as_string(), "\n";
+        }
+
+          # Expire items with move dates older than 3 days
+        $trasher->expire(3 * 24 * 3600);
+
+DESCRIPTION
+    "Trash::Park" helps removing files by hiding them in a safe location and
+    querying details of these parking moves.
+
+    "Trash::Park" comes with a command line utility, "trashpark".
+
+METHODS
+    "my $trasher = Trash::Park->new()"
+        Construct a new trasher object. By default the trashing depot will
+        be created under "~/.trashpark". An alternative location can be
+        specified using the "trash_dir" parameter:
+
+            my $trasher = Trash::Park->new(
+                trash_dir => "/tmp/trashdir",
+            );
+
+        The ".trashpark" directory contains the following file structure:
+
+            .trashpark/
+                index/trash
+                repo/
+                    some/file/somewhere/file.dat
+                    ...
+
+        "index/trash" contains meta data on parked files in comma separated
+        format (in fact, it's a DBD::CSV database):
+
+            # index.csv
+            # file,move-date,mover,perm
+            some/file/somewhere/file.dat,214289710522201,mschilli,0755
+
+    "$trasher->trash($file_or_directory)"
+        "trash()" puts a file or a directory into the trash can. Note that
+        if you trash a directory, all files are moved to the trash
+        recursively. All files are stored under their full path name.
+        However, no hierarchical directory or link information gets
+        preserved, only single (regular) files are moved, directories and
+        symbolic link get deleted.
+
+    "$trasher->history()"
+        Get a complete history of trash moves. Returns a reference to an
+        array of Trash::Park::Element objects, each of which represents a
+        trashed file:
+
+            my $history = $trasher->history();
+
+            for my $item (@$history) {
+
+                print $item->file(), "\n";
+                print $item->mode(), "\n";
+                print $item->uid(), "\n";
+                print $item->move_time(), "\n";
+
+                  # Or:
+                print $item->as_string(), "\n";
+
+                  # Or, print the full path to the trashed file:
+                print $trasher->repo() . $item->file(), "\n";
+            }
+
+    "$trasher->expire($expire_time)"
+        Remove all entries from the trash can older than $expire_time in
+        seconds.
+
+    "$trasher->clean()"
+        Clear out the entire trash can.
+
+    "$trasher->repo()"
+        Return the top directory of the the repository. This is where the
+        the deleted files are saved under the original path information. If
+        you trash a file named "/tmp/foobar", it will show up under
+        "$trasher->repo() . "/tmp/foobar"".
+
+TODO
+    *   cd/cdback to DB dir shouldn't be necessary (check DBD::CSV).
+
+    *   sudo trashpark (root home dir?)
+
+LEGALESE
+    Copyright 2005 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2005, Mike Schilli <cpan@perlmeister.com>
+

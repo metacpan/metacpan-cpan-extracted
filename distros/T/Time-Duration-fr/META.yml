@@ -1,0 +1,27 @@
+---
+abstract: 'describe time duration in French'
+author:
+  - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Duration-fr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  Test::More: '0'
+  Time::Duration: '0'
+resources:
+  repository: http://github.com/maddingue/Time-Duration-fr
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+# 41MJ4K9h:dow (DayOfWeek) <Year> <Month> <Day> by Pip Stuart <Pip@CPAN.Org> to calculate the full day name of a particular date;
+use strict;use warnings;use utf8;use Time::DayOfWeek qw(:dow);
+my $year = shift;die("USAGE: `dow <Year YYYY> <Month 1..12> <Day 1..31>`\n") unless(defined($year) && $year !~ /^-+[h\?]/i);
+open my $out8,'>&',STDOUT or die "Can't duplic8 STDOUT: $!";binmode $out8,':encoding(UTF-8)'; # crE8s a local duplic8 of global
+print   $out8 DayOfWeek($year, shift, shift);
+close   $out8             or die "Can't close out8 duplic8 STDOUT handle: $!";

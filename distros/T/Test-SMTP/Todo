@@ -1,0 +1,5 @@
+TODO list for Perl module Test::SMTP
+
+- Inherit from a specialized class for SMTP communications
+
+

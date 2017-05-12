@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use AnyEvent;
+use Getopt::Long;
+use File::Spec ();
+use FindBin;
+BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+
+use Treex::View;
+use Treex::Core::Document;
+use Valence;
+
+sub print_usage {
+  print "usage: view-treex file\n";
+  exit(shift);
+}
+
+my $help = 0;
+my $pretty = 0;
+GetOptions('help|h' => \$help) or print_usage(1);
+print_usage(0) if $help;
+
+unless (@ARGV) {
+  print_usage(1);
+}
+
+my $view = Treex::View->new();
+my $v = Valence->new;
+my $app = $v->require('app');
+my $filename = shift @ARGV;
+
+$app->on(ready => sub {
+  my $main_window = $v->require('browser-window')->new({
+    width => 1000,
+    height => 600,
+    title => 'Treex View',
+  });
+
+  my $ipc = $v->require('ipc');
+  my ($web_contents, $json);
+
+  $ipc->on('treex-view-ready' => sub {
+    # Parse document at this point because the loading screen is running
+    unless ($json) {
+      my $doc = Treex::Core::Document->new({ filename => $filename });
+      $json = $view->convert($doc, 0);
+    }
+    $web_contents->send('file-loaded' => $json);
+  });
+
+  $main_window->loadUrl('file://' . File::Spec->catfile($view->static_dir, 'index.html'));
+  $web_contents = $main_window->attr('webContents');
+});
+
+sub terminate() {
+  $app->quit();
+  $v->{cv}->send();
+  undef $app; undef $v;
+}
+
+$app->on('window-all-closed' => \&terminate);
+
+$v->{hdl}->on_error(sub {
+  my ($handle, $fatal, $message) = @_;
+  print STDERR $message;
+});
+
+$SIG{TERM} = $SIG{INT} = \&terminate;
+
+$v->run;

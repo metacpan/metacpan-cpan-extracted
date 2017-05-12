@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Task/Devel/Cover/Recommended.pm
+samples/generate.pl
+t/00-load.t
+t/01-deps.t

@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Text-Report
+version:             1.004
+abstract:            Perl extension for generating mixed columnar formatted reports and report templates
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - David Huggins <davidius@cpan.org>

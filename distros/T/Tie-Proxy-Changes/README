@@ -1,0 +1,95 @@
+Tie::ChangeProxy
+================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Tie::InsertOrderHash
+  perl 5.6.1
+
+DESCRIPTION
+
+This module, like all of the Games::Freelancer Tree provide an interface 
+to datastructures and files used in the Game "Freelancer" from Microsoft.
+
+See: http://www.microsoft.com/games/freelancer/
+
+The sourcecode was written according to a now removed article on 
+http://www.lancersreactor.com with some improvements
+
+UTF-FILES
+
+Freelancer uses UTF files for various files, for example it is used in models 
+(.cmp, .3db), materials (.tex, .mat) and scenes (.dfm).
+It uses compressed of uncompressed .ini files for other data (See 
+Games::Freelancer::BINI), .dll for string and XML resources and there are some 
+.ale files used for effects which nobody can really decrypt as of now.
+
+These files that this module can work with are called UTF files, because of 
+their characteristic header starting with UTF. I have no idea what that means,
+it certainly has nothing to do with Unicode, so I hope it means something cool 
+like "Unified Tree Format" or so.
+
+REPRESENTING UTF FILES IN PERL
+
+The UTF files consist of binary Nodes which have a name and may have childs 
+and/or siblings.
+
+The easiest way to represent these in Perl are with Hashes of Hashes of ... of Values. Since the UTF file can contian arbitrary depth and has no enforced 
+structure other that what Freelancer awaits from them, I belive those files can
+represent any form of Tree. The tree and treenodes are represented as Hashes,
+and the leaves are always scalars containing the data. Nodes seem to contain 
+only data or childnodes, but the specification might allow for nodes with both,
+but I have yet to encounter this. So if you find a file contain this structure
+please send it to me at perl@marc-s.de. 
+
+If you are not sure about what I tried to discripe up there, just throw a tree
+at Data::Dumper (See the manpage for example). 
+
+Games::Freelancer::UTF provides the ability to read and write back those files.
+This also generates a new problem: The order of the nodes in one level seems
+to be important enough to be saved in the file, yet Freelancer doesn't seem to 
+care for it according to my tests. Perl hashes are always unsorted so this is
+where Tie::InsertOrderHash comes in. Every hash in the returned tree is tied
+against Tie::InsertOrderHash, so the order is preserved for writing back. If 
+you plan the generate files out of the blue, you also should use that module
+(or a similar), but Games::Freelancer::UTF does work either way. See the 
+manpage for examples on how to preserve the order.
+
+You can easily inspect UTF files with the free UTFedit tool, which can be found on the internet by searching for "Utfedit Freelancer". With some file UTFedits
+representation is a bit buggy, but it works with most files and has a nice GUI.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2002-2008 Marc Lucksch
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+

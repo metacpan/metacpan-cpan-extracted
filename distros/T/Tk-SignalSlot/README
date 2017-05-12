@@ -1,0 +1,73 @@
+SignalSlot(3)         User Contributed Perl Documentation        SignalSlot(3)
+
+
+
+NNNNAAAAMMMMEEEE
+       Tk::SignalSlot - An alternative to Tk::bind
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+           use Tk::SignalSlot;
+
+           $w->connect(’<1>’ => \&callback1);
+           $w->connect(’<1>’ => \&callback2);
+
+           my $id = $w->connect(’<<Event>>’ => \&callback3);
+           ...
+           $w->disconnect($id) if $w->is_connected($id);
+
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+       TTTTkkkk::::::::SSSSiiiiggggnnnnaaaallllSSSSllllooootttt provides an alternative to Tk::bind that is more similar
+       to Qt’s signal/slot mechanism. The main idea is that multiple callbacks
+       can now be bound to one event. This allows for a more modular and
+       object-oriented approach to Tk::bind which results in simpler, and eas-
+       ier to maintain code.
+
+       Please see the section on "RESTRICTIONS" for some important informa-
+       tion.
+
+MMMMEEEETTTTHHHHOOOODDDDSSSS
+       TTTTkkkk::::::::SSSSiiiinnnnggggaaaallllSSSSllllooootttt exports three new methods into the TTTTkkkk:::::::: namespace:
+
+       _$_w_i_d_g_e_t->ccccoooonnnnnnnneeeecccctttt(_e_v_e_n_t, _c_a_l_l_b_a_c_k)
+           This method connects the given callback to the event. This means
+           that when the event is triggered, this callback will be executed.
+           Any number of callbacks can be connected to any one event. When the
+           event fires, all connected callbacks will execute in the order they
+           were connected. _e_v_e_n_t is any valid Tk event, and _c_a_l_l_b_a_c_k is any
+           valid Tk callback.
+
+           Upon success, this method returns a unique ID that can be used in
+           the _dd_ii_ss_cc_oo_nn_nn_ee_cc_tt_((_)) method below.
+
+       _$_w_i_d_g_e_t->ddddiiiissssccccoooonnnnnnnneeeecccctttt(_I_D);
+           Given a valid ID (returned by the _cc_oo_nn_nn_ee_cc_tt_((_)) mmmmeeeetttthhhhoooodddd), this method
+           disconnects the associated callback from the event.  Obviously,
+           this means that when the event fires, this callback will not be
+           executed.
+
+       _$_w_i_d_g_e_t->iiiissss____ccccoooonnnnnnnneeeecccctttteeeedddd(_I_D);
+           Returns 1 if the given ID is that of a validly connected callback.
+           Otherwise, returns 0;
+
+RRRREEEESSSSTTTTRRRRIIIICCCCTTTTIIIIOOOONNNNSSSS
+       If you decide to use TTTTkkkk::::::::SSSSiiiiggggnnnnaaaallllSSSSllllooootttt, then you should stick with it
+       thoroughtout your program. Intermixing TTTTkkkk::::::::SSSSiiiiggggnnnnaaaallllSSSSllllooootttt with TTTTkkkk::::::::bbbbiiiinnnndddd can
+       have some unpredictable effects since TTTTkkkk::::::::SSSSiiiiggggnnnnaaaallllSSSSllllooootttt uses TTTTkkkk::::::::bbbbiiiinnnndddd
+       internally.
+
+BBBBUUUUGGGGSSSS
+       None so far.
+
+AAAAUUUUTTTTHHHHOOOORRRR
+       AAAAllllaaaa QQQQuuuummmmssssiiiieeeehhhh <aqumsieh@cpan.org>
+
+CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
+       Copyright (c) 2006 Ala Qumsieh. All rights reserved.
+
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+3rd Berkeley Distribution         perl v5.6.1                    SignalSlot(3)

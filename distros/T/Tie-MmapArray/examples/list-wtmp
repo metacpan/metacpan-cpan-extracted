@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+
+use strict;
+use lib qw(blib/lib blib/arch ../blib/lib ../blib/arch);
+use Data::Dumper;
+
+use Tie::MmapArray;
+
+my $wtmp_file = "/var/log/wtmp";
+
+
+my %ut_types = ( 0 => 'UT_UNKNOWN',
+		 1 => 'RUN_LVL',
+		 2 => 'BOOT_TIME',
+		 3 => 'NEW_TIME',
+		 4 => 'OLD_TIME',
+		 5 => 'INIT_PROCESS',
+		 6 => 'LOGIN_PROCESS',
+		 7 => 'USER_PROCESS',
+		 8 => 'DEAD_PROCESS',
+		 9 => 'ACCOUNTING' );
+
+my $wtmp_format = [ ut_type    => 'i',
+		    ut_pid     => 'i',	# pid_t
+		    ut_line    => 'Z32',
+		    ut_id      => 'Z4',
+		    ut_user    => 'Z32',
+		    ut_host    => 'Z256',
+		    ut_exit    => [ # struct exit_status
+				   e_termination => 's',
+				   e_exit        => 's' ],
+		    ut_session => 'l',
+		    ut_tv      => [ # struct timeval
+				   tv_sec  => 'l',
+				   tv_usec => 'l' ],
+		    ut_addr_v6 => 'l4',
+		    pad        => 'a20' ];
+
+my @wtmp;
+my $failed;
+
+tie(@wtmp,
+    'Tie::MmapArray',
+    $wtmp_file,
+    { template => $wtmp_format,
+      mode     => "ro" });
+
+
+
+
+printf "there are %d wtmp entries\n", @wtmp;
+foreach my $i (0 .. 10) {
+    my $href = $wtmp[$i];
+    my($ss, $mm, $hh, $DD, $MM, $YY) = localtime($href->{ut_tv}->{tv_sec});
+
+    printf("%s %-14s %6d %-4s %-20s %s\@%s\n",
+	   sprintf("%04d-%02d-%02d %02d:%02d:%02d", $YY+1900, $MM+1, $DD, $hh, $mm, $ss),
+	   $ut_types{$href->{ut_type}} || $href->{ut_type},
+	   $href->{ut_pid},
+	   $href->{ut_id},
+	   $href->{ut_line},
+	   $href->{ut_user},
+	   $href->{ut_host});
+}

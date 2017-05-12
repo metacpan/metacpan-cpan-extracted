@@ -1,0 +1,16 @@
+Revision history for Perl extension Test::Fixture::DBIC::Schema
+
+0.04    Thu May  2 10:04:31 2013
+
+    - fix tests to be robust against hash order randomization
+
+0.03    Wed Jan 20 02:42:18 2010
+
+    - add awareness for views and don't write on them
+
+0.02
+
+    - fixed prereqs.(reported by SCHWIGON++)
+
+0.01    Wed Jan 23 09:48:18 2008
+        - original version

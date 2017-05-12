@@ -1,0 +1,141 @@
+Revision history for Test-Version
+
+2.05      2016-09-17
+  - Bump requirement for newer version of Module::Metadata (again)
+    Required for ignore_unindexable
+
+2.04      2016-06-22
+  - Bump requirement for a newer version of Module::Metadata
+    (the version that comes with Perl 5.14 cannot handle package block syntax)
+
+2.03      2015-06-29
+  - Remove annoying warnings when version_ok called by itself GH #5 (DROLSKY)
+
+2.02      2015-06-17
+  - Production release identical to 2.01_01 release
+
+2.01_01   2015-06-15
+  - Added 'multiple' option to check each version inside a .pm file
+    with multiple packages.
+
+2.01      2015-05-19
+  - Fix failing test in t/all-generated.t
+
+2.00      2015-05-06
+  - Added filename_match setting
+
+1.05      2015-05-05
+  - New maintainer (PLICEASE) updated meta
+
+1.004001  2014-10-20
+	- improved consistent check diagnostics GH #11 (SZABGAB)
+
+1.004000  2014-10-18
+	- add consistent check GH #10 (SZABGAB)
+
+1.003001  2014-09-06
+	- remove inline and remove _get_version, trying to skip test there won't
+	  work GH #4 (ETHER)
+
+1.003000  2014-09-05
+	- skip packages unindexable by pause GH #4 (ETHER)
+
+1.002004  2013-11-21
+	- fix bugs in argument handling
+	- fix whitespace
+
+1.002003  2013-10-14
+	- fix misgithap
+	- more dist.ini updates
+
+1.002002  2013-10-14
+	- fix synopsis GH #6, #7 ( plicease )
+	- change Dist::Zilla Plugins
+	- remove old documentation that no longer applies
+
+1.002001  2012-03-14
+	- fix metadata caused by a bug in DZP::GitHub after asking repo to be
+	  unlinked from gitpan.
+
+1.002000  2012-01-09
+	- use Module::Metadata
+	- allow disabling of 'has_version'
+	- require at least 1 version
+	- allow for checking that a module is_strict
+
+1.001003  2011-12-01
+	- use Module::Metadata apparently it's closer to how Perl works than
+	  Module::Extract::VERSION
+
+1.001002  2011-11-02
+	- fix some issues in the pod
+
+1.001001  2011-11-01
+	- provide is_strict setting to replace STRICTNESS
+	- provide has_version setting to disable that a module must always have a
+	  version
+	- use perl decimal style semantic versioning because of bugs in EUMM with
+	  vstring versions
+
+v1.1.0    2011-08-14
+	- check if versions are strict
+	- provide STRICTNESS settings to decide what to do if they aren't strict
+
+1.0.0     2011-07-01
+	- Change to Semantic Versioning
+	- Consider API Stable
+	- No real changes since version 0.11
+
+0.11      2011-06-18
+	- correct the version of version.pm that we need to depend on. is_lax was
+	  not properly exported until version 0.86
+
+0.10      2011-06-08
+	- fix warning on bad api call #1
+	- make diagnostics human readable #1
+	- remove diagnostics from pod #1
+	- change return values #1
+	- improve tests #1
+
+0.09      2011-06-07
+	- Test for FILE_NOT_DEFINED was not actually included in the last release.
+	  Add it.
+
+0.08      2011-06-04
+	- test NO_FILE and FILE_NOT_DEFINED
+	- document only use 0.04 or later
+	- fix 04-all.t test that compares the arrays
+
+0.07      2011-05-29
+	- more documentation
+	- don't use diag for VERSION_OK status
+
+0.06      2011-05-28
+	- update diag messages
+	- check that $file exists
+	- switch to Test::Tester exclusively
+	- fix 04-all.t from failing due to array order being random
+
+0.05      2011-05-27
+	- switch to Test::Tester for some tests.
+	- update changelog for 0.04 due to leaving featurelist out
+
+0.04      2011-05-26
+	- Release new codebase as a trial version
+	- Ability to iterate through a directory checking versions with
+	  version_all_ok()
+	- validate versions with is_lax
+
+0.03      2011-05-26
+	- Maintainership passed to Caleb Cushing <xenoterracide@gmail.com>
+	- Deprecate "expected" parameter to version_ok
+	- Switch to Dist::Zilla for release management
+
+0.02	2002-11-18
+	- removed rogue 'plan' statement in Version.pm,
+	  which was causing test failure
+
+0.01	2002-11-17
+	- original version; created by h2xs 1.21 with options
+		-AX Test::Version
+

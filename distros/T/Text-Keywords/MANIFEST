@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Text/Keywords.pm
+lib/Text/Keywords/Container.pm
+lib/Text/Keywords/Found.pm
+lib/Text/Keywords/List.pm
+t/00-load.t
+t/01-simple.t
+t/lib/Test/Text/Keywords/Standard.pm
+t/release-pod-syntax.t

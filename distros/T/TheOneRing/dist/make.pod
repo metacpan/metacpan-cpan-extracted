@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use TheOneRing;
+
+foreach my $key (keys(%TheOneRing::master_arguments)) {
+    print "=head2 $key\n\n=over\n\n";
+    open(X,"perl -Ilib tor $key --getopt-to-pod 2>&1 |");
+    while (<X>) {
+	last if /Help Options/;
+	print;
+    }
+    print "\n\n=back\n\n";
+}

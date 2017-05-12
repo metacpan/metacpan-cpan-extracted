@@ -1,0 +1,22 @@
+Time/Progress
+=========================
+
+  Time::Progress - Elapsed and estimated finish time reporting.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2001-2015 Vladi Belperchinov-Shabanski <cade@biscom.net>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+
+

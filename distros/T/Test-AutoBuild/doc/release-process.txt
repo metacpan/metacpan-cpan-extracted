@@ -1,0 +1,103 @@
+ Test-AutoBuild Release Process
+ ==============================
+
+This document covers the series of steps required to make a formal
+release for Test-AutoBuild software.
+
+
+Release Preparation
+-------------------
+
+ - Run coverage tests to ensure that test and POD coverage meets
+   targets set for this release in task tracker
+
+      cover -delete
+      HARNESS_PERL_SWITCHES=-MDevel::Cover make test
+      cover
+
+ - Update the ChangeLog file in the root directory with details
+   of all significant changes
+
+ - Update the $VERSION variable in lib/Test/AutoBuild.pm by adding
+   1 to the least significant version number component. (The first
+   two components are updated whenever a new development branch
+   starts)
+
+ - Update the Test-AutoBuild.spec.PL file to reset the Release:
+   tag to 1
+
+ - Update the Test-AutoBuild.spec.PL file to add details to the
+   %changelog section
+
+ - Update the debian/changelog file to add details of the changes
+   in the new release
+
+ - Write a release announcement and save it as doc/announce/release-X.Y.Z.txt
+
+ - Checkin all of above work to CVS
+
+ - Tag files with a release tag of form RELEASE_X_Y_Z
+
+
+Source build
+------------
+
+ - Get a fresh checkout of code with tag RELEASE_X_Y_Z in a different 
+   working directory
+
+ - Run rollingbuild.sh to generate formal build
+
+ - Install build on a clean test machine & run a build with the example
+   configuration file ensuring no failures
+
+ - Upload source tar.gz build to CPAN
+
+
+Binary builds
+-------------
+
+For each OS for which RPMs or Debian packages are required
+
+ - Get a fresh checkout of code with tag RELEASE_X_Y_Z in a different 
+   working directory
+
+ - Run rollingbuild.sh to generate formal build
+
+ - Install build on a clean test machine & run a build with the example
+   configuration file ensuring no failures
+
+ - Upload RPMs or Debian packages to GNA! files site
+
+
+Announcments
+------------
+
+Once source build has appeared on CPAN (~2 hours from upload)
+
+ - Update download.htmlt & index.htmlt pages for website source to
+   detail the new build
+
+ - Re-generate the main website from source and checkin to CVS
+
+ - Post release announcement to project's GNA! site news items
+
+ - Post release announcement to freshmeat
+
+ - Send e-mail announcement to testautobuild-annouce list
+
+ - Send e-mail announcement to LWN.net
+
+
+Relaxation
+----------
+
+Having done all that you'll be exhausted so
+
+ - Step away from the keyboard
+
+ - Make a Gin & Tonic / Painkiller / other sunny drink of choice
+
+ - Lie back on the sun lounger and watch the waves come in
+
+
+-- End

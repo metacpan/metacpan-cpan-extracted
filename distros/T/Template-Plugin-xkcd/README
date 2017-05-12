@@ -1,0 +1,51 @@
+SYNOPSIS
+
+        # in your template
+        [% USE xkcd %]
+    
+        <h1>xkcd comics!</h1>
+    
+        <p>Today's xkcd comic: [% xkcd.comic %]</p>
+    
+        <p>The 20th comic: [% xkcd.comic(20) %]</p>
+
+DESCRIPTION
+
+    A Template (Template::Toolkit) plugin to provide an image tag for xkcd
+    comics. You can pick which comic (either latest, or by number).
+
+    It uses WWW::xkcd.
+
+METHODS
+
+ new
+
+    This method is used by Template.
+
+    If you want to use this plugin, simply add the following to your
+    template:
+
+        [% USE xkcd %]
+
+ comic
+
+    Fetches a comic.
+
+    Accept an optional argument for the number of a comic.
+
+    Returns an HTML <img> tag with the path and alternative text (alt
+    text).
+
+    This gets the latest:
+
+        [% xkcd.comic %]
+
+    This gets the first:
+
+        [% xkcd.comic(1) %]
+
+WHY
+
+    Just because. It's actually more useful than a lot of other stuff on
+    CPAN. :)
+

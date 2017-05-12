@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                TAP-Convert-TET
+version:             0.2.1
+abstract:            Convert TAP to TET
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Getopt::Long:                  2.34
+    Pod::Usage:                    1.12
+    TAP::Parser:                   v0.51
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andy Armstrong <andy@hexten.net>

@@ -1,0 +1,107 @@
+SYNOPSIS
+
+     use Text::Chart qw(gen_text_chart);
+
+    Bar chart:
+
+     my $res = gen_text_chart(
+         data => [1, 5, 3, 9, 2],
+         type => 'bar',
+     );
+
+    will produce this:
+
+     *
+     *****
+     ***
+     *********
+     **
+
+    Adding data labels and showing data values:
+
+     my $res = gen_text_chart(
+         data => [["Andi",1], ["Budi",5], ["Cinta",3], ["Dewi",9], ["Edi",2]],
+         type => 'bar',
+         show_data_label => 1,
+         show_data_value => 1,
+     );
+
+    Result:
+
+     Andi |*         (1)
+     Budi |*****     (5)
+     Cinta|***       (3)
+     Dewi |********* (9)
+     Edi  |**        (2)
+
+    Column chart:
+
+     my $res = gen_text_chart(
+         data => [["Andi",1], ["Budi",5], ["Cinta",3], ["Dewi",9], ["Edi",2]],
+         type => 'column',
+         show_data_label => 1,
+     );
+
+    Result:
+
+                         *
+                         *
+                         *
+                         *
+            *            *
+            *            *
+      *     *      *     *
+      *     *      *     *     *
+      *     *      *     *     *
+     Andi  Budi  Cinta  Dewi  Edi
+
+    Sparkline chart:
+
+     my $res = gen_text_chart(
+         data => [["Andi",1], ["Budi",5], ["Cinta",3], ["Dewi",9], ["Edi",2]],
+         type => 'column',
+         show_data_label => 1,
+     );
+    
+     my $res = gen_text_chart(
+         data => [1.5, 0.5, 3.5, 2.5, 5.5, 4.5, 7.5, 6.5],
+         type => 'sparkline',
+     );
+
+    Result:
+
+     XXX
+
+    Plotting multiple data columns:
+
+     XXX
+
+DESCRIPTION
+
+    THIS IS AN EARLY RELEASE, MANY FEATURES ARE NOT YET IMPLEMENTED.
+    Currently only sparkline chart is implemented. Showing data labels and
+    data values are not yet implemented.
+
+    This module lets you generate text-based charts.
+
+FAQ
+
+ Why am I getting 'Wide character in print/say' warning?
+
+    You are probably printing Unicode characters to STDOUT without doing
+    something like this beforehand:
+
+     binmode(STDOUT, ":utf8");
+
+SEE ALSO
+
+    Text::Graph, a mature CPAN module for doing text-based graphs. Before
+    writing Text::Chart I used this module for a while, but ran into the
+    problem of weird generated graphs. In addition, I don't like the way
+    Text::Graph draws things, e.g. a data value of 1 is drawn as zero-width
+    bar, or the label separator : is always drawn. So I decided to write an
+    alternative charting module instead. Compared to Text::Graph, here are
+    the things I want to add or do differently as well: functional (non-OO)
+    interface, colors, Unicode, resampling, more chart types like
+    sparkline, animation and some interactivity (perhaps).
+

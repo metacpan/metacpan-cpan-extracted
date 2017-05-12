@@ -1,0 +1,29 @@
+20130412 - Fri Apr 12 17:32:43 BST 2013
+    Bug Fixes
+    * Now compatible with Test::Builder 1.5.0
+
+
+20090704.203236 - Sat Jul  4 20:32:36 PDT 2009
+    Other
+    * Picked a better default seed
+
+    Tests
+    * The date generation example (also a test) would go out of bounds
+
+
+20090704 - Sat Jul  4 13:23:17 PDT 2009
+    Docs
+    * Sugestions for making Test::Sims a bit less chaotic.
+
+    Tests
+    * control_rand.t made the non-portable assumption that rand() will
+      return the same thing on all platforms given the same random seed.
+
+
+20090630.033501 - Tue Jun 30 03:35:01 UTC 2009
+    Docs
+    * Mention Data::Random and Data::Generate in the docs.
+
+
+20090630 - Mon Jun 29 23:33:00 EDT 2009
+    First version released

@@ -1,0 +1,26 @@
+Types-XSD-Lite
+==============
+
+Created:      2013-07-08
+Home page:    <https://metacpan.org/release/Types-XSD-Lite>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD-Lite>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-04-12
+
+ [ Documentation ]
+ - s/Types::XSD/Types::XSD::Lite/ in a few places.
+
+0.004	2014-04-12
+
+ [ Bug Fixes ]
+ - Fix bug where inline_check called multiple times on a parameterized type
+   works the first time, but ignores all parameters on subsequent calls.
+   Fixes RT#94620.
+   Diab Jerius++
+   <https://rt.cpan.org/Ticket/Display.html?id=94620>
+
+ [ Packaging ]
+ - use Dist::Inkt
+
+0.003	2013-07-08	Initial release; split from Types-XSD-0.002

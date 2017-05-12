@@ -1,0 +1,195 @@
+=head1 Toader Entry Documentation
+
+=head1 Entry Storage
+
+Each entry is stored under a ".toader/entries" a file in the
+Toader directory. Each file has a specifically formated date,
+as below.
+
+%Y%m%d-%H%M%S.$microsecond
+
+=head1 File Format
+
+The storage used is MIME.
+
+The following headers are should be used.
+
+    renderer
+    title
+    summary
+    Date
+    From
+    publish
+    tags
+
+'renderer' is the name of the renderer to use.
+
+'tags' is a L<Text::Tags> parsable string.
+
+'title' is the title for the article.
+
+'summary' is a summary of the entry.
+
+'Date' is a RFC 2822 date.
+
+'From' is a RFC 5322 email address. This is for the author.
+
+'publish' is a boolean value specifies if a entry should be published or not.
+The values used are '0' and '1'. If not specified, it defaults to '1'.
+
+=head1 Rendering
+
+=head2 Content
+
+The entry content, the 'renderContent' method, is rendered in three passes.
+
+=head3 Pass One
+
+First the body is ran through L<Text::Template>.
+
+No template is used for this pass.
+
+The variables below are passed to L<Text::Template>.
+
+    title - This is the title of the entry.
+    from - This is the author or authors, from the From header.
+    date - This is the entry name/date stap.
+    g - This is a L<Toader::Render::General> object.
+    toader - This is a L<Toader> object.
+    sec - Seconds value take from the Date header.
+    min - Minutes value take from the Date header.
+    hour - Hours value take from the Date header.
+    day - Day value take from the Date header.
+    month - Month value take from the Date header.
+    year - Year value take from the Date header.
+    zone - Time zone value take from the Date header.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> object containing the Toader config.
+
+=head3 Pass Two
+
+Second the return results are of the first pass is ran through
+specified backend.
+
+No template is used for this.
+
+=head3 Pass Three
+
+The third pass generates what can be included into something.
+
+The template used is 'entryContent'. The default one is below.
+
+    <div id="content">
+      <h4>[== $g->elink( $g->or2r, $date, $title ) ==]</h4>
+      Date: [== $year.$month.$day."-".$hour.":".$min ==] <br>
+      Author: [== $g->authorsLink( $from ) ==]<br>
+      <div id="content">
+        [== $body ==]
+      </div>
+    </div>
+
+The variaables below are passed to L<Text::Template>.
+
+    body - This is output from pass two.
+    title - This is the title of the entry.
+    from - This is the author or authors, from the From header.
+    date - This is the entry name/date stap.
+    g - This is a L<Toader::Render::General> object.
+    toader - This is a L<Toader> object.
+    sec - Seconds value take from the Date header.
+    min - Minutes value take from the Date header.
+    hour - Hours value take from the Date header.
+    day - Day value take from the Date header.
+    month - Month value take from the Date header.
+    year - Year value take from the Date header.
+    zone - Time zone value take from the Date header.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> object containing the L<Toader> config.
+
+=head2 Output Rendering.
+
+This is rendered via the 'render' method.
+
+The template used is 'page' with the variables below passed to it.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> object containing the L<Toader> config.
+    content - The output from the 'renderContent' method.
+
+Once that is created, it is written to
+$outputDir.'/'.$r2r.'/.pages/'.$pageName.'/index.html'. Any
+files are written to $outputDir.'/'.$r2r.'/.pages/'.$pageName.'/.files/' .
+
+=head1 Object Specific Methods
+
+=head2 archive
+
+This renders the archive of all entries.
+
+The 'page' template is used with the following variables passed to it.
+
+    toader - This is the L<Toader> object.
+    g - This is the L<Toader::Render::General> object.
+    self - This is the TL<oader::Render::Entry> object.
+    obj - This is the L<Toader::Entry> object.
+    c - This is the L<Config::Tiny> object holding the L<Toader> config.
+    locationID - This is the location ID to use, 'Entries Archive'.
+    content - This is the return from 'archiveContent' method.
+
+Once that has been created, it is writen to
+$outputDir.'/'.$r2r.'/.entries/archive.html' .
+
+=head2 archiveContent
+
+This creates the content for the archive method.
+
+This uses the template 'entryArchive' and passes the variables below to it.
+
+    toader - This is the L<Toader> object.
+    g - This is the L<Toader::Render::General> object.
+    self - This is the L<Toader::Render::Entry> object.
+    obj - This is the L<Toader::Entry> object.
+    c - This is the L<Config::Tiny> object.
+
+The default template is as below.
+
+    [== $g->entryArchive ==]
+
+=head2 index
+
+This renders the index page for the '.entries' directory.
+
+The template used is 'page' and the variables below are passed to it.
+
+    toader - This is the L<Toader> object.
+    g - This is the L<Toader::Render::General> object.
+    self - This is the L<Toader::Render::Entry> object.
+    obj - This is the L<Toader::Entry >object.
+    c - This is the L<Config::Tiny> object holding the L<Toader> config.
+    content - This is the return from the 'indexContent' method.
+
+Once it has been rendered, it is written to 
+$outputDir.'/'.$r2r.'/.entries/index.html' .
+
+=head2 indexContent
+
+This renders the content for the 'index.html' page.
+
+The template 'entryIndex' is used.
+
+    toader - The L<Toader> object.
+    g - The L<Toader::Render::General> object.
+    self - The L<Toader::Render::Entry> object.
+    obj - The L<Toader::Entry> object.
+    c - The L<Config::Tiny> holding the Toader config.
+
+The default template is as below.
+
+    [== $g->lastEntries( $c->{_}->{last} ) ==]
+
+=cut

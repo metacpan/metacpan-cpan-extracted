@@ -1,0 +1,113 @@
+NAME
+
+Term::Screen::ReadLine - Term::Screen extended with ReadLine
+
+PREREQUISITES
+
+Term::Screen
+
+SYNOPSIS
+
+  use lib "./blib/lib";
+
+  use Term::Screen::ReadLine;
+
+  $scr = new Term::Screen::ReadLine;
+
+  $scr->clrscr();
+  $a=$scr->getch();
+  print $a," ",length $a," ",ord($a),"\n";
+  $scr->two_esc;
+  $a=$scr->getch();
+  print $a," ",length $a," ",ord($a),"\n";
+  $scr->one_esc;
+
+
+  $scr->clrscr();
+  $scr->at(4,4)->puts("input? ");
+  $line=$scr->readline(ROW => 4, COL => 12);
+  $line=$scr->readline(ROW => 5, COL => 12, DISPLAYLEN => 20);
+  $scr->at(10,4)->puts($line);
+  $scr->two_esc;
+  $line=$scr->readline(ROW => 6, COL => 12, DISPLAYLEN => 20, ONLYVALID => "[ieIE]+", CONVERT => "up");
+
+  print "\n";
+  print $scr->lastkey(),"\n";
+
+  $r=$scr->getch();
+  print $r,ord($r),"\n";
+  $r=ord($r);
+  print $r,"\n";
+  if ($r eq 13) {
+    print "aja!\n";
+  }
+
+
+exit;
+
+
+DESCRIPTION
+
+This module extends Term::Screen with a readline() function.
+It also makes it possible to use a *single* Esc to escape instead
+of the Term::Screen double Esc.
+
+USAGE
+
+readline(
+    ROW 	=> 0,
+    COL 	=> 0,
+    LEN 	=> 40,
+    DISPLAYLEN	=> undef,
+    LINE	=> "",
+    ONLYVALID	=> undef,
+    CONVERT	=> undef,
+    PASSWORD	=> undef
+)
+
+  ROW,COL	'at(ROW,COL) readline()...'.
+  LEN		The maximum length of the line to read.
+  DISPLAYLEN	The maximum length of the displayed field.
+		The display will scroll if the displaylen is exceeded.
+  EXITS 	Explained below.
+  LINE		A default value for LINE to use.
+  ONLYVALID	A regex to validate the input.
+  CONVERT	"up" or "lo" for uppercase or lowercase. Nothing
+		if not used. Note: conversion will take place *after*
+		validation.
+  PASSWORD	Display stars ('*') instead of what is typed..
+
+  returns the inputted line.
+
+  The readline() function does always return on the following keys:
+
+	Enter, Arrow up, Arrow down, Esc, Tab and Ctrl-Enter.
+
+  This can be extended using the EXITS argument, is a hash of keys
+  (see Term::Screen) and a description to return for that key.
+
+  example:
+
+	EXITS => { "k1" => "help", "k3" => "cancel" },
+
+
+last_key()
+
+  returns the last key pressed, that made the readline function return.
+
+
+one_esc()
+
+  Makes it possible to press only one time Esc to make readline return.
+  This is the default for Term::Screen::ReadLine.
+
+two_esc()
+
+  Revert back to the standard Term::Screen behaviour for the Esc key.
+
+
+AUTHOR
+
+  Hans Dijkema <hans@oesterholt-dijkema.emailt.nl>
+
+

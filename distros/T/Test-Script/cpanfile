@@ -1,0 +1,32 @@
+requires "File::Spec" => "0.80";
+requires "IPC::Run3" => "0.034";
+requires "Probe::Perl" => "0.01";
+requires "Test::Builder" => "0.32";
+requires "Test::More" => "0.96";
+requires "perl" => "5.006";
+
+on 'test' => sub {
+  requires "Test::Builder" => "0.32";
+  requires "Test::Builder::Tester" => "1.02";
+  requires "Test::More" => "0.96";
+  requires "Test::Tester" => "0";
+  requires "perl" => "5.006";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.006";
+};
+
+on 'develop' => sub {
+  requires "FindBin" => "0";
+  requires "Test::EOL" => "0";
+  requires "Test::Fixme" => "0.07";
+  requires "Test::More" => "0.94";
+  requires "Test::NoTabs" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+  requires "Test::Pod::Spelling::CommonMistakes" => "0";
+  requires "Test::Spelling" => "0";
+  requires "YAML" => "0";
+};

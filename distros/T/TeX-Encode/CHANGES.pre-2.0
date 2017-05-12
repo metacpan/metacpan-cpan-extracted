@@ -1,0 +1,64 @@
+Revision history for Perl extension Encode::LaTeX.
+
+2.0
+    - New co-maintainer, added repository link
+    - Added 295 new mappings (PAUSE issue #118001)
+
+1.3
+	- Oops, missing BibTeX.pm and charmap.pm from MANIFEST
+
+1.2
+	- Added support to encode() for check argument
+	- Adds braces to protect whitespace after macros
+	- This version is a clean-up version that doesn't emit HTML fragments, if
+	  you want HTML you should look at http://www.mathjax.org/
+
+1.1
+	- Added support for \ensuremath{}
+	- Wrap greek letters in \ensuremath{} to fix a typesetting problem
+	  (reported by Mark Muldoon)
+
+1.0
+	- CPAN thinks 0.10 is less than 0.9
+
+0.10
+	- Remove empty braces e.g. $\sim{}200$
+
+0.9
+	- Removed autoloader: this isn't an xs module
+	- Added LaTeX 'special characters'
+	- Changed decode behaviour to decode mathmode first, then other macros
+	- Modified decode to use a single regexp for other macros
+	- Searches for longest named macro first
+
+0.7
+	- Fixed bug: Wasn't actually eating paired braces at all
+	- math** and text** now map to span classes of the same name in htmlise
+	- Added encoding of TeX reserved characters
+
+0.6
+	- Fixed incompatibility with HTML::Parser 1.35
+	- Upped the required versions of Pod::LaTeX and HTML::Entities to ones I know
+		work
+
+0.5
+	- Fixed an incorrect quoting bug in MathMode
+	- Added a couple of tests for quote bug and escaping
+	- Now unescapes any singular character (\\ => \, \x => x, etc), this may be
+		too broad and need casing?
+
+0.4
+	- Support for Latex braces (e.g. {\rm \sigma})
+	- Support for fractions (still off-set though)
+
+0.3
+	- Moved namespace to TeX::Encode, as this isn't really
+	character encoding per-se (more character escaping)
+
+0.2
+	- Added support for decoding mathematical symbols
+
+0.1  Tue Aug 16 12:58:54 2005
+	- original version; created by h2xs 1.23 with options
+		-X -v 0.1 -b 5.8.0 -n Encode::LaTeX
+

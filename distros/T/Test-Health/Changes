@@ -1,0 +1,55 @@
+==================================================
+Changes from 2015-12-10 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2016-12-09 09:55:39 +0000
+------------------------------------------
+
+  Change: 4370b242bb73e335647254a9cb72e7914e6490f0
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-09 07:15:04 +0000
+
+    Fixed dist.ini Added sample report 
+
+------------------------------------------
+version 0.002 at 2016-12-02 01:10:35 +0000
+------------------------------------------
+
+  Change: 6e8d7cf19c539a6b4d469c1a9e0fee1b428c011a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-01 23:10:35 +0000
+
+    Improved Kwalitee and updated Pod 
+
+  Change: 9e7f23abb06bd2751183d4b88e161a6dffe0b6b2
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-11-30 21:19:01 +0000
+
+    Added testing for Harness Fixed bugs in Harness.pm 
+
+  Change: f2562ca8d8109feb3f2aec65078ef4ea2319aad4
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-11-28 12:29:22 +0000
+
+    Added more tests 
+
+  Change: 45ceda824d56dfc5b4369026fc4558406df3725a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-11-28 11:46:41 +0000
+
+    Initial release 
+
+------------------------------------------
+version 0.001 at 2016-11-28 12:21:16 +0000
+------------------------------------------
+
+  Change: eb746fae909d55a460a67cf06b7868e175e58479
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-11-28 10:21:16 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

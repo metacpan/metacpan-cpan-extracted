@@ -1,0 +1,80 @@
+0.23	May 25, 2005
+
+	- fix for configuring tabs wo/ close buttons
+		(Thanks to Daniel Wikman for the patch)
+
+0.22	May 21, 2005
+
+	- added -hidden page option to make tabs disappear/reappear, 
+	
+	- added -tabtip page option to attach a balloon
+		widget to a tab
+	
+	- added -tiptime, tipcolor to configure the tabtip balloon
+
+0.20	Jan. 15, 2005
+
+	- added -tabclose option w/ close button in tabs
+	- added -tabside option to specify tab orientation
+	- added -image, -label options
+	- revised demo script
+	- improved test scripts
+	- fixed -raisecolor behavior to revert color of
+		prior raised tab
+	- fixed "roaming" tab connector frame 
+	- code mods for performance
+	- added -tabcolor/-backpagecolor, -raisecolor widget level options
+	- added -raisecmd attribute to add() to support event callback
+	- added some Tk::Notebook drop-in compatibility (pagecget(),
+		pageconfigure(), pages(), raised())
+	- POD enhancements
+	- added -textalign
+	- added -tabrotate
+	- added flash(), deflash()
+
+0.07	March 15, 2004
+	- added -raisecolor option
+	- fixed config debounce for ptk 804.025betaX
+
+0.06	Jan. 16, 2004
+	- fixed programmatic raise
+	- added (simple) install test 
+	- added programmatic raise button to demo app
+
+0.05	Jan. 13, 2004
+	- added "pseudo-tabs" to backfill the space
+	between the right side of last tab in a row,
+	and the right side of the enclosing frame
+
+0.04	Jan. 6, 2004
+	- fixed TabRemove for remove from arbitrary position
+
+	- updated demo app to exersize arbitrary position
+	removal
+
+	- fixed apparent timing issue with TabRemove and
+	resizing that caused occasional phantom client entries
+
+0.03	Jan. 5, 2004
+	- added raised_name() method/-raised_name property
+	to retrieve caption of currently raised tab
+
+	- fixed tab ordering on resize when raised tab
+	gets moved to other than bottom row
+
+0.02	Dec. 29, 2003
+	- Modified Raise behavior to simply rotate rows,
+	not rearrange tabs
+	
+	- Modified Raise behavior to just raise client
+	frame, and lower other client frames, instead
+	of placeForget() to eliminate redraw flicker.
+
+	- modified font behavior to use system defaults
+	for tabs if none explicitly specified
+	
+	- added -tablock option to disable tab rearrangement
+	on widget resize events
+
+0.01	Dec. 25, 2003
+	Coded.

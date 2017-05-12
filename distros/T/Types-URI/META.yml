@@ -1,0 +1,44 @@
+---
+abstract: 'type constraints and coercions for URIs'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+  Test::Requires: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-URI
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Types::URI:
+    file: lib/Types/URI.pm
+    version: '0.006'
+requires:
+  Type::Library: '1.000000'
+  Types::Path::Tiny: '0'
+  Types::Standard: '0'
+  Types::UUID: '0'
+  URI: '0'
+  URI::FromHash: '0'
+  perl: '5.008'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Types-URI/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Types-URI
+  homepage: https://metacpan.org/release/Types-URI
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-types-uri.git
+version: '0.006'

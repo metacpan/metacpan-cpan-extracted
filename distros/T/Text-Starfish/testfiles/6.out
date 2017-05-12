@@ -1,0 +1,19 @@
+An example of C-preprocessor-like behaviour in (La)TeX:
+
+% <? $Star->setStyle('TeX') !>
+
+% For version 1 of a document
+% <? #$Star->addHook("\n%Begin1","\n%End1",'s/\n%+/\n/g');
+%    #$Star->addHook("\n%Begin2","\n%End2",'s/\n%*/\n%/g');
+%    #For version 2
+%    $Star->addHook("\n%Begin1","\n%End1",'s/\n%*/\n%/g');
+%    $Star->addHook("\n%Begin2","\n%End2",'s/\n%+/\n/g');
+% !>
+
+%Begin1
+%Document 1
+%End1
+
+%Begin2
+Document 2
+%End2

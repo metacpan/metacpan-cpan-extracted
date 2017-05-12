@@ -1,0 +1,5 @@
+Text::Placeholder - a simple placeholder system for text
+
+This is an experimental module. Text::Placeholder substitutes symbolic placeholders in a text with values derived from function calls. Placeholder names as well as their current values are dynamic. Real work is delegated to placeholder groups. There are groups or combination of groups to produce SQL statements, directory listings or parts of HTML pages.
+
+

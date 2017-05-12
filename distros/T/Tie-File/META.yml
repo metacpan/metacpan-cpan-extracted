@@ -1,0 +1,25 @@
+---
+abstract: 'Access the lines of a disk file via a Perl array'
+author:
+  - 'Mark Jason Dominus <MJD@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-File
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/toddr/Tie-File
+  x_MailingList: http://lists.perl.org/list/perl5-porters.html
+version: 1.00

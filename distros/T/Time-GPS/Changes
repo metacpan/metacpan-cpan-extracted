@@ -1,0 +1,44 @@
+version 0.003; 2012-03-22
+
+  * in test suite, require bugfixed version of Math::BigRat (for
+    construction from decimal fraction strings)
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+version 0.002; 2010-10-23
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.001; 2009-04-30
+
+  * use "warnings" and "strict" pragmas
+
+  * test explicitly for correct class of result
+
+  * use simpler "parent" pragma in place of "base"
+
+  * test POD syntax and coverage
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.000; 2006-06-13
+
+  * initial released version

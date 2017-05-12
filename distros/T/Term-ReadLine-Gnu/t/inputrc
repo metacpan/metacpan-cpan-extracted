@@ -1,0 +1,8 @@
+# readline init file for t/readline.t
+#	`a' and `b' should be bind to about, and 'c' not.
+"a": abort
+$if ReadLineTest
+"b": abort
+$else
+"c": abort
+$endif

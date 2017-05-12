@@ -1,0 +1,298 @@
+#!/usr/bin/perl
+#
+# Generate 256-color test files.
+#
+# Takes one or more of six arguments: basic, bright, fg256 (foreground), bg256
+# (background), grey, or ansi256.  Generates a test file for either basic ANSI
+# colors or 256-color emulators, testing that region of colors.
+#
+# This script requires Term::ANSIColor 4.00 or later already be installed or
+# that this script be run manually under Perl with flags pointing to where the
+# module is.
+#
+# Copyright 2012 Kurt Starsinic <kstarsinic@gmail.com>
+# Copyright 2012, 2014, 2016 Russ Allbery <rra@cpan.org>
+#
+# This program is free software; you may redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+use 5.006;
+use strict;
+use warnings;
+
+use Carp qw(croak);
+use Term::ANSIColor 4.00 qw(color);
+
+# Screen width for centering headings.
+use constant SCREEN_WIDTH => 80;
+
+# The basic attributes and eight colors.
+use constant ATTRIBUTES => qw(bold dark italic underline blink concealed);
+use constant COLORS     => qw(black red green yellow blue magenta cyan white);
+
+# print and printf with error checking.  autodie unfortunately can't help us
+# with these because they can't be prototyped and hence can't be overridden.
+
+## no critic (Subroutines::RequireArgUnpacking)
+sub print_checked  { print @_  or croak('print failed');  return }
+sub printf_checked { printf @_ or croak('printf failed'); return }
+## use critic
+
+# The sample background or foreground colors for 256-color tests.
+my @SAMPLES = qw(000 222 555);
+
+# The list of all possible RGB values.
+my @RGB;
+for my $r (0 .. 5) {
+    for my $g (0 .. 5) {
+        push(@RGB, map { "$r$g$_" } 0 .. 5);
+    }
+}
+
+# Center a text string with spaces.
+#
+# $text  - Text to center
+# $width - Width in which to center the text
+#
+# Returns: Text centered within that width
+sub center {
+    my ($text, $width) = @_;
+    my $padding  = $width - length($text);
+    my $trailing = int($padding / 2);
+    my $leading  = $padding - $trailing;
+    return (q{ } x $leading) . $text . (q{ } x $trailing);
+}
+
+# Print out the test file that tries all the basic eight ANSI colors.
+#
+# Returns: undef
+#  Throws: Text exception on I/O failure
+sub print_basic_test {
+    print_checked("Basic ANSI colors (eight-color, or dim)\n\n");
+    for my $bg (COLORS) {
+        printf_checked('%4s %-7s ', q{ }, $bg);
+        for my $fg (COLORS) {
+            print_checked(color($fg, "on_$bg"), center($fg, 8));
+        }
+        print_checked(color('reset'), "\n");
+        printf_checked('%4s %-7s ', 'bold', $bg);
+        for my $fg (COLORS) {
+            print_checked(color($fg, 'bold', "on_$bg"), center($fg, 8));
+        }
+        print_checked(color('reset'), "\n");
+    }
+    print_checked("\nAttributes: ");
+    for my $fg (ATTRIBUTES) {
+        print_checked(center($fg, 10));
+    }
+    print_checked("\n", q{ } x 12);
+    for my $fg (ATTRIBUTES) {
+        print_checked(color($fg), center('testing', 10), color('reset'));
+    }
+    print_checked("\n\n");
+    return;
+}
+
+# Print out the test file that tries all the bright colors from the
+# sixteen-color palette.
+#
+# Returns: undef
+#  Throws: Text exception on I/O failure
+sub print_bright_test {
+    print_checked("Bright ANSI colors (sixteen-color)\n\n");
+    for my $bg (COLORS) {
+        printf_checked('%6s %-7s ', 'dim', $bg);
+        for my $fg (COLORS) {
+            my $escape = color("bright_$fg", "on_$bg");
+            print_checked($escape, center($fg, 8));
+        }
+        print_checked(color('reset'), "\n");
+        printf_checked('%6s %-7s ', 'bright', $bg);
+        for my $fg (COLORS) {
+            my $escape = color("bright_$fg", "on_bright_$bg");
+            print_checked($escape, center($fg, 8));
+        }
+        print_checked(color('reset'), "\n");
+    }
+    print_checked("\n");
+    return;
+}
+
+# Print out the test file that tries all valid RGB foreground colors.
+#
+# Returns: undef
+#  Throws: Text exception on I/O failure
+sub print_fg256_test {
+    print_checked("RGB000 - RGB555 from 256-color palette (foreground)\n");
+    for my $bg (@SAMPLES) {
+        for my $i (0 .. $#RGB) {
+            if (($i % 18) == 0) {
+                printf_checked("%s\nbg %03d %s",
+                    color('reset'), $bg, color("on_rgb$bg"));
+            }
+            printf_checked('%s%03d ', color("rgb$RGB[$i]"), $RGB[$i]);
+        }
+    }
+    print_checked(color('reset'), "\n\n");
+    return;
+}
+
+# Print out the test file that tries all valid RGB background colors.
+#
+# Returns: undef
+#  Throws: Text exception on I/O failure
+sub print_bg256_test {
+    print_checked("RGB000 - RGB555 from 256-color palette (background)\n");
+    for my $fg (@SAMPLES) {
+        for my $i (0 .. $#RGB) {
+            if (($i % 18) == 0) {
+                printf_checked("%s\nfg %03d %s",
+                    color('reset'), $fg, color("rgb$fg"));
+            }
+            printf_checked('%s%03d ', color("on_rgb$RGB[$i]"), $RGB[$i]);
+        }
+    }
+    print_checked(color('reset'), "\n\n");
+    return;
+}
+
+# Print out the test file that shows all valid grey-scale colors.
+#
+# Returns: undef
+#  Throws: Text exception on I/O failure
+sub print_grey_test {
+    print_checked("Grey0 - Grey23 from 256-color palette\n\n");
+    for my $bg (0 .. 23) {
+        printf_checked('%2d %s', $bg, color("on_grey$bg"));
+        for my $fg (0 .. 23) {
+            printf_checked('%s%d ', color("grey$fg"), $fg);
+        }
+        print_checked(color('reset'), "\n");
+    }
+    print_checked("\n");
+    return;
+}
+
+# Print out the test file that shows the 16 ANSI colors from the 256-color
+# palette.
+#
+# Returns: undef
+#  Throws: Text exception on I/O failure
+sub print_ansi256_test {
+    print_checked("ANSI colors 0 - 15 from 256-color palette\n\n");
+    for my $bg (0 .. 15) {
+        printf_checked('%2d %s', $bg, color("on_ansi$bg"));
+        for my $fg (0 .. 15) {
+            printf_checked('%s%d ', color("ansi$fg"), $fg);
+        }
+        print_checked(color('reset'), "\n");
+    }
+    print_checked("\n");
+    return;
+}
+
+# Main routine.  Scan @ARGV for which test files to print out.
+my %tests = (
+    basic   => \&print_basic_test,
+    bright  => \&print_bright_test,
+    fg256   => \&print_fg256_test,
+    bg256   => \&print_bg256_test,
+    grey    => \&print_grey_test,
+    ansi256 => \&print_ansi256_test,
+);
+for my $file (@ARGV) {
+    if ($tests{$file}) {
+        $tests{$file}->();
+    } else {
+        die "Unknown test file: $file\n";
+    }
+}
+
+__END__
+
+=for stopwords
+fg256 bg256 RGB rgb000 rgb222 rgb555 ansi256 CPAN Starsinic Allbery grey
+grey-scale
+
+=head1 NAME
+
+generate-colors - Generate color test patterns for ANSI terminal support
+
+=head1 SYNOPSIS
+
+B<generate-colors> I<type> [I<type> ...]
+
+=head1 REQUIREMENTS
+
+Perl 5.6 and Term::ANSIColor 4.00 or later.
+
+=head1 DESCRIPTION
+
+B<generate-colors> generates test and demonstration tables for ANSI color
+and text attribute support for eight-color, sixteen-color, and 256-color
+terminal emulators.  The I<type> command-line argument specifies a table
+to print to standard output.  Multiple I<type> arguments can be specified,
+and each of those tables will be printed in the order given.
+
+The supported values of I<type> are:
+
+=over 8
+
+=item basic
+
+The basic eight ANSI colors as both foreground and background, as well as
+examples of bold for each color and a separate table of the non-color text
+attributes supported by Term::ANSIColor.
+
+=item bright
+
+The "bright" ANSI colors from the sixteen-color palette (colors 8 through
+15) on all possible color backgrounds (colors 0 through 15).
+
+=item fg256
+
+All of the 216 colors in the 256-color palette that are specified by three
+RGB values (each from 0 to 5) as foreground colors, shown against three
+possible backgrounds (rgb000, rgb222, and rgb555).
+
+=item bg256
+
+The same as C<fg256> except showing all of the background colors for three
+different possible foreground colors (rgb000, rgb222, and rgb555).
+
+=item grey
+
+The 24 grey-scale colors in the 256-color palette, shown as both foreground
+and background.
+
+=item ansi256
+
+The 256-color palette devotes the lowest 16 colors to duplicating the colors
+from the sixteen-color palette.  This test table shows all sixteen as both
+foreground and background colors, but using the 256-color escape sequence
+format to specify them.  It's possible that this test will not work with
+some emulators that support C<basic> and C<bright> if 256-color support is
+not implemented.
+
+=back
+
+=head1 SEE ALSO
+
+L<Term::ANSIColor>
+
+This script is an example in the Term::ANSIColor distribution, available
+from its web site at L<https://www.eyrie.org/~eagle/software/ansicolor/>
+or from CPAN.
+
+=head1 AUTHORS
+
+Original script written by Kurt Starsinic.  It was restructured and updated
+by Russ Allbery to add the C<basic> and C<bright> test tables.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2012 Russ Allbery <rra@cpan.org>.  Copyright 2012 Kurt Starsinic
+<kstarsinic@gmail.com>.  This program is free software; you may
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

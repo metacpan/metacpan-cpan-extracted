@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testsuites>
+  <testsuite name="t/internal_tests/die_head_end.test" errors="1" failures="0" tests="4">
+    <system-out/>
+    <testcase name="t/internal_tests/die_head_end.test" time="TEST_TIME">
+      <failure><![CDATA[Fail reason(s):
+    parse errors (No plan found in TAP output)
+Test output:
+ok 1
+ok 2
+ok 3
+ok 4
+
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

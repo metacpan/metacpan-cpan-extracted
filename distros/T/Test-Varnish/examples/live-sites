@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+#
+# Sniff some random (norwegian) websites for Varnish presence.
+# Varnish is a very popular software in Norway.
+# In fact, it comes from Norway :)
+#
+# If you didn't install Test::Varnish yet,
+# run it with:
+#
+# perl -I../lib ./live-sites 
+
+use strict;
+use warnings;
+use Test::Varnish;
+use Test::More;
+
+plan tests => 3;
+
+my $test_ua = Test::Varnish->new({
+	verbose => 1
+});
+
+$test_ua->is_cached(
+	{
+		url => 'http://www.digi.no/',
+	}, 'Digi.no frontpage is using Varnish'
+);
+
+$test_ua->isnt_cached(
+	{
+		url => 'http://www.finn.no/',
+	}, 'Finn.no frontpage does not have Varnish headers'
+);
+
+$test_ua->isnt_cached(
+	{
+		url => 'http://www.opera.com',
+	}, 'Opera Software main website does not use Varnish'
+);
+

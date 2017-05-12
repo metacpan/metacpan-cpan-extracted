@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+Changes
+t/00basic.t
+t/01tie.t
+lib/Tie/Hash/Approx.pm

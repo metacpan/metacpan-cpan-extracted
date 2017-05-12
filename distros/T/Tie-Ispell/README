@@ -1,0 +1,29 @@
+ Tie::Ispell version 0.04
+==========================
+
+Ties an hash with an ispell dictionary
+
+
+ABSTRACT
+
+This module implements a way to deal with ispell dictionaries using a
+hash. It tries to work also with aspell.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENSE
+
+Copyright 2004 Natura Project, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

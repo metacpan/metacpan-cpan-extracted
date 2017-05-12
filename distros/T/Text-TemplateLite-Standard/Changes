@@ -1,0 +1,11 @@
+Revision history for Text-TemplateLite-Standard
+
+0.03	2012-1012
+	Removed unused Data::Dumper from test scripts
+
+0.02	2012-10-12
+	Add missing testing dependency to Makefile.PL
+
+0.01    2012-10-12
+        First version, released on an unsuspecting world.
+

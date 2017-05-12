@@ -1,0 +1,130 @@
+Revision history for Test-CPAN-Meta
+===================================
+
+0.25    2015-05-06
+        - POD fixes (by Olivier Mengué (DOLMEN)).
+        - removed Test::CPAN::Meta from the recommends list, as CPAN.pm tries
+          to install it first. (RT#104023 Steve Hay (SHAY)).
+
+0.24    2015-01-13
+        - extended META test suite.
+        - added META.json and tests.
+        - documentation updates
+
+0.23    2013-04-07
+        - change file dates changed to meet W3CDTF standards.
+
+0.22    2012-08-12
+        - updated INSTALL instructions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - implemented Perl::Critic suggestions.
+        - added meta_yaml_ok test and example.
+        - several Version.pm updates, including new() parameter name change:
+          'yaml' is now 'data'.
+
+0.21    2012-04-19
+        - RT#76609: further spelling fix. (Florian Schlichting).
+        - removed DSLIP info.
+
+0.20    2012-04-17
+        - RT#76609: spelling fix. (Florian Schlichting & Gregor Herrmann).
+
+0.19    2012-04-13
+        - RT#74317: imported url validation from CPAN::Meta (Alex Hartmaier).
+        - RT#66692: updated license type (Paul Howarth).
+        - updates to examples.
+
+0.18    2011-02-13
+        - documentation clean up.
+
+0.17    2010-04-12
+        - fixed qr// delimiters due to issues with the NOT SIGN symbol
+          (suggested by Ricardo Signes & David Golden).
+
+0.16    2009-12-18
+        - renamed word() to keyword().
+        - added identifier() validation.
+        - changed optional_features key from a keyword to an identifier type,
+          thus further clarifying RT#52685 (thanks Kevin).
+
+0.15    2009-12-12
+        - clarified spec defined and user defined keys, as promoted by Kevin
+          Ryde in RT#52685 (thanks Kevin).
+
+0.14    2009-12-07
+        - RT#46473: license url with fragment part (Kevin Ryde)
+        - RT#47393: "optional_features" as map rather than list (Kevin Ryde)
+        - above applied to 1.4, 1.3 and 1.2 version of the meta-spec.
+
+0.13    2009-05-24
+        - added version checking to standard 94metatest.t
+        - added changes file checking, 95changedate.t
+        - added support for v-strings (thanks to David Golden)
+        - relaxed resource keys names, as per spec (thanks to Jonathan Yu)
+
+0.12    2008-06-27
+        - added spec version 1.4
+        - added further check to ensure we have a known spec version
+
+0.11    2008-06-02
+        - added 'git' as an accepted url protocol (Mischa Poslawsky).
+
+0.10    2008-03-28
+        - purely a cosmetic release to render the Makefile.PL time issues, that
+          have generated bogus FAIL reports in previous releases, null and
+          void.
+
+0.09    2008-03-17
+        - it helps when you fix all the versioning too!
+
+0.08    2008-03-17
+        - fixed licensing list (adding Artistic2). (Bernhard Schmalhofer)
+        - value for license is mandatory, but the actual value could be any
+          string. Therefore the license() function now returns 1 if the given
+          value is a known license type, returns 2 if a value is given, or 0
+          if no value is given.
+        - hashref returned of the parsed META.yml file, by both meta_spec_ok()
+          and meta_yaml_ok(), in the event the user wishes to perform addition
+          checks on the values of the hash keys. (Adam Kennedy)
+        - added t/05metaspec.t test file.
+
+0.07    2008-01-10
+        - removed dependencies on Test::YAML::Valid, YAML and YAML-Syck, in
+          their place we now use the new Parse::CPAN::Meta module, which has
+          been proposed for including in the Perl Core.
+        - name change from 'Test::YAML::Meta' to 'Test::CPAN::Meta', to follow
+          the better naming convention as per Parse::CPAN::Meta.
+        - added AUTOMATED_TESTING checks to packaging tests.
+
+0.06    2007-11-05
+        - fixed RT#29457: distribution_type is not mandatory in spec 1.2 (domm)
+
+0.05    2007-11-02
+        - a curious error report fails validating META.yml the first time, but
+          is okay the second time. As such I'm removing the 93metavalid.t as
+          the test is redundant now.
+
+0.04    2007-05-15
+        - provided better error reporting (spec chain and validating version)
+        - added a new test file, supplied by Jochen Stenzel, which highlights
+          an error in the way the author line was created.
+        - bumped the Test::More version required, due to a bugfix in
+          Test::Builder:Tester.
+        - provided a cleaner way to report undef values as errors
+        - added lots more tests for edge cases
+        - finally sorted the Test::Builder::Tester tests in 04metatester.t
+        - Devel::Cover = 95.6%
+
+0.03    2007-02-27
+        - POD & comment updates
+        - removed 92distribution.t test as it can't detect that YAML::Syck is
+          optional
+        - fixed a misunderstanding of mine from the META.yml specification.
+
+0.02    2007-02-27
+        - Fixed a bug in detecting module name
+
+0.01    2007-02-27
+        - Initial release.
+        - Devel::Cover = 91.7%

@@ -1,0 +1,67 @@
+{
+   "abstract" : "A templating engine using the L<JavaScript::V8> module",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-JavaScript",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Any::Moose" : 0,
+            "JavaScript::V8" : 0,
+            "JavaScript::Value::Escape" : 0,
+            "Template" : 0,
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Slurp" : 0,
+            "File::Spec::Functions" : 0,
+            "File::Temp" : 0,
+            "FindBin" : 0,
+            "Test::More" : 0,
+            "Test::Output" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Template-JavaScript@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Template-JavaScript"
+      },
+      "homepage" : "http://search.cpan.org/dist/Template-JavaScript/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avar/template-javascript.git",
+         "web" : "http://github.com/avar/template-javascript"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AVAR"
+}
+

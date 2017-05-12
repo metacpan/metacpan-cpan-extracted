@@ -1,0 +1,8 @@
+MANIFEST
+README
+lib/Tk/JFileDialog.pm
+Makefile.PL
+JFileDialogTest.pl
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

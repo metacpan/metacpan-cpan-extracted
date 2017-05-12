@@ -1,0 +1,63 @@
+package Test::WWW::Selenium::More::Manual::ForTheImpatient;
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::ForTheImpatient
+
+=head1 NAME
+
+Test::WWW::Selenium::More::Manual::ForTheImpatient
+
+=head1 INSTALL THE SELENIUM SERVER
+
+Selenium is written in Java.  So you need Java.  Then download the latest
+selenium server jar file from http://seleniumhq.org/download.  Put it anywhere.
+
+=head1 WRITE A BASIC SELENIUM TEST
+
+    # put the following code into t/test.t
+
+    use Test::Most;
+    use Test::WWW::Selenium::More;
+
+    my $s = Test::WWW::Selenium::More->new( 
+        host        => 'localhost', # selenium server host
+        port        => 4444,        # selenium server port
+        browser_url => "http://localhost:5000",
+    );
+
+    $s->open_ok("/");
+    $s->title_like(qr/Hello world/);
+
+    done_testing;
+
+=head1 RUN YOUR SELENIUM TEST
+
+    # Start your web server on localhost, port 5000
+    ...
+
+    # Start the Selenium server
+    java -jar selenium-server.jar -port 4444 -trustAllSSLCertificates -browserSessionReuse
+
+    # Run your tests against localhost, port 5000
+    prove -lrv t/test.t
+
+=head1 AUTHOR
+
+Eric Johnson <kablamo at iijo dot nospamthanks dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Eric Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

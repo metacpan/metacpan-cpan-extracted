@@ -1,0 +1,92 @@
+{
+   "abstract" : "Haml Perl implementation",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Haml",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Section::Simple" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "IO::File" : "0",
+            "Scalar::Util" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Haml" : {
+         "file" : "lib/Text/Haml.pm",
+         "version" : "0.990118"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/text-haml/issues"
+      },
+      "homepage" : "https://github.com/vti/text-haml",
+      "repository" : {
+         "url" : "git://github.com/vti/text-haml.git",
+         "web" : "https://github.com/vti/text-haml"
+      }
+   },
+   "version" : "0.990118",
+   "x_contributors" : [
+      "enosis <enosis@github.com>",
+      "rightgo09 <skyarrow09@gmail.com>",
+      "Breno G. de Oliveira <garu@cpan.org>",
+      "Yuya Tanaka <yuya.presto@gmail.com>",
+      "Carlos Lima <carlos@carlos>",
+      "Jason Younker <jason@ynkr.org>",
+      "Neil Bowers <neil@bowers.com>",
+      "Evgenni Grishkovelli <grishkovelli@gmail.com>",
+      "Hyungsuk Hong <aanoaa@gmail.com>",
+      "Keedi Kim <keedi.k@gmail.com>",
+      "TheAthlete <theathlet@yandex.ru>",
+      "Mark Aufflick <mark@aufflick.com>",
+      "vti <vti@clarive.com>",
+      "Graham Todd <gtodd@iciti.ca>",
+      "vti <viacheslav.t@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

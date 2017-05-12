@@ -1,0 +1,26 @@
+Build.PL
+Changes
+ignore.txt
+lib/TeX/AutoTeX.pm
+lib/TeX/AutoTeX/ConcatPDF.pm
+lib/TeX/AutoTeX/Config.pm
+lib/TeX/AutoTeX/Exception.pm
+lib/TeX/AutoTeX/File.pm
+lib/TeX/AutoTeX/Fileset.pm
+lib/TeX/AutoTeX/HyperTeX.pm
+lib/TeX/AutoTeX/Log.pm
+lib/TeX/AutoTeX/Mail.pm
+lib/TeX/AutoTeX/PostScript.pm
+lib/TeX/AutoTeX/Process.pm
+lib/TeX/AutoTeX/StampPDF.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+SIGNATURE
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

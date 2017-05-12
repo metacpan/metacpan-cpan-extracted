@@ -1,0 +1,18 @@
+Revision history for Tie-Tk-Text
+
+0.92 (2009-01-20)
+    - Updated documentation to reflect that this works for any Tk-based
+      text widget (e.g. Tkx::ROText).
+    - Use Module::Build for installation. ExtUtils::MakeMaker can still be used 
+      as well.
+
+0.91 (2006-11-29)
+    - Added Tk as a prerequisite so that the automated testers pick up 
+      on it. (The module itself doesn't use Tk but it serves no purpose
+      without it.)
+
+0.90 (2006-11-21)
+    - provides all methods for tied arrays (note: EXTEND is a no-op)
+
+0.01 (2006-11-19)
+    - original version released on CPAN; provides *readonly* access

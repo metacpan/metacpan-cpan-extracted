@@ -1,0 +1,11 @@
+Revision history for Perl extension Tk::mySplashScreen.
+
+1.0.3	4/4/03 18:05:32
+	no code changes. Added default.gif and trog_splash.gif to the MANIFEST
+	(duh!)
+
+1.0.2	3/31/03	11:37:38
+	created proper test suite.		
+	
+1.0.1	3/24/03
+		initial release as MakeMaker package.

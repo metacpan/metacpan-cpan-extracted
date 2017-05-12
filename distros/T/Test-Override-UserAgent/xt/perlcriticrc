@@ -1,0 +1,19 @@
+exclude  = Miscellanea::RequireRcsKeywords
+severity = 1
+
+[Documentation::PodSpelling]
+stop_words = AnnoCPAN API CPAN CPAN's HASHREF perldoc PSGI URI
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | METHODS | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
+script_sections = NAME | VERSION | USAGE | DESCRIPTION | OPTIONS | DIAGNOSTICS | EXIT STATUS | CONFIGURATION | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5

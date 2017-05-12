@@ -1,0 +1,98 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "Type::Library 0.004"^^doap-deps:CpanId;
+	];
+	doap-deps:test-recommendation [ doap-deps:on "Moo 1.003000"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::TypeTiny 0.004"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD-Lite>;
+	doap:created         "2013-07-08"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Types-XSD-Lite>;
+	doap:homepage        <https://metacpan.org/release/Types-XSD-Lite>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Types-XSD-Lite";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-types-xsd-lite>;
+	];
+	doap:shortdesc       "type constraints based on a subset of XML schema datatypes".
+
+<http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Initial release; split from Types-XSD-0.002";
+	dc:identifier        "Types-XSD-Lite-0.003"^^xsd:string;
+	dc:issued            "2013-07-08"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-Lite-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Types-XSD-Lite-0.004"^^xsd:string;
+	dc:issued            "2014-04-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix bug where inline_check called multiple times on a parameterized type works the first time, but ignores all parameters on subsequent calls.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/94620>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/djerius>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-Lite-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Types-XSD-Lite-0.005"^^xsd:string;
+	dc:issued            "2014-04-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "s/Types::XSD/Types::XSD::Lite/ in a few places.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-Lite-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/djerius>
+	a                    foaf:Person;
+	foaf:name            "Diab Jerius";
+	foaf:nick            "DJERIUS";
+	foaf:page            <https://metacpan.org/author/DJERIUS>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/94620>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "94620"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=94620>.
+

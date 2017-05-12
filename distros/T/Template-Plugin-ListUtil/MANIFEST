@@ -1,0 +1,10 @@
+Build.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+lib/Template/Plugin/ListUtil.pm
+lib/Template/Plugin/ListUtilVMethods.pm
+t/01basic.t
+t/02vmethod.t
+Makefile.PL
+META.yml
+CHANGES

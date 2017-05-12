@@ -1,0 +1,22 @@
+Revision history for Perl extension Template::Plugin::Filter::Minify::CSS.
+
+0.95  2014-04-01
+    - remove Module::Signature requirement
+
+0.94  2011-09-02
+    - use my Dist::Zilla pluginbundle
+    - update for Dist::Zilla 4.x: Prereq -> Prereqs
+    - fix POD typo
+
+0.93      2010-03-24 10:26:14 America/Chicago
+    - switch to Dist::Zilla for cutting releases.  Raaaaar!
+
+0.92  Fri Nov 13 2009
+    - disable signature test unless TEST_SIGNATURE is enabled, otherwise test
+      fails if keyserver is unreachable.
+
+0.91  Tue Oct 27 2009
+    - added signature test
+
+0.90  Thu Oct 15 2009
+    - initial version

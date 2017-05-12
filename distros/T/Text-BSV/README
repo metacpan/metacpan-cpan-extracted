@@ -1,0 +1,54 @@
+Text::BSV::* version 1.04
+
+DESCRIPTION
+
+    This distribution includes the following modules:
+
+        Text::BSV::BsvFileReader - Defines a class for reading BSV data
+        from a file and then turning the data into an array of field names
+        plus one hash encapsulating each record.
+
+        Text::BSV::BsvListReader - Defines a class for reading BSV data
+        from a list of strings containing the rows (without end-of-line
+        characters), including the header row, and then turning the data
+        into an array of field names plus one hash encapsulating each
+        record.
+
+        Text::BSV::BsvWriter - Defines a class for generating BSV data from
+        a list of field names and a list of references to hashes that
+        encapsulate records.  The class provides a method for returning the
+        BSV data as a reference to an array of strings, and a method for
+        writing the BSV data to a file.
+
+        Text::BSV::BsvParsing - Contains helper functions for parsing and
+        generating BSV data.  These functions are used by the other modules.
+        Although there is no prohibition against client code using these
+        functions directly, there is little likelihood of that being useful.
+
+        Text::BSV::Exception - Defines a package for creating a
+        Text::BSV::Exception object, which can be thrown using the Perl
+        "die" function and caught using "eval".
+
+    For information on the BSV (Bar-Separated Values) format itself, see the
+    file named "bsv_format.txt".
+
+REQUIREMENTS
+
+    These modules require Perl 5, version 5.10.1 or later.
+
+INSTALLATION
+
+    To install the modules included in this distribution, simply copy the
+    "Text" directory (with its BSV subdirectory and the files therein) to a
+    location in @INC (for example, "/etc/perl" or "C:\Perl\site\lib").
+
+AUTHOR
+
+    Benjamin Fitch <blernflerkl@yahoo.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2010 by Benjamin Fitch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

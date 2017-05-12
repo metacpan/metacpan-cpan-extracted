@@ -1,0 +1,234 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::Widget::Term
+at lib/Tickit/Widget/Term.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Tickit::Widget::Term - runs a process in a window, using terminal emulation that makes VT100 look like advanced technology
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ use Tickit::Async;
+ use Tickit::Widget::Term;
+ use IO::Async::Loop;
+ use Log::Any qw($log);
+ use Log::Any::Adapter qw(Stderr);
+ use Tickit::Widget::Frame;
+ 
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+ 	my $tickit = Tickit::Async->new
+ );
+ my $frame = Tickit::Widget::Frame->new(
+ 	child => my $term = Tickit::Widget::Term->new(
+ 		command => ['/bin/bash'],
+ 		loop => $loop
+ 	),
+ 	title => 'shell',
+ 	style => {
+ 		linetype => 'single'
+ 	},
+ );
+ $tickit->set_root_widget(
+ 	$frame
+ );
+ $term->take_focus;
+ $tickit->run;
+
+=head1 DESCRIPTION
+
+In principle, a terminal widget would provide an abstraction for running any terminal application under
+L<Tickit>. This would include full support for attributes, cursor movement, scrolling, mouse/keyboard input,
+and if used as the root window should be indistinguishable from running the code directly from the parent
+terminal itself.
+
+What you get with this module is a minimum-viable implementation for running a tiny subset of the
+basic shell commands. It's a hack using cargo-culted L<IO::Pty> pieces, manual forking under L<IO::Async>,
+and a vague understanding of terminal control codes based on watching low-budget police shows. It redraws
+everything at the slightest excuse. You'd have to run reset(1) before you can even get your own keyboard
+input echoing back. The code spends most of its time logging the endless list of features that aren't supported.
+
+Having said that, here are some things you can expect to work:
+
+=over 4
+
+=item * ls (partly)
+
+=item * some of the letters
+
+=item * maybe the enter key
+
+=back
+
+Unlikely scenarios:
+
+=over 4
+
+=item * anything which does more than move the cursor or select one of the 8 colours.
+
+=back
+
+At this point, it's customary to mention that the module and API are experimental and likely to change.
+Careful readers will already have noticed that this is a placeholder module and "likely to change" is
+somewhat understated.
+
+=head2 Logging
+
+This module uses L<Log::Any> to generate copious amounts of unhelpful diagnostics. Future versions may
+add even more!
+
+=head1 METHODS
+
+=head2 new
+
+This creates a new instance. I'd recommend against using it.
+
+ Tickit::Widget::Term->new(
+  command => ['/bin/bash'],
+  loop => $loop
+ )
+
+=head2 window_gained
+
+Sets up cursor position and notifies the child process via WINCH when we get a window.
+
+=head2 loop
+
+Accessor for the L<IO::Async::Loop> instance.
+
+=head2 pty
+
+Accessor for the L<IO::Pty> instance.
+
+=head2 lines
+
+How many lines we're expecting to use. This value was carefully researched from a wide selection of
+popular terminal applications, and is not just the highest number I can count to on one hand.
+
+=head2 cols
+
+Default number of columns. The number 80 seemed appropriate here.
+
+=head2 render_to_rb
+
+Renders things. You don't call this, L<Tickit> does.
+
+=head2 command
+
+Returns the command to execute plus any args, as an arrayref.
+
+=head2 init
+
+Calling this yourself is probably not needed, so documenting it would be even less useful.
+
+=head2 on_key
+
+This will be called when we get a key. Its purpose is mostly to emit unhappy log messages about
+how few of those keys we're passing along.
+
+=head2 pen
+
+Returns a pen. Probably one that matches the currently-requested attributes.
+
+=head2 csi_map
+
+Dispatch table thing for handling control sequence introducers. They do things like set
+colours, apparently.
+
+=head2 handle_terminal_output
+
+This takes bytes from the PTY handle, then throws most of them away. Since the method
+no longer fits on my screen I have no idea what any of it really does.
+
+=head2 find_next_tab
+
+Returns the next tab stop after our current position.
+
+=head2 push_state
+
+Stores current state, including things like colours.
+
+=head2 pop_state
+
+Restores the previous state.
+
+=head2 terminal_line
+
+Which line the terminal thinks it's on. Usually zero-based.
+
+=head2 terminal_col
+
+Which column the terminal thinks it's on. Also zero-based.
+
+=head2 push_text
+
+Takes some text characters and puts them into the write operation queue.
+
+=head2 available_lines
+
+Guesses how many lines we have.
+
+=head2 available_cols
+
+Does the same for columns.
+
+=head2 terminal_next_line
+
+Moves to the next line - if we're at the end of the screen then it'll attempt to scroll.
+
+=head2 scroll
+
+Does some sort of scrolling.
+
+=head2 update_cursor
+
+Moves the window cursor to the terminal cursor position.
+
+You might be wondering why there are two cursors - that's possibly due to the misguided notion
+that this code should be able to run the PTY quietly in the background even when we have no window.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * libvterm - if I had the patience for C, I would have started with bindings to this
+
+=item * L<http://invisibleisland.net> - xterm docs
+
+=item * L<console_codes(4)> - Linux console terminal codes
+
+=item * screen, tmux, term.js - they're probably doing it properly. If I wasn't on a plane
+while writing this, that's the source code I'd be reading first.
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<on_pen_changed|Tickit::Widget/on_pen_changed>, L<parent|Tickit::Widget/parent>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<reshape|Tickit::Widget/reshape>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_pen|Tickit::Widget/set_pen>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>, L<window_lost|Tickit::Widget/window_lost>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2015. Licensed under the same terms as Perl itself.

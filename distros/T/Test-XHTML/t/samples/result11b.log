@@ -1,0 +1,6 @@
+#          got: 0
+#     expected: 1
+# 
+# Errors:
+# 1. W002: all <input> tags require a unique id (test3) [WCAG v2 4.1.1 (A)] [row 17, column 2]
+# 2. W001: no submit button in form (form1) [WCAG v2 3.2.2 (A)] [row 25, column 2]

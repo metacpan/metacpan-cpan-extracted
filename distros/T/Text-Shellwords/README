@@ -1,0 +1,35 @@
+Text/Shellwords version 1.08
+============================
+
+This is a thin wrapper around the shellwords.pl package, which comes
+preinstalled with Perl.  This module imports a single subroutine,
+shellwords().  The shellwords() routine parses lines of text and
+returns a set of tokens using the same rules that the Unix shell does
+for its command-line arguments.  Tokens are separated by whitespace,
+and can be delimited by single or double quotes.  The module also
+respects backslash escapes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  shellwords.pl (standard part of Perl distribution)
+
+COPYRIGHT AND LICENCE
+
+Author: Lincoln Stein <lstein@cshl.org>.
+
+Copyright (c) 2001 Cold Spring Harbor Laboratory
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.  See DISCLAIMER.txt for
+disclaimers of warranty.

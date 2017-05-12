@@ -1,0 +1,50 @@
+---
+abstract: 'Teng plugin providing ResultSet'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Teng: 0
+  Teng::Row: 0
+  Teng::Schema::Declare: 0
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Teng-Plugin-ResultSet
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Teng::Plugin::ResultSet:
+    file: lib/Teng/Plugin/ResultSet.pm
+    version: 0.01
+  Teng::ResultSet:
+    file: lib/Teng/ResultSet.pm
+requires:
+  Class::Accessor::Lite::Lazy: 0.03
+  Class::Load: 0
+  Class::Method::Modifiers: 0
+  String::CamelCase: 0
+  Teng::Iterator: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/Songmu/Teng-Plugin-ResultSet/issues
+  homepage: https://github.com/Songmu/Teng-Plugin-ResultSet
+  repository: git://github.com/Songmu/Teng-Plugin-ResultSet.git
+version: 0.01

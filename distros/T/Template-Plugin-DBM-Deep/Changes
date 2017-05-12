@@ -1,0 +1,9 @@
+Revision history for Perl extension Template::Plugin::DBM::Deep.
+
+0.02  Sat Mar 26 09:59:36 PST 2005
+      - Added Test::Pod and Test::Pod::Coverage to improve Kwalitee
+
+0.01  Wed May 19 16:36:26 2004
+	- original version; created by h2xs 1.23 with options
+		-XAn Template::Plugin::DBM::Deep -b 5.6.0
+

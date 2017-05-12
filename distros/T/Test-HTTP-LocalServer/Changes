@@ -1,0 +1,3 @@
+0.57 20170508
+    . Spun off from WWW::Mechanize::PhantomJS
+      (and WWW::Mechanize::Firefox, and WWW::Mechanize::Shell)

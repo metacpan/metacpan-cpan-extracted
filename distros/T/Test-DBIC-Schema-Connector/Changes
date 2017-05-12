@@ -1,0 +1,23 @@
+==================================================
+Changes from 1741-07-26 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2015-05-10 03:29:50 +0000
+------------------------------------------
+
+  Change: 101ef3895c665d08bdcc2643b97d29073e714397
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-05-10 05:29:00 +0000
+
+    Added .travis.yml, fixes for release 
+
+  Change: 51cb85db354f64ef8bea2d81991baea79de6dd75
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-05-10 05:28:04 +0000
+
+    Rerelease 
+
+================
+End of releases.
+================

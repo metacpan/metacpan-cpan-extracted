@@ -1,0 +1,40 @@
+TEI::Lite README
+================
+
+This library of Perl modules was designed as an interface for the easy 
+creation and manipulation of XML documents conforming to the markup 
+schema created by the Text Encoding Initiative (http://www.tei-c.org/).
+This group created a original SGML markup language they dubbed TEI which
+could theoretically markup any text document a person might create.  The
+original specification was quite large and to ease the use and help 
+facilitate the transition to using this new markup, they created a subset
+variation called TEI Lite.  TEI Lite markup though being a subset of the 
+original specification is still powerful enough to markup "most" documents
+created by man.  The TEI Lite model is starting to see increasing popularity
+in libraries and electronic text archives.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ *) Carp
+ *) Exporter
+ *) XML::LibXML
+ *) Date::Calc
+ *) I18N::LangTags
+ *) Exporter::Cluster
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002-2005 D. Hageman (Dracken Technologies).
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.

@@ -1,0 +1,71 @@
+Revision history for Test-Kit
+
+2.15    2016-06-06
+        - Add back one Test-Simple 1.3 special case for strict/warnings
+        - Remove Test::Aggregate tests
+        - Update POD
+
+2.14    2015-11-26
+        - Remove special cases for Test::Builder 1.3 - they are no longer
+          needed for Test::Kit to work under the latest DEV release of
+          Test::Builder/Test::Stream :-)
+
+2.13    2014-12-21
+        - Add support and tests for including 'strict' and 'warnings' pragmata
+          in test kits. Not sure this is the best implementation, but it seems
+          to work on a wide range of Perl versions and Test::Builder versions
+          so I'm calling it good enough, until CPAN Testers or bug reports tell
+          me otherwise.
+        - Unfortunately had to add a new dependency on Hook::LexWrap for
+          strict/warnings support.
+        - Small POD change where I still accidentally referenced the obsolete
+          Provider stuff.
+        - Couple new tests proving that test kits can do things they already
+          could do.
+
+2.12    2014-12-10
+        - Let's just pretend 2.11 never happened shall we...
+        - Remove support for the experimental Test::Builder::Provider-based
+          version of Test::Builder. It'll never go stable, and nobody uses it!
+        - Fix up the $Test::Builder::VERSION checks so that they will work when
+          Test::Builder 1.301001 becomes the stable release
+        - Thanks again Chad!
+
+2.11    2014-12-10
+        - Support for the latest Test::Builder dev release using
+          Test::Stream::Toolset to make Test::Kit work. Lovely.
+        - Thanks once again to Chad Granum for his support!
+
+2.10    2014-08-27
+        - Huge overhaul of the internals for Test::Builder::Provider
+        - Still backwards compatible for older versions of Test::Builder
+        - Solved the scalar export issue while I was at it
+        - Thanks to Chad Granum and Karen Etheridge for their help!
+
+2.02    2014-07-17
+        - Add the fake package to %INC for newer import::into
+
+2.01    2014-05-16
+        - Bug fix: don't trigger "already has an import" ourselves
+        - CPAN Testers: set minimum perl version to 5.10.0
+        - Add missing Test::Pod dependency to dist.ini
+
+2.00    2014-05-15
+        - Complete rewrite of Test::Kit by Alex Balhatchet
+
+0.101   2009-10-21
+        - List Test::Most as a dependency.  Reported by Andreas Koenig at
+          https://rt.cpan.org/Ticket/Display.html?id=50688
+
+0.100   2009-10-18
+        - Production release.
+        - Pod patches from Gabrielle Roth
+          (http://rt.cpan.org/Public/Bug/Display.html?id=46124)
+        - Fixed bug where Test::Most and Test::More clash.
+
+0.02    2008-08-15
+        - Added Test::Differences as a build dependency.
+        - Added a version number to Test::Kit::Features.
+
+0.01    2008-08-14
+        - Basic functionality.  Compose tests and limited test features.

@@ -1,0 +1,19 @@
+Revision history for Perl extension TX.
+
+0.09  Mon Jun 14 18:02:04 CEST 2010
+      - silence a warning with perl 5.12
+
+0.06  Tue Mar 10 14:45:45 CET 2009
+      - default template path depends on ref($I) + __PACKAGE__
+
+0.04  Sun Mar  8 15:40:36 CET 2009
+      - attributes() class method added
+      - Subclassing instructions updated and tested
+
+0.03  some forgotten date
+      - first really usable version
+
+0.01  Tue Nov 11 14:56:58 2008
+      - original version; created by h2xs 1.23 with options
+      	  -A -b 5.8.0 -n TX -XS
+

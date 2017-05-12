@@ -1,0 +1,61 @@
+0.009	Thu Dec 25 22:43:07 CST 2014
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	Comment-out Bundle::CPAN due to issues.
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	New additions.
+
+0.008	Wed Oct  8 07:42:04 PDT 2014
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	Added Throwable, removed duplicate entry for namespace::autoclean, and
+	fixed typo in entry for Crypt::OpenPGP.
+
+0.007	Fri Feb 14 10:08:56 PST 2014
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	Removed Image::ExifTool.
+
+0.006	Sat Jun  1 12:06:43 PDT 2013
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	More additions, some re-ordering.
+
+0.005	Fri May 31 15:07:45 PDT 2013
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	Added two more modules to existing sections and created a new section
+	for work-related modules that I need.
+
+0.004	Thu May 30 16:03:27 PDT 2013
+
+	* Build.PL
+
+	I clearly did not understand how this worked before now.
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	Corrected version number.
+
+0.003	Thu May 30 13:33:40 PDT 2013
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	Fixed typo in the spec for Archive::Zip.
+
+0.002	Thu May 30 13:25:24 PDT 2013
+
+	* lib/Task/BeLike/RJRAY.pm
+
+	Fixed typo in the spec for App::Changelog2x.
+
+0.001	Thu May 30 08:43:36 PDT 2013
+
+	* Initial release.

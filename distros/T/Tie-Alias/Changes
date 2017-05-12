@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Alias.
+
+0.01  Mon Nov 25 16:15:57 2002
+	- original version; created by h2xs 1.22 with options
+		-A -X Tie::Alias
+

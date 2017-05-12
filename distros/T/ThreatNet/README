@@ -1,0 +1,29 @@
+NAME
+    ThreatNet - Pooled intelligence sharing of realtime hostile internet
+    hosts
+
+DESCRIPTION
+    This module is in hibernation for now, see ThreatNet::DATN2004 for the
+    original paper.
+
+    See ThreatNet::Bot::AmmoBot for an example of a working ThreatNet bot.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ThreatNet>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

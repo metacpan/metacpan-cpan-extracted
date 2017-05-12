@@ -1,0 +1,99 @@
+{
+   "abstract" : "Extends Try::Tiny to allow retries",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Try-Tiny-Retry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.059",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0.96",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Try::Tiny::Retry" : {
+         "file" : "lib/Try/Tiny/Retry.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Try-Tiny-Retry/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Try-Tiny-Retry",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Try-Tiny-Retry.git",
+         "web" : "https://github.com/dagolden/Try-Tiny-Retry"
+      }
+   },
+   "version" : "0.004",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "David Steinbrunner <dsteinbrunner@pobox.com>"
+   ]
+}
+

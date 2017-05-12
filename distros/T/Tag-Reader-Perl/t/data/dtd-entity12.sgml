@@ -1,0 +1,1 @@
+<!ENTITY % zz '&#60;!ENTITY tricky "error-prone" >' >

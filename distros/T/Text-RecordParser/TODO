@@ -1,0 +1,16 @@
+-   Some way to control files with a variable number of columns, e.g.
+
+    foo,bar,baz,quux
+    flim,flam,flom
+
+If I want the above parsed into just three fields, would I want:
+
+    foo,bar,[baz,quux]
+    flim,flam,[flom]
+
+Or just:
+
+    foo,bar,baz
+    flim,flam,flom
+
+How would I specify this in the API?

@@ -1,0 +1,3 @@
+apple	red or green
+orange orange
+banana		  yellow

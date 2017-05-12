@@ -1,0 +1,12 @@
+Revision history for Text-Snippet
+
+0.04    2010-05-21
+        Enabled "fallback" for the overloaded objects (to prep for Text-Snippet 0.95_01/02)
+        dzil-ify the distribution
+0.03    2009-02-17
+        Added character position (in addition to line/column position) to the cursor interface
+0.02    2009-01-08
+        Fixed the MANIFEST
+0.01    2009-01-08
+        Initial Release
+

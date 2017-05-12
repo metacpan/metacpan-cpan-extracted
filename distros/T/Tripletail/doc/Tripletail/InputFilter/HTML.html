@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../../style.css" />
+  <title>Tripletail::InputFilter::HTML - 通常 HTML 向け CGI クエリ読み取り</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::InputFilter::HTML - 通常 HTML 向け CGI クエリ読み取り
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::InputFilter::HTML - 通常 HTML 向け CGI クエリ読み取り
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  $TL-&gt;setInputFilter('Tripletail::InputFilter::HTML');
+  
+  $TL-&gt;startCgi(
+      -main =&gt; \&amp;main,
+  );
+  
+  sub main {
+      if ($CGI-&gt;get('mode') eq 'Foo') {
+          ...
+      }
+  }</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">以下の場所からクエリを読み取る。
+
+</span>
+</p>
+
+<dl>
+<dt><a id="X$ENVX7bQUERY_STRINGX7d"><span class="pod_lang"><code class="pod_iseq_C">$ENV{QUERY_STRING}</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">application/x-www-form-urlencoded を読み取る。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="STDIN"><span class="pod_lang"><code class="pod_iseq_C">STDIN</code>
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">application/x-www-form-urlencoded または multipart/form-data を読み取る。
+multipartでファイルがアップロードされた場合は、そのファイル名と
+IO ハンドルが <a href="../.././Tripletail/Form.html">Form</a> に格納される。
+詳しくは <a href="../.././Tripletail.html">Tripletail</a> の Ini パラメータを参照。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+<p>
+<span class="pod_lang">また、 <a href="../.././Tripletail/Session.html">Tripletail::Session</a> が有効になっている場合は、セッションデータを
+<a href="../.././Tripletail/Cookie.html">クッキー</a> から読み出す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">クエリの文字コードはINIの<a href="../.././Tripletail/InputFilter.html#charset">charset</a>が指定されていればそれが使用される。
+指定されていない場合は自動判別され、文字コード変換には Encode が優先される。
+Encode が利用可能でない場合はUnicode::Japaneseが用いられる。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">文字コードの自動判別は、フォームの中の CCC キーに含まれる「愛」という文字列によって行われる。
+通常、 TL から出力された HTML には、自動的にこの情報が追加されるが、
+外部の静的な HTML や FLASH コンテンツ等からフォームデータを渡す場合は、
+追加する必要がある。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">例えば、 UTF-8 コードで、name キーに「名前」の文字列を渡す場合は、
+CCC=%e6%84%9b&amp;name=%E5%90%8D%E5%89%8D
+をフォームデータとして渡す。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="decodeCgi"><span class="pod_lang">decodeCgi
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">内部メソッド
+
+</span>
+</p>
+
+</dd>
+<dt><a id="decodeURL"><span class="pod_lang">decodeURL
+
+</span></a></dt>
+<dd>
+<p>
+<span class="pod_lang">内部メソッド
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<dl>
+<dt><a id="X_"><span class="pod_lang"><a href="../.././Tripletail.html">Tripletail</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__00"><span class="pod_lang"><a href="../.././Tripletail/InputFilter.html">Tripletail::InputFilter</a>
+
+</span></a></dt>
+<dd>
+</dd>
+<dt><a id="X__01"><span class="pod_lang"><a href="http://search.cpan.org/perldoc/Tripletail::InputFilter::MobileHTML">Tripletail::InputFilter::MobileHTML</a>
+
+</span></a></dt>
+<dd>
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::InputFilter::HTML - 通常 HTML 向け CGI クエリ読み取り
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$ENVX7bQUERY_STRINGX7d">$ENV{QUERY_STRING}</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#STDIN">STDIN</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#X_">Tripletail</a></li>
+<li><a href="#X__00">Tripletail::InputFilter</a></li>
+<li><a href="#X__01">Tripletail::InputFilter::MobileHTML</a></li>
+<li><a href="#decodeCgi">decodeCgi</a></li>
+<li><a href="#decodeURL">decodeURL</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::InputFilter::HTML - 通常 HTML 向け CGI クエリ読み取り
+
+
+</div>
+
+</body>
+</html>

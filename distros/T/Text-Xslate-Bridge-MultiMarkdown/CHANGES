@@ -1,0 +1,19 @@
+Changelog for Text-Xslate-Bridge-MultiMarkdown
+
+0.002 2013-08-09T18:13:52
+ [Sören Kornetzki <mail@soeren-kornetzki.de>]
+ - Update README.md
+   
+   Example for markdown options
+
+ - Accept markdown options
+   
+   `markdown` accepts now options for `Text::MultiMarkdown`
+
+
+ [William Wolf <throughnothing@gmail.com>]
+ - Merge pull request #1 from burnersk/master
+   
+   Accept markdown options
+
+

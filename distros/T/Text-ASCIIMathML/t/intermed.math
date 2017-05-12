@@ -1,0 +1,291 @@
+? -a
+<math title="-a">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>-</mo>
+    <mi>a</mi>
+  </mstyle>
+</math>
+$$- a$$
+
+? E=mc^2
+<math title="E=mc^2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>E</mi>
+    <mo>=</mo>
+    <mi>m</mi>
+    <msup>
+      <mi>c</mi>
+      <mn>2</mn>
+    </msup>
+  </mstyle>
+</math>
+$$E = m c^2$$
+
+? e^(ipi)=-1
+<math title="e^(ipi)=-1">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mi>e</mi>
+      <mrow>
+        <mi>i</mi>
+        <mi>&pi;</mi>
+      </mrow>
+    </msup>
+    <mo>=</mo>
+    <mo>-</mo>
+    <mn>1</mn>
+  </mstyle>
+</math>
+$$e^{i \pi} = - 1$$
+
+? a !<= b !>= c
+<math title="a !&lt;= b !&gt;= c">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+    <mo>!</mo>
+    <mo>&le;</mo>
+    <mi>b</mi>
+    <mo>!</mo>
+    <mo>&ge;</mo>
+    <mi>c</mi>
+  </mstyle>
+</math>
+$$a ! \leq b ! \geq c$$
+
+? a!=0
+<math title="a!=0">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+    <mo>&ne;</mo>
+    <mn>0</mn>
+  </mstyle>
+</math>
+$$a \ne 0$$
+
+? ax^2+bx+c=0
+<math title="ax^2+bx+c=0">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <mi>b</mi>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mi>c</mi>
+    <mo>=</mo>
+    <mn>0</mn>
+  </mstyle>
+</math>
+$$a x^2 + b x + c = 0$$
+
+? x^2+y_1+z_12^34
+<math title="x^2+y_1+z_12^34">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <msub>
+      <mi>y</mi>
+      <mn>1</mn>
+    </msub>
+    <mo>+</mo>
+    <mrow>
+      <msubsup>
+        <mi>z</mi>
+        <mn>12</mn>
+        <mn>34</mn>
+      </msubsup>
+    </mrow>
+  </mstyle>
+</math>
+$$x^2 + y_1 + z_{12}^{34}$$
+
+? x^2+y_1+z^34_12
+<math title="x^2+y_1+z^34_12">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <msub>
+      <mi>y</mi>
+      <mn>1</mn>
+    </msub>
+    <mo>+</mo>
+    <mrow>
+      <msubsup>
+        <mi>z</mi>
+        <mn>12</mn>
+        <mn>34</mn>
+      </msubsup>
+    </mrow>
+  </mstyle>
+</math>
+$$x^2 + y_1 + z_{12}^{34}$$
+
+? a//b
+<math title="a//b">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+    <mo>/</mo>
+    <mi>b</mi>
+  </mstyle>
+</math>
+$$a / b$$
+
+? sqrtsqrtroot3x
+<math title="sqrtsqrtroot3x">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msqrt>
+      <msqrt>
+        <mroot>
+          <mi>x</mi>
+          <mn>3</mn>
+        </mroot>
+      </msqrt>
+    </msqrt>
+  </mstyle>
+</math>
+$$\sqrt{\sqrt{\sqrt[3]{x}}}$$
+
+? abc-123.45^-1.1
+<math title="abc-123.45^-1.1">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+    <mi>b</mi>
+    <mi>c</mi>
+    <mo>-</mo>
+    <msup>
+      <mn>123.45</mn>
+      <mrow>
+        <mo>-</mo>
+        <mn>1.1</mn>
+      </mrow>
+    </msup>
+  </mstyle>
+</math>
+$$a b c - 123.45^{- 1.1}$$
+
+? stackrel"def"=
+<math title="stackrel&quot;def&quot;=">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mover>
+      <mo>=</mo>
+      <mrow>
+        <mtext>def</mtext>
+      </mrow>
+    </mover>
+  </mstyle>
+</math>
+$$\stackrel{\mbox{def}}{=}$$
+
+? \stackrel{\Delta}{=}" "("or ":=)
+<math title="\stackrel{\Delta}{=}&quot; &quot;(&quot;or &quot;:=)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mover>
+      <mrow>
+        <mo>=</mo>
+      </mrow>
+      <mrow>
+        <mo>&Delta;</mo>
+      </mrow>
+    </mover>
+    <mrow>
+      <mspace width="1ex"/>
+      <mtext></mtext>
+      <mspace width="1ex"/>
+    </mrow>
+    <mrow>
+      <mo>(</mo>
+      <mrow>
+        <mtext>or</mtext>
+        <mspace width="1ex"/>
+      </mrow>
+      <mo>:=</mo>
+      <mo>)</mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\stackrel{\Delta}{=} \mbox{ } ( \mbox{or } := )$$
+
+? {::}_(\ 92)^238U
+<math title="{::}_(\ 92)^238U">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <msubsup>
+        <mrow/>
+        <mrow>
+          <mo>&nbsp;</mo>
+          <mn>92</mn>
+        </mrow>
+        <mn>238</mn>
+      </msubsup>
+    </mrow>
+    <mi>U</mi>
+  </mstyle>
+</math>
+$$\mbox{}_{\, 92}^{238} U$$
+
+? a_(mn)
+<math title="a_(mn)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msub>
+      <mi>a</mi>
+      <mrow>
+        <mi>m</mi>
+        <mi>n</mi>
+      </mrow>
+    </msub>
+  </mstyle>
+</math>
+$$a_{m n}$$
+
+? a_{mn}
+<math title="a_{mn}">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msub>
+      <mi>a</mi>
+      <mrow>
+        <mi>m</mi>
+        <mi>n</mi>
+      </mrow>
+    </msub>
+  </mstyle>
+</math>
+$$a_{m n}$$
+
+? sqrtx
+<math title="sqrtx">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msqrt>
+      <mi>x</mi>
+    </msqrt>
+  </mstyle>
+</math>
+$$\sqrt{x}$$
+
+? x^2
+<math title="x^2">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+  </mstyle>
+</math>
+$$x^2$$
+
+? S'
+<math title="S'">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>S</mi>
+    <mo>'</mo>
+  </mstyle>
+</math>
+$$S '$$

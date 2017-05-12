@@ -1,0 +1,105 @@
+=head1 NAME
+
+Tangram::Type::Array::FromOne - map Perl arrays using a foreign key
+
+=head1 SYNOPSIS
+
+   use Tangram;
+
+   # or
+   use Tangram::Core;
+   use Tangram::Type::Array::FromOne;
+
+   $schema = Tangram::Schema->new(
+
+      classes => { Agenda => { fields => {
+
+      iarray =>
+      {
+         # long form
+         entries =>
+         {
+            class => 'Entry',
+            coll => 'agenda',
+         },
+
+         # or (short form)
+         entries => 'Entry',
+      }
+
+=head1 DESCRIPTION
+
+This class maps references to a Perl array in an intrusive
+fashion. The persistent fields are grouped in a hash under the
+C<iarray> key in the field hash.
+
+The array may contain only objects of persistent classes. These classes
+must have a common persistent base class.
+
+Tangram uses two columns on the element's table to store:
+
+=over 4
+
+=item * the id of the object containing the collection
+
+=item * the position of the element in the collection
+
+=back
+
+CAUTION: the same object may not be an element of the same collection,
+in two different objects. This mapping may be used only for
+one-to-many relationships.
+
+The field names are passed in a hash that associates a field name with
+a field descriptor. The field descriptor may be either a hash or a
+string. The hash uses the following fields:
+
+=over 4
+
+=item * class
+
+=item * aggreg
+
+=item * back
+
+=item * coll
+
+=item * slot
+
+=item * deep_update
+
+=back
+
+Mandatory field C<class> specifies the class of the elements.
+
+Optional field C<aggreg> specifies that the elements of the collection
+must be removed (erased) from persistent storage along with the
+containing object. The default is not to aggregate.
+
+Optional field C<back> sets the name of a field that is inserted in
+the elements. That field acts as a demand-loaded, read-only reference
+to the object containing the collection.
+
+Optional field C<coll> sets the name the column containing the id of
+the containing object. This defaults to 'C_m', where 'C' is the class
+of the containing object, and 'm' is the field name.
+
+Optional field C<slot> sets the name the column containing the id of
+the containing object. This defaults to 'C_m_slot', where 'C' is the
+class of the containing object, and 'm' is the field name.
+
+The "C" in C_m and C_m_slot are passed through the schema
+normalisation function before being combined into a column name.
+
+Optional field C<deep_update> specificies that all elements have to be
+updated automatically when C<update> is called on the collection
+object. Automatic update ensures consisitency between the Perl
+representation and the DBMS state, but degrades update performance so
+use it with caution. The default is not to do automatic updates.
+
+If the descriptor is a string, it is interpreted as the name of the
+element's class. This is equivalent to specifying only the C<class>
+field in the hash variant.
+
+
+

@@ -1,0 +1,87 @@
+{
+   "abstract" : "The fast Text::Diff module",
+   "author" : [
+      "-2017 Pine Mizune"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.7",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Diff-Unified-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005",
+            "Module::Build::XSUtil" : "0.16"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0.103012",
+            "Minilla" : "v3.0.4",
+            "Perl::Critic" : "1.125",
+            "Software::License::MIT" : "0.103011",
+            "Test::CPAN::Meta" : "0.25",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.05",
+            "Test::Perl::Critic" : "1.03",
+            "Test::Pod" : "1.51",
+            "Test::Spellunker" : "v0.4.0",
+            "Text::Diff" : "1.44",
+            "Version::Next" : "1.000"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "Test::More" : "0.98",
+            "Time::Strptime" : "1.00"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Diff::Unified::XS" : {
+         "file" : "lib/Text/Diff/Unified/XS.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pine/p5-Text-Diff-Unified-XS/issues"
+      },
+      "homepage" : "https://github.com/pine/p5-Text-Diff-Unified-XS",
+      "repository" : {
+         "url" : "git://github.com/pine/p5-Text-Diff-Unified-XS.git",
+         "web" : "https://github.com/pine/p5-Text-Diff-Unified-XS"
+      }
+   },
+   "version" : "0.07",
+   "x_authority" : "cpan:PINE",
+   "x_contributors" : [
+      "Pine Mizune <pinemz@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

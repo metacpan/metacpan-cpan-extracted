@@ -1,0 +1,50 @@
+NAME
+    Test::Stub - Stub! Stub! Stub!
+
+SYNOPSIS
+        use Test::Stub;
+
+        # DSL style
+        my $agent = LWP::UserAgent->new();
+        stub($agent)->get(HTTP::Response->new(200, "OK"));
+        is($agent->get('http://www.aiseikai.or.jp/')->code, 200);
+
+        # simple style
+        my $agent = LWP::UserAgent->new();
+        make_stub($agent, 'get', HTTP::Response->new(200, "OK"));
+        is($agent->get('http://www.aiseikai.or.jp/')->code, 200);
+
+DESCRIPTION
+    Test::Stub is a simple stubbing library for Perl5.
+
+EXPORTABLE FUNCTIONS
+    stub($stuff) : Test::Stub::Driver
+        Create a new instance of Test::Stub::Driver.
+
+    make_stub($object, $method, $stub) : Undef
+        Make monadic class from blessed($object) and add a $method with
+        $stub.
+
+Test::Stub::Driver
+    This class only provides a AUTOLOAD method.
+
+    AUTOLOAD method rebless the $stuff to anonymous class.
+
+    For example. After calling following code:
+
+        stub($stuff)->foo('bar');
+
+    "$stuff->foo()" returns 'bar'.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+    The interface was taken from Test::Double.
+
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

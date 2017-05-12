@@ -1,0 +1,1654 @@
+#!/usr/bin/perl
+
+#-- native plugins -------------------------------------------------------------------------
+package TM::Workbench::Plugin::Null;
+
+use base 'TM::Workbench::Plugin';
+
+sub precedence { return 'p1'; }
+
+sub matches {
+    my $self = shift;
+    my $cmd  = shift;
+    return $cmd =~ /^$/
+}
+
+sub execute {
+    my $self = shift;
+    return "";
+    # do what you can do best: nothing
+}
+
+1;
+
+package TM::Workbench::Plugin::Help;
+
+use base 'TM::Workbench::Plugin';
+
+sub precedence { return 'p1'; }
+
+sub matches {
+    my $self = shift;
+    my $cmd  = shift;
+    return $cmd =~ /^(help|\?)/
+}
+
+sub execute {
+    my $self = shift;
+    my $cmd  = shift;
+
+    use Pod::Usage;
+    if ($cmd =~ /tau/) {
+	pod2usage(-input      => 'TM/Tau.pm',
+		  -exitval    => 0, 
+		  -verbose    => 2, 
+		  -exitval    => 'NOEXIT');              # print a nice man page, but do not terminate
+    } else {
+	pod2usage(-exitval    => 0, 
+		  -verbose    => 2, 
+		  -exitval    => 'NOEXIT');              # print a nice man page, but do not terminate
+    }
+    return;
+}
+
+1;
+
+#--  native mapspheres --------------------------------------------------------------
+
+package MyMapSphere;
+
+use TM;
+use base qw(TM);
+use Class::Trait ('TM::MapSphere', 'TM::Synchronizable');
+
+sub source_in {}; # nothing to be done here
+
+1;
+
+package MyPersistentMapSphere;
+
+our $ms;
+
+use Data::Dumper;
+
+sub new {
+    my $class = shift; # dont care
+    my %opts  = @_;
+#warn "unfiltered new got URL $opts{url}";
+    (my $path = $opts{url}) =~ s/^tm://;
+#warn "got path $path";
+    my $submap = $ms->is_mounted ($path);
+#warn "map there is ". $submap;
+    die "unknown path '$path' in mapsphere" unless $submap;
+    return $submap;
+}
+
+1;
+
+#------------------------------------------------------------------------------------
+
+package MyMapSphereFilter;
+
+use TM::Tau::Filter;
+use base qw(TM::Tau::Filter);
+use Class::Trait qw(TM::MapSphere);
+
+sub last_mod {
+    my $self = shift;
+#warn "filtered MyMapSphere last_mod";
+    die "internal error: lost path to determine modification" unless $self->{_path_to_be};
+    if (my $submap = $ms->is_mounted ($self->{_path_to_be})) {       # if there is alread a map
+	return $submap->last_mod;                                    # then take its last mod
+    } else {
+	return 0;                                                    # no map there, make sure content will be loaded, pretend to be oooold
+    }
+}
+
+sub source_in {
+    my $self = shift;
+
+#warn "filtered MyMapSphere source in";
+    $self->{left}->source_in;
+    die "internal error: lost path to mount" unless $self->{_path_to_be}; # just make sure its there
+    $self->mount (delete $self->{_path_to_be}, $self->{left}, 1); # we force it
+#warn "mount done";
+}
+
+1;
+
+package MyPersistentMapSphereFilter;
+
+our $ms;
+
+sub new {
+    my $class = shift; # we do not really care about that one
+    my %opts  = @_;
+#warn "filtered got URL $opts{url}";
+    (my $path = $opts{url}) =~ s/^tm://;
+#warn "got path $path (for $ms)";
+    $ms->{_path_to_be} = $path; # !!! NB: Here I _know_ that I am the only one fiddling around, this is NOT thread-safe!!
+    return $ms;
+}
+
+1;
+
+#-----------------------------------------------------------------------------------
+
+package main;
+
+use strict;
+use warnings;
+use Data::Dumper;
+
+use constant HISTORY_SIZE => 500;
+use constant PROMPT       => "tm> ";
+
+my %options; # he were collect on the way Getopt options
+
+=pod
+
+=head1 NAME
+
+tm - Topic Map client and work-bench
+
+=head1 SYNOPSIS
+
+=head2 Invocation of the work-bench
+
+   tm <command line switch>...
+
+   # interactive version using persistent local store
+   tm --mapsphere=file:/tmp/
+
+   # using remote store
+   tm --mapsphere=http://host:13131/
+
+   # batch version
+   cat commands | tm -
+
+   # using extensions
+   tm --source '^dns:'=TM::Virtual::DNS --extension ....
+
+   # providing your own plugins
+   tm --plugin=/some/directory/ --plugin=/some/other/directory/
+
+=head2 Commands within the work-bench
+
+   # getting help
+   tm> help                           this command
+   tm> help tm                        all help on the work-bench
+   tm> help tau                       help on Tau expressions
+
+   # reading in commands
+   tm> do <file>                      execute a history (config) file
+
+   # listing all loaded plugins
+   tm> plugins:
+
+   # deploy implementations
+   tm> source /<regexp>/ <package>    load the package and register it as source implementation
+   tm> filter /<regexp>/ <package>    load the package and register it as filter implementation
+
+   # dealing with history
+   tm> history                        show some past commands
+   tm> !<integer>                     execute command with nr <integer> in history
+   tm> <cursor-up> or <cursor-down>   get previous/next command in the history (if Term::ReadLine is installed)
+
+   # doing several things in sequence
+   tm> <cmd1> ; <cmd2> ; ...          do all commands in a sequence
+
+   # getting out
+   tm> exit                           leave the bench
+   tm> quit                           ditto
+   tm> ^D                             ditto (Control-d)
+
+   # making comments
+   tm> # nice weather today           is ignored
+
+=head1 DESCRIPTION
+
+This simple, text-oriented user interface gives access to some Topic Map functions. This program is
+mainly thought for quick prototyping and testing Topic Maps and/or TM software, not so much to
+provide eye-candy.
+
+There are two modi operandi:
+
+=over
+
+=item B<batch>
+
+Whenever you invoke the program with the parameter C<-> then it will expect commands coming from
+STDIN. It will process them one by one and will then terminate.
+
+  cat my-commands | tm -
+
+=item B<interactive>
+
+If you invoke the program without a parameter
+
+  tm
+
+then you will be welcomed by a command prompt. Type 'help' within this shell to get an overview over
+available commands. See L<TM::Tau> for information about the language.
+
+=back
+
+=head1 OPTIONS
+
+Following command line switches are understood by the program:
+
+=over
+
+=item B<history> (boolean, default: on)
+
+If this option is turned on, a history file will be consumed before
+the interactive loops starts. At the end of the session the history
+will be updated.  See FILES for details on the location.
+
+Note: History handling only applies to the interactive mode. Still, nothing can stop you to take a
+history file (which contains simply lines of commands) and pipe it into this program:
+
+  cat myhistory | tm -
+
+=cut
+
+my $history = 1;
+$options{'history!'} = \$history;
+
+=pod
+
+=item B<source> (default: undef)
+
+This multiple option allows to add new map implementations for resourceable maps. To add, for
+instance, a virtualized map covering the DNS (domain name service), you would add
+
+  --source '^dns:'=TM::Virtual::DNS
+
+The first value is a regular expression which specifies under which circumstances the processor is
+supposed to use that extension if it parses a source as part of a Tau expression (L<TM::Tau>). The
+other value is the name of the package which is associated with that pattern. The package is 'use'd
+at startup time, a warning will be issued if that fails.
+
+Several such extensions can be provided. There is no order which can be controlled.
+
+=cut
+
+my %sources = ();
+$options{'source=s'} = \%sources;
+
+=pod
+
+=item B<filter> (default: undef)
+
+This multiple option allows to add new filter implementations.
+
+  --filter '^stats:'=TM::Tau::Filter::Statistics'
+
+=cut
+
+my %filters = ();
+$options{'filter=s'} = \%filters;
+
+=pod
+
+=item B<plugin> (default: none means take the installed ones)
+
+This multiple option allows to override and specify the directories where plugins are searched
+for. If you specify one, then B<none> of the default ones will be loaded!
+
+=cut
+
+my @plugin_dirs = ();
+$options{'plugin=s'} = \@plugin_dirs;
+
+=pod
+
+=item B<mapsphere> (default: undef)
+
+This URL defines where the background map store has to persistently live in which the maps are
+stored and from which they can be retrieved later.
+
+If it is left undefined, then the store will be simulated in memory only. In the local file system
+case (using a URL like C<file:/tmp/>), all data will be stored in the local file system. If you
+happen to have the server package L<TM::Server> installed, then you may also provide a  URL:
+
+  http://my.machine.org:13131/
+
+In that case all maps would be stored and retrieve from there.
+
+=cut
+
+my $mapsphere= undef; # 'file:/tmp/';
+$options{'mapsphere=s'} = \$mapsphere;
+
+=pod
+
+=item B<logfile> (default: C<tm.log>) 
+
+Controls the file name where the log messages should be written to.
+This mainly applies to debugging TM components as all error messages
+will be output directly.
+
+=cut
+
+my $logfile = 'tm.log';
+$options{'logfile=s'} = \$logfile;
+
+=pod
+
+=item B<loglevel> (default: INFO)
+
+The log level can be set to any of the following values:
+OFF
+FATAL
+ERROR
+WARN
+INFO
+DEBUG
+ALL
+
+=cut
+
+my $loglevel = 'INFO';
+$options{'loglevel=s'} = \$loglevel;
+
+=pod
+
+=item B<help> 
+
+...does hopefully what you would expect.
+
+=cut
+
+my $help;
+$options{'help|?|man'} = \$help;
+
+=pod
+
+=back
+
+=head1 FILES
+
+The interpreter will look for history files:
+
+=begin html
+
+<PRE>
+      $ENV{HOME}/.tm/history
+      $ENV{HOME}/.tmhistory
+      ./.tmhistory
+</PRE>
+
+=end html
+
+=begin text
+
+      $ENV{HOME}/.tm/history
+      $ENV{HOME}/.tmhistory
+      ./.tmhistory
+
+=end text
+
+=begin man
+
+      $ENV{HOME}/.tm/history
+      $ENV{HOME}/.tmhistory
+      ./.tmhistory
+
+=end man
+
+in this order taking only the first it will find. It will only use the last
+100 lines.
+
+=cut
+
+#== here the fun begins ==================================================================
+
+#-- consume the command line options -----------------------------------------------------
+use Getopt::Long;
+if (!GetOptions (%options) || $help) {
+    use Pod::Usage;
+    pod2usage(-exitstatus => 0, -verbose => 1);
+}
+
+my ($OUT, $ERR); # my file handles
+
+our $log;    # others may want to use this as $main::log
+
+{
+    use Log::Log4perl qw(:levels);
+    my $layout   = Log::Log4perl::Layout::PatternLayout->new ("%d %F %L %c - %m%n");
+
+    use Log::Log4perl::Appender::File;
+    my $appender = Log::Log4perl::Appender->new ("Log::Log4perl::Appender::File",
+						 filename  => $logfile);
+    $appender->layout ($layout);
+
+    $main::log = Log::Log4perl->get_logger ("tm");
+    $main::log->add_appender ($appender);
+
+    eval qq|\$main::log->level(\${$loglevel}});|;
+}
+
+use TM::Tau;
+
+$TM::Tau::filters{'^io:stdout$'} =
+$TM::Tau::filters{'^-$'}         = [ 'TM::Serializable::Summary' ];        # every map on stdout should be a summary
+
+#-- extensions, loading ------------------------------------------------------------------
+foreach my $m (keys %sources) {
+    eval "use $sources{$m}";
+    if ($@) {
+        warn "cannot load '$sources{$m}', trying to continue";
+    } else {
+	$TM::Tau::sources{$m} = $sources{$m};
+    }
+}
+foreach my $m (keys %filters) {
+    eval "use $filters{$m}";
+    if ($@) {
+	warn "cannot load '$filters{$m}', trying to continue";
+    } else {
+	$TM::Tau::filters{$m} = $filters{$m};
+    }
+}
+
+#-- figuring out what mapsphere we are going to use -------------------------------------
+if (! defined $mapsphere) {                                               # not defined -> here we create a memory-based one
+    $MyPersistentMapSphere::ms       = new MyMapSphere       (baseuri => 'tm:', url => 'null:');
+    $MyPersistentMapSphereFilter::ms = new MyMapSphereFilter (baseuri => 'tm:', url => 'null:');
+
+#} elsif ($mapsphere =~ /^file:/) {
+#    $ms = new TM::MapSphere::MLDBM2 (url => $mapsphere);
+#} elsif ($mapsphere =~ /^http:/) {
+#    eval "use TM::MapSphere::Client;";
+#    die $@ if $@;
+#    $ms = new TM::MapSphere::Client (url => $mapsphere);
+} else {
+    $main::log->logdie (scalar __PACKAGE__ . ": unknown URL method '$mapsphere'");
+}
+
+$TM::Tau::filters{'^tm:/.*'} = 'MyPersistentMapSphereFilter';
+$TM::Tau::sources{'^tm:/.*'} = 'MyPersistentMapSphere';
+
+# TODO: XTM?
+
+#-- plugins ------------------------------------------------------------------------------
+
+my @plugins = (new TM::Workbench::Plugin::Null,                              # native plugins are there in any case
+               new TM::Workbench::Plugin::Help,
+    );
+
+if (@plugin_dirs) {
+    push @plugins, map { _load_plugins ($_) } @plugin_dirs;
+
+    sub _load_plugins {
+	my $dir = shift;
+	my @ps;
+	
+	foreach my $p (glob ("$dir*.pm")) {
+	    $p =~ s|.*(TM/.*)|$1|;                                           # keep only the part after TM/
+	    $p =~ s|.pm||;                                                   # remove the extension
+	    $p =~ s|/|::|g;                                                  # package-ify the name
+	    $main::log->warn (scalar __PACKAGE__ . ": trying to load plugin '$p'");
+	    eval "use $p";
+	    push @ps, new $p;
+	}
+	return @ps;
+    }
+
+} else {
+    use TM::Workbench::Plugin::Tau;
+
+    my $file = $INC{'TM/Workbench/Plugin/Tau.pm'}
+	       or die "cannot find Tau plugin";                              # try to find the plugins
+    (my $plugdir = $file) =~ s|Tau.pm||;                                     # construct the directory where this is
+    push @plugins, _load_plugins ($plugdir);
+}
+
+@plugins = sort { $a->precedence cmp $b->precedence } @plugins;               # reorder according to precedence level
+
+#use Data::Dumper;
+#$main::log->logwarn ( Dumper \@plugins );
+
+#-- dealing with Ctrl-c ------------------------------------------------------------------
+
+sub interrupt { die "interrupted by user"; }
+$SIG{INT} = \ &interrupt;
+
+#-- see whether we have content on STDIN or not ------------------------------------------
+if (defined $ARGV[0] && $ARGV[0] eq '-') {                                # we are supposed to read something from STDIN
+
+    $OUT = \*STDOUT;
+    $ERR = \*STDERR;
+
+    while (<>) {
+	eval {
+	    execute_line ($_);                                            # exceptions will cause this to crash, that's it
+	}; 
+	last if $@ =~ /^exit/;                                            # the only thing we honor is the 'exit'
+	die $@ if $@;
+    }
+} else {                                                                  # otherwise we are in interactive mode
+    use Term::ReadLine;
+    my $term = new Term::ReadLine 'TM Processor';
+#    $term->MinLine (HISTORY_SIZE);
+    *STDOUT = $term->OUT;
+
+    unless ($term->Features->{'getHistory'}) {
+	warn "History management not supported by this ReadLine implementation";
+	undef $history;
+    }
+
+    $OUT = $term->OUT;
+    $ERR = $term->OUT;
+
+    load_history ($term) if $history;
+
+    eval {                                                                # wrap it in eval because Ctrl-c may happen at prompt
+	while (defined ($_ = $term->readline(PROMPT))) {
+	    next if /^\#/;                                                # ignore line long comments
+	    eval {
+		execute_line ($_, $term);                                 # execute one input line
+	    };
+	    last if $@ =~ /^exit/;                                        # if someone typed 'exit', the get out of the loop
+	    print $ERR $@;
+	}
+    };                                                                    # exit either with 'exit', Ctrl-d or Ctrl-c
+    unless ($@ =~ /interrupt/) {                                          # unless the loop was exited via Ctrl-c
+	save_history ($term) if $history;                                 # so save the history
+	print $OUT "\n";                                                  # make a nice prompt
+    }
+    close STDOUT;                                                         # close all output to avoid any DESTROY output
+    close STDERR;
+
+}
+
+#-- Processing Commands ---------------------------------------------------------------------
+
+sub execute_line {
+    my $line = shift;
+    my $term = shift;
+
+    foreach my $cmd (split (/\s*;\s*/, $line)) {             # look for ;'s
+	$cmd =~ s/\s+\#\s.*//;                               # remove trailing comments
+	$cmd =~ s/^\s*//;                                    # remove leading blanks
+	$cmd =~ s/\s*$//;                                    # remove trailing blanks
+
+	if ($cmd =~ /^(exit|quit)$/) {                       # user wants to exit?
+	    die "exit";                                      # propagate dieing
+
+	} elsif ($cmd =~ /^history$/) {                      # some history listing
+	    my $count = 1;
+	    print $OUT map { $count++."\t$_" }
+	               map { $_."\n" }
+                       $term->GetHistory ();
+	    
+	} elsif ($cmd =~ /!(\d+)$/) {                        # recall a certain command
+	    my @history = $term->GetHistory ();
+	    if (my $line    = $history[$1-1]) {
+		print $OUT "$line\n";
+		execute_line ($line, $term);
+	    } else {
+		print $OUT "$1: command not found\n";
+	    }
+
+	} elsif ($cmd =~ /^plugins:$/) {
+	    use Data::Dumper;
+	    print $OUT Dumper \@plugins;
+
+	} elsif (my ($plugin) = grep { $_->matches ($cmd) } 
+		                @plugins) {                  # try to find a matching plugin
+	    print $OUT $plugin->execute ($cmd);
+
+#	    warn "unfilt ".ref ($MyPersistentMapSphere::ms);
+#	    warn "  filt ".ref ($MyPersistentMapSphereFilter::ms);
+#	    warn "about to exec $cmd";
+
+
+	    #%{$MyPersistentMapSphere::ms} = %{$MyPersistentMapSphereFilter::ms};     # make a content-copy of the mapsphere
+#warn "mounttab of unfiltered: ". Dumper $MyPersistentMapSphere::ms->{mounttab};
+
+
+	} else {
+	    die "unknown command '$cmd'";                    #   or complain if there is none
+
+	}
+    }
+}
+
+#-- history load/save ------------------------------------------------------------------------
+
+sub load_history { ## without executing it
+    my $term = shift;
+
+    my $tmhistory;
+    if (     -r ($tmhistory = $ENV{HOME}."/.tm/history")) {
+    } elsif (-r ($tmhistory = $ENV{HOME}."/.tmhistory")) {
+    } elsif (-r ($tmhistory =            ".tmhistory")) {
+    } else {
+	return;
+    }
+##print $OUT "reading from $tmhistory\n";
+    eval {
+	use IO::File;
+	my $fh = new IO::File $tmhistory || warn "Could not open '$tmhistory'";
+	my @l = <$fh>;
+	my $l = scalar @l >= 100 ? 100 : scalar @l;                        ## only last 100, otherwise eternal growth, a net schlecht
+	foreach my $l (@l[-$l..-1]) {
+	    chomp $l;
+	    $term->AddHistory ($l);
+	}
+    }; print $OUT $@ ? "Exception: $@" : "";
+}
+
+sub save_history {
+    my $term = shift;
+
+##print $OUT "checking $ENV{HOME}..." ;
+    my $tmhistory;
+    if (-d $ENV{HOME}."/.tm/") {
+	$tmhistory = $ENV{HOME}."/.tm/history";
+    } elsif ($ENV{HOME}) {
+	$tmhistory = $ENV{HOME}."/.tmhistory";
+    } else {
+	$tmhistory = ".tmhistory";
+    }
+##print $OUT "writing to $mqlhistory" ;
+    eval {
+	use IO::File;
+	my $fh = new IO::File ">>$tmhistory" || warn "Cannot open logfile '$tmhistory'";
+
+	print $fh map { $_."\n" } $term->GetHistory ();
+    }; print $OUT $@ ? "Exception: $@" : "";
+}
+
+exit;
+
+
+our $VERSION = "2.00";
+our $REVISION = '$Id$';
+
+=pod
+
+=head1 AUTHOR INFORMATION
+
+Copyright 200[1-68], Robert Barta <drrho@cpan.org>, All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl
+itself.  http://www.perl.com/perl/misc/Artistic.html
+
+=cut
+
+__END__
+
+
+sub ExecuteCommand {
+  $_ = shift;
+  s/^\s*//;
+
+##print $OUT "Executing...$_....\n";
+
+  if (/^$/) { 
+    # empty line ignore
+  } elsif (/^\#/) {     # comment
+    print $OUT "comment\n";
+
+##-- history --in out -----------------------------------------
+  } elsif (/^history\s*(([<>])\s*(.*))?/) {
+    eval {
+
+      if ($2 eq '>') {
+	my $fh = new IO::File ">$3" || warn "Cannot open '$3' for writing";
+	print $fh map { $_."\n" } grep (!/^history/, $term->GetHistory ());
+      } elsif ($2 eq '<') {
+	my $fh = new IO::File $3 || warn "Could not open '$3' for reading";
+	ExecuteLineList (map { chomp; $_ } (<$fh>));
+      } else {
+	print $OUT join ("\n",  $term->GetHistory ()), "\n";
+      }
+    }; print $OUT $@ ? "Exception: $@" : "";
+##-- scoping -------------------------------------------------
+  } elsif (/^scope(\s+(.+?)\s*)?$/) {
+    if ($1) {
+      $scope = $2;
+    } else {
+      print $OUT (defined $scope ? $scope : "-- undefined --"),"\n";
+    }
+##-- loading -------------------------------------------------
+  } elsif (/^load\s+(.+?)\s*$/) {
+    my $expr = $1;
+    eval {
+      $tm = new XTM (tie         => new XTM::Virtual (expr => $expr),
+		     consistency => $consistency);
+    }; if ($@) {
+      print $OUT "xtm: Exception: $@\n";
+    }
+##-- freezing ------------------------------------------------
+  } elsif (/^freeze\s*(.+?)\s*$/) {
+    if ($1) {
+      my ($fio, $io);
+      ($io = new IO::File "> $1") &&
+	($fio = new IO::Filter::gzip ($io, "w")) &&
+	  $fio->print (freeze($tm)) &&
+	    $fio->close;
+    } else {
+      my $fio;
+      ($fio = new IO::Filter::gzip ($OUT, "w")) &&
+	$fio->print (freeze($tm));
+    }
+##-- thawing --------------------------------------------------
+  } elsif (/^thaw\s+(.+?)\s*$/) {
+    if ($1) {
+      undef $/;
+      my ($fio, $io);
+      ($io = new IO::File $1, 'r') &&
+	($fio = new IO::Filter::gunzip ($io, "r"));
+      my $ice;
+      my $buffer;
+      while ($fio->read ($buffer, 1000)) {
+	$ice .= $buffer;
+      }
+      $fio->close;
+      ($tm) = thaw $ice;
+    } else {
+      print $OUT "xtm: Exception: could not open '$1' for reading";
+    }
+##-- the gory details ------------------------------------------------
+  } elsif (/^dump/) {
+    print $OUT Dumper $tm;
+##-- the gory details ------------------------------------------------
+  } elsif (/^info/) {
+    print $OUT Dumper $tm->info ('informational')->{informational} if $tm && defined $tm->memory;
+  } elsif (/^warn/) {
+    print $OUT Dumper $tm->info ('warnings')->{warnings} if $tm && defined $tm->memory;
+  } elsif (/^errors/) {
+    print $OUT Dumper $tm->info ('errors')->{errors} if $tm && defined $tm->memory;
+  } elsif (/^stats/) {
+    print $OUT Dumper $tm->info ('statistics')->{statistics} if $tm && defined $tm->memory;
+##-- finding -------------------------------------------------
+  } elsif (/^find\s+topic(\s+(.+?)\s*)?$/ || /^topics$/) {
+    my $query = $2 if $1;
+    eval {
+      my $ts = $tm->topics ($query);
+      my $bns = $tm->baseNames ($ts, [ $scope ]);
+      foreach my $tid (sort { $bns->{$a} cmp $bns->{$b} } keys %$bns) {
+	print $OUT "$tid: $bns->{$tid}\n";
+      }
+    }; if ($@) {
+      print $OUT "xtm: Exception: $@";
+    }
+  } elsif (/^find\s+assoc(\s+(.+?)\s*)?$/ || /^assocs$/) {
+    my $query = $2 if $1;
+    eval {
+      my $as = $tm->associations ($query);
+      my $bns = $tm->baseNames ($as, [ $scope ]);
+      foreach my $aid (sort { $bns->{$a} cmp $bns->{$b} } keys %$bns) {
+	print $OUT "$aid: $bns->{$aid}\n";
+      }
+    }; if ($@) {
+      print $OUT "xtm: Exception: $@";
+    }
+  } elsif (/^topic\s+(\S+)/) {
+    my $tid = $1;
+    eval {
+      output_topic ($tm->topic ($tid));
+    }; if ($@) {
+      print $OUT "xtm: Exception: $@";
+    }
+  } elsif (/^assoc\s+(\S+)/) {
+    my $aid = $1;
+    eval {
+      output_assoc ($tm->association ($aid));
+    }; if ($@) {
+      print $OUT "xtm: Exception: $@";
+    }
+  } elsif (/^loglevel(\s+(\d+))?/) {
+    $XTM::Log::loglevel = $2 if $1;
+    print $OUT $XTM::Log::loglevel,"\n";
+  } elsif (/^merge(\s+(.+))?/) {
+    $consistency->{merge} = [ split (/,/, $2) ] if $2;
+    print $OUT join (",", @{$consistency->{merge}}),"\n";
+  } elsif (/^duplicate_suppression(\s+(.+))?/) {
+    $consistency->{duplicate_suppression} = [ split (/,/, $2) ] if $2;
+    print $OUT join (",", @{$consistency->{duplicate_suppression}}),"\n";
+  } elsif (/^follow_maps(\s+(.+))?/) {
+    $consistency->{follow_maps} = [ split (/,/, $2) ] if $2;
+    print $OUT join (",", @{$consistency->{follow_maps}}),"\n";
+  } elsif (/^exit/ || /^quit/) {
+    save_history();
+    exit;
+
+  } elsif (/^help/ || /\?/ || /^command/) {
+    print $OUT "
+Following commands are currently available:
+
+load  <url>                          loading the topic map from the <url> [ Note: files have
+                                                                            to be loaded with file:... ]
+freeze [ <file> ]                    dumps a compressed image of the map onto <file>. If that is missing,
+                                     then on STDOUT. Format is that of FreezeThaw, gzipped
+thaw  <url>                          loads a frozen map
+topic <topic-id>                     shows some information about a particular topic
+assoc <assoc-id>                     shows some information about a particular association
+find topic  <query>                  finds all topics according to <query> (see XTM::Memory)
+find topic                           finds all topics
+topics                               finds all topics
+find assoc  <query>                  finds all assocs according to <query> (see XTM::Memory)
+find assoc                           finds all assocs
+assocs                               finds all assocs
+scope [ <scope-tid> ]                show/set scope
+
+merge                                show/set merging policies (comma separated list, see XTM)
+duplicate_suppression                show/set suppressing policies (comma separated list, see XTM)
+follow_maps                          show/set policies for following maps (comma separated list, see XTM)
+
+info                                 get some overview information about the map
+warn                                 find unused topics....
+errors                               find undefined topics...
+stats                                show some more statistical information
+
+dump                                 dumps out the whole map (can be huge!)
+
+history                              show history
+history < <file>         	     loading a history from a file
+history > <file>         	     saving the current history to a file
+
+loglevel  n                          set logging level to n
+
+exit                                 yes, exit
+quit                                 ditto
+
+You can use command line editing (emacs style) and cursor up/down to browse the history.
+
+";
+
+
+##-- no clue ---------------------------------------------------------
+  } else {
+    print $OUT "what '$_'?\n"
+  }
+
+}
+
+sub output_assoc {
+  my $a = shift;
+
+#  print $OUT Dumper $a;
+  print $OUT "(scoped by ".join (", ", map { $_->href } @{$a->scope->references}). ")\n";
+  print $OUT "is-a:  ";
+  my $type = $a->instanceOf->{reference}->{href} if $a->instanceOf;
+  $type =~ s/^#//;
+  print $OUT "   $type\n";
+
+  print $OUT "members:\n";
+  foreach my $m (@{$a->members}) {
+    my $role = $m->roleSpec ? $m->roleSpec->reference->href : "-";
+    $role =~ s/^\#//;
+    print $OUT "   role:    $role\n";
+    print $OUT "   players: ".join (", ", map { my $s = $_->href; $s =~ s/^\#//; $s } @{$m->references}). "\n";
+  }
+}
+
+sub output_topic {
+  my $t = shift;
+
+#  print $OUT Dumper $t;
+  print $OUT "baseNames:\n";
+  foreach my $b (@{$t->baseNames}) {
+    print $OUT "   ".$b->baseNameString->string, 
+               " (scoped by ".join (", ", map { $_->href } @{$b->scope->references}). ")\n";
+  }
+  print $OUT "is-a:\n";
+  foreach my $i (@{$t->instanceOfs}) {
+    my $type = $i->{reference}->{href};
+    $type =~ s/^#//;
+    print $OUT "   $type\n";
+  }
+  print $OUT "occurrences:\n";
+  foreach my $o (@{$t->occurrences}) {
+    print $OUT "   ".($o->resource->isa ('XTM::resourceData') ?
+		      $o->resource->data : $o->resource->href);
+    my $type = $o->instanceOf->reference->href;
+    $type =~ s/^#//;
+    print $OUT " (typed: ", $type;
+    print $OUT " ,scoped by ".join (", ", map { $_->href } @{$o->scope->references}). ")\n";
+  }
+  print $OUT "associations:\n";
+  foreach my $a (@{$tm->associations ("has-role ".$t->id)}) {
+    print $OUT "as role in ".$a, "\n";
+  }
+  foreach my $a (@{$tm->associations ("has-member ".$t->id)}) {
+    print $OUT "as member in ".$a, "\n";
+  }
+}
+
+__END__
+
+
+  select (STDERR); $| = 1;
+
+}
+
+
+#-- create/manage pid files ------------------------------------------------------------
+use Proc::PID::File;
+if (Proc::PID::File->running (dir => $cfg->{server}->{piddir})) {
+    $main::log->error_die ("already running, so will terminate now")
+	if Proc::PID::File->running (dir => $cfg->{server}->{piddir});
+}
+
+$main::log->debug ("PID file created");
+
+#-- install interupt handler -----------------------------------------------------------
+foreach my $s (qw (TERM KILL INT PIPE)) {
+  $SIG{$s} = sub {
+      $main::log->info ("received signal '$s', shutting down.");
+      exit;
+  };
+}
+
+
+
+__END__
+
+package main;
+
+our $log;
+
+our %contexts;
+
+1;
+
+package Rhobot;
+
+use TM::Virtual;
+use base qw(TM::Virtual);
+
+use TM::Maplet;
+use TM::Access;
+
+our $ontology = q|
+
+(is-subclass-of)
+ superclass: server
+ subclass: irc-bot
+
+rhobot (irc-bot)
+ bn: rhobot
+ in: written in Perl -- understands ontologies which can be loaded dynamically -- uses AsTMaPath to navigate in (virtual and federated maps)
+
+(is-realised-via)
+ abstraction: command
+ realisation: action
+
+(understands-command)
+ system: rhobot
+ command: reload
+
+reload (command)
+ bn: reload command
+ in: this tells the rhobot to restart -- may include later reloading of configuration
+
+(is-realised-via)
+ abstraction: reload
+ realisation: execute-reload
+
+execute-reload (action)
+ bn: the execution of a reload command
+ oc (execute) : urn:x-rhobot:reload
+
+#--
+
+(understands-command)
+ system: rhobot
+ command: shutdown
+
+shutdown (command)
+ bn: shutdown command
+ in: shuts down the rhobot and terminates it -- who would want such a beauty to die?
+
+(is-realised-via)
+ abstraction: shutdown
+ realisation: execute-shutdown
+
+execute-shutdown (action)
+ bn: the execution of a shutdown command
+ oc (execute) : urn:x-rhobot:shutdown
+
+#--
+
+(understands-command)
+ system: rhobot
+ command: rotfl
+
+rotfl (command)
+ bn: rolling on the floor laughing
+
+(is-realised-via)
+ abstraction: rotfl
+ realisation: execute-rotfl
+
+execute-rotfl (action)
+ bn: laughing loud and violently -- scary -- all people are looking in bewilderment
+
+
+# this should actually be a rule:
+# forall $a [ (understands) ] =>
+#   exists $a [ (understands)
+#               system: rhobot
+#               context: $a_context ]
+#   AND
+#   exists [ $a_context (context) ]
+
+(understands)
+ system: rhobot
+ context: dyna--a-context
+
+dyna--a-context (ontology)
+ bn: dynamically loaded map (inclusive ontology)
+ in: consists of an ontology and other maps -- constructed via tau expression
+
+|;
+
+sub capabilities {
+  return [ TM::Access::LIVE_IN ];
+}
+
+sub new {
+  my $class = shift;
+  my $self  = $class->SUPER::new (@_);
+
+  use TM::Materialized::AsTMa;
+  $self->{ontology} = new TM::Materialized::AsTMa (inline => $ontology);
+  $self->{ontology}->sync_in;
+
+  return bless $self, $class;
+}
+
+sub toplet {
+  my $self = shift;
+
+  use Data::Dumper;
+##warn "rhobot toplet ". Dumper \@_;
+
+  my @l;
+  foreach (@_) {
+    if (my @t = $self->{ontology}->toplet ($_)) {
+      push @l, @t;
+    } elsif ($main::contexts{$_}) {
+      push @l, new Toplet (id                 => $_,
+			   characteristics    => [ [ 'universal-scope', undef, TM::Maplet::KIND_BN, $_ ] ]);
+    } else {
+      push @l, undef;
+    }
+  }
+  return @l;
+}
+
+sub toplets {
+  my $self = shift;
+  return ($self->{ontology}->toplets, keys %main::contexts);
+}
+
+sub maplets  {
+  my $self     = shift;
+  my $template = shift;
+
+  my @maplets;
+  push @maplets, $self->{ontology}->maplets ($template);
+
+  if (ref ($template) eq 'TemplateWildcard') {
+    die "unwilling to conform";
+  } elsif (ref ($template) eq 'TemplateIPlayer') {
+    die "unwilling to conform";
+  } elsif (ref ($template) eq 'TemplateIPlayerIRole') {
+    die "unwilling to conform";
+  } elsif (ref ($template) eq 'TemplateIPlayerType') {
+    die "unwilling to conform";
+  } elsif (ref ($template) eq 'TemplateIPlayerIRoleType') {
+    if ($template->type eq 'understands' && $template->irole eq 'system' && $template->iplayer eq 'rhobot') {
+      foreach my $ctx (keys %main::contexts) {
+	push @maplets, new Maplet (scope   => $TM::PSI::US,
+				   type    => 'understands',
+				   roles   => [ 'system',           'context' ],
+				   players => [ $template->iplayer, $ctx ]);
+      }
+    } else {
+    }
+  } else {
+    die "unimplementated template";
+  }
+  return @maplets;
+}
+
+1;
+
+
+
+use warnings;
+use strict;
+
+use Data::Dumper;
+
+use constant CHANNEL        => "#rhobot";
+#use constant CHANNEL        => "#topicmaps";
+use constant NICK           => 'rhobot';
+use constant RETRY_INTERVAL => 10; # secs
+use constant MASTER         => 'drrho!~rho@CPE-203-45-146-245.qld.bigpond.net.au';
+use constant SERVER         => 'irc.freenode.net';
+use constant PORT           => 6667;
+use constant MAX_RESULTS    => 5;
+
+my %options; # he were collect on the way Getopt options
+
+ =pod
+
+ =head1 NAME
+
+rhobot.pl - IRC bot, Topic Map based
+
+ =head1 SYNOPSIS
+
+  rhobot.pl <command line switch>...
+
+  rhobot.pl --config bot.conf
+
+Type 'help' within this shell to get an overview over available
+commands.
+
+ =head1 DESCRIPTION
+
+TBD
+
+ =head1 OPTIONS
+
+Following command line switches are understood by the program:
+
+ =over
+
+ =item
+
+B<help>
+
+This tells you about the rhobot itself. All other options are ignored, no
+execution is done.
+
+ =cut
+
+my $help;
+$options{'help|?|man'} = \$help;
+
+ =pod
+
+ =item
+
+B<config> <file> (default: C<rhobot.conf>)
+
+Name of the configuration file. This file is XML-based, outlining
+particular aspects of the bot itself (server, channel, ...) as well as
+containing a list of topic maps which should be understood by the bot.
+
+See FILES section.
+
+ =cut
+
+use constant CONFIG_FILE    => 'rhobot.conf';
+my $config_file = CONFIG_FILE;
+$options{'config=s'} = \$config_file;
+
+ =pod
+
+ =item
+
+B<logfile> <file> (default: none)
+
+This specifies the name of the log file. No fancy, except that we are
+using Log::Log4perl to write to it.
+
+ =cut
+
+my $logfile = 'rhobot.log';
+$options{'logfile=s'} = \$logfile;
+
+ =pod
+
+ =item
+
+B<tail> <yes/no> (default: C<no>)
+
+If switched on the log file will be I<tail>ed, i.e. shown on STDOUT as
+it is filled. This is if you want to watch what is going on. If not
+switched on, the rhobot will only write into the log file (which can
+be I<tail>ed separately, of course).
+
+ =cut
+
+my $tail = '';
+$options{'tail!'} = \$tail;
+
+ =pod
+
+ =item
+
+B<mode> <irc/batch/interactive> (default: C<interactive>)
+
+The mode controls how the rhobot gets its commands and where it puts
+the responses.
+
+B<NOTE>: Da hat's was! REDESIGN!!!
+
+ =over
+
+ =item
+
+batch mode:
+
+If switched on, the rhobot will run in test mode:
+
+  - no connecting to IRC
+  - commands are consumed from STDIN
+  - responses go to STDOUT
+  - master information for all contexts is ignored
+  - all errors go to STDERR
+
+ =item
+
+irc mode:
+
+All responses are expected on the configured IRC channel for the configured
+nick.
+
+ =item
+
+interactive mode:
+
+TBD
+
+ =back
+
+
+ =cut
+
+my $mode = '';
+$options{'mode=s'} = \$mode;
+
+ =pod
+
+ =back
+
+ =head1 FILES
+
+ =head2 Configuration file
+
+The configuration file should look like this:
+
+   <configuration>
+      <identity polite="no" nick="rhobot"/>
+      <server>irc.freenode.net:6667</server>
+      <channel>#rhobot</channel>
+      <contexts>
+        <context name="rhobot">
+          <master>nick!~user@host.isp.com</master>
+          rhobot:
+        </context>
+        <context name="dns">dns:whatever</context>
+      </contexts>
+      <logfile>/dev/null</logfile>
+   </configuration>
+
+It is consumed at program start and takes effect. All switches, though,
+have a higher precedence. This is to say, that, for instance a
+
+  rhobot.pl --logfile rhobot.log
+
+will override any settings in the configuration file
+
+ =head2 Log file
+
+This is generated via Log4perl. See the code and the documentation to
+change the format. This is not configurable at the moment.
+
+ =head1 ARCHITECTURE
+
+TBD
+
+ =head1 TOPIC MAP Packages
+
+TBD
+
+ =head1 AUTHOR INFORMATION
+
+Copyright 200[3], Robert Barta <drrho@cpan.org>, All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+http://www.perl.com/perl/misc/Artistic.html
+
+ =cut
+
+use Getopt::Long;
+
+if (!GetOptions (%options) || $help) {
+use Pod::Usage;
+  pod2usage(-exitstatus => 0, -verbose => 2);
+}
+
+use XML::Simple;
+my $config = XMLin ($config_file,
+                    keyattr    => { context => '+name' },
+                    forcearray => [ 'context' ],
+                    contentkey => 'tau');
+
+$logfile ||= $config->{logfile};
+
+{
+  use Log::Log4perl qw(:levels);
+  my $layout   = Log::Log4perl::Layout::PatternLayout->new("[%r] %F %L %c - %m%n");
+
+  use Log::Log4perl::Appender::File;
+  my $appender = Log::Log4perl::Appender->new("Log::Log4perl::Appender::File",
+					      filename  => $logfile);
+  $appender->layout($layout);
+
+  $main::log = Log::Log4perl->get_logger("rhobot");
+  $main::log->add_appender($appender);
+}
+
+$main::log->info ("startup");
+
+
+$main::log->info ("consumed config file '$config_file'");
+
+my $nick     = $config->{identity}->{nick}      || NICK;
+my $polite   = $config->{identity}->{polite}    || "yes"; # here we control whether the rhobot has to be address directly as 'rhobot:...'
+my $channel  = $config->{channel}               || CHANNEL;
+my $master   = $config->{master}                || MASTER;
+my ($server) = $config->{server} ? $config->{server} =~ /([^:]+)/ : (SERVER);
+my ($port)   = $config->{server} ? $config->{server} =~ /:(\d+)/  : (PORT);
+
+##print Dumper $config;
+
+use TM;
+$TM::schemes{'rhobot:'} = 'Rhobot';
+
+sub _load_ctxs {
+  foreach my $c (keys %{$config->{contexts}->{context}}) {
+    $main::log->warn ("no tau expression for '$c'") && next unless $config->{contexts}->{context}->{$c}->{tau};
+    eval {
+      $main::contexts{$c}->{map}    = new TM (tau => $config->{contexts}->{context}->{$c}->{tau});
+      $main::contexts{$c}->{master} = $config->{contexts}->{context}->{$c}->{master};
+      $main::log->debug ("loaded context $c");
+    }; if ($@) { $main::log->warn ($@); }
+  }
+}
+_load_ctxs;
+
+
+# different modes, das stinkt nach redesign
+
+if ($mode eq 'batch') {
+##  warn "Contexts". Dumper \%contexts;
+
+  while (my $msg = <>) {
+    chomp $msg;
+    _process_msg ($nick,
+		  'drrho!~rho@CPE-203-45-146-245.qld.bigpond.net.au', # who,
+		  $msg,
+		  sub {
+		    my $s = shift;
+		    print STDOUT "$s\n";
+		  },
+		  {
+		   reload   => sub { _load_ctxs; return "ok"; },
+		   shutdown => sub { exit; }
+		  },
+		 );
+  }
+
+} elsif ($mode eq 'irc') { # IRC
+  use POE;
+  use POE::Component::IRC;
+  POE::Component::IRC->new ('rhobot');                     # make session for the bot
+  POE::Session->new                                          # make session which controls the bot
+      (
+       _start     => sub {                                     # we start our application and tell IRC client what to do first
+	 my $kernel  = $_[KERNEL];
+	 my $heap    = $_[HEAP];
+	 my $session = $_[SESSION];
+
+	 $kernel->sig('QUIT', '__signal');
+
+	 $main::log->info ("starting bot...(may take a while as IRC servers are probing)");
+
+	 $kernel->post( rhobot => register => "all" );
+	 $kernel->post( rhobot => connect =>
+			{ Nick     => $nick,
+			  Username => $nick,
+			  Ircname  => 'POE::Component::IRC rhobot',
+			  Server   => $server,
+			  Port     => $port,
+			}
+		      );
+       },
+
+       _stop      => sub {
+	 my $kernel  = $_[KERNEL];
+	 $main::log->info ("bot shutdown");
+	 $kernel->yield ("shutdown");
+       },
+
+#   __signal   => sub {
+#     my ($kernel, $signal_name) = @_[KERNEL, ARG0];
+#     $main::log->info ("received signal SIG$signal_name");
+#     $kernel->post( rhobot => '_stop' );
+#     $kernel->sig_handled();
+#   },
+
+       irc_001    => sub {                                    # we get a welcome message from the IRC server
+	 $main::log->info ("got welcome message, bot should join now...");
+	 $_[KERNEL]->post( rhobot => join => $channel );
+       },
+
+       irc_public    => sub {                                 # we got a private message
+	 my ( $kernel, $who, $where, $msg ) = @_[ KERNEL, ARG0, ARG1, ARG2 ];
+	 my $channel = $where->[0];
+
+	 _process_msg ($nick,                           # nick
+		       $who,                            # partner id
+		       $msg,                            # msg
+		       sub {                            # how to output
+			 my $s = shift;
+			 $kernel->post( rhobot => privmsg => $channel, $s );
+		       },
+		       {
+			reload   => sub { _load_ctxs; return "ok"; },
+			shutdown => sub { $kernel->post( rhobot => _stop => ''); return "ok"; }
+		       },
+		      );
+	 },
+
+
+	 irc_disconnected => sub {
+	   my ( $kernel ) = @_[ KERNEL,  ];
+
+	   $main::log->info ("disconnected...reconnecting after ".RETRY_INTERVAL." secs");
+	   $kernel->delay( '_start', RETRY_INTERVAL );
+	 },
+
+	 irc_kick => sub {
+	   my ( $kernel, $kickee ) = @_[ KERNEL, ARG2, ];
+
+	   $main::log->info ("someone kicked $kickee...rejoining after ".RETRY_INTERVAL." secs");
+	   $kernel->delay( '_start', RETRY_INTERVAL );
+	 },
+
+	 irc_error => sub {
+	   my ($error ) = @_[ ARG0, ];
+	   $main::log->error ($error);
+	 }
+	);
+
+
+    POE::Session->create
+	(
+	 inline_states =>
+	 { _start    => sub {
+	     use POE::Wheel::FollowTail;
+	     $_[HEAP]->{wheel} = POE::Wheel::FollowTail->new(
+							     Filename     => $_[ARG0],
+							     InputEvent   => 'got_line',
+							     ErrorEvent   => 'got_error',
+							     PollInterval => 5,
+							     SeekBack     => 1024,
+							    );
+	     $_[HEAP]->{first} = 0;
+	   },
+	   got_line  => sub { print "$_[ARG0]\n" if $_[HEAP]->{first}++ },
+	   got_error => sub { warn "$_[ARG0]\n" },
+	 },
+	 args => [ $logfile ],
+	) if $tail;
+
+    # starting endless loop
+    $poe_kernel->run();
+
+} elsif ($mode eq '' || $mode eq 'interactive') {
+  die "interactive not implemented yet";
+} else {
+  die "unknown mode '$mode'";
+}
+
+$main::log->info ("shutdown");
+
+exit 0;
+
+
+sub _process_msg {
+  my $nick     = shift;
+  my $who      = shift;
+  my $msg      = shift;
+  my $out      = shift;
+  my $commands = shift;
+
+  my $pnick   = ( split /!/, $who )[0];
+
+  my $command;
+  if (($polite eq 'yes' && ((undef, $command) = $msg =~ /^($nick\s*:\s*)(.+)/))
+      ||
+      ($polite eq 'no'  && ((undef, $command) = $msg =~ /^($nick\s*:\s*)?(%.+)/))){
+    if ($command =~ /^help/) {
+      &$out ("$pnick:    try '$nick: %rhobot: rhobot -> system \\ understands / ontology'");
+
+    } elsif (! (my ($ctx, $tid, $apath) = $command =~ m/%(\w+?)\s*:\s*([\*\d\.\w-]+)\s*(->.*)?/)) {  # %google: google ->  offers ...
+      &$out ("$pnick:    syntax: %context: topic -> ..." );
+
+    } elsif (! $main::contexts{$ctx}) {
+      &$out ("$pnick:    error unknown context '$ctx'" );
+
+    } elsif ($main::contexts{$ctx}->{master} && $main::contexts{$ctx}->{master} ne $who) {
+      &$out ("$pnick:    sorry, you are no master for '$ctx'" );
+
+    } else {
+      $main::log->debug ("split /$ctx/$tid/". ($apath ? "$apath/" : '' ));
+
+      my @toplets;
+      eval {
+	@toplets = $tid eq '*' ?
+	  $main::contexts{$ctx}->{map}->toplet ($main::contexts{$ctx}->{map}->toplets)
+	    :
+	      $main::contexts{$ctx}->{map}->toplet ($tid);
+      }; if ($@) {
+        &$out ("$pnick:   unwilling/unable to extract topics for '$apath'" );
+        $main::log->debug ("toplet extraction problem '$@'");
+        return;
+      }
+
+      ##warn Dumper \@toplets;
+
+      use TM::AsTMa::Path;
+      my $ap;
+      eval {
+	$ap = new TM::AsTMa::Path ($apath);
+      }; if ($@) {
+	&$out ("$pnick:    parse error in '$apath'" );
+	$main::log->debug ("found parse error '$@'");
+	return;
+      }
+
+      my @res;
+      eval {
+	@res = $ap->eval ($main::contexts{$ctx}->{map}, \@toplets);
+      }; if ($@) {
+	&$out ("$pnick:    evaluation error in '$apath': $@" );
+	$main::log->debug ("eval error '$apath': '$@'");
+	return;
+      }
+
+      if (@res == 0) {
+	&$out ("$pnick:    <no results>" );
+      } else {
+	foreach my $m (@res[0..MAX_RESULTS-1]) {
+	  next unless $m;
+
+	  my $response;
+	  use TM::Maplet;
+	  if (ref($m) eq 'Toplet') {
+
+	    my @bns = grep ($_->[KIND] == TM::Maplet::KIND_BN && $_->[SCOPE] eq 'universal-scope', @{$m->[CHARS]});
+	    $response  = $m->[ID];
+	    $response .= ' \\\\ bn: '.$bns[0]->[VALUE];
+
+	    my @exe = grep ($_->[KIND] == TM::Maplet::KIND_OC && $_->[TYPE] eq 'execute', @{$m->[CHARS]});
+	    foreach my $e (@exe) {
+	      $e->[VALUE] =~ /urn:x-rhobot:(.+)/;
+	      my $status;
+	      eval {
+		$status = &{$commands->{$1}} if $commands->{$1};
+	      }; if ($@) {
+		$status = $@;
+		last;
+	      }
+	      $response .= ' \\\\ oc (status): '.$status;
+	    }
+
+
+	  } else { #must be maplet then
+	    $response  = '('.$m->[TYPE].') ' . ($m->[SCOPE] ne $TM::PSI::US ? '@ ' . $m->[SCOPE] : '');
+	    my $p = $m->players;
+	    my $r = $m->roles;
+	    for (my $i = 0; $i < @$p; $i++) {
+	      $response .= " \\\\ $r->[$i] : $p->[$i] ";
+	    }
+	  }
+	  &$out ("$pnick:    $response" );
+	}
+	&$out ("$pnick:    (more results suppressed, limit ".MAX_RESULTS.")" )
+	  if $res[MAX_RESULTS];
+      }
+    }
+  }
+
+}
+
+
+__END__
+
+
+
+#-- these are the Modules (operators) we want to use (should go into some config) --------
+use TM::Tau::Filter::Statistics;
+
+#use TM::Virtual::DNS;
+#$TM::schemes{'dns:'}    = 'TM::Virtual::DNS';
+
+# -- we have to define that - at begin means read AsTMa= from STDIN and that - at the end means
+# -- to write to STDOUT
+use TM::Tau; @@@@@@@@@@@@@@@@@@@@
+%TM::Tau::STDIN  = (module => 'TM::Materialized::AsTMa',  url => 'io:stdin');
+%TM::Tau::STDOUT = (module => 'TM::Materialized::Memory', url => 'io:stdout');
+
+#-- here remote/local decision will be done for me ---------------------------------------
+use TM::Tau::Processor;
+my $tau_proc = new TM::Tau::Processor (BaseURL  => $baseurl,
+                                       AutoList => 1);
+

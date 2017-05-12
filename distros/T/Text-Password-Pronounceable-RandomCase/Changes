@@ -1,0 +1,17 @@
+0.03	We 22 Aug 2012 22:10:25 CEST
+	
+	fixed typo (by Olaf Alders)
+
+0.02	Sa 12 Sep 2009 14:34:57 CEST
+
+	defaults for functional interface
+	explicitly state defaults in documentation
+	test functional interface
+	fixed wrong precedence
+	added new test for password generation with standard probability
+	fixed two typos
+	added link to repository
+	add Changes file
+
+0.01
+	initial version

@@ -1,0 +1,24 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    PLACEHOLDER. NOT YET IMPLEMENTED.
+
+FUNCTIONS
+
+ create_tree_from_dir($path) => obj
+
+    This module provides a convenience function to build a tree of objects
+    that mirrors a directory structure on the filesystem. Each node will
+    represent a file or a subdirectory.
+
+    The class can be any class that provides parent and children methods.
+    See Role::TinyCommons::Tree::Node for more details on the requirement.
+
+SEE ALSO
+
+    Role::TinyCommons::Tree
+
+    Other ways to create tree: Tree::FromStruct, Tree::FromText,
+    Tree::FromTextLines, Tree::Create::Callback, Tree::Create::Size.
+

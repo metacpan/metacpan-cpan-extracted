@@ -1,0 +1,43 @@
+Test-SynchHaveWant
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::SynchHaveWant
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-SynchHaveWant
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-SynchHaveWant
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-SynchHaveWant
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-SynchHaveWant/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Curtis 'Ovid' Poe
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

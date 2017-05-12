@@ -1,0 +1,221 @@
+NAME
+    Tk::MDI - Multiple Document Interface for Tk
+
+SYNOPSIS
+            use Tk;
+            use Tk::MDI;
+
+            $mw = tkinit;
+            $mdi = $mw->MDI(
+                    -style=>'win32',
+                    -background=>'white');
+
+            $child1 = $mdi->add;
+            $text = $child1->Text->pack;
+            $text->insert('end',"A text widget");
+
+            $child2 = $mdi->add(-titletext=>'Listbox Title');
+            $lb = $child2->Listbox->pack;
+            $lb->insert(0,"A Listbox");
+
+            $child3 = $mdi->newWindow(-titlebg=>'white');
+            $c = $child3->Scrolled('Canvas',-scrollbars=>'se')->pack;
+            $c->create('text',50,50,-text=>"A Canvas");
+
+            MainLoop;
+
+STANDARD OPTIONS
+    The following standard widget options are supported:
+
+    -background/-bg
+
+WIDGET SPECIFIC OPTIONS
+    Name menu
+    Class Menu
+    Switch -menu
+        This option controls placement of the MDI menu. The MDI menu acts as
+        a control for child window placement. It allows for minimizing,
+        cascading, restoring and tiling child windows of the MDI object.
+
+        If this option can be specified in two ways.. If a reference to a
+        user created menu is given, then the MDI menu will be *cascaded* to
+        that menu. If no menu reference is given then a new Menu will be
+        created to be accessible according to the value of this *-menu*
+        option. In this case, the value shall be one of: menubar, popup,
+        both, or none. The default value is both.
+
+        The *-menu* option is *not* meant to be adjusted via the configure
+        method. It should really only be used at MDI creation.
+
+    Name focus
+    Class Focus
+    Switch -focus
+        This option controls the focus policy of the child windows created
+        using the add or newWindow method as described below. The value can
+        be one of: click, lazy or strict. The default value is click.
+
+        Where:
+
+            *click*
+                *ClickToFocus* - Clicking into a window activates it.
+
+            *lazy*
+                *FocusFollowsMouse* - Moving the mouse pointer actively onto
+                a window activates it.
+
+            *strict*
+                *FocusStrictlyUnderMouse* - Only the window under the mouse
+                pointer is active. If the mouse points nowhere, nothing has
+                the focus.
+
+    Name shadow
+    Class Shadow
+    Switch -shadow
+        Specifies whether or not a *rubberband* or *shadow* type rectangle
+        shall be used on a move or resize of a child window. This value must
+        be a proper boolean such as 0 or 1. The default value is: 1 (i.e.
+        on).
+
+    Name autoresize
+    Class AutoResize
+    Switch -autoresize
+        Specifies whether or not a child window should be automatically
+        resized to fit within the MDI parent frame. This value must be a
+        proper boolean such as 0 or 1. The default value is: 0 (i.e. <off>).
+
+        Note: This is best turned on when using all of a similar type of
+        widget - such as a Text widget (like a true MDI).
+
+    Switch -style
+        Specifies the style of buttons to use in the decorative frame
+        surrounding the child windows. This will be enhanced in future
+        releases but as of this time is only supports the following values:
+        win32, kde, default. The default value is: default.
+
+        NOTE: This currently cannot be changed by the configure method so it
+        MUST be stated at MDI creation in order to set the button images
+        properly.
+
+DESCRIPTION
+    This module emulates MDI type functionality with a twist. The twist is
+    ... virtually any Tk widget can be used! Hence, the 'D' in MDI is
+    somewhat of a misnomer.
+
+    The MDI method creates a new MDI window (i.e. a Frame) and returns a
+    blessed reference to the MDI widget. The MDI widget is created as a
+    direct descendent of the Toplevel or MainWindow of the calling $widget.
+    The purpose of the MDI widget is to serve as a container to confine
+    *child* windows; which can be created at any time using the methods
+    described below.
+
+    The MDI functionality has been designed to mimic as closely as possible
+    other MDI applications such as PFE and MSWord.
+
+WIDGET METHODS
+    The MDI method creates a new object. This object supports the configure
+    and cget methods described in options which can be used to enquire and
+    modify *most* of the options described above.
+
+    The following additional methods are available for MDI widgets:
+
+    *$child*=*$mdi*->add(?*option, value, ...?*);
+        A shortcut to the newWindow method.
+
+    *$child*=*$mdi*->newWindow(?*option, value, ...?*);
+        Both add and newWindow create a new child window within the MDI
+        parent. These methods return the reference to a Toplevel window. You
+        must then explicitly pack your widgets into this window. Note: When
+        you pack your widgets - it is a good idea to turn -expand on and
+        -fill both. This will allow your widgets to fill the Toplevel area
+        on a resize, cascade or tile.
+
+        Where allowable options are:
+
+        -titletext
+            A text string which will show in the titlebar of the child
+            window.
+
+        -titlebg
+            Color of the titlebar background when child window has focus.
+
+    *$child*->destroy;
+        Kill the MDI child window.
+
+CHILD WINDOW BINDINGS
+    All MDI child windows are confined to the MDI space. This is a standard
+    feature of MDI. On Win32 - this will work *best* if you have Win32::API
+    installed. If it is, then the windows will be confined using the native
+    win32 'ClipCursor' API function. Otherwise, a perl only 'hack' is
+    invoked.
+
+    Move
+        To move a child window, left click on the titlebar and drag. If the
+        *-shadow* option is on then only the outline of the window will be
+        shown until you release the button.
+
+    Resize
+        To resize a child window, left click on the outer frame. Drag as per
+        move.
+
+    Shade
+        To roll up the child window like a 'shade' - Right click on the
+        titlebar. Another right click will restore the window to it's
+        previous position.
+
+KNOWN BUGS
+    This should be considered a Beta version. We would like feedback on any
+    bugs you find, or enhancements you would like to see. Please read the
+    ToDo list to see what we have planned.
+
+    On win32 - sometimes if a child window titlebar lies directly beneath a
+    menu item, the buttonrelease event from the menu will trigger on that
+    child window.
+
+    Titlebar 'flickers' on Enter and Leave events.
+
+    Still do not have keyboard focus working for internal widgets.
+
+    Smart placement needs to get smarter.
+
+    If run on a dual-monitored system - there may be some bugs in moving or
+    resizing a child window if the pointer is on the edge of the second
+    screen.
+
+AUTHORS
+    Ala Qumsieh <aqumsieh@hyperchip.com> Jack Dunnigan
+    <jack.dunnigan@ec.gc.ca>
+
+COPYRIGHT
+    Copyright (c) 2002 Ala Qumsieh & Jack Dunnigan. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+
+***********************************************************
+
+Bugs:-----
+1. Sometimes if a window titlebar lies directly beneath the "CASCADE" 
+menu item. The release event triggers on the window below. This will
+have the unfortunate consequence of moving the window.
+2. Titlebar 'flickers' on click, entering Internal frame! (Win32)
+3. Focus policy doesn't quite work yet on internal widgets.
+
+To Do list for 1st release:------
+
+1. Look into 'DEFAULT' delegate?
+4. Finish Maximize problem on 'New Window' - i.e for now
+we should just maximize a new window if any other window is
+currently maximized. i.e. Smartplacement will not happen.
+
+ToDo/Wish List future releases:
+1. Allow configurable button images, including pixmaps.
+1a. Also allow new images on mouseover for these buttons.
+1b. Same for titlebar - i.e. themes.
+
+2. Top Left menu with configurable image and menu.
+3. Full-fledged Text based MDI...including File open etc.
+4. Make smart placement smarter. Allow the user to pick
+relative width and height of new or cascaded widgets.
+5. 
+
+

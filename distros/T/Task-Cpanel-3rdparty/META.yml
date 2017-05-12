@@ -1,0 +1,56 @@
+---
+abstract: 'These modules are used for 3rdparty application development with B<cPanel & WHM>.'
+author:
+  - 'cPanel <cpanel@cpan.org>'
+build_requires:
+  FindBin: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Cpanel-3rdparty
+requires:
+  CGI::Session: 0
+  Class::Std::Utils: 0
+  Config::Crontab: 0
+  Config::General: 0
+  Convert::BinHex: 0
+  Convert::TNEF: 0
+  DBD::SQLite: 0
+  Date::Format: 0
+  Date::Simple: 0
+  File::MimeInfo: 0
+  Gearman::Client: 0
+  HTML::StripTags: 0
+  IO::Interactive: 0
+  IO::Socket::SSL: 0
+  IO::Stringy: 0
+  JSON: 0
+  JSON::XS: 0
+  LWP::UserAgent: 0
+  MIME::Tools: 0
+  Mail::Header: 0
+  Mozilla::CA: 0
+  Net::CIDR: 0
+  Net::DNS::SEC: 0
+  Net::IP: 0
+  Net::Ident: 0
+  NetAddr::IP: 0
+  Pod::Escapes: 0
+  Proc::ProcessTable: 0
+  SOAP::Lite: 0
+  Smart::Comments: 0
+  Sys::SigAction: 0
+  Test::Pod: 0
+  Unix::Syslog: 0
+  WWW::FieldValidator: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/CpanelInc/Task-Cpanel-3rdparty
+version: 11.36.001

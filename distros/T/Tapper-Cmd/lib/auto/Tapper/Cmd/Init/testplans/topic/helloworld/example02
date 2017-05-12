@@ -1,0 +1,6 @@
+[%#- -*- mode: tt -*- %]
+[% USE env = EnvHash %]
+[%- IF tests_host  == '' %][% tests_host     = "$env.HOME/.tapper/hello-world/controlfiles/local-start-test.sh" %][% END -%]
+[%- IF machines    == '' %][% machines       = 'ali,hug,dekkers' %][% END -%]
+[%- IF queue       == '' %][% queue          = 'arm' %][% END -%]
+[%- PROCESS 'topic/any/generic/local' -%]

@@ -1,0 +1,87 @@
+Revision history for Test-CleanNamespaces
+
+0.22      2016-08-19 03:45:32Z
+  - properly find the list of modules to test (regression since 0.19)
+
+0.21      2016-08-16 01:31:28Z
+  - no changes since 0.20
+
+0.20      2016-06-19 02:41:02Z (TRIAL RELEASE)
+  - switch to plain old Exporter, removing build_* subs from the API,
+
+0.19      2016-06-17 05:00:35Z
+  - removed dependencies on namespace::clean, Sub::Exporter, File::Find::Rule
+
+0.18      2015-01-21 03:54:30Z
+  - remove Moose test requires <-> Test::CleanNamespaces test recommends
+    circular relationship (softened to suggests)
+
+0.17      2015-01-20 03:46:46Z
+  - skip Mouse tests if some required interfaces are not available
+
+0.16      2014-08-28 23:55:47Z
+  - skip Moose-related tests for normal installs, to get out of circularity
+    hell if Moose is installed but broken and needing an upgrade
+
+0.15      2014-08-16 00:18:15Z
+  - bump Package::Stash prereq to ensure used methods are available
+
+0.14      2014-08-11 21:44:34Z
+  - remove accidental dependency on Class::MOP (which turned into a circular
+    dependency with Moose-2.1211)
+
+0.13      2014-06-24 19:14:03Z
+  - bump (optional) prereq on Moo to get some fixes for handling roles
+
+0.12      2014-06-18 01:58:18Z
+  - also special case constant subs, which show up in the symbol table before
+  perl 5.010 as 'constant::__ANON__'
+
+0.11      2014-06-15 04:02:16Z
+  - the return value of namespaces_clean() and all_namespaces_clean() is now
+    consistent with the result of the test(s).
+  - fixed tests to expose an issue with Mouse classes, and documented this
+    (now) known issue
+
+0.10      2014-05-12 04:30:17Z (TRIAL RELEASE)
+  - fix test diagnostics in the success case
+  - fix use of a new Scalar::Util export in tests
+
+0.09      2014-05-07 05:06:58Z (TRIAL RELEASE)
+  - increased version for optional Role::Tiny prereq, to get the needed
+    is_role interface
+  - now ignoring 'import', 'unimport' subs; also handle users of
+    Moose::Exporter without erroring
+  - now ignoring overloaded methods
+  - now also properly handle classes using Class::MOP directly
+
+0.08      2014-03-09 01:08:34Z
+  - fixed method identification in Moose and Mouse roles
+
+0.07      2014-03-02 06:55:41Z
+  - remove test prereqs that are meant to be optional (added in v0.06)
+  - fix handling of subs composed from a role (Moose::Role, Moo::Role,
+    Mouse::Role, and Role::Tiny), broken in v0.06
+
+0.06      2014-03-01 19:14:39Z
+  - lots more tests
+  - in failing tests, identify the source of the uncleaned sub(s)
+  - remove the dependency on Class::MOP by inspecting the package stash
+    directly
+ - line numbers in shipped code are now almost the same (within 3) as the
+   repository source, for easier debugging
+
+0.05      2013-09-25 03:34:13Z
+  - re-release with fixed compile test
+
+0.04      2013-09-14 17:32:26Z
+  - remove use of deprecated Class::MOP::load_class
+
+0.03   2010-05-07 22:29:00 +0200
+  - Stop using the deprecated get_method_map method.
+
+0.02   2009-05-28 06:05:26 +0200
+  - Declare dependency on Test::Tester.
+
+0.01   2009-05-16 18:32:11 +0200
+  - Initial release.

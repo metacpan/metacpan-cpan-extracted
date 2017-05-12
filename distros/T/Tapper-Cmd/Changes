@@ -1,0 +1,133 @@
+Revision history for Tapper-Cmd
+
+5.0.8     2017-02-14
+        - support for testrun pause/continue
+
+5.0.7     2016-11-11
+        - default config for tapper_prc: tapper-client without path
+
+5.0.6     2016-04-06
+        - log4perl timestamps in GMT
+
+5.0.5     2016-03-30
+        - apply_macro() also looks into include path paths.use_case_path
+
+5.0.4     2016-03-30
+        - hello-world - povide example tapper-selftest with preconditions
+
+5.0.3     2016-03-11
+        - hello-world - bugfixes in example testplans, benchmarks
+        - tapper init - separated createdb from initializing rows
+
+5.0.2     2016-03-03
+        - testplan template tweaking
+          * drop quote characters from name/shortname
+          * fix TT filter 'autoformat' -> 'Autoformat'
+          * dependencies declared to Template-Toolkit plugins
+
+5.0.1     2016-03-03
+        - 'tapper init' polishing
+          * prepare benchmark subsystem
+          * update examples for latest TAP::DOM
+          * Web UI log config
+
+5.0.0     2016-02-15
+        - big refactoring complementing the CLI rework
+        - performance tweaks
+        - bugfixes on handling queues, hosts, testruns
+        - find all files that belong to a testrun
+        - db transaction awareness
+
+4.1.8     2013-03-14
+        - helloworld: example_kernel_install.sh: example installer
+        - helloworld: example_producer_builder.sh: example for builder
+        - helloworld: testplans/*/example03-builder: frontend to testplans/*/local
+        - helloworld: testplans/*/local: allow specifying precondition producers
+        - tapper init: testplans/ subdir now fine-grained
+        - tapper init: provide a subdir for producers
+        - add notifications for new testrun if requested
+        - [TEST] adding notification with testrun
+        - [FIX] API docs: new notifications can not be added as a string
+
+4.1.7     2012-11-27
+        - helloworld: add example macroprecondition
+        - helloworld: rename subdir 03-controlfiles -> controlfiles
+
+4.1.6     2012-11-27
+        - helloworld: new script to run all hello-world examples
+        - testplan 'local': add -Dtest_timeout
+
+4.1.5     2012-11-26
+        - exmaple testplans: fix default queues
+
+4.1.4     2012-11-26
+        - polished backend testplan "topic.any.generic.local"
+        - example frontend testplans "topic.helloworld.example*"
+        - testplans now provide a default [% HOME %] substitution
+
+4.1.3     2012-11-23
+        - tapper init: more example programs in ~/.tapper/
+          for new 'local' testruns
+
+4.1.2     2012-11-22
+        - 'tapper init' with more ~/.tapper/ boilerplate,
+          for Tapper::MCP::MessageReceiver and first testplans
+        - new command: 'tapper testplan-new'
+          (migrated from former 'tapper-testrun newtestplan')
+
+4.1.1     2012-11-19
+        - new command: 'tapper init' to initialize a ~/.tapper
+        - inclusive a ~/.tapper/hello-world/ directory with examples
+
+4.1.0     2012-10-19
+        * PostgreSQL support
+        - [FIX] slow first() usage
+        - rename USER into OWNER
+
+        * Cobbler support
+        - [FEAT] host_update function
+        - [FEAT] host listing in Cobbler
+        - [FEAT] Cobbler database handling
+
+        * Misc
+        - [FEAT] testplan rerun
+        - [FIX] ALWAYS have an owner for testrun
+        - [FIX] finish testruns when testplan is deleted
+        - [FIX] deactivate jobs in deleted queue
+        - [FIX] New on queue with deleted flag reactivated the existing one
+        - [FIX] delete queue with/without jobs
+
+4.0.1     2012-06-11
+        - cmd for user management
+        - add listing of notifications
+        - delete queue by just setting deleted flag
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* fix URLs in README
+	* release version++ roundhouse kick
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* repository and bugtracker urls
+	* more overviewish README
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.2
+
+	* try to force YAML versions
+
+	* testplan element now called "multitest" and module/type mapping
+	  done internally
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

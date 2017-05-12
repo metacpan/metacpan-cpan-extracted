@@ -1,0 +1,32 @@
+Try::Chain version 0.005
+========================
+
+Call method, hash and/or array chains with break on undef means,
+that in some cases it is ok to get back nothing late or early.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    parent
+    Try::Tiny
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2017,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

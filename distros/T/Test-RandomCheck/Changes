@@ -1,0 +1,8 @@
+Revision history for Test-BangAway
+
+0.03  2016-10-02 23:38:20 UTC
+        - Fix dependencies
+        - Drop older perls support
+
+0.02  2016-09-29 11:43:24 UTC
+        - Initial release

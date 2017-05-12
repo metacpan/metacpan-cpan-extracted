@@ -1,0 +1,92 @@
+Text-HistogramChart
+
+Text::HistogramChart creates graphical charts for terminal displays or any other display device where bitmap graphics is not available!
+You can supply the Y axel legend (vertical) values or Text::HistogramChart can calculate them from the input values.
+
+	require Text::HistogramChart;
+
+	my $chart = Text::HistogramChart->new();
+
+	@values = (1, 2, 3, 4, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -4, -3, -2, -1, 0);
+	@legend_values = (4, 3, 2, 1, 0, -1, -2, -3, -4);
+	$chart->{'values'} = \@values;
+	$chart->{'legend_values'} = \@legend_values;
+	$chart->{'screen_height'} = 9;                # (height reserved for the graph.)
+	$chart->{'roof_value'} = 0;                   # (active if != 0), # Arbitrarily squeeze or extend the size (height) of bars (not screen)
+	$chart->{'floor_value'} = 0;                  # (the "floor" of the chart, default: 0)
+	$chart->{'write_floor'} = 1;                  # (make floor visible)
+	$chart->{'use_floor'} = 1;                    # (use the floor value)
+	$chart->{'write_floor_value'} = 1;            # If value == floor_value, then write value (mostly "0").
+	$chart->{'write_legend'} = 1;                 # (Prepend legend to each row.)
+	$chart->{'legend_horizontal_width'} = 4;      # width of the space left for legend (left edge of chart)
+	$chart->{'horizontal_width'} = 2;             # Horizontal width of one bar. This parameter directly influences the width of the screen (i.e. chart).
+	$chart->{'write_value'} = 1;                  # (YES = 1, NO = 0, default: no; write the value on the end of the bar),
+	$chart->{'write_always_over_value'} = 0;      # (YES = 1, NO = 0, default: yes; write the value only if it is too high for the graph),
+	$chart->{'write_always_under_value'} = 0;     # (YES = 1, NO = 0, default: yes; write the value only if it is too low for the graph),
+	$chart->{'bar_char'} = '|';                   # (default: '|')
+	$chart->{'floor_char'} = '-';                 # (default '-' )
+	$chart->{'over_value_char'} = '+';            # (default: '+')
+	$chart->{'under_value_char'} = '_';           # (default: '-' )
+	$rval = $chart->chart();
+	if($rval >= 1) {
+		my @ready_chart = @{$chart->{'screen'}};
+		print (join '\n', @ready_chart) . "\n";
+	} else {
+		print "Error in creating chart: " . $chart->error_string . "\n";
+	}
+
+	# Result:
+	#	4         4 5 4                             
+	#	3       3 | | | 3                           
+	#	2     2 | | | | | 2                         
+	#	1   1 | | | | | | | 1                       
+	#	0   ------------------0 ------------------0 
+	#	-1                      -1| | | | | | | -1  
+	#	-2                        -2| | | | | -2    
+	#	-3                          -3| | | -3      
+	#	-4                            -4-5-4        
+
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::HistogramChart
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-HistogramChart
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Text-HistogramChart
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-HistogramChart
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-HistogramChart/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Mikko Koivunalho
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

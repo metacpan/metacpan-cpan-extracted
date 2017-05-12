@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Template-Plugin-DtFormatter-RelativeDate
+version:            0.04
+abstract:           return finder like relative date.
+author:
+    - bokutin <bokuin@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DateTime::Format::MySQL:  0
+    DateTime::Format::Natural:  0
+    Locale::Maketext:     0
+    Template:             0
+    Test::Base:           0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

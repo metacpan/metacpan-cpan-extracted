@@ -1,0 +1,201 @@
+[[PageOutline(1-2)]]
+
+List of existing and planned features with links to description of each feature
+with relevant tickets and test cases to make sure the features are implemented correctly.
+
+= Features =
+
+ * multi-platform: [wiki:DownloadWindows Microsoft Windows], [wiki:Download Linux], [wiki:DownloadFreeBSD FreeBSD], [wiki:DownloadMacOSX Mac OS X], [wiki:DownloadNetBSD NetBSD]
+ * Free and Open Source Software under the Perl licensing terms: [http://svn.perlide.org/padre/trunk/Padre/COPYING GPL I] [http://svn.perlide.org/padre/trunk/Padre/Artistic Artistic I]
+ * Written in Perl. There are parts that rely on libraries written in C or C++ but they are all wrapped in CPAN packages and have an API in Perl 5.
+ * [wiki:Features/BasicEditorFeatures Basic Editor Features]
+ * [wiki:Features/VisualEditorEffects Visual Editor Effects]
+   * Line Numbers
+   * Code Folding
+   * Current Line
+   * Right Margin
+   * Newlines
+   * Whitespaces
+   * Indentation Guide 
+ * [wiki:Features/SyntaxHighlighting Syntax Highlighting]
+ * [wiki:Features/Run Run a Script]
+ * [wiki:Features/TitleAndStatusBarPersonalization Title and Status Bar Personalization]
+ * [wiki:Features/CommandLineWindow Command Line Window]
+ * [wiki:Features/OpenResource Open Resource]
+ * [wiki:Features/QuickMenuAccess Quick Menu Access]
+ * [wiki:Features/SingleInstance Single Instance]
+ * [wiki:Features/AutoSave Automatic Save and Backup]
+ * [wiki:Features/RemoteEditing Remote Editing via FTP, HTTP, SSH]
+ * [wiki:Features/CooperativeEditing Cooperative Editing] (Swarm)
+ * [wiki:Features/SearchAndReplace Search and Replace]
+ * [wiki:Features/IncrementalSearch Incremental Search]
+ * [wiki:Features/FindInFiles Find In Files]
+ * [wiki:Features/TODOList TODO List]
+ * [wiki:Features/EditPatch Patch]
+ * [wiki:Features/AutoDiff Auto-Diff]
+ * [wiki:Features/CodeSnippets Code Snippets]
+ * [wiki:Features/CPANModuleInstaller CPAN Module Installer]
+ * [wiki:Features/SessionManagement Session Management]
+ * [wiki:Features/SplitView Split View]
+ * [wiki:Features/Bookmarks Bookmarks]
+ * [wiki:Features/RightClick Context Menu]
+ * [wiki:Features/ProjectManagement Project Management]
+ * [wiki:Features/ProjectSkeletonGeneration Project Skeleton Generation]
+ * [wiki:Features/Autocomplete Autocomplete]
+ * [wiki:Features/HelpViewer Help Viewer]
+ * [wiki:Features/ContextSensitiveHelp Context Sensitive Help]
+ * [wiki:Features/RectangularEditing Rectangular Selection and Editing]
+ * [wiki:Features/Autoindent Autoindent]
+ * [wiki:Features/Brackets Bracket Completition and Matching]
+ * [wiki:Features/Outline Code Browser and Var tree called Outline] 
+ * [wiki:Features/Autocomplete Source code suggestions and Autocomplete]
+ * [wiki:Features/PreferenceSystem Configuration and Preference System]
+ * [wiki:Features/OpenSelection Open Selection]
+ * Multi-document editing - as far as we understand this only means you can edit several files at the same time
+ * Code-assist editor - What does this cover?
+ * IME - [wiki:Features/MultilingualInputMethodEditor Multilingual Input Method Editor]
+ * [wiki:Features/IntegratedWebServer Integrated Web Server] for web application development
+ * Call tips
+* [wiki:Features/ToolsPrefernces Tools Prefernces draft]
+
+== Perl-specific features ==
+
+ * [wiki:Features/SyntaxChecking Real Time Syntax Checking For Perl 5 and 6]
+ * [wiki:Features/Perl5Debugger Perl 5 Debugger] - perl debugging in Padre
+ * [wiki:Features/RefactoringPerl5 Refactoring Perl 5 code]
+ * [wiki:Features/AutomatedBuildAndTest Automated Build and Test]
+ * [wiki:Features/Perl6 Perl 6 features]
+ * [wiki:Features/RegexEditor Regex Editor]
+ * [wiki:PluginAPI Extendable in Perl 5] via a Powerful [wiki:PluginAPI Plugin API]
+ * [wiki:Features/PerlTidy] - automatic reformatting (tidying) of code
+ * [wiki:Features/REPL REPL]
+ * [wiki:Features/ProjectBrowser Project Browser] (Tree view of source files and resources)
+ * [wiki:Features/IdentifyCommonErrors Identify Common Errors]
+ * special features for beginners (we can create a page listing them)
+ * advanced features (we can create a page listing them)
+
+ * [wiki:Features/Extendable Extendable in Perl 6 and other languages]
+ * [wiki:Features/HandleMultipleLanguages]
+
+
+== Plugins ==
+
+ * [wiki:Plugins] generic plugins related tickets
+ * [wiki:Features/IntegratedVersionControl Integrated Version Control]
+ * [wiki:Features/SuperGrep Super Grep]
+
+= Feature requests and ideas from other sources =
+
+In this section we have lists of features taken from verious articles
+and web sites comparing tools and even from other IDEs.
+
+For each feature we first link it to a related ticket but later
+on we will point to the description of our implementation of
+that feature.
+
+== From Perlmonks ==
+
+Perlmonks has a table comparing features of IDEs and editors to be used for Perl
+development.
+
+The table can be found at [http://www.perlmonks.org/?node=Perl%20Development%20Tools Perl Development Tools]
+
+TODO: add links to the relevant Feature Pages
+
+|| '''Feature'''      || '''Status or link to ticket''' ||
+|| Perl Exclusive     || Why is yes considered good here? ||
+|| Free               || yes - Under the "perl" license. ||
+|| Perl Engine        || Any - Padre itself runs on 5.8.7 or higher but your code can run on any version of perl ||
+|| [wiki:Features/SyntaxChecking Syntax Checking]  || yes ||
+|| [wiki:Features/SyntaxHighlighting Syntax colouring]  || yes ||
+|| [wiki:Features/Autoindent Autoindent]    || yes ||
+|| [wiki:Features/IncrementalSearch Incremental search] || yes ||
+|| [wiki:Features/Brackets Bracket Completition and Matching] || yes ||
+|| Folding            || see under [wiki:Features/VisualEditorEffects Visual Editor Effects] ||
+|| Var tree           || see in [wiki:Features/Outline Outline] ||
+|| Code browser       || see in [wiki:Features/Outline Outline] ||
+|| Debugger           || [wiki:Features/Perl5Debugger Perl 5 Debugger] ||
+|| Stepping           || See Debugger ||
+|| Breakpoints        || See Debugger ||
+|| Watches            || See Debugger ||
+|| Var evaluation     || See Debugger ||
+|| Stack module       || See Debugger ||
+|| [wiki:Features/Bookmarks Bookmarks]    || yes ||
+|| Suggest & complete || see #67 but add more ||
+|| [wiki:Features/IdentifyCommonErrors Identify errors] || also [wiki:Features/SyntaxChecking Syntax Checking] ||
+|| [wiki:Features/REPL Interactive shell]  || ||
+|| [wiki:Features/CodeSnippets Code snippets]  || yes ||
+|| [wiki:Features/ProjectManagement Project] || ||
+|| Control version    ||  [wiki:Features/IntegratedVersionControl Integrated Version Control] ||
+|| Multi document     || yes ||
+|| [wiki:Features/SplitView Split View] || ||
+|| IME                || Multilingual Input Method Editor ||
+|| [wiki:Features/HelpViewer Docs & Help viewer] || yes ||
+|| [wiki:Features/CPANModuleInstaller Module installer]   || ||
+|| WEB                || [wiki:Features/IntegratedWebServer Integrated Web Server] ||
+|| FTP                || #12 Read and write over ftp protocol (modify the program at remote server) ||
+|| HTML export        || #112 To export the source of program with the syntax colouring. ||
+|| Linux              || [wiki:Download] ||
+|| BSD                || [wiki:DownloadFreeBSD] and [wiki:DownloadNetBSD] ||
+|| Mac OS X           || [wiki:DownloadMacOSX] ||
+|| Solaris            || ||
+|| Windows            || [wiki:DownloadWindows] ||
+
+
+== From Perl Needs Better Tools ==
+
+[http://www.eigenstate.net/perl_tools/ Perl Needs Better Tools] by Matisse Enzer 
+
+||'''Feature'''                                                    || '''Status or link to ticket''' ||
+||[wiki:Features/SyntaxHighlighting Syntax coloring]               || ||
+||[wiki:Features/SyntaxChecking Real Time Syntax Checking] || ||
+||[wiki:Features/IntegratedVersionControl Version control integration] || ||
+||Code-assist editor                                               ||  ||
+||Excellent refactoring support                                    || [wiki:Features/RefactoringPerl5 Refactoring Perl 5 code] ||
+||Tree view of source files and resources                          ||  ||
+||Support for creating and running unit tests                      || [wiki:Features/AutomatedBuildAndTest Automated Build and Test] ||
+||Language-specific help                                           || [wiki:Features/ContextSensitiveHelp Context Sensitive Help] ||
+||Run your code under a debugger with real-time display of results ||  ||
+||Automatic reformatting of code.                                  ||  ||
+||handling of multiple languages                                   ||  ||
+||Automated build and test                                         ||  ||
+
+
+== From Enlightened Perl ==
+
+Work together with the folks at Enlightened Perl http://www.enlightenedperl.org/
+to see how Padre can provide a GUI for their efforts.
+Look at Kensho, http://search.cpan.org/dist/Task-Kensho/ a list of recommended module
+and see how Padre can provide a GUI (via a plugin or in core Padre) for them.
+
+== From Competitors ==
+
+See the [wiki:'Competitor Analysis']
+
+== From Eclipse EPIC ==
+
+[http://www.eclipse.org/cdt/ Eclipse CDT - C/C++ Development Tooling]
+[http://www.eclipse.org/jdt/ Eclipse Java development tools (JDT)]
+
+Some of these features are only relevant (or possible) for C/C++ or Java
+
+||'''Feature'''                                            || '''Status or link to ticket''' ||
+||Find all references                                      || ||
+||Find definition/declaration/usage                        || ||
+||Type Hierarchy                                           || ||
+||Call Hierarchy (or call graph)                           || ||
+||[wiki:Features/RefactoringPerl5 Refactoring]             || ||
+||[wiki:Features/SourceNavigation Source navigation]       || ||
+||[wiki:Features/SyntaxHighlighting Syntax highlighting]   || ||
+||Code folding                                             || under [wiki:Features/VisualEditorEffects Visual Editor Effects] ||
+||Hyperlink navigation                                     || ||
+||Include browser                                          || ||
+||Project creation                                         || [wiki:Features/ProjectSkeletonGeneration Project Skeleton Generation] ||
+||Managed build for various toolchains                     || ||
+||Standard make build                                      || Via Run menu ||
+||Macro definition browser                                 || ||
+||Code generation                                          || partly (File -> New...) ||
+||Visual debugging tools                                   || ||
+||Memory, registers, and disassembly viewers               || ||
+
+

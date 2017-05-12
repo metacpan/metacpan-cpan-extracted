@@ -1,0 +1,15 @@
+---
+# indicator is the field that is used to test for form submission
+indicator: submit
+# Start listing the form elements
+elements:
+  - type: Radiogroup
+    name: use_case
+    attributes:
+      class: radiogroup vertical 
+    constraints:
+      - Required
+
+  - type: Submit
+    name: submit
+    value: Choose

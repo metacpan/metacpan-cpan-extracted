@@ -1,0 +1,58 @@
+TODO for perl module Text::TemplateFill
+
+This is as much things that I don't think should be added as well
+as things that I would/might like to.
+
+It is understood that any contribution that is sent in for distribution
+with this module shall have copyright assigned to addw who will release
+it under the same licence as the rest of the module. Contributions will
+be acknowledged.
+
+Comments to Alain Williams <addw@phcomp.co.uk>
+
+SCCS: @(#)TODO 1.3 03/27/03 10:40:58
+
+
+More test cases. In fact the current test program is more of a demo,
+it is the stripping out of part of one of the first uses of this module.
+
+
+More examples, a random list of things that should be shown:
+* Date formatting
+* Accumulation of a variable (eg number of widgets sold)
+* The different options (SetOpt)
+* Accessing of variables in different paragraphs
+
+
+Conditional use of paragraphs. The sort of thing that I have in mind is
+when processing sorted data a page break might be forced when one of the
+variables changes.
+There are a couple of different cases:
+* Substitute a different paragraph
+* Insert a paragraph before the requested one (eg insert page break).
+This is easier now that Math::Expression is used.
+The obvious way would be to have a different set of ${Calc directives that
+were evaluated before the decision is made if the paragraph will fit on
+the current page. The choice of new page might be done by setting a special
+variable - keeps the syntax simple. Eg:
+	${ParaCalc LastSupplier ne Supplier ? INSERT_PARA : dummy := ( 'Footer', 'Header' ) }
+This compares the supplier name with the last one, if it is different
+INSERT_PARA is assigned to otherwise a dummy variable is assigned to.
+What is assigned is a list of two paragraphs, one to end the current page, the next
+to start a new one. More thought needed.
+
+
+The reading in of a paragraph causes the reading in of other paragraphs. This
+means that paragraphs can be added by, say, a translator - paragraphs that
+the original programmer did not forsee. This would be particularily useful
+with conditional use of paragraphs. Eg:
+	${ReadPara Para1 Para2 }
+
+
+It would be nice to use the Math::Expression ability of specifying a different
+function evalutation function. This would yeild the possibility callbacks in
+paragraphs to the main program. So you have a part-number and want it
+description, price, weight, ... 
+Why not just pass this information in bound varaibles ? Well, computing it
+might be expensive and so only do it if the paragraph really needs it; anyway
+this would be a cool thing to do.

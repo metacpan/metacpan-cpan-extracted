@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8310269f9e5eac6fcac438b52f8e87075ae32e89 Changes
+SHA1 d297641695ad905836f22c8f1df34991a2f35f7a MANIFEST
+SHA1 a38d14af7ee9b876667bc87f92348abab655474e META.yml
+SHA1 de036be8927e5092f942eeabd1d157d89f9fcf50 Makefile.PL
+SHA1 ae17785e55029c5b925bdb61e1fab51a6327e667 README
+SHA1 dc2f35c5596161ce02b5ab43818a67f0071229f2 U32.xs
+SHA1 d9c9be1140d9dc8fd248b8a0f213023698dcbd92 examples/u32.t
+SHA1 e1892991c181e420ba7b8a8a7040652121cdeba6 html/U32.html
+SHA1 d90c797dc2c8eba2986207094b1ea8ec084008d9 html/docs.css
+SHA1 914c2fe4f2df49fba44ba1d0aeec1c22413b38d3 lib/Test/U32.pm
+SHA1 e025dfa24a881d66b0b2e4074d7dec859e14811e misc/kwalitee.t
+SHA1 caeefb74df20ef182263a30796d1fe21826d43e2 misc/make_manifest.pl
+SHA1 74440f42d3c5784eb32b5f9dc60c9de277092796 misc/mkdist.bat
+SHA1 8e8ace77d3b6013fcbc9fcad5191f3a37df59c3c misc/spelling.t
+SHA1 e2b984fb39332c60e18a3e6302a6af91c6ca8ca2 t/Test-U32.t
+SHA1 af1136d14010cbb2bfde90acc9c345ce188bf0fb t/pod.t
+SHA1 b5280719d86dcda716c79e1e5c9592425a888ed3 t/pod_coverage.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (MingW32)
+
+iJwEAQECAAYFAkhKSuIACgkQngy2BUOcVTM1yQP+NnpBMHXAcQU7dFUPZOtLCqvZ
+aQ5SuovcxXrsUOQMSj9DjwCL7KFQ1+fQe8JDSsgD8PsIQHprIhZvQtrFoQ8AwNdA
+zxyd18oDRZtF5ltLn2T475AJ+q3TlkxLpL7a2YEcSclRi8/nv62T9VyuD75QAcGH
++zgCKfmpTI0IQ/UWiqw=
+=6nhn
+-----END PGP SIGNATURE-----

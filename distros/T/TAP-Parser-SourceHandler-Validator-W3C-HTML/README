@@ -1,0 +1,64 @@
+NAME
+    TAP::Parser::SourceHandler::Validator::W3C::HTML - validate HTML content
+
+SYNOPSIS
+     $ prove --source Validator::W3C::HTML http://example.com/some/page.html /path/to/some/file.html
+
+DESCRIPTION
+    Unit testing is awesome. App::Prove is awesome. HTML validation is
+    awesome. Thus, the Validator::W3C::HTML SourceHandler was born.
+
+    This SourceHandler provides TAP::Harness with TAP output generated as
+    the result of HTML validation via the W3C validator. Both remote URIs
+    and local HTML files are supported depending upon the type of source
+    passed to the harness.
+
+    If the source is a file with a .html or .htm extension or a file which
+    contains text matching /html/i in the first line, then the source will
+    be handled by this SourceHandler as raw HTML content.
+
+    If the source is an HTTP or HTTPS URI, the source will be handled by
+    this SourceHandler via <WWW::Robot>. When operating in URI mode, a few
+    extra options are available. See below for configuration.
+
+CONFIGURATION
+    Configuration is done via the environment as is pretty common with perl
+    testing. The supported configuration options are as follows:
+
+    TEST_W3C_HTML_CRAWL (default: no)
+        When in URI mode, crawl the site and recursively test all URIs below
+        the hierarchy of the root URI.
+
+    TEST_W3C_HTML_VALIDATOR_URI (default: http://validator.w3.org/check)
+        The location of the W3C validator instance you wish to use. Please
+        do not use the default if you're going to be using the validator for
+        any volume.
+
+    TEST_W3C_HTML_TIMEOUT (default: 5)
+        The timeout for the LWP::UserAgent instance used by WWW::Robot.
+
+    TEST_W3C_HTML_CHILDREN (default: no)
+        When recursively crawling a site, use a Test::Builder child for each
+        URI. This indents the TAP output for each URI, but can be less
+        readable when using non-TAP formatters such as JUnit.
+
+    Any environment variables beginning with TEST_W3C_HTML_SPIDER_ will be
+    interpreted as attributes to be passed on to the WWW::Robot instance
+    after stripping the leading portion.
+
+CAVEATS
+    This is my first experience with TAP::Harness. TAP::Harness is quite
+    abstract and I am probably abusing it horribly. Please let me know if
+    you have any suggestions for improvement.
+
+AUTHOR
+    Mike Eldridge <diz@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2013 by Infinity Interactive, Inc.
+
+    http://www.iinteractive.com
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

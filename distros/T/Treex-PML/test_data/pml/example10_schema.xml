@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!--
+  Created by pml_simplify on Sun Mar 14 10:23:16 2010
+  Command-line: pml_simlify examples/example9_schema.xml
+-->
+<pml_schema xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/" version="1.1">
+  <revision>0.1</revision>
+  <description>
+    Extended example of tree annotation over a tokenization layer
+  </description>
+  <reference name="tokenization" readas="dom"/>
+  <!--  ============ import schema="example8_schema.xml" ============  -->
+  <root name="annotation" type="annotation.type"/>
+  <type name="w.type">
+    <container>
+      <attribute name="id" role="#ID" required="1">
+        <cdata format="PMLREF"/>
+      </attribute>
+      <cdata format="any"/>
+    </container>
+  </type>
+  <type name="ID.type">
+    <cdata format="ID"/>
+  </type>
+  <!--  ============ derived from annotation.type ============  -->
+  <type name="annotation.type">
+    <sequence role="#TREES" content_pattern="meta, S+">
+      <element name="S" type="S.type"/>
+      <element name="meta" type="newmeta.type"/>
+    </sequence>
+  </type>
+  <!--  ============ derived from S.type ============  -->
+  <type name="S.type">
+    <container role="#NODE">
+      <attribute name="annotators_comment">
+        <cdata format="any"/>
+      </attribute>
+      <attribute name="sentence.rf">
+        <cdata format="PMLREF"/>
+      </attribute>
+      <list ordered="1" role="#CHILDNODES" type="node.type"/>
+    </container>
+  </type>
+  <type name="node.type">
+    <structure role="#NODE">
+      <member as_attribute="1" name="label" type="label.type"/>
+      <member name="w.rf">
+        <list ordered="0" role="#KNIT" type="w.type">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
+      <member name="constituents" role="#CHILDNODES">
+        <list ordered="1" type="node.type"/>
+      </member>
+    </structure>
+  </type>
+  <!--  ============ derived from label.type ============  -->
+  <type name="label.type">
+    <choice>
+      <value>VP</value>
+      <value>NP</value>
+      <value>PP</value>
+      <value>ADVP</value>
+      <!-- etc. -->
+      <value>SDECL</value>
+      <value>SIMP</value>
+      <value>SQUEST</value>
+    </choice>
+  </type>
+  <!--  =============================================================  -->
+  <!--  ============ import schema="example1_schema.xml"  type="meta.type"============  -->
+  <type name="meta.type">
+    <structure>
+      <member name="annotator">
+        <cdata format="any"/>
+      </member>
+      <member name="datetime">
+        <cdata format="any"/>
+      </member>
+    </structure>
+  </type>
+  <!--  ==============================================================================  -->
+  <type name="newmeta.type">
+    <structure>
+      <member name="lang">
+        <cdata format="any"/>
+      </member>
+      <member name="changes">
+        <list type="changes.type" ordered="1"/>
+      </member>
+    </structure>
+  </type>
+  <!--  ============ derived from meta.type ============  -->
+  <type name="changes.type">
+    <structure>
+      <member name="annotator">
+        <cdata format="any"/>
+      </member>
+      <member name="datetime">
+        <cdata format="any"/>
+      </member>
+      <member name="id" role="#ID" as_attribute="1" required="1">
+        <cdata format="ID"/>
+      </member>
+      <member name="desc">
+        <cdata format="any"/>
+      </member>
+    </structure>
+  </type>
+</pml_schema>

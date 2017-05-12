@@ -1,0 +1,137 @@
+## spreadsheet.tcl
+##
+## This demos shows how you can simulate a 3D table
+## and has other basic features to begin a basic spreadsheet
+##
+## jeff.hobbs@acm.org
+##  Converted to perl/tk by John Cerney
+
+
+use Tcl::pTk qw/:perlTk/;
+use Tcl::pTk::TableMatrix;
+use Tcl::pTk::BrowseEntry;
+
+$| = 1;
+
+my ($rows,$cols) = (10,10); # number of rows/cols
+my $page = 'AA';
+my $oldPage = '';
+
+my $tableColors = { default => 'pink',AA => 'orange', BB => 'blue', CC => 'green'};
+
+my $top = MainWindow->new;
+
+sub colorize{
+	my ($num) = @_;
+	return 'colored' if( $num > 0 && $num%2);
+	return '';
+}
+
+# Sub to fill the array variable
+sub fill{
+
+	my ($name, $array,$r,$c) = @_;
+	my ($i,$j);
+	$r ||= $rows;
+	$c ||= $cols;
+	for( $i = 0; $i<$r; $i++){
+		for( $j = 0; $j<$c; $j++){
+			if( $j && $i){
+				$array->{"$i,$j"} = "$name $i,$j";
+			}
+			elsif( $i ){
+				$array->{"$i,$j"} = "$i";
+			}
+			elsif( $j ){
+				$array->{"$i,$j"} = sprintf("%c",($j+64));
+			}
+		}
+	}
+}
+
+my $arrayVar = { AA => {},
+		 BB => {},
+		 CC => {}};
+
+fill('AA',$arrayVar->{AA}, $rows,$cols); # fill up the array variable
+fill('BB',$arrayVar->{BB}, $rows/2,$cols/2); # fill up the array variable
+
+my $t = $top->Scrolled('TableMatrix', -rows => $rows, -cols => $cols, 
+                              -width => 5, -height => 5,
+			      -titlerows => 1, -titlecols => 1,
+			      -coltagcommand => \&colorize,
+			      -selectmode => 'extended',
+			      -flashmode => 'on',
+			      -variable => $arrayVar->{$page},		      				
+
+                    );
+
+
+my $label = $top->Label(-text => "TableMatrix vs Spreadsheet Example");
+
+# Label the changes with the value of currentTest
+my $currentText = '';
+my $currentLabel = $top->Label(-textvariable => \$currentText);
+
+# Entry that changes with the value of activeText
+my $activeText = '';
+my $activeEntry = $top->Entry(-textvariable => \$activeText);
+
+my $pageLabel = $top->Label(-text => 'PAGE:', -width => 6, -anchor => 'e');
+my $pageSelect = $top->BrowseEntry( -options => [ qw/ AA BB CC/], 
+		-variable => \$page,
+		-command => \&changepage);
+
+
+
+sub changepage{
+
+	my $newPage = $page;
+	
+	if( $newPage ne $oldPage){
+	
+		$t->selectionClear('all');
+		$t->activate(''); # unactivate anything
+		$t->configure(-variable => $arrayVar->{$newPage});
+	        # $e config -textvar ${i}(active)
+		$t->activate('origin');
+		if( exists $tableColors->{$newPage}){
+			$t->tagConfigure('colored', -bg => $tableColors->{$newPage});
+		}
+		else{
+			$t->tagConfigure('colored', -bg => $tableColors->{'default'});
+		}
+		$t->see('active');
+		$oldPage = $newPage;
+	}
+}
+
+$t->configure( -browsecommand => sub{
+					my ($oldindex,$index) = @_;
+					$currentText = $index;
+					$activeText = $t->get($index);
+				});
+
+
+
+# hideous Color definitions here:
+$t->tagConfigure('colored', -bg => $tableColors->{$page});
+$t->tagConfigure('title', -fg => 'red', -relief => 'groove');
+$t->tagConfigure('blue', -bg => 'blue');
+$t->tagConfigure('green', -bg => 'green');
+
+$t->tagCell('green', '6,3','5,7','4,9');
+$t->tagCell('blue', '8,8');
+$t->tagRow('blue', 7);
+$t->tagCol('blue', 6,8);
+
+$t->colWidth( 0 => 3, 2 => 7);
+
+$label->grid(				'-',		'-',		'-',		'-',	'-sticky' => 'ew');
+$currentLabel->grid(		$currentLabel,	$activeEntry, 	$pageLabel, 	$pageSelect, 	'-',	'-sticky' => 'ew');
+$t->grid( 				'-',		'-',		'-',		'-',	'-sticky' => 'nsew');
+$top->gridColumnconfigure(1, -weight => 1);
+$top->gridRowconfigure(2, -weight => 1);
+
+
+MainLoop;

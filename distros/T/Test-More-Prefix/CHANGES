@@ -1,0 +1,16 @@
+0.07 Fri 29 Apr 2016
+    - Another attempt to fix versioning issues
+0.06 Mon 04 Apr 2016
+    - Fixed version snafu
+0.05 Mon 04 Apr 2016
+    - Work with new Test::More stuff:
+      https://rt.cpan.org/Public/Bug/Display.html?id=110959
+0.04 Tue 23 Dec 2014
+    - Updated to use the new Test::Stream stuff, instead of TB2
+0.03 Sun 24 Nov 2013
+    - Refined the version number we use to decide if to use TB2 or not, hat-tip
+      to ilmari
+0.02 Wed 04 Jan 2012
+    - Added TB2 compatibility
+0.01 Fri 27 May 2011
+    - Initial release

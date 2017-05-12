@@ -1,0 +1,10 @@
+Changes
+COPYING
+lib/Tie/FileSystem/System.pm
+lib/Tie/FileSystem.pm
+Makefile.PL
+MANIFEST
+README
+t/Tie-FileSystem.t
+t/Tie-FileSystem-System.t
+META.yml                                 Module meta-data (added by MakeMaker)

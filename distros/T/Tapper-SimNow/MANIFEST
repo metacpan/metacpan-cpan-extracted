@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/tapper-simnow-start
+dist.ini
+lib/Tapper/SimNow.pm
+t/00-load.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/tapper-simnow.t
+xt/critic.t

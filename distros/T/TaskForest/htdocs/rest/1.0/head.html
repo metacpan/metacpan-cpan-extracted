@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+ <head>
+  <title>$title</title>
+ </head>
+ <body>
+
+   <div class="header_navigation">
+     <a href="/rest/1.0/familyList.html">Family List</a>
+     <a href="/rest/1.0/jobList.html">Job List</a>
+     <a href="/rest/1.0/insList.html">Instructions List</a>
+     <a href="/rest/1.0/status.html">Status</a>
+   </div>
+
+   <form id="rerun" class="request" method="POST" action="/rest/1.0/request.html">
+     <label for="rerun_family">Family</label><input id="rerun_family" name="family" /><br />
+     <label for="rerun_job">Job</label><input id="rerun_job" name="job" /><br />
+     <label for="rerun_log_date">Log Date</label><input id="rerun_log_date" name="log_date" /><br />
+     <label for="rerun_options">Options</label><select id="rerun_options" name="options">
+       <option value="">None</option>
+       <option value="cascade">Cascade</option>
+       <option value="dependents_only">Dependents Only</option>
+     </select>
+     <input type=submit name=submit  value="Rerun"/>
+   </form>
+
+   <form id="mark" class="request" method="POST" action="/rest/1.0/request.html">
+     <label for="mark_family">Family</label><input id="mark_family" name="family" /><br />
+     <label for="mark_job">Job</label><input id="mark_job" name="job" /><br />
+     <label for="mark_log_date">Log Date</label><input id="mark_log_date" name="log_date" /><br />
+     <label for="mark_options">Options</label><select id="mark_options" name="options">
+       <option value="">None</option>
+       <option value="cascade">Cascade</option>
+       <option value="dependents_only">Dependents Only</option>
+     </select>
+     <label for="mark_status">Status</label><select id="mark_status" name="status">
+       <option value="Success">Success</option>
+       <option value="Failure">Failure</option>
+     </select>
+     <input type=submit name=submit  value="Mark"/>
+   </form>
+
+   <form id="logs" class="request" method="GET" action="/rest/1.0/logs.html">
+     <label for="logs_date">Date</label><input id="logs_date" name="date" size=8 maxlength=8/><br />
+     <input type=submit name=submit  value="View Logs"/>
+   </form>
+   
+   <form id="release" class="request" method="POST" action="/rest/1.0/request.html">
+     <label for="release_family">Family</label><input id="release_family" name="family" /><br />
+     <label for="release_job">Job</label><input id="release_job" name="job" /><br />
+     <label for="release_log_date">Log Date</label><input id="release_log_date" name="log_date" /><br />
+     <input type=submit name=submit  value="Release"/>
+   </form>
+
+   <form id="hold" class="request" method="POST" action="/rest/1.0/request.html">
+     <label for="hold_family">Family</label><input id="hold_family" name="family" /><br />
+     <label for="hold_job">Job</label><input id="hold_job" name="job" /><br />
+     <label for="hold_log_date">Log Date</label><input id="hold_log_date" name="log_date" /><br />
+     <input type=submit name=submit  value="Hold"/>
+   </form>
+
+   <form id="hold" class="request" method="POST" action="/rest/1.0/request.html">
+     <label for="release_hold_family">Family</label><input id="release_hold_family" name="family" /><br />
+     <label for="release_hold_job">Job</label><input id="release_hold_job" name="job" /><br />
+     <label for="release_hold_log_date">Log Date</label><input id="release_hold_log_date" name="log_date" /><br />
+     <input type=submit name=submit  value="Release Hold"/>
+   </form>
+
+       
+       

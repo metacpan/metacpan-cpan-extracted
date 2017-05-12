@@ -1,0 +1,48 @@
+
+Tie::Persistent v1.00
+=====================
+
+The Persistent package makes working with persistent data real
+easy by using the C<tie> interface.
+
+It works by storing data contained in a variable into a file (not
+unlike a database). The primary advantage is speed, as the whole
+datastructure is kept in memory (which is also a limitation), and, of
+course, that you can use arbitrary data structures inside the variable
+(unlike DB_File).
+
+To install, either use the excellent CPAN module or do the usual
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Note that Tie::Persistent uses Data::Dumper and Storable, so
+you should make sure that these are available.  As Data::Dumper
+comes with the base perl package and Storable is also on its way
+there, this shouldn't be a problem in the future.  Actually
+Storable isn't needed and if it's not there, a warning is issued,
+but the module will work without it.
+
+Changes:
+--------
+
+* fixed a bug with numbered backupfiles
+
+* Storable is now optional, a warning is issued if '-w' is active.
+
+* removed Sys::Hostname due to portability problems
+
+* added a sync() method and autosyncing (thanks to Benjamin Liberman
+  <beanjamman@yahoo.com> for that)
+
+* fixed a bug with scalar refs and splice
+
+I'm considering Tie::Persistent quite mature from now on (apart
+from the experimental feature, for which I haven't received any
+feedback).
+
+Please feel free to send feedback and support requests.
+
+Roland Giersig <RGiersig@cpan.org>

@@ -1,0 +1,1698 @@
+2016-10-30  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.015
+
+        * Modified Fatal Error message for Result => undef.
+
+
+2016-10-29  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.014
+
+        * Added STDOUT to GetTerminalSize() for Windows.
+
+        * Added Fatal Error message for Result => undef.
+
+
+2016-10-11  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.013
+
+        * Added %stdout_capture and %stderr_capture
+          to @EXPORTS.
+
+
+2016-10-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.012
+
+        * Removed IO::Interactive dependency.
+
+
+2016-10-09  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.011
+
+        * Fix for Capture::Tiny inclusion.
+
+
+2016-10-09  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.010
+
+        * Disabled IO::Interactive dependency.
+
+
+2016-10-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.009
+
+        * Fully qualify IO::Interactive dependency.
+
+
+2016-10-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.008
+
+        * Added IO::Interactive dependency.
+
+
+2016-10-07  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.007
+
+        * Removed STDOUT argument for updated
+          Term::ReadKey.
+
+
+2016-08-29  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.006
+
+        * Fixed backward navigation bug.
+
+
+2016-08-26  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.005
+
+        * Fixed Form Input bug.
+
+
+2016-08-25  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.004
+
+        * Fixed Banner Only bug.
+
+
+2016-08-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.003
+
+        * Fixed Form Input bug.
+
+
+2016-08-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.002
+
+        * Fixed $show_banner_only bug.
+
+
+2016-03-30  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.001
+
+        * New Term::Menus FORMS!!! (See POD Documentation).
+
+
+2016-03-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.000
+
+        * Fixed for BerkeleyDB init to match FullAuto.
+
+
+2016-01-09  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.99
+
+        * Disabled SIG{__DIE__} for PadWalker.
+
+
+2015-12-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.98
+
+        * Fixed output when banner menu is last.
+
+
+2015-12-27  Brian M. ielly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.97
+
+        * Escaping { with [{] for Perl 5.22.
+
+
+2015-10-12  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.96
+
+        * Changed $FA_Secure to $berkeley_db_path
+
+
+2015-10-03  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.95
+
+        * Added extra \\ for escaping { for Perl 5.22.
+
+
+2015-05-20  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.94
+
+        * Filtered out another Berkeley DB symbol.
+
+
+2015-05-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.93
+
+        * Filtered out more Berkeley DB symbols.
+
+
+2015-05-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.92
+
+        * Improved/Fixed bug with forms.
+
+        * Filtered out more Berkeley DB symbols.
+
+
+2015-04-12  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.91
+
+        * Removed fa_maps for FullAuto architecture.
+
+
+2015-01-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.90
+
+        * Update Copyright to 2015.
+
+        * Repair META.yml from 2.89 (was still 2.88).
+
+
+2015-01-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.89
+
+        * Fixed banner logic to repair fa --figlet.
+
+
+2014-12-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.88
+
+        * Problem with Signature on 2.87 release.
+
+
+2014-12-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.87
+
+        * Fixed banner menu when coming from full menu.
+  
+        * Fixed navigation when having returned from child,
+          user makes different selelction.
+
+
+2014-11-02  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.86
+
+        * Fixed form entry when form followes banner menu.
+
+
+2014-10-28  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.85
+
+        * Fixed where many were being passed when 'Many' was
+          not set.
+
+
+2014-10-20  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.84
+
+        * Updated Forms to save values that can now be accessed
+          from other menus and result routines.
+
+
+2014-08-03  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.83
+
+        * Fix for Scrolling when at end of items.
+
+        * Changed to [v][^] display.
+
+
+2014-07-29  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.82
+
+        * Minor change to new line padding in banners.
+
+
+2014-07-27  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.81
+
+        * More Fixes for Scroll.
+
+
+2014-07-27  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.80
+
+        * Fix for Scroll.
+
+
+2014-07-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.79
+
+        * Fix for forms.
+
+
+2014-07-18  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.78
+
+        * Added two variables from FullAuto to EXPORT
+
+
+2014-07-18  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.77
+
+        * Implemented forms. Now there are 'Input' screens with
+          configurable text boxes (new macros). Ground breaking
+          NEW functionality. (awaiting documentation)
+
+
+2014-07-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.76
+
+        * Changed Scroll behavior.
+
+
+2014-07-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.75
+
+        * Added Shell Out functionality
+
+        * Fixed UPARROW when only one item on last screen
+
+
+2014-07-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.74
+
+        * Added new line to unix menus
+
+
+2014-07-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.73
+
+        * Updated documentation.
+
+        * Changed on-screen help messages to use ikeys
+          save screen space.
+
+
+2014-07-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.72
+
+        * Fixed Scrolling bugs.
+
+
+2014-07-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.71
+
+        * Fixed Scrolling bugs.
+
+
+2014-07-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.70
+
+        * Fixed Scrolling bugs.
+
+
+2014-07-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.69
+
+        * Fixed Scrolling bugs.
+
+
+2014-07-12  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.68
+
+        * Removed temporary error checking.
+
+
+2014-07-12  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.67
+
+        * Implemented Scrolling with Arrow Character
+
+
+2014-07-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.66
+
+        * Delete __FA_Banner__ when back to parent.
+
+
+2014-07-06  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.65
+
+        * Fixed printing of blanklines.
+
+
+2014-06-29  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.64
+
+        * Fixed defaults with navigation.
+
+
+2014-06-28  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.63
+
+        * Updated License to GNU Affero General Public License
+          Version 3.0.
+
+
+2014-06-28  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.62
+
+        * Fixed SaveNext.
+
+
+2014-06-26  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.61
+
+        * Fixed return routine.
+
+
+2014-06-26  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.60
+
+        * Fixed return routine.
+
+
+2014-06-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.59
+
+        * Fixed forward and backward navigation when going
+          from banner-only to menu.
+
+
+2014-06-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.58
+
+        * Fixed forward and backward navigation.
+
+
+2014-06-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.57
+
+        * Updated POD documentation for banner only menus.
+
+        * Added banner only menus.
+
+        * Fixed Default selections.
+
+
+2014-06-11  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.56
+
+        * Updated POD documentation for filtered menus.
+
+
+2014-06-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.55
+
+        * Fixed Default Setting.
+
+        * Added --tutorial for FullAuto and fixed --users.
+
+        * "Finally" got filtered menus working properly (% /)
+
+
+2013-12-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.54
+
+        * Fixed return to named Menu after forward and back
+          navigation.
+
+        * Implemented $FA_Sudo in fa_global.pm for FullAuto.
+
+
+2013-12-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.53
+
+        * Fixed forward and back navigation.
+
+        * Changed fa_defs to fa_global for FullAuto.
+
+
+2013-12-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.52
+
+        * Implemented Return to Admin from Admin sub menus.
+
+
+2013-12-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.51
+
+        * Added --cat argument for FullAuto.
+
+
+2013-12-01  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.50
+
+        * Fixed bug with macro expansion for descendant menus.
+
+
+2013-11-24  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.49
+
+        * Re-worked macro expansion for descendant menus.
+
+        * Added step child and grandchild documentation.
+
+
+2013-11-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.48
+
+        * Slight adjustment to documentation.
+
+
+2013-11-19  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.47
+
+        * Added argument filter FullAuto --users.
+
+
+2013-09-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.46
+
+        * Fix for passing along multiple selections to child
+          menus.
+
+
+2013-09-07  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.45
+
+        * Some tweaks to transform_scim sub.
+
+
+2013-08-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.44 released.
+
+        * More work done on returning to previous Menu
+          from Result and now Convey Items with {<Menu_Name>}<
+          macro.
+
+
+2013-08-25  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.43 released.
+
+        * More work done on CODE parsing routines affecting Macros.
+
+        * ]S[ now can take multiple menu names ]S[{Menu1_Name|Menu2_Name}.
+
+
+2013-08-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.42 released.
+
+        * Plan expiration for FullAuto is now in place.
+
+        * Lots of code cleanup, including error messages.
+
+
+2013-08-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.41 released.
+
+        * Can now indicate what Menu to return to from
+          Result with new {<Menu_Name>}< macro.
+
+
+2013-08-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.40 released.
+
+        * Fixed CODE parsing routines affecting Macros.
+
+
+2013-08-03  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.39 released.
+
+        * Label elements renamed to "Name" elements
+          and are no longer explicitly "required"
+          for most anticipated usages of Term::Menus;
+          though, are needed for some constructs and
+          are therefore considered "best practice".
+          Now using the CPAN modules PadWalker and
+          Devel::Symdump to dynamically discover
+          *MOST* Menu names.
+
+        * Fixed a number of navigation components when
+          using dynamic and anonymous Menus constructs.
+
+        * Changed documentation to reflect changes, and
+          describe "Explicit Named Macros" and coding
+          approaches for their usage. 
+
+
+2013-07-28  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.38 released.
+
+        * Reworked a number of Result error messages to
+          be more helpful to Menu developers.
+
+        * Working toward goal of making Label element
+          completely optional - not required.
+
+
+2013-07-27  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.37 released.
+
+        * Enabled returning '<' in anonymous subroutines so
+          that user has option to code a return to parent
+          Menus from a Result subroutine by simply returning
+          '<'.
+
+
+2013-07-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.36 released.
+
+        * Tweaked formatting of documentation.
+
+
+2013-07-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.35 released.
+
+        * Minor fix for back and forward navigation.
+
+        * Tweaked formatting of documentation.
+
+
+2013-07-20  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.34 released.
+
+        * Minor fix for Anonymous Subroutines.
+
+
+2013-07-09  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.33 released.
+
+        * Menus with FullAuto can now dynamically authenticate.
+          This enables some items to be authenticated, and
+          others not.
+          
+
+2013-06-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.32 released.
+
+        * More work on result block. Fixed when in use
+          with FullAuto.
+
+
+2013-06-19  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.31 released.
+
+        * Documentation updated.
+
+
+2013-06-19  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.30 released.
+
+        * More work on result block. Documentation updated
+          to illustrate use of Anonymous Subroutines with
+          result items.
+
+
+2013-06-18  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.29 released.
+
+        * More work on result block. Documentation updated
+          to illustrate use of Anonymous Subroutines with
+          result items.
+
+
+2013-06-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.28 released.
+
+        * More work on result block. Documentation updated
+          to illustrate use of closures with result items.
+
+
+2013-06-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.27 released.
+
+        * Fixed all items for tickets 84173 and 72041.
+          Result block now works correctly for predefined
+          subroutines, as explained in the documentation.
+
+
+2013-06-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.26 released.
+
+        * Fixed typo error in one of documentation examples.
+
+
+2013-03-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.25 released.
+
+        * Added warning and hint when fa_defs.pm cannot be read.
+
+
+2012-12-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.24 released.
+
+        * Happy New Year!
+
+	* Use --login Id from FullAuto when running with
+          FullAuto
+
+
+2012-12-24  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.23 released.
+
+        * 2.22 didn't have the updated Menus.pm.
+
+
+2012-12-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.22 released.
+
+        * Fixed editing for FullAuto so the files open
+          even when syntax errors are present.
+
+
+2012-11-11  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.21 released.
+
+        * Improved BerkeleyDB loading for FullAuto.
+
+
+2012-11-05  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.20 released.
+
+        * Added cache pass-through for FullAuto.
+
+
+2012-10-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.19 released.
+
+        * Added new BerkeleyDB variable to import list
+          (needed for FullAuto).
+
+
+2012-10-02  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.18 released.
+
+        * Fixed some install issues when bunlded with FullAuto.
+
+
+2012-09-30  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.17 released.
+
+        * Added "help" and "admin" menus to all FullAuto menus.
+
+
+2012-08-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.16 released.
+
+        * Fixed username lookup when using FullAuto with TeamSite.
+
+
+2012-04-27  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.15 released.
+
+        * Fixed code for selecting fa_menu for FullAuto.
+
+
+2012-03-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.14 released.
+
+        * Removed temp error messages.
+
+
+2012-02-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.13 released.
+
+        * Fixed bug in summation menu.
+
+
+2012-02-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.12 released.
+
+        * Fixed bug returning pick from search menu.
+
+
+2012-02-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.11 released.
+
+        * Fixed bug returning hashes when when select is many
+          on single level menu.
+
+
+2012-01-30  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.10 released.
+
+        * Recursive Menus now properly return accurate results
+          when select is many, and no dirs in topmenu.
+
+
+2012-01-28  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.9 released.
+
+        * Recursive Menus now properly return accurate results.
+
+        * Recursive Menus example updated. The example menu
+          dynamically navigates the file system.
+
+
+2012-01-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.8 released.
+
+        * Navigation Search is fixed for multi-level menus.
+
+
+2012-01-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.7 released.
+
+        * More fixes for navigation markers when going
+          backwards in multi-level menus.
+
+
+2012-01-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.6 released.
+
+        * Fixed navigation markers when going backwards in
+          multi-level menus.
+
+
+2012-01-09  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.5 released.
+
+        * Fixed navigation when going backwards in multi-level
+          menus.
+
+
+2011-12-20  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.4 released.
+
+        * Fix for FullAuto - added more constants to Export.
+
+
+2011-11-28  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.3 released.
+
+        * Fix for FullAuto - check user when SSH connection
+          detected.
+
+
+2011-10-02  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.2 released.
+
+        * Fix for FullAuto.
+
+
+2011-09-30  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.1 released.
+
+        * Fix for FullAuto.
+
+
+2011-09-28  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 2.0 released. Ran out numbers and didn't
+          want to go deeper past the decimal. FullAuto is VERY
+          close to it's 1.0 release, so pusing Term::Menus to
+          2.0 now makes sense. The "fanfare" will be saved for
+          the 1.0 release of Net::FullAuto.
+
+        * Fixed a bug in module selection for FullAuto.
+
+
+2011-09-25  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.99 released.
+
+        * Improved Error Message Line number reporting.
+
+
+2011-09-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.98 released.
+
+        * Fixed code to complement FullAuto -
+          default set and other defaults.
+
+        * Eliminated need for Module::Load::Conditional
+
+        * Updated License to GPL 3.0:
+          http://opensource.org/licenses/gpl-3.0.html
+
+
+2011-09-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.97 released.
+
+        * Fixed code to complement FullAuto - 
+          default set and other defaults.
+
+
+2011-09-11  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.96 released.
+
+        * Fixed code to complement FullAuto - now invokes
+          default set and other defaults in Solaris.
+
+
+2011-09-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.95 released.
+
+        * Added code to complement FullAuto - now invokes
+          default set and other defaults.
+
+
+2011-09-02  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.94 released.
+
+        * Added code to complement FullAuto - now invokes
+          default set when one is defined.
+
+
+2011-08-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.93 released.
+
+        * Added code to complement FullAuto - fixed BerkeleyDB
+          error.
+
+
+2011-08-20  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.92 released.
+
+        * Added code to complement FullAuto - fixed error
+          reporting.
+
+
+2011-08-18  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.91 released.
+
+        * Added code to complement FullAuto.
+
+
+2011-08-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.90 released.
+
+        * Added code to complement FullAuto.
+
+
+2011-08-07  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.89 released.
+
+        * Added code to complement FullAuto.
+
+
+2011-07-30  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.88 released.
+
+        * Better handling of top script indicated menu_config.
+
+
+2011-07-25  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.87 released.
+
+        * Bug fix to new code from 07-05
+
+
+2011-07-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.86 released.
+
+        * Added code to complement FullAuto. New code works
+          with FullAuto to enable user to select and save
+          a default startup menu file.
+
+
+2011-07-05  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.85 released.
+
+        * Removed some overlooked error-checking code.
+
+
+2011-07-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.84 released.
+
+        * Added ability to revise banner with anonymous subs.
+
+
+2011-06-07  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.83 released.
+
+        * Fixes to navigation with recursive menus.
+
+
+2011-06-03  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.82 released.
+
+        * Fixed bug when using with FullAuto introduced with
+          recent changes.
+
+
+2011-06-03  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.81 released.
+
+        * New ITEM LEVEL Select element. See POD documentation
+          for details.
+
+        * New Mark element. See POD documentation
+          for details.
+
+
+2011-05-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.80 released.
+
+        * New recursive support added. See POD documentation
+          for details.
+
+
+2011-03-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.79 released.
+
+        * Fixed issue when user moved back to parent menu
+          and makes different selection than previously
+
+
+2011-03-01  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.78 released.
+
+        * Updated POD documentation to include new instructions
+          on how to pass multiple selections to sub menus, and
+          use anonymous subroutines or closures with macros to
+          transform those selections before presenting them to
+          user in the next layer menuing.
+
+
+2011-02-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.77 released.
+
+        * Fixed '$numbor' accuracy when storing in FullAuto Plan.
+
+
+2011-02-06  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.76 released.
+
+        * Put in test for HASH ref for Module Conditional. Installation
+          was broken in Ubuntu with new 'use strict' pragma in use.
+
+
+2011-02-02  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.75 released.
+
+        * Fixed %Config::Config is read-only bug that was
+          breaking CPAN testing reports.
+
+
+2011-02-02  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.74 released.
+
+        * New Macro work complete. New Macro array indicators
+          and delimiter indicators.
+
+        * All new documentation will accompany the release
+          of Term::Menus 2.0. - to co-incide with the 
+          1.0 Release of Net::FullAuto.
+
+
+2011-01-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.73 released.
+
+        * Lots more code added to improve submenus.
+          Now complete.
+
+        * Removed embedded Term::RawInput since Term::RawInput
+          is now available as a stand-alone CPAN module.
+
+
+2011-01-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.72 released.
+
+        * Fixed return for &pickone.
+
+        * Lots of code added to improve submenus. Added code
+          to enable multiple choice menus to be included in
+          submenu tree - and convey results to child menus,
+          and ultimately to output. Not yet complete.
+
+
+2011-01-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.71 released.
+
+        * Added ability to use anonymous subroutines with
+          the Result element. The subroutines can contain
+          macros that will be populated before the 
+          subroutine is executed.
+
+
+2011-01-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.70 released.
+
+        * Updated embedded RawInput package - it now works
+          with Windows Versions of Perl (i.e. Strawberry).
+          Turned on rawInput instead of <STDIN> so arrow keys
+          now WORK with scrolling and menu navigation.
+
+
+2011-01-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.69 released.
+
+        * Added %rawInput to @EXPORT.
+
+
+2011-01-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.68 released.
+
+        * Dozens of changes in conjunction with hundreds of
+          changes in FullAuto. 'use strict' and 'use warnings'
+          are NOW TURNED *ON* in both Menus and FullAuto.
+
+
+2011-01-18  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.67 released.
+
+        * Fixed EXPORT issue - THANKS to Yogesh Sawant for
+          pointing this out.
+
+
+2011-01-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.66 released.
+
+        * Massive strict cleanup.
+
+
+2011-01-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.65 released.
+
+        * Attempting fix to Input Version for CPAN parser.
+
+
+2011-01-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.64 released.
+
+        * Temporarily included new module Term::Input as
+          package Input inside of Term::Menus until CPAN
+          approves Term::Menu for inclusion in the Module
+          List.
+
+
+2011-01-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.63 released.
+
+        * Updated to use new Term::Input in order to capture
+          arrow keys for easy scrolling and navigation.
+
+
+2011-01-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.62 released.
+
+        * Added more new code to support FullAuto 'service/daemon'
+          functionality. Functionality now WORKS.
+
+
+2011-01-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.61 released.
+
+        * Added more new code to support FullAuto 'Plan'
+          functionality. Functionality now WORKS.
+
+
+2010-12-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.60 released.
+
+        * HAPPY NEW YEAR!
+
+        * Added LOTS of new code to support FullAuto 'Plan'
+          functionality.
+
+
+2010-12-29  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.59 released.
+
+        * Updated error handling code for eval-ing FullAuto
+          subroutines from subfile.
+
+
+2010-10-26  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.58 released.
+
+        * Initialized Config values to avoid warning.
+
+
+2010-10-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.57 released.
+
+        * Changed way Module::Load::Conditional loads so that
+          it's not required to run Term::Menus
+
+
+2010-10-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.56 released.
+
+        * Added new ability to define result with anonymous
+          subroutine - with macros in the subroutine. This
+          new feature is not yet documented.
+
+
+2010-09-27  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.55 released.
+
+        * Fixed Bug #32350 for Term-Menus:
+          Using &selected(]Selected[) does not always work
+          - found bug in fix for 1.54
+
+
+2010-09-27  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.54 released.
+
+        * Fixed Bug #32350 for Term-Menus:
+          Using &selected(]Selected[) does not always work
+
+        * Improved Error reporting in certain routines
+
+
+2010-09-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.53 released.
+
+        * Added requires Module::Load::Conditional to
+          Makefile.PL in attempt to clean up CPAN
+          testers reports.
+
+
+2010-09-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.52 released.
+
+        * Using eval around GetTerminalSize so that CPAN
+          Testers automated tests won't break (somehow this
+          fix got overwritten from release 1.50)
+
+
+2010-09-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.51 released.
+
+        * Added can_load for files in Custom directory - if
+          file doesn't exist, load Distro instead
+
+
+2010-09-11  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.50 released.
+
+        * Using eval around GetTerminalSize so that CPAN
+          Testers automated tests won't break
+
+
+2010-09-11  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.49 released.
+
+        * Now using Module::Load::Conditional to load
+          Term::ReadKey
+
+
+2010-09-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.48 released.
+
+        * Removed Build.PL from build
+
+
+2010-09-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.47 released.
+
+        * 'Finally' got the gpg signature going again
+
+
+2010-08-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.46 released.
+
+        * Implemented 'unattended' mode for use with Net:FullAuto
+          and other scripts that run in batch. For 'unattended'
+          mode to work, Menu blocks must be configured with
+          Default selections.
+
+
+2010-08-30  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.45 released.
+
+        * 'Default' items now work for Menus with large
+          numbers of choices.
+
+        * 'Default' messaging is better - Users are informed
+          when 'Default' selections exist on hidden screens.
+
+        * Press 'q' to quit has been changed to
+          Type 'quit' to quit
+
+
+2010-08-26  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.44 released.
+
+        * Fixed bug when Selection is set to One
+
+        * Modified to conform to new Net:FullAuto architecture
+
+
+2010-08-25  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.43 released.
+
+        * Added 'Custom' to Net::FullAuto paths
+
+
+2010-08-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.42 released.
+
+        * More error handling cleanup for iteraction with
+          Net::FullAuto
+
+
+2010-08-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.41 released.
+
+        * More error handling cleanup for iteraction with
+          Net::FullAuto
+
+
+2010-08-12  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.40 released.
+
+        * Fixed Makefile.PL Term::ReadKey dependency
+
+
+2010-08-12  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.39 released.
+
+        * Fixed some deprecated defined(%hash) statements
+
+
+2010-08-09  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.36 released.
+
+        * Changed Terminal size testing code in order to not break
+          CPAN testing.
+
+
+2010-08-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.35 released.
+
+        * Added code to implement 'tosspass' condition for Net::FullAuto
+
+
+2010-08-05  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.34 released.
+
+        * Added test for Term::ReadKey and if found use termheight
+          to define whitespace header for screens
+
+        * Fixed bug https://rt.cpan.org/Ticket/Display.html?id=18382
+          where the screen was not properly clearing for Windows
+
+        $ Fixed bug with "Default" setting
+
+        * Changes to repair interactions with FullAuto architecture
+
+
+2010-07-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.33 released.
+
+        * Changes to repair interactions with FullAuto architecture
+
+
+2008-02-07  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.32 released.
+
+        * Added Macro enhancement ]Previous[{Menu_Label} to POD
+          documentation.
+
+        * Repaired and updated code so that Macros work as advertised
+
+        * Repaired subroutine use with Convey => '&sub()', and
+          Result => '&sub()', elements in Item_<#> hashes in the Menu
+          configuration hash.
+
+        * Repaired full Macro use in Banners
+
+        * Repaired a number of navigation bugs
+
+2008-01-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.31 released.
+
+        * Repair Distribution (bad META.yml).
+
+2008-01-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.30 released.
+
+        * Repaired bugs impairing the use of subroutines with
+          the ]Convey[ macro in nested menus.
+
+2007-09-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.29 released.
+
+        * Repaired bugs when "Result =>" setting value is
+          the name of a perl subroutine.
+
+2007-09-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.28 released.
+
+        * More changes to 'require menu_cfg' to reflect FullAuto architecture
+
+2007-09-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.27 released.
+
+        * More changes to 'require menu_cfg' to reflect FullAuto architecture
+
+2007-09-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.26 released.
+
+        * More changes 'require menu_cfg' to reflect FullAuto architecture
+
+2007-09-13  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.25 released.
+
+        * Bug Fix - %{$LookUpMenuName} was not being populated properly
+                    when using multiple menus defined in main:: and
+                    not a separate menu_cfg.pm file.
+
+2007-08-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.24 released.
+
+        * Changed 'require menu_cfg' to reflect FullAuto architecture
+
+2007-08-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.23 released.
+
+        * More POD documentation and README tweaks in preparation
+          for the initial roll-out of Net::FullAuto
+
+2007-08-23  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.22 released.
+
+        * Tweaked the POD documentation so that all examples
+          listed will print output to the console. This was
+          a potentially confusing omission.
+
+2007-08-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.21 released.
+
+        * Added error checking to trap and inform users of possible
+          configuration errors in menu blocks.
+
+        * Made changes in preparation for the release of Net::FullAuto,
+          for which Term::Menus is a required module.
+
+
+2007-05-16  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.20 released.
+
+        * Repaired "Clear All" to actually clear all selections after
+          "Select All" was used.
+
+2006-08-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.19 released.
+
+        * No Changes to Term::Menus - Repaired CPAN distribution
+
+2006-08-25  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.18 released.
+
+        * Added ability to call custom subroutine to create Text Items
+          and customized Banners. When using sub menus, previous selections
+          from parent menus are available for use in dynamically constructing
+          the current menu. Documentation was updated to explain this new
+          feature
+
+        * Also, sub-menus now seem to work fairly reliably - so the caveat
+          against their aggressive use has been removed from the documentation
+
+2006-08-15  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.17 released.
+
+        * Fixed sub menus when the ]Convey[ macro is not set
+
+2006-07-31  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.16 released.
+
+        * Fixed even more inconsistent behavior between 'One' and 'Many'
+          Selection setting when using sub-menus on one or more items
+
+2006-07-28  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.15 released.
+
+        * Fixed more inconsistent behavior between 'One' and 'Many' Selection
+          setting when using sub-menus on one or more items
+
+2006-07-27  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.14 released.
+
+        * Fixed clear for ActiveState perl
+
+        * Fixed inconsistent behavior between 'One' and 'Many' Selection
+          setting when using sub-menus on one or more items
+
+2006-06-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.13 released.
+
+        * Version 1.12 distribution was broken due to improperly wrapped lines
+
+2006-06-21  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.12 released.
+
+	* Added Support for unreleased FullAuto utility
+
+	* Fixed "my" scoping bug for $cnt variable
+
+2005-08-12  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.11 released.
+
+        * Added new feature - "View Sorted Items with
+          Percent '%' Key" functionality
+
+2005-07-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.1 released.
+
+        * Added new feature - "View Selections Summary with
+          Star '*' Key" functionality
+
+2005-06-02  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.09 released.
+
+        * The package name was incorrect - needs to be Term::Menus
+          - 'not' Menus (my bad)
+
+2005-05-29  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.08 released.
+
+        * Repaired code related to dynamic menu building.
+          The construct ]Previous[{Menu_1} now works properly.
+
+2005-05-22  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.06 released.
+
+	* Added three new Item Configuration Hash elements:
+
+            Default => qr/ /,
+            Exclude => qr/ /,
+            Include => qr/ /,
+
+          How to use these is explained in detail in the
+          updated pod documentation inside the module.
+
+        * Fixed Navigation issues.
+
+2005-05-10  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.05 released.
+
+        * Fixed bug where when the Display => element is not
+          specified in a Menu Item Hash, the default number of
+          10 was not being referenced, and no items would display.
+
+
+2005-05-04  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+	* Version 1.04 released.
+
+	* Modified module layout to work and build in the Term::
+	  root directory on CPAN. Menus.pm is now officially
+	  Term::Menus (Term/Menus.pm).
+
+	* Abstract updated to inform prospective users that Term::Menus
+	  works in Terminals, Consoles and CMD environments.
+
+
+2005-05-02  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 1.03 released.
+
+        * Modified Makefile.PL to properly make manpages.
+
+        * Added ChangeLog, updated MANIFEST.

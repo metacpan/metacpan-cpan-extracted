@@ -1,0 +1,204 @@
+=head1 NAME
+
+TUWF::Response - Response generation methods for TUWF
+
+=head1 DESCRIPTION
+
+This module is used to generate a HTTP response. It is automatically loaded by
+TUWF and its methods can be used without requiring any special work.
+
+This module can not be used outside of the TUWF framework.
+
+=head1 METHODS
+
+The following methods are added to the main TUWF object:
+
+=head2 resInit()
+
+Initializes or resets the response data. All headers, cookies and content will
+be reset to their defaults. This method is called at the start of each request
+by TUWF, but it can also be useful in your own code:
+
+  # create a response, setting headers and content, etc...
+  $self->resCookie(userid => $user);
+  print { $self->resFd() } "Content!\n";
+  
+  # when you later decide that you actually wanted to create a totally
+  # different response:
+  $self->resInit();
+  # ...after which you can start again
+
+=head2 resHeader(name, value, add)
+
+When only the I<name> argument is present, returns the list of values of the
+named header in list context, or the first value in scalar context. An empty
+list or undef is returned if the named response header has not been set.
+
+When I<name> is given and I<value> is C<undef>, all set headers with that name
+will be removed from the response.
+
+When I<name> and I<value> are both given, the named header will be set to the
+value, possibly overwriting an earlier header of the same name. When I<add> is
+also given and set to a true value, the header will be I<added>, without
+potentially overwriting a previous value.
+
+The default headers (as set by C<reqInit()>) are:
+
+  Content-Type: text/html; charset=UTF-8
+  X-Powered-By: Perl-TUWF
+
+A C<Content-Encoding> header may be set by C<resBuffer()>. A C<Content-Length>
+header is added automatically when the response is sent. C<Set-Cookie> headers
+set by C<resCookie()> are not manipulated through this function.
+
+TIP: When setting the C<Content-Type> header to a textual type, do not forget
+to indicate that the charset is UTF-8.
+
+=head2 resCookie(name, value, %options)
+
+Add and manipulate C<Set-Cookie> response headers. When only I<name> is given
+or when I<value> is C<undef>, the named cookie will be removed. That is, there
+will be a C<Set-Cookie> header telling the browser to remove the cookie. When
+I<value> is also defined, the cookie will be set to that value, possibly
+overwriting a previous value. The following additional options are accepted:
+
+=over
+
+=item expires
+
+A UNIX timestamp indicating when this cookie should expire. A value before the
+current C<time()> means the cookie should be immediately removed, which is
+equivalent to setting I<value> to undef.
+
+=item domain
+
+The domain name for which this cookie should be used.
+
+=item path
+
+The absolute path for which this cookie should be present.
+
+=item secure
+
+Set to true to add the I<secure> flag to the cookie. This means that the cookie
+will only be present if the client is connected through HTTPS.
+
+=item httponly
+
+Set to true to only allow the cookie to be read using HTTP. That is, disallow
+the cookie to be used within Javascript.
+
+=back
+
+It is possible to set defaults for these options with the
+L<cookie_defaults|TUWF/cookie_defaults> setting.
+
+
+=head2 resBuffer(action)
+
+Reads or manipulates the output buffer and its encoding.  I<action> can be one
+of the following:
+
+=over
+
+=item undef / empty string
+
+Returns the currently used output encoding, which can be one of 'none', 'gzip'
+or 'deflate'.
+
+=item clear
+
+Clears the output buffer, but does not modify the output encoding.
+
+=item none
+
+Clears the output buffer and disables any output encoding. All data will be
+sent to the client as-is.
+
+=item gzip
+
+Clears the output buffer and enables gzip output compression. Requires
+C<PerlIO::gzip>.
+
+=item deflate
+
+Same as gzip, but does not include the gzip header. (More correctly called
+'zlib'). Requires C<PerlIO::gzip>.
+
+=item auto
+
+Automatically detect which output encoding to use. If C<PerlIO::gzip> is not
+installed, it will use 'none'. If it is, it will choose whatever the browser
+requested with the C<Accept-Encoding> request header.
+
+=back
+
+The C<Content-Encoding> response header is automatically set to the correct
+value if compression is used.  C<reqInit()> automatically calls C<reqBuffer()>.
+The default encoding can be set with the
+L<content_encoding|TUWF/content_encoding> setting.
+
+Note that the C<:utf8> IO filter is always enabled, regardless of the encoding.
+
+
+=head2 resFd()
+
+Returns the filehandle of the output buffer. The C<:utf8> filter is enabled on
+this filehandle, meaning that everything you write to it should be in Perls
+native unicode format. It is a bad idea to use this filehandle for anything
+other than writing. It is important to remember that this filehandle writes to
+a B<buffer>, and its contents will not be flushed before the request has been
+fully processed. Since C<resBuffer()> creates a new filehandle each time it is
+called, the return value of C<resFd()> is invalid after a call to
+C<resBuffer()>.
+
+You rarely have to use this filehandle directly.  L<TUWF::XML|TUWF::XML>
+provides a more convenient set of functions, including C<lit()>, which can be
+used to output raw text.
+
+=head2 resStatus(code)
+
+Gets or sets the numeric HTTP response status code.
+
+=head2 resRedirect(location, type)
+
+Generate a HTTP redirect to I<location>, which should be a path relative to the
+domain, including leading a slash. If I<type> is not defined, a 301 (Moved
+Permanently) is used. If I<type> is 'temp', a 307 (Temporary Redirect) or if
+I<type> is 'post' a 303 (See Other) status code is used. The latter is
+recommended for use as response to a POST request, as it explicitely tells the
+browser to use a GET request for the redirect.
+
+C<resRedirect()> calls C<resInit()>, so if you wish to send any additional
+headers or cookies, you have to set these B<after> calling C<resRedirect()>.
+
+=head2 resNotFound()
+
+Return a 404 Page Not Found response. The response will be exactly the same as
+the 404 response used when the path did not match any of the registered URI
+handles. This means the callback configured with
+L<error_404_handler|TUWF/error_404_handler> will be called.
+
+B<Important:> Do B<NOT> call this function from your C<error_404_handler>
+function, this will cause infinite recursion!
+
+
+=head1 SEE ALSO
+
+L<TUWF>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008-2015 Yoran Heling.
+
+This module is part of the TUWF framework and is free software available under
+the liberal MIT license. See the COPYING file in the TUWF distribution for the
+details.
+
+
+=head1 AUTHOR
+
+Yoran Heling <projects@yorhel.nl>
+
+=cut

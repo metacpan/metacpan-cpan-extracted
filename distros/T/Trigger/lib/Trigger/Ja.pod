@@ -1,0 +1,150 @@
+=encoding utf-8
+
+=head1 NAME
+
+Trigger - Trigger framework
+
+=head1 概要
+
+    use Trigger;
+    my $trigger = Trigger->new(
+        inline_states => {
+            heap        => {}, # \%hash or \@array or \$scalar or \&sub or object
+            init        => sub {
+                my $heap = shift;
+                # 初期処理
+            },
+            process     =>  sub {
+                my $context = shift;
+                my $heap = $context->heap;
+                my @args = @_; # eval メソッドの引数
+                # メイン処理
+            },
+            trigger_and_action => [
+                sub { # trigger
+                    # トリガーとなる条件を定義するところ
+                    my $context = shift;
+                    my $heap = $context->heap;
+                    my @args = @_; # 'process'の戻り値をパラメータとして受け取る
+                    # 'trigger'は、値を返すか又はFALSEを返さなければならない。
+                    # false を戻り値としたい場合、return 0 としてはならない、
+                    # false を戻り値としたい場合は、ただ単に return と書くこと。
+                    # 例）defined $result ? return $result : return;
+                } => sub { # action
+                    # 'trigger'にの戻り値がある場合に実行される アクションを定義する。
+                    my $context = shift;
+                    my $heap = $context->heap;
+
+                    # トリガーの戻り値をパラメータとして受け取る
+                    my @trigger_re = @_; 
+                },
+                # 'trigger'と'action'は、対で定義する必要がある。
+                
+                # 複数の'trigger'を定義することができます。
+                sub { # trigger
+                    my $context = shift;
+                    my $heap = $context->heap;
+                    #   :
+                } => [ 
+                	# 「アクション」を配列のリファレンスで複数定義できます。
+                	# 定義した順番に「アクション」は実行されます。
+                	sub { # action
+	                    my $context = shift;
+    	                my $heap = $context->heap;
+                    	#   :
+                	},
+                	sub { # action
+	                    my $context = shift;
+    	                my $heap = $context->heap;
+                    	#   :
+                	},
+                ],
+            ],
+            end     =>  sub {
+                my $context = shift;
+                my $heap = $context->heap;
+                # 後処理
+                # 例えばファイルハンドルをClose、DBのdisconnectなど。
+            },
+        }
+    );
+
+    while ( @list ){
+        my @args = split /,/, $_;
+        my $result = $trigger->eval(@args) or last;
+    }
+
+=head1 説明
+
+条件(トリガ)がセットされる時、指定されたアクションは自動的に処理されるでしょう。
+1つを越えるTriggerおよびアクションは定義することができます。
+
+=head1 メソッド
+
+=head2 new(%args)
+
+トリガおよびアクションを定義します。
+
+=head2 eval(@args)
+
+通常 evalメソッドの戻り値は、'process' で処理した結果を返しますが、
+'trigger' の条件が満たされた場合、'action'が実行され、'action'の結果が、evalメソッドの戻り値となります。
+1つ以上のトリガが定義されている場合、最後に実行された'action'の結果が、evalメソッドの戻り値となります。
+
+=head1 AUTHOR
+
+Yuji Suzuki E<lt>yuji.suzuki.perl@gmail.comE<gt>
+
+L<http://arbolbell.jp/>
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-trigger at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Trigger>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Trigger
+    perldoc Trigger::JA  ;# 日本語ドキュメント
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Trigger>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Trigger>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Trigger>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Trigger>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007 Yuji Suzuki, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut

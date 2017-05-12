@@ -1,0 +1,41 @@
+Revision history for Test-Server
+
+0.06    11 Dec 2009
+    * check also for closed ports
+    * Pod fixes
+    * link to Test::System
+
+0.05    06. Nov 2008
+    * disk-free.t example added
+    * dns-resolution.t example added
+    * find-huge-files.t example added
+    * folder-file.t example added
+    * Test::Server::Util module added
+    * messages.t example added
+    * interfaces-ptr.t example added
+    * wakeup.t example added
+    * net-hops.t example added
+
+0.04
+    * added missing files to manifest
+    * folder-file.t example
+    * find-huge-files example
+    * timing of dns responses
+#    * install tests to /etc/t, commented out
+    * disk-free checking
+
+0.03   
+    * check if all nameservers in /etc/resolv.conf are reachable
+    * Sys::Net modules
+    * check time synchronization
+    * check shell command output and exit code
+    * dependency fix
+    * spelling fixes
+
+0.02     7. Mar 2008
+    * test for open ports and services
+    * more todo
+
+0.01    26. Feb 2008
+        First release to check what others think about it
+

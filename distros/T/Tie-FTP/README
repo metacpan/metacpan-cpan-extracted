@@ -1,0 +1,63 @@
+NAME
+    Tie::FTP - A module to open files on FTP servers as filehandles
+
+SYNOPSIS
+            tie *FH,'Tie::FTP';
+
+            open FH,'ftp://user:password@host/file';
+
+            print while (<FH>);
+
+            seek FH,0,0;
+            print FH foo;
+            close FH;
+
+    Or
+
+            tie *FH,'Tie::FTP';
+        
+            (tied *FH)->taint;
+            my $fh = (tied *FH)->tmpfh;
+        
+            seek $fh,0,0;
+            print $fh foo;
+            close FH;
+
+DESCRIPTION
+    This module downloads a file on an FTP server into a temporary file, and
+    allows editing on that. Upon destroy the object rewrites itself to the
+    server if there were any write operations.
+
+AVOIDING THE TIE INTERFACE
+    Since all the operations are actually delegated you're better off tying
+    a gensym, and then using "my $fh = (tied $ftpfh)->tmpfh;". Just remember
+    to call "(tied $ftpfh)->taint;" if you want to commit changes at DESTROY
+    time.
+
+METHODS
+    TIEHANDLE
+        This method accepts either a URI string or object, or a logged in
+        Net::FTP object and a path string.
+
+        In the former all login credentials are sucked out of the URI, and a
+        Net::FTP object is created. See CAVEATS.
+
+        In the latter form the Net::FTP object is assumed to be connected,
+        and the path string is a relative one.
+
+CAVEATS
+    The file will be written regardless of wether or not there are write
+    permissions.
+
+    You may need to do "(tied $ftpfh)->ftp->noop;" every once in a while, to
+    stir things up.
+
+    Net::FTP and URI are not used from within the module as you may prefer
+    to pass other types of objects, with a compatible interface.
+
+AUTHOR
+    Yuval Kogman <nothingmuch@woobling.org>
+
+COPYRIGHT
+    peh.
+

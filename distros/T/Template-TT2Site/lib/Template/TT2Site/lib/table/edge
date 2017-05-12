@@ -1,0 +1,12 @@
+[% # $Id: edge,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+<table border="0" cellspacing="1" cellpadding="0"
+       bgcolor="[% site.col.table.edge %]">
+  <tr>
+    <td>
+      <table border="0" bgcolor="[% site.col.table.back %]"
+             cellspacing="2" cellpadding="4">
+        [%- content -%]
+      </table>
+    </td>
+  </tr>
+</table>

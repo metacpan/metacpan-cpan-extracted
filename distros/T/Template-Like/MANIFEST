@@ -1,0 +1,26 @@
+Changes
+lib/Template/Like.pm
+lib/Template/Like/Filters.pm
+lib/Template/Like/Plugin/Dumper.pm
+lib/Template/Like/Processor.pm
+lib/Template/Like/Stash.pm
+lib/Template/Like/VMethods.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/constant.t
+t/directives.t
+t/element.t
+t/exception.t
+t/filter.t
+t/input.t
+t/load_filters.t
+t/long_statement.t
+t/namespace.t
+t/output.t
+t/plugin.t
+t/Plugin/Test/OurPlugin.pm
+t/semicolon.t
+t/tag_style.t
+META.json                                Module JSON meta-data (added by MakeMaker)

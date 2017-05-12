@@ -1,0 +1,33 @@
+---
+abstract: 'DBI login dialog class for Perl/Tk.'
+author:
+  - 'tmcmeeki <tmcmeeki@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-DBI-LoginDialog
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  DBI: '1.58'
+  Data::Dumper: '0'
+  Log::Log4perl: '0'
+  Tk: '800.024'
+  Tk::BrowseEntry: '0'
+  Tk::DialogBox: '0'
+  Tk::Entry: '0'
+  Tk::Label: '0'
+  Tk::ROText: '0'
+  perl: '5.010001'
+version: '1.006'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

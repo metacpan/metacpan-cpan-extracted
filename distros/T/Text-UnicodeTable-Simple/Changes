@@ -1,0 +1,36 @@
+Revision history for Perl extension Text::UnicodeTable::Simple
+
+0.10 2015-06-05T06:42:54Z
+       - No code changes, only document fix(Thanks trapple)
+
+0.09 2014-08-28T04:04:32Z
+       - Add default alignment parameter
+
+0.08 2013-05-16T04:30:19Z
+       - Convert Minilla
+
+0.07 2012-10-20
+        - Bump Module::Install version
+
+0.06 2011-12-31
+        - Fix spell check test of author tests
+        - Fix 'add_row_line' document.
+
+0.05 2011-12-04
+        - Fix dependency.
+            Required Term::ANSIColor >= 2.01
+
+0.04 2011-11-30
+        - add 'ansi_color' parameter to constructor
+          for table cell string which has ANSI color escape sequence
+
+0.03  2011-11-26
+        - add 'header' parameter to constructor
+        - add Chinese and Korean sample programs in eg/
+
+0.02  2011-11-17
+        - add feature 'no border'
+        - add 'add_rows' method for adding row at one time
+
+0.01  2011-07-01
+        - original version

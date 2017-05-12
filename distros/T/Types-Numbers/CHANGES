@@ -1,0 +1,53 @@
+Revision History for Types-Numbers
+==================================
+
+v0.94 2014-10-18
+----------------
+
+[d83b874]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-01 23:38:13 -0400 (2 weeks ago)
+
+Minor DZIL fixes, including IRC resource (fixes #1)
+
+[742b3f8]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-25 08:08:14 -0400 (12 months ago)
+
+Minor cleanup
+
+
+v0.93 2013-10-20
+----------------
+
+[8e53c1b]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-20 11:25:37 -0400 (12 months ago)
+
+Change inf tests to TODO tests for Win32/INF/looks_like_number bug
+Fix up some v-string requirement errors
+
+[720b62d]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-20 10:58:16 -0400 (12 months ago)
+
+Convert lower priority and/or to &&/||
+Fix uninitialized warnings from perl -w and BlessedNum
+
+[8406218]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-15 09:21:41 -0400 (1 year ago)
+
+Release v0.92_01
+
+[f48c8e4]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-15 09:01:56 -0400 (1 year ago)
+
+Upgrade Math::BigFloat version to v1.65
+Fix docs (sprintf + parens around param types)
+
+
+===================================
+End of changes in the last 365 days
+===================================

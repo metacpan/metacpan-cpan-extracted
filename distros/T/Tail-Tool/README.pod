@@ -1,0 +1,95 @@
+=pod
+
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/Tail-Tool"><img src="https://travis-ci.org/ivanwills/Tail-Tool.png" alt="Tail-Tool"></a>
+
+=head1 Tail-Tool
+
+Library for tailing files with plugins to enhance the output of the tail
+
+=head1 SYNOPSIS
+
+   tailt [option] file1 [ file2 ...]
+   tailt --help | --man | --VERSION
+
+ OPTIONS:
+  file             This can be a local file or a remote file specified by an
+                   ssh URI eg ssh://user@example.com:22//var/log/error.log
+  -r --restart     Turn on menu, which allows chnaging of options/files/plugin
+                   configuration on the fly. To see the menu type any thing
+                   other than q and press enter, typing q & enter quit.
+  -n --lines=int   The number of lines form the end of a file to start tailing
+                   The default is 10.
+  -c --config=str  Use the str config option from previously save config
+     --no_inotify  Inotify works wonderfully usually but if a file is on a network
+                   networked drive it sometimes doesn't fire when a tailed file
+                   changes, this option turns off inotify and uses the polling
+                   option
+  -d --disable=file
+                   Add the file to the list of files but don't automatically
+                   start tailing it. This can be specified more than once for
+                   multiple disabled files or comma/semi-comma seperated
+
+  -v --verbose       Show more detailed option
+     --VERSION       Prints the version information
+     --help          Prints this help information
+     --man           Prints the full documentation for tailt
+
+ PLUGIN OPTIONS:
+  -h --highlight   Sets up the hightlight plugin options
+  -m --match       Sets up the match plugin option to only show lines that natch
+                   the regexp.
+  -i --ignore      Sets up the ignore plugin options to hide all lines that
+                   match the regexp.
+  -r --replace     Sets op the replace plugin option which chnages match values.
+     --spacing key=value
+
+=head1 DESCRIPTION
+
+L<Tail::Tool> allows you to
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tail::Tool
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tail-Tool
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tail-Tool
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tail-Tool
+
+    Search CPAN
+        http://search.cpan.org/dist/Tail-Tool/
+
+    Source Code
+        git://github.com/ivanwills/Tail-Tool.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2014 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

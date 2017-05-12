@@ -1,0 +1,29 @@
+---
+name: ToolSet-y
+version: 0.01
+author:
+  - 'codeacrobat <joerg {AT} joergmeltzer.de>'
+abstract: -My one-liner ToolSet
+license: perl
+resources:
+  license: ~
+build_requires:
+  Class::Autouse: 1.29
+  Test::More: 0
+  ToolSet: 1
+recommends:
+  Data::Dump: 1.14
+  File::Find::Rule: 0
+  File::ReadBackwards: 0
+  List::MoreUtils: 0
+  List::Pairwise: 0
+  Package::Alias: 0.04
+  Statistics::Descriptive: 2.6
+provides:
+  ToolSet::y:
+    file: lib/ToolSet/y.pm
+    version: 0.01
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

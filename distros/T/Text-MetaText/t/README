@@ -1,0 +1,36 @@
+This directory contains the MetaText test scripts (*.t):
+  ./block.t     Test BLOCK declarations
+  ./chomp.t     Tests chomping of newlines
+  ./declare.t   Test pre-declared blocks
+  ./define.t    Test variable definitions
+  ./eval.t      Test expression evaluation code
+  ./exec.t      Test execution options (EXECUTE)
+  ./include.t   Test INCLUDE directive
+  ./rogue.t     Test handling of unrecognised directives (ROQGUE)
+  ./subst.t     Test basic SUBST directive
+
+Other files:
+  ./test.pl     Common file for all test scripts.
+
+Additional directories:
+  ./src         Source files used by test scripts
+  ./dest        Post-process output written here
+  ./expect      Expected output, compared against equivalent ./dest file
+  ./lib         Element files used by the above
+
+Test results are written to the logfile, test.log.
+
+The test scripts may be a little obscure in places especially as they
+often try to tickle the deepest, darkest innards of MetaText into 
+spewing forth a bug.  Having said that, they are a good starting place 
+for seeing how the different directives work and what can be done.
+
+If you uncover a bug in MetaText, the best way to demonstrate it is
+to create a small, simple test script that illustrates the problem.
+Not only does that help me reproduce it easily, but it also means I 
+have a test script ready to install in this suite to check that it 
+doesn't happen again.
+
+
+A
+

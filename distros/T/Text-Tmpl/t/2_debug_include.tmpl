@@ -1,0 +1,7 @@
+<!--#loop "variables-" $number-->
+<!--#echo $variable_name--> => <!--#echo $variable_value-->
+
+<!--#endloop--><!--#loop "named_children-" $number-->
+<!--#loop $nc_name--><!--#echo $nc_name-->: 
+<!--#include "t/2_debug_include.tmpl"-->
+<!--#endloop--><!--#endloop-->

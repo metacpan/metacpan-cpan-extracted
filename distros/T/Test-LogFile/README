@@ -1,0 +1,55 @@
+NAME
+    Test::LogFile - Wrapper module for testing shared logfile
+
+SYNOPSIS
+      use Test::More;
+      use Test::LogFile;
+
+      my $file = log_file();
+
+      my $pid = fork();
+      if ($pid == 0) {
+        # run any worker
+      }
+      elsif ($pid) {
+        # wait for worker
+        waitpid($pid, 0);
+
+        # kill worker
+        kill( 15, $pid );
+
+        # testing
+        count_ok(
+          file  => $file,
+          str   => "any text for searching in logfile",
+          count => 1, # count that appear str arg in logfile
+          hook  => sub {
+              my $line = shift;
+              # other test when hitting str arg
+          }
+        );
+
+        done_testing; # done_testing should be call in parent process only.
+      }
+
+DESCRIPTION
+    Test::LogFile is testing with shared logfile.
+
+    This module aim testing worker, server, and any daemonize program with
+    log output.
+
+METHODS
+    log_file()
+        return temporary file path for log.
+
+    count_ok()
+        Testing with number of test string. This method is using Test::More
+        for checking count.
+
+AUTHOR
+    Koji Takiguchi <kojiel at@ gmail.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

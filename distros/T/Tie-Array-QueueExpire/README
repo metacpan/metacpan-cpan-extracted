@@ -1,0 +1,251 @@
+Tie::Array::QueueExpire - Introduction
+      Tie::Array::QueueExpire - Tie an ARRAY over a TokyCabinet Btree DB ( see http://tokyocabinet.sourceforge.net )
+      Revision: 1.01
+
+SYNOPSIS
+      use Tie::Array::QueueExpire;
+      my $t = tie( my @myarray, "Tie::Array::QueueExpire", '/tmp/db_test.bdb' );
+      push @myarray, int rand 1000;
+  
+      # normal ARRAY function
+      my $data = shift @myarray;
+      my $data = pop @myarray;
+      print "this elem exists\n"  if (exists( $myarray[6]));
+      print "size = ". scalar( @myarray )."\n";
+  
+      # using the PUSH with an extra parameter to put the new element in futur
+      # also return the key of the inserted value
+      for ( 1 .. 10 )
+      {
+        say  "t=".time.'  '.  int (($t->PUSH( $_ . ' ' . time, 10 ))/1000);
+        sleep 1;
+      }
+      sleep 10;  
+      # Get the expired elements ( 7 seconds before now )
+      my $ex = $t->EXPIRE( 7 );
+ 
+      # Get the expired elements
+      my @EXP = @{$t->EXPIRE($exp)};
+      # Get and delete the expired elements ( 20 seconds before now )
+      $ex =  $t->EXPIRE(20,1);
+      my @EXP = @{$t->EXPIRE($exp,1)};
+  
+      # fetch element
+      # in scalar context return the value 
+      # in array context return in first element the key and in second, the value
+      my $a =$t->FETCH(6);
+      my @b = $t->FETCH(6);
+      # the normal array fetch is always in scalar mode
+      my @c=$myarray[6];
+      say Dumper( $a );
+      say Dumper( \@b );
+      say Dumper( \@c );
+
+DESCRIPTION
+      Tie an ARRAY over a TokyCabinet Btree DB and allow to get or deleted expired data;
+  
+      This module require Time::HiRes, TokyoCabinet (database and perl module.)
+      The insertion is ms unique ( 0.001 seconds )
+  
+      The normal ARRAY function present are
+  
+      push
+      pop
+      shift
+      exits
+      scalar
+      clear
+      unshift  (but put data 1 second before the first entry)
+
+      The following function is not completely iplemented.
+  
+      splice
+  
+      The following function are not implemented.
+  
+      extend
+      store
+      STORESIZE
+
+      The following function are specific of this module.
+  
+      LAST
+      FIRST
+      EXPIRE
+      OPTIMIZE
+      PUSH
+      FETCH
+
+Basic ARRAY functions
+    * *
+
+  tie
+            Tie an array over a TokyoCabinet DB
+            my $t = tie( my @myarray, "Tie::Array::QueueExpire", '/tmp/db_test.bdb' );
+            The fist parameter if the TokyoCabinet file used (or created)
+            Four optional parameter are allowed
+            In place two, a flag to serialize the data in the DB
+            In place three, an octal MASK allow to set the permission of the DB created
+                    The default permission is 0600 (-rw-------) 
+            In place four a parameter to delete the DB file if present and corrupted
+                    The default value is 0 (don't delete the file)
+            In place five a parameter to exit on error when opening the DB file
+                    The default value is 0 (don't exit, only report error)
+
+  FETCH
+            Retrieve a specific key from the array
+            my $data = $myarray[6];
+            or
+            my $data = $t->FETCH(6);
+            or 
+            my @data = $t->FETCH(6);
+            where 
+              $data[0] = insertion key
+            and 
+              $data[1] = value
+
+  FETCHSIZE
+            Get the size of the array
+            my $data = scalar(@myarray);
+
+  PUSH
+            Add an element at the end of the array
+            push @myarray , 45646;
+            or 
+            $t->PUSH( 45646 );
+            it is also possible to add an elemnt with a offset expiration 
+            $t->PUSH( 45646 , 10 );
+            add element in the array to be expired in 10 seconds
+            if the offset is negative, add the expiration in past
+
+  EXISTS
+            Test if en element in the array exist
+            print "element exists\n" if (exits $myarray[5]);
+            return the insertion key
+
+  POP
+            Extract the latest element from the array (the youngest)
+            my $data = pop @myarray;
+            or
+            my $data = $t->POP();
+            or 
+            my @data = $t->POP();
+            where 
+              $data[0] = insertion key
+            and 
+              $data[1] = value
+
+  SHIFT
+            Extract the first element from the array  (the oldest)
+            my $data = shift @myarray;
+            or
+            my $data = $t->SHIFT();
+            or 
+            my @data = $t->SHIFT();
+           where 
+              $data[0] = insertion key
+            and 
+              $data[1] = value
+
+  UNSHIFT
+            Add an element in the front of the array
+            unshift @myarray , 45646;
+            UNSHIFT data 1 mili-second before the first item
+
+  CLEAR
+            Delete all element in the array
+            $t->CLEAR;
+
+  DESTROY
+            Normal destructor call when untied the array
+            Normaly never called by user
+
+Specific functions from this module
+    * *
+
+  SPLICE
+            SPLICE don't allow a list replacement 
+            because the insert order is made by time.
+            my @tmp   = splice @myarray, 5 ,3;
+
+  LAST
+            Get the latest element in the array (oldest)
+            my $data = $t->LAST;
+            or
+            my @data = $t->LAST;
+            where 
+              $data[0] = insertion key
+            and 
+              $data[1] = value
+
+  FIRST
+            Get the first element in the array (youngest)
+            my $data =$t->FIRST;
+            or
+            my @data = $t->FIRST;
+            where 
+              $data[0] = insertion key
+            and 
+              $data[1] = value
+
+  EXPIRE
+            Get the elements expired in the array.
+            my @ALL = $t->EXPIRE( 1207840028) ;
+            return a refernce to an array with all the expired value.
+        
+            If a second parameter is provided and not null, the data are also deleted from the array.
+            my @ALL = $t->EXPIRE( 1207840028 , 1 ) ;
+            return a refernce to an array with all the expired value.
+
+  OPTIMIZE
+            Function to compact the DB (after a lot of delete )
+            $t->OPTIMIZE;
+
+Functions not Implemented
+    * *
+
+  EXTEND
+            Not implemented because not signifiant for a expiration queue
+
+  STORE
+            Not implemented because not signifiant for a expiration queue
+
+  STORESIZE
+            Not implemented because not signifiant for a expiration queue
+
+AUTHOR
+            Fabrice Dulaunoy <fabrice_at_dulaunoy_dot_com>
+
+SEE ALSO
+            - Data::Queue::Persistent from Mischa Spiegelmock, <mspiegelmock_at_gmail_dot_com>
+            - TokyoCabinet from Mikio Hirabayashi <mikio_at_users_dot_sourceforge_dot_net>
+
+TODO
+            - make test
+            - implementation of EXTEND to allow clear of array with @myarray = ();
+            - implementation of STORESIZE to allow clear of array with $#myarray = -1;
+
+LICENSE
+            Under the GNU GPL2
+
+            This program is free software; you can redistribute it and/or modify it 
+            under the terms of the GNU General Public 
+            License as published by the Free Software Foundation; either version 2 
+            of the License, or (at your option) any later version.
+
+            This program is distributed in the hope that it will be useful, 
+            but WITHOUT ANY WARRANTY;  without even the implied warranty of
+            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+            See the GNU General Public License for more details.
+
+            You should have received a copy of the GNU General Public License 
+            along with this program; if not, write to the 
+            Free Software Foundation, Inc., 59 Temple Place, 
+            Suite 330, Boston, MA 02111-1307 USA
+
+            Tie::Array::QueueExpire  Copyright (C) 2004 2005 2006 2007 2008 2009 2010 DULAUNOY Fabrice  
+            Tie::Array::QueueExpire comes with ABSOLUTELY NO WARRANTY; 
+            for details See: L<http://www.gnu.org/licenses/gpl.html> 
+            This is free software, and you are welcome to redistribute 
+            it under certain conditions;
+

@@ -1,0 +1,14 @@
+Revision history for Time-Precise
+
+1.0000  2015-10-07
+        First version, released on an unsuspecting world.
+1.0002  2015-10-07
+        Bugfix affecting Linux platforms.
+1.0004  2015-10-07
+        Bugfix affecting old versions of BSD with old versions of Perl
+1.0006  2015-10-08
+        Bugfix on localtime, it was using a dot for seconds even when $PRECISION was set to zero
+1.0008  2015-10-08
+        Fixed incorrect META.yml reported in RT 112413
+1.0010  2016-02-26
+        Added croak to cases where Perl is < 5.012 and negative seconds are used for functions related to localtime.

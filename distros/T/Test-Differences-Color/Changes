@@ -1,0 +1,21 @@
+Revision history for Test-Differences-Color
+
+0.06    2013年04月49日 12時41分00秒
+        passing all arguments to Test::Differences
+
+0.05    2009年09月08日 21時44分21秒
+        use Module::Install
+
+0.04    2009年02月06日 00時35分13秒 CST
+        replace overrided subroutine from Test::Builder::_print_diag to Test::Builder::_print_to_fh
+
+0.03    2008年09月08日 18時39分12秒 CST
+        RESET before new line character
+
+0.02    2008年09月07日 11時06分21秒 CST
+        three diff colors were seperated
+        ON_RED, ON_BLUE, ON_GREEN
+
+0.01    2008年09月07日 10時37分19秒 CST
+        First version, released on an unsuspecting world.
+

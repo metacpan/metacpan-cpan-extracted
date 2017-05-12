@@ -1,0 +1,42 @@
+
+=head1 NAME
+
+Tangram::Driver::SQLite - Orthogonal Object Persistence in SQLite databases
+
+=head1 SYNOPSIS
+
+   use Tangram;
+   use Tangram::Driver::SQLite;
+
+   $schema = Tangram::Driver::SQLite->schema( $hashref );
+
+   Tangram::Driver::SQLite->deploy($schema, $dbh);
+
+   $storage = Tangram::Driver::SQLite->connect( $schema,
+      $data_source, $username, $password );
+
+   $storage->disconnect();
+
+   Tangram::Driver::SQLite->retreat($schema, $dbh);
+
+=head1 DESCRIPTION
+
+This is the entry point in the SQLite-specific object-relational
+persistence backend.
+
+=head1 ERRATA
+
+For reasons similar to the L<Tangram::Driver::Pg> module, this
+back-end automatically encodes L<Tangram::Type::Dump::Storable>
+objects via L<MIME::Base64> to avoid truncation of values on NUL
+bytes.
+
+Also, note that despite what is mentioned on the front page of
+L<www.sqlite.org>, SQLite is not actually an ACID database; any writer
+to the database has to wait for all other writers to finish before
+they can begin their transaction.
+
+So make sure you start and complete your transactions as quickly as
+possible with this back-end.
+
+=cut

@@ -1,0 +1,22 @@
+---
+abstract: 'Describe time duration in Indonesian'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Time-Duration-id
+requires:
+  Time::Duration: 1.1
+  perl: 5.010001
+resources:
+  homepage: http://metacpan.org/dist/Time-Duration-id
+  repository: http://github.com/sharyanto/perl-Time-Duration-id
+version: 0.04

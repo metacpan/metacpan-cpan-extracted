@@ -1,0 +1,1078 @@
+#!/usr/bin/perl
+#Copyright (c) 2013, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Toader::Entry;
+use Toader::Entry::Cache;
+use Toader::Entry::Manage;
+use Toader;
+use Cwd;
+use Term::CallEditor qw/solicit/;
+use Sys::Hostname;
+use Text::Template;
+use Toader::Render::Entry;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "toader-entry 0.1.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"Switches:\n".
+		"-a <action> - The action to perform.\n".
+		"-b <body file> - The file to read for the body.\n".
+		"-e <entry> - The specified entry.\n".
+		"-f <from> - The author's email address.\n".
+		"-F <file> - The file for a part.\n".
+		"-p - Print the returned value for the render check.\n".
+		"-P <publish> - This sets the publish value. Either '0' or '1'.\n".
+		"-r <render> - The render to use.\n".
+		"-s <summary> - What to set for the summary.\n".
+		"-S <summary template> - The template to use for the summary.\n".
+		"-t <title> - The title for the entry.\n".
+		"-T <tags> - The tags for the entry.\n".
+		"\n".
+		"Environmental Variables:\n".
+		"Toader_outputdir - The output directory to use.\n".
+		"Toader_from - The author's email address. Overrode by -f. ".
+		"Toader_entry_summary - The formatting for the display of the summary of the entries.\n".
+		"\n".
+		"Actions:\n".
+		"be - Edits the body of the specified entry\n".
+		"bg - Prints the body of the specified entry\n".
+		"bs - Sets the body of the specified entry\n".
+		"create - Creates a entry.\n".
+		"fg - Gets the author/from.\n".
+		"fs - Sets the author/from.\n".
+		"ls - Lists the entries in the specified directory.\n".
+		"lp - Lists the published entries in the specified directory.\n".
+		"pa - Adds a subpart.\n".
+		"pe - Extracts the subpart.\n".
+		"pl - List the subparts.\n".
+		"pr - Removes a subpart.\n".
+		"pubg - Gets the publish value.\n".
+		"pubs - Sets the publish value, a boolean value of either '0' or '1'.\n".
+		"rm - Removes the specified entry.\n".
+		"rp - Prints the raw entry.\n".
+		"summary - Prints a summary.\n".
+		"ss - Sets the summary.\n".
+		"sg - Gets the summary.\n".
+		"ts - Sets the title.\n".
+		"tg - Gets the title.\n".
+		"tagg - Gets the tags.\n".
+		"tags - Sets the tags.\n".
+		"rc - Checks if the content of a entry can be rendered.\n".
+		"rs - Sets the renderer.\n".
+		"rg - Gets the renderer.\n".
+		"render - Renders the entry.\n".
+		"\n".
+		"From:".
+		"A from address is required by Toader::Entry. If not specified via either switch or".
+		"environmental variable, It is formed via getlogin.'\@'.hostname .\n".
+		"\n".
+		"Entry Summary Formatting:\n".
+		"The entry summary is a Text::Template template. The default is '[\$id] - [\$from] - [\$title]' The delimiters are '[' and ']' and the variables are as below.\n".
+		"\$id - This is the entry ID.\n".
+		"\$from - This is the author.\n".
+		"\$title - This is the entry title.\n".
+		"\$renderer - This is the renderer to use.\n".
+		"\$summary - This is the entry summary.\n";
+}
+
+#gets the options
+my %opts=();
+getopts('a:b:e:f:F:r:s:S:t:T:pP:', \%opts);
+
+if ( ! defined( $opts{a} ) ){
+	$opts{a}='ls';
+}
+
+if ( ! defined( $opts{S} ) ){
+	if ( defined( $ENV{'Toader_entry_summary'} ) ){
+		$opts{S}=$ENV{'Toader_entry_summary'};
+	}else{
+		$opts{S}='[$id] - [$from] - [$title]';
+	}
+}
+
+#make sure a valid entry is present
+if (
+	( $opts{a} ne 'ls' ) &&
+	( $opts{a} ne 'lp' ) &&
+	( $opts{a} ne 'rm' ) &&
+	( $opts{a} ne 'bs' ) &&
+	( $opts{a} ne 'bg' ) &&
+	( $opts{a} ne 'rp' ) &&
+	( $opts{a} ne 'ss' ) &&
+	( $opts{a} ne 'create' ) &&
+	( $opts{a} ne 'summary' ) &&
+	( $opts{a} ne 'be' ) &&
+	( $opts{a} ne 'ss' ) &&
+	( $opts{a} ne 'sg' ) &&
+	( $opts{a} ne 'ts' ) &&
+	( $opts{a} ne 'tg' ) &&
+	( $opts{a} ne 'tags' ) &&
+	( $opts{a} ne 'tagg' ) &&
+	( $opts{a} ne 'fs' ) &&
+	( $opts{a} ne 'fg' ) &&
+	( $opts{a} ne 'rc' ) &&
+	( $opts{a} ne 'rs' ) &&
+	( $opts{a} ne 'rg' ) &&
+	( $opts{a} ne 'pl' ) &&
+	( $opts{a} ne 'pa' ) &&
+	( $opts{a} ne 'pr' ) &&
+	( $opts{a} ne 'pe' ) &&
+	( $opts{a} ne 'pubg' ) &&
+	( $opts{a} ne 'pubs' ) &&
+	( $opts{a} ne 'render' )
+	){
+	warn('toader-entry: No valid action specified');
+	exit 254;
+}
+
+#get the current directory
+my $dir=getcwd;
+
+#figure out what to use for the from if not specified via a switch
+if ( ! defined( $opts{f} ) ){
+	if(! defined( $ENV{'Toader_from'} ) ){
+		$opts{f}=getlogin.'@'.hostname;
+	}else{
+		$opts{f}=$ENV{'Toader_from'};
+	}
+}
+
+#initialize Toader as a bit of a test and it may be used later
+my $toader=Toader->new({ dir=>$dir });
+if ( $toader->error){
+	warn('toader-entry: Failed to initialize Toader. error="'.$toader->error.
+		 '" errorString="'.$toader->errorString.'"');
+	exit $toader->error;
+}
+
+#
+if ( defined( $ENV{'Toader_outputdir'} ) ){
+	$toader->setOutputDir( $ENV{'Toader_outputdir'} );
+	if ( $toader->error ){
+		warn('toader-entry: Failed to set the output directory. error="'.$toader->error.
+			 '" errorString="'.$toader->errorString.'"');
+		exit $toader->error;
+	}
+}
+
+#create a new Toader entry
+if ( $opts{a} eq 'create' ){
+	my $body='';
+	if ( defined( $opts{b} ) ){
+		my $fh;
+		if ( ! open( $fh, '<', $opts{b} ) ){
+			warn('toader-entry: Failed to open "'.$opts{b}.'" to read for the body');
+			exit 254;
+		}
+		my $body=join( '', <$fh> );
+		close( $fh );
+	}
+
+	my $entry=Toader::Entry->new({
+		body=>$body,
+		from=>$opts{f},
+		renderer=>$opts{r},
+		summary=>$opts{s},
+		title=>$opts{t},
+		toader=>$toader,
+		});
+	if ( $entry->error  ){
+		warn('toader-entry: Failed to create the new entry. error="'.$entry->error.
+			 '" errorString="'.$entry->errorString.'"');
+		exit $entry->error;
+	}
+	$entry->dirSet($dir);
+	if ( $entry->error  ){
+		warn('toader-entry: Failed to set the Toader directory for the entry. error="'.
+			 $entry->error.'" errorString="'.$entry->errorString.'"');
+		exit $entry->error;
+	}
+	$entry->write;
+	if ( $entry->error  ){
+		warn('toader-entry: Failed to write the entry. error="'.
+			 $entry->error.'" errorString="'.$entry->errorString.'"');
+		exit $entry->error;
+	}
+
+	print $entry->entryNameGet."\n";
+
+	exit 0;
+}
+
+#gets a summary
+if ( $opts{a} eq 'summary' ){
+	my $ehelper=Toader::Entry::Helper->new( $toader );
+	$ehelper->setDir($dir);
+	if ( $ehelper->error ){
+		warn('toader-entry: Failed to set the directory for the helper object. error="'.
+			 $ehelper->error.'" errorString="'.$ehelper->errorString.'"');
+		exit $ehelper->error;
+	}
+
+	my %summary=$ehelper->summary;
+	if ( $ehelper->error ){
+        warn('toader-entry: Failed to generate a summary of the entries. error="'.
+             $ehelper->error.'" errorString="'.$ehelper->errorString.'"');
+        exit $ehelper->error;
+    }
+
+	my $template = Text::Template->new(
+		TYPE => 'STRING',
+		SOURCE => $opts{S},
+		DELIMITERS=>[ '[', ']' ],
+		);
+
+	#prints each one
+	my @entries=sort(keys(%summary));
+	my $int=0;
+	while( defined( $entries[$int] ) ){
+		print $template->fill_in(
+			HASH=>{
+				id=>$entries[$int],
+				from=>$summary{ $entries[$int] }{from},
+				title=>$summary{ $entries[$int] }{title},
+				renderer=>$summary{ $entries[$int] }{renderer},
+				summary=>$summary{ $entries[$int] }{summary},
+				})."\n";
+
+		$int++;
+	}
+
+	exit 0;
+}
+
+#initialize this here as it used by both remove and ls
+my $emanage=Toader::Entry::Manage->new( $toader );
+if ( $emanage->error ){
+	warn( 'toader-entry: Failed to initialize Toader::Entry::Manage' );
+	exit $emanage->error;
+}
+$emanage->setDir( $dir );
+if ( $emanage->error  ){
+	warn('toader-entry: Failed to set the directory for the manage object. error="'.
+		 $emanage->error.'" errorString="'.$emanage->errorString.'"');
+	exit $emanage->error;
+}
+
+#lists a entry
+if ( $opts{a} eq 'ls' ){
+	my @entries=$emanage->list;
+	if ( $emanage->error  ){
+		warn('toader-entry: Failed to list the entries. error="'.
+			 $emanage->error.'" errorString="'.$emanage->errorString.'"');
+		exit $emanage->error;
+	}
+	if ( ! defined( $entries[0] ) ){
+		exit 0;
+	}
+	print join( "\n", @entries )."\n";
+	exit 0;
+}
+
+#lists a entry
+if ( $opts{a} eq 'lp' ){
+	my @entries=$emanage->published;
+	if ( $emanage->error  ){
+		warn('toader-entry: Failed to list the published entries. error="'.
+			 $emanage->error.'" errorString="'.$emanage->errorString.'"');
+		exit $emanage->error;
+	}
+	if ( ! defined( $entries[0] ) ){
+		exit 0;
+	}
+	print join( "\n", @entries )."\n";
+	exit 0;
+}
+
+#removes a entry
+if ( $opts{a} eq 'rm' ){
+	$emanage->remove( $opts{e} );
+	if ( $emanage->error  ){
+		warn('toader-entry: Failed to remove the specified entry. error="'.
+			 $emanage->error.'" errorString="'.$emanage->errorString.'"');
+		exit $emanage->error;
+	}
+	exit 0;
+}
+
+#prints the body of a entry
+if ( $opts{a} eq 'bg' ){
+	my $entry=$emanage->read($opts{e});
+	if ( $emanage->error  ){
+		warn('toader-entry: Failed to to read the entry. error="'.
+			 $emanage->error.'" errorString="'.$emanage->errorString.'"');
+		exit $emanage->error;
+	}
+	print $entry->bodyGet;
+	exit 0;
+}
+
+#sets the body of a entry
+if ( $opts{a} eq 'bs' ){
+	my $entry=$emanage->read($opts{e});
+	if ( $emanage->error  ){
+		warn('toader-entry: Failed to to read the entry. error="'.
+			 $emanage->error.'" errorString="'.$emanage->errorString.'"');
+		exit $emanage->error;
+	}
+	my $body;
+	if ( defined( $opts{b} ) ){
+		my $fh;
+		if ( ! open( $fh, '<', $opts{b} ) ){
+			warn('toader-entry: Failed to open "'.$opts{b}.'" to read for the body');
+			exit 254;
+		}
+		$body=join( '', <$fh> );
+		close( $fh );
+	}else{
+		warn('toader-entry: Nothing file specified via the -b flag');
+		exit 254;
+	}
+	$entry->bodySet($body);
+	$entry->write;
+	exit 0;
+}
+
+#edits the body of a entry
+if ( $opts{a} eq 'be' ){
+	my $entry=$emanage->read($opts{e});
+	if ( $emanage->error  ){
+		warn('toader-entry: Failed to to read the entry. error="'.
+			 $emanage->error.'" errorString="'.$emanage->errorString.'"');
+		exit $emanage->error;
+	}
+	my $body=$entry->bodyGet;
+	my $fh=solicit($body);
+	$body=join( '', <$fh> );
+	$entry->bodySet($body);
+	$entry->write;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to write the entry out. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	exit 0;
+}
+
+#prints the body of a entry
+if ( $opts{a} eq 'rp' ){
+	my $entry=$emanage->read($opts{e});
+	if ( $emanage->error  ){
+		warn('toader-entry: Failed to to read the entry. error="'.
+			 $emanage->error.'" errorString="'.$emanage->errorString.'"');
+		exit $emanage->error;
+	}
+	print $entry->as_string;
+	exit 0;
+}
+
+#prints the summary
+if ( $opts{a} eq 'ss' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->summarySet($opts{s});
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to set the summary. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	$entry->write;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to write the entry out. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+    exit 0;
+}
+
+#gets the summary of a entry
+if ( $opts{a} eq 'sg' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my $summary=$entry->summaryGet;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to set the summary. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	print $summary."\n";
+	exit 0;
+}
+
+#prints the from/author
+if ( $opts{a} eq 'fs' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->fromSet($opts{f});
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to set the from/author. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	$entry->write;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to write the entry out. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+    exit 0;
+}
+
+#gets the from/author of a entry
+if ( $opts{a} eq 'fg' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my $from=$entry->fromGet;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to get the from/author. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	print $from."\n";
+	exit 0;
+}
+
+#prints the title
+if ( $opts{a} eq 'ts' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->titleSet($opts{t});
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to set the title. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	$entry->write;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to write the entry out. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+    exit 0;
+}
+
+#gets the title of a entry
+if ( $opts{a} eq 'tg' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my $title=$entry->titleGet;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to get the title. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	print $title."\n";
+	exit 0;
+}
+
+#sets the tags for a entry
+if ( $opts{a} eq 'tags' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->tagsSetFromString($opts{T});
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to set the title. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	$entry->write;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to write the entry out. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+    exit 0;
+}
+
+#gets the tags of a entry
+if ( $opts{a} eq 'tagg' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my @tags=$entry->tagsGet;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to get the tags. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	print join("\n", @tags)."\n";
+	exit 0;
+}
+
+#prints the title
+if ( $opts{a} eq 'rs' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->rendererSet($opts{r});
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to set the renderer. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	$entry->write;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to write the entry out. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+    exit 0;
+}
+
+#gets the title of a entry
+if ( $opts{a} eq 'rg' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my $title=$entry->rendererGet;
+    if ( $entry->error  ){
+        warn('toader-entry: Failed to get the renderer. error="'.
+             $entry->error.'" errorString="'.$entry->errorString.'"');
+        exit $entry->error;
+    }
+	print $title."\n";
+	exit 0;
+}
+
+#gets the title of a entry
+if ( $opts{a} eq 'rc' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my $renderer=Toader::Render::Entry->new({
+		obj=>$entry,
+		toader=>$toader,
+		});
+	if ( $renderer->error ){
+		warn('toader-entry: Failed To initializae Toader::Render::Entry. error="'.
+			$renderer->error.'" errorString="'.$renderer->errorString.'"');
+		exit $renderer->error;
+	}
+	my $content=$renderer->content;
+
+	if ( $opts{p} ){
+		print $content;
+	}
+
+    exit 0;
+}
+
+#this lists the parts
+if ( $opts{a} eq 'pl' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my @files=$entry->subpartsList;
+	print join ("\n", @files)."\n";
+	exit 0;
+}
+
+#this adds a new part
+if ( $opts{a} eq 'pa' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->subpartsAdd( $opts{F} );
+	if ( $entry->error ){
+		warn('toader-entry: Failed to add "'.$opts{F}.'" as a subpart for "'.$opts{e}.'"');
+		exit $entry->error;
+	}
+	$entry->write;
+	exit 0;
+}
+
+#this removes a part
+if ( $opts{a} eq 'pr' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->subpartsRemove( $opts{F} );
+	if ( $entry->error ){
+		warn('toader-entry: Failed to add "'.$opts{F}.'" as a subpart for "'.$opts{e}.'"');
+		exit $entry->error;
+	}
+	$entry->write;
+	exit 0;
+}
+
+#this removes a part
+if ( $opts{a} eq 'pe' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->subpartsExtract( $opts{F} );
+	if ( $entry->error ){
+		warn('toader-entry: Failed to extract to "'.$opts{F}.'"');
+		exit $entry->error;
+	}
+	$entry->write;
+	if ( $entry->error ){
+		warn('toader-entry: Failed to write the entry');
+		exit $entry->error;
+	}
+	exit 0;
+}
+
+#this gets the publish value
+if ( $opts{a} eq 'pubg' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my $publish=$entry->publishGet;
+    if ( $entry->error ){
+        warn('toader-entry: Failed to get the publish value');
+        exit $entry->error;
+    }
+	print $publish."\n";
+    exit 0;
+}
+
+#this sets the publish value
+if ( $opts{a} eq 'pubs' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	$entry->publishSet( $opts{P} );
+    if ( $entry->error ){
+        warn('toader-entry: Failed to set the publish value, "'.$opts{P}.'",');
+        exit $entry->error;
+    }
+	$entry->write;
+	if ( $entry->error ){
+		warn('toader-entry: Failed to write the entry');
+		exit $entry->error;
+	}
+    exit 0;
+}
+
+#this renders it
+if ( $opts{a} eq 'render' ){
+    my $entry=$emanage->read($opts{e});
+    if ( $emanage->error  ){
+        warn('toader-entry: Failed to to read the entry. error="'.
+             $emanage->error.'" errorString="'.$emanage->errorString.'"');
+        exit $emanage->error;
+    }
+	my $renderer=Toader::Render::Entry->new(
+		{
+			obj=>$entry,
+			toader=>$toader,
+		}
+		);
+	if ( $renderer->error ){
+        warn('toader-entry: Failed to initiate the renderer. error="'.
+             $renderer->error.'" errorString="'.$renderer->errorString.'"');
+        exit $renderer->error;
+    }
+	$renderer->render;
+	if ( $renderer->error ){
+		warn('toader-entry: Failed to render the entry. error="'.
+			 $renderer->error.'" errorString="'.$renderer->errorString.'"');
+		exit $renderer->error;
+	}
+	exit 0;
+}
+
+=head1 NAME
+
+toader-entry - A tool for manipulating a Toader entry.
+
+=head1 SYNOPSIS
+
+toader-entry -a be -e <entry>
+
+toader-entry -a bg -e <entry>
+
+toader-entry -a bs -e <entry> -b <body file>
+
+toader-entry -a create
+
+toader-entry -a fg -e <entry>
+
+toader-entry -a fs -e <entry> -f <from>
+
+toader-entry -a ls
+
+toader-entry -a pa -e <entry> -F <file>
+
+toader-entry -a pe -e <entry> -F <file>
+
+toader-entry -a pl -e <entry>
+
+toader-entry -a pr -e <entry> -F <file>
+
+toader-entry -a rc [-p] -e <entry>
+
+toader-entry -a render -e <entry>
+
+toader-entry -a rg -e <entry>
+
+toader-entry -a rm -e <entry>
+
+toader-entry -a rp -e <entry>
+
+toader-entry -a rs -e <entry> -r <renderer>
+
+toader-entry -a sg -e <entry>
+
+toader-entry -a ss -e <entry> -s <summary>
+
+toader-entry -a summary
+
+toader-entry -a tg -e <entry>
+
+toader-entry -a ts -e <entry> -t <title>
+
+=head1 SWITCHES
+
+=head2 -a <action>
+
+The specified action to perform.
+
+Defaults to ls if not specified.
+
+=head2 -b <body file>
+
+The body file to use.
+
+=head2 -f <from>
+
+The author's email address.
+
+=head2 -F <file>
+
+The file to use, file part to remove, or
+directory to extract them to.
+
+=head2 -p
+
+Print the rendered content.
+
+=head2 -r <renderer>
+
+The renderer to use.
+
+=head2 -s <summary>
+
+The summary to use.
+
+=head2 -S <summary template>
+
+The template to use for the summary.
+
+=head2 -t <title>
+
+The title for the new entry.
+
+=head1 ACTIONS
+
+=head2 be
+
+Edits the body of the specified entry.
+
+Required switches...
+
+    -e <entry>
+
+=head2 bg
+
+Prints the body of the specified entry.
+
+=head2 bs
+
+Sets the body of the specified entry.
+
+Required switches...
+
+    -b <body file>
+    -e <entry>
+
+=head2 create
+
+Creates a new entry and print the new entry name.
+
+=head2 fg
+
+Gets the author/from.
+
+Required switches...
+
+    -e <entry>
+
+=head2 fs 
+
+Sets the author/from.
+
+Required switches...
+
+    -e <entry>
+    -f <from>
+
+=head2 ls
+
+Lists the entries in the specified entry.
+
+
+=head2 pa
+
+Adds a subpart.
+
+Required switches...
+
+    -e <entry>
+    -F <file>
+
+=head2 pe
+
+Extracts the subparts.
+
+Required switches...
+
+    -e <entry>
+    -F <directory>
+
+=head2 pl
+
+List the subparts.
+
+=head2 pr
+
+Removes a subpart.
+
+Required switches...
+
+    -e <entry>
+    -F <file>
+
+=head2 rm
+
+Removes the specified entry.
+
+Required switches...
+
+    -e <entry>
+
+=head2 rp
+
+Prints the raw directory.
+
+Required switches...
+
+    -e <entry>
+    -r <renderer>
+
+=head2 rc
+
+Checks if the content of a entry can be rendered.
+
+Optional switches...
+
+    -e <entry>
+    -p
+
+=head2 render 
+
+Renders the entry.
+
+Optional switches...
+
+    -e <entry>
+
+=head2 rg
+
+Gets the renderer.
+
+=head2 rs
+
+Sets the renderer.
+
+Required switches...
+
+    -e <entry>
+    -r <renderer>
+
+=head2 sg
+
+Gets the summary
+
+Required switches...
+
+    -e <entry>
+
+=head2 ss
+
+Sets the summary.
+
+Required switches...
+
+    -e <entry>
+    -s <summary>
+
+=head2 ts
+
+Sets the title.
+
+Required switches...
+
+    -e <entry>
+    -r <title>
+
+=head2 tg
+
+Gets the title.
+
+Required switches...
+
+    -e <entry>
+    -r <title>
+
+=head1 Environmental Variables:
+
+=head2 Toader_outputdir
+
+The output directory to use.
+
+=head2 Toader_from
+
+The author's email address. Overrode by -f.
+
+=head2 Toader_entry_summary
+
+The formatting for the display of the summary of the entries.
+
+=head1 Entry Summary Formatting:
+
+The entry summary is a Text::Template template. The default is '[$id] - [$from] - [$title]'
+The delimiters are '[' and ']' and the variables are as below.
+
+    $id - This is the entry ID.
+    $from - This is the author.
+    $title - This is the entry title.
+    $renderer - This is the renderer to use.
+    $summary - This is the entry summary.
+
+=head1 AUTHOR
+
+Copyright (c) 2013, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+unix
+
+=head1 README
+
+toader-entry - A tool for manipulating a Toader entry.
+
+=cut

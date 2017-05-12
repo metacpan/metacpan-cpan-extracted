@@ -1,0 +1,42 @@
+Revision history for Perl extension Tk::Carp.
+
+Version 1.2
+  Released to CPAN May 11, 2004.
+
+  Added support for different icons for deaths and warnings.
+
+  Added tkDeathsNonFatal option.
+
+  Suppressed handling of die inside of eval and added a Tk::Error
+  sub to compensate (Tk wraps all calls to user code in evals and
+  handles errors via Tk::Error).  This prevents spurrious errors that
+  are caught by eval and never propagated from being sent to dialogs.
+
+Version 1.1
+  Released to PerlMonks August 20, 2001.
+
+  Added tkwarn and tkdie.
+
+  Changed $Tk::Carp::UseMessageBox to $Tk::Carp::UseTkDialog and
+  inverted the sense.  Added useMessageBox as a special import directive.
+
+  Fixed bug that caused applications to remain running after had closed
+  the application's MainWindow.  This bug only occurred if the user
+  specified immediateWarnings, set $Tk::Carp::MainWindow and
+  a warning was raised before the application entered the MainLoop.  It
+  was due to the fact that the dialog created its own MainWindow, the
+  reference to which was lost when the user set $Tk::Carp::MainWindow,
+  and the fact that Tk's MainWindows are not destroy()'ed when
+  no more user variables point to them.
+
+  Fixed bug that caused widgets on the user's MainWindow to not respond to
+  any mouse events if a warning was raised (with immediateWarnings)
+  between the user setting $Tk::Carp::MainWindow and entering MainLoop
+  and which was displayed with messageBox.  I'm still not sure what caused
+  it; it appears to be a bug in (probably) messageBox().  I could only fix
+  it by creating a new MainWindow every time messageBox() was called,
+  and destroy()'ing it immediately afterwards.  This makes useTkDialog
+  even more relatively efficient.
+
+Version 1.0
+  Released to PerlMonks August 13, 2001.

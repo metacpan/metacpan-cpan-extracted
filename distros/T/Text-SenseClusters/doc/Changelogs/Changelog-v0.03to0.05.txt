@@ -1,0 +1,17 @@
+Changes made in Sense-Clusters version 0.03 during version 0.05
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota at Duluth
+
+(1)	Added precision options to matrix.pl and mcquitty.pl 
+
+(2)	Made matrix.pl more efficient for memory usage by removing a 2D array
+	structure
+
+(3)	Removed Sub Diagonal to Super Diagonal Conversion part from
+	mcquitty.pl
+
+(Changelog-v0.03to0.05 Last Updated on 01/26/2003 by Amruta)
+

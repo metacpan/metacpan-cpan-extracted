@@ -1,0 +1,6 @@
+Revision history for Perl extension Template::Parser::RemoteInclude.
+
+0.01  Tue May  3 13:13:24 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Template::Parser::RemoteInclude
+

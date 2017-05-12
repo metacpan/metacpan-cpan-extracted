@@ -1,0 +1,22 @@
+BEGIN OUTPUT BY Text::Ngrams version 
+
+1-GRAMS (total count: 8)
+FIRST N-GRAM: The
+ LAST N-GRAM: fox
+------------------------
+The	1
+brown	3
+fox	3
+quick	1
+
+2-GRAMS (total count: 7)
+FIRST N-GRAM: The brown
+ LAST N-GRAM: brown fox
+------------------------
+The brown	1
+brown fox	2
+brown quick	1
+fox brown	2
+quick fox	1
+
+END OUTPUT BY Text::Ngrams

@@ -1,0 +1,83 @@
+Revision history for Template::Flute::Style::CSS
+
+0.0081 Tue Nov 26 10:53:22 2013 CET
+
+    [BUG FIXES]
+
+    * Bump up requisite on Template::Flute to 0.0081 to prevent
+      using buggy version 0.0080 (rt.cpan.org #90610).
+
+0.0031 Wed Jun 20 18:17:50 2012 CEST
+
+    [BUG FIXES]
+ 
+    * Prevent inherited properties from being overridden by global
+      defaults.
+    * Only add pt unit for numbers when adding automatic margin for p
+      elements.
+
+    [ENHANCEMENTS]
+
+    * Use 1em as default margin for p tags.
+
+0.0030 Thu May 10 23:20:56 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for min-width and min-height properties.
+    * Add support for font-style property.
+    * Use always capital as first letter for font names.
+
+0.0026 Fri Feb 10 10:15:04 2012 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for vertical-align property.
+
+0.0025 Sun Jan 29 15:15:22 2012 CET
+
+    [BUGFIX]
+
+    * Fix bug disregarding zero margin.
+
+    [ENHANCEMENTS]
+
+    * Acknowledge translate function in transform property.
+    * Extend regular expression on transform property to allow real
+      numbers and negative angles for rotate value. 
+
+0.0024 Sun Jan 22 14:32:59 2012 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for display property.
+    * Add support for text-decoration property
+    * Add support for the various transform CSS properties.
+
+    [BUG FIXES]
+
+    * Fix CSS specificity of tag selectors.
+    * Fix bug determining border properties triggered by second class
+      overriding specific border property.
+
+0.0003  Wed May 25 11:03:06 2011 CEST
+	
+    [BUG FIXES]
+
+    * Fix properties for tag.class selectors.
+
+0.0002  Wed Apr 13 18:31:37 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for list-style CSS property.
+    * Add support for external stylesheets on local file system.
+    * Add test for loading example stylesheet.
+
+    [BUG FIXES]
+
+    * Fix MANIFEST.
+
+0.0001  Sun Mar 13 15:40:50 2011 CET
+
+    * Initial release.

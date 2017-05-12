@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution Told-Client,
+version 0.001:
+
+  A client to log messages into a told log recorder.
+See https://github.com/petershaw/told-LogRecorder to lern more about told.
+
+This software is copyright (c) 2013 by Peter Shaw.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,24 @@
+Revision history for Test-Is.
+
+20140823.1    2014-08-23    DOLMEN (Olivier Mengué)
+	Added missing documentation for the perl version check feature.
+
+20140823     2014-08-23    DOLMEN (Olivier Mengué)
+	New feature: perl version check: use Test::Is 'perl v5.10.0';
+	Coded and released from Sofia, at YAPC::EU::2014.
+
+20130423     2013-04-23    DOLMEN (Olivier Mengué)
+	Fix environment variable name (NON_INTERACTIVE =>
+          NONINTERACTIVE_TESTING) now that the final spec of the Lancaster has
+	  been published.
+	POD: add links to the spec.
+
+20130414.1    2013-04-19    DOLMEN (Olivier Mengué)
+	Fix t/simulation.t for perl < 5.14
+
+20130414     2013-04-16    DOLMEN (Olivier Mengué)
+	Initial release.
+	Work started at the Perl QA Hackathon 2013, just after the
+	  #LancasterConsensus on environment variables for skipping tests.
+	Work finished (well, for this release) in the train on my way back to
+	  home.

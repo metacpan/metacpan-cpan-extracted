@@ -1,0 +1,22 @@
+---
+abstract: 'Display time taken for each test'
+author:
+  - 'Chris Grau <cgrau@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAP-Formatter-Elapsed
+requires:
+  POSIX: 0
+  TAP::Formatter::Console: 0
+  Time::HiRes: 0
+  base: 0
+  strict: 0
+version: 0.02

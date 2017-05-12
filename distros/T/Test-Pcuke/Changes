@@ -1,0 +1,23 @@
+Revision history for Test-Cucumber
+
+0.0.6   03.12.2011
+	Fix: dependencies %-(
+	
+0.0.5   02.12.2011
+	Fix: dependencies
+
+0.0.4   02.11.2011
+	Fix: MANIFEST to include t/lib/.../Mockery.pm
+
+0.0.3	16.09.2011
+		Fix: Report shows error messages
+		Fix: --i18n xxx respects encoding
+		Fix: encoding option defaults to utf8
+
+0.0.2	09.09.2011
+		Add: pcuke --i18n <LANG>
+		Add: pcuke --encoding <ENCODING> option
+
+0.0.1    02.09.2011
+        First version, released on an unsuspecting world.
+

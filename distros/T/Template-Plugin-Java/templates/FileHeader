@@ -1,0 +1,18 @@
+[%# vim: set syntax=java: #%]
+
+[% IF package %]
+package $package;
+
+[% END %]
+import org.xml.sax.*;
+
+import java.sql.*;
+import java.sql.Date;
+
+import java.io.FileReader;
+import java.io.CharArrayWriter;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import java.util.Vector;
+import java.util.Enumeration;

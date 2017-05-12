@@ -1,0 +1,50 @@
+==================================================
+Changes from 2012-08-19 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.053 at 2013-08-19 13:57:10 +0000
+------------------------------------------
+
+  Change: 6d89337dd9ec3a57dbd8018649548ce9a650e344
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-19 09:56:32 +0000
+
+    [rt.cpan.org 87941] Remove TestLib from dependencies. We provide
+    that. 
+
+------------------------------------------
+version 0.052 at 2013-08-15 16:59:23 +0000
+------------------------------------------
+
+  Change: e04f7570efc7eef10ad009e904e16525ad69fca4
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-15 12:59:23 +0000
+
+    Add MANIFEST.SKIP to skip things like backup files. 
+
+------------------------------------------
+version 0.051 at 2013-08-15 06:48:51 +0000
+------------------------------------------
+
+  Change: 7baa879c1bb478f922c420eb01d8b71d01f94972
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-15 02:48:51 +0000
+
+    Update copyright date. 
+
+  Change: 6a7502e739d0c1c59862a209578c49e9196f57c1
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-15 02:39:41 +0000
+
+    Fix example for modern POE::Component::IRC. 
+
+  Change: c33a78fbdf0f4f9ba780365e45f7ea30733af59a
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-11 17:54:06 +0000
+
+    Switch to Dist::Zilla. 
+
+================================================
+Plus 2 releases after 2012-08-19 00:00:00 +0000.
+================================================

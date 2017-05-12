@@ -1,0 +1,35 @@
+Text-Microformat
+
+Text::Microformat is a Microformat parser for Perl.
+
+Text::Microformat sports a very pluggable API, which allows not only new kinds
+of Microformats to be added, but also extension of the parser itself, to allow
+new parsing metaphors and source document encodings.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+BUGS
+	
+Log bugs and feature requests here: 
+	
+http://code.google.com/p/ufperl/issues/list
+
+SUPPORT
+
+Project homepage: 
+
+http://code.google.com/p/ufperl/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Keith Grennan
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

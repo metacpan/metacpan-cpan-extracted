@@ -1,0 +1,24 @@
+Revision history for Perl extension Tie::OneOff
+
+1.03 Sat Feb 2 2008;
+	- Added pod.t to manifest - it was omitted in error in 1.02
+
+1.02 Wed Dec 12 2007;
+	- Fix assumption that Carp::croak is pre-loaded
+
+1.01 Wed Sep 3 2003;
+	- documentation enhancements and finally call it 'released'!
+
+0.4  Mon Sep 1 2003;
+	- added hash/array/scalar/lvalue methods
+	- thanks to Anno Siegel <anno4000@lublin.zrz.tu-berlin.de>
+
+0.3  Wed Aug 20 17:41:29 2003
+	- added shorthand for FETCH-only variables
+	- thanks to Iain Truskett <spoon@cpan.org>
+
+0.2  Wed Feb 19 12:15:06 2003
+	- fixed test suite problem on some platforms;
+
+0.1  Mon Oct 14 15:15:06 2002
+	- original version;

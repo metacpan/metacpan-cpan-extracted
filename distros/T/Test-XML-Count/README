@@ -1,0 +1,44 @@
+Test-XML-Count version 0.01
+===========================
+
+This is a testing module that enables you to quickly verify the
+number of occurances that a given element has at a given depth in
+an XML document.  For example, you can use it as a validation test
+to ensure than <foo>...</foo> appears at least 4 times at some
+specific location in your XML document. Alternatively you can
+ensure that the element occured exactly some number of times, or
+at most some number of times.
+
+Element locations are specified in XPATH, which is basically a
+directory-structure-like XML path specification (e.g. a/b/c
+would point to any/all <c/> located at <a><b><c/><b/><a/>).
+
+It's a basic test, yes.  It is important to realize that basic
+tests should be the basis of any comprehensive and complete test
+suite.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML::LibXML
+Test::Simple (Test::More/Test::Builder -- core)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Adam J Kaplan and The New York Times Company
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

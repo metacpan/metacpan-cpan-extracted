@@ -1,0 +1,30 @@
+NAME
+    Template::Plugin::Hatena - TT plugin for Text::Hatena
+
+SYNOPSIS
+      [% USE Hatena -%]
+      [% FILTER hatena -%]
+      * Hello, World!
+
+      - Good Morning
+      -- Greetings
+
+      * Farewell
+
+      - Good Bye
+      - Thank you
+      [%- END %]
+
+DESCRIPTION
+    Template::Plugin::Hatena is a plugin for TT, which format your text with
+    Hatena Style.
+
+SEE ALSO
+    Template, Text::Hatena
+
+AUTHOR
+    Naoya Ito <naoya@bloghackers.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

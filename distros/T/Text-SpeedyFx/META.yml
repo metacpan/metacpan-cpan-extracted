@@ -1,0 +1,24 @@
+---
+abstract: 'tokenize/hash large amount of strings efficiently'
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires:
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-SpeedyFx
+requires:
+  List::MoreUtils: '0'
+  autodie: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/creaktive/Text-SpeedyFx/issues
+  homepage: https://github.com/creaktive/Text-SpeedyFx
+  repository: git://github.com/creaktive/Text-SpeedyFx.git
+version: '0.012'
+x_contributors:
+  - 'Sergey Romanov <sromanov-dev@yandex.ru>'

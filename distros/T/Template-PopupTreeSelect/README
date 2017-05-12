@@ -1,0 +1,47 @@
+Template::PopupTreeSelect version 0.9
+=====================================
+
+This module is a subclass of HTML::PopupTreeSelect by Sam Tregar.
+It uses Template-Toolkit rather than HTML::Template.
+
+This module creates an HTML popup tree selector.  The HTML and
+Javascript produced will work in Mozilla 1+ (Netscape 6+) on all
+operating systems, Microsoft IE 5+ and Safari 1.0.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Then copy the images from HTML::PopupTreeSelect in images/ into a
+place here your web server can find them.  Remember where you put them
+so you'll know what value to set for image_path when you call new().
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::PopupTreeSelect 1.4
+  Template 2.08
+  Test::More
+  Carp
+
+
+CONTRIBUTORS
+
+My initial version was a modified copy of HTML::PopupTreeSelect by Sam
+Tregar.  Chris Nandor modified it to subclass instead of replace it.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Jonas Liljegren
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.

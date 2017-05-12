@@ -1,0 +1,41 @@
+[% USE ArrayRef %]
+[% USE Dumper %]
+
+[% PERL %]
+    $stash->set( get_zero  => sub { ()     } );
+    $stash->set( get_one   => sub { (1)    } );
+    $stash->set( get_two   => sub { (1, 2) } );
+[% END %]
+
+[% SET zero = get_zero %]
+[% SET one  = get_one %]
+[% SET two  = get_two %]
+[% Dumper.dump(zero) %] # $VAR1 = '';
+[% Dumper.dump(one) %]  # $VAR1 = 1;
+[% Dumper.dump(two) %]  # $VAR1 = [ 1, 2 ];
+
+[% SET zero = get_zero.list %]
+[% SET one  = get_one.list %]
+[% SET two  = get_two.list %]
+[% Dumper.dump(zero) %] # $VAR1 = '';
+[% Dumper.dump(one) %]  # $VAR1 = [ 1 ];
+[% Dumper.dump(two) %]  # $VAR1 = [ 1, 2 ];
+
+[% SET zero = ArrayRef.get_zero %]
+[% SET one  = ArrayRef.get_one %]
+[% SET two  = ArrayRef.get_two %]
+[% Dumper.dump(zero) %] # $VAR1 = [];
+[% Dumper.dump(one) %]  # $VAR1 = [ 1 ];
+[% Dumper.dump(two) %]  # $VAR1 = [ 1, 2 ];
+
+[% USE arrayref = ArrayRef %]
+[% SET zero = arrayref.get_zero %]
+[% SET one  = arrayref.get_one %]
+[% SET two  = arrayref.get_two %]
+[% Dumper.dump(zero) %] # $VAR1 = [];
+[% Dumper.dump(one) %]  # $VAR1 = [ 1 ];
+[% Dumper.dump(two) %]  # $VAR1 = [ 1, 2 ];
+
+# in DBIC cases...
+[% SET items = row.arrayref.items %]
+[% SET items = row.items_rs.arrayref.all %]

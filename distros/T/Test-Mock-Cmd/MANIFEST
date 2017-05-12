@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Test/Mock/Cmd.pm
+lib/Test/Mock/Cmd/TestUtils.pm
+lib/Test/Mock/Cmd/TestUtils/X.pm
+lib/Test/Mock/Cmd/TestUtils/Y.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+t/01.system.t
+t/02.qx.t
+t/03.exec.t
+t/perlcritic.t
+t/perltidy.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

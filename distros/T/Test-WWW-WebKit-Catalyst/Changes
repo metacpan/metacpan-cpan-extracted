@@ -1,0 +1,9 @@
+0.02 2013-10-01 16:00:00 CEST
+    * Fix spurious tests exiting with error code
+    * Allow Gtk3 to be used in Catalyst backends
+    * Do not fail tests if Xvfb is not available
+
+0.01 2012-02-23 17:00:00 CET
+    * first public version
+
+# vim: expandtab shiftwidth=4 sts=4:

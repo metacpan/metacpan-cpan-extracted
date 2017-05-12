@@ -1,0 +1,101 @@
+                       Tie::ShadowHash version 1.0
+         (Merge multiple data sources into a hash with overrides)
+
+  Copyright 1999, 2002, 2010 by Russ Allbery <rra@stanford.edu>.  This
+  program is free software; you may redistribute it and/or modify it under
+  the same terms as Perl itself.
+
+  I welcome all bug reports and patches for this package (and in
+  particular, if you're looking for a project, see TODO).  However, please
+  be aware that I tend to be extremely busy and to get a lot of mail.
+  I'll save your mail and get to it as soon as I can, but depending on how
+  busy I am it may take me a couple of months.
+
+BLURB
+
+  Tie::ShadowHash is a Perl module that lets you stack together multiple
+  hash-like data structures, including tied hashes such as DB_File
+  databases or text files parsed into a hash, and then treat them like a
+  merged hash.  Lookups are handled in the order of the added sources.
+  You can store additional values, change values, and delete values from
+  the hash and those actions will be reflected in later operations, but
+  the underlying objects are not changed.
+
+DESCRIPTION
+
+  If you have a bunch of separate sources of data in the form of Perl
+  hashes, tied hashes (of whatever type, including on-disk databases tied
+  with DB_File, GDBM_File, or similar modules), or text files that you
+  want to turn into hashes, and you want to be able to query all of those
+  sources of data at once for a particular key without having to check
+  each one of them individually each time, this module is what you're
+  looking for.  If you want to use a hash-like data source, even just one,
+  but make modifications to its data over the course of your program that
+  override its contents while your program runs but which don't have any
+  permanent effect on it, then this module may be what you're looking for.
+
+  Tie::ShadowHash lets you create a "shadow hash" that looks like a
+  regular Perl hash to your program but behind the scenes queries a whole
+  list of data sources.  All the data sources underneath have to also
+  behave like Perl hashes, but that's the only constraint.  They can be
+  regular Perl hashes or other tied hashes, including tied DB_File or
+  GDBM_File hashes or the like to access on-disk databases.  All data
+  sources are treated as read-only; modifications to any data is stored in
+  the shadow hash itself, and subsequent accesses reflect any
+  modifications, but none of the data sources are changed.
+
+  See the POD documentation for complete details, features, and usage.
+
+REQUIREMENTS
+
+  Perl 5.006 or later is the only requirement for this module.
+
+  To run the test suite, Test::More is required.  It is available from
+  CPAN and part of Perl core as of 5.6.2.
+
+  The test suite includes a formatting and spelling check of all of the
+  POD documentation.  To check formatting, Test::Pod is required.  To
+  check spelling, Pod::Spell and either aspell or ispell with the american
+  dictionary are also required.  The user's path is searched for aspell or
+  ispell and aspell is preferred.  Spelling tests are disabled by default
+  since spelling dictionaries differ too much between systems.  To enable
+  those tests, set RRA_MAINTAINER_TESTS to a true value.
+
+INSTALLATION
+
+  Follow the standard installation procedure for Perl modules, which is to
+  type the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+  You'll probably need to do the "make install" as root.  If instead you
+  wish to install the module by hand, simply copy ShadowHash.pm into a
+  directory named Tie in your Perl library directory.
+
+HOMEPAGE AND SOURCE REPOSITORY
+
+  The podlators web page at:
+
+      http://www.eyrie.org/~eagle/software/shadowhash/
+
+  will always have the current version of this package, the current
+  documentation, and pointers to any additional resources.
+
+  Tie::ShadowHash is maintained using Git.  You can access the current
+  source by cloning the repository at:
+
+      git://git.eyrie.org/perl/shadowhash.git
+
+  or view the repository on the web at:
+
+      http://git.eyrie.org/?p=perl/shadowhash.git
+
+THANKS
+
+  To Chris Nandor <pudge@pobox.com> for testing this module on the Mac,
+  pointing out that SDBM_File wasn't available there, mentioning that SDBM
+  was byte-order-dependent anyway, and suggesting using AnyDBM_File
+  instead.

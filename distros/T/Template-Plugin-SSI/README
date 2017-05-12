@@ -1,0 +1,36 @@
+Template/Plugin/SSI version 0.11
+================================
+
+A Template Toolkit Plugin that provides an easy way to include Apache's 
+SSI within a template. (acts as a wrapper to CGI::SSI)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::SSI >= 0.82
+
+
+AUTHORS
+  
+  Corey Wilson           <cwilson@sbgnet.com>
+  Mike Kralec            <mkralec@sbgnet.com>
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 - Sinclair Broadcast Group
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

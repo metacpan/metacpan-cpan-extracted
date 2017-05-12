@@ -1,0 +1,20 @@
+Revision history for Tree-FromStruct
+
+0.03    2016-03-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention other modules that create tree.
+
+
+0.02    2016-03-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- To avoid duplicated effort, trim documentation and refer to
+	  Role::TinyCommons::Tree::FromStruct instead.
+
+
+0.01    2016-03-23 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,197 @@
+0.33    - bugfix release
+        - fixed dist/build issue
+0.32    - bugfix release
+        - fixed 64-bit compatibility issue (tobez@tobez.org)
+0.31    - keeping up with the joneses release
+        - added META.yml
+        - added 'use warnings'
+        - switched from 'use vars' to 'our'
+0.30    - bugfix release
+        - fixed 2 memory leaks (casret@pobox.com)
+        - added tests for accidental, but useful, functionality
+0.29    - bugfix release
+        - fixed concatenation of multiple variables in an argument
+0.28    - bugfix release
+        - fixed core when loop name expanded to null value
+0.27    - bugfix release
+        - fixed warnings when perl extension tags return undef
+0.26    - bugfix release
+        - fixed core when passing null values into perl extension tags
+          (dan@unpossible.com)
+0.25	- bugfix release
+	- fixed hanging when a tag pair isn't closed (jon@binadopta.com)
+	- fixed Win32 crash in template_parse_(file|string) (dan@unpossible.com)
+	- updated contact information
+0.24	- port release
+	- port to Win32 (ak@dasburo.de)
+	- switched tests around to use Test.pm (neil@kenamea.com)
+	- added C++ support for fetch_loop_iteration(), remove_simple() and
+	  remove_pair()
+	- added documentation for the fetch_loop_iteration() function
+	- added remove_simple() and remove_pair() functions, and associated
+	  tests and documentation
+0.23	- redesign release
+	- added buffer to context structure to avoid mallocs
+	- added context_root function to return the root of a group of contexts
+	- eliminated memory leak in new parsing engine
+	- minor syntax fix to template_cc.h
+	- one-line wrapper functions replaced with macros
+	- minor optimizations to echo and include tag functions
+	- optimizations to the new parsing engine
+	- completely rewrote the parser as a separate tokenizer and a parser,
+	  a much cleaner approach
+0.22	- feature release
+	- removed calls to destroy() from tests
+	- added destroy() to Tmpl.pm for backwards compatibility, and removed
+	  references to destroy() from documentation
+	- made destructor work without explicit calling by piggybacking in the
+	  MAGIC structure
+	- updated typemap and perl_tags.c to use '~' magic for storage of
+	  context_p variables, so that the pointer can't be changed from Perl
+	- updated parse_arg() to use append_output() for string management
+	- fixed a minor bug in the typemap
+	- added template_fetch_loop_iteration function, for loading an
+	  existing iteration from a loop by number; added related tests
+	  and XS code
+	- removed some debugging code which was accidentally released
+	- made 2_debug.t test the debug tag more rigorously
+0.21	- bugfix release
+	- fixed a severe bug which broke debugging output completely - the
+	  non-anonymous children of anonymous contexts were incorrectly
+	  inheriting the anonymous flag (gphan@sydney.daveb.net)
+	- removed extraneous memory allocation from context_init()
+	- added t/2_debug.* for minimal testing of the debugging tag pair.
+0.20	- bugfix release
+	- fixed a null termination bug in the parser (ak@dasburo.de)
+	- added t/3_relationships.t to test for bugs related to the size of
+	  variables and the size of variable names
+0.19	- performance release
+	- modified append_output() in parser.c to never call strlen(), which
+	  is a *huge* performance win for large templates
+	- removed unnecessary atoi() call in default_tags.c (ak@dasburo.de)
+0.18	- bugfix release
+	- added additional tests for large input problems
+	- fixed a bug (introduced in 0.17) with variables larger than 1024
+	  bytes, under certain circumstances (ak@dasburo.de)
+0.17	- bugfix and feature release
+	- moved some constant strings into #defines where they belonged
+	- moved the placeholder debugging code into the new 'flags', and
+	  attendant changes
+	- fixed instances in C code of multiple recalculations of the
+	  lengths of the same string
+	- optimized the context structure by using bitwise 'flags' field
+	  rather than several boolean fields and internal variables
+	- echo tag now echoes all arguments instead of only the first
+	- added 3_deep_nesting.t to test the functioning of extremely deeply
+	  nested contexts
+	- added template_strerror(), Text::Tmpl::errno, Text::Tmpl::strerror
+	  and very basic test code
+	- added template_errno and relevant error reporting code
+	- fixed innumerable cases of duplicated argument checking in C code
+	- fixed a couple of small potential bugs in C code
+	- made boolean tags (if and ifn) treat strings which don't contain
+	  numbers as true rather than false (ak@dasburo.de)
+	- replaced calloc() with malloc() through most of the code
+	- added a pointer to the last peer context (loop iteration) to the
+	  context structure to improve the performance of long loops
+	- integrated with Devel::PPPort v1.0007
+	- added examples/ directory, and a few simple example programs
+	- added C++ class header file template_cc.h
+0.16	- compatibility release
+	- reversed the #defines for backwards compatibility with na and
+	  sv_undef (schinder@pobox.com)
+	- included XSUB.h in perl_tags.c so that it'll still work with a perl
+	  built with PERL_IMPLICIT_CONTEXT (multiplicity, threads or
+	  perl_object)
+0.15	- bugfix and feature release
+	- fixed template.c problem with systems which don't define MAXPATHLEN
+	  (Artur.Silveira@rezo.com)
+	- added t/3_huge_input.t to test large string input to some functions
+	- added t/3_long_lists.t to test adding tons of variables to a
+	  context, and tons of loop iterations
+	- simplified the logic of adding to certain linked list structures
+	- fixed warnings from Tmpl.xs (Artur.Silveira@rezo.com)
+	- removed '-g' flag from default compiler flags (you can always add it 
+	  back if you need it...)
+	- tidied up the code in Tmpl.xs a bit
+	- tidied up the code in typemap a bit
+	- Minor changes to typemap and Tmpl.xs to better support subclassing.
+	- Added t/3_subclass tests for the correct behavior of subclassed
+	  packages of Text::Tmpl.
+0.14	- bugfix and feature release
+	- Cleaned up the perl_tags.c code a little.
+	- Moved tag delimiters into context-specific variables.  (No more
+	  globals!)  Related test and documentation changes.  As a side
+	  effect, there is no arbitrary limit on tag delimiter size anymore.
+	- Updated perl_tags.c and Tmpl.xs so that perl tags are also
+	  context-specific.
+	- Made simple tags and tag pairs context-specific, with attendant
+	  test and documentation changes.  This fixes bugs related to
+	  multiple contexts.
+	- Added 3_multiplicity test to detect glaring multiple context
+	  problems.  (Vladimir Tomasovic <Vladimir.Tomasovic@kiss.sk>)
+	- Added alias_simple and alias_pair functions, and all relevant
+	  tests and documentation.
+	- switched to PL_na and PL_sv_undef notation, and added #defines
+	  for backwards compatibility (schinder@pobox.com)
+0.13	- bugfix and feature release
+	- added t/1_exporter.t to test use of exported symbols
+	- made Text::Tmpl a subclass of Exporter, and added the package
+	  global functions and constants to @EXPORT_OK
+	- updated documentation and tests to use new instead of init
+	- added a new() constructor, which allows subclassing and whose
+          syntax is the familiar "my $context = new Text::Tmpl;"
+	- added a CREDITS file
+	- added tests to t/3_undef_input.t for set_values()
+	- fixed warnings generated by set_values() when some values in the
+	  hashref are undefined (Tibor Lorincz <Tibor.Lorincz@kiss.sk>)
+	- fixed a bug with set_dir() requiring that the directory end with
+	  a trailing slash to work correctly (Tibor Lorincz
+          <Tibor.Lorincz@kiss.sk>)
+0.12	- interim release
+	- updated the README file for readability and accuracy
+	- moved libtmpl stuff into base directory & got rid of standalone
+	  Makefile; also added libtmpl.a target to Makefile.PL
+	- tiny fix to Tmpl.xs
+	- removed assumption about gcc from libtmpl/Makefile
+	  (Artur.Silveira@rezo.com)
+0.11	- bugfix release
+	- removed t/2_debug.* for now, because the test is filesystem
+	  location dependent. (schinder@pobox.com)
+	- added documentation of the debug tag pair, and extended the
+	  template_syntax document in general.
+	- added context_get_value() call to Tmpl.xs
+0.10	- interim release
+	- updated README file
+	- changed the memory allocation scheme used by the parser so that
+          it is more efficient with large variable values and templates
+	- made perl_simple_tag and perl_tag_pair bless the contexts
+	  they pass into the underlying perl functions they call
+	- added documentation for set_values()
+	- added set_values() method
+	- updated the documentation a bit
+	- moved tests into t/*.t format & started adding more tests
+	- made XS code & typemap more robust in the face of undef input
+0.09	- bugfix release
+	- fixed a bunch of memory leaks in the underlying C library
+	- updated README file
+	- added TODO file
+0.08	- bugfix release
+	- fixed a coredumping problem when parsing a nonexistent or empty
+	  template
+0.07	- bugfix release
+	- fixed a memory leak in Tmpl.xs
+	- added a test or two
+	- fixed another bug in Tmpl.xs
+0.06	- bugfix release
+	- fixed a bug in Tmpl.xs, which may have been the root of all these
+	  optimizer woes.
+0.05	- compatibility fix release
+	- added some casts to avoid compiler warnings on solaris.
+	- gcc bug on solaris.  Added hints/solaris.pl as workaround.
+          (schinder@pobox.com)
+0.04	- compatibility fix release
+	- ExtUtils::MakeMaker will write a Makefile that is syntactically
+	  incorrect for gmake(1) if there are .pod files with '::' in them.
+	  Fixed. (schinder@pobox.com)
+0.03	- first public release

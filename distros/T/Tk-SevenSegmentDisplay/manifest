@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+manifest
+readme
+t/Tk-SevenSegmentDisplay.t
+lib/Tk/SevenSegmentDisplay.pm

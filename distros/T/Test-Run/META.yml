@@ -1,0 +1,122 @@
+---
+abstract: 'Base class to run standard TAP scripts.'
+author:
+  - unknown
+build_requires:
+  Test::Trap: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - back-end
+  - harness
+  - prove
+  - qa
+  - QA
+  - 'quality assurance'
+  - run
+  - runprove
+  - tap
+  - TAP
+  - TAP::Harness
+  - test
+  - testing
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Run
+provides:
+  Test::Run:
+    file: lib/Test/Run.pm
+  Test::Run::Assert:
+    file: lib/Test/Run/Assert.pm
+    version: '0.0304'
+  Test::Run::Base:
+    file: lib/Test/Run/Base.pm
+  Test::Run::Base::PlugHelpers:
+    file: lib/Test/Run/Base/PlugHelpers.pm
+  Test::Run::Base::Plugger:
+    file: lib/Test/Run/Base/Plugger.pm
+  Test::Run::Base::Struct:
+    file: lib/Test/Run/Base/Struct.pm
+  Test::Run::Class::Hierarchy:
+    file: lib/Test/Run/Class/Hierarchy.pm
+  Test::Run::Core:
+    file: lib/Test/Run/Core.pm
+    version: '0.0304'
+  Test::Run::Core_GplArt:
+    file: lib/Test/Run/Core_GplArt.pm
+  Test::Run::Iface:
+    file: lib/Test/Run/Iface.pm
+  Test::Run::Obj:
+    file: lib/Test/Run/Obj.pm
+    version: '0.0304'
+  Test::Run::Obj::CanonFailedObj:
+    file: lib/Test/Run/Obj/CanonFailedObj.pm
+  Test::Run::Obj::Error:
+    file: lib/Test/Run/Obj/Error.pm
+  Test::Run::Obj::Error::Straps:
+    file: lib/Test/Run/Obj/Error.pm
+  Test::Run::Obj::Error::Straps::CannotRunPerl:
+    file: lib/Test/Run/Obj/Error.pm
+  Test::Run::Obj::Error::TestsFail:
+    file: lib/Test/Run/Obj/Error.pm
+  Test::Run::Obj::Error::TestsFail::Bailout:
+    file: lib/Test/Run/Obj/Error.pm
+  Test::Run::Obj::Error::TestsFail::NoOutput:
+    file: lib/Test/Run/Obj/Error.pm
+  Test::Run::Obj::Error::TestsFail::NoTestsRun:
+    file: lib/Test/Run/Obj/Error.pm
+  Test::Run::Obj::Error::TestsFail::Other:
+    file: lib/Test/Run/Obj/Error.pm
+  Test::Run::Obj::FailedObj:
+    file: lib/Test/Run/Obj/FailedObj.pm
+  Test::Run::Obj::IntOrUnknown:
+    file: lib/Test/Run/Obj/IntOrUnknown.pm
+  Test::Run::Obj::TestObj:
+    file: lib/Test/Run/Obj/TestObj.pm
+  Test::Run::Obj::TotObj:
+    file: lib/Test/Run/Obj/TotObj.pm
+  Test::Run::Output:
+    file: lib/Test/Run/Output.pm
+  Test::Run::Plugin::CmdLine::Output:
+    file: lib/Test/Run/Plugin/CmdLine/Output.pm
+  Test::Run::Sprintf::Named::FromAccessors:
+    file: lib/Test/Run/Sprintf/Named/FromAccessors.pm
+  Test::Run::Straps:
+    file: lib/Test/Run/Straps.pm
+    version: '0.0304'
+  Test::Run::Straps::Base:
+    file: lib/Test/Run/Straps/Base.pm
+  Test::Run::Straps::EventWrapper:
+    file: lib/Test/Run/Straps/EventWrapper.pm
+  Test::Run::Straps::StrapsDetailsObj:
+    file: lib/Test/Run/Straps/StrapsDetailsObj.pm
+  Test::Run::Straps::StrapsTotalsObj:
+    file: lib/Test/Run/Straps/StrapsTotalsObj.pm
+  Test::Run::Straps_GplArt:
+    file: lib/Test/Run/Straps_GplArt.pm
+  Test::Run::Trap::Obj:
+    file: lib/Test/Run/Trap/Obj.pm
+requires:
+  File::Spec: '0.6'
+  IPC::System::Simple: '1.21'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  MRO::Compat: '0'
+  Moose: '0'
+  MooseX::StrictConstructor: '0'
+  Scalar::Util: '0'
+  TAP::Parser: '3.09'
+  Test::Harness: '2.53'
+  Text::Sprintf::Named: '0.02'
+  UNIVERSAL::require: '0'
+  perl: '5.008'
+resources:
+  homepage: http://web-cpan.shlomifish.org/modules/Test-Run/
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/shlomif/perl-test-run
+version: '0.0304'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

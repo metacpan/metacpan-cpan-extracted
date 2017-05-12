@@ -1,0 +1,47 @@
+{
+   "abstract" : "Translate Kwiki formatted text into HTML",
+   "author" : [
+      "Ruey-Cheng Chen <rueycheng@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-KwikiFormat",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Kwiki" : "0.39",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Text::KwikiFormat" : {
+         "file" : "lib/Text/KwikiFormat.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

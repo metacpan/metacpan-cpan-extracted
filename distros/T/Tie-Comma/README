@@ -1,0 +1,52 @@
+Tie::Comma, version 0.04
+========================
+
+This module provides Yet Another way to format numbers with commas,
+this time via a tied hash.  This makes it very easy to format a number
+while inserting it into a string.
+
+EXAMPLES
+
+ # Simple formatting with commas:
+ $a = 1234567.89;
+ print "With commas: $comma{$a}";      => "With commas: 1,234,567.89"
+
+ # Specify number of decimal places:
+ print "1 decimal:   $comma{$a,1}";    => "1 decimal:   1,234,567.9"
+ print "3 decimals:  $comma{$a,3}";    => "3 decimals:  1,234,567.890"
+
+ # Specify field width:
+ print "Min width:  '$comma{$a,0,12}'" => "Min width:  '   1,234,568'
+
+ # In-string computations:
+ print "Seconds in a year: $comma{365 * 24 * 60 * 60}";
+    => "Seconds in a year: 31,536,000";
+
+DEVELOPMENT STATE
+
+This is an early version of this module, so who knows what bugs lurk.
+
+If you find any bugs, or if any behavior of Comma surprises you, I
+would be grateful if you could send me an email message about it.
+Thanks.
+
+INSTALLATION
+
+To install this module, do the standard Perl module four-step:
+
+   perl Makefile.PL    or    perl Makefile.pl LIB='my/install/path'
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Exporter.pm and Carp.pm, both of which come with Perl.
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode, roode@cpan.org
+
+Copyright (c) 2005 by Eric J. Roode.  All Rights Reserved.
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

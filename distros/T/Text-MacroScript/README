@@ -1,0 +1,30 @@
+============================================================================
+This module was adopted by pscust@cpan.org
+============================================================================
+
+You can install this using in the usual Perl fashion
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+The documentation is in the module file.  Once you install
+the file, you can read it with perldoc.
+
+	perldoc Text::MacroScript 
+
+If you want to read it before you install it, you can use
+perldoc directly on the module file.
+
+	perldoc MacroScript.pm
+
+This module repository is kept in Github, please feel free to submit issues, 
+fork and send pull requests.
+
+	https://github.com/pauloscustodio/Text-MacroScript
+
+
+Enjoy, 
+
+Paulo Custodio, pscust@cpan.org

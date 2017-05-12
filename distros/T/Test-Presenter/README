@@ -1,0 +1,41 @@
+
+Test::Presenter is a general purpose tool for generating software testing
+reports including test run summaries, performance graphs, historical
+comparison charts, and diff comparisons.  New types or layouts of
+reports can be created using Template-Toolkit.
+
+Tests tend to have a wide diversity in the styles used for their results
+files.  Even though they're generally all some form of plain text,
+definition of units, column names, and so forth can vary widely from
+test to test.  Thus, you should use Test::Parser to render the data from
+these different tests into a neutral XML format called TRPI.
+
+TRPI files are very information-rich, but as a consequence they are very
+large.  However, since any test's results can be represented in the TRPI
+file, it is useful as a generalized interchange format.
+
+From the user's perspective, if Test::Parser and Test::Presenter are used
+together, the fact that TRPI is used can be safely ignored; any test
+format that Test::Parser understands can "magically" be transformed into
+any report style that Test::Presenter supports.
+
+Please see doc/Overview.txt for more details.
+
+For more information on how to use the script, see the
+pod documentation via the command
+  perldoc Test::Presenter
+or, after installation, view the man pages with
+  man Test::Presenter
+
+For instructions on how to install the script, see the
+file INSTALL.
+
+Problems, questions, etc. may be sent to crucible-devel@lists.sf.net
+
+Test-Presenter is Copyright (c) 2006, by John Daiker, and the Open Source
+Development Labs.  All rights reserved. You may distribute this code
+under the terms of either the GNU General Public License or the Artistic
+License, as specified in the Perl README file.
+
+
+

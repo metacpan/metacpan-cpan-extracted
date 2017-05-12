@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Template-Plugin-ListUtil
+version: 0.02
+license: perl
+distribution_type: module
+requires:
+  List::Util: 0
+  Template: 2.06
+  Template::Plugin::VMethods: 0.02
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Template::Plugin::ListUtil:
+    file: lib/Template/Plugin/ListUtil.pm
+    version: 0.02
+  Template::Plugin::ListUtilVMethods:
+    file: lib/Template/Plugin/ListUtilVMethods.pm
+generated_by: Module::Build version 0.20

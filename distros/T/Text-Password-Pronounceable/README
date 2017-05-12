@@ -1,0 +1,56 @@
+NAME
+    Text::Password::Pronounceable - Generate pronounceable passwords
+
+SYNOPSIS
+      # Generate a pronounceable password that is between 6 and 10 characters.
+      Text::Password::Pronounceable->generate(6, 10);
+
+      # Ditto
+      my $pp = Text::Password::Pronounceable->new(6, 10);
+      $pp->generate;
+
+DESCRIPTION
+    This module generates pronuceable passwords, based the the English
+    digraphs by D Edwards.
+
+  METHODS
+    new
+          $pp = Text::Password::Pronounceable->new($min, $max);
+          $pp = Text::Password::Pronounceable->new($len);
+
+        Construct a password factory with length limits of $min and $max. Or
+        create a password factory with fixed length if only one argument is
+        provided.
+
+    generate
+          $pp->generate;
+          $pp->generate($len);
+          $pp->generate($min, $max);
+
+          Text::Password::Pronounceable->generate($len);
+          Text::Password::Pronounceable->generate($min, $max);
+
+        Generate password. If used as an instance method, arguments override
+        the factory settings.
+
+HISTORY
+    This code derived from mpw.pl, a bit of code with a sordid history.
+
+    *   CPAN module by Chia-liang Kao 9/11/2006.
+
+    *   Perl cleaned up a bit by Jesse Vincent 1/14/2001.
+
+    *   Converted to perl from C by Marc Horowitz, 1/20/2000.
+
+    *   Converted to C from Multics PL/I by Bill Sommerfeld, 4/21/86.
+
+    *   Original PL/I version provided by Jerry Saltzer.
+
+LICENSE
+    Copyright 2006 by Best Practical Solutions, LLC.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

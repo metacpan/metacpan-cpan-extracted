@@ -1,0 +1,46 @@
+TODO
+
+. Use configuration file for default options to test() and files();
+for example, it could be named .testusage, searched for in same place
+as Usage.pm, $HOME; if it didn't exist, wouldn't use it.
+
+. Allow files() to take a list of files as an argument, in addition
+to/instead of the 'd' option.
+
+. Explain what type of glob a and e match. Make the globs a bit
+smarter, allowing for example 'a[123]'.
+
+. Warn (die?) if test labels are duplicated.
+
+. Fix running under debug: it is broken, because of the capture of the
+I/O streams.
+
+. In addition to ok(), it would be nice to have methods similar
+  to the ones supplied by the other Perl Test modules, like;
+
+  is  ($this, $that, $test_name);
+  isnt($this, $that, $test_name);
+  like  ($this, qr/that/, $test_name);
+  unlike($this, qr/that/, $test_name);
+  cmp_ok($this, '==', $that, $test_name);
+  can_ok($module, @methods);
+  isa_ok($object, $class);
+  pass($test_name);
+  fail($test_name);
+
+      # I'd like methods like these to be generally available
+      # predicates, not buried inside a test module.
+  is_deeply($complex_structure1, $complex_structure2, $test_name);
+  eq_array(\@this, \@that);
+
+  SKIP: {
+     skip $why, $how_many unless $have_some_feature;
+     ok( foo(),       $test_name );
+     is( foo(42), 23, $test_name );
+  };
+  TODO: {
+     local $TODO = $why;
+     ok( foo(),       $test_name );
+     is( foo(42), 23, $test_name );
+  };
+

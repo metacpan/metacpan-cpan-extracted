@@ -1,0 +1,55 @@
+Revision history for Tapper-Test
+
+5.0.0     2016-02-15
+        - release version bump only
+
+4.1.2     2012-11-19
+        - dzil pluginbundle TAPPER
+
+4.1.1     2012-10-19
+        - upload again
+
+4.0.2     2012-06-04
+        - more laxity on those not-so-clever tests
+
+4.0.1     2012-05-16
+        - platform independent sysinfo
+        - fix tests
+        - big Dist::Zilla roundhouse kick
+
+2011-11-24  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v3.0.12
+
+	* Fix stupidity. Making the information retrieval platform
+	  independent and then have Linux and machine specific
+	  unittests is, erm, stupid.
+
+2011-08-10  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v3.0.11
+
+	* Get information platform independent by using Sys::Info
+	  instead of using uname, /proc/cpuinfo, etc.
+
+2011-04-07 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* changelog
+	* [DOC] documentation now works
+	* more robust 00-tapper-meta
+	* release version++ roundhouse kick
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* documentation fixes
+	* distro maintenance
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

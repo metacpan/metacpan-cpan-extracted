@@ -1,0 +1,15 @@
+---
+name: Twitter-Daily
+version: v0.1.3
+author:
+  - Bit-Man
+abstract: Twitter Daily News read your twitter timeline and stores them into your favorite blog.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+configure_requires:
+  Module::Build: 0.340201
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

@@ -1,0 +1,16 @@
+0.05 2007/05/09 15:42
+    - add pkgs method.
+
+0.04 2007/04/23 21:40
+    - use FindBin... not use Findbin... sorry...
+
+0.03 2007/04/23 21:00
+    - add pre require modules.
+
+0.02 2007/04/22 22:50
+    - use require_of() instead of require_by() when using
+      Module::Recursive::Require because of deprecation.
+    - now you can use base_pkg or pkg method .
+
+0.01 2006/06/07
+    - created.

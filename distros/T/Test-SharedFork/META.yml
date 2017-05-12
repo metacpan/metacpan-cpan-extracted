@@ -1,0 +1,61 @@
+---
+abstract: 'fork test'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom  slkjfd gmail.com>'
+build_requires:
+  App::Prove: '0'
+  Test::Builder::Tester: '0'
+  Test::Requires: '0'
+  Time::HiRes: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-SharedFork
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::SharedFork:
+    file: lib/Test/SharedFork.pm
+    version: '0.35'
+  Test::SharedFork::Array:
+    file: lib/Test/SharedFork/Array.pm
+  Test::SharedFork::Scalar:
+    file: lib/Test/SharedFork/Scalar.pm
+  Test::SharedFork::Store:
+    file: lib/Test/SharedFork/Store.pm
+requires:
+  File::Temp: '0'
+  Test::Builder: '0.32'
+  Test::Builder::Module: '0'
+  Test::More: '0.88'
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/tokuhirom/Test-SharedFork/issues
+  homepage: https://github.com/tokuhirom/Test-SharedFork
+  repository: git://github.com/tokuhirom/Test-SharedFork.git
+version: '0.35'
+x_contributors:
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'Vyacheslav Matyukhin <me@berekuk.ru>'
+  - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Perlover <perlover@perlover.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Rob Hoelz <rob@hoelz.ro>'
+  - 'rwhitworth <me@ryanwhitworth.com>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Chad Granum <chad.granum@dreamhost.com>'
+  - 'Chad Granum <exodist7@gmail.com>'

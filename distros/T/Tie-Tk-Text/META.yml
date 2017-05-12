@@ -1,0 +1,21 @@
+---
+name: Tie-Tk-Text
+version: 0.92
+author:
+  - 'Michael J. Carman <mjcarman@cpan.org>'
+abstract: Access Tk text widgets as arrays.
+license: perl
+resources:
+  license: ~
+requires:
+  Tk: 0
+build_requires:
+  Test::More: 0
+provides:
+  Tie::Tk::Text:
+    file: lib/Tie/Tk/Text.pm
+    version: 0.92
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

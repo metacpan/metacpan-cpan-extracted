@@ -1,0 +1,27 @@
+Revision history for Perl module Test::VCR::LWP
+
+0.5 Thu Dec 04 2014
+    - Moved build process over to Dist::Zilla.
+    - Some minor doc tweaks.
+    - Changed debug output to be more accurate.
+    
+0.4 Wed Nov 26 2014
+    - Added withoutVCR function, which can be used within a withVCR call to skip
+      the recording of certain interactions.
+    - Die if withVCR is called within an anonymous sub and not passed a tape name.
+    - Try to work with older MakeMakers in Makefile.PL
+    - Update github urls.
+
+0.3 Wed Nov 19 2014
+    - Don't use sites that are https only in the test suite.
+    - Catch and rethrow exceptions while recording, allowing the tape to still
+      be saved to file.
+
+0.2 Fri Nov 14 2014
+    - Fix authors to include Mark Ng.
+    - Fix a bug where the tests suite failed under windows.
+
+0.1 Thu Nov 13 2014
+    - original version; created by ExtUtils::ModuleMaker 0.52
+
+

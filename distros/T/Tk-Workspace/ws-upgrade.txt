@@ -1,0 +1,15 @@
+NAME
+      ws-upgrade -- Upgrade a workspace.
+
+SYNOPSIS
+      ws-upgrade <workspace-file-names>
+
+DESCRIPTION
+    Makes a new version of <workspace> that is compatible with the installed
+    version of Tk::Workspace.pm. The pre-upgrade workspace is saved with the
+    extension ".old," and the text itself is saved to
+    "<workspace-name>.txt."
+
+CREDITS
+      Robert Allan Kiesling <rkiesling@earthlink.net>
+

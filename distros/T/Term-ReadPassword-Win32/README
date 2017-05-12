@@ -1,0 +1,64 @@
+NAME
+    Term::ReadPassword::Win32 - Asking the user for a password (for Win32)
+
+SYNOPSIS
+      use Term::ReadPassword::Win32;
+      while (1) {
+        my $password = read_password('password: ');
+        redo unless defined $password;
+        if ($password eq 'flubber') {
+          print "Access granted.\n";
+          last;
+        } else {
+          print "Access denied.\n";
+          redo;
+        }
+      }
+
+DESCRIPTION
+    This module lets you ask the user for a password from the keyboard just
+    as Term::ReadPassword.
+
+    Using Term::ReadPassword is a good way to make password prompts, but it
+    doesn't work with ActivePerl under Windows. So I wrote this module.
+
+    You can use this module under Windows or Unix. If you use this under
+    Windows, Win32::* modules are required. If you use this under Unix, this
+    acts as a wrapper to Term::ReadPassword.
+
+    The Term::ReadPassword::Win32::read_password function is almost same as
+    Term::ReadPassword::read_password function.
+
+    The first and second parameters are just same. The first one is a prompt
+    message, and the second one is timeout value.
+
+    The third parameter is different from Term::ReadPassword::read_password.
+
+    If the third parameter is 0, Ctrl+C will be entered into the input
+    buffer just as any other character.
+
+    If the third parameter is 1, the input operation is terminated when the
+    user types Ctrl+C or Esc.
+
+    If the third parameter is 2, the input operation is terminated when the
+    user types Esc. If the user types Ctrl+C, the program may be terminated.
+
+    If the user types Ctrl+U, the input buffer will be cleared.
+
+BUG
+    Multibyte characters are not treated properly. (When you want to delete
+    a multibyte character, you must type BackSpace more than once.)
+
+SEE ALSO
+    Term::ReadPassword, Term::Getch
+
+COPYRIGHT
+    Copyright (C) 2005 Ken Takata <kentkt@anet.ne.jp>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DOWNLOAD
+    You can download the latest version from http://webs.to/ken/ (Japanese
+    page)
+

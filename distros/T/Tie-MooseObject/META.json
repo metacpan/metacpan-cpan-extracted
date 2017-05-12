@@ -1,0 +1,48 @@
+{
+   "abstract" : "a tied hash interface to Moose object attributes",
+   "author" : [
+      "Scott A. Beck <scottbeck@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101550, CPAN::Meta::Converter version 2.101610",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-MooseObject",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "List::Util" : "1.23",
+            "Moose::Util::TypeConstraints" : "1.03",
+            "MooseX::Declare" : "0.33",
+            "MooseX::Has::Sugar" : "0.0405",
+            "MooseX::Types::Moose" : "0.12"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bline/Tie-MooseObject.git",
+         "web" : "http://github.com/bline/Tie-MooseObject"
+      }
+   },
+   "version" : "0.0001"
+}

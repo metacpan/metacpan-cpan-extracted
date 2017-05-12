@@ -1,0 +1,99 @@
+=head1 NAME
+
+brewbuild.conf - Optional configuration file for the C<Test::BrewBuild>
+build system.
+
+=head1 DESCRIPTION
+
+By default, an example C<brewbuild.conf-dist> configuration file is copied into
+C<~/brewbuild> directory upon installation.
+
+To use a configuration file, copy the C<brewbuild.conf-dist> file to
+C<brewbuild.conf> within the same directory, and edit it accordingly.
+
+Command line arguments will override whatever configuration you have in the
+config file.
+
+=head1 SECTIONS
+
+=head2 [brewbuild]
+
+Configuration for the core
+L<brewbuild|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/brewbuild>
+script.
+
+=head3 timeout
+
+This is the timeout to use for the C<instance_install()> method. It defaults to
+600 seconds. If an install takes longer than the time set in C<timeout>, it'll
+roll out the changes and log an error, then proceed.
+
+=head3 remove
+
+Set to 1 to remove all instances of perl on every run. Defaults to 0.
+
+=head3 plugin
+
+Overrides the default plugin L<Test::BrewBuild::Plugin::DefaultExec> that is
+the actual command set that performs the testing routines.
+
+=head3 save
+
+Default off, set to 1 to enable saving of all PASS logs along with the FAIL
+ones.
+
+=head3 debug
+
+Default is 0. Range is 0-7.
+
+=head3 legacy
+
+Default off. Perls 5.8.x and lower will be installed if you set this to 1.
+
+=head2 [dispatch]
+
+Configuration for the dispatcher,
+L<bbdispatch|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/bbdispatch>.
+
+=head3 testers
+
+A comma delimited list of test servers to dispatch to. Example:
+
+    testers = 127.0.0.1, 10.5.5.5:9999
+
+=head3 cmd
+
+The C<brewbuild> command string you want to use as default. Example:
+
+    cmd = brewbuild -r -R -d 7
+
+=head3 repo
+
+The repo to default to. If not specified here or at the command-line, we'll
+default to looking for a repository in your current working directory. Example:
+
+    repo = https://github.com/stevieb9/p5-test-brewbuild
+
+=head3 auto_sleep
+
+When using an auto dispatch run (eg: C<bbdispatch --auto>), the integer value of
+this directive specifies how many seconds to sleep in between each build run
+sent to the testers.
+
+=head2 [tester]
+
+Configuration for the tester
+L<bbtester|https://metacpan.org/pod/distribution/Test-BrewBuild/bin/bbtester>
+test runner daemon.
+
+=head3 ip
+
+Specify the IP address you want your tester to listen on. Example:
+
+    ip = 127.0.0.1
+
+=head3 port
+
+Which port should your tester listen on? Example:
+
+    port = 9999

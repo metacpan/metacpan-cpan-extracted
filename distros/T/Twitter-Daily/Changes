@@ -1,0 +1,53 @@
+Change Log for Twitter Daily
+============================
+
+v0.1.2
+------
+
+- Added Test::Kwalitee and Test::Pod to test requirements
+
+v0.1.1
+------
+
+- Moved modules dependencies from configure to build
+
+v0.1.0
+------
+
+- First release distributed via CPAN
+- Pass Test::Kwalitee test
+- Added POD coverage tests
+- Full modules documentation (pass POD coverage)
+- Making Twitter::Daily testable using mock classes
+ 
+v0.0.3
+------
+
+- Entries shown ordered in ascending creation time
+- Added install instructions
+
+v0.0.2
+------
+
+- Allow dashes in URLs
+- Accept more than one twitter nickname in the same line
+- Recognition of # for searches
+
+v0.0.1
+------
+
+- Fix for Twitter returning more entries than expected
+- Quiet mode added
+- Shows entries generated in normal mode
+- Bug fix : months were not filtered when comparing dates
+
+v0.0
+----
+First TwitterDaily running version !!!
+- twitterDaily.pl now only contains the main script for calling Twitter::Daily,
+and this one is offered as a separata package, for programatic access to Twitter
+Daily
+- Added date parsing for a better default title, and also passing the title
+(optional)
+- adds https, + sign and @username recognition
+- No entry is published if no news exist in the Twitter timeline

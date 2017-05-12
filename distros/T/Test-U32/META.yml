@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Test-U32
+version: 0.01
+abstract: Designed to test the proposition that U32 is 32 bits wide
+license: artistic_2
+generated_by: ExtUtils::MakeMaker version 6.3201
+distribution_type: module
+requires:     
+  perl: 5.0
+provides:
+  Test::U32:
+    file: lib/Test/U32.pm
+    version: 0.01
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+author:
+  - Dr James Freeman>

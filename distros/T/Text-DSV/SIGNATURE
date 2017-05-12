@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 67fa1d823078f70c6981d7282c55698c47d7d165 Changes
+SHA1 aceb10ab21db399be1d72c373aabcf22e27f6925 DSV.pm
+SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
+SHA1 098d090e8877272138193256491a2fbb9ad4e71e MANIFEST
+SHA1 12b892963319ffb6e303652033e4669771b90593 META.yml
+SHA1 774b9599fef28034688bb55e7d8a48b134db7dc2 Makefile.PL
+SHA1 777a7e58ec384c0caa7ad32ea17ac9bdbde5f80c README
+SHA1 e5de9cc6bf0d962f3d585cefa9be430914a2bb57 examples/ex1.pl
+SHA1 0d30b4654a8fc3bee372ac05532516e69d73ee58 examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 c2004061092e68eaca517d25350922811671dc8b t/Text-DSV/01-use.t
+SHA1 0d29a5a31c08230949030cc505af9c5453a2302b t/Text-DSV/02-version.t
+SHA1 2440554930de3a9b9ad4ba6dfc1705d8b678a898 t/Text-DSV/03-new.t
+SHA1 a12218e5c2150ad1cc7bb922432aa12cfdc3a97e t/Text-DSV/04-parse.t
+SHA1 7dbaa34dd4cddfa4f1a406cad97cc48ca94c4093 t/Text-DSV/05-parse_line.t
+SHA1 fb3568b9c52d56639d4edf7c1b89b8cc07981ec9 t/Text-DSV/06-serialize.t
+SHA1 9e7bafc84ea95a413d867a893671d2beeaa29341 t/Text-DSV/07-serialize_line.t
+SHA1 a7b54c8707cf8dc1ea77fd22b4459a15b9d1c91a xt/Text-DSV/01-pod_coverage.t
+SHA1 4aee6411277b063ce3e83114abac8886e4c0add1 xt/Text-DSV/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWBUlNAAoJEJe+XXKaIuTlwakH/0JCevsFpkOvr6fBR2slVIh0
+75cbnhNNtNN/faltjE5HomtimLKxIeU5M8cHmN83dWeN+FYi8UIbZ6BEmmaNshFK
+m+AjqNly9fyhIMUkyPxW4yJwkoOBgvptREHDeLrxI1tdjIBWLkV5R6znYVGDsLPR
+rwF4Qbnp3FotzxBx2AZ+raDh4pfOVxq6kx0oeYZS4/JhALcdXFI481+S7yBBeeEi
+wZ+B47Rtn0J0fjvm26SiuMYtTJgaa/khbjbbPfEwboCOOp5HwLfp1YaeSIDVIXu+
+aczRooh3MSFVHtURpVvsaYkNFcoCYls+UOXiGTd2+UZGPCxlYX4AzTW/VqM0bcg=
+=XPyF
+-----END PGP SIGNATURE-----

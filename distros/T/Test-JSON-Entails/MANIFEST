@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Test/JSON/Entails.pm
+t/arguments.t
+t/blessed.t
+t/compile.t
+t/hash.t

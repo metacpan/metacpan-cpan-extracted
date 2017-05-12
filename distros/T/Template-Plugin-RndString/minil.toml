@@ -1,0 +1,6 @@
+name = "Template-Plugin-RndString"
+# badges = ["travis"]
+authority="cpan:BBON"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,40 @@
+Revision history for perl distribution Test-Mojo-Role-Selenium
+
+0.09 2017-04-26T16:10:23+0200
+ - Add wait_for()
+
+0.08 2017-03-28T11:31:21+0200
+ - Add support for arguments in MOJO_SELENIUM_DRIVER
+
+0.07 2017-02-13T18:31:29+0100
+ - Add toggle_checked_ok()
+ - Change click_ok() to move mouse to the element first
+ - Change wait_until() to a test method
+
+0.06 2017-01-05T14:58:18+0100
+ - Add wait_until()
+ - Add support for send_keys_ok(undef, ...)
+ - Remove wait_for_url()
+ - Do not build app if MOJO_SELENIUM_BASE_URL is set
+
+0.05 2017-01-04T17:25:03+0100
+ - Renamed skip_all_or_setup() to setup_or_skip_all()
+
+0.04 2017-01-04T16:50:06+0100
+ - Fix $t->app()
+ - Add if_tx()
+ - Add skip_all_or_setup()
+
+0.03 2017-01-04T11:19:34+0100
+ - Fix send_keys_ok() with special keys
+ - Add live_value_is() and live_value_like()
+ - Add wait_for_url()
+ - Add missing method go_back(), go_forward() and refresh()
+ - More robust send_keys_ok() for invisible elements
+
+0.02 2017-01-04T09:26:41+0100
+ - Add support for MOJO_SELENIUM_BASE_URL
+
+0.01 2017-01-04T00:18:18+0100
+ - Started project
+ - Marked role as EXPERIMENTAL

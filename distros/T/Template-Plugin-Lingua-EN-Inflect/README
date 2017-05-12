@@ -1,0 +1,65 @@
+Template-Plugin-Lingua-EN-Inflect
+=================================
+
+The Lingua::EN::Inflect is an interface to Damian Conway's
+Linua::EN::Inflect Perl module, which provides plural inflections,
+"a"/"an" selection for English words, and manipulation of numbers as words.
+
+The plugin provides an 'inflect' filter, which can be used to
+interpolate inflections in a string.  The NUM() function sets a
+persistent default value to be used whenever an optional number
+argument is omitted.  The number to be used for a particular
+invocation of 'inflect' can also be specified with a 'number' option.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these modules:
+
+  Template
+  Template::Plugin
+  Lingua-EN-Inflect
+
+For testing the module requires these modules:
+
+  IO::File
+  Test::More
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+DEDICATION
+
+This distribution was originally created by Andrew Ford. Sadly in early 2014,
+Andrew was diagnosed with Pancreatic Cancer and passed away peacfully at home
+on 25th April 2014.
+
+One of his wishes was for his OpenSource work to continue. At his funeral, many
+of his colleagues and friends, spoke of how he felt like a person of the world, 
+and how he embrace the idea of OpenSource being for the benefit of the world.
+
+Anyone wishing to donate in memory of Andrew, please consider the following
+charities:
+
+* Dignity in Dying - http://www.dignityindying.org.uk/
+* Marie Curie Cancer Care - http://www.mariecurie.org.uk/
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2005-2014 Andrew Ford
+  Copyright (C) 2014-2015 Barbie for Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic Licence v2.

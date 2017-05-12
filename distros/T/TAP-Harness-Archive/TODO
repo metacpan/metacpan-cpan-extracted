@@ -1,0 +1,7 @@
+=head1 TODO
+
+=over
+
+=item * use TAP::Harness callbacks as they become available and more stable so we don't have to override runtests()
+
+=back

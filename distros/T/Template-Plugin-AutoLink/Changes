@@ -1,0 +1,10 @@
+Revision history for Perl extension Template::Plugin::AutoLink
+0.03  Thu Feb 02 16:28:57 2006
+    - update POD.
+
+0.02  Thu Jul 29 17:29:12 2004
+    - define alias 'auto_link'
+    - now attributes of A tag can be set by using filter argument.
+
+0.01  Thu May 20 18:23:28 2004
+	- original version

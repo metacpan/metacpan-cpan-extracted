@@ -1,0 +1,26 @@
+lib/Test/Lithium.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+scripts/start_dancer_server
+t/00-load.t
+t/08-connect.t
+t/09-windows.t
+t/10-timeout.t
+t/11-user_agent.t
+t/12-alert-dialogs.t
+t/13-value.t
+t/14-select.t
+t/15-checkbox.t
+t/16-text.t
+t/17-click.t
+t/18-js.t
+t/19-iframe.t
+t/20-lithium_support.t
+t/common.pm
+t/dance.pm
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

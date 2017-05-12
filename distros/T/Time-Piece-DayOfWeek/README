@@ -1,0 +1,32 @@
+NAME
+    Time::Piece::DayOfWeek - adds is_<day of week> method to Time::Piece
+
+SYNOPSIS
+    use Time::Piece; use Time::Piece::DayOfWeek;
+
+    my $tp = localtime; return $tp->fullday if $tp->is_monday;
+
+DESCRIPTION
+    Time::Piece::DayOfWeek is a day of the week utility for Time::Piece.
+    This module adds is_(sunday|mondy|tuesday|wednesday|thursday|friday)
+    methods to Time::Piece objects
+
+METHODS
+  is_monday
+  is_tuesday
+  is_wendnesday
+  is_thursday
+  is_friday
+  is_saturday
+  is_sunday
+AUTHOR
+    Jesse Shy <jshy@cpan.org>
+
+COPYRIGHT
+    Copyright 2013- Jesse Shy
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

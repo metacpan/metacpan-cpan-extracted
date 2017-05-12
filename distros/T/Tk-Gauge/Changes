@@ -1,0 +1,16 @@
+
+0.1       2004/05/19  Initial RFD.
+
+0.2       2004/06/09  First CPAN release.
+
+0.3       2004/06/18  Bug fixes, new options and new example from
+                      Christoph Fuchs: 
+                      . A needle's -showvalue is incorrect if -from != 0.
+                      . Bands do not display correctly if the last band
+                        does not extend to -to.
+                      . Add -majorticklabelfont option.
+                      . Add -majorticklabelpad option.
+                      . Add examples/thermometer.
+                      . Some distance computationss have been enhanced to
+                        use fontMeasure() for better label positioning.
+                      . Add required Tk/Trace.pm patch.

@@ -1,0 +1,42 @@
+###################
+# THREAD::ISOLATE #
+###################
+
+Thread::Isolate - Create Threads that can be called externally and use them to isolate modules from the main thread.
+
+###############
+# DESCRIPTION #
+###############
+
+This module has the main purpose to isolate loaded modules from the main thread.
+
+The idea is to create the I<Thread::Isolate> object and call methods, evaluate
+codes and use modules inside it, with synchronized and unsynchronized calls.
+
+See POD for more...
+
+################
+# INSTALLATION #
+################
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+##########
+# AUTHOR #
+##########
+
+Graciliano M. P. <gmpassos@cpan.org>
+
+I will appreciate any type of feedback (include your opinions and/or suggestions). ;-P
+
+############# 
+# COPYRIGHT #
+#############
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+

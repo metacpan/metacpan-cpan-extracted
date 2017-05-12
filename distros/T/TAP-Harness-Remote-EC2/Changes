@@ -1,0 +1,8 @@
+Revision history for TAP-Harness-Remote-EC2
+
+1.00  Tue Sep 30 17:28:50 EDT 2008
+       Support for auto-starting EC2 instances
+
+0.01  Mon May 12 16:37:34 EDT 2008
+       Initial release.
+

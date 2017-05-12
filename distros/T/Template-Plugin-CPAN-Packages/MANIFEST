@@ -1,0 +1,27 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/StandardTests.pm
+inc/Module/Install/Template.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Test/Compile.pm
+inc/Test/Differences.pm
+inc/Test/More.pm
+inc/UNIVERSAL/require.pm
+lib/Template/Plugin/CPAN/Packages.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_bundle_for_author.t
+t/02_bundle_by_dist_prefix.t
+t/02packages.details.txt.gz
+t/perlcriticrc

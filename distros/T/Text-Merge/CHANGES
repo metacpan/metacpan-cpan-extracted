@@ -1,0 +1,251 @@
+
+=======================================================================
+0.35 -> 0.36     4/1/2004 -sdh
+-----------------------------------------------------------------------
+suppressed some warnings in value conversion methods 
+=======================================================================
+
+
+=======================================================================
+0.34 -> 0.35     3/31/2004 -sdh
+-----------------------------------------------------------------------
+modified publish_email to strip illegal chars to prevent potential
+issues with some mailers
+
+tweaked some docs
+=======================================================================
+
+
+=======================================================================
+0.33 -> 0.34     3/12/2001 -modified to coversion of values to use 
+first value of array ref as a scalar value if there is only one item 
+in the array.
+=======================================================================
+
+
+=======================================================================
+0.32 -> 0.33     12/13/2000 -sdh (not released)
+-----------------------------------------------------------------------
+Fixed minor problems in text_process()
+
+Modified set_delimiters() to allow set_delimiters('',''), allowing
+the "zeroing" out the delimiters to improve performance SLIGHTLY 
+(the less efficient substitutions are ignored if the delimiters are 
+zeroed out).  This feature is undocumented.
+=======================================================================
+
+
+=======================================================================
+0.31 -> 0.32     7/3/2000 -sdh
+-----------------------------------------------------------------------
+Added "$items" test to sort_method() in Text::Merge::Lists
+=======================================================================
+
+
+=======================================================================
+0.30 -> 0.31	 5/9/2000 -sdh
+-----------------------------------------------------------------------
+Added cgi2data() method for converting CGI.pm parameters to data.  This
+has to be called as Text::Merge::cgi2data($cgi) or without the $cgi
+parameter if you have imported the :standard methods from CGI.pm.
+
+Added de_tab() method and the 'detab' format to convert tab characters 
+to spaces in strings.
+
+Added tests for detab filter.
+
+Improved list testing.
+=======================================================================
+
+
+=======================================================================
+0.29 -> 0.30	 3/7/2000 -sdh
+-----------------------------------------------------------------------
+Fixed numerous warnings and bugs in the Text::Merge::Lists function
+sort_method().
+
+Fixed numerous warnings in type conversion where values are funny
+(numeric vs. string, undefined versus empty).
+=======================================================================
+
+
+=======================================================================
+0.28 -> 0.29     11/22/99 -sdh
+-----------------------------------------------------------------------
+Fixed backward compatibility issues on function names due to renaming
+for AutoLoading in version 0.28.
+
+Reorganized and renamed the test suite for better tracking.  A test
+file is now generated using join("\n", ...) to test "line_by_line"
+mode on the local system.
+
+Fixed a bug that showed up on some versions of Perl5 as an "empty"
+delimiter string.  This appears to be related to a bug in the /o 
+regular expression modifier, which seemed to compile our delimiters
+as empty at some point in some extreme cases.  It is fixed at the
+expense of some efficiency.  I hope to use 'qr' to correct this in
+a later version.
+=======================================================================
+
+
+=======================================================================
+0.27 -> 0.28     8/24/99 -sdh
+-----------------------------------------------------------------------
+Added AutoLoading for the filter functions.
+
+Added custom tag delimiters (outer brackets only).  See the 
+'set_delimiters()' object method.
+
+Put in a default list nesting depth of 3 for nested lists.  See the
+'set_max_nesting_depth()' object method for Text::Merge::Lists.
+
+Minor changes to test organization.  Also added two tests for
+nesting depth limits.  Added one test for delimiter reassignment.
+=======================================================================
+
+
+=======================================================================
+0.26 -> 0.27	 8/23/99 -sdh
+-----------------------------------------------------------------------
+This release mainly adjusts the tests to (hopefully) run on more
+platforms.
+
+Altered 'TestDate' definition in the t/test.pl file to be system
+independent using Time::Local to obtain the test value.  
+Updated test files to generate the input and output files, instead
+of using UNIX files from the tarball.
+
+Added perl program 't/diffutil' instead of using the UNIX 'diff' 
+utility.  It's not as robust, but it works for testing.
+
+Fixed 't/test13.t' and 't/test14.t' to clean up after themselves.
+=======================================================================
+
+
+=======================================================================
+0.25 -> 0.26	 7/12/99 -sdh
+-----------------------------------------------------------------------
+Improved parse, to allow nesting of non-delimited commands within
+delimited commands.
+=======================================================================
+
+
+=======================================================================
+0.24 -> 0.25	 5/17/99 -sdh
+-----------------------------------------------------------------------
+Added 'truncate' or 'trunc' instead of just 'trunc' format for text
+output.
+
+Improved logic in determining whether template parameter is a text
+block, filename, or FileHandle reference.
+=======================================================================
+
+
+=======================================================================
+0.23 -> 0.24	 4/6/99 -sdh
+-----------------------------------------------------------------------
+Fixed bug in parameterization of header info in publish_email().  How
+did we miss this?  Added 'From' support but the mailer only supports
+it for privileged users for obvious reasons.
+=======================================================================
+
+
+=======================================================================
+0.22 -> 0.23	 3/29/99 -sdh
+-----------------------------------------------------------------------
+Added conversion of &gt; &lt; &amp; and &quot; in browser_unescape() 
+in Merge.pm so that we are compatible with the CGI::Base module (and
+probably CGI.pm, too).
+=======================================================================
+
+
+=======================================================================
+0.21 -> 0.22	 3/4/99 -sdh
+-----------------------------------------------------------------------
+Fixed bug in test programs to handle no elegant Time Zone conversion
+in perl.  Now the test input is constructed before the tests are run.
+
+Added 'paragraph##' and 'indent##' formats for text output.
+=======================================================================
+
+
+=======================================================================
+0.20 -> 0.21	 2/21/99 -sdh
+-----------------------------------------------------------------------
+Fixed bug in table style display related to filler cell.
+=======================================================================
+
+
+=======================================================================
+0.18 -> 0.20	 2/11/99 -sdh
+-----------------------------------------------------------------------
+Added HTML table style support.
+=======================================================================
+
+
+=======================================================================
+0.17 -> 0.18	 1/29/99 -sdh
+-----------------------------------------------------------------------
+Null value now returned on date conversions of empty or zero values.
+=======================================================================
+
+
+=======================================================================
+0.16 -> 0.17	 1/14/99 -sdh
+-----------------------------------------------------------------------
+Added the conversion format 'words#' where # is an integer.
+=======================================================================
+
+
+=======================================================================
+0.15 -> 0.16	 1/2/99 -sdh
+-----------------------------------------------------------------------
+Installed Test::Harness usage.
+
+Added a defined but empty return value to handle_tag() in
+Merge.pm for the exception cases.
+
+Added empty return value when invoking an ACT: with a subroutine
+id that is undefined.
+
+Added the sort_list() method to Text::Merge::Lists.
+
+Reduced error messages in Text::Merge::Lists::list_style_template() 
+
+Added url_encode() & url_decode() to the Text::Merge package.
+=======================================================================
+
+
+=======================================================================
+0.14 -> 0.15	 12/23/98 -sdh
+-----------------------------------------------------------------------
+Changed namespace from "Publish" to "Text::Merge" per the CPAN 
+registration.
+
+Fixed typo for line-by-line mode in publish_to() for publishing 
+Filename to FileHandle.
+=======================================================================
+
+
+=======================================================================
+0.13 -> 0.14	 12/20/98 -sdh
+-----------------------------------------------------------------------
+Fixed bug whereby data was not passed to convert_value() in 
+Publish::Lists for the header,footer,divider, and empty components.
+=======================================================================
+
+
+=======================================================================
+0.12 -> 0.13	 12/19/98 -sdh
+-----------------------------------------------------------------------
+Fixed warning on null formats in handle_tag()
+=======================================================================
+
+
+=======================================================================
+0.11 -> 0.12     12/18/98 -sdh
+-----------------------------------------------------------------------
+Fixed critical linkage bug in publish()
+=======================================================================
+
+

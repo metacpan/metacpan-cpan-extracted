@@ -1,0 +1,11 @@
+Revision history for Test-Pcuke-Gherkin
+
+0.0.3	02.12.2011 15:19
+	Trying to fix dependencies
+	
+0.02	02.11.2011 14:37
+	Fix: MANIFEST to include mock objects
+	
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

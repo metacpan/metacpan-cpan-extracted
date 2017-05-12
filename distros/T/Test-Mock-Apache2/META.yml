@@ -1,0 +1,21 @@
+---
+abstract: 'Mock mod_perl2 objects when running outside of Apache'
+author:
+  - 'Cosimo Streppone <cosimo@opera.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300017, CPAN::Meta::Converter version 2.120921'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Mock-Apache2
+requires:
+  Test::MockObject: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Mock-Apache2
+  repository: git://github.com/cosimo/perl5-test-mock-apache2.git
+version: 0.05

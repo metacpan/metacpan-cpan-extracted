@@ -1,0 +1,37 @@
+Build.PL
+Changes
+lib/Tie/FieldVals.pm
+lib/Tie/FieldVals/Join.pm
+lib/Tie/FieldVals/Row.pm
+lib/Tie/FieldVals/Row/Join.pm
+lib/Tie/FieldVals/Select.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml			# Will be created by "make dist"
+META.json			# Will be created by "make dist"
+README
+scripts/fv2xml
+scripts/hash2fv
+scripts/xml2fv
+t/00_dist.t
+t/01_load.t
+t/02_simple.t
+t/03_select.t
+t/04_join.t
+t/05_create.t
+t/06_sort.t
+t/07_sort2.t
+t/08_sort3.t
+t/20_fv2xml.t
+t/30_xml2fv.t
+t/40_hash2fv.t
+t/compare.pl
+t/good_test1.xml
+t/good_test_hash.data
+t/pod-coverage.t
+t/pod.t
+t/test1.data
+t/test2.data
+t/test_ARCHIVE_DB.pl
+t/test_sort2.data
+TODO

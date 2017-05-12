@@ -1,0 +1,11 @@
+the on-error tal tag
+
+default builtin page variables
+
+'letter' element of RepeatValue
+
+Perhaps Template::TAL::Language::PETAL.
+
+METAL
+
+Strip namespaces from the output dom

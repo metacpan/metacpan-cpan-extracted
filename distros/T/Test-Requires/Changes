@@ -1,0 +1,53 @@
+Revision history for Perl module Test::Requires
+
+0.10 2015-07-21T12:37:03Z
+
+    - Support 5.6 again.
+
+0.09 2015-07-21T04:01:50Z
+
+    - requires 5.8.1
+
+0.08 2014-07-16T00:21:22Z
+
+    - Switch to EUMM.
+
+0.07 2013-07-01T03:08:52Z
+
+    - If the C<< RELEASE_TESTING >> environment variable is true, then instead
+      of skipping tests, Test::Requires bails out.
+      (tobyink)
+
+0.07 2013-06-30
+
+    - document that use Test::Requires "5.010" works.
+      (tobyink)
+
+0.06 2010-09-26
+
+    - support Perl 5.6.0 or later. Because Mouse need to support it.
+      (gfx)
+
+0.05 2010-03-27
+
+    - requires Test::More 0.61 or later, because Test::Builder::Module was
+      first appeared at 0.60_02.
+      (suggested by miyagawa++)
+
+0.04 2010-03-27
+
+    - no Test::Base (miyagawa)
+
+0.03 2009-09-21
+
+    - support older test::builder
+      (reported by tomyhero++)
+
+0.02 2009-09-09
+
+    - remove hacky stuff
+
+0.01 2009-07-02
+
+    - original version
+

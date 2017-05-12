@@ -1,0 +1,66 @@
+NAME
+    Types::UUID - type constraints for UUIDs
+
+SYNOPSIS
+       package FroobleStick;
+   
+       use Moo;
+       use Types::UUID;
+   
+       has identifier => (
+          is      => 'lazy',
+          isa     => Uuid,
+          coerce  => 1,
+          builder => Uuid->generator,
+       );
+
+DESCRIPTION
+    Types::UUID is a type constraint library suitable for use with Moo/Moose
+    attributes, Kavorka sub signatures, and so forth.
+
+  Type
+    Currently the module only provides one type constraint, which is exported
+    by default.
+
+    `Uuid`
+        A valid UUID string, as judged by the `is_uuid_string()` function
+        provided by UUID::Tiny.
+
+        This constraint has coercions from `Undef` (generates a new UUID),
+        `Str` (fixes slightly broken-looking UUIDs, adding missing dashes;
+        also accepts base-64-encoded UUIDs) and URI objects using the
+        `urn:uuid:` URI scheme.
+
+  Methods
+    The `Uuid` type constraint is actually blessed into a subclass of
+    Type::Tiny, and provides an aditional method:
+
+    `Uuid->generate`
+        Generates a new UUID. `Uuid->coerce(undef)` would also work, but looks
+        a little odd.
+
+    `Uuid->generator`
+        Returns a coderef which generates a new UUID. For an example usage,
+        see the "SYNOPSIS".
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-UUID>.
+
+SEE ALSO
+    Type::Tiny::Manual, UUID::Tiny.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

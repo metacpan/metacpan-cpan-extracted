@@ -1,0 +1,48 @@
+{
+   "abstract" : "rounded or exact English expression of durations",
+   "author" : [
+      "Sean M Burke <sburke@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-Duration",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "constant" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/Time-Duration",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/Time-Duration.git",
+         "web" : "https://github.com/neilbowers/Time-Duration"
+      }
+   },
+   "version" : "1.20"
+}
+

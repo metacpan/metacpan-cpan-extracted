@@ -1,0 +1,6 @@
+name = "Test-Time-At"
+badges = ["travis"]
+authority="cpan:SHIBAZAKI"
+
+module_maker="ModuleBuildTiny"
+

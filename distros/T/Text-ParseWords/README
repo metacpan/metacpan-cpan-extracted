@@ -1,0 +1,43 @@
+
+Module: Text::ParseWords
+- ----------------------
+
+This is a CORE module. If you installed perl 5.003 or above, an
+old version of this module is already available to you. This CPAN
+package is only here to update core distributions prior 5.10.
+
+The version provided is the same that comes with perl 5.10.
+If you run a newer version of perl, the version of Text::ParseWords
+included there may be newer.
+
+Please run "perldoc Text::ParseWords" to see what this module
+is for.
+
+
+Installation
+- ----------
+
+To update your core, simply perform these usual steps:
+
+make
+make test
+make install
+
+
+Authors of Text::ParseWords
+- -------------------------
+
+Maintainer: Alexandr Ciornii.
+
+Previous maintainer: Hal Pomeranz <pomeranz@netcom.com>, 1994-1997 (Original
+author unknown).  Much of the code for &parse_line() (including the
+primary regexp) from Joerk Behrends <jbehrends@multimediaproduzenten.de>.
+
+Examples section another documentation provided by John Heidemann 
+<johnh@ISI.EDU>
+
+Bug reports, patches, and nagging provided by lots of folks-- thanks
+everybody!  Special thanks to Michael Schwern <schwern@envirolink.org>
+for assuring me that a &nested_quotewords() would be useful, and to 
+Jeff Friedl <jfriedl@yahoo-inc.com> for telling me not to worry about
+error-checking (sort of-- you had to be there).

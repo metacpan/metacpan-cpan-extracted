@@ -1,0 +1,19 @@
+Revision history for TAP-Harness-Restricted
+
+0.003     2014-07-18 09:34:41-04:00 America/New_York
+
+    [ADDED]
+
+    - Now also skips files matching space-separated glob patterns in
+      $ENV{HARNESS_SKIP}
+
+0.002     2013-03-16 13:46:39 America/New_York
+
+    [CHANGED]
+
+    - Clarified that TAP::Harness 3.18 is required
+
+0.001     2013-03-13 13:43:20 America/New_York
+
+    - First release
+

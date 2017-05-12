@@ -1,0 +1,8 @@
+Changes
+lib/Test/PureASCII.pm
+Makefile.PL
+MANIFEST
+README
+t/pods.t
+t/Test-PureASCII.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,20 @@
+requires "Carp" => "0";
+requires "Exporter" => "0";
+requires "Importer" => "0.014";
+requires "Scalar::Util" => "0";
+requires "Sub::Info" => "0.002";
+requires "Test2" => "1.302048";
+requires "Test2::AsyncSubtest" => "0.000017";
+requires "Test2::Suite" => "0.000034";
+requires "Time::HiRes" => "0";
+requires "overload" => "0";
+requires "perl" => "5.010000";
+suggests "Sub::Name" => "0.11";
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::Pod" => "1.41";
+};

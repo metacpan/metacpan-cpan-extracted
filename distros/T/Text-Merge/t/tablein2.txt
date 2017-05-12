@@ -1,0 +1,14 @@
+
+Test of complete table: 
+
+REF:FruitList:table3_testtable
+
+
+Test of empty table:
+
+REF:EmptyList:table3_testtable
+
+
+Test of null table:
+
+REF:Null:table3_testtable

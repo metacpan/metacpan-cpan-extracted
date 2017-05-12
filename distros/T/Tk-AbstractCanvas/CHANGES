@@ -1,0 +1,15 @@
+CHANGES
+    Revision history for Perl extension Tk::AbstractCanvas:
+
+    - 1.4.A7QFZHF Mon Jul 26 15:35:17:15 2010
+      * updated license to GPLv3
+
+    - 1.2.75L75Nr Mon May 21 07:05:23:53 2007
+      * added ex/* examples && tidied everything up
+
+      * added Ctrl rot callbacks (mocb, rlcb) && limited Motion && Release
+      to just Ctrl + one MouseButton events
+
+    - 1.0.56BHMOt Sat Jun 11 17:22:24:55 2005
+      * original version
+

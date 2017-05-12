@@ -1,0 +1,9 @@
+print <<DUMMY_TEST;
+1..6
+ok 1
+ok 2    # skip rain delay
+ok 3    
+ok 4 # TODO
+not ok 5 # TODO
+ok 6
+DUMMY_TEST

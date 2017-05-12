@@ -1,0 +1,34 @@
+Text::Structured is a class for manipulating fixed-format pages of
+text.  It contains methods for extracting text from the page.
+
+See the POD for further details.
+
+paul@miraclefish.com
+
+Prerequisites
+=============
+None, although the class has been designed to be used with Text::FillIn.
+
+Installation
+============
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Text::Structured has been successfully built and tested on the following
+platforms:
+
+	   RedHat Linux 5.0
+	   Solaris 2.6
+
+History
+=======
+
+25-Mar-1999                 Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+RELEASE 0.01
+  First CPAN release.
+RELEASE 0.02
+  Fixed typo in README.

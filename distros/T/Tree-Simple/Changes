@@ -1,0 +1,238 @@
+Revision history for Perl extension Tree::Simple.
+
+1.31  2017-04-17T09:11:00
+	- Add 3 new methods: getSiblingCount(), isFirstChild() and isLastChild().
+		Warning: getSiblingCount() does not include the invocant, unlike getAllSiblings().
+	- Add t/24_Tree_Simple_sibling_test.t.
+	- These methods are used by Tree::Simple::View::HTML V 0.19 to output HTML compatible with the
+		HTML5 standard for nested lists. See https://www.w3.org/wiki/HTML_lists#Nesting_lists.
+		Thanx to Ekkehard Plicht for suggesting this, and for the patches, which I have reworked.
+		See RT#121099.
+
+1.30  2017-03-15T09:45:00
+	- Add convenience method generateChild($scalar) which simply does addChild(new($scalar) ).
+		Thanx to Rene Nyffenegger for this suggestion.
+		Add matching test t/22_Tree_Simple_generate_child.t.
+	- Reduce pre-req version of Test::More from 1.001014 to 1.001002.
+
+1.29  2016-05-04T08;15:00
+	- Correct physical address of Free Software Foundation in LICENSE file. See RT#114149.
+		Thanx to Petr Pisar.
+
+1.28  2016-04-27T17:35:00
+	- No code changes.
+	- Adopt workflow techniques suggested by Kent Fredric. This means a cleaner workdir and a
+		much more reliable dist. The latter now has auto-generated MANIFEST and META.* files.
+
+1.27  2016-04-25T09:26:00
+	- No code changes.
+	- Fix my licence (sic) mess so all references are to Perl. This involves edits to Makefile.PL
+		and LICENSE. See RT#113949. Thanx Kent Fredric.
+	- Fix Makefile.PL so modules only used for testing are in TEST_REQUIRES and not PREREQ_PM.
+		See RT#113948. Thanx Kent Fredric.
+	- Fix README so it more-or-less conforms to the Perl Foundation's guidelines at
+		http://www.perlfoundation.org/cpan_licensing_guidelines.
+
+1.26  2015-11-28T09:30:00
+	- No code changes.
+	- Accept patches from Manwar via github. See https://github.com/stevan/tree-simple/pull/10.
+	- I (Ron) followed github's advice on handling merge conflicts from the command line, but could
+		not see the patches after the merge.
+	- So, create github repo https://github.com/ronsavage/Tree-Simple.
+	- Remove Build.PL.
+	- Reformat dates in this file.
+	- Oops. Can't get Test::Stream to work in 10_Tree_Simple_test.t. Logged issue, but it's
+		probably a problem with the way I tried to use Test::Stream. Revert to Test::More.
+	- Add xt/author/changes.t to MANIFEST.
+
+1.25  2014-01-13T08:51:00
+	- Fix logic in sub DESTROY for when children are/are not present. Reported by astortz.
+		See https://github.com/stevan/tree-simple/issues/8.
+
+1.24  2014-09-06T09:27:00
+	- Abandon Test::Version and hence delete t/version.t. Putting version.t in xt/author/ is not a
+		solution, because Test::Version has problems with Test::EOL and Test::Builder.
+		Thanx to Kent Fredric for the github issue which started me investigating this issue.
+
+1.23  2013-11-09T10:43:00
+	- No code changes.
+	- Accept spelling corrections from the Debian Perl Group, with thanx. See RT#90171.
+		Note: The change to lib/Tree/Simple/Visitor.pm had already been made.
+	- Add t/version.t, which uses Test::Version, to cross-check version #s.
+
+1.22  2013-09-30T08:35:00
+	- Metadata fixes in Build.PL and correct bugtracker queue in Makefile.PL. Thanx to dsteinbrunner
+		(via github).
+
+1.21  2013-09-26T13:08:00
+	- Fix syntax error in Makefile.PL.
+
+1.20  2013-09-26T11:16:00
+	- Merge source from https://github.com/stevan/tree-simple.
+	- Close github issues.
+	- Add bugtracker and license to Build.PL and Makefile.PL.
+
+1.19  2013-09-23T08:26:00
+	- Maintenance now by Ron Savage.
+	- Rectify datestamp format in this file.
+	- Add Changelog.ini.
+	- Make Simple.pm and Visitor.pm have the same version #.
+	- Reformat Build.PL and Makefile.PL.
+	- Move t/pod* into xt/author/.
+	- Minor doc patches.
+	- Add t/17_Tree_Simple_width_test.t. This code was attached to RT#40407, to demonstrate a bug in
+		keeping a running total of the width (leaf count) of a tree during node additions to leaves.
+		Thanx to David Cryer for the test code and patch.
+	- Add t/21_Tree_Simple_Visitor_test.t. This code was attached to RT#30032, to demonstrate a bug
+		in including the root in a traversal after calling $visitor -> includeTruck(1).
+	- RT#30032: Adopt patch from Moses Amaro. With thanx.
+	- RT#38607: Reject. Suppressing deep recursion warnings should not normally be done. Sub-class!
+	- RT#40407: Adopt patch from David Cryer. With thanx.
+	- RT#84797: Reject. Changing the return value of setUID could break any amount of code.
+
+1.18  2007-11-11T12:00:00
+	- fixing version string to not choke on 5.10 (RT #29746).
+
+1.17  2006-10-23T12:00:00
+	- Make loading of Scalar::Util::weaken, completely optional
+	- Added a $post_func optional arg to &traverse. Thanks to Mark Lawrence for the patch, docs and
+		tests :).
+
+1.16  2006-02-06T12:00:00
+	- Converted to use Module::Build (Rob Kinyon)
+	- Refactored &addChild and &addChildren to be implemented in terms of &insertChild and
+		&insertChildren (Rob Kinyon)
+	- Other misc. refactorings (Rob Kinyon)
+	- Updated Scalar::Util version dependency (Stevan Little)
+	- Updated copyrights for the new year (Stevan Little)
+
+1.15  2005-05-26T12:00:00
+	- Added optional use of weakened parent references and improved the old circular reference
+		DESTROY model to make more sense. See the documentation for more info.
+	- Fixed bug in the fixDepth() function.
+
+1.14  2004-11-18T12:00:00
+	- Now using Scalar::Util::blessed() instead of the convoluted UNIVERSAL::isa() stuff.
+	- Added Scalar::Util as a dependency.
+
+1.13  2004-11-15T12:00:00
+	- Added width functionality (with getWidth). Thanks to Mark Thomas for his insight/suggestions.
+	- Added tests for this.
+	- Added documentation for this.
+	- Improved the height functionality, thanks again to Mark Thomas for his insight/suggestions.
+	- Deprecated the 'height' method in favor of the more consistent 'getHeight' method.
+	- Added tests for this.
+	- Added documentation for this.
+	- Added some info in the docs to explain the depth value for ROOT trees.
+	- Cleaned up and improved the following test files:
+		11_Tree_Simple_fixDepth_test.t
+		13_Tree_Simple_clone_test.t
+
+1.12  2004-10-07T12:00:00
+	- Fixed the clone method, it was not correctly cloning parental relationships.
+	- Added tests and docs for this.
+	- Improved clone and cloneShallow with the addition of the _cloneNode utility function, we now
+		deep clone the nodes.
+	- Added test and docs for this.
+
+1.11  2004-10-04T12:00:00
+	- Some documentation changes, no code changes.
+
+1.10  2004-08-31T12:00:00
+	- Streamlined the DESTROY method to avoid method calls as this can sometimes cause issues
+		during global destruction with subclasses.
+
+1.09  2004-08-31T12:00:00
+	- Fixed DESTROY to avoid memory leaks (RT-BUG: #7512).
+	- Added documentation to explain when to call the DESTROY method to properly clean up any
+		circular references.
+	- Added test (14_Tree_Simple_leak_test.t) to verify this fix. Needs Test::Memory::Cycle to run.
+
+1.08  2004-08-25T12:00:00
+	- Added the 'height' and 'size' methods.
+	- Added tests for these.
+	- Added documentation for these.
+
+1.07  2004-07-28T12:00:00
+	- Added the getUID and setUID methods to Tree::Simple. Thanks to Brett Nuske for that
+		suggestion.
+	- Added documentation for these methods.
+	- Added tests for those methods.
+	- Added t/pod.t and t/pod_coverage.t to the test suite.
+
+1.06  2004-07-06T12:00:00
+	- Changed what the Tree::Simple accept method accepts.
+	- Added tests for this.
+	- Completely Revised the Tree::Simple::Visitor object so that it is a better base class.
+		This coincides with the release of the Tree::Simple::VisitorFactory collection of Visitor
+		objects.
+	- Added tests for this.
+
+1.05  2004-06-06T12:00:00
+	- Fixed some vagueness in the documentation as well as made sure that the ROOT constant could
+		be given as a the $parent argument.
+
+1.04  2004-05-18T12:00:00
+	- The second argument to the Tree::Simple constructor was a parent, and that argument was not
+		getting properly type checked before attempting to call 'addChild' on it. Now it is
+		properly type checked and will throw an exception if it is not correct.
+
+1.03  2004-05-09T12:00:00
+	- I have added a new method 'getIndex', which will fetch the index of the current tree within
+		it's parent's child list. I have also added documentation and tests for this.
+
+1.02  2004-05-02T12:00:00
+	- I thought about the API change, and I decided that the new method (removeChildAt($index) )
+		did not make sense. It made more sense for removeChild to accept both $child and an $index,
+		and do the right thing based upon which one was given. This of course is how it works
+		anyway since I maintained backwards compatibility. But take note, removeChildAt($index)
+		will not be supported. The method is still there, but it will very soon go away.
+		I think this is a cleaner way to do this in the end.
+
+1.01  2004-04-28T12:00:00
+	- Made API change:
+	- removeChild($index) is now removeChildAt($index) and removeChild($child) has replaced it.
+		See the documentation for more info.
+	- Backwards compatibility maintained under change.
+	- New tests written to test the new code and to test the backwards compatibility.
+	- Test suite is not at 99% coverage (with 415 tests).
+	- Moved object initialization code from Tree::Simple::Visitor::new to
+		Tree::Simple::Visitor::_init. This keeps in line with the Tree::Simple code and the
+		seperation of object creation and initialization.
+
+1.00  2004-04-05T12:00:00
+	- I dont know why, but I was wary of calling this 1.0 but that is really what it is. I think
+		too many module	avoid that number, but I am not gonna do that. So here goes, its 1.0 baby!!
+	- Note: Being new to this versioning thing, I was actually going for a "minor" version thing
+		with the jump from 0.3 to 0.14. I realized that was not only dumb, but incorrect. But in
+		realizing this, I decided this is really 1.0 code anyway and took the plunge.
+
+0.15  2004-04-05T12:00:00
+	- Made a few adjustments:
+	- Changed to UNIVERSAL::isa($object, "Class") so as to avoid warnings if non-object refs are
+		passed.
+	- Added more tests to the Tree::Simple::Visitor object.
+	- Added more tests to check for non-object-refs passed where they shouldn't be.
+
+0.14  2004-04-04T12:00:00
+	- I feel this module is ready for serious use. I have been using it in production environments
+		for almost 2 years now, and I have recently beefed up the test suite as well. It now
+		has 371 tests with approx. 95% code coverage. I feel the code is solid as is the API
+		(although some people dont like my Java-esque naming style, but hey whatta ya do). Most of
+		this release is just tweaking and fine tuning of code, and updating of the documentation.
+
+0.03  2004-04-01T12:00:00
+	- Like an idiot I forgot to change the version number from version 0.01 to 0.02 and because of
+		CPAN's security-type restriction about uploading files with a duplicate name I have to up
+		the version number.
+
+0.02  2004-04-01T12:00:00
+ 	- First revision:
+	- Fixed a few bugs.
+	- Improved error messages.
+	- Added tests:
+	- Test for exceptions.
+	- Checked test coverage with Devel::Cover.
+
+0.01  2004-03-11T10:46:33
+	- Original version; created by h2xs 1.22 with options -X -n Tree::Simple.

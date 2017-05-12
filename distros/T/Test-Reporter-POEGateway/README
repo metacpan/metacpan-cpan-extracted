@@ -1,0 +1,181 @@
+NAME
+    Test::Reporter::POEGateway - A Test::Reporter::HTTPGateway using the
+    power of POE
+
+SYNOPSIS
+            #!/usr/bin/perl
+            use strict; use warnings;
+            use Test::Reporter::POEGateway;
+
+            # let it do the work!
+            Test::Reporter::POEGateway->spawn();
+
+            # run the kernel!
+            POE::Kernel->run();
+
+ABSTRACT
+    This implements the same logic as Test::Reporter::HTTPGateway but in
+    POE. The reason for this is because I didn't have a cgi host :(
+    Furthermore, this module splits the relaying logic into 2 separate
+    modules. You can either run both in one process or separate. That way,
+    you have more control over how the mailer will work. See
+    Test::Reporter::POEGateway::Mailer for the mailing side of the module.
+
+DESCRIPTION
+    Really, all you have to do is load the module and call it's spawn()
+    method:
+
+            use Test::Reporter::POEGateway;
+            Test::Reporter::POEGateway->spawn( ... );
+
+    This method will return failure on errors or return success. Normally
+    you don't need to pass any arguments to it, but if you want to do zany
+    things, you can!
+
+    This constructor accepts either a hashref or a hash, valid options are:
+
+   alias
+    This sets the alias of the session.
+
+    The default is: POEGateway
+
+   mailer
+    This sets the mailer session that POEGateway will use to send reports.
+    Useful to set if you have both running in the same process and you don't
+    want to use the file-based method of saving reports. Beware: if the
+    process/machine terminates and you have pending reports in the queue,
+    they will be lost!
+
+    The default is: undef ( not used )
+
+            use Test::Reporter::POEGateway;
+            use Test::Reporter::POEGateway::Mailer;
+
+            Test::Reporter::POEGateway->spawn(
+                    'mailer'        => 'mymailer',
+            );
+            Test::Reporter::POEGateway::Mailer->spawn(
+                    'alias'         => 'mymailer',
+                    'poegateway'    => 1,
+                    'mailer'        => 'SMTP',
+                    'mailer_conf'   => { ... },
+            );
+
+   reports
+    This sets the path where it will store received report submissions. This
+    effectively acts as a cache and lets the mailer pick up reports from the
+    directory and send them.
+
+    The default is: $ENV{HOME}/cpan_reports
+
+   key_cb
+    This sets the callback routine if you want to require a key to use the
+    gateway.
+
+    The callback will receive one argument: the key. It may be undefined or
+    a string or whatever the submitter put in it. It should return either 1
+    or 0.
+
+    The default is: sub { 1 } # do not require a key
+
+   httpd
+    Sets various POE::Component::Server::SimpleHTTP options if desired. This
+    should be a hashref. You normally would want to override the port, for
+    example. Note: You cannot override the HANDLERS!
+
+    The default is: { ALIAS => HTTPD, PORT => 11_111, HOSTNAME =>
+    POEGateway.net }
+
+  Commands
+    There is only one command you can use, as this is a very simple module.
+
+   shutdown
+    Tells this module to shut down the underlying httpd session and
+    terminate itself.
+
+            $_[KERNEL]->post( 'POEGateway', 'shutdown' );
+
+  More Ideas
+    None as of now, if you have ideas please submit them to me!
+
+  Module Notes
+    You can enable debugging mode by doing this:
+
+            sub Test::Reporter::POEGateway::DEBUG () { 1 }
+            use Test::Reporter::POEGateway;
+
+SEE ALSO
+    Test::Reporter::POEGateway::Mailer
+
+    Test::Reporter::HTTPGateway
+
+    Test::Reporter
+
+    POE
+
+    POE::Component::Server::SimpleHTTP
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::Reporter::POEGateway
+
+  Websites
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Test-Reporter-POEGateway>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Test-Reporter-POEGateway>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Test-Reporter-POEGateway>
+
+    *   CPAN Forum
+
+        <http://cpanforum.com/dist/Test-Reporter-POEGateway>
+
+    *   RT: CPAN's Request Tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Reporter-POEGateway>
+
+    *   CPANTS Kwalitee
+
+        <http://cpants.perl.org/dist/overview/Test-Reporter-POEGateway>
+
+    *   CPAN Testers Results
+
+        <http://cpantesters.org/distro/T/Test-Reporter-POEGateway.html>
+
+    *   CPAN Testers Matrix
+
+        <http://matrix.cpantesters.org/?dist=Test-Reporter-POEGateway>
+
+    *   Git Source Code Repository
+
+        This code is currently hosted on github.com under the account
+        "apocalypse". Please feel free to browse it and pull from it, or
+        whatever. If you want to contribute patches, please send me a diff
+        or prod me to pull from your repository :)
+
+        <http://github.com/apocalypse/perl-test-reporter-poegateway>
+
+  Bugs
+    Please report any bugs or feature requests to
+    "bug-test-reporter-poegateway at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Reporter-POEGateway
+    >. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+AUTHOR
+    Apocalypse <apocal@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2010 by Apocalypse
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

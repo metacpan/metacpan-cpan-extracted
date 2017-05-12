@@ -1,0 +1,53 @@
+---
+abstract: 'Detects unused variables in perl modules'
+author:
+  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Vars
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Vars:
+    file: lib/Test/Vars.pm
+    version: '0.014'
+requires:
+  B: '0'
+  List::Util: '1.33'
+  parent: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/houseabsolute/p5-Test-Vars/issues
+  homepage: https://github.com/houseabsolute/p5-Test-Vars
+  repository: git://github.com/houseabsolute/p5-Test-Vars.git
+version: '0.014'
+x_contributors:
+  - 'Nicholas Clark <nick@ccl4.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Dmitry Matrosov <amidos@amidos.ru>'
+  - 'Ran Eilam <ran.eilam@gmail.com>'
+  - 'FUJI Goro <gfx@users.noreply.github.com>'
+  - 'FUJI Goro <goro.fuji@ebookjapan.co.jp>'
+  - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Gregory Oschwald <goschwald@maxmind.com>'
+  - 'Dave Rolsky <autarch@urth.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

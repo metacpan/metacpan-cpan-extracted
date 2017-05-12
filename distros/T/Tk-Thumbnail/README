@@ -1,0 +1,12 @@
+
+DESCRIPTION
+       Create a Table of thumbnail images, having a default size
+       of 32x32 pixels.  Once we have a Photo of an image, shrink
+       it by copying a subsample of the original to a blank
+       Photo. Or maybe even zoom-in to expand it.
+
+       Click on an animated GIF to play it like a QuickTime movie.
+
+Steve Lidie
+2005/05/15
+sol0@lehigh.edu

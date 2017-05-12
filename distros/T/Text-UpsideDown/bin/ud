@@ -1,0 +1,130 @@
+#!/usr/bin/env perl
+use 5.008;
+use strict;
+use warnings;
+
+# PODNAME: ud
+# ABSTRACT: print your text Upside Down
+our $VERSION = '1.22'; # VERSION
+
+use Text::UpsideDown qw(upside_down);
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+use open qw(:std :encoding(UTF-8));
+use utf8;
+
+
+my %opts = ();
+GetOptions(\%opts,
+    'help',
+    'version',
+) or pod2usage(-verbose => 2, -output => *STDERR);
+pod2usage(-verbose => 2) if $opts{help};
+if ($opts{version}) {
+    print __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev';
+    exit;
+}
+
+if (@ARGV) {
+    print upside_down("@ARGV\n"), "\n";
+}
+else {
+    my $text = '';
+    while (<STDIN>) {
+        $text .= $_;
+    }
+    print upside_down($text), "\n";
+}
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+ud - print your text Upside Down
+
+=head1 VERSION
+
+version 1.22
+
+=head1 SYNOPSIS
+
+    $ ud hello
+    oʃʃǝɥ
+    $ ud
+    hello
+    world
+
+    pʃɹoʍ
+    oʃʃǝɥ
+
+=head1 DESCRIPTION
+
+If you provide text as command line arguments, they'll be printed
+back to you, upside down.
+
+If you don't, input is expected on STDIN, and will be turned
+upside down when EOF is reached.
+
+=head2 Options
+
+=over 4
+
+=item B<--help>
+
+Print this manpage and exit.
+
+=item B<--version>
+
+Print the version number.
+
+=back
+
+=encoding utf-8
+
+=for test_synopsis 1;
+__END__
+
+=head1 AVAILABILITY
+
+The project homepage is L<http://metacpan.org/release/Text-UpsideDown/>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/Text::UpsideDown/>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/doherty/Text-UpsideDown>
+and may be cloned from L<git://github.com/doherty/Text-UpsideDown.git>
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/doherty/Text-UpsideDown/issues>.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Mike Doherty <doherty@cpan.org>
+
+=item *
+
+Marcel Grünauer <marcel@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2007 by Marcel Grünauer and Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

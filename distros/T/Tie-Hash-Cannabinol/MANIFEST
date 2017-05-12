@@ -1,0 +1,13 @@
+lib/Tie/Hash/Cannabinol.pm
+Changes
+Makefile.PL
+Build.PL
+MANIFEST
+t/test.t
+t/test2.t
+t/pod.t
+t/pod-coverage.t
+COPYING
+README
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json

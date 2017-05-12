@@ -1,0 +1,44 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Template-Plugin-Filter-Pipe/",
+      "repository" : "http://github.com/hanekomu/Template-Plugin-Filter-Pipe",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-Filter-Pipe"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100860",
+   "name" : "Template-Plugin-Filter-Pipe",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Template::Plugin::Filter::Pipe" : {
+         "version" : "1.100860",
+         "file" : "lib/Template/Plugin/Filter/Pipe.pm"
+      }
+   },
+   "requires" : {
+      "Scalar::Util" : "0",
+      "parent" : "0",
+      "English" : "0",
+      "Template" : "0",
+      "Template::Plugin::Filter" : "0",
+      "Carp" : "0",
+      "perl" : "5.008",
+      "Test::More" : "0.88",
+      "Test::Differences" : "0",
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Text::Pipe" : "0"
+   },
+   "abstract" : "Filter plugin adapter for Text::Pipe",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

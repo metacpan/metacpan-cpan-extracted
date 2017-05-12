@@ -1,0 +1,11 @@
+Revision history for Test::Group::Foreach
+
+0.03    2009-11-28
+        Improved tgf_label() docs
+
+0.02    2009-11-14
+        Added the tgf_label() function
+
+0.01    2009-11-13
+        Initial release
+

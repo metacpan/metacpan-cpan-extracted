@@ -1,0 +1,5 @@
+#!perl
+use strict;
+use warnings;
+use Test::mysqld::DatadirDumper::CLI;
+Test::mysqld::DatadirDumper::CLI->run(@ARGV);

@@ -1,0 +1,28 @@
+Revision history for Perl extension UPF.
+
+1.0.5	Wed Oct 22 16:58:12 EDT 2003
+		fixed bugs in the Wants() method. It actually works now ;-)
+
+1.0.4	Fri Oct 10 17:14:58 EDT 2003
+		updated syntax for Config::Framework instantiation
+		updated Makefile.PL to require Config::Framework >= 2.4
+
+1.0.3	Tue Aug 19 16:08:23 EDT 2003
+		added Wants method.
+
+1.0.2	5/13/03 13:49:08
+		new syntax for ShowDiary population method, shows the way to passing
+		function style arguments within directives.
+		updated POD to reflect changes.
+
+1.0.1	10/25/02 9:44:08
+		fixed 'use' statement in test.pl so that it will at least
+		not fail CPAN testers. Still needs real test suite though.
+
+1.0		10/23/02 12:10:00
+		initial release for CPAN under namespace Text::UPF
+		first version of POD written for CPAN release.
+
+
+	
+	

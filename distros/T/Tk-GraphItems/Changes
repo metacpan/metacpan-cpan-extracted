@@ -1,0 +1,42 @@
+Revision history for Perl extension Tk::GraphItems.
+
+0.12  added LabeledConnectors (suggested by Serge Fleury)
+
+0.11  More and better tests 
+      Better examples
+
+0.10  More Tests
+
+0.08  Fixed a bug in Tk::GraphItems caused by 
+      Tk::GraphItems::TextBox->new resolving as (Tk::GraphItems::TextBox()) -> new .
+      Will never use ucfirst methodnames again ;)  
+
+0.07  Changed Makefile to require Tk 804.027
+
+0.06  2006-05-29
+      Moved functionality to Node.pm - parent class of TextBox and Circle
+      Added tests for Circle- and Tie- classes 
+      'bind_class' implemented for Connectors
+      Changed use VERSION to 5.008
+      requiring Scalar::Util 1.10 
+
+0.05  Added Circle class ( suggested by Nandor Sieben, thanks for testing )
+
+0.04  Added option autodestroy to Tk::GraphItems::Connector
+      Added option font to Tk::GraphItems::TextBox
+      Added example gi-graph.pl to demonstrate usage with Graph.pm
+
+0.03  Changed use VERSION to 5.008001 
+      Changed Tk::GraphItems::GraphItem::DESTROY to silence warnings during
+      global destruction.
+
+0.02  Added error-check  to GraphItem::_set_layer
+      Made GraphItems a wrapper for GraphItems::TextBox::new 
+      and GraphItems::Connector::new
+
+0.01  Thu Apr 20 19:09:55 2006
+	
+	first version
+
+
+

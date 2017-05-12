@@ -1,0 +1,42 @@
+=head1 NAME
+
+Toadfarm::Manual::VirtualHost - Virtual host setup
+
+=head1 DESCRIPTION
+
+This is an alternative to using C<nginx> (or another web server) in front
+as virtual host router.
+
+This is especially useful if already have a CDN (like L<http://cloudflare.com>)
+in front.
+
+=head2 Script
+
+The magic part here is the "Host" HTTP header which is sent by the browser,
+and will route to the correct application.
+
+  #!/usr/bin/perl
+  use Toadfarm -init;
+
+  mount "/home/www/project1/script/app1" => {
+    Host => "example.com",
+  };
+
+  mount "/home/www/project2/script/app2" => {
+    Host => "your-other-domain.com",
+  };
+
+  start ["http://*:8080"], workers => 8;
+
+Note: Defining a default app might be an idea, in case the a browser doesn't
+set the "Host" header.
+
+=head1 SEE ALSO
+
+L<http://en.wikipedia.org/wiki/Virtual_host>
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

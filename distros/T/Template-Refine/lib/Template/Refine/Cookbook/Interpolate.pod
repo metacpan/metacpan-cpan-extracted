@@ -1,0 +1,102 @@
+=head1 NAME
+
+Template::Refine::Cookbook::Interpolate - learn how to interpolate "variables" into HTML
+
+=head1 DESCRIPTION
+
+We'll start with a very
+simple task -- variable interpolation.  In C<Template::Refine>, we
+look at document regions, not "control structures", so the input HTML
+can look like anything.  The designer doesn't need to specifically
+mention in the template where C<$foo> is being interpolated.
+
+In reality, the designer is probably going to give you a page with
+some test data where the interpolation should be, like this:
+
+  <p>Hello, <span class="username">world</span>.</p>
+
+The C<username> class is there because the designer always wants
+usernames to show up in a yellow-on-green font, but we can use this
+tag to know where to interpolate the C<$username> variable.
+
+So let's do that.
+
+We start by loading C<Template::Refine>.  The main entry point is
+currently C<Template::Refine::Fragment>.  This class represents a
+document fragment that can be refined.
+
+    use Template::Refine::Fragment;
+    use Template::Refine::Utils qw(simple_replace replace_text);
+
+We also load some sugar, C<Template::Refine::Utils>.  Continuing, we
+need to load the document:
+
+   my $frag = Template::Refine::Fragment->new_from_file('welcome.html');
+
+Here we load the contents of C<welcome.html>; you could also load from
+a string with the C<new_from_string> constructor.  (An C<XML::LibXML>
+DOM tree is another option; see the POD for details.)
+
+Now we need to write the rule to replace the test data with the real
+username in the right places.  C<Template::Refine::Utils> contains a
+function, C<simple_replace>, that will return a
+C<Template::Refine::Processor::Rule> object to do this.  (It covers up
+a verbose-but-complete API for writing rules.  You can read the POD or
+source if you want to know how the whole rule processing system works.)
+
+C<simple_replace> takes two arguments, a coderef that generates the
+replacement DOM node given the current DOM node, and an XPath
+expression that finds relevant DOM nodes.  In this case, we want to
+find nodes that look like C<//*[@class="username"]>.  The code we want
+to run on each of those nodes will remove all the text inside the node
+and replace it with the username:
+
+   sub {
+       my $node = shift;
+       return replace_text $node, $username;
+   }
+
+C<replace_text> is another utility function.  It will take C<$node>,
+make a copy, remove the copy's children, add a simple text node (using
+C<$username> as the text) as a child, and then return the whole thing.
+This has the effect of transforming a node like C<< <p>Hello,
+<b>world</b></p> >> to C<< <p>Your text goes here</p> >>, which is
+what we want to do here.  (You can build your own nodes with the
+C<XML::LibXML> API if you want.)
+
+Anyway, the whole rule will look like this:
+
+   my $username = 'Test User';
+   my $rule = simple_replace {
+       my $node = shift;
+       return replace_text $node, $username;
+   } '//*[@class="username"]';
+
+Once we have the rule, we just need to apply it to the document
+fragment C<$frag>:
+
+   $frag = $frag->process($rule);
+
+We assign the result of the process call to the original variable
+since C<process> returns a copy; it doesn't modify the original
+document.  I was in a functional-programming mood when I wrote the
+module.  (Copying minimizes confusing side-effects, anyway.)
+
+We can obviously call C<$process> as many times as we want.  When
+we are done processing, we just need to C<render> the document to get
+our HTML back:
+
+  say $frag->render;
+
+That will then print:
+
+  <p>Hello, <span class="username">Test User</span>.</p>
+
+And that's that.  The basic flow is:
+
+  Template::Refine::Fragment->
+    new( ... )->
+    process( simple_replace { ... } '//x/path' )->
+    render;
+
+Simple!

@@ -1,0 +1,146 @@
+
+=head1 TODO
+
+Even though this template system is simple, that doesn't mean it can't
+be extended in many ways. Here are some features and designs that
+would be good extensions which add useful functionality without adding
+too much complexity.
+
+=over 4
+
+=item Closure call tree
+
+The internal format can be a nested set of closures. Each closure would contain
+private data such as fixed text parts of the original template, lists
+of other closures to run, etc. It is trivial to write a basic closure
+generator which will make build this tree a simple task. 
+
+=item Code ref call tree
+
+This format is a Perl data tree where the nodes have a code reference
+and its args (which can be nested instances of the same
+nodes). Instead of executing this directly, you will need a small
+interpreter to execute all the code refs as it runs through the tree.
+
+This would make for a challenging project to any intermediate Perl
+hacker. It just involves knowing recursion, data trees and code refs.
+Contact me if you are interested in doing this.
+
+=back
+
+=head2 Cased Hash Lookups
+
+One possible option is to allow hash renderings to always use upper or
+lower cased keys in their lookups.
+
+=head2 Render tokens before includes and chunks
+
+Currently tokens are rendered after includes and chunks. If tokens
+were rendered in a pass before the others, the include and chunk names
+could be dynamically set. This would make it harder to precompile
+templates as too much would be dynamic, i.e. you won't know what the
+fixed text to parse out is since anything can be included at render
+time. But the extra flexibility of changing the include and chunk
+names would be interesting. It could be done easily and enabled by an
+option.
+
+=head2 Plugins
+
+There are two different potential areas in Template::Simple that could
+use plugins. The first is with the rendering of chunkas and
+dispatching based on the data type. This dispatch table can easily be
+replaced by loaded modules which offer a different way to
+render. These include the precompiled renderers mentioned above. The
+other area is with code references as the data type. By defining a
+closure (or a closure making) API you can create different code refs
+for the rendering data. The range of plugins is endless some of the
+major template modules have noticed. One idea is to make a closure
+which contains a different Template::Simple object than the current
+one. This will allow rendering of a nested chunk with different rules
+than the current chunk being rendered.
+
+=head2 Data Escaping
+
+Some templaters have options to properly escape data for some types of
+text files such as html. this can be done with some variant of the
+_render_hash routine which also does the scalar rendering (which is
+where data is rendered). The rendering scalars code could be factored
+out into a set of subs one of which is used based on any escaping
+needs.
+
+=head2 Data Tree is an Object
+
+This is a concept I don't like but it was requested so it goes into
+the TODO file. Currently C<render> can only be passed a regular
+(unblessed) ref (or a scalar) for its data tree. Passing in an object
+would break encapsulation and force the object layout to be a hash
+tree that matches the layout of the template. I doubt that most
+objects will want to be organized to match a template. I have two
+ideas, one is that you add a method to that object that builds up a
+proper (unblessed) data tree to pass to C<render>. The other is by
+subclassing C<Template::Simple> and overriding C<render> with a sub
+that does take an object hash and it can unbless it or build a proper
+data tree and then call C<render> in SUPER::. A quick solution is to
+use C<reftype> (from Scalar::Utils) instead of C<ref> to allow object
+hashes to be passed in.
+
+=head2 Includes and Closure Synergy
+
+By pairing up an include template along with code that can generate
+the appropriate data tree for its rendering, you can create a higher
+level template framework (the synergy). Additional code can be
+associated with them that will handle input processing and
+verification for the templates (e.g. web forms) that need it. A key to
+this will be making all the closures for the data tree. This can be
+greatly simplified by using a closure maker sub that can create all
+the required closures.
+
+=head2 Metafields and UI Generation
+
+Taking the synergy up to a much higher level is the concept of meta
+knowledge of fields which can generate templates, output processing
+(data tree generation), input processing, DB backing and more. If you
+want to discuss such grandiose wacky application schemes in a long
+rambling mind bending conversation, please contact me.
+
+=head2 More Examples and Idioms
+
+As I convert several scripts over to this module (they all used the
+hack version), I will add them to an examples section or possibly put
+them in another (pod only) module. Similarly the Idioms section needs
+rendering and could be also put into a pod module. One goal requested
+by an early alpha tester is to keep the primary docs as simple as the
+markup itself. This means moving all the extra stuff (and plenty of
+that) into other pod modules. All the pod modules would be in the same
+cpan tarball so you get all the docs and examples when you install
+this.
+
+
+=head2 get_dependencies
+
+This method render the only C<INCLUDE> markups of a template and it
+returns a list of the file paths that were found and loaded. It is
+meant to be used to build up a dependency list of included templates
+for a main template. Typically this can be called from a script (see
+TODO) that will do this for a set of main templates and will generate
+Makefile dependencies for them. Then you can regenerate rendered
+templates only when any of their included templates have changed. It
+takes a single argument of a template.
+
+UNKNOWN: will this require a clearing of the cache or will it do the
+right thing on its own? or will it use the file path cache?
+
+	my @dependencies =
+		$tmpl->get_dependencies( '[%INCLUDE top_level%]' );
+
+
+find templates and tests
+
+deep nesting tests
+
+greedy tests
+
+methods pod
+
+slurp dependency in makefile.pl
+

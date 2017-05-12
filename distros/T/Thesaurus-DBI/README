@@ -1,0 +1,32 @@
+Thesaurus-DBI version 0.01
+==========================
+
+Thesaurus::DBI - Store and query synonyms (Thesaurus) in an SQL database.
+This module ist a subclass of Thesaurus.pm and implements database storage.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Thesaurus
+  DBI
+  (DBD::mysql)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Jo Seibert, jseibert (at) seibert-media (dot) net
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

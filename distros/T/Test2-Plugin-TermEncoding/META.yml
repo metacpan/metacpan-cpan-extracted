@@ -1,0 +1,29 @@
+---
+abstract: 'Test2 plugin to test with the encoding of the terminal'
+author:
+  - 'magnolia <magnolia.k@icloud.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.66'
+  Test2::Suite: '0.000070'
+configure_requires:
+  ExtUtils::MakeMaker: '6.66'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Plugin-TermEncoding
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Term::Encoding: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/magnolia-k/Test2-Plugin-TermEncoding/issues
+  homepage: https://github.com/magnolia-k/Test2-Plugin-TermEncoding
+  repository: https://github.com/magnolia-k/Test2-Plugin-TermEncoding.git
+version: '0.000002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

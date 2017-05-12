@@ -1,0 +1,34 @@
+<corpus lang='english'>
+<lexelt item="word1.n">
+<instance id="word1.1" docsrc="1">
+<answer instance="word1.1" senseid="1"/>
+<context>
+ T h i s i s t h e c o n t e x t f o r i n s t a n c e i d 
+</context>
+</instance>
+<instance id="word1.2" docsrc="2">
+<answer instance="word1.2" senseid="2"/>
+<context>
+ T h i s i s t h e c o n t e x t f o r i n s t a n c e i d 
+</context>
+</instance>
+<instance id="word1.3" docsrc="3">
+<answer instance="word1.3" senseid="3"/>
+<context>
+ T h i s i s t h e c o n t e x t f o r i n s t a n c e i d 
+</context>
+</instance>
+<instance id="word1.4" docsrc="4">
+<answer instance="word1.4" senseid="4"/>
+<context>
+ T h i s i s t h e c o n t e x t f o r i n s t a n c e i d 
+</context>
+</instance>
+<instance id="word1.5" docsrc="5">
+<answer instance="word1.5" senseid="5"/>
+<context>
+ T h i s i s t h e c o n t e x t f o r i n s t a n c e i d 
+</context>
+</instance>
+</lexelt>
+</corpus>

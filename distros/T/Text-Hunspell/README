@@ -1,0 +1,233 @@
+NAME
+
+Text::Hunspell - Perl interface to the Hunspell library
+
+DESCRIPTION
+
+Text::Hunspell is an interface to the GNU Hunspell library.  GNU Hunspell is a
+Free and Open Source spell checker.  The Text::Hunspell module is a thin XS
+wrapper around the Hunspell C++ Library.  Hopefully this is obvious, but you
+MUST have the Hunspell library installed on your system as a .so library,
+before installing this module.  You also MUST have any hunspell dictionary
+installed for "make test" to pass.  
+
+Hunspell's location is http://hunspell.sourceforge.net
+
+See BUILD NOTES and CURRENT ISSUES below before reporting any bugs.
+
+This module has been built and passed all tests on the following platforms:
+
+    perl 5.8.8 on Linux, gcc version 4.0.1 
+    hunspell 1.2.8 or higher
+    Mandriva Linux 2006
+    Knoppix Linux (Debian Linux)
+
+Please read SUPPORT below if you have trouble building Text::Hunspell.
+
+
+INSTALLATION
+
+Windows users see below.
+
+1) Install Hunspell and a Dictionary
+
+    Make sure you have a current version of Hunspell installed.
+    You must install both the Hunspell program and a dictionary.
+    They are distributed as separate packages. The dictionary can be
+    copied anywhere, since at startup the full path of the .dic/.aff files
+    will be givern to hunspell.
+
+    Hunspell and the dictionary packages contain README files that include
+    installation instructions.  Here's a basic overview:
+
+    Hunspell must be installed first, then install the dictionary file and finally
+    install the Text::Hunspell module.
+
+    Hunspell installation example:
+    1. download an untar hunspell
+    2. cd hunspell
+    3. ./configure
+    4. ./make
+    5. cd ./src/hunspell
+    6. ./configure
+    7. make
+    8. copy makeso.sh file here
+    9. sh makeso.sh and do manually the copy and 2 link commands
+       as described at the end of makeso.sh
+   10. cd ../tools
+   11. ./configure
+   12. make
+
+ 
+    If you used a --prefix option to install Hunspell in a non-standard location you
+    will need to adjust your path to include $PREFIX/bin.  The configure script
+    for the dictionary needs to find programs installed in the previous step.
+
+
+    At this point you should be able to run Hunspell in interactive mode.
+    For example:
+    cd hunspell/src/tools
+    ./example full_path_aff full_path_dic file_to test
+
+
+2) Build and install this Text::Hunspell module.
+
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    # make install
+
+
+    If you installed Hunspell in a non-standard location (for example, if
+    you don't have root access) then you will need to tell Makefile.PL where to
+    find the library.
+
+    For example, if Hunspell was installed in $HOME/local (--prefix=$HOME/local)
+    and the perl module should be installed in the perl library $HOME/perl_lib:
+
+    $ perl Makefile.PL PREFIX=$HOME/perl_lib \
+    CCFLAGS=-I$HOME/local/include \
+    LIBS="-L$HOME/local/lib -lhunspell"
+
+    $ LD_RUN_PATH=$HOME/local/lib make
+    $ make test
+    $ make install
+
+    Perl must have been buit with thread support in order to work with Text::Hunspell.
+
+WINDOWS USERS
+
+Randy Kobes has provided a PPM and the following instructions for installing
+Text::Hunspell on Windows.  Thanks very much Randy.
+
+For installing on Win32, first get and install the "Full installer"
+executable at
+
+   http://hunspell.net/win32/
+
+this will install Hunspell into a location such as C:\Program Files\Hunspell. You
+will also need to fetch and install at least one of the precompiled
+dictionaries found on the same page.
+
+Make sure that the path to the Hunspell bin directory (e.g. C:\Program
+Files\Hunspell\bin\) is in your PATH environment variable.  For help with
+setting your path see "set environment variables" in the Windows Help
+Utility.  You may need to reboot or open a new shell window after setting
+your path.  The Hunspell .dll file must be located in the PATH before using
+Text::Hunspell.
+
+Then, to install Text::Hunspell, type at a DOS prompt (all on one line)
+
+   C:\> ppm install http://theoryx5.uwinnipeg.ca/ppms/Text-Hunspell.ppd
+
+for an ActivePerl 8xx version, or
+
+   C:\> ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Text-Hunspell.ppd
+
+for an ActivePerl 6xx version.
+
+If you wish to build Text::Hunspell from source:
+
+If you want to build Text::Hunspell yourself, you'll need a C compiler, which
+must be the same one that your Perl is built with (for ActivePerl, this means
+VC++ 6). Assuming you have that, in addition to the "Full installer" binary
+package at http://hunspell.net/win32/, you'll also need to get and install the
+hunspell-dev package (also located at http://hunspell.net/win32/), which contains
+the necessary .lib and .h files needed to compile the Perl module.
+
+Like above, make sure the PATH environment variable points to the location of
+the installed Hunspell .dll file before building Text::Hunspell.
+
+Installation then proceeds as described for the Unix version:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+with the additional requirement of passing to 'perl Makefile.PL' the
+necessary arguments (e.g. INC and LIBS) to specify the locations of the lib
+and header files, if these were installed in a non-standard location. Make
+sure that if a non-standard location was used that this is added to your PATH
+environment variable before running the tests.
+
+
+SUPPORT
+
+Before contacting me with problems building Text::Hunspell please try and debug
+as much as possible.
+
+For example, if "make test" fails, then run in verbose mode:
+
+   make test TEST_VERBOSE=1
+
+That may show at what test is failing.  It's easy to run the test
+script manually -- and you can even edit and add a few print statements to
+aid in debugging.
+
+For example:
+
+   perl -Iblib/lib -Iblib/arch t/test.t | less
+
+Use of LD_RUN_PATH, CCFLAGS and LIBS as above may also help if the build
+process fails.
+
+Remember that you *must* have the English dictionary installed for tests to
+pass (sorry, have to check against some dictionary).  Also, you may need to
+set your LANG variable to "en_US" so that the English dictionary is selected.
+
+If all else fails, use the request tracker at:
+
+  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Hunspell
+
+
+BUILD NOTES / CURRENT ISSUES
+
+A number of people have reported the
+
+    $speller->store_replacement()
+
+test failing on some platforms.  I don't know why.  Search google to find out
+why I don't know why.  The code (from what I can tell) looks like it should be
+returning an error value, but fails on some platforms.  Until I can get a
+better answer I'm going to assume Hunspell is broken and ignore the return value
+in t/test.t.  So don't test the return value in your code, either.
+
+Some users of OS X have reported the test failing after calling clear_session().
+The test is suppose to see if a word added to the session is removed after calling
+clear_session().  It's another error I have not been able to reproduce on the machines
+I tested on.
+
+
+"Pax" provided these notes:
+
+    I just got Text::Hunspell to build and work under OpenBSD 3.7 and thought you
+    might like a tiny suggestion: in the README, you might note that under this
+    operating system you need to add -lstdc++ to the list of libraries you link
+    against, e.g.:
+
+            $ perl Makefile.PL \
+                   PREFIX=/usr/local INSTALLDIRS=site \
+                   CCFLAGS=-I/usr/local/include \
+                   LIBS="-L/usr/local/lib -lhunspell -lstdc++"
+
+    If you don't do this, then any attempt to use Text::Hunspell will throw
+    thousands of unresolved symbol errors trying to load your shared object.
+    This is against libhunspell in /usr/local/lib installed from the hunspell
+    port in the OpenBSD 3.7 ports tree, FWIW.
+
+
+A number of Solaris uses have reported the need to set:
+
+    LDFLAGS='-L/usr/local/lib -R/usr/local/lib'
+
+and also having to copy libstdc++* to /usr/lib.  YMMV.
+
+
+Changes compared to Hunspell::text
+
+hunspell.h was modified, since classe Hunspell was heavily modified between
+1.2.8 and 1.4.x, among others methods spell and suggest got new parameters,
+that causes the function name to get modified from U _ZN8Hunspell5spellEPKc to
+U _ZN8Hunspell5spellEPKcPiPPc 
+

@@ -1,0 +1,32 @@
+benchmark.pl measures the speed differences between a hash, Tree::Ternary,
+and Tree::Ternary_XS.
+
+The results below are from my developement system, it shows Tree::Ternary_XS
+being faster from between 50 and 260 times faster.
+
+Leon Brocard, leon@astray.com, 31/4/2000
+
+** insert **
+Benchmark: running Hash, Ternary, Ternary_XS, each for at least 20 CPU seconds...
+      Hash: 26 wallclock secs (25.71 usr +  0.01 sys = 25.72 CPU) @  1.05/s (n=27)
+   Ternary: 30 wallclock secs (28.92 usr +  0.44 sys = 29.36 CPU) @  0.03/s (n=1)
+            (warning: too few iterations for a reliable count)
+Ternary_XS: 24 wallclock secs (24.32 usr +  0.00 sys = 24.32 CPU) @  1.48/s (n=36)
+
+** search **
+Benchmark: running Hash, Ternary, Ternary_XS, each for at least 20 CPU seconds...
+      Hash: 26 wallclock secs (25.98 usr +  0.01 sys = 25.99 CPU) @  1.77/s (n=46)
+   Ternary: 46 wallclock secs (46.10 usr +  0.00 sys = 46.10 CPU) @  0.07/s (n=3)
+            (warning: too few iterations for a reliable count)
+Ternary_XS: 22 wallclock secs (22.34 usr +  0.00 sys = 22.34 CPU) @  3.80/s (n=85)
+
+** pmsearch **
+Benchmark: running Ternary, Ternary_XS, each for at least 20 CPU seconds...
+   Ternary: 173 wallclock secs (171.28 usr +  0.02 sys = 171.30 CPU) @  0.01/s (n=1)
+            (warning: too few iterations for a reliable count)
+Ternary_XS: 27 wallclock secs (26.04 usr +  0.02 sys = 26.06 CPU) @  1.23/s (n=32)
+
+** nearsearch **
+Benchmark: running Ternary, Ternary_XS, each for at least 20 CPU seconds...
+   Ternary: 35 wallclock secs (34.05 usr +  0.01 sys = 34.06 CPU) @  0.32/s (n=11)
+Ternary_XS: 20 wallclock secs (20.07 usr +  0.03 sys = 20.10 CPU) @ 83.73/s (n=1683)

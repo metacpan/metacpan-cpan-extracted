@@ -1,0 +1,30 @@
+Tie::ShareLite version 0.03
+==========================
+
+Tie::ShareLite provides for a tied hash interface to the IPC::ShareLite module
+that is very similar to the one provided by IPC::Shareable.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IPC::ShareLite
+
+COPYRIGHT AND LICENCE
+
+Copyright 2004, Nathan Shafer <nate-tiesharelite@seekio.com>.
+All rights reserved.
+
+This module is free software; you may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+

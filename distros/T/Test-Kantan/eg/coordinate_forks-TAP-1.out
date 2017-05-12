@@ -1,0 +1,8 @@
+
+
+# Heh
+ok 1 - ok { 1 }; # Parent
+# Diagnostic from parent
+not ok 2 - ok { 0 }; # Child
+# Diagnostic from child
+1..2

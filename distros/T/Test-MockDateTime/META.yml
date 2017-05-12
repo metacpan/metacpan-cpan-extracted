@@ -1,0 +1,19 @@
+---
+abstract: 'mock DateTime->now calls during tests'
+author:
+  - 'Wolfgang Kinkeldei <wolfgang@kinkeldei.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-MockDateTime
+requires:
+  DateTime: 1
+  DateTime::Format::DateParse: 0.05
+  ok: 0.11
+version: 0.02

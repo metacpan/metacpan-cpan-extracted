@@ -1,0 +1,19 @@
+---
+name: Test-TAP
+version: 0.03
+author:
+  - 'Curtis Poe <ovid@cpan.org>'
+abstract: Test your TAP
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  Test::TAP:
+    file: lib/Test/TAP.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

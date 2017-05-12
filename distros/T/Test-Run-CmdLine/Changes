@@ -1,0 +1,174 @@
+Revision history for Test-Run-CmdLine
+
+0.0131  2015-01-20
+    - Hopefully fix t/03-prove.t on MS Windows and other \r\n systems.
+        - The problem appeared to be a bug in the perl 5 regex engine.
+
+0.0130  2015-12-28
+    - Resubmit.
+
+0.0129  2015-12-13
+    - Update an old E-mail address.
+
+0.0128  2015-06-04
+    - Hopefully fix the test failures on Microsoft Windows.
+        - the problem was matching newline as qr/\n/ instead of qr/\r?\n/.
+
+0.0127  2015-06-02
+    - Add $VERSION to lib/**.pm modules that were missing it so they'll be
+    indexed
+        - See https://rt.cpan.org/Ticket/Display.html?id=104864
+        - Thanks to CHORNY for the report.
+    - Convert from 'use base' to the more modern 'use parent'.
+        - “Because I’m all about the base, about the base, about the base.
+        No parent!”
+
+0.0126  2014-01-31
+    - Get rid of trailing space with a test - t/style-trailing-space.t .
+    - Add scripts/bump-version-number.pl
+    - Separate "LICENSE" file (CPANTS).
+
+0.0125  2012-09-05
+    - Moved away tag-release.pl under scripts to it won't be installed
+    by default.
+
+0.0124  2012-09-04
+    - Explicit dependency on Test::Run::Core-0.0126, due to failing tests
+    because of old Test::Runs such as:
+        - http://www.cpantesters.org/cpan/report/1ed1430c-c44b-11e1-a3d2-759981a2c3a6
+
+0.0123  2011-06-25
+    - Fix failing tests when Test::More is in PERL5LIB and under taint:
+        - http://www.cpantesters.org/cpan/report/a37248f8-9d15-11e0-a7a9-d9218ce8c8b8
+
+0.0122  2010-07-14
+    * Changed the wrong "Regexp" type constraint to "RegexpRef".
+        - this caused a breakage in recent Moose releases.
+
+0.0121  2010-02-09
+    * Converted to MooseX-Getopt.
+    * Moved away from _init into BUILD.
+    * Got rid of the _get_private_fields() anti-Moosism.
+
+0.0120  2009-08-06
+    * Changed to use YAML::XS instead of YAML.pm.
+    * Converted to Moose.
+    * Bumped the version number to 0.0120 to indicate the Moosification.
+
+0.0112  2009-07-05
+    * Changed the exit status of "runprove --help" to 0.
+    * Added meta-data and other information to the Build.PL.
+
+0.0111  2009-05-04
+    * Replaced "NEXT.pm" with MRO::Compat.
+
+0.0110  2008-08-19
+    * Documentation fix - converted:
+        {{ =head2 $self->private_backend_args() }}
+    To:
+        {{ =head2 $self->private_backend_plugins() }}
+
+    * Fixed a bug where YAML.pm was not loaded and as a result the YAML
+    arguments were broken.
+
+0.0109  2008-08-19
+    * Factored out some methods in lib/Test/Run/CmdLine/Iface.pm to
+    make debugging easier.
+        - _real_prepare_driver_class
+        - _prepare_driver_class
+        - _calc_driver
+    * Added private_backend_plugins() to collect the backend plugins
+    from the front-end plugins.
+    * Added more tests to the private_backend_plugins().
+    * Moved the t/Test module-directory-structure to under t/lib .
+        - Adapted the test files accordingly.
+        - Adapted the MANIFEST accordingly.
+
+0.0108  2008-08-18
+    * Changed all the initializers to _init() instead of _initialize().
+        - In compatibility with Test-Run-0.0117
+    * Now depends on Test-Run-0.0117
+
+0.0107  2008-02-19
+    * Now testing the system return code of runprove in t/03-prove.t.
+        - Fixed it in the module.
+    * Added some examples for integrating Test::Run::CmdLine into Perl-based
+    build-systems under examples/.
+
+0.0106  2007-06-23
+    * Placed the runprove trapping functionality in
+    lib/Test/Run/CmdLine/Trap/Prove.pm for easy re-use by the
+    plugins.
+    * Added lib/Test/Run/CmdLine/Prove/App.pm as a standalone -M command
+    line module implementing the "runprove" functionality.
+        - Also useful for testing - see below.
+        - converted runprove to use it.
+    * Added lib/Test/Run/CmdLine/Trap/ProveApp.pm for testing
+    the ::Prove::App Module-App, so we won't rely on "runprove"
+    being in the path.
+
+0.0105  2007-06-11
+    * Now prove does not barf with weird errors when ran with no arguments.
+    * Converted t/04-t-r-cl-iface.t to Test::Trap.
+    * Refactored the get_backend_env_args() method of Test::Run::CmdLine.
+    * Extracted a method.
+    * Extended the environment variables handling in
+    Test::Run::CmdLine with types.
+    * Replaced "back_end" with "backend" in an identifier for better
+    consistency.
+    * Added the yamldata backend environment variable type, and
+    converted the "alternate interpreters" plugin to use it.
+    * Added the "varmap" type to Test::Run::CmdLine.
+    * Converted to use Build.PL and Test::Run::Builder.
+    * Refactored the tests of t/03-prove.t into Test::Run::Trap::Obj.
+    * Converted the Test::Run::CmdLine get_backend_env_args to
+    private_backend_args (using accum_array) instead of NEXT::.
+    * Converted the indirect_env_mapping routines to using
+    accum_array instead of NEXT::.
+
+0.0104  2007-03-19
+    * Fixed running runprove with no arguments.
+    * Converted the tests to Test::Trap.
+
+0.0103  2007-02-16
+
+    * Fixed a bug in Test::Run::CmdLine::Prove where the Switches parameter
+    was not over-rided from its "-w" default. This caused -w to be passed
+    to the interpreter which broken non-perl test scripts.
+
+0.0102  2006-11-11
+    * Changed the dependency from Test::Run::Obj to Test::Run::Core to make
+    CPAN.pm happy. Don't know why Test::Run::Obj wasn't indexed.
+
+0.0101  2006-11-08
+    * Added some links to the POD, most of which are inserted by new versions
+    of Module-Starter.
+    * First stable version.
+
+0.0001_04   2006-10-07
+    * Added UNIVERSAL::require to the pre-requisites.
+
+0.0001_03   2006-10-05
+    * Fixed the tests in Test-Run-CmdLine so they'll pass even if plugins
+    are specified by deafult (or any other $ENV{HARNESS_.*}) shenanigan.
+    * Adapted to the new ($self, $args) instead of ($self, %args) interface
+    of Test::Run.
+    * Changed the interface of the classes' constructors to accept a single
+    $args hash ref, instead of %args.
+
+0.0001_02   2006-03-13
+    * Added docs/Namespace-Planning.txt for the namespace planning.
+    * Made Test::Run::CmdLine into a driver+plugins architecture
+      with a backend driver and plugins.
+    * Created a Test::Run::CmdLine::Prove class with the implementation
+      of the "runprove" command line utility to run tests directly from
+      the command line.
+    * Added the documentation of prove to the end of the runprove program
+      itself and adapted it for runprove.
+    * Added pod to Test::Run::CmdLine.
+    * Added many tests.
+
+0.0001_01   2005-11-29
+    * Initial CPAN.pm version. Works sort of and has a functional "runprove"
+    utility.
+

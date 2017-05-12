@@ -1,0 +1,7 @@
+
+<<Included template>>
+
+<<main template>>
+
+message: "hello"
+

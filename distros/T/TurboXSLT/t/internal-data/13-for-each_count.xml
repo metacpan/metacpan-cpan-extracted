@@ -1,0 +1,11 @@
+<subgenres>
+	<subgenre>
+		<genre_type arts_count="1"/>
+		<genre_type arts_count="2"/>
+		<genre_type arts_count="3"/>
+	</subgenre>
+	<subgenre>
+		<genre_type arts_count="4"/>
+		<genre_type arts_count="5"/>
+	</subgenre>
+</subgenres>

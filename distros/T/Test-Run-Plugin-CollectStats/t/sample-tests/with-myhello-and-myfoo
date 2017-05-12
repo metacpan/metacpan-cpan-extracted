@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Test::More tests => 2;
+
+use MyHello;
+use MyFoo;
+
+my $value = "Trilogy";
+
+my $ret = MyHello::return_hello($value);
+
+# TEST
+is_deeply($ret, ["Trilogy", "hello"]);
+
+$ret = MyFoo::return_foo($value);
+# TEST
+is_deeply($ret, ["Trilogy", "foo"]);

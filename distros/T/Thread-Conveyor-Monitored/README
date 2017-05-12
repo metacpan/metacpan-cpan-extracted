@@ -1,0 +1,34 @@
+README for Thread::Conveyor::Monitored
+
+Sub-class of Thread::Conveyor that creates a belt and a monitoring
+thread that monitors the values that are put in boxes on the belt.
+Can be used for simple logging or warning for specific events or
+whatever you want to monitor that is able to send information to
+the monitored belt.
+
+                   *** A note of CAUTION ***
+
+This module only functions on Perl versions 5.8.0 and later.
+And then only when threads are enabled with -Dusethreads.
+It is of no use with any version of Perl before 5.8.0 or
+without threads enabled.
+
+                   *************************
+
+Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Version:
+ 0.14
+
+Required Modules:
+ load (any)
+ Thread::Conveyor (0.15)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

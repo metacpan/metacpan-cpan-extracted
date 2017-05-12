@@ -1,0 +1,36 @@
+=head1 NAME
+
+Term::ShellKit::ReadMe - Reusable command-line Perl environment
+
+
+=head1 MOTIVATION
+
+It's often useful to be able to use a Perl interpreter interactively, to experiment with new code, or to perform a one-off operation. Developers often rely on a simple Perl invocation such as C<perl -d -e 1> or C<perl -n -e 'eval; warn "$@\n"'>. This module provides an enhanced version of such an interpreter that provides more features commonly associated with shell processes
+
+It uses Perl's Term::Readline to support Unix line editing conventions, including standard control characters, continuation lines, and a command history. Results of each eval are printed, or piped through a pager program if they're long (default is /usr/bin/more).
+
+An "alias" command lets you create shortcuts for common operations, and a few default aliases are defined to let you quickly run /bin/sh expressions ("! ls /tmp") or get perldoc documentation for a module ("? LWP::UserAgent").
+
+It also provides a "reload" command that re-reads the source code to any modules that have changed since they were last loaded, which facilitates the type of "interactive coding" under discussion. In particular, you can create an object and start working with it, then change the source code for one of its methods, reload, and use the new code, without loosing the current internal state of your object.
+
+
+=head1 CREDITS AND COPYRIGHT
+
+=head2 Developed By
+
+  M. Simon Cavalletto, simonm@cavalletto.org
+  Evolution Softworks, www.evoscript.org
+
+=head2 Copyright
+
+Copyright 2002 Matthew Cavalletto. 
+
+Portions copyright 2000, 2001 Evolution Online Systems, Inc.
+
+Based on the CPAN shell by Andreas Koenig E<lt>andreas.koenig@anima.deE<gt>.
+
+=head2 License
+
+You may use, modify, and distribute this software under the same terms as Perl.
+
+=cut

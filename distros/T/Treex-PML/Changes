@@ -1,0 +1,37 @@
+Revision history for Treex-PML
+
+2.22    Tue Apr  4 23:51:00 CEST 2017
+        Fix documentation formatting.
+
+2.21    Mon Oct  3 00:04:34 CEST 2016
+        Hack: require correct XML::CompactTree::XS if wrong version is
+        present in both Build.PL and Makefile.PL
+
+2.20    Sun Oct  2 21:40:28 CEST 2016
+        Proper fix for 5.20+: increase minimal version of
+        XML::CompactTree::XS
+
+2.19    Sun Oct  2 13:10:19 CEST 2016
+        bugfix: should work in 5.20+
+
+2.18    Wed Nov  4 00:13:33 CET 2015
+        bugfixes: inverted logic in validation, FSFactory removed
+
+2.11    Sun Mar  3 22:09:16 CET 2013
+        bugfixes: do not resolve symlinks
+
+2.09    Tue Oct 25 11:02:29 CEST 2011
+        bugfix: quote ']]>'
+
+2.06    Tue Mar 8 15:50:38 2011
+        bugfix: correctly test $@ when trying backends
+
+2.03    Fri Apr 23 08:56:17 2010
+        Fixed a bug in relative URL resolving revealed on MSWin32 platform
+	Minor fixes: build, compatibility, documentation, nest Fs2csts
+	and Csts2fs into Treex::PML namespace properly
+
+2.01    Mon Apr 19 16:15:35 2010
+        First version released on an unsuspecting world
+	(ported from a library originally called Fslib and used
+	internally in the tree editor TrEd).

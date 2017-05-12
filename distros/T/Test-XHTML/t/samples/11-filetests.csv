@@ -1,0 +1,9 @@
+#,# Configuration,
+config,wai=1,
+
+#,# Rules for all pages,
+all body,Copyright &#169; 2010,.. Footer found
+
+#,# WAI Test Page,
+file,./t/samples/test03.html,
+body,<h1>Details</h1>,

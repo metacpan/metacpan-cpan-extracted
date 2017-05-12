@@ -1,0 +1,53 @@
+{
+   "abstract" : "Change terminal modes, and perform non-blocking reads.",
+   "author" : [
+      "Kenneth Albanowski",
+      "Jonathan Stowe"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TermReadKey",
+   "no_index" : {
+      "file" : [
+         "Configure.pm"
+      ],
+      "package" : [
+         "Configure"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.58"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.58"
+         }
+      }
+   },
+   "provides" : {
+      "Term::ReadKey" : {
+         "file" : "META.yml",
+         "version" : "2.37"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jonathanstowe/TermReadKey.git",
+         "web" : "https://github.com/jonathanstowe/TermReadKey"
+      }
+   },
+   "version" : "2.37",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

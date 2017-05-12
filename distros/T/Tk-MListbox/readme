@@ -1,0 +1,83 @@
+Tk::MListbox Module 1.10
+
+
+Tk::MListbox is another "column" or "table" widget. It works much like a
+Listbox, but instead of storing each row as a scalar, each row in the MListbox
+is a list or an array, each element in the list/array represents a column in 
+the row. 
+
+Tk::MListbox lets the user resize the columns by dragging a separator bar
+between each column. The user might change the order of the column by dragging
+the column headers. The data in the widget might be sorted by clicking one of
+the column headers. A new click, and the sort order is reversed.
+
+Tk::MListbox is scrollable and supports the Scrolled() method.
+
+Tk::MListbox is designed for displaying reports like the result of a database
+query or the contents of a directory.
+
+Two example programs are provided: sql.pl lets the user enter a query and 
+displays the result in a MListbox. Requires DBI.pm. test.pl is a very 
+simple file browser for unix/windows.
+
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+MListbox.pm contains pod documentation.
+
+
+ABOUT VERSION  1.10
+
+This version is a thorough scrub of version 1.09 - I'm hopeful
+that I caught all bugs, but realistic enough to know that I 
+probably didn't. So, if you should find one, please report it
+and I'll fix it. The comp.lang.perl.tk newsgroup is the best
+place to post such finds - this was the problems can be 
+brought to the attention of a larger group of people and 
+perhaps someone will offer a patch that much faster.
+
+In an attempt to get this out the door before Christmas, there
+are some things which are incomplete - documentation and a decent
+test script. There is something called test.pl, but this is 
+really just a script that shows MListbox being used. As for 
+documentation... There is MListbox.pod which is the older
+documentation that I need to update. Since this version is 
+mostly just a maintenance version, the docs should be valid,
+though threadbare.
+
+You will find my documenation in a directly called docs. It's
+a format that I've been experimenting with. MListbox.html
+is mostly done. What's left to be finished is:
+
+docs/MListbox/tutorial.html
+docs/MListbox/MLColumn.html
+docs/MListbox/HButton.html
+docs/MListbox/CListbox.html
+
+Between the old docs, and MListbox.html, and
+the sample scripts, I'm confident that it should be enough
+to get started started until I can finish off the rest of 
+the docs.
+
+
+For bug reports, comments and suggestions:
+
+post problems to the comp.lang.perl.tk group
+but if absolutely necessary, send an email to:
+
+ Rob Seegel (RobSeegel@aol.com)
+
+
+
+
+
+
+
+
+
+
+

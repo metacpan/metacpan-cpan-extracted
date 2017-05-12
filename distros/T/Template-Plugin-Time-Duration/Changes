@@ -1,0 +1,8 @@
+Revision history for Template-Plugin-Time-Duration
+
+0.02    February 3, 2010
+    - Fix undeclared dependency on ok.pm (Thanks Andreas Koenig)
+
+0.01    January 31, 2010
+        First version, released on an unsuspecting world.
+

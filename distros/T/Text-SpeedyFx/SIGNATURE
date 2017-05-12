@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 32806593f076e6fef6194a857980c2cdacc295ac Changes
+SHA1 d57d49453ae8e1f06611a169b9958fa805fd5f83 LICENSE
+SHA1 0cd87758c7ba2abcc5773d303d616808e6ee53ee MANIFEST
+SHA1 29c63f1c45825d4b753556dd307abea557d746e1 MANIFEST.SKIP
+SHA1 0e1f12f8e01a94e6f01eeb1dc4a2d8906d3ee508 META.yml
+SHA1 22b6f9a49eaab7fbdf7248d515ecdaddb623ae47 Makefile.PL
+SHA1 55b587e5d88c91acfd254d63b5fc2eb5ca26d946 README
+SHA1 c3f6086892033203d2abbce53c792e19d34da9d9 SpeedyFx.xs
+SHA1 7350fe68da811873dc44c5acf5f414d786aa4f05 bin/cosine_cmp
+SHA1 9950b2cfdefb2b98fa1f96bea58589f28ee82852 bin/minhash_cmp
+SHA1 38294927bb6c0cd5c59c94caa0adfcc200f01aef bin/uniq_wc
+SHA1 e475dda0da1e162adfdd384281f9a7654f59ed63 dist.ini
+SHA1 0b4b110a90a0eb936010c1cb8ae929f6e727b208 eg/benchmark.pl
+SHA1 2f3c792906d8ba1bb03621103363360d518d4c3c lib/Text/SpeedyFx.pm
+SHA1 59a4930fe99e9ecb688a5a5e1ff79c74e450259d nedtrie.h
+SHA1 41b7251366b2eeb10817591a705c1b7150308404 perlcritic.rc
+SHA1 d169c475eede0a30a9935619fec7352deeabc8d5 ppport.h
+SHA1 5b331e39086e7d1814ae4889cc9bfbc46d732e05 t/00-compile.t
+SHA1 b112e820bc612f5c74b566f5d56599badb71bba1 t/00-load.t
+SHA1 3cd40be7f3dfdd9d5f8775a56fb60856e12350b8 t/05-nedtrie.t
+SHA1 c8c1892945bf2eb1c03fea9e2d7ab032bb67cc55 t/10-tiny.t
+SHA1 a130845bfe55e07105c1e963694122891464e768 t/20-small.t
+SHA1 f4a244c5754f8d4e47fa5df081ad99cc793072c3 t/30-latin1.t
+SHA1 5b157512467a18bf65a468f86b6c28dde445bea4 t/40-leak.t
+SHA1 8b1503a4d84d232e7786aa1685b19cde72db7588 t/50-break.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 00a59482fa74fd536a1a3ea919bbe46b0ff91ae1 t/author-eol.t
+SHA1 46bfa3db3ac49eb519c6fed798eaad13b28e4228 t/author-no-tabs.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 d165f8ec069354540640243399f536af695046dd t/release-distmeta.t
+SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 bf4fdda27bd4e8ec177c38cca43083317494cba8 t/release-portability.t
+SHA1 44aad671b03350a7f2d915c721dab2f1c2e068f5 t/release-synopsis.t
+SHA1 af34d5f9f8bd79b21b6c01c69e0afdd81f25c16b t/release-test-version.t
+SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
+SHA1 0697d2ddb4d6a4e719ea5ce13617f5f4ecb51dd4 typemap
+SHA1 0e14f49aa86c16a2c24271c32101394f118d0b09 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUoUK/AAoJEDlxU7ZVUpmiOncH/2VTfsj+jxcrcdVOLyEItoPb
+0tJ02s2oIpZAmxcHuBokcvrhVpuG2pCUBx6kVVKQhKs2AAuafdDbi3sSEEU2sFP2
+bhsMrWCJpBbkt7P87YE9DactdrWk+Abh8wee+2CbaNyPIZ8s24ZrbEr6YdVx13G+
+HE4FuAeNOmUdm5v0DslnNwix9JJ6XM5i57UJNcDL9TptQ8w7F+a+xF8EqAMmazMR
++VCeuHbGsf8Atyv23kCVjCQSP3naDSqQslwvK9TdPmr5SfBfSDjL1ba7d4wMoejs
+MRNJscW0mmU8rYU8BumrNozrziDJHZTjtrkFud54SVPIK8uSoiQMJ3CNe18vK6U=
+=XVtb
+-----END PGP SIGNATURE-----

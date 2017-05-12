@@ -1,0 +1,282 @@
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+
+
+
+# ==================== "scheduling"
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+    active: 1
+
+- schema: Queue
+  name: KVM Queue
+  data:
+    id: 2
+    name: KVM
+    priority: 200
+    active: 1
+
+- schema: Queue
+  name: Kernel Queue
+  data:
+    id: 3
+    name: Kernel
+    priority: 10
+    active: 1
+
+# -------------------- "test requests" (Testruns)
+
+# ======================= Xen requests =========================
+
+# --- aaa ---
+
+- schema: Testrun
+  name: aaa-xen
+  data:
+    id: 1001
+    owner_id: 12
+    shortname: aaa-xen
+    notes: aaa
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Xen-aaa
+  data:
+    id: 101
+    testrun_id: 1001            # aaa
+    queue_id: 1                 # Xen
+    status: schedule
+
+# --- aaa2 ---
+
+- schema: Testrun
+  name: aaa2-xen
+  data:
+    id: 1002
+    owner_id: 12
+    shortname: aaa2-xen
+    notes: aaa2
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Xen-aaa2
+  data:
+    id: 102
+    testrun_id: 1002            # aaa2
+    queue_id: 1                 # Xen
+    status: schedule
+
+# --- aaa3 ---
+
+- schema: Testrun
+  name: aaa3-xen
+  data:
+    id: 1003
+    owner_id: 12
+    shortname: aaa3-xen
+    notes: aaa3
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Xen-aaa3
+  data:
+    id: 103
+    testrun_id: 1003            # aaa3
+    queue_id: 1                 # Xen
+    status: schedule
+
+
+# ======================= KVM requests =========================
+
+# --- bbb ---
+
+- schema: Testrun
+  name: bbb-kvm
+  data:
+    id: 2001
+    owner_id: 12
+    shortname: bbb-kvm
+    notes: bbb
+    topic_name: Distribution
+
+
+- schema: TestrunScheduling
+  name: KVM-bbb
+  data:
+    id: 201
+    testrun_id: 2001            # bbb
+    queue_id: 2                 # KVM
+    status: schedule
+
+# --- bbb2 ---
+
+- schema: Testrun
+  name: bbb2-kvm
+  data:
+    id: 2002
+    owner_id: 12
+    shortname: bbb2-kvm
+    notes: bbb2
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: KVM-bbb2
+  data:
+    id: 202
+    testrun_id: 2002            # bbb2
+    queue_id: 2                 # KVM
+    status: schedule
+
+# --- bbb3 ---
+
+- schema: Testrun
+  name: bbb3-kvm
+  data:
+    id: 2003
+    owner_id: 12
+    shortname: bbb3-kvm
+    notes: bbb3
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: KVM-bbb3
+  data:
+    id: 203
+    testrun_id: 2003            # bbb3
+    queue_id: 2                 # KVM
+    status: schedule
+
+# ======================= Kernel requests =========================
+
+# --- ccc ---
+
+- schema: Testrun
+  name: ccc-kernel
+  data:
+    id: 3001
+    owner_id: 12
+    shortname: ccc-kernel
+    notes: ccc
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Kernel-ccc
+  data:
+    id: 301
+    testrun_id: 3001            # ccc
+    queue_id: 3                 # Kernel
+    status: schedule
+
+# --- ccc2 ---
+
+- schema: Testrun
+  name: ccc2-kernel
+  data:
+    id: 3002
+    owner_id: 12
+    shortname: ccc2-kernel
+    notes: ccc2
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Kernel-ccc2
+  data:
+    id: 302
+    testrun_id: 3002            # ccc2
+    queue_id: 3                 # Kernel
+    status: schedule
+
+# --- ccc3 ---
+
+- schema: Testrun
+  name: ccc3-kernel
+  data:
+    id: 3003
+    owner_id: 12
+    shortname: ccc3-kernel
+    notes: ccc3
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Kernel-ccc3
+  data:
+    id: 303
+    testrun_id: 3003            # ccc3
+    queue_id: 3                 # Kernel
+    status: schedule
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 5
+    name: iring
+    active: 1
+    free: 1
+
+- schema: Host
+  name: bullock
+  data:
+    id: 6
+    name: bullock
+    active: 1
+    free: 0
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 7
+    name: dickstone
+    active: 1
+    free: 0
+
+- schema: Host
+  name: athene
+  data:
+    id: 8
+    name: athene
+    active: 1
+    free: 0
+
+- schema: Host
+  name: bascha
+  data:
+    id: 9
+    name: bascha
+    active: 1
+    free: 0
+
+
+# ----------------- queues and hosts ---------------
+
+
+- schema: DeniedHost
+  name: dickstone_denied_from_queue_with_deny
+  data:
+    id: 1
+    queue_id: 1
+    host_id: 5

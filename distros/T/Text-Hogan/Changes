@@ -1,0 +1,54 @@
+Revision history for perl module Text::Hogan
+
+1.04 2016-11-02
+    * Prefer array over arrayref (thanks Tom Hukins!)
+    * Add copyright_holder to dist.ini (thanks Tom Hukins!)
+
+1.03 2016-05-07
+    * SEE ALSO documentation update
+
+1.02 2016-03-03
+    * Transfer ownership from company to individual
+    * Add allow_whitespace_before_hashmark feature
+      Thanks to Ricky Morse (remorse on Github)
+
+1.01 2015-07-13
+    * Add numeric_string_as_string feature
+
+1.00 2015-07-12
+    * Implemented lambda sections
+      ... We now pass the whole mustache spec! Time for a 1.0 release :-)
+    * Removed "model_get" hold-over from hogan.js
+    * Add synopsis tests
+    * Small spec_test.t improvements
+    * Small POD improvements
+
+0.09 2015-06-25
+    * Document the link to hogan.js much more clearly
+
+0.08 2015-06-24
+    * Further POD improvements
+
+0.07 2015-06-23
+    * Documentation! POD! Woo!
+
+0.06 2015-06-22
+    * Small performance improvements
+    * Die on lambda section to make very clear they are not supported
+    * Use custom MinimumPerl test_finder to skip YAML spec files
+
+0.05 2015-06-19
+    * use Github as a bug tracker rather than rt.cpan.org
+
+0.04 2015-06-19
+    * add Minimum Perl version to dist.ini
+    * don't use defined-or to support Perl 5.6 and 5.8
+
+0.03 2015-06-18
+    * remove un-used "use DDP;" from spec_test.t
+
+0.02 2015-06-18
+    * drop boolean.pm as a requirement
+
+0.01 2015-06-18
+    * initial release based on hogan.js 3.0.2

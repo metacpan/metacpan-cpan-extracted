@@ -1,0 +1,17 @@
+
+
+Test::Snapshots allows you to test any executable without
+caring what languages it has been written in.
+It only cares about what it prints to the standard output 
+and error.
+
+The module integrates well with the Test::Simple/Test::More world
+as it is using Test::Builder as a back-end.
+
+Installation:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

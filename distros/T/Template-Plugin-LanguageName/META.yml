@@ -1,0 +1,28 @@
+---
+abstract: 'Template filter to lookup the name for a ISO639-1 or ISO639-2 language code'
+author:
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+build_requires:
+  Software::License: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-LanguageName
+provides:
+  Template::Plugin::LanguageName:
+    file: lib/Template/Plugin/LanguageName.pm
+    version: 0.0101
+requires:
+  Locale::Codes::Language: 3.18
+  Template: 2.22
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0101

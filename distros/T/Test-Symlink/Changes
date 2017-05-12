@@ -1,0 +1,22 @@
+Revision history for Test-Symlink
+
+0.02	2005-07-06
+
+	Include an example C< use Test::Symlink tests => 3;>
+
+	Note that $test_name is optional in the entry for symlink_ok.
+
+	Include an example showing how to test that that destination of a
+	symlink exists.
+
+	Be explicit about the test name that is generated if the caller does
+	not provide one.
+
+	Explain what sanity checking happens to the arguments even if symlinks
+	aren't supported on the running platform.
+
+	Add an explicit 'use' line for Test::Builder.
+
+0.01    2005-07-05
+	First version, released on an unsuspecting world.
+

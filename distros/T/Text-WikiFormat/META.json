@@ -1,0 +1,59 @@
+{
+   "abstract" : "module for translating Wiki formatted text into other formats",
+   "author" : [
+      "chromatic, C<chromatic@wgz.org>, with much input from the Jellybean team"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-WikiFormat",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.30"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "1.14",
+            "URI::Escape" : "0.01"
+         }
+      }
+   },
+   "provides" : {
+      "Text::WikiFormat" : {
+         "file" : "lib/Text/WikiFormat.pm",
+         "version" : "0.81"
+      },
+      "Text::WikiFormat::Block" : {
+         "file" : "lib/Text/WikiFormat/Blocks.pm",
+         "version" : 0
+      },
+      "Text::WikiFormat::Block::code" : {
+         "file" : "lib/Text/WikiFormat/Blocks.pm",
+         "version" : 0
+      },
+      "Text::WikiFormat::Blocks" : {
+         "file" : "lib/Text/WikiFormat/Blocks.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.81"
+}

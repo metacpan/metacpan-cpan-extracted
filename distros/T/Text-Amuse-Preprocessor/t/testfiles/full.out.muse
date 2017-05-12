@@ -1,0 +1,9 @@
+#title Test
+#lang ru
+
+Hello [1] there [2] «hullo», ‘hullo’ [3] [1978]
+[1] ààà
+[2] čČč
+
+‘Hello’ — «there»!!!
+[3] three čČč Да поехал

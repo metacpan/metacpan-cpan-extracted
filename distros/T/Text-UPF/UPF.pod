@@ -1,0 +1,336 @@
+=head1 NAME
+
+Text::UPF - (UPF is a Population Format) a module for auto-populating text.
+
+=head1 SYNOPSIS
+
+use Text::UPF;
+
+=head1 DESCRIPTION
+
+UPF stands for UPF is a Population Format.
+This module provides yet annother way to populate text templates (aka 'form') with dynamic data. 
+Additionally, this module provides support for caching forms, loading them from a 
+database (via DBTools), or loading them from a file. Additionally, you may pass an arbitrary
+string to be populated. If you plan to load templates from a database, you must also use the 
+Config::Framework module to handle your username and password for database access.
+
+=head1 FORM FORMAT
+
+UPF defines "pop" tags in the text of your form (aka 'template'), which are replaced with dynamic 
+data when the text is populated. Here is a quick example to give you a taste of the flavor:
+
+	"Hello customer, today is <pop>today</pop>"
+
+As you can probably surmise, <pop>today</pop> is replaced with the current date. 
+The "pop tag" has pretty much three parts:
+
+	"tagin"		=> "<pop>"
+	"payload"	=> "today"
+	"tagout"	=> "</pop>"
+
+Both the "tagin" and "tagout" can be defined to be something other than <pop> and </pop> upon
+instantiation. (see method: new). The "payload" can be one of two things a "method" or "data".
+
+=over
+
+=item PAYLOAD is Data
+
+=back
+
+If the payload is data, that pretty much means it's just a hash key. The "Populate" method
+allows you to supply a hash reference on the 'Data' option (see method: Populate). If the
+payload string exists as a hash key under the 'Data' option, then the pop tag is simply 
+replaced with the hash value under that key. That's a lot less complicated than it sounds.
+Here's a quick example to illustrate:
+
+
+$string = $UPFObject->Populate(
+    Text	=> "hello <pop>customer</pop> today is <pop>today</pop>",
+    Data	=> { 'customer'	=> "Cirius Cybernetics" }
+) || die ("can't populate: $UPFObject->{'errstr'}\n");
+
+
+This would produce the following value of $string:
+
+"Hello Cirius Cybernetics today is Tue Oct 22, 2002."
+
+In this manner you can populate a template with the data you define on the hash reference.
+Handy stuff, indeed. ;-)
+
+=over
+
+=item PAYLOAD is Method
+
+=back
+
+If the payload dosen't match any hash keys to data, then UPF will attempt to execute a
+subroutine in it's own namespace with the same name. The pop tag will be replaced with the 
+value returned by the subroutine. An example of a pop tag which calls a method is:
+<pop>today</pop>, 'today' is actually the name of a subroutine which returns the current 
+date. Optionally, you can supply arguments to methods, using curly brackets. Again, here's an
+example: 
+<pop>today{format => "dd/mm/yy"}</pop>
+This sends the string "dd/mm/yy" to the subroutine 'today' on the 'format' option.
+
+
+=head1 To Do:
+
+    Write Test Programs for 'make test'.
+    
+    Add user defined callbacks for specified methods.
+    
+    Add optional time formats for nbd and today
+    
+    
+=head1	Methods
+
+=head1	new (contructor)
+
+=head2 Notes
+
+This is the object constructor. Upon failure, the method will return the undef value, and an 
+error message will be written to $Text::UPF::errstr.
+
+=head2 Synopsis
+
+ $Object = Text::UPF::New([options]) || die $Text::UPF::errstr, "\n";
+
+=head2 Options
+
+=over
+
+=item	tagin
+
+An alternate string may be specified to serve as the "tagin" on this option. If not defined,
+the value will default to "<pop>"
+
+=item	tagout
+
+An alternate string may be specified to serve as the "tagout" on this option. If not defined,
+the value will default to "</pop>"
+
+=item	'Form View'
+
+If you intend to retrieve forms (aka 'templates') from a database, this is the table or view
+to retrieve the form text from. If this option is undefined, it defaults to the value given 
+durring the Makefile.PL. Don't worry about it if you aren't going to 
+
+=item	'Form Name'
+
+This is the field in the table or view defined by 'Form View' which contains the name of the 
+form. This defaults to the answer given durring Makefile.PL unless otherwise specified at 
+instantiation. Don't worry about this unless you intend to retrieve forms from a database.
+
+
+=item	'Form Text'
+
+This is the field in the table or view defined by 'Form View' which contains the text of the 
+form. This defaults to the answer given durring Makefile.PL unless otherwide specified at 
+instantiation. Don't worry about this unless you intend to retrieve forms from a database.
+
+=item	'Columns'
+
+Wrap line lengths in populated text to this number of columns. If left undefined at instantiation,
+this defaults to the value given durring Makefile.PL.
+
+=item	'DiscQuote'
+
+Quote the disclaimer text with these charachters at the front of each line. (See 'Disclaimer' below)
+
+=item	'Disclaimer'
+
+If you build this module to be able to retrieve forms from a database, you can optionally define
+a special form in the database to be used as a 'disclaimer'. I call it a 'disclaimer' because this
+arose from a need to tack a special disclaimer to the top of all customer communications at my job.
+In practicality, all this means is that you can easily populate the 'disclaimer', and include it 
+in other forms by using the <pop>Disclaimer</pop> tag in the target form. You can optionally 
+'quote' the disclaimer by using the 'DiscQuote' option. If 'Disclaimer' is undefined at instantiation
+then the value defaults to the answer given durring Makefile.PL. Here's a quick example:
+
+if my 'disclaimer' was defined to be:
+"Hi <pop>name</pop> the views in this here document are not bonifide. you shoulda r-u-n-n-o-f-t."
+
+and my form was defined to be:
+<pop>Disclaimer</pop>
+
+Dear <pop>Customer</pop>:
+This is to inform you that as of <pop>today</pop>, our 
+software bites the wax llama.
+Please respond by <pop>nbd</pop>
+
+and my data was defined to be
+'Customer'	=> "Cirius Cybernetics"
+'name'		=> "Zaphod Beeblebrox"
+
+and I defined 'DiscQuote' to be "** ", then this is what I would get when i populated the form:
+
+** Hi Zaphod Beeblebrox the views in this here document are not bonifide.
+** you shoulda r-u-n-n-o-f-t.
+
+Dear Cirius Cybernetics:
+This is to inform you that as of Wed Oct 23, 2002, our
+software bites the wax llama.
+Please respond by Thu Oct 24, 2002.
+
+=back
+
+=head1	Populate
+
+=head2	Synopsis
+
+$text = $Object->Populate([options]) || die $Object->{'errstr'};
+
+=head2 Notes
+
+This is the bit that actually populates things for you.
+
+=head2 Options
+
+=over
+
+=item	Text
+
+An arbirary string of text to be populated can be supplied on this option. This option supercedes
+File and Form. That is to say, that if for some reason you defined, Text, File, and Form, Populate 
+would chose to use Text.
+
+
+=item	Form
+
+This is the name of the form to be retrieved from the database. Naturally, you can't use this if
+you didn't build the module to retrieve forms from a database. Well, actually, you COULD TRY to 
+use it, but then it wouldn't work, and you would get lots of errors ;-) This is second in the pecking
+order. Which is to say, that Text must be undefined to use Form, and that if both Form and File are
+defined, Populate will chose to use Form.
+
+=item	File
+
+This is the path and name of a file to load a form from. This option is last in the pecking order
+so to speak. That is to saym that if Text and Form must be undefined for File to be used.
+
+=item	Data
+
+this is a hash reference, containing data items to insert in the Form specified by Form, File, or
+Text (see above). Each key in the hash should correspond to one of the pop tags in the document, 
+the associated value, of course, would be the data to replcace the pop tage with. (see above).
+
+=back
+
+
+=head1	Wants
+
+=head2	Synopsis
+
+my $field_list = $Object->Wants(Form => $form_name) || die $Object->{'errstr'};
+
+=head2	Notes
+
+this method returns an array reference containing the list of data fields required by pop tags
+in the given document. The document can be specified in any of the three ways available to the
+Populate method (Text, Form, or File).
+
+=head2	Options
+
+=over
+
+=item	Text
+
+specify a text string containing pop tags. (see Populate method for more info)
+
+=item	Form
+
+specify a form name to be retrieved from the database. (see Populate method for more info)
+
+=item	File
+
+specify a file to read a form letter from. (see Populate method for more info)
+
+=back
+
+
+=head1	Destroy
+
+=head2	Synopsis
+
+$Object->Destroy();
+
+=head2 Notes
+
+This is pretty much pointless unless you have been retrieving forms from a databse, in which case,
+we log out of the database gracefully before consigning the object to oblivion. If you didn't 
+get anything from a databse, then the object is simply consigned to the briney deep.
+
+
+=head1	nbd
+
+=head2	Synopsis
+
+<pop>nbd</pop>
+
+=head2 	Notes
+
+This is a built in population method, which returns the next business day from the current date.
+This version only skips weekends. In future versions I hope to be able to define a configuration
+file in which you can specify holidays and such. As well, I hope to add the ability to define a date
+format (i.e. mm/dd/yy, etc).
+
+
+=head1	today
+
+=head2	Synopsis
+
+<pop>today</pop>
+
+=head2	Notes
+
+This is a built in population method, which returns the current date. In fiture releases I hope to 
+add the ability to define a date format (i.e. mm/dd/yy, etc).
+
+
+=head1	ShowDiary
+
+=head2	Synopsis
+
+<pop>ShowDiary{[options]}</pop>
+<pop>ShowDiary{Mode => "html", Data => "Diary"}</pop>
+
+=head2	Notes
+
+This is a built in population method, which produces formatted output of remedy diary fields in
+either plain text or html. The diary is passed in as an array reference in the format produced 
+by either DBTools::ParseDiary or ARS::GetField.
+
+=head2	Options
+
+=over
+
+=item	directive
+
+This is the name of the hash key under Data which contains the array reference containing the diary
+information.
+
+=item	Mode
+
+Valid values are "html" or "text". This controls the output format.
+
+=back
+
+=head1	Disclaimer
+
+=head2	Synopsis
+
+<pop>Disclaimer</pop>
+
+=head2	Notes
+
+This is a built in population method, which includes the special form from the database and
+optionally quotes it with the DiscQuote charachters. See above.
+
+
+=head1 Author: 
+
+    Andrew N. Hicox	<andrew@hicox.com>
+    http://www.hicox.com
+
+=cut

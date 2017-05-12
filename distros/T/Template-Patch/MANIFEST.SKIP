@@ -1,0 +1,9 @@
+\.vim$
+\.cvsignore
+\.swp$
+^_build
+^blib
+^Build$
+Template-Patch-.*\.tar\.gz
+\.bak$
+\.git

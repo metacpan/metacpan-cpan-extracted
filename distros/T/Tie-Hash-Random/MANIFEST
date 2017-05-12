@@ -1,0 +1,7 @@
+INSTALL
+README
+Makefile.PL
+lib/Tie/Hash/Random.pm
+t/random.t
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

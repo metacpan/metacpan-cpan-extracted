@@ -1,0 +1,89 @@
+#title This is a very long long title name and this is a very long long title name and this is a very long long title name
+#subtitle This is a very long long subtitle name and this is a very long long subtitle name and this is a very long long subtitle name
+#date This is a very long long date and this is a very long long date and this is a very long long date
+#lang en
+
+A Muse document uses special, contextual markup rules to determine how
+to format the output result. For example, if a paragraph is indented,
+Muse assumes it should be quoted. Indentation is heavily used to
+determine if the paragraph is something different from “normal” text.
+
+There are not too many markup rules, and all of them strive to be as
+simple as possible so that you can focus on document creation, rather
+than formatting.
+
+This document describes Muse, which was written by John Wiegley, then
+maintained by Michael Olson and heavily edited and partially rewritten
+for this implementation by Marco Pessotto.
+
+If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
+replace the “with...Texts.” line with this:
+
+  with the Invariant Sections being LIST THEIR TITLES, with the
+  Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+
+If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License,
+to permit their use in free software.
+
+A Muse document uses special, contextual markup rules to determine how
+to format the output result. For example, if a paragraph is indented,
+Muse assumes it should be quoted. Indentation is heavily used to
+determine if the paragraph is something different from “normal” text.
+
+There are not too many markup rules, and all of them strive to be as
+simple as possible so that you can focus on document creation, rather
+than formatting.
+
+This document describes Muse, which was written by John Wiegley, then
+maintained by Michael Olson and heavily edited and partially rewritten
+for this implementation by Marco Pessotto.
+
+If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
+replace the “with...Texts.” line with this:
+
+  with the Invariant Sections being LIST THEIR TITLES, with the
+  Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+
+If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License,
+to permit their use in free software.
+
+A Muse document uses special, contextual markup rules to determine how
+to format the output result. For example, if a paragraph is indented,
+Muse assumes it should be quoted. Indentation is heavily used to
+determine if the paragraph is something different from “normal” text.
+
+There are not too many markup rules, and all of them strive to be as
+simple as possible so that you can focus on document creation, rather
+than formatting.
+
+This document describes Muse, which was written by John Wiegley, then
+maintained by Michael Olson and heavily edited and partially rewritten
+for this implementation by Marco Pessotto.
+
+If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
+replace the “with...Texts.” line with this:
+
+  with the Invariant Sections being LIST THEIR TITLES, with the
+  Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+
+If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License,
+to permit their use in free software.
+

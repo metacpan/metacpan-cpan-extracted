@@ -1,0 +1,96 @@
+Revision history for Text-RewriteRules
+
+0.25    2012, July 10 (22:17)
+        - Fixed stupid bug for too generic regexps;
+
+0.24    2012, June 8 (18:44)
+        - POD fixes
+
+0.23    2010, May 26 (19:51)
+        - Added /d debug mode for RULES and RULES/m;
+
+0.22    2010, Apr 4 (20:02)
+        - It seems that some code was using an undefined behavior of
+          \G and regular expressions. That code was workarounded not
+          to use it. While it worked perfectly under perl 5.8 and perl
+          5.10 something changed on perl 5.12 regular expression
+          engine that created this behavior.
+
+0.21    2009, Jun 4 (17:08)
+        - Mark algorithm skiping new lines.
+        - Better compilation of power regexps.
+        - Basic capturing for power regexps.
+
+0.20    2009, May 15 (21:13)
+        - Added parenthesized expressions (parenthesis, brackets and curly braces);
+        - Fixed XML regular expression (both empty tags and balanceness)
+
+0.19    2009, May 13 (11:52)
+        - Added support for XML automagical tags [[:XML:]] and [[:XML(tag):]];
+        - Added variable +{TAG} when using [[:XML:]];
+        - Compile function removes 'use Text::RewriteRules;'
+
+0.18    2009, Mar 2 (20:56)
+        - Added parenthesis around regexps so them supports ~or~s nicely.
+
+0.17    2009, Fev 15 (00:55)
+        - Added support for conditional last rules on simple RULES blocks.
+        - Added support for conditional and non conditional last rules on MRULES blocks.
+
+0.16    2008, Nov 25 (19:42)
+        - Workaround with a bug for perl 5.8.x
+        - Added support for multiple lexers at the same time;
+        - Added support to the 'x' flag on the MRULES;
+
+0.15    2008, Nov 23 (21:27)
+        - Fixed some issues with a global variable.
+
+0.14    2008, Nov 15 (11:00)
+        - Added support for lex-style blocks for lexers (LRULES and RULES/l)
+
+0.13    2008, Apr 18 (15:50)
+        - Added support for some spaces between RULES and the rule identifier.
+	- Support scripts written under MS OSes that still use carriage returns. 
+
+0.12    2008, Mar 16 (14:30)
+	- missing an entry on MANIFEST
+
+0.11    2008, Mar 15 (14:30)
+	- Added support to the =b=> begin rule;
+	- added a compiler
+
+0.10    2005, Dec  5 (19:40)
+	- Corrected problems with cursor mode
+	- Some more examples and tests
+	- Some documentation for the cursor mode
+
+0.09    2005, May 14 (14:30)
+	- Corrected evaluation rules on mark approach
+
+0.08    2005, Mar 06 (20:13)
+	- Added RULES/x flag -- needs some more tests
+
+0.07    2005, Feb 22 (18:38)
+	- upload for 0.06 failed.
+0.06    2005, Feb 22 (18:28)
+	- Added a lot of documentation (Hurray!!)
+
+0.05    2005, Feb 21 (17:20)
+	- Added RULES/m as option for MRULES;
+	- Added RULES/i flag for ignore case;
+	- Added flag support on RULES line;
+        - Support for empty lines and/or comments;
+
+0.04    2005, Feb 18 (17:25)
+	- Missing commas on generated code giving problems.
+
+0.03    2005, Feb 15 (16:34)
+	- Corrected bug: mark walking code missing
+	- Added support for ignore case
+
+0.02    2004, Dec 30 (14:00)
+	- Added num2words example
+
+0.01    2004, Dec 27 (11:30)
+        - First version.
+

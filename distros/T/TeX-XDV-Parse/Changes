@@ -1,0 +1,19 @@
+Revision history for Perl extension TeX::XDV::Parse.
+
+0.04  Sat Jan  3 13:42:47 EST 2015
+    - use strict; use warnings; in Makefile.PL (sheese)
+
+0.03  Sat Jan  3 06:15:11 EST 2015
+    - version bump - hasnt been tested in a while
+    - updated copyright notice
+    - added basic color test
+    - build system upgrades
+
+0.02  Fri May  3 22:27:00 UTC 2013
+    - added TeX::XDV::Print in inc to test
+    - older constant.pm has no hash interface
+
+0.01  Wed May  1 07:17:39 2013
+    - original version; created by h2xs 1.23 with options
+        -AXn TeX::XDV::Parse
+

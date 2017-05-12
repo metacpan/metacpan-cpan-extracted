@@ -1,0 +1,30 @@
+1.39
+  - Add LICENSE section to the documentation
+  - Fix detection of threaded perl builds in the tests
+  - Fix STORABLE_freeze when no plain keys are added
+
+1.38
+  - Skip threaded.t in more situations where it's borked
+
+1.37
+  - Don't break without Scalar::Util
+
+1.36
+  - Don't use thread cloning registry unless Scalar::Util::weaken is available
+  - Warn when threads are enabled but Scalar::Util::weaken is missing
+  - Likewise warn during Makefile.PL
+  - Add weaken() as a predicate to the test
+
+1.35_01
+  - http://public.activestate.com/cgi-bin/perlbrowse?patch=28185
+
+1.35
+  - Set INSTALLDIRS => 'perl', as suggested in
+    http://rt.cpan.org/Ticket/Display.html?id=22582
+
+1.34
+	- Add support for Storable
+	- Add support for reblessing, through refadd (plus compat)
+
+1.33
+	- Fork from bleadperl, May 7th, 2006

@@ -1,0 +1,63 @@
+This is the README file for Text::Vpp, the Perl versatile
+pre-processor.
+
+You may find this module useful if you want to preprocess text. 
+
+Vpp can handle conditional text, loop, variable substitutions in the
+text.  Advanced users may also include inline perl code , inline
+subroutines in the text.
+
+In other words, Vpp understands if, else, elsif, endif, include,
+foreach and variables such as $foo and $bar. (See the test files in
+the distribution for examples).
+
+You may also include small perl instructions to manipulate or set the 
+variables inside the text.
+
+The product of the substitution may be written directly on a file or 
+loaded in the user's program for further manipulations.
+
+You might want to use Text::Vpp instead of cpp if :
+- you use the '#' in your file as a comment character
+- are tired of angular #ifdef and prefer round shapes such as @ifdef
+- want to keep /* ... */ in your file
+- cpp doesn't like your text.
+- you are allergic to cpp
+- want to include shell or perl code output in your text
+
+You might also want to use Text::Vpp instead of m4 if :
+- you can't find the m4 macro to do what you want
+- m4 think your text is a macro
+- you are allergic to m4
+
+Another advantage of using the module is to do the pre-processing inside
+your perl program instead of spawning another process.
+
+
+This module is in 'Release' state
+
+This module requires perl5.6.0.
+
+See the embedded documentation in the module for more details.
+
+Comments and suggestions are always welcome.
+
+Finally, I'd like to thank Helmut Jarausch for his bug report and the
+numerous patches he provided (including the 'foreach' feature).
+
+Copyright (c) 1996-2001 Dominique Dumont. All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+ - Dominique Dumont
+   dominique_dumont@grenoble.hp.com
+
+---------------------------------------------------------------------
+INSTALLATION
+
+   	 gunzip -x <distribution_file> | tar xvf -
+   	 cd <module>
+   	 perl Makefile.PL
+   	 make test
+   	 make install
+

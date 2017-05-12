@@ -1,0 +1,48 @@
+{
+   "abstract" : "Perl extension for the R-tree data structure and algorithms",
+   "author" : [
+      "Ari Jolma <https://github.com/ajolma>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0701, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tree-R",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ajolma/Tree-R.git",
+         "web" : "https://github.com/ajolma/Tree-R"
+      }
+   },
+   "version" : "0.072",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}
+

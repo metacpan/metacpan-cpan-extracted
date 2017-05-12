@@ -1,0 +1,29 @@
+---
+abstract: 'Tk::Text widget with support for ANSI color escape codes'
+author:
+  - 'Tim Jenness (E<lt>F<tjenness@cpan.org>E<gt>)'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-TextANSIColor
+provides:
+  Tk::ROTextANSIColor:
+    file: lib/Tk/ROTextANSIColor.pm
+    version: 0.01
+  Tk::TextANSIColor:
+    file: lib/Tk/TextANSIColor.pm
+    version: 0.15
+requires:
+  File::Spec: 0.8
+  Term::ANSIColor: 1
+  Tk: 804
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/timj/perl-Tk-TextANSIColor.git
+version: 0.16

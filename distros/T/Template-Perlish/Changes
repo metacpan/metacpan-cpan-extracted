@@ -1,0 +1,99 @@
+1.52  2016-04-09 18:34:36 CEST
+   - fixed spelling of SYNOPSIS in documentation
+   - release after 335 passes on CPAN Testers (thanks!)
+
+1.5101  2016-04-02 20:17:00 CEST
+   - minor Kwalitee changes
+   - added options for traversal: traverse_methods, strict_blessed and
+     method_over_key
+   - added configuration presets
+   - added traversal through method calls
+
+1.51_00  2016-03-31 19:03:20 CEST
+   - clarification on relationship between V and traverse
+   - added STDOUT usage avoidance and P function
+   - changed output in case of empty template, now empty string
+
+1.50  2016-01-04 01:12:31 CET
+   - release after 373 passes on CPAN Testers (thanks!)
+
+1.41_04  2015-12-27 19:34:39 CET
+   - variable accessors accept an optional input data parameter
+
+1.41_03  2015-12-13 15:34:55 CET
+   - simplified interface for traverse, unified with _V
+   - perlcritic --brutal fixed with a few selected exclusions
+
+1.41_02  2015-12-13 12:27:43 CET
+   - exporting crumble and traverse (with documentation)
+   - tests for path parsing and traversal
+
+1.41_01  2015-12-12 15:39:06 CET
+   - fixed a few errors in documentation
+   - perlcritic --brutal now passes (with a few selected exclusions)
+
+1.40  2015-10-03 07:40:15 EDT
+   - Milla's dist.ini fix
+   - release after 78 passes in CPAN Testers
+
+1.30_04   2015-10-03 03:57:09EDT-0400 America/New_York (TRIAL RELEASE)
+   - Minor fixes
+   - Using Milla for hanlding the distribution
+   - Put POD into its own file, to make mobundling leaner
+   - Moved some test in xt, removed pod test as is a duplication
+
+1.30_03 Fri Oct 02 07:46:09 2015
+   - Removed a defined-or, for perl 5.8.x
+
+1.30_02 Thu Oct 01 17:16:19 2015
+   - A few fixes on the new functions for %variables accessing
+
+1.30_01 Thu Oct 01 15:52:47 2015
+   - Easy %variables access from templates via V, A, H, HK, and HV
+   - Additional note about security
+
+1.21 Thu Feb 19 20:05:32 2015
+   - Removed debugging leftover.
+
+1.20 Fri Feb 13 23:33:47 2015
+   - Enhanced error reporting.
+   - Refactoring.
+
+1.06 Sun Jul 21 16:51:00 2013
+   - Added "SEE ALSO" section.
+   - Added handling of utf-8 flag.
+   - Fixed issue with POD encoding.
+   - Removed POD tests for non-authors.
+
+1.05 Tue Sep 02 12:32:00 2008
+   - Added a convenience function 'render' for one-shot template
+     renderings.
+
+1.04 Tue Sep 02 02:26:00 2008
+   - Changed order of chunks in this file :)
+   - Removed dependency on version in Makefile.PL
+
+1.03 Wed Jul 30 13:03:09 2008
+   - Fixed internal POD links in documentation.
+   - Fixed some stuff in the docs.
+   - Added "evaluate and print" of Perl expressions via [%= ... %]
+
+1.02 Fri Apr 11 23:00:00 2008
+   - Simplified print statement in certain conditions.
+   - Added prerequisite on perl version in Build.PL.
+   - Added an --edefine|--eval-define|-E option to tptree.
+   - Fixed some parts in the documentation.
+   - Added a "SHOULD YOU USE THIS" section.
+
+1.01 Sat Apr 5 19:49:00 2008
+   - Simplified parameter grabbing in set_variables
+   - Added shortcut to expand simple scalar variables
+   - Added number of tests to be executed for better test reliability
+   - Added compile_as_sub method and tests
+   - Expanded documentation
+   - Got rid of accessors in favour of direct hash access. This keeps
+     the code at a very minimum.
+   - Added tptree script and companions.
+
+1.0  Thu Apr  3 23:19:11 2008
+   - Initial release.

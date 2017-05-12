@@ -1,0 +1,759 @@
+=pod
+
+=head1 NAME
+
+auto-build.conf - Test-AutoBuild configuration file
+
+=head1 DESCRIPTION
+
+The C<auto-build.conf> file contains the configuration information
+for a build instance. It is used to define general metadata such
+as the host name of build machine, the administrator / developer
+email addresses, email alerts; the parameters for accessing source
+control repositories; the modules to be checked out from source 
+control and built.
+
+The configuration file is processed by the L<Config::Record(3pm)>
+module, so refer to that manual page for formal syntax rules. Prior
+to loading it is also run through the L<Template(3pm)> module - the
+L<Template::Manual::Syntax(3pm)> manual page details the syntax for
+the pre-processor. The pre-processor is most useful if there are a
+large number of modules to be defined, each with pretty much identical
+configuration parameters.
+
+=head1 CONFIGURATION PARAMETERS
+
+The example configuration file contains inline comments summarizing
+important points, however, the full details are as follows:
+
+=head2 HOST DETAILS
+
+=over 4
+
+=item engine = /etc/auto-build.d/engine/host-build.conf
+
+The fully qualified path to the build engine definition. There is
+only one build engine setup currently provided, so this can be left
+on its default setting of C</etc/auto-build.d/engine/host-main.conf>
+At a later date extra engines will be provided for doing builds with
+chroot, or virtual machines.
+
+=item templateDir = /etc/auto-build.d/templates
+
+The fully qualified path to the directory containing template files 
+for the HTML status pages, RSS feed and email alerts. The template
+files are all processed using the C<Template(3pm)> module, so refer to 
+the C<Template::Manual::Syntax(3pm)> manual page for details on the
+syntax.
+
+=item buildRoot = /var/lib/builder
+
+The path to the directory within which the build instance will operate.
+This directory should previously have been populated with pre-requisite
+sub-dirs by running the C<auto-build-make-root(1)> script. The RPM
+install C<perl-Test-AutoBuild-account> installs the correct directory
+structure under C</var/lib/builder>, so if the build host only needs to
+run a sigle instance of the builder, this parameter can be left unchanged.
+
+=item label = Continous Automatic Builder
+
+A short descriptive name for this build configuration. This label is used
+as the page title for HTML status pages, the subject in the email alerts,
+and the title of the RSS feed.
+
+=item adminEmail = admin@example.com
+
+The email address for the person responsible for administering the build
+instance.
+
+=item adminName = Build Administrator
+
+The name of the person responsible for administering the build instance.
+
+=item groupEmail = dev@example.com
+
+The email address for the development team whose software is being built.
+This would typically be the address of the main developers mailing list.
+
+=item groupName = Build Developers
+
+The name of the development team whose software is being built, or alternatively
+the name of the developers mailing list.
+
+=item hostname = example.com
+
+When the build host has multiple hostname aliases configured (for virtual
+hosting), specifies the preferred hostname for accessing the FTP / HTTP
+sites. This is used for generating links within the email alerts and RSS
+feeds.
+
+=item httpPrefix  = /~builder
+
+The URL path prefix under which the HTML status pages are accessible. If
+using the C</etc/auto-build.d/http/aliased.conf> HTTP config file, then
+this would be set to C</builder>. If the user.conf HTTP config file is
+used, then this would be set to C</~builder>. Finally, if the vhost.conf
+HTTP config file is used, then this is simply set to the empty string.
+
+=item lockMethod = fcntl
+
+The method used for acquiring a lock file to prevent multiple
+build instances running at the same time against the same
+buildRoot directory. 
+
+=over 4
+
+=item fcntl
+
+This is the best option, but is only implemented for Linux, SunOS
+and FreeBSD. It correctly protects from multiple build instances
+running against a single build root, even if the build root is on
+NFS and accessed from multiple hosts.
+
+=item flock
+
+This is more portable than C<fcntl>, working on any UNIX platform, 
+but it does not protect a NFS hosted build root from being accessed
+by multiple hosts.
+
+=item file
+
+This uses a simple file creation/deletion test. The downside is that
+if the build engine or host machine crashes, it will be neccessary to 
+manually delete the lock file ($buildRoot/.build.mutex) before the
+builder will run again.
+
+=back
+
+=back
+
+=head2 FEATURES
+
+There are various features available in the build engine workflow which
+can be turned on/off as desired. They are all contained within a nested
+C<features> block.
+
+=over 4
+
+=item cache = 1
+
+If the cache is enabled, then modules will only be built if their
+sources have changed since the previous build cycle. This provides 
+much faster cycle times if there are many modules in the build
+config, only a few of which ever change
+
+=item checkout = 1
+
+Whether to try and checkout the latest sources from version control
+If checkout is disabled, the build will run with whatever sources
+#were checked out on the previous cycle.
+
+=item createrepo_index = 1
+
+Whether to run the 'createrepo' tool against the RPMs on the HTTP
+distribution site. The XML metadata files created are used by package
+update tools such as Yum for resolving dependancies between RPMs.
+
+=item yum_index = 1
+
+Whether to run the 'yum-arch' tool against the RPMs on the HTTP
+distribution site. This tool is now deprecated in favour of the
+'createrepo' tool, so this module is only provided for backwards
+compatability with old YUM versions.
+
+=item apt_index = 1
+
+Whether to generate an APT index of RPMs / Debian packages on the
+HTTP distribution site.
+
+=item email_alerts = 1
+
+Whether to send email alerts at the end of each build cycle. The alerts
+contain details of which modules successfully built, or failed to build.
+
+=back 
+
+=head2 EMAIL ALERTS
+
+The parameters for email alerts are grouped within a nested configuration
+block with the name C<alert>. For example
+
+  alert = {
+    ...parameters..
+  }
+
+=over 4
+
+=item   scope = builder
+
+The scope can be either C<builder> in which case a single email is sent
+containing details of all modules, or it can be C<module> in which case
+a separate email is sent for each module. This latter option is useful
+in the case where a single builder instance is building modules maintained
+by a number of distinct development teams.
+
+=item   trigger = first-fail
+
+The trigger defines the conditions under which an alert will be generated.
+If the trigger is C<always>, alerts will be sent on every build cycle. If
+the trigger is C<fail>, alerts will be sent whenever the a module fails to
+build. If the trigger is C<first-fail>, alerts will be sent the first time
+a module fails, but no further alerts will be sent until the module has been
+fixed. This latter option prevents a single coding error, generating a long
+series of duplicated build alerts.
+
+=item   to = group
+
+This specifies the recipient of the email alerts. It can either be an explicit
+email address, or one of two C<magic> addresses. The first magic address is
+C<admin> which is substituted by the value of the C<adminEmail> configuration
+parameter. The second magic address is C<group> which is substituted by the
+value of the C<groupEmail> configuration parameter.
+
+=item   from = builder@example.com
+
+This specifies the address to use in the C<From:> field of the email.
+
+=item   smtpServer = mail.example.com
+
+If the build host machine is not running an SMTP relay process on port 25,
+then this parameter is required to specify the hostname of the STMP sever
+to relay alerts via.
+
+=back
+
+=head2 CACHE LIMITS
+
+If the C<cCache> feature is set to 1, then various files and pieces of
+metadata are cached across build cycles. Since disk space is a finite resource
+it is neccessary to limit the size of the cache. The suitable size will 
+depend on the size of particular modules being built. The cache should be sized
+such that the output of at least 1 complete cycle be saved.
+
+=over 4
+
+=item maxCacheSize = 100M
+
+The maximum size of the cache, can be specified in megabytes by postfixing
+the letter C<M>, or in gigabytes by postfixing the letter C<G>. 
+
+=item maxCacheAge = 7d
+
+The maximum age sets a limit on how long a cache will be considered valid,
+before a module is forced to be re-built from scratch.
+
+=back
+
+=head2 GLOBAL ENVIRONMENT
+
+The nested C<env> configuration block provides the ability to specify arbitrary
+environment variables which will be set whenever the build engine executes a
+command.
+
+  env = {
+    ENV-NAME = ENV-VALUE
+    ...
+  }
+
+=head2 SOURCE REPOSITORIES
+
+For large development projects, multiple projects will be checked out for building
+from a single source repository. Thus, the parameters required to access particular
+source repositories are defined separately to the modules themselves. The definition
+is within the nested C<repositories> block.
+
+  repositories = {
+    repo-name = {
+       ...repository params...
+    }
+  }
+
+The available repository configuration parameters are:
+
+=over 4
+
+=item label = Repository Name
+
+The arbitrary descriptive name for the repository, used to identify repositories
+in the HTML status pages.
+
+=item type = cvs
+
+Specifies the source control tool used to access files within the repository. 
+There are many source control tools supported
+
+=over 4
+
+=item cvs
+
+The CVS repository type requires that the command C<cvs> be present in the 
+$PATH. The C<CVSROOT> environment variable should be set in the C<env> 
+configuration block to identify the location of the repository. For remote 
+repositories it may also be neccessary to specify the C<CVS_RSH> environment 
+variable. For example
+
+  env = {
+    CVSROOT = :pserver:anonymous@cvs.gna.org:/cvs/testautobuild
+  }
+
+=item p4
+
+The Perforce repository type requires that the command C<p4> be present in
+the $PATH. The C<P4CONFIG> environment variable should to set to point to
+a client view. The paths in the view spec will be filled in automatically
+by the build engine. For example
+
+  env = {
+    P4CONFIG = /var/lib/builder/.p4config
+  }
+
+=item tla
+
+The GNU Arch repository type requires that the command C<tla> be present in
+the $PATH. The 'archive-name' and 'archive-uri' options should be set to 
+identify the remote repository. For example
+
+  options = {
+    archive-name = lord@emf.net--2004
+    archive-uri = http://arch.quackerhead.com/~lord/archives/lord@emf.net--2004
+  }
+
+=item hg
+
+The Mercurial repository type requires that the command C<hg> be present in
+the $PATH. Additionally, it must be at least version 0.7 or later. The 
+'base-url' option should be set to identify the base URL under which the 
+repositories are located. For example
+
+  options = {
+    base-url = http://www.selenic.com/
+  }
+
+=item git
+
+The GIT repository type requires that the command C<git> be present in
+the $PATH. Additionally, it must be at least version 1.5.0.0 or later. The 
+'base-url' option should be set to identify the base URL under which the 
+repositories are located. For example
+
+  options = {
+    base-url = git://anongit.freedesktop.org/git/
+  }
+
+=item bzr
+
+The Bazaar repository type requires that the command C<gbzr> be present in
+the $PATH. Additionally, it must be at least version 0.91 or later. The 
+'base-url' option should be set to identify the base URL under which the 
+repositories are located. For example
+
+  options = {
+    base-url = http://www.darcs.net/repos/
+  }
+
+=item mtn
+
+The Monotone repository type requires that the command C<mtn> be present in
+the $PATH. Additionally, it must be at least version 0.37 or later. The 
+'server' option should be set to identify the hostname & port number at
+which the repository is located. For example
+
+  options = {
+    server = guitone.thomaskeller.biz
+  }
+
+The module path will simply be the name of the branch to checkout
+
+=item darcs
+
+The Darcs repository type requires that the command C<darcs> be present in
+the $PATH. Additionally, it must be at least version 1.0.0 or later. The 
+'base-url' option should be set to identify the base URL under which the 
+repositories are located. For example
+
+  options = {
+    base-url = http://www.darcs.net/repos/
+  }
+
+=item svn
+
+The Subversion repository type requires that the command C<svn> be present in
+the $PATH. The 'url' option should be set to identify the base URL at which the
+repository is accessed.
+
+  options = {
+    url = http://aplaws.redhat.com/svn/aplaws/
+  }
+
+=item svk
+
+The SVK repository type requires that the command C<svk> be present in
+the $PATH. It (currently) requires no special options to be set, rather
+expecting the modules to specify their full checkout URL. This will, 
+however, likely change in the future.
+
+=item disk
+
+The local disk repository type bypasses all version control, allowing
+source files to be simply copied straight from another directory. The 
+'directory' otion to refer to the base directory containing the source
+files.
+
+  options = {
+    directory = /var/lib/builder/local-files
+  }
+
+=back
+
+=item options
+
+The nested C<options> configuration block is used to set parameters 
+which are specific to each repository type. Refer to the description
+of the C<type> parameter for details of what options are valid for
+a particular type.
+
+=item env
+
+The nested C<env> configuration block is used to set environment 
+variables which are specific to each repository type. Refer to the 
+description of the C<type> parameter for details of what variables 
+are relevant for a particular type.
+
+=back
+
+=head2 MODULES
+
+The modules block is where the applications / tools / libraries to
+be built are defined. The definitions for each module are within
+the nested C<modules> block:
+
+  modules = {
+    module-name = {
+       ...module params...
+    }
+  }
+
+=over 4
+
+=item label = Module name
+
+This defines a free text display name for the module, and will be
+used in email alerts, web status pages & related areas.
+
+=item useArchive = 1|0
+
+Controls whether builds can be cached, if no SCM changes were
+detected. Defaults to 1, if set to 0, then the module will be
+built on every build cycle, even if no SCM changes were detected.
+
+=item enabled = 1|0
+
+Use to temporarily hide a module from the build. If set to 0, the
+effect will be just as if the module was never included in the
+config file.
+
+=item admin-email = admin@example.com
+
+Define the email address of a module-specific build administrator.
+If this is omitted, it defaults to the global administrator email
+address.
+
+=item admin-name = Module Administrator
+
+Define a name for the module-specific administrator. As with the
+C<admin-email>, if this is omitted, the global administrator name
+is used as a default.
+
+=item group-email = developers@example.com
+
+Define the email address of a mailing list for the module specific
+development team. If this is omitted, it defaults to the global 
+developers email address.
+
+=item group-name = Module developers
+
+Define a name for the module-specific development team. If this is
+omitted it defaults to the global development team name.
+
+=item source
+
+The nested C<source> block defines the location from which the source
+code for the module will be checked out. 
+
+  source = {
+    ... source location options ...
+  }
+
+There are two entries required to be presented in the C<source> block:
+
+=over 4
+
+=item repository = gna-cvs
+
+This defines the name of the repository from which the source will be
+checked out. This repository must be defined earlier in the configuration
+file.
+
+=item path = /testautobuild
+
+This defines the path from which to check out the module. The syntax for
+the path varies depending on the type of repository, and will typically
+be specified relative to the root of the repository.
+
+=back
+
+=item env
+
+The nested C<env> configuration block provides the ability to specify 
+arbitrary environment variables which will be set whenever the build 
+engine executes a command for this module.
+
+  env = {
+    ENV-NAME = ENV-VALUE
+    ...
+  }
+
+=item links
+
+The nested C<links> configuration block defines a list of 'interesting'
+hyperlinks pertaining to this module. No functional interpretation is
+placed on the links, they are simply passed through to the HTML template
+engine when generating the status pages. It is common to provide links
+to the project's homepage, and a URL for browsing the source code online.
+
+  links = (
+    {
+       ...first link...
+    }
+    {
+       ... second link...
+    }
+  )
+
+Within the block for each link, there are two required entries:
+
+=over 4
+
+=item href
+
+The fully-qualified URL for the link, which will typically be used
+in the C<href> tag of an HTML hyperlink.
+
+=item label
+
+The free-text string to use as the title of the link - the text a
+user will click on to follow the link.
+
+=back
+
+=item groups
+
+The nested C<groups> configuration block defines the list of groups
+of which the module is a member. The entries in the list are simply
+names of groups defined earlier in the configuration block. The group
+membership is primarily used to control generation of the HTML pages.
+
+  groups = (
+    group-name-a
+    group-name-b
+    ...
+  )
+
+=item artifacts
+
+The nested C<artifacts> configuration block defines a list of build
+artifacts to publish to the distribution servers. A build artifact
+can be anything which is generated during the course of a build,
+test logs, documentation files, code coverage reports. Each entry
+in the artifacts list is a block with the following keys
+
+=over 4
+
+=item src = blib/html/*
+
+The path to the source files for the artifact, relative to the
+module's build root. The source can be a file, a directory, or
+a BSD glob.
+
+=item dst = apidocs/
+
+The destination path at which to publish the artifacts, if the
+source is a file, this parameter will be treated as a filename.
+If the source is a glob, or directory, this parameter will be
+treated as the base directory.
+
+=item path = apidocs/Test/AutoBuild.html
+
+An optional parameter providing an alternate link to the published
+artifacts. This is useful if the web server does not allow directory
+browsing, and there is no index.html file.
+
+=item label = API Documentation
+
+The label to use when displaying a link to the artifacts.
+
+=back
+
+=back
+
+=head2 CD ISO IMAGES
+
+XXX
+
+=head1 COMPLETE EXAMPLE
+
+  engine = /etc/auto-build.d/engine/main.conf
+  templateDir = /etc/auto-build.d/templates
+
+  buildRoot = /var/lib/builder
+
+  label = Continous Automatic Builder
+
+  adminEmail = admin@example.com
+  adminName = Build Administrator
+
+  groupEmail = dev@example.com
+  groupName = Build Developers
+
+  hostname = example.com
+  httpPrefix  = /~builder
+
+  lockMethod = fcntl
+
+  features = {
+    cache = 1
+    checkout = 1
+    createrepo_index = 1
+    yum_index = 1
+    apt_index = 1
+    email_alerts = 1
+  }
+
+  alert = {
+    scope = builder
+    trigger = first-fail
+    to = group
+    from = builder@example.com
+    smtpServer = mail.example.com
+  }
+
+  maxCacheSize = 100M
+  maxCacheAge = 7d
+
+  groups = {
+    software = {
+      label = Software
+    }
+    autobuild = {
+      label = Test-AutoBuild
+    }
+    docs = {
+      label = Documentation
+    }
+  }
+
+  env = {
+    USER = builder
+  }
+
+  repositories = {
+    gna-cvs = {
+      label = GNA Anonymous CVS Server
+      type = cvs
+      env = {
+        CVSROOT = :pserver:anonymous@cvs.gna.org:/cvs/testautobuild
+      }
+    }
+  }
+
+  modules = {
+    autobuild-dev = {
+      label = Test AutoBuild Unstable
+
+      admin-email = autobuild-admin@example.com
+      admin-name = Module Administrator
+      group-email = autobuild-dev@example.com
+      group-name = Module Developers
+
+      source = {
+        repository = gna-cvs
+        path = testautobuild
+      }
+
+      env = {
+        HTMLURLPREFIX = /~builder/artifacts/autobuild-dev/apidocs
+      }
+
+      groups = (
+        autobuild
+        software
+      )
+
+      links = (
+        {
+          href = http://www.autobuild.org/
+          label = Homepage
+        }
+        {
+          href = http://cvs.gna.org/viewcvs/testautobuild/testautobuild/
+          label = Browse CVS Repository
+        }
+      )
+
+      artifacts = (
+        {
+          src = README
+          dst = README
+          label = Readme
+        }
+        {
+          src = blib/coverage/*
+          dst = coverage/
+          label = Code Test & POD coverage Reports
+        }
+        {
+          src = blib/html/*
+          dst = apidocs/
+          path = apidocs/Test/AutoBuild.html
+          label = Module API documentation
+        }
+      )
+    }
+  }
+
+  isos = {
+    autobuild-unstable = {
+      name = autobuild-unstable.iso
+      label = Test-AutoBuild Unstable
+
+      packageTypes = (
+        rpm
+        zip
+      )
+
+      modules = (
+        autobuild-dev
+      )
+    }
+  }
+
+
+=head1 FILES
+
+
+
+  /etc/auto-build.d/templates/*    - templates for HTML status pages & email alerts
+  /etc/auto-build.d/engine/*.conf  - definitions for build engine runtime setup
+  /etc/auto-build.d/httpd/*.conf   - example apache configuration files
+  /etc/auto-build.d/cron/*.conf    - example crontab entries for automating builder
+  /var/lib/builder                 - default build working directory
+
+=head1 SEE ALSO
+
+L<auto-build(1)>, L<Config::Record(3pm)>, L<Template(3pm)>
+
+=head1 AUTHORS
+
+Daniel P. Berrange <dan@berrange.com>
+
+=cut

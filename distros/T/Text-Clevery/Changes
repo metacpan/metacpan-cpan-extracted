@@ -1,0 +1,26 @@
+Revision history for Perl extension Text::Clevy
+
+0.0004 2010-11-17 22:31:36
+    - Changes for Xslate 0.2015
+
+0.0003 Thu Sep 30 11:58:08 2010
+    - Rename the name Clevy to Clevery, to remind Smarty more easily
+      (thanks to miyagawa)
+    - Skip tests that require tzset(3) if the system doesn't support it
+
+0.0002 Wed Sep 29 16:32:03 2010
+    - Although it is not completed, I have released this module as
+      a non-dev version.
+
+0.0001_03 Mon Aug  2 14:01:54 2010
+    - Update dependencies
+
+0.0001_02 Mon Jul 26 17:49:35 2010
+    - Catch up to Xslate 0.1048
+    - Fix timezone problems in tests
+
+0.0001_01 Mon Jul 19 17:10:16 2010
+    - First development release!
+
+0.01 Fri Jun 18 09:19:21 2010
+    - original version; created by Module::Setup

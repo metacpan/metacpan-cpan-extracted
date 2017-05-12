@@ -1,0 +1,19 @@
+
+
+
+
+
+  (Diagnostic message):
+
+
+      ✓
+      ok { 1 };
+         at eg/flat.t line 6
+
+      ✖
+      ok { 0 };
+         at eg/flat.t line 7
+
+
+not ok
+1..1

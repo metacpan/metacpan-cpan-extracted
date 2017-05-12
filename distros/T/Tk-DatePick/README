@@ -1,0 +1,94 @@
+Tk/DatePick version 1.02
+========================
+ Minor patch over 1.02 to rectify errors pointed out by Slaven Rezic.
+
+ This is a minor patch over 1.0 to take into account leapyears properly when
+adding and subtracting years
+
+ NAME
+
+Tk::DatePick - Perl extension for Tk to pick dates
+
+ SYNOPSIS
+
+  use Tk::DatePick;
+  	$datepick = $main->DatePick(
+		-text => $currentdate,
+		-dateformat => $format,
+		-max => $max,
+		-min => $min,
+		-yeartype => $yeartype,
+		-disabled => 'normal',
+	)->pack();
+	$currentdate = $datepick->cget('-text');
+
+ DESCRIPTION
+
+This widget is meant to get idiot-proof input of date data in the correct
+format. The date is not user editable, so the problem of checking the format
+does not arise. It consists of a label field holding the date and six
+firebuttons to increment or decrement the year, month and day.
+
+All options are optional. This works fine:
+
+	$datepick = $main->DatePick()->pack();
+	$newdate = $datepick->cget('-text');
+
+The options are:
+
+	-text: this is the date fed in by the programmer. Defaults to the current
+system date.
+
+	-dateformat: 0 = dd/mm/yyyy, 1 = mm/dd/yyyy. defaults to 0.
+
+	-max, -min: these are strings in the correct date format to specify the
+range of dates. max defaults to 31/12/2095 and min to 1/1/1905.
+
+	-yeartype: 'calyear' sets min to 1st jan and max to 31st dec of the current
+year specified in the '-text' option. 
+'finyear' does the same setting the limits to the financial year (1st april
+to 31st march). If the '-text' option is not set, the system date is taken
+for determining the current calendar or financial year. If '-yeartype' is set it overrides any settings for '-max'
+and '-min'.
+
+	-status: can be 'disabled' where the user cannot change the date or 'normal'
+which is the default. 
+
+	There is a demo called example.pl which shows the features.
+
+
+
+ PREREQUISITES
+
+	1. Tk
+
+	2. Tk-GBARR
+
+ INSTALLATION
+
+	Unpack the distribution
+
+	perl Makefile.PL
+	make
+	make install
+
+
+ AUTHOR
+
+	Kenneth Gonsalves.
+
+ 	I welcome all comments, suggestions and flames to 
+
+	lawgon@thenilgiris.com
+
+ BUGS
+
+	Must be any number crawling around - havent found any though.
+
+
+ COPYRIGHT AND LICENCE
+
+	Same License as Perl
+
+	Copyright (C) 2002 Kenneth Gonsalves
+

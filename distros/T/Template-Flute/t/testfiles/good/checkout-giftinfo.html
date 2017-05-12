@@ -1,0 +1,111 @@
+	<div class="main-cart">
+
+		<h1>Vaše naročilo</h1>
+		
+		<div class="category-bg">
+		<div class="category-border">
+			<div class="step-box step-box-selected">1. Dostava</div>
+			<div class="step-box">2. Plačilo</div>
+			<div class="step-box">3. Povzetek</div>
+			<div class="step-box">4. Zaključek</div>
+			<div class="clear"></div>
+		</div>
+		</div>
+
+		<div class="alert">Prosimo, izpolnite zahtevana polja: Ime in priimek, Naslov, Pošta, Kraj.</div>
+
+		<form name="giftinfo" class="frm-default" action="/checkout" method="POST">
+
+			<fieldset class="align-left">
+			<legend>Podatki o dostavi</legend>
+			<ul>
+				<li>
+					<label>Naziv</label>
+					<select class="fld-date" name="gender">
+						<option>Mr.</option>
+					</select>
+				</li>
+				<li>
+					<label>Ime</label>
+					<span class="form-error" id="error-first-name">!! Vpišite ime</span>
+					<input type="text" name="first_name"/>
+				</li>
+				<li>
+					<label>Priimek</label>
+					<input type="text" name="last_name"/>
+				</li>
+				<li>
+					<label>Naslov</label><span class="form-error" id="error-last-name">!! Vpišite naslov</span>
+					<input type="text" name="street_address"/>
+				</li>
+				<li>
+					<label>Pošta in kraj</label><span class="form-error" id="error-zip-city">!! Vpišite pošto in kraj</span>
+					<input type="text" name="zip" class="fld-small" /> <input type="text" name="city"/>
+				</li>
+				<li>
+					<label>Država</label>
+                    <select name="country">
+                    </select>
+				</li>
+				<li>
+					<label>Telefon</label>
+					<input type="text" name="phone"/>
+				</li>
+			</ul>
+			</fieldset>
+
+
+			<fieldset class="align-left">
+			<legend>Posvetilo</legend>
+			<div class="gift-message">Za posvetilo ni doplačila.</div>
+			<ul>
+				<li>
+					<select>
+						<option>Ljubezensko sporočilo</option>
+					</select>
+				</li>
+				<li>
+					<textarea name="message" cols="" rows="5">Neskončno te ljubim...</textarea><br />
+					<span class="txt-info">Še 450 znakov</span>
+				</li>
+			</ul>
+			</fieldset>
+
+			<fieldset class="align-left" style="margin-top: 45px;">
+			<legend>Čas dostave</legend>
+			<ul>
+				<li>
+					<table width="300" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td>
+						<label>Dan</label>
+						<select class="fld-date" name="day">
+							<option>Pet, 17</option>
+						</select>
+						</td>
+						<td>
+						<label>Mesec</label>
+						<select class="fld-date" name="month">
+							<option>Okt 2012</option>
+						</select>
+						<a href=""><img src="img/i_calendar.png" style="margin-bottom: -4px;" /></a>
+						</td>
+						<td>
+							<label>Ura</label>
+							<select class="fld-date" name="time">
+								<option>10.00 - 15.00</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+				</li>
+			</ul>
+			</fieldset>
+
+			<div class="clear"></div>
+
+			<input type="submit" value="Naprej na plačilo" class="btn-submit" />
+
+		</form>
+
+	</div> <!-- end main -->

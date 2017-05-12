@@ -1,0 +1,26 @@
+Revision history for Perl extension Tie::REHash.
+
+0.01  2007
+	- original prototype (Big Bang) version. It was created for and long time battle tested as part of various applications. The general idea and hash interface were similar. It had test suit and documentation.
+
+1.00  6 December 2010
+	- first version released to CPAN. It is the complete redesign of both hash interface and implementation, as well as tests and documentation rewrite. 
+
+1.01  7 December 2010
+	- the "next-day" version. No change in API. Performance tunning. Minimum perl version is now corrected - it is (and was) 5.6. Minor corrections/improvements in documentation. Installation instructions in README now go all the way, up to source editing :) 
+
+1.02  8 December 2010
+	- the yet another "next-day" version. Again, no change in API. Working around perl bugs that cause installation problems revealed by cpantesters on perl 5.10.1 and pre-5.8.3 perls. Documentation update (in particular, BUGS section). 
+
+1.03  17 December 2010
+	- No changes except minor edits of perl bug warnings. Contrary to the information of rt.perl.org ticket 79178, it was discovered (from cpantesters reports for 1.02) that this perl bug is not confined to specified perl (core) versions range and even not strictly related to perl version - it may or may not affect different builds of same version of perl (probably it is up to differences in perl build options).  
+
+1.04  18 December 2010
+	- Performance improvement - repeated fetches of dynamic value can now be cached (still recalculated for each fetch, as required).  
+
+1.05  3 December 2012
+	- Dynamic value accessor API has been changed in backward-incompatible way: first argument is now tied() object, second - accessed key (was first argument earlier, so if you use dynamic values, shift() arguments in your accessors when upgrading), and rest of arguments are the rest of explicit fetch()'s arguments (if any) propagated to accessor. This change makes accessor to look like method of tied() object and allows modifying accessor's default behavior with extra arguments when calling fetch() explicitly.
+	- Fixed bug in documentation that promised $1, $2, $3, etc. of the match to be ALWAYS available to dynamic value accessor - they are not available in case caching is used (documentation suggests workaround).
+	- Specific instance of cache hash can now be specified as (true) value of do_cache() attribute
+	- Test suit is extended to explicitly test new code from documentation's SYNOPSIS
+	- Second edition of documentation

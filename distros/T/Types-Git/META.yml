@@ -1,0 +1,25 @@
+---
+abstract: 'Type::Tiny types for git stuff.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Simple: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-Git
+requires:
+  List::MoreUtils: '0.28'
+  Type::Tiny: '1'
+  namespace::clean: '0'
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/bluefeet/Types-Git/issues
+  homepage: https://github.com/bluefeet/Types-Git
+  repository: https://github.com/bluefeet/Types-Git.git
+version: '0.03'

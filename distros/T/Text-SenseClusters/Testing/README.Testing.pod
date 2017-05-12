@@ -1,0 +1,80 @@
+=head1 Name
+
+README.Testing - Explains structure and use of /Testing 
+
+=head1 DESCRIPTION
+
+The purpose of Testing directory is to provide test scripts to test the 
+correct functionality of the programs provided with this distribution. The 
+test scripts can be run to make sure that package is installed properly and 
+all required system paths are set. This also helps us to test backward 
+compatibility of programs when programs are upgraded. 
+
+=head2 Organization 
+
+Testing/ contains various sub directories, each of which tests 
+individual program of this package. 
+
+Each subdirectory has various .sh test files written in C shell script. 
+All tests that test behavior of a program under normal conditions are 
+named as testA*sh, and all those that test error conditions are named as 
+testB*.sh. 
+
+Note that in earlier versions the testA*.sh scripts were run 
+by a script called normal-op.sh, and the testB*.sh scripts were run by a 
+script called error-op.sh. However, this required that subtestll.sh and 
+testall.sh (the main driver scripts for the Testing directory) be 
+installed in the system level binary directory. We'd prefer to keep the 
+Testing scripts and data isolated to the Testing directory, so we 
+created a single script ot run all test cases, ALL-TESTS.sh
+
+All test scripts in all the program directories can be run with a single 
+command 'csh ./TEST-ALL.sh'. If you add or change test cases, this is 
+the only place you will need to make modifications to add your test case to 
+the sequence of test scripts. 
+
+If everything is fine, the tests will show the following:
+
+ STATUS : OK 
+
+If the package is not installed rightly or paths not set, 
+Tests will show the following:
+
+ STATUS : ERROR 
+
+=head1  AUTHORS
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+ Amruta Purandare
+ University of Pittsburgh
+
+ Anagha Kulkarni
+ Carnegie-Mellon University
+
+ Mahesh Joshi
+ Carnegie-Mellon University
+
+=head1 Copyright
+
+Copyright (c) 2002-2008, Ted Pedersen, Anagha Kulkarni, Mahesh Joshi, Amruta Purandare
+
+This suite of programs is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place - Suite 330, Boston, MA  02111-1307, USA.
+
+Note: The text of the GNU General Public License is provided in the file
+GPL.txt that you should have received with this distribution.
+
+=cut

@@ -1,0 +1,14 @@
+---
+- uri: debian.html?repo=perl-5.10
+  title_is: Serenevy: .deb Repository
+  contains:
+    - libdevice-usb-perl
+    - alt="(source package available)"
+
+- uri: debian.html
+  params:
+    repo: perl-5.10
+  title_is: Serenevy: .deb Repository
+  contains:
+    - libdevice-usb-perl
+    - alt="(source package available)"

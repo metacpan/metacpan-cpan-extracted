@@ -1,0 +1,49 @@
+# NAME
+
+Template::Plugin::GoogleChart - Using Google::Chart as a template plugin
+
+# SYNOPSIS
+
+    [% USE c = GoogleChart %]
+    [% chart = c.new_chart %]
+    [% ... set up chart ... %]
+    [% chart.img_tag %]
+
+# DESCRIPTION
+
+# METHODS
+
+- `new_chart`
+
+Returns a new [Google::Chart](http://search.cpan.org/perldoc?Google::Chart) object. See its documentation for how to use
+the chart object. You will probably want to write out the URL with the chart
+object's `get_url()` method or write out the `IMG` tag with `img_tag()` as
+shown in the synopsis.
+
+# BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through the web interface at
+<http://rt.cpan.org>.
+
+# INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+# AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a CPAN
+site near you. Or see <http://search.cpan.org/dist/Template-Plugin-GoogleChart/>.
+
+# AUTHORS
+
+Marcel Gr&uuml;nauer, `<marcel@cpan.org>`
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2007-2009 by the authors.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

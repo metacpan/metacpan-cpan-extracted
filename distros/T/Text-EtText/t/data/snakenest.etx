@@ -1,0 +1,21 @@
+Testing!
+
+ * Handles different kinds of lists
+   1. Bulleted
+   2. Numbered
+      - You can nest them as far as you want.
+      - It's pretty decent about figuring out which level of list it
+        is supposed to be on.
+        - You don't need to change bullet markers to start a new list.
+   3. Lettered
+      A. Finally handles lettered lists
+      B. Upper and lower case both work
+         a) Here's an example
+         b) I've been meaning to add this for some time.
+      C. Of course, HTML can't specify how ordered lists should be
+         indicated, so it may be a numbered list in some
+	 browsers. (Ok, most browsers)
+ * Doesn't screw up mail-ish things
+ * Spots preformated text sometimes
+
+Testing!

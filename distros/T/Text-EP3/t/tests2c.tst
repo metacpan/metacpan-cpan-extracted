@@ -1,0 +1,1 @@
+c  "this is line 1 of tests2c.tst"

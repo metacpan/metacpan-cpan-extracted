@@ -1,0 +1,27 @@
+1..8 todo 4 8;
+# OS            : MSWin32
+# Perl          : 5.006001 Win32 Build 635
+# Local Time    : Thu Apr 15 12:52:04 2004
+# GMT Time      : Thu Apr 15 16:52:04 2004
+# Test          : 1.15
+# Test::Tech    : 1.18
+# Data::Secs2   : 1.16
+# Data::SecsPack: 0.02
+# =cut 
+ok 1 - Test version 
+ok 2 - Pass test 
+ok 3 - Skipped tests  # skip
+not ok 4 - Todo Test that Fails 
+# Test 4 got: '12' (techA0.t at line 61 *TODO*)
+#   Expected: '6'
+not ok 5 - Failed test that skips the rest 
+# Test 5 got: '5' (techA0.t at line 66)
+#   Expected: '6'
+ok 6 - A test to skip  # skip - Test not performed because of previous failure.
+ok 7 - A not skip to skip  # skip - Test not performed because of previous failure.
+ok 8 - Stop skipping tests. Todo Test that Passes  # (techA0.t at line 82 TODO?!)
+ok 9 - Unplanned pass test 
+# Extra  : 9
+# Skipped: 3 6 7
+# Failed : 4 5
+# Passed : 4/6 66%

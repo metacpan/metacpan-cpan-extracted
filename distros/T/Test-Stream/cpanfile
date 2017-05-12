@@ -1,0 +1,26 @@
+requires "B" => "0";
+requires "Carp" => "0";
+requires "File::Spec" => "0";
+requires "File::Temp" => "0";
+requires "List::Util" => "0";
+requires "PerlIO" => "0";
+requires "Scalar::Util" => "0";
+requires "Storable" => "0";
+requires "Test::Harness" => "0";
+requires "overload" => "0";
+requires "perl" => "5.008001";
+requires "utf8" => "0";
+suggests "Sub::Name" => "0.11";
+suggests "Sub::Util" => "1.40";
+suggests "Term::ReadKey" => "2.03";
+suggests "Trace::Mask" => "0.000007";
+suggests "Unicode::GCString" => "2013.10";
+suggests "Unicode::LineBreak" => "v2015.7.16";
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::Pod" => "1.41";
+};

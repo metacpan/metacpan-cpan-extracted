@@ -1,0 +1,13 @@
+bin/tap2tet
+Changes
+examples/sample.tap
+lib/TAP/Convert/TET.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/10.basic.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

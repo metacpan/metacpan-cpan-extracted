@@ -1,0 +1,57 @@
+#! /usr/bin/perl
+# PODNAME: tapper-action
+# ABSTRACT: cmdline frontend to Tapper::Action/daemonize
+
+use strict;
+use warnings;
+
+use Tapper::Action::Daemon;
+use Cwd;
+
+$ENV{MX_DAEMON_STDOUT} ||= '/tmp/tapper_action_daemon_stdout.log';
+$ENV{MX_DAEMON_STDERR} ||= '/tmp/tapper_action_daemon_stderr.log';
+
+$ENV{MX_DAEMON_STDOUT} = '/tmp/tapper_action_daemon_stdout.log' if not -w $ENV{MX_DAEMON_STDOUT};
+$ENV{MX_DAEMON_STDERR} = '/tmp/tapper_action_daemon_stderr.log' if not -w $ENV{MX_DAEMON_STDERR};
+
+
+my $notify = Tapper::Action::Daemon->new
+    (
+     basedir => getcwd,
+     pidfile => '/tmp/tapper-action-daemon.pid',
+    );
+$notify->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-action - cmdline frontend to Tapper::Action/daemonize
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=item *
+
+Tapper Team <tapper-ops@amazon.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

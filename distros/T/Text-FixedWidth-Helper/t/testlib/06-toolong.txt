@@ -1,0 +1,12 @@
+fname            15
+mi                1
+lname            15
+customer_id      10
+city             20
+state             2
+zip               5
+secret_code    1000
+
+Sylvester      JGomez          M789294592Rochester           NY14618
+Arthur         XFridrikkson    M783891590Oakland             CA94601
+Kasimir        EKristemanaczewsN389182992Buffalo             NY14214

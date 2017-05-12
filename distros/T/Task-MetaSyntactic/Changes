@@ -1,0 +1,106 @@
+Revision history for Task-MetaSyntactic
+
+1.042 2017-02-22 BOOK
+    - list WordList::MetaSyntactic under "OTHER METASYNTACTIC MODULES"
+    - list WordList::MetaSyntactic::dangdut under "OTHER METASYNTACTIC MODULES"
+    - list Acme::MetaSyntactic::WordList under "OTHER METASYNTACTIC MODULES"
+    - list App::ShellCompleter::meta under "OTHER METASYNTACTIC MODULES"
+    - list Dist::Zilla::Plugin::Acme::MetaSyntactic under "OTHER METASYNTACTIC MODULES"
+    - list App::metastasize under "OTHER METASYNTACTIC MODULES"
+    - list Complete::Acme::MetaSyntactic under "OTHER METASYNTACTIC MODULES"
+    - list App::metasyn under "OTHER METASYNTACTIC MODULES"
+
+1.041 2017-02-03 BOOK
+    - add Acme::MetaSyntactic::chinese_zodiac
+
+1.040 2016-11-04 BOOK
+    - add Acme::MetaSyntactic::display_resolution
+    - add Acme::MetaSyntactic::christmas
+
+1.039 2016-07-16 BOOK
+    - document that Acme-MetaSyntactic-RefactorCode is only on BackPAN
+    - other minor documentation fixes
+    - reformat this file as per CPAN::Changes::Spec
+
+1.038 2016-07-06 BOOK
+    - add Acme::MetaSyntactic::legostarwarstheforceawakens
+
+1.037 2016-06-12 BOOK
+    - add Acme::MetaSyntactic::countries
+    - add Acme::MetaSyntactic::dangdut
+    - add Acme::MetaSyntactic::frasier
+    - add Acme::MetaSyntactic::id_names
+    - add Acme::MetaSyntactic::seinfeld
+
+1.036 2016-04-23 BOOK
+    - add Acme::MetaSyntactic::legomarvelsavengers
+
+1.035 2015-12-25 BOOK
+    - add Acme::MetaSyntactic::mlpfim
+
+1.034 2015-08-29 BOOK
+    - add Acme::MetaSyntactic::legojurassicworld
+
+1.033 2015-03-15 BOOK
+    - list Data::Fake::MetaSyntactic under "OTHER METASYNTACTIC MODULES"
+
+1.032 2014-10-27 BOOK
+    - add Acme::MetaSyntactic::legomovievideogame
+    - add Acme::MetaSyntactic::legothehobbit
+
+1.031 2014-05-26 BOOK
+    - add Acme::MetaSyntactic::cpanauthors
+    - list Acme::CPANAuthors::MetaSyntactic under "OTHER METASYNTACTIC MODULES"
+
+1.030 2014-04-16 BOOK
+    - list Data::Faker::MetaSyntactic under "OTHER METASYNTACTIC MODULES"
+
+1.029 2014-01-26 BOOK
+    - add Acme::MetaSyntactic::legocityundercover
+    - add Acme::MetaSyntactic::legomarvelsuperheroes
+
+1.028 2013-06-11 BOOK
+    - list distributions that require Acme::MetaSyntactic,
+      but that do not contain any themes
+
+1.027 2013-05-13 BOOK
+    - add Acme::MetaSyntactic::xkcdcommon1949
+    - rename to Task::MetaSyntactic (and turned into a Task)
+    - switch do Dist::Zilla
+    - add a README file and "use strict", to improve my CPANTS score
+
+1.026 2013-04-01 BOOK - Bundle-MetaSyntactic
+    - add Acme::MetaSyntactic::dune
+    - add Acme::MetaSyntactic::legobatman
+    - add Acme::MetaSyntactic::legoharrypotter
+    - add Acme::MetaSyntactic::legoindianajones
+    - add Acme::MetaSyntactic::legolotr
+    - add Acme::MetaSyntactic::legopiratesofthecaribbean
+
+1.025 2012-10-16 BOOK - Bundle-MetaSyntactic
+    - add Acme::MetaSyntactic::morning_musume
+    - fixed the date format in the Changes files
+      (in accordance with CPAN::Changes)
+
+1.024 2012-08-06 BOOK - Bundle-MetaSyntactic
+    - fix a typo in Acme::MetaSyntactic::soviet's name
+
+1.023 2012-08-06 BOOK - Bundle-MetaSyntactic
+    - add Acme::MetaSyntactic::soviet
+
+1.022 2012-06-21 BOOK - Bundle-MetaSyntactic
+    - add Acme::MetaSyntactic::errno
+
+1.021 2012-05-21 BOOK - Bundle-MetaSyntactic
+    - add Acme::MetaSyntactic::Themes::Abigail
+
+1.020 2012-05-08 BOOK - Bundle-MetaSyntactic
+    - add Acme::MetaSyntactic::Themes
+    - document the distribution split
+
+1.01 2007-12-31 BOOK - Bundle-MetaSyntactic
+    - add the daleks theme
+
+1.00 2007-08-17 BOOK - Bundle-MetaSyntactic
+    - First version of the bundle
+    - includes the buzzwords, nethack and vim additional themes

@@ -1,0 +1,9 @@
+etc/geography_countries.pl
+etc/locale_country.pl
+lib/Telephony/CountryDialingCodes.pm
+Changes
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+t/pod.t

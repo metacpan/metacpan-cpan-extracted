@@ -1,0 +1,64 @@
+{
+   "abstract" : "Record and playback LWP interactions.",
+   "author" : [
+      "Chris Reinhardt <crein@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-VCR-LWP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "LWP::UserAgent" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Sub::Name" : "0",
+            "Test::Exception" : "0",
+            "Test::File::Contents" : "0",
+            "Test::More" : "0",
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ctriv/perl-Test-VCR-LWP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/creinhardt/perl-Test-VCR-LWP.git",
+         "web" : "https://github.com/creinhardt/perl-Test-VCR-LWP"
+      }
+   },
+   "version" : "0.5",
+   "x_contributors" : [
+      "Mark Ng <cpan@markng.co.uk>"
+   ]
+}
+

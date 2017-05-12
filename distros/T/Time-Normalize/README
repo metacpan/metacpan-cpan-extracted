@@ -1,0 +1,81 @@
+Time::Normalize version 0.09
+============================
+
+This module is no big deal.  It doesn't do anything flashy, or
+revolutionary, or even difficult.  It simply provides some functions
+that aid in parsing date/time values, by taking various input values
+and normalizing them into standard, ready-to-use values.
+
+This module is meant to be used as an aid for checking and
+reformatting sloppy input values from dubious sources.  But it also
+can be used simply to transform or reformat known-good time and date
+values as well.
+
+This module is also very handy when parsing dates and times matched
+with Regexp::Common::time.
+
+EXAMPLES
+
+ ($y, $m, $d) = normalize_ymd (2005, 'jan', 7);
+ # Returns '2005', '01', '07'.
+
+ ($y, $m, $d, $w, $wn, $wn3, $mn, $mn3) = normalize_ymd ('05', 1, 7);
+ # Returns '2005', '01', '07', 3, 'Friday', 'Fri', 'January', 'Jan'.
+
+ ($h24, $m, $s, $h12, $am) = normalize_hms (13, 45);
+ # Returns '13', '45', '00', 1, 'p'
+
+ ($h24, $m, $s, $h12, $am) = normalize_hms (11, 45, undef, 'P.M.');
+ # Returns '23', '45', '00', 11, 'p'
+
+ ($y, $m, $d) = normalize_ymd (2005, 'February', 29);
+ # Throws an error: Invalid day "29"
+
+
+DEVELOPMENT STATE
+
+This module is stable.  The interface should not change, and the test
+suite is fairly complete.  I will upgrade this module's version number
+to 1.0 sometime in the next few months, unless I get feature requests
+or bug reports.
+
+If you find any bugs, or if any behavior of Time::Normalize surprises
+you, I would be grateful if you would send me an email message about
+it.  Thanks.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you do not have Module::Build, you can use the older steps:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On Windows, if you have Activestate perl, you will need to use nmake
+instead of make. If you have Strawberry perl, you will need to use dmake.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  POSIX           (optional)
+  I18N::Langinfo  (optional)
+  Test::More      (used by the test suite only)
+
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode, roode@cpan.org
+
+Copyright © 2005–2014 by Eric J. Roode. All Rights Reserved.
+This module is free software; See the copyright notice in the
+module source code for full details.

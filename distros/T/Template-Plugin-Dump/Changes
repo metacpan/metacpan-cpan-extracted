@@ -1,0 +1,9 @@
+Revision history for Template-Plugin-Dump
+
+0.02 2007/05/27
+  - maintenance release: no significant code changes
+  - added license info to Makefile.PL
+
+0.01 2007/03/13
+  - initial release
+

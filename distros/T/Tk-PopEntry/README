@@ -1,0 +1,11 @@
+Tk::PopEntry is a derived widget, based on Tk::Entry.
+
+It includes a pop-up menu that appears automatically when
+a user right-clicks on the Entry widget.  There are five
+default options: Cut, Copy, Paste, Delete and Sel. All.
+
+There are also input mask options that can be used to limit
+the types of data that a user may enter.
+
+See the POD documentation for a full description
+of this module.

@@ -1,0 +1,115 @@
+Template-Plugin-HighlightPerl version 0.04
+==========================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Syntax::Highlight::Perl
+
+DESCRIPTION
+
+Template::Plugin::HighlightPerl - Template Toolkit plugin which 
+implements wrapper around L<Syntax::Highlight::Perl> module and provides filter
+for converting perl code to syntax highlighted HTML. Also adds support for
+non-perl code, see below.
+
+If you plan to use this in a blog type application, just make sure to use
+the proper code tags around you Perl code before you store to database.
+
+Proper and required code tags are:
+Open:  [perl]
+Close: [/perl]
+
+Your Perl code goes between opening and closing tags. ;)
+
+If you need to format non-perl code, use the following tags:
+Open:  [code]
+Close: [/code]
+
+If you are not using code tags and do not want line breaks:
+Open: [nobr]
+Close [/nobr]
+
+Within your template file, use the following:
+
+    [% USE HighlightPerl -%]
+
+    [% FILTER highligh_perl -%]
+        [% article.body %]
+    [% END -%]
+
+Where [% article.body %] is data passed to the template file from database query.
+
+Please note that, unless you use [nobr] tags, line breaks are generated. So you
+will not need to use other TT2 filters, such as html_line_break or html_para.
+Also note that pre tags are automaticlly producted to maintain proper formatting
+of your Perl code, so there is no need to add white space pre to css file.
+
+This template filter also produces CSS div classes for user customization. 
+
+Generated CSS classes for perl code:
+    <div class="highlight_perl_head">Perl Code:</div>
+    <div class="highlight_perl_body"><pre>Perl Code</pre></div>
+
+Generated CSS for non-perl code:
+    <div class="highlight_code_head">Code:<div>
+    <div class="highlight_code_body"><pre>Non-Perl Code</pre></div>
+
+For example, you can use the following in your css file:
+
+    .highlight_perl_head {
+        margin-left: 10px;
+    }
+    .highlight_perl_body {
+        margin-left: 10px;
+        margin-top:5px;
+        margin-bottom: 5px;
+        white-space: pre;
+        background: #0a0a0a;
+        color: #cccccc;
+        font-family: monospace;
+        font-size: 93%;
+        border: 1px solid #555555;
+        overflow: auto;
+        padding: 10px;
+        width: 640px;
+    }
+    .highlight_code_head {
+        margin-left: 10px;
+    }
+    .highlight_code_body {
+        margin-left: 10px;
+        margin-top:5px;
+        margin-bottom: 5px;
+        white-space: pre;
+        background: #0a0a0a;
+        color: #cccccc;
+        font-family: monospace;
+        font-size: 93%;
+        border: 1px solid #555555;
+        overflow: auto;
+        padding: 10px;
+        width: 640px;
+    }
+
+This will produce nice div areas with head description and black background and auto-scoll bars for code overflow.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Stephen A Sykes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

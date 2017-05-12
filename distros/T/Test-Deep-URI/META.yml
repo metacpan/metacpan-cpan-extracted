@@ -1,0 +1,35 @@
+---
+abstract: 'Easier testing of URIs for Test::Deep'
+author:
+  - 'Nigel Gregoire <nigelgregoire@gmail.com>'
+build_requires:
+  Test::More: '0.96'
+  Test::Tester: '0'
+  Test::Warnings: '0.005'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Deep-URI
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Exporter::Tiny: '0'
+  Test::Deep: '0'
+  URI: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/nfg/Test-Deep-URI/issues
+  homepage: https://github.com/nfg/Test-Deep-URI
+  repository: https://github.com/nfg/Test-Deep-URI.git
+version: '0.02'

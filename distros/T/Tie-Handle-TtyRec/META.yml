@@ -1,0 +1,31 @@
+---
+abstract: 'write a ttyrec'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Term::TtyRec::Plus: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Handle-TtyRec
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Tie::Handle: 0
+  Time::HiRes: 0
+resources:
+  homepage: http://github.com/sartak/Tie-Handle-TtyRec/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/sartak/Tie-Handle-TtyRec.git
+    web: http://github.com/sartak/Tie-Handle-TtyRec/tree
+version: 0.04

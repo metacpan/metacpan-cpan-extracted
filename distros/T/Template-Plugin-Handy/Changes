@@ -1,0 +1,13 @@
+Revision history for Template-Plugin-Handy
+
+0.001   10 Oct 2008
+        First version, released on an unsuspecting world.
+
+0.002   10 Nov 2008
+        * add sort_by method to LIST and HASH ops
+
+0.003   26 Feb 2009
+        * sort_by() now returns arg if a ref() but not LIST or HASH
+          This is to handle the (common?) TT case where a method returns
+          a single object instead of an array ref with one item.
+

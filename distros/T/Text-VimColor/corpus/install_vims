@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+#
+# This file is part of Text-VimColor
+#
+# This software is copyright (c) 2011 by Randy Stauner.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions); # core
+
+sub msg { print STDERR ' == ', @_, "\n"; }
+
+our ($build, $install);
+GetOptions(
+  'build=s',   \$build,
+  'install=s', \$install,
+);
+
+{
+  no strict 'refs';
+  (-d $$_) || die "$_ dir should exist ($$_)\n"
+    foreach qw( build install );
+}
+
+# grab from leftover args, otherwise find all
+my @built = @ARGV ? @ARGV : sort grep { -d } glob("$build/vim*");
+
+foreach my $ver ( @built ){
+  my $base = ($ver =~ m!/(vim.+)$!)[0];
+  unless( -d "$install/$base" ){
+    msg "installing $base";
+    system("cd $build/$base; ./configure --prefix=$install/$base && make && make install");
+    print "\n";
+  }
+}

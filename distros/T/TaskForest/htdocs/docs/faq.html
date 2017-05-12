@@ -1,0 +1,380 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Frequently Asked Questions (FAQ)</div>
+
+  <ul>
+    <li><a href="#dst">How does Taskforest deal with Daylight Saving Time?</a></li>
+    <li><a href="#midnight">How can I run jobs overnight?</a></li>
+    <li><a href="#long">Does TaskForest support jobs that run for longer than 24 hours?</a></li>
+    <li><a href="#tz">What time zones are available?</a></li>
+    <li><a href="#tokens">Can I prevent too many jobs from running simultaneously?</a></li>
+    <li><a href="#missing_logs">On the web page, why can't I click on the status of a job to see the logs?</a></li>
+    <li><a href="#release">What is the difference between releasing a hold and releasing all dependencies?</a></li>
+  </ul>
+
+  <div class="new_section_header"><a name="dst">How does Taskforest deal with Daylight Saving Time?</a></div>
+
+  <p>
+    For time zones that observe Daylight Saving Time, on the day that DST
+    starts (in Spring) the day has only 23 hours.  On the day that DST
+    ends the day has 25 hours.  If you run an hourly job on those days,
+    the job will run either 23 or 25 times.  If you prefer, you can have
+    your Family file use a timezone that does not observe DST - like GMT,
+    for instance.
+  </p>
+
+  <div class="new_section_header"><a name="midnight">How can I run jobs overnight?</a></div>
+
+  <p>
+    Having a midnight point gives us a convenient time interval within
+    which a run of a job is considered valid.  For example, with the
+    system as it is now, saying "job J1 has run" means that it has run
+    *today*.  If J2 depends on J1, we only have to look for successful
+    runs of J1 today.
+  </p>
+
+  <p>
+    If we don't have a known time interval, then we have to resolve the
+    problem that occurs when jobs run for longer than 24 hours.  Let's
+    start with a simple example first.  Assume that our Family file looks
+    like this:
+  </p>
+
+  <div class="code"><pre><code>
++----------------------------------------------------------------
+|start=>'00:00',tz=>'America/Chicago',days=>'Mon,Tue,Wed,Thu,Fri'
+| | J1( start=>22:00 ) | J2()
++----------------------------------------------------------------
+</code></pre></div>
+
+  <div class="example_name">Example 1: J1's run time is 5 hours.  This is what happens today</div>
+
+  <div class="code"><pre><code>
+(Chicago)
+Day  Time       Action(s)
+Mon 00:00
+    01:00
+    02:00
+    03:00
+    04:00
+    05:00
+    06:00
+    07:00
+    08:00
+    09:00
+    11:00
+    12:00
+    13:00
+    14:00
+    15:00
+    16:00
+    17:00
+    18:00
+    19:00
+    20:00
+    21:00
+    22:00       J1 Starts
+    23:00          |
+Tue 00:00          |
+    01:00          |
+    02:00          v
+    03:00       J1 Ends
+    04:00
+    05:00
+    06:00
+    07:00
+    08:00
+    09:00
+    11:00
+    12:00
+    13:00
+    14:00
+    15:00
+    16:00
+    17:00
+    18:00
+    19:00
+    20:00
+    21:00
+    22:00       J1 Starts
+    23:00          |
+Wed 00:00          |
+    01:00          |
+    02:00          v
+    03:00       J1 Ends
+    04:00
+</code></pre></div>
+
+
+  <p>
+    So you can see that J2 never gets a chance to run!  At 03:00 on Tuesday,
+    the system checks to see if J1 has run for that day, and it hasn't.  So J2
+    can't run for that day.
+  </p>
+
+  <p>
+    Now, I could remedy this particular case with the following technique (or
+    hack):
+  </p>
+
+  <div class="example_name">Example 2: J1's run time is 5 hours. J2's run time is 1 hour.</div>
+
+  <p>
+    Change the Family File to say:
+  </p>
+
+  <div class="code"><pre><code>
++----------------------------------------------------------------
+| # changed the start time, time zone and days of week
+|start => '00:00', tz => <em>'GMT'</em>, days => <em>'Tue,Wed,Thu,Fri,Sat'</em>
+|
+| J1( <em>start=>03:00</em> )
+| J2()
++----------------------------------------------------------------
+</code></pre></div>
+
+  <p>
+    What this does is *shift* the entire Family so that all jobs in it run
+    on the same day in the time zone specified.  If you use cron to invoke
+    TaskForest, the crontab entry that invokes taskforest does not need to
+    be changed.  That can stay the same.  Now, this is what happens:
+  </p>
+
+  <div class="code"><pre><code>
+(Chicago)       (GMT)
+Day  Time       Day  Time      Action(s)
+Mon 00:00       Mon 05:00
+    01:00           06:00
+    02:00           07:00
+    03:00           08:00
+    04:00           09:00
+    05:00           11:00
+    06:00           12:00
+    07:00           13:00
+    08:00           14:00
+    09:00           15:00
+    11:00           16:00
+    12:00           17:00
+    13:00           18:00
+    14:00           19:00
+    15:00           20:00
+    16:00           21:00
+    17:00           22:00
+    18:00           23:00
+    19:00       Tue 00:00
+    20:00           01:00
+    21:00           02:00
+    22:00           03:00      J1 Starts
+    23:00           04:00         |
+Tue 00:00           05:00         |
+    01:00           06:00         |
+    02:00           07:00         v
+    03:00           08:00      J1 Ends, J2 Starts
+    04:00           09:00               J2 Ends
+    05:00           11:00
+    06:00           12:00
+    07:00           13:00
+    08:00           14:00
+    09:00           15:00
+    11:00           16:00
+    12:00           17:00
+    13:00           18:00
+    14:00           19:00
+    15:00           20:00
+    16:00           21:00
+    17:00           22:00
+    18:00           23:00
+    19:00       Wed 00:00
+    20:00           01:00
+    21:00           02:00
+    22:00           03:00      J1 Starts
+    23:00           04:00         |
+Wed 00:00           05:00         |
+    01:00           06:00         |
+    02:00           07:00         v
+    03:00           08:00      J1 Ends, J2 Starts
+    04:00           09:00               J2 Ends
+    05:00           10:00
+</code></pre></div>
+
+  <p>
+    Shifting the start/end of the days by changing the timezones has fixed
+    this problem.  J1 still starts at 22:00 Chicago time, and J2 will
+    still run if J1 runs successfully.
+  </p>
+
+  <p>
+    If the jobs in your Family files run in less than 24 hours, you
+    can use this method now.
+  </p>
+
+  <p>
+    However, this is not a universal solution.  What happens if J1's run time
+    is 26 hours?  Even with the family as shown in Example 2, J1 ends the day
+    after it started. This means that J2 will never run, no matter what we set
+    the timezone to be.  This is because no matter what day it is, <em>today's</em>
+    run of J1 will never have completed that day.
+  </p>
+
+  <p>
+    So the current version of taskforest does not support Family files whose
+    jobs run for more than 24 hours from the start of the first job to the end
+    of the last job, even if each individual job runs for less than 24 hours.
+  </p>
+
+  <div class="example_name">Example 3:  J1 runs for 25 hours</div>
+  
+  <div class="code"><pre><code>
+(Chicago)       (GMT)
+Day  Time       Day  Time      Action(s)
+Mon 00:00       Mon 05:00
+    01:00           06:00
+    02:00           07:00
+    03:00           08:00
+    04:00           09:00
+    05:00           11:00
+    06:00           12:00
+    07:00           13:00
+    08:00           14:00
+    09:00           15:00
+    11:00           16:00
+    12:00           17:00
+    13:00           18:00
+    14:00           19:00
+    15:00           20:00
+    16:00           21:00
+    17:00           22:00
+    18:00           23:00
+    19:00       Tue 00:00
+    20:00           01:00
+    21:00           02:00
+    22:00           03:00      J1 Starts
+    23:00           04:00         |
+Tue 00:00           05:00         |
+    01:00           06:00         |
+    02:00           07:00         |
+    03:00           08:00         |
+    04:00           09:00         |
+    05:00           11:00         |
+    06:00           12:00         |
+    07:00           13:00         |
+    08:00           14:00         |
+    09:00           15:00         |
+    11:00           16:00         |
+    12:00           17:00         |
+    13:00           18:00         |
+    14:00           19:00         |
+    15:00           20:00         |
+    16:00           21:00         |
+    17:00           22:00         |
+    18:00           23:00         |
+    19:00       Wed 00:00         |
+    20:00           01:00         |
+    21:00           02:00         |
+    22:00           03:00         |     J1 Starts
+    23:00           04:00         v        |
+Wed 00:00           05:00      J1 Ends     |
+    01:00           06:00                  |
+    02:00           07:00                  |
+    03:00           08:00                  |
+    04:00           09:00                  |
+    05:00           10:00                  |
+</code></pre></div>
+
+  <p>
+    The other thing we're seeing here is that now we have 2 instances of J1
+    running simultaneously (for 2 hours), even though that is not the intent
+    of the Family file.  This could be a major problem.  J2 never runs.
+  </p>
+    
+  <p>
+    I can't think of a foolproof way to resolve this.
+  </p>
+
+  <p>
+    If we implement rules that require a family to 'complete' all of the
+    previous day's jobs until it can run no more - because all jobs have
+    completed successfully.  I don't know if this is a satisfactory approach
+    or not.  This means that J1's start times will be as follows:
+  </p>
+
+  <div class="code"><pre><code>
+   Mon: 22:00
+   Wed: 00:00
+</code></pre></div>
+
+  <p>
+    On Tuesday we don't run the Family, because Monday's run hasn't
+    completed.  That's fine.  But what about Wednesday?  With this
+    definition, Wednesday will never run as well because Tuesday's run
+    never completed (there wasn't a run on Tuesday).  So the system has to
+    be smart about that and realize that.  And that's fine, until you
+    change the family on Tuesday to run a new job J3 after J2.  Then, the
+    system needs to know on Wednesday not to wait for look for a
+    successful run of J3 for Monday's run (because J3 didn't exist on
+    Monday).  Which means that the system needs to know your change
+    control history.  Which is a whole other problem.
+  </p>
+
+  <div class="new_section_header"><a name="long">Does TaskForest support jobs that run for longer than 24 hours?</a></div>
+
+  <p>
+    No.  For a detailed explanation, please see <a href="#midnight">the
+    answer to the previous FAQ</a>.
+  </p>
+
+
+  <div class="new_section_header"><a name="tz">What time zones are available?</a></div>
+
+  <p>
+    To see a list of all time zones you may use, you can read the perldoc
+    for <a href="http://search.cpan.org/dist/DateTime-TimeZone/lib/DateTime/TimeZone/Catalog.pm">DateTime::TimeZone::Catalog</a>.
+  </p>
+  
+
+  <div class="new_section_header"><a name="tokens">Can I prevent too many jobs from running simultaneously?</a></div>
+
+  <p>
+    Yes.  You can use <a href="/docs/tokens.html">tokens</a> to limit how
+    many jobs of a class may run simultaneously.  If these jobs all use
+    the same token, you can set the cardinality of the token to the upper
+    limit on the number of jobs that may run simultaneously.
+  </p>
+
+
+  <div class="new_section_header"><a name="missing_logs">On the web page, why can't I click on the status of a job to see the logs?</a></div>
+
+  <p>
+    You're probably using 'run' as
+    the <a href="/docs/configuring/options.html#run_wrapper"><code>run_wrapper</code></a>
+    instead of 'run_with_log'.  The former will not generate log files,
+    and therefore will not generate the links.  The latter will.
+  </p>
+
+
+  <div class="new_section_header"><a name="release">What is the difference between releasing a hold and releasing all dependencies?</a></div>
+
+  <p>
+    When a job is on hold, it will never run during the current day.  Once
+    you release a hold on a job, then the job is 'back to normal' and it
+    will run once its dependencies are met.  When you release all
+    dependencies on a job, it will run right away, even if all its
+    dependencies have not been met.  What's important to realize is that
+    if a job is on Hold, that takes priority over whether or not you can
+    release all dependencies.  The website does not allow you to release
+    all dependencies on a job that's on hold.  First you must release the
+    hold, and only then can you release all dependencies.
+  </p>
+
+
+<div class="clear_both"></div>
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

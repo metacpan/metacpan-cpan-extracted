@@ -1,0 +1,130 @@
+Revision history for Test::Apocalypse
+
+1.006	2014-10-25 20:10:12 UTC
+
+	Proper release on CPAN :)
+
+1.005	2014-10-25 19:58:22 UTC
+
+	FakeRelease to test my dzil configs!
+
+1.004	2014-10-25 05:07:26 UTC
+
+	Tweak how we skip/disable plugins because of the recent subtest change, I broke some stuff :(
+	I give up on the Pod::No404s test, the internet is too flaky everywhere :(
+	Removed the OutdatedPrereqs test because I now use Dist::Zilla::Plugin::PromptIfStale, thanks ETHER!
+
+1.003	2014-10-25 00:12:08 UTC
+
+	Add Test::Mojibake to the dist
+	Add more exclusions to the standard Perl::Critic config
+	Add PERL_CRITIC_STRICT env var to skip the bundled Perl::Critic config
+	Fix an error in Test::Apocalypse::Script
+	Use Test::CPAN::Changes instead of the outdated Test::CheckChanges
+	Ripped out the dysfunctional Test::NoWarnings in favor of Test::FailWarnings, thanks DAGOLDEN!
+	Ignore the 'perl' dependency when checking deps
+	Fix version mismatch error when checking dependencies ( 'v0.0.6' vs '0.0.6' )
+	Thanks everyone who sent RT tickets to clean up the FAILs :)
+	Finally enabled the Test::Vars plugin as I've switched over to using subtests instead of Test::Block
+
+1.002	2011-04-21 21:49:46 UTC
+
+	Add more default exclusions to the Perl::Critic default .perlcriticrc
+	Tweaked the OutdatedPrereqs test *again* so it FAILs if a prereq version is higher than found on CPAN
+	Tweaked the Dependencies test so it correctly processes found prereqs that has no version
+
+1.001	2011-03-08 21:37:20 UTC
+
+	Tweaked the OutdatedPrereqs test so it will correctly FAIL if a prereq wasn't found on CPAN
+	Tweaked the Dependencies test so it correctly filters provided packages
+
+1.000	2011-03-04 23:37:23 UTC
+
+	Converted to Dist::Zilla for the release process!
+	Tweaked the internals to cleanup automated issues
+	Ported the META.(yml|json) tests to the new Test::CPAN::Meta infrastructure, thanks JAWNSY! ( RT#66215 )
+	Changed some plugins so they execute tests as TODO, to not cause spurious FAILs
+	Added Test::Vars to the testsuite
+	Added Test::Script to the testsuite
+	Added Test::Pod::LinkCheck to the testsuite
+	Added Test::Pod::Spelling::CommonMistakes to the testsuite
+	Added debugging of test info, thanks POE::Test::Loops!
+	Replaced Test::Dependencies with homebrew solution utilizing Perl::PrereqScanner
+	Removed Test::Module::Used plugin ( see above )
+	Removed the Test::Prereq plugin because it never worked reliably and we already have a plugin for it ( see above )
+	Removed the Test::UseAllModules plugin because we have other plugins that do the same thing
+	Bumped Test::NoPlan prereq to 0.0.6 so it works properly under Test::Block
+	Bumped Test::Pod prereq to 1.41 so it doesn't complain about L<text|scheme> being invalid
+	Added Pod::Coverage::TrustPod as the coverage class for Test::Pod::Coverage
+	Fixed a bug in Test::Spelling where the file stopwords weren't added right
+	Fixed a bug in OutdatedPrereqs where it complained if the CPAN version was older than what was specified
+	Revamped the Perl::Critic test to automatically use a default config if one wasn't found in t/perlcriticrc
+
+0.10	0000-00-00 00:00:00 UTC
+
+	Added smart AUTOMATED_TESTING logic so we are now behaving in the same way as Alias envisaged
+		This means certain tests are disabled when AUTOMATED is set :)
+	Minor POD/Build.PL/test output tweaks
+	Added META.json to FileChecks test
+	Bumped Test::Strict prereq to 0.14 because now it works with Moose!
+	Tweaked the module loading logic so we have less duplication now + less bugs, yay!
+	Fixed a warning in the OutdatedPrereqs test so we don't cause FAILs with the Test::NoWarnings module :(
+	Added Test::NoPlan to the testsuite
+
+0.09	0000-00-00 00:00:00 UTC
+
+	Added the PERL_APOCALYPSE env var to override test selection and test all plugins
+	Run the plugins in alphabetical order, which is prettier :)
+	Removed the crappy stopwords addition in Pod_Spelling test
+	Added Test::JSON::Meta to the testsuite
+
+0.08	0000-00-00 00:00:00 UTC
+
+	Minor POD tweaks
+	Added Test::Pod::No404s to the testsuite
+	Fixed a warning in the PerlMetrics test so we don't cause FAILs with the Test::NoWarnings module :(
+
+0.07	0000-00-00 00:00:00 UTC
+
+	Fixed a issue with META.yml quoting causing parse failures when using tools that depend on it
+	Upgraded Module::Build to 0.3601, had to change prereq from '0.2.2' to '0.002002' to satisfy M::B::Compat :(
+
+0.06	0000-00-00 00:00:00 UTC
+
+	Fixed OutdatedPrereqs test so it doesn't blow up on zero prereqs - thanks Ryan52!
+	Added $@ to the module load failure output, for better debugging - thanks Ryan52!
+	Minor POD tweaks
+	Added more common terms to the Pod_Spelling test
+	Added Test::NoBreakpoints to the testsuite
+	Added Test::ConsistentVersion to the testsuite
+	Added Test::EOL to the testsuite
+	Added Test::AutoLoader to the testsuite
+	Modified is_apocalypse_here() to accept options, you can now enable/disable specific tests!
+	Test::Apocalypse now finally passes it's own testsuite under RELEASE_TESTING, ha! ( thanks to Debian guys for prodding me )
+	The Kwalitee test for EXPERIMENTAL/EXTRA metrics is not treated as a failure now
+	Oops, Module::Pluggable wasn't listed as a prereq!
+	Sorry - added a lot of Perl::Critic extensions so you will not get failed tests because you missed to test an extension!
+
+0.05	0000-00-00 00:00:00 UTC
+
+	Added Test::Module::Used to the testsuite
+	Added Test::Synopsis to the testsuite
+	Enabled the Test::Pod::Coverage test, it was previously disabled by mistake!
+	Changed to the new ENV var scheme, proposed by Alias ( and thanks to JAWNSY for prodding me )
+
+0.04	0000-00-00 00:00:00 UTC
+
+	Removed Test::CheckManifest and replaced with Test::DistManifest, thanks JAWNSY!
+	Various POD cleanups and additions
+
+0.03	0000-00-00 00:00:00 UTC
+
+	Added more tests :)
+
+0.02	0000-00-00 00:00:00 UTC
+
+	fix bad test
+
+0.01	0000-00-00 00:00:00 UTC
+
+	initial release

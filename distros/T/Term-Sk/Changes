@@ -1,0 +1,158 @@
+Revision history for Term-Sk
+
+0.18 - 2015-11-01T18:54:14+01:00
+
+  [ENHANCEMENTS]
+
+  - Add methods mute_on() and mute_off().
+
+0.17 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+0.16 - 2014-09-07T19:42:55+01:00
+
+  [DOCUMENTATION]
+
+  - Add a .gitignore file
+
+  - Changelog dates are better written as YYYY.MM.DD and probably ordered in
+    the other, descending, direction
+    Remark: I have decided to follow the ISO 8601 standard at
+    http://www.w3.org/TR/NOTE-datetime
+
+  - Just use a Makefile.PL and not a Build.PL the latter does not have any
+    added value any more
+
+  - In Makefile.PL ==> meta files link to repository
+
+0.15 - 2014-08-17T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Reformat changes files to comply with the format already used in Acme::Indent
+    Also, make time token (%t) align right (and not left)
+
+0.14 - 2013-05-19T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Add a new sub tok_maybe(), which is similar to token(), except that
+    tok_maybe() calls $self->show_maybe; whereas...
+    token()     calls $self->show;
+
+0.13 - 2012-12-30T12:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - Bug #82102 for Term-Sk: [PATCH] Small Spelling error in manpage (Wed, 19 Dec 2012 07:21:10 +0100)
+    https://rt.cpan.org/Public/Bug/Display.html?id=82102
+    >> Hi In Debian we are currently applying the attached patch to Term-Sk. We thought you might be interested
+    >> in it, too. Thanks in advance, Salvatore Bonaccorso, Debian Perl Group
+    >> -counter must be instantiated with an in tial value for the token.
+    >> +counter must be instantiated with an initial value for the token.
+
+0.12 - 2012-12-08T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - make subroutine $sk->token() to display the progress immediately (replacing
+    $self->show_maybe; by $self->show; inside the subroutine token)
+
+0.11 - 2011-07-19T12:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - update the documentation and give some examples to allow more than one token in a single line
+
+0.10 - 2011-07-16T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - allow more than one token in a single line
+
+0.09 - 2011-06-21T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - refactor/simplify subroutine rem_backspace().
+    refactor/simplify time recording (subroutine show_maybe())
+    in subroutine token(): replace $self->up; by $self->show_maybe;
+    add some more tests
+    add initialiser 'mock_tm' and method mock_time() to mock time for testing
+    add configure_requires => { 'Module::Build' => 0.30 } to Build.PL
+
+0.08 - 2011-05-14T12:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - In the POD documentation, remove the "or die..." from "my $ctr = Term::Sk->new(...) or die..."
+    Also, as suggested by Salvatore Bonaccorso, change the POD documentation as follows:
+    before: This option allows to register...
+    after : This option allows one to register...
+    Make subs log_info(), set_chunk_size() and set_bkup_size() effectively dummy operations (i.e. they
+    don't have any effect whatsoever)
+
+0.07 - 2011-05-09T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Introduce a new format character "%k" (="Token"). Idea and patch provided by Bruce Ravel.
+    Token which updates its value before being displayed. An example use
+    of this would be a loop wherein every step of the loop could be
+    identified by a particular string.
+
+0.06 - 2010-05-28T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - add option {num => q{9'999}} to allow variable number formats
+    add dynamic growth of a number, such that format: '%c of %m' outputs
+    2_870 of 9_274
+    Also, write something reasonable in file README
+
+0.05 - 2010-05-11T12:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - in Build.PL and in Makefile.PL
+    change requirement "use 5.10" to the less restrictive "use 5.8"
+
+0.04 - 2010-03-27T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - add a function rem_backspace() that takes a file and removes backspaces from that file
+
+  [REVERT]
+
+  - revert back to version 0.02 (except for "add Build.PL" and "make new() die on errors"), that is...
+    * remove item from ver 0.03: "...add code to detect $ENV{TERM_SK_OUTPUT}..."
+    * remove item from ver 0.03: "...add Sidenotes.pod..."
+    * remove item from ver 0.03: "...add use IO::Handle and replace local $| = 1;..."
+
+0.03 - 2010-01-22T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - add code to detect $ENV{TERM_SK_OUTPUT} to connect to, in which case {quiet =>...} is ignored
+    add Build.PL
+    add Sidenotes.pod
+    make new() die on errors
+    add "use IO::Handle" and replace "local $| = 1;" by "IO::Handle::flush();"
+
+0.02 - 2009-11-24T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - make option {quiet => !-t STDOUT} the default
+    make option {pdisp => '!'} meaningless, i.e. always use "#" to
+    display the progress bar
+
+0.01 - 2009-06-20T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.

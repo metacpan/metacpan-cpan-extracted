@@ -1,0 +1,102 @@
+BODY { 
+  font-family: helvetica, arial, sans-serif; 
+}
+
+
+A {
+  font-family: arial, helvetica, sans-serif;
+}
+
+ADDRESS {
+  font-family: arial, helvetica, sans-serif;
+}
+
+H3 {
+  font-family: arial, helvetica, sans-serif;
+}
+
+H4 {
+  font-family: arial, helvetica, sans-serif;
+}
+
+TD {
+  font-family: arial, helvetica, sans-serif;
+}
+
+TH {
+  font-family: arial, helvetica, sans-serif;
+}
+
+P {
+  font-family: arial, helvetica, sans-serif;
+}
+
+PRE { 
+  font-family: mono-space;
+  white-space: pre; 
+  font-color: #333333; 
+  font-weight: 100; 
+  background-color: #eeeeee; 
+  padding: 5pt; 
+  width: 90%; 
+  border-style: solid;
+  border-width: 2pt; 
+  border-color: #bebebe; 
+}
+
+
+LI {
+  font-family: arial, helvetica, sans-serif;
+  margin-right: .75in;
+  list-style-type: disk;
+}
+
+LI.spaced {
+  font-family: arial, hel
+
+
+
+UL {
+  font-family: arial, helvetica, sans-serif;
+}
+
+
+.pMargin {
+  font-family: arial, helvetica, sans-serif;
+  margin-left: .25in;
+  margin-right: .75in;
+}
+
+.header {
+  font-family: arial, helvetica, sans-serif;
+  font-weight: bold;
+  font-size: large;
+  background-color: #0080ff;
+  color: white;
+}
+
+.mainheader {
+  font-family: arial, helvetica, sans-serif;
+  font-weight: bold;
+  background-color: #0080ff;
+  color: white;
+}
+
+.subheader {
+  font-family: arial, helvetica, sans-serif;
+  font-weight: bold;
+  background-color: #0080ff;
+  color: white;
+}
+
+.method {
+  font-family: arial, helvetica, sans-serif;
+  font-weight: bold;
+  margin-left: 0in;
+}
+
+
+DD { font-family: arial, helvetica, sans-serif; list-item-indent: .5in }
+H2 { FONT-FAMILY: arial, helvetica, sans-serif }
+H3 { font-family: arial, helvetica, sans-serif }
+H1 { font-family: arial, helvetica, sans-serif }

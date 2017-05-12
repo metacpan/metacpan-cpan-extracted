@@ -1,0 +1,87 @@
+Revision history for Perl extension Term::Activity.
+
+1.20  2014/04/30
+
+	Using GNU TAR now. The previous release had PAX headers in the tar file.
+	Build scripts now automatically configure minium perl version.
+
+1.19  2014/03/27
+
+	Adding missing RT information to Changes
+
+1.18  2014/03/13
+
+	Correcting a typo in the MANIFEST
+
+1.17  2014/03/11
+
+	Adding a POD test
+
+1.16  2014/03/03
+
+	Now auto-building correct meta information
+
+1.15  2014/02/25
+
+	Updated meta information
+	Added LICENSE file to distribution
+
+1.14  2014/02/19
+
+	Updaing core SCM to git.
+	Version numbers are now generated on release, not commits.
+	Added "interval" and "count" to options. (RT #18223)
+	Added "Term::Size" as a prereq
+	META.yml now with correct version. (RT #76201)
+	
+1.11  2012/03/04
+
+	Tests updated to be compatible with perl 5.15. 
+	(Swapped to Test::Simple to avoid using future bareword "plan")
+	Correct initilization check for skinning parameters.
+	Version jump to match cvs archive.
+
+1.06  2004/09/10
+
+	Now you can provide your own start time.
+	Debug output is now offered as a configurable parameter.
+	Oops! The class implementation clobbered the input parameters.
+
+1.05  2004/04/02
+
+	Properly blessing into the class name.
+	Full copyright and license information.
+
+1.04  2004/03/25
+
+	Added the ability to relabel the display.
+	Improved algorithm for handling slowdowns in the rate of processing.
+
+1.03  2003/10/08
+
+	Fixed an 'overlap' bug that was due to the number field expanding 
+	 onto the current cursor location. Warnings galore.
+	Emails updated to current preferences.
+
+1.02  2003/09/23
+
+	Use of 'our' requires 5.6.0 not 5.006.
+	Symbol table rewrite eliminated.
+	Term::Size properly implemented and checks output for sanity.
+	General code cleanup and reorg.
+	All warnings are now enabled.
+
+1.01  2003/09/22
+
+	Fixed a few overzealous uses of 'our' that throw warnings.
+	Oops! The Term::Size check was outside of new().
+
+1.00  2003/09/18
+
+	Updated version number to reflect mature release status.
+	Added test for custom characters in 'flat' skin.
+	Included the correct README file.
+
+0.01  2003/09/09
+
+	Derived from HMS tool Util::Status (1.12 2003/09/08)

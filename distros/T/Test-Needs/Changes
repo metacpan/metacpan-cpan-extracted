@@ -1,0 +1,33 @@
+Revision history for Test::Needs
+
+0.002005 - 2016-09-27
+  - fix skipping when Test::Tester (Test::More < v2) is loaded
+
+0.002004 - 2016-08-18
+  - fix test counts when Test2 not available
+
+0.002003 - 2016-08-18
+  - fix loud warnings when aborting a test under Test2
+  - some kwalitee improvements
+
+0.002002 - 2016-06-03
+  - fix tests on non .0 perl versions
+
+0.002001 - 2016-06-03
+  - additional for error messages and perl version handling
+  - improved documentation
+  - use supported API for terminating subtests in Test2
+
+0.002000 - 2016-05-19
+  - drop support for bare versions meaning perl version checks.  The perl
+    version can still be checked using the hashref interface.
+  - reject invalid module names rather than treating them as missing.
+  - fix tests when Test2 and old Test::Builder are installed.
+  - be backwards compatible with Test::More 0.45
+
+0.001001 - 2016-05-17
+  - fix compatibility with older Test::More and perl
+  - fix prerequisites to be more accurate
+
+0.001000 - 2016-05-17
+  - initial release

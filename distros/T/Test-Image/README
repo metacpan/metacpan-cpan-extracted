@@ -1,0 +1,233 @@
+NAME
+    Test::Image - test an image
+
+SYNOPSIS
+      use Test::More plan => 1;
+      use Test::Image;
+  
+      # create a new image tester
+      my $i = Test::Image->new(Image::Imlib2->new("foo.jpg"));
+      ok($i, "image ok");  
+      $i->size(400,300);  # (see also $i->width, $i->height)
+
+      # you can check pixels using names, rgb hex, or rgb decimal  
+      $i->pixel(10,10,"white");           # 10, 10 is white
+      $i->pixel(10,10,"ffffff");          # 10, 10 is white
+      $i->pixel(10,10,[255,255,255]);     # 10, 10 is white
+
+      $i->pixel_not(10,10,"white");       # 10, 10 isn't white
+      $i->pixel_not(10,10,"ffffff");      # 10, 10 isn't white
+      $i->pixel_not(10,10,[255,255,255]); # 10, 10 isn't white
+  
+      # you can use multiple posibilities too
+      # check pixel is red, white or blue:
+      $i->pixel(10,10,["red", "white", "blue"]);  
+      $i->pixel(10,10,["ff0000", "ffffff", "0000ff"]);
+      $i->pixel(10,10,[[255,0,0], [255,255,255], [0,0,255]]);
+  
+      # check that the pixel isn't red white or blue:
+      $i->pixel_not(10,10,["red", "white", "blue"]);
+      $i->pixel_not(10,10,["ff0000", "ffffff", "0000ff"]);
+      $i->pixel_not(10,10,[[255,0,0], [255,255,255], [0,0,255]]);
+  
+      # row functions (or replace "row" with "col" or "column" for column tests)
+      # you can use multiple colours
+      $i->row(10, "white");       # row 11 is all white
+      $i->row_all(10, "white");   # row 11 is all white
+      $i->row_any(10, "white");   # row 11 has a white pixel
+      $i->row_none(10, "white");  # row 11 has no white pixels
+
+      # likewise for the whole image (again can use multiple colours)
+      $i->all("white");           # whole image is white
+      $i->any("white");           # whole image has a white pixel
+      $i->none("white");          # whole image has no white pixels
+  
+      # finally regions (you can use _all, _any or _none too)
+      # check the 10x10 region starting at 40,30
+      $i->region(40, 30, "r10", "r10", "white");  
+  
+DESCRIPTION
+    This modules is a "Test::Builder" compatible testing module for testing
+    images.
+
+    Calling the methods of this module prints out Test Anything Protocol
+    output designed to be processed by Test::Harness during a "make test" or
+    "./Build test". This module 'plays nice' with other test modules also
+    crafted with Test::Builder. For example, you can happily use this module
+    in conjunction with Test::More, Test::Exception, Test::DatabaseRow, etc,
+    and not have to worry about your test numbers getting confused.
+
+    All methods take an optional description as the last arguement. For
+    example:
+
+      $i->width(400);                  # prints "ok 1 - image width"
+      $i->width(400, "1st width");     # prints "ok 2 - 1st width"
+
+  Constructing
+    new($image)
+        The constructor takes one arguement, the image you want to test. By
+        default we only support GD::image and Image::Imlib2 objects, but you
+        can provide further plugins for other image formats by following the
+        PLUGINS guide below.
+
+  Image Size
+    There are various tests that can be used to check the magnitude of the
+    image:
+
+      # check that fred.png is 100 by 300 pixels big
+      my $i = Test::Image->new(Image::Imlib2->new( "fred.png" ));
+      $i->size(100,300)
+
+    If you have "Number::Compare" installed, then you can use non absolute
+    values, and you can use magnitudes.
+
+      # image is at least 300x200
+      $i->size(">=300", ">=200");
+  
+      # It's a five megapixel image!
+      $i->total_pixels(">=5M");
+
+    See Number::Compare for more info. If you do not have "Number::Compare"
+    installed, these style of tests will be automatically skipped.
+
+    width($w_pixels)
+        Test the width of the image
+
+    height($h_pixels)
+        Test the height of the image
+
+    size($w_pixels, $h_pixels)
+        Test the width and the height of the image at the same time
+
+    total_size($pixels)
+        Test the total number of pixels in the image (i.e. width x height)
+
+  Color specification
+    The testing system can cope with multiple definitions of color. You can
+    use an arrayref containing the red, green and blue values (between 0 and
+    255:)
+
+      my $red = [255,0,0];
+
+    You can specify the value in hex if you want too:
+
+      my $red = "ff0000";
+      my $red = "FF0000";  # it's case insensitive
+      my $red = "ff0000";  # you can put a # at the start if you want
+
+    If you install the Graphics::ColorNames module from CPAN then you can
+    use the name of the color in the "X" color scheme.
+
+      my $red = "red";
+
+    Finally you can specify more than one colour by using an array ref
+    containing the other forms.
+
+      my $rwab = ["red", "white", "blue"];
+      my $rwab = ["ff0000", "ffffff", "0000ff"];
+      my $rwab = [[255,0,0], [255,255,255], [0,0,255]];
+
+  Checking Single Pixels
+    The simple "pixel" test can be used to check the color of a given pixel
+    either is or isn't a particular color (or set of colors)
+
+      # check the pixel at 40, 30 is red
+      $i->pixel(40, 30, [255,0,0])
+
+      # check the pixel at 40, 30 is red or white
+      $i->pixel(40, 30, [[255,0,0], [255,255,255]])
+
+      # check the pixel at 40, 30 isn't red
+      $i->pixel_not(40, 30, [255,0,0])
+  
+      # check the pixel at 40, 30 isn't red or white
+      $i->pixel_not(40, 30, [[255,0,0], [255,255,255]])
+  
+    This will fail if the pixel isn't the correct color, or the pixel is
+    outside the image.
+
+    You can also use negative numbers to indicate coordinates relative the
+    far sides of the image in a similar manner to Perl arrays. For example:
+
+      $i->pixel(-1,-2, "red");
+
+    Is the same for a 400x300 image as:
+
+      $i->pixel(399,298, "red");
+
+PLUGINS
+    This module can be extended to allow you to test arbitary image formats.
+    To do this you need to implement a module called Test::Image::Plugin::*
+    which supports the following methods:
+
+    new( $image )
+        A constructor. Return an object if you're prepared to handle the
+        image that's passed in. Return "undef" if the image isn't something
+        you'll handle (hopefully some other plugin will.)
+
+    width
+    height
+        Instance methods. These methods should return the width and height
+        of the image.
+
+    color_at($x, $y)
+        Instance method should return a three element list that contains the
+        red, green and blue value. This should return the empty list if the
+        pixel specified is outside the image.
+
+    In order for these plugins to work you must first install
+    "Module::Pluggable" from CPAN. If you're writing "Test::Image" plugin
+    and distributing it on CPAN, you should add "Module::Pluggable" to your
+    required modules in "Makefile.PL" / "Build.PL"
+
+BUGS
+    If you don't have module compare installed and you pass a string to any
+    of the image size routines that isn't just a plain old number then that
+    test will be skipped if you don't have "Number::Compare" installed, even
+    if that string is just junk. This is to allow this module to be
+    compatible with future improvements to "Number::Compare". You are
+    encouraged to have "Number::Compare" installed when developing tests on
+    your own system.
+
+    We should probably automatically skip named colors if you don't have
+    "Graphics::ColorNames" installed. We don't yet.
+
+    Please report any further bugs you find via the CPAN RT system.
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test::Image>
+
+OTHER BUGS
+    British Airways doesn't have TIVO like movies like Virgin Atlantic. Or,
+    if it does, it doesn't have it on this flight, and that's all I really
+    care about at the momement.
+
+    In the movie "Failure To Launch" taking of your facemask while playing
+    paintball is insanely dangerous. It also makes me want to shout lock
+    off! when Ace is belaying. I don't find climbing accidents funny. Who's
+    belaying the guy from Alias in that scene anyway? Despite all that, I
+    quite enjoyed the film.
+
+    I somehow ended up with some of my sister in law's music in iTunes and
+    now when I'm coding I sometime randomly get some Christina Aguilera.
+
+    Coding on a plane is very hard to do, as you don't have the arm room to
+    type properly.
+
+    This said, I don't get a chance to listen to my entire Chemical Brothers
+    collection in one go uninterrupted very often.
+
+AUTHOR
+    Written by Mark Fowler, <mark@twoshortplanks.com>. Please see
+    <http://twoshortplanks.com/contact/> for details of how to contact me.
+
+    Copyright Fotango 2006-2007. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Test::Image::GD, for an alternative way of testing GD Images.
+
+    Exporter
+
+    The Test Anything Protocol
+

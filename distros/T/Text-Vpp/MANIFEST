@@ -1,0 +1,24 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Vpp.pm
+advanced.txt
+for_subs.txt
+inc_text.txt
+inc2_text.txt
+perlprog.txt
+test.pl
+text_action.txt
+text_backslash.txt
+text_elsif.txt
+text_eval_include.txt
+text_shell.txt
+text_in.txt
+text_in2.txt
+test1_1.txt
+test1_1.var
+vpp
+vpp_test
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,50 @@
+Tie-Hash-MongoDB
+
+Module for using the Perl tie() function to connect a hash to
+a MongoDB document.
+
+Every single action to the hash is directly processed
+on the MongoDB server, remember this while using this
+module!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tie::Hash::MongoDB
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Hash-MongoDB
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tie-Hash-MongoDB
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tie-Hash-MongoDB
+
+    Search CPAN
+        http://search.cpan.org/dist/Tie-Hash-MongoDB/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Sebastian Willing
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

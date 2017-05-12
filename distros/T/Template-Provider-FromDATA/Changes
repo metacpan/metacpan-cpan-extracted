@@ -1,0 +1,53 @@
+Revision history for Perl extension Template::Provider::FromDATA
+
+0.13 2012-10-22
+ - Repackage to fix Module::Install 1.04 issue
+
+0.12 2011-12-07
+ - Added PRELOAD option to get around situations where lazy-loading templates
+   is problematic (RT #25805)
+ - Minor documentation fixes
+
+0.11 2009-12-01
+ - Fix pod coverage test
+ - Move pod + pod coverage tests to release-only testing
+
+0.10 2009-11-24
+ - Added the ability to specify a fully qualified template name (Kevin
+   McGrath)
+ - Fix for mod_perl usage (Kevin McGrath)
+
+0.09 2009-11-19
+ - repackaged with a new version of Module::Install
+
+0.08 2008-02-26
+ - Makefile.PL updates
+
+0.07 2007-09-10
+ - switch to Module::Install
+ - better internal caching of templates
+ - added caveat about same-named templates
+
+0.06 2007-01-23
+ - fixed deps: added Class::Accessor
+
+0.05 2006-11-03
+ - rewrite based on code from Jess Robinson
+ - refs are no longer passed to the super class
+ - test suite fixes
+ - require latest Template Toolkit (2.15)
+
+0.04 2005-11-28
+ - fixed test suite line endings
+
+0.03 2005-11-28
+ - fixed handling of scalar reference templates
+
+0.02 2005-11-25
+ - hooked in to TT2's caching system
+ - attempt to require() classes specified
+ - added tests
+
+0.01 2005-11-23
+ - original version
+

@@ -1,0 +1,27 @@
+---
+abstract: 'Encoding aware Text::CSV.'
+author:
+  - 'Makamaka Hannyaharamitu, <makamaka[at]cpan.org>'
+build_requires:
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-CSV-Encoded
+requires:
+  IO::Handle: '0'
+  Test::Harness: '0'
+  Test::More: '0'
+  Text::CSV: '1.31'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/singingfish/Text-CSV-Encoded/issues
+  homepage: https://github.com/singingfish/Text-CSV-Encoded
+  repository: https://github.com/singingfish/Text-CSV-Encoded.git
+version: '0.25'

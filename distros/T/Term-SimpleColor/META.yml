@@ -1,0 +1,22 @@
+---
+abstract: 'A very simple color screen output'
+author:
+  - 'Takashi Uesugi <tksuesg@gmail.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-SimpleColor
+provides:
+  Term::SimpleColor:
+    file: lib/Term/SimpleColor.pm
+    version: v0.0.3
+requires:
+  Test::More: 0
+  version: 0
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: v0.0.3

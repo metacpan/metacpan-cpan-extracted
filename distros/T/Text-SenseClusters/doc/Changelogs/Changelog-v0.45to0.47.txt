@@ -1,0 +1,56 @@
+
+Changes made in Sense-Clusters version 0.45 during version 0.47
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Fixed the regex in agglom that detects the error when
+	first line in matrix file doesn't show the <keyfile> tag 
+	nor N.
+
+2. 	Added level tracing to agglom.
+
+3.	Added text2sval program to get plain text into Senseval-2 format
+
+4.	Updated order1vec, order2vec and windower to accept Senseval-2 
+	formatted files
+
+5.	Modified order1vec to use feature regex/s from nsp2regex
+
+6.	Modified wrappers to accept single file instead of a lexelt directory
+
+7.      Added --space option to wrappers to run either vector/similarity
+        experiment
+
+8.      Removed inefficient options --pdlsvd and --rowonly from wrappers 
+	and instead made SVDPACK and rowonly as defaults.
+
+9.	Made cluto matrix/vector format as default format
+
+10.	Updated evaluation programs to use consistent cluster and sense ids
+
+11.	Changed option names --number, --percent to --numthrow and --perthrow
+	to be consistent with wrappers and cluto2label
+
+12.	Added Docs directory
+
+13.	Added a single flowchart instead of UML diagrams in Flows 
+
+14.	Moved Flows and supplementary files into Docs/
+
+15.	Added --rf option to mat2harbo. Changed the --k default to 300
+
+16.	Added compare.pl program instead of system diff command in
+	Testing/svdpackout to avoid precision errors on different systems 
+
+17.	Removed output files from Testing directory
+
+18.	Added scripts create_doc.sh and traverse.sh to automatically 
+	generate the html documentation
+
+19.	Added INSTALL and Makefile.PL to automate and describe the
+	installation
+
+(Changelog-v0.45to0.47 Last Updated on 01/02/2004 by Amruta)

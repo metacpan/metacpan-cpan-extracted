@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Text/WikiFormat/SAX.pm
+t/00basic.t
+t/01parse_fh.t
+t/02parse_str.t
+t/03parse_file.t
+t/file.wiki

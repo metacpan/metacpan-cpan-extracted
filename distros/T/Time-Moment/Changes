@@ -1,0 +1,305 @@
+0.42 2017-04-10
+  - Avoid relying on current working directory being in @INC
+
+0.41 2016-12-10
+  - Time::Moment
+    - Documented the precision value returned by ->precision()
+    - Documented the optional precision value in ->compare()
+  - Time::Moment::Adjusters
+    - Corrected the NearestMinuteInterval example
+    - Increased and documented the accepted values for NearestMinuteInterval
+
+0.40 2016-11-26
+  - Correct forward function declaration to include interpreter context
+    Bug fix for #22, compilation with threaded perls. Reported by
+    Slaven Rezić (eserte).
+
+0.39 2016-11-25
+  - Added following methods to Time::Moment:
+    - precision
+    - with_precision
+  - Added following adjusters to Time::Moment::Adjusters:
+    - WesternEasterSunday()
+    - OthodoxEasterSunday()
+    - NearestMinuteInterval($interval)
+  - Added following examples to eg/
+    - eg/se_bank_holidays.pl
+
+0.38 2016-01-22
+  - Added following methods to the API:
+    - is_leap_year
+  - Added following examples to eg/
+    - eg/age.pl
+
+0.37 2015-12-18
+  - Added following methods to the API:
+    - with_quarter
+  - Clarified parts of documentation 
+
+0.36 2015-10-11
+  - Applied patch from Vitaliy V. Tokarev (issue #15) which addresses build
+    issues on Solaris with Sun Compiler.
+
+0.35 2015-10-10
+  - Added support for named parameters in from_epoch
+  - Fix a compiler issue related to PERL_UNUSED_VAR(), reported by CPAN 
+    smokers, <http://www.cpantesters.org/distro/T/Time-Moment.html?grade=5&version=0.34>.
+
+0.34 2015-10-10
+  - This release has no code changes. Re-released without object files.
+
+0.33 2015-10-10
+  - Fixed a bug in from_rd, from_jd and from_mjd when Perl is compiled
+    with long double. Reported by Slaven Rezić (SREZIC), issue #19.
+
+0.32 2015-10-09
+  - Added Test::Number::Delta v1.06 as a test prerequisite
+  - Increased test coverage
+  - Added following methods to the API:
+    - from_rd
+
+0.31 2015-09-28
+  - Added following methods to the API:
+    - delta_years
+    - delta_months
+    - delta_weeks
+    - delta_days
+
+0.30 2015-09-23
+  - Fixed a bug in the delta methods that where added in previous release. The
+    result should be negative if the other time is before the time of the 
+    invocant.
+  - Added two examples to eg/
+    - eg/ago.pl
+    - eg/beat.pl
+
+0.29 2015-09-17
+  - Changed the fractional second precision in from_epoch() when invoked with 
+    a floating point value from nanosecond precision to microsecond precision. 
+  - Changed the exception message in ->from_string(), from "Cannot parse ..." 
+    to "Could not parse ...".
+  - Added following methods to the API:
+    - delta_hours
+    - delta_minutes
+    - delta_seconds
+    - delta_milliseconds
+    - delta_microseconds
+    - delta_nanoseconds
+    - microsecond_of_day
+    - nanosecond_of_day
+    - with_microsecond_of_day
+    - with_nanosecond_of_day
+
+0.28 2015-09-12
+  - Changed the lenient mode in ->from_string to be more lenient. The string 
+    representation may now consist of a mixture of the basic format and the 
+    extended format. e.g. the date may be in the basic format, while the 
+    time of day is in the extended format, 20121224T12:15:30Z.
+  - Changed the fractional second precision in ->jd, ->mjd and ->rd from 
+    nanosecond to millisecond, higher precision can be returned by providing
+    the optional named parameter precision.
+  - Applied pull request by Gareth Harper (GHARPER) which fixes test issues,
+    due to changes in Test::More (pull request #17).
+
+0.27 2015-09-02
+  - Added ->with method
+  - Added Time::Moment::Adjusters
+  - Added following examples to eg/
+    - eg/cal.pl
+    - eg/excel.pl
+    - eg/us_federal_holidays.pl
+
+0.26 2015-08-28
+  - The optional epoch date in ->from_jd and ->from_mjd has changed from
+    0001-01-01T00Z to 0000-12-31T00Z (Rata Die).
+  - Applied patch from Vitaliy V. Tokarev (issue #15) which addresses builds
+    on Solaris.
+  - Added following methods to the API:
+    - minutes_of_day
+    - with_minutes_of_day
+    - millisecond_of_day
+    - with_millisecond_of_day
+  - Internals has been refactored to ease maintainability
+  - Added more test cases
+
+0.25 2015-07-07
+  - Added following methods to the API:
+    - from_jd
+    - from_mjd
+    - rd
+
+0.24 2015-05-20
+  Bug fix for when Perl is compiled with threads.
+    - Bug introduced in 60591ef (0.23) fixes issue #13, reported by 
+      Dmytro Zagashev (ZDM).
+
+0.23 2015-05-19
+  - Added following methods to the API:
+    - at_midnight
+    - at_noon
+    - at_last_day_of_year
+    - at_last_day_of_quarter
+    - at_last_day_of_month
+    - with_second_of_day
+
+0.22 2015-02-14
+  - Fixed issue #12. Redefinition of bool with Visual Studio 2013 C compiler, 
+    reported by A. Sinan Ünür (NANIS).
+  - Added following method:
+      - second_of_day
+
+0.21 2014-11-23
+  - Added following methods to increase consistency in the API:
+       - with_week
+       - with_day_of_week
+       - length_of_week_year
+
+0.20 2014-11-04
+  - Reduced the required accuracy in ISO 8601 representations, previously 
+    the time of day where required to include hour and minute, the required 
+    accuracy has now been reduced to hour.
+  - Documented the %w conversion specification in ->srtftime, reported
+    by Peter Isaksson.
+  - Minor documentation tweaks.
+
+0.19 2014-10-08
+  - Fixed Makefile.PL to only check if Module::Install is missing, should
+    make it possible to install using cpanm.
+  - Added accessors for Julian Date (->jd) and Modified Julian Date (->mjd).
+
+0.18 2014-09-09
+  - Ensure that the referenced object has a SvREFCNT of 1 before trying to 
+    reuse the invocant, fixes issue #7. Reported by Tomohiro Hosaka (bokutin).
+  - Added accessor method ->utc_year, used by DateTime::TimeZone for dates 
+    far into the future, fixes issue #6. Reported by Karl Lohner (klohner).
+
+0.17 2014-08-07
+  - Ensure that the SvREFCNT is 1 before trying to reuse the invocant in
+    chained method calls (leont++).
+  - Require Test::Fatal v0.006 or higher, fixes issue #5. Reported by
+    Doug Bell (preaction).
+  - Removed the "early preview release" warning from the documentation.
+
+0.16 2014-03-18
+  - Fixed the Storable thaw method to account for negative offsets
+  - Corrected documentation for length_of_{year,quarter,month} methods
+  - Added following methods to increase consistency in the API:
+       - with_day_of_quarter()
+       - with_millisecond()
+       - with_microsecond()
+       - plus_milliseconds()
+       - plus_microseconds()
+       - minus_milliseconds()
+       - minus_microseconds()
+
+0.15 2014-02-23
+  - Changed API in to_string() to use named parameters instead of boolean to
+    make the API more consistent.
+  - Added three new methods:
+        - length_of_year()
+        - length_of_quarter()
+        - length_of_month()
+  - Corrected typedef declaration in dt_config.h, should now hopefully
+    compile correctly on Windows when using MSC.
+
+0.14 2014-01-26
+  - Changed now() to use the reentrant localtime_r() if provided by libc
+  - Added support for the literal strings 'UTC' and 'GMT' as UTC designator
+    in from_string() when lenient is true.
+  - Sereal is now a supported serializer, documented and tested. Added an 
+    examample of usage, eg/sereal.pl
+
+0.13 2014-01-04
+  - Implemented ->with_offset_same_local()
+  - Renamed the method ->with_offset to ->with_offset_same_instant, the old 
+    method name is aliased.
+  - Added a new section to the documentation "TIME ZONES" which shows how to
+    convert between time zones using DateTime::TimeZone.
+  - Added more tests
+
+0.12 2013-12-29
+  - Implemented support for lenient parsing in ->from_string, should be capable
+    of parsing most ISO 8601 profiles, including non conformant ISO 8601 
+    representations such as ISO 9075.
+  - Implemented support for generic FREEZE / THAW serialization, upcomming Sereal
+    will support these callbacks.
+  - Implemented ->new
+  - Refactored test suite and added more tests
+  - Implemented support for GNU's '_', '-' and '0' flags in ->strftime()
+  - Added eg/strftime.pl
+
+0.11 2013-12-15
+  - Added support for date/time arithmethics
+  - Added support for altering the components of the date/time
+  - Changed ->from_epoch to only accept seconds and nanosecond parameters
+  - Added POD section with example format strings
+  - Documentation improvements
+
+0.10 2013-12-07
+  - Added support for fractional seconds in the constructor ->from_epoch
+  - Added serialization support for:
+        - Storable
+        - JSON
+        - CBOR
+  - Changed the method ->to_string to return the same string representation 
+    as stringification.
+  - Optimized the usage of chained method calls from constructors.
+  - Added eg/cbor.pl and eg/json.pl
+
+0.09 2013-12-05
+  - Added new constructor method, ->now_utc
+  - Added two extended conversion specifications, %k and %l. Both common in
+    GNU, BSD and perl implementations of strftime()
+  - The extended %f conversion specification now accepts an optional maximum 
+    field width
+  - Documented remaining methods and overloaded operators
+  - Added the now_utc constructor to dev/bench.pl
+
+0.08 2013-12-04
+  - Changed resolution from microsecond to nanosecond
+  - Implemented ->with_nanosecond()
+  - Documentation improvements
+  - Fixed strftime() to preserve the SvUTF8 flag if the given format 
+    string has the SvUTF8 flag set.
+  - Overhauled strftime() conversion specifications to better confirm to 
+    IEEE Std 1003.1. Extended conversion specifications is now documented 
+    as such.
+
+0.07 2013-12-02
+  - Documented most of the API.
+  - Implemented ->to_string().
+  - Changed stringification to only include fractional seconds in output 
+    if present.
+
+0.06 2013-11-31
+  - Added more docs.
+
+0.05 2013-11-30
+  - Renamed internal variable pow10 to prevent symbol clashes
+
+0.04 2013-11-30
+  - Added accessor for week of the year, ->week
+  - Implemented support for parsing of any ISO 8601 date and time of day
+    in both extended and basic format. For example:
+        - 0001-01-01T00:00:00Z  (Calender date, extended format)
+        - 00010101T000000Z      (Calender date, basic format)
+        - 0001-W01-1T00:00:00Z  (Week date, extended format)
+        - 0001W011T000000Z      (Week date, basic format)
+        - 0001-001T00:00:00Z    (Ordinal date, extended format)
+        - 0001001T000000Z       (Ordinal date, basic format)
+  - Added localtime() and POSIX::strftime() to benchmark, invoking 
+    Time::Moment->now is ~ 70% faster than invoking localtime().
+
+0.03 2013-11-28
+  - Renamed variable 'sun' to 'sunday' to prevent conflict on Solaris 
+    operating system which defines a macro named 'sun'. (leont++)
+
+0.02 2013-11-25
+  - Implemented ->from_string() in C
+  - Implemented ->now() in C if the system supports gettimeofday(2)
+  - Added dev/sizeof.pl
+  - Added Time::Piece to dev/bench.pl
+
+0.01 2013-11-24
+  - Initial CPAN preview release.
+

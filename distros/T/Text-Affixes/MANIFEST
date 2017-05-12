@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+Makefile
+README.md
+cpanfile
+lib/Text/Affixes.pm
+t/01-prefixes.t
+t/02-suffixes.t
+t/03-extreme_cases.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+MANIFEST

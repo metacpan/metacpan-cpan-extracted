@@ -1,0 +1,43 @@
+---
+abstract: 'test file attributes'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::Builder: '1.001006'
+  Test::Builder::Tester: '1.04'
+  Test::More: '0.95'
+  Test::utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - testing
+  - file
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-File
+no_index:
+  directory:
+    - t
+    - inc
+    - t/inc
+    - inc
+  file:
+    - t/lib/test.pm
+  namespace:
+    - Local
+  package:
+    - version
+    - Local
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/test-file/issues
+  homepage: https://github.com/briandfoy/test-file
+  repository: https://github.com/briandfoy/test-file.git
+version: '1.443'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

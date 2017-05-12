@@ -1,0 +1,34 @@
+Changes
+lib/Term/ReadLine/Simple.pm
+lib/Term/ReadLine/Simple/Constants.pm
+lib/Term/ReadLine/Simple/Linux.pm
+lib/Term/ReadLine/Simple/Win32.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-can.t
+t/02-methods.t
+t/03_arguments_config.t
+xt/04_valid_arguments_readline.t
+xt/05_invalid_arguments_readline.t
+xt/06_readline.t
+xt/Data_Test_Arguments.pm
+xt/Data_Test_Readline.pm
+xt/manifest.t
+xt/perl_minimum_version.t
+xt/pod-coverage.t
+xt/pod.t
+xt/prereqs.t
+xt/readline.pl
+xt/readline_invalid_args.pl
+xt/readline_valid_args.pl
+xt/spelling.t
+xt/synopsis.t
+xt/version1.t
+xt/version2.t
+xt/whitespaces.t
+xt/year_copyright.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

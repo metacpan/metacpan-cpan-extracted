@@ -1,0 +1,1405 @@
+If some fields are empty or look unusual you may have an old version.
+Compare to the current minimal requirements in Documentation/Changes.
+ 
+Gentoo Base System version 1.4.16
+Linux cl009 2.6.15-rc3-CITI_NFS4_ALL-1 #1 SMP PREEMPT Fri Dec 9 15:08:49 PST 2005 i686 Pentium III (Coppermine) GenuineIntel GNU/Linux
+ 
+Gnu C                  gcc (GCC) 3.3.5 (Gentoo Linux 3.3.5-r1, ssp-3.3.2-3, pie-8.7.7.1) Copyright (C) 2003 Free Software Foundation, Inc. This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Gnu make               3.80
+util-linux             2.12
+mount                  2.12
+modutils               3.0
+e2fsprogs              1.35
+Linux C Library        2.3.4
+head: `-1' option is obsolete; use `-n 1' since this will be removed in the future
+Dynamic linker (ldd)   2.3.4
+Procps                 3.2.4
+Net-tools              1.60
+Kbd                    1.12
+Sh-utils               5.2.1
+Modules Loaded         acenic
+
+free reports:
+             total       used       free     shared    buffers     cached
+Mem:        899840     868656      31184          0     311748      66292
+-/+ buffers/cache:     490616     409224
+Swap:      2097136          0    2097136
+
+/proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 8
+model name	: Pentium III (Coppermine)
+stepping	: 6
+cpu MHz		: 866.932
+cache size	: 256 KB
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 mmx fxsr sse
+bogomips	: 1736.46
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 8
+model name	: Pentium III (Coppermine)
+stepping	: 6
+cpu MHz		: 866.932
+cache size	: 256 KB
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 mmx fxsr sse
+bogomips	: 1733.55
+
+<<<test_start>>>
+tag=arp stime=1134770343
+cmdline="arp01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+which: no arp in (/usr/bin:/bin:/testcases/bin:/usr/src/ltp-full-20050405/testcases/bin)
+arp01       1  BROK  :  Test broke: command arp not found
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=1 corefile=no
+cutime=0 cstime=1
+<<<test_end>>>
+<<<test_start>>>
+tag=echo stime=1134770343
+cmdline="export TCbin=$LTPROOT/testcases/network/tcp_cmds/echo; echo01 "
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+Creating echo file echofile
+Compute the checksum of this file
+echo:connect: Connection refused
+ERROR occured during connect socket operation(9172)
+echo:connect: Connection refused
+ERROR occured during connect socket operation(9173)
+Test Failed: Error in echoes test in loop 1
+
+***NOTE***
+Make sure the streamed echo is uncommented in inetd.conf
+on the server. Also try increasing max connections from
+default of 40, i.e. nowait.400
+<<<execution_status>>>
+duration=1 termination_type=exited termination_id=1 corefile=no
+cutime=2 cstime=3
+<<<test_end>>>
+<<<test_start>>>
+tag=finger stime=1134770344
+cmdline="finger01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+finger01    0  INFO  :  finger01: doing /usr/src/ltp-full-20050405/testcases/bin/finger01.
+finger01    1  FAIL  :  test failed: Please start fingerd locally.
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=1 corefile=no
+cutime=2 cstime=11
+<<<test_end>>>
+<<<test_start>>>
+tag=ftp stime=1134770344
+cmdline="export TCbin=$LTPROOT/testcases/network/tcp_cmds/ftp; ftp01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+ftp: connect: Connection refused
+Not connected.
+Local directory now /usr/src/ltp-full-20050405/testcases/network/tcp_cmds/ftp/ftp9201
+Not connected.
+Not connected.
+Not connected.
+ls: /usr/src/ltp-full-20050405/testcases/network/tcp_cmds/ftp/ftp9201/bin.sm: No such file or directory
+/usr/src/ltp-full-20050405/testcases/bin/ftp01: line 148: [: =: unary operator expected
+rmdir: `/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/ftp/ftp9201': No such file or directory
+: doing /usr/src/ltp-full-20050405/testcases/bin/ftp01.
+ftp         1  FAIL  :  Test Failed: Test Fail: Wrong sum while performing ftp get bin.sm binary
+<<<execution_status>>>
+duration=1 termination_type=exited termination_id=1 corefile=no
+cutime=6 cstime=9
+<<<test_end>>>
+<<<test_start>>>
+tag=host stime=1134770345
+cmdline="host01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+Usage: host [-aCdlrTwv] [-c class] [-n] [-N ndots] [-t type] [-W time]
+            [-R number] hostname [server]
+       -a is equivalent to -v -t *
+       -c specifies query class for non-IN data
+       -C compares SOA records on authoritative nameservers
+       -d is equivalent to -v
+       -l lists all hosts in a domain, using AXFR
+       -i Use the old IN6.INT form of IPv6 reverse lookup
+       -N changes the number of dots allowed before root lookup is done
+       -r disables recursive processing
+       -R specifies number of retries for UDP packets
+       -t specifies the query type
+       -T enables TCP/IP mode
+       -v enables verbose output
+       -w specifies to wait forever for a reply
+       -W specifies how long to wait for a reply
+host01      0  INFO  :  host01: test the basic functionality of the  command.
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+cl009.pdx.osdl.net has address 172.20.9.10
+host01      0  INFO  :  host01: doing /usr/src/ltp-full-20050405/testcases/bin/host01.
+host01      1  PASS  :  Test Successful
+<<<execution_status>>>
+duration=1 termination_type=exited termination_id=0 corefile=no
+cutime=27 cstime=46
+<<<test_end>>>
+<<<test_start>>>
+tag=netstat stime=1134770346
+cmdline="netstat01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+netstat01    1  PASS  :  Test Successful
+<<<execution_status>>>
+duration=1 termination_type=exited termination_id=0 corefile=no
+cutime=5 cstime=57
+<<<test_end>>>
+<<<test_start>>>
+tag=perf_lan stime=1134770347
+cmdline="export TCbin=$LTPROOT/testcases/network/tcp_cmds/perf_lan; perf_lan"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+perf_lan    0  INFO  :  : doing /usr/src/ltp-full-20050405/testcases/bin/perf_lan.
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 1
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 2
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 3
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 4
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 5
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 6
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 7
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 8
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 9
+perf_lan    0  INFO  :  Starting pingpong - to send / receive packets from host 
+
+perf_lan    0  INFO  :  Get host net address for sending packets 
+
+perf_lan    0  INFO  :  Determine packet size 
+
+perf_lan    0  INFO  :  Determine number of packets to send 
+
+perf_lan    0  INFO  :  echoing cl009.pdx.osdl.net: 512 data bytes
+
+perf_lan    0  INFO  :  Create a child process to continue to send packets 
+
+perf_lan    0  INFO  :  Setup ICMP packet structure to send to host 
+
+perf_lan    0  INFO  :  Add time stamp, user data, and check sum to packet. 
+
+perf_lan    0  INFO  :  Sending packet through created socket 
+
+perf_lan    0  INFO  :  1 packets transmitted, 
+perf_lan    0  INFO  :  Parent started - to  receive packets 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  Verify data in packet after returned from sender 
+
+perf_lan    0  INFO  :  Checking Data.
+
+perf_lan    0  INFO  :  Receiving packet 
+
+perf_lan    0  INFO  :  2 packets received, 
+
+perf_lan    0  INFO  :  Successful execution for loop 10
+perf_lan    0  INFO  :  : doing /usr/src/ltp-full-20050405/testcases/bin/perf_lan.
+perf_lan    0  INFO  :  : doing /usr/src/ltp-full-20050405/testcases/bin/perf_lan.
+perf_lan    1  PASS  :  Test Successful
+<<<execution_status>>>
+duration=101 termination_type=exited termination_id=0 corefile=no
+cutime=5 cstime=9
+<<<test_end>>>
+<<<test_start>>>
+tag=ping stime=1134770448
+cmdline="ping01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+ping01      0  INFO  :  ping with 8 16 32 64 128 256 512 1024 2048 4064 ICMP packets
+ping01      0  INFO  :  calling ping with packet size = 8
+ping01      0  INFO  :  calling ping with packet size = 16
+ping01      0  INFO  :  calling ping with packet size = 32
+ping01      0  INFO  :  calling ping with packet size = 64
+ping01      0  INFO  :  calling ping with packet size = 128
+ping01      0  INFO  :  calling ping with packet size = 256
+ping01      0  INFO  :  calling ping with packet size = 512
+ping01      0  INFO  :  calling ping with packet size = 1024
+ping01      0  INFO  :  calling ping with packet size = 2048
+ping01      0  INFO  :  calling ping with packet size = 4064
+ping01      1  PASS  :  Test Successful
+<<<execution_status>>>
+duration=50 termination_type=exited termination_id=0 corefile=no
+cutime=3 cstime=9
+<<<test_end>>>
+<<<test_start>>>
+tag=rcp stime=1134770498
+cmdline="export TCbin=$LTPROOT/testcases/network/tcp_cmds/rcp; rcp01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+cl009.pdx.osdl.net: Connection refused
+sum: /usr/src/ltp-full-20050405/testcases/network/tcp_cmds/rcp/rcp9670/bin.sm: No such file or directory
+/usr/src/ltp-full-20050405/testcases/bin/rcp01: line 104: [: 48792: unary operator expected
+rmdir: `/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/rcp/rcp9670': No such file or directory
+rcp01       1  FAIL  :  Test Failed: FAILED: wrong sum in transfer to cl009
+<<<execution_status>>>
+duration=32 termination_type=exited termination_id=1 corefile=no
+cutime=11 cstime=10
+<<<test_end>>>
+<<<test_start>>>
+tag=rdist stime=1134770530
+cmdline="export TCbin=$LTPROOT/testcases/network/tcp_cmds/rdist; rdist01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+root@cl009: updating host cl009
+root@cl009: bin.sm: installing
+root@cl009: bin.med: installing
+root@cl009: bin.lg: installing
+root@cl009: bin.jmb: installing
+root@cl009: file.dir/bin.sm: installing
+root@cl009: file.dir/bin.med: installing
+root@cl009: file.dir/bin.jmb: installing
+root@cl009: updating of root@cl009 finished
+rdist01     0  INFO  :  Success rdist in root@cl009 
+rdist01     1  PASS  :  Test Successful
+<<<execution_status>>>
+duration=12 termination_type=exited termination_id=0 corefile=no
+cutime=14 cstime=32
+<<<test_end>>>
+<<<test_start>>>
+tag=rlogin stime=1134770542
+cmdline="rlogin01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+ Starting
+Host: 
+spawn rlogin  -l root
+: Unknown host
+send: spawn id exp5 not open
+    while executing
+"send "ls -l /etc/hosts | wc -w > $TESTLOG/$RUSER.$RHOST \r""
+    ("while" body line 19)
+    invoked from within
+"while {$count < $LOOPCOUNT} {
+   set count [expr $count+1]
+      send_user "Host: $RHOST\n"
+
+      # rlogin to the host
+      spawn rlogin $RHOST -l $..."
+    (file "/usr/src/ltp-full-20050405/testcases/bin/rlogin01" line 66)
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=1 corefile=no
+cutime=1 cstime=0
+<<<test_end>>>
+<<<test_start>>>
+tag=rsh stime=1134770542
+cmdline="rsh01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+rsh01       0  INFO  :  rsh Test successful in loop 1
+rsh01       0  INFO  :  rsh Test successful in loop 2
+rsh01       0  INFO  :  rsh Test successful in loop 3
+rsh01       0  INFO  :  rsh Test successful in loop 4
+rsh01       0  INFO  :  rsh Test successful in loop 5
+rsh01       0  INFO  :  rsh Test successful in loop 6
+rsh01       0  INFO  :  rsh Test successful in loop 7
+rsh01       0  INFO  :  rsh Test successful in loop 8
+rsh01       0  INFO  :  rsh Test successful in loop 9
+rsh01       0  INFO  :  rsh Test successful in loop 10
+rsh01       0  INFO  :  rsh Test successful in loop 11
+rsh01       0  INFO  :  rsh Test successful in loop 12
+rsh01       0  INFO  :  rsh Test successful in loop 13
+rsh01       0  INFO  :  rsh Test successful in loop 14
+rsh01       0  INFO  :  rsh Test successful in loop 15
+rsh01       0  INFO  :  rsh Test successful in loop 16
+rsh01       0  INFO  :  rsh Test successful in loop 17
+rsh01       0  INFO  :  rsh Test successful in loop 18
+rsh01       0  INFO  :  rsh Test successful in loop 19
+rsh01       0  INFO  :  rsh Test successful in loop 20
+rsh01       0  INFO  :  rsh Test successful in loop 21
+rsh01       0  INFO  :  rsh Test successful in loop 22
+rsh01       0  INFO  :  rsh Test successful in loop 23
+rsh01       0  INFO  :  rsh Test successful in loop 24
+rsh01       0  INFO  :  rsh Test successful in loop 25
+rsh01       1  PASS  :  Test Successful
+<<<execution_status>>>
+duration=6 termination_type=exited termination_id=0 corefile=no
+cutime=90 cstime=30
+<<<test_end>>>
+<<<test_start>>>
+tag=rwho stime=1134770548
+cmdline="rwho01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+rwho01      0  INFO  :  Starting rwhod on cl009
+root     10086     1  0 14:02 ?        00:00:00 /usr/sbin/rwhod
+root     10087 10086  0 14:02 ?        00:00:00 /usr/sbin/rwhod
+root     10096 10071  0 14:02 pts/4    00:00:00 grep rwhod
+rwho01      0  INFO  :  Test 1 of 25 complete
+rwho01      0  INFO  :  Test 2 of 25 complete
+rwho01      0  INFO  :  Test 3 of 25 complete
+rwho01      0  INFO  :  Test 4 of 25 complete
+rwho01      0  INFO  :  Test 5 of 25 complete
+rwho01      0  INFO  :  Test 6 of 25 complete
+rwho01      0  INFO  :  Test 7 of 25 complete
+rwho01      0  INFO  :  Test 8 of 25 complete
+rwho01      0  INFO  :  Test 9 of 25 complete
+rwho01      0  INFO  :  Test 10 of 25 complete
+rwho01      0  INFO  :  Test 11 of 25 complete
+rwho01      0  INFO  :  Test 12 of 25 complete
+rwho01      0  INFO  :  Test 13 of 25 complete
+rwho01      0  INFO  :  Test 14 of 25 complete
+rwho01      0  INFO  :  Test 15 of 25 complete
+rwho01      0  INFO  :  Test 16 of 25 complete
+rwho01      0  INFO  :  Test 17 of 25 complete
+rwho01      0  INFO  :  Test 18 of 25 complete
+rwho01      0  INFO  :  Test 19 of 25 complete
+rwho01      0  INFO  :  Test 20 of 25 complete
+rwho01      0  INFO  :  Test 21 of 25 complete
+rwho01      0  INFO  :  Test 22 of 25 complete
+rwho01      0  INFO  :  Test 23 of 25 complete
+rwho01      0  INFO  :  Test 24 of 25 complete
+rwho01      0  INFO  :  Test 25 of 25 complete
+rwho01      0  INFO  :  Stopping rwhod on cl009
+rwho01      1  PASS  :  Test Successful
+<<<execution_status>>>
+duration=22 termination_type=exited termination_id=0 corefile=no
+cutime=63 cstime=151
+<<<test_end>>>
+<<<test_start>>>
+tag=sendfile stime=1134770570
+cmdline="export TCbin=$LTPROOT/testcases/network/tcp_cmds/sendfile; sendfile01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+sendfile01    0  INFO  :  sendfile01: doing /usr/src/ltp-full-20050405/testcases/bin/sendfile01.
+sendfile01    0  INFO  :  Starting testsf_c 172.20.9.10 Client_filename Server_filename Size 
+sendfile    0  INFO  :  sp=220=/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.sm
+
+sendfile    0  INFO  :  client write 85 bytes to server with contents 220=/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.sm
+
+sendfile    0  INFO  :  File /usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.sm received
+
+sendfile01    0  INFO  :  Starting testsf_c 172.20.9.10 Client_filename Server_filename Size 
+sendfile    0  INFO  :  sp=4020=/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.med
+
+sendfile    0  INFO  :  client write 87 bytes to server with contents 4020=/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.med
+
+sendfile    0  INFO  :  File /usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.med received
+
+sendfile01    0  INFO  :  Starting testsf_c 172.20.9.10 Client_filename Server_filename Size 
+sendfile    0  INFO  :  sp=80020=/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.lg
+
+sendfile    0  INFO  :  client write 87 bytes to server with contents 80020=/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.lg
+
+sendfile    0  INFO  :  File /usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.lg received
+
+sendfile01    0  INFO  :  Starting testsf_c 172.20.9.10 Client_filename Server_filename Size 
+sendfile    0  INFO  :  sp=1600020=/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.jmb
+
+sendfile    0  INFO  :  client write 90 bytes to server with contents 1600020=/usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.jmb
+
+sendfile    0  INFO  :  File /usr/src/ltp-full-20050405/testcases/network/tcp_cmds/sendfile/datafiles/ascii.jmb received
+
+sendfile01    0  INFO  :  sendfile01: doing /usr/src/ltp-full-20050405/testcases/bin/sendfile01.
+sendfile01    1  PASS  :  Test Successful
+<<<execution_status>>>
+duration=12 termination_type=exited termination_id=0 corefile=no
+cutime=19 cstime=26
+<<<test_end>>>
+<<<test_start>>>
+tag=tcpdump stime=1134770582
+cmdline="tcpdump01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+which: no tcpdump in (/usr/bin:/bin:/testcases/bin:/usr/src/ltp-full-20050405/testcases/bin)
+tcpdump01    1  BROK  :  Test broke: command tcpdump not found
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=1 corefile=no
+cutime=2 cstime=2
+<<<test_end>>>
+<<<test_start>>>
+tag=telnet stime=1134770582
+cmdline="telnet01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+ Starting
+
+Test PASSES
+
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=0 corefile=no
+cutime=1 cstime=1
+<<<test_end>>>
+<<<test_start>>>
+tag=iptables stime=1134770582
+cmdline="iptables_tests.sh"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+iptables    0  INFO  :  INIT: Inititalizing tests.
+iptables    1  BROK  :  Test INIT: iptables command does not exist. Reason:
+which: no iptables in (/usr/bin:/bin:/testcases/bin:/usr/src/ltp-full-20050405/testcases/bin)
+iptables    2  BROK  :  Remaining cases broken
+iptables    3  BROK  :  Remaining cases broken
+iptables    4  BROK  :  Remaining cases broken
+iptables    5  BROK  :  Remaining cases broken
+iptables    6  BROK  :  Remaining cases broken
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=1 corefile=no
+cutime=1 cstime=3
+<<<test_end>>>
+<<<test_start>>>
+tag=dhcpd stime=1134770582
+cmdline="dhcpd_tests.sh"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+dhcpd       0  INFO  :  INIT: Inititalizing tests.
+dhcpd       1  PASS  :  INIT: dhcpd is already running. Declaring success
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=0 corefile=no
+cutime=3 cstime=6
+<<<test_end>>>
+<<<test_start>>>
+tag=mc_cmds stime=1134770582
+cmdline="mc_cmds"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+Getting ALL enabled interfaces which are configured !
+Testing ifconfig and netstat
+/usr/src/ltp-full-20050405/testcases/bin/mc_cmds: line 77: ifconfig: command not found
+/usr/src/ltp-full-20050405/testcases/bin/mc_cmds: line 77: ifconfig: command not found
+: doing /usr/src/ltp-full-20050405/testcases/bin/mc_cmds.
+: doing /usr/src/ltp-full-20050405/testcases/bin/mc_cmds.
+Test Failed: Multicast not listed for eth1
+eth2
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=1 corefile=no
+cutime=3 cstime=3
+<<<test_end>>>
+<<<test_start>>>
+tag=mc_commo stime=1134770582
+cmdline="export TCsrc=$LTPROOT/testcases/network/multicast/mc_commo; mc_commo"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+mc_commo: doing /usr/src/ltp-full-20050405/testcases/bin/mc_commo.
+Starting mc_recv on 224.0.0.3 172.20.9.10 3333
+root     10795 10781  0 14:03 pts/4    00:00:00 /usr/src/ltp-full-20050405/testcases/network/multicast/mc_commo/mc_recv 224.0.0.3 172.20.9.10 3333
+Running ping to verify group can be reached 
+mc_commo: doing /usr/src/ltp-full-20050405/testcases/bin/mc_commo.
+mc_commo: doing /usr/src/ltp-full-20050405/testcases/bin/mc_commo.
+Killing all recv processes!!
+/usr/src/ltp-full-20050405/testcases/bin/mc_commo: line 211: 10795 Killed                  $TCsrc/$EXECUTABLES $GROUP_ADDR $INTERFACE $PORT >>$OUTFILE
+Test Failed: failed: ping -c5 -I 172.20.9.10 224.0.0.3
+<<<execution_status>>>
+duration=20 termination_type=exited termination_id=1 corefile=no
+cutime=5 cstime=14
+<<<test_end>>>
+<<<test_start>>>
+tag=mc_member stime=1134770602
+cmdline="export TCsrc=$LTPROOT/testcases/network/multicast/mc_member; mc_member"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+mc_member: doing /usr/src/ltp-full-20050405/testcases/bin/mc_member.
+Running mc_member_e on 3.3.3.3
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+Running (1st) member on 172.20.9.10
+Running (2nd) member on  172.20.9.10
+eth1            8      224.10.10.11
+PING 224.10.10.11 (224.10.10.11) from 172.20.9.10 : 56(84) bytes of data.
+
+--- 224.10.10.11 ping statistics ---
+3 packets transmitted, 0 received, 100% packet loss, time 2014ms
+
+Error - mc_member: 224.10.10.11 NOT responding over 172.20.9.10
+eth1            6      224.10.10.12
+PING 224.10.10.12 (224.10.10.12) from 172.20.9.10 : 56(84) bytes of data.
+
+--- 224.10.10.12 ping statistics ---
+3 packets transmitted, 0 received, 100% packet loss, time 2013ms
+
+Error - mc_member: 224.10.10.12 NOT responding over 172.20.9.10
+eth1            4      224.10.10.13
+PING 224.10.10.13 (224.10.10.13) from 172.20.9.10 : 56(84) bytes of data.
+
+--- 224.10.10.13 ping statistics ---
+3 packets transmitted, 0 received, 100% packet loss, time 2000ms
+
+Error - mc_member: 224.10.10.13 NOT responding over 172.20.9.10
+eth1            2      224.10.10.14
+PING 224.10.10.14 (224.10.10.14) from 172.20.9.10 : 56(84) bytes of data.
+
+--- 224.10.10.14 ping statistics ---
+3 packets transmitted, 0 received, 100% packet loss, time 2000ms
+
+Error - mc_member: 224.10.10.14 NOT responding over 172.20.9.10
+eth1            1      224.10.10.15
+PING 224.10.10.15 (224.10.10.15) from 172.20.9.10 : 56(84) bytes of data.
+
+--- 224.10.10.15 ping statistics ---
+3 packets transmitted, 0 received, 100% packet loss, time 2002ms
+
+Error - mc_member: 224.10.10.15 NOT responding over 172.20.9.10
+mc_member: doing /usr/src/ltp-full-20050405/testcases/bin/mc_member.
+mc_member: doing /usr/src/ltp-full-20050405/testcases/bin/mc_member.
+Test Failed: 224.10.10.16 NOT joined to 172.20.9.10
+<<<execution_status>>>
+duration=291 termination_type=exited termination_id=1 corefile=no
+cutime=24 cstime=81
+<<<test_end>>>
+<<<test_start>>>
+tag=mc_opts stime=1134770893
+cmdline="export TCsrc=$LTPROOT/testcases/network/multicast/mc_opts; mc_opts"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+mc_opts: doing /usr/src/ltp-full-20050405/testcases/bin/mc_opts.
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+Running mc_opts opts_e on 172.20.9.10
+agrv sub 1 is 172.20.9.10
+Set interface: 172.20.9.10 for multicasting
+Got multicasting socket interface: 172.20.9.10
+Socket has been set for multicasting on interface: 172.20.9.10
+getsockopt: got ttl = 1
+TTL set on multicast socket
+Got loopback setting
+IP_MULTICAST_LOOP is enabled
+Multicast loopback disabled
+Got multicast loopback value
+IP_MULTICAST_LOOP disabled
+Running ping with bad values
+Running ping on a invalid interface!
+mc_opts: doing /usr/src/ltp-full-20050405/testcases/bin/mc_opts.
+mc_opts: doing /usr/src/ltp-full-20050405/testcases/bin/mc_opts.
+Test Successful
+<<<execution_status>>>
+duration=0 termination_type=exited termination_id=0 corefile=no
+cutime=5 cstime=14
+<<<test_end>>>
+<<<test_start>>>
+tag=rpc01 stime=1134770893
+cmdline="export TCbin=$LTPROOT/testcases/network/rpc/rpc01; rpc01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+The rpc_server PID is 11140
+Starting rpc01
+rpc01: doing /usr/src/ltp-full-20050405/testcases/bin/rpc01.
+Test Successful
+<<<execution_status>>>
+duration=1 termination_type=exited termination_id=0 corefile=no
+cutime=14 cstime=9
+<<<test_end>>>
+<<<test_start>>>
+tag=rpcinfo stime=1134770894
+cmdline="export TCbin=$LTPROOT/testcases/network/rpc/rpcinfo01; rpcinfo01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+Checking for portmap daemon on cl009 and cl009
+Test rpcinfo with default options
+rpcinfo -p
+/usr/src/ltp-full-20050405/testcases/bin/rpcinfo01: line 91: rpcinfo: command not found
+rpcinfo01: doing /usr/src/ltp-full-20050405/testcases/bin/rpcinfo01.
+Test Failed: rpcinfo -p failed
+<<<execution_status>>>
+duration=1 termination_type=exited termination_id=1 corefile=no
+cutime=6 cstime=8
+<<<test_end>>>
+<<<test_start>>>
+tag=rup stime=1134770895
+cmdline="export TCbin=$LTPROOT/testcases/network/rpc/rup; rup01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+Checking for rstatd on cl009
+Attempting to start rstatd on cl009
+bash: line 1: /usr/sbin/rpc.rstatd: No such file or directory
+rstatd started on cl009
+Test rup with defaults....please be patient
+rup
+Test rusers with options set...please be patient
+rup cl009
+rup: cl009: RPC: Program not registered
+
+rup01: doing /usr/src/ltp-full-20050405/testcases/bin/rup01.
+bash: line 1: kill: (11199) - No such process
+rstatd daemon stopped on cl009
+Test Failed: rup cl009 - failed
+<<<execution_status>>>
+duration=54 termination_type=exited termination_id=1 corefile=no
+cutime=10 cstime=9
+<<<test_end>>>
+<<<test_start>>>
+tag=rusers stime=1134770949
+cmdline="export TCbin=$LTPROOT/testcases/network/rpc/rusers; rusers01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+Checking for rusersd on cl009
+Attempting to start rusersd on cl009
+bash: line 1: /usr/sbin/rpc.rusersd: No such file or directory
+ruserd started on cl009
+Test rusers with defaults...please be patient
+Test rusers with options set...please be patient
+rusers: RPC: Program not registered
+rusers01: doing /usr/src/ltp-full-20050405/testcases/bin/rusers01.
+bash: line 1: kill: (11248) - No such process
+rusersd daemon stopped on cl009
+Test Failed: rusers cl009 - failed
+<<<execution_status>>>
+duration=55 termination_type=exited termination_id=1 corefile=no
+cutime=10 cstime=8
+<<<test_end>>>
+<<<test_start>>>
+tag=nfs01 stime=1134771004
+cmdline="export VERSION SOCKET_TYPE; export TCbin=$LTPROOT/testcases/network/nfs/nfs01; nfs01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+
+Test Options:
+ VERSION: 4
+ RHOST: cl009
+ NFILES: 1000
+ SOCKET_TYPE: tcp
+Setting up remote machine: cl009
+Mounting NFS filesystem cl009:/tmp/nfs0111298.testdir on /usr/src/ltp-full-20050405/testcases/network/nfs/nfs01/nfs0111298 with parameters tcp,vers=4 
+'vers=4' is not supported.  Use '-t nfs4' instead.
+Cleaning up testcase
+'vers=4' is not supported.  Use '-t nfs4' instead.
+Cannot mount /usr/src/ltp-full-20050405/testcases/network/nfs/nfs01/nfs0111298
+umount: /usr/src/ltp-full-20050405/testcases/network/nfs/nfs01/nfs0111298: not mounted
+Cannot umount /usr/src/ltp-full-20050405/testcases/network/nfs/nfs01/nfs0111298
+Test Failed: Cannot mount /usr/src/ltp-full-20050405/testcases/network/nfs/nfs01/nfs0111298
+<<<execution_status>>>
+duration=6 termination_type=exited termination_id=1 corefile=no
+cutime=14 cstime=8
+<<<test_end>>>
+<<<test_start>>>
+tag=nfs02 stime=1134771010
+cmdline="export VERSION SOCKET_TYPE; export TCbin=$LTPROOT/testcases/network/nfs/nfs02; nfs02"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+do_setup nfs02
+mount clntudp_create: RPC: Program not registered
+do_cleanup nfs02 
+umount: /usr/src/ltp-full-20050405/testcases/network/nfs/nfs02/nfs0211333: not found
+rmdir: `/usr/src/ltp-full-20050405/testcases/network/nfs/nfs02/nfs0211333': No such file or directory
+Test Failed: /tmp/nfs0211333 not exported
+<<<execution_status>>>
+duration=4 termination_type=exited termination_id=1 corefile=no
+cutime=11 cstime=8
+<<<test_end>>>
+<<<test_start>>>
+tag=nfs03 stime=1134771014
+cmdline="export VERSION SOCKET_TYPE; export TCbin=$LTPROOT/testcases/network/nfs/nfs03; nfs03"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+
+Test Options:
+ VERSION: 4
+ SOCKET_TYPE: tcp
+ RHOST: cl009
+
+Test Parameters:
+ Number of Directories: 100
+ Number of Files per Directory:  100
+ Number of nfsds tested: 1
+
+Setting up remote machine: cl009
+Mounting NFS filesystem cl009:/tmp/nfs0311368.testdir on /usr/src/ltp-full-20050405/testcases/network/nfs/nfs03/nfs0311368 with parameters vers=4,proto=tcp 
+'vers=4' is not supported.  Use '-t nfs4' instead.
+Cleaning up testcase
+umount: /usr/src/ltp-full-20050405/testcases/network/nfs/nfs03/nfs0311368: not mounted
+Cannot umount /usr/src/ltp-full-20050405/testcases/network/nfs/nfs03/nfs0311368
+Test Failed: Cannot mount /usr/src/ltp-full-20050405/testcases/network/nfs/nfs03/nfs0311368
+<<<execution_status>>>
+duration=8 termination_type=exited termination_id=1 corefile=no
+cutime=16 cstime=11
+<<<test_end>>>
+<<<test_start>>>
+tag=nfs03 stime=1134771022
+cmdline="export VERSION SOCKET_TYPE; export TCbin=$LTPROOT/testcases/network/nfs/nfs03; nfs04"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+
+Test Options:
+ VERSION: 4
+ RHOST: cl009
+ FILESIZE: 10
+ SOCKET_TYPE: tcp
+ LOOPS: 1
+nfs04       0  INFO  :  Setting up remote machine: cl009
+nfs04       0  INFO  :  Mounting NFS filesystem
+'vers=4' is not supported.  Use '-t nfs4' instead.
+umount: /tmp/nfs0411412: not mounted
+nfs04       1  BROK  :  Cannot umount /tmp/nfs0411412
+nfs04       1  FAIL  :  Test Failed: Cannot mount /tmp/nfs0411412
+<<<execution_status>>>
+duration=8 termination_type=exited termination_id=1 corefile=no
+cutime=16 cstime=12
+<<<test_end>>>
+<<<test_start>>>
+tag=nfslock01 stime=1134771030
+cmdline="export VERSION; export TCbin=$LTPROOT/testcases/network/nfs/nfslock01; nfslock01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+doing Setup
+Testing locking
+locking /usr/src/ltp-full-20050405/testcases/network/nfs/nfslock01/nfslock11460/nfs_flock_idata file and writing data
+: doing /usr/src/ltp-full-20050405/testcases/bin/nfslock01.
+Test Successful
+<<<execution_status>>>
+duration=7 termination_type=exited termination_id=0 corefile=no
+cutime=5 cstime=36
+<<<test_end>>>
+<<<test_start>>>
+tag=nfsstress stime=1134771037
+cmdline="export VERSION SOCKET_TYPE; export TCbin=$LTPROOT/testcases/network/nfs/nfsstress; nfsstress 20 50 1"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+
+Test Options:
+ VERSION: 4
+ RHOST: cl009
+ SOCKET_TYPE: tcp
+
+Test Parameters:
+ Number of Directories: 20
+ Number of Files per Directory: 50
+ Number of Threads: 1
+
+Setting up remote machine: cl009
+Mounting NFS filesystem cl009:/tmp/nfsstress11481.testdir on /usr/src/ltp-full-20050405/testcases/network/nfs/nfsstress/nfsstress11481 with parameters vers=4,proto=tcp 
+'vers=4' is not supported.  Use '-t nfs4' instead.
+Cleaning up testcase
+umount: /usr/src/ltp-full-20050405/testcases/network/nfs/nfsstress/nfsstress11481: not mounted
+Cannot umount /usr/src/ltp-full-20050405/testcases/network/nfs/nfsstress/nfsstress11481
+Test Failed: Cannot mount /usr/src/ltp-full-20050405/testcases/network/nfs/nfsstress/nfsstress11481
+<<<execution_status>>>
+duration=10 termination_type=exited termination_id=1 corefile=no
+cutime=17 cstime=7
+<<<test_end>>>
+<<<test_start>>>
+tag=nfsstat01 stime=1134771047
+cmdline="export VERSION; export TCbin=$LTPROOT/testcases/network/nfs/nfsstat01; nfsstat01"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
++ TC=nfsstat01
++ TCbin=/usr/src/ltp-full-20050405/testcases/network/nfs/nfsstat01
++ EXPORTDIR=/tmp/nfsstat0111520
+++ hostname
++ HOST=cl009
++ MOUNTDIR=/tmp/nfsstat0111520Mount
++ CLEANUP=ON
++ VERSION=4
++ do_setup
++ set -x
++ echo 'do_setup nfsstat01'
+do_setup nfsstat01
++ echo 'This test runs LOCALLY.'
+This test runs LOCALLY.
+++ whoami
++ IAM=root
++ '[' root == root ']'
++ grep mountd
++ rpcinfo -p
+/usr/src/ltp-full-20050405/testcases/bin/nfsstat01: line 68: rpcinfo: command not found
++ '[' 1 -eq 0 ']'
++ end_testcase 'Mountd is NOT running'
++ set -x
++ '[' ON = ON ']'
++ do_cleanup
++ set -x
++ echo 'do_cleanup nfsstat01 '
+do_cleanup nfsstat01 
++ umount /tmp/nfsstat0111520Mount
+umount: /tmp/nfsstat0111520Mount: not found
++ sleep 3
++ rm -rf /tmp/nfsstat0111520Mount
++ sleep 3
++ /usr/sbin/exportfs -u cl009:/tmp/nfsstat0111520
++ rm -rf /tmp/nfsstat0111520
++ '[' 1 = 0 ']'
++ echo 'Test FAIL: Mountd is NOT running'
+Test FAIL: Mountd is NOT running
++ exit 1
+<<<execution_status>>>
+duration=6 termination_type=exited termination_id=1 corefile=no
+cutime=3 cstime=4
+<<<test_end>>>
+<<<test_start>>>
+tag=nfsx-linux stime=1134771053
+cmdline="export VERSION SOCKET_TYPE; export TCbin=$LTPROOT/testcases/network/nfs/fsx-linux; fsx.sh"
+contacts=""
+analysis=exit
+initiation_status="ok"
+<<<test_output>>>
+
+Test Options:
+ VERSION: 4
+ RHOST: cl009
+ ITERATIONS: 50000
+ SOCKET_TYPE: tcp
+Setting up remote machine: cl009
+Mounting NFS filesystem cl009:/tmp/fsx11534.testdir on /usr/src/ltp-full-20050405/testcases/network/nfs/fsx-linux/fsx11534 with parameters tcp,vers=4 
+'vers=4' is not supported.  Use '-t nfs4' instead.
+Cleaning up testcase
+Unmounting /usr/src/ltp-full-20050405/testcases/network/nfs/fsx-linux/fsx11534
+umount: /usr/src/ltp-full-20050405/testcases/network/nfs/fsx-linux/fsx11534: not mounted
+/usr/src/ltp-full-20050405/testcases/bin/fsx.sh: line 158: error: command not found
+Test Failed: Cannot mount /usr/src/ltp-full-20050405/testcases/network/nfs/fsx-linux/fsx11534
+incrementing stop
+<<<execution_status>>>
+duration=8 termination_type=exited termination_id=1 corefile=no
+cutime=16 cstime=12
+<<<test_end>>>
+pan reported FAIL

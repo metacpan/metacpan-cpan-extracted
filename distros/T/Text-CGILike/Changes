@@ -1,0 +1,27 @@
+0.6       2014-02-15 17:35:30 Europe/Paris
+
+0.5       2012-11-27 23:09:56 Europe/Paris
+
+    * change meta
+
+0.4       2012-07-18 16:39:48 Europe/Paris
+
+    Use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
+    Add pod
+    Export all tag like CGI
+
+0.3 - 2012-06-08 10:25
+===
+
+    * change author name
+
+0.2 - 2012-06-05 14:30
+===
+
+    * add empty meta
+    * Add params for start_html
+
+0.1 - 2012-06-05 18:15
+===
+
+    * First version, no doc, very little, no test

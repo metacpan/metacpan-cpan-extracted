@@ -1,0 +1,17 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/Tie/Toggle.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+t/toggle.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

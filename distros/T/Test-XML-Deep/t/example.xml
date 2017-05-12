@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<example>
+    <sometag>some data</sometag>
+    <sometag>more data</sometag>
+    <date>Thu Feb 26 20:41:16 PST 2009</date>
+    <number>123123123.321</number>
+    <ignore>this</ignore>
+</example>
+

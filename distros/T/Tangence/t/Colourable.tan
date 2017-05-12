@@ -1,0 +1,3 @@
+class t.Colourable {
+  prop colour = str;
+}

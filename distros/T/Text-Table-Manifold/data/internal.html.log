@@ -1,0 +1,12 @@
+Format: as_internal_html: 
+<table align = "center" border = "1">
+<thead>
+<tr><th><div style='text-align: left'>Homepage</div></th><th><div style='text-align: center'>Country</div></th><th><div style='text-align: right'>Name</div></th><th><div style='text-align: center'>Metadata</div></th></tr>
+</thead>
+<tr><td><div style='text-align: left'>http://savage.net.au/</div></td><td><div style='text-align: center'>Australia</div></td><td><div style='text-align: right'>Ron Savage</div></td><td><div style='text-align: center'>undef</div></td></tr>
+<tr><td><div style='text-align: left'>https://duckduckgo.com/</div></td><td><div style='text-align: center'>Earth</div></td><td><div style='text-align: right'>Mr. S. Engine</div></td><td><div style='text-align: center'>empty</div></td></tr>
+<tfoot>
+<tr><th><div style='text-align: left'>One</div></th><th><div style='text-align: center'>Two</div></th><th><div style='text-align: right'>Three</div></th><th><div style='text-align: center'>Four</div></th></tr>
+<tfoot>
+</table>
+

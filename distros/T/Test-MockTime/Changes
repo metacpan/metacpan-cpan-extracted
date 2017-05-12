@@ -1,0 +1,58 @@
+CHANGES
+-------
+
+  0.15 - 03 Sep 2015
+
+      * Corrected README.  Merged POD into pm file
+
+  0.14 - 03 Sep 2015
+
+      * fixing POD code examples as per RT #104088.
+
+  0.13 - 07 Aug 2014
+
+      * explicit license in META as per RT #97806
+      * included other updates to Makefile.PL details (author, etc)
+
+  0.12 - 09 Apr 2009
+
+      * removing t/DateCalc.t and lib/Test/MockTime/DateCalc.pm to allow Kevin Ryde to maintain a separate module.
+
+  0.11 - 08 Apr 2009
+
+      * now including it in Manifest file
+
+  0.10 - 08 Apr 2009
+
+      * including t/DateCalc.t and lib/Test/MockTime/DateCalc.pm from Kevin Ryde in an attempt to work with Date::Calc
+      * This changeset may need to be broken out into a separate module, depending on how much work is required on it
+
+  0.09 - 30 June 2008
+
+      * including t/pod.t
+
+  0.08 - 30 June 2008
+
+      * fixing Pod with a patch from Ansgar Burchardt.
+  
+  0.07 - 05 September 2007
+
+      * including the missing t/prototypes.t into the MANIFEST so it actually gets included. *ZONK*
+
+  0.06 - 04 September 2007
+
+      * fixing a call to Exporter to allow Test::MockTime on perl 5.6.1 to run, although still with warnings about prototypes
+      * including the missing t/prototypes.t that Peter sent me.
+
+  0.05 - 28 December 2006
+
+      * Patch from Peter du Marchie van Voorthuysen to give the correct function prototypes for gmtime, localtime and time
+      * now only requiring Time::Piece when using specs
+
+  0.04 - 31 July 2006
+
+      * Patch from Michael Hendricks to allow importing all subroutines
+
+  0.03 - 30 July 2006
+
+      * Patch from Michael Hendricks to allow dates in formats other than seconds since the unix epoch

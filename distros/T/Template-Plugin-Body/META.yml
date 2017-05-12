@@ -1,0 +1,22 @@
+---
+abstract: 'Strip HTML to just keep the body content'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+module_name: Template::Plugin::Body
+name: Template-Plugin-Body
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Template: 2.10
+  perl: 5.005
+version: 1.04

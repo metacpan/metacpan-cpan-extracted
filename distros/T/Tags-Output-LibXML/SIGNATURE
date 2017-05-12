@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e6018a6be506119b9cca421df09b5ef81499290c Changes
+SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
+SHA1 49bcc807a47b5cc0ede06b2f8ac2a974bd1e74ab LibXML.pm
+SHA1 fbfd419cf18090cde642b0ad8fd7ab31cfc1fa8e MANIFEST
+SHA1 058f0b5f2ca6825a08cbb8614475ab90fb20202d META.yml
+SHA1 5bc1ae389fa3316028ad1406d3c4a4bfe458b8f8 Makefile.PL
+SHA1 8227c26047acb7506e3e4f45a5b6e9453267efbb README
+SHA1 010bcc79de896e5fe5c45dd6389a0af0059da5ef examples/ex1.pl
+SHA1 f695a469bd6a18b53f7be25339e1a0e044af0276 examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 12cd70fb4dd8340a1792a999c770ea4ace4c923d t/Tags-Output-LibXML/01-use.t
+SHA1 65b81eee860559f896ad09fadde4ed77b8bcbf24 t/Tags-Output-LibXML/02-version.t
+SHA1 d69e09ad55535d8e96c865675c7b20a806850931 t/Tags-Output-LibXML/03-new.t
+SHA1 2235d5b54ad0d406b41ddda707dd9285e1692ecd t/Tags-Output-LibXML/04-comment.t
+SHA1 48e7678dfd34e61d4014fc53b45fe99c1ab934dc t/Tags-Output-LibXML/05-simple_tag.t
+SHA1 16f3d781484f5fd435f9dbbc15a745c944c6399a t/Tags-Output-LibXML/06-tag.t
+SHA1 84957c7b0f02663410cb7945f53bf493ed58bb3d t/Tags-Output-LibXML/07-preserve_from_attribute.t
+SHA1 9a9df12e9add96bd9b25c66d8f5e37c68710eff9 t/Tags-Output-LibXML/08-cdata.t
+SHA1 7c05e0550db14cabd6924fc9779110533730f4e8 t/Tags-Output-LibXML/09-attributes.t
+SHA1 bea79320f4ef71ff1aab2ba271d4d1e792319f78 t/Tags-Output-LibXML/10-instruction.t
+SHA1 6dce25344d5e38902a4aa800f2e05159a22790a3 t/Tags-Output-LibXML/11-raw.t
+SHA1 0b0dd0079940a2738c44ad9c6e27d5323277e02d t/Tags-Output-LibXML/12-data_callback.t
+SHA1 0f544f94a16aaa544ed72ad85137c14bf35ad3de xt/Tags-Output-LibXML/01-pod_coverage.t
+SHA1 91bf07fbf15fee64dc48c062f2459ac712f4c01c xt/Tags-Output-LibXML/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWMpX/AAoJEJe+XXKaIuTlXscH/1PEmRurJUH6KzULq4AlpC4S
+Zq/pyw+kV5ziedAJ+KJr4lC0dWj8NjHzbUSHKb2o8ki+qzgdQX9RyHL3v/r+vYyT
+2we5L1UNkZzKyfozqY2qTpJ0QYNRJh8/kcsy8lHcl0Rx60vkdmQcxg+pEU/O5MW/
+Wh9cqc96K5DPFVpu98HrsXMDY7MH6xBtMaMNJUl9Eyi3yV3cFQrGM6lkVVu3ePgH
+G7dGq5vP6teTEEA862i2k/KTh1qhpSNBwmraesw4ZnMW2Xm2W/KxpVBecqZeL8Ug
+vuMxyX0SX7fNsVUZHGoxURcg1ICADRIecUhOhbAgHiP0sI9VgtSeZdO1Yw/scgg=
+=2HI5
+-----END PGP SIGNATURE-----

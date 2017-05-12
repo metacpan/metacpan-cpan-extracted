@@ -1,0 +1,27 @@
+!----------------------------------------------------
+! Common settings
+!----------------------------------------------------
+*font								: Helvetica -12 bold
+*background 						: forestgreen
+*foreground 						: black
+*selectForeground					: grey80
+*selectBackground					: steelblue
+*highlightThickness 				: 0
+*padX								: 1m
+*Button*activeBackground			: gold
+*Button*background					: darkblue
+!----------------------------------------------------
+*CompoundButton*background			: LightSteelBlue1
+*CompoundButton*side				: left
+*CompoundButton*activeBackground	: green
+*CompoundButton*activeForeground	: red
+*CompoundButton*padX				: 3m
+!*CompoundButton*padX				: 10m
+*CompoundButton*Anchor				: ne
+*CompoundButton*Justify				: left
+*CompoundButton*Font				: misc-fixed 15 bold
+!----------------------------------------------------
+
+!
+!! E O F
+!

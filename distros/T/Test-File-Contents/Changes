@@ -1,0 +1,63 @@
+Revision history for Test-File-Contents
+
+0.23  2016-03-16T17:09:37Z
+      - Fix encoding errors when reading in a file on Windows with `utf8`
+        enabled. See https://rt.perl.org/Ticket/Display.html?id=127668 for the
+        bug we've worked around.
+
+0.22  2016-03-02T23:54:26Z
+      - Adjusted tests to account for change in output of Text::Diff 1.44.
+        They still pass with earlier versions of Text::Diff.
+      - Removed Pod tests from the distribution.
+
+0.21    2013-04-12
+      - Require Test::Pod 1.41 for Pod tests. Fixes test failures due to the
+        use of the `L<text|scheme>` Pod syntax diallowed in earlier versions
+        of Test::Pod.
+      - Eliminated "v-string in use/require non-portable" warning on Perl
+        5.10.0.
+
+0.20    2011-02-18
+      - Now require Perl 5.8.3 or higher. 5.8 has effectively been the
+        required Perl all along thanks to the dependency on Digest::MD5.
+      - Added encoding option, to make sure that files are read in their
+        proper encoding.
+      - Significant refactoring; only visible change should be that the
+        actualy MD5 checksum will no longer be included in the `file_md5sum`
+        failure diagnostics.
+      - Renamed `file_md5sum` to `file_md5sum_is`. The old name remains as an
+        alias for backwards compatibility.
+      - Renamed `file_contents_identical` to `files_eq`. The old name remains
+        as an alias for backwards compatibility.
+      - Added `file_contents_eq_or_diff()` and `files_eq_or_diff()`.
+
+0.10    2011-02-18
+      - Maintainership taken by David E. Wheeler.
+      - Removed `examples/simple.pl`, since it wouldn't run anyway.
+      - Added prototypes to the test functions.
+      - Failure diagnostics now appear after the failure message, rather than
+        before.
+      - Renamed `file_contents_is` and `file_contents_isnt` to
+        `file_contents_eq` and `file_contents_ne`, respectively. The old names
+        remain as aliases for backwards compatibility.
+      - Reworked default test descriptions to include the names of the files
+        being tested.
+      - Wordsmithed some of the diagnostic messages.
+
+0.05    2007-03-20
+      - Packaging fixes. No functional changes.
+
+0.04    2005-10-26
+      - Small tweaks to the packaging, mostly for CPANTS.  No functional
+        changes.
+
+0.03    2006-01-20
+      - Added file_contents_isnt and file_contents_unlike and made file
+        access OS-neutral (contributed by David Wheeler).
+
+0.02    2004-08-25
+      - Minor packaging fixes.
+
+0.01    2004-08-25
+      - First version, released on an unsuspecting world.
+

@@ -1,0 +1,1757 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key attr.name="ac_label" attr.type="string" for="graph" id="dg0"/>
+  <key attr.name="baselabel" attr.type="string" for="graph" id="dg1"/>
+  <key attr.name="language" attr.type="string" for="graph" id="dg2"/>
+  <key attr.name="linear" attr.type="boolean" for="graph" id="dg3"/>
+  <key attr.name="name" attr.type="string" for="graph" id="dg4"/>
+  <key attr.name="stemmata" attr.type="string" for="graph" id="dg5"/>
+  <key attr.name="version" attr.type="string" for="graph" id="dg6"/>
+  <key attr.name="wit_list_separator" attr.type="string" for="graph" id="dg7"/>
+  <key attr.name="wordsep" attr.type="string" for="graph" id="dg8"/>
+  <key attr.name="grammar_invalid" attr.type="boolean" for="node" id="dn0"/>
+  <key attr.name="id" attr.type="string" for="node" id="dn1"/>
+  <key attr.name="is_common" attr.type="boolean" for="node" id="dn2"/>
+  <key attr.name="is_end" attr.type="boolean" for="node" id="dn3"/>
+  <key attr.name="is_lacuna" attr.type="boolean" for="node" id="dn4"/>
+  <key attr.name="is_nonsense" attr.type="boolean" for="node" id="dn5"/>
+  <key attr.name="is_ph" attr.type="boolean" for="node" id="dn6"/>
+  <key attr.name="is_start" attr.type="boolean" for="node" id="dn7"/>
+  <key attr.name="join_next" attr.type="boolean" for="node" id="dn8"/>
+  <key attr.name="join_prior" attr.type="boolean" for="node" id="dn9"/>
+  <key attr.name="language" attr.type="string" for="node" id="dn10"/>
+  <key attr.name="lexemes" attr.type="string" for="node" id="dn11"/>
+  <key attr.name="normal_form" attr.type="string" for="node" id="dn12"/>
+  <key attr.name="rank" attr.type="int" for="node" id="dn13"/>
+  <key attr.name="text" attr.type="string" for="node" id="dn14"/>
+  <key attr.name="annotation" attr.type="string" for="edge" id="de0"/>
+  <key attr.name="displayform" attr.type="string" for="edge" id="de1"/>
+  <key attr.name="extra" attr.type="boolean" for="edge" id="de2"/>
+  <key attr.name="non_correctable" attr.type="boolean" for="edge" id="de3"/>
+  <key attr.name="non_independent" attr.type="boolean" for="edge" id="de4"/>
+  <key attr.name="reading_a" attr.type="string" for="edge" id="de5"/>
+  <key attr.name="reading_b" attr.type="string" for="edge" id="de6"/>
+  <key attr.name="scope" attr.type="string" for="edge" id="de7"/>
+  <key attr.name="type" attr.type="string" for="edge" id="de8"/>
+  <key attr.name="witness" attr.type="string" for="edge" id="de9"/>
+  <graph edgedefault="directed" id="Sermo_Augustini_170" parse.edgeids="canonical" parse.edges="461" parse.nodeids="canonical" parse.nodes="29" parse.order="nodesfirst">
+    <data key="dg0"> (a.c.)</data>
+    <data key="dg1">base text</data>
+    <data key="dg2">Latin</data>
+    <data key="dg3">1</data>
+    <data key="dg6">3.2</data>
+    <data key="dg4">Sermo Augustini 170</data>
+    <data key="dg5">digraph stemma {  l [ class=hypothetical ];  v [ class=hypothetical ];  "λ" [ class=hypothetical ];  F [ class=extant ];  "F (a.c.)" [ class=extant ];  L1 [ class=extant ];  L2 [ class=extant ];  L3 [ class=extant ];  "L3 (a.c.)" [ class=extant ];  L4 [ class=extant ];  "L4 (a.c.)" [ class=extant ];  L5 [ class=extant ];  "L5 (a.c.)" [ class=extant ];  L6 [ class=extant ];  "L6 (a.c.)" [ class=extant ];  L7 [ class=extant ];  "L7 (a.c.)" [ class=extant ];  L8 [ class=extant ];  "L8 (a.c.)" [ class=extant ];  L9 [ class=extant ];  "L9 (a.c.)" [ class=extant ];  M [ class=extant ];  "M (a.c.)" [ class=extant ];  V10 [ class=extant ];  "V10 (a.c.)" [ class=extant ];  V11 [ class=extant ];  "V11 (a.c.)" [ class=extant ];  W [ class=extant ];  "W (a.c.)" [ class=extant ];  maur [ class=extant ];  "F (a.c.)" -&gt; F;  "F (a.c.)" -&gt; v;  "F (a.c.)" -&gt; "λ";  F -&gt; v;  F -&gt; "λ";  L1 -&gt; L2;  "L3 (a.c.)" -&gt; L3;  "L3 (a.c.)" -&gt; maur;  L3 -&gt; maur;  "L4 (a.c.)" -&gt; L4;  "L5 (a.c.)" -&gt; L5;  "L6 (a.c.)" -&gt; L6;  "L7 (a.c.)" -&gt; L7;  "L8 (a.c.)" -&gt; L8;  "L8 (a.c.)" -&gt; maur;  L8 -&gt; maur;  "L9 (a.c.)" -&gt; L9;  "M (a.c.)" -&gt; M;  "V10 (a.c.)" -&gt; L3;  "V10 (a.c.)" -&gt; "L3 (a.c.)";  "V10 (a.c.)" -&gt; V10;  V10 -&gt; L3;  V10 -&gt; "L3 (a.c.)";  "V11 (a.c.)" -&gt; V11;  "W (a.c.)" -&gt; W;  l -&gt; L1;  l -&gt; L3;  l -&gt; "L3 (a.c.)";  l -&gt; L4;  l -&gt; "L4 (a.c.)";  l -&gt; L5;  l -&gt; "L5 (a.c.)";  l -&gt; L6;  l -&gt; "L6 (a.c.)";  l -&gt; L7;  l -&gt; "L7 (a.c.)";  l -&gt; L8;  l -&gt; "L8 (a.c.)";  l -&gt; L9;  l -&gt; "L9 (a.c.)";  v -&gt; L7;  v -&gt; "L7 (a.c.)";  v -&gt; V10;  v -&gt; "V10 (a.c.)";  v -&gt; V11;  v -&gt; "V11 (a.c.)";  "λ" -&gt; M;  "λ" -&gt; "M (a.c.)";  "λ" -&gt; W;  "λ" -&gt; "W (a.c.)";  "λ" -&gt; l;}</data>
+    <data key="dg7">, </data>
+    <data key="dg8"> </data>
+    <node id="n0">
+      <data key="dn10">Default</data>
+      <data key="dn14">#END#</data>
+      <data key="dn3">1</data>
+      <data key="dn1">__END__</data>
+      <data key="dn13">27</data>
+    </node>
+    <node id="n1">
+      <data key="dn10">Default</data>
+      <data key="dn14">#START#</data>
+      <data key="dn7">1</data>
+      <data key="dn1">__START__</data>
+      <data key="dn13">0</data>
+    </node>
+    <node id="n2">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // qui // cat@conj","Latin // qui // cat@adv type@int","Latin // qui // cat@adv type@rel","Latin // qui // cat@pron type@rel gender@masc num@sing case@nom","Latin // qui // cat@pron type@rel gender@masc num@pl case@nom"],"language":"Latin","string":"qui"}]</data>
+      <data key="dn14">qui</data>
+      <data key="dn1">n1007</data>
+      <data key="dn13">1</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n3">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // diligo // cat@verb mode@ind tense@pres pers@3 num@sing voice@act"],"language":"Latin","form":"Latin // diligo // cat@verb mode@ind tense@pres pers@3 num@sing voice@act","is_disambiguated":"1","string":"diligit"}]</data>
+      <data key="dn14">diligit</data>
+      <data key="dn1">n1008</data>
+      <data key="dn13">2</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n4">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // mundus // cat@noun gender@neut num@sing case@acc","Latin // mundus // cat@adj gender@neut num@sing case@voc","Latin // mundus // cat@noun gender@masc num@sing case@acc","Latin // mundus // cat@noun gender@neut num@pl case@gen","Latin // mundus // cat@noun gender@masc num@pl case@gen","Latin // mundus // cat@adj gender@neut num@sing case@acc","Latin // mundus // cat@adj gender@neut num@pl case@gen","Latin // mundus // cat@adj gender@neut num@sing case@nom","Latin // mundus // cat@adj gender@masc num@sing case@acc","Latin // mundus // cat@noun gender@neut num@sing case@voc","Latin // mundus // cat@adj gender@masc num@pl case@gen","Latin // mundus // cat@noun gender@neut num@sing case@nom"],"language":"Latin","string":"mundum"}]</data>
+      <data key="dn14">mundum</data>
+      <data key="dn1">n1009</data>
+      <data key="dn13">3</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n5">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // in // cat@prep"],"language":"Latin","form":"Latin // in // cat@prep","is_disambiguated":"1","string":"in"}]</data>
+      <data key="dn14">in</data>
+      <data key="dn1">n1010</data>
+      <data key="dn13">4</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n6">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // mundus // cat@adj gender@neut num@sing case@dat","Latin // mundus // cat@adj gender@neut num@sing case@abl","Latin // mundus // cat@noun gender@masc num@sing case@dat","Latin // mundus // cat@noun gender@neut num@sing case@dat","Latin // mundus // cat@adj gender@masc num@sing case@dat","Latin // mundus // cat@noun gender@masc num@sing case@abl","Latin // mundus // cat@noun gender@neut num@sing case@abl","Latin // mundus // cat@adj gender@masc num@sing case@abl"],"language":"Latin","string":"mundo"}]</data>
+      <data key="dn14">mundo</data>
+      <data key="dn1">n1011</data>
+      <data key="dn13">5</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n7">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // habito // cat@verb mode@ind tense@pres pers@3 num@sing voice@act"],"language":"Latin","form":"Latin // habito // cat@verb mode@ind tense@pres pers@3 num@sing voice@act","is_disambiguated":"1","string":"habitat"}]</data>
+      <data key="dn14">habitat</data>
+      <data key="dn1">n1013</data>
+      <data key="dn13">6</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n8">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // cum // cat@prep","Latin // cum // cat@conj"],"language":"Latin","string":"cum"}]</data>
+      <data key="dn14">cum</data>
+      <data key="dn1">n1014</data>
+      <data key="dn13">7</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n9">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // princeps // cat@adj gender@masc num@sing case@abl","Latin // princeps // cat@noun gender@masc num@sing case@abl","Latin // princeps // cat@adj gender@fem num@sing case@abl","Latin // princeps // cat@adj gender@neut num@sing case@abl"],"language":"Latin","string":"principe"}]</data>
+      <data key="dn14">principe</data>
+      <data key="dn1">n1015</data>
+      <data key="dn13">8</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n10">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // mundus // cat@noun gender@neut num@sing case@gen","Latin // mundus // cat@noun gender@masc num@pl case@voc","Latin // mundus // cat@adj gender@neut num@sing case@gen","Latin // mundus // cat@noun gender@masc num@pl case@nom","Latin // mundus // cat@adj gender@masc num@pl case@nom","Latin // mundus // cat@adj gender@masc num@sing case@gen","Latin // mundus // cat@noun gender@masc num@sing case@gen","Latin // mundus // cat@adj gender@masc num@pl case@voc"],"language":"Latin","string":"mundi"}]</data>
+      <data key="dn14">mundi</data>
+      <data key="dn1">n1017</data>
+      <data key="dn13">10</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n11">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // omnis // cat@adj gender@masc num@pl case@acc","Latin // omnis // cat@adj gender@masc num@pl case@nom","Latin // omnis // cat@adj gender@masc num@pl case@voc","Latin // omnis // cat@adj gender@fem num@pl case@nom","Latin // omnis // cat@adj gender@fem num@pl case@acc","Latin // omnis // cat@adj gender@fem num@pl case@voc"],"language":"Latin","string":"Omnes"}]</data>
+      <data key="dn14">Omnes</data>
+      <data key="dn1">n1018</data>
+      <data key="dn13">11</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n12">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // ergo // cat@adv"],"language":"Latin","form":"Latin // ergo // cat@adv","is_disambiguated":"1","string":"ergo"}]</data>
+      <data key="dn14">ergo</data>
+      <data key="dn1">n1020</data>
+      <data key="dn13">12</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n13">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"language":"Latin","string":"dilectores"}]</data>
+      <data key="dn14">dilectores</data>
+      <data key="dn1">n1021</data>
+      <data key="dn13">13</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n14">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // mundus // cat@adj gender@masc num@pl case@nom","Latin // mundus // cat@noun gender@neut num@sing case@gen","Latin // mundus // cat@noun gender@masc num@pl case@voc","Latin // mundus // cat@adj gender@masc num@sing case@gen","Latin // mundus // cat@adj gender@neut num@sing case@gen","Latin // mundus // cat@noun gender@masc num@sing case@gen","Latin // mundus // cat@adj gender@masc num@pl case@voc","Latin // mundus // cat@noun gender@masc num@pl case@nom"],"language":"Latin","string":"mundi"}]</data>
+      <data key="dn14">mundi</data>
+      <data key="dn1">n1022</data>
+      <data key="dn13">14</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n15">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // ipse // cat@det gender@masc num@pl case@nom","Latin // ipse // cat@det gender@masc num@sing case@dat","Latin // ipse // cat@det gender@neut num@sing case@dat","Latin // ipse // cat@det gender@masc num@pl case@voc","Latin // ipse // cat@det gender@fem num@sing case@dat"],"language":"Latin","string":"ipsi"}]</data>
+      <data key="dn14">ipsi</data>
+      <data key="dn1">n1023</data>
+      <data key="dn13">15</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n16">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // sum // cat@verb mode@ind tense@pres pers@3 num@pl voice@act"],"language":"Latin","form":"Latin // sum // cat@verb mode@ind tense@pres pers@3 num@pl voice@act","is_disambiguated":"1","string":"sunt"}]</data>
+      <data key="dn14">sunt</data>
+      <data key="dn1">n1024</data>
+      <data key="dn13">16</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n17">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // mundus // cat@adj gender@masc num@sing case@nom","Latin // mundus // cat@noun gender@masc num@sing case@nom"],"language":"Latin","string":"mundus"}]</data>
+      <data key="dn14">mundus</data>
+      <data key="dn1">n1025</data>
+      <data key="dn13">17</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n18">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // habitator // cat@noun gender@masc num@pl case@acc","Latin // habitator // cat@noun gender@masc num@pl case@nom","Latin // habitator // cat@noun gender@masc num@pl case@voc"],"language":"Latin","string":"habitatores"}]</data>
+      <data key="dn14">habitatores</data>
+      <data key="dn1">n1026</data>
+      <data key="dn13">18</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n19">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // mundus // cat@adj gender@masc num@pl case@nom","Latin // mundus // cat@noun gender@neut num@sing case@gen","Latin // mundus // cat@noun gender@masc num@pl case@voc","Latin // mundus // cat@adj gender@masc num@sing case@gen","Latin // mundus // cat@adj gender@neut num@sing case@gen","Latin // mundus // cat@noun gender@masc num@sing case@gen","Latin // mundus // cat@adj gender@masc num@pl case@voc","Latin // mundus // cat@noun gender@masc num@pl case@nom"],"language":"Latin","string":"mundi"}]</data>
+      <data key="dn14">mundi</data>
+      <data key="dn1">n1027</data>
+      <data key="dn13">19</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n20">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // non // cat@adv"],"language":"Latin","form":"Latin // non // cat@adv","is_disambiguated":"1","string":"non"}]</data>
+      <data key="dn14">non</data>
+      <data key="dn1">n1028</data>
+      <data key="dn13">20</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n21">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // carnis // cat@noun gender@fem num@sing case@abl"],"language":"Latin","form":"Latin // carnis // cat@noun gender@fem num@sing case@abl","is_disambiguated":"1","string":"carne"}]</data>
+      <data key="dn14">carne</data>
+      <data key="dn1">n1029</data>
+      <data key="dn13">21</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n22">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // qui // cat@pron type@rel gender@neut num@sing case@acc","Latin // qui // cat@pron type@rel gender@neut num@sing case@nom"],"language":"Latin","string":"quod"}]</data>
+      <data key="dn14">quod</data>
+      <data key="dn1">n1030</data>
+      <data key="dn13">22</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n23">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // omnis // cat@adj gender@masc num@pl case@acc","Latin // omnis // cat@adj gender@masc num@pl case@nom","Latin // omnis // cat@adj gender@masc num@pl case@voc","Latin // omnis // cat@adj gender@fem num@pl case@nom","Latin // omnis // cat@adj gender@fem num@pl case@acc","Latin // omnis // cat@adj gender@fem num@pl case@voc"],"language":"Latin","string":"omnes"}]</data>
+      <data key="dn14">omnes</data>
+      <data key="dn1">n1031</data>
+      <data key="dn13">23</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n24">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // iustus // cat@adj gender@masc num@pl case@nom","Latin // iustus // cat@adj gender@masc num@sing case@gen","Latin // iustus // cat@adj gender@neut num@sing case@gen","Latin // iustus // cat@adj gender@masc num@pl case@voc"],"language":"Latin","string":"iusti"}]</data>
+      <data key="dn14">iusti</data>
+      <data key="dn1">n1032</data>
+      <data key="dn13">24</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n25">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // sed // cat@conj"],"language":"Latin","form":"Latin // sed // cat@conj","is_disambiguated":"1","string":"sed"}]</data>
+      <data key="dn14">sed</data>
+      <data key="dn1">n1034</data>
+      <data key="dn13">25</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n26">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // animus // cat@noun gender@masc num@sing case@dat","Latin // animus // cat@noun gender@masc num@sing case@abl"],"language":"Latin","string":"animo"}]</data>
+      <data key="dn14">animo</data>
+      <data key="dn1">n1035</data>
+      <data key="dn13">26</data>
+      <data key="dn2">1</data>
+    </node>
+    <node id="n27">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // habito // cat@verb mode@ind tense@pres pers@3 num@sing voice@act"],"language":"Latin","form":"Latin // habito // cat@verb mode@ind tense@pres pers@3 num@sing voice@act","is_disambiguated":"1","string":"habitat"}]</data>
+      <data key="dn14">habitat</data>
+      <data key="dn1">r1012.2</data>
+      <data key="dn13">9</data>
+      <data key="dn2">0</data>
+    </node>
+    <node id="n28">
+      <data key="dn10">Latin</data>
+      <data key="dn11">[{"wordform_matchlist":["Latin // ita // cat@conj"],"language":"Latin","form":"Latin // ita // cat@conj","is_disambiguated":"1","string":"itaque"}]</data>
+      <data key="dn14">itaque</data>
+      <data key="dn1">r1019.0</data>
+      <data key="dn13">12</data>
+      <data key="dn2">0</data>
+    </node>
+    <edge source="n1" target="n2" id="e0">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n1" target="n2" id="e1">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n1" target="n2" id="e2">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n1" target="n2" id="e3">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n1" target="n2" id="e4">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n1" target="n2" id="e5">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n1" target="n2" id="e6">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n1" target="n2" id="e7">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n1" target="n2" id="e8">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n1" target="n2" id="e9">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n1" target="n2" id="e10">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n1" target="n2" id="e11">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n1" target="n2" id="e12">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n1" target="n2" id="e13">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n1" target="n2" id="e14">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n1" target="n2" id="e15">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n1" target="n2" id="e16">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n2" target="n3" id="e17">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n2" target="n3" id="e18">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n2" target="n3" id="e19">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n2" target="n3" id="e20">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n2" target="n3" id="e21">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n2" target="n3" id="e22">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n2" target="n3" id="e23">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n2" target="n3" id="e24">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n2" target="n3" id="e25">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n2" target="n3" id="e26">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n2" target="n3" id="e27">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n2" target="n3" id="e28">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n2" target="n3" id="e29">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n2" target="n3" id="e30">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n2" target="n3" id="e31">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n2" target="n3" id="e32">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n2" target="n3" id="e33">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n2" target="n3" id="e34">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n3" target="n4" id="e35">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n3" target="n4" id="e36">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n3" target="n4" id="e37">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n3" target="n4" id="e38">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n3" target="n4" id="e39">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n3" target="n4" id="e40">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n3" target="n4" id="e41">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n3" target="n4" id="e42">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n3" target="n4" id="e43">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n3" target="n4" id="e44">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n3" target="n4" id="e45">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n3" target="n4" id="e46">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n3" target="n4" id="e47">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n3" target="n4" id="e48">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n3" target="n4" id="e49">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n3" target="n4" id="e50">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n3" target="n4" id="e51">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n3" target="n4" id="e52">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n4" target="n5" id="e53">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n4" target="n5" id="e54">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n4" target="n5" id="e55">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n4" target="n5" id="e56">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n4" target="n5" id="e57">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n4" target="n5" id="e58">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n4" target="n5" id="e59">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n4" target="n5" id="e60">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n4" target="n5" id="e61">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n4" target="n5" id="e62">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n4" target="n5" id="e63">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n4" target="n5" id="e64">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n4" target="n5" id="e65">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n4" target="n5" id="e66">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n4" target="n5" id="e67">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n4" target="n5" id="e68">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n4" target="n5" id="e69">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n4" target="n5" id="e70">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n5" target="n6" id="e71">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n5" target="n6" id="e72">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n5" target="n6" id="e73">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n5" target="n6" id="e74">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n5" target="n6" id="e75">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n5" target="n6" id="e76">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n5" target="n6" id="e77">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n5" target="n6" id="e78">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n5" target="n6" id="e79">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n5" target="n6" id="e80">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n5" target="n6" id="e81">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n5" target="n6" id="e82">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n5" target="n6" id="e83">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n5" target="n6" id="e84">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n5" target="n6" id="e85">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n5" target="n6" id="e86">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n5" target="n6" id="e87">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n5" target="n6" id="e88">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n6" target="n7" id="e89">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n6" target="n7" id="e90">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n6" target="n7" id="e91">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n6" target="n7" id="e92">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n6" target="n7" id="e93">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n6" target="n7" id="e94">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n6" target="n7" id="e95">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n6" target="n7" id="e96">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n6" target="n7" id="e97">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n6" target="n7" id="e98">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n6" target="n7" id="e99">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n6" target="n7" id="e100">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n6" target="n7" id="e101">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n6" target="n7" id="e102">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n6" target="n8" id="e103">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n6" target="n8" id="e104">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n6" target="n8" id="e105">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n6" target="n8" id="e106">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n7" target="n8" id="e107">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n7" target="n8" id="e108">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n7" target="n8" id="e109">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n7" target="n8" id="e110">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n7" target="n8" id="e111">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n7" target="n8" id="e112">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n7" target="n8" id="e113">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n7" target="n8" id="e114">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n7" target="n8" id="e115">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n7" target="n8" id="e116">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n7" target="n8" id="e117">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n7" target="n8" id="e118">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n7" target="n8" id="e119">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n7" target="n8" id="e120">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n8" target="n9" id="e121">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n8" target="n9" id="e122">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n8" target="n9" id="e123">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n8" target="n9" id="e124">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n8" target="n9" id="e125">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n8" target="n9" id="e126">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n8" target="n9" id="e127">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n8" target="n9" id="e128">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n8" target="n9" id="e129">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n8" target="n9" id="e130">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n8" target="n9" id="e131">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n8" target="n9" id="e132">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n8" target="n9" id="e133">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n8" target="n9" id="e134">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n8" target="n9" id="e135">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n8" target="n9" id="e136">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n8" target="n9" id="e137">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n8" target="n9" id="e138">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n9" target="n27" id="e139">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n9" target="n27" id="e140">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n9" target="n27" id="e141">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n9" target="n27" id="e142">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n9" target="n10" id="e143">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n9" target="n10" id="e144">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n9" target="n10" id="e145">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n9" target="n10" id="e146">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n9" target="n10" id="e147">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n9" target="n10" id="e148">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n9" target="n10" id="e149">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n9" target="n11" id="e150">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n9" target="n11" id="e151">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n9" target="n11" id="e152">
+      <data key="de2"> (a.c.)</data>
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n9" target="n11" id="e153">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n9" target="n11" id="e154">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n9" target="n11" id="e155">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n9" target="n11" id="e156">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n9" target="n11" id="e157">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n10" target="n11" id="e158">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n10" target="n11" id="e159">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n10" target="n11" id="e160">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n10" target="n11" id="e161">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n10" target="n11" id="e162">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n10" target="n11" id="e163">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n10" target="n11" id="e164">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n10" target="n11" id="e165">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n10" target="n11" id="e166">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n10" target="n11" id="e167">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n10" target="n11" id="e168">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n11" target="n28" id="e169">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n11" target="n28" id="e170">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n11" target="n28" id="e171">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n11" target="n28" id="e172">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n11" target="n28" id="e173">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n11" target="n28" id="e174">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n11" target="n28" id="e175">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n11" target="n28" id="e176">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n11" target="n28" id="e177">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n11" target="n28" id="e178">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n11" target="n28" id="e179">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n11" target="n28" id="e180">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n11" target="n12" id="e181">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n11" target="n12" id="e182">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n11" target="n12" id="e183">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n11" target="n12" id="e184">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n11" target="n12" id="e185">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n11" target="n12" id="e186">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n12" target="n13" id="e187">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n12" target="n13" id="e188">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n12" target="n13" id="e189">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n12" target="n13" id="e190">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n12" target="n13" id="e191">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n12" target="n13" id="e192">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n13" target="n14" id="e193">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n13" target="n14" id="e194">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n13" target="n14" id="e195">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n13" target="n14" id="e196">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n13" target="n14" id="e197">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n13" target="n14" id="e198">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n13" target="n14" id="e199">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n13" target="n14" id="e200">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n13" target="n14" id="e201">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n13" target="n14" id="e202">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n13" target="n14" id="e203">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n13" target="n14" id="e204">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n13" target="n14" id="e205">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n13" target="n14" id="e206">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n13" target="n14" id="e207">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n13" target="n14" id="e208">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n13" target="n14" id="e209">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n13" target="n14" id="e210">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n14" target="n15" id="e211">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n14" target="n15" id="e212">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n14" target="n15" id="e213">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n14" target="n15" id="e214">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n14" target="n15" id="e215">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n14" target="n15" id="e216">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n14" target="n15" id="e217">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n14" target="n15" id="e218">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n14" target="n15" id="e219">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n14" target="n15" id="e220">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n14" target="n15" id="e221">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n14" target="n15" id="e222">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n14" target="n15" id="e223">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n14" target="n15" id="e224">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n14" target="n15" id="e225">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n14" target="n15" id="e226">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n14" target="n15" id="e227">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n14" target="n15" id="e228">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n15" target="n16" id="e229">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n15" target="n16" id="e230">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n15" target="n16" id="e231">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n15" target="n16" id="e232">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n15" target="n16" id="e233">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n15" target="n16" id="e234">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n15" target="n16" id="e235">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n15" target="n16" id="e236">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n15" target="n16" id="e237">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n15" target="n16" id="e238">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n15" target="n16" id="e239">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n15" target="n16" id="e240">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n15" target="n16" id="e241">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n15" target="n16" id="e242">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n15" target="n16" id="e243">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n15" target="n16" id="e244">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n15" target="n16" id="e245">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n15" target="n16" id="e246">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n16" target="n17" id="e247">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n16" target="n17" id="e248">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n16" target="n17" id="e249">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n16" target="n17" id="e250">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n16" target="n17" id="e251">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n16" target="n17" id="e252">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n16" target="n17" id="e253">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n16" target="n17" id="e254">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n16" target="n17" id="e255">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n16" target="n17" id="e256">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n16" target="n17" id="e257">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n16" target="n17" id="e258">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n16" target="n17" id="e259">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n16" target="n17" id="e260">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n16" target="n17" id="e261">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n16" target="n17" id="e262">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n16" target="n17" id="e263">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n16" target="n17" id="e264">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n17" target="n18" id="e265">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n17" target="n18" id="e266">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n17" target="n18" id="e267">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n17" target="n18" id="e268">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n17" target="n18" id="e269">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n17" target="n18" id="e270">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n17" target="n18" id="e271">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n17" target="n18" id="e272">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n17" target="n18" id="e273">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n17" target="n18" id="e274">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n17" target="n18" id="e275">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n17" target="n18" id="e276">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n17" target="n18" id="e277">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n17" target="n18" id="e278">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n17" target="n18" id="e279">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n17" target="n18" id="e280">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n17" target="n18" id="e281">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n17" target="n18" id="e282">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n18" target="n19" id="e283">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n18" target="n19" id="e284">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n18" target="n19" id="e285">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n18" target="n19" id="e286">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n18" target="n19" id="e287">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n18" target="n19" id="e288">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n18" target="n19" id="e289">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n18" target="n19" id="e290">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n18" target="n19" id="e291">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n18" target="n19" id="e292">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n18" target="n19" id="e293">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n18" target="n19" id="e294">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n18" target="n19" id="e295">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n18" target="n19" id="e296">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n18" target="n19" id="e297">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n18" target="n19" id="e298">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n18" target="n19" id="e299">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n18" target="n19" id="e300">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n19" target="n20" id="e301">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n19" target="n20" id="e302">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n19" target="n20" id="e303">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n19" target="n20" id="e304">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n19" target="n20" id="e305">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n19" target="n20" id="e306">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n19" target="n20" id="e307">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n19" target="n20" id="e308">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n19" target="n20" id="e309">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n19" target="n20" id="e310">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n19" target="n20" id="e311">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n19" target="n20" id="e312">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n19" target="n20" id="e313">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n19" target="n20" id="e314">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n19" target="n20" id="e315">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n19" target="n20" id="e316">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n19" target="n20" id="e317">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n19" target="n20" id="e318">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n20" target="n21" id="e319">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n20" target="n21" id="e320">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n20" target="n21" id="e321">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n20" target="n21" id="e322">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n20" target="n21" id="e323">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n20" target="n21" id="e324">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n20" target="n21" id="e325">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n20" target="n21" id="e326">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n20" target="n21" id="e327">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n20" target="n21" id="e328">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n20" target="n21" id="e329">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n20" target="n21" id="e330">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n20" target="n21" id="e331">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n20" target="n21" id="e332">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n20" target="n21" id="e333">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n20" target="n21" id="e334">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n20" target="n21" id="e335">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n20" target="n21" id="e336">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n21" target="n22" id="e337">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n21" target="n22" id="e338">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n21" target="n22" id="e339">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n21" target="n22" id="e340">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n21" target="n22" id="e341">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n21" target="n22" id="e342">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n21" target="n22" id="e343">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n21" target="n22" id="e344">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n21" target="n22" id="e345">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n21" target="n22" id="e346">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n21" target="n22" id="e347">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n21" target="n22" id="e348">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n21" target="n22" id="e349">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n21" target="n22" id="e350">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n21" target="n22" id="e351">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n21" target="n22" id="e352">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n21" target="n22" id="e353">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n21" target="n22" id="e354">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n22" target="n23" id="e355">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n22" target="n23" id="e356">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n22" target="n23" id="e357">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n22" target="n23" id="e358">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n22" target="n23" id="e359">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n22" target="n23" id="e360">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n22" target="n23" id="e361">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n22" target="n23" id="e362">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n22" target="n23" id="e363">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n22" target="n23" id="e364">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n22" target="n23" id="e365">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n22" target="n23" id="e366">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n22" target="n23" id="e367">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n22" target="n23" id="e368">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n22" target="n23" id="e369">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n22" target="n23" id="e370">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n22" target="n23" id="e371">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n22" target="n23" id="e372">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n23" target="n24" id="e373">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n23" target="n24" id="e374">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n23" target="n24" id="e375">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n23" target="n24" id="e376">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n23" target="n24" id="e377">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n23" target="n24" id="e378">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n23" target="n24" id="e379">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n23" target="n24" id="e380">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n23" target="n24" id="e381">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n23" target="n24" id="e382">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n23" target="n24" id="e383">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n23" target="n24" id="e384">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n23" target="n24" id="e385">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n23" target="n24" id="e386">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n23" target="n24" id="e387">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n23" target="n24" id="e388">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n23" target="n24" id="e389">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n23" target="n24" id="e390">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n24" target="n25" id="e391">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n24" target="n25" id="e392">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n24" target="n25" id="e393">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n24" target="n25" id="e394">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n24" target="n25" id="e395">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n24" target="n25" id="e396">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n24" target="n25" id="e397">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n24" target="n25" id="e398">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n24" target="n25" id="e399">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n24" target="n25" id="e400">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n24" target="n25" id="e401">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n24" target="n25" id="e402">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n24" target="n25" id="e403">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n24" target="n25" id="e404">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n24" target="n25" id="e405">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n24" target="n25" id="e406">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n24" target="n25" id="e407">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n24" target="n26" id="e408">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n25" target="n26" id="e409">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n25" target="n26" id="e410">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n25" target="n26" id="e411">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n25" target="n26" id="e412">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n25" target="n26" id="e413">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n25" target="n26" id="e414">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n25" target="n26" id="e415">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n25" target="n26" id="e416">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n25" target="n26" id="e417">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n25" target="n26" id="e418">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n25" target="n26" id="e419">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n25" target="n26" id="e420">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n25" target="n26" id="e421">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n25" target="n26" id="e422">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n25" target="n26" id="e423">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n25" target="n26" id="e424">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n25" target="n26" id="e425">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n26" target="n0" id="e426">
+      <data key="de9">F</data>
+    </edge>
+    <edge source="n26" target="n0" id="e427">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n26" target="n0" id="e428">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n26" target="n0" id="e429">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n26" target="n0" id="e430">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n26" target="n0" id="e431">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n26" target="n0" id="e432">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n26" target="n0" id="e433">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n26" target="n0" id="e434">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n26" target="n0" id="e435">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n26" target="n0" id="e436">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n26" target="n0" id="e437">
+      <data key="de9">V10</data>
+    </edge>
+    <edge source="n26" target="n0" id="e438">
+      <data key="de9">V11</data>
+    </edge>
+    <edge source="n26" target="n0" id="e439">
+      <data key="de9">W</data>
+    </edge>
+    <edge source="n26" target="n0" id="e440">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n26" target="n0" id="e441">
+      <data key="de9">flor</data>
+    </edge>
+    <edge source="n26" target="n0" id="e442">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n26" target="n0" id="e443">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n1" target="n2" id="e444">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n27" target="n10" id="e445">
+      <data key="de9">M</data>
+    </edge>
+    <edge source="n27" target="n10" id="e446">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n27" target="n10" id="e447">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n27" target="n10" id="e448">
+      <data key="de9">ulim</data>
+    </edge>
+    <edge source="n28" target="n13" id="e449">
+      <data key="de9">L1</data>
+    </edge>
+    <edge source="n28" target="n13" id="e450">
+      <data key="de9">L2</data>
+    </edge>
+    <edge source="n28" target="n13" id="e451">
+      <data key="de9">L3</data>
+    </edge>
+    <edge source="n28" target="n13" id="e452">
+      <data key="de9">L4</data>
+    </edge>
+    <edge source="n28" target="n13" id="e453">
+      <data key="de9">L5</data>
+    </edge>
+    <edge source="n28" target="n13" id="e454">
+      <data key="de9">L6</data>
+    </edge>
+    <edge source="n28" target="n13" id="e455">
+      <data key="de9">L7</data>
+    </edge>
+    <edge source="n28" target="n13" id="e456">
+      <data key="de9">L8</data>
+    </edge>
+    <edge source="n28" target="n13" id="e457">
+      <data key="de9">L9</data>
+    </edge>
+    <edge source="n28" target="n13" id="e458">
+      <data key="de9">am</data>
+    </edge>
+    <edge source="n28" target="n13" id="e459">
+      <data key="de9">maur</data>
+    </edge>
+    <edge source="n28" target="n13" id="e460">
+      <data key="de9">ulim</data>
+    </edge>
+  </graph>
+  <graph edgedefault="directed" id="relationships" parse.edgeids="canonical" parse.edges="1" parse.nodeids="canonical" parse.nodes="29" parse.order="nodesfirst">
+    <node id="n0">
+      <data key="dn1">__END__</data>
+    </node>
+    <node id="n1">
+      <data key="dn1">__START__</data>
+    </node>
+    <node id="n10">
+      <data key="dn1">n1017</data>
+    </node>
+    <node id="n11">
+      <data key="dn1">n1018</data>
+    </node>
+    <node id="n12">
+      <data key="dn1">n1020</data>
+    </node>
+    <node id="n13">
+      <data key="dn1">n1021</data>
+    </node>
+    <node id="n14">
+      <data key="dn1">n1022</data>
+    </node>
+    <node id="n15">
+      <data key="dn1">n1023</data>
+    </node>
+    <node id="n16">
+      <data key="dn1">n1024</data>
+    </node>
+    <node id="n17">
+      <data key="dn1">n1025</data>
+    </node>
+    <node id="n18">
+      <data key="dn1">n1026</data>
+    </node>
+    <node id="n19">
+      <data key="dn1">n1027</data>
+    </node>
+    <node id="n2">
+      <data key="dn1">n1007</data>
+    </node>
+    <node id="n20">
+      <data key="dn1">n1028</data>
+    </node>
+    <node id="n21">
+      <data key="dn1">n1029</data>
+    </node>
+    <node id="n22">
+      <data key="dn1">n1030</data>
+    </node>
+    <node id="n23">
+      <data key="dn1">n1031</data>
+    </node>
+    <node id="n24">
+      <data key="dn1">n1032</data>
+    </node>
+    <node id="n25">
+      <data key="dn1">n1034</data>
+    </node>
+    <node id="n26">
+      <data key="dn1">n1035</data>
+    </node>
+    <node id="n27">
+      <data key="dn1">r1012.2</data>
+    </node>
+    <node id="n28">
+      <data key="dn1">r1019.0</data>
+    </node>
+    <node id="n3">
+      <data key="dn1">n1008</data>
+    </node>
+    <node id="n4">
+      <data key="dn1">n1009</data>
+    </node>
+    <node id="n5">
+      <data key="dn1">n1010</data>
+    </node>
+    <node id="n6">
+      <data key="dn1">n1011</data>
+    </node>
+    <node id="n7">
+      <data key="dn1">n1013</data>
+    </node>
+    <node id="n8">
+      <data key="dn1">n1014</data>
+    </node>
+    <node id="n9">
+      <data key="dn1">n1015</data>
+    </node>
+    <edge source="n7" target="n27" id="e0">
+      <data key="de5">habitat</data>
+      <data key="de6">habitat</data>
+      <data key="de8">transposition</data>
+      <data key="de7">local</data>
+    </edge>
+  </graph>
+</graphml>

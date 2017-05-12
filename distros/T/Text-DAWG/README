@@ -1,0 +1,21 @@
+Text::DAWG
+
+A class implementing string set recognition by way of directed acyclic
+word graphs.  Written mostly out of spite since someone claimed on Usenet
+that it couldn't be done in pure Perl.  Can output dot files for Graphviz
+to turn into pretty pictures.
+
+
+PREREQUISITES
+
+perl 5.8 or later.
+
+
+INSTALLATION
+
+The usual four-stroke process:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

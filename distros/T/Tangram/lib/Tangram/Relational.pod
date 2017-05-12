@@ -1,0 +1,105 @@
+=head1 NAME
+
+Tangram::Relational - Orthogonal Object Persistence in Relational Databases
+
+=head1 SYNOPSIS
+
+   use Tangram;
+
+   $schema = Tangram::Relational->schema( $hashref );
+
+   Tangram::Relational->deploy($schema, $dbh);
+
+   $storage = Tangram::Relational->connect( $schema,
+      $data_source, $username, $password );
+
+   $storage->disconnect();
+
+   Tangram::Relational->retreat($schema, $dbh);
+
+=head1 DESCRIPTION
+
+This is the entry point in the vanilla object-relational persistence
+backend. Vendor-specific backends should be used when they
+exist. Currently Mysql, Sybase and Oracle have such backends; see
+L<Tangram::mysql>, L<Tangram::Sybase> and L<Tangram::Oracle>.
+
+More backends could be added in the future; they might implement
+persistence in XML documents, pure object databases, using C database
+libraries to bypass the need for an RDBMS, etc.
+
+=head1 CLASS METHODS
+
+=head2 schema
+
+   $schema = Tangram::Relational->schema( $hashref );
+
+Returns a new Schema object. See L<Tangram::Schema>. 
+
+=head2 deploy
+
+   Tangram::Relational->deploy($schema);
+   Tangram::Relational->deploy($schema, HANDLE);
+   Tangram::Relational->deploy($schema, @dbi_args);
+
+Writes SQL statements for preparing a database for use with the given
+$schema.
+
+Called with a single argument, writes SQL statements to STDOUT.
+
+Called with two arguments, writes SQL statements to HANDLE. HANDLE may
+be a DBI connection handle or a file handle.
+
+Called with more than two arguments, passes all but the first to
+DBI::connect() and writes statements to the resulting DBI handle,
+which is automatically closed.
+
+The SQL code is only guaranteed to work on newly created databases.
+
+=head2 connect
+
+   $storage = Tangram::Relational->connect( $schema,
+      $data_source, $user, $password, \%options )
+
+Connects to a storage and return a handle object. Dies in case of
+failure.
+
+$schema is a Schema object describing the system of
+classes stored in the database.
+
+$data_source, $user and $password are passed directly to
+DBI::connect().
+
+\%options is a reference to a hash containing connection options. See
+L<Tangram::Storage> for a description of available options.
+
+=head2 retreat
+
+   Tangram::Relational->retreat($schema);
+   Tangram::Relational->retreat($schema, HANDLE);
+   Tangram::Relational->retreat($schema, @dbi_args);
+
+Remove the tables created by deploy(). Only guaranteed to work against
+a database that was deployed using exactly the same schema.
+
+For an explanation of the possible argument lists, see L<deploy>.
+
+=head1 WRITING A VENDOR DRIVER
+
+Like Charles Moore (inventor of Forth) used to say, "standards are
+great, everybody should have one!".
+
+Tangram can take advantage of extensions available in some SQL
+dialects.
+
+To create a vendor-specific driver, call it C<Tangram::Foo> (where
+C<Foo> is the name of the DBI driver, as would be selected with the
+DBI connection string C<dbi:Foo:>), and derive C<Tangram::Relational>.
+
+For now, the existing back-ends should be used as examples of how to
+extend Tangram to support different databases or utilise some of their
+more exotic features.
+
+=cut
+
+

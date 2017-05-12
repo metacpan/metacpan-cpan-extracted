@@ -1,0 +1,20 @@
+
+* {
+  border: 1px solid black !IMPORTANT;
+  margin: 5px;
+  padding: 5px;
+border-spacing: 5px;
+}
+
+div.header {
+  background: rgb(255,230,230);
+}
+div.body {
+  background: rgb(230,255,230);
+}
+div.footer {
+  background: rgb(230,230,255);
+}
+div.panels {
+  background: rgb(255,230,255);
+}

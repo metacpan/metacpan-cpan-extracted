@@ -1,0 +1,51 @@
+{
+   "abstract" : "detailed diagnostics for your reference tracking tests",
+   "author" : [
+      "Olivier Mengu\u00c3\u00a9 <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-DiagRef",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::FindRef" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Devel::FindRef" : "0"
+         },
+         "requires" : {
+            "Exporter" : "5.57",
+            "Test::More" : "0",
+            "perl" : "5"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dolmen/p5-Test-DiagRef",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dolmen/p5-Test-DiagRef.git",
+         "web" : "https://github.com/dolmen/p5-Test-DiagRef"
+      }
+   },
+   "version" : "1.132080"
+}
+

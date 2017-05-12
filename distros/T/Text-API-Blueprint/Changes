@@ -1,0 +1,14 @@
+Revision history for Text-API-Blueprint
+
+0.003 2016-02-04
+ - fix problem with Dist::Zilla of last release
+
+0.002 2016-02-03
+ - make host and name for Compile() optional
+ - allow paragraphs via ArrayRef in Intro, Resource, Action and Payload
+   description
+
+0.001 2016-02-02
+ - Initial release
+
+0.000 0000-00-00

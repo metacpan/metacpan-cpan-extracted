@@ -1,0 +1,6 @@
+<config>
+  <pattern name="DATACENTER-ndc">
+    <inclusion>^corp-</inclusion>
+    <tag>market</tag>
+  </pattern>
+</config>

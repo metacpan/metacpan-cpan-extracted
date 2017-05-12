@@ -1,0 +1,11 @@
+lib/Template/Plugin/XML/Feed.pm
+Makefile.PL
+Build.PL
+MANIFEST			This list of files
+META.yml
+README
+Changes
+t/pod.t
+t/pod_coverage.t
+t/rss.t
+t/xml/example.rdf

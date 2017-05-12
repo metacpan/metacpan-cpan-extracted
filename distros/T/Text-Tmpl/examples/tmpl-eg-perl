@@ -1,0 +1,23 @@
+use strict;
+use diagnostics;
+
+use Text::Tmpl;
+
+use constant TEMPLATE => 'tmpl-eg.tmpl';
+
+my $t = new Text::Tmpl;
+
+$t->set_strip(0);
+
+$t->set_value("var1", "value1");
+$t->set_value("var2", "value2");
+
+for (my $i = 1; $i <= 10; $i++)
+{
+    my $iter = $t->loop_iteration("loop1");
+
+    $iter->set_value("loopvar1", "loopvalue1");
+    $iter->set_value("loopvar2", "loopvalue2");
+}
+
+print $t->parse_file(TEMPLATE);

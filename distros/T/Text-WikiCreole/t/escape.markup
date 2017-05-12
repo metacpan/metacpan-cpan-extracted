@@ -1,0 +1,35 @@
+use the escape character to stop
+~{{{ 
+nowiki blocks from being
+nowiki blocks
+}}}
+
+~* escape lists
+
+* you can also
+~* escape the second list item
+
+~= escape a heading
+
+~: escape an indented paragraph
+
+escape a horizontal line
+~-----
+
+~| escape a | table
+~| r2c1 | rc2c |
+
+~{{{
+escape nowiki ** with bold in it **
+}}}
+
+~; escape definition lists
+~: like so
+
+you can also escape inline markup 
+like ~** bold ~**, ~// italics~//, ~\\ newlines, 
+~[[ links ]], ~{{images}}, etc
+
+
+
+

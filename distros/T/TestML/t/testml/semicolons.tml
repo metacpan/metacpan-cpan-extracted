@@ -1,0 +1,10 @@
+# Trailing semicolons are allowed, but we only allow one statement per line in
+# TestML.
+
+%TestML 0.1.0
+
+Plan = 3;
+
+'one' == 'one'
+'two' == 'two';
+'three' == 'three'

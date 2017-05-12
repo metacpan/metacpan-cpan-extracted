@@ -1,0 +1,101 @@
+h1. Test::Against - Test Data Against Formal Schemas
+
+Version: 0.100
+
+h2. WHAT IS IT
+
+This is a testing framework for comparing text or other data to formal schemas
+such as XML Schema or Document Type Declarations. It functions in a way
+similar to Test::More, exporting all the same functions that Test::More
+exports. It can be used by itself, or in conjuntion with other Test::More-
+compatible modules.
+
+h2. USING Test::AgainstSchema
+
+You use Test::AgainstSchema itself as an umbrella class for the specific kind
+of schemas you plan to test against, or you can use the specific classes
+themselves:
+
+<pre>
+<code>
+        use Test::AgainstSchema::XML;
+
+        plan tests => $NUMBER_OF_TESTS;
+
+        is_well_formed_xml($xml_file);
+        is_valid_against_dtd($dtd_file, $xml_file,
+                             "$xml_file validates against $dtd_file");
+
+        ...
+</code>
+</pre>
+
+or
+
+<pre>
+<code>
+        use Test::AgainstSchema 'XML', tests => $NUMBER;
+
+        is_well_formed_xml($xml_file);
+        is_valid_against_dtd($dtd_file, $xml_file,
+                             "$xml_file validates against $dtd_file");
+
+        ...
+</code>
+</pre>
+
+h2. BUILDING/INSTALLING
+
+This package provides a Makefile.PL file as is typical of CPAN modules.
+Building and installing is as easy as:
+
+<pre>
+<code>
+        perl Makefile.PL
+        make
+        make test
+        # If tests pass
+        make install
+</code>
+</pre>
+
+(The "make install" step may require super-user privileges.)
+
+h2. PROBLEMS/BUG REPORTS
+
+Problems, bug reports, or suggestions for enhancements can be sent to the RT
+instance set up for all CPAN-based distributions:
+
+bq. http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-AgainstSchema
+
+h2. CHANGES
+
+This is the initial release.
+
+* lib/Test/AgainstSchema.pm (added)
+* lib/Test/AgainstSchema/XML.pm (added)
+* t/10_xml/05_xml_parsing.t (added)
+* t/10_xml/10_sgmldtd.t (added)
+* t/10_xml/20_xmlschema.t (added)
+* t/10_xml/30_relaxng.t (added)
+* t/10_xml/basic_tests.pl (added)
+* t/10_xml/simple-bad.dtd (added)
+* t/10_xml/simple-bad.rng (added)
+* t/10_xml/simple-bad.xsd (added)
+* t/10_xml/simple.dtd (added)
+* t/10_xml/simple.rng (added)
+* t/10_xml/simple.xsd (added)
+* t/10_xml/xml-simple-bad.xml (added)
+* t/10_xml/xml-simple.xml (added)
+* t/90_integration/10_with_xml.t (added)
+* t/90_integration/90_empty_subclass.t (added)
+* t/90_integration/MyTestAgainstSchema.pm (added)
+* t/util.pl (added)
+* xt/00_load.t (added)
+* xt/01_pod.t (added)
+* xt/02_pod_coverage.t (added)
+* xt/03_meta.t (added)
+* xt/04_minimumversion.t (added)
+* xt/05_critic.t (added)
+
+p{margin-bottom:2em}. Initial commit of code, tests and test files.

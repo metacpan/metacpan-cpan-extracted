@@ -1,0 +1,26 @@
+Changes
+Makefile.PL
+MANIFEST			# This list of files
+MANIFEST.SKIP
+README.txt
+Indexed.pm
+Indexed.pod
+Indexed/Utf8.pm
+Indexed/Utf8.pod
+Indexed/JSON.pm
+Indexed/JSON.pod
+Indexed/Storable.pm
+Indexed/Storable.pod
+Indexed/StorableN.pm
+Indexed/StorableN.pod
+Indexed/Freeze.pm
+Indexed/Freeze.pod
+Indexed/FreezeN.pm
+Indexed/FreezeN.pod
+t/01_ini.t
+t/02_basic.t
+t/03_utf8.t
+t/04_json.t
+t/05_storable.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

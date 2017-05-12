@@ -1,0 +1,74 @@
+package Test::BDD::Cucumber::Manual::Architecture;
+
+=head1 NAME
+
+Test::BDD::Cucumber::Manual::Architecture - Structural Overview
+
+=head1 VERSION
+
+version 0.52
+
+=head1 INTRODUCTION
+
+This short document exists to give you an idea how the different components of
+this distribution fit together.
+
+=head1 MODELS
+
+The core of a Cucumber-based test suite are the feature files and the step
+definitions files. By convention, these are saved under C</features/> and
+C</features/step_definitions/> respectively.
+
+The feature files are encapsulated by the classes in
+C<Test::BDD::Cucumber::Model>.
+
+                  one to one
+ TBCM::Feature<----------------->TBCM::Document
+      |                               |
+      +-------------------+           |
+      | has many          | has a     | has many
+      V                   |           V
+ TBCM::Scenario           +----->TBCM::Line
+      |                            ^  ^
+      +----------------------------+  |
+      | has many                      |
+      V                               |
+ TBCM::Step---------------------------+
+
+=head1 EXECUTOR
+
+We build up a L<Test::BDD::Cucumber::Executor> object, in to which we load the
+step definitions. We then pass this in a L<Test::BDD::Cucumber::Model::Feature>
+object, along with a L<Test::BDD::Cucumber::Model::Harness> object, which
+controls interaction with the outside world.
+
+=head1 EXTENSION
+
+Extensions allow hooking into the execution of the steps, with pre- and post
+hooks for steps, scenarios, features and the entire execution. Extensions
+can provide additional step directories from which steps will be made
+available. The feature and scenario stashes are passed to the extension hooks
+allowing for a means of communication between the hooks and the steps.
+
+Extensions - when loaded by the pherkin test executor - receive their
+configuration from the pherkin.yaml configuration file, which works
+similar to L<the configuration of extensions in
+Behat|http://docs.behat.org/en/v2.5/guides/7.config.html#extensions>.
+
+Note: when using extensions in combination with the
+C<TAP::Parser::SourceHandler::Feature> plugin for C<prove>, there is no
+guarantee that the C<pre_execute> and C<post_execute> hooks execute
+exactly once or even execute at all.
+This is a current limitation to be lifted in a future release.
+
+=head1 AUTHOR
+
+Peter Sergeant C<pete@clueball.com>
+
+=head1 LICENSE
+
+Copyright 2011-2016, Peter Sergeant; Licensed under the same terms as Perl
+
+=cut
+
+1;

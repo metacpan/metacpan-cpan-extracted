@@ -1,0 +1,183 @@
+==================================================
+Changes from 2015-11-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 2.001 at 2016-11-06 14:33:35 +0000
+------------------------------------------
+
+  Change: 8d5239cee075ddb5667042b9167c3578f79b00ae
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-11-06 15:30:56 +0000
+
+    Added Dist::Zilla AutoPrereqs
+
+    This fixes Github issue #1 Also version-bumping is now automatic via
+    Git::NextVersion 
+
+----------------------------------------
+version 2.0 at 2016-10-26 10:20:07 +0000
+----------------------------------------
+
+  Change: 432e6bd256cbff57749dd0a35084680c44a272e9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-26 12:20:07 +0000
+
+    Migrated to Dist::Zilla 
+
+  Change: f0bc4ae46a0f830fd28e2c9e90592d0e27ed1082
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-25 22:46:03 +0000
+
+    295 new mappings for TeX::Encode::charmap
+
+    Based on the patch attached to PAUSE issue #118001
+
+    NOTE: \varphi and \varfriends are defective for the time being. They
+    will start working, when the module switches to longest prefix
+    matching. 
+
+  Change: 4a703267415cc453262b5cb79ba3e2245e8b99c9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-25 09:21:48 +0000
+
+    Added .gitignore 
+
+  Change: 1018a3324a73cd02f431889b62105790493bc365
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:14 +0000
+
+    import TeX-Encode 1.3
+
+    git-cpan-module: TeX-Encode git-cpan-version: 1.3 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 1.3 at 2016-10-25 06:29:14 +0000
+----------------------------------------
+
+  Change: 1018a3324a73cd02f431889b62105790493bc365
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:14 +0000
+
+    import TeX-Encode 1.3
+
+    git-cpan-module: TeX-Encode git-cpan-version: 1.3 git-cpan-authorid:
+    TIMBRODY 
+
+  Change: fbf1be3ed880e0088f8bd6745b114fe24da3e9c1
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:14 +0000
+
+    import TeX-Encode 1.2
+
+    git-cpan-module: TeX-Encode git-cpan-version: 1.2 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 1.1 at 2016-10-25 06:29:13 +0000
+----------------------------------------
+
+  Change: 87332167b73b6bda2c9a3b2a20b50938bf0535d2
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:13 +0000
+
+    import TeX-Encode 1.1
+
+    git-cpan-module: TeX-Encode git-cpan-version: 1.1 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 1.0 at 2016-10-25 06:29:12 +0000
+----------------------------------------
+
+  Change: 8e343e66dc83d26979abe5241c96ede4a20cc07e
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:12 +0000
+
+    import TeX-Encode 1.0
+
+    git-cpan-module: TeX-Encode git-cpan-version: 1.0 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 0.9 at 2016-10-25 06:29:11 +0000
+----------------------------------------
+
+  Change: 5b844da09c5b1ebe830aa385c7c7ccee88f81050
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:11 +0000
+
+    import TeX-Encode 0.9
+
+    git-cpan-module: TeX-Encode git-cpan-version: 0.9 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 0.8 at 2016-10-25 06:29:10 +0000
+----------------------------------------
+
+  Change: e28abe18863cf2f9a83abbcc4fbdb97b03af7fdc
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:10 +0000
+
+    import TeX-Encode 0.8
+
+    git-cpan-module: TeX-Encode git-cpan-version: 0.8 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 0.6 at 2016-10-25 06:29:09 +0000
+----------------------------------------
+
+  Change: 7ef247a9a50dd133cd26f4e136f04733d70f452a
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:09 +0000
+
+    import TeX-Encode 0.6
+
+    git-cpan-module: TeX-Encode git-cpan-version: 0.6 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 0.5 at 2016-10-25 06:29:08 +0000
+----------------------------------------
+
+  Change: f506fdc302595d8d9f96c997223211fe6365433d
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:08 +0000
+
+    import TeX-Encode 0.5
+
+    git-cpan-module: TeX-Encode git-cpan-version: 0.5 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 0.4 at 2016-10-25 06:29:07 +0000
+----------------------------------------
+
+  Change: 74516d58c859b7d6ec7338bc9c65688cde5e7d72
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:07 +0000
+
+    import TeX-Encode 0.4
+
+    git-cpan-module: TeX-Encode git-cpan-version: 0.4 git-cpan-authorid:
+    TIMBRODY 
+
+----------------------------------------
+version 0.3 at 2016-10-25 06:29:06 +0000
+----------------------------------------
+
+  Change: da2176c217a11f6a71a8633cb4287af676a009f6
+  Author: TIMBRODY <TIMBRODY@cpan.org>
+  Date : 2016-10-25 08:29:06 +0000
+
+    initial import of TeX-Encode 0.3
+
+    git-cpan-module: TeX-Encode git-cpan-version: 0.3 git-cpan-authorid:
+    TIMBRODY 
+
+================
+End of releases.
+================

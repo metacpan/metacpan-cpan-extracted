@@ -1,0 +1,27 @@
+---
+abstract: 'markdown converter that supports perl-specific extensions'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Markdown-PerlExtensions
+requires:
+  Exporter: '0'
+  Text::Balanced: '0'
+  Text::Markdown: '0'
+  parent: '0'
+  perl: v5.8.0
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/Text-Markdown-PerlExtensions
+  repository: https://github.com/neilb/Text-Markdown-PerlExtensions.git
+version: '0.06'

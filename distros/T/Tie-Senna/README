@@ -1,0 +1,63 @@
+NAME
+    Tie::Senna - Tie Senna With Hashes
+
+SYNOPSIS
+      use Tie::Senna;
+      my $senna = Senna::Index->create(...);
+
+      tie %hash, 'Tie::Senna', index => $index;
+      # tie %hash, 'Tie::Senna', index => $index, storage => \%storage;
+      $hash{$key} = $value;
+
+      foreach my $r ( tied(%hash)->search($query) ) {
+        print "matched ", $r->key, " -> score: ", $hash{$r->key}\n";
+      }
+
+DESCRIPTION
+    Tie::Senna ties an existing hash with a senna index.
+
+METHODS
+  tie(%hash, 'Tie::Senna', %args)
+    Tie a Senna with a hash. After tieing, subsequent calls to modify %hash
+    will trigger necessary changes to the underlying senna index, so you can
+    perform searches on it.
+
+    %args must contain the 'index' parameter. This must point to a
+    Senna::Index object.
+
+    You may optionally specify a reference to hash as the "storage"
+    parameter. It is recommended that you specify this, as otherwise
+    Tie::Senna will use a plain old in-memory hash, and all data will be
+    lost when the object is garbage collected. You can specify other tied
+    hashes, too:
+
+       use Tie::Senna;
+       use DB_File;
+
+       my %storage;
+       tie %storage, 'DB_File', ...;
+
+       my $index = Senna::Index->create(...);
+       my %senna;
+       tie %senna, 'Tie::Senna', index => $index, storage => \%storage;
+
+  search($query)
+    Perform a full text search on the index and returns a Senna::Cursor
+    object, or a list of Senna::Result objects in list context. You need to
+    access the tied() object from the tied hash to call this method.
+
+  storage()
+    Return a reference to the underlying hash that is used as the data
+    storage
+
+  index()
+    Return the underlying Senna::Index object being used.
+
+AUTHOR
+    (c) Copyright 2005 - Daisuke Maki <dmaki@cpan.org>.
+
+    Development funded by Brazil, Ltd. <http://b.razil.jp>
+
+SEE ALSO
+    Senna, Tie::Hash, Class::DBI::Plugin::Senna
+

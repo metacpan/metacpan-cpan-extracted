@@ -1,0 +1,7 @@
+* Resync with spec
+  * Handle \# in test descriptions, when the spec is updated for it
+  * Spaces between # and directive, and directive and reason, should be optional
+  * Clarify handling of unknown directives
+* Comprehensive test suite.
+  * Add a lot more tests in t/spec-tests/
+  * Add a test file that compares behavior to Test::Harness?

@@ -1,0 +1,23 @@
+NAME
+    Task::CVSMonitor - Install all the CPAN modules needed by CVS Monitor
+    0.6.3
+
+DESCRIPTION
+    This Task module installs all the dependencies for the current stable
+    version of CVS Monitor 0.6.3.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>, <http://ali.as/>
+
+SEE ALSO
+    Task, <http://ali.as/devel/cvsmonitor>
+
+COPYRIGHT
+    Copyright 2005 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

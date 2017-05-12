@@ -1,0 +1,98 @@
+Changelog for Text-SpeedyFx
+
+0.012 2014-12-29T12:02:05
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - Fix for issue #2 (Stanislaw Pusep)
+
+0.011 2014-06-20T12:56:59
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - Documentation update (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Sergey Romanov)
+
+0.010 2013-01-09T14:33:25
+ - documentation improvement (Stanislaw Pusep)
+ - fixed undefined symbol: DPPP_my_newSVpvn_flags (Stanislaw Pusep)
+ - nedtrie CLEAR test (Stanislaw Pusep)
+
+0.009 2013-01-06T22:37:32
+ - nedtrie test (Stanislaw Pusep)
+ - speedup (Stanislaw Pusep)
+ - documented the nedtries caveat (Stanislaw Pusep)
+ - safety check (Stanislaw Pusep)
+ - DELETE implemented (Stanislaw Pusep)
+ - README.pod update (Stanislaw Pusep)
+ - benchmark update (Stanislaw Pusep)
+ - major reorganization (Stanislaw Pusep)
+ - ++magic (Stanislaw Pusep)
+ - tied implementation complete (Stanislaw Pusep)
+ - tied NEDTRIE interface (Stanislaw Pusep)
+ - removed unnecessary speedyfx_store() (Stanislaw Pusep)
+ - realloc() breaks pointers on Linux (Stanislaw Pusep)
+ - ++overengineering (Stanislaw Pusep)
+
+0.008 2013-01-01T21:36:52
+ - renamed cosine_sim to cosine_cmp (to keep consistence with minhash_cmp)
+   (Stanislaw Pusep)
+ - fixed function name clash (_itoa already present on Win32) (Stanislaw
+   Pusep)
+
+0.007 2012-12-31T01:50:24
+ - updated benchmark results (yep, it is that faster, even on the lower
+   clock! (Stanislaw Pusep)
+ - less indirections (Stanislaw Pusep)
+ - micro-optimizations for latin1 (Stanislaw Pusep)
+ - macro rampage (Stanislaw Pusep)
+ - macros cleanup (Stanislaw Pusep)
+ - .gitignore update (Stanislaw Pusep)
+ - no more warnings under Clang (Stanislaw Pusep)
+ - added murmur to benchmark for comparison (Stanislaw Pusep)
+ - replaced sprintf() by custom itoa() (Stanislaw Pusep)
+
+0.006 2012-12-27T22:46:31
+ - minor fixes (Stanislaw Pusep)
+ - documented multibyte parsing tricks (Stanislaw Pusep)
+ - break test (Stanislaw Pusep)
+ - leak test (Stanislaw Pusep)
+ - more optimizations (Stanislaw Pusep)
+ - better utf8/latin1 tests (Stanislaw Pusep)
+ - updated benchmark results (Stanislaw Pusep)
+ - added cosine_sim utility (Stanislaw Pusep)
+ - reallocation fixed (Stanislaw Pusep)
+ - graduated the uniq_wc tool (Stanislaw Pusep)
+ - make use of PerlIO::mmap layer (Stanislaw Pusep)
+ - examples cleanup (Stanislaw Pusep)
+ - optimizations (Stanislaw Pusep)
+ - implemented variable codetable (+ raw ASCII support) (Stanislaw Pusep)
+ - variable size arrays (Stanislaw Pusep)
+ - Dist::Zilla profile update (Stanislaw Pusep)
+ - File::Slurp => File::Map (Stanislaw Pusep)
+
+0.005 2012-04-10T13:58:26
+ - feature vector reimplemented as a bit string (Stanislaw Pusep)
+ - Changelog (Stanislaw Pusep)
+
+0.004 2012-03-30T14:55:01
+ - minhash_cmp @ARGV fix (Stanislaw Pusep)
+
+0.003 2012-03-30T14:39:20
+ - oops! (Stanislaw Pusep)
+ - cast hash keys as unsigned int (Stanislaw Pusep)
+ - test separation (Stanislaw Pusep)
+ - minhash_cmp documentation (Stanislaw Pusep)
+ - eg/benchmark.pl (Stanislaw Pusep)
+
+0.002 2012-03-29T13:24:38
+ - perl v5.10.2 compatibility (Stanislaw Pusep)
+ - static fold table (Stanislaw Pusep)
+ - hash_min() (Stanislaw Pusep)
+ - min method (Stanislaw Pusep)
+ - ++MinHash utility (Stanislaw Pusep)
+
+0.001 2012-03-28T22:12:52
+ - ++documentation (Stanislaw Pusep)
+ - cleanup (Stanislaw Pusep)
+ - seed is optional (Stanislaw Pusep)
+ - ++hash_fv (Stanislaw Pusep)
+ - passes release tests (Stanislaw Pusep)
+ - INIT (Stanislaw Pusep)
+

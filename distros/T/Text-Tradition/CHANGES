@@ -1,0 +1,178 @@
+Version 2.1.0
+=============
+* Support for right-to-left and bidirectional texts
+* Enhanced logic to support normal forms of readings
+* Various bugfixes
+
+Version 2.0.0
+=============
+* Major version bump to allow minor releases for stupid mistakes
+* New "adjacency list" output format
+* Cope with Stemweb's lack of UTF-8 support
+* Various and sundry bugfixes
+
+Version 1.3
+===========
+* Deal with Moose objectification of its exceptions
+* Add functionality to merge readings according to relationship type
+* Add attributes for reading relationships to indicate their significance
+* Move custom Moose datatypes to their own package
+* Allow specification of relationship colors for SVG output
+* Allow layered witnesses to be excluded from alignment table for 
+  phylogenetic data
+* Add functionality for tab-separated alignment table
+* Limited improvements to CTE parsing
+* Various and sundry bugfixes and POD fixes
+
+Version 1.2
+===========
+* Generalize relationship scheme so that a user can define a set of 
+  relationships for each text
+* Allow witness renaming in a tradition (before collation)
+* Allow clearing of collation object
+* Enable duplication (i.e. splitting) of readings within the collation
+* Propagate relationships logically according to their transitivity properties
+* Improvements to some of the parsers
+* Various bugfixes and improved tests
+
+Version 1.1
+===========
+* Split out text morphology functionality into separate package 
+* (unreleased, available from http://github.com/tla/stemmatology -> /morphology
+
+Version 1.0
+===========
+[far, far too many commits to list individually]
+
+* Modularization / split of stemma analysis logic and morphology logic
+* Support for tradition persistence, user logic
+* Months of redesigns and bugfixes.
+
+Version 0.3
+===========
+
+commit 85030ed0b680146d92cda476df6b32a081999311
+Author: Tara L Andrews <tla\@mit.edu>
+Date:   Sun Feb 26 03:54:38 2012 +0100
+
+    remove analysis tests from CPAN module too
+
+
+Version 0.2
+===========
+
+commit 4e483aa5bae680511b62d9c77984f732ae699066
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Fri Feb 24 11:38:44 2012 +0100
+
+    merge readings properly based on join_* and wordsep
+
+commit 0ac5e75094ef0e62b940ab89b0c12d9a3287ff83
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Fri Feb 24 02:17:15 2012 +0100
+
+    fix small logic bug in pre-existing scoped relationship detection
+
+commit 7c293912d5aeee653131449d246a0f442dc8119f
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Fri Feb 24 02:11:05 2012 +0100
+
+    fix change detection bug
+
+commit ca6e6095920ad91d131ee8365872ca8501849f08
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Fri Feb 24 02:06:55 2012 +0100
+
+    handle some cases for existing scoped relationships etc.
+
+commit 629e27b0b63f69e99a5f2a82e360a4081f8d971a
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Thu Feb 23 04:47:55 2012 +0100
+
+    allow for prefix/suffix readings
+
+commit 98a6cab2686bd3c1e7174cfa340f41e05665a642
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Thu Feb 23 03:09:18 2012 +0100
+
+    add support for direct SQL query of directory
+
+commit 44a6e7af93c340e0cdec95f115d94702dc350e04
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Feb 22 21:09:52 2012 +0100
+
+    make cmp_str a noop except for the tradition that needs it
+
+commit d7ba60b4f5b9621bdb6d257a27b77696d8e2abff
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Feb 22 15:20:42 2012 +0100
+
+    restore Directory deletion, albeit without garbage collection
+
+commit 3d14b48ee0a2081fb622df2e5fa67c1dbeae3dd7
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Feb 22 15:13:51 2012 +0100
+
+    abandon 'collated' relationship removal
+
+commit c1915ab92db09d28aa270d86e5910a103d4f98cd
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Feb 22 13:12:12 2012 +0100
+
+    try to be smarter about recalculating rank and common readings
+
+commit 55bc8c78b0f3ae1eeab669e8607522ca9a886a7b
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Feb 22 12:57:07 2012 +0100
+
+    track the language of a text if applicable
+
+commit bfcbcecb79f1f863779fef01bcf8e81c0bdbe7b1
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Tue Feb 21 01:19:46 2012 +0100
+
+    don't run SVG tests unless dot is installed
+
+commit 5be0cdeb978d5ebacb5f73ecc5a7f027b7090aa7
+Author: Tara L Andrews <tla\@mit.edu>
+Date:   Fri Feb 17 16:25:28 2012 +0100
+
+    reinstate useful_variant; better handling of AC wits
+
+commit c12bb87843b49eee09f588126ac7d375046b29fd
+Author: Tara L Andrews <tla\@mit.edu>
+Date:   Fri Feb 17 15:45:40 2012 +0100
+
+    remove redundant a.c. witnesses from list
+
+commit 2acf0892d2cfca8036e2208e4f83d0404d761695
+Author: Tara L Andrews <tla\@mit.edu>
+Date:   Fri Feb 17 15:07:19 2012 +0100
+
+    add JSON serialization method
+
+commit 7c75081a2273aff7bb142564ed9f95a3c129ba1c
+Merge: 47263c9 0655d30
+Author: Tara L Andrews <tla\@mit.edu>
+Date:   Wed Feb 15 22:15:33 2012 +0100
+
+    Merge branch 'master' of github.com:tla/stemmatology
+
+commit 0655d30ce9cda59f3f25091aa4bb50e2b28c65a5
+Merge: 8ac2394 7b5da8b
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Feb 15 22:14:37 2012 +0100
+
+    revamp of Analysis.pm and associated changes
+
+commit 7b5da8b612e63f308f46a9dd4cd07795abc7cb4e
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Feb 15 22:06:03 2012 +0100
+
+    limit variant graph size
+
+commit 7f52eac8cd00b160ea9e828790cbd093dc444feb
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Mon Feb 13 23:26:04 2012 +0100
+
+    refactored Analysis module with associated changes

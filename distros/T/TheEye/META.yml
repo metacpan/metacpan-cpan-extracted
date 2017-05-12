@@ -1,0 +1,42 @@
+---
+abstract: 'TheEye is a TAP based monitoring system'
+author:
+  - 'Lenz Gschwendtner <lenz@springtimesoft.com>'
+build_requires:
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TheEye
+requires:
+  Data::Dumper: 0
+  File::ShareDir: 0
+  File::Util: 0
+  HTTP::Request: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Mouse: 0
+  Mouse::Role: 0
+  POSIX: 0
+  Sys::Hostname: 0
+  TAP::Parser: 0
+  TAP::Parser::Aggregator: 0
+  Test::More: 0
+  Time::HiRes: 0
+  URI::Escape: 0
+  XML::Simple: 0
+  lib: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/norbu09/TheEye/issues
+  homepage: https://github.com/norbu09/TheEye/wiki
+  repository: git://github.com/norbu09/TheEye.git
+version: 0.5

@@ -1,0 +1,14 @@
+---
+abstract: 'Test::Toolbox - tools for testing'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Test-Toolbox
+provides:
+    Test::Toolbox:
+        file: lib/Test/Toolbox.pm
+        version: 0.4
+requires:
+    perl: 5.003
+version: 0.4

@@ -1,0 +1,81 @@
+=head1 NAME
+
+Tk::Chart::Splines - To create lines graph as BE<eacute>zier curve. 
+
+=head1 SYNOPSIS
+
+Do not use this module. Use L<Tk::Chart::Lines>.
+
+=head1 DESCRIPTION
+
+You have to use B<Tk::Chart::Lines> module and use 
+B<-spline> and B<-bezier> options.
+
+See L<Tk::Chart::Lines/"Options for all lines graph"> and 
+L<Tk::Chart::Lines/"Options for spline lines graph">
+
+
+B<Be careful>, a BE<eacute>zier curve (L<http://en.wikipedia.org/wiki/Bezier_curve>) does not touch all points of dataset, just the extremity points.
+
+But, B<Tk::Chart::Lines> allow you to create a BE<eacute>zier curve crossing by all points (-bezier => 1 and -spline => 1).
+
+
+=head1 EXAMPLES
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use Tk;
+  use Tk::Chart::Lines;
+
+  my $mw = MainWindow->new(
+    -title      => 'bezier curve examples',
+    -background => 'white',
+  );
+  my $chart = $mw->Lines(
+    -title      => 'bezier curves',
+    -xlabel     => 'X Label',
+    -ylabel     => 'Y Label',
+    -background => 'snow',
+    -spline     => 1,
+    -bezier     => 1,     
+    -linewidth  => 2,
+  )->pack(qw / -fill both -expand 1 /);
+  
+  my @data = (
+    [ '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th' ],
+    [ 10,    30,    20,    30,    5,     41,    1,     23 ],
+    [ 10,    5,     10,    0,     17,    2,     40,    23 ],
+    [ 20,    10,    12,    20,    30,    10,    35,    12 ],
+  
+  );
+ 
+  # Add a legend to the graph
+  my @legends = ( 'legend 1', 'legend 2', 'legend 3' );
+  $chart->set_legend(
+    -title       => 'Title legend',
+    -data        => \@legends,
+    -titlecolors => 'blue',
+  );
+
+  # Add help identification
+  $chart->set_balloon();
+
+  # Create the graph
+  $chart->plot( \@data );
+
+  MainLoop();
+
+=head1 SEE ALSO
+
+See L<Tk::Chart::Lines>, L<Tk::Chart::FAQ>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2011 Djibril Ousmanou, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut

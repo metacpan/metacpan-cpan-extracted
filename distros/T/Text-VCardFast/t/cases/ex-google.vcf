@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Bloggs;Joe;;;
+FN:Joe Bloggs
+EMAIL;TYPE=INTERNET;TYPE=HOME:me@joebloggs.com
+TEL;TYPE=CELL:+44 20 1234 5678
+ADR;TYPE=HOME:;;1 Trafalgar Square;London;;WC2N;United Kingdom
+item1.URL:http\://joebloggs.com
+item1.X-ABLabel:_$!<HomePage>!$_
+X-SKYPE:joe.bloggs
+item2.URL:http\://twitter.com/test
+item2.X-ABLabel:Twitter
+END:VCARD

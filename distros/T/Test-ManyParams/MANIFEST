@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+ManyParams.pm
+README
+t/1.t
+t/CommonStuff.pm
+t/all_ok.t
+t/all_are.t
+t/all_arent.t
+t/all_params_are_passed.t
+t/any_ok.t
+t/any_isnt.t
+t/any_is.t
+t/most_ok.t
+t/seed.t
+t/implicit_var.t

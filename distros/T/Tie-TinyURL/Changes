@@ -1,0 +1,7 @@
+Version 0.02 - Thursday 1st June 2006
+	+ Added "timeout" paramater to set a specific
+	  HTTP timeout value in the LWP::UserAgent object
+
+Version 0.01 - Monday 29th May 2006
+	+ Initial release
+

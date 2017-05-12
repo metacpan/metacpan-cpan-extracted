@@ -1,0 +1,69 @@
+0.06 2016-03-23T21:19:20+01:00
+ [Tags::Output::Raw]
+ - Add test comments.
+ - Fix finalize() in SGML mode.
+ - Simple optimalization.
+
+0.05 2016-03-22T19:16:13+01:00
+ [Common]
+ - Update copyright years.
+ - Rewrite test files to better names.
+
+ [Tags::Output]
+ - Add test comments.
+ - Rewrite 'tag' to 'element' in tests.
+
+ [Tags::Output::Raw]
+ - Add some test comments.
+ - Add test for end of element.
+ - Fix sitution for end of element without begin of element in xml mode.
+ - Rewrite 'tag' to 'element' in tests.
+
+ [Tags::Utils::Preserve]
+ - Rewrite 'tag' to 'element' in tests.
+
+0.04 2015-10-27T12:39:38+01:00
+ [Common]
+ - Add cleaning of Error::Pure errors.
+ - Add Test::NoWarnings to tests.
+ - Fix tabs in code.
+ - Fix tabs in doc.
+ - Improve LICENSE AND COPYRIGHT sections in doc.
+ - Improve SEE ALSO sections in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+ [Tags::Output]
+ - Add 'METHODS TO OVERWRITE' section to doc.
+ - Improve doc in 'output_sep' parameter.
+
+ [Tags::Output::Raw]
+ - Fix 'no_simple' parameter in doc.
+ - Remove TODOs from doc.
+ - Remove default value for 'output_sep' parameter. It doesn't used in this
+   module.
+
+ [Tags::Utils::Preserve]
+ - Remove TODOs from doc.
+
+0.03 2014-11-10T06:54:17+01:00
+ [Common]
+ - Add minimal version of Perl.
+ - Update Module::Install to 1.14 version.
+ - Update LICENSE AND COPYRIGHT section in doc to my standard (bsd-2).
+
+ [Tags::Output::Raw]
+ - Fix SYNOPSIS in Tags::Output::Raw doc.
+
+ [Tags::Utils::Preserve]
+ - Improve tests.
+ - Update ERRORS section in doc.
+ - Update EXAMPLE section in doc.
+ - Update SYNOPSIS section in doc.
+
+0.02 2014-10-17T07:37:27+02:00
+ - Fix test dependencies.
+
+0.01 2014-10-13T13:33:17+02:00
+ - First version.

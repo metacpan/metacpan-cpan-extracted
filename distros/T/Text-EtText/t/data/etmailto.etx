@@ -1,0 +1,13 @@
+
+LINKS TEST
+----------
+
+mailto links: mailto:jm@nospam-jmason.org , mailto followed by a non-mail char:
+mailto:jm@nospam-jmason.org, and bare email addresses: jm@nospam-jmason.org.
+
+
+<test@test.org> test@test.org mailto:test@test.org
+<a href=mailto:test@test.org>test@test.org</a>
+<a href="mailto:test@test.org">test@test.org</a>
+<a href='mailto:test@test.org'>test@test.org</a>
+

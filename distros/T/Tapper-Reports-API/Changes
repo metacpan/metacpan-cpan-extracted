@@ -1,0 +1,56 @@
+Revision history for Tapper-Reports-API
+
+5.0.5     2016-04-07
+        - don't store empty files
+
+5.0.4     2016-03-30
+        - more explicit dependencies
+
+5.0.3     2016-03-11
+        - handling empty files
+
+5.0.2     2016-03-03
+        - let EU:MM decide bin path
+
+5.0.1     2016-03-03
+        - more details in 'mason not enabled' message
+
+5.0.0     2016-02-15
+        - use Lo4Perl for logging
+        - merge ReportsDB/TestrunDB
+        - pid/log files back'n'forth experimenting *sigh*
+
+4.1.2     2012-11-20
+        - fix missing deps
+
+4.1.1     2012-11-20
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-21
+        - sync with release version
+
+4.0.1     2012-05-16
+        - misc bugfixes everywhere
+        - [FEAT] allow pure SQL::Abstract queries in query api
+        - [FEAT] allow search by filename without report
+        - big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* rewritable shebang line
+	* enable test for TT template api
+	* release version++ roundhouse kick
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+2011-03-02  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0
+
+	* first public CPAN release

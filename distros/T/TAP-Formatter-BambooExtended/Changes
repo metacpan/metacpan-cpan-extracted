@@ -1,0 +1,9 @@
+Revision history for Perl extension TAP::Formatter::BambooExtended
+
+1.00 Sun Mar  16 20:04:18 UTC 2014
+        - Initial release.
+
+1.01 Mon Dec  8 02:37:44 UTC 2014
+	- Removing dependency on Moose
+	- Removing test that always failed due to shell escape differences
+

@@ -1,0 +1,65 @@
+---
+abstract: 'load fixture data to database.'
+author:
+  - 'Toru Yamaguchi <zigorou@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::Exception: '0'
+  Test::LoadAllModules: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Fixture-DBI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Fixture::DBI:
+    file: lib/Test/Fixture/DBI.pm
+    version: '0.09'
+  Test::Fixture::DBI::Util:
+    file: lib/Test/Fixture/DBI/Util.pm
+    version: '0.09'
+  Test::Fixture::DBI::Util::SQLite:
+    file: lib/Test/Fixture/DBI/Util/SQLite.pm
+    version: '0.09'
+  Test::Fixture::DBI::Util::mysql:
+    file: lib/Test/Fixture/DBI/Util/mysql.pm
+    version: '0.09'
+requires:
+  Carp: '0'
+  DBI: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  SQL::Abstract: '0'
+  SQL::Abstract::Plugin::InsertMulti: '0'
+  Scalar::Util: '0'
+  UNIVERSAL::require: '0'
+  YAML::Syck: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/zigorou/p5-test-fixture-dbi/issues
+  homepage: https://github.com/zigorou/p5-test-fixture-dbi
+  repository: https://github.com/zigorou/p5-test-fixture-dbi.git
+version: '0.09'
+x_contributors:
+  - 'Atsushi Kobayashi <nekokak@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'

@@ -1,0 +1,53 @@
+Revision history for Perl extension Text::TabFile.
+
+1.14  2014/03/08
+
+	Now using warnings
+
+1.13  2014/03/01
+
+	Correcting POD errors
+
+1.12  2014/02/28
+
+	Including a missing test data file.
+
+	Bumped version due to earlier upload error.
+
+	Now auto-generating META.json and META.yml
+
+	Updated meta information
+
+	Added LICENSE file to distribution
+
+1.10  2006/06/31
+
+	Provided non-capitalized method names to match Perl style as suggested
+	 by CPAN rating comments. Historic "Java-style" method names still
+	 function.
+
+	Corrected POD and docs for new method names, version changes, other
+	 grammatical errors and removed accidental references to TabFile.pm
+
+	Added two basic test scripts for historic and current method calls
+	 that parse a provided tab file.
+
+	Added initialization checks on exported methods to avoid superfluous
+	 warnings generated when -w is used.
+
+	Added credit to PetBlvd (http://www.petblvd.com) for the sponsorship
+	 of further development.
+
+1.00  2004/04/02
+
+	Full copyright and license information.
+
+	Sufficient usage to warrent a release of 1.0.
+
+0.80  2004/01/15
+
+	Derived from HMS tool Util::TabFile (1.9 2003/11/05)
+
+	Constructed to instance Text::Delimiter properly.
+
+	Module made to pass strict.

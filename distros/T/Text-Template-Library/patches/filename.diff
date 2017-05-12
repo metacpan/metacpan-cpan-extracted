@@ -1,0 +1,27 @@
+--- lib/Text/Template.pm~	2008-07-04 21:27:32.000000000 +0200
++++ lib/Text/Template.pm	2008-07-05 16:57:55.000000000 +0200
+@@ -56,6 +56,7 @@
+     my $prepend = _param('prepend', %a);
+     my $alt_delim = _param('delimiters', %a);
+     my $broken = _param('broken', %a);
++    my $filename = _param('filename', %a);
+     my $evalcache = _param('evalcache', %a);
+     unless (defined $source) {
+       require Carp;
+@@ -69,6 +70,7 @@
+ 		PREPEND => $prepend,
+                 UNTAINT => $untaint,
+                 BROKEN => $broken,
++		FILENAME => $filename,
+                 EVALCACHE => $evalcache,
+ 		(defined $alt_delim ? (DELIM => $alt_delim) : ()),
+ 	       };
+@@ -260,7 +262,7 @@
+   my $fi_ofh = _param('output', %fi_a);
+   my $fi_eval_package;
+   my $fi_scrub_package = 0;
+-  my $fi_filename = _param('filename') || $fi_self->{FILENAME} || 'template';
++  my $fi_filename = _param('filename', %fi_a) || $fi_self->{FILENAME} || 'template';
+   my $fi_evalcache = _param('evalcache', %fi_a)  || $fi_self->{EVALCACHE};
+ 
+   my $fi_prepend = _param('prepend', %fi_a);

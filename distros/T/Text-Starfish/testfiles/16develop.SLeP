@@ -1,0 +1,4 @@
+<? $Star->setStyle('TeX');
+   $Star->addHook("\n%Dbegin","\n%Dend",'s/\n%!/\n/g');
+   $Star->addHook("\n%Rbegin","\n%Rend",'s/\n(?:%!)?/\n%!/g');
+!>

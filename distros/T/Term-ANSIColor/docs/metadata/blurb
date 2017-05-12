@@ -1,0 +1,5 @@
+Term::ANSIColor provides constants and simple functions for setting ANSI
+text attributes, most notably colors.  It can be used to set the current
+text attributes or to apply a set of attributes to a string and reset the
+current text attributes at the end of that string.  Eight-color,
+sixteen-color, and 256-color escape sequences are all supported.

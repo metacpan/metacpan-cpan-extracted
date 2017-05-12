@@ -1,0 +1,46 @@
+TUWF - The Ultimate Website Framework
+-------------------------------------
+
+This package provides the following set of modules:
+
+  TUWF
+  TUWF::DB
+  TUWF::Misc
+  TUWF::Request
+  TUWF::Response
+  TUWF::XML
+
+Documentation for each of these modules is provided in a .pod file along
+their .pm implementations. Check out the documentation of the main TUWF
+module for a general introduction.
+
+
+Optional dependencies:
+  (Perl core modules not listed)
+
+  DBI              for SQL functionality (TUWF::DB)
+  FCGI             to run in a FastCGI environment
+  PerlIO::gzip     output compression
+
+
+Installing:
+
+  If you have obtained a TUWF package and do not have Module::Build installed:
+
+    perl Makefile.PL
+    make
+    make install
+
+  Otherwise:
+
+    perl Build.PL
+    ./Build
+    ./Build install
+
+
+Contact
+
+  Homepage: http://dev.yorhel.nl/tuwf
+       Git: http://g.blicky.net/tuwf.git/
+     Email: projects@yorhel.nl
+

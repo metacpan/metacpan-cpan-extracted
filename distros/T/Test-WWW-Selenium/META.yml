@@ -1,0 +1,63 @@
+---
+abstract: 'Perl Client for the Selenium Remote Control test tool'
+author:
+  - 'Maintained by: Matt Phillips <mattp@cpan.org>, Luke Closs <lukec@cpan.org>'
+  - 'Originally by Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Spec: 0
+  File::Temp: 0
+  FindBin: 0
+  Test::Builder::Tester: 0
+  Test::Exception: 0
+  Test::Mock::LWP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-WWW-Selenium
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - util
+provides:
+  Devel::REPL::Plugin::Selenium:
+    file: lib/Devel/REPL/Plugin/Selenium.pm
+    version: 1.36
+  Test::WWW::Selenium:
+    file: lib/Test/WWW/Selenium.pm
+    version: 1.36
+  WWW::Selenium:
+    file: lib/WWW/Selenium.pm
+    version: 1.36
+  WWW::Selenium::Util:
+    file: lib/WWW/Selenium/Util.pm
+    version: 1.36
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Exporter: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  IO::Socket: 0
+  LWP::UserAgent: 0
+  Test::Builder: 0
+  Test::More: 0
+  Time::HiRes: 0
+  URI::Escape: 0
+  base: 0
+  namespace::clean: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-WWW-Selenium
+  homepage: https://github.com/lukec/cpan-selenium-rc-perl
+  repository: https://github.com/lukec/cpan-selenium-rc-perl.git
+version: 1.36

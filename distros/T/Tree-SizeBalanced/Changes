@@ -1,0 +1,44 @@
+Revision history for Perl extension Tree::SizeBalanced.
+
+2.006002    2016.9.2
+            Fix link url in the document.
+
+2.006001    2016.9.2
+            Add benchmark/, and add benchmark result into document.
+
+2.006000    2016.8.22
+            rearrange cntr field order to avoid tiny crash probability with Data::Dumper
+            remove unnamed struct and union for older c compiler
+
+2.005000    2016.8.20
+            c compiler option -std=gnu99 -> -std=c11 for ISO compiler
+
+2.004000    2016.8.20
+            c compiler option -std=c99 -> -std=gnu99 for unnamed union
+
+2.003000    2016.8.20
+            reorder key field to fix polymorphic type function error
+
+2.002000    2016.8.19
+            fix incorrect Export
+
+2.001001    2016.8.19
+            fix document
+
+2.001000    2016.8.19
+            remove unused UNKNOWN/MIN/MAX value code, and fix document
+
+2.000000    2016.8.19
+            add bulk query, and make methods sensitive to the inserting order
+
+1.003000    2016.8.15
+            add default type constructor, MANIFEST generated SizeBalanced.pm file for cpan document
+
+1.002000    2016.8.15
+            add missing pTHX / aTHX
+
+1.001000    2016.8.15
+            Add missing files into MANIFEST
+
+1.000000    2016.8.14
+            A bran new package

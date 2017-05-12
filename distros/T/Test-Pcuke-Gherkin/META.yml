@@ -1,0 +1,57 @@
+---
+abstract: 'roll your own cucumber'
+author:
+  - "\"Andrei V. Toutoukine\" <\"tut@isuct.ru\">"
+build_requires:
+  Exporter: 0
+  FindBin: 0
+  Mock::Quick: 0
+  Scalar::Util: 0
+  Test::Most: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Pcuke-Gherkin
+provides:
+  Test::Pcuke::Gherkin:
+    file: lib/Test/Pcuke/Gherkin.pm
+    version: 0.000003
+  Test::Pcuke::Gherkin::Executor:
+    file: lib/Test/Pcuke/Gherkin/Executor.pm
+  Test::Pcuke::Gherkin::Executor::Status:
+    file: lib/Test/Pcuke/Gherkin/Executor/Status.pm
+  Test::Pcuke::Gherkin::I18n:
+    file: lib/Test/Pcuke/Gherkin/I18n.pm
+  Test::Pcuke::Gherkin::Lexer:
+    file: lib/Test/Pcuke/Gherkin/Lexer.pm
+    version: 0.000001
+  Test::Pcuke::Gherkin::Node:
+    file: lib/Test/Pcuke/Gherkin/Node.pm
+  Test::Pcuke::Gherkin::Node::Background:
+    file: lib/Test/Pcuke/Gherkin/Node/Background.pm
+  Test::Pcuke::Gherkin::Node::Feature:
+    file: lib/Test/Pcuke/Gherkin/Node/Feature.pm
+  Test::Pcuke::Gherkin::Node::Outline:
+    file: lib/Test/Pcuke/Gherkin/Node/Outline.pm
+  Test::Pcuke::Gherkin::Node::Scenario:
+    file: lib/Test/Pcuke/Gherkin/Node/Scenario.pm
+  Test::Pcuke::Gherkin::Node::Scenarios:
+    file: lib/Test/Pcuke/Gherkin/Node/Scenarios.pm
+  Test::Pcuke::Gherkin::Node::Step:
+    file: lib/Test/Pcuke/Gherkin/Node/Step.pm
+  Test::Pcuke::Gherkin::Node::Table:
+    file: lib/Test/Pcuke/Gherkin/Node/Table.pm
+  Test::Pcuke::Gherkin::Node::Table::Row:
+    file: lib/Test/Pcuke/Gherkin/Node/Table/Row.pm
+  Test::Pcuke::Gherkin::Parser:
+    file: lib/Test/Pcuke/Gherkin/Parser.pm
+requires:
+  Carp: 0
+  Scalar::Util: 0
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 0.000003

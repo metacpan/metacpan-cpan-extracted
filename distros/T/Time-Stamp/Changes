@@ -1,0 +1,32 @@
+Revision history for Time-Stamp
+
+1.300     2013-01-10T03:34:01Z
+
+  [Bug Fixes]
+  - Preserve leading zeros in fractions when microseconds
+    are less_than 100_000.
+
+  - Drop the 'CORE::' prefix from calls to built-ins
+    so that time() can be overridden (mocked in tests, etc).
+
+1.200     2012-05-21T18:02:33Z
+
+  - Enable fractional seconds in timestamps
+    and handle them correctly in parsers
+
+1.003     2012-01-17T20:46:12Z
+
+  - Enable shortcuts like 'gm-compact' to simplify one-liners
+
+1.002     2011-07-15T00:22:07Z
+
+  - Superficial dist/release changes
+
+1.001     2011-03-24T16:21:01Z
+
+  - Added functions for parsing the timestamps back into epoch-seconds
+  - Documentation fixes
+
+1.000     2011-03-17T18:46:23Z
+
+  - Initial release to CPAN

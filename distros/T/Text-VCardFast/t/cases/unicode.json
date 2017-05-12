@@ -1,0 +1,15 @@
+{
+   "objects" : [
+      {
+         "type" : "vcard",
+         "properties" : {
+            "val" : [
+               {
+                  "value" : "а и м т щ. А И М Т Щ",
+                  "name" : "val"
+               }
+            ]
+         }
+      }
+   ]
+}

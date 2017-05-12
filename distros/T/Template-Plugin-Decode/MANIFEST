@@ -1,0 +1,7 @@
+MANIFEST
+Changes
+README
+Makefile.PL
+lib/Template/Plugin/Decode.pm
+t/00_compile.t
+META.yml                                 Module meta-data (added by MakeMaker)

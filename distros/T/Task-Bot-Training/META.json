@@ -1,0 +1,38 @@
+{
+   "abstract" : "Install all known L<Bot::Training> modules",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "build_requires" : {
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Test::More" : "0"
+   },
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.31"
+   },
+   "generated_by" : "Dist::Zilla version 2.101170",
+   "license" : "perl",
+   "meta-spec" : {
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html",
+      "version" : 1.4
+   },
+   "name" : "Task-Bot-Training",
+   "no_index" : {},
+   "recommends" : {},
+   "requires" : {
+      "Bot::Training" : "0",
+      "Bot::Training::MegaHAL" : "0",
+      "Bot::Training::StarCraft" : "0",
+      "perl" : "5.010"
+   },
+   "resources" : {
+      "Ratings" : "http://cpanratings.perl.org/d/Task-Bot-Training",
+      "bugtracker" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Bot-Training",
+      "homepage" : "http://search.cpan.org/dist/Task-Bot-Training/",
+      "license" : "http://dev.perl.org/licenses/",
+      "repository" : "http://github.com/avar/task-bot-training"
+   },
+   "version" : "0.02"
+}
+

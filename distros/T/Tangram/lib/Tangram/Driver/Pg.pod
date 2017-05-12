@@ -1,0 +1,50 @@
+=head1 NAME
+
+Tangram::Driver::Pg - Orthogonal Object Persistence in PostgreSQL databases
+
+=head1 SYNOPSIS
+
+   use Tangram;
+   use Tangram::Driver::Pg;
+
+   $schema = Tangram::Driver::Pg->schema( $hashref );
+
+   Tangram::Driver::Pg->deploy($schema, $dbh);
+
+   $storage = Tangram::Driver::Pg->connect( $schema,
+      $data_source, $username, $password );
+
+   $storage->disconnect();
+
+   Tangram::Driver::Pg->retreat($schema, $dbh);
+
+=head1 DESCRIPTION
+
+This is the entry point in the Pg-specific object-relational
+persistence backend.
+
+This module performs the following:
+
+=head1 METHODS
+
+This backend does not add any methods; for a description of
+available methods, see L<Tangram::Relational>.
+
+=head1 ERRATA
+
+L<Tangram::Type::Dump::Storable> objects are first encoded with
+L<MIME::Base64>, because Tangram does not currently have an easy
+mechanism for calling C<DBI-E<gt>bind_param()> at the appropriate time
+to flag the column as binary.
+
+L<Tangram::Type::Dump::Perl> objects are stored as C<BYTEA> columns,
+which as of L<DBD::Pg> 1.31, also do not get correctly escaped by the
+DBD driver.  This also affects the (as-yet not fully functional)
+L<Tangram::Type::Dump::YAML> back-end, which might put C<\> characters
+into a YAML document.
+
+It is recommended to use the C<storable> type with
+L<Tangram::Type::Dump::Any> for this reason.
+
+=cut
+

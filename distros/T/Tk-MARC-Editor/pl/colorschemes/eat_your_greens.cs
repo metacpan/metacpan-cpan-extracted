@@ -1,0 +1,17 @@
+datafg	#fdfdfd
+databg	#004000
+fieldfg	#80ff80
+fieldbg	#004000
+fixedfg	#97e899
+fixedbg	#004000
+ind1fg	yellow
+ind1bg	darkslategrey
+ind2fg	yellow
+ind2bg	darkslategrey
+leaderfg	black
+leaderbg	#a3e09c
+leadereditfg	blanchedalmond
+leadereditbg	white
+subfieldfg	#ecec00
+subfieldbg	#008000
+background	#004000

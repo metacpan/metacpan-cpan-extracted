@@ -1,0 +1,11 @@
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -1983,7 +1983,7 @@ asmlinkage long sys_prctl(int option, uno
+                        error = current->mm->dumpable;
+                        break;
+                case PR_SET_DUMPABLE:
+-                       if (arg2 < 0 || arg2 > 2) {
++                       if (arg2 < 0 || arg2 > 1) {
+                                error = -EINVAL;
+                                break;
+                        }

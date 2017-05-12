@@ -1,0 +1,13 @@
+Revision history for Perl extension Tie::Array::Iterable.
+
+$Log: Changes,v $
+Revision 0.03  2001/11/16 02:27:56  mneylon
+Fixed packing version variables
+
+Revision 0.01.01.1  2001/11/15 01:41:19  mneylon
+Branch from 0.01 for new features
+
+Revision 0.01  2001/11/11 18:36:10  mneylon
+Initial Release
+
+

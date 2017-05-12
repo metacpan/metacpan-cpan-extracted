@@ -1,0 +1,16 @@
+Revision history for Template-Plugin-DataPrinter
+
+0.013     2015-06-13T15:48:29AEST+1000
+ - Fix 'please pass arguments as references' failure
+
+0.012     2013-08-07T14:39:22EST+1000
+ - Work around spurious test failure in perl 5.18
+
+0.011     2012-11-22T14:34:42EST+1100
+ - Fix false-negative test failure with Data::Printer v0.34
+
+0.010     2012-07-10T17:54:22EST+1000
+ - Stable release unchanged from 0.001 trial
+
+0.001-TRIAL 2012-07-05T11:42:22EST+1000
+ - Initial trial release

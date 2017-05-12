@@ -1,0 +1,16 @@
+Changes
+ignore.txt
+lib/Text/Nimble.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-parse-render.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Text-Nimble-0.002000/META.json
+Text-Nimble-0.002000/META.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

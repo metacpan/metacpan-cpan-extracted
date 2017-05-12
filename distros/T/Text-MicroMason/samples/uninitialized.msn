@@ -1,0 +1,11 @@
+% my $x;
+Hello Mr. <% $x %>!
+
+% # another line
+% sub stuff { 1 }
+% do { stuff() };
+
+% my %h;
+Hello, <% $h{not_defined} %>!
+
+And, then end.

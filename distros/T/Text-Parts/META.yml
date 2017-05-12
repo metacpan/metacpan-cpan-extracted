@@ -1,0 +1,42 @@
+---
+abstract: 'split text file to some parts(from one line start to another/same line end)'
+author:
+  - 'Ktat, C<< <ktat at cpan.org> >>'
+build_requires:
+  Digest::MD5: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.4, CPAN::Meta::Converter version 2.132140'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Parts
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Text::Parts:
+    file: lib/Text/Parts.pm
+    version: 0.16
+requires:
+  File::Spec: 0
+resources:
+  bugtracker: https://github.com/ktat/Text-Parts/issues
+  homepage: https://github.com/ktat/Text-Parts
+  repository: git://github.com/ktat/Text-Parts.git
+version: 0.16
+x_contributors:
+  - 'ktat <ktat.is@gmail.com>'

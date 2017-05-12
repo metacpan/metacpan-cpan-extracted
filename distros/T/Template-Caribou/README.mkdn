@@ -1,0 +1,72 @@
+# NAME
+
+Template::Caribou - class-based HTML-centric templating system
+
+# VERSION
+
+version 1.2.1
+
+# SYNOPSIS
+
+```perl
+package MyTemplate;
+
+use Template::Caribou;
+
+use Template::Caribou::Tags::HTML qw/ :all /;
+
+has name => ( is => 'ro' );
+
+template page => sub {
+    my $self = shift;
+
+    html { 
+        head { 
+            title { 'Example' } 
+        };
+        
+        $self->my_body;
+    }
+};
+
+template my_body => sub {
+    my $self = shift;
+
+    body { 
+        h1 { 'howdie ' . $self->name } 
+    }
+};
+
+package main;
+
+my $template = MyTemplate->new( name => 'Yanick' );
+print $template->page;
+```
+
+# DESCRIPTION
+
+WARNING: Codebase is alpha with extreme prejudice. Assume that bugs are
+teeming and that the API is subject to change.
+
+[Template::Caribou](https://metacpan.org/pod/Template::Caribou) is a [Moose](https://metacpan.org/pod/Moose)-based, class-centric templating system
+mostly aimed at producing sgml-like outputs, mostly HTML, but also XML, SVG, etc. It is
+heavily inspired by [Template::Declare](https://metacpan.org/pod/Template::Declare).
+
+For a manual on how to use `Template::Caribou`, have a peek at
+[Template::Caribou::Manual](https://metacpan.org/pod/Template::Caribou::Manual).
+
+When `use`d within a namespace, `Template::Caribou` will apply the role [Template::Caribou::Role](https://metacpan.org/pod/Template::Caribou::Role)
+to it (and auto-turn the namespace into Moose class if it wasn't a Moose class or role already),
+as well as import the keywords `template` and `attr` (the latter from
+[Template::Caribou::Tags](https://metacpan.org/pod/Template::Caribou::Tags)), as well as load [Template::Caribou::Utils](https://metacpan.org/pod/Template::Caribou::Utils).
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

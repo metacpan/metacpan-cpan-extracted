@@ -1,0 +1,35 @@
+NAME
+    Time::Duration::id - Describe time duration in Indonesian
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+     use Time::Duration::id;
+     my $duration = duration(310); # => "5 menit 10 detik"
+
+     $Time::Duration::MILLISECOND = 1;
+     $duration = duration(3.1); # => "3 detik 100 milidetik"
+
+DESCRIPTION
+    "Time::Duration::id" is a localized version of "Time::Duration".
+
+FUNCTIONS
+    See Time::Duration.
+
+CREDITS
+    The code was first copied from Time::Duration::fr by Sébastien
+    Aperghis-Tramoni.
+
+SEE ALSO
+    Time::Duration, Time::Duration::Locale
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

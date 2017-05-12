@@ -1,0 +1,8 @@
+lib/Tie/Indexer.pm
+lib/Tie/SymlinkTree.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+t/00basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

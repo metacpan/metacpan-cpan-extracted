@@ -1,0 +1,46 @@
+INSTALL :
+
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+DESCRIPTION :
+
+This module lets you layer hashes on top of each other
+opaquely so that top most layers obscure bottom ones.
+
+Think of it like sheets of OHP transparencies, if a 
+value is set in a top and bottom layer then that's 
+you when you access that key you get the value from
+the top layer but if you access something not set in
+the top layer but set in the bottom layer then you
+get the value from the bottom layer ...
+
+... and breath.
+
+In short :
+
+Tied Hash :   foo=>'bob'  , quux=>'fleeg'
+                 |              |     
+                 ^              |
+Layer 1   :   foo=>'bob'        ^
+Layer 2   :   foo=>'bar'  , quux=>'fleeg'
+
+
+
+So why is this useful. Well, the obvious application
+is for preferences. In a CGI app you could tie in the 
+bottom most hash to a database with default users' 
+preferences, the second layer with the current user's 
+preferences, the layer above that with the per 
+session preferences and the layer above that with the 
+per request values.
+
+AUTHOR :
+
+Simon Wistow <simon@twoshortplanks.com>
+
+COPYING :
+
+This module is distributed under the same terms as Perl itself

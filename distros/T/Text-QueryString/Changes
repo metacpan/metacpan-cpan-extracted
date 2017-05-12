@@ -1,0 +1,14 @@
+Changes
+=======
+
+0.03 - Aug 07 2013
+    - Handle "+" as well
+    - use URL::Encode! see docs
+    - If you for some reason like this module and want to improve, send me
+      pullreqs!
+
+0.02 - Aug 07 2013
+    - Fix SV memory leak, and remove unnecessary copying of SV
+
+0.01 - Aug 06 2013
+    - Initial release

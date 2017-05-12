@@ -1,0 +1,107 @@
+NAME
+    Test::DiagINC - List modules and versions loaded if tests fail
+
+VERSION
+    version 0.006
+
+SYNOPSIS
+        # preferably load before anything else
+        use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC';
+        use Test::More;
+
+DESCRIPTION
+    Assuming you shipped your module to CPAN with working tests, test
+    failures from CPAN Testers <http://www.cpantesters.org/> might be due to
+    platform issues, Perl version issues or problems with dependencies. This
+    module helps you diagnose deep dependency problems by showing you
+    exactly what modules and versions were loaded during a test run.
+
+    When this module is loaded, it sets up an "END" block that will take
+    action if the program is about to exit with a non-zero exit code or if
+    $test_builder->is_passing is false by the time the "END" block is
+    reached. If that happens, this module prints out the names and version
+    numbers of non-local modules appearing in %INC at the end of the test.
+
+    For example:
+
+        $ perl -MTest::DiagINC -MTest::More -e 'fail("meh"); done_testing'
+        not ok 1 - meh
+        #   Failed test 'meh'
+        #   at -e line 1.
+        1..1
+        # Looks like you failed 1 test of 1.
+        # Listing modules and versions from %INC
+        #   5.018002 Config
+        #       5.68 Exporter
+        #       5.68 Exporter::Heavy
+        #       1.07 PerlIO
+        #       0.98 Test::Builder
+        #       0.98 Test::Builder::Module
+        #      0.003 Test::DiagINC
+        #       0.98 Test::More
+        #       1.22 overload
+        #       0.02 overloading
+        #       1.07 strict
+        #       1.03 vars
+        #       1.18 warnings
+        #       1.02 warnings::register
+
+    This module deliberately does not load any other modules during runtime,
+    instead delaying all loads until it needs to generate a failure report
+    in its "END" block. The only exception is loading strict and warnings
+    for self-check if and only if "RELEASE_TESTING" is true. Therefore an
+    empty invocation will look like this:
+
+        $ perl -MTest::DiagINC -e 'exit(1)'
+        # Listing modules from %INC
+        #  0.003 Test::DiagINC
+
+    NOTE: Because this module uses an "END" block, it is a good idea to load
+    it as early as possible, so the "END" block it installs will execute as
+    late as possible (see perlmod for details on how this works). While this
+    module does employ some cleverness to work around load order, it is
+    still a heuristic and is no substitute to loading this module early. A
+    notable side-effect is when a module is loaded in an "END" block
+    executing after the one installed by this library: such modules will be
+    "invisible" to us and will not be reported as part of the diagnostic
+    report.
+
+    Modules that appear to be sourced from below the current directory when
+    "Test::DiagINC" was loaded will be excluded from the report (e.g.
+    excludes local modules from "./", "lib/", "t/lib", and so on).
+
+    The heuristic of searching %INC for loaded modules may fail if the
+    module path loaded does not map to a package within the module file.
+
+    If "Test::More" is loaded, the output will go via the "diag" function.
+    Otherwise, it will just be sent to STDERR.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Test-DiagINC/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Test-DiagINC>
+
+      git clone https://github.com/dagolden/Test-DiagINC.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Peter Rabbitson <ribasushi@cpan.org>
+
+    *   Roy Ivy III <rivy.dev@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

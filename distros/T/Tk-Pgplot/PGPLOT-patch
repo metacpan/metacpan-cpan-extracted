@@ -1,0 +1,57 @@
+The directory pgplot.patch contains modified/additional files from the 
+pgplot 5.2.2 distribution:
+
+  drivers.list               Added ptk to device list
+  makemake                   Added ptk compile options
+  drivers/pkdriv.c	     Dummy pgplot/tk driver
+  drivers/ptk/ptkpgplot.c    Ported code from Tcl/Tk driver
+  drivers/ptk/ptkpgplot.h
+  sys_linux/...              Modified makedefs for Linux
+  sys_sol2/...               Modified makedefs for Solaris
+  sys_hp/...                 Modified makedefs for HP-UX
+
+Tk800.022 and Tk800.023 are not compatible. If you wish to compile the
+PTK driver with Tk800.022 (and earlier, though I don't guarantee this
+will work), you *must* edit the .conf file you will use, and make
+uncomment the line:
+  OLDPTK=-DOLDTK
+If you see a compiler warning such as
+  ptkpgplot.c:613: warning: implicit declaration of function `LangWidgetObj'
+or make test dies with are error
+  undefined symbol: LangWidgetObj
+then you are using an incompatible version of Tk. Try either commenting in
+or out the OLDPTK definition.
+
+The script patchit.pl (beta quality) will copy *and overwrite* the
+patched files into a clean pgplot source directory. Please let me know
+if you have problems with this. The script runs from the Tk::Pgplot
+directory and takes a single argument, the pgplot source directory.
+it tries to check it won't do anything terrible and renames existing
+files with a .orig suffix.
+
+The main change to the ".conf" files in the inclusion of the PTK_INCL
+definition. I have embedded a small perl script which should figure
+out the correct value for this, but is is probably worth verifying the
+Makefile if you have compilation troubles. Set the value by hand if
+the correct value is not found.
+
+Currently this has been tested under Linux. To get this to work for
+other OSes, copy the section from one of the included .conf files the
+.conf file for your OS/compile combination.
+
+You must compile the C wrappers to pgplot to get it to work from
+Perl. The Tcl/Tk code inserts a dummy driver into the normal libpgplot
+so that applications not using the Perl/Tk driver do not have to link
+with Perl. When the Perl/Tk driver is wanted the dynamic linker should
+load the correct objects.
+
+***NOTE***
+
+Getting the PTK driver to work is a delicate business. Make sure you:
+ - Install the Perl/Tk module
+ - Install the source code for Tk::Pgplot and patch pgplot
+ - Enable PTK driver in pgplot drivers.list
+ - Recompile (and re-install) pgplot (make sure libptkpgplot.a is present)
+ - Install the Perl PGPLOT module
+ - Compile and install Tk::Pgplot (note you should only run perl Makefile.PL
+   at this stage).

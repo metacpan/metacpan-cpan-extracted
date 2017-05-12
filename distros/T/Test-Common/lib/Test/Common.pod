@@ -1,0 +1,95 @@
+=encoding utf8
+
+=head1 NAME
+
+Test::Common - Simple, Reusable Module Tests
+
+=head1 SYNOPSIS
+
+From the command line:
+
+    > test-common help
+    > test-common config
+    > edit t/common.yaml
+    > test-common update
+
+Optionally, in your Module::Install based Makefile.PL:
+
+    use inc::Module::Install;
+    ...
+    # Keep common tests up to date
+    test_common_update;
+
+=head1 DESCRIPTION
+
+There are many module unit tests that are either exactly the same or slightly
+different, from dist to dist. Test::Common is a framework for distributing and
+sharing these common tests. (The hope is...) By having many authors contribute
+to common test pools, not only will it be easier to write common tests fast,
+it will help expose where specific tests need to be written, and common ways
+to set these tests up.
+
+As a module author, you maintain a configuration file called C<t/common.yaml>,
+which contains information on all the common tests you want to use. These
+tests can come from Common::Test or any other module that distributes tests in
+the same way.
+
+The common test scripts are files under the F<share/> directory. These files
+are actually Template Toolkit templates. Test::Common renders the templates
+into real test files (using data from t/common.yaml) every time you run the
+command C<test-common update>.
+
+=head1 CONFIGURATION
+
+When you run:
+
+    test-common config
+
+you get an example C<t/common.yaml> file. Edit it. There are comments inside
+exlaining the basics. For a given entry, like:
+
+    - test: foo-bar.t
+
+all the data in that hash gets passed to Template Toolkit to render the test's
+template. Simple.
+
+To rename a test, do:
+
+    - test: foo-bar.t
+      name: test-foo-bar.t
+
+=head1 EXTENDING
+
+To create a package of your own common tests, put .t files into a share
+directory, so they get installed by C<make install>, et al. Then other authors
+can add your test package to the 'sources' list of their C<t/common.yaml>
+file.
+
+=head1 COMMIT OR CLEAN?
+
+Since Test::Common tests are always generated, it is your choice whether or
+not to commit the rendered tests. The only file you really ever need is
+C<t/common.yaml>.
+
+The config file has a C<clean> setting that allows you to control what:
+
+    common-tests clean
+
+does. If you use the Module::Install plugin then you can just do:
+
+    make clean
+
+=head1 AUTHOR
+
+Ingy döt Net <ingy@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2011. Ingy döt Net.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

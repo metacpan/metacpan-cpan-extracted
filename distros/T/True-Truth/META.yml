@@ -1,0 +1,32 @@
+---
+abstract: 'merge multiple versions of truth into one'
+author:
+  - 'Lenz Gschwendtner <mail@norbu09.org>'
+build_requires:
+  Data::Dumper: 0
+  Test::Deep: 0
+  Test::More: 0
+  lib: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: True-Truth
+requires:
+  Any::Moose: 0
+  Cache::KyotoTycoon: 0
+  Data::Dump: 0
+  MIME::Base64: 0
+  Storable: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/norbu09/True-Truth/issues
+  homepage: https://github.com/norbu09/True-Truth/wiki
+  repository: git://github.com/norbu09/True-Truth.git
+version: 1.1

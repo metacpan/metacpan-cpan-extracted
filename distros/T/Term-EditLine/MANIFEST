@@ -1,0 +1,19 @@
+.gitattributes
+.travis.yml
+Changes
+EditLine.xs
+fallback/const-c.inc
+fallback/const-xs.inc
+inc/Alien/Base/Wrapper.pm
+lib/Term/EditLine.pm
+LICENSE
+maint/releaseprep
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/1.t
+t/2.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

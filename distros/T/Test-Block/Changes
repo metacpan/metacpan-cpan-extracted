@@ -1,0 +1,73 @@
+Revision history for Perl extension Test::Block.
+
+0.13 - 24 Jan 2012
+    -   Marked as depreciated 
+    -   Fixed RT#74295 (thanks Andreas Koenig)
+
+0.12
+    -   Moved to github
+
+0.11
+    -   Removed spelling.t, pod.t, signature.t and documented.t from mandatory 
+        tests
+    -   Added a bunch of optional developer tests
+    -   Added reference to Test::Group (thanks to Nadim Khemir)
+    -   Named blocks are now 'quoted' if they're not the default number (thanks
+        to Nadim Khemir for pointing this out)
+
+0.10
+    -   Can now name a block with a string that maps to false if you want
+    -   Test coverage now at 100% (statement, branch & condition)
+
+0.09
+    -   Moved stuff from build_requires to requires so it works with
+        CPANPLUS
+    -   Added COMMUNITY section to POD
+    -   Removed a bogus UNIVERSAL::isa just in case somebody wants to 
+        subclass nicely
+    -   Tidied code a little
+    -   Stopped Test::Block accepting some bad plans
+    -   Added Test::Class to SEE ALSO section
+    -   Added link to tada list to the TO DO section of the POD
+
+0.08
+    -   Cosmetic changes to POD
+
+0.07
+    -   Requires Test::Builder::Tester 1.01 so tests will pass with
+        Test::Simple 0.48.
+    -   New signature file since old key about to be revoked
+
+0.06
+    -   Fixed incorrect comment that 0.05 wasn't released on CPAN (doh!)
+    -   Fixed incorrect README (double doh!)
+    -   Switched to Module::Build so I won't make that darn README 
+        mistake again
+    -   Added signature tests
+
+0.05
+    -   removed blocks declaration
+    -   pod.t now uses Test::Pod
+    -   documented.t now uses Test::Pod::Coverage
+    -   cleaned up code a bit
+    -   now dies if you don't specify the number of tests
+    -   block names default to the block number
+    -   blocks now named NAME => NUM_TESTS
+
+0.04 (not released on CPAN)
+    -   Added named blocks (suggested by Fergal Daly)
+    -   Added all_in_block, builder and block_count class methods
+    -   Added $Plan (suggested by Michael G Schwern)
+    -   Renamed C<expecting> to C<plan> for consistancy
+    -   Rewrote POD
+
+0.03 (not released on CPAN)
+    -   Rewrote as a sane object to avoid evil tie/Hook::LexWrap code :-)
+
+0.02 (not released on CPAN)
+    -   Rewrote so that it would cope with nested blocks
+
+0.01  Mon May  5 21:28:59 2003
+    - original version; created by h2xs 1.22 with options
+        --compat-version=5.6.1 --use-new-tests --skip-exporter -APX -n Test::Block
+

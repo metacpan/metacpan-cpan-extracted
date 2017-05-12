@@ -1,0 +1,20 @@
+Revision history for Tiny-OpenSSL
+
+0.1.3 2015-10-06
+
+ - Add PKCS#12 support
+ - Add sign method for CA
+
+0.1.2 2014-10-06
+
+ - Set RSA block cipher to AES256
+ - Don't encrypt private key unless a password is defined.
+ - Load key if key file already exists when create is called.
+
+0.1.1 2014-09-28
+
+ - Add missing Carp in Tiny::OpenSSL::CertificateSigningRequest [GH-1]
+
+0.1.0 2014-09-27
+
+ - Initial Release

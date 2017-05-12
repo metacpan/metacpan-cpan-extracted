@@ -1,0 +1,269 @@
+# -*- Perl -*-
+# this are code-fragments which will be useful when implementing a
+# direct in memory access model
+#
+# the existing parser should be used to fill up those values
+
+
+=item getXVals (s)
+
+get a list of values of the s'th independent variable. 0 <= s <
+nIV. It is currently not garanteed that all variable have been set already.
+
+=cut
+
+sub getXVals {
+    my ($self, $s) = @_;
+    return $self->{XVals}[$s] || [];
+}
+
+
+# =item setXVals (s, values)
+
+# set a array-ref of values of the s'th independent variable. 0 <= s < nIV
+
+# =cut
+
+# sub setXVals {
+#     my ($self, $s, $values) = @_;
+#     unless (ref $values eq 'ARRAY') {
+# 	$self->_carp("values needs to be ARRAY-ref");
+# 	return;
+#     }
+#     if (($s >= 0) && ($s < $self->nIV)) {
+# 	$self->{XVals}[$s] = $values;
+#     }
+# }
+
+=item newXVal ([X1,...,Xs])
+
+add a new independent variable. The list must consist of nIV elements.
+
+=cut
+
+sub newXVal {
+    my ($self, $xVal) = @_;
+    unless (ref $xVal eq 'ARRAY') {
+	$self->_carp("xVal needs to be array-ref");
+	return;
+    }
+    unless (@$xVal != $self->nIV) {
+	$self->_carp("xVal needs ".$self->nIV() ." elements, got ". scalar @$xVal);
+	return;
+    }
+    for (my $s = 0; $s < $self->nIV; $s++) {
+	push @{ $self->getXVals($s) }, $xVal->[$s];
+    }
+}
+
+=item getV (Xvals)
+
+get a list of values of variables (nV elements) at position Xvals.
+Xvals is a array-ref of length nIV containing the values of the independent
+variables
+
+=cut
+
+sub getV {
+    my ($self, $xVals) = @_;
+    unless (ref $xVals eq 'ARRAY') {
+	$self->_carp("xVals needs to be Array-Ref");
+	return;
+    }
+    my @vals = @$xVals;;
+    unless (@vals == $self->nIV) {
+	$self->_carp("not enough independent variables to getVs, need". $self->nIV . 
+	    ", got " . scalar @vals);
+	return;
+    }
+    my $ref = $self->{_variables};
+    while (@vals) {
+	unless ($ref) {
+	    return undef;
+	}
+	$ref = $ref->{shift @vals};
+    }
+
+    unless ($ref && exists $ref->{V}) {
+	return undef;
+    }
+    return $ref->{V};
+
+}
+
+
+=item setV (Xvals, [values])
+
+set a list of values of variables (nV elements) at position Xvals.
+Xvals is a array-ref of length nIV containing the values of the independent
+variables. The values will be stored as reference. It will overwrite
+an existing variable at the same position. It will also include the Xval
+to the list of xVals.
+
+=cut
+
+sub setV {
+    my ($self, $xVals, $vs) = @_;
+    unless (ref $xVals eq 'ARRAY') {
+	$self->_carp("xVals needs to be Array-Ref");
+	return;
+    }
+    unless (ref $xVals eq 'ARRAY') {
+	$self->_carp("Vs needs to be Array-Ref");
+	return;
+    }
+    my @xvals = @$xVals;;
+    unless (@xvals == $self->nIV) {
+	$self->_carp("not enough independent variables (xVals) to setVs, need ".
+	    $self->nIV . ", got " . scalar @xvals);
+	return;
+    }
+    unless (@$vs == $self->nV) {
+	$self->_carp("not enough variable (values) to setVs, need " . $self->nV .
+	    ", got ". scalar @$vs);
+	return;
+    }
+
+
+    if ($self->getV(\@xvals)) {
+	# renew entry
+	my $ref = $self->{_variables};
+	while (@xvals) {
+	    $ref = $ref->{shift @xvals};
+	}
+	$ref->{V} = $vs;
+    } else {
+	$self->newVal($xVals);
+	# going to last know position
+	my $existRef = $self->{_variables};
+	while (@xvals) {
+	    my $thisVal = shift @xvals;
+	    my $newexistRef = $existRef->{$thisVal};
+	    if (defined $newexistRef) {
+		$existRef = $newexistRef;
+	    } else {
+		unshift @xvals, $thisVal;
+		last;
+	    }
+	}
+	# creating the new positions
+	my $lastRef;
+	{
+	    my %hash;
+	    $hash{V} = $vs;
+	    $lastRef = \%hash;
+	}
+	while (@xvals > 1) {
+	    my %lhash;
+	    $lhash{pop @xvals} = $lastRef;
+	    $lastRef = \%lhash;
+	}
+	# use last element to join old and new hash-hashes entries
+	$existRef->{$xvals[0]} = $lastRef;
+    }
+}
+
+=item getA (Xvals)
+
+get a list of auxiliary variables (nAuxV elements) at position Xvals.
+Xvals is a array-ref of length nIV containing the values of the independent
+variables
+
+=cut
+
+sub getA {
+    my ($self, $xVals) = @_;
+    unless (ref $xVals eq 'ARRAY') {
+	$self->_carp("xVals needs to be Array-Ref");
+	return;
+    }
+    my @xvals = @$xVals;;
+    unless (@xvals == $self->nIV) {
+	$self->_carp("not enough independent variables to getVs, need". $self->nIV . 
+	    ", got " . scalar @xvals);
+	return;
+    }
+    my $ref = $self->{A};
+    while (@xvals) {
+	unless ($ref) {
+	    return undef;
+	}
+	$ref = $ref->{shift @xvals};
+    }
+
+    unless ($ref && exists $ref->{A}) {
+	return undef;
+    }
+    return $ref->{A};
+}
+
+
+=item setA (Xvals, [values])
+
+set a list of auxiliary variables (nAuxV elements) at position Xvals.
+Xvals is a array-ref of length nIV containing the values of the independent
+variables. The values will be stored as reference. It will overwrite
+an existing variable at the same position. It will also include the Xval
+to the list of xVals.
+
+=cut
+
+sub setA {
+    my ($self, $xVals, $as) = @_;
+    unless (ref $xVals eq 'ARRAY') {
+	$self->_carp("xVals needs to be Array-Ref");
+	return;
+    }
+    unless (ref $xVals eq 'ARRAY') {
+	$self->_carp("A values needs to be Array-Ref");
+	return;
+    }
+    my @xvals = @$xVals;;
+    unless (@xvals == $self->nIV) {
+	$self->_carp("not enough independent variables (xVals) to setVs, need ".
+	    $self->nIV . ", got " . scalar @xvals);
+	return;
+    }
+    unless (@$as == $self->nAuxV) {
+	$self->_carp("not enough variable (values) to setVs, need " . $self->nAuxV .
+	    ", got ". scalar @$as);
+	return;
+    }
+
+    if ($self->getV(\@xvals)) {
+	# renew entry
+	my $ref = $self->{_variables};
+	while (@xvals) {
+	    $ref = $ref->{shift @xvals};
+	}
+	$ref->{A} = $as;
+    } else {
+	$self->newVal($xVals);
+	# going to last know position
+	my $existRef = $self->{_variables};
+	while (@xvals) {
+	    my $thisVal = shift @xvals;
+	    my $newexistRef = $existRef->{$thisVal};
+	    if (defined $newexistRef) {
+		$existRef = $newexistRef;
+	    } else {
+		unshift @xvals, $thisVal;
+		last;
+	    }
+	}
+	# creating the new positions
+	my $lastRef;
+	{
+	    my %hash;
+	    $hash{A} = $as;
+	    $lastRef = \%hash;
+	}
+	while (@xvals > 1) {
+	    my %lhash;
+	    $lhash{pop @xvals} = $lastRef;
+	    $lastRef = \%lhash;
+	}
+	# use last element to join old and new hash-hashes entries
+	$existRef->{$xvals[0]} = $lastRef;
+    }
+}

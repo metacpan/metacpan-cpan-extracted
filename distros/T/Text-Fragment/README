@@ -1,0 +1,54 @@
+SYNOPSIS
+
+     use Text::Fragment qw(list_fragments
+                           get_fragment
+                           set_fragment_attrs
+                           insert_fragment
+                           delete_fragment);
+    
+     my $text = <<_;
+     foo = "some value"
+     baz = 0
+     _
+
+    To insert a fragment:
+
+     my $res = insert_fragment(text=>$text, id=>'bar', payload=>'bar = 2');
+
+    $res->[2]{text} will now contain:
+
+     foo = "some value"
+     baz = 0
+     bar = 2 # FRAGMENT id=bar
+
+    To replace a fragment:
+
+     $res = insert_fragment(text=>$res->[2], id='bar', payload=>'bar = 3');
+
+    $res->[2]{text} will now contain:
+
+     foo = "some value"
+     baz = 0
+     bar = 3 # FRAGMENT id=bar
+
+    and $res->[2]{orig_payload} will contain the payload before being
+    replaced:
+
+     bar = 2
+
+    To delete a fragment:
+
+     $res = delete_fragment(text=>$res->[2], id=>'bar');
+
+    To list fragments:
+
+     $res = list_fragment(text=>$text);
+
+    To get a fragment:
+
+     $res = get_fragment(text=>$text, id=>'bar');
+
+    To set fragment attributes:
+
+     $res = se_fragment_attrs(text=>$text, id=>'bar', attrs=>{name=>'val', ...});
+

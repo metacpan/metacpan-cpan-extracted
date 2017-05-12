@@ -1,0 +1,224 @@
+NAME
+    Test::Signature - Automated SIGNATURE testing
+
+SYNOPSIS
+        # This is actually the t/0-signature.t file from this distribution.
+        use Test::More tests => 1;
+        use Test::Signature;
+
+        signature_ok();
+
+ABSTRACT
+    "Test::Signature" verifies that the "Module::Signature" generated
+    signature of a module is correct.
+
+DESCRIPTION
+    "Module::Signature" allows you to verify that a distribution has not
+    been tampered with. "Test::Signature" lets that be tested as part of the
+    distribution's test suite.
+
+    By default, if "Module::Signature" is not installed then it will just
+    say so and not fail the test. That can be overridden though.
+
+    IMPORTANT: This is not a substitute for the users verifying the
+    distribution themselves. By the time this module is run, the users will
+    have already run your Makefile.PL or Build.PL scripts which could have
+    been compromised.
+
+    This module is more for ensuring you've updated your signature
+    appropriately before distributing, and for preventing accidental errors
+    during transmission or packaging.
+
+FUNCTIONS
+    "signature_ok" is exported by default. "signature_force_ok" must be
+    explicitly exported.
+
+  signature_ok()
+    This will test that the "Module::Signature" generated signature is valid
+    for the distribution. It can be given two optional parameters. The first
+    is a name for the test. The default is "Valid signature". The second is
+    whether a lack of "Module::Signature" should be regarded as a failure.
+    The default is 0 meaning 'no'.
+
+        # Test with defaults
+        signature_ok()
+        # Test with custom name
+        signature_ok( "Is the signature valid?" );
+        # Test with custom name and force C<Module::Signature> to exist
+        signature_ok( "Is the signature valid?", 1 );
+        # Test without custom name, but forcing
+        signature_ok( undef, 1 );
+
+  signature_force_ok()
+    This is equivalent to calling "signature_ok( $name, 1 )" but is more
+    readable.
+
+        # These are equivalent:
+        signature_force_ok( "Is our signature valid?" );
+        signature_ok( "Is our signature valid?", 1);
+
+        # These are equivalent:
+        signature_force_ok();
+        signature_ok( undef, 1 );
+
+NOTES ON USE
+  MANIFEST and MANIFEST.SKIP
+    It is imperative that your MANIFEST and MANIFEST.SKIP files be accurate
+    and complete. If you are using "ExtUtils::MakeMaker" and you do not have
+    a MANIFEST.SKIP file, then don't worry about the rest of this. If you do
+    have a MANIFEST.SKIP file, or you use "Module::Build", you must read
+    this.
+
+    Since the test is run at "make test" time, the distribution has been
+    made. Thus your MANIFEST.SKIP file should have the entries listed below.
+
+    If you're using "ExtUtils::MakeMaker", you should have, at least:
+
+        #defaults
+        ^Makefile$
+        ^blib/
+        ^blibdirs$
+        ^pm_to_blib$
+
+    These entries are part of the default set provided by
+    "ExtUtils::Manifest", which is ignored if you provide your own
+    MANIFEST.SKIP file.
+
+    If you are using "Module::Build", there is no default MANIFEST.SKIP so
+    you must provide your own. It must, minimally, contain:
+
+        ^Build$
+        ^Makefile$
+        ^_build/
+        ^blib/
+
+    If you don't have the correct entries, "Module::Signature" will complain
+    that you have:
+
+        ==> MISMATCHED content between MANIFEST and distribution files! <==
+
+    You should note this during normal development testing anyway.
+
+  Use with Test::Prereq
+    "Test::Prereq" tends to get a bit particular about modules. If you're
+    using the *force* option with "Test::Signature" then you will have to
+    specify that you expect "Module::Signature" as a prerequisite.
+    "Test::Signature" will not have it as a prerequisite since that would
+    defeat the point of having the *force* variant.
+
+    If you are using "ExtUtils::MakeMaker" you should have a line like the
+    following in your Makefile.PL:
+
+        'PREREQ_PM' => {
+            'Test::Signature'   => '1.04',
+            'Module::Signature' => '0.22',
+            'Test::More'        => '0.47',
+        },
+
+    If using "Module::Build", your Build.PL should have:
+
+        build_requires => {
+            'Test::Signature'   => '1.04',
+            'Module::Signature' => '0.22',
+            'Test::More'        => '0.47',
+        },
+
+    If you just want the default behaviour of testing the signature if and
+    only if the user already has "Module::Signature" installed, then you
+    will need something like the following code. The example uses
+    "Module::Build" format but it should be trivial for you to translate to
+    "ExtUtils::MakeMaker".
+
+        #!/usr/bin/perl -w
+        use strict;
+        use Module::Build 0.18;
+
+        my @extra_build;
+
+        eval { require Module::Signature };
+        if (!$@ or $Test::Prereq::VERSION)
+        {
+            push @extra_build, "Module::Signature" => '0.22'
+        }
+
+        my $m = Module::Build->new(
+            dist_name => 'WWW-Yahoo-Groups',
+            dist_version => '1.7.7',
+            license => 'perl',
+
+            requires => {
+                # various modules
+                'perl'             => '5.6.0',
+            },
+            build_requires => {
+                'Test::More'          => 0.47,
+                'Test::Prereq'        => 0.19,
+                'Test::Prereq::Build' => 0.04,
+                'Test::Signature'     => 1.04,
+                @extra_build,
+            },
+        );
+
+        $m->create_build_script;
+
+    If you have any questions on using this module with "Test::Prereq", just
+    email me (address below).
+
+  Use with Module::Install
+    "Module::Install" is a module to assist in the bundling of build
+    prerequisite modules in packages. Well, among other things.
+
+    "Test::Signature" is a perfect candidate for such a module. As it's a
+    module aimed purely at those writing modules rather than those using
+    them.
+
+    Here's a good way to use it:
+
+    Make a test file (say, t/00sig.t) that contains the following:
+
+        use lib 'inc';
+        use Test::More tests => 1;
+        use Test::Signature;
+        signature_ok();
+
+    In your Makefile.PL (or Build.PL if appropriate) add:
+
+        include 'Test::Signature';
+
+    And that's it! You don't have to specify it as a prerequisite or
+    anything like that because "Module::Install" will include it in your
+    distribution. And you don't have to worry about size because
+    "Module::Install" strips out all this waffling POD.
+
+THANKS
+    Arthur Bergman for suggesting the module.
+
+    Audrey Tang for writing Module::Signature, and making some suggestions.
+
+    Tels suggested testing network connectivity to Audrey; Audrey added that
+    to "Module::Signature" 0.16 and I (Iain Truskett) added it to this
+    module (as of 1.03).
+
+BUGS
+    Please report bugs at <bug-test-signature@rt.cpan.org> or via the web
+    interface at <http://rt.cpan.org>
+
+AUTHORS
+    Iain Truskett <spoon@cpan.org>, now passed away.
+
+    Currently maintained by Audrey Tang <cpan@audreyt.org>
+
+LICENSE AND COPYRIGHT
+    Copyright 2002, 2003 by Iain Truskett. All rights reserved. Copyright
+    2003, 2007, 2015 by Audrey Tang <cpan@audreyt.org>.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl, Module::Signature, Test::More.
+
+    Module::Build, ExtUtils::Manifest, ExtUtils::MakeMaker.
+
+    Test::Prereq, Module::Install.
+

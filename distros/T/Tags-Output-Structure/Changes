@@ -1,0 +1,21 @@
+0.04 2015-10-29T22:43:02+01:00
+ - Fix DEPENDENCIES section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-03-21T14:47:52+01:00
+ - Fix dependencies.
+ - Fix minimal version of Perl in META.yml file.
+ - Fix test depdendencies.
+
+0.02 2015-03-20T07:19:20+01:00
+ - Add README file.
+ - Add minimal version of Perl.
+ - Add tests.
+ - Fix abstract name in Makefile.PL.
+ - Fix instruction processing.
+ - Update META.yml file.
+
+0.01 2015-03-18T13:53:24+01:00
+ - First version.

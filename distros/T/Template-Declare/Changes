@@ -1,0 +1,125 @@
+0.47 2014-12-16
+ - Stop checking warning message contents explictly (Aaron Crane)
+
+0.46 2012-12-23
+ - Documentation fixes (Brigham Johnson)
+ - Hash ordering fixes for 5.17 (Kent Fredric)
+
+0.45 2011-04-15
+ - Added new HTML 5 elements to the HTML Tag set. (Theory)
+
+0.44 2010-12-08
+ - Added support for $TAG_INDENTATION and $EOL (Marc Chantreux)
+ - Add a current_base_path() convenience function (trs)
+
+0.43 2009-11-18
+ - Test warning fixes (Theory)
+ - Dist fixes suggested by rafl (Sartak)
+
+0.42 2009-11-01
+ - Added the "strict" attribute to make exceptional situations fatal.
+   (Theory)
+ - Removed unused "implementor" attribute in Template::Declare::TagSet.
+   (Theory)
+
+0.41 2009-10-29
+ - Documentation tweaks (Theory)
+
+0.40_02 2009-10-23
+ - David (Theory) Wheeler spent considerable effort on cleaning up
+   Template-Declare for this release.
+ - Reworked all the documentation, neatening things, expanding the "USAGE"
+   section, fixing bugs in the examples, and adding missing docs for
+   various functions and methods.
+ - Added "dispatch_to" to replace "roots", which is now deprecated. Note
+   that "dispatch_to" resolves to template classes in the opposite order to
+   "roots". This won't be an issue if you only use a single temlate class.
+ - Converted the implementation of "alias" to be the same as that used for
+   "import_templates", which is much more efficient.
+ - Added the "into" parameter to "alias" and "import_templates".
+ - Added the "setting" syntactical sugar keyword for use with "alias".
+ - Renamed "import_templates" to "mix". The former is still around, but is
+   deprecated.
+ - Added support for package variables with "mix".
+ - Deprecated the undocumented "aliases()" and "alias_metadata()" methods,
+   as they are no longer needed. They're now no-ops that issue warnings. To
+   be removed altogether in a future version.
+
+0.40_01 2009-08-12
+ - Support for inline tagset definitions. Thanks to Olivier 'dolmen'
+   Mengué [rt.cpan.org #48642]
+
+0.40 2009-07-08
+ - Fix subname issue with the debugger and specifically Devel::NYTProf
+ - String::BufferStack usage improvements
+
+0.39 2009-03-05
+ - No code changes; increase Test::Warn dependency to 0.11, as 0.10 was
+   broken
+
+0.38 2009-02-27
+ - Support, but deprecate, Template::Declare->buffer->data(...) usage
+
+0.37 2009-02-19
+ - Make HTML::Lint an optional dependency
+
+0.36 2009-02-05
+ - Hint to the source of the buffer using a 'from' argument.  This allows
+   us to inspect the call stack by looking at the buffer stack.
+
+0.35 2009-01-20
+ - Buffers have been moved to using String::BufferStack, for better
+   interopability with other templating systems.  Code which manipulated
+   Template::Declare::Buffer objects by hand may need to be adjusted.
+
+0.31_01 2008-12-19
+ - INCOMPATIBLE: there were inconsistency in arguments passing. show in
+   TD::Tags could pass arguments into template as array reference depending
+   on a way it's called. Now arguments are always passwed the same way they
+   passed into show. This change is only backwards incompatible for those
+   who were using this incorrect behaviour.
+ - stringify argument in TD::Buffer::append as we can deal with an object
+   with overloaded stringification that puts data into buffer when
+   stringified
+ - correctly escape objects with overloaded stringification
+ - use less buffers for operations and a few other small optimizations
+
+0.30 2008-11-26
+ - Remove the "wrapper" export, its name is too generic and clashes with a
+   lot of existing code. It's a negligible amount of sugar.
+
+0.29 2008-07-01
+ - Sugar for defining a tag-like wrapper. Thanks Theory! #37624
+ - Don't load all of CGI.pm to get a list of tags. #37630
+ - Don't add attrs to the first tag in smart_tag_wrapper. #37622.
+
+0.28 2008-02-14
+ - Added the missing dependency Class::ISA to Makefile.PL
+ - Added the "canvas" tag to the HTML tagset.
+ - Added around_template for instrumentation.
+
+0.27 2007-11-02
+ - Added support for the RDF tag set (T::D::TagSet::RDF).
+ - Added support for the Mozilla EM RDF tag set (T::D::TagSet::RDF::EM)
+
+0.26 2007-08-14
+ - Refactored Template::Declare::Tags to make the tag sets configurable.
+ - Added Template::Declare::TagSet::HTML and
+   Template::Declare::TagSet::XUL, respectively, as well as their common
+   base class, Template::Declare::TagSet. Added
+   Template::Declare::TagSet::HTML and Template::Declare::TagSet::XUL,
+   respectively.
+ - Added support for XML namespace: use Template::Declare::Tags 'XUL',
+   'HTML' => { namespace => 'html' }; and ... 'HTML' => { namespace =>
+   'html', package => 'MyHtml' };
+ - And we can now say 'use Template::Declare::Tags qw/ HTML XUL /;
+ - Added @Template::Declare::Tags::TAG_SUB_LIST which records all the tag
+   subroutines generated on-the-fly, which is necessary for secondary
+   symbol exporting in Jifty::View::Declare::Helpers.
+ - Implemented C< use Template::Declare::Tags HTML => { from =>
+   'My::HTML::TagSet' } >.
+ - Allow content post-proceessing with a callback.
+ - Added a PITFALLS section to T::D's POD.
+ - Added a global sub append_attr to provide friendly diagnostics and the
+   infamous "Undefined subroutine &Template::Declare::Tags::append_attr
+   called at ..." is now gone.

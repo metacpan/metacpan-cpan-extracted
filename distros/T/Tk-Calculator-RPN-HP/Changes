@@ -1,0 +1,12 @@
+
+1.0	2007/04/02	Fixed Greg's bug, see below, but failed to give him credit.
+
+1.1	2007/04/02	Check return code from eval() in HP.pm. Fixed this bug reported by Greg O'Neil.
+
+Can't locate object method "MainWindow" via package "Tk::Calculator::RPN::HP_21" at /usr/lib/perl5/site_perl/5.8.8/Tk/Calculator/RPN/HP.pm line 163.
+ at /usr/lib/perl5/site_perl/5.8.8/i586-linux-thread-multi/Tk/Widget.pm line 203
+
+        Amazingly, this was all because Tk::LCD and Tk::SlideSwitch were not installed.
+
+1.2	2007/04/02	Display version for tkhpcalc -h, else same as above, CPAN hassles.
+

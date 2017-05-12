@@ -1,0 +1,169 @@
+Revision history for Perl module Time::ParseDate
+
+2015.1030 2015-10-30
+        - Not requirement for Time::Piece for tests.
+2015.0925 2015-09-25
+        - https://rt.cpan.org/Ticket/Display.html?id=96453
+          fix epoch second 0 with timezone. 
+2015.0925 2015-09-25
+        - apply patch from bug https://rt.cpan.org/Ticket/Display.html?id=90367
+          use Time::Piece in place of POSIX tzset for better compatibility with Windows. 
+2015.0925 2015-09-25
+        - apply patch from bug https://rt.cpan.org/Ticket/Display.html?id=96031
+          manpage typo patch 
+2013.1113 2013-11-13
+	- fix bug https://rt.cpan.org/Ticket/Display.html?id=90343
+	  "Month day, year" wasn't parsing correctly.
+2013.0920 2013-09-20
+	- Skip tests when tzset isn't available
+	- Type-o fixes
+2013.0917 2013-09-17
+	- Replaced CHANGELOG with Changes file.
+2013.0916 2013-09-16
+	- Module NAME changed to Time::ParseDate.  Change requested by
+	  David Steinbrunner.
+2013.0913 2013-09-13
+	- Changed date terminator to accept many more characters (not just
+	  whitespace.  Fixing: https://rt.cpan.org/Ticket/Display.html?id=87828
+	- Added "Sept" as an abbr for September.
+	  Fixing: https://rt.cpan.org/Ticket/Display.html?id=87451
+	- Parse subsecond strings longer than six digits.
+	  Can only return about four digits though.
+	  https://rt.cpan.org/Ticket/Display.html?id=79740
+2013.0912 2013-09-12
+        - Pulled fix from Adam Schobelock that removes timezone offset
+	  caching because it was creating incorrect behavor or Moscow.
+2011.0517 2011-05-17
+	- Bugfix from Sophie Hamilton: call tzset() when changing timezones.
+	- Bugfix: bail out of tests cleanly when tzset doesn't work.
+2011.0505 2011-05-05
+	- Bugfix: make sure $ampm is defined so no undefined string warnings
+	  are issued.
+	- Honor the GMT flag when parsing time specs.  Patch from
+	  kris at shannon.id.au.
+	- Bugfix: RT#31477 noon & midnight would match in the middle of strings.
+	- Added %v conversion for Time::CTime
+	- Added tests to disprove invalid bug reports.
+2006.0814 2006-08-14
+	- A bugfix for negative offsets that overflowed (from Vernon Lyon 
+	  <vlyon at uk.yahoo-inc.com>)
+	- Add a few more timezones (from Peter Ludemann <ludemann at yahoo-inc.com>
+	  and Alex Bowley <kilinrax at cpan.org>)
+	- Recognize fractional times counts like "1.5 minutes ago" 
+	  (from Simon Wistow <simon@thegestalt.org>)
+	- Recognize Dow "before last" (from Ole Craig <ocraig at stillsecure.com>)
+	- Change various __DATA__ to __END__ (from Nick Ing-Simmons 
+	  <nick at ing-simmons.net>)
+2003.1125 2003-11-25
+	- Various folks have complained that JulianDay isn't correct.  An
+	  errata section has been added to the documentation.
+	- Mark Ivey <mivey@r2tech.com> add '@' as a synonym for 'at'.
+	  Fixed typos.  
+	- Bryan Henderson <bryanh@giraffe-data.com> sent in a patch to
+	  allow NOW => 0 so that ParseDate can be used to parse relative
+	  times. 
+	- ewan@baremetal.com sent in a patch adding a bit of ISO 8601
+	  support.
+	- David Alban <david@responsible.com> doesn't like allowing the
+	  hour 24:00.  I agree.  Gone if you have VALIDATE=>1.
+	- Still to be done: the support the large number of ISO 8601 
+	  date formats: http://hydracen.com/dx/iso8601.htm
+2003.0211 2003-02-11
+	- Mike Cramer <cramer@webkist.com> sent a patch to Timezone to
+	  handle changes in $ENV{TZ}. 
+	- Rani Pinchuk <rani@cpan.org> sent in a definition for the
+	  CEST timezone.
+	- On Phil.Moore@msdw.com's behalf the timezone 'MET DST' is now
+	  supported.
+2002.1001 2002-10-01
+	- No real changes, just added a license.
+101.062001 2001-06-20
+	- Paul Zimmer <pzimmer@bepress.com> found that '7/17/01' with
+	  PREFER_FUTURE failed badly.  Fixed.  This was also submitted
+	  by Dana Burd <DBurd@cpr.org>.
+	- Ben Daglish <bdaglish@yahoo.com> noted that array context
+	  was implying WHOLE and DATE_REQUIRED.  Fixed.
+	- Streppone Cosimo <cstrep@idgroup.it> requested support for
+	  postgresql's date format ("dd/mm/yyyy hh:mn:ss +tzo")
+	- Ameeth Linus Daniel <linus@teil.soft.net> found that IST wasn't 
+	  a defined timezone.  I've defined it as +0530, but I'm not 
+	  positive that's correct.
+	- Gautam Tripathi <dayalpura@hotmail.com> sent in a fix for
+	  timezone offset calculations making them consistent across
+	  all systems (no more problems with differing interpretations
+	  of negative modulus operations).
+	- Mike Nerone <mnerone@idworld.net> requested the syntax 
+	  "4 days ago".  He says that that syntax is suppored by
+	  GNU date.  This was also requested by Townsend, John E. 
+	  <John.Townsend@lexis-nexis.com>.
+	- Anton Berezin <tobez@heechee.tobez.org> notice that ParseDate
+	  couldn't handle "Sunday, 06-Nov-94 08:49:37 GMT" and sent
+	  in a patch.
+100.010301 2000-01-03
+	- W. Phillip Moore <Phil.Moore@msdw.com> reproted a Y2K bug: it could
+	  not parse 'Jan  1 2000 10:30:30AM'.  Fixed.  This is embarassing
+	  beasue <alangmead@boston.com> sent in a patch Dec 9th!
+99.111701 1999-11-17
+	- Allen Smith <easmith@beatrice.rutgers.edu> noticed that VALIDATE
+	  wouldn't accept hours > 0...  
+	- Hugh C Kennedy <kennedyh@engin.umich.edu> contributed patches to
+	  parse months like `Jan.' in additon to `Jan' and `January'.
+99.062401 1999-06-24:
+	- Randy Kobes <randy@theoryx5.uwinnipeg.ca> sent in a fix for
+	  Timezone.pm that allows all tests to pass on MSWin32.
+99.062301:
+	- Eric Prestemon <ecp@adknowledge.com> noticed that %y would print
+	  "0" in 2000, not "00" as it should.  Fixed.
+	- Parsedate() now checks for wantarray() and returns what remains of
+	  its input when called from array context.
+	- Added another parsing option: VALIDATE.  When VALIDATE is set,
+	  silly values for hours, months, etc will be rejected.  Like the
+	  32nd of December will no longer be new years day.
+99.062201 1999-06-22
+	- Optionally return fractional seconds from ParseDate (including 
+	  the SYBASE formatted ones).  Provide for printing fractional
+	  seconds in CTime.  Changes from Douglas Wegscheid 
+	  <wegscd@whirlpool.com>
+99.061601 1999-06-16
+	- More attempts to support systems whose time function isn't 
+	  centered around Jan 1, 1970 midnight GMT.
+99.061501 1999-05-15
+	- Fixed a couple of compiler warnings.  Did extensive testing with
+	  dates beyond 2000 and before 1970.  Quite a few code changes.
+	  Old code would have worked in many > 2000 cases but broke 
+	  terribly for dates < 1970.
+	  New code should work until year 10k.  Well, there's one problem:
+	  unix time format is only 32 bits, signed. 
+98.112901 1998-11-29
+	- Slight change to avoid an "Use of uninitialized value" error
+	  pointed out by Mike Coffin <mhc@Eng.Sun.COM>.
+98.112801 1998-11-12
+	- It turns out that Sybase emits time values like "3:09:59:000PM".  The
+	  last three digits are milliseconds.  Such times are now recognized
+	  but the milliseconds are ignored.  Change requested by
+	  ryanmcleish <ryan@email.labmed.umn.edu>.
+	- Corrected the documenation on strftime conversions for %d and %e.  The
+	  code and the documentation now agree:
+		%d - 01 to 31
+		%e -  1 to 31
+98.052201 1998-05-22
+	- Minor bugfix: didn't recognize 5/18/1998.
+97.092101 1997-09-21
+	- Fix a 5.004 warning.
+	- Add support for "June 4, 1997"
+96.110801 1996-11-08
+	- Added support for negative relative times.
+	- Bugfix: "now" by itself was ignored.
+	- Bugfix: could not combine "now" with time offsets (only date offsets)
+96.032801 1996-03-28
+	- Added support for "TZN
+96.032702 1996-03-27
+	- This is the first release to use the Makefile.PL 
+	  packaging.  There are many changes with repect to 
+	  previous releases.  All modules now running with -w and
+	  use strict.
+	- CTime.pm: should be faster
+	- ParseDate.pm: core logic changed, more dates parsed.
+	- datetime.t: more tests
+	- Timezone.pm: ripped out tzset code and replaced it
+	  with code from Graham Barr <bodg@tiuk.ti.com>

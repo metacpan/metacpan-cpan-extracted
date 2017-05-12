@@ -1,0 +1,65 @@
+=== basic
+--- wiki
+&ref(http://livedoor.com/test.gif)
+--- html
+<a href="http://livedoor.com/test.gif"><img src="http://livedoor.com/test.gif" border="0" /></a>
+=== label 
+--- wiki
+&ref(http://livedoor.com/test.gif){ラベル'"<>}
+--- html
+<a href="http://livedoor.com/test.gif"><img src="http://livedoor.com/test.gif" border="0" alt="ラベル'&quot;&lt;&gt;" /></a>
+=== propeties 
+--- wiki
+&ref(http://livedoor.com/test.gif,100,200,no_link)
+--- html
+<img src="http://livedoor.com/test.gif" border="0" width="100" height="200" />
+=== propeties 
+--- wiki
+&ref(http://livedoor.com/test.gif,100,200,left)
+--- html
+<a href="http://livedoor.com/test.gif"><img src="http://livedoor.com/test.gif" border="0" width="100" height="200" align="left" /></a>
+=== propeties 
+--- wiki
+&ref(http://livedoor.com/test.gif,200,left)
+--- html
+<a href="http://livedoor.com/test.gif"><img src="http://livedoor.com/test.gif" border="0" width="200" align="left" /></a>
+=== propeties 
+--- wiki
+&ref(http://livedoor.com/test.gif,,200,left)
+--- html
+<a href="http://livedoor.com/test.gif"><img src="http://livedoor.com/test.gif" border="0" height="200" align="left" /></a>
+=== propeties 
+--- wiki
+&ref(http://livedoor.com/test.gif,right)
+--- html
+<a href="http://livedoor.com/test.gif"><img src="http://livedoor.com/test.gif" border="0" align="right" /></a>
+=== no args
+--- wiki
+&ref()
+--- html
+&amp;ref()
+=== not image url
+--- wiki
+&ref(<script>tag</script>)
+--- html
+&amp;ref(&lt;script&gt;tag&lt;/script&gt;)
+=== too many 
+--- wiki
+&ref(http://livedoor.com/test.gif,100,200,12313)
+--- html
+<a href="http://livedoor.com/test.gif"><img src="http://livedoor.com/test.gif" border="0" width="100" height="200" /></a>
+=== synopsis
+--- wiki
+&ref(http://image.profile.livedoor.jp/icon/polocky_60.gif)
+&ref(http://image.profile.livedoor.jp/icon/polocky_60.gif){hoge hoge"'><}
+&ref(http://image.profile.livedoor.jp/icon/polocky_60.gif,10,10,left)
+&ref(http://image.profile.livedoor.jp/icon/polocky_60.gif,left,10,10)
+&ref(http://image.profile.livedoor.jp/icon/polocky_60.gif,left,10)
+&ref(http://image.profile.livedoor.jp/icon/polocky_60.gif,10)
+--- html
+<a href="http://image.profile.livedoor.jp/icon/polocky_60.gif"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" border="0" /></a>
+<a href="http://image.profile.livedoor.jp/icon/polocky_60.gif"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" border="0" alt="hoge hoge&quot;'&gt;&lt;" /></a>
+<a href="http://image.profile.livedoor.jp/icon/polocky_60.gif"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" border="0" width="10" height="10" align="left" /></a>
+<a href="http://image.profile.livedoor.jp/icon/polocky_60.gif"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" border="0" width="10" height="10" align="left" /></a>
+<a href="http://image.profile.livedoor.jp/icon/polocky_60.gif"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" border="0" width="10" align="left" /></a>
+<a href="http://image.profile.livedoor.jp/icon/polocky_60.gif"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" border="0" width="10" /></a>

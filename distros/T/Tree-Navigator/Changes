@@ -1,0 +1,21 @@
+Revision history for Tree-Navigator
+
+0.06 08.11.2015
+  - RT108070 removing MYMETA files from the distribution (Chorny++)
+
+0.05 02.10.2012
+  - replacing HTTP::Server::PSGI::Mortal by plain HTTP::Server::PSGI, 
+    now that it has harakiri mode
+
+0.04 19.09.2012
+  - Yet more dependencies
+
+0.03 18.09.2012
+  - Yet more dependencies
+
+0.02 18.09.2012
+  - Fixed dependencies
+
+0.01 18.09.2012
+  - First version
+

@@ -1,0 +1,55 @@
+
+Tk_Multi is a set of Tk composite widget to allow you to manage
+several scrolled Text or Canvas or TFrame (aka titled frame) widgets
+in your Toplevel window.
+
+The manager allows you to hide or show any managed text window through
+a menu.
+
+Tk::Multi::* widgets uses Adjuster to increase, decrease the window
+size, and a menu to print its content.
+
+This module was last tested with perl5.00804 and needs Tk804.027.
+
+See the embedded documentation in the module for more details.
+
+Comments and suggestions are always welcome.
+
+Note that this module is in beta state. Its interface may still change
+(but I don't think so)
+
+I'd like people who actually use this module for their application to
+drop me a short note about what they're using this module for.
+
+Many thanks to Larry W. Virden, Achim Bohnet for all the tests,
+patches (and reports) they made. Many bugs were fixed and improvements
+were included thanks to their efforts.
+
+
+TO DO (well, bugs...): 
+----------------------
+
+- The print pop-up menu should be replaced by a modified version of
+Albert W. Dorrington's PrintDialog. Once this is done, the
+Tk::Multi::Any class will be removed.
+
+
+Legal mumbo jumbo:
+------------------
+
+ Copyright (c) 1997-1999,2002,2004 Dominique Dumont. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.
+
+ - Dominique Dumont
+   dominique_dumont@grenoble.hp.com
+
+---------------------------------------------------------------------
+INSTALLATION
+
+   	 gunzip -c <dist_file>.tar.gz | tar xvf -
+   	 cd <dist_directory>
+   	 perl Makefile.PL
+   	 make test          
+   	 make install
+

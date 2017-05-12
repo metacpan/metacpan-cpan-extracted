@@ -1,0 +1,23 @@
+Time/ZoneInfo version 0.1
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Only the actual zoneinfo files and standard perl modules.
+
+COPYRIGHT AND LICENCE
+
+This is licenced under the same terms as perl itslef (Perl Artistic Licence)
+and the LGPL (you can choose)
+
+Copyright (C) 2002 Scott Penrose <scottp@dd.com.au> - http://linux.dd.com.au/
+

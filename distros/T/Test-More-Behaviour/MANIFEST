@@ -1,0 +1,14 @@
+Changes
+examples/README
+examples/BankAccount.pm
+examples/BankAccountSpec.t
+lib/Test/More/Behaviour.pm
+lib/Test/More/Behaviour/Helper.pm
+License.txt
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/Behaviour.t
+t/Helper.t
+META.yml                                 Module meta-data (added by MakeMaker)

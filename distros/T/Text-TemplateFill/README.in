@@ -1,0 +1,140 @@
+Text::TemplateFill version MODVER
+=============================
+
+This module essentially does the same job as perl formats that you would 'write'.
+The big advantage is that the text is read from files and so:
+* may be easily changed by users
+* may be chosen at run time; perhaps based on a country code
+
+Buzz word alert: a paragraph is the basic unit of output text and will be read from a file.
+
+The major features are:
+
+* I18N formatting support, eg: decimal comma in France
+* I18N date support
+* Automatic page breaks
+* Variables are 'registered', not passed to each GeneratePara
+* Calculations may be defined as part of the paragraph definition in the file.
+* Optional use of your own Error reporting code
+* Variables can be formatted by the full power of printf
+* Automatic page/paragraph counting
+* Output is a string that may be then written anywhere
+
+
+Quick example:
+
+	use strict;
+	use Text::TemplateFill;
+
+	my $tmpl = new Text::TemplateFill;
+
+	# Set options:
+	# * where the templates are to be found
+	# * how to report errors
+	# * MSDOS line terminator
+	$tmpl->SetOpt('BaseDir' => "$TemplateDir/$Country", 'LineTerminator' => "\r\n");
+
+	# Read the paragraphs:
+	$tmpl->ReadPara('Header');
+	$tmpl->ReadPara('ItemPO');
+
+	# Bind variables in this program to the names used in the paragraphs:
+	$tmpl->BindVars('purchase_order_no' => \$PONo, 'orderdate' => \$Date, 'shipdate' => \$ShipDate);
+
+	...
+
+	print $tmpl->GeneratePara('Header');
+
+	...
+
+	while(...) {
+		$PONo = ....
+		$Date = ....
+		$ShipDate = ....
+
+		# Print the paragraph with the items that we have just read in
+		print $tmpl->GeneratePara('ItemPO');
+	}
+
+
+TemplateDir/uk/Header might contain:
+
+	${#} Store Purchase Orders.
+	${#}
+	${Opt StartPage } 
+	${#}
+	${Opt StartPageTag Header } This is the default page header
+	${Opt Locale en_GB.ISO8859-1}
+	${#} Reset the page totals of units:
+	${Calc PageTotal := 0 }
+	${Calc PageTotalLastPage := 0 }
+	${#}
+	                                                 ACME Ltd                                       PAGE ${PageNo}
+	                                              PURCHASE ORDER
+	
+	       Destination Store: ${country}${branch%5.5d}                                  Supplier Code: ${vendor_number%10.10d}
+	                                                                   Supplier Name: ${vendor_name}
+	                                                           Purchase Order Number: ${purchase_order_no}
+	                                                                      Order Date: ${orderdate@time<%Y %B %d>}
+	                                                                   Delivery Date: ${shipdate@time<%Y %B %d>}
+	
+	
+	                                                           Quantity        Current
+	   Department     SKU       Description               Ordered  Received     Price        Value
+	   ==========     ===       ===========               =======  ========     =====        =====
+	
+	                                                               ________
+	${#} end of paragraph
+
+
+
+For examples of use see the test program: test.pl
+POD documentation is in the module.
+	
+You install the module by running these commands:
+	
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+
+Please report any bugs/suggestions to Alain Williams <addw@phcomp.co.uk>
+
+
+It is understood that any contribution that is sent in for distribution
+with this module shall have copyright assigned to addw who will release
+it under the same licence as the rest of the module. Contributions will
+be acknowledged.
+
+
+
+COPYRIGHT
+
+      /\
+     /  \              (C) Copyright 2002-2003 Parliament Hill Computers Ltd.
+     \  /              All rights reserved.
+      \/
+       .               Author: Alain Williams, July 2002
+       .               addw@phcomp.co.uk
+        .
+          .
+
+	SCCS: @(#)README.in 1.2 03/27/03 10:40:02
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. You must preserve this entire copyright
+notice in any use or distribution.
+The author makes no warranty what so ever that this code works or is fit
+for purpose: you are free to use this code on the understanding that any problems
+are your responsibility.
+
+Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is
+hereby granted, provided that the above copyright notice appear in all copies and that both that copyright notice and
+this permission notice appear in supporting documentation.
+
+
+Note that the version number of this README may be different from the version of the module.
+The version number at the top of this file should correspond to the version number of the
+module at the time that it was bundled into a tar file.

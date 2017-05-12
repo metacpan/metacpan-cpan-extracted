@@ -1,0 +1,39 @@
+---------------------
+Text::BarGraph  v1.1
+---------------------
+
+Copyright (c) 2001 Kirk Baucom.  All rights reserved.  This
+module can be distributed or modified under the 'Artistic License',
+as distributed with Perl.
+
+Website:
+--------
+You can find any updates at:
+http://www.robobunny.com/projects/bargraph
+or at http://search.cpan.org
+
+Overview
+--------
+This module generates text bar graphs based on data sent to it in a hash.
+
+Contributors
+------------
+Robert Eric Pearse <pearse@robertpearse.com>: Numeric key sorting
+
+Requirements
+------------
+If you want the module to automatically determine the size of your screen
+when generating a graph, you will need the Term::ReadKey module, which you
+can get from http://search.cpan.org. If you request the graph to be
+automatically sized, and the module is not there, it will silently revert
+to 80 columns.
+
+Term::ANSIColor is used if available. Raw ANSI escape sequences are used
+otherwise.
+
+Installation
+------------
+
+perl Makefile.PL
+make
+make install

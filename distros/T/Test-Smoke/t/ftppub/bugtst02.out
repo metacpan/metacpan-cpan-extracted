@@ -1,0 +1,198 @@
+Started smoke at 1076751124
+Smoking patch __PATCHLEVEL__
+Stopped smoke at 1076751131
+Started smoke at 1076751131
+
+Configuration: -Dusedevel
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3.1 (cygming special)
+TSTENV = stdio  u=3.44  s=6.72  cu=435.89  cs=261.79  scripts=812  tests=80463
+
+    ../ext/IPC/SysV/t/ipcsysv.t.............FAILED 1-16
+    ../ext/IPC/SysV/t/msg.t.................FAILED ??
+    ../ext/IPC/SysV/t/sem.t.................FAILED ??
+    ../lib/File/Temp/t/mktemp.t.............FAILED 6-9
+    ../lib/File/Temp/t/object.t.............FAILED 6-18
+    ../lib/File/Temp/t/security.t...........FAILED 3 5 7 11-13
+    ../lib/File/Temp/t/tempfile.t...........FAILED 6-22
+    ../lib/IPC/SysV.t.......................FAILED 1-16
+    ../t/io/tell.t..........................FAILED 28
+    ../t/op/filetest.t......................FAILED 8
+    ../t/op/sysio.t.........................FAILED 39
+    ../t/op/taint.t.........................FAILED 150-223
+Inconsistent test results (between TEST and harness):
+    ../t/op/alarm.t.........................FAILED at test 1
+
+TSTENV = perlio u=3.03  s=3.37  cu=346.89  cs=246.12  scripts=812  tests=80463
+
+    ../ext/IPC/SysV/t/ipcsysv.t.............FAILED 1-16
+    ../ext/IPC/SysV/t/msg.t.................FAILED ??
+    ../ext/IPC/SysV/t/sem.t.................FAILED ??
+    ../lib/File/Temp/t/mktemp.t.............FAILED 6-9
+    ../lib/File/Temp/t/object.t.............FAILED 6-18
+    ../lib/File/Temp/t/security.t...........FAILED 3 5 7 11-13
+    ../lib/File/Temp/t/tempfile.t...........FAILED 6-22
+    ../lib/IPC/SysV.t.......................FAILED 1-16
+    ../t/op/filetest.t......................FAILED 8
+    ../t/op/sysio.t.........................FAILED 39
+    ../t/op/taint.t.........................FAILED 150-223
+
+Stopped smoke at 1076753563
+Started smoke at 1076753563
+
+Configuration: -Dusedevel -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3.1 (cygming special)
+Unable to make anything but miniperl in this configuration
+TSTENV = minitest           cp ext/re/re.pm ext/re/re.tmp && sh mv-if-diff ext/re/re.tmp lib/re.pm
+    You may see some irrelevant test failures if you have been unable
+    to build lib/Config.pm or lib/lib.pm.
+        && PATH=/P/perl-current:.:/P/perl-current:.:/pro/bin:/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:/C/Bin:/C/Util/Perl/bin:/C/Util/Elvis:/C/WinNT/system32:/C/WinNT:/C/WinNT/System32/Wbem:/C/Util/MySQL/bin:/C/Util/ImageMagick:/usr/local:/etc:/usr/lib:/lib:/sbin:/usr/sbin ./perl TEST base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
+Stopped smoke at 1076754075
+Started smoke at 1076754075
+
+Configuration: -Dusedevel -Duse64bitint
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3.1 (cygming special)
+TSTENV = stdio  u=4.03  s=3.92  cu=454.10  cs=270.25  scripts=814  tests=80607
+
+    ../ext/IPC/SysV/t/ipcsysv.t.............FAILED 1-16
+    ../ext/IPC/SysV/t/msg.t.................FAILED ??
+    ../ext/IPC/SysV/t/sem.t.................FAILED ??
+    ../lib/File/Temp/t/mktemp.t.............FAILED 6-9
+    ../lib/File/Temp/t/object.t.............FAILED 6-18
+    ../lib/File/Temp/t/security.t...........FAILED 3 5 7 11-13
+    ../lib/File/Temp/t/tempfile.t...........FAILED 6-22
+    ../lib/IPC/SysV.t.......................FAILED 1-16
+    ../t/io/tell.t..........................FAILED 28
+    ../t/op/filetest.t......................FAILED 8
+    ../t/op/sysio.t.........................FAILED 39
+    ../t/op/taint.t.........................FAILED 150-223
+
+TSTENV = perlio u=2.82  s=3.77  cu=378.71  cs=255.91  scripts=814  tests=80607
+
+    ../ext/IPC/SysV/t/ipcsysv.t.............FAILED 1-16
+    ../ext/IPC/SysV/t/msg.t.................FAILED ??
+    ../ext/IPC/SysV/t/sem.t.................FAILED ??
+    ../lib/File/Temp/t/mktemp.t.............FAILED 6-9
+    ../lib/File/Temp/t/object.t.............FAILED 6-18
+    ../lib/File/Temp/t/security.t...........FAILED 3 5 7 11-13
+    ../lib/File/Temp/t/tempfile.t...........FAILED 6-22
+    ../lib/IPC/SysV.t.......................FAILED 1-16
+    ../t/op/filetest.t......................FAILED 8
+    ../t/op/sysio.t.........................FAILED 39
+    ../t/op/taint.t.........................FAILED 150-223
+
+Stopped smoke at 1076756694
+Started smoke at 1076756694
+
+Configuration: -Dusedevel -Duse64bitint -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3.1 (cygming special)
+Unable to make anything but miniperl in this configuration
+TSTENV = minitest           cp ext/re/re.pm ext/re/re.tmp && sh mv-if-diff ext/re/re.tmp lib/re.pm
+    You may see some irrelevant test failures if you have been unable
+    to build lib/Config.pm or lib/lib.pm.
+        && PATH=/P/perl-current:.:/P/perl-current:.:/pro/bin:/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:/C/Bin:/C/Util/Perl/bin:/C/Util/Elvis:/C/WinNT/system32:/C/WinNT:/C/WinNT/System32/Wbem:/C/Util/MySQL/bin:/C/Util/ImageMagick:/usr/local:/etc:/usr/lib:/lib:/sbin:/usr/sbin ./perl TEST base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
+Stopped smoke at 1076757078
+Started smoke at 1076757078
+
+Configuration: -Dusedevel -Duseithreads
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3.1 (cygming special)
+TSTENV = stdio  u=3.83  s=3.77  cu=677.39  cs=283.97  scripts=839  tests=81168
+
+    ../ext/IPC/SysV/t/ipcsysv.t.............FAILED 1-16
+    ../ext/IPC/SysV/t/msg.t.................FAILED ??
+    ../ext/IPC/SysV/t/sem.t.................FAILED ??
+    ../lib/File/Temp/t/mktemp.t.............FAILED 6-9
+    ../lib/File/Temp/t/object.t.............FAILED 6-18
+    ../lib/File/Temp/t/security.t...........FAILED 3 5 7 11-13
+    ../lib/File/Temp/t/tempfile.t...........FAILED 6-22
+    ../lib/IPC/SysV.t.......................FAILED 1-16
+    ../t/io/tell.t..........................FAILED 28
+    ../t/op/filetest.t......................FAILED 8
+    ../t/op/sysio.t.........................FAILED 39
+    ../t/op/taint.t.........................FAILED 150-223
+
+TSTENV = perlio u=3.30  s=3.58  cu=566.65  cs=277.41  scripts=839  tests=81168
+
+    ../ext/IPC/SysV/t/ipcsysv.t.............FAILED 1-16
+    ../ext/IPC/SysV/t/msg.t.................FAILED ??
+    ../ext/IPC/SysV/t/sem.t.................FAILED ??
+    ../lib/File/Temp/t/mktemp.t.............FAILED 6-9
+    ../lib/File/Temp/t/object.t.............FAILED 6-18
+    ../lib/File/Temp/t/security.t...........FAILED 3 5 7 11-13
+    ../lib/File/Temp/t/tempfile.t...........FAILED 6-22
+    ../lib/IPC/SysV.t.......................FAILED 1-16
+    ../t/op/filetest.t......................FAILED 8
+    ../t/op/sysio.t.........................FAILED 39
+    ../t/op/taint.t.........................FAILED 150-223
+
+Stopped smoke at 1076760305
+Started smoke at 1076760305
+
+Configuration: -Dusedevel -Duseithreads -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3.1 (cygming special)
+Unable to make anything but miniperl in this configuration
+TSTENV = minitest           cp ext/re/re.pm ext/re/re.tmp && sh mv-if-diff ext/re/re.tmp lib/re.pm
+    You may see some irrelevant test failures if you have been unable
+    to build lib/Config.pm or lib/lib.pm.
+        && PATH=/P/perl-current:.:/P/perl-current:.:/pro/bin:/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:/C/Bin:/C/Util/Perl/bin:/C/Util/Elvis:/C/WinNT/system32:/C/WinNT:/C/WinNT/System32/Wbem:/C/Util/MySQL/bin:/C/Util/ImageMagick:/usr/local:/etc:/usr/lib:/lib:/sbin:/usr/sbin ./perl TEST base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
+Stopped smoke at 1076760720
+Started smoke at 1076760720
+
+Configuration: -Dusedevel -Duseithreads -Duse64bitint
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3.1 (cygming special)
+TSTENV = stdio  u=3.54  s=4.64  cu=661.54  cs=252.49  scripts=841  tests=81312
+
+    ../ext/IPC/SysV/t/ipcsysv.t.............FAILED 1-16
+    ../ext/IPC/SysV/t/msg.t.................FAILED ??
+    ../ext/IPC/SysV/t/sem.t.................FAILED ??
+    ../lib/File/Temp/t/mktemp.t.............FAILED 6-9
+    ../lib/File/Temp/t/object.t.............FAILED 6-18
+    ../lib/File/Temp/t/security.t...........FAILED 3 5 7 11-13
+    ../lib/File/Temp/t/tempfile.t...........FAILED 6-22
+    ../lib/IPC/SysV.t.......................FAILED 1-16
+    ../t/io/tell.t..........................FAILED 28
+    ../t/op/filetest.t......................FAILED 8
+    ../t/op/sysio.t.........................FAILED 39
+    ../t/op/taint.t.........................FAILED 150-223
+
+TSTENV = perlio u=3.24  s=5.08  cu=539.53  cs=266.99  scripts=841  tests=81312
+
+    ../ext/IPC/SysV/t/ipcsysv.t.............FAILED 1-16
+    ../ext/IPC/SysV/t/msg.t.................FAILED ??
+    ../ext/IPC/SysV/t/sem.t.................FAILED ??
+    ../lib/File/Temp/t/mktemp.t.............FAILED 6-9
+    ../lib/File/Temp/t/object.t.............FAILED 6-18
+    ../lib/File/Temp/t/security.t...........FAILED 3 5 7 11-13
+    ../lib/File/Temp/t/tempfile.t...........FAILED 6-22
+    ../lib/IPC/SysV.t.......................FAILED 1-16
+    ../t/op/filetest.t......................FAILED 8
+    ../t/op/sysio.t.........................FAILED 39
+    ../t/op/taint.t.........................FAILED 150-223
+
+Stopped smoke at 1076766708
+Started smoke at 1076766708
+
+Configuration: -Dusedevel -Duseithreads -Duse64bitint -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: gcc version 3.3.1 (cygming special)
+Unable to make anything but miniperl in this configuration
+TSTENV = minitest           cp ext/re/re.pm ext/re/re.tmp && sh mv-if-diff ext/re/re.tmp lib/re.pm
+    You may see some irrelevant test failures if you have been unable
+    to build lib/Config.pm or lib/lib.pm.
+        && PATH=/P/perl-current:.:/P/perl-current:.:/pro/bin:/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:/C/Bin:/C/Util/Perl/bin:/C/Util/Elvis:/C/WinNT/system32:/C/WinNT:/C/WinNT/System32/Wbem:/C/Util/MySQL/bin:/C/Util/ImageMagick:/usr/local:/etc:/usr/lib:/lib:/sbin:/usr/sbin ./perl TEST base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
+Finished smoking __PATCHLEVEL__
+Stopped smoke at 1076767143

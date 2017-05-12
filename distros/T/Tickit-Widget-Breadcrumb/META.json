@@ -1,0 +1,69 @@
+{
+   "abstract" : "breadcrumb-like interface",
+   "author" : [
+      "Tom Molesworth <cpan@perlsite.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tickit-Widget-Breadcrumb",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Adapter::Async::OrderedList::Array" : "0.007",
+            "Future" : "0.30",
+            "Mixin::Event::Dispatch" : "1.006",
+            "Tickit" : "0.50",
+            "Tickit::Widget" : "0",
+            "curry" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98",
+            "Test::Refcount" : "0.07"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-tickit-widget-breadcrumb at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Tickit-Widget-Breadcrumb"
+      },
+      "homepage" : "http://search.cpan.org/dist/Tickit-Widget-Breadcrumb/"
+   },
+   "version" : "0.003"
+}
+

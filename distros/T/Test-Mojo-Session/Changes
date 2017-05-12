@@ -1,0 +1,26 @@
+Revision history for Perl extension Test::Mojo::Session.
+
+1.04 2015-03-02T04:56:47Z
+    - Added compatibility with Mojo 6.0
+
+1.03 2015-02-15T12:20:31Z
+    - Rename distributive, use case sensitive name.
+
+1.02 2015-01-25T06:38:23Z
+    - Don't use deprecated Mojo::JSON and Mojo::JSON::Pointer API.
+    - Set minimum version of Mojolicious to 4.82.
+
+1.01  2014-02-05
+    - Fixed dependency.
+
+1.0   2014-02-03
+    - Checked signature of sessions.
+
+0.03  2013-03-09
+    - Set minimum version of Mojolicious to 3.47.
+
+0.02  2013-03-07
+    - Fixed bug with passing args to new method in base class.
+
+0.01  2013-03-06
+    - First release of Test::Mojo::Session.

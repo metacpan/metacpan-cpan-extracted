@@ -1,0 +1,35 @@
+TYPEMAP
+const char *        T_PV
+XMLNODE *           T_PTROBJ_NODE
+XSLTGLOBALDATA *    T_PTROBJ
+TRANSFORM_CONTEXT * T_PTROBJ_CONTEXT
+
+INPUT
+T_PTROBJ_NODE
+  if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+  {
+    $var = ($type)SvIV((SV *)SvRV($arg));
+  }
+  else
+  {
+    warn(\"${Package}::$func_name() -- $var is not a blessed SV reference\");
+    XSRETURN_UNDEF;
+  }
+
+T_PTROBJ_CONTEXT
+  if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+  {
+    $var = ($type)SvIV((SV *)SvRV($arg));
+  }
+  else
+  {
+    warn(\"${Package}::$func_name() -- $var is not a blessed SV reference\");
+    XSRETURN_UNDEF;
+  }
+
+OUTPUT
+T_PTROBJ_NODE
+  sv_setref_pv($arg, "TurboXSLT::Node", (void *)$var);
+
+T_PTROBJ_CONTEXT
+  sv_setref_pv($arg, "TurboXSLT::Stylesheet", (void *)$var);

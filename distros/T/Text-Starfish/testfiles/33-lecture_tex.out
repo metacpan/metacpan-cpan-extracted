@@ -1,0 +1,34 @@
+% -*- compile-command: "make 01s 01"; -*-
+
+\section{Course Introduction}
+
+\subsection{About Course}
+
+\subsubsection{Logistics and Administrivia}
+
+
+\par\vspace{4mm}\hrule\vspace{3mm}
+\begin{center}
+\begin{tabbing}
+xxxxxxxxxxx\=\kill
+\>  Time:\' Tuesdays and Thursdays 10:05 -- 11:25 \nltabbing
+\> Location:\' ... \nltabbing
+\end{tabbing}
+\end{center}
+\hrule\vspace{0cm}
+\newpageforslides
+
+\setslidesLarge
+\bsl{Course Description}
+\item Introducing principles of practice of programming
+\esl
+
+Other stuff...
+
+
+both
+both
+
+only notes
+etc.
+

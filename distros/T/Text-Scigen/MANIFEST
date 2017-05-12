@@ -1,0 +1,16 @@
+bin/scigen.pl
+Changes
+lib/Text/Scigen.pm
+lib/Text/Scigen/functions.in
+lib/Text/Scigen/graphviz.in
+lib/Text/Scigen/scigen.pm
+lib/Text/Scigen/scirules.in
+lib/Text/Scigen/svg_figures.in
+lib/Text/Scigen/system_names.in
+lib/Text/Scigen/talkrules.in
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/Text-Scigen.t
+META.yml                                 Module meta-data (added by MakeMaker)

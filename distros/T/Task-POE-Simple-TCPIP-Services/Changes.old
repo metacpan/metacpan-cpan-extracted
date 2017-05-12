@@ -1,0 +1,22 @@
+Task::POE::Simple::TCPIP::Services
+==================================
+
+1.08	Tue Apr 22 09:02:30 BST 2008
+	- Switched to Task:: namespace
+
+Bundle::POE::Simple::TCPIP::Services
+====================================
+
+1.06    Thu Apr  3 12:55:22 BST 2008
+        - Updated versions.
+
+1.02    Thu Nov  1 15:28:38 GMT 2007
+        - Updated Module::Install to 0.68
+
+1.01    Wed Jul 25 12:44:30 BST 2007
+        - Fixed abstract_from in Makefile.PL
+        - updated the version of Echo.pm required
+
+1.00    Mon Feb 05 14:30:31 GMT 2007
+        - Initial public release.
+

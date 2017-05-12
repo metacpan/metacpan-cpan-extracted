@@ -1,0 +1,14 @@
+Changes
+LICENSE
+lib/Term/Screen/Lite.pm
+lib/Term/Screen/Lite/Generic.pm
+lib/Term/Screen/Lite/Win32.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

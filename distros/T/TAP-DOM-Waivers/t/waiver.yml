@@ -1,0 +1,10 @@
+---
+- comment: Force all failed IPv6 stuff to true
+  match_dpath:
+    - "//lines//description[value =~ /IPv6/]/../is_ok[value eq 0]/.."
+  patch:
+    is_ok:        1
+    has_todo:     1
+    is_actual_ok: 0
+    explanation:  ignore failing IPv6 related tests
+    directive:    TODO

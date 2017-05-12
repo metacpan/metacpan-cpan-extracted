@@ -1,0 +1,22 @@
+bin/ura-m
+Build.PL
+Changelog
+COPYING
+lib/Travel/Status/DE/ASEAG.pm
+lib/Travel/Status/DE/MvgMainz.pm
+lib/Travel/Status/DE/URA.pm
+lib/Travel/Status/DE/URA/Result.pm
+lib/Travel/Status/DE/URA/Stop.pm
+lib/Travel/Status/GB/TFL.pm
+MANIFEST			This list of files
+META.json
+README
+t/10-pod-coverage.t
+t/20-aseag.t
+t/21-get-stop-by-name.t
+t/22-results-via.t
+t/23-results.t
+t/24-results-route.t
+t/in/instant_V1
+META.yml
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,12 @@
+Revision history for Tie-CHI
+
+** denotes an incompatible change
+
+0.02  Nov 6, 2011
+
+- Declare dependencies CHI and Scalar::Util - RT #72031 - Andreas Koenig
+
+0.01  Oct 6, 2011
+
+- Initial version
+

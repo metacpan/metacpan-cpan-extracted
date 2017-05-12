@@ -1,0 +1,14 @@
+Changes made in Sense-Clusters version 0.33 during version 0.35
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Added Senseval-2 Demos
+2.	Changed name of cluster.pl to similarity.pl
+3.	Added options 
+	--nomulti to vector.pl
+	--numthrow, --perthrow, --precision to similarity.pl
+
+(Changelog-v0.33to0.35 Last Updated on 07/15/2003 by Amruta)

@@ -1,0 +1,1 @@
+<: include alternating_recursive_include2.txt :>

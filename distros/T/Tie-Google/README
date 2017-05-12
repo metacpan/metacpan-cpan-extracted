@@ -1,0 +1,213 @@
+NAME
+    Tie::Google - Single-variable access to Google search results
+
+SYNOPSIS
+      my $KEYFILE = glob "~/.googlekey";
+      my ($g, @g, %g);
+
+      # Tied array interface
+      tie @g, "Tie::Google", $KEYFILE, "perl";
+      for my $r (@g) {
+          printf " * <a href='%s'>%s</a>\n",
+              $r->{'URL'}, $r->{'title'};
+      }
+
+      # Tied hash interface
+      tie %g, "Tie::Google", $KEYFILE;
+      for my $term (qw[ perl python ruby ]) {
+          my $res = $g{$term};
+          printf "%d results for '%s:\n", scalar @$res, $term;
+
+          for my $r (@$res) {
+              printf " * <a href='%s'>%s</a>\n",
+                  $r->{'URL'}, $r->{'title'};
+          }
+      }
+
+      # Tied scalar interface: I Feel Lucky
+      use LWP::Simple qw(getprint);
+      tie $g, "Tie::Google", $KEYFILE, "perl";
+      getprint($g->{'URL'});
+
+USING Tie::Google
+    Using tied variables can make searching Google much simpler for trivial
+    programs. "Tie::Google" presents a simple interface to Google's search
+    API, using "Net::Google" as the underlying transport mechanism. To use
+    "Tie::Google", you must already be registered with Google and have an
+    API key.
+
+    You can tie scalars, arrays, or hashes to the "Tie::Google" class; each
+    offers slightly different functionality, but all offer direct access to
+    Google search results. The basic syntax of all types is:
+
+      tie VAR, 'Tie::Google', $APIKEY, $QUERY, \%OPTIONS;
+
+    where:
+
+    VAR     VAR is the variable name, which can be a scalar, array, or hash:
+
+              tie $g, "Tie::Google", $KEY, $term;
+              tie @g, "Tie::Google", $KEY, $term;
+              tie %g, "Tie::Google", $KEY, $term;
+
+    $APIKEY APIKEY is your Google API key or a file containing the key as
+            the only item on the first line; see http://apis.google.com for
+            details.
+
+    $QUERY  QUERY is your actual search term(s), as a string. This can be
+            arbitrarily complex, up to the limits Google allows:
+
+              tie $g, "Tie::Google", $KEY,
+                "site:cnn.com allintitle:priest court -judas";
+
+    %OPTIONS
+            Any options specified in this hashref will be passed to the
+            Net::Google::Search instance. Available options include
+            "starts_at", "max_results", "ie", "oe", and "lr". See the
+            Net::Google manpage.
+
+  The Tied Array Interface
+
+    Tieing an array to "Tie::Google" gives you an array of search results.
+    How many search results are returned depends on the value of the
+    "max_results" option defined when the array was tied (or
+    $DEFAULT_BATCH_SIZE if "max_results" was not set), though extending the
+    array of results can be done by growing the array.
+
+      $#g = 20;
+
+    Will resize the result set to 20 results. If there are more than 20, the
+    ones on the end will be popped off; if there are less than 20, then more
+    will be retrieved.
+
+    "Tie::Google" supports all non-additive array operations, including
+    "shift", "pop", and the 3 argument form of "splice" (not the 4 argument
+    version). Specifically unallowed are "unshift", "push", and general
+    assigment.
+
+    See the section on "RESULTS" for details about the individual search
+    results.
+
+  The Tied Hash Interface
+
+    The tied hash interface is similar to the tied array interface, except
+    that there are a bunch of them. Asking for a key in the hash %g
+    initiates a search to Google, with the specified key as the search term:
+
+      my $results = $g{'perl apache'};
+
+    This initiates a search with "perl apache" as the query. $results is a
+    reference to an array of hashrefs (see the section on "RESULTS" for
+    details about said hashrefs).
+
+    Tied hashes support all hash functions, including "each", "keys", and
+    "values". Deleting from the hash is allowed (it removes the search
+    results for the deleted terms), but adding to the hash is not.
+
+    There can be many sets of search results stored in a tied hash. To see
+    what this looks like, try this:
+
+      use Data::Dumper;
+      my (%g, $KEY, $dummy);
+
+      tie %g, "Tie::Google", $KEY;
+      $dummy = $g{'perl'};
+      $dummy = $g{'python'};
+      $dummy = $g{'ruby'};
+
+      print Dumper(tied(%g));
+
+    Also, for comparison, try:
+
+      tie @g, "Tie::Google", $KEY, "perl";
+      print Dumper(tied(@g));
+
+    If "starts_at" or "max_results" are specified during the "tie", these
+    options are carried over into new searches (when a new key is requested
+    from the hash), so plan accordingly. If the "max_value" is set to 1000,
+    for example, then every access of a new key is going to contain 1000
+    elements, which will be pretty slow.
+
+  The Tied Scalar Interface
+
+    Do you feel lucky? If so, tie a scalar to "Tie::Google":
+
+      tie $g, "Tie::Google", $KEY, "python";
+
+    Will give you the top result. This is conceptually similar to using the
+    "I Feel Lucky" button on Google.com's front search interface.
+
+RESULTS
+    All results (values returned from these tied variables) are hash
+    references; the contents of these hashrefs are based on the
+    "Net::Google::Response" class (see the Net::Google::Response manpage for
+    details). These elements currently are:
+
+    *   title
+
+    *   URL
+
+    *   snippet
+
+    *   cachedSize
+
+    *   directoryTitle
+
+    *   summary
+
+    *   hostName
+
+    *   directoryCategory
+
+    All keys are case sensitive, and return exactly what the
+    Net::Google::Response manpage says they do ("Tie::Google" does no
+    massaging of this data).
+
+TODO / BUGS
+    This module is far from complete, or even fully thought out. TODO items
+    currently include:
+
+    *   The tests currently suck, to the point of embarrassment. Don't
+        mention it, I'm a little sensitive about it.
+
+    *   Some of the behaviors are kind of wonky. If anyone has any better
+        ideas, please let me know. Patches demanded^Wwelcome^.
+
+    *   Tied arrays should get the next 10 results when you get to the end
+        of the array. Currently, you have to manually extend the array
+        using:
+
+          $#g = 100;
+
+        to get 100 search results.
+
+        Although this technique will have the unfortunate side-effect of
+        trying to iterate through all the results in Google's database.
+
+    *   The tied hash interface should be implemented in terms of the tied
+        array interface. That is, the values associated with each key
+        (search term) should be a reference to an array tied to
+        "Tie::Google". I started doing it this way but it made my brain
+        hurt.
+
+    *   Does there need to be a TIEHANDLE interface as well? Hmmm...
+
+          while (<$google>) {
+              ...
+
+    *   Should returned search results be data structures (they are
+        currently), the actual "Net::Google::Result" instances (where the
+        data is currently being derived from), or new objects in their own
+        right (e.g., "Tie::Google::Result")? I see advantages to each path:
+        data structures would be simpler, passing on "Result" objects
+        without modification would be faster, and using a new set of objects
+        allows new functionality to be added, for example useful
+        stringification.
+
+SEE ALSO
+    the Net::Google manpage, the DBD::google manpage
+
+AUTHOR
+    darren chamberlain (<darren@cpan.org>), with some prompting from Richard
+    Soderberg.
+

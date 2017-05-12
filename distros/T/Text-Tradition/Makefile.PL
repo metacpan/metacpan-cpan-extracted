@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use inc::Module::Install;
+author( 'Tara L Andrews <aurum@cpan.org>' );
+license( 'perl' );
+perl_version( '5.012' );
+all_from( 'lib/Text/Tradition.pm' );
+requires( 'Algorithm::Diff' );
+requires( 'File::Which' );
+requires( 'Graph' );
+requires( 'IPC::Run' );
+requires( 'JSON' );
+requires( 'Module::Load' );
+requires( 'Moose' );
+requires( 'Moose::Util' );
+requires( 'Moose::Util::TypeConstraints' );
+requires( 'Safe::Isa' );
+requires( 'Spreadsheet::ParseExcel' );
+requires( 'Spreadsheet::XLSX' );
+requires( 'StackTrace::Auto' );
+requires( 'Text::CSV' );
+requires( 'Text::TEI::Markup' => '1.7' );
+requires( 'Throwable::X' );
+requires( 'TryCatch' );
+requires( 'XML::Easy::Syntax' );
+requires( 'XML::LibXML' );
+requires( 'XML::LibXML::XPathContext' );
+build_requires( 'Data::Dump' );
+build_requires( 'Test::Warn' );
+build_requires( 'Test::More::UTF8' );
+&WriteAll;

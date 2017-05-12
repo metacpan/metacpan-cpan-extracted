@@ -1,0 +1,4 @@
+
+* parse HTML input, instead of linebased processing
+
+* optionally use variables as input and output instead of files

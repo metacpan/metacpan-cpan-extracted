@@ -1,0 +1,157 @@
+=head1 NAME
+
+INSTALL - Installation instructions for Text-NSP
+
+=head1 SYNOPSIS
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    cd Testing
+    csh ./ALL-TESTS.sh
+    cd ..
+    make clean
+
+=head1 DESCRIPTION
+
+=head2 Dependencies
+
+Getopt::Long : to support command line options, very likely already 
+installed on your system with Perl
+
+=head2 Detailed Installation Instructions
+
+If you have superuser (root) access, you should be able to install
+Text::NSP by following these simple steps:
+
+    perl Makefile.PL
+    make
+    make test  
+    su         # or sudo, as the case may be
+    make install
+
+    cd Testing # optional, but recommended
+    csh ./ALL-TESTS.sh 
+    cd ..
+
+    make clean
+
+If you need to install this distribution in your local user account
+because you lack superuser privileges, then the recommended method
+on Unix-like systems (Linux, Solaris, Cygwin) is as follows:
+
+    perl Makefile.PL PREFIX=~/MyNSP LIB=~/MyPerlLib
+    make
+    make test
+    make install
+    cd Testing 
+    csh ./ALL-TESTS.sh 
+    cd ..
+
+This will install the executable scripts into ~/MyNSP/bin, 
+the man pages in ~/MyPerlLib/man, and the libraries into ~/MyPerlLib.  
+
+You will need to set your PERL5LIB variable to point to the LIB directory.
+
+In bash:
+
+    export PERL5LIB=~/MyPerlLib
+
+In csh or tcsh:
+
+    setenv PERL5LIB ~/MyPerlLib
+
+Add these lines to your .bashrc, .bash_profile, or .cshrc files as the
+case may be.
+
+=head2 Orientation
+
+ INSTALL           : this file
+
+ README            : a plain text version of doc/README.pod
+
+ CHANGES           : a plain text version of doc/CHANGES.pod
+
+ TODO              : a plain text version of doc/TODO.pod
+
+ MANIFEST          : a list of the files found in this distribution,
+                     created automatically by "make manifest" and used
+                     by Makefile.PL and "make dist".
+
+ bin/count.pl      : program that counts Ngrams in corpora
+
+ bin/statistic.pl  : program that measures association of Ngrams based on
+                     count.pl output
+
+ doc/              : directory of documentation
+
+                     README.pod  - complete description of NSP
+   		     INSTALL.pod - this file
+		     CHANGES.pod - changes in this version
+                     FAQ.pod     - frequently asked questions
+                     TODO.pod    - our list of things to do
+                     USAGE.pod   - sample usages (very basic)
+                     cicling2003.(ps|pdf) - overview of NSP design
+                     NSP-Class-diagram.(png|pdf) - UML of measure hierarchy
+		     ChangeLogs  - archive of Change logs
+
+ bin/utils/        : directory that contains several useful programs
+
+                     rank.pl: compare two measures of association
+                     kocos.pl: find kth order co-occurrences
+                     combig.pl: find unordered counts of bigrams
+
+ t/                : directory of test scripts that run with "make test"
+
+ Testing/          : directory of test scripts for each program in NSP.
+                     You can run these to make sure your installation is
+                     working, and also to see some sample usages. Each
+                     program tested has its own directory within Testing
+                     in which you can find a README.txt file that describes
+                     the testing process. Please note that "make test" above
+                     does *not* run these tests.  They must be run separately
+                     after installation is complete. This style of testing
+                     has mostly been depricated, while we keep these tests
+ 	             running for the new versions, we are putting all of 
+		     our news tests into t/. 
+
+ lib/		   : directory where measures modules are found.
+
+ GPL.txt           : copy of the GNU General Public License, the terms
+                     under which NSP source code is distributed.
+
+ FDL.txt           : copy of the GNU Free Documentation License, the terms
+                     under which NSP documentation is distributed.
+
+=head1 AUTHOR
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+This document last modified by :
+$Id: INSTALL.pod,v 1.5 2010/03/04 04:08:16 tpederse Exp $
+
+=head1 SEE ALSO
+
+Please join the NSP mailing list to report bugs, receive information 
+about updates, etc. 
+
+L<http://groups.yahoo.com/group/ngram/>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2000-2010, Ted Pedersen
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut
+

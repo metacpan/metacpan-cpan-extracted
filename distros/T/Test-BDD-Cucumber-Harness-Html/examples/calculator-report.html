@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Test Report">
+
+    <title>Test Report</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <style type="text/css">
+    .step-name { display: inline; text-align: left; }
+    .step-line { display: inline; text-align: left; color: grey; }
+    .step-result { float: right; display: inline; color: black; }
+    .panel-heading a { color: black; }
+    .panel-heading a:before {
+        font-family: 'Glyphicons Halflings';
+        content: "\e114";    
+     }
+     .panel-heading a.collapsed:before {
+         content: "\e080";
+     }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <div class="page-header"><h1>Test Report</h1></div>
+
+      <h2>Document meta information</h2>
+      <table class="table table-bordered">
+      	<thead>
+	  <th>Key</th>
+	  <th>Value</th>
+	</thead>
+	<tbody>
+	  <tr><td>Hostname</td><td>affenschaukel</td></tr>
+	  <tr><td>Time</td><td>Fri Feb  5 10:30:55 2016</td></tr>
+	  <tr><td>Command</td><td>/usr/local/bin/pherkin -o Html features/</td></tr>
+	</tbody>
+      </table>
+
+      <h2>Summary</h2>
+<table class="table table-bordered">
+<thead>
+  <th>Status</th>
+  <th>Count</th>
+</thead>
+<tbody>
+  <tr class="success">
+  	<td>Passed</td><td>72</td>
+  </tr>
+  <tr class="danger">
+  	<td>Failed</td><td>1</td>
+  </tr>
+  <tr class="warning">
+  	<td>Pending</td><td>2</td>
+  </tr>
+  <tr class="">
+  	<td>Skipped</td><td>0</td>
+  </tr>
+</tbody>
+</table>
+      <h2>Table of Content</h2>
+<ul>
+  <li><a href="#feature-42767416">Basic Calculator Functions</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">72</button>
+		<button type="button" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="right" title="failed">1</button>
+		<button type="button" class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="right" title="pending">2</button>
+		</li>
+  <ul>
+      <li><a href="#scenario-42821744">First Key Press on the Display</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">5</button>
+				</li>
+      <li><a href="#scenario-42829824">Several Key Presses on the Display</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">5</button>
+				</li>
+      <li><a href="#scenario-42846816">Pressing Clear Wipes the Display</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">6</button>
+				</li>
+      <li><a href="#scenario-42847296">Add as you go</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">5</button>
+				</li>
+      <li><a href="#scenario-42847632">Basic arithmetic</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">8</button>
+				</li>
+      <li><a href="#scenario-42847632">Basic arithmetic</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">8</button>
+				</li>
+      <li><a href="#scenario-42847632">Basic arithmetic</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">8</button>
+				</li>
+      <li><a href="#scenario-42847632">Basic arithmetic</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">8</button>
+				</li>
+      <li><a href="#scenario-42827256">Separation of calculations</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">3</button>
+		<button type="button" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="right" title="failed">1</button>
+		<button type="button" class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="right" title="pending">2</button>
+		</li>
+      <li><a href="#scenario-42804616">Ticker Tape</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">5</button>
+				</li>
+      <li><a href="#scenario-42821672">Enter number using text</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">5</button>
+				</li>
+      <li><a href="#scenario-42848160">Enter numbers using text</a>	<button type="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="right" title="passed">6</button>
+				</li>
+    </ul>
+</ul>
+
+
+        <h2 id="feature-42767416">Basic Calculator Functions <small>(features/basic.feature) 	<button type="button" class="btn  btn-success" data-toggle="tooltip" data-placement="right" title="passed">72</button>
+		<button type="button" class="btn  btn-danger" data-toggle="tooltip" data-placement="right" title="failed">1</button>
+		<button type="button" class="btn  btn-warning" data-toggle="tooltip" data-placement="right" title="pending">2</button>
+		</small></h2>
+<pre><code>In order to check I've written the Calculator class correctly
+As a developer I want to check some basic operations
+So that I can have confidence in my Calculator class.</code></pre>
+    <h3 id="scenario-42821744">First Key Press on the Display</h3>
+<div class="panel-group" id="scenario-42821744-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1992541-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1992541-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4124075-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 7)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4124075-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-3432037-body">
+<b class="text-success">And</b> having pressed 1
+
+<div class="step-line">(line: 8)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-3432037-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed 1
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4899041-body">
+<b class="text-warning">Then</b> the display should show 1
+
+<div class="step-line">(line: 9)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4899041-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 1
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4618922-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4618922-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42829824">Several Key Presses on the Display</h3>
+<div class="panel-group" id="scenario-42829824-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4996130-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4996130-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7218499-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 12)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7218499-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6464920-body">
+<b class="text-success">And</b> having pressed 1 and 2 and 3 and . and 5 and 0
+
+<div class="step-line">(line: 13)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6464920-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed 1 and 2 and 3 and . and 5 and 0
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4680792-body">
+<b class="text-warning">Then</b> the display should show 123.50
+
+<div class="step-line">(line: 14)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4680792-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 123.50
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5904699-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5904699-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42846816">Pressing Clear Wipes the Display</h3>
+<div class="panel-group" id="scenario-42846816-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-3827249-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-3827249-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9133639-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 17)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-9133639-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7779742-body">
+<b class="text-success">And</b> having pressed 1 and 2 and 3
+
+<div class="step-line">(line: 18)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7779742-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed 1 and 2 and 3
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9424887-body">
+<b class="text-success">And</b> having pressed C
+
+<div class="step-line">(line: 19)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-9424887-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed C
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6002116-body">
+<b class="text-warning">Then</b> the display should show 0
+
+<div class="step-line">(line: 20)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6002116-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 0
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-753651-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-753651-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42847296">Add as you go</h3>
+<div class="panel-group" id="scenario-42847296-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-3964449-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-3964449-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8284627-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 23)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8284627-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6514312-body">
+<b class="text-success">And</b> having pressed 1 and 2 and 3 and + and 4 and 5 and 6 and +
+
+<div class="step-line">(line: 24)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6514312-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed 1 and 2 and 3 and + and 4 and 5 and 6 and +
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6902821-body">
+<b class="text-warning">Then</b> the display should show 579
+
+<div class="step-line">(line: 25)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6902821-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 579
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1244091-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1244091-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42847632">Basic arithmetic</h3>
+<div class="panel-group" id="scenario-42847632-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1022311-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1022311-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8598597-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 28)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8598597-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9799175-body">
+<b class="text-success">And</b> having keyed 5.0
+
+<div class="step-line">(line: 29)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-9799175-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed 5.0
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-610770-body">
+<b class="text-success">And</b> having keyed +
+
+<div class="step-line">(line: 30)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-610770-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed +
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6530569-body">
+<b class="text-success">And</b> having keyed 5.0
+
+<div class="step-line">(line: 31)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6530569-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed 5.0
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7554568-body">
+<b class="text-success">And</b> having pressed =
+
+<div class="step-line">(line: 32)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7554568-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed =
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4711022-body">
+<b class="text-warning">Then</b> the display should show 10
+
+<div class="step-line">(line: 33)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4711022-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 10
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-3300994-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-3300994-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42847632">Basic arithmetic</h3>
+<div class="panel-group" id="scenario-42847632-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7882761-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7882761-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4146118-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 28)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4146118-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5747667-body">
+<b class="text-success">And</b> having keyed 6
+
+<div class="step-line">(line: 29)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5747667-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed 6
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2352781-body">
+<b class="text-success">And</b> having keyed /
+
+<div class="step-line">(line: 30)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2352781-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed /
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-3843571-body">
+<b class="text-success">And</b> having keyed 3
+
+<div class="step-line">(line: 31)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-3843571-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed 3
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5513762-body">
+<b class="text-success">And</b> having pressed =
+
+<div class="step-line">(line: 32)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5513762-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed =
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5700931-body">
+<b class="text-warning">Then</b> the display should show 2
+
+<div class="step-line">(line: 33)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5700931-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 2
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-3172599-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-3172599-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42847632">Basic arithmetic</h3>
+<div class="panel-group" id="scenario-42847632-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9255628-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-9255628-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1982302-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 28)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1982302-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1464780-body">
+<b class="text-success">And</b> having keyed 10
+
+<div class="step-line">(line: 29)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1464780-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed 10
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7332767-body">
+<b class="text-success">And</b> having keyed *
+
+<div class="step-line">(line: 30)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7332767-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed *
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9486466-body">
+<b class="text-success">And</b> having keyed 7.550
+
+<div class="step-line">(line: 31)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-9486466-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed 7.550
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2745750-body">
+<b class="text-success">And</b> having pressed =
+
+<div class="step-line">(line: 32)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2745750-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed =
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6166982-body">
+<b class="text-warning">Then</b> the display should show 75.5
+
+<div class="step-line">(line: 33)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6166982-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 75.5
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1473957-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1473957-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42847632">Basic arithmetic</h3>
+<div class="panel-group" id="scenario-42847632-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5886490-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5886490-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1319674-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 28)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1319674-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6590926-body">
+<b class="text-success">And</b> having keyed 3
+
+<div class="step-line">(line: 29)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6590926-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed 3
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8569074-body">
+<b class="text-success">And</b> having keyed -
+
+<div class="step-line">(line: 30)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8569074-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed -
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7977608-body">
+<b class="text-success">And</b> having keyed 10
+
+<div class="step-line">(line: 31)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7977608-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed 10
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-3776247-body">
+<b class="text-success">And</b> having pressed =
+
+<div class="step-line">(line: 32)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-3776247-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having pressed =
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-3741607-body">
+<b class="text-warning">Then</b> the display should show -7
+
+<div class="step-line">(line: 33)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-3741607-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show -7
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2275474-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2275474-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42827256">Separation of calculations</h3>
+<div class="panel-group" id="scenario-42827256-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8248447-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8248447-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2058783-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 42)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2058783-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-danger">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-917651-body">
+<b class="text-success">And</b> having successfully performed the following calculations
+
+<div class="step-line">(line: 43)</div>
+<div class="step-result">failed</div>
+	</a></div>
+	<div id="step-917651-body" class="panel-collapse collapse in"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having successfully performed the following calculations
+not ok 2 - Test compiled
+#   Failed test 'Test compiled'
+#   at /usr/share/perl5/Test/BDD/Cucumber/Executor.pm line 338.
+# Can't locate object method &quot;dispatch&quot; via package &quot;Test::BDD::Cucumber::StepContext&quot; at features/step_definitions/calculator_steps.pl line 69.
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-warning">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-304658-body">
+<b class="text-success">And</b> having pressed 3
+
+<div class="step-line">(line: 48)</div>
+<div class="step-result">pending</div>
+	</a></div>
+	<div id="step-304658-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>1..0 # SKIP Short-circuited from previous tests</pre>
+	</div></div>
+</div>
+<div class="panel panel-warning">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9016738-body">
+<b class="text-warning">Then</b> the display should show 3
+
+<div class="step-line">(line: 49)</div>
+<div class="step-result">pending</div>
+	</a></div>
+	<div id="step-9016738-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>1..0 # SKIP Short-circuited from previous tests</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8581112-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8581112-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42804616">Ticker Tape</h3>
+<div class="panel-group" id="scenario-42804616-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6697906-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6697906-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9096227-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 52)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-9096227-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-29657-body">
+<b class="text-success">And</b> having entered the following sequence
+
+<div class="step-line">(line: 53)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-29657-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having entered the following sequence
+1..1
+</pre>
+<h4>Example Data:</h4>
+<pre>1 + 2 + 3 + 4 + 5 + 6 -
+100
+* 13 === + 2 =
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-1354780-body">
+<b class="text-warning">Then</b> the display should show -1025
+
+<div class="step-line">(line: 59)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-1354780-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show -1025
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5549292-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5549292-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42821672">Enter number using text</h3>
+<div class="panel-group" id="scenario-42821672-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-7300946-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-7300946-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5162322-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 62)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5162322-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-5086853-body">
+<b class="text-success">And</b> having keyed __THE_NUMBER_FIVE__
+
+<div class="step-line">(line: 63)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-5086853-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having keyed __THE_NUMBER_FIVE__
+ok 2 - Passed in a word to map [__THE_NUMBER_FIVE__]
+ok 3 - Mapping found
+1..3
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-931536-body">
+<b class="text-warning">Then</b> the display should show 5
+
+<div class="step-line">(line: 64)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-931536-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 5
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8142664-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8142664-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+    <h3 id="scenario-42848160">Enter numbers using text</h3>
+<div class="panel-group" id="scenario-42848160-accordion">
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-6752870-body">
+<b class="text-">before</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-6752870-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - use Calculator;
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-9117673-body">
+<b class="text-success">Given</b> a new Calculator object
+
+<div class="step-line">(line: 67)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-9117673-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: a new Calculator object
+1..1
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-839459-body">
+<b class="text-success">And</b> having added these numbers
+
+<div class="step-line">(line: 68)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-839459-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: having added these numbers
+ok 2 - Passed in a word to map [__THE_NUMBER_FOUR__]
+ok 3 - Mapping found
+ok 4 - Passed in a word to map [__THE_NUMBER_FIVE__]
+ok 5 - Mapping found
+ok 6 - Passed in a word to map [__THE_NUMBER_ONE__]
+ok 7 - Mapping found
+1..7
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-2408104-body">
+<b class="text-warning">Then</b> the display should show 10
+
+<div class="step-line">(line: 73)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-2408104-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show 10
+ok 2 - Calculator display as expected
+1..2
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-4445727-body">
+<b class="text-warning">And</b> the display should show __THE_NUMBER_TEN__
+
+<div class="step-line">(line: 74)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-4445727-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: the display should show __THE_NUMBER_TEN__
+ok 2 - Passed in a word to map [__THE_NUMBER_TEN__]
+ok 3 - Mapping found
+ok 4 - Calculator display as expected
+1..4
+</pre>
+	</div></div>
+</div>
+<div class="panel panel-success">
+	<div class="panel-heading"><a data-toggle="collapse" data-target="#step-8316775-body">
+<b class="text-">after</b> 
+
+<div class="step-line">(line: 0)</div>
+<div class="step-result">passed</div>
+	</a></div>
+	<div id="step-8316775-body" class="panel-collapse collapse"><div class="panel-body">
+<h4>Test Output:</h4>
+<pre>ok 1 - Starting to execute step: 
+ok 2 - Calculator cleaned up
+1..2
+</pre>
+	</div></div>
+</div>
+</div>
+
+    </div> <!-- /container -->
+  </body>
+</html>

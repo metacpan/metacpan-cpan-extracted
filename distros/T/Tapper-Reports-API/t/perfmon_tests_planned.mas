@@ -1,0 +1,5 @@
+% my @res = reportdata '{ "suite.name" => "perfmon" } :: //tap/tests_planned';
+Planned tests:
+% foreach (@res) {
+  <% $_ %>
+% }

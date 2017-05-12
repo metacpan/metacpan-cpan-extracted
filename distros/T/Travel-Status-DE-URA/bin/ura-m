@@ -1,0 +1,468 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+our $VERSION = '2.01';
+
+binmode( STDOUT, ':encoding(utf-8)' );
+
+use DateTime;
+use DateTime::Format::Duration;
+use Getopt::Long qw(:config no_ignore_case bundling);
+use List::Util qw(first max);
+use Travel::Status::DE::URA;
+
+my (@grep_lines);
+my $hide_past       = 1;
+my $strftime_format = '%H:%M:%S';
+my $strfrel_format  = '%M min';
+my ( %edata, @edata_pre );
+my $calculate_routes = 0;
+my $developer_mode;
+my $via;
+my ( $list_services, $service );
+my $ura_base    = 'http://ivu.aseag.de/interfaces/ura';
+my $ura_version = 1;
+my $script_name = ( split( qr{/}, $0 ) )[-1];
+
+GetOptions(
+	'f|strftime=s'  => \$strftime_format,
+	'F|strfrel=s'   => \$strfrel_format,
+	'h|help'        => sub { show_help(0) },
+	'l|line=s@'     => \@grep_lines,
+	'o|output=s@'   => \@edata_pre,
+	'p|with-past'   => sub { $hide_past = 0 },
+	's|service=s'   => \$service,
+	'v|via=s'       => \$via,
+	'V|version'     => \&show_version,
+	'devmode'       => \$developer_mode,
+	'list'          => \$list_services,
+	'ura-base=s'    => \$ura_base,
+	'ura-version=s' => \$ura_version,
+
+) or show_help(1);
+
+if ($list_services) {
+	show_services(0);
+}
+
+if ( @ARGV != 1 ) {
+	show_help(1);
+}
+
+if ( not $service and $script_name ne 'ura-m' ) {
+	($service) = ( $script_name =~ m{ ^ ( [^-]+ ) -m $ }x );
+}
+
+# --line=foo,bar support
+@edata_pre  = split( qr{,}, join( q{,}, @edata_pre ) );
+@grep_lines = split( qr{,}, join( q{,}, @grep_lines ) );
+
+for my $efield (@edata_pre) {
+	given ($efield) {
+		when ('a') { $edata{route_after}       = 1; $calculate_routes = 1 }
+		when ('b') { $edata{route_before}      = 1; $calculate_routes = 1 }
+		when ('f') { $edata{route_full}        = 1; $calculate_routes = 1 }
+		when ('i') { $edata{indicator}         = 1 }
+		when ('r') { $edata{route_interesting} = 1; $calculate_routes = 1 }
+		when ('T') { $edata{relative_times}    = 1 }
+		default    { $edata{$efield}           = 1 }
+	}
+}
+
+if ($service) {
+	my $service_ref = first { lc( $_->{shortname} ) eq lc($service) }
+	Travel::Status::DE::URA::get_services();
+	if ( not $service_ref ) {
+		printf STDERR (
+"Error: Unknown service '%s'. The following services are supported:\n\n",
+			$service
+		);
+		show_services(1);
+	}
+	$ura_base    = $service_ref->{ura_base};
+	$ura_version = $service_ref->{ura_version};
+}
+
+my ($stop_name) = @ARGV;
+
+my $status = Travel::Status::DE::URA->new(
+	developer_mode => $developer_mode,
+	ura_base       => $ura_base,
+	ura_version    => $ura_version,
+	with_messages  => 1,
+);
+
+sub show_help {
+	my ($code) = @_;
+
+	print
+	  "Usage: $script_name [-pV] [-o <output>] [-l <lines>] [-v <stopname>] "
+	  . "<stopname>\n"
+	  . "See also: man ura-m\n";
+
+	exit $code;
+}
+
+sub show_services {
+	my ($code) = @_;
+
+	printf( "%-60s %-14s %s\n\n", 'service', 'abbr. (-s)', 'url (--ura-base)' );
+	for my $service ( Travel::Status::DE::URA::get_services() ) {
+		printf( "%-60s %-14s %s\n", @{$service}{qw(name shortname ura_base)} );
+	}
+
+	exit $code;
+}
+
+sub show_version {
+	say "$script_name version ${VERSION}";
+
+	exit 0;
+}
+
+sub display_result {
+	my (@lines) = @_;
+
+	if ( not @lines ) {
+		die("Nothing to show\n");
+	}
+
+	my $max_col_idx = $#{ $lines[0] } - 1;
+
+	my @format = (q{%-}) x ( $max_col_idx + 1 );
+
+	if ( $edata{relative_times} ) {
+		$format[0] = q{%};
+	}
+
+	for my $i ( 0 .. $max_col_idx ) {
+		$format[$i] .= max map { length( $_->[$i] ) } @lines;
+		$format[$i] .= 's';
+	}
+
+	for my $line (@lines) {
+
+		printf( join( q{  }, @format ) . "\n", @{$line}[ 0 .. $max_col_idx ] );
+
+		if ( @{ $line->[ $max_col_idx + 1 ] } ) {
+			for my $route ( @{ $line->[ $max_col_idx + 1 ] } ) {
+				printf( join( q{  }, @format ) . "\n", @{$route} );
+			}
+			print "\n";
+		}
+	}
+
+	return;
+}
+
+sub get_exact_stop_name {
+	my ($fuzzy_name) = @_;
+
+	my @stops = $status->get_stop_by_name($fuzzy_name);
+
+	if ( @stops == 0 ) {
+		say STDERR "Got no departures for '$fuzzy_name'";
+		say STDERR 'The stop may not exist or not be in service right now';
+		exit(3);
+	}
+	elsif ( @stops == 1 ) {
+		return $stops[0];
+	}
+	else {
+		say STDERR "The stop name '$fuzzy_name' is ambiguous. Please choose "
+		  . 'one of the following:';
+		say STDERR join( "\n", @stops );
+		exit(3);
+	}
+}
+
+sub show_route {
+	my ( $dt_now, $dt_format, @routes ) = @_;
+	my @res;
+
+	if ( $edata{relative_times} ) {
+		@res = map {
+			[
+				$dt_format->format_duration(
+					$_->datetime->subtract_datetime($dt_now)
+				),
+				q{},
+				$_->name,
+				q{},
+			]
+		} @routes;
+	}
+	else {
+		@res = map {
+			[ $_->datetime->strftime($strftime_format), q{}, $_->name, q{}, ]
+		} @routes;
+	}
+
+	return @res;
+}
+
+sub show_results {
+	my @output;
+
+	my $dt_now = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $dt_format
+	  = DateTime::Format::Duration->new( pattern => $strfrel_format );
+
+	for my $m ( $status->messages_by_stop_name($stop_name) ) {
+		printf( "# %s\n", $m );
+	}
+
+	for my $d (
+		$status->results(
+			calculate_routes => $calculate_routes,
+			hide_past        => $hide_past,
+			stop             => $stop_name,
+			via              => $via,
+		)
+	  )
+	{
+
+		if ( ( @grep_lines and not( $d->line ~~ \@grep_lines ) ) ) {
+			next;
+		}
+		my ( @line, @route );
+
+		if ( $edata{route_full} ) {
+			@route = (
+				show_route( $dt_now, $dt_format, $d->route_pre ),
+				[ ' - - - -', q{}, q{}, q{} ],
+				show_route( $dt_now, $dt_format, $d->route_post ),
+			);
+		}
+		elsif ( $edata{route_after} ) {
+			@route = show_route( $dt_now, $dt_format, $d->route_post );
+		}
+		elsif ( $edata{route_before} ) {
+			@route = reverse show_route( $dt_now, $dt_format, $d->route_pre );
+		}
+
+		if ( $edata{relative_times} ) {
+			@line = (
+				$dt_format->format_duration(
+					$d->datetime->subtract_datetime($dt_now)
+				),
+				$d->line,
+				q{},
+				$d->destination,
+				\@route,
+			);
+		}
+		else {
+			@line = (
+				$d->datetime->strftime($strftime_format),
+				$d->line, q{}, $d->destination, \@route,
+			);
+		}
+
+		if ( $edata{indicator} ) {
+			splice( @line, 1, 0, $d->stop_indicator );
+		}
+
+		if ( $edata{route_interesting} ) {
+			$line[2] = join( q{  }, map { $_->name } $d->route_interesting );
+		}
+
+		push( @output, \@line );
+	}
+
+	display_result(@output);
+
+	return;
+}
+
+if ( my $err = $status->errstr ) {
+	say STDERR "Request error: ${err}";
+	exit 2;
+}
+
+$stop_name = get_exact_stop_name($stop_name);
+if ($via) {
+	$via = get_exact_stop_name($via);
+}
+show_results();
+
+__END__
+
+=head1 NAME
+
+ura-m - Unofficial interface to URA-based departure monitors
+
+=head1 SYNOPSIS
+
+B<ura-m> [B<-s> I<service>] [B<-pV>] [B<-l> I<lines>] [B<-o> I<outputtypes>]
+[B<-f> I<timefmt> | B<-F> I<timefmt>]
+[B<-v> I<stopname>] I<stopname>
+
+=head1 VERSION
+
+version 2.01
+
+=head1 DESCRIPTION
+
+B<ura-m> lists upcoming bus departures and bus service messages at the stop
+I<name>.  It only shows realtime data and has no knowledge of schedules or
+delays.  Departures without such data may not appear at all.
+
+=head1 OPERATOR SELECTION
+
+By default, B<ura-m> looks up departures for stops operated by ASEAG (Aachener
+StraE<szlig>enbahn und Energieversorgungs AG), so it only works for Aachen and
+its vicinity. Other operators (and, thus, other areas) can be selected using
+either the B<-s>/B<--service> option, the B<--ura-base> option, or the program
+name.
+
+By creating a I<service>-m symlink to B<ura-m>, it will default to the URA
+interface operated by I<service>, as if B<-s> I<service> was specified. So,
+for example, linking tfl-m to ura-m will request departures for TfL-operated
+stops, and linking aseag-m to ura-m will request departures for ASEAG-operated
+stops.
+
+Use the B<--list> option to get a list of supported backend services.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-f>, B<--strftime> I<format>
+
+Format absolute times in I<format>, applies both to departure and route
+output.  See DateTime(3pm) for allowed patterns.
+
+=item B<-F>, B<--strfrel> I<format>
+
+Format relative times in I<format>, only applies when used with B<-oT>.
+See DateTime::Format::Duration(3pm) for allowed patterns.
+
+=item B<-l>, B<--line> I<lines>
+
+Limit output to departures of I<lines> (comma-separated list of line
+names, may be used multiple times).
+
+=item B<--list>
+
+List supported URA services with their URLs (see B<--ura-base>) and
+abbreviations (see B<-s>).
+
+=item B<-o>, B<--output> I<outputtypes>
+
+Format output according to I<outputtypes>. I<outputtypes> is a
+comma-separated list and the B<--output> option may be repeated. Each
+output type has both a short and a long form, so for instance both
+C<< -or,T >> and C<< --output=route_interesting,relative_times >> are valid.
+
+Valid output types are:
+
+=over
+
+=item a / route_after
+
+For each departure, include the route after I<name>. Both stop names and
+departure times are shown.
+
+=item b / route_before
+
+For each departure, include the route leading to I<name>. Both stop names and
+departure times are shown.
+
+=item f / route_full
+
+For each departure, include the entire route (stop names and departure times).
+
+=item i / indicator
+
+Show stop point indicator, if available. This is usually a sub-stop or
+platform number, such as "H3".
+
+=item r / route_interesting
+
+For each departure, show up to three "interesting" stops between I<name> and
+its destination. The importance of a stop is determined heuristically based on
+its name, so it is not always accurate.
+
+=item T / relative_times
+
+Show relative times. Applies to departure and route output.
+
+=back
+
+Note that the routes may be incomplete, since the backend only provides a
+limited amount of departures and the routes are calculated from this set.
+intermediate stops are always included, but both route_after and route_before
+may be cut off after / before any stop. The same applies to route_full.
+
+=item B<-p>, B<--with-past>
+
+Include past departures. Applies both to the departure output and to the
+route output of B<-oa>, B<-ob>, B<-of>.
+
+=item B<-s>, B<--service> I<service>
+
+Request departures for URA instance I<service>, e.g. ASEAG (Aachen, Germany)
+or TfL (London, UK). Use B<--list> to get a list of supported URA instances.
+Note that I<service> is not case sensitive.
+
+=item B<-v>, B<--via> I<stop>
+
+Only show lines which also serve I<stop> after I<name>.
+
+=item B<-V>, B<--version>
+
+Show version information.
+
+=item B<--ura-base> I<url>
+
+Set URA base to I<url>, defaults to C<< http://ivu.aseag.de/interfaces/ura >>.
+See also B<--list> and B<-s>.
+
+=item B<--ura-version> I<version>
+
+Set URA API version to I<version>, defaults to C<< 1 >>.
+
+=back
+
+=head1 EXIT STATUS
+
+Normally zero. B<1> means B<ura-m> was called with invalid options,
+B<2> indicates a request error from Travel::Status::DE::URA(3pm),
+B<3> a bad (unknown or ambiguous) I<stop> name.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * Class::Accessor(3pm)
+
+=item * DateTime(3pm)
+
+=item * DateTime::Format::Duration(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=item * Text::CSV(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Unknown.
+
+=head1 AUTHOR
+
+Copyright (C) 2013-2016 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This program is licensed under the same terms as Perl itself.

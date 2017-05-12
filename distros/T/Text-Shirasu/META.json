@@ -1,0 +1,78 @@
+{
+   "abstract" : "Text::MeCab wrapped for natural language processing ",
+   "author" : [
+      "Kei Kamikawa <x00.x7f@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.7",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Shirasu",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::JA::NormalizeText" : "0",
+            "Text::MeCab" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Shirasu" : {
+         "file" : "lib/Text/Shirasu.pm",
+         "version" : "v0.0.3"
+      },
+      "Text::Shirasu::Node" : {
+         "file" : "lib/Text/Shirasu/Node.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Code-Hex/Text-Shirasu/issues"
+      },
+      "homepage" : "https://github.com/Code-Hex/Text-Shirasu",
+      "repository" : {
+         "url" : "git://github.com/Code-Hex/Text-Shirasu.git",
+         "web" : "https://github.com/Code-Hex/Text-Shirasu"
+      }
+   },
+   "version" : "0.0.3",
+   "x_authority" : "cpan:CODEHEX",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,39 @@
+BEGIN OUTPUT BY Text::Ngrams version 1.8
+
+1-GRAMS (total count: 8)
+FIRST N-GRAM: a
+ LAST N-GRAM: h
+------------------------
+a	1
+b	1
+c	1
+d	1
+e	1
+f	1
+g	1
+h	1
+
+2-GRAMS (total count: 7)
+FIRST N-GRAM: a b
+ LAST N-GRAM: g h
+------------------------
+a b	1
+b c	1
+c d	1
+d e	1
+e f	1
+f g	1
+g h	1
+
+3-GRAMS (total count: 6)
+FIRST N-GRAM: a b c
+ LAST N-GRAM: f g h
+------------------------
+a b c	1
+b c d	1
+c d e	1
+d e f	1
+e f g	1
+f g h	1
+
+END OUTPUT BY Text::Ngrams

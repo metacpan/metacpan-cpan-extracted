@@ -1,0 +1,36 @@
+Text-TypingEffort version 0.23
+========================
+
+DESCRIPTION
+
+Text::TypingEffort is used to calculate how much physical effort was
+required to type a given text. Several metrics of effort are used.  For
+further information, consult the POD.
+
+A small script ("effort") is included so that you can quickly examine
+the amount of effort it would take to type a given file or files.
+Run "effort --help" for usage.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+   Test::More - version 0.31 or higher
+   Getopt::Std - if you want to use the effort script
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Michael Hendricks
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

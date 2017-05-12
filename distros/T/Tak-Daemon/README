@@ -1,0 +1,20 @@
+NAME
+    Tak::Daemon - tools for doing daemon-like things with Tak
+
+SYNOPSIS
+      die "mst is an ass and needs to ship this now, more in a later release";
+
+AUTHOR
+    mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None required yet. Maybe this module is perfect (hahahahaha ...).
+
+COPYRIGHT
+    Copyright (c) 2011 the Tak::Daemon "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

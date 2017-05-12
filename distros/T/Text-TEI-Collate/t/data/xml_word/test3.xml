@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="tools/tei_ms_crit.rng" type="xml"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Ժամանակագրութիւն</title>
+        <author>Մատթէոս Ուռհայեցի</author>
+        <respStmt xml:id="tla">
+          <resp>Transcription by</resp>
+          <name>Tara L Andrews</name>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>Unpublished manuscript</p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc xml:id="C">
+          <msIdentifier>
+            <settlement>London</settlement>
+            <repository>British Library</repository>
+            <idno>OR 5260</idno>
+          </msIdentifier>
+          <p>pp. 234r-245r</p>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <div>
+<!-- division begins waaayy back on p. 203b, for Skleros revolt. -->
+<!-- paragraph begins on p. 233a -->
+        <pb n="233բ"/>
+        <p xmlns="http://www.tei-c.org/ns/1.0">
+          <w>Ար՝դ</w>
+          <w>ահա՛</w>
+          <lb/>
+          <w>մինչև՛</w>
+          <w>ցայս</w>
+          <w>վայրս</w>
+          <w>բազմաջան</w>
+          <w>և</w>
+          <w>աշխատաւոր</w>
+          <seg type="word">քննու՛թ<ex resp="#tla">եամ</ex>բ</seg>
+          <lb/>
+          <w>գտեալ</w>
+          <w>գրեցա՛ք</w>
+          <w>զշարա՛գրակա՛ն</w>
+          <w>գրեա՛լս,</w>
+          <seg type="word">զ<num value="100">Ճ</num></seg>
+          <w>ամա՛ց</w>
+          <w>զորս</w>
+          <w>ի</w>
+          <lb/>
+          <seg type="word">
+            <expan>բխազում</expan>
+          </seg>
+          <w>ժամանակաց</w>
+          <w>հետա՛քննեալ</w>
+          <w>հասու</w>
+          <w>եղաք</w>
+          <w>ըստ</w>
+          <seg type="word">այ՛ս<lb/>քանեա՛ցս</seg>
+          <w>տեսողացն</w>
+          <w>և</w>
+          <w>լսողացն,</w>
+          <w>որք</w>
+          <w>էին</w>
+          <w>ի</w>
+          <w>հին</w>
+          <w>ամաց</w>
+          <seg type="word"><expan>ծնեալք</expan>,</seg>
+          <lb/>
+          <w>և</w>
+          <w>ընդ</w>
+          <w>ընթերցօ՛ղսն</w>
+          <w>յառաջի՛ն</w>
+          <w>պատմա՛գրա՛ցն</w>
+          <w>որք</w>
+          <seg type="word">ակա<lb/>նա՛տեսք</seg>
+          <w>է՛ին</w>
+          <w>լեալք</w>
+          <seg type="word">
+            <expan>ամենայն</expan>
+          </seg>
+          <w>եղելո՛ցս</w>
+          <w>և</w>
+          <seg type="word">նեղութե<ex resp="#tla">ան</ex>ցս</seg>
+          <w>յայսոցիկ</w>
+          <lb/>
+          <w>զոր</w>
+          <seg type="word">
+            <expan>վասն</expan>
+          </seg>
+          <w>մեղաց</w>
+          <w>տա՛նն</w>
+          <w>հայոց,</w>
+          <w>և</w>
+          <w>ահա՛</w>
+          <w>որ</w>
+          <w>զայս</w>
+          <w>բազու՛մ</w>
+          <w>անգամ</w>
+          <lb/>
+          <w>զմտաւ</w>
+          <w>ածեա՛լ</w>
+          <w>իմ,</w>
+          <seg type="word">
+            <expan>վասն</expan>
+          </seg>
+          <w>այս</w>
+          <w>յետինս</w>
+          <w>ժամա</w>
+          <w>գրել</w>
+          <seg type="word">զդառնա՛<lb/><pb n="234ա"/>շու՛նչ</seg>
+          <seg type="word"><abbr>կտրծսն</abbr>։</seg>
+          <lb/>
+        </p>
+        <p xmlns="http://www.tei-c.org/ns/1.0">
+          <w>Իսկ</w>
+          <w>ի</w>
+          <w>լինելն</w>
+          <seg type="word">
+            <expan>թվականութեանս</expan>
+          </seg>
+          <w>հայո՝ց</w>
+          <w>յամս</w>
+          <seg type="word">
+            <num value="502">ՇԲ</num>
+          </seg>
+          <w>եղև</w>
+          <seg type="word">ահաւ՛<lb/>որ</seg>
+          <w>նշան</w>
+          <w>և</w>
+          <w>սոսկալի՛</w>
+          <w>և</w>
+          <w>կատարածի</w>
+          <w>մեծի</w>
+          <seg type="word">բարկութե<ex resp="#tla">ան</ex></seg>
+          <seg type="word">երև<lb/>եալ</seg>
+          <w>ի</w>
+          <seg type="word">
+            <expan>քաղաքն</expan>
+          </seg>
+          <w>անտիո՛ք,</w>
+          <w>զոր</w>
+          <w>ի</w>
+          <w>ներքոյ</w>
+          <w>արեգա՛կանն</w>
+          <seg type="word">գործե<lb/>ցաւ</seg>
+          <w>այս</w>
+          <w>սքանչելի՝ս,</w>
+          <w>որ</w>
+          <w>էր</w>
+          <w>տեսողա՛ցն</w>
+          <w>ահաւոր</w>
+          <w>և</w>
+          <w>հրաշալի՛.</w>
+          <lb/>
+          <w>եղև</w>
+          <w>այս</w>
+          <w>նշա՛նս</w>
+          <w>ահ</w>
+          <w>և</w>
+          <w>դողդումն</w>
+          <seg type="word">
+            <expan>ամենայն</expan>
+          </seg>
+          <w>հաւատացելո՛ց</w>
+          <seg type="word"><expan>քրիստոսի</expan>,</seg>
+          <lb/>
+          <w>զորս</w>
+          <w>ա՛յժմ</w>
+          <w>մեծա՛սաստ</w>
+          <w>սպառնալեօ՛ք</w>
+          <w>յայտնեա՛ց</w>
+          <seg type="word">
+            <expan>աստուած</expan>
+          </seg>
+          <lb/>
+          <w>զդատաստա՛նն</w>
+          <w>յահաւոր</w>
+          <w>և</w>
+          <w>իշխանն</w>
+          <w>որ</w>
+          <w>հաւատն</w>
+          <lb/>
+          <w>եթո՛ղ,</w>
+          <w>եղև</w>
+          <w>հակառակ</w>
+          <w>մեծ</w>
+          <w>ազգին</w>
+          <w>ասորոց.</w>
+          <lb/>
+        </p>
+      </div>
+<!-- ends on p. 254ա -->
+    </body>
+  </text>
+</TEI>

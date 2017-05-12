@@ -1,0 +1,33 @@
+---
+name: Tree-MultiNode
+version: v1.0.13
+author:
+  - 'Kyle R. Burton <mortis@voicenet.com> (initial version, and maintenence)'
+  - Daniel X. Pape <dpape@canis.uiuc.edu> (see Changes file from the source archive)
+  - 'Eric Joanis <joanis@cs.toronto.edu>'
+  - 'Todd Rinaldo <toddr@cpan.org>'
+abstract: lib/Tree/MultiNode.pm
+license: perl
+resources:
+  MailingList: mailto:toddr@cpan.org
+  bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=Tree-MultiNode
+  homepage: http://github.com/toddr/Tree-MultiNode
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/toddr/Tree-MultiNode.git
+build_requires:
+  Module::Build: 0.35
+  Test::More: 0.40
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Tree::MultiNode:
+    file: lib/Tree/MultiNode.pm
+    version: v1.0.13
+  Tree::MultiNode::Handle:
+    file: lib/Tree/MultiNode.pm
+  Tree::MultiNode::Node:
+    file: lib/Tree/MultiNode.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

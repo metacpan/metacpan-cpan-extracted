@@ -1,0 +1,158 @@
+SYNOPSIS
+
+     use Text::Table::Any;
+    
+     my $rows = [
+         # header row
+         ['Name', 'Rank', 'Serial'],
+         # rows
+         ['alice', 'pvt', '123456'],
+         ['bob',   'cpl', '98765321'],
+         ['carol', 'brig gen', '8745'],
+     ];
+     print Text::Table::Any::table(rows => $rows, header_row => 1,
+                                   backend => 'Text::Table::Tiny');
+
+DESCRIPTION
+
+    This module provides a single function, table, which formats a
+    two-dimensional array of data as text table, using one of several
+    available backends. The interface is modelled after Text::Table::Tiny
+    (0.3); Text::Table::Tiny also happens to be the default backend.
+
+    The example shown in the SYNOPSIS generates the following table:
+
+     +-------+----------+----------+
+     | Name  | Rank     | Serial   |
+     +-------+----------+----------+
+     | alice | pvt      | 123456   |
+     | bob   | cpl      | 98765321 |
+     | carol | brig gen | 8745     |
+     +-------+----------+----------+
+
+    When using Text::Table::Org backend, the result is something like:
+
+     | Name  | Rank     | Serial   |
+     |-------+----------+----------|
+     | alice | pvt      | 123456   |
+     | bob   | cpl      | 98765321 |
+     | carol | brig gen | 8745     |
+
+    When using Text::Table::CSV backend:
+
+     "Name","Rank","Serial"
+     "alice","pvt","123456"
+     "bob","cpl","98765321"
+     "carol","brig gen","8745"
+
+    When using Text::ANSITable backend:
+
+     .-------+----------+----------.
+     | Name  | Rank     |   Serial |
+     +-------+----------+----------+
+     | alice | pvt      |   123456 |
+     | bob   | cpl      | 98765321 |
+     | carol | brig gen |     8745 |
+     `-------+----------+----------'
+
+    When using Text::ASCIITable backend:
+
+     .-----------------------------.
+     | Name  | Rank     | Serial   |
+     +-------+----------+----------+
+     | alice | pvt      |   123456 |
+     | bob   | cpl      | 98765321 |
+     | carol | brig gen |     8745 |
+     '-------+----------+----------'
+
+    When using Text::FormatTable backend:
+
+     Name |Rank    |Serial
+     alice|pvt     |123456
+     bob  |cpl     |98765321
+     carol|brig gen|8745
+
+    When using Text::MarkdownTable backend:
+
+     | Name  | Rank     | Serial   |
+     |-------|----------|----------|
+     | alice | pvt      | 123456   |
+     | bob   | cpl      | 98765321 |
+     | carol | brig gen | 8745     |
+
+    When using Text::Table backend:
+
+     Name  Rank     Serial
+     alice pvt        123456
+     bob   cpl      98765321
+     carol brig gen     8745
+
+    When using Text::TabularDisplay backend:
+
+     +-------+----------+----------+
+     | Name  | Rank     | Serial   |
+     +-------+----------+----------+
+     | alice | pvt      | 123456   |
+     | bob   | cpl      | 98765321 |
+     | carol | brig gen | 8745     |
+     +-------+----------+----------+
+
+FUNCTIONS
+
+ table(%params) => str
+
+ OPTIONS
+
+    The table function understands these arguments, which are passed as a
+    hash.
+
+      * rows (aoaos)
+
+      Required. Takes an array reference which should contain one or more
+      rows of data, where each row is an array reference.
+
+      * backend (str, default Text::Table::Tiny)
+
+      Optional. Pick a backend module. Supported backends:
+
+	* Text::ANSITable
+
+	* Text::ASCIITable
+
+	* Text::FormatTable
+
+	* Text::MarkdownTable
+
+	* Text::Table
+
+	* Text::Table::CSV
+
+	* Text::Table::HTML
+
+	* Text::Table::HTML::DataTables
+
+	* Text::Table::Org
+
+	* Text::Table::Paragraph
+
+	* Text::Table::Tiny
+
+	* Text::Table::TinyColor
+
+	* Text::Table::TinyColorWide
+
+	* Text::Table::TinyWide
+
+	* Text::TabularDisplay
+
+      * header_row (bool, default 0)
+
+      Optional. If given a true value, the first row in the data will be
+      interpreted as a header row, and separated visually from the rest of
+      the table (e.g. with a ruled line). But some backends won't display
+      differently.
+
+SEE ALSO
+
+    Bencher::Scenario::TextTableModules
+

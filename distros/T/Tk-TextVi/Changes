@@ -1,0 +1,71 @@
+Revision history for Tk-TextVi
+
+0.015   10 May 2009
+        Added normal-mode A, B, I
+
+        Added visual-mode y
+
+        Added insert-mode ^O
+
+        A subroutine can be tied to any :command.  This replaces the
+        -systemcommand callback.
+
+        Use ^X notation for control characters in ga
+
+        Bug fixed where keypresses from mappings weren't cleared.
+
+0.014   28 Sep 2008
+        Added normal-mode R and ~ commands
+
+        r command now works in visual mode
+
+        Added Replace mode
+
+        Example of a composite widget provided in EditorVi.pm
+
+        softtabstop settings had numerous bugs, was missing some behavior
+        and was not documented.
+
+        Some other documentation updates.
+
+        Tests no longer blow up when Tk can't function at all and the
+        script blames the tester who lied about their Tk ability.
+
+        (0.0141 - built the tar with the wrong version of the demo file)
+        (0.0142 - tar wasn't setting the permission bits right)
+        (0.0143 - this time for sure:
+                - fixed error in makefile.PL that installed EditorVi.pm
+                - fixed error in test that still failed on NIX
+                - fixed typo in documentation)
+
+0.013   30 Jun 2008
+        Added normal-mode W and E commands
+
+        Added command-mode ! and set commands
+
+        Added the < and > marks
+
+        command-mode commands may take a range
+
+        Capital letter registers now append when written to
+
+        Added setting shiftwidth
+
+        Bug fix with normal-mode / where the status line was
+        not redisplayed.
+
+0.012   18 May 2008
+        Several errors in the POD are fixed (Gratia, Michal Spacek).
+
+        Undo now works with insert mode and works a bit better with
+        normal commands.
+
+        Tested under Tk version 804.027 with no problems.  The required
+        version has been reduced.
+
+        The demo script is now correctly listed in Makefile.PL.
+
+0.01    3 May 2008
+        First upload.
+
+        (0.011) Tk missing from PREREQ_PM

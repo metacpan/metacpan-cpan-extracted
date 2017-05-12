@@ -1,0 +1,16 @@
+Revision history for TBX-XCS
+
+0.05      2013-11-15 12:12:21 America/Los_Angeles
+    Fixed test dependence on hash key ordering
+0.04      2013-10-28 17:40:28 America/Los_Angeles
+    Updated repository location
+0.03      2013-06-05 21:42:59 America/Los_Angeles
+    JSON serialization/deserialization support
+    Store forTermComp value, instead of converting to boolean
+    Croak with missing <contents> element
+0.02      2013-05-30 18:24:55 America/Los_Angeles
+    Validate contents of <levels>
+    Fix problem where termCompList was expected to have a datatype
+    datCatId is no longer generated if it doesn't exist
+0.01      2013-05-28 18:59:05 America/Los_Angeles
+	initial release

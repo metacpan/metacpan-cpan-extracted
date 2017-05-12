@@ -1,0 +1,110 @@
+TEST
+	Test 0
+		Regression prevention: absolute -f canonicalization
+
+	Test 1
+		Kerning
+
+		Mixtures of -m_odes and orientation (-[xX]), default mode
+
+		Narrow & wide wrap
+
+		overlap
+			single column glyph e.g; term (esp. in Ransom)
+
+			hardblanks
+
+	Test 2
+		-U=0, -U=-1
+
+	Test 3
+		Ransom -m_odes
+
+	Test ?
+		DOS-formatted txt file font
+
+		bifig.flf post-processing, problem with (missing) hardspaces?
+
+FEATURES
+        More smushing modes, consult http://bolknote.ru/files/figlet/?
+
+	"Vertical Fitting", indicated by header[-2] above
+
+	Ransom support for ANSI & Unicode (w/ sparse codepoints)
+
+	Ransom script to generate font, test output, then save font
+
+        QOTW19 "OCR"? http://perl.plover.com/qotw/e/019
+
+	controls; h j b g
+		isn't u enough?
+
+	other scripts: chkfont... this is hard
+
+FIX
+	Control
+		literal needs to use $RE{UTFchar}
+			$opts{-U} = 1 if /^\s*/
+			$opts{-U} ? UTFchar : bytechar
+
+		if pre 5.6 ignore char > 0xFF and use \x.. syntax?!
+			switch to s alternation (for > 0xff)?
+
+	XXX	cannot support unicode literals...?
+			at all (#$#@, could translate to \x{} notation)
+
+			just pre 5.6 (could translate to s///)
+	Ransom
+		Unicode support
+
+	Native UTF-8 dependent (major rev bump and pre 5.8 support dropped)
+	??	TOIlet permits widechars as EOL!
+
+		charmapl.pl
+			TOIlet fonts?
+
+	$\ should be used for output, not $/?
+	...although there may have been some emthod to this madness?
+	This would be a major-ish change, and would wait for major rev bump
+
+REFACTOR
+	Switch to ::AnyInflate?
+
+	Benchmark
+		$font alias again
+
+        Negative Char performance
+		 Pre-allocating length halves size of array,
+		 req. scan file for - 1st, seek/read backwards? iff -U
+		     (assumes sane file order, but is okay for optimization?)
+	XXX	     Alas header[-1], codetag count, is useless here
+
+		 Hash(collision performance hit)?
+
+		 2nd array(code complexity?)?
+
+	detect if glyph has been seen before, and reference it?
+
+	reduce reliance upon $/
+		ammend split expression?
+
+        Native UTF8 in 5.8+? Major version bump and drop support for $]<= 5.7
+
+	-m=-0
+		a) keep current hack on hack
+		b) use header width
+
+		may break, depending on Text::Wrap?
+
+		use header[3] as initial approximation of char width,
+		to help nix up-to 0x7e heuristic
+
+	header	http://www.jave.de/figlet/figfont.html#headerline
+		[-2] = full layout
+	XXX	[-1] = figchar count!! optimize file parser with this?
+
+
+	Revisit local 1.07 branches, anything to salvage?
+
+	Experimental parsing (mis-)feature?
+	my $file = qr/^(??{$hunk})*$/x;

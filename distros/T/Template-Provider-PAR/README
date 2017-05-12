@@ -1,0 +1,177 @@
+NAME
+    Template::Provider::PAR - Include templates from a path within a PAR or
+    Zip archive.
+
+VERSION
+    This document describes Template::Provider::PAR version 0.1.102.
+
+SYNOPSIS
+        use Template;
+        use Template::Provider::PAR;
+
+        # Specify the provider in the config for Template::Toolkit.  Note,
+        # since no archive name is specified here, the name of the archive
+        # will be obtained from $0
+        my $tt_config =
+        {
+            LOAD_TEMPLATES =>
+            [Template::Provider::PAR->new(INCLUDE_PATH => 'some/archive/dir')]
+        };
+
+        my $template = <<TEMPLATE;
+        [% PROCESS something_in_the_archive.tt %]
+        TEMPLATE
+
+        my $tt = Template->new($tt_config);
+        $tt->process($template, $vars) || die $tt->error;
+
+DESCRIPTION
+    This "Template::Provider::PAR" is designed to behave like a regular
+    "Template::Provider", except that it retrieves templates from a path in
+    a PAR archive, by default the archive in which the running script is
+    embedded within.
+
+    This allows "Template::Toolkit" to be used from an entirely
+    self-contained PAR archive.
+
+INHERITED METHODS
+    These methods are inherited from Template::Provider and function in
+    exactly the same way:
+
+    * "fetch()"
+    * "store()"
+    * "load()"
+    * "include_path()"
+    * "paths()"
+    * "DESTROY()"
+
+    See Template::Provider for details of these methods.
+
+CLASS METHODS
+  "$obj = $class->new(%parameters)"
+    Constructs a new instance.
+
+    Accepts all the arguments as for the base class Template::Provider, with
+    the following additions:
+
+    "ARCHIVE"
+        This optional parameter explicity sets the archive to use, either as
+        a filename or a reference to a "Archive::Zip" object. If omitted,
+        then the return value of "PAR::par_handle($0)" is used. If this
+        returns undef, an error is thrown.
+
+    "INCLUDE_PATH"
+        This works as before, except obviously it refers to a path within
+        the archive.
+
+    Note that the "RELATIVE" parameter makes no sense within a PAR archive,
+    as it has no concept of a current directory, so the behaviour is
+    currently undefined and it should not be used.
+
+INSTANCE METHODS
+  "$obj->archive"
+    Returns a reference to the PAR archive (an instance of Archive::Zip).
+
+SEE ALSO
+    Template, Template::Provider, PAR, Archive::Zip
+
+DIAGNOSTICS
+    In addition to errors raised by Template::Provider and DBIx::Class,
+    Template::Provider::PAR may generate the following error messages:
+
+    "Archive '$archive' does not exist"
+        Thrown by the constructor if the "ARCHIVE" paramter is a
+        non-existant filename.
+
+    "ARCHIVE parameter is not an Archive::Zip instance"
+        Thrown by the constructor if the "ARCHIVE" paramter references an
+        object which isn't an "Archive::Zip" instance.
+
+    "As we do not seem to be used within a PAR archive you must define the
+    ARCHIVE parameter to reference a Zip archive"
+        Thown by the constructor if no "ARCHIVE" parameter is defined and
+        the host archive can't be inferred (i.e. if the running script is
+        not packaged within a PAR archive).
+
+CONFIGURATION AND ENVIRONMENT
+    "Template::Provider::PAR" requires no configuration files or environment
+    variables, other than those set by "PAR"'s runtime environment.
+
+DEPENDENCIES
+    *   Archive::Zip
+
+    *   PAR
+
+    *   Scalar::Util
+
+    *   File::Spec
+
+    *   Carp
+
+    *   Template::Provider
+
+    *   Module::Build
+
+    *   Test::More
+
+    Additionally, use of this module requires an object of the class
+    DBIx::Class::Schema or DBIx::Class::ResultSet.
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS
+    Please report any bugs or feature requests to "bug-template-provider-par
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Provider-PAR>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Template::Provider::PAR
+
+    You may also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Template-Provider-PAR/>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Provider-PAR>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Template-Provider-PAR/>
+
+AUTHOR
+    Nick Woolley <npw@cpan.org>
+
+    Much of the code was adapted from Template::Provider by Andy Wardley and
+    Template::Provider::DBIC, by David Cardwell.
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Nick Woolley. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

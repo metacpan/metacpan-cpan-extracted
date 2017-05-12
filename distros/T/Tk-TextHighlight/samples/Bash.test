@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# Sample .xinitrc for SuSE Linux
+# This script is called from 'startx' when you start an X session
+#
+
+#
+# In case everything goes wrong, we at least fall back to a plain xterm
+#
+failsafe="xterm -ls -T Failsave -geometry 80x24-0-0"
+trap "exec $failsafe" EXIT SIGHUP SIGINT SIGPIPE SIGTERM SIGIO
+
+#
+# Some bash (1 and 2) settings to avoid trouble on a
+# failed program call.
+#
+test -n "$BASH" && set +o posix
+no_exit_on_failed_exec=1
+type shopt > /dev/null 2>&1 && shopt -s execfail
+set +e > /dev/null 2>&1
+
+#
+# This should be the default
+#
+export TERM=xterm
+
+#
+# choose a window manager
+#
+if test -n "$WINDOWMANAGER" ; then
+    WINDOWMANAGER=`type -p $WINDOWMANAGER`
+fi
+exit 0
+

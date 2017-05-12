@@ -1,0 +1,28 @@
+---
+abstract: 'Install Metabase server related modules'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100711'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Metabase
+provides:
+  Task::Metabase:
+    file: lib/Task/Metabase.pm
+    version: 1.100760
+requires:
+  CPAN::Testers::Common::Utils: 0.001
+  CPAN::Testers::Metabase: 1.999
+  CPAN::Testers::Report: 1.999
+  JSON::XS: 2.00
+  Metabase: 0.005
+  Metabase::Client::Simple: 0.005
+  Metabase::Fact: 0.006
+resources:
+  repository: http://github.com/dagolden/task-metabase
+version: 1.100760

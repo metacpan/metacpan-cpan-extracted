@@ -1,0 +1,69 @@
+Consider adding the following from Test::More
+
+   note
+   explain
+   can_ok
+   isa_ok
+   subtest
+   cmp_ok
+
+   like
+   unlike
+       handles strings match regexps
+       lists contain certain element
+       hashes contain certain keys
+
+Add support for input files
+
+Look at:
+   Test::Group
+   Test::Slow
+to see if there's anything I want to add.
+
+Look at using Data::PrettyPrintObjects to print out the results.
+
+Add support for timing tests:
+
+   ok 1  (12 ms)
+   ok 2  (23 ms)
+
+=========================================================================
+OLD STUFF
+
+# Add a variable TI_TODO
+#   if '' (default) pass even if TODO tests fail
+#   if 'warn', pass but warn about TODO tests
+#   if 'fail', fail if TODO tests fail
+
+# Add functions:
+#    like, unlike
+#    cmp_ok
+#    can_ok
+#    isa_ok
+#    new_ok
+#    subtest
+#    pass, fail
+#    is_deeply
+#    explain
+
+# Conditional tests
+#    skip(N)   skip next N (defaults to 1) tests
+#    todo_skip
+
+# ARGS => VALS
+#    true if returned values are itentical to VALS
+# ARGS =>OP VALS
+#    =>is
+#    =>isnt
+#    =>like
+#    =>unlike
+#    =>cmp(NOP)
+#       NOP : < > <= >= !=
+#    =>cmp(N,M)
+#       true if VAL > N and VAL < M
+#    =>cmp[N,M]
+#       true if VAL >= N and VAL <= M
+#    =>cmp(N,M]
+#    =>cmp[N,M)
+#    =>member
+#       true if the return value is any of the VALS

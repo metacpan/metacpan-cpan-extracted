@@ -1,0 +1,46 @@
+#!perl
+
+=head1 NAME
+
+TkMonth - a Tk based calendar.
+
+=head1 SYNOPSIS
+
+TkMonth <options> [strftime time formats]
+
+=head1 DESCRIPTION
+
+This pops up a Tk based calendar that can be used to display the
+current date and time in various formats based on strftime.
+
+This script is based on, and is part of, the Perl L<Tk::Month> module.
+
+=head1 OPTIONS
+
+Most of these options correspond to the configuration options of the
+module L<Tk::Month>.
+
+=head1 SEE ALSO
+
+See also Perl module L<Tk::Month>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 1998-2014 Anthony R Fletcher. All rights reserved.
+This script is free software; you can redistribute them and/or modify
+them under the same terms as Perl itself.
+
+This code is supplied as-is - use at your own risk.
+
+=cut
+
+use 5;
+use warnings;
+use strict;
+
+use Tk::Month;
+
+Tk::Month::TkMonth(@ARGV);
+
+1;
+

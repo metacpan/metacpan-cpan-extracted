@@ -1,0 +1,4 @@
+<h1>
+	[%- USE Text::Widont nbsp => 'html' %]
+	[% "If the world didn't suck, we'd all fall off" | widont %]
+</h1>

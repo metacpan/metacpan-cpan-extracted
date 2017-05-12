@@ -1,0 +1,62 @@
+{
+   "abstract" : "Read lines from STDIN.",
+   "author" : [
+      "Matthaeus Kiem <cuer2s@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-Form",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Encode::Locale" : "0",
+            "Exporter" : "0",
+            "List::Util" : "1.33",
+            "Term::ReadKey" : "0",
+            "Text::LineFold" : "0",
+            "Unicode::GCString" : "0",
+            "perl" : "5.008003",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kuerbis/Term-Form.git",
+         "web" : "https://github.com/kuerbis/Term-Form"
+      }
+   },
+   "version" : "0.310",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

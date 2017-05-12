@@ -1,0 +1,391 @@
+# DNS
+
+(is-subclass-of)
+subclass: internet-service
+superclass: service
+
+internet-service
+bn: Internet Service
+in: service provided by set of processes using Internet protocols
+in (example): e-mail
+in (example): WWW
+in (example): file-transfer
+in (example): newsgroup
+in (example): IRC (chat)
+
+
+dns (internet-service)
+bn: DNS, Domain Name Service
+oc: http://www.internic.net/faqs/authoritative-dns.html
+oc: http://www.auggy.mlnet.com/ibm/3376c45.html#namesrv
+oc (reference): ftp://rtfm.mit.edu/pub/usenet/news.answers/internet/tcp-ip/domains-faq/
+oc (introduction): http://www.dns.net/dnsrd/docs/whatis.html
+oc (introduction): http://www.freesoft.org/CIE/Topics/75.htm
+in: is a hierarchical, tree structured system -- domain name space and IP address space
+in: distributed Internet directory service -- used to map between domain names and IP addresses -- mapping stored in a world-wide database -- distributed over millions of machines
+in: most Internet services rely on DNS to work
+
+
+
+
+(translates)
+translator : dns
+from : domain-name
+to   : ip-address
+
+(translates)
+translator : dns
+to : domain-name
+from   : ip-address
+
+(is-subclass-of)
+subclass: domain-name
+superclass: name
+
+domain-name
+bn: Domain Name
+oc: http://computer.howstuffworks.com/dns3.htm
+oc: http://searchwebservices.techtarget.com/sDefinition/0,,sid26_gci211988,00.html
+in: locates an organisation or other entity on the Internet
+in: domain names are for human convenience, instead of machine-readable IP-addresses
+in: each domain name is made up of a series of character strings (labels) separated by dots: bond.edu.au.
+
+(is-subclass-of)
+subclass: full-qualified-domain-name
+superclass: domain-name
+
+full-qualified-domain-name
+bn: FQDN, Fully Qualified Domain Name
+in: to determine a unique Internet address for any host on the Internet
+in (example): www.bond.edu.au. ( hostname + domain-name, incl. top-level domain)
+
+
+
+(is-subclass-of)
+superclass : domain-name
+subclass   : top-level-domain
+
+(is-subclass-of)
+superclass : domain-name
+subclass   : second-level-domain
+
+top-level-domain
+bn: Top Level Domain (TLDs)
+oc: http://www.icann.org/tlds/
+oc: http://searchwebservices.techtarget.com/sDefinition/0,,sid26_gci213511,00.html
+in: identifies the most general part of the domain name in an Internet address
+in: TLD is either a generic top-level domain (gTLD), such as "com", or a country code top-level domain (ccTLD), such as "fr" 
+in: within every top-level domain there is a list of second-level domains
+in: responsibility for operating each TLD is delegated
+
+second-level-domain
+bn: Second Level Domain 
+oc: http://searchwebservices.techtarget.com/sDefinition/0,,sid26_gci213548,00.html
+in: second-level domain name includes the top-level domain, e.g. cnn.com.
+in: must be unique and registered with accredited companies
+in: there can be duplication across domains; e.g. howstuffworks.com and howstuffworks.org are completely different domains
+in: can be divided into further domain levels 
+
+
+(is-registered-by)
+registrar : icann
+registered: top-level-domain
+
+icann (organisation)
+bn: ICANN
+oc (homepage): http://www.icann.org/
+in: global, non-profit corporation, responsible for managing and coordinating DNS to ensure universal resolvability -- responsible for naming, removing and introducing top-level domain names (.com, .museum, .....)
+in: accredits companies to run service of allocating domain names to end customers
+in: coordinates root-dns-servers
+in (history): in earlier times IANA did registration and administration
+oc (article): http://www.theregister.co.uk/content/6/36226.html
+
+(coordinate)
+coordinator : icann
+activity    : operation-of-root-dns-server
+
+(is-operated-by)
+operation : operation-of-root-dns-server
+operator  : verisign
+system    : root-dns-server
+
+root-dns-server (server)
+bn: Root DNS Server
+in: 13 special servers distributed around the world and coordinated by ICANN
+in: only handle what is in the 'root zone' . -- top-level domains --\
+   master list of top-level domain (TLD) names is kept on server A -- list is replicated to the others
+oc: http://searchnetworking.techtarget.com/sDefinition/0,,sid7_gci212922,00.html
+oc (homepage): http://www.root-servers.org/
+oc (operational-report): http://d.root-servers.org/october21.txt
+oc (monitoring): http://dnsmon.ripe.net/
+
+
+(is-subclass-of)
+subclass   : generic-top-level-domain
+superclass : top-level-domain
+
+generic-top-level-domain
+bn: gTLD, generic TLD
+oc: http://www.icann.org/tlds/
+in: best known ones are .org, .com, .net, .edu, .mil, .gov
+in: new generic TLDs: .info, . biz, .museum, ....
+in: domain names in these TLDs can only be registered through ICANN-accredited registrars 
+
+
+
+
+(is-subclass-of)
+subclass   : country-code-top-level-domain
+superclass : top-level-domain
+
+country-code-top-level-domain
+bn: ccTLD, country-code TLD
+oc: http://thewhir.com/find/domain-names/guides/cc-tld.cfm
+in: TLDs with two letters (such as .de, .mx, and .jp) -- established for over 240 countries and external territories -- ISO 3166
+in: can provides regional-specific branding that a typical generic TLD does not
+in (comment): common misconception is that ccTLDs can only be assigned to Web sites physically located in the suffix country --\
+  some countries have specific rules for who can register domains using their suffix and for what purposes
+
+
+
+
+(service-is-provided-by)
+provider : dns-server
+service  : dns
+
+(is-subclass-of)
+subclass: dns-server
+superclass: server
+
+dns-server
+bn: DNS Server
+oc: http://computer.howstuffworks.com/dns.htm
+oc (setup): http://www.linux.org/docs/ldp/howto/DNS-HOWTO.html
+in: accepts requests from programs or from other name servers to convert domain names into IP addresses, or back
+in: uses the world-wide largest and most active distributed databases
+in: each database contains records (A, MX, NS, SOA, CNAME, PTR)
+in: every name server has a list of all of the known root servers
+in (procedure): when request arrives it can do one of four things: answer the request with an IP address by looking in its cache --\
+  contact another name server (recursive) --\
+  return IP address from another name server to client (iterative) --\
+  return an error message because the requested domain name is invalid or does not exist
+
+
+(is-subclass-of)
+subclass: dns-zone
+superclass: namespace
+
+dns-zone
+bn: DNS Zone
+oc: http://www.menandmice.com/online_docs_and_faq/glossary/zone.htm
+in: all information about a domain name and names within it
+
+# is-reified-by dns-zone-transfer
+(is-transferred)
+from : primary-dns-server
+to   : secondary-dns-server
+what : dns-zone
+
+# is-reified-by dns-zone-transfer
+(is-transferred)
+from : dns-server
+to   : dns-client
+what : dns-zone
+
+(performs-function)
+performer: dns-server
+function : dns-zone-transfer iterative-dns-query recursive-dns-query
+
+
+dns-zone-transfer (information-exchange)
+bn: Zone Transfer
+oc: http://www.microsoft.com/windows2000/en/server/help/default.asp?url=/windows2000/en/server/help/sag_DNS_und_ZoneTransfers.htm
+in: special type of query that asks a name server for the entire contents of a zone
+in: "trusted" DNSs exchange complete zones, using TTL for caching (how long it is valid)
+in: zone transfers are usually used by secondary servers to update its own zone data from its primary server
+in: ISPs exchange zones
+
+(is-subclass-of)
+subclass: iterative-dns-query
+superclass: dns-query
+
+iterative-dns-query
+bn: Iterative DNS Query
+oc: http://techrepublic.com.com/5100-6262-1058014.html
+in: DNS server answers either directly to client or gives reference to other DNS server --\
+   client itself has now to query the recommanded DNS server
+in: references are first to servers 'higher up the DNS hierarchy' (includes root servers) -- then down the hierarchy
+
+(is-subclass-of)
+subclass: recursive-dns-query
+superclass: dns-query
+
+recursive-dns-query
+bn: Recursive DNS Query
+oc: http://techrepublic.com.com/5100-6262-1058014.html
+in: DNS server answers directly or may contact other DNS servers for assistance (using iterative queries) --\
+   then passes on the information back to the client that originated the name resolution request
+in: more costly for DNS server
+
+(exposes)
+exposer: dns-server
+exposed: dns-database
+
+dns-database
+bn: DNS Database
+oc: http://www.tldp.org/LDP/nag/node39.html
+in: large distributed database -- handling billions of requests every day through a network of millions of name servers
+in: different types of entries the DNS database called records (A, MX, NS, SOA, CNAME, PTR, ...)
+in: content is organized in zones
+
+(contains)
+container : dns-database
+content   : a-record ns-record mx-record soa-record cname-record ptr-record
+
+
+
+a-record (information)
+bn: A-Record
+oc: http://www.zytrax.com/books/dns/ch8/a.html
+oc: http://www.jhsoft.com/help/rec_a.htm
+in: assigns an IP address to a given domain name -- "forward lookup"
+in: domain name can be mapped to more than one IP-address (load-balancing, back-up)
+in (example): www.bond.edu.au -> A  131.244.5.50
+in (example): www.ibm.com -> A 129.42.18.99 A 129.42.19.99 A 129.42.16.99 A 129.42.17.99
+
+
+mx-record (information)
+bn: MX record
+oc: http://www.jhsoft.com/help/rec_MX.htm
+oc: http://www.rscott.org/dns/mx.html
+in: identifies the mail server (mail exchanger, MX) that is responsible for handling emails (incoming SMTP) for a given domain name
+in: can get more than one entry -- preference numbers indicate the order in which mail servers should be used --\
+  if best (lowest number) preference cannot be reached, then client will try next higher number
+in (example): @microsoft.com ->  MX  10 maila.microsoft.com.  --  MX  100 mailb.microsoft.com. -- MX 10 mailc.microsoft.com.
+
+ns-record (information)
+bn: NS record
+oc: http://www.zytrax.com/books/dns/ch8/ns.html
+in: lists the DNS servers which hold the databases for a given zone - not the IP-address
+in: records list the primary and secondary servers for the zone
+in: only one name server is defined in the SOA record but any number of NS records may be defined
+in (example): bond.edu.au -> NS  kirk.bond.edu.au. -- NS diablo.onthenet.com.au. -- NS minerva.its.bond.edu.au.
+
+soa-record (information)
+bn: SOA record
+oc: http://www.jhsoft.com/help/rec_SOA.htm
+in: SOA-record lists primary DNS server -- email address of the person responsible for the zone --\
+  serial number used by secondary DNS servers to check if the zone has been modified --\
+  details about caching used by secondary DNS servers
+in (example): bond.edu.au. -> SOA minerva.its.bond.edu.au. hostmaster.bond.edu.au. 2003093001 10800 1800 3600000 86400
+
+(refers-to)
+referrer: soa-record
+referral: primary-dns-server secondary-dns-server
+
+cname-record (information)
+bn: CNAME record
+oc: http://www.jhsoft.com/help/rec_CNAME.htm
+in: lists canonical (real) name
+in: host may have more than one name -- one name for the machine itself -- other names for different services on one machine
+in: canonical host name is the one with an A record associated -- others are simply aliases referring to the canonical host name
+in: CNAMEs are useful when a service needs to be migrated from between hosts
+in (example): www.bond.edu.au. ->  CNAME huntsman.bond.edu.au.
+
+
+ptr-record (information)
+bn: PTR record
+oc: http://www.jhsoft.com/help/rec_PTR.htm
+in: PTR-records are used to map IP addresses to domain names (reverse of forward lookup) -- "reverse look-up"
+in: query is done by reversing the IP-address followed by IN-ADDR.ARPA. domain
+in (example):  1.1.244.131.in-addr.arpa ->  PTR  kirk.Bond.edu.au.
+
+
+
+(has-features)
+object  : dns-server
+feature : dns-caching dns-redundancy
+
+dns-redundancy
+bn: DNS redundancy
+oc: http://www.dummies.com/WileyCDA/DummiesArticle/id-1699.html
+in: multiple name servers exist for every zone -- so if one fails, there are others to handle the requests --\
+ one of the key aspects to make DNS work globally
+in: minimum of two DNS servers is needed for each domain for fault tolerance -- usually handled by the ISP or the customer
+
+
+(is-achieved-through)
+achievement: dns-redundancy
+measure    : secondary-dns-server
+
+
+dns-caching
+bn: DNS Caching
+oc: http://www.vicomsoft.com/glossary/dnscaching.html
+in: once a name server resolves a request, it caches all of the IP addresses it receives --\
+ e.g. after a request for something.com to a root server, it memorizes the IP address for that name server handling this domain --\
+  dramatic speed up of overall operation -- only works if the number of changes is small compared to the number of read requests
+in: every information has a due date -- Time To Live (TTL) -- controls how long a server will cache a piece of information
+
+(is-achieved-through)
+achievement: performance
+measure    : dns-caching
+
+
+(is-using-protocol)
+user: dns-client dns-server
+protocol: dns-protocol
+
+
+dns-protocol (protocol)
+bn: DNS Protocol
+oc: http://www.freesoft.org/CIE/Course/Section2/11.htm
+in: application protocol used to request resource records from name server
+in: normal resource records lookups are done with UDP
+in: zone transfers -- TCP must be used -- transfer entire content of a zone between (usually between primary and secondary DNS server)
+
+dns-client
+bn: DNS Client, Resolver
+oc: http://www.menandmice.com/online_docs_and_faq/glossary/glossarytoc.htm?resolver.htm
+in: software within an application that formats requests to be sent to the Domain Name Server for hostname to Internet address conversion
+in: user program can be: e-mail, FTP client, http-client, ...
+in: resolver  must know the name server it should use for converting URLs to IP addresses
+in: nearest name server is either at ISP (for individuals) or in company
+
+
+(is-subclass-of)
+subclass: primary-dns-server
+superclass: dns-server
+
+primary-dns-server
+bn: Primary DNS Server
+oc: http://www.menandmice.com/online_docs_and_faq/glossary/primary.server.htm
+in: also called 'master' (of a zone)
+in: holds authoritative information about a zone -- there can only be one
+in: this is encoded in the SOA (start of authority) record -- hostmaster, serial number, caching information
+
+
+
+
+(is-subclass-of)
+subclass: secondary-dns-server
+superclass: dns-server
+
+secondary-dns-server
+bn: Secondary DNS Server
+in: keeps copies of a zone -- updated on a regular basis using zone transfer
+in: "slave" server
+
+#-- DNSreporter -----------------------------------
+
+(can-be-analyzed-with)
+tool: dns-report
+object: dns-database
+
+dns-report (online-service)
+bn: www.DNSreport.com
+in: debugging and testing DNS entries
+oc (homepage): http://www.dnsreport.com/
+
+
+#%cancel

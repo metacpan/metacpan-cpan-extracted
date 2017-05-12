@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Data::Dumper;
+use Thrift::IDL;
+use Tapir::Validator;
+use HTML::Mason;
+use FindBin;
+use List::Util qw(first);
+
+my %opt;
+
+GetOptions(
+    'idl=s' => \$opt{idl},
+    'out=s' => \$opt{out},
+);
+
+if (my @missing_args = grep { ! $opt{$_} } qw(idl out)) {
+    die "Must pass ".(join ', ', map { "--" . $_ } @missing_args)."\n";
+}
+
+my $document = Thrift::IDL->parse_thrift_file($opt{idl});
+my $validator = Tapir::Validator->new();
+my $namespace = first { defined } map { $document->headers->[0]->namespace($_) } qw(js * perl);
+
+my @audit_errors = $validator->audit_idl_document($document);
+die "IDL file failed audit\n" if @audit_errors;
+
+my $comp_source;
+{
+    local $/ = undef;
+    $comp_source = <DATA>;
+}
+
+my $mason_output = '';
+my $interp = HTML::Mason::Interp->new(
+    out_method => \$mason_output,
+);
+my $comp = $interp->make_component( comp_file => $FindBin::Bin . '/tapir.mjs' );
+#my $comp = $interp->make_component( comp_source => $comp_source );
+
+my $return_value = $interp->exec(
+    $comp,
+    namespace => $namespace,
+    document => $document,
+    types => $validator->{custom_types},
+);
+
+open my $out, '>', $opt{out} or die "Couldn't write to '$opt{out}': $!";
+print $out $mason_output;
+close $out;
+
+print "Wrote output to $opt{out}\n";
+
+__DATA__
+This is <% 'Mason ' x 9 %>

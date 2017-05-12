@@ -1,0 +1,65 @@
+Revision history for Perl extension Thread::Suspend.
+
+1.23 Tue Apr 11 05:14:22 2017
+	- Fix test suite errors
+
+1.22 Wed Nov 21 19:34:31 2012
+	- Fix for test hangs on Windows
+
+1.21 Fri Dec 24 17:58:16 2010
+	- POD update
+
+1.19 Thu Jun 12 13:46:30 2008
+	- Fix SKIPs in tests
+
+1.18 Tue Jun 10 16:58:13 2008
+	- End all tests with exit(0)
+
+1.17 Thu Feb 28 16:05:15 2008
+	- More fixes to tests
+
+1.16 Wed Feb 27 17:43:15 2008
+	- More fixes to tests
+
+1.15 Wed Feb 27 13:43:14 2008
+	- More fixes to tests
+
+1.14 Wed Feb 27 01:14:00 2008
+	- More fixes to tests
+
+1.13 Mon Feb 25 22:17:19 2008
+	- Fixes to tests
+
+1.12 Fri Feb 22 22:19:37 2008
+	- Allow installation on non-threaded Perls
+
+1.11 Wed Feb 20 17:26:30 2008
+	- Build/test updates
+
+1.09 Sat Oct 14 09:08:47 EST 2006
+	- Check for $Config{useithreads}
+
+1.08 Thu Oct 12 13:28:25 EDT 2006
+	- Added example and POD tests
+
+1.07 Wed Aug 30 14:25:35 EDT 2006
+	- Support 5.8.0
+
+1.06 Thu Aug 10 14:51:07 EDT 2006
+	- More fixes to tests (sigh)
+
+1.05 Wed Aug  2 13:54:17 EDT 2006
+	- More fixes to tests
+
+1.04 Tue Aug  1 13:56:38 EDT 2006
+	- Fixes to tests
+
+1.03 Thu Jul 13 08:53:36 EDT 2006
+	- Added caveat to POD concerning locks
+
+1.02 Wed Jul 12 16:00:03 EDT 2006
+	- Fix lock issues in tests
+
+1.01 Tue Jul 11 09:18:45 EDT 2006
+	- Initial release
+

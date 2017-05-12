@@ -1,0 +1,81 @@
+{
+   "abstract" : "Compare two html structures and show differences if it is not same",
+   "author" : [
+      "cho45 <cho45@lowreal.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-HTML-Differences",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::Base" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Util::Call" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "0",
+            "Test::Differences" : "0.5",
+            "Text::Diff" : "0",
+            "Text::Diff::Table" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::HTML::Differences" : {
+         "file" : "lib/Test/HTML/Differences.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cho45/Test-HTML-Differences/issues"
+      },
+      "homepage" : "https://github.com/cho45/Test-HTML-Differences",
+      "repository" : {
+         "url" : "git://github.com/cho45/Test-HTML-Differences.git",
+         "web" : "https://github.com/cho45/Test-HTML-Differences"
+      }
+   },
+   "version" : "0.05",
+   "x_authority" : "cpan:SATOH"
+}

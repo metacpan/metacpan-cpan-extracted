@@ -1,0 +1,105 @@
+==================================================
+Changes from 2013-11-02 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.02 at 2014-11-02 02:37:24 +0000
+-----------------------------------------
+
+  Change: 2201bfb30f04069632490d0018a9bec3ebc6448b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 19:36:13 +0000
+
+    skip RFC 6761 example URLs 
+
+  Change: 3c2f35ddca8e6b799cf9169257b86279c69081f1
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 19:29:32 +0000
+
+    fix error in link gathering 
+
+  Change: 069e98c58c4ba1683f17d97488ae041c3256794a
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 19:13:29 +0000
+
+    rename 
+
+  Change: c2f7d6c6f0bfaeaa269a4ec00800aa3fa5c6b649
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 19:12:34 +0000
+
+    try to get original uri 
+
+  Change: c6dd9567bf4432a90512e8429dfb4c797da57850
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 18:53:27 +0000
+
+    use List::MoreUtils::any instead of boolean grep 
+
+  Change: fec1c1885e0a39d7b0bc6da8e3d592cc7369f988
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 18:49:44 +0000
+
+    remove old testing files 
+
+-----------------------------------------
+version 0.01 at 2014-11-02 01:43:36 +0000
+-----------------------------------------
+
+  Change: c2b830a52d1cfdb5f66ba55d80320a7d4f863e8b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 18:43:36 +0000
+
+    d0h add dist.ini 
+
+  Change: 68594457cbcbde02340ea8c3a235791f491b424c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 18:43:22 +0000
+
+    dzilification 
+
+  Change: 95b4d9f5e47aeabbd7b53d35c4a5dccfcd2d9f62
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-05-27 20:47:45 +0000
+
+    add SEE ALSO link 
+
+  Change: f458f0a466ef9e821d93a9cc74d8e50563143dbc
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-05-27 20:44:55 +0000
+
+    add note about Test::Pod::LinkCheck 
+
+  Change: c132c5ed88fdaad4a5e286d799158be40a626c21
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-03-25 22:55:02 +0000
+
+    cleanups 
+
+  Change: d6287139b5b7df5c39e93987902a73fdc89166f8
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-03-06 17:02:23 +0000
+
+    add todo section 
+
+  Change: 5dd416c7cdf2e61a90c259244c6d979fa7fc13dc
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-02-03 12:34:22 +0000
+
+    new CPAN tarball 
+
+  Change: a660e6dbc8bfe3a84d73d48b33f06ba8fabe8cf3
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-02-03 12:32:52 +0000
+
+    first version 
+
+  Change: 28ef47feec11cae4f482851f7bb1e388ba9c5781
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-02-02 14:24:53 +0000
+
+    first commit 
+
+================
+End of releases.
+================

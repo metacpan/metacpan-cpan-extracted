@@ -1,0 +1,103 @@
+{
+   "abstract" : "Convenient mocking of externalities by recording and replaying method calls.",
+   "author" : [
+      "Michael Jemmeson <mjemmeson@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-MethodFixtures",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Milla" : "0",
+            "Dist::Zilla::Plugin::MetaProvides" : "0",
+            "Test::Pod" : "0"
+         },
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::Dump" : "0",
+            "Digest::MD5" : "0",
+            "Path::Tiny" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Hook::LexWrap" : "0",
+            "Scalar::Util" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "File::Temp" : "0",
+            "Path::Tiny" : "0",
+            "Storable" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Test::MethodFixtures" : {
+         "file" : "lib/Test/MethodFixtures.pm",
+         "version" : "0.08"
+      },
+      "Test::MethodFixtures::Storage" : {
+         "file" : "lib/Test/MethodFixtures/Storage.pm",
+         "version" : "0.08"
+      },
+      "Test::MethodFixtures::Storage::File" : {
+         "file" : "lib/Test/MethodFixtures/Storage/File.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjemmeson/Test-MethodFixtures/issues"
+      },
+      "homepage" : "https://github.com/mjemmeson/Test-MethodFixtures",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mjemmeson/Test-MethodFixtures.git",
+         "web" : "https://github.com/mjemmeson/Test-MethodFixtures"
+      }
+   },
+   "version" : "0.08"
+}
+

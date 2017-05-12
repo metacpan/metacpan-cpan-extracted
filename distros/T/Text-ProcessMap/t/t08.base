@@ -1,0 +1,7 @@
++------------------------.  +------------------------.  +------------------------.
+|          [I1]          |  |          [P1]          |  |          [O1]          |
+|        MyInput         |  |       MyProcess        |  |        MyOutput        |
+|    Input Element 1     |  |   Process Element 1    |  |    Output Element 1    |
+|    Input Element 2     |  |   Process Element 2    |  |    Output Element 2    |
+`------------------------'  `------------------------'  `------------------------'
+

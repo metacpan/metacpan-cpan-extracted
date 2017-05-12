@@ -1,0 +1,9 @@
+<sense id="art%1:01:00::" percent="20.00"/>
+<sense id="art%1:02:00::" percent="20.00"/>
+<sense id="art%1:04:00::" percent="20.00"/>
+<sense id="art%1:06:00::" percent="20.00"/>
+<sense id="art_gallery%1:06:00::" percent="20.00"/>
+Total Instances = 5 
+Total Distinct Senses = 5
+Distribution = {20.00,20.00,20.00,20.00,20.00}
+% of Majority Sense = 20.00

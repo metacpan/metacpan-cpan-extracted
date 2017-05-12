@@ -1,0 +1,10 @@
+Version 2009110701
++ Modernized Makefile.PL
++ Fix prerequisites.
+
+Version 2009040401
++ Modernize.
++ Move to git and github.
+
+Revision 1.1  1999/07/20 06:55:25  abigail
++ Initial revision

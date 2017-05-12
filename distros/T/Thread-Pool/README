@@ -1,0 +1,34 @@
+README for Thread::Pool
+
+Create a group of threads to perform similar jobs, without having to start
+and stop a thread for each job.  It is intended to be used in situations
+where the completion of similar jobs (e.g. fetching URL's or resolving
+reverse DNS of IP-numbers) may take an indeterminate amount of time.
+Using a pool of threads, these jobs can be executed more or less
+simultaneously, causing the wallclock time of an application to be shortened.
+
+                         *** A note of CAUTION ***
+
+This module only functions on Perl versions 5.8.0-RC3 and later.  And then
+only when threads are enabled with -Dusethreads.  It is of no use with any
+version of Perl before 5.8.0-RC3 or without threads enabled.
+
+                         *************************
+
+Copyright (c) 2002, 2003, 2010 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Version:
+ 0.33
+
+Required Modules:
+ Thread::Conveyor (0.15)
+ Thread::Conveyor::Monitored (0.11)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

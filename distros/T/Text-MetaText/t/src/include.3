@@ -1,0 +1,50 @@
+#
+# This file tests the INCLUDE directive with print filters and formats
+#
+
+# INCLUDE using 'sr' (search/replace) print filter
+%% INCLUDE
+   quote
+   filter="sr(^>, fred->)"
+%%
+%% INCLUDE
+   quote
+   filter="sr([a-z])"
+%%
+
+
+# INCLUDE using 'escape' (escape characters) print filter
+%% INCLUDE
+   adam
+   filter="escape([\'\"])"
+%%
+
+# INCLUDE using a print format 
+-->%% INCLUDE
+   adam
+   format="[%s]"
+%%<--
+
+# INCLUDE using both a filter and a print formatter
+-->%% INCLUDE
+   adam
+   filter="escape([\'\"])"
+   format="[ %s ]"
+%%<---
+
+%% INCLUDE
+   adam
+   format="-- woops, forgot to include a string marker --"
+%%
+
+
+%% BLOCK quote %%
+> This is a quoted block
+> This is the next line
+%% ENDBLOCK %%
+
+%% BLOCK adam %%
+Madam, I'm Adam.
+"Enough of that", she said.
+%% ENDBLOCK %%
+

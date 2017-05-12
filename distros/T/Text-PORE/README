@@ -1,0 +1,40 @@
+Text::PORE version 1.01
+=======================
+
+Text::PORE - Perl Object Rendering Engine
+
+PORE is a general-purpose template-based object rendering engine. It is intended for producing dynamic
+content by rending Perl objects with templates. The template language consists a set of XML tags. The 
+template parser is built using byacc. PORE is light and fast. 
+
+Parallel to the idea of JSP and PHP, PORE was designed to separate data from presentation. 
+The data is encapsulated in Perl objects, like Java Beans. The presentation is represented by 
+PORE::Template, like JSP files. PORE consists of a templating language that is a set of XML tags 
+and a rendering engine that parses templates and generates output using specified Perl objects. 
+PORE is suitable for any environment where dynamic content needs to be produced based on Perl objects. 
+For instance, it can be used for developing CGI programs, where Perl developers can concentrate on 
+writing business logics and data retrieval, while content developers can focus on producing presentation 
+layout.
+
+INSTALLATION
+------------
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+AUTHOR
+------
+Zhengrong Tang, ztang@cpan.org
+
+
+COPYRIGHT AND LICENCE
+----------------------
+Copyright 2004 by Zhengrong Tang
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.  
+                                       

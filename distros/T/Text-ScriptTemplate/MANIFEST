@@ -1,0 +1,14 @@
+CHANGE.LOG
+MANIFEST
+Makefile.PL
+README.TXT
+ScriptTemplate.pm
+bin/benchmark.pl
+bin/dumpvar.pl
+t/20fopen.t
+t/50include.t
+t/50include.sub
+t/30embed.t
+t/40brace.t
+t/10basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

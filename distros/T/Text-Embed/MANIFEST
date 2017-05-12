@@ -1,0 +1,12 @@
+TODO
+README
+Changes
+Makefile.PL
+MANIFEST
+t/Text-Embed.t
+lib/Text/Embed.pm
+misc/debug-test.pl
+misc/debug-re.pl
+misc/make-manifest.pl
+misc/debug-docs.pl
+misc/debug-install.pl

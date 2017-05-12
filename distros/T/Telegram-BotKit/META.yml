@@ -1,0 +1,33 @@
+---
+abstract: 'Set of Perl classes for creation of interactive and dynamic Telegram bots. Now bots can only process text, but work in progress :)'
+author:
+  - 'Pavel Serikov <pavelsr@cpan.org>'
+build_requires:
+  Class::Inspector: '0'
+  Config::JSON: '0'
+  Test::More: '0'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Telegram-BotKit
+requires:
+  Data::Dumper: '0'
+  Encode: '0'
+  Exporter: '0'
+  JSON::MaybeXS: '0'
+  List::MoreUtils: '0'
+  Module::Load: '0'
+  WWW::Telegram::BotAPI: '0'
+  base: '0'
+  common::sense: '0'
+resources:
+  bugtracker: https://github.com/pavelsr/Telegram-BotKit/issues
+  repository: git://github.com/pavelsr/Telegram-BotKit.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,73 @@
+t/faker.test ......
+1..4
+ok 1 - Expected result OK
+not ok 2 - Unexpected result not OK
+
+#   Failed test 'Unexpected result not OK'
+#   at t/faker.test line 9.
+#          got: 'expected'
+#     expected: 'unexpected'
+ok 3 - whoop deee # TODO Making sure this test is still marked fail, not todo pass
+ok 4 # skip cuz I can
+# Looks like you failed 1 test of 4.
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/4 subtests
+    (less 1 skipped subtest: 2 okay)
+    (1 TODO test unexpectedly succeeded)
+t/fake.test .......
+1..2
+ok 1 - STORAGE TANKS SEARED
+# whee
+not ok 2 - NOT SO SEARED AFTER ARR
+
+#   Failed test 'NOT SO SEARED AFTER ARR'
+#   at t/fake.test line 10.
+# Looks like you failed 1 test of 2.
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/2 subtests
+t/notests.test ....
+1..2
+# whee
+Died at t/notests.test line 5.
+# Looks like your test exited with 255 before it could output anything.
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Failed 2/2 subtests
+t/pass.test .......
+1..1
+ok 1 - yay!
+ok
+t/skipall.test .... skipped: cause I can
+t/skip.test .......
+1..3
+ok 1 # skip STORAGE TANKS SEARED
+not ok 2 # TODO & SKIP NOT SO SEARED AFTER ARR
+ok 3 - STORAGE TANKS SEARED # TODO skippity doo dah
+ok
+t/todo_pass.test ..
+1..3
+ok 1 - yay!
+ok 2 - ruh roh # TODO Ez duz it
+not ok 3 - diddley # TODO Ez duz it
+
+#   Failed (TODO) test 'diddley'
+#   at t/todo_pass.test line 6.
+ok
+
+Test Summary Report
+-------------------
+t/faker.test    (Wstat: 256 Tests: 4 Failed: 1)
+  Failed test:  2
+  TODO passed:   3
+  Non-zero exit status: 1
+t/fake.test     (Wstat: 256 Tests: 2 Failed: 1)
+  Failed test:  2
+  Non-zero exit status: 1
+t/notests.test  (Wstat: 65280 Tests: 0 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 2 tests but ran 0.
+t/skip.test     (Wstat: 0 Tests: 3 Failed: 0)
+  TODO passed:   3
+t/todo_pass.test (Wstat: 0 Tests: 3 Failed: 0)
+  TODO passed:   2
+Files=7, Tests=13,  2 wallclock secs ( 0.04 usr  0.01 sys +  0.10 cusr  0.02 csys =  0.17 CPU)
+Result: FAIL

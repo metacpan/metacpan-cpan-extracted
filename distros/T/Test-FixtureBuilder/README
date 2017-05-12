@@ -1,0 +1,143 @@
+NAME
+    Test::FixtureBuilder - Quickly define fixture data for unit tests
+
+DESCRIPTION
+    When writing unit tests for applications it is often necessary to load
+    some basic data into a database. This data is often referred to fixture
+    data. There are several approaches to loading fixture data: Manual, From
+    YAML files, or code to create objects.
+
+    Sometimes you just want to shove some rows into a database, and you do
+    not want to be bothered with the SQL or the object->new calls. In those
+    cases this module is for you.
+
+SYNOPSYS
+    There are two interfaces to this module.
+
+  DECLARE
+    The declarative interface is really quite nice.
+
+    NOTE: You MUST subclass Test::FixtureBuilder, or use a predefined
+    subclass in order to use the declarative form.
+
+        package Test::FixtureBuilder::MyBuilder;
+
+        use DBI;
+        use DBD::SQLite;
+
+        use base Test::FixtureBuilder;
+
+        sub name_to_handle {
+            my $class = shift;
+            my ($name) = @_;
+            return DBI->connect("dbi:SQLite:dbname=$name","","");
+        }
+
+        1;
+
+    Then to use it:
+
+        use Test::FixtureBuilder::MyBuilder;
+
+        fixture_db my_db => sub {
+            fixture_table my_table => sub {
+                fixture_row { col1 => 'val1', col2 => 'val2' };
+
+                fixture_row { key => $_, col2 => 'xxx' }
+                    for 1 .. 10;
+            };
+
+            fixture_table my_table2 => sub {
+                fixture_row { col1 => 'val1', col2 => 'val2' };
+            };
+        };
+
+        fixture_db my_db2 => sub { ... };
+
+        ...
+
+        1;
+
+  OOP
+        use Test::FixtureBuilder ();
+
+        my $fb = Test::FixtureBuilder->new( dbh => $dbh );
+        $fb->insert_row(tableA => { col1 => 'val1' });
+        $fb->insert_row(tableB => { col1 => 'val1' });
+
+        $fb->insert_rows(
+            'tableX',
+            { ... },
+            { ... },
+            ...
+        );
+
+EXPORTS
+    fixture_db db_name => sub { ... }
+        Create a scope in which fixtures use the db_name database
+
+    fixture_table table_name => sub { ... }
+        Create a scope in which fixtures use the table_name table
+
+    fixture_row { col => val, ... }
+    fixture_row ( col => val, ... )
+    fixture_row col => val, ...
+        Load a row, you can use a hashref, or key/value pairs.
+
+    my $meta = $class->FIXTURE_BUILDER_META
+        Get the meta-object. Documented for completeness, you should not use
+        this directly.
+
+METHODS
+    my $dbh = $class->name_to_handle($dbname)
+        Get a database handle from a name. You must override this before it
+        will do anything useful. The default behavior is to die unless the
+        $dbname variable is blessed in which case it is returned unchanged.
+
+    my $fb = $class->new(...)
+        Create a new instance. Any valid accessor can be specified at
+        construction time. This includes accessors for your specific
+        subclass.
+
+    $class = $fb->class
+        Used internally.
+
+    $fb->db($dbname)
+    $dbh = $fb->db
+        Set the database by name (only useful if you override
+        "name_to_handle()"). When no argument is given it behaves like
+        "dbh()".
+
+    $fb->dbh($dbh)
+    $dbh = $fb->dbh
+        Get and/or set the database handle.
+
+    $fb->insert_row(table => { ... })
+        Insert a row into the specified table of the current database.
+
+    $fb->insert_rows(table => { ... }, { ... }, ...)
+        Insert multiple rows into the specified table of the current
+        database.
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+OTHER CREDITS
+    DreamHost
+        I originally developed a tool very similar to this one for use at
+        DreamHost in our test suite. DreamHost gave me permission to release
+        an open-source implementation of the tool.
+
+        <http://www.dreamhost.com>
+
+COPYRIGHT
+    Copyright (C) 2014 Chad Granum
+
+    Test-FixtureBuilder is free software; Standard perl license (GPL and
+    Artistic).
+
+    Test-FixtureBuilder is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the license for
+    more details.
+

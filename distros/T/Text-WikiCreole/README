@@ -1,0 +1,72 @@
+Text-WikiCreole
+
+Text::WikiCreole implements the Wiki Creole markup language, version
+1.0, as described at http://www.wikicreole.org.  It reads Creole 1.0
+markup and returns XHTML.
+
+In addition to the official Creole 1.0 markup elements, it also supports
+several extensions, such as plugins, superscript, subscript, underline, 
+definition lists, indented paragraphs, plugins, etc.
+
+CHANGES:
+    Version 0.07:
+       Bug fix: Italics around links rendered incorrectly.
+
+    Version 0.06:
+       Bug fix: & not converted to &amp; where appropriate
+       Feature addition: creole_barelink() and creole_custombarelinks() 
+          functions for customized handling of http://google.com style links
+          courtesy of Bernd Zeimetz
+
+    Version 0.05:
+       Added creole_customlinks() and creole_customimgs()
+
+    Version 0.04:
+       Fixed a bug with creole_parse and undefined input
+
+    Version 0.03:
+       Added <<< alternate plugin >>> syntax
+
+    Version 0.02: 
+       Fixed bug parsing plugin blocks
+       Fixed bug with nowiki blocks at end of file
+       Added creole_img for custom image URLs
+                  
+    Version 0.01: Initial release.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Text::WikiCreole
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-WikiCreole
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-WikiCreole
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Text-WikiCreole
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Text-WikiCreole
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Jason Burnett
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

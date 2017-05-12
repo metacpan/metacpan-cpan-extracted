@@ -1,0 +1,29 @@
+#result {
+  display: none;
+}
+
+#result textarea {
+  width: 100%;
+  height: 30em;
+}
+
+#blank_style {
+  display: default;
+}
+
+#indicator {
+  display: none;
+}
+
+.success {
+    color: lime;
+}
+.warn {
+    color: red;
+}
+.error {
+    color: red;
+}
+.info {
+    color: gray;
+}

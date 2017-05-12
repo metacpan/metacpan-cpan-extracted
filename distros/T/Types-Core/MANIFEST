@@ -1,0 +1,14 @@
+MANIFEST
+Changes
+README
+LICENSE
+Makefile.PL
+lib/Types/Core.pm
+t/t00.t
+t/t01.t
+t/t02.t
+t/t03.t
+t/t04.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

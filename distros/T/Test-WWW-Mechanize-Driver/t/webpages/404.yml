@@ -1,0 +1,26 @@
+---
+uri: http://test/missing.html
+
+request: 'http://serenevy.net/missing_page'
+--- |
+HTTP/1.1 404 Not Found
+Connection: close
+Date: Fri, 13 Mar 2009 21:47:54 GMT
+Server: Apache/2
+Vary: Accept-Encoding
+Content-Length: 274
+Content-Type: text/html; charset=iso-8859-1
+Client-Date: Fri, 13 Mar 2009 21:47:54 GMT
+Client-Peer: 206.212.243.242:80
+Client-Response-Num: 1
+Title: 404 Not Found
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL /missing_page was not found on this server.</p>
+<hr>
+<address>Apache/2 Server at serenevy.net Port 80</address>
+</body></html>

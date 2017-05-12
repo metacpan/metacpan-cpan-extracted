@@ -1,0 +1,54 @@
+NAME
+    Test::Reporter::Transport::Legacy - Legacy Test::Reporter::Transport
+    modules
+
+VERSION
+    version 1.59
+
+DESCRIPTION
+    This distribution contains legacy Test::Reporter transport modules from
+    when the CPAN Testers project still accepted test report from email. As
+    email submission has been discontinued, these module have been split out
+    from the main Test::Reporter distribution.
+
+    They are available for historical record and are not needed for CPAN
+    Testers. They are provided on CPAN in case someone has built a custom
+    testing solution using Test::Reporter and these modules and still needs
+    them.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to
+    "bug-test-reporter-transport-legacy at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Reporter-Transpor
+    t-Legacy>. You will be automatically notified of any progress on the
+    request by the system.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <http://github.com/dagolden/test-reporter-transport-legacy>
+
+      git clone http://github.com/dagolden/test-reporter-transport-legacy
+
+AUTHORS
+    *   Adam J. Foxson <afoxson@pobox.com>
+
+    *   David Golden <dagolden@cpan.org>
+
+    *   Kirrily "Skud" Robert <skud@cpan.org>
+
+    *   Ricardo Signes <rjbs@cpan.org>
+
+    *   Richard Soderberg <rsod@cpan.org>
+
+    *   Kurt Starsinic <Kurt.Starsinic@isinet.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Authors and Contributors.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

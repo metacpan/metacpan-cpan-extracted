@@ -1,0 +1,33 @@
+Tie::Scalar::RingBuffer
+=======================
+
+This module ties a $scalar to a @list so that every time you access the
+$scalar, you are really accessing the next element in the list. The list is
+treated as a ring buffer, so there is no 'end' to the iteration.
+
+SYNOPSIS
+
+    use Tie::Scalar::RingBuffer;
+
+    tie $in_order,    'Tie::Scalar::RingBuffer', \@data;
+    tie $every_other, 'Tie::Scalar::RingBuffer', \@data, { increment => 2 };
+    tie $backwards,   'Tie::Scalar::RingBuffer', \@data, { start_offset => $#data, increment => -1 };
+    tie $random,      'Tie::Scalar::RingBuffer', \@data, { random => 1 };
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 John Millaway <millaway@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

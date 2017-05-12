@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+package Text::Mining::Parser; {
+    use Class::Std;
+    use warnings;
+    use strict;
+
+    sub new {
+        print "Text::Mining::Parser new\n";
+        return rand >= 0.5
+            ? Text::Mining::Parser::Text->new()
+            : Text::Mining::Parser::PubMedCentral->new();
+    }
+
+    sub BUILD {
+        print "Text::Mining::Parser BUILD\n";
+    }
+
+    sub describe {
+        print "Text::Mining::Parser object\n";
+    }
+}
+
+package Text::Mining::Parser::Text; {
+    use Class::Std;
+    use warnings;
+    use strict;
+
+    sub BUILD {
+        print "Text::Mining::Parser::Text BUILD\n";
+    }
+
+    sub describe {
+        print "Text::Mining::Parser::Text object\n";
+    }
+}
+
+package Text::Mining::Parser::PubMedCentral; {
+    use Class::Std;
+    use warnings;
+    use strict;
+
+    sub BUILD {
+        print "Text::Mining::Parser::PubMedCentral BUILD\n";
+    }
+
+    sub describe {
+        print "Text::Mining::Parser::PubMedCentral object\n";
+    }
+}
+
+package main;
+use warnings;
+use strict;
+
+for (1..10) {
+    my $obj = Text::Mining::Parser->new();
+    $obj->describe();
+}
+
+exit;
+

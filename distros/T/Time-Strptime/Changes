@@ -1,0 +1,46 @@
+Revision history for Perl extension Time-Strptime
+
+1.00 2016-03-19T10:21:00Z
+
+    - bump up version
+
+1.00_01 2016-03-19T09:46:49Z
+
+    - fixed dependency
+    - updated benchmark result
+
+0.99 2016-03-19T09:21:11Z
+
+    - fixed something bugs
+    - added documentation
+
+0.07 2016-02-16T01:23:55Z
+
+    - fixed dependency
+
+0.06 2016-02-15T06:56:51Z
+
+    - allow to omit the day of month
+
+0.05 2016-02-15T04:21:04Z
+
+    - allow to use for blessed DateTime::TimeZone
+
+0.04 2016-02-15T02:03:26Z
+
+    - time zone suppoot by DateTime::TimeZone
+
+0.03 2015-09-04T14:58:46Z
+
+    - Fixed utf8 flag problem on perl 5.22
+    - Fixed regexp escape when charactor
+
+0.02_01 2015-08-29T06:47:42Z
+
+    - micro performance optimization.
+    - fixed "%A", "%a" and "%C" format definition.
+
+0.01_1 2015-01-22T10:34:02Z
+
+    - original version
+

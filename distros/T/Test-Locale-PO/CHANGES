@@ -1,0 +1,43 @@
+==================================================
+Changes from 2012-08-29 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.02 at 2013-08-29 12:32:39 +0000
+-----------------------------------------
+
+  Change: 178dc0ffc00bce9685d33f24a0fb3e2cc9198d2b
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-29 14:32:06 +0000
+
+    -dont use next because this also skips fuzzy check 
+
+  Change: b019a3e1b6bc1ec121ba9396ff9f099023d4f941
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-29 14:27:35 +0000
+
+    -also handle plurals 
+
+-----------------------------------------
+version 1.01 at 2013-08-23 12:42:59 +0000
+-----------------------------------------
+
+  Change: e38f072f584659834cc23607863eeb97cea2e2b0
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-23 14:42:59 +0000
+
+    -added tests 
+
+-----------------------------------------
+version 1.00 at 2013-08-23 12:01:54 +0000
+-----------------------------------------
+
+  Change: c1cb2cf9207c32376819eb0697848882651aaa7d
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-23 14:01:54 +0000
+
+    -initial checkin 
+
+================
+End of releases.
+================

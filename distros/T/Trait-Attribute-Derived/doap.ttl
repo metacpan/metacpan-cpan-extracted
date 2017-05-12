@@ -1,0 +1,141 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "MooseX::Role::Parameterized 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "Sub::Install 0"^^doap-deps:CpanId ], [ doap-deps:on "Sub::NonRole 0.002"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moose 2.00"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Trait-Attribute-Derived>;
+	doap:created         "2013-01-02"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Trait-Attribute-Derived>;
+	doap:homepage        <https://metacpan.org/release/Trait-Attribute-Derived>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Trait-Attribute-Derived";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-trait-attribute-derived>;
+	];
+	doap:shortdesc       "trait for lazy-built Moose attributes that are derived from another attribute".
+
+<http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Trait-Attribute-Derived-0.001"^^xsd:string;
+	dc:issued            "2013-01-04"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Trait-Attribute-Derived-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Trait-Attribute-Derived-0.002"^^xsd:string;
+	dc:issued            "2013-01-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Correctly list dependencies";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/mithaldu>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Trait-Attribute-Derived-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Trait-Attribute-Derived-0.003"^^xsd:string;
+	dc:issued            "2013-01-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix the example in the SYNOPSIS";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/82523>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/spudsoup>;
+		], [
+			a doap-changeset:Addition, doap-changeset:Documentation;
+			rdfs:label "Add examples/text-example-from-pod.pl";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Trait-Attribute-Derived-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Trait-Attribute-Derived-0.004"^^xsd:string;
+	dc:issued            "2013-02-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix test_requires dependency on self";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/83157>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/chorny>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Trait-Attribute-Derived-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Trait-Attribute-Derived-0.005"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Trait-Attribute-Derived-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/chorny>
+	a                    foaf:Person;
+	foaf:nick            "CHORNY";
+	foaf:page            <https://metacpan.org/author/CHORNY>.
+
+<http://purl.org/NET/cpan-uri/person/mithaldu>
+	a                    foaf:Person;
+	foaf:nick            "MITHALDU";
+	foaf:page            <https://metacpan.org/author/MITHALDU>.
+
+<http://purl.org/NET/cpan-uri/person/spudsoup>
+	a                    foaf:Person;
+	foaf:nick            "SPUDSOUP";
+	foaf:page            <https://metacpan.org/author/SPUDSOUP>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/82523>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "82523"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=82523>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/83157>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "83157"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=83157>.
+

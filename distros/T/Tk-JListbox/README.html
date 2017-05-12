@@ -1,0 +1,110 @@
+<HTML>
+<HEAD>
+<TITLE>JListbox.pm</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#jlistbox">JListbox</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<UL>
+
+			<LI><A HREF="#justify">-justify</A></LI>
+			<LI><A HREF="#popupmenu">-popupmenu</A></LI>
+		</UL>
+
+	</UL>
+
+	<LI><A HREF="#known bugs">KNOWN BUGS</A></LI>
+	<LI><A HREF="#planned changes">PLANNED CHANGES</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="jlistbox">JListbox</A></H1>
+<P>JListbox - justify text within a Listbox</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use JListbox;
+  $dw = $parent-&gt;JListbox(-justify=&gt;'center', -popupmenu=&gt;1);
+  $dw-&gt;pack;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>JListbox is identical to a Listbox, but has two addtional options: -justify
+and -popupmenu.</P>
+<P>
+<H3><A NAME="justify">-justify</A></H3>
+<P>Possible values for '-justify' are 'left', 'center' and 'right'.  The default 
+is 'left'.  All text within the Listbox will be justified according to the 
+option you set.</P>
+<P>The widget automatically checks for variable or fixed width fonts 
+and adjusts accordingly.</P>
+<P>You cannot justify individual entries separately (as of version .02).</P>
+<P>Your text will remain justified appropriately, even if you 
+set the '-expand' and '-fill' options.</P>
+<P>The justification ability is provided via plain old pixel and 
+character counting (depending on whether you are using a variable or 
+fixed width font).  There have been no underlying changes in the C code
+to the Tcl Listbox.</P>
+<P>
+<H3><A NAME="popupmenu">-popupmenu</A></H3>
+<P>If the -popupmenu option is used, a ``Cut, Copy, Paste'' menu will appear when
+the user right-clicks anywhere on the JListbox.</P>
+<P>The ``Cut'' option will remove the item from the JListbox, copy it to the
+clipboard and the remaining items will shift up automatically.</P>
+<P>The ``Copy'' option simply copies the selected value to the clipboard.</P>
+<P>The ``Paste'' option, if selected, will bring up a Dialog window that gives the
+user the option to paste (insert) above or below the selected item, as well as
+on the same line, either to the left or right of the selected item.</P>
+<P>One whitespace character automatically separates the pasted value from the 
+original value if the 'left' or 'right' option is chosen.</P>
+<P>If you wish to modify the popup menu itself, you can retrieve it using the
+Subwidget method with 'popupmenu' as the widget name.</P>
+<P>$menu = $dw-&gt;Subwidget('popupmenu');</P>
+<P>
+<HR>
+<H1><A NAME="known bugs">KNOWN BUGS</A></H1>
+<P>If using a variable width font, you may encounter a problem with the last 
+character disappearing off the right side of the listbox when you use
+right justify.  I think I fixed this, so let me know if you have any problems.</P>
+<P>If the text you insert into the listbox includes characters that have 
+special meaning in regular expressions (e.g. '*', '?'), you will need to 
+escape them using the '\' character or your app may crash.</P>
+<P>e.g. $dw-&gt;insert('end', ``What did you say\?'');</P>
+<P>
+<HR>
+<H1><A NAME="planned changes">PLANNED CHANGES</A></H1>
+<P>Fix the regular expression issue mentioned above.</P>
+<P>Allow individual entries to be justified.</P>
+<P>Add the 'addMenuItem' and 'deleteMenuItem' methods to allow greater
+configurability of the right-click menu.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Daniel J. Berger
+<A HREF="mailto:djberg96@hotmail.com">djberg96@hotmail.com</A></P>
+<P>Thanks goes to Damion K. Wilson for his help with creating widgets.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>Listbox</P>
+
+</BODY>
+
+</HTML>
+

@@ -1,0 +1,52 @@
+Task-Digest
+===========
+
+Task to install all available cryptographic message digests.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Crypt::RIPEMD160
+    Digest::BLAKE
+    Digest::BMW
+    Digest::CubeHash
+    Digest::ECHO
+    Digest::EdonR
+    Digest::Fugue
+    Digest::GOST
+    Digest::Groestl
+    Digest::Hamsi
+    Digest::JH
+    Digest::Keccak
+    Digest::Luffa
+    Digest::MD2
+    Digest::MD4
+    Digest::MD5
+    Digest::MD6
+    Digest::Perl::MD4
+    Digest::Perl::MD5
+    Digest::SHA
+    Digest::SHA1
+    Digest::SHA::PurePerl
+    Digest::SHAvite3
+    Digest::SIMD
+    Digest::Shabal
+    Digest::Skein
+    Digest::Whirlpool
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

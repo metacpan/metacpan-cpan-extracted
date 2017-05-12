@@ -1,0 +1,4 @@
+*base 50000
+
+TEST_DOUBLE     1       double
+TEST_FML32      2       fml32

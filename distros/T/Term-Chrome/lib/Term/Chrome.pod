@@ -1,0 +1,287 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Chrome - DSL for colors and other terminal chrome
+
+=head1 SYNOPSIS
+
+=for test_synopsis
+  use feature qw<say>;
+
+
+    use Term::Chrome qw<Red Blue Bold Reset Underline Green color>;
+
+    # Base color constant and attribute
+    say Red, 'red text', Reset;
+
+    # Composition, using operator overloading
+    say Red/Blue+Bold, 'red on blue', Reset;
+
+    # Undo
+    say Bold, 'bold', !Bold, 'not bold';
+
+    # Extended xterm-256 colors
+    say color(125) + Underline, 'Purple', Reset;
+
+    # Define your own constants
+    use constant Pink => color 213;
+
+    # Use ${} around Chrome expression inside strings
+    say "normal ${ Red+Bold } RED ${ +Reset } normal";
+
+    # Extract components
+    say( (Red/Blue)->bg, "blue text", (Green+Reset)->flags );
+
+Chromizer: get a closure that applies given chrome before, and undo after
+the argument.
+
+=for test_synopsis
+  use Term::Chrome qw<Red Blue Bold Reset Underline Green color>;
+  use feature qw<say>;
+
+
+    # Get an efficient chromizer
+    my $boldifier = \&{ +Bold };
+    # Use the chromizer
+    say $boldifier->("bold text");
+    # Same as:
+    say Bold, "bold text", !Bold;
+
+    # Short lived chromizers using color literals:
+    say(&{+Red}('red'));
+    say(&{ Red/Blue + Bold }('red on blue'));
+    # Same, but requires perl 5.21.4+
+    #say(( Red/Blue + Bold )->('red on blue'));
+
+=head1 DESCRIPTION
+
+C<Term::Chrome> is a domain-specific language (DSL) for terminal decoration
+(colors and other attributes).
+
+In the current implementation stringification to ANSI sequences for C<xterm>
+and C<xterm-256> is hard-coded (which means it doesn't use the L<terminfo(5)>
+database), but this gives optimized (short) strings.
+
+Colors and attributes are exposed as objects that have overloading for
+arithmetic operators.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+C<color(I<0-255>)>
+
+Build a L<Term::Chrome> object with the given color number. You can use this
+constructor to create your own set of color constants.
+
+For example, C<color(0)> gives the same result as C<Black> (but not the same
+object).
+
+=head2 Colors
+
+Each of these function return a Chrome object.
+
+=over 4
+
+=item *
+
+C<Black>: C<color 0>
+
+=item *
+
+C<Red>: C<color 1>
+
+=item *
+
+C<Green>: C<color 2>
+
+=item *
+
+C<Yellow>: C<color 3>
+
+=item *
+
+C<Blue>: C<color 4>
+
+=item *
+
+C<Magenta>: C<color 5>
+
+=item *
+
+C<Cyan>: C<color 6>
+
+=item *
+
+C<White>: C<color 7>
+
+=cut
+
+# Secret: Chartreuse
+
+=back
+
+=head2 Decoration flags
+
+The exact rendering of each flag is dependent on how the terminal implements
+them. For example C<Underline> and C<Blink> may do nothing.
+
+=over 4
+
+=item *
+
+C<Bold>
+
+=item *
+
+C<Underline>
+
+=item *
+
+C<Blink>
+
+=item *
+
+C<Reverse>
+
+=back
+
+=head2 Special flags
+
+=over 4
+
+=item *
+
+C<Reset> : reset all colors and flags
+
+=back
+
+=head1 METHODS
+
+Here are the methods on C<Term::Chrome> objects:
+
+=over 4
+
+=item C<fg>
+
+Extract the Chrome object of just the foreground color. Maybe C<undef>.
+
+=item C<bg>
+
+Extract the Chrome object of the just background color. Maybe C<undef>.
+
+=item C<flags>
+
+Extract a Chrome object of just the decoration flags. Maybe C<undef>.
+
+=back
+
+=head1 OVERLOADED OPERATORS
+
+=over 4
+
+=item C</> (mnemonic: "over")
+
+Conmbine a foreground color (on the left) with a background color.
+
+=item C<+>
+
+Add decoration flags (on the right) to colors (on the left).
+
+=item C<""> (stringification)
+
+Transform the object into a sting of ANSI sequences. This is
+particularly useful to directly use a Chrome object in a double quoted string.
+
+=item C<${}> (scalar dereference)
+
+Same result as C<""> (stringification). This operator is overloaded because
+it is convenient to interpolate Chrome expressions in double-quoted strings.
+
+Examples:
+
+    say "normal ${ +Red } red ${ +Reset }";
+    say "normal ${ Red + Bold } red ${ +Reset }";
+
+Note that you must force expression parsing context when a Chrome constant is
+used alone inside C<${ }>: C<${ +Red }> or C<${ (Red) }> or C<${ Red() }>.
+C<use strict 'vars';> will detect those cases, but you may miss them in
+one-liners.
+
+=item C<&{}> (code dereference, or I<codulation>)
+
+Wrap some text with the given chrome and C<Reset>.
+
+Example:
+
+    say Red->("red text");
+    # Same result as:
+    say Red, "red text", Reset;
+
+Unfortunately perl had a bug
+(L<perl RT#122607|https://rt.perl.org/Ticket/Display.html?id=122607>) that makes this feature not much usable in practice when applied to constants. That bug
+is fixed in perl 5.21.4+.
+On perl < 5.21.4 you have to wrap the chrome constant in a C<do {}> or use C<&{}()>:
+
+    say do{ Red }->("red text");
+    say &{ +Red }("red text");
+
+
+Codulation can also be used to extract a colorizer sub that will be more
+efficient if you use it multiple times:
+
+    my $redifier = \&{ Red };
+    say $redifier->("red text");
+
+=back
+
+=head1 BUGS
+
+See the warnings about C<${}> and C<&{}> above.
+
+=head1 SEE ALSO
+
+Comments on each modules are opinions of the author.
+
+=over 4
+
+=item *
+
+L<Term::ANSIColor>: the same basic features (and the others should not be in
+Term::ANSIColor itself but in an extension), but with an awful API I could never
+even consider to use while keeping my sanity.
+
+=item *
+
+L<Term::ScreenColor>
+
+=item *
+
+L<PerlIO::via::ANSIColor>
+
+=item *
+
+L<AngelPS1> or L<https://github.com/dolmen/angel-PS1>: "The Angel's Prompt" is
+the project for which C<Term::Chrome> has been built. L<AngelPS1::Compiler>,
+the C<angel-PS1> compiler has special support for C<Term::Chrome> values.
+
+=back
+
+=head1 TRIVIA
+
+Did you know that I<chartreuse> is one of the favorite colors of Larry Wall?
+
+=head1 AUTHOR
+
+Olivier MenguE<eacute> <dolmen@cpan.org>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright E<copy> 2013-2016 Olivier MenguE<eacute>.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl 5 itself.
+
+=cut
+# vim:set et ts=8 sw=4 sts=4:

@@ -1,0 +1,10 @@
+use lib 'lib';
+use Text::FormatTable;
+my $table = Text::FormatTable->new('r|l');
+$table->head('a', 'b');
+$table->rule('=');
+$table->row('this a test, a nice test', 'a test!');
+$table->rule;
+$table->row('you mean it\'s really a test?', 'yep');
+$table->rule('=');
+print $table->render(20);

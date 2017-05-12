@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+Netstring.pm
+t/netstring.t
+META.yml                                 Module meta-data (added by MakeMaker)

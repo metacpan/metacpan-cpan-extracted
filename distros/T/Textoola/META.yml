@@ -1,0 +1,17 @@
+---
+abstract: 'Statistical text and string analysis tools'
+author:
+  - 'Sascha Dibbern <sacha@dibbern.info>'
+build_requires:
+  Test::Exception: 0.32
+  Test::More: 1.001003
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Textoola
+version: 0.003

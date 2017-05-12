@@ -1,0 +1,82 @@
+=head1 NAME
+
+Ticketmaster is to generate change
+
+=head1 SYNOPSIS
+
+  use Ticketmaster;
+
+  $store = Ticketmaster->new(5 => 1, 20 => 3, 50 => 1, 100 => 1);
+
+  $change = $store->change(160);
+
+  $balance = $store->balance;
+
+=head1 DESCRIPTION
+
+The module is for calculating change correctly.
+For example, a coins machine for people to buy bus tickets needs to generate change.
+
+=head1 CONSTRUCTOR
+
+  $store = Ticketmaster->new;
+  $store = Ticketmaster->new(5 => 1, 20 => 3, 50 => 1, 100 => 1);
+
+If the constructor does not have a hash reference as the option, it is required to call L<reload|/reload> method to set the store later.
+
+=head1 METHODS
+
+The following methods are provided by the Ticketmaster class:
+
+=head2 C<reload>
+
+  $store = Ticketmaster->new;
+  $store->reload(5 => 1, 20 => 3, 50 => 1, 100 => 1);
+
+This utility method might be executed following by the L<constructor|/constructor>.
+After executing C<reload>, the quantity of each denomination will be reset.
+
+=head2 C<change>
+
+  $change = $store->change(160);
+
+This method is to get change to an array reference. Each element is a coin.
+If the change cannot be made, a reference to an empty array will be returned.
+
+=head2 C<add_coins>
+
+  $store->add_coins(5 => 2, 30 => 1);
+
+Optional method, is used for increasing the number of coins in store.
+
+=head2 C<balance>
+
+  $balance = $store->balance;
+
+Returns the number of each denomination in a hash reference.
+
+=head1 RULES FOR GENERATING CHANGE
+
+When the machine generates change it will do so by trying to use the largest denominations it has first.
+For example, if the machine has the following denominations 2x10c, 4x20c and 1x50c and has to give 60c change it will use 1x50c and 1x10c rather than 3x20c or 2x10c and 2x20c. 
+There is a difficulty with this though. For example, if the machine has the following denominations 3x20c and 1x50c and has to give 60c change, it will use 1x50c and then realise it has not got 10c change. On the other hand, the 3x20c add up to 60c exactly.
+At this moment, this module has addressed these issues.
+
+=head1 BUGS
+
+I hope you do not find any, but if you do please email me.
+
+=head1 AUTHOR
+
+Pan Yu, E<lt>xiaocong[AT]vip.163.com<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 by Pan Yu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

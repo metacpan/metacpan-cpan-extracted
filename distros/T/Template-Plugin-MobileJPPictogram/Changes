@@ -1,0 +1,24 @@
+Revision history for Perl extension Template::Plugin::MobileJPPictogram
+
+0.06
+
+    - fixed testing issue
+
+0.05
+
+    - no Test::Base;
+
+0.04
+
+    - Test::Base is required
+
+0.03
+
+    - modernize package
+
+0.02
+
+    - fixed test_deps for YAML
+
+0.01    Wed Jan  2 03:05:29 2008
+        - original version

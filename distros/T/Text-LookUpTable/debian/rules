@@ -1,0 +1,54 @@
+#! /usr/bin/make -f
+#                                                       -*- makefile -*-
+# debian/rules file for the Debian Linux libtext-lookuptable-perl package
+#
+
+package := $(shell dh_listpackages)
+debtmp	:= $(CURDIR)/debian/$(package)
+
+#export DH_VERBOSE=1
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	perl Makefile.PL INSTALLDIRS=vendor
+	$(MAKE)
+	$(MAKE) test
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean build-stamp install-stamp
+	[ ! -f Makefile ] || $(MAKE) realclean
+
+install: install-stamp
+install-stamp: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	$(MAKE) install DESTDIR=$(debtmp)
+	[ ! -d $(debtmp)/usr/lib/perl5 ] || rmdir --ignore-fail-on-non-empty --parents --verbose $(debtmp)/usr/lib/perl5
+	touch $@
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_perl
+	dh_installdocs README
+	dh_installexamples	doc/examples/*
+	dh_installchangelogs	Changes
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-arch: build install
+
+source diff:                                                                  
+	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

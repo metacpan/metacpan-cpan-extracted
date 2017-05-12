@@ -1,0 +1,21 @@
+This is a pure Perl module for reading CSV-type formats.
+
+Features:
+
+  o Line oriented.  (ie Doesn't slurp the whole file.)
+
+  o Handles embedded commas, returns, and quotes properly.
+
+  o Simple interface.
+
+  o It attempts to give informative errors on problems in the file.
+
+Drawbacks:
+
+  o It is not optimized for performance.
+
+  o It is strongly oriented towards reading data from a file.
+
+  o Any use of the special variables $`, $&, or $' will slow it
+    significantly.
+

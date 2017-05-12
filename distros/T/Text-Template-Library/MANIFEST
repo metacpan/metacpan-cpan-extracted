@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+mk_README.sh
+perl-Text-Template-Library.spec
+t/Text-Template-Library.t
+lib/Text/Template/Library.pm
+lib/Text/Template/Base.pm
+patches/doc.diff
+patches/evalcache.diff
+patches/filename.diff
+patches/fi_ofn.diff
+patches/local_underscore.diff
+patches/newline_in_delimiter.diff
+patches/set_lineno.diff
+META.yml                                 Module meta-data (added by MakeMaker)

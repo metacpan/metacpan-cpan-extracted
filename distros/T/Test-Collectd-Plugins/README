@@ -1,0 +1,48 @@
+Test-Collectd-Plugins
+
+This module aids in Collectd perl plugin development.
+As of the time of writing, there was no proper way to test Collectd perl plugins
+outside of collectd's perl interpreter. The best option was to run the plugin using
+collectd, then any of EnableDebugger option, csv plugin, logfile plugin, running collectd
+in foreground etc.
+Using this module, you can test your fresh new collectd plugin as easily as 'read_ok("Collectd::Plugins::NewFresh","newfresh")'.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Collectd::Plugins
+
+You can also look for information at:
+
+    Github (report bugs here)
+        https://github.com/faxm0dem/Test-Collectd-Plugins/issues
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Collectd-Plugins
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Collectd-Plugins
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Collectd-Plugins/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Fabien Wernli
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of: CeCILL Free Software License Agreement
+http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+

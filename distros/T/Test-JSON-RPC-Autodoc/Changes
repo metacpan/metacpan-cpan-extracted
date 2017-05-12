@@ -1,0 +1,64 @@
+    Revision history for Perl extension Test-JSON-RPC-Autodoc
+
+0.15 2016-06-22T10:21:06Z
+
+   - add spaces
+
+0.14 2016-06-22T09:08:21Z
+
+   - make the template more simple
+
+0.13 2016-06-22T09:02:49Z
+
+   - fixed bugs about writing index document
+
+0.12 2016-06-22T08:12:33Z
+
+   - support index of api documents
+
+0.11 2015-03-01T11:42:12Z
+
+   - fixed some issues for the template
+
+0.10 2015-03-01T09:02:09Z
+
+   - fixed template!
+   - show HTTP headers
+
+0.09 2015-02-27T00:33:46Z
+
+   - only "post_ok" method will be documented
+   - use utf8 flag on json-module
+
+0.08 2015-02-07T02:50:09Z
+
+   - fixed utf8 issue for post_only
+
+0.07 2015-02-03T04:20:49Z
+
+    - add "post_only" method
+
+0.06 2015-01-30T06:22:44Z
+
+    - fixed utf8 issues
+
+0.05 2015-01-30T05:40:21Z
+
+    - add required modules
+
+0.04 2015-01-30T05:36:03Z
+
+    - fixed some bugs
+
+0.03 2014-11-14T23:57:08Z
+
+    - fixed Plack module version
+
+0.02 2014-11-12T03:43:25Z
+
+    - improve SYNOPSIS
+
+0.01 2014-11-12T02:44:08Z
+
+    - original version
+

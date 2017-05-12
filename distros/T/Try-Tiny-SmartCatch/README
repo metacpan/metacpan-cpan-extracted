@@ -1,0 +1,57 @@
+Try-Tiny-SmartCatch
+
+Lightweight Perl module for powerful exceptions handling.
+
+Provides set of functions (by default):
+ * try
+ * catch_when
+ * catch_default
+ * then
+ * finally 
+
+Also you can request to import "throw" function (currently it is an alias
+for "die", but more explicit):
+use Try::Tiny::Extended qw/:all/;
+
+Try::Tiny::SmartCatch give you the same posibilities as Try::Tiny, but 
+also allow you to catch only certain types of exceptions.
+Additionally change a little it's syntax to use explicit sub blocks.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Or just:
+    cpan Try::Catch::SmartCatch
+
+:)
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Try::Tiny::SmartCatch
+
+You can also look for information at:
+
+    Try::Tiny::SmartCatch home & source code
+        https://github.com/mysz/try-tiny-smartcatch
+
+    Issue tracker (report bugs here)
+        https://github.com/mysz/try-tiny-smartcatch/issues
+
+LICENSE AND COPYRIGHT
+
+	Copyright (c) 2012 Marcin Sztolcman. All rights reserved.
+
+    Base code is borrowed from Yuval Kogman L<Try::Tiny> module,
+    released under MIT License.
+
+	This program is free software; you can redistribute
+	it and/or modify it under the terms of the MIT license.

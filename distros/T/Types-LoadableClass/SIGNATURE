@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 17934c46232f8cfaf18e161b3f1bf43655ee6286 COPYRIGHT
+SHA1 ed648ecff7a9be20639c8cccb2567d9586b23a27 CREDITS
+SHA1 d775c53d76dd1f30185d8a30bcd2dd9fa69c2d6f Changes
+SHA1 a0a25e7755aba1e33fe69c2b429b3b9f32276a19 INSTALL
+SHA1 47870123f373f5185d6893cb98bf06a8a05510aa LICENSE
+SHA1 ed740268915de3257807aa0c95d13e7a56c7193c MANIFEST
+SHA1 be1f515316b851a0c1ad64f9512b76e73725ff62 META.json
+SHA1 c76268119309d8d7730395fef62e990029493345 META.yml
+SHA1 ea6ca009809f9700410d0169d1fa4f84d57017e5 Makefile.PL
+SHA1 140b75c6e5c48f24b30ccf3df6968d02546bc3ae README
+SHA1 6bcd2a30d816b89d1bc2ea1316dffddb7bceec8d dist.ini
+SHA1 d61b47336bfa25612f1efa237aa379e8b7d634aa doap.ttl
+SHA1 9d90913d33cc43e01b2c49cc2731d9c71a31adc7 lib/Types/LoadableClass.pm
+SHA1 af3745e4c64dc8afb868285bd89e772901390c4a t/01basic.t
+SHA1 cee3501e0a43bfe209ec747003ad51703ca6b5ab t/all_imports.t
+SHA1 76bfea3d922be49bce3ac2261034ec458273f368 t/basic-moo.t
+SHA1 0dfca8e1d4e6b5ed8a6d9f76f8039dbeba5ef6f8 t/basic.t
+SHA1 87e81a09f6fdae29ff09180be0e69eae3a473860 t/clobber_dollerunderscore.t
+SHA1 bdd7ca528c721be395e84758b40f8f0276850b5f t/expand-prefix.t
+SHA1 e8bc5d72b71c1ea3d702dd269a54002b4b3a68ba t/lib/ClobberDollarUnderscore.pm
+SHA1 7d6a0da90e08fe8db903ed4cc73d7315828f187f t/lib/FooBarTestClass.pm
+SHA1 b562fa1632ccd31dae13e344624e88a0c81b06e9 t/lib/FooBarTestClassMoo.pm
+SHA1 2d1a5dfe2274db060e3bc2902294a354d10be737 t/lib/FooBarTestClassPlain.pm
+SHA1 02c0cd05fb3268b85972b370a58a1fdc77848762 t/lib/FooBarTestRole.pm
+SHA1 2a82f97e31c76141282dfe98de7188ad95708017 t/lib/FooBarTestRoleMoo.pm
+SHA1 e9bc2a4a41a07104ee4358455894b731f45b4e67 t/lib/FooBarTestRolePlain.pm
+SHA1 277728b9143c616132c3bf7fdccd9570e12e9f9c t/no_moose.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlM+muQACgkQzr+BKGoqfTmHMACgrnT99T3vS4f+jS9WLniLW5Nl
+u8kAnim9EJl0OHfX04Ijr380AzZagCjj
+=l9jD
+-----END PGP SIGNATURE-----

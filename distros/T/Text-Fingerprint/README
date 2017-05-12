@@ -1,0 +1,109 @@
+NAME
+
+    Text::Fingerprint - perform simple text clustering by key collision
+
+VERSION
+
+    version 0.006
+
+SYNOPSIS
+
+        #!/usr/bin/env perl
+        use common::sense;
+    
+        use Text::Fingerprint qw(:all);
+    
+        my $str = q(
+            À noite, vovô Kowalsky vê o ímã cair no pé do pingüim
+            queixoso e vovó põe açúcar no chá de tâmaras do jabuti feliz.
+        );
+    
+        say fingerprint($str);
+        # a acucar cair cha de do e feliz ima jabuti kowalsky
+        # no noite o pe pinguim poe queixoso tamaras ve vovo
+    
+        say fingerprint_ngram($str);
+        # abacadaialamanarasbucachcudedoeaedeieleoetevfeg
+        # uhaifiminiritixizjakokylilsmamqngnoocoeoiojokop
+        # osovowpepipoqurarnsdsksotatetiucueuiutvevowaxoyv
+    
+        say fingerprint_ngram($str, 1);
+        # abcdefghijklmnopqrstuvwxyz
+
+DESCRIPTION
+
+    Text clustering functions borrowed from the Google Refine
+    <http://code.google.com/p/google-refine/>. Can be useful for finding
+    groups of different values that might be alternative representations of
+    the same thing. For example, the two strings "New York" and "new york"
+    are very likely to refer to the same concept and just have
+    capitalization differences. Likewise, "Gödel" and "Godel" probably
+    refer to the same person.
+
+FUNCTIONS
+
+ fingerprint($string)
+
+    The process that generates the key from a $string value is the
+    following (note that the order of these operations is significant):
+
+      * normalize extended western characters to their ASCII representation
+      (for example "gödel" → "godel")
+
+      * change all characters to their lowercase representation
+
+      * remove leading and trailing whitespace
+
+      * split the string into punctuation, whitespace and control
+      characters-separated tokens (using /[\W_]/ regexp)
+
+      * sort the tokens and remove duplicates
+
+      * join the tokens back together
+
+ fingerprint_ngram($string, $n)
+
+    The n-gram <http://en.wikipedia.org/wiki/N-gram> fingerprint method is
+    similar to the fingerprint method described above but instead of using
+    whitespace separated tokens, it uses n-grams, where the $n (or the size
+    in chars of the token) can be specified by the user (default: 2).
+    Algorithm steps:
+
+      * normalize extended western characters to their ASCII representation
+
+      * change all characters to their lowercase representation
+
+      * remove all punctuation, whitespace, and control characters (using
+      /[\W_]/ regexp)
+
+      * obtain all the string n-grams
+
+      * sort the n-grams and remove duplicates
+
+      * join the sorted n-grams back together
+
+CAVEAT
+
+    Fingerprint functions are not exactly the same as those found in Google
+    Refine! They were slightly changed to take advantage of the superb Perl
+    handling of Unicode characters.
+
+SEE ALSO
+
+      * Text::Unidecode
+
+      * Methods and theory behind the clustering functionality in Google
+      Refine.
+      <http://code.google.com/p/google-refine/wiki/ClusteringInDepth>
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

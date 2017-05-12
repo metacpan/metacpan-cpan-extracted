@@ -1,0 +1,21 @@
+Revision history for Perl extension Test::Apache2
+
+0.05  Tue Dec 15 17:43:49 2009 (JST)
+    - Fixed "handler" method by Dagfinn Ilmari Mannsåker:
+      http://rt.cpan.org/Public/Bug/Display.html?id=50931.
+    - Moved some methods from Test::Apache2::RequestRec to
+      Test::Apache2::RequestIO and Test::Apache2::RequestUtil.
+	- Fixed uri, unparserd_uri, and location of Test::Apache2::RequestRec.
+	- Fixed "Use of uninitialized value" warning at Test::Apache::Server.
+
+0.04  Fri May 15 17:40:40 2009 (JST)
+	- Module::Build -> Module::Install.
+	- Copied all headers from Test::Apache2::RequestRec to HTTP::Response.
+	- Added methods of Apache2::RequestIO.
+
+0.03  Mon May 11 19:01:50 2009 (JST)
+	- Test::Apache2::RequestRec->new takes HTTP::Request instance.
+	- Added "to_response" method to Test::Apache2::RequestRec.
+
+0.02  Sat May 9 04:34:23 2009 (JST)
+	- Initial release.

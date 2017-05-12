@@ -1,0 +1,10 @@
+use Moose;
+with 'Alfa' => { -version => 0.01 },
+     'Beta' => { -version => 0.02 };
+extends 'Charlie', 'Delta';
+with qw/Echo Foxtrot/ => { -version => 0.03 };
+extends "Golf", {foo => -version,qq{v0.04},
+	-xxx => 5};
+with Indirect object => ( method => call );
+with;
+extends;

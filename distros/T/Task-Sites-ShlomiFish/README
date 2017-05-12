@@ -1,0 +1,37 @@
+Task-Sites-ShlomiFish
+
+This is a Task:: module for installing the CPAN dependencies of Shlomi
+Fish' homesite (http://www.shlomifish.org/)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    $ perl -MCPAN -e 'install Task::Sites::ShlomiFish'
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Task::Sites::ShlomiFish
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Task-Sites-ShlomiFish
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Sites-ShlomiFish
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Task-Sites-ShlomiFish
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Task-Sites-ShlomiFish
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Shlomi Fish
+
+This program is released under the following license: MIT X11
+

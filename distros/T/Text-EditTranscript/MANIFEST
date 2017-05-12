@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Text-EditTranscript.t
+lib/Text/EditTranscript.pm
+META.yml                                 Module meta-data (added by MakeMaker)

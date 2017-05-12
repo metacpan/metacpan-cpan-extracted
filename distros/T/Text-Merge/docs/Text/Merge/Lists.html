@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Text::Merge::Lists - v.0.30 Text/data merge with lists/table support</title>
+<link rev="made" href="mailto:terrapin@furthur.nullspace.lan" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#list_structure">List Structure</a></li>
+		<li><a href="#list_style_syntax">List Style Syntax</a></li>
+		<li><a href="#list_style_features">List Style Features</a></li>
+		<li><a href="#table_style_syntax">Table Style Syntax</a></li>
+		<li><a href="#table_style_features">Table Style Features</a></li>
+		<li><a href="#methods">Methods</a></li>
+	</ul>
+
+	<li><a href="#prerequisites">PREREQUISITES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Text::Merge::Lists - v.0.30 Text/data merge with lists/table support</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        $filter = new Text::Merge::Lists($template_path);</pre>
+<pre>
+        $filter-&gt;set_max_nesting_depth($intval);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Text::Merge::Lists</code> package is designed to extend the <code>Text::Merge</code> package with ``list styles'' in addition 
+to the other formatting methods of fields.  This allows the display of fields that contain ``lists'' of 
+items in addition to the normal ``scalar'' fields supported by <code>Text::Merge</code>.  See the <code>Text::Merge</code> package 
+documentation for more information on templates and merging.</p>
+<p>All the features of the <code>Text::Merge</code> package are supported and invoked in an identical fashion.  The only difference 
+in your programs to use the <code>Text::Merge::Lists</code> object instead of the <code>Text::Merge</code> object is the constructor, 
+which must be invoked with the ``Template Path'' to the directory containing your various arbitrary lists 
+style directories, described later.  See the <code>Text::Merge</code> object for a description of the publishing methods 
+available to you.</p>
+<p>Lists can be nested, and you can use the <a href="#item_set_max_nesting_depth"><code>set_max_nesting_depth()</code></a> object method to override 
+the default maximum nesting depth of 3.  That is to say, you can only have a list of a list of a list 
+by default.  If you want to nest further you will need to adjust this value.  The depth limit here is to
+prevent you from clobbering the perl stack (and possibly other memory!) with deep recursion.</p>
+<p>
+</p>
+<h2><a name="list_structure">List Structure</a></h2>
+<p>A list variable is a reference to an ARRAY of data HASH references or item HASH references.  Basically, the
+equivalent of the <code>$data</code> or <code>$item</code> argument to the publishing methods.  If you apply a list style to a 
+SCALAR it will be treated as a list of one item.  Undefined lists are not considered empty, but they are
+undefined as one would expect.  Here is an example list assignment to the variable <code>$fruit_list</code>:</p>
+<pre>
+        $apple = { 'Color'=&gt;'Red', 'Size'=&gt;'medium', 'Shape'=&gt;'round' };
+        $pear = { 'Color'=&gt;'Green', 'Size'=&gt;'medium', 'Shape'=&gt;'pear-shaped' };
+        $grape = { 'Color'=&gt;'Purple', 'Size'=&gt;'small', 'Shape'=&gt;'round' };
+        $fruit_list = [ $apple, $pear, $grape ];</pre>
+<p>
+</p>
+<h2><a name="list_style_syntax">List Style Syntax</a></h2>
+<p>If you have read the <code>Text::Merge</code> module documentation, which is recommended,
+then you may be familiar with the syntax for displaying arbitrary fields using different styles,
+such as this example for a displaying a numerical value, stored in the <code>MyDollars</code> field, as a decimal
+value with two decimal places:</p>
+<pre>
+        REF:MyDollars:dollars</pre>
+<p>There are many display styles available, some of which only apply to <em>particular types of data</em>.  These are
+described in detail in the <code>Text::Merge</code> module documentation.</p>
+<p>The <code>Text::Merge::Lists</code> object extends the <code>Text::Merge</code> object with support for list (ARRAY) references.  By 
+using the list style designators, you can display lists in various contexts, just as you
+would any other field value.  The templates for the various lists styles are stored in directories corresponding
+to the list style names.  These are located in the path provided to the constructor.</p>
+<p>The individual items stored in the lists should be data or item HASH references as described in the <code>Text::Merge</code>
+documentation.  These objects have an ``ItemType'' designator, allowing the individual list styles to display 
+each type differently in that context.  These listing templates are plain text files, ending in '.txt' and 
+stored in the style directory.  For example, a list style of 'showcase' stored in the templates 
+path <code>/usr/templates/</code> would have all of it's files stored in the path, <code>/usr/templates/showcase/</code>.  If you 
+had an item type of 'book' to display in a given list, that template would be stored at 
+<code>/usr/templates/showcase/book.txt</code>.  The template will be used for each occurrence of the item type
+'book' in any list displayed using the 'showcase' style.  In most cases, the listing templates will be output
+``end on end'' but that may not always be the case as described later.</p>
+<p>The syntax for a reference to an item list field named, <code>DisplayItems</code>, for the example list style of 'showcase' 
+would look something like this:</p>
+<pre>
+        REF:DisplayItems:list_showcase</pre>
+<p>Notice the <code>list_</code> portion (that is an 'underscore').  This tells the filter that you want to treat the field
+<code>DisplayItems</code> as a list of items and use the 'showcase' list style.  The system will then look-up any templates
+it needs for the list in the 'showcase' directory mentioned above.</p>
+<p>
+</p>
+<h2><a name="list_style_features">List Style Features</a></h2>
+<p>Each list style has various special features that you can use by providing certain files in the list style directory.
+These include a <code>header</code>, a <code>footer</code>, a <code>default</code> item, and a message to display if the list is <code>empty</code>.</p>
+<dl>
+<dt><strong><a name="item_list_header">List Header</a></strong><br />
+</dt>
+<dd>
+The list header is an HTML fragment contained in a plain text file that is treated by the filter as if it were part of
+the original document (as opposed to a list item), it is displayed immediately before the list itself.  It is 
+contained in the file <code>header.txt</code> in the list style directory.  This file is optional.
+</dd>
+<p></p>
+<dt><strong><a name="item_list_footer">List Footer</a></strong><br />
+</dt>
+<dd>
+The list footer is similar to the list header described above.  It is displayed immediately following the list itself.
+It is contained in the file <code>footer.txt</code> in the list style directory.  This file is also optional.
+</dd>
+<p></p>
+<dt><strong><a name="item_default_item_type">Default Item Type</a></strong><br />
+</dt>
+<dd>
+You may provide a listing fragment that will be used for any item that does not have a template in the designated
+list style directory.  This could be an error message, or it my display information universal to all of your objects.
+You can use this item template if all of your items are very similar and you don't want to construct a template for
+each item in that style.
+</dd>
+<dd>
+<p>The default item template is located in a file called <code>default.txt</code> in the designated list style directory.  This
+file is optional.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_empty_list_message">Empty List Message</a></strong><br />
+</dt>
+<dd>
+Similar to a header or footer, the empty list message is a file contained in the designate style directory that is
+treated as part of the parent document for display purposes, if no items exist in your list.  If this file is not
+provided, then empty lists are constructed as empty strings.  The file name for the empty list message is 
+<code>empty.txt</code> in the designated list style directory and is optional.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="table_style_syntax">Table Style Syntax</a></h2>
+<p>In addition to list styles, <code>Text::Merge::Lists</code> also supports HTML table styles.  Table styles are trickier to 
+set up than list styles, but the principle is basically the same, and you get the benefit of having more than one
+column in your list display.  You maintain full control over the styling of the individual cells and the table
+attributes.  All tables are HTML.</p>
+<p>The syntax of a table style is very similar to the syntax of a list style, but you need to specify the number of
+columns for the table in the tag.  For example:</p>
+<pre>
+        REF:ItemList:table4_options</pre>
+<p>The example listed above would generate a table using the table style defintion, ``options'', that is four columns 
+wide.  The number is required and must be at least 1.  Large numbers (&gt;10) are discouraged because they are 
+practically unusable.</p>
+<p>A table generated by a table style is basically a ``grid'' of the specified width with a ``filler'' cell at the end
+of the table if necessary.  The filler cell may be one or more cells wide, up to one less than the specified
+table width.  With this in mind, there are more restrictions on the templates required for a table style, as described
+later.</p>
+<p>Just as is the case with the list styles, individual items stored in the lists should be data or item HASH 
+references as described in the <code>Text::Merge</code> documentation.  These objects have an ``ItemType'' designator, allowing 
+the individual table styles to display the cell for each type differently in the same context.  The cell
+templates are plain text files, ending in '.txt' and stored in the table style directory.</p>
+<p>For example, a table style of 'options' stored in the templates path <code>/usr/templates/</code> would be located at
+<code>/usr/templates/tables/options/</code>.  If you had an item of type 'choice' to display in a given list, then the
+cell template for display of that particular item would be <code>/usr/templates/tables/options/choice.txt</code>.  Notice
+that the path was created by stringing together the list-styles/template (<code>/usr/templates</code>)path, the table 
+styles subdirectory (<code>tables/</code>), and the directory and path for the individual style and item type
+(<code>options/choice.txt</code>).</p>
+<p>If you choose to construct a table style, take care to include all the required elements.  Start and finish your
+cell templates with the &lt;TD&gt; and &lt;/TD&gt; elements respectively.  Start your header with &lt;TABLE&gt; and end it with
+&lt;/TABLE&gt;.  Remember that the Text::Merge::Lists methods will insert the &lt;TR&gt; and &lt;/TR&gt; elements for rows containing
+your cell templates.  Only use &lt;TR&gt; and &lt;/TR&gt; in the header and footer files, and if you do be sure to use
+only one cell in each row and use the <code>TableColumns</code> field to assign the COLSPAN for that table.  Observing these 
+few things should keep your tables functional.</p>
+<p>
+</p>
+<h2><a name="table_style_features">Table Style Features</a></h2>
+<p>Each table style has similar requirements for the files stored in the designated table style directory.
+The required files include a <code>header</code>, a <code>footer</code>, a <code>filler</code> template, a <code>default</code> cell template,
+and the optional template to use if the list is <code>empty</code>.  The <code>header</code>, <code>footer</code>, and <code>empty</code> templates
+will all have access to the data of the calling template, in addition the <code>header</code> and <code>footer</code> templates
+will also have the additional field TableColumns set.  Likewise, the <code>filler</code> template will have the FillerColumns
+field set, and that must be used to set the COLSPAN of the last table cell as described later.</p>
+<dl>
+<dt><strong><a name="item_table_header_template">Table Header Template</a></strong><br />
+</dt>
+<dd>
+The table header is contained in a file named <code>header.txt</code> in the table style directory.  This file <strong>must contain</strong>
+the &lt;TABLE ...&gt; element defintion.  It may also contain full table rows to start off the table.  Because table
+styles may be invoked with a variable column count, the field <code>TableColumns</code> is provided to use for a cell in these
+table rows, and while limited, it does allow the insertion of header rows.  For example, this might be the contents
+of a common header.txt file:
+</dd>
+<dd>
+<pre>
+        &lt;TABLE BORDER=1&gt;
+                &lt;TR NOSAVE&gt;&lt;TD ALIGN=CENTER 
+                        COLSPAN=&quot;REF:TableColumns&quot;&gt;&lt;B&gt;Title&lt;/B&gt;&lt;/TD&gt;&lt;/TR&gt;</pre>
+</dd>
+<dd>
+<p>Notice the <code>REF:TableColumns</code> portion of the code, which will be replaced with the number of columns in the
+table when the table is created.  This allows for a ``variable width'' header that covers all columns.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_table_footer_template">Table Footer Template</a></strong><br />
+</dt>
+<dd>
+The table footer is contained in a file named <code>footer.txt</code> and is very similar to the <code>header.txt</code> file described
+above.  The <code>footer.txt</code> file <strong>must contain</strong> the &lt;/TABLE&gt; element closing out the table.  Before that element, 
+any number of optional footer rows can be listed, and they too can use the <code>TableColumns</code> field to span the 
+table columns as well.  For example:
+</dd>
+<dd>
+<pre>
+            &lt;TR&gt;&lt;TD COLSPAN=&quot;REF:TableColumns&quot;&gt;This 
+                        is the last table row.&lt;/TD&gt;&lt;/TR&gt;&lt;/TABLE&gt;</pre>
+</dd>
+<dd>
+<p>Notice the <code>REF:TableColumns</code> field used in the the last cell definition, just as is done with the header rows.  Also
+notice the &lt;/TABLE&gt; listed at the very end.  This basically closes out the table and is required.  You can also include
+other HTML after this element if you wish, but it will not be included in the table itself.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_table_filler_template">Table Filler Template</a></strong><br />
+</dt>
+<dd>
+The table filler cell is contained in a file named <code>filler.txt</code> in the table style directory.  This is the template
+used for the last cell of a table to fill the empty spaces that may be left if the number of items in the list is
+not evenly divisible by the number of columns in the table.  A field named <code>FillerColumns</code> is provided to this 
+template and it <strong>must be used</strong> to specify the COLSPAN of the cell.  This template, as with all other cell templates,
+must contain the &lt;TD ...&gt; and &lt;/TD&gt; elements of the cell.  This is a simple example filler cell template:
+</dd>
+<dd>
+<pre>
+        &lt;TD COLSPAN=&quot;REF:FillerColumns&quot;&gt;&lt;I&gt;this is filler&lt;/I&gt;&lt;/TD&gt;</pre>
+</dd>
+<dd>
+<p>The filler cell will be created with a single non-blocking space character (<em>&amp;nbsp;</em>) as content if no 
+<code>filler.txt</code> template file exists.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_item_type_cell_template">Item Type Cell Template</a></strong><br />
+</dt>
+<dd>
+Each item in the list can be displayed based on its <code>ItemType</code> attribute if a cell template exists in the table style
+directory that is named with the item type followed by the '.txt' suffix.  If such a template exists, it will be used
+to display the cell using the item data and actions.  Every cell template <strong>must contain</strong> the &lt;TD...&gt;...&lt;/TD&gt; elements
+to work properly in the table style.
+</dd>
+<p></p>
+<dt><strong><a name="item_default_cell_template">Default Cell Template</a></strong><br />
+</dt>
+<dd>
+The default cell template will be used if there is no cell template for the item type to be displayed.  That is to say,
+if no file as described above exists for the item type in question, a file called 'default.txt' will be used to 
+display the item.  The  'default.txt' file is required if your table style definition is be robust.
+</dd>
+<p></p>
+<dt><strong><a name="item_empty_table_template">Empty Table Template</a></strong><br />
+</dt>
+<dd>
+The empty table template is used if the list exists but contains no items.  The empty table template is contained
+in a file in the table style directory named 'empty.txt'.  This template will have access to all the data and actions
+of the calling template.  Note that if the 'empty.txt' template is used, then none of the other templates will be
+used for that table style and the results of processing 'empty.txt' will be the only thing displayed.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="methods">Methods</a></h2>
+<p>These are the methods that extend the basic functions of the <code>Text::Merge</code> object.  Note that we overload 
+<a href="#item_convert_value"><code>convert_value()</code></a> in order to insert our list style format recognition and interpretation.  This is
+very elegant and easy to do.</p>
+<dl>
+<dt><strong><a name="item_new"><code>new($liststyles)</code></a></strong><br />
+</dt>
+<dd>
+This method constructs a <code>Text::Merge::Lists</code> object.  It basically grabs a new <code>Text::Merge</code> object and then
+assigns the liststyles directory (which is required).  If the template path is omitted, an the call
+is treated as a normal <code>Text::Merge</code> object request.
+</dd>
+<p></p>
+<dt><strong><a name="item_convert_value">convert_value($dataref, $name, $style, $item)</a></strong><br />
+</dt>
+<dd>
+This method catches list styles and handles them, otherwise the <code>Text::Merge</code> method is used.
+</dd>
+<p></p>
+<dt><strong><a name="item_set_max_nesting_depth"><code>set_max_nesting_depth($intval)</code></a></strong><br />
+</dt>
+<dd>
+This method assigns the maximum nesting depth for lists.  The default maximum depth is 3.
+</dd>
+<p></p>
+<dt><strong><a name="item_sort_method">sort_method($methodstr, $listref)</a></strong><br />
+</dt>
+<dd>
+This method returns the sorted list by processing the <code>$methodstr</code> for each item
+in the list.  A common <code>$methodstr</code> might look something like:
+</dd>
+<dd>
+<pre>
+        $method = 'REF:SomeField reverse numeric';</pre>
+</dd>
+<dd>
+<p>Which would perform a reverse numeric sort on the list.  Basically a merge is
+performed on the $methodstr and the sort algorithm is sensitive to the keyword
+designators: <code>reverse</code> and <code>numeric</code>, which must appear at the end of the 
+sort method string.</p>
+</dd>
+<dd>
+<p>These must be items, where the data is contained in the 'Data' field.  For
+instance:</p>
+</dd>
+<dd>
+<pre>
+        $item = { 'ItemType' =&gt; 'someitem',
+                  'Data' =&gt; { 'field1' =&gt; 'val1',
+                              'field2' =&gt; 'val2' } };</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="prerequisites">PREREQUISITES</a></h1>
+<p>This module inherits and extends the <code>Text::Merge</code> module by this author.
+This module was written and tested under perl 5.005 and runs with <code>-Tw</code> set and <code>use strict</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>This software is released under the Perl Artistic License.  Modify as you please, but please 
+attribute releases and include all derived source code.  (C) 1997, 1998, 1999, by Steven D. Harris, 
+<a href="mailto:sharris@nullspace.com">sharris@nullspace.com</a></p>
+
+</body>
+
+</html>

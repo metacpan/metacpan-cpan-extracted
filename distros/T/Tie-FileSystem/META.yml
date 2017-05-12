@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tie-FileSystem
+version:      2.15
+version_from: lib/Tie/FileSystem.pm
+installdirs:  site
+requires:
+    Data::Dumper:                  0
+    Fcntl:                         0
+    Symbol:                        0
+    Tie::Hash:                     0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

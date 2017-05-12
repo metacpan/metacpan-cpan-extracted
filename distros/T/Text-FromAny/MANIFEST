@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+COPYING
+COPYING.artistic
+COPYING.gpl
+t/01-reading.t
+t/02-state.t
+lib/Text/FromAny.pm
+t/data/test-basic.doc
+t/data/test-basic.docx
+t/data/test-basic.html
+t/data/test-basic.odt
+t/data/test-basic.pdf
+t/data/test-basic.rtf
+t/data/test-basic.sxw
+t/data/test-basic.txt
+t/data/test-extraFormat.html
+t/data/test-basic-pdftotext.pdf
+META.yml                                 Module meta-data (added by MakeMaker)

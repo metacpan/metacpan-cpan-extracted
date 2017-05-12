@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+
+################################################################################
+#
+# File:    run
+# Date:    $Date: 2008-04-06 20:13:45 -0500 (Sun, 06 Apr 2008) $
+# Version: $Revision: 119 $
+#
+# This is the default run wrapper program.  A run wrapper is responsible for
+# executing a job and maintaining 
+#
+################################################################################
+
+use strict;
+use warnings;
+
+use IO::Socket::INET;
+
+my $server_port = shift;
+my $output_file = shift;
+
+my $request;
+my $client;
+
+
+my $pid = fork;
+if (defined($pid)) { 
+    if ($pid) {
+        # this is the parent.  Give the child a sporting chance
+        sleep 5;
+        exit 0;
+    }
+}
+else {
+    die "Can't daemonize";
+}
+
+
+my $server = IO::Socket::INET->new(LocalPort => $server_port,
+                                Type      => SOCK_STREAM,
+                                Reuse     => 1,
+                                Listen    => 10 )  # or SOMAXCONN
+    or die "Can't be a TCP server on port $server_port : $!\n";
+
+print "Listening on port $server_port\n";
+
+while ($client = $server->accept()) {
+    # $client is the new connection
+    open OUT, ">>$output_file" or die "Can't write to output file $output_file\n";
+    print OUT "Accepted Connection\n\n";
+    print OUT "S: > 200 OK TaskForest Fake SMTP Server\n";
+    
+    print $client "200 OK TaskForest Fake SMTP Server\r\n";
+
+    while (my $request = <$client>) {
+        $request =~ s/\r\n//;
+        print OUT "C: < $request\n";
+        last if $request =~ /^quit/i;
+
+        if ($request eq "exit") {
+            close $client;
+            close $server;
+            exit 0;
+        }
+
+        if ($request =~ /^\./) {
+            print OUT "S: > 200 OK\n";
+            print $client "200 OK\r\n";
+        }
+        else {
+            my $command = substr($request, 0, 4);
+            if (   $command =~ /^EHLO/i
+                || $command =~ /^HELO/i
+                || $command =~ /^RCPT/i
+                || $command =~ /^MAIL/i
+                || $command =~ /^RSET/i
+                || $command =~ /^DATA/i
+                )
+            {
+                print OUT "S: > 200 OK\n";
+                print $client "200 OK\r\n";
+            }
+        }
+    }
+    close $client;
+    close OUT;
+}
+
+close $server;
+
+exit 0;

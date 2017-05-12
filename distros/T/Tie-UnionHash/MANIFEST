@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Tie/UnionHash.pm
+Makefile.PL
+MANIFEST
+README
+t/UnionHash.t
+t/UnionHash_freeze_keys.t
+META.yml

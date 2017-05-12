@@ -1,0 +1,9 @@
+Changes
+Scws.pm
+Scws.xs
+MANIFEST
+Makefile.PL
+README
+typemap
+t/00_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

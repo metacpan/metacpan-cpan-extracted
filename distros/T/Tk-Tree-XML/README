@@ -1,0 +1,57 @@
+Tk-Tree-XML
+
+DESCRIPTION
+
+Tk::Tree::XML graphically displays the tree structure of XML documents loaded 
+from either an XML file or an XML string. 
+
+Tk::Tree::XML enables Perl/Tk applications with a widget that allows visual 
+representation and interaction with XML document trees. 
+
+Target applications may include XML viewers, editors and the like. 
+
+VERSION
+
+Tk::Tree::XML version 0.01.
+
+USER VISIBLE CHANGES SINCE LAST RELEASE
+
+N/A.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tk::Tree::XML
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-Tree-XML
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tk-Tree-XML
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tk-Tree-XML
+
+    Search CPAN
+        http://search.cpan.org/dist/Tk-Tree-XML
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2008 José Santos. All rights reserved.
+
+This program is free software. It can redistributed and/or modified under the 
+same terms as Perl itself.

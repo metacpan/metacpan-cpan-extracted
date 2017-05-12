@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Text::PORE::Template - PORE Template Handle</title>
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Text::PORE::Template - PORE Template Handle</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        $tpl = new Text::PORE::Template('file'=&gt;'demo.tpl');</pre>
+<pre>
+        $tpl = new Text::PORE::Template('id'=&gt;'demo');</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>PORE::Template represents the handle for PORE templates. To instantiate a PORE::Template object,
+either a filename of the template or the a template id is required. The instance is then passed to
+<code>PORE::render()</code> during the rendering process.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_new">new</a></strong><br />
+</dt>
+<dd>
+Usage:
+</dd>
+<dd>
+<pre>
+        new Text::PORE::Template('file'=&gt;$filename);</pre>
+</dd>
+<dd>
+<pre>
+        new Text::PORE::Template('id'=&gt;$template_id);</pre>
+</dd>
+<dd>
+<p>A PORE::Template object can be created in two different ways, by accepting a filename or a template id.</p>
+</dd>
+<dd>
+<p>To create a template using a filename, the syntax is 
+<code>new Text::PORE::Template('file'=</code>&gt;<code>$filename)</code>, where <code>$filename</code> is the full path of a file.</p>
+</dd>
+<dd>
+<p>To create a template using a template id, the syntax is
+<code>new Text::PORE::Template('id'=</code>&gt;<code>$template_id)</code>, where <code>$template_id</code> is the id of a template.
+In this case, templates are stored in a predefined directory called template root. By default, the
+template root is the current directory. Template root can be changed by calling 
+<code>PORE::setTemplateRootDir()</code>. All template files stored in this directory must be named in the format
+of <code>&lt;template_id</code>&gt;<code>.tpl</code>, where <code>&lt;template_id</code>&gt; is the id of this template.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Zhengrong Tang, <a href="mailto:ztang@cpan.org">ztang@cpan.org</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright 2004 by Zhengrong Tang
+
+</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+</p>
+
+</body>
+
+</html>

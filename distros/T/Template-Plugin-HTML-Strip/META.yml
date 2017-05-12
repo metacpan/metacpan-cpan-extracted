@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Template-Plugin-HTML-Strip
+version:      0.01
+version_from: lib/Template/Plugin/HTML/Strip.pm
+installdirs:  site
+requires:
+    HTML::Strip:                   1.04
+    Template:                      2.14
+    Template::Test:                2.7
+    Test::More:                    0.62
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

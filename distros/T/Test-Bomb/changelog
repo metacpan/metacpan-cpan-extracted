@@ -1,0 +1,9 @@
+0.007     2011-03-24 23:35:51 America/Chicago
+
+0.005     2011-03-02 18:59:16 America/Chicago
+        added group/config file and distribution checking
+
+0.004     2011-01-31 13:49:19 CST6CDT
+	added prereq Test::Tester that caused some failures...
+	increased dzil usage
+

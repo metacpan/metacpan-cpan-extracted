@@ -1,0 +1,27 @@
+This is Perl module Text::MicroTemplate::DataSection.
+
+INSTALLATION
+
+Text::MicroTemplate::DataSection installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Text::MicroTemplate::DataSection
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Text::MicroTemplate::DataSection documentation is available as in POD. So you can do:
+
+    % perldoc Text::MicroTemplate::DataSection
+
+to read the documentation online with your favorite pager.
+
+Daisuke Murase

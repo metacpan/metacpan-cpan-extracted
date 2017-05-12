@@ -1,0 +1,289 @@
+NAME
+
+    Test::Mock::Wrapper
+
+VERSION
+
+    version 0.18
+
+SYNOPSIS
+
+ Mock a single instance of an object
+
+        use Test::Mock::Wrapper;
+        use Foo;
+    
+        my $foo = Foo->new;
+        my $wrapper = Test::Mock::Wrapper->new($foo);
+    
+        $wrapper->addMock('bar')->with('baz')->returns('snarf');
+        # Old api, depricated but still supported
+        # $wrapper->addMock('bar', with=>['baz'], returns=>'snarf');
+        # #######################################
+    
+        &callBar($wrapper->getObject);
+    
+        $wrapper->verify('bar')->with(['baz'])->once;
+
+ Mock an entire package
+
+        use Test::Mock::Wrapper;
+        use Foo;
+    
+        my $wrapper = Test::Mock::Wrapper->new('Foo');
+    
+        $wrapper->addMock('bar')->with('baz')->returns('snarf');
+    
+        &callBar(Foo->new);
+    
+        $wrapper->verify('bar')->with(['baz'])->once;
+    
+        $wrapper->DESTROY;
+    
+        my $actualFoo = Foo->new;
+
+ Mock Exported functions
+
+        use Test::Mock::Wrapper qw(Foo);
+        use Foo qw(bar);
+    
+        is(&bar, undef);   # Mocked version of bar, returns undef by default.
+    
+        my $wrapper = Test::Mock::Wrapper->new('Foo');
+    
+        $wrapper->addMock('bar')->with('baz')->returns('snarf');
+    
+        print &bar('baz'); # prints "snarf"
+    
+        $wrapper->verify('bar')->exactly(2); # $wrapper also saw the first &bar (even though it was before you instantiated it)
+    
+        $wrapper->DESTROY;
+    
+        print &bar('baz');  # Back to the original Foo::bar (whatever that did)
+
+DESCRIPTION
+
+    This is another module for mocking objects in perl. It will wrap around
+    an existing object, allowing you to mock any calls for testing
+    purposes. It also records the arguments passed to the mocked methods
+    for later examination. The verification methods are designed to be
+    chainable for easily readable tests for example:
+
+      # Verify method foo was called with argument 'bar' at least once.
+      $mockWrapper->verify('foo')->with('bar')->at_least(1);
+    
+      # Verify method 'baz' was called at least 2 times, but not more than 5 times
+      $mockWrapper->verify('baz')->at_least(2)->at_most(5);
+
+    Test::Mock::Wrapper can also be used to wrap an entire package. When
+    this is done, Test::Mock::Wrapper will actually use metaclass to alter
+    the symbol table an wrap all methods in the package. The same rules
+    about mocking type (see options to new below) apply to mocked packages,
+    but you only get one wrapper that records and mocks calls to all
+    instances of the package, and any package methods called outside of an
+    object. When mocking an entire package, destroying the wrapper object
+    will "unwrap" the package, restoring the symbol table to is original
+    unmocked state. Objects instantiated before the wrapper was destroyed
+    may not behave correctly (i.e. throw exceptions).
+
+METHODS
+
+    Test::Mock::Wrapper->new($object, [%options])
+
+      Creates a new wrapped mock object and a controller/accessor object
+      used to manipulate the mock without poluting the namespace of the
+      object being mocked.
+
+      Valid options:
+
+      type=>(mock|stub|wrap):
+
+	Type of mocking to use.
+
+	mock:
+
+	  All methods available on the underlying object will be available,
+	  and all will be mocked
+
+	stub (default when wrapping a class):
+
+	  Any method called on the mock object will be stubbed, even those
+	  which do not exist in the original object
+
+	wrap (default when wrapping an object):
+
+	  Only methods which have been specifically set up with addMock
+	  will be mocked all others will be passed through to the
+	  underlying object.
+
+      recordAll=>BOOLEAN (default false)
+
+	If set to true, this will record the arguments to all calls made to
+	the object, regardless of the method being mocked or not.
+
+      recordMethod=>(copy|clone)
+
+	By default arguments will be a simple copy of @_, use clone to make
+	a deep copy of all data passed in. If references are being passed
+	in, the default will not trap the state of the object or reference
+	at the time the method was called, though clone will. Naturally
+	using clone will cause a larger memory foot print.
+
+      wrap_superclass=>qr/REGEX/ (Package Only)
+
+	*CAUTION*
+
+	This is is a powerful, but potentially problematic feature. By
+	providing wrap_superclass=>qr/REGEX/ the module will mock methods
+	called on the wrapped package, even if they are inherited from
+	parent classes. This option only works when mocking an entire
+	pacakge, and cannot work on a single mocked object. The big GOTCHA
+	here happens if the provided REGEX is to broad. It will match as
+	far up the heritance tree as perl will allow, including mocking
+	methods in UNIVERSAL which can have adverse effects if not used
+	wisely.
+
+	When wrapping a superclass, this module should only mock superclass
+	methods when they are invoked via an object blessed into the mocked
+	class... consider the following example:
+
+            package Pet;
+        
+            sub play {
+                return "fun";
+            }
+        
+            package Dog;
+            use base qw(Pet);
+        
+            sub speak {
+                return "Bark";
+            }
+        
+            package Cat;
+            use base qw(Pet);
+        
+            sub speak {
+                return "Meow";
+            }
+        
+            package main;
+            use Test::Mock::Wrapper;
+        
+            my $mock = Test::Mock::Wrapper->new('Cat', wrap_supercalss=>qr/^Pet/);
+            $mock->addMock('play')->returns('Maybe later');
+        
+            my $cat = Cat->new;
+            my $dog = Dog->new;
+        
+            print $cat->play."\n";   # prints "Maybe Later\n";
+            print $dog->play."\n";   $ prints "Fun\n";
+
+    $wrapper->getObject
+
+      This method returns the wrapped 'mock' object. The object is actually
+      a Test::Mock::Wrapped object, however it can be used exactly as the
+      object originally passed to the constructor would be, with the
+      additional hooks provieded by the wrapper baked in.
+
+    $wrapper->addMock($method, [OPTIONS])
+
+      This method is used to add a new mocked method call. Currently
+      supports two optional parameters:
+
+	* returns used to specify a value to be returned when the method is
+	called.
+
+            $wrapper->addMock('foo', returns=>'bar')
+
+	Note: if "returns" recieves an array refernce, it will return it as
+	an array. To return an actual array reference, wrap it in another
+	reference.
+
+            $wrapper->addMock('foo', returns=>['Dave', 'Fred', 'Harry'])
+            my(@names) = $wrapper->getObject->foo;
+        
+            $wrapper->addMock('baz', returns=>[['Dave', 'Fred', 'Harry']]);
+            my($rnames) = $wrapper->getObject->baz;
+
+	* with used to limit the scope of the mock based on the value of
+	the arguments. Test::Deep's eq_deeply is used to match against the
+	provided arguments, so any syntax supported there will work with
+	Test::Mock::Wrapper;
+
+            $wrapper->addMock('foo', with=>['baz'], returns=>'bat')
+
+      The with option is really only usefull to specify a different return
+      value based on the arguments passed to the mocked method. When
+      addMock is called with no with option, the returns value is used as
+      the "default", meaning it will be returned only if the arguments
+      passed to the mocked method do not match any of the provided with
+      conditions.
+
+      For example:
+
+          $wrapper->addMock('foo', returns=>'bar');
+          $wrapper->addMock('foo', with=>['baz'], returns=>'bat');
+          $wrapper->addMock('foo', with=>['bam'], returns=>'ouch');
+      
+          my $mocked = $wrapper->getObject;
+      
+          print $mocked->foo('baz');  # prints 'bat'
+          print $mocked->foo('flee'); # prints 'bar'
+          print $mocked->foo;         # prints 'bar'
+          print $mocked->foo('bam');  # prints 'ouch'
+
+    $wrapper->isMocked($method, $args)
+
+      This is a boolean method which returns true if a call to the
+      specified method on the underlying wrapped object would be handled by
+      a mock, and false otherwise. Any conditional mocks specified with the
+      with option will be evaluated accordingly.
+
+          $wrapper->addMock('foo', with=>['bar'], returns=>'baz');
+          $wrapper->isMocked('foo', ['bam']); # False
+          $wrapper->isMocked('foo', ['bar']); # True
+
+    $wrapper->getCallsTo($method)
+
+      This method wil return an array of the arguments passed to each call
+      to the specified method, in the order they were recieved.
+
+    $wrapper->verify($method)
+
+      This call returns a Test::Mock::Wrapper::Verify object, which can be
+      used to examine any calls which have been made to the specified
+      method thus far. These objects are intended to be used to simplify
+      testing, and methods called on the it are chainable to lend to more
+      readable tests.
+
+    $wrapper->resetCalls([$method])
+
+      This method clears out the memory of calls that have been made, which
+      is usefull if using the same mock wrapper instance multiple tests.
+      When called without arguments, all call history is cleared. With the
+      optional $method argument, only history for that method is called.
+
+    $wrapper->resetMocks([$method])
+
+      This method clears out all previously provided mocked methods.
+      Without arguments, all mocks are cleared. With the optional $method
+      argument, only mocks for that method are cleared.
+
+    $wrapper->resetAll
+
+      This method clears out both mocks and calls. Will also rebless any
+      mocked instances created from a mocked package (Prevents intermitent
+      failures during global destruction).
+
+AUTHOR
+
+      Dave Mueller <dave@perljedi.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Dave Mueller.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,143 @@
+Tree::Predicate 0.03
+
+NAME
+	Tree::Predicate - a tree of predicate logic (e.g. an SQL predicate)
+
+SYNOPSIS
+	use Tree::Predicate qw(:logical);
+	
+	my $left_branch = OR('a', 'b');
+	my $right_branch = OR('c', 'd');
+	
+	my $tree = AND($left_branch, $right_branch);
+	
+	my $sql = $tree->as_string;
+	
+	my @subtrees = $tree->split;
+	for (@subtrees) {
+		print $_->as_string;
+	}
+
+DESCRIPTION
+	Improving static queries for optimal performance is almost as old
+	as SQL itself.  A relatively recent discussion (on which this module
+	is based) can be found in the book "High Performance MySQL" from
+	O'Reilly.  One technique for improving queries relies on the way
+	that MySQL chooses which indexes to use.  Prior to MySQL 5.0, a query
+	such as:
+	
+	SELECT * FROM foo WHERE a = 1 OR b = 2
+	
+	would result in a full-table scan, regardless of whether foo is indexed
+	on a or b.  For MySQL 5.0 or later, a combination index would be used
+	for that query.
+	
+	But for this query:
+	
+	SELECT * FROM foo WHERE c IN ('foo', 'bar') AND (a = 1 OR b = 2)
+	
+	both before-5.0 and after-5.0 will use an index on c before considering
+	a merged index of a/b.  For such queries, a significant improvement
+	is available by rewriting the query as:
+	
+	SELECT * FROM foo WHERE c IN ('foo', 'bar') AND a = 1
+	UNION
+	SELECT * FROM foo WHERE c IN ('foo', 'bar') AND b = 2
+	
+	Even if we are using placeholders, it is straight-forward to rewrite
+	any static query in whatever form performs best.  What about queries
+	that are created dynamically, though?
+
+	This is where Tree::Predicate comes in.  Construct a tree with its
+	logical operators (AND/OR/NOT).  The "split" method will return a
+	list of subtrees that can be used as predicates in a series of
+	UNION queries that are logically equivalent to the original predicate.
+	
+	The subtrees can be used to construct a complete query or can be used
+	to query a database successively so that previous results can be used to
+	modify subsequent queries.  Suppose we have a tree $tree that is
+	being used to query table items:
+	
+		my @ids;
+		for my $subtree ($tree->split) {
+			if (@ids) {
+				my $ids = join ',' => @ids;
+				my $phrase = "NOT IN ($ids)";
+				my $new_subtree = AND($phrase, $subtree);
+				my $sql =
+					"SELECT id FROM items WHERE " . $new_subtree->as_string;
+				my $aryref = $dbh->selectcol_arrayref($sql);
+				push @ids, @$aryref;
+			} else {
+				my $sql =
+					"SELECT id FROM items WHERE " . $subtree->as_string;
+				my $aryref = $dbh->selectcol_arrayref($sql);
+				@ids = @$aryref;
+			}
+		}
+	
+	This is just an example, of course.  Actual implementations will
+	probably be more sophisticated.
+	
+CAVEATS
+	Particularly with slower predicate atoms, such as REGEXP and LIKE, it is
+	possible to turn a slow query into a VERY slow query by splitting its
+	predicate into several.  You will probably want a heuristic that governs
+	when you try to improve the dynamically-generate query or whether you
+	just give the whole mess to the database to sort out.
+	
+FUTURE DIRECTIONS
+	I have several ideas for future directions for this module.
+	
+	One is to allow associating anticipated selectivity and cost information
+	with an atom so that the module can order subtrees accordingly.
+	(Obviously, we should choose to execute predicates that can find as much
+	of the total result as cheaply as possible.)
+	
+	Two related ideas would entail giving the tree a database handler, plus
+	other information, so that it can compute its own result.  This would
+	allow the short-circuit emulation above to become internal to the module.
+	Additionally, tables that are joined for the purpose of evaluating one
+	part of the predicate could be joined when that predicate is part of
+	the subtree being evaluated.  Some parts of a predicate could be
+	stored elsewhere, such as in a cache, which could avoid some database
+	activity.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tree::Predicate
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tree-Predicate
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tree-Predicate
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tree-Predicate
+
+    Search CPAN
+        http://search.cpan.org/dist/Tree-Predicate/
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 Yahoo!, Inc.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

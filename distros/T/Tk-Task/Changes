@@ -1,0 +1,12 @@
+Revision history for Perl extension Tk::Task.
+
+1.1   Wed Oct 23 20:55:00 2002
+	- move Task subroutine to Tk::Widget from Mainwindow.
+
+1.0   Sun Mar 17 21:20:00 2002
+	- first CPAN release
+
+0.01  Tue Feb 26 22:44:42 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-XA Tk::Task
+

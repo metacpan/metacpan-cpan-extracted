@@ -1,0 +1,9 @@
+<!--#loop "loop1"-->
+<!--#echo $index-->
+<!--#endloop-->
+<!--#loop "nonexistent"-->
+this should never be output
+<!--#endloop-->
+<!--#loop $nonexistent-->
+this should never be output
+<!--#endloop-->

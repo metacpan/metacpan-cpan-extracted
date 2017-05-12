@@ -1,0 +1,20 @@
+use base 'Alfa';
+use parent -norequire, qw(Beta Charlie);
+use aliased "Delta::Echo::Foxtrot";
+use base qw/Golf/;
+use base qw{ Hotel };
+use ok 'India';
+use ok qw/Julliet Kilo/;
+use base;
+use aliased "Lima" => "Mike";
+use superclass '-norequire', qw(November Oscar), Papa => '1.00';
+use Mojo::Base -base;
+use Mojo::Base -strict;
+use Mojo::Base 'Quebec';
+use mixin::with qw(Romeo);
+use Test::Class::Most parent => 'Sierra';
+use Test::Class::Most
+	parent => "Tango",
+	is_abstract => 1,
+	attributes => [qw/foo bar baz/],
+	parent => [qw/Uniform Victor/];

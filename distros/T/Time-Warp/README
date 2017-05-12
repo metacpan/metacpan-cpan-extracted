@@ -1,0 +1,12 @@
+Time::Warp - offers developers control over the measurement of time
+
+
+SYNOPSIS
+
+    use Time::Warp qw(scale to time);
+
+    to(CORE::time + 5);  # 5 seconds ahead
+    scale(2);            # double speed of time
+
+
+AVAILABLE FROM CPAN!

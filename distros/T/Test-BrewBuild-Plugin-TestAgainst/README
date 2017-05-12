@@ -1,0 +1,34 @@
+NAME
+
+    Test::BrewBuild::Plugin::TestAgainst - Test external modules against
+    current builds of the one being tested
+
+SYNOPSIS
+
+        brewbuild --plugin Test::BrewBuild::Plugin::TestAgainst --args Module::Name
+
+DESCRIPTION
+
+    This is a plugin for Test::BrewBuild. The plugin sub takes the name of
+    a module, and after testing and installing of the revision of the local
+    module, it'll run the test suite of the external module to ensure it
+    passes with the current prerequisite codebase.
+
+    Useful mainly for testing reverse dependencies of the module you're
+    currently working on.
+
+FUNCTIONS
+
+ brewbuild_exec($module_name);
+
+    Takes the name of the module, and returns back the appropriate
+    configuration commands to Test::Brewbuild.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+COPYRIGHT & LICENSE
+
+    Same as Test::BrewBuild
+

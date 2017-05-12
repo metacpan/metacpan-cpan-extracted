@@ -1,0 +1,171 @@
+=head1 NAME
+
+README.samples - How to run SenseCluster sample scripts 
+
+=head1 SYNOPSIS
+
+ cd samples
+
+ csh ./makedata.sh
+ csh ./sc-toolkit.sh
+ mv LexSample LexSample-SC
+
+ csh ./makedata.sh
+ csh ./target-wrapper.sh 
+ mv LexSample LexSample-Target
+
+ csh ./makedata.sh
+ csh ./word-wrapper.sh 
+ mv LexSample LexSample-Word
+
+The script makedata.sh takes the English lexical sample data found in 
+/Data and converts it into a form where each target word has its own 
+directory within LexSample, which allows for a series of experiments to 
+be carried out on the words individually.
+
+=head1 DESCRIPTION
+
+The samples directory allows a user to run various sample experiments 
+with the SenseClusters system. Sample data is provided in the /Data 
+directory, and there are scripts available that show how to exercise 
+some of the major functionality of the package. 
+
+The package supports two basic modes, native SenseClusters and Latent 
+Semantic Analysis. Both of those can be run via scripts found in this 
+directory. 
+
+SenseClusters provides a wrapper program called discriminate.pl that can 
+be used to run many different experiments. This wrapper calls many of the 
+other programs found in the package and integrates their functionality for 
+you. We show how discriminate.pl can be used to carry out target word 
+discrimination both in the native SenseClusters mode as well as for Latent 
+Semantic Analysis (target-wrapper.sh). 
+
+SenseClusters also allows a user to customize the sequence of operations 
+carried out in their experiments, and examples of that are shown in scripts 
+for native SenseClusters (sc-toolkit.sh) and Latent 
+Semantic Analysis (coming soon). 
+
+SenseClusters also supports word clustering in native SenseClusters mode 
+and feature clustering in LSA mode. These are shown in the script 
+word-wrapper.sh 
+
+=head1 SAMPLE DATA PREPARATION (makedata.sh)
+
+A number of sample data files are provided in /Data. The files that begin 
+with eng-lex-sample.* are from the Senseval-2 word sense disambiguation  
+exercise (English lexical sample task), and consist of multiple contexts 
+that contain a given target word that will be clustered. 
+
+The training data file (eng-lex-sample.training.xml) is intended to be 
+used for feature selection. The evaluation/test file 
+(eng-lex-sample.evaluation.xml) is the data that will be clustered. 
+eng-lex-sample.key is the official key from the Senseval-2 event, which 
+indicates what the correct sense assignment of each context should be 
+(according to that event at least). This information can be used for 
+evaluation. Finally, the file eng-global-train.txt is a file of raw text 
+that can be used for feature selection in the global mode, that is without 
+respect to any particular target words. 
+
+Before you start working with the data, you  should run the following 
+script (makedata.sh). This converts the data into a form where each 
+target word is stored in a separate directory in /LexSample. 
+makedata.sh also takes advantage of SenseClusters preprocessing 
+wrapper program setup.pl, and allows filtering of test data based on the 
+frequency of the senses found in that data.
+
+Before running any sample, make sure to do the following :
+
+=over
+
+=item remove LexSample directory if one already exists (rm -fr LexSample)
+
+=item run makedata.sh to create fresh copy of LexSample
+
+=back
+
+=head1 CONTENTS OF /Regexs
+
+=item token.regex
+
+This is a sample token regex file containing Perl regex/s that specify 
+the tokenization scheme to be used in processing the data. This defines 
+what we consider words to be, and how we handle things like apostrophe's 
+and other kinds of embedded punctuation. 
+
+=item nontoken.regex
+
+This is a sample nontoken regex file that explicitly defines strings 
+that should not be considered as tokens and removed. It is (in a sense) 
+the opposite of the token.regex file, and has a similar effect as does 
+the stoplist discussed below.
+
+The token and nontoken files are modeled after the same technique in the 
+Ngram Statistics Package. You can find out more about them here :
+L<Text::NSP> 
+
+=item target.regex
+
+This is a sample target regex file containing Perl regex/s that specify 
+how to detect the target word in the Data.
+
+The user is free to modify token.regex and target.regex files to provide 
+their data specific token and target matching expressions. Each 
+expression should be a valid Perl regular expression delimited within 
+'/' (forward slashes). Multiple regexes can be provided on separate 
+lines (single regex on each line) in both files in the following form:
+
+   /REGEX1/
+   /REGEX2/
+   /REGEX3/
+
+Programs that require such token and target definition files, have 
+--token and --target options where user can supply these or similar 
+regex files.
+
+Some programs will by default, assume that these files reside in the 
+same directory where the programs are run and have same names (i.e. 
+token.regex, target.regex etc).
+
+We recommend that you modify our sample token.regex and target.regex 
+files to your token/target matching schemes and copy them to the 
+directory where you run an experiment.
+
+=item stoplist-nsp.txt
+
+This is a sample stopfile to use with SenseClusters. These are words 
+that will be ignored or excluded from your text. This file is again 
+formatted as a series of regular expressions as shown above. 
+
+Our stoplists follow the format of those used in the Ngram Statistics 
+Package. More information about that format can be found here :
+L<Text::NSP>.
+
+=head1 AUTHOR
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003-2008,  Ted Pedersen
+
+This program is free software; you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the 
+Free Software Foundation; either version 2 of the License, or (at your 
+option) any  later version.
+
+This program is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General 
+Public License for more details.
+
+You should have received a copy of the GNU General Public License along 
+with this program; if not, write to
+
+ The Free Software Foundation, Inc.,
+ 59 Temple Place - Suite 330,
+ Boston, MA  02111-1307, USA.
+
+=cut
+

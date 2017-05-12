@@ -1,0 +1,60 @@
+NAME
+    Time::Piece::Month - a month of Time::Piece objects
+
+SYNOPSIS
+      use Time::Piece::Month;
+
+            my $month = Time::Piece::Month->new(Time::Piece $tp);
+            my $month = Time::Piece::Month->new("2002-01-03");
+
+            my Time::Piece::Month $prev = $month->prev_month;
+            my Time::Piece::Month $next = $month->next_month;
+
+            my @dates = $month->dates;
+            my @dates = $month->wraparound_dates;
+
+DESCRIPTION
+    This is an extension to Time::Piece::Range that represents a complete
+    calendar month.
+
+CONSTRUCTOR
+            my $month = Time::Piece::Month->new(Time::Piece $tp);
+
+            my $month = Time::Piece::Month->new("2002-01-03");
+
+    A Month object can be instantiated from either a Time::Piece object, or
+    a Y-m-d format string.
+
+METHODS
+    As well as the inherited Time::Piece::Range methods, we also include:
+
+prev_month / next_month
+            my Time::Piece::Month $prev = $month->prev_month;
+            my Time::Piece::Month $next = $month->next_month;
+
+    The next and previous months.
+
+  wraparound_dates
+    This returns a list of Time::Piece objects representing each day in the
+    month, but also including the days on either side that ensure that the
+    full list runs from a Sunday to a Saturday. This is useful for
+    displaying calendars.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Business-Barcode-EAN13@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2002-2005 Kasei
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

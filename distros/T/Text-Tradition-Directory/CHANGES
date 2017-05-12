@@ -1,0 +1,18 @@
+*** Version 1.2, 07/12/2014
+
+- Workaround for a UTF-8 encoding bug when using MySQL as the storage backend
+
+
+*** Version 1.1, 23/09/2012
+
+commit 3f54eb870cf3bae380898dbe0c21ec7a22a2c8eb
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Fri Sep 21 03:25:09 2012 +0200
+
+    add Text::Tradition and explicit version to package dependencies
+
+commit a4c19656afb19c0e01b42f6199388bd098f604ef
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Tue Sep 18 22:26:29 2012 +0200
+
+    support user lookup by email as well as id

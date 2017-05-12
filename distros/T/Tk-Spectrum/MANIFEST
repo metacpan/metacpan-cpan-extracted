@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-Spectrum.t
+lib/Tk/Spectrum.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Collection of distributions for continuous integration using Jenkins",
+   "author" : [
+      "Jonas B. Nielsen (JONASBN)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Jenkins",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Prove" : "0",
+            "Devel::Cover" : "0",
+            "Devel::Cover::Report::Clover" : "0",
+            "TAP::Formatter::JUnit" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Task::Jenkins" : {
+         "file" : "lib/Task/Jenkins.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Jenkins"
+      },
+      "homepage" : "http://logiclab.jira.com/wiki/display/TJENKINS/Home",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jonasbn/tjenkins.git"
+      },
+      "x_ProjectChangelog" : "http://logiclab.jira.com/browse/TJENKINS#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel",
+      "x_ProjectSite" : "http://logicLAB.jira.com/browse/TJENKINS",
+      "x_ProjectWiki" : "http://logiclab.jira.com/wiki/display/TJENKINS/Home"
+   },
+   "version" : "0.05"
+}

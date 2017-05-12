@@ -1,0 +1,26 @@
+0.37 -- Fixed bug #12096: Automated testing issues
+
+0.36 -- Applied patch by anonymous
+	66522 	overwrite rather than remove characters on initialisation
+
+0.35 -- Fixed a circumstantial BUG. 
+	 -- The getch() function will result in a race condition, in certain situations.
+        Notably, when a telnet window is being killed without terminating the program, which
+        results in a 'floating tty bound program', that keeps the CPU at 100%.
+
+ 	    The problem has been solved, by checking for ord($c)==0 in the getch() function,
+        and using an exit 100, when this condition occures.
+
+0.34 -- Removed debugging information.
+
+0.33 -- Some internal changes.
+     -- notably the setstr() function to make a string of '*' characters.
+
+0.32 -- Converted all files to UNIX format.
+
+0.30 -- Made test.pl better structured test.
+     -- With test.pl, debugged ReadLine.pm.
+     -- Changed Makefile.PL to contain dependency to Term::Screen
+     -- Extended readline() function with PASSWORD functionality.
+
+0.20 -- First version.

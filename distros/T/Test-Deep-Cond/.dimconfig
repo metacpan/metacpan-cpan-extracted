@@ -1,0 +1,8 @@
+#!perl
+# This file is managed by /Users/kitahara-so/perl5/perlbrew/perls/perl-5.14.2/bin/dim.
+{
+  dist => 'Test::Deep::Cond',
+  distdir => 'Test-Deep-Cond',
+  module => 'Test::Deep::Cond',
+  template => 'Default'
+}

@@ -1,0 +1,42 @@
+Text::Templet
+=============
+
+Text::Templet implements a very small, efficient and fast template 
+processor that allows you to embed Perl variables and snippets of Perl 
+code directly into HTML, XML or any other text. The module contains only
+about 50 lines of actual code. Text::Templet uses Perl syntax for all
+its functionality, which means you don't need to learn an entire new
+platform to use it.
+
+INSTALLATION
+
+To install this module, unpack all files from the archive into a directory,
+then cd into it and type:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module under Microsoft Windows, you need to obtain nmake.exe
+utility which can be downloaded from
+http://support.microsoft.com/default.aspx?scid=kb;en-us;Q132084
+Ensure that folders containing perl.exe and nmake.exe are in the PATH.
+Then unpack all files from the archive into a directory, enter MS-DOS prompt,
+change directory to the directory containing unpacked files, and type:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+DEPENDENCIES
+
+Requires Perl version 5.6 or later
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004,2005,2006 Denis Petrov - www.denispetrov.com
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

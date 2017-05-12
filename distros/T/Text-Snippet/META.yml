@@ -1,0 +1,29 @@
+---
+abstract: 'TextMate-like snippet functionality'
+author:
+  - 'Brian Phillips <bphillips@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Snippet
+recommends: {}
+requires:
+  Carp: 0
+  Class::XSAccessor: 0
+  List::Util: 0
+  Scalar::Util: 0
+  Text::Balanced: 0
+  overload: 0
+resources:
+  repository: http://github.com/brianphillips/text-snippet
+version: 0.04

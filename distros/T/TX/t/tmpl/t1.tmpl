@@ -1,0 +1,13 @@
+<% define t1 %>
+  [t1]<% $V{v} %><% $V{w} %>[/t1]
+<% /define %>
+
+=========
+  <% $V{v} %>
+=========
+<% OUT TX::include '#t1', {VMODE=>uc($V{v})}, w=>'w'; '';
+%>=========
+<% $TX::TX->include( 'lib#m1', {VMODE=>lc($V{v}), OUTPUT=>''}, w=>'w' ); '';
+%>=========
+<% include 'lib#m2', {VMODE=>ucfirst($V{v})}, w=>'w'; '';
+%>=========

@@ -1,0 +1,13 @@
+# Generic files
+.*~$
+.*\#$
+.*\.gz$
+.*\.bak$
+
+# Specific files
+^Makefile$
+
+# Specific directories
+^blib
+^pm_to_blib
+^latex/

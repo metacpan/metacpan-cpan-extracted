@@ -1,0 +1,38 @@
+# Copyright 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+
+# This file is part of Test-VariousBits.
+#
+# Test-VariousBits is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Test-VariousBits is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Test-VariousBits.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "prereqs.test.suggests" modules from
+# META.yml for more tests, but they're optional author tests really
+# and would just make the build tools drag in more stuff.
+
+Source: libtest-variousbits-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.8
+Homepage: http://user42.tuxfamily.org/test-variousbits/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libtest-variousbits-perl
+Architecture: all
+Depends: perl, ${perl:Depends}, ${misc:Depends}
+Recommends: libsub-delete-perl
+Description: Various test helper modules
+ Test helper modules including without shm, without GD file formats,
+ and some Test::Weaken extras.

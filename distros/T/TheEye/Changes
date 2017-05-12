@@ -1,0 +1,373 @@
+==================================================
+Changes from 2013-04-04 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.5 at 2014-04-04 01:11:58 +0000
+----------------------------------------
+
+  Change: 36b73e4c164c01289ee449ae7cb600fd2677da0b
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-04-04 14:11:23 +0000
+
+    different HTTP Auth handling 
+
+  Change: f2e50dce21d2d8e48655152997b04b3cb675d84a
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-04-03 17:06:28 +0000
+
+    v0.4 
+
+----------------------------------------
+version 0.4 at 2014-04-03 03:56:45 +0000
+----------------------------------------
+
+  Change: e966beaefeaf3c084ceb900c319b99747c25b747
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-04-03 16:56:45 +0000
+
+    v0.3 
+
+----------------------------------------
+version 0.3 at 2014-04-03 03:55:39 +0000
+----------------------------------------
+
+  Change: c600c685b23acaae7420ecd72de83303a985be83
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-04-03 16:55:39 +0000
+
+    moved plugins with external dependencies into separate repository 
+
+  Change: 83e7e2cf4a45203928e588984b3e565f4bfb59a5
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-04-03 16:30:52 +0000
+
+    v0.2 
+
+----------------------------------------
+version 0.2 at 2014-04-03 03:30:29 +0000
+----------------------------------------
+
+  Change: b7b4f776cb1ca42d6d0fc086d356fa95b384d7e4
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-04-03 16:30:29 +0000
+
+    add a way to ignore queues 
+
+  Change: 10c61532bcd5ecf178608fd69022957b417daca3
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-04-03 16:17:38 +0000
+
+    v0.1 
+
+----------------------------------------
+version 0.1 at 2014-04-03 03:01:16 +0000
+----------------------------------------
+
+  Change: db19a590dd33505eac46f3c87a06f303a5adeb01
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-04-03 16:01:16 +0000
+
+    added RabbitMQ helper 
+
+  Change: d5bba57142692419884d7ee96b1aadfdfcbc70ea
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-30 18:00:45 +0000
+
+    fixed graphite storage 
+
+  Change: 3769d1f99dbae30f3191db3bea13385c54d1723c
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-30 14:25:45 +0000
+
+    addd drill_down functionality for rabbitmq queues in various depths 
+
+  Change: 95cb765162262fa2df735c315e7defbc68a9c464
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-30 12:45:19 +0000
+
+    added a load definition 
+
+  Change: 52961fffda463f6a5a436c407da8e3f1c3cff870
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-29 21:39:55 +0000
+
+    added hipchat notify plugin 
+
+  Change: 210527a45cb14733a45ebfbce60462b751e8afe8
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-29 19:41:56 +0000
+
+    added grahpite storage plugin 
+
+  Change: bfcd71769c209719a5c5c22f3a67438a8b7ac560
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-29 15:40:42 +0000
+
+    fixed pager duty stuff to do the right thing 
+
+  Change: 916cc06400efe2125ee8a0acb4c79a8000fb7c78
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-17 16:20:53 +0000
+
+    trying to silence Perl::Critic 
+
+  Change: 92d06c07f90bfda84b9f0b5202ae5bca87fbb955
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-17 16:11:37 +0000
+
+    more cleanup 
+
+  Change: 26ac67908c181aa2d378bf1cff2141898725bbe2
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-17 16:06:50 +0000
+
+    more cleanup 
+
+  Change: ee53235aa4db0cec35b9358e35d1c3c752d81a17
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-17 15:21:16 +0000
+
+    cleanup 
+
+  Change: 5bdf155c12feee0acf5d748ab038d81bfa1f0d58
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-17 15:20:58 +0000
+
+    satisfy Perl::Critic 
+
+  Change: 29250e490121b8de49dba9c45f96c5bd5980071b
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-17 14:13:38 +0000
+
+    more cleanup 
+
+  Change: 486f0773cb4e05afd41aaca977deba072b48e035
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-17 13:59:31 +0000
+
+    cleanup 
+
+  Change: 287b6488c9d1a41324b41637e86d72e6cc7ab856
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-17 13:34:47 +0000
+
+    added Pager Duty nitification plugin 
+
+  Change: d3718df4c30fbb1c46687116e0db46e618e17978
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-02-12 00:52:42 +0000
+
+    fixed demo github test 
+
+  Change: dba45df350838d4c5d9695dda4db099ae604009f
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-02-12 00:43:45 +0000
+
+    added Riemann plugin 
+
+  Change: c809429d16d22cad15f218f0701d7ddb5a0a1c86
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-12-16 22:56:13 +0000
+
+    accept multiline responses from graphite 
+
+  Change: ab1caf250b252e93f3ba348f5073f78616e818da
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-12-15 22:56:59 +0000
+
+    Checking in changes prior to tagging of version 0.7.
+
+    Changelog diff is:
+
+    diff --git a/Changes b/Changes index d10bb08..6dd77cb 100644 ---
+    a/Changes +++ b/Changes @@ -1,5 +1,8 @@
+
+    Revision history for TheEye
+
+    +0.7 2012-12-15T22:55:13 + first draft of new Graphite helper lib +
+
+    0.6 2012-07-24T20:43:03
+
+    made some changes to handle unplanned debug output from
+
+    phantomjs tests 
+
+  Change: 1e3ee9816b4f7bdbc31746aa2f589c058d436f52
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-12-15 22:37:57 +0000
+
+    Graphite helper lib for quick tests against graphite data 
+
+  Change: 97fed751ab606ab6996abd6e9970fd8629f13502
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-12-14 15:29:30 +0000
+
+    added a plugin for OnCall 
+
+  Change: 672a90d9f573bb5f357ca08d57f46d0737840e88
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-07-24 20:45:44 +0000
+
+    Checking in changes prior to tagging of version 0.6.
+
+    Changelog diff is:
+
+    diff --git a/Changes b/Changes index d5f7739..d10bb08 100644 ---
+    a/Changes +++ b/Changes @@ -1,5 +1,9 @@
+
+    Revision history for TheEye
+
+    +0.6 2012-07-24T20:43:03 + made some changes to handle unplanned
+    debug output from + phantomjs tests +
+
+    0.5 2011-06-27T16:01:03
+
+    first real production release 
+
+  Change: 2230358b2e5937bf92122c6e2ab30c922cd7bd2e
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2012-07-24 11:20:13 +0000
+
+    fixed unexpected debug output breaking TAP parser 
+
+  Change: 1d51dcae10998bdf50b164f20170111963355517
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-27 16:15:44 +0000
+
+    merge 
+
+  Change: 49336b65b87498b570686ef77623d446f33c3acf
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-27 16:13:11 +0000
+
+    Checking in changes prior to tagging of version 0.5.
+
+    Changelog diff is:
+
+    diff --git c/Changes w/Changes index e606dd3..d5f7739 100644 ---
+    c/Changes +++ w/Changes @@ -1,5 +1,8 @@
+
+    Revision history for TheEye
+
+    -0.1 2010-02-07T16:41:06 - very basic parsing and RRD creation done
+    +0.5 2011-06-27T16:01:03 + first real production release + +0.1
+    2010-02-07T16:41:06 + very basic parsing and RRD creation done 
+
+  Change: 93bf4e8f8e6a00ccc9c95d12794b2554559fcd2e
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-27 16:00:49 +0000
+
+    cleanup commit 
+
+  Change: c4ab597d4c77cd51568854d0dd94184675481436
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-27 15:57:51 +0000
+
+    fixed notifies 
+
+  Change: b87fa18aad05dc1ace281b46e4211607b89f1696
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2011-06-26 01:52:26 +0000
+
+    merge ignore files 
+
+  Change: df3a7b8f4742cb1af963eedfd4167b67aa26ee4f
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-23 15:21:13 +0000
+
+    added a downtime function for prowl notifies 
+
+  Change: 70cc496a19ce04aaa77027c7d73639166bcf258f
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-23 14:26:02 +0000
+
+    fixed the Makefile 
+
+  Change: f689327ee965f261e9e0b0c526869b06ea1826f2
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-23 14:16:48 +0000
+
+    fixed the plugins and wrote a collectd plugin 
+
+  Change: ede8ec0557a306e5347e7c1728bac4cd0b4d3900
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-23 13:07:36 +0000
+
+    added more tests 
+
+  Change: e68744d246c1328039089f382a2faa27fc23c0db
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2011-06-23 12:30:14 +0000
+
+    revived TheEye and ported it to Mouse 
+
+  Change: 6d8a74b1c13b2b50da881ea4e6daadbd7cacf7e6
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-10 15:10:38 +0000
+
+    small fixes and missing includes 
+
+  Change: 6d596e9e071eed86ef00e61aebfdcebdbace689d
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-10 15:09:38 +0000
+
+    small fixes and missing includes 
+
+  Change: 503b3a5f60c672d9bdd8f2035e51f888551d178a
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-09 23:03:03 +0000
+
+    added a _very_ basic web interface in share/TheEye/www 
+
+  Change: 7b17c3353d87e05d1571a3aa60cfb7d770dea706
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-07 23:38:42 +0000
+
+    basic notifies work - now with prowl 
+
+  Change: b12d1018fe7e9d602514f0f1a52ee9f7ae932810
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-07 23:14:36 +0000
+
+    added first notify handler 
+
+  Change: 3532780b2dac57511e0f2aa3a1dc651795c8d2f1
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-07 19:52:45 +0000
+
+    test script got some real tests 
+
+  Change: 01b1211e07e61adc16609de345b3c95b6eefd5cd
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-07 19:35:39 +0000
+
+    added missing libraries 
+
+  Change: f1f2a08ba01a3a5b1f98d5d55b97248ad4f3ef1c
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-07 19:31:25 +0000
+
+    ... and added a demo test 
+
+  Change: 08ba3d00193d6517f0249a52cf46ea56e971a9f1
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-07 19:25:53 +0000
+
+    added graphing via RRD 
+
+  Change: fcf467962ef973b99e21e93fcf0eee4e0233c93a
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-07 16:50:31 +0000
+
+    some basic docs 
+
+  Change: 8b9be6391b354f3f2194b79fbe17591653e2dff9
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2010-02-07 16:37:38 +0000
+
+    initial import 
+
+================
+End of releases.
+================

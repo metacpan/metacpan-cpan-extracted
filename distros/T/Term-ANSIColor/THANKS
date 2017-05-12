@@ -1,0 +1,92 @@
+                          Term::ANSIColor Thanks
+
+Thanks to all of the following people for helping with the development of
+this module.
+
+To Jon Lennox for looking at early versions of this module, providing
+feedback, and offering suggestions for improvement.
+
+To Jesse Taylor for writing the first significant script to use this
+module (colorized calsplit), thus offering innumerable opportunities to
+test and debug.
+
+To Jean Delvare for providing documentation of what the various attributes
+do on various different terminal emulators, and for noting that attribute
+2 is dark.
+
+To Edward Avis for the implementation of uncolor.
+
+To Rani Pinchuk for the idea of ANSI_COLORS_DISABLED and an initial
+implementation.
+
+To ATricket for the information about what PuTTY, Windows telnet, and
+OpenSSH under Cygwin support.
+
+To Richard Maus for pointing out DARK was missing from the exported
+constants list and CYAN and WHITE were missing from the documentation.
+
+To Autrijus Tang for noticing a problem with string comparisons in the
+test suite.
+
+To Daniel Lindsley for the information about what Mac OS X Terminal
+supports.
+
+To Joe Smith for the original test files that exercise a wide variety of
+VT100 escape sequences including the ECMA-48 color control codes.  These
+have been replaced by an example script, but they were very useful.
+
+To James Bowlin for catching a bug in colored when $EACHLINE is set that
+caused it to not color lines consisting solely of 0.
+
+To Helge Kreutzmann for pointing out the need for warnings in the
+documentation about background colors that span newlines.
+
+To Baron Schwartz for pointing out that cyan and white were missing from
+the documentation.
+
+To Michael R. Wolf for pointing out that Wikipedia and the ECMA standard
+use faint instead of dark as the name of attribute 2.
+
+To openmethods.com voice solutions for contributing PUSHCOLOR, POPCOLOR,
+and LOCALCOLOR support.
+
+To Tim Bellinghausen for the AUTOLOAD taint fix for Perl 5.10.
+
+To Paul Miller for the idea and initial implementation of colorstrip.
+
+To Jakob Ilves for sixteen-color support and the initial documentation of
+bright color issues.
+
+To Revilo Reegiles for reporting problems with the colored function and
+non-array references with stringification defined, and providing a test
+case.
+
+To Kent Fredric for the request for italic and the report of a terminal
+emulator that supports it.
+
+To Simon Wistow for reporting that Term::ANSIColor was inadvertantly
+clobbering $@ when generating constant subs.
+
+To Kurt Starsinic for the initial implementation of 256-color support.
+
+To Magnus Woldrich for Term::ExtendedColor and for research on which
+emulators support 256 colors.
+
+To Stephen Thirlwall for the initial implementation of custom color
+support.
+
+To BlueT - Matthew Lien - 練喆明 for quick testing of 4.00 and reporting a
+problem with skipping one of the tests.
+
+To David Cantrell for testing with Perl 5.6.2 and debugging why a test
+case didn't work with its version of Exporter.
+
+To Olivier Mengué for fixing a SYNOPSIS quoting error and for various
+other build fixes and recommendations about environment variables for test
+control.
+
+To Nicolas R for pointing out a 70% memory usage increase over Perl 5.14
+that could be mostly avoided by dodging POSIX character classes in regexes
+and delaying loading of the Carp module.
+
+To Larry Wall, as always, for Perl.

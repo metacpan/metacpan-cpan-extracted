@@ -1,0 +1,7 @@
+#!/usr/bin/env testml
+
+%TestML 1.0
+
+Print("1..1\n");
+
+"ok 1 - TestML runs as a script!\n".Print;

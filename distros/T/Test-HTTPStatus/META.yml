@@ -1,0 +1,32 @@
+---
+abstract: 'check an HTTP status'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::Builder::Module: '0'
+  Test::More: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-HTTPStatus
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  HTTP::SimpleLinkChecker: '1.165'
+  Mojo::URL: '0'
+  Mojolicious: '6'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/test-httpstatus/issues
+  homepage: https://github.com/briandfoy/test-httpstatus
+  repository: https://github.com/briandfoy/test-httpstatus.git
+version: '2.002'

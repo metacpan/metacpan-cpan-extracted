@@ -1,0 +1,24 @@
+AUTHORS				Who made this
+Changes				The history of the Tree-Range releases
+lib/Tree/Range.pm		Provide the Tree::Range->new () wrapper
+lib/Tree/Range.pod		Document Tree::Range
+lib/Tree/Range/base.pm		The Tree::Range::base class implementation
+lib/Tree/Range/base.pod		The Tree::Range::base class documentation
+lib/Tree/Range/conflict.pm	Protect ranges from being written over
+lib/Tree/Range/conflict.pod	Document Tree::Range::conflict
+lib/Tree/Range/RB.pm		A range tree implemented on top of Tree::RB
+lib/Tree/Range/RB.pod		The Tree::Range::RB class documentation
+lib/Tree/Range/RB/Conflict.pm	Like Tree::Range::RB, but overwrite-protected
+lib/Tree/Range/RB/Conflict.pod	Document Tree::Range::RB::Conflict
+Makefile.PL			The build system
+MANIFEST			This file
+t/10-rb.t			Basic tests for the Tree::Range::RB class
+t/10-changes.t			Check the Changes file's compliance
+t/12-rb-conflict.t		Check the Tree::Range::RB::Conflict methods
+t/20-rb-cmp.t			Tests for Tree::Range::RB using string keys
+t/20-rb-int.t			Tests for Tree::Range::RB using integer keys
+t/20-rb-num.t			Tests for Tree::Range::RB using numeric keys
+t/24-rb-conflict-cmp.t		Check Tree::Range::RB::Conflict (cmp)
+t/30-range.t			Check Tree::Range
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

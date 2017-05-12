@@ -1,0 +1,12 @@
+To install this library you need the Tie::IxHash perl module, version
+1.2 or later, which is available from all mirrors of the CPAN ftp
+site.  
+
+To build and install the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+
+

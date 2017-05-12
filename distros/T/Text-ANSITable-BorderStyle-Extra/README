@@ -1,0 +1,84 @@
+NAME
+    Text::ANSITable::BorderStyle::Extra - More border styles
+
+VERSION
+    This document describes version 0.03 of
+    Text::ANSITable::BorderStyle::Extra (from Perl distribution
+    Text-ANSITable-BorderStyle-Extra), released on 2014-12-13.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-ANSITable-BorderStyle-Extra>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Text-ANSITable-BorderStyle-Extra>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSITable-Border
+    Style-Extra>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+INCLUDED BORDER STYLES
+  Extra::dash2
+    Dash 2 (utf8: yes, box_chars: no).
+
+     ┌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌┐
+     ┆ column1 ╎ column2 ╎
+     ├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┤
+     ╎ row1.1  ╎ row1.2  ╎
+     ╎ row2.1  ╎ row3.2  ╎
+     ├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┤
+     ╎ row3.1  ╎ row3.2  ╎
+     └╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌┘
+
+  Extra::dash3
+    Dash 3 (utf8: yes, box_chars: no).
+
+     ┌┄┄┄┄┄┄┄┄┄┬┄┄┄┄┄┄┄┄┄┐
+     ┆ column1 ┆ column2 ┆
+     ├┄┄┄┄┄┄┄┄┄┼┄┄┄┄┄┄┄┄┄┤
+     ┆ row1.1  ┆ row1.2  ┆
+     ┆ row2.1  ┆ row3.2  ┆
+     ├┄┄┄┄┄┄┄┄┄┼┄┄┄┄┄┄┄┄┄┤
+     ┆ row3.1  ┆ row3.2  ┆
+     └┄┄┄┄┄┄┄┄┄┴┄┄┄┄┄┄┄┄┄┘
+
+  Extra::hboldh_dsingle
+    Horizontally-bold for header, single for data (utf8: yes, box_chars:
+    no).
+
+     ┌─────────┬─────────┐
+     │ column1 │ column2 │
+     ┝━━━━━━━━━┿━━━━━━━━━┥
+     │ row1.1  │ row1.2  │
+     │ row2.1  │ row3.2  │
+     ├─────────┼─────────┤
+     │ row3.1  │ row3.2  │
+     └─────────┴─────────┘
+
+  Extra::hdoubleh_dsingle
+    Horizontally-double for header, single for data (utf8: yes, box_chars:
+    no).
+
+     ┌─────────┬─────────┐
+     │ column1 │ column2 │
+     ╞═════════╪═════════╡
+     │ row1.1  │ row1.2  │
+     │ row2.1  │ row3.2  │
+     ├─────────┼─────────┤
+     │ row3.1  │ row3.2  │
+     └─────────┴─────────┘
+

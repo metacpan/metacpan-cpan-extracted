@@ -1,0 +1,26 @@
+<testsuites>
+  <testsuite failures="2"
+             errors="0"
+             tests="5"
+             name="data_tap_simple_fail">
+    <testcase name="1"></testcase>
+    <testcase name="2">
+      <failure type="TestFailed"
+               message="not ok 2"><![CDATA[not ok 2]]></failure>
+    </testcase>
+    <testcase name="3"></testcase>
+    <testcase name="4"></testcase>
+    <testcase name="5">
+      <failure type="TestFailed"
+               message="not ok 5"><![CDATA[not ok 5]]></failure>
+    </testcase>
+    <system-out><![CDATA[1..5
+ok 1
+not ok 2
+ok 3
+ok 4
+not ok 5
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

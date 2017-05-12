@@ -1,0 +1,43 @@
+README
+------
+
+This is an extension for Tk800.014 and upper which supplies TIFF
+format loader for Photo image type. The TIFF code is stolen from
+imgTIFF.c from the img1.2b2 distribution by Jan Nijtmans. Use
+Tk-TIFF-0.01 for a Tk40*.* version.
+
+Installation:
+
+You need libtiff (http://www.libtiff.org/ or
+ftp://ftp.sgi.com/graphics/tiff/) and probably libjpeg
+(ftp://ftp.uu.net/graphics/jpeg/) installed on your system.
+
+Check Makefile.PL for configuration variables at the top and
+appropriate library and include paths. Then build the extension by
+typing:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+The current version of the module is only tested with the following
+configurations:
+
+* Linux 2.4.20 (RedHat 8.0), perl 5.8.0, Tk 800.025, tiff 3.5.7, jpeg ? 
+* Linux 2.4.20 (RedHat 8.0), perl 5.8.7, Tk 804.027, tiff 3.5.7, jpeg ? 
+* FreeBSD 4.10, perl 5.8.0, Tk 800.024, tiff 3.5.7, jpeg 6b
+* FreeBSD 4.10, perl 5.8.3, Tk 804.027, tiff 3.5.7, jpeg 6b
+ 
+Previous versions worked with other Linux and FreeBSD configurations.
+I expect that there are no more endian problems, so this module will
+also work on Sun Sparcs and other machines.
+
+For AIX, I got reports that you have to manually add -lm and -lgcc to
+the @libs variable in Makefile.PL.
+
+Since version 0.10, also 32-bit Float-TIFFs are supported, but only
+with Tk804.xxx and newer.
+
+Slaven Rezic <slaven@rezic.de>
+

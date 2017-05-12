@@ -1,0 +1,172 @@
+show all
+              name               |                setting                 |                                         description                                          
+---------------------------------+----------------------------------------+----------------------------------------------------------------------------------------------
+ add_missing_from                | off                                    | Automatically adds missing table references to FROM clauses.
+ allow_system_table_mods         | off                                    | Allows modifications of the structure of system tables.
+ archive_command                 | unset                                  | WAL archiving command.
+ array_nulls                     | on                                     | Enable input of NULL elements in arrays.
+ australian_timezones            | off                                    | Interprets ACST, CST, EST, and SAT as Australian time zones.
+ authentication_timeout          | 60                                     | Sets the maximum time in seconds to complete client authentication.
+ autovacuum                      | off                                    | Starts the autovacuum subprocess.
+ autovacuum_analyze_scale_factor | 0.2                                    | Number of tuple inserts, updates or deletes prior to analyze as a fraction of reltuples.
+ autovacuum_analyze_threshold    | 500                                    | Minimum number of tuple inserts, updates or deletes prior to analyze.
+ autovacuum_naptime              | 60                                     | Time to sleep between autovacuum runs, in seconds.
+ autovacuum_vacuum_cost_delay    | -1                                     | Vacuum cost delay in milliseconds, for autovacuum.
+ autovacuum_vacuum_cost_limit    | -1                                     | Vacuum cost amount available before napping, for autovacuum.
+ autovacuum_vacuum_scale_factor  | 0.4                                    | Number of tuple updates or deletes prior to vacuum as a fraction of reltuples.
+ autovacuum_vacuum_threshold     | 1000                                   | Minimum number of tuple updates or deletes prior to vacuum.
+ bgwriter_all_maxpages           | 5                                      | Background writer maximum number of all pages to flush per round
+ bgwriter_all_percent            | 0.333                                  | Background writer percentage of all buffers to flush per round
+ bgwriter_delay                  | 200                                    | Background writer sleep time between rounds in milliseconds
+ bgwriter_lru_maxpages           | 5                                      | Background writer maximum number of LRU pages to flush per round
+ bgwriter_lru_percent            | 1                                      | Background writer percentage of LRU buffers to flush per round
+ block_size                      | 8192                                   | Shows size of a disk block
+ bonjour_name                    | unset                                  | Sets the Bonjour broadcast service name.
+ check_function_bodies           | on                                     | Check function bodies during CREATE FUNCTION.
+ checkpoint_segments             | 1024                                   | Sets the maximum distance in log segments between automatic WAL checkpoints.
+ checkpoint_timeout              | 3600                                   | Sets the maximum time in seconds between automatic WAL checkpoints.
+ checkpoint_warning              | 30                                     | Logs if filling of checkpoint segments happens more frequently than this (in seconds).
+ client_encoding                 | SQL_ASCII                              | Sets the client's character set encoding.
+ client_min_messages             | notice                                 | Sets the message levels that are sent to the client.
+ commit_delay                    | 0                                      | Sets the delay in microseconds between transaction commit and flushing WAL to disk.
+ commit_siblings                 | 5                                      | Sets the minimum concurrent open transactions before performing commit_delay.
+ config_file                     | /mnt/postgresql/pgdata/postgresql.conf | Sets the server's main configuration file.
+ constraint_exclusion            | off                                    | Enables the planner to use constraints to optimize queries.
+ cpu_index_tuple_cost            | 0.001                                  | Sets the planner's estimate of processing cost for each index tuple (row) during index scan.
+ cpu_operator_cost               | 0.0025                                 | Sets the planner's estimate of processing cost of each operator in WHERE.
+ cpu_tuple_cost                  | 0.01                                   | Sets the planner's estimate of the cost of processing each tuple (row).
+ custom_variable_classes         | unset                                  | Sets the list of known custom variable classes.
+ data_directory                  | /mnt/postgresql/pgdata                 | Sets the server's data directory.
+ DateStyle                       | ISO, MDY                               | Sets the display format for date and time values.
+ db_user_namespace               | off                                    | Enables per-database user names.
+ deadlock_timeout                | 1000                                   | The time in milliseconds to wait on lock before checking for deadlock.
+ debug_assertions                | off                                    | Turns on various assertion checks.
+ debug_pretty_print              | off                                    | Indents parse and plan tree displays.
+ debug_print_parse               | off                                    | Prints the parse tree to the server log.
+ debug_print_plan                | off                                    | Prints the execution plan to server log.
+ debug_print_rewritten           | off                                    | Prints the parse tree after rewriting to server log.
+ default_statistics_target       | 10                                     | Sets the default statistics target.
+ default_tablespace              | unset                                  | Sets the default tablespace to create tables and indexes in.
+ default_transaction_isolation   | read committed                         | Sets the transaction isolation level of each new transaction.
+ default_transaction_read_only   | off                                    | Sets the default read-only status of new transactions.
+ default_with_oids               | off                                    | Create new tables with OIDs by default.
+ dynamic_library_path            | $libdir                                | Sets the path for dynamically loadable modules.
+ effective_cache_size            | 1000                                   | Sets the planner's assumption about size of the disk cache.
+ enable_bitmapscan               | on                                     | Enables the planner's use of bitmap-scan plans.
+ enable_hashagg                  | on                                     | Enables the planner's use of hashed aggregation plans.
+ enable_hashjoin                 | on                                     | Enables the planner's use of hash join plans.
+ enable_indexscan                | on                                     | Enables the planner's use of index-scan plans.
+ enable_mergejoin                | on                                     | Enables the planner's use of merge join plans.
+ enable_nestloop                 | on                                     | Enables the planner's use of nested-loop join plans.
+ enable_seqscan                  | on                                     | Enables the planner's use of sequential-scan plans.
+ enable_sort                     | on                                     | Enables the planner's use of explicit sort steps.
+ enable_tidscan                  | on                                     | Enables the planner's use of TID scan plans.
+ escape_string_warning           | on                                     | Warn about backslash escapes in ordinary string literals.
+ explain_pretty_print            | on                                     | Uses the indented output format for EXPLAIN VERBOSE.
+ external_pid_file               | unset                                  | Writes the postmaster PID to the specified file.
+ extra_float_digits              | 0                                      | Sets the number of digits displayed for floating-point values.
+ from_collapse_limit             | 8                                      | Sets the FROM-list size beyond which subqueries are not collapsed.
+ fsync                           | on                                     | Forces synchronization of updates to disk.
+ full_page_writes                | on                                     | Writes full pages to WAL when first modified after a checkpoint.
+ geqo                            | on                                     | Enables genetic query optimization.
+ geqo_effort                     | 5                                      | GEQO: effort is used to set the default for other GEQO parameters.
+ geqo_generations                | 0                                      | GEQO: number of iterations of the algorithm.
+ geqo_pool_size                  | 0                                      | GEQO: number of individuals in the population.
+ geqo_selection_bias             | 2                                      | GEQO: selective pressure within the population.
+ geqo_threshold                  | 12                                     | Sets the threshold of FROM items beyond which GEQO is used.
+ hba_file                        | /mnt/postgresql/pgdata/pg_hba.conf     | Sets the server's "hba" configuration file
+ ident_file                      | /mnt/postgresql/pgdata/pg_ident.conf   | Sets the server's "ident" configuration file
+ ignore_system_indexes           | off                                    | Disabled reading from system indexes.
+ integer_datetimes               | off                                    | Datetimes are integer based.
+ join_collapse_limit             | 8                                      | Sets the FROM-list size beyond which JOIN constructs are not flattened.
+ krb_caseins_users               | off                                    | Sets whether Kerberos user names should be treated as case-insensitive.
+ krb_server_hostname             | unset                                  | Sets the hostname of the Kerberos server.
+ krb_server_keyfile              | unset                                  | Sets the location of the Kerberos server key file.
+ krb_srvname                     | postgres                               | Sets the name of the Kerberos service.
+ lc_collate                      | C                                      | Shows the collation order locale.
+ lc_ctype                        | C                                      | Shows the character classification and case conversion locale.
+ lc_messages                     | C                                      | Sets the language in which messages are displayed.
+ lc_monetary                     | C                                      | Sets the locale for formatting monetary amounts.
+ lc_numeric                      | C                                      | Sets the locale for formatting numbers.
+ lc_time                         | C                                      | Sets the locale for formatting date and time values.
+ listen_addresses                | localhost                              | Sets the host name or IP address(es) to listen to.
+ log_connections                 | off                                    | Logs each successful connection.
+ log_destination                 | stderr                                 | Sets the destination for server log output.
+ log_directory                   | pg_log                                 | Sets the destination directory for log files.
+ log_disconnections              | off                                    | Logs end of a session, including duration.
+ log_duration                    | off                                    | Logs the duration of each completed SQL statement.
+ log_error_verbosity             | default                                | Sets the verbosity of logged messages.
+ log_executor_stats              | off                                    | Writes executor performance statistics to the server log.
+ log_filename                    | postgresql-%Y-%m-%d_%H%M%S.log         | Sets the file name pattern for log files.
+ log_hostname                    | off                                    | Logs the host name in the connection logs.
+ log_line_prefix                 | unset                                  | Controls information prefixed to each log line
+ log_min_duration_statement      | -1                                     | Sets the minimum execution time in milliseconds above which statements will be logged.
+ log_min_error_statement         | panic                                  | Causes all statements generating error at or above this level to be logged.
+ log_min_messages                | notice                                 | Sets the message levels that are logged.
+ log_parser_stats                | off                                    | Writes parser performance statistics to the server log.
+ log_planner_stats               | off                                    | Writes planner performance statistics to the server log.
+ log_rotation_age                | 1440                                   | Automatic log file rotation will occur after N minutes
+ log_rotation_size               | 10240                                  | Automatic log file rotation will occur after N kilobytes
+ log_statement                   | none                                   | Sets the type of statements logged.
+ log_statement_stats             | off                                    | Writes cumulative performance statistics to the server log.
+ log_truncate_on_rotation        | off                                    | Truncate existing log files of same name during log rotation.
+ maintenance_work_mem            | 16384                                  | Sets the maximum memory to be used for maintenance operations.
+ max_connections                 | 140                                    | Sets the maximum number of concurrent connections.
+ max_files_per_process           | 1000                                   | Sets the maximum number of simultaneously open files for each server process.
+ max_fsm_pages                   | 200000                                 | Sets the maximum number of disk pages for which free space is tracked.
+ max_fsm_relations               | 1000                                   | Sets the maximum number of tables and indexes for which free space is tracked.
+ max_function_args               | 100                                    | Shows the maximum number of function arguments.
+ max_identifier_length           | 63                                     | Shows the maximum identifier length
+ max_index_keys                  | 32                                     | Shows the maximum number of index keys.
+ max_locks_per_transaction       | 64                                     | Sets the maximum number of locks per transaction.
+ max_prepared_transactions       | 5                                      | Sets the maximum number of simultaneously prepared transactions.
+ max_stack_depth                 | 2048                                   | Sets the maximum stack depth, in kilobytes.
+ password_encryption             | on                                     | Encrypt passwords.
+ port                            | 5432                                   | Sets the TCP port the server listens on.
+ post_auth_delay                 | 0                                      | Waits N seconds on connection startup after authentication.
+ pre_auth_delay                  | 0                                      | no description available
+ preload_libraries               | unset                                  | Lists shared libraries to preload into server.
+ random_page_cost                | 4                                      | Sets the planner's estimate of the cost of a nonsequentially fetched disk page.
+ redirect_stderr                 | off                                    | Start a subprocess to capture stderr output into log files.
+ regex_flavor                    | advanced                               | Sets the regular expression "flavor".
+ search_path                     | "$user",public                         | Sets the schema search order for names that are not schema-qualified.
+ server_encoding                 | SQL_ASCII                              | Sets the server (database) character set encoding.
+ server_version                  | 8.2devel                               | Shows the server version.
+ shared_buffers                  | 200000                                 | Sets the number of shared memory buffers used by the server.
+ silent_mode                     | off                                    | Runs the server silently.
+ sql_inheritance                 | on                                     | Causes subtables to be included by default in various commands.
+ ssl                             | off                                    | Enables SSL connections.
+ standard_conforming_strings     | off                                    | '...' strings treat backslashes literally.
+ statement_timeout               | 0                                      | Sets the maximum allowed duration (in milliseconds) of any statement.
+ stats_block_level               | on                                     | Collects block-level statistics on database activity.
+ stats_command_string            | on                                     | Collects statistics about executing commands.
+ stats_reset_on_server_start     | on                                     | Zeroes collected statistics on server restart.
+ stats_row_level                 | on                                     | Collects row-level statistics on database activity.
+ stats_start_collector           | on                                     | Starts the server statistics-collection subprocess.
+ superuser_reserved_connections  | 2                                      | Sets the number of connection slots reserved for superusers.
+ syslog_facility                 | LOCAL0                                 | Sets the syslog "facility" to be used when syslog enabled.
+ syslog_ident                    | postgres                               | Sets the program name used to identify PostgreSQL messages in syslog.
+ tcp_keepalives_count            | 0                                      | Maximum number of TCP keepalive retransmits.
+ tcp_keepalives_idle             | 0                                      | Seconds between issuing TCP keepalives.
+ tcp_keepalives_interval         | 0                                      | Seconds between TCP keepalive retransmits.
+ temp_buffers                    | 1000                                   | Sets the maximum number of temporary buffers used by each session.
+ TimeZone                        | PST8PDT                                | Sets the time zone for displaying and interpreting time stamps.
+ trace_notify                    | off                                    | Generates debugging output for LISTEN and NOTIFY.
+ trace_sort                      | off                                    | Emit information about resource usage in sorting.
+ transaction_isolation           | read committed                         | Sets the current transaction's isolation level.
+ transaction_read_only           | off                                    | Sets the current transaction's read-only status.
+ transform_null_equals           | off                                    | Treats "expr=NULL" as "expr IS NULL".
+ unix_socket_directory           | unset                                  | Sets the directory where the Unix-domain socket will be created.
+ unix_socket_group               | unset                                  | Sets the owning group of the Unix-domain socket.
+ unix_socket_permissions         | 511                                    | Sets the access permissions of the Unix-domain socket.
+ vacuum_cost_delay               | 0                                      | Vacuum cost delay in milliseconds.
+ vacuum_cost_limit               | 200                                    | Vacuum cost amount available before napping.
+ vacuum_cost_page_dirty          | 20                                     | Vacuum cost for a page dirtied by vacuum.
+ vacuum_cost_page_hit            | 1                                      | Vacuum cost for a page found in the buffer cache.
+ vacuum_cost_page_miss           | 10                                     | Vacuum cost for a page not found in the buffer cache.
+ wal_buffers                     | 4096                                   | Sets the number of disk-page buffers in shared memory for WAL.
+ wal_sync_method                 | fdatasync                              | Selects the method used for forcing WAL updates out to disk.
+ work_mem                        | 1024                                   | Sets the maximum memory to be used for query workspaces.
+ zero_damaged_pages              | off                                    | Continues processing past damaged page headers.
+(167 rows)
+

@@ -1,0 +1,1 @@
+text from included_test_01 with {scalar_test}, {INCLUDE_TEMPLATE included_test_02}

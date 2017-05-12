@@ -1,0 +1,32 @@
+---
+name: Template-Provider-PAR
+version: 0.1.102
+author:
+  - 'Nick Woolley <npw@cpan.org>'
+abstract: Include templates from a path within a PAR or Zip archive
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Archive::Zip: 0
+  File::Spec: 0
+  Module::Build: 0
+  PAR: 0
+  Scalar::Util: 0
+  Template::Provider: 2.93
+  Test::More: 0
+  version: 0
+recommends:
+  Test::Differences: 0.47
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Test::Prereq::Build: 0
+provides:
+  Template::Provider::PAR:
+    file: lib/Template/Provider/PAR.pm
+    version: 0.1.102
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

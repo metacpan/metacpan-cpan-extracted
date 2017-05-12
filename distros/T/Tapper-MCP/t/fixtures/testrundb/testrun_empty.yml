@@ -1,0 +1,13 @@
+---
+
+# empty DB, just one dummy because empty file does not work
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret

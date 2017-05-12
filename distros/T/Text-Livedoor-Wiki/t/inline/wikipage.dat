@@ -1,0 +1,20 @@
+=== basic
+--- wiki
+[[ほげ]]
+--- html
+<a href="/%e3%81%bb%e3%81%92">ほげ</a>
+=== basic + label
+--- wiki
+[[はげ>ほげ]]
+--- html
+<a href="/%e3%81%bb%e3%81%92">はげ</a>
+=== url
+--- wiki
+[[http://wiki.livedoor.com]]
+--- html
+<a href="http://wiki.livedoor.com" class="outlink">http://wiki.livedoor.com</a>
+=== url + label
+--- wiki
+[[はげ>http://wiki.livedoor.com]]
+--- html
+<a href="http://wiki.livedoor.com" class="outlink">はげ</a>

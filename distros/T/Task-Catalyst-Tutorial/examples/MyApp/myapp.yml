@@ -1,0 +1,38 @@
+---
+name: MyApp
+authentication:
+    dbic:
+        # Note this first definition would be the same as setting
+        # __PACKAGE__->config->{authentication}->{dbic}->{user_class} = 'MyAppDB::User'
+        # in lib/MyApp.pm (IOW, each hash key becomes a "name:" in the YAML file).
+        #
+        # This is the model object created by Catalyst::Model::DBIC from your
+        # schema (you created 'MyAppDB::User' but as the Catalyst startup
+        # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::User').
+        # NOTE: Omit 'MyApp::Model' here just as you would when using 
+        # '$c->model("MyAppDB::User)'
+        user_class: MyAppDB::User
+        # This is the name of the field in your 'users' table that contains the user's name
+        user_field: username
+        # This is the name of the field in your 'users' table that contains the password
+        password_field: password
+        # Other options can go here for hashed passwords
+        # Enabled hashed passwords
+        password_type: hashed
+        # Use the SHA-1 hashing algorithm
+        password_hash_type: SHA-1
+authorization:
+    dbic:
+        # This is the model object created by Catalyst::Model::DBIC from your
+        # schema (you created 'MyAppDB::Role' but as the Catalyst startup
+        # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::Role').
+        # NOTE: Omit 'MyApp::Model' here just as you would when using 
+        # '$c->model("MyAppDB::User)'
+        role_class: MyAppDB::Role
+        # The name of the field in the 'roles' table that contains the role name
+        role_field: role
+        # The name of the accessor used to map a role to the users who have this role
+        # See the has_many() in MyAppDB/Role.pm
+        role_rel: map_user_role
+        # The name of the field in the user_role table that references the user
+        user_role_user_field: user_id

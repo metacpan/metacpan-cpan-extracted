@@ -1,0 +1,60 @@
+This file documents the revision history for Perl extension Text::SimpleTable.
+
+2.03  2010-03-11 11:38:00
+        - New maintainer.
+
+2.02  2010-03-09 00:00:00
+        - Cleaned up tests.
+
+2.01  2010-03-01 00:00:00
+        - Removed .perltidyrc.
+
+2.0   2009-08-01 00:00:00
+        - Fixed package.
+
+1.9   2009-08-01 00:00:00
+        - Improved Kwalitee.
+
+1.8   2009-08-01 00:00:00
+        - Improved Kwalitee.
+
+1.7   2009-08-01 00:00:00
+        - Fixed typo.
+
+1.6   2009-07-27 00:00:00
+        - Improved Kwalitee.
+
+1.5   2009-07-27 00:00:00
+        - Added readme.
+
+1.4   2009-07-16 00:00:00
+        - Fixed all shebang lines.
+
+1.3   2009-07-02 00:00:00
+        - Code cleanup.
+
+1.2   2009-07-02 00:00:00
+        - Fixed infinite loop bug.
+
+1.1   2009-07-02 00:00:00
+        - Added hr method. (bricas)
+
+1.0   2009-07-02 00:00:00
+        - Fixed pod coverage.
+        - Cleanup.
+
+0.05  2008-08-28 00:00:00
+        - Adden new contact information
+        - No more os x garbage files (hopefully)
+
+0.04  2008-08-28 00:00:00
+        - Removed Build.PL
+
+0.03  2006-01-17 22:00:00
+        - Fixed bug where text items of '0' were not displayed
+
+0.02  2005-11-07 00:00:00
+        - Added support for newlines
+
+0.01  2005-10-24 00:00:00
+        - first release

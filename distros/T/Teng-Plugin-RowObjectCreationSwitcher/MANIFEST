@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Teng/Plugin/RowObjectCreationSwitcher.pm
+minil.toml
+t/00_compile.t
+t/01_row_object_enable_disable.t
+t/Utils.pm
+t/lib/Mock/Basic.pm
+t/lib/Mock/Basic/Schema.pm
+t/lib/TengTest.pm
+META.yml
+MANIFEST

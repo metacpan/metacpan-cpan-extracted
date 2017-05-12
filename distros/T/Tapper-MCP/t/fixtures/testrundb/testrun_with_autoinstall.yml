@@ -1,0 +1,91 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: mhentsc3
+  data:
+    id: 12
+    name: Maik Hentsche
+    login: mhentsc3
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "perfmon", "lmbench"
+
+- schema: Testrun
+  name: Autoinstall
+  data:
+    id: 1
+    owner_id: 12
+    shortname: Autoinstall
+    notes: autoinstall
+    topic_name: Software
+
+- schema: TestrunScheduling
+  name: Autoinstall-Job
+  data:
+    id: 101
+    testrun_id: 1            # aaa
+    queue_id: 1              # Xen
+    status: schedule
+    host_id: 1
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: Autoinstall precondition
+  data:
+    id: 1
+    shortname: autoinstall_precondition
+    precondition: |
+      precondition_type: autoinstall
+      name: opensuse-11.2-rc2-x86_64
+      repository: /tftp/farnold/
+      grub_text: |
+         title opensuse 11.2
+         kernel /tftpboot/kernel autoyast=bare.cfg $TAPPER_OPTIONS
+         initrd /tftpboot/initrd
+
+- schema: Precondition
+  name: testprogram_autoinstall
+  data:
+    id: 2
+    shortname: testprogram_autoinstall
+    precondition: |
+      precondition_type: testprogram
+      program: /bin/tapper-testsuite-oprofile
+      timeout: 600
+
+# -------------------- "KVM" <== "KVMtest"
+
+- schema: TestrunPrecondition
+  name: 1st autoinstall
+  data:
+    testrun_id: 1
+    precondition_id: 1
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 1st autoinstall
+  data:
+    testrun_id: 1
+    precondition_id: 2
+    succession: 2
+
+
+# ------------------ Hosts
+- schema: Host
+  name: iring
+  data:
+    id: 1
+    name: iring
+    free: 1
+    active: 1

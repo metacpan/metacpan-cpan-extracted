@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-empty_test" errors="1" failures="0" tests="0" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/empty.test">
+    <failure>
+<![CDATA[Fail reason(s):
+    failed test
+Explanation:
+    parse errors (No plan found in TAP output)
+Test output:
+    not ok - t/internal_tests/empty.test
+]]>
+    </failure>
+  </testcase>
+</testsuite>

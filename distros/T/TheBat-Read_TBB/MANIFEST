@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/TheBat-Read_TBB.t
+t/messages.tbb
+example/list_messages.pl
+lib/TheBat/Read_TBB.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

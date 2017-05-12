@@ -1,0 +1,8 @@
+Revision history for Text::Template
+
+1.47  2017-02-27
+    - Fix longstanding memory leak in _scrubpkg() [#22031]
+    - Fix various spelling errors [#86872]
+
+0.01 - 0.45 Various
+    - Maintained by Mark Jason Dominus (MJD)

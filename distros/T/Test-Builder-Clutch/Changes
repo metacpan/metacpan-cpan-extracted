@@ -1,0 +1,23 @@
+Revision history for Test-Builder-Clutch
+
+0.07    20141119
+        Work with new versions of Test-Simple based on Test::Stream
+
+0.06    20131224
+        Fix bad test filename.
+
+0.05    20120908
+        Add antitest method.
+
+0.04    20110517
+        Remove bogus line from Build.PL
+
+0.03    20110513
+        Add prerequisites to Build.PL and Makefile.PL
+
+0.02    20110416
+        Changed module name to Test::Builder::Clutch.
+
+0.01    20110408
+        First version, released on an unsuspecting world.
+

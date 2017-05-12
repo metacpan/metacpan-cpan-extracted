@@ -1,0 +1,17 @@
+
+    README for Perl module Test::Pod::Coverage
+
+This module is used to add a test to your Perl distribution,
+which checks for pod coverage of all appropriate files.
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/Test::Pod::Coverage
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one let, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+This module was written by Andy Lester, <petdance@cpan.org>

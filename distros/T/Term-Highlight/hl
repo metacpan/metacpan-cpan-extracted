@@ -1,0 +1,746 @@
+#!/usr/bin/env perl
+
+use Term::Highlight ();
+
+( $PROGNAME = $0 ) =~ s/.*\///;
+$VERSION = "1.9.4";
+$TAGTYPE = "term";
+$RC_FILE = "$ENV{ HOME }/.hlrc";
+$SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
+$CTX_PTN = qr/^(\d+)?\.?(\d+)?$/;
+$SNIPPET_OPT_PTN = qr/(?:^-s)(\S*)/;
+$CTX_OPT_PTN = qr/(?:^-c)(\S*)/;
+
+
+sub PrintUsage
+{
+print << "EOHELP"
+$PROGNAME, version $VERSION. See man $PROGNAME for details.
+
+Usage: $PROGNAME [global-options] [[--] highlight-options [patterns] ...]
+          [- file1 [file2] ...]
+
+Global options affect the behaviour of the program globally:
+    -s <snippet> loads a snippet with specified name from file ~/.hlrc or
+       ~/.hlrc_<snippet>. The white space between '-s' and the name of the
+       snippet can be omitted. For example -sW loads a snippet with name 'W'.
+       Multiple options -s with different snippet names are allowed.
+    -g (-grep) prints only lines that match specified patterns.
+    -r greps recursively, implies '-g'.
+       If the file list is empty then grep starts in the current directory.
+    -l prints the list of files where matches were found, implies '-g'.
+    -c <pre[.post]> where 'pre' and 'post' are numbers, prints context lines
+       around matches, if 'post' is not set then it is supposed to be equal to
+       'pre', implies '-g'.
+    -n prints line numbers.
+    -u (-utf8) enables matching of Unicode characters from UTF-8 encoded input
+    -b (-bin) enables processing of binary files (not enabled by default).
+    -t (-term) forces using ANSI color escape sequences even when output
+       is not a terminal, this may be useful when piped to 'less -r' or alike.
+    -d (-debug) turns on debug support (colors are printed out as symbolic
+       sequences).
+    -h (-help) prints this message and exits.
+
+Highlight options apply to the following them patterns:
+    -x[xx][.b] highlights following patterns with color id x[xx], x[xx] is a
+               number within range [0..255], b is 0 or 1 and stands for
+               background. If b is 0 then color id applies to foreground,
+               if 1 - to background. Suffix .b may be omitted in which case b
+               is equal to 0.
+    -i sets ignorecase search.
+    -ni unsets ignorecase search.
+    -b sets bold font.
+    -rfg resets foreground color to default value.
+    -rb resets bold font to normal.
+    -rbg resets background color to default value.
+    -r resets both background color and bold font.
+    -ra resets all settings to default values.
+
+Highlight options separators separate highlight options from other options:
+    -- explicitly separates global and highlight options.
+     - separates global and highlight options from list of files to process.
+
+$PROGNAME may read from stdin that makes using list of input files optional.
+
+Files ~/.hlrc and ~/.hlrc_<snippet> must contain lines in format:
+        snippet name highlight_options
+    where snippet is a keyword, name is the name of the snippet and
+    highlight_options is an arbitrary line that contains highlight options
+    possibly preceded by the global option '-u'. Arguments within
+    highlight_options are split by white spaces. If you want to use white
+    spaces inside patterns then put single quotes around the patterns.
+    Single quote by itself must be escaped by a backslash. Too long lines
+    can be split into multiple lines using backslashes.
+EOHELP
+}
+
+
+sub LoadSnippets
+{
+    my ( $snippet ) = @_;
+    return if exists $rcLoaded{ $snippet } && defined $rcLoaded;
+    my $rc = 0;
+    my $RC_FILE_S = $RC_FILE . '_' . $snippet;
+    if ( exists $rcLoaded{ $snippet } || ( $rc = open ( RC, "< $RC_FILE_S" ) ) )
+    {
+        $rcLoaded{ $snippet } = 1;
+    }
+    elsif ( defined $rcLoaded || ( $rc = open ( RC, "< $RC_FILE" ) ) )
+    {
+        $rcLoaded{ $snippet } = 0;
+        $rcLoaded = 1;
+    }
+    else
+    {
+        $rcLoaded = 0;
+    }
+    return unless $rc;
+    my $command;
+    while ( <RC> )
+    {
+        if ( /\\$/o )
+        {
+            $command .= substr( $_, 0, length( $_ ) - 2 );
+            next;
+        }
+        $command .= $_;
+        unless ( $command =~ /$SNIPPET_PTN/ )
+        {
+            $command = undef;
+            next;
+        }
+        my ( $name, $snippet ) = ( $1, $2 );
+        my ( $start, $seek ) = ( 0, 0 );
+        my $waitquote = 0;
+        while ( 1 )
+        {
+            $seek = index $snippet, "'", $seek;
+
+            if ( $seek < 0 )
+            {
+                ( my $fragment = substr $snippet, $start ) =~ s/^\s+//;
+                push @{ $Snippets{ $name } }, split '\s+', $fragment;
+                last;
+            }
+
+            if ( substr( $snippet, $seek - 1, 1 ) eq "\\" )
+            {
+                ++$seek;
+                next;
+            }
+
+            unless ( $waitquote )
+            {
+                ( my $fragment = substr $snippet, $start, $seek - $start ) =~
+                                                                    s/^\s+//;
+                push @{ $Snippets{ $name } }, split '\s+', $fragment;
+                $start = ++$seek;
+                $waitquote = 1;
+                next;
+            }
+
+            push @{ $Snippets{ $name } },
+                                        substr $snippet, $start, $seek - $start;
+
+            $start = ++$seek;
+            $waitquote = 0;
+        }
+        $command = undef;
+    }
+    close ( RC );
+}
+
+
+sub Flush
+{
+    my ( $fh ) = @_;
+    my $old_fh = select $fh;
+    my $old_flush = $|;
+    $| = 1;
+    $| = $old_flush;
+    select $old_fh;
+}
+
+
+
+# MAIN LOOP BEGIN
+
+push @Hl_args, split '\s+', $ENV{ HL_INITSTRING } if exists
+                                                        $ENV{ HL_INITSTRING };
+
+$TAGTYPE = "none" unless -t STDOUT;
+
+while ( my $arg = shift )
+{
+    last if $arg eq '-';
+    SWITCH_ARGS :
+    {
+        last SWITCH_ARGS if $Hl_args;
+        if ( $arg eq "-r" )
+        {
+            $Grep = 1; $GrepRecursively = 1; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-l" )
+        {
+            $Grep = 1; $GrepList = 1; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-n" )
+        {
+            $LineNumbers = 1; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-g" || $arg eq "-grep" || $arg eq "--grep" )
+        {
+            $Grep = 1; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-u" || $arg eq "-utf8" || $arg eq "--utf8" )
+        {
+            $UTF8Support = 1; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-b" || $arg eq "-bin" || $arg eq "--binary" )
+        {
+            $BinarySupport = 1; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-t" || $arg eq "-term" || $arg eq "--terminal" )
+        {
+            $TAGTYPE = "term"; last SWITCH_ARGS;
+        }
+        if ( $arg =~ $CTX_OPT_PTN )
+        {
+            my $value = ( $1 eq undef ) ? shift : $1;
+            die "Unrecognized context pattern" unless $value =~ $CTX_PTN;
+            $Grep = 1;
+            $CtxPre = $1 || 0;
+            $CtxPost = defined $2 ? $2 : $CtxPre; last SWITCH_ARGS;
+        }
+        if ( $arg =~ $SNIPPET_OPT_PTN )
+        {
+            my $snippet = ( $1 eq undef ) ? shift : $1;
+            LoadSnippets( $snippet ) unless exists $Snippets{ $snippet };
+            die "Snippet '$snippet' failed to load"
+                                            unless exists $Snippets{ $snippet };
+            if ( $Snippets{ $snippet }[ 0 ] eq '-u' )
+            {
+                shift @{ $Snippets{ $snippet } };
+                $UTF8Support = 1;
+            }
+            push @Hl_args, @{ $Snippets{ $snippet } }; last SWITCH_ARGS;
+        }
+        if ( $arg eq "--" )
+        {
+            $Hl_args = 2; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-h" || $arg eq "-help" || $arg eq "--help" ||
+             $arg eq "--version" )
+        {
+            PrintUsage; exit 0;
+        }
+        if ( $arg eq "-d" || $arg eq "-debug" || $arg eq "--debug" )
+        {
+            $TAGTYPE = "debug-term"; last SWITCH_ARGS;
+        }
+        $Hl_args = 1;
+    }
+    push @Hl_args, $arg if $Hl_args == 1;
+    $Hl_args = 1 if $Hl_args == 2;
+}
+
+
+#create a new highlight object
+my $hl = Term::Highlight->new( tagtype => $TAGTYPE );
+
+#process command line arguments
+if ( $UTF8Support )
+{
+    require Encode;
+    Encode->import( qw( decode_utf8 ) );
+    @Hl_args = map { decode_utf8( $_, 1 ) } @Hl_args;
+}
+$hl->LoadArgs( \@Hl_args );
+my $Patterns = $hl->GetPatterns();
+my $AlwaysMatches = @$Patterns && $$Patterns[ 0 ][ 0 ] eq undef;
+
+my @Files = @ARGV;
+my $ManyFiles = @Files > 1;
+
+my $hl_loc = undef;
+
+if ( exists $ENV{ HL_LOCATION } && ! $GrepList &&
+     ( $GrepRecursively || $LineNumbers || $ManyFiles ) )
+{
+    $hl_loc = Term::Highlight->new( tagtype => $TAGTYPE );
+    $hl_loc->LoadArgs( [ split '\s+', $ENV{ HL_LOCATION } ] );
+}
+
+my $CheckCtx = $CtxPre || $CtxPost;
+my $CtxDelim = '--';
+
+if ( exists $ENV{ HL_CTXDELIM } && ! $GrepList && $CheckCtx )
+{
+    my $hl_ctx = Term::Highlight->new( tagtype => $TAGTYPE );
+    $hl_ctx->LoadArgs( [ split '\s+', $ENV{ HL_CTXDELIM } ] );
+    $hl_ctx->Process( \$CtxDelim );
+}
+
+my $Location = '';
+my $print_ctx = 0;
+
+
+sub InitCtx
+{
+    @CtxPre = ();
+    $CurCtxPost = $CtxPost;
+    $LastLine = -1;
+}
+
+
+sub ProcessCtx
+{
+    my ( $matches, $print_ctx, $file ) = @_;
+    if ( $matches )
+    {
+        my $n = $#CtxPre;
+        print "$CtxDelim\n" if $$print_ctx++ && $. > $LastLine + $n + 2;
+        for my $i ( 0 .. $n )
+        {
+            my $line = $. - ( $n + 1 - $i );
+            if ( $GrepRecursively )
+            {
+                $Location = $LineNumbers ? $file . ':' . $line : $file;
+            }
+            else
+            {
+                $Location = $ManyFiles ?
+                    ( $LineNumbers ? $file . ':' . $line : $file ) :
+                    ( $LineNumbers ? $line : '' );
+            }
+            if ( $Location ne '' )
+            {
+                $hl_loc->Process( \$Location ) if defined $hl_loc;
+                $Location .= ': ';
+            }
+            print $Location, $CtxPre[ $i ];
+        }
+        @CtxPre = () if $CtxPre > 0;
+        $CurCtxPost = 0;
+        return 1;
+    }
+    if ( $CurCtxPost < $CtxPost )
+    {
+        ++$CurCtxPost;
+        return 1;
+    }
+    if ( $CtxPre > 0 )
+    {
+        push @CtxPre, $_;
+        shift @CtxPre if @CtxPre > $CtxPre;
+    }
+    0;
+}
+
+
+#process STDIN or file list line by line
+if ( $GrepRecursively )
+{
+    my $count = 0;
+    for my $File ( @Files )
+    {
+        unless ( -e $File )
+        {
+            warn( "WARNING: File $File does not exist" );
+            ++$count;
+        }
+    }
+    if ( $count == 0 || $count != @Files )
+    {
+        require File::Find;
+        File::Find->import( qw( find ) );
+        @Files || push @Files, './';
+        find
+        (
+            sub
+            {
+                my ( $FullFile, $File, $FileIsBinary ) =
+                                            ( $File::Find::name, $_, -B $_ );
+                return unless -f $File;
+                return if $FileIsBinary && ! $BinarySupport;
+                unless ( open $FileHandle, "< $File" )
+                {
+                    Flush( *STDOUT );
+                    warn( "WARNING: Unable to open $File: $!" );
+                    return;
+                }
+                if ( $FileIsBinary )
+                {
+                    binmode( $FileHandle );
+                }
+                elsif ( $UTF8Support )
+                {
+                    binmode( $FileHandle, ':utf8' );
+                    binmode( STDOUT, ':utf8' ) unless $GrepList;
+                }
+                InitCtx if $CheckCtx;
+                while ( <$FileHandle> )
+                {
+                    my $matches = $AlwaysMatches;
+                    unless ( $matches )
+                    {
+                        for my $ptn ( @$Patterns )
+                        {
+                            if ( $_ =~ @$ptn[ 0 ] )
+                            {
+                                $matches = 1;
+                                last;
+                            }
+                        }
+                    }
+                    my $print_once = $GrepList || $FileIsBinary;
+                    if ( $matches )
+                    {
+                        print "$FullFile\n" if $GrepList && ! $FileIsBinary;
+                        print "Binary file $FullFile matches\n"
+                                                            if $FileIsBinary;
+                        last if $print_once;
+                    }
+                    next if $print_once;
+                    next if $CheckCtx &&
+                        ! ProcessCtx( $matches, \$print_ctx, $FullFile ) ||
+                        ! $CheckCtx && ! $matches;
+                    $Location = $LineNumbers ? $FullFile . ':' . $. : $FullFile;
+                    $hl_loc->Process( \$Location ) if defined $hl_loc;
+                    $hl->Process( \$_ ) if $matches && $_ ne "\n";
+                    print "$Location: $_";
+                    $LastLine = $.;
+                }
+                close $FileHandle;
+            },
+            @Files
+        );
+    }
+}
+else
+{
+    @Files || push @Files, *STDIN;
+    for my $File ( @Files )
+    {
+        my ( $FileHandle, $FileIsBinary );
+        if ( $File eq *STDIN )
+        {
+            $FileHandle = *STDIN;
+        }
+        else
+        {
+            unless ( open $FileHandle, "< $File" )
+            {
+                Flush( *STDOUT );
+                warn( "WARNING: Unable to open $File: $!" );
+                next;
+            }
+            if ( -d $FileHandle )
+            {
+                Flush( *STDOUT );
+                warn( "WARNING: $File is a directory, ignored" );
+                next;
+            }
+            $FileIsBinary = -B $FileHandle;
+            if ( $FileIsBinary && ! $BinarySupport )
+            {
+                Flush( *STDOUT );
+                warn( "WARNING: $File is a binary file, ignored" );
+                next;
+            }
+        }
+        if ( $FileIsBinary )
+        {
+            binmode( $FileHandle );
+        }
+        elsif ( $UTF8Support )
+        {
+            binmode( $FileHandle, ':utf8' );
+            binmode( STDOUT, ':utf8' ) unless $GrepList;
+        }
+        InitCtx if $CheckCtx;
+        while ( <$FileHandle> )
+        {
+            #pre-check that line matches: it is cheaper than calling Process()!
+            my $matches = $AlwaysMatches;
+            unless ( $matches )
+            {
+                for my $ptn ( @$Patterns )
+                {
+                    if ( $_ =~ @$ptn[ 0 ] )
+                    {
+                        $matches = 1;
+                        last;
+                    }
+                }
+            }
+            my $print_once = $GrepList || $FileIsBinary;
+            if ( $matches )
+            {
+                print "$File\n" if $GrepList && ! $FileIsBinary;
+                print "Binary file $File matches\n" if $FileIsBinary;
+                last if $print_once;
+            }
+            next if $print_once;
+            next if $Grep && ( $CheckCtx &&
+                ! ProcessCtx( $matches, \$print_ctx, $File ) ||
+                ! $CheckCtx && ! $matches );
+            #print current line
+            if ( $ManyFiles || $LineNumbers )
+            {
+                $Location = $ManyFiles ?
+                            ( $LineNumbers ? $File . ':' . $. : $File ) : $.;
+                $hl_loc->Process( \$Location ) if defined $hl_loc;
+                $Location .= ': ';
+            }
+            #call Process() only when line matches and is not empty
+            $hl->Process( \$_ ) if $matches && $_ ne "\n";
+            #debug purpose
+            #print "$_->[ 0 ], $_->[ 1 ], $_->[ 2 ], $_->[ 3 ], ",
+            #      "@${ $_->[ 4 ] }\n" foreach $hl->Process( \$_ );
+            print $Location, $_;
+            $LastLine = $.;
+        }
+        close $FileHandle;
+    }
+}
+
+
+
+=encoding utf-8
+
+=head1 NAME
+
+hl - terminal patterns highlighter
+
+=head1 SYNOPSIS
+
+hl [global-options] [[--] highlight-options [patterns] ...] [- file1 [file2] ...]
+
+=head1 DESCRIPTION
+
+hl reads text from list of files or standard input and prints it on terminal
+with specified patterns highlighted using ANSI color escape sequences.
+Patterns are intrinsically Perl-compatible regular expressions.
+
+Global options are processed internally by hl whereas highlight options
+are passed into Term::Highlight module, therefore they should not mix.
+The first occurrence of an option which has not been recognized as global is
+regarded as beginning of highlight options.
+Highlight options can be explicitly separated from global options with option
+'--' (must not be confused with option '-' that separates list of files from
+highlight options).
+
+=head3 Global options:
+
+=over
+
+=item -s <snippet>
+
+loads a snippet with specified name from file ~/.hlrc or ~/.hlrc_<snippet>.
+The white space between '-s' and the name of the snippet may be omitted.
+For example -sW loads a  snippet with name 'W'.
+Multiple options -s with different snippet names are allowed.
+
+=item -g (-grep)
+
+prints only lines that match specified patterns.
+
+=item -r
+
+greps recursively, implies '-g'.
+If the file list is empty then grep starts in the current directory.
+
+=item -l
+
+prints the list of files where matches were found, implies '-g'.
+
+=item -c <pre[.post]>
+
+where 'pre' and 'post' are numbers.
+Prints context lines around matches.
+If 'post' is not set then it is supposed to be equal to 'pre', implies '-g'.
+
+=item -n
+
+prints line numbers.
+
+=item -u (-utf8)
+
+enables matching of Unicode characters from UTF-8 encoded input.
+For instance matching against '\x{239C}' or 'функци[яи]' will not work without
+this option.
+
+=item -b (-bin)
+
+enables processing of binary files (not enabled by default).
+
+=item -t (-term)
+
+forces using ANSI color escape sequences even when output is not a terminal,
+this may be useful when output is piped to 'less -r' or alike.
+
+=item -d (-debug)
+
+turns on debug support (colors are printed out as symbolic sequences).
+
+=item -h (-help)
+
+prints usage and exits.
+
+=back
+
+=head3 Highligh options:
+
+=over
+
+=item -x[xx][.b]
+
+highlights following patterns with color defined by number x[xx].
+x[xx] is color id corresponding to an ANSI color escape sequence number
+and thus should range within [0..255].
+I<b> must be 0 or 1: .0 applies the color id to foreground, .1 - to background.
+.0 is default choice and may be omitted.
+If your terminal does not support 256 colors then valid color ids are [0..15].
+I<Note>: if your terminal is 256 colors capable then better use [16..255]
+colors!
+To see for how many colors your terminal has support use command B<tput colors>.
+
+=item -i
+
+sets ignorecase search.
+
+=item -ni
+
+unsets ignorecase search.
+
+=item -b
+
+sets bold font.
+
+=item -rfg
+
+resets foreground color to default value.
+
+=item -rb
+
+resets bold font to normal.
+
+=item -rbg
+
+resets background color to default value.
+
+=item -r
+
+resets both background color and bold font.
+
+=item -ra
+
+resets all settings to default values.
+
+=back
+
+Highlight options apply to following them regexp patterns or to the whole text
+if trailing highlight options are not followed by patterns.
+
+It is possible to define common highlight options on session level.
+hl supports environment variable B<HL_INITSTRING> which value will be prepended
+to any highlight options given in command line.
+
+=head3 Highlight options separators:
+
+=over
+
+=item --
+
+explicitly separates global and highlight options.
+
+=item -
+
+separates global and highlight options from list of files to process.
+As soon as hl may read from standard input, using a list of files to process is
+not obligatory.
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over
+
+=item B<HL_INITSTRING>
+
+defines common highlight options which will be prepended to any highlight
+options given in command line.
+For example setting B<HL_INITSTRING>='-21 -i' will make hl highlight patterns
+with color id 21 and ignore cases without explicit definition of highlight
+options in command line.
+I<Note>: B<HL_INITSTRING> must not contain global options!
+
+=item B<HL_LOCATION>
+
+defines highlight options for file names and line numbers when they are printed.
+For example setting B<HL_LOCATION>='-224 (?<=:)\d+$ -248' will make hl print
+file names with color id 248 and line numbers with color id 224.
+
+=item B<HL_CTXDELIM>
+
+defines highlight options for context chunks delimiters (double dashes) when
+they are printed.
+For example setting B<HL_CTXDELIM>=-248 will make hl print context chunks
+delimiters with color id 248.
+
+=back
+
+=head1 EXAMPLES
+
+B<ls | hl -b -46.1 -21 '\bw.*?\b'>
+
+reads output of command B<ls> and highlights words that start with I<w> in
+color id 21 using color id 46 for background and bold font.
+
+=head1 FILES
+
+B<~/.hlrc> and B<~/.hlrc_<snippet-nameE<gt>>
+
+currently these files may contain only snippets that can be loaded with option
+'-s'.
+The format of the snippet line is
+
+B<snippet name highlight_options>
+
+where I<snippet> is a keyword, I<name> is the name of the snippet and
+I<highlight_options> contains highlight options possibly preceded by the global
+option '-u'.
+Here is an example of a snippet to highlight words that start with a capital
+letter.
+
+B<snippet W       -130 (?:^|[\s])[A-Z]\S+>
+
+Lines that do not match the snippet line pattern are ignored.
+Arguments of I<highlight_options> are naturally split by white spaces.
+If you want to use white spaces inside patterns then put single quotes around
+the patterns.
+Single quote by itself must be escaped by a backslash.
+Too long lines can be split into multiple lines using backslashes.
+
+Files with names containing specific snippet names are loaded before ~/.hlrc:
+they are supposed to declare a single snippet (perhaps with a few auxiliary
+snippets) to help hl start faster.
+
+=head1 SEE ALSO
+
+Term::Highlight(3), tput(1)
+
+=head1 AUTHOR
+
+Alexey Radkov <alexey.radkov@gmail.com> 
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008-2016 by A. Radkov.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

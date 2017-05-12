@@ -1,0 +1,53 @@
+NAME
+    Text::Sentence::Alignment - Two Sentence Alignment
+
+VERSION
+    Version 0.12
+
+SYNOPSIS
+    This Module process two sentences (i.e. terms separated by space)
+    alignment. Now it provide two kind of alignment method, Global and Local
+    Alignment.
+
+        use Text::Sentence::Alignment;
+
+        my $TSA = Text::Sentence::Alignment->new();
+
+        # local alignment
+        $TSA->is_local(1);
+        my ($result1,$result2) = $TSA->do_alignment($s1,$s2); 
+
+        # global alignment
+        $TSA->is_local(0);
+        my ($result1,$result2) = $TSA->do_alignment($s1,$s2); 
+
+FUNCTIONS
+  new
+  is_local
+    Set/get if current algorithm is local alignment
+
+  delimeter
+    The delimeter() is used to set delimeter of word/tags.
+
+  do_alignment
+  calculate_matrix
+  similarity_print
+  get_align_result
+AUTHOR
+    Cheng-Lung Sung, "<clsung@cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-text-sentence-alignment@rt.cpan.org", or through the web interface
+    at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Sentence-Alignment>
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2005 - 2007 Cheng-Lung Sung, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

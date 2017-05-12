@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- :tabSize=2:indentSize=2:wrap=hard: -->
+<changelog xmlns="http://www.blackperl.com/2009/01/ChangeLogML"
+    xmlns:sc="http://www.blackperl.com/2009/01/ChangeLogML/source-control"
+    xmlns:git="http://www.blackperl.com/2009/01/ChangeLogML/source-control/git"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.blackperl.com/XML/ChangeLog etc/ChangeLogML.xsd">
+  <project>Test::AgainstSchema</project>
+  <title>Perl Module Test::AgainstSchema Change History</title>
+  <description>
+    A Perl module to test formatted text against various schemas.
+  </description>
+  <release version="0.100" sc:tag="0.100" date="2012-01-16T14:00:00-08:00">
+    <change git:commit="31d42df1110a96efc6a607d40b7f44385cff2607">
+      <fileset>
+        <file path="lib/Test/AgainstSchema.pm" action="ADD" />
+        <file path="lib/Test/AgainstSchema/XML.pm" action="ADD" />
+        <file path="t/10_xml/05_xml_parsing.t" action="ADD" />
+        <file path="t/10_xml/10_sgmldtd.t" action="ADD" />
+        <file path="t/10_xml/20_xmlschema.t" action="ADD" />
+        <file path="t/10_xml/30_relaxng.t" action="ADD" />
+        <file path="t/10_xml/basic_tests.pl" action="ADD" />
+        <file path="t/10_xml/simple-bad.dtd" action="ADD" />
+        <file path="t/10_xml/simple-bad.rng" action="ADD" />
+        <file path="t/10_xml/simple-bad.xsd" action="ADD" />
+        <file path="t/10_xml/simple.dtd" action="ADD" />
+        <file path="t/10_xml/simple.rng" action="ADD" />
+        <file path="t/10_xml/simple.xsd" action="ADD" />
+        <file path="t/10_xml/xml-simple-bad.xml" action="ADD" />
+        <file path="t/10_xml/xml-simple.xml" action="ADD" />
+        <file path="t/90_integration/10_with_xml.t" action="ADD" />
+        <file path="t/90_integration/90_empty_subclass.t" action="ADD" />
+        <file path="t/90_integration/MyTestAgainstSchema.pm" action="ADD" />
+        <file path="t/util.pl" action="ADD" />
+        <file path="xt/00_load.t" action="ADD" />
+        <file path="xt/01_pod.t" action="ADD" />
+        <file path="xt/02_pod_coverage.t" action="ADD" />
+        <file path="xt/03_meta.t" action="ADD" />
+        <file path="xt/04_minimumversion.t" action="ADD" />
+        <file path="xt/05_critic.t" action="ADD" />
+      </fileset>
+      <description>
+        Initial commit of code, tests and test files.
+      </description>
+    </change>
+  </release>
+</changelog>

@@ -1,0 +1,12 @@
+${#} Store transfer/paperless dispatch.
+${#} SCCS: @(#)ItemPO 1.1 03/27/03 09:12:25
+${#}
+${#} This paragraph is generated for every SKU that is transfered
+${#}
+${#} Accumulate total items per page - grand total is calculated by the program, but
+${#} the program doesn't know about page breaks.
+${Calc PageTotal := $PageTotal + $quantity }
+${#}
+                                                               |      |
+       ${department%3.3d}      ${SKU%6.6d}      ${description%-21s}      ${quantity%5d}   |______|   ${price%9.2f}   ${value%10.2f}
+${#} end of paragraph

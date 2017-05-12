@@ -1,0 +1,14 @@
+<!--<? use CGI qw/:standard/;
+       echo comment('AUTOMATICALLY GENERATED - DO NOT EDIT');
+!>-->
+<HTML><HEAD>
+<TITLE>Some title</TITLE>
+</HEAD>
+<BODY>
+<!--<? echo "One line." !>-->
+1
+# This is a comment
+2
+ # But this is not a comment
+</BODY>
+</HTML>

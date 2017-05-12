@@ -1,0 +1,32 @@
+=head1 LICENSE
+
+=head2 This module
+
+=over
+
+=item * Thou shalt not claim ownership of unmodified materials.
+
+=item * Thou shalt not claim whole ownership of modified materials.
+
+=item * Thou shalt grant the indemnity of the provider of materials.
+
+=item * Thou shalt use and dispense freely without other restrictions.
+
+=back
+
+Or if you truly insist, you may use and distribute this under ther terms
+of Perl itself (GPL and/or Artistic License).
+
+=head2 Included fonts
+
+This distribution also includes fonts and control files by other authors:
+
+=over
+
+=item * The FIGlet fonts and control files are under the Artistic license.
+
+A copy of one of those fonts, F<mini.flf>, is rolled into F<minifig.pl>
+
+=item * The TOIlet files are under the "Do What The Fuck You Want To Public License," which can be construed to mean they are Public Domain.
+
+=back

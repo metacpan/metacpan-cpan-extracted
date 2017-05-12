@@ -1,0 +1,22 @@
+---
+name: Text-Reform
+version: 1.20
+author:
+  - 'Damian Conway <DCONWAY@CPAN.org>'
+abstract: Manual text wrapping and reformatting
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Exporter: 0
+  perl: 5.005
+build_requires:
+  Test::More: 0
+provides:
+  Text::Reform:
+    file: lib/Text/Reform.pm
+    version: 1.20
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

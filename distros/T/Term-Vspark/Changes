@@ -1,0 +1,24 @@
+Revision history for Term::Vspark.
+
+0.34 2015-04-27T02:36:15Z
+    - Removed example scripts
+    - Removed README.pod
+
+0.33 2015-04-27T02:33:38Z
+    - Fixed a warning when columns is undefined
+    - Fixed bin/vspark to use latest changes
+    - Forgot to export vspark() in the last release
+
+0.32 2015-04-27T02:05:03Z
+    - Renamed show_graph() to vspark().  keeping show_graph() around for
+      backwards compat.
+    - Default value of 'max' param is now 80 chars or terminal width whichever
+      is smaller.
+    - Added a 'char' param in case you hate unicode
+    - Many bug fixes.
+    - Added lots of tests.
+
+0.31 2015-04-26T01:49:21Z
+    - Switched to Minilla
+    - Added tests
+    - Updates to documentation

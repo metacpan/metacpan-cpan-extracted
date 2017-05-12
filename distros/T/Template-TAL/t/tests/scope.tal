@@ -1,0 +1,22 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+
+  <div tal:define="foo string:bar">
+
+    <div tal:define="global baz string:ning" tal:omit-tag="string:1" />
+  
+    <p tal:content="foo">should be bar</p>
+    <p tal:content="baz">should be ning</p>
+  
+    <div tal:define="foo string:baz">
+      <div tal:define="global baz string:wop" tal:omit-tag="string:1" />
+  
+      <p tal:content="foo">should be baz</p>
+      <p tal:content="baz">should be wop</p>
+    </div>
+  
+    <p tal:content="foo">should be bar</p>
+    <p tal:content="baz">should be wop</p>
+
+  </div>
+  
+</html>

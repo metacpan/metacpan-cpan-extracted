@@ -1,0 +1,39 @@
+<xportal>
+	<xportal-page full-url="pages/alphabet_authors/asxml/" host-id="100" host="pda.fbhub.ru" pay-for-trafic="0" user="13" username="user" fullname="Оо" mobile="0" real-ip="195.42.181.161" request-string="pages/alphabet_authors/" secure-page="" atype="" static_path="pda" page-type="0" url="pages/alphabet_authors/" server_protocol="http" all-user-groups="7,55" browser="chrome" agent_version_major="42" agent_version_minor="0" agent_advanced="1" money_amount="208.42" money_amount_full="944.70" money_bonus="777.96" is-librarian="0" is-reader="1" age="29" subs="2" email_ok="1" email="sasdddssfsdfsdfsdfsdfsdf@sdfsdfsdf.ru" phone="" msisdn_confirmed="0" partner-id="28442505" i-phone="0" sid="70b63c9e1619929e00590b167d9d5d2B" in-action="0" default-partner-percent="10" ip-pool="0" ip="10.6.1.154" user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36" platform="" bee-kown-phone="-1" face-color="1" unread-messages="0" random="368983265" now="2015-05-13 19:05:05" now_timestamp="1431533105" last_paymethod="32" offert-accepted="1" is-developer="1" root-type="" test-group="2" mts-3g="5" original-url="pages/alphabet_authors/asxml/" country="RUS" city="" region="" region-name="">
+	<alphabet_authors>
+		<letter c="А"/>
+		<author-list>
+			<author level="1" subject="3117656" last_name="Абади" first_name="Дж." middle_name="М." has_new="0" relation="0" arts_count="1" genres_count="1"/>
+			<author level="1" subject="3575409" last_name="Абаева" first_name="Т." has_new="0" relation="0" arts_count="1" genres_count="1"/>
+			<author level="1" subject="3200306" last_name="Абазиева" first_name="К." middle_name="Г." has_new="0" relation="0" arts_count="1" genres_count="3"/>
+			<author level="1" subject="3808780" last_name="Абакаров" first_name="С." has_new="0" relation="0" arts_count="1" genres_count="1"/>
+			<author level="1" subject="3174875" last_name="Абакарова" first_name="П." has_new="0" relation="0" arts_count="1" genres_count="1"/>
+			<author level="1" subject="269165" last_name="Абакумов" first_name="Игорь" has_new="0" relation="0" arts_count="1" genres_count="1"/>
+			<author level="1" subject="3141185" last_name="Абакумов" first_name="Михаил" has_new="0" relation="0" arts_count="1" genres_count="1"/>
+			<author level="1" subject="3057447" last_name="Абакумова" first_name="Ольга" has_new="0" relation="0" arts_count="1" genres_count="4"/>
+			<author level="1" subject="3115346" last_name="Абакумова" first_name="Татьяна" has_new="0" relation="0" arts_count="2" genres_count="1"/>
+			<author level="1" subject="3120731" last_name="Абалос" first_name="Рафаэль" has_new="0" relation="0" arts_count="1" genres_count="2"/>
+			<author level="1" subject="235255" last_name="Абамелек-Лазарев" first_name="С." has_new="0" relation="0" arts_count="1" genres_count="2"/>
+			<author level="1" subject="3121499" last_name="Абанина" first_name="А." has_new="0" relation="0" arts_count="2" genres_count="2"/>
+			<author level="2" subject="3759440" last_name="Абаринов" first_name="Владимир" has_new="0" relation="0" arts_count="2" genres_count="3"/>
+			<author level="3" subject="54817" last_name="Абатуров" first_name="Валерий" middle_name="Викторович" has_new="0" relation="0" arts_count="2" genres_count="3"/>
+			<author level="1" subject="161482" last_name="Абашев" first_name="В." middle_name="В." has_new="0" relation="0" arts_count="2" genres_count="1"/>
+			<author level="1" subject="262035" last_name="Абашев" first_name="Дмитрий" middle_name="Николаевич" has_new="0" relation="0" arts_count="1" genres_count="2"/>
+			<author level="1" subject="3674447" last_name="Аббакумов" first_name="Вадим" middle_name="Леонардович" has_new="0" relation="0" arts_count="1" genres_count="3"/>
+			<author level="1" subject="249495" last_name="Аббасов" first_name="Ифтихар" middle_name="Балакиши" has_new="0" relation="0" arts_count="2" genres_count="4"/>
+			<author level="3" subject="291725" last_name="Аббасов" first_name="Ифтихар" middle_name="Балакиши оглы" has_new="0" relation="0" arts_count="8" genres_count="6"/>
+
+		</author-list>
+		<author_split asplit=" -Аа" alph_pagenumber="0"/>
+		<author_split asplit="Аба-Абд" alph_pagenumber="1"/>
+		<author_split asplit="Абе-Або" alph_pagenumber="2"/>
+		<author_split asplit="Абр-Абт" alph_pagenumber="3"/>
+		<author_split asplit="Абу-Абэ" alph_pagenumber="4"/>
+		<author_split asplit="Ава-Авд" alph_pagenumber="5"/>
+		<author_split asplit="Аве-Аво" alph_pagenumber="6"/>
+
+
+	</alphabet_authors>
+	</xportal-page>
+	<formdata alph_pagenumber="1" letter="А"/>	
+</xportal>

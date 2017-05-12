@@ -1,0 +1,21 @@
+Release of 0.45 is mainly motivated to include some support for NAACL 2004
+experiments
+
+Changes made in Sense-Clusters version 0.43 during version 0.45
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota, Duluth
+
+1.	Called mat2harbo in wrappers with --numform option with same value as
+	the --format specified
+
+2.	Added --numthrow and --perthrow options to cluto2label.pl
+
+3.	Modified wrappers to use --numthrow and --perthrow options of 
+	cluto2label.pl
+
+4.	Supported K < #Cols in pdlsvd.pl
+
+(Changelog-v0.43to0.45 Last Updated on 11/10/2003 by Amruta)

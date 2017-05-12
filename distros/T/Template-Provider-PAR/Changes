@@ -1,0 +1,51 @@
+------------------------------------------------------------------------
+r95 | nick | 2007-09-09 19:00:13 +0100 (Sun, 09 Sep 2007) | 2 lines
+
+1.97 - Sun Sep  9 19:49:13 2007
+	Released version 0.1.97 (failed)
+
+Fixed broken pod coverage test and updated version for new release.
+
+------------------------------------------------------------------------
+r92 | nick | 2007-09-04 00:35:40 +0100 (Tue, 04 Sep 2007) | 1 line
+
+* for version 1.89
+------------------------------------------------------------------------
+r91 | nick | 2007-09-04 00:33:43 +0100 (Tue, 04 Sep 2007) | 1 line
+
+* for version 1.89
+------------------------------------------------------------------------
+r90 | nick | 2007-09-04 00:32:29 +0100 (Tue, 04 Sep 2007) | 1 line
+
+updated Changes
+------------------------------------------------------------------------
+r89 | nick | 2007-09-03 19:16:41 +0100 (Mon, 03 Sep 2007) | 5 lines
+
+Version 0.1.89 - Mon Sep  3 20:53:34 2007
+	First release
+
+Fixed a problem due to t/templates not being packaged since it is 
+empty - tests now recreate it when required. Also fixed a broken 
+dependency on Template v2.93 which should have been 
+Template::Provider v2.93.
+
+------------------------------------------------------------------------
+r88 | nick | 2007-09-03 18:50:22 +0100 (Mon, 03 Sep 2007) | 3 lines
+
+Added 06.prereq.t to test prerequisites, META.yml, and tweaked a few
+details such as the version number and the MANIFEST.
+
+------------------------------------------------------------------------
+r87 | nick | 2007-09-03 16:56:40 +0100 (Mon, 03 Sep 2007) | 2 lines
+
+Added docs, and tests, should now be more or less releasable
+
+------------------------------------------------------------------------
+r86 | nick | 2007-09-03 13:08:57 +0100 (Mon, 03 Sep 2007) | 1 line
+
+Imported code - should be working, but requires tests.
+------------------------------------------------------------------------
+r85 | nick | 2007-09-03 12:57:53 +0100 (Mon, 03 Sep 2007) | 1 line
+
+freshly module-starter'ed
+------------------------------------------------------------------------

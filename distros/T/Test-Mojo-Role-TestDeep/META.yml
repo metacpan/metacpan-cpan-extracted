@@ -1,0 +1,36 @@
+---
+abstract: 'Add Test::Deep methods to Test::Mojo::WithRoles'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::More: '1.001005'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mojo-Role-TestDeep
+requires:
+  Mojolicious: '6.0'
+  Role::Tiny: '0'
+  Test::Deep: '0'
+  Test::Mojo::WithRoles: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/preaction/Test-Mojo-Role-TestDeep/issues
+  homepage: https://github.com/preaction/Test-Mojo-Role-TestDeep
+  repository: https://github.com/preaction/Test-Mojo-Role-TestDeep.git
+version: '0.007'
+x_authority: cpan:PREACTION
+x_contributors:
+  - 'Doug Bell <madcityzen@gmail.com>'

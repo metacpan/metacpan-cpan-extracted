@@ -1,0 +1,69 @@
+* list at start of file
+** second level
+### third level numbered list
+### second one
+** back to second level
+
+Just a regular paragraph
+* interrupted by a list
+
+another 
+paragraph
+| interrupted by | a table
+| r2c1           | r2c2
+
+another paragraph
+= interrupted by a heading
+
+* how about a list
+====== interrupted by a small heading
+* this is a new list
+
+| tables | can be interrupted |
+by paragraphs
+
+| tables | can be interrupted |
+# by lists
+
+| tables | can be interrupted |
+; by anything: that's not a table
+
+* a list
+* can be interrupted
+: by an indented paragraph
+
+* a list
+* can be interrupted
+{{{
+  by a nowiki block
+}}}
+
+a paragraph can
+be interrupted
+{{{
+  by a nowiki block
+}}}
+
+; any block can be
+: interrupted
+{{{
+  by a nowiki block
+}}}
+
+horizontal lines
+-----
+also interrupt other blocks
+
+{{{
+-----
+but not nowiki
+}}}
+
+* see, lists
+-----
+* are interrupted by lines also
+
+; crazy stuff happens
+-----
+: when a line splits a definition list
+

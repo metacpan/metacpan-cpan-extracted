@@ -1,0 +1,403 @@
+diff -pru ./pTk/mTk/os2/tkOS2Init.c ./pTk/mTk/os2.my/tkOS2Init.c
+--- ./pTk/mTk/os2/tkOS2Init.c	Thu Feb 26 02:31:12 1998
++++ ./pTk/mTk/os2.my/tkOS2Init.c	Fri Nov 13 01:39:58 1998
+@@ -185,6 +185,12 @@ TkPlatformInit(interp)
+  *----------------------------------------------------------------------
+  */
+ 
++#ifdef INIT_VIA_PERL
++unsigned long Perl_hab_GET();
++unsigned long Perl_Register_MQ(int serve);
++void	Perl_Deregister_MQ(int serve);
++#endif	/* defined INIT_VIA_PERL */ 
++
+ void
+ TkOS2InitPM (void)
+ {
+@@ -199,7 +205,11 @@ TkOS2InitPM (void)
+ #endif
+ 
+     /* Initialize PM */
++#ifdef INIT_VIA_PERL
++    hab = Perl_hab_GET();
++#else	/* !( defined INIT_VIA_PERL ) */ 
+     hab = WinInitialize (0);
++#endif	/* !( defined INIT_VIA_PERL ) */ 
+ 
+     /* Create message queue, increased size from 10 */
+ #ifdef REGISTER_MQ
+@@ -341,7 +351,11 @@ TkOS2ExitPM (void)
+ #else
+     WinDestroyMsgQueue(hmq);
+ #endif
++#ifdef INIT_VIA_PERL
++    /* Not needed */
++#else	/* !( defined INIT_VIA_PERL ) */ 
+     WinTerminate(hab);
++#endif	/* !( defined INIT_VIA_PERL ) */ 
+     hmq= hab= 0;
+ }
+ 
+@@ -355,6 +369,10 @@ Register_MQ(void)
+     PPIB pib;
+     PTIB tib;
+ 
++#ifdef INIT_VIA_PERL
++    hmq = Perl_Register_MQ(1);
++#else	/* !( defined INIT_VIA_PERL ) */ 
++
+     if (hmq)
+ 	return;
+     DosGetInfoBlocks(&tib, &pib);
+@@ -368,15 +386,20 @@ Register_MQ(void)
+ 	    _exit(188);			/* Panic can try to create a window. */
+ 	panic("Cannot create a message queue, am I a PM application?");
+     }
++#endif	/* !( defined INIT_VIA_PERL ) */ 
+     Tcl_WaitForEventProc = &OS2Tcl_WaitForEvent;
+ }
+ 
+ void
+ Deregister_MQ(void)
+ {
++#ifdef INIT_VIA_PERL
++    Perl_Deregister_MQ(1);
++#else	/* !( defined INIT_VIA_PERL ) */ 
+     if (hmq) {
+ 	WinDestroyMsgQueue(hmq);
+     }
++#endif	/* !( defined INIT_VIA_PERL ) */ 
+     Tcl_WaitForEventProc = NULL;
+ }
+ 
+diff -pru ./pTk/mTk/os2/tkOS2Int.h ./pTk/mTk/os2.my/tkOS2Int.h
+--- ./pTk/mTk/os2/tkOS2Int.h	Sat May 30 20:50:46 1998
++++ ./pTk/mTk/os2.my/tkOS2Int.h	Wed Oct  7 22:45:06 1998
+@@ -258,7 +264,7 @@ typedef struct TkWmInfo {
+ /* Force positioning on Tk-specified coordinates: turn off byte-alignment */
+ #define EX_TOPLEVEL_STYLE (FCF_NOBYTEALIGN|FCF_TITLEBAR|FCF_SIZEBORDER|FCF_MINMAX|FCF_SYSMENU|FCF_TASKLIST)
+ #define EX_OVERRIDE_STYLE (FCF_NOBYTEALIGN|FCF_BORDER)
+-#define EX_TRANSIENT_STYLE (FCF_NOBYTEALIGN|FCF_BORDER|FCF_TITLEBAR|FCF_TASKLIST)
++#define EX_TRANSIENT_STYLE (FCF_NOBYTEALIGN|FCF_BORDER|FCF_TITLEBAR|FCF_SYSMENU|FCF_TASKLIST)
+ 
+ 
+ 
+diff -pru ./pTk/mTk/os2/tkOS2Wm.c ./pTk/mTk/os2.my/tkOS2Wm.c
+--- ./pTk/mTk/os2/tkOS2Wm.c	Sun May 31 14:51:36 1998
++++ ./pTk/mTk/os2.my/tkOS2Wm.c	Fri Oct  9 01:06:18 1998
+@@ -98,7 +98,46 @@ char *clientData;
+  ckfree(p);
+ }
+ 
+-
++ 
++void
++RemoveTaskList(WmInfo *wmPtr)
++{
++    
++    if (wmPtr->exStyle & FCF_TASKLIST) {
++        HSWITCH hSwitch;
++        SWCNTRL switchData;
++	ULONG rc;
++
++        hSwitch = WinQuerySwitchHandle(TkOS2GetHWND(wmPtr->reparent), 0);
++#ifdef DEBUG
++        if (hSwitch == NULLHANDLE) {
++            printf("WinQuerySwitchHandle ERROR %x\n", WinGetLastError(hab));
++        } else {
++            printf("WinQuerySwitchHandle OK:%x\n", hSwitch);
++        }
++#endif
++        rc = WinQuerySwitchEntry(hSwitch, &switchData);
++#ifdef DEBUG
++        if (rc != 0) {
++            printf("WinQuerySwitchEntry ERROR %x\n", WinGetLastError(hab));
++        } else {
++            printf("WinQuerySwitchEntry %x OK\n", hSwitch);
++        }
++#endif
++        /* Set visibility off */
++        switchData.uchVisibility = SWL_INVISIBLE;
++        rc = WinChangeSwitchEntry(hSwitch, &switchData);
++#ifdef DEBUG
++        if (rc != 0) {
++            printf("WinChangeSwitchEntry OFF ERROR %x\n", WinGetLastError(hab));
++        } else {
++            printf("WinChangeSwitchEntry OFF %x OK\n", hSwitch);
++        }
++#endif
++    }
++    
++}
++
+ /*
+  *----------------------------------------------------------------------
+  *
+@@ -355,9 +394,26 @@ TkpGetWrapperWindow(TkWindow *winPtr) {
+ }
+ 
+ void
+-CreateMenubar(Tk_Window menubar, Tk_Window winPtr)
++PreCreateMenubar(Tk_Window menubar, TkWindow * winPtr)
+ {
+-	WmInfo *wmPtr = ((TkWindow*)winPtr)->wmInfoPtr;
++	WmInfo *wmPtr = winPtr->wmInfoPtr;
++	TkWindow *menubarPtr = (TkWindow *) menubar;
++	int ret;
++
++	menubarPtr->wmInfoPtr = wmPtr;
++	Tk_CreateEventHandler(menubar, StructureNotifyMask, MenubarDestroyProc,
++		(ClientData) menubar);
++	Tk_ManageGeometry(menubar, &menubarMgrType, (ClientData) wmPtr);
++	Tk_MoveResizeWindow(menubar, wmPtr->xInParent, 
++			    /* wmPtr->yInParent is for the main subwindow. */
++			    wmPtr->yInParent - wmPtr->menuHeight,
++			    Tk_Width(winPtr), wmPtr->menuHeight);
++}
++
++void
++CreateMenubar(Tk_Window menubar, TkWindow * winPtr)
++{
++	WmInfo *wmPtr = winPtr->wmInfoPtr;
+ 	TkWindow *menubarPtr = (TkWindow *) menubar;
+ 	int ret;
+ 
+@@ -378,15 +434,7 @@ CreateMenubar(Tk_Window menubar, Tk_Wind
+         }
+ #  endif 
+ #endif 
+-	menubarPtr->wmInfoPtr = wmPtr;
+-	Tk_MoveResizeWindow(menubar, wmPtr->xInParent, 
+-			    /* wmPtr->yInParent is for the main subwindow. */
+-			    wmPtr->yInParent - wmPtr->menuHeight,
+-			    Tk_Width(winPtr), wmPtr->menuHeight);
+ 	Tk_MapWindow(menubar);
+-	Tk_CreateEventHandler(menubar, StructureNotifyMask, MenubarDestroyProc,
+-		(ClientData) menubar);
+-	Tk_ManageGeometry(menubar, &menubarMgrType, (ClientData) wmPtr);
+ 	menubarPtr->flags |= TK_REPARENTED;
+ 	wmPtr->flags |= ~WM_MB_NEVER_MAPPED;
+ }
+@@ -618,12 +618,30 @@ TkWmMapWindow(winPtr)
+          */
+ 
+         if (!(wmPtr->sizeHintsFlags & (USPosition | PPosition))) {
+-            x = CW_USEDEFAULT;
+-            y = CW_USEDEFAULT;
+-            wmPtr->style |= FCF_SHELLPOSITION;
++	    extern unsigned long Perl_hab_GET();
++	    SWP swp;
++	    int rc = WinQueryTaskSizePos(Perl_hab_GET(), 0 /* myself */, &swp);
++
++	    if (rc)
++		printf("WinQueryTaskSizePos, rc => %d\n", rc);
++	    else {
++		x = swp.x;
++		y = swp.y;
++		y = yScreen - height - y;
++
++		if (x + width > xScreen)
++		    x = xScreen - width;
++		if (x < 0)
++		    x = 0;
++		if (y + height > yScreen)
++		    y = yScreen - height;
++		if (y < 0)
++		    y = 0;
+ #ifdef DEBUG
+-            printf("Positioning: FCF_SHELLPOSITION\n");
++		printf("Positioning: WinQueryTaskSizePos => %d, %d\n", x, y);
+ #endif
++		
++	    }
+         } else {
+             x = winPtr->changes.x;
+             y = winPtr->changes.y;
+@@ -694,11 +751,14 @@ TkWmMapWindow(winPtr)
+ #endif
+         WinSetWindowPos(child, HWND_TOP, wmPtr->xInParent, yInParent,
+                   winPtr->changes.width, winPtr->changes.height,
+                   SWP_SIZE | SWP_MOVE | SWP_SHOW);
+ 
+ 	/* Now process menubar: */
+-	if (wmPtr->menubar)
++	if (wmPtr->menubar) {
++	    PreCreateMenubar(wmPtr->menubar, winPtr);
+             CreateMenubar(wmPtr->menubar, winPtr);
++	}
++	
+ 
+ 	/*
+ 	 * Generate a reparent event.
+@@ -727,8 +803,11 @@ TkWmMapWindow(winPtr)
+ 	}
+ 	UpdateGeometryInfo((ClientData) winPtr);
+ 
+-        if ((wmPtr->flags & WM_MB_NEVER_MAPPED) && wmPtr->menubar)
++        if ((wmPtr->flags & WM_MB_NEVER_MAPPED) && wmPtr->menubar) {
++	    PreCreateMenubar(wmPtr->menubar, winPtr);
+             CreateMenubar(wmPtr->menubar, winPtr);
++	}
++	
+ 
+ 	/* If applicable, make visible in switch-list */
+         if (wmPtr->exStyle & FCF_TASKLIST) {
+@@ -792,8 +871,8 @@ TkWmMapWindow(winPtr)
+ 	    XUnmapWindow(winPtr->display, winPtr->window);
+ 	}
+     } else if (wmPtr->hints.initial_state == WithdrawnState) {
++	RemoveTaskList(wmPtr);
+ 	return;
+-
+     } else {
+ 	XMapWindow(winPtr->display, winPtr->window);
+ 	wmPtr->flags |= WM_SYNC_PENDING;
+@@ -856,36 +935,7 @@ TkWmUnmapWindow(winPtr)
+ #endif
+ 
+     /* If applicable, remove from task list */
+-    if (wmPtr->exStyle & FCF_TASKLIST) {
+-        HSWITCH hSwitch;
+-        SWCNTRL switchData;
+-        hSwitch = WinQuerySwitchHandle(TkOS2GetHWND(wmPtr->reparent), 0);
+-#ifdef DEBUG
+-        if (hSwitch == NULLHANDLE) {
+-            printf("WinQuerySwitchHandle ERROR %x\n", WinGetLastError(hab));
+-        } else {
+-            printf("WinQuerySwitchHandle OK:%x\n", hSwitch);
+-        }
+-#endif
+-        rc = WinQuerySwitchEntry(hSwitch, &switchData);
+-#ifdef DEBUG
+-        if (rc != 0) {
+-            printf("WinQuerySwitchEntry ERROR %x\n", WinGetLastError(hab));
+-        } else {
+-            printf("WinQuerySwitchEntry %x OK\n", hSwitch);
+-        }
+-#endif
+-        /* Set visibility off */
+-        switchData.uchVisibility = SWL_INVISIBLE;
+-        rc = WinChangeSwitchEntry(hSwitch, &switchData);
+-#ifdef DEBUG
+-        if (rc != 0) {
+-            printf("WinChangeSwitchEntry OFF ERROR %x\n", WinGetLastError(hab));
+-        } else {
+-            printf("WinChangeSwitchEntry OFF %x OK\n", hSwitch);
+-        }
+-#endif
+-    }
++    RemoveTaskList(wmPtr);
+ 
+     wmPtr->flags &= ~WM_SYNC_PENDING;
+     XUnmapWindow(winPtr->display, winPtr->window);
+@@ -2866,14 +2916,19 @@ Tk_GetRootCoords(tkwin, xPtr, yPtr)
+ 	     * y coordinates, then continue with the toplevel (in case
+ 	     * it's embedded).
+ 	     */
+-
++#if 0
+ 	    y -= winPtr->wmInfoPtr->menuHeight;
+ 	    winPtr = winPtr->wmInfoPtr->winPtr;
+ 	    continue;
++#else	/* !( 0 ) */ 
++	    break;
++#endif
+ 	}
+ 	if (winPtr->flags & TK_TOP_LEVEL) {
++#if 0					/* changes.x/y contain root coords */
+ 	    x += winPtr->wmInfoPtr->xInParent;
+ 	    y += winPtr->wmInfoPtr->yInParent;
++#endif
+ 	    break;
+ 	}
+ 	winPtr = winPtr->parentPtr;
+@@ -3382,7 +3437,7 @@ TkOS2WmConfigure(winPtr, pos)
+     WmInfo *wmPtr;
+     int width, height, notify_bar = 0;
+     SWP swp;
+-    ULONG x11y;
++    ULONG x11y, x;
+     ULONG rc;
+ 
+     if (winPtr == NULL) {
+@@ -3495,6 +3550,7 @@ TkOS2WmConfigure(winPtr, pos)
+      * Update the shape of the contained window.
+      */
+ 
++#if 0
+     if (wmPtr->exStyle & FCF_TITLEBAR) {
+         x11y += titleBar;
+ #ifdef DEBUG
+@@ -3502,6 +3558,10 @@ TkOS2WmConfigure(winPtr, pos)
+ #endif
+     }
+     x11y += wmPtr->menuHeight;
++#else
++    x    = pos->x + wmPtr->xInParent;
++    x11y += wmPtr->yInParent;
++#endif
+     
+ #if 0
+     /* Ignore initial activate message: */
+@@ -3511,7 +3571,7 @@ TkOS2WmConfigure(winPtr, pos)
+             || winPtr->changes.width != width
+             || winPtr->changes.height != height)) {
+ #endif
+-        winPtr->changes.x = pos->x;
++        winPtr->changes.x = x;
+         winPtr->changes.y = x11y;
+         winPtr->changes.width = width;
+         winPtr->changes.height = height;
+@@ -3527,6 +3587,8 @@ TkOS2WmConfigure(winPtr, pos)
+ 	    Tk_MoveResizeWindow(wmPtr->menubar, wmPtr->xInParent, 
+ 				wmPtr->yInParent - wmPtr->menuHeight,
+ 				width, wmPtr->menuHeight);
++	    ((TkWindow*)(wmPtr->menubar))->changes.x = x;
++	    ((TkWindow*)(wmPtr->menubar))->changes.y = x11y - wmPtr->menuHeight;
+ #if 0
+ 	    WinSetWindowPos(TkOS2GetHWND(((TkWindow*)wmPtr->menubar)->window), 
+ 			    HWND_TOP, wmPtr->xInParent,
+@@ -3551,7 +3613,7 @@ TkOS2WmConfigure(winPtr, pos)
+     event.xconfigure.window = winPtr->window;
+     event.xconfigure.border_width = winPtr->changes.border_width;
+     event.xconfigure.override_redirect = winPtr->atts.override_redirect;
+-    event.xconfigure.x = pos->x;
++    event.xconfigure.x = x;
+     event.xconfigure.y = x11y;
+     event.xconfigure.width = width;
+     event.xconfigure.height = height;
+@@ -3580,7 +3642,7 @@ TkOS2WmConfigure(winPtr, pos)
+ 	event.xconfigure.window = menubarPtr->window;
+ 	event.xconfigure.border_width = menubarPtr->changes.border_width;
+ 	event.xconfigure.override_redirect = menubarPtr->atts.override_redirect;
+-	event.xconfigure.x = pos->x;
++	event.xconfigure.x = x;
+ 	event.xconfigure.y = x11y - wmPtr->menuHeight;
+ 	event.xconfigure.width = width;
+ 	event.xconfigure.height = wmPtr->menuHeight;
+@@ -4229,15 +4291,23 @@ TkUnixSetMenubar(tkwin, menubar)
+ 	     || (Tk_Screen(menubar) != Tk_Screen(tkwin))) {
+ 	    panic("TkUnixSetMenubar got bad menubar");
+ 	}
++
++	menubarPtr->wmInfoPtr = wmPtr;
++        wmPtr->flags |= WM_CREATE_PENDING|WM_MOVE_PENDING;
++        UpdateGeometryInfo((ClientData)menubarPtr);
++        wmPtr->flags &= ~(WM_CREATE_PENDING|WM_MOVE_PENDING);
++
+ 	wmPtr->menuHeight = Tk_ReqHeight(menubar);
+ 	if (wmPtr->menuHeight <= 1) {
+-	    wmPtr->menuHeight = 20;
++	    wmPtr->menuHeight = 8;	/* A temporary kludge, was needed to see something if logic fails */
+ 	}
+ 	Tk_MakeWindowExist(tkwin);
+ 	Tk_MakeWindowExist(menubar);
+ 
++	
++	PreCreateMenubar(menubar, (TkWindow*)tkwin);
+ 	if (wmPtr->reparent) {
+-	    CreateMenubar(menubar,tkwin);
++	    CreateMenubar(menubar,(TkWindow*)tkwin);
+ 	}
+     }
+     wmPtr->flags |= WM_UPDATE_SIZE_HINTS;

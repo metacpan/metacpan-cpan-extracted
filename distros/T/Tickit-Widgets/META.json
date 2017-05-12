@@ -1,0 +1,152 @@
+{
+   "abstract" : "a collection of Tickit::Widget implementations",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tickit-Widgets",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.33",
+            "Parser::MGC" : "0",
+            "Struct::Dumb" : "0",
+            "Tickit::RenderBuffer" : "0",
+            "Tickit::Utils" : "0.29",
+            "Tickit::Window" : "0.57",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Tickit::ContainerWidget" : {
+         "file" : "lib/Tickit/ContainerWidget.pm",
+         "version" : "0.52"
+      },
+      "Tickit::OneLineWidget" : {
+         "file" : "lib/Tickit/OneLineWidget.pm",
+         "version" : "0.51"
+      },
+      "Tickit::SingleChildWidget" : {
+         "file" : "lib/Tickit/SingleChildWidget.pm",
+         "version" : "0.51"
+      },
+      "Tickit::Style" : {
+         "file" : "lib/Tickit/Style.pm",
+         "version" : "0.51"
+      },
+      "Tickit::Style::Parser" : {
+         "file" : "lib/Tickit/Style/Parser.pm",
+         "version" : "0.51"
+      },
+      "Tickit::Widget" : {
+         "file" : "lib/Tickit/Widget.pm",
+         "version" : "0.52"
+      },
+      "Tickit::Widget::Border" : {
+         "file" : "lib/Tickit/Widget/Border.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::Box" : {
+         "file" : "lib/Tickit/Widget/Box.pm",
+         "version" : "0.52"
+      },
+      "Tickit::Widget::Button" : {
+         "file" : "lib/Tickit/Widget/Button.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::CheckButton" : {
+         "file" : "lib/Tickit/Widget/CheckButton.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::Entry" : {
+         "file" : "lib/Tickit/Widget/Entry.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::Fill" : {
+         "file" : "lib/Tickit/Widget/Fill.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::Frame" : {
+         "file" : "lib/Tickit/Widget/Frame.pm",
+         "version" : "0.31"
+      },
+      "Tickit::Widget::GridBox" : {
+         "file" : "lib/Tickit/Widget/GridBox.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::HBox" : {
+         "file" : "lib/Tickit/Widget/HBox.pm",
+         "version" : "0.47"
+      },
+      "Tickit::Widget::HSplit" : {
+         "file" : "lib/Tickit/Widget/HSplit.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::LinearBox" : {
+         "file" : "lib/Tickit/Widget/LinearBox.pm",
+         "version" : "0.46"
+      },
+      "Tickit::Widget::LinearSplit" : {
+         "file" : "lib/Tickit/Widget/LinearSplit.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::Placegrid" : {
+         "file" : "lib/Tickit/Widget/Placegrid.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::RadioButton" : {
+         "file" : "lib/Tickit/Widget/RadioButton.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::Spinner" : {
+         "file" : "lib/Tickit/Widget/Spinner.pm",
+         "version" : "0.27"
+      },
+      "Tickit::Widget::Static" : {
+         "file" : "lib/Tickit/Widget/Static.pm",
+         "version" : "0.51"
+      },
+      "Tickit::Widget::VBox" : {
+         "file" : "lib/Tickit/Widget/VBox.pm",
+         "version" : "0.47"
+      },
+      "Tickit::Widget::VSplit" : {
+         "file" : "lib/Tickit/Widget/VSplit.pm",
+         "version" : "0.27"
+      },
+      "Tickit::WidgetRole" : {
+         "file" : "lib/Tickit/WidgetRole.pm",
+         "version" : "0.51"
+      },
+      "Tickit::WidgetRole::Alignable" : {
+         "file" : "lib/Tickit/WidgetRole/Alignable.pm",
+         "version" : "0.51"
+      },
+      "Tickit::Widgets" : {
+         "file" : "lib/Tickit/Widgets.pm",
+         "version" : "0.27"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.27",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

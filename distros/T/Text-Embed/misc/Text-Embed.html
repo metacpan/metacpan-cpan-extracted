@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Text::Embed - Cleanly seperate unwieldy text from your source code</title>
+<link rev="made" href="mailto:root@midas.slackware.lan" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#general_usage_">General Usage:</a></li>
+		<li><a href="#custom_usage_">Custom Usage:</a></li>
+		<ul>
+
+			<li><a href="#stage_1__parsing">Stage 1: Parsing</a></li>
+			<li><a href="#stage_2__processing">Stage 2: Processing</a></li>
+			<li><a href="#an_example_callback_chain">An Example Callback chain</a></li>
+			<li><a href="#utility_functions">Utility Functions</a></li>
+			<li><a href="#commenting">Commenting</a></li>
+			<li><a href="#templating">Templating</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#bugs___caveats">BUGS &amp; CAVEATS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>Text::Embed - Cleanly seperate unwieldy text from your source code</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Text::Embed
+    use Text::Embed CODE|REGEX|SCALAR
+    use Text::Embed CODE|REGEX|SCALAR, LIST</pre>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<p>Code often requires chunks of text to operate - chunks not large enough 
+to warrant extra file dependencies, but enough to make using quotes and 
+heredocs' ugly.</p>
+<p>A typical example might be code generators. The text itself is code, 
+and as such is difficult to differentiate and maintain when it is 
+embedded inside more code. Similarly, CGI scripts often include 
+embedded HTML or SQL templates.</p>
+<p><strong>Text::Embed</strong> provides the programmer with a flexible way to store 
+these portions of text in their namespace's __DATA__ handle - <em>away 
+from the logic</em> - and access them through the package variable <strong>%DATA</strong>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>
+</p>
+<h2><a name="general_usage_">General Usage:</a></h2>
+<p>The general usage is expected to be suitable for a majority of cases:</p>
+<pre>
+    use Text::Embed;</pre>
+<pre>
+    foreach(keys %DATA)
+    {
+        print &quot;$_ = $DATA{$_}\n&quot;;
+    }</pre>
+<pre>
+    print $DATA{foo};</pre>
+<pre>
+    __DATA__
+    
+    __foo__</pre>
+<pre>
+    yadda yadda yadda...</pre>
+<pre>
+    __bar__</pre>
+<pre>
+    ee-aye ee-aye oh</pre>
+<pre>
+    __baz__
+    
+    woof woof</pre>
+<p>
+</p>
+<h2><a name="custom_usage_">Custom Usage:</a></h2>
+<p>There are two stages to <strong>Text::Embed</strong>'s execution - corresponding to the 
+first and remaining arguments in its invocation.</p>
+<pre>
+    use Text::Embed ( 
+        sub{ ... },  # parse key/values from DATA 
+        sub{ ... },  # process pairs
+        ...          # process pairs
+    );</pre>
+<pre>
+    ...</pre>
+<pre>
+    __DATA__</pre>
+<pre>
+    ...</pre>
+<p>
+</p>
+<h3><a name="stage_1__parsing">Stage 1: Parsing</a></h3>
+<p>By default, <strong>Text::Embed</strong> uses similar syntax to the __DATA__ token to 
+seperate segments - a line consisting of two underscores surrounding an
+identifier. Of course, a suitable syntax depends on the text being embedded.</p>
+<p>A REGEX or CODE reference can be passed as the first argument - in order 
+to gain finer control of how __DATA__ is parsed:</p>
+<dl>
+<dt><strong><a name="item_regex">REGEX</a></strong><br />
+</dt>
+<dd>
+<pre>
+    use Text::Embed qr(&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;(\w*?)&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;);</pre>
+</dd>
+<dd>
+<p>A regular expression will be used in a call to <code>split()</code>. Any 
+leading or trailing empty strings will be removed automatically.</p>
+</dd>
+<dt><strong><a name="item_code">CODE</a></strong><br />
+</dt>
+<dd>
+<pre>
+    use Text::Embed sub{$_ = shift; ...}
+    use Text::Embed &amp;Some::Other::Function;</pre>
+</dd>
+<dd>
+<p>A subroutine will be passed a reference to the __DATA__ <em>string</em>. 
+It should return a LIST of key-value pairs.</p>
+</dd>
+</dl>
+<p>In the name of laziness, <strong>Text::Embed</strong> provides a couple of 
+predefined formats:</p>
+<dl>
+<dt><strong><a name="item__3adefault">:default</a></strong><br />
+</dt>
+<dd>
+Line-oriented __DATA__ like format:
+</dd>
+<dd>
+<pre>
+    __BAZ__ 
+    baz baz baz
+    __FOO__
+    foo foo foo
+    foo foo foo</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item__3adefine">:define</a></strong><br />
+</dt>
+<dd>
+CPP-like format (%DATA is readonly - can be used to define constants):
+</dd>
+<dd>
+<pre>
+    #define BAZ     baz baz baz
+    #define FOO     foo foo foo
+                    foo foo foo</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item__3acdata">:cdata</a></strong><br />
+</dt>
+<dd>
+Line-agnostic CDATA-like format. Anything outside of tags is ignored.
+</dd>
+<dd>
+<pre>
+    &lt;![BAZ[baz baz baz]]&gt;
+    &lt;![FOO[
+        foo foo foo
+        foo foo foo
+    ]]&gt;</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h3><a name="stage_2__processing">Stage 2: Processing</a></h3>
+<p>After parsing, each key-value pair can be further processed by an arbitrary
+number of callbacks.</p>
+<p>A common usage of this might be controlling how whitespace is represented 
+in each segment. <strong>Text::Embed</strong> provides some likely defaults which operate
+on the hash values only.</p>
+<dl>
+<dt><strong><a name="item__3atrim">:trim</a></strong><br />
+</dt>
+<dd>
+Removes trailing or leading whitespace
+</dd>
+<p></p>
+<dt><strong><a name="item__3acompress">:compress</a></strong><br />
+</dt>
+<dd>
+Substitutes zero or more whitspace with a single &lt;SPACE&gt;
+</dd>
+<p></p>
+<dt><strong><a name="item__3ablock_2dindent">:block-indent</a></strong><br />
+</dt>
+<dd>
+Removes trailing or leading blank lines, preserves all indentation
+</dd>
+<p></p>
+<dt><strong><a name="item__3ablock_2dnoindent">:block-noindent</a></strong><br />
+</dt>
+<dd>
+Removes trailing or leading blank lines, preserves unique indentation
+</dd>
+<p></p>
+<dt><strong><a name="item__3araw">:raw</a></strong><br />
+</dt>
+<dd>
+Leave untouched
+</dd>
+<p></p>
+<dt><strong>:default</strong><br />
+</dt>
+<dd>
+Same as <strong>:raw</strong>
+</dd>
+<p></p></dl>
+<p>If you need more control, CODE references or named subroutines can be 
+invoked as necessary. At this point it is safe to rename or modify keys. 
+Undefining a key removes the entry from <strong>%DATA</strong>.</p>
+<p>
+</p>
+<h3><a name="an_example_callback_chain">An Example Callback chain</a></h3>
+<p>For the sake of brevity, consider a module that has some embedded SQL. 
+We can implement a processing callback that will prepare each statement, 
+leaving <strong>%DATA</strong> full of ready to execute DBI statement handlers:</p>
+<pre>
+    package Whatever;</pre>
+<pre>
+    use DBI;
+    use Text::Embed(':default', ':trim', 'prepare_sql');</pre>
+<pre>
+    my $dbh;</pre>
+<pre>
+    sub prepare_sql
+    {
+        my ($k, $v) = @_;
+        if(!$dbh)
+        {
+            $dbh = DBI-&gt;connect(...);
+        }
+        $$v = $dbh-&gt;prepare($$v);
+    }</pre>
+<pre>
+    sub get_widget
+    {
+        my $id  = shift;
+        my $sql = $DATA{select_widget};</pre>
+<pre>
+        $sql-&gt;execute($id);
+    
+        if($sql-&gt;rows)
+        {
+            ...          
+        }
+    }</pre>
+<pre>
+    __DATA__
+    
+    __select_widget__
+        SELECT * FROM widgets WHERE widget_id = ?;</pre>
+<pre>
+    __create_widget__
+        INSERT INTO widgets (widget_id,desc, price) VALUES (?,?,?);</pre>
+<pre>
+    ..etc</pre>
+<p>Notice that each pair is <em>passed by reference</em>.</p>
+<p>
+</p>
+<h3><a name="utility_functions">Utility Functions</a></h3>
+<p>Several utility functions are available to aid implementing custom 
+processing handlers. These are not exported into the callers namespace.</p>
+<p>The first are equivalent to the default processing options:</p>
+<dl>
+<dt><strong><a name="item_text_3a_3aembed_3a_3atrim_scalarref">Text::Embed::trim SCALARREF</a></strong><br />
+</dt>
+<dd>
+<pre>
+    use Text::Embed(':default',':trim');
+    use Text::Embed(':default', sub {Text::Embed::trim($_[1]);} );</pre>
+</dd>
+<dt><strong><a name="item_text_3a_3aembed_3a_3acompress_scalarref">Text::Embed::compress SCALARREF</a></strong><br />
+</dt>
+<dd>
+<pre>
+    use Text::Embed(':default',':compress');
+    use Text::Embed(':default', sub {Text::Embed::compress($_[1]);} );</pre>
+</dd>
+<dt><strong><a name="item_text_3a_3aembed_3a_3ablock_scalarref_boolean">Text::Embed::block SCALARREF BOOLEAN</a></strong><br />
+</dt>
+<dd>
+<pre>
+    use Text::Embed(':default',':block-indent');
+    use Text::Embed(':default', sub {Text::Embed::block($_[1]);} );</pre>
+</dd>
+<dd>
+<p>If a true value is passed as the second argument, then shared
+indentation is removed, ie <strong>:block-noindent</strong>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h3><a name="commenting">Commenting</a></h3>
+<p>If comments would make your segments easier to manage, <strong>Text::Embed</strong> 
+provides defaults handlers for stripping common comment syntax - 
+<strong>:strip-perl</strong>, <strong>:strip-c</strong>, <strong>:strip-cpp</strong>, <strong>:strip-xml</strong>.</p>
+<dl>
+<dt><strong><a name="item_text_3a_3aembed_3a_3astrip_scalarref__5bregex_5d__">Text::Embed::strip SCALARREF [REGEX] [REGEX]</a></strong><br />
+</dt>
+<dd>
+<pre>
+    use Text::Embed(':default',':strip-c');
+    use Text::Embed(':default', sub {Text::Embed::strip($_[1], '/\*', '\*/');} );</pre>
+</dd>
+<dd>
+<p>Strips all sequences between second and third arguments. The default 
+arguments are '#' and '\n' respectively.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h3><a name="templating">Templating</a></h3>
+<p>Typically, embedded text may well be some kind of template. Text::Embed 
+provides rudimentary variable interpolation for simple templates.
+The default variable syntax is of the form <code>$(foo)</code>:</p>
+<dl>
+<dt><strong><a name="item_text_3a_3aembed_3a_3ainterpolate_scalarref_hashref">Text::Embed::interpolate SCALARREF HASHREF [REGEX]</a></strong><br />
+</dt>
+<dd>
+<pre>
+    my $tmpl = &quot;Hello $(name)! Your age is $(age)\n&quot;;
+    my %vars = (name =&gt; 'World', age =&gt; 4.5 * (10 ** 9));
+    
+    Text::Embed::interpolate(\$tmpl, \%vars);
+    print $tmpl;</pre>
+</dd>
+<dd>
+<p>Any interpolation is done via a simple substitution. An additional 
+regex argument should accomodate this appropriately, by capturing 
+the necessary hashkey in <code>$1</code>:</p>
+</dd>
+<dd>
+<pre>
+    Text::Embed::interpolate(\$tmpl, \%vars, '&lt;%(\S+)%&gt;');</pre>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="bugs___caveats">BUGS &amp; CAVEATS</a></h1>
+<p>The most likely bugs related to using this module should manifest 
+themselves as <code>bad key/value</code> error messages. There are two related 
+causes:</p>
+<dl>
+<dt><strong><a name="item_comments">COMMENTS</a></strong><br />
+</dt>
+<dd>
+It is important to realise that <strong>Text::Embed</strong> does <em>not</em> have its own 
+comment syntax or preprocessor. Any parser that works using <code>split()</code> is 
+likely to fail if comments precede the first segment. <em>Comments should 
+exist in the body of a segment - not preceding it</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item_custom_parsing">CUSTOM PARSING</a></strong><br />
+</dt>
+<dd>
+If you are defining your own REGEX parser, make sure you understand 
+how it works when used with <code>split()</code> - particularly if your syntax 
+wraps your data. Consider using a subroutine for anything non-trivial.
+</dd>
+<p></p></dl>
+<p>If you employ REGEX parsers, use seperators that are <em>significantly</em> 
+different - and well spaced - from your data, rather than relying on
+complicated regular expressions to escape pathological cases.</p>
+<p>Bug reports and suggestions are most welcome.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Copyright (C) 2005 Chris McEwan - All rights reserved.</p>
+<p>Chris McEwan &lt;<a href="mailto:mcewan@cpan.org">mcewan@cpan.org</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This program is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

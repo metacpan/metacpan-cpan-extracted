@@ -1,0 +1,57 @@
+#!/usr/local/bin/perl
+use Tk;
+use Tk::Gauge;
+use strict;
+use warnings;
+
+my $mw = MainWindow->new;
+
+my( $hour, $minute );
+
+my $clock = $mw->Gauge(
+    -background           => 'bisque',
+    -extent               => -359.9, # 360 loses outline
+    -fill                 => 'red',
+    -from                 => 0,
+    -hubcolor             => 'gray',
+    -huboutline           => 'black',
+    -majortickcolor       => 'bisque',
+    -majortickinterval    => 5,
+    -majorticklabelcolor  => 'bisque',
+    -majorticklabelformat => '%02d',
+    -majorticklabelscale  => 24 / 120,
+    -majorticklabelskip   => [ 120 ],
+    -majorticklength      => 15,
+    -majortickthickness   => 3,
+    -margin               => 65,
+    -minortickinterval    => 2,
+    -minorticklength      => 7,
+    -needles              => [
+		              {
+		                  -radius   => 120,
+		                  -variable => \$minute,
+                                  -width    => 2,
+		              },
+		              {
+                                  -color    => 'bisque',                        
+		                  -radius   => 80,
+		                  -variable => \$hour,
+		              },
+		             ] ,
+    -needlepad            => 10,
+    -start                => 90,
+    -to                   => 120,
+)->pack;
+
+# Add the minute ticks and their labels.
+
+my( $center_x, $center_y ) = $clock->centerpoint;
+my $radius = $clock->maxradius;
+foreach ( 1 .. 12 ) {
+    my( $x, $y ) = $clock->radialpoint( 120 / 12 * $_, $radius + 20 );
+    $clock->createText( $x, $y, -text => $_ * 5 );
+}
+
+$mw->after(200 => sub {$hour = 1.2 * 5; $minute = 11 * 2; } );
+
+MainLoop;

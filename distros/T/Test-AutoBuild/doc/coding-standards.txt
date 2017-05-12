@@ -1,0 +1,56 @@
+ Test-AutoBuild Coding Standards
+ ===============================
+
+The following outlines some rules (compulsory) & guidelines (recommended)
+for code in Test-AutoBuild.
+
+Rules
+-----
+
+The following points are mandatory for all new code:
+
+ * 'use warnings' in every file
+
+ * 'use strict' in every file
+
+ * Debugging & logging goes to Log::Log4perl with a category
+   matching the module name
+
+    my $log = Log::Log4perl->get_logger();
+    $log->debug("Some thing");
+
+ * 100% POD coverage of methods defined in modules
+
+ * At least 50% code coverage by Devel::Cover
+
+ * Use 'die' instead of 'confess' - auto-build.pl hooks confess
+   into the die handler automatically.
+
+ * All code must be OS portable - ie use File::Spec::Functions rather
+   than hardcoding '/'
+
+ * The end user should not be aware of the fact that Test-AutoBuild is
+   written in Perl. ie
+     - Don't display Perl stack traces
+     - Don't have print / warn strings containing raw hash refs
+     - Don't require knowledge of perl to configure the system
+
+Guidelines
+----------
+
+The following points are recommended best practice for all code:
+
+ * Use Class::MethodMaker for creating 'new' method
+
+    use Class::MethodMaker
+      new_with_init => 'new';
+
+ * Use Class::MethodMaker for creating simple getters & setters
+
+    use Class::MethodMaker
+      get_set => [qw( name label start_time end_time )];
+
+ * 85% code coverage by Devel::Cover (assuming its feasible)
+
+-- End
+

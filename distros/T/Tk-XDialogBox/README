@@ -1,0 +1,23 @@
+Tk::XDialogBox
+============================
+
+Patched Version from Tk::DialogBox with new Features.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+All rights reserved by B<Rajappa Iyer> rsi@earthling.net
+This code is distributed under the same terms as Perl.
+
+Changes Frank (xpix) Herrmann
+
+ 

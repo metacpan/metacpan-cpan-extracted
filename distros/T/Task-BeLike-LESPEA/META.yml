@@ -1,0 +1,566 @@
+---
+abstract: 'Modules that LESPEA uses on a daily basis'
+author:
+  - 'Adam Lesperance <lespea@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::More: '0.88'
+  perl: '5.008'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-LESPEA
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - utils
+    - share
+    - example
+    - examples
+  file:
+    - README.html
+requires:
+  Any::Moose: '0.000000'
+  AnyEvent: '0.000000'
+  Async::Interrupt: '0.000000'
+  Coro: '0.000000'
+  DBD::CSV: '0.000000'
+  DBI: '0.000000'
+  Data::Dumper::Perltidy: '0.000000'
+  Data::Printer: '0.000000'
+  Date::Calc: '0.000000'
+  Date::Manip: '0.000000'
+  DateTime: '0.000000'
+  DateTime::Format::DB2: '0.000000'
+  DateTime::Format::DBI: '0.000000'
+  DateTime::Format::DateManip: '0.000000'
+  DateTime::Format::DateParse: '0.000000'
+  DateTime::Format::Duration: '0.000000'
+  DateTime::Format::Duration::DurationString: '0.000000'
+  DateTime::Format::Duration::XSD: '0.000000'
+  DateTime::Format::Epoch: '0.000000'
+  DateTime::Format::Epoch::ActiveDirectory: '0.000000'
+  DateTime::Format::Epoch::MacOS: '0.000000'
+  DateTime::Format::Epoch::Unix: '0.000000'
+  DateTime::Format::Excel: '0.000000'
+  DateTime::Format::Flexible: '0.000000'
+  DateTime::Format::HTTP: '0.000000'
+  DateTime::Format::Human: '0.000000'
+  DateTime::Format::Human::Duration: '0.000000'
+  DateTime::Format::ISO8601: '0.000000'
+  DateTime::Format::MSSQL: '0.000000'
+  DateTime::Format::MySQL: '0.000000'
+  DateTime::Format::Natural: '0.000000'
+  DateTime::Format::Natural::Calc: '0.000000'
+  DateTime::Format::Natural::Compat: '0.000000'
+  DateTime::Format::Natural::Duration: '0.000000'
+  DateTime::Format::Natural::Duration::Checks: '0.000000'
+  DateTime::Format::Natural::Expand: '0.000000'
+  DateTime::Format::Natural::Extract: '0.000000'
+  DateTime::Format::Natural::Formatted: '0.000000'
+  DateTime::Format::Natural::Helpers: '0.000000'
+  DateTime::Format::Natural::Lang::Base: '0.000000'
+  DateTime::Format::Natural::Lang::EN: '0.000000'
+  DateTime::Format::Natural::Rewrite: '0.000000'
+  DateTime::Format::Natural::Test: '0.000000'
+  DateTime::Format::Natural::Utils: '0.000000'
+  DateTime::Format::Natural::Wrappers: '0.000000'
+  DateTime::Format::Oracle: '0.000000'
+  DateTime::Format::Pg: '0.000000'
+  DateTime::Format::RFC3339: '0.000000'
+  DateTime::Format::RFC3501: '0.000000'
+  DateTime::Format::RSS: '0.000000'
+  DateTime::Format::Roman: '0.000000'
+  DateTime::Format::SQLite: '0.000000'
+  DateTime::Format::Strptime: '0.000000'
+  DateTime::Format::Sybase: '0.000000'
+  DateTime::Format::WindowsFileTime: '0.000000'
+  DateTime::Format::XSD: '0.000000'
+  Devel::Cover: '0.000000'
+  Devel::NYTProf: '0.000000'
+  Devel::REPL: '0.000000'
+  Devel::REPL::Plugin::DataPrinter: '0.000000'
+  Dist::Zilla: '0.000000'
+  Dist::Zilla::App::Command::cover: '0.000000'
+  Dist::Zilla::App::Command::perltidy: '0.000000'
+  Dist::Zilla::App::Command::shell: '0.000000'
+  Dist::Zilla::PluginBundle::Author::LESPEA: '1.005001'
+  Dist::Zilla::Shell: '0.000000'
+  EV: '0.000000'
+  Encode: '0.000000'
+  Event: '0.000000'
+  Excel::Writer::XLSX: '0.000000'
+  Exporter::Easy: '0.000000'
+  File::HomeDir: '0.000000'
+  File::Next: '0.000000'
+  File::ShareDir: '0.000000'
+  File::Slurp: '0.000000'
+  Getopt::Long::Descriptive: '0.000000'
+  Guard: '0.000000'
+  HTML::Entities: '0.000000'
+  HTML::Tree: '0.000000'
+  HTML::TreeBuilder::XPath: '0.000000'
+  IO::Scalar: '0.000000'
+  JSON: '0.000000'
+  JSON::Any: '0.000000'
+  JSON::XS: '0.000000'
+  LWP: '0.000000'
+  LWP::Protocol::https: '0.000000'
+  List::AllUtils: '0.000000'
+  List::Gen: '0.000000'
+  List::MoreUtils: '0.000000'
+  Locale::US: '0.000000'
+  Math::Big: '0.000000'
+  Math::Big::Factors: '0.000000'
+  Modern::Perl: '1.201205'
+  Module::Build: '0.3601'
+  Module::Install: '0.000000'
+  Module::Install::AuthorTests: '0.000000'
+  Module::Install::ExtraTests: '0.000000'
+  Module::Refresh: '0.000000'
+  Module::Reload: '0.000000'
+  Moose: '0.000000'
+  Moose::Meta::Attribute::Native: '0.000000'
+  MooseX::Aliases: '0.000000'
+  MooseX::App: '0.000000'
+  MooseX::App::Cmd: '0.000000'
+  MooseX::Log::Log4perl: '0.000000'
+  MooseX::Method::Signatures: '0.000000'
+  MooseX::Singleton: '0.000000'
+  MooseX::StrictConstructor: '0.000000'
+  MooseX::Types: '0.000000'
+  MooseX::Types::Common: '0.000000'
+  MooseX::Types::Common::Numeric: '0.000000'
+  MooseX::Types::Common::String: '0.000000'
+  MooseX::Types::DateTime::ButMaintained: '0.000000'
+  MooseX::Types::Email: '0.000000'
+  MooseX::Types::IPv4: '0.000000'
+  MooseX::Types::JSON: '0.000000'
+  MooseX::Types::NetAddr::IP: '0.000000'
+  MooseX::Types::PortNumber: '0.000000'
+  MooseX::Types::Structured: '0.000000'
+  MooseX::Types::URI: '0.000000'
+  MooseX::Types::UUID: '0.000000'
+  MouseX::Types: '0.000000'
+  Net::CIDR::Lite: '0.000000'
+  Net::DNS: '0.000000'
+  Net::IP: '0.000000'
+  Net::Netmask: '0.000000'
+  Net::Ping: '0.000000'
+  NetAddr::MAC: '0.000000'
+  PPI::HTML: '0.000000'
+  Perl::Critic: '0.000000'
+  Perl::Tidy: '0.000000'
+  Readonly::XS: '0.000000'
+  Regexp::Common: '0.000000'
+  Scalar::Util: '0.000000'
+  Spreadsheet::ParseExcel: '0.000000'
+  Spreadsheet::WriteExcel: '0.000000'
+  Spreadsheet::XLSX: '0.000000'
+  Task::Weaken: '0.000000'
+  Template: '0.000000'
+  Test::Fatal: '0.000000'
+  Test::File: '0.000000'
+  Test::LeakTrace: '0.000000'
+  Test::Memory::Cycle: '0.000000'
+  Test::Most: '0.000000'
+  Test::Output: '0.000000'
+  Test::Perl::Critic: '0.000000'
+  Test::Pod: '0.000000'
+  Test::Pod::Coverage: '0.000000'
+  Test::Taint: '0.000000'
+  Text::CSV_XS: '0.000000'
+  Text::Trim: '0.000000'
+  Try::Tiny: '0.000000'
+  WWW::Mechanize: '0.000000'
+  XML::LibXML: '0.000000'
+  XML::SAX: '0.000000'
+  XML::Simple: '0.000000'
+  XML::Twig: '0.000000'
+  YAML: '0.000000'
+  YAML::Any: '0.000000'
+  YAML::Syck: '0.000000'
+  YAML::XS: '0.000000'
+  autodie: '0.000000'
+  autovivification: '0.000000'
+  namespace::autoclean: '0.000000'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-LESPEA
+  homepage: http://search.cpan.org/dist/Task-BeLike-LESPEA
+  repository: git://github.com/lespea/task-belike-lespea.git
+version: '2.005000'
+x_Dist_Zilla:
+  perl:
+    version: '5.018002'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Author::LESPEA/@Filter/GatherDir'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: '@Author::LESPEA/@Filter/CopyFilesFromBuild'
+      version: '0.103510'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::LESPEA/@Filter/UploadToCPAN'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::ArchiveRelease
+      name: '@Author::LESPEA/@Filter/ArchiveRelease'
+      version: '4.00'
+    -
+      class: Dist::Zilla::Plugin::AutoMetaResources
+      name: '@Author::LESPEA/@Filter/AutoMetaResources'
+      version: '1.20'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Author::LESPEA/@Filter/Authority'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@Author::LESPEA/@Filter/Test::Synopsis'
+      version: '2.000004'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Author::LESPEA/@Filter/PkgVersion'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Author::LESPEA/Name'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Author::LESPEA/Version'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::LESPEA/prelude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: EXPORTS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: OPTIONS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: CONSTANTS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Author::LESPEA/Leftovers'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::LESPEA/postlude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::SeeAlso
+              name: '@Author::LESPEA/SeeAlso'
+              version: '1.002'
+            -
+              class: Pod::Weaver::Section::Installation
+              name: '@Author::LESPEA/Installation'
+              version: '1.101421'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Author::LESPEA/Authors'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Support
+              name: '@Author::LESPEA/Support'
+              version: '1.005'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Author::LESPEA/Legal'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::WarrantyDisclaimer
+              name: '@Author::LESPEA/WarrantyDisclaimer'
+              version: '0.121290'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@Author::LESPEA/-Transformer'
+              version: '4.006'
+      name: '@Author::LESPEA/@Filter/PodWeaver'
+      version: '4.005'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::LESPEA/@Filter/NextRelease'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@Author::LESPEA/@Filter/MinimumPerl'
+      version: '1.003'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::LESPEA/@Filter/AutoPrereqs'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::LESPEA/@Filter/MetaConfig'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Author::LESPEA/@Filter/Test::Compile'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::ConsistentVersionTest
+      name: '@Author::LESPEA/@Filter/ConsistentVersionTest'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@Author::LESPEA/@Filter/Test::Perl::Critic'
+      version: '2.112410'
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@Author::LESPEA/@Filter/Test::DistManifest'
+      version: '2.000004'
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: '@Author::LESPEA/@Filter/HasVersionTests'
+      version: '1.101420'
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@Author::LESPEA/@Filter/MetaTests'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@Author::LESPEA/@Filter/Test::MinimumVersion'
+      version: '2.000005'
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Author::LESPEA/@Filter/NoTabsTests'
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Author::LESPEA/@Filter/PodCoverageTests'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::LESPEA/@Filter/PodSyntaxTests'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@Author::LESPEA/@Filter/Test::Portability'
+      version: '2.000005'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: '@Author::LESPEA/@Filter/Test::CPAN::Changes'
+      version: '0.008'
+    -
+      class: Dist::Zilla::Plugin::SpellingCommonMistakesTests
+      name: '@Author::LESPEA/@Filter/SpellingCommonMistakesTests'
+      version: '1.001000'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Author::LESPEA/@Filter/ExtraTests'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::LESPEA/@Filter/PruneCruft'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::LESPEA/@Filter/ManifestSkip'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::LESPEA/@Filter/ExecDir'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::LESPEA/@Filter/ShareDir'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: '@Author::LESPEA/@Filter/ReportVersions::Tiny'
+      version: '1.10'
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: '@Author::LESPEA/@Filter/ModuleBuild'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Author::LESPEA/@Filter/MakeMaker'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::DualBuilders
+      name: '@Author::LESPEA/@Filter/DualBuilders'
+      version: '1.001'
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Author::LESPEA/@Filter/MetaNoIndex'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::LESPEA/@Filter/License'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: '@Author::LESPEA/@Filter/InstallGuide'
+      version: '1.200002'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::LESPEA/@Filter/MetaJSON'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::LESPEA/@Filter/MetaYAML'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::LESPEA/@Filter/html.build'
+      version: '0.133360'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::LESPEA/@Filter/text.build'
+      version: '0.133360'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::LESPEA/@Filter/pod.root'
+      version: '0.133360'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::LESPEA/@Filter/Manifest'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::LESPEA/@Filter/TestRelease'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::LESPEA/@Filter/ConfirmRelease'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: Git::Check
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: Commit_Changes
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: Git::Tag
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: Git::Push
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.013'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.013'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.013'
+x_authority: cpan:LESPEA

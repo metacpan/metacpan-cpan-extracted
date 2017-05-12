@@ -1,0 +1,130 @@
+1.6.5   April 21 2015
+
+-   Changes to make installation work better, address 
+    https://rt.cpan.org/Public/Bug/Display.html?id=54816
+
+1.6.3   August 9 2012
+
+-   Fixed bug in "Build.PL" regarding "podselect," updated Build.PL reqs
+
+1.6.2   August 9 2012
+
+-   Made output of "tablify -v" prettier using Text::Autoformat
+
+1.6.1   April 30 2013
+
+-   Removed a debug statement
+-   Fixed INSTALL
+
+1.6.0   April 30 2013
+
+-   Moved to Git repo at github.com:kyclark/text-recordparser.git
+-   Changes to "tablify"
+    - Allow for comment lines 
+    - Added more single-letter argument names
+    - Allow for definition of column names
+
+1.5.0   July 21 2010
+
+-   Some small changeds to be more defensive about non-existent fields
+
+1.4.0   February 18 2010
+
+-   Not sure, but I made a release here
+
+1.3.0   April 20 2009
+
+-   Guess record separator based on file extension
+-   Automatically escape single quotes in incoming text for parse_line 
+    (resolves RT #34844)
+-   Added "strip-quotes" to tablify (related to RT #40664)
+-   Now more conservative on trimming whitespace from individual 
+    fields rather than the whole line (resolves RT #38871)
+-   Added Text::RecordParser::Object (resolves RT #38338)
+-   Added tab2graph
+
+1.2.1   March 6 2006
+
+-   Fixed bug in "tablify" that didn't checked definedness of value 
+    when printing vertically, added tests and documentation on 
+    vertical display
+
+1.1.1   February 21 2006
+
+-   Fixed RT bug #17787 submitted by Carl Franks on failed test on Win32
+-   Fixed RT bug #17788 submitted by Carl Franks on failed test when
+    prereq Text::TabularDisplay is not installed
+-   Fixed off-by-one bug in "--limit" option for "tablify", added test
+
+1.1.0   February 17 2006
+
+-   Automatically strip backslash-escaped single quotes (because quotes
+    *must* be escaped to parse)
+-   Added code to "tablify" to display records vertically
+
+1.0.1   February 8 2006
+
+-   Fixed a bug in Build.PL that failed to install scripts
+
+1.0.0   December 9 2005
+
+-   Fixed bug in "extract" that caused infinite loops when called in 
+    a loop context (Sharon Wei)
+-   Added convenience args to "new" ("fs" for "field_separator", 
+    "rs" for "record_separator")
+-   Added Text::RecordParser::Tab (convenience class for tab files)
+-   Added back in test for scripts as Text::TabularDisplay 1.21 fixes
+    earlier bug causing tests to fail
+-   Coverted to Module::Build
+-   Now with more test coverage!
+
+0.09    August 2 2005
+
+-   Just one arg to "new" means a filename
+-   Removed tests that break with bad version of Text::TabularDisplay
+
+0.08    November 16 2004
+
+-   Added "tabmerge" script
+-   Fixed bug in "no-headers" parsing that reordered fields
+
+0.07    September 3 2004
+
+-   Bug fixes to whitespace parsing
+
+0.06    April 6 2004
+
+-   Added ability to split on whitespace by adding support for regexes 
+    as the "field_separator"
+-   Added "trim" method to automatically removed leading and trailing
+    whitespace from fields (to better support parsing of 
+    whitespace-separated data)
+-   Improved test suites to run outside of traditional "make test"
+-   Added "tablify" script
+
+0.05    December 16 2003
+
+-   Added "quotemeta" to field separator argument to "parse_line" to fix
+    error reported by Olaf Weinert
+
+0.04    November 5 2003
+
+-   Added "comment" method to identify lines which should be skipped
+    as comments
+-   Altered "fetchrow_array" to croak if it reads a line but can't parse
+    it into fields, also changed to skip empty lines automatically
+
+0.03    June 27 2003
+
+-   Cleaned up "extract" a bit
+-   Allow "new" to accept a single argument and treat as "filename"
+
+0.02    May 6 2003
+
+-   Added "data" method to allow reading of data from a scalar
+-   Allow "fetchall_hashref" to use a computed field for the key
+
+0.01    Apr 28 2003
+    
+-   Created initial version
+

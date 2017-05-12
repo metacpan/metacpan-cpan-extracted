@@ -1,0 +1,11 @@
+bin/lorem
+Build.PL
+CHANGES
+INSTALL
+lib/Text/Lorem.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/01_words.t
+t/02_singleton.t

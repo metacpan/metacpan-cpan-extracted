@@ -1,0 +1,128 @@
+==================================================
+Changes from 2015-07-12 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.07 at 2016-07-11 23:17:30 +0000
+-----------------------------------------
+
+  Change: a66e33598d5fe60d13c0b8102d9c84fe53191de8
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-07-11 11:33:03 +0000
+
+    Improved project documentation 
+
+  Change: 204ace763b959ae1df5e6c0c5359e0b966533d24
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-07-11 11:25:17 +0000
+
+    Improving Kwalitee Using automatic changelog creation Generating meta
+    information with Dist::Zilla Generating meta information in JSON with
+    Dist::Zilla 
+
+-----------------------------------------
+version 0.07 at 2016-05-30 04:24:37 +0000
+-----------------------------------------
+
+  Change: d555680c800e29e7a01be5bd6475465a0988684d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-05-30 01:24:37 +0000
+
+    Added additional checking to avoid data inconsistency To avoid the
+    error "Negative repeat count does nothing at
+    C:\cpan\build\Term-YAP-0.04-dBSj6O/blib/lib/Term/YAP.pm line 263,
+    <DATA> line 1." 
+
+  Change: b550fa6d2ef2c51ee73c026356c1672ec6490960
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-12-11 22:25:38 +0000
+
+    Fixed dependencies versions 
+
+  Change: 292904cd582126a0ce756ef0e0440b66437002c7
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-21 23:18:56 +0000
+
+    Fixed wrong version as requirement 
+
+  Change: 6862c576dbd2f5e69e37cb073cf2a771336a66a6
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-21 20:53:09 +0000
+
+    Finishing migration to Dist::Zilla Moved author tests to the rigth
+    place 
+
+  Change: 741c65f6c0c04bfe28bf05ef81d81fccf8ca5164
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-05-28 11:32:48 +0000
+
+    Small fixes Added additional information about the project in the
+    Makefile.PL Change the restriction of Perl version to 5.8 in
+    Makefile.PL Removed debug information that was left in Term::YAP 
+
+  Change: d68ca00a02b0a53ae08722c3efcae76f6b9c9e37
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-05-25 17:28:06 +0000
+
+    just added a more informative message when running perl without
+    ithreads available 
+
+  Change: 2f15d8464cf2084ebbf0364a4573157d53ef66ee
+  Author: Alceu Rodrigues de Freitas Junior <glasswalker@yahoo.com.br>
+  Date : 2015-05-25 11:20:24 +0000
+
+    Added missing dependency of namespace::clean Increased the number of
+    tests with start/stop methods 
+
+  Change: e08e58ac0ad979bc20bfde93020ae593f90ac994
+  Author: Alceu Rodrigues de Freitas Junior <glasswalker@yahoo.com.br>
+  Date : 2015-05-24 12:26:39 +0000
+
+    Added additional sleep calls to avoid output "scaping" in Windows 
+
+  Change: 5ecdcf4ceea39b85b98cf1be0331639972ae027a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-05-24 12:05:47 +0000
+
+    Fixed another bug with ithreads Improved testing of child
+    process/threads creation (required addition of more code in the
+    parent class) Other minor improvements 
+
+  Change: 8bb79ca4b703c9924ffbc8090b86b7ac45d46c81
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-05-24 01:18:29 +0000
+
+    Fixed bugs with usage.t test Added tests for Ter::YAP::Process Fixed
+    minor bugs with interpreters not supporting ithreads for
+    pod-coverage.t Updated Makefile.PL with more dependencies 
+
+  Change: 595910c381a94906bfc27970f6f24660204d45b6
+  Author: Alceu Rodrigues de Freitas Junior <glasswalker@yahoo.com.br>
+  Date : 2015-05-20 03:29:17 +0000
+
+    fixed serious bug with Term::YAP::iThread because the thread was
+    leaving the function and another one was not being created (changed
+    basically everything in the class) added new tests 
+
+  Change: fc37dc9a398eb504cfe505b8ef2aa1acba1d982c
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-05-12 12:24:16 +0000
+
+    finished implementation of Process.pm added Pod removed t/output.t
+    because it is just too hard to test the output automatically 
+
+  Change: ee08a473de270d02e7847d5ba68efb7dfe9601e1
+  Author: Alceu Rodrigues de Freitas Junior <glasswalker@yahoo.com.br>
+  Date : 2015-04-26 10:33:06 +0000
+
+    initial release, tests are not complete Process.pm is not complete 
+
+  Change: 36e22a41bafc7f5b20f42dc60db83770dd43011d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2015-04-19 22:16:57 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

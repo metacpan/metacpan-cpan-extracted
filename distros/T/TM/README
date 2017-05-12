@@ -1,0 +1,76 @@
+What is it?
+-----------
+This base package contains Perl extensions for Topic Maps
+
+   http://www.isotopicmaps.org/
+
+With it you can
+
+  - manipulate topic maps via an API
+  - navigate through TMs via a TMDM-like API (almost TMAPI)
+  - read/write AsTMa 1.x and 2.x resources
+  - read LTM resources
+  - read/write XTM 1/2 resources
+  - create virtualized topic maps
+  - use a topic map backend store
+  - add drivers for your own native store
+  - add indices to speed up things
+  - query topic maps via TMQL (query language, in the working)
+  - and more
+
+Prerequisites
+-------------
+
+Of course, TM::* relies heavily on other Perl packages. Most of them
+(hopefully all) should be resolved automatically if you use the CPAN
+frontend.
+
+Installation
+------------
+
+This module should be completely installable via the cpan frontend.
+To build the extensions manually, unpack this distribution somewhere,
+and exercise the usual incantation:
+
+perl Makefile.PL
+make
+make test
+make install
+
+You will need perl version 5.8 or better to install these modules.
+
+There may also be Debian packages for this generation.
+
+Documentation
+-------------
+
+You can learn about Topic Maps in general at
+
+  http://www.isotopicmaps.org/  (standards)
+  http://kill.devc.at/taxonomy/term/22 (my blog)
+
+  http://topicmaps.bond.edu.au/ (tutorials, other stuff)
+  http://easytopicmaps.com/     (tutorials, lotta links and hints)
+
+  http://astma.it.bond.edu.au/  (shorthand notation used by the authors)
+
+For this particular package I also recommend the
+tutorials in
+
+  maps/tutorials.atm
+
+Support
+-------
+
+You can either
+
+  - mail to the author (rho@devc.at), or
+  - discuss this in one of the topicmap mailing lists, or
+  - find me in the freenode #topicmaps IRC channel, or
+  - create a bug entry in rt.cpan.org (preferred)
+
+Copyright 200[1-8] Robert Barta, rho@devc.at
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

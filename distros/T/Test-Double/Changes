@@ -1,0 +1,20 @@
+Revision history for Perl extension Test::Double
+
+0.05
+        - added at_least, at_most, times, and with for mock expectation (ka2u)
+        - added verify, verify_result, and reset methods (ka2u)
+
+0.04
+        - remove Test::Flatten dependency
+        - mentioned Test::Stub
+
+0.03
+        - add Test::Flatten dependency, oops
+        - memory tests are moved to xt
+
+0.02
+        - fixed memory leaks
+        - flatten outputs at subtest (Test::Flatten)
+
+0.01
+        - original version

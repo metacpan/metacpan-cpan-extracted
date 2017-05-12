@@ -1,0 +1,36 @@
+---
+abstract: 'Compare Teng::Row object by get_columns method in using Test::Deep'
+author:
+  - 'Soh Kitahara <sugarbabe335@gmail.com>'
+build_requires:
+  DBI: 0
+  ExtUtils::MakeMaker: 6.59
+  Teng: 0
+  Test::More: 0.88
+  Test::Requires: 0.06
+  Test::Tester: 0
+  Test::mysqld: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Test::Deep::Teng::Row
+name: Test-Deep-Teng-Row
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Exporter::Lite: 0
+  Test::Deep: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/soh335/Test-Deep-Teng-Row.git
+version: 0.01

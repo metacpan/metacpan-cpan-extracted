@@ -1,0 +1,163 @@
+Revision history for Perl extension Test::WWW::Simple.
+0.34   Fri Jan 25 19:11:49 PST 2013
+    - update Mojolicious::Lite invocation to match current Mojolicious.
+    - proper Meta.yml for CPANTS
+0.33   Mon Jul 11 12:53:17 PDT 2011
+    - added Makefile.PL check for installations with bad HTML/Parser.so
+0.32   Sun Jul  3 13:30:16 PDT 2011
+	- Fix regex-to-regex matches that are inconsistent across Perl versions
+
+0.31   Wed Mar  9 17:36:31 PST 2011
+       - added explicit prereq of WWW::Mechanize::Pluggable
+
+0.30   Wed Mar  9 00:15:58 PST 2011
+       - Added DNSAdvantage test exceptions for CPAN testers on Comcast.
+
+0.29   Fri May 21 17:03:55 PDT 2010
+	- Fix numerous failing tests.
+	- Make sure all tests are in the MANIFEST.
+	- Start converting webserver-based tests to Mojo.
+
+0.28   Wed Dec 17 13:34:53 PST 2008
+	- Corrected prereqs (HTML::Tree, not TreeBuilder)
+
+0.27   Fri Sep 21 12:06:02 PDT 2007
+	- Remember that the changelog wasn't updated, sigh.
+
+0.26   Fri Sep 21 12:05:21 PDT 2007
+	- Fix the test that fails on Windows because of a 
+	  piped open.
+
+0.25   Mon Jun 12 15:57:45 PDT 2006
+	- on some platforms, the cache test faile because
+	  HTTP::Daemon constructs a URI composed of the 
+	  hex representation of the IP address. Caught by
+	  Dave Santo (dhsanto at wildblue dot net). Fixed
+	  to always go to localhost.
+
+0.24   Fri Jun  2 14:03:47 PDT 2006
+	- minor change to test infrastructure: stop depending on
+	  content of live pages, which change all the time; use a
+	  local server (if possible) instead.
+
+0.23   Fri Mar 31 15:04:16 PST 2006
+	- added HTML::TreeBuilder to prereqs (needed
+	  for plaintext stuff)
+	- fix liketext to not depend on the Python website;
+	  its text gets reworded every fifteen minutes
+
+0.22   Fri Mar 10 10:25:28 PST 2006
+	- strict error in text_like corrected
+	- corrected sense of OK tests for 404 and 500 server errors
+	  in 06liketext.t
+	- added _clean_text to string \xa0 (non-breaking spaces)
+	  from pages
+
+0.21  Wed Mar  8 12:38:56 PST 2006
+	- add text_like and text_unlike to allow "visual"
+	  page content testing (eliminates markup)
+	- add new tests for text_lie/text_unlike
+	- fix tests looking at python.org (they upgraded
+	  to XHTML)
+	- fix 05a_agent to not use use_ok()
+
+0.20  Fri Jan  6 11:45:43 PST 2006
+	- removed call to agent_alias; setting a default
+	  agent causes problems when testing WAP gateways
+	- cleaned up test webserver code; now cleanly starts
+          on a random port and cleanly shuts down
+
+0.19  Tue Nov 22 14:03:20 2005
+	- Actually export last_test!
+
+0.18  Wed Nov 16 15:10:16 2005 
+	- Changed page_like and page_unlike to actually fail
+	  instead of just issuing a diag when a fetch fails
+	- added page_like_full and page_unlike_full for folks
+	  who actually want to see the entire page source as 
+	  a diag when a test fails
+
+0.17  Wed Nov  9 15:33:01 2005 
+	- added last_test, to allow simple_scan plugins to
+	  check the status of the last test.
+
+0.16  Wed Sep 28 15:25:22 2005 
+	- Switched underlying Mech object to Mech::Pluggable.
+	- Added mech(), for plugin support in future
+	  versions of simple_scan
+        - removed simple_scan to App::SimpleScan
+
+0.15  Fri Sep 23 17:38:13 2005
+	- Added alternate bracketing: <xx> and >xx<
+	  now both work
+	- Added tests to verify that a bug causing 
+	  multiple copies of lines with no substitutions
+	  to be emitted when an "xx" pragma was in force
+
+0.14  Tue Sep 20 17:17:42 2005
+	- updated simple_scan:
+	  - handles flags on regexes
+          - Handles test spec syntax errors better
+	  - Adds notation as to whether pattern should
+	    have matched or not to the test comment
+
+0.13  Wed Aug 31 16:44:02 2005
+	- added pod tests
+
+0.12  Tue Aug 23 15:58:44 2005 
+	- --warn option added (print warnings if any;
+	  off by default)
+
+0.11  Mon Apr 18 10:29:33 2005 
+        - added %cache/%nocache pragmas to simple_scan
+        - added tests for cache/nocache in simple_scan
+        - added pause to webserver-based tests to allow it to spin up
+        - refactored page_like/page_unlike shared code
+        - added tests for cache/no_cache import
+        - reworked output check in 06ss_fails.t
+        - updated README to mention simple_scan and caching, and to
+          actually include an accurate version number
+
+0.10  Mon Mar 28 13:52:35 2005
+	- cache/no_cache routines
+
+0.09  Tue Feb  2 10:03:56 2005
+        - minor changes to example simple_scan input
+
+0.08  Mon Feb  1 19:04:34 2005
+        - Further updates to simple_scan
+          -- expanded %%xx pragma support
+          -- automatic embed of source URL in test output
+        - 100% test coverage!
+
+0.07  Fri Jan 28 11:53:07 2005
+        - Updates for simple_scan
+          -- comments now supported (# in column 1)
+          -- blank lines now supported (d'oh!)
+          -- garbage lines now silently discarded
+        - Modified logic in page_like/page_unlike to 
+          play properly with Test::Harness; now does
+          either a fail() or the test, depending on whether
+          WWW::Mechanize->get() fails or not.
+
+0.06  Thu Jan 27 15:30:45 2005
+        - documented pragmas (but didn't update Changes!)
+
+0.05  Wed Jan 26 15:30:02 2005
+        - added %%xx: and %%agent pragmas for simple_scan
+        - added tests for these items
+        - changed default user agent to 'Windows IE 6'
+
+0.04  Tue Jan 25 09:36:21 2005
+        - added tests for simple_scan examples
+
+0.03  Fri Jan 21 17:04:00 2005
+        - added examples/ to MANIFEST (oops)
+
+0.02  Fri Jan 21 14:11:23 2005
+        - updated exaples/simple_scan to use Regexp::Common to 
+          parse URLs and regexes out of input
+
+0.01  Fri Jan 14 14:31:55 2005
+	- original version; created by h2xs 1.23 with options
+		-AN -n Test::WWW

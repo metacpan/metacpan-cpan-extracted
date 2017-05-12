@@ -1,0 +1,10 @@
+
+A.pm
+MANIFEST                        This list of files (for t/eg/)
+
+lib/B.pm
+lib/B/C.pm
+
+inc/Foo.pm
+
+

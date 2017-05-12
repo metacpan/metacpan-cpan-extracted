@@ -1,0 +1,43 @@
+NAME
+
+Time::TAI::Now - determine current time in TAI
+
+DESCRIPTION
+
+This module is one answer to the question "what time is it?".
+It determines the current time on the TAI scale, and puts a bound on how
+inaccurate it could be.  It is designed to interoperate with Time::TAI,
+which knows all about the TAI time scale.
+
+TAI (International Atomic Time) is a time scale produced by an ensemble of
+atomic clocks around Terra.  It attempts to tick at the rate of proper
+time on the Terran geoid (i.e., at sea level).  It is the frequency
+standard underlying Coordinated Universal Time (UTC).
+
+TAI is not connected to planetary rotation, and so has no inherent
+concept of a "day" or of "time of day".  (There is nevertheless a
+convention for how to represent TAI times using day-based notations,
+for which see Time::TAI.)  This module represents instants on the TAI
+time scale as a scalar number of TAI seconds since its epoch, which
+was at 1958-01-01T00:00:00.0 UT2 as calculated by the United States
+Naval Observatory.  This matches the convention used by "Time::TAI".
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2009, 2010 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

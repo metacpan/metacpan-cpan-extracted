@@ -1,0 +1,76 @@
+---
+abstract: 'sends test results to cpan-testers@perl.org'
+author:
+  - 'Adam J. Foxson <afoxson@pobox.com>'
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Kirrily "Skud" Robert <skud@cpan.org>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Richard Soderberg <rsod@cpan.org>'
+  - 'Kurt Starsinic <Kurt.Starsinic@isinet.com>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Reporter
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Test::Reporter:
+    file: lib/Test/Reporter.pm
+    version: '1.62'
+  Test::Reporter::Transport:
+    file: lib/Test/Reporter/Transport.pm
+    version: '1.62'
+  Test::Reporter::Transport::File:
+    file: lib/Test/Reporter/Transport/File.pm
+    version: '1.62'
+  Test::Reporter::Transport::Null:
+    file: lib/Test/Reporter/Transport/Null.pm
+    version: '1.62'
+recommends:
+  Mail::Send: '0'
+  Net::DNS: '0'
+  Net::Domain: '0'
+  Net::SMTP: '0'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Temp: '0'
+  FileHandle: '0'
+  Sys::Hostname: '0'
+  Time::Local: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cpan-testers/Test-Reporter/issues
+  homepage: https://github.com/cpan-testers/Test-Reporter
+  repository: https://github.com/cpan-testers/Test-Reporter.git
+version: '1.62'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Andreas Koenig <andk@cpan.org>'
+  - 'Ed J <mohawk2@users.noreply.github.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Vincent Pit <perl@profvince.com>'

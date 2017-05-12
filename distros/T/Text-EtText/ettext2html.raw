@@ -1,0 +1,104 @@
+#!/usr/bin/perl -w
+
+use lib 'lib';
+use lib '../lib';
+
+use FindBin;
+BEGIN {
+  # This code will track down the directories where EtText
+  # keeps its modules, portably, so it'll work on Macs, UNIX and Win32,
+  # with or without a UNIX-style "make install" installation.
+  # Sadly, we can't rely on File::Spec to do the slash-twiddling for us;
+  # it's not included with some versions of MacPerl. :(
+  #
+  my $bin = $FindBin::Bin;
+  my $slash = '/';              # between directories in a path
+  my $dirtrailer = '';          # at the end of a directory's path
+
+  if ($^O eq 'MacOS') {
+    $slash = ':'; $dirtrailer = ':';
+  } elsif ($^O =~ /(win|os2)/) {
+    $slash = '\\';
+  }
+
+  # first, find the common candidates: "lib" in
+  # the same dir as the script. These are likely on all platforms.
+  $_ = $bin.$slash. "lib" . $dirtrailer;
+  push (@INC, $_);
+
+  # next, support UNIX-style /usr-based installation, where the
+  # script lives in /usr/*/bin and the support files in /usr/*/lib
+  # or /usr/*/share. This only happens on UNIX afaik.
+  if ($slash eq '/') {
+    $_ = $bin . "/../lib/ettext";
+    if (-d $_) { push (@INC, "$_/lib"); }
+
+    $_ = $bin . "/../share/ettext";
+    if (-d $_) { push (@INC, "$_/lib"); }
+  }
+}
+
+require Text::EtText::EtText2HTML;
+
+if ($#ARGV >= 0) {
+  for $_ (@ARGV) {
+    open (STDIN, "< $_") or die "cannot read $_\n";
+    do_stdin ();
+  }
+} else {
+  do_stdin ();
+}
+exit;
+
+sub do_stdin {
+  $t = new Text::EtText::EtText2HTML;
+  print $t->text2html ();
+}
+
+# ---------------------------------------------------------------------------
+
+=head1 NAME
+
+ettext2html - convert from the simple EtText editable-text format into HTML
+
+=head1 SYNOPSIS
+
+  ettext2html file.txt > file.html
+
+=head1 DESCRIPTION
+
+ettext2html will convert a text file in the EtText editable-text format into
+HTML.
+
+For more information on the EtText format, check the WebMake documentation on
+the web at http://ettext.taint.org/ .
+
+=head1 INSTALLATION
+
+The B<ettext2html> command is part of the B<HTML::WebMake> Perl module set.
+Install this as a normal Perl module, using C<perl -MCPAN -e shell>, or by
+installing WebMake.
+
+=head1 ENVIRONMENT
+
+No environment variables, aside from those used by perl, are required to
+be set.
+
+=head1 SEE ALSO
+
+C<webmake>
+C<ettext2html>
+C<ethtml2text>
+C<HTML::WebMake>
+C<Text::EtText>
+
+=head1 AUTHOR
+
+Justin Mason E<lt>jm /at/ jmason.orgE<gt>
+
+=head1 PREREQUISITES
+
+C<HTML::Entities>
+
+=cut
+

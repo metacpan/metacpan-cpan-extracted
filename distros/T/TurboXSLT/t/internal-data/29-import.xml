@@ -1,0 +1,46 @@
+<xportal_rmd>
+	<basic_arts>
+		<art name="test_name1" adult="18" atype="1" author-name="Виктор Пелевин" author-name-rodit="Виктора Пелевина" author_id="45850" authors-count="1" available="1" basic_block_pos="1" basic_number="1" cover_ratio="0.635" downloads="0" drm="0" id="8251513" in_basket="228610943" mem="text" price="249.00" promo_price="249.00" release_file="10977487" type="0">
+			<banner name="newg_460x220_1">
+				<text_html>
+					<hidden>
+						<div style="background-color:#;padding:0;" align="center">
+							<a href="/banerclick/1699/?l=http%3A%2F%2Fwww.litres.ru%2Fanna-todd-2%2Fposle-2%2F" target="_self">
+								<img src="/static/imgb/100/00/00/16/00001699.jpg" width="460" height="220" border="0" alt="Litres Baner"/>
+							</a>
+						</div>
+					</hidden>
+				</text_html>
+			</banner>
+			<like_basic>
+				<art name="test_name2" adult="18" atype="2" author-name="Виктор Пелевин" author-name-rodit="Виктора Пелевина" author_id="45850" authors-count="1" available="1" cover_ratio="1.114" downloads="1" drm="0" id="8271413" in_basket="228604512" mem="audio" price="199.00" promo_price="199.00" purchased="1" reason="person" reason_id="45850" reason_name="reason_name 1" release_file="10977500" type="1"/>
+				<art name="test_name3" adult="16" atype="1" author-name="Виктор Пелевин" author-name-rodit="Виктора Пелевина" author_id="45850" authors-count="1" available="1" cover_ratio="0.652" drm="0" id="2547755" mem="text" price="199.00" promo_price="199.00" reason="person" reason_id="45850" reason_name="reason_name 2" release_file="4336925" type="0"/>
+				<art name="test_name4" adult="16" atype="1" author-name="Дина Рубина" author-name-rodit="Дины Рубиной" author_id="45922" authors-count="1" available="1" cover_ratio="0.636" drm="0" id="6698569" mem="text" price="164.90" promo_price="164.90" reason="genre" reason_id="6285" reason_name="reason_name 3" release_file="9022485" type="0"/>
+				<art name="Обитель" adult="16" atype="1" author-name="Захар Прилепин" author-name-rodit="Захара Прилепина" author_id="60862" authors-count="1" available="1" cover_ratio="0.664" drm="0" id="6687009" mem="text" price="119.90" promo_price="119.90" reason="genre" reason_id="6285" reason_name="Современная русская литература" release_file="9392482" type="0"/>
+				<art name="Легкие миры (сборник)" adult="18" atype="1" author-name="Татьяна Толстая" author-name-rodit="Татьяны Толстой" author_id="47112" authors-count="1" available="1" cover_ratio="0.633" drm="0" id="7061997" mem="text" price="149.90" promo_price="149.90" reason="genre" reason_id="6285" reason_name="Современная русская литература" release_file="10076896" type="0"/>
+			</like_basic>
+			<teaser id="2" caption="Надо жить и читать" head="Интервью с прилепиным" img_filetype="png" txt="литература очень мало и не всегда реагирует на то, что мы сегодня видим вокруг себя" url="/intervju/zahar-prilepin/"/>
+		</art>
+		<art name="test_name1" adult="18" atype="1" author-name="Виктор Пелевин" author-name-rodit="Виктора Пелевина" author_id="45850" authors-count="1" available="1" basic_block_pos="1" basic_number="1" cover_ratio="0.635" downloads="0" drm="0" id="8251513" in_basket="228610943" mem="text" price="249.00" promo_price="249.00" release_file="10977487" type="0">
+			<banner name="newg_460x220_1">
+				<text_html>
+					<hidden>
+						<div style="background-color:#;padding:0;" align="center">
+							<a href="/banerclick/1699/?l=http%3A%2F%2Fwww.litres.ru%2Fanna-todd-2%2Fposle-2%2F" target="_self">
+								<img src="/static/imgb/100/00/00/16/00001699.jpg" width="460" height="220" border="0" alt="Litres Baner"/>
+							</a>
+						</div>
+					</hidden>
+				</text_html>
+			</banner>
+			<like_basic>
+				<art name="test_name5" adult="18" atype="2" author-name="Виктор Пелевин" author-name-rodit="Виктора Пелевина" author_id="45850" authors-count="1" available="1" cover_ratio="1.114" downloads="1" drm="0" id="8271413" in_basket="228604512" mem="audio" price="199.00" promo_price="199.00" purchased="1" reason="person" reason_id="45850" reason_name="reason_name 4" release_file="10977500" type="1"/>
+				<art name="test_name6" adult="16" atype="1" author-name="Виктор Пелевин" author-name-rodit="Виктора Пелевина" author_id="45850" authors-count="1" available="1" cover_ratio="0.652" drm="0" id="2547755" mem="text" price="199.00" promo_price="199.00" reason="person" reason_id="45850" reason_name="reason_name 5" release_file="4336925" type="0"/>
+				<art name="test_name7" adult="16" atype="1" author-name="Дина Рубина" author-name-rodit="Дины Рубиной" author_id="45922" authors-count="1" available="1" cover_ratio="0.636" drm="0" id="6698569" mem="text" price="164.90" promo_price="164.90" reason="genre" reason_id="6285" reason_name="reason_name 6" release_file="9022485" type="0"/>
+				<art name="Обитель" adult="16" atype="1" author-name="Захар Прилепин" author-name-rodit="Захара Прилепина" author_id="60862" authors-count="1" available="1" cover_ratio="0.664" drm="0" id="6687009" mem="text" price="119.90" promo_price="119.90" reason="genre" reason_id="6285" reason_name="Современная русская литература" release_file="9392482" type="0"/>
+				<art name="Легкие миры (сборник)" adult="18" atype="1" author-name="Татьяна Толстая" author-name-rodit="Татьяны Толстой" author_id="47112" authors-count="1" available="1" cover_ratio="0.633" drm="0" id="7061997" mem="text" price="149.90" promo_price="149.90" reason="genre" reason_id="6285" reason_name="Современная русская литература" release_file="10076896" type="0"/>
+			</like_basic>
+			<teaser id="2" caption="Надо жить и читать" head="Интервью с прилепиным" img_filetype="png" txt="литература очень мало и не всегда реагирует на то, что мы сегодня видим вокруг себя" url="/intervju/zahar-prilepin/"/>
+		</art>
+	</basic_arts>
+</xportal_rmd>

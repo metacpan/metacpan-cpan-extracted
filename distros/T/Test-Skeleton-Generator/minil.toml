@@ -1,0 +1,6 @@
+name = "Test-Skeleton-Generator"
+# badges = ["travis"]
+authority="cpan:MANNI"
+
+module_maker="ModuleBuildTiny"
+

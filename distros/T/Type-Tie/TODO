@@ -1,0 +1,4 @@
+- bundle Test::Fatal and Test::Requires in "inc"
+- bundle a super-minimal dependency-free type library in "inc" for test cases
+- remove test dependency on Types::Standard by making those tests optional
+- add a few tests using bundled type library

@@ -1,0 +1,85 @@
+=== basic
+--- wiki
+&lislog(http://lislog.livedoor.com/r/20853)
+--- html
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/20853/plugin.js?graph_type=pie&color=red'></script></div>
+=== no args
+--- wiki
+&lislog()
+--- html
+&amp;lislog()
+=== not valid url
+--- wiki
+&lislog(http://wiki.livedoor.com)
+--- html
+&amp;lislog(http://wiki.livedoor.com)
+=== synopsis
+--- wiki
+&lislog(http://lislog.livedoor.com/r/20853)
+&lislog(http://lislog.livedoor.com/r/20853){small}
+&lislog(http://lislog.livedoor.com/r/20853){large}
+&lislog(http://lislog.livedoor.com/r/20853){medium}
+&lislog(http://lislog.livedoor.com/r/20853,bar)
+&lislog(http://research.news.livedoor.com/r/20853,bar,green)
+--- html
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/20853/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/small/20853/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/large/20853/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/20853/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/20853/plugin.js?graph_type=bar&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/20853/plugin.js?graph_type=bar&color=green'></script></div>
+=== with type
+--- wiki
+&lislog(http://lislog.livedoor.com/r/20853,bar)
+--- html
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/20853/plugin.js?graph_type=bar&color=red'></script></div>
+=== ilegal type
+--- wiki
+&lislog(http://lislog.livedoor.com/r/20853,hoge)
+--- html
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/20853/plugin.js?graph_type=pie&color=red'></script></div>
+=== new url
+--- wiki
+&lislog(http://research.news.livedoor.com/r/31834)
+&lislog(http://research.news.livedoor.com/r/31834,pie)
+&lislog(http://research.news.livedoor.com/r/31834,pie,red)
+&lislog(http://research.news.livedoor.com/r/31834,bar)
+&lislog(http://research.news.livedoor.com/r/31834,bar,green)
+--- html
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/31834/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/31834/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/31834/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/31834/plugin.js?graph_type=bar&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/31834/plugin.js?graph_type=bar&color=green'></script></div>
+=== new url with value
+--- wiki
+&lislog(http://research.news.livedoor.com/r/31834){small}
+&lislog(http://research.news.livedoor.com/r/31834){middle}
+&lislog(http://research.news.livedoor.com/r/31834){large}
+--- html
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/small/31834/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/31834/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/large/31834/plugin.js?graph_type=pie&color=red'></script></div>
+===  new url with 2 args and one value
+--- wiki
+&lislog(http://research.news.livedoor.com/r/31834,pie){small}
+&lislog(http://research.news.livedoor.com/r/31834,bar){middle}
+&lislog(http://research.news.livedoor.com/r/31834,blue){large}
+--- html
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/small/31834/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/31834/plugin.js?graph_type=bar&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/large/31834/plugin.js?graph_type=pie&color=blue'></script></div>
+=== new url with 3 args and one value
+--- wiki
+&lislog(http://research.news.livedoor.com/r/31834,pie,red){small}
+&lislog(http://research.news.livedoor.com/r/31834,green,bar){middle}
+&lislog(http://research.news.livedoor.com/r/31834,bar,red){large}
+--- html
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/small/31834/plugin.js?graph_type=pie&color=red'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/middle/31834/plugin.js?graph_type=bar&color=green'></script></div>
+<div><script language='javascript' type='text/javascript' charset='utf-8' src='http://research.news.livedoor.com/publish/large/31834/plugin.js?graph_type=bar&color=red'></script></div>
+=== error
+--- wiki
+&lislog(http://news.livedoor.com/r/31834,chart,gold){x-large}
+--- html
+&amp;lislog(http://news.livedoor.com/r/31834,chart,gold){x-large}

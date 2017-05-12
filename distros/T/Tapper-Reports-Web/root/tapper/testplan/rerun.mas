@@ -1,0 +1,9 @@
+<%args>
+$testplan
+</%args>
+
+<h2>Restarted <a href="/tapper/testplan/id/<% $testplan->id %>/">Testplan Instance with ID <% $testplan->id %></a></h2>
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+

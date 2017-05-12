@@ -1,0 +1,38 @@
+Tk-GraphItems version 0.12
+==========================
+
+Display graphical representations of relation-graphs on a Tk::Canvas-widget.
+This Package provides Tk::GraphItems::TextBox, Tk::GraphItems::Circle
+and Tk::GraphItems::Connector to build objects, representing a graphs nodes
+and edges. Nodes can be dragged manually or moved/placed programmatically.
+See the 'Examples' subdir for demonstration of the items options.
+Some of the examples demonstrate how 'Tk::GraphItems' can be used with
+'Graph.pm' and  'Graph::Layout::Aesthetic'. 
+
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Tk;
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2006-2008 by Ch. Lamprecht
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

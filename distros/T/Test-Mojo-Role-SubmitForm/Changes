@@ -1,0 +1,40 @@
+Revision history for Test-Mojo-Role-SubmitForm
+
+1.002002  2016-05-16
+    [Changes by PLICEASE]
+        - Allow forms with missing/empty action="";
+            will use current page to submit to
+
+1.002001 2016-05-12
+    - upload failed due to PAUSE error
+
+1.001008  2016-01-13
+    - Bump Mojolicious version prereq, to avoid broken
+      version 6.37
+
+1.001007  2015-09-27
+    - Fixed POD directive error
+
+1.001006  2015-09-23
+    - Fixed bug where overrides did not receive correct values for
+        multiple controls with same name (#5)
+    - Minor doc updates (#6)
+
+1.001005  2015-09-23
+    - Fixed incorrect handling of multiple controls with same name (#4)
+    - Micro optimizations
+
+1.001004  2015-09-22
+    - Switch to use Mojo::DOM's native ->val
+
+1.001003  2015-09-22
+    - Added debug mode through MOJO_SUBMITFORM_DEBUG
+    - Do not submit 'undef' values
+
+1.001002  2015-09-21
+    - Handle exotic name=""s
+
+1.001001  2015-09-21
+   - First version released on an unsuspecting world
+
+

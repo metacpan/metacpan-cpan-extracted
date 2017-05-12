@@ -1,0 +1,44 @@
+body {
+  background-color: #ffffff; 
+  color: #000000; 
+  font-size: medium;
+  font-family: verdana,lucida,helvetica,sans-serif;
+}
+
+// OL,UL,P,BODY,TD,TR,TH,FORM {
+  // font-family: verdana,lucida,helvetica,sans-serif;
+  // font-size: medium;
+  // color: #000000;
+}
+
+code, samp, pre
+{
+  font-family: monospace;
+}
+
+H1 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; }
+H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; }
+H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; }
+H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+
+A:link {
+  font-weight: bold;
+  color: #004000;
+  text-decoration: underline; 
+}
+
+A:visited {
+  font-weight: normal;
+  color: #008000;
+  text-decoration: underline; 
+}
+
+A:active {
+  font-weight: bold;
+  color: #800000;
+  text-decoration: underline; 
+}
+
+

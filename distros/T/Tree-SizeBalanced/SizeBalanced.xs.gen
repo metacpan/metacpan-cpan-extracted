@@ -1,0 +1,93 @@
+// vim: filetype=xs
+#define PERL_NO_GET_CONTEXT
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include "ppport.h"
+
+#include "const-c.inc"
+
+GV * a_GV, * b_GV;
+
+#include "tree_common.h"
+
+#define KV_PASTER(NAME, KEY, VALUE) NAME ## _ ## KEY ## _ ## VALUE
+#define KV_EVALUATOR(NAME, KEY, VALUE) KV_PASTER(NAME, KEY, VALUE)
+#define KV(NAME) KV_EVALUATOR(NAME, KEY, VALUE)
+
+#define K_PASTER(NAME, KEY) NAME ## _ ## KEY
+#define K_EVALUATOR(NAME, KEY) K_PASTER(NAME, KEY)
+#define K(NAME) K_EVALUATOR(NAME, KEY)
+#define V(NAME) K_EVALUATOR(NAME, VALUE)
+
+#define I_EVALUATOR(NAME) NAME ## _id
+#define I(NAME) I_EVALUATOR(NAME)
+
+#define T_EVALUATOR(NAME) NAME ## _t
+#define T(NAME) T_EVALUATOR(NAME)
+
+#include "tree_customize.h"
+
+#define KEY int
+#  include "include_tree_with_different_value_type.h"
+#undef KEY
+
+#define KEY num
+#  include "include_tree_with_different_value_type.h"
+#undef KEY
+
+#define KEY str
+#  include "include_tree_with_different_value_type.h"
+#undef KEY
+
+#define KEY any
+#  include "include_tree_with_different_value_type.h"
+#undef KEY
+
+MODULE = Tree::SizeBalanced		PACKAGE = Tree::SizeBalanced::Core		
+
+BOOT:
+    a_GV = gv_fetchpvn_flags("::a", 3, 1, SVt_PV);
+    b_GV = gv_fetchpvn_flags("::b", 3, 1, SVt_PV);
+
+INCLUDE: const-xs.inc
+
+new(SV * class, SV * cmp = &PL_sv_undef)
+DESTROY(SV * obj)
+
+size(SV *obj)
+ever_height(SV *obj)
+insert(SV * obj, SV * key, SV * value = &PL_sv_undef)
+insert_before(SV * obj, SV * key, SV * value = &PL_sv_undef)
+insert_after(SV * obj, SV * key, SV * value = &PL_sv_undef)
+delete(SV * obj, SV * key)
+delete_first(SV * obj, SV * key)
+delete_last(SV * obj, SV * key)
+
+find(SV * obj, SV * key, int limit = 1)
+find_first(SV * obj, SV * key, int limit = 1)
+find_last(SV * obj, SV * key, int limit = 1)
+find_lt(SV * obj, SV * key, int limit = 1)
+find_le(SV * obj, SV * key, int limit = 1)
+find_gt(SV * obj, SV * key, int limit = 1)
+find_ge(SV * obj, SV * key, int limit = 1)
+
+find_gt_lt(SV * obj, SV * lower_key, SV * upper_key)
+find_ge_lt(SV * obj, SV * lower_key, SV * upper_key)
+find_gt_le(SV * obj, SV * lower_key, SV * upper_key)
+find_ge_le(SV * obj, SV * lower_key, SV * upper_key)
+
+count_lt(SV * obj, SV * key)
+count_le(SV * obj, SV * key)
+count_gt(SV * obj, SV * key)
+count_ge(SV * obj, SV * key)
+
+find_min(SV * obj, int limit = 1)
+find_max(SV * obj, int limit = 1)
+
+skip_l(SV * obj, int offset, int limit = 1)
+skip_g(SV * obj, int offset, int limit = 1)
+
+dump(SV *obj)
+check(SV * obj)

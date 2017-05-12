@@ -1,0 +1,66 @@
+{
+   "abstract" : "Mocks Furl for testing",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Mock-Furl",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::AllModules" : "0.11",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Furl" : "0",
+            "Test::MockObject" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Mock::Furl" : {
+         "file" : "lib/Test/Mock/Furl.pm",
+         "version" : "0.05"
+      },
+      "Test::Mock::Furl::Furl" : {
+         "file" : "lib/Test/Mock/Furl/Furl.pm"
+      },
+      "Test::Mock::Furl::HTTP" : {
+         "file" : "lib/Test/Mock/Furl/HTTP.pm"
+      },
+      "Test::Mock::Furl::Request" : {
+         "file" : "lib/Test/Mock/Furl/Request.pm"
+      },
+      "Test::Mock::Furl::Response" : {
+         "file" : "lib/Test/Mock/Furl/Response.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/Test-Mock-Furl"
+      }
+   },
+   "version" : "0.05"
+}

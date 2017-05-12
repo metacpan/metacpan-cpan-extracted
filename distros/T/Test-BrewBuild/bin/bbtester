@@ -1,0 +1,219 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use Getopt::Long;
+use Test::BrewBuild;
+use Test::BrewBuild::Tester;
+
+our $VERSION = '2.17';
+
+my $auto;
+my $auto_csum_match;
+my $ip;
+my $port;
+my $foreground = 0;
+my $stdout = 0;
+my $logfile;
+my $debug;
+my $help;
+
+if (@ARGV && $ARGV[0] !~ /(?:start|stop|--fg|-f)/ || ! @ARGV){
+    $help = 1;
+}
+
+my $op = '';
+
+if ($ARGV[0] !~ /(?:--fg|-f)/){
+    $op = shift @ARGV;
+}
+
+GetOptions(
+    "auto"       => \$auto,
+    "csum"       => \$auto_csum_match,
+    "ip=s"       => \$ip,
+    "port=i"     => \$port,
+    "fg"         => \$foreground,
+    "stdout"     => \$stdout,
+    "logfile"    => \$logfile,
+    "debug=s"    => \$debug,
+    "help"       => \$help,
+);
+
+if ($help){
+    print <<'EOF';
+Usage: 
+
+bbtester start [--ip 0.0.0.0] [--port 7800]] [--debug 0-7] [--logfile] [--auto]
+bbtester stop
+
+bbtester --fg [--ip 0.0.0.0] [--port 7800] [--debug 0-7] [--stdout] [--auto]
+
+EOF
+exit;
+}
+
+my $tester = Test::BrewBuild::Tester->new(
+    auto => $auto,
+    csum => $auto_csum_match,
+    debug => $debug,
+    stdout => $stdout,
+    logfile => $logfile,
+);
+
+$tester->ip($ip);
+$tester->port($port);
+
+if ($op eq 'stop'){
+    $tester->stop;
+    exit;
+}
+if ($op eq 'start'){
+    $tester->start;
+}
+if ($foreground){
+    $tester->listen;
+}
+=pod
+
+=head1 NAME
+
+bbtester - Remote Windows/Unix testing platform server daemon for
+C<Test::BrewBuild>
+
+=head1 SYNOPSIS
+
+Start the listener in the background, listening on the default IP
+0.0.0.0 and port 7800 (TCP)
+
+    bbtester start
+
+Listen using a different IP/Port pair
+
+    bbtester start -i 192.168.10.5 -p 7789
+
+Stop the service from running
+
+    bbtester stop
+
+Run the tester in the foreground for testing/debugging/troubleshooting
+purposes.
+
+    bbtester --fg
+
+Enable debug logging. By default, log entries get returned with the results.
+
+    bbtester [...] -d 0-7
+
+Send the logs to STDOUT directly. Only useful in foreground mode.
+
+    bbtester --fg [...] -d 0-7 --stdout
+
+Send the logs to a log file (C<~/brewbuild/bbtester_*.log> by default).
+
+    bbtester start [...] -d 7 --logfile
+    bbtester --fg -d 7 -l
+
+Run in "auto" mode. This feature is only available when running a dispatcher in
+the same mode.
+
+    bbtester start -a
+
+=head1 DESCRIPTION
+
+This script is the listener end of the distributed C<Test::BrewBuild> testing
+environment.
+
+C<bbtester> daemonizes a L<Test::BrewBuild::Tester> object, and listens for
+incoming build requests from a test dispatcher.
+
+We then run the appropriate commands, and return the results to the dispatcher
+for processing.
+
+The default working directory for a Tester is C<~/brewbuild> on all platforms.
+
+=head1 COMMAND LINE OPTIONS
+
+=head2 start
+
+Starts the tester and puts it into the background. Conflicts with C<--fg>.
+
+=head2 stop
+
+Stops the tester.
+
+=head2 -i, --ip
+
+Set the IP address to listen on. If not set, will check for one in the config
+file, and if still not found, will default to C<0.0.0.0>, ie. all IPs bound
+on the system.
+
+=head2 -p, --port
+
+Same as IP, if not sent in, we'll check the config file, and then default to
+C<7800>.
+
+=head2 -f, --fg
+
+Instead of using C<start> which puts the service into the background, this
+option will run the tester in the foreground.
+
+=head2 -a, --auto
+
+This mode does some extra work when running the dispatcher in continuous mode.
+It will skip doing a test run if the local repository's commit checksum matches
+that of the remote.
+
+=head2 -c, --csum
+
+When in auto mode, by default, we only start the unit test run if the local
+repository commit checksum differs from that at the remote. Set this flag if
+you want to run tests even if the checksums are the same.
+
+=head2 -d, --debug
+
+Pass this option an integer from 0-7, and we'll enable that level of debugging.
+
+If the tester is put into the background with C<start>, or the C<--stdout>
+option isn't used with the C<--fg> option, we'll return the debug results with
+the test results.
+
+=head2 -s, --stdout
+
+When using C<--fg> to run the tester in the foreground, use this flag to display
+debug information live time on C<STDOUT>, as opposed to having it collected and
+returned.
+
+=head2 -l, --logfile
+
+Set this argument and we'll write all tester output to a log file. The parent
+tester server will create a C<$workdir/bbtester_parent.log> file (where
+C<$workdir> is C<~/brewbuild> by default), and the children tester runners will
+all log to C<$workdir/bbtester_child.log>.
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 SEE ALSO
+
+    perldoc brewbuild
+    perldoc Test::BrewBuild
+
+    perldoc bbdispatch
+    perldoc Test::BrewBuild::Dispatch
+
+    perldoc Test::BrewBuild::brewbuild.conf
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
+

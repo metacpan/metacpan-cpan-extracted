@@ -1,0 +1,14 @@
+Simple method:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+Advanced method:
+
+	Same as simple method, unless you can think of ways to make it
+        complex.  If so, go to it.
+
+

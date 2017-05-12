@@ -1,0 +1,43 @@
+
+		--------------------------------------
+			Readme for Tie::STDERR
+		--------------------------------------
+
+If you use the line
+
+	use Tie::STDERR;
+
+at the start of your script (and maybe CGI script), any output that
+would go to STDERR will be sent by email to root. You can specify the
+recipient, for example
+
+	use Tie::STDERR 'adelton';
+
+would send the message to me.
+
+Alternatively, you can pipe the output to some other process or append
+the output to some file:
+
+	use Tie::STDERR '| logger ...';
+	
+	use Tie::STDERR '>> /tmp/testing.log';
+
+The module will catch all output, including your explicit prints to
+STDERR, warnings about undefined values, dies and even dies as
+a result of compilation error. You do not need any special
+treatment/functions -- Tie::STDERR will catch all. Now, this also
+works in mod_perl/Apache::Registry scripts
+
+Warning for now:
+	Nor the name nor the functionality has yet been cleared with
+	other people from the Perl community -- if you like the
+	module, please let me (or c.l.p.misc) know.
+
+Available:
+	http://www.fi.muni.cz/~adelton/perl/ and from your favorite
+	CPAN site in the authors/id/JANPAZ/ directory.
+
+Copyright: (c) 1998 Jan Pazdziora, adelton@fi.muni.cz. All rights
+	reserved. This package is free software; you can redistribute
+	it and/or modify it under the same terms as Perl itself.
+

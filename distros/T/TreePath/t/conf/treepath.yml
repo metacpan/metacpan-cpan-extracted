@@ -1,0 +1,136 @@
+-
+  id: 1
+  source: File
+  file: /tmp/file1.txt
+
+-
+  id: 2
+  source: File
+  file: /tmp/file2.txt
+
+-
+  id: 1
+  source: Page
+  parent: 0
+  files:
+    - File_1:
+    - File_2:
+  name: /
+
+-
+  id: 2
+  source: Page
+  parent:
+    Page_1:
+  name: A
+
+-
+  id: 3
+  source: Page
+  parent:
+    Page_2:
+  name: B
+
+-
+  id: 4
+  source: Page
+  parent:
+    Page_3:
+  name: C
+
+-
+  id: 5
+  source: Page
+  parent:
+    Page_4:
+  name: D
+
+-
+  id: 6
+  source: Page
+  parent:
+    Page_4:
+  name: E
+
+-
+  id: 7
+  source: Page
+  parent:
+    Page_2:
+  name: ♥
+
+-
+  id: 8
+  source: Page
+  parent:
+    Page_7:
+  name: G
+
+-
+  id: 9
+  source: Page
+  parent:
+    Page_7:
+  name: E
+
+-
+  id: 10
+  source: Page
+  parent:
+    Page_9:
+  name: I
+
+-
+  id: 11
+  source: Page
+  parent:
+    Page_9:
+  name: J
+
+-
+  id: 1
+  source: Comment
+  page:
+    Page_1:
+
+-
+  id: 2
+  source: Comment
+  page:
+    Page_1:
+
+-
+  id: 3
+  source: Comment
+  page:
+    Page_2:
+
+-
+  id: 4
+  source: Comment
+  page:
+    Page_2:
+
+-
+  id: 5
+  source: Comment
+  page:
+    Page_1:
+
+-
+  id: 6
+  source: Comment
+  page:
+    Page_7:
+
+-
+  id: 7
+  source: Comment
+  page:
+    Page_11:
+
+-
+  id: 8
+  source: Comment
+  page:
+    Page_11:

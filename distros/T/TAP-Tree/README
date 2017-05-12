@@ -1,0 +1,150 @@
+NAME
+    TAP::Tree - TAP (Test Anything Protocol) parser which supported the
+    subtest
+
+SYNOPSIS
+    Parses a TAP output.
+
+      use v5.10.1;
+      require TAP::Tree;
+      my $tap = <<'END';
+      1..2
+          ok 1 - sub test 1
+          1..1
+      ok 1 - test 1
+      not ok 2 - test 2
+      END
+
+      my $taptree = TAP::Tree->new( tap_ref => \$tap );
+      my $tree = $taptree->parse;   # return value is hash reference simply.
+
+      say $tree->{plan}{number};             # -> print 2
+      say $tree->{testline}[0]{description}; # -> print test 1
+      say $tree->{testline}[1]{description}; # -> print test 2
+
+      say $tree->{testline}[0]{subtest}{testline}[0]{description};
+      # -> print sub test 1
+
+    Summarises the parsed TAP output
+
+      my $summary = $taptree->summary;
+      say $summary->{planned_tests}; # -> print 2
+      say $summary->{ran_tests};     # -> print 2
+      say $summary->{failed_tests};  # -> print 1 ... number of failed tests.
+                                    # 'TODO' tests are counted as 'ok', not 'not ok'
+
+    Iterates the parsed TAP
+
+      my $iterator = $taptree->create_tap_tree_iterator( subtest => 1 );
+  
+      while ( my $result = $iterator->next ) {
+          say '>' x $result->{indent} . $result->{testline}{description};
+      }
+
+      # -> print
+      #   test 1
+      #   >sub test 1
+      #   test 2
+
+DESCRIPTION
+    TAP::Tree is a simple parser of TAP which supported the subtest.
+
+    It parses the data of a TAP format to the data of tree structure.
+
+    Moreover, the iterator for complicated layered tree structure is also
+    prepared.
+
+METHODS
+    * new
+
+        require TAP::Tree;
+        my $taptree = TAP::Tree->new( tap_ref => $tap_ref );
+
+      Creates the instance of "TAP::Tree".
+
+      Specify the reference to the scalar variable which stored the outputs
+      of TAP as tap_ref of an arguments.
+
+      The arguments can be specified "tap_file" and "tap_tree" in addition
+      to "tap_ref".
+
+      "tap_file" is specified the path to file which stored the outputs of
+      TAP.
+
+        my $taptree = TAP::Tree->new( tap_file => $path );
+
+      "tap_tree" is specified the data of the tree structure which
+      "TAP::Tree" parsed.
+
+        my $taptree = TAP::Tree->new( tap_tree => $parsed_tap );
+
+      "utf8" is specified, when TAP is encoded by UTF-8.
+
+        my $taptree = TAP::Tree->new( tap_ref => $tap_ref, utf8 => 1 );
+
+    * parse
+
+        require TAP::Tree;
+        my $taptree = TAP::Tree->new( tap_ref => $tap_ref );
+        my $tree    = $taptree->parse;
+
+        say $tree->{plan}{number};
+        say $tree->{testline}[0]->{description};
+
+      Parses a output of TAP and returns the tree structure data. The return
+      value is a hash reference and all of the parsed result of TAP are
+      stored.
+
+      Please dump the detailed content of inclusion :)
+
+        {
+            version   => {},  # the version number of TAP (usually 12). 
+            plan      => {},  # the hash reference in which the numbers of tests.
+            testline  => [],  # the array reference in which the result of each tests.
+            bailout   => {},  # the hash reference in which an informational about Bailout.
+        }
+
+    * summary
+
+      Returns the summary of the TAP output.
+
+      The contents of a summary is below ( hash reference ).
+
+        version          -> the version number of TAP (usually 12).
+        is_skipped_all   -> the flag that shows whether all the tests were skipped.
+        skip_all_msg     -> the message that shows the reason of skip tests.
+        is_bailout       -> the flag that shows whether bailout the tests.
+        bailout_msg      -> the message that shows the reason of bailout.
+        planned_tests    -> the number of the planned tests.
+        ran_tests        -> the number of the ran tests.
+        failed_tests     -> the number of the failed tests.
+        is_good_plan     -> the flag that shows whether the number of plan is set.
+        is_ran_all_tests -> the flag that shows whether the all tests are ran.
+
+    * create_tap_tree_iterator
+
+      "TAP::Tree" makes becomes the complicated structure where a hierarchy
+      is deep, when there is a subtest.
+
+      Therefore, the iterator which can follow a tree strucutre data easily
+      is prepared for "TAP::Tree".
+
+        my $taptree = TAP::Tree->new( tap_ref => $tap_ref );
+        $taptree->parse;
+        my $iterator = $taptree->create_tap_tree_iterator( subtest => 1);
+
+        my $test = $iterator->next;
+        say $test->{testline}{description};
+
+      Specify arguments "subtest", when following subtest.
+
+ISSUE REPORT
+    <https://github.com/magnolia-k/p5-TAP-Tree/issues>
+
+COPYRIGHT
+    copyright 2014- Magnolia "<magnolia.k@me.com>".
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

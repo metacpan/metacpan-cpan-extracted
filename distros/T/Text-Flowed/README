@@ -1,0 +1,56 @@
+Text::Flowed - text formatting routines for RFC2646 format=flowed
+
+This module provides functions that deals with formatting data with
+Content-Type 'text/plain; format=flowed' as described in RFC2646
+(http://www.rfc-editor.org/rfc/rfc2646.txt). In a nutshell,
+format=flowed text solves the problem in plain text files where it is
+not known which lines can be considered a logical paragraph, enabling
+lines to be automatically flowed (wrapped and/or joined) as appropriate
+when displaying.
+
+In format=flowed, a soft newline is expressed as " \n", while hard
+newlines are expressed as "\n". Soft newlines can be automatically
+deleted or inserted as appropriate when the text is reformatted.
+
+  use Text::Flowed qw(reformat quote quote_fixed);
+  print reformat($text, \%args); # Reformat some format=flowed text
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Copyright 2002-2003, Philip Mak
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+---
+
+Revision History
+
+2002-08-14: v0.14
+- $args->{fixed} logic was broken.
+- Removed $args->{break} option. It violates the RFC, and after fiddling
+  with it, I think such functionality should be implemented by the user
+  agent when displaying text to the user.
+
+2002-08-13: v0.13
+- Increased version to 0.13 because CPAN's being stubborn.
+- $OPT_LENGTH was being used by mistake instead of $args->{opt_length}.
+- $args->{break} was breaking words longer than opt_length but shorter
+  than max_length.
+- $args->{fixed} == 2 makes all lines interpreted as format=fixed.
+- Off-by-one bug: Lines could be longer than opt_length/max_length by
+  one character.
+
+2002-08-11: v0.02
+- reformat($text, {fixed => 1}) was incorrectly interpreting all lines
+  as fixed, rather than just unquoted lines as fixed.
+- reformat() was not unstuffing joined lines.
+- Lines were sometimes double-quoted due to _num_quotes() using $1 even
+  if it was undefined.
+- $args->{break} added to break excessively long words (in violation of
+  RFC2646).

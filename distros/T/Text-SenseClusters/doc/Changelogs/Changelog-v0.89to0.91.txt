@@ -1,0 +1,26 @@
+
+Changes made in Sense-Clusters version 0.89 during version 0.91
+
+Ted Pedersen 	 tpederse@d.umn.edu
+Anagha Kulkarni  kulka020@d.umn.edu
+
+1. Added config.txt under SC-cgi dir and now the settings for PATH, PERL5LIB, 
+complete path to SC-cgi and SC-htdocs and name of the cgi dir are read by 
+second.cgi, fifth.cgi and callwrap.pl from this single file.					- Anagha 
+
+2. Modified fourth.cgi to include the missing case for --cluststop "gap" 
+option setting.																	- Anagha
+
+3. Included plot generation scripts under SC-cgi dir and updated the 
+callwrap.pl accordingly.														- Anagha
+
+4. Modified /Web/README.Web.pod to indicate the following pre-requisites for 
+the plot generation: gnuplot, latex and ps2pdf			  						- Anagha
+
+5. Updated /Web/README.Web.pod for the new config.txt related changes.			- Anagha
+
+6. Updated Docs/FAQs.pod														- Anagha
+
+7. Added FAQs.html to Docs/HTML dir.											- Anagha
+
+(Changelog-v0.89to0.91 Last Updated on 06/16/2006 by Anagha)

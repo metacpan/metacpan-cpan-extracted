@@ -1,0 +1,13 @@
+Changes
+eg/pod.pl
+eg/pod_time_cmp_ok.pl
+lib/Test/AnyEvent/Time.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/10-elapsed_time.t
+t/20-Time.t
+t/manifest.t
+t/pod.t

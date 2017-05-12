@@ -1,0 +1,22 @@
+Changes
+lib/Ticketmaster/API.pm
+lib/Ticketmaster/API/Discovery.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/10-get_data.t
+t/10-new.t
+t/Mock/Ticketmaster/API.pm
+t/recordings/GET_discovery_v1_attractions.json_apikey_testAPIkey
+t/recordings/GET_discovery_v1_attractions_919340.json_apikey_testAPIkey
+t/recordings/GET_discovery_v1_categories.json_apikey_testAPIkey
+t/recordings/GET_discovery_v1_categories_32.json_apikey_testAPIkey
+t/recordings/GET_discovery_v1_events.json_apikey_testAPIkey
+t/recordings/GET_discovery_v1_events.json_apikey_testAPIkey_marketId_101
+t/recordings/GET_discovery_v1_events_universe-566c8cb9f1f86e93b1000747.json_apikey_testAPIkey
+t/recordings/GET_discovery_v1_events_universe-566c8cb9f1f86e93b1000747_images.json_apikey_testAPIkey
+t/recordings/GET_discovery_v1_venues.json_apikey_testAPIkey
+t/recordings/GET_discovery_v1_venues_341396.json_apikey_testAPIkey
+t/recordings/record.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

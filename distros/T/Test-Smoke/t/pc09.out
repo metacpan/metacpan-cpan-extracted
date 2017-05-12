@@ -1,0 +1,213 @@
+Started smoke at 1188591621
+Smoking patch 31775
+MANIFEST did not declare 'merijn/Configure'
+Stopped smoke at 1188591622
+Started smoke at 1188591622
+
+Configuration: -Dusedevel
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=7.42  s=1.94  cu=549.72  cs=59.70  scripts=1379  tests=183876
+All tests successful.
+TSTENV = perlio	u=7.48  s=2.07  cu=515.40  cs=57.32  scripts=1379  tests=183876
+All tests successful.
+TSTENV = locale:en_US.utf8	u=7.24  s=1.82  cu=536.75  cs=62.72  scripts=1378  tests=183871
+All tests successful.
+Stopped smoke at 1188594593
+Started smoke at 1188594593
+
+Configuration: -Dusedevel -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=9.97  s=2.07  cu=633.68  cs=61.09  scripts=1379  tests=183877
+All tests successful.
+TSTENV = perlio	u=9.23  s=2.17  cu=599.73  cs=57.52  scripts=1379  tests=183877
+All tests successful.
+TSTENV = locale:en_US.utf8	u=9.51  s=2.01  cu=617.77  cs=60.91  scripts=1378  tests=183872
+All tests successful.
+Stopped smoke at 1188597968
+Started smoke at 1188597968
+
+Configuration: -Dusedevel -Duse64bitint
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=8.11  s=2.03  cu=547.60  cs=60.61  scripts=1380  tests=184020
+All tests successful.
+TSTENV = perlio	u=7.57  s=2.07  cu=516.77  cs=58.19  scripts=1380  tests=184020
+All tests successful.
+TSTENV = locale:en_US.utf8	u=7.46  s=1.96  cu=528.58  cs=62.74  scripts=1379  tests=184015
+All tests successful.
+Stopped smoke at 1188600948
+Started smoke at 1188600948
+
+Configuration: -Dusedevel -Duse64bitint -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=9.62  s=2.17  cu=624.21  cs=59.14  scripts=1380  tests=184021
+All tests successful.
+TSTENV = perlio	u=8.85  s=1.82  cu=593.22  cs=56.08  scripts=1380  tests=184021
+All tests successful.
+TSTENV = locale:en_US.utf8	u=9.29  s=1.98  cu=605.61  cs=61.29  scripts=1379  tests=184016
+All tests successful.
+Stopped smoke at 1188604289
+Started smoke at 1188604289
+
+Configuration: -Dusedevel -Duselongdouble
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=7.62  s=1.96  cu=558.75  cs=62.80  scripts=1379  tests=183877
+All tests successful.
+TSTENV = perlio	u=7.84  s=1.97  cu=510.88  cs=59.01  scripts=1379  tests=183877
+All tests successful.
+TSTENV = locale:en_US.utf8	u=7.99  s=2.33  cu=531.21  cs=61.70  scripts=1378  tests=183872
+All tests successful.
+Stopped smoke at 1188607351
+Started smoke at 1188607351
+
+Configuration: -Dusedevel -Duselongdouble -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=9.32  s=2.20  cu=619.61  cs=61.89  scripts=1379  tests=183878
+All tests successful.
+TSTENV = perlio	u=8.06  s=1.98  cu=582.31  cs=58.57  scripts=1379  tests=183878
+All tests successful.
+TSTENV = locale:en_US.utf8	u=8.90  s=2.14  cu=603.52  cs=62.34  scripts=1378  tests=183873
+All tests successful.
+Stopped smoke at 1188610674
+Started smoke at 1188610674
+
+Configuration: -Dusedevel -Dusemorebits
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=7.54  s=1.87  cu=560.97  cs=56.24  scripts=1380  tests=184020
+All tests successful.
+TSTENV = perlio	u=7.30  s=1.91  cu=514.50  cs=54.95  scripts=1380  tests=184020
+All tests successful.
+TSTENV = locale:en_US.utf8	u=7.35  s=1.91  cu=531.19  cs=60.40  scripts=1379  tests=184015
+All tests successful.
+Stopped smoke at 1188613655
+Started smoke at 1188613655
+
+Configuration: -Dusedevel -Dusemorebits -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=9.00  s=1.94  cu=640.90  cs=61.06  scripts=1380  tests=184021
+All tests successful.
+TSTENV = perlio	u=9.02  s=2.04  cu=598.77  cs=57.73  scripts=1380  tests=184021
+All tests successful.
+TSTENV = locale:en_US.utf8	u=9.94  s=2.34  cu=616.67  cs=62.04  scripts=1379  tests=184016
+All tests successful.
+Stopped smoke at 1188617028
+Started smoke at 1188617028
+
+Configuration: -Dusedevel -Duseithreads
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=8.97  s=2.18  cu=645.00  cs=60.24  scripts=1423  tests=185064
+All tests successful.
+TSTENV = perlio	u=7.74  s=1.90  cu=589.40  cs=56.74  scripts=1423  tests=185064
+All tests successful.
+TSTENV = locale:en_US.utf8	u=7.96  s=2.01  cu=614.37  cs=62.02  scripts=1422  tests=185059
+All tests successful.
+Stopped smoke at 1188620527
+Started smoke at 1188620527
+
+Configuration: -Dusedevel -Duseithreads -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=10.37  s=2.38  cu=759.89  cs=65.20  scripts=1423  tests=185065
+All tests successful.
+TSTENV = perlio	u=10.34  s=2.12  cu=704.12  cs=63.88  scripts=1423  tests=185065
+All tests successful.
+TSTENV = locale:en_US.utf8	u=9.53  s=2.27  cu=729.57  cs=68.00  scripts=1422  tests=185060
+All tests successful.
+Stopped smoke at 1188624550
+Started smoke at 1188624550
+
+Configuration: -Dusedevel -Duseithreads -Duse64bitint
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=8.19  s=2.08  cu=650.26  cs=64.28  scripts=1424  tests=185208
+All tests successful.
+TSTENV = perlio	u=7.97  s=1.84  cu=604.36  cs=60.99  scripts=1424  tests=185208
+All tests successful.
+TSTENV = locale:en_US.utf8	u=8.63  s=2.15  cu=630.67  cs=65.50  scripts=1423  tests=185203
+All tests successful.
+Stopped smoke at 1188628100
+Started smoke at 1188628100
+
+Configuration: -Dusedevel -Duseithreads -Duse64bitint -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=10.58  s=2.21  cu=763.30  cs=65.62  scripts=1424  tests=185209
+All tests successful.
+TSTENV = perlio	u=10.39  s=2.30  cu=719.52  cs=63.05  scripts=1424  tests=185209
+All tests successful.
+TSTENV = locale:en_US.utf8	u=10.58  s=2.40  cu=747.94  cs=68.04  scripts=1423  tests=185204
+All tests successful.
+Stopped smoke at 1188632174
+Started smoke at 1188632174
+
+Configuration: -Dusedevel -Duseithreads -Duselongdouble
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=8.86  s=2.19  cu=639.97  cs=64.30  scripts=1423  tests=185065
+All tests successful.
+TSTENV = perlio	u=7.62  s=2.00  cu=594.38  cs=61.90  scripts=1423  tests=185065
+All tests successful.
+TSTENV = locale:en_US.utf8	u=8.49  s=2.10  cu=619.79  cs=67.15  scripts=1422  tests=185060
+All tests successful.
+Stopped smoke at 1188635777
+Started smoke at 1188635777
+
+Configuration: -Dusedevel -Duseithreads -Duselongdouble -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=11.06  s=2.42  cu=758.51  cs=68.88  scripts=1423  tests=185066
+All tests successful.
+TSTENV = perlio	u=10.51  s=2.34  cu=704.01  cs=65.62  scripts=1423  tests=185066
+All tests successful.
+TSTENV = locale:en_US.utf8	u=10.63  s=2.38  cu=736.21  cs=70.40  scripts=1422  tests=185061
+All tests successful.
+Stopped smoke at 1188639825
+Started smoke at 1188639825
+
+Configuration: -Dusedevel -Duseithreads -Dusemorebits
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=9.05  s=2.17  cu=646.88  cs=65.60  scripts=1424  tests=185208
+All tests successful.
+TSTENV = perlio	u=8.09  s=2.10  cu=607.44  cs=63.63  scripts=1424  tests=185208
+All tests successful.
+TSTENV = locale:en_US.utf8	u=7.78  s=2.08  cu=623.32  cs=68.24  scripts=1423  tests=185203
+All tests successful.
+Stopped smoke at 1188643369
+Started smoke at 1188643369
+
+Configuration: -Dusedevel -Duseithreads -Dusemorebits -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: ccache gcc version 4.0.2
+TSTENV = stdio	u=10.03  s=2.16  cu=757.21  cs=68.63  scripts=1424  tests=185209
+All tests successful.
+TSTENV = perlio	u=9.70  s=2.35  cu=717.33  cs=66.15  scripts=1424  tests=185209
+All tests successful.
+TSTENV = locale:en_US.utf8	u=10.58  s=2.30  cu=740.85  cs=71.22  scripts=1423  tests=185204
+All tests successful.
+Finished smoking 31775
+Stopped smoke at 1188647424

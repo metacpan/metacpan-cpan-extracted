@@ -1,0 +1,67 @@
+{
+   "abstract" : "A tied array which combines the power of Tie::File and Text::CSV",
+   "author" : [
+      "Joel Berger"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-Array-CSV",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Text::CSV" : "0",
+            "Tie::File" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::Array::CSV" : {
+         "file" : "lib/Tie/Array/CSV.pm",
+         "version" : "0.07"
+      },
+      "Tie::Array::CSV::HoldRow" : {
+         "file" : "lib/Tie/Array/CSV/HoldRow.pm",
+         "version" : 0
+      },
+      "Tie::Array::CSV::HoldRow::Row" : {
+         "file" : "lib/Tie/Array/CSV/HoldRow.pm",
+         "version" : 0
+      },
+      "Tie::Array::CSV::Row" : {
+         "file" : "lib/Tie/Array/CSV.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Tie-Array-CSV/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Tie-Array-CSV"
+      }
+   },
+   "version" : "0.07"
+}

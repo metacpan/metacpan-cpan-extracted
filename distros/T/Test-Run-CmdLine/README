@@ -1,0 +1,24 @@
+Test-Run-CmdLine
+
+This module allows one to run TAP tests and analyze them from the command
+line using the Test::Run module.
+
+It provides runprove, as well as other command line facilities similar to
+Test::Harness' default behaviour only using its Test::Run spin-off.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Shlomi Fish
+
+This program is released under the MIT X11 License.
+

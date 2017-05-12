@@ -1,0 +1,33 @@
+---
+abstract: 'handy utf8 tests'
+author:
+  - 'Written by Mark Fowler B<mark@twoshortplanks.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Builder::Tester: 0.09
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-utf8
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Test::Builder: 0
+  perl: 5.7.3
+resources:
+  homepage: https://github.com/2shortplanks/Test-utf8/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/2shortplanks/Test-utf8.git
+    web: https://github.com/2shortplanks/Test-utf8/tree
+version: 1.01

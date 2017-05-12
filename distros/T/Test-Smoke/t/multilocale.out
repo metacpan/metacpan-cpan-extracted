@@ -1,0 +1,27 @@
+Started smoke at 1188392181
+Smoking patch 31760
+Stopped smoke at 1188392184
+Started smoke at 1188392184
+
+Configuration: -Dusedevel
+------------------------------------------------------------------------------
+
+Compiler info: cc version 4.0.1 (Apple Computer, Inc. build 5367)
+TSTENV = stdio	u=17.77  s=9.11  cu=1008.20  cs=251.72  scripts=1378  tests=183887
+
+    ../t/op/utftaint.t......................FAILED 87-88
+
+TSTENV = perlio	u=17.91  s=8.70  cu=938.80  cs=246.62  scripts=1378  tests=183887
+
+    ../t/op/utftaint.t......................FAILED 87-88
+
+TSTENV = locale:be_BY.UTF-8	u=18.17  s=8.82  cu=955.91  cs=250.25  scripts=1377  tests=183884
+
+    ../t/op/utftaint.t......................FAILED 87-88
+
+TSTENV = locale:nl_NL.UTF-8	u=17.73  s=8.46  cu=934.79  cs=241.66  scripts=1377  tests=183884
+
+    ../t/op/utftaint.t......................FAILED 87-88
+
+Finished smoking 31760
+Stopped smoke at 1188401720

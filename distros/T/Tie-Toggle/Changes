@@ -1,0 +1,34 @@
+Revision history for Perl module Tie::Toggle
+
+1.081 2016-01-12T19:49:03Z
+	* Freshen the module with all the current info
+
+1.08 - 2007-09-24
+	* Updating dist and Makefile.PL. No need to upgrade.
+
+1.07 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.06 - 2006-05-17
+	* Updated dist for copyright notice, kwalitee. No need to upgrade.
+
+1.05 - 2005-03-08
+	* Added POD coverage tests: no need to upgrade
+
+1.04 - 2004-09-07
+	* cleaned up distribution and added README
+	* no need to upgrade if you already have this module
+
+1.03 - 2002-12-17
+	* removed 'require 5.6.0' (perl5.8 complains about v-strings)
+	* beefed up distribution files
+	* no code changes --- no need to install if you already have this
+
+0.02 - 2001-01-24
+	* minor doc fixes
+
+0.01 - 2000-08-13
+	* original version; created by h2xs 1.20 with options
+		-AXn Tie::Toggle
+

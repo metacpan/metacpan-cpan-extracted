@@ -1,0 +1,10 @@
+[% WRAPPER page.tt %]
+  <h2>Build engine status</h2>
+
+  <ol>
+  [% FOREACH result = results %]
+    [% INCLUDE "status-stage.tt" 
+         context = result.name %]
+  [% END %]
+  </ol>
+[% END %]

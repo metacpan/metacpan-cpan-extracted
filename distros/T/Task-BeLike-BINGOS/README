@@ -1,0 +1,26 @@
+NAME
+
+    Task::BeLike::BINGOS - Be the most BINGOS you can be
+
+VERSION
+
+    version 1.06
+
+DESCRIPTION
+
+    Task::BeLike::BINGOS is a Task module to install all the modules that I
+    like to have kicking around.
+
+    See the Makefile.PL file in this distribution for details.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

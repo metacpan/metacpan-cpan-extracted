@@ -1,0 +1,21 @@
+Revision history of Test::Skeleton::Generator
+
+0.06 2014-08-25T14:09:52Z
+    - Use autodie in a way the hopefully fixes all the test failures
+
+0.05 2014-08-19T07:46:14Z
+    - Include 'autodie' in cpanfile
+
+0.04 2014-08-18T07:38:36Z
+    - Test::Most isn't spelled Test::More. Updated the cpanfile
+
+0.03 2014-08-17T09:33:34Z
+    - Write tests, tests, tests
+
+0.02 2014-08-16T22:00:30Z
+    - add more documentation
+
+0.01 2014-08-16T14:38:02Z
+
+    - original version
+

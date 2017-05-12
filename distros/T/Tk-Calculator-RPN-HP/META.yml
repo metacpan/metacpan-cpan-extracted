@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tk-Calculator-RPN-HP
+version:      1.2
+version_from: Tk/Calculator/RPN/HP.pm
+installdirs:  site
+requires:
+    Getopt::EvaP:                  
+    Tk::LCD:                       1.2
+    Tk::ProgressBar::Mac:          1.1
+    Tk::SlideSwitch:               1.1
+    Tk::Splashscreen:              1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

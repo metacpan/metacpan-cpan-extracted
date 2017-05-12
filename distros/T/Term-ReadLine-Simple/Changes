@@ -1,0 +1,117 @@
+Revision history for Term::ReadLine::Simple
+
+
+0.309   2016-08-30
+        - Renamed "Term::ReadLine::Simple" to "Term::Form".
+
+0.308   2015-12-13
+        - Handle multi-line prompt.
+
+0.307   2015-12-04
+        - Makefile.PL: fixed url to github repository  [github #1 - Mohammad S Anwar (Manwar)].
+
+0.306   2015-12-03
+        - List::Util: 'any()'not available before version "1.33".
+
+0.305   2015-12-02
+        - Bugfix in "fill_form": don't alter the passed AoA - make a copy instead.
+        - Removed option "sep".
+        - New option "ro" - readonly.
+        - Update documentation.
+
+0.304   2015-11-12
+        - Bugfix list-reference.
+
+0.303   2015-10-31
+        - Bugfix: set "auto_up" to 0 so it is defined.
+
+0.302   2015-05-11
+        - "readline": catch "key-up" and "key-down".
+
+0.301   2015-04-14
+        - Expect tests only in xt.
+        - Code refactoring.
+
+0.300   2015-03-28
+        - "fill_form": meaning of the option "auto_up" changed.
+        - "fill_form": new option "sep".
+
+0.209   2015-03-23
+        - Changed tests.
+
+0.208_06   2015-03-22
+        - Changed tests.
+
+0.208_05   2015-03-21
+        - Changed tests.
+
+0.208_04   2015-03-20
+        - Changed tests.
+
+0.208_03   2015-03-19
+        - Changed tests.
+
+0.208_02   2015-03-19
+        - Changed tests.
+
+0.208_01   2015-03-18
+        - Changed tests.
+
+0.208   2015-03-18
+        - Changed tests.
+
+0.207_02   2015-03-18
+        - Changed tests.
+
+0.207_01   2015-03-17
+        - Changed tests.
+
+0.207   2015-03-17
+        - option "compat" affects also "fill_form".
+        - Update documentation.
+
+0.206   2015-03-16
+        - Modified test.
+
+0.205   2015-03-16
+        - Modified test.
+        - Changed "ENTER" key behavior.
+
+0.204   2015-03-16
+        - Modified test.
+
+0.203   2015-03-15
+        - Modified test.
+
+0.202   2015-03-15
+        - Refactored "option" code.
+
+0.201   2015-03-15
+        - "fill_form": new option "auto_up".
+        - Code refactoring.
+        - Update documentation.
+
+0.200   2015-03-14
+        - Refactored 'readline' - keep output in one row.
+        - New method 'fill_form'.
+        - Update documentation.
+
+0.016   2015-02-05
+        - Use constant.
+        - Update year copyright.
+
+0.015   2014-12-08
+        - Perl minimum version: "5.8.3".
+        - Update build requirements.
+
+0.014   2014-11-20
+        - Make tests which use "Expect" optional.
+
+0.013   2014-09-06
+        - Modified tests: skip if a "Given filehandle is not a tty in clone_winsize_from".
+
+0.012   2014-08-27
+        - Improved documentation.
+
+0.011   2014-08-27
+        - First release on CPAN.

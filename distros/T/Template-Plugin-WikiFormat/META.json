@@ -1,0 +1,63 @@
+{
+    "name": "Template-Plugin-WikiFormat",
+    "version": "0.07",
+    "abstract": "TT wrapper for Text::WikiFormat",
+    "author": ["Barbie <barbie@cpan.org>"],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "template",
+        "wiki"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Template": "2",
+                "Template::Plugin::Filter": "2",
+                "Text::WikiFormat": "0.75"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Template::Test": "2",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Template::Plugin::WikiFormat": {
+            "file": "lib/Template/Plugin/WikiFormat.pm",
+            "version": "0.07"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-WikiFormat" },
+        "repository": {
+            "url": "git://github.com/barbie/template-plugin-wikiformat.git",
+            "web": "http://github.com/barbie/template-plugin-wikiformat",
+            "type": "git"
+        }
+    }
+}

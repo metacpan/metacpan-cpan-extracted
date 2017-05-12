@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-PerlInheritanceTree.t
+t/pod.t
+lib/Tk/PerlInheritanceTree.pm
+META.yml                                 Module meta-data (added by MakeMaker)

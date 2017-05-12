@@ -1,0 +1,42 @@
+# check that chomp works...
+%% DEFINE 
+   one = 1
+   two = 2
+%%
+%% DEFINE 
+   three = 3
+   four  = 4
+%%
+# this comment line should immediately proceed the previous one when 
+# CHOMP is enabled (chomp.1).  With CHOMP disabled (chomp.2), there 
+# should be 2 blank lines between them which are the newlines trailing
+# after the DEFINE directives above.  
+
+# These examples have extraneous characters and whitespace between the
+# end of the directive and EOL which should over-ride the CHOMPer
+%% DEFINE 
+   five = 5
+   six  = 6
+%%   
+%% DEFINE
+   seven = 7
+%%  .
+# that's it for CHOMP
+
+
+# now let's INCLUDE a block that has been TRIMmed (default)...
+-->%% INCLUDE foo %%<-- 
+# ...and one that hasn't been trimmed by explicitly stating "trim=0"
+-->%% INCLUDE bar %%<--
+# that's it for trim
+
+__MTEND__
+%% BLOCK foo %%
+foo/1  This is block foo
+foo/2  This block is trimmed (default)
+%% ENDBLOCK %%
+
+%% BLOCK bar trim=0 %%
+bar/1  This is block bar
+bar/2  This block is not trimmed
+%% ENDBLOCK %%

@@ -1,0 +1,61 @@
+Revision history for Perl extension Tk::ToolBar.
+
+0.12  2015-02-28
+    - removes Tk::CursorControl as prerequisite to allow automatic PPM build by ActiveState
+	- normalized white space ident in Makefile.PL
+
+0.11  2015-02-23
+    - pod fixes (Alexander Becker)
+    - support for Tk::BrowseEntry
+
+0.10  Sun Feb 28 2010
+new maintainer: Alexandr Ciornii
+        - Dist maintenance
+        - pod test
+        - Better META.yml
+        - Symlink removed
+
+0.09  Fri Jan  9 18:28:31 PST 2004
+	- Added -in.
+	- Added -float. Now toolbars can float on desktop.
+	- Changed shape of edge slightly
+
+0.08  Wed Aug  6 16:40:33 PDT 2003
+	- Fixed Tk::CursorControl support (somehow it got dropped).
+	- $_ is localized when reading tkIcons.
+	- Added -space option to separators.
+	- Added -indicatorcolor and -indicatorrelief options to 
+	  control color/relief of visual indicator.
+	- Changed default visual indicator color to nice blue.
+
+0.07  Hmmm ...
+
+0.06  Wed Jun 25 15:46:31 PDT 2003
+	- Added tk-style icons.
+	- Misc. bug fixes.
+
+0.05  Tue Jun  3 11:38:25 2003
+	- Made separators movable.
+	- Added '-accelerator' option to ToolButtons to bind
+	  for short-cuts.
+	- Added support for Tk::CursorControl, if installed.
+
+0.01  Fri Mar 14 16:35:07 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Tk::ToolBar
+
+0.03  Sun Apr 13 14:26:07 2003
+	- Added support for embedding ToolBars inside each other.
+	- Added support for Menubuttons, Labels, Entries and LabEntries.
+
+0.04  Mon May  5 17:51:47 2003
+	- Added separator() method.
+	- Implemented a visual indicator that shows where the
+	  dragged ToolBar will stick.
+	- Added "real-time" dragging so dragged ToolBar is
+	  completely visible during dragging.
+	- Now, the entire dimension of the dragged ToolBar is used
+	  to calculate proximity to an edge (rather than just mouse
+	  position).
+	- Added tooltips via Tk::Balloon.
+	

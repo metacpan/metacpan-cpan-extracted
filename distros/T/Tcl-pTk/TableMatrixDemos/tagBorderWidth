@@ -1,0 +1,39 @@
+# Script show the new multi-number borderwidth option for tags
+#   Borderwidth can be specified as a space separated list of 
+#     4 numbers representing left right top bottom borders drawn in a cell
+#
+#   In this example, the tag'ed row will have a large top/bottom border, and a normal
+#     size left/right border
+
+use Tcl::pTk qw/:perlTk/;
+use Tcl::pTk::TableMatrix;
+
+use strict;
+
+my $mw = MainWindow->new;
+
+#$mw->optionAdd('*background', 'blue', 'interactive');
+$mw->optionAdd('*tablematrix*background', 'skyblue');
+
+my $table = $mw->TableMatrix(-rows => 5,
+                            -cols => 8,
+                            -cache => 1,
+			    #-bg => 'blue',
+			    );                
+$table->pack(-expand => 1, -fill => 'both');
+
+$table->tagConfigure("invalid", -background => 'red', -relief => 'raised', -bd => '1 1 5 5');
+$table->tagConfigure("left", -anchor => 'w');
+
+foreach my $row (0..4) {
+     #$table->tagRow('invalid', $row);                # swap
+     foreach my $column (0..7) {
+       $table->set("$row,$column", "hello");
+             #$table->tagCell('left', "$row,$column");    # swap
+   }
+}
+
+$table->tagCell('left', '2,3');
+$table->tagRow('invalid', 2);
+
+MainLoop;

@@ -1,0 +1,61 @@
+NAME
+
+    Text::Guess::Script - Guess script from text using ISO-15924 codes
+
+SYNOPSIS
+
+      use Text::Guess::Script;
+      my $guessed_script = Text::Guess::Script->guess($text);
+
+DESCRIPTION
+
+    Text::Guess::Script matches the characters in the text against the
+    script property and returns the code of script with most characters.
+
+ CONSTRUCTOR
+
+    new()
+
+      Creates a new object which maintains internal storage areas for the
+      Text::Guess::Script computation. Use one of these per concurrent
+      Text::Guess::Script->guess() call.
+
+ METHODS
+
+    guess($text)
+
+      Returns the script code with the most characters.
+
+ EXPORT
+
+    None by design.
+
+STABILITY
+
+    Until release of version 1.00 the included methods, names of methods
+    and their interfaces are subject to change.
+
+    Beginning with version 1.00 the specification will be stable, i.e. not
+    changed between major versions.
+
+SOURCE REPOSITORY
+
+    http://github.com/wollmers/Text-Guess-Script
+
+AUTHOR
+
+    Helmut Wollmersdorfer <helmut.wollmersdorfer@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2016- Helmut Wollmersdorfer
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Locale::Codes::Script
+

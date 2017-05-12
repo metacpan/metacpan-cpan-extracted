@@ -1,0 +1,139 @@
+<%args>
+        $report
+        %failures => {}
+</%args>
+<%method meta_row>
+  <%args>
+        $name
+        $value
+  </%args>
+% if ($value) {
+<tr>
+        <th><% $name %>:</th>
+        <td>
+%       if ($name =~ /url$/) {
+%           my @urls = split(qr/\s+/, $value);
+%           foreach my $url (@urls) {
+                <a href="<% $url %>"><% $url %></a>
+%           }
+%       } else {
+            <% $value %>
+%       }
+        </td>
+</tr>
+% }
+</%method>
+
+%          # this enumeration is a bit lame. anyway: copy the list from Tapper::TAP::Harness.@SECTION_HEADER_KEYS_GENERAL.
+%          my @meta_cols = qw/ram cpuinfo bios lspci uname osname uptime language-description
+%                             flags kernel changeset description
+%                             xen-version xen-changeset xen-dom0-kernel xen-base-os-description
+%                             xen-guest-description xen-guest-test xen-guest-start xen-guest-flags
+%                             kvm-module-version kvm-userspace-version kvm-kernel
+%                             kvm-base-os-description kvm-guest-description
+%                             kvm-guest-test kvm-guest-start kvm-guest-flags
+%                             simnow-version
+%                             simnow-svn-version
+%                             simnow-device-interface-version
+%                             simnow-svn-repository
+%                             simnow-bsd-file
+%                             simnow-image-file
+%                             ticket-url wiki-url planning-id moreinfo-url codereview-url
+%                             tags
+%                            /;
+%
+% my $reportgrouptestrun = $report->reportgrouptestrun;
+% my @reportlist = ($report);
+% if ($reportgrouptestrun) {
+%     @reportlist = $reportgrouptestrun->groupreports->all;
+% }
+
+% if (keys %failures) {
+<h4>Issue Summary</h4>
+    <table class="issuesummary">
+      <tbody>
+%   foreach my $key (sort keys %failures) {
+%     my $report_name = $failures{$key}{name};
+%     my $machine_name = $failures{$key}{machine_name};
+%     if (my @report_failures = @{$failures{$key}{failures} || []}) {
+        <tr>
+          <td><a href="/tapper/reports/id/<% $key %>">
+%         if ($key eq $report->id) {
+            <strong>
+%         }
+            <% $key %>
+%         if ($key eq $report->id) {
+            </strong>
+%         }
+          </a></td>
+          <th colspan="2"><u><% $report_name %></u>&nbsp;@&nbsp;<u><% $machine_name %></u></th>
+        </tr>
+%       foreach my $failure (@report_failures) {
+        <tr>
+          <td/>
+          <td/>
+          <td>not ok <% $failure->{number} %> <strong><% $failure->{description} %></strong></td>
+        </tr>
+%       } # foreach failure
+%     } # if @eport_failures
+%   } # foreach keys failures
+      </tbody>
+    </table>
+% } # if keys failures
+
+% # --------------------------------------------------------
+% # Prepare Test Execution Context - avoid duplicate entries
+% # --------------------------------------------------------
+%  my %already_seen = ();
+%  my @contexts = ();
+%  foreach my $r ( @reportlist) {
+%   my $sections = $r->reportsections;
+%   if ($r->some_meta_available) {
+%     my $context;
+%     $context->{suite_name} = $r->suite ? $r->suite->name : 'unknown suite';
+%     $context->{id} = $r->id;
+%     my @context_sections = ();
+%     while (my $section = $sections->next) {
+%        if ($section->some_meta_available) {
+%          my $context_section;
+%          $context_section->{name} = $section->name;
+%          $context_section->{machine_name} = $r->machine_name;
+%          my %cols = $section->get_columns;
+%           my $signature = join("~", map { "$_".":".($cols{$_}||"") } map { s/-/_/g; $_ } sort @meta_cols);
+%           if (not $already_seen{$r->suite->name}{$section->name}{$signature}) {
+%                   $already_seen{$r->suite->name}{$section->name}{$signature} = 1;
+%               my @meta_lines = ();
+%               foreach (sort map { s/-/_/g; $_ } @meta_cols) {
+%                   push @meta_lines, { name => $_, value => $cols{$_} } if defined $cols{$_};
+%               }
+%               $context_section->{meta_lines} = \@meta_lines;
+%           }
+%           push @context_sections, $context_section if @{$context_section->{meta_lines} || []};
+%        } # if $section->some_meta_available
+%     } # while $sections->next
+%     $context->{context_sections} = \@context_sections if @context_sections;
+%     push @contexts, $context if @{$context->{context_sections} || []};
+%   } # if $r->some_meta_available
+%  }
+
+% # ---------------------------------------------
+% # Actually print Prepare Test Execution Context
+% # ---------------------------------------------
+% if (@contexts) {
+     <h4>Test Execution Context</h4>
+%    foreach my $context (@contexts) {
+        <h5><b><% $context->{suite_name} %></b> (r<a href="<% $context->{id} %>"><% $context->{id} %></a>)</h5>
+        <table class="reportsectionmeta">
+%       foreach my $context_section (@{$context->{context_sections} || []}) {
+            <tr><td colspan="2"><h5>&nbsp;&nbsp;<% $context_section->{name} %> on <% $context_section->{machine_name} %></h5></td></tr>
+%           foreach my $meta_line (@{$context_section->{meta_lines} || []}) {
+                <& SELF:meta_row, name => $meta_line->{name} , value => $meta_line->{value} &>
+%           }
+%       }
+        </table>
+%    }
+%  }
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

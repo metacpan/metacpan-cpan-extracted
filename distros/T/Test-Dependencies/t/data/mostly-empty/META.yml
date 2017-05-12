@@ -1,0 +1,4 @@
+author: Zev Benjamin <zev@cpan.com>
+requires: ~
+version: 1.0
+name: Mostly::Empty

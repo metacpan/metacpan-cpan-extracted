@@ -1,0 +1,288 @@
+NAME
+    "Text::Ngramize" - Computes lists of n-grams from text.
+
+SYNOPSIS
+      use Text::Ngramize;
+      use Data::Dump qw(dump);
+      my $ngramizer = Text::Ngramize->new (normalizeText => 1);
+      my $text = "This sentence has 7 words; doesn't it?";
+      dump $ngramizer-> (text => \$text);
+
+DESCRIPTION
+    "Text::Ngramize" is used to compute the list of n-grams derived from the
+    bytes, characters, or words of the text provided. Methods are included
+    that provide positional information about the n-grams computed within
+    the text.
+
+CONSTRUCTOR
+  "new"
+      use Text::Ngramize;
+      use Data::Dump qw(dump);
+      my $ngramizer = Text::Ngramize->new (normalizeText => 1);
+      my $text = ' To be.';
+      dump $ngramizer->getListOfNgrams (text => \$text);
+      # dumps:
+      # ["to ", "o b", " be", "be "]
+
+    The constructor "new" has optional parameters that set how the n-grams
+    are computed. "typeOfNgrams" is used to set the type of tokens used in
+    the n-grams, "normalizeText" is used to set normalization of the text
+    before the tokens are extracted, and "ngramWordSeparator" is the
+    character used to join n-grams of words.
+
+    "typeOfNgrams"
+         typeOfNgrams => 'characters'
+
+        "typeOfNgrams" sets the type of tokens to extract from the text to
+        form the n-grams: 'asc' indicates the list of ASC characters
+        comprising the bytes of the text are to be used, 'characters'
+        indicates the list of characters are to be used, and 'words'
+        indicates the words in the text are to be used. Note a word is
+        defined as a substring that matches the Perl regular expression
+        '\p{Alphabetic}+', see perlunicode for details. The default is
+        'characters'.
+
+    "sizeOfNgrams"
+         sizeOfNgrams => 3
+
+        "sizeOfNgrams" holds the size of the n-grams that are to be created
+        from the tokens extracted. Note n-grams of size one are the tokens
+        themselves. "sizeOfNgrams" should be a positive integer; the default
+        is three.
+
+    "normalizeText"
+         normalizeText => 0
+
+        If "normalizeText" evalutes to true, the text is normalized before
+        the tokens are extracted; normalization proceeds by converting the
+        text to lower case, replacing all non-alphabetic characters with a
+        space, compressing multiple spaces to a single space, and removing
+        any leading space but not a trailing space. The default value of
+        "normalizeText" is zero, or false.
+
+    "ngramWordSeparator"
+          ngramWordSeparator => ' '
+
+        "ngramWordSeparator" is the character used to separate token-"words"
+        when forming n-grams from them. It is only used when "typeOfNgrams"
+        is set to 'words'; the default is a space. Note, this is used to
+        avoid having n-grams clash, for example, with bigrams the word pairs
+        'a aaa' and 'aa aa' would produce the same n-gram 'aaaa' without a
+        space separating them.
+
+METHODS
+  "getTypeOfNgrams"
+    Returns the type of n-grams computed as a string, either 'asc',
+    'characters', or 'words'.
+
+      use Text::Ngramize;
+      use Data::Dump qw(dump);
+      my $ngramizer = Text::Ngramize->new ();
+      dump $ngramizer->getTypeOfNgrams;
+      # dumps:
+      # "characters"
+
+  "getSizeOfNgrams"
+    Returns the size of n-grams computed.
+
+      use Text::Ngramize;
+      use Data::Dump qw(dump);
+      my $ngramizer = Text::Ngramize->new ();
+      dump $ngramizer->getSizeOfNgrams;
+      # dumps:
+      # 3
+
+  "getListOfNgrams"
+    The function "getListOfNgrams" returns an array reference to the list of
+    n-grams computed from the text provided or the list of tokens provided
+    by "listOfTokens".
+
+    "text"
+          text => ...
+
+        "text" holds the text that the tokens are to be extracted from. It
+        can be a single string, a reference to a string, a reference to an
+        array of strings, or any combination of these.
+
+    "listOfTokens"
+          listOfTokens => ...
+
+        Optionally, if "text" is not defined, then the list of tokens to use
+        in forming the n-grams can be provided by "listOfTokens", which
+        should point to an array reference of strings.
+
+    An example using the method:
+
+      use Text::Ngramize;
+      use Data::Dump qw(dump);
+      my $ngramizer = Text::Ngramize->new (typeOfNgrams => 'words', normalizeText => 1);
+      my $text = "This isn't a sentence.";
+      dump $ngramizer->getListOfNgrams (text => \$text);
+      # dumps:
+      # ["this isn t", "isn t a", "t a sentence"]
+      dump $ngramizer->getListOfNgrams (listOfTokens => [qw(aa bb cc dd)]);
+      # dumps:
+      # ["aa bb cc", "bb cc dd"]
+
+  "getListOfNgramsWithPositions"
+    The function "getListOfNgramsWithPositions" returns an array reference
+    to the list of n-grams computed from the text provided or the list of
+    tokens provided by "listOfTokens". Each item in the list returned is of
+    the form "['n-gram', starting-index, n-gram-length]"; the starting index
+    and n-gram length are relative to the unnormalized text. When
+    "typeOfNgrams" is 'asc' the index and length refer to bytes, when
+    "typeOfNgrams" is 'characters' or 'words' they refer to characters.
+
+    "text"
+          text => ...
+
+        "text" holds the text that the tokens are to be extracted from. It
+        can be a single string, a reference to a string, a reference to an
+        array of strings, or any combination of these.
+
+    "listOfTokens"
+          listOfTokens => ...
+
+        Optionally, if "text" is not defined, then the list of tokens to use
+        in forming the n-grams can be provided by "listOfTokens", which
+        should point to an array reference where each item in the array is
+        of the form "[token, starting-position, length]", where
+        "starting-position" and "length" are integers indicating the
+        position of the token.
+
+    An example using the method:
+
+      use Text::Ngramize;
+      use Data::Dump qw(dump);
+      my $ngramizer = Text::Ngramize->new (typeOfNgrams => 'words', normalizeText => 1);
+      my $text = " This  isn't a  sentence.";
+      dump $ngramizer->getListOfNgramsWithPositions (text => \$text);
+      # dumps:
+      # [
+      #   ["this isn t", 1, 11],
+      #   ["isn t a", 7, 7],
+      #   ["t a sentence", 11, 13],
+      # ]
+
+  "getListOfNgramHashValues"
+    The function "getListOfNgramHashValues" returns an array reference to
+    the list of integer hash values computed from the n-grams of the text
+    provided or the list of tokens provided by "listOfTokens". The advantage
+    of using hashes over strings is that they take less memory and are
+    theoretically faster to compute. With strings the time to compute the
+    n-grams is proportional to their size, with hashes it is not since they
+    are computed recursively. Also, the amount of memory used to store the
+    n-gram strings grows proportional to their size, with hashes it does
+    not. The disadvantage lies with hashing collisions, but these will be
+    very rare. However, for small n-gram sizes hash values may take more
+    time to compute since all code is written in Perl.
+
+    "text"
+          text => ...
+
+        "text" holds the text that the tokens are to be extracted from. It
+        can be a single string, a reference to a string, a reference to an
+        array of strings, or any combination of these.
+
+    "listOfTokens"
+          listOfTokens => ...
+
+        Optionally, if "text" is not defined, then the list of tokens to use
+        in forming the n-grams can be provided by "listOfTokens", which
+        should point to an array reference of strings.
+
+    An example using the method:
+
+      use Text::Ngramize;
+      use Data::Dump qw(dump);
+      my $ngramizer = Text::Ngramize->new (typeOfNgrams => 'words', normalizeText => 1);
+      my $text = "This isn't a sentence.";
+      dump $ngramizer->getListOfNgramHashValues (text => \$text);
+      # NOTE: hash values may vary across computers.
+      # dumps:
+      # [
+      #   "4038955636454686726",
+      #   "5576083060948369410",
+      #   "6093054335710494749",
+      # ]  dump $ngramizer->getListOfNgramHashValues (listOfTokens => [qw(aa bb cc dd)]);
+      # dumps:
+      # ["7326140501871656967", "5557417594488258562"]
+
+  "getListOfNgramHashValuesWithPositions"
+    The function "getListOfNgramHashValuesWithPositions" returns an array
+    reference to the list of integer hash values and n-gram positional
+    information computed from the text provided or the list of tokens
+    provided by "listOfTokens". Each item in the list returned is of the
+    form "['n-gram-hash', starting-index, n-gram-length]"; the starting
+    index and n-gram length are relative to the unnormalized text. When
+    "typeOfNgrams" is 'asc' the index and length refer to bytes, when
+    "typeOfNgrams" is 'characters' or 'words' they refer to characters.
+
+    The advantage of using hashes over strings is that they take less memory
+    and are theoretically faster to compute. With strings the time to
+    compute the n-grams is proportional to their size, with hashes it is not
+    since they are computed recursively. Also, the amount of memory used to
+    store the n-gram strings grows proportional to their size, with hashes
+    it does not. The disadvantage lies with hashing collisions, but these
+    will be very rare. However, for small n-gram sizes hash values may take
+    more time to compute since all code is written in Perl.
+
+    "text"
+          text => ...
+
+        "text" holds the text that the tokens are to be extracted from. It
+        can be a single string, a reference to a string, a reference to an
+        array of strings, or any combination of these.
+
+    "listOfTokens"
+          listOfTokens => ...
+
+        Optionally, if "text" is not defined, then the list of tokens to use
+        in forming the n-grams can be provided by "listOfTokens", which
+        should point to an array reference where each item in the array is
+        of the form "[token, starting-position, length]", where
+        "starting-position" and "length" are integers indicating the
+        position of the token.
+
+    An example using the method:
+
+      use Text::Ngramize;
+      use Data::Dump qw(dump);
+      my $ngramizer = Text::Ngramize->new (typeOfNgrams => 'words', normalizeText => 1);
+      my $text = " This  isn't a  sentence.";
+      dump $ngramizer->getListOfNgramHashValuesWithPositions (text => \$text);
+      # NOTE: hash values may vary across computers.
+      # dumps:
+      # [
+      #   ["4038955636454686726", 1, 11],
+      #   ["5576083060948369410", 7, 7],
+      #   ["6093054335710494749", 11, 13],
+      # ]
+
+INSTALLATION
+    To install the module run the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    If you are on a windows box you should use 'nmake' rather than 'make'.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    information processing, ngram, ngrams, n-gram, n-grams, string, text
+
+SEE ALSO
+    Encode, perlunicode, utf8
+

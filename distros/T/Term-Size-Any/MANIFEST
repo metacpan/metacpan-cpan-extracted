@@ -1,0 +1,21 @@
+
+Makefile.PL
+MANIFEST			This list of files
+README
+Changes
+
+lib/Term/Size/Any.pm
+lib/Term/Size/Any.pod
+
+t/01use.t
+t/02basic.t
+#t/03each.t
+t/05perl.t
+#t/06size.t
+#t/07readkey.t
+t/08win32.t
+#t/lib/Devel/Hide/Patched.pm
+
+t/98pod-coverage.t
+t/99pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

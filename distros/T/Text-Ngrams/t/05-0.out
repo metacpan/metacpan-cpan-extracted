@@ -1,0 +1,39 @@
+BEGIN OUTPUT BY Text::Ngrams version 1.8
+
+1-GRAMS (total count: 12)
+FIRST N-GRAM: M
+ LAST N-GRAM: _
+-------------------------
+_	1
+I	4
+M	1
+P	2
+S	4
+
+2-GRAMS (total count: 11)
+FIRST N-GRAM: M I
+ LAST N-GRAM: I _
+-------------------------
+I _	1
+I P	1
+I S	2
+M I	1
+P I	1
+P P	1
+S I	2
+S S	2
+
+3-GRAMS (total count: 10)
+FIRST N-GRAM: M I S
+ LAST N-GRAM: P I _
+-------------------------
+I P P	1
+I S S	2
+M I S	1
+P I _	1
+P P I	1
+S I P	1
+S I S	1
+S S I	2
+
+END OUTPUT BY Text::Ngrams

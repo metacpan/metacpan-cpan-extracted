@@ -1,0 +1,37 @@
+Test::Run::Plugin::AlternateInterpreters
+
+This is a module that allows one to specify alternate interpreters
+for each test files as being run by Test::Run.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Test::Run::Plugin::AlternateInterpreters
+
+You can also look for information at:
+
+    Search CPAN
+        https://metacpan.org/release/Test-Run-Plugin-AlternateInterpreters
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test::Run::Plugin::AlternateInterpreters
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Test::Run::Plugin::AlternateInterpreters
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Shlomi Fish
+
+This program is released under the following license: MIT X11.

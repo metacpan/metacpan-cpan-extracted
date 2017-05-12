@@ -1,0 +1,39 @@
+Text-Tags version 0.04
+
+Text::Tags is a folksonomy parser.  It takes a string of space-separated "tags"
+and splits them.  You can include spaces in tags by putting them in "double quotes"
+or 'single quotes'.  There is no backslash-escaping.  All whitespace is compressed to a single
+space.
+
+A major feature is that there are no "error cases" -- *every* possible string parses
+successfully.  (However, there are a few types of strings that can't appear in a tag,
+generally involving tags that contain both single and double quotes.)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+None.
+
+AUTHOR
+
+David Glasser <glasser@bestpractical.com>
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

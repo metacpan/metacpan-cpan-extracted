@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Term/GnuScreen.pm
+t/00-load.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

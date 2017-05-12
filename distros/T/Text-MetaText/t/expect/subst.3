@@ -1,0 +1,34 @@
+# this tests pre-defined variables that are passed into the 
+# Text::MetaText::process() method.
+# CASE sensitivity is OFF.  Expected text is shown in (parenthesis).
+
+ foo (predef-foo): predef-foo
+ bar (predef-bar): predef-bar
+
+
+
+ newfoo(NEWpredef-foo): NEWpredef-foo
+$newfoo(NEWpredef-foo): NEWpredef-foo
+ newbar(NEWpredef-bar): NEWpredef-bar
+$newbar(NEWpredef-bar): NEWpredef-bar
+
+
+#
+# The following variables are set as CASEVARS.  They must be passed into 
+# the MetaText->process_xxxx() and an appropriate reference must also be
+# made in the CASEVARS configuration item.  These variable values will
+# be used when a SUBST directive names it in *exactly* the same case as
+# defined.  A variable specified in any other case will be treated as 
+# a normal variable.  Thus, it is possible to define 'SPECIAL' which 
+# must be used as 'SPECIAL' but also to have a 'special' variable which
+# can be specified in any case combination (apart from 'SPECIAL', of 
+# course).  Metapage uses this to define certain "SYSTEM" variables
+# that a) can't be re-defined and b) don't stomp on any existing user
+# variables of the same name.
+#
+
+
+original copyright: (C) Copyright 1998 Andy Wardley
+modified copyright: (C) 1998 Ima Plagiarist
+modified copyright: (C) 1998 Ima Plagiarist (case folded)
+

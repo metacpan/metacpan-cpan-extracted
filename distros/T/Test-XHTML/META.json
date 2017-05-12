@@ -1,0 +1,86 @@
+{
+    "name": "Test-XHTML",
+    "version": "0.13",
+    "abstract": "Test web page code validation.",
+    "author": ["Barbie <barbie@cpan.org>"],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "validation",
+        "xhtml",
+        "test",
+        "qa",
+        "web"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Class::Accessor::Fast": "0",
+                "Data::Dumper": "0",
+                "File::Basename": "0",
+                "File::Find::Rule": "0",
+                "File::Path": "0",
+                "Getopt::Long": "0",
+                "HTML::TokeParser": "3.69",
+                "IO::File": "0",
+                "Test::Builder": "0",
+                "WWW::Mechanize": "0",
+                "XML::Catalogs::HTML": "0",
+                "XML::LibXML": "1.70"
+            }
+        },
+        "test" : {
+            "requires": {
+                "Test::Builder::Tester": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Test::XHTML": {
+            "file": "lib/Test/XHTML.pm",
+            "version": "0.13"
+        },
+        "Test::XHTML::Critic": {
+            "file": "lib/Test/XHTML/Critic.pm",
+            "version": "0.13"
+        },
+        "Test::XHTML::Valid": {
+            "file": "lib/Test/XHTML/Valid.pm",
+            "version": "0.13"
+        },
+        "Test::XHTML::WAI": {
+            "file": "lib/Test/XHTML/WAI.pm",
+            "version": "0.13"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Test-XHTML" },
+        "repository": {
+            "url": "git://github.com/barbie/test-xhtml.git",
+            "web": "http://github.com/barbie/test-xhtml",
+            "type": "git"
+        }
+    }
+}

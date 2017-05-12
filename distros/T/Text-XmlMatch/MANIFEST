@@ -1,0 +1,23 @@
+Changes
+extras/config.xml
+extras/ConfigurationFile.xml
+extras/EHConfig.xml
+extras/facilityConfig.xml
+extras/marketConfig.xml
+extras/singlepattern.xml
+lib/Text/XmlMatch.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+t/001_load.t
+t/002_rdc.t
+t/003_facility.t
+t/004_market.t
+t/005_extensiveGrouping.t
+t/006_problemcases.t
+t/007_listGroups.t
+t/008_marketGroups.t
+t/009_facilityGroups.t
+t/010_singlePatternFailure.t
+t/011_singlePatternExtended.t
+META.yml                                 Module meta-data (added by MakeMaker)

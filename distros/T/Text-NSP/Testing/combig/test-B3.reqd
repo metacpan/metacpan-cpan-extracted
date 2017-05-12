@@ -1,0 +1,2 @@
+ERROR(combig.pl):
+        Bigram file <test-B3.big> should show the total number of bigrams.

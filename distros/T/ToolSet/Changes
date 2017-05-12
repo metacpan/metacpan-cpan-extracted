@@ -1,0 +1,58 @@
+Revision history for ToolSet
+
+1.03      2017-05-05 23:15:15-04:00 America/New_York
+
+    [FIXED]
+
+    - Pass tests on newer perls without '.' in @INC.
+
+1.02      2016-03-10 21:01:23-05:00 America/New_York
+
+    [ADDED]
+
+    - Added support for exact control of white space when constructing
+      an import line.
+
+1.01      2014-02-27 11:02:19-05:00 America/New_York
+
+    [CHANGED]
+
+    - Updated metadata, repo and bugtracker
+
+    - Switched to managing distribution with Dist::Zilla
+
+1.00 Thu Apr  2 07:05:19 EDT 2009
+
+    - Changed: modules can be repeated in the list to export() to support
+      things like autouse.  (Patch from JMELTZER)
+
+0.99 Thu Dec  4 09:17:40 EST 2008
+
+    - Added: use_pragma() and no_pragma() for compile-time pragma support
+
+    - Deprecated: set_strict(), set_warnings() and set_feature() are
+      deprecated favor of use_pragma()
+
+    - Changed: switched to the Apache License, version 2.0; (it's clearer,
+      relicensable, and is explicit about contributions)
+
+0.14 Thu Nov  6 17:26:10 EST 2008
+    - Added: support for feature.pm in Perl 5.10
+
+0.13 Tue May 23 00:09:22 EDT 2006
+    - made pod/pod_coverage author tests skip by default
+    - removed always-out-of-date version info from Pod
+    - moved build_requires to build for better CPANPLUS compatibility
+
+0.12 Sun Dec  4 23:45:35 EST 2005
+    - fixed Build.PL generation of Makefile.PL
+
+0.11 Tue Oct 25 06:42:25 EDT 2005
+    - adds support for @EXPORT to list functions that ToolSet
+      will export by default
+
+0.10 Sat Oct 22 17:14:21 EDT 2005
+    - set_strict() added
+    - set_warnings() added
+    - export() added
+    - sample ToolSet::SWC added

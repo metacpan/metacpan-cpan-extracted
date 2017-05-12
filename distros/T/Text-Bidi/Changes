@@ -1,0 +1,88 @@
+Revision history for Perl module Text::Bidi
+2.12      2016-10-02 18:17:21+03:00 Asia/Jerusalem
+        * Added META comments to misc/bidi
+        * Misc build and install changes, issues #108736, #108738 (Thanks 
+          ppisar@redhat.com) 
+
+2.11      2015-11-08 01:08:59+02:00 Asia/Jerusalem
+        * Fix versioning issue (https://rt.cpan.org/Public/Bug/Display.html?id=108498)
+        * Fixed a bug in combining characters (Niqqud) handling, and added 
+          support for it in the urxvt plugin
+
+2.10      2015-10-17 20:53:51+03:00 Asia/Jerusalem
+        * Implemented Arabic joining and shaping (thanks to Dmitry Karasik)
+
+2.09      2014-06-03 09:51:08IDT+0300 Asia/Jerusalem
+        * Fixed pod language (rt #96158)
+        * Added missing ; in Makefile.PL
+        * Made ucd.t optional via the TEXT_BIDI_SKIP_UCD env variable
+
+2.08      2013-10-18 15:48:39 Asia/Jerusalem
+        * Made ucd.t less fail prone on older versions of Perl and fribidi
+        * Added fribidi_version_num to Text::Bidi
+
+2.07      2013-10-17 12:47:51 Asia/Jerusalem
+        * Added functions for retrieving version of libfribidi and Unicode
+        * Added method type_names() to Text::Bidi::Paragraph
+        * get_bidi_type_name() in Text::Bidi is now exportable
+        * Added debugging options --hex, --types, --verbose ... to fribidi.pl
+        * Fixed bugs in fribidi.pl
+        * Fixed bug with variable interpolation in Constants.pm
+
+2.06      2013-10-15 23:28:06 Asia/Jerusalem
+        * Made log2vis() more useful
+        * Bug fixes
+        * Added some tests
+        * Improved docs
+
+2.05      2013-09-23 11:56:35 Asia/Jerusalem
+        * Added a README.mkdn file
+        
+2.04      2013-09-23 11:46:51 Asia/Jerusalem
+        * The Fribidi constants are now loaded via a separate module, 
+          Text::Bidi::Constants
+        * Switching to Dist::Zilla
+
+2.03      2013-09-20 12:09:39 Asia/Jerusalem
+        * More changes to Makefile.PL
+
+2.02      2013-09-12
+        * Fixed Makefile.PL
+        
+2.01      2013-09-11
+        * Refactored Text::Bidi::Array::* to have a common base class 
+          Text::Bidi::Array
+        * Significantly improved the documentation of Text::Bidi::Array*
+        * Fixed a bug in Text::Bidi::Array::Long --- now returns the correct 
+          size
+        * Added loading tests for Text::Bidi::Array*
+        * Removed "no warnings 'experimental'", since this caused tests to 
+          fail on older versions of perl.
+        * Added information about the bidi extension for urxvt to the README 
+          file
+
+2.00      2013-09-10
+        * Almost completely rewritten, mostly due to the changes in 
+          libfribidi.  The interface has changed as well, so this version is 
+          incompatible with the previous ones.
+
+0.04      2008-02-07
+        * Changed the build system to use ExtUtils::PkgConfig (if available), 
+          to find the correct compilation flags (this is required since the 
+          new version of libfribidi may need glib to build.)
+
+0.03      2007-01-18
+        * The PUSH macros caused some weird results, replaced with my own 
+          macros
+        * Apparently, Newx did not exist before 5.8.8, defined it if does not 
+          exist
+
+0.02      2007-01-17
+        * Fixed memory leak in remove_bidi_marks when called with two 
+          arguments
+        * Fixed bug when calling log2vis with 2 arguments
+        * Changed the typemaps to use more perlapi macros (XPUSH, etc.)
+
+0.01      2006-08-28
+        * First version
+

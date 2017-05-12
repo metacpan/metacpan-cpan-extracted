@@ -1,0 +1,159 @@
+==================================================
+Changes from 2013-11-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.102 at 2014-11-09 11:04:00 +0000
+------------------------------------------
+
+  Change: 74c7309eac3892ef276f418a28bde363263c4249
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 03:03:48 +0000
+
+    fix synopsis 
+
+  Change: 742140b6651b7d5f5d4f4623c79a501f7c11d3f8
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 02:51:32 +0000
+
+    fix again 
+
+  Change: bd2d2db40d3ca687963502e0f7767875a4d4b483
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 01:16:51 +0000
+
+    tweak POD yet again 
+
+------------------------------------------
+version 1.101 at 2014-11-09 09:02:09 +0000
+------------------------------------------
+
+  Change: 9c61189080c7e11b5246179a712d48d3c3becef1
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 01:02:09 +0000
+
+    New CPAN release of Task-POE-All - v1.101
+
+    - Fixed the POD as I mangled the format, arg!
+
+    [STATISTICS]
+
+    - code churn: 4 files changed, 802 insertions(+), 12 deletions(-) 
+
+  Change: 50d899fc9db768341867adc1b5b4e986ecf4e964
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 00:38:38 +0000
+
+    fix 
+
+------------------------------------------
+version 1.100 at 2014-11-09 08:29:46 +0000
+------------------------------------------
+
+  Change: 20392090d72a93e8b2845921bab84368a4e5b661
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 00:29:46 +0000
+
+    New CPAN release of Task-POE-All - v1.100
+
+    - Converted to Dist::Zilla for the release process!
+
+    - Updates to the auto-generated files
+
+    [STATISTICS]
+
+    - code churn: 20 files changed, 555 insertions(+), 132 deletions(-) 
+
+  Change: 59474b398c2cff6aa5efee35e91e42553b57e167
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 00:10:09 +0000
+
+    tweak the generation of the template 
+
+  Change: 561d94f4236af7b011efc341bd55f56f4e68113c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-08 23:41:50 +0000
+
+    update mailmap 
+
+  Change: a2578330fa7feb22f62131f44364a7beda0d047a
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-08 23:33:51 +0000
+
+    remove old tests, d0h 
+
+  Change: 4cfdec2fd69209a5e50d9f90e9375a71db33b780
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-08 23:33:09 +0000
+
+    updated the Task with latest deps 
+
+  Change: 876def80522610b28ba1682af2e4b7ac21b5f36d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-08 23:32:27 +0000
+
+    more fixes to the generator 
+
+  Change: 5abad97bc7611d767e1bb43d1f1c7a53b358f9ed
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-08 23:19:35 +0000
+
+    work on the prereq generator 
+
+  Change: 15bb5ee5cea91a55f25f89e0b84e5ba003cf3fc2
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-08 22:10:02 +0000
+
+    migrate to dzil 
+
+  Change: d05c7c31dfed908a6d130efffec141550af474eb
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-07 12:29:11 +0000
+
+    let M::B specify itself as configure_requires 
+
+  Change: ea17efcca5195135ee15d2b6e26bbf6ca64c1ca1
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-07 12:27:14 +0000
+
+    cleanup and new distro for CPAN 
+
+  Change: 7d2425ca55139e4fcf8a301005b4cc5b2073d08f
+  Author: Apocalypse <apoc@blackhole.(none)>
+  Date : 2009-11-15 20:58:04 +0000
+
+    added Eclipse prefs 
+
+  Change: 65c73f49515c044c3224204c1fd3ca8f6a5b182d
+  Author: Apocalypse <apoc@blackhole.(none)>
+  Date : 2009-11-15 20:31:42 +0000
+
+    add Eclipse includepath 
+
+  Change: 1e4fe81353fa8398131c6e4f2b2db04c23a4285a
+  Author: Apocalypse <apoc@satellite.(none)>
+  Date : 2009-01-27 13:25:56 +0000
+
+    new distro 
+
+  Change: ff6845f85a314698948fb042ea3de6ca24a55a9f
+  Author: Apocalypse <apoc@satellite.(none)>
+  Date : 2009-01-27 13:21:58 +0000
+
+    kwalitee fixes 
+
+  Change: 93d1fc38d792c8ee421c8b303787a225a192abb2
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2008-12-18 08:58:36 +0000
+
+    new disro 
+
+  Change: db42495f280cf59e4b2a4358e23d657cebc058af
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2008-12-18 06:04:43 +0000
+
+    import from old Bundle::POE::All module 
+
+================
+End of releases.
+================

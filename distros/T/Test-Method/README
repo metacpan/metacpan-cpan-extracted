@@ -1,0 +1,66 @@
+NAME
+    Test::Method - test sugar for methods
+
+VERSION
+    version 0.001002
+
+SYNOPSIS
+            use Test::More;
+            use Test::Method;
+
+            my $obj = Class->new; # blessed reference
+
+            method_ok( $obj, 'method', [], 'value' ); # Class->method() is value
+
+            method_ok( $obj, 'method', undef, 'value' ); # Class->method() is value
+
+            method_ok( $obj, 'method', ['arg1', 'arg2'], 'expected', 'testname' );
+            # testname Class->method(...) is 'expected'
+
+            use Test::Deep;
+            method_ok( $obj, 'method', [], re('^foo'), );
+            # Test->method() is Test::Deep::Regexp
+
+            done_testing;
+
+DESCRIPTION
+    The reason for creating Test::Method is to provide an easy way of
+    testing methods without writing a test name which could equate to
+    Object, method name, arguments, expected return. I found my test names
+    suffered from lack of appropriate details simply due to lack of desire
+    for repetitive typing. This module should help reduce this. The ultimate
+    goal of this module is to make testing methods on objects easier and
+    less repetitive.
+
+    We're using Test::Deep under the hood so you may use it's comparison
+    functions in place of expected.
+
+FUNCTIONS
+  method_ok
+            method_ok( $obj, 'method', \@method_args, 'expected', 'testname' );
+
+    use for testing a single method in an object, if not passing args use
+    undef or an empty arrayref will work. Unlike most testing modules
+    specifying test name will not replace all of the default test name,
+    instead it is simply prepended. This feature was desirable due to some
+    object names not really being obvious as to what I was looking at, so it
+    allows me to give a hint to the parent object or maybe a grander
+    purpose.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/xenoterracide/test-method/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Caleb Cushing.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

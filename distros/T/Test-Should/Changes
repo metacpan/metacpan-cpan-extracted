@@ -1,0 +1,17 @@
+Revision history for Perl extension Test::Should
+
+0.04
+
+    - hooks undefined value.
+      undef->should_not_be_ok works.
+
+0.03
+
+    - added 'should_change' method
+
+0.02
+
+    - hide a package from pause
+
+0.01    Fri Oct 26 08:52:53 2012
+    - original version

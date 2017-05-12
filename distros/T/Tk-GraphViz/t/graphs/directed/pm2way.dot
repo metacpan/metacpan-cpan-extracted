@@ -1,0 +1,22 @@
+digraph g {
+	node [label="\N", fontsize=14, fontname="Times-Roman", fontcolor=black, shape=box, color=black, width="0.5"];
+	edge [fontsize=14, fontname="Times-Roman", fontcolor=black, color=black];
+	graph [bb="0,0,495,392"];
+	22690 [label="22690\n?", width="0.72", pname="?", kind=proc, pos="203,366", height="0.50"];
+	22692 [label="22692\ndotty", width="0.75", pname=dotty, kind=proc, pos="203,294", height="0.50"];
+	"116842+2595" [label="116842+2595\n/home/ek/work/sun4/bin/dotty", shape=ellipse, width="3.36", kind=file, fname="/home/ek/work/sun4/bin/dotty", pos="121,214", height="0.71"];
+	22693 [label="22693\nlefty", width="0.72", pname=lefty, kind=proc, pos="286,214", height="0.50"];
+	"182440-1" [label="182440-1\n182441-1\npipe", fontsize=7, shape=doublecircle, width="0.78", kind=file, fname=pipe, subkind=pipe, pos="212,36", height="0.78"];
+	"182442-1" [label="182442-1\n182443-1\npipe", fontsize=7, shape=doublecircle, width="0.78", kind=file, fname=pipe, subkind=pipe, pos="304,36", height="0.78"];
+	22694 [label="22694\ndot", width="0.75", pname=dot, kind=proc, pos="258,126", height="0.50"];
+	"4761+2595" [label="4761+2595\n/home/ek/pm2.dot", shape=ellipse, width="2.14", kind=file, fname="/home/ek/pm2.dot", pos="418,126", height="0.71"];
+	22690 -> 22692 [pos="e,203,312 203,348 203,340 203,331 203,322"];
+	22692 -> "116842+2595" [dir=back, pos="s,184,276 177,269 168,260 157,249 147,239"];
+	22692 -> 22693 [pos="e,267,232 222,276 233,265 248,251 260,239"];
+	22693 -> "182440-1" [dir=back, pos="s,260,196 253,189 240,176 226,161 222,152 210,124 208,88 209,64"];
+	22693 -> "182442-1" [dir=forward, pos="e,302,64 289,196 290,183 292,167 294,152 297,125 299,95 301,72"];
+	22693 -> 22694 [pos="e,264,144 280,196 276,184 271,167 267,153"];
+	22694 -> "182440-1" [dir=forward, pos="e,225,61 249,108 243,97 236,83 229,70"];
+	22694 -> "182442-1" [dir=back, pos="s,267,108 271,101 277,88 285,73 291,61"];
+	22693 -> "4761+2595" [dir=back, pos="s,312,197 320,192 339,179 364,162 384,149"];
+}

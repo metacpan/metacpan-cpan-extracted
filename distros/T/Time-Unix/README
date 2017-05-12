@@ -1,0 +1,27 @@
+NAME
+    Time::Unix - Force time() to return seconds since UNIX epoch
+
+SYNOPSIS
+       use Time::Unix;     # time() now returns UNIX epoch seconds
+
+DESCRIPTION
+    This module does one thing: It imports a new version of time() that
+    returns seconds since the UNIX epoch on ALL platforms. It is intended
+    mainly as a proof-of-concept for the below Perl 6 RFC.
+
+    In addition to importing a time() function, it also imports a systime()
+    function which gives you direct access to the system's native epoch
+    (i.e., what time() would return if you hadn't used this module).
+
+    This doesn't do anything useful on UNIX platforms, so don't do that.
+
+REFERENCES
+    See http://dev.perl.org/rfc/99.html for a complete description.
+
+AUTHOR
+    Copyright (c) 2000, Nathan Wiger <nate@sun.com>. All Rights Reserved.
+
+    This module is free software; you may copy this under the terms of the
+    GNU General Public License, or the Artistic License, copies of which
+    should have accompanied your Perl kit.
+

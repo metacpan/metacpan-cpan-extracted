@@ -1,0 +1,11 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<ifm c=message>
+  <div class=error>$message</div>
+  <div class=system_error><pre>$error</pre></div>
+</ifm>
+<elsem>
+  Request accepted.
+</elsem>  
+
+<include TaskForest::REST::PassThrough /foot.html />

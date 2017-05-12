@@ -1,0 +1,62 @@
+NAME
+    TBX::Checker - Check TBX validity using TBXChecker
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+            use TBX::Checker qw(check);
+            my ($passed, $messages) = check('/path/to/file.tbx');
+            $passed && print 'ok!'
+                    or print join (qq{\n}, @$messages);
+
+DESCRIPTION
+    This modules allows you to use the Java TBXChecker utility from Perl. It
+    has one function, "check" which returns the errors found by the
+    TBXChecker (hopefully none!).
+
+METHODS
+  "check"
+    Checks the validity of the given TBX file. Returns 2 elements: a boolean
+    representing the validity of the input TBX, and an array reference
+    containing messages returned by TBXChecker.
+
+    Arguments: a string containing a TBX file path, or a string pointer
+    containing TBX data to be checked, followed by named arguments accepted
+    by TBXChecker. For example: "check('file.tbx', loglevel =" 'ALL')>. The
+    allowed parameters are listed below:
+
+        loglevel      Increase level of output while processing.
+                             OFF     => Error code only.
+                             SEVERE  => Error code only.
+                             WARNING => Valid or invalid message (default).
+                             INFO    => Location of files used in processing.
+                             CONFIG  => .
+                             FINE    => .
+                             FINER   => .
+                             FINEST  => .
+                             ALL     => All logging messages.
+        lang           ISO-639 lowercase two-letter language code.
+        country      ISO-3166 uppercase two-letter country code.
+        variant
+        system       System ID to use for relative paths in document.
+                             Default: Uses the directory where the file is located.
+        version       Displays version information and quits.
+        environment    Adds the environmental conditions on startup to the messages.
+
+    Keep in mind that if you use a string pointer instead of a file name,
+    all relative URI's will be resolved from the current working directory.
+
+SEE ALSO
+    The TBXChecker project is located on SourceForge in a project called
+    tbxutil <http://sourceforge.net/projects/tbxutil/>.
+
+AUTHOR
+    Nathan Glenn <garfieldnate@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Alan K. Melby.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

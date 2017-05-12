@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name: Tree-BPTree
+version: 1.07
+author:
+  - |-
+    Andrew Sterling Hanenkamp, E<lt>hanenkamp@users.sourceforge.netE<gt>
+abstract: Perl implementation of B+ trees
+license: perl
+requires:
+  perl: 5.8
+provides:
+  Tree::BPTree:
+    file: lib/Tree/BPTree.pm
+    version: 1.07
+  Tree::BPTree::Cursor:
+    file: lib/Tree/BPTree.pm
+    version: 1.07
+  Tree::BPTree::Leaf:
+    file: lib/Tree/BPTree.pm
+    version: 1.07
+  Tree::BPTree::Node:
+    file: lib/Tree/BPTree.pm
+    version: 1.07
+generated_by: Module::Build version 0.25

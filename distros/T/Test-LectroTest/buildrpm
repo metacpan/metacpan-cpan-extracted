@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo Usage: buildrpm VERSION 1>&2
+    exit 1
+fi
+
+for v in "$@"; do
+    cpan2rpm "Test-LectroTest-$v.tar.gz" \
+        --release=1.fc3.tgm \
+        --url=http://community.moertel.com/LectroTest \
+        --author='Tom Moertel <tom@moertel.com>' \
+        --version=$v \
+        --make-no-test
+done

@@ -1,0 +1,75 @@
+{
+   "abstract" : "determine positions for hyphens inside Turkish words",
+   "author" : [
+      "Alex Kapranoff <alex@kapranoff.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Hyphen-TR",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::Hyphen" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Hyphen::TR" : {
+         "file" : "lib/Text/Hyphen/TR.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kappa/Text-Hyphen-TR/issues"
+      },
+      "homepage" : "https://github.com/kappa/Text-Hyphen-TR",
+      "repository" : {
+         "url" : "git://github.com/kappa/Text-Hyphen-TR.git",
+         "web" : "https://github.com/kappa/Text-Hyphen-TR"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KAPPA",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

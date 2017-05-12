@@ -1,0 +1,78 @@
+Copyright (c) 2003 Harry Jackson. All rights reserved.
+
+DATE
+18 December 2003
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 
+
+NAME
+Tie::RDBM::Cached
+
+DESCRIPTION
+Tie::RDBM::Cached should support any database supported by Tie::RDBM. 
+
+Please see the pod documentation in the module itself for more
+information. This is a very early release of this module and I am 
+expecting quite a few bugs.
+
+Feel free to contact me at harry@hjackson.org if you have any problems 
+queries or sugestions.
+
+REQUIREMENTS
+This module dependa upon Tie::RDBM and DBI. Please read the
+documentation from Tie::RDBM as this has more information on ways to use
+this module.
+
+INSTALLATION
+perl Makefile.PL
+make test DRIVER=[Driver] DB=[dbname] USER=user PASS=password
+make install
+
+The "make test" is optional.
+
+If you are using Postgres please ensure the following syntax where "test" 
+is the name of the database.
+
+make test DRIVER=Pg DB=dbname=test USER=user PASS=password
+
+
+LIMITATIONS
+This module will only add performance gains for quite specific tasks
+involving two columns in a table, one of which should be a primary key
+or be unique. For inserts and deletes this module will have a detrimental 
+affect on performance. Please see the Tie::RDBM documentation for more 
+information about this.
+
+If you are required to carry out a lot of updates repeatedly to the same 
+record then this module will offer significant performance gains over 
+Tie::RDBM. I am a fan of DBI, please make sure you know why you want to 
+use this rather than the DBI interface or the Tie::RDBM mmodule.
+
+TROUBLESHOOTING
+If you get an error when using this module and you have tried Tie::RDBM
+in its place please send me the code and the error output and I
+will try to help you. Please do not send me any errors before testing
+the Tie::RDBM module first because this is what I will do.           
+
+The latest version of this module is available on CPAN.
+
+Further Information can be found in the following documentation:
+
+Lincoln D. Stein's Tie::RDBM 
+Tim Bunce's DBI:
+
+
+AUTHOR 
+Harry Jackson
+http://www.hjackson.org
+harry@hjackson.org
+
+This module was written by Harry Jackson based on Lincoln D. 
+Steins Tie::RDBM module.
+
+COPYRIGHT
+Copyright (C) 2003 Harry Jackson.  All Rights Reserved.
+   
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

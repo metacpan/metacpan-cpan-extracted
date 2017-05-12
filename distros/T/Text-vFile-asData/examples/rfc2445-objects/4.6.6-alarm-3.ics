@@ -1,0 +1,11 @@
+BEGIN:VALARM
+TRIGGER:-P2D
+ACTION:EMAIL
+ATTENDEE:MAILTO:john_doe@host.com
+SUMMARY:*** REMINDER: SEND AGENDA FOR WEEKLY STAFF MEETING ***
+DESCRIPTION:A draft agenda needs to be sent out to the attendees
+ to the weekly managers meeting (MGR-LIST). Attached is a
+ pointer the document template for the agenda file.
+ATTACH;FMTTYPE=application/binary:http://host.com/templates/agen
+ da.doc
+END:VALARM

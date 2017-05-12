@@ -1,0 +1,305 @@
+NAME
+    Test::XML::Easy - test XML with XML::Easy
+
+SYNOPSIS
+        use Test::More tests => 2;
+        use Test::XML::Easy;
+
+        is_xml $some_xml, <<'ENDOFXML', "a test";
+        <?xml version="1.0" encoding="latin-1">
+        <foo>
+           <bar/>
+           <baz buzz="bizz">fuzz</baz>
+        </foo>
+        ENDOFXML
+
+        is_xml $some_xml, <<'ENDOFXML', { ignore_whitespace => 1, description => "my test" };
+        <foo>
+           <bar/>
+           <baz buzz="bizz">fuzz</baz>
+        </foo>
+        ENDOFXML
+
+        isnt_xml $some_xml, $some_xml_it_must_not_be;
+
+        is_well_formed_xml $some_xml;
+
+DESCRIPTION
+    A simple testing tool, with only pure Perl dependancies, that checks if
+    two XML documents are "the same". In particular this module will check
+    if the documents schemantically equal as defined by the XML 1.0
+    specification (i.e. that the two documents would construct the same DOM
+    model when parsed, so things like character sets and if you've used two
+    tags or a self closing tags aren't important.)
+
+    This modules is a strict superset of Test::XML's interface, meaning if
+    you were using that module to check if two identical documents were the
+    same then this module should function as a drop in replacement. Be
+    warned, however, that this module by default is a lot stricter about how
+    the XML documents are allowed to differ.
+
+  Functions
+
+    This module, by default, exports a number of functions into your
+    namespace.
+
+    is_xml($xml_to_test, $expected_xml[, $options_hashref])
+        Tests that the passed XML is "the same" as the expected XML.
+
+        XML can be passed into this function in one of two ways; Either you
+        can provide a string (which the function will parse for you) or you
+        can pass in XML::Easy::Element objects that you've constructed
+        yourself somehow.
+
+        This funtion takes several options as the third argument. These can
+        be passed in as a hashref:
+
+        description
+            The name of the test that will be used in constructing the `ok'
+            / `not ok' test output.
+
+        ignore_whitespace
+            Ignore many whitespace differences in text nodes. Currently this
+            has the same effect as turning on
+            `ignore_surrounding_whitespace' and
+            `ignore_different_whitespace'.
+
+        ignore_surrounding_whitespace
+            Ignore differences in leading and trailing whitespace between
+            elements. This means that
+
+              <p>foo bar baz</p>
+
+            Is considered the same as
+
+              <p>
+                foo bar baz
+              </p>
+
+            And even
+
+              <p>
+                this is my cat:<img src="http://myfo.to/KsSc.jpg" />
+              </p>
+
+            Is considered the same as:
+
+              <p>
+                this is my cat: <img src="http://myfo.to/KsSc.jpg" />
+              </p>
+
+            Even though, to a web-browser, that extra space is significant
+            whitespace and the two documents would be renderd differently.
+
+            However, as comments are completely ignored (we treat them as if
+            they were never even in the document) the following:
+
+              <p>foo<!-- a comment -->bar</p>
+
+            would be considered different to
+
+              <p>
+                foo
+                <!-- a comment -->
+                bar
+              </p>
+
+            As it's the same as comparing the string
+
+              "foobar"
+
+            And:
+
+                "foo
+    
+                bar"
+
+            The same is true for processing instructions and DTD
+            declarations.
+
+        ignore_leading_whitespace
+            The same as `ignore_surrounding_whitespace' but only ignore the
+            whitespace immediately after an element start or end tag not
+            immedately before.
+
+        ignore_trailing_whitespace
+            The same as `ignore_surrounding_whitespace' but only ignore the
+            whitespace immediately before an element start or end tag not
+            immedately after.
+
+        ignore_different_whitespace
+            If set to a true value ignores differences in what characters
+            make up whitespace in text nodes. In other words, this option
+            makes the comparison only care that wherever there's whitespace
+            in the expected XML there's any whitespace in the actual XML at
+            all, not what that whitespace is made up of.
+
+            It means the following
+
+              <p>
+                foo bar baz
+              </p>
+
+            Is the same as
+
+              <p>
+                foo
+                bar
+                baz
+              </p>
+
+            But not the same as
+
+              <p>
+                foobarbaz
+              </p>
+
+            This setting has no effect on attribute comparisons.
+
+        verbose
+            If true, print obsessive amounts of debug info out while
+            checking things
+
+        show_xml
+            This prints out in the diagnostic messages the expected and
+            actual XML on failure.
+
+        If a third argument is passed to this function and that argument is
+        not a hashref then it will be assumed that this argument is the the
+        description as passed above. i.e.
+
+          is_xml $xml, $expected, "my test";
+
+        is the same as
+
+          is_xml $xml, $expected, { description => "my test" };
+
+    isnt_xml($xml_to_test, $not_expected_xml[, $options_hashref])
+        Exactly the same as `is_xml' (taking exactly the same options) but
+        passes if and only if what is passed is different to the not
+        expected XML.
+
+        By different, of course, we mean schematically different according
+        to the XML 1.0 specification. For example, this will fail:
+
+          isnt_xml "<foo/>", "<foo></foo>";
+
+        as those are schematically the same XML documents.
+
+        However, it's worth noting that the first argument doesn't even have
+        to be valid XML for the test to pass. Both these pass as they're not
+        schemantically identical to the not expected XML:
+
+          isnt_xml undef, $not_expecteded_xml;
+          isnt_xml "<foo>", $not_expected_xml;
+
+        as invalid XML is not ever schemanitcally identical to a valid XML
+        document.
+
+        If you want to insist what you pass in is valid XML, but just not
+        the same as the other xml document you pass in then you can use two
+        tests:
+
+          is_well_formed_xml $xml;
+          isnt_xml $xml, $not_expected_xml;
+
+        This function accepts the `verbose' option (just as `is_xml' does)
+        but turning it on doesn't actually output anything extra - there's
+        not useful this function can output that would help you diagnose the
+        failure case.
+
+    is_well_formed_xml($string_containing_xml[, $description])
+        Passes if and only if the string passed contains well formed XML.
+
+    isnt_well_formed_xml($string_not_containing_xml[, $description])
+        Passes if and only if the string passed does not contain well formed
+        XML.
+
+  A note on Character Handling
+
+    If you do not pass it an XML::Easy::Element object then these functions
+    will happly parse XML from the characters contained in whatever scalars
+    you passed in. They will not (and cannot) correctly parse data from a
+    scalar that contains binary data (e.g. that you've sucked in from a raw
+    file handle) as they would have no idea what characters those octlets
+    would represent
+
+    As long as your XML document contains legal characters from the ASCII
+    range (i.e. chr(1) to chr(127)) this distintion will not matter to you.
+
+    However, if you use characters above codepoint 127 then you will
+    probably need to convert any bytes you have read in into characters.
+    This is usually done by using `Encode::decode', or by using a PerlIO
+    layer on the filehandle as you read the data in.
+
+    If you don't know what any of this means I suggest you read the
+    Encode::encode manpage very carefully. Tom Insam's slides at
+    http://jerakeen.org/talks/perl-loves-utf8/ may or may not help you
+    understand this more (they at the very least contain a cheatsheet for
+    conversion.)
+
+    The author highly recommends those of you using latin-1 characters from
+    a utf-8 source to use Test::utf8 to check the string for common mistakes
+    before handing it `is_xml'.
+
+AUTHOR
+    Mark Fowler, `<mark@twoshortplanks.com>'
+
+    Copyright 2009 PhotoBox, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    There's a few cavets when using this module:
+
+    Not a validating parser
+        Infact, we don't process (or compare) DTDs at all. These nodes are
+        completely ignored (it's as if you didn't include them in the string
+        at all.)
+
+    Comments and processing instructions are ignored
+        We totally ignore comments and processing instructions, and it's as
+        if you didn't include them in the string at all either.
+
+    Limited entity handling
+        We only support the five "core" named entities (i.e. `&amp;',
+        `&lt;', `&gt;', `&apos;' and `&quot;') and numerical character
+        references (in decimal or hex form.) It is not possible to declare
+        further named entities and the precence of undeclared named entities
+        will either cause an exception to be thrown (in the case of the
+        expected string) or the test to fail (in the case of the string you
+        are testing)
+
+    No namespace support
+        Currently this is only an XML 1.0 parser, and not XML Namespaces
+        aware (further options may be added to later version of this module
+        to enable namespace support)
+
+        This means the following document:
+
+          <foo:fred xmlns:foo="http://www.twoshortplanks.com/namespaces/test/fred" />
+
+        Is considered to be different to
+
+          <bar:fred xmlns:bar="http://www.twoshortplanks.com/namespaces/test/fred" />
+
+    XML whitespace handling
+        This module considers "whitespace" to be what the XML specification
+        considers to be whitespace. This is subtily different to what Perl
+        considers to be whitespace.
+
+    No node reordering support
+        Unlike Test::XML this module considers the order of sibling nodes to
+        be significant, and you cannot tell it to ignore the differring
+        order of nodes when comparing the expected and actual output.
+
+    Please see http://twoshortplanks.com/dev/testxmleasy for details of how
+    to submit bugs, access the source control for this project, and contact
+    the author.
+
+SEE ALSO
+    Test::More (for instructions on how to test), XML::Easy (for info on the
+    underlying xml parser) and Test::XML (for a similar module that tests
+    using XML::SchemanticDiff)
+

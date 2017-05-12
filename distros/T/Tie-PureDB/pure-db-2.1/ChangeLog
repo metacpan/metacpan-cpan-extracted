@@ -1,0 +1,32 @@
+
+* Version 2.1 :
+    The binary search could return -1 as a slot number when a hash key
+wasn't found. It has been fixed.
+    The regression tests are now also probing for unknown hashes.
+    Autoconf/Automake were updated.    
+
+* Version 2.0 :
+    Use binary search instead of linear search for lower byte lookup.
+Contributed by Philip Gladstone.
+    New --with-minimal configure switch to disable binary search (and
+possibly other stuff in the future) .
+    Some operating systems don't support rename() to an existing file for
+atomic replacements. So we just unlink() the file if a previous rename()
+failed.
+
+* Version 1.3 :
+    Upgraded to Autoconf 2.52f.
+    Merged the fixes from Pure-FTPd 1.0.
+
+* Version 1.2 :
+    Portability improvements, added forgotten casts, removed wrong ones.
+    Don't forget to initialize every pointer of a dbw structure with NULL,
+so that puredbw_free() can be called at any time, even after a
+puredbw_open() failure.
+
+* Version 1.1 :
+    Added "regression" program.
+    Fixed a pointer arithmetic error in puredb_write.
+
+* Version 1.0 :
+    Initial release.

@@ -1,0 +1,46 @@
+---
+abstract: 'With great power, comes great responsibility.'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::Tester: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.1, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Power
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Power:
+    file: lib/Test/Power.pm
+    version: 0.14
+  Test::Power::FromLine:
+    file: lib/Test/Power/FromLine.pm
+requires:
+  Devel::CodeObserver: 0.10
+  Test::More: 0.98
+  Text::Truncate: 0
+  parent: 0
+  perl: 5.014000
+resources:
+  bugtracker: https://github.com/tokuhirom/Test-Power/issues
+  homepage: https://github.com/tokuhirom/Test-Power
+  repository: git://github.com/tokuhirom/Test-Power.git
+version: 0.14
+x_contributors:
+  - 'adrian.candos <adrian.candos@dena.jp>'

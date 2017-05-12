@@ -1,0 +1,123 @@
+NAME
+    Test::Approx - compare two things for approximate equality
+
+SYNOPSIS
+      use Test::Approx 'no_plan';
+
+      is_approx( 'abcd', 'abcd', 'equal strings' );
+      is_approx( 1234, 1234, 'equal integers' );
+      is_approx( 1.234, 1.234, 'equal decimal numbers' );
+      is_approx( '1.234000', '1.234', 'equal decimal numbers, extra zeros' );
+      is_approx( 1.0, 1, 'equal decimal number & integer' );
+
+      is_approx( 'abcdefgh', 'abcdefg', 'approx strings' );
+      is_approx( 1, 1.001, 'approx given decimal number & integer' );
+      is_approx( 51.60334, 51.603335, 'approx decimal numbers' );
+
+      # default Levenshtein edit tolerance is 5% of avg string length:
+      is_approx( 'abcdefg', 'abcgfe', 'str tolerance' ); # fail
+
+      # default difference tolerance is 5% of first number:
+      is_approx( 1, 1.04, 'num tolerance' ); # fail
+      is_approx( 1, 1.05, 'num tolerance' ); # fail
+
+      # default difference tolerance is 5% of first integer, or 1:
+      is_approx( 1, 2, 'int tolerance' ); # pass
+      is_approx( 100, 105, 'int tolerance' ); # pass
+      is_approx( 100, 106, 'int tolerance' ); # fail
+
+      # you can set the tolerance yourself:
+      is_approx( 'abcdefg', 'abcgfe', 'diff strings', '50%' ); # pass
+
+      # you can set tolerance as a number too:
+      is_approx( 'abcdefg', 'abcgfe', 'diff strings', 6 );
+
+      # you can force compare as string, number, or integer:
+      is_approx_str( '1.001', '1.901', 'pass as string' );
+      is_approx_num( '1.001', '1.901', 'fail as num' );
+      is_approx_int( '1.001', '1.901', 'pass as int' ); # not rounded!
+
+DESCRIPTION
+    This module lets you test if two things are *approximately* equal. Yes,
+    that sounds a bit wrong at first - surely you know if they should be
+    equal or not? But there are actually valid cases when you don't / can't
+    know. This module is meant for those rare cases when close is good
+    enough.
+
+FUNCTIONS
+    is_approx( $arg1, $arg2 [, $test_name, $tolerance ] )
+        Tests if two scalars $arg1 & $arg2 are approximately equal by using
+        one of: "is_approx_str", "is_approx_num" or is_approx_int.
+
+        $test_name defaults to 'arg1' =~ 'arg2'.
+
+        $tolerance is used to determine how different the scalars can be, it
+        defaults to "5%". It can also be set as a number representing a
+        threshold. To determine which:
+
+          $tolerance = '6%'; # threshold = calculated at 6%
+          $tolerance = 0.06; # threshold = 0.06
+
+        See the individual functions to determine how $tolerance is used.
+
+    is_approx_str( $str1, $str2 [, $test_name, $tolerance ] )
+        Tests if $str1 is approximately equal to $str2 by using
+        Text::LevenshteinXS to compute the edit distance between the two
+        strings, and comparing that to $tolerance.
+
+        $tolerance is used to determine how many edits are allowed before
+        the comparison test fails. If a percentage is given, the edit
+        distance threshold will be set to "x%" of the *average lengths of
+        the two strings*. eg:
+
+          $edit_threshold = int( $x_percent * avg(length($str1), length($str2)) );
+
+        If that's less than 0, it defaults to 1. You can also pass
+        $tolerance in as an number. To avoid confusion:
+
+          $tolerance = '6%'; # threshold = 6% of avg strlen
+          $tolerance = 0.06; # threshold = int( 0.06 ) = 0
+
+    is_approx_num( $num1, $num2 [, $test_name, $tolerance ] )
+        Tests if $num1 is approximately equal to $num2 by calculating the
+        distance between them and comparing that to $tolerance.
+
+        If $tolerance is a percentage, the distance threshold will be set to
+        "x%" of the *first number*, eg:
+
+          $threshold = $x_percent * $num1;
+
+        Note that this can be 0 > $t > 1, which is probably what you want.
+        To avoid confusion:
+
+          $tolerance = '6%'; # threshold = 6% of $num1
+          $tolerance = 0.06; # threshold = 0.06
+
+    is_approx_int( $int1, $int2 [, $test_name, $tolerance ] )
+        Tests if $int1 is approximately equal to $int2 by calculating the
+        distance between them and comparing that to $tolerance. This is
+        slightly different to "is_approx_num" as all fractions are removed.
+
+        If $tolerance is a percentage, the distance threshold will be set to
+        "x%" of the *first integer*, or 1. Eg:
+
+          $threshold = int( $x_percent * $int1 ) || 1;
+
+        To avoid confusion:
+
+          $tolerance = '6%'; # threshold = 6% of $int1
+          $tolerance = 0.06; # threshold = 0.06
+
+EXPORTS
+        "is_approx", "is_approx_str", "is_approx_num", "is_approx_int"
+
+AUTHOR
+        Steve Purkis <spurkis@cpan.org>
+
+COPYRIGHT
+        Copyright (c) 2008-2010 Steve Purkis. Released under the same terms
+        as Perl itself.
+
+SEE ALSO
+        Text::LevenshteinXS, Test::Builder
+

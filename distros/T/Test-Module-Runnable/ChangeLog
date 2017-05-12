@@ -1,0 +1,12 @@
+2.1.0
+-----
+* Update all license notices to 2012
+* Support VERSION for package.
+* Retab everything
+* Support empty section names
+* Fix warning; undefined shlibs
+* Add support for non-key/value data.
+* Correct tab/space inconsistency in documentation for GetLines
+  and GetLine functions.
+* Issue #1: Config files cannot handle LDAP DN
+* Issue #2: Allow quoted strings containing comment symbols

@@ -1,0 +1,13 @@
+1.01  Changed the way error checking works.  Rather than checking if
+      if the function returns undef (which is wrong) we check if
+      $untaint->error is set (which is right)
+
+      Changed the diagnostics.  Now if the extraction fails rather
+      than printing out that the result is undef rather than what
+      we expected we print out the error message
+
+      Fixed a grammar error in one of the error messages.
+
+      Improved the test suite to test above changes.
+
+1.00  Initial release to CPAN

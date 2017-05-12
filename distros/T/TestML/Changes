@@ -1,0 +1,154 @@
+0.54 Wed Jan 11 17:53:47 CET 2017
+ - Fix bug in lite compiler. \ being removed too early.
+
+0.53 Fri Jan  6 20:20:13 CET 2017
+ - Support configable markers in Lite compiler
+ - Allow dashes in words
+
+0.52 Sat Dec 27 14:45:50 PST 2014
+ - Fix file path creation issues on MSWin32
+
+0.51 Sun Dec 14 12:53:02 PST 2014
+ - Fix a bug causing 000compile to fail
+
+0.50 Fri Dec 12 10:52:23 PST 2014
+ - Make TestML::Setup more clear
+ - Share TestML grammar
+
+0.49 Sat Aug 16 12:46:47 PDT 2014
+ - Meta 0.0.2
+
+0.48 Sat Aug 16 03:03:29 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.47 Sat Aug 16 00:35:15 PDT 2014
+ - Move Module::Install::TestML doc to its dist
+
+0.46 Sat Aug 16 00:23:39 PDT 2014
+ - Move Module::Install::TestML out of dist
+
+0.45 Fri Aug 15 20:51:09 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.44 Wed Aug 13 16:27:24 PDT 2014
+ - Fixd issue/4, proper ONLY handling
+
+0.43 Sat Aug  9 00:25:05 PDT 2014
+ - Fix swim errors
+
+0.42 Mon Aug  4 12:37:49 PDT 2014
+ - Support === and --- as text
+
+0.41 Mon Aug  4 00:59:19 PDT 2014
+ - Finish doc to Swim
+
+0.40 Mon Aug  4 00:42:55 PDT 2014
+ - Remove (c) from Copyright
+
+0.39 Sat Aug  2 23:55:37 PDT 2014
+ - Fix years in Meta
+
+0.38 Sat Aug  2 23:50:11 PDT 2014
+ - Fix copyright years.
+
+0.37 Wed Jul 16 23:44:36 PDT 2014
+ - Move doc to Swim
+ - Fix Meta and add Contributing file
+
+0.36 Sun Jun 22 16:22:12 PDT 2014
+ - Use manual VERSION
+
+0.35 Sun Jun 15 13:01:01 PDT 2014
+ - Add Chomp to Standard Library
+
+0.34 Sat Jun 14 12:53:08 PDT 2014
+ - New Meta updates
+
+0.33 Sun Jun  8 12:31:30 PDT 2014
+ - Add badges
+
+0.32 Sat Jun  7 10:05:42 PDT 2014
+ - zild release
+ - Switch to PkgVersion
+
+0.31 Sun May 18 01:08:48 PDT 2014
+ - Upgrade to Pegex 0.30
+ - Change to new release setup
+
+0.30 Mon Feb 10 15:09:39 PST 2014
+ - Make sure Capture::Tiny is available for testing.
+
+0.29 Sat Feb  8 19:22:48 PST 2014
+ - Switch to dzil
+
+0.28 Thu Nov  8 10:49:04 PST 2012
+ - Require Pegex-0.21 API changes
+
+0.27 Thu Aug 30 00:07:58 PDT 2012
+ - Use new Pegex version
+
+0.26 Mon Nov  7 20:27:00 PST 2011
+ - Module::Install::TestML includes Pegex::Input.
+
+0.25 Sat Nov  5 01:11:22 PDT 2011
+ - Don't actually use Pegex.pm to get it in the META.
+
+0.24 Fri Sep 30 00:47:16 CEST 2011
+ - Use new Mo, inlined.
+
+0.23 Wed Sep 21 23:47:33 CEST 2011
+ - Totally refactored Pegex grammar.
+ - Released from Whoopie's room in Liz++ and Wendy++'s house.
+
+0.22 Fri Aug 19 20:54:29 EEST 2011
+ - Ship with new Pegex.
+
+0.21 Fri Aug 19 20:53:43 EEST 2011
+ - Make TestML::Setup work better.
+
+0.20 Thu Sep  9 10:47:15 PDT 2010
+ - Total language rewrite.
+ - Added functions definitions and calls.
+ - Added scoped variables.
+
+0.11 Mon Aug 16 11:49:12 PDT 2010
+ - Had a small problem with the transmission...
+ - TestML files didn't get into the MANIFEST because of symlink stuffs.
+   Fixed.
+
+0.10 Sat Aug 14 17:47:26 PDT 2010
+ - Add a light type system to context variables.
+
+0.08 Tue Aug 10 17:24:07 PDT 2010
+ - Fixed bug so OK(); can be just OK;
+
+0.07 Tue Aug 10 14:49:21 PDT 2010
+ - The Boston.pm release!! patch++
+ - Add HAS/OK support.
+ - Add Not support.
+ - Start testing truth.
+
+0.06 Tue Aug 10 01:56:55 PDT 2010
+ - Update Module::Install::TestML
+ - Remove TestML::CLI and bin/testml
+
+0.05 Tue Aug 10 01:45:13 PDT 2010
+ - Uses Pegex (moved from Parse::Pegex)
+
+0.04 Tue Aug  3 02:50:49 PDT 2010
+ - Major update
+ - Perl6 implementation backports
+ - New grammar spec
+ - Uses Parse::Pegex
+
+0.03 Sun May 24 09:42:06 PDT 2009
+ - Add Catch support
+ - Tweaks and bug fixes
+ - Rewrite the runtime and change to the spec requiring $point syntax.
+
+0.02 Thu May 21 19:27:50 PDT 2009
+ - Complete rewrite.
+ - Written to spec. http://testml.org/spec/
+
+0.01 Thu Apr 23 05:43:45 PDT 2009
+ - Initial version.

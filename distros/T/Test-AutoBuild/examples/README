@@ -1,0 +1,12 @@
+This directory contains a handful of autobuild.sh script illustrating
+recipes for different build systems
+
+ - autobuild-autoconf.sh - from the libvirt project. Illustrates autoconf
+   autobuild, libtool in a big C program
+
+ - autobuld-perl-makemaker.sh - from this project. Illustrates ExtUtils::MakeMaker
+   in a Perl program
+
+ - autobuild-python.sh - from python-virtinst. Illustrates distutils in a
+   Python program
+

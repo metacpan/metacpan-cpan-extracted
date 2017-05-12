@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Template-Plugin-HighlightPerl.t
+lib/Template/Plugin/HighlightPerl.pm
+META.yml                                 Module meta-data (added by MakeMaker)

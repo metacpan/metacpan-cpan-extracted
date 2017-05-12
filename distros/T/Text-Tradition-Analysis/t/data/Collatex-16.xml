@@ -1,0 +1,294 @@
+<?xml version="1.0" ?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+    xmlns:xsi="http://www.C.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+    <key id="d0" for="node" attr.name="number" attr.type="int"/>
+    <key id="d1" for="node" attr.name="tokens" attr.type="string"/>
+    <key id="d2" for="edge" attr.name="number" attr.type="int"/>
+    <key id="d3" for="edge" attr.name="type" attr.type="string"/>
+    <key id="d4" for="edge" attr.name="witnesses" attr.type="string"/>
+    <graph id="g0" edgedefault="directed" parse.nodeids="canonical" parse.edgeids="canonical"
+        parse.order="nodesfirst">
+        <node id="n0">
+            <data key="d0">0</data>
+            <data key="d1"/>
+        </node>
+        <node id="n1">
+            <data key="d0">1</data>
+            <data key="d1">when</data>
+        </node>
+        <node id="n2">
+            <data key="d0">2</data>
+            <data key="d1">april</data>
+        </node>
+        <node id="n3">
+            <data key="d0">3</data>
+            <data key="d1">with</data>
+        </node>
+        <node id="n4">
+            <data key="d0">4</data>
+            <data key="d1">his</data>
+        </node>
+        <node id="n5">
+            <data key="d0">5</data>
+            <data key="d1">showers</data>
+        </node>
+        <node id="n6">
+            <data key="d0">6</data>
+            <data key="d1">sweet</data>
+        </node>
+        <node id="n7">
+            <data key="d0">7</data>
+            <data key="d1">with</data>
+        </node>
+        <node id="n8">
+            <data key="d0">8</data>
+            <data key="d1">april</data>
+        </node>
+        <node id="n9">
+            <data key="d0">11</data>
+            <data key="d1">fruit</data>
+        </node>
+        <node id="n10">
+            <data key="d0">12</data>
+            <data key="d1">the</data>
+        </node>
+        <node id="n11">
+            <data key="d0">13</data>
+            <data key="d1">teh</data>
+        </node>
+        <node id="n12">
+            <data key="d0">14</data>
+            <data key="d1">march</data>
+        </node>
+        <node id="n13">
+            <data key="d0">15</data>
+            <data key="d1">drought</data>
+        </node>
+        <node id="n14">
+            <data key="d0">16</data>
+            <data key="d1">of</data>
+        </node>
+        <node id="n15">
+            <data key="d0">17</data>
+            <data key="d1">march</data>
+        </node>
+        <node id="n16">
+            <data key="d0">18</data>
+            <data key="d1">drought</data>
+        </node>
+        <node id="n17">
+            <data key="d0">19</data>
+            <data key="d1">has</data>
+        </node>
+        <node id="n18">
+            <data key="d0">20</data>
+            <data key="d1">pierced</data>
+        </node>
+        <node id="n19">
+            <data key="d0">21</data>
+            <data key="d1">unto</data>
+        </node>
+        <node id="n20">
+            <data key="d0">22</data>
+            <data key="d1">to</data>
+        </node>
+        <node id="n21">
+            <data key="d0">23</data>
+            <data key="d1">teh</data>
+        </node>
+        <node id="n22">
+            <data key="d0">24</data>
+            <data key="d1">the</data>
+        </node>
+        <node id="n23">
+            <data key="d0">9</data>
+            <data key="d1">rood</data>
+        </node>
+        <node id="n24">
+            <data key="d0">10</data>
+            <data key="d1">root</data>
+        </node>
+        <node id="n25">
+            <data key="d0">25</data>
+            <data key="d1"/>
+        </node>
+        <edge id="e0" source="n0" target="n1">
+            <data key="d2">0</data>
+            <data key="d3">path</data>
+            <data key="d4">A, B, C</data>
+        </edge>
+        <edge id="e1" source="n1" target="n2">
+            <data key="d2">1</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e2" source="n1" target="n5">
+            <data key="d2">2</data>
+            <data key="d3">path</data>
+            <data key="d4">B, C</data>
+        </edge>
+        <edge id="e3" source="n2" target="n3">
+            <data key="d2">3</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e4" source="n8" target="n9">
+            <data key="d2">4</data>
+            <data key="d3">path</data>
+            <data key="d4">B, C</data>
+        </edge>
+        <edge id="e5" source="n5" target="n6">
+            <data key="d2">5</data>
+            <data key="d3">path</data>
+            <data key="d4">A, B, C</data>
+        </edge>
+        <edge id="e6" source="n3" target="n4">
+            <data key="d2">6</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e7" source="n9" target="n10">
+            <data key="d2">7</data>
+            <data key="d3">path</data>
+            <data key="d4">A, B</data>
+        </edge>
+        <edge id="e8" source="n9" target="n11">
+            <data key="d2">8</data>
+            <data key="d3">path</data>
+            <data key="d4">C</data>
+        </edge>
+        <edge id="e9" source="n6" target="n7">
+            <data key="d2">9</data>
+            <data key="d3">path</data>
+            <data key="d4">A, B, C</data>
+        </edge>
+        <edge id="e10" source="n7" target="n8">
+            <data key="d2">10</data>
+            <data key="d3">path</data>
+            <data key="d4">B, C</data>
+        </edge>
+        <edge id="e11" source="n10" target="n13">
+            <data key="d2">11</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e12" source="n10" target="n12">
+            <data key="d2">12</data>
+            <data key="d3">path</data>
+            <data key="d4">B</data>
+        </edge>
+        <edge id="e13" source="n11" target="n13">
+            <data key="d2">13</data>
+            <data key="d3">path</data>
+            <data key="d4">C</data>
+        </edge>
+        <edge id="e14" source="n7" target="n9">
+            <data key="d2">14</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e15" source="n3" target="n4">
+            <data key="d2">15</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e16" source="n13" target="n14">
+            <data key="d2">16</data>
+            <data key="d3">path</data>
+            <data key="d4">A, C</data>
+        </edge>
+        <edge id="e17" source="n12" target="n14">
+            <data key="d2">17</data>
+            <data key="d3">path</data>
+            <data key="d4">B</data>
+        </edge>
+        <edge id="e18" source="n4" target="n5">
+            <data key="d2">18</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e19" source="n14" target="n15">
+            <data key="d2">19</data>
+            <data key="d3">path</data>
+            <data key="d4">A, C</data>
+        </edge>
+        <edge id="e20" source="n14" target="n16">
+            <data key="d2">20</data>
+            <data key="d3">path</data>
+            <data key="d4">B</data>
+        </edge>
+        <edge id="e22" source="n15" target="n17">
+            <data key="d2">22</data>
+            <data key="d3">path</data>
+            <data key="d4">A, C</data>
+        </edge>
+        <edge id="e23" source="n16" target="n17">
+            <data key="d2">23</data>
+            <data key="d3">path</data>
+            <data key="d4">B</data>
+        </edge>
+        <edge id="e24" source="n17" target="n18">
+            <data key="d2">24</data>
+            <data key="d3">path</data>
+            <data key="d4">A, B, C</data>
+        </edge>
+        <edge id="e25" source="n18" target="n19">
+            <data key="d2">25</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e26" source="n18" target="n20">
+            <data key="d2">26</data>
+            <data key="d3">path</data>
+            <data key="d4">B</data>
+        </edge>
+        <edge id="e27" source="n18" target="n21">
+            <data key="d2">27</data>
+            <data key="d3">path</data>
+            <data key="d4">C</data>
+        </edge>
+        <edge id="e28" source="n19" target="n22">
+            <data key="d2">28</data>
+            <data key="d3">path</data>
+            <data key="d4">A</data>
+        </edge>
+        <edge id="e29" source="n20" target="n22">
+            <data key="d2">29</data>
+            <data key="d3">path</data>
+            <data key="d4">B</data>
+        </edge>
+        <edge id="e30" source="n21" target="n23">
+            <data key="d2">30</data>
+            <data key="d3">path</data>
+            <data key="d4">C</data>
+        </edge>
+        <edge id="e31" source="n22" target="n24">
+            <data key="d2">31</data>
+            <data key="d3">path</data>
+            <data key="d4">A, B</data>
+        </edge>
+        <edge id="e32" source="n23" target="n25">
+            <data key="d2">32</data>
+            <data key="d3">path</data>
+            <data key="d4">C</data>
+        </edge>
+        <edge id="e33" source="n24" target="n25">
+            <data key="d2">33</data>
+            <data key="d3">path</data>
+            <data key="d4">A, B</data>
+        </edge>
+        <edge id="e36" source="n8" target="n2">
+            <data key="d2">36</data>
+            <data key="d3">transposition</data>
+        </edge>
+        <edge id="e37" source="n13" target="n16">
+            <data key="d2">37</data>
+            <data key="d3">transposition</data>
+        </edge>
+        <edge id="e38" source="n15" target="n12">
+            <data key="d2">38</data>
+            <data key="d3">transposition</data>
+        </edge>
+    </graph>
+</graphml>

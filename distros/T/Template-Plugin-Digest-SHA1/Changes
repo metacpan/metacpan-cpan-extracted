@@ -1,0 +1,17 @@
+Revision history for Template-Plugin-Digest-SHA1
+================================================
+
+0.05    2014-12-31
+        - fixed license fields in META.json to be lists.
+
+0.04    2014-06-25
+        - new maintainer: BARBIE.
+        - repackaged distribution.
+        - added LICENSE file.
+        - updated META.yml, added META.json.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - extended test suite.
+
+0.03    2006-04-26
+        - Last release to CPAN by Andrew.

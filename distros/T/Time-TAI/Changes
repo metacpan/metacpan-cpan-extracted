@@ -1,0 +1,66 @@
+version 0.003; 2010-07-23
+
+  * bugfix: require bugfixed versions of Time::TT::OffsetKnot (for
+    $SIG{__DIE__} handling)
+
+  * recognise new agencies BY, DMDM (formerly ZMDM), EIM, INTI, KIM,
+    KZ, LV, NRL, SIQ, SMD, UA, VMI
+
+  * recognise new agency names IGNA (formerly IGMA), and update their
+    recipes for the new filenames
+
+  * be more stringent in parsing time scale data files
+
+  * regularise LWP version checking code
+
+  * use simpler "parent" pragma in place of "base"
+
+  * document standard Time::TT::Realisation methods in
+    Time::TAI::Realisation_TAI
+
+  * use full stricture in test suite
+
+  * test POD syntax and coverage, and rename some internal functions to
+    satisfy the coverage test
+
+  * drop prototypes from method subs (where the prototypes have no effect)
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+  * check for required Perl version at runtime
+
+version 0.002; 2007-02-20
+
+  * accept new style of utc-* files which contains uncertainty data
+    (not yet doing anything with the uncertainty data)
+
+  * recognise new agency names BIM (formerly NMC), MKEH (formerly OMH),
+    and ZA (formerly CSIR), and update their recipes for the new filenames
+
+  * in documentation, reference Time::TAI::Now
+
+  * test explicitly for correct class of result
+
+version 0.001; 2006-08-03
+
+  * list exact required modules in Makefile.PL
+
+  * use "=> 0" instead of "=> undef" in unversioned dependencies in
+    Makefile.PL
+
+  * don't include underscore in string version of module version numbers
+    in Makefile.PL
+
+  * bugfix in an internal can't-happen error message
+
+  * use "warnings" and "strict" pragmas in all modules
+
+version 0.000; 2006-06-13
+
+  * initial released version

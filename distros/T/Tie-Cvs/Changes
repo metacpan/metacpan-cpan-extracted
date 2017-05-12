@@ -1,0 +1,24 @@
+Revision history for Perl extension Tie::Cvs.
+
+0.06  Sun Oct 11 15:02:48 WEST 2015
+      - Fix tests to use File::Temp.
+
+0.05  Sat Oct 10 20:18:14 WEST 2015
+      - Fix POD errors.
+
+0.04  Wed Jun 22 19:09:19 2011
+      - Better cvs discovery, and hopefully, bail out from testers without cvs.
+
+0.03  Thu Mar 31 15:45:00 2005
+	- Added documentation
+	- changed tests
+
+0.02  Wed Sep 29 18:00:00 2004
+	- norm and norminv now uses a slightly smaller syntax.
+
+0.01  Thu Oct  8 08:51:53 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -c -b 5.6.0 -n Tie::Cvs
+	- basic functionality
+	- added tests for norm/norminv;
+	- added some stress tests;

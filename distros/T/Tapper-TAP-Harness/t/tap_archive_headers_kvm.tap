@@ -1,0 +1,36 @@
+1..1
+# Tapper-section: Metainfo
+# Tapper-Suite-Name: Daily-Report
+# Tapper-Suite-version: 0.01
+# Tapper-machine-name: kepek
+# Tapper-reportername: sschwigo
+# Tapper-Hardwaredb-Systems-Id: 4711
+# Tapper-machine-description: PC-Ware
+# Tapper-cpuinfo: 1x Family: 15, Model: 107, Stepping: 1
+# Tapper-ram: 3839 MB
+# Tapper-bios: American Megatrends Inc., 0201, 10/15/2007
+# Tapper-uptime: 21 hrs
+# Tapper-reportcomment: Hot Funky Report
+ok 1 host metadata
+1..1
+# Tapper-section: KVM-Metainfo
+# Tapper-kvm-module-version: kvm-84-6620-ge3dbe3f
+# Tapper-kvm-userspace-version: kvm-84-488-gee8b55c
+# Tapper-kvm-base-os-description: Fedora release 10 (Cambridge)
+# Tapper-kvm-kernel: 2.6.27.21-170.2.56.fc10.x86_64 x86_64
+# Tapper-description: description affe 0
+ok 1 kvm metadata
+1..3
+# Tapper-section: guest_1_ms_vista_32b_up_qcow
+# Tapper-kvm-guest-description: 001-WinSST
+# Tapper-kvm-guest-test: WinSST-4.7.4
+# Tapper-kvm-guest-start: 2009-04-06 19:52:18
+# Tapper-kvm-guest-flags: -m 2304 -smp 1
+# Tapper-description: description affe 1
+ok 1 general
+ok 2 time 
+ok 3 WinSST 4.7.4
+1..1
+# Tapper-section: host
+# Tapper-description: description affe 2
+ok 1 no test performed 

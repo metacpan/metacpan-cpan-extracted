@@ -1,0 +1,20 @@
+=== color
+--- wiki
+&color(red){hoge}
+--- html
+<font color="red">hoge</font>
+=== bgcolor
+--- wiki
+&color(,red){hoge}
+--- html
+<font style="background-color:red">hoge</font>
+=== color bgcolor
+--- wiki
+&color(red,red){hoge}
+--- html
+<font color="red" style="background-color:red">hoge</font>
+=== parser
+--- wiki
+&color(red){hoge &color(#000){hoge} hoge}
+--- html
+<font color="red">hoge <font color="#000">hoge</font> hoge</font>

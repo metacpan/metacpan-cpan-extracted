@@ -1,0 +1,19 @@
+Changes for Test::Exit
+
+0.11 2013-07-31
+  * Updated documentation, which I forgot to update for 0.10.
+  * Expose an "exit_code" function like Test::Fatal's "exception".
+
+0.10 2013-07-31
+  * Use Return::MultiLevel's uplevel return instead of exceptions for
+    exit. Now works even if the tested code uses eval.
+
+0.03 2009-12-04
+  * Handle "exit;" properly -- it should behave like exit(0).
+    Thanks to KATO Kazuyoshi (kzys).
+
+0.02 2009-08-14
+  * Fix a POD error.
+
+0.01 2009-07-23
+  * Original release.

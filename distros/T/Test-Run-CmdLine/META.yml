@@ -1,0 +1,70 @@
+---
+abstract: 'Analyze tests from the command line using Test::Run'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Trap: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - cmdline
+  - command-line
+  - front-end
+  - harness
+  - prove
+  - qa
+  - QA
+  - 'quality assurance'
+  - run
+  - runprove
+  - tap
+  - TAP
+  - TAP::Harness
+  - test
+  - testing
+  - Test::Run
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Run-CmdLine
+provides:
+  Test::Run::CmdLine:
+    file: lib/Test/Run/CmdLine.pm
+    version: '0.0131'
+  Test::Run::CmdLine::Drivers::Default:
+    file: lib/Test/Run/CmdLine/Drivers/Default.pm
+    version: '0.0131'
+  Test::Run::CmdLine::Iface:
+    file: lib/Test/Run/CmdLine/Iface.pm
+    version: '0.0131'
+  Test::Run::CmdLine::Prove:
+    file: lib/Test/Run/CmdLine/Prove.pm
+    version: '0.0131'
+  Test::Run::CmdLine::Prove::App:
+    file: lib/Test/Run/CmdLine/Prove/App.pm
+    version: '0.0131'
+  Test::Run::CmdLine::Trap::Prove:
+    file: lib/Test/Run/CmdLine/Trap/Prove.pm
+    version: '0.0131'
+  Test::Run::CmdLine::Trap::ProveApp:
+    file: lib/Test/Run/CmdLine/Trap/ProveApp.pm
+    version: '0.0131'
+requires:
+  Moose: '0'
+  MooseX::Getopt: '0.26'
+  MooseX::Getopt::Basic: '0'
+  Test::Run::Core: '0.0126'
+  UNIVERSAL::require: '0'
+  YAML::XS: '0'
+  parent: '0'
+  perl: '5.008'
+resources:
+  homepage: http://web-cpan.berlios.de/modules/Test-Run/
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://bitbucket.org/shlomif/perl-test-run
+version: '0.0131'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

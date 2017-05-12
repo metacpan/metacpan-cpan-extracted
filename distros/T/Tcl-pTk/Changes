@@ -1,0 +1,50 @@
+Summary of Changes to Tcl::pTk
+
+Release 0.92:  8/21/16
+
+ * Updated to work with Tcl.pm versions > 1.02. Tcl.pm versions > 1.02 broke compatibility
+     with Tcl::pTk, so the Tcl 1.02 interface was moved to Tcl/pTk.pm 
+ * Added new ttkTixNotebook widget, which emulates the interface of the Tk Notebook widget.
+   Updated Facelift.pm to use this new widget, instead of the old tix NoteBook widget.
+ * Fix to Wm.pm to handle an rare condition where if Busy is called when a canvas is opened
+   in another window, the new window will popup under the existing window, not on top as expected.
+ * Fix for a problem with the dialog box widget that would pop up off the screen if running from
+   two displays. Added a test case for this condition.
+           
+Release 0.90:  7/4/15
+
+ * Updates to work with Tcl/Tk 8.6.
+ * Added background error handling (including a ErrorDialog.pm file like perl/tk) that is
+   more compatible with the way perl/tk does it.
+ * Fixed bug where a repeat call would create a TCL-command in TCL-land for each repeated event. 
+   Changed to reuse the Tcl-command. Added test case (repeatSubReuse.t)
+           
+Release 0.85:  11/5/10
+
+ * Bug-fix Release. Tweaks to HList to support returning photo objects
+   when calling entrycget with -image option.
+
+Release 0.84:  10/5/10
+
+ * Bug-fix Release
+
+Release 0.83:  9/5/10
+
+ * Minor updates to be more compatible with Tcl 8.4 installation (although Tcl 8.5 is preferred)
+
+Release 0.82:  8/25/10
+
+ * Minor updates to remove the requirement for the tcl package snit. This is not needed anymore. 
+
+Release 0.81:  8/21/10
+
+ * Minor updates so the CPAN indexer won't index demo directories. 
+ * Changed order of execution in Makefile.PL so that CPAN testers will get the proper prereqs
+   before the test-for-tk script is run.
+
+
+Release 0.8:  8/18/10
+
+ * First Public Release.
+
+

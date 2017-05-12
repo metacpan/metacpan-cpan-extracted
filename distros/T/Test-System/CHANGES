@@ -1,0 +1,181 @@
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 27 16:38:46 2009 -0600
+
+    details of each test now will have the same hash elements of
+    TAP::Result::Test plus a new one: is_ok (now a hash, not a subroutine)
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 23 22:24:51 2009 -0600
+
+    New changes
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 23 22:23:06 2009 -0600
+
+    Now each test can be represented as a scalar (the name/filepath) or as
+    an array (of 2 items, first item of filepath and second for the
+    description). The same applies to test plans.
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 23 19:47:23 2009 -0600
+
+    To the details of each test we now have a new key: is_ok to know if the
+    test failed or passed.
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 23 15:49:15 2009 -0600
+
+    New changes
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 23 15:47:59 2009 -0600
+
+    When a new format factory gets added we should still be calling
+    Test::system::Output::Factory cause this is where _all_ formats are.
+    Then user can override a format type by using Class::Factory.
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 23 13:19:48 2009 -0600
+
+    New changes
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 23 13:18:05 2009 -0600
+
+    Cleaner way: runtests for an array of test and run_test_plan for
+    running/loading a test plan (in yaml), then it will call runtests() with
+    the array of test to execute.
+    
+    Also now Test::System makes sure that %options is really a hash, if it
+    doesn't then it dies.
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Sun Nov 22 13:51:09 2009 -0600
+
+    Updated CPAN files and examples too
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Sat Nov 21 19:16:42 2009 -0600
+
+    Files needed for building a new version
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Sat Nov 21 19:15:20 2009 -0600
+
+    New changes.
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Sat Nov 21 19:11:26 2009 -0600
+
+     - Catch notes that come from the tests and place them on
+     $result->{'notes'}
+     - Result details are moved form $result->{'result'} to
+     $result->{'details'}
+     - The custom_factory attribute is now called format_factory_class
+     - Fix some bugs when we send a plan rather than an array of @tests.
+     - By default warnings are printed, they can be disabled by setting
+     Test::System->show_warnings to something Perl understand as false
+     (empty, 0, undef)
+     - For examples/suites.pl now it is a CLI command that uses
+     Getopt::Awesome (another of my *awesome* modules). This is not a
+     required dependency but instead it is a "recommended" dependency.
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 20 11:36:44 2009 -0800
+
+    Extra CPAN file updates
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 20 11:35:09 2009 -0800
+
+    Some other undef fixes
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 20 00:57:16 2009 -0800
+
+    CPAN files
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 20 00:55:48 2009 -0800
+
+    Fixed reference bugs
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Thu Nov 19 19:04:13 2009 -0800
+
+    New version of files before I create the tarball
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Thu Nov 19 19:00:55 2009 -0800
+
+    A fiix, we shouldn't be depending on Universal::isa
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Wed Nov 18 11:13:46 2009 -0800
+
+    Documentation improvements and add a new function: pretest_verification
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 22:21:43 2009 -0800
+
+    Update METa.yml
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 22:20:00 2009 -0800
+
+    Update CHANGES, Makefile and README with latest stuff
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 22:18:03 2009 -0800
+
+    Now Test::System can connect with callbacks of TAP::Parser and
+    TAP::Harness in order to know whats really happening and to build a hash
+    with all this information so user can later process.
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 12:54:24 2009 -0800
+
+    Update the CHANGES file and the README
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 12:53:29 2009 -0800
+
+    Increment version (forgot a file)
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 12:13:30 2009 -0800
+
+    Fixed some documentation issues and improved it.
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 02:21:48 2009 -0800
+
+    Increment version since I did something stupid via PAUSE
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 02:19:12 2009 -0800
+
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 02:12:45 2009 -0800
+
+    ./Makefile.PL result
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Fri Nov 13 02:07:02 2009 -0800
+
+    Let Test::System read a test plan from a YAML file and execute from
+    there.
+    
+    Also drop some attributes from Test::System since they are not really
+    needed or some are not that *required*
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 9 14:05:18 2009 -0800
+
+    Make it more CPAN standard
+
+Author: Pablo Fischer <pablo@pablo.com.mx>
+Date:   Mon Nov 9 09:53:02 2009 -0800
+
+    Initial revision

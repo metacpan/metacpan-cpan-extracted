@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Tie-Nested
+version:             0.10
+abstract:            Ties on nested structures
+license:             perl
+author:              
+    - Mark Overmeer
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Hash::Case:                    1.01
+    Log::Report:                   0.26
+    Test::More:                    0.47
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

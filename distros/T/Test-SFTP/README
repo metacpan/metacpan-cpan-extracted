@@ -1,0 +1,229 @@
+NAME
+    Test::SFTP - An object to help test SFTPs
+
+VERSION
+    version 1.10
+
+SYNOPSIS
+        use Test::SFTP;
+
+        my $t_sftp = Test::SFTP->new(
+            host     => 'localhost',
+            user     => 'sawyer',
+            password => '2o7U!OYv',
+            ...
+        );
+
+        $t_sftp->can_get( $remote_path, $local_path, "Getting $remote_path" );
+
+        $t_sftp->can_put(
+            $local_path,
+            $remote_path,
+            "Trying to copy $local_path to $remote_path",
+        );
+
+DESCRIPTION
+    Unlike most testing frameworks, *Test::SFTP* provides an object oriented
+    interface. The reason is that it's simply easier to use an object than
+    throw the login information as command arguments each time.
+
+ATTRIBUTES
+    Most attributes (at least those you can set on initialization) are
+    read-only. That means they cannot be set after the object was already
+    created.
+
+        $t_sftp->new(
+            host     => 'localhost',
+            user     => 'root'
+            password => 'p455w0rdZ'
+            debug    => 1     # default: 0
+            more     => [ qw( -o PreferredAuthentications=password ) ]
+            timeout  => 10    # 10 seconds timeout for the connection
+        );
+
+  host
+    The host you're connecting to.
+
+  user
+    Username you're connecting with.
+
+    If you do not specify this explicitly, it will use the user who is
+    running the application.
+
+  password
+    Password for the username you're connecting with.
+
+    If you do not specify this explicitly, it will try other connection
+    methods such as SSH keys.
+
+  port
+    Port you're connecting to.
+
+  debug
+    This flag turns on verbose for *Net::SFTP::Foreign*.
+
+  more
+    SSH arguments, such as used in *Net::SFTP::Foreign*, *Net::OpenSSH* or
+    plain OpenSSH.
+
+  timeout
+    This turns on both connection timeout (via *-o ConnectTimeout=$time*)
+    for ssh and a timeout for every data request.
+
+    It is recommended to set a timeout, or the test might hang for a very
+    long time if the target is unavailable.
+
+  Sensitive Attributes
+    connected
+        A boolean attribute to note whether the *Net::SFTP::Foreign* object
+        is connected.
+
+        Most methods used need the object to be connected. This attribute is
+        used internally to check if it's not connected yet, and if it isn't,
+        it reconnect.
+
+        You can use this attribute to check whether it's connected
+        internally in your test script or run it using
+        *$t_sftp->is_connected* as a test.
+
+        However, try not to set this attribute.
+
+    "$t_sftp->object($object)"
+        This holds the object of *Net::SFTP::Foreign*. It's there to allow
+        users more fingergrain access to the object. With that, you can do:
+
+            is(
+                $t_sftp->object->some_method( ... ),
+                'Specific test not covered in the framework',
+            );
+
+        Please refer to Net::SFTP::Foreign for all the attributes and
+        methods it supports.
+
+SUBROUTINES/METHODS
+  $t_sftp->can_connect($test_name)
+    Checks whether we were able to connect to the machine.
+
+  $t_sftp->cannot_connect($test_name)
+    Checks whether we were not able to connect to the machine.
+
+  $t_sftp->is_status( $string , $test_name )
+    Checks the status code returned from the SFTP server.
+
+    This is practicely the FX2TXT.
+
+  $t_sftp->is_error( $string , $test_name )
+    Checks for a certain SFTP error existing.
+
+  $t_sftp->can_get( $remote, $local, $test_name )
+    Checks whether we're able to get a file from $remote to $local.
+
+  $t_sftp->cannot_get( $remote, $local, $test_name )
+    Checks whether we're unable to get a file from $remote to $local.
+
+  $t_sftp->can_put( $local, $remote, $test_name )
+    Checks whether we're able to upload a file from $local to $remote.
+
+  $t_sftp->cannot_put( $local, $remote, $test_name )
+    Checks whether we're unable to upload a file from $local to $remote.
+
+  $t_sftp->can_ls( $path, $test_name )
+    Checks whether we're able to ls a folder or file. Can be used to check
+    the existence of files or folders.
+
+  $t_sftp->cannot_ls( $path, $test_name )
+    Checks whether we're unable to ls a folder or file. Can be used to check
+    the nonexistence of files or folders.
+
+  BUILD
+    Internal Moose function used to initialize the object. Do not touch. :)
+
+DEPENDENCIES
+    Moose
+
+    Expect
+
+    IO::Pty
+
+    Net::SFTP::Foreign.
+
+    Test::Builder
+
+    namespace::autoclean
+
+    parent
+
+DIAGNOSTICS
+    You can use the object attribute to access the *Net::SFTP::Foreign*
+    object directly.
+
+CONFIGURATION AND ENVIRONMENT
+    Some tests in the module require creating and removing files. As long as
+    we don't have complete control over the environment we're going to
+    connect to, it's hard to know if we're gonna upload a file that perhaps
+    already exists already. We try hard to avoid it by creating a file with
+    a random number as the filename.
+
+    So, in previous versions (actually, only 1), these tests were mixed with
+    all the other tests so if you had set the environment variable to
+    testing, it would test it with everything. If you don't, it would not
+    test a bunch of other tests that aren't dangerous at all.
+
+    To ask for this to be tested as well, set the environment variable
+    TEST_SFTP_DANG.
+
+INCOMPATIBILITIES
+    The default backend in Net::SFTP::Foreign uses Expect for password
+    authentication. Unfortunately, on windows, it only works using Cygwin
+    Perl.
+
+    So, if you're using Windows and need password authentication, you might
+    want to use *plink* instead of OpenSSH SSH client or the Net_SSH2
+    backend.
+
+BUGS AND LIMITATIONS
+    This module will have the same limitations that exist for
+    *Net::SFTP::Foreign*, though probably more.
+
+    Please report any bugs or feature requests to "bug-test-sftp at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-SFTP>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::SFTP
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-SFTP>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Test-SFTP>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Test-SFTP>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Test-SFTP/>
+
+ACKNOWLEDGEMENTS
+    Salvador Fandi√±o Garc√a for Net::SFTP::Foreign, Net::OpenSSH, being a
+    responsive dedicated author and a really nice guy! :)
+
+AUTHOR
+    Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

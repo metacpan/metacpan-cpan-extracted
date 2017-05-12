@@ -1,0 +1,30 @@
+Test::ExtDirect
+===============
+
+    This module provides a set of utility functions for testing Ext.Direct
+    classes. For each test script, an instance of RPC::ExtDirect::Server
+    will be created, and requests will be made with RPC::ExtDirect::Client.
+
+    This way you can simulate actual Ext JS or Sencha Touch client code
+    making calls, submitting forms, uploading files, or polling events - all
+    without having to set up a browser testing environment.
+
+    This kind of testing provides additional layer of insurance against
+    Ext.Direct specific problems and errors that may otherwise creep into
+    the codebase over time.
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make && make test
+        make install
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2012-2014 by Alex Tokarev <tokarev@cpan.org>.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

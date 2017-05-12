@@ -1,0 +1,140 @@
+#!/usr/bin/perl
+
+# PODNAME: plugauthlite
+# ABSTRACT: Minimal PlugAuth server
+# VERSION
+
+=head1 SYNOPSIS
+
+ % htpasswd 
+ % plugauthlite
+
+=head1 DESCRIPTION
+
+Very minimal L<PlugAuth> server implementation suitable for 
+L<Clustericious> apps to authenticate against using 
+L<Clustericious::Plugin::PlugAuth>.
+
+The only prerequsites are L<Mojolicious> and a Perl supported by L<Mojolicious>.
+
+It provides authentication only (not authorization).  Username/password
+combinations are specified in a standard Apache like password file.
+If L<Crypt::PasswdMD5> is installed then the passwords can be encrypted.
+
+The password file is specified using the environment variable C<PLUGAUTH_LITE_FILE>
+and C<passwd> in the current directory is used by default.  If the environment
+variable C<PLUGAUTH_LITE_PLAIN> is true then it will not attempt to use
+L<Crypt::PasswdMD5> and will not use encryption for the password file.
+
+=head1 ROUTES
+
+Any routes not specified return 404.
+
+=head2 GET /auth
+
+=over 4
+
+=item * if username and password provided using BASIC authentication and are correct
+
+Return 200 ok
+
+=item * if username and password provided using BASIC authentication but are not correct
+
+Return 403 not ok
+
+=item * if username and password are not provided using BASIC authentication
+
+Return 401 please authenticate
+
+=back
+
+=head2 GET /authz/user/#user/#action/(*resource)
+
+For this server all user/action/resource combination are authorized.  If you need to customize the
+authorization, use the full featured L<PlugAuth> server or partially featured L<Mojolicious::Plugin::PlugAuthLite>
+plugin.
+
+=over 4
+
+=item * if the given user (#user) is permitted to perform the given action (#action) on the given resource (*resource)
+
+Return 200 ok
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use Mojolicious::Lite;
+
+my $validate_pw;
+
+unless($ENV{PLUGAUTH_LITE_PLAIN})
+{
+  eval q{
+    use Crypt::PasswdMD5 qw( unix_md5_crypt apache_md5_crypt );
+  
+    $validate_pw = sub
+    {
+      my($plain, $encrypted) = @_;
+      return 1 if crypt($plain, $encrypted) eq $encrypted;
+    
+      # idea borrowed from Authen::Simple::Password
+      if($encrypted =~ /^\$(\w+)\$/)
+      {
+        return 1 if $1 eq 'apr1' && apache_md5_crypt( $plain, $encrypted ) eq $encrypted;
+
+        # on at least modern Linux crypt will accept a UNIX 
+        # MD5 password, so this may be redundant
+        return 1 if $1 eq '1'    && unix_md5_crypt  ( $plain, $encrypted ) eq $encrypted;
+      }
+      return 0;
+    }
+  };
+  if(my $error = $@)
+  {
+    app->log->info("Encryption failure install/fix Crypt::PasswdMD5");
+    app->log->error($error);
+  }
+  else
+  {
+    app->log->info("Using Encryption");
+  }
+}
+
+unless(defined $validate_pw)
+{
+  $validate_pw = sub {
+    my($plain, $encrypted) = @_;
+    return 1 if $plain eq $encrypted;
+    return 0;
+  };
+}
+
+my $pwdb = eval {
+  use autodie;
+  my %h;
+  open my $fh, '<', ($ENV{PLUGAUTH_LITE_FILE} // 'passwd');
+  while(<$fh>)
+  {
+    next if /^#/;
+    chomp;
+    if(/^(.*?):(.*)$/) { $h{$1} = $2 };
+  }
+  close $fh;
+  \%h;
+} // {};
+
+if(my $error = $@)
+{
+  app->log->error("unable to read password file $@");
+}
+
+plugin 'plug_auth_lite', auth => sub {
+  my($user, $pass) = @_;
+  return 0 unless defined $pwdb->{$user};
+  return $validate_pw->($pass, $pwdb->{$user});
+};
+
+app->start;

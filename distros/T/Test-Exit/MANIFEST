@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Test/Exit.pm
+t/basic.t
+t/exception-handling.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,37 @@
+---
+name: TreeFromDB
+
+
+Model::TPath:
+  schema_class: Schema::TPath
+  connect_info:
+    dsn: 'dbi:SQLite:dbname=:memory:'
+#    dsn: 'dbi:SQLite:dbname=test.db'
+
+TreePath:
+  debug: 0
+  backend:
+    name: DBIx
+    args:
+      model: Model::TPath
+      populate_backend: 1
+      load_order:
+        - File
+        - Page
+        - Comment
+      sources_name:
+        File:
+          columns:
+            - file
+        Page:
+          columns:
+            - name
+            - parent
+            - files
+          search_key: name
+          parent_key: parent
+
+        Comment:
+          columns:
+            - page
+          parent_key: page

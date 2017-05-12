@@ -1,0 +1,48 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Group::Generic - a basket to be filled with placeholders
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder;
+	my $placeholder = Text::Placeholder->new(
+		my $generic = '::Generic');
+	$generic->add_placeholder('some_value', sub { return(time()%86400) });
+
+	$placeholder->compile('Some value: [=some_value=]');
+	print ${$placeholder->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+Text::Placeholder::Group::Generic provides no placeholders by default. Any sense has to be added via add_placeholder (see below). Keep in mind that the placeholders have to be added before compilation.
+
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item add_placeholder($placeholder, $code_ref)
+
+Adds the $code_ref under the name of $placeholder. $code_ref is executed and returns the current value to be substituted for $placeholder.
+
+=back
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

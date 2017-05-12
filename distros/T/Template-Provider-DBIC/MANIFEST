@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/example.pl
+INSTALL
+lib/Template/Provider/DBIC.pm
+MANIFEST
+t/00.load.t
+t/01.functionality.t
+t/02.perlcritic.t
+t/03.pod.t
+t/04.pod-coverage.t
+t/lib/TemplateProviderDBICTest.pm
+t/lib/TestSchema/Template.pm
+t/lib/TestSchema.pm
+Makefile.PL
+README
+META.yml

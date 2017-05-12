@@ -1,0 +1,47 @@
+Revision history for Task-BeLike-Cebjyre
+
+1.0.2     2013-08-06 16:07:00 Australia/Sydney
+    Switching this dist to Build rather than MM per https://github.com/rjbs/Dist-Zilla/issues/171#issuecomment-22158881
+
+1.0.1     2013-08-05 12:49:04 Australia/Sydney
+    Specifying min version for Dist::Zilla::PluginBundle::CEBJYRE
+
+1.0.0     2011-08-16 15:01:02 Australia/Sydney
+    Added App::Base64
+
+0.9.1     2011-08-15 20:44:14 Australia/Sydney
+    Fixed changelog for 0.9.0
+
+0.9.0     2011-08-15 20:42:15 Australia/Sydney
+    Added Pod::Coverage::TrustPod
+
+0.8.0     2011-06-20 12:20:17 Australia/Sydney
+    Added LWP::Protocol::https (SSL is handy)
+
+0.7.0     2011-05-30 10:53:17 Australia/Sydney
+    Added Dist::Zilla::Plugin::TaskWeaver (exclusively for making this module).
+    Added modules for making the CPAN shell more friendly, and autotesting installed modules.
+
+0.6.0     2011-05-07 14:53:11 America/Los_Angeles
+    Added App::Whatsit
+
+0.5.0     2011-03-18 14:45:51 Australia/Sydney
+    Added my modules, Net::OAuth, and some test modules
+
+0.4.0     2011-02-23 12:08:32 Australia/Sydney
+    Added MongoDB (& unlisted prereq Try::Tiny)
+
+0.3.1     2011-02-11 20:57:48 Australia/Sydney
+    Stop doubling up of sections in POD
+
+0.3.0     2011-02-08 12:45:36 Australia/Sydney
+    Added ack
+
+0.2.0     2011-02-04 19:20:38 Australia/Sydney
+    More Email stuff, and corrected where Moose came from
+
+0.1.0     2010-11-09 11:56:49 Australia/Sydney
+    Added JSON
+
+0.0.1     2010-11-05 15:28:12 Australia/Sydney
+    Initial build

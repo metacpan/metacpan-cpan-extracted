@@ -1,0 +1,15 @@
+# local defaults for perlcritic
+severity = 3
+verbose = 4
+
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 5
+
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 70
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 75
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = numeric once redefine

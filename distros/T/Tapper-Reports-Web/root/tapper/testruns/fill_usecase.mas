@@ -1,0 +1,54 @@
+<%args>
+$description_text => undef
+$form
+$all_testruns => undef
+</%args>      
+              
+% if ($c->session->{valid}) {
+%     if ($all_testruns) {
+          <h3>Testruns created</h3>
+          <ul>
+%         my @testrunlist;
+%         foreach my $testrun (@{$all_testruns}) {
+%             if ($testrun->{error}) {
+                  <li>Can not create testrun on host <% $testrun->{host} %>: <% $testrun->{error} %></li>
+%             } else {
+%                 push @testrunlist, $testrun->{id};
+                  <li>
+                  <a href="/tapper/testruns/id/<% $testrun->{id} %>">Testrun <% $testrun->{id} %></a> 
+                  created on host <strong><% $testrun->{host} %></strong>
+                  with precondition IDs: 
+%                    foreach my $precondition (@{$testrun->{preconditions}}) {
+                        <a href="/tapper/preconditions/id/<% $precondition %>"><% $precondition %></a> 
+%                    }
+                 </li>
+%             }
+%         }
+          </ul>
+          <ul>
+                 <li>
+                   Follow <a href="/tapper/testruns/idlist/<% join(',', @testrunlist) %>">these testruns</a>.
+                 </li>
+          </ul>
+%     } else {
+          <h3>Use case details</h3>
+%         if ($description_text) {
+              <p>
+              <h4>Description</h4>
+              <p><b>(Please note, that <strong>queueing</strong> can not be influenced from the precondition parameters, regardless of what the self-description says.)</b></p>
+              <pre>
+<% $description_text %>
+              </pre>
+              </p>
+%        }
+         <h4>Values</h4>
+         <fieldset>
+         <% $form|n %>
+         <p>(*) Required</p>
+         <p><a href="/tapper/testruns/create">Back</a></p>
+         </fieldset>
+%    }
+% } else {
+    <h1>Error: You followed an incorrect deep link. Session data is missing</h1>
+% }
+<p><a href="/tapper/start/">Back to start page</a></p>

@@ -1,0 +1,2 @@
+ERROR(wordvec.pl):
+        Pair "test<>case" is repeated in the WORD_PAIRS file <test-A2.bi>.

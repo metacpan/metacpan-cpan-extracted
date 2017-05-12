@@ -1,0 +1,67 @@
+Revision history for Test::Run::Plugin::AlternateInterpreters
+
+0.0124  2015-05-31
+        * Add a link to the VCS repository in META.yml / META.json.
+        * Update links to point to MetaCPAN.
+
+0.0123  2014-01-31
+        * Minimum version of perl in META.yml (CPANTS).
+        * Add LICENSE file (CPANTS).
+        * Add t/cpan-changes.t and t/style-trailing-space.t
+
+0.0122  2012-09-29
+        * Remove a stray "END:" label in one of the tests, which caused
+        the tests to break on some perl versions:
+            - http://www.cpantesters.org/cpan/report/1006fb2a-09a9-11e2-8e23-9a24f233959e
+
+0.0121  2010-02-09
+        * Remove _get_simple_params and _get_private_simple_params.
+            - they seem to be unused.
+
+0.0120  2009-08-06
+        * Converted to YAML::XS instead of YAML.pm.
+        * Moosified.
+
+0.0109  2009-05-04
+        * Changed from NEXT.pm to MRO::Compat.
+
+0.0108  2008-09-14
+        * Added a fix for:
+    http://www.nntp.perl.org/group/perl.cpan.testers/2008/09/msg2204098.html
+            - Cwd.pm (not the XS version) cannot abs_path() a non-existent
+            file in an existent directory.
+            - fixed t/02-cmdline-run.t
+
+0.0107  2008-08-19
+        * Converted to private_backend_plugins().
+        * Removed the loading of YAML and NEXT - no longer needed.
+        * Now depending on Test-Run-CmdLine-0.0110 which fixes the
+        relevant bugs.
+
+0.0106  2008-08-18
+        * _initialize() -> _init().
+        * Bumped the required versions.
+
+0.0105  2008-04-04
+        * Changed the plugin due to a Test::Run::Core incompatibility.
+        * Now requiring Test::Run::Core 0.0115.
+
+0.0104  2007-06-23
+        * Converted the distribution to Test-Run-Builder.
+        * Now using Test::Run::CmdLine::Trap::ProveApp for the tests (to
+        prevent the "runprove" cannot be found false failures.)
+
+0.0103  2007-06-11
+        * Converted to the "yamldata" environment variable type
+        of Test-Run-CmdLine-0.0105
+        * Converted the tests to Test::Trap.
+
+0.0102  2007-03-17
+        Fixed the code to build against the latest Test::Run, while fixing
+        Test::Run::Core in the process.
+
+0.0101  2007-03-16
+        Added the prerequisites to the Build.PL
+
+0.01    2007-03-16
+        First version, released on an unsuspecting world.

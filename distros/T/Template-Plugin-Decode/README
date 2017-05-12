@@ -1,0 +1,18 @@
+Template-Plugin-Decode Version 0.02
+
+decoding filter plugin for Template-Toolkit
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Lyo Kato
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

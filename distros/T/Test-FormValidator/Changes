@@ -1,0 +1,42 @@
+Revision history for Test-FormValidator
+
+0.07    October 25, 2009
+        - Now require DFV 4.0 (RT #27068).  Thanks to Mark Stosberg.
+        
+        - Fixed failing test (RT #24127, RT #45729).  Thanks to Olaf 
+          Alders and Mike Tonks for the reports.
+
+        - Changes of interest to module maintainers only:
+          - fixed the makedocs script to work with more recent pod2html
+          - source repo now on github: http://github.com/mgraham/Test-FormValidator
+
+
+0.06    November 16, 2005
+        - $tfv->check_ok now returns a $results object on failure as
+          well as on success
+        - added $tfv->results (useful for examining the results after
+          calling $tfv->check_not_ok)
+        - minor doc fix
+
+0.05    October 20, 2005
+        - fix so that $tfv->check() works with a CGI query object
+        - added check_ok() and check_not_ok() (suggested by Mark Stosberg)
+
+0.04    October 11, 2005
+        - fixed bug with invalid_ok where the presense of extra fields
+          in %fields_and_constraints spec wasn't considered a test
+          failure
+
+0.03    October 11, 2005
+        - added 'prefix()'
+        - changed 'comment' to 'description' throughout (Test::Simple
+          calls it 'name', but the TAP doc calls it 'description'.
+          Either way, 'comment' is wrong)
+
+0.02    October 11, 2005
+        - minor pod fixes
+        - t/testform.html was missing from distribution
+
+0.01    October 10, 2005
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,54 @@
+
+Milestone 0 - Basic results report
+===========
+   * (DONE) Plan creating report from tm/autobuild_results.tt2
+   * (DONE) Generate tt2 for web report of lhcs tests
+   * (DONE) Create initial Test::Parser base class
+   * (DONE) Plan creating script to parse out results from lhcs_regression runs
+   * (DONE) Plan creating script to generate report from lhcs_results.tt2
+   * (DONE) Identify required info for reports; plan adding to test run data
+   * Extract warnings/errors from build_kernel output
+
+Milestone 1
+===========
+   * For NFS, adapt tm/autobuild_results.tt2 for multi-config runs
+   * Plan creating script to parse an NFSv4 run into a hash
+   * (DONE) Consider tie-in with tslogparser
+   * Merge web_test_reporter and report_generator scripts
+   * Set up to generate reports after every test run
+   * (DONE) Conceptualize what this tool should do
+   * Create template library from lhcs_results.tt2
+   * (DONE) Create CSS for test reports
+   * (DONE) Create initial Test::Parser::LHCS
+   * (DONE) Create routine to take a lhcs run to stdin and populate a
+     Test::Parser data structure
+   * (DONE) Create initial Test::Parser::LTP
+   * (DONE) Create initial Test::Parser::PyNFS
+   * Test out Test::Parser for generating TRPI XML
+   * (DONE) Test out running parse_lhcs on a LHCS test result file
+   * Modify treport/tm/lhcs_results to conform to TRPI data structure
+   * Create script that uses Test::Parser::LHCS to parse a test run into
+     memory, then calls $parser->properties() and passes that data
+     structure to TT2 to process lhcs_results.tt2
+   
+
+Milestone 2
+===========
+   * Create script that scans /testing/runs/*/ for new test results
+     and generates RSS feeds categorized by project name
+   * Document how this tool works
+   * (DONE) Create perl module that parses LTP results into hash (see scripts/ltp_stats)
+   * Plan creating report from tm/ltp_results.txt
+   * Add option to only report major package releases
+   * Plan writing article for LTP on this
+   * Review http://freshmeat.net/projects/survey/
+
+Milestone 3 - Graphing
+======================
+   * (DONE) Learn GnuPlot - http://www.cs.uni.edu/Help/gnuplot/3dplots.html
+   * (DONE) Create script to prettify gnuplot output - http://www.burningcutlery.com/derek/bargraph/
+   * (DONE) Create script to convert iozone data to gnuplot
+
+Wishlist
+========
+   * Export to spreadsheet

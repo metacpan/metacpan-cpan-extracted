@@ -1,0 +1,261 @@
+# NAME
+
+Task::BeLike::YANICK - like Yanick? Be like Yanick!
+
+# VERSION
+
+version 0.8.0
+
+# SYNOPSIS
+
+    $ cpan Task::BeLike::YANICK
+
+# DESCRIPTION
+
+This [Task](http://search.cpan.org/perldoc?Task) module installs the modules that I use on
+a regular basis.
+
+Wait, there is more! 
+It can also __update__ the modules that I use on a regular basis! 
+To do that, do
+
+    TASK_UPGRADE=1 cpan -f Task::BeLike::YANICK
+
+# MODULES INSTALLED BY THIS TASK
+
+## General
+
+- [Task::Kensho](http://search.cpan.org/perldoc?Task::Kensho)
+
+Might not use'em all, but I want them all near me, just in case.
+
+- [Set::CrossProduct](http://search.cpan.org/perldoc?Set::CrossProduct)
+
+    my $iterator = Set::CrossProduct->new([
+        [ a..z ],
+        [ 1..10 ],
+    ]);
+
+    while( my $i = $iterator->get ) {
+        print @$i;
+    }
+- [Algorithm::Combinatorics](http://search.cpan.org/perldoc?Algorithm::Combinatorics)
+
+Permutations are fun!
+
+## Object-Oriented Frameworks
+
+- [Moose](http://search.cpan.org/perldoc?Moose)
+- [MooseX::Declare](http://search.cpan.org/perldoc?MooseX::Declare)
+
+## XML Processing
+
+- [XML::LibXML](http://search.cpan.org/perldoc?XML::LibXML)
+- [XML::Writer](http://search.cpan.org/perldoc?XML::Writer)
+
+Because writing XML should be left to
+professionals.
+
+- [XML::Simple](http://search.cpan.org/perldoc?XML::Simple)
+
+Useful for quick'n'dirty XML creation or slurping.
+
+- [XML::XPathScript](http://search.cpan.org/perldoc?XML::XPathScript)
+
+Can't leave out my baby, now, can I?
+
+## Applications
+
+- [App::GitGot](http://search.cpan.org/perldoc?App::GitGot)
+
+Git repo herder.
+
+- [App::Ack](http://search.cpan.org/perldoc?App::Ack)
+
+`grep` is nice, but `ack` is just nicer.
+
+- [App::HTTPThis](http://search.cpan.org/perldoc?App::HTTPThis)
+
+Want to share a directory over http?
+
+    $ cd /path/to/dir/we/wanna/share
+    $ http_this
+
+- [Module::Info](http://search.cpan.org/perldoc?Module::Info)
+
+Want to know where the module is?
+
+    module_info Task::BeLike::YANICK
+
+- [App::PAUSE::cleanup](http://search.cpan.org/perldoc?App::PAUSE::cleanup)
+
+Muuuch better than via the PAUSE web interface.
+
+## Web Development
+
+- [Dancer](http://search.cpan.org/perldoc?Dancer)
+
+So you think you can dance?
+
+- [Dancer::Template::Mason](http://search.cpan.org/perldoc?Dancer::Template::Mason)
+- [Dancer::Plugin::Cache::CHI](http://search.cpan.org/perldoc?Dancer::Plugin::Cache::CHI)
+- [Catalyst::Runtime](http://search.cpan.org/perldoc?Catalyst::Runtime)
+- [HTML::Mason](http://search.cpan.org/perldoc?HTML::Mason)
+
+My templating system of choice.
+
+- [Template](http://search.cpan.org/perldoc?Template)
+
+I prefer [HTML::Mason](http://search.cpan.org/perldoc?HTML::Mason), but `TT` is used in an awful lot 
+of applications.
+
+- [WWW::Mechanize](http://search.cpan.org/perldoc?WWW::Mechanize)
+
+A must for testing and small web hacks.  Plus, this module name always 
+reminds me of _Battletech_.
+
+## Version Control Systems
+
+- [Git::CPAN::Patch](http://search.cpan.org/perldoc?Git::CPAN::Patch)
+
+Effortlessly import CPAN distros in a Git repository.
+
+## Testing
+
+- [Test::Class](http://search.cpan.org/perldoc?Test::Class)
+
+Add some class to your testing.
+
+- [Test::Perl::Critic](http://search.cpan.org/perldoc?Test::Perl::Critic)
+- [Test::Perl::Critic::Progressive](http://search.cpan.org/perldoc?Test::Perl::Critic::Progressive)
+
+Raise the bar, millimeter by millimeter.
+
+- [DBD::Mock](http://search.cpan.org/perldoc?DBD::Mock)
+
+Want to test the logic of something connecting to a database, but don't
+have a database handy? No problem.
+
+## Development
+
+- [Method::Signatures](http://search.cpan.org/perldoc?Method::Signatures)
+- [Carp::Always::Color](http://search.cpan.org/perldoc?Carp::Always::Color)
+
+"You're going to tell me what you know. EVERYTHING you know..."
+
+"...and you are going to tell me... IN COLORS!"
+
+- [autodie](http://search.cpan.org/perldoc?autodie)
+
+Because my minions should know that their missions should
+always either end in success, or death...
+
+Part of the core as of 5.10.1.
+
+- [Const::Fast](http://search.cpan.org/perldoc?Const::Fast)
+
+First, there was [constant](http://search.cpan.org/perldoc?constant), then [Readonly](http://search.cpan.org/perldoc?Readonly), and now [Const::Fast](http://search.cpan.org/perldoc?Const::Fast).
+
+- [Perl::Tidy](http://search.cpan.org/perldoc?Perl::Tidy)
+
+Because tidy code is so easier to read.
+
+- [Perl::Critic](http://search.cpan.org/perldoc?Perl::Critic)
+- [Module::Which](http://search.cpan.org/perldoc?Module::Which)
+
+Which version of _Foo::Bar_ am I running, and in which lib directory
+is it hidding?
+
+- [Pod::POM::Web](http://search.cpan.org/perldoc?Pod::POM::Web)
+
+Because search.cpan.org doesn't deserved to be poked every
+five minutes.
+
+## CPAN
+
+- [App::cpanminus](http://search.cpan.org/perldoc?App::cpanminus)
+
+Slam, bang, thank you CPAN.
+
+- [CPAN::SQLite](http://search.cpan.org/perldoc?CPAN::SQLite)
+
+CPAN asks for it, so there it is.
+
+- [App::cpanoutdated](http://search.cpan.org/perldoc?App::cpanoutdated)
+
+    cpan-outdated | cpanm
+
+## Dist::Zilla
+
+- [Dist::Zilla](http://search.cpan.org/perldoc?Dist::Zilla)
+
+Rooooar!
+
+- [Dist::Zilla::PluginBundle::YANICK](http://search.cpan.org/perldoc?Dist::Zilla::PluginBundle::YANICK)
+
+One bundle to configure'em all...
+
+- [Dist::Zilla::Plugin::Git](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::Git)
+
+Git-related Dist::Zilla actions.
+
+- [Dist::Zilla::Plugin::GithubMeta](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::GithubMeta)
+
+Github actions.
+
+# AUTHOR
+
+Yanick Champoux, `<yanick at cpan.org>` [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# BUGS
+
+Please report any bugs or feature requests to
+`bug-task-belike-yanick at rt.cpan.org`, or through the web
+interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-BeLike-YANICK](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-BeLike-YANICK).
+I will be notified, and then you'll automatically be notified of
+progress on your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Task::BeLike::YANICK
+
+You can also look for information at:
+
+- AnnoCPAN: Annotated CPAN documentation
+
+[http://annocpan.org/dist/Task-BeLike-YANICK](http://annocpan.org/dist/Task-BeLike-YANICK)
+
+- CPAN Ratings
+
+[http://cpanratings.perl.org/d/Task-BeLike-YANICK](http://cpanratings.perl.org/d/Task-BeLike-YANICK)
+
+- RT: CPAN's request tracker
+
+[http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-BeLike-YANICK](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-BeLike-YANICK)
+
+- Search CPAN
+
+[http://search.cpan.org/dist/Task-BeLike-YANICK](http://search.cpan.org/dist/Task-BeLike-YANICK)
+
+# ACKNOWLEDGEMENTS
+
+# COPYRIGHT & LICENSE
+
+Copyright 2009 Yanick Champoux, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

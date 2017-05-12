@@ -1,0 +1,43 @@
+digraph G {
+	node [label="\N"];
+	graph [bb="0,0,222,420"];
+	subgraph cluster_0 {
+		graph [style=filled];
+		graph [color=lightgrey];
+		graph [label="process #1"];
+		graph [lp="48,354"];
+		graph [bb="8,76,98,364"];
+		node [style=filled];
+		node [color=white];
+		a0 [pos="63,318", width="0.75", height="0.50"];
+		a1 [pos="63,246", width="0.75", height="0.50"];
+		a2 [pos="63,174", width="0.75", height="0.50"];
+		a3 [pos="63,102", width="0.75", height="0.50"];
+		a0 -> a1 [pos="e,63,264 63,300 63,292 63,283 63,274"];
+		a1 -> a2 [pos="e,63,192 63,228 63,220 63,211 63,202"];
+		a2 -> a3 [pos="e,63,120 63,156 63,148 63,139 63,130"];
+		a3 -> a0 [pos="s,49,302 43,295 37,286 31,275 27,264 14,218 14,201 27,156 32,142 41,128 49,118"];
+	}
+	subgraph cluster_1 {
+		graph [color=blue];
+		graph [label="process #2"];
+		graph [lp="180,354"];
+		graph [bb="138,76,208,364"];
+		node [style=filled];
+		b0 [pos="173,318", width="0.75", height="0.50"];
+		b1 [pos="173,246", width="0.75", height="0.50"];
+		b2 [pos="173,174", width="0.75", height="0.50"];
+		b3 [pos="173,102", width="0.75", height="0.50"];
+		b0 -> b1 [pos="e,173,264 173,300 173,292 173,283 173,274"];
+		b1 -> b2 [pos="e,173,192 173,228 173,220 173,211 173,202"];
+		b2 -> b3 [pos="e,173,120 173,156 173,148 173,139 173,130"];
+	}
+	start [shape=Mdiamond, pos="118,392", width="1.00", height="0.56"];
+	end [shape=Msquare, pos="118,28", width="0.53", height="0.54"];
+	start -> a0 [pos="e,75,334 107,378 100,367 89,353 80,342"];
+	start -> b0 [pos="e,161,334 129,378 136,367 147,353 156,342"];
+	a1 -> b3 [pos="e,160,118 75,230 94,204 132,155 154,125"];
+	b2 -> a3 [pos="e,82,115 154,161 136,150 109,133 89,120"];
+	a3 -> end [pos="e,103,48 75,86 81,77 89,66 97,56"];
+	b3 -> end [pos="e,133,48 161,86 155,77 147,66 139,56"];
+}

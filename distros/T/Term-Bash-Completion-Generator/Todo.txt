@@ -1,0 +1,19 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+example of how to implement --? to give help
+	--option?
+		complete with help
+	--option??
+		complete with verbos help
+	--option?3
+		complete with verbosity level help
+	--option?3
+		complete with verbosity level help
+	--complet_option?
+		display help
+		
+help through the completion system
+	command argument?
+	

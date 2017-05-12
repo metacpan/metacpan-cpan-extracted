@@ -1,0 +1,2 @@
+void MyFree ( void *p );
+

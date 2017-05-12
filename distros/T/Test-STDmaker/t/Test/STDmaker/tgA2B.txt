@@ -1,0 +1,32 @@
+1..11 todo 3 6;
+# Running under perl version 5.006001 for MSWin32
+# Win32::BuildNumber 635
+# Current time local: Sat May 22 20:03:45 2004
+# Current time GMT:   Sun May 23 00:03:45 2004
+# Using Test.pm version 1.24
+# Test::Tech     : 1.26
+# Data::Secs2    : 1.26
+# Data::Startup  : 0.07
+# Data::Str2Num  : 0.08
+# Number of tests: 11
+# =cut 
+ok 1 - Quiet Code 
+ok 2 - Pass test 
+ok 3 - Todo test that passes  # (tgA1.t at line 149 TODO?!)
+not ok 4 - Test that fails 
+# Test 4 got: "6" (tgA1.t at line 164)
+#   Expected: '7'
+ok 5 - Skipped tests  # skip
+not ok 6 - Todo Test that Fails 
+# Test 6 got: '12' (tgA1.t at line 182 *TODO*)
+#   Expected: '6'
+ok 7 - verify only 
+not ok 8 - Failed test that skips the rest 
+# Test 8 got: '5' (tgA1.t at line 203)
+#   Expected: '6'
+ok 9 - A test to skip  # skip - Test not performed because of previous failure.
+ok 10 - A not skip to skip  # skip - Test not performed because of previous failure.
+ok 11 - A skip to skip  # skip - Test not performed because of previous failure.
+# Skipped: 5 9 10 11
+# Failed : 4 6 8
+# Passed : 4/7 57%

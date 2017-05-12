@@ -1,0 +1,34 @@
+BEGIN:VCARD
+ADR;TYPE=home:;;Nordstr. 59;Tübingen;;72074;
+FN:Musterfrau\, Elke
+N:Musterfrau;Elke;;;
+TEL;TYPE=HOME:(07071) 800580
+UID:-1009899895
+VERSION:3.0
+END:VCARD
+
+BEGIN:VCARD
+ADR;TYPE=home:;;Wilhelmstr. 13;Tübingen;;72072;
+FN:Mustermann\, Klaus
+N:Mustermann;Klaus;;;
+TEL;TYPE=HOME:(07071) 123456
+TEL;TYPE=WORK:(07474) 65432
+UID:-1009899991
+VERSION:3.0
+END:VCARD
+
+BEGIN:VCARD
+ADR;TYPE=home:;;Mierendorffstr. 20;Tübingen;;72074;
+BDAY:1956-03-07T00:00:00Z
+CLASS:PUBLIC
+EMAIL:musterfamilie@t-online.de
+FN:Musterfamilie\, Christa
+N:Musterfamilie;Christa;;;
+NOTE:Günther Musterfamilie\, Geb 28.01.1955
+REV:2007-07-12T13:07:32Z
+TEL;TYPE=HOME:(07071) 74879
+TEL;TYPE=CELL:(0172) 98765432
+TEL;TYPE=WORK:(0711) 238014220
+UID:-1027624167
+VERSION:3.0
+END:VCARD

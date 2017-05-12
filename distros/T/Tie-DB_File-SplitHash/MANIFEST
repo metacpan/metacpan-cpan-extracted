@@ -1,0 +1,15 @@
+MANIFEST
+README
+Changes
+LICENSE
+Artistic_License.txt
+GPL_License.txt
+Makefile.PL
+Build.PL
+META.yml
+lib/Tie/DB_File/SplitHash.pm
+lib/Tie/DB_File/SplitHash.pod
+t/01_Tie-DB_File-SplitHash.t
+t/97_distribution.t
+t/98_pod_coverage.t
+t/99_pod.t

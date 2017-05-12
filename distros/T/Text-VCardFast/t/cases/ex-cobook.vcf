@@ -1,0 +1,16 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Bloggs;Joe;;;
+FN:Joe Bloggs
+item1.EMAIL;type=INTERNET:me@joebloggs.com
+item1.X-ABLabel:_$!<Home>!$_
+item2.TEL;type=VOICE:+44 20 1234 5678
+item2.X-ABLabel:_$!<Mobile>!$_
+item3.ADR:;;1 Trafalgar Square;London;;WC2N;United Kingdom
+item3.X-ABLabel:_$!<Home>!$_
+item4.URL:http://joebloggs.com
+item4.X-ABLabel:_$!<Home>!$_
+item5.IMPP;X-SERVICE-TYPE=Skype:x-apple:joe.bloggs
+item5.X-ABLabel:_$!<Home>!$_
+X-SOCIALPROFILE;type=Twitter;x-user=joebloggs:http://twitter.com/joebloggs
+END:VCARD

@@ -1,0 +1,24 @@
+README for Text-FixedWidth-Helper
+
+Preparation and verification of fixed-width data are often part of software
+development projects.  Because fixed-width data is more difficult for humans
+to visually decode than character-delimited data, it is often difficult to
+construct and/or verify small sample files.  This library provides assistance
+with that task.
+
+This library assumes that the user of a program can type a plain-text file in
+a simple format and present it, perhaps via a GUI interface, to a Perl program
+using the library.
+
+For more documentation:
+
+    perldoc lib/Text/FixedWidth/Helper.pm
+
+You should be able to use this set of instructions to install the module.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

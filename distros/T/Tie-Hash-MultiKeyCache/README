@@ -1,0 +1,109 @@
+NAME
+    Tie::Hash::MultiKeyCache - aged cache or fifo
+
+SYNOPSIS
+    This module is an extension of Tie::Hash::MultiKey and it iherits all of
+    the methods and characteristics of the parent module. Only the methods
+    unique to this module are shown here. See the Tie::Hash::MultiKey
+    manpage for complete documentation.
+
+      use Tie::Hash::MultiKeyCache;
+
+      $thm = tie %h, 'Tie::Hash::MultiKeyCache',
+                    SIZE    => n,
+                    ADDKEY  => false,
+                    DELKEY  => false;
+      or
+
+      $thm = tie %h, 'Tie::Hash::MultiKeyCache',
+                    SIZE    => n,
+                    FIFO    => true,
+
+      $rv      = $thm->lock($key);
+      $rv      = $thm->unlock($key);
+      $size    = $thm->cacheSize();
+      $oldsize = $thm->newSize();
+
+DESCRIPTION
+    This module provides a setable fixed size CACHE implemented as a hash
+    with multiple keys per value. In normal use as new values are added to
+    the CACHE and the CACHE size is exceeded, the least used items will drop
+    from the CACHE. Particular items may be locked into the CACHE so they
+    never expire.
+
+    The CACHE may also be configured as a FIFO where the first items added
+    to the CACHE are the first to drop out when size is exceeded. As in the
+    recent use scenario, items LOCKED into CACHE will not be dropped.
+
+    * $thm = tie %h, 'Tie::Hash::MultiKeyCache',
+                                SIZE    => n,
+                                ADDKEY  => false, # optional
+                                DELKEY  => false; # optional
+                                FIFO    => true;  # optional
+                                  over rides ADD,DEL KEY
+
+        The arguments beyond the package name may be specified as a hash as
+        shown or as a reference to a hash.
+
+          $thm = tie %h $package, { SIZE => n, options... }
+
+        Creates a CACHE of maximum SIZE value elements and returns a method
+        pointer. Default operation refreshes cache positioning for an
+        element when a ADD Key or DELETE Key operation is performed. To
+        disable this feature, provide ADDKEY and/or DELKEY with a false
+        value.
+
+          input:        hash,
+                        cachesize
+          returns:      method pointer
+
+        The method pointer may also be accessed later with:
+
+                $thm = tied(%h);
+
+    * $rv = $thm->lock($key);
+        Locks the value item into CACHE via any key in the value item's key
+        set.
+
+          input:        any key associated with value
+          return:       true on success
+                        false if the key does not exist
+
+    * $rv = $thm->unlock($key);
+        Unlocks the value item via any key in the value item's key set. No
+        operation is performed if the value item is not locked in CACHE.
+
+          input:        any key associated with value
+          return:       true on success
+                        false if the key does not exist
+
+    * $size = $thm->cacheSize;
+        Returns the set size of the CACHE. This may not be the same as the
+        number of items in the CACHE. See: the Tie::Hash::MultiKey manpage
+        $thm->size;
+
+          input:        none
+          returns:      set size of the CACHE
+
+    * $oldsize = $thm->newSize($newsize);
+        Sets the maximum size of the CACHE to a new size and returns the old
+        size. A CACHE flush is performed if the new CACHE is smaller than
+        the actual size of the current CACHE. However, items locked in CACHE
+        will not be flushed if their number exceeds the new size parameter.
+
+AUTHOR
+        Michael Robinton, <miker@cpan.org>
+
+COPYRIGHT
+        Copyright 2014, Michael Robinton
+
+        This program is free software; you may redistribute it and/or modify
+        it under the same terms as Perl itself.
+
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+        the Tie::Hash manpage, the Tie::Hash::MultiKey manpage
+

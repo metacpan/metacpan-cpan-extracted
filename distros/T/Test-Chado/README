@@ -1,0 +1,136 @@
+NAME
+    Test::Chado - Unit testing for chado database modules and applications
+
+VERSION
+    version v4.1.1
+
+SYNOPSIS
+   Start with a perl module
+    This means you have a module with namespace(with or without double
+    colons), along with Makefile.PL or Build.PL or even dist.ini. You have
+    your libraries in lib/ folder and going to write tests in t/ folder.
+    This could an existing or new module, anything would work.
+
+   Write tests
+    It should be in your .t file(t/dbtest.t for example)
+
+      use Test::More;
+      use Test::Chado;
+      use Test::Chado::Common;
+
+      my $schema = chado_schema(load_fixtures => 1);
+
+      has_cv($schema,'sequence', 'should have sequence ontology');
+      has_cvterm($schema, 'part_of', 'should have term part_of');
+      has_db($schema, 'SO', 'should have SO in db table');
+      has_dbxref($schema, '0000010', 'should have 0000010 in dbxref');
+
+      drop_schema();
+
+   Run any test commands to test it against chado sqlite
+      prove -lv t/dbtest.t
+
+      ./Build test 
+
+      make test
+
+   Run against postgresql
+      #Make sure you have a database with enough permissions
+  
+      prove -l --dsn "dbi:Pg:dbname=testchado;host=localhost"  --user tucker --password halo t/dbtest.t
+
+      ./Build test --dsn "dbi:Pg:dbname=testchado;host=localhost"  --user tucker --password halo
+
+      make test  --dsn "dbi:Pg:dbname=testchado;host=localhost"  --user tucker --password halo
+
+   Run against postgresql without setting any custom server
+      prove -l --postgression t/dbtest.t
+
+      ./Build test --postgression
+
+      make test --postgression
+
+DOCUMENTATION
+    Use the quick start or pick any of the section below to start your
+    testing. All the source code for this documentation is also available
+    here <https://github.com/dictyBase/Test-Chado-Guides>.
+
+    Quick start
+    Testing perl distribution
+    Testing web application
+    Testing with postgresql
+    Loading custom schema(sql statements) for testing
+    Loading custom fixtures(test data)
+
+API
+   Methods
+    All the methods are available as all export group. There are two more
+    export groups.
+
+    schema
+
+        chado_schema
+        reload_schema
+        drop_schema
+
+    manager
+
+        get_fixture_loader_instance
+        set_fixture_loader_instance
+        get_dbmanager_instance
+        set_dbmanager_instance
+
+    chado_schema(%options)
+        Return an instance of DBIx::Class::Schema for chado database.
+
+        However, because of the way the backends works, for Sqlite it
+        returns a on the fly schema generated from
+        DBIx::Class::Schema::Loader, whereas for Pg backend it returns
+        Bio::Chado::Schema
+
+        options
+            load_fixture : Pass a true value(1) to load the default fixture,
+            default is false.
+
+            custom_fixture: Path to a custom fixture file made with
+            DBIx::Class::Fixtures. It should be a compressed tarball.
+            Currently it is recommended to use tc-prepare-fixture script to
+            make custom fixutre so that it fits the expected layout.
+            Remember, only one fixture set could be loaded at one time and
+            if both of them specified, *custom_fixture* will take
+            precedence.
+
+    drop_schema
+    reload_schema
+        Drops and then reloads the schema.
+
+    set_fixture_loader_type
+        Sets the type of fixture loader backend it should use, either of
+        preset or flatfile.
+
+    get_dbmanager_instance
+        Returns an instance of backend class that implements the
+        Test::Chado::Role::HasDBManager Role.
+
+    set_dbmanager_instance
+        Sets the dbmanager class that should implement
+        Test::Chado::Role::HasDBManager Role.
+
+    get_fixture_loader_instance
+        Returns an instance of fixture loader class that implements the
+        Test::Chado::Role::Helper::WithBcs Role.
+
+    set_fixture_loader_instance
+        Sets fixture loader class that should implement the
+        Test::Chado::Role::Helper::WithBcs Role.
+
+Build Status
+AUTHOR
+    Siddhartha Basu <biosidd@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Siddhartha Basu.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

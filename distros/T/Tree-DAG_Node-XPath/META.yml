@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Tree-DAG_Node-XPath
+version:            0.11
+abstract:           Add XPath support to Tree::DAG_Node
+author:
+    - Michel Rodriguez <mirod@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Tree::DAG_Node:     1.04
+    Tree::XPathEngine:  0.05
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

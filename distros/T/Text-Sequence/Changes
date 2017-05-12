@@ -1,0 +1,32 @@
+Wed Feb 15 14:58:00 2017   v0.27
+
+As 0.26, but I botched the upload of 0.26 to PAUSE.
+
+
+
+Tue Feb 14 19:33:00 2017    v0.26
+
+Very minor internal tweak to make the test suite pass consistently
+on recent Perls. This is RT#111173.
+
+
+
+Tue Jul  6 17:32:52 BST 2004   v0.25
+
+Lots of work on singletons by Adam Spiers. Some work
+to generate regexen by Simon Wistow.
+
+
+
+Mon Jun 21 09:44:25 BST 2004   v0.22
+
+Initial release. This is based on some code by Simon Wistow
+and then bashed into a more usuable and general form by 
+Adam Spiers. 
+
+It was largely done to attempt to find sequences of files so
+it may still have the odd anachronism because of that.
+
+
+
+

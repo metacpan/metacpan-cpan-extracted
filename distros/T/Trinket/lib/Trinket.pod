@@ -1,0 +1,45 @@
+=head1 NAME
+
+Trinket - Perl object persistence and lookup framework
+
+=head1 SYNOPSYS
+
+TODO
+
+=head1 DESCRIPTION
+
+Trinket
+
+=head1 SEE ALSO
+
+TODO
+
+=over 4
+
+=item L<Trinket::Object>
+
+=item L<Trinket::Directory>
+
+=item L<Trinket::DataAccess>
+
+=item L<Trinket::DataAccess::RAM>
+
+=item L<Trinket::DataAccess::BerkeleyDB>
+
+=item L<Trinket::DataAccess::DBI>
+
+=item L<Trinket::FilterParser>
+
+=item L<Trinket::FilterParser::LDAP>
+
+=back
+
+=head1 AUTHOR
+
+Maintained by Leslie Michael Orchard <F<deus_x@pobox.com>>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000, Leslie Michael Orchard.  All Rights Reserved.
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

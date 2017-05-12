@@ -1,0 +1,31 @@
+Revision history for Perl extension Test::Skip::UnlessExistsExecutable
+
+0.041 Mon Mar 27 2:06:00 2010
+        * Updated README
+
+0.04 Mon Mar 26 20:48:00 2010
+        * Changed API 
+
+0.03 Mon Mar 25 20:00:00 2010
+        * Renamed the module. 
+
+0.024 Mon Mar 18 20:17:00 2010
+        *  POD improvements; explain rationale/use case of
+           the module (daxim++)
+
+0.023 Mon Mar 17 23:59:00 2010
+	* removed unused module dependency 
+        * updated File::Which version
+
+0.022 Mon Mar 17 23:40:00 2010
+	* updated POD. 
+          updated source availability and descrition
+
+0.021 Mon Mar 17 13:00:00 2010
+	* Added pod
+
+0.02 Mon Mar 17 12:49:58 2010
+	* Supported shortname
+
+0.01 Mon Mar 15 21:52:58 2010
+	* original version

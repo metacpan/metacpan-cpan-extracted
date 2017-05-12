@@ -1,0 +1,39 @@
+TAP-Harness-Remote version 0.01
+
+Sometimes you want to run tests on a remote testing machine, rather
+than your local development box.  C<TAP::Harness::Remote> allows you
+so reproduce entire directory trees on a remote server via C<rsync>,
+and spawn the tests remotely.  It also supports round-robin
+distribution of tests across multiple remote testing machines.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+A recent enough TAP::Harness build; 3.03 or later should suffice.
+Working copies of OpenSSH and rsync.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007-2008, Best Practical Solutions, LLC.  All rights
+reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.

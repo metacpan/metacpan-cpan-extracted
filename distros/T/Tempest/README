@@ -1,0 +1,26 @@
+Tempest
+
+The goal of Tempest is to provide a a consistent, reliable, multi-language API
+for generating heatmap images based on coordinate data-sets.
+
+Tempest is implemented natively in multiple programming languages, including
+Perl 5.  This implementation is "pure" Perl, meaning that there is no
+C or XS code to configure or compile.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 Evan Kaufman
+
+This program is released under the MIT license
+http://www.opensource.org/licenses/mit-license.php
+

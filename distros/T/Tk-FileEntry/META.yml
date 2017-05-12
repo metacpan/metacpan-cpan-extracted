@@ -1,0 +1,29 @@
+---
+abstract: 'FileEntry widget with optional file selection box'
+author:
+  - 'Alex Becker <c a p f a n _a-t_ g m x write_Adot-here d e - i n v a l l i d>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0.98
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.08
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-FileEntry
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: 6.64
+  Tk: 804.030
+  perl: 5.008008
+resources:
+  repository: https://github.com/asb-capfan/Tk-FileEntry
+version: 2.3

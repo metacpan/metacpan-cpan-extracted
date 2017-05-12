@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::Typoifier.
+
+0.01  Fri Feb 22 09:55:07 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-n Text::Typoifier -X
+

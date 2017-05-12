@@ -1,0 +1,23 @@
+Template::Provider::MD5
+=======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+   Template (Template Toolkit)
+
+COPYRIGHT AND LICENCE
+
+Perl Artistic AND GNU
+
+Copyright (C) 2004 Scott Penrose <scottp@dd.com.au>
+	http://linux.dd.com.au/
+
+

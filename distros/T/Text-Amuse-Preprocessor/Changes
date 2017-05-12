@@ -1,0 +1,104 @@
+Revision history for perl module Text-Amuse-Preprocessor
+
+0.36 2016-11-11
+
+ - Bump up Text::Amuse prerequisite to avoid failing tests.
+
+0.35 2016-10-22
+
+ - Removed use of $_ while reading files
+
+0.34 2016-10-16
+
+ - Added support for danish
+
+0.33 2016-07-22
+
+ - Added support for albanian
+ - Minor test cleaning
+
+0.32 2016-06-18
+
+ - Cleaned tests (do not leave dirs behind)
+
+0.31 2016-06-15
+
+ - Added --inplace option to muse-preprocessor
+ - Removed min perl version from tests
+
+0.30 2016-05-13
+
+ - Added portugese support
+ - Removed min perl version
+
+0.29 2016-04-16
+
+ - Fixed typographical filter to avoid opening quotes at the end of
+   line with lonely characters.
+
+0.28 2016-04-16
+
+ - Added support for french
+
+0.27 2016-03-12
+
+ - Improved the HTML with better handling of text blocks and tables.
+
+0.26 2016-02-21
+
+ - Documentation fixes
+ - Debian files for packaging
+
+0.25 2015-11-17
+
+ - Added script muse-preprocessor.pl for CLI usage
+ - Added pod-to-muse.pl script, using Pod::Simple::Wiki
+ - Cleaned up and enhanced HTML converter
+
+0.24 2015-03-21
+ - Remove the invisible soft hyphen on the common filters
+
+0.23 2014-11-20
+ - Corrected swedish language code
+
+0.22 2014-11-20
+ - Added support for swedish
+ - Added support for german
+
+0.21 2014-10-12
+ - Fixed indexing of Text::Amuse::Preprocessor::Typography (deprecated)
+
+0.20 2014-10-12
+ - Major upgrade. Text::Amuse::Preprocessor is now the recommend interface
+ - Footnote rearranger is now plugged into the preprocessor
+ - New script: muse-check-footnotes.pl
+ - Major internal refactoring
+ - New tests
+
+0.09 2014-05-19
+ - Fixed html-to-muse.pl options and doc
+
+0.08 2014-05-18
+ - Added script to convert local and remote files to muse
+
+0.07 2014-04-15
+ - Fixed memory cycles test
+
+0.06 2014-04-13
+ - Fixed manifest
+
+0.05 2014-04-13
+ - Added function to return a filter sub
+
+0.04 2014-02-09
+ - Fixed "pre" tag parsing
+
+0.03 2014-01-30
+ - Fixed Changes and versions
+
+0.02 2014-01-30
+ - Updated russian filter
+
+0.01 2014-01-26
+ - First release on CPAN.
+

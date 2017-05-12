@@ -1,0 +1,25 @@
+Term::CallEditor - solicit data from an external editor
+
+Install from CPAN:
+
+  cpan Term::CallEditor
+
+For the source code, see:
+
+http://github.com/thrig/Term-CallEditor
+
+This can be built and installed by running:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Run perldoc(1) on Term::CallEditor for more documentation.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004,2005,2009-2015 Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

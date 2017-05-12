@@ -1,0 +1,109 @@
+
+~~~~~~ Demonstration overview ~~~~~
+ 
+The results from executing the Perl Code 
+follow on the next lines as comments. For example,
+
+ 2 + 2
+ # 4
+
+~~~~~~ The demonstration follows ~~~~~
+
+     #########
+     # For "TEST" 1.24 or greater that have separate std err output,
+     # redirect the TESTERR to STDOUT
+     #
+     tech_config( 'Test.TESTERR', \*STDOUT );
+
+ ##################
+ # Quiet Code
+ # 
+ 
+ 'hello world'
+
+ # 'hello world'
+ #
+
+ ##################
+ # Pass test
+ # 
+ 
+ my $x = 2
+ my $y = 3
+ $x + $y
+
+ # '5'
+ #
+
+ ##################
+ # Todo test that passes
+ # 
+ 
+ $y-$x
+
+ # '1'
+ #
+
+ ##################
+ # Test that fails
+ # 
+ 
+ $x+4
+
+ # '6'
+ #
+
+ ##################
+ # Skipped tests
+ # 
+ 
+
+ ##################
+ # Todo Test that Fails
+ # 
+ 
+ $x*$y*2
+
+ # '12'
+ #
+
+ ##################
+ # demo only
+ # 
+ 
+ $x
+
+ # 2
+ #
+
+ ##################
+ # Failed test that skips the rest
+ # 
+ 
+ $x + $y
+
+ # '5'
+ #
+
+ ##################
+ # A test to skip
+ # 
+ 
+ $x + $y + $x
+
+ # '7'
+ #
+
+ ##################
+ # A not skip to skip
+ # 
+ 
+ $x + $y + $x + $y
+
+ # '10'
+ #
+
+ ##################
+ # A skip to skip
+ # 
+ 

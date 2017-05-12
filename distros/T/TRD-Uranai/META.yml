@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                TRD-Uranai
+version:             0.0.2
+abstract:            Today's Uranai Count down.
+license:             ~
+author:              
+    - Takuya Ichikawa <trd.ichi@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Jcode:                         0
+    LWP::UserAgent:                0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

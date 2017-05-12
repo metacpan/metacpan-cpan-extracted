@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-CanvasDirTree.t
+lib/Tk/CanvasDirTree.pm

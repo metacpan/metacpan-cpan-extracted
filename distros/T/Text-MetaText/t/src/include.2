@@ -1,0 +1,22 @@
+#
+# This file tests the INCLUDE directive
+#
+
+%% DEFINE title="Default MetaText Title" %%
+
+INCLUDE header with default title: "Default MetaText Title"
+%% INCLUDE header %%
+--
+INCLUDE header with specific title: "Some Title"
+%% INCLUDE header 
+   title = "Some Title"
+%%
+--
+INCLUDE footer with default copyright message
+%% INCLUDE footer %%
+--
+INCLUDE footer with specific copyright message
+%% INCLUDE footer 
+   copyright="(C) Copyright 1990-1998 Andy Wardley"
+%%
+==

@@ -1,0 +1,23 @@
+TODO:
+    - Test for edit-on-file-swap
+
+0.0016 Tuesday July 05 09:40:55 PDT 2011:
+    - Added better error reporting
+
+0.0015 Tuesday October 19 14:04:46 PDT 2010:
+    - Added graceful recovery on editor exception
+
+0.0014 Monday October 18 10:17:29 PDT 2010:
+    - Added file => support
+
+0.0013 Thursday October 14 12:20:47 PDT 2010:
+    - Make sure to 'use IO::File' and check for error
+
+0.0012 Tuesday October 12 19:36:32 PDT 2010:
+    - Safer read from tmp edit (?), encountered weird issue with vim
+
+0.0011 Thursday June 17 21:01:00 PDT 2010:
+    - Tighter joining (on empty preamble)
+
+0.0010:
+    - Initial release

@@ -1,0 +1,151 @@
+.\" Copyright (c) 2014, 2015 Yon <anaseto@bardinflor.perso.aquilenet.fr>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd February 8, 2015
+.Dt FRUNDIS 1
+.Os
+.Sh NAME
+.Nm frundis
+.Nd exporting tool for the frundis markup language
+.Sh SYNOPSIS
+.Nm
+.Fl T Ar format
+.Op Fl as
+.Op Fl o Ar output-file
+.Op Ar path
+.Sh DESCRIPTION
+The
+.Nm
+program reads an UTF-8 encoded file given by
+.Ar path ,
+or standard input if no file is given as argument, written in the
+.Nm frundis
+language as documented in
+.Xr frundis_syntax 5 ,
+and exports it to LaTeX, XHTML or EPUB.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl a
+When exporting to XHTML, output only one file, instead of a directory with one
+file per part or chapter, and implies also that
+.Fl s
+is no longer the default.
+.It Fl o Ar output-file
+Specify the name of an output file, instead of printing to stdout.
+In the case
+of exporting to EPUB, and XHTML unless
+.Fl a
+is specified, this option is mandatory and specifies the name of a new
+directory that will contain all the necessary files.
+For EPUB, zipping has to
+be done manually after.
+.It Fl s
+Specify that a standalone document should be produced.
+This is the default for
+XHTML and EPUB output formats.
+.It Fl T Ar format
+Specify the format in which to export.
+The
+.Ar format
+argument can be
+.Cm latex ,
+.Cm xhtml
+or
+.Cm epub .
+.El
+.Sh ENVIRONMENT
+.Nm
+uses the following environment variables:
+.Bl -tag -width 13n
+.It Ev FRUNDISLIB
+This variable can be used to specify a colon separated list of directories in
+which to search for
+.Nm
+included source files.
+.El
+.Sh FILES
+.Bl -tag -width Ds -compact
+.It Pa examples/
+This directory available in the root of the distribution contains examples for
+easy customization of output.
+.It Pa examples/stylesheet.css
+Example stylesheet for easy customization of XHTML and EPUB output formats.
+.It Pa examples/preamble.tex
+Example of preamble for LaTeX for easy customization.
+.El
+.Sh EXAMPLES
+To print simple XHTML without headers:
+.Pp
+.Dl "$ frundis -a -T xhtml input.frundis > output.html"
+.Pp
+To print a standalone XHTML:
+.Pp
+.Dl "$ frundis -a -s -T xhtml input.frundis > output.html"
+.Pp
+To create a directory with XHTML files and an index:
+.Pp
+.Dl "$ frundis -T xhtml -o output-dir input.frundis"
+.Pp
+To create an EPUB file, assuming the zip program from
+.Lk http://infozip.sourceforge.net/
+is installed:
+.Pp
+.Dl "$ frundis -T epub -o output-dir input.frundis"
+.Dl "$ cd output-dir"
+.Dl "$ zip -X0 ../my-epub.epub mimetype"
+.Dl "$ zip -Xur9D ../my-epub.epub *"
+.Pp
+To produce a LaTeX document without a preamble:
+.Pp
+.Dl "$ frundis -T latex input.frundis > output.tex"
+.Pp
+To produce a complete LaTeX document:
+.Pp
+.Dl "$ frundis -s -T latex input.frundis > output.tex"
+.Sh DIAGNOSTICS
+Standard error messages have the following form:
+.Pp
+.D1 Nm Ns : Ns Ar file Ns : Ns Ar lnum Ns : Ns Ar level Ns : Ns Ar message
+.Pp
+The
+.Ar file
+field specifies the name of the source file in which an error was encountered.
+It can be
+.Cm stdin
+when reading from standard input.
+The
+.Ar lnum
+field specifies the number of the line in the source file where the error has
+been detected.
+The
+.Ar level
+field can be
+.Cm warning
+for deprecated features or error prone uses,
+.Cm error
+for partially recoverable errors,
+or
+.Cm fatal
+for errors that stop processing.
+The
+.Ar message
+field provides further details on the nature of the error.
+.Pp
+The
+.Ar file
+and
+.Ar lnum
+fields appear only when it makes sense.
+.Sh SEE ALSO
+.Xr frundis_syntax 5

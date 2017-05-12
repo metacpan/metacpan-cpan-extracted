@@ -1,0 +1,311 @@
+=head1 NAME
+
+FAQ - Frequently Asked Questions about SenseClusters
+
+=head1 SYNOPSIS
+
+Answers to some frequently asked questions about SenseClusters 
+
+=head1 DESCRIPTION
+
+=head2 Functionality related questions :
+
+=head3 What are contexts ?
+
+Contexts are units of text whose categorization you are interested in. For example,
+if you have a bunch of emails which you would like to categorize then each email
+will become a context and SenseClusters will try to cluster these contexts (emails)
+into separate clusters.
+
+=head3 How small or large can a context be ?
+
+A context can be as small as a phrase/sentence or as large as a complete document.
+
+=head3 What applications can SenseClusters be used for ?
+
+SenseClusters can be applied to any problem where you have a set of text-units (contexts) 
+which you would like to cluster into separate groups based on their (dis)similarity. 
+Few such applications are listed below:
+
+ * Word Sense Discrimination
+ * Proper Name Discrimination 
+ * Email Clustering
+ * Word Clustering
+ * Document clustering
+
+=head2 Package related Questions :
+
+=head3 Can I use SenseClusters without installing all the other packages like NSP, SVDPACK, CLUTO ?
+
+Some packages are required while others are optional. 
+You will always need NSP, Math::SparseVector, Algorithm::Munkres, 
+PDL and Cluto. If you plan to carry out Singular Value Decomposition to  
+reduce the feature dimensions,  SVDPACK is required.
+
+Additionally, you will  also need the Bit::Vector and Set::Scalar modules  
+if you decide to select the --binary option in wrappers or run bitsimat.pl. 
+
+Technically speaking then, NSP, PDL, Math::SparseVector, Cluto  and
+Algorithm::Munkres are  required while SVDPACK is recommended.   
+Bit::Vector and Set::Scalar are optional. However, we strongly recommend 
+that all of these be installed to take full advantage of the package.
+
+=head2 Questions on DATA Formatting :
+
+=head3 Is there any specific reason why you prefer Senseval-2 format ?
+
+Yes. There are various data formats and it gets very complicated and confusing 
+if we don't specify one as our standard. Senseval-2 format is very simple
+and does a nice job to put together the information like instance and sense 
+ids along with the actual context data. An example of Senseval-2 formatted 
+file follows:
+
+ <?xml version="1.0" encoding="iso-8859-1" ?>
+ <!DOCTYPE corpus SYSTEM  "lexical-sample.dtd">
+ <corpus lang='english' tagged="NO">
+ <lexelt item="art.n">
+ <instance id="art.40025" docsrc="bnc_ASY_548">
+ <answer instance="art.40025" senseid="arts%1:09:00::"/>
+ <context>
+ i would therefore argue that one of the chief tasks of education perhaps its overriding task is the education and encouragement of a child's imagination so that he may not be a slave to a perception confined solely to the present a perception that is little more than blindness the teaching of history is one part of such an education the encouragement of creativity is another and there are others still after primary school the encouragement of the imagination in children and the cultivation of specifically creative activities has often been thought an optional part of the curriculum a luxury that may have to be dispensed with left in if at all for the less able pupils deemed incapable of serious learning or for that minority determined to reject understanding imagination has been associated especially with the <head>arts</head> and thus in recent years has been increasingly downgraded 
+ </context>
+ </instance>
+ <instance id="art.40028" docsrc="bnc_A0P_1561">
+ <answer instance="art.40028" senseid="arts%1:09:00::"/>
+ <context>
+ it was not all going to be wine and roses and leonard again felt the sharp problem of the canadian writer at that time having a small home market not wishing to become artistically part of the of america and yet having nowhere else to go as layton said still regret that we got no encouragement from the cbc because i think that we would have gone on to write plays so it was that they went on to do other things but separately a working relationship was thereby broken up and two highly creative thinkers had their play writing ambitions stillborn this was not in fact the end of leonard's ambitions in that regard in flowers for hitler pp ff he published his new a ballet drama in one act and an involvement in film making would help to sublimate it as we shall see leonard did however manage to get a grant from the canadian <head>arts</head> council 
+ </context>
+ </instance>
+ <instance id="art.40031" docsrc="bnc_CAF_1966">
+ <answer instance="art.40031" senseid="art%1:06:00::"/>
+ <context>
+ lush life is your perennial lost soul an individual living on the marginal precipice of society and veering quickly towards a grim finale he is in short the perfect nik cohn character from the outset cohn makes it very clear that he is bent on taking a walk on the wild side to chronicle the lives of the losers he meets along this small strip of the great american nowhere and so the heart of the world is ultimately a collection of encounters of stories stories like that of the wall street broker who is currently sweeping the streets as part of his sentence for possessing controlled substances or the black broadway actor who always fears ending up in the gutter or the refugee from china who develped a passion for a stone woman from county clare or the iranian <head>art</head> merchant who once defaced picasso's guernica with a spray can 
+ </context>
+ </instance>
+ <instance id="art.40034" docsrc="bnc_A5J_102">
+ <answer instance="art.40034" senseid="art%1:06:00::"/>
+ <context>
+ kate foster of the halkin arcade belgravia the scholarly specialist in continental porcelain found the opposite suppose we've got to get used to rich people coming along with their she said met new clients which is what i went for in the oriental field bluett's failed to find buyers for a group of chinese warring states bronze vessels of extraordinary scholarly interest while colnaghi oriental found spectacularly decorative seventeenth century bronzes easy to move american buyers depend on advisers whether decorators or art specialists to an extent unparalleled in europe they read publications that keep them abreast of market trends personalities lawsuits and prices rather than delving into <head>art</head> history as do their counterparts in europe 
+ </context>
+ </lexelt>
+ </corpus>
+
+=head3 How should I get my data in Senseval-2 format ?
+
+We provide a preprocessing program text2sval.pl in Toolkit/preprocess/plain 
+that converts data in plain text format into Senseval-2 format. Data in
+any other format has to be converted to Senseval-2 format to use SenseClusters.
+
+=head3 What if I am using SenseClusters for an application like email sorting where my data instances are emails and don't have any target words ?
+
+In version 0.53, we call this as a global mode in which training and/or test
+data could be generic and are not the instances of a specific target word. 
+The new modified wrapper discriminate.pl handles this case automatically. 
+It first checks if the target.regex is provided by the user or if it exists
+in the current directory. If not, it tries to create the target.regex 
+automatically by searching all <head> tags in the test data. If there are no 
+<head> tags found in test, it assumes that the test data is global and 
+treats it differently from local (target-specific) data. For example,
+co-occurrence features are not supported in global mode, scope option will
+not work if the corresponding train/test file is global and so on ...
+
+=head3 Can I use multiple target words in the context of the same instance ?
+
+No, SenseClusters will allow only single target word per instance. But you 
+can handle this situation by duplicating same instance with different 
+target words. This makes most sense when you specify --scope option that 
+considers only few words around the target word. So when you duplicate 
+same instance with different target words, hopefully they will have different
+contexts.
+
+=head3 I can't use setup.pl because it splits data into different files according to their <lexelt> values. What if I want to discriminate whole data that has multiple <lexelt> tags ?
+
+There are 2 ways to handle this kind of situation. 
+
+1. Use single <lexelt> tag with any item value, say <lexelt item="MULTI">
+and to retain the lexelt information, append the original lexelt value 
+to the instance ids so after clustering you will know which instances 
+belong to which lexelt item.
+
+OR
+
+2. Let setup split the data on <lexelt> values and then concatenate the
+split results into a single data file. Note that, the concatenation of XML
+like Senseval-2 files is tricky and make sure to remove the header information
+(<xml>, <corpora> etc tags) before each <lexelt> tag except the first one 
+and all footer tags (</corpora>) after each </lexelt> tag except the last one.
+
+We plan to distribute some of our own scripts that combine two Senseval-2
+formatted xml files into a single valid Senseval-2 file, in order to support
+the multi-lexelt issue. 
+
+=head2 Questions on FEATURES :
+
+=head3 What are second order co-occurrences ?
+
+These are the words that co-occur with co-occurrences of the target word.
+e.g. if the given bigram file includes bigrams like - 
+
+ telephone<>line<>
+ product<>line<>
+ market<>product<>
+ telephone<>service<>
+
+then, telephone and product directly co-occur with line and hence become
+the (first order) co-occurrences of line, while, market and service co-occur
+with product and telephone resp. and hence become the second order 
+co-occurrences as they are indirectly related to line.
+
+=head3 I see target word in the features file. How can I exclude target words from my feature set ?
+
+By default, SenseClusters doesn't make an attempt to exclude the target word
+but there is an option --extarget in programs wordvec.pl and order1vec.pl
+that will omit the target word from feature set and hence avoiding them
+as features while creating word and context vectors.
+
+=head2 Questions on SVD:
+
+=head3 I see various files at L<http://netlib.org/svdpack/> - which should I download to use SenseClusters ?
+
+Last item svdpackc.tar.gz ! This is a C implementation of SVDPACK.
+
+=head3 I get following error when I do "make las2"...
+
+	make las2
+	gcc -O -c las2.c
+	las2.c:1365: conflicting types for "random"
+	/usr/include/stdlib.h:397:previous declaration of "random"
+	make: *** [las2.o] Error1
+
+Any ideas why ?
+
+Yes. Modify the Makefile distributed with SVDPACKC to use ANSI
+C compiler. You can fix this by changing CC = gcc line in Makefile
+to CC = gcc -ansi
+
+=head3 When I run las2, I get an error message "cannot open file matrix for reading".
+
+las2 requires that the input matrix is in the same directory where you run
+las2 and has name "matrix". A quick test is to -
+ 1. gunzip belladit.Z # this is a sample matrix distributed with SVDPACKC
+ 2. cp belladit matrix # copy belladit as matrix
+ 3. las2 # running las2 on matrix
+
+This should create 2 output files lao2 (text file) and lav2 (binary file). 
+You can take a quick look at lao2 and make sure that there are no error
+messages in it.
+
+=head3 How do I install SVDPACK ?
+
+The INSTALL file distributed in SenseClusters' main package directory  
+includes detailed instructions on installing and running a sample test on  
+SVDPACK.
+
+=head3 How do I set values of parameters in file lap2 and las2.h ?
+
+A detailed help on setting values of various parameters in files lap2 and
+las2.h is provided in the perldoc of program mat2harbo.pl distributed 
+with SenseClusters. Type "man mat2harbo.pl" to see this documentation.
+
+=head3 I see some errors when running the test scripts for svdpackout.pl It looks like svd/las2 is producing "reasonable" results, but those seem to be different than what the test case is expecting. What's happening? 
+
+SVDPACKC produces somewhat different results on different hardware 
+platforms, and can sometimes produce different results from run to run on 
+the same platform due to certain random choices that the algorithm makes. 
+
+Our test cases for svdpackout.pl are constructed using a Linux computer 
+that is running an i686/SMP flavor of Linux. If you run the test scripts 
+on a different platform, you may get different (but equally good) results. 
+
+One option we are considering for future releases is to have a separate  
+set of tests for svd/las2 that will create the  expected results for the  
+test cases for svdpackout.pl. If SVDPACKC is not  installed properly this  
+could lead to these test cases failing, but if that is the case then  
+there are bigger problems anyway. 
+
+=head3 I am getting format errors from svdpackout.pl. What's the problem? 
+
+There are several possibilities. One is that you may need to add more 
+precision or otherwise adjust the format to store the results from 
+SVDPACK. 
+
+Also note that las2 produces output in a binary format that   
+svdpackout.pl "decodes". If you have run las2 on a different platform than 
+what you are running svdpackout.pl on, you can also see these format 
+errors.
+
+=head2 Questions on Clustering:
+
+=head3 I see some segmentation faults while running CLUTO's vcluster and scluster programs. Is there anything going wrong there ?
+
+A clustering program will not function properly if the vector/similarity
+matrix that we input to it is highly sparse. We especially notice this
+problem while running agglomerative algorithm in vector space that shows
+segmentation fault errors when the input context vectors are very very sparse.
+
+In our next version, we plan to show a warning message that will notify the
+user when the context vectors going to the clustering program are too sparse
+to work normally. This problem occurs if the training data given is
+very small and so if the feature set created from it.
+
+=head3 How do I know how many clusters to create ?
+
+SenseClusters now supports four different cluster stopping measures that each 
+try to predict the appropriate number of clusters for the given data.
+Refer to http://www.d.umn.edu/~tpederse/Pubs/naacl06-demo.pdf for more details.
+
+=head2 Questions on Evaluation:
+
+=head3 In Word Sense Disambiguation, I can see how one can evaluate the accuracy by comparing the sense tags attached by a disambiguation algorithm against the manually attached sense tags. Its not clear to me, how the evaluation works in Discrimination where the algorithm doesn't attach any sense tags. 
+
+There are various ways to evaluate the performance of evaluation. Some require
+the manually attached or true sense tags while others don't.
+
+1. You can use cluster analysis techniques that report 
+intra-cluster/inter-cluster similarity, standard deviation as a measure to 
+evaluate performance. Ideally, the result should show you high intra-cluster 
+similarity and low inter-cluster similarity. This doesn't require the 
+knowledge of true sense tags.
+
+2. You can also look at the most discriminating features that are peculiar
+characteristic of each cluster and manually judge how they describe a 
+unique word meaning of the target word. This too doesn't require the knowledge
+of true sense tags of the instances.
+
+3. Finally, one can evaluate discrimination performance by providing 
+sense tagged data for test purposes and request explicit evaluation by 
+selecting --evaluate option in wrapper. This will report the accuracy of
+discrimination in terms of precision and recall. The details on
+evaluation of word sense discrimination can be found in our NAACL-03 student
+workshop paper.
+
+=head1 SEE ALSO
+
+L<http://senseclusters.sourceforge.net/>
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+ Amruta Purandare
+ University of Pittsburgh
+
+ Anagha Kulkarni
+ Carnegie-Mellon University
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003-2008, Ted Pedersen, Amruta Purandare, Anagha Kulkarni
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut

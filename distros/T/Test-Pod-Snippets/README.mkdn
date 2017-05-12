@@ -1,0 +1,334 @@
+# NAME
+
+Test::Pod::Snippets - Generate tests from pod code snippets
+
+# VERSION
+
+version 0.07
+
+# SYNOPSIS
+
+    use Test::More tests => 3;
+
+    use Test::Pod::Snippets;
+
+    my $tps = Test::Pod::Snippets->new;
+
+    my @modules = qw/ Foo Foo::Bar Foo::Baz /;
+
+    $tps->runtest( module => $_, testgroup => 1 ) for @modules;
+
+# DESCRIPTION
+
+- Fact 1
+
+In a perfect world, a module's full API should be covered by an extensive
+battery of testcases neatly tucked in the distribution's `t/` directory. 
+But then, in a perfect world each backyard would have a marshmallow tree and
+postmen would consider their duty to circle all the real good deals in pamphlets
+before stuffing them in your mailbox. Obviously, we're not living in a perfect
+world.
+
+- Fact 2
+
+Typos and minor errors in module documentation. Let's face it: it happens to everyone. 
+And while it's never the end of the world and is prone to rectify itself in
+time, it's always kind of embarassing. A little bit like electronic zits on
+prepubescent docs, if you will.
+
+Test::Pod::Snippets's goal is to address those issues. Quite simply, 
+it extracts verbatim text off pod documents -- which it assumes to be 
+code snippets -- and generate test files out of them.
+
+# METHODS
+
+## new( %options )
+
+Creates a new __Test::Pod::Snippets__ object. The method accepts
+the following options:
+
+- verbatim => _$boolean_
+
+If set to true, incorporates the pod's verbatim parts to the test.
+
+Set to true by default.
+
+- functions => _$boolean_
+
+If set to true, extracts function definitions from the pod.
+More specifically, Test::Pod::Snippets looks for a pod section 
+called FUNCTIONS, and assumes the title of all its 
+subsections to be functions. 
+
+For example, the pod
+
+    =head1 FUNCTIONS
+
+    =head2 play_song( I<$artist>, I<$song_title> )
+
+    Play $song_title from $artist.
+
+    =head2 set_lighting( I<$intensity> )
+
+    Set the room's light intensity (0 is pitch black 
+    and 1 is supernova white, -1 triggers the stroboscope).
+
+would generate the code
+
+    @result = play_song( $artist, $song_title );
+    @result = set_lightning( $intensity );
+
+Pod markups are automatically stripped from the headers. 
+
+- methods  => _$boolean_
+
+Same as `functions`, but with methods. In this
+case, Test::Pod::Snippets looks for a pod section called METHODS.
+The object used for the tests is assumed to be '$thingy' 
+(but can be overriden using the argument `object_name`,
+and its class must be given by a variable '$class'.
+
+For example, the pod
+
+    =head1 METHODS
+
+    =for test
+        $class = 'Amphibian::Frog';
+
+    =head2 new( $name )
+
+    Create a new froggy!
+
+    =head2 jump( $how_far )
+
+    Make it jumps.
+
+will produces
+
+    $class = 'Amphibian::Frog';
+    $thingy = $class->new( $name );
+    @result = $thingy->jump( $how_far );
+
+- object_name => _$identifier_
+
+The name of the object (with the leading '$') to be
+used for the methods if the T:P:S object is set to 
+extract methods.
+
+- preserve_lines => _$boolean_
+
+If sets to true (which is the default), the generated code
+will be peppered with '#line' pre-compiler lines that will
+have any failing test point to the test's original file.
+
+## is_extracting_verbatim
+
+## is_extracting_functions
+
+## is_extracting_methods
+
+Returns true if the object is configured to
+extract that part of the pod, false otherwise.
+
+## extracts_verbatim( _$boolean_ )
+
+## extracts_functions( _$boolean_ )
+
+## extracts_methods( _$boolean_ )
+
+Configure the object to extract (or not) the given
+pod parts.
+
+## generate_test( $input_type => _$input_, %options )
+
+Extracts the pod off _$input_ and generate tests out of it.
+_$input_type_ can be 'file' (a filename), 
+'fh' (a filehandler), 'pod' (a string containing pod) or
+'module' (a module name).
+
+The method returns the generate tests as a string.
+
+The method accepts the following options:
+
+- standalone => _$boolean_
+
+If standalone is true, the generated
+code will be a self-sufficient test script. 
+Defaults to 'false'.
+
+    # create a test script out of the module Foo::Bar
+    open my $test_fh, '>', 't/foo-bar.t' or die;
+    print {$test_fh} $tps->generate_test( 
+        module     => 'Foo::Bar',
+        standalone => 1 ,
+    );
+
+- sanity_tests => _$boolean_
+
+If true (which is the default), two tests are added to the
+very beginning and end of the extracted code, like so:
+
+    ok 1 => 'the tests compile';   
+    $extracted_code
+    ok 1 => 'we reached the end!';
+
+- testgroup => _$boolean_
+
+If true, the extracted code will be wrapped in a [Test::Group](http://search.cpan.org/perldoc?Test::Group) 
+test, which will report a single 'ok' for the whole series of test
+(but will give more details if something goes wrong).  Is set
+to 'false' by default.
+
+## generate_test_file( $input_type => _$input_, %options )
+
+Does the same as `generate_test`, but save the generated
+code in a file. The name of the file is the value of the
+option __output__, if given. If the file already exist,
+the method dies.  If __output__ is not given, 
+the filename will be
+of the format 'tps-XXXX.t', where XXXX is choosen not to
+interfere with existing tests.  Exception made of `output`,
+the options accepted by the method are the same than for
+`generate_test`.
+
+Returns the name of the created file.
+
+## runtest( $input_type => _$input_, %options )
+
+Does the same than `generate_test`, except that it 
+executes the generated code rather than return it. 
+The arguments are treated the same as for `generate_test`.
+
+## generate_snippets( @filenames )
+
+For each file in _@filenames_, generates a _pod-snippets-X.t_
+file in the `t/` directory.
+
+## extract_snippets_from_file( $filename )
+
+Extracts the snippets from the file and returns a string containing
+the generated tests.
+
+## extract_snippets( $pod )
+
+Extracts the snippets from the string _$pod_ and
+returns a string containing the generated tests.
+
+## snippets_ok( $pod )
+
+Extracts the snippets from _$pod_ (which can be a string or a filename) and
+run the code, returning b<true> if the code run and b<false> if it fails.
+
+# HOW TO USE TEST::POD::SNIPPETS IN YOUR DISTRIBUTION
+
+The easiest way is to create a test.t file calling Test::Pod::Snippets
+as shown in the synopsis.  If, however, you don't want to 
+add T:P:S to your module's dependencies, you can 
+add the following to your Build.PL:
+
+  my $builder = Module::Build->new(
+    # ... your M::B parameters
+    PL_files  => { 'script/test-pod-snippets.PL' => q{}  },
+    add_to_cleanup      => [ 't/tps-*.t' ],
+  );
+
+Then create the file `script/test-pod-snippets.PL`, which should contains
+
+    use Test::Pod::Snippets;
+
+    my $tps = Test::Pod::Snippets->new;
+
+    my @files = qw#
+        lib/your/module.pm
+        lib/your/documentation.pod
+    #;
+    
+
+    print "generating tps tests...\n";
+    print $tps->generate_test_file( $_ ), "created\n" for @files;
+    print "done\n";
+
+And you're set! Running __Build__ should now generate one test file
+for each given file.
+
+# SYNTAX
+
+By default, Test::Pod::Snippets considers all verbatim pod text to be 
+code snippets. To tell T::P::S to ignore subsequent pieces of verbatim text,
+add a `=for test ignore` to the pod. Likely, to return to the normal behavior, 
+insert `=for test`. For example:
+
+    A sure way to make your script die is to do:
+
+    =for test ignore
+
+        $y = 0; $x = 1/$y;
+
+    The right (or safe) way to do it is rather:
+
+    =for test
+
+        $y = 0; $x = eval { 1/$y };
+        warn $@ if $@;
+
+`=for test` and `=begin test ... =end test` can also be used to
+add code that should be include in the tests but not in the documentation.
+
+Example:
+
+    The right way to do it is:
+
+        $y = 0; $x = eval { 1/$y };
+
+        =for test
+           # make sure an error happened
+           is $x => undef;
+           ok length($@), 'error is reported';
+
+# SEE ALSO
+
+[podsnippets](http://search.cpan.org/perldoc?podsnippets)
+
+## Test::Inline
+
+Whereas [Test::Pod::Snippets](http://search.cpan.org/perldoc?Test::Pod::Snippets) extracts
+tests out of the modules' documentation, Adam Kennedy's _Test::Inline_ 
+allows to insert tests within a module, side-by-side with its code 
+and documentation. 
+
+For example, the following code using _Test::Pod::Snippets_
+
+    =head2 shout()
+
+    Shoutify the passed string.
+
+        # set $x to 'CAN YOU HEAR ME NOW?'
+        my $x = shout( 'can you hear me now?' );
+
+        =for test
+        is $x => 'CAN YOU HEAR ME NOW?';
+
+is equivalent to this code, using _Test::Inline_:
+
+    =head2 shout()
+
+    Shoutify the passed string.
+
+        # set $x to 'CAN YOU HEAR ME NOW?'
+        my $x = shout( 'can you hear me now?' );
+
+    =begin testing
+    my $x = shout( 'can you hear me now?' );
+    is $x => 'CAN YOU HEAR ME NOW?';
+    =end testing
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

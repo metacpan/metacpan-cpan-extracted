@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Tk-DataTree
+version:      0.06
+version_from: lib/Tk/DataTree.pm
+installdirs:  site
+requires:
+    Tk:                            800.021
+    Tk::ItemStyle:                 3.004
+    Tk::Tree:                      3.019
+    Tk::widgets:                   3.009
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

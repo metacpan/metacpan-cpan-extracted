@@ -1,0 +1,51 @@
+Revision history for Perl extension Term::Size.
+
+0.207 2008-08-16  Term-Size
+        - the original code for retrieving terminal size
+          via XS ioctl is back -- and this dist
+          is again Unix-centric
+        - use Term::Size::Any for platform independency
+
+0.205 2008-02-27  Term-Size-Unix
+        - disabled prototypes in XS code - too misleading
+          to be useful
+        - borrowed rewritten test from Term::Size::Any
+          (which should fix most test failures)
+        - NOTE: this distribution will disappear soon,
+          merging back to the original Term-Size dist
+
+0.204 2006-09-13  Term-Size-Unix
+        - included license in Makefile.PL
+
+0.203 2006-05-21  Term-Size-Unix
+	- moved sources from Term-Size to this distribution
+	- bug fixed: &pixels always used fd 0 rather than fileno(f)
+	- added test scripts "t/00_use.t" and "t/99_pod.t"
+
+0.203 2006-05-21  Term-Size
+	- bug fixed: &pixels always used fd 0 rather than fileno(f)
+	- experimental support for Win32 was introduced by
+	  adding a dependency on Term::Size::Win32
+	- added test scripts "t/00_use.t" and "t/99_pod.t"
+	- the XS code moved to distribution Term::Size::Unix -
+	  this module is now a thin skin to call the appropriate
+	  module Term::Size::Unix or Term::Size::Win32
+
+0.202 2006-05-19  Term-Size
+	- inserted a note to say this is an UNOFFICIAL distribution
+
+0.201 2006-05-18  Term-Size
+	- 'test.pl' rewritten with Test::More and renamed to 't/01_basic.t'
+	- an initializer is now used when creating a struct winsize
+	  to avoid what looks like a bug on Cygwin: ioctl(., TIOCGWINSZ, .)
+	  does not set ws_xpixel and ws_ypixel fields, leaving them untouched.
+	  If they contained garbage, they kept the garbage
+	- attempt to restore AIX compatibility according to suggestion
+	  in CPAN RT #11539 (by jydawg [at] xs4all.nl): "termios.h" 
+	  is not where Unix thinks it should
+
+0.2 1997-05-13  Term-Size
+	- support filehandle arguments
+
+0.1 1997-04-23  Term-Size
+	- original version

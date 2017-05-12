@@ -1,0 +1,329 @@
+use strict ;
+use Win32 ;
+
+package SmedPerl ;
+
+Smed::AddCallBackCommand('GetToolTipInformation', 'SmedPerl::GetToolTipInformation()') ;
+
+#Smed::RegisterPartialWordLookupClass("p_word") 
+#Smed::AddLookupEntriesFromFile("p_word", "python\\python_partial_words.txt")  
+
+Smed::RegisterWordLookupClass("perl_functions") ;
+Smed::AddLookupEntriesFromFile("perl_functions", "perl\\db\\perl_functions.pl") ;
+Smed::AddLookupEntriesFromFile("perl_functions", "perl\\db\\module_functions.pl") ;
+
+Smed::AddCommand('C00SPACE', 'SmedPerl::CommandCompletion()') ;
+Smed::AddCommand('CS0C', 'SmedPerl::FlipComment()') ;
+Smed::AddCommand('CS0D', 'SmedPerl::DuplicateAndComment()') ;
+Smed::AddCommand('C00C', 'SmedPerl::CommentAndCopy()') ;
+Smed::AddCommand('CS0W', 'SmedPerl::DisplayAllPerlIdentifiers()') ;
+
+Smed::AddCommand('C0AM', 'SmedPerl::MakeFileReadWrite()') ;
+
+AddSkeleton() ;
+LoadIdentifiersForCompletion() ;
+
+#-------------------------------------------------------------------------------
+
+sub MakeFileReadWrite
+{
+my $file_name = Smed::GetFileName() ;
+
+use Fcntl ':mode';
+chmod S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH, $file_name ;
+}
+
+#-------------------------------------------------------------------------------
+
+sub AddSkeleton
+{
+if($Smed::DOCUMENT_LOADED == Smed::WaitForDocumentToLoad(2000))
+	{
+	my $first_line = Smed::GetLineText(0) ;
+	
+	if(1 == Smed::GetNumberOfLines()&& 0 == length($first_line))
+		{
+		Smed::InsertAligned(<<'SKELETON') ;
+# Nadim Khemir
+#
+
+use strict ;
+use warnings ;
+
+while(<>)
+	{
+	if(//)
+		{
+		print qq[\n] ;
+		}
+	else
+		{
+		}
+
+	#print qq[\n] ;
+	}
+
+SKELETON
+
+		Smed::SetModificationLine(2) ;
+		Smed::SetModificationPosition(7) ;
+		}
+	}
+else
+	{
+	print "Timed out !\n"
+	}
+}
+
+#-------------------------------------------------------------------------------
+
+sub GetToolTipInformation
+{
+my $current_word = Smed::GetCurrentWord() ;
+
+if($current_word ne '')
+	{
+	my $word_list = Smed::GetLookupList("perl_functions", $current_word) ;
+	$word_list =~ s/\ smed_separator\ //g ;
+	
+	if(length($word_list) != 0)
+		{
+		Smed::SetToolTipText($word_list) ;
+		Smed::SetToolTipTextColor( 0, 0, 0) ;
+		Smed::SetToolTipBackgroundColor( 255, 245, 238) ;
+		}
+	else
+		{
+		#display line and character insex in tooltip
+		my $line = Smed::GetModificationLine() ;
+		my $character = Smed::GetDisplayPosition($line, Smed::GetModificationPosition()) ;
+		
+		# adjust start index as lines are number from 1
+		$line++ ;
+		$character++ ;
+
+		Smed::SetToolTipText("$line, $character") ;
+		Smed::SetToolTipTextColor( 150, 150, 150) ;
+		Smed::SetToolTipBackgroundColor( 235, 235, 235) ;
+		}
+	}
+}
+
+#-------------------------------------------------------------------------------
+
+sub DuplicateAndComment
+{
+my $position = Smed::GetModificationPosition() ;
+my @lines ;
+
+my ($selection_start_line, $selection_end_line) = (0, 0) ;
+
+if(0 == Smed::IsSelectionEmpty())
+	{
+	# save selection limits
+	$selection_start_line = Smed::GetSelectionStartLine() ;
+	$selection_end_line   = Smed::GetSelectionEndLine() ;
+	
+	if( 0 == Smed::GetSelectionEndCharacter())
+		{
+		$selection_end_line = $selection_end_line - 1 ;
+		}
+
+	# deselect
+	Smed::ClearSelection() ;
+	}
+else
+	{
+	$selection_start_line = Smed::GetModificationLine() ;
+	$selection_end_line = $selection_start_line ;
+	}	
+
+for(my $line_index = $selection_start_line ; $line_index <= $selection_end_line  ; $line_index++)
+	{
+	Smed::SetModificationLine($line_index) ;
+	
+	my $current_line_text = Smed::GetLineText($line_index) ;
+	push @lines, $current_line_text ;
+	
+   next if $current_line_text =~ /^\s*$/ ; #ignore blank lines
+   
+	if($current_line_text =~ /^(\s*)\#~ /)
+		{
+		# uncomment
+		Smed::SetModificationPosition(length($1)) ;
+		Smed::Delete(3) ;
+		}
+	else
+		{
+		$current_line_text =~ /^(\s*)/ ;
+		
+		Smed::SetModificationPosition(length($1)) ; 
+		Smed::Insert('#~ ') ;
+		}
+	}
+	
+Smed::SetModificationLine($selection_end_line) ;
+Smed::MoveToEndOfLine() ;
+Smed::Insert("\n" . join("\n", @lines)) ;
+Smed::SetModificationPosition($position) ;
+}
+
+sub FlipComment
+{
+my ($selection_start_line, $selection_end_line) = (0, 0) ;
+
+if(0 == Smed::IsSelectionEmpty())
+	{
+	# save selection limits
+	$selection_start_line = Smed::GetSelectionStartLine() ;
+	$selection_end_line = Smed::GetSelectionEndLine() ;
+	
+	if( 0 == Smed::GetSelectionEndCharacter())
+		{
+		$selection_end_line = $selection_end_line - 1 ;
+		}
+
+	# deselect
+	Smed::ClearSelection() ;
+	}
+else
+	{
+	$selection_start_line = Smed::GetModificationLine() ;
+	$selection_end_line = $selection_start_line ;
+	}	
+
+for(my $line_index = $selection_start_line ; $line_index <= $selection_end_line  ; $line_index++)
+	{
+	Smed::SetModificationLine($line_index) ;
+	
+	my $current_line_text = Smed::GetLineText($line_index) ;
+   next if $current_line_text =~ /^\s*$/ ; #ignore blank lines
+   
+	if($current_line_text =~ /^(\s*)\#~ /)
+		{
+		# uncomment
+		Smed::SetModificationPosition(length($1)) ;
+		Smed::Delete(3) ;
+		}
+	else
+		{
+		$current_line_text =~ /^(\s*)/ ;
+		
+		Smed::SetModificationPosition(length($1)) ; 
+		Smed::Insert('#~ ') ;
+		}
+	}
+
+}
+
+#-------------------------------------------------------------------------------
+=comment
+sub CommentAndCopy
+{
+my $current_position = Smed::GetModificationPosition() ; 
+my ($selection_start_line, $selection_end_line) = (0, 0) ;
+
+if(0 == Smed::IsSelectionEmpty())
+	{
+	Smed::SetSelectionAnchor(Smed::GetSelectionStartLine(), 0) ;
+	
+	# save selection limits
+	$selection_start_line = Smed::GetSelectionStartLine() ;
+	$selection_end_line = Smed::GetSelectionEndLine() ;
+	
+	if( 0 == Smed::GetSelectionEndCharacter())
+		{
+		$selection_end_line = $selection_end_line - 1 ;
+		}
+
+	# deselect
+	Smed::ClearSelection() ;
+	}
+else
+	{
+	$selection_start_line = Smed::GetModificationLine() ;
+	$selection_end_line = $selection_start_line ;
+	}	
+	
+
+Smed:CopySelectionToClipboard_4
+FlipComment() ;
+goto end of selection
+new line
+Smed:InsertClipboardContents_4
+place cursor
+}
+=cut
+
+#-------------------------------------------------------------------------------
+
+sub DisplayAllPerlIdentifiers
+{
+my @filter = shift || ('a' .. 'z', 'A' .. 'Z') ;
+
+my $scalar_list ;
+my $array_list ;
+my $hash_list ;
+my $bareword_list ;
+
+for (@filter)
+	{
+	$scalar_list .= join ', ', sort split / smed_separator /, Smed::GetLookupList("identifiers", "\$$_") ;
+	$scalar_list .= ', ' ;
+	
+	$array_list .= join ', ', sort split / smed_separator /, Smed::GetLookupList("identifiers", "\@$_") ;
+	$array_list .= ', ' ;
+	
+	$hash_list .= join ', ', sort split / smed_separator /, Smed::GetLookupList("identifiers", "\%$_") ;
+	$hash_list .= ', ' ;
+	
+	$bareword_list .= join ', ', sort split / smed_separator /, Smed::GetLookupList("identifiers", "$_") ;
+	$bareword_list .= ', ' ;
+	}
+	
+my $all_list = "$scalar_list\n\n$array_list\n\n$hash_list\n\n$bareword_list" ;
+$all_list =~ s/, [, ]+/, /g ;
+$all_list =~ s/\n, /\n/g ;
+$all_list =~ s/, \n/\n/g ;
+$all_list =~ s/\n{4}/\n\n/g ;
+	
+Win32::MsgBox($all_list, Win32::MB_ICONINFORMATION, "Identifiers") ;
+}
+
+#-------------------------------------------------------------------------------
+
+sub LoadIdentifiersForCompletion
+{
+LoadPerlFunctionForCompletion() ;
+LoadWxClassesAndMembersForCompletion() ;
+
+if(Smed::GetFileName() =~ /\.spl/)
+	{
+	Smed::RegisterPartialWordLookupClass("global_identifiers") ;
+	Smed::AddLookupEntriesFromFile("global_identifiers", "core\\db\\smed_identifiers.pl") ;
+	}
+#else
+	# nothing to load
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub LoadPerlFunctionForCompletion
+{
+Smed::RegisterPartialWordLookupClass("global_identifiers") ;
+Smed::AddLookupEntriesFromFile("global_identifiers", "perl\\db\\perl_identifiers.pl") ;
+}
+
+#-------------------------------------------------------------------------------
+
+sub LoadWxClassesAndMembersForCompletion
+{
+Smed::RegisterPartialWordLookupClass("global_identifiers") ;
+Smed::AddLookupEntriesFromFile("global_identifiers", "common\\wxWindows\\wx_keywords.lup") ;
+}
+
+#-------------------------------------------------------------------------------
+
+1 ;
+

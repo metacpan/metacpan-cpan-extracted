@@ -1,0 +1,14 @@
+Revision history for Perl extension Template-Plugin-RndString
+
+0.02 2017-02-06T17:12:43Z
+
+    - option "chrset" now may be a string
+
+    - first symbol of output string always a letter, if possible
+
+    - correct docs
+
+0.01 2017-02-06T15:02:17Z
+
+    - original version
+

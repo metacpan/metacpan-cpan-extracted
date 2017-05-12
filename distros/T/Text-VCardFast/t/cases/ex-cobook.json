@@ -1,0 +1,132 @@
+{
+   "objects" : [
+      {
+         "type" : "vcard",
+         "properties" : {
+            "n" : [
+               {
+                  "name" : "n",
+                  "values" : [
+                     "Bloggs",
+                     "Joe",
+                     "",
+                     "",
+                     ""
+                  ]
+               }
+            ],
+            "impp" : [
+               {
+                  "params" : {
+                     "x-service-type" : [
+                        "Skype"
+                     ]
+                  },
+                  "group" : "item5",
+                  "value" : "x-apple:joe.bloggs",
+                  "name" : "impp"
+               }
+            ],
+            "version" : [
+               {
+                  "value" : "3.0",
+                  "name" : "version"
+               }
+            ],
+            "x-socialprofile" : [
+               {
+                  "params" : {
+                     "x-user" : [
+                        "joebloggs"
+                     ],
+                     "type" : [
+                        "Twitter"
+                     ]
+                  },
+                  "value" : "http://twitter.com/joebloggs",
+                  "name" : "x-socialprofile"
+               }
+            ],
+            "email" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "INTERNET"
+                     ]
+                  },
+                  "group" : "item1",
+                  "value" : "me@joebloggs.com",
+                  "name" : "email"
+               }
+            ],
+            "tel" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "VOICE"
+                     ]
+                  },
+                  "group" : "item2",
+                  "value" : "+44 20 1234 5678",
+                  "name" : "tel"
+               }
+            ],
+            "x-ablabel" : [
+               {
+                  "group" : "item1",
+                  "value" : "_$!<Home>!$_",
+                  "name" : "x-ablabel"
+               },
+               {
+                  "group" : "item2",
+                  "value" : "_$!<Mobile>!$_",
+                  "name" : "x-ablabel"
+               },
+               {
+                  "group" : "item3",
+                  "value" : "_$!<Home>!$_",
+                  "name" : "x-ablabel"
+               },
+               {
+                  "group" : "item4",
+                  "value" : "_$!<Home>!$_",
+                  "name" : "x-ablabel"
+               },
+               {
+                  "group" : "item5",
+                  "value" : "_$!<Home>!$_",
+                  "name" : "x-ablabel"
+               }
+            ],
+            "url" : [
+               {
+                  "group" : "item4",
+                  "value" : "http://joebloggs.com",
+                  "name" : "url"
+               }
+            ],
+            "adr" : [
+               {
+                  "group" : "item3",
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "1 Trafalgar Square",
+                     "London",
+                     "",
+                     "WC2N",
+                     "United Kingdom"
+                  ]
+               }
+            ],
+            "fn" : [
+               {
+                  "value" : "Joe Bloggs",
+                  "name" : "fn"
+               }
+            ]
+         }
+      }
+   ]
+}

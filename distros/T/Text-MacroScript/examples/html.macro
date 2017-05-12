@@ -1,0 +1,202 @@
+%CASE[0]
+
+Macros used to maintain http://www.perlpress.com
+
+Copyright (c) Mark Summerfield 1999-2000. All Rights Reserved.
+
+These macros may be used/distributed/modified under the GPL. 
+
+The bulk of their work has now been pushed into macroutil.pl, except for the
+menus which should be extracted out but haven't got round to doing so yet.
+
+%END_CASE
+
+%REQUIRE[macroutil.pl]
+
+%DEFINE_VARIABLE MENU_OUROBOURUS_UPDATE     [2000/07/31]
+
+%DEFINE_VARIABLE MENU_PERLMODULE_UPDATE     [2002/05/26]
+%DEFINE_VARIABLE MENU_PERLPROGRAM_UPDATE    [2001/05/26]
+%DEFINE_VARIABLE MENU_PERLARTICLE_UPDATE    [2000/10/20]
+%DEFINE_VARIABLE MENU_PERLEXPERIMENT_UPDATE [2000/02/11]
+%DEFINE_VARIABLE MENU_PERLANTIQUES_UPDATE   [2000/00/00]
+%DEFINE_VARIABLE MENU_NOBLINK_UPDATE        [2000/01/01]
+%DEFINE_VARIABLE MENU_NOBLINK_LINUX_UPDATE  [2000/01/01]
+%DEFINE_VARIABLE MENU_NOBLINK_MAC_UPDATE    [2000/01/01]
+%DEFINE_VARIABLE MENU_NOBLINK_WIN_UPDATE    [2000/01/01]
+%DEFINE_VARIABLE MENU_OUROBOURUS_UPDATE     [2000/07/31]
+
+%DEFINE NOPATENTS[<a href="http://petition.eurolinux.org"><img src="/images/nopatent.gif" /></a>]
+
+%DEFINE DOCTYPE_HTML[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">]
+%DEFINE DOCTYPE[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">]
+
+%DEFINE_SCRIPT STYLESHEET
+my $root = relpath ;
+qq{<link href="${root}style.css" rel="stylesheet" type="text/css" />}
+%END_DEFINE
+
+%DEFINE_SCRIPT BANNER
+'';
+# qq{
+# <!--VirtualAvenueBanner-->
+# <a id="TOP" name="TOP" /><!--#exec cgi="/cgi-bin/log.cgi" -->
+# }
+%END_DEFINE
+
+%DEFINE_SCRIPT _ROOT[relpath]
+
+%DEFINE_SCRIPT PAGETOP
+qq{<a href="#TOP">} .
+image( relpath . "images/top.gif", 'Top' ) .
+'</a>'
+%END_DEFINE
+
+%DEFINE_SCRIPT HOME_AND_TOP
+my $root = relpath ;
+qq{<a href="#TOP">} .
+image( "${root}images/top.gif", 'Top' ) .
+'</a>' .
+qq{<a href="${root}index.html">} .
+image( "${root}images/home.gif", 'Home' ) .
+'</a>' ; 
+%END_DEFINE
+
+%DEFINE_SCRIPT IMAGE
+image( relpath . "images/$Param[0]", $Param[1] )
+%END_DEFINE
+
+%DEFINE_SCRIPT NEW
+# Only puts `new' images if they haven't expired.
+my $date = shift @Param ;
+$date = $Var{$date} unless $date =~ /^\d\d\d\d\D\d\d?\D\d\d?$/ ; 
+imageif( relpath . "images/new.gif", $date, 'New' ) ;
+%END_DEFINE
+
+%DEFINE_SCRIPT UPDATED
+# Only puts `updated' images if they haven't expired.
+my $date = shift @Param ;
+$date = $Var{$date} unless $date =~ /^\d\d\d\d\D\d\d?\D\d\d?$/ ; 
+imageif( relpath . "images/updated.gif", $date, 'Updated' ) ;
+%END_DEFINE
+
+%DEFINE_SCRIPT BODY
+if ( abspath =~ /python/ ) {
+    return qq{<body bgcolor="white">};
+}
+my $image = relpath . "images/perlpress-tile.gif" ;
+my $size  = lc html_imgsize( $image ) || '' ;
+$size =~ s/(\d+)/"$1"/go ;
+qq{<body bgcolor="white" background="$image" ${size} alt="Tile Image">} ;
+%END_DEFINE
+
+%DEFINE_SCRIPT COPYRIGHT
+'<h6>' . copyright('<a href="mailto:summer@perlpress.com">PerlPress</a>') . '</h6>'
+%END_DEFINE
+
+%DEFINE_SCRIPT FRONTPAGECOPYRIGHT
+'<h6>' . copyright('<a href="mailto:summer@perlpress.com">PerlPress</a>') .
+qq{<br />We respect your <a href="privacy.html">privacy</a>.</h6>}
+%END_DEFINE
+
+%DEFINE EMAIL
+<a href="mailto:summer@perlpress.com">summer@perlpress.com</a>
+%END_DEFINE
+
+%DEFINE_SCRIPT MAINMENU
+my %item = (
+        perlmodule     => [ 0, "perl/modules.html",     "Perl Modules"        ],
+        perlprogram    => [ 1, "perl/programs.html",    "Perl Programs"       ],
+        perlarticle    => [ 2, "perl/articles.html",    "Articles"            ],
+        noblink        => [ 3, "noblink/index.html",    "NoBlink"             ],
+        python	       => [ 4, "python/index.html",	"Python"	      ],
+        perlexperiment => [ 5, "perl/experiment.html",  "Perl Experiments"    ],
+        perlantiques   => [ 6, "perl/antiques.html",    "Perl Antiques"       ],
+    ) ;
+
+my $thisitem = shift @Param ;
+my $root     = relpath ;
+my $menu     = qq{<ul class="navigate">\n} ;
+if( $thisitem ne 'main' ) {
+    $menu .= qq{<li><a href="${root}index.html">} .
+    image( "${root}images/home.gif", 'Home' ) . "</a></li>\n" ;
+}
+foreach my $item ( sort { $item{$a}[0] <=> $item{$b}[0] } keys %item ) {
+    my $date = $Var{"MENU_\U${item}_UPDATE"} ;
+    if( $item eq $thisitem ) {
+        $menu .= qq{<li style="text-color:lightgrey">$item{$item}[2]} .
+                 imageif( "${root}images/updated.gif", $date, 'Updated' ) .
+                 "</li>\n" ;
+    }
+    else {
+        my $path = $root;
+        $path = '' if $item{$item}[1] =~ m,^http://,;
+        $menu .= qq{<li><a href="${path}$item{$item}[1]">} .
+                 qq{$item{$item}[2]</a>} . 
+                 imageif( "${root}images/updated.gif", $date, 'Updated' ) .
+                 "</li>\n" ;
+    }
+}
+$menu .= "</ul>\n" ;
+%END_DEFINE
+
+%DEFINE_SCRIPT NOBLINKMENU
+my %item = (
+        linux   => [ 0, "noblink/linux.html", "Linux NoBlink" ],
+        mac     => [ 1, "noblink/mac.html",   "Mac NoBlink"   ],
+        win     => [ 2, "noblink/win.html",   "Win NoBlink"   ],
+    ) ;
+
+my $thisitem = shift @Param ;
+my $root     = relpath ;
+my $menu     = qq{<ul class="navigate">\n} ;
+if( $thisitem ne 'main' ) {
+    $menu .= qq{<li><a href="${root}index.html">} .
+    image( "${root}images/home.gif", 'Home' ) . "</a></li>\n" ;
+}
+if( $thisitem ne 'noblinkhome' ) {
+    $menu .= qq{<li><a href="${root}noblink/index.html">NoBlink Home</a>} .
+    imageif( "${root}images/updated.gif", $Var{'MENU_NOBLINK_UPDATE'}, 'Updated' ) . 
+    "</li>\n" ;
+}
+foreach my $item ( sort { $item{$a}[0] <=> $item{$b}[0] } keys %item ) {
+    my $date = $Var{"MENU_NOBLINK_\U${item}_UPDATE"} ;
+    if( $item eq $thisitem ) {
+        $menu .= qq{<li style="text-color:lightgrey">$item{$item}[2]} .
+                 imageif( "${root}images/updated.gif", $date, 'Updated' ) .
+                 "</li>\n" ;
+    }
+    else {
+        $menu .= qq{<li><a href="${root}$item{$item}[1]">} .
+                 qq{$item{$item}[2]</a>} . 
+                 imageif( "${root}images/updated.gif", $date, 'Updated' ) .
+                 "</li>\n" ;
+    }
+}
+$menu .= "</ul>\n" ;
+%END_DEFINE
+
+%DEFINE_SCRIPT OCOPYRIGHT
+'<h6>' . 
+copyright('<a href="mailto:mark@perlpress.com">Mark Summerfield</a>', 2000) . 
+'</h6>'
+%END_DEFINE
+
+%DEFINE_SCRIPT OFRONTPAGECOPYRIGHT
+'<h6>' . 
+copyright('<a href="mailto:mark@python.com">Mark Summerfield</a>', 2000) . 
+qq{<br />I respect your <a href="privacy.html">privacy</a>.</h6>}
+%END_DEFINE
+
+%DEFINE_SCRIPT OLOGO
+my $image = relpath . "images/ourobourus-logo.gif" ;
+my $size  = lc html_imgsize( $image ) || '' ;
+$size =~ s/(\d+)/"$1"/go ;
+qq{<p style="text-align:center;">} .
+qq{<a href="/"><img border="0" src="/images/ourobourus-logo.gif"} .
+qq{ $size alt="ourobourus"></a></p>}
+%END_DEFINE
+
+
+
+

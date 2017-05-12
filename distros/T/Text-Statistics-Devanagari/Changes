@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::Statistics::Devanagari.
+
+0.01  Sun Jul 15 03:01:00 2007
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Text::Statistics::Devanagari
+

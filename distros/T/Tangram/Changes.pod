@@ -1,0 +1,1070 @@
+
+=head1 WHAT'S NEW IN TANGRAM
+
+=head1 RELEASE 2.12, 9 Oct 2015.
+
+Just to fix a couple of typos in the release.
+
+=head1 RELEASE 2.11, 8 Oct 2015.
+
+First production Tangram 2 release in over 9 years ;-)
+
+=over
+
+=item *
+
+Fix compatibility with newer Perls.  Thanks Doug Scoular!
+
+=item *
+
+Fix compatibility with newer MySQL which expects C<ENGINE=InnoDB>
+instead of C<TYPE=InnoDB>.  Breaks compatibility with any database
+which really wants C<TYPE=X> instead, but AFAIK no such beast exists.
+Tested with MariaDB 10.0.0
+
+=back
+
+=head1 RELEASE 2.10_01, 29 Jan 2007
+
+After so many contributed features, I thought it must be time for a
+dev. release.  Go at it!  No big new features in this version, should
+be just stability fixes.
+
+=over
+
+=item *
+
+L<Tangram::Relational> methods will now automatically try to load a
+L<Tangram::Driver> based on the DBI connection string.
+
+=item *
+
+L<Tangram::Core> is now deprecated; use C<Tangram qw(:core)> instead.
+
+=item *
+
+Query objects (C<Tangram::Expr::QueryObject>'s, as returned by
+L<Tangram::Storage/remote> support C<IS NULL> and C<IS NOT NULL>, via
+the unary C<!> operator or C<!!> idiom, respectively.
+
+=item *
+
+The C<make_id> function that you supply to C<Tangram::Schema-E<gt>new> 
+is now passed an extra argument, the instance that is having its ID
+made.
+
+=back
+
+=head1 RELEASE 2.10, 29 Mar 2006
+
+This release is the first step in the major refactoring of Tangram,
+which is API-backwards compatible.  The differences between 2.09 and
+2.10 are limited to namespace re-organisation.  The test suite still
+succeeds unmodified, but has been tweaked to suppress warnings that
+deprecated modules are being used.
+
+=over
+
+=item *
+
+Sync release with 2.09.  svk this time made this extremely painful,
+but we must forgive it because after all trying to support distributed
+source management tool atop of a synchronised versioning filesystem is
+pushing shit uphill.
+
+=back
+
+=head2 DEV. RELEASE 2.09_02, 21 Nov 2005
+
+=over
+
+=item *
+
+Sync release with 2.08_06.  svk made this far, far, too easy.
+
+=back
+
+=head2 DEV. RELEASE 2.09_01, 20 Oct 2005
+
+=over
+
+=item *
+
+Renamed lots of modules to a grand new layout scheme.
+
+Various classes, such as C<Tangram::Scalar>, C<Tangram::Set>, etc, are
+now called L<Tangram::Type::Scalar>, L<Tangram::Type::Coll::Set>, etc.
+
+However, so long as you C<use Tangram::Core>, C<use Tangram> or C<use
+Tangram::Compat> before any of these old names are used, then C<@INC>
+magic should be able to catch the inclusion and load the correct
+module instead.
+
+=item *
+
+Added new C<use Tangram> import arguments C<:core> and
+C<:compat_quiet>.  to be documented.
+
+=back
+
+=head1 RELEASE 2.09, 29 Mar 2006
+
+=over
+
+=item *
+
+Disable some tests on MySQL, that try to do things far too difficult
+for its little brain.
+
+=item *
+
+Suppress a warning in the test suite.
+
+=back
+
+=head2 DEV. RELEASE 2.08_06, 21 Nov 2005
+
+=over
+
+=item *
+
+Test suite changes: add a test for weakref, fix bad prefetch test that
+was causing false negatives.
+
+=item *
+
+Make Scalar::Util the hard dependency that it is.
+
+=item *
+
+Fix the default C<get_id> function debug output, related to the test
+for weakref.  Also fix a bug in C<get_id> that caused bizarre erratic
+behaviour in the scariest of circumstances.
+
+=item *
+
+Disabled nested join tests on SQLite.
+
+=back
+
+=head2 DEV. RELEASE 2.08_05, 20 Oct 2005
+
+=over
+
+=item *
+
+Previous aggregation function change broke
+C<$storage-E<gt>count($filter)>.  Fixed.
+
+=item *
+
+Fixed outer joins again.  They've even documented now!  C<:D> See
+L<Tangram::Storage/select>.
+
+=item *
+
+Fix F<Makefile.PL> so as not to deliver F<Changes.pod>.
+
+=back
+
+=head1 RELEASE 2.09
+
+=head2 DEV. RELEASE 2.08_04, 13 Oct 2005
+
+=over
+
+=item *
+
+A very nasty but also obscure bug affecting horizontal mapping and
+polymorphic retrieval (or aggregation) was reported by Alex.
+
+The fix for it has made remote expressions always include filtering
+(via WHERE) on the type column as well as the ID column in most
+queries.  This should not affect the result of queries; it is just
+passing on an assertion in the code base through to the database
+back-end.  The times it will affect results are when your currently
+active schema does not match the one used to create the database and
+you were previously relying on side-effects.
+
+Examples of the query differences will follow here before the 2.09
+release.
+
+=back
+
+This version has broken outer joins; to be fixed in the next release.
+
+Also, this Changes.pod seems to being delivered to some random place
+in your C<@INC>; sorry about that, the next release will exclude it
+via the appropriate L<ExtUtils::MakeMaker> voodoo.
+=======
+This release is the first step in the major refactoring of Tangram,
+which is API-backwards compatible.  The differences between 2.09 and
+2.10 are limited to namespace re-organisation.  The test suite still
+succeeds unmodified, but has been tweaked to suppress warnings that
+deprecated modules are being used.
+
+=over
+
+=item *
+
+Sync release with 2.09.  svk this time made this extremely painful,
+but we must forgive it because after all trying to support distributed
+source management tool atop of a synchronised versioning filesystem is
+pushing shit uphill.
+
+=back
+
+=head2 DEV. RELEASE 2.09_02, 21 Nov 2005
+
+=over
+
+=item *
+
+Sync release with 2.08_06.  svk made this far, far, too easy.
+
+=back
+
+=head2 DEV. RELEASE 2.09_01, 20 Oct 2005
+
+=over
+
+=item *
+
+Renamed lots of modules to a grand new layout scheme.
+
+Various classes, such as C<Tangram::Scalar>, C<Tangram::Set>, etc, are
+now called L<Tangram::Type::Scalar>, L<Tangram::Type::Coll::Set>, etc.
+
+However, so long as you C<use Tangram::Core>, C<use Tangram> or C<use
+Tangram::Compat> before any of these old names are used, then C<@INC>
+magic should be able to catch the inclusion and load the correct
+module instead.
+
+=item *
+
+Added new C<use Tangram> import arguments C<:core> and
+C<:compat_quiet>.  to be documented.
+
+=back
+
+=head1 RELEASE 2.09, 29 Mar 2006
+
+=over
+
+=item *
+
+Disable some tests on MySQL, that try to do things far too difficult
+for its little brain.
+
+=item *
+
+Suppress a warning in the test suite.
+
+=back
+
+=head2 DEV. RELEASE 2.08_06, 21 Nov 2005
+
+=over
+
+=item *
+
+Test suite changes: add a test for weakref, fix bad prefetch test that
+was causing false negatives.
+
+=item *
+
+Make Scalar::Util the hard dependency that it is.
+
+=item *
+
+Fix the default C<get_id> function debug output, related to the test
+for weakref.  Also fix a bug in C<get_id> that caused bizarre erratic
+behaviour in the scariest of circumstances.
+
+=item *
+
+Disabled nested join tests on SQLite.
+
+=back
+
+=head2 DEV. RELEASE 2.08_05, 20 Oct 2005
+
+=over
+
+=item *
+
+Previous aggregation function change broke
+C<$storage-E<gt>count($filter)>.  Fixed.
+
+=item *
+
+Fixed outer joins again.  They've even documented now!  C<:D> See
+L<Tangram::Storage/select>.
+
+=item *
+
+Fix F<Makefile.PL> so as not to deliver F<Changes.pod>.
+
+=back
+
+=head2 DEV. RELEASE 2.08_04, 13 Oct 2005
+
+=over
+
+=item *
+
+A very nasty but also obscure bug affecting horizontal mapping and
+polymorphic retrieval (or aggregation) was reported by Alex.
+
+The fix for it has made remote expressions always include filtering
+(via WHERE) on the type column as well as the ID column in most
+queries.  This should not affect the result of queries; it is just
+passing on an assertion in the code base through to the database
+back-end.  The times it will affect results are when your currently
+active schema does not match the one used to create the database and
+you were previously relying on side-effects.
+
+Examples of the query differences will follow here before the 2.09
+release.
+
+=back
+
+This version has broken outer joins; to be fixed in the next release.
+
+Also, this Changes.pod seems to being delivered to some random place
+in your C<@INC>; sorry about that, the next release will exclude it
+via the appropriate L<ExtUtils::MakeMaker> voodoo.
+
+=head2 DEV. RELEASE 2.08_03, 31 Aug 2005
+
+=over
+
+=item *
+
+Make F<Makefile.PL> output display modules that failed, rather than
+letting C<ExtUtils::MakeMaker> do it for it.
+
+=item *
+
+Make L<Data::Lazy> 0.6 a "hard" requirement in the F<Makefile.PL>.
+This is still slightly problematic as only version 0.5 will be
+installed via the CPAN shell.
+
+=item *
+
+Support direct use of SQL in order clauses via C<order =E<gt> [ 'SQL'
+]> (see L<Tangram::Storage/select>)
+
+=item *
+
+Support the SQLite 2 found in Ubuntu Hoary's C<libdbd-sqlite-perl>
+package, which uses a connection string of C<sqlite2>.
+
+=back
+
+=head2 DEV. RELEASE 2.08_02, 16 Aug 2005
+
+=over
+
+=item *
+
+Fix L<Data::Lazy> dependency version number
+
+=item *
+
+Allow one-column L<Tangram::Ref>
+
+=item *
+
+add C<$storage-E<gt>make_oid()> (See L<Tangram::Storage/make_oid>)
+
+=item *
+
+Various documentation fixes from Andres Kievsky
+
+=item *
+
+Make test suite fail gracefully (skip all) if disabled
+
+=back
+
+=head2 DEV. RELEASE 2.08_01, 29 Jun 2005
+
+=over
+
+=item *
+
+Remove redundant confusing copyright messages; the whole work is
+copyrighted, such notices should either be complete or absent IMHO.
+
+=item *
+
+Fix link to Tangram site and mailing list
+
+=item *
+
+Merge in a whole lotta Oracle fixes
+
+=back
+
+=head1 RELEASE 2.08, March 2005
+
+This release was C<2.07_07> with a couple of minor bug fixes.
+
+=over
+
+=item *
+
+L<Tangram::Dump> now checks (via C<$storage-E<gt>id_maybe_insert()>)
+whether objects that it is saving should be inserted to the DB first,
+which allows the practice illustrated by the F<t/musicstore/> test
+suite to work.
+
+=back
+
+=head2 DEV. RELEASE 2.07_07, 24 Dec 2004
+
+=over
+
+=item *
+
+added support for multiple test suites, each with their own schema, to
+end the ballooning schema madness that was affecting the springfield
+test suite.
+
+=item *
+
+reworked the way the DBMS date formatting worked again, adding
+L<Tangram::CookedDateTime>
+
+=item *
+
+added support for L<Time::Piece> and L<DateTime>.
+
+=item *
+
+much work on database portability.  The L<Tangram::Pg> back-end now
+works very well, and I have also ported to SQLite (see
+L<Tangram::SQLite>).
+
+=item *
+
+much more documentation, including L<Tangram::Intro>
+
+=item *
+
+reworked the test suite to have multiple sections
+
+=item *
+
+new test section for Object Persistathon (F<t/musicstore/> schema)
+
+=back
+
+=head2 DEV. RELEASE 2.07_06, 10 Oct 2004
+
+=over
+
+=item *
+
+Support for SQL sequences.  See L<Tangram::Schema>.
+
+=back
+
+=head2 DEV. RELEASE 2.07_05, 2.07_06
+
+=over
+
+=item *
+
+lots of changes.  full list to follow once I get the time to look at
+the revision history :-}
+
+=back
+
+=head2 DEV. RELEASE 2.07_04, 20 May 2004
+
+=over
+
+=item *
+
+Various POD modifications, including the main Tangram page, the
+addition of the stub L<Tangram::Complicity> and the removal of bogus
+C<Tangram::Dialect>
+
+=item *
+
+Enhanced TRACE messages
+
+=item *
+
+Added support for Oracle via L<Tangram::Oracle>
+
+=item *
+
+Added support for cursors that select no objects (just retrieve extra
+columns, eg for aggregate selects)
+
+=item *
+
+`Fixed' F<t/datetime.t> so that it doesn't do PostgreSQL/MySQL
+specific tests unless it is running on those databases
+
+=item *
+
+L<Tangram::Storage> and L<Tangram::Relational::Engine> now hold a
+handle to the L<Tangram::Relational> object that created them,
+allowing for various DBMS dependant hooks (used to rewrite column
+types, format dates, etc)
+
+=item *
+
+Extra sanity checking in the core
+
+=item *
+
+The id_col feature in L<Tangram::Schema> now actually works :-).
+Previously, there were many places where C<.id> was hard-coded.
+
+=item *
+
+Added C<-E<gt>in()> method, a L<Tangram::Expr> object that allows
+direct use of the SQL C<IN ()> construct, rather than just via
+C<includes_or()>, or with collections using joins.
+
+=item *
+
+L<Tangram::DMDateTime> now expects database to understand the ISO-8601
+date format, but the MySQL driver has been enhanced to convert
+ISO-8601 to MySQL format.
+
+=item *
+
+New method C<Tangram::Storage::unload_all> (see
+L<Tangram::Storage/unload_all>)
+
+=back
+
+=head2 DEV. RELEASE 2.07_03, 17 May 2004
+
+=over
+
+=item *
+
+Added L<Tangram::IDBIF> to combine multiple object fields into one
+perl_dump style field (including a "catch-all" facility) Test suite
+for this isn't complete yet.
+
+=back
+
+Most other changes from Kurt Stephens L<ks.perl@kurtstephens.com>, with
+many thanks:
+
+=over
+
+=item *
+
+Do not C<$self-E<gt>{db}-E<gt>disconnect> in
+C<Tangram::Storage::disconnect()> and C<::DESTROY()>, if
+C<$self-E<gt>{db} eq $opts-E<gt>{dbh}> in
+C<Tangram::Storage-E<gt>connect($schema, $cs, $user, $pw, { 'dbh'
+=E<gt> ... } )>; See C<$self-E<gt>{db_owned}>.
+
+=item *
+
+Handle objects that lazily initialize L<Tangram::AbstractSet>
+L<Set::Object> fields.  See UMMF.
+
+=item *
+
+Added L<Tangram::IntrRef> ("Intrusive Ref") for 1-to-1 bi-directional
+Association navigation using only one column in one table.  Derived
+from L<Tangram::IntrSet>.  I need help with this one. :)
+
+=item *
+
+Added C<@sums = $storage-E<gt>sum([ $expr1, $expr2 ], ...)> support.
+
+=item *
+
+Added support for reused tables for mapping both sides of many-to-many
+UML Associations to the same table with L<Tangram::Set> and
+L<Tangram::Array>. See UMMF's F<example/ex1>.
+
+=item *
+
+Added support for timestamping all tables through
+C<$schema-E<gt>{sql}{timestamp_all_tables}>.  See
+L<Tangram::Schema/Global Properties>.
+
+=item *
+
+Prevent additional records being inserted to the Tangram control table
+on C<-E<gt>redeploy>.
+
+=item *
+
+Added support for C<GROUP BY> in L<Tangram::Cursor>.
+
+=item *
+
+Added C<COUNT($remote)> and C<SUM($filter_expr)> support.
+
+=back
+
+Editorial release changes:
+
+=over
+
+=item *
+
+Started using C<_NN> version style, so CPAN marks it as a development
+release
+
+=item *
+
+added brief test suite for aggregate functions
+
+=back
+
+=head2 DEV. RELEASE 2.07.2, 6 Jan 2004
+
+=over
+
+=item *
+
+L<Tangram::IntrHash> prefetch test added
+
+=item *
+
+Documentation enhancements
+
+=item *
+
+L<Tangram::Dump> class to `fix' persistent references in data
+structures prior to insertion, so that :
+
+=item *
+
+L<Tangram::PerlDump> now can contain persistent objects safely
+
+=item *
+
+and hey, why not write a L<Tangram::Storable>
+
+=item *
+
+and a L<Tangram::YAML> (not working, waiting for a CPAN bug to be fixed)
+
+=back
+
+=head2 DEV. RELEASE 2.07.1, 29 Dec 2003
+
+=over
+
+=item *
+
+L<Tangram::IntrHash> implemented at last :-).  C<Tangram::IxHash> and
+C<Tangram::IntrIxHash> are next :->
+
+=item *
+
+verbose error message in L<Tangram::Coll> when demand paging is
+happening on stale tied collections (eg, erroneously created via
+dclone())
+
+=item *
+
+fix for Postgres sub-select detection (Pedro Alves)
+
+=item *
+
+C<make_1st_id_in_tx> now only called for 1st insert (Chengzhi Liang)
+
+=back
+
+=head1 RELEASE 2.07 8 Nov 2003
+
+=over
+
+=item *
+
+Fixed bug with C<Tangram::Intr*> and erasing objects that referred to
+a class which didn't use their class name as their table name [closes:
+2650]
+
+=item *
+
+Added the ability to use C<limit =E<gt> [ N, Y ]> in
+C<Tangram::Storage-E<gt>select> statements (see
+L<Tangram::Storage/select>)
+
+=item *
+
+Added C<Tangram::Coll::includes_or>; see L<Tangram::Expr>
+
+=item *
+
+Enhancement of error message from L<Tangram::Relational::Engine>
+[related to 2631]
+
+=item *
+
+Support for using table types via C<$schema-E<gt>{sql}{table_type}>
+
+=item *
+
+Support for sub-selects with MySQL, for the one test that uses them.
+Also C<$storage-E<gt>{no_subselects}> is auto-detected.
+
+=item *
+
+Completed C<$storage-E<gt>prefetch()> function for all working types,
+new test F<t/prefetch.t>
+
+=item *
+
+If you have NULL values in array or hash slots in your database, then
+it won't cause a hard error, except possibly with prefetch() [related
+to 2631]
+
+=item *
+
+Various small fixes to bizarre internal error messages [related to
+2631]
+
+=item *
+
+Minor documentation fixes
+
+=item *
+
+Exceptions on various DB failures are now thrown when
+C<DBI::execute()> is called internally, rather than being largely
+ignored.
+
+=item *
+
+Cosmetic Test Suite change
+
+=item *
+
+ID column name wasn't being used for the index in
+L<Tangram::Relational::Engine> (Kurt Stephens)
+
+=item *
+
+Lost patches from
+2002/06/25 (Kurt Stephens):
+
+Added missing L<Tangram::Expr> and L<Tangram::Filter> operators:
+
+  '+', '-', '*', '/',
+  '&', '|', '!',
+  '==', '!=', '<', '>', '<=', '>=',
+  'eq', 'ne', 'lt', 'gt', 'le', 'ge',
+  'cos', 'sin', 'acos',
+
+=item *
+
+Lost patches from
+2002/06/25 (Kurt Stephens):
+
+Added argument swapping for non-commutative operators, like
+
+  "<"
+
+=item *
+
+Fixed export problem with 5.6.1 (reported by Kate Pugh)
+
+=item *
+
+C<deep_update> with L<Tangram::Ref> bug fix (reported by Aaron Mackey)
+
+=item *
+
+F<Makefile.PL> should now hopefully be more informative about which
+modules are needed for what.
+
+=item *
+
+Removed C<Selfloader> from L<Tangram::Ref> (Kate Pugh)
+
+=back
+
+=head1 RELEASE 2.06 Jul 17 2003
+
+=over
+
+=item *
+
+Added C<$storage-E<gt>oid_isa($oid, "ClassName")> method for
+marshalling OIDs
+
+=item *
+
+Fixed minor bugs causing test suite to issue large warnings on
+5.8.1-RC2
+
+=back
+
+=head1 RELEASE 2.05 Jul 2003
+
+=over
+
+=item *
+
+L<Tangram::Scalar> and L<Tangram::Ref> column names are now passed
+through C<$schema-E<gt>{normalize}-E<gt>()>
+
+=back
+
+
+=head2 DEV. RELEASE 2.05pre2 Jun 2003
+
+=over
+
+=item *
+
+Minor L<Tangram::Expr> defined vs logically-false fix (Aaron Mackey)
+
+=item *
+
+explicitly select all C<ORDER BY> columns (Aaron Mackey)
+
+=item *
+
+normalise default "C<slot>" and "C<coll>" column names in
+C<Tangram::Intr*> types
+
+=back
+
+=head2 DEV. RELEASE 2.05pre1 May 2003
+
+First "not the momma" release.
+
+Patches from lots of people were applied, don't know who 'coz the
+honourable grand master JLL applied a lot of them, I'll try to
+summarize and attribute them here:
+
+=over
+
+=item *
+
+back-porting pieces for 5.00503 (that was me)
+
+=item *
+
+a more elegant solution for the
+L<Tangram::AbstractArray>/L<Tangram::AbstractHash> corner case than
+the one I submitted :-)
+
+=item *
+
+code that (possibly) completes L<Tangram::Hash> support (I haven't
+written a test case to confirm this yet)
+
+=item *
+
+A fix to L<Tangram::AbstractSet> that again caters to some very
+strange corner cases (this was me too)
+
+=item *
+
+Working implementation of the L<Tangram::DMDateTime> type mapping, a
+good thing that running a persistent application server offsets the
+huge time it takes to load in L<Date::Manip> :-)
+
+=item *
+
+A bug fix to L<Tangram::FlatArray> mapping type that affects deleting
+members (don't know whose)
+
+=item *
+
+C<Tangram::IntrSet::get_intrusions> (? can anyone claim or explain
+this one?)
+
+=item *
+
+Minor L<Tangram::PerlDump> fix (a simple one)
+
+=item *
+
+Deep, deep magic in L<Tangram::Relational::Engine>; new function
+get_heterogeneity (anyone?)
+
+=item *
+
+C<Use of uninitialised variable in Tangram::Relational::Engine>...
+
+=item *
+
+Other large changes to L<Tangram::Schema> (? - get_bases, get_specs,
+is_root, etc)
+
+=item *
+
+A problem with merging schemas when you used a `back-ref' to a class
+that is later on in the schema (me)
+
+=item *
+
+Scattered showers of changes in L<Tangram::Storage>
+(get_insert_statements etc, lots of `off by one' (reference nesting
+level that is) changes)
+
+=back
+
+All I can say is that there have been some very smart people looking
+at this code and submitting patches.
+
+
+=head1 HISTORIC Changes
+
+Originally as F<Changes> in the distribution
+
+ Revision history for Perl extension Tangram.
+ 
+ 0.01  Sun Mar 21 10:46:45 1999
+ 	- original version; created by h2xs 1.18
+ 
+ 0.03  Stardate: unknown
+ 	- first public alpha release
+ 
+ 0.08  Stardate: unknown
+ 	- second public alpha release
+ 
+ 0.09  Stardate: unknown
+ 
+    - split Tangram.pm into several modules
+    - replaced @ISA with 'use base'
+    - replaced default typetags with automounting
+    - prefetch now takes either class or remote
+    - implemented prefetch for IntrArray and IntrSet
+       *::prefetch still need real-life testing,
+       especially when class(coll) <> class(item)
+ 
+ 1.00  Nov 07 1999 - first mature release version
+ 	- deploy() now also works directly on DBI handles
+ 	- deploy() allows specification of SQL types via the schema hash
+ 	- intrusive collections allow element-to-container navigation
+ 	- improve speed of read_object
+ 	- fixed various bugs
+ 	- rewrote part of, and expanded documentation
+ 
+ 1.01  Nov 12 1999 - interim version
+ 	- added (raw) mapping between Perl strings and date/time SQL types
+ 
+ 1.02  Nov 14 1999 - interim version
+ 	- added support for aggregated refs, arrays and sets
+ 
+ 1.03  Dec 28 1999 - interim version
+ 	- added support for customizing object & class id types, etc
+ 	- as a consequence Tangram should now work with PostgreSql
+ 	- fixed bug: erase() failed in presence of stateless leaf classes
+ 	- temporarily removed RawDate and RawTime tests because M$ SQL
+ 	  cannot handle them; those modules are still present though
+ 
+ 1.04  Jan 03 2000 - interim version
+ 	- fixed two bugs related to explicit tables
+ 
+ 1.05  Jan 03 2000 - interim version
+ 	- fixed: Storage::prefetch now works with inherited members
+ 	- fixed: _insert() ignored collections in stateless classes
+ 
+ 1.06  Feb 29 2000 - higly experimental interim version
+ 	- added typechecks on collection members
+ 	- started cleaning up autovivification of colls upon save
+ 	- documented like()
+ 	- documented extended select options retrieve, order & filter
+ 	- changed _limit into the Limit in test suite
+ 	- added temporary hack in Makefile.PL to support Access
+ 	- added mapping for flat arrays
+ 	- factorized code common to Array & FlatArray
+ 
+ 1.07  Feb 29 2000 - interim version
+ 	- adapted test suite for Sybase and other NULL-picky databases
+ 	- added experimental support for vendor extensions (Dialect)
+ 	- added skeleton Dialect::Sybase with support for datepart
+ 	- did extensive rework on Expr instantiation
+ 	- began documenting Type
+ 	- added Storage::reload()
+ 
+ 1.08  Mar 26 2000 - interim version
+ 	- batch allocation of object ids
+ 	- support for Lobs contributed by marian.kelc@ruhr-uni-bochum.de
+ 	- Storage::reset()
+ 
+ 1.09  ? - interim version
+ 	- String calls DBI for correct quoting, as Marian Kelc suggested
+ 	- fixed Array problem when removing elements from middle of collection
+ 	- (?)
+ 
+ 1.10  Apr 19 2000 - interim version
+ 	- changed reset() into unload() and added support for partial unloading
+ 	- tx_do() can now propagate arguments to closure/anon-sub;
+ 	  insert(), update() and erase() pass anon-subs to tx_do to prevent
+ 	  leaks (thanks Radu Greab)
+ 
+ 1.11  May 29 2000 - public version
+ 	- ordering result set by descending order is now supported
+ 	- die() on attempt to load from an invalid id
+ 	- removed silly table id allocation limit (t1000) in Coll.pm
+ 
+ 1.13  Jul 11 2000 - interim version
+ 	- new FlatHash and DMDateTime mappings contributed by Gabor Herr
+           <herr@iti.informatik.tu-darmstadt.de>
+ 	- some more doc in Type.pod
+ 	- date & time doc moved to DateTime.pod
+ 	- deploy() puts \n between instructions in trace
+ 
+ 1.15  Jul 21 2000 - interim version
+ 	- new PerlDump mapping contributed by Gabor Herr
+           <herr@iti.informatik.tu-darmstadt.de>
+ 
+ 1.16  Jul 25 2000 - interim version
+ 	- fixed deploy() bug: didn't take col names into account for Array, Set and Hash
+ 	- fixed query_expr bug in Scalar and Ref: used field name instead of col name
+ 
+ 1.17  Jul 28 2000 - interim version
+ 	- Gabor's patches on deep updates
+ 
+ 1.18  Jul 28 2000 - stable version
+ 	- weakrefs!
+ 	- tuples
+ 	- mysql tx acquired lock regardless of tx nesting
+ 
+ 1.19  Jul 28 2000 - stable version
+ 	- improved id allocation for mysql
+ 	- bitwise operators for mysql
+ 	- manual class id allocation
+ 	- install now works in the absence of DBI and Set::Object
+ 	- Makefile.PL prerequisites work now
+ 	- Guided Tour is now generated & can be run
+ 	- added support for LIMIT in selects
+ 	- deploy() didn't take explicit oid/cid type into account; fixed
+ 	- deploy() wrongly defaulted to NULLable types; fixed
+ 	- class id can now be specified
+ 	- oid and cid now default to INTEGER
+ 	- fixed error in Expr.pod but I don't remember what it was	
+ 	- minor improvement to Schema.pod
+ 	- added Springfield.pm for users to play with
+ 	- added support for SELECT SUM
+ 
+ 2.00  Feb ?? 2001 - first S.O.L. release
+ 	- added copyright notices
+ 	- added a copy of the GPL
+ 	- implemented inlined exports
+ 	- INSERT and UPDATE now make use of prepared statements when available
+ 	- re-executable Cursors
+ 	- changed database layout, Class Table is gone and 'control' table in there
+ 	- object ids are no longer allocated on a class basis
+ 	- introduced Tangram::Relational
+ 	- dialect are now done via derivation
+ 	- stored object id no longer contains type id
+ 	- introduced Relational::Engine
+ 	- flexible mapping
+
+=cut

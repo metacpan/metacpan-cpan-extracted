@@ -1,0 +1,8 @@
+Revision history for Test-LWP-MockSocket-http
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.03	Fixed // to if !defined idiom to support older perls
+0.04    Declared dependency on IO::String in Makefile.PL, also some more tests
+0.05    Declared dependency on LWP::Protocol::http (duh!)

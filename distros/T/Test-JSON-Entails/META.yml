@@ -1,0 +1,28 @@
+---
+abstract: 'Test whether one JSON or Perl structure entails/subsumes another'
+author:
+  - 'Jakob Voss'
+build_requires:
+  Test::Builder::Tester: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-JSON-Entails
+requires:
+  Carp: 0
+  JSON::Any: 0
+  Scalar::Util: 0
+  Test::Builder::Module: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/nichtich/Test-JSON-Entails/issues
+  repository: https://github.com/nichtich/Test-JSON-Entails
+version: 0.2

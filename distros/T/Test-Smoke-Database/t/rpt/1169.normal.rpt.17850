@@ -1,0 +1,145 @@
+Newsgroups: perl.daily-build.reports
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:1169
+Return-Path: <easmith@beatrice.rutgers.edu>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 76886 invoked by uid 1005); 8 Sep 2002 17:43:30 -0000
+Delivered-To: perlmail-smokers-reports@perl.org
+Received: (qmail 76883 invoked by uid 76); 8 Sep 2002 17:43:30 -0000
+Received: from [CUG8xFZM8SdUQFIO/MUnSfhxSx2VY9wt]@dogberry.rutgers.edu (HELO dogberry.rutgers.edu) (165.230.209.227) by onion.perl.org (qpsmtpd/0.10) with SMTP; 2002-09-08 17:43:30Z
+Received: from beatrice.rutgers.edu (sendmail@beatrice.rutgers.edu [165.230.209.226])	by dogberry.rutgers.edu (8.11.2/8.11.2) with ESMTP id g88HkDc6936740	for <smokers-reports@perl.org>; Sun, 8 Sep 2002 13:46:13 -0400 (EDT)
+Received: (from root@localhost)	by beatrice.rutgers.edu (8.11.2/8.11.2) id g88Hk9P1837447;	Sun, 8 Sep 2002 13:46:09 -0400 (EDT)
+Date: Sun, 8 Sep 2002 13:46:09 -0400 (EDT)
+Message-ID: <msgid+200209081746.g88Hk9P1837447@beatrice.rutgers.edu>
+To: smokers-reports@perl.org
+Reply-To: allens@cpan.org
+Subject: Smoke 17850 irix64 6.5 6.5.16m IP28 r10000 /usr/share/src/cpan-current-beatrice
+X-SMTPD: qpsmtpd/0.10, http://develooper.com/code/qpsmtpd/
+Approved: news@nntp.perl.org
+
+Automated smoke report for patch 17850 on irix64
+ - 6.5 6.5.16m IP28
+ r10000
+          v1.14      using cc -64 version MIPSpro Compilers: Version 7.3.1.3m
+O = OK
+F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown
+    c = Configure, m = make, t = make test-prep
+
+         Configuration
+-------  --------------------------------------------------------------------
+F F m m -Duseperlio
+- - - - -Duseperlio -Duse64bitint
+t t F F -Duseperlio -Duse64bitall
+t t F F -Duseperlio -Duselongdouble
+- - F F -Duseperlio -Dusemorebits
+F F t t -Duseperlio -Duse64bitall -Duselongdouble
+F F t t -Dusethreads -Duseithreads -Duseperlio
+F F - - -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+- - t t -Dusethreads -Duseithreads -Duseperlio -Duse64bitall
+t t F F -Dusethreads -Duseithreads -Duseperlio -Duselongdouble
+t t F F -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+- - t t -Dusethreads -Duseithreads -Duseperlio -Duse64bitall -Duselongdouble
+| | | +- PERLIO = perlio -DDEBUGGING
+| | +--- PERLIO = stdio  -DDEBUGGING
+| +----- PERLIO = perlio
++------- PERLIO = stdio
+
+Failures:
+
+irix         stdio            -Duseperlio
+    ext/Encode/t/Aliases.................FAILED at test 18
+    ext/Encode/t/at-cn...................FAILED at test 1
+    ext/Encode/t/CJKT....................FAILED at test 17
+    ext/Encode/t/guess...................FAILED at test 14
+    ext/Encode/t/perlio..................FAILED at test 1
+    lib/CPAN/t/loadme....................FAILED at test 1
+    lib/ExtUtils/t/Constant..............FAILED at test 3
+.../lib/CPAN/t/loadme..........dubiousD. FAILED test 1
+
+irix         perlio           -Duseperlio
+    ext/Encode/t/Aliases.................FAILED at test 18
+    ext/Encode/t/at-cn...................FAILED at test 1
+    ext/Encode/t/CJKT....................FAILED at test 17
+    ext/Encode/t/guess...................FAILED at test 14
+    ext/Encode/t/perlio..................FAILED at test 1
+
+irix         stdio            -DDEBUGGING -Duseperlio -Duse64bitall
+    t/lib/1_compile......................FAILED at test 6
+    ext/IPC/SysV/ipcsysv.................FAILED at test 0
+    ext/IPC/SysV/t/msg...................FAILED at test 0
+    ext/IPC/SysV/t/sem...................FAILED at test 0
+    ext/Safe/safe1.......................FAILED at test 0
+    ext/Safe/safe2.......................FAILED at test 0
+    ext/Storable/t/code..................FAILED at test 1
+    lib/bignum/t/bignum..................FAILED at test 1
+    lib/CPAN/t/loadme....................FAILED at test 1
+    lib/CPAN/t/Nox.......................FAILED at test 1
+    lib/CPAN/t/vcmp......................FAILED at test 0
+    lib/IPC/SysV.........................FAILED at test 0
+.../t/lib/1_compile.........FAILED test 6
+.../lib/CPAN/t/loadme.......dubiousD. FAILED test 1
+
+irix         perlio           -DDEBUGGING -Duseperlio -Duse64bitall
+    t/lib/1_compile......................FAILED at test 6
+    ext/IPC/SysV/ipcsysv.................FAILED at test 0
+    ext/IPC/SysV/t/msg...................FAILED at test 0
+    ext/IPC/SysV/t/sem...................FAILED at test 0
+    ext/Safe/safe1.......................FAILED at test 0
+    ext/Safe/safe2.......................FAILED at test 0
+    ext/Storable/t/code..................FAILED at test 1
+    lib/bignum/t/bignum..................FAILED at test 1
+    lib/CPAN/t/loadme....................FAILED at test 1
+    lib/CPAN/t/Nox.......................FAILED at test 1
+    lib/CPAN/t/vcmp......................FAILED at test 0
+    lib/ExtUtils/t/Constant..............FAILED at test 3
+    lib/ExtUtils/t/Embed.................FAILED at test 1
+    lib/IPC/SysV.........................FAILED at test 0
+    lib/Unicode/UCD......................FAILED at test 161
+.../t/lib/1_compile............FAILED test 6
+.../lib/CPAN/t/loadme..........dubiousD. FAILED test 1
+
+irix         stdio/perlio     -DDEBUGGING -Duseperlio -Duselongdouble
+irix         stdio/perlio     -DDEBUGGING -Duseperlio -Dusemorebits
+irix         stdio/perlio     -Duseperlio -Duse64bitall -Duselongdouble
+    t/base/num...........................FAILED at test 48
+.../t/base/num....FAILED test 48
+
+irix         stdio            -Dusethreads -Duseithreads -Duseperlio
+    ext/Encode/t/Aliases.................FAILED at test 32
+    ext/Encode/t/at-tw...................FAILED at test 1
+    ext/Encode/t/CJKT....................FAILED at test 1
+    ext/Encode/t/guess...................FAILED at test 14
+    lib/Unicode/UCD......................FAILED at test 161
+
+irix         perlio           -Dusethreads -Duseithreads -Duseperlio
+    ext/Encode/t/Aliases.................FAILED at test 32
+    ext/Encode/t/at-tw...................FAILED at test 1
+    ext/Encode/t/CJKT....................FAILED at test 1
+    ext/Encode/t/guess...................FAILED at test 14
+    lib/Text/Balanced/t/extmul...........FAILED at test 0
+    lib/Unicode/UCD......................FAILED at test 161
+
+irix         stdio            -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+    ext/IPC/SysV/ipcsysv.................FAILED at test 0
+    ext/IPC/SysV/t/msg...................FAILED at test 0
+    ext/IPC/SysV/t/sem...................FAILED at test 0
+    lib/ExtUtils/t/Constant..............FAILED at test 3
+    lib/IPC/SysV.........................FAILED at test 0
+    lib/Unicode/UCD......................FAILED at test 161
+
+irix         perlio           -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+    ext/IPC/SysV/ipcsysv.................FAILED at test 0
+    ext/IPC/SysV/t/msg...................FAILED at test 0
+    ext/IPC/SysV/t/sem...................FAILED at test 0
+    lib/IPC/SysV.........................FAILED at test 0
+    lib/Text/Balanced/t/extmul...........FAILED at test 0
+    lib/Unicode/UCD......................FAILED at test 161
+
+irix         stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads -Duseperlio -Duselongdouble
+irix         stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+    t/base/num...........................FAILED at test 48
+.../t/base/num....FAILED test 48
+

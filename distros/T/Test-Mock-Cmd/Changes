@@ -1,0 +1,25 @@
+Revision history for Test-Mock-Cmd
+
+0.7  Thu Dec 15 10:18:13 2016
+    - rt119171: (Thanks Frank Bicknel!) fix qr/qx confusion
+    - Change rt to github
+
+0.6  Fri May 3 10:42:53 2013
+    - rt 84976: Add .t example
+    - rt 84975: (Thanks for the idea SCHWERN!) add selective-mocking-factory-hash support
+
+0.5  Thu Dec 15 16:05:42 2011
+    Update pod testing to not call plan twice (i.e. when the optional module is not available)
+
+0.4  Thu Dec 15 14:13:50 2011
+    update copyright/license per employer
+    
+0.3  Sun Dec 11 15:43:32 2011
+    add named function support to import() w/ PDO and tests
+    
+0.2  Tue Dec  6 04:37:24 2011
+    rt 73042 v0.2 TODOs
+
+0.1  Thu Dec  1 17:37:07 2011
+       Initial release.
+

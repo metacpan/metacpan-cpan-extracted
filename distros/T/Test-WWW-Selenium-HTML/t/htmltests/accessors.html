@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://www.apnic.net/" />
+<title>accessors</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">accessors</td></tr>
+</thead><tbody>
+<tr>
+    <td>open</td>
+    <td>accessors.html</td>
+    <td></td>
+</tr>
+<tr>
+    <td>storeBodyText</td>
+    <td>myvar</td>
+    <td></td>
+</tr>
+<tr>
+    <td>echo</td>
+    <td>${myvar}</td>
+    <td></td>
+</tr>
+<tr>
+    <td>waitForElementPresent</td>
+    <td>id=div</td>
+    <td></td>
+</tr>
+<tr>
+    <td>waitForElementNotPresent</td>
+    <td>id=div2</td>
+    <td></td>
+</tr>
+<tr>
+    <td>verifyElementPresent</td>
+    <td>id=div</td>
+    <td></td>
+</tr>
+<tr>
+    <td>verifyElementNotPresent</td>
+    <td>id=div2</td>
+    <td></td>
+</tr>
+<tr>
+    <td>waitForElementNotPresent</td>
+    <td>id=div2</td>
+    <td></td>
+</tr>
+<tr>
+    <td>assertElementWidth</td>
+    <td>id=div</td>
+    <td>200</td>
+</tr>
+<tr>
+    <td>assertNotElementWidth</td>
+    <td>div</td>
+    <td>201</td>
+</tr>
+<tr>
+    <td>verifyElementWidth</td>
+    <td>div</td>
+    <td>200</td>
+</tr>
+<tr>
+    <td>verifyNotElementWidth</td>
+    <td>div</td>
+    <td>201</td>
+</tr>
+<tr>
+    <td>storeElementWidth</td>
+    <td>div</td>
+    <td>width</td>
+</tr>
+
+<tr>
+    <td>waitForElementPresent</td>
+    <td>id=div</td>
+    <td></td>
+</tr>
+<tr>
+    <td>waitForElementNotPresent</td>
+    <td>id=div2</td>
+    <td></td>
+</tr>
+<tr>
+    <td>waitForElementHeight</td>
+    <td>id=div</td>
+    <td>300</td>
+</tr>
+<tr>
+    <td>waitForElementHeight</td>
+    <td>id=div</td>
+    <td>regexp:\d\d\d</td>
+</tr>
+<tr>
+    <td>waitForElementHeight</td>
+    <td>id=div</td>
+    <td>exact:300</td>
+</tr>
+<tr>
+    <td>waitForElementHeight</td>
+    <td>id=div</td>
+    <td>glob:3*0</td>
+</tr>
+<tr>
+    <td>waitForNotElementHeight</td>
+    <td>id=div</td>
+    <td>301</td>
+</tr>
+<tr>
+    <td>assertElementHeight</td>
+    <td>id=div</td>
+    <td>300</td>
+</tr>
+<tr>
+    <td>assertNotElementHeight</td>
+    <td>div</td>
+    <td>301</td>
+</tr>
+<tr>
+    <td>verifyElementHeight</td>
+    <td>div</td>
+    <td>300</td>
+</tr>
+<tr>
+    <td>verifyNotElementHeight</td>
+    <td>div</td>
+    <td>301</td>
+</tr>
+<tr>
+    <td>storeElementHeight</td>
+    <td>div</td>
+    <td>height</td>
+</tr>
+
+<tr>
+    <td>storeAllLinks</td>
+    <td>alllinks</td>
+    <td></td>
+</tr>
+<tr>
+    <td>verifyExpression</td>
+    <td>${alllinks}</td>
+    <td>regexp:link1.*link2.*link3</td>
+</tr>
+<tr>
+    <td>verifyAllLinks</td>
+    <td>regexp:link1.*link2.*link3</td>
+    <td></td>
+</tr>
+<tr>
+    <td>verifyAllLinks</td>
+    <td>exact:link1,link2,link3</td>
+    <td></td>
+</tr>
+<tr>
+    <td>verifyAllLinks</td>
+    <td>link1*link2*link3</td>
+    <td></td>
+</tr>
+
+<tr>
+    <td>select</td>
+    <td>id=select-box</td>
+    <td>id=one</td>
+</tr>
+<tr>
+    <td>select</td>
+    <td>id=select-box</td>
+    <td>id=three</td>
+</tr>
+<tr>
+    <td>storeSelectedIds</td>
+    <td>id=select-box</td>
+    <td>selected-ids</td>
+</tr>
+<tr>
+    <td>verifyExpression</td>
+    <td>${selected-ids}</td>
+    <td>regexp:.hr..</td>
+</tr>
+<tr>
+    <td>verifyNotExpression</td>
+    <td>${selected-ids}</td>
+    <td>regexp:fo..</td>
+</tr>
+<tr>
+    <td>verifyExpression</td>
+    <td>${selected-ids}</td>
+    <td>exact:three</td>
+</tr>
+<tr>
+    <td>verifyNotExpression</td>
+    <td>${selected-ids}</td>
+    <td>exact:Three</td>
+</tr>
+<tr>
+    <td>verifyExpression</td>
+    <td>${selected-ids}</td>
+    <td>glob:*hree</td>
+</tr>
+<tr>
+    <td>verifyNotExpression</td>
+    <td>${selected-ids}</td>
+    <td>glob:*four*</td>
+</tr>
+<tr>
+    <td>store</td>
+    <td>mystring</td>
+    <td>myvariable</td>
+</tr>
+<tr>
+    <td>verifyExpression</td>
+    <td>${myvariable}</td>
+    <td>glob:my?tring</td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

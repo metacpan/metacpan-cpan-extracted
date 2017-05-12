@@ -1,0 +1,41 @@
+---
+abstract: 'test sugar for methods'
+author:
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Deep: 0
+  Test::More: 0.88
+  Test::Tester: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Method
+no_index:
+  file:
+    - perlcritic.rc
+provides:
+  Test::Method:
+    file: lib/Test/Method.pm
+    version: 0.001002
+requires:
+  Exporter: 0
+  Scalar::Util: 0
+  Test::Builder: 0
+  Test::Deep::NoTest: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/xenoterracide/test-method/issues
+  homepage: https://metacpan.org/dist/Test-Method
+  repository: git://github.com/xenoterracide/test-method.git
+version: 0.001002

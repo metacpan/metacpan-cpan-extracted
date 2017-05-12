@@ -1,0 +1,10 @@
+[
+   {
+      "dist_name" : "Plack",
+      "cpan_id" : "MIYAGAWA",
+      "mod_vers" : "undef",
+      "dist_file" : "M/MI/MIYAGAWA/Plack-1.0034.tar.gz",
+      "dist_vers" : "1.0034",
+      "mod_name" : "Plack::Test"
+   }
+]

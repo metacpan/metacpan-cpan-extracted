@@ -1,0 +1,32 @@
+0.08
+    Fix and improve diagostics
+
+0.09
+    Add an is_string_nows() function (RT #14018)
+
+0.10
+    Better implementation of _common_prefix_length
+    by Tassilo von Parseval
+
+0.11
+    Require a more recent Test::Builder::Tester,
+    since tests fail with 1.03.
+
+0.12
+    Show longest common substring in diagnostics
+    (Breno G. de Oliveira)
+
+0.13
+    Allow to display LCSS output in diagnostics
+
+0.14
+    Compatibility fix with perl 5.13.5
+
+0.15
+    Show line and column number in diagostics (Mark Fowler)
+
+0.16
+    Force string comparison to use string context (Nick Pongratz)
+
+0.17
+    Regenerate tarball, update changes

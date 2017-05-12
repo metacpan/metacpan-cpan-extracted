@@ -1,0 +1,19 @@
+Revision history for Perl extension Tk::JPEG::Lite
+
+2.015
+	- stable release
+
+2.014_07
+	- fixed some Makefile problems
+
+2.014_06
+	- modernized distribution
+
+2.014_05
+	- fixed call to Devel::CheckLib
+
+2.014_04
+	- added configure_requires to META.yml
+	- added experimental Devel::CheckLib check
+
+...

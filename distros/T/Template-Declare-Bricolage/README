@@ -1,0 +1,38 @@
+Template/Declare/Bricolage version 0.01
+=======================================
+
+This module provides Template::Declare-based tools to simplify the generation
+of XML documents for use with the Bricolage SOAP API. If you need to generate
+XML files to send to Bricolage, this is the library to make your life easier.
+If you don't use Bricolage, well, you don't need this library. But see
+Template::Declare itself for a nice, Perlish templating environment.a
+
+INSTALLATION
+
+To install this module, type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you don't have Module::Build installed, type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Dependencies
+------------
+
+Template::Declare::Bricolage has one none-core dependency:
+`Template::Declare` - Perlish declarative templates.
+
+Copyright and Licence
+---------------------
+
+Copyright (c) 2009 David E. Wheeler. Some Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

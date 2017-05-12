@@ -1,0 +1,19 @@
+Revision history for Test-Run-Plugin-CollectStats
+
+0.0103  2014-01-31
+        - Add a prereq on Moose.
+        - Add minimum version of perl - 5.8.
+        - Add configure_requires.
+        - Add t/cpan-changes.t and t/style-trailing-space.t .
+
+0.0102  2010-06-18
+        - Converted to Moose.
+        - Updated to latest Test-Run and Moose.
+
+0.0101  2009-03-10
+        - Adapted the module to recent Test::Run's.
+            - Now hopefully the CPAN Testers tests won't fail.
+
+0.01    2007-03-17
+        First version, released on an unsuspecting world.
+

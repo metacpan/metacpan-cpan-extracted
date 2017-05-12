@@ -1,0 +1,11 @@
+# A simple example... running starfish on the following file...
+#     # SLePerl:LastUpdate:April 27, 2001 11:35:14
+#     <? $O= "test" !>
+line before
+#SLePerlOut
+test
+#/SLePerlOut
+ continue
+
+# <? $test = 'test'; !>
+# <? $O="ver=($ver) test=($test)" !>

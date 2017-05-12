@@ -1,0 +1,57 @@
+---
+abstract: 'All Acme::MetaSyntactic themes at once'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  File::Path: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-MetaSyntactic
+requires:
+  Acme::MetaSyntactic: '0'
+  Acme::MetaSyntactic::Themes: '0'
+  Acme::MetaSyntactic::Themes::Abigail: '0'
+  Acme::MetaSyntactic::buzzwords: '0'
+  Acme::MetaSyntactic::chinese_zodiac: '0'
+  Acme::MetaSyntactic::christmas: '0'
+  Acme::MetaSyntactic::countries: '0'
+  Acme::MetaSyntactic::cpanauthors: '0'
+  Acme::MetaSyntactic::daleks: '0'
+  Acme::MetaSyntactic::dangdut: '0'
+  Acme::MetaSyntactic::display_resolution: '0'
+  Acme::MetaSyntactic::dune: '0'
+  Acme::MetaSyntactic::errno: '0'
+  Acme::MetaSyntactic::frasier: '0'
+  Acme::MetaSyntactic::id_names: '0'
+  Acme::MetaSyntactic::legobatman: '0'
+  Acme::MetaSyntactic::legocityundercover: '0'
+  Acme::MetaSyntactic::legoharrypotter: '0'
+  Acme::MetaSyntactic::legoindianajones: '0'
+  Acme::MetaSyntactic::legojurassicworld: '0'
+  Acme::MetaSyntactic::legolotr: '0'
+  Acme::MetaSyntactic::legomarvelsavengers: '0'
+  Acme::MetaSyntactic::legomarvelsuperheroes: '0'
+  Acme::MetaSyntactic::legomovievideogame: '0'
+  Acme::MetaSyntactic::legopiratesofthecaribbean: '0'
+  Acme::MetaSyntactic::legostarwarstheforceawakens: '0'
+  Acme::MetaSyntactic::legothehobbit: '0'
+  Acme::MetaSyntactic::mlpfim: '0'
+  Acme::MetaSyntactic::morning_musume: '0'
+  Acme::MetaSyntactic::nethack: '0'
+  Acme::MetaSyntactic::seinfeld: '0'
+  Acme::MetaSyntactic::soviet: '0'
+  Acme::MetaSyntactic::vim: '0'
+  Acme::MetaSyntactic::xkcdcommon1949: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-MetaSyntactic
+  repository: http://github.com/book/Task-MetaSyntactic.git
+version: '1.042'

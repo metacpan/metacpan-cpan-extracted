@@ -1,0 +1,49 @@
+---
+abstract: 'Trap exit codes, exceptions, output, etc.'
+author:
+  - 'Eirik Berg Hanssen <ebhanssen@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Trap
+provides:
+  Test::Trap:
+    file: lib/Test/Trap.pm
+    version: v0.3.2
+  Test::Trap::Builder:
+    file: lib/Test/Trap/Builder.pm
+    version: v0.3.2
+  Test::Trap::Builder::PerlIO:
+    file: lib/Test/Trap/Builder/PerlIO.pm
+    version: v0.3.2
+  Test::Trap::Builder::SystemSafe:
+    file: lib/Test/Trap/Builder/SystemSafe.pm
+    version: v0.3.2
+  Test::Trap::Builder::TempFile:
+    file: lib/Test/Trap/Builder/TempFile.pm
+    version: v0.3.2
+requires:
+  Carp: '0'
+  Data::Dump: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  Test::Builder: '0'
+  Test::More: '0'
+  Test::Tester: '0.107'
+  base: '0'
+  constant: '0'
+  lib: '0'
+  perl: v5.6.2
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.3.2

@@ -1,0 +1,33 @@
+Changes
+lib/Test/Mock/Mango.pm
+lib/Test/Mock/Mango/Collection.pm
+lib/Test/Mock/Mango/Cursor.pm
+lib/Test/Mock/Mango/DB.pm
+lib/Test/Mock/Mango/FakeData.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/collection.t
+t/collection/aggregate.t
+t/collection/create.t
+t/collection/drop.t
+t/collection/find.t
+t/collection/find_and_modify.t
+t/collection/find_one.t
+t/collection/full_name.t
+t/collection/insert.t
+t/collection/remove.t
+t/collection/update.t
+t/cursor.t
+t/cursor/all.t
+t/cursor/count.t
+t/cursor/limit.t
+t/cursor/next.t
+t/cursor/sort.t
+t/database/command.t
+t/db.t
+t/mango.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

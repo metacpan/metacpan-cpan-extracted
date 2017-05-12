@@ -1,0 +1,58 @@
+Revision history for Perl extension Teradata::SQL.
+
+0.01  Tue Nov 15 14:09:01 2005
+	- original version; created by h2xs 1.21 with options
+		-n Teradata::SQL
+
+0.02  Wed Mar 15 07:41:43 2006
+	- Added check to make sure MAX_FIELDS is not exceeded.
+	  Increased MAX_FIELDS to 520.
+
+0.03  Tue Jan 30 08:11:02 2007
+	- Added support (if you could call it that) for MS Visual C.
+	- Minor bug fixes.
+
+0.04  Tue Apr  1 10:50:46 2008
+	- Added support for BIGINT.
+	- Added server_info function.
+	- Added hints file for AIX.
+	- Bug fixes; added typedef for ByteInt.
+	- Added test for presence of CLI includes to help CPAN testers.
+
+0.05  Thu Apr  3 11:25:12 2008
+	- Added dec_digits method.
+	- Clarified handling of large decimals.
+
+0.06  Tue Oct 21 11:12:51 2008
+	- Corrections to server_info.
+
+0.07  Thu Dec 18 13:35:07 2008
+	- Added support for segmented requests.
+
+0.08  Fri Aug  7 16:09:23 2009
+	- Corrected Zfetch to handle multiple result sets from a single
+	  request.
+
+0.09  Mon Jan 18 21:06:30 2010
+	- Jacques Wernert reported a problem in reading empty strings.
+	  Changed newSVpv to newSVpvn to correct it.
+
+0.10  Wed Dec 28 12:40:02 2011
+	- Transitional release to support 64-bit OS's. Unfortunately,
+	  there are unresolved issues with 64-bit CLI, but the following
+	  changes are meant to ease the transition to 64-bit code.
+	- Changed handling of connection and request handles. In
+	  previous versions, these handles were actually pointers to
+	  the Session or Request structs, cast to IV's. Now we pass
+	  the actual struct as an SV. Required because under a 64-bit
+	  OS a pointer is not necessarily the same size as an int.
+	- Changed several longs to Int32, unsigned long to UInt32, etc.
+
+0.11  Mon Aug 11 14:20:01 2014
+	- Added LOGMECH support.
+
+0.12  Wed Sep 10 16:26:12 2014
+	- Added NUMBER support.
+
+0.14  Tue Sep 16 19:51:07 2014
+	- Better support for Windows.

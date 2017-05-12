@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Text/Karma.pm
+t/01_parsing.t
+t/02_storage.t

@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+t/00.load.t
+t/no-dash-T.t
+t/pod-coverage.t
+t/pod.t
+t/taint.t
+t/taint_deeply.t
+t/tainted.t
+t/tainted_ok.t
+t/tainted_ok_deeply.t
+Taint.pm
+Taint.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

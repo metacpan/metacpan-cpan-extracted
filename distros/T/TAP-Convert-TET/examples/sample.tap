@@ -1,0 +1,9 @@
+1..8
+ok 1 - Simple: parser created OK
+ok 2 - Simple: converter created OK
+ok 3 - The object isa TAP::Convert::TET
+ok 4 - Simple: results match
+ok 5 - All TAP syntax: parser created OK
+ok 6 - All TAP syntax: converter created OK
+ok 7 - The object isa TAP::Convert::TET
+ok 8 - All TAP syntax: results match

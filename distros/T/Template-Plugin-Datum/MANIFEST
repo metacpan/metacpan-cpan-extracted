@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Template/Plugin/Datum.pm
+t/datum.t

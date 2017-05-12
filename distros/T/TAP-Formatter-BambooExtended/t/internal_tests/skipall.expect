@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="t-internal_tests-skipall_test" errors="0" failures="0" tests="0" time="TEST_TIME" skipped="0">
+  <testcase name="t/internal_tests/skipall.test"/>
+</testsuite>

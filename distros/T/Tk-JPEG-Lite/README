@@ -1,0 +1,12 @@
+This is a "lite" version of Tk::JPEG which uses an already installed
+libjpeg shared library.
+
+Installation:
+
+perl Makefile.PL
+make 
+make test 
+make install
+
+Slaven Rezic  <slaven@rezic.de>
+

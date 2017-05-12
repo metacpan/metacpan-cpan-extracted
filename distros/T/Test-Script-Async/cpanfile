@@ -1,0 +1,40 @@
+requires "AE" => "0";
+requires "AnyEvent::Open3::Simple" => "0.86";
+requires "Probe::Perl" => "0";
+requires "Test2" => "0.000042";
+requires "Test2::Suite" => "0.000028";
+requires "perl" => "5.008001";
+recommends "EV" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0.94";
+  requires "perl" => "5.008001";
+};
+
+on 'test' => sub {
+  recommends "EV" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.008001";
+};
+
+on 'develop' => sub {
+  requires "FindBin" => "0";
+  requires "Test::CPAN::Changes" => "0";
+  requires "Test::EOL" => "0";
+  requires "Test::Fixme" => "0.07";
+  requires "Test::More" => "0.94";
+  requires "Test::NoTabs" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+  requires "Test::Pod::Spelling::CommonMistakes" => "0";
+  requires "Test::Spelling" => "0";
+  requires "Test::Strict" => "0";
+  requires "YAML" => "0";
+};
+
+on 'develop' => sub {
+  recommends "YAML::XS" => "0";
+};

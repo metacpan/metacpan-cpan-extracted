@@ -1,0 +1,33 @@
+
+
+use FileHandle;
+
+my $fname1 = $ARGV[0];
+my $fname2 = $ARGV[1];
+
+my $file1 = new FileHandle("<$fname1");
+my $file2 = new FileHandle("<$fname2");
+
+my $linec1, $linec2 = 0;
+my ($line1,$line2);
+while (1) {
+	$line1 = next_line($file1);
+	$line2 = next_line($file2);
+	last unless (defined $line1 || defined $line2);
+	$linec1++ if $line1;
+	$linec2++ if $line2;
+	if ($line1 ne $line2) { 
+		print "($linec1)\<$line1\n" if defined $line1;
+		print "($linec2)\>$line2\n" if defined $line2;
+	};
+}
+
+$file1->close;
+$file2->close;
+
+sub next_line {
+	my $fh = shift;
+	return undef if eof($fh);
+	return <$fh>;
+}
+

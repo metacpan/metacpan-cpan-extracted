@@ -1,0 +1,13 @@
+The makefile contains the actual commands for the demo, which are nothing simpler than one of these:
+
+$ copyright-injection.pl  . check
+$ copyright-injection.pl  . add
+$ copyright-injection.pl  . remove
+$ copyright-injection.pl  --help
+
+
+DEMO
+$ make remove            # deletes copyright notices from all pl and pm files under lib/ and script/
+$ make grep              # verify that copyright notices have been removed
+$ make add               # add copyright notices back again
+$ make grep              # verify they have been added

@@ -1,0 +1,31 @@
+#
+# This file tests the INCLUDE directive with print filters and formats
+#
+
+# INCLUDE using 'sr' (search/replace) print filter
+fred-> This is a quoted block
+fred-> This is the next line
+> T    
+> T    
+
+
+# INCLUDE using 'escape' (escape characters) print filter
+Madam, I\'m Adam.
+\"Enough of that\", she said.
+
+# INCLUDE using a print format 
+-->[Madam, I'm Adam.]
+["Enough of that", she said.]<--
+
+# INCLUDE using both a filter and a print formatter
+-->[ Madam, I\'m Adam. ]
+[ \"Enough of that\", she said. ]<---
+
+-- woops, forgot to include a string marker --
+-- woops, forgot to include a string marker --
+
+
+
+
+
+

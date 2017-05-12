@@ -1,0 +1,2 @@
+#!/bin/sh
+perl `dirname $0`/Makefile.PL

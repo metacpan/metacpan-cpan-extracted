@@ -1,0 +1,32 @@
+---
+abstract: 'Perl extension for formatting text with livedoor Wiki Style. '
+author:
+  - polocky
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.88'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Livedoor-Wiki
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Data::Inheritable: 0
+  Module::Pluggable: 0
+  Scalar::Util: 0
+  Test::Base: 0.56
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::Memory::Cycle: 0
+  UNIVERSAL::require: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

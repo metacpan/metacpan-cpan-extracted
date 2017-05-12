@@ -1,0 +1,87 @@
+Revision history for Test-Rinci
+
+0.14    2016-03-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add example name (in addition to summary) to test name, if
+	  available.
+
+
+0.13    2016-02-21 (PERLANCAR)
+
+	- Handle result_naked when testing example result.
+
+
+0.12    2016-02-17 (PERLANCAR)
+
+	- Check that argument's default value validates against schema.
+
+
+0.11    2016-01-19 (PERLANCAR)
+
+	- [Incompatible change] in example specification in function
+	  metadata, result now means the whole result not just actual
+	  result (third element) in an enveloped result.
+
+
+0.10    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.09    2014-12-17 (PERLANCAR)
+
+	- Add some options to test-rinci: --exclude-function,
+	  --exclude-package, -W, -E.
+
+        - Remove the use of Log::Any::App to reduce deps.
+
+
+0.08    2014-07-18 (SHARYANTO)
+
+        - Add diag+explain when testing result.
+
+
+0.07    2013-12-21 (SHARYANTO)
+
+        - No functional changes. Adjust to Perinci::Access::Perl 0.55+ (list
+          action returns relative URIs).
+
+
+0.06    2013-11-20 (SHARYANTO)
+
+        - No functional changes. Add 'use experimental smartmatch' for perl
+          5.18+.
+
+
+0.05    2013-11-07 (SHARYANTO)
+
+        - Allow skipping testing an example if example's 'test' property is set
+          to 0 (Rinci 1.1.41).
+
+
+0.04    2013-10-15 (SHARYANTO)
+
+        - Recognize Rinci 1.1.39's examples with 'src' (but skips them for now).
+
+
+0.03    2013-09-08 (SHARYANTO)
+
+        - Replace Perinci::Access::InProcess with ::Perl.
+
+
+0.02    2013-08-22 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Forgot to 'use File::Spec'.
+
+
+0.01    2012-10-31 (SHARYANTO)
+
+        - First release.

@@ -1,0 +1,84 @@
+Extendable Interfaces
+---------------------
+
+There are several packages in the Test::AutoBuild code base that are designed to
+be extended or replaced if you wish to do so.
+
+Here is a list of the base packages and their public interfaces.  When you
+extend or replace any of these packages, you must make sure to provide
+implementations of these methods.
+
+package Test::AutoBuild::Stage;
+sub new
+  IN A: class reference or class name
+  IN B: (possibly empty) flattened hash of parameters
+  ACTION: create a new stage object
+  OUT: stage object
+
+sub option
+  IN A: class reference
+  IN B: string
+  IN C: (optional) scalar
+  ACTION: If C is provided, set the value of the option named A.  This value
+          must persist until the object is destroyed or the value is reset
+  OUT: the value of the option named A (after setting it to C when applicable)
+
+sub run
+  IN A: class reference
+  ACTION: Perform the action that this stage is meant to perform.  It is
+          expected that the stage's status will be set before returning.  It is
+          expected that the stage's start_time will be set to the time at which
+          the run method is called, and the stage's end_time will be set to the
+          time at which the run method exits.  Finally, it is expected that the
+          stage will run each of its substages which are enabled.
+  OUT: A list: the first element is any true value upon success or any false
+       value upon failure.  The second element in the list is optional.  If
+       present, it is a string describing the outcome of the method call.
+
+sub name
+  IN A: class reference
+  IN B: (optional) string
+  ACTION: set the stage's name to B if it is supplied.
+  OUT: the stage's name
+
+sub label
+  IN A: class reference
+  IN B: (optional) string
+  ACTION: set the stage's label to B if it is supplied.
+  OUT: the stage's label
+
+sub start_time
+  IN A: class reference
+  IN B: (optional) integer describing date in seconds since epoch
+  ACTION: set the stage's start_time to B if it is supplied.
+  OUT: the stage's start_time
+
+sub end_time
+  IN A: class reference
+  IN B: (optional) integer describing date in seconds since epoch
+  ACTION: set the stage's end_time to B if it is supplied.
+  OUT: the stage's end_time
+
+sub stages
+  IN A: class reference
+  IN B: (optional) reference to an array of Stage object references
+  ACTION: set the stage's list of substages to B if it is supplied.
+  OUT: the stage's list of substages
+
+sub status
+  IN A: class reference
+  IN B: (optional) string - one of 'success', 'failure'
+  ACTION: set the stage's status to B if it is supplied.
+  OUT: the stage's status
+
+sub is_critical
+  IN A: class reference
+  IN B: (optional) boolean value
+  ACTION: set the stage's criticalness to B if it is supplied.
+  OUT: the stage's criticalness
+
+sub enabled
+  IN A: class reference
+  IN B: (optional) boolean value
+  ACTION: set the stage's enabled status to B if it is supplied.
+  OUT: the stage's enabled status

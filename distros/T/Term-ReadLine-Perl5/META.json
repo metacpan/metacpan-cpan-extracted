@@ -1,0 +1,109 @@
+{
+   "abstract" : "Perl5 version of GNU ReadLine.",
+   "author" : [
+      "Rocky Bernstein <rocky@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-ReadLine-Perl5",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::HomeDir" : "0.81",
+            "File::Spec" : "0",
+            "Term::Cap" : "0",
+            "Term::ReadKey" : "2.3"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "perl" : "5.008005"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "rlib" : "0.02"
+         },
+         "requires" : {
+            "Class::Accessor::Lite" : "0.05",
+            "File::HomeDir" : "0.81",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "POSIX" : "0",
+            "Term::ReadKey" : "2.3",
+            "Text::VisualWidth::PP" : "0",
+            "Unicode::EastAsianWidth::Detect" : "0.03",
+            "perl" : "5.008005",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Term::ReadLine::Perl5" : {
+         "file" : "lib/Term/ReadLine/Perl5.pm",
+         "version" : "1.43"
+      },
+      "Term::ReadLine::Perl5::Common" : {
+         "file" : "lib/Term/ReadLine/Perl5/Common.pm"
+      },
+      "Term::ReadLine::Perl5::Dumb" : {
+         "file" : "lib/Term/ReadLine/Perl5/Dumb.pm"
+      },
+      "Term::ReadLine::Perl5::History" : {
+         "file" : "lib/Term/ReadLine/Perl5/History.pm"
+      },
+      "Term::ReadLine::Perl5::Keymap" : {
+         "file" : "lib/Term/ReadLine/Perl5/Keymap.pm"
+      },
+      "Term::ReadLine::Perl5::OO" : {
+         "file" : "lib/Term/ReadLine/Perl5/OO.pm",
+         "version" : "0.43"
+      },
+      "Term::ReadLine::Perl5::OO::History" : {
+         "file" : "lib/Term/ReadLine/Perl5/OO/History.pm"
+      },
+      "Term::ReadLine::Perl5::OO::Keymap" : {
+         "file" : "lib/Term/ReadLine/Perl5/OO/Keymap.pm"
+      },
+      "Term::ReadLine::Perl5::OO::State" : {
+         "file" : "lib/Term/ReadLine/Perl5/OO/State.pm"
+      },
+      "Term::ReadLine::Perl5::TermCap" : {
+         "file" : "lib/Term/ReadLine/Perl5/TermCap.pm"
+      },
+      "Term::ReadLine::Perl5::Tie" : {
+         "file" : "lib/Term/ReadLine/Perl5/Tie.pm",
+         "version" : "1.43"
+      },
+      "Term::ReadLine::Perl5::readline" : {
+         "file" : "lib/Term/ReadLine/Perl5/readline.pm",
+         "version" : "1.43"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rocky/p5-Term-ReadLine-Perl5/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/rocky/p5-Term-ReadLine-Perl5"
+      }
+   },
+   "version" : "1.43"
+}

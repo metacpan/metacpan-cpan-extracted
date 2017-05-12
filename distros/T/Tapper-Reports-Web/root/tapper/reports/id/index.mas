@@ -1,0 +1,81 @@
+<%args>
+    $report
+    $failures => {}
+    $overview
+    %reportlist_rga => {}
+    %reportlist_rgt => {}
+</%args>
+<link rel="stylesheet" type="text/css" title="Red" href="/tapper/static/css/tap_formatter_html.css" />
+<script type="text/javascript" src="/tapper/static/js/tap_formatter_html_jquery-1.2.3.pack.js"></script>
+<script type="text/javascript" src="/tapper/static/js/tap_formatter_html.js"></script>
+
+% use Tapper::TAP::Harness;
+% no warnings 'uninitialized'; # because hell, its a template. Its ok in here.
+% if ( $report ) {
+% my $report_name = $report->suite ? $report->suite->name : 'unknown suite';
+    <h3>
+        Report
+        <strong><% $report->id %></strong>:
+        <strong><a href="/tapper/reports/suite/<% $report_name %>"><% $report_name %></a></strong>
+    </h3>
+
+    <!-- ************************************************************ -->
+
+        <& /tapper/reports/report_group_list.mas, report => $report, reportlist_rga => \%reportlist_rga, reportlist_rgt => \%reportlist_rgt &>
+
+    <!-- ************************************************************ -->
+
+	<ul class="post_info">
+		<li class="date">report id: <strong><% $report->id %></strong></li>
+		<li class="date"><% $report->created_at->ymd %> <% $report->created_at->hms %> GMT</li>
+		<li class="meta"><% (grep /./, $report->sections_cpuinfo)[0] || '' %></li>
+%               if (my $os = (grep /./, $report->sections_osname)[0]) {
+		<li class="meta"><% $os %></li>
+%               }
+		<li class="meta">
+                        Host: '<strong><% $report->machine_name || 'unknown host' %></strong>'
+%                       if ($report->machine_description) {
+                        	(<% $report->machine_description %>)
+%                       }
+                </li>
+	</ul>
+
+    <!-- ************************************************************ -->
+
+        <& /tapper/reports/report_details.mas, report => $report, failures => $failures &>
+
+    <!-- ************************************************************ -->
+
+    <& /tapper/testruns/testrun_overview.mas, overview => $overview &>
+
+    <!-- ************************************************************ -->
+
+        <h4>Test results</h4>
+%       if ($report && $report->tap && $report->tap->tap) {
+%               my $harness = new Tapper::TAP::Harness( tap => $report->tap->tap,
+%                                                        tap_is_archive => $report->tap->tap_is_archive );
+%               my $html = $harness->generate_html;
+                <% $html | n %>
+%       } else {
+                No TAP available.
+%       }
+
+    <!-- ************************************************************ -->
+
+        <p>
+          <ul class="additional_table">
+            <li><a href="/tapper/reports/tap/<% $report->id%>">raw TAP report</a></li>
+          </ul>
+        </p>
+
+    <!-- ************************************************************ -->
+
+        <& /tapper/reports/report_files.mas, report => $report &>
+
+    <!-- ************************************************************ -->
+
+% }
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

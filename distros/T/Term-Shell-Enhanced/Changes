@@ -1,0 +1,35 @@
+Revision history for Perl extension Term-Shell-Enhanced
+
+1.101420  2010-05-22 11:41:27 Europe/Vienna
+    - added documentation and a better synopsis and eg/testsh.pl
+    - removed unused variables
+
+1.100820  2010-03-23 17:45:04 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.05  Thu 2010.02.11 15:00:29 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.04  Thu, 29 May 2008 12:08:22 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - fixed pod typo ('unterscores')
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.03  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - simplified accessor declaration
+
+0.02  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+
+0.01  Wed, 03 Oct 2007 23:15:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

@@ -1,0 +1,19 @@
+#title Examples
+
+<example>
+
+      Hello
+
+           There [1]
+
+</example>
+
+<example>
+
+      1, 2, 3
+
+           Test [2]
+
+[2] Not a footnote
+
+

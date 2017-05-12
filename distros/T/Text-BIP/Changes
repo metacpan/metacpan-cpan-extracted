@@ -1,0 +1,9 @@
+Revision history for Text::BIP.
+
+0.51 Jan 21 2004
+	- Fixed test script problem reported by CPAN testers.
+	- Cleaned up docs a bit.
+
+0.5  Jan 14 2004
+	- Initial version released into CPAN.
+

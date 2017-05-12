@@ -1,0 +1,25 @@
+#
+
+_default_2:
+  l : [ l1, l2 ]
+
+two:
+  a : 2a
+  b : bb
+
+four:
+  b : 4b
+  c : cc
+  d :
+    e : 4e
+    f : 4f
+  l : [ '' , l4 ]
+
+six:
+  z1 : [ a, b, c, d ]
+  z2 : one
+  z3 : two
+
+eight:
+  c  : 8a
+  x0 : foo

@@ -1,0 +1,31 @@
+---
+abstract: 'A Task to install all compression related POE Filters.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-POE-Filter-Compression
+requires:
+  POE: '1.0001'
+  POE::Filter::Bzip2: '1.54'
+  POE::Filter::LZF: '1.64'
+  POE::Filter::LZO: '1.64'
+  POE::Filter::LZW: '1.64'
+  POE::Filter::Zlib: '1.93'
+resources:
+  homepage: https://github.com/bingos/task-poe-filter-compression
+  repository: https://github.com/bingos/task-poe-filter-compression.git
+version: '1.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

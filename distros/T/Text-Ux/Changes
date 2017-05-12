@@ -1,0 +1,17 @@
+Revision history for Perl extension Text-Ux
+
+0.11 2015-02-03T09:12:45Z
+	- Allow to pass a IV to search methods
+	- Hack to work around an error on Clang
+
+0.10 2014-10-16T16:05:52Z
+	- Support in-memory dictionary data
+	  load/save methods allow an scalarref.
+
+0.02 2014-09-07T15:26:56Z
+	- Update docs
+
+0.01 2014-02-22T19:16:12Z
+
+    - original version
+

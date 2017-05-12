@@ -1,0 +1,1 @@
+<%my $name = shift%>Hello <%=$name%>. Foo is: <%=$foo%> and bar is <%=$bar->[0]%>

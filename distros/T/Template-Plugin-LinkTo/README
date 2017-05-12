@@ -1,0 +1,91 @@
+SYNOPSIS
+    Input:
+
+      [% USE LinkTo -%]
+      [% args = {
+          href => '/link/to',
+      } -%]
+      [% LinkTo.link_to('link_text', args) %]
+
+    Output:
+
+      <a href="/link/to">link_text</a>
+
+    Input:
+
+      [% USE LinkTo -%]
+      [% args = {
+          href => '/link/to',
+          hoge => 'huga',
+          foo  => 'bar',
+      } -%]
+      [% LinkTo.link_to('link_text', args) %]
+
+    Output:
+
+      <a href="/link/to?foo=bar&hoge=huga">link_text</a>
+
+    Input:
+
+      [% USE LinkTo -%]
+      [% args = {
+          href   => '/link/to',
+          hoge   => 'huga',
+          target => '_blank',
+      } -%]
+      [% LinkTo.link_to('link_text', args) %]
+
+    Output:
+
+      <a href="/link/to?hoge=huga" target="_blank">link_text</a>
+
+    Input:
+
+      [% USE LinkTo -%]
+      [% args = {
+          href    => '/link/to',
+          hoge    => 'huga',
+          target  => '_blank',
+          confirm => 'really ?',
+      } -%]
+      [% LinkTo.link_to('link_<br />a&b<br />"text"', args) %]
+
+    Output:
+
+      <a href="/link/to?hoge=huga" target="_blank" onclick="return confirm('really ?');">link_&lt;br /&gt;a&amp;b&lt;br /&gt;&quot;text&quot;</a>
+
+    Input:
+
+      [% USE LinkTo -%]
+      [% args = {
+      } -%]
+      [% LinkTo.link_to('link_text', args) %]
+
+    Output:
+
+      link_text
+
+  Sample with DBIx::Class::ResultSet
+      [% USE LinkTo -%]
+      [%- WHILE (u = users.next) -%]
+      [% args = {
+          href => "user/${u.id}",
+          hoge => 'huga',
+          foo  => 'bar',
+      } -%]
+      [% LinkTo.link_to(u.nickname, args) %]
+      [%- END %]
+ 
+DESCRIPTION
+    Template::Plugin::LinkTo is like link_to in Ruby on Rails, but NOT same
+    at all.
+
+SEE ALSO
+    Template, Template::Plugin
+
+AUTHOR
+    Tomoya Hirano, <hirafoo@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This library is free software; you can redistribute it and/or modify
+

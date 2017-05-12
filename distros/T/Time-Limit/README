@@ -1,0 +1,89 @@
+NAME
+    Time::Limit - kill your broken Perl script
+
+SYNOPSIS
+       use strict;
+       use warnings;
+       use Time::Limit '0.5';
+   
+       while (1) {
+          print "infinite loop\n";
+       }
+
+DESCRIPTION
+    It is oh so very easy to accidentally write a Perl script that dives
+    straight into an infinite loop, or stumbles into a runaway recursion. In
+    most cases, you can hit `Ctrl + C` and get on with the job of figuring out
+    what went wrong. However, if you're not running the process in a local
+    terminal (e.g. you're running it over a slow SSH connection, or not in a
+    terminal at all), these processes might be tricky to kill.
+
+    The Time::Limit module starts a monitor process that shadows your script's
+    execution, and kills it off if your script has overrun its allotted time
+    limit. Because Time::Limit is global in effect its use in modules is
+    discouraged. Instead, use it only in your main script, or pass it as a
+    parameter to Perl on the command line:
+
+       perl -MTime::Limit myscript.pl
+
+    The syntax for using Time::Limit is:
+
+       use Time::Limit @flags, $limit;
+
+    Flags are strings prefixed with a hyphen. The following flags are
+    supported:
+
+    `-group`
+        Send the signal to your script's process group instead of its
+        individual process number. That is, your script and any child
+        processes started with `fork` will be killed.
+
+    `-quiet`
+        Kill the script quietly.
+
+    `-verbose`
+        Output extra debugging information.
+
+    The $limit is a number indicating the time in seconds before your script
+    gets killed. It does not have to be an integer. It defaults to a very
+    generous 10.
+
+    Be careful to avoid triggering Perl's `use MODULE VERSION` syntax.
+
+       use Time::Limit -verbose, 4.0;  # yep, kill after 4 seconds
+       use Time::Limit '4.0';          # yep, kill after 4 seconds
+       use Time::Limit 4.0;            # nah, want $VERSION==4.0
+
+    After $limit is reached, Time::Limit will try signalling your script to
+    terminate cleanly (SIGTERM) a few times; if that fails, it will become
+    more aggressive and send SIGKILL signals until it receives word of your
+    script's timely death.
+
+    Some random examples using Time::Limit from the command-line:
+
+       perl -MTime::Limit=-quiet,4 myscript.pl
+       perl -MTime::Limit=-group,-verbose,4.1 myscript.pl
+       perl -MTime::Limit=3 myscript.pl
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Time-Limit>.
+
+SEE ALSO
+    Time::Out - this allows you to apply a timeout to an individual block of
+    code, and then gracefully carry on.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

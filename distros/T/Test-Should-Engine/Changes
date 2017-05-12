@@ -1,0 +1,40 @@
+Revision history for Perl extension Test::Should::Engine
+
+0.04
+
+    commit 2007f3b6a40f8714c6e4192df3c86cb1369a090f
+    Author: Kentaro Kuribayashi <kentarok@gmail.com>
+    Date:   Tue Nov 6 16:30:14 2012 +0900
+
+    Fixed `should_have_length` couldn't handle ARRAY value correctly.
+
+    lib/Test/Should/Engine.pm |    6 +++++-
+    t/Test-Should-Engine.t    |   19 +++++++++++++++----
+    2 files changed, 20 insertions(+), 5 deletions(-)
+
+    commit afbf922254b9e42afba1114aab4b155cf73f95f9
+    Author: Kentaro Kuribayashi <kentarok@gmail.com>
+    Date:   Tue Nov 6 16:21:15 2012 +0900
+
+    Added a description about `should_be_an` into POD.
+
+    lib/Test/Should/Engine.pm |    3 ++-
+    1 file changed, 2 insertions(+), 1 deletion(-)
+
+    commit 5210d984f4b8185e2c317c6e96da35d3aecf7539
+    Author: Kentaro Kuribayashi <kentarok@gmail.com>
+    Date:   Tue Nov 6 16:19:32 2012 +0900
+
+    Added `should_be_an` as a variation of `should_be_a`.
+
+0.03
+
+    - added should_be_true, should_be_false, should_be_undef
+
+0.02
+
+    [BUG FIX]
+    - should_equal throws exception on scalar values
+
+0.01    Fri Oct 26 10:14:16 2012
+    - original version

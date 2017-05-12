@@ -1,0 +1,38 @@
+---
+abstract: unknown
+author:
+  - 'Matthaeus Kiem <cuer2s@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Choose-Util
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Encode::Locale: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  Term::Choose: '1.500'
+  Term::Choose::LineFold: '1.500'
+  Term::ReadKey: '0'
+  constant: '0'
+  perl: '5.008003'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/kuerbis/Term-Choose-Util
+version: '0.051'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

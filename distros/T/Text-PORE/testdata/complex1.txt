@@ -1,0 +1,10 @@
+Name: Joe Smith
+Children:
+
+	John Smith, 10, Male
+
+	Jack Smith, 15, Male
+
+	Joan Smith, 20, Female
+
+	Jim Smith, 25, Male

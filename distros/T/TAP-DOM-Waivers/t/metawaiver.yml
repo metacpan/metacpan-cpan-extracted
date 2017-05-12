@@ -1,0 +1,6 @@
+---
+- comment: Force all failed IPv6 stuff to true
+  match_dpath:
+    - "//lines//description[value =~ /IPv6/]/../is_ok[value eq 0]/.."
+  metapatch:
+    TODO:  ignore failing IPv6 related tests

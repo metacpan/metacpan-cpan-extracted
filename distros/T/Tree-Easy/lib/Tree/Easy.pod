@@ -1,0 +1,243 @@
+=head1 NAME
+
+Tree::Easy - An easy, simple & fast N-ary tree datatype
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+  use Tree::Easy;
+
+  my $foo = Tree::Easy->new();
+  $foo->data('foo');
+
+  $foo->push_new('bar');
+  my $bar = $foo->search('bar')
+    or die q{Couldn't find bar!};
+
+  # You can also use references as data
+  $bar->push_new(['baz']);
+  my $baz = $foo->search( sub { eval { shift->data->[0] eq 'baz' }} )
+    or die q{Couldn't find baz!};
+
+=head1 DESCRIPTION
+
+Tree::Easy is a very minimal tree class.  It was designed to be easy
+to use and quick.  It's one of the fastest pure-perl tree modules and
+easiest in my horribly biased opinion.
+
+=head1 REPRESENTATION
+
+A Tree::Easy object is a blessed arrayref.  This array contains the
+children of the node.  You can modify it directly if you dare.  These
+children are also Tree::Easy objects.  Each node is therefore a tree
+if it has children making a recursive structure.  The child node is
+completely unaware of its parent node.
+
+Data is stored privately in a inside-out object fashion.  Data can
+only be accessed using the node's data method.
+
+=head1 WARNING
+
+Tree::Easy does not check to make sure you do not make an invalid
+tree.  You can make cycles and have one node appear twice in the tree.
+This violates the concept of a tree.  I might add a simple check
+later if the need arises.
+
+=head1 METHODS
+
+Arguments given in brackets are optional.
+
+=head2 new [$data]
+
+  my $tree = Tree::Easy->new();
+  my $tree = Tree::Easy->new( 'root' );
+
+Creates a new tree or node depending on your point of view.
+Stores data into the new node if supplied any.
+
+=head2 data [$newdata]
+
+  my $data = $tree->data;
+  $tree->data( 'foo' );
+  $tree->data( [ 'foo' ] );
+  $tree->data( { foo => 'bar' } );
+
+Retrieves or stores data assigned to the node.
+
+=head2 clone
+
+  my $tree_copy = $tree->clone;
+
+Creates a copy of the given tree.  This also creates a shallow copy
+of every node's data (only one level deep).
+
+=head2 insert_node $node [$where=-1]
+
+  my $node = Tree::Easy->new('foo');
+  $tree->insert_node($node)
+
+=head2 push_new $data
+
+  $new_node = $tree->push_new('right');
+
+=head2 unshift_new $data
+
+  $new_node = $tree->unshift_new('left');
+
+=head2 push_node $node
+
+  $new_node = $tree->push_node( Tree::Easy->new('right') );
+
+=head2 unshift_node $node
+
+  $new_node = $tree->push_node( Tree::Easy->new('left') );
+
+=head2 npush [@args]
+
+  @new_nodes = $tree->npush( @datum_or_nodes )
+
+This calls push_node for each argument that is a Tree::Easy object,
+and calls push_new for each argument that is anything else.
+
+The new nodes created are returned.
+
+=head2 nunshift [@args]
+
+  @new_nodes = $tree->unshift( @datum_or_nodes )
+
+This calls unshift_node for each argument that is a Tree::Easy object,
+and calls unshift_new for each argument that is anything else.
+
+The new nodes created are returned.
+
+=head2 remove_node $which
+
+  my $node = $tree->remove_node(0);
+
+=head2 pop_node
+
+Pretty obvious.
+
+=head2 shift_node
+
+Pretty obvious.
+
+=head2 traverse $code_ref [$how=0]
+
+  $root->$traverse( { printf "%s\n", shift->data }, -1 );
+
+=over
+
+=item $coderef
+
+Code to run on each node, it is passed the node as its only argument.
+
+=item $how
+
+Whether to traverse in prefix (-1), infix (0), or postfix (1).
+
+=back
+
+=head2 search $code_ref [$how='dfs']
+
+  my $found = $root->search( { shift->data == 'findme' }, 'dfs' );
+
+=over
+
+=item $code_ref
+
+Code to run on each node, it is passed the node as its only argument.
+Return 1 when you find what you need.
+
+=item $how
+
+Whether to do a breadth-first-search (bfs) or depth-first-search (dfs).
+
+=item $found
+
+When you return a true value, the search function returns the reference
+to that node you were just visiting.
+
+=back
+
+=head2 get_height
+
+Returns the height of the tree.
+
+=head2 dumper
+
+Dump the tree.  The tree structure is shown similar to the unix 'tree' command.
+The data of each node is dumped with C<dump_node_data>.
+
+=head2 dump_node_data
+
+Dumps the node data using L<Data::Dumper>.  C<dumper> uses this method.
+
+=head1 AUTHOR
+
+Justin Davis, C<< <jrcd83 at gmail.com> >>
+
+=head1 BUGS
+
+Email any bugs to me at the above address.  Or use the thing below.
+
+Please report any bugs or feature requests to C<bug-tree-tiny at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tree-Easy>.  I will
+be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Tree::Easy
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tree-Easy>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Tree-Easy>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Tree-Easy>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Tree-Easy/>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Tree::Fast> - not as fast ;)
+
+=item * L<Tree::Simple> - not as simple ;)
+
+=item * L<Tree::DAG_Node> - pretty advanced trees.
+
+=item * L<Tree::Node> - very very fast XS tree module, scalars for data.
+
+=item * Theres a ton more on CPAN, mostly more complex.
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Justin Davis, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

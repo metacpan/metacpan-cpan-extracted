@@ -1,0 +1,224 @@
+NAME
+
+    Test::BrewBuild - Perl/Berry brew unit testing automation, with remote
+    tester dispatching capabilities.
+
+DESCRIPTION
+
+    This module is the backend for the brewbuild script that is accompanied
+    by this module.
+
+    For end-user use, see brewbuild
+    <https://metacpan.org/pod/distribution/Test-BrewBuild/bin/brewbuild>.
+    You can also read the documentation for the network dispatcher
+    bbdispatch
+    <https://metacpan.org/pod/distribution/Test-BrewBuild/bin/bbdispatch>,
+    the remote test listener bbtester
+    <https://metacpan.org/pod/distribution/Test-BrewBuild/bin/bbtester>, or
+    browse through the Test::BrewBuild::Tutorial for network testing.
+
+    This module provides you the ability to perform your unit tests across
+    all of your Perlbrew <http://perlbrew.pl> (Unix) or Berrybrew
+    <https://github.com/stevieb9/berrybrew> (Windows) Perl instances.
+
+    For Windows, you'll need to install Berrybrew
+    <https://github.com/stevieb9/berrybrew>, and for Unix, you'll need
+    Perlbrew <http://perlbrew.pl>.
+
+    It allows you to remove and reinstall on each test run, install random
+    versions of perl, or install specific versions.
+
+    All unit tests are run against all installed instances, unless
+    specified otherwise.
+
+SYNOPSIS
+
+        use Test::BrewBuild;
+    
+        my $bb = Test::BrewBuild->new;
+    
+        my @perls_available = $bb->perls_available;
+        my @perls_installed = $bb->perls_installed;
+    
+        # remove all currently installed instances of perl, less the one you're
+        # using
+    
+        $bb->instance_remove;
+    
+        # install four new random versions of perl
+    
+        $bb->instance_install(4);
+    
+        # install two specific versions
+    
+        $bb->instance_install(['5.10.1', '5.20.3']);
+    
+        # install all instances
+    
+        $bb->instance_install(-1);
+    
+        # find and test against all the current module's reverse CPAN dependencies
+    
+        $bb->revdep;
+    
+        # run the unit tests of the current module only
+    
+        $bb->test;
+
+METHODS
+
+ new(%args)
+
+    Returns a new Test::BrewBuild object. See the documentation for the
+    brewbuild
+    <https://metacpan.org/pod/distribution/Test-BrewBuild/bin/brewbuild>
+    script to understand what the arguments are and do.
+
+    Many of the options can be saved in a configuration file if you want to
+    set them permanently, or override defaults. Options passed into the
+    various methods will override those in the configuration file. See
+    config file documentation
+    <https://metacpan.org/pod/distribution/Test-BrewBuild/lib/Test/BrewBuild/brewbuild.conf.pod>.
+
+ brew_info
+
+    Returns in string form the full output of *brew available.
+
+ perls_available
+
+    Returns an array containing all perls available, whether already
+    installed or not.
+
+ perls_installed
+
+    Returns an array of the names of all perls currently installed under
+    your *brew setup.
+
+ instance_install
+
+    If an integer is sent in, we'll install that many random versions of
+    perl. If the integer is -1, we'll install all available versions. You
+    can also send in an array reference, where each element is a version of
+    perl, and we'll install those instead.
+
+    You can send a second parameter, an integer for a time out. On each
+    install, we'll bail if it takes longer than this time. Default is 300
+    seconds. If you're on a fast machine, you should probably lower this
+    value.
+
+    On Windows, where you want to install specific perls, we'll default to
+    installing 64-bit versions only, if a 64 bit perl is available for the
+    version desired and you haven't added the _64/_32 suffix per berrybrew
+    available.
+
+    Simply add the _32 suffix if you want to install it specifically. Note
+    that if you're dispatching to Unix and Windows servers, the Unix
+    systems will remove this invalid portion of the version prior to
+    processing further.
+
+ instance_remove
+
+    Uninstalls all currently installed perls, less the one you are
+    currently switched or used to.
+
+ test
+
+    Processes and returns the test results as a string scalar of the
+    distribution located in the current working directory.
+
+ revdeps
+
+    Returns a list of the reverse dependencies (according to CPAN) that the
+    module you're working on in the current working directory have.
+
+ revdep
+
+    Loops over all of the current module's reverse dependencies, and
+    executes test() on each one at a time. This helps you confirm whether
+    your new build won't break your downstream users' modules.
+
+ legacy
+
+    By default, we don't install perl versions less than v5.8.9. Pass in a
+    true value to override this default.
+
+ options(\%args)
+
+    Takes a hash reference of the command-line argument list, and converts
+    it into a hash of the translated Test::BrewBuild parameters along with
+    their values.
+
+    Returns the converted hash for passing back into new().
+
+    If an invalid argument is included, we'll set $args{error} = 1;. It is
+    up to the caller to look for and process an error handling routine.
+
+ config_file
+
+    Returns a string that contains the path/filename of the configuration
+    file, if available.
+
+ plugin('Module::Name')
+
+    Fetches and installs a custom plugin which contains the code that
+    perlbrew/berrybrew exec will execute. If not used or the module
+    specified can't be located (or it contains errors), we fall back to the
+    default bundled Test::BrewBuild::Plugin::DefaultExec (which is the
+    canonical example for writing new plugins).
+
+    Note that you can send in a custom plugin *.pm filename to plugin as
+    opposed to a module name if the module isn't installed. If the file
+    isn't in the current working directory, send in the relative or full
+    path.
+
+ is_win
+
+    Helper method, returns true if the current OS is Windows, false if not.
+
+ log
+
+    Returns an instance of the packages log object for creating child log
+    objects.
+
+ tempdir
+
+    Sets up the object with a temporary directory used for test logs, that
+    will be removed after the run.
+
+ workdir
+
+    Returns the brewbuild working directory.
+
+ setup
+
+    Prints out detailed information on setting up a testing environment, on
+    Windows and Unix.
+
+ help
+
+    Displays the brewbuild command line usage information.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+SEE ALSO
+
+    Berrybrew for Windows:
+
+    https://github.com/stevieb9/berrybrew
+
+    Perlbrew for Unixes:
+
+    http://perlbrew.pl
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

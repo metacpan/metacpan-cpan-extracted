@@ -1,0 +1,59 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder::Group::Counter - counts execution of placeholder substitution
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder;
+	my $placeholder = Text::Placeholder->new(
+		my $counter = '::Counter');
+	$placeholder->compile('Counter: [=counter=]');
+
+	print ${$placeholder->execute()}, "<-\n";
+	print ${$placeholder->execute()}, "<-\n";
+	$counter->reset;
+	print ${$placeholder->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+Text::Placeholder::Group::Counter provides the placeholder 'counter'. Increments the counter each time 'execute' is called.
+
+
+=head1 METHOD REFERENCE (API)
+
+The design goal was a simple and robust API with a straightforward implementation, respecting all limitations of Perl 5. $obj refers to a Text::Placeholder object.
+
+=over 8
+
+=item reset
+
+Resets the counter to one.
+
+=item add_placeholder($placeholder, $code_ref)
+
+Adds the $code_ref under the name of $placeholder. $code_ref is executed and returns the current value to be substituted for $placeholder.
+
+=back
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+Text::Placeholder was part of a bigger software project and has recently been separated. However, the style of the code should be good enough for an initial release.
+
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

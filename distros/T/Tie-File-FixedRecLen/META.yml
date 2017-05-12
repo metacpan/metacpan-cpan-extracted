@@ -1,0 +1,32 @@
+---
+abstract: 'Fixed Length Record support for Tie:File'
+author:
+  - 'Oliver Gorwits <oliver@cpan.org>'
+build_requires:
+  Config: 0
+  File::Spec: 0
+  POSIX: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-File-FixedRecLen
+requires:
+  Carp: 0
+  Fcntl: 0
+  Symbol: 0
+  Tie::File: 0
+  base: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-File-FixedRecLen
+  homepage: https://github.com/ollyg/Tie-File-FixedRecLen/wiki
+  repository: git://github.com/ollyg/Tie-File-FixedRecLen.git
+version: 2.112531

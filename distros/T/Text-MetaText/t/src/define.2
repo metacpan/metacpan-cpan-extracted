@@ -1,0 +1,32 @@
+# this tests simple variable definition and substitution, in particular
+# testing the DEFINE directive for multiple variable definitions.  
+# Expected text is shown in (parenthesis).
+
+
+%% DEFINE name=World msg="Hello" %%
+%%msg%% %%name%%
+--
+%% DEFINE
+one = 1
+two = 2
+%%
+
+%% DEFINE
+   four = "IV"
+   five = "V"
+%%
+--
+%% one %% - %% two %% - %% three %% - %% four %% - %% five %%
+--
+
+
+%% DEFINE 
+   server = www.kfs.org
+   home   = /~abw/
+%%
+
+%% DEFINE 
+   homepage = http://$server${home}index.html
+%%
+
+my homepage: %% homepage %%

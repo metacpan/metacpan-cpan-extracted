@@ -1,0 +1,49 @@
+{
+   "abstract" : "create URL slugs from text",
+   "author" : [
+      "Robert Norris <rob@eatenbyagrue.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Slugify",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Text::Unaccent::PurePerl" : "0"
+         },
+         "requires" : {
+            "Exporter" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robn/Text-Slugify/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robn/Text-Slugify.git",
+         "web" : "https://github.com/robn/Text-Slugify"
+      }
+   },
+   "version" : "0.002"
+}
+

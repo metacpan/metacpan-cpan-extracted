@@ -1,0 +1,12 @@
+Revision history for Perl extension Template::Plugin::Trac
+
+1.02    Fri Apr 23 22:17 PDT 2010
+    - Switch to Git
+
+1.01    Sun Sep 30 15:43 PDT 2007
+    - POD updates
+    - switched to Module::Build instead of EU::MM
+    - added POD coverage tests
+
+1.000   Wed Sep 20 9:02pm 2006
+    - original version

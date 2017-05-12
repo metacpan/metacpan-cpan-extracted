@@ -1,0 +1,43 @@
+Received: (qmail 18560 invoked by alias); 28 Aug 2001 20:49:53 -0000
+Delivered-To: alias-localdelivery-skud-filter@e-smith.com
+Received: (qmail 18557 invoked by uid 5027); 28 Aug 2001 20:49:53 -0000
+Delivered-To: skud@allspice.e-smith.com
+Received: (qmail 18555 invoked by alias); 28 Aug 2001 20:49:53 -0000
+Delivered-To: alias-localdelivery-skud@e-smith.com
+Received: (qmail 18552 invoked by uid 8); 28 Aug 2001 20:49:52 -0000
+Received: from damper.ottawa.e-smith.com (192.168.16.182, claiming to be
+    "borscht.ottawa.e-smith.com")
+    by allspice.ottawa.e-smith.com with SMTP id smtpdj3HGM1; Tue,
+    28 Aug 2001 16:49:48 EDT
+Received: (qmail 23780 invoked by uid 5027); 28 Aug 2001 20:49:38 -0000
+Date: Tue, 28 Aug 2001 16:49:38 -0400
+From: Kirrily Robert <skud@e-smith.com>
+To: Kirrily Robert <skud@e-smith.com>
+X-Test-Mail: foo
+Subject: this is a test
+Message-Id: <20010828164938.A23775@e-smith.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2.5i
+Lines: 11
+
+foo: bar
+fOo-Bar: baz
+foo: quux
+FOO: quux
+subject: another test
+
+    wombat: koala
+> wibble: blerf
+
+thing:
+
+This is a test
+
+-- 
+Kirrily "Skud" Robert -- skud@e-smith.com
+Developer website: http://www.e-smith.org 
+Corporate website: http://www.e-smith.com
+
+

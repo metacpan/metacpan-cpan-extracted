@@ -1,0 +1,25 @@
+Warning from statistic library!
+  Warning code: 204
+  Warning message: Total bigram count cannot be less than to zero
+Skipping ngram one<>two<>5 13 7
+Warning from statistic library!
+  Warning code: 204
+  Warning message: Total bigram count cannot be less than to zero
+Skipping ngram one<>three<>5 13 5
+Warning from statistic library!
+  Warning code: 204
+  Warning message: Total bigram count cannot be less than to zero
+Skipping ngram one<>four<>3 13 5
+Warning from statistic library!
+  Warning code: 204
+  Warning message: Total bigram count cannot be less than to zero
+Skipping ngram two<>two<>2 3 7
+Warning from statistic library!
+  Warning code: 204
+  Warning message: Total bigram count cannot be less than to zero
+Skipping ngram two<>four<>1 3 5
+Warning from statistic library!
+  Warning code: 204
+  Warning message: Total bigram count cannot be less than to zero
+Skipping ngram three<>four<>1 1 5
+test-1.sub-3.cnt does not look like a ngram frequency file. The total ngrams should be greater than the sum of counts of all the ngrams.

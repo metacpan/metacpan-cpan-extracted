@@ -1,0 +1,49 @@
+NAME
+    Text::FileTree - convert a list of files with full paths to a tree
+
+DESCRIPTION
+    A file list can be organized in a number of ways. The two that most
+    probably comes to mind is a "state free" way, where each file is listed
+    with full path and doesn't depend on its context. The "find" command
+    outputs files in this way.
+
+    There is also the "stateful" way of display file lists, where each file
+    is sorted by its common parents. E.g., instead of
+
+     foo/bar
+     foo/baz
+
+    you might have the following structure instead:
+
+     foo/
+       bar
+       baz
+
+    This module does just that, converts a "plain" file listing in to the
+    "stateful", directory sorted, way.
+
+AVAILABILITY AND BUG REPORTING
+    Latest released version is available through CPAN. Latest development
+    version is available on github:
+
+    *   <http://metacpan.org/pod/Text::FileTree>
+
+    *   <http://github.com/olof/Text-FileTree>
+
+    Bugs can be reported on either rt.cpan.org, as an issue on github or as
+    an e-mail to me. The primary issue tracker is github.
+
+KNOWN BUGS AND LIMITATIONS
+    This module does not separate between a file and a directory. This only
+    affects leaf nodes, as you can deduce that a file with children is
+    indeed a directory. This is unlikely to be fixed, as there is really no
+    way of distinguish them in, say, the output from find. Often, you should
+    be able to determine this by context: e.g. by giving "find" the "-type
+    f" flag --- now all leaf nodes are regular files.
+
+COPYRIGHT
+    Copyright (c) 2012 - Olof Johansson <olof@cpan.org> All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

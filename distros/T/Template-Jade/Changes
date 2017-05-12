@@ -1,0 +1,17 @@
+Revision history for Template-Jade
+
+0.05
+	Fixed a bug with leftpadding in perl expressions
+
+0.04
+	Fixed a bug with - in chacater class
+
+0.03
+	Added small fix to split, need to make these work with ballanced quotes
+
+0.01-0.02  2014-05-21
+	Added and fixed self closing tags
+
+0.01_01    2014-05-19
+	First attempt at a port.
+

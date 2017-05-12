@@ -1,0 +1,9 @@
+0.02    Sun Oct 12 18:41:15 2008
+        Depend on new HTTP::Server::Simple to avoid race conditions in tests
+
+0.01    Fri Nov  2 14:34:26 2007
+        Version bump
+
+0.01_01 Wed Sep 26 16:15:16 2007
+        Initial release to CPAN
+

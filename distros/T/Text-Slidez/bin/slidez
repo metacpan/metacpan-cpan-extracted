@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2009 Eric L. Wilhelm
+
+=head1 NAME
+
+slidez - succinct slide setup
+
+=head1 About
+
+This program formats hbml (Shebangml) slides input into single or
+multi-file html output.
+
+Some manual setup of stylesheets and support files is still required.
+See the distribution directory for examples and stock stylesheets.
+
+=head1 USAGE
+
+  slidez [options] input.hbml [output.html]
+
+=head1 OPTIONS
+
+=over
+
+=item -i, --input FILE
+
+=for positional
+=for isa File::Fu::File
+
+Input filename.
+
+=item -o, --output FILE
+
+=for positional
+=for isa File::Fu::File
+
+Filename for single-file output.
+
+=item -d, --directory DIR
+
+=for isa File::Fu::Dir
+
+Directory for multi-file output.
+
+=item --version
+
+Show program version.
+
+=item -h, --help
+
+Show help.
+
+=back
+
+=cut
+
+$VERSION = v0.0.1;
+package bin::slidez;
+
+$VERSION = $main::VERSION;
+
+use warnings;
+use strict;
+
+use Getopt::AsDocumented;
+use Text::Slidez;
+
+sub main {
+  my (@args) = @_;
+
+  my $o = Getopt::AsDocumented->process(\@args) or return;
+
+  my $slidez = Text::Slidez->new->load($o->input->open);
+
+  if(my $dir = $o->directory) {
+    $dir->mkdir unless($dir->d);
+    #warn $slidez->dump;
+    my @slides = $slidez->slides;
+    for(my $i = 0; $i < @slides; $i++) {
+      my $file = $dir + sprintf("%03d.html", $i+1);
+      my $xhtml = $slidez->format_slide($slides[$i],
+        $i < $#slides ? (next => sprintf("%03d.html", $i + 2)) : (),
+        $i ? (prev => sprintf("%03d.html", $i)) : (),
+        last => sprintf("%03d.html", scalar @slides),
+        first => '001.html',
+      );
+      $file->write(["$xhtml"]);
+    }
+  }
+  else {
+    my $page = $slidez->as_single_page;
+    $o->output->write([ $page ]);
+  }
+}
+
+package main;
+
+use warnings;
+use strict;
+
+if($0 eq __FILE__) {
+  bin::slidez::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::slidez';

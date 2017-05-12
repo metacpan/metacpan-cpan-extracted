@@ -1,0 +1,35 @@
+--- 
+abstract: Extremely light-weight web-based authentication manager
+author: 
+  - Adam Kennedy <adamk@cpan.org>
+build_requires: 
+  File::Copy: 0
+  File::Remove: 0.37
+  IPC::Run3: 0.034
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: TinyAuth
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Authen::Htpasswd: 0.15
+  CGI: 3.00
+  CGI::Cookie: 0
+  Carp: 0
+  Email::MIME: 1.859
+  Email::MIME::Creator: 1.453
+  Email::Send: 2.182
+  File::Spec: 0.80
+  FindBin: 0
+  Module::CGI::Install: 0.04
+  Scalar::Util: 1.15
+  YAML::Tiny: 1.12
+  perl: 5.005
+version: 0.98

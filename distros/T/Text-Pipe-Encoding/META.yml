@@ -1,0 +1,49 @@
+---
+abstract: 'Text pipes that can encode and decode in various ways'
+author:
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+build_requires:
+  Carp: 0
+  Encode: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+  Text::Pipe: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101582, CPAN::Meta::Converter version 2.101591'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Pipe-Encoding
+provides:
+  Text::Pipe::Encoding:
+    file: lib/Text/Pipe/Encoding.pm
+    version: 1.101700
+  Text::Pipe::Encoding::Base64::Decode:
+    file: lib/Text/Pipe/Encoding/Base64/Decode.pm
+    version: 1.101700
+  Text::Pipe::Encoding::Base64::Encode:
+    file: lib/Text/Pipe/Encoding/Base64/Encode.pm
+    version: 1.101700
+  Text::Pipe::Encoding::QuotedPrint::Decode:
+    file: lib/Text/Pipe/Encoding/QuotedPrint/Decode.pm
+    version: 1.101700
+  Text::Pipe::Encoding::QuotedPrint::Encode:
+    file: lib/Text/Pipe/Encoding/QuotedPrint/Encode.pm
+    version: 1.101700
+requires:
+  MIME::Base64: 3.09
+  MIME::QuotedPrint: 3.09
+  Text::Pipe::Base: 0
+  parent: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Pipe-Encoding
+  homepage: http://search.cpan.org/dist/Text-Pipe-Encoding/
+  repository: http://github.com/hanekomu/Text-Pipe-Encoding
+version: 1.101700

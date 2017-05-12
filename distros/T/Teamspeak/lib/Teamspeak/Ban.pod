@@ -1,0 +1,6 @@
+=head1 NAME
+
+Teamspeak::Ban - a Teamspeak::Server may have different Bans.
+
+=cut
+

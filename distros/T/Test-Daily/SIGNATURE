@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ecfaccec664559f60465510768422068f3e218a9 Build.PL
+SHA1 d6cf98236c41c692d021ba09105493c91278f50a Changes
+SHA1 1b2f01d721d51cbf8e9a770b602cda016b97e9ee MANIFEST
+SHA1 0c646f01f4074bc61cac81124eec319dd8c9c095 META.yml
+SHA1 961559b2fdfbb71d395e9863adb4428ea72df0a8 README
+SHA1 e73bc4f0d99f2c5710de7e08174da434fe35849a conf/test-daily/test-daily.conf
+SHA1 2b482680cf3291ab26557d9adf46239e568169fb lib/Test/Daily.pm
+SHA1 cc59dc112d32dd2e222323cdb27f10780c2a808f lib/Test/Daily/SPc.pm
+SHA1 342f2f5742e0678d3884f10825084c932075981b script/test-daily
+SHA1 fb2d70e537749308dbed65d51e6e1e6eed7fdb48 share/test-daily/tt-lib/_footer.tt2
+SHA1 871c5b6127248356f3608035044d019a7b890da2 share/test-daily/tt-lib/_header.tt2
+SHA1 deacedfe279a9ac40e83395a3c2caff572cf6451 share/test-daily/tt-lib/atom.tt2
+SHA1 c1c91e1eeb674d10f679329cc5beaa109ffc69cd share/test-daily/tt-lib/test-feed-summary.tt2
+SHA1 2e600e03b5957ea86c815458e74529c27b08bf86 share/test-daily/tt/Makefile-project.tt2
+SHA1 e2c1edd1c939406a0373a8d489923b9aeccc06b7 share/test-daily/tt/Makefile-site.tt2
+SHA1 1dcf7baa485a9ea4aae932e96a2475b25e3b27eb share/test-daily/tt/Makefile-test.tt2
+SHA1 10ad57a419149d0d9d90c092a6770c01505e3239 share/test-daily/tt/project.tt2
+SHA1 41346bd22968a19df665a76e1e7c3462ba407cb3 share/test-daily/tt/site.tt2
+SHA1 a15cd510b0d85880ff64418918e531364707a02b share/test-daily/tt/summary2rssfeed.tt2
+SHA1 eac6498028dc5eb538a0133a27df374c90a55637 share/test-daily/xsd/atom.xsd
+SHA1 102d87e5e68e7edceb649c80b74a649e7e636541 share/test-daily/xsd/xml.xsd
+SHA1 605f05a5336cc37a476bb10b218f5ad1a2bd340d t/00_compile.t
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/distribution.t
+SHA1 10c564e5ffe84748070827b350edbf3d6b832b20 t/fixme.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 5a21ddcb3b6387703145ca0eb5a252cb928a3196 t/pod-spell.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 952f76579eefab5fd584d1955c2a9983e1e7a9af www/test-daily/_td/default_page.css
+SHA1 57ae6470b584d6be4c4859db46bce461d4705a5b www/test-daily/_td/default_report.css
+SHA1 39bb53546142e9bd94264d15abae7adf1397b205 www/test-daily/_td/default_report.js
+SHA1 58b83c75c0ce6d70066070cbce6ccfa90a575923 www/test-daily/_td/jquery-1.3.2.js
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkrCbZEACgkQC0OgUPgL2ScMxQCfblCfFeaoYkdd/wgau9ix3lqI
+UyoAoJn4H5lFw1xWWnIY7wPWsNsxe2MT
+=NAzE
+-----END PGP SIGNATURE-----

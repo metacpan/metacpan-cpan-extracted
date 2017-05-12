@@ -1,0 +1,13 @@
+Revision history for Test-Varnish
+
+0.03    2010/01/16
+		This should fix all test failures.
+        All tests in t/analyze-response.t were failing. Test plan was output after a use_ok().
+
+0.02    2010/01/14
+        Completed documentation, and fixed a test script glitch that
+		caused test failure reports on Windows.
+
+0.01    2010/01/13
+        First version, released on an unsuspecting world.
+

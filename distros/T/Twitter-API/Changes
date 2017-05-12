@@ -1,0 +1,59 @@
+Revision history for Twitter::API
+
+0.0112  2017-04-18 15:45:24 PDT
+  - fixed typo: Undefined subroutine &Twitter::API::Error::is_hash
+  - fixed documentation for OAuth methods, s/get_/oauth_/
+
+0.0111  2017-03-18 18:43:33 PDT
+  - allow array ref for media_ids parameter to update
+
+0.0110  2017-02-08 15:59:31 PST
+  - remove experimental status; ready for production
+  - drop dependency on Data::Visitor::Lite and Class::Load
+  - Fix create_mute and destroy_mute required parameters
+  - Add Twitter error codes 99, 135, and 136 for is_token_error
+
+0.0109  2016-12-17 07:29:53 PST
+  - Added Twitter API error code 215 to is_token_error
+
+0.0108  2016-12-12 10:53:34 PST
+  - make Migration trait optional
+  - use WWW::Form::UrlEncoded::PP in tests to avoid a fall back warning
+
+0.0107  2016-12-11 06:37:10 PST
+  - moved and renamed API endpoint helper methods into
+    Twitter::API::Role::RequestArgs for other implementers
+
+0.0106  2016-12-10 17:31:25 PST
+  - improved tests and fixes for oauth management methods
+  - renamed s/Transition/Migration
+  - fixed some POD links
+
+0.0105  2016-12-09 22:16:05 PST
+  - alpha release
+  - updated examples for changes semantics in 0.0104
+  - added example/oauth_webapp.psgi
+  - dependecy diet: replaced Net::OAuth with WWW::OAuth
+
+0.0104  2016-12-08 15:10:34 PST (TRIAL RELEASE)
+  - added Net::Twitter/::Lite migration support
+  - renamed methods that exist in Net::Twitter with different semantics,
+    primarily OAuth management methods
+  - more documentation and tests
+
+0.0103  2016-12-06 07:43:10 PST (TRIAL RELEASE)
+  - fixed: RetryOnError failed to load
+  - upload_media accepts positional params media or media_data
+
+0.0102  2016-12-05 08:44:19 PST (TRIAL RELEASE)
+  - fix invalidate_token
+  - more documentation
+  - reworked Twitter::API::Utils - timestamp methods now return time (epoch
+    seconds), gmtime, and localtime, respectively
+
+0.0101  2016-12-03 20:13:21 PST (TRIAL RELEASE)
+  - documented trait ApiMethods
+  - fixed broken ApiMethods methods and the test that wasn't catching them
+
+0.0100  2016-12-02 13:32:27 PST (TRIAL RELEASE)
+  - initial release

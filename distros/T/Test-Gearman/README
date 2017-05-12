@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Test-Gearman,
+version v0.2.0:
+
+  A class for testing and mocking Gearman workers.
+
+This software is copyright (c) 2013 by L<Need Backup|http://www.needbackup.com/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

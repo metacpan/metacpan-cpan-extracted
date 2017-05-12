@@ -1,0 +1,69 @@
+Template-Plain version 1.00
+===========================
+
+I know, I know. Another templating module? Why? Don't we have enough of those 
+already? 
+
+But wait! This one may just be the wheel you've all been reinventing because 
+available templating systems were overkill for what you needed, had a few too 
+many dependencies, had a learning curve that was a little too steep, or were 
+just too bloated. 
+
+Template::Plain doesn't have a dozen different delimiters or its own mini-
+language to learn. If it weren't for its test suite, it'd have no dependencies
+at all. And, though it's claimed compatibility is only back to 5.6.0, it should
+be compatible with early 5.0 versions if 'use warnings' were removed and its 
+$VERSION variable were declared with 'use vars' instead of 'our'. 
+
+Template::Plain is nearly braindead in its simplicity. You create templates 
+with some delimited tags, tell Template::Plain what to replace those tags with, 
+and that's pretty much it. Oh, it might have a bell or a whistle, but probably 
+not more than one of each. 
+
+One feature that's really quite handy is it's way of determining where to get
+the content for the template. Of course, you can pass it explicitly. But when
+you don't, Template::Plain looks for it in a couple places. First it looks in 
+the DATA section of the calling package. If not there, it tries the DATA 
+section of the main package. And, if not there, it falls back to the ARGV file
+handle. It takes very little imagination to come up with some good uses for 
+this behavior. 
+
+Template::Plain allows the filling of place holders with the result returned 
+by some code or the contents of an array (you can specify the output 
+delimiter.) It also allows you to change the delimiters for the placeholders 
+and to recursively fill templates. This feature is rarely used but quite 
+powerful. 
+
+I have been using a version of this module--well more like an exact copy 
+except for its name and documentation--for many years now. I released it once 
+in a post on Perlmonks.org but never put it up on CPAN. I don't know why not. 
+It's one of my personal goto modules and, hands down, one of the most 
+generally useful modules I've ever written. 
+
+Please enjoy! 
+
+Jeremy Madea <jeremy@cpan.org>
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Test::More for testing only. 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Jeremy Madea
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,63 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Installing TaskForest</div>
+  <p>
+    This program depends on DateTime, for timezone support. You can
+    install DateTime as follows:
+  </p>
+
+  <div class="code"><pre><code>perl -MCPAN -e 'install DateTime'</code></pre></div>
+
+  <p>
+    Similarly, as of version 1.10, it also depends on Config::General and
+    Log::Log4perl. You can install these as follows:
+  </p>
+    
+  <div class="code"><pre><code>perl -MCPAN -e 'install Config::General'
+perl -MCPAN -e 'install Log::Log4perl'</code></pre></div>
+
+  <p>
+    As of version 1.15, it also depends on the LWP libraries such as
+    HTTP::Daemon, HTTP::Request, etc.
+  </p>
+
+  <p>
+    Download the latest TaskForest-X.YY.tar.gz file.  You can install it
+    the 'normal' way:
+  </p>
+
+  <div class="code"><pre><code>tar -xzf TaskForest-X.YY.tar.gz
+cd TaskForest-X.YY
+perl Makefile.PL
+make
+make test
+make install</code></pre></div>
+
+  <p>
+    If you don't have root access, and want to install in a local
+    directory like ~/perl, replace the third line with
+  </p>
+
+  <div class="code"><pre><code>perl Makefile.PL prefix=~/perl</code></pre></div>
+
+  <p>OR</p>
+
+  <p>You could just enter:</p>
+
+  <div class="code"><pre><code>perl -MCPAN -e 'install TaskForest'</code></pre></div>
+
+  <p>
+    to install TaskForest. This may not install the latest version
+    immediately after it's available on Sourceforge because it takes a
+    little while (a day or so) for the files to be available on
+    CPAN.  </p>
+  
+</div>
+edna 
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

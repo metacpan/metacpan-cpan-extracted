@@ -1,0 +1,49 @@
+NAME
+    Template::Plugin::Octets - TT2 plugin to format numeric values as binary
+    octets
+
+VERSION
+    version 0.18
+
+SYNOPSIS
+        [% USE Octets %]
+
+        Xmit [% Octets.kio(100500) -%] Kio
+        Recv [% Octets.mio(9000) -%] Mio
+
+        # Output:
+        # Xmit 98.1 Kio
+        # Recv ~0 Mio
+
+DESCRIPTION
+    Template::Plugin::Octets is a plugin for Template Toolkit v2, which
+    allows you to format numbers in templates. Try to run
+
+        tpage eg/traffic.tt
+
+    to see it in action.
+
+METHODS
+  kio
+    Format value as kibioctets (2^10 octets).
+
+  mio
+    Format value as mebioctets (2^20 octets).
+
+  gio
+    Format value as gibioctets (2^30 octets).
+
+SEE ALSO
+    Template
+
+    Template::Plugin::Procedural
+
+AUTHOR
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

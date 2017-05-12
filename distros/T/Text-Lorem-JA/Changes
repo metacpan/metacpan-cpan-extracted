@@ -1,0 +1,18 @@
+Revision history for Perl extension Text-Lorem-JA
+
+0.04 2013-10-30T12:33:00Z
+    - Dictionary file was moved to share directory
+
+0.03 2013-10-02T03:14:33Z
+
+    - Improved document
+    - no_index for dictionary generators
+
+0.02 2013-10-01T02:52:51Z
+
+    - Documented `lorem_ja` executable
+
+0.01 2013-10-01T02:43:38Z
+
+    - original version
+

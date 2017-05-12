@@ -1,0 +1,55 @@
+{
+   "abstract" : "Test::Run plugin to collect statistics and",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Run-Plugin-CollectStats",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Trap" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MRO::Compat" : "0",
+            "Moose" : "0",
+            "Storable" : "0",
+            "Test::Run::Base::Struct" : "0",
+            "Test::Run::Core" : "0.0106",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Run::Plugin::CollectStats" : {
+         "file" : "lib/Test/Run/Plugin/CollectStats.pm",
+         "version" : "0.0103"
+      },
+      "Test::Run::Plugin::CollectStats::TestFileData" : {
+         "file" : "lib/Test/Run/Plugin/CollectStats/TestFileData.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.0103"
+}

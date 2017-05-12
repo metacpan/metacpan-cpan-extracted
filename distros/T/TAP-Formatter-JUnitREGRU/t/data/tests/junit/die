@@ -1,0 +1,11 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="1"
+             tests="0"
+             name="data_tests_die">
+    <system-out></system-out>
+    <system-err><![CDATA[Dubious, test returned 1 (wstat 256, 0x100)
+]]></system-err>
+    <error message="Dubious, test returned 1 (wstat 256, 0x100)" />
+  </testsuite>
+</testsuites>

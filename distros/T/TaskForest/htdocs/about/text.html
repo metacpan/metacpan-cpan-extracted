@@ -1,0 +1,59 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_about.html />
+
+<div class="width6 last">
+  <div class="section_header">Why Text Files are a Good Idea</div>
+  <p>
+    One of the initial design requirements of TaskForest was that it be
+    easily configuriable with just a shell prompt and your favorite text
+    editor.  Many of the servers I administer are old boxes which I
+    administer by logging into them via <code>ssh</code>.  So when it came
+    to designing job dependencies in Family files, I chose a text file
+    representation.  The benefits of text files over a graphical user
+    interface for this are many:
+  </p>
+
+  <ul class=bullet>
+    <li><b>Easy Remote Access - </b>All you need is the ability to get to a
+        command line and a text editor on the machine that
+        runs <code>taskforest</code>.  With the such low client access
+        requirements, virtually any old machine that has internet access
+        and an <code>ssh</code> client can be used to administer the
+        system.  I have often worked on our <code>taskforestd</code>
+        server from a local internet cafe using a Putty.exe downloaded
+        minutes earlier.
+    </li>
+
+    <li><b>Mobile Access - </b>Text files also make work relatively easy using a
+        mobile ssh client like Idokorro Mobile SSH.  A dedicated mobile
+        client would be ideal, but short of that, the text file approach
+        assures low bandwidth usage and easy-to-make changes.
+    </li>
+      
+    <li><b>Flexibility - </b>The simple, easily parseable format of text
+        files allows us to build richer clients later that would use a
+        graphical interface to specify relationships between jobs.
+    </li>
+
+    <li><b>Source Control - </b>The text based format makes it easy to
+        place the Family files under source control.  You can also
+        easily <code>diff</code> different versions of the same family
+        file.
+    </li>
+
+    <li><b>Grep - </b>When you have dozens of family files and hundreds of
+        jobs, you may need to answer questions like: "Are we still running
+        Job J1?  It needs to be decommissioned."  This can easily be
+        answered by <code>grep</code>ping the Family files for job J1.
+    </li>
+
+  </ol>
+
+
+
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

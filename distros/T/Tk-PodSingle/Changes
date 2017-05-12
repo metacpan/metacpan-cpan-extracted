@@ -1,0 +1,9 @@
+Revision history for Perl extension Tk::PodSingle.
+
+1.01  Thu Oct 13 2005
+	- Removed the requirement for Perl 5.8.6 
+
+1.00  Thu Jul 21 12:58:36 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Tk::PodSingle
+

@@ -1,0 +1,27 @@
+
+This is the Perl distribution Text-Pipe-W3CDTF.
+
+## Installation
+
+Text-Pipe-W3CDTF installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan Text::Pipe::W3CDTF
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Text-Pipe-W3CDTF documentation is available as in POD.
+So you can do:
+
+    % perldoc Text::Pipe::W3CDTF
+
+to read the documentation with your favorite pager.

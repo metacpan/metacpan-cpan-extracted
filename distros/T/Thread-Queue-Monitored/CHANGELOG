@@ -1,0 +1,91 @@
+1.04    7 December 2012
+        Upgraded to Devel::MaintBlead 0.08.  This should fix the problem as
+        reported in https://rt.cpan.org/Ticket/Display.html?id=81354 by
+        Justin Traer.  Also upgraded the maint version to 0.14.
+
+1.03    4 June 2012
+        Upgraded to Devel::ThreadsForks 0.05 and Devel::MaintBlead 0.04.
+        Also upgraded the maint version to 0.13.
+
+1.02    2 June 2012
+        Updated "maintblead" to Devel::MaintBlead 0.02.  This should fix the
+        problem that if an inappropriate Perl version was seen, the Makefile.PL
+        would not exit.  Also updated "threadsforks" to Devel::ThreadsForks
+        0.02.
+
+1.01    1 June 2012
+        No functional differences, except that the threads/forks check is
+        now done by Devel::ThreadsForks, and the maint/blead code path logic
+        is now done by Devel::MaintBlead.  Also added installation text which
+        explains the features of maint/blead code paths.
+
+        The maint version has been upped to 0.12 to differentiate it from
+        0.11 with regards to the installation process.
+
+1.00    30 May 2012
+        Allow testing with unthreaded perl but with "forks" installed.
+
+        Split codebase into "blead" (1.00) and "maint" (0.11) version.
+        Minimum requirement for this module is now perl 5.14, unless you
+        want to install the "maint" version.
+
+        Upgrade "blead" code and test-suite to 5.14 features.  No other
+        functional changes yet.
+
+0.10    1 April 2012
+        Some code refactoring and code esthetics.  Verified it runs on 5.14.2.
+
+0.09    3 October 2007
+        Hopefully fixed test-suite for non-thread enabled Perls.  Updated
+        to use new VERSION feature of Devel::Required.
+
+0.08    28 December 2003
+        Added automatic required modules update using Devel::Required.
+
+0.07    13 August 2003
+        Cleaned up Makefile.PL and updated copyright info.  Made sure the
+        test-suite runs without warnings.
+
+        Removed use of "our" and ":unique" from the source, as with all my
+        other thread modules.
+
+0.06    24 July 2002
+        Made the dequeue_xxx methods die centrally.
+
+        Made $VERSION and @ISA have the : unique attribute to save memory.
+
+        23 July 2002
+        Fixed problem with warnings if an undefined exit value was used
+        (the default).
+
+0.05    21 July 2002
+        Added "can_ok" test to test-suite.
+
+        Renamed dummy "dequeue_nb" to "dequeue_dontwait" to be more in line
+        with Thread::Pool.  Added synonym "dequeue_nb" for compatibility.
+
+0.04    18 July 2002
+        Added support for "post" routine, so that a routine will be executed
+        when monitoring stops.  Results of the "post" routine are available
+        with the "join" method on the thread object.
+
+0.03    17 July 2002
+        My my, third version on the same day!
+
+        Added class method "self" for use within the "pre" or "monitor"
+        routine the Thread::Queue::Monitored object they're working for.
+
+        Changed the input parameters of "new" to be more like those of
+        Thread::Pool->new.  This is incompatible with the way it was
+        before.  Fortunately there won't be that many people hurt by
+        it.  Adapted the test-suite accordingly.
+
+0.02    17 July 2002
+        Added support for Thread::Queue::Any::Monitored by making the
+        monitoring routine dependent on the class for which it is being
+        blessed.
+
+        Fixed some documentation nits.
+
+0.01    17 July 2002
+        First version of Thread::Queue::Monitored.

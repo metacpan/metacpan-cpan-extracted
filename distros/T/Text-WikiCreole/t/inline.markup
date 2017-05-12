@@ -1,0 +1,49 @@
+** bold at at start of file **
+
+**bold**, //italics//, __underline__, ^^superscript^^, __subscript__, 
+and ##monospace## all work the same way.
+
+// italics at start of paragraph //
+
+a paragraph with 
+## monospace in the middle ##
+with more after
+
+__ underline with
+no closing 
+markup
+
+* ,, subscript as first list item,
+continued on second line ,,
+
+* first list item
+* ^^ superscript as second item, no closing tag
+* with more to come
+
+* first item
+## ## monospace ** with bold ** as first subitem in numbered list ##
+*** another sublist after // with italics //
+
+= heading ** with bold **, which is redundant but possible
+== heading // with italics // is not redundant
+
+
+| here's a table | with // italics in it
+| second row ^^ squared ^^ | etcetera
+
+here's a [[ link | link //** with bold italics **// in it ]].  
+here's some __// ** bold ** inside italics // and underlined __.  
+here's what happens when you don't mix ** bold and // italics ** // properly.  
+don't try it in {{{ __ inline nowiki __ }}}, but feel free to put it
+## // inside monospace // ##.  
+
+{{{
+no point in trying to put ^^ superscript ^^ inside nowiki blocks either
+}}}
+
+; how 'bout  **__ Underlined bold __** in a definition list?
+: not to mention, the actual // italicized definition //
+
+: should also be able to put ** bold ^^ and superscript ^^ ** in an
+indented paragraph
+

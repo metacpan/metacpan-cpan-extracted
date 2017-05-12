@@ -1,0 +1,52 @@
+Revision history for Perl extension Text-Pipe
+
+0.10 Fri Sep 18 13:07:44 MSZ 2009 (Marcel Gruenauer <marcel@cpan.org>)
+    - removed link to TextPipe Pro by request of the TextPipe Pro author
+
+0.09 Thu Sep 17 18:36:56 MSZ 2009 (Marcel Gruenauer <marcel@cpan.org>)
+    - added link to TextPipe Pro to disambiguate
+
+0.08  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.07  Thu, 29 May 2008 12:08:37 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.07
+     - moved generated documentation of inherited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - .shipit: fixed svk.tagpattern
+
+0.06  Sun, 25 Nov 2007 20:43:46 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.06
+     - Text::Pipe: pipe() is now called PIPE() so as to not conflict with the
+       perl built-in pipe()
+     - Text::Pipe::Tester: added VERSION
+     - Text::Pipe: documented PIPE()
+
+0.05  Sat, 24 Nov 2007 19:30:05 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.05
+     - Makefile.PL: added auto_install()
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - Text::Pipe::Base: added 'fallback => 1' to overload; got lots of CPAN
+       tester results saying that stringification wasn't overloaded
+
+0.04  Thu, 15 Nov 2007 15:35:46 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - added Append, Chomp, Chop, LowercaseFirst, Prepend, Print and Say
+       segments, and tests
+     - tags: NEWFEATURE
+
+0.03  Wed, 14 Nov 2007 21:50:26 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Text::Pipe::Base uses Class::Accessor::Constructor's mk_constructor for
+       new() and defines an empty init()
+     - tags: NEWFEATURE
+
+0.02  Mon, 12 Nov 2007 12:35:58 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Fixed newlines in pod
+     - added pipe() method to Text::Pipe for easier construction
+     - added Text::Pipe::Split
+     - tags: DOCFIX, NEWFEATURE
+
+0.01  Sat, 10 Nov 2007 20:44:05 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

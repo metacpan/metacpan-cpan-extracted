@@ -1,0 +1,13 @@
+Changes
+Date.pm
+TkDate.pm
+demos/date.pl
+demos/localized_date.pl
+examples/simpleclock
+MANIFEST
+Makefile.PL
+README
+t/date.t
+t/noprereq.t
+t/nowarn.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,181 @@
+NAME
+    Test::RDF - Test RDF data for content, validity and equality, etc.
+
+VERSION
+    Version 1.20
+
+SYNOPSIS
+     use Test::RDF;
+
+     is_valid_rdf($rdf_string, $syntax,  'RDF string is valid according to selected syntax');
+     is_rdf($rdf_string, $syntax1, $expected_rdf_string, $syntax2, 'The two strings have the same triples');
+     isomorph_graphs($model, $expected_model, 'The two models have the same triples');
+     are_subgraphs($model1, $model2, 'Model 1 is a subgraph of model 2' );
+     has_uri($uri_string, $model, 'Has correct URI');
+     hasnt_uri($uri_string, $model, "Hasn't correct URI");
+     has_subject($uri_string, $model, 'Subject URI is found');
+     has_predicate($uri_string, $model, 'Predicate URI is found');
+     has_object_uri($uri_string, $model, 'Object URI is found');
+     has_literal($string, $language, $datatype, $model, 'Literal is found');
+     hasnt_literal($string, $language, $datatype, $model, 'Literal is not found');
+     pattern_target($model);
+     pattern_ok($pattern, '$pattern found in $model');
+     pattern_fail($pattern, '$pattern not found in $model');
+
+DESCRIPTION
+    This Perl module, Test::RDF, provides tools for testing code which deals
+    with RDF. It can test RDF for validity, check if two RDF graphs are the
+    same, or subgraphs of each other, if a URI is or is not in a dataset, if
+    it has certain subjects, predicates, objects or literals. It can also test
+    to see if a full pattern is present or absent.
+
+EXPORT
+  is_valid_rdf
+    Use to check if the input RDF string is valid in the chosen syntax
+
+  is_rdf
+    Use to check if the input RDF strings are isomorphic (i.e. the same).
+
+  isomorph_graphs
+    Use to check if the input RDF::Trine::Models have isomorphic graphs.
+
+  are_subgraphs
+    Use to check if the first RDF::Trine::Models is a subgraph of the second.
+
+  has_subject
+    Check if the string URI passed as first argument is a subject in any of
+    the statements given in the model given as second argument.
+
+  has_predicate
+    Check if the string URI passed as first argument is a predicate in any of
+    the statements given in the model given as second argument.
+
+  has_object_uri
+    Check if the string URI passed as first argument is a object in any of the
+    statements given in the model given as second argument.
+
+  has_literal
+    Check if the string passed as first argument, with corresponding optional
+    language and datatype as second and third respectively, is a literal in
+    any of the statements given in the model given as fourth argument.
+
+    language and datatype may not occur in the same statement, so the test
+    fails if they are both set. If none are used, use `undef`, like e.g.
+
+     has_literal('A test', undef, undef, $model, 'Simple literal');
+
+    A test for a typed literal may be done like
+
+     has_literal('42', undef, 'http://www.w3.org/2001/XMLSchema#integer', $model, 'Just an integer');
+
+    and a language literal like
+
+     has_literal('This is a Another test', 'en', undef, $model, 'Language literal');
+
+  hasnt_literal
+    This is like the above, only the opposite: It checks if a literal doesn't
+    exist. Like the above, the test will fail if the literal is invalid,
+    however.
+
+  has_uri
+    Check if the string URI passed as first argument is present in any of the
+    statements given in the model given as second argument.
+
+  hasnt_uri
+    Check if the string URI passed as first argument is not present in any of
+    the statements given in the model given as second argument.
+
+  pattern_target
+    Tests that the object passed as its parameter is an RDF::Trine::Model or
+    RDF::Trine::Store. That is, tests that it is a valid thing to match basic
+    graph patterns against.
+
+    Additionally, this test establishes the target for future `pattern_ok`
+    tests.
+
+  pattern_ok
+    Tests that the pattern passed matches against the target established by
+    `pattern_target`. The pattern may be passed as an RDF::Trine::Pattern, or
+    a list of RDF::Trine::Statement objects.
+
+     use Test::RDF;
+     use RDF::Trine qw[iri literal blank variable statement];
+     use My::Module;
+
+     my $foaf = RDF::Trine::Namespace->new('http://xmlns.com/foaf/0.1/');
+     pattern_target(My::Module->get_model); # check isa RDF::Trine::Model
+     pattern_ok(
+       statement(
+         variable('who'),
+         $foaf->name,
+         literal('Kjetil Kjernsmo')
+         ),
+       statement(
+         variable('who'),
+         $foaf->page,
+         iri('http://search.cpan.org/~kjetilk/')
+         ),
+       "Data contains Kjetil's details."
+       );
+
+    Note: `pattern_target` must have been tested before any `pattern_ok`
+    tests.
+
+  pattern_fail
+    The same as above, but tests if the pattern returns no results instead.
+
+NOTE
+    Graph isomorphism is a complex problem, so do not attempt to run the
+    isomorphism tests on large datasets. For more information see
+    <http://en.wikipedia.org/wiki/Graph_isomorphism_problem>.
+
+AUTHOR
+    Kjetil Kjernsmo, `<kjetilk at cpan.org>`
+
+BUGS
+    Please report any bugs using github
+    <https://github.com/kjetilk/Test-RDF/issues>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::RDF
+
+    You may find the Perl and RDF community website <http://www.perlrdf.org/>
+    useful.
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Test-RDF>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Test-RDF>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Test-RDF/>
+
+    *   MetaCPAN
+
+        <https://metacpan.org/module/Test::RDF>
+
+ACKNOWLEDGEMENTS
+    Michael Hendricks wrote the first Test::RDF. The present module is a
+    complete rewrite from scratch using Gregory Todd William's
+    RDF::Trine::Graph to do the heavy lifting.
+
+    Toby Inkster has submitted the pattern_* functions.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 ABC Startsiden AS. Copyright 2010, 2011, 2012, 2013, 2014
+    Kjetil Kjernsmo.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published by
+    the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

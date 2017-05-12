@@ -1,0 +1,9 @@
+Revision history for Text-ECSV
+
+0.02    11.12.2016
+        - no functional changes
+        - move author tests to xt/ folder
+        - distribution clean-up
+
+0.01    15.06.2008
+        First version, released on an unsuspecting world.

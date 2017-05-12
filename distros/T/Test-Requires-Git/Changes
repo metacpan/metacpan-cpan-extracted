@@ -1,0 +1,44 @@
+Revision history for Test-Requires-Git
+
+1.008 2017-03-07 BOOK
+    - Make sure the test suite works as expected when @INC does not contain '.'
+      (closes RT #120537, thanks to KENTNL for the report)
+
+1.007 2016-10-02 BOOK
+    - Add an extra diagnostic reporting the git version used for testing
+      (with a scheme to limit the number of times it's output, so as not
+      to pollute test output too much)
+
+1.006 2016-05-08 BOOK
+    - Documentation improvements
+    - Code improvements
+    - Add tests for git versions with comments
+
+1.005 2016-04-02 BOOK
+    - Add support for a lone version argument (with implicit 'version_ge')
+    - Minor documentation updates
+    - Added a test using a git.git tag name
+
+1.004 2016-02-29 BOOK
+    - Use Git::Version::Compare to compare versions
+    - Tests now cover 100% of the code
+    - Rewrite the Changes file according to CPAN::Changes::Spec
+
+1.003 2015-05-31 BOOK
+    - A bare `use Test::Requires::Git` now checks if git is available
+    - The -nocheck option skips that check when there are not other
+      arguments to `use Test::Requires::Git`
+    - The 'git' option makes it possible to set the path to git
+
+1.002 2015-05-25 BOOK
+    - Added supports for many aliases
+    - Improved support for skipping "all remaining tests"
+    - Made the test suite more reliable by not mangling the system
+      (thanks to Christian Walde (MITHALDU) for the idea)
+
+1.001 2015-05-12 BOOK
+    - A bare test_requires_git will skip if git is not available
+    - Improved test coverage
+
+1.000 2015-05-10 BOOK
+    - First published version

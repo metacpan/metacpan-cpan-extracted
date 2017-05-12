@@ -1,0 +1,106 @@
+TeX-AutoTeX
+
+This module is the basis for arXiv's (http://arXiv.org/) automatic (La-)TeX
+processing. It has been abstracted from arXiv internals and an attempt has
+been made to make this useful standalone. However this is not a turn-key
+solution for document processing, instead it is intended to provide a basis
+for integration with other systems.
+
+The normal use is to point it at a directory containing an assortment of
+files which constitute the source material for a (La-)TeX
+document. TeX::AutoTeX::process then attempts to generated DVI, PostScript,
+or PDF from the input based on heuristics which have been developed and
+employed at arXiv for many years. The resulting file(s) remain in the same
+directory. It is up to the calling process to pre- or post-process the
+directory contents as required.
+
+For example the directory contents could originate from a storage module or
+repository system and is unpacked to flat files in a temporary directory
+before TeX::AutoTeX is being invoked on that directory. The generated
+PostScript or PDF is assumed to then be used in a document delivery system.
+
+No particular naming conventions or other requirements are imposed on the
+source material, and sub-directories are permitted. The module attempts to
+determine processing order and input format based on file characteristics and
+heuristics and generally does not require any user input. This distinguishes
+TeX::AutoTeX from other existing frameworks, which require particular
+configuration, or are based on specific Makefiles or similar constructs.
+
+The system has been tuned to process scientific papers received at arXiv and
+may not perform optimally in other settings. You are welcome to modify it to
+your needs and are encouraged to communicate changes and improvements back to
+arXiv.
+
+
+WARNING 
+
+TeX::AutoTeX::process will modify, overwrite, and delete files in the specified
+directory. It is assumed that directory is a temporary working directory and
+that the sources were copied from elsewhere for processing.
+
+
+INSTALLATION
+
+This module relies on the presence of a comprehensive TeX installation on the
+host system to function. arXiv is using TeXLive 2009 and TeXLive 2010, but
+MikTeX or similar should also work.
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+CONFIGURATION
+
+After installing, you must edit TeX::AutoTeX::Config to use your TeX
+installation. See the comments in that file.
+
+QUICKSTART
+
+Make sure you have backups of your source files. Only invoke TeX::AutoTeX on
+a copy in a temporary directory! Files in that directory may be modified,
+overwritten, deleted or otherwise rendered unusable. You have been warned!
+
+After installation, edit TeX::AutoTeX::Config (see CONFIGURATION), switch to
+a temporary directory containing a copy of the (La-)TeX sources for a single
+paper and then run:
+
+perl -MCwd -MTeX::AutoTeX -e '$t=TeX::AutoTeX->new(workdir => getcwd, verbose => 1,); $t->process;'
+
+See perldoc TeX::AutoTeX for more options.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc TeX::AutoTeX
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=TeX-AutoTeX
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/TeX-AutoTeX
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/TeX-AutoTeX
+
+    Search CPAN
+        http://search.cpan.org/dist/TeX-AutoTeX/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Thorsten Schwander
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,28 @@
+---
+name: Tie-Mounted
+version: 0.18
+author:
+  - 'Steven Schubiger <schubiger@cpan.org>'
+abstract: Tie a mounted node to an array
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  File::Which: 0
+  IO::File: 0
+  Symbol: 0
+  Tie::Array: 0
+build_requires:
+  Test::More: 0
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+provides:
+  Tie::Mounted:
+    file: lib/Tie/Mounted.pm
+    version: 0.18
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

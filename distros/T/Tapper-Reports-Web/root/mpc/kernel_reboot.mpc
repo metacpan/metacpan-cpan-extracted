@@ -1,0 +1,107 @@
+# tapper-optional-fields: kernelpkg.file, kernel_version
+# tapper-config-file: kernel_reboot.yml
+# tapper-description: Reboot test with a prebuilt kernel package
+### Dies ist die Geschichte von Polly Nom.
+### Polly wollte eine Liste mit Anstrichen. Kriegt sie:
+### - erster Anstrich
+### - zweiter Anstrich
+###         weit eingerückter Sonderkram
+---
+arch: linux64
+image: suse/suse_sles10_sp2_64b_smp_raw_new.tar.gz
+mount: /
+partition: testing
+precondition_type: image
+---
+precondition_type: copyfile
+name: /data/bancroft/tapper/live/repository/testprograms/uname_tap/uname_tap.sh
+dest: /bin/
+protocol: local
+---
+precondition_type: copyfile
+name: /data/bancroft/tapper/live/repository/packages/tapperutils/kernel/gen_initrd.sh
+dest: /bin/
+protocol: local
+---
+[% IF  kernelpkg %]
+precondition_type: package
+filename: [% kernelpkg %]
+---
+precondition_type: exec
+filename: /bin/gen_initrd.sh
+options:
+  - [% kernel_version %]
+[% ELSE %]
+precondition_type: produce
+producer: Kernel
+[% END %]
+---
+precondition_type: reboot
+count: 2
+---
+[% IF (Tests.CTCS) or (Tests == 'CTCS') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_ctcs
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.LMBench) or (Tests == 'LMBench') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_lmbench
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.LTP) or (Tests == 'LTP') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_ltp
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.Kernbench) or (Tests == 'Kernbench') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_kernbench
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.Aim) or (Tests == 'Aim') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_aim
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.HTS) or (Tests == 'HTS') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_hts
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.LLC) or (Tests == 'LLC') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_llc
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.Parselog) or (Tests == 'Parselog') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_parselog
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.ReAim) or (Tests == 'ReAim') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_reaim
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.RHv7) or (Tests == 'RHv7') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_rhv7
+timeout: 10800
+---
+[% END %]
+[% IF (Tests.Phoronix) or (Tests == 'Phoronix') %]
+precondition_type: testprogram
+program: /opt/tapper/bin/py_phoronix
+timeout: 10800
+---
+[% END %]

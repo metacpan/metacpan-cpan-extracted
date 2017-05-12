@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test username="user" fullname="Oo">
+	<sub_test username="sub_user" fullname="sub_Oo"/>
+	<sub_test2 username="sub_user2" fullname="sub_Oo2"/>
+</test>

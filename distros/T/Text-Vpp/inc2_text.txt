@@ -1,0 +1,5 @@
+# this isn't a comment and should show up
+// But this is a comment and should NOT show up
+%FOREACH $x (1..2)
+expanded loop (\Var2 file) line \x EOL
+%ENDFOR

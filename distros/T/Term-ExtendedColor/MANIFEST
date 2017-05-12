@@ -1,0 +1,26 @@
+bin/color_matrix
+bin/colored_dmesg
+bin/show_all_colors
+bin/uncolor
+examples/attributes.pl
+examples/fall_through_attributes.pl
+lib/Term/ExtendedColor.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-pod.t
+t/03-get_colors.t
+t/04-color.t
+t/05-uncolor.t
+t/10-strict.t
+t/20-synopsis.t
+t/30-eol.t
+t/30-fixme.t
+t/30-notabs.t
+t/40-kwalitee.t
+t/50-complexity.t
+t/60-pod-coverage.t
+t/60-pod-syntax.t
+t/80-minperl.t
+META.yml                                 Module meta-data (added by MakeMaker)

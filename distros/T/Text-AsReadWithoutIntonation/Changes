@@ -1,0 +1,8 @@
+Revision history for Perl extension Text::AsReadWithoutIntonation.
+
+0.01  Mon Aug 27 20:21:01 2007
+	- original version; created by h2xs 1.23 with options
+		-X -n Text::AsReadWithoutIntonation
+
+0.9   Wed Nov 11 21:06:45 2009
+	- first public version

@@ -1,0 +1,41 @@
+Revision history for Tickit-Console
+
+0.07    2014/09/08 19:30:44
+        [CHANGES]
+         * Added ->prepend_line, allowing pre-history text to be inserted at
+           the top of a scroller
+         * Split out Tickit::Console::Tab into its own file
+         * Allow applications to specify a custom tab class
+         * Support management of timestamps and datestamps in scroller history
+         * Renamed ->add_line to ->append_line
+
+0.06    2014/08/16 21:00:11
+        [CHANGES]
+         * Allow ->add_tab with a make_widget CODEref to create a tab with a
+           custom internal layout
+         * Proxy for ->remove_tab and ->move_tab
+         * Pass active tab into 'on_line' callbacks on them, rather than the
+           main console object
+         * Added ->bind_key at the console and tab level
+
+0.05    2014/05/14 16:51:29
+        [BUGFIXES]
+         * Fix t/01basic.t for the fact that a window clear operation now
+           happens first
+
+0.04    2013/11/09 16:49:48
+        [CHANGES]
+         * Added a simple netcat-like client example
+
+        [BUGFIXES]
+         * Fix unit test termlog expectations for recent Tickit changes
+
+0.03    CHANGES:
+         * Updated unit tests for visual style of Tickit::Widget:Tabbed 0.005
+         * Make sure to declare dependency on Tickit::Widget::Entry
+
+0.02    CHANGES:
+         * Use new bottom-gravity behaviour of Tickit::Widget::Scroller 0.04
+
+0.01    First version, released on an unsuspecting world.
+

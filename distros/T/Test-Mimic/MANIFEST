@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01.t
+lib/Test/Mimic.pm
+.test_mimic_data/history_for_playback.rec
+.test_mimic_data/lib/RecordMe.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,171 @@
+/**
+ * oconfig - src/parser.y
+ * Copyright (C) 2007,2008  Florian octo Forster <octo at verplant.org>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; only version 2 of the License is applicable.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+ */
+
+%{
+sub YYERROR {
+	join " ", @_;
+}
+%}
+
+%start entire_file
+
+%union {
+	double  number;
+	int     boolean;
+	char   *string;
+	oconfig_value_t  cv;
+	oconfig_item_t   ci;
+	argument_list_t  al;
+	statement_list_t sl;
+}
+
+%token <number> NUMBER
+%token <boolean> BTRUE BFALSE
+%token <string> QUOTED_STRING UNQUOTED_STRING
+%token SLASH OPENBRAC CLOSEBRAC EOL
+
+%type <string> string
+%type <string> identifier
+/* arguments */
+%type <cv> argument
+%type <al> argument_list
+/* blocks */
+%type <ci> block_begin
+%type <ci> block
+%type <string> block_end
+/* statements */
+%type <ci> option
+%type <ci> statement
+%type <sl> statement_list
+%type <ci> entire_file
+
+/* pass an verbose, specific error message to yyerror() */
+/* this is bison only jargon %error-verbose */
+
+%%
+string:
+	QUOTED_STRING		{ unquote ($_[1]);}
+	| UNQUOTED_STRING	{$_[1];}
+	;
+
+argument:
+	NUMBER			{$_[1]}
+	| BTRUE			{1}
+	| BFALSE		{0}
+	| string		{$_[1]}
+	;
+
+argument_list:
+	argument_list argument
+	{
+	 my $argument_list = $_[1];
+	 push @{ $argument_list->{values} }, $_[2];
+	 return $argument_list;
+	}
+	| argument
+	{
+	 { values => [ $_[1] ] };
+	}
+	;
+
+identifier:
+	UNQUOTED_STRING			{$_[1]}
+	;
+
+option:
+	identifier argument_list EOL
+	{
+		{
+			children => [],
+			key => $_[1],
+			%{$_[2]},
+		};
+	}
+	;
+
+block_begin:
+	OPENBRAC identifier CLOSEBRAC EOL
+	{
+	 {key => $_[2], values => []};
+	}
+	|
+	OPENBRAC identifier argument_list CLOSEBRAC EOL
+	{
+	 {key => $_[2], %{$_[3]}};
+	}
+	;
+
+block_end:
+	OPENBRAC SLASH identifier CLOSEBRAC EOL
+	{
+	 $_[3];
+	}
+	;
+
+block:
+	block_begin statement_list block_end
+	{
+	 if ($_[1]->{key} ne $_[3])
+	 {
+		printf ("block_begin = %s; block_end = %s;\n", $_[1]->{key}, $_[3]);
+	 	YYERROR ("Block not closed..\n");
+		die;
+	 }
+	 return {
+		%{$_[1]},
+		children => $_[2],
+	 };
+	}
+	;
+
+statement:
+	option		{ $_[1] }
+	| block		{ $_[1] }
+	| EOL		{ return }
+	;
+
+statement_list:
+	statement_list statement
+	{
+	 my $statement_list = $_[1];
+	 push @{ $statement_list }, $_[2] if defined $_[2];
+	 return $statement_list;
+	}
+	| statement
+	{
+		if (defined $_[1]) {
+			return [ $_[1] ];
+		} else {
+			return;
+		}
+	}
+	;
+
+entire_file:
+	statement_list
+	{
+		$_[1]->[0];
+	}
+	;
+
+%%
+sub unquote ($) {
+	(my $string = shift) =~ s/(?<!\\)"//g;
+	return $string;
+}
+

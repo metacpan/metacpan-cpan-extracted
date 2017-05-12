@@ -1,0 +1,40 @@
+=head1 NAME
+
+README.Web.user_data - [Web Interface] Description of user_data directory in Web interface
+
+=head1 DESCRIPTION
+
+For each instance of the web-interface a directory is created under this 
+user_data directory.
+
+These user directories remain in user_data directory until the processing is 
+complete. Once the processing is complete the user directory is moved to 
+htdocs/SC-htdocs directory.
+
+If an error occurs and processing is interrupted then the user directory 
+remains here.
+
+So ideally this directory should act only as a temporary residence for these 
+user directories and should contain only this README.user_data.pod file.
+
+=head1 AUTHORS
+
+ Anagha Kulkarni, Carnegie-Mellon University
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+=head1 Copyright
+
+Copyright (c) 2008, Ted Pedersen and Anagha Kulkarni
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 
+or any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+Note: a copy of the GNU Free Documentation License is available on 
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in 
+this distribution as FDL.txt.
+
+=cut

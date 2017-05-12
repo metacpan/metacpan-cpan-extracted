@@ -1,0 +1,24 @@
+This archive contains the distribution Types-DBIx-Class,
+version 1.000006:
+
+  Type::Tiny for DBIx::Class objects
+
+It provides type checking for various DBIx::Class objects "Schema",
+"Rows", "ResultSet", and "ResultSource", and allows parameterizing
+those types where it makes sense to do so. It can be used standalone,
+or with Moo, Mouse, or Moose for "isa" attribute type checking.
+
+It is pure perl, and depends on only Type::Tiny (which is part of
+Moo, but does not require Moo), Sub::Quote, and DBIx::Class.
+
+The "authoring build" uses Module::Build::Tiny and "mbtiny". The
+author writes the dependencies in "cpanfile", and metadata in
+"metamerge.yml". Then "mbtiny dist" generates the MANIFEST, Build.PL,
+META.json, and META.yml files and builds the tarball.
+
+This software is copyright (c) 2015 by Yary Hluchan.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Peace and long life.

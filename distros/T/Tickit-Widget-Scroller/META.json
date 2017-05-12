@@ -1,0 +1,56 @@
+{
+   "abstract" : "a widget displaying a scrollable collection of",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tickit-Widget-Scroller",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "String::Tagged" : "0",
+            "Tickit::Pen" : "0.19",
+            "Tickit::RenderBuffer" : "0.43",
+            "Tickit::Widget" : "0.35",
+            "Tickit::Window" : "0.57"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Tickit::Test" : "0.12"
+         }
+      }
+   },
+   "provides" : {
+      "Tickit::Widget::Scroller" : {
+         "file" : "lib/Tickit/Widget/Scroller.pm",
+         "version" : "0.22"
+      },
+      "Tickit::Widget::Scroller::Item::RichText" : {
+         "file" : "lib/Tickit/Widget/Scroller/Item/RichText.pm",
+         "version" : "0.22"
+      },
+      "Tickit::Widget::Scroller::Item::Text" : {
+         "file" : "lib/Tickit/Widget/Scroller/Item/Text.pm",
+         "version" : "0.22"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.freenode.net/#tickit"
+   },
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="tools/tei_ms_crit.rng" type="xml"?>
+<TEI xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Ժամանակագրութիւն</title>
+        <author>Մատթէոս Ուռհայեցի</author>
+        <respStmt xml:id="tla">
+          <resp>Transcription by</resp>
+          <name> Tara L Andrews</name>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>Unpublished manuscript</p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc>
+          <msIdentifier>
+            <settlement>Venice</settlement>
+            <repository>Mekhitarist Library</repository>
+            <idno>887</idno>
+          </msIdentifier>
+          <p>pp. 160-177</p>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <p><!-- began on p.159 --><pb n="160"/>
+Արդ՝ մինչև ցայս վայ՛րս <expan>բազմ</expan>աջան և աշխատ<ex resp="#tla">ա</ex>ւ<ex resp="#tla">ո</ex>ր <lb/>
+քնն<expan>ութեամբ</expan> գտե<ex resp="#tla">ա</ex>լ գրեց<ex resp="#tla">ա</ex>ք զշարագր<ex resp="#tla">ա</ex>կ<ex resp="#tla">ա</ex>ն գրե<ex resp="#tla">ա</ex>լս զ<num value="100">Ճ</num>ից ամաց` զորս ի <expan>բազում</expan> <lb/><pb n="161"/><expan>ժամանակաց</expan> հետաքննե<ex resp="#tla">ա</ex>լ հասու եղա՞ք։ Ընդ այնքանե<ex resp="#tla">ա</ex>ց տեսողացն և լս<lb/>
+ողացն որք էին ի հին ամաց ծնե<ex resp="#tla">ա</ex>լք, և <expan>ընդ</expan> ընթերցողսն <expan>յառաջին</expan> պատմագր<lb/>
+ացն որք ականատեսք էին լեա՛լք <expan>ամենայն</expan> եղելոցս, և նեղ<expan>ութեանցս</expan> այսոցիկ <lb/>
+զոր <expan>վասն</expan> մեղ<ex resp="#tla">ա</ex>ց կրե<ex resp="#tla">ա</ex>ց տունն հայո՛ց և ահ<ex resp="#tla">ա</ex>ւ<ex resp="#tla">ո</ex>ր զայս <expan>բազում</expan> <expan>անգամ</expan> զմտաւ <lb/>
+ածե<ex resp="#tla">ա</ex>լ եմ <expan>վասն</expan> այս յետին <expan>ժամանակին</expan> գրել զդառնաշունչ <abbr>կտրծսն</abbr>։ <lb/></p>
+      <p><hi>Իսկ ի լինել թվական<expan>ութեանս</expan> հայոց ի յամս <num value="502">ԵՃԲ</num> եղև ահ</hi><lb/>
+աւոր նշան և սոսկ<ex resp="#tla">ա</ex>լի, և <abbr>կտրծ</abbr> մեծ ի բ<ex resp="#tla">ա</ex>րկութենէ, երևե<ex resp="#tla">ա</ex>լ ի մեծ <lb/><expan>քաղաքն</expan> անտիոք, զոր ի ներքոյ <expan>արեգականն</expan> <expan>գործեցաւ՛</expan> այս սքանչելիս որ է՛ր տես<lb/>
+ողացն ահաւոր և <expan>հրաշալի</expan>. և եղև այս <subst><del>իշխ</del><add place="above">նշ</add></subst>անս ա՛հ և դողումն <expan>ամենայն</expan> <ex>հաւատաց</ex><lb/>
+ելոց <expan>քրիստոսի</expan>, զորս <del>յ</del>այ<del>ն</del>ժ<del>ա</del>մ մեծասաստ սպառնալեօք յայտնե<ex resp="#tla">ա</ex>ց <expan>աստուած</expan> <expan>զդատաստան</expan> <lb/>
+իւր զահաւոր. և իշխ<lb/>
+անն <expan>զհաւատսն</expan> եթո՛ղ, և եղև <expan>հակառակ</expan> մեծ ազգին ասորո՛ց. և յայնժամ մատն<lb/>
+եցան ասորիքն ի մեծ նեղ<expan>ութիւն</expan>, <expan>վասն</expan> սկսան <expan>հաւատոյ</expan> քնն<expan>ութիւն</expan> առնե՛լ <expan>հանապազօր</expan>. <lb/>
+և յայնժամ լրբե<ex resp="#tla">ա</ex>լ եղեն ազգն հոռոմո՛ց, որ և <expan>զգործեալն</expan> ոչ գիտե՛լ, <expan>վասն</expan> զի զ<expan>քրիստոս</expan><lb/>
+ակ<ex resp="#tla">ա</ex>ն աւետ<ex resp="#tla">ա</ex>ր<ex resp="#tla">ա</ex>նն հրով այրե՛լ <expan>հրամայեաց</expan> պատրիարգն. և եղև <expan>յորժամ</expan> ի հուրն <lb/>
+դրին զաւետարանն <expan>աստուծոյ</expan>, ձայն ելանէ՛ր յաւետ<ex resp="#tla">ա</ex>ր<ex resp="#tla">ա</ex>նէն անտի և ի կրակէն <lb/>
+ի դուրս ելանէ՛ր. <lb/></p>
+    </body>
+  </text>
+</TEI>

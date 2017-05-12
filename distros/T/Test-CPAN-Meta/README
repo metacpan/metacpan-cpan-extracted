@@ -1,0 +1,79 @@
+Test-CPAN-Meta
+==============
+
+DESCRIPTION
+
+Validate your CPAN META.yml files.
+
+This distribution was written to ensure that a META.yml file, provided with a 
+standard distribution uploaded to CPAN, meets the specifications that are
+slowly being introduced to module uploads, via the use of package makers and
+installers such as ExtUtils::MakeMaker, Module::Build and Module::Install.
+
+Current CPAN META Specification, 2.0, was finally approved in April 2010, 
+which forms the basis for the contents of a META.json file. The full 
+specification is now included with the CPAN-Meta distribution.
+
+http://search.cpan.org/perldoc?CPAN::Meta
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  Parse::CPAN::Meta
+  Test::Builder
+
+For testing purposes, the following modules are required:
+
+  IO::File
+  Test::More
+
+For testing purposes, the following modules are desireable, but not essential:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+INSTALLATION
+
+To install this module type the following:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+For more detailed installation instructions, see INSTALL.
+
+USAGE
+
+Read the pod documentation in the distribution files.
+
+CHANGES
+
+For a complete list of changes, see the Changes file.
+
+SUPPORT
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please send an email to barbie@cpan.org or submit a bug to the
+RT system (http://rt.cpan.org/Public/Dist/Display.html?Name=Test-CPAN-Meta). 
+However, it would help greatly if you are able to pinpoint problems or even 
+supply a patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+AUTHOR
+
+Barbie <barbie@cpan.org>
+for Miss Barbell Productions http://www.missbarbell.co.uk.
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2007-2015 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

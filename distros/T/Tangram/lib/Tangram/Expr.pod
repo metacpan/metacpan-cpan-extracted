@@ -1,0 +1,161 @@
+# -*- perl -*-
+
+=head1 NAME
+
+Tangram::Expr - represent expressions on database server side
+
+=head1 SYNOPSIS
+
+   my ($r1, $r2) = $storage->remote(qw( ... ));
+
+   $r1->{field} operator $value
+   $r1->{field} operator $r2->{field2}
+
+   $r1->{collection}->includes( $obj )
+   $r1->{collection}->exists( $obj, $filter )
+   $r1->{collection}->includes_or( $obj1, $obj2, ... )
+
+=head1 DESCRIPTION
+
+Tangram::Expr objects represent expressions that will be evaluated on
+the database server side.
+
+Expression objects fall into one of the following categories: numeric,
+string, reference or collection.
+
+Many of the methods in Expr are needed only by people extending
+Tangram.  See also L<Tangram::Relational>, and the source the
+L<Tangram::mysql> and L<Tangram::Sybase> for examples on how these
+functions are intercepted to allow RDBMS-specific expressions.
+
+=head1 NUMERIC EXPRESSIONS
+
+Numeric expression objects can be compared using the operators ==, !=,
+<, >, <= and >=.  The other operand must be either another numeric
+expression object, or a normal Perl numeric value.  The result of the
+comparison is a Filter.
+
+=head1 STRING EXPRESSIONS
+
+String expression objects can be compared using the operators eq, ne,
+lt, gt, le, and ge.  The other operand must be either a string
+expression object or any Perl scalar value. Tangram will automatically
+quote the operand as required by the SQL syntax.  The result of the
+comparison is a Tangram::Expr::Filter.
+
+String expression objects also support the method like($str), where
+$str is a string that may contain SQL wildcards. The result is a
+Tangram::Expr::Filter that translates to a SQL C<LIKE $str> predicate.
+
+=head1 REFERENCE EXPRESSIONS
+
+Reference expression objects can be compared for equality using
+operators == and !=. The other operand must be another reference
+expression, a persistent object or undef(). The result of the
+comparison is a Filter.
+
+=head1 COLLECTION EXPRESSIONS
+
+Collection expression objects represents a collection inside an
+object. It supports the includes() and exists() methods, which returns
+a Tangram::Expr::Filter stating that the collection must contain the
+operand. exists() uses a subselect.
+
+It also supports the includes_or() methods, which accepts a list and
+is performs a logical OR - using the IN (x,y,z) SQL construct.
+
+The operand may be a Tangram::Remote, a persistent object,
+or an object ID.
+
+operator < is provided as a synonym for includes().
+
+The includes() method can be used for all collection types (Set,
+Array, Hash, and the Intr* versions).
+
+=head1 PREDICATES
+
+Predicate objects represent logical expressions, or
+conditions. Predicates support logical operators &, | and !. Note that
+a I<single> ampersand or vertical bar must be used (this is a Perl
+limitation).  The result is another predicate.
+
+=head1 CLASS METHODS
+
+=head2 new($type, $expr, @remotes)
+
+Returns a new instance.
+
+$type is a Type object corresponding to this expression (see
+L<Tangram::Type>).
+
+$expr is a SQL expression. It will eventually become part of a
+WHERE-CLAUSE.
+
+@remotes contains the Remote objects (see L<Tangram::Remote>) that
+participate in the expression. Tangram uses this list to insert the
+corresponding tables in the FROM clause and conditions in the
+WHERE-CLAUSE.
+
+=head1 INSTANCE METHODS
+
+=head2 expr()
+
+Returns the SQL equivalent for this expression.
+
+=head2 type()
+
+Returns the Type (see L<Tangram::Type>) corresponding  to this
+expression.
+
+=head2 objects()
+
+Returns the list of the objects that participate in this
+expression. 
+
+=head2 storage()
+
+Returns the Storage associated with this expression.
+
+=head1 EXAMPLES
+
+$person is called 'Homer'
+
+      $person->{name} eq 'Homer'
+
+$person's name ends with 'mer'
+
+      $person->{name}->like('%mer');
+
+$person is older than 35
+
+      $person->{age} > 35
+
+$person is married to $homer
+
+      $person->{partner} == $homer
+
+$person is not $homer
+
+      $person != $homer
+
+$person is not $homer and is older than 65
+
+      $person != $homer & $person->{age} > 65
+
+$person is $bart's parent
+
+      $person->{children}->includes( $bart )
+      $person->{children} < $bart
+
+$person is not $bart's parent
+
+      !$person->{children}->includes( $bart )
+      !($person->{children} < $bart)
+
+$person is one of the local list of people, @person
+
+      $person->in(@person)
+
+=head1 SEE ALSO
+
+L<Tangram::Remote>, L<Tangram::Expr>, L<Tangram::Storage>

@@ -1,0 +1,22 @@
+<%args>
+    $chart_tag => 0
+</%args>
+
+%   for my $or_tag (
+%       $c
+%           ->model('TestrunDB')
+%           ->resultset('ChartTagRelations')
+%           ->search( undef, {
+%               prefetch    => 'chart_tag',
+%               order_by    => { -asc => 'chart_tag' },
+%               select      => ['me.chart_tag_id', 'chart_tag.chart_tag'],
+%               group_by    => ['me.chart_tag_id', 'chart_tag.chart_tag'],
+%           })
+%   ) {
+%       if ( defined $chart_tag && $chart_tag == $or_tag->chart_tag_id ) {
+            <option value="<% $or_tag->chart_tag_id %>" selected="selected"><% $or_tag->chart_tag->chart_tag %></option>
+%       }
+%       else {
+            <option value="<% $or_tag->chart_tag_id %>"><% $or_tag->chart_tag->chart_tag %></option>
+%       }
+%   }

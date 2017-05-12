@@ -1,0 +1,8 @@
+Revision history for Tie-Hash-ReadonlyStack
+
+0.2  Sat May 16 13:25:21 2009
+    Added clear_compiled_cache() and add_lookup_override_hash_without_clearing_cache() 
+
+0.1  Tue May 12 22:55:36 2009
+       Initial release.
+

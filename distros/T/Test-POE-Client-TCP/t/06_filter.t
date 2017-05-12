@@ -1,0 +1,170 @@
+use strict;
+
+{
+  package TPCTParseWords;
+
+  use base qw(POE::Filter);
+  use Text::ParseWords;
+
+  my $VERSION = '1.02';
+
+  sub new {
+    my $class = shift;
+    my %opts = @_;
+    $opts{lc $_} = delete $opts{$_} for keys %opts;
+    $opts{keep} = 0 unless $opts{keep};
+    $opts{delim} = '\s+' unless $opts{delim};
+    $opts{BUFFER} = [];
+    bless \%opts, $class;
+  }
+
+  sub get {
+    my ($self, $raw) = @_;
+    my $events = [];
+    push @$events, [ parse_line( $self->{delim}, $self->{keep}, $_ ) ] for @$raw;
+    return $events;
+  }
+
+  sub get_one_start {
+    my ($self, $raw) = @_;
+    push @{ $self->{BUFFER} }, $_ for @$raw;
+  }
+
+  sub get_one {
+    my $self = shift;
+    my $events = [];
+    my $event = shift @{ $self->{BUFFER} };
+    push @$events, [ parse_line( $self->{delim}, $self->{keep}, $event ) ] if defined $event;
+    return $events;
+  }
+
+  sub put {
+    warn "PUT is unimplemented\n";
+    return;
+  }
+
+  sub clone {
+    my $self = shift;
+    my $nself = { };
+    $nself->{$_} = $self->{$_} for keys %{ $self };
+    $nself->{BUFFER} = [ ];
+    return bless $nself, ref $self;
+  }
+
+}
+
+use Socket;
+use Test::More tests => 10;
+use POE qw(Wheel::SocketFactory Wheel::ReadWrite Filter::Line);
+use_ok('Test::POE::Client::TCP');
+
+POE::Session->create(
+  package_states => [
+	'main' => [qw(
+			_start
+			_accept
+			_failed
+			_sock_in
+			_sock_err
+			testc_registered
+			testc_connected
+			testc_disconnected
+			testc_input
+			testc_flushed
+	)],
+  ],
+);
+
+$poe_kernel->run();
+exit 0;
+
+sub _start {
+  my ($kernel,$heap) = @_[KERNEL,HEAP];
+  $heap->{listener} = POE::Wheel::SocketFactory->new(
+      BindAddress    => '127.0.0.1',
+      SuccessEvent   => '_accept',
+      FailureEvent   => '_failed',
+      SocketDomain   => AF_INET,             # Sets the socket() domain
+      SocketType     => SOCK_STREAM,         # Sets the socket() type
+      SocketProtocol => 'tcp',               # Sets the socket() protocol
+      Reuse          => 'on',                # Lets the port be reused
+  );
+  $heap->{testc} = Test::POE::Client::TCP->spawn(
+     inputfilter => TPCTParseWords->new(),
+     outputfilter => POE::Filter::Line->new(),
+  );
+  isa_ok( $heap->{testc}, 'Test::POE::Client::TCP' );
+  return;
+}
+
+sub _accept {
+  my ($kernel,$heap,$socket) = @_[KERNEL,HEAP,ARG0];
+  my $wheel = POE::Wheel::ReadWrite->new(
+      Handle       => $socket,
+      InputEvent   => '_sock_in',
+      ErrorEvent   => '_sock_err',
+  );
+  $heap->{wheels}->{ $wheel->ID } = $wheel;
+  $wheel->put('"This is just a test" "line" "so there"');
+  return;
+}
+
+sub _failed {
+  my ($kernel,$heap,$operation,$errnum,$errstr,$wheel_id) = @_[KERNEL,HEAP,ARG0..ARG3];
+  die "Wheel $wheel_id generated $operation error $errnum: $errstr\n";
+  return;
+}
+
+sub _sock_in {
+  my ($heap,$input,$wheel_id) = @_[HEAP,ARG0,ARG1];
+  pass('Got input from client');
+#  $heap->{wheels}->{ $wheel_id }->put( $input ) if $heap->{wheels}->{ $wheel_id };
+  delete $heap->{wheels}->{ $wheel_id } if $input eq 'quit';
+  return;
+}
+
+sub _sock_err {
+  my ($heap,$wheel_id) = @_[HEAP,ARG3];
+  pass('Client disconnected');
+  delete $heap->{wheels}->{ $wheel_id };
+  return;
+}
+
+sub testc_registered {
+  my ($kernel,$sender,$object) = @_[KERNEL,SENDER,ARG0];
+  pass($_[STATE]);
+  isa_ok( $object, 'Test::POE::Client::TCP' );
+  my $port = ( sockaddr_in( $_[HEAP]->{listener}->getsockname() ) )[0];
+  $kernel->post( $sender, 'connect', { address => '127.0.0.1', port => $port } );
+  return;
+}
+
+sub testc_connected {
+  my ($kernel,$sender) = @_[KERNEL,SENDER];
+  pass($_[STATE]);
+#  $kernel->post( $sender, 'send_to_server', 'Hello, is it me you are looking for?' );
+  return;
+}
+
+sub testc_flushed {
+  pass($_[STATE]);
+  return;
+}
+
+sub testc_input {
+  my ($heap,$input) = @_[HEAP,ARG0];
+  pass('Got something back from the server');
+#  ok( $input eq 'Hello, is it me you are looking for?', $input );
+  ok( ( $input->[0] eq 'This is just a test' and $input->[1] eq 'line' and $input->[2] eq 'so there' ) , 'Test Get' );
+  $heap->{testc}->send_to_server('quit');
+  return;
+}
+
+sub testc_disconnected {
+  my ($heap,$state) = @_[HEAP,STATE];
+  pass($state);
+  delete $heap->{wheels};
+  delete $heap->{listener};
+  $heap->{testc}->shutdown();
+  return;
+}

@@ -1,0 +1,512 @@
+NAME
+    Text::Replace - replace variables from a hash
+
+SYNOPSIS
+     #######
+     # Subroutine Interface
+     #
+     use Text::Replace qw(&replace_variables);
+     $success = replace_variables(\$template, \%variable_hash, \@variable);
+
+     ########
+     # Class Interface
+     #
+     use Text::Replace;
+     $success = Text::Replace->replace_variables(\$template, \%variable_hash, \@variable);
+
+DESCRIPTION
+    The "Text::Replace" program module is simple and plain by design. The
+    "Text::Replace" program module mimics the built-in Perl double quote,
+    '"', literal scalar that replaces Perl scalar variables named with a
+    leading '$'. The "Text::Replace" program module stays in the background,
+    just like John William's movie scores. There is no large manual thicker
+    than the Bible with tricks and tips and gyrations to learn and to
+    distract. The module is plain, simple with no expressiveness. The
+    "Text::Replace" program module does only one thing: substitute a value
+    for a variable. It is amazing how many times, just a simple double quote
+    literal replacement in a small string or even a large text string gets
+    the job done.
+
+    Does "Text::Replace" solve all variable replacement, template problems?
+    Definitely not. There is no capabilities for inserting graphs, text wrap
+    plug-ins, GD interface. If an application needs something this
+    sophisticated, there are many fine template program modules in CPAN such
+    as the highly rated "Template" program module.
+
+SUBROUTINES
+  replace_variables
+
+    The "replace_variables" subroutine, takes a "\$template" reference
+    containing Perl scalar variables, always named the leading *funny
+    character* '$', and recursively looks up the value for the scalar
+    variables in the "\%variable_hash" and replaces the value in the
+    "\$template". The "replace_variables" subroutine only replaces those
+    variables in the "\@variable" list.
+
+REQUIREMENTS
+    Some day.
+
+DEMONSTRATION
+     #########
+     # perl Replace.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::Spec;
+
+         use File::Package;
+         my $fp = 'File::Package';
+
+         my $tr = 'Text::Replace';
+
+         my $loaded = '';
+         my $template = '';
+         my %variables = ();
+         my $expected = '';
+
+     ##################
+     # Load UUT
+     # 
+
+     my $errors = $fp->load_package($tr)
+     $errors
+
+     # ''
+     #
+
+     ##################
+     # replace variables
+     # 
+
+     $template = << 'EOF';
+     =head1 Title Page
+
+      Software Version Description
+
+      for
+
+      ${TITLE}
+
+      Revision: ${REVISION}
+
+      Version: ${VERSION}
+
+      Date: ${DATE}
+
+      Prepared for: ${END_USER} 
+
+      Prepared by:  ${AUTHOR}
+
+      Copyright: ${COPYRIGHT}
+
+      Classification: ${CLASSIFICATION}
+
+     =cut
+
+     EOF
+
+     %variables = (
+        TITLE => 'SVDmaker',
+        REVISION => '-',
+        VERSION => '0.01',
+        DATE => '1969/5/6',
+        END_USER => 'General Public',
+        AUTHOR => 'Software Diamonds',
+        COPYRIGHT => 'none',
+        CLASSIFICATION => 'none');
+
+     $tr->replace_variables( \$template, \%variables );
+     $template
+
+     # '=head1 Title Page
+
+     # Software Version Description
+
+     # for
+
+     # SVDmaker
+
+     # Revision: -
+
+     # Version: 0.01
+
+     # Date: 1969/5/6
+
+     # Prepared for: General Public 
+
+     # Prepared by:  Software Diamonds
+
+     # Copyright: none
+
+     # Classification: none
+
+     #=cut
+
+     #'
+     #
+
+QUALITY ASSURANCE
+    Running the test script "Replace.t" verifies the requirements for this
+    module. The "tmake.pl" cover script for Test::STDmaker automatically
+    generated the "Replace.t" test script, "Replace.d" demo script, and
+    "t::Text::Replace" program module POD, from the "t::Text::Replace"
+    program module contents. The "tmake.pl" cover script automatically ran
+    the "Replace.d" demo script and inserted the results into the
+    'DEMONSTRATION' section above. The "t::Text::Replace" program module is
+    in the distribution file Text-Replace-$VERSION.tar.gz.
+
+NOTES
+  Author
+
+    The holder of the copyright and maintainer is
+
+    <support@SoftwareDiamonds.com>
+
+  Copyright Notice
+
+    Copyrighted (c) 2002 Software Diamonds
+
+    All Rights Reserved
+
+  Binding Requirements
+
+    Binding requirements are indexed with the pharse 'shall[dd]' where dd is
+    an unique number for each header section. This conforms to standard
+    federal government practices, STD490A 3.2.3.6. In accordance with the
+    License, Software Diamonds is not liable for any requirement, binding or
+    otherwise.
+
+  License
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    3   Commercial installation of the binary or source must visually
+        present to the installer the above copyright notice, this list of
+        conditions intact, that the original source is available at
+        http://softwarediamonds.com and provide means for the installer to
+        actively accept the list of conditions; otherwise, a license fee
+        must be paid to Softwareware Diamonds.
+
+    SOFTWARE DIAMONDS, http://www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE ALSO
+    Template
+    Docs::Site_SVD::Text_Replace
+    Test::STDmaker
+    ExtUtils::SVDmaker
+NAME
+    Text::Replace - replace variables from a hash
+
+Title Page
+     Software Version Description
+
+     for
+
+     Text::Replace - replace variables from a hash
+
+     Revision: F
+
+     Version: 0.07
+
+     Date: 2004/05/11
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright 2003 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The "Text::Replace" program module is simple and plain. This is
+    intentional. The "Text::Replace" mimics the built-in Perl double quote,
+    '"', literal scalar that replaces Perl scalar variables named with a
+    leading '$'. The "Text::Replace" program module foregoes expressiveness
+    for convenience and performance. Like a movie score, it stays in the
+    background. There is no large manual thicker than the Bible with tricks
+    and tips and gyrations to learn and to distract. It is amazing how many
+    times, just a simple double quote literal replacement in a small text
+    string or even a large text string gets the job done.
+
+    Does "Text::Replace" solve all variable replacement, template problems?
+    Definitely not. There is no capabilities for inserting graphs, text wrap
+    plug-ins, GD interface. If an application needs something this
+    sophisticated, there are many fine template program modules in CPAN such
+    as the highly rated "Template" program module.
+
+  1.3 Document overview.
+
+    This document releases Text::Replace version 0.07 providing a
+    description of the inventory, installation instructions and other
+    information necessary to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     Text-Replace-0.07.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright 2003 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        3   Commercial installation of the binary or source must visually
+            present to the installer the above copyright notice, this list
+            of conditions intact, that the original source is available at
+            http://softwarediamonds.com and provide means for the installer
+            to actively accept the list of conditions; otherwise, a license
+            fee must be paid to Softwareware Diamonds.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/Text_Replace.pm                            0.07    2004/05/11 revised 0.06
+     MANIFEST                                                     0.07    2004/05/11 generated, replaces 0.06
+     Makefile.PL                                                  0.07    2004/05/11 generated, replaces 0.06
+     README                                                       0.07    2004/05/11 generated, replaces 0.06
+     lib/Text/Replace.pm                                          1.13    2004/05/11 revised 1.12
+     t/Text/Replace.t                                             0.05    2004/05/04 unchanged
+     t/Text/Replace.pm                                            0.03    2004/05/04 unchanged
+     t/Text/Replace.d                                             0.04    2004/05/04 unchanged
+     t/Text/File/Package.pm                                       1.17    2004/05/11 revised 1.16
+     t/Text/Test/Tech.pm                                          1.24    2004/05/11 revised 1.22
+     t/Text/Data/Secs2.pm                                         1.22    2004/05/11 revised 1.19
+     t/Text/Data/SecsPack.pm                                      0.07    2004/05/11 revised 0.04
+     t/Text/Data/Startup.pm                                       0.06    2004/05/11 revised 0.04
+
+  3.3 Changes
+
+    Changes are as follows:
+
+    Test-STD-STDutil-0.01
+        Rename Module
+            At 02:44 AM 6/14/2003 +0200, Max Maischein wrote: A second thing
+            that I would like you to reconsider is the naming of
+            "Test::TestUtil" respectively "Test::Tech" - neither of those is
+            descriptive of what the routines actually do or what the module
+            implements. I would recommend renaming them to something closer
+            to your other modules, maybe "Test::SVDMaker::Util" and
+            "Test::SVDMaker::Tech", as some routines do not seem to be
+            specific to the Test::-suite but rather general
+            (format_array_table). Some parts (the "scrub" routines) might
+            even better live in another module namespace,
+            "Test::Util::ScrubData" or something like that.
+
+            Broke away the template and table routines from Test::TestUtil
+            created this module Test::STD::STDutil.
+
+    Test-STD-STDutil-0.02
+        Use the new modules from the break-up of the "File::FileUtil" module
+
+    Text-Replace-0.01
+        Broke up the "Test::STD::STDutil" module and moved it to more
+        appropriate places in the high level directory tree.
+
+    Text-Replace-0.02
+        Change the test so that test support program modules resides in
+        distribution directory tlib directory instead of the lib directory.
+        Because they are no longer in the lib directory, test support files
+        will not be installed as a pre-condition for the test of this
+        module. The test of this module will precede immediately. The test
+        support files in the tlib directory will vanish after the
+        installtion.
+
+    Text-Replace-0.03
+        Recreate distribution file with Archive::TarGzip 0.02 that uses mode
+        777 for directories instead of 666. Started to get emails from Unix
+        installers about untar not being able to change to a directory with
+        mode of 666.
+
+    Text-Replace-0.04
+        Add the module 'Data::Secs2' in the tlib that provides 'stringify'
+        support for the 'Test::Tech' module.
+
+    Text-Replace-0.05
+        The lastest build of "Test::STDmaker" expects the test library in
+        the same directory as the test script. Coordiated with the lastest
+        Test::STDmaker by moving the test library from tlib to t/Text, the
+        same directory as the test script and deleting the test library
+        "File::TestPath" program module, adding the "Data::SecsPack" and
+        "Data::Startup" to the test library.
+
+        Added Description, Subroutines, See Also headers. Clean up the
+        Quality Assurance and Notes.
+
+    Text-Replace-0.06
+        Broken POD link cause big problems with pod2html. Fixed and run
+        throught podchecker.
+
+    Text-Replace-0.07
+        Had the wrong name in POD NAME section. Fixed.
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'Text-Replace-0.07.tar.gz' and download to a
+        temporary installation directory. Enter the following where $make is
+        'nmake' for microsoft windows; otherwise 'make'.
+
+         gunzip Text-Replace-0.07.tar.gz
+         tar -xf Text-Replace-0.07.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         None.
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/Text/Replace.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+
+    There is still much work needed to ensure the quality of this module as
+    follows:
+
+    *   State the functional requirements for each method including not only
+        the GO paths but also what to expect for the NOGO paths
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+2.0 SEE ALSO
+    Text::Replace
+    Docs::US_DOD::SVD
+    Template

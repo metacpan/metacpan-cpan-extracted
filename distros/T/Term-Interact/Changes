@@ -1,0 +1,55 @@
+Revision history for Perl extension Term::Interact.
+
+0.40  Wed Apr 10 1:25:33 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Term::Interact
+
+0.41 Tue Jun 19 2002
+        - upgraded documentation.
+        - major simplification of the API.  Sorry, no backward
+          compatability, but the new API rocks. 
+        - added translate method.
+        - added filetest check.
+        - added various formatting parms for greater "look
+          and feel" control.
+        - *all* output to FH_OUT now uses format() from 
+          Text::Autoformat for consistency.
+        - added AUTOLOADING of get/set methods for modifying
+          parameters stored in Term::Interact objects.
+        - added new_check method to offload processing of
+          check parms from the individual check subs.  Now
+          all the check subs expect check objects, which 
+          are constructed by new_check.
+
+0.42 Tue Jun 25 2002
+        - now untars correctly (into a subdirectory) instead
+          of into individual files.  :-)
+
+0.43 Thu Jul 25 2002
+        - now works under cron (obviously in a non-interactive
+          mode :-)
+        - new method: parameters.  Can return info regarding
+          available parameters, their types, and their
+          defaults.  Called with no arguments, it simply
+          returns a list of available parameters.
+        - accessor/mutator methods enabled for all parameters. 
+
+0.44 Thu Oct 10 2002
+        - custom check functionality was broken; now fixed.
+        - added 'succinct' parameter to allow less wordy
+          interaction.
+        - added 'echo' parameter to tell get method to echo
+          validated input to FH_OUT before it returns.
+        - added 'check_default' parameter to force validation
+          of default value if it is chosen.
+
+0.50 Thu Jan 08 2009
+        - Updated test script because existing tests would no
+          longer pass when doing a fresh install.  I suppose
+          this was because other modules and Perl itself have
+          changed a bit in the past six years!  :-)
+        - Fixed a bug: the default message was being incorrectly
+          constructed if a name was specified but no message was
+          specified.  Added a test to cover for it.  Thanks go
+          out to Dr. Henrik Seidel!
+

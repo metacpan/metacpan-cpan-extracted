@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Text-DeSupercite
+version: 0.6
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0
+  Text::Quoted: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Text::DeSupercite:
+    file: lib/Text/DeSupercite.pm
+    version: 0.6
+generated_by: Module::Build version 0.20

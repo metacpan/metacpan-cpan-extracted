@@ -1,0 +1,5 @@
+[% USE 
+	rss = RSSLite("test/slashdot.rdf");
+	USE Dumper;
+	Dumper.dump(rss);
+%]

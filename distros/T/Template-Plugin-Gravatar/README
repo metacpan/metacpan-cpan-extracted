@@ -1,0 +1,13 @@
+Template-Plugin-Gravatar
+
+Easy and fully configurable Gravatars from user emails in your
+templates.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/traffic.tt
+lib/Template/Plugin/Octets.pm
+t/00-compile.t
+t/01_methods.t
+t/release-distmeta.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-test-version.t

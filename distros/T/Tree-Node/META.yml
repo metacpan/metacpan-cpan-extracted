@@ -1,0 +1,27 @@
+---
+name: Tree-Node
+version: 0.08
+author:
+  - 'Robert Rothenberg <rrwo at cpan.org>'
+abstract: Memory-efficient tree nodes in Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.6.0
+build_requires:
+  Test::More: 0
+  base: 0
+recommends:
+  Devel::Leak: 0
+  Test::Pod: 1.00
+  Test::Pod::Coverage: 0
+  Test::Portability::Files: 0
+provides:
+  Tree::Node:
+    file: lib/Tree/Node.pm
+    version: 0.08
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

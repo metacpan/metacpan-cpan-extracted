@@ -1,0 +1,10 @@
+Revision history for Perl extension Text::CountString
+
+0.03    Mon Apr 28 08:50:01 JST 2014
+        - removed the line: no need
+
+0.02    Sun Apr 27 23:51:22 JST 2014
+        - switchable internal implements
+
+0.01    Sat Apr 26 11:22:31 JST 2014
+        - original version

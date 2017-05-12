@@ -1,0 +1,12 @@
+Changes
+lib/Template/Parser/CET.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00_base.t
+t/7_template_00_base.t
+t/7_template_04_html_template.t
+t/7_template_05_text_tmpl.t
+t/7_template_06_velocity.t
+META.yml                                 Module meta-data (added by MakeMaker)

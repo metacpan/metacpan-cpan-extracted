@@ -1,0 +1,10 @@
+<%args>
+$form
+</%args>
+
+<h3>Create a new testrun</h3>
+<fieldset>
+<strong>Choose use case</strong>
+<% $form|n %>
+</fieldset>
+<p><a href="/tapper/start/">Cancel</a></p>

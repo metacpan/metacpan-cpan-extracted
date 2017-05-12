@@ -1,0 +1,159 @@
+Revision history for Perl module Test::SharedFork
+
+0.35 2015-12-21T23:25:12Z
+
+    - Support Test2
+
+0.34 2015-09-29T14:53:27Z
+
+    - Support upcoming Test::Stream changes
+
+0.33 2015-06-06T03:36:58Z
+
+    - Tell Test::Stream::IPC to poll for results
+
+0.32 2015-06-04T16:14:57Z
+
+    - Update for newer Test::Stream
+    - REmove some old Test::Stream support
+
+0.31 2015-04-28T20:25:31Z
+
+    - Fix test that accidentally got commited last release
+
+0.30 2015-04-28T20:19:58Z
+
+    - Minor changes to support newer Test::Stream versions
+
+0.28 2014-07-04T07:37:50Z
+
+    - Fixed minor testing issue on Win32.
+      (charsbar++)
+
+0.27 2014-07-03T05:37:00Z
+
+    commit fa8821ff5fe7b44a2461ea58e537ea01221504ed
+    Author: Chad Granum <chad.granum@dreamhost.com>
+    Date:   Tue Jul 1 15:13:28 2014 -0700
+
+        Fix another issue with Result_Stream branch of TB
+
+0.26 2014-06-27T04:20:47Z
+
+    - Fix support for Result_Stream Test::Builder branch
+      (exodist)
+
+0.25 2014-06-24T01:34:10Z
+
+    - Switch to EUMM
+
+0.24 2014-04-07T21:21:56Z
+
+    - Cygwin 64-bit - allow tests to pass
+      (rwhitworth)
+
+0.23 2014-03-12T20:12:11Z
+
+    - 06_fail_lineno.t fails on Windows due to path separator #9
+      (nanis)
+
+0.22 2014-03-11T00:01:43Z
+
+    - Care the is_passing value.
+      https://rt.cpan.org/Public/Bug/Display.html?id=93726
+      (Reported by RHOELZ++)
+
+0.21 2012-11-28
+
+    - t/10_subtest.t: added --norc option for more portable testing.
+
+0.20 2012-02-09
+
+    - test_requires Time::HiRes for redhat.
+      (berekuk++)
+
+0.19 2011-11-29
+
+    - fixed TB2 support(tokuhirom)
+
+0.18 2011-10-04
+
+    - More fixes for failure locations(hoelzro)
+
+0.17 2011-10-03
+
+    - fixed test level(hoelzro)
+
+0.16 2011-02-10
+
+    - doc tweaks
+
+0.15 2010-09-11
+
+    - added "LIMITATION" section to docs.
+      I gave up to support ithreads.
+
+0.14 2010-09-11
+
+    - release!
+
+0.13_01 2010-09-10
+
+    - Test::Builder2 support
+
+0.12 2010-08-17
+
+    - fixed lazy loading issue RT#60426
+      (reported by J.)
+
+0.11 2009-12-16
+
+    - write depended perl version. this module requires perl5.8 or later.
+
+0.10 2009-12-14
+
+    - oops
+
+0.09 2009-10-26
+
+    - fixed $Test::Builder::Level(by konbuizm)
+
+0.08 2009-10-18
+
+    - fixed deps for Test::More 0.88(thanks to andk++)
+
+0.07 not released
+
+    - cleanup code.->parent, ->child, ->fork was obsoleted.
+
+0.07_01 2009-10-18
+
+    - win32 support
+    - added premitive test cases
+
+0.06 2009-10-15
+
+    - call parent() automatically(reported by kazuho++)
+
+0.05 2009-04-12
+
+    - enhancements for subtests support
+
+0.04 2009-03-25
+
+    - [BUG] previous version does not works with many fork
+
+0.03 2009-03-25
+
+    - added Test::SharedFork->fork()
+    - use flock(2) instead of IPC::ShareLite
+
+0.02 2009-03-25
+
+    - ooppppsss. Test::Fork was already used by schwern.
+      rename to Test::SharedFork
+
+0.01 2009-03-25 14:06:28
+
+    - original version
+

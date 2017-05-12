@@ -1,0 +1,7 @@
+wrapper=reg:[% wrapper_var %],meta={% wrapper_meta_var %}
+content=[% content %]
+content_meta={% content %}
+include_meta={% INCLUDE include.tt %}
+include=[% INCLUDE include.tt %]
+process_meta={% PROCESS process.tt %}
+process=[% PROCESS process.tt %]

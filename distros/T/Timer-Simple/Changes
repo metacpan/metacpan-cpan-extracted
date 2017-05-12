@@ -1,0 +1,34 @@
+Revision history for Timer-Simple
+
+1.006     2015-04-29T13:47:13Z
+
+  - Fix pod link.  Thanks to perlancar for the pull request (gh-2).
+
+1.005     2014-02-01T16:59:43Z
+
+  - Add 'rps' format to show possible requests per second ('4.743616s (0.211/s)').
+    Thanks Tomohiro Hosaka!
+
+1.004     2011-07-15T00:32:30Z
+
+  - Add some debug output for a smoke test failure
+  - Superficial dist/release changes
+
+1.003     2011-03-25T01:56:38Z
+
+  - 'string' attribute to new() sets default format for string() method
+    (customizable stringification)
+  - Default stringifcation changed from 'hms' to new 'short' format
+  - Deprecate 'format' attribute; Use 'hms' instead
+
+1.002     2011-03-24T00:40:28Z
+
+  - fix bug of adjusting the clock when calling stop() mutliple times
+
+1.001     2011-03-24T00:35:59Z
+  - Overload numeric context (evaluates to elapsed())
+  - Provide package functions for working with multiple timers
+
+1.000     2011-03-24T00:19:07Z
+
+  - Initial version

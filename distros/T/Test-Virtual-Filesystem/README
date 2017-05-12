@@ -1,0 +1,287 @@
+NAME
+    Test::Virtual::Filesystem - Validate a filesystem
+
+SYNOPSIS
+        use Test::Virtual::Filesystem;
+        Test::Virtual::Filesystem->new({mountdir => '/path/to/test'})->runtests;
+
+    or with more customization:
+
+        use Test::Virtual::Filesystem;
+        my $test = Test::Virtual::Filesystem->new({mountdir => '/path/to/test', compatible => '0.03'});
+        $test->enable_test_xattr(1);
+        $test->enable_test_chown(1);
+        $test->enable_test_atime(1);
+        $test->runtests;
+
+    See the file t/filesys.t in this distribution or the file t/fusepdf.t in
+    the Fuse::PDF distribution for thorough examples.
+
+    WARNING: all of the files in the `mountdir' will be deleted in the
+    `teardown' method so BE CAREFUL that you specify the right folder!
+
+LICENSE
+    Copyright 2008 Chris Dolan, *cdolan@cpan.org*
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DESCRIPTION
+    If you are creating a filesystem, say via Fuse or Filesys::Virtual, you
+    need a fairly mundane set of tests to try out lots of typical filesystem
+    operations. This package attempts to accumulate a bunch of those tests
+    into a handy suite to make it easier for you to test your filesystem.
+
+    This suite is based on `Test::Class', a fantastic library for organizing
+    tests into bite-sized bundles. The power of Test::Class lets you select
+    a subset of tests to run at author time. For example, when I was working
+    on the extended attribute (aka `xattr') tests, I found myself typing
+    this:
+
+      env TEST_METHOD='xattr_.*' perl -Ilib t/filesys.t
+
+    which runs just the test methods that begin with `xattr_'.
+
+    There are several methods that let you turn on or off a subset of the
+    tests. For example, if you do not intend that your filesystem will
+    support symbolic links, you can invoke `$test-'enable_test_symlink(0)>
+    in your test program just before you call `$test-'runtests>.
+
+COMPATIBILITY POLICY
+    Every time I add a new test to this suite, I annotate it with a version
+    number. If client code specifies an expected version number (say, 1.10)
+    and it's running against a newer version or this module (say, 1.20) then
+    any newer test will be marked as a TODO test. That way if the test
+    fails, it won't regress published code that used to work.
+
+    This policy will allow us to continue adding new filesystem tests
+    without worrying about breaking existing CPAN modules.
+
+CAVEATS AND LIMITATIONS
+    This module needs a more complete suite of test cases. In particular,
+    tests are needed for the following filesystem features:
+
+        hardlinks
+        nlink
+        seek/rewinddir, tell/telldir
+        read, sysread, syswrite
+        overwrite (with open '+<')
+        deep directories
+        very full directories
+        large files
+        filenames with spaces
+        non-ASCII filenames (maybe constructor should specify the encoding?)
+        permissions
+        special file types (fifos, sockets, character and block devices, etc)
+        chown
+        binmode, non-binmode
+        eof
+        fileno
+        statfs (AKA `df` or `mount`)
+        rename corner cases:
+         * dest inside src
+         * src or dest leaf is '.' or '..'
+         * src or dest is FS root
+         * dest leaf is symlink
+        threading and re-entrancy
+        file locking?
+        async I/O??
+
+    Any help writing tests (or adapting tests from existing suites) will be
+    appreciated!
+
+METHODS
+    This module is a subclass of Test::Class. All methods from that class
+    are available, particularly `runtests()'.
+
+    $pkg->new({mountdir => $mountdir, ...})
+        Create a new test suite which will operate on files contained within
+        the specified mount directory. WARNING: any and all files and
+        folders in that mount directory will be deleted!
+
+        The supported options are:
+
+        `mountdir'
+            This required property indicates where tests should run.
+
+        `compatible'
+            Specify a Test::Virtual::Filesystem version number that is known
+            to work. If the actual Test::Virtual::Filesystem version number
+            is greater, then any test cases added after the specified
+            compatible version are considered `TODO' tests. See Test::More
+            for details about `TODO' tests.
+
+    $self->init()
+        Invoked just before then end of `new()'. This exists solely for
+        subclassing convenience. This implementation does nothing.
+
+PROPERTIES
+    The following accessor/mutator methods exist to turn on/off various
+    features. They all behave in usual Perl fashion: with no argument, they
+    return the current value. With one argument, they set the current value
+    and return the newly set value.
+
+    $self->enable_test_all()
+        As a getter, checks whether all of the other tests are enabled.
+
+        As a setter, turns on/off all the tests.
+
+    $self->enable_test_xattr()
+        Default false.
+
+    $self->enable_test_time()
+        Default true. If set false, it also sets `atime', `mtime' and
+        `ctime' false.
+
+    $self->enable_test_atime()
+        Default false.
+
+    $self->enable_test_mtime()
+        Default true.
+
+    $self->enable_test_ctime()
+        Default true.
+
+    $self->enable_test_permissions()
+        Default false.
+
+    $self->enable_test_special()
+        Default true. If set false, it also sets `fifo' false.
+
+    $self->enable_test_fifo()
+        Default false. AKA named pipes.
+
+    $self->enable_test_symlink()
+        Default true, except for platforms that do not support symlinks (for
+        example MSWin32 and cygwin) as determined by
+        `$Config::Config{d_symlink}'.
+
+    $self->enable_test_hardlink()
+        AKA the `link()' function. Default true. If set false, this also
+        sets `nlink' false.
+
+    $self->enable_test_nlink()
+        Count hard links. Default true.
+
+    $self->enable_test_chown()
+        Default false.
+
+TEST CASES
+    setup()
+        Runs before every test to prepare a directory for testing.
+
+    teardown()
+        Runs after every test to clean up the test directory so the next
+        test will have a clean workspace.
+
+    Introduced($version)
+        A subroutine attribute used to flag the Test::Virtual::Filesystem
+        version number when that test was introduced. It's used like this:
+
+          sub open_nonexistent_file : Tests(1) : Introduced('0.02') {
+             ok(!open(my $f, '<', '/tmp/no_such_file'));
+          }
+
+    Features($featurelist)
+        This is a subroutine attribute to specify one or more features used
+        in the test. The features should be listed as a comma-separated
+        list:
+
+          sub symlink_create : Tests(1) : Features('symlink') {
+             ok(symlink($src, $dest));
+          }
+          sub symlink_permissions : Tests(2) : Features('symlink, permissions') {
+             ok(symlink($src, $dest));
+             ok(-w $dest);
+          }
+
+        Subfeatures must be separated from their parent features by a `/'.
+        For example:
+
+          sub atime_mtime_set : Tests(1) : Features('time/atime, time/mtime') {
+             my $now = time;
+             ok(utime($now, $now, $file));
+          }
+
+        Look at the source code for `%feature_defaults' to see the supported
+        features and subfeatures. The `enable_test_*' methods above describe
+        the all the features, but in those methods the subfeature names are
+        flattened.
+
+    stat_dir(), introduced in v0.01
+    read_dir(), introduced in v0.01
+    read_dir_fail(), introduced in v0.01
+    read_file_fail(), introduced in v0.01
+    write_empty_file(), introduced in v0.01
+    write_file(), introduced in v0.01
+    write_file_subdir_fail(), introduced in v0.01
+    write_append_file(), introduced in v0.01
+    write_read_file(), introduced in v0.01
+    write_read_file_binary(), introduced in v0.08
+    write_unlink_file(), introduced in v0.01
+    write_mkdir(), introduced in v0.01
+    write_mkdir_fail(), introduced in v0.01
+    write_rmdir(), introduced in v0.01
+    write_subdir(), introduced in v0.01
+    symlink_create(), introduced in v0.02
+    symlink_follow(), introduced in v0.04
+    symlink_deep(), introduced in v0.06
+    symlink_loop(), introduced in v0.06
+    truncate_file(), introduced in v0.06
+    truncate_no_file(), introduced in v0.06
+    truncate_file_no_dir(), introduced in v0.06
+    truncate_dir(), introduced in v0.06
+    time_mtime_create(), introduced in v0.06
+    time_ctime_create(), introduced in v0.06
+    time_mtime_set(), introduced in v0.06
+    time_atime_set(), introduced in v0.06
+    xattr_list(), introduced in v0.02
+    xattr_set(), introduced in v0.02
+    rename_file(), introduced in v0.08
+    rename_file_exists(), introduced in v0.08
+    rename_file_self(), introduced in v0.08
+    rename_file_subdir(), introduced in v0.08
+    rename_file_missing_src(), introduced in v0.08
+    rename_file_missing_srcdir(), introduced in v0.08
+    rename_file_missing_destdir(), introduced in v0.08
+    rename_dir(), introduced in v0.08
+    rename_dir_exists(), introduced in v0.08
+    rename_dir_notempty(), introduced in v0.08
+    rename_dir_self(), introduced in v0.08
+    rename_dir_subdir(), introduced in v0.08
+    rename_mismatch_dir(), introduced in v0.08
+    rename_mismatch_file(), introduced in v0.08
+    rename_symlink(), introduced in v0.08
+CODE PHILOSOPHY
+    These are some coding/design rules for the tests:
+
+    Use only core filesystem functions
+        Don't use File::Slurp, File::Path, etc. because they abstract
+        filesystem operations and make it less clear what we're testing.
+
+    Keep the tests small
+        Test as little as possible in each method. Let authors know what's
+        failed by the pattern of failing tests. This also helps avoid
+        needing to edit the tests later.
+
+    Avoid editing methods
+        Don't break published CPAN code. If you want to test something new,
+        write a new method.
+
+    Try to use a few different filesystem functions as practical in one
+    method
+        For example, if you're testing `chmod', don't `mkdir' or `chown'
+        unless you're writing a `chmod_mkdir_chown' test.
+
+    Minimize test infrastructure
+        Use method attributes and Test::Class features to keep the test
+        methods really simple.
+
+SEE ALSO
+    Test::Class
+
+    Fuse::PDF
+
+AUTHOR
+    Chris Dolan, *cdolan@cpan.org*
+

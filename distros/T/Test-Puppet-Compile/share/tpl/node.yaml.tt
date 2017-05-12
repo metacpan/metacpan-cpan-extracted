@@ -1,0 +1,77 @@
+--- !ruby/object:Puppet::Node::Facts
+  values:
+    rubyversion: "1.8.7"
+    swapfree: "115.75 MB"
+    postgres_default_version: "9.1"
+    boardmanufacturer: "Intel Corporation"
+    ip6tables_version: "1.4.12"
+    type: Other
+    is_virtual: "true"
+    lsbdistcodename: precise
+    osfamily: Debian
+    virtual: vmware
+    uptime_days: "0"
+    ipaddress: "172.23.42.23"
+    netmask: "255.255.0.0"
+    ps: "ps -ef"
+    netmask_lo: "255.0.0.0"
+    environment: [% environment %]
+    hostname: [% hostname %]
+    processor0: "Intel(R) Xeon(R) CPU E5-2603 0 @ 1.80GHz"
+    architecture: amd64
+    memoryfree: "818.32 MB"
+    lsbdistdescription: "Ubuntu 12.04.2 LTS"
+    boardserialnumber: None
+    path: "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+    physicalprocessorcount: "2"
+    serialnumber: "VMware-42 23 ca fe de ad ba be-b0 0b ba be de ca f0 00"
+    domain: [% domain %]
+    is_pe: "false"
+    id: root
+    macaddress_eth0: "00:50:56:a3:ff:ff"
+    ipaddress_eth0: "172.23.42.23"
+    selinux: "false"
+    netmask_eth0: "255.255.0.0"
+    network_eth0: "172.23.0.0"
+    !ruby/sym "_timestamp": 2013-06-07 11:12:42.635734 +02:00
+    interfaces: "eth0,lo"
+    hardwaremodel: x86_64
+    clientversion: "2.7.11"
+    rubysitedir: /usr/local/lib/site_ruby/1.8
+    uptime_seconds: "47395"
+    kernelmajversion: "3.2"
+    kernelversion: "3.2.0"
+    lsbdistrelease: "12.04"
+    boardproductname: "440BX Desktop Reference Platform"
+    iptables_version: "1.4.12"
+    macaddress: "00:50:56:a3:ff:ff"
+    memorytotal: "1.96 GB"
+    ipaddress_lo: "127.0.0.1"
+    uniqueid: "01010101"
+    operatingsystem: Ubuntu
+    uptime: "01:01 hours"
+    uptime_hours: "1"
+    kernel: Linux
+    manufacturer: "VMware, Inc."
+    operatingsystemrelease: "12.04"
+    swapsize: "121.00 MB"
+    fqdn: [% hostname %].[% domain %]
+    network_lo: "127.0.0.0"
+    productname: "VMware Virtual Platform"
+    processorcount: "2"
+    processor1: "Intel(R) Xeon(R) CPU E5-2603 0 @ 1.80GHz"
+    lsbdistid: Ubuntu
+    hardwareisa: x86_64
+    puppetversion: "2.7.11"
+    kernelrelease: "3.2.0-45-generic"
+    augeasversion: "0.10.0"
+    root_home: /root
+    lsbmajdistrelease: "12"
+    puppet_vardir: /var/lib/puppet
+    clientcert: [% hostname %].[% domain %]
+    memorysize: "1.96 GB"
+    timezone: CEST
+    facterversion: "1.6.5"
+  name: [% hostname %].[% domain %]
+  expiration: 2113-06-07 11:42:42.596193 +02:00
+

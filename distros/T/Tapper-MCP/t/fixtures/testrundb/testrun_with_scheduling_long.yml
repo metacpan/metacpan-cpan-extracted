@@ -1,0 +1,214 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 1
+    name: iring
+    free: 1
+    active: 1
+
+- schema: Host
+  name: bullock
+  data:
+    id: 2
+    name: bullock
+    free: 1
+    active: 1
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 3
+    name: dickstone
+    free: 1
+    active: 1
+
+- schema: Host
+  name: athene
+  data:
+    id: 4
+    name: athene
+    free: 1
+    active: 1
+
+- schema: Host
+  name: bascha
+  data:
+    id: 5
+    name: bascha
+    free: 1
+    active: 1
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+    active: 1
+
+- schema: Queue
+  name: KVM Queue
+  data:
+    id: 2
+    name: KVM
+    priority: 200
+    active: 1
+
+- schema: Queue
+  name: Kernel Queue
+  data:
+    id: 3
+    name: Kernel
+    priority: 100
+    active: 1
+
+- schema: Queue
+  name: AdHoc Queue
+  data:
+    id: 4
+    name: AdHoc
+    priority: 1000
+    active: 1
+
+
+- schema: QueueHost
+  name: Iring-AdHoc
+  data: 
+    queue_id: 4
+    host_id: 1
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: autoinstall
+  data:
+    id: 1
+    shortname: auto_auto
+    precondition: |
+      ---
+      precondition_type: autoinstall
+      timeout: 10800
+      filename: suse/SLES10SP3_x86_64.lst
+
+- schema: Precondition
+  name: Config for autoinstall
+  data:
+    id: 2
+    shortname: auto_prc
+    precondition: |
+      ---
+      precondition_type: testprogram
+      runtime: 30
+      program: /bin/uname_tap.sh
+      timeout: 90
+
+
+
+
+# ==================== "scheduling"
+
+
+# -------------------- "test requests" (Testruns)
+
+# ======================= Xen requests =========================
+
+# --- aaa ---
+
+- schema: Testrun
+  name: aaa
+  data:
+    owner_id: 12
+    shortname: Test-aaa-Xen
+    notes: 
+    topic_name: Software
+
+- schema: TestrunScheduling
+  name: Xen-aaa
+  data:
+    testrun_id: 1            # aaa
+    queue_id: 1              # Xen
+    status: schedule
+    auto_rerun: 1
+
+
+
+# ======================= KVM requests =========================
+
+# --- bbb ---
+
+- schema: Testrun
+  name: bbb
+  data:
+    owner_id: 12
+    shortname: Test-bbb-kvm
+    notes: 
+    topic_name: Software
+    
+- schema: TestrunScheduling
+  name: KVM-bbb
+  data:
+    testrun_id: 2               # bbb
+    queue_id: 2                 # KVM
+    status: schedule
+    auto_rerun: 1
+
+# ======================= Kernel requests =========================
+
+# --- ccc ---
+    
+- schema: Testrun
+  name: ccc-kernel
+  data:
+    owner_id: 12
+    shortname: Test-ccc-kernel
+    notes: ccc
+    topic_name: Distribution
+
+- schema: TestrunScheduling
+  name: Kernel-ccc
+  data:
+    testrun_id: 3               # ccc
+    queue_id: 3                 # Kernel
+    status: schedule
+    auto_rerun: 1
+
+
+# -------------------- "perfmon" <== "perl", "tapper-tools"
+
+- schema: TestrunPrecondition
+  name: precondition for Test1
+  data:
+    testrun_id: 1
+    precondition_id: 1
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: precondition for Test2
+  data:
+    testrun_id: 2
+    precondition_id: 2
+    succession: 1

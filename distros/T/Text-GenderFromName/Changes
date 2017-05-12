@@ -1,0 +1,39 @@
+Revision history for Perl extension Text::GenderFromName.
+
+0.33 Tue Apr 20 15:07:51 CDT 2010
+
+# Wow. People still use this! Fixed Makefile.PL to allow automated
+# smoke tests.
+
+0.30 Wed Jul 30 14:56:32 CDT 2003
+
+# Version 0.30 is a significant departure from previous versions. By
+# default, version 0.30 uses the U.S. Social Security Administration's
+# "Most Popular Names of the 1980's" list of 1001 male first names and
+# 1013 female first names. See CAVEATS in the pod documentation for
+# details on this list.
+#
+# Version 0.30 also allows for arbitrary female and male hashed lists
+# to be provided at run-time, and includes several built-ins to
+# provide matches based on exclusivity, weight, metaphones, and both
+# version 0.20 and version 0.10 regexp-style matching. The user can
+# also specify additional match subroutines and change the match order
+# at run-time.
+
+0.2  Fri Oct 26 18:01:18 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n Text::GenderFromName
+# Version 0.2.  Module list status is "Rdpf."
+#
+# Two big changes between this and version 0.1:
+#
+# First, the gender() subroutine now returns "m" if none of the rules 
+# trigger, instead of "undef".  This isn't meant to be sexist, but merely 
+# to reflect that the original rules were organized such that male names
+# were meant to "fall through" to the end.
+# 
+# Second, I've appended a big list of names that gets searched first.
+# This is counter to the spirit of the original code -- the whole point
+# was that it used heuristics to guess at the gender rather than a 
+# huge list of names.  But enough people have requested this that I 
+# decided to add in the huge list, disk space be darned.

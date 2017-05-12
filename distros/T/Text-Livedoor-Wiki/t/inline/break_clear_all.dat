@@ -1,0 +1,10 @@
+=== basic
+--- wiki
+~~~
+--- html
+<br clear="all" />
+=== with text
+--- wiki
+text ~~~ text %%text%%
+--- html
+text <br clear="all" /> text <del>text</del>

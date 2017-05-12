@@ -1,0 +1,218 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use Template::Patch;
+
+GetOptions \our %Conf, qw(patch|p=s version);
+
+version(), exit 0 if $Conf{version};
+
+my $p = Template::Patch->new_from_file($Conf{patch});
+
+my $input = slurp_in();
+$p->extract($input);
+$p->patch;
+
+$p->print;
+
+exit 0;
+
+sub slurp_in { local $/; <> }
+sub version {
+    (my $me = $0) =~ s,^.*/|\\,,;
+    print "$me ", Template::Patch->VERSION, "\n";
+}
+
+# vim: ts=4 et :
+
+__END__
+
+=head1 NAME
+
+metapatch - Apply parameterized patches
+
+=head1 SYNOPSIS
+
+    $ metapatch --patch mychanges.mp < oldfile > newfile
+
+    # or, programmatically:
+
+    use Template::Patch;
+
+    my $tp = Template::Patch->parse_patch_file($metapatch_file);
+    $tp->extract($source);
+    $tp->patch;
+    $tp->print;
+
+=head1 DESCRIPTION
+
+C<diff> and C<patch> are fine tools for applying changes to files. But
+sometimes you need to apply a change that cannot be expressed with one
+diff, for example, you have some parts that differ among files but which
+you wish to preserve:
+
+    # file1
+    
+     sub init {
+        info "init called";
+        # ...
+
+    # file2
+     
+    sub init {
+        info "init called (and oh, this is file2)";
+        # ...
+
+Suppose you want to go over all your init functions, and change the C<info>
+calls to C<debug>. You don't want to blindly C<perl -pi -e 's/info/trace/'>
+because you may have legitimate info prints elsewhere in the files that you
+wish to leave alone. You can't blindly patch C<info("init called");> to use
+C<trace>, because the text of the log message isn't identical. You I<could>
+write a simple parser that looks for the first log message after an C<init>
+call, but that's coding; and you I<could> do this with a regexp, but that's
+not very nice to maintain.
+
+C<Template::Patch> lets you write I<metapatches> describing your intended
+change. It uses L<Template::Toolkit> and L<Template::Extract> to describe
+what an interesting change would be. Because the input is first processed
+with L<Template::Extract>, you can access a dictionary of extracted values
+by name when describing your output. This can improve readability of your
+patch by giving names to data you rearrange or just pass through.  It can
+also be used for fancy templating stuff like repeating an interesting
+line from the input several times in the output.
+
+The metapatch for performing the change described above is:
+
+    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    sub init {
+        info [% message %]
+    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    sub init {
+        debug [% message %]
+
+=head1 METAPATCH FORMAT
+
+A I<metapatch file> (typically with the extension C<.mp>) has three
+sections.  Two separators (of twenty C<< < >>s and twenty C<< > >>s in
+turn) keep them apart.  (The separator lines may have more than twenty
+characters, everything after the first 20 is ignored until the line
+end.) XXX: this is stupid. If you have a better idea, please let me know.
+
+The first section (which may be empty) contains metapatch configuration
+directives. See the Configuration section for details.
+
+The second ("IN") section (after the C<< < >> separator) contains
+a TT2 template of expected text in the input file. It is fed to
+L<Template::Extract>, and variables extracted are kept around.
+
+The third ("OUT") section (after the C<< > >> separator) contains a TT2
+template of replacement text that goes in the output. Any TT2 directives
+are allowed. In particular, you may use variables extracted in the "IN"
+section.
+
+=head2 Configuration
+
+Configuration directives are optional. If they appear, they must be in
+C<key : value> format, one per line. Blanks and lines starting with C<#>
+are ignored.
+
+By default, the metapatch is not anchored. This means that implicitly,
+it is surrounded by C<[% pre %] ... [% post %]> variables, which are
+then emitted as-is in the output.
+
+To force your template to the beginning of the text, set the
+C<anchor-start> configuration parameter.
+
+To force your template to the end of the text, set the C<anchor-end>
+configuration parameter.
+
+=head1 TODO
+
+All these need more design.
+
+=over 4
+
+=item * Repeat matches in IN
+
+=item * Can several unrelated and order-indifferent chunks of mp live together in one file?
+
+=item * The metapatch format is silly
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Template::Patch>
+
+=item * L<Template::Toolkit>
+
+=item * L<Template::Extract>
+
+=back
+
+=head1 AUTHOR
+
+Gaal Yahas, C<< <gaal at forum2.org> >>
+
+=head1 CAVEATS
+
+This tool and the included L<Template::Patch> module are in early stages
+of gathering ideas and coming up with a good interface. They work (and have
+saved me time), but expect change in the interfaces.
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-template-patch at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Patch>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Template::Patch
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Template-Patch>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Template-Patch>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Patch>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Template-Patch>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Audrey Tang for sausage machine (and general) havoc.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Gaal Yahas, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+1; # End of Template::Patch

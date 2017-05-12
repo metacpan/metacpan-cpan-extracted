@@ -1,0 +1,11 @@
+Revision history for Tie-Handle-FileWriteRotate
+
+0.02    2012-12-26 (SHARYANTO)
+
+        Rename dist from Tie-Handle-FileRotate to Tie-Handle-FileWriteRotate.
+
+
+0.01    2012-12-21 (SHARYANTO)
+
+        First release.
+

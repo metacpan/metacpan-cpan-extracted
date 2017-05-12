@@ -1,0 +1,39 @@
+--- csparse.c~	2010-03-26 23:17:28.082788800 +0900
++++ csparse.c	2010-03-27 23:00:41.431782400 +0900
+@@ -1425,7 +1425,7 @@
+       arg->expr1 = NULL;
+     }
+     nargs = rearrange_for_call(&(arg->expr1));
+-    if (nargs != arg->function->n_args)
++    if (arg->function->n_args != -1 && nargs != arg->function->n_args)
+     {
+       return nerr_raise (NERR_PARSE,
+ 	  "%s Incorrect number of arguments in call to %s, expected %d, got %d",
+@@ -4441,3 +4442,27 @@
+   return nerr_pass (err);
+ }
+ #endif
++
++
++/* functions for Text::ClearSilver */
++
++NEOERR*
++tcs_eval_expr(CSPARSE* parse, CSARG* arg, CSARG* result) {
++    return nerr_pass(eval_expr(parse, arg, result));
++}
++
++const char*
++tcs_var_lookup(CSPARSE* parse, const char* name) {
++    return var_lookup(parse, name);
++}
++
++long
++tcs_var_int_lookup(CSPARSE* parse, const char* name) {
++    return var_int_lookup(parse, name);
++}
++
++HDF*
++tcs_var_lookup_obj(CSPARSE* parse, const char* name) {
++    return var_lookup_obj(parse, name);
++}
++

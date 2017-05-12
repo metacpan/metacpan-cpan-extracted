@@ -1,0 +1,19 @@
+--[%% INCLUDE block1 %%]--
+--[%% INCLUDE block2 %%]--
+--[%% INCLUDE block3 %%]--
+__MTEND__
+%% BLOCK block1 trim=0 %%
+This block is not "trimmed"
+The leading and trailing newlines are left intact
+%% ENDBLOCK %%
+
+%% BLOCK block2 %%
+This block is "trimmed"
+The leading and trailing newlines are removed.
+This gives the results that most people expect.
+This is the default mode for MetaText and can be over-ridded with a 
+"trim=0" parameter in the BLOCK
+%% ENDBLOCK %%
+
+%% BLOCK block3 trim=0 %%This block is not "trimmed" but doesn't introduce any
+extraneous newlines%% ENDBLOCK %%

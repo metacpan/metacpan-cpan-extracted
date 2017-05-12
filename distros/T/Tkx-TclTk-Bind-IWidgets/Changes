@@ -1,0 +1,24 @@
+Revision history for Perl extension Tkx::TclTk::Bind::IWidgets.
+================================================================================
+
+1.0.00  Mon 17.Dez.2012 - 14:31
+        Initial CPAN release.
+
+1.0.01  Mon 17.Dez.2012 - 17 21
+        - Revised documentation
+
+1.2.00  Sam 15.Jun.2013 - 21:30
+        - Revised erase routine
+
+1.2.01  Son 16.Jun.2013 - 21:30
+        - additional examples
+
+1.300   Son 20.Dez.2015 - 18:00
+        - Revised documentation and testing
+
+1.301   Son 20.Dez.2015 - 20:00
+        - More tests
+        - Added Build.PL
+
+1.400   Son. 14.Feb.2016 - 16:20
+        - Module 'Perl::Modern::Perl' replace by 'Modern::PBP::Perl'

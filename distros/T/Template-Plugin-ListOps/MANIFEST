@@ -1,0 +1,19 @@
+Build.PL
+examples/README.examples
+HISTORY
+lib/Template/Plugin/ListOps.pm
+lib/Template/Plugin/ListOps.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01.exp
+t/01.in
+t/01.out
+t/01.t
+t/pod.t
+t/pod_coverage.t
+t/runtests
+t/runtests.bat
+t/test.pl
+META.yml

@@ -1,0 +1,9 @@
+Revision history for Tree-SEMETrie
+
+0.01    2011-11-15 / 12:15 am
+        First version, released on an unsuspecting world.
+0.02    2011-11-15 / 02:00 am
+        - add/insert now returns a reference to the inserted value instead of just 1
+				- fixed documenation errors
+0.04    2011-12-14 / 4:42 pm
+        - added missing test dependency

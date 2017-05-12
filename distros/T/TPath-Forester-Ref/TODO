@@ -1,0 +1,7 @@
+Key
+ . = still to do
+ - = discarded
+ * = completed
+
+- put 'extends' in BEGIN block
+* make compatible with refactored TPath

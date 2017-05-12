@@ -1,0 +1,7 @@
+1.02 2013-10-02
+
+* Move to Module::Install
+* Add standard PerlCritic tests
+* Fix bug with case sensitivity in test suite (thanks Alfie John)
+
+1.01  Legacy Release 

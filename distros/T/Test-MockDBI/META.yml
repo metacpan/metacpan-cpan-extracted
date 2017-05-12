@@ -1,0 +1,37 @@
+---
+abstract: 'Mocked DBI interface for testing purposes'
+author:
+  - 'Mark Leighton Fisher <mark-fisher@fisherscreek.com>'
+build_requires:
+  CPAN::Meta: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+keywords:
+  - Test
+  - Mock
+  - DBI
+  - database
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-MockDBI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Clone: 0
+  DBI: 0
+  File::Spec::Functions: 0
+  Scalar::Util: 0
+  Test::Differences: 0
+  Test::MockObject: 0.14
+  Test::More: 0
+  Test::Warn: 0
+resources:
+  repository: https://github.com/aff/Test-MockDBI
+version: 0.70

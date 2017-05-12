@@ -1,0 +1,6 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <div tal:replace="html" />
+    <div tal:replace="structure html" />
+  </body>
+</html>

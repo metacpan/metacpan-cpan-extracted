@@ -1,0 +1,27 @@
+Revision history for Perl extension Tie::Cycle::Sinewave
+
+0.05 2007-11-07 21:31:52 UTC
+    - New-style POD testing infrastructure used.
+    - META.yml should conform to current spec. No code changes,
+      current users do not need to upgrade.
+
+0.04 2006-11-03 13:11:01 UTC
+    - Clarified licensing information in META.yml. No other functional
+      changes.
+
+0.03 2006-07-25 14:13:26 UTC 
+    - Fixed up a silly error in the synopsis example code.
+    - Refined the code to deal with 2*PI wraparound (only shows up on
+      64-bit platforms. Not sure if this fix is sufficient).
+    - The README talked about Build.PL instead of Makefile.PL.
+
+0.02 2005-10-02 15:16:29 UTC
+    - Couldn't get Build.PL to play nicely under smoke tests (the dreaded
+      "Too early to specify a build action 'Build'." error). So I threw
+      it away and use ExtUtils::MakeMaker instead.
+    - t/pod.t and t/pod_coverage.t were subsumed by t/00-basic.t
+    - detabbed source files
+
+0.01 2005-04-05 15:00:09 UTC
+    - initial release
+

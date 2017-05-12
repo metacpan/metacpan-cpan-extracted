@@ -1,0 +1,8 @@
+[% USE head_fmt = format("%-20s %8s %8s %-8s %5s %5s %5s %6s") -%]
+[% USE data_fmt = format("%-20s %8s %8s %-8s %5d %5d %5d %4.1f") -%]
+[% head_fmt("Patch Name", "Run ID", "LTP Ver", "SUT", "PASS", "FAIL", "WARN", "BROK", "RunTime" %]
+
+[% FOR r IN results;
+   data_fmt(r.kernel_version, r.run_id, r.ltp.version, r.sut, r.ltp.pass, r.ltp.fail, r.ltp.warn, r.ltp.broken, r.ltp.runtime);
+   END
+%]

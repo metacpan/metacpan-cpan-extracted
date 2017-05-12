@@ -1,0 +1,17 @@
+Tk::SlideShow::Dict->Get('text')->place(205,636);
+Tk::SlideShow::Dict->Get('image')->place(687,294);
+Tk::SlideShow::Dict->Get('i2')->place(758,636);
+Tk::SlideShow::Dict->Get('anim')->place(326,202);
+Tk::SlideShow::Dict->Get('oval')->place(694,293)->wh(225,177);
+Tk::SlideShow::Dict->Get('anim-oval')->ftpos(3,7);
+Tk::SlideShow::Dict->Get('text-i2')->ftpos(3,7)->width(18)->shape(8,33,8);
+Tk::SlideShow::Dict->Get('gus1')->place(1214,835);
+Tk::SlideShow::Dict->Get('gus2')->place(1142,835);
+Tk::SlideShow::Dict->Get('gus3')->place(1077,834);
+Tk::SlideShow::Dict->Get('gus4')->place(1011,831);
+Tk::SlideShow::Dict->Get('gus5')->place(645,854);
+Tk::SlideShow::Dict->Get('gus6')->place(706,850);
+Tk::SlideShow::Dict->Get('gus7')->place(812,794);
+Tk::SlideShow::Dict->Get('gus8')->place(889,682);
+Tk::SlideShow::Dict->Get('gus9')->place(867,881);
+Tk::SlideShow::Dict->Get('gus10')->place(942,811);

@@ -1,0 +1,45 @@
+0.11    Wednesday 8th March, 2016
+        Regenerated tarball on a linux machine (0.10 was released from OSX
+        which added non-standard extended header attributes to the tar)
+
+0.10    Wednesday 14th September, 2016
+        Added ability to alter regex seperator (patch from Mark Fowler)
+        Switch distribution packaging back to ExtUtils::MakeMaker (RT#104876)
+
+0.09    Tuesday 22nd February, 2010
+        Compiled documentation fixes (collected by Tom Hukins from fixes on rt.cpan)
+
+0.08	Wednesday 2nd May, 2007
+	Expose glob_to_regex_string (Joshua Hoblitt)
+
+0.07	Friday 14th July, 2006
+	Explictly quote @ and %.  Though they don't really need it to work
+	normally, it's needed for when you roundtrip the
+	regex back into text (like File::Find::Rule does).
+
+0.06    Monday 1st September, 2003
+	- port to Module::Build
+        - Nested alternations fix from Mike Benson
+	
+0.05	15th August, 2002
+	- !match_glob("*.foo", "foo/.foo"); 
+	- test suite overhaul
+	- backslash expansion fixed
+	- /[+^$|]/ made less 'special'
+	- handle embedded newlines in glob patterns
+	- add tests for 'foo[abc]'
+	- Many thanks go to Nick Cleaton for finding these
+
+0.04	14th August, 2002
+	- $Text::Glob::{strict_leading_dot,strict_wildcard_slash} from
+	  bug report from Nick Cleaton
+        - (quite poor) documentation of supported globbing constructs
+
+0.03	2nd August, 2002
+	- complete work of 0.02 by escaping ) too. bug found by Andy Lester
+
+0.02	29th July, 2002
+	- fix handling of ( and ? tokens
+
+0.01	21st July 2002
+	- initital release

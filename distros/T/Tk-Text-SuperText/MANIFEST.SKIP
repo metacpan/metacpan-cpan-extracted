@@ -1,0 +1,7 @@
+Makefile$
+pm_to_blib$
+\.bak$
+\.old$
+\.gz$
+^blib
+^tt

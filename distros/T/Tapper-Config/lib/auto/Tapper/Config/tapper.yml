@@ -1,0 +1,290 @@
+
+---
+
+# +------------------------------------------------------------------
+# |
+# | Base config.
+# |
+# | Will be overwritten with special values for sub environments
+# |
+# |   'development'
+# |   'live'
+# |   'test'
+# |
+# | See below.
+# +------------------------------------------------------------------
+
+name: Tapper
+
+test_value:              base
+test_value_only_in_base: only_in_base
+
+# WebGUI currently offers only one queue for new testruns
+new_testrun_queue: AdHoc
+
+# CLI uses this URL to show links to WebGUI
+base_url: http://tapper/tapper
+
+# whether Tapper::Reports::API allows mason and TT templates
+reports_enable_mason: 0
+reports_enable_tt: 1
+
+mcp_host:                tapper
+mcp_port:                1337
+tftp_server_address:     165.204.15.222
+report_server:           tapper
+report_port:             7357
+report_api_port:         7358
+sync_port:               1337
+prc_nfs_server:          tapper
+webserver:               tapper
+
+# Whether to cache TAP::DOMs in DB.
+#
+# This only speeds up things when using Tapper::Reports::DPath AND the
+# same TAP is queried again and again. Nowadays this combination is
+# rarely used, so we disable it by default because it wastes a HUGE
+# amount of space in the database.
+cache_tapdom_in_db: 0
+
+# Watch out: grub contains newlines and indented whitespace!
+mcp:
+  child:
+    get_message_sleep_interval: 10
+  installer:
+    default_grub: |
+      default 0
+      timeout 2
+      title Test run (Install)
+        tftpserver $TAPPER_TFTPSERVER
+        kernel $TAPPER_KERNEL root=/dev/nfs ro ip=dhcp nfsroot=$TAPPER_NFSROOT $TAPPER_OPTIONS $HOSTOPTIONS
+  test:
+    default_grub: |
+      default 0
+      timeout 2
+      title Test run (Execute)
+        root $grubroot
+        kernel /boot/vmlinuz root=$root ip=dhcp noapic $TAPPER_OPTIONS $HOSTOPTIONS
+        $initrd_options
+
+# for host specific replacements add another key after '_default' named after the respective hostname
+grub_completion_HOSTOPTIONS:
+  _default:
+    earlyprintk=serial,ttyS0,115200 console=ttyS0,115200
+
+database:
+  TestrunDB:
+    dsn:        dbi:mysql:dbname=testrundb;mysql_use_result=1
+    username:   tapper
+    password:   tapper
+  HardwareDB:
+    dsn:        dbi:mysql:dbname=hardwaredb;mysql_use_result=1
+    username:   hardware
+    password:   myhardware
+  by_TAPPERDBMS:
+    mysql:
+      TestrunDB:
+        dsn:        dbi:mysql:dbname=testrundb;mysql_use_result=1
+        username:   tapper
+        password:   tapper
+    postgresql:
+      TestrunDB:
+        dsn:        dbi:Pg:dbname=testrundb
+        username:   tapper
+        password:   tapper
+
+testplans:
+  path: /data/tapper/live/testplans
+  generator:
+    interval: 86400  # one day
+  reporter:
+    interval: 604800 # one week
+    plugin:
+      name: Taskjuggler
+      url: https://osrc.amd.com/pub/schedules/
+      mailhost: smtp.osrc.amd.com
+      mailfrom: Tapper Testplan Reporter <Tapper@elbe.amd.com>,
+      mailto: Tapper Testplan Reporter <Tapper@elbe.amd.com>,
+      base_url: http://tapper
+      cacheroot: /data/tapper/live/configs/cacheroot/
+      cachetime: 10 min
+
+notification:
+  sender:
+    plugins:
+      Mail:
+        mailhost: mailhost
+        mailfrom: Tapper Notifier <Tapper@tapper>,
+
+
+times:
+   poll_intervall:  10
+   boot_timeout: 3600
+   reschedule_time: 3600
+   test_runtime_default: 7200
+   installer_timeout: 7200
+   default_testprogram_timeout: 60
+   receiver_timeout: 86400
+   notification_poll_intervall: 10
+   action_poll_intervall: 10
+
+# configurable files paths
+paths:
+   base_dir:               /mnt/target/
+   config_path:            /data/tapper/live/configs/
+   guest_mount_dir:        /mnt/guests/
+   grubpath:               /data/tapper/live/configs/tftpboot/
+   image_dir:              /data/tapper/live/repository/images/
+   localdata_path:         /data/tapper/live/configs/tftpboot/
+   message_receiver_path:  /data/tapper/live/output/message_receiver/
+   metareport_path:        /data/tapper/live/metareports/
+   nfsroot:                165.204.15.222:/data/tapper/live/nfsroot/installation_base/
+   output_dir:             /data/tapper/live/output/
+   package_dir:            /data/tapper/live/repository/packages/
+   pids_path:              /var/run
+   prc_nfs_mountdir:       /data/tapper/
+   simnow_path:            /opt/tapper/simnow-linux64/
+   sync_path:              /data/tapper/live/sync/
+   temare_path:            /home/tapper/temare
+   testplan_path:          /data/tapper/live/testplan/
+   testprog_path:          /data/tapper/live/testprogram/
+   use_case_path:          /data/tapper/live/configs/use_cases/
+
+
+# basenames of files
+files:
+  installer_kernel: /tftpboot/bzImage
+  log4perl_cfg: log4perl.cfg           # not used in PRC
+  log4perl_webgui_cfg: log4perl_webgui.cfg           # used in Tapper::Reports::Web
+  receiver_log4perl_cfg: receiver_log4perl.cfg
+  windows_test_image: osko:/export/image_files/official_testing/windows_test.img
+  tapper_package:
+    linux64: tapperutils/opt-tapper64.tar.gz
+    linux32: tapperutils/opt-tapper32.tar.gz
+    windows: tapperutils/wintest.tar.gz
+    local: tapperutils/opt-tapperlocal.tar.gz
+  tapper_prc: tapper-client
+  simnow_installer: /opt/tapper/bin/tapper-installer-simnow.pl
+  simnow_config: /tmp/simnow.yml
+  simnow_console: /root/.simnow/com1/simnow_out
+
+conserver:
+   server: gutrune.amd.com
+   port:   7782
+   user:   tapper
+
+# config for Tapper::Reports::Web
+web:
+  use_authentication: 0
+
+# config for Tapper::Benchmark
+benchmark:
+    config_file: /opt/tapper/data/conf/tapper_benchmark.conf
+
+# +------------------------------------------------------------------
+# |
+# | The following subsections (development, test, live) are merged
+# | into the toplevel hash and are usually *NOT* meant to be used
+# | directly.
+# |
+# +------------------------------------------------------------------
+
+# special live environment
+live:
+  test_value:     live
+
+# explicit development environment
+development:
+  install_tapper_toolchain: 1
+  paths:
+    nfsroot:                165.204.15.222:/data/tapper/development/nfsroot/installation_base/
+    output_dir:             /tmp/output/
+    temare_path:            /data/tapper/development/tools/temare
+    sync_path:              /data/tapper/development/sync/
+    config_path:            /data/tapper/development/configs/
+    use_case_path:          /data/tapper/development/configs/use_cases/
+
+  test_value:          development
+  mcp_host:            165.204.15.37
+  report_server:       bascha
+  tftp_server_address: 165.204.15.37
+  database:
+    TestrunDB:
+      dsn:        dbi:mysql:dbname=testrundb_dev;mysql_use_result=1
+      username:   tapper
+      password:   tapper
+    by_TAPPERDBMS:
+      mysql:
+        TestrunDB:
+          dsn:        dbi:mysql:dbname=testrundb_dev;mysql_use_result=1
+          username:   tapper
+          password:   tapper
+      postgresql:
+        TestrunDB:
+          dsn:        dbi:Pg:dbname=testrundb_dev
+          username:   tapper
+          password:   tapper
+  files:
+    log4perl_cfg: log4perl_test.cfg
+    receiver_log4perl_cfg: receiver_log4perl_test.cfg
+    tapper_package:
+      linux64: tapperutils/opt-tapper64_devel.tar.gz
+      linux32: tapperutils/opt-tapper32_devel.tar.gz
+  testplans:
+    path: /data/tapper/live/testplans
+
+
+# special test environment
+test:
+# whether Tapper::Reports::API allows mason and TT templates
+  reports_enable_mason: 1
+  reports_enable_tt: 1
+  cache_tapdom_in_db: 1
+
+  test_value:      test
+  mcp_port:        11337
+  report_server:   localhost
+  report_port:     17357
+  report_api_port: 17358
+  sync_port:       17359
+  database:
+    TestrunDB:
+      dsn:        dbi:SQLite:dbname=t/tapper_schema_testrundb_test.sqlite
+      username:   ''
+      password:   ''
+  files:
+    log4perl_cfg: log4perl_test.cfg            # not used in PRC
+    receiver_log4perl_cfg: receiver_log4perl_test.cfg
+    log4perl_webgui_cfg: t/config/log4perl_webgui.cfg
+  times:
+   poll_intervall:  10
+   boot_timeout: 5
+   reschedule_time: 3600
+   installer_timeout: 3
+   test_runtime_default: 5
+   receiver_timeout: 5
+  paths:
+    config_path:            t/tmp/
+    grubpath:               t/tmp/
+    grubpath:               t/tmp/
+    guest_mount_dir:        t/tmp/
+    image_dir:              t/tmp/
+    localdata_path:         t/tmp/
+    message_receiver_path:  t/tmp/
+    metareport_path:        t/tmp/
+    nfsroot:                t/tmp/
+    output_dir:             t/file_upload/
+    package_dir:            t/tmp/
+    pids_path:              t/tmp/
+    prc_nfs_mountdir:       t/tmp/
+    simnow_path:            t/tmp/
+    sync_path:              t/tmp/
+    temare_path:            t/misc_files/bin/
+    testplan_path:          t/files/testplan/
+    testprog_path:          t/tmp/
+    use_case_path:          root/mpc/
+    base_dir:               t/tmp/
+    autoinstall:
+      grubfiles: t/misc_files/
+  testplans:
+    path: t/testplans

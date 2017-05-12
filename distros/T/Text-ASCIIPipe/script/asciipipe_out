@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+# Default to work from the repo, use the binary dir for libs.
+# I refrain from adding $HOME/lib/perl again ... use PERL5LIB.
+use FindBin qw($Bin);
+use File::Spec;
+use lib File::Spec->catfile($Bin,'..','lib');
+use Text::ASCIIPipe;
+
+use strict;
+
+if(@ARGV)
+{
+	my $expect_more = 1;
+	for my $f (@ARGV)
+	{
+		unless($expect_more)
+		{
+			die "Cannot pull '$f' out of the pipe, there is nothing more to be expected.\n"
+		}
+		print STDERR "Pulling '$f' from pipe.\n";
+		open(my $fh, '>', $f) or die "Cannot open $f! ($!)\n";
+		my $res = Text::ASCIIPipe::pull_file(undef, $fh);
+		if($res < 0)
+		{
+			die "Unable to get any data for $f!\n";
+		}
+		print STDERR "Pull done.\n";
+		$expect_more = $res;
+	}
+}
+else
+{
+	print STDERR "Please provide a list of file names to write to from the pipe.\n";
+}

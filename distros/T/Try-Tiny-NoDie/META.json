@@ -1,0 +1,65 @@
+{
+   "abstract" : "minimal try/catch with local-disabling of SIGDIE",
+   "author" : [
+      "Arnold Tan Casis <atancasis@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Try-Tiny-NoDie",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Try::Tiny" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/atancasis/Try-Tiny-NoDie/issues"
+      },
+      "homepage" : "https://github.com/atancasis/Try-Tiny-NoDie",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/atancasis/Try-Tiny-NoDie.git",
+         "web" : "https://github.com/atancasis/Try-Tiny-NoDie"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,3 @@
+<!ATTLIST list
+          type    (bullets|ordered|glossary)  "ordered">
+

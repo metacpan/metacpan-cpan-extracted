@@ -1,0 +1,33 @@
+---
+abstract: 'Everything you need to play with Mojolicious, and more'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.95'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-MojoLearningEnvironment
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  Mojolicious: '0'
+  Redis: '0'
+  Sereal: '0'
+  XML::Twig: '0'
+  local::lib: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/briandfoy/Task-MojoLearningEnvironment/issues
+  homepage: https://github.com/briandfoy/Task-MojoLearningEnvironment
+  repository: https://github.com/briandfoy/Task-MojoLearningEnvironment.git
+version: '0.002'

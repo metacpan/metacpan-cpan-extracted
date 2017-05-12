@@ -1,0 +1,47 @@
+[2016-03-27 16:43:42.976][info][Test::BrewBuild] in _create_log()
+[2016-03-27 16:43:42.977][info][Test::BrewBuild] in new(), constructing Test::BrewBuild object
+[2016-03-27 16:43:42.977][info][Test::BrewBuild.Test::BrewBuild::BrewCommands] constructing new Test::BrewBuild::BrewCommands object
+[2016-03-27 16:43:42.977][notice][Test::BrewBuild] 
+[2016-03-27 16:43:42.978][warning][Test::BrewBuild] successfully loaded Test::BrewBuild::Plugin::DefaultExec plugin
+[2016-03-27 16:43:42.978][notice][Test::BrewBuild.run] commencing run()
+[2016-03-27 16:43:42.978][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.available] generating available
+[2016-03-27 16:43:43.628][info][Test::BrewBuild.brew_info] brew info set to:
+  perl-5.23.9
+i perl-5.22.1
+  perl-5.20.3
+  perl-5.18.4
+  perl-5.16.3
+  perl-5.14.4
+  perl-5.12.5
+  perl-5.10.1
+  perl-5.8.9
+  perl-5.6.2
+  perl5.005_04
+  perl5.004_05
+  perl5.003_07
+
+[2016-03-27 16:43:43.630][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.available] determining available perls
+[2016-03-27 16:43:43.631][info][Test::BrewBuild.perls_available] perls available: perl-5.23.9, perl-5.22.1, perl-5.20.3, perl-5.18.4, perl-5.16.3, perl-5.14.4, perl-5.12.5, perl-5.10.1, perl-5.8.9, perl-5.6.2
+[2016-03-27 16:43:43.632][info][Test::BrewBuild.perls_installed] checking perls installed
+[2016-03-27 16:43:43.633][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.installed] cleaning up perls installed
+[2016-03-27 16:43:43.634][warning][Test::BrewBuild.run] installed perls: perl-5.22.1
+[2016-03-27 16:43:43.634][info][Test::BrewBuild.perls_installed] checking perls installed
+[2016-03-27 16:43:43.635][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.installed] cleaning up perls installed
+[2016-03-27 16:43:43.635][info][Test::BrewBuild.results] warnings trapped locally
+[2016-03-27 16:43:43.636][info][Test::BrewBuild.exec] creating temp file
+[2016-03-27 16:43:43.638][info][Test::BrewBuild.exec] temp filename: /tmp/eQ1rq2cIXF
+[2016-03-27 16:43:43.638][info][Test::BrewBuild] Test::BrewBuild class/obj retrieving a log object
+[2016-03-27 16:43:43.639][info][Test::BrewBuild.Test::BrewBuild::Plugin::DefaultExec::brewbuild_exec] performing plugin duties
+[2016-03-27 16:43:43.639][info][Test::BrewBuild.exec] instructions to be executed:
+system "cpanm --installdeps . && cpanm -v --test-only .";
+
+[2016-03-27 16:43:43.640][info][Test::BrewBuild.exec] system "cpanm --installdeps . && cpanm -v --test-only .";
+
+[2016-03-27 16:43:43.640][info][Test::BrewBuild.exec] temp file handle closed
+[2016-03-27 16:43:43.641][info][Test::BrewBuild.Test::BrewBuild::BrewCommands.brew] *brew cmd is: perlbrew
+[2016-03-27 16:43:43.641][notice][Test::BrewBuild.exec] exec'ing: perlbrew exec perl /tmp/eQ1rq2cIXF
+[2016-03-27 16:43:45.992][notice][Test::BrewBuild.results] got 1 results
+[2016-03-27 16:43:45.992][info][Test::BrewBuild.results] 5.22.1 PASSED...
+
+5.22.1 :: PASS
+[2016-03-27 16:43:45.993][notice][Test::BrewBuild.results] Test::BrewBuild run finished

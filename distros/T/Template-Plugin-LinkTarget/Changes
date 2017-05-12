@@ -1,0 +1,7 @@
+Revision history for Perl extension Template::Plugin::LinkTarget
+
+0.02    Fri Apr 23 22:10 PDT 2010
+    - Switch to Git
+
+0.01    Mon Jan 14 23:31 PST 2008
+    - initial version

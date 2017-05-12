@@ -1,0 +1,33 @@
+Revision history for Task-POE-All
+
+1.102 2014-11-09T11:03:58Z UTC
+ - Fixed the POD yet again to have the right sections
+
+ [STATISTICS]
+ - code churn: 3 files changed, 33 insertions(+), 42 deletions(-)
+
+1.101 2014-11-09T08:59:09Z UTC
+ - Fixed the POD as I mangled the format, arg!
+
+ [STATISTICS]
+ - code churn: 4 files changed, 802 insertions(+), 12 deletions(-)
+
+1.100 2014-11-09T08:28:58Z UTC
+ - Converted to Dist::Zilla for the release process!
+ - Updates to the auto-generated files
+
+ [STATISTICS]
+ - code churn: 20 files changed, 555 insertions(+), 132 deletions(-)
+
+1.02 0000-00-00T00:00:00Z UTC
+ - Removed all AUTHOR tests and replaced with Test::Apocalypse
+ - Cleaned up POD a bit
+ - Add POEx::* modules too, thanks nperez!
+ - Cleaned up Build.PL to be a bit more smarter
+
+1.01 0000-00-00T00:00:00Z UTC
+ - Added a_metayml.t AUTHOR test
+
+1.00 0000-00-00T00:00:00Z UTC
+ - Initial release ( import from Bundle::POE::All )
+

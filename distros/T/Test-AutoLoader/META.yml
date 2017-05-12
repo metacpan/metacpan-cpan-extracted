@@ -1,0 +1,13 @@
+---
+name: Test-AutoLoader
+version: 0.03
+license: gpl
+requires:
+  File::Spec: 0
+  Test::Builder: 0
+build_requires:
+  Test::Pod: 0.95
+  Test::Tester: 0.08
+no_index:
+  dir:
+    - tlib

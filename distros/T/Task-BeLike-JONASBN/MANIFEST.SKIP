@@ -1,0 +1,54 @@
+#!start included /System/Library/Perl/5.10.0/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\b_darcs\b
+.git
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+#!end included /System/Library/Perl/5.10.0/ExtUtils/MANIFEST.SKIP
+
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid archives of this distribution
+\bBundle-JONASBN-[\d\.\_]+
+\bTask-BeLike-JONASBN-[\d\.\_]+
+
+# Avoid project specific files
+spikes
+^MYMETA.yml$
+\.kpf$
+\.komodoproject$
+
+^MYMETA\.json$

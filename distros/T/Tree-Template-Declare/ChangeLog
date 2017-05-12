@@ -1,0 +1,28 @@
+0.7       2015-03-28 12:47:20+00:00 Europe/London
+  - moved to Dist::Zilla
+  - fixed prereqs
+  - removed useless "use Data::Dumper" from several files
+
+0.6 2015-03-25
+  - fixed tests that depended on a particular output from
+    Tree::DAG_Node::tree_to_lol(), they should now work with any
+    version of Tree::DAG_Node
+   
+0.5 2013-01-27
+  - fixed tests broken by better hash randomisation in perl 5.18
+
+0.4 2011-02-13
+  - fixed test for HTML::Element
+  - silenced some critic violations
+
+0.3 2009-06-27
+  - now the "current node" is global, so that you can call
+    node-generating subs in other packages, and actually get the
+    result (see 07-inherit.t)
+
+0.2 2009-04-30
+  - fixed Perl::Critic tests
+  - fixed perl version requirement
+
+0.1 2009-04-27
+  - initial version

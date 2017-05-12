@@ -1,0 +1,10 @@
+use $alfa;
+use @beta 1.00;
+use %charlie qw//;
+require *delta;
+use Echo;
+require Foxtrot;
+require 'Golf.pm';
+require "Hotel.pm";
+require q !India.pm!;
+require qq{Juliett.pm};

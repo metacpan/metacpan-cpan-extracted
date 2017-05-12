@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Tempest
+version:             2010.09.26
+abstract:            Flexible temperature-map/heat-map generator
+license:             MIT
+author:              
+    - Evan Kaufman <evan@digitalflophouse.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    File::Basename:                0
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

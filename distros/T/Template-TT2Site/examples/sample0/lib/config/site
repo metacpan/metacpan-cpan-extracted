@@ -1,0 +1,24 @@
+[% # $Id: site,v 1.2 2005/01/16 16:14:30 jv Exp $ -%]
+[%
+
+site = {
+    title    = "Template::TT2Site"
+    short    = "TT2Site"
+    about    = "A Template::Toolkit extension"
+    mailto   = "mailto:website@squirrel.nl"
+};
+
+# Copyright notice.
+
+USE date;
+firstyear = 2004;
+year = date.format(date.now,'%Y','en_GB');
+IF year > firstyear;
+THEN;
+  year = firstyear _ "-" _ year;
+END;
+site.copyright = "&copy; Copyright ${year} Squirrel Consultancy. All Rights Reserved."
+site.design = "Site design: <a href='http://www.squirrel.nl'>Squirrel Consultancy</a> using
+<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site</a>."
+
+-%]

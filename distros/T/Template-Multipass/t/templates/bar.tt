@@ -1,0 +1,8 @@
+{% header %}
+[% blah %]
+{
+    [%- FOR i IN array -%]
+    [%- i.name %]: "[% i.value %]"[% UNLESS loop.last %],[% END %]
+    [%- END -%]
+}
+{% footer %}

@@ -1,0 +1,69 @@
+1.20
+
+* Fixed: since normal(), bold(), underline() and reverse() are
+  considered to be 'termcap' sequences (as opposed to ANSI color
+  sequences) and are therefore immune to colorizability, so also
+  putcolor(), colored() and color2esc(), called with each of these
+  names, should make no difference for colorizability.
+* Restructured code.
+
+1.19
+
+* Fixed tests: flash() is not available everywhere
+
+1.18
+
+* Fixed test: on OpenBSD, normal() may return "\e(B\e[m"
+
+1.17
+
+* Deprecated support for static calls to color(), putcolor(), colored()
+  and putcolored(). This was never correctly supported anyway, and this
+  fixes some bugs.
+* Added tests for color(), putcolor(), colored() and putcolored().
+
+1.16
+
+* Workaround for OpenSolaris 11 bug. It has no termcap database and
+  "infocmp -C" does not provide the properties 'normal', 'bold' and
+  'reverse' (even though "infocmp" does). Therefore, Term::Cap cannot
+  provide these properties.  In that case, fall back on terminfo and
+  cache the results.
+* Added flash2esc()
+
+1.15
+
+* Fixed bug: color2esc('') now returns empty string instead of \e[m
+
+1.14
+
+* Fixed tests: normal() may also return \e[m\017
+* Fixed Makefile.PL: dependency on Term::Cap was missing
+
+1.13a
+
+* Fixed tests: flash() is not available everywhere; normal()
+  may return \e[m instead of \e[0m.
+
+1.13
+
+* Fixed bug in Term::Screen where partial function key escape
+  sequences were added to the wrong end of the input buffer.
+* Added flash() to send visual bell
+* Changed raw() and cooked(): they no longer call echo() and
+  noecho().
+
+1.12
+
+* Added bold2esc(), reverse2esc(), underline2esc(), normal2esc()
+* Changed: underline() can no longer be turned off with
+  colorizable(); underscore() can.
+
+1.11
+
+* Fixed bug in Term::Screen where getch() would cause keypresses
+  to become hidden from the application (replaced getc() with
+  sysread()).
+* Added timeout so that Escape does not have to be pressed twice.
+* Added raw() and cooked() for convenience.
+

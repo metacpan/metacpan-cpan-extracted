@@ -1,0 +1,19 @@
+0.003
+
+Added dependency on Test::NoWarningss
+
+0.002
+
+Fixed the comparison, got confused with all n/u/s and 1/2, effectively I was
+only comparing the number of iterations.
+
+Added is_fastest().
+
+Fixed some typos in the docs.
+
+Fixed get_res was using $_ instead of $sub although it made no difference
+until is_fastest.
+
+0.001
+
+Initial release

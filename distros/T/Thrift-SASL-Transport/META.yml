@@ -1,0 +1,42 @@
+---
+abstract: 'Thrift Transport allowing Kerberos auth/encryption through GSSAPI'
+author:
+  - 'David Morel <david.morel@amakuru.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - hadoop
+  - thrift
+  - sasl
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Thrift-SASL-Transport
+requires:
+  Authen::SASL::XS: '0'
+  Data::Dumper: '0'
+  Thrift: v0.10.0
+  Thrift::BinaryProtocol: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Perl-Hadoop/Thrift-SASL/issues
+  repository: git://github.com/Perl-Hadoop/Thrift-SASL.git
+version: '0.006'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+  - 'David Morel <dmor@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

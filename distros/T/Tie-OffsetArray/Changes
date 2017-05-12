@@ -1,0 +1,5 @@
+Revision history for Perl extension Tie::OffsetArray.
+
+0.01  Fri Oct 15 15:16:18 1999
+	- original version; created by John Porter, via h2xs 1.19
+

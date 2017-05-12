@@ -1,0 +1,25 @@
+Time::Profiler
+==============
+
+Time::Profiler provides simple API for measuring code speed and reporting.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Time::Profiler requires the following non-core perl modules:
+
+    Time::HR
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2013-2015 Vladi Belperchinov-Shabanski <cade@cpan.org> <cade@bis.bg>

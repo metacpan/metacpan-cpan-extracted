@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+#ls -l | perl -pe s/(\w{3}\s+\d+\s+\d{2}:\d{2})/`pt -c "$1 2004"`/e
+
+use strict;
+use Math::BaseCnv qw(:all);
+use Time::PT;
+
+my $list = `ls -l`;
+while($list =~ /\s(\d+)\s+(\w{3}\s+\d+\s+\d{2}:\d{2})/) {
+  my $fsiz = $1; 
+  my $stat = $2;
+  my $b6fs = b64($fsiz); $b6fs = ' ' x (length($fsiz) - length($b6fs)) . $b6fs;
+  # @s=split(/ /,scalar(localtime((stat(shift))[9])));print \"@s\";
+  # use stat() instead of just appending '2004'
+  my $ptim = Time::PT->new('verbose' => "$stat 2004");
+  my $pcol = $ptim->color('ansi') . "\e[0;30m";
+  if(length($pcol) < (8*5 + 7)) {
+    $pcol .= '0' x (5 - int((length($pcol) - 7) / 8));
+  }
+  $pcol .= "\e[1;32m";
+  $list =~ s/$fsiz/$b6fs/g;
+  $list =~ s/$stat/$pcol/g;
+  $list =~ s/r--/\e[1;34m4\e[1;32m/g;
+  $list =~ s/r-x/\e[1;35m5\e[1;32m/g;
+  $list =~ s/rw-/\e[1;36m6\e[1;32m/g;
+  $list =~ s/rwx/\e[1;31m7\e[1;32m/g;
+  $list =~ s/rws/\e[1;33m7\e[1;32m/g;
+}
+print $list;

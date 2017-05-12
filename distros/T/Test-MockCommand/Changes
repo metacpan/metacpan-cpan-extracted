@@ -1,0 +1,18 @@
+Revision history for Perl extension Test::MockCommand.
+
+0.01  Wed Oct 15 11:15:58 2008
+	- original version; created by h2xs 1.23 with options
+		-X Test::MockCommand
+
+0.02
+	- fixed T::MC::ScalarReadline so it works with Perl 5.6's Exporter
+	- added 'playback' to import options
+	- check if file is a directory in merge() / load()
+	- add open_handler() class method
+	- add author tests for pod quality
+
+0.03
+	- included t/open-handler.t in manifest
+	- for perl 5.6, skipped 6 tests of open() that it can't handle
+	- define WIFEXITED and WEXITSTATUS macros if not implemented
+	- macros defined and tests now pass on Win32, thanks to William Orr

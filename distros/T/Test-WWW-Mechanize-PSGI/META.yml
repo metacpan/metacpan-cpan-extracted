@@ -1,0 +1,36 @@
+---
+abstract: 'Test PSGI programs using WWW::Mechanize'
+author:
+  - 'Leon Brocard <acme@astray.com>'
+build_requires:
+  CGI::Cookie: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-WWW-Mechanize-PSGI
+requires:
+  Carp: '0'
+  HTTP::Message::PSGI: '0'
+  Test::WWW::Mechanize: '0'
+  Try::Tiny: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/acme/Test-WWW-Mechanize-PSGI/issues
+  homepage: https://metacpan.org/release/Test-WWW-Mechanize-PSGI
+  repository: https://github.com/acme/test-www-mechanize-psgi.git
+version: '0.36'
+x_contributors:
+  - 'Chia-liang Kao <clkao@clkao.org>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Shin Kojima <shin@kojima.org>'
+  - 'tokuhirom <tokuhirom@gmail.com>'

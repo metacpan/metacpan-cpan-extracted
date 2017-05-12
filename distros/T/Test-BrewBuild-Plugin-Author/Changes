@@ -1,0 +1,9 @@
+Revision history for Test-BrewBuild-Plugin-Author
+
+0.02    2017-04-28
+        - added $ENV{RELEASE_TESTING} = 1;
+        - added logging if RELEASE_TESTING somehow isn't set in the
+          brewbuild_exec() call
+
+0.01    2017-04-28
+    - initial release

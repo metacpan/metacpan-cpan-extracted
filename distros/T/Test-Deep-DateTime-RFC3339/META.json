@@ -1,0 +1,70 @@
+{
+   "abstract" : "Test RFC3339 timestamps are within a certain tolerance",
+   "author" : [
+      "Thomas Sibley <trsibley@uw.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Deep-DateTime-RFC3339",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "DateTime::Format::Duration::DurationString" : "0",
+            "DateTime::Format::Human::Duration" : "0",
+            "DateTime::Format::RFC3339" : "0",
+            "Safe::Isa" : "0",
+            "Test::Deep" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Test-Deep-DateTime-RFC3339@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Test-Deep-DateTime-RFC3339"
+      },
+      "homepage" : "https://metacpan.org/pod/Test::Deep::DateTime::RFC3339",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tsibley/Test-Deep-DateTime-RFC3339.git",
+         "web" : "https://github.com/tsibley/Test-Deep-DateTime-RFC3339"
+      }
+   },
+   "version" : "0.04"
+}
+

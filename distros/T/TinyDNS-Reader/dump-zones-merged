@@ -1,0 +1,72 @@
+#!/usr/bin/perl -Iblib/lib/ -Ilib/
+#
+# This simple script will invoke our parser on any filename which
+# is named on the command-line, and dump the results to the console.
+#
+# It can be used for a quick sanity-check of the records.
+#
+# Steve
+# --
+#
+
+use strict;
+use warnings;
+
+use TinyDNS::Reader::Merged;
+
+
+#
+# The number of files we processed.
+#
+my $count = 0;
+
+
+#
+# Process each named file.
+#
+while ( my $file = shift )
+{
+
+    $count += 1;
+
+    if ( !-e $file )
+    {
+        print STDERR "File not found - $file\n";
+        next;
+    }
+
+
+    #
+    #  Parse
+    #
+    my $helper = TinyDNS::Reader::Merged->new( file => $file );
+    my $records = $helper->parse();
+
+    #
+    #  Dump.
+    #
+    foreach my $record (@$records)
+    {
+        print $record->{ 'name' } . "\n";
+        my $val = $record->{ 'value' };
+        if ( ref \$val eq "SCALAR" )
+        {
+            print "\t$val\n";
+        }
+        else
+        {
+            print "\t" . join( ", ", @$val ) . "\n";
+        }
+
+        print "\tType: $record->{'type'}\n";
+        print "\tTTL: $record->{'ttl'}\n";
+    }
+}
+
+#
+#  If we didn't get any files show that.
+#
+if ( $count < 1 )
+{
+    print "Usage: $0 file1 file2 .. fileN\n";
+}

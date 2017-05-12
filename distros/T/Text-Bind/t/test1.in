@@ -1,0 +1,25 @@
+<html>
+<body>
+<img src="##PL_site=imageURL##/foo.gif">
+
+##PL_site=strsite##
+##PL_site=funcsite##
+##PL_site=filehandlesite##
+##PL_site=funcsiteargs##
+##PL_site=objsite##
+
+Here is a site "##PL_site=nobind##" with no binding.
+
+##PL_site=strsite## This is ##PL_site=strsite####PL_site=strsite##.
+
+<p>ls command
+</p>
+<pre>
+##PL_file=/bin/ls -lF |##
+</pre>
+
+<p>test.t source code
+</p>
+<plaintext>
+##PL_file=t/test.t##
+

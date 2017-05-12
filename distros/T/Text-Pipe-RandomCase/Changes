@@ -1,0 +1,12 @@
+Changelog for Text::Pipe::RandomCase
+
+0.03	Mo 14. Sep 10:15:13 CEST 2009
+	fixed missing dependency on Text::Pipe
+
+0.02	So 13 Sep 2009 22:41:18 CEST
+	added new method force_one
+	reworked documentation
+	added tests
+
+0.01	So 13 Sep 2009 11:41:43 CEST
+	initial version

@@ -1,0 +1,73 @@
+Treex-PML
+
+This module implements a basic API for working with Prague Markup
+Language (PML).
+
+Prague Marup Language (PML) is an XML-based, universally applicable
+data format based on abstract data types intended primarily for
+interchange of linguistic annotations. It is completely independent of
+a particular annotation schema. It can capture simple linear
+annotations as well as annotations with one or more richly structured
+interconnected annotation layers, dependency or constituency trees. A
+concrete PML-based format for a specific annotation is defined by
+describing the data layout and XML vocabulary in a special file called
+PML Schema and referring to this schema file from individual data
+files (instances). The schema can be used to validate the
+instances. It is also used by applications to ``understand'' the
+structure of the data and to choose optimal in-memory
+representation. The generic nature of PML makes it very easy to
+convert data from other formats to PML without loss of information.
+
+PML and was developed at the Institute of Formal and Applied
+Linguistics of the Charles University in Prague. It was first used in
+the Prague Dependency Treebank 2.0 and several other treebanks
+since. Conversion tools for various existing treebank formats are
+available, too.
+
+See http://ufal.mff.cuni.cz/jazz/pml/
+
+Note: this library was originally developed for the TrEd framework
+(http://ufal.mff.cuni.cz/tred) and evolved gradually from an
+older library called Fslib implementing a different data format.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Treex::PML
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Treex-PML
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Treex-PML
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Treex-PML
+
+    Search CPAN
+        http://search.cpan.org/dist/Treex-PML/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2006-2010 Petr Pajas
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

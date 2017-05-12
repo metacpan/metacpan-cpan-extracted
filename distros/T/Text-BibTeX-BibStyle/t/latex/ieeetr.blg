@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99c (Web2C 7.3.1)
+The top-level auxiliary file: ieeetr.aux
+The style file: ieeetr.bst
+Database file #1: xampl.bib
+Warning--empty author in whole-journal
+Warning--empty title in whole-journal
+You've used 36 entries,
+            1876 wiz_defined-function locations,
+            630 strings with 7001 characters,
+and the built_in function-call counts, 6301 in all, are:
+= -- 653
+> -- 191
+< -- 4
++ -- 83
+- -- 47
+* -- 436
+:= -- 912
+add.period$ -- 67
+call.type$ -- 36
+change.case$ -- 31
+chr.to.int$ -- 0
+cite$ -- 38
+duplicate$ -- 325
+empty$ -- 673
+format.name$ -- 48
+if$ -- 1532
+int.to.chr$ -- 0
+int.to.str$ -- 36
+missing$ -- 25
+newline$ -- 144
+num.names$ -- 36
+pop$ -- 109
+preamble$ -- 2
+purify$ -- 0
+quote$ -- 0
+skip$ -- 150
+stack$ -- 0
+substring$ -- 183
+swap$ -- 79
+text.length$ -- 4
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 2
+while$ -- 50
+width$ -- 38
+write$ -- 367
+(There were 2 warnings)

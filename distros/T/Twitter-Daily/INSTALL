@@ -1,0 +1,23 @@
+Twitter Daily Install
+=====================
+
+Download
+--------
+
+Twitter Daily can be checked out from GitHub [1].
+Let's assume that either download or checkout was carried out into folder
+$HOME/tDaily
+
+
+[1] https://github.com/bit-man/Twitter-Daily
+
+Install
+-------
+
+Add the lib folder to PERL5LIB env. variable and the src folder to your PATH
+env. variable (the latter is optional). e.g. :
+
+# export PERL5LIB="$PERL5LIB:$HOME/tDaily/lib"
+# export PATH="$PATH:$HOME/tDaily/src"
+
+Done !

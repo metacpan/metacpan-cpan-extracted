@@ -1,0 +1,36 @@
+# Metadata
+MANIFEST            This list of files
+MANIFEST.SKIP       The opposite of this list of files
+
+# Library
+lib/Text/Lossy.pm   The main library file
+Makefile.PL         The makefile
+
+# Executables
+script/text-lossy   A command-line text filter for lossy compression
+
+# Documentation
+Changes             The changelog
+README              The distribution README, plain text (for installers)
+TODO                The list of proposed changes
+
+# Tests
+t/00-load.t
+t/01-lower.t
+t/02-whitespace.t
+t/03-punctuation.t
+t/04-alphabetize.t
+t/05-add.t
+t/06-clear.t
+t/07-list.t
+t/08-register_filters.t
+t/09-available_filters.t
+t/10-whitespace_nl.t
+t/11-punctuation_sp.t
+t/12-process.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

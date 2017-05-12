@@ -1,0 +1,355 @@
+NAME
+
+    Test::MTA::Exim4 - Test Anything interface for testing Exim4
+    configurations
+
+VERSION
+
+    version 0.05
+
+SYNOPSIS
+
+    Test::MTA::Exim4 allows the testing of an exim installation and
+    configuration using the perl TAP (Test Anything Protocol) methodology.
+
+    This allows the writing of some simple test scripts which can check for
+    features of exim and check that this configuration routes, accepts or
+    rejects mail as you would expect. As such it is an ideal system for
+    creating a test suite for your mail configuration allowing you to check
+    that there are no unexpected regressions when you make a change.
+
+    You need to be aware that an exim installation depends on more than
+    just a config file - the exim binary, and the installation environment
+    may effect the behaviour and/or routing of messages. You really need to
+    do final configuration tests on the box that the system will be running
+    on in production.
+
+WARNING
+
+    At present this module is experimental - both the API and
+    implementation are subject to change. To this end I welcome discussion
+    on how best to implement or expose functionality. There is other work
+    proposed to produce similar test modules for other MTAs and so a common
+    mechanism or compatibility layer between them is possible - this module
+    has been produced to get something out as code is a better discussion
+    point than vapourware ideas!
+
+    Having said all that, it has now been around for several years, without
+    substantial changes, so it may be as well to accept the API to be as
+    stable as that of exim itself...
+
+EXAMPLES
+
+    The sample directory contains an example used for testing the
+    <exim.org> installation, and should hopefully act as a reasonable
+    example configuration.
+
+METHODS
+
+ new
+
+        my $exim = Test::MTA::Exim4->new( \%fields );
+
+    Create a new exim configuration testing object. You may pass
+    configuration information in as a hash reference - this is the only
+    point at which the locations of the exim binary and configuration file
+    may be set.
+
+    The options that can be passed in are:-
+
+      * exim_path
+
+      This is the path to the exim binary. If this is not set, the default
+      is taken as the first of the following:-
+
+	* DEFAULT_EXIM_PATH - environment variable
+
+	* exim4 in the current path
+
+	* exim in the current path
+
+	* /usr/sbin/exim
+
+      * config_file
+
+      The configuration file used. If this is not set the value of the
+      environment variable DEFAULT_EXIM_CONFIG_FILE is used and if that is
+      not set no config file is passed to the exim binary (meaning the
+      default compiled into that is used).
+
+      * test
+
+      A test object - defaults to a new instance of Test::Builder
+
+      * timeout
+
+      The timeout enforced on commands, in seconds. Defaults to 5 seconds.
+
+ reset
+
+    Resets the internal state. Not sure when this might be useful!
+
+ config_ok
+
+    Checks that exim considers the configuration file as syntactically
+    valid. The config file must be specified when new is called, otherwise
+    the default is used.
+
+ exim_version
+
+    Returns the version of exim seen when the configuration was checked.
+    This is intended for use within your own tests for appropriate
+    versions, for example:-
+
+        # ensure we are running exim 4.69 or later
+        ok(($exim->exim_version gt '4.69'), 'Exim version check');
+
+ exim_build
+
+    Returns the build number of exim seen when the configuration was
+    checked. This is intended for use within your own tests for appropriate
+    versions/builds.
+
+ has_option
+
+        $exim->has_option($option, $optional_msg)
+
+    Checks whether the named exim option exists. This is taken from the
+    list of options listed by exim -bP
+
+ has_not_option
+
+        $exim->has_not_option($option, $optional_msg)
+
+    Precisely the opposite of has_option with an opposite test - so fails
+    if the option does exist.
+
+ option_is
+
+        $exim->option_is($option, $value, $optional_msg)
+
+    Checks the named exim option has the appropriate value. This is taken
+    from the list of options listed by exim -bP
+
+ option_is_true
+
+        $exim->option_is_true($option, $optional_msg)
+
+    Checks the named exim option has a true value. This is taken from the
+    list of options listed by exim -bP
+
+ option_is_false
+
+        $exim->option_is_false($option, $optional_msg)
+
+    Checks the named exim option has a false value. This is taken from the
+    list of options listed by exim -bP
+
+ expansion_is
+
+        $exim->expansion_is($string, $value, $optional_msg)
+
+    Checks the given exim expansion string ends up with the appropriate
+    value.
+
+ has_capability
+
+        $exim->has_capability($type, $what, $optional_msg)
+        $exim->has_capability('lookup', 'lsearch', 'Has lsearch capability')
+
+    Checks that exim has the appropriate capability. This is taken from the
+    lists of capabilities listed by exim -bV
+
+    The types of capability are:-
+
+      * support_for
+
+      * lookup
+
+      * authenticator
+
+      * router
+
+      * transport
+
+    The items within a capability are processed to be lowercase
+    alphanumeric only - so iconv rather than iconv() as output by exim. The
+    subitems (for example maildir is a subitem of appendfile) are treated
+    as separately checkable items.
+
+    If the version of exim being used has both built-in and dynamic lookups
+    (or potentially in later versions multiple types of other
+    capabilities), then these are merged into a single capability list.
+
+ has_not_capability
+
+    Precisely the opposite of has_capability with an opposite test - so
+    fails if this does exist.
+
+ routes_ok
+
+        $exim->routes_ok($address, $optional_msg);
+        $exim->routes_ok('address@example.com', 'Checking routing');
+
+    Checks that exim with this configuration can route to the address
+    given. Accepts any working address which may route to any number of
+    final targets as long as there are no undeliverable addresses in the
+    set.
+
+ routes_as_ok
+
+        $exim->routes_as_ok($address, $target, $optional_msg);
+        $exim->routes_as_ok('address@example.com',
+            {transport => 'local_smtp}, 'Checking routing');
+
+    Checks that exim with this configuration routes to the address given
+    with the appropriate target results.
+
+    The target is an arrayref of hashes (or as a special case a single
+    hash), which matches against the addresses section of the result from
+    _run_exim_bt. Each address matches if all the elements given in the
+    target hash match (so an empty hash will match anything).
+
+    See _run_exim_bt for hash elements.
+
+ discards_ok
+
+        $exim->discards_ok($address, $optional_msg);
+        $exim->discards_ok('discards@example.com', 'Checking discarding');
+
+    Checks that exim with this configuration will discard the given
+    address.
+
+ undeliverable_ok
+
+        $exim->undeliverable_ok($address, $optional_msg);
+        $exim->undeliverable_ok('discards@example.com', 'Checking discarding');
+
+    Checks that exim with this configuration will consider the given
+    address to be undeliverable.
+
+INTERNAL METHODS
+
+    These methods are not intended to be run by end users, but are exposed.
+
+ _run_exim_command
+
+    Runs an exim instance with the appropriate configuration file and
+    arguments. The configuration file is taken from the test object, the
+    arguments are passed as arguments to this function.
+
+ _run_exim_bv
+
+    Runs exim -bV with the appropriate configuration file, to check that
+    the configuration file is valid. The output of the command is parsed
+    and stashed and used to provide the functions to check versions numbers
+    and capabilities.
+
+ _run_exim_bp
+
+    Runs exim -bP with the appropriate configuration file, to cause Exim to
+    display the value of all the main configuration options. The output of
+    the command is parsed and stashed and used to provide the functions to
+    check individual option values.
+
+ _run_exim_be
+
+    Runs exim -be, with the appropriate configuration file, in expansion
+    testing mode, to cause Exim to expand the specified string.
+
+ _run_exim_bt
+
+    Runs exim -bt (address test mode) with the appropriate configuration
+    file, to check how the single address passed routes. The output of the
+    command is parsed and passed back in the results.
+
+    The results structure is hash that looks like:- { all_ok => # no
+    invocation errors deliverable => # number of deliverable addresses
+    undeliverable => # number of undeliverable addresses total => # total
+    number of addresses addresses => {} }
+
+    The addresses part of the structure has one key for each resultant
+    address, the value of which is another hash, which may contain the
+    following items:-
+
+      * ok
+
+      True if the address routed OK, False otherwise.
+
+      * discarded
+
+      True if the address was discarded by the router, false or missing if
+      not.
+
+      * data
+
+      Scalar of lines picked out of exim output related to this address and
+      not otherwise recognised.
+
+      * router
+
+      The router name used to handle this address.
+
+      * transport
+
+      The transport name used to handle this address.
+
+      * address
+
+      The final destination address.
+
+      * original
+
+      The original address that was used within this transformation. This
+      is actually an arrayref each containing an address as several
+      transformations may take place.
+
+      * target
+
+      For a local transport, the delivery target.
+
+ _diag
+
+    Spits out some Test::Builder diagnostics for the last run command. Used
+    internally by some tests on failure. The output data is the last error
+    seen by IPC::Cmd and the complete output of the command.
+
+ACKNOWLEDGEMENTS
+
+    The module draws very strongly on the Test::Exim4::Routing module by
+    Max Maischein. It is structured differently, and is currently very
+    experimental (meaning the API may change in a big way), so these
+    changes were made as a new module in a name space that is intended for
+    use by similar modules for other MTAs.
+
+INSTALLATION
+
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+
+    You can make new bug reports, and view existing ones, through the web
+    interface at
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Test-MTA-Exim4.
+
+AVAILABILITY
+
+    The project homepage is https://metacpan.org/release/Test-MTA-Exim4.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit http://www.perl.com/CPAN/ to find a
+    CPAN site near you, or see
+    https://metacpan.org/module/Test::MTA::Exim4/.
+
+AUTHOR
+
+    Nigel Metheringham <nigelm@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Nigel Metheringham.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,46 @@
+Text::FileTree 0.24, 2015-09-04
+
+ * Only load core Perl::Critic policies. Reported by Slaven Rezić.
+   (Turns out that if you have, for instance OTRS policies installed,
+   Perl::Critic will run them as well. I don't agree with their coding
+   conventions :-).)
+
+   https://github.com/olof/Text-FileTree/issues/3
+
+-- Olof Johansson <olof@cpan.org>
+
+Text::FileTree 0.23, 2015-09-04
+
+ * Bump perl requirement to 5.8. (Thanks to cpantesters report)
+ * Fix documentation on how to use from_fh. Patch by Zoffix Znet.
+ * Add bugtracker info to META. Patch by Zoffix Znet.
+ * Clarify bug tracking preferences in POD.
+ * Add perlcritic test suite.
+
+-- Olof Johansson <olof@cpan.org>
+
+Text::FileTree 0.22, 2014-05-12
+
+ * Add git repo info to META.*
+
+-- Olof Johansson <olof@cpan.org>
+
+Text::FileTree 0.21, 2012-10-02
+
+ * Document Module::Loader as dependency
+ * Release 0.2 and 0.21 are dedicated to cpantesters.org <3
+
+-- Olof Johansson <olof@cpan.org>
+
+Text::FileTree 0.2, 2012-10-01
+
+ * Solve unit test failures on exotic platforms like MSWin32
+ * Solve unit test failures on ancient Perl version (pre 5.10)
+
+-- Olof Johansson <olof@cpan.org>
+
+Text::FileTree 0.1, 2012-09-22
+
+ * Initial release
+
+-- Olof Johansson <olof@cpan.org>

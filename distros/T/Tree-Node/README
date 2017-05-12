@@ -1,0 +1,102 @@
+NAME
+    Tree::Node - Memory-efficient tree nodes in Perl
+
+REQUIREMENTS
+    Perl 5.6.0 or newer is required. Only core modules are used.
+
+    A C compiler to is required to build the module. (There is no Pure-perl
+    version because this package was written to overcome limitations of
+    Perl. See the DESCRIPTION section below.)
+
+INSTALLATION
+    Installation can be done using the traditional Makefile.PL method:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    (On Windows platforms you should use `nmake' instead.)
+
+SYNOPSIS
+      use Tree::Node;
+
+      $node = Tree::Node->new(2);
+
+      $node->set_child(0, $left);
+      $node->set_child(1, $right);
+
+      while ($node->key_cmp($key) < 0) {
+        $node = $node->get_child(0);
+      }    
+
+DESCRIPTION
+    This module implements a memory-efficient node type (for trees, skip
+    lists and similar data structures) for Perl.
+
+    You may ask "Why bother implementing an ordered structure such as a tree
+    when Perl has hashes built-in?" Since Perl is optimized for speed over
+    memory usage, hashes (and lists) use a lot of memory.
+
+    Using Devel::Size for a reference, a list with four elements
+    (corresponding to a key, value, and two child node pointers) will use at
+    least 120 bytes. A hash with four key/value pairs will use at least 228
+    bytes. But an equivalent Tree::Node object will use at least 68 bytes.
+    (However, see the KNOWN ISSUES section below for caveats regarding
+    memory usage.)
+
+    So the purpose of this package is to provide a simple low-level Node
+    class which can be used as a base class to implement various kinds of
+    tree structures. Each node has a key/value pair and a variable number of
+    "children" pointers.
+
+    How nodes are organized or the algorithm used to organize them is for
+    you to implement.
+
+REVISION HISTORY
+    The following changes have been made since the last release:
+
+    0.08  Fri 20 Jul 2007
+            - minor tweaks and typo corrections
+    
+    0.07  Fri 13 Jul 2007
+            - distro is no longer signed (due to Module:Signature issues)
+            - fixed error with reading undefined key or value
+            - added force_set_key mode to change key
+            - test for leaks in procedural interface
+            - improved pointer cast
+            - minor changes to Build.PL
+
+    See the Changes file for a more detailed revision history.
+
+KNOWN ISSUES
+    This module implements a Perl wrapper around a C struct, which for the
+    object-oriented inferface involves a blessed reference to a pointer to
+    the struct. This overhead of about 45 bytes may make up for any memory
+    savings that the C-based struct provided!
+
+    So if you what you are doing is implementing a simple key/value lookup,
+    then you may be better off sticking with hashes. If what you are doing
+    requires a special structure that cannot be satisfied with hashes (even
+    sorted hashes), or requires a very large number of nodes, then this
+    module may be useful to you.
+
+    Another alternative is to use the Procedural Interface.
+
+SEE ALSO
+    Tree::DAG_Node is written in pure Perl, but it offers a more flexible
+    interface.
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+  Suggestions and Bug Reporting
+
+    Feedback is always welcome. Please use the CPAN Request Tracker at
+    http://rt.cpan.org to submit bug reports.
+
+LICENSE
+    Copyright (c) 2005,2007 Robert Rothenberg. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

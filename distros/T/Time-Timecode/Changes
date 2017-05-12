@@ -1,0 +1,9 @@
+-------------------------
+2016-07-16	v0.30
+-------------------------
+* Fixed dropframe calculations and changed algorithm [RT Bug #91181]
+* Changed $DEFAULT_FPS from 30 to 29.97
+* Added strftime(3) style formatting via to_string(), which now accepts an optional format string
+* Added package variable $DEFAULT_TO_STRING_FORMAT that allows one to set to_string's default format
+* Added support for relational operators
+* Added timecode conversion executable

@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Sysctl.
+
+0.01  Fri Jun 27 18:17:41 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Tie::Sysctl
+

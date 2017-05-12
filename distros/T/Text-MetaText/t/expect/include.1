@@ -1,0 +1,21 @@
+#
+# This file tests the INCLUDE directive
+#
+
+# basic INCLUDE
+This is any old file
+
+--
+<<PRE>> This is any old file
+
+--
+This is any old file
+ <<POST>>
+--
+<<PRE>> This is any old file
+ <<POST>>
+--
+<<PRE>> This is any old file
+ <<MID>> This is any old file
+ <<POST>>
+==

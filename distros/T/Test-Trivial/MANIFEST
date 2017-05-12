@@ -1,0 +1,21 @@
+CHANGES
+INSTALL
+lib/Test/Trivial.pm
+LICENSE.TXT
+Makefile.PL
+MANIFEST
+README
+t/test.t
+t/unlike.t
+t/ok.t
+t/nok.t
+t/is.t
+t/isnt.t
+t/isa.t
+t/id.t
+t/eq.t
+t/like.t
+t/err.t
+t/todo.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

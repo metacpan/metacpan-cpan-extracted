@@ -1,0 +1,233 @@
+
+<html>
+<head>
+<title>Thread::Queue::Queueable</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;CONSTR&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;CONSTR&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Thread::Queue::Queueable</h2>
+
+<p>
+<dl>
+<dt><b>Known Subclasses:</b>
+<dd><a href='../../Thread/Queue/Duplex.html'>Thread::Queue::Duplex</a></dd>
+</dt>
+</dl>
+
+<hr>
+
+Abstract base class defining the interfaces, and providing
+simple marshalling methods, for complex object to be passed
+across a <a href='./Duplex.html'>Thread::Queue::Duplex</a>
+queue.
+<p>
+Licensed under the Academic Free License version 2.1, as specified in the
+License.txt file included in this software package, or at
+<a href="http://www.opensource.org/licenses/afl-2.1.php">OpenSource.org</a>.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.90</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2005-12-01
+</dd>
+
+<p>
+<i>Unless otherwise noted, <code>$obj
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#curse'>curse</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Marshal an object into a value that can be passed via
+a <a href='./Duplex.html'>Thread::Queue::Duplex</a> object
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#onCancel'>onCancel</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pure virtual function to apply any object-specific cancel processing
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#onDequeue'>onDequeue</a>($object)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unmarshall an object after being dequeued
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#onEnqueue'>onEnqueue</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Marshal an object for queueing to a <A href='
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#redeem'>redeem</a>($object)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unmarshall an object back into its blessed form
+</td></tr>
+</table>
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='curse'></a>
+<h3>curse</h3>
+<pre>
+curse()
+</pre><p>
+<dl>
+<dd>Marshal an object into a value that can be passed via
+a <a href='./Duplex.html'>Thread::Queue::Duplex</a> object.
+<p>
+Called by TQD's various <a href='./Duplex.html#enqueue'>enqueue()</a> and
+<a href='./Duplex.html#respond'>respond()</a> methods
+when the TQQ object is being enqueue'd. Should return an unblessed,
+shared version of the input object.
+<p>
+Default returns a shared
+arrayref or hashref, depending on the object's base structure, with
+copies of all scalar members.
+<p>
+<b>Note</b> that objects with more complex members will need to
+implement an object specific <code>curse()</code> to do any deepcopying,
+including curse()ing any subordinate objects.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>marshalled version of the object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='onCancel'></a>
+<h3>onCancel</h3>
+<pre>
+onCancel()
+</pre><p>
+<dl>
+<dd>Pure virtual function to apply any object-specific cancel processing. Called by TQD's
+<a href='./Duplex.html#cancel>cancel()</a> methods,
+as well as the <a href='./Duplex.html#respond>respond()</a> method
+when a cancelled operation is detected.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>1
+</dd>
+</dl></dd></dl><hr>
+
+<a name='onDequeue'></a>
+<h3>onDequeue</h3>
+<pre>
+onDequeue($object)
+</pre><p>
+<dl>
+<dd>Unmarshall an object after being dequeued. Called by any of TQD's
+<a href='./Duplex.html#dequeue'>dequeue()</a> methods,
+as well as the various request side dequeueing
+methods (e.g., <a href='./Duplex.html#wait'>wait()</a>).
+<p>
+The default implementation <a href='#redeem'>redeem()'s</a> the input object
+to copy the input shared arrayref or hashref into a nonshared equivalent, then
+blessing it into the specified class, returning the redeemed object.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$object</code> - the marshalled representation of the object
+</dd>
+<dt><b>Returns:</b><dd>the unmarshalled <i>aka</i> "redeemed" object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='onEnqueue'></a>
+<h3>onEnqueue</h3>
+<pre>
+onEnqueue()
+</pre><p>
+<dl>
+<dd>Marshal an object for queueing to a <A href='./Duplex.html'>Thread::Queue::Duplex</a>
+queue. Called by any of TQD's <A href='./Duplex.html#enqueue'>enqueue()</a> methods,
+as well as <A href='./Duplex.html#respond'>respond()</a> method.
+<p>
+The default implementation <A href='#curse>curse()'s</a> the input
+object into either a shared array or shared hash (depending on the base structure
+of the object), and returns a list consisting of the object's class name, and the cursed object.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>(list of (object's class, object's marshalled representation)
+)</dd>
+</dl></dd></dl><hr>
+
+<a name='redeem'></a>
+<h3>redeem</h3>
+<pre>
+redeem($object)
+</pre><p>
+<dl>
+<dd>Unmarshall an object back into its blessed form.
+<p>
+Called by TQD's various <a href='./Duplex.html#dequeue'>dequeue()</a> and
+<a href='./Duplex.html#wait'>wait</a> methods to
+"redeem" (i.e., rebless) the object into its original class.
+<p>
+Default creates non-shared copy of the input object structure,
+copying its scalar contents, and blessing it into the specified class.
+<p>
+<b>Note</b> that objects with complex members need to implement
+an object specific <code>redeem()</code>, possibly recursively
+redeem()ing subordinate objects <i>(be careful
+of circular references!)</i>
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$object</code> - marshalled <i>aka</i> "cursed" version of the object
+
+</dd>
+<dt><b>Returns:</b><dd>unmarshalled, blessed version of the object
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Sun Mar  5 11:01:53 2006</i>
+</center>
+</small>
+</body>
+</html>

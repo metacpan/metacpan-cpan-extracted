@@ -1,0 +1,19 @@
+Revision history for Perl extension Template::Plugin::LDAP.
+
+0.05  Mon Nov 2 2009
+     - #39418: Foward declaration of attribute functions
+     - #39604: Call to undefined subroutine _throw
+
+0.04  Thu Mar 29 2007
+     - More basic tests, README (pod2readme) and docs
+
+0.03  Thu Mar 29 2007
+     - Changed ownership/maintainer to Gavin Henry - <ghenry@suretecsystems.com>
+
+0.02  Thu Mar 29 13:05:55 BST 2007
+     Clean up the distribution a little.
+
+0.01  Sun Dec 16 00:13:43 2001
+    - original version; created by h2xs 1.20 with options
+    AX -n Template::Plugin::LDAP
+

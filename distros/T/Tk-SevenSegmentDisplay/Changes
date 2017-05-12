@@ -1,0 +1,6 @@
+Revision history for Perl extension Tk::SevenSegmentDisplay.
+
+0.01  Sat Nov 21 18:48:24 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn Tk::SevenSegmentDisplay
+

@@ -1,0 +1,33 @@
+
+=head1 NAME
+
+Text::Xslate::Manual - Xslate users manual
+
+=head1 TABLE OF CONTENTS
+
+L<Text::Xslate> - Perl Interface to the Xslate template engine
+
+L<Text::Xslate::Syntax::Kolon> - The default template syntax
+
+L<Text::Xslate::Syntax::TTerse> - A Template Toolkit compatible syntax
+
+L<Text::Xslate::Manual::Builtin> - Builtin methods and filters/functions
+
+L<Text::Xslate::Manual::Cookbook> - The Xslate cookbook
+
+L<Text::Xslate::Manual::FAQ> - Frequently asked questions and answers
+
+L<Text::Xslate::Manual::Debugging> - How to debug Xslate templates
+
+=head1 NOTES
+
+Xslate manual pages are not yet completed. Patches are welcome.
+
+=head1 SEE ALSO
+
+L<http://xslate.org> - The Xslate web site
+
+L<https://github.com/xslate> - Xslate repositories
+
+=cut
+

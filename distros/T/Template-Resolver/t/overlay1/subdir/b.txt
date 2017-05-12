@@ -1,0 +1,1 @@
+Random thought for today is: ${T{todays.random.thought:silly}}

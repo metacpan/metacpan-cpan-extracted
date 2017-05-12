@@ -1,0 +1,70 @@
+
+LINKS TEST
+----------
+
+This is a test of a single-word link [1], same with text label [txtlink],
+a "multi-word link test" [2].
+
+  [1]: http://jmason.org/
+  [txtlink]: http://slashdot.org/
+  [2]: http://www.ntk.net/
+
+As you can see, the link lists do not need to occur at the end of the
+document, they can occur immediately after the paragraph they are used
+in. However the link labels must be unique throughout the doc.
+
+Another point is that the presence of the link labels must not cause
+side-effects in the output, such as producing extra empty paragraph tags
+or that kind of thing.
+
+Better make sure that links work OK when no whitespace is used in
+the link text[scoop]. And how's about a "glossary link"?
+
+  [scoop]: http://sitescooper.cx/
+  [glossary link]: http://jmason.org/
+
+Or a "onewordgloslink"?
+
+  [onewordgloslink]: http://sourceforge.net/
+
+Links can be used anywhere in the content, even if they were defined
+far above. Here's a link to NTK [2].
+
+Of course, EtText links should not screw up <a href=http://webmake.taint.org>
+traditional a hrefs</a>. And tags with embedded quotes should be OK too, even
+if they too use an EtText link...  <img
+src="http://jmason.org/license_plate.jpg" width="10" height="10"> [homepage].
+
+  [homepage]: http://jmason.org/
+
+Here's an odd one. EtText links should be ok when you use both text and a tag
+in the "link text <img src=http://sitescooper.cx/new.gif>" [scoop].
+
+Traditional hrefs on images should be OK too, like this: <a
+href=http://webmake.taint.org><img src="http://jmason.org/license_plate.jpg"
+width="10" height="10"></a>.
+
+This should be a link: http://webmake.taint.org/ . Also
+http://webmake.taint.org , with URL: <URL:http://webmake.taint.org/>
+
+Links follows by non-link chars: http://webmake.taint.org/,
+http://webmake.taint.org/. (blah blah http://webmake.taint.org/)
+
+That's it. Oh, one more -- since ''test_requires_this_warning'' has not be
+defined as a link label, "test_requires_this_warning" is not a link (but it
+should produce a warning).
+
+This should be a link: URL:http://webmake.taint.org/
+url:http://webmake.taint.org/ .
+
+Test links containing colons. an EtLink: "HTML::Mason" [mason], a trad link: <a
+href="http://www.masonhq.org/">HTML::Mason</a>.
+
+	[mason]: http://www.masonhq.org/
+
+Here's a new feature -- link text recogition: this is a test of linktext.
+That should be a href...
+
+	Auto: [test of linktext]: http://ettext.taint.org/
+
+

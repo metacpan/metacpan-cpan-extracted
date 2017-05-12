@@ -1,0 +1,8 @@
+0.02  Tue Dec  5 16:52:45 MET 2000
+
+	Corrected malformatting in the HTML documentation by restructuring
+	the pod.
+
+0.01  Mon Sep 25 17:55:03 METDST 2000
+
+	Initial release

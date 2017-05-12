@@ -1,0 +1,15 @@
+Artistic
+Copying
+MANIFEST
+Makefile.PL
+MmapArray.pm
+MmapArray.xs
+README
+NOTES
+NEWS
+TODO
+typemap
+t/00-basic.t
+t/01-strings.t
+t/10-subhashes.t
+examples/list-wtmp

@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+
+use Getopt::Long;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.03_03';
+
+my ( $do_verbatim, $do_methods, $do_functions ) = ( 1, 0, 0 );
+
+GetOptions( 'verbatim!' => \$do_verbatim,
+            'methods!'  => \$do_methods,
+            'functions!'  => \$do_functions,
+);
+
+use Test::Pod::Snippets;
+
+my $xps = Test::Pod::Snippets->new(
+    verbatim => $do_verbatim,
+    methods => $do_methods,
+    functions => $do_functions,
+);
+
+print $xps->generate_test( guess_type( $_ ) => $_ ) for @ARGV;
+
+sub guess_type {
+    my $x = shift;
+
+    return   $x =~ /::/ ? 'module'  # that's easy
+           : -f $x      ? 'file'    # must mean the file
+           :              'module'  # check for a module...
+           ;
+
+}
+
+__END__
+
+=head1 NAME
+
+podsnippets - extract tests out of Perl pod
+
+=head1 SYNOPSIS
+
+B<podsnippets> [ I<options> ] I<pod files>
+
+=head1 DESCRIPTION
+
+B<podsnippets> extracts code out of the pod files it 
+receives as arguments and prints it out in stdout.
+
+=head1 OPTIONS
+
+=head2 -verbatim, -noverbatim
+
+Enable or disable the extraction of verbatim code found in the pod file.
+By default, verbatim code is extracted.
+
+=head2 -functions, -nofunctions
+
+Enable or disable the extraction of function definitions from the pod file.
+If enabled, headers of the form
+
+    =head1 FUNCTIONS
+
+    =head2 foo( $bar, $baz )
+
+are going to be extracted as
+
+    @result = foo( $bar, $baz );
+
+
+By default, function definitions are not extracted.
+
+=head2 -methods, -nomethods
+
+Enable or disable the extraction of method definitions from the pod file.
+If enabled, headers of the form
+
+    =head1 METHODS
+
+    =head2 foo( $bar, $baz )
+
+are going to be extracted as
+
+    @result = $thingy->foo( $bar, $baz );
+
+
+By default, method definitions are not extracted.
+
+
+=head1 SEE ALSO
+
+L<Test::Pod::Snippets>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-test-pod-snippets at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Pod-Snippets>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 VERSION
+
+This document describes pod2snippets version 0.03_03
+
+=head1 AUTHOR
+
+Yanick Champoux, C<< <yanick at cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006, 2007, 2008 Yanick Champoux, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,40 @@
+Text-Tokenize-Indented
+
+As part of the Decl language project (the windmill I've been tilting at since 2010), I end up working with
+text a lot that is structured by indentation. Finally, I think, this module provides a solid underpinning
+to working with that kind of text, in that it provides as convenient a tokenizer as possible.
+
+It's based on L<Iterator::Simple::Lookahead>, meaning that it (1) does a lazy tokenization of a list passed
+into it, and (2) provides a peek and unget so that you can easily chain tokenizers; if a given piece that has
+already been identified turns out to break into multiple tokens, you simply tokenize it and push the subpieces
+back into the stream for later retrieval as individual tokens.
+
+This allows very nice compartmentalization of the details of parsing, leaving you a lot less to debug when
+parsing more difficult items.
+
+You use it like this:
+
+   use Text::Tokenize::Indented;
+   
+   my $tok = Text::Tokenize::Indented ({tab => 4}, <<EOF, {tab => 8}, $trailing_iterator)
+   text
+   text
+      text
+      text
+   
+   text
+   EOF
+   
+(For instance.) This then returns the following token stream:
+
+   [0, 'text']
+   [0, 'text']
+   [3, 'text']
+   [3, 'text']
+   [-1]
+   [0, 'text']
+   (whatever the trailing iterator returns)
+   
+We might then chain another tokenizer onto this one which would tokenize the individual lines into more meaningful things.
+Note that blank lines officially have an indentation of -1.
+

@@ -1,0 +1,13 @@
+<%args>
+    $owner
+</%args>
+
+%   my @a_owner = $c->model('TestrunDB')->resultset('Owner')->search();
+%   for my $or_owner ( @a_owner ) {
+%       if ( $owner && $or_owner->id() == $owner ) {
+            <option selected value="<% $or_owner->id() %>"><% $or_owner->name() || $or_owner->login() %></option>
+%       }
+%       else {
+            <option value="<% $or_owner->id() %>"><% $or_owner->name() || $or_owner->login() %></option>
+%       }
+% }

@@ -1,0 +1,16 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="0"
+             tests="3"
+             name="data_tests_bad_chars">
+    <testcase name="1 - Control chars ^A^B^C"></testcase>
+    <testcase name="2 - Weird control chars ^_^]^^"></testcase>
+    <testcase name="3 - Unicode Þϴ쌇"></testcase>
+    <system-out><![CDATA[1..3
+ok 1 - Control chars ^A^B^C
+ok 2 - Weird control chars ^_^]^^
+ok 3 - Unicode Þϴ쌇
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

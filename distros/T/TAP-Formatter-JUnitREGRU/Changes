@@ -1,0 +1,79 @@
+Revision history for Perl extension TAP::Formatter::JUnit.
+
+0.11    Wed Oct  1 13:26 PDT 2014
+    - Use "IPC::Run" instead of "IPC::Open2" in tests, to fix problems with
+      tests freezing on Windows.
+
+0.10    Mon Sep 29 12:38 PDT 2014
+    - Switch from "Test::Differences" to "Test::XML", to eliminate failures due
+      to differences in ordering of XML attributes.  Addresses RT#81552
+    - Use "File::Spec->null()" to get proper path to NULL.  RT#81200, RT#82227.
+    - Moved POD tests to "xt/" directory.
+    - Move timing sensitive tests to "xt/" directory, as they can cause
+      spurious failures for people.  While _I_ want to make sure they run
+      successfully, that's about my checking functionality as opposed to
+      verifying if things will run successfully on your own system.  RT#69777.
+
+0.09    Wed Jan 25 15:13 PST 2012
+    - Switch from Class::Field to Moose.  Thanks to Dave Lambley for the poke,
+      and the patience.
+    - Track and report timings for "(init)" and "(teardown)" of the test.
+      Without this, Hudson does not properly report on the total time needed
+      for a test suite (it calculates total time by adding up the constituent
+      tests, not by looking at the <testsuite> "time" attribute).
+    - Rewrite internals, switching from a streaming style to an iterative style
+      of processing the TAP.  Same results, but easier to work with.
+
+0.08    Thu Jul 15 23:44 PDT 2010
+    - RT#58838, "Error reporting on die or missing plan".  Thanks to Colin
+      Robertson.  Output compatible w/Hudson (so it now sees these as errors).
+    - RT#59206, "Plan/Tests Mismatch".  Thanks for Phillip Kimmey.  JUnit
+      output now reports mismatches with an "<error>" so Hudson detects it.
+
+0.07    Fri Jan 29 23:23 PST 2010
+    - Fix RT#53927, "Times reported by T:F:JUnit for individual test cases in
+      a .t file are incorrect".  Thanks to Marc Abramowitz.
+
+0.06    Wed Jan 13 21:24 PST 2010
+    - Fix bug in tap2junit which would cause multiple TAP streams to have the
+      *same* name in their output JUnit XML.  Introduced in 0.04.
+
+0.05    Wed Jan 13 16:32 PST 2010
+    - Add support for ALLOW_PASSING_TODOS environment variable, which forces
+      T:F:JUnit to treat passing TODOs as a "pass" and not a "fail" condition.
+      Thanks to Joe McMahon.
+    - Removed need for Test::Output; I forgot that you can pass a FH directly
+      in to TAP::Harness.  Doh!
+
+0.04    Wed Jan 13 15:51 PST 2010
+    - extra escaping/cleanup of characters before inserting them into the XML
+      stream, to keep JUnit parsers like Hudson's from choking.  Thanks go out
+      to Joe McMahon and Michael Nachbaur for prodding to get this fixed and
+      for patches.
+    - new "--name" option for tap2junit, allowing for tests to be explicitly
+      named.  Aliased to "--junit_name" to provide compatibility with patch
+      from Joe McMahon.
+    - tap2junit can now filter stdin/stdout; use "-" as the filename.  Thanks
+      to Joe McMahon for the original patch on which this is based
+    - switch unit tests to use Test::Output for capturing output, instead of
+      trying to run "prove" directly
+    - update unit tests to run against "blib/lib" and "blib/script" instead
+      of just "lib" and "bin"
+
+0.03    Sun Dec 13 22:36 PST 2009
+    - add timer output for each test case (not just for the suite as a whole);
+      Hudson needs this in order to show timing output for test runs.  Thanks
+      to Mark Aufflick for the poke.
+    - internal cleanups
+
+0.02    Fri Jan  9 23:35 PST 2009
+    - POD updates
+    - minor cleanup to the test names output in JUnit
+    - attempt to fix failing CPAN Tester reports, where an older version of
+      'prove' was being picked up by t/formatter.t; provide our own
+      't/bin/my-prove' and use that instead.
+
+0.01    Wed Jan  7 22:06 PST 2009
+    - initial version
+    - had this sitting around on my HD for several months and am (finally)
+      getting around to uploading it to CPAN

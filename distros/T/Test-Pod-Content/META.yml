@@ -1,0 +1,23 @@
+---
+abstract: 'Test Pod content'
+author:
+  - 'Martin Kutter <martin.kutter@fen-net.de>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Pod-Content
+provides:
+  Test::Pod::Content:
+    file: lib/Test/Pod/Content.pm
+    version: v0.0.6
+requires:
+  Pod::Simple: 0
+  Test::More: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.6

@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Text-Modify
+version: 0.5
+author:
+  - Roland Lammel (lammel@cpan.org)
+abstract: oo-style interface for simple, rule-based text modification
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

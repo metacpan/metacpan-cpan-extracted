@@ -1,0 +1,69 @@
+{
+   "abstract" : "Tie a hash to a Cache::RedisDB",
+   "author" : [
+      "Inspire.com"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-CacheRedisDB",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::RedisDB" : "0.09",
+            "Scalar::Util" : "1.45",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::FailWarnings" : "0.008",
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Inspire-com/perl-Tie-CacheRedisDB/issues"
+      },
+      "homepage" : "https://github.com/Inspire-com/perl-Tie-CacheRedisDB",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Inspire-com/perl-Tie-CacheRedisDB.git",
+         "web" : "https://github.com/Inspire-com/perl-Tie-CacheRedisDB"
+      }
+   },
+   "version" : "1.0.1",
+   "x_contributors" : [
+      "Matt Miller <matt@inspire.com>"
+   ]
+}
+

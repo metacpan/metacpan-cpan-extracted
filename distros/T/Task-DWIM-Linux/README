@@ -1,0 +1,28 @@
+Partial list of modules for http://dwimperl.com/
+
+
+
+To release run bin/release.pl It will create all the Task::DWIM::* packages
+and Task::DWIM itself.
+
+
+
+TODO
+======
+
+Further remove entries from the Modules.txt of modules that are dependencies
+and not really interesting to anyone excepe CPAN authors.
+
+Further split it into parts (max 100 modules per Task package).
+
+Improve the script fetching the dependency tree so it can be ammended
+manually when some optional or platform related dependencies are encountered.
+(Though those dependencies might need to be added to the main list of modules
+maybe with a commend why were they added)
+
+Allow freezing the list of versions and show the difference between the
+frozen list and the latest on CPAN. Allow upgrading specific modules to
+specific versions or to latest (and what if it changed in the meantime?).
+
+Go over the lists and check the commented out modules.
+

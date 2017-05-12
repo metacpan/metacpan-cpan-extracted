@@ -1,0 +1,109 @@
+0.2.6 2014-11-22T14:12:23Z
+
+    - repackage(no internal change)
+
+0.2.5 2014-11-19T11:28:17Z
+
+    - migrate to Minilla
+    - fix: RT#100270 for Test-Module-Used: Test::More alphas break this. 
+
+0.2.4
+    - fix: RT#81553 Test failures due to hash randomisation in perl 5.17.6 (thanks ANDK)
+
+0.2.3
+    - fix: tests are failed when using newer Parse::CPAN::Meta.
+0.2.2
+    - version++
+    - update year in copyright
+    (no other changes from 0.2.1_04)
+0.2.1_04
+    - add tests
+    - refactorings
+0.2.1_03
+	- implement used_ok() and requires_ok()
+
+0.2.1_02
+	- fix: forget to use Carp
+
+0.2.1_01
+	- META.json support
+0.2.0
+    - add AuthorRequires
+    - uniquify module lists
+
+0.1.9
+    - fix: modules used in test_lib_dir are ignored.(RT#54187)
+    - ChangeLog format change(Because ShipIt doesn't support previous format)
+
+0.1.8
+	- remove executable permission in Makefile.PL
+
+
+0.1.7
+	- add repository in Makefile.PL
+	(merge from git://github.com/cpanservice/Test-Module-Used.git)
+
+0.1.6
+	- fix: add copyright information(for RT#53290)
+
+
+0.1.5
+	- fix: insufficient version of version.pm specified.
+
+
+0.1.4
+	- improve error messages when test fails.
+
+0.1.3_02
+	- fix: POD structure(chaptering) is insufficient.
+
+
+0.1.3_01
+    - deprecated parameters are deleted
+    - read perl version from META.yml and NOT from *.pm
+
+0.1.2
+	- add parameter 'test_lib_dir' in constructor
+      and automatically push exclude_in_testdir to modules which are in
+      test_lib_dir.
+
+0.1.1
+	- fix: failed if package statement doesn't exist in *.pm file.
+
+0.1.0
+	- fix: fix again test failed in windows environment
+      remove all slash directory separator, and instead of using catfile().
+
+0.0.9
+	- fix: test failed in windows environment
+
+0.0.8
+	- implement push_exclude_in_{test,module}dir(), it enables
+      set exclude_in_{test,module}dir after new()
+
+0.0.7
+	- fix: bugs in version fetching from file.
+
+0.0.6
+	- refactoring methods and some optimization
+       find bug in handling core module
+
+0.0.5
+    - fix: test faild in windows environment
+
+0.0.4
+    - found bug in ok(module_requires exclude)
+      add build_requires and requires exclusion in constructor
+
+0.0.3
+    - add ChangeLog and README
+    - describe about perl_version
+    - bug fix (failed when test is empty)
+    - parse perlversion using Perl::MinimumVersion
+
+0.0.2
+    - fix insufficient index(set no_index to testdata)
+
+0.0.1
+    - initial release
+

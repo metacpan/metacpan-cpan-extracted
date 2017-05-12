@@ -1,0 +1,25 @@
+---
+abstract: 'A file base extention of Test::Deep'
+author:
+  - 'G. Allen Morris III, <gam3@gam3.net>'
+build_requires:
+  Test::Exception: 0.027
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-DeepFile
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Test::Deep: 0.103
+  Test::More: 0.008
+  YAML: 0.066
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.003

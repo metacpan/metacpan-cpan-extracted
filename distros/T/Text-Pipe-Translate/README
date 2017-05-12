@@ -1,0 +1,57 @@
+NAME
+    Text::Pipe::Translate - Translate text from one language to another
+
+VERSION
+    version 1.100890
+
+SYNOPSIS
+        use Text::Pipe 'PIPE';
+        my $pipe = PIPE 'Translate::Babelfish', from => 'en', to => 'de';
+        my $german = $pipe->filter('My hovercraft is full of eels.'),
+
+DESCRIPTION
+    This pipe segment can translate text from one language to another. To do
+    so it uses Lingua::Translate.
+
+    Both source and destination language are to be given in RFC3066 form.
+    See I18N::LangTags.
+
+METHODS
+  get_translator
+    Constructs a translator object for the current settings of "from()" and
+    "to()" and caches it using the "translators()" accessor.
+
+  filter_single
+    Takes a string and translates it according to the current settings of
+    "from()" and "to()".
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Pipe-Translate>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Text-Pipe-Translate/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Text-Pipe-Translate/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

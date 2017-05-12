@@ -1,0 +1,741 @@
+<webmake>
+<!--
+
+  This is the source .wmk file for the EtText documentation.
+
+-->
+
+<!-- ------------------------------------------------------------------------ -->
+
+<content name="blurb.txt" format="text/et">
+<wmmeta name="Title" value="The Blurb" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+What it is, and what it does
+</wmmeta>
+
+EtText is a simple plain-text format which allows conversion to and from HTML.
+Instead of editing HTML directly, it provides an easy-to-edit, easy-to-read and
+intuitive way to write HTML, based on the plain-text markup conventions we've
+been using for years.
+
+Like most simple text markup formats (POD, setext, etc.), EtText markup handles
+the usual things: insertion of P tags, header recognition and markup. However
+it also adds a powerful link markup system.
+
+EtText markup is simple and effective; it's very similar to setext, WikiWikiWeb
+TextFormattingRules or Zope's StructuredText.
+
+EtText is distributed under the same licensing terms as Perl itself.
+
+</content>
+<content name="contributors.txt" format="text/et">
+<wmmeta name="Title" value="Contributors to Text::EtText" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="60" />
+<wmmeta name="Abstract">
+Contributors to Text::EtText
+</wmmeta>
+
+Here's a list of people who've contributed to Text::EtText:
+
+  - Justin Mason &lt;jm /at/ jmason.org&gt;: original author and maintainer
+
+  - Caolan McNamara &lt;caolan /at/ csn.ul.ie&gt;: EtText contributions; lists,
+    pre-formatted text, lots of suggestions
+
+  - rudif /at/ bluemail.ch: lots of help with supporting Windows
+
+  - Chris Barrett, chris /at/ getfrank.com: suggested CSS class support for the
+    Latte-style balanced tags
+
+Thanks all!  Patches and suggestions are welcomed -- "send them in" [hacking]!
+(By the way, patch contributors get listed at the top, 'cos patches save
+me writing the code ;)
+
+	[hacking]: http://ettext.taint.org/hacking.html
+
+</content>
+<content name="ettext.txt" format="text/et">
+<wmmeta name="Title" value="Using EtText" />
+<wmmeta name="Section" value="02-reference" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+The basics of using EtText
+</wmmeta>
+
+Like most simple text markup formats (POD, setext, etc.), EtText markup
+handles the usual things: insertion of __&lt;P&gt;__ tags, header
+recognition and markup. However it adds a powerful link markup system
+and several other useful features.
+
+EtText markup is simple and effective; it's based loosely on setext, with bits
+of WikiWikiWeb [wiki] TextFormattingRules [rules] thrown in.
+
+	[wiki]: http://c2.com/cgi/wiki?WikiWikiWeb
+	[rules]: http://c2.com/cgi/wiki?TextFormattingRules
+
+EtText was previously part of WebMake [WebMake], but is now distributed
+as a standalone component.
+
+	[WebMake]: http://webmake.taint.org/
+
+Basic Text Markup
+~~~~~~~~~~~~~~~~~
+
+If you leave blank lines between paragraphs, **&lt;p&gt;** and
+**&lt;/p&gt;** tags will be inserted in the correct places.
+EtText does quite a good job of this.
+
+Words wrap and fill automatically, so there's no need to worry about wrapping
+before 80 characters. (It's good form to do so anyway, in case other people
+ever need to edit your text, or you need to mail it around.)
+
+A paragraph consisting of a line of 10 or more consecutive - or _ signs will be
+converted to a HR tag.
+
+Sections of text between pairs of certain characters will be turned into
+markup, as follows:
+
+  <table>
+  <tr><th width=30%>**EtText**</th>
+  <th width=30%>**Tag Used**</th>
+  <th width=30%>**Result**</th>
+  </tr>
+  <tr><td width=30%><code>&#42;&#42;text&#42;&#42;</code></td>
+  <td width=30%>&lt;strong&gt;</td>
+  <td width=30%>**text**</td>
+  </tr>
+  <tr><td width=30%><code>&#95;&#95;text&#95;&#95;</code></td>
+  <td width=30%>&lt;em&gt;</td>
+  <td width=30%>__text__</td>
+  </tr>
+  <tr><td width=30%><code>&#35;&#35;text&#35;&#35;</code></td>
+  <td width=30%>&lt;code&gt;</td>
+  <td width=30%>##text##</td>
+  </tr>
+  </table>
+
+**&amp;** signs that have whitespace on either side will be converted
+to **&amp;amp;** signs automatically.
+
+Text indented from the left margin will be converted into a **&lt;P&gt;**
+paragraph wrapped in a **&lt;blockquote&gt;** -- unless it starts with a
+<code>*</code>, <code>-</code>, <code>+</code>, <code>o</code> character
+followed by whitespace, or is numbered -- <code>1.</code>, ##A)## or ##a.##,
+etc. -- in which case it's interpreted as a list item; see <a
+href=$(lists)>Lists</a> below.
+
+Another exception to the above rule is that text indented by only 1 space, or
+on lines starting in the first column with two colon characters, will be
+surrounded by &lt;pre&gt; tags.
+
+If you find writing HTML tag-pairs manually annoying, EtText includes an idea
+from Latte [latte]; balanced-tag generation.  Wrap the text to be tagged with
+the name of the tag followed immediately by a { character on the left, and a }
+character on the right.  In other words,
+
+	code{strong&#123;text&#125;}
+	
+will be rendered as
+
+	##&lt;strong&gt;text&lt;/strong&gt;##
+
+or, in other words, **text** .  This can be nested, so code{strong&#123;text
+with i&#123;italic&#125; bits&#125;} will be rendered as **text with i{italic}
+bits**.
+
+	Auto: [latte]: http://www.latte.org/
+
+In addition, the balanced-tag support has a bonus feature, in that it supports
+CSS classes; follow the name of the tag with a full stop and the class, and
+it will use that class, like so:
+
+	code{i.green&#123;foo&#125;}
+	
+will be rendered as
+
+	##&lt;i class="green&gt;foo&lt;/i&gt;##
+
+Mail headers, and mail messages, are now marked up automatically.
+
+</content>
+<content name="lists.txt" format="text/et">
+<wmmeta name="Title" value="Lists" />
+<wmmeta name="Section" value="02-reference" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract">
+EtText support for lists
+</wmmeta>
+
+A paragraph indented from the left margin (by either spaces or tabs, or both),
+and starting with a <code>*</code>, <code>-</code>, <code>+</code> or
+<code>o</code> character followed by whitespace, will be converted into a list
+item (**&lt;li&gt;** tag).
+
+The same goes for indented paragraphs that start with the string
+<code>1.</code>, ##a.##, ##A.##, ##1)##, ##A)##, or ##a)##, followed by
+whitespace.  However the default list tag in this case will be an
+**&lt;ol&gt;**...**&lt;/ol&gt;** list.  Any positive integer followed
+immediately by a full stop and a space will do the trick.  The **&lt;ol&gt;**
+tag will use the correct **type** attribute to match the indexing you're using.
+
+	__(Compatibility note: previous versions of EtText required that the
+	**&lt;ul&gt;** or **&lt;ol&gt;** tags be written manually. This is no
+	longer the case, they will be added automatically.)__
+
+When you're writing **&lt;ul&gt;** lists, note that some text editors (such as
+__vim__) will reformat list items automatically, assuming that you want the
+text to line up with the start of the text, instead of the bullet-point
+character, on the previous line, like so:
+
+<pre>
+    - this is a list item. We should make sure that
+      blah blah etc. etc.
+</pre>
+
+This is pretty handy, so using a ##-## as the list bullet point character is
+recommended.
+
+Indented paragraphs that start with <code>**term**:</code> __tab__ <code>**rest
+of paragraph**</code> will be converted into definition lists (this is another
+StolenFromWikiIdea [wiki]).  As a result, this:
+
+<safe>
+    Foo:	Blah blah blah etc.
+</safe>
+
+
+Will look like this:
+
+	Foo:	Blah blah blah etc.
+
+</content>
+<content name="sidebars.txt" format="text/et">
+<wmmeta name="Title" value="Sidebars and Side Images" />
+<wmmeta name="Section" value="02-reference" />
+<wmmeta name="Score" value="30" />
+<wmmeta name="Abstract">
+EtText support for side images
+</wmmeta>
+
+If you wish to display an image, or small sidebar, beside a paragraph of text,
+use the **&lt;etleft&gt;** and **&lt;etright&gt;**
+tags.  These are rendered as a one-row, two-column
+**&lt;table&gt;** wrapping the paragraph and the sidebar, as
+follows:
+
+<pre>
+  &lt;etleft&gt;&lt;img src=bubba.png&gt;&lt;/etleft&gt;This is the main
+  paragraph body.  Foo bar baz blah blah blah etc.
+</pre>
+
+Is displayed as:
+
+<etleft><img src=bubba.png></etleft>This is the main paragraph body.
+Foo bar baz blah blah blah etc.
+
+<pre>
+  &lt;etright&gt;&lt;img src=bubba.png&gt;&lt;/etright&gt;This is the
+  main paragraph body.  Foo bar baz blah blah blah etc.
+</pre>
+
+Is displayed as:
+
+<etright><img src=bubba.png></etright>This is the main paragraph body.
+Foo bar baz blah blah blah etc.
+</content>
+<content name="links.txt" format="text/et">
+<wmmeta name="Title" value="Links in EtText" />
+<wmmeta name="Section" value="02-reference" />
+<wmmeta name="Score" value="40" />
+<wmmeta name="Abstract">
+How to link with EtText
+</wmmeta>
+
+As well as the standard **&lt;a href=url&gt;...&lt;/a&gt;** link
+specification used in HTML, EtText will automatically add href tags for URLs
+and email addresses  that occur in the text.  In addition, EtText supports its
+own link format, as follows.
+
+To use labelled links, you surround the link text with double-square-brackets,
+and (optionally) use a single open-square-bracket on the right-hand side with
+the link label.
+
+Here's an example:
+
+<safe>
+  WebMake's home page is [[at this website [WebMake]].
+</safe>
+
+Alternatively, if the link text matches the link label, the link label is
+optional.
+
+<safe>
+  Here's an example: [[WebMake]].
+</safe>
+
+The href used in the link is then defined at another point in the document, as
+an indented line like this:
+
+<safe>
+	[WebMake]: http://webmake.taint.org/
+</safe>
+
+Even simpler: if the link label has been set as an <a
+href=#Auto_Links_Even_More_Convenient>Auto link</a>, you can omit the square
+brackets altogether:
+
+<safe>
+  Here's an example: WebMake.
+</safe>
+
+Text and markup can be enclosed in the double-square-brackets, everything
+quoted will become part of the link text.  Unlike the older form of EtText
+links (see below), even single words need to be enclosed in brackets
+to become links.  This protects against accidentally interpreting normal
+text as a broken link.
+
+EtText Linking, Backwards Compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following text describes the old style for EtText links.  Since it
+was way too easy to produce links this way where they were not intended
+to be, it has now been obsoleted by the method described above.  However,
+support for it will remain on by default for a few revisions.
+
+To turn off this backwards compatibility, set the **EtTextOldLinkStyle** option
+to 0, either using WebMake's &lt;option&gt; tag, or from your code.
+
+The basic concept is of a word or ''quoted set of words'' followed by an
+optional link label in &etsqi;square brackets&etsqo;, like this: **''this is a
+link'' &etsqi;label&etsqo;**.
+
+The href used in the link is then defined at another point in the document, as
+above.
+
+Text and markup can be enclosed in the quotes, everything quoted will become
+part of the link text. Single words or HTML tags do not need to be quoted, so
+
+<safe>
+  <img src="/license_plate.jpg" width="10" height="10"> [homepage]
+</safe>
+
+will work correctly.
+
+Glossary Links
+~~~~~~~~~~~~~~
+
+EtText also supports a concept called __glossary links__; if you define a link,
+the name of that link will automatically become a href if enclosed in
+double-square-brackets or quotes.  For example:
+
+<safe>
+  [Justin Mason]: http://jmason.org/
+</safe>
+
+will mean that any occurrence of **&etsqi;&etsqi;Justin Mason]]**, or
+**''Justin Mason''**, in __any__ EtText content chunk or file in the
+site, becomes a link to that address.
+
+    These links are stored in the WebMake cache file, if WebMake is being used.
+    If you use EtText in a standalone mode, without WebMake, you can provide an
+    implementation of the **Text::EtText::LinkGlossary** interface to store
+    defined links so that they can be used in other EtText files.
+
+Quoted bits of text that do not map to an entry in the glossary are not
+converted to links (unless they're followed by a square-bracketed link-label
+reference).
+
+Auto Links - Even More Convenient
+~~~~~~~~~~~~~~~~~~~~~
+
+In addition, if the link definition is preceded with ##Auto:##, the quotes are
+not required, and any occurrence of the link label -- with or without quotes or
+double-square-brackets -- will become a link.
+
+<safe>
+  Auto: [WebMake]: http://webmake.taint.org/
+  Auto: [any occurrence of the words]: http://webmake.taint.org/
+</safe>
+
+URLs and Email Addresses
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+URLs, such as http://webmake.taint.org/ , and email addresses, such as
+jm@nospam-jmason.org, are automatically converted into links to that same
+address.
+
+Blocking EtText Link Interpretation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To block interpretation as a link, replace square brackets with the HTML
+entities **&amp;etsqi;** and **&amp;etsqo;**, which map to &etsqi; and &etsqo;
+respectively; replace quote characters, **"**, with two apostrophes,
+**&#39;&#39;**.  If that doesn't do the trick, wrap the entire section of text
+with the **&lt;!--etsafe--&gt;**...**&lt;!--/etsafe--&gt;** tags.
+
+  Auto: [WebMake]: http://webmake.taint.org/
+
+</content>
+<content name="similar.txt" format="text/et">
+<wmmeta name="Title" value="Similar Systems" />
+<wmmeta name="Section" value="02-reference" />
+<wmmeta name="Score" value="50" />
+<wmmeta name="Abstract">
+Systems and tools that similar to EtText
+</wmmeta>
+
+EtText-like plain-text-to-markup conversion systems have a long history.  The
+first time I came across the concept was with Setext [setext], which was
+included with Tony Sanders' __Plexus__ web server, back in September 1993.
+Yes, 1993. Setext has been around for a while!
+
+	Auto: [setext]: http://www.bsdi.com/setext/
+
+WikiWikiWeb [wiki] is quite a recent, well-established system which uses
+a similar markup style.
+
+txt2html provided a lot of impetus to rewrite the core of EtText since 2.0,
+since its list-parsing engine was __much__ better.  However EtText is now up to
+scratch again ;)
+
+	Auto: [txt2html]: http://www.aigeek.com/txt2html/
+
+The real inspiration for EtText was Userland's Frontier [frontier]; Dave
+Winer's evangelisation of its easily-editable markup system convinced me that
+it was worth polishing up the rudimentary EtText system I had then.  In
+addition, the name ''EtText'' is derived from ''Edit This Text'', in
+a tip of the hat to Dave's ''Edit This Page'' concept.
+
+	Auto: [frontier]: http://www.userland.com/
+
+Some well-known sites that use their own converters to convert
+plain-text to markup include http://www.blogger.com/, http://slashdot.org/
+(for comments) and http://www.advogato.org/.
+
+Jorn Barger maintains an impressive summary of etext formats at "his Robot
+Wisdom site" [etextfaq]. Skip down to section 3, <em>Internet etext
+standards</em>, for the directly-relevant stuff.
+
+	[etextfaq]: http://www.robotwisdom.com/net/etextfaq.html
+
+Zope and ZWiki use a format called "StructuredText", which again comes from
+WikiLand. There's some interesting work going on there with the "STXDocument"
+object, which is ''a web-managable object that contains information marked up
+in the structured text format''.
+
+    Auto: [StructuredText]: http://dev.zope.org/Wikis/DevSite/Proposals/StructuredText
+    Auto: [STXDocument]: http://www.zope.org/Members/jim/StructuredTextWiki/STXDocument
+
+</content>
+<content name="protecting.txt" format="text/et">
+<wmmeta name="Title" value="When HTML and EtText Collide" />
+<wmmeta name="Section" value="02-reference" />
+<wmmeta name="Score" value="60" />
+<wmmeta name="Abstract">
+Protecting text from interpretation
+</wmmeta>
+
+HTML tags can be used freely throughout an EtText document.  However, in some
+situations, you may wish to preserve whitespace, avoid paragraph tags being
+added, etc.; to use your own HTML without meddling from EtText, wrap it in an
+**&lt;!--etsafe--&gt;**...**&lt;!--/etsafe--&gt;**
+tag pair; this will protect it.
+
+Note that text blocks wrapped in **&lt;pre&gt;**,
+**&lt;listing&gt;** and **&lt;xmp&gt;** tags are
+automatically protected in this way; the **&lt;!--etsafe--&gt;**
+tag pair is not required.
+
+EtText adds two entities, **&amp;etsqi;** and **&amp;etsqo;**.  These represent
+&etsqi; and &etsqo; respectively, and are used to protect a square-bracketed
+piece of text from being interpreted as a link URL (see __Link Markup__ below).
+
+If this is insufficient, and you're using WebMake, the **&lt;safe&gt;** tag
+will escape any type of code to protect it from interpretation by WebMake,
+EtText or HTML.
+
+</content>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<{perl
+  my @names = content_matching ('*.txt');
+  set_list ("all_files", @names);
+  '';
+}>
+
+<!-- include some library .wmk's -->
+<include file="${WebMake.PerlLib}/safe_tag.wmk" />
+
+<!-- stylesheets -->
+<contents src="" name="*.css" map="false" />
+
+<!-- the names and titles of all the sections -->
+<contents src="svfile:sections.tsv" name="*" format="text/html"
+	namefield=1 valuefield=2 delimiter="|"
+	listname=all_sections map=false
+/>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- include the POD documentation directly from the source files -->
+
+<attrdefault name="listname"	value="all_pods">
+<attrdefault name="format"	value="text/pod">
+<attrdefault name="asis"	value="true">
+<attrdefault name="map"		value="true">
+<metadefault name="score"	value="50">
+
+<metadefault name="section"	value="08-pod">
+<contents src="../lib/Text/EtText" name="EtText2HTML.pm" />
+<contents src="../lib/Text/EtText" name="HTML2EtText.pm" />
+<contents src="../lib/Text/EtText" name="LinkGlossary.pm" />
+<contents src="../lib/Text/EtText" name="DefaultGlossary.pm" />
+</metadefault>
+
+<metadefault name="section"	value="09-man">
+<contents src=".." name="ettext2html" />
+<contents src=".." name="ethtml2text" />
+</metadefault>
+
+<!-- and now define the metadata for those PODs quickly using a metatable -->
+
+</metadefault>
+</attrdefault>
+</attrdefault>
+</attrdefault>
+</attrdefault>
+
+<metatable delimiter="|">
+.|title|abstract
+
+EtText2HTML.pm|Text::EtText::EtText2HTML|module documentation
+HTML2EtText.pm|Text::EtText::HTML2EtText|module documentation
+LinkGlossary.pm|Text::EtText::LinkGlossary|module documentation
+DefaultGlossary.pm|Text::EtText::DefaultGlossary|module documentation
+ettext2html|ettext2html(1)|manual page
+ethtml2text|ethtml2text(1)|manual page
+</metatable>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<attrdefault name=map value=false />
+
+<!-- Some static bits of HTML for headers and footers... -->
+
+<content name=header>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+      <title>EtText: Documentation: $[this.title]</title>
+      <meta name="generator" content="${WebMake.GeneratorString}">
+      <style>${documentation.css}</style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+  <font face="lucida,verdana,sans-serif">
+
+  <div align=center><img src=images/EtTextTitle.png ${IMGSIZE}></div>
+  ${navbar}
+
+  <!-- yes, it's that Mozilla black-border code again ;) -->
+  <!-- stolen from www.mozilla.org via rc3.org -->
+  <table border=0 cellpadding=0 cellspacing=0 width="100%">
+  <tr><td BGCOLOR="#aaaaaa">
+  <table border=0 cellspacing=4 cellpadding=4 width="100%">
+  <tr><td BGCOLOR="#ffffff">
+  <table border=0 cellspacing=4 cellpadding=4 width="100%">
+  <tr><td>
+
+  <h2>$[this.title]</h2>
+</content>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<content name=navbar>
+  <table width=100%><tr><td valign=top>
+  <strong><a href=http://ettext.taint.org/>EtText</a>
+  Documentation</strong> (version ${WebMake.Version})
+  </td><td valign=top>
+  <div align=right>
+  	[ $[navlinks] | <a href=$(index)>Index</a>
+	| <a href=$(allinone)>All&nbsp;In&nbsp;One</a> ]
+  </div>
+  </td></tr></table>
+</content>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<content name=footer>
+  </td></tr></table>
+  </td></tr></table>
+  </td></tr></table>
+  ${navbar}
+  <div align=right>
+  <a href=http://webmake.taint.org/>
+  <img src=$(TOP/)images/BuiltWithWebMake.png ${IMGSIZE} border=0></a>
+  </div>
+  </font></body></html>
+</content>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- Take all the files and all the sections, and come up with
+     a list, for each section, of the files that should be in it,
+     in sorted order.
+  -->
+<{perl
+
+  my @all_files = get_list("all_files");
+  my @all_pods = get_list("all_pods");
+  my @all_sects = get_list("all_sections");
+
+  foreach my $sectname (@all_sects) {
+    my @files_in_sect = ();
+
+    foreach my $pg (@all_files, @all_pods) {
+      next unless (get_content ("$pg.section") eq $sectname);
+      push (@files_in_sect, $pg);
+    }
+
+    @files_in_sect = content_names_to_objects (@files_in_sect);
+    @files_in_sect = sort_content_objects ('score title', @files_in_sect);
+    @files_in_sect = content_objects_to_names (@files_in_sect);
+    set_list ("$sectname.files", @files_in_sect);
+  }
+  '';
+  
+}>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- Generate the index.html file dynamically. -->
+
+<content name=index_section_item>
+<li>
+  <h2>${section_title}</h2>
+  <ul>
+  ${section_list}
+  </ul>
+</li>
+</content>
+
+<content name=index_item>
+<li>
+  <p><a href=$[${item}.url]>$[${item}.title]</a> - $[${item}.abstract]</p>
+</li>
+</content>
+
+<content name=index isroot=true map=true>
+<wmmeta name="title" value="Contents" />
+<wmmeta name="abstract" value="What's in this documentation" />
+
+  <ul>
+  <{perl
+      my @all_sects = get_list("all_sections");
+
+      foreach my $sectname (@all_sects) {
+	my @section_list = ();
+
+	foreach my $pg (get_list ("$sectname.files")) {
+	  set_content ("item", $pg);
+	  push (@section_list, get_content ("index_item"));
+	}
+
+	set_content ("section", $sectname);
+	set_content ("section_title", get_content ($sectname));
+	set_list ("section_list", @section_list);
+	$_ .= get_content ("index_section_item");
+      }
+      $_;
+  }>
+  </ul>
+
+</content>
+
+<!-- ------------------------------------------------------------------------ -->
+<!-- sitemap for navigation -->
+
+<content name=sitemapnode>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a> - $[${name}.abstract]<br>
+      <ul> ${list} </ul>
+    </p>
+  </li>
+</content>
+
+<content name=sitemapleaf>
+  <li><p><a href=$(url)>${title}</a> - $[${name}.abstract]<br></p></li>
+</content>
+
+<out name=docmap file=docmap.html>
+  ${header}${mainsitemap}${footer}
+</out>
+
+<sitemap name=mainsitemap node=sitemapnode leaf=sitemapleaf
+			sortorder="section score title" map=true>
+  <wmmeta name=title value="Documentation map" />
+  <wmmeta name=Abstract value="Map of this documentation" />
+  <wmmeta name=Section value="99-sitemap" />
+</sitemap>
+
+<content name=up></content>
+<content name=next><a href=${url}>Forward</a></content>
+<content name=prev><a href=${url}>Back</a></content>
+<content name=nonext>(Last Page)</content>
+<content name=noprev>(First Page)</content>
+
+<navlinks name=navlinks map=mainsitemap up=up next=next prev=prev
+	nonext=nonext noprev=noprev>
+${prevtext} | ${nexttext}
+</navlinks>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<for name=pg values="${all_pods}">
+  <out name="${pg}.html" file="${pg}.html">
+  ${header}${${pg}}${footer}
+  </out>
+</for>
+
+<for name=pg namesubst="s/.txt//" values="${all_files}">
+  <out name="${pg}" file="${pg}.html">
+  ${header}${${pg}.txt}${footer}
+  </out>
+</for>
+
+<out name=index file=index.html>
+  ${header}${index}${footer}
+</out>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- An all-in-one page, for printing. -->
+
+<out name=allinone file=allinone.html ismainurl=false>
+  <wmmeta name="title" value="All-In-One Documentation" />
+  ${header}
+
+  <h1>$[index.title]</h1>
+  ${index}<hr>
+
+  <{perl
+	foreach my $sectname (get_list ("all_sections")) {
+	  foreach my $pg (get_list ("$sectname.files")) {
+	    my $shortpg = $pg; $shortpg =~ s/\.txt$//;
+	    $_ .= "<h1>".get_content("$pg.title")."</h1>".
+		  get_content ("$pg") . "<hr>";
+	  }
+	}
+	$_;
+  }>
+
+  ${footer}
+</out>
+</webmake>

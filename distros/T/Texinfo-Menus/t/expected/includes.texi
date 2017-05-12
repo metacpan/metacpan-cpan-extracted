@@ -1,0 +1,43 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@c includes.texi
+@setfilename includes.info
+@settitle Includes Test
+@c %**end of header
+
+@ifinfo
+@node Top, Overview, (dir), (dir)
+@top Includes Test
+
+This document tests @@include files with Texinfo::Menus.
+
+@menu
+* Overview::                    This came from a DESC comment
+* Data Structures::             
+* Syntax::                      
+* Chapter 4::                   Chapter Four
+
+ --- The Detailed Node Listing ---
+
+Data Structures
+
+* Variable names::              This came from the Top menu
+* Context::                     This came from the Data Structures menu
+@c * Scalar Context::           Scalar context
+@c * List Context::             List context DESC comment
+@c * Void Context::             Void context from the Top menu
+* Scalar values::               Scalar values DESC comment
+
+Syntax
+
+* Syntax Overview::             
+* Declarations::                
+* Comments::                    
+@end menu
+@end ifinfo
+
+@include chapter1.texi
+@include chapter2.texi
+@include chapter3-4.texi
+
+@bye

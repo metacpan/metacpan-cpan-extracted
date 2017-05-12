@@ -1,0 +1,11 @@
+=head1 NAME
+
+Teamspeak::Channel - Teamspeak::Server have multiple Channels.
+
+=head1 SYNOPSIS
+
+The Interface depends on the L<"Teamspeak">->type().
+See L<"Teamspeak::Telnet::Channel">, L<"Teamspeak::SQL::Channel">...
+
+=cut
+

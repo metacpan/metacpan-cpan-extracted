@@ -1,0 +1,64 @@
+{
+   "abstract" : "Harness output delegate for Jenkins TAP Plugin",
+   "author" : [
+      "Evgeniy Vostrov <vostrov.e@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TAP-Formatter-Jenkins",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "TAP::Harness" : "0",
+            "Test::MockObject::Extends" : "0",
+            "Test::More" : "0",
+            "Test::Spec" : "0",
+            "Test::Spec::Mocks" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.42",
+            "Moose" : "2",
+            "MooseX::NonMoose" : "0.2",
+            "TAP::Harness" : "3.2",
+            "TAP::Parser::YAMLish::Writer" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "TAP::Formatter::Jenkins" : {
+         "file" : "lib/TAP/Formatter/Jenkins.pm",
+         "version" : "0.02"
+      },
+      "TAP::Formatter::Jenkins::MyParser" : {
+         "file" : "lib/TAP/Formatter/Jenkins/MyParser.pm",
+         "version" : 0
+      },
+      "TAP::Formatter::Jenkins::Session" : {
+         "file" : "lib/TAP/Formatter/Jenkins/Session.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

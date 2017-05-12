@@ -1,0 +1,93 @@
+=begin html
+
+<a href="https://travis-ci.org/rocky/p5-Term-ReadLine-Perl5"><img src="https://travis-ci.org/rocky/p5-Term-ReadLine-Perl5.png"></a>
+
+=end html
+
+=encoding utf8
+
+=head1 NAME
+
+Term::ReadLine::Perl5 - A Perl5 implementation GNU Readline
+
+=head1 SYNOPSIS
+
+  use Term::ReadLine::Perl5;
+  $term = Term::ReadLine::Perl5->new('ProgramName');
+  while ( defined ($_ = $term->readline('prompt>')) ) {
+    ...
+  }
+
+=head1 DESCRIPTION
+
+=head2 Overview
+
+This is a implementation of the GNU Readline/History Library written
+in Perl5.
+
+GNU Readline reads lines from an interactive terminal with I<emacs> or
+I<vi> editing capabilities. It provides as mechanism for saving
+history of previous input.
+
+This package typically used in command-line interfaces and REPLs (Read,
+Eval, Print, Loop).
+
+See L<Term::ReadLine::Perl5> for details on the API.
+
+=head2 Demo program
+
+Another package, L<Term::ReadLine::Perl5::Demo> is available to let
+you run I<Term::ReadLine::Perl5> to experiment with its capabilities
+and show how to use the API.
+
+=head1 INSTALL
+
+To install this module type:
+
+    perl Build.PL
+    make
+    # for interactive testing:
+    make test
+    # for non-interactive testing
+    AUTOMATED_TESTING=1 make test
+    make install # might need sudo make install
+
+=head1 DEVELOPMENT HISTORY
+
+The first implementation was in Perl4 (mostly) by Jeffrey
+Friedl. He referenced FSF the code Roland Schemers F<line_edit.pl>.
+
+Ilya Zakharevich turned this into a Perl5 module called
+L<Term::ReadLine::Perl>. Some of the changes he made include using
+L<Term::ReadKey> if present, and made this work under I<xterm>. The
+file F<Term/ReadLine/Perl5/CHANGES> up to but not including version
+1.04 contains a list of his changes.
+
+Starting with version 1.04 Rocky Bernstein forked the code, adding GNU
+readline history. He put it into a public git repository (github) and
+also started modernizing it and doing the things CPAN prefers,
+including adding POD documentation and non-interactive tests, removing
+(some) type globs, and respecting CPAN module namespaces.
+
+=head1 BUGS
+
+Bugs are accepted via the L<github issues
+tracker|https://github.com/rocky/p5-Term-ReadLine-Perl5/issues>.
+
+=head1 LICENSE
+
+Copyright (c) 2013-2014 Rocky Bernstein.
+Copyright (c) 1995 Ilya Zakharevich.
+
+This program is distributed WITHOUT ANY WARRANTY, including but not
+limited to the implied warranties of merchantability or fitness for a
+particular purpose.
+
+The program is free software. You may distribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation (either version 2 or any later version) and
+the Perl Artistic License as published by O’Reilly Media, Inc. Please
+open the files named gpl-2.0.txt and Artistic for a copy of these
+licenses.
+
+=cut

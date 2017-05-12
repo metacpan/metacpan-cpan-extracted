@@ -1,0 +1,60 @@
+NAME
+    `Time::timegm' - a UTC version of `mktime()'
+
+SYNOPSIS
+     use Time::timegm qw( timegm );
+
+     my $epoch = timegm( 0, 0, 0, 14, 6-1, 2012-1900 );
+
+     print "2012-06-14 00:00:00 UTC happened at ",
+        scalar localtime($epoch), " localtime\n";
+
+DESCRIPTION
+    The POSIX standard provides three functions for converting between
+    integer epoch values and 6-component "broken-down" time representations.
+    `localtime' and `gmtime' convert an epoch into the 6 components of
+    seconds, minutes, hours, day of month, month and year, in either local
+    timezone or UTC. The `mktime' function converts a local broken-down time
+    into an epoch value. However, `POSIX' does not provide a UTC version of
+    this.
+
+    This module provides a function `timegm' which has this ability.
+
+    Unlike some other CPAN implementations of this behaviour, this version
+    does not re-implement the time handling logic internally. It reuses the
+    `mktime' and `gmtime' functions provided by the system to ensure its
+    results are always consistent with the other functions.
+
+FUNCTIONS
+  $epoch = timegm( $sec, $min, $hour, $mday, $mon, $year )
+    Returns the epoch integer value representing the time given by the 6
+    broken-down components.
+
+    As with `POSIX::mktime' it is *not* required that these values be within
+    their "valid" ranges. This function will normalise values out of range.
+    For example, the 25th hour of a day is normalised to the 1st hour of the
+    following day; or the 0th month is normalised to the 12th month of the
+    preceeding year.
+
+COMPARISON WITH Time::Local
+    The Time::Local module also provides a function called `timegm()' with
+    similar behaviour to this one. The differences are:
+
+    * `Time::timegm::timegm()' handles denormalised values (that is, seconds
+      or minutes outside of the range 0 to 59, hours outside 0 to 23, etc..)
+      by adjusting the next largest unit (such that 61 seconds is 1 second
+      of the next minute, etc). `Time::Local::timegm()' croaks on
+      out-of-range input. `Time::Local' also provides a function
+      `timegm_nocheck()' which does not croak but it is documented that the
+      behavior is unspecified on out-of-range values.
+
+    * `Time::timegm::timegm()' is implemented by a light XS wrapper around
+      the `timegm(3)' or `_mkgmtime(3)' function provided by the platform's
+      C library if such a function is provided, so its behaviour is
+      consistent with the rest of the platform. `Time::Local' re-implements
+      the logic in perl code. `Time::timegm' will fall back to a perl
+      implementation only if the XS one cannot be used.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

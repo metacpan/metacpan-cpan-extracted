@@ -1,0 +1,18 @@
+Revision history for Perl extension Tk::StyleDialog.
+
+  0.04  Sep 24 2008
+  - Fixed Makefile.PL to name Tk and Tk::PNG as dependencies (to stop being
+    nagged by CPAN test failures :P)
+
+  0.03  Sep 19 2008
+  - Fixed a bug with "-grab => global" not working properly.
+
+  0.02  Sep 19 2008
+  - Added a binding so that the space bar invokes the default button in addition
+    to just the return key.
+  - Added an option of `-center => 0` to stop the default behavior of centering
+    the dialog box on-screen.
+  - Fixed the Makefile so it doesn't require Perl 5.10 :)
+
+  0.01  Sep 18 2008
+  - Initial release.

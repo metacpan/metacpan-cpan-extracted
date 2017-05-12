@@ -1,0 +1,19 @@
+TAPORlib - CHANGES HISTORY
+==========================
+
+v8.70 - 28-NOV-2001
+===================
+
+- Completed SNlib.pl -> TAPORlib.pm.
+
+- More functions added.
+
+- Now function GetPageNow_4() uses IO::Socket & IO::Select.
+
+
+v8.60 - 27-NOV-2001
+===================
+
+- TAPORlib has been tested under ActivePerl for Win9x/WinNT/Win2k.
+
+- A lot of improvments / bugfixes.

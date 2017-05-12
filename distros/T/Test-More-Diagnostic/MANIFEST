@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Test/More/Diagnostic.pm
+Makefile.PL
+MANIFEST
+README
+t/basic.t
+xt/author/pod-coverage.t
+xt/author/pod.t
+META.yml

@@ -1,0 +1,12 @@
+---
+version: 0.02
+date:    2011-12-25
+changes:
+- [NOTICE] Removed ft and st from to_ligature until non-defaults are implemented
+- [NOTICE] Renamed to_ligature/from_ligature to to_ligatures/from_ligatures
+- Added deprecated to_ligature/from_ligature aliases
+---
+version: 0.01
+date:    2011-12-20
+changes:
+- First release

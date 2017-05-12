@@ -1,0 +1,55 @@
+? a
+<math title="a">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mi>a</mi>
+  </mstyle>
+</math>
+$$a$$
+
+? 12
+<math title="12">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mn>12</mn>
+  </mstyle>
+</math>
+$$12$$
+
+# Distinguish unary minus from subtraction
+? -4
+<math title="-4">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>-</mo>
+    <mn>4</mn>
+  </mstyle>
+</math>
+$$- 4$$
+
+? 12-4
+<math title="12-4">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mn>12</mn><mo>-</mo><mn>4</mn>
+  </mstyle>
+</math>
+$$12 - 4$$
+
+? "a"
+<math title="&quot;a&quot;">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mtext>a</mtext>
+    </mrow>
+  </mstyle>
+</math>
+$$\mbox{a}$$
+
+? " "
+<math title="&quot; &quot;">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mspace width="1ex"/>
+      <mtext></mtext>
+      <mspace width="1ex"/>
+    </mrow>
+  </mstyle>
+</math>
+$$\mbox{ }$$

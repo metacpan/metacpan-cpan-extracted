@@ -1,0 +1,18 @@
+Revision history for Tapper-Reports-Receiver-Level2-BenchmarkAnything
+
+5.0.3     2016-03-11
+        - aggregated TAP metrics track suitename as additional key
+
+5.0.2     2016-03-03
+        - also track TAP success_ratio
+        - refactor TAP summary metric names
+        - drop 'exit' and 'wait' from attributes
+        - fix Data::Dumper format config which broke tap_dom serialization
+
+5.0.1     2016-02-26
+        - optionally auto-generate metrics about the incoming TAP
+        - utilize BenchmarkAnything's queueing and batch processing
+          for safety and performance
+
+5.0.0     2016-02-19
+        - a level2 receiver to handle BenchmarkAnything data

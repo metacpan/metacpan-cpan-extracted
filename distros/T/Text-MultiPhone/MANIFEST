@@ -1,0 +1,10 @@
+Changes
+TODO
+Makefile.PL
+MANIFEST
+README
+t/Text-MultiPhone.t
+lib/Text/MultiPhone/de.pm
+lib/Text/MultiPhone/no.pm
+lib/Text/MultiPhone.pm
+META.yml                                 Module meta-data (added by MakeMaker)

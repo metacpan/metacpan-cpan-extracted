@@ -1,0 +1,15 @@
+0.54 -- (20/2/2005) - Applied a patch by Dan Sully that provides the
+        CLEAR function, to clear the hash.
+
+0.53 -- Documentation change. Email address has changed, last name has
+	changed.
+
+0.52 -- On advise of Michael G Schwern, I've changed the tie interface
+        to Tie::Cache::LRU used in Tie::Cache::LRU::Expires in an object 
+        interface (seems to be twice as fast).
+
+0.51 -- Because of a detected memory leak in v0.20 of Tie::Cache::LRU, i've
+        had to make this module dependend on v0.21 of Tie::Cache::LRU.
+
+0.50 -- Initial version
+

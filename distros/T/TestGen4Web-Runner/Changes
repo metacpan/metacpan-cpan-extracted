@@ -1,0 +1,56 @@
+Revision history for Perl extension TestGen4Web::Runner
+
+0.11	2008-11-27
+	
+	Added 'var' action support.
+	Added explicit AJAX support.
+	Added magic form support.
+
+0.10	2008-11-20
+	
+	Fixed "goto_frame" bug in previous release.
+
+0.09	2008-11-19
+	
+	Added support for frame "goto".
+	Added support for frame "goto" with substitute.
+	Added support for form action override.
+	Fixed a _log_warn warning.
+
+0.08	2006-07-18
+	
+	Fixed bug when using numbered input fields in xpaths.
+
+0.07	2006-05-25
+
+	Ignoring HTML comments during xpath parse.
+	Disabled LWP::UserAgent automatic redirects.
+
+0.06	2006-05-23
+
+	Replaced switch statment with ifs
+
+0.05	2006-05-02
+
+	Adding x and y to submits
+	Support for @HREF attrib in a tag clicks.
+
+0.04	2006-03-20
+
+	Support for named forms and numbered inputs in xpaths.
+	Supporting refreshes on form submits.
+	New cookie_jar() accessor. Renamed cookie_jar_file() accessor.
+	Bug fix: failing if missing 'method' on form.
+
+0.03	2006-03-09
+
+	Added requirement for Switch 2.10
+
+0.02	2006-02-28
+
+	Small bug fixes
+
+0.01	2006-02-23
+
+	First release.
+

@@ -1,0 +1,337 @@
+BODY {
+  background: white;
+  color: black;
+  font-family: arial,sans-serif;
+  margin: 0;
+  padding: 0ex;
+  border: 0px;
+}
+ H1      {
+  background: transparent;
+  color: #006699;
+  font-size: large;
+  margin-left: 3px;
+  margin-bottom: 0px;
+  padding: 0;border: 0;
+}
+
+ H2      {
+  background: transparent;
+  color: #006699;
+  font-size: medium;
+  margin-left: 5px;
+}
+.mod1
+  { background : #DDDDDD; }
+.mod0
+  { background : #FFFFFF; }
+TABLE {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-width: 0;
+  color: inherit;
+}
+
+IMG {
+  border: 0;
+}
+
+FORM {
+  margin: 0;
+}
+
+A.fred {
+  text-decoration: none;
+}
+
+A:link, A:visited {
+  background: transparent;
+  color: #006699;
+}
+
+.smoke { text-align: center; }
+.ccver { font-size: 80%; }
+.result { text-align: right; }
+.red A:link, .red A:visited, .red {
+	  color: #FFFFFF;
+	  background: red;
+  }
+.makeTestFail A:link, .makeTestFail A:visited, .makeTestFail {
+  background: orange;
+}
+.confFail A:link, .confFail A:visited, .confFail {
+  background: red;
+}
+.makeFail A:link, .makeFail A:visited, .makeFail {
+  background:  yellow;
+}
+.makeOk {
+}
+
+TD {
+  margin: 0;
+  padding: 1px;
+  font-size: 90%;
+}
+
+DIV {
+  border-width: 0;
+}
+
+DT {
+  margin-top: 1em;
+}
+
+.credits TD {
+  padding: 0.5ex 2ex;
+}
+
+.huge {
+  font-size: 32pt;
+}
+
+.s {
+  background: #dddddd;
+  color: inherit;
+}
+
+.s TD, .r TD {
+  padding: 0.2ex 1ex;
+  vertical-align: baseline;
+}
+
+TH {
+  background: #bbbbbb;
+/*  color: inherit;*/
+/*  padding: 0.4ex 1ex;*/
+  text-align: left;
+}
+
+TH A:link, TH A:visited {
+  background: transparent;
+  color: black;
+}
+
+.box {
+  border: 1px solid #006699;
+  margin: 10px;
+  padding: 0px;
+}
+.box2 {
+  margin: 0px;
+  padding: 0px;
+}
+
+.distfiles TD {
+  padding: 0 2ex 0 0;
+  vertical-align: baseline;
+}
+
+.manifest TD {
+  padding: 0 1ex;
+  vertical-align: top;
+}
+
+.l1 {
+  font-weight: bold;
+}
+
+.l2 {
+  font-weight: normal;
+}
+
+.t1, .t2, .t3  {
+  background: #006699;
+  color: white;
+  padding: 0.5ex 1ex;
+}
+
+/* IE does not support  .box>.t1  Grrr */
+.box .t1, .box .t2, .box .t3 {
+  margin: 0;
+}
+
+.t1 {
+  font-size: 1.4em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.t2 {
+  font-size: 1.0em;
+  font-weight: bold;
+  text-align: left;
+}
+
+.t3 {
+  font-size: 1.0em;
+  font-weight: normal;
+  text-align: left;
+}
+
+/* width: 100%; border: 0.1px solid #FFFFFF; */ /* NN4 hack */
+
+.datecell {
+  text-align: center;
+  width: 17em;
+}
+
+.cell {
+  padding: 0.2ex 1ex;
+  text-align: left;
+}
+
+.label {
+  background: #aaaaaa;
+  color: black;
+  font-weight: bold;
+  padding: 0.2ex 1ex;
+  text-align: right;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+.categories {
+  border-bottom: 3px double #006699;
+  margin-bottom: 1ex;
+  padding-bottom: 1ex;
+}
+
+.categories TABLE {
+  margin: auto;
+}
+
+.categories TD {
+  padding: 0.5ex 1ex;
+  vertical-align: baseline;
+}
+
+.path A {
+  background: transparent;
+  color: #006699;
+  font-weight: bold;
+}
+
+.path {
+  background: #dddddd;
+  border-bottom: 1px solid #006699;
+  color: #006699;
+  font-size: 1.4em;
+  margin: 1ex 0;
+  padding: 0.5ex 1ex;
+}
+
+.menubar TD {
+  background: #006699;
+  color: white;
+}
+
+.menubar {
+  background: #006699;
+  color: white;
+  margin: 1ex 0;
+  padding: 5px;
+}
+
+.menubar .links     {
+  background: transparent;
+  color: white;
+  padding: 0.5ex;
+  text-align: left;
+}
+
+.menubar .searchbar {
+  background: black;
+  color: black;
+  margin: 0px;
+  padding: 2px;
+  text-align: right;
+}
+
+A.m:link, A.m:visited {
+  background: #006699;
+  color: white;
+  font: bold 10pt Arial,Helvetica,sans-serif;
+}
+
+A.o:link, A.o:visited {
+  background: #006699;
+  color: #ccffcc;
+  font: bold 10pt Arial,Helvetica,sans-serif;
+}
+
+A.o:hover {
+  background: transparent;
+  color: #ff6600;
+  text-decoration: underline;
+}
+
+A.m:hover {
+  background: transparent;
+  color: #ff6600;
+  text-decoration: underline;
+}
+
+.pod PRE     {
+  background: #dddddd;
+  border: 1px solid black;
+  color: black;
+  padding-top: 1em;
+  white-space: pre;
+}
+
+.pod H1      {
+  background: transparent;
+  color: #006699;
+  font-size: large;
+}
+
+.pod H2      {
+  background: transparent;
+  color: #006699;
+  font-size: medium;
+}
+
+.faq DT {
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+.chmenu {
+  background: black;
+  color: red;
+  font: bold 1.1em Arial,Helvetica,sans-serif;
+  margin: 1ex auto;
+  padding: 0.5ex;
+}
+
+.chmenu TD {
+  padding: 0.2ex 1ex;
+}
+
+.chmenu A:link, .chmenu A:visited  {
+  background: transparent;
+  color: white;
+  text-decoration: none;
+}
+
+.chmenu A:hover {
+  background: transparent;
+  color: #ff6600;
+  text-decoration: underline;
+}
+
+.column {
+  padding: 0.5ex 1ex;
+  vertical-align: top;
+}
+
+.datebar {
+  margin: auto;
+  width: 14em;
+}
+
+.date {
+  background: transparent;
+  color: #008000;
+}

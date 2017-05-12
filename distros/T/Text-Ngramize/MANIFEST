@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Text/Ngramize.pm
+scripts/examples_Text_Ngramize.pl
+t/001_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

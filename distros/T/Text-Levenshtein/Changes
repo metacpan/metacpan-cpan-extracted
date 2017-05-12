@@ -1,0 +1,83 @@
+Revision history for Perl module Text::Levenshtein
+
+0.12 2015-08-11 NEILB
+    - Added Text::Dice to SEE ALSO.
+    - Added [MetaJSON] to dist.ini, so META.json will be included in
+      the release tarball.
+
+0.12 2014-10-26 NEILB
+    - Require Unicode::Collate 1.04 or higher. Tests on early Perls were
+      failing, most often down to Unicode::Collate 0.52, on Perl 5.8.9.
+
+0.11 2014-10-26 NEILB
+    - The first implementation of the ignore_diacritics option was
+      very inefficient. It's now at least an order of magnitude faster,
+      if calling it multiple times.
+
+0.10 2014-10-24 NEILB
+
+    - Added { ignore_diacritics => 1 } option, which can be passed as the
+      last argument to the distance() and fastdistance() subs.
+      OALDERS++ for the suggestion in RT#97883.
+
+0.09 2014-04-26 NEILB
+
+    - Added Text::Levenshtein::TestUtils in t/lib/ to make it easy to
+      write tests (for different languages).
+    - Added Swedish tests in t/20-swedish.t - thanks to Graham Bowers.
+    - Moved Russian tests (from MMCLERIC) to t/21-russian.t.
+    - Added separate Japanese tests in t/22-japanese.t
+      Thanks to Robert Fraser.
+    - Added Greek tests in t/23-greek.t - thanks to Wikipedia.
+
+0.08 2014-04-23 NEILB
+
+    - Copy and pasting text from a web page ended up with a UTF-8 dash,
+      instead of the hyphen character I assumed was there. RT#94962
+    - Added Japanese hiragana test
+    - Added some Russian test cases -- thanks to Vyacheslav Matyukhin
+    - Another test for UTF-8, in Japanese, from Ben Bullock.
+
+0.07 2014-04-23 NEILB
+
+    - Completely rewrote module, based on the "iterative with two matrix rows"
+      version on the Wikipedia page. Added three new testsuites.
+    - Use List::Util::min()
+    - Drop the '&' before 'fastdistance' in the doc. RT#42535
+    - Moved module to lib/Text/Levenshtein.pm
+    - Moved test.pl to t/01-original.t and changed it to be a proper testsuite
+    - Removed META.yml so metadata files will be generated
+    - Specified min perl version as 5.6.0
+    - Added a bunch of similar modules to the SEE ALSO section
+    - Added an explicit COPYRIGHT AND LICENSE section in pod
+    - Added github repo to pod (and to the metadata)
+    - Reformatted Changes as per CPAN::Changes::Spec
+
+0.06_01 2008-05-14 JGOLDBERG
+
+    - Bugfixes, especially 26134
+
+0.05 2004-07-01 JGOLDBERG
+
+    - Rename distfile for consistency
+
+0.04: 2004-03-06 JGOLDBERG
+
+    - Added several modifications to increase speed
+    - Added fastdistance routine when array form can be sacrificed
+      for increased speed
+
+0.03 2002-07-28 DREE
+
+   - Changed docs to point to Text::WagnerFischer
+     (Thanks to S. Rodighiero and D. Frankowski to point me this)
+   - Better initialization of the matrix 
+
+0.02 2002-05-29 DREE
+
+   - Added array support
+
+0.01 2002-05-20 DREE
+
+   - No changes -- initial release
+

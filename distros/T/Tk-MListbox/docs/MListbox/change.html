@@ -1,0 +1,170 @@
+
+<!doctype html public "-//w3c//dtd html 3.2//en">
+<html>
+<head>
+  <title>Tk::MListbox - Changes/Bug fixes</title>
+  <link rel="stylesheet" type="text/css" href="../ptkdocs.css">
+ </head>
+<body background="../bg.gif">
+<table CELLPADDING=4 WIDTH="100%" align=center>
+<tr valign=middle>
+  <td CLASS="header">Tk::MListbox - Changes/Bug fixes</TD>
+  <th width=10%" class=subheader>Document Info</th>
+  </tr>
+<tr>
+  <td><a  href="../MListbox.html">Class Reference</a> <b>|</b> 
+         <a href="tutorial.html">Tutorial</a>          <b>|</b> 
+         <a href=""></a>FAQ  
+  </td>
+  <td valign="top" width ="30%" height='100%' rowspan=2>
+    <table width="100%" >
+      <tr ><th align=right>Date:</th><td>27 Dec 2001</td></tr>
+      <tr><th align=right>Author:</th><td>Rob Seegel</td></tr>
+      <tr><th align=right>Package:</b></td><td>MListbox</td></tr>
+    </table>      
+  </td>
+</tr>
+
+<tr>
+  <td>
+<ul>
+     <li><A HREF="#bugs">Bug Reports</a></li> 
+     <li><A HREF="#changes">API changes/Deprecated methods</a></li>
+     <li><A HREF="#release">Release information</a></li>
+</ul>
+</td></tr>
+</table>
+<hr>
+
+
+<table border width="95%" cellpadding=4>
+<tr valign=top>
+  <td colspan=4 class=header><a name="bugs">Bug Reports</a></td></tr>
+
+<tr valign=top>
+  <th width="15%">Date</th>
+  <th width="15%">Version Fixed</th>
+  <th width="15%">Status</th>
+  <th> Bug Report</th>
+</tr>
+
+<tr valign=top>
+  <td nowrap>15 Dec 2001</td><td>1.10</td><td>Closed</td>
+  <td>Color options not working correctly: -background, -foreground, 
+      -selectbackground, -selectforeground <br><i>I overhauled the ConfigSpecs
+      call for MListbox, and all internally defined Classes, these colors will now
+      work correctly, and they default to standard Tk colors set for win32 and unix
+       - RCS</i>
+  </td>
+</tr>
+<tr valign=top>
+  <td nowrap>15 Dec 2001</td><td>1.10</td><td>Closed</td>
+  <td>Deprecated function used within MListbox causing warning messages
+  <br><i>"defined @array" error fixed - RCS</i>
+  </td>
+</tr>
+<tr valign=top>
+  <td>15 Dec 2001</td><td>1.10</td><td>Closed</td>
+  <td>Non-existant keyboard bindings
+      <br><i>I added several - see <a href="../MListbox.html#kbindings">key bindings</a>
+      section in docs - RCS</i>
+  </td>
+</tr>
+<tr valign=top>
+  <td nowrap>15 Dec 2001</td><td>1.10</td><td>Closed</td>
+  <td>columnPackInfo not returning values after widget creation
+      <br><i>The problem occurred because MainLoop had not yet been encountered
+      and the widget was not yet done with it's initial configuration - there is 
+      an update called inside this method now. -RCS</i>.
+  </td>
+</tr>
+<tr valign=top>
+  <td>15 Dec 2001</td><td>1.10</td><td>Closed</td>
+  <td>when seting a width for a column, this method would appear
+      to be deleting the header. This occured when columnPack
+      was called prior to MainLoop.<br><i>corrected method to use reqwidth()
+      method instead of width() - RCS</td>
+</tr>
+
+<tr valign=top>
+  <td nowrap>15 Dec 2001</td><td>1.10</td><td>Closed</td>
+  <td>-selectmode not working correctly in extended mode - not extending to last row</td>
+</tr>
+<tr valign=top>
+  <td nowrap>26 Dec 2001</td><td>1.11</td><td>Closed</td>
+  <td>when using bindRows(), the row index returned does not always correespond
+         with the last element, yet the last element was returned.<br>
+        <i>Because I had used the nearest() method call, when there was space
+        following the last row, nearest() would still return the last element, because
+        it was nearest. This was changed to return -1 when a row is not directly beneath
+        the mouse pointer - RCS</i>    
+</td>
+</tr>
+
+
+<!-- End of Bug section -->
+
+<tr valign=top>
+  <td colspan=4 class=header><a name="changes">API changes/deprecated methods</a></td></tr>
+
+<tr valign=top>
+  <th width="15%">Date</th>
+  <th width="15%">Version</th>
+  <th colspan=2> Change </th>
+</tr>
+<tr valign=top><td nowrap>20 Dec 2001</td><td>1.10</td>
+    <td colspan=2>Deprecated bind() method<br> <i>This method used to override the base bind() method
+    and alias to bindRows(). This was not a good idea, since there is value to being able
+    to bind to the MListbox widget as a whole (ie. Enter, Leave, various key bindings). -RCS</i></td>
+</tr>
+<tr valign=top><td nowrap>20 Dec 2001</td><td>1.10</td>
+    <td colspan=2>Modified bindRows(), bindColumns(), and bindSeparators() methods
+    to return a hash reference containing row, column, and subwidget info instead of
+    column index.<br>
+    <i>This was done as a convenience. Usually, when binding to a widget, the first widget
+    passed to the callback, has useful Event info. Not so in this case, because the first widget
+    being passed back isn't the widget being bound to. The change was to include more information
+    in a convenient package, and leave the door open for more info at a later time - RCS</i>
+</tr>
+<tr valign=top><td nowrap>20 Dec 2001</td><td>1.10</td>
+    <td colspan=2>Replaced Canvas for Frame within MLColumn to be used as "separator"
+    widget.<br>
+    <i>I'm not entirely sure why it was a Canvas to begin with. It seemed like overkill to me,
+    and added unnecessary overhead, so I replaced it with Frame. -RCS</i></td>
+<tr valign=top>
+
+<tr valign=top><td class=header colspan=4>
+  <!-- Realease info -->
+  <a name="release">Release information</a>
+<tr valign=top>
+  <th width="15%">Date</th>
+  <th colspan=3> Comments </th>
+</tr>
+<tr valign=top><td nowrap>10 Feb 2000</td>
+    <td colspan=3>HJH Releases version 1.09 of MListbox</td>
+</tr>
+<tr valign=top><td nowrap>Apr 2000</td>
+    <td colspan=3>HJH ceases work on MListbox</td>
+</tr>
+<tr valign=top><td nowrap>Nov 2000</td>
+    <td colspan=3>RCS takes over maintenance of MListbox</td>
+</tr>
+<tr valign=top><td nowrap>20 Dec 2001</td>
+    <td colspan=3>RCS releases version 1.10; Created new documentation package for MListbox and
+     modified test.pl to be more Win32 friendly <br><i>1.10 is a fairly massive scrubbing of
+     MListbox code - there were many minor and a few semi-major changes done thoughout. Let me
+     know if this version badly breaks your apps -- though chances are, many of the the
+     changes you have likely already made - RCS</i></td>
+</tr>
+<tr valign=top><td nowrap>27 Dec 2001</td>
+    <td colspan=3>RCS releases version 1.11 --  very minor changes - tweaked bindRows
+    method, updated some docs</i></td>
+</tr>
+</table>
+
+<p>
+<hr>
+<i>Last Updated by Rob Seegel on 27 Dec 2001</i>
+
+</body>
+</html>

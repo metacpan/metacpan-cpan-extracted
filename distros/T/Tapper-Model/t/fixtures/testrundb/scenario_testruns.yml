@@ -1,0 +1,543 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+# -------------------- testruns "perfmon", "lmbench"
+
+- schema: Testrun
+  name: perfmon
+  data:
+    id: 23
+    owner_id: 12
+    shortname: perfmon
+    notes: perfmon
+    topic_name: Software
+
+- schema: Testrun
+  name: lmbench
+  data:
+    id: 24
+    owner_id: 12
+    shortname: lmbench
+    notes: tapper test suite lmbench wrapper
+    topic_name: Distribution
+
+- schema: Testrun
+  name: foobar
+  data:
+    id: 4
+    owner_id: 12
+    shortname: foobar
+    topic_name: Software
+    wait_after_tests: 5
+
+- schema: Testrun
+  name: foobar
+  data:
+    id: 100
+    owner_id: 12
+    shortname: autoinstall
+    notes: this testrun only exists to test autoinstall preconditions
+    topic_name: Software
+    wait_after_tests: ~
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: tapper-tools
+  data:
+    id: 7
+    shortname: tapper-tools
+    precondition: some yaml here 1
+
+- schema: Precondition
+  name: perl-5.10
+  data:
+    id: 8
+    shortname: perl-5.10
+    precondition: some yaml here 2
+
+- schema: Precondition
+  name: gcc
+  data:
+    id: 9
+    shortname: gcc-4.2
+    precondition: some yaml here 3
+
+- schema: Precondition
+  name: glibc
+  data:
+    id: 10
+    shortname: glibc-2.1
+    precondition: some yaml here 4
+
+- schema: Precondition
+  name: gcc
+  data:
+    id: 11
+    shortname: gcc-4.2
+    precondition: some yaml here 5
+
+
+- schema: Precondition
+  name: autoinstall
+  data:
+    id: 101
+    shortname: auto_auto
+    precondition: |
+      ---
+      precondition_type: autoinstall
+      timeout: 10800
+      filename: suse/SLES10SP3_x86_64.lst
+
+- schema: Precondition
+  name: Config for autoinstall
+  data:
+    id: 102
+    shortname: auto_prc
+    precondition: |
+      ---
+      precondition_type: testprogram
+      runtime: 30
+      program: /bin/uname_tap.sh
+      timeout: 90
+
+
+# -------------------- "perfmon" <== "perl", "tapper-tools"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for perfmon
+  data:
+    testrun_id: 23
+    precondition_id: 8
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd preconditions for perfmon
+  data:
+    testrun_id: 23
+    precondition_id: 7
+    succession: 2
+
+# -------------------- "lmbench" <== "perl", "tapper-tools", "gcc", "glibc"
+
+- schema: TestrunPrecondition
+  name: 1st precondition for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 8
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: 2nd preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 7
+    succession: 2
+
+- schema: TestrunPrecondition
+  name: 3rd preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 9
+    succession: 3
+
+- schema: TestrunPrecondition
+  name: 4th preconditions for lmbench
+  data:
+    testrun_id: 24
+    precondition_id: 10
+    succession: 4
+
+# -------------------- "perl" <== "gcc(9)", "glibc"
+
+- schema: PrePrecondition
+  name: 1st precondition for perl
+  data:
+    parent_precondition_id: 8
+    child_precondition_id: 9
+    succession: 1
+
+- schema: PrePrecondition
+  name: 2nd precondition for perl
+  data:
+    parent_precondition_id: 8
+    child_precondition_id: 10
+    succession: 2
+
+# -------------------- "tapper-tools" <== "gcc(11)"
+
+- schema: PrePrecondition
+  name: make tapper-tools a parent for another gcc-4.2
+  data:
+    parent_precondition_id: 7
+    child_precondition_id: 11
+    succession: 1
+
+# -------------------- "autoinstall"
+
+- schema: TestrunPrecondition
+  name: First precondition for autoinstall
+  data:
+    testrun_id: 100
+    precondition_id: 101
+    succession: 1
+
+- schema: TestrunPrecondition
+  name: Second precondition for autoinstall
+  data:
+    testrun_id: 100
+    precondition_id: 102
+    succession: 2
+
+# ==================== "scheduling"
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+
+- schema: Queue
+  name: KVM Queue
+  data:
+    id: 2
+    name: KVM
+    priority: 200
+
+- schema: Queue
+  name: Kernel Queue
+  data:
+    id: 3
+    name: Kernel
+    priority: 10
+
+# -------------------- "test requests" (Testruns)
+
+# ======================= Xen requests =========================
+
+# --- aaa ---
+
+- schema: Testrun
+  name: aaa-xen
+  data:
+    id: 1001
+    owner_id: 12
+    shortname: aaa-xen
+    notes: aaa
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: aaa-mem-8000
+  data:
+    id: 101
+    testrun_id: 1001            # aaa
+    host_id: 9                  # bascha
+
+- schema: TestrunScheduling
+  name: Xen-aaa
+  data:
+    id: 101
+    testrun_id: 1001            # aaa
+    queue_id: 1                 # Xen
+    status: schedule
+
+# --- aaa2 ---
+
+- schema: Testrun
+  name: aaa2-xen
+  data:
+    id: 1002
+    owner_id: 12
+    shortname: aaa2-xen
+    notes: aaa2
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: aaa2-mem-8000
+  data:
+    id: 102
+    testrun_id: 1002            # aaa2
+    host_id: 9                  # bascha
+
+- schema: TestrunScheduling
+  name: Xen-aaa2
+  data:
+    id: 102
+    testrun_id: 1002            # aaa2
+    queue_id: 1                 # Xen
+    status: schedule
+
+# --- aaa3 ---
+
+- schema: Testrun
+  name: aaa3-xen
+  data:
+    id: 1003
+    owner_id: 12
+    shortname: aaa3-xen
+    notes: aaa3
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: aaa3-mem-8000
+  data:
+    id: 103
+    testrun_id: 1003            # aaa3
+    host_id: 9                  # bascha
+
+- schema: TestrunScheduling
+  name: Xen-aaa3
+  data:
+    id: 103
+    testrun_id: 1003            # aaa3
+    queue_id: 1                 # Xen
+    status: schedule
+
+
+# ======================= KVM requests =========================
+
+# --- bbb ---
+    
+- schema: Testrun
+  name: bbb-kvm
+  data:
+    id: 2001
+    owner_id: 12
+    shortname: bbb-kvm
+    notes: bbb
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: bbb-mem-8000
+  data:
+    id: 201
+    testrun_id: 2001            # bbb
+    host_id: 6                  # bullock
+
+- schema: TestrunScheduling
+  name: KVM-bbb
+  data:
+    id: 201
+    testrun_id: 2001            # bbb
+    queue_id: 2                 # KVM
+    status: schedule
+
+# --- bbb2 ---
+    
+- schema: Testrun
+  name: bbb2-kvm
+  data:
+    id: 2002
+    owner_id: 12
+    shortname: bbb2-kvm
+    notes: bbb2
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: bbb2-mem-8000
+  data:
+    id: 202
+    testrun_id: 2002            # bbb2
+    host_id: 6                  # bullock
+
+- schema: TestrunScheduling
+  name: KVM-bbb2
+  data:
+    id: 202
+    testrun_id: 2002            # bbb2
+    queue_id: 2                 # KVM
+    status: schedule
+
+# --- bbb3 ---
+    
+- schema: Testrun
+  name: bbb3-kvm
+  data:
+    id: 2003
+    owner_id: 12
+    shortname: bbb3-kvm
+    notes: bbb3
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: bbb3-mem-8000
+  data:
+    id: 203
+    testrun_id: 2003            # bbb3
+    host_id: 6                  # bullock
+
+- schema: TestrunScheduling
+  name: KVM-bbb3
+  data:
+    id: 203
+    testrun_id: 2003            # bbb3
+    queue_id: 2                 # KVM
+    status: schedule
+
+# ======================= Kernel requests =========================
+
+# --- ccc ---
+    
+- schema: Testrun
+  name: ccc-kernel
+  data:
+    id: 3001
+    owner_id: 12
+    shortname: ccc-kernel
+    notes: ccc
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: ccc-mem-8000
+  data:
+    id: 301
+    testrun_id: 3001            # ccc
+    host_id: 5                  # iring
+
+- schema: TestrunScheduling
+  name: Kernel-ccc
+  data:
+    id: 301
+    testrun_id: 3001            # ccc
+    queue_id: 3                 # Kernel
+    status: schedule
+
+# --- ccc2 ---
+    
+- schema: Testrun
+  name: ccc2-kernel
+  data:
+    id: 3002
+    owner_id: 12
+    shortname: ccc2-kernel
+    notes: ccc2
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: ccc2-host-iring
+  data:
+    id: 302
+    testrun_id: 3002            # ccc2
+    host_id: 5                  # iring
+
+- schema: TestrunScheduling
+  name: Kernel-ccc2
+  data:
+    id: 302
+    testrun_id: 3002            # ccc2
+    queue_id: 3                 # Kernel
+    status: schedule
+
+# --- ccc3 ---
+    
+- schema: Testrun
+  name: ccc3-kernel
+  data:
+    id: 3003
+    owner_id: 12
+    shortname: ccc3-kernel
+    notes: ccc3
+    topic_name: Distribution
+
+- schema: TestrunRequestedHost
+  name: ccc3-mem-8000
+  data:
+    id: 303
+    testrun_id: 3003            # ccc3
+    host_id: 5                  # iring
+
+- schema: TestrunScheduling
+  name: Kernel-ccc3
+  data:
+    id: 303
+    testrun_id: 3003            # ccc3
+    queue_id: 3                 # Kernel
+    status: schedule
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 5
+    name: iring
+    free: 1
+    active: 1
+
+- schema: Host
+  name: bullock
+  data:
+    id: 6
+    name: bullock
+    free: 1
+    active: 1
+
+- schema: Host
+  name: dickstone
+  data:
+    id: 7
+    name: dickstone
+    free: 1
+    active: 1
+
+- schema: Host
+  name: athene
+  data:
+    id: 8
+    name: athene
+    free: 1
+    active: 1
+
+- schema: Host
+  name: bascha
+  data:
+    id: 9
+    name: bascha
+    free: 1
+    active: 1
+
+# -------------------- scenarios --------------------
+
+- schema: Scenario
+  name: interdep
+  data:
+    id: 1
+    type: interdep
+
+- schema: ScenarioElement
+  name: aaa_interdep
+  data:
+    id: 1
+    scenario_id: 1
+    testrun_id: 1001
+    is_fitted: 0
+
+- schema: ScenarioElement
+  name: aaa_interdep
+  data:
+    id: 2
+    scenario_id: 1
+    testrun_id: 1002
+    is_fitted: 0
+      

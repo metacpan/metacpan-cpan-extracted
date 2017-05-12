@@ -1,0 +1,53 @@
+Revision history for Perl extension Tree-Simple-Manager.
+
+0.07 Mon. Nov. 5, 2007
+    * Tree::Simple::Manager::Index
+      - added the hasTreeAtID method 
+        - added tests and docs for this
+
+0.06 Fri. Oct. 5, 2007
+    * Tree::Simple::Manager
+      + tree cache now auto-expires if the tree file is 
+        newer then the cache file (thanks to nothingmuch)   
+        - added tests for this
+
+0.05 Tues. Oct. 2, 2007
+    ~ added some more tests ...
+    
+    * Tree::Simple::Manager
+      + added support for tree_file_encoding 
+        which works with Tree::Parser 0.15
+
+0.04 Fri. April 27, 2007
+    * Tree::Simple::Manager
+      + added support for Tree metadata
+    * Tree::Simple::WithMetaData
+      + added tree subclass which handles metadata
+
+0.03 Mon. March 19, 2007
+    * Tree::Simple::Manager
+      + added some methods to make subclassing more flexible
+      + added the tree_cache_path option to optionally store
+        a parsed tree using Storable
+        - added tests for this
+        - added docs for this
+
+0.02 Thurs Jan 13, 2005
+    * Tree::Simple::Manager
+        + added the 'tree_parse_filter' field for configs
+            - added tests for this
+            - added docs for this
+        - updated the docs for new() to include descriptions
+          of the fields available
+          
+    * Tree::Simple::Manager::Index
+        - added the indexTree() method to allow for easier
+          customization of indexing through subclassing
+            - added docs for this
+
+    * Tree::Simple::Manager::Exceptions
+        + added Tree::Simple::Manager::IncorrectObjectType
+
+0.01 Mon Jan 10 01:01:17 2005
+    - module created
+

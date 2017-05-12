@@ -1,0 +1,15 @@
+Revision history for Text-vFile-toXML
+
+0.01    2006-12-25T12:35-0600
+        First version, released on an unsuspecting world.
+
+0.02    2007-03-26T21:50-0600
+        Fixed license in META.yml; removed tmp files from MANIFEST (oops).
+
+0.03    2007-04-07T12:47-0500
+        Fixed LICENSE in Makefile.PL (instead of META.yml, where it gets
+        overwritten).
+
+0.04    2007-12-28T16:10-0600
+        Added some tests to make Devel::Cover happy; moved to Module::Install.
+        No functionality changes (as far as I know!).

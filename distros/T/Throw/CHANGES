@@ -1,0 +1,193 @@
+==================================================
+Changes from 2014-12-18 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.13 at 2015-12-18 18:15:11 +0000
+-----------------------------------------
+
+  Change: f1d2b3e2ade74552e9628cbc3b63ab06b2cfb448
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2015-12-17 23:53:14 +0000
+
+    Version bump for makefile minimum perl fix 
+
+  Change: 6d92c5f8dac3ccce9737b659661aeb5fdfe2d88e
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2015-12-17 20:09:32 +0000
+
+    Merge pull request #7 from oaxlin/travis_yml
+
+    Travis yml 
+
+  Change: 71c96988cff8a6e3326fc47068b1110a10eeaf3d
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-12-17 20:04:08 +0000
+
+    force min perl version to 5.8.8 
+
+  Change: 2bae839ca560e01a376ff62abc0dc3da741a48d9
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-12-17 20:01:10 +0000
+
+    test 588 require 
+
+  Change: 578f2ab7fce765ee1d00b33478fd3860dd6fb055
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-12-17 15:18:38 +0000
+
+    testing travisyml 
+
+  Change: af90135e66237d9bb0bf872eea121f95b0f25534
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2015-12-17 15:13:28 +0000
+
+    Merge pull request #6 from oaxlin/travis_yml
+
+    add travis yml 
+
+  Change: 16756cb4ff86f2b128261622e05de52bc5aca7b4
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-12-17 15:11:45 +0000
+
+    add travis yml 
+
+  Change: 668a39ed4c9b38a7b38db2b70a6cbe2e21e766fb
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-02-06 13:52:28 +0000
+
+    version bump, include manifest and minimum perl version 
+
+  Change: bcd207eb650693dbf399d084e82d01f83c4b4eb3
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2015-02-06 13:36:48 +0000
+
+    Merge pull request #5 from Jayceh/dist_changes
+
+    Add in GithubMeta so metacpan will work nicer 
+
+  Change: 2b1f846b53955204820403983e86c44467c020f7
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2015-02-06 13:34:57 +0000
+
+    Add in GithubMeta so metacpan will work nicer 
+
+  Change: 369b1cc4087c3055ed824c1f5f9236173cfc1257
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-05 11:25:25 +0000
+
+    Add license info to perldoc. Require 5.8.8. Minor test cleanup. 
+
+  Change: b6501f1cbc1c5825bae0b36897ae765e8afb1f87
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-04-04 14:44:12 +0000
+
+    Generate markdown from pod 
+
+  Change: 5daa203edc62e01322b00de3c0b3eb83455eca59
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2014-04-04 14:40:26 +0000
+
+    Merge pull request #4 from Karlyll/master
+
+    Basic testing for Throw standard use cases. Initial Commit. 
+
+  Change: de2b199c3a8f2dc255c5a90cef8d215f0b9ceb5d
+  Author: jalsop <jalsop@localhost.localdomain>
+  Date : 2014-04-04 14:37:43 +0000
+
+    Basic testing for Throw standard use cases. Initial Commit. 
+
+  Change: 8d44e0ffacd6632a48502e14b12ca63e53b84faf
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2014-04-04 14:11:51 +0000
+
+    Merge pull request #3 from nhandy/master
+
+    adding descriptions for new and TO_JSON 
+
+  Change: 990739e996203f9a0ccf01f32815f6bfe518bf6c
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-04-04 14:10:21 +0000
+
+    make perl critic happy 
+
+  Change: 8ff1196f7a6def183d986a5ea59dc668c59c9cc8
+  Author: Nathan Handy <nhandy@Nathans-MacBook-Pro.local>
+  Date : 2014-04-04 14:06:17 +0000
+
+    adding descriptions for new and TO_JSON 
+
+  Change: 7f15f0a15559f762cf45846abbc60e82d071dd34
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-04-04 13:59:24 +0000
+
+    Fix silly warn about dup my 
+
+  Change: d85ff398b34cf1814c0e01678cefc262ec71fe1b
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-04-04 13:58:13 +0000
+
+    Basic carp/confess tests 
+
+  Change: f678a46006fc2ea520474e74a7e9b0d57e871973
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2014-04-04 13:20:18 +0000
+
+    Merge pull request #2 from Karlyll/master
+
+    Added basic commit for use_ok and require_ok testing for 'Throw'. 
+
+  Change: b35e64270f3790780a618a6fa8d12285658e6bb3
+  Author: jalsop <jalsop@localhost.localdomain>
+  Date : 2014-04-04 13:17:49 +0000
+
+    Added basic commit for use_ok and require_ok testing for 'Throw'. 
+
+  Change: e1f88012ec3f1f5b5eaec2a9e55d72c40281ad89
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2014-04-04 13:02:25 +0000
+
+    Merge pull request #1 from nhandy/master
+
+    adding JSON as a prereq 
+
+  Change: edc0fb2d8f55f3090d1991e3144bd1139372c6d9
+  Author: Nathan Handy <nhandy@Nathans-MacBook-Pro.local>
+  Date : 2014-04-04 12:57:59 +0000
+
+    adding JSON as a prereq 
+
+  Change: 5b662b414110c65e5e1cd7010a31d0a76ebe8e4e
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-04-04 12:10:45 +0000
+
+    Initial version number 
+
+  Change: 2c54d5e1fd64b60f6bd6e2dede02b6b1362f53dd
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-04-04 12:09:30 +0000
+
+    This is not a perl file =p 
+
+  Change: 61927a51db0728104de8e545205f86e4e844f0b7
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-04-04 11:51:47 +0000
+
+    Initial dist::zilla config 
+
+  Change: 42177bb9d66ecdd8abc01bb76f5100482c03dc17
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-04-04 11:46:44 +0000
+
+    Initial public commit 
+
+  Change: 305b9faed34aaa99ed24408a5e7f7f580204cbcc
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2014-04-04 10:44:26 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

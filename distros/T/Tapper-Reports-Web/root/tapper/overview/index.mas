@@ -1,0 +1,12 @@
+% my $overviews = $c->stash->{overviews};
+% if ($overviews){
+<h2>Overview</h2>
+<ul>
+% foreach my $key(sort keys %$overviews) {
+  <li><a href="<% $overviews->{$key} %>"><% $key  %></a></li>
+% }
+</ul>
+% } else {
+<meta http-equiv="refresh" content="0; URL=/tapper/start">
+<meta name="description" content="Tapper Reports">
+% }

@@ -1,0 +1,31 @@
+lib/Test/Pockito.pm
+lib/Test/Pockito/DefaultMatcher.pm
+lib/Test/Pockito/Exported.pm
+lib/Test/Pockito/Moose/Role.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.TXT
+t/001_load.t
+t/002_basic_mock.t
+t/003_moose_basic_mock.t
+t/004_default_comparator.t
+t/005_class_struct_mock.t
+t/006_example.t
+t/exported/convert_to_small_tests.pl
+t/exported/test_01.t
+t/exported/test_02.t
+t/exported/test_03.t
+t/exported/test_04.t
+t/exported/test_05.t
+t/exported/test_06.t
+t/exported/test_07.t
+t/exported/test_08.t
+t/exported/test_09.t
+t/exported/test_10.t
+t/exported/test_11.t
+t/exported/test_12.t
+t/exported/test_13.t
+t/exported/test_14.t
+t/exported/test_15.t
+META.yml                                 Module meta-data (added by MakeMaker)

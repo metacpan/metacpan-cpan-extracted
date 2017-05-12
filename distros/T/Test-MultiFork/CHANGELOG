@@ -1,0 +1,40 @@
+= 2006/07/04	0.6
+
+Don't exit too quickly on 'Bail out!'
+
+Re-work where newline is inserted.
+
+= 2006/06/22	0.5
+
+Bugfix: bailout code had wrong argument throughout.
+
+= 2004/05/05	0.4
+
+Now requires IO::Event 0.504 -- bugs fixed there.
+
+= 2004/04/21	0.3
+
+Bugfix: "sub foobar;" was parsed as starting a sub
+
+Bugfix: line number could get off a bit
+
+Requires the new release of IO::Event
+
+Regression test fixes.
+
+Documentation fixes
+
+= 2004/02/25	0.2
+
+Bug: Inactivity timeout timer always fired -- fixed
+
+Can now import 'stderr' to indicate that stderr output
+should be tagged with what stream it came from.
+
+Can now import 'colorize' to color the output based on which
+stream it came from.
+
+Can now import 'bail_on_bad_plan' to exit early when a child
+exits early.
+
+Initial revision

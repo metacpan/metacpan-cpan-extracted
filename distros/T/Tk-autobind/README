@@ -1,0 +1,49 @@
+NAME
+    Tk::autobind - automatically bind a widget to an ALT-key
+
+SYNOPSIS
+    use Tk::autobind;
+
+    $widget->autobind(callback);
+
+DESCRIPTION
+    `Tk::autobind' offers a convenient way to set up a form and have ALT-key
+    bindings for the widgets on that form. All you have to do is call
+    `autobind' after you create a widget. If the widget has an `-underline'
+    configuration option set to a value greater than or equal to 0, its
+    ALT-key binding is the key at that location in the widget's `-text'
+    configuration option.
+
+    For example, if you have a Checkbutton with the following `-text':
+
+        Automatically fix
+
+    and its `-underline' value is set to 0, then if the user presses ALT-A
+    while the focus is in the widget's main window, the checkbutton widget
+    will be invoked.
+
+    The binding that is generated is essentially
+
+    `$widget->toplevel->bind('<Alt-Key-*x*>', $callback);'
+
+METHODS
+    $widget->autobind(callback);
+        Adds the binding given above. If *callback* is specified, it must be
+        one of the forms of a valid Tk callback (see the Tk::callbacks
+        manpage). If it is omitted, a closure is generated and used:
+
+            sub { $widget->Invoke }
+
+        If *callback* is explicitly set to an empty string, the binding is
+        removed.
+
+        This method always returns $widget to allow method chaining. For
+        example, you can stick autobind before the call to pack:
+
+            my $checkbutton = $mw->Checkbutton(Name => 'cb1')->autobind->pack;
+
+SEE ALSO
+    the Tk::bind manpage
+
+AUTHOR
+    Kevin Michael Vail <kevin@vaildc.net>

@@ -1,0 +1,11 @@
+o Integrate Viktor's Logo!
+
+o Automatically generate po/en.po and po/en_GB.po.
+
+o Check whether Build.PL actually works.
+
+o When selecting multiple tests, the other notebook page is not updated
+  accordingly.
+
+o Changed test suites currently lead to errors.
+

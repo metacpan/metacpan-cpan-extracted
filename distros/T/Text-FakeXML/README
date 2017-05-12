@@ -1,0 +1,65 @@
+Text-FakeXML
+============
+
+Many applications use XML-style data, e.g., for configuration.
+However, very often this data is not 'real' XML, but just text with
+some XML-like markups. Therefore is it not necessary to pull in the
+whole vast XML machinery to create these files. A simple 'fake' module
+is sufficient.
+
+For example, consider this real-life config file for eye-of-gnome:
+
+  <?xml version='1.0'?>
+  <gconf>
+    <entry name='geometry_collection' mtime='1164190071' type='string'>
+      <stringvalue>440x350+1063+144</stringvalue>
+    </entry>
+  </gconf>
+
+This doesn't require anything fancy:
+
+    use Text::FakeXML;
+    my $cfg = Text::FakeXML->new(version => "1.0");
+    $cfg->xml_elt_open("gconf");
+    $cfg->xml_elt("entry", name => "geometry_collection",
+                  mtime => "1164190071", type => "string");
+    $cfg->xml_elt("stringvalue", "440x350+1063+144" );
+    $cfg->xml_elt_close("gconf");
+
+Text::FakeXML does not use any other (non-core) modules.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::FakeXML
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-FakeXML
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Text-FakeXML
+
+    Search CPAN
+        http://search.cpan.org/dist/Text-FakeXML
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,68 @@
+^Test-Perl-Critic-
+
+## Below here are generic entries that apply to any project ##
+
+# Version Control files
+^\.cvsignore$
+CVS
+RCS
+,v$
+\.svn
+\.git
+\.gitignore
+
+# Distribution files
+\.zip$
+\.gz$
+\.tgz$
+\.tar\.gz$
+\.tar$
+\-docs\b
+
+# Devel/Build files
+^\.perltidyrc$
+^t/01distribution\.t$
+\.devel\b
+^_build
+^Build$
+^blib
+^Makefile$
+^cover_db
+^nytprof
+^pm_to_blib$
+^Makefile.old$
+^patch
+\.patch$
+\.rej$
+\.old$
+^t/00_local_.*t$
+^tags$
+
+# Temp/backup files
+~$
+\.bak$
+^temp[^l]
+^temp$
+\.tmp$
+\.\#.+
+\#$
+\.swp$
+\.vim_backup$
+
+# Mac/SMB files
+\.DS_Store
+^\._.+
+\bIcon\x0d
+
+# Flash development
+\.swd$
+^test\.swf$
+
+# Avoid Eclipse files.
+\.project\b
+^\.includepath$
+
+# Avoid my Ant build script
+^build\.xml$
+^MYMETA\.yml$
+^MYMETA\.json$

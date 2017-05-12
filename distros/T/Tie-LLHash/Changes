@@ -1,0 +1,83 @@
+Change log for Tie-LLHash:
+
+Development
+
+1.004  2014-10-03  XAERXESS
+
+ - added explicit SCALAR implementation, as perltie suggests
+
+ - added warning about hash behavior in scalar context on Perls < 5.8.3
+
+ - updated README
+
+1.003_01  2014-09-30  XAERXESS
+
+ - Grzegorz Rożniecki (XAERXESS) has taken over maintenance
+
+ - updated revision history in Changes (as per CPAN::Changes::Spec)
+
+ - cleaned up documentation
+
+ - moved LLHash.pm to lib/Tie/LLHash.pm
+
+ - tweaked Makefile.PL
+
+ - migrated tests to Test::More
+
+1.003  2004-03-13 16:53:28
+
+ - delete($hash{$key}) now returns the associated value, previously it
+   returned an internal data structure not meant for external use.
+
+ - With normal perl hashes, the caller can call delete() in a loop
+   that uses the hash's iterator, as long as the item being deleted is
+   the most recent item returned by the iterator.  This wasn't working
+   in Tie::LLHash, but now it's fixed.  [Spotted by Steve Tolkin]
+
+ - Un-synchronized version numbers with CVS
+
+1.002  2000-04-01 16:04:27
+
+ - Added more documentation about the differences between this module and
+   Tie::IxHash.
+
+ - Synchronized version numbers with CVS.
+
+0.04  1999-12-01 22:51:01
+
+ - Added 'lazy-mode', which allows you to append new entries to the end
+   of the hash by assigning to the hash by doing $hash{key} = 'value';
+
+0.03  1998-09-29 20:14:53
+
+ - fixed a fatal bug in the current_value() method
+
+ - insert(key,value) now equivalent to first(key,value),
+   making it somewhat easier to insert values at the beginning
+   of the hash.
+
+ - wrote documentation for the non-TIEHASH methods
+
+0.02  1998-05-20 19:21:52
+
+ - forgot to include a README file in the original distribution, so I
+   added one now
+
+ - running all tests now won't give any warnings under -w flag
+
+ - added tests 7-10
+
+ - fixed some problems with the DELETE method - it went wrong when
+   deleting the last element in a hash
+
+ - insert() didn't work right when inserting after the last element
+
+ - can give initialization hash for tie() constructor
+
+0.01  1998-05-11 17:45:43
+
+ - original version; created by h2xs 1.18
+
+ - wrote tests 2-6
+
+ - thanks to Byron Brummer who pointed out a pre-release bug in the EXISTS method

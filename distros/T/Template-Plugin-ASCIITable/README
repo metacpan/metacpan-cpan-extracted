@@ -1,0 +1,17 @@
+Template::Plugin::ASCIITable
+
+Allows you to use Text::ASCIITable in your templates.
+
+INSTALLATION
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2007 dakkar <dakkar@thenautilus.net>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

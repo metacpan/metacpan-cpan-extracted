@@ -1,0 +1,73 @@
+Revision history for Perl extension Foo::Bar
+
+* 1.00
+
+Is this a bug or a feature
+
+* 0.04
+
+Added some stuff
+
+* 0.03
+
+Fix bug reported by ABC
+Revision history for Perl extension Data::Miscellany.
+
+1.02  Do Okt 18 10:09:39 CEST 2007
+        - fixed version requirement of Test::More
+
+0.02  Do Okt 18 10:09:39 CEST 2007
+        - fixed version requirement of Test::More
+
+0.01  Do Okt  4 19:16:00 CEST 2007
+        - original version
+
+Revision history for Perl extension Foo::Bar
+
+* 1.10
+
+Is this a bug or a feature
+
+* 0.14
+
+Added some stuff
+
+* 0.13
+
+
+---
+global:
+  name: Class-Factory-Enhanced
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - set the version to 0.07
+      - 'Changes: fixed global.name'
+    date: 2007-11-29T16:29:04Z
+    tags: []
+    version: 0.07
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - Added requirement for Class::Accessor::Installer
+      - '.shipit: added Twitter step'
+      - 'Makefile.PL: added auto_install() and process_templates()'
+      - 'lib/*: converted to template'
+      - updated MANIFEST
+      - updated t/perlcriticrc
+    date: 2007-11-21T18:21:11Z
+    tags:
+      - BUGFIX
+    version: 0.06
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - Makefile.PL now requires Class::Factory 1.06 or better specifically.
+    date: 2007-11-07T14:40:43+01:00
+    tags: []
+    version: 0.05
+
+0.001  Do Okt  4 19:16:00 CEST 2007
+        - original version
+
+2.000  Do Okt  4 19:16:00 CEST 2007
+        - original version
+

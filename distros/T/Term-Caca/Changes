@@ -1,0 +1,39 @@
+Revision history for Term::Caca
+
+1.2.0     2011-12-03
+    [ENHANCEMENTS]  
+        * add possibility to chose display driver.
+
+    [BUG FIXES]
+        * protect against a potential memory leak (rt62971)
+            Reported by Kevin Ryde.
+
+
+1.1.0     2011-09-25
+    [BUG FIXES]
+        * strip leftover 0.x stuff from Caca.pm and Caca.xs
+
+1.0_1     2011-06-09
+    [ENHANCEMENTS]  
+        * add export() method
+
+1.0_0     2011-06-05
+  * upgrade to API 1.x of libcaca
+  * add maze.pl example
+  * remove script caca-sprite
+
+0.97 2011-05-12
+  * draw_thin_line was erronously _draw_line (rt62969)
+  * Build.PL now verify that libcaca is available
+
+0.96 2011-05-08
+  * add support for API 1.x of libcaca (rt68008)
+  * remove dependency to Tie::Array::Pointer (rt62970)
+  * add basic test
+  * drop Makefile.PL support
+
+0.95  2006-03-05
+  * first release in a long time
+  * added much pod
+  * killed memory leaks
+  * added pod coverage tests

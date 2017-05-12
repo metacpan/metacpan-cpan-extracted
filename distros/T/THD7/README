@@ -1,0 +1,824 @@
+NAME
+    THD7 - Perl module providing control to a Kenwood TH-D7 radio via serial
+    port
+
+SYNOPSIS
+        use THD7 qw(:constants :functions);
+
+        my $Radio = new THD7 ("/dev/ttyS0");
+        $Radio->Band(BAND_A);
+        $Radio->DataBand(BAND_A);
+        $Radio->TNC(ON);
+        $Radio->APRS_TransmitInterval(1);
+        $Radio->APRS_Beacon(ON);
+
+    When running in the Windows environment, specify the path to the Win32
+    SerialPort configuration file, as such:
+
+        my $configuration = "D:\\MyRadio\\COM6port.cfg";
+        my $radio = new THD7 ($configuration);
+
+ABSTRACT
+    This module allows you to perform real-time control over the Kenwood
+    TH-D7 radio via a serial port.
+
+    In its simplest usage, you can send commands to configure your D7 as if
+    you were entering them on the D7's keypad. By using the more advanced
+    functions such as Polling, you can construct callback functions that
+    will be called whenever the D7 does something (like receive a
+    transmission or is reconfigured via the D7's keypad).
+
+    The current version of THD7.pm should always be available via CPAN or:
+
+        http://fastolfe.net/ham/THD7.pm
+
+DESCRIPTION
+    Before interacting with the radio in any way, an object must be created
+    and tied to the serial port where the D7 is connected. This is done like
+    this:
+
+        use THD7 qw/:constants :functions/;
+        my $Radio = new THD7 ("/dev/ttyS0");
+
+    The ":constants" and ":functions" tags import certain constants and
+    conversion functions described later on. These will be useful and their
+    use is encouraged.
+
+  BASIC CONTROL
+    Now that you've got your THD7 object opened and connected to a serial
+    port, you can start sending commands to the D7 and querying the D7
+    settings. Nearly all of the commands listed here are readable and
+    writable. If you call a method without specifying a setting, the current
+    setting will be returned. Unless otherwise noted, the returned values
+    will exactly match the argument list.
+
+    Most methods have two names. The short name matches the command string
+    sent to the D7 (ARL, BAL, BUF) while the long name is a more descriptive
+    version and should be used to maximize readability.
+
+        $Radio->Band();             # Returns current band
+        $Radio->Band(BAND_A);       # Sets the band to band A
+        $Radio->Band();             # Returns 0 (BAND_A)
+
+    Here is a list of all control and query functions available:
+
+    AI [*on_off*]
+        Turns on/off status and reporting notifications. See the section on
+        Polling and callback functions for more information about this.
+        *on_off* can be either ON or OFF. Leave this off unless you're going
+        to be using Poll to retrieve the information. There are no
+        keystrokes available on the D7 to modify this value.
+
+            $Radio->AI(ON);
+
+    VHFAIP [*on_off*] (AIP)
+        Turns on/off the Advanced Intercept Point feature. Equivalent to
+        pressing [MENU], [1], [5], [6].
+
+    APO [*setting*]
+        Turns on/off the Auto Power-Off feature. *Setting* can take one of
+        three constants: OFF, APO_30, APO_60 (0, 1 or 2). NOTE: An
+        additional argument is returned from this function (or by polling).
+        When the argument is set to ON, the D7 is about to power down
+        because of the APO setting.
+
+            $Radio->APO(APO_30);        # Turn off after 30 minutes.
+
+            # After 30 minutes, your callback function receives an APO
+            # event with an additional argument, set to 1.  (See below for
+            # information about Polling and callback functions):
+
+            sub APO_callback {
+                my ($name, $APO_setting, $about_to_shut_down) = @_;
+
+                if ($about_to_shut_down) {
+                    print "WARNING! D7 about to shut down!\n";
+                } else {
+                    print "APO setting now: $APO_setting\n";
+                }
+            }
+
+        Equivalent to pressing [MENU], [1], [2], [2].
+
+    APRS_Beacon [*on_off*] (BCN)
+        Turns on/off the APRS beacon mode. Equivalent to pressing [BCON].
+
+    APRS_Comment [*setting*] (POSC)
+        Sets/retrieves the APRS positional comment. The *setting* is an
+        integer from 0 to 7:
+
+            0   Off Duty
+            1   Enroute
+            2   In Service
+            3   Returning
+            4   Committed
+            5   Special
+            6   Priority
+            7   Emergency
+
+            $Radio->APRS_Comment(1);   # We're now enroute!
+
+        Note that setting this to 5 or greater will cause your call sign to
+        appear with red flashing lights and alarm klaxons with some APRS
+        installations.
+
+        Equivalent to pressing [MENU], [2], [4].
+
+    APRS_Icon [*user_defined* *icon*] (ICO)
+        Sets/retrieves the current icon setting. By default, the D7 has 16
+        built-in icons (numbered from 0 to E, hex). You can either set
+        *user_defined* to zero (0) and use this number to specify a built-in
+        icon, or you can set *user_defined* to 1 and specify your own
+        two-byte APRS icon as your *icon*. Equivalent to pressing [MENU],
+        [2], [5].
+
+            $Radio->APRS_Icon(0, 8);   # A little car
+
+    APRS_MyCall [*call*] (MYC)
+        Sets/retrieves the call sign for APRS packets. Equivalent to
+        pressing [MENU], [2], [1].
+
+    APRS_Path [*path*] (PP)
+        Sets/retrieves the current APRS path (e.g. "RELAY,WIDE"). Equivalent
+        to pressing [MENU], [2], [8].
+
+    APRS_PosLimit [*distance*] (ARL)
+        Limit APRS notifications to *distance* miles/kilometers. This value
+        must be divisible by ten (10). Equivalent to pressing [MENU], [2],
+        [B].
+
+            $Radio->APRS_PosLimit(500);    # 500 mi/km
+            $Radio->APRS_PosLimit(499);    # Invalid
+            $Radio->APRS_PosLimit(490);    # OK
+
+    APRS_Status [*text*] (STAT)
+        Sets/retrieves the current APRS status text. Equivalent to pressing
+        [MENU], [2], [6].
+
+    APRS_TransmitMode [*setting*] (DTX)
+        Sets/retrieves the current APRS transmit mode. *Setting* can be any
+        of MANUAL, PTT or AUTO. Equivalent to pressing [MENU], [2], [9].
+
+    APRS_Unprotocol [*string*] (UPR)
+        Sets/retrieves the current APRS Unprotocol string. Equivalent to
+        pressing [MENU], [2], [A].
+
+    AutoOffset [*on_off*] (ARO)
+        Turns on/off automatic repeater offsets. Equivalent to pressing
+        [MENU] + [1], [5], [1].
+
+    Balance [*balance*] (BAL)
+        Adjusts the speaker balance between the two bands. Equivalent to
+        pressing [BAL].
+
+            Value  BAND_A  BAND_B
+            =====================
+                0    100%      0%
+                1     75      25
+                2     50      50
+                3     25      75
+                4      0     100
+
+    Band [*band*] (BC)
+        Switches the currently selected band. *band* can be either BAND_A or
+        BAND_B. Equivalent to pressing [A/B].
+
+    BatterySave [*setting*] (SV)
+        Sets/retrieves the current Battery Save setting. *Setting* is one of
+        the following:
+
+            0   Off
+            1   0.2s
+            2   0.4
+            3   0.6
+            4   0.8
+            5   1
+            6   2
+            7   3
+            8   4
+            9   5
+
+        Equivalent to pressing [MENU], [1], [2], [1].
+
+    Beep [*setting*] (BEP)
+        Turns on/off the key/data notification beep. *Setting* can be OFF,
+        KEY, <KEY_DATA> or <ALL>. Equivalent to pressing [MENU], [1] + [5],
+        [3].
+
+    Bell *band* [*on_off*]
+        Turns on/off bell notification for the specified band. *Band* must
+        be either BAND_A or BAND_B. Equivalent to pressing [F], [ENT].
+
+    Buffer *band* [*frequency*, *step*, *x1*, *reverse*, *tone*, *CTCSS*,
+    *x2*, *tonefreq*, *x3*, *CTCSSfreq*, *offset*, *mode*] (BUF)
+        This function sets or retrieves the current frequency information
+        for the specified band (BAND_A or BAND_B). "Set" is an alias for
+        this method. The specified band must be in VFO mode (via Mode) for
+        this call to succeed. When making changes via this method, ALL
+        arguments are required:
+
+        *frequency* Integer frequency value in Hz
+
+        *step* Integer step value; see "HELPER FUNCTIONS" later for
+        information on how to generate this value
+
+        *reverse* Reverse repeater offset (ON or OFF)
+
+        *tone* PL tone enabled (ON or OFF)
+
+        *CTCSS* CTCSS tone enabled (ON or OFF)
+
+        *tonefreq* PL tone frequency; see "HELPER FUNCTIONS" later for
+        information on how to generate this value
+
+        *CTCSSfreq* ditto
+
+        *offset* Repeater offset in Hz
+
+        *mode* Modulation mode (FM or AM)
+
+        *x1 x2 x3* Unknown (set to 0?)
+
+        For an easier method to set/retrieve the current frequency without
+        all of that extra crap, see the Freq method.
+
+    ChannelMode [*on_off*] (CH)
+        Activates the channel display mode. Effectively places the D7 in a
+        mode where the user may only navigate the channel list. See the D7
+        manual page 31 ("CHANNEL DISPLAY") for other restrictions.
+        Equivalent to pressing POWER OFF, [A/B]+ POWER ON.
+
+    Contrast [*setting*] (CNT)
+        Adjust the contrast of the LCD display. Valid settings are integers
+        from 1 to 16. Equivalent to pressing [MENU], [1], [1], [2].
+
+    CTCSS [*on_off*] (CT)
+        Enable/disable CTCSS. Equivalent to pressing [F], [3].
+
+    CTCSSFreq [*tone*] (CTN)
+        Set/retrieve the CTCSS tone frequency. *Tone* is an integer value
+        from 1 to 39. See the ToTone and FromTone methods described in
+        "HELPER FUNCTIONS" for information on how to generate this value.
+        Equivalent to pressing [F], [4].
+
+    DataBand [*band*] (DTB)
+        Sets/retrieves the current data band selection (BAND_A or BAND_B).
+        Equivalent to pressing [MENU], [1], [4], [1].
+
+    DCDSense [*setting*] (DS)
+        Sets/retrieves the DCD sense setting. Valid *setting*s are DATA or
+        BOTH.
+
+    Down (DW)
+        Adjusts the frequency downward by the current step setting. See
+        also: Up
+
+    DTMF_Name *memory* [*name*] (DMN)
+        Sets/retrieves the DTMF memory name for location *memory*.
+        Equivalent to pressing [MENU], [1], [3], [1].
+
+    DTMF_Memory *memory* [*number*] (DM)
+        Sets/retrieves the DTMF string for location *memory*. Equivalent to
+        pressing [MENU], [1], [3], [1].
+
+    DTMF_Pause [*setting*] (PT)
+        Sets/retrieves the current DTMF pause setting. *Setting* is an
+        integer representing one of these timings:
+
+            0   100ms
+            1   200
+            2   500
+            3   750
+            4   1000
+            5   1500
+            6   2000
+
+        Equivalent to pressing [MENU], [1], [3], [4].
+
+    DTMF_Speed [*setting*] (TSP)
+        Sets/retrieves the current DTMF speed setting. Valid *setting*s are
+        SLOW or FAST. Equivalent to pressing [MENU], [1], [3], [2].
+
+    Dual [*on_off*] (DL)
+        Activate/Deactivate the dual band feature of the HT. Equivalent to
+        pressing [DUAL].
+
+    Duplex [*setting*] (DUP)
+        Activates/deactivates full duplex mode. *Setting* can be either FULL
+        (ON) or HALF (OFF). Equivalent to pressing [DUP].
+
+    Freq [*frequency* *step*] (FQ)
+        The easy way to set/retrieve the current frequency (as opposed to
+        its big brother, Buffer). *Frequency* is in Hz and *step* should be
+        set via ToStep described under "HELPER FUNCTIONS".
+
+    FreqList (FL) READ-ONLY
+        Returns four pairs of arguments, the first in the pair being the
+        lower extent for an available band, the second being the upper
+        extent. The values are in MHz (e.g. "00118", though you can treat it
+        numerically).
+
+    GPS [*on_off*] (GU)
+        Turns on/off support for an attached NMEA-compatible GPS receiver.
+        At the present time, this is a simple boolean ON/OFF setting, but if
+        Kenwood ever adds sport for additional receiver types, you can
+        simply use the appropriate integer offset in place of a constant.
+        NMEA is synonymous with ON. Equivalent to pressing [MENU], [2], [2].
+
+    ID (GU) READ-ONLY
+        Returns the ID string associated with the HT, e.g. "TH-D7".
+
+    Lock [*on_off*] (LK)
+        Lock/unlock the radio keypad. Equivalent to pressing [F] (1 s)
+
+    Lamp [*on_off*] (LMP)
+        Set/check the status of the LCD display lamp. Momentary lighting of
+        the lamp via the [LAMP] button doesn't count. Equivalent to pressing
+        [F], [LAMP].
+
+    Memory *band* [*channel*] (MC)
+        Retrieve or set the current memory channel for the specified band.
+        *Channel* is any valid channel number supported by that band.
+        Equivalent to selecting [MR] mode and entering a channel number.
+
+        The specified band must be in MEMORY mode (via Mode) for this call
+        to succeed.
+
+        Whenever this command is issued or received, it will be followed by
+        callbacks to Memory (yes, again, if issued), MemoryLock, MemoryName
+        and Buffer to describe the contents of the channel. Be sure you're
+        calling Poll to catch these if AI is enabled.
+
+    MemoryLock *band* [*on_off*] (MCL)
+        Turns on/off the "locked" attribute for the displayed memory channel
+        for the specified band. The specified band must be in VFO mode (via
+        Mode for this call/query to succeed. Equivalent to pressing [F],
+        [0].
+
+    MemoryName *x1* *channel* [*name*]
+        Set/retrieve the 8-character text name associated with a memory
+        channel. *x1* is unknown and should probably be set to zero or
+        something.
+
+    Message [*text*] (MES)
+        Set/retrieve power-on message. Equivalent to pressing [MENU], [1],
+        [1], [1].
+
+    Mode *band* [*mode*] (VMC)
+        Sets the specified band's mode. Valid *mode*s are VFO, MEMORY and
+        CALL.
+
+    Modulation [*mod*] (MD)
+        When in the 118MHz band, the D7 can operate in AM or FM mode. Use
+        this method to select. Equivalent to pressing [F], [6].
+
+    MemoryRead *x1* *x2* *channel*
+        Returns the contents of memory location *channel*. The format of the
+        returned values are identical to the arguments to MemoryWrite below,
+        except there's an additional argument at the beginning of the list
+        (*x1*, whatever that is). I don't know what *x2* is either.
+
+    MemoryWrite *x1* [*channel*, *frequency*, *step*, *x2*, *reverse*,
+    *tone*, *CTCSS*, *x3*, *tonefreq*, *x4*, *CTCSSfreq*, *offset*, *mode*,
+    *x5*] (BUF)
+        This function writes a frequency to memory channel *channel*. When
+        making changes via this method, ALL arguments are required:
+
+        *channel* Memory channel
+
+        *frequency* Integer frequency value in Hz
+
+        *step* Integer step value; see "HELPER FUNCTIONS" later for
+        information on how to generate this value
+
+        *reverse* Reverse repeater offset (ON or OFF)
+
+        *tone* PL tone enabled (ON or OFF)
+
+        *CTCSS* CTCSS tone enabled (ON or OFF)
+
+        *tonefreq* PL tone frequency; see "HELPER FUNCTIONS" later for
+        information on how to generate this value
+
+        *CTCSSfreq* ditto
+
+        *offset* Repeater offset in Hz
+
+        *mode* Modulation mode (FM or AM)
+
+        *x1 x2 x3 x4 x5* Unknown (set to 0?)
+
+    Monitor [*on_off*] (MON)
+        Behaves exactly like pressing the [MONI] button. Similar in behavior
+        to Squelched, but it uses the currently selected band. When AI is
+        on, this is immediately followed by a Squelched (BY) callback.
+
+    Offset *offset* (OS)
+        Sets/retrieves the current repeater offset. *Offset* is specified in
+        Hz. Equivalent to pressing [F], [5].
+
+            $Radio->Offset(600000);   # 600kHz offset
+
+    Packet *on_off* (TS) WRITE-ONLY
+        Places the TNC in/out of packet mode. This command is an odd one,
+        since you can't read the current setting from it, and internally, ON
+        and OFF are reversed (you don't have to worry about this though).
+        It's also the only "command" available while in packet mode. Another
+        peculiarity about it is that the callback is actually sent with the
+        command "TS", but we compensate for that in the callback code and
+        return "TC". This might change in the future.
+
+        See the section "PACKET USE" below for information on using THD7.pm
+        and the D7 with packet mode.
+
+    Position [*posit*] (MP)
+        Set/receive current GPS position. The *posit* is a string of 17
+        numbers arranged like this:
+
+            AABBBBBCDDDEEEEEF
+
+            A   Latitude degrees
+            B   Latitude minutes without decimal point (12.34 -> 1234)
+            C   0=north, 1=south
+            D   Longitude degrees
+            E   Longitude minutes without decimal point
+            F   0=east 1=west
+
+        You probably want to use the ToPosit and FromPosit methods described
+        under "HELPER FUNCTIONS" to convert between this format and a
+        readable format automatically. Equivalent to pressing [POS].
+
+    ProgrammableVFO *VFO* [*low* *high*] (PV)
+        Sets/retrieves frequency ranges for the VFO's in the HT. You can set
+        a programmable VFO via this method by specifying the low and high
+        frequencies in MHz. Available VFO's are:
+
+            1   Air
+            2   VHF A
+            3   VHF B
+            6   UHF
+
+        Equivalent to pressing [F], [7].
+
+    Receive (RX)
+        Issuing this command causes the transceiver to stop transmitting.
+        The D7 returns this when switching out of Transmit/TX mode. No
+        arguments are sent or returned. See Transmit.
+
+    Reverse [*on_off*] (EV)
+        Sets reverse mode ON or OFF. Equivalent to pressing [REV].
+
+    ScanResume [*setting*] (SCR)
+        Sets/retrieves the current Scan Resume setting. Possible *setting*s
+        are TIME, CARRIER and SEEK. Equivalent to pressing [MENU], [1], [5],
+        [2].
+
+    Shift [*setting*] (SFT)
+        Sets/adjusts the current repeater shift setting. Valid *setting*s
+        are OFF, NEGATIVE or POSITIVE. Equivalent to pressing [F], [MHz].
+
+    SignalMeter *band* (SM)
+        Check/report the current signal meter on the specified *band*. The
+        returned arguments will be *band* and the reported signal, which
+        ranges from 0 (no signal) to 5.
+
+        Whenever the squelch is opened or closed, the SignalMeter callback
+        function is called with the signal level of the received
+        transmission.
+
+    Sky_CommanderCall [*call*] (SCC)
+        Sets/retrieves the SkyCommand Commander Call. Equivalent to [MENU],
+        [4], [1].
+
+    Sky_TransporterCall [*call*] (SCT)
+        Sets/retrieves the SkyCommand Transporter Call. Equivalent to
+        [MENU], [4], [2].
+
+    Sky_Tone [*tone*] (SKTN)
+        Sets/retrieves the Sky Command Access Tone. As with the Tone and
+        CTCSS methods, you probably want to make use of the ToTone and
+        FromTone methods below to get the correct arguments.
+
+    Squelch *band* [*setting*] (SQ)
+        Set the squelch for the specified band (BAND_A or BAND_B. Valid
+        *setting*s are integers from 0 to 5, with 0 being open. Equivalent
+        to pressing [F], [MONI].
+
+    Squelched *band* [*open_closed*] (BY)
+        Open or close the squelch on the specified band (BAND_A or BAND_B).
+        You may use the constants OPEN or CLOSED to set this value.
+        Equivalent to pressing [MONI]. See also: Monitor
+
+    SSTV_CallColor [*color*] (MAC)
+        Sets/retrieves the current color of your call sign as it appears
+        with SSTV images. The *color* argument is an integer from 0 to 7,
+        but fortunately, we have the constants BLACK, BLUE, RED, MAGENTA,
+        GREEN, CYAN, YELLOW and WHITE defined. Equivalent to pressing
+        [MENU], [3], [2].
+
+    SSTV_Message [*message*] (SMSG)
+        Sets/retrieves the current SSTV message. Equivalent to pressing
+        [MENU], [3], [3].
+
+    SSTV_MessageColor [*color*] (SMC)
+        Sets/retrieves the current SSTV message color. Uses the same color
+        constants listed under SSTV_CallColor. Equivalent to pressing
+        [MENU], [3], [4].
+
+    SSTV_MyCall [*call*] (SMY)
+        Sets/retrieves the current SSTV call sign. Equivalent to pressing
+        [MENU], [3], [1].
+
+    SSTV_RSVMessage [*message*] (RSV)
+        Sets/retrieves the current SSTV RSV message. Equivalent to pressing
+        [MENU], [3], [5].
+
+    SSTV_RSVColor [*color*] (RSC)
+        Sets/retrieves the current SSTV RSV message color. Uses the same
+        color constants listed under SSTV_CallColor. Equivalent to pressing
+        [MENU], [3], [6].
+
+    SSTV_Shutter [*on_off*] (VCS)
+        Activates/deactivates the SSTV VC shutter. Equivalent to pressing
+        [MENU], [3], [9].
+
+    SSTV_Superimpose [*call* *x1*] (STC)
+        Presumably, superimposes *call* over the SSTV image. I don't know
+        what *x1* is. Equivalent to pressing [MENU], [3], [7].
+
+    SSTV_Mode (STS)
+        Presumably queries the VC for the current SSTV transmit mode.
+        Returned values are unknown. Equivalent to pressing [MENU], [3],
+        [8].
+
+    Step [*step*] (ST)
+        Sets/retrieves the current frequency step. *Step* is an integer
+        representing the following values:
+
+            0     5 kHz
+            1     6.25
+            2    10
+            3    12.5
+            4    15
+            5    20
+            6    25
+            7    30
+            8    50
+            9   100
+
+        You may wish to use the ToStep and FromStep methods described below
+        under "HELPER FUNCTIONS" to do the conversions automatically.
+
+    TNC [*on_off*]
+        Activate/deactivate the TNC (APRS mode only). There is no way to
+        activate or deactivate TNC packet mode except by pressing the [TNC]
+        button on the D7 keypad. APRS is an alias for TNC. Equivalent to
+        pressing [TNC].
+
+    Tone [*on_off*]
+        Enable/disable PL tone. Equivalent to pressing [F], [1].
+
+    ToneFreq [*freq*]
+        Set/retrieve current PL tone frequency. As with most all tone
+        values, you might want to make use of the ToTone and FromTone
+        methods described below to determine the correct argument.
+        Equivalent to pressing [F], [2].
+
+    Transmit [*band*] (TX)
+        Begin transmitting on the specified band. BAND_A is assumed if no
+        band is specified. The RX command must be issued to cease
+        transmitting. Equivalent to pressing [PTT].
+
+    TransmitInhibit [*on_off*] (TXS)
+        Enables/disables the TX Inhibit function, preventing transmissions.
+        Equivalent to pressing [MENU], [1], [5], [5].
+
+    TuneEnable [*on_off*] (ELK)
+        Activate/deactivate the Tune Enable feature. Equivalent to pressing
+        [MENU], [1], [5], [4].
+
+    Unit [*setting*] (UNIT)
+        Set/retrieve the current English/metric setting. Valid *setting*s
+        are ENGLISH or METRIC. Equivalent to pressing [MENU], [2], [C].
+
+    Up (UP)
+        Adjusts the frequency up by the current step setting. See also: Down
+
+    VFORead *vfo* (VR)
+        Reads the currently set frequency for the VFO in question. See the
+        ProgrammableVFO method for a list of valid VFO's. Second and further
+        arguments follow the argument list of Buffer starting with the
+        frequency in Hz.
+
+    VFOWrite *vfo* ... (VW)
+        See Buffer for the full argument list (*band* is replaced with
+        *vfo*. *Vfo* is the VFO you want to adjust. See ProgrammableVFO for
+        a list of valid VFO's.
+
+  CONSTANTS
+    Quite a lot of constants have been defined to make your job a bit
+    easier. These constants are only available if you use the ":constants"
+    import argument:
+
+        use THD7 qw/:constants/;
+
+    This is a complete list of constants. Use them where appropriate (as
+    defined in the method's documentation above). See the THD7.pm source
+    code for the definitions to these constants if, for whatever reason, you
+    can't use them.
+
+        BAND_A BAND_B
+        ON OFF 
+        KEY KEY_DATA ALL
+        TIME CARRIER SEEK 
+        DATA BOTH 
+        SLOW FAST 
+        APO_30 APO_60
+        ENGLISH METRIC 
+        MANUAL PTT AUTO 
+        NMEA
+        BLACK BLUE RED MAGENTA GREEN CYAN YELLOW WHITE
+        HIGH LOW EL 
+        OPEN CLOSED 
+        FULL HALF 
+        AIR VHF_A VHF_B UHF
+
+  HELPER FUNCTIONS
+    Some methods like ToneFreq and Step take an indexed value from 0 to n to
+    mean any of a range of discreet values. To aid in one's sanity, a few
+    helper functions were written to make the process of converting between
+    known values to their appropriate integer offset.
+
+    These functions are made available to your namespace if you used the
+    ":functions" import argument:
+
+        use THD7 qw/:functions/;
+        $tone = ToTone(88.5);
+
+    However, they're always available as methods or if you qualify them with
+    the package name:
+
+        use THD7;
+        ...
+        $tone = $Radio->ToTone(88.5);
+        $tone = &THD7::ToTone(88.5);
+
+    ToTone and FromTone
+        These functions convert between PL/CTCSS tone frequencies and their
+        appropriate integer offsets for sending to the D7. Example:
+
+            $Radio->ToneFreq(ToTone(88.5));       # Set 88.5Hz tone
+            return FromTone($Radio->ToneFreq);    # returns 88.5
+
+    ToStep and FromStep
+        These functions convert between the frequency steps and their
+        appropriate integer counterparts. Example:
+
+            $Radio->Step(ToStep(10));             # Set 10kHz steps
+            return FromStep($Radio->Step);        # returns 10
+
+    ToPosit and FromPosit
+        These functions convert between "readable" GPS longitude/latitude
+        coordinates and the numeric string used to set/retrieve position
+        from the D7 (via Position (MP)). Example:
+
+            # Set a position of 12'34.56"N 98'54.32"W (west = negative)
+            $Radio->Position(ToPosit(12, 34.56, -98, 54.32));
+
+            # Print our position in a readable fashion:
+            printf("%d'%2.2f\" %d'%3.2f\"", FromPosit($Radio->Position));
+
+  POLLING AND CALLBACK FUNCTIONS
+    The D7 is capable of sending messages whenever something changes, either
+    via the keypad or if some internal state changes (like when receiving a
+    transmission). The AI method enables such notifications.
+
+    In order to handle these messages, you need to set up a callback
+    function for every method you want to listen for. Every control method
+    described above can alternatively accept a single argument, a code
+    reference to a callback function. A special value, NOCALLBACK is used to
+    clear the callback function for a method. For example:
+
+        sub BandSwitch {
+           my ($self, $command, $argument) = @_;
+           printf("The band was just switched to band %s!\n",
+               $argument == BAND_A ? "A" : "B");
+        }
+
+        $Radio->Band(\&BandSwitch);
+
+        # Do something, Poll perhaps (see below)
+        $Radio->Poll;
+
+        $Radio->Band(NOCALLBACK);   # Clear the callback function
+
+    The arguments sent to your callback function will consist of *$self*, a
+    reference to the THD7 object in question, *$command*, the actual D7
+    command being reported and *@args*, a list of arguments (if any) being
+    reported for that command. Unless otherwise noted, the argument list
+    will exactly match the argument list of the method in question. E.g.,
+    the first argument to the Band method is *band*, which is what you'll
+    see as the first (well, third) argument to your callback function.
+
+    Now you just know how to set and clear callback functions. In order for
+    the script to actually wait for something to happen, you can call the
+    Poll method to check for an incoming event. The following methods are
+    used:
+
+    Poll [*timeout*]
+        Checks for waiting events from the D7. If *timeout* is undefined,
+        this method will block indefinitely until something is heard from
+        the D7. Set it to 0 to ensure it returns immediately.
+
+        In a scalar context, it returns undef if there was a timeout, 0 if
+        an event was received but no callback function defined to handle it,
+        or 1 if an event was received and handled. In a list context, the
+        method also returns the command name and arguments returned by the
+        HT.
+
+        This method automatically activates the AI mode if it's not already
+        activated.
+
+    PollOnResult [*on_off*]
+        This is off by default, but if turned on, will cause ALL response
+        messages will be routed through the Polling mechanism, including
+        return values from other methods. Adding to the Band example above:
+
+            $Radio->Band(BAND_A);     # Doesn't activate BandSwitch
+            $Radio->PollOnResult(ON);
+            $Radio->Band(BAND_A);     # BandSwitch is called before return
+
+    Callback [*coderef*]
+        Establishes a "default" callback function. If we can't find a
+        specific callback function for a particular event, we'll try this
+        one instead. If *coderef* is undefined, NOCALLBACK is assumed (which
+        clears it).
+
+  PACKET USE
+    By enabling packet mode via the Packet method, you're free to
+    communicate with the TNC using your own functions. There are no methods
+    here to do that for you. See the Kenwood D7 manual for information on
+    the TNC commands. Some methods of interest are:
+
+    BinaryMode [*on_off*]
+        Places the THD7.pm module in "binary" mode (ON), meaning
+        reads/writes are done in a binary friendly way (via syswrite(),
+        select() and sysread()). I don't really know if this makes much of a
+        difference, but in "text" mode (OFF), normal Perl conventions are
+        used to read single lines from the TNC, which is probably perfectly
+        adequate. This is off by default, because it's tons more efficient.
+        You probably want to turn this off after you're done using it and
+        want to return the D7 to a normal command state.
+
+    RawReceive [*timeout*]
+        Reads a chunk (line in "text" mode) of data from the D7. Returns the
+        data/line read.
+
+        When reading data from the TNC in "binary" mode, there will always
+        be a very slight delay, since RawReceive uses the select() timeout
+        to determine when enough data's been read. That *timeout* is by
+        default 0.3 seconds. In "text" mode, the *timeout* argument is
+        ignored and can be undefined.
+
+    RawSend *data*
+        Sends the *data* to the TNC. In "text" mode, this is done via
+        print(). In "binary" mode, it's done via syswrite().
+
+    If you don't trust these methods, or desire much greater control over
+    the socket/filehandle used here, the GetSocket method will return the
+    D7's Perl filehandle.
+
+BUGS
+    * Several fields in the BUF and MW argument lists are still unknown.
+    * The following commands are implemented, but their function is unknown.
+    Please send any protocol additions, hints or help to either of the
+    addresses below. CR CW GC GM PC SR TH TT CIN CTD LAN MIN MNF MSH NSFT
+    RBN TXN TYD ULC
+    * The following commands are implemented and APPEAR to have something to
+    do with SSTV via the Kenwood VC. If someone has a VC and would care to
+    do a bit of research into these commands, it would be much appreciated:
+    STM STR STP STS STT
+    * The serial port code needs some work. Occasionally it fails to open
+    the port properly if the serial port's been used for something else
+    recently. Maybe I should make use of some IO modules.
+    * In the HTML version of this documentation, the text in this section is
+    bold. I have no idea why.
+
+AUTHOR
+    THD7.pm was written by David Nesting, WL7RO, <wl7ro@fastolfe.net>.
+    Please send any bug reports, patches and comments to that address.
+    http://fastolfe.net/
+
+    The D7 protocol was reverse engineered by Darryl Smith, VK2TDS,
+    <vk2tds@ozemail.com.au> and David Nesting, WL7RO, <wl7ro@fastolfe.net>.
+    The latest version of the protocol should be available from
+    http://www.ozemail.com.au/~vk2tds/d7.htm .
+
+    The THD7.pm home page is at http://fastolfe.net/ham/thd7.html .
+
+COPYRIGHT
+    Copyright (C) 1999, David Nesting, WL7RO, <wl7ro@fastolfe.net>
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

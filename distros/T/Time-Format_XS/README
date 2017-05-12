@@ -1,0 +1,48 @@
+eTime/Format_XS version 1.03
+===========================
+
+This is a companion module to Time::Format.  It contains a version of
+the time_format function written in C, so it is much faster.
+
+Time::Format (versions 0.10 and later) automatically detect whether a
+compatible version of Time::Format_XS is installed.  If so, it will
+load the module and use it for speed improvement.  If not, it will use
+its own pure perl implementation.  Either way, any programs that use
+Time::Format do not need to change.
+
+INSTALLATION
+
+To install this module, do the standard Perl module four-step:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note that Windows users using Microsoft Visual C will need to run
+VCVARS32.BAT before running "perl Makefile.PL", and will need to use
+nmake.exe (available for free from microsoft.com) instead of make.
+
+Or wait until ActiveState makes the module available in their
+repository.  :-)
+
+Strawberry perl users on Windows should use dmake instead of make.
+
+DEPENDENCIES
+
+This module requires the standard C header file locale.h, which should
+be installed with any ISO compliant C compiler.
+
+If the POSIX langinfo.h header file is not available on your system,
+non-English month and weekday names will return English names only.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003-2009 Eric J. Roode.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it.  See the end of Format_XS.pm for full details on the license.
+
+To avoid my spam filter, please include "Perl", "module", or this
+module's name in the message's subject line, and/or GPG-sign your
+message.

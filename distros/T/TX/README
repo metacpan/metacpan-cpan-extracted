@@ -1,0 +1,453 @@
+NAME
+    TX - a simple template system based on Text::Template::Library
+
+SYNOPSIS
+     use TX;
+     my $T=TX->new( delimiters=>[qw/<% %>/],
+                    path=>[qw!/path/to/dir1 /path/to/dir2 ...!],
+                    binmode=>':utf8',             # how to read template files
+                    cachesize=>$max_cached_templates,
+                    evalcache=>\%another_hash,
+                    evalcachesize=>$max_items_in_another_hash,
+                    export_include=>0,            # default is 1
+                    auto_reload_templates=>1,     # default is 0
+                    prepend=>'use warnings',      # default not set
+                    output=>sub {...},            # default undef
+                    package=>'My::Dummy',         # default TX::__
+                    );
+
+     $T->include( 'template1', key=>'value', ...);
+     $T->include( 'template1', {OUTPUT=>'', ...}, key=>'value', ...);
+
+    or
+
+     use TX qw/include/;
+
+     @ENV{qw/TEMPLATE_PATH TEMPLATE_BINMODE
+             TEMPLATE_DELIMITERS TEMPLATE_EVALCACHE/}=
+       ('/path/to/dir1:/path/to/dir2', ':utf8', "<%\t%>", 1);
+
+     include( 'template1', {OUTPUT=>'', ...}, key=>'value', ...);
+
+    "template1.tmpl" may contain:
+
+     <% define mymacro %>
+     ...
+     <% /define %>
+
+     call macro defined in the same template:
+       <% include '#mymacro', key=>'value', ... %>
+
+     call macro defined somewhere else:
+       <% include 'library#libmacro1', key=>'value', ... %>
+
+    "library.tmpl" may contain:
+
+     <% define libmacro1 %>
+     ...
+     <% /define %>
+
+     <% define libmacro2 %>
+     ...
+     <% /define %>
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    * perl 5.8.8
+    * Text::Template::Library
+
+DESCRIPTION
+    "Text::Template::Base" and "Text::Template::Library" are good at
+    processing single templates. They lack the ability to manage sets of
+    template files. This module adds that functionality in a (what I think)
+    user friendly manner.
+
+    The most important function of this module is "include". It actually
+    processes the template. "include" can be called in 2 ways, as simple
+    subroutine or as object method. The second way introduces much more
+    features and hence should be prefered. If called as simple subroutine an
+    internal object is created and and initialized from environment
+    variables.
+
+  The object oriented interface
+    All keys passed to the constructor "new" are also usable as accessor
+    methods, e.g. "$object->output=sub {...};". They methods can be used as
+    Lvalues.
+
+    TX->new(key=>value, ...)
+        creates a "TX" object. Options are passed as key, value pairs.
+
+        *   "delimiters"
+
+            Specify delimiters used in the templates. If omitted the
+            environment variable "TEMPLATE_DELIMITERS" is used.
+
+            The value can be an array that contains 2 strings or a string.
+            In the latter case the string is splitted into 2 by the
+            tabulator "\t+" character. If that fails "\s+" is tried. If one
+            of them produces a 2 element list it is used as delimiters.
+
+            Example:
+
+            Those 3 are equivalent:
+
+             delimiters => [qw/<% %>/]
+             delimiters => "<%\t%>"
+             delimiters => "<% %>"
+
+            as are those 2 (note the additional space characters):
+
+             delimiters => ['<% ', ' %>']
+             delimiters => "<% \t %>"
+
+            but those are not:
+
+             delimiters => ['<% ', ' %>']
+             delimiters => "<%  %>"
+
+        *   "path"
+
+            Specify a search path where to look for templates. The format
+            corresponds to that used for the "PATH" variable on your system.
+            If omitted the environment variable "TEMPLATE_PATH" is used.
+
+            As value is expected either an array or a string. In the latter
+            case it is split up by your local path separator (see "path_sep"
+            in Config).
+
+            Template files are searched in the order given by the path.
+            Additionally to each template name the file name extensions
+            ".tmpl" and ".html" are appended while looking for it in a given
+            directory.
+
+            So, assume "dir1:dir2" is passed as "path" and the file
+            "dir2/template.tmpl" exists. The the call
+
+             include 'template', ...
+
+            will try "dir1/template", "dir1/template.tmpl",
+            "dir1/template.html", "dir2/template" and then find
+            "dir2/template.tmpl".
+
+        *   "binmode"
+
+            Specify a perlio layer to read template files. If omitted the
+            environment variable TEMPLATE_BINMODE is used.
+
+            If your templates use UTF8 encoding pass "utf8" or ":utf8" here.
+
+        *   "cachesize"
+
+            A "TX" object maintains a template cache to hold compiled
+            templates and thus to avoid reading them from disk each time.
+            Internally it is implemented as a hash with the template names
+            as key. You can access that cache via "$object->cache".
+
+            If a cache size greater than zero is given the hash is tied to
+            "Tie::Cache::LRU" to limit the number of cached templates.
+
+        *   "auto_reload_templates"
+
+            If set to true "TX" tracks whether a cached template has changed
+            after the most recent read. For best performance try to avoid
+            that feature.
+
+        *   "evalcache" and "evalcachesize"
+
+            This cache corresponds to the "EVALCACHE" parameter of
+            "Text::Template::Base" objects. If "evalcachesize" greater than
+            zero is given it is tied to "Tie::Cache::LRU" to limit the
+            number of cached compiled code fragments.
+
+            The value passed as "evalcache" can be either a hash reference
+            or a boolean. In the latter case an anonymous hash is created if
+            a true value is passed.
+
+        *   "prepend"
+
+            Almost corresponds to the "Text::Template::Base" "PREPEND"
+            parameter. At template compile time the string
+
+             use strict; our (%V, %G, %L);
+
+            is appended to the current value. That means code fragments are
+            always evaluated in strict mode and the hashes %V, %G and %L are
+            declared.
+
+        *   "output"
+
+            Corresponds more or less to the "Text::Template::Base" "OUTPUT"
+            parameter.
+
+            If omitted "\*STDOUT" is used. So by default the output is
+            directly sent to STDOUT. If a scalar is assigned the output is
+            returned as a string result from "include". Also a function can
+            be set. In that case each time a piece of output is ready that
+            function is called with the data is passed as $_[0].
+
+            The value specified here is only the default value. It can be
+            overridden by the %options parameter to "include".
+
+        *   "package"
+
+            Corresponds to the "Text::Template::Base" "PACKAGE" parameter.
+            If omitted "TX::__" is used. Code fragments in templates are
+            evaluated in this package.
+
+            The value specified here is only the default value. It can be
+            overridden by the %options parameter to "include".
+
+        *   "export_include"
+
+            This boolean value specifies whether or not to export the
+            "include" function into the package given by the "package"
+            parameter or the package passed in the %options hash to
+            "include". If true the template author can call
+
+             include ...
+
+            otherwise it is necessary to use the fully specified name:
+
+             TX::include ...
+
+            This option is true by default.
+
+        *   "preserve_G"
+
+            If set to a true value "$template-"G> is not initialized as an
+            empty hash on the toplevel "include()" invocation.
+
+    $object->include($template, \%options, key=>value, ...)
+        This method processes the template $template. The template may be
+        given as a filename or the basename of a filename (filename without
+        extension) or as a hash reference.
+
+        In the former case the template is looked up in the template search
+        path unless it is already present in the template cache.
+
+        If a hash is passed in as template it is expected to have at least
+        the following entries, "template" - the template string (that would
+        be otherwise read from the template file) and "filename" - a name
+        under which the template can be cached. Make sure to use file names
+        that may not occur in your operating system, e.g. names starting
+        with a "\0" character.
+
+        Data is passed to the template as key, value pairs after the
+        optional "\%options" parameter. These parameters are collected into
+        a hash and made accessible inside the template as %V. So, a value
+        passed by a certain KEY is accessed from the template as $V{KEY}.
+
+        Further, the 2 hashes %L and %G are available to pass data around.
+        %G is a global hash in a certain meaning. Normally, it is
+        initialized as an empty hash by the outermost "include" call, the
+        one that is invoked from your perl program in contrast to
+        invocations from within templates. All templates and template
+        modules share the same %G. When the outermost "include" call is done
+        it is accessible as "%{$object->G}". So if you carry around large
+        data structures, open filehandles or similar that may cause
+        undesireable side effects consider to "undef" it after the call:
+
+         $template->include(...);
+         undef $template->G;            # G is an lvalue function
+
+        As said before %G is normally initialized as an empty hash. But
+        suppose there is a set of templates that somehow belong together and
+        want to carry around data between toplevel calls. %G is not usable
+        in this case. But if the "preserve_G" object property is set and
+        "$template->G" is set to a hash reference before the outermost call
+        %G will not be reset as in:
+
+         $template->G=\my %G;
+         $G{'meaning of life'}=42;
+         $template->preserve_G=1;
+         $template->include(...);
+         # $G{'meaning of life'} is still 42 if not
+         # overwritten by the template
+
+        This way it can be used to pass data in and out of a template and to
+        carry data around between toplevel "include" calls.
+
+        %L is sort of local. Each time "include" is called a new %L hash is
+        created. For example:
+
+         [% define m1 %]
+           G=[% ++$G{g} %] L=[% ++$L{l} %]
+         [% /define %]
+
+         [% $G{g}=10; $L{l}=10; '' #init some hash members %]
+
+         [% ++$G{g}         # will output 11 %]
+         [% ++$L{l}         # will output 11 %]
+         [% include '#m1'   # will output G=12 L=1 (a localized %L is used) %]
+         [% ++$G{g}         # will output 13 %]
+         [% ++$L{l}         # will output 12 %]
+
+        Code fragments are evaluated with "use strict" in effect. The 3
+        hashes %V, %G and %L are declared with the "our" keyword.
+
+        The optional "\%options" hash reference is used to modify the
+        current "include" operation. You can
+
+        *   override the default output destination. For example
+            "$object->output" is set to a file handle. In a template you
+            want to include the output of another one but postprocess the
+            string a bit. Then you can do:
+
+             my $string=include $template, {OUTPUT=>''}, ...;
+             $string=~s/(\w+)/ucfirst $1/ge;
+             OUT $string;
+
+            This makes sure that $string really receives the output of the
+            template evaluation no matter that the objects output
+            destination is set to a file handle.
+
+        *   override the evaluation package. Normally you'll set the
+            evaluation package as an object property or use the default
+            package "TX::__". Sometimes it may be handy to evaluate certain
+            templates in another package. Be aware that
+            "Text::Template::Base" installs a $OUT variable and a "OUT"
+            function in that package. If "$object->export_include" is set
+            (the default) this module installs a "include" function in the
+            package.
+
+        *   modify the way the parameters are merged into the %V hash.
+            Normally a "local()"ized version containing only the currently
+            passed parameters is created.
+
+            The "VMODE" option is used to modify that behavior. It is
+            intended to be used inside a template, not at top level.
+
+            *   keep
+
+                The current %V hash is passed to the template. The remaining
+                parameter list is ignored. In this mode the callee can
+                modify the caller's %V.
+
+            *   add
+
+                A new %V is created as a clone from the caller's %V. Then
+                the parameter list is incorporated into the new hash adding
+                thus new keys and overriding existing ones.
+
+        In case of an error "include" throws an exception. If the error
+        occures in a template the template file name and line number are
+        given along with the error message. If a template throws an error
+        object or any other reference it is propagated unchanged.
+
+    $object->G
+        returns "\%G" after a call to "include".
+
+    $object->clear_cache
+    $object->clear_cache($string_or_regexp, $delete)
+    $object->clear_cache($string)
+        Clears the template cache. If called without parameters the whole
+        cache is cleared.
+
+        If 2 parameters are given the first is interpreted as regexp. It may
+        be a string containing a regexp or a "Regexp" object (the result of
+        a "qr/.../"). If the second parameter is true all matching cache
+        elements are dropped otherwise all non-matching. That means in the
+        latter case matching cache elements are preserved.
+
+        If only one parameter is given and it is a "Regexp" object all
+        non-matching cache elements are dropped.
+
+        If only one parameter is given and it is a string the first
+        character of the string value decides if the matching or
+        non-matching cache elements are to be removed. If it is a
+        exclamation mark ("!") it is deleted from the string. Then the
+        string is interpreted as regular expression and all matching cache
+        elements are dropped. Otherwise the whole string (including the
+        first character) is interpreted as regular expression and all
+        non-matching cache elements are dropped.
+
+  Functional Interface
+    If "include" is called without the first parameter being a "TX" object
+    or subclassed object of "TX" the default object $TX::TX is used. $TX::TX
+    is initialized at the first call according to the environment variables
+    as explained above.
+
+SUBCLASSING
+    "TX" is internally represented a an array. The first few elements are
+    used to hold its properties. @TX::attributes holds a list of property
+    names. If a subclass wants to add new properties it must not override
+    the existing ones. So, new attributes can be added this way:
+
+      package My::TX;
+
+      use strict;
+      use warnings;
+
+      use TX;
+      @My::TX::ISA=qw/TX/;
+
+      our @attributes;
+      BEGIN {
+        # define attributes and implement accessor methods
+        @attributes=(TX::attributes(), qw/p1 p2 _p3/);
+        for( my $i=TX::attributes(); $i<@attributes; $i++ ) {
+          my $method_num=$i;
+          ## no critic
+          no strict 'refs';
+          *{__PACKAGE__.'::'.$attributes[$method_num]}=
+            sub : lvalue {$_[0]->[$method_num]};
+          ## use critic
+        }
+      }
+      sub attributes {@attributes}
+
+    Now, if a user calls "My::TX->new(p1=>..., _p3=>...)" the inherited
+    constructor initializes "$self->p1" but prints a warning for "_p3".
+    "_p3" begins with an underline and hence is treated as private. "_p3"
+    will not be assinged.
+
+    Optionally you can also define an "init()" method to initialize private
+    data and process left over parameters:
+
+      package My::TX;
+      sub {
+        my ($I, %param)=@_;
+        $I->_p3=some_processing(delete $param{p3});
+        return $I->SUPER::init(%param);
+      }
+
+    or slightly more effective:
+
+      package My::TX;
+      sub {
+        my ($I, %param)=@_;
+        $I->_p3=some_processing(delete $param{p3});
+        @_=($I, %param);
+        goto \&TX::init;
+      }
+
+    The "init()" method must delete the parameters it knows about from @_
+    and return the rest. So, this is also valid:
+
+      package My::TX;
+      sub {
+        my ($I, %param)=@_;
+        $I->SUPER::init;
+        $I->_p3=some_processing(delete $param{p3});
+        return %param;
+      }
+
+    Note, you must call "TX::init" at some point.
+
+SEE ALSO
+    Text::Template::Base, Text::Template::Library
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net<gt>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008-2009 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

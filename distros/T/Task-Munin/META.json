@@ -1,0 +1,86 @@
+{
+   "abstract" : "an unoffical module listing the dependencies of Munin",
+   "author" : [
+      "Gabor Szabo <szabgab@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.08, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Munin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::RRDtool" : "0",
+            "DBD::Pg" : "0",
+            "DBD::SQLite" : "1.42",
+            "DBI" : "1.631",
+            "File::ReadBackwards" : "0",
+            "File::Slurp" : "9999.19",
+            "HTML::Template::Pro" : "0",
+            "HTTP::Server::Simple::CGI" : "0",
+            "IO::Scalar" : "0",
+            "IO::Socket::INET6" : "2.69",
+            "LWP::UserAgent" : "6.06",
+            "List::MoreUtils" : "0.33",
+            "List::Util" : "0",
+            "Log::Dispatch" : "2.41",
+            "Module::Build" : "0.21",
+            "Net::DNS" : "0",
+            "Net::IP" : "0",
+            "Net::SNMP" : "v6.0.1",
+            "Net::SSLeay" : "1.65",
+            "Net::Server::Daemonize" : "0.06",
+            "Net::Server::Fork" : "0",
+            "Params::Validate" : "1.13",
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::Differences" : "0.62",
+            "Test::LongString" : "0",
+            "Test::MockModule" : "0",
+            "Test::MockObject" : "0",
+            "Test::Perl::Critic" : "0",
+            "URI" : "1.64",
+            "XML::Dumper" : "0",
+            "XML::LibXML" : "0",
+            "XML::Parser" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/szabgab/Task-Munin/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/szabgab/Task-Munin.git",
+         "web" : "http://github.com/szabgab/Task-Munin",
+         "x_license" : "http://dev.perl.org/licenses/"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

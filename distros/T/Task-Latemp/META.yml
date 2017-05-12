@@ -1,0 +1,48 @@
+---
+abstract: 'Specifications for modules needed by the Latemp CMS.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Latemp
+provides:
+  Task::Latemp:
+    file: lib/Task/Latemp.pm
+    version: '0.0103'
+requires:
+  CGI: '0'
+  Class::Accessor: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::Path: '0'
+  Getopt::Long: '0'
+  HTML::Latemp::GenMakeHelpers: '0'
+  HTML::Latemp::NavLinks::GenHtml::Text: '0'
+  HTML::Latemp::News: '0'
+  HTML::Widgets::NavMenu: '0'
+  Pod::Usage: '0'
+  Template: '0'
+  Template::Stash: '0'
+  YAML: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Latemp
+  repository: ssh://git@github.com:thewml/latemp.git
+version: '0.0103'

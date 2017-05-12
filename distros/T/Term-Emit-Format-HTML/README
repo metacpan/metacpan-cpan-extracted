@@ -1,0 +1,67 @@
+Term-Emit-Format-HTML version 0.0.2
+
+SYNOPSIS
+
+    use Term::Emit::Format::HTML 'format_html';
+    my $out = "some output from Term::Emit";
+    my $html = format_html($out);
+
+
+DESCRIPTION
+
+This module reformats the output from an application that uses
+Term::Emit into a chunk of HTML, which you can embed in a web page.
+
+This module is handy if you write Web UIs that wrap a command line
+utility and show the output from that utility on a web page.
+
+Suppose you have a utility that produces this output:
+
+    Quobalating all frizzles...
+        We operate on only the first and
+        second frizzles in this step.
+      Merfubbing primary frizzle.......... [OK]
+      Xylokineting secondary frizzle...... [WARN]
+    Quobalating all frizzles.............. [DONE]
+
+This module can parse that output and convert it into this:
+
+    <h1 class="done">Quobalating all frizzles</h1>
+      <p>We operate on only the first and second frizzles in this step.</p>
+      <h2 class="ok">Merfubbing primary frizzle</h2>
+      <h2 class="warn">Xylokineting secondary frizzle</h2>
+
+Note how the steps that have completed with a status, such as [OK] or [DONE],
+get tagged in the resulting HTML with a class.  This simple hook allows you
+to do some fancy CSS so you can associate images, colors, and so forth
+with the output to really spiff up your web page.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Steve Roscio
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

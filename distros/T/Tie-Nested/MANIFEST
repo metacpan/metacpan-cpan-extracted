@@ -1,0 +1,9 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Tie/Nested.pm
+lib/Tie/Nested.pod
+t/10recurse.t
+t/20nest.t
+META.yml                                 Module meta-data (added by MakeMaker)

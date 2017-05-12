@@ -1,0 +1,36 @@
+{
+  "belongs_to": { "fetch": 0},
+	"sets": [
+		{
+			"class": "Cv::Cvterm",
+			"quantity": "all",
+			"join" : ["cv"],
+			"cond":
+			    {
+			      "cv.name":
+			          [
+			            "sequence",
+			            "relationship",
+			            "chado_properties",
+			            "feature_property"
+			          ]
+			    },
+			"fetch": [
+			  {
+					"rel": "dbxref",
+					"quantity": "all"
+				},
+				{
+					"rel": "cvterm_dbxrefs",
+					"quantity": "all",
+					"fetch": [
+					  {
+					  	"rel": "dbxref",
+					  	"quantity": "all"
+					  }
+					]
+				}
+			]
+		}
+	]
+}

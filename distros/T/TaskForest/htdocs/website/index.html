@@ -1,0 +1,124 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<div class="width10">
+  <div class="demarcated">
+    <div class="width4">
+      <div class="home_page_headline">Version 1.37 released on March 23, 2010</div>
+      <p class="front_news">
+        There are two main enhancements in this release.  The first is
+        that now you can configure TaskForest to <a href="/docs/configuring/retry.html">automatically retry</a>
+        running a job if it fails.  The number of times it retries, as
+        well as the amount of time between retries is configurable on a
+        per-job basis.
+      </p>
+      <p class="front_news">
+        TaskForest now also features a very powerful email system.  You
+        can configure TaskForest to <a href="/docs/configuring/email.html">email you when a job fails</a>, when a job
+        is retried, and when a job suceeds after failing and being
+        retried.  Each kind of email can be sent to a different email
+        address, and these email addresses can be configured system-wide,
+        or for each job, or for anything in the middle.
+      </p>
+      <p>
+        If you have developed your own run wrapper, please be advised that
+        the interface to the run wrappers has changed.  Instead of being
+        passed parameters as command line arguments, the wrappers now look
+        for environment variables.  
+      </p>
+      <p>
+
+      </p>
+
+      
+    </div>
+    <div class="width6 last">
+      <include TaskForest::REST::PassThrough /summary.html />
+    </div>
+    <div class="clear_both"></div>
+  </div>
+</div>
+
+<div class="width2 last">
+  <div class="width2 last demarcated">
+    <div class="section_header">Quick Links</div>
+    <a href="/docs/configuring/retry.html">Auto-Retries</a><br >
+    <a href="/docs/configuring/email.html">Sending Emails</a><br >
+    <a href="/docs/configuring/calendars.html">Calendars</a><br >
+    <a href="/docs/faq.html">FAQ</a><br >
+    <a href="/docs/tokens.html">Tokens</a><br >
+    <a href="/docs/webSecurity.html">Security</a><br >
+    <a href="/docs/bugs.html">Report a bug</a><br >
+    <a href="/docs/howto.html">HOWTO</a><br >
+  </div>
+  <div class="width2 last demarcated">
+    <div class="section_header"><a href="/releaseNotes.html">Release Notes &amp; Videos</a></div>
+    <a href="/releaseNotes.html#1.37"><b>1.37</b></a> 2010-03-29<br>
+    <a href="/releaseNotes.html#1.36"><b>1.36</b></a> 2010-02-23<br>
+    <a href="/releaseNotes.html#1.35"><b>1.35</b></a> 2010-02-11<br>
+    <a href="/releaseNotes.html#1.33"><b>1.33</b></a> 2009-06-01<br>
+    <a href="/releaseNotes.html#1.26"><b>1.26</b></a> 2009-05-19<br>
+    <!--
+    <a href="/releaseNotes.html#1.25"><b>1.25</b></a> 2009-05-18<br>
+    <a href="/releaseNotes.html#1.24"><b>1.24</b></a> 2009-04-26<br>
+    <a href="/releaseNotes.html#1.23"><b>1.23</b></a> 2009-03-24<br>
+    <a href="/releaseNotes.html#1.22"><b>1.22</b></a> 2009-03-23<br>
+    <a href="/releaseNotes.html#1.21"><b>1.21</b></a> 2009-03-12<br>
+    <a href="/releaseNotes.html#1.20"><b>1.20</b></a> 2009-03-10<br>
+    <a href="/releaseNotes.html#1.19"><b>1.19</b></a> 2009-03-07<br>
+    <a href="/releaseNotes.html#1.18"><b>1.18</b></a> 2009-03-06<br>
+    <a href="/releaseNotes.html#1.17"><b>1.17</b></a> 2009-02-21<br>
+    -->
+  </div>
+  <div class="width2 last demarcated">
+    <div class="section_header"><a href="/changes.html">Change Log</a></div>
+    <a href="/changes.html#1.37"><b>1.37</b></a> 2010-03-29<br>
+    <a href="/changes.html#1.36"><b>1.36</b></a> 2010-02-23<br>
+    <a href="/changes.html#1.35"><b>1.35</b></a> 2010-02-11<br>
+    <a href="/changes.html#1.33"><b>1.33</b></a> 2009-06-01<br>
+    <a href="/changes.html#1.26"><b>1.26</b></a> 2009-05-19<br>
+    <!--
+    <a href="/changes.html#1.25"><b>1.25</b></a> 2009-05-18<br>
+    <a href="/changes.html#1.24"><b>1.24</b></a> 2009-04-26<br>
+    <a href="/changes.html#1.23"><b>1.23</b></a> 2009-03-24<br>
+    <a href="/changes.html#1.22"><b>1.22</b></a> 2009-03-23<br>
+    <a href="/changes.html#1.21"><b>1.21</b></a> 2009-03-12<br>
+    <a href="/changes.html#1.20"><b>1.20</b></a> 2009-03-10<br>
+    <a href="/changes.html#1.19"><b>1.19</b></a> 2009-03-07<br>
+    <a href="/changes.html#1.18"><b>1.18</b></a> 2009-03-06<br>
+    <a href="/changes.html#1.17"><b>1.17</b></a> 2009-02-21<br>
+    <a href="/changes.html#1.16"><b>1.16</b></a> 2009-02-18<br>
+    <a href="/changes.html#1.15"><b>1.15</b></a> 2009-02-15<br>
+    <a href="/changes.html#1.14"><b>1.14</b></a> 2009-01-22<br>
+    <a href="/changes.html#1.13"><b>1.13</b></a> 2008-06-02<br>
+    -->
+  </div>
+</div>
+<div class="clear_both"></div>
+
+<div class="width4 demarcated">
+  <div class="home_page_headline">Features Coming Soon</div>
+  <dl>
+    <dt>Enhancements to the included web site</dt>
+    <dd>
+      We plan on adding contextual menus so that you can right-click on a
+      job from the status screen and select one or more actions.
+    </dd>
+    <dt>Multiple Hosts</dt>
+    <dd>Specify which host on a network a job should run on, and what
+        userid it should run as.
+    </dd>
+  </dl>
+</div>  
+<!--
+<div class="width4 demarcated">
+  <div class="home_page_headline">Latest News</div>
+  <ul>
+    <li>2009/02/21 - Version 1.17 Released</li>
+    <li>2009/02/18 - Version 1.16 Released</li>
+    <li>2009/02/15 - Version 1.15 Released</li>
+  </ul>
+</div>  
+<div class="clear_both"></div>
+  -->
+
+<include TaskForest::REST::PassThrough /foot.html />

@@ -1,0 +1,9 @@
+
+severity = 5
+
+#------------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0

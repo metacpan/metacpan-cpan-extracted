@@ -1,0 +1,39 @@
+# Copyright 2009, 2010, 2011 Kevin Ryde
+
+# This file is part of Test-MockTime-DateCalc.
+#
+# Test-MockTime-DateCalc is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Test-MockTime-DateCalc is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Test-MockTime-DateCalc.  If not, see
+# <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libtest-mocktime-datecalc-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5), libtest-more-perl | perl (>= 5.6.2)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.1
+Homepage: http://user42.tuxfamily.org/test-mocktime-datecalc/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libtest-mocktime-datecalc-perl
+Architecture: all
+Depends: libdate-calc-perl (>= 4), ${perl:Depends}, ${misc:Depends}
+Description: Fake date/time for Date::Calc functions.
+ Test::MockTime::DateCalc arranges for the functions in Date::Calc to
+ follow the Perl level time() function, and in particular any fake
+ date/time set there by Test::MockTime and similar.

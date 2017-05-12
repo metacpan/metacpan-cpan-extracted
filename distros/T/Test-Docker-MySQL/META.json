@@ -1,0 +1,70 @@
+{
+   "abstract" : "Test::Docker::MySQL is a module to launch MySQL in docker containers.",
+   "author" : [
+      "punytan <punytan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Docker-MySQL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.036"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::mysql" : "4.027",
+            "DBI" : "1.631",
+            "IPC::Run" : "0.92",
+            "Time::HiRes" : "1.9726",
+            "perl" : "5.008000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "Test::SharedFork" : "0.24"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/punytan/p5-Test-Docker-MySQL/issues"
+      },
+      "homepage" : "https://github.com/punytan/p5-Test-Docker-MySQL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/punytan/p5-Test-Docker-MySQL.git",
+         "web" : "https://github.com/punytan/p5-Test-Docker-MySQL"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "bayashi <bayashi@cpan.org>"
+   ]
+}
+

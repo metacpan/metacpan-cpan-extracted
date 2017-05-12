@@ -1,0 +1,29 @@
+Changes		A change history
+Gnu.pm		The GNU Readline extension Perl module
+Gnu.xs		The GNU Readline extension external subroutines
+Gnu/XS.pm
+INSTALL		Installtion instructions
+MANIFEST	This list of files
+Makefile.PL	The GNU Readline extension makefile writer
+README		The Instructions
+eg/perlsh	A powerful calculator
+eg/fileman	A short completion example
+eg/pftp		An ftp client with the GNU Readline support
+eg/ptksh+	Simple perl/Tk shell which demonstrates the callback functions
+ppport.h	Perl/Pollution/Portability Version 1.0007
+t/comptest/0123		A file for t/readline.t
+t/comptest/012345	A file for t/readline.t
+t/comptest/023456	A file for t/readline.t
+t/comptest/README	A file for t/readline.t
+t/comptest/a_b		A file for t/readline.t
+t/00checkver.t	A version check script
+t/callback.t	A test script for the GNU Readline callback function
+t/history.t	A test script for the GNU History Library function
+t/inputrc	A file for t/readline.t
+t/readline.t	A test script for the GNU Readline Library function
+t/utf8_binary.t	A test script for UTF-8 binary string
+t/utf8_text.t	A test script for UTF-8 text string
+t/utf8.txt	A file for t/utf8_*.t
+typemap		The GNU Readline extension interface types
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

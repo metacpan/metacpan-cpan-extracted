@@ -1,0 +1,66 @@
+{
+   "abstract" : "Parse bio Taxon names",
+   "author" : [
+      "Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Taxon-Parse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.036"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::More::UTF8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wollmers/Taxon-Parse/issues"
+      },
+      "homepage" : "https://github.com/wollmers/Taxon-Parse",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wollmers/Taxon-Parse.git",
+         "web" : "https://github.com/wollmers/Taxon-Parse"
+      }
+   },
+   "version" : "0.013",
+   "x_contributors" : [
+      "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>"
+   ]
+}
+

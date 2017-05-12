@@ -1,0 +1,109 @@
+====================== CHANGELOG ======================
+Version 1.901.2
+- fix t/isa.t with Regexp types
+
+Version 1.901.1
+- fix t/isa.t with REGEXP types
+
+Version 1.901.0
+- try to work around errors finding the script after chdir called
+- fix versioning
+
+Version 1.9
+- Fix IO::Tee prereq - majestic
+
+Version 1.8
+- Fix IO::Scalar prereq - majestic
+
+Version 1.7
+- Fix licence as per Module::Build::API - Sandip Bhattacharya
+
+Version 1.6_01
+- minor doc change
+- update t/isa.t for older perl
+
+Version 1.6
+- added perldoc documentation
+
+Version 1.5.6
+- guard against someone tweaking $/
+
+Version 1.5.5
+- fix potential infinate loop in text_to_line
+
+Version 1.5.4
+- fix IS diagnostics for strings without newlines
+
+Version 1.5.3
+- remove "TRY" filter, too confusing to use
+- add ERR helper routine to capture exceptions
+- add ISA check to check inheritance of an object
+
+Version 1.5.2
+- fix warning:
+    Ambiguous use of *{Test::More::_format_stack} resolved to *Test::More::_format_stack
+
+Version 1.5.1
+- add --log option to log verbose output to file
+- if TEST_TRIVIAL_LOG env variable set log verbose
+  output to file
+
+Version 1.5.0
+- use Text::Diff for multiline diffs
+- add --diff option to change diff format
+- add diff => $type module option to change diff format
+
+Version 1.4.0
+- fixed issue with linebreaks in tests below;
+- add "TRY" as a stand alone keyword so it can
+  be used as TRY OK, TRY IS etc.
+- add "TODO" keyword like TRY to support test cases known to fail;
+  
+Version 1.3.0
+- allow linebreaks in line so this will work:
+IS "abc123"
+    =>
+   "abc123";
+
+Version 1.2.0
+- adding TRYOK and TRYNOK to wrap tests in try/otherwise block
+  (via Filter::Simple)
+
+Version 1.1.1
+- change messaging for NOK to prepend "not"
+
+Version 1.1.0
+- adding NOK routine (ie Not OK)
+- adding --verbose default option
+
+Version 1.0.5
+- add $Test::Trivial::LEVEL so that calling code can define a
+  sub like so:
+  sub SUCCESS {
+   local $Test::Trivial::LEVEL = $Test::Trivial::LEVEL + 1;
+   warn "I'm success";
+   OK(@_);
+  }
+  then call it SUCCESS("life is good" == "life is good");
+  and Test::Trivial will produce OK - "life is good" == "life is
+  good", rather than OK - OK(@_);
+
+Version 1.0.4
+- added ID to be synonym or EQ
+- added --fatal option
+
+Version 1.0.3
+* fixed bogus "test X Failed" on IS when comparing
+  data structures.
+
+Version 1.0.2
+* IS now calls is_deeply so you can quickly compare data
+  complete structures
+* added "EQ" which is simlar to IS but will not
+  recurse data structures if args are pointers
+        
+Version 1.0.1
+* Fixed package dependencies
+
+Version 1.0.0
+* Initial release

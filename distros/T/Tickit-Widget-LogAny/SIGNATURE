@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3e0f86cf640fd20120cd0d337067460bc3f69e7a Changes
+SHA1 3f79c6a4c1b2f38883098249fde43242631f0d84 INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 36c77a3faabf8e73dc2de590125380431688afa2 MANIFEST
+SHA1 b79445f5cce336d4cde6d43c7d6df5755013e1f5 META.json
+SHA1 7260d72894d694c316154932f8bbf61111aebf7a META.yml
+SHA1 7d462281caef5375d8098256a68600009abf7a3f Makefile.PL
+SHA1 d2b53e5a53667c1015211c05115cc7ab6a9acb67 README
+SHA1 065374851c64435982db6e2dca5669a0579a5023 cpanfile
+SHA1 95eb64ec677b30bca21bbe3977ba239f49c22d28 dist.ini
+SHA1 05ed11208c0b3c66bffdfd6542472582d820a882 examples/desktop.pl
+SHA1 e357b3091c653dab1566adeb72decf20caaed6f4 examples/io-async.pl
+SHA1 d45cd051fb8ec1ee1fd95a06108b54db096ecdb5 examples/log-any.pl
+SHA1 4935cb514902de980f90112325fb9932aa3100d9 examples/stderr.pl
+SHA1 99d4a26493c05a74da8867ee0f303c0d14da3fd3 examples/synopsis.pl
+SHA1 5a8ca3fdd09e7b6ad8165c47801c1511e360d90d lib/Log/Any/Adapter/Tickit.pm
+SHA1 634f2c4c341ead9cfcf3f71584fd7bff0c017f6b lib/Log/Any/Adapter/Tickit.pod
+SHA1 c4d08709457ab447cc08e50cb03505498b749723 lib/Tickit/Widget/LogAny.pm
+SHA1 276bb5c3ff5017122aa0a29278fd6fce7ae26bf6 lib/Tickit/Widget/LogAny.pod
+SHA1 ba98a1252d1e3714ff3b0488214bb59b7f23fb7b lib/Tie/Tickit/LogAny/STDERR.pm
+SHA1 9a03902fe19cc6e055ddfcde7c1650557f719347 screenshots/tickit-widget-logany-basic.png
+SHA1 80367fabfc547bdfe31614d1dbabbc6fa517c313 screenshots/tickit-widget-logany-stacktrace.png
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 e9ed666b7b843d21d33406a583a0656d652de62a t/00-compile.t
+SHA1 068d0841a57cb342f577b96fc41abeb4a4cdb1f0 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJYZ623AAoJEG2WkcbynxAl8R0QAIwvdcUJcjKhrULn8rC9EntE
+mcRAT34IijgPGV9bVATFES4HYjcKv2wBt9Ci2v6nzMzmh5WARQUUmXWp10TAqoph
+rmSXhnkXB2e3uUs4JkfHJbC5j/I2VDEvKwvRDYslOTJTDCMdlSiKNZClVoq5410i
+OR5qW8LozWu11hYpOAi7nz1Eh8bTrIw5RG7uSc+Mxwo9RRZswvOG/MJTaRjR54o/
+/pSRwheNvJMN+ML1UCAw9tAs+VycRmECX/q2TT93WwYWL5lmevW9IL7iG7rLirXx
+WreK2ThMDheJ6Ngg28LlrvYCuxRNU9agmkWUg25dcIS+9gcfjZ6wSQB+9S6+HBav
+T0FG7XVQ1uqEkY0iqAQ9+wqCPC86cv2aUJUM+KP+f/mDlMib61VuvBagh7PejMof
+VExWOXJvRcXy92KHY37k4qexUtD1PQ5akuhd9ofj8znZ18PnrS7irO4y9GrIR2br
+UZp5x93ur4kYRmgmprjUd6kowbUE62b32fKSi3xUP1Sp/m5I/FMLjKmDCq4tGBtq
+wmpE8IVNIiuj7YR98UompV+HXw/avyefN/kL7QdXavv6Z3DV2y9XZgczKqATNouh
+u5gvnwqpAiYZz4ufghKvggtz2yBPyPRR7XRSWtzdpn2MuotBMp3F928qP+jSr0jb
+5X0CYK23HSigE24VrGGk
+=YItf
+-----END PGP SIGNATURE-----

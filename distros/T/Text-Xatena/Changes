@@ -1,0 +1,102 @@
+2011-12-18  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.18:
+	Fixed bug in blockquote cite.
+
+2011-12-01  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.16:
+	Fixed bug on list synaxes.
+	* 0.17:
+	Fixed bug on list synaxes again...
+
+2011-11-18  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.15:
+	Support blockquote title: >http://example.com/:title> .. <<
+	Fixed Inline::Aggressive to get title correctly.
+
+2011-11-17  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.14:
+
+	* Enable use templates:
+	You can specify templates in Text::Xatena#new(templates => {}).
+
+	* Imcompatible changes:
+	Removed Text::Xatena::Node::Section::BASE.
+	Removed Text::Xatena::Node::Section::BEGINNING.
+	Removed Text::Xatena::Node::Section::ENDOFNODE.
+	Use templates instead of these options.
+
+2011-11-16  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.13:
+	Fixed warnings in formatting empty string.
+
+2011-11-14  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.12:
+	Fixed bug on list syntax.
+
+2011-07-21  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.11:
+	Supported customizing class of super-pre syntax for ready-made syntax
+	highlighter (eg. google-code-pretty.) (implemented by mattn)
+
+2011-02-22  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.10:
+	Performance improved
+
+2011-02-20  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.09:
+	Fixed treating some linefeed code correctly (reported by tokuhirom)
+
+2010-12-07  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.08:
+	Fixed bahavior of many returns.
+	Fixed Makefile.PL.
+
+2010-12-05  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.07:
+	Fixed Makefile.PL
+
+2010-12-03  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.06:
+	Supported seemore syntax partly.
+	Updated dependency.
+
+2010-12-02  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.05:
+	Supported footnotes.
+	Supported :title= syntax in normal inline module.
+
+2010-11-20  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.04:
+	Fixed dependency.
+	Performance improved.
+
+2010-03-23  SATOH Hiroh <cho45@lowreal.net>
+
+	* Fixed comment syntax
+	* Fixed test of aggressive (override LWP::get to pass tests)
+	* 0.03
+	Released
+
+2010-03-20  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01
+	Released
+	* 0.02
+	Fixed module dependency bug
+
+
+vim:ft=changelog:

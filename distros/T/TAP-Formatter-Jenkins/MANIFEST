@@ -1,0 +1,9 @@
+Build.PL
+lib/TAP/Formatter/Jenkins.pm
+lib/TAP/Formatter/Jenkins/MyParser.pm
+lib/TAP/Formatter/Jenkins/Session.pm
+MANIFEST			This list of files
+README
+Makefile.PL
+META.yml
+META.json

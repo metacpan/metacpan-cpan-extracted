@@ -1,0 +1,82 @@
+<corpus lang="english" tagged="YES">
+<lexelt item="system">
+<instance id="sys0">
+<answer instance="sys0" senseid="gerard"/>
+<context>
+i would say it would be okay.  gerard should be able to handle a little extra load .  i'll make the access change today , and double check with don to make sure none of the policies we made this fall are being violated .  i don't think they are .
+</context>
+</instance>
+<instance id="sys1">
+<answer instance="sys1" senseid="gerard"/>
+<context>
+i think the only solaris machines that jason and amruta have access to are ccsdev , which isn't the best for them to use if they need to do cross platform testing, etc. would it be possible to give them access to some of the grad lab machines ( like gerard , for example ) .
+</context>
+</instance>
+<instance id="sys2">
+<answer instance="sys2" senseid="space"/>
+<context>
+i observed that /home/cs5 is getting very full. if you can , delete any duplicate or non-essential stuff from that partition ( you are both on this for /home/cs ) . or at the very least compress stuff you aren't using right now .
+</context>
+</instance>
+<instance id="sys3">
+<answer instance="sys3" senseid="print"/>
+<context>
+could you point me at the file you are trying to print ?  i'll take a look at it and see if i can print parts of it elsewhere .  it appears to be hanging up again on cspr3 .
+</context>
+</instance>
+<instance id="sys4">
+<answer instance="sys4" senseid="print"/>
+<context>
+how are you trying to print that file ?  just using lpr ?  have you successfully printed pdf files that way in the past ? i was able to print that document on my sun by using acroread , and then printing .  i notice that the size of my printer file is much smaller than what you are sending , so i'm curious about your method . try using xpdf on those files , and then select a page and print it .  i think that will work better than trying to use "lpr" directly .
+</context>
+</instance>
+<instance id="sys5">
+<answer instance="sys5" senseid="print"/>
+<context>
+well, the first thing you should do is remove your active job from the queue.  if that doesn't clear things, you can try to power cycle the printer .
+</context>
+</instance>
+<instance id="sys6">
+<answer instance="sys6" senseid="install"/>
+<context>
+tell me what you need installed, and i can ask jim to take care of that early next week (on marimba? or would you prefer elsewhere?)
+</context>
+</instance>
+<instance id="sys7">
+<answer instance="sys7" senseid="install"/>
+<context>
+devel - size is now available ! this is what bridget and amruta mentioned last friday . set - scalar is neat , although it's specific to something amruta is working on .
+</context>
+</instance>
+<instance id="sys8">
+<answer instance="sys8" senseid="install"/>
+<context>
+ok, it doesn't need any installations. we just need to include those header files in the c program. so just unpacking the package .
+</context>
+</instance>
+<instance id="sys9">
+<answer instance="sys9" senseid="space"/>
+<context>
+the "df" command give the disk usage for the whole partition .  "du" with various options will give the disk usage for a particular directory . so , to find out how much disk space your directory on /home/cs5 is using, you could cd to that directory and then do "du -s ." the /home/cs5 partition has about 43gb available to use.  bridget is currently using 9gb, and amruta is using about 3gb.  there are 21 users with directories in /home/cs5.  if each user used about 2gb, it wouldn't fill.  so, amruta i'd say you are slightly over what you should be using, and bridget is way over and should clean up a bit.  i'll check the others in that directory , and suggest they clean up as well.
+</context>
+</instance>
+<instance id="sys10">
+<answer instance="sys10" senseid="space"/>
+<context>
+what do you have on marimba's local storage ? anything you can delete? also, when running these experiments, i don't think we need to have tracing on too much - the tracing just creates way too much data...
+</context>
+</instance>
+<instance id="sys11">
+<answer instance="sys11" senseid="space"/>
+<context>
+ah, great! glad you have some space available now. if you start to get back up around 80%, let me know. we can probably use talisker and my machine for extra local storage if needed!
+</context>
+</instance>
+<instance id="sys12">
+<answer instance="sys12" senseid="sunpci"/>
+<context>
+i shouldn't have to send out this warning, as you shouldn't be keeping anything important on the windows images on the suns , but i plan to start replacing the windows images on all of the grad student suns and the suns in hh314 this weekend.this new image will have the lates windows updates and virus definitions, among other things.  but, it should mostly be the same as the one i put out there at the beginning of the semester. remember that you should view the windows images on the suns as volatile, and the could get replaced any time.  thus, you should keep important files off of those images .
+</context>
+</instance>
+</lexelt>
+</corpus>

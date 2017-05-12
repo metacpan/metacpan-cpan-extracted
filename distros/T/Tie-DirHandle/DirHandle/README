@@ -1,0 +1,85 @@
+README for Tie::DirHandle.pm
+
+CONTENTS
+--------
+
+I.  Brief Description
+II. POD
+
+##############################################################################
+
+I.  Brief Description
+---------------------
+
+Tie::DirHandle allows for <HANDLE> syntax to be used on a tied filehandle to
+a directory handle.  That's basically it.  There's not much support for a tied
+directory, since they can't be written to.
+
+
+II. POD
+-------
+
+NAME
+    Tie::DirHandle - definitions for tied directory handles
+
+SYNOPSIS
+        use Tie::DirHandle;
+        
+        [$ref =] tie *FH, "Tie::DirHandle", *DH, "/usr/local/lib";
+        while (<FH>){
+            do_something_with_file($_);
+        }
+        (tied *FH)->rewind; # or $ref->rewind;
+        untie *FH;
+
+DESCRIPTION
+    This module provides filehandle-like read access to directory
+    handles. There are not many available methods, because directory
+    handles are read-only. The only methods are `TIEHANDLE',
+    `READLINE', `DESTROY', and `rewind'.
+
+    To tie a filehandle to a directory handle, the syntax is as
+    follows: tie *FILEHANDLE, "Tie::DirHandle", *DIRHANDLE,
+    "/path/to/dir";
+
+    The module will open the directory (and croak with an error if
+    not able to do so). When untying the filehandle, the directory
+    is closed.
+
+    After a filehandle has been tied to a directory handle, you can
+    read from the directory using the <HANDLE> syntax. This syntax
+    calls `READLINE'.
+
+    To rewind the directory, there are two possible syntaxes: (tied
+    *FH)->rewind; or $ref->rewind;
+
+    The second works if you have stored the return value of the tie
+    in a variable $ref. The value of `tied *FH' and $ref are the
+    same.
+
+    The variable $ref (or `tied *FH') contains a hash reference,
+    with three keys. $ref->{HANDLE} returns the directory handle it
+    references. $ref->{PATH} and $ref->{DIR} are synonymous, and
+    return the path of the directory.
+
+    TIEHANDLE classname, DIRHANDLE, DIR
+        This ties the specified directory handle to the filehandle
+        given as the first argument to tie(). DIR is the pathname of
+        the directory.
+
+    READLINE this
+        This returns the next value (if called in a scalar context)
+        or the next values (if returned in a list context) of
+        readdir().
+
+    DESTROY this
+        This closes the directory.
+
+See Also
+    Look into the perltie manpage, the documentation on the tie()
+    function.
+
+Author
+     Jeff Pinyan (CPAN ID: PINYAN)
+     jeffp@crusoe.net
+     www.crusoe.net/~jeffp

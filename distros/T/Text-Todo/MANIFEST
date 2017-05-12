@@ -1,0 +1,25 @@
+.cvsignore
+bin/todo.pl
+Build.PL
+cgi-bin/todo.cgi
+Changes
+lib/Text/Todo.pm
+lib/Text/Todo/Entry.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00.load.t
+t/entry.t
+t/list.t
+t/perlcritic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+t/read_todo.t
+t/special_tags.t
+t/todo.cfg
+t/todo.list.txt
+t/todo1.txt

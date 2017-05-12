@@ -1,0 +1,41 @@
+# NAME
+
+Template::Plugin::String::Truncate - String::Truncate functions for Template Toolkit
+
+# VERSION
+
+version 0.02
+
+# SYNOPSIS
+
+    [% USE st = String.Truncate %]
+
+    This string is elided: [% st.elide('LONG ASS STRING, SON!', 18); %]
+    This one is truncated: [% st.trunc('DAMN YOU GOT LONG STRINGS!', 10); %]
+    And other stuff can happen too: [% st.elide('SHORT STRING', 5, { truncate => 'left' }) %]
+
+# DESCRIPTION
+
+This plugin allows you to use functions from [String::Truncate](http://search.cpan.org/perldoc?String::Truncate) in your templates.
+It is very simple and hopefully requires little explanation.  
+
+# FUNCTIONS
+
+## elide
+
+Truncates a string and marks the elision.  See `elide` in [String::Truncate](http://search.cpan.org/perldoc?String::Truncate).
+
+## trunc
+
+Truncates a string.  See `trunc` in [String::Truncate](http://search.cpan.org/perldoc?String::Truncate).
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

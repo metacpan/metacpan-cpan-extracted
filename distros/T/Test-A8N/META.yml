@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Test-A8N
+version:      0.06
+version_from: lib/Test/A8N.pm
+installdirs:  site
+requires:
+    File::Find:                    0
+    Module::Load:                  0
+    Moose:                         0.33
+    Pod::Usage:                    0
+    Test::Builder:                 0
+    Test::Deep:                    0
+    Test::FITesque:                0.01
+    Test::More:                    0
+    WWW::Selenium:                 0
+    YAML::Syck:                    0.94
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

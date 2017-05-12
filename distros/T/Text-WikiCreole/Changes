@@ -1,0 +1,29 @@
+Revision history for Text-WikiCreole
+
+0.07    10/5/2008
+   Bug fix: Italics around links rendered incorrectly
+
+0.06    10/5/2008
+   Bug fix: & not converted to &amp; where appropriate
+   Feature addition: creole_barelink() and creole_custombarelinks() 
+      functions for customized handling of http://google.com style links
+      courtesy of Bernd Zeimetz
+
+0.05    10/11/2007
+    Added creole_customlinks() and creole_customimgs() 
+
+0.04 10/10/2007
+    Fixed a bug with creole_parse and undefined input
+
+0.03    9/21/2007
+    Added <<< alternate plugin >>> syntax, since Perl can be hard to embed in
+    << 2-bracket >> plugins
+
+0.02    9/12/2007
+    Fixed bug parsing plugin blocks
+    Fixed bug with nowiki blocks at end of file
+    Added creole_img for custom image URLs
+
+0.01    9/11/2007
+    Initial Release
+

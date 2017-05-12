@@ -1,0 +1,40 @@
+<corpus lang="en" tagged="YES">
+<lexelt item="line-n">
+<instance id="line-n.w8_036:2056:">
+<answer instance="line-n.w8_036:2056:" senseid="phone"/>
+<context>
+" bursts on the <head>line</head> ! in the middle of phone calls "
+</context>
+</instance>
+<instance id="line-n.art} aphb 08800556:">
+<answer instance="line-n.art} aphb 08800556:" senseid="cord"/>
+<context>
+ we name the group triplet falls we make a portage around the first past the second and third ; 
+we let down with <head>lines</head>
+</context>
+</instance>
+<instance id="line-n.w9_40:5727:">
+<answer instance="line-n.w9_40:5727:" senseid="product"/>
+<context>
+ people will turn to the next question what kind of real momentum will be created by the combination of these businesses asks david maccallum a new york pharmaceutical analyst for san francisco 
+brokers hambrecht quist inc i don't think there's anything those two organizations will do that will create significant momentum 
+for the top sales ?
+</context>
+</instance>
+<instance id="line-n.w8_032:6138:">
+<answer instance="line-n.w8_032:6138:" senseid="division"/>
+<context>
+ but for years president zia forestalled political liberalizations as a result social and political pressures are starting to pull pakistan apart along ethnic <head>lines</head> ...
+</context>
+</instance>
+<instance id="line-n.w8_120:14831:">
+<answer instance="line-n.w8_120:14831:" senseid="product"/>
+<context>
+ it isn't clear whether the vehicles will retain the chevrolet name or just 
+carry the chevy bow tie emblem in any event chevrolet hopes to launch geo this 
+fall almost two years before the debut of gm's saturn car <head>line</head> 
+another new nameplate that unlike geo will also be a separate franchise
+</context>
+</instance>
+</lexelt>
+</corpus>

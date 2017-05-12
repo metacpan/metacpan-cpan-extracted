@@ -1,0 +1,252 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Guido Flohr <guido@imperia.net>.
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: Guido Flohr <guido@imperia.net>\n"
+"POT-Creation-Date: 2006-05-12 15:37+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: ../gtestrunner.glade:8
+msgid "GTestRunner"
+msgstr ""
+
+#: ../gtestrunner.glade:37
+msgid "_File"
+msgstr ""
+
+#: ../gtestrunner.glade:74
+msgid "_Tests"
+msgstr ""
+
+#: ../gtestrunner.glade:83
+msgid "_Run"
+msgstr ""
+
+#: ../gtestrunner.glade:105
+msgid "Run _Selected"
+msgstr ""
+
+#: ../gtestrunner.glade:151
+msgid "_Settings"
+msgstr ""
+
+#: ../gtestrunner.glade:160
+msgid "_Refresh suites before every run"
+msgstr ""
+
+#: ../gtestrunner.glade:174
+msgid "_Help"
+msgstr ""
+
+#: ../gtestrunner.glade:183
+msgid "_About"
+msgstr ""
+
+#: ../gtestrunner.glade:246
+msgid "Run"
+msgstr ""
+
+#: ../gtestrunner.glade:264
+msgid "Selected"
+msgstr ""
+
+#: ../gtestrunner.glade:298
+msgid "Refresh the test suite"
+msgstr ""
+
+#: ../gtestrunner.glade:335
+msgid "Refresh suites before every run"
+msgstr ""
+
+#: ../gtestrunner.glade:368
+msgid "Quit"
+msgstr ""
+
+#: ../gtestrunner.glade:484
+msgid "Failures"
+msgstr ""
+
+#: ../gtestrunner.glade:537
+msgid "Test Hierarchy"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:282
+msgid "Starting GTestRunner."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:317 ../lib/Test/Unit/GTestRunner.pm:365
+msgid "Test"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:329
+msgid "Test Case"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:329
+msgid "Source"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:480
+#, perl-brace-format
+msgid "Test cannot be started: {cmd}: {err}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:488
+msgid "Running ..."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:520
+msgid ""
+"The test suite you want to run has changed.  Please make a new\n"
+"selection, and run again.\n"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:617
+msgid "Waiting for test to terminate ..."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:623
+msgid "Refreshing the test suite."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:677
+#, perl-brace-format
+msgid "Testsuite cannot be listed: {cmd}: {err}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:700
+#, perl-brace-format
+msgid "Corrupt test listing: {line}\n"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:712
+#, perl-brace-format
+msgid "Invalid change in test depth ({old} to {new})."
+msgstr ""
+
+#. TRANSLATORS: Replace this string with your
+#. own names and e-mail addresses, one name
+#. per line.
+#: ../lib/Test/Unit/GTestRunner.pm:957
+msgid "translator-credits"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:968 ../lib/Test/Unit/GTestRunner.pm:985
+msgid "Select a test suite or test case to run!"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1012
+#, perl-brace-format
+msgid "Select on pipe to child process failed: {err}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1020 ../lib/Test/Unit/GTestRunner.pm:1029
+#: ../lib/Test/Unit/GTestRunner.pm:1039
+msgid "Unexpected end of file while reading from child process."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1023 ../lib/Test/Unit/GTestRunner.pm:1042
+#, perl-brace-format
+msgid "Read from pipe to child process failed: {err}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1153
+msgid "Test terminated."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1161
+#, perl-brace-format
+msgid "Running: {test}"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1167 ../lib/Test/Unit/GTestRunner.pm:1202
+#, perl-brace-format
+msgid "one test, "
+msgid_plural "{num_tests} tests, "
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1169 ../lib/Test/Unit/GTestRunner.pm:1204
+#, perl-brace-format
+msgid "one error, "
+msgid_plural "{num_errors} errors, "
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1171 ../lib/Test/Unit/GTestRunner.pm:1206
+#, perl-brace-format
+msgid "one failure"
+msgid_plural "{num_failures} failures"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1224
+#, perl-brace-format
+msgid "Success: {test}"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1249
+#, perl-brace-format
+msgid "Failure: {test}"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1343
+msgid "Test aborted."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1358
+msgid "Test process terminated."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1369
+msgid "Child process cannot be terminated."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1376
+#, perl-brace-format
+msgid "Child process signaled with SIG{NAME}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner.pm:1395
+#, perl-brace-format
+msgid ""
+"Internal error: Unrecognized error state \"{state}\".  This should\n"
+"not happen.\n"
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner/Lister.pm:52
+#: ../lib/Test/Unit/GTestRunner/Worker.pm:47
+#, perl-brace-format
+msgid "Standard output cannot be duplicated: {err}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner/Lister.pm:59
+#, perl-brace-format
+msgid "Standard output cannot be closed: {err}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner/Lister.pm:64
+#, perl-brace-format
+msgid "Standard output cannot be redirected to standard error: {err}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner/Worker.pm:58
+#, perl-brace-format
+msgid "Standard output cannot be tied: {err}."
+msgstr ""
+
+#: ../lib/Test/Unit/GTestRunner/Worker.pm:64
+#, perl-brace-format
+msgid "Standard error cannot be tied: {err}."
+msgstr ""

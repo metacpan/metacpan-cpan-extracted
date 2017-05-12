@@ -1,0 +1,6 @@
+^Makefile$
+^Makefile.old$
+.*CVS.*
+~$
+^blib.*
+^pm_to_blib$

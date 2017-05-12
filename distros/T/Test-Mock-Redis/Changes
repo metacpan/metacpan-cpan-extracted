@@ -1,0 +1,81 @@
+Revision history for Perl module Test::Mock::Redis
+
+0.20 2017-02-03
+    - support negative indicies (Gianni Ceccarelli)
+    - zrevrange sort fix (Gianni Ceccarelli)
+    - Support EX, PX, NX, and XX for set (Nigel Gregoire)
+
+0.19 2015-12-18
+    - fix for hexists return value (Chris Reinhardt)
+
+0.18 2015-08-03
+    - fix for keys match (Yaakov Shaul)
+
+0.17 2015-05-15
+    - zrevrangebyscore command added (Kevin Goess)
+    - zrangebyscore sort fixes (Kevin Goess)
+
+0.16 2015-04-14
+    - rpoplpush command added (Keith Broughton)
+
+0.15 2014-08-29
+    - watch/unwatch commands added (Ian Burrell)
+    - del command fixes (Ian Burrell)
+
+0.14 2013-08-31
+    - change_num_databases class method added (Kevin Goess)
+
+0.13 2013-08-27
+    - support for changing number of available databases (Kevin Goess)
+
+0.12 2013-12-06
+    - support for pipelined calls, using callback subs (Karen Etheridge)
+
+0.11 2013-18-05
+    - atomic transactions ('multi', 'exec', 'discard') now supported:
+      http://redis.io/topics/transactions (Karen Etheridge)
+
+0.10 2013-16-05
+    - 'info' output brought up-to-date w/redis 2.6
+
+    - fixed output for these commands: (Karen Etheridge)
+            should return OK, not 1:
+                auth
+                set
+                setex
+                mset
+                rename
+                ltrim
+                lset
+                select
+                save
+            should return a list length, not the list itself:
+                rpush
+                lpush
+                rpushx
+                lpushx
+
+0.09 2013-26-02
+    - Expired keys are not returned in the KEYS list (Karen Etheridge)
+
+0.08 2012-13-04
+    - Correct type is returned for non-existent keys
+      (RT#76534, Karen Etheridge)
+
+0.07 2011-05-10
+    - Fix for RT-71461, incorrect rename behavior
+
+0.04 2011-18-02
+    - Made error conditions consistent with Redis.pm's behavior
+
+0.03 2011-16-02
+    - Pay attention to the server argument to new -
+      now a singleton per server, just like redis
+    - Fixed Test::Exception dependency
+
+0.02 2011-14-02
+    - More redis functions, including
+      auth, append, strlen, getset, mset & msetnx
+
+0.01 2011-13-02
+    - First version, released on an unsuspecting world.

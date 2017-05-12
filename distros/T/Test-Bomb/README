@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Test-Bomb,
+version 0.007:
+
+  a test which succeeds until a deadline passes ( a time bomb )
+
+This software is copyright (c) 2011 by David Delikat.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

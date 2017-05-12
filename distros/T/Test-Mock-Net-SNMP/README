@@ -1,0 +1,39 @@
+Test-Mock-Net-SNMP version 1.01
+===============================
+
+This module is an attempt to mock David M Town's Net::SNMP module. It is 
+intended that a user of this module can easily set up mock return
+values for the methods provided in Net::SNMP. It should also make
+it easy to ensure that the code calling the methods is calling
+them with the intended arguments.
+
+This module also provides the ability to test how your code reacts
+to Net::SNMP errors.
+
+This module utilizes chromatic's Test::MockObject::Extends to perform
+the mocking of Net::SNMP.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::SNMP, Test::MockObject::Extends
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Rob Halliday
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

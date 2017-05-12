@@ -1,0 +1,24 @@
+---
+abstract: 'Synchronize volatile have/want values for tests'
+author:
+  - "Curtis 'Ovid' Poe <ovid@cpan.org>"
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-SynchHaveWant
+provides:
+  Test::SynchHaveWant:
+    file: lib/Test/SynchHaveWant.pm
+    version: 0.01
+requires:
+  Test::Builder: 0.9
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Ovid/test-synchhavewant
+version: 0.01

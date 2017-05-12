@@ -1,0 +1,13 @@
+Revision history for Test-NoSmartComments
+
+0.005     2014-12-02 19:46:57 PST-0800
+    * Add a no_smart_comments_in_tests() file, to check all *.t files
+
+0.004     2011-03-18 17:59:37 America/Los_Angeles
+    * Add doc tweaks from dougwilson (thanks!)
+
+0.003     2011-03-17 21:06:31 America/Los_Angeles
+    * Listing dependencies would be nice *sigh*
+
+0.002
+    * Correct the docs

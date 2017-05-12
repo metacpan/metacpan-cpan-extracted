@@ -1,0 +1,86 @@
+NAME
+    Tie::Hash::Check - Tied construct for hash key checking.
+
+SYNOPSIS
+     use Tie::Hash::Check;
+     tie my %hash, 'Tie::Hash::Check', {
+             %parameters,
+     };
+
+SUBROUTINES
+    "TIEHASH"
+             Hash create.
+
+    "CLEAR"
+             Hash clear.
+
+    "DELETE"
+             Hash delete.
+
+    "EXISTS"
+             Hash exists.
+
+    "FETCH"
+             Hash fetch.
+
+    "FIRSTKEY"
+             Hash first key.
+
+    "NEXTKEY"
+             Hash nextkey.
+
+    "SCALAR"
+             Hash scalar.
+
+    "STORE"
+             Hash store.
+
+ERRORS
+     TIEHASH():
+             Parameter isn't hash.
+             Stack isn't array.
+
+     FETCH():
+             Key '%s' doesn't exist.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Tie::Hash::Check;
+
+     # Set error type.
+     $ENV{'ERROR_PURE_TYPE'} = 'Print';
+
+     # Tied hash.
+     tie my %hash, 'Tie::Hash::Check', {
+             'one' => 1,
+             'two' => 2,  
+     };
+
+     # Turn error "Key 'three' doesn't exist.".
+     print $hash{'three'};
+
+     # Output:
+     # Tie::Hash::Check: Key 'three' doesn't exist.
+
+DEPENDENCIES
+    Error::Pure, Error::Pure::Utils.
+
+REPOSITORY
+    <https://github.com/tupinek/Hash-Check>.
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2009-2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.08
+

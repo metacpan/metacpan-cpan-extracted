@@ -1,0 +1,26 @@
+Tk::Date Module
+
+Tk::Date is a date widget in development. See demos/date.pl or the
+examples subdirectory for usage examples.
+
+To install, type
+
+	perl Makefile.PL
+	make
+	make install
+
+For Windows NT and ActiveState Perl, replace "make" with "nmake", if
+you have the Visual C++ compiler available. Otherwise, just copy
+Date.pm to C:\Perl\lib\site\Tk.
+
+Additional requirements (it's not essential, but recommended):
+Tk-GBARR-2.01.tar.gz or better. For full functionality of the "get"
+method, either the POSIX or Date::Format module is also needed.
+
+After installation, you may start the "widget" program to invoke the
+Tk::Date demonstration (it's in the "User Contributed Demonstrations"
+section). The demo is also startable with "make demo" before
+installation.
+
+Send bug reports, comments and suggestions to srezic@cpan.org
+

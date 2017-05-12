@@ -1,0 +1,37 @@
+This tests Multisource operations:
+
+Sources                                : source1 source2
+
+Eles                                   : eight five four one seven six three two
+
+Eles_in_source (source1)               : eight five four one seven six three
+Eles_in_source (source2)               : eight five four seven six three two
+
+Ele_in_sources (one)                   : source1
+Ele_in_sources (two)                   : source2
+Ele_in_sources (three)                 : source1 source2
+Ele_in_sources (zero)                  :
+
+Ele_in_source (source1,one)            : 1
+Ele_in_source (source1,two)            : 0
+
+Ele (one)                              : 1
+Ele (zero)                             : 0
+
+Access (three,/a)                      : 
+Access (three,/b)                      : 3b1
+Access (three,/c)                      : 3c
+Access (four,/l)                       : 2
+
+Access (one,/l)                        : l1 l2
+Access (one,/)                         : b c l
+
+Which (/b bb)                          : one
+Which (/c cc)                          : four one
+
+Which_sources (zero /a all)            :
+Which_sources (one /xxx all)           :
+Which_sources (eight /c all)           : source1 source2
+Which_sources (eight /c all-val)       : source1
+Which_sources (eight /c readonly)      : source1 source2
+Which_sources (eight /c readonly-val)  : source1

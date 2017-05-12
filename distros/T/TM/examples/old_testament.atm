@@ -1,0 +1,58 @@
+adam
+bn: Adam Adamovich
+
+(eats)
+eater: adam
+food: apple_1
+
+eve
+bn: Eve
+in: the first lady
+
+
+
+
+(begets)
+parent: adam eve
+child: cain
+
+(begets)
+parent: adam eve
+child: abel
+
+(begets)
+parent: adam eve
+child: seth
+
+(begets)
+parent: adam eve
+child: azura
+
+#--
+
+(begets)
+parent: cain
+child: enoch
+
+#--
+
+(begets)
+parent: enoch
+child: irad
+
+#--
+
+(begets)
+parent: irad
+child: mehajael
+
+#--
+
+(begets)
+parent: seth
+child: enosh
+
+(begets)
+parent: seth
+child: noam
+

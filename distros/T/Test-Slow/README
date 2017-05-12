@@ -1,0 +1,48 @@
+Synopsis
+========
+
+Skips tests that are too slow to run frequently so that you
+can run the quick tests more often.
+
+Installation
+============
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Support and Documentation
+=========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Slow
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Slow
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Slow
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Slow
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Slow/
+
+Copyright and Licence
+=====================
+
+Copyright (C) 2010 Tomáš Znamenáček, zoul@fleuron.cz
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

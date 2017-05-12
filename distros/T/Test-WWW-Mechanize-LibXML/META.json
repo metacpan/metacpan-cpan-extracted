@@ -1,0 +1,55 @@
+{
+   "abstract" : "use HTML::TreeBuilder::LibXML for testing",
+   "author" : [
+      "Shlomi Fish <shlomif@insurgentsoftware.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-WWW-Mechanize-LibXML",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::TreeBuilder::LibXML" : "0",
+            "MRO::Compat" : "0",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::WWW::Mechanize::LibXML" : {
+         "file" : "lib/Test/WWW/Mechanize/LibXML.pm",
+         "version" : "v0.0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/shlomif/perl-Test-WWW-Mechanize-LibXML"
+      }
+   },
+   "version" : "v0.0.4"
+}

@@ -1,0 +1,27 @@
+Tk::VisualBrowser version 0.14
+============================== 
+
+You can install this using the usual Perl fashion:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The documentation is in the module file. Once you
+install the file, you can read it with perldoc.
+
+  perldoc Tk::VisualBrowser 
+
+If you want to read it before you install it, you
+can use perldoc directly on the module file.
+
+  perldoc lib/Tk/VisualBrowser.pm 
+
+This module is licenced under GPL. It is provided as
+is without any warranty.
+
+Enjoy,
+
+Lorenz Domke, lorenz.domke@gmx.de
+

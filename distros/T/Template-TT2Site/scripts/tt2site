@@ -1,0 +1,161 @@
+#!/usr/bin/perl -w
+my $RCS_Id = '$Id: tt2site,v 1.5 2005/02/27 15:34:03 jv Exp $ ';
+
+# Author          : Johan Vromans
+# Created On      : Mon Dec  6 21:48:07 2004
+# Last Modified By: Johan Vromans
+# Last Modified On: Fri Feb  4 21:12:51 2005
+# Update Count    : 153
+# Status          : Unknown, Use with caution!
+
+################ Common stuff ################
+
+use strict;
+
+# Package name.
+my $my_package = 'TT2Site';
+# Program name and version.
+my ($my_name, $my_version) = $RCS_Id =~ /: (.+),v ([\d.]+)/;
+# Tack '*' if it is not checked in into RCS.
+$my_version .= '*' if length('$Locker:  $ ') > 12;
+
+################ The Process ################
+
+BEGIN {
+    if ( $ENV{TT2SITE_LIB} ) {
+	unshift(@INC, $ENV{TT2SITE_LIB});
+    }
+}
+
+use Template::TT2Site;
+sub ident(*);
+sub usage(;$);
+
+@ARGV = qw(build) unless @ARGV;
+
+use Getopt::Long qw(:config require_order no_ignore_case pass_through);
+
+GetOptions("ident"     => sub { ident(*STDERR) },
+	   "version|V" => sub { ident(*STDOUT); exit(0); },
+	   "help"      => sub { usage(0); },
+	  )
+  or usage(2);
+
+Template::TT2Site->execute(@ARGV);
+
+################ Subroutines ################
+
+sub ident(*) {
+    my $fd = shift;
+    print $fd ("This is $my_package [$my_name $my_version] ",
+	       "using Template::TT2Site version ",
+	       $Template::TT2Site::VERSION, "\n");
+}
+
+sub usage(;$) {
+    my $ret = shift;
+    my $usage = "Usage: tt2site [ options ] command\n";
+
+    if ( defined($ret) && $ret ) {
+	print STDERR $usage,
+	  "Use \"--help\" for a list of commands\n";
+    }
+    else {
+	print STDOUT $usage, "\n",
+	  "Commands:\n\n";
+	Template::TT2Site->command_help;
+    }
+    exit($ret) if $ret;
+}
+
+__END__
+
+=head1 NAME
+
+tt2site - Template Toolkit site builder
+
+=head1 SYNOPSIS
+
+tt2site [options] [setup|build|rebuild|clean|realclean]
+
+Options:
+
+   --ident 	     show identification and TT2Site version
+   --version -V	     show identification and TT2Site version, and exit
+   --help --usage    show command usage, and exit
+
+=head1 COMMANDS
+
+NOTE: For the actual commands supported by this particular version,
+use the C<--help> option.
+
+Commands that are usually supported:
+
+=over 8
+
+=item B<setup>
+
+Initialises a new site directory. This command must be run once before
+you can do anything else.
+
+=item B<build>
+
+Runs the C<ttree> application to update the site files.
+
+=item B<rebuild>
+
+Runs the C<ttree> application to completely rebuild all site files.
+
+=item B<clean>
+
+Cleans the generated HTML files, and editor backup files.
+
+=item B<realclean>
+
+Cleans the generated HTML files, editor backup files, and all files
+originally installed using the B<setup> command.
+
+You'll be asked for confirmation before your files are removed.
+
+=back
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--version> B<-V>
+
+Prints a version identification to standard output and exits.
+
+=item B<--help>
+
+Prints a brief help message to standard output and exits.
+
+=item B<--ident>
+
+Prints a program identification.
+
+=back
+
+=head1 DESCRIPTION
+
+B<tt2site> is the main tool to use the C<Template::TT2Site> program.
+
+For more information, see the HTML documentation in the
+distribution, or visit the web site at
+L<http://www.squirrel.nl/people/jvromans/tt2site/index.html>.
+
+=head1 AUTHOR
+
+Johan Vromans <jvromans@squirrel.nl>
+
+=head1 COPYRIGHT
+
+This programs is Copyright 2004-2005, Squirrel Consultancy.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the Perl Artistic License or the GNU General
+Public License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+=cut

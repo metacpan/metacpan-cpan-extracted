@@ -1,0 +1,20 @@
+
+Changes from NSP version 0.67 to 0.69
+-------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+March 23, 2004
+
+Measures
+--------
+
+	Converted pmi.pm into new measure2d style. All other
+	measures had been converted in 0.67, but for some reason
+	pmi.pm was left behind. (Bridget)
+
+Utils 
+-------
+
+	Modified combig.pl program to use less memory. (Amruta)
+

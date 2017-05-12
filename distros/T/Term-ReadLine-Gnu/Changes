@@ -1,0 +1,614 @@
+	-*- Indented-text -*-
+	$Id: Changes 556 2016-11-03 14:24:45Z hayashi $
+
+1.35  2016-11-03
+	- readline-7.0 support
+	    new function
+		rl_clear_visible_line
+		rl_tty_set_echoing
+		rl_pending_signal
+	    new variable
+		rl_persistent_signal_handlers
+	- Gnu.xs: fix a bug of rl_readline_state variable causing on a
+	  big-endian, sizeof(int)==4, and sizeof(long)==8 platform
+	  with the GNU Readline Library 7.0. [rt.cpan.org #118371]
+
+1.34  2016-06-12
+	- ppport.h: update from version 1.0007 to version 3.31.
+	- t/utf8_text.t: fix for the fail when PERL_UNICODE environment
+	  variable is set.
+
+1.33  2016-06-10
+	- Gnu.pm, t/utf8_text.t: fix version checks for perl 5.10.0.
+	- t/utf8_text.t: fix the number of skip for systems which do
+	  not support en_US.UTF-8 locale.
+	- Gnu.pm: delete old formated 'use VERSION'
+
+1.32  2016-06-06
+	- improve UTF-8 handling
+	  - UTF-8 decoding is done at the interface between Perl and
+            XS.  This makes it possible for UTF-8 strings to be get
+            from the GNU Readline Library functions and variables.
+	  - add enableUTF8() method
+	  - UTF-8 support is enabled when STDIN is in UTF-8 by the -C
+	    command-line switch, or PERL_UNICODE environment variable,
+	    or IN file handle has utf8 IO layer, or -enableUTF8 method
+	    is called.
+	  - pop IO layer only when stdio layer is pushed on utf8 layer
+            to support Perl 5.8.x
+	- rl_save_state(), rl_restore_state(),
+          history_get_history_state(), and history_set_history_state()
+          are finally implemented.
+	- update RL_STATE_* definitions
+	- fix rl_readline_state and history_legnth variable to be
+          writable
+	- fix rl_completion_quote_character and
+          rl_completion_found_quate variable to be read only
+	- update POD document
+	- t/*.t: use Test::More and improved
+	  - t/utf8_binary.t, t/utf8_text.t:
+	    - use en_US.UTF-8 instead of en_US.utf8 for locale
+	    - force the GNU Readline Library 8bit through
+	    - add variable access test, IO layer check, verbose mode,
+              etc.
+	    - use camel characters instead of Japanese kanji
+              characters
+	  - t/utf8_binary.t: skip when PERL_UNICODE is
+            set. [rt.cpan.org #114185]
+	  - t/utf8.txt: use camel characters instead of Japanese kanji
+            characters
+	  - t/callback.t: update comments and code clean-up
+	- use some modern Perl features (but still in 5.8 era)
+	  - use file handle references
+	  - define export tags
+	  - comment out 'use vars' for subroutine name aliase
+
+1.31  2016-03-06
+	- t/utf8_binary.t, t/utf_text.t: skip on non UTF-8 environment.
+	- t/readline.t: skip the cursor move test for an active CPAN
+          tester's environment
+
+1.30  2016-03-02
+	- t/utf8_binary.t: add a fix to handle escape sequences which
+	  rl_initialize may output.
+
+1.29  2016-02-28
+	- pop the stdio PerlIO layer only when utf8 layer is included
+          for remote debugging. [rt.cpan.org #110121]
+	- call utf8::decode() for a UTF8-enabled input filehandle.
+          [rt.cpan.org #104239]
+	- call newTTY() any time to set filehandles.
+	- make use of 'our' instead of 'use vars'.
+	- add tests for UTF-8 handling.
+	- pass _rl_store_iostream 'FILE *' in stead of 'PerlIO *'.
+	- remove T_STDIO definition from typemap.
+	- requires Perl 5.8.1
+
+1.28  2015-09-21
+	- Makefile.PL: revert a change on 1.27 which causes fail on
+          the rlmalloc test. [rt.cpan.org #107201]
+	- t/readline.t, t/history.t: use LC_ALL instead of LANG.
+
+1.27  2015-09-06
+	- readline-7.0-rc2 support
+	    new function
+		rl_callback_sigcleanup
+	- improve POD documents
+	- Gnu.xs: not to use obsoleted typedefs which were obsoleted
+          by ReadLine 6.3
+	- fix a wrong fix on 1.21 to let completion_function do case
+          insensitive match. [rt.cpan.org #72378]
+	- fix rl_display_match_list to show the first entry of the
+          array.  The bug caused segmentation fault with readline-7.0.
+	- some improvement of Makefile.PL:
+	  - add support homebrew on Mac OS X. [rt.cpan.org #104389]
+	  - print an error string when system() fails.
+	  - specify 'int' on 'main()'.
+	  - use -O when -D_FORTIFY_SOURCE is defined.
+
+1.26  2015-01-31
+	- call ornaments() after rl_initialize() to set tty before
+          calling rl_initialize() not to output some charactores to
+          STDIO. [rt.cpan.org #96569, #101196]
+	- make handling of iostreams simple (make _rl_store_iostream()
+          return void and remove _rl_fetch_iostream()) [rt.cpan.org #101078]
+	- fix the Prerequisites section to require Perl 5.8 (it was
+          required since TRG 1.23.).
+	- t/callback.t: add some new Tk-tests from CPAN Testers' site.
+
+1.25  2014-12-13
+	- fix to call rl_initialize() after I/O stream
+	  setting. [rt.cpan.org #96569]
+	- t/readline.t: comment-out stty-command calls. 
+	- t/history.t, t/readline.t: print out the corresponding
+          section names in the manuals of the libraries.
+	- eg/perlsh: use 'IO' instead of 'FILEHANDLE' which Perl 5.20
+	  warns. [rt.cpan.org #100883]
+	- fix copyright notices to use the year of first publication.
+
+1.24  2014-03-23
+	- fix not to make the PerlIO layer empty for Perl 5.8.9 or
+          before. [rt.cpan.org #59832]
+	- update Pod document assuming the use of Pod::Simple::HTMLBatch.
+	- t/00checkver.t: not to use 'display-readline-version' and "use
+	  Test;"
+	- INSTALL: add "(Install) Using Package" section.
+
+1.23  2014-03-20
+	- add description of the pager command bug in Perl debugger
+	  which causes segementation fault [rt.perl.org #121456]
+	- fix not to clobber binmode layer (utf-8) on filehandles [rt.cpan.org #59832]
+	- support UTF-8 input as compatible with Term::ReadLine
+	  - Now Term::ReadLine::Gnu requires perl 5.8.0 or above
+	- define Term::ReadLine::Gnu::ornaments method [rt.cpan.org #93614]
+	- Makefile.PL: Fix the URL of the bug-tracker [rt.cpan.org #93680]
+	- eg/perlsh: POD syntax fix. [rt.cpan.org #93895]
+	- README: add note for bug-tracker
+	- INSTALL: update "1.3 Trouble Shooting"
+
+1.22  2014-03-05
+	- make Kwalitee <http://cpants.cpanauthors.org/> friendly
+	  - add MakeMaker options for META.yml
+	  - add Changelog
+	  - fix POD errors
+	  - make .pm versions consistent
+	  - use "use warnings"
+	- Makefile.PL dies on the CPAN Test for OpenBSD temporarily
+          (hopefully).
+
+1.21  2014-03-02
+	- readline-6.3 support (Gnu Readline Library 6.3 requires this
+	  release or newers.)
+	    new function
+		rl_clear_history
+	    new variable
+		rl_signal_event_hook
+		rl_input_available_hook
+		rl_executing_key
+		rl_executing_keyseq
+		rl_key_sequence_length
+		rl_change_environment
+		rl_filename_stat_hook
+	- readline-6.1 support
+	    new function
+		rl_free_keymap (enabled)
+	    new variable
+		rl_filename_rewrite_hook (now implemented)
+	- make the following variables read-only.: rl_executing_macro,
+          history_length, rl_readline_state, rl_explicit_arg,
+	  rl_numeric_arg, rl_editing_mode
+	- Improve backward compatiblity variable and function definitions.
+	- Fix Term::ReadLine::Gnu::XS::_trp_completion_function not to
+	  perform a case-sensitive filter. [rt.cpan.org #72378]
+	- fix Gnu.xs:rl_initialize to be compiled with Perl 5.8.5 or
+          before. [rt.cpan.org #61626]
+	- update Pod documents
+
+	- t/readline.t, t/history.t: add variable access tests.
+	- t/readline.t: consider .svn directory on filename
+          completion test and to set the standard tty setting before
+          re_initialize() being called.
+	- eg/perlsh makes use of the deferred signal (safe signal)
+          feature.
+
+	- Maefile.PL checks whether the xmalloc exported by readline
+	  is indeed called 'xmalloc' or whether it has been renamed to
+	  '_rl_malloc'. [rt.cpan.org #65973]
+	- Makefile.PL: add -DTRL_READLINE_VERSION to show GNU Readline
+          Library version in CPAN Tester Reports.
+	- t/00checkver.t: let messages go to stdout.
+
+	- README: add project home page URL and remove out-of-date
+          descriptions.
+	- INSTALL: add a section "Install on Mac OS X"
+
+1.20  2010-05-02
+	- Make a copy of the environment variable array to stop
+          segmentation faults on some systems (ex. FreeBSD)
+	- t/readline.t skip the test of rl_readline_version for GNU
+	  Readline Library 6.1 which may return a wrong value [rt.cpan.org #54977]
+	- readline-6.1 support
+	    new function
+		rl_free_keymap (disabled due to readline-6.1 bug)
+	    new variable
+		rl_filename_rewrite_hook (not implemented yet)
+
+1.19  2009-03-21
+	- make sure the outstream fd inside the readline library is in
+          sync [rt.cpan.org #16440]
+	- fixes to be more CPAN Testers friendly
+	  - t/readline.t does not use visible bell for "make test"
+	  - Makefile.PL requires perl 5.7.0 or later.  (Use
+	    Term::ReadLine::Gnu-1.09 for older Perl.)
+	  - Makefile.PL exits 0 when /dev/tty cannot be opened.
+	- INSTALL
+	    add description of the -DPERL_USE_SAFE_PUTENV issue.  If
+	    you encounter a segmentation fault, read it. [rt.cpan.org #37194]
+
+1.18  2009-02-27
+	- better error checking of Makefile.PL for automatic testing
+	  on non-supported platfrom (for example one without GNU
+	  Readline Library).
+	- readline-6.0 support
+	    new function
+		rl_save_state (not supported yet)
+		rl_restore_state (not supported yet)
+		rl_echo_signal_char
+	    new variable
+		rl_display_prompt
+		rl_sort_completion_matches
+		rl_completion_invoking_key
+	    t/history.t does not fail by hist_expand() which is fixed
+	    on readline-6.0
+
+1.17  2008-02-07
+	- Unnecessary PerlIO_releaseFILE() calls are removed.  This
+          fix prevents `make test' from failing on Perl 5.10.
+	- Makefile.PL now fails with the EditLine Library on MacOS X.
+          Use the GNU Readline Library. [rt.cpan.org #28523]
+	- tested with readline-5.2 (which has no new feature to be
+          supported).
+
+1.16  2006-04-02
+	- fix Makefile.PL to work with the latest Cygwin.
+         (Use 1.15 for old Cygwin.)
+	- readline-5.1 support
+	    new function
+		variable_value
+		reset_screen_size
+	    new variable
+		prefer_env_winsize
+
+1.15  2004-10-17
+	- readline-5.0 support
+	    new function
+		bind_key_if_unbound
+		bind_keyseq
+		bind_keyseq_if_unbound
+		tty_unset_default_bindings
+		add_history_time
+		history_get_time
+	    new variable
+		history_write_timestamps
+		completion_quote_character
+		completion_suppress_quote
+		completion_found_quote
+		completion_word_break_hook
+	- double IO stream close bug fix (more use of PerlIO) [rt.cpan.org #7672]
+	- warning on 'use Term::ReadLine::Gnu;'.
+
+1.14  2003-03-16
+	- kludge not to cause segmentation fault on Perl 5.8.0
+          w/PerlIO and FileHandle (ex. CPAN.pm)
+	- clean up Makefile.PL (use strict, fix for HPUX and FreeBSD,
+          fix typo, etc.)
+
+1.13  2002-07-27
+	- readline-4.3 support
+	    new variables
+		rl_completion_suppress_append
+		rl_completion_mark_symlink_dirs
+	    new functions
+		rl_replace_line()
+		rl_completion_mode()
+	- tgetstr() calls tput() to apply padding information.  No
+	  more "$<2>" on prompt.
+	- shadow_redisplay() with ornament works on xterm.
+
+1.12  2002-03-30
+	- add '-static' flag to 'LDDFLAGS' on Cygwin 1.3.
+	- shadow redisplay does not pester you with warning on a poor
+	  terminal, or a terminal with wrong TERM environment variable
+	  setting.
+	- update documents
+	- improve coding style of Gnu.xs. (indentation style, more
+          typemap, etc.)
+
+1.11  2001-10-27
+	- fix bug of filename-list.  Now works with perldb.
+	- by setting rl_line_buffer, proper value are set in rl_end
+	  and rl_point.
+	- add history-expand-line command
+	- readline-4.2a support
+	    new variable
+		rl_readline_version
+	    new function
+		rl_get_termcap
+
+1.10  2001-04-22
+	- readline-4.2 support
+	    new variables
+		rl_attemped_completion_over
+		rl_completion_type
+		rl_deprep_term_function
+		rl_directory_rewrite_hook
+		rl_dispatching
+		rl_editing_mode
+		rl_executing_macro
+		rl_explicit_arg
+		rl_gnu_readline_p
+		rl_num_char_to_read
+		rl_numeric_arg
+		rl_prep_term_function
+		rl_readline_state
+		history_word_delimiters
+	    new functions
+		rl_add_funmap_entry
+		rl_alphabetic
+		rl_clear_pending_input
+		rl_crlf
+		rl_deprep_terminal
+		rl_execute_next
+		rl_expand_prompt
+		rl_get_screen_size
+		rl_macro_bind
+		rl_macro_dumper
+		rl_prep_terminal
+		rl_push_macro_input
+		rl_set_keyboard_input_timeout
+		rl_set_paren_blink_timeout(usec)
+		rl_set_prompt
+		rl_set_screen_size
+		rl_setkey
+		rl_show_char
+		rl_tty_set_default_bindings
+		rl_tty_set_default_bindings
+		rl_variable_bind
+		rl_variable_dumper
+	    rename functions
+		free_undo_list()		-> rl_free_undo_list()
+		ding()				-> rl_ding()
+		completion_matches()		-> rl_completion_matches()
+		filename_completion_function	-> rl_filename_completion_function()
+		username_completion_function	-> rl_username_completion_function()
+		max_input_history		-> history_max_entries
+
+	- fix bug when ornament string does not use any control characters.
+	- add Gnu/euc_jp.pm which is still experimental.
+	- typemap: redefine FILE * to support perl 5.7.
+
+1.09  2000-04-04
+	- Perl-5.6 now does not warn without `POLLUTE=1' during `perl
+          Makefile.PL'.  (Thanks to PPPort.)
+	- change the default terminal escape sequence to stop
+          underline.
+	- support rl_already_prompted and rl_on_new_line_with_prompt()
+	  which are introduced by readline-4.1-beta.
+	- support rl_funmap_names() and rl_last_func.
+	- update documentation.
+
+1.08  1999-12-30
+	- fix Makefile.PL to search libreadline.* correctly even if it
+	  is not included in the paths specified with the configuration
+	  variable `libpth'.
+	- add dummy assignment to %ENV before $self->initialize()
+
+1.07  1999-07-19
+	- search path for the GNU Readline Library is specified by
+	  command line argument instead of editing Makefile.PL.
+	- fix bug of t/readline.t which warns for the GNU Readline
+	  version 2.1.
+	- Makefile.PL now looks for shared libraries not only for
+	  static ones
+	- add support for Cygwin b20.1 and HPUX (HPUX support may be
+	  incomplete.)
+	- no change on Gnu.pm and Gnu.xs
+
+1.06  1999-05-05
+	- fix a bug which causes segmentation fault when
+	  completion_matches() returns long list.
+	- fix a bug which causes segmentation fault when
+	  perl subroutine returns a list of undef in
+	  attempted_completion_function_wrapper().
+	- disable Autosplit for AutoLoad.pm bug distributed with Perl
+	  5.004 or earlier.
+	- add check if perl is configured with sfio to Makefile.PL.
+
+1.05  1999-04-04
+	- bug fix
+		Term::ReadLine::Perl compatibility variable
+		`completion_function' and function `rl_filename_list' are
+		now compatible with Term::ReadLine::Perl.  Completion code
+		written for Term::ReadLine::Perl, e.g. perl5db.pl, works
+		with this module.
+
+		search text of list_completion is quoted
+	
+	- add support of new variables and functions introduced by GNU
+	  Readline Library Version 4.0
+	    new variable
+		rl_erase_empty_line
+		rl_catch_signals
+		rl_catch_sigwinch
+		rl_pre_input_hook
+		completion_display_matches_hook
+		history_inhibit_expansion_function
+	    new function
+		rl_display_match_list()
+		rl_cleanup_after_signal()
+		rl_free_line_state()
+		rl_reset_after_signal()
+		rl_resize_terminal()
+		rl_set_signals()
+		rl_clear_signals()
+	
+	- add support of variables and function which were not supported
+	  yet
+		filename_quoting_function
+		filename_dequoting_function
+		char_is_quoted_p
+		ignore_some_completions_function
+		directory_completion_hook
+
+	  	rl_get_all_function_names()
+
+	- add support of functions which are specific to Term::ReadLine::Gnu
+		display_readline_version()
+		change_ornaments()
+		shadow_redisplay()
+
+	- rename some functions for the orthogonality
+		rl_unbind_function_in_map to rl_unbind_function
+		rl_unbind_command_in_map to rl_unbind_command
+
+	- `make test' is executed non-interactively and comprehensively
+	
+	- sample code improvement
+	  eg/perlsh
+	  	Perl symbol completion was rewritten and much more
+		improved.
+		SIGINT clears the current line
+		add support \w (current working package) in the prompt
+		string
+		add support `afterinit' hook as Perl debugger.
+	
+	  eg/pftp
+		password input is now invisible.
+		displaying of completion candidates are improved by using
+		completion_display_matches_hook.
+	
+	- internal changes
+		Perl code for Term::ReadLine::Gnu::XS package are moved
+		into separate file Gnu/XS.pm and `AutoSplit'ed.
+	
+		replace operate_and_get_next() to one borrowed from bash.
+	
+1.04  1999-02-23
+	- fix a bug by which $if-$endif feature in ~/.inputrc was
+	  disabled.
+	- works with GNU Readline Library version 4.0 in which some
+	  function names were changed.  New functions, that are
+	  introduced in the new library, were not supported in this
+	  release.
+
+1.03  1998-09-27
+	- fix a bug when prompt string includes non-printing
+	  characters and an input line is longer than terminal width.
+	  Constants, RL_PROMPT_START_IGNORE and RL_PROMPT_END_IGNORE,
+	  are incorporated from the GNU Readline Library to support
+	  this feature.
+	- now works on a system which does not have /etc/termcap and
+	  has termcap compatible library, libncurses or libcurses.
+
+1.02  1998-08-14
+	- fix a bug in Makefile.PL, which quoted a variable, $increadlinedir,
+	  with a pair of single quotes
+	- this is an internal revision
+
+1.01  1998-05-13
+	- support readline-2.2
+		add rl_unbind_function_in_map() and rl_unbind_command_in_map()
+		Makefile.PL checks the version of the GNU Readline Library
+	- define rl_save_prompt() and rl_restore_prompt()
+	- document fix
+		'Changes' file is removed.  It is merged into README file.
+		fix a bug in a sample program of rl_completion_entry_function
+
+1.00  1998-04-15
+	- the 1st major release
+	- ornaments feature is now on by default as recent
+	  Term::ReadLine and Term::ReadLine::Perl
+	- document fix
+		remove description related to mymalloc
+	- add ornaments-change function to t/readline.t which
+	  demonstrates rl_message().
+
+0.10  1998-03-31
+	- new functions/variables
+		ornaments support
+		newTTY() (not tested)
+		max_input_history
+		read_history() (an aliase of read_history_range())
+		unstifle_history()
+		history_search_pos()
+		history_list()
+		history_tokenize() (Thank you, Tim Thomas)
+		history_arg_extract()
+		get_history_event()
+	- new sample/test programs
+		eg/fileman
+		t/history.t
+	- bug fix
+		dynamic loading works on Solaris2.x (define xfree() locally)
+		readline() calls add_history() only when MinLength > 0
+		Feature `addhistory' is renamed to `addHistory' since
+		Term/ReadLine.pm is fixed.
+		add NULL check for all sv_setpv()
+		remove arguments 'pos' from history_search()
+	- misc
+		change my E-mail address
+
+0.09  Mon Aug 25 00:33:29 1997
+	- add documentation about readline-2.1.tar.gz
+	- add documentation about Solaris 2.5 with dynamic loading
+	- bug fix
+		fix for Digital Unix C compiler
+	- add two sample programs
+		eg/pftp		An ftp client with the GNU Readline support
+		eg/ptksh+	Simple perl/Tk shell which demonstrates
+				the callback functions
+
+0.08  Sun Apr 13 23:24:52 1997
+	- bug fix: AddHistory() accepts list again.
+	- move perlsh into eg/.
+	- add eg/ptksh+ which demonstrates the callback functions.
+	  Thank you Achim.
+	- add eg/pftp: an ftp client which has much the GNU Readline support.
+	- Author's Email address is changed.
+	- internal functions, fetch_var() and store_var(), are removed.
+
+0.07  Wed Mar 19 02:26:06 1997
+	- interface to internal function and variables are changed.
+	  New interface is compatible with new Term::ReadLine.pm which
+	  is distributed with Perl 5.003_92 and later.  But it is not
+	  compatible with previous release.
+
+		- add method interface to all internal function
+		- add Attribs method to access internal variables
+		- EXPORT_OK contains only some constant definitions
+
+	- tkRunning support (new ReadLine.pm is required)
+	- add document
+	- bug fixes
+		- XS bugs correspond to callback interface
+		- fix _rl_store_function() and _rl_fetch_function()
+		- fix prototype of append_history
+		- use new _rl_store_rl_line_buffer() instead of
+		  reallocate rl_line_buffer.
+		- etc.
+
+0.06  Wed Feb  5 01:26:27 1997
+	- the first revision on CPAN
+	- support for non ANSI C compiler
+	- rename addhistory to AddHistory
+	- checked by gcc -Wall
+	- fix void_arg_func_wrapper()
+	- add hook for rl_startup_hook in readline()
+	- update documents
+
+0.05  Sat Jan 25 00:06:56 1997
+	- Fix for Perl 5.002 and 5.003
+		escape from an strange Exporter's behavior 
+		remove white spaces in prototype
+		add argument explicitly
+
+0.04  Thu Jan 23 00:25:45 1997
+	- This revision supports readline-2.1 or later.  readline-2.0
+	  is not supported.
+	- implement almost all GNU Readline/History Library variables
+	  and functions
+	- use filehandle directly to access rl_instream and rl_outstream
+	- define operate_and_get_next and bind to "\C-o" by default
+
+0.03  Sun Nov 24 23:34:27 1996
+	- OS/2 support by Ilya Zakharevich <ilya@math.ohio-state.edu>
+	- implement $rl_completer_word_break_characters
+	- define HAVE_STRING_H by checking $Config{strings}
+	- remove verbose prototypes on methods
+
+0.02  Thu Nov 21 00:22:11 1996
+	- fix to install on
+		SunOS 4.1.3, Solaris 2.3, AIX 4.1.3
+
+0.01  Wed Nov 20 01:14:09 1996
+	- The 1st alpha release revision (tested on Linux 1.2.13)

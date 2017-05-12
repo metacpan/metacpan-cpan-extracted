@@ -1,0 +1,11 @@
+Changes
+lib/Template/Provider/Encode.pm
+lib/Template/Provider/Encode/Guess.pm
+Makefile.PL
+MANIFEST
+README
+t/00-compile.t
+t/01-sjis2utf8.t
+t/02-guess.t
+t/tmpl/SJIS.tt2
+META.yml                                 Module meta-data (added by MakeMaker)

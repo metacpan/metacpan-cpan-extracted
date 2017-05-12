@@ -1,0 +1,5 @@
+Starting the for loop.
+<: for x in 3 :>
+<: include "for_include_special_vars_context_included.txt" y=x.__inner__ :>
+<: endfor :>
+Ending the for loop.

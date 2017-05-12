@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Test::More 'tests' => 4;
+
+is('expected','expected','Expected result OK');
+is('expected','unexpected','Unexpected result not OK');
+
+TODO: {
+    local $TODO = 'Making sure this test is still marked fail, not todo pass';
+    pass('whoop deee');
+}
+
+SKIP: {
+    skip('cuz I can',1);
+    fail('har har');
+}
+
+0;

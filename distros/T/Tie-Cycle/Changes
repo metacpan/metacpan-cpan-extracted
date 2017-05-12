@@ -1,0 +1,88 @@
+Revision history for Perl module Tie::Cycle
+
+1.224 2017-04-18T11:41:22Z
+	* Fix up various dist things and clarify that this is under
+	the Artistic License 2.0.
+
+1.222 2017-01-20T11:30:37Z
+	* The module seems to have disappeared from CPAN, so I'm
+	re-uploading.
+
+1.221 2016-02-02T21:17:53Z
+	* Freshen distro
+
+1.21 - 2014-10-03
+	* Update Makefile for better META data
+
+1.20 - 2014-08-16
+	* Bump to user version
+
+1.19_01 - 2013-09-02
+	* Take out // (5.10 feature I used without thought) to restore
+	5.8 compatibility.
+
+1.19 - 2013-08-27
+	* Update for modern usage, better code
+	* I use this as an example in Mastering Perl, so I shouldn't
+	leave embarrassing practices in the code. :)
+
+1.17 - 2009-01-30
+	* Updated the docs for the move to Github
+	* There aren't any code changes
+
+1.16 - 2007-10-27
+	* distro cleanups after moving from CVS to SVN
+
+1.15 - 2007-03-18
+	* Cleaning dist for new SVN repository
+	* No need to upgrade
+
+1.14 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.13 - 2006-05-17
+	* Minor cleanups in docs, copyright, and pod testing. No need to
+	upgrade.
+
+1.12 - 2005-03-08
+	* Added POD coverage tests.  No need to upgrade
+
+1.11 - 2005-01-03
+	* Previously, this module refused to work unless the input array had
+	more than one element.  What's the point of cycling otherwise?  I've
+	removed that restriction, though, because I shouldn't be the one who
+	gets to decide that.  A one element array should get a chance to act
+	like any other array.  It just happens to have one element.
+
+1.09 - 2004-09-02
+	* Just some distribution fixes.  No need to upgrade.
+
+1.07 - 2004-01-31
+	* No code changes.
+	* Removed dependencies on Test::Manifest, Test::Pod and
+	  File::Find::Rule.
+	* Fixed some warnings in tests.
+
+1.06 - 2002-12-17
+	* cycle.t test was actually one from Tie::Toggle.  it is not
+	the right test.
+
+1.05 - 2002-12-17
+	* removed 'require 5.6.0' (perl5.8 complains about v-strings)
+	* beefed up distribution files
+	* no code changes --- no need to install if you already have this
+
+0.05 - 2002-08-14
+	* added reset() method for underlying object so Andy
+	Lester can do HTML table tricks
+	* since I was there, I added previous() and next()
+	methods so you can peek at values without affecting
+	the position.
+
+0.02 - 2001-01-24
+	* minor doc fixes
+
+0.01 - 2000-08-12
+	* original version; created by h2xs 1.20 with options -AXn Tie::Cycle
+

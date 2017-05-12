@@ -1,0 +1,38 @@
+Test-WWW version 0.11
+=====================
+
+Test::WWW is a basic module for the testing of Web applications. It is based
+on a combination of WWW::Mechanize and Test::Builder, allowing it to be used
+in conjunction with any other of the Test::Builder-based mechanisms.
+
+In particular it includes the simple_scan utility, a test generator program 
+that allows people who are not particularly familiar with Perl to code 
+basic page tests.
+
+Both Test::WWW::Simple and simlpe_scan provide a means of controlling whether
+or not page fetches are cached; using caching for pages which do not change
+on each fetch can dramatically decrease the runtime of tests which do multiple
+checks on the same URL.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+  WWW::Mechanize (available from CPAN)
+  Test::Builder (supplied with most Perl 5.6 and up installations)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Yahoo!
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

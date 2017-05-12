@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Hash::ImmutableKeys.
+
+0.01  Wed Jun  6 16:32:21 2007
+	- original version; created by h2xs 1.23 with options
+		-AXn Tie::Hash::ImmutableKeys
+

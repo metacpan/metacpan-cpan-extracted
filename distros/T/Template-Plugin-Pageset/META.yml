@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Template-Plugin-Pageset
+version: 1.02
+author:
+  - Chunzi <chunzi@chunzi.org>
+abstract: wrapper for Data::Page::Pageset
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

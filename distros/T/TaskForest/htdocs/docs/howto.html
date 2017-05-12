@@ -1,0 +1,217 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">HOWTO</div>
+
+  <ul>
+    <li><a href="#cron">Run taskforest all day with cron</a></li>
+    <li><a href="#genpasswd">Allow a user to view the web site</a></li>
+    <li><a href="#start">Start the web server</a></li>
+    <li><a href="#stop">Stop the web server</a></li>
+    <li><a href="#cert">Create a self-signed certificate with openssl</a></li>
+    <li><a href="#release">Force a job to run NOW</a></li>
+    <li><a href="#prevent">Temporarily prevent a job from running</a></li>
+  </ul>
+
+  <div class="new_section_header"><a name="cron">Run taskforest all day with cron</a></div>
+
+  <p>
+    This is the kind of line I have in my crontab:
+  </p>
+
+  <div class="code"><pre><code>02 00 * * * /a/b/taskforest --config_file=/b/c/taskforest.cfg</code></pre></div>
+
+  <div class="new_section_header"><a name="genpasswd">Allow a user to view the web site</a></div>
+
+  <p>
+    Please make sure you read the section
+    entitled <a href="/docs/webSecurity.html">"Web Server Security"</a>
+    for important security considerations.
+  </p>
+
+  <p>
+    Having said that, : The userids and passwords are specified in the
+    <a href="/docs/runningTaskForestd.html#config_file">configuration
+    file</a> using the same format as Apache's .htpasswd files. You can
+    see <a href="/docs/runningTaskForestd.html#valid_user">commented-out
+    examples</a> of this in the configuration
+    file <a href="/docs/runningTaskForestd.html#config_file">taskforestd.cfg</a>. For
+    your convenience, the TaskForest distribution includes a program
+    called <code>gen_passwd</code> that generates text that you can copy
+    and paste into the config file:
+  </p>
+  
+  <div class="code"><pre><code>gen_passwd foo bar</code></pre></div>
+
+  <p>
+    The above command will print out somthing that looks like the
+    following;
+  </p>
+
+  <div class="code"><pre><code>foo:4poVZGiAlO1BY</code></pre></div>
+
+  <p>
+    This text can then be copied and pasted into the configuration file.
+  </p>
+
+  <p>
+    Make sure you stop the server and restart it after making any changes
+    to the configuration file.
+  </p>
+
+  <div class="new_section_header"><a name="start">Start the web server</a></div>
+
+  <p>
+    To start the web server, run the taskforestd program with
+    the <code>--config_file</code> and <code>--start</code> options. For
+    example:
+  </p>
+
+  <div class="code"><pre><code>taskforestd --config_file=taskforestd.cfg --stop
+        
+OR
+        
+taskforestdssl --config_file=taskforestd.cfg --stop</code></pre></div>
+  
+
+  <div class="new_section_header"><a name="stop">Stop the web server</a></div>
+
+  <p>
+    To stop the web server, run the <code>taskforestd</code> program
+    with the <code>--config_file</code> and <code>--stop</code>
+    options. For example:
+  </p>
+
+  <div class="code"><pre><code>taskforestd --config_file=taskforestd.cfg --stop
+
+OR
+        
+taskforestdssl --config_file=taskforestd.cfg --stop</code></pre></div>
+
+  <div class="new_section_header"><a name="cert">Create a self-signed certificate with openssl</a></div>
+
+  <p>
+    This is what works for me (instructions found at <a href="http://www.modssl.org/docs/2.8/ssl_faq.html#ToC25">http://www.modssl.org/docs/2.8/ssl_faq.html#ToC25</a> ).
+  </p>
+
+<div class="code"><pre><code>
+1) Create a server key
+
+openssl genrsa -des3 -out server.key.en 1024
+
+2) Make a decrypted version of it
+
+openssl rsa -in server.key.en -out server-key.pem
+
+3) Create a CSR (Certificate Signing Request)
+
+openssl req -new -key server-key.pem -out server.csr
+
+4) Create a CA Private Key
+
+openssl genrsa -des3 -out ca.key.en 1024
+
+5) Create a decrypted version of it
+
+openssl rsa -in ca.key.en -out ca.key
+
+6) Create a 10-yr self-signed CA cert with the CA key
+
+openssl req -new -x509 -days 3650 -key ca.key -out my-ca.pem
+
+7) Sign the CSR
+
+sign.sh server.csr
+
+   The sign.sh program can be found in the
+   pkg.contrib/ subdirectory of the mod_ssl
+   distribution.  It is not clear whether or not I
+   can include that script in this distribution,
+   so for now at least, you'll have to use your
+   own copy.  Make sure you specify the locations
+   of the files in the taskforestd configuration
+   file.
+</code></pre></div>
+
+
+
+  <div class="new_section_header"><a name="release">Force a Job to run NOW</a></div>
+
+  <p>
+    Let's say you have a job J4 that depends on 3 other jobs - J1, J2 and
+    J3.  Normally, that setup is fine, but today you really want the job
+    to run now.  You don't care whether J1, J2 and J3 run successfully or
+    not, as far as J4 is concerned.  What you need to do is release all
+    the dependencies off J4.  You also don't want to make a permanent
+    change to the family file.
+  </p>
+  <p>
+    This means that regardless of what job dependencies or time
+    dependencies J4 has, when you release all its dependencies, it will
+    run the very next time TaskForest checks to see if there are any jobs
+    that need to be run (determined
+    by <a href="/docs/configuring/options.html#wait_time"><code>wait_time</code></a>).
+    It's as if those dependencies never existed.
+  </p>
+  <p>
+    A release 'request' is only valid once - once J4 runs, the system has
+    no 'memory' of the fact that J4's dependencies were released.  It will
+    not change the behavior of the rest of the family.  If J5 depends on
+    J4, then J5 will be ready to run, even if J1, J2 and J3 haven't run
+    yet. To release all dependencies from a job, run the following
+    command:
+  </p>
+
+  <div class="code"><pre><code>release --log_dir=l_d --job=Ff::Jj --family_dir=f_d</code></pre></div>
+
+  <p>
+    where <code>l_d</code> is the log directory and <code>Ff</code> is the
+    family name and <code>Jj</code> is the job name and <code>f_d</code>
+    is the family_directory.  Dependencies on a job will only be released
+    if the job is in the 'Waiting' state.
+  </p>
+
+  <p>
+    You can also use the "Release" button on the 'Status' or 'View Logs'
+    page on the web site to release all dependencies off a job.
+  </p>
+
+  <p>
+    Remember: no changes are made to the Family file.  So next time this
+    family runs, J4 will still depend on J1, J2 and J3, just like it
+    always did.
+  </p>
+
+
+
+
+
+
+
+
+  <div class="new_section_header"><a name="prevent">Temporarily prevent a job from running</a></div>
+
+  <p>
+    To temporarily prevent a job from running, you need
+    to <a href="hold.html">put it on hold</a>.  When you put a job on
+    hold, it will not run even if all its dependencies are met.  It will
+    only be run after the hold is <a href="releaseHold.html">released</a>.
+    Even after the hold is released, its dependencies need to be met (or
+    you need to force a run by <a href="release.html">releasing all
+    dependencies</a>).  To hold a job, enter the following command:
+  </p>
+
+  
+
+</div>
+
+
+
+
+<div class="clear_both"></div>
+
+
+
+<include TaskForest::REST::PassThrough /foot.html />

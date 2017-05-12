@@ -1,0 +1,192 @@
+See the documentation.txt file for detailed information regarding
+this module.
+
+Some examples of vertical sizes available (sizes 1-5 are available,
+but 4 & 5 are huge and won't be included here)
+
+
+
+[ SIZE 1 ]
+
+      T
+      T
+      T
+TTTTTTT
+      T
+      T
+      T
+       
+eeeeee 
+e  e e 
+e  e e 
+e  e e 
+e  e e 
+e    e 
+       
+ s  s  
+s  s s 
+s  s s 
+s  s s 
+s  s s 
+ ss    
+       
+       
+     t 
+     t 
+tttttt 
+     t 
+     t 
+
+
+
+
+[ SIZE 2 ]
+
+            TT
+            TT
+            TT
+            TT
+            TT
+            TT
+TTTTTTTTTTTTTT
+TTTTTTTTTTTTTT
+            TT
+            TT
+            TT
+            TT
+            TT
+            TT
+              
+              
+eeeeeeeeeeee  
+eeeeeeeeeeee  
+ee    ee  ee  
+ee    ee  ee  
+ee    ee  ee  
+ee    ee  ee  
+ee    ee  ee  
+ee    ee  ee  
+ee    ee  ee  
+ee    ee  ee  
+ee        ee  
+ee        ee  
+              
+              
+  ss    ss    
+  ss    ss    
+ss    ss  ss  
+ss    ss  ss  
+ss    ss  ss  
+ss    ss  ss  
+ss    ss  ss  
+ss    ss  ss  
+ss    ss  ss  
+ss    ss  ss  
+  ssss        
+  ssss        
+              
+              
+              
+              
+          tt  
+          tt  
+          tt  
+          tt  
+tttttttttttt  
+tttttttttttt  
+          tt  
+          tt  
+          tt  
+          tt  
+
+
+
+
+[ SIZE 3 ]
+
+
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+TTTTTTTTTTTTTTTTTTTTT
+TTTTTTTTTTTTTTTTTTTTT
+TTTTTTTTTTTTTTTTTTTTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                  TTT
+                     
+                     
+                     
+eeeeeeeeeeeeeeeeee   
+eeeeeeeeeeeeeeeeee   
+eeeeeeeeeeeeeeeeee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee      eee   eee   
+eee            eee   
+eee            eee   
+eee            eee   
+                     
+                     
+                     
+   sss      sss      
+   sss      sss      
+   sss      sss      
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+sss      sss   sss   
+   ssssss            
+   ssssss            
+   ssssss            
+                     
+                     
+                     
+                     
+                     
+                     
+               ttt   
+               ttt   
+               ttt   
+               ttt   
+               ttt   
+               ttt   
+tttttttttttttttttt   
+tttttttttttttttttt   
+tttttttttttttttttt   
+               ttt   
+               ttt   
+               ttt   
+               ttt   
+               ttt   
+               ttt
+

@@ -1,0 +1,131 @@
+[[PageOutline(1-2)]]
+
+= Development in general =
+
+We are using Subversion for version control.
+The main development of Padre is in the trunk [http://svn.perlide.org/padre/trunk/Padre] but there are several 
+additional projects and almost all the plugins of Padre also live in the same repository so the best if you check 
+out the whole trunk [http://svn.perlide.org/padre/trunk]
+
+{{{
+$ svn co http://svn.perlide.org/padre/trunk padre
+}}}
+
+Then you can run the standard CPAN module process:
+
+Make sure you have all of the needed prerequisites. See [http://padre.perlide.org/trac/wiki/Download]
+
+{{{
+$ cd padre/Padre
+$ perl Makefile.PL      # which will tell about all the missing dependencies of Padre
+                        # this may fail if you don't have Module::Install
+                        # if so, start cpan and install it with all its prerequisites
+$ make
+$ make test
+}}}
+
+For a more detailed set of instructions on how to install the dependencies visit the [wiki:Download]
+
+Once all the above works well you can launch Padre from the SVN tree by running
+{{{
+$ perl dev
+}}}
+
+dev has some more parameters you can see by typing
+{{{
+$ perl dev -h
+}}}
+
+The most important being
+{{{
+$ perl dev -a
+}}}
+that will include the path to all the plugins located in trunk/
+
+
+== Coding ==
+
+See the http://search.cpan.org/dist/Padre/lib/Padre/Manual/Hacking.pod file for Core Padre development
+and http://search.cpan.org/dist/Padre/lib/Padre/Plugin.pm for Plugin development.
+
+== Translation ==
+
+Translation is basically part of the development effort. For more details please take a look at this page:
+See [wiki:TranslationIntro]
+
+== Documentation ==
+
+The documentation of Padre is standard POD embedded in the .pm files. If you'd like to 
+improve those you should check out the source code of Padre as described above and send
+patches or ask for commit bit. The documentation is part of the regular development process.
+
+
+== QA/Testing ==
+
+Unfortunately Padre has not enough automated test mostly due to the fact that 
+we hardly know how to test GUI applications. The existing tests are located 
+in the standard t/ directory. 
+If you'd like to help in this and if you are on Windows you could take a look at the 
+t/win32/ directory where we have a few tests written using Win32::GUItest.
+You would be very highly regarded if you improved the test coverage of Padre!!
+
+== Release Management ==
+
+See separate page about [wiki:Release]
+
+
+= Development in a branch =
+
+Most of our development is done on the trunk but occasionally we prefer to make our private corner for experimental changes
+or changes that might not be stable for some time.
+Instructions on how to do that:
+
+Create a branch and work on it:
+
+Assuming you have already checked out http://svn.perlide.org/padre/trunk/ to /path/to/padre
+
+{{{
+$ svn cp http://svn.perlide.org/padre/trunk/Padre http://svn.perlide.org/padre/branches/My-branch -m'some messages'
+$ cd /path/to/padre/Padre
+$ svn switch http://svn.perlide.org/padre/branches/My-branch .
+}}}
+
+If you run 
+{{{
+svn st ..
+}}}
+
+You will see a letter S infront to the Padre directory as that one is switched.
+
+Now you can edit, test and commit as usual. Your changes will be committed to the branch.
+
+
+When done and you would like to merge your changes
+
+1. Make sure everything is committed
+
+{{{
+$ cd /path/to/padre/Padre
+$ svn switch http://svn.perlide.org/padre/trunk/Padre
+$ svn log --stop-on-copy http://svn.perlide.org/padre/branches/My-branch
+}}}
+
+This will show you the changes you made on the branch. Take the FIRST and LAST revision numbers in this log and
+use the following command to see the full change you made:
+{{{
+svn diff -rFIRST:LAST http://svn.perlide.org/padre/branches/My-branch
+}}}
+
+use the following to merge it back to trunk
+{{{
+svn merge -rFIRST:LAST http://svn.perlide.org/padre/branches/My-branch .
+svn commit -m'merged  -rFIRST:LAST http://svn.perlide.org/padre/branches/My-branch '
+svn rm http://svn.perlide.org/padre/branches/My-branch -m'My-branch is not needed any more'
+}}}
+
+If you decided it was a dead-end you can just switch back to trunk and remove the branch.
+
+== Tickets ==
+
+[[TicketQuery(component=development,order=id,desc=1,format=table,col=resolution|summary|owner|reporter)]]
+

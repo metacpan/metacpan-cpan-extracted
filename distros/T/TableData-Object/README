@@ -1,0 +1,25 @@
+FUNCTIONS
+
+ table($data[ , $spec ]) => obj
+
+    Shortcut for TableData::Object->new(...).
+
+METHODS
+
+ new($data[ , $spec ]) => obj
+
+    Detect the structure of $data and create the appropriate
+    TableData::Object::FORM object.
+
+SEE ALSO
+
+    TableData::Object::Base for list of available methods.
+
+    TableData::Object::aos
+
+    TableData::Object::aoaos
+
+    TableData::Object::aohos
+
+    TableData::Object::hash
+

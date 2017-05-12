@@ -1,0 +1,9 @@
+Changes
+Script.pm
+MANIFEST
+Makefile.PL
+README
+grammar.yp
+lib/Text/Flowchart/Script/Lexer.pm
+lib/Text/Flowchart/Script/Parser.pm
+test.pl

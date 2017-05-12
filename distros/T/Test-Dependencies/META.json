@@ -1,0 +1,90 @@
+{
+   "abstract" : "Verify dependencies in META.yml or cpanfile",
+   "author" : [
+      "Erik Huelsmann <ehuels@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Dependencies",
+   "optional_features" : {
+      "Heavy" : {
+         "description" : "\"Heavy\" dependency search policy",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "B::PerlReq" : "0",
+                  "PerlReq::Utils" : "0"
+               }
+            }
+         },
+         "x_default" : "0"
+      },
+      "Legacy" : {
+         "description" : "Legacy (no-arguments) ok_dependencies() invocation",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "CPAN::Meta" : "0",
+                  "File::Find::Rule::Perl" : "0"
+               }
+            }
+         },
+         "x_default" : "1"
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta::Requirements" : "2.120620",
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "B::PerlReq" : "0",
+            "CPAN::Meta" : "0",
+            "File::Find::Rule::Perl" : "0",
+            "PerlReq::Utils" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::Strip" : "0",
+            "perl" : "v5.10.1"
+         },
+         "suggests" : {
+            "B::PerlReq" : "0",
+            "CPAN::Meta" : "0",
+            "File::Find::Rule::Perl" : "0",
+            "PerlReq::Utils" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.30",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ehuelsmann/perl-Test-Dependencies/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ehuelsmann/perl-Test-Dependencies.git",
+         "web" : "https://github.com/ehuelsmann/perl-Test-Dependencies"
+      }
+   },
+   "version" : "0.23"
+}
+

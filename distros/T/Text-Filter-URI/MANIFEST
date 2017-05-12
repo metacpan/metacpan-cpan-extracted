@@ -1,0 +1,13 @@
+Changes
+lib/Text/Filter/URI.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.md
+t/00-load.t
+t/01-testing.t
+t/boilerplate.t
+xt/pod-coverage.t
+xt/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

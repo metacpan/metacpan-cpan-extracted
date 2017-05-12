@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Test::Standalone;
+use Getopt::Std;
+use Sysadm::Install qw(:all);
+
+main();
+
+###########################################
+sub main {
+###########################################
+   for my $file (@ARGV) {
+       open FILE, ">$file" or die "Cannot open $file";
+       print FILE "$0 was here!\n";
+       close FILE;
+   }
+}
+
+=begin test
+
+    # Test modules ...
+use Test::More tests => 1;
+use File::Temp qw(tempfile);
+
+    # Tests ...
+my($fh, $file) = tempfile();
+@ARGV=($file);
+
+main();
+is(slurp($file), "$0 was here!\n", "single file");
+
+1;
+
+=end test
+
+__END__
+
+=head1 NAME
+
+    tagger - Test script with embedded test suite
+
+=head1 SYNOPSIS
+
+        # Normal operation
+    $ tagger filename ...
+
+        # Run regression test suite
+    $ tagger --test
+
+=head1 DESCRIPTION
+
+C<tagger> is a test script and has no real purpose but demonstrating
+how to embed a regression test suite into a standalone script using
+Test::Standalone.
+
+C<tagger> will write the line "tagger was here!\n"
+into every file specified on the command line. To run the regression
+test suite instead, call C<tagger --test>.
+
+=head1 LEGALESE
+
+Copyright 2005 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2005, Mike Schilli <cpan@perlmeister.com>

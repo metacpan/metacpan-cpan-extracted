@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+lib/Test/ShellScript.pm
+t/run_step_by_step.t
+t/run_continous.t
+t/command_validation.t
+t/compat_TestMore.t
+t/compat_TestMore_no_plan.t
+t/lib/Internal.pm
+samples/run.sh
+samples/run.bat

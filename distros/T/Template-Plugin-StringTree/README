@@ -1,0 +1,131 @@
+NAME
+    Template::Plugin::StringTree - Access tree-like groups of strings
+    naturally in code and Templates
+
+SYNOPSIS
+      use Template::Plugin::StringTree;
+  
+      # Create a StringTree and set some values
+      my $Tree = Template::Plugin::StringTree->new;
+      $Tree->set('foo', 'one');
+      $Tree->set('foo.bar', 'two');
+      $Tree->set('you.get.the.point' => 'right?');
+  
+      # Get simple hash of these variables for the template
+      my $vars = $Tree->variables;
+  
+      #######################################################
+      # Later that night in a Template
+  
+      After the number [% foo %] comes the number [% foo.bar %], [% you.get.the.point %]
+  
+      #######################################################
+      # Which of course produces
+  
+      After the number one comes the number two, right?
+
+DESCRIPTION
+    For a couple of months, I had found it really annoying that when I
+    wanted to put a bunch of configuration options into a template, that I
+    couldn't use a natural [% IF show.pictures %][% IF
+    show.pictures.dropshadow %] ...etc... type of notation. Simply, to get
+    "dot" formatting in template, you need hashes. Which means stupid
+    notation like [% show.pictures.at_all %]. ugh...
+
+    As the size of the config tree I wanted to use grew and grew, it finally
+    started getting totally out of control, so I've created
+    Template::Plugin::StringTree, which lets you build tree structures in
+    which every node can have a value. And you can get at these naturally in
+    templates.
+
+METHODS
+  new
+    The "new" constructor simply creates a new ::StringTree object and
+    returns it.
+
+  get $path
+    Taking a single "this.is.a.path" argument, the "get" method returns the
+    value associated with the path, if there is one.
+
+    Returns the value for the path, if one exists. Returns "undef" if no
+    value exists at that path.
+
+  set $path, $value
+    The "set" method takes a "this.is.a.path" style path and a value for
+    that path. "undef" is valid as a value, erasing a single value at the
+    node for the path. ( It does not remove children of that node ).
+
+    Returns true if the value is set correctly, or "undef" on error.
+
+    The "add" method is nearly identical to the normal "set" method, except
+    that the it expects there NOT to be an existing value in place. Rather
+    than overwrite an existing value, this method will return an error.
+
+    Returns true if there is no existing value, and it is successfully set,
+    or "undef" if there is an existing value, or an error while setting.
+
+  hash
+    The "hash" method produces a flat hash equivalent to the
+    Template::Plugin::StringTree object, which can be passed to the template
+    parser. You can manually add additional elements to the hash after it
+    has been produced, but you should not attempt to add anything to a hash
+    key the same as the first element in a path already added via the "set"
+    method earlier.
+
+    Returns a reference to a HASH containing the tree of strings.
+
+  freeze
+    Ever good structure can be serialized and deserialized, and this one is
+    no exception. The "freeze" method takes a ::StringTree object and
+    converts it into a string, which just so happens to be highly useful as
+    a config file format!
+
+      foo: one
+      foo.bar: two
+      you.get.the.point: right?
+
+    So terribly simple. To make life just a LITTLE more complicated though,
+    Template::Plugin::StringTree does a little bit of escaping if there's a
+    newline in the string. But since you'll probably never DO that, it won't
+    be a problem will it? :)
+
+  thaw $string
+    The "thaw" method is the reverse of the "freeze" method, taking the same
+    format string turning it back into a Template::Plugin::StringTree
+    object. THIS is where using this module as a config file -> template
+    mechanism really comes into it's own. Each entry is the config file is
+    available using the same path in Template Toolkit templates.
+    Template::Plugin::StringTree takes care of all the details or making it
+    work across the different models transparently.
+
+    If the string is formatted correctly, returns a new
+    Template::Plugin::StringTree object. Returns "undef" on error, probably
+    because the string wasn't formatted correctly.
+
+  equal $path, $value
+    The "equal" method provides a quick and convenient bit of shorthand to
+    let you see if a particular path equals a particular value. And the
+    method is totally undef-safe. You can test for a value of "undef", and
+    test a value against a path which returns "undef" quite safely.
+
+    Returns true if the value matches the path, or false otherwise.
+
+SUPPORT
+    Bugs should be submitted via the CPAN bug tracker, located at
+
+      http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-StringTree
+
+    For other issues, contact the author
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2004, 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

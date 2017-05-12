@@ -1,0 +1,23 @@
+{
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "no_index" : {
+      "directory" : [ "t" ]
+   },
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Test-Mojo-WithRoles/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Test-Mojo-WithRoles"
+      }
+   }
+}

@@ -1,0 +1,66 @@
+{
+   "abstract" : "trait for lazy-built Moose attributes that are derived from another attribute",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::10 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Trait-Attribute-Derived",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "2.00",
+            "MooseX::Role::Parameterized" : "0",
+            "Sub::Install" : "0",
+            "Sub::NonRole" : "0.002",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Trait::Attribute::Derived" : {
+         "file" : "lib/Trait/Attribute/Derived.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Trait-Attribute-Derived/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Trait-Attribute-Derived"
+      },
+      "homepage" : "https://metacpan.org/release/Trait-Attribute-Derived",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-trait-attribute-derived.git",
+         "web" : "https://github.com/tobyink/p5-trait-attribute-derived"
+      }
+   },
+   "version" : "0.005"
+}

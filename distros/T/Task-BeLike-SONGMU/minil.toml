@@ -1,0 +1,6 @@
+name = "Task-BeLike-SONGMU"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+[build]
+build_class = "builder::MyBuilder"

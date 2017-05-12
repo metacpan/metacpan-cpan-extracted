@@ -1,0 +1,38 @@
+Revision history for Perl extension Text::LookUpTable.
+
+0.05  Wed, 04 Aug 2010 17:25:27 -0700
+
+  [Jeremiah Mahler]
+  * Added load_blank for creating a blank table.
+  * Added set_x_coords and set_y_coords for assigning the
+    coordinate values.
+  * documentation cleaned up
+  * change 'croak' to 'carp'
+  * added diff_*_coords operation to find differences in coordinates
+  * Removed load_file test that caused test failure by CPAN Testers
+    [http://www.cpantesters.org/cpan/report/07648452-b19f-3f77-b713-d32bba55d77f]
+
+
+0.04  Thu, 29 Jul 2010 21:37:59 -0700
+
+  [Jeremiah Mahler]
+  * fixed some typos
+
+0.03  Thu, 29 Jul 2010 15:51:47 -0700
+
+  [Jeremiah Mahler]
+  * Converted to inc::Module::Install
+
+0.02  Wed, 28 Jul 2010 15:45:51 -0700
+
+  [Jeremiah Mahler]
+  * Fixed erroneous inclusion of README.pod in to library directory.
+    Having README.pod in the main directory results in nice output
+    when uploaded to github.com.  But it is erroneously included by
+    ExtUtils::MakeMaker in to the lib directory.
+    No easy way of overcoming this fault was found.
+    See /usr/share/perl/5.10.1/ExtUtils/MM_Unix.pm line 1265
+  
+0.01  Wed, 28 Jul 2010
+  - start
+

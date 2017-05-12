@@ -1,0 +1,26 @@
+---
+abstract: 'Test fallback behaviour in absence of modules'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Without-Module
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Test::Without::Module:
+    file: lib/Test/Without/Module.pm
+    version: '0.20'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Corion/test-without-module.git
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

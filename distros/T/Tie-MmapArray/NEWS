@@ -1,0 +1,11 @@
+Version 0.03
+
+Pack type 'Z' implemented and handling of type 'A' fixed.
+
+
+27-Dec-1999  Version 0.02 released.
+
+Now supports nested data structures.
+
+
+20-Dec-1999  Initial version 0.01 released.

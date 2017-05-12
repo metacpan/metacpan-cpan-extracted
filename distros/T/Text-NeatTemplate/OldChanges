@@ -1,0 +1,24 @@
+Revision history for Text-NeatTemplate
+======================================
+
+0.08 Mon 21 August 2006
+-----------------------
+
+  * (21 Aug 2006) renaming module
+  	I renamed this from "Swift" to "Neat" because it probably isn't
+  as fast as Template::Trivial, and I don't want to be misleading.
+
+  * (21 Aug 2006) documentation changes
+  	This is really a middleweight engine, not a lightweight one.
+
+0.0701 Sat 19 August 2006
+-------------------------
+
+  * (19 Aug 2006) correction
+  	Needed to fix up the change log.
+
+0.07 Sat 19 August 2006
+-----------------------
+
+  * (19 Aug 2006) initial checkin
+  	Now a separate module; originally was part of SQLite::Work modules.

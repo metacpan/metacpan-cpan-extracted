@@ -1,0 +1,11 @@
+Revision history for Tk::Role::HasWidgets.
+
+1.112380  2011-08-26 17:36:29 Europe/Paris
+ - new method: _clear_w()
+
+1.112070  2011-07-26 14:22:28 Europe/Paris
+ - new method: _del_w()
+
+1.111050  2011-04-15 10:12:31 Europe/Paris
+ - original version
+

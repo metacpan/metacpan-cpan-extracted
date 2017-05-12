@@ -1,0 +1,57 @@
+Text::Wrapper version 1.05, released January 18, 2014
+
+
+    This module provides simple word wrapping.  It breaks long lines,
+    but does not alter spacing or remove existing line breaks.  If
+    you're looking for more sophisticated text formatting, try the
+    Text::Format module.
+
+    Reasons to use Text::Wrapper instead of Text::Format:
+
+    *   Text::Wrapper is significantly smaller.
+
+    *   It does not alter existing whitespace or combine short lines.
+        It only breaks long lines.  By design, Text::Format removes
+        all whitespace and then adds whitespace where it thinks
+        appropriate.
+
+    In short, Text::Wrapper is the object-oriented equivalent of
+    Text::Wrap, but with fewer bugs (I hope).
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package Minimum Version
+  ------- ---------------
+  perl     5.8.0
+  Carp
+
+
+
+CHANGES
+    Here's what's new in version 1.05 of Text::Wrapper:
+    (See the file "Changes" for the full revision history.)
+
+	- no functional changes
+	- additional tests showing all possible breakpoints
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

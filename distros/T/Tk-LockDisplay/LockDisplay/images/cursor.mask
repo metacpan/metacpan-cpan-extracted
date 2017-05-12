@@ -1,0 +1,4 @@
+#define cursor_width 1
+#define cursor_height 1
+static unsigned char cursor_bits[] = {
+  0x01, };

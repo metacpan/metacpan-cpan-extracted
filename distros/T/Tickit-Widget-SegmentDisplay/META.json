@@ -1,0 +1,42 @@
+{
+   "abstract" : "show a single character like a segmented display",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tickit-Widget-SegmentDisplay",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tickit::Test" : "0.12",
+            "Tickit::Widget" : "0.36"
+         }
+      }
+   },
+   "provides" : {
+      "Tickit::Widget::SegmentDisplay" : {
+         "file" : "lib/Tickit/Widget/SegmentDisplay.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

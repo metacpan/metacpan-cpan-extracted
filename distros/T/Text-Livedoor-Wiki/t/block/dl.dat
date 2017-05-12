@@ -1,0 +1,16 @@
+=== basic
+--- wiki
+:title1|desc1
+:title2|desc2
+--- html
+<dl id="content_block_1">
+<dt>title1</dt><dd>desc1</dd>
+<dt>title2</dt><dd>desc2</dd>
+</dl>
+=== inline
+--- wiki
+:__title1__|__desc1__
+--- html
+<dl id="content_block_1">
+<dt><sub>title1</sub></dt><dd><sub>desc1</sub></dd>
+</dl>

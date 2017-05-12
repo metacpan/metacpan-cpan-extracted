@@ -1,0 +1,38 @@
+#,# Configuration,
+config,xhtml=1,
+config,dump=0,
+config,wai=1,
+
+#,# Rules for all pages,
+all body,<a href="/login.pl" title="Home: Keyboard Shortcut: CTRL\+SHIFT\+M">Home</a>,.. Home link found
+except,mis_(expenditure|orderanalysis|performance|perfsummary|cbc_analysis)\.pl,
+except,(stock_search|edit_collections|nielsen_marc|nielsen_val_map)\.pl,
+all body,<div id="clearfooter"></div>,.. Footer found
+except,mis_(expenditure|orderanalysis|performance|perfsummary|cbc_analysis)\.pl,
+except,(stock_search|edit_collections|nielsen_marc|nielsen_val_map)\.pl,
+all body,<a href="/logout.pl">Logout</a>,.. Logout link found
+except,mis_(expenditure|orderanalysis|performance|perfsummary|cbc_analysis)\.pl,
+except,(stock_search|edit_collections|nielsen_marc|nielsen_val_map)\.pl,
+except,(request_username\.pl|cookies\.html|copyright\.html|login\.pl|logout\.pl),
+all body,<div( id="rightside")? class="((centre|right) )?(blue|cyan|green|yellow|orange|brown|pink|purple|grey|<TMPL_VAR NAME=COLOUR>)">,.. Coloured container found
+except,mis_(expenditure|orderanalysis|performance|perfsummary|cbc_analysis)\.pl,
+except,(stock_search|edit_collections|nielsen_marc|nielsen_val_map)\.pl,
+except,(request_username\.pl|cookies\.html|login\.pl|logout\.pl),
+all body,<title>Peters Bookselling Services : PetraNET - ([\w\s]+)</title>,
+except,mis_(expenditure|orderanalysis|performance|perfsummary|cbc_analysis)\.pl,
+except,(stock_search|edit_collections|nielsen_marc|nielsen_val_map)\.pl,
+
+#,# Search,
+url,http://petranet2/do_search.pl,
+body,Exact Match,
+
+#,# Booklists,
+url,http://petranet2/do_search.pl?functype=advt0,
+body,This week,
+body,1 mth ahead,
+url,http://petranet2/do_search.pl?functype=advt1&start=1&count=10&0_5=1,
+url,http://petranet2/view_booklists.pl,
+body,Lists created by Peters Books,
+
+#,# Logout,
+url,http://petranet2/logout.pl,

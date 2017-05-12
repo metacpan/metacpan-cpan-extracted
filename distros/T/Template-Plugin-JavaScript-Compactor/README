@@ -1,0 +1,26 @@
+NAME
+    Template::Plugin::JavaScript::Compactor - TT plugin for
+    Data::JavaScript::Compactor
+
+SYNOPSIS
+      [% USE JavaScript::Compactor -%]
+      [% FILTER jscompactor -%]
+      document.writeln('Hello, World!');
+      function foobar () {
+        alert('hoge');
+      }
+      [%- END %]
+
+DESCRIPTION
+    Template::Plugin::JavaScript::Compactor is a plugin for TT, which allows
+    you to make your JavaScript compact.
+
+SEE ALSO
+    Template, Data::JavaScript::Compactor
+
+AUTHOR
+    Naoya Ito <naoya@bloghackers.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

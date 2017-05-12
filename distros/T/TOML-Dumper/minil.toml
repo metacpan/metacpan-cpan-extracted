@@ -1,0 +1,6 @@
+name = "TOML-Dumper"
+# badges = ["travis"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,40 @@
+Revision history for Perl extension Text::Diff3.
+
+0.10  Thu Feb  3 02:52:38 2011 UTC
+    - warn a `deprecated' message on import with ':factory' switch.
+    - FIX invalid range checking at diff3 conflict cases.
+
+0.09  Wed Feb  2 04:54:49 2011 UTC
+    - _heckel_diff() uses index of array directly.
+    - delete _eq() function.
+    - fix bad SYNOPSIS.
+
+0.08  Tue Feb 16 15:24:52 2010 JST
+    - Add function style diff3, merge, and diff subroutines.
+    - Change to use Test::Base.
+    - Code cleaning to pass `perlcritic --theme pbp`
+    - Add notices that component styles are no longer maintenance.
+
+0.07  Sat Aug  1 02:42:40 2009
+    - Fix Text::Diff3::Text treats newlines at the end of text collectly.
+    - Source code cleaning.
+
+0.06  Sat Oct 23 15:29:17 2005 JST
+    - Collect mistyping in PODs.
+
+0.05  Wed Oct 19 20:51:23 2005 JST
+    - Separete into several files.
+    - Change List now simple list. Leave off first delegator.
+    - Add descriptions.
+
+0.04  Tue Oct 18 15:10:17 2005 JST
+    - Add Ruby style iterator to ListBase (0.04)
+    - Add randam3.pl for test text generator (0.04)
+    - Add merge.pl for test. compatible with diff3 -m -A my org your (0.04)
+    - Fix diff3 fails at text0 and text1 complarison (0.04)
+    - Fix diff2 to diff3 parameter's mismatch (0.03)
+    - Fix diff3 fails at lo0, hi0, lo1, and hi1 calcuration (0.02)
+    - Fix Text->at now returns undef for minus index (0.02)
+
+0.01  Mon Oct 17 00:13:46 2005
+    - First beta publishing version

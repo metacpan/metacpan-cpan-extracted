@@ -1,0 +1,25 @@
+Test::Pod::Content readme
+-------------------------
+
+Test::Pod::Content is a simple test module for testing a pod's content.
+
+INSTALLING
+----------
+
+ perl Build.PL
+ perl Build
+ perl Build test
+ perl Build install
+
+EXAMPLES
+--------
+
+For examples on Test::Pod::Content's usage, see the test files provided.
+
+They test Test::Pod::Content's own Pod using Test::Pod::Content.
+
+LICENSE
+-------
+
+This library is free software - you may distribute/modify it under the same
+terms as perl itself.

@@ -1,0 +1,53 @@
+version 0.004; 2012-02-23
+
+  * bugfix: require bugfixed version of Time::UTC (for requiring working
+    version of Math::BigRat)
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+version 0.003; 2010-09-01
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2009-05-19
+
+  * bugfix: require bugfixed version of Time::UTC (for $SIG{__DIE__}
+    handling)
+
+  * use simpler "parent" pragma in place of "base"
+
+  * test POD syntax and coverage
+
+  * in tests, avoid unreliable "\S" regexp element
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.001; 2007-02-02
+
+  * new functions utc_day_to_mjdn() and utc_mjdn_to_day(), duplicated
+    from Time::UTC, for interconversion with MJDNs for interoperability
+    with other code that deals with UT days
+
+  * test explicitly for correct class of results
+
+version 0.000; 2006-07-04
+
+  * initial released version

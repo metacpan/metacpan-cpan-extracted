@@ -1,0 +1,68 @@
+==================================================
+Changes from 2015-04-13 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.002 at 2016-04-12 07:26:23 +0000
+------------------------------------------
+
+  Change: be44b8bd95dbd854e8646316f65c5961fed187f8
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-04-12 09:25:59 +0000
+
+    Merge branch 'master' of
+    https://github.com/benningm/Test-BDD-Cucumber-Harness-Nagios 
+
+  Change: 899cc87673a3f79bb008581f310dcb20487ff6f6
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-04-12 09:25:40 +0000
+
+    dont include README.pod in dist 
+
+  Change: d0f135768aedb65d0d75493e23a0380961d9268c
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 09:57:20 +0000
+
+    added travis CI file 
+
+  Change: 2ae697f413cbb2c8004ea49eab9e0ec4426a1a81
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 09:05:47 +0000
+
+    update build env 
+
+------------------------------------------
+version 1.001 at 2015-06-24 18:47:40 +0000
+------------------------------------------
+
+  Change: c4333610697989bc43fb96ebd38b022a2f648984
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-06-24 20:47:40 +0000
+
+    fix check_pherkin typo and add examples 
+
+  Change: f51c2acd9e9ec9295fb735bfa202640e74a0b38d
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-06-24 20:38:55 +0000
+
+    add README link 
+
+------------------------------------------
+version 1.000 at 2015-06-24 18:36:39 +0000
+------------------------------------------
+
+  Change: 28baefd79e68a77266c2fc72ef9af4505f231af0
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-06-24 20:36:39 +0000
+
+    documentation, distribution adjustments 
+
+  Change: 00be3c25ce769290cb44f952c273aee8f43610f5
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-06-24 20:22:19 +0000
+
+    initial checkin 
+
+================
+End of releases.
+================

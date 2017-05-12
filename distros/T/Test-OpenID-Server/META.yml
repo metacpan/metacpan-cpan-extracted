@@ -1,0 +1,29 @@
+---
+author:
+  - 'Jesse Vincent <jesse@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Warnings: '0.009'
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-OpenID-Server
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTTP::Server::Simple: 0
+  Net::OpenID::Server: 0
+  Test::HTTP::Server::Simple: 0
+  Test::OpenID::Consumer: 0
+  Test::WWW::Mechanize: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'

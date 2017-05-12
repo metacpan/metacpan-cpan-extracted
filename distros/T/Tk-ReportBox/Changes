@@ -1,0 +1,12 @@
+Revision history for Perl extension Tk::ReportBox.
+1.01  Jun 30 2003
+	added waitVariable to deliver method
+	added test.pl
+
+1.01  Jun 28 2003
+	fixed '-title' option
+
+1.00  Sat Jun 28 15:04:34 2003
+	- original version; created by h2xs 1.20 with options
+		-AX -n Tk::ReportBox
+

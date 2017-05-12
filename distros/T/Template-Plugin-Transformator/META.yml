@@ -1,0 +1,31 @@
+---
+abstract: 'TemplateToolkit plugin for Net::NodeTransformator'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-Transformator
+requires:
+  Net::NodeTransformator: '0'
+  Template::Plugin::Filter: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libtemplate-plugin-transformator-perl/issues
+  homepage: https://github.com/zurborg/libtemplate-plugin-transformator-perl
+  repository: https://github.com/zurborg/libtemplate-plugin-transformator-perl.git
+version: '0.001'
+x_contributors:
+  - 'David Zurborg <zuborg@cpan.org>'

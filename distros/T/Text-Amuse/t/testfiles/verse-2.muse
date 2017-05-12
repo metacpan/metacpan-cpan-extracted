@@ -1,0 +1,62 @@
+#title *test* <em>test</em> <script>" [[http://link.org]]
+#lang en <script>"
+#topics test1; test2; test3; test4; <script>"
+
+#desc this is a quite long <script>"
+description <em>with shit</em> and <strong>strong</strong> ***really?*** "<script>
+
+#src [[http://theanarchistlibrary.org][<script>"'] <script>"
+
+> A line of Emacs verse;
+>   forgive its being so terse.
+>
+> In terms of terse verse,
+>   you could do worse.
+
+Regular.
+
+> A line of Emacs verse;
+>   forgive its being so terse. [2] 
+
+You can also use the <verse> tag, if you prefer. [3]
+
+<verse>
+A line of Emacs verse;
+  forgive its being so terse.
+</verse>
+
+Multiple stanzas may be included in one set of <verse> tags, as
+follows.
+
+<verse>
+A line of Emacs verse;
+  forgive its being so terse.
+
+In terms of terse verse,
+        you could do worse. [1]
+
+</verse>
+
+<verse>
+[space=on] *level 0*
+ [hello=there] level 1 
+  *This* buffer is for notes you don't want to save level 3
+
+*This* buffer is for notes you don't want to save, and for Lisp evaluation.This buffer is for notes you don't want to save, and for Lisp evaluation. [4]
+</verse>
+
+> *hello* (0)
+>  there (1) [5]
+> 
+>   hey! (2, after a blank line)
+
+[1] The author
+
+[2] Another author
+
+[3] This sucks
+
+[4] This buffer is for notes you don't want to save, and for Lisp evaluation.This buffer is for notes you don't want to save, and for Lisp evaluation.
+
+[5] last
+

@@ -1,0 +1,59 @@
+---
+author:
+  - 'Ricardo SIGNES <rjbs@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.71'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Task-Email-PEP-NoStore
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Message: 1.011
+  Email::ARF::Report: 0.003
+  Email::Abstract: 2.134
+  Email::Address: 1.889
+  Email::Date: 1.103
+  Email::Date::Format: 1.002
+  Email::Delete: 1.022
+  Email::Filter: 1.031
+  Email::Folder: 0.854
+  Email::Folder::IMAP: 1.102
+  Email::Folder::IMAPS: 1.102
+  Email::Folder::POP3: 1.013
+  Email::FolderType: 0.813
+  Email::FolderType::Net: 1.041
+  Email::LocalDelivery: 0.217
+  Email::MIME: 1.861
+  Email::MIME::Attachment::Stripper: 1.314
+  Email::MIME::ContentType: 1.014
+  Email::MIME::Creator: 1.454
+  Email::MIME::Encodings: 1.311
+  Email::MIME::Modifier: 1.442
+  Email::MIME::XPath: 0.004
+  Email::MessageID: 1.351
+  Email::Reply: 1.202
+  Email::Send: 2.192
+  Email::Send::IO: 2.200
+  Email::Sender: 0.001
+  Email::Simple: 2.003
+  Email::Simple::Creator: 1.424
+  Email::Simple::FromHandle: 0.050
+  Email::Simple::Headers: 1.030
+  Email::Stuff: 2.04
+  Email::Thread: 0.711
+  Email::Valid: 0.179
+  MIME::Lite: 3.021
+  Mail::Audit: 2.222
+  Mail::Audit::DKIM: 0.002
+  Mail::Audit::List: 1.852
+  Mail::Audit::PGP: 1.701
+  Mail::DeliveryStatus::BounceParser: 1.518
+  Mail::LocalDelivery: 0.304
+  Mail::SpamAssassin::SimpleClient: 0.005
+  Net::Server::Mail: 0.16
+version: 8100.021

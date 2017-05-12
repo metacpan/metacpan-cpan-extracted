@@ -1,0 +1,21 @@
+<biblio_genres>
+	<subgenres>
+		<root_title value="Зарубежная литература" root_id="111">
+			<subgenre sub_id="6075" sub_name="foreign_business" sub_title="Зарубежная деловая литература" count_recommended="0">
+				<genre_type type="audio" arts_count="41"/>
+				<genre_type type="hardcopy" arts_count="225"/>
+				<genre_type type="text" arts_count="530"/>
+			</subgenre>
+			<subgenre sub_id="6293" sub_name="foreign_action" sub_title="Зарубежные боевики" count_recommended="0">
+				<genre_type type="hardcopy" arts_count="1"/>
+				<genre_type type="text" arts_count="1"/>
+			</subgenre>
+			<subgenre sub_id="6235" sub_name="foreign_children" sub_title="Зарубежные детские книги" count_recommended="0">
+				<genre_type type="" arts_count="1"/>
+				<genre_type type="audio" arts_count="134"/>
+				<genre_type type="hardcopy" arts_count="1230"/>
+				<genre_type type="text" arts_count="425"/>
+			</subgenre>
+		</root_title>
+	</subgenres>
+</biblio_genres>

@@ -1,0 +1,3 @@
+ERROR(simat.pl):
+        Line1 in Vector file <test-B1b.vec> should show
+        #nrows #ncols #nnz.

@@ -1,0 +1,19 @@
+Revision history for Perl extension Test::Groonga
+
+0.06    2011-11-22
+        - added construction params 'default_command_version'.
+
+0.05    2011-06-08
+        - copied after Perl Best Practice.
+
+0.04    2010-12-27
+        - add function to load dump file before testing.
+
+0.03    2010-12-18
+        - use Test::TCP and change interface
+
+0.02    2010-12-18
+        - refactoring
+
+0.01    2010-12-09
+        - original version

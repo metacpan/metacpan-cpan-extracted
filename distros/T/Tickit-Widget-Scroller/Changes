@@ -1,0 +1,116 @@
+Revision history for Tickit-Widget-Scroller
+
+0.22    2016/08/08 14:11:25
+        [CHANGES]
+         * Updated for Tickit 0.57:
+            + Use $win->bind_event instead of $win->set_on_*
+
+0.21    2016/05/16 11:48:54
+        [BUGFIXES]
+         * Fix for ->shift when exposing bottom of contained content
+
+0.20    2016/01/06 19:48:20
+        [CHANGES]
+         * Updates for latest Tickit:
+            + no longer necessary to set $win->expose_after_scroll
+         * Updated module documentation style to use =head2 barenames
+
+0.19    2014/12/15 18:49:57
+        [CHANGES]
+         * Added ->pop method
+         * Have ->shift and ->pop return the item(s) they removed
+
+0.18    2014/04/12 14:40:45
+        [CHANGES]
+         * Avoid $rb->flush_to_window during unit testing; all unit tests
+           should be done directly to mockterm
+
+        [BUGFIXES]
+         * Text item render shouldn't care about the width of the
+           RenderBuffer, only of itself
+
+0.17    2014/04/04 00:00:45
+        [CHANGES]
+         * Use Tickit 0.32-style event structures for key/mouse events
+         * Prepare for Tickit 0.44's whole-tree RB rendering order
+
+0.16    2014/04/01 22:50:13
+        [CHANGES]
+         * Clarify documentation on behaviour of on_scrolled
+         * Use new Window expose with_rb event from Tickit 0.42
+         * Fix unit tests to work with Tickit 0.43's new ordering
+
+0.15    2013/11/11 20:23:05
+        [CHANGES]
+         * Added 'on_scrolled' event
+
+        [BUGFIXES]
+         * Correctly reset gravity after shrinking from oversized window
+
+0.14    2013/09/02 00:44:56
+        [CHANGES]
+         * Don't declare linecount as ->lines after all, as it breaks things
+         * Implement ->scroll_to on top of ->scroll, preparing for use via
+           Tickit::Widget::ScrollBox
+
+        [BUGFIXES]
+         * Update unit tests to use RenderBuffer instead of RenderContext
+
+0.13    2013/09/01 01:39:07
+        [CHANGES]
+         * Use Tickit::RenderBuffer and ->render_to_rb from
+           Tickit::Widget 0.35
+         * Have Scroller declare its actual total line height as 'lines'
+
+0.12    CHANGES:
+         * Updated for Tickit::Style 0.32 and Tickit::RenderContext 0.07
+
+0.11    CHANGES:
+         * Updated to use Tickit::Style and Tickit::RenderContext
+
+0.10    CHANGES:
+         * Added ->unshift operation analogous to ->push
+
+0.09    CHANGES:
+         * Added indicators (may require Tickit 0.24 to scroll efficiently)
+         * Added ->lines_above, ->lines_below
+         * Added count_offscreen behaviour to item2line
+
+0.08    CHANGES:
+         * Try to linewrap on word boundaries if possible, even during pen
+           changes
+         * Enable new expose_after_scroll behaviour
+         * Disable deprecated CLEAR_BEFORE_RENDER behaviour
+         * Fix unit tests to work correctly with new experimental
+           FLOAT_ALL_THE_WINDOWS behaviour
+
+0.07    CHANGES:
+         * Don't allow overscroll past the end of the content
+         * More unit testing of full Unicode text
+         * Handle zero-length substring chunks correctly
+
+0.06    CHANGES:
+         * Allow linefeeds in Text and RichText items
+
+0.05    CHANGES:
+         * Bugfix to item wrapping boundary condition when a word ends exactly
+           at the righthand boundary
+
+0.04    CHANGES:
+         * Added 'gravity' parameter to control resize behaviour
+         * Respond to mouse wheel events by scrolling 5 lines at a time
+
+0.03    CHANGES:
+         * Use Window->print rather than Window->penprint
+         * Handle ->item2line with no items
+         * Preserve 'at-bottom'ness while not onscreen, restore it later
+         * Use new is_display TEXT() assertions from Tickit 0.12
+
+0.02    CHANGES:
+         * Added Tickit::Widget::Scroller::Item::RichText
+         * New API for ->item2line
+         * Handle some keybindings by default
+         * Updated for Tickit::Test 0.07
+
+0.01    First version, released on an unsuspecting world.
+

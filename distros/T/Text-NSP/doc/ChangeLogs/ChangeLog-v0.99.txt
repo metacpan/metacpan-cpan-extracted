@@ -1,0 +1,22 @@
+Changes from NSP version 0.97 to 0.99
+--------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+
+June 23, 2006
+
+Makefile.PL
+-----------
+
+In response to a number of reports to rt.cpan.org, I have
+modified the Makefile.PL so that documentation is installed
+in system default directories. Previously we were forcing
+the installation to occur in certain directories. 
+
+/Testing
+--------
+
+I have set the files and directories in the /Testing subdirectory
+to be executable. 
+

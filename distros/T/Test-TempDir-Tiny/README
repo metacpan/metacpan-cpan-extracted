@@ -1,0 +1,162 @@
+NAME
+    Test::TempDir::Tiny - Temporary directories that stick around when tests
+    fail
+
+VERSION
+    version 0.016
+
+SYNOPSIS
+        # t/foo.t
+        use Test::More;
+        use Test::TempDir::Tiny;
+
+        # default tempdirs
+        $dir = tempdir();          # ./tmp/t_foo_t/default_1/
+        $dir = tempdir();          # ./tmp/t_foo_t/default_2/
+
+        # labeled tempdirs
+        $dir = tempdir("label");   # ./tmp/t_foo_t/label_1/
+        $dir = tempdir("label");   # ./tmp/t_foo_t/label_2/
+
+        # labels with spaces and non-word characters
+        $dir = tempdir("bar baz")  # ./tmp/t_foo_t/bar_baz_1/
+        $dir = tempdir("!!!bang")  # ./tmp/t_foo_t/_bang_1/
+
+        # run code in a temporary directory
+        in_tempdir "label becomes name" => sub {
+            my $cwd = shift;
+            # do stuff in a tempdir
+        };
+
+DESCRIPTION
+    This module works with Test::More to create temporary directories that
+    stick around if tests fail.
+
+    It is loosely based on Test::TempDir, but with less complexity, greater
+    portability and zero non-core dependencies. (Capture::Tiny is
+    recommended for testing.)
+
+    The "tempdir" and "in_tempdir" functions are exported by default.
+
+    If the current directory is writable, the root for directories will be
+    ./tmp. Otherwise, a File::Temp directory will be created wherever
+    temporary directories are stored for your system.
+
+    Every *.t file gets its own subdirectory under the root based on the
+    test filename, but with slashes and periods replaced with underscores.
+    For example, t/foo.t would get a test-file-specific subdirectory
+    ./tmp/t_foo_t/. Directories created by "tempdir" get put in that
+    directory. This makes it very easy to find files later if tests fail.
+
+    The test-file-specific name is consistent from run-to-run. If an old
+    directory already exists, it will be removed.
+
+    When the test file exits, if all tests passed, then the
+    test-file-specific directory is recursively removed.
+
+    If a test failed and the root directory is ./tmp, the test-file-specific
+    directory sticks around for inspection. (But if the root is a File::Temp
+    directory, it is always discarded).
+
+    If nothing is left in ./tmp (i.e. no other test file failed), then ./tmp
+    is cleaned up as well (unless it's a symlink).
+
+    This module attempts to avoid race conditions due to parallel testing.
+    In extreme cases, the test-file-specific subdirectory might be created
+    as a regular File::Temp directory rather than in ./tmp. In such a case,
+    a warning will be issued.
+
+FUNCTIONS
+  tempdir
+        $dir = tempdir();          # .../default_1/
+        $dir = tempdir("label");   # .../label_1/
+
+    Creates a directory underneath a test-file-specific temporary directory
+    and returns the absolute path to it in platform-native form (i.e. with
+    backslashes on Windows).
+
+    The function takes a single argument as a label for the directory or
+    defaults to "default". An incremental counter value will be appended to
+    allow a label to be used within a loop with distinct temporary
+    directories:
+
+        # t/foo.t
+
+        for ( 1 .. 3 ) {
+            tempdir("in loop");
+        }
+
+        # creates:
+        #   ./tmp/t_foo_t/in_loop_1
+        #   ./tmp/t_foo_t/in_loop_2
+        #   ./tmp/t_foo_t/in_loop_3
+
+    If the label contains any characters besides alphanumerics, underscore
+    and dash, they will be collapsed and replaced with a single underscore.
+
+        $dir = tempdir("a space"); # .../a_space_1/
+        $dir = tempdir("a!bang");  # .../a_bang_1/
+
+    The test-file-specific directory and all directories within it will be
+    cleaned up with an END block if the current test file passes tests.
+
+  in_tempdir
+        in_tempdir "label becomes name" => sub {
+            my $cwd = shift;
+            # this happens in tempdir
+        };
+
+    Given a label and a code reference, creates a temporary directory based
+    on the label (following the rules of "tempdir"), changes to that
+    directory, runs the code, then changes back to the original directory.
+
+    The temporary directory path is given as an argument to the code
+    reference.
+
+    When the code finishes (even if it dies), "in_tempdir" will change back
+    to the original directory if it can, to the root if it can't, and will
+    rethrow any fatal errors.
+
+ENVIRONMENT
+  "PERL_TEST_TEMPDIR_TINY_NOCLEANUP"
+    When this environment variable is true, directories will not be cleaned
+    up, even if tests pass.
+
+SEE ALSO
+    *   File::Temp
+
+    *   Path::Tiny
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Test-TempDir-Tiny/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Test-TempDir-Tiny>
+
+      git clone https://github.com/dagolden/Test-TempDir-Tiny.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Christian Walde <walde.christian@googlemail.com>
+
+    *   David Golden <xdg@xdg.me>
+
+    *   Kent Fredric <kentfredric@gmail.com>
+
+    *   Shawn Laffan <shawnlaffan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

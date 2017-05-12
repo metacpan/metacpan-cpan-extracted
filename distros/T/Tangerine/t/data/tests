@@ -1,0 +1,19 @@
+use Test::More;
+use_ok 'Alfa';
+use_ok("Beta");
+use_ok("Charlie", @imports);
+use_ok "Delta", @imports;
+require_ok "Echo";
+require_ok "Foxtrot", qw/Golf Hotel/;
+require_ok qw/India Juliett Kilo/;
+use_ok('Mo', qw/default is xs/);
+use_ok "Mo", "default", "is", "xs";
+use_ok "Mo", "isa";
+#use_ok "Mo", @imports;
+use_ok "parent", qw/-norequire Lima/;
+syntax_ok "Mike::November";
+use_ok;
+require_ok;
+syntax_ok;
+use_ok("Oscar", qw(Papa
+Quebec));

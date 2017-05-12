@@ -1,0 +1,175 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+pherkin - Execute tests written using Test::BDD::Cucumber
+
+=head1 VERSION
+
+version 0.52
+
+=head1 SYNOPSIS
+
+ pherkin
+ pherkin some/path/features/
+
+=head1 DESCRIPTION
+
+C<pherkin> accepts a single argument of a directory name, defaulting to
+C<./features/> if none is specified. This directory is searched for feature
+files (any file matching C<*.feature>) and step definition files (any file
+matching C<*_steps.pl>). The step definitions are loaded, and then the features
+executed.
+
+Steps that pass are printed in green, those that fail in red, and those for
+which there is no step definition - or that are skipped as the result of a
+previous failure - as yellow.
+
+C<pherkin> will exit with a non-zero status if (and only if) the overall result
+is considered to be failing.
+
+=head1 OPTIONS
+
+Controlling @INC
+
+ -l, --lib              Add 'lib' to @INC
+ -b, --blib             Add 'blib/lib' and 'blib/arch' to @INC
+ -I [dir]               Add given directory to @INC
+
+Output formatting
+
+ -o, --output           Output harness. Defaults to 'TermColor'. See 'Outputs'
+ -c, --theme            Theme for 'TermColor'. `light` or `dark` (default)
+
+Extra Steps
+
+  -s, --steps [path]    Include an extra step file, or directory of step files
+                        (as identified by *_steps.pl; multiple use accepted)
+
+Tag specifications
+
+ -t, --tags @tag        Run scenarios tagged with '@tag'
+ -t, --tags @tag1,@tag2 Run scenarios tagged with '@tag1' and '@tag2'
+ -t, --tags ~@tag       Run scenarios tagged without '@tag'
+
+Configuration profiles (see CONFIGURATION PROFILES below/`man pherkin`)
+
+ -g, --config [path]    A YAML file containing configuration profiles
+ -p, --profile [name]   Name of the profile to load from the above config file.
+                        Defaults to `default`
+ --debug-profile        Shows information about which profile was loaded and how
+                        and then terminates
+
+Extensions
+
+ -e Extension::Module   Load an extension. You can place a string in brackets at
+                        the end of the module name which will be eval'd and
+                        passed to new() for the extension.
+
+Help
+
+ -h, -?, --help         Print usage information.
+ --i18n LANG            List keywords for a particular language.
+                        '--i18n help' lists all languages available.
+
+=head1 OUTPUTS
+
+C<pherkin> can output using any of the C<Test::BDD::Cucumber::Harness> output
+modules. L<Test::BDD::Cucumber::TermColor> is the default, but
+L<Test::BDD::Cucumber::TestBuilder> is also a reasonable option:
+
+  pherkin -o TermColor some/path/feature   # The default
+  pherkin -o TestBuilder some/path/feature # Test::Builder-type text output
+
+=head1 CONFIGURATION PROFILES
+
+You can specify sets of command line options using a YAML configuration file
+with named profiles in it, and the C<-g, --config> and C<-p, --profile> command
+line options.
+
+If you don't specify a config file, the following paths are searched (in order)
+for one:
+
+ (contents of $ENV{'PHERKIN_CONFIG'})
+ .pherkin.yaml
+ ./config/pherkin.yaml
+ ./.config/pherkin.yaml
+ t/.pherkin.yaml
+ ~/.pherkin.yaml
+
+The contents of each profile is merged in as if you'd specified it on the
+command line. C<default> is used if you didn't specify one. For example:
+
+ default:
+   steps:
+     - foo/steps
+     - ~/steps
+   output: TermColor
+   tags:
+     - tag1,tag2
+
+is equivalent to:
+
+  --steps foo/steps --steps ~/steps --output TermColor --tags tag1,tag2
+
+If you specify both command-line options, and options in a configuration file,
+then the command-line ones override single-value items, and are placed at the
+end of multi-item ones.
+
+If you specify C<--debug-profile> then information showing which profile is
+loaded and how is printed to STDOUT, and then `pherkin` terminates.
+
+=head2 EXTENSION CONFIGURATION
+
+Extensions named in the C<extensions> section of the configuration will
+be loaded with the configuration from the configuration file:
+
+ default:
+   includes:
+      # include location where extensions reside on disk
+      - t/lib
+   extensions:
+      # extension with configuration
+      Test::CucumberPush:
+          key1: value1
+          key2: value2
+      # extension without configuration
+      Test::CucumberPop:
+
+Notice that contrary to all other configuration parameters, the names
+of the extensions are not prefixed with a dash (i.e. '- t/lib' vs
+'Test::CucumberPush').
+
+The example above is the equivalent of
+
+  use Test::CucumberPush;
+  use Test::CucumberPop;
+
+  Test::CucumberPush->new({ 'key1' => 'value1', 'key2' => 'value2' });
+  Test::CucumberPop->new();
+
+
+=head1 AUTHOR
+
+Peter Sergeant C<pete@clueball.com>
+
+=head1 LICENSE
+
+Copyright 2012-2014, Peter Sergeant; Licensed under the same terms as Perl
+
+=cut
+
+# See App::pherkin for documentation
+use strict;
+use warnings;
+use App::pherkin;
+
+BEGIN {
+    if ( not -t STDOUT and not defined $ENV{'ANSI_COLORS_DISABLED'} ) {
+        $ENV{'ANSI_COLORS_DISABLED'} = 1;
+    }
+}
+
+my $result = App::pherkin->new()->run(@ARGV);
+
+exit( $result->result eq 'failing' );

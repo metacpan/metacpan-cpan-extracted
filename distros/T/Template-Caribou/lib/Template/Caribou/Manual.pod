@@ -1,0 +1,371 @@
+package Template::Caribou::Manual;
+# ABSTRACT: User Guide to Template::Caribou
+
+
+'end of Template::Caribou::Manual';
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Template::Caribou::Manual - User Guide to Template::Caribou
+
+=head1 VERSION
+
+version 1.2.1
+
+=head1 SYNOPSIS
+
+    package MyTemplate;
+
+    use Template::Caribou;
+
+    use Template::Caribou::Tags::HTML qw/ :all /;
+
+    has name => ( is => 'ro' );
+
+    template page => sub {
+        html { 
+            head { title { 'Example' } };
+            show( 'body' );
+        }
+    };
+
+    template body => sub {
+        my $self = shift;
+
+        body { 
+            h1 { 'howdie ' . $self->name } 
+        }
+    };
+
+    package main;
+
+    my $template = MyTemplate->new( name => 'Yanick' );
+    print $template->render('page');
+
+=head1 DESCRIPTION
+
+This document describes how to use the C<Caribou> templating system. 
+
+The C<Caribou> system is made of two major components: the templating role
+itself (L<Template::Caribou>) and the tag libraries,
+(L<Template::Caribou::Tags>,
+L<Template::Caribou::Tags::HTML::Extended>, etc). 
+
+=head1 C<Template::Caribou::Role> 
+
+The C<Template::Caribou::Role> role behaves like any other L<Moose> role. Typically,
+a class will consume it via
+
+    package MyTemplate;
+
+    use Moose;
+
+    with 'Template::Caribou';
+
+    ...;
+
+The C<use Template::Caribou> line is required to imports three keywords into
+the class's namespace: C<template>, C<show> and C<attr>.
+
+=head2 template $name => sub { ... }
+
+C<template> is used to add a template to the class. Its first argument is the
+name of the template, and the second the coderef that will be executed to
+generate the template's output. 
+
+At its core, the template coderef is straight Perl code that uses a simple
+rule to generate its output. It is given two output channels, C<STDOUT> and
+C<::RAW>; everything passed to C<::RAW> is printed verbatim, and everything
+printed to C<STDOUT> is HTML-escaped.
+
+    template 'greetings' => sub {
+        print       "<h1>Hello world</h1>";    
+        print ::RAW "<h2>Lovely day, isn't?</h2>";    
+    };
+
+    # later on...
+    print $bou->render( 'greetings' );
+
+    # will output
+    #   &lt;h1>Hello world&lt/h1><h2>Lovely day, isn't?</h2>
+
+The rendering rule has one one special case: if the template didn't print
+anything, its return value will be taken as its output.
+
+    template 'clock' => sub {
+        print "current time: " . localtime;    
+    };
+
+    # equivalent to
+
+    template 'clock' => sub {
+        "current time: " . localtime;    
+    };
+
+=head3 render()
+
+A Caribou object processes its templates via the method C<render()>.
+Templates are passed the object, as well as any additional arguments.
+
+    template 'greetings' => sub {
+        my( $self, $name ) = @_;
+        "Howdie " . $name;
+    };
+
+    # later on...
+    print $bou->render( 'greetings' => 'Yanick' );
+
+    # prints 'Howdie Yanick'
+
+While it's not necessary, I personally like to define the templates with
+Perl's new signatures, which makes things a little cleaner:
+
+   # equivalent to code above
+   use experimental 'signatures';
+
+   template 'greetings' => sub($self, $name) {
+        "Howdie " . $name;
+    };
+
+And since we are talking about template B<objects>, the arguments to
+C<render()> can often be modified to be attributes.
+
+   has name => (
+       is  => 'ro',
+       isa => 'Str',
+       required => 1,
+   );
+
+   template 'greetings' => sub($self) {
+        "Howdie " . $self->name;
+   };
+
+   # and then later on...
+   my $bou = MyGreeter->new( name => 'Yanick' );
+
+   print $bou->render( 'greetings' );
+
+Instead of a template name, C<render()> can also be given a coderef as its
+first argument, in which case it'll take it as an anonymous template. Which
+can be useful for debugging or quick template hacking. 
+
+    package MyGreeter;
+
+    use Moose;
+    with 'Template::Caribou';
+
+    print __PACKAGE__->new->render(sub { "Hi there!" });
+
+=head2 C<show()>
+
+While it is perfectly possible to call sub-templates via C<render()>, the
+resulting syntax looks a little clunky:
+
+    template head => sub { '<head>..</head>' };
+    template head => sub { '<body>..</body>' };
+
+    template page => sub($self) {
+        print ::RAW $self->render( 'head' );
+        print ::RAW $self->render( 'body' );
+    };
+
+Hence C<show()>, which provides a shortcut for the same behavior:
+
+    # equivalent to the code above
+    
+    template head => sub { '<head>..</head>' };
+    template head => sub { '<body>..</body>' };
+
+    template page => sub($self) {
+        show('head');
+        show('body');
+    };
+
+=head2 C<attr()>
+
+So far, beside the automatic HTML escaping that C<STDOUT> provides, C<Caribou>
+doesn't provides any tool specific to tag generation. This is where the tag
+libraries come in. C<attr()> is actually a keyword generated by
+L<Template::Caribou::Tags>, but as it is used in most cases, it is part of the 
+L<Template::Caribou> exports for convenience.
+
+=head1 THE TAG LIBRARIES
+
+=head2 L<Template::Caribou::Tags::HTML>
+
+The base library that you are most likely to use is
+L<Template::Caribou::Tags::HTML>, which exports functions 
+mapping to the most common HTML tags.
+
+    # exports the helper functions for the tags 'html', 'body' and 'p'
+    use Template::Caribou::Tags::HTML qw/ html body p /;
+
+    # get'em all
+    use Template::Caribou::Tags::HTML qw/ :all /;
+
+All functions are called with a coderef, which is treated as an inner
+template. When called within a template, the functions will output
+their corresponding tag and the result of the inner template:
+
+    template inner => sub {
+        p { 
+            print "Hello world";
+        };
+    };
+
+    # will output '<p>Hello world</p>';
+    
+    # equivalent, shorter form:
+    template inner => sub {
+        p { "Hello world" };
+    };
+
+Tags, of course, can be used within one another:
+
+    template page => sub {
+        html {
+            head { title { "Hello world" } };
+            body { 
+                h1 { "Howdie!" }; 
+                p { "Beautiful day, isn't?" }; 
+            };
+        };
+    };
+
+Attributes for the tag are set via C<%_> or the 'attr()' function,
+which can appear anywhere within the inner template.
+
+    use Template::Caribou::Tags::HTML qw/ div /;
+
+    template inner => sub {
+        div {
+            $_{id} = 'inner',
+            $_{class}{'main-div'} = 1;
+
+            div {
+                "some inner div";
+            };
+
+        };
+    };
+
+    # or, equivalently
+
+    template inner => sub {
+        div {
+            attr id    => 'inner',
+                 class => 'main-div';
+
+            div {
+                "some inner div";
+            };
+
+        };
+    };
+
+    # will output
+    #   <div id="inner" class="main-div"><div>some inner div</div></div>
+
+C<%_> takes attribute name/value pairs. If the value is a hashref,
+then the final attribute value will be the concatenated list
+of the keys with true values. Which is mostly useful for the C<class> attribute,
+where you can toggle the different classes.
+
+=head2 L<Template::Caribou::Tags>
+
+This library is useful to craft your own tags and provide semantic shortcuts.
+
+=head3 Semantic shortcuts via 'mytag'
+
+New semantic-based shortcut tags can easily be generated via the 
+C<mytag> export directive.
+
+    use Template::Caribou::Tags 
+        mytag => {
+            -as   => 'widget',
+            class => 'thingy',
+            name  => 'div',
+        };
+
+    template body => sub {
+        widget { '...' };
+    };
+
+    # will output
+    #   <div class="thingy">...</div>
+
+Note that the tag name does default to 'div', so the code above be further
+simplified as
+
+    use Template::Caribou::Tags 
+        mytag => { -as => 'widget', class => 'thingy', };
+
+=head3 Creating New Tags
+
+The module can also export C<render_tag>, which can be used to create new
+tags. For example, a 'favicon' tag can be created via
+
+    sub favicon($) {
+        my $url = shift;
+
+        render_tag( 'link', sub {
+            attr rel => 'shortcut icon', href => $url;
+        } );
+    }
+
+and later can be used like any other tag:
+
+    print $bou->render(sub{
+        favicon '/logo.png';
+    });
+
+    # will output
+    <link rel="shortcut icon" href="/logo.png" />
+
+More documentation will come soon. In the meantime, check out the source code of the
+different tag libraries for examples.
+
+=head2 L<Template::Caribou::Tags::HTML::Extended>
+
+This library provides optimized shortcuts for oft-used patterns. For example,
+it provides C<anchor>, which is a stream-lined C<a>:
+
+    anchor 'http://foo.com/' => 'the site';
+
+    # same as
+    a { attr href => 'http://foo.com'; 'the site' };
+
+    anchor 'http://bar.com' => sub {
+        b{ "the other site" };
+    };
+
+    # same as
+    a { attr href => 'http://bar.com'; 
+        b { "the other site" }; 
+    };
+
+=head1 OTHER PIECES
+
+Once you get started on bigger sets of templates, you'll probably want to 
+have one file for each individual template. L<Template::Caribou::Files>
+is there just for that. This role can be given directories where it'll 
+locate individual templates and incorporate them in the main class.
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

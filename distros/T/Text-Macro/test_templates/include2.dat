@@ -1,0 +1,7 @@
+#sub sub3
+
+in sub3/
+
+#endsub throw away
+
+include2 loaded

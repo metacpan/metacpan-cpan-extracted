@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu>
+  <restaurant>Trébol</restaurant>
+  <item>
+    <name>Pollo en Fuego Lento con un Ragout de Calabasa</name>
+    <price>$17</price>
+    <description></description>
+  </item>
+  <item>
+    <name>Atun Empanisado con papas, Calabacitas y Tomates</name>
+    <price>$16</price>
+    <description>Crusted &amp; Seared Albacore Tuna with a Potato, Squash Gratin &amp; a Sassy Tomato Broth</description>
+  </item>
+  <item vegetarian="yes">
+    <name>Enchiladas de Calabasa, Cebollas, Verduras, Queso Fresco y un Huevo Frito</name>
+    <price>$16</price>
+    <description>Traditional Enchilada with Summer Squash, Caramelized Onions, Wilted Greens, Queso Fresco &amp; a Fried Egg</description>
+  </item>
+  <item>
+    <name>Layuda con Frijoles Negros, Pollo Cocinado en Fuego Lento y Salsita de Aguacate</name>
+    <price>$14</price>
+    <description>House Made Flat Bread topped with Braised Chicken, Black Beans &amp; Avocado Sauce</description>
+  </item>
+  <item>
+    <name>Tostada de Pescada Ahumado con Ensalada Mixto</name>
+    <price>$15</price>
+    <description>Mesquite Smoked Fish Tostada with Mixed Greens</description>
+  </item>
+  <item>
+    <name>Caldo de Mariscos</name>
+    <price>$17</price>
+    <description>Heirloom Tomato &amp; Red Wine Stew of Calamari, Fish, Clams, Serrano   Chili’s &amp; Wilted Greens</description>
+  </item>
+  <item vegetarian="yes">
+    <name>Crepa de Calabacita, Cebollas y Ensalada Mixto</name>
+    <price>$14</price>
+    <description>Crepe Stuffed with Grilled Zucchini, Caramelized Onions &amp; Fresh Greens</description>
+  </item>
+  <item>
+    <name>Puerco a la Parilla con un Torta de Calabacita, Vejetales de Verano</name>
+    <price>$18</price>
+    <description>Grilled Pork Loin with Zucchini Torta &amp; Mulato Cider Vinaigrette</description>
+  </item>
+  <item>
+    <name>Trébol Torta Hamburgesa, con Mayonesa de Jalapeños, Escabeche y Verduras</name>
+    <price>$9</price>
+    <description>Trébol Ground  Sirloin on a Onion Bun, Jalapeño Aioli, Pickles, Mixed Greens</description>
+    <addition cost="$1">Bacon</addition>
+    <addition cost="$1">Asadero Cheese</addition>
+    <addition cost="$1">Guacamole</addition>
+  </item>
+</menu>

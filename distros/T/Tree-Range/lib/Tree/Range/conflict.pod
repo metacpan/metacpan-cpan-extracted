@@ -1,0 +1,72 @@
+### conflict.pod --- Document Tree::Range::conflict  -*- POD -*-
+
+### Ivan Shmakov, 2013
+
+## To the extent possible under law, the author(s) have dedicated all
+## copyright and related and neighboring rights to this software to the
+## public domain worldwide.  This software is distributed without any
+## warranty.
+
+## You should have received a copy of the CC0 Public Domain Dedication
+## along with this software.  If not, see
+## <http://creativecommons.org/publicdomain/zero/1.0/>.
+
+### Code:
+
+=head1 NAME
+
+Tree::Range::conflict E<ndash> override C<range_set>, so that it fails
+instead of writing over
+
+=head1 SYNOPSIS
+
+    package Tree::Range::Foo::Conflict 0.022;
+
+    require Tree::Range::conflict;
+    require Tree::Range::Foo;
+
+    push (our @ISA, qw (Tree::Range::conflict Tree::Range::Foo));
+
+=head1 DESCRIPTION
+
+This class overrides the C<range_set> method, adding a guard which
+raises an exception (S<i. e.>, I<dies>) if the range being
+associated is
+already given a value or values other than the I<leftmost> one
+(as determined by the C<range_free_p> method.)
+
+Consider, S<e. g.:>
+
+    ## assuming numeric (<=>) comparison function
+    $rat->range_set (100, 200, "foo");
+    $rat->range_set (200, 300, "bar");
+    $rat->range_set (150, 250, "baz");
+
+The last C<range_set> invocation in the example above raises an
+exception if the class of C<$rat> is a descendant of this one.
+
+B<Note,> however, that the C<range_set_over> method is I<not>
+overridden, so itE<rsquo>s still possible to
+overwrite an arbitrary rangeE<rsquo>s association,
+or to effectively E<ldquo>removeZ<>E<rdquo> one
+(by associating it with the I<leftmost> value.)
+
+=head1 SEE ALSO
+
+L<Tree::Range::base>, L<Tree::Range::RB::Conflict>
+
+=head1 AUTHOR
+
+Ivan Shmakov <oneingray@gmail.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the 3-clause BSD license, as
+included within the code.
+
+=cut
+
+### Emacs trailer
+## Local variables:
+## coding: us-ascii
+## End:
+### conflict.pod ends here

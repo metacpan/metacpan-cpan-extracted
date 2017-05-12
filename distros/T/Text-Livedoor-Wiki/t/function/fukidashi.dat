@@ -1,0 +1,107 @@
+=== livedoor id
+--- wiki
+&fukidashi(polocky){こんにちは！}
+--- html
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><a target="_blank" title="polocky" href="http://profile.livedoor.com/polocky/"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" /></a></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">こんにちは！</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+=== default icon
+--- wiki
+&fukidashi(){こんにちは！}
+--- html
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/fukidashi/icon_guest.gif" /></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">こんにちは！</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+=== image icon 
+--- wiki
+&fukidashi(http://wiki.livedoor.com/img/0809/cmn/logo_wiki.gif){こんにちは！}
+--- html
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><img src="http://wiki.livedoor.com/img/0809/cmn/logo_wiki.gif" /></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">こんにちは！</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+=== right 
+--- wiki
+&fukidashi(polocky,right){こんにちは！}
+--- html
+<div class="BOX-balloon BOX-balloon-right">
+<div class="BOX-balloon-image"><a target="_blank" title="polocky" href="http://profile.livedoor.com/polocky/"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" /></a></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">こんにちは！</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+=== right 
+--- wiki
+&fukidashi(polocky,left){こんにちは！}
+--- html
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><a target="_blank" title="polocky" href="http://profile.livedoor.com/polocky/"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" /></a></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">こんにちは！</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+=== undef location
+--- wiki
+&fukidashi(polocky,){hi}
+--- html
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><a target="_blank" title="polocky" href="http://profile.livedoor.com/polocky/"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" /></a></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">hi</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+=== synopsis
+--- wiki
+&fukidashi(polocky){i am polocky}
+&fukidashi(polocky,right){i am polocky}
+&fukidashi(polocky,left){i am polocky}
+&fukidashi(,right){i am polocky}
+&fukidashi(){i am polocky}
+&fukidashi(http://image.livedoor.com/img/top/10/logo.gif){i am polocky}
+--- html
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><a target="_blank" title="polocky" href="http://profile.livedoor.com/polocky/"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" /></a></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">i am polocky</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+
+<div class="BOX-balloon BOX-balloon-right">
+<div class="BOX-balloon-image"><a target="_blank" title="polocky" href="http://profile.livedoor.com/polocky/"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" /></a></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">i am polocky</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><a target="_blank" title="polocky" href="http://profile.livedoor.com/polocky/"><img src="http://image.profile.livedoor.jp/icon/polocky_60.gif" /></a></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">i am polocky</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+
+<div class="BOX-balloon BOX-balloon-right">
+<div class="BOX-balloon-image"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/fukidashi/icon_guest.gif" /></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">i am polocky</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/fukidashi/icon_guest.gif" /></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">i am polocky</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><img src="http://image.livedoor.com/img/top/10/logo.gif" /></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">i am polocky</div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->
+=== mix
+--- wiki
+&fukidashi(){hoge __hoge__ }
+--- html
+<div class="BOX-balloon BOX-balloon-left">
+<div class="BOX-balloon-image"><img src="http://static.wiki.livedoor.jp/formatter-storage/images/function/fukidashi/icon_guest.gif" /></div><div class="BOX-balloon-text"><div class="balloon-top"><div class="balloon-top-inner"></div></div><div class="balloon-body"><div class="balloon-body-inner"><div class="balloon-body-inner2">hoge <sub>hoge</sub></div></div></div>
+<div class="balloon-bottom"><div class="balloon-bottom-inner"></div></div>
+</div><!-- /BOX-balloon-text -->
+</div><!-- /BOX-balloon -->

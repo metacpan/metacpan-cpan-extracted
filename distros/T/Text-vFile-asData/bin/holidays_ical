@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Text::vFile::asData;
+use Digest::MD5 qw(md5_hex);
+use DateTime;
+use CGI;
+
+my $file = -e 'Holidays' ? 'Holidays' : 'http://intranet.fotango.private/index.php?title=Holidays&action=raw';
+
+=head1 NAME
+
+holidays_ical - scrape the Holidays wiki page into ics
+
+=head1 DESCRIPTION
+
+So this is why I wanted an iCal generator/parser.
+
+We have an intranet, with a page for who's going to be out of the office
+which blech suggested might be good to have available as .ics.
+
+The page is structured roughly like so:
+
+ = 2004 =
+
+ == February ==
+
+ * [[Richard Clamp]]
+ ** 1st - 3rd Baying at the moon
+
+This script scrapes that page and makes it available as a vCalendar.
+It's called as a cgi so you can subscribe to it with iCal.app and
+phpICal.
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=cut
+
+
+# sometimes, we want to use a url so wrap read_file as get_lines
+sub get_lines {
+    my $file = shift;
+    if ($file =~ m{^https?://}) {
+        # s'really a url
+        require LWP::Simple;
+        my $content = LWP::Simple::get( $file );
+        return split $/, $content;
+    }
+    require File::Slurp;
+    return File::Slurp::read_file( $file );
+}
+
+# horrible stateful stuff, but easier than driving Template::Extract
+my ($year, $month, $who);
+
+my %months = (
+    January => 1, February => 2, March => 3, April => 4, May => 5, June => 6,
+    July => 7, August => 8, September => 9, October => 10, November => 11,
+    December => 12 );
+
+sub guesstimate_event {
+    my $event = shift;
+    my $when = $event;
+
+    my ($firstday, $lastday);
+    if ($when =~ /(\d+)(?:st|nd|rd|th)?\s*(?:to|-)\s*(\d+)/i) {
+        #print "From $1 to $2: $event\n";
+        ($firstday, $lastday) = ($1, $2);
+    }
+    elsif ($when =~ /(\d+)/) {
+        ($firstday, $lastday) = ($1, $1);
+    }
+    else {
+        warn "didn't handle $event";
+        return;
+    }
+
+    my $start = DateTime->new(
+        year => $year, month => $months{ $month }, day  => $firstday,
+       );
+    my $end   = DateTime->new(
+        year => $year, month => $months{ $month }, day  => $lastday
+       )->add(
+           days => 1,
+           ( $firstday > $lastday ? ( months => 1 ) : () ) # 28th - 2nd probably means it went over a month
+          );
+
+    return {
+        type => 'VEVENT',
+        properties => {
+            SUMMARY => [ { value => $who } ],
+            DESCRIPTION => [ { value => $event } ],
+            DTSTART => [ { value => $start->ymd(''),
+                           param => { VALUE => 'DATE' },
+                       } ],
+            DTEND   => [ { value => $end->ymd(''),
+                           param => { VALUE => 'DATE' },
+                       } ],
+            UID     => [ { value => md5_hex( "$year $month $who - $event" ),
+                       } ],
+        },
+    };
+}
+
+my $cal = {
+    type => 'VCALENDAR',
+    properties => {
+        'X-WR-CALNAME' => [ { value => "Fotango Holidays" } ],
+    },
+    objects => [],
+};
+for (get_lines( $file )) {
+    next if /^\s*$/;
+    /^= (.*) =/      and do { $year  = $1; next };
+    /^== (.*) ==/    and do { $month = $1; next };
+    /^\* \[\[(.*)\]\]/  and do { $who   = $1; next };
+    /^\*\* (.*)/ and do {
+        #print "year = $year, month = $month, event = $1\n";
+        push @{ $cal->{objects} }, guesstimate_event( $1 );
+        next;
+    };
+    # warn "unhandled line: $_";
+}
+
+print CGI->header('text/calendar');
+print map "$_\n", Text::vFile::asData->generate_lines( $cal );

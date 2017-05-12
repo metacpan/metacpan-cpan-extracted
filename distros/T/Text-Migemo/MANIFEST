@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Text/Migemo.pm
+lib/Text/Migemo.xs
+src/ppport.h
+t/00_compile.t
+t/01_basic.t
+t/dict/han2zen.dat
+t/dict/hira2kata.dat
+t/dict/migemo-dict
+t/dict/roma2hira.dat

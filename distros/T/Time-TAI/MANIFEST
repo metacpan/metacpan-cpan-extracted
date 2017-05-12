@@ -1,0 +1,13 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Time/TAI.pm
+lib/Time/TAI/Realisation_TAI.pm
+t/mjd.t
+t/pod_cvg.t
+t/pod_syn.t
+SIGNATURE    Added here by Module::Build

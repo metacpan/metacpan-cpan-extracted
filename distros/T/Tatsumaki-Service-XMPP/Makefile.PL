@@ -1,0 +1,16 @@
+use inc::Module::Install;
+name 'Tatsumaki-Service-XMPP';
+all_from 'lib/Tatsumaki/Service/XMPP.pm';
+readme_from 'lib/Tatsumaki/Service/XMPP.pm';
+requires 'Tatsumaki';
+requires 'AnyEvent::XMPP';
+requires 'HTTP::Message::PSGI';
+requires 'LWP';
+requires 'namespace::clean';
+build_requires 'Test::More';
+use_test_base;
+auto_include_deps;
+author_tests('xt');
+auto_set_repository;
+auto_install;
+WriteAll;

@@ -1,0 +1,174 @@
+#primaryContent_2columns {
+    margin-right: 0;
+}
+#secondaryContent_2columns {
+    display: none;
+}
+#columnA_2columns {
+    left   : 0;
+    bottom : 0;
+    right  : 0;
+}
+
+#right_box {
+    position: absolute;
+    right: 5px;
+    bottom: 0;
+    top: 25px;
+    left: 1212px;
+}
+div.chart_boxs {
+    position: absolute;
+    left: 5px;
+    top: 25px;
+    right: 410px;
+    bottom: 0;
+}
+div.charts {
+    width           : 1200px;
+    height          : 600px;
+    text-align      : center;
+    border          : 1px solid #E1E1E1;
+    margin-top      :  5px;
+}
+div.chartsoverview {
+    margin-top      : 5px;
+    text-align      : center;
+    border          : 1px solid #E1E1E1;
+    width           : 1200px;
+    height          : 100px;
+}
+div.charts img,
+div.chartsoverview img {
+    position        : relative;
+    top             : 35px;
+    border          : none;
+}
+div.charts img.newimage {
+    top             : 30px;
+}
+div.chart_headers {
+    border          :    1px solid #E1E1E1;
+    width           : 1200px;
+    height          :   21px;
+}
+div.chart_headers div.search {
+    float: left;
+    width: 622px;
+    padding-left: 4px;
+}
+div.chart_headers div.search a,
+div.chart_headers div.search div {
+    float: left;
+}
+div.chart_headers div.search a,
+div.chart_headers div.search font {
+    margin-top  : 3px;
+    margin-left : 3px;
+    margin-right: 3px;
+}
+div.chart_headers div.text {
+    float: left;
+    width: 502px;
+    margin-top: 3px;
+    padding-left: 4px;
+}
+div.chart_headers div.icons {
+    float: left;
+    width: 67px;
+    margin-top: 3px;
+}
+div.chart_headers div.icons img {
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: -4px;
+    margin-top: -1px;
+}
+#main_inner {
+    margin-left: 15px;
+}
+#bt_create_static_url_idx {
+    width: 120px;
+    float:left;
+    margin-top: -2px;
+}
+
+#choices {
+    border      :    1px solid #E1E1E1;
+    width       : 650px;
+    min-height  :  55px;
+    margin-top  :  -8px;
+    padding     :   5px;
+    padding-top :   0;
+    float       : left;
+}
+#idx_tags_area {
+    border      :    1px solid #E1E1E1;
+    width       : 650px;
+    min-height  :  50px;
+    margin-top  :   5px;
+    padding     :   5px;
+    float       : left;
+}
+#idx_marking_area {
+    border      :    1px solid #E1E1E1;
+    width       : 650px;
+    min-height  :  50px;
+    margin-top  :   5px;
+    padding     :   5px;
+    float       :   left;
+}
+#idx_marking_area div {
+    float       : left;
+    width       : 10px;
+    height      : 10px;
+    margin-right:  3px;
+    margin-top  :  3px;
+}
+
+#idx_clear {
+    clear       : both;
+}
+
+#choices input {
+    position: relative;
+    top: -10px;
+}
+#choices label {
+    position: relative;
+    top: -12px;
+    margin-left: 3px;
+}
+#dv_searchleft_idx,
+#dv_searchright_idx {
+    font-size: 30px;
+    margin-top: -10px;
+}
+#idx_chart_version {
+    width: 170px;
+    margin-top:-4px;
+}
+
+.xAxis > .tickLabel {
+    white-space         : nowrap;
+    margin-top          : 5px;
+    /* set 90° Rotation of x-axis labels for Firefox, IE, Safari and Chrome */
+    -moz-transform      : rotate(45deg);
+    -o-transform        : rotate(45deg);
+    -webkit-transform   : rotate(45deg);
+    filter              : progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+}
+
+/* css for timepicker */
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { float: left; clear:left; padding: 0 0 0 5px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 45%; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+
+.ui-timepicker-rtl{ direction: rtl; }
+.ui-timepicker-rtl dl { text-align: right; padding: 0 5px 0 0; }
+.ui-timepicker-rtl dl dt{ float: right; clear: right; }
+.ui-timepicker-rtl dl dd { margin: 0 45% 10px 10px; }

@@ -1,0 +1,13 @@
+Changelog for Tk-Sugar
+
+1.093190  2009-11-15 10:31:47 UTC
+ - subs available for padding
+ - subs available for internal padding
+ - subs available for widget state
+ - subs available for anchor option
+ - subs available for orientation
+
+1.093180 Sat Nov 14 19:52:21 2009
+ - initial release
+ - subs available for pack sides
+ - subs available pack fills

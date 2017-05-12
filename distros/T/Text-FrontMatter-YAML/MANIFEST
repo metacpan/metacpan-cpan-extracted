@@ -1,0 +1,23 @@
+Changes
+lib/Text/FrontMatter/YAML.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/10-basic-init-from-string.t
+t/11-noyaml.t
+t/12-emptyyaml.t
+t/13-nodata.t
+t/14-emptydata.t
+t/15-emptyboth.t
+t/20-basic-init-from-sections.t
+t/21-empty-null-yaml.t
+t/22-empty-null-data.t
+t/30-yaml-as-hash.t
+t/31-data-as-filehandle.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>TOBYINK::Pod::HTML</title>
+		<meta charset="utf-8"/>
+	</head>
+	<body class="pod">
+		<span id="___top"/>
+		<h1><span id="NAME">NAME</span></h1>
+		<p>TOBYINK::Pod::HTML - convert Pod to HTML like TOBYINK</p>
+		<h1><span id="SYNOPSIS">SYNOPSIS</span></h1>
+		<pre class="highlighting-perl"><span class="line_number" style="color:#666"> 1: </span><span class="comment" style="color:#060;font-style:italic">   #!/usr/bin/perl
+</span><span class="line_number" style="color:#666"> 2: </span>   
+<span class="line_number" style="color:#666"> 3: </span>   <span class="keyword" style="color:#009;font-weight:bold">use</span> <span class="pragma" style="color:#009">strict</span><span class="structure">;</span>
+<span class="line_number" style="color:#666"> 4: </span>   <span class="keyword" style="color:#009;font-weight:bold">use</span> <span class="pragma" style="color:#009">warnings</span><span class="structure">;</span>
+<span class="line_number" style="color:#666"> 5: </span>   <span class="keyword" style="color:#009;font-weight:bold">use</span> <span class="word">TOBYINK::Pod::HTML</span><span class="structure">;</span>
+<span class="line_number" style="color:#666"> 6: </span>   
+<span class="line_number" style="color:#666"> 7: </span>   <span class="keyword" style="color:#009;font-weight:bold">my</span> <span class="symbol" style="color:#333;background-color:#fcc">$pod2html</span> <span class="operator" style="color:#000;font-weight:bold">=</span> <span class="double" style="color:#909">"TOBYINK::Pod::HTML"</span><span class="operator" style="color:#000;font-weight:bold">-&gt;</span><span class="word">new</span><span class="structure">(</span>
+<span class="line_number" style="color:#666"> 8: </span>      <span class="word">pretty</span>             <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="number" style="color:#39C">1</span><span class="operator" style="color:#000;font-weight:bold">,</span>       <span class="comment" style="color:#060;font-style:italic"># nicely indented HTML</span>
+<span class="line_number" style="color:#666"> 9: </span>      <span class="word">code_highlighting</span>  <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="number" style="color:#39C">1</span><span class="operator" style="color:#000;font-weight:bold">,</span>       <span class="comment" style="color:#060;font-style:italic"># use PPI::HTML</span>
+<span class="line_number" style="color:#666">10: </span>      <span class="word">code_line_numbers</span>  <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="core" style="color:#009;font-weight:bold">undef</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+<span class="line_number" style="color:#666">11: </span>      <span class="word">code_styles</span>        <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="structure">{</span>        <span class="comment" style="color:#060;font-style:italic"># some CSS</span>
+<span class="line_number" style="color:#666">12: </span>         <span class="word">comment</span>   <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:green'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+<span class="line_number" style="color:#666">13: </span>         <span class="word">keyword</span>   <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'font-weight:bold'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+<span class="line_number" style="color:#666">14: </span>      <span class="structure">}</span>
+<span class="line_number" style="color:#666">15: </span>   <span class="structure">);</span>
+<span class="line_number" style="color:#666">16: </span>   
+<span class="line_number" style="color:#666">17: </span>   <span class="word">print</span> <span class="symbol" style="color:#333;background-color:#fcc">$pod2html</span><span class="operator" style="color:#000;font-weight:bold">-&gt;</span><span class="word">file_to_html</span><span class="structure">(</span><span class="word">__FILE__</span><span class="structure">);</span></pre>
+		<h1><span id="DESCRIPTION">DESCRIPTION</span></h1>
+		<p>Yet another pod2html converter.</p>
+		<p>Note that this module requires Perl 5.14, and I have no interest in supporting legacy versions of Perl.</p>
+		<h2><span id="Constructor">Constructor</span></h2>
+		<dl><dt><span id="new(%attrs)"><code>new(%attrs)</code></span></dt><dd><p>Moose-style constructor.</p></dd></dl>
+		<h2><span id="Attributes">Attributes</span></h2>
+		<dl>
+			<dt><span id="pretty"><code>pretty</code></span></dt>
+			<dd><p>If true, will output pretty-printed (nicely indented) HTML. This doesn't make any difference to the appearance of the HTML in a browser.</p><p>This feature requires <a href="https://metacpan.org/module/XML%3A%3ALibXML%3A%3APrettyPrint" class="podlinkpod">XML::LibXML::PrettyPrint</a>.</p><p>Defaults to false.</p></dd>
+			<dt><span id="code_highlighting"><code>code_highlighting</code></span></dt>
+			<dd><p>If true, source code samples within pod will be syntax highlighted as Perl 5.</p><p>This feature requires <a href="https://metacpan.org/module/PPI%3A%3AHTML" class="podlinkpod">PPI::HTML</a> and <a href="https://metacpan.org/module/PPI%3A%3ADocument" class="podlinkpod">PPI::Document</a>.</p><p>Defaults to false.</p></dd>
+			<dt><span id="code_line_numbers"><code>code_line_numbers</code></span></dt>
+			<dd><p>If undef, source code samples within pod will have line numbers, but only if they begin with <code>"#!"</code>.</p><p>If true, all source code samples within pod will have line numbers.</p><p>This feature only works in conjunction with <code>code_highlighting</code>.</p><p>Defaults to undef.</p></dd>
+			<dt><span id="code_styles"><code>code_styles</code></span></dt>
+			<dd>
+				<p>A hashref of CSS styles to assign to highlighted code. The defaults are:</p>
+				<pre class="highlighting-perl">   <span class="operator" style="color:#000;font-weight:bold">+</span><span class="structure">{</span>
+      <span class="word">symbol</span>        <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#333;background-color:#fcc'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">pod</span>           <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#060'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">comment</span>       <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#060;font-style:italic'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">operator</span>      <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#000;font-weight:bold'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">single</span>        <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#909'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">double</span>        <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#909'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">literal</span>       <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#909'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">interpolate</span>   <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#909'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">words</span>         <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#333;background-color:#ffc'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">regex</span>         <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#333;background-color:#9f9'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">match</span>         <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#333;background-color:#9f9'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">substitute</span>    <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#333;background-color:#f90'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">transliterate</span> <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#333;background-color:#f90'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">number</span>        <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#39C'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">magic</span>         <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#900;font-weight:bold'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">cast</span>          <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#f00;font-weight:bold'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">pragma</span>        <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#009'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">keyword</span>       <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#009;font-weight:bold'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">core</span>          <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#009;font-weight:bold'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">line_number</span>   <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#666'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+<span class="comment" style="color:#060;font-style:italic">      # for non-Perl code
+</span>      <span class="word">alert</span>         <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#f00;background-color:#ff0'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">warning</span>       <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#f00;background-color:#ff0;font-style:italic'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">error</span>         <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">'color:#f00;background-color:#ff0;font-style:italic;font-weight:bold'</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">bstring</span>       <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">''</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">function</span>      <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">''</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">regionmarker</span>  <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">''</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+      <span class="word">others</span>        <span class="operator" style="color:#000;font-weight:bold">=&gt;</span> <span class="single" style="color:#909">''</span><span class="operator" style="color:#000;font-weight:bold">,</span>
+   <span class="structure">}</span></pre>
+				<p>Which looks kind of like the Perl highlighting from SciTE.</p>
+			</dd>
+		</dl>
+		<h2><span id="Methods">Methods</span></h2>
+		<dl><dt><span id="file_to_dom($filename)"><code>file_to_dom($filename)</code></span></dt><dd><p>Convert pod from file to a <a href="https://metacpan.org/module/XML%3A%3ALibXML%3A%3ADocument" class="podlinkpod">XML::LibXML::Document</a> object.</p></dd><dt><span id="string_to_dom($document)"><code>string_to_dom($document)</code></span></dt><dd><p>Convert pod from string to a <a href="https://metacpan.org/module/XML%3A%3ALibXML%3A%3ADocument" class="podlinkpod">XML::LibXML::Document</a> object.</p></dd><dt><span id="file_to_xhtml($filename)"><code>file_to_xhtml($filename)</code></span></dt><dd><p>Convert pod from file to an XHTML string.</p></dd><dt><span id="string_to_xhtml($document)"><code>string_to_xhtml($document)</code></span></dt><dd><p>Convert pod from string to an XHTML string.</p></dd><dt><span id="file_to_html($filename)"><code>file_to_html($filename)</code></span></dt><dd><p>Convert pod from file to an HTML5 string.</p><p>This feature requires <a href="https://metacpan.org/module/HTML%3A%3AHTML5%3A%3AWriter" class="podlinkpod">HTML::HTML5::Writer</a>.</p></dd><dt><span id="string_to_html($document)"><code>string_to_html($document)</code></span></dt><dd><p>Convert pod from string to an HTML5 string.</p><p>This feature requires <a href="https://metacpan.org/module/HTML%3A%3AHTML5%3A%3AWriter" class="podlinkpod">HTML::HTML5::Writer</a>.</p></dd></dl>
+		<h2><span id="Alternative_Syntax_Highlighting">Alternative Syntax Highlighting</span></h2>
+		<!-- for highlighter language=Text -->
+		<p>This module defines an additional Pod command to change the language for syntax highlighting. To tell TOBYINK::Pod::HTML to switch to, say, Haskell instead of the default (Perl), just use:</p>
+		<pre class="highlighting-text">   =for highlighter language=Haskell</pre>
+		<p>Then all subsequent code samples will be highlighted as Haskell, until another such command is seen.</p>
+		<p>While syntax highlighting for Perl uses <a href="https://metacpan.org/module/PPI%3A%3AHTML" class="podlinkpod">PPI::HTML</a>, alternative syntax highlighting uses <a href="https://metacpan.org/module/Syntax%3A%3AHighlight%3A%3AEngine%3A%3AKate" class="podlinkpod">Syntax::Highlight::Engine::Kate</a>, so you need to have that installed if you want that feature. Note that the language names defined by Syntax::Highlight::Engine::Kate are case-sensitive, and TOBYINK::Pod::HTML makes no attempt at case-folding, so you must use the correct case!</p>
+		<p>Note that only the PPI highlighter supports line numbering.</p>
+		<p>The following command can be used to switch to plain text syntax highlighting (i.e. no highlighting at all):</p>
+		<pre class="highlighting-text">   =for highlighter language=Text</pre>
+		<!-- for highlighter language=Perl -->
+		<h1><span id="SEE_ALSO">SEE ALSO</span></h1>
+		<p><a href="https://metacpan.org/module/Pod%3A%3ASimple" class="podlinkpod">Pod::Simple</a>, <a href="https://metacpan.org/module/PPI%3A%3AHTML" class="podlinkpod">PPI::HTML</a>, etc.</p>
+		<h1><span id="AUTHOR">AUTHOR</span></h1>
+		<p>Toby Inkster &lt;tobyink@cpan.org&gt;.</p>
+		<h1><span id="COPYRIGHT_AND_LICENCE">COPYRIGHT AND LICENCE</span></h1>
+		<p>This software is copyright (c) 2013 by Toby Inkster.</p>
+		<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+		<h1><span id="DISCLAIMER_OF_WARRANTIES">DISCLAIMER OF WARRANTIES</span></h1>
+		<p>THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+	</body>
+</html>

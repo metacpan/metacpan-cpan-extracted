@@ -1,0 +1,25 @@
+# this tests print formats and filters
+
+
+
+"gimp"
+
+"gimp"
+
+'gimp' => $99.42
+
+#========================================================================
+
+# TIME is a special variable.  This will return the current system time
+# which will not match the expected test.  The "#pragma ignore" in the 
+# corresponding expected output (../expect/subst.5) tells the
+# test script to turn off line comparison checking until the next 
+# "#pragma check"
+
+#pragma ignore
+894439217 seconds since the epoch
+06-May-98 
+#pragma check
+
+#========================================================================
+

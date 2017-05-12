@@ -1,0 +1,25 @@
+---
+name: Tk-Airports
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+abstract: 'A widget to select airports'
+version: 0.061
+version_from: lib/Tk/Airports.pm
+installdirs:  site
+requires:
+    Tk: 804.027
+    Tk::HList: 0
+    Tk::Toplevel: 0
+    Test::More: 0.67
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30
+license: perl
+provides:
+  Tk::Airports:
+    file: lib/Tk/Airports.pm
+    version: 0.061
+resources:
+  license: http://dev.perl.org/licenses
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

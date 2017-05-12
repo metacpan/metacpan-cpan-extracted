@@ -1,0 +1,13 @@
+Changes
+DateEntry.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/dateentry.t
+t/decode_posix_bytes.t
+t/isodate.t
+t/locale_daynames.t
+t/TkTest.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

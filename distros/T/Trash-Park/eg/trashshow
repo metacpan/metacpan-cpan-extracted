@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+###########################################
+# trashshow 
+# 2005, Mike Schilli <cpan@perlmeister.com>
+###########################################
+use strict;
+use warnings;
+
+use Trash::Park;
+
+my $trasher = Trash::Park->new();
+
+for my $item (@{$trasher->history()}) {
+    print $item->as_string(), "\n";
+}

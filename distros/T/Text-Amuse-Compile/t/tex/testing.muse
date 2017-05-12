@@ -1,0 +1,15 @@
+#title Testing *for* me
+#author Pallino *Pinco* 1
+#date 2014
+#lang mk
+#hyphenation pal-li-no pin-co _garbage -remove -me %%%&i9071954'0913248979
+
+** This is just a test
+
+àààà test
+
+** Another test
+
+àààà test ć đ ÀÀÀÀ TEST Ć Đ 
+
+Pallino Pinco

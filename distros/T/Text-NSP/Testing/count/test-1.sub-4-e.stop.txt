@@ -1,0 +1,5 @@
+@stop.mode=AND
+/\bis\b/
+/here$/
+
+/(o|O)(n|N)/

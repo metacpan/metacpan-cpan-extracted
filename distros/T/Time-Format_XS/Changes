@@ -1,0 +1,34 @@
+Revision history for Perl extension Time::Format_XS.
+
+0.10  2003 July 5
+        - First version.  Version number to match that of Time::Format.
+
+0.11  2003 Juy 11
+        - No changes.  Version number incremented to keep up with
+          Time::Format.
+
+0.12  2003 July 20
+        - International month is now not case-converted; interpolated
+          in the locale-preferred capitalization.
+        - Support \Q, \U, \L, \E, \l, \u.
+
+0.13  2003 August 1
+        - Complete rewrite.  Now more structured and easier to maintain.
+          And almost 10% faster to boot.
+        - Now works on platforms where langinfo.h is not available.
+        - Many thanks to Mike Taylor for testing under Windows.
+
+1.00  2004 August 10
+        - Increase version to 1.00.  No other changes.
+
+1.01  2005 December 1
+        - Now handles DateTime objects, stringified DateTimes,
+          Date::Manip strings, and iso8601 strings.
+
+1.02  2005 December 1
+        - No changes. Had to increment the number because of a PAUSE
+          upload problem.
+
+1.03  2009 June 18
+        - Fix longstanding segfault bug in set_locale.
+        - Conditionally declare tzname, so will compile in mingw (Strawberry)

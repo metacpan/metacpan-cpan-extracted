@@ -1,0 +1,160 @@
+# History of Perl distribution Test-Virtual-Filesystem.  This change log is valid YAML.
+
+0.13 :
+     - Released: 2008 Jul 27
+     - Summary: Fix for 5.10 (finally!)
+
+     - Fix: Attributes::Handler argument types changed for 5.10
+       Credit: cpan testers andreas.koenig, srezic, imacat, DEVOGON, DAGOLDEN, Josts Smokehouse. chris, david
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/876250
+
+0.12 :
+     - Released: 2007 Dec 05
+     - Summary: Fix for Cygwin
+
+     - Fix: Cygwin, like MSWin32, allows rename(<dir>, <file>)
+       Credit: cpan tester srezic@cpan.org
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/834715
+
+0.11 :
+     - Released: 2007 Dec 04
+     - Summary: Fix for Solaris
+
+     - Feature: Supports Solaris
+
+     - Fix: Solaris reports EEXIST, not ENOTEMPTY, for rename_dir_notempty
+       Credit: cpan-tester Davd Cantrell
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg812452.html
+
+0.10 :
+     - Released: 2007 Dec 02
+     - Summary: Fixes for Win32
+
+     - Feature: Supports Win32 (well, at least Strawberry Perl 5.8.8)
+
+     - Fix: MSWin32 allows rename(<dir>, <file>), instead of ENOTDIR
+       Credit: cpan tester srezic@cpan.org
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg806443.html
+
+     - Caveats: Fails rename_dir_notempty on Solaris.  Better diagnostics should make this fixable.
+       Credit: cpan-tester Davd Cantrell
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg812452.html
+
+0.09_01 :
+     - Released: 2007 Nov 26
+     - Summary: Speculative fixes for platform inconsistencies
+
+     - Fix: MSWin32 reports EACCES, not EISDIR, for truncate_dir
+       Credit: cpan tester srezic@cpan.org
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg806443.html
+
+     - Fix: MSWin32 reports ENOENT, not ENOTDIR, for truncate_file_no_dir
+       Credit: cpan tester srezic@cpan.org
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg806443.html
+
+     - Fix: MSWin32 reports EACCES, not EISDIR, for rename_mismatch_dir
+       Credit: cpan tester srezic@cpan.org
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg806443.html
+
+     - Internals: Better failure diagnostics, including POSIX strerror() messages for $OS_ERROR
+
+0.08 :
+     - Released: 2007 Nov 26
+     - Summary: Added rename tests
+
+     - Feature: Added rename_* tests, documented some unimplemented corner cases
+
+     - Prerequisites: Added Test::Builder::Tester v1.04
+     - Prerequisites: Pointlessly add some core deps (Carp, File::Spec, POSIX) for CPANTS
+
+     - Internals: Convert */*.t to use Test::Builder::Tester instead of ad-hoc Test::Builder data
+     - Internals: Got rid of noisy messages about TODO and skip tests
+     - Internals: Make read operations optionally die, as per test needs
+
+0.07 :
+     - Released: 2007 Nov 24
+     - Summary: Fix nested symlink test for Linux; Forgive skew between clock and disk timestamp
+
+     - Fix: Linux has a stricter limit of 5 nested symlinks.  Settle on this lower limit.
+       Credit: cpan-testers David Cantrell and ICERIDER
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg791775.html      
+
+     - Fix: Add tolerance for difference between CPU clock and disk timestamp
+       Credit: cpan-tester David Cantrell
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg791775.html
+
+     - Prerequisites: Added Readonly.pm v1.00
+
+     - Press: http://www.nntp.perl.org/group/perl.qa/2007/11/msg9676.html
+
+0.06 :
+     - Released: 2007 Nov 20
+     - Summary: Perl prereq to 5.8.0; new truncate, symlink, a/m/ctime tests
+
+     - Incompatibility: Upped prereq to Perl 5.8.0 instead of 5.6.0
+     - Incompatibility: (minor) renamed "enable_test_utime" to "enable_test_mtime"
+
+     - Fix: Specify actual minimum of Perl 5.8.0; 5.6.x bombed on local through ref
+       Credit: cpan-tester David Cantrell
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/790313
+
+     - Internals: Removed unneeded prereqs from Build.PL and Filesystem.pm
+
+0.05 :
+     - Released: 2007 Nov 19
+     - Summary: Fix for non-English localized Perl
+
+     - Fix: Check numeric $! against POSIX errno instead of string $! against english
+       Credit: cpan-tester Andreas Koenig
+       RT: http://rt.cpan.org/Ticket/Display.html?id=30839
+       CPANTesters: http://www.nntp.perl.org/group/perl.cpan.testers/2007/11/msg784219.html
+
+0.04 :
+     - Released: 2007 Nov 18
+     - Summary: Renamed test_* methods from v0.03; Subclassing; Bug fixes
+
+     - Incompatibility: Renamed 'test_*' methods to 'enable_test_*'
+
+     - Fix: Add List::MoreUtils to Build.PL/Makefile.PL
+       Credit: cpan-tester David Cantrell
+     - Fix: Turn off symlink and chown for Win32; better support for OS non-features
+       Credit: cpan-tester stro@cpan.org, MSWin32 (for symlink part)
+     - Fix: Enable subclassing (via a hack/workaround for Test::Class 0.24 -- see rt.cpan.org 30836)
+
+     - Internals: Moved self-test tests into subclasses in t/*.t
+
+     - TODO: Remove above workaround if RT 30836 is resolved
+
+     - Press: http://use.perl.org/~ChrisDolan/journal/34920
+
+0.03 :
+     - Released: 2007 Nov 16
+     - Summary: Important bug fixes
+
+     - Fix: Don't use "\n" since it is one or two characters, depending on platform
+       Credit: cpan-tester stro@cpan.org, MSWin32
+
+     - Fix: Disable the stat_dir_size() test because it is too filesystem-dependent
+       Credit: cpan-tester srezic@cpan.org, cygwin
+
+     - Fix: Make xattr test more tolerant of getxattr() implementations (undef vs. '')
+
+0.02 :
+     - Released: 2007 Nov 16
+     - Summary: Backward compatibility, xattrs, symlinks
+
+     - Feature: let client specify a compatibility version.  Mark newer tests TODO.
+     - Feature: skip tests that the client wants to ignore
+     - Feature: new test to exercise symlinks
+     - Feature: new test to read/write extended attributes
+     - Feature: new test to check that dirs have non-zero size
+
+     - Prerequisites: (optional) File::ExtAttr v0.08
+
+     - Press: http://use.perl.org/article.pl?sid=07/11/16/0925222
+
+0.01 :
+     - Released: 2007 Nov 14
+     - Summary: initial release
+     - Caveats: very incomplete collection of tests. See CAVEATS in documentation
+

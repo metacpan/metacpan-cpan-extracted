@@ -1,0 +1,65 @@
+=head1 NAME
+
+Toadfarm::Manual::Intro - Introduction to Toadfarm
+
+=head1 DESCRIPTION
+
+This manual aims to give an introduction to how to set up C<toadfarm>.
+
+=head2 Script
+
+First you need to create a basic script to describe when an application
+will be triggered. This is a plain Perl script which allow you to pull in
+any trick you like from the Perl toolbox.
+
+Example:
+
+  #!/usr/bin/perl
+  use Toadfarm -init;
+
+  mount "/home/web/project1/script/app1" => {
+    "X-Request-Base" => "http://mydomain.com/whatever"
+  };
+
+  mount "Web::App2" => {
+    "Host" => "mydomain.com",
+  };
+
+  start;
+
+The script above will pass the request on to C<app1> when the
+"X-Request-Base" header is set to "http://mydomain.com/whatever".
+Or it will pass the request on to C<Web::App2> if the "Host" header
+is set to "mydomain.com".
+
+You can save the content of the file anywhere and run it as any other
+L<Mojolicious> application.
+
+Note: There are other special fields to trigger on, besides HTTP headers. See
+L<Toadfarm::Manual::Config/Apps> for more details.
+
+=head2 Start Toadfarm
+
+After you have saved the config file, you can start the L<Toadfarm> application:
+
+  $ /path/to/your-script start
+
+After this, you should see C<your-script> running and the applications can be
+accessed from L<http://localhost:8080>.
+
+=head2 Further reading
+
+See L<Toadfarm::Manual::RunningToadfarm> for more command line options, and
+L<Toadfarm::Manual::Config> for full list of config file options.
+
+=head1 SEE ALSO
+
+L<Toadfarm::Manual::Config>.
+
+L<Toadfarm::Manual::RunningToadfarm>.
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

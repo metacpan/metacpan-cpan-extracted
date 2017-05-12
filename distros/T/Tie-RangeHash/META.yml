@@ -1,0 +1,33 @@
+---
+name: Tie-RangeHash
+version: 1.05
+author:
+  - 'Robert Rothenberg <rrwo at cpan.org>'
+abstract: Allows hashes to associate values with a range of keys
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+requires:
+  Algorithm::SkipList: 1.02
+  base: 0
+  perl: 5.006
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Algorithm::SkipList::NumericRangeNode:
+    file: lib/Tie/RangeHash.pm
+  Algorithm::SkipList::StringRangeNode:
+    file: lib/Tie/RangeHash.pm
+  Tie::RangeHash:
+    file: lib/Tie/RangeHash.pm
+    version: 1.05
+  Tie::RangeHash::TYPE_NUMBER:
+    file: lib/Tie/RangeHash.pm
+  Tie::RangeHash::TYPE_STRING:
+    file: lib/Tie/RangeHash.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

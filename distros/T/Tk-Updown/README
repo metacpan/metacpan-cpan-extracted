@@ -1,0 +1,18 @@
+I submit these Control to the Perl community in the hope that someone
+other than myself will find them useful. I have placed POD documentation
+with example program.
+
+Requirements :-
+
+        Tk              - 800.005 or above
+
+The suite is built/installed in the conventional manner :-
+
+        perl Makefile.PL
+        make
+        make install
+
+Bugs, suggestions, fixes, etc. can either be sent to palash_bksys@yahoo.com
+
+Copyright (c) 2004-2005 P. Sanjaysen, all rights reserved. These classes are
+distributed under identical terms as Perl itself.

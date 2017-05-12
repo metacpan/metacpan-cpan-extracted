@@ -1,0 +1,24 @@
+Revision history for Time-Tiny
+
+1.07      2016-06-23 09:41:50-04:00 America/New_York
+    - No changes from 1.06
+
+1.06      2016-06-20 14:39:46-04:00 America/New_York (TRIAL RELEASE)
+    - David Golden taking over as maintainer
+    - Fix tests with DateTime::Locale 1.00 and later
+    - Fix documentation typos
+    - Ensure Carp is loaded before using it
+
+1.05 Wed  2 Dec 2009
+    - POD fixes (MTROUT)
+
+1.04 Mon 20 Apr 2009
+    - Converting to EU:MM
+    - Adding a few more tests
+
+1.02 Thu  5 Jun 2008
+    - Updating to Module::Install 0.75
+          (Mental note, convert to EU:MM later)
+
+0.01 Mon  4 Sep 2006
+    - original version

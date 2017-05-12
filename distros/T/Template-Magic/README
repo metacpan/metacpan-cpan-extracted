@@ -1,0 +1,53 @@
+Template-Magic README File
+==========================
+
+
+Description
+-----------
+
+Template-Magic is a "magic" interface between programming and design. It makes
+"magically" available all the runtime values - stored in your variables or
+returned by your subroutines - inside a static template file. Usually no need to
+assign values to the object.
+
+
+Structure
+---------
+
+This is the general three of the template::Magic system
+
+    Bundle::Template::Magic      a bundle to install everything in one step
+    Template::Magic              the main module
+    Template::Magic::Zone        defines the zone object
+    Template::Magic::HTML        handlers useful in HTML environment
+
+    
+Installation
+------------
+
+0.  Prerequisites:
+- Perl version >= 5.6.1
+- OOTools      >= 2
+- IO::Util     >= 1.46
+- File::Spec   >= 0
+
+
+1. CPAN installation
+- if you want to install Template::Magic plus all related extensions
+(Template::Magic::HTML and prerequisites), all in one easy step:
+
+    perl -MCPAN -e 'install Bundle::Template::Magic'
+
+
+2. Standard installation
+- from the directory where this file is located, type:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+--
+Domizio Demichelis - perl.4pro.net
+2005-01-03

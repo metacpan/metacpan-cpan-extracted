@@ -1,0 +1,6 @@
+%% BLOCK title_block chomp %%
+This is the title block: %% title %%
+%% ENDBLOCK %%
+%% BLOCK footer_block chomp %%
+This is the footer block
+%% ENDBLOCK %%

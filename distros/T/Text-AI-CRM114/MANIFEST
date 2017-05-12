@@ -1,0 +1,12 @@
+CRM114.xs
+Makefile.PL
+MANIFEST
+README
+typemap
+t/Text-AI-CRM114-libcrm114.t
+t/Text-AI-CRM114.t
+t/SampleText.pm
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Text/AI/CRM114.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body tal:define="foo string:bar; bar string:foo">
+    <h1 tal:content="foo">The title</h1>
+    <h1 tal:content="bar">The title</h1>
+  </body>
+</html>

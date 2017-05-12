@@ -1,0 +1,109 @@
+NAME
+        Test::Out - Test output from FILEHANDLE
+
+SYNOPSIS
+        use Test::Out;
+        my $out = Test::Out->new( output => *STDOUT, tests => 4 );
+
+        # Or ...
+
+        my $out = Test::Out->new(tests => 4);
+        $out->redirect( output => *STDOUT );
+
+        ## This will go to a place that your harness can see
+        $out->diag("Testing is* functions");
+
+        ## But this will not be displayed but captured for test methods
+        $some->method_that_prints("This is a test\n");
+        $out->is_output("This is a test\n", "test 1");
+        $out->isnt_output("Han shot first", "test 2");
+
+        $out->diag("Testing regex functions");
+        CORE::print "A random number: @{[int rand 100]}\n";
+        $out->like_output(qr/random number: \d+/, "test 3");
+        $out->unlike_output(qr/i like pickles$/, "test 4");
+
+        $out->restore;
+
+        ## This will be printed to STDOUT
+        print "Done.\n";
+
+DESCRIPTION
+    Test out is another Test::Builder application that implements a few of
+    the well known test facilities except the result of output to an
+    IO::Handle is used. This could be used to capture output being printed
+    to a file, but it's ideal for output being sent to STDOUT or STDERR.
+
+    See the SYNOPSIS for an example use.
+
+AUTHOR
+    Lane Davis <cpan@upt.org>
+
+FUNCTIONS
+  METHODS
+    $out->new(%options)
+        The Test::Out package constructor has several arguments, some
+        required some optional
+
+        REQUIRED OPTIONS
+            The following options must be present in the hash passed to the
+            constructor:
+
+            THE NUMBER OF PLANNED TESTS
+
+                tests => $Tests
+                    The number of tests are simply passed to Test::Builder
+
+        NON-REQUIRED OPTIONS
+
+            THE OUTPUT YOU WISH TO TEST
+                Actually the "output" key is required, but you have the
+                option of passing the key into the constructor or to the
+                redirect method. This is useful if you have several segments
+                of tests wrapped with redirect and restore.
+
+                output => *FH
+                    The output argument is required and may contain either a
+                    FILEHANDLE typeglob, or
+
+                output => \*FHREF
+                    The "output" key may also point to a typeglob reference
+
+    $out->redirect
+    $out->redirect(output => *FH)
+    $out->redirect(output => \*FH)
+        This method will be automatically invoked by the constructor if the
+        output key is passed to new.
+
+  TESTS
+    $out->is_output(EXPR, NAME)
+    $out->was_output(EXPR, NAME)
+        Tests the last output buffer against EXPR. If there isn't a perfect
+        string comparison the test fails. Pay particular attention to
+        possible newlines in the last output. If you're unsure either paste
+        the contents of $\ to your comparitor or use the "like" method.
+
+        The was_output method is an alias for is_output.
+
+    $out->isnt_output(EXPR, NAME)
+    $out->wasnt_output(EXPR, NAME)
+        This is the inverse of is_output, the negation of the comparing EXPR
+        to the last printed output is performed.
+
+        The wasnt_output method is an alias for isnt_output.
+
+    $out->like_output(qr/STRING/, NAME)
+        This performs a test with the last output and a compiled regular
+        expression as its first argument.
+
+    $out->unlike_output(qr/STRING/, NAME)
+        This performs a negated test with the last output and a compiled
+        regular expression as its first argument.
+
+    $out->cmp_output(OP, EXPR, NAME)
+        This performs a comparison allowing you to pass your own perl binary
+        operator as the first arugment (e.g., "==", "eq", etc).
+
+    $out->diag(@messages)
+        Prints a diagnostic message
+

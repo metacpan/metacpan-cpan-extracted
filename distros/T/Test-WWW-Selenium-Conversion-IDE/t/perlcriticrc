@@ -1,0 +1,3 @@
+[NamingConventions::Capitalization]
+packages = :no_restriction
+subroutines = :no_restriction

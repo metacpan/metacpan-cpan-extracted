@@ -1,0 +1,66 @@
+0.09	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.08	20 November 2003
+	You can't unlink an open file on Win32.  Fixed problem in the
+	test-suite.
+
+0.07	8 October 2003
+	Added dependency on load.pm, as that was somehow missed before.
+
+	Mike Pomraning pointed out that Thread::Serialize wasn't necessary
+	at all, as die() can take a reference inside an eval.  Changed code
+	according his suggestions and added support for exiting flag to the
+	end subroutine.  Removed dependency on Thread::Serialize.
+
+0.06	30 August 2003
+	Missed the fact that threads->create is a synonym for threads->new.
+	Before, threads->create still referred to the original threads->new
+	rather than the one we put in its place.  Now fixed thanks to spot
+	by Tom Brettin.  Adapted test-suite as well.
+
+	Changed "$new" package lexical into a closure.
+
+0.05	13 August 2003
+	Cleaned up Makefile.PL and updated copyright info.  Increased
+	dependency on Thread::Serialize to 0.06.
+
+	Fixed some warnings that could be fixed.  Added message for those
+	warnings that can not be fixed (for now).
+
+0.04	30 September 2002
+        Use "load.pm" instead of AutoLoader.  Increased dependency on
+        Thread::Serialize to 0.05, which also uses "load.pm".
+
+        Removed "our" from $VERSION, should shave off some bytes in
+        memory usage, as found from testing with Benchmark::Thread::Size.
+
+0.03	6 September 2002
+	Fixed some problems with real exit() in main thread + regression
+	test added.  Suggested by Rafael Garcia-Suarez.
+
+	Test for "ismain" added.
+
+0.02	5 September 2002
+	Added "begin" subroutine support + documentation + test-suite.
+	Nick Ing-Simmons suggested this on p5p.  It seemed like an easy
+	thing to add.  And it was.
+
+	Since "begin" would make an automatic = 1 as the default much more
+	sensible, I've changed the default behaviour to have threads
+	automatically inherit any "begin" and "end" subroutine specifications.
+	And to make the naming of the subroutines more consistent, "automatic"
+	was renamed to "inherit".  All of this makes it incompatible with
+	0.01, so it was released as soon as possible on the same day as 0.01.
+
+	Added class method documentation.
+
+	Added support for "ismain" class method, to mark the current thread
+	as the "main" thread from which a "real" exit() should occur.
+
+	Fixed some documentation nits.
+
+	Oops, VERSION file was wrong.  It now correctly shows 0.02.
+
+0.01	5 September 2002
+	First version of Thread::Exit.

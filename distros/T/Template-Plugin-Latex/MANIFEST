@@ -1,0 +1,28 @@
+MANIFEST			This list of files
+README                          General information, installation, etc.
+INSTALL
+Changes
+TODO
+Makefile.PL                    
+lib/Template/Latex.pm
+lib/Template/Plugin/Latex.pm
+t/README
+t/00-latex.t
+t/01-latex2dvi.t
+t/02-latex2pdf.t
+t/03-latex2ps.t
+t/10-output.t
+t/11-plugin-errors.t
+t/12-template.t
+t/13-latex-encode.t
+t/20-references.t
+t/input/bibfiles/testbib.bib
+t/input/deeply/nested/directory/testinc2.tex
+t/input/testinc.tex
+t/input/testrefs.dvi
+t/input/testrefs.tex
+t/lib/Template/Test/Latex.pm
+t/output/README
+texinputs/tt2.sty
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

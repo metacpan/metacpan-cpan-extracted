@@ -1,0 +1,45 @@
+#
+# $Id: Changes,v 2.4 2003/05/26 10:39:49 dankogai Exp dankogai $
+#
+$Revision: 2.4 $ $Date: 2003/05/26 10:39:49 $
+! lib/Text/Kakasi/JP.pod
+  s/Text::Kakasi/Text::Kakasi::JP/ for NAME section
+  Thank Graham Barr <gbarr@pobox.com> for showing me the
+  right trick.  But I STILL THINK search.cpan.org is WRONG.
+  Message-Id: <rt-22325-58215.2.40083316787562@rt.perl.org>
+- lib/Text/Kakasi.pod
+! Kakasi.pm
+  Merged pod back in and deleted lib/Text/Kakasi.pod
+
+2.03 2003/05/26 04:29:26
+! lib/Text/Kakasi.pod
+  Very minor document fixes
+! Kakasi.pm
+  Added 1st paragraph of =head1 DESCRIPTION so BSDPAN is happy.
+
+2.02 2003/05/26 04:29:26
+! Kakasi.pm MANIFEST
++ lib/Text/Kakasi.pod
+  English POD detached from Kakasi.pm prevent search.cpan.org from 
+  wrongly treats JP.pod as the main document for Kakasi.
+
+2.01 2003/05/25 14:14:31
+! lib/Text/Kakasi/JP.pod
+  POD retouches.
+! MANIFEST
++ lib/Text/Kakasi/JP.pod
+- Kakasi/JP.pod
+  Path renamed to prevent CPAN indexer from getting confused.
+
+2.00 2003/05/22 18:19:11
++ *
+  ! Version jumps to 2.0
+  + OOP interface
+  + cleaner XS codes
+  + CPAN-savvy test suites
+  + perl 5.8 Encode support
+  = backword compatibility
+  - ChangeLog -> ChangeLog.1 is the Changes file for ver. 1.x
+  ! Dan Kogai <dankogai@dan.co.jp>  Takes over the maintainance from
+    NOKUBI Takatsugu <knok@daionet.gr.jp>
+  Message-Id: <76B724DB-8B4B-11D7-9D18-000393AE4244@dan.co.jp>  

@@ -1,0 +1,32 @@
+Telephone-Lookup-Americom version 0.01
+======================================
+
+This module looks up service information for a particular telephone number,
+exchage, or area code.  The most useful feature is that it will give you 
+the name of the service provider for an exchange (e.g. '216-374').
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 by Sidharth Malhotra
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

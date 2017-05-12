@@ -1,0 +1,11 @@
+# Revision history for Perl module Text::Emoticon::Unicode
+---
+version: 0.02
+date:    2012-01-25
+changes:
+  - Added the parent pragma to requirements
+---
+version: 0.01
+date:    2012-01-25
+changes:
+  - First release

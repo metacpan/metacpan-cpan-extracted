@@ -1,0 +1,106 @@
+<!-- this is a makerelease script: http://makerelease.sourceforge.net/ -->
+<makerelease>
+  <steps>
+
+    <step type="system" title="Pre-Checks">
+      <commands>
+	<command>perl -Ilib or status -q</command>
+	<command>grep VERSION or</command>
+      </commands>
+    </step>
+
+    <step type="prompt" prompt="Enter the new version number:"
+      title="Pick A Version Number"
+      parameter="VERSION" values="^[\.\d]+$"
+      />
+
+    <step type="modify" title="Updating version number">
+      <modifications>
+	<modify
+	  find="(VERSION\s*=\s*.)([0-9]+\.[0-9]+)"
+	  replace="${1}{VERSION}">
+	  <files>
+	    <file>lib/*.pm</file>
+	    <file>lib/*/*.pm</file>
+	    <file>or</file>
+	  </files>
+	</modify>
+      </modifications>
+    </step>
+
+    <step type="system" title="Check the version number changes">
+      <commands>
+	<command ignoreerror="1">perl -Ilib or diff | egrep '^[-\+]'</command>
+      </commands>
+    </step>
+
+    <step type="system" title="SVN Commit the changes"
+    interactive="1">
+      <commands>
+	<command>perl -Ilib or commit -m "Update Version Number: {VERSION}"</command>
+      </commands>
+    </step>
+
+    <step type="system" title="Make Test">
+      <commands>
+	<command>make clean</command>
+	<command>perl Makefile.PL</command>
+	<command>make test</command>
+      </commands>
+    </step>
+
+    <step type="section" interactive="1" title="Create Release">
+      <text>
+	We'll now:
+         - create the tag
+         - export the results to a tar ball.
+         - upload it to CPAN
+
+	Quit now if you're not ready to finish the release.
+      </text>
+    
+      <steps>
+	<step type="system" title="tag the release">
+	  <commands>
+	    <command>svk copy -m "tag of version {VERSION}" //local/or/trunk //local/or/tags/TheOneRing-{VERSION}</command>
+	  </commands>
+	</step>
+
+	<step type="system" title="make dist">
+	  <commands>
+	    <command>make dist</command>
+	  </commands>
+	</step>
+
+	<step type="system" title="creating binaries">
+	  <commands>
+	    <command>sh dist/Makefile.pp {VERSION}</command>
+	  </commands>
+	</step>	  
+
+	<step type="system" title="upload to cpan">
+	  <commands>
+	    <command>cpan-upload -mailto wjhns117@hardakers.net -user hardaker -verbose TheOneRing-{VERSION}.tar.gz</command>
+	  </commands>
+	</step>
+
+	<step type="system" title="upload to personal site">
+	  <commands>
+	    <command>scp TheOneRing-{VERSION}.tar.gz dh:hardakers.net/code/TheOneRing/releases/</command>
+	    <command>scp or-{VERSION}.linux dh:hardakers.net/code/TheOneRing/releases/</command>
+	  </commands>
+	</step>
+	  
+
+      </steps>
+    </step>
+
+    <step type="system" title="make docs">
+      <commands>
+	<command>pod2html --infile=or --outfile=or.html</command>
+	<command>pod2html --infile=lib/TheOneRing.pm --outfile=TheOneRing.html</command>
+	<command>scp or.html TheOneRing.html dh:hardakers.net/code/TheOneRing/</command>
+      </commands>
+    </step>
+  </steps>
+</makerelease>

@@ -1,0 +1,76 @@
+TAP Version 13
+1..1
+# Affe
+ok 1 - zomtec
+  ---
+  0:
+    CPU0: 1136556
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  timer
+  1:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 8
+    linetail: IO-APIC-edge  i8042
+  4:
+    CPU0: 391
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  serial
+  7:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  parport0
+  8:
+    CPU0: 0
+    CPU1: 2
+    CPU2: 0
+    linetail: IO-APIC-edge  rtc
+  9:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-level  acpi
+  12:
+    CPU0: 102
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge  i8042
+  14:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 225207
+    linetail: IO-APIC-edge  ide0
+  169:
+    CPU0: 1
+    CPU1: 327
+    CPU2: 8092
+    linetail: IO-APIC-level  xen-platform-pci
+  177:
+    CPU0: 25
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-level  uhci_hcd:usb1
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: ~
+  LOC:
+    CPU0: 1136220
+    CPU1: 1136082
+    CPU2: 1136081
+    linetail: ~
+  ERR:
+    CPU0: 0
+    CPU1: ~
+    CPU2: ~
+    linetail: ~
+  MIS:
+    CPU0: 0
+    CPU1: ~
+    CPU2: ~
+    linetail: ~
+  ...

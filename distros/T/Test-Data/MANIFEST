@@ -1,0 +1,25 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/Test/Data.pm
+lib/Test/Data/Array.pm
+lib/Test/Data/Function.pm
+lib/Test/Data/Hash.pm
+lib/Test/Data/Scalar.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/array.t
+t/function.t
+t/hash.t
+t/import.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/scalar.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

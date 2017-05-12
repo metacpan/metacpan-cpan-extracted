@@ -1,0 +1,3 @@
+In t/templates/includes/inc2
+<%@ include file="../dirtest1b.psp" %>
+

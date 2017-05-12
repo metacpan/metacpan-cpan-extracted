@@ -1,0 +1,26 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tk-GraphItems-Circle.t
+t/Tk-GraphItems-TextBox.t
+t/Tk-GraphItems-Tie.t
+t/Tk-GraphItems.t
+t/pod.t
+t/pod_coverage.t
+
+lib/Tk/GraphItems.pm
+lib/Tk/GraphItems/TextBox.pm
+lib/Tk/GraphItems/Connector.pm
+lib/Tk/GraphItems/LabeledConnector.pm
+lib/Tk/GraphItems/Circle.pm
+lib/Tk/GraphItems/Node.pm
+lib/Tk/GraphItems/GraphItem.pm
+lib/Tk/GraphItems/TiedCoord.pm
+lib/Tk/GraphItems/Examples/moving_items.pl
+lib/Tk/GraphItems/Examples/gi_circles_graph.pl
+lib/Tk/GraphItems/Examples/create_and_autolayout.pl
+lib/Tk/GraphItems/Examples/test_graph_items.pl
+lib/Tk/GraphItems/Examples/gi_easy.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

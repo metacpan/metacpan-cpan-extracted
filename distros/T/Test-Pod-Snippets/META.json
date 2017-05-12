@@ -1,0 +1,79 @@
+{
+   "abstract" : "Generate tests from pod code snippets",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Pod-Snippets",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Module::Locate" : "0",
+            "Moose" : "0",
+            "MooseX::SemiAffordanceAccessor" : "0",
+            "Params::Validate" : "0",
+            "Pod::Parser" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0.94",
+            "perl" : "5.004"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Pod::Snippets" : {
+         "file" : "lib/Test/Pod/Snippets.pm",
+         "version" : "0.07"
+      },
+      "Test::Pod::Snippets::Parser" : {
+         "file" : "lib/Test/Pod/Snippets.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-test-pod-snippets at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-Snippets"
+      },
+      "homepage" : "http://search.cpan.org/dist/Test-Pod-Snippets/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/test-pod-snippets.git",
+         "web" : "https://github.com/yanick/test-pod-snippets"
+      }
+   },
+   "version" : "0.07",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK"
+}
+

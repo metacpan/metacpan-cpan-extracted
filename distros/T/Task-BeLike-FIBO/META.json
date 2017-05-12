@@ -1,0 +1,69 @@
+{
+   "abstract" : "Leonardo Pisano a.k.a. Fibonacci",
+   "author" : [
+      "G. Casati <fibo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-BeLike-FIBO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "Test::Compile" : "v1.2.1",
+            "Test::More" : "1.001009",
+            "Test::Pod" : "1.48"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Ack" : "2.14",
+            "CPAN" : "2.10",
+            "CPAN::Uploader" : "0.103007",
+            "ExtUtils::MakeMaker" : "6.64",
+            "Module::CoreList" : "5",
+            "PPI::HTML" : "1.08",
+            "Perl::Tidy" : "20140711",
+            "Term::ReadKey" : "2.32",
+            "Term::ReadLine::Perl" : "1.0303",
+            "Test::Compile" : "v1.2.1",
+            "Test::More" : "1.001009",
+            "Test::Pod" : "1.48",
+            "V" : "0.13",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/fibo/Task-BeLike-FIBO-pm/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Task::BeLike::FIBO",
+      "license" : [
+         "http://g14n.info/artistic-license"
+      ],
+      "repository" : {
+         "url" : "https://github.com/fibo/Task-BeLike-FIBO-pm"
+      }
+   },
+   "version" : "0.19"
+}

@@ -1,0 +1,95 @@
+README for the Perl Module Time::Period
+
+
+Copyright (c) 1997 Patrick Ryan.  All rights reserved.
+
+This Perl module uses the conditions given by Perl.  This module may only
+be distributed and or modified under the conditions given by Perl.
+
+
+-----------------
+Document Contents
+-----------------
+
+  - Document Contents
+  - Overview
+  - Getting the Distribution
+  - Installation of the Module
+  - Using the Module
+  - Contacting the Author
+  - Removing the Module
+
+
+--------
+Overview
+--------
+
+Period.pm is a Perl module that contains code to deal with time periods.
+Currently, there is only a function in this module.  That function is
+called inPeriod().
+
+inPeriod() determines if a given time is within a given time period.
+It will return 1 if it is, 0 if not, and -1 if either the time or the
+period passed to it were malformed.  The time is specified in non-leap
+year seconds past January 1, 1970, as per the time() function.  The period
+is a string which is of the form described in Period's man page.
+
+
+------------------------
+Getting the Distribution
+------------------------
+
+This distribution can be retrieved at from CPAN at
+<URL=http://www.perl.com/CPAN/modules/by-module/Time/>.
+
+
+--------------------------
+Installation of the Module
+--------------------------
+
+Make sure the user executing this has sufficient permissions to add and
+modify files in the global perl installation.  The user should use this
+sequence to install this module.
+
+  perl Makefile.PL
+  make
+  make install
+  make realclean
+
+
+----------------
+Using the Module
+----------------
+
+The module is simple to use.  It is fully documented with pod
+documentation.  To read it, execute
+
+  perldoc Time::Period
+
+after the module is installed.
+
+A HTML version of the pod documentation is included in the distribution.
+It was created with pod2html, which comes with Perl.
+
+
+---------------------
+Contacting the Author
+---------------------
+
+I welcome any feedback on this module.  If you have comments, questions,
+or ideas, feel free to send them to me, Patrick Ryan, pgryan@geocities.com.
+
+
+-------------------
+Removing the Module
+-------------------
+
+Under a user with sufficient permissions and from the Period distribution 
+directory, execute
+
+  perl Makefile.PL
+
+if there isn't a file called Makefile.  Then execute
+
+  make uninstall
+

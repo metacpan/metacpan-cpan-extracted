@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use English qw( -no_match_vars );
+
+use FindBin qw( $Bin );
+use File::Spec::Functions qw( catfile );
+
+my @package = slurp(catfile($Bin, '..', 'lib', 'Template', 'Perlish.pm'));
+my @tptree = slurp(catfile($Bin, 'tptree'));
+for (@tptree) {
+   next if m{\A use \s* Template::Perlish; \s*\z}mxs;
+   if (m{\A __END__ \s* \z}mxs) {
+      for (@package) {
+         last if m{\A __END__ \s* \z}mxs;
+         print;
+      }
+      @package = ();
+   }
+   print;
+}
+
+sub slurp {
+   my $filename = shift;
+   open my $fh, '<', $filename or die "open('$filename'): $OS_ERROR";
+   return <$fh> if wantarray;
+   local $/;
+   return <$fh>;
+}

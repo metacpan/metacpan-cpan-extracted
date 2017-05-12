@@ -1,0 +1,286 @@
+# NAME
+
+Term::ANSIScreen - Terminal control using ANSI escape sequences
+
+# SYNOPSIS
+
+    # qw/:color/ is exported by default, i.e. color() & colored()
+
+    use Term::ANSIScreen qw/:color :cursor :screen :keyboard/;
+
+    print setmode(1), setkey('a','b');
+    print "40x25 mode now, with 'a' mapped to 'b'.";
+    <STDIN>; resetkey; setmode 3; cls;
+
+    locate 1, 1; print "@ This is (1,1)", savepos;
+    print locate(24,60), "@ This is (24,60)"; loadpos;
+    print down(2), clline, "@ This is (3,15)\n";
+
+    setscroll 1, 20;
+
+    color 'black on white'; clline;
+    print "This line is black on white.\n";
+    print color 'reset'; print "This text is normal.\n";
+
+    print colored ("This text is bold blue.\n", 'bold blue');
+    print "This text is normal.\n";
+    print colored ['bold blue'], "This text is bold blue.\n";
+    print "This text is normal.\n";
+
+    use Term::ANSIScreen qw/:constants/; # constants mode
+    print BLUE ON GREEN . "Blue on green.\n";
+
+    $Term::ANSIScreen::AUTORESET = 1;
+    print BOLD GREEN . ON_BLUE "Bold green on blue.", CLEAR;
+    print "\nThis text is normal.\n";
+
+    # Win32::Console emulation mode
+    # this returns a Win32::Console object on a Win32 platform
+    my $console = Term::ANSIScreen->new;
+    $console->Cls;	# also works on non-Win32 platform
+
+# DESCRIPTION
+
+Term::ANSIScreen is a superset of __Term::ANSIColor__ (as of version 1.04
+of that module).  In addition to color-sequence generating subroutines
+exported by `:color` and `:constants`, this module also features
+`:cursor` for cursor positioning, `:screen` for screen control, as
+well as `:keyboard` for key mapping.
+
+## NOTES
+
+- All subroutines in __Term::ANSIScreen__ will print its return value if
+called under a void context.
+- The cursor position, current color, screen mode and keyboard
+mappings affected by __Term::ANSIScreen__ will last after the program
+terminates. You might want to reset them before the end of
+your program.
+
+# FUNCTIONS
+
+## __Win32::Console__ emulation mode
+
+When used in a object-oriented fashion, __Term::ANSIScreen__ acts as a
+__Win32::Console__ clone:
+
+    use Term::ANSIScreen;
+    my $console = Term::ANSIScreen->new;
+    $console->Cls();		# unbuffered
+    $console->Cursor(0, 0);	# same as locate(1, 1)
+    $console->Display();	# really a no-op
+
+On the Win32 platform, the `new` constructor simply returns a geniune
+__Win32::Console__ object, if that module exists in the system.
+
+This feature is intended for people who has to port Win32 console
+applications to other platforms, or to write cross-platform application
+that needs terminal controls.
+
+## The `:color` function set (exported by default)
+
+__Term::ANSIScreen__ recognizes (case-insensitively) following color
+attributes: clear, reset, bold, underline, underscore, blink,
+reverse, concealed, black, red, green, blue, white, yellow, magenta,
+cyan, on_black, on_red, on_green, on_blue, on_white, on_yellow,
+on_magenta, and on_cyan.
+
+The color alone sets the foreground color, and on_color sets
+the background color. You may also use on_color without the
+underscore, e.g. "black on white".
+
+- color LIST
+
+Takes any number of strings as arguments and considers them
+to be space-separated lists of attributes.  It then forms
+and returns the escape sequence to set those attributes.
+
+- colored EXPR, LIST
+
+Takes a scalar as the first argument and any number of
+attribute strings as the second argument, then returns the
+scalar wrapped in escape codes so that the attributes will
+be set as requested before the string and reset to normal
+after the string.
+
+Alternately, you can pass a reference to an array as the
+first argument, and then the contents of that array will
+be taken as attributes and color codes and the remainder
+of the arguments as text to colorize.
+
+Normally, this function just puts attribute codes at the
+beginning and end of the string, but if you set
+$Term::ANSIScreen::EACHLINE to some string, that string will
+be considered the line delimiter and the attribute will be set
+at the beginning of each line of the passed string and reset
+at the end of each line.  This is often desirable if the
+output is being sent to a program like a pager, which can
+be confused by attributes that span lines.
+
+Normally you'll want to set `$Term::ANSIScreen::EACHLINE` to
+`"\n"` to use this feature.
+
+## The `:constants` function set
+
+If you import `:constants` you can use the constants CLEAR,
+RESET, BOLD, UNDERLINE, UNDERSCORE, BLINK, REVERSE, CONCEALED,
+BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, ON_BLACK, ON_RED,
+ON_GREEN, ON_YELLOW, ON_BLUE, ON_MAGENTA, ON_CYAN, and ON_WHITE
+directly.  These are the same as color('attribute') and can be
+used if you prefer typing:
+
+    print BOLD BLUE ON_WHITE "Text\n", RESET;
+    print BOLD BLUE ON WHITE "Text\n", RESET; # _ is optional
+
+to
+    print colored ("Text\n", 'bold blue on_white');
+
+When using the constants, if you don't want to have to remember
+to add the `, RESET` at the end of each print line, you can set
+`$Term::ANSIScreen::AUTORESET` to a true value.  Then, the display
+mode will automatically be reset if there is no comma after the
+constant.  In other words, with that variable set:
+
+    print BOLD BLUE "Text\n";
+
+will reset the display mode afterwards, whereas:
+
+    print BOLD, BLUE, "Text\n";
+
+will not.
+
+## The `:cursor` function set
+
+- locate [EXPR, EXPR]
+
+Sets the cursor position. The first argument is its row number,
+and the second one its column number.  If omitted, the cursor
+will be located at (1,1).
+
+- up    [EXPR]
+- down  [EXPR]
+- left  [EXPR]
+- right [EXPR]
+
+Moves the cursor toward any direction for EXPR characters. If
+omitted, EXPR is 1.
+
+- savepos
+- loadpos
+
+Saves/restores the current cursor position.
+
+## The `:screen` function set
+
+- cls
+
+Clears the screen with the current background color, and set
+cursor to (1,1).
+
+- clline
+
+Clears the current row with the current background color, and
+set cursor to the 1st column.
+
+- clup
+
+Clears everything above the cursor.
+
+- cldown
+
+Clears everything below the cursor.
+
+- setmode EXPR
+
+Sets the screen mode to EXPR. Under DOS, ANSI.SYS recognizes
+following values:
+
+     0:  40 x  25 x   2 (text)   1:  40 x  25 x 16 (text)
+     2:  80 x  25 x   2 (text)   3:  80 x  25 x 16 (text)
+     4: 320 x 200 x   4          5: 320 x 200 x  2
+     6: 640 x 200 x   2          7: Enables line wrapping
+    13: 320 x 200 x   4         14: 640 x 200 x 16
+    15: 640 x 350 x   2         16: 640 x 350 x 16
+    17: 640 x 480 x   2         18: 640 x 480 x 16
+    19: 320 x 200 x 256
+
+- wrapon
+- wrapoff
+
+Enables/disables the line-wraping mode.
+
+- setscroll EXPR, EXPR
+
+Causes scrolling to occur only on the lines numbered between
+the first and second arguments, inclusive.
+
+## The `:keyboard` function set
+
+- setkey EXPR, EXPR
+
+Takes a scalar representing a single keystroke as the first
+argument (either a character or an escape sequence in the
+form of `"num1;num2"`), and maps it to a string defined by
+the second argument.  Afterwards, when the user presses the
+mapped key, the string will get outputed instead.
+
+- resetkey [LIST]
+
+Resets each keys in the argument list to its original mapping.
+If called without an argument, resets all previously mapped
+keys.
+
+# DIAGNOSTICS
+
+- Invalid attribute name %s
+
+You passed an invalid attribute name to either color() or
+colored().
+
+- Identifier %s used only once: possible typo
+
+You probably mistyped a constant color name such as:
+
+    print FOOBAR "This text is color FOOBAR\n";
+
+It's probably better to always use commas after constant names
+in order to force the next error.
+
+- No comma allowed after filehandle
+
+You probably mistyped a constant color name such as:
+
+    print FOOBAR, "This text is color FOOBAR\n";
+
+Generating this fatal compile error is one of the main advantages
+of using the constants interface, since you'll immediately know
+if you mistype a color name.
+
+- Bareword %s not allowed while "strict subs" in use
+
+You probably mistyped a constant color name such as:
+
+    $Foobar = FOOBAR . "This line should be blue\n";
+
+or:
+
+    @Foobar = FOOBAR, "This line should be blue\n";
+
+This will only show up under use strict (another good reason
+to run under use strict).
+
+# SEE ALSO
+
+[Term::ANSIColor](http://search.cpan.org/perldoc?Term::ANSIColor), [Win32::Console](http://search.cpan.org/perldoc?Win32::Console)
+
+# AUTHORS
+
+唐鳳 <cpan@audreyt.org>
+
+# CC0 1.0 Universal
+
+To the extent possible under law, 唐鳳 has waived all copyright and related
+or neighboring rights to Term-ANSIScreen.
+
+This work is published from Taiwan.
+
+[http://creativecommons.org/publicdomain/zero/1.0](http://creativecommons.org/publicdomain/zero/1.0)

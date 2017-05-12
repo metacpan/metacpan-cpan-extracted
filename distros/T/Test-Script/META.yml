@@ -1,0 +1,34 @@
+---
+abstract: 'Basic cross-platform tests for scripts'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Adam Kennedy'
+build_requires:
+  Test::Builder: '0.32'
+  Test::Builder::Tester: '1.02'
+  Test::More: '0.96'
+  Test::Tester: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Script
+requires:
+  File::Spec: '0.80'
+  IPC::Run3: '0.034'
+  Probe::Perl: '0.01'
+  Test::Builder: '0.32'
+  Test::More: '0.96'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/Test-Script/issues
+  homepage: https://metacpan.org/pod/Test::Script
+  repository: git://github.com/plicease/Test-Script.git
+version: '1.18'
+x_serialization_backend: 'YAML::Tiny version 1.70'

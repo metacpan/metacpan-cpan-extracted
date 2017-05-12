@@ -1,0 +1,172 @@
+---
+
+# -------------------- systems
+
+- schema: Systems
+  name: a system called affe
+  data:
+    lid: 42
+    systemname: affe
+    revision_id: 142
+
+- schema: Systems
+  name: a system called iring
+  data:
+    lid: 12
+    systemname: iring
+    revision_id: 112
+
+- schema: Systems
+  name: a system called bascha
+  data:
+    lid: 15
+    systemname: bascha
+    revision_id: 115
+
+- schema: Systems
+  name: a system called bullock
+  data:
+    lid: 8
+    systemname: bullock
+    revision_id: 118
+
+# ------ revision
+
+- schema: Revision
+  name: iring revisions
+  data:
+    lid: 112
+    revision_id: 112
+    component_type: cpu
+    component_id: 3112
+
+
+- schema: Revision
+  name: iring revisions
+  data:
+    lid: 113
+    revision_id: 112
+    component_type: ram
+    component_id: 3212
+
+- schema: Revision
+  name: iring revisions
+  data:
+    lid: 114
+    revision_id: 112
+    component_type: ram
+    component_id: 3213
+
+- schema: Revision
+  name: Bullock RAM
+  data:
+    lid: 118
+    revision_id: 118
+    component_type: ram
+    component_id: 3214
+
+
+- schema: Revision
+  name: Bascha RAM
+  data:
+    lid: 115
+    revision_id: 115
+    component_type: ram
+    component_id: 3215
+
+- schema: Revision
+  name: Affe RAM
+  data:
+    lid: 142
+    revision_id: 142
+    component_type: ram
+    component_id: 3216
+
+
+
+# ----- CPU
+
+- schema: Cpu
+  name: iring cpu 3B2
+  data:
+    lid: 3112
+    vendor: AMD
+    family: 10
+    model: 3
+    stepping: 2
+    revision: B
+
+
+# ------ RAM
+- schema: Ram
+  name: RAM1
+  data:
+    lid: 3212
+    size_mbyte: 2048
+    vendor: Kingston
+
+- schema: Ram
+  name: RAM2
+  data:
+    lid: 3213
+    size_mbyte: 4123
+    vendor: Kingston
+
+- schema: Ram
+  name: RAM3
+  data:
+    lid: 3214
+    size_mbyte: 567
+    vendor: Kingston
+
+- schema: Ram
+  name: RAM3
+  data:
+    lid: 3215
+    size_mbyte: 123
+    vendor: Kingston
+
+- schema: Ram
+  name: RAM3
+  data:
+    lid: 3216
+    size_mbyte: 234
+    vendor: Kingston
+
+
+
+# ------ Network
+- schema: Network
+  name: iring network card
+  data:
+    lid: 3311
+    vendor: RealTek
+    chipset: rtl8169
+    mac: 00:18:4d:76:7a:12
+    bus_type: PCI
+    media: RJ45
+
+# --- bascha hardware ---
+
+- schema: Revision
+  name: iring revisions
+  data:
+    lid: 1150
+    revision_id: 115
+    component_type: cpu
+    component_id: 3115
+
+
+# ----- CPU
+
+- schema: Cpu
+  name: bascha cpu 3B2
+  data:
+    lid: 3115
+    vendor: AMD
+    family: 15
+    model: 67
+    stepping: 2
+    revision: 
+
+

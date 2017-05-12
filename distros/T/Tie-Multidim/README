@@ -1,0 +1,89 @@
+
+NAME
+     Tie::Multidim - "tie"-like	multidimensional data structures
+
+SYNOPSIS
+      use Tie::Multidim;
+      my $foo =	new Tie::Multidim \%h, '%@%';
+      $foo->[2]{'die'}[4] = "isa";
+
+
+DESCRIPTION
+     This module implements multi-dimensional data structures on
+     a hash.  $foo->[2]{'die'}[4] gets "mapped"	to
+     $bar{"2;die;4"}, where the	';' is actually	$SUBSEP	($;), and
+     %bar is a hash you	provide.
+
+     It	is particularly	useful in two, not disjoint, situations:
+
+     1.	the data space (matrix,	if you prefer) is sparsely populated;
+
+     2.	the hash into which the	data is	mapped is tied.
+
+     This illustrates (1):
+
+      my %matrix; # hash to store the data in.
+      local $; = ' ';
+      my $foo =	new Tie::Multidim \%matrix, '@@'; # array-of-arrays.
+
+      print $foo->[5432][9876];
+      #	prints the value of  $matrix{"5432 9876"}.
+
+     This illustrates (2):
+
+      my %matrix;
+      tie %matrix, 'Matrix';  #	some hashtie-able class.
+      local $; = ";"; #	gets remembered	by the object.
+      my $foo =	new Tie::Multidim \%matrix, '%@%';
+      #	3-level	structure: hash	of arrays of hashes.
+
+      $foo->{'human'}[666]{'beast'} = "value";
+
+      #	causes a call to
+      sub Matrix::STORE	{
+	my( $self, $index, $value ) = @_;
+	my( $x,	$y, $z ) = split $;, $index;
+	# with $x = 'human', $y	= 666, and $z =	'beast'.
+      }
+
+
+METHODS
+     new
+
+     This is the constructor.
+
+     The first argument	is a hash-reference.  This hash	will be
+     used by the Tie::Multidim object to actually store	the data.
+     The reference can be to an	anonymous hash,	to a normal hash,
+     or	to a tied hash.	 Tie::Multidim doesn't care, as	long as
+     it	supports the normal hash get and set operations	(STORE
+     and FETCH methods,	in TIEHASH terminology).
+
+     The second	argument is a string containing	'@' and	'%'
+     characters	(a al function prototypes).  The multidimensional
+     data structure will be constructed	to have	as many
+     dimensions	as there are characters	in this	string;	and each
+     dimension will be of the type indicated by	the character.
+     '@%' is an	array of hashes; '%@' is a hash	of arrays; and so
+     on.
+
+     storage
+
+     This returns the same hash	reference that was passed as the
+     first argument to the constructor.	 Not exactly a method, it
+     must be called as a package function, and passed the
+     multidim reference.
+
+	     $foo = new	Tie::Multidim, \%h, '@@';
+	     $hashref =	Tie::Multidim::storage(	$foo );
+	     # same effect as:
+	     $hashref =	\%h;
+
+
+AUTHOR
+     jdporter@min.net (John Porter)
+
+COPYRIGHT
+     This module is free software; you may redistribute	it and/or
+     modify it under the same terms as Perl itself.
+

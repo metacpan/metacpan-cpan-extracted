@@ -1,0 +1,3 @@
+use Test::More tests=>1;
+use Test::Tail::Multi files=>'baz';
+is int @Test::Tail::Multi::monitored, 1, "right number of entries";

@@ -1,0 +1,44 @@
+Revision history for Perl extension Test-EasyMock
+
+0.10 2013-10-02T22:21:43Z
+
+  - Add 'and_answer' and 'and_stub_answer' method at ExpectationsSetter.
+  - Add 'and_list_return' and 'and_stub_list_return' method at ExpectationsSetter.
+
+0.09 2013-08-18T02:59:06Z
+
+  - Fix POD and Changes.
+
+0.08 2013-08-18T02:08:53Z
+
+  - Fix circular reference.
+  - Support class method mocking.
+
+0.07 2013-07-05T03:12:05Z
+
+  - Use Data::Dump instead of Data::Dumper.
+
+0.06 2013-06-29T11:20:47Z
+
+  - Add arguments matcher feature.
+
+0.05 2013-06-27T14:05:19Z
+
+  - Move some test to xt/.
+
+0.04 2013-06-23T09:19:01Z
+
+  - Use minilla for authoring.
+
+0.03 -- Thu Aug 23 20:50:35 JST 2012
+
+  - Support mock to 'can' method. 
+
+0.02 -- Fri Aug 17 15:51:19 JST 2012
+
+  - Support mock part of an object.
+
+0.01 -- Sat Mar 10 04:43:07 JST 2012
+
+  - Initial release.
+

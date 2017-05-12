@@ -1,0 +1,34 @@
+This package provides:
+- Tie::Hash::CustomStorage
+- Tie::Array::CustomStorage
+
+Tie::Hash::CustomStorage is a tied hash class which makes it easy to
+also specify a custom storage for the hash.
+
+In other words you can get:
+- a tied hash of tied scalar
+- a tied hash of object 
+- a tied hash of value with automatic initialization
+
+Likewise, Tie::Array::CustomStorage is a tied array class where you
+can specify the same kind of storage.
+
+
+Legal mumbo jumbo:
+------------------
+
+ Copyright (c) 2004 Dominique Dumont. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.
+
+ - Dominique Dumont
+   domi@komarr.grenoble.hp.com
+
+---------------------------------------------------------------------
+INSTALLATION
+
+         gunzip -c <dist_file>.tar.gz | tar xvf -
+         cd <dist_directory>
+         perl Makefile.PL
+         make test          
+         make install

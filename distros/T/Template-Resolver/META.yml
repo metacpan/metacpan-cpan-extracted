@@ -1,0 +1,22 @@
+---
+abstract: 'A powerful, and simple, library for resolving placeholders in templated files'
+author:
+  - 'Lucas Theisen <lucastheisen@pastdev.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Resolver
+requires:
+  Log::Any: '0'
+  perl: '5.008009'
+resources:
+  homepage: https://github.com/lucastheisen/template-resolver
+  repository: https://github.com/lucastheisen/template-resolver.git
+version: '1.13'
+x_serialization_backend: 'YAML::Tiny version 1.69'

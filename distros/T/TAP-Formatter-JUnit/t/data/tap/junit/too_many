@@ -1,0 +1,33 @@
+<testsuites>
+  <testsuite failures="4"
+             errors="4"
+             tests="7"
+             name="data_tap_too_many">
+    <testcase name="1"></testcase>
+    <testcase name="2"></testcase>
+    <testcase name="3"></testcase>
+    <testcase name="4">
+      <error type="UnplannedTest" message="ok 4"><![CDATA[ok 4]]></error>
+    </testcase>
+    <testcase name="5">
+      <error type="UnplannedTest" message="ok 5"><![CDATA[ok 5]]></error>
+    </testcase>
+    <testcase name="6">
+      <error type="UnplannedTest" message="ok 6"><![CDATA[ok 6]]></error>
+    </testcase>
+    <testcase name="7">
+      <error type="UnplannedTest" message="ok 7"><![CDATA[ok 7]]></error>
+    </testcase>
+    <system-out><![CDATA[1..3
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+]]></system-out>
+    <system-err></system-err>
+    <error message="Looks like you planned 3 tests but ran 7." />
+  </testsuite>
+</testsuites>

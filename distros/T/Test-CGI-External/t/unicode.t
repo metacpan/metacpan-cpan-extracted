@@ -1,0 +1,25 @@
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use Test::More;
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+use Test::CGI::External;
+my $input = 'ばびぶべぼ';
+my %options;
+$options{input} = $input;
+$options{REQUEST_METHOD} = 'POST';
+my $tester = Test::CGI::External->new ();
+$tester->set_cgi_executable ("$Bin/unicode.cgi");
+$tester->expect_charset ('UTF-8');
+$tester->run (\%options);
+cmp_ok ($options{content_length}, '==', 15,
+	"Content length is bytes, not unicode characters");
+ok (utf8::is_utf8 ($options{body}), "Content body is Unicode-upgraded");
+is ($options{body}, "ばぶぼびぶ\n", "Content body is as expected");
+done_testing ();

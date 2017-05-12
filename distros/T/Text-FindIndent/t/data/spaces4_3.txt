@@ -1,0 +1,14 @@
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    PL_FILES            => {},
+    LICENSE             => 'perl',
+    PREREQ_PM => {
+                  'Test::More' => 0,
+                  'Yahoo::Search::XML' => '20060729.004',
+                  'LWP::UserAgent' => 0,
+                  'URI' => 1.36,
+		  'Encode' => 0, #this line has tabs
+    },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+);

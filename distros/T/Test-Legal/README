@@ -1,0 +1,62 @@
+Test-Legal version 0.01
+=======================
+
+ Test::Legal checks for LICENSE file, for copyright annotations
+in .pl and .pm files of lib/ and script/ directories, and some
+legal-related fields of META.yml (or META.json). 
+
+ Problems are fixable manually in the usual way, or use 
+the included copyright-injection.pl and license-injection.pl to
+fix them using scripts. (See the EXAMPLES dir, or type --help .)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+	Log::Log4perl
+	Getopt::Compact
+	List::MoreUtils
+	List::Util
+	File::Slurp
+	List::Compare
+	CPAN::Meta
+	Test::Builder::Module
+	File::Find::Rule
+	IO::Prompter
+	Sub::Exporter
+	Software::License
+
+And, these modules for testing:
+
+	Test::Pod::Coverage
+	Test::Pod
+	Test::HasVersion
+	Test::CPAN::Meta
+	Test::Exception
+	Test::Dependencies
+	Test::MinimumVersion
+	Test::Strict
+	File::Copy
+	Test::Spelling
+	Test::Script
+	Test::t
+
+
+COPYRIGHT AND LICENCE
+
+
+	Copyright (C) 2011 by Ioannis Tambouras
+
+	This library is free software; you can redistribute it and/or modify
+	it under the same terms as Perl itself, either Perl version 5.12.1 or,
+	at your option, any later version of Perl 5 you may have available.
+
+

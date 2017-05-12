@@ -1,0 +1,51 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Text-Pipe-W3CDTF/",
+      "repository" : "http://github.com/hanekomu/Text-Pipe-W3CDTF",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Pipe-W3CDTF"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100890",
+   "name" : "Text-Pipe-W3CDTF",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Text::Pipe::W3CDTF" : {
+         "version" : "1.100890",
+         "file" : "lib/Text/Pipe/W3CDTF.pm"
+      },
+      "Text::Pipe::W3CDTF::Format" : {
+         "version" : "1.100890",
+         "file" : "lib/Text/Pipe/W3CDTF/Format.pm"
+      },
+      "Text::Pipe::W3CDTF::Parse" : {
+         "version" : "1.100890",
+         "file" : "lib/Text/Pipe/W3CDTF/Parse.pm"
+      }
+   },
+   "requires" : {
+      "Scalar::Util" : "0",
+      "parent" : "0",
+      "English" : "0",
+      "Text::Pipe::Base" : "0",
+      "Carp" : "0",
+      "perl" : "5.008",
+      "DateTime::Format::W3CDTF" : "0",
+      "Test::More" : "0.88",
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Text::Pipe" : "0"
+   },
+   "abstract" : "Text pipes that convert W3CDTF date-time strings and objects",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

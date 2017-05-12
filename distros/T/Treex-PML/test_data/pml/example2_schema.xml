@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<pml_schema version="1.1"
+  xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/">
+  <description>Example of constituency tree annotation</description>
+  <root name="annotation">
+    <sequence role="#TREES" content_pattern="meta, nt+">
+      <element name="meta" type="meta.type"/>
+      <element name="nt" type="nonterminal.type"/>
+    </sequence>
+  </root>
+  <type name="meta.type">
+    <structure>
+      <member name="annotator"><cdata format="any"/></member>
+      <member name="datetime"><cdata format="any"/></member>
+    </structure>
+  </type>
+  <type name="nonterminal.type">
+    <container role="#NODE">
+      <attribute name="label" type="label.type"/>
+      <sequence role="#CHILDNODES">
+	<element name="nt" type="nonterminal.type"/>
+	<element name="form" type="terminal.type"/>
+      </sequence>
+    </container>
+  </type>
+  <type name="terminal.type">
+    <container role="#NODE">
+      <cdata format="any"/>
+    </container>
+  </type>
+  <type name="label.type">
+    <choice>
+      <value>S</value>
+      <value>VP</value>
+      <value>NP</value>
+      <value>PP</value>
+      <value>ADVP</value>
+      <!-- etc. -->
+    </choice>
+  </type>
+
+</pml_schema>

@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Text/Categorize/Textrank.pm
+lib/Text/Categorize/Textrank/En.pm
+lib/Text/Categorize/Util.pm
+t/001_test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

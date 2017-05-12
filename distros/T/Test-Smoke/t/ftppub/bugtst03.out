@@ -1,0 +1,323 @@
+Started smoke at 1078266866
+Smoking patch __PATCHLEVEL__
+Stopped smoke at 1078266869
+Started smoke at 1078266869
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078267543
+Started smoke at 1078267543
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078268301
+Started smoke at 1078268301
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Accflags='-DPERL_COPY_ON_WRITE'
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 10 12 14 16-18
+    op/magic.t..............................FAILED 37-53
+    op/tie.t................................FAILED 22
+
+Stopped smoke at 1078268975
+Started smoke at 1078268975
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Accflags='-DPERL_COPY_ON_WRITE' -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 9-20
+    op/magic.t..............................FAILED 37-53
+    op/tie.t................................FAILED 22
+
+Stopped smoke at 1078269728
+Started smoke at 1078269728
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Dusemymalloc
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078270372
+Started smoke at 1078270372
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Dusemymalloc -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078271131
+Started smoke at 1078271131
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Dusemymalloc -Accflags='-DPERL_COPY_ON_WRITE'
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 10 12 14 16-18
+    op/magic.t..............................FAILED 37-53
+    op/tie.t................................FAILED 22
+
+Stopped smoke at 1078271777
+Started smoke at 1078271777
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Dusemymalloc -Accflags='-DPERL_COPY_ON_WRITE' -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 9-20
+    ../lib/DBM_Filter/t/utf8.t..............FAILED 13 19
+    op/magic.t..............................FAILED 37-53
+    op/tie.t................................FAILED 22
+
+Stopped smoke at 1078272529
+Started smoke at 1078272529
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duselargefiles
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078273215
+Started smoke at 1078273215
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duselargefiles -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078274131
+Started smoke at 1078274131
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duselargefiles -Accflags='-DPERL_COPY_ON_WRITE'
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 10 12 14 16-18
+    op/magic.t..............................FAILED 37-53
+    op/tie.t................................FAILED 22
+
+Stopped smoke at 1078275030
+Started smoke at 1078275030
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duselargefiles -Accflags='-DPERL_COPY_ON_WRITE' -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 9-20
+    op/magic.t..............................FAILED 37-53
+    op/tie.t................................FAILED 22
+
+Stopped smoke at 1078276035
+Started smoke at 1078276035
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duselargefiles -Dusemymalloc
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078276975
+Started smoke at 1078276975
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duselargefiles -Dusemymalloc -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078277982
+Started smoke at 1078277982
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duselargefiles -Dusemymalloc -Accflags='-DPERL_COPY_ON_WRITE'
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 10 12 14 16-18
+    op/magic.t..............................FAILED 37-53
+    op/tie.t................................FAILED 22
+
+Stopped smoke at 1078278836
+Started smoke at 1078278836
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duselargefiles -Dusemymalloc -Accflags='-DPERL_COPY_ON_WRITE' -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 9-20
+    ../lib/DBM_Filter/t/utf8.t..............FAILED 13 19
+    op/magic.t..............................FAILED 37-53
+    op/tie.t................................FAILED 22
+
+Stopped smoke at 1078279799
+Started smoke at 1078279799
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+Inconsistent test results (between TEST and harness):
+    ../ext/threads/t/thread.t...............FAILED test 25
+
+Stopped smoke at 1078280866
+Started smoke at 1078280866
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078281988
+Started smoke at 1078281988
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Accflags='-DPERL_COPY_ON_WRITE'
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 18-20
+
+Stopped smoke at 1078283071
+Started smoke at 1078283071
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Accflags='-DPERL_COPY_ON_WRITE' -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 9-20
+
+Stopped smoke at 1078284288
+Started smoke at 1078284288
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Dusemymalloc
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078285398
+Started smoke at 1078285398
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Dusemymalloc -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078286549
+Started smoke at 1078286549
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Dusemymalloc -Accflags='-DPERL_COPY_ON_WRITE'
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 18-20
+
+Stopped smoke at 1078287526
+Started smoke at 1078287526
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Dusemymalloc -Accflags='-DPERL_COPY_ON_WRITE' -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 9-20
+
+Stopped smoke at 1078288795
+Started smoke at 1078288795
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Duselargefiles
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+Inconsistent test results (between TEST and harness):
+    ../ext/threads/t/problems.t.............dubious
+
+Stopped smoke at 1078289835
+Started smoke at 1078289835
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Duselargefiles -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078290933
+Started smoke at 1078290933
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Duselargefiles -Accflags='-DPERL_COPY_ON_WRITE'
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 18-20
+Inconsistent test results (between TEST and harness):
+    ../ext/threads/shared/t/sv_simple.t.....dubious
+
+Stopped smoke at 1078291752
+Started smoke at 1078291752
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Duselargefiles -Accflags='-DPERL_COPY_ON_WRITE' -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 9-20
+
+Stopped smoke at 1078292635
+Started smoke at 1078292635
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Duselargefiles -Dusemymalloc
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+Inconsistent test results (between TEST and harness):
+    ../ext/threads/t/problems.t.............dubious
+
+Stopped smoke at 1078293452
+Started smoke at 1078293452
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Duselargefiles -Dusemymalloc -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	All tests successful.
+Stopped smoke at 1078294339
+Started smoke at 1078294339
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Duselargefiles -Dusemymalloc -Accflags='-DPERL_COPY_ON_WRITE'
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 18-20
+Inconsistent test results (between TEST and harness):
+    ../ext/threads/shared/t/sv_simple.t.....dubious
+
+Stopped smoke at 1078295145
+Started smoke at 1078295145
+
+Configuration: -Dusedevel -DINST_TOP=$(INST_DRV)\Smoke\doesntexist -Duseithreads -Duselargefiles -Dusemymalloc -Accflags='-DPERL_COPY_ON_WRITE' -DDEBUGGING
+------------------------------------------------------------------------------
+
+Compiler info: cl version 12.00.8804
+TSTENV = stdio	
+    ../ext/Cwd/t/cwd.t......................FAILED 9-20
+
+Finished smoking __PATCHLEVEL__
+Stopped smoke at 1078296034

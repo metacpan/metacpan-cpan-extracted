@@ -1,0 +1,27 @@
+MANIFEST
+Makefile.PL
+README
+MultiMediaControls.pm
+test.pl
+multimediacontrols.pl
+images/Fast-Hi-Blue.png
+images/Fast-N-R.png
+images/Fast-N.png
+images/Home-Hi-Blue.png
+images/Home-N-R.png
+images/Home-N.png
+images/Pause-Hi-Blue.png
+images/Pause-N-R.png
+images/Pause-N.png
+images/penguin.gif
+images/Play-Hi-Blue.png
+images/Play-N-R.png
+images/Play-N.png
+images/Rewind-Hi-Blue.png
+images/Rewind-N-R.png
+images/Rewind-N.png
+images/Stop-Hi-Blue.png
+images/Stop-N-R.png
+images/Stop-N.png
+images/penguin.gif
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Reads INI configuration files",
+   "author" : [
+      "Ioannis Tambouras <ioannis@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.280801, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Format-Ini",
+   "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "Test::Exception" : 0,
+            "Test::More" : 0,
+            "Test::Pod" : 0,
+            "Test::Pod::Coverage" : "1.0"
+         },
+         "requires" : {
+            "Attribute::Handlers" : 0,
+            "File::Slurp" : 0,
+            "Parse::RecDescent" : 0,
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Format::Ini" : {
+         "file" : "lib/Config/Format/Ini.pm",
+         "version" : "0.06"
+      },
+      "Config::Format::Ini::Grammar" : {
+         "file" : "lib/Config/Format/Ini/Grammar.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

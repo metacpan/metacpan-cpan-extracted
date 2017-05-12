@@ -1,0 +1,265 @@
+package Tree::SizeBalanced;
+
+# vim: filetype=perl
+
+use 5.008009;
+use strict;
+use warnings;
+use Carp;
+
+require Exporter;
+use AutoLoader;
+
+our @ISA = qw(Exporter);
+
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
+
+# This allows declaration	use Tree::SizeBalanced ':all';
+# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
+# will save memory.
+
+our $VERSION = '2.006002';
+
+=head1 NAME
+
+Tree::SizeBalanced - Size balanced binary search tree (XS implementation)
+
+Handy for in-memory realtime ranking systems.
+
+=head1 SYNOPSIS
+
+  use Tree::SizeBalanced; # use $tree = Tree::SizeBalanced::int_any->new
+  use Tree::SizeBalanced qw(:long); # use $tree = sbtree_int_any;
+  use Tree::SizeBalanced qw(:short); # use $tree = sbtreeia;
+  use Tree::SizeBalanced qw(:all); # export :short and :long
+
+  my $tree_map_any_any = sbtree_any_any { length($b) <=> length($a) };
+  my $tree_map_any_any = sbtreeaa { length($b) <=> length($a) }; # shorter form
+  my $tree_map_any_any = Tree::SizeBalanced::any_any->new
+    sub { length($b) <=> length($a) }; # full form
+  # tree map with any scalars as keys
+
+  my $tree_set_num = sbtree_num_void;
+  my $tree_set_num = sbtreen; # shorter form
+  my $tree_set_num = Tree::SizeBalanced::num_void->new; # full form
+  # or set version.
+  #  This one use numeric values (floating point numbers) as keys
+
+  my $tree = sbtree_int_any;
+  my $tree = sbtreeia; # shorter form
+  my $tree = Tree::SizeBalanced::int_any->new; # full form
+  # tree map (key value pairs)
+  #  the keys are signed integers
+  #  the values are any scalars
+
+  $tree->insert(1, {a => 3});
+
+  ...
+
+  my $count = $tree->count_lt(25);
+  # how many entries in the tree whose key is less than 25
+  my $count = $tree->count_gt(25);
+  # how many entries in the tree whose key is greater than 25
+
+  ($key, $value) = $tree->skip_l(23);
+  $key = $tree->skip_l(23);
+  # Get the first (smallest) entry whose key is greater than 23
+
+  ($key, $value) = $tree->skip_g(23);
+  $key = $tree->skip_g(23);
+  # Get the first (largest) entry whose key is less than 23
+
+  ($key, $value) = $tree->find_min;
+  $key = $tree->find_min;
+  ($key, $value) = $tree->find_max;
+  $key = $tree->find_max;
+
+  ($k1, $v1, $k2, $v2) = $tree->find_min(2);
+  ($k1, $v1, $k2, $v2, $k3, $v3) = $tree->find_min(3);
+  ($k1, $v1, $k2, $v2, $k3, $v3, ...) = $tree->find_min(-1);
+
+  ($k1, $v1, ...= $tree->find_lt_gt($lower_bound, $upper_bound);
+
+  ...
+
+  $tree->delete(1);
+
+=head1 DESCRIPTION
+
+Quoted from L<http://wcipeg.com/wiki/Size_Balanced_Tree>:
+
+=encoding UTF-8
+
+> A size balanced tree (SBT) is a self-balancing binary search tree (BBST) first published by Chinese student Qifeng Chen in 2007. The tree is rebalanced by examining the sizes of each node's subtrees. Its abbreviation resulted in many nicknames given by Chinese informatics competitors, including "sha bi" tree (Chinese: 傻屄树; pinyin: shǎ bī shù; literally meaning "dumb cunt tree") and "super BT", which is a homophone to the Chinese term for snot (Chinese: 鼻涕; pinyin: bítì) suggesting that it is messy to implement. Contrary to what its nicknames suggest, this data structure can be very useful, and is also known to be easy to implement. Since the only extra piece of information that needs to be stored is sizes of the nodes (instead of other "useless" fields such as randomized weights in treaps or colours in red–black tress), this makes it very convenient to implement the select-by-rank and get-rank operations (easily transforming it into an order statistic tree). It supports standard binary search tree operations such as insertion, deletion, and searching in O(log n) time. According to Chen's paper, "it works much faster than many other famous BSTs due to the tendency of a perfect BST in practice."
+
+For performance consideration, this module provides trees with many stricter types.
+
+If you choose any scalar as the key type, you must provide a comparing sub.
+The comparing sub should exammed localized C<$a> and C<$b> (or C<$::a> and C<$::b> if there are introduced lexical <$a> and <$b> right outside the sub).
+And if your comparing sub using an indirect way to judge the size of the keys,
+don't do anything that will change the judge result. Or, the tree will be confused and give you incorrect results.
+
+If you put more than one entries with equal-sized keys,
+the insertion order is preserved by treating the first one as the smallest one among them.
+
+PS. Qifeng Chen is 陈启峰 in simplified Chinese.
+
+This module has been tested on perl version 5.8.9, 5.10.1, 5.12.5, 5.14.4, 5.16.3, 5.18.4, 5.20.3, 5.22.2
+
+=head2 EXPORT
+
+All exported subs are different style ways to create new trees.
+
+=over 4
+
+=item (nothing)
+
+Without importing anything, you can use the full form to obtain a new tree:
+
+  my $tree = Tree::SizeBalanced::str_any->new;
+
+=item :long
+
+With the long form:
+
+  my $tree = sbtree_any_str { length($a) <=> length($b) || $a cmp $b };
+
+=item :short
+
+With the short form:
+
+  my $tree = sbtreei;
+
+=item :all = :short + :long
+
+=back
+
+=head2 Different trees with different types
+
+=cut
+
+"INSERT POINT";
+
+=head3 Default type constructors
+
+=over 4
+
+=item $tree = Tree::SizeBalanced->new;
+
+equivalent to C<< $tree = Tree::SizeBalanced::int_any->new; >>
+
+=item $tree = Tree::SizeBalanced->new sub { $a cmp $b };
+
+equivalent to C<< $tree = Tree::SizeBalanced::any_any->new; >>
+
+=item $tree = sbtree;
+
+equivalent to C<$tree = sbtreeia>
+
+=item $tree = sbtree { $a cmp $b };
+
+equivalent to C<$tree = sbtreeaa>
+
+=back
+
+=head1 BENCHMARK
+
+test result: (perl 5.22.2, Tree::SizeBalanced 2.6)
+
+L<incremental integer query|https://github.com/CindyLinz/Perl-Tree-SizeBalanced/blob/master/benchmark/incremental_integer_query.pl> seed_count=10, data_size=100_000, verbose=0
+
+    Benchmark: timing 1 iterations of Sorted array, Static array, tree set any, tree set int...
+    Sorted array: 12 wallclock secs (12.60 usr +  0.00 sys = 12.60 CPU) @  0.08/s (n=1)
+                (warning: too few iterations for a reliable count)
+    ^CSIGINT!
+    Static array: 737 wallclock secs (736.96 usr +  0.14 sys = 737.10 CPU) @  0.00/s (n=1)
+                (warning: too few iterations for a reliable count)
+    tree set any:  5 wallclock secs ( 4.70 usr +  0.01 sys =  4.71 CPU) @  0.21/s (n=1)
+                (warning: too few iterations for a reliable count)
+    tree set int:  1 wallclock secs ( 0.69 usr +  0.01 sys =  0.70 CPU) @  1.43/s (n=1)
+                (warning: too few iterations for a reliable count)
+
+    (Note that "Static array" didn't complete. It's interrupted)
+
+L<incremental string query|https://github.com/CindyLinz/Perl-Tree-SizeBalanced/blob/master/benchmark/incremental_string_query.pl> seed_count=10, data_size=100_000, verbose=0
+
+    Benchmark: timing 1 iterations of Sorted array, Static array, tree set any, tree set str...
+    Sorted array: 15 wallclock secs (15.28 usr +  0.00 sys = 15.28 CPU) @  0.07/s (n=1)
+                (warning: too few iterations for a reliable count)
+    ^CSIGINT!
+    Static array: 673 wallclock secs (672.08 usr +  0.15 sys = 672.23 CPU) @  0.00/s (n=1)
+                (warning: too few iterations for a reliable count)
+    tree set any:  6 wallclock secs ( 6.65 usr +  0.00 sys =  6.65 CPU) @  0.15/s (n=1)
+                (warning: too few iterations for a reliable count)
+    tree set str:  2 wallclock secs ( 1.88 usr +  0.00 sys =  1.88 CPU) @  0.53/s (n=1)
+                (warning: too few iterations for a reliable count)
+
+    (Note that "Static array" didn't complete. It's interrupted)
+
+L<bulk integer query|https://github.com/CindyLinz/Perl-Tree-SizeBalanced/blob/master/benchmark/bulk_integer_query.pl> seed_count=10, data_size=100_000, verbose=0
+
+    Benchmark: timing 1 iterations of Sorted array, Static array, tree set any, tree set int...
+    Sorted array:  3 wallclock secs ( 2.99 usr +  0.00 sys =  2.99 CPU) @  0.33/s (n=1)
+                (warning: too few iterations for a reliable count)
+    ^CSIGINT!
+    Static array: 251 wallclock secs (251.85 usr +  0.02 sys = 251.87 CPU) @  0.00/s (n=1)
+                (warning: too few iterations for a reliable count)
+    tree set any:  6 wallclock secs ( 5.24 usr +  0.00 sys =  5.24 CPU) @  0.19/s (n=1)
+                (warning: too few iterations for a reliable count)
+    tree set int:  1 wallclock secs ( 0.86 usr +  0.00 sys =  0.86 CPU) @  1.16/s (n=1)
+                (warning: too few iterations for a reliable count)
+
+    (Note that "Static array" didn't complete. It's interrupted)
+
+L<bulk string query|https://github.com/CindyLinz/Perl-Tree-SizeBalanced/blob/master/benchmark/bulk_string_query.pl> seed_count=10, data_size=100_000, verbose=0
+
+    Benchmark: timing 1 iterations of Sorted array, Static array, tree set any, tree set int...
+    Sorted array:  5 wallclock secs ( 5.59 usr +  0.00 sys =  5.59 CPU) @  0.18/s (n=1)
+                (warning: too few iterations for a reliable count)
+    ^CSIGINT!
+    Static array: 363 wallclock secs (361.56 usr +  0.07 sys = 361.63 CPU) @  0.00/s (n=1)
+                (warning: too few iterations for a reliable count)
+    tree set any:  8 wallclock secs ( 7.85 usr +  0.00 sys =  7.85 CPU) @  0.13/s (n=1)
+                (warning: too few iterations for a reliable count)
+    tree set int:  3 wallclock secs ( 3.27 usr +  0.01 sys =  3.28 CPU) @  0.30/s (n=1)
+                (warning: too few iterations for a reliable count)
+
+    (Note that "Static array" didn't complete. It's interrupted)
+
+=head1 SEE ALSO
+
+This mod's github L<https://github.com/CindyLinz/Perl-Tree-SizeBalanced>.
+It's welcome to discuss with me when you encounter bugs, or
+if you think that some patterns are also useful but the mod didn't provide them yet.
+
+Introduction to Size Balanced Tree L<http://wcipeg.com/wiki/Size_Balanced_Tree>.
+
+陈启峰's original paper L<https://drive.google.com/file/d/0B6NYSy8f6mQLOEpHdHh4U2hRcFk/view?usp=sharing>,
+I found it from L<http://sunmoon-template.blogspot.tw/2015/01/b-size-balanced-tree.html>.
+
+=head1 AUTHOR
+
+Cindy Wang (CindyLinz) <cindy@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by CindyLinz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 ACKNOWLEDGEMENT
+
+Thank TDYa127 L<https://github.com/a127a127/> who tell me size balanced tree.
+
+=cut
+
+require XSLoader;
+XSLoader::load('Tree::SizeBalanced', $VERSION);
+
+1;
+__END__
+

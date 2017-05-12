@@ -1,0 +1,409 @@
+Revision history for Perl extension Tk::JComboBox.
+
+1.14 Maintenance/Bug Fixes: (No new features)
+
+   - Issue: bdz (on clptk) reported a problem when choices 
+     arrayref contained a selected param for one of the 
+     entries (in editable mode). The problem was due to 
+     choices method being called prior to the widget 
+     options being defined in ConfigSpecs within the 
+     Populate method.
+
+     - Resolution: Moved choices call to after the 
+        ConfigSpecs definition; tested. Seems fine.
+
+   - Issue: Benoît Vincente reported obscure problem that
+     indicated problems with JComboBox::Tie. After 
+     investigation, it appears that when the master
+     JComboBox is destroyed, it is not automatically
+     removed the tie. This problem is trickier than 
+     it appears, partly because of the implementation
+     of Tk::JComboBox::Tie and partly because of how
+     widget destruction is done in Perl/Tk. 
+
+     - Resolution: Added a few lines to check all 
+     JComboBox listeners, to see if they still existed prior
+     to sending event notification to each. If a listener
+     no longer exists, it is removed, and the reference 
+     is undef'd. This appears to fix the case Benoît 
+     reported (which should rarely occur in any case).
+
+   - Minor revisions to JComboBox pod.
+   
+1.13 Maintenance/Bug Fixes:
+
+  There are no new features in this release. It contains some
+minor changes to documentation, and test code. In addition it
+contains one a fix for memory leaks due to the 8.4 version of
+Listbox.
+
+   - Issue: JComboBox has exhibted memory leaks due to its use
+     of Tk::Listbox since the 804 (Tk8.4) release.
+
+     -- Any megawidget or application that uses Listbox 
+        potentially has this issue, unless a workaround is 
+        used. The workaround regards the new -listvariable
+        option and is less than intuitive, since as the docs
+        for Listbox state, -listvariable is not completely
+        implemented. Suffice to say, there are gotchas. The
+        real solution is to patch the C code so that it no
+        longer leaks. The fix I have in place will do for now.
+        Thanks to Zentara for his posts on c.l.p.tk and 
+        Perlmonks that got me headed in the right direction.
+   
+   - Issue: The new test for Pod has a minor typo, that will
+     result in a test failure instead of a skipped tests for
+     those system that do not have Test::Pod installed. This
+     problem was reported by bdz on c.l.p.tk. 5 Oct 06.
+
+     -- Resolution: Fixed typo.
+
+   - Issue: JComboBox docs need updating for binding/event
+     handling. Also pointed out by bdz on c.l.p.tk.
+
+     -- Resolution: Revised docs and example.
+
+   - Misc: Removed a few tabs from code, along with Line feeds,
+     that have found their way in again.
+
+1.12 Maintenance/Bug Fixes:
+
+This is a maintenance release of Tk-JComboBox that addresses an 
+issue with the -popupcreate callback option. In addition, I've
+updated some test cases, added an examples directory, and updated
+some of the Pod files. There is a potential backward compatibility
+issue with this release (the -popupcreate option), but there is no
+major new functionality (At least one new option may be coming in
+the next release...)
+ 
+   - Issue: jdtoronto posted a bug report on the Perlmonks site.
+     http://perlmonks.org/?node_id=573624. He was attempting to 
+     use the popupcreate option to modify the JComboBox each time
+     the Popup was triggered. In version 1.11 and for at least the
+     past few versions, registering a callback to this option 
+     meant that you were assuming responsibility for configuring
+     the height/width and positioning of the JCombobox, which can
+     be a pain. 
+
+     -- Resolution: I decided that this was too big a pain to pass on
+     to users, and modified the option so that the physical 
+     configuration occurs outside of this callback. -popupmodify
+     can still be used to override the layout properties if needed.
+     The result is that popupcreate is simpler to implement (it was
+     mostly provided as a means to alter the list item contents of
+     the JComboBox). Documentation, and test cases were adjusted 
+     accordingly, plus an example was provided in the new examples
+     directory that demonstrates the option in action.
+
+   - After conversation with Fred Jan, I reconsidered the implementation
+     of the -textvariable option. JComboBox goes a bit further than some
+     other widgets and heavily controls -textvariable use. I've decided
+     to leave it as is for now, but to hold onto the correspondance and
+     possibly revisit it in the future. No changes aside from a tweak
+     to the docs.
+
+   - Took another pass through the JComboBox docs to update several links
+     that were incorrect, and fix some wording here and there.
+
+1.11 Bug Fixes:
+
+   - Bug: incorrect behavior when state is disabled twice in a row.
+     reported via rt[at]cpan.org (#19154) by: Neal
+
+     Description: When JComboBox state is disabled, in addition to
+      freezing the controls, the foreground colors are replaced to 
+      provide a visual clue that the widget was disabled, which 
+      is inline with other Tk widget behavior. Unfortunately, due to
+      a bug in the DisableControls method, setting the state to 
+      disabled twice in a row, resulted in the foreground color not
+      getting restored correctly.
+     
+     Resolution: Neal provided a patch to the faulty method, which 
+      corrected the problem and doesn't appear to introduct any 
+      side-effects that I could observe during testing. Patch gratefully
+      accepted, and applied to code.      
+
+   - Questionable behavior: hard-coded color (white) for popup listbox bg
+     reported via rt[at]cpan.org (#18357) by: ozcat[at]bigpond.net.au
+     - resolution: removed hard-code color.
+
+     Notes: I vaguely have some recollection of changing this to be white
+     because I wanted to ensure default behavior, but in retrospect, 
+     this was a big mistake, and meant that default user/env  preferences 
+     would be ignored. Glad someone called me on it...
+
+   - Bug: Forgotten debug line left in code. 
+     reported via rt[at]cpan.org (#17785)  by: northwind_1980 
+     - resolution: removed line.
+
+   - Bug: Invalid behavior related to grab (again... aaarrgh!)
+     reported via newsgroup and email by Lars Oeschey
+
+     Description: 
+       Lars sent sample code that featured two JComboBox instances, one 
+       defined a -selectcommand callback which called setSelectedIndex(0), 
+       and then showPopup in the other instance. The result: grab settings
+       were messed up.
+
+     Problem: the problem was in the ButtonRelease event handler. In it,
+      I called setSelectedIndext (which in turn triggers the selectcommand
+      callback), before calling hidePopup. Big mistake. This appears to be
+      the only place left in the code where they are ordered this way. 
+      hidePopup should always be called before triggering the selectcommand
+      callback, otherwise it's very easy to get the current grab mixed up,
+      before hidePopup has had a chance to clear it correctly.
+ 
+     Resolution: reversed ordering of the two lines in ButtonRelease, and 
+      the test code appears to work correctly.
+
+   - Documentation updates: Looking over the docs in AnnoCPAN I noticed that
+     some of the Subwidgets were mislabled. This has been corrected.
+
+1.10 Bug Fix: corrected -textvariable problems.
+
+   - Bug reported via c.l.p.tk [Tk::JComboBox Question - 
+     http://groups.google.com/group/comp.lang.perl.tk/msg/2971450102b53533
+     textvariable option not working correctly: when set, a default value
+     *does* appear in the JCombobox Entry, however once the Button is 
+     pressed, it does not appear selected (or scrolled to) within the 
+     Listbox. This occcurs when the Button is pushed once. If pressed again
+     the item does show as selected.
+
+     The problem: Because I wasn't a big fan of the option, I implemented
+     it in an overly simplistic way, by delegating it to the Entry widget.
+     This meant that it if the variable was assigned a value, then it would
+     appear within the Entry widget, but the rest of the JComboBox code
+     would not necessarily be aware of it. There was code that was "set"
+     the value as selected when the Popup Listbox was closed, but not 
+     when it was triggered.
+
+     The solution: I tried two different solutions, the one I decided to 
+     go with was what I probably should have done orginally which was tie
+     the textvariable to JComboBox code, so that stores/fetches were tied
+     to JComboBox methods, and there was some measure of consistancy in the
+     implementation. For example, before if the JComboBox was in readonly
+     mode, you could use -textvariable to set a value that didn't appear
+     within the Listbox, which broke the basic model of the mode. I used
+     Steve Lidie's Tie::Watch class to implement the fix.
+
+   - Docs and Test cases were updated to reflect the modifications, and I 
+     did some more proofreading on JComboBox.pod to remove typos and a few
+     inaccuracies. 
+
+1.09 Bug Fix
+
+   - Bug reported and fixed in version 1.06 (cpan#12372) reopened in
+     report (cpan#14520) from tjtoocool@phreaker.net - there were 
+     still some lingering issues with DialogBox widgets interfering
+     with this widget, Including two specific cases where hidePopup 
+     tried to reinstate grab to a destroyed widget and another case 
+     where hidePopup would try to assign grab to a
+     widget that was iconified. 
+
+1.08 Bug Fixes + new Features
+
+   - Fonts still an issue for 1.07 tests; commented out tests while I 
+     rethink testing scheme.
+   
+   - Jack Dunnigan requested that the choices array be made to support
+     multiple JComboBox instances; I've put in an initial implementation
+     but I susppect that it will be refactored in the future with a 
+     better solution. Updated docs to reflect change.
+
+     -- I'm still considering a more generic solution, like the ListModel
+     in the java swing api. Something that could be reused easily for 
+     the various Tk widgets that use internal Lists.
+
+1.07 Bug Fixes + new Features
+
+   - Ken Prows reported test failure to CPAN bug tracker #12788
+     The failure was due to a font within a test not being available
+     on a test platform. 
+
+     - I've fixed this, hopefully this will fix test failures.
+   
+   - Jack Dunnigan reported a bug related to -state option: 
+     when state is disabled, then reset to normal some of the colors
+     don't switch back as they should.
+ 
+     - This has been fixed. Jack also noted that there is a lot of
+     code that seems to be unnecessary for disabled bg/fg. I agreed,
+     but this code is in place to make it backward-compatible for
+     those who have not upgraded to Tk804.* releases. Eventually, I see
+     some of this code fading away, but for now, it remains. There 
+     still seem to be issues with Tk804.* so some may not have upgraded.
+
+   - Jack Dunnigan requested the ability to tie internal state of 
+     JCombobox items to the array reference passed to the -choices 
+     option. 
+
+     - I added this new feature, and added tests, and new docs
+     in JComboBox reference and tutorial pod.
+ 
+     Notes: I hadn't thought of doing this before, and it was 
+     intriguing. It is similar in principle to how Java's swing 
+     components implement MVC. Jack suggesed Tk::Trace, however I
+     preferred Steve Lidie's Tie::Watch module. After implementing
+     most of the functionality, I discovered that Tie::Watch didn't
+     support DELETE and EXISTS (which I've come to discover have
+     limited usefulness when applied to arrays...). I notified Steve,
+     and switched to use Tie::Array instead. I plan to switch back
+     to Tie::Watch the next time there is a Tk release that includes
+     Steve's updated module. 
+
+   - Jack Dunnigan requested a way to alter how autofind anchors
+     its search string when determine whether or not a field matches.
+
+     - Implemented this with a new callback option called -matchcommand
+     This will allow someone to supply their own callback to determine
+     if an item matches or not.
+
+     Notes: I originally considering implementing this as another 
+     autofind option called -searchanchor, but ultimately decided against 
+     it, when James White commented that the option could be made even 
+     more flexible by passing a reference to a regular expression. I 
+     think that the callback approach should deliver a decent option
+     that delivers sufficient flexibility to plug in whichever approach
+     is required. I believe this option will rarely be used in any case,
+     because I question whether the resulting behavior is user friendly.
+     I'm not sure if JComboBox is the best fit for Jack's intended 
+     purpose.
+
+1.06 Bug Fix for JComboBox, fixes to Test Code
+
+   - Ken Prows reported bug to CPAN Bug Tracker #12372
+     JComboBox was interfering with grab. Ken suggested
+     a solution, which I added. 
+
+     - Added a test to 06_Bugs.t to test the new code.
+     - Updated docs to add some mention of grab issues.
+
+   - Testers reported several issues with test cases, and 
+     I think I have worked at least some of these out.
+
+     - Found spots where I wasn't destroying a JCombobox
+       between test cases which fouled up a few tests. Fixed it.
+   
+     - Used carp to print labels for tests, so that I can track
+       problems more efficiently. My own tests work fine on WinXP
+       and Fedora 2 (using Gnome & KDE).
+
+     - Removed line feeds from tests.
+
+1.05 Updated Test Code - No changes to any of the Modules!
+    
+   - Failed Test Report:
+     http://www.nntp.perl.org/group/perl.cpan.testers/188280
+     By cpan@www.interlab.nl
+  
+     Reported that I'd Forgotten PREREQ_PM - (how embarrassing)
+       - Modfied Makefile.PL accordingly.  
+     
+   - Failed Test Report:
+     http://www.nntp.perl.org/group/perl.cpan.testers/188015
+     by: saper@cpan.org
+
+     I hope Sébastien doesn't give up on me and stop testing this
+     module. I expected it would fail, since I wasn't entirely
+     certain what had failed. Unfortunately, this error report
+     was tougher to get anything out of than the last one, and the
+     fault lies solely with me, since my scripts were apparently 
+     so brittle that a few of them died before running even ONE
+     test!
+
+     - Modified test scripts making extensive use of eval blocks
+     so that problems with one test would kill the entire script.
+     Hopefully, the carp calls I've added will give me more helpful
+     information on what's going wrong, so that I can fix it. 
+
+1.04 Bug Fix - Response to Failed test report
+     http://www.nntp.perl.org/group/perl.cpan.testers/187588
+     By: Sébastien Aperghis-Tramoni <saper@cpan.org>
+ 
+   - Some options were not being set to an initial value, and 
+     were passing undef or "" off as a color. NOTE: this did
+     not trigger an error on Win32.
+     - Set default values for -highlightbackground, -highlightcolor,
+       and -disabledbackground.
+
+   - Noticed that some tests were using methods that expected 
+     JComboBox to be packed (TestListwidth). Adjusted setup
+     method TestListwidth and TestHighlight to test packed
+     widgets, and made sure that update was called immediately
+     after pack call. Mods in 02_Basic_Options.t, 
+     03_Options_Callback. NOTE: the problem did not trigger
+     any errors on Win32.
+
+   - Cleaned code in various Test files, and JComboBox.pm
+     - Ensure that I was using single quotes for all uses
+       of cget and hash keys. This was done for consistancy
+       and possibly older versions of perl.
+
+1.03 Bug Fix - Bug Submitted by Ken Prows - 01 Mar 05
+
+   - Bug (cpan#11707) Fixed: AutoFind was not using listbox->see
+     to ensure that an entry in the listbox would be visible
+     when it was selected through AutoFind.
+     - Added 16 Tests in Test suite to test for bug (06_Bugs.t)
+     - Fixed AutoFind sub in JComboBox.pm
+
+   - Updated Construct Call so that JComboBox can only be created
+     by a Frame-based widget.
+     
+1.02 Repaired Broken Test file: accidentally left a MainLoop call in test.
+     No code changed. Versions: 1.01, 0.01, 0.02 removed from CPAN.
+
+1.01 Bug Fix and Refactorings
+
+   - Tutorial images were excluded from distribution. Added:
+      lib/Tk/JComboBox/jcb_edit.gif
+      lib/Tk/JComboBox/jcb_ro.gif
+
+   - Updated -listwidth:
+     - Fixed the -listwidth option to work correctly in JComboBox.pm
+       the default value and conditions within the code were incorrect
+     - Updated JComboBox.pod to include default value for -listwidth
+     - added unit tests for -listwidth in 02_Options_Basic.t
+
+   - Replaced majority of "constants" using new CreateGetSet 
+     method to create a cleaner way of setting/accessing hashref keys
+     The constants were not working as desired.
+
+   - Corrected typos in tutorial.pod based on feedback from 
+     Zentara <zentara@highstream.net>
+
+   - Updated -entrybackground:
+     - Changed reference to -textbackground option to -entrybackground
+       in tutorial.pod
+     - corrected -entrybackground configuration in JComboBox::ConfigSpecs.
+     - updated description in JComboBox.pod.
+     - added unit tests in 02_Options_Basic.t
+
+   - Updated -state option: when set to 'disabled' keyboard traversal using
+     Tab was not working correctly. JComboBox should have been skipped.
+     - fixed the problem, and added unit test for option in 04+Options_Misc.t
+
+   - Dumbed down test slightly in 04_Options_Misc.t because of problems
+     with Tk in Windows 2000. Was unable to correctly generate events for
+     <Up> and <Down>. The unit tests were throwing false errors because
+     of Tk problems and not JComboBox code. Modified test to call event
+     handler directly instead of simulating <Up> or <Down> events.
+
+1.00 Major release with many changes and new features.
+
+   - HTML docs converted to POD format
+
+   - Extensive test suite added
+
+   - Updated -mode option: Now can only be set once, at construction time.
+     - documentation updated to reflect this change.
+
+   - Added -autofind option to decouple validation from a find keyboard-based
+     find capability. (see docs).
+
+   - Updated subwidget names (kept old ones for backward compatibility).
+
+0.02  Bug Fix and Refactoring 
+
+0.01  Initial Release
+

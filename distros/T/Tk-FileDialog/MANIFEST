@@ -1,0 +1,5 @@
+FileDialog.pm		File Dialog package
+MANIFEST		This file
+Makefile.PL		Makemaker makefile
+README			General info
+

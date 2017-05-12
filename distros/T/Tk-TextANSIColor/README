@@ -1,0 +1,65 @@
+Tk::TextANSIColor
+-----------------
+
+Tk::TextANSIColor provides a sub-classed Tk::Text widget that 
+understands ANSI color codes. A read-only widget is also supplied.
+
+The ANSI color codes are replaced by tags in the Text widget.
+
+Requirements
+------------
+
+Requires the following modules:
+
+  Tk
+  Term::ANSIColor
+  Test
+
+0.10 Has been tested with perl 5.004_04/5.005_03 on Linux RedHat5.2
+and Sparc Solaris 2.6 and Tk800.014.
+
+0.11 Has been tests on Redhat6.1, Tk800.021 and perl5.6.0/5.005_03 and
+      Windows NT 4 with ActivePerl 5.6.0 and Tk800.018
+
+Installation
+------------
+
+This is a standard perl module. To install:
+
+  % perl Makefile.PL
+  % make
+  % make test
+  % make install
+
+The tests require access to a graphics display.
+
+Changes
+-------
+
+V0.16  Use Module::Build and Test::More
+       Fix CPAN Testers failure with no X display
+
+V0.15  Tweak the way that fonts are specified in TextANSIColor
+       such that the Tk::Font system is used.
+
+V0.14  Add getansi() method from Jim Turner <turnerjw2@netscape.net>
+       and related test. This allows the ANSI escape codes to be retrieved
+       from the Text widget.
+
+V0.13  Forgot to include Tk::ROTextANSIColor in the MANIFEST!
+
+V0.12  Add Read-only widget Tk::ROTextANSIColor at request of
+       Piotr Synowiec <mysiar@krakow.sky.pl>
+
+V0.11  Add proper test routine. No other changes.
+
+V0.10  Initial Release
+
+Author
+------
+
+This module was written by Tim Jenness (tjenness@cpan.org).
+
+Copyright (C) 1999-2001,2003 Tim Jenness. All rights reserved.  This
+program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,23 @@
+--- #YAML:1.0
+meta-spec:
+    url: http://module-build.sourceforge.net/META-spec.html
+name:         Tk-Mirror
+version:      0.06
+abstract: Perl extension for a graphic user interface to up- or download local and remote directories
+author:
+   - Torsten Knorr <create-soft@tiscali.de>
+license: perl
+version_from: lib/Tk/Mirror.pm
+installdirs:  site
+requires:
+    Net::DownloadMirror: 0.10    
+    Net::UploadMirror: 0.13     
+    Net::MirrorDir: 0.19
+    Tk::Frame: 0
+    Tk: 0
+    Storable: 0
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.25
+
+
+

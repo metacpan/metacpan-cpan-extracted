@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7e44c41247795dec12749789dcff30414f0ebb47 CONTRIBUTORS
+SHA1 6035a23c7f240c6e3d11ac77ec35757b5de726e2 Changes
+SHA1 aafef7efd5e9bbc5bb597870f6bf837cf22f7892 LICENSE
+SHA1 e12d53ea108a251c271d8c5635714ee7020a2a2a MANIFEST
+SHA1 1eda8c66da4bca67c53029dcccf09ec90fb41862 META.yml
+SHA1 fbc3a996f3b967a9eefdb0abc6edc6070070ef5a Makefile.PL
+SHA1 f12bd7f0e8e7cd12e2130e6981ee69933652e800 README
+SHA1 af0fff25d50fbcad7de1fef5760c0fcc0aeb7fcb dist.ini
+SHA1 f2c6dd6715b8bfa03d421ab480ddea8589fffcc0 lib/Template/Plugin/Transformator.pm
+SHA1 7e397cd5b4e4c9b737fc1c5ee4af51b6c9ab9f20 t/01-usage.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 1bf69b71b924777ef46b198af9435e8381149fc7 t/release-cpan-changes.t
+SHA1 bdd52baa1a968cc0e1a577a7b073f046d563a317 t/release-kwalitee.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - http://gpgtools.org
+
+iQIcBAEBAgAGBQJUg1XLAAoJEHwWRyBU62lqw7QQAI637WqwhcmO0ubSo5Nf1e+B
+Mw51whDgVJkYWPa1FgqmLtl8XdrRt+mhFxKnS+JbZMB2boifekLNeyrsBkuWbsN0
+KyhyTlBI32Ge+yBonshvX7KNprJXATCxoAbXraBgq0Ry8QmbOw8CnmMkT9KuDc6w
+4bf6Xgnde/N0RuIiYnTHaE0NvEaNEIEC9CCVSIEKNu0qNgmQCCK4N9kxVA4DlCAE
+BSRwlGiWd6RKyV+y4iA4LwsnO36IAbBPCZjJWMUqIT6658pWqi5rxe6/ELnnNEj+
+uIXY1q3jA7QHMKSNVNyrcUiTZsLgT+/oLxMCOsPKa8lqikeUHqaXuwknQpAtEbBn
+ZetfuPoeHD6/6bhb5+6jmQeSG5ACvoRArj0aZCENDYl/ip4SDTKuNLzW6lBqX1MV
+27UBZanqD7voBwkYNCOMMYRFUx0spubqbRNqGF7BpwpHU5CvNL8K7S6pIXWzmdO4
+XBImVJ6He7qgIXpAhbXfgbXp8adDczlGb56aDgICH6wqxP0+RKVQ4apSj4RfpYmp
+dpla4SSjrZC1EoL7yI/3T4fpGm999p4Of83j7dgpSSDAeg7d34KWezAeEksboYwa
+i2Uid+RZMibsqnqkovamrurN+tcnnt6+HO3DWqFyy4ygR3UpOkAKkDQYgzj1hc2D
+hd+M9eSTAni5n0424pZ9
+=mPT1
+-----END PGP SIGNATURE-----

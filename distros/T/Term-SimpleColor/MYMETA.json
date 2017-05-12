@@ -1,0 +1,55 @@
+{
+   "abstract" : "A very simple color screen output",
+   "author" : [
+      "Takashi Uesugi <tksuesg@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.3603, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-SimpleColor",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Test::More" : 0,
+            "Test::Perl::Critic" : 0,
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04",
+            "base" : 0,
+            "strict" : 0,
+            "utf8" : 0,
+            "version" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Term::SimpleColor" : {
+         "file" : "lib/Term/SimpleColor.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "v0.0.3"
+}

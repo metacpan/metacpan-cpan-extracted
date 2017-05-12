@@ -1,0 +1,124 @@
+Travel::Status::DE::DeutscheBahn 2.02 - Sun Jan 08 2017
+
+    * New dependencies: DateTime and DateTime::Format::Strptime
+    * Result: New accessors ->datetime, ->countdown and ->countdown_sec
+
+Travel::Status::DE::DeutscheBahn 2.01 - Sat Oct 10 2015
+
+    * Result: Fix ->type accessor (was not working for all backends)
+    * Result: Add ->train_no / ->line_no accessor
+
+Travel::Status::DE::DeutscheBahn 2.00 - Fri Sep 25 2015
+
+    * This release is NOT backwards compatible with 1.xx versions
+    * It now uses the HAFAS API instead of parsing bahn.de/ris and also
+      supports various other HAFAS installations
+    * New module dependencies: JSON, List::MoreUtils
+    * Renamed db-ris to hafas-m
+    * New modules: Travel::Status::DE::HAFAS and
+      Travel::Status::DE::HAFAS::StopFinder
+    * Renamed Travel::Status::DE::DeutscheBahn::Result to
+      Travel::Status::DE::HAFAS::Result
+    * db-ris/hafas-m: The options -f /--full-route and -v/--via are no longer
+      supported
+    * db-ris/hafas-m: New options -s / --service, -u / --url and --list
+    * Travel::Status::DE::DeutscheBahn/HAFAS->new: The mot parameter is no
+      longer supported. Use the new excluded_mots and exclusive_mots parameters
+      instead
+    * Travel::Status::DE::DeutscheBahn/HAFAS->new: Add service and url
+      parameters
+    * Travel::Status::DE::DeutscheBahn/HAFAS: Add errcode, similar_stops
+      and get_active_service accessors
+    * Travel::Status::DE::DeutscheBahn/HAFAS: Add static methods get_services
+      and get_service
+    * Result: Remove route, route_raw, route_info, route_interesting and
+      route_timetable accessors
+    * Result: Add is_changed_platform and messages accessors
+    * Result->info is now undef instead of an empty string when no information
+      is available
+
+Travel::Status::DE::DeutscheBahn 1.05 - Thu May 14 2015
+
+    * Result->route_interesting: Also consider airports
+    * Result: Add route_info accessor
+    * Result: Add is_cancelled accessor
+
+Travel::Status::DE::DeutscheBahn 1.04 - Sun May 03 2015
+
+    * Result: Add type accessor
+    * DeutscheBahn->new: Add lwp_options parameter to pass options to
+      LWP::UserAgent->new
+
+Travel::Status::DE::DeutscheBahn 1.03 - Tue Oct 21 2014
+
+    * Add primitive JSON serializer to Travel::Status::DE::DeutscheBahn::Result
+    * Fix $result->delay (was broken by changes in the RIS output format)
+
+Travel::Status::DE::DeutscheBahn 1.02 - Tue Sep 17 2013
+
+    * Respect proxy environment variables
+    * Add -a / --arrivals option to show arrivals instead of departures
+    * Disable smartmatch warnings on perl >= 5.018
+
+Travel::Status::DE::DeutscheBahn 1.01 - Sat Dec 03 2011
+
+    * Detect ambiguous input errors (available via errstr)
+    * Add language switch for additional information (german/english)
+
+    [Travel::Status::DE::DeutscheBahn::Result]
+    * Result: Add line (== train) and date accessors
+
+    [db-ris]
+    * Add -l / --lang option
+
+Travel::Status::DE::DeutscheBahn 1.00 - Sun Sep 04 2011
+
+    [db-ris]
+    * Add --full-route option
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Fix bug when receiving no platform numbers from the DB RIS
+
+    [Travel::Status::DE::DeutscheBahn::Result]
+    * Add route_timetable accessor containing station names and
+      their corresponding arrival times
+
+Travel::Status::DE::DeutscheBahn 0.05 - Tue Aug 09 2011
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Fix ->results returning duplicate connections when accessed more than
+      one time
+    * new: Only die when encountering wrong options, set ->errstr otherwise
+    * Adds new ->errstr accessor to check for request errors
+
+Travel::Status::DE::DeutscheBahn 0.04 - Wed Jul 13 2011
+
+    [Travel::Status::DE::DeutscheBahn::Result]
+    * The info accessor now strips the mostly useless "k.A." / "pünktlich"
+      (train on time) text parts
+    * Add (slightly experimental) route_interesting accessor
+    * Add delay accessor
+
+Travel::Status::DE::DeutscheBahn 0.03 - Wed Jul 13 2011
+
+    * Clarify derl dependency (we actually need >= 5.10.1)
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Strip leading / trailing whitespace in result fields
+
+Travel::Status::DE::DeutscheBahn 0.02 - Wed Jul 06 2011
+
+    [db-ris]
+    * Only display info when a train is late, not when on time / unknown
+    * Add --ignore-late option
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Add route_raw accessor
+    * Proper HTTP request error handling
+    * Strip leading whitespace from ::Result info
+    * Do not include canceled stops in the route
+
+Travel::Status::DE::DeutscheBahn 0.01 - Mon Jun 27 2011
+
+    * Initial release
+    * Crawls almost all data available in the web interface

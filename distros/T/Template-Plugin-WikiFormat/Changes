@@ -1,0 +1,35 @@
+Revision history for Template-Plugin-WikiFormat
+===============================================
+
+0.07    2015-01-06
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+
+0.06    2014-06-30
+        - fixed distribution name in META.
+        - added git repository links to metadata.
+
+0.05    2013-01-20
+        - change file dates changed to meet W3CDTF standards.
+        - License updated to Artistic License v2.0.
+	    - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - added META.json.
+        - updated test suite.
+        - updated LICENSE and README files.
+
+0.04    2009-08-17
+        - new maintainer, Barbie, due to the untimely death of Ivor Williams.
+        - updated documentation
+        - added more tests
+
+0.03    2008-06-25T15:57:23
+        - Add global_replace option.
+
+0.02    2008-05-18T21:47:27
+        - Sort out Makefile.PL, dependencies etc.
+
+0.01    2008-05-18T11:02:37
+        - original version; created by ExtUtils::ModuleMaker 0.51
+          Pass params to Text::Wikiformat as tags or options.
+          Basic tests using Template::Test

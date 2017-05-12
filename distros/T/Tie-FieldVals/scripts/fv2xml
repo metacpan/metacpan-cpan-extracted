@@ -1,0 +1,380 @@
+#!/usr/bin/env perl
+# vim:ts=8 sw=4 sts=4 ai
+require v5.6.1;
+use strict;
+use warnings;
+
+=head1 NAME
+
+fv2xml - convert a Tie::FieldVals datafile into XML data.
+
+=head1 VERSION
+
+This describes version B<0.6203> of fv2xml.
+
+=cut
+
+our $VERSION = '0.6203';
+
+=head1 SYNOPSIS
+
+fv2xml --help | --manpage | --version
+
+fv2xml { --match I<field>=I<pattern> } [ --match_any I<pattern> ]
+[ --num_recs I<num> ] [ --start_rec I<num> ]
+{ --sort_by I<field> } { --sort_numeric I<field> } { --sort_reversed I<field> }
+I<datafile> [ I<outfile> ]
+
+=head1 DESCRIPTION
+
+This script converts a (subset of) a Tie::FieldVals datafile into
+XML data.
+
+=head1 OPTIONS
+
+=over
+
+=item --datafile I<filename>
+
+The input data file (in Tie::FieldVals format). 
+
+=item --help
+
+Print help message and exit.
+
+=item --manpage
+
+Print the full help documentation (manual page) and exit.
+
+=item --match I<field>=I<pattern>
+
+Extract a subset of records from the file, by only including
+those which match the given pattern for the given field.  This option
+can be repeated for multiple fields.
+For example:
+
+    --match Author=Mary
+
+will give the records for authors which contain the string "Mary".
+
+=item --match_any I<pattern>
+
+Extract a subset of records from the file by only including
+those which match the given pattern in any field.
+
+=item --num_recs I<n>
+
+Extract a subset of at most n records from the collection (it may
+be less).
+
+=item --sort_by I<field>
+
+Sort by this field.  Can be repeated to sort by multiple fields.
+Thus, if one wished to sort by Author and then Title, one would give:
+
+    --sort_by Author --sort_by Title
+
+=item --sort_numeric I<field>
+
+If sorting by this field, use this to alter the type of the sort, to
+make it numeric.
+
+For example:
+
+    --sort_by SeriesOrder --sort_numeric SeriesOrder
+
+To switch off numeric sort for a field, give the value of 0 to the
+argument.
+
+For example:
+    --sort_by SeriesOrder --sort_numeric SeriesOrder=0
+
+=item --sort_reversed I<field>
+
+If sorting by this field, use this to alter the direction of the sort, to
+make it sort reversed.
+
+For example:
+    --sort_by Author --sort_reversed Author
+
+To switch off reversed sort for a field, give the value of 0 to the
+argument.
+
+For example:
+    --sort_by Author --sort_reversed Author=0
+
+=item --start_rec I<n>
+
+Extract a subset of records starting from the nth record.
+
+=item --verbose
+
+Print informational messages.
+
+=item --version
+
+Print version information and exit.
+
+=back
+
+=head1 FILE FORMATS
+
+=head2 FieldVals Format
+
+The input data file is in the form of Field:Value pairs, with each
+record separated by a line with '=' on it.
+
+See L<Tie::FieldVals/FILE FORMAT> for more information.
+
+=head2 XML FORMAT
+
+The format of the output XML file is as follows:
+
+    <fv_data>
+        <record>
+	   <Field>Value</Field>
+	    <AnotherField>AnotherValue</AnotherField>
+	    ...
+	</record>
+	...
+    </fv_data>
+
+Each field name is given its own tag, and the element contains
+the value for that field.
+
+=head1 REQUIRES
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+    Data::Dumper
+    Tie::FieldVals
+    Tie::FieldVals::Row
+    Tie::FieldVals::Select
+
+=head1 SEE ALSO
+
+perl(1)
+Getopt::Long
+Getopt::ArgvFile
+Pod::Usage
+
+=cut
+
+use Getopt::Long 2.34;
+use Getopt::ArgvFile qw(argvFile);
+use Pod::Usage;
+use Data::Dumper;
+use Tie::FieldVals;
+use Tie::FieldVals::Row;
+use Tie::FieldVals::Select;
+
+#========================================================
+# Subroutines
+sub init_data ($) {
+    my $data_ref = shift;
+
+    # options
+    my %default_conf = ();
+    $default_conf{debug} = 0;
+    $default_conf{manpage} = 0;
+    $default_conf{version} = 0;
+    $default_conf{verbose} = 0;
+    $default_conf{outfile} = '-';
+    $default_conf{datafile} = '';
+    $default_conf{sort_by} = [];
+    $default_conf{sort_numeric} = {};
+    $default_conf{sort_reversed} = {};
+    $default_conf{start_rec} = 0;
+    $default_conf{num_recs} = -1;
+    $default_conf{match} = {};
+    $default_conf{match_any} = '';
+    $data_ref->{options} = \%default_conf;
+} # init_data
+
+sub process_args ($) {
+    my $data_ref = shift;
+
+    my $ok = 1;
+
+    argvFile(home=>1,current=>1,startupFilename=>'.fv2xmlrc');
+
+    pod2usage(2) unless @ARGV;
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($data_ref->{options},
+		    'verbose!',
+		    'manpage',
+		    'debug!',
+		    'datafile=s',
+		    'sort_by=s@',
+		    'sort_numeric:1%',
+		    'sort_reversed:1%',
+		    'start_rec=i',
+		    'num_recs=i',
+		    'match=s%',
+		    'match_any=s',
+		    'outfile=s',
+		   ) or pod2usage(2);
+
+    if ($data_ref->{options}->{'manpage'})
+    {
+	pod2usage({ -message => "$0 version $VERSION",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+
+} # process_args
+
+sub convert_file ($) {
+    my $data_ref = shift;
+
+    my $outfile = $data_ref->{options}->{outfile};
+
+    print STDERR "datafile: ", $data_ref->{options}->{datafile},
+	" outfile: ", $outfile,
+	"\n" if ($data_ref->{options}->{verbose});
+    if ($data_ref->{options}->{verbose}
+	&& %{$data_ref->{options}->{match}})
+    {
+	print STDERR Data::Dumper->Dump([$data_ref->{options}->{match}],
+	    [qw(match)]);
+    }
+    if ($data_ref->{options}->{verbose}
+	&& $data_ref->{options}->{match_any})
+    {
+	print STDERR "match any: ", $data_ref->{options}->{match_any}, "\n";
+    }
+    if ($data_ref->{options}->{debug})
+    {
+	print STDERR Data::Dumper->Dump([$data_ref], [qw(fv2xml)]);
+    }
+    # get the records, sort them, and grab them
+    my @sel_recs = ();
+    Tie::FieldVals::Select::debug($data_ref->{options}->{'debug'});
+    my $sel_obj = tie @sel_recs, 'Tie::FieldVals::Select',
+	datafile=>$data_ref->{options}->{'datafile'},
+	selection=>$data_ref->{options}->{'match'},
+	match_any=>$data_ref->{options}->{'match_any'};
+    $data_ref->{_sel_recs} = \@sel_recs;
+    $data_ref->{_sel_obj} = $sel_obj;
+    if (@{$data_ref->{options}->{sort_by}})
+    {
+	$sel_obj->sort_records(
+		sort_by=>$data_ref->{options}->{'sort_by'},
+		sort_numeric=>$data_ref->{options}->{'sort_numeric'},
+		sort_reversed=>$data_ref->{options}->{'sort_reversed'});
+    }
+
+    my $count = @sel_recs;
+    print STDERR "$count records found\n" if ($data_ref->{options}->{verbose});
+
+    my $first_rec = 0;
+    if ($data_ref->{options}->{start_rec} >= 0
+	and $data_ref->{options}->{start_rec} < $count)
+    {
+	$first_rec = $data_ref->{options}->{start_rec};
+    }
+    my $last_rec = $first_rec + $data_ref->{options}->{num_recs};
+    if ($data_ref->{options}->{num_recs} <= 0)
+    {
+	$last_rec = $count;
+    }
+    if ($last_rec > $count)
+    {
+	$last_rec = $count;
+    }
+    if ($first_rec > $last_rec)
+    {
+	warn "record number $first_rec > $last_rec -- aborting\n";
+	return 0;
+    }
+    print STDERR "records from #$first_rec to #$last_rec\n" if ($data_ref->{options}->{verbose});
+
+    # for each record, create the XML version
+    if ($outfile ne '-')
+    {
+	open(OUTFILE, ">$outfile") || die "Can't open '$outfile' for writing.";
+	print OUTFILE "<fv_data>\n";
+    }
+    else
+    {
+	print "<fv_data>\n";
+    }
+    for (my $i=$first_rec; $i < $last_rec; $i++)
+    {
+	my $vals = $sel_recs[$i];
+	my $row_obj = tied %{$vals};
+	my $xml_str = $row_obj->get_xml_string();
+	if ($outfile eq '-')
+	{
+	    print $xml_str;
+	}
+	else
+	{
+	    print OUTFILE $xml_str;
+	}
+    }
+    if ($outfile ne '-')
+    {
+	print OUTFILE "</fv_data>\n";
+	close(OUTFILE);
+    }
+    else
+    {
+	print "</fv_data>\n";
+    }
+    print STDERR "done!\n" if ($data_ref->{options}->{verbose});
+} # convert_file
+
+#========================================================
+# Main
+
+MAIN: {
+    my %data = ();
+
+    init_data(\%data);
+    process_args(\%data);
+
+    # first argument is the datafile
+    if (@ARGV)
+    {
+	$data{options}->{datafile} = shift @ARGV;
+    }
+    if (!$data{options}->{datafile})
+    {
+	print STDERR "$0 no datafile\n";
+	return 0;
+    }
+
+    # remaining argument is the output file
+    if (@ARGV)
+    {
+	$data{options}->{outfile} = shift @ARGV;
+    }
+    convert_file(\%data);
+}
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+__END__

@@ -1,0 +1,42 @@
+---
+abstract: 'Run your test suite continuously when developing.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::Class: '0.5'
+  Test::Exception: '0.4'
+  YAML: '0.77'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.14, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Continuous
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  App::Prove: '3.23'
+  File::ChangeNotify: '0.12'
+  File::Spec: '3.29'
+  File::Temp: '0.21'
+  Git::Repository: '0'
+  List::MoreUtils: '0.22'
+  Log::Dispatch: '2.22'
+  Module::ExtractUse: '0.23'
+  TAP::Harness: '3.16'
+  Term::Cap: '1.1'
+  Test::More: '0.42'
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gugod/Test-Continuous.git
+version: '0.76'
+x_module_name: Test::Continuous

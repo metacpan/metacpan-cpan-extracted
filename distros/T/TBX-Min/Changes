@@ -1,0 +1,33 @@
+Revision history for TBX-Min
+
+0.08      2016-05-18 12:31:31-06:00 America/Denver
+	fixed missing author
+	fixed unused variables test
+	fixed EOL tests
+	changed expression forms of 'map' and 'grep' to block forms to comply with perlcritic
+0.07      2016-01-06 11:58:07-07:00 America/Denver
+	Updated TBX::Min to comply with current TBX-Min schema
+0.06      2014-02-03 13:01:04 America/Los_Angeles
+    check input document for use of incorrect dialect
+    import TBX::Min::Entry, etc. automatically
+    updated documentation
+0.05      2014-01-30 14:55:25 America/Los_Angeles
+    Fixed warning on 5.10.X
+    add_concept changed to add_entry as should have been done in 0.04
+    as_xml returns pretty-printed XML
+    as_xml return scalar ref instead of just scalar
+0.04      2014-01-28 19:27:39 America/Los_Angeles
+    "conceptEntry" element changed to "entry"
+0.03      2013-11-19 16:50:25 America/Los_Angeles
+    Uninitialized arrays are now returned as [] instead of undef
+0.02      2013-11-12 14:07:47 America/Los_Angeles
+    Several changes were made to the TBX-Min dialect to ensure compatibility
+    with UTX:
+        renamed "origin" to "creator"
+        renamed "title" to "id"
+        added "description" field to header
+        added "dateCreated" field to header
+        removed "doc_lang"
+
+0.01      2013-11-08 21:18:18 America/Los_Angeles
+	initial release

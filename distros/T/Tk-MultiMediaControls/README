@@ -1,0 +1,11 @@
+
+DESCRIPTION
+       Create multimedia controls similar to that found on Apple applications
+       like QuickTime, iMovie, iDVD, iTunes, etcetera. This mega-widget
+       accepts a -buttons option that specifies a list of controller buttons,
+       and a series of specialized options that bind callbacks to those but-
+       tons.
+
+Steve Lidie
+2004/01/21
+sol0@lehigh.edu

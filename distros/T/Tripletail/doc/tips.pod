@@ -1,0 +1,69 @@
+=encoding utf-8
+
+=head1 NAME
+
+tips Tips
+
+=head1 DESCRIPTION
+
+このドキュメントでは、TripletaiL を使用する際に知っておいた方が良いTipsについて紹介します。
+
+
+=head2 速度に関するチューニング
+
+=head3 DBクラスのオーバーヘッドの回避
+
+DBクラスは、L<拡張プレースホルダ|Tripletail::DB/拡張プレースホルダ詳細>等の追加機能を実現するために、オーバーヘッドがあります。
+
+大量のクエリを発行するバッチ処理などでは、DBクラスの拡張機能を利用せず、DBIを直接利用することでパフォーマンスが改善します。
+
+例えば以下のように利用します。
+
+ my $DB = $TL->getDB('DB');
+ my $DBH = $DB->getDbh();
+ my $sth = $DBH->prepare(q{SELECT * FROM test WHERE id = ?});
+ $sth->execute($id);
+ while(my $data = $sth->fetchrow_hashref) {
+   # ...
+ }
+
+
+=head2 TripletaiLを利用しないHTMLフォームからの値の受け取り
+
+TripletaiL は、出力時にHTMLソースを加工し、フォームに文字コード判別用の
+文字を追加しています。
+フォームを受け取ったときは、この文字を利用して文字コードを判別することによって、
+どの日本語文字コードで受け取っても正しくデコードできるようにしています。
+
+TripletaiL 以外のプログラムや、静的なHTMLファイルからフォームを受け取る場合、
+この文字コード判別用の文字を追加する必要があります。
+この文字がない場合、正しく文字コードが判別できず、受け取った内容が文字化けします。
+
+以下の内容のフォームデータを一緒に送信するようにして下さい。
+
+ <input type="hidden" name="CCC" value="愛">
+
+URLの場合は、文字コードにあわせて、以下のようにデータを送信して下さい。
+
+ UTR-8の場合 http://example.com/tl.cgi?CCC=%e6%84%9b&key1=value1&key2=value2
+ Shift_JISの場合 http://example.com/tl.cgi?CCC=%88%a4&key1=value1&key2=value2
+ EUC-JPの場合 http://example.com/tl.cgi?CCC=%b0%a6&key1=value1&key2=value2
+
+
+=head1 AUTHOR INFORMATION
+
+=over 4
+
+Copyright 2007 YMIRLINK Inc.
+
+This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+Address bug reports and comments to: tl@tripletail.jp
+
+HP : http://tripletail.jp/
+
+=back
+
+=cut

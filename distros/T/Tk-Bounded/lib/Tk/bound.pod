@@ -1,0 +1,200 @@
+# -*- mode: text; fill-column: 80;  comment-column: 80; -*-
+
+# Tk::bound.pod --
+#
+#	This file provides out of bounds mechanics.
+#
+# Copyright (c) 2000-2007 Meccanomania
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# svn: @(#) $Id: bound.pod 58 2008-01-10 23:29:20Z meccanomania $
+#-------------------------------------------------------------------------------
+
+
+=head1  NAME
+
+Tk::bound -  change the base class for bound binded widgets.
+
+=for category  Binding Events and Callbacks
+
+=head1  SYNOPSIS
+
+Retreive boundings:
+
+S<    >I<$widget>-E<gt>B<bound>
+
+S<    >I<$widget>-E<gt>B<bound>(I<tag>)
+
+S<    >I<$widget>-E<gt>B<bound>(I<sequence>)
+
+Associate and destroy boundings:
+
+S<    >I<$widget>-E<gt>B<bound>(I<sequence>,I<oob>)
+
+S<    >I<$widget>-E<gt>B<bound>(I<sequence>,I<oob>,I<callback>)
+
+S<    >I<$widget>-E<gt>B<bound>(I<tag>,I<sequence>,I<oob>)
+
+S<    >I<$widget>-E<gt>B<bound>(I<tag>,I<sequence>,I<oob>,I<callback>)
+
+=head1  DESCRIPTION
+
+The B<bound> method associates callbacks with X events. If I<oob> is specified,
+B<bound> will arrange for I<oob> to be evaluated whenever the event(s) given by
+I<sequence> occur in the window(s) identified by I<$widget> or I<tag>. If I<oob>
+is an empty string then the current binding for I<sequence> is destroyed,
+leaving I<sequence> bound less. In all of the cases where a I<oob> argument is
+provided, B<bind> returns an empty string. If I<oob> is specified and evaluated
+to a valid out of bounds bit mask, then B<bound> will arrange for I<callback> to
+be called, if specified, for the previous callback to be called otherwise.
+
+If I<sequence> is specified without I<oob>, then the out of bounds callback
+currently bound to I<sequence> is returned, or B<undef> is returned if there is
+no bounding for I<sequence>. If neither I<sequence> nor I<callback> is
+specified, then the return value is a list whose elements are all the sequences
+for which there exist boundings for I<tag>. 
+
+If no I<tag> is specified then the B<bound> refers to I<$widget>. If I<tag> is
+specified then it is typically a class name and the B<bound> refers to all
+instances of the class on the B<MainWindow> associated with I<$widget>. (It is
+possible for I<tag> to be another "widget object" but this practice is
+deprecated.) Perl's B<ref>(I<$object>) can be used to get the class name of any
+object. Each window has an associated list of tags, and a bounding applies to a
+particular window if its tag is among those specified for the window.
+Although the B<bountags> method may be used to assign an arbitrary set of
+bounding tags to a window, the default bounding tags provide the following
+behavior:
+
+If a tag is the name of an internal window the bounding applies to that window.
+
+If the tag is the name of a toplevel window the bounding applies to the toplevel
+window and all its internal windows.
+
+If the tag is the name of a class of widgets, such as B<Tk::Button>, the bounding
+applies to all widgets in that class;
+
+If I<tag> has the value B<all>, the bounding applies to all windows descended
+from the MainWindow of the application.
+
+=head1 EVENT PATTERNS
+
+Please refer to the L<Tk::bind> manual page.
+
+=head1 MODIFIERS
+
+Please refer to the L<Tk::bind> manual page.
+
+=head1 EVENT TYPES
+
+Please refer to the L<Tk::bind> manual page.
+
+=head1 OUT OF BOUND BITMASKS
+
+The I<oob> argument to B<bound> is a bitmask that specifies the out of bounds
+situation. It is evaluted by the B<bound> function as a bitmask value or as a
+callback that returns a bitmask value. The bits in the bitmask specifies the
+relative positions and level in the bounding tags (See L<Tk::boundtags> for
+description of the possible forms.) of the out of bounds callback (the I<next>
+bit) and the previous callback (the I<previous> bit). Bitmaks are made of the
+letters n, N, p, P, where lowercase specifies enabled and uppercase specifies disabled. 
+
+The out of bound bitmask is to be taken among the following constant values :
+
+=over 4
+
+=item B<'np'>
+
+next callback is called before previous callback;
+
+=item B<'nP'>
+
+next callback is called before without previous callback;
+
+=item B<'Np'>
+
+previous callback only, this is the default situation;
+
+=item B<'NP'>
+
+void;
+
+=item B<'pn'>
+
+previous callback is called before next callback;
+
+=item B<'pN'>
+
+previous callback only, this is the default situation;
+
+=item B<'Pn'>
+
+next callback only;
+
+=item B<'PN'>
+
+void.
+
+=back
+
+=head1 BOUNDING CALLBACKS AND SUBSTITUTIONS
+
+The I<callback> argument to B<bound> is a perl/Tk callback. which will be
+executed whenever the given event sequence occurs. (See L<Tk::callbacks> for
+description of the possible forms.) I<Callback> will be associated with the same
+B<MainWindow> that is associated with the I<$widget> that was used to invoke
+the B<bound> method, and it will run as though called from B<MainLoop>. If
+I<callback> contains any B<bEv>(I<%>) calls, then each "nested" B<bEv>(I<%>)
+"callback" will be evaluated when the event occurs to form arguments
+to be passed to the main I<callback>. The replacement depends on the character
+I<%>, as defined in the list below.  Unless otherwise indicated, the
+replacement string is the B<Ev>(I<%>) numeric (decimal) value of the given field
+from the current event. 
+
+=over 4
+
+=item B<'t'>
+
+The tag used (or calculated) when out of bounds event arises.
+
+=item B<'s'>
+
+The sequence when out of bounds event arises.
+
+=item B<'S'>
+
+The normalised sequence when out of bounds event arises.
+
+=item B<'c'>
+
+The evaluated previous callback when out of bounds event arises.
+
+=item B<'m'>
+
+The mask when out of bounds event arises.
+
+=back
+
+=head1 OUT OF BOUND LEVEL
+
+It is possible for an already bound binded widget event to be bound binded again,
+increasing its out of B<bound level>. The level is specified by the B<bountags>
+function.
+
+=head1 ERRORS
+
+Please refer to the L<Tk::bind> manual page.
+
+head1 SEE ALSO
+
+L<Tk::Error|Tk::Error>
+L<Tk::callbacks|Tk::callbacks>
+L<Tk::bindtags|Tk::bindtags>
+L<Tk::boundtags|Tk::boundtags>
+
+=head1 KEYWORDS
+
+Event, binding
+
+=cut

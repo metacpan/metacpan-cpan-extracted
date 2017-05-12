@@ -1,0 +1,97 @@
+---
+abstract: Quick design of syntax highlighted text applications
+author: 'Sebastien Grommier <sgrommier@free.fr>'
+build_requires:
+  Test: 0
+  Test::More: 0
+  Config: 0
+distribution_type: module
+generated_by: DumpFile of YAML perl module
+licence: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 0.49
+name: Text::Editor::Easy
+provides:
+  Text::Editor::Easy:
+    file: lib/Text/Editor/Easy.pm
+    version: 0.49
+  Text::Editor::Easy::Abstract:
+    file: lib/Text/Editor/Easy/Abstract.pm
+    version: 0.49
+  Text::Editor::Easy::Abstract::Key:
+    file: lib/Text/Editor/Easy/Abstract/Key.pm
+    version: 0.49
+  Text::Editor::Easy::Comm:
+    file: lib/Text/Editor/Easy/Comm.pm
+    version: 0.49
+  Text::Editor::Easy::Cursor:
+    file: lib/Text/Editor/Easy/Cursor.pm
+    version: 0.49
+  Text::Editor::Easy::Data:
+    file: lib/Text/Editor/Easy/Data.pm
+    version: 0.49
+  Text::Editor::Easy::Display:
+    file: lib/Text/Editor/Easy/Display.pm
+    version: 0.49
+  Text::Editor::Easy::File_manager:
+    file: lib/Text/Editor/Easy/File_manager.pm
+    version: 0.49
+  Text::Editor::Easy::Graphic::Tk_glue:
+    file: lib/Text/Editor/Easy/Graphic/Tk_glue.pm
+    version: 0.49
+  Text::Editor::Easy::Key:
+    file: lib/Text/Editor/Easy/Key.pm
+    version: 0.49
+  Text::Editor::Easy::Line:
+    file: lib/Text/Editor/Easy/Line.pm
+    version: 0.49
+  Text::Editor::Easy::Motion:
+    file: lib/Text/Editor/Easy/Motion.pm
+    version: 0.49
+  Text::Editor::Easy::Program::Eval::Exec:
+    file: lib/Text/Editor/Easy/Program/Eval/Exec.pm
+    version: 0.49
+  Text::Editor::Easy::Program::Eval::Print:
+    file: lib/Text/Editor/Easy/Program/Eval/Print.pm
+    version: 0.49
+  Text::Editor::Easy::Program::Flush:
+    file: lib/Text/Editor/Easy/Program/Flush.pm
+    version: 0.49
+  Text::Editor::Easy::Program::Open_editor:
+    file: lib/Text/Editor/Easy/Program/Open_editor.pm
+    version: 0.49
+  Text::Editor::Easy::Program::Search:
+    file: lib/Text/Editor/Easy/Program/Search.pm
+    version: 0.49
+  Text::Editor::Easy::Program::Tab:
+    file: lib/Text/Editor/Easy/Program/Tab.pm
+    version: 0.49
+  Text::Editor::Easy::Syntax::Perl_glue:
+    file: lib/Text/Editor/Easy/Syntax/Perl_glue.pm
+    version: 0.49
+  Text::Editor::Easy::Trace::Print:
+    file: lib/Text/Editor/Easy/Trace/Print.pm
+    version: 0.49
+  Text::Editor::Easy::Window:
+    file: lib/Text/Editor/Easy/Window.pm
+    version: 0.49
+  Text::Editor::Easy::Zone:
+    file: lib/Text/Editor/Easy/Zone.pm
+    version: 0.49
+requires:
+  Data::Dump: 0
+  Devel::Size: 0
+  Fcntl: 0
+  File::Basename: 0
+  File::Spec: 0
+  IO::File: 0
+  SDBM_File: 0
+  Scalar::Util: 0
+  Syntax::Highlight::Perl: 0
+  Thread::Queue: 0
+  Time::HiRes: 0
+  Tk: 0
+ressources:
+  homepage: http://sgrommier.free.fr/perl
+version: 0.49

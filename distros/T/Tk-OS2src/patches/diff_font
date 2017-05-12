@@ -1,0 +1,111 @@
+This patch is already applied to files in Tk-OS2 distribution!
+
+
+--- tkOS2Font.c~.orig	Tue Feb  3 00:54:48 1998
++++ tkOS2Font.c	Tue Feb  3 23:18:46 1998
+@@ -31,7 +31,14 @@ static char *lastname;
+ #define CP_1004   1004L
+ #define CP_65400  65400L
+ 
++#ifdef USE_PMRES_120
++#  define IGNOREPMRES
++#endif 
++
+ #ifdef IGNOREPMRES
++#  ifndef USE_PMRES_120
++#    define USE_PMRES_120 96
++#  endif
+     /*
+      * Shrink 120 to 96 to facilitate 'better' sizing for those displays
+      * which report a resolution of 120dpi but have actual resolution close
+@@ -42,25 +49,27 @@ static char *lastname;
+      */
+     #define PIXTOPOINT(pixels) ( \
+         (aDevCaps[CAPS_VERTICAL_FONT_RES] == 120) \
+-        ? (((pixels) * 72) / 96) \
++        ? (((pixels) * 72) / USE_PMRES_120) \
+         : (((pixels) * 72) / aDevCaps[CAPS_VERTICAL_FONT_RES]) \
+     )
+     #define POINTTOPIX(points) ( \
+         (aDevCaps[CAPS_VERTICAL_FONT_RES] == 120) \
+-        ? (((points) * 96) / 72) \
++        ? (((points) * USE_PMRES_120) / 72) \
+         : (((points) * aDevCaps[CAPS_VERTICAL_FONT_RES]) / 72) \
+     )
+     #define PTOP(p) ( \
+         (aDevCaps[CAPS_VERTICAL_FONT_RES] == 120) \
+-        ? (((p) * 96) / 120 ) \
++        ? (((p) * USE_PMRES_120) / 120 ) \
+         : (p) \
+     )
++    #define FIX_RES(res) if (res == 120) (res = USE_PMRES_120)
+ #else
+     #define PIXTOPOINT(pixels) \
+         (((pixels) * 72) / aDevCaps[CAPS_VERTICAL_FONT_RES])
+     #define POINTTOPIX(points) \
+         (((points) * aDevCaps[CAPS_VERTICAL_FONT_RES]) / 72)
+     #define PTOP(p)  (p)
++    #define FIX_RES(res) 
+ #endif
+ 
+ 
+@@ -664,8 +673,8 @@ XLoadFont(display, name)
+ #ifdef DEBUG
+                 printf("    d %d, n %d\n", l, off);
+ #endif
+-                    logfonts[lFontID].fattrs.lMaxBaselineExt = POINTTOPIX(l);
+-                    logfonts[lFontID].deciPoints = l * 10;
++                    logfonts[lFontID].fattrs.lMaxBaselineExt = l;
++                    logfonts[lFontID].deciPoints = PIXTOPOINT(l * 10);
+                     name += off;
+                     useIntended = TRUE;
+                     /* Get the fontname out */
+@@ -848,13 +857,14 @@ XLoadFont(display, name)
+               os2fonts[i].lMaxBaselineExt * 10,
+               logfonts[lFontID].fattrs.lMaxBaselineExt * 10);
+ #endif
+-/*
++#if 1
+             err1 = ( useIntended ? os2fonts[i].sNominalPointSize
+                                  : (os2fonts[i].lMaxBaselineExt * 10))
+                      - logfonts[lFontID].fattrs.lMaxBaselineExt * 10;
+-*/
++#else
+             err1 = ( (os2fonts[i].lEmHeight * 10) 
+                      - logfonts[lFontID].fattrs.lMaxBaselineExt * 10 );
++#endif 
+             if (err1 < 0) {
+                 err1 = -err1;
+             }
+@@ -1736,6 +1746,9 @@ TkOS2ScaleFont(hps, pointSize, pointWidt
+             yRes = aDevCaps[CAPS_VERTICAL_FONT_RES];
+         }
+     }
++
++    FIX_RES(xRes);
++    FIX_RES(yRes);
+ 
+     /*
+      * Determine desired point size in pixels with device resolution.
+--- tkOS2Default.h~	Thu Sep 11 15:38:44 1997
++++ tkOS2Default.h	Wed Feb  4 00:10:22 1998
+@@ -403,7 +403,7 @@
+ #define DEF_TEXT_CURSOR			"xterm"
+ #define DEF_TEXT_FG			BLACK
+ #define DEF_TEXT_EXPORT_SELECTION	"1"
+-#define DEF_TEXT_FONT			"-*-Courier-Medium-R-Normal--*-100-*-*-*-*-*-*"
++#define DEF_TEXT_FONT			"10.Courier"
+ #define DEF_TEXT_HEIGHT			"24"
+ #define DEF_TEXT_HIGHLIGHT_BG		NORMAL_BG
+ #define DEF_TEXT_HIGHLIGHT		BLACK
+--- tkOS2Int.h~	Tue Feb  3 00:32:00 1998
++++ tkOS2Int.h	Tue Feb  3 21:13:36 1998
+@@ -453,6 +453,8 @@ extern unsigned long dllHandle;	/* Handl
+ 
+ extern void Register_MQ();
+ extern void Deregister_MQ();
++extern long PM_Pixres;
++#define USE_PMRES_120 PM_Pixres
+ 
+ #endif 
+ 

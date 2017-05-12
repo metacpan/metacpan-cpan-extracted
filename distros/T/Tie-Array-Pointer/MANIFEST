@@ -1,0 +1,14 @@
+.cvsignore
+Build.PL
+ChangeLog
+doc/Artistic.txt
+doc/GPL.txt
+lib/Tie/Array/Pointer.pm
+lib/Tie/Array/Pointer.xs
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README.txt
+t/00_use.t
+t/01_array.t

@@ -1,0 +1,1 @@
+Hello, <TMPL_VAR NAME="name">.

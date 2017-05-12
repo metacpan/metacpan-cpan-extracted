@@ -1,0 +1,31 @@
+---
+abstract: 'Test BSON documents'
+author:
+  - 'Nick Patch <patch@cpan.org>'
+build_requires:
+  Test::More: 0.82
+  Test::Tester: 0.107
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-BSON
+provides:
+  Test::BSON:
+    file: lib/Test/BSON.pm
+    version: 0.01
+requires:
+  BSON: 0
+  Test::Differences: 0.47
+  parent: 0
+  perl: v5.6.0
+resources:
+  bugtracker: http://github.com/patch/test-bson-pm5/issues
+  homepage: http://github.com/patch/test-bson-pm5
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/patch/test-bson-pm5.git
+version: 0.01

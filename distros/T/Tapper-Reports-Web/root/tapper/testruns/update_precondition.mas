@@ -1,0 +1,6 @@
+<%args>
+</%args>
+
+<h3>Edit preconditions for testrun <% $testrun->id %></h3>
+<% $form|n %>
+<p><a href="/tapper/testruns/id/<% $testrun->id %>">Cancel</a></p>

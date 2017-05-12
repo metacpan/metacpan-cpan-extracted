@@ -1,0 +1,72 @@
+Tk::Clock
+    Clock widget for Perl/Tk with analog and/or digital display
+
+DESCRIPTION
+    A canvas clock widget with both analog and digital represen-
+    tation of both time and date.
+
+    It is highly configurable for as far as colors and fonts and
+    the way time and date is displayed.
+
+    The year is displayed in two digits  in the default configu-
+    ration, which makes it not Y2K compliant.
+
+COPYING:
+    Copyright (c) 1998-2016 H.Merijn Brand.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    Recent changes can be (re)viewed in the public GIT repository
+    at https://github.com/Tux/Tk-Clock
+    Feel free to clone your own copy:
+
+     $ git clone https://github.com/Tux/Tk-Clock Tk-Clock
+
+    or get it as a tgz:
+
+     $ wget --output-document=Tk-Clock-git.tgz \
+            https://github.com/Tux/Tk-Clock/archive/master.tar.gz
+
+PREREQUISITES
+    perl5 (probably 5.004.04 or better)
+    Tk (probably 400.xxx or better)
+
+    This port was tested on several OS's with perl-5.8.8-dor,
+    perl-5.8.7-dor, and perl-5.8.5-dor in 32bit and 64bit builds
+    all with Tk-804.027.
+
+BUILDING AND INSTALLATION
+    As all CPAN modules:
+	# perl Makefile.PL
+	# make test
+	# make install
+
+    make test should run the clock with some changing contrasting
+    colors showing the following configurations for 4 seconds each:
+    	1. Both analog and digital clock,
+    	2. Only analog clock,
+    	3. Only digital clock,
+    	4. Both analog- and digital clock using an american like
+    	   time/date format (for wich I shouldn't actualy support
+    	   formats, cause amaricans do often not support european
+    	   formats, but I thought, I'd be nice for this time),
+	5. Only digital clock with an empty time format and a
+	   double line date format showing the day of the week
+	   and the date.
+
+BUGS
+    Probably a few. One of them is that if you change the clock
+    too often with ->config (), some elements might not be moved
+    correctly, like getting a clock with 5 hands :)
+
+CHANGES
+    See ChangeLog
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 1999-2016 H.Merijn Brand
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself. 
+
+As always, have the appropriate amount of fun!

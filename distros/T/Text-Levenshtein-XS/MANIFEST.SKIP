@@ -1,0 +1,25 @@
+# Top-level filter (only include the following...)
+^(MYMETA\.(?:yml|json)|Makefile|pm_to_blib|.*\.o|.*\.c|.*\.bs|blib/.*)$
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\b_darcs\b
+# (.git only in top-level, hence it's blocked above)
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\..*?\.sw[po]$
+\#$
+\b\.#
+# avoid OS X finder files
+\.DS_Store$
+# ditto for Windows
+\bdesktop\.ini$
+\b[Tt]humbs\.db$
+# Avoid patch remnants
+\.orig$
+\.rej$

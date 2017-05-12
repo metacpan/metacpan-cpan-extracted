@@ -1,0 +1,17 @@
+Revision history for Perl extension Tk::FcyEntry.
+
+1.8		2017-01-12
+	- tewaked tests. There should be less failing auto tests due to missing display now.
+
+1.7		2016-11-22
+	- improved tests: do not fail if there is no display, skip the tests
+	- removed very old Perl version check from Makefile.PL
+
+1.5		2016-11-14
+	- fixed Makefile (forgot to change it on module creation)
+
+1.4		2016-11-14
+	- separated Tk::FcyEntry from Tk::ACH
+	- improved example file
+	- added .pl file extension to example file
+

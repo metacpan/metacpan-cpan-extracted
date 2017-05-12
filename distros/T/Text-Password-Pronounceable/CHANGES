@@ -1,0 +1,28 @@
+
+[Changes for 0.30 - 16 Aug 2010]
+
+* Updated dist metadata and M::I
+
+[Changes for 0.29 (unreleased) - 11 Sep, 2007]
+
+* T::P::P->generate($len) works
+* Fix behavior:
+       T::P::P->new(2,10)->generate(6) 
+  was equivalent to 
+       T::P::P->generate(6,10) 
+  which is too subtle. Now it works just as 
+       T::P::P->generate(6,6)
+* Improved warnings on bad arguments
+
+[Changes for 0.28 - 6 Jan, 2007]
+
+* Make ->new take just one $len as well. [Adriano Ferreira]
+
+[Changes for 0.27 - 8 Nov, 2006]
+
+* Fix distname typo in package.
+* Add pod tests.
+
+[Changes for 0.25 - 11 Sep, 2006]
+
+Initial CPAN release, extracted from RT.

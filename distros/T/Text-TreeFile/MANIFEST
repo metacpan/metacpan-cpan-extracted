@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TreeFile.pm
+TreeFile/details.pod
+TreeFile/internals.pod
+test.pl
+demodata/treetest.tre
+demodata/testfile.tre
+demodata/inclfile.tre
+demodata/pickhues.tre
+demodata/ftp_cpan_org.tre
+demodata/cpan_mjd.tre
+t/test00.t

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Field.t
+lib/Text/CSV/Field.pm

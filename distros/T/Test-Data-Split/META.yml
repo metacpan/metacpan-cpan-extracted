@@ -1,0 +1,48 @@
+---
+abstract: 'split data-driven tests into several test scripts.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Differences: '0'
+  Test::More: '0'
+  blib: '1.01'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Data-Split
+provides:
+  Test::Data::Split:
+    file: lib/Test/Data/Split.pm
+    version: v0.2.0
+  Test::Data::Split::Backend::Hash:
+    file: lib/Test/Data/Split/Backend/Hash.pm
+    version: v0.2.0
+  Test::Data::Split::Backend::ValidateHash:
+    file: lib/Test/Data/Split/Backend/ValidateHash.pm
+    version: v0.2.0
+requires:
+  Carp: '0'
+  IO::All: '0'
+  List::MoreUtils: '0'
+  MooX: '0'
+  MooX::late: '0.010'
+  autodie: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Data-Split
+  repository: https://github.com/shlomif/perl-Test-Data-Split.git
+version: 0.2.0

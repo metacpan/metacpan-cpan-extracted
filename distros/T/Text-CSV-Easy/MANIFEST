@@ -1,0 +1,18 @@
+.gitignore
+Changes
+MANIFEST
+Makefile.PL
+README
+ignore.txt
+lib/Text/CSV/Easy.pm
+lib/Text/CSV/Easy_PP.pm
+t/00-load.t
+t/easy.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/pp_csv_build.t
+t/pp_csv_parse.t
+t/xs_pp_comparision.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

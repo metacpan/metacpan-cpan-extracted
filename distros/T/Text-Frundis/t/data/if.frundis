@@ -1,0 +1,24 @@
+.#if 1
+True.
+.#;
+.#if -f xhtml
+xhtml.
+.#;
+.#if -f xhtml 0
+False and xhtml.
+.#;
+.#if -f xhtml 1
+True and xhtml.
+.#;
+.\" nested if
+.#if 1
+True
+.#if 0
+False
+.#;
+True;
+.#;
+.\" No close
+.#if 1
+.#if 1
+True

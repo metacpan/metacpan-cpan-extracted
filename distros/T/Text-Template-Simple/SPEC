@@ -1,0 +1,27 @@
+{
+    module_name    => 'Text::Template::Simple',
+    requires       => {
+        'Digest::MD5' => 1,
+    },
+    build_requires => {
+        'File::Temp'   => '0.12',
+    },
+    recommends     => {
+        'Devel::Size'  => '0.77',
+        'Text::Table'  => '1.107',
+        'Perl::Tidy'   => '0',
+    },
+    meta_merge     => {
+        resources => {
+            repository => 'http://github.com/burak/cpan-text-template-simple/',
+        },
+    },
+    BUILDER => {
+        change_versions                  => 1,
+        build_monolith                   => 1,
+        monolith_add_to_top              => '[ qw( Constants.pm Util.pm ) ]',
+        taint_mode_tests                 => 1,
+        copyright_first_year             => 2004,
+        add_pod_author_copyright_license => 1,
+    },
+}

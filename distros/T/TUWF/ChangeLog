@@ -1,0 +1,26 @@
+1.0 - 2015-09-17
+	- !! Some backwards-imcompatible changes, marked * !!
+	- kv_validate() improvements:
+	  - Fix maxcount option
+	  - Fix non-array argument to 'func'
+	  - Added some default templates: num, int, uint, ascii, email, weburl
+	  - * Removed 'min' and 'max' options, these now require the num template
+	  - Add 'inherit' option for template definitions
+	  - Allow templates to provide default values for 'required', 'default',
+	    'rmwhitespace', 'multi', 'mincount' and 'maxcount'
+	  - Add tests
+	- * reqPath() now includes the leading slash
+	- * reqGet(), reqPost(), reqParam(), reqUploadMIME() and reqUploadRaw()
+	  now only work in scalar context.
+	- * Add plural versions of the above methods (reqGets() etc) that only
+	  work in list context.
+	- Add reqQuery()
+	- Fix warning with Perl 5.22
+
+0.2 - 2012-01-19
+	- Fixed bug with in-place utf8_decode() in recent Perls
+	- Lowered minimum Perl version to 5.8.0
+
+0.1 - 2011-02-07
+	Initial version
+

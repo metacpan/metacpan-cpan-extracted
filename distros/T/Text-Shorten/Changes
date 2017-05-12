@@ -1,0 +1,22 @@
+Revision history for Text-Shorten
+
+0.06	2013-03-27
+	Accomodate new, sometimes inconsistent hash ordering scheme in
+	Perl 5.17.10
+
+0.05	2012-06-07
+	RT#77673 fix: iterating over hash resets 'each' iterator
+	Pod and test improvements.
+
+0.04	2011-07-08
+	Bug fix in abbreviation routine for long hashes.
+
+0.03	2011-02-16
+	Efficiency improvements for arrays and hashes with thousands
+	of elements.
+
+0.02	2011-01-20
+	Made compatible with <= v5.8.
+
+0.01	2011-01-18
+	First version, released on an unsuspecting world.

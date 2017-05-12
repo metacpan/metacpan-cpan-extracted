@@ -1,0 +1,167 @@
+Revision history for Text-Editor-Easy
+
+--------------------------+
+0.49  :                   !
+--------------------------+
+    - Event sequences.
+    - Adding a few events, updating doc.
+
+--------------------------+
+0.48  : 20 June 2009      !
+--------------------------+
+    - Dynamic event management, continued :
+        - code can be written on the fly and used to manage the events ('dynamic designing')
+         => demo 12 added.
+
+--------------------------+
+0.47  : 29 May 2009       !
+--------------------------+
+    - true initialization made with a 'use Text::Editor::Easy;' :
+        - Class methods had to be accesible without the need to create an instance first
+    - Start to set the trace mecanism : suppression of package variable %Trace, start to write the doc.
+    - Can now choose any shortcut for 'Text::Editor::Easy' (a bit too long, indeed) : this
+        shortcut is a start to allow standard perl inheritance system (thread complexity with
+        knowledge diffusion still to be checked)
+    - Starting dynamic event management :
+        - events can be added, updated or deleted during execution
+        - specific event management can be set for future instance creations
+
+--------------------------+
+0.46  : 17 April 2009     !
+--------------------------+
+    - Using module Syntax::Highlight::Perl::Improved instead of Syntax::Highlight::Perl.
+    - Suppression of old event management, but new event management still to be completed.
+    - Migration of 'Motion' thread (used for event management) from Text::Editor::Easy module to Editor.pl program :
+    now, this thread has nothing special and any other thread could be added the same way with any name for any event.
+    - Using 'Events.pm' to manage 'Text::Editor::Easy::Zone' events.
+
+--------------------------+
+0.44  : 8 January 2009    !
+--------------------------+
+        - start of event documentation, start of event enhancement : clic test
+
+--------------------------+
+0.43  : 1 December 2008   !
+--------------------------+
+        - insert enhancement. Documentation of insert and display methods.
+
+--------------------------+
+0.42  : 25 October 2008   !
+--------------------------+
+        - bloc insertion, start of insert optimisation...
+
+--------------------------+
+0.41  : 23 September 2008 !
+--------------------------+
+        - start of external program traces (perl program edited and runned by F5)
+        - better management of Eval and internal log traces
+
+-----------------------+
+0.4   : 24 August 2008 !
+-----------------------+
+        - start of inter-thread and eval traces
+        - start to trace some user events
+            ---> pseudo-demo11 explains all that.
+
+-----------------------+
+0.35  : 29 July 2008   !
+-----------------------+
+        - text selection with mouse.
+        - start of zone resizing : in an individual way and in absolute coordinates.
+        
+        ... by the way, believe it or not, this sub-version was created and edited almost
+        exclusively with my perl program "Editor.pl". Well, to tell the truth, there are
+        still lots of (sometimes 'very') annoying bugs that make these program and module
+        not yet usable for a standard use.
+
+-----------------------+
+0.34  : 18 July 2008   !
+-----------------------+
+        - better key management (alt, ctrl, ...)
+        - should skip tests on machins that can't do them without failing everywhere...
+
+-----------------------+
+0.33  : 06 July 2008   !
+-----------------------+
+        - main window size and position are now saved in the editor session
+        - should skip tests on machins with no support of ithreads or Tk (not so
+        obvious to leave with return code 0 from a ".t file" checking Tk that fails)
+
+-----------------------+
+0.32  : 04 July 2008   !
+-----------------------+
+        - save mecanism (for personal use) with Text::Editor::Easy::Program::Save module
+        - I expect better reports (Text::Editor::Easy uses ithreads and graphical environnement)
+
+-----------------------+
+0.31  : 29 June 2008   !
+-----------------------+
+        - sub implementation of Key functions with "Text::Editor::Easy::Abstract::Key.pm" (faster than 
+        "Text::Editor::Easy::Key.pm" that used the object interface) : for debug reasons, lots of things are
+        traced and tend to slow down the program.
+        - suppression of selected text, "cut key" (ctrl-x)
+        - start of graphical open implementation : specific "Text::Editor::Easy" instance to open files (ctrl-o),
+        code in "Text::Editor::Easy::Program::Open_editor.pm"
+        - better encapsulation of tab and session management (specific to the program, not to be known by the module)
+        
+-----------------------+
+0.3  : 1st June 2008   !
+-----------------------+
+        - start to implement session management (demo11, F10 key, start of Text::Editor::Easy objects destruction)
+
+-----------------------+
+0.2  : 27 April 2008   !
+-----------------------+
+        Meta.yml file created by hand, I hope the tests will be all right this time... 
+        Lots of little things (and bugs) added : 
+                - start to implement the selection (just with keys, for the moment), copy (ctrl-c) and paste (ctrl-v)
+                - start to implement the search (ctrl-F and F3 short-cuts) + demo10
+                - key-function can be specific to a Text::Editor::Easy instance (see "up" and "down" in demo10)
+                - faster line search (mouse move on Editor log is now usable)
+                - "change_last" event (to replace "insert_last" event for the macro instructions) : macro panel is now sensitive to delete modifications too
+                - lazy call tests ("anything_for" sub called in "editor_number" or "editor_search" and recursive asynchronous call test with "editor_visual_search" for the graphic thread)
+        Still not usable. I planned to deliver this date, the content doesn't matter.
+
+-----------------------+
+0.1 : 16 March 2008    !
+-----------------------+
+        Standardization of thread mecanism. Using clean packages in "Text::Editor::Easy" namespace. Adding about 250 tests.
+
+a) Standardization of thread mecanism : see "Text::Editor::Easy::Comm" for a discussion of different types of threads
+---------------------------------------
+With the version 0.01, there were different implementations for each type of threads. And I also mixed "package" and "module" perl notions
+during thread creation process. I couldn't go on with this mess (this mess was an improvement of another mess, still, there is a time
+where you need to simplify, think another time, and reinvent something more powerful that fulfils all the new needs you have created :
+but it was, of course, impossible to imagine the actual solution before writing anything and seeing the needs).
+
+The version 0.1 is just that : the new thread mecanism. First this thread mecanism was completely separated from the other 
+thread mecanisms that were running. I created sample tests for this newly defined mecanism. Then, one by one, I migrated all the ancient
+thread to the new thread system. And, believe it or not, I had problems almost for each thread migration. This migration was difficult,
+because work has to be made but without any visible change (no visual functionnality added).
+
+b) Using clean packages in "Text::Editor::Easy" namespace
+---------------------------------------------------------
+The new thread system allowed me to use clean packages easily thanks to 'use' and 'package' options of the "create_new_server' sub.
+All my packages are now 'behind' "Text::Editor::Easy".
+
+c)  Adding about 250 tests
+--------------------------
+All tests should be written before writing any code, as soon as the interface have been defined. Only, it's not obvious to choose a right
+interface on the paper without using it and seeing the real problems.
+Often, I have to write bad code before I can think really about the interface (and I still write bad code after too !).
+I'm very careful about debugging because multi-thread is complex to debug. Sometimes all your threads work well, taken individually.
+But the communications between them is not synchronized : either some little things don't work or everything is blocked... The best
+way to avoid nightmares when I have to debug is to have the more tests I can and lots of displays to watch. With an Editor, you can
+have even better : a complete dynamic explanations of all displays (history of thread calls, from which module/line and so on...).
+I'll try to have this complete debugging tool working before version 1.0. For the moment, history is done in only one thread and
+that's too limited to understand a multi-threaded program. I think that to debug complex mecanism you need powerful tool.
+Otherwise, you lose more and more time maintaining your complexity and your complexity brings you nothing but new problems.
+
+
+
+-----------------------+
+0.01 : 20 January 2008 !
+-----------------------+
+        First version, 9 demos in Editor.pl program.
+
+

@@ -1,0 +1,53 @@
+#========================================================================
+#
+# Changes
+#
+# DESCRIPTION
+#   Revision history for Template::Directive::XSSAudit
+#
+# AUTHOR
+#   David Bartle   <dbartle@mediatemple.net>
+#
+#========================================================================
+
+
+#-----------------------------------------------------------------------
+# Version  1.03 - 12th Aug 2010
+#------------------------------------------------------------------------
+
+* Remove duplication when generating the string to print/warn in the
+  default error handlers and the command line script
+
+#-----------------------------------------------------------------------
+# Version  1.02 - 10th Aug 2010
+#------------------------------------------------------------------------
+
+* META.yml now contains more resources such as repository, bugtracker
+  and homepage (thanks to t0m on irc.perl.org/#catalyst for pointing
+  this out)
+* Documentation updated to reflect new error output format
+* Documentation for ttxsscheck updated to have more information
+
+#-----------------------------------------------------------------------
+# Version  1.01 - 6th Aug 2010
+#------------------------------------------------------------------------
+
+* on_filtered callback created so that sucessfully filtered variables
+  can be tracked as well. This will facilitate creating reports geared
+  toward ratios of filtered and unfiltered output variables.
+* The ttxsscheck script was updated to also print out successful filters
+
+#-----------------------------------------------------------------------
+# Version  1.00 - 5th Aug 2010
+#------------------------------------------------------------------------
+
+* callback parameters are completely reworked (NOT BACKWARD COMPATIBLE)
+* line and file information is now found more often
+* String literals no longer count as something needing escaping
+* ttxsscheck script created for running reports on the command line
+
+#-----------------------------------------------------------------------
+# Version  0.05 - 3rd Aug 2010
+#------------------------------------------------------------------------
+
+* Initial public release 

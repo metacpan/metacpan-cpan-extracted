@@ -1,0 +1,165 @@
+
+=head1 NAME
+
+Tk::TextHighlight - a TextUndo widget with syntax highlighting capabilities
+
+=head1 SYNOPSIS
+
+=over 4
+
+ use Tk;
+ require Tk::TextHighlight;
+
+ my $m = new MainWindow;
+
+ my $e = $m->Scrolled('TextHighlight',
+    -disablemenu => 1,
+    -syntax => 'Perl',
+    -scrollbars => 'se',
+ )->pack(-expand => 1, -fill => 'both');
+
+ $m->configure(-menu => $e->menu);
+ $m->MainLoop;
+
+=back
+
+=head1 DESCRIPTION
+
+Tk::TextHighlight inherits Tk::TextUndo and all its options and methods. Besides
+syntax highlighting, methods are provided for commenting and uncommenting
+as well as indenting and unindenting a selected area, matching pairs of braces, brackets and
+brackets and curlies and automatic indenting of new lines.
+
+Syntax highlighting is done through a plugin approach. Adding languages 
+is a matter of writing plugin modules. Theoretically this is not limited to programming languages. 
+The plugin approach could also provide the possibility for grammar or spell checking in spoken 
+languages. If you have written a plugin and it works, if you send it to me, i 
+will be happy to include it in the next release of Tk::TextHighlight. Currently there is
+support for B<Perl>, B<Pod>, B<Bash>, B<HTML> and B<Xresources>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item Name: B<autoindent>
+
+=item Class: B<Autoindent>
+
+=item Switch: B<-autoindent>
+
+Boolean, when you press the enter button, should the next line begin at the
+same position as the current line or not. By default B<false>.
+
+=item Name: B<commentchar>
+
+=item Class: B<Commentchar>
+
+=item Switch: B<-commentchar>
+
+By default "#".
+
+=item Name: B<disablemenu> 
+
+=item Class: B<Disablemenu>
+
+=item Switch: B<-disablemenu>
+
+Boolean, by default 0. In case you don't want the menu under the
+right mouse button to pop up.
+
+=item Name: B<indentchar>
+
+=item Class: B<Indentchar>
+
+=item Switch: B<-indentchar>
+
+By default "\t".
+
+=item Name: B<match>
+
+=item Class: B<Match>
+
+=item Switch: B<-match>
+
+string of pairs for brace/bracket/curlie etc matching. If this description
+doesn't make anything clear, don't worry, the default setting will:
+
+ '[]{}()'
+
+if you don't want matching to be available, simply set it to ''.
+
+=item Name: B<matchoptions>
+
+=item Class: B<Matchoptions>
+
+=item Switch: B<-matchoptions>
+
+Options list for the tag 'Match'. By default:
+
+ [-background => 'red', -foreground => 'yellow']
+
+You can also specify this option as a space separated string. Might come in
+handy for your Xresource files.
+
+ "-background red -foreground yellow"
+
+=item Name: not available
+
+=item Class: not available
+
+=item Switch B<-rules>
+
+Specify the color and font options for highlighting. You specify a list
+looking a bit like this.
+
+ [
+     ['Tagname1', @options1],
+     ['Tagname2', @options2],
+ ]
+
+The names of the tags are depending on the syntax that is highlighted. 
+See the language modules for more information about this data structure.
+
+=item Name: rulesdir
+
+=item Class: Rulesdir
+
+=item Switch B<-rulesdir>
+
+Specify the directory where this widget stores its coloring defenitions.
+Files in this directory are stored as "HTML.rules", "Perl.rules" etc.
+By default it is set to '', which means that when you switch syntax
+the highlighting rules are not loaded or stored. The hard coded defaults
+in the language modules will be used.
+
+=item Name: B<syntax>
+
+=item Class: B<Syntax>
+
+=item Switch: B<-syntax>
+
+
+Specifies the language for highlighting. At this moment the possible
+values are B<None>, B<HTML>, B<Perl>, B<Pod> and B<Xresources>. 
+By default B<None>
+
+Alternatively it is possible to specify a reference to your independent plugin.
+
+=item Name: Not available
+
+=item Class: Not available
+
+=item Switch: B<-updatecall>
+
+Here you can specify a callback that will be executed whenever the insert
+cursor has moved or text has been modified, so your application can keep
+track of position etc. Don't make this callback to heavy, the widget will
+get sluggish quickly.
+
+=back
+
+There are some undocumented options. They are used internally. 
+It is propably best to leave them alone.
+
+=cut
+

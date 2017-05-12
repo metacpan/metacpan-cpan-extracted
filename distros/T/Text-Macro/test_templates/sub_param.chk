@@ -1,0 +1,7 @@
+before foo
+arg0=.
+arg1=.
+between foo
+arg0=one.
+arg1=two.
+after foo

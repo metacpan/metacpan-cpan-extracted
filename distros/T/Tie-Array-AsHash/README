@@ -1,0 +1,29 @@
+Tie-Array-AsHash version 0.09
+=============================
+
+Tie::Array::AsHash - Access lines using a hash
+
+Read the module's POD for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+AUTHOR
+
+Chris Angell <chris@chrisangell.com>, Jens Rehsack <rehsack@web.de>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Chris Angell
+Copyright (C) 2008 by Jens Rehsack
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, including any version of Perl 5.

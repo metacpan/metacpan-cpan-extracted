@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name: Tie-StorableDir
+version: 0.075
+author:
+  - Bryan Donlan <bdonlan@gmail.com>
+abstract: |-
+  Perl extension for tying directories with Storable files
+license: perl
+requires:
+  Carp: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  IO::Dir: 0
+  Storable: 0
+  Tie::Hash: 0
+provides:
+  Tie::StorableDir:
+    file: lib/Tie/StorableDir.pm
+    version: 0.075
+  Tie::StorableDir::BackedArray:
+    file: lib/Tie/StorableDir/BackedArray.pm
+  Tie::StorableDir::BackedHash:
+    file: lib/Tie/StorableDir/BackedHash.pm
+  Tie::StorableDir::BackedScalar:
+    file: lib/Tie/StorableDir/BackedScalar.pm
+  Tie::StorableDir::Slot:
+    file: lib/Tie/StorableDir/Slot.pm
+generated_by: Module::Build version 0.26

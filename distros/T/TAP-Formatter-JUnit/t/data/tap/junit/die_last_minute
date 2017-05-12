@@ -1,0 +1,18 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="0"
+             tests="4"
+             name="data_tap_die_last_minute">
+    <testcase name="1"></testcase>
+    <testcase name="2"></testcase>
+    <testcase name="3"></testcase>
+    <testcase name="4"></testcase>
+    <system-out><![CDATA[ok 1
+ok 2
+ok 3
+ok 4
+1..4
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

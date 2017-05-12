@@ -1,0 +1,8 @@
+Throwable::SysError - a sub-class of Throwable::Error for system error objects
+
+To install this module, use the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

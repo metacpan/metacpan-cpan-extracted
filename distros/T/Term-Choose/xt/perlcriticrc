@@ -1,0 +1,9 @@
+severity  = 5
+verbose   = 8
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = utf8 uninitialized

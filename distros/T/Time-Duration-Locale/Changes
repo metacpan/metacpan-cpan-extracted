@@ -1,0 +1,54 @@
+Copyright 2009, 2010, 2011, 2013, 2016, 2017 Kevin Ryde
+
+This file is part of Time-Duration-Locale.
+
+Time-Duration-Locale is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Time-Duration-Locale is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Time-Duration-Locale.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 12, April 2017
+    - cross-ref Time::Duration::es
+
+Version 11, October 2016
+    - Time::Duration::Filter avoid warning perl 5.26 up copying variables
+
+Version 10, December 2013
+n   - cross-ref Time::Duration::pl
+
+Version 9, January 2013
+    - cross-ref Time::Duration::id
+
+Version 8, February 2011
+    - fix Makefile.PL for perl 5.6 and earlier
+
+Version 7, September 2010
+    - test manifest only as an author test
+
+Version 6, July 2010
+    - use I18N::LangTags::Detect for language preferences
+
+Version 5, June 2010
+    - cross reference Time::Duration::fr
+
+Version 4, April 2010
+    - cross reference Time::Duration::pt
+
+Version 3, January 2010
+    - test script watch out for threads.pm not available
+
+Version 2, August 2009
+    - new Time::Duration::en_PIGLATIN, for fun
+
+Version 1, June 2009
+    - the first version

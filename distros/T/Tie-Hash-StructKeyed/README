@@ -1,0 +1,39 @@
+NAME
+    Tie::Hash::StructKeyed - use structures like hashes and arrays as keys
+    to a hash
+
+SYNOPSIS
+       use Tie::Hash::StructKeyed;
+       tie %hash,  'Tie::Hash::StructKeyed';
+
+       $hash{[1,2,3]} = 'Keyed by listref';
+
+       my $h = { one=>1, two=>2 };
+       $hash{$h}      = 'Keyed by hashref';
+
+DESCRIPTION
+    Tie::Hash::StructKeyed ties a hash so that you can use arrays, hashes or
+    complex structures as the key of the hash.
+
+NOTE
+    The current implementation uses YAML to generate the hash-key for the
+    structure. This is possibly the easiest way to get a powerful and
+    flexible key-hashing behaviour.
+
+    It does mean that the behaviour for objects is undefined: Two objects
+    with the same representation will hash the same. The same object, after
+    an internal state change may hash differently. Behaviour of objects as
+    keys (or as part of a key) is subject to change in future versions.
+
+AUTHOR
+    osfameron - osfameron@cpan.org
+
+VERSION
+    Version 0.03 Apr 14 2005
+
+     This program is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+    perl perltie
+

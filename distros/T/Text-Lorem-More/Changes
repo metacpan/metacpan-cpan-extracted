@@ -1,0 +1,39 @@
+0.13 Wednesday October 01 11:44:03 PDT 2008:
+    - Conversion from Build.PL to Makefile.PL (Module::Install)
+    - Move from svn to git (github)
+    - Fix for RT39738 (http://rt.cpan.org/Ticket/Display.html?id=39738)
+0.12 2006-10-3
+    + More documentation.
+0.11 2006-10-2
+    + Set up 'Makefile.PL' in addition to 'Build.PL'
+    + Minor documentation tweak.
+0.10 2006-10-1
+    + Added Parse::RecDescent prerequisite.
+    + Some documentation tweaks.
+0.09 2006-10-1
+    + Vastly improved documentation (well, from what it was before, at least).
+0.08 2006-10-1
+    + 'title' generatelet.
+    + 'description' generatelet.
+    + Name change of 'parse' to 'process'
+0.07 2006-10-1
+    + Minor bug fix, for real this time.
+    + New croak to catch a missing generatelet.
+0.06 2006-10-1
+    + Minor bug fix.
+0.05 2006-10-1
+    + Took out some failing boilerplate tests.
+0.04 2006-10-1
+    + Separate parsing/generation into separate functions: parse() & generate()
+    + parse() uses a simple Parse::RecDescent grammar so we can escape '+'.
+    + Can now bracket a variable (e.g., "+{name}") to prevent unintended interpolation.
+    + 03-singleton.t
+    + 04-brace.t
+    + 05-escape.t
+0.03 2006-09-29
+    + Switch from MakeMaker to Module::Build.
+    + 02-compatibility.t
+0.02 2006-09-29
+    + Update to the manifest and some documentation.
+0.01 2006-09-28
+    + Initial release. More testing and documentation to be done, but it should work.

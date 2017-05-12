@@ -1,0 +1,15 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Template/Plugin/XML/LibXML.pm
+t/docu.t
+t/libxml.t
+t/test/html/basic.html
+t/test/html/xhtml.html
+t/test/xml/document.xml
+t/test/xml/example.rdf
+t/test/xml/testfile.xml
+Build.PL
+META.yml

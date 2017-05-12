@@ -1,0 +1,121 @@
+NAME
+    Template::Plugin::MP3 - Interface to the MP3::Info Module
+
+SYNOPSIS
+        [% USE mp3 = MP3("Montana.mp3") %]
+
+        [% mp3.title %]
+        [% mp3.album %]
+
+        # perldoc MP3::Info for more ideas
+
+DESCRIPTION
+    "Template::Plugin::MP3" provides a simple wrapper for using "MP3::Info"
+    in object oriented mode; see the MP3::Info manpage for more details.
+
+CONSTRUCTOR and CONFIGURATION
+    "Template::Plugin::MP3" takes a filename as its primary argument:
+
+        [% USE MP3("Tryin_To_Grow_A_Chin.mp3") %]
+
+    Optional configuration info can also be specified in the constructor:
+
+        [% USE MP3("Camarillo_Brillo.mp3", utf8 => 1, dir => "/mp3") %]
+
+    The name of the file can also be specified as a named parameter
+    ("name"):
+
+        [% USE MP3(name => "A_Token_Of_My_Extreme.mp3", dir => "/mp3") %]
+
+    "Template::Plugin::MP3" understands the following options:
+
+    name    The name of the MP3 file. Note that if both a positional
+            argument and a "name" parameter are passed the positional
+            argument will take precedence.
+
+    dir     Specify a base directory name; will be prepended to the
+            filename, if it is defined.
+
+    utf8    Determines whether results should be returned in UTF-8, as
+            handled by "MP3::Info"'s use_mp3_utf8() function. See the
+            use_mp3_utf8 entry in the MP3::Info manpage. Note that this
+            requires Unicode::String.
+
+    If the constructor cannot create an instance using the filename passed,
+    a "plugin.mp3" Exception is thrown, which will need to be caught
+    appropriately:
+
+        [% TRY %]
+            [% USE mp3 = MP3("Willie The Pimp.mp3") %]
+        [% CATCH plugin.mp3 %]
+            Can't find that MP3; are you sure you spelled it right?
+        [% CATCH %]
+            Unexpected exception: [% error %]
+        [% END %]
+
+METHODS
+    "Template::Plugin::MP3" provides the following, mostly intuitive,
+    methods:
+
+    file            Name of the file.
+
+    artist          Name of the artist.
+
+    album           Name of the album.
+
+    bitrate         Bitrate at which the mp3 was encoded.
+
+    size            Size of the file, in bytes.
+
+    time, secs, mm, ss, ms
+                    Length of the song, in various permutations. For
+                    example:
+
+                    time    03:37
+
+                    secs    217.0253125
+
+                    mm      3
+
+                    ss      27
+
+                    ms      25.3125000000125
+
+    genre           Genre of the MP3.
+
+    tagversion      Full name of the version of the MP3 tag, e.g. "ID3v1.1"
+
+    version         Version of the MP3 tag: 1 or 2
+
+    "MP3::Info" defines some other fields that I don't grok; try
+
+        [% MP3.Dump %]
+
+    to see them all.
+
+    Of course, all of the above methods don't return the advertised value if
+    the tag being read does not contain useful information.
+
+OTHER STUFF
+    "Template::Plugin::MP3" provides access to the @mp3_genres and
+    @winamp_genres arrays via the mp3_genres() and winamp_genres() class
+    methods, or collectively through the genres() class method:
+
+        [% FOREACH genre = MP3.genres %]
+           * [% genre;
+        END %]
+
+AUTHORS
+    darren chamberlain <darren@cpan.org>
+
+    Doug Gorley <douggorley@shaw.ca>
+
+COPYRIGHT
+    (C) 2003 darren chamberlain
+
+    This library is free software; you may distribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Template::Plugin manpage, the MP3::Info manpage
+

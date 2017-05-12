@@ -1,0 +1,14 @@
+Changes
+lib/Test/JavaScript.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/diag.t
+t/fail.t
+t/lib/Test/Simple/Catch.pm
+t/lib/TieOut.pm
+t/no_clobber.t
+t/no_plan.t
+t/plan.t
+t/samp_validator.t
+Test-JavaScript-0.06.tar.gz

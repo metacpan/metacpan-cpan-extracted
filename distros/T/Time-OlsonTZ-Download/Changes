@@ -1,0 +1,38 @@
+version 0.004; 2012-07-20
+
+  * switch to new official repository, <ftp://ftp.iana.org/tz/releases/>
+
+version 0.003; 2012-03-19
+
+  * new constructor ->new_from_local_source to support working with
+    locally-modified Olson source
+
+  * convert .cvsignore to .gitignore
+
+version 0.002; 2011-10-09
+
+  * with elsie down due to legal action, use instead the new de facto
+    canonical repository, <ftp://munnari.oz.au/pub/>
+
+  * new methods ->code_version and ->data_version to retrieve the version
+    numbers of the two parts of the distribution independently
+
+  * abandon support for HTTP-based archive, instead using the archive
+    on the same FTP site as the current version (which munnari supplies
+    but elsie didn't)
+
+  * handle archived versions with two-digit year and those compressed with
+    compress rather than gzip
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.001; 2010-11-18
+
+  * accept a tzcode version number that is lower than the available
+    tzdata version number on elsie
+
+version 0.000; 2010-08-31
+
+  * initial released version

@@ -1,0 +1,10 @@
+CHANGES
+Cache.pm
+MANIFEST
+MANIFEST.SKIP
+MANIFEST.bak
+Makefile.PL
+README
+tie-cache-bench.pl
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

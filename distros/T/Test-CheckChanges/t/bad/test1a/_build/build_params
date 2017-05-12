@@ -1,0 +1,17 @@
+
+[
+          {
+            'ARGV' => []
+          },
+          {},
+          {
+            'dist_version' => bless( {
+                                       'original' => '0.02',
+                                       'version' => [
+                                                      0,
+                                                      20
+                                                    ]
+                                     }, 'Module::Build::Version' ),
+          }
+
+]

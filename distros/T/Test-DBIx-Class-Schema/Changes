@@ -1,0 +1,124 @@
+This file documents the revision history for Test::DBIx::Class::Schema.
+
+1.0.10    2016-05-12 05:01:56-04:00 America/New_York
+ - replace ContributorsFromGit with Git::Contributors
+ - bump minimum Test::More version to 1.302015
+ - add .mailmap file to combine same-author-different-email
+ - add required test deps to dist.ini
+ - use Test::More 0.92 → 1.302015
+ - do not push 'not ok 11' if we find Test2::... (#12)
+ - refudge the @expected_out for issue #12
+ - add buildkite status badge for builds on master
+
+1.0.9     2015-12-23 12:08:56+00:00 UTC
+ - add ContributorsFromGit
+   and remove hand-written contributors
+ - add CopyFilesFromBuild
+ - allow README.mkdn to be 'dirty' from git's perspective
+
+1.0.8     2015-12-17 17:04:43+00:00 UTC
+ - fix tests when Test::More >= 1.3 (issue #12 / pull #15)
+ - add buildkite helper scripts (submodule and init)
+ - Add weaver.ini; better POD weaving
+
+1.0.7     2015-01-29 17:59:09+00:00 Europe/London
+ - Fix bug with MooseX::NonMoose interaction
+   - Merge pull request #14 from jasontang/new_result
+ - Update dzil plugins used
+
+1.0.6     2013-11-05 10:34:01 Europe/London
+ - deal with new isa_ok message format in test_out() tests
+
+1.0.5     2013-11-04 16:24:30 Europe/London
+ - don't die when using 5.18 and not all methods are defined
+
+1.0.4     2013-05-16 17:22:47 Europe/London
+ - Drop use of { AutoCommit => 1 } from DBHelper
+ - Remove BEGIN/COMMIT when creating spanish_inquisition
+ - Update bugtracker to point to github
+
+1.0.3     2013-02-21 15:54:04 Europe/London
+ - add documentation for 'glue' and 'schema' options [rupertl]
+
+1.0.2     2012-07-31 22:41:37 UTC
+ - TODO: can't test relationships defined as CODE
+
+1.0.1     2012-06-03 11:16:06 UTC
+ - add AutoPrereqs dzil plugin
+   - this should resolve the cpantesters failures around parent.pm
+
+1.0.0     2012-05-29 16:58:12 Europe/London
+ - make Changes conform to CPAN::Changes::Spec
+   via: http://changes.cpanhq.org/author/CHISEL
+ - Fix bad comma(s) in contributor listing
+ - dzil process clean-up
+   - Add [PkgVersion] plugin; remove [PodVersion]
+ - Git::NextVersion changes for x.y.z version format
+ - Tidy up missing column/relation test output
+
+0.01016   2011-09-16 17:00:09 Europe/London
+ - Add test for unexpected columns in DB (jasontang)
+ - Switch to using dzil's Git::NextVersion
+
+0.01015   2011-02-25 13:16:02 Europe/London
+ - Added test for many-to-many relationship (dariusj)
+ - Fix for proxied cols/relations (dariusj)
+ - Flesh out relationships/tests (dariusj)
+ - Add ReadmeMarkdownFromPod / Repository plugins
+ - Add test data and test proxied cols/relationships (dariusj)
+
+0.01014   2011-02-17 12:23:59 Europe/London
+ - Compound foreign key fix (dariusj)
+
+0.01013   2011-02-10 15:01:35 Europe/London
+ - Add tests for incorrect foreign/self keys in rels (dariusj)
+ - Fix test for missing column(s) (dariusj)
+ - Extend test suite (chisel)
+
+0.01012   2011-02-07 13:45:19 Europe/London
+ - [RT#65521] don't OOM with very large tables (dariusj)
+
+0.01011   2011-01-18 17:06:54 Europe/London
+  - improve testing in many areas (dariusj/chisel)
+    - test against tables with no data
+    - handle proxy columns/relationships
+    - deal with many_to_many
+
+0.01010   2010-12-23 15:15:37 EST5EDT
+  - replace DBIx::Class::Schema dependency with DBIx::Class +version
+
+0.01009   2010-12-09 17:39:54 Europe/London
+  - convert to Dist::Zilla
+
+0.01008 2010-12-08 10:50 GMT
+    - replace first() with ->slice()->single() [speed optimisation] (dakkar)
+
+0.01007 2010-01-20 09:48 GMT
+    - [RT #53825] Added ->{glue} option/hack
+
+0.01006 2009-10-05 16:13 BST
+    - fixed issues that were revealed when running under Test::Aggregate
+    - fixed issues that were revealed when testing with a more complicated
+      schema definition
+
+0.01005 2009-10-01 11:58 BST
+    - added tests for $rs methods that *don't* rely on table having data
+    - removed test planning in favour of "done_testing"
+
+0.01004 2008-04-08 11:47 BST
+    - added username/password options to new()
+    - fixed test plan count
+
+0.01003 2008-04-05 14:23
+    - minor fixes
+
+0.01002 2008-04-05 01:28
+    - fixed Makefile.PL (missing name)
+    - added README (I'm such a bad boy!)
+
+0.01001 2008-04-05 01:08
+    - Added Changes (this file!)
+    - fixed module name thinko in POD
+
+0.01000 2008-04-04 19:35
+    - Initial module release

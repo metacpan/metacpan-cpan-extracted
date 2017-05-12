@@ -1,0 +1,13 @@
+#if ##my_hash{key2}## eq "val2" and ##my_array[2]## eq "two"
+Good
+#else
+bad
+#endif
+
+#if undef
+Bad
+#elsif ##my_hash{key2}## eq "val2" and ##my_array[2]## eq "two"
+Good
+#else
+bad
+#endif

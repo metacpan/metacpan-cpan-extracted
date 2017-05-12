@@ -1,0 +1,51 @@
+{
+   "abstract" : "Acceptance testing for JSON-Schema based validators like JSON::Schema",
+   "author" : [
+      "Ben Hutton (@relequestual) <relequest@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-JSON-Schema-Acceptance",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::Fatal" : "0.014",
+            "Test::More" : "1.001",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/Relequestual/Test-JSON-Schema-Acceptance"
+      },
+      "x_IRC" : "irc://irc.perl.org/#json-schema"
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,26 @@
+Tie::SymlinkTree Version 1.0
+============================
+
+This package started out as a simple persistant storage module, but
+it's scope has broadened a bit: The included Tie::Indexer is a
+generic module for searching through nested hashes and speeding up
+these searches via on-disk hashes, it is not limited to
+Tie::SymlinkTree.
+
+Read 'perldoc Tie::SymlinkTree' and/or 'perldoc Tie::Indexer' for details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+This module is distributed under the same terms as perl itself.
+
+Copyright (C) 2004 JÃ¶rg Walter <jwalt@cpan.org>
+

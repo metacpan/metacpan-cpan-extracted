@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+use Text::PDF::File;
+
+unless (defined $ARGV[0])
+{
+    die <<'EOT';
+    PDFREVERT infile
+    
+Removes one layer of changes to a PDF file, trying to maximise the size of the
+output file (to account for linearised PDF).
+EOT
+}
+
+$cr = '\s*(?:\r|\n|(?:\r\n))';
+$VERSION = "1.000";         # MJPH   6-NOV-1998     Original
+
+$f = Text::PDF::File->open($ARGV[0], 1);
+exit unless defined $f->{'Prev'};
+
+# account for linearised pdf, maximise output
+for ($t = $f; defined $t->{' prev'}; $t = $t->{' prev'})
+{
+    $loc1 = $t->{'Prev'}->val;
+    $loc = $loc1 if ($loc1 > $loc);
+}
+
+$fd = $f->{' INFILE'};
+seek($fd, $loc, 0);
+$rest = "";
+while ($len = read($fd, $dat, 1024))
+{
+    $len += length($rest);
+    $_ = $rest . $dat;
+    if (m/(?:\r|\n|(?:\r\n))%%EOF$cr/oi)
+    {
+        $loc += length($` . $&);
+        last;
+    }
+    elsif (m/$cr(.*?)$/oi)
+    {
+        $rest = $1;
+        $loc += $len - length($rest);
+    }
+}
+
+if ($len != 0)
+{
+    truncate($fd, $loc) || die "Can't truncate";
+}
+

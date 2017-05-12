@@ -1,0 +1,4 @@
+TODO list for Perl module Tie::Filehandle::Preempt::Stdin
+
+04/17/2005:  Figure out a way to get code to work with just <>.
+

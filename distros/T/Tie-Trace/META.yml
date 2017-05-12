@@ -1,0 +1,40 @@
+---
+abstract: 'easy print debugging with tie, for watching variable'
+author:
+  - 'Ktat, C<< <ktat.is at gmail.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Base: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Trace
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Tie::Trace:
+    file: lib/Tie/Trace.pm
+    version: '0.17'
+requires:
+  PadWalker: '0'
+resources:
+  bugtracker: https://github.com/ktat/Tie-Trace/issues
+  homepage: https://github.com/ktat/Tie-Trace
+  repository: git://github.com/ktat/Tie-Trace.git
+version: '0.17'
+x_contributors:
+  - 'ktat <ktat.is@gmail.com>'

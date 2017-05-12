@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Tie-File-AnyData-MultiRecord_CSV
+version:             0.01
+abstract:            Accessing groups of CSV records in a file via a Perl array.
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Parse::CSV:                    0
+    Test::More:                    0
+    Tie::File::AnyData:            0.01
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - motif <motif@cpan.org>

@@ -1,0 +1,561 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+use utf8;
+
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+our $VERSION = '1.14';
+
+binmode( STDOUT, ':encoding(utf-8)' );
+
+use Encode qw(decode);
+use Getopt::Long qw(:config no_ignore_case bundling);
+use List::Util qw(first max);
+use Travel::Status::DE::EFA;
+
+my $efa_url = 'http://efa.vrr.de/vrr/XSLT_DM_REQUEST';
+my ( $date, $time, $input_type, $list_lines, $offset, $relative_times );
+my ($full_routes);
+my ( $filter_via,    $track_via );
+my ( $timeout,       $developer_mode );
+my ( @grep_lines,    @grep_platforms, @grep_mots );
+my ( %edata,         @edata_pre );
+my ( $list_services, $service, $discover_and_print, $discover );
+my $efa;
+
+@ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
+
+GetOptions(
+	'A|auto-url|discover-and-print' => \$discover_and_print,
+	'd|date=s'                      => \$date,
+	'D|discover'                    => \$discover,
+	'h|help'                        => sub { show_help(0) },
+	'l|line=s@'                     => \@grep_lines,
+	'L|linelist'                    => \$list_lines,
+	'list'                          => \$list_services,
+	'm|mot=s@'                      => \@grep_mots,
+	'o|offset=i'                    => \$offset,
+	'O|output=s@'                   => \@edata_pre,
+	'p|platform=s@'                 => \@grep_platforms,
+	'r|relative'                    => \$relative_times,
+	's|service=s'                   => \$service,
+	't|time=s'                      => \$time,
+	'timeout=i'                     => \$timeout,
+	'u|efa-url=s'                   => \$efa_url,
+	'v|via=s'                       => \$filter_via,
+	'V|track-via=s'                 => sub { $filter_via = $track_via = $_[1] },
+	'version'                       => \&show_version,
+	'devmode'                       => \$developer_mode,
+
+) or show_help(1);
+
+if ($list_services) {
+	show_services();
+}
+
+if ( @ARGV != 2 ) {
+	show_help(1);
+}
+
+# --line=foo,bar support
+@edata_pre      = split( qr{,}, join( q{,}, @edata_pre ) );
+@grep_lines     = split( qr{,}, join( q{,}, @grep_lines ) );
+@grep_mots      = split( qr{,}, join( q{,}, @grep_mots ) );
+@grep_platforms = split( qr{,}, join( q{,}, @grep_platforms ) );
+
+my ( $place, $input ) = @ARGV;
+
+if ( $input =~ s{ ^ (?<type> address|poi|stop) : }{}x ) {
+	$input_type = $+{type};
+}
+
+for my $efield (@edata_pre) {
+	given ($efield) {
+		when ('a') { $edata{route_after}  = 1; $full_routes = 1 }
+		when ('b') { $edata{route_before} = 1; $full_routes = 1 }
+		when ('f') { $edata{fullroute}    = 1; $full_routes = 1 }
+		when ('r') { $edata{route}        = 1; $full_routes = 1 }
+		default    { $edata{$efield}      = 1 }
+	}
+}
+if ($filter_via) {
+	$full_routes = 1;
+}
+
+if ($service) {
+	my $service_ref = first { lc( $_->{shortname} ) eq lc($service) }
+	Travel::Status::DE::EFA::get_efa_urls();
+	if ( not $service_ref ) {
+		printf STDERR (
+			"Error: Unknown service '%s'. See 'efa-m --list' for a "
+			  . "list of supported service names\n",
+			$service
+		);
+		exit 1;
+	}
+	$efa_url = $service_ref->{url};
+}
+
+sub new_efa_by_url {
+	my ($url) = @_;
+	my $res = Travel::Status::DE::EFA->new(
+		date           => $date,
+		developer_mode => $developer_mode,
+		efa_url        => $url,
+		full_routes    => $full_routes,
+		place          => $place,
+		name           => $input,
+		time           => $time,
+		type           => $input_type,
+		timeout        => $timeout,
+	);
+
+	return $res;
+}
+
+sub show_help {
+	my ($code) = @_;
+
+	print "Usage: efa-m [-d <dd.mm.yyyy>] [-t <hh:mm>] <city> <station>\n"
+	  . "See also: man efa-m\n";
+
+	exit $code;
+}
+
+sub show_services {
+	printf( "%-45s %-14s %s\n\n", 'service', 'abbr. (-s)', 'url (-u)' );
+	for my $service ( Travel::Status::DE::EFA::get_efa_urls() ) {
+		printf( "%-45s %-14s %s\n", @{$service}{qw(name shortname url)} );
+	}
+
+	exit 0;
+}
+
+sub show_version {
+	say "efa-m version ${VERSION}";
+
+	exit 0;
+}
+
+sub format_route {
+	my (@route) = @_;
+
+	my $output = q{};
+
+	for my $stop (@route) {
+		if ( not $stop ) {
+			say 'BUG';
+			next;
+		}
+		if ( not defined $stop->arr_time ) {
+			$output .= sprintf( "        %5s  %40s %s\n",
+				$stop->dep_time, $stop->name, $stop->platform, );
+		}
+		elsif ( not defined $stop->dep_time ) {
+			$output .= sprintf( "%5s          %40s %s\n",
+				$stop->arr_time, $stop->name, $stop->platform, );
+		}
+		elsif ( $stop->arr_time eq $stop->dep_time ) {
+			$output .= sprintf( "    %5s      %40s %s\n",
+				$stop->dep_time, $stop->name, $stop->platform, );
+		}
+		else {
+			$output .= sprintf(
+				"%5s → %5s  %40s %s\n",
+				$stop->arr_time, $stop->dep_time,
+				$stop->name,     $stop->platform,
+			);
+		}
+	}
+	return $output;
+}
+
+sub display_result {
+	my (@lines) = @_;
+
+	my @line_length;
+
+	if ( not @lines ) {
+		die("Nothing to show\n");
+	}
+
+	for my $i ( 0 .. 4 ) {
+		$line_length[$i] = max map { length( $_->[$i] ) } @lines;
+	}
+
+	for my $line (@lines) {
+
+		if ( length( $line->[5] ) ) {
+			$line->[5] =~ tr{\n\x0d}{ }s;
+			chomp $line->[5];
+			print "\n";
+			for my $info_line ( split( qr{\n}, $line->[5] ) ) {
+				say "# ${info_line}";
+			}
+		}
+
+		printf(
+			join( q{  }, ( map { "%-${_}s" } @line_length ) ) . "\n",
+			@{$line}[ 0 .. 4 ]
+		);
+
+		if ( $line->[6] ) {
+			say $line->[6];
+		}
+	}
+
+	return;
+}
+
+sub show_lines {
+	my @output;
+
+	for my $l ( $efa->lines ) {
+
+		if (   ( @grep_lines and not( $l->name ~~ \@grep_lines ) )
+			or ( @grep_mots and not( $l->mot_name ~~ \@grep_mots ) ) )
+		{
+			next;
+		}
+
+		if ( @grep_mots and not( $l->mot_name ~~ \@grep_mots ) ) {
+			next;
+		}
+
+		push( @output,
+			[ $l->type, $l->name, $l->direction // q{}, q{}, $l->route // q{} ]
+		);
+	}
+
+	display_result(@output);
+
+	return;
+}
+
+sub show_results {
+	my @output;
+
+	for my $d ( $efa->results ) {
+
+		my @output_line;
+		my $platform = $d->platform;
+		my $dtime    = (
+			$relative_times
+			? sprintf( '%2d min', $d->countdown )
+			: $d->sched_time
+		);
+
+		if ( $d->platform_db ) {
+			$platform .= ' (DB)';
+		}
+
+		if (
+			   ( @grep_lines and not( $d->line ~~ \@grep_lines ) )
+			or ( @grep_mots and not( $d->mot_name ~~ \@grep_mots ) )
+			or ( @grep_platforms
+				and not( $platform ~~ \@grep_platforms ) )
+			or ( $offset and $d->countdown < $offset )
+			or ( $filter_via
+				and
+				not( first { $_->name =~ m{$filter_via}io } $d->route_post ) )
+		  )
+		{
+			next;
+		}
+
+		if ( $d->is_cancelled ) {
+			if ($relative_times) {
+				next;
+			}
+			else {
+				$dtime .= ' CANCELED';
+			}
+		}
+		elsif ($track_via) {
+			my $via = first { $_->name =~ m{$filter_via}io } $d->route_post;
+			$dtime .= ' → ' . $via->arr_time;
+		}
+		if ( $d->delay ) {
+			if ($relative_times) {
+				$dtime .= ' (+' . $d->delay . ')';
+			}
+			else {
+				$dtime .= ' +' . $d->delay;
+			}
+		}
+
+		@output_line
+		  = ( $dtime, $platform, $d->line, q{}, $d->destination, $d->info );
+
+		if ( $edata{route} ) {
+			$output_line[3]
+			  = join( q{  }, map { $_->name_suf } $d->route_interesting );
+		}
+
+		if ( $edata{fullroute} ) {
+			$output_line[6]
+			  = format_route( $d->route_pre )
+			  . ' -' x 30 . "\n"
+			  . format_route( $d->route_post );
+		}
+		elsif ( $edata{route_after} ) {
+			$output_line[6] = format_route( $d->route_post );
+		}
+		elsif ( $edata{route_before} ) {
+			$output_line[6] = format_route( reverse $d->route_pre );
+		}
+
+		push( @output, \@output_line );
+	}
+
+	display_result(@output);
+
+	return;
+}
+
+if ( $discover or $discover_and_print ) {
+	for my $service_ref ( Travel::Status::DE::EFA::get_efa_urls() ) {
+		$efa = new_efa_by_url( $service_ref->{url} );
+		if ( $efa and not $efa->errstr ) {
+			if ($discover_and_print) {
+				last;
+			}
+			printf(
+				"%s / %s (%s)\n   ->  efa-m -s %s %s\n\n",
+				@{$service_ref}{qw(name shortname url shortname)},
+				join( q{ }, map { "'$_'" } @ARGV ),
+			);
+		}
+	}
+	if ($discover) {
+		exit 0;
+	}
+}
+
+$efa = new_efa_by_url($efa_url);
+
+if ( my $err = $efa->errstr ) {
+	say STDERR "Request error: ${err}";
+
+	if ( $efa->place_candidates ) {
+		say 'You might want to try one of the following places:';
+		say join( "\n", $efa->place_candidates );
+	}
+	elsif ( $efa->name_candidates ) {
+		say 'You might want to try one of the following names:';
+		say join( "\n", $efa->name_candidates );
+	}
+
+	exit 2;
+}
+
+if ($list_lines) {
+	show_lines();
+}
+else {
+	show_results();
+}
+
+__END__
+
+=head1 NAME
+
+efa-m - Unofficial interface to the efa.vrr.de departure monitor
+
+=head1 SYNOPSIS
+
+B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
+[B<-l> I<lines>] [B<-p> I<platforms>] [B<-u> I<url>]
+I<city> [I<type>B<:>]I<name>
+
+=head1 VERSION
+
+version 1.14
+
+=head1 DESCRIPTION
+
+B<efa-m> lists scheduled tram, bus and train departures at the location I<name>
+in I<city>.  Realtime data (i.e. delays) is included if available, it's
+visible in the output as a "+x" remark (meaning a delay of x minutes).
+
+By default, I<name> refers to a stop, this can be changed by specifying
+I<type>.  Supported types are B<address> and B<poi> (point of interest).
+
+=head1 OPTIONS
+
+=over
+
+=item B<-A>, B<--auto-url>, B<--discover-and-print>
+
+Probe all known EFA entry points for the specified stop. Print the first
+result which was not an error.
+
+Note that this may take a while and will not necessarily return the best
+result.  Also, using thi option by default is not recommended, as it puts EFA
+services under considerable additional load.
+
+=item B<-d>, B<--date> I<dd.mm.yyyy>
+
+Show departures for I<date> instead of today.
+May also be specified as I<dd.mm.>
+
+=item B<-D>, B<--discover>
+
+Probe all known EFA entry points for the specified stop. Print the URLs and
+names of all entry points which did not return an error.
+
+=item B<-L>, B<--linelist>
+
+Do not show departures. Instead, list all lines serving the specified place.
+Note that this information may be incomplete -- only lines which are in
+service either at the time of the B<efa-m> call or at the time specifed
+using B<--date> and B<--time> are guaranteed to be included.
+
+=item B<-l>, B<--line> I<lines>
+
+Only show departures of I<lines> (comma-separatad list, option may be
+repeated)
+
+=item B<--list>
+
+List supported EFA services wit their URLs (see B<-u>) and abbreviations (see
+B<-s>).
+
+=item B<-m>, B<--mot> I<motlist>
+
+Only show departures whose type appears in I<motlist> (comma-separated list,
+this option may be repeated).
+
+The following departure types ("modes of transport") are supported:
+zug, s-bahn, u-bahn, stadtbahn, tram, stadtbus, regionalbus, schnellbus,
+seilbahn, schiff, ast, sonstige
+
+=item B<-o>, B<--offset> I<minutes>
+
+Ignore departures which are less than I<minutes> from now.
+
+=item B<-O>, B<--output> I<outputtypes>
+
+For each result, show additional information as specified by I<outputtypes>.
+I<outputtypes> is a comma-separated list, the B<-O>/B<--output> option may
+also be repeated. Each output type has both a short and long form, for instance
+both "-Or" and "--output=route" are valid.
+
+The following output types are supported:
+
+=over
+
+=item a / route_after
+
+Show each departure's full route (timestamps and stop names) after the
+requested station.
+
+=item b / route_before
+
+Show each departure's full route (timestamps and stop names) before the
+requested station.
+
+=item f / fullroute
+
+Show each departure's full route (timestamps and stop names) before and
+after the requested station.
+
+=item r / route
+
+Show up to three stops between the requested station and the departure's
+destination. B<efa-m> tries to display the three most important stops,
+however these are heuristically determined and may not be optimal.
+
+=back
+
+=item B<-p>, B<--platform> I<platforms>
+
+Only show departures at I<platforms> (comma-separated list, option may be
+repeated).  Note that the C<< Bstg. >> / C<< Gleis >> prefix must be omitted.
+
+=item B<-r>, B<--relative>
+
+Show relative departure times in minutes (i.e. the time difference between
+the departure and the time of the request).  In this case, realtime data is
+already included.
+
+=item B<-s>, B<--service> I<name>
+
+Short name of the EFA entry point. See Travel::Status::DE::EFA(3pm) and the
+B<--list> option for a list of services.
+
+=item B<-t>, B<--time> I<hh:mm>
+
+Show departures starting at I<time> instead of now.
+
+=item B<-u>, B<--efa-url> I<url>
+
+URL to the EFA entry point, defaults to
+L<http://efa.vrr.de/vrr/XSLT_DM_REQUEST>.  Depending on your location, some
+I<url>s may contain more specific data than others.  See
+Travel::Status::DE::EFA(3pm) and the B<--list> option for alternatives.
+
+=item B<--timeout> I<seconds>
+
+Set timeout for HTTP requests. Default: 10 seconds. Set to 0 or a negative
+value to disable it.
+
+=item B<-v>, B<--via> I<station>
+
+Only show trains serving I<station> after the requseted stop. I<station>
+is matched against the "I<city> I<stop>" fields in each line's route.
+Regular expressions are also supported.
+
+=item B<-V>, B<--track-via> I<station>
+
+Lik B<--via>: Only show trains serving I<station> after the requseted stop.
+Also, show the arrival time at I<station> after the departure time at the
+current stop.
+
+=item B<--version>
+
+Show version information.
+
+=back
+
+=head1 EXIT STATUS
+
+Normally zero. B<1> means B<efa-m> was called with invalid options,
+B<2> indicates a request error from Travel::Status::DE::EFA(3pm).
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * Class::Accessor(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=item * Travel::Status::DE::EFA(3pm)
+
+=item * XML::LibXML(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+B<efa-m> uses the VRR EFA service by default, which seems to contain the
+greatest available set of information. However, some cities (e.g. Berlin or
+parts of Hamburg) are not supported there, and B<efa-m> is not yet able to
+choose the appropriate EFA URL for these by itself. In these cases, you should
+find an appropriate EFA service using the B<-D>/B<--discover> option and then
+use B<-s> I<service> when making requests.
+
+=head1 AUTHOR
+
+Copyright (C) 2011-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This program is licensed under the same terms as Perl itself.

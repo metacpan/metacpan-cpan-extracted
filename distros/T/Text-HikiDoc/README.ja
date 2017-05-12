@@ -1,0 +1,229 @@
+NAME
+    Text::HikiDoc - 「テキスト→HTML」変換ツール 'HikiDoc' の Perl による実装
+
+SYNOPSIS
+      use Text::HikiDoc;
+
+      # $text = '!Title';
+      # $html = '<h1>Title</h1>';
+
+      $obj = Text::HikiDoc->new();
+      $html = $obj->to_html($text);
+
+        or
+
+      $obj = Text::HikiDoc->new($text);
+      $html = $obj->to_html();
+
+      # $text = "!Title\n----\n!!SubTitle";
+      # $html = "<h2>Title</h2>\n<hr />\n<h3>SubTitle</h3>";
+
+      $obj = Text::HikiDoc->new({
+                                 string => $text,
+                                 level => 2,
+                                 empty_element_suffix => ' />',
+                                 br_mode => 'true',
+                                 table_border => 'false',
+                                });
+
+        or
+
+      $obj = Text::HikiDoc->new($text, 2, ' />', 'true', 'false');
+
+      $html = $obj->to_html();
+
+      # $text = "!Title\n----\n!!SubTitle\nhogehoge{{br}}fugafuga";
+      # $html = "<h1>Title</h1>\n<hr />\n<h2>SubTitle</h2>\n<p>hogehoge<br />fugafuga</p>\n";
+
+      $obj = Text::HikiDoc->new();
+      $obj->enable_plugin('br');
+      $html = $obj->to_html($text);
+
+      $obj->enable_plugin('br','ins');
+      @plugins = $obj->plugin_list; # br, ins
+      $obj->is_enabled('br'); # 1
+      $obj->is_enabled('pr'); # 0
+
+DESCRIPTION
+    'HikiDoc' は「テキスト→ HTML」変換ツールです。書きやすく読みやすい
+    文法の テキストをまともな HTML (や XHTML) に変換します。
+    オリジナルの 'HikiDoc' は Ruby による実装です。
+
+    本ライブラリは、Pure Perl による 'HikiDoc' の実装です。オリジナルの
+    'HikiDoc' と互換性を保っています。
+
+Methods
+  new
+    HikiDoc オブジェクトを生成します。下記のパラメータを指定できます。
+
+    string
+        変換するテキストデータです。
+
+    level
+        <h1>〜<h6> タグに変換する際のレベル指定です。デフォルトは 1 です。
+        2 を設定すれば、HTML変換時 <h2> から始めます。
+
+    empty_element_suffix
+        閉タグがないタグ (<hr> や <br>など) の閉じ方を指定します。デフォ
+        ルトは「 />」です。<hr />のようになります。<hr> としたい場合は
+        「>」を設定してください。
+
+    br_mode
+        br_mode を「true」にすると、<p></p> 内の改行を <br> に変換します。
+        デフォルトは「false」です。
+
+        このパラメータは、本ライブラリ独自の拡張です。
+
+    table_border
+        table_border を「true」にすると <table border="1"> に、「false」
+        にすると <table> に変換します。デフォルトは「true」です。
+
+        このパラメータは、本ライブラリ独自の拡張です。
+
+  to_html
+    HTML に変換します。
+
+    string
+        変換するテキストデータです。もし new と to_html の両方で string
+        を設定した場合は、to_html の方が優先されます。
+
+  enable_plugin(@args)
+    プラグインを有効にします。「@args」はプラグインの名前リストです
+
+  plugin_list
+    有効になっているプラグインの名前リストを返します
+
+  is_enabled($str)
+    プラグイン $str が有効かどうか 1 か 0 で返します。有効なら 1 を返し
+    ます
+
+Plugin
+    Text::HikiDoc はプラグインによる拡張が可能です。enable_plugin() を
+    使って、プラグインを有効にできます
+
+  Text::HikiDoc::Plugin::aa
+          {{aa "
+                       (__)
+                      (oo)
+               /-------\/
+              / |     ||
+             *  ||----||
+                ~~    ~~
+          "}}
+
+          を下記のように変換します
+
+          <pre class="ascii-art">
+                       (__)
+                      (oo)
+               /-------\/
+              / |     ||
+             *  ||----||
+                ~~    ~~
+          </pre>
+
+          Text::HikiDoc::Plugin::texthighlight か Text::HikiDoc::Plugin::vimcolor
+          が有効なら、下記のように書く事もできます
+
+          <<< aa
+                       (__)
+                      (oo)
+               /-------\/
+              / |     ||
+             *  ||----||
+                ~~    ~~
+          >>>
+
+  Text::HikiDoc::Plugin::br
+        {{br}}
+
+        を下記のように変換します
+
+        <br />
+
+  Text::HikiDoc::Plugin::e
+        {{e('hearts')}} {{e('9829')}}
+
+        を下記のように変換します
+
+        &hearts; &#9829;
+
+  Text::HikiDoc::Plugin::ins
+        {{ins 'insert part'}}
+
+        を下記のように変換します
+
+        <ins>insert part</ins>
+
+  Text::HikiDoc::Plugin::sub
+        H{{sub('2')}}O
+
+        を下記のように変換します
+
+        H<sub>2</sub>O
+
+  Text::HikiDoc::Plugin::sup
+        2{{sup(3)}}=8
+
+        を下記のように変換します
+
+        2<sup>3</sup>=8
+
+  Text::HikiDoc::Plugin::texthighlight
+        pre に、Text::Highlight を使ったシンタックスハイライトを追加します
+
+        下記の表記は、Perl のソースコードとしてハイライトされます。
+        「<<< Perl」のかわりに「<<<」と記述すれば、ハイライトされない通常
+        の pre になります
+
+          <<< Perl
+          sub dummy {
+              $string = shift;
+  
+              $string =~ /$PLUGIN_RE/;
+              print "s:$string\tm:$1\ta:$2\n";
+              $a = $2;
+              $a =~ s/^\s*(.*)\s*$/$1/;
+  
+              if ( $a =~ /($PLUGIN_RE)/ ) {
+                  &hoge($a);
+              }
+              return $string;
+          }
+          >>>
+
+        NOTE: このプラグインの実装方法は将来変わるかもしれません
+
+  Text::HikiDoc::Plugin::vimcolor
+        pre に、Text::VimColor を使ったシンタックスハイライトを追加します
+
+        NOTE: このプラグインの実装方法は将来変わるかもしれません
+
+SEE ALSO
+    本家 'HikiDoc' サイト
+        http://http://projects.netlab.jp/hikidoc/
+
+    Text::HikiDoc::Plugin
+    Text::HikiDoc::Plugin::aa
+    Text::HikiDoc::Plugin::br
+    Text::HikiDoc::Plugin::e
+    Text::HikiDoc::Plugin::ins
+    Text::HikiDoc::Plugin::sub
+    Text::HikiDoc::Plugin::sup
+    Text::HikiDoc::Plugin::texthighlight
+    Text::HikiDoc::Plugin::vimcolor
+
+AUTHORS
+    オリジナルの 'HikiDoc' はかずひこ氏 <kazuhiko@fdiary.net> によって
+    作られました。
+
+    本ライブラリの本リリースは、川端 一道 (Higemaru) <kawabata@cpan.org>
+    によって作られました。
+    http://haro.jp/
+
+COPYRIGHT AND LICENSE
+    This library 'HikiDoc.pm' is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+
+    Copyright (C) 2006- Kawabata, Kazumichi (Higemaru) <kawabata@cpan.org>
+

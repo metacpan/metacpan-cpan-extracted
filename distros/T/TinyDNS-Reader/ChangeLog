@@ -1,0 +1,47 @@
+
+0.7.7 - 12th May 2016
+    Correctly handle mixed/upper-case input.
+
+0.7.6 - 17th Sep 2015
+    Ensure that TTLs are always numeric.
+
+0.7.5 - 12th Aug 2015
+    Ensure that TXT records without TTLs are parsed.
+
+0.7.4 - 27th May 2015
+    Added support for SRV records with "_" prefix, again non-standard.
+
+0.7.3 - 9th April 2015
+    Updated copyright years.
+	Updated some spelling in the text/POD.
+	Handle invalid records more appropriately in TinyDNS::Reader::Merged
+	Added TinyDNS::Record::input() method.
+
+0.7.2 - 2nd December 2014
+	Updated to suppot "&" / NS records.
+
+0.7.1 - 26th October 2014
+	Rework the dependencies and MakeMaker configuration
+
+0.7 - 5th September 2014
+	Added missing dependency on Test::Strict.
+
+0.6 - 3rd September 2014
+	Attempt to generate a correct META.yml file for the release.
+
+0.5 - 2nd September 2014
+	Attempt to generate a correct META.yml file for the release.
+
+0.4 - 30th July 2014
+	Fixed the merge-reader to allow both text/file constructor.
+	Fixed to allow multiple records to be unqiue.
+
+0.3 - 30th July 2014
+        Added TinyDNS::Reader::Merged
+
+0.2 - 3rd July 2014
+	Bump version for public release.
+	Added dump-zone utility script.
+
+0.1 - 19th June 2014
+	Initial version of code

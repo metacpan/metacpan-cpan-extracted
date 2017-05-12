@@ -1,0 +1,17 @@
+Revision history for Perl module Text::Corpus::VoiceOfAmerica
+
+1.00 Dec  7 2009
+    - First working version released to CPAN.
+
+1.01 Dec  8 2009
+    - Made minor changes to documentation.
+    - Fixed minor bug in testing.
+
+1.02 Aug 20 2010
+    - Fixed encoding and parsing errors.
+    - Removed defined on hash.
+    - Minor improvements to the documentation.
+
+1.03
+	- Added HTML::Encoding to Makefile.PL.
+	- Addd no warnings around encoding_from_html_document.

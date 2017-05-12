@@ -1,0 +1,12 @@
+Revision history for Text-Table-HTML-DataTables
+
+0.002   2016-12-29 (PERLANCAR)
+
+	- Output <html> so that browsers like Opera and Chrome view the
+	  output as HTML even though the filename does not have .html
+	  extension.
+
+
+0.001   2016-12-29 (PERLANCAR)
+
+        - First release.

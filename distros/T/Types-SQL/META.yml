@@ -1,0 +1,30 @@
+---
+abstract: 'A library of SQL types'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+  Test::Most: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-SQL
+recommends:
+  PerlX::Maybe::XS: '0'
+  Type::Tiny::XS: '0'
+requires:
+  PerlX::Maybe: '0'
+  Ref::Util: '0'
+  Type::Library: '0'
+  Type::Utils: '0.44'
+  Types::Standard: '0'
+  perl: v5.8.8
+  strictures: '0'
+  version: '0'
+resources:
+  bugtracker: https://github.com/robrwo/Types-SQL/issues
+  repository: git://github.com/robrwo/Types-SQL.git
+version: v0.0.3

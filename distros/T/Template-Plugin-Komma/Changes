@@ -1,0 +1,27 @@
+Revision history for Perl extension Template::Plugin::Komma.
+
+0.07 2009-02-01
+ - fix pod error (bah, buggy Dist::Zilla)
+
+0.06 2008-12-23
+ - get rid of sprintf() completely
+ - extended test suite (test negative numbers around .5)
+ - thanks to Moritz Onken for reporting and testing
+
+0.05
+ - bugfix: PREREQ_PM set to Template V2.0
+ - bugfix: t/03_komma2 failed on some systems (sprintf does not round)
+ - thanks to the CPAN-testers
+
+0.04
+ - bugfix: negative numbers were converted to positive numbers
+ - more tests
+
+0.03
+ - bugfix: sprintf failed to round in komma2 ('%.2f') on some systems
+
+0.02
+ - komma0 and komma2 use sprintf and let komma do the work
+
+0.01
+ - first version, inspired by Template::Plugin::Comma

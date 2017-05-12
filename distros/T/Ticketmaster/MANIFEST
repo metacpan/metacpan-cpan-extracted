@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Ticketmaster.t
+lib/Ticketmaster.pm
+lib/Ticketmaster.pod
+META.yml                                 Module meta-data (added by MakeMaker)

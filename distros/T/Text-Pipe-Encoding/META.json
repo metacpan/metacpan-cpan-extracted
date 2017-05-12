@@ -1,0 +1,79 @@
+{
+   "abstract" : "Text pipes that can encode and decode in various ways",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101582, CPAN::Meta::Converter version 2.101591",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Pipe-Encoding",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MIME::Base64" : "3.09",
+            "MIME::QuotedPrint" : "3.09",
+            "Text::Pipe::Base" : 0,
+            "parent" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "Encode" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94",
+            "Text::Pipe" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Text::Pipe::Encoding" : {
+         "file" : "lib/Text/Pipe/Encoding.pm",
+         "version" : "1.101700"
+      },
+      "Text::Pipe::Encoding::Base64::Decode" : {
+         "file" : "lib/Text/Pipe/Encoding/Base64/Decode.pm",
+         "version" : "1.101700"
+      },
+      "Text::Pipe::Encoding::Base64::Encode" : {
+         "file" : "lib/Text/Pipe/Encoding/Base64/Encode.pm",
+         "version" : "1.101700"
+      },
+      "Text::Pipe::Encoding::QuotedPrint::Decode" : {
+         "file" : "lib/Text/Pipe/Encoding/QuotedPrint/Decode.pm",
+         "version" : "1.101700"
+      },
+      "Text::Pipe::Encoding::QuotedPrint::Encode" : {
+         "file" : "lib/Text/Pipe/Encoding/QuotedPrint/Encode.pm",
+         "version" : "1.101700"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-text-pipe-encoding at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Pipe-Encoding"
+      },
+      "homepage" : "http://search.cpan.org/dist/Text-Pipe-Encoding/",
+      "repository" : {
+         "url" : "http://github.com/hanekomu/Text-Pipe-Encoding"
+      }
+   },
+   "version" : "1.101700"
+}
+

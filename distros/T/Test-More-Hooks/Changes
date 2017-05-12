@@ -1,0 +1,28 @@
+Revision history for Perl extension Test-More-Hooks
+
+0.12 2013-05-31T07:08:26Z
+
+    - fix dependency for test enviroment
+
+0.11 2013-05-05T04:21:35Z
+
+    - refactor variable control method
+    - update META.json to fix faild tests
+    - update document
+
+0.04 2013-04-30T04:59:58Z
+
+    - update README
+
+0.03 2013-04-30T03:46:41Z
+
+    - bug fix: don't clean hooks when enter out of scope of hooks
+
+0.02 2013-04-29T12:11:16Z
+
+    - add dependency description for cpan testers 
+
+0.01 2013-04-28T09:11:16Z
+
+    - original version
+

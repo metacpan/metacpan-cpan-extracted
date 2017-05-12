@@ -1,0 +1,37 @@
+Text-Markdown-Discount
+======================
+
+Text::Markdown::Discount - Perl extension interface for "Discount", an
+implementation of John Gruber's "markdown"[^1] in C developed by 
+David Loren Parsons[^2].
+
+[^1] <http://daringfireball.net/projects/markdown/> 
+[^2] <http://www.pell.portland.or.us/~orc>
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+AUTHOR
+======
+
+Masayoshi Sekimura, <sekimura@cpan.org>
+
+COPYRIGHT AND LICENSE
+=====================
+
+Copyright (C) 2009 by Masayoshi Sekimura
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.10.0 or, at
+your option, any later version of Perl 5 you may have available.
+
+This product includes software developed by David Loren Parsons
+<http://www.pell.portland.or.us/~orc>
+

@@ -1,0 +1,291 @@
+0.46 2016-06-27T11:37:25+02:00
+ - Update Map::Tube to 3.15 version.
+ - Update Map::Tube::CLI to 0.18 version.
+ - Update Map::Tube::Plugin::Formatter to 0.09 version.
+ - Update Map::Tube::Plugin::Graph to 0.20 version.
+ - Update Task::Map::Tube::Metro to 0.12 version.
+ - Update Test::Map::Tube to 0.17 version.
+
+0.45 2016-04-04T15:14:00+02:00
+ - Rename LICENSE.artistic_2 to LICENSE file.
+ - Update Map::Tube::CLI to 0.17 version.
+ - Update Task::Map::Tube::Metro to 0.11 version.
+ - Update copyright years.
+
+0.44 2015-11-27T14:08:21+01:00
+ - Update Map::Tube::CLI to 0.15 version.
+ - Update Map::Tube::Cookbook to 0.03 version.
+ - Update Task::Map::Tube::Metro to 0.09 version.
+
+0.43 2015-11-03T23:05:13+01:00
+ - Add Map::Tube::Cookbook 0.02 version.
+ - Update Map::Tube to 3.12 version.
+ - Update Map::Tube::Exception to 3.06 version.
+ - Update Test::Map::Tube to 0.14 version.
+
+0.42 2015-10-19T07:26:22+02:00
+ - Fix author requires.
+ - Update Map::Tube to 3.07 version.
+ - Update Map::Tube::Exception to 3.05 version.
+ - Update Map::Tube::Graph to 0.05 version.
+ - Update Task::Map::Tube::Metro to 0.08 version.
+ - Update Test::Map::Tube to 0.10 version.
+
+0.41 2015-09-27T18:13:27+02:00
+ - Update Task::Map::Tube::Metro to 0.05 version.
+ - Update Test::Map::Tube to 0.08 version.
+
+0.40 2015-09-21T22:40:30+02:00
+ - Add Map::Tube::Exception 3.03 version.
+ - Move author tests to xt/ directory.
+ - Update Map::Tube to 3.01 version.
+ - Update Map::Tube::CLI to 0.13 version.
+ - Update Map::Tube::Plugin::Formatter to 0.08 version.
+ - Update Map::Tube::Plugin::Graph to 0.19 version.
+ - Update Task::Map::Tube::Metro to 0.04 version.
+
+0.39 2015-09-07T13:54:05+02:00
+ - Improve SEE ALSO section in doc.
+ - Update Map::Tube::CLI to 0.11 version.
+ - Update README.
+ - Update Task::Map::Tube::Metro to 0.03 version.
+
+0.38 2015-08-25T22:39:09+02:00
+ - Update Map::Tube::CLI to 0.10 version.
+ - Update Task::Map::Tube::Metro to 0.02 version.
+
+0.37 2015-08-07T17:35:06+02:00
+ - Update Map::Tube::CLI 0.09 version.
+
+0.36 2015-05-19T14:02:41+02:00
+ - Update Map::Tube::CLI 0.08 version.
+ - Update Module::Install to 1.16 version.
+
+0.35 2015-04-28T15:59:07+02:00
+ - Update Map::Tube to 3.00 version.
+ - Update Map::Tube::CLI 0.07 version.
+
+0.34 2015-03-28T18:09:27+01:00
+ - Move metro modules to Task::Map::Tube::Metro.
+ - Remove obsolete test module dependency.
+
+0.33 2015-03-28T17:49:47+01:00
+ - Update Map::Tube to 2.97 version.
+ - Update Map::Tube::Berlin to 0.09 version.
+ - Update Map::Tube::CLI 0.06 version.
+ - Update Map::Tube::London to 0.72 version.
+ - Update Map::Tube::Plugin::Formatter to 0.07 version.
+ - Update Map::Tube::Plugin::FuzzyFind 0.08 version.
+
+0.32 2015-03-24T22:57:17+01:00
+ - Add Map::Tube::CLI 0.02 version.
+ - Update Map::Tube to 2.94 version.
+ - Update Map::Tube::KoelnBonn to 0.09 version.
+ - Update Map::Tube::Plugin::Formatter to 0.06 version.
+ - Update Map::Tube::Plugin::FuzzyFind 0.07 version.
+
+0.31 2015-03-23T13:14:16+01:00
+ - Add Map::Tube::Plugin::Formatter 0.03 version.
+ - Update Map::Tube to 2.93 version.
+ - Update Map::Tube::London to 0.71 version.
+ - Update Map::Tube::Vienna to 0.04 version.
+
+0.30 2015-03-15T23:30:47+01:00
+ - Update Map::Tube to 2.89 version.
+ - Update Map::Tube::Berlin to 0.08 version.
+ - Update Map::Tube::Dnipropetrovsk to 0.03 version.
+ - Update Map::Tube::London to 0.70 version.
+ - Update Map::Tube::Nanjing to 0.02 version.
+ - Update Map::Tube::Prague to 0.10 version.
+ - Update Map::Tube::Yekaterinburg to 0.03 version.
+ - Update Map::Tube::Vienna to 0.03 version.
+ - Update Map::Tube::Warsaw to 0.04 version.
+
+0.29 2015-03-11T08:06:18+01:00
+ - Update Map::Tube to 2.88 version.
+ - Update Map::Tube::Glasgow to 0.07 version.
+ - Update Map::Tube::KoelnBonn to 0.08 version.
+ - Update Map::Tube::Lyon to 0.06 version.
+ - Update Map::Tube::Moscow to 0.05 version.
+ - Update Map::Tube::Plugin::FuzzyFind 0.05 version.
+ - Update Map::Tube::Plugin::Graph to 0.18 version.
+ - Update Map::Tube::Prague to 0.09 version.
+ - Update Test::Map::Tube to 0.07 version.
+
+0.28 2015-03-07T23:45:06+01:00
+ - Update Map::Tube::Bucharest to 0.05 version.
+ - Update Map::Tube::Budapest to 0.02 version.
+ - Update Map::Tube::KoelnBonn to 0.07 version.
+
+0.27 2015-03-02T07:50:30+01:00
+ - Update Map::Tube::Barcelona to 0.20 version.
+ - Update Map::Tube::Delhi to 0.33 version.
+ - Update Map::Tube::London to 0.69 version.
+ - Update Map::Tube::Moscow to 0.04 version.
+ - Update Map::Tube::NYC to 0.22 version.
+ - Update Map::Tube::Tokyo to 0.18 version.
+ - Update Test::Map::Tube to 0.05 version.
+
+0.26 2015-02-26T22:21:25+01:00
+ - Update Map::Tube::Glasgow to 0.06 version.
+ - Update Map::Tube::Lyon to 0.05 version.
+ - Update Map::Tube::NYC to 0.21 version.
+
+0.25 2015-02-25T12:58:10+01:00
+ - Update Map::Tube::Delhi to 0.32 version.
+ - Update Map::Tube::Glasgow to 0.05 version.
+ - Update Map::Tube::GraphViz to 0.06 version.
+ - Update Map::Tube::KoelnBonn to 0.04 version.
+ - Update Map::Tube::Lyon to 0.04 version.
+ - Update Map::Tube::Plugin::FuzzyFind 0.03 version.
+ - Update Map::Tube::Tokyo to 0.16 version.
+ - Update Test::Map::Tube to 0.04 version.
+
+0.24 2015-02-23T12:48:14+01:00
+ - Add Map::Tube::Beijing 0.01 version.
+ - Add Map::Tube::Text::Shortest 0.01 version.
+ - Update Map::Tube to 2.87 version.
+ - Update Map::Tube::London to 0.66 version.
+
+0.23 2015-02-21T23:05:54+01:00
+ - Add Test::Map::Tube 0.02 version.
+ - Update Map::Tube to 2.86 version.
+ - Update Map::Tube::London to 0.64 version.
+
+0.22 2015-02-20T07:53:59+01:00
+ - Update Map::Tube to 2.85 version.
+ - Update Map::Tube::Glasgow to 0.04 version.
+ - Update Map::Tube::London to 0.63 version.
+ - Update Map::Tube::Moscow to 0.03 version.
+ - Update Map::Tube::Plugin::FuzzyFind 0.02 version.
+
+0.21 2015-02-18T07:19:42+01:00
+ - Update Map::Tube to 2.84 version.
+ - Update Map::Tube::London to 0.59 version.
+ - Update Map::Tube::SaintPetersburg to 0.03 version.
+ - Update Map::Tube::Yekaterinburg to 0.02 version.
+
+0.20 2015-02-17T14:13:18+01:00
+ - Add Map::Tube::Plugin::FuzzyFind 0.01 version.
+ - Update Map::Tube::London to 0.55 version.
+ - Update Map::Tube::NYC to 0.17 version.
+
+0.19 2015-02-16T17:52:24+01:00
+ - Add Map::Tube::Singapore 0.01 version.
+ - Update Map::Tube to 2.83 version.
+ - Update Map::Tube::NYC to 0.15 version.
+ - Update Map::Tube::Plugin::Graph to 0.16 version.
+
+0.18 2015-02-10T14:34:15+01:00
+ - Update Map::Tube to 2.80 version.
+ - Update Map::Tube::Delhi to 0.31 version.
+ - Update Map::Tube::London to 0.53 version.
+ - Update Map::Tube::NYC to 0.14 version.
+ - Update Map::Tube::Plugin::Graph to 0.14 version.
+
+0.17 2015-02-08T21:31:00+01:00
+ - Update Map::Tube to 2.78 version.
+ - Update Map::Tube::Barcelona to 0.19 version.
+ - Update Map::Tube::Glasgow to 0.03 version.
+ - Update Map::Tube::KoelnBonn to 0.03 version.
+ - Update Map::Tube::Lyon to 0.03 version.
+ - Update Map::Tube::NYC to 0.13 version.
+ - Update Map::Tube::Tokyo to 0.14 version.
+
+0.16 2015-02-03T19:02:04+01:00
+ - Update Map::Tube::Delhi to 0.30 version.
+ - Update Map::Tube::London to 0.52 version.
+ - Update Map::Tube::Plugin::Graph to 0.11 version.
+
+0.15 2015-01-30T23:03:46+01:00
+ - Update Map::Tube::GraphViz to 0.05 version.
+ - Update Map::Tube::London to 0.48 version.
+ - Update Map::Tube::Plugin::Graph to 0.10 version.
+
+0.14 2015-01-28T07:52:36+01:00
+ - Add Map::Tube::Glasgow 0.02 version.
+ - Add Map::Tube::KoelnBonn 0.02 version.
+ - Add Map::Tube::Lyon 0.02 version.
+ - Update Map::Tube to 2.77 version.
+ - Update Map::Tube::Berlin to 0.07 version.
+ - Update Map::Tube::GraphViz to 0.04 version.
+
+0.13 2015-01-27T06:30:02+01:00
+ - Add Map::Tube::Vienna 0.02 version.
+ - Update Map::Tube to 2.75 version.
+ - Update Map::Tube::GraphViz to 0.03 version.
+ - Update Map::Tube::Prague to 0.07 version.
+ - Update Map::Tube::Sofia to 0.05 version.
+
+0.12 2015-01-24T18:44:09+01:00
+ - Update Map::Tube to 2.72 version.
+ - Update Map::Tube::Plugin::Graph to 0.09 version.
+ - Update Map::Tube::Text::Table to 0.04 version.
+
+0.11 2015-01-23T01:18:00+01:00
+ - Update Map::Tube to 2.70 version.
+ - Update Map::Tube::Longon to 0.46 version.
+ - Update Map::Tube::Plugin::Graph to 0.07 version.
+ - Update copyright years.
+
+0.10 2015-01-21T00:15:30+01:00
+ - Update Map::Tube to 2.68 version.
+ - Update Map::Tube::Berlin to 0.06 version.
+ - Update Map::Tube::Bucharest to 0.03 version.
+ - Update Map::Tube::Longon to 0.44 version.
+ - Update Map::Tube::Plugin::Graph to 0.05 version.
+
+0.09 2015-01-19T23:26:41+01:00
+ - Update Map::Tube to 2.65 version.
+ - Update Map::Tube::GraphViz to 0.02 version.
+ - Update Map::Tube::London to 0.41 version.
+ - Update Map::Tube::Plugin::Graph to 0.03 version.
+
+0.08 2015-01-19T08:13:09+01:00
+ - Add Map::Tube::Plugin::Graph 0.01 version.
+ - Update Map::Tube to 2.64 version.
+ - Update Map::Tube::Barcelona to 0.16 version.
+ - Update Map::Tube::Graph to 0.04 version.
+ - Update Map::Tube::London to 0.39 version.
+
+0.07 2015-01-15T00:53:13+01:00
+ - Fix REPOSITORY section in doc.
+ - Update Map::Tube to 2.63 version.
+ - Update Map::Tube::Barcelona to 0.15 version.
+ - Update Map::Tube::Delhi to 0.27 version.
+ - Update Map::Tube::London to 0.36 version.
+ - Update Map::Tube::NYC to 0.12 version.
+ - Update Map::Tube::Tokyo to 0.13 version.
+
+0.06 2015-01-13T10:04:42+01:00
+ - Add Map::Tube::Graph to SEE ALSO section in doc.
+ - Add SYNOPSIS section to doc.
+ - Add Task::MapMetro::Maps to SEE ALSO section in doc.
+ - Update Map::Tube::Kiev to 0.03 version.
+ - Update Map::Tube::Minsk to 0.03 version.
+
+0.05 2015-01-09T22:52:13+01:00
+ - Update Map::Tube::Barcelona to 0.13 version.
+ - Update Map::Tube::Delhi to 0.25 version.
+ - Update Map::Tube::London to 0.35 version.
+ - Update Map::Tube::NYC to 0.11 version.
+ - Update Map::Tube::Tokyo to 0.12 version.
+
+0.04 2015-01-07T18:41:36+01:00
+ - Update Map::Tube to 2.61 version.
+ - Update Map::Tube::Barcelona to 0.12 version.
+ - Update Map::Tube::Delhi to 0.24 version.
+ - Update Map::Tube::London to 0.34 version.
+ - Update Map::Tube::NYC to 0.10 version.
+ - Update Map::Tube::Text::Table to 0.03 version.
+
+0.03 2015-01-06T07:50:46+01:00
+ - Add version for each module.
+
+0.02 2015-01-05T19:57:40+01:00
+ - Add Map::Tube::Budapest.
+ - Add Map::Tube::Nanjing.
+ - Add all modules to SEE ALSO section in doc.
+
+0.01 2014-12-27T12:00:42+01:00
+ - First version

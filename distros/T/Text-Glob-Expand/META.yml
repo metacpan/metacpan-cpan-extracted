@@ -1,0 +1,36 @@
+---
+abstract: 'permute and expand glob-like text patterns'
+author:
+  - 'Nick Stokoe <wulee@cpan.org>'
+build_requires:
+  Module::Build: 0.2808
+configure_requires:
+  Module::Build: 0.2808
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Glob-Expand
+provides:
+  Text::Glob::Expand:
+    file: lib/Text/Glob/Expand.pm
+    version: v1.1.1
+  Text::Glob::Expand::Permutation:
+    file: lib/Text/Glob/Expand/Permutation.pm
+    version: v1.1.1
+  Text::Glob::Expand::Segment:
+    file: lib/Text/Glob/Expand/Segment.pm
+    version: v1.1.1
+recommends:
+  Test::Perl::Critic: 0.001000
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+requires:
+  Sub::Exporter: 0
+  Test::More: 0
+  version: 0.77
+resources:
+  repository: git://github.com/wu-lee/Text-Glob-Expand
+version: 1.1.1

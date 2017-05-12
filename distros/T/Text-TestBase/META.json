@@ -1,0 +1,100 @@
+{
+   "abstract" : "Parser for Test::Base format",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-TestBase",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0.05",
+            "Exporter" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::More" : "0.98",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Section::TestBase" : {
+         "file" : "lib/Data/Section/TestBase.pm",
+         "version" : "0.13"
+      },
+      "Test::Base::Less" : {
+         "file" : "lib/Test/Base/Less.pm",
+         "version" : "0.13"
+      },
+      "Test::Base::Less::Filter" : {
+         "file" : "lib/Test/Base/Less.pm"
+      },
+      "Text::TestBase" : {
+         "file" : "lib/Text/TestBase.pm",
+         "version" : "0.13"
+      },
+      "Text::TestBase::Block" : {
+         "file" : "lib/Text/TestBase/Block.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Text-TestBase/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Text-TestBase",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Text-TestBase.git",
+         "web" : "https://github.com/tokuhirom/Text-TestBase"
+      }
+   },
+   "version" : "0.13",
+   "x_contributors" : [
+      "Neil Bowers <neil@bowers.com>",
+      "Hiroki Honda <cside.story@gmail.com>",
+      "Nathan Glenn <nathan.g.glenn@atr-trek.co.jp>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

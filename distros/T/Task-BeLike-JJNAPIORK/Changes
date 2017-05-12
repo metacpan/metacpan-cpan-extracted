@@ -1,0 +1,45 @@
+This file documents the revision history for Perl Application 'Task::BeLike::JJNAPIORK'.
+
+0.09 2011-03-24
+    - New copyright date and minor increases to the dependency versions
+
+0.08 2010-12-30
+    - Decreased Perl version requirement to 5.8.5 since it seems all the
+      dependencies work at least that far back
+
+0.07 2010-12-20
+    - New makefile include setup for better communication over errors and
+      missing bits.
+    - Minor documentation updates
+    - New versions for Module::Setup.
+
+0.06 2010-12-15
+    - Removed unused dependencies
+    - changed Makefile setup to reflect my modern practice
+    - documented above
+
+0.05 2010-09-22
+    - Removed App::Ack, since its not someone you need to do the most basic
+      deployment stuff that is the goal of this distribution.
+    - Clean up of the Makefil.PL to be more explicit in what it needs
+
+0.04 2010-09-17
+    - Swapped MI::Github with MI::Repository for non github based projects.
+    - Swapped MI::ReadmePodFromPod to MI::ReadMeMarkdownFromPod.
+    - Added MI::Homepage and MI::License for more automation.
+    - Added a Module::Setup custom flavor (the one I like :) )
+    - Changed Makefile.PL to reflect and test above.  Addes docs as well.
+
+0.03 2010-09-15
+    - took out CARP::REPL since it's a debugging tool, not something that fits
+      the role of this module which is intended to be a sort of personal SDK,
+      not a catchall of everything I use all the time.
+    - Add Module::Install::ManifestSkip since I hate having to copy this around
+      and have it clutter up my repo.
+    - Added MI:ReadmeFromPOD since sometimes we want a text only README.
+
+0.02 2010-08-31
+    - fixed bad tests
+ 
+0.01 2010-08-31
+    - initial revision.

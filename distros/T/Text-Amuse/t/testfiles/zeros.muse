@@ -1,0 +1,39 @@
+#title 0
+#subtitle 0
+#author 0
+#notes 0
+#date 0
+#source 0
+
+* 0
+
+** 0
+
+*** 0
+
+**** 0
+
+Hello [1] There is a title, an author, a date, a source, two footnoes. All filled with
+0
+and
+0
+and
+0
+
+0
+
+[[float.png][0]]
+
+ | 0 | 0 |
+ | 0 | 0 |
+ |+  0  +|
+
+
+0 [2]
+
+And a [[http://cpan.org][0]]
+
+[1] 0
+
+[2] 0
+

@@ -1,0 +1,61 @@
+<%method navi>
+% my $navi = $c->stash->{navi};
+% foreach my $nav (@$navi) {
+%       my $href  = $nav->{href}  || '';
+%       my $title = $nav->{title} || '';
+%       my $image = $nav->{image} || '';
+%       my $i_id  = $nav->{id}    || '';
+%       my $subnavi = $nav->{subnavi};
+	<h4>
+%           if ($subnavi) {
+                <span>
+%           }
+            <a class="navilink" href="<% $href %>"><% $title %></a>
+%           if ($image) {
+              <a class="navilink" href="<% $href %>"><img src="<% $image %>"></a>
+
+%           }
+%           if ($subnavi) {
+                </span>
+%           }
+        </h4>
+        <ul id="<% $i_id %>">
+%               if ($subnavi and @$subnavi) {
+%                       foreach my $snav (@$subnavi) {
+%                               my $shref  = $snav->{href}  || '';
+%                               my $stitle = $snav->{title} || '';
+%                               my $confirm= $snav->{confirm} || '';
+%                               my $simage = $snav->{image} || '';
+                                <li>
+%                                       if ( $shref ) {
+%                                               if ($simage) {
+                                                        <a class="navilink" href="<% $shref %>" ><img src="<% $simage %>"></a>
+%                                               } else {
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;
+%                                               }
+                                                        <a href="<% $shref %>"
+%                                                          if ( $confirm ) {
+                                                             onclick="return confirm('<% $confirm %>');"
+%                                                          }
+                                                        ><% $stitle %></a><br />
+%                                       }
+%                                       else {
+                                                <% $stitle %>
+%                                       }
+                                </li>
+%                       }
+%               }
+        </ul>
+% }
+</%method>
+% my %metareport;
+% %metareport = %{$c->stash->{metareport}} if $c->stash->{metareport}
+%                                             and ref($c->stash->{metareport}) eq 'HASH';
+% if (%metareport) {
+        <div align="center">
+            <a href="<% $metareport{url} %>"><img src="<% $metareport{img} %>" alt="<% $metareport{alt} || 'metareport' %>" width="150" height="100"></a>
+            <strong><% $metareport{headline} %></strong>
+        </div>
+% }
+
+<& SELF:navi &>

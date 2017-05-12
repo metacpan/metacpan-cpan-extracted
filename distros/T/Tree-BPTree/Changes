@@ -1,0 +1,69 @@
+Revision history for Perl extension Tree::BPTree.
+
+1.07  Tue Nov 30 2004
+	- Changed to use Module::Build from ExtUtils::MakeMaker
+	- Moved BPTree.pm into lib/Tree/BPTree.pm in distribution
+	- Updated the README
+	- Updated the MANIFEST
+
+1.06  Mon Sep 22 2003
+	- Revised each() to work more like one would expect. It returns key/value
+	  pairs rather than key/bucket pairs. This is more useful, though slower.
+	- Removed grep_flattened_values() and flattened_values() since they are no
+	  longer required with the changes to each().
+	- Fixed Tree::BPTree::Cursor::delete to match the new functionality and
+	  removed the optional $value argument.
+	- Fixed documentation for each() change.
+	- Fixed tests for each() change.
+	- Removed t/cursor_delete_value.t since it is no longer applicable.
+	- Updated the MANIFEST to reflect the missing t/cursor_delet_value.t.
+	- Updated documentation to reflect the latest benchmarks.
+
+1.05  Mon Sep 15 2003
+	- Added cursor current() method.
+	- Added a new test to t/cursors.t for testing this method.
+	- Fixed the MANIFEST as I forgot to add t/cursor_delete.t and
+	  t/cursor_delete_value.t in the last revision.
+
+1.04  Mon Sep 15 2003
+	- Added cursor delete.
+	- Re-optimized each() as cursor delete changed some things.
+	- Added t/cursor_delete.t test for cursor delete.
+	- Added t/cursor_delete_value.t test for cursor delete by value.
+
+1.03  Mon Sep 15 2003
+	- Added prof.pl to perform some Perl profiler comparisons.
+	- Used profiling results to find which methods were causing the biggest
+	  slowdowns.
+	- Removed Tree::BPTree::Node::key, ::value, ::nkeys, ::nvalues, ::last_key,
+	  and ::last_value from the internal node API. This results in a 200%
+	  increase in the speed of insert and find and about a 2000% speed up for
+	  iteration.
+	- Updated the documentation to reflect this and added a bit more optimism.
+	- The try.pl script has changed some.
+	- Added missing regression tests for pairs().
+	- This release adds no features, just provides some optimization. This code
+	  is still slow, nonetheless.
+
+1.02  Sat Sep 13 2003
+	- Added benchmark.pl to compare speed to hashes and lists (results are
+	  attrocious.
+	- Corrected typos in the Changes file.
+	- Added a line to Makefile.PL to prevent *.pl files from being installed.
+	- Updated documentation to reflect poor benchmarks.
+	- Added the reverse() method to perform an action similar to the Perl
+	  reverse operator.
+	- Added the new_cursor() method and altered the way each() works to allow
+	  for multiple simultaneous iterators.
+	- Added a missing pairs() method.
+	- Altered keys(), values(), and flattened_values() to use the new each()
+	  method with a cursor.
+	- Added t/cursors.t to test simultaneous cursors.
+	- Added t/reverse.t to test reverse().
+	- Added t/reverse_find.t to test find() after a reverse() has taken
+	  place--since this updates the -keycmp subroutine.
+
+1.01  Wed Sep 10 2003
+	- original version; created by h2xs 1.22 with options
+		-AXn Tree::BPTree
+

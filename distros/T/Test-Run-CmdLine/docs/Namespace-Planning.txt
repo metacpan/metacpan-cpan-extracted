@@ -1,0 +1,32 @@
+What I'd like to have is:
+
+1. A Test::Run::CmdLine front-end initialises a Test::Run::Obj back-end.
+
+2. A command-line interface class instantiates a
+Test::Run::CmdLine derivative plus Plugins class and in turn lets it run.
+
+3. This front-end class instantiates a back-end class possibly adding plug-ins
+to it.
+
+4. It calls this class and let it run.
+
+Where everything should be found?
+---------------------------------
+
+Test::Run::CmdLine plug-ins should be under Test::Run::CmdLine::Plugin::.
+
+Test::Run::Obj plug-ins should be under Test::Run::Plugin::
+
+The Test::Run::CmdLine interface will be called Test::Run::CmdLine::Iface.
+
+T::R::CL::I will initialise $ENV{'HARNESS_DRIVER'} (or $args{'driver_class'}),
+and load it with the extra plugins $ENV{'HARNESS_PLUGINS'}
+(or $args{'driver_plugins'}). Then it will push Test::Run::CmdLine to the end
+of its @ISA.
+
+Test::Run::CmdLine will initialise the class that the plug-ins tell it to
+(or to Test::Run::Iface by default), load it with all the extra plug-ins, and
+finally push Test::Run::Obj to its @ISA. Then it will let it run.
+
+A plugin always resides under Test::Run::Plugin::.
+

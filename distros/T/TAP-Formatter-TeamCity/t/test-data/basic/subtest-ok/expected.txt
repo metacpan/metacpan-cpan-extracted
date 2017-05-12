@@ -1,0 +1,8 @@
+##teamcity[testSuiteStarted flowId='t/test-data/basic/subtest-ok/input.st' name='t/test-data/basic/subtest-ok/input.st']
+##teamcity[testStarted captureStandardOutput='true' flowId='t/test-data/basic/subtest-ok/input.st' name='subtest-ok-msg-1']
+##teamcity[testFinished flowId='t/test-data/basic/subtest-ok/input.st' name='subtest-ok-msg-1']
+##teamcity[testSuiteStarted flowId='t/test-data/basic/subtest-ok/input.st' name='subtest-A-name']
+##teamcity[testStarted captureStandardOutput='true' flowId='t/test-data/basic/subtest-ok/input.st' name='subtest-ok-msg-2']
+##teamcity[testFinished flowId='t/test-data/basic/subtest-ok/input.st' name='subtest-ok-msg-2']
+##teamcity[testSuiteFinished flowId='t/test-data/basic/subtest-ok/input.st' name='subtest-A-name']
+##teamcity[testSuiteFinished flowId='t/test-data/basic/subtest-ok/input.st' name='t/test-data/basic/subtest-ok/input.st']

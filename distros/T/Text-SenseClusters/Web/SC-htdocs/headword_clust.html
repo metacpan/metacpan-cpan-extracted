@@ -1,0 +1,23 @@
+<html>
+<title>Target Word Clustering (native SenseClusters) </title>
+<body>
+<h1>Target Word Clustering (native SenseClusters) </h1>
+</body>
+</html>
+
+Target word clustering takes as input multiple contexts, each of which 
+includes a single target word that is marked with a special XML 
+tag known as "head". The object is to cluster those contexts to discover  
+the different meanings of the target word. This is based on the idea that 
+words that occur in similar contexts will have similar meanings. 
+Likewise, the various similar contexts in which a target word occurs will 
+reflect different meanings of that word.
+<br><br>
+In SenseClusters native mode, a word co-occurrence matrix is created from 
+a separate set of training data, or the data to be clustered, and that is 
+used to provide word vectors that replace each of the words that surround 
+a target word in a context. These word vectors are averaged together to 
+create a representation of the context. The premise is that contexts 
+that are made up of words that occur with some of the same other words 
+will be similar to each other. 
+

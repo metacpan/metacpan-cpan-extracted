@@ -1,0 +1,28 @@
+Revision history for Perl extension Text::FixEOL.
+
+1.00 2005.05.01 - First Release
+
+1.01 2005.05.03 - Attempt to system to play nice with the Test::xxxx modules
+                  and CPANPLUS. No functional changes.
+
+1.02 2005.05.05 - Added more build tests and made various bug
+                  fixes and tweaks. 100% code coverage for
+                  tests reached. Added Test::Pod to tests.
+                  Changed text in POD for licence to correctly
+                  identify license as dual Artistic/GPL.
+
+1.03 2005.06.17 - Removed NoWarnings test to improve ability to build on
+                  older installations. Added pod coverage test. Made all
+                  pod tests optional. No functional changes.
+
+1.04 2005.09.09 - Tweaked POD tests. Tweaked META.yml. Extended license
+                  statement and appended liability disclaimer. Appended GPL and
+                  Artistic licenses to distribution. No functional changes.
+
+1.05 2005.09.13 - Changed pod tests to be more CPANTS friendly.
+                  Removed usage of 'warnings' pragma and 'our' for
+                  Perl 5.005 compatibility.
+
+1.06 2011.07.30 - Replaced inadvertent Unicode usage in POD with non-Unicode.
+                  No functional changes.
+

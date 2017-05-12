@@ -1,0 +1,84 @@
+SYNOPSIS
+
+     use Text::Table::Paragraph;
+    
+     my $rows = [
+         # header row
+         ['name', 'summary', 'description'],
+         # rows
+         ['foo', 'bandung', 'a long description .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ....'],
+         ['bar', 'jakarta', 'another long description .... .... .... .... .... .... .... .... .... .... .... .... .... .... ....'],
+         ['baz', 'palangkaraya', 'yet another long description .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ....'],
+     ];
+     print Text::Table::Paragraph::table(rows => $rows, header_row => 1);
+
+DESCRIPTION
+
+    This module provides a single function, table, which formats a
+    two-dimensional array of data as paragraphs. Each paragraph shows a row
+    of data and columns are shown as name: value lines. Long values by
+    default are wrapped and shown indented in the subsequent lines.
+
+    The example shown in the SYNOPSIS generates the following table:
+
+     name: foo
+     summary: bandung
+     description: a long description .... .... .... .... .... .... .... .... ....
+       .... .... .... .... .... .... .... .... ....
+    
+     name: bar
+     summary: jakarta
+     description: another long description .... .... .... .... .... .... .... ....
+       .... .... .... .... .... .... ....
+    
+     name: baz
+     summary: palangkaraya
+     description: yet another long description .... .... .... .... .... .... ....
+       .... .... .... .... .... .... .... .... .... .... .... .... .... .... ....
+       ....
+
+FUNCTIONS
+
+ table(%params) => str
+
+ OPTIONS
+
+    The table function understands these arguments, which are passed as a
+    hash.
+
+      * rows (aoaos)
+
+      Takes an array reference which should contain one or more rows of
+      data, where each row is an array reference.
+
+      * header_row (bool)
+
+      If given a true value, the first row in the data will be interpreted
+      as a header row that contains column names. Otherwise, columns will
+      be named: column1, column2, and so on.
+
+      * wrap (bool, default 1)
+
+      Whether to wrap long values.
+
+      * wrap_width (int, default 72)
+
+ENVIRONMENT
+
+ TEXT_TABLE_PARAGRAPH_WRAP => bool
+
+    Set default for wrap option.
+
+ TEXT_TABLE_PARAGRAPH_WRAP_WIDTH => int
+
+    Set default for wrap_width option.
+
+SEE ALSO
+
+    This module is currently basically Text::Table::Tiny 0.03 modified to
+    output paragraphs instead of its original 2D text table format.
+
+    Text::Table::*, Text::Table::Any
+
+    See also Bencher::Scenario::TextTableModules.
+

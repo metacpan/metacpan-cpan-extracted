@@ -1,0 +1,58 @@
+Term/Twiddle version 2.73
+=========================
+
+DESCRIPTION
+
+Term::Twiddle displays a little spinning baton (thingy) while
+something else is going on. Its primary use is to give bored users
+something to watch while some long routine is executing.
+
+You can change the baton into something else (e.g., a pair of blinking
+eyes, etc.), the rate at which it spins (or changes), randomize the
+speed of the baton, and other such things.
+
+EXAMPLE
+
+    use Term::Twiddle;
+
+    my $tw = new Term::Twiddle;
+
+    ## do something
+    $tw->start;
+
+    ## while untar'ing, the baton is spinning
+    system('tar', '-xf', 'some_big_tarfile.tar');
+
+    $tw->stop;
+
+
+    ## now do something else
+    $tw->random;
+    $tw->start;
+
+    ## while executing, the baton changes speed randomly
+    &some_long_subroutine();
+
+    $tw->stop;
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  sys/syscall.ph (required for setitimer)
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Perl Artistic License.
+
+Copyright (C) 2002-2012 Scott Wiersdorf

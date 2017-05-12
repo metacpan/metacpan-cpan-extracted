@@ -1,0 +1,15 @@
+                        Tie::ShadowHash To-Do List
+
+A list of things planned for the future for this module, in no particular
+order.  As this is a module I can only work on in my free time, or when I
+need something for something else I'm doing, I probably won't get to any
+of this as fast as I'd like.  If you'd like to implement anything on this
+list, drop me a line first at rra@stanford.edu and then have at it!
+Credits will be noted in the README.
+
+ * A way of removing a specific source from the shadow hash might be nice,
+   but we'd have to solve the naming problem.
+
+ * Querying the shadow hash for status would also be nice; things like the
+   full source list, the override hash, and the deleted hash could be
+   exposed to the intrepid.

@@ -1,0 +1,48 @@
+---
+abstract: 'L<TPath::Forester> that understands file systems'
+author:
+  - 'David F. Houghton <dfhoughton@gmail.com>'
+build_requires:
+  Exporter: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+  FindBin: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0.88
+  autodie: 0
+  base: 0
+  lib: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TPath-Forester-File
+no_index: {}
+requires:
+  Cwd: 0
+  Encode: 0
+  Encode::Detect::Detector: 0
+  Fcntl: 0
+  File::Spec: 0
+  File::stat: 1.02
+  Module::Load::Conditional: 0
+  Moose: 0
+  Moose::Exporter: 0
+  Moose::Role: 0
+  MooseX::MethodAttributes::Role: 0
+  TPath: 1.000
+  TPath::Forester: 0
+  TPath::Index: 0
+  filetest: 0
+  namespace::autoclean: 0
+  overload: 0
+  perl: v5.12.0
+version: 0.003

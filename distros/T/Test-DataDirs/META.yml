@@ -1,0 +1,23 @@
+---
+abstract: 'manage t/data and t/temp directories for your tests'
+author:
+  - 'Nick Stokoe <wulee@cpan.org>'
+build_requires:
+  Module::Build: 0.2808
+  Pod::Coverage::TrustPod: 0
+  Test::Exception: 0
+configure_requires:
+  Module::Build: 0.2808
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-DataDirs
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+resources:
+  repository: git://github.com/wu-lee/Test-DataDirs.git
+version: 0.1.2

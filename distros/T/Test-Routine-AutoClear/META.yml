@@ -1,0 +1,22 @@
+---
+abstract: 'Enables autoclearing attrs in Test::Routines'
+author:
+  - 'Piers Cawley <pdcawley@bofh.org.uk>'
+build_requires:
+  Test::More: 0
+  Test::Routine::Util: 0
+  namespace::autoclean: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Routine-AutoClear
+requires:
+  Moose::Exporter: 0
+  Moose::Role: 0
+  Test::Routine: 0
+version: 0.004

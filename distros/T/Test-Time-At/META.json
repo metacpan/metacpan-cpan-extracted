@@ -1,0 +1,80 @@
+{
+   "abstract" : "Do a test code, specifying the time",
+   "author" : [
+      "shibayu36 <shibayu36@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Time-At",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "Test::Time" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0",
+            "Time::Piece" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Time::At" : {
+         "file" : "lib/Test/Time/At.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hatena/Test-Time-At/issues"
+      },
+      "homepage" : "https://github.com/hatena/Test-Time-At",
+      "repository" : {
+         "url" : "git://github.com/hatena/Test-Time-At.git",
+         "web" : "https://github.com/hatena/Test-Time-At"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:SHIBAZAKI",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

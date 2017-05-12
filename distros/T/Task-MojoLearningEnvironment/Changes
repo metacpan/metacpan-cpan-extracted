@@ -1,0 +1,10 @@
+# changes for Task::MojoLearningEnvironment
+
+0.002 2015-04-23T02:53:33Z
+	* Fix my MANIFEST-challenged first release
+
+0.001 2015-04-23T02:39:32Z
+	* First try at a Task to install everything for a Mojo class
+	at MojoConf 2015.
+
+

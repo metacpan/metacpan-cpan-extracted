@@ -1,0 +1,6 @@
+<tasklist name="example" version="1.0">
+  <task name="Learn tasks application" id="1">
+  Learn how to use tasks application,
+  play with it.
+  </task>
+</tasklist>

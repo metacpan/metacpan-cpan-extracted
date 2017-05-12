@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 57448da1451d079a5e2d643090ec857c140cc491 Changes
+SHA1 fda23a0b314432c4a81e8d7beb5290e9f0219c73 LICENSE
+SHA1 80e93bcd6fc65517f839f11f0a72870c178c999d MANIFEST
+SHA1 ca4d425e1fc19c3a598ee25c9143b12d9323d2af META.yml
+SHA1 cc2617e62e75243fd67833069adcb596f8b6b2e2 Makefile.PL
+SHA1 96b52ccf829190552ea70cea1f3222184cc96c5e Person.pm
+SHA1 1cf5a42db16a1e0d342a80e5b908c79336ba36bb README
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 62c07eaa5893ff484e6f41762f51cb150e83f572 t/Task-Mock-Person/01-use.t
+SHA1 d80edf03fe930d4faa0d2ede1c16892b6670c3ab t/Task-Mock-Person/02-version.t
+SHA1 3f412888a6e21b26879971f6810af80b04b87526 xt/Task-Mock-Person/01-pod_coverage.t
+SHA1 98789b5a6d8190dcb1b7d5010b1e44240d2c5389 xt/Task-Mock-Person/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWMjuqAAoJEJe+XXKaIuTlKI0H/iNpJYrOlCl8Sr3D/nZL6tW1
+IYvlB6mtMyfbUAMBx0XRTK+xP9euoy/j22p7b//dvn9tmv094+btng9q0RuhVv7T
+sM6HXQiFMZ8/0BAveoMYEZNGZQTz8GlJwvzdUDALiFMAp86OpcPefn5uLtPopqcN
+a2AzEfyCaVMuZi2ZjJPJgy/0Wm4IAZ4DX6synF8VqLxEDv5Ge26fe/aZpDcAaefS
+yeVhmTbUQEiTaD5lKSRCg4EGe/myWC8aodMl/Lm2+POMLhMaUKzIa+VBHA1kkpEl
++F8XJiA8CbBV+zJb4Cj6px+E6UHHHR799NdCZCtTmvyPN+mmxH136hK3CzJyTJ8=
+=MmX+
+-----END PGP SIGNATURE-----

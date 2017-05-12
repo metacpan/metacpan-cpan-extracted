@@ -1,0 +1,14 @@
+Revision history for Test-Ranger
+
+0.0.4   2010-09-15 15:40:17
+    - Fix still more dependencies.
+
+0.0.3   2010-09-15 03:24:16
+    - Fix more dependencies.
+
+0.0.2   2010-09-14 15:22:51
+    - Fix dependency on Acme::Teddy.
+
+0.0.1   2010-08-29 01:04:21
+    - Launch project.
+

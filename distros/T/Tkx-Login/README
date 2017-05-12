@@ -1,0 +1,45 @@
+
+         Tkx::Login - A Simple Login Window for Tkx - v1.11
+
+================================================================================
+SYNOPSIS:
+================================================================================
+
+    Tkx::Login provides a simple login interface for Tkx applications. Given
+    a window value to extend, it opens a new window, queries for username and
+    password and returns the values.
+
+================================================================================
+INSTALLATION:
+================================================================================
+
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+================================================================================
+USAGE:
+================================================================================
+
+  use Tkx::Login;
+    
+  my ($username,$password) = Tkx::Login::askpass($mainwindow,$message,$pre_user,$pre_password);
+
+  Parameters:
+  
+  $mainwindow - Current MainWindow in your Tkx app. (required)
+  $message - A text message to display in the login window. (optional)
+  $pre_user - A value to pre-populate the username blank with. (optional)
+  $pre_pass - A value to pre-populate the password blank with. This will be obscured with asterisks. (optional)
+
+================================================================================
+AUTHORSHIP:
+================================================================================
+
+    Tkx::Login v1.11 2014/04/29
+
+    (c) 2012-2014, Phillip Pollard <bennie@cpan.org>
+    Released under the Perl Artistic License

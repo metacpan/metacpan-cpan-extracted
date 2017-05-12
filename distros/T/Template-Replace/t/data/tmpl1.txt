@@ -1,0 +1,26 @@
+# t/data/tmpl1.txt:
+Testdatei, 1. Zeile ...
+2. Zeile der Testdatei
+
+<!--( Abschnitt1 )-->
+Erste Zeile von Abschnitt 1.
+Zweite Zeile mit ($Variable1$) darin.
+<!--( /Abschnitt1 )-->
+<!--? !Abschnitt1 ?-->
+Das hier sollte nicht erscheinen!
+<!--? /!Abschnitt1 ?-->
+<!--? Abschnitt1 ?-->
+Das hier sollte erscheinen!
+<!--? /Abschnitt1 ?-->
+<!--? !Abschnitt2 ?-->
+Abschnitt 2 ist nicht definiert!
+<!--? /!Abschnitt2 ?-->
+
+<!--# Ein Kommentar. #-->
+Text nach Abschnitt1.
+<!--#
+	Ein mehrzeiliger Kommentar.
+	Hier mit zweiter Zeile.
+#-->
+Noch eine Zeile ...
+<!--{ tmpl2.txt }-->

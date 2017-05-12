@@ -1,0 +1,44 @@
+---
+abstract: 'Work package for holiday modules in the Date::Holidays namespace'
+author:
+  - 'Jonas B. Nielsen <jonasbn@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.30'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Date-Holidays
+requires:
+  Date::Holidays::AT: '0'
+  Date::Holidays::AU: '0'
+  Date::Holidays::BR: '0'
+  Date::Holidays::CA: '0'
+  Date::Holidays::CA_ES: '0'
+  Date::Holidays::DE: '0'
+  Date::Holidays::DK: '0'
+  Date::Holidays::ES: '0'
+  Date::Holidays::FR: '0'
+  Date::Holidays::GB: '0'
+  Date::Holidays::KR: '0'
+  Date::Holidays::NO: '0'
+  Date::Holidays::NZ: '0'
+  Date::Holidays::PL: '0'
+  Date::Holidays::PT: '0.03'
+  Date::Holidays::RU: '0'
+  Date::Holidays::SK: '0'
+  Date::Holidays::USFederal: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/jonasbn/perl-Task-Date-Holidays
+  repository: https://github.com/jonasbn/perl-Task-Date-Holidays.git
+version: '0.05'

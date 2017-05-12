@@ -1,0 +1,41 @@
+NAME
+    Tk::Stderr - capture standard error output, display in separate window
+
+SYNOPSIS
+    use Tk::Stderr;
+
+    $mw = MainWindow->new->InitStderr;
+    print STDERR 'stuff';   ## goes to standard error window
+    warn 'eek!';            ## likewise
+
+DESCRIPTION
+    This module captures that standard error of a program and redirects it
+    to a read only text widget, which doesn't appear until necessary. When
+    it does appear, the user can close it; it'll appear again when there is
+    more output.
+
+INSTALLATION
+
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2003 Kevin Michael Vail
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself. 
+
+CHANGES
+
+    Version 1.1 just adds a dependency for Tk in the Makefile.PL file.
+
+    Version 1.2 adds the RedirectStderr method to allow redirection
+    to be turned on and off during the execution of a program.
+
+AUTHOR
+    Kevin Michael Vail <kevin@vaildc.net>

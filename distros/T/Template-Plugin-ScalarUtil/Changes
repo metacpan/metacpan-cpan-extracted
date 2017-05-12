@@ -1,0 +1,11 @@
+Revision history for Template-Plugin-ScalarUtil
+
+1.121160    Wed Apr 25 23:47:13 2012
+            [rt#73305] Require perl 5.8
+
+1.110920    Sat Apr  2 14:04:31 2011
+            Fix test failure on $] < 5.011 (regexp vs. scalar)
+
+1.110770    Fri Mar 18 20:48:57 2011
+            First version
+

@@ -1,0 +1,8 @@
+.Ft -f xhtml -filter "perl -e 'print qq{«3»\en}'" ""
+.Ft -f xhtml -filter "perl -e 'print qq{«3»\en}'"
+.Ft -f xhtml -filter "perl -pe 's/a/b/'" "«blabla» "
+.If -as-is -filter "perl -pe 's/a/b/'" t/data/includes/text_to_filter.txt
+.Bf -f latex -filter "perl -pe 's/b//g'"
+LaTeX blabla
+more blabla
+.Ef

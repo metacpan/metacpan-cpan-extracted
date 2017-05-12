@@ -1,0 +1,21 @@
+
+Revision history for Task-BeLike-AMD
+
+4.1.0     2012-10-19
+        - [FIX] Moose task dependency
+
+0.004     2012-08-14
+        - Postgres dependencies
+        - bareword::filehandles
+        - indirect
+        - multidimensional
+        - Pod::Weaver::PluginBundle::AMD
+
+0.003     2012-05-22
+        - list polishing
+
+0.002     2012-05-10
+	- scale down to less libs
+
+0.001     2012-05-08
+        - initial module collection

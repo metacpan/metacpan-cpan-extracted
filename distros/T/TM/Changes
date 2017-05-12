@@ -1,0 +1,464 @@
+Revision history for Perl extension TM
+
+Note: Entries marked with 
+    - ! indicate a break of backwards compatibility.
+    - ~ indicate a future break of compatibility, marked as deprecated
+
+1.56  Mon Nov  8 07:49:21 CET 2010
+        - fix: removed lingering test/performance code (rho)
+
+1.55  Sun Nov  7 15:44:43 CET 2010
+        - fix: TM::IndexAble misbehaved with closed indices and empty lists
+        ~ mod: pumped up to Perl 5.10 as prereq (rho)
+	- fix: TM::IndexAble small memory leak at deindex (rho)
+	- add: TM::IndexAble deindex parameters (rho)
+	- fix: BDB did not properly store top-level keys (rho)
+	- add: first version of TM::ObjectAble (rho)
+	- fix: LibXML operator overloading changed and triggered fails in 06*xtmserializ (rho)
+	- mod: relaxed speedup tests to diagnostics (fails on some platforms, difficult to control) (rho)
+	~ mod: MemCached, BDB files will soon go into separate distribution (rho)
+
+1.54  Tue Aug  3 12:25:03 CEST 2010
+        - add: TM axes: one more to compute characteristics based on oc types (rho)
+        - fix: newly introduced problem with XTM serialization (rho)
+	- add: TM::Index::Taxonomy for taxo intensive apps (rho)
+	- fix: MLDBM could be fooled into empty maps if file existed with size 0 (rho)
+	- add: TM::IndexAble, an experimental trait to provide index functionality for maps (rho)
+	- add: EXPERIMENTAL & undocumented TM::ResourceAble::BDB, a Berkeley DB backed store (rho)
+	- fix: speed problems with MLDBM backed store (rho)
+	- fix: speed problems with AsTMa serializer (rho)
+	- mod: speedup when parsing LARGE AsTMa streams (rho)
+	- add: EXPERIMENTAL TM::ResourceAble::MemCached, a memcached backed store (rho)
+
+1.53  Sat Jun  5 16:17:56 CEST 2010
+        - add: extended Serializable::CSV serialization (rho)
+	- mod: sync_in/out and source_in/out allow to pass through parameters (rho)
+        - fix: added dependency
+	- add: Serializable::CSV has also first serialize support (rho)
+        - fix: XTM serialization: namespaces, instanceOf (rho)
+	- add: TM::Index::Reified for apps which excessively call is_reified (rho), TODO: more tests
+
+1.52  Tue Jun  1 07:27:10 CEST 2010
+        - fix: missing dependency :/ (rho)
+
+1.51  Sun May 30 19:14:21 CEST 2010
+        - fix: internalize will get 'undef' when invoking it with undef => 'http:...' (perl 5.10, az, rho)
+	- fix: tids did not recognize reified subject addresses of assocs (az)
+	- add: TM::Serializable::CSV deserialize (rho)
+	- ~: all workbench related stuff is now marked "deprecated", will be replaced by ts (TempleScript)
+
+1.50  Sun May  2 17:25:23 CEST 2010
+        - fixed: version 0.42 of BerkeleyDB does not like empty files to tie with (rho)
+
+1.49  Tue Apr 13 20:44:25 CEST 2010
+        - fixed: dependency on YAML::Syck missing (az)
+	- fixed: cparser target mentions TM::QL (az)
+
+1.48  Mon Apr 12 07:51:27 CEST 2010
+        - fix: removed test code in TM::Serializable::AsTMa with unsatisfied dependency (rho)
+
+1.47  Sat Apr 10 11:01:06 CEST 2010
+        - fix: &TM::add and &TM::clear did not touch map subcomponents so that MLDBM picked that up (rho)
+	- mod: retrieve uses now shorthands not to confuse MLDBM trait (created huge memory problems) (rho)
+	- add: TM::Analysis::entropy (rho)
+	- add: TM::Graph::neighborhood (rho)
+	- fix: TM::Serialize::AsTMa: missing eol at end of file added (rho)
+	- fix: TM::Serialize::AsTMa: inline data with \n's treated correctly (rho)
+	- fix: TM::toplets & asserts did not play well with DBM-backed store - memory hog (rho)
+	- mod: removed implicit dependency from URI::Escape (produced wrong version numbers with dh-make-perl) (rho)
+	- add: JTM support via JSON and YAML (az)
+
+1.46  Sat Nov 14 17:36:21 CET 2009
+        - mod: dependency to URI and not URI::file
+	- !del: TM::QL and all related packages (problem with smoke testers, decoupling)
+
+1.45  Mon Apr 13 16:45:08 CEST 2009
+	- fix: deserialization to astma1 "topic reifies non-assoc" handled properly (az)
+	- fix: bug in TM::asserts (comparison based on mem address and not on LID!)
+	- add: added TM::clear method to remove all content in one go
+	- mod: CTM parser: deserializes now returns map object
+	- mod: AsTMa deserializer: additional omit_provenance option
+
+1.44  Sat Oct  4 19:40:52 CEST 2008
+	- fix:    toplets did not return correct results (rho)
+	- adapt:  new LWP::Simple chokes on non-absolute URLs and causes hiccups (rho)
+	- fix:    TM: synopsis wrong (retrieve, asserts), (rho)
+	- change: test files do not show STDERR messages (rho)
+	- add:    TM::Coverage to display coverage information (rho)
+
+1.43  Mon Jul 21 20:44:09 CEST 2008
+	- change: Makefile.PL adapted to new mcpani version
+	- change: Makefile.PL uses 5.8 (instead of v5.8) to not upset 5.5 interpreters
+	- fix:    diff handling (az)
+
+1.42  Mon Jun 30 21:09:29 CEST 2008
+	- fix:    bug (03resource) made wrong assumption about inline: resources
+	- fix:    bug (TM.pm) getting all assertions ARRAY ref'ed
+	- fix:    version bug when creating the TM::Axes pod
+	~ add:    package TM::Materialized::MLDBM2 is replaced/renamed to TM::ResourceAble::MLDBM (old now deprecated)
+	- change: README updated
+	- fix:    infrastructure was only initialized by first new TM => one could not access it before a dummy instantiation
+	- change: default configuration for Log4Perl does not any longer write a file tm.log, but logs to STDERR
+	- change: TM::Materialized::MLDBM uses Storable for serializing
+	- change: moved smallest working version up to Perl v5.8 (from v5.6)
+	- update: TM::FAQ
+	- fix:    AsTMa= 1.x identifiers could not start with is-a-...., in-, ex-, oc-, bn because of clashes with symbols IN, EX, ...
+	- fix:    AsTMa= 1.x comment chars can now be escaped: \# will suppress comment, \\# will escape the escape
+	- change: $TM::toplet_ctr is now made 'our' instead of 'my'
+	- add:    EXPERIMENTAL read support for CTM
+
+1.41  Sat May 17 13:05:24 CEST 2008
+	- fix:    MLDBM2 did not properly address $TM::log
+	- add:    more test cases for XTM support
+	- add:    DTDs for the zoo of XTM versions
+
+1.40  Mon May 12 21:18:12 CEST 2008
+	- add:    XTM 1.0 serialize/deserialize support (based on az-ware)
+	- add:    XTM 2.0 preliminary support (serialize, deserialize)
+
+1.39  Thu May  8 08:11:29 CEST 2008
+	- add:    TM::Graph: improved documentation
+	- fix:    TM::DM: doc
+	- change: tm workbench got plugin infrastructure
+	- add:    TM::Bulk: added vortex axes peers* and peers**, plus test cases
+	- add:    TM: methods types, typesT, instances, ... generalized to handle lists of tids
+	- fix:    AsTMa 1.x deserializer did not allow identifiers with _- to reify assocs
+	- fix:    TM::QL::PE needed to load XML::LibXML if use it loose context
+	- add:    precompiled CParser version for TM::QL (reduces start-up time by 10 secs)
+	- fix:    bug in TM::DM::toplets when using local identifiers
+
+1.38  Fri Apr 11 21:45:50 CEST 2008
+	- TM::Graph: doc fixes, fixed bug for nesting repeats
+	- TM::* : analysis: fixed missing test cases
+
+1.37  Wed Apr  9 20:08:00 CEST 2008
+	- importing into private trac
+	- test autoupload
+
+1.36  Sa 29. Mär 15:58:42 CET 2008
+	- README: overhaul
+	- TM: diff: added missing differential assertions (fix, rho), TODO: this all needs more test cases
+
+1.35  Do 27. Mär 18:52:36 CET 2008
+	- TM: more documentation fixes (rho)
+	- TM: constructor psis parameter now not any long official (rho)
+	! TM: everything is a subclass of 'thing' (rho, it was actually always the case)
+	- added examples directory
+	! TM: are_instances operates now on lists and not anymore on references (rho)
+
+1.34  Mo 24. Mär 10:50:05 CET 2008
+	- fixed: spurious error message in t/096 because of whacky tmp file creation (rho)
+	- fixed: deactivated speed test for indices (rho), TODO systematic test
+
+1.33  So 23. Mär 20:39:55 CET 2008
+	- TM::* removed dependency from Test::Deeply::NoTest (conflicts with Class::Trait under Perl 5.10)
+	- TM: reactivated diff code and added test cases for it (rho, TODO identification stuff flaky)
+
+1.32  Mi 19. Mär 17:17:11 CET 2008
+	- t/*.t trying to massage Class::Trait invocations such that they work with Perl 5.10
+
+1.31  Di 18. Mär 13:37:54 CET 2008
+	- TM::Bulk: added peers and peers* (rho)
+	- TM::Bulk: added associations (rho)
+	- TM::Bulk: fixed broken test cases (rho)
+	- TM::DM: fixed names, occurrences bug (a->z)
+	- TM: major reorg of the documentation (rho/a->z)
+	- TM::hash: no longer publicly documented (but works as before) (rho)
+	- TM::Axes: documentation of match search specifications (rho)
+	- TM: duplicate subject indicators are now systematically suppressed (a->z)
+	- TM::Tau: added some magic to treat < and * the same (rho)
+	- TM::Serializable::AsTMa: changed default omit_trivia to 1 (rho)
+	- TM: 'add' method now tries to protect _local_ LIDs, see doc (rho)
+	- TM: 'insane' method tries to detect inconsistencies in the TM structure (rho)
+	! TM: 'toplets' return ***REAL*** structures, not just IDs (rho)
+	- TM: 'asserts' return assertions, analog to toplets (rho)
+	- TM::Statistics: you have to ask for nr_toplets and nr_asserts (rho)
+	! TM: had to rename 'hash' because of a possible collision with another package (CPAN smoke tests), (rho)
+	- mldbm2.t: added "real" temp file handling (triggered spurious errors at smoke tests) (rho)
+	! TM: toplets return now only topic-like things (not assertions) (rho)
+	- TM: asserts returns now assertions, names, assocs, occs (rho)
+	! TM: toplets does not try anymore to make the list unique (rho)
+	! TM: methods is_reified and reifies aligned to canonical TMDM interpretation (rho)
+	- TM::Serializable::AsTMa: newly introduced directive %trace allows a bit more debugging (rho)
+
+1.30  Sa 28. Jul 18:40:45 CEST 2007
+	! TM::Bulk: renaming of basenames to names, documentation
+	! TM::Bulk: vortex request fields aligned with modern TMDM/TMRM view
+	! TM::ResourceAble::mtime now returns 0 (not undef) when the resource cannot be determined
+	! TM::Tree: cluster moved into TM::Graph (just rename your use trait from TM::Tree to TM::Graph)
+	- TM : get_players has now the role optional
+	- TM::Graph added: (contains cluster, frontier and is_path)
+
+1.29  Mo 16. Jul 21:14:31 CEST 2007
+	- made Log4Perl log object native into TM.pm (should now work stand-alone)
+	- TM: internalize always took (undef, \ 'http://some.uri') parameters, documented now
+	- bugfix: TM::Synchronizable::MapSphere did not find child map implementation
+
+1.28  Do 28. Jun 19:33:06 CEST 2007
+	- TM::MapSphere: mounted map topics get additional meta information as occurrences
+
+1.27  Mi 27. Jun 19:00:04 CEST 2007
+	- added TM::Bulk trait (for mass retrieval)
+
+1.26  Mon Apr 16 14:13:57 EST 2007
+	- added: diff for maps (EXPERIMENTAL, test cases missing, az)
+
+1.25  Fri Jan  5 18:51:12 EST 2007
+	- added: TODO list
+	- rearranged (and generalized): TS.pm atomification handling
+	- TMQL: added || shortcut, removed computed_content
+	- TMQL: rearranged grammar, generalized to content whereever possible
+	- TMQL: XML generation, content variable, attribute values variable
+	- 16tmql.t now responds to parameter (id of test case)
+	- fixed: TS ts_uo_eq treated one tuple sequence as set, the other as bag
+	- added dependencies: Term::ReadLine, XML::Simple (was missing in previous version)
+
+1.24  Sun Dec 24 17:52:02 EST 2006
+	- added: parameter control of things to ask in TM::Analysis
+	- added: workbench tm
+	- added: TM::Serializable::Summary: creates a short overview of the map content
+	- moved: selection mechanism of TMDM::topics is also available for TM::midlets
+	- ! changed: TM::midlet() expects that all IDs passed in are already absolute
+	- added: TM/QL/*
+	- aligned TMQL support with latest spec (not complete yet, though)
+	- added: rudimentary AsTMa 1.0 serialization support (az)
+
+1.23  Fri Dec  1 17:56:09 EST 2006
+	- modified: TM: match_forall hook char.irole -> char.topic, old deprecated
+	- created: TM::Index to hold all index-related functionality
+	- modified: TM index handling now can used lists of indices in match_forall
+
+1.22  Thu Nov 30 18:22:51 EST 2006
+	- improved: TM::DM documentation
+	- rearranged traits to do 'inheritance'
+	- improved: TM::Tau documentation
+	- re-added: TM::Overview (tutorials missing)
+	- created: TM::FAQ (draft state)
+	- fixed: taxonomy bug in types (variable scoping wrong)
+	- changed: meaning of 'instances': a thing has _ALL_ topics as instances (even itself)
+	- added: TM::Analysis orphanage: figures out topics which have no instances, no types, ...
+	- added: TM::DM has more sophistication in selecting topics from a map
+	- changed: TM::Analysis is now a trait
+
+1.21  Sun Oct  1 11:01:40 EST 2006
+	- added: first experimental TMQL support (test cases not yet included)
+	- improved: PSI docu (somewhat)
+	- introduced: traits (Class::Trait) to solve some architectural problems
+	- reintroduced: tree analysis
+	- improved: TM docu
+	- added: first support for indices, significant speedup
+	- patched: identifiers in AsTMa[12] can also contain . (dot)
+
+1.20  Sun Oct  1 08:33:21 EST 2006
+	- added TM::Tau::Filter
+	- added TM::Analysis (first part)
+
+1.19  Thu Sep 28 18:18:42 EST 2006
+	- split mapsphere test into two parts (MLDBM does not like it to be used with different serializers in one program)
+	- added torture test for hierarchical MLDBM2 databases
+
+1.18  Sun Sep 24 18:24:11 EST 2006
+	- added first MapSphere support (experimental)
+	- added more subjects in TM::PSI
+
+1.17  Sat Sep 23 09:26:42 EST 2006
+	- added BerkeleyDB based MLDBM map implementation (TM::Materialized::MLDBM2)
+	- fixed/reduced package dependencies
+
+1.16  Tue Sep 19 20:15:49 EST 2006
+	- added driver for maps stored via MLDBM
+
+1.15  Sun Sep 17 12:03:54 EST 2006
+	- added AsTMa 2.0 parser
+	- added merging tests
+
+1.14  Sat Sep 16 17:08:10 EST 2006
+	- reanimated AsTMa 1.x parser
+	- added TM::Resource to capture generic resource handling (adapted TM::M::File)
+
+1.13  Sat Sep 16 10:27:01 EST 2006
+	- another consolidation after much infrastructure work
+
+... only internal distributions for experimentation...
+
+1.10  Tue Jul 27 13:48:21 EST 2004
+	- complete reorganisation and new (yeah) basic data structures
+
+-- COMPATIBILITY LEAP ----------------------------------------------
+
+1.05  Tue Jan 13 08:29:29 EST 2004
+	- public version, packaging
+
+1.01-1.04 pure internal development version
+	- added abstraction layer for virtual maps and tau expressions
+	- added transactions
+	- reorganised driver infrastructure 10 times
+	- update AsTMa= parser to latest spec
+
+1.00  Sun Jun 29 19:56:20 EST 2003
+	- feature poor reimplementation with completely revamped data structure
+
+-- COMPATIBILITY LEAP ----------------------------------------------
+
+0.36  Not published
+	- added freeze and thaw commands to xtm.pl
+
+0.35  Mon Aug  5 21:20:43 EST 2002
+	- added missing maps/test.ltm (need better cpan simulator)
+
+0.34  Sun Aug  4 21:32:45 EST 2002
+	- added LTM/CParser (would not build automatically on some systems?)
+	- more speed improvements in XTM::Memory (topics query)
+	- fixed documentation bug for induced_topic_tree
+	- added class-instance as special association type to induced_topic_tree
+	- added loop support (via shared trees) in induced_topic_tree, pruning reduces runtime
+	- added some PSIs to XTM::PSI
+	- added method descriptions to the most important base classes
+
+0.33  Fri Jul 26 21:35:17 EST 2002
+	- fixed bug which raises exception when XTM::Path creating /topic[@id = '...']
+	- changed simple search syntax in XTM::Memory 'regexp' -> 'regexps'
+	- added commands 'merge', 'duplicate_suppression', 'follow_maps' to xtm.pl
+	- added consistency to be passed through all sync_ins also through XTM::Virtual
+	- added t/08topic.t for simple tests
+	- added 'is-reified-by' clauses in AsTMa (XTM::AsTMa::Parser) for topics and associations
+	- added AsTMa directive auto_complete
+	- added AsTMa directive encoding to occur several times in a document
+	- added first (still experimental) version of LTM parsing, see XTM::LTM
+	- fixed strange 'cannot add to undefined' error in XTM::Path when using XTM::Path::create and find inside one program (workaround, not solved yet)
+	- allowed several scope topics for an association (follows XTM and LTM)
+	- added caching to XTM::Path, already parsed expressions are cached
+	- added variable to XTM::Path (similar to SQL prepare/expecute)
+	- added method add_defaults to XTM::topic to add default type/scope to topic components if missing
+	- modified Memory, generic for major performance improvements when merging (still some potential to be used)
+	- modified Memory: merging dies if a topic is merged with an existing but both have a
+	     different addressable resource
+	- fixed bug in XTM::Path not detecting correctly strings '0'
+
+0.32  Sun Jun 30 20:36:01 EST 2002
+	- added XTM::grammar, a package to hold element dependencies and nesting (internal mainly)
+	- added XTM::Path, XPath-like navigation through XTM::base data structures
+	- XTM::Memory::id: setting of id added
+	- XTM::topic, doc corrections
+	- using a precompiled version of the Parse::Recdescent (considerable AsTMa= speedup)
+	- fixed potential problems in XTM::generic
+	- added merging code to XTM::Memory, is controlled via a hash in XTM constructor (BACKWARD COMPATIBILITY?)
+	- fixed docu/code mismatch in XTM::topic (occurrences)
+	- added scope_eq to XTM::scope
+	- added canonicalize to XTM::topic (removes duplicates, sorts things)
+	- added more query clauses for the simple query language in XTM::Memory
+	- more directives for XTM::AsTMa (naming, encoding). Use with care.
+
+0.31  Thu May 16 16:56:40 EST 2002
+	- got rid of XTM::XML::ParseError and used XML::SAX::Exception instead	
+
+0.30  Wed May  8 17:50:02 EST 2002
+	- removed dependency of File::Slurp (weird version number), reported by az
+	- fixed bug in incorrectly reporting line numbers in AsTMa::Parser, reported by az
+	- various documention bugs fixed (still much to do)
+	- astma2xtm.pl: some minor changes in switches (see man page)
+	- AsTMa parser: local comments MUST have at least one blank before the '#' (see docs, may break some maps, sorry)
+	- activated tests (old XML::LibXML core dump error has disappeared)
+
+0.29  Feb 25 07:23 EST 2002
+	- Debian test version
+
+0.28  Wed Jan 16 22:17:57 EST 2002
+	- fixed empty character handling in AsTMa::Parser, added line number for better debugging
+	- added more accurate dependencies
+	- added some explanation to the README
+	- fixed XTM::XML::MemoryBuilder to work with SAX::Expat, LibXML::SAX and PurePerl (still a problem there)
+	- AsTMa parser: added directives %cancel, %log
+
+0.27  Mon Jan 14 12:23:41 EST 2002
+	- added missing XTM::AsTMA::MemoryBuilder
+	- fixed test suite bugs which occur at some other Perl installations
+
+0.26  Mon Dec 31 21:49:37 EST 2001
+	- add xml output serialization for (most) classes
+	- revamped XML::ATM into XML::AsTMa, XML::ATM is not distributed any more
+	- added astma2xtm.pl into bin/ (converter), this obsoletes atm2xtm.pl
+	- fixed some bugs in XTM::XML
+	- added connected methods to topic and association to return all topic refs mentioned there
+	- added test for topic IDs in XTM::topic.pm (experimental), have to be valid XML identifiers
+	- started to move to Test::More for testing
+	- added bin/prettifyxtm.pl
+	- fixed unclean code in XTM::topic::has_instanceOf, checking for URIs now
+	- moved XML parsing to XML::LibXML::SAX using the XML::SAX factory
+	- moved most testing to Test::More, added numerous tests
+	- added population mechanism into XTM::topic to load default values
+	- added auto_complete parameter to all XTM::IO subclasses to control auto_completion, default is 1
+	- updated README to reflect Perl version 5.6.1
+	- added support rt.cpan.org to README 
+	- added 'stats' command to xtm.pl
+	- added commands 'topics' and 'assocs' to xtm.pl
+	- modified URIs handling in xtm.pl: URIs without a scheme will default as file: URIs
+
+0.25  Mon Dec 17 18:06:24 EST 2001
+	- added statistics to info() in XTM
+	- added clusters() in XTM
+
+0.24  Sat Oct 20 18:46:32 EST 2001
+	- fixed bug of not escaping & in XTM::ATM for occurrences
+	- fixed bug of not checking for all URI schemes in XTM::ATM
+	- fixed too restrictive pattern in XTM::ATM to allow valid XML ids as topic ids
+
+0.23  Sat Oct 13 12:32:11 EST 2001
+	- added XTM::ATM support, documentation in docs/astma.html
+	- fixed hickup in pod in XTM::Virtual
+	- silenced 'Uninitialized value....' during make test in XTM::XML and XTM::ATM
+	- fixed some documentation errors, formatting
+	- added more map debugging facility in XTM (see XTM::info)
+	- added map meta information to XTM and xtm.pl
+	- distinguished between topic and assoc searches in xtm.pl
+	- straightened syntax for XTM::topics 'assocs .....' to allow no trailing characters
+	- changed meaning of parameters of induced_vortex in a subtle but dangerous way
+
+0.22  Sat Mar 17 10:22:40 EST 2001
+	- fixed test maps which made 'make test' fail
+	- fixed nr of subtests in 04virtual.t
+	- removed debugging output from XTM::Virtual
+	- fixed missing use XTM::generic in XTM::subjectIndicatorRef
+
+0.21  Sat Mar 10 11:24:10 EST 2001
+	- added XTM::Virtual
+	- added virtual map support into xtm.pl
+	- added commodity function (induce*) to XTM
+		induced_vortex
+		induced_assoc_tree
+	- added XTM::base as introductory package
+	- moved XTM::XML::PSI to XTM::PSI
+	- removed _massage from XTM::XML::Grove2TM
+	- relaxed is-a ... pattern for queryingto allow for PSIs
+	- unified various redundant subroutines in XTM::Memory
+
+0.20  Sat Feb 24 23:28:45 EST 2001
+	- minor release gap because of completely reorganised package structure
+	- honoring XTM-1.0 http://www.topicmaps.org/xtm/1.0/xtm1-20010223.html (modulo TNC)
+	- consolidated topics and c_topics into some simple query language driven routine
+	- moved all thread code into separate server distribution
+	- added xtm.pl workbench
+
+0.12  Sat Feb 17 10:15:39 EST 2001
+        - fixed memory management which cause loooong hangs on the server at some requests
+	- fixed small bug in xtmctrl which made it complain in interactive mode
+        - optimized a bit assoc via <topic> with <topic> queries
+	- optimized XTM::Virtual cache management, small reorgs there
+        - introduced config management via additional switch to xtmd.pl
+
+0.11..0.07 not documented, intermediate panic releases
+
+
+0.06  Fri Feb  9 13:49:13 EST 2001
+        - fixed daemonization
+        - optimized XTM::Memory::_topic_tree handling a bit
+	- XTM December version of the standard implemented, not fully complete
+
+0.04  Sun Dec 31 14:18:45 2000
+	- original version; created by h2xs 1.19
+        - cloned from inofficial TM-0.04 version
+
+0.01  Tue Jul 27 13:27:54 2004
+	- original version; created by h2xs 1.23 with options
+		-n TM -X
+

@@ -1,0 +1,14 @@
+---
+name: Basic failing test
+tap: |
+  1..1
+  not ok 1
+want:
+  passed:               false
+  has_plan:             true
+  planned_tests:        1
+  version:              12
+  tests:
+    - number:   1
+      status:   not ok
+      passed:   false

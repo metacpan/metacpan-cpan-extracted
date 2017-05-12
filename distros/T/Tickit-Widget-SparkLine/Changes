@@ -1,0 +1,59 @@
+0.106     2016-08-04 17:39:36+01:00 Europe/London
+	No new features.
+
+	Test fixes:
+	* [RT#116424] Avoid ->chattr on immutable pens (thanks SREZIC)
+
+0.105     2015-04-22 02:11:05+01:00 Europe/London
+	No new features.
+
+	Deprecation fixes:
+	* Set WIDGET_PEN_FROM_STYLE constant for Tickit 0.50+ support
+	(RT#103865, thanks to SREZIC for reporting)
+
+0.104     2014-08-16 03:24:57+01:00 Europe/London
+	No new features.
+
+	Dependency fixes:
+	* Add Tickit::Widget and parent
+
+0.103     2013-09-28 20:09:02 Europe/London
+	No new features.
+
+	Bug fixes:
+	* Updated Dist::Zilla::Plugin::Test::Compile for RT88783
+
+0.102     2013-09-14 20:28:39 Europe/London
+	No new features.
+
+	Bug fixes:
+	* Return number of datapoints as cols
+	* Keep rv/b attributes for background pen (used for rendering the
+	full bars)
+
+	Documentation:
+	* Add some info about styling and a warning regarding b/rv settings.
+
+0.101     2013-09-13 23:22:40 Europe/London
+	No new features.
+
+	Examples:
+	* Provide simple animation example (sin/cos/tan waves)
+
+	Documentation:
+	* Included animated GIF to demonstrate above example
+
+0.100     2013-09-03 22:14:27 Europe/London
+	Features:
+	* Scale to fit when datapoints won't all fit in the window
+	* Switched to Tickit::RenderBuffer
+
+	API changes:
+	* char_for_value - this now returns the Unicode codepoint, rather than the character itself.
+
+	Bug fixes:
+	* Avoid undef warnings with ->data(1,2,3).
+
+0.002     2011-11-27 05:44:43 Europe/London
+	Initial CPAN release
+

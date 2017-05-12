@@ -1,0 +1,53 @@
+Revision history for Perl extension Tie::Mounted.
+
+0.18 Tue Feb 26 21:16:18 CET 2008
+
+ - Extended the "gathering-path" code for according
+   mount/umount paths.
+
+ - Revised the code for excluding '.' and '..'.
+
+ - Refined the documentation.
+
+0.16 Mon May  1 17:02:19 CEST 2006
+
+ - Extended the _gather_paths() function to croak
+   appropriately in case File::Which::which() fails
+   to find mount/umount.
+
+0.15 Sun Apr 30 17:38:31 CEST 2006
+
+ - Removed the _locallcall() function, because we don't
+   need to guard against mount/umount abuse since local
+   file permissions set on them prove to be sufficient.
+
+ - Added the _gather_paths() function which ensures in case
+   the predefined variables $MOUNT_BIN & $UMOUNT_BIN
+   don't refer to the actual locations that a which()
+   lookup is performed.
+
+ - File::Which, IO::File and Symbol are now part of the
+   prerequisite set.
+
+ - Improved the documentation to suit the actual state of
+   the art.
+
+ - Updated Build.PL to include the author name, the new
+   prerequisites, the correct license & the changed
+   create_makefile_pl argument.
+
+ - Made the INSTALL file a part of the distribution.
+
+0.08 2004/02/03
+
+ - Nodes are validated upon the existance of an associated
+   directory, their enlistment in /etc/fstab and according
+   state (enabled/disabled).
+
+0.03 2004/01/29
+
+ - Added bogus array option.
+
+0.01 2004/01/29
+
+ - Initial version.

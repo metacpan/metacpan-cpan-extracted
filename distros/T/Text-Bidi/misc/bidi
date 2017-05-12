@@ -1,0 +1,220 @@
+#! perl
+
+=head1 NAME
+
+bidi - Make urxvt present Bidi text correctly
+
+=head1 DESCRIPTION
+
+This extension filters the text displayed by Urxvt, so that Bi-directional 
+text (e.g., Hebrew or Arabic mixed with English) is displayed correctly. It 
+does so using the L<Text::Bidi> module (which should be installed).
+
+The extension emulates a cursor via rendition. This means that when typing, 
+there will be two cursors, the original one whose location corresponds to the 
+current location within the logical string (so, mostly useless), and a fake 
+one which corresponds to the current insertion point.
+
+To enable the extension, add C<bidi> to the I<Urxvt.perl-ext-common> 
+resource. See urxvt(1) and urxvtperl(1) for other options and more details.
+
+The extension recognises the following resources:
+
+=over
+
+=cut
+
+#:META:RESOURCE:%.FieldSep:string:Separator between different fields
+
+=item I<bidi.FieldSep>
+
+This should be a string on which each line is split before applying the Bidi 
+algorithm. This permits creating tables, where each cell is treated 
+separately, e.g., in the index of an email client. Note that this is a 
+string, not a regular expression. The default is C<\x{2502}>.
+
+=cut
+
+#:META:RESOURCE:%.LRE:string:Insert LRE mark where this matches
+
+=item I<bidi.LRE>
+
+A regular expression. The plugin insert an explicit left-right mark where it 
+matches.
+
+=cut
+
+#:META:RESOURCE:%.PDF:string:Insert PDF mark where this matches
+
+=item I<bidi.PDF>
+
+A regular expression. The plugin insert a PDF mark (end of LRE) where it 
+matches.
+
+=cut
+
+#:META:RESOURCE:%.par:boolean:Work in paragraph mode
+
+=item I<bidi.par>
+
+Boolean, if true work in paragraph mode: the paragraph direction is not reset 
+on each line, but only on lines that start or end a paragraph
+
+=cut
+
+#:META:RESOURCE:%.ParReset:string:Start a new paragraph where this matches
+
+=item I<bidi.ParReset>
+
+A regular expression. A line matching this will start a new paragraph.
+
+=cut
+
+#:META:RESOURCE:%.ParResetAfter:string:Start a new paragraph after this matches
+
+=item I<bidi.ParResetAfter>
+
+Similar to I<bidi.ParReset>, but the paragraph starts after the matching 
+line.
+
+=back
+
+For example, I use urxvt with this plugin to edit LaTeX documents in Hebrew.  
+I have the following resources defined:
+
+    URxvt.bidi.LRE: \\\\[([]
+    URxvt.bidi.PDF: \\\\[)\\]]
+    urxvt-vimh.bidi.par: true
+    urxvt-vimh.cursorUnderline: true
+    urxvt-vimh.bidi.ParReset: ^\\s*$|^\\\\begin|^\\\\\\[
+    urxvt-vimh.bidi.ParResetAfter: ^\\\\end|\\\\\\]$
+
+This causes inline equations (delimited by C<\(> and C<\)>) be displayed 
+correctly, and equation environments be considered a paragraph (so that it is 
+displayed on the left).
+
+=cut
+
+use 5.10.0;
+use Text::Bidi qw(log2vis is_bidi);
+use Text::Bidi::Constants;
+use Encode qw(decode_utf8);
+
+sub on_start {
+    my ($self) = @_;
+    $self->{'split'} = decode_utf8($self->x_resource('%.FieldSep')) // 
+                       "\x{2502}";
+    my $lre = decode_utf8($self->x_resource('%.LRE')) // '';
+    my $pdf = decode_utf8($self->x_resource('%.PDF')) // '';
+    my $preset = decode_utf8($self->x_resource('%.ParReset')) // '^\s*$';
+    my $preseta = decode_utf8($self->x_resource('%.ParResetAfter')) // '(?!)';
+    $self->{'par'} = decode_utf8($self->x_resource('%.par')) // '';
+    $self->{'lre'} = qr/.*?($lre)/ if $lre;
+    $self->{'pdf'} = qr/.*?$pdf/ if $pdf;
+    $self->{'pres'} = qr/$preset/;
+    $self->{'presa'} = qr/$preseta/;
+    #warn "LRE: $self->{'lre'}\n";
+    #warn "PDF: $self->{'pdf'}\n";
+    #warn "$self->{'lre'}, $self->{'llre'}, $self->{'pdf'}, 
+    #$self->{'lpdf'}\n";
+    $self->{'spre'} = qr/\Q$self->{'split'}\E/;
+    $self->{'ls'} = length($self->{'split'});
+}
+
+sub on_refresh_begin {
+    my ($self) = @_;
+    my ($crow, $ccol) = $self->screen_cur;
+    my $pdir;
+    my $l;
+    for my $i ( 0..$self->nrow-1 ) {
+        $l = $self->ROW_t($i);
+        $pdir = undef if $l =~ $self->{'pres'};
+        # for speed
+        next unless is_bidi($l) or 
+            (defined($pdir) and $pdir == $Text::Bidi::Par::RTL);
+        chomp($l);
+        my @r = @{$self->ROW_r($i)};
+        # expand combining chars (Nikud) from one illegal char to two legal
+        $l = $self->special_decode($l);
+        # add bidi marks
+        if ( $self->{'lre'} ) {
+            while ( $l =~ /\G$self->{'lre'}/gc ) {
+                my $p = pos($l);
+                my $j = $p - length($1);
+                substr($l, $j, 0) = "\x{202a}";
+                splice(@r, $j, 0, 0);
+                $ccol++ if $j <= $ccol and $i == $crow;
+                pos($l) = $p + 1;
+            }
+            pos($l) = undef;
+            while ( $l =~ /\G.*?$self->{'pdf'}/gc ) {
+                my $j = pos($l);
+                substr($l, $j, 0) = "\x{202c}";
+                splice(@r, $j, 0, 0);
+                $ccol++ if $j <= $ccol and $i == $crow;
+                pos($l) = $j + 1;
+            }
+        }
+        # nikud
+        while ( $l =~ /[\x{5b0}-\x{5bb}]/g ) {
+            my $j = pos($l) - 1;
+            splice(@r, $j, 0, 0);
+            $ccol++ if $j <= $ccol and $i == $crow;
+        }
+        my @l = split $self->{'spre'}, $l;
+        my (@res, @map);
+        # current offset within the line
+        my $off = 0;
+        # we keep the map, so that we can apply it to the rendition
+        for my $part ( @l ) {
+            my ($p, $v) = log2vis($part, undef, $pdir);
+            my $types = $p->types;
+            #warn "$i: <$part> ==>\n  <$v>\n  dir:" . $p->dir . "\ntype: " .  
+            #join(',', map { my $cc = substr($part, $_, 1); '[' . $cc . ':' .  
+            #sprintf("%x", ord($cc)) . ":" . $types->[$_] . ']' } 
+            #0..$#{$types}) . "\n\n";
+            push @res, $v;
+            my @mmap = @{$p->map};
+            push @map, map { $_ + $off } @mmap;
+            $off += length($v);
+            # compensate for the field separator
+            push @map, $off..$off+$self->{'ls'}-1;
+            $off += $self->{'ls'};
+            $pdir = $p->dir if ( $self->{'par'} and not defined $pdir );
+        }
+        # remove the last field separator
+        splice @map, -$self->{'ls'};
+        my $res = join($self->{'split'}, @res);
+        # remove bidi marks
+        while ( $res =~ /[\x{200b}-\x{200f}\x{202a}-\x{202f}\x{5b0}-\x{5bb}]/g ) {
+            $map[pos($res)-1] = -1;
+        }
+        $res =~ s/[\x{200b}-\x{200f}\x{202a}-\x{202f}]//g;
+        $res = $self->special_encode($res); 
+        # fake cursor
+        if ( $crow == $i ) {
+            $r[$ccol] |= urxvt::RS_RVid unless $map[$ccol]==$ccol;
+        }
+        my @newr = (@r)[grep { $_ >= 0 } @map];
+        # keep the logical data for restoring after display
+        $self->{'text'}[$i] = $self->ROW_t($i, $res);
+        $self->{'rend'}[$i] = $self->ROW_r($i, \@newr);
+    } continue {
+        $pdir = undef if $l =~ $self->{'presa'};
+    }
+    ()
+}
+
+sub on_refresh_end {
+    my ($self) = @_;
+    return unless defined $self->{'text'};
+    foreach (0..$self->nrow-1 ) {
+        next unless defined $self->{'text'}[$_];
+        $self->ROW_t($_, $self->{'text'}[$_]);
+        $self->ROW_r($_, $self->{'rend'}[$_]);
+    }
+    delete $self->{'text'};
+    delete $self->{'rend'};
+    ()
+}
+

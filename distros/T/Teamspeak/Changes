@@ -1,0 +1,23 @@
+$Id: Changes 35 2007-10-21 22:23:54Z maletin $
+$URL: http://svn.berlios.de/svnroot/repos/cpan-teamspeak/cpan/trunk/Changes $
+
+0.6 2007-10-22
+  tests corrected.
+
+0.5 2007-09-21
+  New Tests.
+  Teamspeak::Telnet::Channel.
+  perltidy -pbp
+
+0.4 2006-05-20
+  New Objects Ban and Privileges for different Handles.
+
+0.3 2005-04-17
+  Teamspeak::Telnet.pm is setting err and errmsg and is using Net::Telnet
+  more correct.
+
+0.2 2005-04-12
+  This Module produce some useful results for a small set of methods.
+
+0.1 2005-01-11
+  Initial Release on Subversion Repository.

@@ -1,0 +1,252 @@
+NAME
+
+    Tie::Array::Cavity - create an array where key are aggregated by step (
+    and optionally could start with an offset )
+
+VERSION
+
+    Version 0.02
+
+SYNOPSIS
+
+    A Tie array module where the keys ( indexes ) are like a cavity bucket
+    and collect all the keys from a specific neighbor range
+
+    Perhaps a little code snippet.
+
+        use Tie::Array::Cavity;
+    
+        my $tied = tie my @a, 'Tie::Array::Cavity' , 10 , 5;
+        
+        $a[1] = 1;
+        $a[15] = 15;
+        $a[25]=25;
+        $a[24]=240;
+        $a[31]=31;
+        $a[40]=40;
+       
+       Result:
+            [
+              1,
+              15,
+              240,
+              31,
+              40
+            ];
+        
+        as a consequence, 
+        $a[1];
+        and 
+        $a[2];
+        refer to the same element of the array 
+        In the previous code     
+           $a[25]=25;   
+        set the the 3 element with the value 25,but
+          $a[24]=240;
+        over write the 3 element with the value 240.
+        
+        
+        !!!!! BECARE !!!!!
+        lvalue update are not working as expected.
+        In the example above,
+        $a[24]++;
+        is setting the second element of the array with '1' because fetching the value $a[24] return the 24 element of the array.
+        It is "by design" to allow normal iteration on the array ( e.g. foreach ( @a ) or Dumper(\@a ) )
+          
+        
+        
+          
+
+EXPORT
+
+    A list of functions that can be exported. You can delete this section
+    if you don't export anything, such as for a purely object-oriented
+    module.
+
+SUBROUTINES/METHODS
+
+ TIEARRAY
+
+    my $tied = tie my @a, 'Tie::Array::Cavity' , 10 , 5;
+
+    Tie::Array::Cavity tie an array where the keys are in a range Two extra
+    parameters are allowed: 1) the granularity of the key range ( default =
+    0 ) 2) the initial offset ( default = 0 )
+
+ STORE
+
+    Add an element in the array at the ARRAY index with the cavity
+    behavior;
+
+    my $tied = tie my @a, 'Tie::Array::Cavity' , 10 , 5; $myarray[31] ,
+    45646;
+
+    store 45646 at the 3 place in the array
+
+            [ 
+                    ...,
+                    ...,
+                    45646,
+                    ...,            
+                    
+            ]
+              
+
+ STORESIZE this
+
+    Sets the total number of items in the tied array associated with object
+    this.
+
+ FETCHSIZE this
+
+    Returns the total number of items in the tied array associated with
+    object this. (Equivalent to scalar(@array)).
+
+ FETCHCAVITY this , index
+
+    Retrieve the value in index for the tied array associated with object
+    this. But the index is calculated with the cavity feature.
+
+ FETCHKEY this , index
+
+    Return the calculated real key used by the cavity feature.
+
+ FETCHKEYCAVITY this , index
+
+    Return the calculated cavity key related to a normal array index.
+
+ FETCH this , index
+
+    Retrieve the value in index for the tied array associated with object
+    this.
+
+ POP this
+
+    Remove the last element of the array and return it.
+
+ SHIFT this
+
+    Remove the first element of the array and return it.
+
+ PUSH this, LIST
+
+    Append elements of LIST to the array.
+
+ UNSHIFT this, LIST
+
+    Insert LIST elements at the beginning of the array, moving existing
+    elements up to make room.
+
+ EXISTSCAVITY this, key
+
+    Verify that the element at index key exists in the tied array this. The
+    key is using the cavity feature.
+
+ EXISTS this, key
+
+    Verify that the element at index key exists in the tied array this.
+
+ DELETECAVITY this, key
+
+    Delete the element at index key from the tied array this. The key is
+    using the cavity feature.
+
+ DELETE this, key
+
+    Delete the element at index key from the tied array this.
+
+ SPLICECAVITY this, offset, length, LIST
+
+    Perform the equivalent of splice on the array.
+
+    offset is optional and defaults to zero, negative values count back
+    from the end of the array.
+
+    length is optional and defaults to rest of the array.
+
+    LIST may be empty.
+
+    Returns a list of the original length elements at offset.
+
+    The offset and length is using the cavity feature.
+
+ SPLICE this, offset, length, LIST
+
+    Perform the equivalent of splice on the array.
+
+    offset is optional and defaults to zero, negative values count back
+    from the end of the array.
+
+    length is optional and defaults to rest of the array.
+
+    LIST may be empty.
+
+    Returns a list of the original length elements at offset.
+
+USAGE
+
+    One of the useful usage of this module is for aggregating data coming
+    for a time series by some slice. Example: You've got a lot of data
+    polled each second for a day, and you would like to aggregate the
+    result by 5 minutes starting at the beginning of the day:
+
+            my %data = ( 1351551600 => 10, 1351551601 => 15, 1351551950 => 5  );
+            my $tied1= tie my @d, 'Tie::Array::Cavity' , 300 ,1351551600 ;
+            
+            my $start = 1351551600;
+            foreach my $t  ( keys %data )
+            {
+                    $d[$t]= $tied1->FETCHCAVITY($t)+ $data{ $t }; 
+            }
+    
+            say Dumper(\@d);
+            
+
+AUTHOR
+
+    DULAUNOY Fabrice, <fabrice at dulaunoy.com>
+
+BUGS
+
+    Please report any bugs or feature requests to bug-tie-array-Cavity at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tie-Array-Cavity. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Tie::Array::Cavity
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker (report bugs here)
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Array-Cavity
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Tie-Array-Cavity
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Tie-Array-Cavity
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Tie-Array-Cavity/
+
+ACKNOWLEDGEMENTS
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2012 DULAUNOY Fabrice.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

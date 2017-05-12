@@ -1,0 +1,9 @@
+This is Time::Epoch, a tiny module that does nothing but convert times in one
+epoch to times in another.  Implemented currently is only converting Mac OS epoch
+to and from the perl/Unix epoch.
+
+Implemented functions are perl2epoch(SECONDS, TYPE) and epoch2perl(SECONDS, TYPE).
+
+Copyright (c) 2000-2003 Chris Nandor.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the terms
+of the Artistic License, distributed with Perl.

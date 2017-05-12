@@ -1,0 +1,81 @@
+{
+   "abstract" : "Create a skeleton for a test file based on an existing module",
+   "author" : [
+      "Manni Heumann <github@lxxi.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Skeleton-Generator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Inspector" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Template" : "0",
+            "Pod::Usage" : "0",
+            "Sub::Information" : "0",
+            "autodie" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Skeleton::Generator" : {
+         "file" : "lib/Test/Skeleton/Generator.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com//mannih/Test-Skeleton-Generator/issues"
+      },
+      "homepage" : "https://github.com//mannih/Test-Skeleton-Generator",
+      "repository" : {
+         "url" : "git://github.com//mannih/Test-Skeleton-Generator.git",
+         "web" : "https://github.com//mannih/Test-Skeleton-Generator"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:MANNI"
+}

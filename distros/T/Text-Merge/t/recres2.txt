@@ -1,0 +1,71 @@
+
+This is the recursion test:
+---recusion test header file---
+
+
+Recursive Test:
+	ID: 2
+	---recursion 2 test header file---
+
+
+Recursive Test:
+	---recusion test header file---
+
+
+Recursive Test:
+	ID: 2
+	---recursion 2 test header file---
+
+
+Recursive Test:
+	---recusion test header file---
+
+
+Recursive Test:
+	ID: 2
+	---recursion 2 test header file---
+
+
+Recursive Test:
+	
+
+---recursion 2 test footer file---
+
+
+---------------------- 
+
+
+Recursive Test:
+	ID: 3
+	This list is empty.
+
+
+---recursion test footer file---
+
+
+---recursion 2 test footer file---
+
+
+---------------------- 
+
+
+Recursive Test:
+	ID: 3
+	This list is empty.
+
+
+---recursion test footer file---
+
+
+---recursion 2 test footer file---
+
+
+---------------------- 
+
+
+Recursive Test:
+	ID: 3
+	This list is empty.
+
+
+---recursion test footer file---

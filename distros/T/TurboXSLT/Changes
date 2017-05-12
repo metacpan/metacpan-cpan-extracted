@@ -1,0 +1,5 @@
+Revision history for Perl extension TurboXSLT.
+
+1.0            Mon Feb 17 11:40:17 MSK 2014
+    - Makefile.PL: Initial revision
+

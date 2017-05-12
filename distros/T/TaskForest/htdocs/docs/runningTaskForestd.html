@@ -1,0 +1,147 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Running the TaskForest Web Server</div>
+  <p>
+    The TaskForest package includes two simple, low-footprint web
+    servers, called <code>taskforestd</code>
+    and <code>taskforestdssl</code>, written in perl. They are
+    identical in every way, except that the latter is a secure SSL
+    version.  See <a href="/docs/webSecurity.html">the web server
+    security page</a> for more info. The webserver uses the LWP
+    library and its sole purpose is to give you an web-based interface
+    to TaskForest. I chose to write a perl-based web server because it
+    is easy for users to download, install and deploy. Also, it may be
+    too much to ask users to install and mantain Apache, and configure
+    mod_perl, just to get this web-based access.
+  </p>
+
+  <p>
+    The behavior of <code>taskforestd</code> is controlled with a
+    configuration file, <code>taskforestd.cfg</code>. This configuration
+    file <b>must</b> be customized as described below, before you can use
+    the web server. Once you have customized the configuration file, you
+    can start web server like this:
+  </p>
+
+  <div class="code"><pre><code>taskforestd --config_file=taskforestd.cfg
+
+OR
+        
+taskforestdssl --config_file=taskforestd.cfg</code></pre></div>
+
+  <p>
+    You can stop the web server like this:
+  </p>
+
+  <div class="code"><pre><code>taskforestd --config_file=taskforestd.cfg --stop
+
+OR
+        
+taskforestdssl --config_file=taskforestd.cfg --stop</code></pre></div>
+
+  <p>
+    For example, if the configuration file specifies that the host on
+    which <code>taskforestd</code> runs is www.example.com, then the web server will be
+    available at http://www.example.com/ .
+  </p>
+
+  <p>
+    To use the webserver (or even the web service described later) you
+    must have a valid userid and password. <code>taskforestd</code> does
+    not ship with any default userid and password pairs. A password is
+    required to authenticate the person making requests via the web
+    browswer. This userid and password combination may be (and should be)
+    different from the userid and password of the account under which
+    taskforestd is running.
+  </p>
+
+  <div class="new_section_header"><a name="config_file">A Sample <code>taskforestd</code> Configuration File</a></div>
+
+  <div class="config_file"><pre><code>
+<span class="comments"># This is a sample taskforestd configuration file</span>
+
+<span class="comments"># Please change all settings to values that make sense</span>
+<span class="comments"># for you.</span>
+
+<a name="log_dir"></a><a name="family_dir"></a><a name="job_dir"></a><span class="comments"># These are the four required command line arguments to</span>
+<span class="comments"># taskforest</span>
+log_dir          = "t/logs"
+family_dir       = "t/families"
+job_dir          = "t/jobs"
+instructions_dir = "instructions"
+
+<a name="lock_file"></a><span class="comments"># This is a file that ensures that only one child</span>
+<span class="comments">#  process can accept connections at any time</span>
+lock_file       = "t/lock_file"
+
+<a name="document_root"></a><span class="comments"># The HTTP server document_root</span>
+document_root   = "htdocs"
+
+<a name="host"></a><span class="comments"># The host on which the taskforest daemon will run</span>
+host            = "127.0.0.1"
+
+<a name="port"></a><span class="comments"># The port on which to listen for connections</span>
+port            = 1111
+
+<a name="child_count"></a><span class="comments"># The number of children available at any time</span>
+child_count     = 10
+
+<a name="requests_per_child"></a><span class="comments"># The number of requests each child process should</span>
+<span class="comments"># serve before exiting.</span>
+<span class="comments"># (To protect from memory leaks, etc)</span>
+requests_per_child = 40
+
+<a name="respawn_wait"></a><span class="comments"># Every time a child dies wait this much time (in</span>
+<span class="comments"># seconds) before starting a new child. Do NOT set</span>
+<span class="comments"># this value to less than 1, otherwise you may</span>
+<span class="comments"># encounter CPU thrashing.  Set it to something like</span>
+<span class="comments"># 10 seconds if you're testing.</span>
+respawn_wait    = 1
+
+<a name="log_threshold"></a><span class="comments"># my default, log stdout messages with status >= this.</span>
+<span class="comments"># This only effects stdout</span>
+<span class="comments"># The sequence of thresholds (smallest to largest is):</span>
+<span class="comments"># debug, info, warn, error, fatal</span>
+log_threshold   = "info"
+
+<a name="log_file"></a><a name="err_file"></a><a name="pid_file"></a><span class="comments"># These file names should NOT end with '.0' or '.1' </span>
+<span class="comments"># because then they will be mistaken for job log files</span>
+<span class="comments">#log_file        = "taskforestd.%Y%m%d.%H%M%S.stdout"  </span>
+<span class="comments">#err_file        = "taskforestd.%Y%m%d.%H%M%S.stderr"  </span>
+log_file        = "taskforestd.stdout"  
+err_file        = "taskforestd.stderr"  
+pid_file        = "taskforestd.pid"
+
+<a name="run_as_daemon"></a><span class="comments"># Run as a daemon (detach from terminal)</span>
+run_as_daemon   = 1
+
+<a name="valid_user"></a><span class="comments"># </span>
+<span class="comments"># In order for the web site to work, you must have</span>
+<span class="comments"># at least one valid user set up.  As the commented</span>
+<span class="comments"># examples below show, you may have more than one.</span>
+<span class="comments"># The value of each valid_user option is the login</span>
+<span class="comments"># followed by a colon (:) followed by a crypt hash</span>
+<span class="comments"># of the password.  There are many ways to generate</span>
+<span class="comments"># the crypt hash, including using the crypt perl</span>
+<span class="comments"># function.  You can also use the gen_password</span>
+<span class="comments"># script included with this release.</span>
+<span class="comments">#</span>
+<span class="comments">#valid_user = "test:e3MdYgHPUo.QY"</span>
+<span class="comments">#valid_user = "foo:jp8Xizm2S52yw"</span>
+
+<a name="server_key_file"></a><span class="comments"># The path to the server private key file</span>
+server_key_file   = "certs/server-key.pem"
+
+<a name="server_cert_file"></a><span class="comments"># The path to the server certificate</span>
+server_cert_file  = "certs/server-cert.pem"
+
+</code></pre></div>
+  
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+use strict; 
+
+# This example uses Tree::DAG_Node::XPath directly
+# it creates a simple tree, with a root and 5 daughters
+# all daughters have the same node name ('daughter'), and
+# an attribute 'nb', set to their rank
+# XPath is used to select 2 of those dautghters by their nb attribute
+
+use Tree::DAG_Node::XPath;
+
+# create the tree
+my $root = Tree::DAG_Node::XPath->new();
+$root->name("root_node");
+
+foreach (1..5)
+  { my $new_daughter = $root->new_daughter;
+    $new_daughter->name("daugther");
+    $new_daughter->attributes( { nb => "$_" });
+  }
+
+# now use XPath to find nodes
+my $daughters= $root->find( '/root_node/daugther[@nb>3]');
+foreach (@$daughters) { print "found ", $_->name, " (nb " . $_->attributes->{nb} .")\n"; }
+ 

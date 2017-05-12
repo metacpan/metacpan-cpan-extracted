@@ -1,0 +1,37 @@
+This is the README file for Tie::Hash::Abbrev::BibRefs,
+by Martin H. Sluka <martin@sluka.de>.
+
+This module is an attempt to ease the mapping of often
+abbreviated bibliographical references to the original titles.
+
+To achieve this, it simplyfies the title according to
+parameterizable rules and stores it as a "normalized key".
+
+When accessing the hash, the key given is also "normalized" and
+compared to the normalized version of the original title.
+In addition, each word (words are separated by whitespace) may be
+abbreviated by specifying only the first few letters.
+
+If more than one matching hash entry is found, the values of all
+matching entries are compared; as long as they are all equal (or
+all undef, the lookup is still considered to be successful.
+
+
+* Installation
+
+This package uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+* Copyright
+
+Copyright 2003 by Martin H. Sluka <martin@sluka.de>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

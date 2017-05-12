@@ -1,0 +1,10 @@
+Revision history for Perl extension Test::Mock::ExternalCommand
+
+0.03    2013/02/05
+        - requires Perl >= 5.10 because readpipe() override is supported since this version.
+
+0.02    2013/01/27
+        - first version in CPAN
+
+0.01    
+		- original version

@@ -1,0 +1,3 @@
+1.402  Wed, 13 Jul 2011 17:41:47 +0200
+  * First stand-alone release to CPAN. This release is identical to version 1.402
+    as shipped with the perl code as of 5.9.3.

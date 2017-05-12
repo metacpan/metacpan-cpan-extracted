@@ -1,0 +1,28 @@
+---
+abstract: 'Data serialization using typed netstrings.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-TNetstrings
+provides:
+  Text::TNetstrings:
+    file: lib/Text/TNetstrings.pm
+    version: v1.2.0
+  Text::TNetstrings::PP:
+    file: lib/Text/TNetstrings/PP.pm
+    version: v1.2.0
+  Text::TNetstrings::XS:
+    file: lib/Text/TNetstrings/XS.pm
+    version: v1.2.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: v1.2.0

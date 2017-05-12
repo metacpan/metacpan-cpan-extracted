@@ -1,0 +1,10 @@
+This is creates and automatically destroys temporary database used for
+testing.
+
+To install issue the following commands:
+
+perl Makefile.PL
+make
+make test
+make install
+

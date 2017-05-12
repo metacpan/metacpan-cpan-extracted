@@ -1,0 +1,36 @@
+Revision history for Perl extension Tk::VisualBrowser.
+
+0.14  Mon Nov 24 13:12:54 2008
+  - $vb->select($idx)
+  - more tests
+  - optional lables for images (basename of image filename or array of labels)
+  - optional balloon texts for images (basename of image filename or array of texts)
+
+0.13  Tue Jun 12 15:34:25 2007
+  - Terminate test with $top->after(3000, ...)
+
+0.12  Fri Mar 18 14:12:34 2005
+  - Error in _select_one corrected
+  - during move of pictures: keep selected thumbs in selection color
+  
+0.11  Mon Mar 02 18:19:35 2005
+  - more checks for undefined handles
+  - more test data (many thumbs in bigger array)
+
+0.10  Mon Feb 14 17:16:27 2005
+  - cleanup (german comments ...)
+  - more tests
+  - configuration of colors for highlighting, background etc.
+
+0.09  Sun Feb 13 16:23:45 2005
+  - selection and moving around of thumbnails via mouse buttons
+
+0.08  Fri Feb  4 14:15:56 2005
+  - Name space changed to Tk::VisualBrowser
+
+0.02 - 0.07 ...
+  - some intermediate versions
+
+0.01  Tue Jan 27 16:03:55 2004
+	- original version; created by Lorenz Domke
+

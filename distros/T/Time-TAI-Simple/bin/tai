@@ -1,0 +1,179 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib "lib";
+use Time::TAI::Simple;
+
+my %OPT = ();
+foreach my $arg ( @ARGV ) {
+    if    ($arg =~ /^\--+(.+?)\=(.*)/) { $OPT{$1} = $2; }
+    elsif ($arg =~ /^\--+(.+)/       ) { $OPT{$1} = -1; }
+    elsif ($arg =~ /^\-(.+)/         ) {
+        my $args = $1;
+        foreach my $c (split(//,$args)) { $OPT{$c} = -1; }
+    }
+}
+
+exit(usage()) if ($OPT{h} || $OPT{help} || $OPT{'?'});
+
+my $nl = "\n";
+$nl = '' if ($OPT{'neol'});
+
+my $precision = 9;
+$precision = int($OPT{p}) if (defined($OPT{p}));
+$precision = 1 if ($precision) < 1;
+my $fmt = "\%0.0$precision"."f";
+
+my $tm;
+if    ($OPT{'35'}) { $tm = tai35(); }
+elsif ($OPT{'3'} ) { $tm = tai35(); }
+elsif ($OPT{'0'} ) { $tm = tai();   }
+else { $tm = tai10(); }
+
+if ($OPT{i}) { # Integer output
+    $tm  = int($tm);
+    $fmt = '%d';
+}
+
+# ISO International standard time format:
+if ($OPT{iso} || $OPT{iso8601} || $OPT{zulu} || $OPT{'strict'}) {
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst);
+    my @gm_list = ();
+    if ($OPT{gm} || $OPT{utc}) {
+        ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime($tm);
+    } else {
+        ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($tm);
+        @gm_list = gmtime($tm);
+    }
+    $sec += $tm - int($tm);
+    my $pad = '';
+    $pad = '0' if ($sec < 10);
+    if ($OPT{iso8601} || $OPT{'strict'}) {
+        # Anally strictly correct format
+        if ($OPT{gm} || $OPT{utc} || $OPT{zulu}) {
+            printf('%04d-%02d-%02dT%02d:%02d:%s'.$fmt.'Z%s', $year+1900, $mon+1, $mday, $hour, $min, $pad, $sec, $nl);
+        } else {
+            my $tz_delta = $hour - $gm_list[2];
+            $tz_delta -= 24 if ($yday < $gm_list[7]);
+            $tz_delta += 24 if ($yday > $gm_list[7]);
+            $tz_delta = "+$tz_delta" unless ($tz_delta < 0);
+            my $sign = substr($tz_delta, 0, 1);
+            $tz_delta = $sign . sprintf('%02d',abs($tz_delta));
+            printf('%04d-%02d-%02dT%02d:%02d:%s'.$fmt.'%s00%s', $year+1900, $mon+1, $mday, $hour, $min, $pad, $sec, $tz_delta, $nl);
+        }
+    } else {
+        # Slightly friendlier format
+        printf('%04d-%02d-%02d %02d:%02d:%s'.$fmt.'%s', $year+1900, $mon+1, $mday, $hour, $min, $pad, $sec, $nl);
+    }
+    exit(0);
+}
+
+# Human-readable non-ISO date/time output:
+if ($OPT{d}) {
+    if ($OPT{gm} || $OPT{utc}) {
+        $tm = gmtime($tm);
+    } else {
+        $tm = localtime($tm);
+    }
+    print "$tm$nl";
+    exit(0);
+}
+
+if ($OPT{i}) {
+    print "$tm$nl";
+} else {
+    printf("$fmt\%s", $tm, $nl);
+}
+exit(0);
+
+sub usage {
+    print "Usage: $0 [options]\n" .
+          "Options are:\n" .
+          "    -d       Display in human-readable date/time format\n" .
+          "    -h       Describe available options\n" .
+          "    -i       Display TAI time as integer, not floating point\n" .
+          "    --0      Display TAI time instead of TAI-10 time\n" .
+          "    --35     Display TAI-35 time instead of TAI-10 time\n" .
+          "    --gm     Do not adjust for timezone when -d or --iso\n" .
+          "    --help   Same as -h\n" .
+          "    --iso    Display in international standard time format\n" .
+          "    --iso8601  Like --iso, but more strictly correct.\n".
+          "    --neol   Do not print terminating EOL\n" .
+          "    --p=N    Show N digits of precision when displaying as float\n";
+    return 1;
+}
+
+=head1 NAME
+
+tai -- print the current TAI time.
+
+=head1 SYNOPSIS
+
+    tai
+    tai --help
+    tai --35 --iso --gm --p=6
+
+=head1 DESCRIPTION
+
+Displays the current TAI time (TAI-10 by default) in any of a number of formats.
+
+Currently supported options:
+
+    -d         Display in human-readable date/time format
+    -h         Describe available options
+    -i         Display TAI time as integer, not floating point
+    --0        Display TAI time instead of TAI-10 time
+    --35       Display TAI-35 time instead of TAI-10 time
+    --gm       Do not adjust for timezone when -d or --iso
+    --help     Same as -h
+    --iso      Display in international standard time format
+    --iso8601  Like --iso, but more strictly correct.
+    --neol     Do not print terminating EOL
+    --p=N      Show N digits of precision when displaying as float
+               (default: 9)
+
+=head1 EXAMPLES
+
+Display TAI-10 as a floating point number with 6 digits of precision:
+
+    $ tai --p=6
+    1406506285.304316
+
+Display TAI-10 as an integer:
+
+    $ tai -i
+    1406506285
+
+Display TAI-10 as a human-readable date/time, adjusted for local timezone:
+
+    $ tai -d
+    Mon Jul 28 13:27:57 2014
+
+Display TAI-10 as a (relaxed) ISO-8601 date/time, B<unadjusted> for timezone:
+
+    $ tai --iso --gm
+    2014-07-28 20:29:12.512542725
+
+Display TAI-35 as a strict ISO-8601 date/time, adjusted for local timezone:
+
+    $ tai --iso8601 --35
+    2014-07-28T13:28:37.512542725-0700
+
+=head1 SEE ALSO
+
+L<Time::TAI::Simple>
+
+=head1 AUTHOR
+
+TTK Ciar, <ttk[at]ciar[dot]org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2014-2015 by TTK Ciar
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

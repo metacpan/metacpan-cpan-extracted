@@ -1,0 +1,28 @@
+Revision history for Tk-ColoredButton
+
+1.05    17/07/2011 12:54:40
+        + delete_tooltip method added : allows delete tooltip on colored button.      
+        Bug fixed : 
+          using or changing tooltip is allowed when button disabled.      
+          The bug with -textvariable option is fixed.      
+
+1.04    01/01/2011 00:00:00
+        POD documentation and code have been updated.      
+
+1.03    04/11/2010 19:48:42
+        Bug fixed for Linux, Solaris or other platforms where SystemButtonFace, SystemDisabledText, SystemXXX colors where unknown.
+        https://rt.cpan.org/Public/Bug/Display.html?id=62685     
+
+1.02    21/06/2010 22:29:28
+        Bug fixed if parent widget button is destroyed after press button.    
+
+1.01    19/06/2010 23:36:13
+        -autofit option have been added to allow the automatic adjustment button.
+        -highlightthickness sets to 0 by default to remove border focus rectangle.
+        The keyboard focus is now visible on button.
+        The bug binding keys have been fixed.
+        When you use -tooltip option, -iniwait option will be really set to 350 ms by default (and not 100 ms). 
+
+1.00    17/06/2010 00:06:00
+        First version.
+

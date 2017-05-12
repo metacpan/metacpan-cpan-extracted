@@ -1,0 +1,21 @@
+=== basic
+--- wiki
++hoge
+++hoge
++++hogehoge
++hoge
++hoge
+--- html
+<ol id="content_block_1" class="list-1">
+<li>hoge
+<ol class="list-2">
+<li>hoge
+<ol class="list-3">
+<li>hogehoge</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>hoge</li>
+<li>hoge</li>
+</ol>

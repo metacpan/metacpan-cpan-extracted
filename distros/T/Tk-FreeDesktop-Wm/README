@@ -1,0 +1,31 @@
+Tk-FreeDesktop-Wm
+=================
+
+Tk::FreeDesktop::WM creates a bridge between freedesktop-compliant
+window managers (see http://www.freedesktop.org/ ) and Perl/Tk
+programs, providing information and manipulation methods.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  Tk
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006,2015 by Slaven Rezic
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,49 @@
+
+
+
+  Array
+
+    push
+      should push an element
+
+  Hash
+
+    fetch
+      take the value
+      take the value
+
+
+
+  (Diagnostic message):
+
+    Array
+      push
+        should push an element:
+
+      ✖
+      ok { join(' ', @a) eq 'a b c d e' };
+         at eg/sample.t line 11
+
+      ♨
+      HOGE
+         at eg/sample.t line 13
+
+    Hash
+      fetch
+        take the value:
+
+      ✖
+      expect($h->{g})->to_be_true;
+         at eg/sample.t line 22
+
+    Hash
+      fetch
+        take the value:
+
+      ✖
+      ok { $h->{g} };
+         at eg/sample.t line 25
+
+
+not ok
+1..1

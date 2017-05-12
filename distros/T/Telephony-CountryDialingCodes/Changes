@@ -1,0 +1,18 @@
+Version 1.04 (2009-11-02):
+
+  - +381 is now only Serbia instead of both Serbia and Montenegro.
+
+Version 1.03 (2007-02-23):
+
+ - Updated data based on: http://en.wikipedia.org/wiki/List_of_country_calling_codes (thanks to Peter Beckman)
+  * American Samoa is now +1 684, not +684
+  * Added Western Sahara to +212
+  * CS (Serbia and Montenegro) and YU (Yugoslavia) have changed to RS (Serbia) and ME (Montenegro), added +382 for ME as well
+  * YU is gone, MK (Macedonia) replaced it
+  * Updated X* values for multiple +8xx and one +9xx
+
+ - Redesigned the internals. Placed PODs below __END__. Replaced data in __DATA__ block with a global hash.
+ - Minor POD changes, including added references to Number::Phone::Country and
+   http://en.wikipedia.org/wiki/List_of_country_calling_codes
+ - Improved test scripts.
+

@@ -1,0 +1,9 @@
+0.2
+
+Made this an inside-out module to support SCALAR deref.
+Copied the RIGHT Changelog into the bundle....
+Made internal stuff internal (starting with an underline)
+
+0.1
+
+First version

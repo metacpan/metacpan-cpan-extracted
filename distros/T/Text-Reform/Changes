@@ -1,0 +1,108 @@
+Revision history for Text-Reform
+
+1.06	Mon Apr 16 14:40:12 2001
+
+	- Devolved &from and &tag from Text::Autoformat to Text::Reform
+	  (still shipped in Text::Autoformat distribution)
+
+	- Tweaked pod to remove invalid markup
+
+	- Documented '<<<>>>' and '[[[]]]' fields in &form
+
+	- Documented the '~' single character block field in &form
+
+	- Modified &form to convert undef fields to ""
+
+	- Fixed non-filling of multiple consecutive newlines (thanks Elias)
+
+	- Fixed left justification of last line of fully justified text
+	  (thanks Elias)
+
+	- Added 'interleave' config flag for &form
+	  See documentation on "Multi-line format specifiers"
+	  (Thanks Elias and Phil)
+
+	- Added 'filler' option to control character used to fill
+	  short lines (thanks Phil)
+
+	- Made recursive calls to &form respect page numbers correctly
+
+
+1.07	Wed Apr  2 04:39:48 2003
+
+	- tweaked demo bugs (were using Text::Autoformat instead of
+	  Text::Reform)
+
+	- squashed filling $gap bug (thanks Phil)
+
+	- fixed bug in handling config hashes (thanks Phil)
+
+	- fixed bug in formats without pagelengths
+
+	- fixed sprintf incompatibility in Perl 5.8 (thanks Andy)
+
+	- Added 'cols' option
+
+	- Fixed handling of final headers that are different lengths
+	  to intermediate headers 
+
+	- Allowed header/footer subs to return an left/centre/right hash
+
+	- Added warning when header+footer > pagelen
+
+	- Added warning when header or footer > page width
+
+	- Added global pagewidth option
+
+	- fixed test.pl
+
+
+1.08	Wed Apr  2 22:27:23 2003
+
+	- fixed test.pl again
+
+
+1.10	Wed Apr  9 08:49:00 2003
+
+	- fixed test.pl AGAIN!!!!!
+
+
+
+1.11	Wed May  7 09:43:53 2003
+
+	- Remove NaN tests (too platform dependent)
+
+	- Added new hyphenator: break_at
+
+
+
+
+1.12.0  Sun Sep 30 04:51:21 2007
+
+	- Added &columns to export list (thanks Bob)
+
+	- Fixed doc buglets (thanks Mike)
+
+	- Removed use of 'our' to preserve 5.005 compatibility
+
+	- Fixed shebang lines in demos 
+
+    - Added WINDOWS_PATCH to patch around apparent bug in POSIX::strtod
+      under Windows (thanks Torsten)
+
+    - Added 'except' option to break_at() (thanks Bron)
+
+    - Changed to dual licensing for Fedora compatibility
+
+
+1.12.1  Sun Sep 30 05:08:10 2007
+
+
+
+1.12.2  Sun Sep 30 05:10:18 2007
+
+
+1.20    2009-09-06 (by Alexandr Ciornii)
+     - reform.t ported to Test::More
+     - Better prereqs
+     - Buggy support of locale removed

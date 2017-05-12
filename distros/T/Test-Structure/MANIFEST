@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Test/Structure.pm
+ignore.txt
+t/00-load.t
+t/01-works.t
+t/manifest.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

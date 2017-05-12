@@ -1,0 +1,16 @@
+NAME
+   Trinket - a Perl toolkit for object construction, introspection, and persistence
+
+AUTHOR
+   l.m.orchard <deus_x@pobox.com> http://www.decafbad.com
+
+VERSION
+   v0.0.1 - experimental
+
+COPYRIGHT
+   Copyright (C) 1999-2002 l.m.orchard. All RIghts Reserved.
+
+   This module is free software; you can redistribute it and/or
+   modify it under the same terms as Perl itself.
+
+For further information, explore the packages and PODs.

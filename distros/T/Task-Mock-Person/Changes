@@ -1,0 +1,14 @@
+0.03 2015-10-29T16:30:48+01:00
+ - Fix dependency for Mock::Person::JP.
+
+0.02 2015-10-29T14:15:09+01:00
+ - Move author tests to xt/ directory.
+ - Update Mock::Person::CZ to 0.04 version.
+ - Update Mock::Person::DE to 0.05 version.
+ - Update Mock::Person::EN to 0.04 version.
+ - Update Mock::Person::SK to 0.04 version.
+ - Update Mock::Person::SK::ROM to 0.02 version.
+ - Update Module::Install to 1.16 version.
+
+0.01 2015-01-22T18:33:22+01:00
+ - First version

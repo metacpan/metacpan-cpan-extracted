@@ -1,0 +1,28 @@
+NAME
+    Test::Mock::LWP - Easy mocking of LWP packages
+
+SYNOPSIS
+
+Make LWP packages to make testing easier.
+
+    use Test::Mock::LWP;
+
+    # Setup fake response content and code
+    $Mock_response->mock( content => sub { 'foo' } );
+    $Mock_resp->mock( code => sub { 201 } );
+
+    # Validate args passed to request constructor
+    is_deeply $Mock_request->new_args, \@expected_args;
+    
+    # Validate request headers
+    is_deeply [ $Mock_req->next_call ],
+              [ 'header', [ 'Accept', 'text/plain' ] ];
+
+    # Special User Agent Behaviour
+    $Mock_ua->mock( request => sub { die 'foo' } );
+
+DESCRIPTION
+
+This package arises from duplicating the same code to mock LWP et al in
+several different modules I've written.  This version is very minimalist, but
+works for my needs so far.  I'm very open to new suggestions and improvements.

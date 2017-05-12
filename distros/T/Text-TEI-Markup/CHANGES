@@ -1,0 +1,64 @@
+Version 1.9
+===========
+commit a1148fa10c0665bee0e8c5805f2aec6fc94f9433
+Author: tla <tla@mit.edu>
+Date:   Fri May 16 16:39:56 2014 +0200
+
+    use LibXML to detect node identity, not hash address
+    fix logic error in checkline
+    make more helpful warnings for possible markup problems
+
+Version 1.8.1
+==========
+commit 0c70d0ec3f5a3bd06d324a34b5ed07acdc94c048
+Author: tla <tla@mit.edu>
+Date:   Tue Mar 11 13:33:17 2014 +0100
+
+    deal with CRLF files too...
+    retain template on multiple runs
+    things needed to run DBI session storage
+    better markup number handling 
+    refrain from having empty hilight 'rend' attributes
+    doc fixes
+
+Version 1.7
+===========
+commit ff6d17a6254b23e4e02b57a58f59693a22c0ca65
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Apr 18 16:41:37 2012 +0200
+
+    zap xmlobj string comparison bug
+
+Version 1.6
+===========
+commit 977b337e64e866bebd7dc1cdb7c492b8bdbc3e6a
+Author: Tara L Andrews <tla@mit.edu>
+Date:   Wed Apr 18 07:26:16 2012 -0700
+
+    fix tests failing on stringification differences
+
+Version 1.5
+===========
+commit 3da264c89146758385dd8fab5eab4655089ede43
+Author: Tara L Andrews <tla\@mit.edu>
+Date:   Wed Apr 18 11:23:54 2012 +0200
+
+    remove redundant "my" declarations in test script
+
+Version 1.4
+===========
+commit d4ff41412bd19be668ad44ea06f961c974603229
+Author: Tara L Andrews <tla\@mit.edu>
+Date:   Tue Apr 17 09:52:04 2012 +0200
+
+    handle recursive text nodes in word wrapping
+
+Version 1.3
+===========
+commit aab075af1ba3a65229c4f9b3355511d7c3391e10
+Author: Tara L Andrews <tla\@mit.edu>
+Date:   Sun Apr 15 20:25:14 2012 +0200
+
+    Extend word_tag_wrap to take/modify an existing XML object; 
+    add a couple of parse tags; 
+    fix up docs and tests

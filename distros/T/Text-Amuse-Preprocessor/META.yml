@@ -1,0 +1,27 @@
+---
+abstract: 'Helpers for Text::Amuse document formatting.'
+author:
+  - 'Marco Pessotto <melmothx@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Amuse-Preprocessor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::PullParser: '0'
+  IO::HTML: '1'
+  Pod::Simple::Wiki: '0.19'
+  Text::Amuse: '0.76'
+resources:
+  repository: https://github.com/melmothx/text-amuse-preprocessor
+version: '0.36'

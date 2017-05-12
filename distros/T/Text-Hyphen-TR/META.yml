@@ -1,0 +1,39 @@
+---
+abstract: 'determine positions for hyphens inside Turkish words'
+author:
+  - 'Alex Kapranoff <alex@kapranoff.ru>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Hyphen-TR
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Hyphen::TR:
+    file: lib/Text/Hyphen/TR.pm
+    version: '0.01'
+requires:
+  Text::Hyphen: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kappa/Text-Hyphen-TR/issues
+  homepage: https://github.com/kappa/Text-Hyphen-TR
+  repository: git://github.com/kappa/Text-Hyphen-TR.git
+version: '0.01'
+x_authority: cpan:KAPPA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

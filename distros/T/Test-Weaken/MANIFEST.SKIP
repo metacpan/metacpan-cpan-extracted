@@ -1,0 +1,27 @@
+^MYMETA[.]json$
+^MYMETA[.]yml$
+^Makefile$
+^Test-Weaken-[0-9].[0-9]{3}_[0-9]{3}/
+^Test-Weaken-[0-9].[0-9]{3}_[0-9]{3}[.]tar[.]gz$
+^Test-Weaken-[0-9].[0-9]{6}/
+^Test-Weaken-[0-9].[0-9]{6}[.]tar[.]gz$
+^[.]git/*
+^\.svn/
+^author[.]t/[.]gitignore$
+^author\.t/display\.errs$
+^author\.t/perlcritic\.errs$
+^blib/
+^junk$
+^pm_to_blib$
+^save/
+
+# emacs backups
+~$
+
+# ExtUtils::MakeMaker leaving Makefile.old
+^Makefile\.old$
+
+# Kevin's dist stuff
+^dist-deb
+^up$
+^MANIFEST\.old$

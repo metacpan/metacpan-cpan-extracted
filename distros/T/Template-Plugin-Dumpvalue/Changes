@@ -1,0 +1,8 @@
+Revision history for Template::Plugin::Dumpvalue
+
+1.01 - 2004-09-07
+     - Fixed dump_template_vars() so it actually dumps the template
+     - stash rather than just return the object.
+     - Made it so the dump output isn't saved in the object so
+     - when dump_template_vars() is called you don't see the whole dump
+     - twice.

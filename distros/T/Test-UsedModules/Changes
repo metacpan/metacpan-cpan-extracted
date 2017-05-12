@@ -1,0 +1,15 @@
+Revision history for Perl extension Test-UsedModules
+
+0.03 2013-07-12T18:07:11Z
+
+    - Enable to check modules that are used by 'load (from Module::Load)'.
+      (Thank you for your suggestion, @azumakuniyuki)
+
+0.02 2013-07-11T05:22:02Z
+
+    - Fix miss detecting.
+
+0.01 2013-07-10T17:12:49Z
+
+    - original version
+

@@ -1,0 +1,44 @@
+Tie::Handle::Flock v0.01
+
+Tie::Handle::Flock causes writes to a filehandle to obtain an exclusive lock
+for the duration of the write. This allows multiple processes (forks) to share
+a filehandle without writes stomping on (interleaving or overwriting) each other.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tie::Handle::Flock
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Handle-Flock
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tie-Handle-Flock
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tie-Handle-Flock
+
+    Search CPAN
+        http://search.cpan.org/dist/Tie-Handle-Flock/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Ivan Heffner
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

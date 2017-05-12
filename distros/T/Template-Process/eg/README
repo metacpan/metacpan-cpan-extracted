@@ -1,0 +1,12 @@
+
+This directory contains some demonstrations for the 
+Template-Process distribution.
+
+1. a dumb META.yml generator
+
+   By blending the TT2 template eg/mk.tt.PL with the data 
+   from eg/META.yml and the functions provided by eg/mk-lib.PL,
+   a simple-minded META.yml can be generated via
+   the following command in a shell:
+
+   $ ( cd eg/ ; tt --tt mk.tt.PL -y META.yml --data mk-lib.PL )

@@ -1,0 +1,36 @@
+Setting up a pristine Windows test environment from scratch.
+
+Note that the key here is that your %PATH% must be free and clear of anything
+Perl. That means that if you're using an existing box with Strawberry or
+ActiveState installed, you *must* remove all traces of them in the PATH
+environment variable for ``brewbuild'' to work correctly.
+
+Easiest way to guarantee a working environment is using a clean-slate Windows
+server with nothing on it. For a Windows test platform, I mainly used an
+Amazon AWS t2.small server.
+
+- download/install git for Windows:
+    https://git-scm.com/download/win)
+
+- create a repository directory, and enter it:
+    mkdir c:\repos
+    cd c:\repos
+
+- clone and configure berrybrew
+    git clone https://github.com/stevieb9/berrybrew
+    cd berrybrew
+    bin\berrybrew.exe config (type 'y' when asked to install in PATH)
+
+- close the current CMD window and open a new one to update env vars
+
+- check available perls, and install one that'll become your core base install
+    berrybrew available
+    berrybrew install 5.22.1_64
+    berrybrew switch 5.22.1_64
+    close CMD window, and open new one
+
+- make sure it took
+    perl -v
+
+- install Test::BrewBuild
+    cpanm Test::BrewBuild

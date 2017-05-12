@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use Archive::Tar; 
+
+get_archive({ file_name => '' });
+
+exit;
+
+sub get_archive {
+        my ( $arg_ref ) = @_;
+
+        my $file_name = $arg_ref->{ file_name } ? $arg_ref->{ file_name } : '';
+	if ( $file_name ) {
+        	my $archive   = Archive::Tar->new();
+        	   $archive->read( $file_name );
+        	return $archive; 
+	} else {
+		return;
+	}
+} 
+

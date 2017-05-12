@@ -1,0 +1,8 @@
+Build.pl
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tie-REHash.t
+lib/Tie/REHash.pm
+META.yml

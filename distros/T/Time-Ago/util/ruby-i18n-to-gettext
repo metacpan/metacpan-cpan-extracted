@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+
+# Usage: ruby-i18n-to-gettext <ruby-translation.yml> <gettext-po>
+# 
+# Converts a ruby translation file for time_ago_in_words to the
+# equivalent gettext .po version.
+# 
+# There's a bunch of mappings below that are specific to the
+# time_ago_in_words project.
+
+use strict;
+use warnings;
+use autodie qw/ :all /;
+use open qw/ :std :utf8 /;
+use File::Basename qw/ fileparse /;
+use YAML::XS qw/ LoadFile /;
+
+# map between gettext msgid and ruby msgid
+my %map = (
+  'about {count} hour'       => 'about_x_hours',
+  'about {count} month'      => 'about_x_months',
+  'about {count} year'       => 'about_x_years',
+  'almost {count} year'      => 'almost_x_years',
+  'half a minute'            => 'half_a_minute',
+  'less than a minute'       => 'less_than_x_minutes',
+  'less than {count} second' => 'less_than_x_seconds',
+  'over {count} year'        => 'over_x_years',
+  '{count} day'              => 'x_days',
+  '{count} minute'           => 'x_minutes',
+  '{count} month'            => 'x_months',
+  '{count} second'           => 'x_seconds',
+);
+
+# How the gettext msgstr[IDX] values map to the ruby i18n plural forms
+my %forms = (
+  default => {
+    0 => 'one',
+    1 => 'other',
+  },
+
+  ja => {
+    0 => 'other',
+  },
+
+  ru => {
+    0 => 'one',
+    1 => 'few',
+    2 => 'many',
+  },
+);
+
+
+@ARGV == 2 or die "Usage: $0 <ruby-translation.yml> <gettext-po>\n";
+
+my $yaml_file = shift @ARGV;
+my $po_file = shift @ARGV;
+
+my $yaml = LoadFile($yaml_file);
+
+my $lang = fileparse($yaml_file, '.yml', '.yaml')
+  or die "unable to determine language from file '$yaml_file'";
+
+$yaml = $yaml->{ $lang }{datetime}{distance_in_words}
+  or die "didn't find distance_in_words hash";
+
+my $forms = $forms{ $lang } || $forms{default} or die 'no plural forms?!';
+
+open my $fh, '<', $po_file;
+my ($msgid, $ruby_msgid);
+while (<$fh>) {
+  if ($msgid) {
+    if (/^\s* msgstr(?:\[(\d+)])? \s+ ""/x) {
+      my $phrases = $yaml->{ $ruby_msgid }
+        or die "translation for ruby msgid '$ruby_msgid' not found";
+
+      my $idx = $1;
+
+      if (defined $idx) { # multiple plural forms
+        my $phrase_form = $forms->{ $idx }
+          or die "unexpected plural index '$idx'";
+
+        my $phrase = $phrases->{ $phrase_form }
+          or die "translation for ruby msgid '$ruby_msgid' form " .
+                 "'$phrase_form' not found";
+
+        $_ = qq{msgstr[$idx] "$phrase"\n};
+      } else { # single phrase
+        !ref $phrases
+          or die "translation of '$ruby_msgid' has multiple forms";
+        $_ = qq{msgstr "$phrases"\n};
+      }
+
+      # convert ruby placeholders to gettext placeholders
+      s/%{([^}]+)}/{$1}/g;
+    }
+  }
+ 
+  # Start of new translation block
+  if (/^\s* msgid \s+ "(.+)"/x) {
+    $msgid = $1;
+
+    $ruby_msgid = delete $map{ $msgid }
+      or die "unknown ruby mapping from msgid '$msgid'";
+  }
+} continue {
+  print;
+}
+
+if (keys %map) {
+  my $keys = join ', ', sort keys %map;
+  die "No mapping found for the following msgids: $keys\n";
+}
+
+exit 0;

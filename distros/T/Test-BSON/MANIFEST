@@ -1,0 +1,15 @@
+Build.PL
+Changes
+INSTALL
+lib/Test/BSON.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/bson.t
+xt/author/kwalitee.t
+xt/author/pod-coverage.t
+xt/author/pod.t
+xt/author/spelling.t

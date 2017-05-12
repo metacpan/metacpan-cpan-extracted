@@ -1,0 +1,50 @@
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+Tree::Fat      RdcO  Embeddable F-Tree Algorithm Suite            JPRIT
+
+Implements object-oriented trees using algorithms adapted from b-trees
+and AVL trees (without resorting to yucky C++).  It's essentially a
+cross between a tree and an array.
+
+
+The reasons for another tree implementation are as follows:
+
+- Publically available code is the best tested.  Bug ridden trees are
+completely unacceptable.  This module has been put through test
+coverage analysis and considerable stress testing.
+
+- The algorithms have been completely separated from any notion of a
+database.  The code is tweaked for easy embedding into other
+applications.  A very flexible set of hooks are available while still
+preserving the functional abstraction.
+
+
+Get it via http://www.perl.com/CPAN/authors/id/JPRIT/ !
+
+
+** 03-09-99 RELEASE 1.11
+
+- Repaired for 5.005_56.  Malloc/free are now used consistently.
+
+
+** 01-05-99 RELEASE 1.1
+
+- Option to cache first and last key of each tree node.  Seek can use
+these to avoid touching actual records (if they happen to be in slow
+memory).
+
+- Added comments to MANIFEST (before I forget everything! :).
+
+- Some macros are renamed or simplified.
+
+- Declare lots of variables 'register' just in case it matters.
+
+- Ran with Insure++.  Didn't find much.
+
+
+Copyright © 1997-1999 Joshua Nathaniel Pritikin.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)

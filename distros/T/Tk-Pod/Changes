@@ -1,0 +1,521 @@
+History for Tk::Pod
+
+version 0.9943
+	o stable release with all changes in 0.9942_50
+
+version 0.9942_50
+	o geo URI handled now by OpenStreetMap
+	o WWWBrowser update
+	o use POSIX::_exist instead of CORE::exit in forked processes
+	  to avoid core dumps with newer perls
+	o more and better tests
+
+version 0.9942
+	o stable release with all changes in 0.9941_50
+
+version 0.99941_50
+	o tkpod -geometry works now
+	o WWWBrowser update (avoid zombies, better debugging)
+	o avoid warnings in some Tk::More method calls with perl 5.18+
+	o test suite works with twm
+
+version 0.9941
+	o stable release with all changes in 0.9940_50
+	o added menu item with link to metacpan.org
+
+version 0.9940_50
+	o history view is showing the Pod title, not anymore the base
+	  filename
+	o use the current perl's perlindex, not the standard one
+	o tkmore: new option -S
+	o accelerator Ctrl-U for View source
+	o workaround for bindtags problems
+	o colors in tree view for script and local dirs
+	o prefer firefox over mozilla when calling external browser
+	o ignore vcs directories in FindPods
+	o refactoring: Class::Struct is not used anymore for the
+	  _HistoryEntry class
+	o zombie reaping (helps in cleaning up temp files for
+	  gv/ghostscript)
+	o add "_tkpod" to suffix of temp files
+	o listed more optional dependencies
+
+version 0.9940
+	o stable release with all changes in 0.9939_50..0.9939_59
+
+version 0.9939_59
+	o support for geo: URIs
+	o WWWBrowser update (fixing Debian issues)
+	o spelling fix in Pod
+	o modernized META.yml/.json creation
+	o regain 5.005 compat
+
+version 0.9939_58
+	o added gzip support in tkmore (needs PerlIO::gzip)
+
+version 0.9939_57
+	o fix for http://rt.cpan.org/Ticket/Display.html?id=41320
+	  (1st issue, cleanup of temporary directory)
+
+version 0.9939_56
+	o create cache directory if necessary
+	o cache directory documentation
+	o use entities instead of iso-8859-2 encoding in some Pods
+	o tests may fail on some systems because of a bug in Tk
+	  (i.e. when creating multiple MainWindows within one process)
+
+version 0.9939_55
+	o tkpod: new -version option
+	o View Source: show Pod source at current line now
+	o fixed partially breakage because of background tree updating
+	o experimental: a new button for rebuilding the fullsearch index
+	  (needs either gksu or xsu)
+	o fix for http://rt.cpan.org/Ticket/Display.html?id=41320
+	  (2nd issue)
+	o pod cache now lives in the home or data directory
+	o TODO file is now written in org-mode, not anymore as Pod
+
+version 0.9939_54
+	o Pod tree is updated in the background (Unix only)
+	o Link to sections: now also non-sections are highlighted
+	o fixed a spelling error in Tk::More's Pod
+
+version 0.9939_53
+	o fixed a broken test
+	o fixed optional_features in META.yml
+
+version 0.9939_52
+	o fixed: cygwin had no protection against missing/invalid DISPLAYs
+
+version 0.9939_51
+	o fixed <2> binding (the last change broke open in new window over
+	  links)
+
+version 0.9939_50
+	o middle button acts now like Mozilla/Firefox: opening pod by selection
+	o moved "Reload" menu item to "View" menu
+	o new menu item "View" > "View source"
+	o improved full text search:
+	  o multi term searches are now possible
+	  o sorting results is done by using number of term hits first
+	  o full text search terms are translated into a stemmed regexp
+	    for the Pod viewer search 
+	  o avoiding AnyDBM_File-related warnings
+
+version 0.9939
+	o new popup menu item "Copy Pod location"
+
+version 0.9938_52
+	o fixed some tests caused by the new optionality of some
+	  modules
+
+version 0.9938_51
+	o META.yml needs also dynamic_config setting
+	o update of README
+
+version 0.9938_50
+	o update to newest WWWBrowser.pm
+	o again fixes for fulltext search paths (problems seen on Debian
+          and Windows)
+	o debug mode: now with Reloader menu item
+	o META.yml uses optional_features instead of recommends
+	o changed DISPLAY check before test_harness call, hopefully
+	  generating UNKNOWN test results
+
+version 0.9938	So  3 Feb 2008 19:12:04 CET
+	o The internal man viewer can handle utf-8 now.
+	o Upgraded to newer WWWBrowser version (changed Windows support)
+	o fix for ActivePerl: perl documentation is in "pods" directory
+	o special handling for a2p pod
+
+version 0.9937
+	o Make sure the displayed Pods in the tree match the actual @INC path
+	o Tk::Pod::Text Pod should now contain all Pod constructs as examples
+        o bugfix: fixed architecture path component stripping
+	o bugfix: fixed core/site/vendor coloring if installvendorlib/arch not
+          defined at all
+	o warning fix in Tk::Pod::FindPods for perl 5.005
+
+version 0.9936
+	o Tk::More now used fixedFont/FixedFont for setting font via option db
+	o more Tk::More-related documentation
+	o t/cmdline.t does not fail anymore with perl 5.005_05
+	o fullsearch dialog with fixed font in listbox, making nicer columns
+	o fullsearch toplevel is now transient
+	o OK button in fullsearch dialog
+	o made the fulltext search work under MSWin32 (by using File::Spec
+	  instead of manual filename arithmetic)
+	o all transient windows now have close buttons
+	o WWWBrowser is now bundled as Tk::Pod::WWWBrowser
+	o printing under MacOSX
+	o added basic tests for PodSearch and PodTree
+
+version 0.9935
+	o fixed missing "use" in tkpod (spotted by Torsten Foertsch)
+	o nicer diagnostics output when finding duplicate modules
+	o better STDERR diagnostics if Pod cannot not be found in findpod
+	o cmdline.t tests with different environment settings
+	o cmdline.t works now in BATCH=0 mode
+
+version 0.9934
+	o Fixed fulltext search on Debian machines (different index
+	  location)
+	o minor Pod changes
+	o Tk::More and tkmore now support the -encoding option
+	o support coloring tree items for vendor directories
+	o new menu item: View Pod source (like Edit Pod, but using
+	  Tk::More)
+	o new method for Tk::More: AddQuitBindings
+	o documented public methods in Tk::More
+
+version 0.9933
+	o new menu items with search.cpan.org and annocpan.org links
+	o Print keybinding
+	o Ptksh menu entry in debug mode
+	o tkpod: pod names now have priority over directories (problem
+	  spotted by Andreas Koenig)
+	o pod tree fixes for MacOSX
+	o do not run test suite if no DISPLAY available (X11 only)
+
+version 0.9932
+	o bugfix - Tk::Pod did not work with Tk804 and without
+	  Tk::ToolBar installed (thanks to Craig Thayer for spotting
+	  the problem)
+
+version 0.9931
+	o Tk::ToolBar menu icon support also for Tk800
+	  (very experimental!)
+
+version 0.9930
+	o fixing zoom function problems on some X11 servers
+	o changed About dialog
+	o tkmore: Pod, new options
+	o new environment variable TKPODCACHE
+	o fixed for installations with vendor_perl in @INC (thanks to
+	  Alexey Tourbin)
+
+version 0.9929
+	o no functional changes, just repair version damage
+
+version 0.9928
+	o -f and -q options for tkpod
+	o fixes for Windows (tested with ActivePerl)
+	o minor usability improvements
+	o full search: it's now possible to restrict to the current
+ 	  selected module subtree
+
+version 0.9927
+	o new script tkmore (installed by default)
+	o experimental: menu icons (only with Tk::ToolBar installed
+          and with Tk804)
+	o fix: Back/Forward menu items are disabled if not applicable
+	o WidgetDump menu entry in debug mode
+	o Use a ligther background color for Text/Tree areas of Tk::Pod.
+	  The -background option is now disabled. This is very experimental
+	  and will change.
+	o experimental: new internal man viewer
+	o experimental: "Open by Name" accepts "-f ..." for displaying
+	  functions and "-q ..." for FAQ questions
+	o Pod::Simple requirement increased to 2.05 because of bugs in
+	  earlier versions
+	o pod_find in Tk::Pod::FindPods now works with softlinked
+	  directories
+
+version 0.9926
+	o changed search order: .pod files first, then .pm, .pl and
+	  extension-less files
+	o Tk::Pod and Tk::Pod::Text are now better subclassable
+	o new tests t/pods.t and t/subclass.t
+	o changed -selectforeground in tree view
+	o polished Tk::HistEntry support
+	o new menu accelerators
+	o tiny layout change for =item (by Torsten Foertsch)
+
+version 0.9925
+	o Tk::Pod::FindPods: using opendir/readdir instead of glob
+
+version 0.9924
+	o fix for a test error
+
+version 0.9923
+	o Zoom in/out was reversed (spotted by Martin Thurn)
+	o temporary print files now may get deleted on process end
+	o removed very experimental CPAN support --- use CPANPLUS::Shell::Tk
+	  instead
+	o experimental support for displaying perlfunc functions in tree
+          (by category or alphabetically)
+	o some missing \Q...\E added
+
+version 0.9922
+	o fixed logic in Tk::Pod::FindPods
+
+version 0.9921
+	o new feature: search Perl FAQ
+	o bugfix (hopefully): aborting the rendering sometimes caused the
+	  styles to get messed up
+	o bugfix: changing the font size now also propagates to Pod pages
+	  in the history
+
+version 0.9920
+	o more information in About dialog
+	o Tk::Pod::Cache: workaround for a reload bug (seen on RedHat 8.0 only)
+	o no more interactive tests --- bow there's "make demo"
+
+version 0.9919
+	o search in Pod tree with history
+	o changed menu entry label "Set Pod" to "Open by Name"
+	o new environment variable TKPODDIRS
+	o documented TKPODPORT
+	o added accelerators for Zoom in/out
+
+version 0.9918
+	o fixed the error case in Tk::Pod::Text::file
+	o changed Home, End, Prior and Next callbacks in Tree view
+	o invalidate cache on reload
+	o openpod with history
+	o added <MouseWheel> support
+
+version 0.9917
+	o propagate -exitbutton to new windows
+	o Set Pod: new "New window" button
+	o tkpod -I lib (again) possible
+	o Tk::FcyEntry not used anymore because of problems under Windows
+	o document cleanup: replaced "POD" with "Pod"
+	o OO rewrite of Tk::Pod::FindPods
+
+version 0.9916
+	o URL and man links are now clickable (Tk::Pod::Text::Link_url and
+	  Tk::Pod::Text::Link_man)
+	o $Config{scriptdir} is now also scanned for pods (suggestion by
+          Marek Rouchal)
+	o New -exitbutton option. By default Tk::Pod widgets do not have an
+          exit menu entry anymore (suggestion by Bruce Ravel)
+	o new cmdline.t test
+	o server cleanup on SIGTERM
+	o fixed option handling in tkpod (-I switch not available anymore)
+	o moved some functions into new module Tk::Pod::Util
+	o bugfix: keyboard selection in POD tree now works
+	o bugfix for perllocal.pod handling
+	o another workaround for Tk::Pod::FindPods on MSWin32
+
+version 0.9915
+	o use Tk::HistEntry in fulltext search dialog, if available
+	o tree view: now automatically jumping to the current leaf
+	o Double-2 binding in Tk::Pod::Text
+	o minor POD fixes
+
+version 0.9914
+	o changed email address
+	o first non-development 0.99* version
+
+version 0.99_13
+	o Tk::Pod::Cache was missing in the distribution :-(
+	o new environment variable TKPODEDITOR
+
+version 0.99_12
+	o new module Tk::Pod::Cache --- memory cached documents are
+          rendered about three times faster than non-cached documents
+	o DEBUG now uses warn instead of print
+
+version 0.99_11
+	o new zoom_normal/in/out menu entries
+	o default OS font size is honored now
+
+version 0.99_10
+	o major changes by Sean Burke:
+	  * Tk::Parse replaced by Pod::Simple and Tk::Pod::SimpleBridge
+	  * changes to Tk::Pod::Text to use the new parser backend
+	  * style definition moved to Tk::Pod::Styles
+	  * printing facility for Windows with write.exe or notepad.exe
+
+version 0.99_08
+	o fixed typo in Tk::Pod::Text --- links to head1 sections should
+	  work now
+	o tkpod -s (server mode) implemented
+	o Adjuster between tree and text widgets works (again)
+
+version 0.99_07
+	o cygwin compatibility
+	o bugfix in Tk::Pod::Text (thanks, John Cerney!)
+
+version 0.99_06
+	o new "Set Pod" menu entry in Pod.pm
+	o Double-2 opens pod in new window (like Shift-Double-1)
+	o another change in Search_db.pm suggested by Martin Raspe
+	o compatibility to Tk 800.014
+
+version 0.99_05
+	o change in Search_db.pm for ActivePerl (suggested by Martin Raspe)
+
+version 0.99_04
+	o switch to show PODs of not installed CPAN modules
+	o new View menu
+	o POD tree is now switchable on and off from the menu
+	o some fixes
+
+version 0.99_03
+
+	o some Text menu bindings in PodText
+	o incremented versions to prevent CPAN mismatches
+	o FullText search term is set automatically as search term in
+	  PodText
+
+version 0.99_02
+
+	o some fixes for MSWin32 and Perl 5.005
+	o Reload menu for PodTree
+
+version 0.99_01
+
+	o various bug fixes
+	o colored entries in pod tree
+	o no more Tk40x.xxx support
+	o new/better More.pm bindings
+	o break long menus (on X11)
+
+version 0.12 (not released)
+
+	o new Tk::Pod::Tree module and a tree view for POD files
+	o better history support: forward/backward/view history
+          (with new menu) 
+	o new popup menu entry Forward
+	o Alt-Left/Right bindings
+	o usign getOpenFile instead of FileSelect
+	o using messageBox instead of BackTrace
+	o standard editor is ptked
+	o using Tk::Parse::Escapes instead of private translate hash
+	o change cursor image over links
+	o scrollbars are now on the right side (only Windows)
+	o bugfix: remove X<...> from section menu entries
+	o bugfix: internal links and middle button work now
+	o new maintainer
+
+version 0.11
+
+        o fixed VERSION problem: 1.14+2 < 3.14
+        o Added 'standard perl' COPYRIGHT notices to modules
+
+version 0.10
+
+	o New Search menu, Up/down bindigs and
+	  PATH scanned after @INC for PODs
+	  Thanks to Slaven Rezic <eserte@cs.tu-berlin.de>
+	o Pod/Text.pm
+		added support simple =head3 support
+		(treated like =head2)
+	o Parse.pm
+		added =begin/=end support (but not nesting or
+		check/match of word after =begin/=end).
+		Better impl. has to wait until Pod::Parser is
+		used 
+	o 'Reload' jumps to same line after document is reloaded
+	o =pod doesn't generate a warning anymore
+	o t/basic.t:  basic widget test ala Tk800 t/create.t
+
+version 0.09
+
+	o Tk::Pod & Tk::Pod::Text: fixed version (1.9 > 1.10 problem)
+	o Added section menu (Thanks Slaven)
+	o Use Busy/UnBusy during load of POD
+	o 'Help'->'Usage..' used Pod_usage.pod
+	o L</"This heading"> works a bit better (still broken
+	  if loaded to new POD window)
+
+version 0.08
+
+	o E<> support also 'space' 'tab'
+	o I<> is now in weight 'medium' and not 'bold'
+	o -font option removed so it's really 'courier'
+	o Fixed version number of Tk::Pod and Tk::Pod::Text
+	  so it increasing again (1.9 > 1.11 problem)
+
+version 0.07
+
+	Tk/Pod/Text.pm
+		o Links don't change font size in =head and
+                  =item commands
+		o Support L<man/"head*"> and L<man/item>
+		  (/"head" and /item still don't work when
+		  new Pod widget should is opened (<2> or
+                  <Shift-1>)
+		o Support L<showthis|man/sec> (new in 5.004_05
+		  to be and > 5.005_56)
+
+	Tk/Pod.pm
+		o Don't pack menubuttons for Tk800.*. (Thanks
+		  to Slaven Rezic <eserte@cs.tu-berlin.de>)
+		o 'Help/Usage' works when installed (also Win*?)
+
+	Tk/More.pm
+		o better h,j,k,l bindings scroll regardless of
+		  'insert' position
+		o insertCursor is invisible (well zero width)
+		o insertCursor off time set to 0 sec to switch
+		  of blinking (see text.n doc)
+		o fixed packing so entry does not fanish for
+		  small More widgets
+
+version 0.06
+
+	o fixed 'Quit' error
+	o Pod widgets created from another Pod widget have now
+	  same parent as Pod widget that created them
+
+version 0.05
+
+	o tkpod: added -tk switch so, Pod will be found
+	  even if Tk:: or Tk/ prefix is omitted.
+
+	o Fixed wrong $VERSION of Tk::Pod
+
+version 0.0401
+
+	o For 2 button mouse owners:
+		<Shift-ButtonRelease-1> does same
+		as <ButtonRelease-2>: load doc into
+		new window.
+
+	o Fixed Tk::Pod version to be higher than in
+	  Tk402.003 so CPAN.pm gets the right distribution
+
+	o more TODO entries :-)
+
+version 0.04
+
+	o applied Tk/Parse.pm patch of Slaven Rezic
+	  <eserte@cs.tu-berlin.de> to fix problem
+	  triggered by perlfaq4.pod
+	o Allow upcase chars in E<> as: Auml, Ouml,...
+	o Shift-Button-1 was used to open new window
+	  on L<>.  Now it's Button-2
+	o added 'szlig' to E<>
+	o Added more example POD markup to Tk/Pod/Text for
+	  verification
+
+version 0.03
+
+	o fixed warn on =for.  Perl Data Language has lots
+	  of them
+	o use alpha FcyEntry widget if available
+	o Tk/More status line: flat<->sunken, disabled<->normal
+	
+version 0.02
+
+	o use CDE default fonts if available
+	o first go on Tk::More widget
+	o use perlindex full text index if available
+
+version 0.01
+
+	o derived from Tk402.003 tkpod Tk/Pod.pm
+	o Extracted Tk::Pod::Text  from Tk::Pod  and use ROText
+	o 'better than nothing POD' for tkpod, Tk::Pod, Tk::Pod::Text.pm
+	o Added tkpod Help menu
+	o L<> in blue
+	o Button-* load POD in same window (with shift in separate
+	  window)
+	o tkpod now exits when last Pod widget is closed
+	o quick and dirty 'back' history.
+	o Added Popup menu: back, reload, edit
+	o removed Autoloader and sub old_process
+	o some other little fixes I can't remember right now

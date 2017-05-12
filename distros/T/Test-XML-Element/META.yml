@@ -1,0 +1,27 @@
+---
+abstract: 'Test the properties a single XML element in isolation.'
+author:
+  - 'Oliver Charles C<< oliver.g.charles@googlemail.com >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-XML-Element
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Test::Builder: 0
+  XML::Simple: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

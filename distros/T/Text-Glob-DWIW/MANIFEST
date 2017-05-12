@@ -1,0 +1,33 @@
+Changes
+lib/Text/Glob/DWIW.pm
+Makefile.PL
+MANIFEST 		#	This list of files
+README
+t/00-load.t
+t/00-loaded.t
+t/01-basic.t
+t/01-expand.t
+t/01-expr.t
+t/01-explicit.t
+t/01-foreign.t
+t/01-grep.t
+t/01-neg.t
+t/01-opt.t
+t/01-quant.t
+t/01-strange.t
+t/01-tumble.t
+t/02-resh.t
+t/02-tge.t
+t/02-sgp.t
+t/02-sre.t
+t/02-rewi.t
+t/02-rsl.t
+t/02-tg.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+examples/info.txt
+# examples/typical.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

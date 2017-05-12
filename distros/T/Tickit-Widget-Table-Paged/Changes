@@ -1,0 +1,25 @@
+Revision history for Tickit-Widget-Table-Paged
+
+0.004     2014-04-22 02:33:42+01:00 Europe/London
+	New features:
+	* ->data method returns the arrayref holding table data
+	* ->selected_rows returns all selected rows (highlighted row only
+	if we're not in multiselect mode). (both features thanks to a patch
+	from buu)
+
+0.003     2014-04-22 02:02:25+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Fixed off-by-one on scrollrect (thanks LeoNerd)
+	* An exception could be raised when scrolling off the end of a list,
+	due to incorrect scrollbar height calculation (thanks buu)
+
+0.002     2013-11-10 01:26:54 Europe/London
+	New features:
+	* Allow setting on_activate at instantiation or via accessor
+	(previously had to set ->{on_activate} manually)
+	* Multiselection support (disabled by default)
+
+0.001     2013-09-15 02:55:07 Europe/London
+	Initial CPAN release

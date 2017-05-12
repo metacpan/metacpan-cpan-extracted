@@ -1,0 +1,514 @@
+NAME
+    Template::Plugin::TwoStage - two stage processing of template blocks
+    with first stage caching
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+    This is a plugin for the Template Toolkit that facilitates a two stage
+    processing of BLOCKs/templates with first stage caching. Processing
+    results of the first (precompilation) stage are cached away for
+    subsequent repeated processing in the second (runtime) stage.
+    Precompilation and runtime tags are seperated by using different tag
+    styles.
+
+    Sample Configuration via TT configuration:
+
+       Template->new( { ..., TwoStage => { caching_dir => My::Application->path_to_tmp(), ... } } );
+
+    Basic usage in the a TT2-template:
+
+       [%   USE TwoStage; 
+            TwoStage.process( 
+                    template => 'cached_page', 
+                    keys => { bar => bar  }, 
+                    ttl => 60 * 60 
+            );
+
+            BLOCK cached_page; 
+                    # use precompile tags or runtime tags here
+       %]
+                    [* foo # runtime stage evaluation *]    
+       [%              IF bar; # precompilation stage evaluation 
+                            # ... 
+                       ELSE;
+                            # ...
+                       END;
+            END 
+       %]
+
+FEATURES
+    *   parameterized precompilation of a single block
+
+        Pass keys as additional identifiers of a BLOCK/template, based upon
+        which the BLOCK/template produces a different precompiled
+        output/version.
+
+    *   expiration
+
+        Give the precompiled BLOCKs/templates a 'time to live' before they
+        expire.
+
+    *   namespaces
+
+        Distinguish different e.g. applications sharing a common TwoStage
+        plugin (sub)class and/or caching directory by the use of namespaces.
+
+    *   development mode
+
+        Edit your templates with caching turned off. The development mode
+        also gives you convenient access to the precompiled versions
+        produced for validation of your separation of precompilation and
+        runtime directives.
+
+    *   flexible configuration
+
+        Set your basic configuration in the TT configuration, or in a
+        subclass of this plugin, and override any configuration option on
+        plugin construction or even on single plugin method calls to
+        include() or process() in the templates.
+
+USE CASES
+    You might benefit from this module if ...
+
+    *   ... you have static external content e.g. from databases or
+        .po-files that you want to pull into your templates only once while
+        still being able to insert dynamic data into the same template
+
+    *   ... you are following the DRY principle by having a central BLOCK
+        library that you use to style your GUI HTML components
+
+    *   ... you do not want to use ttree because you prefer "lazy"
+        precompilation (only on demand), and you want to see your changes to
+        the template without running an external program first
+
+CONFIGURATION
+    Plugin behaviour can be controlled using following options:
+
+  Options
+   caching_dir
+    The TwoStage plugin will store the resulting precompiled templates from
+    the first stage on disk in a 'caching directory', that can be specified
+    with the 'caching_dir' option.
+
+    The directory 'TT_P_TwoStage' in your platform specific tmp-directory
+    determined with the help of File::Spec->tmpdir() is the default setting
+    for this option. Pass a path in order to change it to some other
+    directory - it will also be automatically extended by the subdirectories
+    'TT_P_TwoStage' and the plugin's class name.
+
+    This option can NOT be set on plugin construction or calls to
+    include()/process().
+
+   dev_mode
+    Set this configuration option to a TRUE value in order to disable the
+    use of cached - precompiled - files, and see your changes to cached
+    BLOCKs/templates immediately while still having access to the
+    precompiled versions on disk for their validation.
+
+    See also the configuration option 'dir_keys' as another interesting
+    feature for development.
+
+   ttl
+    Specify the "time to live" for the precompiled versions of the
+    BLOCKs/templates in seconds - 0 is 'no expiration' and the default
+    setting.
+
+   dir_keys
+    Usually the keys connected to a precompiled version are included among
+    other things into the file name of a BLOCK/template in order to identify
+    a precompiled cached BLOCK/template on disk. This is accomplished by
+    using the SHA1 hash function.
+
+    To make the retrieval of a certain caching file easier for humans, the
+    configuration parameter 'dir_keys' lets you include the keys into the
+    file path of the precompiled cached BLOCK/template. This behaviour might
+    be handy in cases where one wants to inspect the precompiled versions
+    produced.
+
+    Set 'dir_keys' either to an array reference holding a selection of keys
+    or a scalar holding a TRUE value for all keys. This feature is available
+    in development mode only! See also configuration option 'dev_mode'.
+
+    See also the section 'Caching with plugin object methods process() and
+    include()' for more on the 'keys' parameter.
+
+   namespace
+    This option can come to rescue in situations where identities of cached
+    BLOCK/template versions on disk can be ambigious relying only on the
+    standard measures taken by this plugin in order to disambiguate cached
+    disk versions (see section 'Avoiding disk cache overlaps' below).
+
+    If e.g. you choose not to subclass this module for an application you
+    can ensure the segmentation of applications by setting the 'namespace'
+    configuration option accordingly. In this example however this approach
+    has the drawback that you need to set this configuration option in each
+    template on plugin construction:
+
+        USE TwoStage( namespace => application_name );
+
+   runtime_tag_style
+    Set this option to one of the predefined tag styles TT is offering like
+    'php', 'mason', 'html', ..., and that are accepted by TT as a value to
+    its 'TAG_STYLE' configuration option or 'TAGS' directive. Default is:
+    star ([* *]).
+
+    Excursus: precompilation tag style
+
+    The precompilation tag style is always the tag style set in the TT
+    configuration or 'default'. A tag style defined local to the file the
+    plugin is being called in ( by means of the 'TAGS'-directive at the
+    beginning of the file) will be handled correctly - this file scoped tag
+    style will also be used in the BLOCK to be precompiled as precompilation
+    tag style.
+
+    Changing the tag style only for a certain BLOCK that is to be
+    precompiled is not possible, as the 'TAGS' directive can be set only on
+    per template file basis. A centralized configuration of the
+    precompilation tag style to be used is not available to date.
+
+   tt_cache_size
+    As one can produce a lot of precompiled versions of a single
+    BLOCK/template controlled by this plugin using the 'keys' feature of
+    process()/include(), it might be advisable in some situations to set the
+    CACHE_SIZE TT configuration option to a positive value in order to curb
+    memory consumption when having a TT singleton object around in a
+    persistent environment.
+
+    As the plugin uses a provider object specific to the plugin it will not
+    respect the CACHE_SIZE configuration property possibly set in your main
+    TT configuration. Use this method in order to set the CACHE_SIZE
+    configuration property for the plugin's specific provider object. By
+    default all precompiled templates are cached.
+
+    In contrast to all the other configuration options - except
+    'caching_dir' - this option can only be set as class data.
+
+  Setting options
+    Configuration options may be set in different ways and with different
+    scopes.
+
+   Setting options in TT configuration
+    This plugin can be configured using the configuration hash provided to
+    the Template Toolkit-constructor. Put your plugin configuration options
+    in a hash, and reference it in the TT configuration hash using the key
+    'TwoStage'.
+
+    Sample code:
+
+       Template->new( { ..., TwoStage => { namespace => 'My::Application', ... } } );
+
+    The configuration options will apply to all TwoStage plugin-objects
+    created in this TT object. Note that this does NOT hold true for derived
+    classes of the plugin!
+
+    Note! In order to avoid disk cache overlaps of applications using the
+    TwoStage plugin without subclassing, configure a unique namespace or a
+    separate caching directory. See also 'Avoiding disk cache overlaps'
+    below.
+
+   Setting options via subclassing
+    This plugin is subclassable. Configuration with scope restricted to the
+    subclass can be achieved by using the inheritable class data accessors
+    provided (see sample code below).
+
+    Subclassing allows you to customize your plugin behaviour at a single
+    place, and to complement the caching keys via a possible callback method
+    extend_keys(). At the same time it avoids disk cache overlaps for
+    applications sharing the same caching directory as long as the derived
+    plugin is not used in different applications.
+
+    Subclasses will not read the plugin options specified in the TT
+    configuration hash when configuring.
+
+    Sample code:
+
+       # sample code is based on an imaginary Catalyst application Your::Application
+
+       package Your::Application::Template::Plugin::TwoStage;
+       use base qw( Template::Plugin::TwoStage );
+
+       __PACKAGE__->caching_dir( Your::Application->config->{home}.'/tmp' );
+       __PACKAGE__->dev_mode( 1 );
+       __PACKAGE__->ttl( 60 * 60 ); # 1 h
+       __PACKAGE__->dir_keys( 1 );
+       __PACKAGE__->runtime_tag_style( 'html' );
+
+       sub extend_keys {
+            my $plugin = shift; # the callback receives the plugin object as 1st parameter
+        
+            my $s = $plugin->{CONTEXT}->stash;
+
+            # get Catalyst context from stash
+            my $c = $s->get( 'c' );
+            my $r = $c->request;
+
+            # hook method for adding standard keys - return the keys => value -hash by reference!
+            { domain => $r->uri->authority,
+              method => $r->method,
+              logged_in => $c->user_exists
+            };
+
+       }
+
+    Don't forget to add your subclass to the plugin base of your
+    TT2-configuration:
+
+            PLUGIN_BASE => [ 'Your::Application::Template::Plugin' ]
+
+    or declare it via the PLUGINS TT2-configuration option
+
+            PLUGINS => { TwoStage => 'Your::Application::Template::Plugin::TwoStage', ... }
+
+   Setting options as named parameters to USE or include()/process()
+    Any option set via subclassing or the TT configuration hash can be
+    overridden on plugin construction ( 'USE TwoStage()' ) or even on the
+    call of the include() or precompile()-methods at your will with only
+    restricted scope. Configuration provided on plugin construction will
+    apply to this specific plugin object only; configuration provided as
+    parameters to include()/process() only to the specific plugin object
+    call.
+
+    Sample code:
+
+       USE TwoStage( ttl => 1000 );
+       TwoStage.process( template => 'some', ttl => 0 );
+
+    Note! The following options can not be overridden this way: caching_dir,
+    tt_cache_size
+
+  Object hook methods
+   extend_keys
+    With this callback method it is possible to merge some default keys into
+    the template signature. The values of the keys introduced this way will
+    be dominated by the values of identical keys passed to process() or
+    include(). Return a hash reference mapping standard signature keys to
+    its values!
+
+    Have a look at the sample code above (section 'Setting options via
+    subclassing').
+
+    When setting options in the TT configuration hash simply add a reference
+    to your extend_keys-function with key 'extend_keys'. It will receive the
+    plugin object as the first parameter when being called.
+
+       Template->new( 
+            { ..., 
+              TwoStage => { 
+                    extend_keys => sub { 
+                            my $plugin = shift; 
+                                        
+                            return { key => $value };  
+                    }, ... 
+   
+              } 
+            } 
+       );
+
+  Avoiding disk cache overlaps
+    Having precompiled a BLOCK/template the TwoStage plugin tries to assign
+    an unique as possible identity to it - refered to as 'signature' later
+    -, and writes it to disk into the configured caching directory (see also
+    corresponding option 'caching_dir') using a SHA1 fingerprint of the
+    signature as its file name.
+
+   What is the unique signature made up of and how unique is it?
+    * template path
+
+      If the component processed with the TwoStage plugin is a template, the
+      template's path is included in the signature.
+
+      Template paths are relative to a template provider object configured
+      and might also be relative to some entry in the provider's
+      INCLUDE_PATH or an equivalent (this does not apply to providers
+      configured to serve templates by absolute path obviously).
+
+    * BLOCK name
+
+      If the component processed with the TwoStage plugin is a BLOCK its
+      name is included into the signature. In order to make the BLOCK name
+      template spanning unique we augment the BLOCK name with the values of
+      TT meta variables 'component.callers' and 'component.name' - which in
+      turn is the call stack of BLOCKs and templates to the BLOCK from the
+      outermost file the BLOCK was included in.
+
+      The uniqueness of BLOCK names achieved however is limited as it is
+      still relative to the template providers and their configuration (see
+      previous item).
+
+    * plugin class name
+
+      The precompiled BLOCK/template versions will be saved in a
+      subdirectory under the caching directory specified and named after the
+      class/package name of the TwoStage plugin.
+
+    * keys passed to process()/include()
+
+      See section 'CACHING / Caching with process() and include()' below.
+
+   Implications
+    * Unless you really know about the consequences always set the
+      configuration option 'caching_dir' to a filesystem directory specific
+      to the TwoStage plugin subclasses used or to the TT object in case the
+      plugin is used directly.
+
+    * Use the namespace option or add an equivalent key via the
+      extend_keys() callback function if you have dynamic entries in the
+      INCLUDE_PATH or an equivalent that reflects the current state auf the
+      INCLUDE_PATH.
+
+CACHING
+  Caching with plugin object methods process() and include()
+    Once the plugin object has been pulled into the template by means of the
+    'USE' directive, calling the plugin object methods include() or
+    process() against it will insert the BLOCK/template content with all the
+    precompilation and caching magic delivered by this plugin into the
+    template.
+
+    Named parameters of process/include:
+
+    *   template
+
+        Specify the name of the BLOCK/template to be processed/included into
+        the template here. Its name does not have to be template spanning
+        unique. The plugin takes care that the name is local to the template
+        it is defined in.
+
+    *   keys (optional)
+
+        Use this parameter in situations where you want to evaluate a
+        certain stash variable in the precompilation stage, and that
+        variable can take on only a limited set of discrete values in the
+        runtime stage but has considerable influence on the precompiled
+        versions. Examples for such variables might be: template language,
+        user preferences, user privileges, ...
+
+        Each combination of the values of the variables passed as 'keys'
+        parameter will produce a distinct precompiled version of the
+        BLOCK/template in question. Take care not to choose to many keys
+        with to many values in order to produce only a reasonable number of
+        precompiled versions.
+
+        If you find some keys are supposed to be added to each and every
+        call to process() or include() consider using the extend_keys() hook
+        method (see also above).
+
+    *   all of the available configuration options (optional)
+
+        For more on those options see section "Configuration Options" in
+        this documentation.
+
+    include() is exposing an identical behaviour as process() with the
+    exception that it does stash localisation in the runtime stage.
+
+  Reset cached content with purge()
+    In order to set back caching remove the cached templates from your
+    caching directory. Maybe a script to assist you in this task will be
+    shipped together with a future version of this plugin.
+
+    Using purge() you remove all files from the caching directory of the
+    class - use this to set back caching from within templates. This method
+    is used mainly in the self tests of this module. Maybe there are even
+    more useful applications for it - so it became a public class method.
+
+            [% TwoStage = USE TwoStage; 
+               TwoStage.purge;
+            %]
+
+  STAT_TTL and caching
+    Please note that the STAT_TTL configuration of TT will not work for
+    cached BLOCKs/templates as you make modifications to the "source"
+    BLOCKS/templates of those cached templates. You should turn off caching
+    instead using the plugin option 'dev_mode'.
+
+EXPORTS
+  TT configuration
+    The compiled plugin configuration is saved with key '_TwoStage' in the
+    main TT configuration hash.
+
+  TT stash
+    There is a temporary stash entry 'TwoStage_precompile_mode = 1;' in the
+    precompilation stage of template processing.
+
+HEURISTICS
+    In order to avoid common pitfalls when using this module you find some
+    tips and reminders below:
+
+    *   Templates used as fragments with runtime directives ought to be
+        controlled by the TwoStage plugin themselves! This ensures that such
+        templates can be included into another template either at runtime or
+        at precompilation stage.
+
+    *   Upstream keys from included templates ( fragments ) must be
+        incorporated into the 'keys' option of the including template!
+        Explanation: They have to be known ex ante meaning prior to a test
+        for a cached version of a template and can therefor not easily be
+        collected from upstream templates automatically!
+
+    *   Situation: A template A includes another template B while both are
+        using the TwoStage plugin. In addition you pass parameters on
+        invocation of INCLUDE, PROCESS to template B. Add those parameters
+        to the 'keys' option when calling the TwoStage plugin in template B
+        and use them at precompilation stage. This way you can include
+        template B at runtime and at precompilation at your will.
+
+    *   Ensure there are no BLOCK definitions inside the BLOCK to be
+        TwoStage processed! This is nothing specific to the TwoStage plugin
+        really, but is a common mistake. Simply put those BLOCKs outside the
+        BLOCK to be TwoStage processed. They will be visible to it anyway.
+
+    *   When altering option 'dev_mode' on plugin object construction or on
+        calls to the methods process()/include() one has to be cautious in
+        situations where calls to the TwoStage plugin methods
+        process()/include() are nested: Remember to alter the option in the
+        outermost call to achieve the desired effect!
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-template-plugin-twostage at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-TwoStage
+    >. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Template::Plugin::TwoStage
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Plugin-TwoStage>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Template-Plugin-TwoStage>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Template-Plugin-TwoStage>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Template-Plugin-TwoStage>
+
+ACKNOWLEDGEMENTS
+    This module was inspired to some extent by Perrin Harkins
+    <http://search.cpan.org/dist/Template-Plugin-Cache> and not least by my
+    CO2 footprint.
+
+SEE ALSO
+    Template::Plugin, <http://search.cpan.org/dist/Template-Plugin-Cache>
+
+AUTHOR
+    Alexander Kühne <alexk@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Alexander Kühne.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

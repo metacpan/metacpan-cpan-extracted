@@ -1,0 +1,23 @@
+---
+abstract: 'A simple error base class.'
+author:
+  - 'Pedro Figueiredo <me@pedrofigueiredo.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TryCatch-Error
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  MooseX::FollowPBP: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

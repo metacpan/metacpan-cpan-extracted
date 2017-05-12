@@ -1,0 +1,12 @@
+renderer: html
+title: Example Directory
+Date: Fri, 21 Oct 2011 10:40:46 -0500
+MIME-Version: 1.0
+
+This is a example body for a directory.
+
+This directory contains 30 example entries.
+
+Below are the last entries.
+
+[== $g->lastEntries; ==]

@@ -1,0 +1,23 @@
+Revision history for Text-JSON-Nibble
+
+1.01	02/05/2017 06:14
+	Updated changes file to correct format
+
+1.00	02/05/2015 06:14
+	Updated entire POD and module to be alot cleaner.
+
+0.05	Corrected documentation, DEPENDS and general layout
+	As subject, thank you Grinnz
+
+0.04	Final off-by-one error fix :)
+	Should all be good now
+
+0.03	Update 2
+	Fixed a small error with stream mode (ok a large one)
+
+0.02	Update 1
+	Added stream mode
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

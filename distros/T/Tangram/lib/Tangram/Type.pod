@@ -1,0 +1,101 @@
+=head1 NAME
+
+Tangram::Type - mapping individual fields
+
+=head1 DESCRIPTION
+
+Tangram's persistent type system is extensible, allowing you to mount
+your own types and make them persistent. All you have to do is to
+register your type and provide mapping code. See L<Tangram::Type::Extending>.
+
+Tangram comes with built-in support for the following types:
+
+=over
+
+=item B<Simple Scalar types>
+
+Supported are strings, integers, real numbers and dates.  More types
+of this ilk are easily added.
+
+C<string>, C<int>, C<real>: see L<Tangram::Type::Scalar>
+
+C<date>, C<time>, C<datetime>, C<dmdatetime>: see L<Tangram::Type/Date/Type/Date/DateTime>
+
+=item B<Compound Structure types>
+
+C<perl_dump>: see L<Tangram::Type::Dump::Perl>.  A C<perl_dump> structure may
+contain any structure which Data::Dumper can dump successfully.
+
+C<storable>: see L<Tangram::Type::Dump::Storable>.  Very much like C<perl_dump>,
+but implemented via the `Storable' serialisation engine.
+
+C<yaml>: see L<Tangram::Type::Dump::YAML>.  Very much like C<perl_dump>, but
+implemented via the `YAML' serialisation engine.  Doesn't currently
+work, due to inadequacies in the current Perl YAML implementation.
+
+B<NEW in Tangram 2.08>:
+
+C<idbif>: see L<Tangram::Type::Dump::Any>.  Like the above, but can combine
+multiple object properties into a single database column.
+
+=item B<`Flat' Array & Hash types>
+
+Note: these are only actually required if you need to be able to query
+on individual fields inside the array/hash - otherwise, the
+C<perl_dump> or C<idbif> mapping is a lot faster and more flexible.
+
+C<flat_array>: see L<Tangram::Type/Array/Scalar>
+
+C<flat_hash>: see L<Tangram::Type/Hash/Scalar>
+
+=item B<References to other objects>
+
+C<ref>: see L<Tangram::Type::Ref::FromMany> (implementing an B<N to 1> relationship,
+in which any object can be the referant)
+
+=item B<Sets of other objects>
+
+Set relationships are closest to the main type of relationship used in
+an RDBMS.  Avid CompSci students will know that the relational
+database model is based heavily on `Set Theory', which is a subset of
+a more general concept of `Categories' - generic couplings of a number
+of classes.
+
+In Perl space, these collections are represented via the Set::Object
+module.  Sets may not have duplicate elements, and cannot contain
+I<undef> values.
+
+C<set>: see L<Tangram::Type::Set::FromMany> (implementing an I<unordered> B<N to N>
+relationship, with all objects sharing a common base class)
+
+C<iset>: see L<Tangram::Type::Set::FromOne> (implementing an I<unordered> B<1 to
+N> relationship, with all objects sharing a common base class)
+
+=item B<Arrays of other objects>
+
+The addition to Sets, you can have `Arrays' of objects, represented by
+a standard Perl array in memory.  Arrays may contain I<undef> values
+(in the middle of the list), and the C<array> type may contain
+duplicates (ie, the same element present in seperate places in the
+list).
+
+C<array> : see L<Tangram::Type::Array::FromMany> (implementing an I<ordered> B<N to N>
+relationship, with all objects sharing a common base class)
+
+C<iarray>: see L<Tangram::Type::Array::FromOne> (implementing an I<ordered> B<1
+to N> relationship, with all objects sharing a common base class)
+
+=item B<Hashes of other objects>
+
+Much like the Array types, the Hash types are indexed via a string
+value, and represented as a Perl hash in memory.  These hashes may not
+contain I<undef> values (those are dropped).  The C<hash> type may
+contain duplicate elements.
+
+C<hash> : see L<Tangram::Type::Hash::FromMany> (implementing a I<keyed> B<N to N>
+relationship, with all objects sharing a common base class)
+
+C<ihash>: see L<Tangram::Type::Hash::FromOne> (implementing a I<keyed> B<1 to N>
+relationship, with all objects sharing a common base class)
+
+=back

@@ -1,0 +1,12 @@
+This is alpha release 0.206 of Term::Size::Win32.
+
+Term::Size::Win32 is a Perl module which provides a straightforward 
+way to get the size of the Win32 terminal (or window) on which 
+a script is running.
+
+NOTE: This distribution was made to install even in non-Win32
+systems. It is done by skipping all tests if Win32::Console
+is not installed. But it is not going to work in these cases.
+(The obscure reason to do this ...
+
+Adriano Ferreira <ferreira@cpan.org> May 21 2006

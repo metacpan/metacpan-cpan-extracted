@@ -1,0 +1,124 @@
+Revision history for Perl module Tangerine
+
+0.23 2016-10-23
+- Extend the testrequires hook with support for Test::Needs
+
+0.22 2016-02-25
+- Handle the version module regexes better and define our own simple fallback
+- Recommend List::Util 1.33+ but just use List::MoreUtils if it isn't available
+- Added support for the simple mixin class
+- Removed a useless debug print
+
+0.21 2016-01-25
+- Restore compatibility with perl 5.10.
+
+0.20 2016-01-22
+- Don't crash if the hook isn't really loaded
+- Switched to using List::Util
+- Ignore more false positives (e.g. use base __PACKAGE__->...)
+- Added support for Test::Class::Most
+- Added support for Role::Tiny::With
+- Various minor speed optimisation all over the place
+
+0.19 2015-08-20
+- HookData now allows to override the hook's own type.
+- Documentation for HookData was corrected and updated.
+- The anymoose hook was dropped; it didn't really make much sense.
+- This release also introduces a new hook, adding support for Module::Hook.
+- The inline hook was enhanced to properly detect Inline::Filters.
+- And finally, the list hooks now support Mojo::Base, mixin::with and Tk::widgets.
+
+0.18 2015-06-24
+- The Inline hook now supports language aliases.
+
+0.17 2015-05-15
+- Added [GithubMeta] to dist.ini, so the repo will be listed in the
+  dist metadata, and also [MetaJSON], so the release will include a
+  META.json file.  Thanks to Neil Bowers
+- Ported the testsuite to the new API introduced in 0.15
+
+0.16 2015-05-13
+
+- No longer ignore numeric module names.  Apparently it's allowed in
+  some situations.
+
+0.15 2015-04-24
+
+- The utility now lives in its own distribution, App::Tangerine
+- Renamed provides/requires/uses methods to package/require/compile;
+  the old method names are still available but consider them deprecated
+- Renamed the hook types respectively, from prov/req/use to
+  package/require/compile; this is an internal change
+- Mode accepts the new type names; also, these are now preferred
+- Drop Mo in favour of a simple object system, cutting the dependency chain
+- Simplified module name filtering so it actually works like it should
+- Fixed a nasty bug with explicit zero version requirements
+- Updated documentation
+
+0.14 2015-03-30
+
+ - Mooselike should now parse extends/with statements enclosed in parens
+   somewhat better
+
+0.13 2015-02-24
+
+ - Inline is now processed but its own specialized hook, hopefully supporting
+   all the import cases properly (for our purposes at least)
+ - Added support for Module::Runtime and its subs
+ - POD fixes
+
+0.12 2015-01-12
+
+ - Add support for Test::Requires and superclass
+ - Update copyright notices
+ - stripquotelike() now explodes anonymous hashes too
+ - The XXX hook now doesn't require YAML on empty imports
+ - `use Inline ()' now works somewhat better
+
+0.11 2014-11-26
+
+ - Moose-like support rewritten -- we now detect versions and avoid indirect
+   object method calls
+ - aliased fixed; it now only reports the first module in the list, duh
+ - We no longer report obvious filenames, really
+ - The required version of perl can be an integer as well, duh again
+ - List constructors spread over multiple lines are now processed correctly
+ - Package names ending in :: are now reported without this suffix
+
+0.10 2014-10-15
+
+ - New internal hook API
+ - Support for use_ok, require_ok, syntax_ok from various test distributions,
+   and for "use ok" added
+ - Inline support added
+ - XXX support added
+ - Minor performance improvements
+ - We no longer report reqs/uses containing non-module strings, like
+   filesnames or variables
+
+0.06 2014-10-06
+
+ - Restore compatibility with 5.10
+
+0.05 2014-09-29
+
+ - Release with proper POD
+
+0.04 2014-09-29
+
+ - Detect conditional and compound require statement correctly
+ - Support Any::Moose
+ - Support Moose-like inheritence (`with' and `extends')
+
+0.03 2014-09-08
+
+ - Add ExecDir to dist.ini to install bin/tangerine by default
+
+0.02 2014-09-05
+
+ - Switch to PP Mo
+ - Include the script's deps in prereqs
+
+0.01 2014-09-04
+
+ - This is the initial public release

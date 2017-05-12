@@ -1,0 +1,7 @@
+TODO for Test::Filename
+
+- add filename_like() and filename_unlike()
+
+- consider basename_is, etc.
+
+- consider abs_path_is, etc.

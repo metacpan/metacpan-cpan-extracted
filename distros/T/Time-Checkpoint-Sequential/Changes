@@ -1,0 +1,6 @@
+0.002     2011-03-06 02:34:55 Europe/London
+	Clean up warnings line to allow compilation on perl5.6
+
+0.001     2011-03-05 09:56:52 Europe/London
+	Initial release to CPAN.
+

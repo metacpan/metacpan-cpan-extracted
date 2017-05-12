@@ -1,0 +1,85 @@
+Revision history for Term-TermKey
+
+0.16    CHANGES:
+         * Meta-merge a configure-time dependency on Alien::libtermkey, as it
+           may be helpful on smoke-test machines.
+
+0.15    CHANGES:
+         * Updated for libtermkey 0.16:
+           + Support TERMKEY_TYPE_MODEREPORT and TERMKEY_TYPE_UNKNOWN_CSI
+
+0.14    CHANGES:
+         * Updated for libtermkey 0.15:
+           + Support TERMKEY_TYPE_POSITION
+         * Provide accessors on key event objects for mouse and position report
+           details
+
+0.13    CHANGES:
+         * Updated for libtermkey 0.14:
+           + Wrap termkey_{start,stop}, termkey_is_started
+
+0.12    CHANGES:
+         * Updated for libtermkey 0.13:
+           + Wrap termkey_new_abstract, termkey_{get,set}_buffer_size
+         * Optionally use Alien::libtermkey if it is available
+
+0.11    CHANGES:
+         * Updated for libtermkey 0.12:
+           + Wrap termkey_push_bytes function
+           + Support filehandle-less (abstract) instances
+
+0.10    CHANGES:
+         * Updated for libtermkey 0.10:
+           + Wrap TERMKEY_CANON_* flags and termkey_{get,set} functions
+        
+        BUGFIXES:
+         * Ensure that EINTR flag shadowing doesn't break ability to read the
+           RAW or UTF8 flags back out of the underlying object
+
+0.09    CHANGES:
+         * Updated for libtermkey 0.9:
+           + Wrap TERMKEY_RES_ERROR, TERMKEY_FLAG_EINTR
+         * Implement EINTR retry logic in XS wrappings so that 
+           PERL_ASYNC_CHECK() can dispatch safe signal handlers
+
+0.08    CHANGES:
+         * Updated for libtermkey 0.7:
+           + Added ->parse_key, ->parse_key_at_pos, ->keycmp
+         * Added $key->modifier_shift, modifier_alt, modifier_ctrl
+
+0.07    CHANGES:
+         * Updated for libtermkey 0.6 - two new flag constants
+
+        BUGFIXES:
+         * Keep a reference to the underlying terminal filehandle globref
+           to ensure it doesn't get destroyed too early
+
+0.06    CHANGES:
+         * Store underlying Term::TermKey object in Term::TermKey::Key event
+           objects; allows $key->format() shortcut
+         * More tests - test simple keypresses, use Test::Refcount
+
+0.05    CHANGES:
+         * Updated for libtermkey 0.5; addsmouse support
+         * Added 'use warnings' also to example scripts
+
+0.04    CHANGES:
+         * Use binmode :encoding(UTF-8) rather than :utf8
+         * Updated for libtermkey 0.3
+         * Added 'use warnings'
+         * Various small updates to keep CPANTS happy
+
+0.03    CHANGES:
+         * Added wrapping of termkey_keyname2sym().
+
+0.02    CHANGES:
+         * Quote async example inline, rather than refering to filename.
+        
+        BUGFIXES:
+         * Detect Ctrl-C in either upper or lowercase, to account for
+           libtermkey version 0.2.
+         * eval{}-wrap the initial call to ExtUtils::PkgConfig in case of
+           failure.
+
+0.01    First version, released on an unsuspecting world.
+

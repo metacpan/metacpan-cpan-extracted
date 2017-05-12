@@ -1,0 +1,33 @@
+---
+abstract: 'Load Tcl/Tk-Library to Temp-Directory'
+author:
+  - 'Juergen von Brietzke <juergen.von.brietzke@t-online.de>'
+build_requires:
+  Test::More: '0'
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tkx-TclTk-Bind
+provides:
+  Tkx::TclTk::Bind:
+    file: lib/Tkx/TclTk/Bind.pm
+    version: '1.400'
+requires:
+  Archive::Tar: '0'
+  Config: '0'
+  Const::Fast: '0'
+  English: '0'
+  Exporter: '0'
+  File::Remove: '0'
+  File::Spec: '0'
+  Modern::PBP::Perl: '0'
+  Tkx: '0'
+version: '1.400'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,22 @@
+TODO:
+    - Test for /mgc
+    - Automatically add /m to end of pattern?
+    - Add 'next' for repeating the same pattern
+
+0.0014 Tuesday June 01 09:48:31 PDT 2010:
+    - Change name to Text::Clip
+
+0.0013 Tuesday June 01 09:15:52 PDT 2010:
+    - Give Text::Clip rename notice
+
+0.0012 Friday May 07 11:43:20 PDT 2010:
+    - Do not automatically add "\n" to the end of the empty string
+    - Check for 0 length before splitting
+    - Add trimming (trim, trimmed)
+
+0.0011 Thursday May 06 07:39:26 PDT 2010:
+    - Improved regular expression handling
+    - Added separate .slurp method
+
+0.0010 Wednesday May 05 18:00:16 PDT 2010:
+    - Initial release

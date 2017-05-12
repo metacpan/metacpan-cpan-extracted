@@ -1,0 +1,33 @@
+Text::DHCPLeases Perl Module
+
+
+INSTALLATION
+
+You have two options:
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+or (if you have GNU make):
+perl Makefile.PL
+make
+make test
+make install
+
+
+DOCUMENTATION
+
+Documentation in POD format included with code.  Try the following:
+
+	 perldoc lib/Text/DHCPLeases.pm
+	 perldoc lib/Text/DHCPLeases/Object.pm
+	 perldoc lib/Text/DHCPLeases/Object/Iterator.pm
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2012, Carlos Vicente <cvicente@cpan.org>. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

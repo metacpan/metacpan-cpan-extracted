@@ -1,0 +1,41 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'List::Compare' => '0',
+                                      'Moo' => '0',
+                                      'PAUSE::Packages' => '0',
+                                      'PAUSE::Permissions' => '0',
+                                      'Parse::LocalDistribution' => '0',
+                                      'Pod::Usage' => '0',
+                                      'strictures' => '2'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::MockObject' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

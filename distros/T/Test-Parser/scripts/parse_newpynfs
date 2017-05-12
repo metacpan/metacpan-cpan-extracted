@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+# This script parses the output of an NewPyNfs run
+#
+# Usage:  parse_newpynfs my_newpynfs.log
+
+use strict;
+use warnings;
+use Test::Parser::newpynfs;
+
+my $parser = new Test::Parser::newpynfs
+    or die "Couldn't create Test::Parser::newpynfs object\n";
+
+$parser->parse($ARGV[0] or \*STDIN)
+    or die "Could not parse newpynfs log.\n";
+
+print "Executed:  ", $parser->num_executed(), "\n";
+print "  Passed:  ", $parser->num_passed(), "\n";
+print "  Failed:  ", $parser->num_failed(), "\n";
+print " Skipped:  ", $parser->num_skipped(), "\n";
+print "\n";
+
+foreach my $test (@{$parser->testcases()}) {
+    next unless defined $test->{'result'};
+    printf("%-12s  %s\n", 
+           ($test->{'name'} || '?'), 
+           $test->{'result'}
+           );
+}

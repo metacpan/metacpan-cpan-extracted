@@ -1,0 +1,45 @@
+Revision history for Test-Some
+
+0.2.1 2017-02-22
+  - Various refactoring.
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 165 insertions(+), 154 deletions(-)
+
+0.2.0 2015-12-19
+  [ ENHANCEMENTS ]
+    - Take in suggestions from Exodist to clean up the BEGIN dance. (GH#4,
+      Exodist)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 22 insertions(+), 18 deletions(-)
+
+0.1.0 2015-12-18
+  [ ENHANCEMENTS ]
+    - The module doesn't monkeypatch Test::More::subtest anymore, but just
+      wrap it within the namespace it's invoked in. (GH#1)
+    - The whitelist of tests to run can now be passed via the env variable
+      TEST_SOME. (GH#2)
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 85 insertions(+), 14 deletions(-)
+
+0.0.3 2015-11-05
+  - Class::Method::Modifiers wasn't picked as one of the dependencies by
+    dzilla.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 22 insertions(+), 2 deletions(-)
+
+0.0.2 2015-11-04
+  - Obfuscate 'package Test::More' so CPAN doesn't think we're claiming the
+    namespace.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 10 insertions(+), 1 deletion(-)
+
+0.0.1 2015-11-04
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 30 insertions(+)

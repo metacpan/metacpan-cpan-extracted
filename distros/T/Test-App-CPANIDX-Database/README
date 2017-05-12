@@ -1,0 +1,88 @@
+NAME
+
+    Test::App::CPANIDX::Database - generate a test database for
+    App::CPANIDX
+
+VERSION
+
+    version 0.06
+
+SYNOPSIS
+
+      use strict;
+      use warnings;
+    
+      use Test::App::CPANIDX::Database;
+    
+      # Create a test database in the current working directory
+    
+      my $tdb = Test::App::CPANIDX::Database->new();
+    
+      # Get the name of the test database file generated
+    
+      my $dbfile = $tdb->dbfile;
+    
+      # The test database will be automagically removed when the 
+      # object goes out of scope.
+
+DESCRIPTION
+
+    Test::App::CPANIDX::Database will generate a test database for use with
+    App::CPANIDX deriatives.
+
+    It generates a very simple DBD::SQLite database which contains a single
+    CPAN author FOOBAR, a single distribution Foo-Bar-0.01.tar.gz and a
+    single module Foo::Bar.
+
+CONSTRUCTOR
+
+    new
+
+      Generates a test database called cpanidx.db and returns an object
+      reference.
+
+      Without any parameters this database file will be located in the
+      current working directory and will be automatically removed when the
+      object falls out of scope.
+
+      You may provide parameters to affect this behaviour.
+
+      unlink
+
+	Set this to a false value to disable the automatic removal of the
+	test database file.
+
+          my $tdb = Test::App::CPANIDX::Database->new( unlink => 0 );
+
+      dir
+
+	Set this to an existing directory path where the database file
+	should be created.
+
+          my $tdb = Test::App::CPANIDX::Database->new( dir => '/some/funky/path' );
+
+METHODS
+
+    dbfile
+
+      Returns the name of the database file that was generated.
+
+SEE ALSO
+
+    App::CPANIDX
+
+    App::CPANIDX::Tables
+
+    DBD::SQLite
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

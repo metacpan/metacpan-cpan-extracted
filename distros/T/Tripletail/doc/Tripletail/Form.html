@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja-JP">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <title>Tripletail::Form - フォーム情報</title>
+  <link rel="index"     href="./" />
+  <link rel="up"        href="../" />
+</head>
+<body>
+
+<div class="pod_title_block">
+Tripletail::Form - フォーム情報
+
+
+</div>
+
+<!-- Begin TABLE_OF_CONTENTS -->
+<div class="pod_toc">
+<p>
+<strong><span class="pod_lang">TABLE OF CONTENTS</span></strong>
+</p>
+<ul>
+<li><a href="#NAME">
+<span class="pod_lang">NAME
+
+</span></a>
+</li>
+<li><a href="#SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a>
+</li>
+<li><a href="#DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a>
+<ul>
+<li><a href="#METHODS">
+<span class="pod_lang">METHODS
+
+</span></a>
+</li>
+</ul>
+</li>
+<li><a href="#SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a>
+</li>
+<li><a href="#AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a>
+</li>
+</ul>
+</div>
+<!-- End TABLE_OF_CONTENTS -->
+
+<!-- Begin CONTENT -->
+<!-- =encoding utf-8 -->
+
+<hr />
+<h1><a id="NAME">
+<span class="pod_lang">NAME
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">Tripletail::Form - フォーム情報
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="SYNOPSIS">
+<span class="pod_lang">SYNOPSIS
+
+</span></a></h1>
+
+<pre class="pod_verbatim"><code>  my $form = $TL-&gt;newForm;
+  $form-&gt;set(Command =&gt; 'DoDispList');
+
+  $TL-&gt;location(
+      $form-&gt;toLink('foo.cgi'));
+  # Location: http://....../foo.cgi?Command=DoDispList</code></pre>
+
+
+<hr />
+<h1><a id="DESCRIPTION">
+<span class="pod_lang">DESCRIPTION
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang">CGIへのクエリ情報を保持するクラス。
+一つのキーに対し、1つ以上の値を持つ。
+
+</span>
+</p>
+
+<h2><a id="METHODS">
+<span class="pod_lang">METHODS
+
+</span></a></h2>
+
+<dl>
+<dt><a id="X$TL->newForm"><span class="pod_lang"><code class="pod_iseq_C">$TL-&gt;newForm</code>
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form = $TL-&gt;newForm
+  $form = $TL-&gt;newForm(a =&gt; 1, b =&gt; [2, 20])
+  $form = $TL-&gt;newForm({a =&gt; 1, b =&gt; [2, 20]})
+  $form = $TL-&gt;newForm('http://foo.com/?a=1&amp;b=2&amp;b=20')</code></pre>
+
+<p>
+<span class="pod_lang">Tripletail::Form オブジェクトを作成。
+三番目の形式ではURLからクエリ情報がデコードされる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="const"><span class="pod_lang">const
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;const</code></pre>
+
+<p>
+<span class="pod_lang">このメソッドを呼び出すと、以後フォームデータの変更は不可能となる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="isConst"><span class="pod_lang">isConst
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;isConst</code></pre>
+
+<p>
+<span class="pod_lang">フォームオブジェクトに対して const メソッドが呼ばれたかどうかを返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="clone"><span class="pod_lang">clone
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $NewForm_obj = $form-&gt;clone</code></pre>
+
+<p>
+<span class="pod_lang">フォームオブジェクトの複製を返す。複製されたフォームオブジェクトは const でない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addForm"><span class="pod_lang">addForm
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;addForm($another_form)</code></pre>
+
+<p>
+<span class="pod_lang">フォームに別のフォームデータを追加する。同じキーが存在した場合、
+そのキーのデータは置き換えられる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getKeys"><span class="pod_lang">getKeys
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  @keys = $form-&gt;getKeys</code></pre>
+
+<p>
+<span class="pod_lang">フォームのキー一覧を返す。ここで返すキーには、アップロードされたファイ
+ルに付けられたものは含まない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="get"><span class="pod_lang">get
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $value = $form-&gt;get($key)
+  $value = $form-&gt;get($key, $joinstr)</code></pre>
+
+<p>
+<span class="pod_lang">指定したキーの値を $joinstr で結合して返す。$joinstr省略時は &quot;,&quot; が使用
+される。$key が存在しない場合は undef を返す。ファイルのキーを指定した
+場合も undef を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getValues"><span class="pod_lang">getValues
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  @values = $form-&gt;getValues($key)</code></pre>
+
+<p>
+<span class="pod_lang">指定したキーの値を配列で返す。
+$key が存在しない場合は () を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getSlice"><span class="pod_lang">getSlice
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  %data = $form-&gt;getSlice(@keys)</code></pre>
+
+<p>
+<span class="pod_lang">指定した複数キーに対して、キーと値が１つなら値そのものを、値が複数なら
+複数の値の配列へのリファレンスのペアを、ハッシュとして返す。
+存在しないキーは無視される。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getSliceValues"><span class="pod_lang">getSliceValues
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  @values = $form-&gt;getSliceValues(@keys)</code></pre>
+
+<p>
+<span class="pod_lang">指定した複数キーに対して、値が１つなら値そのものを、値が複数なら
+複数の値の配列へのリファレンスを対応させて、配列として返す。
+存在しないキーに対しては、それに対応する値はundefになる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="lookup"><span class="pod_lang">lookup
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $flag = $form-&gt;lookup($key, $value)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたキーに指定された値があれば、1を。そうでなければundefを返す。
+$keyが存在しなくてもエラーとはならない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="set"><span class="pod_lang">set
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;set($key =&gt; $value, $key2 =&gt; $value2, ...)
+  $form-&gt;set($key =&gt; \@value, $key2 =&gt; \@value2, ...)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたキーに、指定された値をセットする。
+以前の値は失われる。（上書きされる）
+
+</span>
+</p>
+
+</dd>
+<dt><a id="add"><span class="pod_lang">add
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;add($key =&gt; $value, $key2 =&gt; $value2, ...)
+  $form-&gt;add($key =&gt; \@value, $key2 =&gt; \@value2, ...)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたキーに、指定された値を追加する。
+以前の値は失われない。（追加される）
+
+</span>
+</p>
+
+</dd>
+<dt><a id="exists"><span class="pod_lang">exists
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $flag = $form-&gt;exists($key)</code></pre>
+
+<p>
+<span class="pod_lang">キーが存在すれば1を、そうでなければundefを返す。
+ファイルの確認には使えない(常に偽となる)。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="remove"><span class="pod_lang">remove
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;remove($key, $value)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたキーから、指定された値を取り除く。
+指定されたキーや値がない場合は何もしない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="delete"><span class="pod_lang">delete
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;delete($key)</code></pre>
+
+<p>
+<span class="pod_lang">指定されたキーを削除する。キーが存在しない場合は何もしない。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="existsFile"><span class="pod_lang">existsFile
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $flag = $form-&gt;existsFile($key)</code></pre>
+
+<p>
+<span class="pod_lang">アップロードキーが存在すれば1を、そうでなければundefを返す。
+ファイルが実際にアップロードされたかどうかに関わらず, キーの存在だけを
+判断します.
+
+</span>
+</p>
+
+</dd>
+<dt><a id="isUploaded"><span class="pod_lang">isUploaded
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $flag = $form-&gt;isUploaded($key)</code></pre>
+
+<p>
+<span class="pod_lang">キーに対応するファイルがアップロードされていれば1を、
+そうでなければundefを返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getFile"><span class="pod_lang">getFile
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $iohandle = $form-&gt;getFile($key, [$from, [$to]]);</code></pre>
+
+<p>
+<span class="pod_lang">キーに対応するIOハンドルを取り出す。ファイルアップロード時のみ取得でき
+る。ファイルアップロードではなかった場合や、キーが存在しない場合は
+undef を返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">第二引数が指定されている場合は、それを変換元の文字コードと見做して文字コード変換
+を行う。第三引数が指定されている場合は、それを変換先の文字コードと見做す。第三引
+数が省略された場合は UTF-8 が指定されたものと見做す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setFile"><span class="pod_lang">setFile
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;setFile($key, $iohandle);</code></pre>
+
+<p>
+<span class="pod_lang">指定したキーにIOハンドルをセットする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getFileKeys"><span class="pod_lang">getFileKeys
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  @keys = $form-&gt;getFileKeys();</code></pre>
+
+<p>
+<span class="pod_lang">アップロードされたファイルのキー一覧を返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getFileName"><span class="pod_lang">getFileName
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $filename = $form-&gt;getFileName($key)</code></pre>
+
+<p>
+<span class="pod_lang">キーに対応するファイル名を取り出す。ファイルアップロード時のみ取得でき
+る。ファイルアップロードではなかった場合や、キーが存在しない場合は
+undef を返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">ファイル名はベース名部分のみを返す(0.45以降)。
+(以前の動作に関しては <a href=".././Tripletail.html#compat_form_getfilename_returns_fullpath">&quot;compat_form_getfilename_returns_fullpath&quot; in Tripletail</a> 
+を参照。)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getFullFileName"><span class="pod_lang">getFullFileName
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $filename = $form-&gt;getFullFileName($key)</code></pre>
+
+<p>
+<span class="pod_lang"><a href="#getFileName">&quot;getFileName&quot;</a> と同様だが、(提供されている場合)フルパスで返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">(0.45 以降)
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setFileName"><span class="pod_lang">setFileName
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;setFileName($key =&gt; $value)</code></pre>
+
+<p>
+<span class="pod_lang">指定したキーにファイル名をセットする。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setLink"><span class="pod_lang">setLink
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;setLink('http://.../?a=1&amp;b=2')</code></pre>
+
+<p>
+<span class="pod_lang">URLからデコードして得られたキーと値のペアで、古い値を置き換える。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="addLink"><span class="pod_lang">addLink
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;addLink('http://.../?a=1&amp;b=2')</code></pre>
+
+<p>
+<span class="pod_lang">URLからデコードして得られたキーと値のペアを追加する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="setFragment"><span class="pod_lang">setFragment
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $form-&gt;setFragment($fragment)
+  $form-&gt;setFragment(undef)</code></pre>
+
+<p>
+<span class="pod_lang">URLのフラグメントを設定する。これはtoLinkの結果に影響する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="getFragment"><span class="pod_lang">getFragment
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $fragment = $form-&gt;getFragment;</code></pre>
+
+<p>
+<span class="pod_lang">URLのフラグメントを取得する。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="toLink"><span class="pod_lang">toLink
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $url = $form-&gt;toLink($base)</code></pre>
+
+<p>
+<span class="pod_lang">フォームデータをURLの形式に変換し返す。$baseを指定すると、そのURLの後に
+「?key=value」形式でデータを追加する。$baseを省略もしくはundefを指定すると、
+自分自身へのリンクを返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">URLが指し示す先はTLフレームワークで作成されたアプリケーションであると見なし、
+文字コード判別用のデータを付与する。
+TLフレームワークで作成されたアプリケーション以外へのリンクを作成する場合は、
+toExtLinkメソッドを利用すること。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">フラグメントが存在する場合は、それが #xxx の形でURLの中に組み込まれる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="toExtLink"><span class="pod_lang">toExtLink
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $url = $form-&gt;toExtLink($base)
+  $url = $form-&gt;toExtLink($base, $code)</code></pre>
+
+<p>
+<span class="pod_lang">フォームデータをURLの形式に変換し返す。$baseを指定すると、そのURLの後に
+「?key=value」形式でデータを追加する。$baseを省略もしくはundefを指定すると、
+自分自身へのリンクを返す。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">$codeで文字コードを指定すると、文字コードを変換してからURLエンコードする。
+指定しなかった場合は UTF-8 コードで出力する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">フラグメントが存在する場合は、それが #xxx の形でURLの中に組み込まれる。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="toHash"><span class="pod_lang">toHash
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>    my $hash = $form-&gt;toHash();
+    # $hash is like {a =&gt; 1, b =&gt; [2, 20]}</code></pre>
+
+<p>
+<span class="pod_lang">フォームデータを HASH ref の形式で返す。
+
+</span>
+</p>
+
+</dd>
+<dt><a id="haveSessionCheck"><span class="pod_lang">haveSessionCheck
+
+</span></a></dt>
+<dd>
+<pre class="pod_verbatim"><code>  $result = $form-&gt;haveSessionCheck($sessiongroup)
+  $result = $form-&gt;haveSessionCheck($sessiongroup, $issecure)</code></pre>
+
+<p>
+<span class="pod_lang">指定したセッショングループのセッションIDを利用したキーが現在フォームに埋め込まれているかを確認する。
+埋め込まれていれば、1を。いなければ、undefを返す。
+$Template-&gt;addSessionCheck とペアで使用する。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">指定したセッショングループのIniで設定するcsrfkeyを必要とする。未設定の場合エラーとなる。
+csrfkeyとセッションIDを利用してキーを作成する為、csrfkeyはサイト毎に違う値を用い、外部に漏れないようにする事。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">使用中のセッションの mode が 'double' の場合は、
+第2引数に 0 または 1 を指定すると、http側、https側を指定できる。
+省略した場合は、そのときの通信が http/https のどちらであるかによって選択される。
+
+</span>
+</p>
+
+</dd>
+</dl>
+
+
+<hr />
+<h1><a id="SEE_ALSO">
+<span class="pod_lang">SEE ALSO
+
+</span></a></h1>
+
+<p>
+<span class="pod_lang"><a href=".././Tripletail.html">Tripletail</a>
+
+</span>
+</p>
+
+
+<hr />
+<h1><a id="AUTHOR_INFORMATION">
+<span class="pod_lang">AUTHOR INFORMATION
+
+</span></a></h1>
+
+<ul>
+<p>
+<span class="pod_lang">Copyright 2006 YMIRLINK Inc.
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">This framework is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">このフレームワークはフリーソフトウェアです。あなたは Perl と同じライセンスの 元で再配布及び変更を行うことが出来ます。
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">Address bug reports and comments to: tl@tripletail.jp
+
+</span>
+</p>
+
+<p>
+<span class="pod_lang">HP : http://tripletail.jp/
+
+</span>
+</p>
+
+</ul>
+
+<!-- End CONTENT -->
+
+<div class="pod_title_block">
+Tripletail::Form - フォーム情報
+
+
+</div>
+
+<!-- Begin INDEX -->
+<hr />
+<h1><a id="INDEX"><span class="pod_lang">INDEX</span></a></h1>
+<div class="pod_idx_outer">
+<ul class="pod_idx">
+<li><a href="#X$TL->newForm">$TL-&gt;newForm</a></li>
+<li><a href="#AUTHOR_INFORMATION">AUTHOR INFORMATION</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#METHODS">METHODS</a></li>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#add">add</a></li>
+<li><a href="#addForm">addForm</a></li>
+<li><a href="#addLink">addLink</a></li>
+<li><a href="#clone">clone</a></li>
+<li><a href="#const">const</a></li>
+<li><a href="#delete">delete</a></li>
+<li><a href="#exists">exists</a></li>
+<li><a href="#existsFile">existsFile</a></li>
+<li><a href="#get">get</a></li>
+<li><a href="#getFile">getFile</a></li>
+<li><a href="#getFileKeys">getFileKeys</a></li>
+<li><a href="#getFileName">getFileName</a></li>
+<li><a href="#getFragment">getFragment</a></li>
+<li><a href="#getFullFileName">getFullFileName</a></li>
+<li><a href="#getKeys">getKeys</a></li>
+<li><a href="#getSlice">getSlice</a></li>
+<li><a href="#getSliceValues">getSliceValues</a></li>
+<li><a href="#getValues">getValues</a></li>
+<li><a href="#haveSessionCheck">haveSessionCheck</a></li>
+<li><a href="#isConst">isConst</a></li>
+<li><a href="#isUploaded">isUploaded</a></li>
+<li><a href="#lookup">lookup</a></li>
+<li><a href="#remove">remove</a></li>
+<li><a href="#set">set</a></li>
+<li><a href="#setFile">setFile</a></li>
+<li><a href="#setFileName">setFileName</a></li>
+<li><a href="#setFragment">setFragment</a></li>
+<li><a href="#setLink">setLink</a></li>
+<li><a href="#toExtLink">toExtLink</a></li>
+<li><a href="#toHash">toHash</a></li>
+<li><a href="#toLink">toLink</a></li>
+</ul>
+</div>
+<!-- End INDEX -->
+
+<div class="pod_title_block">
+Tripletail::Form - フォーム情報
+
+
+</div>
+
+</body>
+</html>

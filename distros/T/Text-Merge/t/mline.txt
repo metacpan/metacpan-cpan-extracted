@@ -1,0 +1,20 @@
+REF:Test1
+[[REF:Test1]]
+{This }REF:Test1{.}
+[[{This }REF:Test1{.}]]
+Some text before REF:Test1
+I love fire[[REF:Test1]]
+Some text before {this }REF:Test1{.}
+Some text before [[{this }REF:Test1{.}]]
+REF:Test1 Some text after is here.
+[[REF:Test1]]ites galore
+{This }REF:Test1{.}  Some text after.
+[[{This }REF:Test1{.}]]..some text after.
+Some text before REF:Test1.  Some text after.
+I love fire[[REF:Test1]]!!!
+Some text before {this }REF:Test1{.}  Some text after.
+Some text before [[{this }REF:Test1{.}]]..some text after.
+ACT:Mothers
+[[ACT:Mothers]]
+Some text before {this }ACT:Mothers{.}  Some text after.
+Some text before [[{this }ACT:Mothers{.}]]..some text after.

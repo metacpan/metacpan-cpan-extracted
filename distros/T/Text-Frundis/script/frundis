@@ -1,0 +1,76 @@
+#!/usr/bin/env perl
+# Copyright (c) 2015 Yon <anaseto@bardinflor.perso.aquilenet.fr>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+use utf8;
+use v5.12;
+use strict;
+use warnings;
+use open qw(:std :utf8);
+
+use Getopt::Std;
+use Text::Frundis;
+
+my %Opts;
+
+my $Usage = <<EOS;
+Usage:
+    $0 -T format [-as] [-o output-file] [file]
+
+See the man page frundis(1) for detailed information.
+EOS
+
+unless (getopts("T:so:a", \%Opts)) {
+    die $Usage;
+}
+
+die "frundis:fatal:-T option required\n$Usage"
+  unless defined $Opts{T};
+
+my $file = @ARGV ? shift @ARGV : undef;    # undef means "stdin"
+
+if ($Opts{a} and $Opts{T} eq "epub") {
+    warn "frundis:warning:-a option doesn't make sense when exporting to epub\n";
+}
+
+if ($Opts{T} eq "epub" and not defined $Opts{o}) {
+    die "frundis:fatal:when exporting to epub the name of the generated "
+      . "directory should be specified with the -o option\n";
+}
+
+if (    $Opts{T} eq "xhtml"
+    and not $Opts{a}
+    and not defined $Opts{o})
+{
+    die "frundis:fatal:when exporting to xhtml, unless -a is specified, "
+      . "-o option is mandatory\n";
+}
+
+my %options = (
+    target_format   => $Opts{T},
+    output_file     => $Opts{o},
+    standalone      => $Opts{s},
+    all_in_one_file => $Opts{a},
+    use_carp        => 0,
+    script          => 1,
+    input_file      => $file,
+);
+
+my $frundis = Text::Frundis->new;
+
+$frundis->process_source(%options);
+
+exit 0;
+
+# vim:sw=4:sts=4:expandtab

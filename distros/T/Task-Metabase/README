@@ -1,0 +1,32 @@
+NAME
+    Task::Metabase - Install Metabase server related modules
+
+VERSION
+    version 1.100760
+
+TASK CONTENTS
+  Core Metabase Modules
+   Metabase::Fact 0.006
+   Metabase::Client::Simple 0.005
+   Metabase 0.005
+  CPAN Testers Facts and Utilities
+   CPAN::Testers::Report 1.999
+   CPAN::Testers::Metabase 1.999
+   CPAN::Testers::Common::Utils 0.001
+  Support Modules
+    Optional but improve performance
+
+   JSON::XS 2.00
+PENDING INCLUSION:
+      Metabase::Web 0.003 # not yet on CPAN
+
+AUTHOR
+      David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2010 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

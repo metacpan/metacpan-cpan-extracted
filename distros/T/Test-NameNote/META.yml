@@ -1,0 +1,29 @@
+---
+name: Test-NameNote
+version: 0.04
+author:
+  - 'Nick Cleaton <nick@cleaton.net>'
+abstract: add notes to test names
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  File::Slurp: 0
+  File::Temp: 0
+  Test::Builder::Tester: 0
+  Test::More: 0
+  Test::Script::Run: 0
+requires:
+  Sub::Prepend: 0
+  Test::Builder: 0
+  perl: 5.006001
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Test::NameNote:
+    file: lib/Test/NameNote.pm
+    version: 0.04
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

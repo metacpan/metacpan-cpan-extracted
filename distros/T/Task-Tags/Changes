@@ -1,0 +1,30 @@
+0.06 2016-03-23T23:22:33+01:00
+ - Update Tags to 0.06 version.
+ - Update Tags::Output::Indent to 0.05 version.
+
+0.05 2015-10-30T08:42:53+01:00
+ - Add new modules to SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Tags to 0.04 version.
+ - Update Tags::Element to 0.02 version.
+ - Update Tags::Output::Indent to 0.04 version.
+ - Update Tags::Output::LibXML to 0.02 version.
+ - Update Tags::Output::PYX to 0.03 version.
+ - Update Tags::Output::Structure to 0.04 version.
+
+0.04 2015-08-24T12:52:27+02:00
+ - Add Tags::Output::LibXML 0.01 version.
+ - Improve SEE ALSO section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update Tags::Output::Structure to 0.03 version.
+
+0.03 2015-03-20T07:21:23+01:00
+ - Add Tags::Output::Structure 0.02 version.
+ - Update Tags::Output::PYX to 0.02 version.
+
+0.02 2015-03-17T11:04:19+01:00
+ - Add Tags::Output::Indent 0.01 version.
+ - Fix LICENSE AND COPYRIGHT section in doc.
+
+0.01 2015-01-20T22:02:17+01:00
+ - First version

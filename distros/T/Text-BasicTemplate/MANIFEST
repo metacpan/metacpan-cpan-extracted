@@ -1,0 +1,16 @@
+README
+INSTALL
+BasicTemplate.pm
+Changes
+Makefile.PL
+MANIFEST
+t/05-real.pl
+t/00simple.t
+t/01conditional.t
+t/02struct.t
+t/03func.t
+t/04pragma.t
+t/09compat.t
+t/05taint.t
+t/03operator.t
+

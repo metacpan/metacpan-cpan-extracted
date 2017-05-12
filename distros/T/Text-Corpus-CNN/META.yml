@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Text-Corpus-CNN
+version:            1.02
+abstract:           Make a corpus of CNN articles for research.
+author:
+    - Jeff Kubina (jeff.kubina@gmail.com)
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CHI:                  0.28
+    Data::Dump:           1.15
+    Date::Manip:          5.54
+    HTML::Encoding:       0.60
+    HTML::TreeBuilder::XPath:  0.11
+    Lingua::EN::Sentence:  0.25
+    Log::Log4perl:        1.24
+    LWP::Simple:          5.827
+    Path::Class:          0.16
+    Proc::Pidfile:        1.005
+    XML::LibXML:          1.69
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

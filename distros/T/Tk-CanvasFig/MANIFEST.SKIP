@@ -1,0 +1,28 @@
+# common files
+\bRCS\b
+^\.git\b
+\bChangeLog\b
+^MANIFEST\.bak
+\bMakefile$
+~$
+^Attic/
+\.gdbinit$
+\.class$
+\.old$
+\.xvpics/
+\.rcsignore(_rx)?$
+^blib/
+^MakeMaker-\d
+\.tar\.gz$
+patch\.gz$
+^pm_to_blib$
+\.ppd$
+# private common files
+\.ok2cgi$
+\.copynewer.SKIP$
+\.spp$
+^\.permissions$
+test-images/.*
+test.fig
+test2-images/.*
+test2.fig

@@ -1,0 +1,24 @@
+[ (knows)
+Person : http://psi.tm.bond.edu.au/astma/1.0/#psi-left
+Person : http://psi.tm.bond.edu.au/astma/1.0/#psi-right ]
+
+rho is-a Person
+bn: Robert Barta
+oc (mbox): mailto:rho@devc.at
+oc (mbox): mailto:drrho@cpan.org
+oc (mbox): mailto:rho@sf.net
+oc (mbox): mailto:robert.barta@tuwien.ac.at
+oc (mbox): mailto:robert.barta@arcs.ac.at
+
+lars-garshol is-a Person knows rho
+bn: Lars Garshol
+
+lars-heuer is-a Person knows rho
+bn: Lars Heuer
+oc (mbox): mailto:heuer@semagia.com
+
+az is-a Person knows rho
+bn: Alexander Zangerl
+oc (mbox): mailto:az@staff.bond.edu.au
+
+

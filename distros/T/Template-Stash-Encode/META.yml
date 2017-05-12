@@ -1,0 +1,16 @@
+---
+name: Template-Stash-Encode
+version: 0.01
+author:
+  - Toru Yamaguchi <zigorou@cpan.org>
+abstract: Encode charactor code on stash variables
+license: perl
+build_requires:
+  Encode: 0
+  Template: 0
+  Test::More: 0
+provides:
+  Template::Stash::Encode:
+    file: lib/Template/Stash/Encode.pm
+    version: 0.01
+generated_by: Module::Build version 0.2612

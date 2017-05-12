@@ -1,0 +1,238 @@
+--
+-- The following ASN.1 specification defines the abstract syntax for 
+--
+--        NRTRDE Version 2.1
+--
+-- The specification is structured as follows:
+--   (1) structure of the NRTRDE record
+--   (2) definition of the individual Call Events 
+--   (3) data items and groups of data items used within (2)
+--   (4) common, non-NRTRDE data types
+--
+-- It is mainly a translation from the logical structure
+-- diagrams. Where appropriate, names used within the 
+-- logical structure diagrams have been shortened.
+--
+
+NRTRDE-0201  DEFINITIONS IMPLICIT TAGS  ::=
+
+BEGIN 
+
+--
+-- Structure of a NRTRDE record 
+--
+
+Nrtrde ::= [APPLICATION 1] SEQUENCE
+{
+  specificationVersionNumber SpecificationVersionNumber OPTIONAL, -- *m.m.
+  releaseVersionNumber       ReleaseVersionNumber       OPTIONAL, -- *m.m.
+  sender                     Sender                     OPTIONAL, -- *m.m.
+  recipient                  Recipient                  OPTIONAL, -- *m.m.
+  sequenceNumber             SequenceNumber             OPTIONAL, -- *m.m.
+  fileAvailableTimeStamp     FileAvailableTimeStamp     OPTIONAL, -- *m.m.
+  utcTimeOffset              UtcTimeOffset              OPTIONAL, -- *m.m.
+  callEvents                 CallEventList              OPTIONAL,
+  callEventsCount            CallEventsCount            OPTIONAL
+}
+
+CallEventList ::=  [APPLICATION 2] SEQUENCE OF CallEvent
+
+CallEvent ::= CHOICE
+{
+  moc       Moc,
+  mtc       Mtc,
+  gprs      Gprs
+}
+
+--
+-- Structure of the individual NRTRDE call events
+-- Note: The Basic Call Information and Optional Call Information Groups
+-- are not present in the physical structure, rather
+-- they have been expanded into MOC, MTC and GPRS respectively.
+--
+
+Moc ::= [APPLICATION 3] SEQUENCE
+{
+  imsi                       Imsi                       OPTIONAL, -- *m.m.
+  imei                       Imei                       OPTIONAL,
+  callEventStartTimeStamp    CallEventStartTimeStamp    OPTIONAL, -- *m.m.
+  utcTimeOffset              UtcTimeOffset              OPTIONAL, -- *m.m.
+  callEventDuration          CallEventDuration          OPTIONAL, -- *m.m.
+  causeForTermination        CauseForTermination        OPTIONAL, -- *m.m.
+  serviceCode                ServiceCode                OPTIONAL, -- *m.m.
+  supplementaryServiceCode   SupplementaryServiceCode   OPTIONAL,
+  dialledDigits              DialledDigits              OPTIONAL,
+  connectedNumber            ConnectedNumber            OPTIONAL,
+  thirdPartyNumber           ThirdPartyNumber           OPTIONAL,
+  recEntityId                RecEntityId                OPTIONAL, -- *m.m.
+  callReference              CallReference              OPTIONAL,
+  chargeAmount               ChargeAmount               OPTIONAL,
+  servingNetwork             ServingNetwork             OPTIONAL,
+  msisdn                     Msisdn                     OPTIONAL,
+  locationArea               LocationArea               OPTIONAL,
+  cellId                     CellId                     OPTIONAL
+}
+
+Mtc ::= [APPLICATION 4] SEQUENCE
+{
+  imsi                       Imsi                       OPTIONAL, -- *m.m.
+  imei                       Imei                       OPTIONAL,
+  callEventStartTimeStamp    CallEventStartTimeStamp    OPTIONAL, -- *m.m.
+  utcTimeOffset              UtcTimeOffset              OPTIONAL, -- *m.m.
+  callEventDuration          CallEventDuration          OPTIONAL, -- *m.m.
+  causeForTermination        CauseForTermination        OPTIONAL, -- *m.m.
+  serviceCode                ServiceCode                OPTIONAL, -- *m.m.
+  callingNumber              CallingNumber              OPTIONAL,
+  recEntityId                RecEntityId                OPTIONAL, -- *m.m.
+  callReference              CallReference              OPTIONAL,
+  chargeAmount               ChargeAmount               OPTIONAL,
+  servingNetwork             ServingNetwork             OPTIONAL,
+  msisdn                     Msisdn                     OPTIONAL,
+  locationArea               LocationArea               OPTIONAL,
+  cellId                     CellId                     OPTIONAL
+}
+
+Gprs ::= [APPLICATION 5] SEQUENCE
+{
+  imsi                       Imsi                       OPTIONAL, -- *m.m.
+  imei                       Imei                       OPTIONAL,
+  callEventStartTimeStamp    CallEventStartTimeStamp    OPTIONAL, -- *m.m.
+  utcTimeOffset              UtcTimeOffset              OPTIONAL, -- *m.m.
+  callEventDuration          CallEventDuration          OPTIONAL, -- *m.m.
+  causeForTermination        CauseForTermination        OPTIONAL, -- *m.m.
+  accessPointNameNI          AccessPointNameNI          OPTIONAL, -- *m.m.
+  accessPointNameOI          AccessPointNameOI          OPTIONAL,
+  dataVolumeIncoming         DataVolumeIncoming         OPTIONAL, -- *m.m.
+  dataVolumeOutgoing         DataVolumeOutgoing         OPTIONAL, -- *m.m.
+  sgsnAddress                SgsnAddress                OPTIONAL, -- *m.m.
+  ggsnAddress                GgsnAddress                OPTIONAL, -- *m.m.
+  chargingId                 ChargingId                 OPTIONAL, -- *m.m.
+  chargeAmount               ChargeAmount               OPTIONAL,
+  servingNetwork             ServingNetwork             OPTIONAL,
+  msisdn                     Msisdn                     OPTIONAL,
+  locationArea               LocationArea               OPTIONAL,
+  cellId                     CellId                     OPTIONAL
+}
+
+-- 
+-- NRTRDE individual data items
+--
+
+AccessPointNameNI ::= [APPLICATION 16] AsciiString --(SIZE(1..63))
+
+AccessPointNameOI ::= [APPLICATION 17] AsciiString --(SIZE(1..37))
+
+BearerServiceCode ::= [APPLICATION 18] HexString --(SIZE(2))
+
+CallEventDuration ::= [APPLICATION 19] INTEGER
+
+CallEventsCount ::= [APPLICATION 20] INTEGER 
+
+CallEventStartTimeStamp ::= [APPLICATION 21] NumberString --(SIZE(14))
+
+CallingNumber ::= [APPLICATION 22] NumberString
+
+CallReference ::= [APPLICATION 23] INTEGER
+
+CauseForTermination ::= [APPLICATION 24] INTEGER
+
+CellId ::= [APPLICATION 47] INTEGER 
+
+ChargeAmount ::= [APPLICATION 25] INTEGER
+
+ChargingId ::= [APPLICATION 26] INTEGER
+
+ConnectedNumber ::= [APPLICATION 27] NumberString
+
+DataVolumeIncoming ::= [APPLICATION 28] INTEGER
+
+DataVolumeOutgoing ::= [APPLICATION 29] INTEGER
+
+DialledDigits ::= [APPLICATION 30] AsciiString
+
+FileAvailableTimeStamp ::= [APPLICATION 31] NumberString --(SIZE(14))
+
+GgsnAddress ::= [APPLICATION 32] AsciiString
+
+Imei ::= [APPLICATION 33] BCDString --(SIZE(7..8)) 
+
+Imsi ::= [APPLICATION 34] BCDString --(SIZE(3..8))
+
+LocationArea ::= [APPLICATION 48] INTEGER 
+
+Msisdn ::= [APPLICATION 49] BCDString --(SIZE(1..8))
+
+RecEntityId ::= [APPLICATION 35] AsciiString
+
+Recipient ::= [APPLICATION 36]  AsciiString --(SIZE(5))
+
+ReleaseVersionNumber ::= [APPLICATION 37] INTEGER
+
+Sender ::= [APPLICATION 38]  AsciiString --(SIZE(5))
+
+SequenceNumber ::= [APPLICATION 39] NumberString --(SIZE(7))
+
+ServiceCode ::= [APPLICATION 46] CHOICE 
+{
+    teleServiceCode      TeleServiceCode,
+    bearerServiceCode    BearerServiceCode
+}
+
+ServingNetwork ::= [APPLICATION 15]  AsciiString
+
+SgsnAddress ::= [APPLICATION 40] AsciiString
+
+SpecificationVersionNumber ::= [APPLICATION 41] INTEGER
+
+SupplementaryServiceCode ::= [APPLICATION 42] HexString --(SIZE(2))
+
+TeleServiceCode ::= [APPLICATION 43] HexString --(SIZE(2))
+
+ThirdPartyNumber ::= [APPLICATION 44] NumberString
+
+UtcTimeOffset ::= [APPLICATION 45] AsciiString --(SIZE(5))
+
+-- 
+-- Local timestamps are noted in the format
+--
+--     CCYYMMDDhhmmss
+--
+-- where CC  =  century  ('20',...)
+--       YY  =  year     ('00' - '99')
+--       MM  =  month    ('01', '02', ... , '12')
+--       DD  =  day      ('01', '02', ... , '31')
+--       hh  =  hour     ('00', '01', ... , '23')
+--       mm  =  minutes  ('00', '01', ... , '59')
+--       ss  =  seconds  ('00', '01', ... , '59')
+-- 
+--
+-- Non-tagged common data types
+--
+--
+-- Recommended common data types to be used for encoding:
+--
+-- The following definitions should be used for NRTRDE record creation 
+-- instead of the default specifications (OCTET STRING)
+--
+--    AsciiString ::= VisibleString
+--
+--    HexString ::= VisibleString
+--
+--    NumberString ::= NumericString
+--
+
+AsciiString ::= OCTET STRING
+
+HexString ::= OCTET STRING
+
+NumberString ::= OCTET STRING
+
+--
+-- The BCDString data type (Binary Coded Decimal String) is used to
+-- represent several digits from 0 through 9, a, b, c, d, e
+-- two digits per octet, f as filler when there is an odd number 
+-- of digits.
+--
+BCDString ::= OCTET STRING
+
+END

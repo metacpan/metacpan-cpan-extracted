@@ -1,0 +1,41 @@
+---
+abstract: 'Flip text upside-down using Unicode'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+  - 'Marcel Grünauer <marcel@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  File::Spec: 0
+  IPC::Run3: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+  Test::Script: 1.05
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-UpsideDown
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Exporter: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+  charnames: 0
+  open: 0
+  perl: 5.008
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doherty/Text-UpsideDown/issues
+  homepage: http://metacpan.org/release/Text-UpsideDown/
+  repository: git://github.com/doherty/Text-UpsideDown.git
+version: 1.22

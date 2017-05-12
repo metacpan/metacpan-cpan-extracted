@@ -1,0 +1,31 @@
+NAME
+
+Time::OlsonTZ::Download - Olson timezone database from source
+
+DESCRIPTION
+
+An object of this class represents a local copy of the source of
+the Olson timezone database, possibly used to build binary tzfiles.
+The source copy always begins by being downloaded from the canonical
+repository of the Olson database.  This class provides methods to help
+with extracting useful information from the source.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2010, 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

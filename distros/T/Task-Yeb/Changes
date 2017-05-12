@@ -1,0 +1,59 @@
+==================================================
+Changes from 1742-05-06 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------------
+version 20160218.000 at 2016-02-18 22:34:21 +0000
+-------------------------------------------------
+
+  Change: 339b90f1c59d1b786da13d04b7c7cf160237aae8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-02-18 23:34:13 +0000
+
+    Added .travis.yml 
+
+  Change: 95ecdeea5653cbaaa17b2da7147f9075f2b673b6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-02-18 23:33:57 +0000
+
+    Fixed a broken minimum version 
+
+-------------------------------------------------
+version 20140705.000 at 2014-07-05 20:56:30 +0000
+-------------------------------------------------
+
+  Change: 08d2dcf55b11e7f2bc623805aeb374caa42b598e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 22:56:30 +0000
+
+    Added DBIC plugin and updated versions 
+
+-------------------------------------------------
+version 20140324.000 at 2014-03-24 23:46:44 +0000
+-------------------------------------------------
+
+  Change: 59fc766e14a3624a75422df20f90130eb5f98e44
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 00:46:44 +0000
+
+    More groups, more plugins 
+
+-------------------------------------------------
+version 20140322.000 at 2014-03-22 22:54:36 +0000
+-------------------------------------------------
+
+  Change: 5fb223bbbca50c40a00e863e6530e962a1a2ac91
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 23:54:36 +0000
+
+    First release 
+
+  Change: a19d948f40ee54eeefef02ce8910c8b4bfe286f8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 23:46:20 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

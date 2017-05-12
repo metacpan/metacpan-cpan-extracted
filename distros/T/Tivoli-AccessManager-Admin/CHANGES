@@ -1,0 +1,18 @@
+Version 1.10 Changes: 
+  o Support for max_concur_session added.  This includes requisite changes in
+    the Context and User module and their tests.
+  o Significantly enhanced coverage testing -- everything is as close to 100%
+    as I can make it.
+  o Some fixpack changed the policy methods such that I have to provide a
+    valid number even if I am disabling the policy.  The code has been
+    modified to reflect this.
+  o Added a TAG to the test scripts to make running my coverage tests easier.
+  o Created the test file for Objectspace.
+  o Documentation added fo qop, tod, warnmode, attributes and exists to POP
+  o Changed all the calls in SSO::Web to use "desc" as the key for
+    description.
+  o Added name() method to Server
+  o Removed several redundant or otherwise useless error traps
+  o The output from a full coverage run has been included.  This is mostly for
+    my own benefit, so I can tell if a bug is something new or something I
+    never noticed.

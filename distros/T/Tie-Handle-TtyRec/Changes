@@ -1,0 +1,19 @@
+Revision history for Tie-Handle-TtyRec
+
+0.04    2012-03-06
+        allow streaming to named pipes (Jesse Luehrs)
+        allow appending (Jesse Luehrs)
+        fix error message (Jesse Luehrs)
+        allow syswrite to work on these handles (Jesse Luehrs)
+
+0.03    Sun Jun 14 14:59:00 2009
+        Modernize the dist
+
+0.02    Thu Dec 13 09:58:48 2007
+        Localize $\ so we don't get unwanted characters in the ttyrec
+        Autoflush so we don't end on an incomplete frame
+        Make sure each frame has a length (ipbt gets cranky otherwise)
+
+0.01    Sun Nov 11 19:56:07 2007
+        First version, released on an unsuspecting world.
+

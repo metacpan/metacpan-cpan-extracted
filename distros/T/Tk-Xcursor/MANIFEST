@@ -1,0 +1,12 @@
+inc/Devel/CheckLib.pm
+.gitignore
+Changes
+Makefile.PL
+MANIFEST			This list of files
+README
+t/xcursor.t
+t/zzzcursor
+typemap
+Xcursor.pm
+Xcursor.xs
+META.yml                                 Module meta-data (added by MakeMaker)

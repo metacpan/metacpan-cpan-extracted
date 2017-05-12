@@ -1,0 +1,85 @@
+Revision history for Perl extension Text::KyTea
+
+0.44    Thu, 28 Feb 2013 12:00:13 +0900
+        - Compatibility with KyTea 0.4.4
+
+0.43    Wed, 09 Jan 2013 21:36:57 +0900
+        - Fixed typo
+
+0.42    Wed, 09 Jan 2013 18:29:15 +0900
+        - Added pron method
+        - Improved Makefile.PL
+
+0.41    Fri, 28 Sep 2012 17:10:46 +0900
+        - improved Makefile.PL
+
+0.40    Sun, 03 Jun 2012 20:48:11 +0900
+        (This version supports KyTea Ver.0.4.2 and later.)
+
+        - removed h2z option (KyTea Ver.0.4.2 and later support this function)
+          - removed dependencies on Data::Recursive and Lingua::JA::Regular::Unicode
+        - replaced Test::Extension with Test::Fatal
+
+0.31    Mon, 14 May 2012 19:25:21 +0900
+        - fixed documentation
+        - improved namespace pollutions
+
+0.30    Fri, 10 Feb 2012 18:23:29 +0900
+        - added h2z option (thanks to Shinsuke MORI of Kyoto University)
+        - added t/03_h2z.t, t/04_parse_h2z.t, t/08_exception.t
+        - modified typemap
+        - improved namespace pollution
+        - added train_kytea subroutine to Makefile.PL
+        - added dependency on Data::Recursive::Encode,
+        Lingua::JA::Regular::Unicode, Test::Exception
+
+0.23_1  Fri, 03 Feb 2012 10:28:57 +0900
+        - removed write_model_method
+        - updated model/test.mod from KyTea Ver.0.3.x model to KyTea Ver.0.4.x model
+
+0.23    Sun, 06 Nov 2011 09:27:14 +0900
+        - removed build dependency on Devel::CheckLib
+
+0.22    Sun, 06 Nov 2011 02:31:25 +0900
+        - fixed Makefile.PL
+        - fixed POD
+        - cleaned some redundant code
+
+0.21    Mon, 24 Oct 2011 16:58:57 +0900
+        - fixed POD
+
+0.20    Sun, 23 Oct 2011 22:31:54 +0900
+        - added options
+        - added write_model method
+
+0.13    Wed, 19 Oct 2011 12:32:58 +0900
+        - fixed leaktrace.t
+        - fixed typemap
+        - fixed parse.t
+        - changed test order
+
+0.12    Tue, 18 Oct 2011 14:41:55 +0900
+        - fixed typemap
+        - fixed parse.t
+
+0.11    Mon, 17 Oct 2011 19:20:40 +0900
+        - cleaned some redundant code
+
+0.10    Mon, 17 Oct 2011 03:03:27 +0900
+        - changed API
+        - fixed POD, Makefile.PL, basic.t
+        - added leaktrace.t, parse.t, model/test.mod, read_model method
+        - moved some files
+
+0.04    Sat, 17 Sep 2011 21:25:41 +0900
+        - fixed Makefile.PL
+
+0.03    Fri Sep 16 22:31:13 2011 +0900
+        - fixed collisions between C++ macros and functions defined by perl (thanks to perlcodesample)
+        - added valgrind.t
+
+0.02    Sun Sep 11 12:42:10 2011 +0900
+        - fixed pod (thanks to tokuhirom)
+
+0.01    Tue Sep  6 02:09:33 2011
+        - original version

@@ -1,0 +1,33 @@
+Text-CSV-Separator
+==================
+
+Description
+-----------
+This module provides a fast detection of the field separator character of a
+CSV file.
+
+Prerequisites
+--------------
+perl 5.008
+
+
+Installation
+------------
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+In Windows systems, use nmake or dmake instead.
+
+
+Copyright and license
+---------------------
+Copyright (C) 2006 by Enrique Nell
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

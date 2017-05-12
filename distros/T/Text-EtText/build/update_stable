@@ -1,0 +1,13 @@
+#!/bin/bash
+
+WEBDIR=/home/jm/ettext.taint.org
+
+vers=`build/get_version`
+
+build/update_devel
+# build/mkrpm
+cp $WEBDIR/devel/Text-EtText-$vers.tar.gz $WEBDIR/released/Text-EtText-$vers.tar.gz
+cp $WEBDIR/devel/Text-EtText-$vers.zip $WEBDIR/released/Text-EtText-$vers.zip
+# cp EtText-${vers}-1.noarch.rpm EtText-${vers}-1.src.rpm $WEBDIR/released
+
+( cd $WEBDIR/released ; cvs add *EtText* )

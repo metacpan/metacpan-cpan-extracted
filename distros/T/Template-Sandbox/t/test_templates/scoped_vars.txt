@@ -1,0 +1,6 @@
+Outer a = <: expr a :>, b = <: expr b :>
+Including inner file without setting a or b, but c=99.
+<: include included_scoped_vars.txt c=99 :>
+Including inner file with scoped vars a=12, b=42, c=98.
+<: include included_scoped_vars.txt a=12 b=42 c=98 :>
+Outer a = <: expr a :>, b = <: expr b :>

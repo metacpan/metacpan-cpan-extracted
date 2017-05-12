@@ -1,0 +1,87 @@
+0.13     2016-05-03
+
+- Really pass teamcity messages through directly. When running tests in
+  parallel these messages were still being buffered.
+
+
+0.12     2016-04-21
+
+* If any code prints a teamcity message directly, it passed through
+  immediately by the formatter, rather than being buffered. This lets you
+  issue progressMessage output from inside your test code.
+
+
+0.11     2016-04-20
+
+* This module now uses TeamCity::Message to generate messages, instead of
+  doing this with private internal code.
+
+
+0.10     2016-03-15
+
+* Previously a lot of test output (especially diagnostics from failures) could
+  end up being doubled in the output stream. As of this release all output is
+  now encoded as a TeamCity build message, and nothing should be printed
+  directly to STDOUT. This will change how some output appears in the build
+  log, but should overall be an improvement in clarity. Reported by Mark
+  Fowler. GitHub #5.
+
+
+0.09     2016-01-11
+
+* All TeamCity messages with name/value pairs now include a flowId value as
+  well. This is always the same as the name of the test file being run, which
+  works fine as long as you do not fork additional processes from inside a .t
+  file.
+
+
+0.08     2016-01-04
+
+* All TeamCity messages with name/value pairs now include a timestamp value as
+  well. This lets TeamCity calculate test length.
+
+
+0.05     2015-12-08
+
+* This release is nearly a rewrite from prior releases. Changes include:
+
+* Added tests for many different scenarios.
+
+* Made sure that this formatter works with skipped tests.
+
+* Made the formatter handle various test death scenarios cleanly.
+
+* Made sure that this formatter works with subtests and Test::Class::Moose.
+
+* Made the formatter hide deep recursion warnings triggered by Devel::Cover.
+
+* Made the formatter work when running tests in parallel.
+
+
+0.04    2009-09-09
+
+* Test diagnostics are now passed through to STDOUT and STDERR, and these will
+  be presented by TeamCity in the "details" for each test failure. However,
+  TeamCity strips out the newlines, so the presentation isn't very pretty.
+
+  The code for doing this is not very pretty either. TeamCity is sensitive
+  about the order of the messages is receives.  So all the diagnostic info has
+  to come between the testStarted and testFinished messages.  But with TAP, it
+  isn't easy to know where the test begins and ends.
+
+* It seems to work for now, but I'll probably re-write it in the near future.
+
+
+0.03    2009-07-30
+
+* Added descriptions to the NAME sections in POD.
+
+
+0.02    2009-07-30
+
+* Forgot to use 'eval' when loading optional modules.
+
+
+0.01    2009-07-30
+
+* Initial release on an unsuspecting world.

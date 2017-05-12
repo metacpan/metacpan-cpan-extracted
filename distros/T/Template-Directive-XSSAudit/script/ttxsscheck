@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+
+use Getopt::Long;
+
+use Template;
+use Template::Directive::XSSAudit;
+use Pod::Usage;
+
+my $help;
+my @libs;
+my @plugins;
+my @filters;
+
+GetOptions(
+    'help'     => \$help,
+    'lib=s'    => \@libs,
+    'plugin=s' => \@plugins,
+    'filter=s' => \@filters,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+foreach my $class (@plugins) {
+    eval "require $class";
+    warn($@) if $@;
+}
+
+my $tt_config = {
+    FACTORY => 'Template::Directive::XSSAudit',
+    ABSOLUTE => 1,
+    INCLUDE_PATH => \@libs,
+};
+my $tt = Template->new($tt_config);
+
+Template::Directive::XSSAudit->good_filters(
+    \@filters
+) if @filters;
+
+Template::Directive::XSSAudit->on_error(sub {
+    my ($context) = @_;
+    print Template::Directive::XSSAudit->event_parameter_to_string(
+        $context,
+        'on_error'
+    ), "\n";
+});
+Template::Directive::XSSAudit->on_filtered(sub {
+    my ($context) = @_;
+    print Template::Directive::XSSAudit->event_parameter_to_string(
+        $context,
+        'on_filtered'
+    ), "\n";
+});
+foreach my $file (@ARGV) {
+    $tt->process($file, {}, \my $out) || warn($tt->error());
+}
+
+exit;
+
+1;
+__END__
+
+=head1 NAME
+
+ttxsscheck - list potential XSS problems with a Template Toolkit file
+
+=head1 SYNOPSIS
+
+ Usage:
+   ttxsscheck [options] [files]
+
+ Options:
+   -h     (--help)       This help
+   -l DIR (--lib=DIR)    Library directory (INCLUDE_PATH) (multiple)
+   -p MOD (--plugin=MOD) Additional perl class names that you would
+                         like to load. Useful if you have custom
+                         filters. (multiple)
+   -f     (--filter)     Override what is considered a 'good' filter
+                         (multiple)
+
+ Examples:
+   # single file check -- setting INCLUDE_PATH to handle relative includes
+   # one or more of the 'html' or 'uri' filters must be used for the GET
+   # to be considered "good"
+   ttxsscheck -l /your/tt/root -f html -f uri -f other_filter /your/tt/root/index.tt
+  
+   # using xargs and find to do a whole bunch of TT files
+   find /your/tt/root-name '*.tt' | xargs ttxsscheck [options] 

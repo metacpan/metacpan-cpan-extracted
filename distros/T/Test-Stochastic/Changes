@@ -1,0 +1,6 @@
+Revision history for Perl extension Test::Stochastic.
+
+0.00_01  Sun Jan  8 11:01:33 2006
+	- original version; created by h2xs 1.23 with options
+		-A -B -X --name=Test::Stochastic -b
+

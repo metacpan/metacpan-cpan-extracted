@@ -1,0 +1,70 @@
+NAME
+    Template::Plugin::Group - Template plugin to group lists into simple
+    subgroups
+
+SYNOPSIS
+      # In your Template
+      [% USE rows = Group(cells, 3) %]
+  
+      <table>
+      [% FOREACH row IN rows %]
+        <tr>
+        [% FOREACH cell IN rows %]
+          <td class="[% cell.class %]">[% cell.content %]</td>
+        [% END %]
+        </tr>  
+      [% END %]
+      <table>
+
+DESCRIPTION
+    "Template::Plugin::Group" is a fairly simple (for now) module for
+    grouping a list of things into a number of subgroups.
+
+    In this intial implementation you can only group "ARRAY" references, and
+    they can only be grouped into groups of a numbered size.
+
+    In practical terms, you can make columns of things and you can break up
+    a list into smaller chunks (for example to chop a large lists into a
+    number of smaller lists for display purposes)
+
+METHODS
+  new [ $Context, ] \@ARRAY, $cols [, 'pad' ]
+    Although this is the "new" method, it doesn't really actually create any
+    objects. It simply takes an array reference, splits up the list into
+    groups, and returns the whole things as another array reference.
+
+    The rest you do normally, with normal Template Toolkit commands.
+
+    If there isn't a perfectly divisible number of elements normally the
+    last group will have less elements than the rest of the groups. If you
+    provide the optional parameter 'pad', the last group will be padded with
+    additional "undef" values so that it has the full number.
+
+TO DO
+    - Support grouping HASH references
+
+    - If everything in the list is an object, support group/sort by method
+
+    - Support complex multi-level grouping (I have code for this already,
+    but it needs to be rewritten and should probably be a separate plugin).
+
+SUPPORT
+    Bugs should be submitted via the CPAN bug tracker, located at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-Group>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <cpan@ali.as>
+
+COPYRIGHT
+    Copyright 2004 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

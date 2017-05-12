@@ -1,0 +1,49 @@
+1.151560  2015-06-04 20:34:32-07:00 America/Los_Angeles
+
+1.133260  2013-11-21 19:55:25 America/Los_Angeles Thu Nov 21 19:48:36 PST 2013
+    - Fixes to support Net::DNS >= 0.69 thanks to Greg Myran<gmyran@drchico.net>
+    - Lots of formatting changes
+
+1.132260  2013-08-13 21:15:05 America/Los_Angeles
+    - Additional automation using Dist::Zilla
+
+0.63 Tue Aug 13 20:07:45 PDT 2013
+    - Move to Dist::Zilla
+
+0.62 Wed Mar 20 19:28:40 PDT 2013
+    - Patch from Alvar Freude <alvar@a-blast.org> to pass optional arguments
+      to the resolver. https://rt.cpan.org/Public/Bug/Display.html?id=43269
+
+0.61 Sun Jan  4 20:06:39 CST 2009
+	- Fixed a test bug
+
+0.6 Sat Jan  3 22:08:57 CST 2009
+	- Brought testing into the 21th century.  :-)
+	- Added dependency on Tie::Cache
+
+0.5 Thu Feb 28 18:11:30 CST 2008
+	- Added caching patch courtesy of kevin brintnall <kbrint@rufus.net>
+	- Brought testing into the 20th century.  :-)
+
+0.41 Tue Jun 26 17:45:40 CDT 2001
+	- Missed a silly, simple bug in the constructor.  Fixed it.
+	- Fixed badly formatted POD
+	- Added POD section for 'all_fields' option.
+
+0.4 Sun Jun 17 00:05:19 CDT 2001
+	- Ability to set default field on a per-record type basis
+	- Simple dynamic updates
+	- Choose 'search' or 'query' lookups.
+
+0.3 Sat Jun 16 19:59:02 CDT 2001
+	- Ability to return all available record types, as supported by Net::DNS
+	- Ability to access any field of any record type.
+	- Ability to change arguments on the fly
+	- Fixed faulty reverse lookup code in the case of multiple return vals
+
+0.2 Wed Jun 13 00:30:56 CDT 2001
+	- Added ability to return record types besides A
+	- Added ability to return multiple records in a single query
+
+0.1 Fri Jun  8 23:57:14 CDT 2001
+	- original version;

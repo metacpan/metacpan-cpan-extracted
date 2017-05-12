@@ -1,0 +1,32 @@
+---
+abstract: 'Provides a bits_is() subroutine for testing binary data'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::Fatal: 0
+  Test::More: 0.88
+  Test::Tester: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Bits
+requires:
+  List::AllUtils: 0
+  Scalar::Util: 0
+  Test::Builder::Module: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Bits
+  homepage: http://metacpan.org/release/Test-Bits
+  repository: git://git.urth.org/Test-Bits.git
+version: 0.02
+x_authority: cpan:DROLSKY

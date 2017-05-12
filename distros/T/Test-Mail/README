@@ -1,0 +1,44 @@
+Test-Mail
+
+This module was written in 2001 to solve a problem I had at the time, and has
+sat unused and unloved ever since.  Recent versions (0.04 onwards) attempt to bring 
+it to a state which will actually install and run under the modern toolset.  However,
+no guarantee is made as to its continued usefulness, stability, etc.  In particular
+please note that the interface is subject to change in future versions.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Test::Mail
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Mail
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Mail
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Test-Mail
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Test-Mail
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Kirrily Robert
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

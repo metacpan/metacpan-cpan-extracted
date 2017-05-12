@@ -1,0 +1,7 @@
+Index: local/CPAN/SVN-Web/branches/svn-client/lib/SVN/Web/I18N.pm
+===================================================================
+--- local/CPAN/SVN-Web/branches/svn-client/lib/SVN/Web/I18N.pm  (revision 0)
++++ local/CPAN/SVN-Web/branches/svn-client/lib/SVN/Web/I18N.pm  (revision 1271)
+@@ -0,0 +1,117 @@
++package SVN::Web::I18N;
++

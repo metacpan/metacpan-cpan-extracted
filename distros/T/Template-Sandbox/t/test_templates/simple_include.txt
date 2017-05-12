@@ -1,0 +1,2 @@
+Including a simple include file.
+<: include included_simple.txt :>

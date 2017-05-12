@@ -1,0 +1,7 @@
+Revision history for Task-TravisCI-Cache
+
+0.002     2015-04-27 19:01:07 PDT-0700
+	* + Devel::Cover::Report::Coveralls
+
+0.001     2015-04-11 14:03:52 PDT-0700
+	* initial release

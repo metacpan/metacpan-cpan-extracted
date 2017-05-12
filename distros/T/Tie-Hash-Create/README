@@ -1,0 +1,86 @@
+Tie::Hash::Create                                             version   0.02
+
+- Extend Tie::ExtraHash, enables the tie-object to reflect the tied array
+============================================================================
+
+SYNOPSIS
+        package Tie::Hash::MyClass; ## Choose your name for MyClass !
+        use base Tie::Hash::Create;
+
+        sub TIEHASH
+        {
+            my $class = shift;
+            ..........................
+            bless [{},undef,,,,],$class;
+            # insert your stuff between the braces after "undef,"
+        }
+
+        # Optionally redefine other methods of Tie::Hash
+
+    ------------ From within another file -----------
+
+        use Tie::Hash::MyClass;
+
+        my $myHash = Tie::Hash::MyClass->newHASH(....);
+
+        # behaves as if
+
+        my $myHash; tie %$myHash,'Tie::Hash::MyClass',...;
+
+DESCRIPTION
+    Look at sections "Inheriting from Tie::ExtraHash" in Tie::Hash. Consider
+    an object, say $tob returned by tie. It is an array, primitive
+    hash-operations are carried out on the first field of this array, that
+    is $tob->[0], a reference to a hash. Surprisingly this hash reference
+    and the reference to the tied hash variable are not the same.
+
+    The purpose of this class is transmit to any derived class these
+    features:
+
+    1. Store the reference to the real tied hash in the object $tob. 2.
+    Define an accessor "$tob->c" to this hash. 3. Provide an operation
+    "newHASH" which manages a tie but returns a reference to the real tied
+    hash. This way the real hash-variable which appear as the first argument
+    of "tie" is omitted. Instead "newHASH" returns an anonymous reference to
+    this hash-object.
+
+    On the top of this file the package 'slot' defines a slot-name
+    "slot::HREF" which identify an index positions of an object. A derived
+    class could also define its own slot names. The choice of the index does
+    not matter, however if two sources of code could not be reused in one
+    class as each one stores data of different matters onto the same place,
+    then it is easy to change one name-value assignment in package 'slot'.
+    Of course the structure of an object created by the constructor must
+    meet such a change, this applies for any derived class too.
+
+  OPERATORS
+    *
+
+        Constructor
+                TIEHASH inherited from superclass "Tie::ExtraHash". Note
+                that the object returned by TIEHASH, the same as returned by
+                "tie" is different from the reference to the tied hash.
+
+        newHASH Calls the constructor TIEHASH, however returns the reference
+                identifying the tied Hash.
+
+        c (content operator)
+                Assume $tob is an object of "Tie::Hash::MyClass" which is a
+                subclass of "Tie::Hash::Create" and %H is the tied hash, so
+                that "$tob = tied %H". Then "$tob->c" evaluates to "\%H".
+
+SEE ALSO
+    A Sample class derived from "Tie::Hash::Create" is Tie::Hash::KeysMask.
+
+PREREQUISITES
+    This module requires these other modules and libraries:
+    "Tie::Hash",<Tie::ExtraHash>
+
+AUTHOR
+    Josef Schönbrunner <j.schoenbrunner@onemail.at>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2005 by Josef Schönbrunner This library is free software;
+    you can redistribute it and/or modify it under the same terms as Perl
+    itself, either Perl version 5.8.7 or, at your option, any later version
+    of Perl 5 you may have available.

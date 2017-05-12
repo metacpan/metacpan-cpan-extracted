@@ -1,0 +1,27 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Text/Diff/Parser.pm
+scripts/cover-diff
+t/00_compile.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/10_ctor.t
+t/15_accessor.t
+t/20_parse.t
+t/30_simplify.t
+t/double.diff
+t/easy.diff
+t/std-2.diff
+t/std-more.diff
+t/tripple.diff
+t/dbix-abstract.patch
+t/svn-one-line.diff
+t/one-line.diff
+t/zero-line.diff
+t/svn-zero-line.diff
+t/kernel-sub.diff
+t/mercurial.diff
+t/mysql.diff
+META.yml                                 Module meta-data (added by MakeMaker)

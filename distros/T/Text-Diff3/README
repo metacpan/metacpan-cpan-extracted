@@ -1,0 +1,30 @@
+Text-Diff3 version 0.10
+============================
+
+Perl module to compute three way diff from texts.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+In most cases, merge.pl and diff3 -m output same result without
+diff3 -m making conflict for same removing lines both 0.txt and 1.txt (why?).
+merge.pl does not treat conflict in such case.
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 MIZUTANI Tociyuki
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.

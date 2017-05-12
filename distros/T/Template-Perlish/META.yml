@@ -1,0 +1,36 @@
+---
+abstract: 'Yet Another Templating system for Perl'
+author:
+  - 'Flavio Poletti <polettix@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Perlish
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Template::Perlish:
+    file: lib/Template/Perlish.pm
+    version: '1.52'
+requires:
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/polettix/Template-Perlish/issues
+  homepage: https://github.com/polettix/Template-Perlish
+  repository: https://github.com/polettix/Template-Perlish.git
+version: '1.52'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'

@@ -1,0 +1,27 @@
+.Ch -nonum Prologue
+.Ch A first chapter
+.Tc -mini
+.\" useless "P":
+.P
+paragraph text.
+.Sh A first section
+paragraph text.
+.\" useless "P":
+.P
+.Ss A subsection
+paragraph text.
+.Ss Another subsection
+paragraph text. A reference to the subsection
+.Sx Another subsection .
+.Sx Another subsection
+.Sx -name "link text to Another subsection" Another subsection .
+.Sh Another section
+paragraph text.
+.Ch A second chapter
+paragraph text.
+.Sh A last section
+.Tc
+.Tc -summary
+.Tc -nonum
+.Tc -nonum -title "Title"
+.Tc -mini

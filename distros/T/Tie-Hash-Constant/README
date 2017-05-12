@@ -1,0 +1,38 @@
+README for Tie::Hash::Constant 0.01
+
+=head1 NAME
+
+Tie::Hash::Constant - make a hash return a constant for all its members
+
+=head1 SYNOPSIS
+
+  use Tie::Hash::Constant;
+  tie my %always_pie, 'Tie::Hash::Constant' => 'PIE!';
+  $always_pie{food} = "salad";
+  print "My favourite food is $always_pie{food}\n"; # prints "My favourite food is PIE!"
+  print "There is no $always_pie{spoon}\n";  # prints "There is no PIE!\n"; !!!
+
+
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+Copyright Richard Clamp 2004.  All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Tie::Hash
+

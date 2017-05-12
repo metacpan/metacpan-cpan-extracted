@@ -1,0 +1,12 @@
+
+DESCRIPTION
+       This widget provides a dynamic image that looks just like
+       a Mac OS 9 progress bar.  Packed around it are four
+       Frames, north, south, east and west, within which you can
+       stuff additional widgets. For example, see how Tk::Copy::Mac
+       uses several Labels and a CollapsableFrame widget to cre-
+       ate a reasonable facsimile of a Macintosh copy dialog.
+
+Steve Lidie
+2002/10/01
+sol0@lehigh.edu

@@ -1,0 +1,11 @@
+Revision history for Template-Plugin-Filter-HTMLScrubber
+
+0.03   Thr Dec  7 03:10:00 2006
+       Adjustment in Pod.
+
+0.02   Wed Dec  6 11:52:00 2006
+       Modify default base setting, adding scrub attribute rules.
+
+0.01   Mon Dec  4 21:11:54 2006
+       Initial release.
+

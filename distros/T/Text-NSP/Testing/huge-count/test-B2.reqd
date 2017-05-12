@@ -1,0 +1,3 @@
+Warning(huge-count.pl):
+        You can run count.pl directly on the single source file if don't
+        want to split the source.

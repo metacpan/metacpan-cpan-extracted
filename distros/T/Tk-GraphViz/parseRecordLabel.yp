@@ -1,0 +1,129 @@
+#
+# parseRecordLabel.yp
+# 
+#
+# 
+# Parse::Yapp grammar file. Used to create parser for the record node
+#   labels
+#
+%token		<i>	T_string 
+%left '{'
+%%
+
+rlabel		:	field  optMoreFields
+				{
+					shift;	
+					my ($arg1, $arg2) = @_;
+					my (@arg1, @arg2);
+					
+					# flatten any args
+					if( ref($arg1) eq 'ARRAY' ){
+						@arg1 = @$arg1;
+					}
+					else{
+						@arg1 = ($arg1);
+					}
+					if( ref($arg2) eq 'ARRAY' ){
+						@arg2 = @$arg2;
+					}
+					elsif(defined($arg2)){
+						@arg2 = ($arg2);
+					}
+					
+					return [ @arg1, @arg2 ];
+				}
+						
+		| 	/* empty */  
+		;
+
+optMoreFields   :	'|'  rlabel  { #print "rlabel = ".Data::Dumper::Dumper($_[2])." in optMoreFields\n";
+					return $_[2]; }
+		| 	/* empty */
+		;
+		
+field  		:	boxlabel         { return $_[1]; }
+		|	'{' rlabel '}'   { return $_[2]; }
+		;
+		
+boxlabel	:	optName T_string { return { $_[1] || '', $_[2] } ;  }
+		;
+
+optName		:	'<' T_string '>'  { return $_[2] }
+		|	/* empty */
+		;
+	
+
+%%
+
+
+
+sub Error {
+    my $parse = shift;
+    my($token)=$parse->YYCurtok;
+    my($value)=$parse->YYCurval;
+    my($expected)=$parse->YYExpect;
+
+    my $input = $parse->YYData->{INPUT};
+    
+    # Get rid of all but the first line
+    ($input) = split("\n",$input);
+
+    print "Parse Error, Got token/value '$token', '$value'; Expected token '$expected'\n";
+    print "Near line :\n".$input."\n";
+    exit(1);
+
+}
+
+sub Lexer {
+    my($parser)=shift;
+
+    my @expect = $parser->YYExpect;
+
+
+    # If at the end of the string, and expecting a T_string token
+    #   Return a null t_string
+    #   This enables strings like '<f0> 0x10ba8| <f1>' to be parsed
+    #   correctly
+    if( $parser->YYData->{INPUT} eq '' && @expect == 1 && $expect[0] eq 'T_string'){
+    	return('T_string','');
+    }
+    
+    defined($parser->YYData->{INPUT})
+    or  return('',undef);    
+
+
+	
+    for( $parser->YYData->{INPUT}){
+    	# Differnt Token Types
+	
+
+
+ 	# check for tokens '<>{} tokens (Whitespace OK)
+	if( s/^\s*([\<\>\{])//){  # <, > and { with whitespace before
+		return($1, $1);
+	}
+	if( s/^(\})\s*//){  # }  with whitespace after
+		return($1, $1);
+	}
+	if( s/^(\|)//){  # |  with no whitespace
+		return($1, $1);
+	}
+	
+
+	# T_string 
+	s/^(.*?)((?<!\\)[\>\{\|\}])/$2/s  # strings with embedded special characters (not backslashed)
+        	and return('T_string',$1);
+		
+	# End of string, return everything
+	s/(.+)//s
+		and return ('T_string', $1);
+		
+	
+	# Other stuff
+        s/^(.)//s
+                and return($1,$1);
+		
+	return('','');
+		
+  }
+ }

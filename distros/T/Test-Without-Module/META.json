@@ -1,0 +1,42 @@
+{
+   "abstract" : "Test fallback behaviour in absence of modules",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Without-Module",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "provides" : {
+      "Test::Without::Module" : {
+         "file" : "lib/Test/Without/Module.pm",
+         "version" : "0.20"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/test-without-module.git",
+         "web" : "https://github.com/Corion/test-without-module"
+      }
+   },
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 2.27202",
+   "x_static_install" : 1
+}

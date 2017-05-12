@@ -1,0 +1,291 @@
+=head1 NAME
+
+Tie::Hash::ReadonlyStack - Treat multiple hashes as a single hash and do not modify original hashes when assigning values
+
+=head1 VERSION
+
+This document describes Tie::Hash::ReadonlyStack version 0.2
+
+=head1 SYNOPSIS
+
+    use Tie::Hash::ReadonlyStack;
+
+    # %defaults could be a readonly hash, maybe from something like this: Readonly::Hash    my %defaults => ( ... );
+    # or maybe you just want to modify some values without blowing away a global default
+    my $tie_obj = tie my %config, 'Tie::Hash::ReadonlyStack', \%defaults;
+    
+    # load up any server specific configuration we have
+    $tie_obj->add_lookup_override_hash('local', \%server_specific_hash);
+    
+    # when we determine the user:
+    $tie_obj->add_lookup_override_hash('user', \%user_specific_hash);
+    
+    # when we go to run a given context:
+    $tie_obj->add_lookup_fallback_hash('context', \%context_specific_hash);
+    
+    # look for 'frobnigate' in  %user_specific_hash, %server_specific_hash, %defaults, %context_specific_hash
+    # returning the value of the first found, lets say it's current value is 1 which is inside %server_specific_hash
+    if ($config{'frobnigate'}) {
+        $config{'frobnigate'} += 5; # %server_specific_hash (actually, all of the hash's above) remains unchanged
+        print $config{'frobnigate'}; 
+        # this prints '6'  , 
+        # the tied hash '%config' holds the new value, the value is unchanged in the hashes making up %config
+    }
+
+    # context is ending so clean up:
+    $tie_obj->delete_lookup_hash('context');
+    
+    ...
+    
+    undef $tie_obj; # untie() caveat!
+    untie %config
+
+=head1 DESCRIPTION
+
+The tie via this module has 2 main behaviors.
+
+First, it treats a stack of hashes as a single unit similar to L<Tie::Proxy::Hash> (but without the "translation" mechanism and some other differences)
+
+This allows you to have your main hash and then assign hashes to look for the given key in either before or after the main hash.
+
+See the L</SYNOPSIS> for an example of that.
+
+Second, it allows you to use hashes that are readonly in said stack without fatal errors.
+
+For example, say you you have a hash created via, ironically enough,  L<Readonly>. If you try to assign to it:
+
+   Readonly::Hash    my %readonly => ( ... );
+   $readonly{'key'} = 'value'; # throws "Modification of a read-only value attempted at ..."
+
+or say you have a L<GDBM_File> file tied in readonly mode:
+
+  tie my %gdbm, 'GDBM_File', 'data.gdbm', &GDBM_READER, 0640;
+  $gdbm{'key'} = 'value'; # throws "gdbm store returned -1, errno 0, key "key" at ..."
+  print $gdbm{'key'}; # never gets here
+  print $gdbm{'abc'};
+
+You could wrap such assignments in an eval but not only is that cluttered the value is unchanged (sort of what "readonly" means ;p)
+
+Putting that hash into a Tie::Hash::ReadonlyStack hash allows you to assign new values without modifying the hash it came from.
+
+   tie my %gdbm, 'GDBM_File', 'data.gdbm', &GDBM_READER, 0640;
+   tie my %data, 'Tie::Hash::ReadonlyStack', \%gdbm;
+   $data{'key'} = 'value'; 
+   print $data{'key'}; # prints 'value'
+   print $data{'abc'}; # prints the value of 'abc' from the database
+
+Besides the fact that storing a new value won't trigger fatal errors on various sorts of readonly type hashes it also has another benefit:
+
+Sometimes a hash keys's value is used to calculate a new value and the new value is re-stored as a cacheing mechanism. 
+
+For example, with a L<Locale::Maketext> Lexicon hash: a key is looked up, compiled into an internal form, and re-stored as a reference, typically a SCALAR or CODE. L<Template::ToolKit> can do similar behavior. If your tied hash stored the new value in your database then the next time it is used, you'd probably get something like 'SCALAR(0x800ab0)' or 'CODE(0x800ab0)' instead of the string you expected.
+
+In short, keeping all new values internally as part of the 'Tie::Hash::ReadonlyStack' is a good thing because it:
+
+=over 4
+
+=item * keeps the orignal hashes unmodified (i.e. does not stomp on things you might not want stomped on)
+
+=item * will make readonly hashes not fatal when values are changed
+
+=item * allow values to be changed for local pruposes (i.e. as part of a calculate-then-cache mechanism)  
+
+=back 
+
+=head1 INTERFACE 
+
+This is just a normal tie(). The only argument after the name space is the single "main" hash.
+
+   tie my %hash, ' Tie::Hash::ReadonlyStack', \%main_hash;
+
+Others can be added or removed via the methods outlined below.
+
+=head2 tie object methods
+
+You get the tie object as the return value of tie() and tied()
+
+    my $tie_obj = tie my %hash, 'Tie::Hash::ReadonlyStack', \%main_hash;
+    
+or 
+
+   tie my %hash, ' Tie::Hash::ReadonlyStack', \%main_hash;
+   ...
+   my $tie_obj = tied(%hash);
+
+If you use the tie object make sure you clean it up before untie()
+
+(i.e. this is the untie() caveat mentioned in pretty much every tie related document, see L</"OBLIGATORY UNTIE CAVEAT">)
+
+   undef $tie_obj; # untie() caveat, undef any references before you untie it!
+   untie %hash;
+
+=head3 add_lookup_override_hash()
+
+Adds the hash to the stack before the "main" one.
+
+   $tie_obj->add_lookup_override_hash('identifier',\%hash);
+
+It will not add the "main" hash or an already existing one. If you want to replace a hash you must del_lookup_hash() first.
+
+If %hash is not tied then this happens:
+
+   $tie_obj->clear_compiled_cache(keys %hash)
+
+If it is tied (since keys() could possibly have a lot of wasted overhead *) then the new hash is checked for the existence of each compiled key which is deleted from the cache if it exists.
+
+If this behavior is undesireable with your tied hash you can call L</add_lookup_override_hash_without_clearing_cache()> and handle the cache however you need to via L</clear_compiled_cache()>
+
+* Imagine it is tied to a DB_File with ten million keys. keys() and each() would be very expensive for no advantage...
+
+=head3 add_lookup_override_hash_without_clearing_cache()
+
+Same as add_lookup_override_hash() except with out the cache clearing behavior.
+
+=head3 add_lookup_fallback_hash()
+
+Adds the hash to the stack after the "main" one.
+
+   $tie_obj->add_lookup_fallback_hash('identifier',\%hash);
+
+It will not add the "main" hash or an already existing one. If you want to replace a hash you must del_lookup_hash() first.
+
+=head3 del_lookup_hash()
+
+Remove the hash from the stack and remove any of its values that are in the cache 
+
+   $tie_obj->del_lookup_hash('identifier')
+
+Returns false if you try to remove the "main" hash.
+
+By default it won't do an exists() check, this is good because it will clean up any dangling bits leftover by bad manual intervention (but you wouldn't do that would you ;p).
+
+To make it return false when the hash being delted does not exist give it a second true argument:
+
+    # assuming $only_if_exists is true:
+    
+    if (!$tie_obj->del_lookup_hash('identifier', $only_if_exists)) {
+        print "The given hash isn't part of the stack, that sure is weird...";
+    }
+    else {
+        print "The given hash has been removed from the stack";
+    }
+
+=head3 clear_compiled_cache()
+
+This method empties the cache or un-caches a given list of keys. 
+
+    $tie_obj->clear_compiled_cache(); # remove all cached values
+    
+The 'no argument' form returns 1.
+
+    $tie_obj->clear_compiled_cache('foo','bar'); # remove 'foo' and 'bar' from the cache
+    
+The 'list of keys arguments' form returns the number of keys actually deleted or false if none of the given keys existed (and hence nothing was deleted)
+
+=head3 get_keys_not_in_stack()
+
+This returns a list of keys that were used but were not found in any of the hashes in the stack.
+
+That happens when you assign a value to a key that does not exist in any of the hashes in the stack:
+
+   $hash{'new_key'} = 42; # $tie_obj->get_keys_not_in_stack() would now include 'new_key'
+   
+   delete $hash{'new_key'}; # $tie_obj->get_keys_not_in_stack() would no longer include 'new_key'
+
+=head2 hash behavior
+
+fetching a value (e.g. using the $hash{'key'} or exists()) will:
+
+=over 4
+
+=item 1 look in the cache to see if we have it already
+
+=item 2 if the key is not in the cache it looks for the key in each hash in the stack of hashes in the proper order 
+
+=item 3 if we're fetching the value: in the first hash it exists in it will cache it and use that
+
+=back
+   
+Assigning a value will add the key and fetched value to the cache (i.e. not to any of the hashes in the stack)
+
+each(), keys(), values(), etc operate on tha cache of values you've accessed and assigned.
+
+That means that if you are tied to a database with ten million keys via a hash that gets them from the DB on demand instead of loading them all up at once and have only referenced 5 then your working hash has 5 keys
+
+If you delete() a key it deletes it from the cache but not from hashes in the stack.
+
+=head1 DIAGNOSTICS
+
+Throws no errors or warnings itself
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Tie::Hash::ReadonlyStack requires no configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+None.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-tie-hash-readonlystack@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 OBLIGATORY UNTIE CAVEAT
+
+See L<perltie/"The C<untie> Gotcha "> or L<perltie/"The C<untie> Gotcha"> depending on if the perdoc you get sent to has the broken-by-extra-space 'The untie Gotcha' header
+
+Note that this module doesn't (currently) define a destructor so we should be fine.
+
+=head1 SEE ALSO
+
+L<Tie::Proxy::Hash>, L<perltie>
+
+=head1 TODO
+
+review for efficiency improvements, especially memory
+
+? consider mechanism to mark certain hashes as "update this hash's value instead of the cache" ?
+
+review for additional tests, perhaps of object's structure and state at various points ?
+
+=head1 AUTHOR
+
+Daniel Muey  C<< <http://drmuey.com/cpan_contact.pl> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2009, Daniel Muey C<< <http://drmuey.com/cpan_contact.pl> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

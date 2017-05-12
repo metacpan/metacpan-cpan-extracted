@@ -1,0 +1,11 @@
+Revision history for TAP-Convert-TET
+
+0.2.1   2007-09-07
+        Removed required TAP::Parser version numbers which were causing
+        warnings against Test::Harness 2.64
+
+0.2     2007-06-03
+        Documentation tidying.
+
+0.1     2007-06-03
+        Initial release.

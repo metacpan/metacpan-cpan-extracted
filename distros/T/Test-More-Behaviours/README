@@ -1,0 +1,66 @@
+Test-More-Behaviours version 0.0.2
+
+This module was initially written by Antony Marcano when he was working with my team to help us practicing Test Driven Development.
+
+It doesn't do much but it helps keeping Test::More based tests organized and documented in a way that make sense.
+In addition, the set_up() and tear_down() mechanisms provided by JUnit was missed by Antony (who has a background in Java Development), so this feature has been added.
+
+This module has also been used and exercised during several Coding Dojos.
+ 
+More background information can be found on Antony Marcano's blog:
+ * http://www.testingreflections.com/node/view/5333
+ * http://www.testingreflections.com/node/view/5361
+
+
+HISTORY
+
+	- 0.0.4 - some cleanup
+	- 0.0.3	-	Made caller() ignore the wrapping sub to test code that use caller() like carp() (thanks to schwern)
+	- 0.0.2	-	Fixed syntax errors in login_recipe.t
+	- 0.0.1 - Renamed the BBC grown code Test::More::LikeXUnit into Test::More::Behaviours
+					- Packaged Test::More::Behaviours as a CPAN module
+					- Added a login_recipe.t test  as an example test
+					- Documented the API (first version, likely to be incomplete, may contains typo)
+
+SEE ALSO
+
+	Project home on github: http://github.com/rija/test-more-behaviours/tree/master
+
+BUGS
+
+none so far, but the module is at an early stage and not widely used.
+Please, feel free to report any bug to the maintainer:
+
+Rija Ménagé (rija.menage AT bbc.co.uk)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, British Broadcasting Corporation
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Text::Emoticon filter for Unicode emoticons",
+   "author" : [
+      "Nick Patch <patch@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Emoticon-Unicode",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.41"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::Emoticon" : 0,
+            "parent" : 0,
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Emoticon::Unicode" : {
+         "file" : "lib/Text/Emoticon/Unicode.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/patch/text-emoticon-unicode-pm5/issues"
+      },
+      "homepage" : "https://github.com/patch/text-emoticon-unicode-pm5",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/patch/text-emoticon-unicode-pm5.git"
+      }
+   },
+   "version" : "0.02"
+}

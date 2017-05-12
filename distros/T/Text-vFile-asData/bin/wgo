@@ -1,0 +1,232 @@
+#!/usr/bin/perl -w
+#
+# What's Going On.  Given one or more .ics files on the command line,
+# produces a text report showing what's happening in the next six weeks.
+#
+# This was my main reason for working on this -- I've been producing things
+# like this by hand for a mailing list of friends on and off for the past
+# six years, and was too lazy to automate the damn thing.
+#
+# To see it in action, try fetching the london.pm calendar from
+# http://london.pm.org/ical.ics, then run "perl wgo ical.ics"
+#
+# Nik Clayton, <nik@FreeBSD.org>
+
+use strict;
+
+use lib '../lib';
+use Text::vFile::asData;
+
+use DateTime;
+use DateTime::Span;
+use DateTime::Format::ICal;
+
+use IO::File;
+
+# Could use Lingua::*::Inflect, but it's overkill for a quick demo
+#                1  2  3  4  5  6  7  8  9  10
+my @inflect = qw(st nd rd th th th th th th th
+		 th th th th th th th th th th
+		 st nd rd th th th th th th th
+		 st);
+
+# Get the current time, and the time six weeks from now.  Then build a
+# DateTime::Span.  We'll test every event we find to see if it, or any of
+# it's recurrences, are inside this span.  If they are, we need to include
+# them in the output.
+#
+# Yes, start time and end time should be parameters to the script.
+my $start_dt = DateTime->now();
+my $end_dt = $start_dt + DateTime::Duration->new(weeks => 6);
+
+my $span = DateTime::Span->from_datetimes(start => $start_dt,
+                                          end   => $end_dt);
+
+my @cals = ();                  # List of refs returned by parse()
+
+my %events = ();                # Events we're interested in.  Key is
+                                # date/time formatted as an ICal string,
+                                # value is a list of events happening at
+                                # that time.
+
+foreach(@ARGV) {
+  push @cals, Text::vFile::asData->new->parse(IO::File->new($_));
+}
+
+foreach my $cal (@cals) {
+  foreach my $obj (@{ $cal->{objects}->[0]->{objects} }) {
+    next if $obj->{type} ne 'VEVENT';   # Not interested in non events
+
+    my %e = ();                         # Info about this event
+    my $p = $obj->{properties};         # The event's properties
+
+    next if ! defined $p->{SUMMARY}->[0]->{value};
+
+    $e{start} =
+      DateTime::Format::ICal->parse_datetime($p->{DTSTART}->[0]->{value});
+
+    if(defined $p->{DTEND}->[0]->{value}) {
+      $e{end} =
+        DateTime::Format::ICal->parse_datetime($p->{DTEND}->[0]->{value});
+      # iCal represents all-day events by using ;VALUE=DATE and setting
+      # DTEND=end_date + 1
+      $e{end}->subtract( days => 1 )
+        if $p->{DTEND}[0]{param}{VALUE} && $p->{DTEND}[0]{param}{VALUE} eq 'DATE'
+
+    } else {
+      $e{duration} =
+        DateTime::Format::ICal->parse_duration($p->{DURATION}[0]{value} || "PT1S" );
+      $e{end} = $e{start} + $e{duration};
+    }
+
+    $e{span} = DateTime::Span->from_datetimes(start => $e{start},
+                                              end   => $e{end});
+
+    $e{summary} = $p->{SUMMARY}->[0]->{value};
+    $e{desc}    = $p->{DESCRIPTION}->[0]->{value};
+
+    $e{desc} ||= '';
+
+    $e{summary} =~ s/\\(.)/$1/g;        # Backslash escape removal
+    $e{desc}    =~ s/\\(.)/$1/g;
+
+    # Handle event recurrences.  If there's a recurrence rule (RRULE), then
+    # use that.
+    if(exists $p->{RRULE}) {            # $e{recur} = DateTime::Set
+      $e{recur} =
+        DateTime::Format::ICal->parse_recurrence(recurrence => $p->{RRULE}->[0]->{value},
+                                                 dtstart => $e{start});
+    } else {
+      # If the event is a multi-day event then synthesise copies of the
+      # event for every day on which it occurs.
+      #
+      # Why?  Suppose you're looking at a 5 day span, and you have an
+      # event that starts on day 2 and finishes on day 4 (3 days in total).
+      # The ->iterator() considers that this is one occurence of the event,
+      # rather than 3.  So create recurrences so the iterator behaves in a
+      # more useful fashion.
+      $e{recur} =
+        DateTime::Set->from_recurrence(
+                                       recurrence => sub {
+                                         $_[0]->truncate(to => 'day')->add(days => 1);
+                                       },
+                                       span => $e{span});
+      $e{recur} = 
+	$e{recur}->union(DateTime::Set->from_datetimes(dates => [$e{start}]));
+    }
+
+    # Synthesise a flag that indicates that this is an all-day event.  Not
+    # sure if this is the correct way of detecting this, but it works so
+    # far...
+    $e{allday} =
+      exists $p->{DTSTART}->[0]->{param}->{VALUE} and
+        $p->{DTSTART}->[0]->{param}->{VALUE} eq 'DATE' ? 1 : 0;
+
+    # Check to see if it's in the time span we're interested in
+    if($e{recur}->intersects($span)) {
+      my $int_set = $e{recur}->intersection($span);
+
+      # Change the event's recurrence details so that only the events
+      # inside the time span we're interested in are listed.
+      $e{recur} = $int_set;
+      my $iter = $int_set->iterator();
+
+      while(my $dt = $iter->next()) {
+        $e{dt} = $dt;
+
+        # Save a copy of the event (es = event saved), and store it in
+        # the list of event refs keyed off the ICal date
+        my %es = %e;
+        push @{$events{ $dt->ymd() }}, \%es;
+      }
+    }
+  }
+}
+
+my $e;                          # Hash ref of event info
+my $last_ed = '';		# Last event date we processed
+
+foreach my $ed (sort keys %events) { # $ed = event date ('yyyy-mm-dd')
+  foreach $e (sort by_type_time @{$events{$ed}}) {
+    # Build the first part of the output line.  For the first event of the
+    # day include the date, month, and day abbreviation.  For subsequent
+    # events on the same day this is the empty string.  This makes for
+    # nicer output, as it's more obvious which events share a day.
+    if($ed ne $last_ed) {	# First event of the day
+      $e->{startstring} = sprintf("%2d %s (%s)",
+				  $e->{dt}->day(),
+				  $e->{dt}->month_abbr(),
+				  $e->{dt}->day_abbr());
+    } else {			# Second and subsequent events
+      $e->{startstring} = '';
+    }
+
+    $last_ed = $ed;
+
+    # If it's not an all day event then the first part of the summary is
+    # the time the event occurs
+    $e->{summary} = sprintf("%02d:%02d - %02d:%02d, %s",
+                            $e->{span}->start()->hour(),
+                            $e->{span}->start()->minute(),
+                            $e->{span}->end()->hour(),
+                            $e->{span}->end()->minute(),
+                            $e->{summary})
+      unless $e->{allday};
+
+    # If this is the second or subsequent appearance of a multi-day event,
+    # replace the description (if it exists) with a pointer to the first
+    # occurence of the description
+    if($e->{recur}->min()->ymd() ne $ed and $e->{desc} ne '') {
+      $e->{desc} = sprintf("See %d%s %s entry for details.",
+			   $e->{recur}->min()->day(),
+			   $inflect[$e->{recur}->min()->day() - 1],
+			   $e->{recur}->min()->month_abbr());
+    }
+
+    $e->{summary}  = punctuate($e->{summary}) . '  ' .
+      punctuate($e->{desc}) if $e->{desc} ne '';
+
+    write;
+  }
+}
+
+exit;
+
+sub by_type_time {		# For sorting lists of events
+  # Two events on the same day?  All day events come first
+  return -1 if $a->{allday} and ! $b->{allday};
+  return  1 if $b->{allday} and ! $a->{allday};
+
+  # If they're both all day events, sort by summary text
+  return $a->{summary} cmp $b->{summary} if $a->{allday} and $b->{allday};
+
+  # Otherwise, sort by start time
+  return $a->{dt} <=> $b->{dt};
+}
+
+# Try and make sure a string ends with sensible punctuation
+sub punctuate {
+  my $str = shift;
+  return '' if ! defined $str;
+  $str =~ s/\s*$//g;
+  $str .= '.' unless $str =~ /[\.\?!]$/;
+  return $str;
+}
+
+format STDOUT =
+@<<<<<<<<<<<  |  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$e->{startstring}, $e->{summary}
+~             |  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                $e->{summary}
+~             |  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                $e->{summary}
+~             |  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                $e->{summary}
+~             |  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                $e->{summary}
+~             |  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                $e->{summary}
+~             |  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                $e->{summary}
+              |
+.

@@ -1,0 +1,3 @@
+This file has UNIX line endings.
+Line 2
+Line 3

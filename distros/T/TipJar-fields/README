@@ -1,0 +1,25 @@
+TipJar/fields version 0.01
+==========================
+Sugar for using array-based objects. Takes a list
+of fields as a use-time argument and created constant
+functions for each, and get and set accessors, assuming
+an array-based object.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+core perl 5
+
+COPYRIGHT AND LICENCE
+
+David Nicol/ TipJar LLC 2003 released GPL/AL
+
+

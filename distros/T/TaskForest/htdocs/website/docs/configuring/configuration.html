@@ -1,0 +1,165 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Configuration File</div>
+
+  <p>
+    The 'taskforest' and 'status' commands now accept a
+    ``<a href="/docs/configuring/options.html#config_file">--config_file=f</a>'' option. You can now specify commonly used options
+    in the config file, so you do not have to include them on the command
+    line. The config file should contain one option per command line. The
+    following sample config file shows the list of all supported options,
+    and documents their usage.
+  </p>
+
+  <div class="config_file"><pre><code>
+<span class="comments"># ########################################</span>
+<span class="comments"># SAMPLE CONFIG FILE</span>
+<span class="comments"># ########################################</span>
+<span class="comments"># These are the four required command line</span>
+<span class="comments"># arguments to taskforest</span>
+<a class="config_file" href="/docs/configuring/options.html#log_dir">log_dir</a>          = "t/logs"
+<a class="config_file" href="/docs/configuring/options.html#family_dir">family_dir</a>       = "/usr/local/taskforest/families"
+<a class="config_file" href="/docs/configuring/options.html#job_dir">job_dir</a>          = "/usr/local/taskforest/jobs"
+<a class="config_file" href="/docs/configuring/options.html#instructions_dir">instructions_dir</a> = "/usr/local/taskforest/instructions"
+<a class="config_file" href="/docs/configuring/options.html#run_wrapper">run_wrapper</a>      = "/usr/local/bin/run_with_log"
+
+
+<span class="comments"># the name of the directory that contains calendar files</span>
+<a class="config_file" href="/docs/configuring/options.html#calendar_dir">calendar_dir</a>    = "/usr/local/taskforest/calendars"
+
+<span class="comments"># wait this many seconds between iterations of</span>
+<span class="comments"># the main loop</span>
+<a class="config_file" href="/docs/configuring/options.html#wait_time">wait_time</a>       = 60
+
+<span class="comments"># stop taskforest at this time of day</span>
+<a class="config_file" href="/docs/configuring/options.html#end_time">end_time</a>        = 2355
+
+<span class="comments"># if set to 1, run taskforest once only and</span>
+<span class="comments"># exit immediately after that</span>
+<a class="config_file" href="/docs/configuring/options.html#once_only">once_only</a>       = 0
+
+<span class="comments"># print out extra logs - may be redundant,</span>
+<span class="comments"># due to log_threshold, below</span>
+<span class="comments"># THIS OPTION WILL BE DEPRECATED SOON.</span>
+<a class="config_file" href="/docs/configuring/options.html#verbose">verbose</a>         = 0
+
+<span class="comments"># by default assume that the --collapse option</span>
+<span class="comments"># was given to the status command</span>
+<a class="config_file" href="/docs/configuring/options.html#collapse">collapse</a>        = 1  <span class="comments"># change from previously</span>
+                     <span class="comments"># default behavior</span>
+
+<span class="comments"># by default assume that all repeating jobs</span>
+<span class="comments"># have the --chained=>1 attribute set</span>
+<a class="config_file" href="/docs/configuring/options.html#chained">chained</a>         = 1  <span class="comments"># change from previously</span>
+                     <span class="comments"># default behavior</span>
+
+<span class="comments"># log stdout and stderr to files</span>
+<a class="config_file" href="/docs/configuring/options.html#log">log</a>             = 1
+
+<span class="comments"># by default, log stdout messages with status >= this value.</span>
+<span class="comments"># This only effects stdout</span>
+<span class="comments"># The sequence of thresholds (smallest to largest) is:</span>
+<span class="comments"># debug, info, warn, error, fatal</span>
+<a class="config_file" href="/docs/configuring/options.html#log_threshold">log_threshold</a>   = "warn"
+
+<span class="comments"># The log_file and err_file names should NOT end with</span>
+<span class="comments"># '.0' or '.1' because then they will be mistaken for</span>
+<span class="comments"># job log files</span>
+<a class="config_file" href="/docs/configuring/options.html#log_file">log_file</a>        = "stdout"  
+<a class="config_file" href="/docs/configuring/options.html#err_file">err_file</a>        = "stderr"  
+
+<span class="comments"># currently unused</span>
+<a class="config_file" href="/docs/configuring/options.html#log_status">log_status</a>      = 0
+
+<span class="comments"># ignore family files whose names match these regexes</span>
+<a class="config_file" href="/docs/configuring/options.html#ignore_regex">ignore_regex</a>    = "~&#036;"
+<a class="config_file" href="/docs/configuring/options.html#ignore_regex">ignore_regex</a>    = ".bak&#036;"
+<a class="config_file" href="/docs/configuring/options.html#ignore_regex">ignore_regex</a>    = '\&#036;'
+
+<span class="comments"># There are two types of tokens in this example:</span>
+<span class="comments"># T - with 1 instance</span>
+<span class="comments"># U - with 2 instance</span>
+&lt;<a class="config_file" href="/docs/tokens.html">token</a> T&gt;
+  number = 1
+&lt;/token&gt;
+&lt;<a class="config_file" href="/docs/tokens.html">token</a> U&gt;
+  number = 2
+&lt;/token&gt;
+
+
+<span class="comments"># This is the number of times to automatically</span>
+<span class="comments"># retry running a job that fails </span>
+<a class="config_file" href="/docs/configuring/options.html#num_retries">num_retries</a>              = 1
+
+<span class="comments"># Wait these many seconds before automatically</span>
+<span class="comments"># retrying running a job that fails </span>
+<a class="config_file" href="/docs/configuring/options.html#retry_sleep">retry_sleep</a>              = 300
+
+
+<span class="comments"># This is the SMTP server that will be used to send </span>
+<span class="comments"># emails out when a job fails, for example</span>
+<a class="config_file" href="/docs/configuring/options.html#smtp_server">smtp_server</a>              = "localhost"
+
+<span class="comments"># The default SMTP port is 25.</span>
+<a class="config_file" href="/docs/configuring/options.html#smtp_port">smtp_port</a>                = 25
+
+<span class="comments"># In a production environment this should be 60 or 120</span>
+<a class="config_file" href="/docs/configuring/options.html#smtp_timeout">smtp_timeout</a>             = 60
+
+<span class="comments"># This is the SMTP envelope sender </span>
+<span class="comments"># (the text after "MAIL FROM:")</span>
+<a class="config_file" href="/docs/configuring/options.html#smtp_sender">smtp_sender</a>                = "user1@example.com"
+
+<span class="comments"># This is the email address that appears in the From: </span>
+<span class="comments"># mail header</span>
+<a class="config_file" href="/docs/configuring/options.html#mail_from">mail_from</a>                = "user1@example.com"
+
+<span class="comments"># If a user replies to a received email, the reply</span>
+<span class="comments"># will go to this address instead of the From: address. </span>
+<span class="comments"># This address is set in the Reply-To mail header.</span>
+<a class="config_file" href="/docs/configuring/options.html#mail_reply_to">mail_reply_to</a>            = "user2@example.com"
+
+<span class="comments"># This is the address to which bounces will be sent if </span>
+<span class="comments"># they occur at the SMTP server (as opposed to the </span>
+<span class="comments"># receiving Mail Transfer Agent).</span>
+<a class="config_file" href="/docs/configuring/options.html#mail_return_path">mail_return_path</a>         = "user3@example.com"
+
+<span class="comments"># This is the directory that stores the contents of</span>
+<span class="comments"># the emails that are sent by the system. </span>
+<a class="config_file" href="/docs/configuring/options.html#instructions_dir">instructions_dir</a>         = "instructions"
+
+<span class="comments"># When a job fails, emails are sent to this address</span>
+<a class="config_file" href="/docs/configuring/options.html#email">email</a>                    = "test@example.com"
+
+<span class="comments"># When a job fails, but is being automatically retried,</span>
+<span class="comments"># emails are sent to this address, as opposed to the </span>
+<span class="comments"># one stored in the 'email' setting.  If no_retry_mail </span>
+<span class="comments"># is set, then no email will be sent in this case</span>
+<a class="config_file" href="/docs/configuring/options.html#retry_email">retry_email</a>              = "test2@example.com"
+
+<span class="comments"># When a job fails, is automatically retried one or more </span>
+<span class="comments"># times and then suceeds, emails are sent to this </span>
+<span class="comments"># address, as opposed to any of the others.  If </span>
+<span class="comments"># no_retry_success_email is set, then no email will be sent</span>
+<span class="comments"># in this case.</span>
+<a class="config_file" href="/docs/configuring/options.html#retry_success_email">retry_success_email</a>      = "test3@example.com"
+
+<span class="comments"># If this is set to 1, then an email will not be sent </span>
+<span class="comments"># when a job fails and is being automatically retried.</span>
+<a class="config_file" href="/docs/configuring/options.html#no_retry_email">no_retry_email</a>           = 0
+
+<span class="comments"># If this is set to 1, then an email will not be sent </span>
+<span class="comments"># when a job fails, was automatically retried one or more </span>
+<span class="comments"># times and then finally succeeded.</span>
+<a class="config_file" href="/docs/configuring/options.html#no_retry_success_email">no_retry_success_email</a>   = 0
+
+  </code></pre></div>
+
+  
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

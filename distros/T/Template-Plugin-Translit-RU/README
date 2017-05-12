@@ -1,0 +1,35 @@
+Template-Plugin-Translit-RU version 0.05
+========================================
+
+DESCRIPTION
+
+Template Toolkit filter converting cyrillic text into
+transliterated and back.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Template
+
+IMPORTANT NOTE
+
+This is alpha release of module. Charset tables and other
+stuff could be changed in future versions. Use this module
+on your own risk. All suggestions are welcome.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Igor Lobanov. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Template/AsGraph.pm
+lib/Template/AsGraph/Context.pm
+t/00-load.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

@@ -1,0 +1,10 @@
+Test::FileReferenced.pm history
+
+Release 0.02 - 03 Jul 2010
+ - Improved handling of 'undef' in referenced files.
+ - When a key is missing in reference file, it will be initialized.
+ - Skip some tests on Windows (for now, will fix in next rev.)
+
+Release 0.01 - 04 Jun 2010
+ - Initial implementation
+

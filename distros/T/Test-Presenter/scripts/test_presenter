@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Test::Presenter;
+use Data::Dumper;
+
+my $re = new Test::Presenter;
+
+my $opt_debug = 0;
+my $db_loc = "/tmp/results";
+my $tmpl_loc = "/usr/share/Test-Presenter/templates";
+my $config_loc = "/usr/share/Test-Presenter/tm";
+
+$re->set_debug($opt_debug);
+$re->open_db($db_loc, "combo.dbxml");
+
+foreach my $doc (@ARGV) {
+    $re->add_doc($db_loc, $doc, "500");
+}
+$re->open_template($tmpl_loc, "xyplot.tmpl");
+$re->open_config($config_loc, "xy.config");
+$re->process();
+
+$re->close();
+
+

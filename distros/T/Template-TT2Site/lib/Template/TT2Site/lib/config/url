@@ -1,0 +1,32 @@
+[% # $Id: url,v 1.2 2004/12/05 11:57:46 jv Exp $ -%]
+[%
+
+# Dynamically adjust the locations depending on the depth of the
+# current template.
+
+up = "../";
+tname = template.name.replace("\\\\","/");
+depth = tname.split("/").size - 1;
+
+# Top of the site.
+site.realtop = up.repeat(depth);
+
+# Take language variants into account.
+site.lang = "";
+IF ( matches = tname.match("^([a-z][a-z])/") );
+    site.lang = matches.0;
+    depth = depth - 1;
+END;
+
+# Path to the language variant (i.e., the html files).
+site.topdir = up.repeat(depth);
+
+# Fix site hash.
+site.url = {
+    home    = "${site.realtop}index.html"
+    images  = "${site.realtop}images"
+    logo    = "${site.realtop}images"
+    css     = "${site.realtop}css"
+}
+
+-%]

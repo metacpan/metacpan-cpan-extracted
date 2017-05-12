@@ -1,0 +1,21 @@
+Revision history for Perl extension Tie::Array::PackedC.
+
+0.01  Wed Sep  3 01:25:35 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Tie::Array::PackedC
+
+0.03
+
+-Fixed bugs when assigning to an element past the end of the
+string. Array was not extended correctly when this happened.
+
+Also added the ->trim method. This prunes the internal representation
+of the structure down to used elements only. Any preextension of the
+underlying string is thrown away. This can be useful for recovering
+unused memory when you know that there will be no more store operations
+occuring.
+
+
+
+
+

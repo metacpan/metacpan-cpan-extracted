@@ -1,0 +1,78 @@
+Revision history for Perl module Text::TestBase
+
+0.13 2015-11-02T06:52:37Z
+
+    commit 3e71c2755a5af796da7c15a62af5071926a343d8
+    Author: Nathan Glenn <nathan.g.glenn@atr-trek.co.jp>
+    Date:   Mon Nov 2 13:04:29 2015 +0900
+
+        lines filter
+
+        Add a default filter for returning a data section as an array of
+        lines.
+
+    commit 7a718f3f4fd47c78474896224dcc68011826943c
+    Author: Nathan Glenn <nathan.g.glenn@atr-trek.co.jp>
+    Date:   Mon Nov 2 12:48:35 2015 +0900
+
+        add simple block filter
+
+        Allow the caller to get only blocks containing a given named section.
+
+0.12 2013-07-22T04:57:52Z
+
+    - Suppress warnings
+      (Hiroki Honda)
+
+0.11 2013-06-04T22:31:09Z
+
+    - get_section: return undefined value if the key does not exist.
+      AUTOLOAD: die if the block does not exists.
+      (tokuhirom)
+
+0.10 2013-05-07T05:22:43Z
+
+    - Fixed deps
+      (tokuhirom)
+
+0.09 2012-11-20
+
+    - fixed testing issue on older perls.
+
+0.08 2012-11-15
+
+    - added 'trim' filter
+    - added 'run_is_deeply'
+
+0.07 2012-11-06
+
+    - added support for 'ONLY', 'LAST', 'SKIP' for Test::Base::Less
+
+0.06 2012-11-06
+
+    - added 'run_is' function and 'uc' filter
+
+0.05 2012-11-06
+
+    - fixed line number version counting
+    - 0.04 is completely broken
+
+0.04 2012-11-06
+
+    [ THIS VERSION OF RELEASE IS BROKEN ]
+    - added line number counting feature for
+      Test::Base::Less, Data::Section::TestBase
+    - added 'run' function for Test::Base::Less
+
+0.03 2012-11-05
+
+    - use coderef as a filter for Test::Base::Less
+
+0.02 2012-11-05
+
+    - added Test::Base::Less
+
+0.01 2012-11-04
+
+    - original version
+

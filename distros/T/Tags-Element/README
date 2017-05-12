@@ -1,0 +1,103 @@
+NAME
+    Tags::Element - Element utilities for 'Tags'.
+
+SYNOPSIS
+     use Tags::Element qw(element);
+     my @tags = element($element, @data);
+
+SUBROUTINES
+    "element($element, @data)"
+             Common element helper for writing Tags code.
+             Returns array of element in Tags format.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Data::Printer;
+     use Tags::Element qw(element);
+
+     # Get example element.
+     my @tags = element('div', {
+             'id' => 'foo',
+             'class' => 'bar',
+     }, 'Foo', 'Bar');
+
+     # Dump to stdout.
+     p @tags;
+
+     # Output.
+     # [
+     #     [0] [
+     #         [0] "b",
+     #         [1] "div"
+     #     ],
+     #     [1] [
+     #         [0] "a",
+     #         [1] "class",
+     #         [2] "bar"
+     #     ],
+     #     [2] [
+     #         [0] "a",
+     #         [1] "id",
+     #         [2] "foo"
+     #     ],
+     #     [3] [
+     #         [0] "d",
+     #         [1] "Foo"
+     #     ],
+     #     [4] [
+     #         [0] "d",
+     #         [1] "Bar"
+     #     ],
+     #     [5] [
+     #         [0] "e",
+     #         [1] "div"
+     #     ]
+     # ]
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Tags::Element qw(element);
+     use Tags::Output::Raw;
+
+     # Get example element.
+     my @tags = element('div', {
+             'id' => 'foo',
+             'class' => 'bar',
+     }, 'Foo', 'Bar');
+
+     # Serialize by Tags.
+     my $tags = Tags::Output::Raw->new;
+     $tags->put(@tags);
+     print $tags->flush."\n";
+
+     # Output.
+     # <div class="bar" id="foo">FooBar</div>
+
+DEPENDENCIES
+    Exporter, Readonly.
+
+SEE ALSO
+    Tags
+        Structure oriented SGML/XML/HTML/etc. elements manipulation.
+
+    Task::Tags
+        Install the Tags modules.
+
+AUTHOR
+    Michal Špaček skim@cpan.org
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

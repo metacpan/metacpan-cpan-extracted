@@ -1,0 +1,6 @@
+#! tt debug=1 <<EOTEMPLATE
+Planned tests:
+[% FOREACH x IN reportdata('{ "suite.name" => "example-03-benchmarks" } :: //tap/summary/planned') -%]
+   [% x %]
+[% END %]
+EOTEMPLATE

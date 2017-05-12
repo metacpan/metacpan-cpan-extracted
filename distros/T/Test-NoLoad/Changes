@@ -1,0 +1,25 @@
+Revision history for Perl extension Test::NoLoad
+
+0.03    Sat Apr 13 18:06:15 JST 2013
+    [NEW FEATURE]
+        - support qr// for check_no_load
+        - added new function: dump_modules
+    [IMPROVEMENT]
+        - fixed test messages
+        - tiny refactors
+
+0.022   Sun Mar  3 01:07:26 JST 2013
+    [NO CODE CHANGES]
+        - fixed for distribution
+
+0.021   Fri Feb 15 12:02:19 JST 2013
+        - fixed POD: added `load_ok` method
+
+0.02    Fri Feb 15 11:26:30 JST 2013
+    [NEW FEATURE]
+        - added new method: load_ok($module)
+    [IMPROVEMENT]
+        - tiny refactoring
+
+0.01    Mon Feb 11 12:41:03 JST 2013
+        - original version

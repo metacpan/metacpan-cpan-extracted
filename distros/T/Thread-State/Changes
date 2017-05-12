@@ -1,0 +1,32 @@
+
+0.09  Sun Nov  5 23:09:41 2006
+	- modified tests for CPAN threads version (more than 1.34)
+
+0.08  Thu Nov  2 15:58:40 2006
+	- modified documentation for CPAN threads version 1.34
+	- method in_context was change to "wantarray"
+	- changed the behavior of is_joinable() and added is_not_joined_nor_detached()
+
+0.07  Tue Apr 25 13:54:53 2006
+	- modified ithreads type for CPAN threads version 1.23
+	  (Now can't use this module under CPAN threads 1.11 - 1.22)
+
+0.06  Tue Mar 28 11:20:52 2006
+	- added an accessor to thread priority
+
+0.05  Sun Mar 26 21:48:06 2006
+	- added coderef method
+	- removed a useless line from State.pm
+
+0.04  Thu Mar 23 11:42:28 2006
+	- fixed is_join() & is_joinable() on Win32 Perl5.8.0
+
+0.03  Sat Mar 18 07:33:03 2006
+	- modified for CPAN version threads (1.11)
+
+0.02  Fri Mar 10 10:28:36 2006
+	- added in_context() which returns created context (like wantarray).
+
+0.01  Wed Mar  8 06:59:43 2006
+	- original version;
+

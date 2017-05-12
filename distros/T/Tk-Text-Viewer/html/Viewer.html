@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Tk::Text::Viewer Version 0.95</title>
+<link rel="stylesheet" href="./html/docs.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#widget_methods">WIDGET METHODS</a></li>
+	<li><a href="#bindings">BINDINGS</a></li>
+	<li><a href="#unicode">UNICODE</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Tk::Text::Viewer - Simple Text Viewer</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Tk;
+    use Tk::Text::Viewer;
+    .....
+    my $mw = MainWindow-&gt;new;
+    my $t1 = $mw-&gt;Scrolled('Viewer', -wrap =&gt; 'none'......);
+    $t1-&gt;LabelText(&quot;Search:&quot;);# Change label text
+    or:
+    my $t1 = $mw-&gt;Viewer()-&gt;pack();
+    .....
+    $t1-&gt;Load($filename)); 
+Also:
+    viewer.pl [TextFile]</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Tk::Text::Viewer <strong>IS A</strong> text widget that can display text files under TK.
+It enable the user to search text and navigate in a Text widget.
+The reason for creating this module is that it doesn't require
+downloading of modules other that Tk;
+Look for widget options in <a href="/Tk/Text.html">the Tk::Text manpage</a>.</p>
+<p>A separate <em class="file">viewer.pl</em> program is included that can be used as a stand alone
+file browser.</p>
+<p>
+</p>
+<hr />
+<h1><a name="widget_methods">WIDGET METHODS</a></h1>
+<p>The <strong>Viewer </strong>widget also inherits all the methods provided by the generic
+ Tk::Widget and Tk::Text classes.</p>
+<p>The following additional method is available for viewer widgets:</p>
+<dl>
+<dt><strong><a name="load" class="item"><em>$text_view</em>-&gt;<strong>Load</strong>(<em>$filename</em>)</a></strong></dt>
+
+<dd>
+<p>Load file into the text widget.</p>
+</dd>
+<dt><strong><a name="labelconfig" class="item"><em>$text_view</em>-&gt;<strong>LabelConfig</strong>(string or hash ref)</a></strong></dt>
+
+<dd>
+<ul>
+<li><strong><code>$text_view</code>-&gt;<code>LabelConfig</code>(<em>&quot;Search:&quot;</em>)</strong>
+
+<p>Change label for the search entry field. You might want to change
+this label if the widget is used in a non English application.</p>
+</li>
+<li><strong><code>$text_view</code>-&gt;<code>LabelConfig</code>(<em>&quot;-cursor=&gt; 'dot'&quot;</em>)</strong>
+
+<p>Change one label widget option (for example cursor).</p>
+</li>
+<li><strong><code>$text_view</code>-&gt;<code>LabelConfig</code>(<em>{text=&gt;'Find:',-cursor=&gt;'dot',...}</em>)</strong>
+
+<p>Replace label widget options with your own set of options.
+<strong>Do not</strong>  change the 'Name' option of the label widget.
+See <a href="/Tk/Label.html">the Tk::Label manpage</a> for valid options</p>
+</li>
+</ul>
+</dd>
+<dt><strong><a name="entryconfig" class="item"><em>$text_view</em>-&gt;<strong>EntryConfig</strong>(string or hash ref)</a></strong></dt>
+
+<dd>
+<p>Change the entry widget options. Read <a href="#labelconfig"><code>LabelConfig</code></a> for information
+about parameters. See <a href="/Tk/Entry.html">the Tk::Entry manpage</a> for valid options.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="bindings">BINDINGS</a></h1>
+<p>For inherited bindings look <a href="/Tk/Text.html">the Tk::Text manpage</a>.
+Following are class specific bindings.</p>
+<dl>
+<dt><strong><a name="space" class="item">&quot;Space&quot;</a></strong></dt>
+
+<dd>
+<p>Clicking Space will move text one page ahead.</p>
+</dd>
+<dt><strong><a name="backspace" class="item">&quot;BackSpace&quot;</a></strong></dt>
+
+<dd>
+<p>Clicking BackSpace will move text one page up.</p>
+</dd>
+<dt><strong><a name="slash" class="item">&quot;Slash&quot;</a></strong></dt>
+
+<dd>
+<p>Clicking &quot;/&quot; will open text search window.</p>
+</dd>
+<dt><strong><a name="n" class="item">&quot;n&quot;</a></strong></dt>
+
+<dd>
+<p>Clicking &quot;n&quot; will move to next search match.</p>
+</dd>
+<dt><strong><a name="n" class="item">&quot;N&quot;</a></strong></dt>
+
+<dd>
+<p>Clicking &quot;N&quot; will move to next previous match.</p>
+</dd>
+<dt><strong><a name="control_a" class="item">&quot;Control-A&quot;</a></strong></dt>
+
+<dd>
+<p>Find all occurrences of searched item.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="unicode">UNICODE</a></h1>
+<p>If <strong>$ENV{LANG}</strong> is a 'UTF-8' locale, file load will assume &quot;utf8&quot; characters in file.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="#">viewer.pl</a> - A utility using <code>Tk::Text::Viewer</code> included with this package.</p>
+<p><a href="/Tk/Text.html">Tk::Text</a>, <a href="/Tk/Widget.html">Tk::Widget</a>, <a href="/Tk/More.html">Tk::More</a>, Tk documentation.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p><code>Tk::Text::Viewer</code> was written by Oded S. Resnik &lt;<a href="mailto:raz@raz.co.il">raz@raz.co.il</a>&gt; in 2003.</p>
+<p><strong>Copyright (c) 2003-2004 RAZ Information Systems All rights reserved</strong>.
+<em><a href="http://www.raz.co.il/">http://www.raz.co.il/</a></em></p>
+<p>You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file</p>
+
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+Text/Orientation version 0.01
+========================
+
+This module enables one to rotate text. For example, Chinese can be written downwards or leftwards, but it is usually not convenient to do so on one's computer. With Text::Orientation one can easily deal with this problem.
+
+INSTALLATION
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+String::Multibyte
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 xern <xern@cpan.org>, released under The Artistic License
+

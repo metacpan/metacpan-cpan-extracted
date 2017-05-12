@@ -1,0 +1,12 @@
+#sub foo
+arg0=##ARGV[0]##.
+#endsub
+
+#sub bar
+bar arg0=##ARGV[0]##.
+#callsub foo "<##ARGV[0]##>"
+#endsub
+
+#callsub foo "dog"
+#callsub foo "<##value##>"
+#callsub bar "cat"

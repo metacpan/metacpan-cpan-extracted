@@ -1,0 +1,28 @@
+Text::Glob::DWIW
+
+Text::Glob::DWIW implements glob(3) style expansion and also
+matching against text. So yet another Text::Glob{::Expand,} like module,
+but some unique features does exists.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Text::Glob::DWIW
+
+
+COPYRIGHT
+
+(c) 2013 Josef. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

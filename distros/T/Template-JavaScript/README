@@ -1,0 +1,41 @@
+NAME
+    Template::JavaScript - A templating engine using the JavaScript::V8
+    module
+
+SYNOPSIS
+        use Test::More qw( no_plan );
+        use Template::JavaScript;
+
+        my $tj = Template::JavaScript->new();
+
+        $tj->output( \my $out );
+
+        $tj->tmpl_string( <<'' );
+        before
+        % for( var i = 3; i ; i-- ){
+          this is a loop
+        % }
+        after
+
+        $tj->run;
+
+        is( $out, <<'', 'can run simple JS code (loops)' );
+        before
+          this is a loop
+          this is a loop
+          this is a loop
+        after
+
+DESCRIPTION
+    This is a very simple template to JavaScript compiler. We compile either
+    templates passed in as strings or as a file with Template Toolkit, so
+    you can do includes etc. like Template normally does it.
+
+    Once Template has run we apply our own syntax, which is that any line
+    beginning with "%" is JavaScript and any other line is output verbatim.
+
+    After the compilation phase (which you can cache) we execute the
+    template with JavaScript::V8. So your templates will run very fast in
+    the V8 JIT. We provide ways to pass variables and functions back & forth
+    to JavaScript::V8 through its normal facilities.
+

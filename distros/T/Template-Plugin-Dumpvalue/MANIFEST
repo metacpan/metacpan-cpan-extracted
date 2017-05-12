@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Template-Plugin-Dumpvalue.t
+lib/Template/Plugin/Dumpvalue.pm

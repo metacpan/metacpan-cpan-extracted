@@ -1,0 +1,19 @@
+
+* make the doubly linked list more efficient
+  (both memory and speed when accessing individual elements)
+
+* add configuration options, e.g.:
+
+   - Reverse        => new elements are inserted in front
+
+   - AppendExisting => storing values to existing keys will
+                       append (or prepend in case of Reverse)
+                       this key
+
+* add more compatibility with Tie::IxHash
+  (i.e. push, pop, shift, unshift, splice, ...)
+
+* add more tests
+
+* add more documentation
+

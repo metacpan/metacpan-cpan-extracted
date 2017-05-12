@@ -1,0 +1,31 @@
+This is the README file for Text::ProcessMap
+
+DESCRIPTION
+
+Create process diagrams in plain text format.
+
+See POD for additional background information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Brad J. Adkins <bradjadkins@badkins.net>
+
+All Rights Reserved
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

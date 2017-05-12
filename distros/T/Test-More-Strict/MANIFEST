@@ -1,0 +1,14 @@
+Changes
+lib/Test/More/Strict.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/basic.t
+t/fail.t
+t/fail.tt
+t/install.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,131 @@
+
+==== NAME ====
+
+Tie::FieldVals - an array tie for a file of enhanced Field:Value data
+
+
+==== VERSION ====
+
+This describes version 0.6202 of Tie::FieldVals.
+
+
+==== DESCRIPTION ====
+
+This is a Tie object to map the records in an enhanced Field:Value data file
+into an array. Each file has multiple records, each record has its values
+defined by a Field:Value pair, with the enhancements that (a) the Value part
+can extend over more than one line (because the Field names are predefined)
+and (b) Fields can have multiple values by repeating the Field:Value part
+for a given field.
+
+Because of its use of the Tie::File module, access to each record is
+reasonably fast. The Tie::File module also ensures that (a) the whole file
+doesn't have to be read into memory (b) record changes are written to the
+file straight away (c) record changes don't require the whole file to be
+rewritten, just the part of the file after the change.
+
+The advantage of this setup is that one can have useful data files which are
+plain text, human readable, human editable, and at the same time able to be
+accessed faster than using XML (I know, I wrote a version of my reporting
+software using XML data, and even the fastest XML parsers weren't as fast as
+this setup, once there were a reasonable number of records). This also has
+advantages over a simpler setup where values are given one per line with no
+indication of what value belongs to what field; the problems with that is
+that it is harder to fix corrupted data by hand, and it is harder to add new
+fields, and one can't have multi-line data.
+
+It is likewise better than a CSV (Comma-Separated Values) file, because
+again, with a CSV file, the data is positional and therefore harder to fix
+and harder to change, and again one can't have multi-line data.
+
+This module is both better and worse than file-oriented databases like
+DB_File and its variants and extensions (such as MLDBM). This module does
+not require that each record have a unique key, and the fact that a DBM file
+is binary makes it not only less correctable, but also less portable. On the
+downside, this module isn't as fast.
+
+Naturally, if one's data needs are more complex, it is probably better to
+use a fully-fledged database; this is oriented towards those who don't wish
+to have the overhead of setting up and maintaining a relational database
+server, and wish to use something more straightforward.
+
+This comes bundled with other support modules, such as the
+Tie::FieldVals::Row module. The Tie::FieldVals::Select module is for
+selecting and sorting a sub-set from a Tie::FieldVals array, and the
+Tie::FieldVals::Join is a very simple method of joining two files on a
+common field.
+
+This distribution includes the fv2xml script, which converts a
+Tie::FieldVals data file into an XML file, and xml2fv which converts an XML
+file into a Tie::FieldVals data file.
+
+
+==== REQUIRES ====
+
+    Test::More
+
+    Carp
+    Tie::Array
+    Tie::File
+    Fcntl
+    Data::Dumper
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+    File::Basename
+
+
+==== INSTALLATION ====
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the "./"
+notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+In order to install somewhere other than the default, such as in a directory
+under your home directory, like "/home/fred/perl" go
+
+   perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will then need to make sure that you alter the PERL5LIB variable to find
+the modules, and the PATH variable to find the script.
+
+Therefore you will need to change: your path, to include
+/home/fred/perl/script (where the script will be)
+
+        PATH=/home/fred/perl/script:${PATH}
+
+the PERL5LIB variable to add /home/fred/perl/lib
+
+        PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+
+==== AUTHOR ====
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com
+
+
+==== COPYRIGHT AND LICENCE ====
+
+Copyright (c) 2004-2008 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

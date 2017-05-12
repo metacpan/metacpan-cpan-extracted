@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/Tie/DxHash.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-distribution.t
+t/01-kwalitee.t
+t/02-perl-critic.t
+t/03-pod.t
+t/04-pod-coverage.t
+t/clear.t
+t/defined.t
+t/delete.t
+t/destroy.t
+t/exists.t
+t/fetch.t
+t/keys.t
+t/multi.t
+t/scalar.t
+t/store.t
+t/tiehash.t
+META.yml

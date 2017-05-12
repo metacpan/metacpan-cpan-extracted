@@ -1,0 +1,9 @@
+
+API:
+
+* preserve_whitespace options?
+
+Implementation:
+
+* Alter Ignorable tags to be non-capturing and fix scrape modulus logic
+* Perform matches in while loop one at a time rather than into big array - even possible?

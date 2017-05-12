@@ -1,0 +1,118 @@
+body 
+{ 
+	background: white; 
+	color: black; 
+	font-family: "Bitstream Vera sans", sans-serif;
+	font-size: 8pt;
+}
+h1
+{
+	font-size: 300%;
+	margin: 0 0 .25em .25em;
+	padding: 0;
+}
+p.test
+{
+	width: 60%;
+	border: thin solid #070;
+	background-color: #afa;
+	font-size: 74%;
+}
+div.channel, div.movies
+{ 
+	width: 31%; 
+	padding: 0;
+	margin: 0 .5em .5em 0; 
+	display: block; 
+	float:left; 
+	border: thin solid black;
+}
+div.movies
+{
+	border-color: #700;
+}
+div.channel h2, div.movies h2
+{ 
+	padding: 0 .25em; 
+	margin: 0; 
+	font-size: 160%;
+	background-color: black;
+	color: white;
+}
+div.movies h2
+{
+	background-color: #700;
+}
+table.channel, table.movies
+{ 
+	border-collapse: collapse; 
+	margin: 1px;
+}
+table.channel tr, table.movies tr 
+{ 
+	padding: 0; 
+	margin: 0; 
+}
+table.channel td, table.movies td
+{ 
+	padding: .08em 0 .08em .5em; 
+	margin: 0; 
+	border: none; 
+	overflow: hidden; 
+}
+table.channel tr.even , table.movies tr.even
+{ 
+	background: #e7e7e7; 
+}
+table.channel td.time, table.movies td.time 
+{ 
+	width: 1%; 
+	vertical-align: top;
+}
+table.channel td.program div.title,
+table.movies td.program div.title
+{ 
+	margin-left: 0.05em;
+	overflow: hidden;
+	height: 1.2em;
+}
+table.channel td.program div.desc,
+table.movies td.program div.desc
+{ 
+	display: none;
+	position: fixed;
+	z-index: 3;
+	
+	right: 1em;
+	top: 1em;
+	width: 40%;
+	min-height: 2.5em;
+	height: auto;
+	
+	padding: .5em;
+	border: 1px solid #0cf;
+	
+	background-color: #cff; 
+	color: black;
+
+	font-style: italic;
+}
+table.channel td.program div.desc div.prog,
+table.movies td.program div.desc div.prog
+{ 
+	font-style: normal;
+}
+table.channel td.program div.desc div.prog span.time,
+table.movies td.program div.desc div.prog span.time
+{ 
+	font-weight: bold;
+	margin-right: 1em;
+}
+div.clear 
+{ 
+	height: 6px; 
+	width: 100%; 
+	clear: both; 
+}
+
+

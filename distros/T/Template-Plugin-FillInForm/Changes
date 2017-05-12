@@ -1,0 +1,15 @@
+Revision history for Perl extension Template::Plugin::FillInForm
+
+0.04  Thu Nov 14 19:08:50 JST 2002
+	* Fixed memory leaks due to Template::Plugin::Filter
+
+0.03  Wed Sep 18 11:51:44 JST 2002
+	- Fixed test suite not fail regardless of hash ordering
+	  (Thanks to Randal L. Schwartz)
+
+0.02  Sat Sep  7 16:47:02 JST 2002
+	- Added HTML::FillInForm in Makefile.PL
+	  (Thanks to Mark Veltzer <mark@veltzer.org>)
+
+0.01  Tue Apr 16 19:47:35 2002
+	- original version

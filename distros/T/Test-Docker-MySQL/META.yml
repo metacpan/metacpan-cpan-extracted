@@ -1,0 +1,37 @@
+---
+abstract: 'Test::Docker::MySQL is a module to launch MySQL in docker containers.'
+author:
+  - 'punytan <punytan@gmail.com>'
+build_requires:
+  Test::More: '1.001002'
+  Test::SharedFork: '0.24'
+configure_requires:
+  Module::Build::Tiny: '0.036'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Docker-MySQL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  DBD::mysql: '4.027'
+  DBI: '1.631'
+  IPC::Run: '0.92'
+  Time::HiRes: '1.9726'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/punytan/p5-Test-Docker-MySQL/issues
+  homepage: https://github.com/punytan/p5-Test-Docker-MySQL
+  repository: https://github.com/punytan/p5-Test-Docker-MySQL.git
+version: '0.02'
+x_contributors:
+  - 'bayashi <bayashi@cpan.org>'

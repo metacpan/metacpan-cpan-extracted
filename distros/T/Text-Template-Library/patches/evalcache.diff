@@ -1,0 +1,185 @@
+--- t/03-out.t~	2008-04-17 01:39:41.000000000 +0200
++++ t/03-out.t	2008-06-20 15:24:44.000000000 +0200
+@@ -12,7 +12,7 @@
+ Aborting"
+   unless $Text::Template::VERSION == 1.45;
+ 
+-print "1..1\n";
++print "1..7\n";
+ 
+ $n=1;
+ 
+@@ -30,22 +30,65 @@
+ { foreach $n (1 .. 20) { $OUT .= $n . ' ' } }
+ };
+ 
++$templateOUTfn = q{
++This line should have a 3: { OUT 1+2 }
++
++This line should have several numbers:
++{ foreach $n (1 .. 20) { OUT $n . ' ' } }
++};
++
+ # Build templates from string
+ $template = new Text::Template ('type' => 'STRING', 'source' => $template)
+   or die;
+ $templateOUT = new Text::Template ('type' => 'STRING', 'source' => $templateOUT)
+   or die;
+ 
++$templateOUTfn = new Text::Template ('type' => 'STRING', 'source' => $templateOUTfn)
++  or die;
++
+ # Fill in templates
+ $text = $template->fill_in()
+   or die;
+ $textOUT = $templateOUT->fill_in()
+   or die;
+ 
++$textOUTfn = $templateOUTfn->fill_in()
++  or die;
++
+ # (1) They should be the same
+ print +($text eq $textOUT ? '' : 'not '), "ok $n\n";
+ $n++;
+ 
++# (2) They should be the same
++print +($text eq $textOUTfn ? '' : 'not '), "ok $n\n";
++$n++;
++
++my %cache;
++
++# (3) As should they
++print +($text eq $template->fill_in(EVALCACHE=>\%cache)
++	? '' : 'not '), "ok $n\n";
++$n++;
++
++# (4) As should they
++print +($text eq $templateOUT->fill_in(EVALCACHE=>\%cache)
++	? '' : 'not '), "ok $n\n";
++$n++;
++
++# (5) As should they
++print +($text eq $template->fill_in(EVALCACHE=>\%cache)
++	? '' : 'not '), "ok $n\n";
++$n++;
++
++# (6) As should they
++print +($text eq $templateOUT->fill_in(EVALCACHE=>\%cache)
++	? '' : 'not '), "ok $n\n";
++$n++;
++
++# (7) Expect 4 key/value pairs in %cache
++print +(keys %cache == 4 ? '' : 'not '), "ok $n\n";
++$n++;
++
+ # Missing:  Test this feature in Safe compartments; 
+ # it's a totally different code path.
+ # Decision: Put that into safe.t, because that file should
+--- lib/Text/Template.pm.old	2008-07-01 13:58:07.000000000 +0200
++++ lib/Text/Template.pm	2008-07-01 14:03:41.000000000 +0200
+@@ -56,6 +56,7 @@
+     my $prepend = _param('prepend', %a);
+     my $alt_delim = _param('delimiters', %a);
+     my $broken = _param('broken', %a);
++    my $evalcache = _param('evalcache', %a);
+     unless (defined $source) {
+       require Carp;
+       Carp::croak("Usage: $ {pack}::new(TYPE => ..., SOURCE => ...)");
+@@ -68,6 +69,7 @@
+ 		PREPEND => $prepend,
+                 UNTAINT => $untaint,
+                 BROKEN => $broken,
++                EVALCACHE => $evalcache,
+ 		(defined $alt_delim ? (DELIM => $alt_delim) : ()),
+ 	       };
+     # Under 5.005_03, if any of $stype, $prepend, $untaint, or $broken
+@@ -255,6 +257,7 @@
+   my $fi_eval_package;
+   my $fi_scrub_package = 0;
+   my $fi_filename = _param('filename') || $fi_self->{FILENAME} || 'template';
++  my $fi_evalcache = _param('evalcache', %fi_a)  || $fi_self->{EVALCACHE};
+ 
+   my $fi_prepend = _param('prepend', %fi_a);
+   unless (defined $fi_prepend) {
+@@ -295,14 +298,12 @@
+   my $fi_ofn;
+   if(defined $fi_ofh) {
+     if(ref $fi_ofh eq 'CODE') {
+-      $fi_ofn = $fi_ofh;
+-    } elsif(ref $fi_ofh eq 'GLOB') {
+-      $fi_ofn = sub {print $fi_ofh $_[0]};
+-    } else {			# object that can ->print()
+-      $fi_ofn = sub {$fi_ofh->print($_[0])};
++      $fi_ofn = sub {&$fi_ofh if defined $_[0] and length $_[0]; return};
++    } else {
++      $fi_ofn = sub {print $fi_ofh $_[0] if defined $_[0] and length $_[0]; return};
+     }
+   } else {
+-    $fi_ofn = sub {$fi_r .= $_[0]};
++    $fi_ofn = sub {$fi_r .= $_[0] if defined $_[0] and length $_[0]; return};
+   }
+   my $fi_item;
+   foreach $fi_item (@{$fi_self->{SOURCE}}) {
+@@ -323,10 +324,22 @@
+ 	my $OUT = $fi_safe->reval('$OUT');
+ 	$fi_res = $OUT if defined $OUT;
+       } else {
+-	my $OUT;
+-	$fi_res = eval $fi_progtext;
++	no warnings 'redefine';
++	local *{$fi_eval_package.'::OUT'}=$fi_ofn;
++	if( ref $fi_evalcache eq 'HASH' ) {
++	  my $fn = $fi_evalcache->{$fi_progtext};
++	  unless(defined $fn) {
++	    $fn = $fi_evalcache->{$fi_progtext} =
++	      eval "sub {my \$OUT;my \$x=do{\n$fi_progtext\n};".
++		   "defined \$OUT ? \$OUT : \$x}";
++	  }
++	  $fi_res = eval {&$fn} if $fn;
++	} else {
++	  my $OUT;
++	  $fi_res = eval $fi_progtext;
++	  $fi_res = $OUT if defined $OUT;
++	}
+ 	$fi_eval_err = $@;
+-	$fi_res = $OUT if defined $OUT;
+       }
+ 
+       # If the value of the filled-in text really was undef,
+--- t/06-ofh.t.old	2008-07-01 14:04:35.000000000 +0200
++++ t/06-ofh.t	2008-06-20 15:18:22.000000000 +0200
+@@ -11,7 +11,7 @@
+ Aborting"
+   unless $Text::Template::VERSION == 1.45;
+ 
+-print "1..6\n";
++print "1..4\n";
+ 
+ $n=1;
+ 
+@@ -36,7 +36,7 @@
+ $n++;
+ 
+ $t='';
+-sub X::print {$t.=$_[$#_]}	# is called as object method and as function
++sub X::print {$t.=$_[$#_]}
+ 
+ $text = $template->fill_in(OUTPUT => \&X::print);
+ 
+@@ -48,16 +48,5 @@
+ print +($t eq "My process ID is $$" ? '' : 'not '), "ok $n\n";
+ $n++;
+ 
+-$t='';
+-$text = $template->fill_in(OUTPUT => bless({},'X'));
+-
+-# (5) No $text should have been constructed.  Return value should be true.
+-print +($text eq '1' ? '' : 'not '), "ok $n\n";
+-$n++;
+-
+-# (6) The text should have been printed to the file
+-print +($t eq "My process ID is $$" ? '' : 'not '), "ok $n\n";
+-$n++;
+-
+ exit;
+ 

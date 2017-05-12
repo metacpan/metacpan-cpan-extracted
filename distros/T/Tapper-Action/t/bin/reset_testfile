@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# This file tests whether Tapper::Action calls scripts as expected. For
+# this it puts all arguments into a file. The test can then check this
+# file.
+
+if ( test -z "$TAPPER_DIR_FOR_ACTION_TEST" ); then 
+    echo "No output file set in $TAPPER_DIR_FOR_ACTION_TEST"
+    exit 1
+fi
+
+echo $* > "$TAPPER_DIR_FOR_ACTION_TEST"

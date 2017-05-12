@@ -1,0 +1,12 @@
+Revision history for Task-BenchmarkAnything
+
+0.003     2016-04-23
+        - +IO::Socket::SSL (for HTTPS servers)
+        - force newer BenchmarkAnything modules
+
+0.002     2015-09-23
+        - +DBD::mysql, +DBD::SQLite
+
+0.001     2015-09-22
+        - initial version
+        - a dependency collection for BenchmarkAnything work

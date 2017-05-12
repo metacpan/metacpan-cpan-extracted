@@ -1,0 +1,123 @@
+## dynarows.tcl
+##
+## This demos shows the use of the validation mechanism of the table
+## and uses the table's cache (no -command or -variable) with a cute
+## dynamic row routine.
+##
+## jeff.hobbs@acm.org
+## Converted to perl/tk and Tcl:Tk by John Cerney
+
+use Tcl::pTk (qw/ :perlTk /);
+
+use Tcl::pTk::TableMatrix::Spreadsheet;
+
+use Date::Parse;   
+use Date::Format;  
+
+$| = 1;  #Pipes hot
+
+my $top = MainWindow->new;
+
+my $t = $top->Scrolled('TableMatrix', -rows => 2, -cols => 3, -cache => 1,
+			      -selecttype => 'row', 
+			      -titlerows => 1, -titlecols => 1,
+			      -height => 5,
+			      -autoclear => 1,
+			
+                    );
+
+$t->configure( -browsecommand => sub{
+	my ($index) = @_;
+        
+	my $val = $t->get($index);
+	return unless $val;
+
+	my ($row,$col) = split(",",$index);
+	
+	## Entries in the last row are allowed to be empty
+	my $nrows = $t->cget(-rows);
+	if( ($row == ($nrows-1)) && $val eq ''){ return; };
+	
+	return if( $row == 0 || $col == 0); #don't check the title row/cols
+	my $timenumber;
+	# try to parse date from value in cell
+	$timenumber = str2time($val);
+	if( !$timenumber || !$val){  # not a valid date:
+		print "'$val' is not a valid date\n";
+		$t->bell;
+		$t->activate($index);
+		$t->selectionClear('all');
+		$t->selectionSet('active');
+		$t->see('active');
+	}
+	else{
+
+		# Convert to a common date format
+		my $date;
+		$date = time2str("%m/%d/%Y",$timenumber);
+		$t->set($index,$date);
+		if( $row == ($nrows-1) ){
+			## if this is the last row and both cols 1 && 2 are not empty
+			## then add a row and redo configs
+			if( $t->get("$row,1") ne ''  &&
+				$t->get("$row,2") ne ''){
+					
+				$t->tagRow('', $row);
+				$t->set("$row,0", $row);
+				$t->configure( -rows => ++$nrows);
+				$t->tagRow('unset', ++$row);
+				$t->set("$row,0","*");
+				$t->see("$row,1");
+				$t->activate("$row,1");
+			}
+		}
+	}
+	
+}
+);
+				
+ 
+		
+$t->set("0,1" => "Begin", "0,2" => 'End', "1,0"=>"*");
+ 
+# hideous Color definitions here:
+$t->tagConfigure('unset',  -fg => '#008811');
+$t->tagConfigure('title',  -fg => 'red');
+$t->tagRow('unset', 1);
+
+$t->colWidth( 0 => 3);
+
+my $label = $top->Label(-text => "Dynamic Date Validated Rows");
+
+$label->pack( -expand => 1, -fill => 'both');
+
+$t->pack(-expand => 1, -fill => 'both');
+
+
+# Bindings:
+# Make the active area move after we press return:
+# We Have to use class binding here so that we override 
+#  the default return binding
+$t->bind('Tk::TableMatrix','<Return>', sub{
+	my $r = $t->index('active', 'row');
+	my $c = $t->index('active', 'col');
+	if( $c == 2){
+		$t->activate(++$r.",1");
+	}
+	else{
+		$t->activate("$r,".++$c);
+	}
+	$t->see('active');
+	Tk->break;
+});
+
+
+# Make enter do the same thing as return:
+$t->bind('<KP_Enter>', $t->bind('<Return>'));
+
+
+
+
+
+
+MainLoop;

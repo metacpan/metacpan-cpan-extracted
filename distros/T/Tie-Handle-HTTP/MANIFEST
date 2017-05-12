@@ -1,0 +1,12 @@
+Changes
+examples/test.pl
+lib/Tie/Handle/HTTP.pm
+Makefile.PL
+MANIFEST
+README
+t/00-Tie-Handle-HTTP.t
+t/09-file.t
+t/10-all.t
+t/Common.perl
+t/test.txt
+META.yml                                 Module meta-data (added by MakeMaker)

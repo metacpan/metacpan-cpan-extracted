@@ -1,0 +1,20 @@
+---
+abstract: "Compare the elements of 2 or more lists in a TT template\r"
+author:
+  - 'Octavian Rasnita <orasnita@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-ListCompare
+requires:
+  List::Compare: 0
+  Template::Plugin: 0
+  perl: 5.008_008
+version: 0.05

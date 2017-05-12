@@ -1,0 +1,213 @@
+NAME
+    Text::Refer - parse Unix "refer" files
+
+    *This is Alpha code, and may be subject to changes in its public
+    interface. It will stabilize by June 1997, at which point this notice
+    will be removed. Until then, if you have any feedback, please let me
+    know!*
+
+SYNOPSIS
+    Pull in the module:
+
+        use Text::Refer;  
+
+
+    Parse a refer stream from a filehandle:
+
+        while ($ref = input Text::Refer \*FH)  {
+    	# ...do stuff with $ref...
+        }
+        defined($ref) or die "error parsing input";
+
+
+    Same, but using a parser object for more control:
+
+        # Create a new parser: 
+        $parser = new Text::Refer::Parser LeadWhite=>'KEEP';
+
+        # Parse:
+        while ($ref = $parser->input(\*FH))  {
+    	# ...do stuff with $ref...
+        }
+        defined($ref) or die "error parsing input";
+
+
+    Manipulating reference objects, using high-level methods:
+
+        # Get the title, author, etc.:
+        $title      = $ref->title;
+        @authors    = $ref->author;      # list context
+        $lastAuthor = $ref->author;      # scalar context
+
+        # Set the title and authors:
+        $ref->title("Cyberiad");
+        $ref->author(["S. Trurl", "C. Klapaucius"]);   # arrayref for >1 value!
+
+        # Delete the abstract:
+        $ref->abstract(undef);
+
+
+    Same, using low-level methods:
+
+        # Get the title, author, etc.:
+        $title      = $ref->get('T');
+        @authors    = $ref->get('A');      # list context
+        $lastAuthor = $ref->get('A');      # scalar context
+
+        # Set the title and authors:
+        $ref->set('T', "Cyberiad");
+        $ref->set('A', "S. Trurl", "C. Klapaucius");
+
+        # Delete the abstract:
+        $ref->set('X');                    # sets to empty array of values
+
+
+    Output:
+
+        print $ref->as_string;
+
+
+DESCRIPTION
+    *This module supercedes the old Text::Bib.*
+
+    This module provides routines for parsing in the contents of "refer"-
+    format bibliographic databases: these are simple text files which
+    contain one or more bibliography records. They are usually found lurking
+    on Unix-like operating systems, with the extension .bib.
+
+    Each record in a "refer" file describes a single paper, book, or
+    article. Users of nroff/troff often employ such databases when
+    typesetting papers.
+
+    Even if you don't use *roff, this simple, easily-parsed parameter-value
+    format is still useful for recording/exchanging bibliographic
+    information. With this module, you can easily post-process "refer"
+    files: search them, convert them into LaTeX, whatever.
+
+  Example
+
+    Here's a possible "refer" file with three entries:
+
+        %T Cyberiad
+        %A Stanislaw Lem
+        %K robot fable 
+        %I Harcourt/Brace/Jovanovich
+
+        %T Invisible Cities
+        %A Italo Calvino
+        %K city fable philosophy
+        %X In this surreal series of fables, Marco Polo tells an
+           aged Kublai Khan of the many cities he has visited in 
+           his lifetime.  
+
+        %T Angels and Visitations
+        %A Neil Gaiman 
+        %D 1993
+
+
+    The lines separating the records must be *completely blank*; that is,
+    they cannot contain anything but a single newline.
+
+    See refer(1) or grefer(1) for more information on "refer" files.
+
+  Syntax
+
+    *From the GNU manpage, `grefer(1)':*
+
+    The bibliographic database is a text file consisting of records
+    separated by one or more blank lines. Within each record fields start
+    with a % at the beginning of a line. Each field has a one character name
+    that immediately follows the %. It is best to use only upper and lower
+    case letters for the names of fields. The name of the field should be
+    followed by exactly one space, and then by the contents of the field.
+    Empty fields are ignored. The conventional meaning of each field is as
+    follows:
+
+    A   The name of an author. If the name contains a title such as Jr. at the
+        end, it should be separated from the last name by a comma. There can
+        be multiple occurrences of the A field. The order is significant. It
+        is a good idea always to supply an A field or a Q field.
+
+    B   For an article that is part of a book, the title of the book
+
+    C   The place (city) of publication.
+
+    D   The date of publication. The year should be specified in full. If the
+        month is specified, the name rather than the number of the month
+        should be used, but only the first three letters are required. It is
+        a good idea always to supply a D field; if the date is unknown, a
+        value such as "in press" or "unknown" can be used.
+
+    E   For an article that is part of a book, the name of an editor of the
+        book. Where the work has editors and no authors, the names of the
+        editors should be given as A fields and , (ed) or , (eds) should be
+        appended to the last author.
+
+    G   US Government ordering number.
+
+    I   The publisher (issuer).
+
+    J   For an article in a journal, the name of the journal.
+
+    K   Keywords to be used for searching.
+
+    L   Label.
+
+        NOTE: Uniquely identifies the entry. For example, "Able94".
+
+    N   Journal issue number.
+
+    O   Other information. This is usually printed at the end of the reference.
+
+    P   Page number. A range of pages can be specified as m-n.
+
+    Q   The name of the author, if the author is not a person. This will only be
+        used if there are no A fields. There can only be one Q field.
+
+        NOTE: Thanks to Mike Zimmerman for clarifying this for me: it means
+        a "corporate" author: when the "author" is listed as an organization
+        such as the UN, or RAND Corporation, or whatever.
+
+    R   Technical report number.
+
+    S   Series name.
+
+    T   Title. For an article in a book or journal, this should be the title of
+        the article.
+
+    V   Volume number of the journal or book.
+
+    X   Annotation.
+
+        NOTE: Basically, a brief abstract or description.
+
+
+    For all fields except A and E, if there is more than one occurrence of a
+    particular field in a record, only the last such field will be used.
+
+    If accent strings are used, they should follow the character to be
+    accented. This means that the AM macro must be used with the -ms macros.
+    Accent strings should not be quoted: use one \ rather than two.
+
+  Parsing records from "refer" files
+
+    You will nearly always use the `input()' constructor to create new
+    instances, and nearly always as shown in the the section on "SYNOPSIS".
+
+    Internally, the records are parsed by a parser object; if you invoke the
+    class method `Text::Refer::input()', a special default parser is used,
+    and this will be good enough for most tasks. However, for more complex
+    tasks, feel free to use the section on "class Text::Refer::Parser" to
+    build (and use) your own fine-tuned parser, and `input()' from that
+    instead.
+
+CHANGES
+  Version 1.101
+
+    Initial release. Adapted from Text::Bib.
+
+
+AUTHOR
+    Copyright (C) 1997 by Eryq, eryq@enteract.com,
+    http://www.enteract.com/~eryq.
+

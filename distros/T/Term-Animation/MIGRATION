@@ -1,0 +1,88 @@
+       Term::Animation Version 1.x to 2.x Migration Guide
+
+Version 2.0 of Term::Animation is not backwards compatible with
+previous versions. This guide describes how to convert your application
+to use the new version.
+
+TERMINOLOGY
+
+I've made a change in terminology throughout the module. Previously,
+the "thingies" on the screen were referred to as "objects". That
+wasn't great to begin with, and now that they are also "objects"
+in the OOP sense, it's even worse. So now they are referred to
+as "entities". Hopefully this will be a bit less confusing.
+
+METHOD CALLS
+
+Starting with version 2.0, some things have been moved to a
+separate Term::Animation::Entity package. In the guide below,
+$anim->foo indicates a call to a Term::Animation method,
+and $ent->foo indicates a call to a Term::Animation::Entity
+method.
+
+Old Version		New Version
+-----------		-----------
+
+enable_color		$anim->color(1)
+disable_color		$anim->color(0)
+color_enabled		$anim->color()
+
+get_screen_size		$anim->screen_size
+set_background		$anim->background
+remove_all_objects	$anim->remove_all_entities
+
+build_object		Term::Animation::Entity->new
+			$anim->new_entity
+			
+add_object		$anim->add_entity
+del_object		$anim->del_entity
+			$ent->kill
+
+get_position		$ent->position
+get_current_frame	$ent->frame
+set_shape		$ent->shape
+set_color		$ent->color
+set_default_color	$ent->default_color
+move_object		$ent->move_entity
+
+auto_trans		auto_trans parameter to
+			Term::Animation::Entity->new
+
+exist			$anim->entity('entity_name')
+
+
+NEW ENTITY PARAMETERS
+
+Some of the parameters when creating a new animation entity
+have changed as well.
+
+The auto_death/death_arg parameters have been replaced
+with separate parameters for each type of auto death.
+They are:
+	die_offscreen (boolean)
+	die_time (epoch time)
+	die_frame (number of frames)
+
+The auto_trans method has been removed and replaced with
+an auto_trans parameter when creating an entity. It
+defaults to off (0).
+
+CALLBACK ROUTINES
+
+Callback routines no longer return a "flag" that can be
+used to specify that the entity in question should be removed.
+Instead, you should call $ent->kill inside the callback
+routine if you want it to go away. Entities are only removed
+once all of the callback routines have been run, so the
+entity will still be there if it needs to be referenced
+by another callback routine in that cycle.
+
+Callback routines now take two arguments. The first argument
+is a reference to the entity that the callback is being called 
+for. The second is a reference to the Term::Animation instance 
+that the callback is being called from.
+
+ENTITY DEPTH
+
+The direction of the Z dimension (depth) has been reversed. Entities
+with a higher Z position will now be further away instead of closer.

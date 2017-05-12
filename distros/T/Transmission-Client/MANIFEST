@@ -1,0 +1,35 @@
+bin/transmission-client.pl
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Transmission/AttributeRole.pm
+lib/Transmission/Client.pm
+lib/Transmission/Session.pm
+lib/Transmission/Stats.pm
+lib/Transmission/Torrent.pm
+lib/Transmission/Torrent/File.pm
+lib/Transmission/Types.pm
+lib/Transmission/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/00-pod-coverage.t
+t/00-pod.t
+t/05-utils.t
+t/10-client.t
+t/10-torrent.t
+t/10-types.t
+t/20-real.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

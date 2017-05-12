@@ -1,0 +1,12 @@
+# Revision history for Perl extension Text::Darts.
+#
+# $Id: Changes,v 0.2 2009/02/21 14:44:54 dankogai Exp dankogai $
+#
+$Revision: 0.2 $ $Date: 2009/02/21 14:44:54 $
+! Makefile.PL lib/Text/Tx.pm
+  Now Compiles on Mac OS X + gcc 4.0
+  (that nasty <iostream>)
+
+0.01 2007/12/23 20:09:54
++ *
+  Copied from Text::Darts since they share a lot in common.

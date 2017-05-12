@@ -1,0 +1,173 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::Widget::SparkLine
+at lib/Tickit/Widget/SparkLine.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Tickit::Widget::SparkLine - minimal graph implementation for L<Tickit>
+
+=head1 VERSION
+
+version 0.106
+
+=head1 SYNOPSIS
+
+ my $vbox = Tickit::Widget::VBox->new;
+ my $widget = Tickit::Widget::SparkLine->new(
+    data   => [ 0, 3, 2, 5, 1, 6, 0, 7 ]
+ );
+ $vbox->add($widget, expand => 1);
+
+=head1 DESCRIPTION
+
+Generates a mini ("sparkline") graph.
+
+=begin HTML
+
+<p><img src="http://tickit.perlsite.co.uk/cpan-screenshot/tickit-widget-sparkline1.gif" alt="Sparkline widget in action" width="350" height="192"></p>
+
+=end HTML
+
+=head1 STYLE
+
+Set the base style background/foreground to determine the graph colours.
+Note that reverse video and bold don't work very well on some terminals,
+since the background+foreground colours won't match.
+
+=head1 METHODS
+
+=head2 new
+
+Instantiate the widget. Takes the following named parameters:
+
+=over 4
+
+=item * data - graph data
+
+=back
+
+=head2 data
+
+Accessor for stored data.
+
+With no parameters, returns the stored data as a list.
+
+Pass either an array or an arrayref to set the data values and request display refresh.
+
+=head2 data_chars
+
+Returns the set of characters corresponding to the current data values. Each value
+is assigned a single character, so the string length is equal to the number of data
+items and represents the minimal string capable of representing all current data
+items.
+
+=head2 push
+
+Helper method to add one or more items to the end of the list.
+
+ $widget->push(3,4,2);
+
+=head2 pop
+
+Helper method to remove one item from the end of the list, returns the item.
+
+ my $item = $widget->pop;
+
+=head2 shift
+
+Helper method to remove one item from the start of the list, returns the item.
+
+ my $item = $widget->shift;
+
+=head2 unshift
+
+Helper method to add items to the start of the list. Takes a list.
+
+ $widget->unshift(0, 1, 3);
+
+=head2 splice
+
+Equivalent to the standard Perl L<splice> function.
+
+ # Insert 3,4,5 at position 2
+ $widget->splice(2, 0, 3, 4, 5);
+
+=head2 graph_steps
+
+Returns an arrayref of characters in order of magnitude.
+
+For example:
+
+ [ ' ', qw(_ x X) ]
+
+would yield a granularity of 4 steps.
+
+Override this in subclasses to provide different visualisations - there's no limit to the number of
+characters you provide in this arrayref.
+
+=head2 resample
+
+Given a width $w, resamples the data (remaining list of
+parameters) to fit, using the current L</resample_method>.
+
+Used internally.
+
+=head2 render_to_rb
+
+Rendering implementation. Uses L</graph_steps> as the base character set.
+
+=head2 char_for_value
+
+Returns the character code corresponding to the given data value.
+
+=head2 max_value
+
+Returns the maximum value seen so far, used for autoscaling.
+
+=head2 resample_mode
+
+Change method for resampling when we have more data than will fit on the graph.
+
+Current values include:
+
+=over 4
+
+=item * average - takes the average of combined values for this bucket
+
+=item * min - lowest value for this bucket
+
+=item * median - highest value for this bucket
+
+=item * max - largest value for this bucket
+
+=item * peak - alias for 'max'
+
+=back
+
+The default is 'average'.
+
+Returns $self if setting a value, or the current value.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<reshape|Tickit::Widget/reshape>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>, L<window_gained|Tickit::Widget/window_gained>, L<window_lost|Tickit::Widget/window_lost>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.

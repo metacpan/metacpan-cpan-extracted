@@ -1,0 +1,21 @@
+---
+abstract: 'profiling/caching-aware version of Template::Context'
+author:
+  - 'Walery Studennikov'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Context-Cacheable
+provides:
+  Template::Context::Cacheable:
+    file: lib/Template/Context/Cacheable.pm
+    version: 0.03
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

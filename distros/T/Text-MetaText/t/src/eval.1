@@ -1,0 +1,73 @@
+# this tests evaluations in INCLUDE directives
+
+# test of simple evaluations
+Testing: 1 && 0
+%% INCLUDE foo pass=1 if="1 && 0" %%
+Testing: 1 and 0
+%% INCLUDE foo pass=2 if="1 and 0" %%
+Testing: 0 && 1
+%% INCLUDE foo pass=3 if="1 && 0" %%
+Testing: 0 and 1
+%% INCLUDE foo pass=4 if="0 and 1" %%
+Testing: 0 and 0
+%% INCLUDE foo pass=5 if="0 and 0" %%
+Testing: 1 and 1
+%% INCLUDE foo pass=6 if="1 and 1" %%
+
+# test simple variable values 
+%% DEFINE age=30 %%
+Age defined: %%age%%
+Testing: age > 20 
+%% INCLUDE foo pass=10 if="age > 20" %%
+Testing: age > 30 
+%% INCLUDE foo pass=11 if="age > 30" %%
+Testing: age > 40 
+%% INCLUDE foo pass=12 if="age > 40" %%
+Testing: age < 40 
+%% INCLUDE foo pass=13 if="age < 40" %%
+Testing: age >= 30 
+%% INCLUDE foo pass=14 if="age >= 30" %%
+Testing: age <= 30 
+%% INCLUDE foo pass=15 if="age >= 30" %%
+Testing: age >= 29 
+%% INCLUDE foo pass=16 if="age >= 29" %%
+Testing: age >= 31 
+%% INCLUDE foo pass=17 if="age >= 31" %%
+ 
+Testing: age != 30 
+%% INCLUDE foo pass=21 if="age != 30" %%
+Testing: age != 31 
+%% INCLUDE foo pass=22 if="age != 31" %%
+Testing: age == 30 
+%% INCLUDE foo pass=23 if="age == 30" %%
+Testing: age == 31 
+%% INCLUDE foo pass=24 if="age == 31" %%
+Testing: age = 30 
+%% INCLUDE foo pass=25 if="age = 30" %%
+Testing: age = 31 
+%% INCLUDE foo pass=26 if="age = 31" %%
+
+# test variable interpolation
+%% DEFINE doit=1 %%
+%% DEFINE dont=0 %%
+
+Testing: doit 
+%% INCLUDE foo pass=31 if="doit" %%
+Testing: dont 
+%% INCLUDE foo pass=32 if="dont" %%
+Testing: doit == 0
+%% INCLUDE foo pass=33 if="doit == 0" %%
+Testing: dont == 0
+%% INCLUDE foo pass=34 if="dont == 0" %%
+
+Testing 0
+%% INCLUDE foo pass=35 if=0   %%
+%% INCLUDE foo pass=36 if="0" %%
+Testing 1
+%% INCLUDE foo pass=37 if=1   %%
+%% INCLUDE foo pass=38 if="1" %%
+
+__END__
+ 
+%% BLOCK foo %%<<< block pass=%%pass%% >>>%% ENDBLOCK %%
+

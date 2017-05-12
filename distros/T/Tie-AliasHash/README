@@ -1,0 +1,44 @@
+NAME
+    Tie::AliasHash - Hash with aliases key (multiple keys, one value)
+
+SYNOPSIS
+      use Tie::AliasHash;
+
+      tie %hash, 'Tie::AliasHash';
+        
+      $hash{ 'foo', 'bar' } = 'baz';
+        
+      print $hash{foo}; # prints 'baz'
+      print $hash{bar}; # prints 'baz' too
+
+      $hash{bar} = 'zab'; # $hash{foo} is changed too
+      print $hash{foo}; # prints 'zab'
+
+DESCRIPTION
+    Tie::AliasHash creates hashes that can have multiple keys for a single
+    value. This means that some keys are just 'aliases' for other keys.
+
+    The example shown in the synopsys above creates a key 'foo' and an alias
+    key 'bar'. The two keys share the same value, so that fetching either of
+    them will always return the same value, and storing a value in one of
+    them will change both.
+
+HISTORY
+    v1.02 (11 Mar 2016)
+        Moved to github, using Build.PL instead of Makefile.PL, added
+        license.
+
+    v1.01 (26 Jun 2003)
+        Fixed a bug in the EXISTS sub, now works as documented (thanks wk)
+
+    v1.00 (07 Mar 2001)
+        First released version
+
+    v0.01 (20 Feb 2001)
+        Original version; created by h2xs 1.20 with options
+
+          -CAXn Tie::AliasHash
+
+AUTHOR
+    Aldo Calpini <dada@perl.it>
+

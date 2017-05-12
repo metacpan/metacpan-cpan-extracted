@@ -1,0 +1,25 @@
+---
+abstract: 'parse and normalize SuDocs numbers'
+author:
+  - 'Clay Fouts <cfouts@khephera.net>'
+build_requires:
+  Data::Dumper: 0
+  Test::Exception: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-SuDocs
+requires:
+  Any::Moose: 0
+  Carp: 0
+  namespace::autoclean: 0
+  perl: 5.10.0
+version: 0.014

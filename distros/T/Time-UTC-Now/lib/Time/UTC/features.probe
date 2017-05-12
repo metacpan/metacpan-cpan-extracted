@@ -1,0 +1,96 @@
+my $testnum = 0;
+
+my $compile_ok = sub {
+	my($builder, $hdrs, $code, $link_p) = @_;
+	use IO::File;
+	my $conftest_base = $builder->localize_file_path(
+				"lib/Time/UTC/conftest$testnum");
+	my $conftest_file = $builder->localize_file_path(
+				"lib/Time/UTC/conftest$testnum.c");
+	$testnum++;
+	$builder->add_to_cleanup($conftest_file);
+	my $src_fh = IO::File->new($conftest_file, "w")
+		or die "can't write $conftest_file: $!";
+	$src_fh->printflush("#include \"EXTERN.h\"\n".
+			"#include \"perl.h\"\n".
+			"#include \"XSUB.h\"\n".
+			join("", map { "#include <$_>\n" } @$hdrs).
+			"int main(void) {$code}\n")
+		or die "can't write $conftest_file: $!";
+	$src_fh = undef;
+	return eval {
+		my $obj_file = $builder->compile_c($conftest_file,
+					no_feature_defs => 1);
+		my $cbuilder = $builder->cbuilder;
+		if($link_p) {
+			$builder->add_to_cleanup(
+				$cbuilder->exe_file($obj_file));
+			$cbuilder->link_executable(objects => $obj_file);
+		}
+		1;
+	};
+};
+
+sub {
+	my($builder) = @_;
+	my %defs;
+	$compile_ok->($builder, ["stdio.h"], q{
+		char buf[5];
+		return sprintf(buf, "%d", 0) + 1;
+	}, 1) or die "probe system failed: can't compile innocuous program";
+	$compile_ok->($builder, [], q{
+		struct foo { int bar; } baz;
+		baz.quux = 5;
+		return baz.quux + 1;
+	}, 0) and die "probe system failed: non-existent struct member usable";
+	$compile_ok->($builder, [], q{
+		extern int HLBNzorFAJMYbPEjiEKkMFBaKqZMkqq(void);
+		return HLBNzorFAJMYbPEjiEKkMFBaKqZMkqq() + 1;
+	}, 1) and die "probe system failed: non-existent function usable";
+	if($compile_ok->($builder, ["sys/timex.h"], q{
+		struct timex tx;
+		int st;
+		st = ntp_adjtime(&tx);
+		return st;
+	}, 1)) {
+		$defs{QHAVE_NTP_ADJTIME} = 1;
+		$compile_ok->($builder, ["sys/timex.h"], q{
+			struct timex tx;
+			tx.time.tv_sec = 0;
+			return tx.time.tv_sec;
+		}, 0) and $defs{QHAVE_STRUCT_TIMEX_TIME} = 1;
+		$compile_ok->($builder, ["sys/timex.h"], q{
+			struct timex tx;
+			tx.time.tv_nsec = 0;
+			return tx.time.tv_nsec;
+		}, 0) and $defs{QHAVE_STRUCT_TIMEX_TIME_TV_NSEC} = 1;
+		$compile_ok->($builder, ["sys/timex.h"], q{
+			struct timex tx;
+			tx.time_state = 0;
+			return tx.time_state;
+		}, 0) and $defs{QHAVE_STRUCT_TIMEX_TIME_STATE} = 1;
+		$compile_ok->($builder, ["sys/timex.h"], q{
+			struct ntptimeval ntv;
+			ntv.time.tv_nsec = 0;
+			return ntv.time.tv_nsec;
+		}, 0) and $defs{QHAVE_STRUCT_NTPTIMEVAL_TIME_TV_NSEC} = 1;
+		$compile_ok->($builder, ["sys/timex.h"], q{
+			struct ntptimeval ntv;
+			ntv.time_state = 0;
+			return ntv.time_state;
+		}, 0) and $defs{QHAVE_STRUCT_NTPTIMEVAL_TIME_STATE} = 1;
+	}
+	$compile_ok->($builder, ["windows.h"], q{
+		FILETIME ft;
+		GetSystemTimeAsFileTime(&ft);
+		ft.dwLowDateTime = ft.dwHighDateTime;
+		return ft.dwLowDateTime;
+	}, 1) and $defs{QHAVE_GETSYSTEMTIMEASFILETIME} = 1;
+	$compile_ok->($builder, ["sys/time.h"], q{
+		struct timeval tv;
+		int st;
+		st = gettimeofday(&tv, NULL);
+		return st;
+	}, 1) and $defs{QHAVE_GETTIMEOFDAY} = 1;
+	return \%defs;
+}

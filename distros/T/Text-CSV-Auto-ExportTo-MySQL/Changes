@@ -1,0 +1,8 @@
+Revision history for Perl extension Text::CSV::Auto::ExportTo::MySQL.
+
+0.02      2011-03-08
+ - Add basic automated test.
+
+0.01      2011-03-07
+ - First release.
+

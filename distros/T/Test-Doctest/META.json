@@ -1,0 +1,59 @@
+{
+   "abstract" : "extract and evaluate tests from pod fragments",
+   "author" : [
+      "Andrei Fyodorov <afyodorov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Doctest",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Spec::Functions" : "0",
+            "Module::Metadata" : "0",
+            "Pod::Parser" : "0",
+            "Test::Builder" : "0",
+            "Test::Deep" : "0.120",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkllnk/PerlDoctest/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mkllnk/PerlDoctest.git",
+         "web" : "https://github.com/mkllnk/PerlDoctest"
+      }
+   },
+   "version" : "0.02"
+}

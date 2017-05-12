@@ -1,0 +1,68 @@
+Revision history for Test-Reporter-Transport-Metabase
+
+1.999010  2016-04-03 13:43:40-04:00 America/New_York
+
+    [PREREQS]
+
+    - Changed from JSON to JSON::MaybeXS for better backend support
+
+1.999009  2015-03-29 21:16:24-04:00 America/New_York
+
+    [FIXED]
+
+        - Stop shipping broken compile test
+
+        - Updated metadata for bugtracker, etc.
+
+1.999008  2010-08-19 10:22:41 EST5EDT
+
+  - Use bsd_glob instead of glob to avoid clobbering spaces
+    on Windows. [Chris Williams]
+
+1.999007  2010-07-26 16:54:26 EST5EDT
+
+  - Bump CPAN::Testers::Report prereq to 1.999001
+
+  - Remove unnecessary ->load_fact_classes calls as they are handled
+    in the report modules themselves
+
+1.999006  2010-07-13 15:24:10 EST5EDT
+
+  - Glob the ID file name so "~/foo/id.json" works
+
+1.999005  2010-07-07 05:57:55 EST5EDT
+
+  - Remove use of 'base' pragma to help diagnose some heisenbugs
+
+1.999004  2010-03-29 15:56:36 EST5EDT
+
+  - Changed to the Apache License, version 2.0; (it's clearer, relicensable,
+    and is explicit about contributions)
+
+  - Use JSON in ASCII mode
+
+1.999003  2010-03-26 00:50:45 EST5EDT
+
+  - Added support for Perl version attribute from Test::Reporter 1.57+
+    and bumped Test::Reporter prereq
+
+  - Converted to Dist::Zilla for release management
+
+1.999002 Thu Mar 11 17:42:36 EST 2010
+
+  - Bumped Metabase::Client::Simple prereq to 0.004 and revised internals
+    to reflect changed constructor args for it
+
+1.999001 Wed Mar 10 11:18:49 EST 2010
+
+  - Fixed documentation to reflect changes in the API
+
+1.999 Mon Mar  8 23:56:09 EST 2010
+
+  - Bump version to 1.999 to indicate preparation for CPAN Testers 2.0
+
+  - Revised internals to reflect latest revisions to Metabase APIs
+
+0.001 Wed Jun 24 22:19:22 EDT 2009
+
+  Initial public release

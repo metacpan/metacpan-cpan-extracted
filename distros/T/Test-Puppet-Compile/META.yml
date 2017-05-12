@@ -1,0 +1,32 @@
+---
+abstract: 'Puppet catalog testing'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Puppet-Compile
+requires:
+  File::Basename: 0
+  File::ShareDir: 0
+  File::Temp: 0
+  Moose: 0
+  Template: 0
+  Test::More: 0
+  Try::Tiny: 0
+  feature: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+resources:
+  bugtracker: https://github.com/gittex/Test-Puppet-Compile/issues
+  repository: git://github.com/gittex/Test-Puppet-Compile.git
+version: 0.04
+x_authority: cpan:TEX

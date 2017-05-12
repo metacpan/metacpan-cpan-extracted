@@ -1,0 +1,19 @@
+.cvsignore
+Build.PL
+Changes
+lib/Template/Provider/PAR.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01.pod.t
+t/02.pod-coverage.t
+t/03.perlcritic.t
+t/04.smoke.t
+t/05.smoke.t
+t/06.prereq.t
+t/data/04.smoke.txt
+t/data/templates/included.tt
+t/lib/My/TestUtils.pm
+

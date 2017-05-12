@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - 'Lukas Mai <l.mai@web.de>'
+build_requires:
+  IO::Handle: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.56
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Try-Tiny-ByClass
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dispatch::Class: 0
+  Exporter: 0
+  Try::Tiny: 0
+  base: 0
+  perl: 5.006000
+  strict: 0
+  warnings: 0
+resources: {}
+version: 0.01

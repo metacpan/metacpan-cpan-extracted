@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Thesaurus.pm
+lib/Thesaurus/BerkeleyDB.pm
+lib/Thesaurus/CSV.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_basic.t
+t/02_bdb.t
+t/03_csv.t
+t/pod-coverage.t
+t/pod.t
+t/SharedTests.pm
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,579 @@
+Release history for Perl module Term::ReadLine::Perl5
+
+1.43 2015-06-19
+
+- Add IN and OUT methods as part of the Term::ReadLine spec, and
+  that Term::ShellUI uses.
+
+1.42 2015-06-18
+
+- Remove prototype on add_line_to_history to match lack of prototypes
+  in other packages that use Term::ReadLine
+- Update Change to comply with CPAN::Changes::Spec
+
+1.41 2014-09-13
+
+- I said, Remove required use of rlib until we can get clarification on its
+  license.
+
+- More small doc formatting changes.
+
+1.40 2014-09-12
+
+- Remove required use of rlib until we can get clarification on its
+  license
+
+- Go over docs. More exploratory work on nested keymaps. Not done yet
+  though.
+
+1.39 2014-08-13
+
+- Start to integrate OO Caroline when we need more than one
+  terminal. Nested keymaps here need more work.
+
+1.38 2014-06-01 Marilyn
+
+- Break out Term::ReadLine::Dumb and Term::ReadLine::Keymap into
+  their own modules
+- Conform better to GNU Readline: add rl_parse_and_bind, rl_bind_keyseq,
+  rl_redisplay, rl_init_file.
+
+1.37 2014-05-25
+
+- A stray character got into function BeginningOfLine. Darn!
+- Fill out demo code better.
+- Fix rl_get which was broken due to namespace change.
+- Improve readline.pm pod and overall pod
+
+1.36 2014-05-25
+
+- Add Term::ReadLine::Perl5::TermCap to remove cyclic
+  dependency between Term::ReadLine::Perl5 and Term::ReadLine.
+- Remove POD redundancy between Term::ReadLine::Perl5 README and
+  Term::ReadLine::Perl5
+- Start to organize and document readline.pm better.
+- Add demo program for interactive test. More should be done here.
+
+1.35 2014-05-22
+
+- more work on ~ expand for FreeBSD.
+
+1.34 2014-05-21
+
+- Better about resetting via setpwent() for testing.
+
+1.33 2014-05-19 Henry Frankel
+- Fix up ~ expansion via getpwent. For example. ~ro now may expand
+  to ~rocky and~root. More POD in readline.pm
+
+1.32 2014-05-14
+- Remove a tilde expand test until BINGOS gets back to me on why
+  it fails on his setup
+
+1.31 2014-05-13
+
+- Fix tilde expansion test on systems without getpwuid and where
+  the initial bsd_glob expansion includes "/";
+- Term::ReadLine::Perl5::readline.pod -> Term::ReadLine::Perl5::readline-guide.pod
+
+1.30 2014-05-11 Happy Mother's day!
+
+- rl_filename_list no longer adds classifier '*', @', '=' suffixes,
+  but does include '/' for directories. Term::ReadLine::GNU and GNU
+  Readline do not add these either. rl_filename_list handles some full
+  tilde expansions, e.g. ~ and ~root, but not partial ones like ~ro,
+  like GNU Readline does.
+
+  This is incompatible change, but T:R:P was incompatible to begin
+  with. Use rl_filename_list_deprecated for the old behavior.
+
+1.29 2013-11-30
+- Document and deprecate get_window_size(). If it can't get the window
+   size, don't die.
+- 6th attempt to reduce CPAN test unknowns
+
+1.28 2013-11-30
+- 5th attempt to reduce CPAN test unknowns
+
+1.27 2013-11-29
+- Doc changes
+- 4th attempt to reduce CPAN test unknowns
+
+1.26 2013-11-28
+- Doc changes
+- 3rd attempt to reduce CPAN test unknowns and CPANTS whining.
+
+1.25 2013-11-27 JB Release
+- Add completion_suppress_append and start documenting attribute variables
+- 2nd attempt to reduce CPAN test unknowns and CPANTS whining.
+
+1.24 2013-11-25
+- Administrivia. Should reduce CPAN test unknowns and CPANTS whining.
+
+1.23 2013-11-24
+- typo in addhistory github issue #3
+- Get Term::Readline::Tie version in correctly
+- Accomondate reasonable CPANTS warnings
+
+1.22 2013-11-17 Sister release
+- no warnings 'once' for Term::ReadLine::Perl5:Tie;
+
+1.20 2013-11-03
+
+- Move readline.pm and proper place for its namespace.
+- Create Term::ReadLine::Perl5::Tie as its own file
+- Create Term::ReadLine::Perl5::History and move history code
+  from Perl5.pm and readline.pm to this
+- Revise history test to use Test::More which simplifies and DRYs code.
+
+1.13 2013-11-01
+
+- Correct minimum Module::Build version number
+
+1.12 2013-10-31 -the Jed Woodward
+
+- Specify min Module::Build version that uses "test_requires"
+- Small doc changes
+- Revise history test - try again with tests where we don't get a tty
+
+1.11 2013-10-30
+
+- Skip some tests if we don't have a tty.
+
+1.10 2013-10-29
+- Make Term::ReadKey a requirement and simplify surrounding code.
+  For those that can't use Term::ReadKey, there is always
+  Term::ReadLine::Perl or something else
+
+1.09 2013-06-15
+- reduce duplicate README documentation and segregate old docs.
+- test.pl uses warnings and strict now.
+- Use File::HomeDir instead of $ENV{'HOME'}
+- Use Module::Build and better CPAN meta information
+
+1.08 2013-06-12
+- Botched release number for 1.07
+
+1.07 2013-06-12
+- CPANTS says Botched release 1.06 for tests
+
+1.06 2013-06-12
+- CPANTS says Botched release 1.05 for tests
+
+1.05 2013-06-12
+
+- Avoid circularity of Term::ReadLine::readline requiring Term::ReadLine::Perl
+  which depends on Term:ReadLine::readline.
+- fix =for comments appearing on metacpan
+- pod readline subroutines
+- Remove SelfLoader, use perl builtins uc, lc instead of home-grown routines
+- use 'warnings' in readline.pm
+- More unit tests
+
+
+1.04 2013-03-02
+
+- First Term::ReadLine::Perl5 release.
+- Add history commit from Rocky Bernstein.
+- Fix some style changes related to use of eval() in readline::_unescape().
+- Fork from Term::ReadLine::Perl.  Original changes located below.
+
+1.0303 2009-10-28
+
+- Would not allow macros with space in them.
+
+- Never try to display the whole prompt unless it is shorter than
+  screen width ;-).
+
+- Test supports PERL_RL_TEST_PROMPT_MINLEN in environment.
+
+- Test hints at special significance of the word `exit'.
+
+- Avoid a warning on unexpected variable assign (thanks to Robin Barker).
+
+- Change error message for unknown method.
+
+- Protect global variables during WINCH processing.
+
+- F_ReverseSearchHistory was not -w-safe (thanks to Peter Valdemar)
+
+- Test for $ENV{PERL_MM_NONINTERACTIVE} also to abort tests.
+
+1.0302 2006-05-23
+
+- C-@ was incorrectly bound to a missing function SetPoint.
+
+- C-x Esc c @ and C-x Esc c Space are now bound to SetMark, so do this
+  if $inDOS too.
+
+- Bind C-x @ c and C-x @ m too (as in Emacs).
+
+1.0301 2006-05-23
+
+- F_TransposeWords implemented
+
+- Enable binmode() on MSWin32 if ReadMode succeeds.
+
+- Since "normal" getc() returns 0 on "special keys" (as opposed
+  to behaviour with reasonable CRT library, which would return
+  a pair of keypresses 0 "keynumber"), to access special keys
+  one needs something like C-[ for Esc, and C-[ c for Alt-c.
+
+- Support \key with key in "abfnrtvd" in init files (\b/\d as C-?/C-d)
+  and \ooo for octal.
+
+- Allow single quotes in macro specifications, and backwacked quotes.
+
+- Support macros (propagate numeric arguments).
+
+- New functions:
+    F_BeginPasteGroup; F_EndPasteGroup;
+    F_BeginEditGroup; F_EndEditGroup; bound to XTerm mouse editing
+
+- Support ~/ in INPUTRC name and $include;
+
+- $ENV{TRP_INPUTRC} overrides $ENV{INPUTRC}.
+
+-  New functions:
+
+     F_DoMetaVersion; F_DoControlVersion;
+     These are bound as in Emacs: C-x Esc m and C-x Esc c.
+
+1.03 2006-04-09
+
+- Support for numeric arguments missed setting $lastcommand.
+
+- MinLine would not return the old value etc.
+
+- On MSWin32 without ReadKey, but with cygwin stty.exe:
+    do binmode (since Enter sends \r in these settings)
+        (XXXX we don't undo binmode; is it needed?)
+        (Only Control-Key work; do "Control-[ key" for Meta)
+
+- When optimizing "cursor" movement, take into account ornaments.
+
+- Optimize "cursor" movement even if we redraw the line.
+    Would display the string twice, even if cursor was at the end of
+        the line.
+    Add key binding for Control-Movement keys in xterm; and some OSX xterm.
+    Do not prefer HPUX xterm bindings to "normal" XTerm bindings.
+    New functions F_BeginUndoGroup F_EndUndoGroup F_DoNothing
+        F_MemorizeDigitArgument F_ForceMemorizeDigitArgument
+        F_UnmemorizeDigitArgument F_ResetDigitArgument
+        F_MergeInserts F_MemorizePos
+            (for better mouse support; untested)
+    Undo list merges together states where the only change is position
+
+1.0208 2006-03-14
+
+- Allow 2-arg form for test.pl
+
+- Open CONIN$ on Win (if asked for CON), and open RW (bug in Win devdriver).
+
+- Allow non-first Digit-Arguments to be escaped too.
+
+- Allow Alt-char translation to \M-char on DOSISH.
+
+- Apparently, self-loaded empty subroutines crash 5.8.2; 5.8.7 OK.
+  Work-around: put "1;" into non-implemented stuff.
+
+1.0207 2006-03-03
+
+- If mark was active, redraw could be performed after Enter.
+
+- Untested Win32 support for cut&paste.
+
+- Alias $var_DeleteSelection for $rl_delete_selection (thus accessible
+  via .inputrc).
+
+1.0206 2006-03-03
+
+- Shift-Ins, Control-Ins, Shift-Del operate on clipboard (if available)
+  (currently native on OS/2 only, otherwise uses commands
+  $ENV{RL_PASTE_CMD}, $ENV{RL_CLCOPY_CMD}, or file
+  $ENV{HOME}/.rl_cutandpaste).
+
+-  In absense of mark, CopyRegionAsKillClipboard operates on the whole line.
+
+-  Completely ignore unknown variables in .inputrc.
+
+-  Moving cursor should remove the highlight of initial string too.
+
+-  Change some local() to my().
+
+-  Region between point and mark is highlighted.
+   Commands SelfInsert, Yank*, *DeleteChar remove this region
+   if $rl_delete_selection is TRUE (the default).
+   (Set mark again to insert without removing.)
+
+1.0205 2006-03-02
+
+- Do not touch $ENV{HOME} unless defined.
+
+- $ENV{AUTOMATED_TESTING} to skip interactive tests.
+
+1.0204 2006-03-02
+
+- Applied patches from Gurusamy and Slaven for vi mode:
+    * Logic to move insertion point one char back was wrong;
+     Disable (YES!) choice of vi-mode based on $ENV{EDITOR}.
+     Just in case: generate proper warning if an old $ket-bug resurrects.
+    * If readkey() returns undef, behave as on EOF.
+        New option --no-print to test.pl.
+        Try to move prompt to the next line if something is already on the
+            current line (controlled by $rl_scroll_nextline,
+            $rl_last_pos_can_backspace);
+            Wrong setting of $rl_last_pos_can_backspace will result:
+                a) 1 and wrong: empty line before the prompt;
+                b) 0 and wrong: if the line contains 1 char only,
+                    (and no NL), the prompt will overwrite it;
+                    test with `perl -Mblib test.pl --no-print',
+                    type `print 1'.
+                [This is not the same as termcap/am!].
+        New variable $readline::rl_default_selected; if true, default string
+            is removed if the first keystroke is self-insert or BackSpace;
+                test.pl modified to test this too;
+            uses mr,me capabilities to highlight the default string.
+        New command: SaveLine (on M-#).
+        New command: PrintHistory (on M-h),
+        PreviousHistory and NextHistory take count.
+        The edited line is saved when one moves to history.
+
+1.0203 2002-05-24
+
+- Unconditional titlecasing of .inputrc "values" broke settings with
+  values such as 'vi' etc (thanks to Russ Southern for a report).
+
+1.0202 2002-04-18
+
+- Warnings on highlight of the right scroll mark '<' fixed
+  (thanks to Slaven Rezic).
+
+1.0201 Unknown
+
+- Warnings due to a misprint fixed (thanks to Tatsuhiko Miyagawa).
+
+1.02 2002-03-31
+
+-  Move reread-init to C-x C-r.
+
+-  Make C-x u and C-x C-u do undo.
+
+-  Set-mark:                C-@, Control-Space on PC.
+-  Exchange-point-and-mark: C-x C-x.
+-  Kill-region:             C-x C-w (as in lynx).
+
+-  Copy-region-as-kill:     C-x w   (kinda similar to Emacs).
+
+   On PC, the last 2 and yank also available on Shift-Del, Control-Insert,
+   Shift-Insert.
+
+-  Kill buffer is prepended or appended in natural manner.
+-  Disable detection of Japanese multibyte characters - conflicts with
+   single-byte scripts.  Reenable by $readline::_rl_japanese_mb = 1.
+
+1.01 Unknown
+
+- Allow unset TERM.
+
+-  Wrong display and warnings if UP/DOWN reach a short line from a
+   scrolled line
+
+-  Highlight the h-scroll indicators "<" ">" same as the prompt.
+
+-  Draw h-scroll indicator "<" even if a part of the prompt is shown.
+-  Scroll right if more than $rl_margin empty space is on the right.
+
+1.00 Unknown
+
+- Ignore $/, $\, $,.
+
+- Handle $include in RC file (by Roland Walker and Alexander Kourakos).
+
+- Support "unsupported ioctl()".
+
+- $rl_vi_replace_default_on_insert (by Russ Southern).
+
+- Now we closely match the new syntax of .inputrc (by David Wollmann).
+
+- Allow setenv PERL_RL_USE_TRK=0 to disable usage of Term::ReadKey.
+
+- With $inDOS vicmd_map had conflicting definitions for #27.
+
+- Removed spurious warnings from failing ioctl and stty.
+
+0.9908 2000-05-20
+
+- support $ENV{INPUTRC}.
+
+- Advice users to look into *this* file for features...
+
+- Joe.Petolino@Eng.Sun.COM added vi support (untested).
+
+- Remove .gz-ness from Makefile.PL.
+
+0.9907 1999-08-04
+
+- remove defined() noise.
+
+0.9906 1998-11-29
+
+- $readline::rl_getc added with the default value \&readline::rl_getc
+
+0.9905 1998-10-21 (thanks to Wilson P. Snyder II wsnyder@maker.com)
+
+- Fix reverse search.
+
+0.9904 1998-04-05 (thanks to Alexander Kourakos <awk@bnt.com>)
+
+- gave warnings for blank lines in my .inputrc
+
+- showed underlined spaces in prompts (in xterm) which look ugly.
+
+0.9903 1998-02-20
+
+- Enable ornaments by default.
+
+- Disable explicit ornaments in the test.pl.
+
+0.9902 1997-12-08
+
+- Do not test TRL::Gnu in test.pl!
+
+- Allow control-? in assignments.  \M-\C- should work, as well as \x7F.
+  (Thanks to Neil Bird!)
+
+0.9901 1997-09-08
+
+-  Support for ornaments busted editing of long lines.
+
+0.99 1997-09-08
+- Buglet with -w corrected.
+
+0.98 1997-08-23
+
+- newTTY added.
+
+- ornaments added.
+
+- no longer installs into PERL dirs.
+
+- Name of interface is now Term::ReadLine::Perl.
+
+- Meta-flag tolerated (thanks to Honza Pazdziora).
+
+- Bindings to \C-letter work again.
+
+0.97 1997-03-17
+
+- Wrong version of Perl.pm was included, did not work with older Perls.
+
+0.96 1997-03-03
+
+- tkRunning support unrolled, now needs newer Term/ReadLine.pm to use it.
+
+- Warnings from inputrc come only if -w.
+
+0.95 1997-01-20 (from Jim Meyering)
+    * readline.pm (preinit): Recognize bash's `input-meta' as a
+    valid variable name.
+    (F_ReReadInitFile): Recognize key binding directives in which
+    the double-quoted RHS contains white space.
+    (rl_set): Treat bash's `visible-stats' as a synonym of
+    CompleteAddsuffix.
+    Workaround against Term::ReadKey::ReadMode returning undef
+        (thanks to Helmut Jarausch).
+
+0.94 1997-01-13
+
+- Should work everywhere where stty works (possibly with a warning).
+
+- Warning says where to find TRK, switchable off.
+
+- ReadLine.pm removed from distribution.
+
+0.93 Unknown
+
+- Updates to Operate, couple of keybindings added.
+
+- $rl_completer_terminator_character, $rl_correct_sw added.
+
+- Reload-init-file moved to C-x C-x.
+- C-x ? and C-x * list/insert possible completions (similar to
+  tcsh globbing).
+
+- For a second ReadLine interface ReadLine::Stub is used (unsuccessfully)?
+  C-x * moves cursor correctly.
+
+0.92 1996-09-10
+
+- Couple of bugs with my $var = @_;
+- use SelfLoader; moved to DATA.
+- Works in XTERM on OS/2.
+
+0.91 1996-06-30
+
+- Optional second argument to ->readline;
+- [sg]etHistory, tkRunning features documented;
+- Operate overwriting parameter fixed;
+- AddHistory copied to addhistory in T::R::Perl;
+- [SG]etHistory documented;
+- tkRunning feature documented.
+-  eval "" => eval {}
+- local => my
+
+0.9 Unknown
+
+tkRunning corrected. New attributes in Features: getHistory,
+setHistory, and new methods: GetHistory and SetHistory.
+
+0.8 1995-12-13
+
+- Insert, Operate, HistorySearch added.
+
+- Rudimental support for tk being active during ReadLine.
+  Should work better if ReadKey is present, but did not bootstrap.
+
+-  SelfLoader (and AutoLoader) supported (uncomment the lines
+    with SelfLoader, ISA, and __DATA__).
+
+0.7 1995-08-20
+
+- We made ReadMode on term_OUT ;-(
+
+- Better workaround for return of globs from a sub.
+
+- Word break chars more suitable for Perl.
+
+0.6 Unknown
+
+-  The bug in 0.5 was due to missing vi keymap. Dirty workaround
+   added.
+
+0.5 Unknown
+
+Code to support ReadLine'less debugger moved to debugger. One user
+reported that having .inputrc triggers the same bug that buggered
+earlier versions of the package. Request for a second readline is
+tried to be executed first, dying only if should work on a different
+terminal.
+
+0.4 Unknown
+
+- Some bugs with $|f corrected.
+
+- Application name is set.
+
+- Works under OS/2 without ReadKey.
+
+- Should work under DOS with minimal changes (see $inDOS in
+  ReadLine/readline.pl).
+
+0.3 Unknown
+
+- Filehandles changed to \* from *, MinLine works, works with
+debugger.
+
+0.2 Unknown
+
+- Test added.

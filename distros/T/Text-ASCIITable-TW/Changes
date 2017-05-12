@@ -1,0 +1,8 @@
+Revision history for Text-ASCIITable-TW
+
+0.03    2008年09月06日 15時20分49秒 CST
+        use Pod::Coverage 0.19 to prevent test fail
+        
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,30 @@
+---
+abstract: 'phonetic encoding for video game titles'
+author:
+  - 'Michael Hendricks, C<< <michael@ndrix.org> >>'
+  - 'Michael Hendricks <michael@ndrix.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Phonetic-VideoGame
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Lingua::EN::Inflect::Number: 0
+  List::MoreUtils: 0
+  Roman: 0
+  String::Nysiis: 0
+  Text::Phonetic: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.05

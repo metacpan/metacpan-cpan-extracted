@@ -1,0 +1,50 @@
+2004-06-04 00:07  psionic
+
+	* Shelly.pm: [no log message]
+
+2004-06-03 23:48  psionic
+
+	* foo.pl: - Test code! :)
+
+2004-06-03 23:48  psionic
+
+	* Shelly.pm: - Added 4 WORD_* constants for the find_word_bound
+	  function   WORD_BEGINNING - get the position of the beginning of
+	  the word   WORD_END - get the position of the end of the word
+	  WORD_ONLY - only count words, ignore trailing spaces	 WORD_REGEX
+	  - you specify your own regex to match - Major update: Made
+	  everything object oriented. perldoc Term::Shelly   for use.  -
+	  Moved $bindings and $mappings to the new() sub for initialization
+	  - Changed init() to new() and added lots of lines.  - Also moved
+	  sigwinch stuff to the new() sub, haven't tested it yet.  - Added
+	  prototypes to most functions, I'll get around to the rest later.
+	  - Podded a bunch of functions, again, will do the rest later.  -
+	  fix_inputline() now does everything... kinda. It does all the
+	  input   position handling. If the input position goes past the
+	  end of the   screen, it'll compensate. Same for if it goes too
+	  far back (left).    Furthermore, sigwinch calls this function too
+	  to redraw the line and    shuffle things if need be. Weee!  -
+	  Wrote find_word_bound() - This took the bound searching
+	  functionality   out of the delete_word_backward function. It
+	  finds word boundaries, see   the pod for usage.  -
+	  complete_word() also uses find_word_bound now.  - Got rid of the
+	  test code (4 whole lines) and moved it to a better place
+
+2004-06-03 01:27  psionic
+
+	* Shelly.pm: - delete_word_backward almost works exactly like it
+	  does in tcsh and
+
+2004-06-03 00:30  psionic
+
+	* Shelly.pm: - Initial commit.	- Most code used in tic
+	  obliterated, it was bad. Some lines I didn't even remember what
+	  they did.  - Dynamic key binding works, dynamic mapping works.  -
+	  SIGWINCH works - termcols gets properly set - backward_char,
+	  forward_char, delete_char_backward, kill_line, newline,
+	  beginning_of_line, end_of_line all work.  - fix_inputline() works
+	  now.	- afaik, key inputs are handled without troubles. Control
+	  chars work, as   do ansi-control keys (left arrow, for instance,
+	  which is actually a	sequence of characters). Moving around
+	  seems like it's working   alright. Whew!
+

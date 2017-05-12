@@ -1,0 +1,18 @@
+---
+abstract: 'Test whether code exits without terminating testing.'
+author:
+  - 'Andrew Rodland <arodland@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Exit
+requires:
+  Return::MultiLevel: 0
+  Test::Builder: 0.86
+version: 0.11

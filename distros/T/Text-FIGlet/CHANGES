@@ -1,0 +1,243 @@
+Revision history for Perl extension Text::FIGlet and "working demos" in bin/
+(figlet.pl, minifig.pl, charmap.pl, showfigfonts.pl)
+
+2.19.3	Fri Apr 19 23h EST 2013
+	- Change $VERSION to avoif MakeMaker mis-handling of v-strings.
+	- Skip Test 4 (POD) if no Test::More
+	- Fix Unicode (tests) and remove "deprecated" encoding pragma,
+	  simplifying Font.pm
+
+2.19.2  Mon Apr 01 23h EST 2013
+	- Repair canonicalization for -f(onts) given as absolute paths.
+	- Fix -m passing in figlet.pl to allow font default.
+
+2.19.1	Mon Apr 01 21h EST 2013
+	- Updated FIGlet font repository URI.
+	- Excise wonky file path canonicalization, tests now run on Windows.
+	- Tweak whatis descriptions.
+	- Fix wrapping of Unicode character display in charmap.pl for perl 5.8+
+
+2.19	Sun Mar 31 22h EST 2013
+	- Full kerning!
+	- Basic smushing support has been added. Universal smushing
+          (aka overlap) is used if any smush mode is specified.
+	- New Illuminated sub-class to use figfonts as accents in plain text.
+	- Add examples of various layout modes to documentation.
+	- Documentation clean-up.
+	- Fix rare quasi-bug in font file parsing exposed by bug #56588
+	- Document fix for use of caca2tlf misformatted TOIlet fonts.
+	- Fix bugs with list-context figification
+	      - Original input string was appended to list
+	      - Switch to Encode::decode en lieu of _utf8_on, keep _uf8_off
+
+2.18	Sat Oct 10 04h EST 2009
+	- Tweaked code so that Font could process DOS formatted files in Un*x.
+	- Document Ransom in FIGlet.pm
+	- Alter Ransom->freeze to return a string rather than print to STDOUT.
+	- Better documentation of freeze.
+	- Added preliminary overlap implementation.
+	- Various small simplifications and corrections.
+	- Although -m=>'-0' is still accepted for fixed-width mode, -3 is the
+	  new and preferred value. With this change, ordering modes by their
+	  values results in a smooth progression of output modification.
+
+2.17	Mon Oct 05 22h EST 2009
+	- Implemented Ransom font freezing
+	- Added support for -m=0 to Ransom
+	- Added tests to check Font smush modes -1, -0, 0
+	- Reworked tests for 5.005 support, no more monkeying with Makefile.PL
+	- Fixed 5.6.X failure from utf8 promotion code w/ Encode::compat sub
+	  Everything should work in 5.00503, 5.6.2, 5.10.0 (linux)
+
+2.16	Mon Oct 05 03h EST 2009
+	- Fixed bug introduced way back in 1.07, that caused newlines in -A
+	  to be ignored, and added a test to catch future breakage.
+	- Fixed -v which broke for some fonts when I created own sum() for 5.005
+	- Minor performance tweaks, including removal of "require 5"
+
+2.15	Sun Oct 04 19h EST 2009, forgot to hit submit on PAUSE
+	- Fixed long-standing oddity of extra whitespace in module -m=-1 output
+ 	  vs. figlet(6) -W output due to off by one calculation error of widths
+	- Added -v support to Ransom
+	- Added Ransom support to base class
+	- Fixed premature wrapping due to the use of wide chars in glyphs.
+	- Re-placed rename(t/) in Makefile.PL to top so that tests work in
+	  5.005 w/o manual fussing; was moved to please "make distclean"
+
+2.14	Sat Oct 03 21h EST 2009
+	- Remove extraneous debug info from test 1-1
+	- Fixed hardblank bug resulting from unfortunate use of /o
+	  Fonts w/ diff hardblank from 1st loaded font not rendered properly.
+	- Added development version of the new Ransom class for the creation
+	  and use of composite fonts.
+	- Additional doc details regarding compressed fonts, and loading files.
+	- Fix example used in FIGlet.pm documentation to include scalar cast
+	- Add examples of post-processing from figlet(6) & noise from TODO
+	- Various small documentation tweaks
+
+2.13    Tue Sep 29 02h EST 2009
+	- Apparently there are some undocumented changes in File::Spec's
+	  behavior since 3.2501, test 1-1 ammended to accomodate this.
+
+2.12	Sun Sep 27 20h EST 2009
+	- Fix _canonical + tests 1-1 & 1-2 to really check Windows paths
+
+2.11	Sun Sep 27 19h EST 2009
+	- Updated showfigfonts to also display TOIlet fonts.
+	- Made non-existent font file messages clearer,
+	  IO::Uncompress:Unzip doesn't play well with others.
+	- Added adhesive strip to prevent premature wrapping of glyphs made
+	  with widechars in perls natively supporting UTF-8.
+	- Switched errors to cluck and confess.
+	- More generic handling of file paths (bug #49936); everything is UN*X
+	- Avoid "called too early to check prototype" warning.
+	- Switch back from readline() to waka-waka for 5.005
+	- Remove modern idioms from figlet for 5.005
+	- Return figify returns utf8 string(s) where appropriate,
+	  removing the need for the user to binmode their output channel.
+
+2.10	Wed Jan 21 02:35 EST 2009
+	- Added support for zipped fonts if IO::Uncompress::Unzip is available.
+	- Provisional support for TOIlet fonts
+	- Fixed a bug uncovered while playing with circle.tlf above
+	- More thorough testing: -E deutsch mapped characters, -X, -x
+	- Added missing 5.005 test.pl to MANIFEST
+
+2.04	Tue Jan 20 02:04 EST 2009
+	- Fixed bugs in figlet's upper.flc which prevented a-macron from being
+	  transliterated to A-macron; and perhaps problems for remaining chars.
+	- Fixed test #2 to work on Windows; File::Spec didn't remove trailing /
+	- Added testing support for 5.005 in an underhanded way
+	- Added work-around to upper.flc for a bug in perl 5.6.1 & 5.6.2
+	- Added memory conservation options
+	- Fix subtle, previously invisible bug in -D that bubbled up w/ -U=>0
+	- Clarify documentation
+	- Major speed-up (up to 4x) for loading of sparse fonts.
+
+2.03	Sun Jan  4 21:14 EST 2009
+	- Fix example used in (Font.pm) documentation to include scalar cast
+	- Further updates to Unicode documentation, and verify 5.005 works.
+
+2.02	Sun Jan  4 17:19 EST 2009
+	- Rework tests
+	- Fixed -D, which broke when perl started randomizing hash key
+	  retrieval order for security
+	- Fix-up and clarify Unicode support for 5.6
+
+2.01	Fri Jan  2 13:54:35 EST 2009
+	- Fixed reversed test which caused "Out of memory during extend array"
+	  in perl 5.8.5+, then completely removed the test as unnecessary :-P
+	- Amended documentation to include notes about negative characters.
+	- Added missing release date for 2.00
+	- Fixed bin/ tools to contend with context awareness of figify
+	- Remove leading zero padding on ASCII/ANSI characters codes in
+	  charmap.pl since codes aren't octal. Also nixed excess \s+ for -chars
+
+2.00	Thu Jan  1 22:48 EST 2009
+	- figify is now context sensitive, and can return a string or array
+	- Fixed no wrap (-w=>-1)
+	- Fixed typo in SYNOPSIS
+	- Fixed parser problem preventing unfortunately formatted fonts
+	  such as poison from being used
+
+1.07	UNRELEASED
+	- Added support for control files, significant documentation rewrite
+	  mayhem ensued
+	- Added Unicode support
+	- Added missing release dates for 1.05 and 1.06
+	  (Not that they're accurate as my clock was majorly skewed,
+	   which wasn't very nice to distribute)
+	- Added an explicit licencse
+	- Removed REVISION in favor of "use Module VERSION"
+	- Removed a dependency on $/ for parsing, which was incorrect anyways
+	- Fixed up to run clean under -w
+	- Fixed a few minor bugs
+	- Fixed various bits to be (more) compliant with the specifications
+	  for FIGdrivers L<figfont.txt>
+	- Fixed up package layout and Makefile.PL for script installation
+	- Fixed figlet.pl -I1 issues
+
+1.06	Fri Feb 15 09:13:59 UTC 2002
+	- Renamed Changes CHANGES
+	- Touched up man pages, added (undocumented) support for
+	   -h and --help to the scripts
+	- Major cleanup, fixed many translucent bugs,
+	  it's amazing if it was even "working" ;-)
+	- Fixed a bug that failed on relative paths to fonts with -f
+	- Added showfigfonts.pl utility,
+	  it's exposes the slowness of loading fonts
+	  (working on it, thangs wog and jryan)
+	- Fixed extended character support,
+	  subsequently reducing memory requirements (in a fashion)
+	- Deprecated -demo, use the charmap.pl utility instead
+	- Added $REVISION to figlet.pl and minifig.pl
+	- Modified switch parsing in figlet.pl and minifig.pl,
+	  perl -s is no longer used. Support for standard figlet switch
+	  syntax was added so now you can say -m0 or -m=0 or -m 0.
+	  Of course this means you can say things like -m-0 and -m -0
+	  which may look a little odd.
+	- Made figlet.pl and minifig.pl use strict
+	- Fixed -w=1, I believe this was broken in 1.04 when I kludged
+	  wrapping. I also did some work on wrapping in general and
+	  there should be no more issues.
+
+1.05  	Fri Dec  1 19:04:12 UTC 2001
+	- Added -m modes 0 (kerning) and -2 (font defined)
+	- Added -c, -l, -r, -x; justification
+	- Added -L, -R, -X; orientation
+	- Added -E
+        - Fixed -f to allow absolute path
+	- Documentation, had neglected to remove -F and other cleanup
+	- Synced figlet.pl and minifig.pl
+	- Updated minifig.HOWTO
+	- Upgraded figlet.pl/minifig.pl version to 2.1,
+	  I'm told this more appropriate based upon current
+	  white-space handling in font files.
+	- Switched internal font structure to an array.
+	  I'd avoided using an array for fear of allocating large
+	  blocks of memory due to auto-vivification. But this
+	  shouldn't even be a potential problem unless you're using
+	  a font that defines extended characters sparsely.
+	  This change increases performance because it avoids
+	  the permutations limiting factor of hashes, and is
+	  proportional to the text size.
+	  -f mini -m 0 -A Hello #Hash
+	  1.800u 0.020s 0:01.81 100.5%    0+0k 0+0io 253pf+0w
+	  -f mini -m 0 -A Hello #Array
+	  1.250u 0.050s 0:01.29 100.7%    0+0k 0+0io 251pf+0w
+	- Removed "- Better line wrapping" from TODO for 1.04.
+	  Considered done until reported broken (See 1.04 below)
+
+1.04  Thu Nov 30 01:37:57 GMT 2000
+	- Decided to fix a bug where if you supplied -d and
+	  an absolute path for -f, you got what you deserved.
+	  But after eating my own dog food (there's a
+	  Webmin module that uses this now... Tastes great!
+	  Totally useless! :-), I found it was rather annoying.
+	- Fixed -w, it is now much smarter and wraps whole words
+	  where applicable en lieu of letters. It is still
+	  conceivable that the output may overrun the requested
+	  outputwidth. If you run into this *LET ME KNOW*
+	  (text w/formatting, font), please. So I can determine
+	  if it's worth opening that can of worms.
+        - Seems I can't quite get this right...
+	  I bumped the VERSION to 1.03 in minifig.pl but
+	  FIGlet.pm was left at 1.02. Also neglected to increment
+	  the figlet.pl VERSION. And I left the timestamp off of
+	  the 1.03 entry below.
+	- Documented -help, added usage statement
+	- Added smush mode
+	  -F has been fixed and is now smush mode -0
+
+1.03  Sun Nov 12 20:07 GMT 2000
+	- Version bumped to 1.03, 0.02 had $VERSION set to 1.02
+	- Added minifig.pl, a self contained figlet
+	- Added -help (it displays the built-in pod)
+	- Added missing URLs in FILES to figlet.pl
+	- Added -D German support
+	- Created -F, fixed width
+	- Created -demo (figlet.pl/minifig.pl)
+	- Cleaned and clarified pod
+
+1.02  Sat Nov 11 15:54:02 EST 2000
+	- initial release

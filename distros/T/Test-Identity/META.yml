@@ -1,0 +1,24 @@
+---
+abstract: 'assert the referential identity of a reference'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Builder::Tester: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Identity
+provides:
+  Test::Identity:
+    file: lib/Test/Identity.pm
+    version: 0.01
+requires:
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

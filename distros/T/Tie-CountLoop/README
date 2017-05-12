@@ -1,0 +1,146 @@
+Tie::CountLoop(3)     User Contributed Perl Documentation    Tie::CountLoop(3)
+
+
+
+NNAAMMEE
+       Tie::CountLoop - Have a counter looping in a scalar with min max and
+       increment value.
+
+SSYYNNOOPPSSIISS
+               use Tie::CountLoop;
+
+               tie my $counter , 'Tie::CountLoop',15 ,-1 ,15 ,7 ,0;
+
+               my $t = tied $counter;
+               $t->increment( 1 );
+
+               for ( 1 .. 20 )
+               {
+                       print "  <<$counter>> <$_>  \n";
+               }
+               ## stop temporary the auto increment behaviour
+               $t->auto( 0 );
+               for ( 1 .. 20 )
+               {
+                       print "  <<$counter>> <$_>  \n";
+               }
+
+               or
+
+               ## the default value allow this
+               ## it is the same as my $counter , 'Tie::CountLoop', 0 , 1 , ( 2**32 ) - 1 , 0 , 0;
+               use Tie::CountLoop;
+               tie my $counter , 'Tie::CountLoop';
+
+               for ( 1 .. 20 )
+               {
+                       print "  <<$counter>> <$_>  \n";
+               }
+
+               ## How to toggle a binary flag after 5 access to the valriable
+               my $t1 = tie my $counter1 , 'Tie::CountLoop',0,1,1,0,5;
+
+               for ( 1 .. 20 )
+               {
+                       print "  <<$counter1>> <$_>  \n";
+               }
+
+DDEESSCCRRIIPPTTIIOONN
+       "Tie::CountLoop" allows you to tie a scalar in such a way that it
+       increments each time it is used.  The tie takes 4 optionals extra
+       arguments.
+
+       Argument 1: is the _s_t_a_r_t value of the counter. (default =0).
+
+       Argument 2: is the _i_n_c_r_e_m_e_n_t value. (default = 1).
+
+       Argument 3: is the _m_a_x_i_m_a_l value. When this value is reached, the
+       counter is set to the _m_i_n_i_m_a_l value (default = (2**32) -1)
+
+       Argument 4: is the _m_i_n_i_m_a_l value. When this value is reached if we used
+       an negative _i_n_c_r_e_m_e_n_t value, the counter is set to the _m_a_x_i_m_a_l _v_a_l_u_e
+       (default = 0)
+
+       Argument 5: is a _s_k_i_p_p_i_n_g value. If set to 3, means that you could
+       access the counter 3 time without incrementing (default=1)
+
+MMEETTHHOODDSS
+        The Tie::CountLoop provide 7 extra methods.
+
+   aauuttoo
+          which change the autoincrement behaviour.  With 1, the counter is
+          incremented when accessed.  With 0, the counter is NOT incremented
+          when accessed.
+
+   ttooggggllee
+          which toggle the autoincrement behaviour (on and off and again).
+
+   vvaalluuee
+          get/set the value of the counter without incrementing the counter.
+
+   mmaaxx
+          get/set the maximal value for the counter.
+
+   mmiinn
+          get/set the minimal value for the counter.
+
+   iinnccrreemmeenntt
+          get/set the increment value for the counter.
+
+   sskkiipp
+          get/set the skipping value for the counter.
+
+RREEVVIISSIIOONN HHIISSTTOORRYY
+           Revision 1.7  2008/09/25 15:52:27  fabrice
+           add extra methods to access all parameter of the counter
+           clean the code for auto and toggle to allow instantiation by object
+
+
+           Revision 1.6  2006/11/14 13:31:56  fabrice
+           fix default value for skip parameter
+
+           Revision 1.5  2006/02/03 10:42:55  fabrice
+           add README file
+
+           Revision 1.4  2006/02/03 10:21:37  fabrice
+           correct code for maximal and minimal value after increment
+
+           Revision 1.3  2006/01/26 19:31:20  fabrice
+           add method 'retrieve'
+
+           Revision 1.2  2006/01/26 15:53:56  fabrice
+           pod created
+
+           Revision: 1.1 start project
+
+AAUUTTHHOORR
+       This package was written by _D_u_l_a_u_n_o_y _F_a_b_r_i_c_e _<_f_a_b_r_i_c_e_@_d_u_l_a_u_n_o_y_._c_o_m>.
+
+CCOOPPYYRRIIGGHHTT aanndd LLIICCEENNSSEE
+       This package is copyright 2006-2008 by _D_u_l_a_u_n_o_y _F_a_b_r_i_c_e
+       _<_f_a_b_r_i_c_e_@_d_u_l_a_u_n_o_y_._c_o_m>.
+
+       Under the GNU GPL2
+
+       This program is free software; you can redistribute it and/or modify it
+       under the terms of the GNU General Public License as published by the
+       Free Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+       This program is distributed in the hope that it will be useful, but
+       WITHOUT ANY WARRANTY;  without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+       General Public License for more details.
+
+       You should have received a copy of the GNU General Public License along
+       with this program; if not, write to the Free Software Foundation, Inc.,
+       59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+       Tie::CountLoop Copyright (C) 2004-2008 DULAUNOY Fabrice Tie::CountLoop
+       comes with ABSOLUTELY NO WARRANTY; for details See:
+       <http://www.gnu.org/licenses/gpl.html> This is free software, and you
+       are welcome to redistribute it under certain conditions;
+
+
+
+perl v5.10.0                      2008-09-25                 Tie::CountLoop(3)

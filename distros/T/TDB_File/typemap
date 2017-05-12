@@ -1,0 +1,42 @@
+TDB_CONTEXT *					T_PTROBJ_CLASS
+TDB_DATA					T_TDB_DATA
+mone_on_fail					T_TDB_MONE_ON_FAIL
+const char *					T_PV
+enum TDB_ERROR					T_UV
+mode_t						T_UV
+tdb_log_func					T_SV
+tdb_traverse_func				T_SV
+#############################################################################
+INPUT
+T_TDB_DATA
+	if (SvOK($arg)) {
+		STRLEN len;
+		$var.dptr = SvPV($arg, len);
+		$var.dsize = len;
+	} else {
+		$var.dptr = NULL;
+		$var.dsize = 0;
+	}
+T_PTROBJ_CLASS
+	if (sv_derived_from($arg, \"$Package\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    croak(\"$var is not of type $Package\")
+T_TDB_MONE_ON_FAIL
+	NOT IMPLEMENTED
+
+#############################################################################
+OUTPUT
+T_TDB_DATA
+	if ($var.dptr) {
+		sv_setpvn((SV*)$arg, $var.dptr, $var.dsize);
+		free($var.dptr);
+	} else
+		$arg = &PL_sv_undef;
+# note use of "class" string:
+T_PTROBJ_CLASS
+        sv_setref_pv($arg, class, (void*)$var);
+T_TDB_MONE_ON_FAIL
+	$arg = ($var == -1) ? &PL_sv_no : &PL_sv_yes;

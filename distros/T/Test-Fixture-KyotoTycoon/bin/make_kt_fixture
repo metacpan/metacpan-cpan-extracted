@@ -1,0 +1,216 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.008000;
+use YAML::XS qw(Dump DumpFile);
+use Getopt::Long;
+use Cache::KyotoTycoon;
+use Storable qw(thaw);
+use Pod::Usage;
+
+our $VERSION = '0.1';
+
+# default option
+my $host    = "127.0.0.1";
+my $port    = 1978;
+my $timeout = 1;
+my $db      = 0;
+
+GetOptions(
+	"h|host=s"                 => \$host,
+	"p|port=i"                 => \$port,
+	"t|timeout=i"              => \$timeout,
+	"db=s"                     => \$db,
+	"custom-deserializer=s"    => \my $custom_deserializer,
+	"n|namespace=s"            => \my $namespace,
+	"o|output-file=s"          => \my $output_file,
+	"help"                     => \my $help,
+	"v|version"                => \my $version,
+) ||  pod2usage(1);
+
+pod2usage(-exitval => 0, -verbose => 1) if $help;
+pod2usage(-exitval => 0, -verbose => 99, -sections => [qw(VERSION AUTHOR)]) if $version;
+
+if (defined $custom_deserializer) {
+	no warnings "redefine";
+    do $custom_deserializer;
+}
+
+my $kt = Cache::KyotoTycoon->new(host => $host, port => $port, timeout => $timeout, db => $db);
+
+my @fixtures;
+my $cursor = $kt->make_cursor(1);
+$cursor->jump;
+while (my($key, $value, $xt) = $cursor->get(1)) {
+	my %hash;
+	if (defined $namespace) {
+		if ($key =~ /^($namespace)(.*)/) {
+			$hash{namespace} = $1;
+			$hash{key}       = $2;
+		} else {
+			next;
+		}
+	} else {
+		$hash{key} = $key;
+	}
+
+	if (defined $xt) {
+		$hash{xt} = $xt * -1;
+	}
+	$hash{value} = maybe_deserialize($value);
+	push @fixtures, \%hash;
+}
+$cursor->delete;
+
+if (scalar(@fixtures) == 0) {
+	warn "data nothing\n";
+	exit;
+}
+
+
+if ($output_file) {
+	DumpFile($output_file, \@fixtures);
+} else {
+	print Dump(\@fixtures);
+}
+
+exit;
+
+sub maybe_deserialize {
+
+	my $serialized = shift;
+	my $deserialized;
+	eval {
+		$deserialized = thaw $serialized;
+	};
+	if ($@) {
+		chomp(my $message = $@);
+		warn "$message\n";
+		$deserialized = $serialized;
+	}
+	return $deserialized;
+}
+
+
+
+__END__
+
+=head1 NAME
+
+make_kt_fixture - make fixture yaml from ktserver
+
+=head1 VERSION
+
+0.1
+
+=head1 SYNOPSIS
+
+Execute:
+
+  make_kt_fixture [--option]
+
+
+Options:
+
+  -h|--host              ktserver host
+  -p|--port              ktserver port 
+  -t|--timeout           ktserver connect timeout
+  --db                   ktserver dbname or id
+  --custom-deserializer  custom-deserializer file path
+  -o|--output-file       output file path
+  -n|--namespace         only target namespace output
+  --help                 display this page
+  -v|--version           display version
+
+=head1 DESCRIPTION
+
+make_kt_fixture - make fixture yaml from ktserver
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h|--host
+
+ktserver host. default 127.0.0.1
+
+=item -p|--port
+
+ktserver port. default 1978
+
+=item -t|--timeout
+
+ktserver connect timeout(sec). default 1
+
+=item --db
+
+ktserver dbname or id. default 0
+
+=item --custom-deserilizer
+
+custom deserializer file path. default Storable::thaw
+
+Custom Deserializer Example(Using JSON::XS):
+
+  # json-deserializer.pl. must be exists maybe_deseriazer
+  use JSON::XS;
+  
+  sub maybe_deserialize {
+  
+      my $serialized = shift;
+      my $deserialized;
+      eval { $deserialized = JSON::XS->new->decode($serialized); };
+      if ($@) {
+          chomp(my $message = $@);
+          warn "$message\n";
+          $deserialized = $serialized;
+      }
+      return $deserialized;
+  }
+
+  # ktremotemgr
+  ktremotemgr set -host 127.0.0.1 key '{"nirvana":"lounge act"}'
+  ktremotemgr list -host 127.0.0.1 -pv
+  key     {"nirvana":"lounge act"}
+  
+  #execute
+  make_kt_fixture --host 127.0.0.1 --custom-deserializer=json-deserializer.pl
+  ---
+  - key: key
+    value:
+      nirvana: lounge act
+
+=item -o|--output-file
+
+fixture output file path. default stdout
+
+=item -n|--namespace
+
+only target namespace output. default none
+
+=item --help
+
+display help and exit
+
+=item -v|--version
+
+display version and exit
+
+=back
+
+=head1 AUTHOR
+
+holly E<lt>emperor.kurt@gmail.comE<gt>
+
+=head1 SEE ALSO
+
+L<Cache::KyotoTycoon> L<YAML::XS>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

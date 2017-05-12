@@ -1,0 +1,37 @@
+Changes for Perl extension Test-POE-Stopping
+
+1.09 Tue 31 May 2011
+	- Updated to deal with the changed POE::API::Peek 2.17
+	- We now have a minimum POE version of 1.310 to deal with the
+	  relationship between POE and POE::API::Peek.
+
+1.08 Fri 27 May 2011
+	- Updating to Module::Install::DSL 1.01
+	- Updated to deal with the session management internals change
+	  to support forking that arrived in POE 1.310
+
+1.07 Mon 13 Sep 2010
+	- I screwed up and mis-named the dependency
+
+1.06 Mon 13 Sep 2010
+	- Support ref-count changes in POE 1.291
+	- Temporarily remove the version lock on POE::API::Peek
+
+1.05 Thu  8 Oct 2009
+	- Adding differentiated queue tracking (from vs to vs total)
+	- Adding a copy of the ref refcount to the diagnostics
+	- Adding detection of attempted shutdown within a nested ->call
+
+1.04 Fri 11 Sep 2009
+	- Adding diagnostics on the state of the various sessions
+	- Updated to Module::Install 0.91
+
+0.03 Wed 11 Mar 2009
+	- No functional changes
+	- Updated Perl dependency to 5.6
+	- Updated to Module::Install 0.79
+
+0.02 Sun 12 Jul 2008
+	- No functional changes
+	- Added the missing Changes file
+	- Updated to Module::Install 0.75

@@ -1,0 +1,12 @@
+0.03 2017-05-08T22:51:16Z
+
+    - migrate to minilla
+	- Merge pull request #1 from djerius/cwd_abs_below_root
+      - fix cwd to absolute path when current directory is not at root, make perl 5.26 compliant
+
+
+0.02
+    - add File::Path dependency for make_path()/remove_tree()
+0.01
+    - initial release
+

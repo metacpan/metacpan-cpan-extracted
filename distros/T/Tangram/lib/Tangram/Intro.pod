@@ -1,0 +1,150 @@
+
+# to be completed.
+
+=head1 NAME
+
+Tangram::Intro - an introduction to Tangram
+
+=head1 SYNOPSIS
+
+ # http://www.faqs.org/rfcs/rfc2324.html
+ perl -MNet::HTCPCP -le 'Net::HTCPCP->new("BREW")->send'
+
+ perldoc Tangram::Intro
+
+=head1 YIN AND YANG OF OBJECT PERSISTENCE
+
+There are yin and yang approaches to object persistence.  Are you a
+yin programmer or a yang programmer?
+
+=over *
+
+=item B<yin>
+
+(without, empty) - "I just want to store my objects"
+
+=item B<yang>
+
+(with, full) - "I want my database to represent my object structure"
+
+=back
+
+Please skip to the introduction that suits you.
+
+=head2 YIN OBJECT PERSISTENCE (A LA PIXIE)
+
+One yin approach is to have a single table of objects -
+
+  +----+------------------+
+  | ID | DATA             |
+  +----+------------------+
+
+This is the raw technique used by modules like MLDBM.  Stick objects
+in, get a tag (or, insert with a tag), and later present that tag to
+get the objects out.
+
+Modules like L<Pixie> extend this concept, to allow you to have
+objects that are I<persistent> (ie, have been stored and could be
+retrieved again by ID or name), inside other structures that are also
+persistent.  This is achieved without storing the same structure
+twice, without having to fetch all objects that are in a single
+persistent structure, and without requiring that the objects being
+stored even know that they are being stored.
+
+Fantastic.  This method is fine for any application that doesn't mind
+single threading data manipulation on objects.
+
+Enough banter, let's see some code; here's a project schema:
+
+ package MyProject::Tangram;
+
+ use Heritable::Types;
+ use Tangram::Core;
+ use Tangram::Type::Dump::Any;
+
+ our $schema =
+     Tangram::Schema->new
+         ( { classes =>
+              [ HASH => {
+                    fields => {
+                        idbif => # poof!
+                           undef
+                    },
+                },
+              ],
+           } );
+
+  sub db { Tangram::Storage->new($schema, @_) }
+
+This defines a sort of "store anything" schema.  You could deploy your
+database like this:
+
+ my $dbh = DBI->connect
+      ("dbi:mysql:tangram", "user", "pass");
+ Tangram::Relational->deploy ( $MyProject::Tangram::schema,
+                               $dbh );
+
+And then shove objects in and out like this:
+
+  use MyProject::Tangram;
+  my $storage = MyProject::Tangram::db
+      ("dbi:mysql:tangram", "user", "pass");
+
+  my $object = bless { first_name => "Homer",
+		       last_lame => "Simpson",
+		      }, "NaturalPerson";
+  my $oid = $storage->insert($object);
+
+  my $homer = $storage->load($oid);
+
+If this Pixie-like functionality is all you're after, then you can
+stop there, and isn't much slower than Pixie.  You also get the choice
+of whether you want to freeze data structures in your database via
+"Data::Dumper", "Storable" or "YAML".
+
+=head2 YANG OBJECT PERSISTENCE
+
+If you wish to enable concurrency without paying a large performance
+penalty for most standard types of data access, then you may need to
+extract single parts of your objects into columns.  That way, you can
+make the most use of your database's (hopefully) highly tuned and
+refined ability to cache and manipulate data indices.
+
+In that case, you may choose to start with mapping all of your
+object's properties to database columns (as was the only option before
+Tangram 2.08):
+
+ package MyProject::Tangram;
+
+ use Tangram::Core;
+
+ our $schema =
+     Tangram::Schema->new
+         ( { classes =>
+              [ NaturalPerson => {
+                    fields => {
+                        string => {
+			},
+			integer => {
+				    }
+                    },
+                },
+              ],
+           } );
+
+  sub db { Tangram::Storage->new($schema, @_) }
+
+Tangram has been transaction-savvy since version 1.  So long as you
+are careful to flush Tangram's object cache, before you start doing
+selects that lock rows for update, then you can easily write
+transaction protected programs.
+
+=head1 FURTHER READING
+
+The original L<Tangram::Tour> is still worth reading - but bear in
+mind the above - Tangram can map schemas richly or simply, and the
+choice is up to you.  See also L<Tangram::Sucks> for the things which
+need to be improved.
+
+=cut
+

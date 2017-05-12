@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 68f2cbc67b279ecedffa5dd84419f7b6cb236cfa Build.PL
+SHA1 8dca200bb519c3582dd2f34e44c60e9d42b0c349 Changes
+SHA1 34247ce15784938da8f6ca62e675aa6fa5359e57 MANIFEST
+SHA1 0592496a6f1a62714d289f6c6a9d907f6d4068ef MANIFEST.SKIP
+SHA1 192cd98e0f8071e942c95dc8b386ba0185097ea0 META.json
+SHA1 44a0ac49f7a53257e5a05b508ed4de81974eb5bf META.yml
+SHA1 643bb6e873c84ccebc98b4130da910ea1bd78a67 Makefile.PL
+SHA1 80e007930b9d6139f4d615e0f5b83f9f12b6aa91 README
+SHA1 a7e169d24c3ceb08b5ddf571cb4d327a581015e5 lib/Time/Normalize.pm
+SHA1 a1d093f11bafe2e27c50ac27a8a5bc1cfb1f9d4b t/0-signature.t
+SHA1 334383223eea3f84c2254efb435fe4f4fcf29d79 t/doc.t
+SHA1 1ab8fd1ecb73f0adf629683b0c1c4a61ca82a78b t/hms.t
+SHA1 81e3b1296e5957d56935e0ebe583719e5fb44434 t/month.t
+SHA1 3ea62b2b78c0ce36e519afe8420f4085bc9682dd t/rct.t
+SHA1 9d8cccfa48881f4ad296812c5952a9e7bb0d6b6c t/utils.t
+SHA1 fb088db10db4310e8672934c3216fffd8c1ce5f4 t/year.t
+SHA1 42224ec9be0405137f84bc9cdc8a8e0b6c404aea t/ym.t
+SHA1 51ae4efe1b42ea3d84d1a4819514ada39b783535 t/ymd.t
+SHA1 387808a9e49980d7cb052089ee44d3352f8fb4e3 t/ymd3.t
+SHA1 0a6d2852ca895df06d5f4d8be73f638294b589aa t/ymdhms.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.21 (MingW32)
+
+iEYEARECAAYFAlNX5hwACgkQwoSYc5qQVqqGCQCgpfx4O2MCAiivK6qosrO5yL0D
+730AnA4nzWlrY/I7X5WIptsC5Z//WT8k
+=beSM
+-----END PGP SIGNATURE-----

@@ -1,0 +1,5 @@
+$bar before: <%= $bar->{test} -%>
+<%
+   $bar->{test} = "I love Text::Template::Simple"
+%>
+<%* t/data/shared-var-3.tts | SHARE: $foo  %>

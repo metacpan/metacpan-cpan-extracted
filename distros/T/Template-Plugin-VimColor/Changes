@@ -1,0 +1,6 @@
+Revision history for Perl extension Template::Plugin::VimColor.
+
+0.01  Mon Jan  2 18:29:10 2006
+	- original version; created by h2xs 1.23 with options
+		-X -A -n Template::Plugin::VimColor
+

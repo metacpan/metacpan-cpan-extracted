@@ -1,0 +1,20 @@
+package Foo::Bad;
+
+# This package has some bad stuff
+
+=pod
+
+=begin testing foo after bar
+
+is( Foo::Bar->foo, 1, '->foo returns expected value' );
+
+=end testing
+
+=cut
+
+sub foo {
+	my $self = shift;
+	return 1;
+}
+
+1;

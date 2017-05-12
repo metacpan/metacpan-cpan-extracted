@@ -1,0 +1,35 @@
+Term-Screen-Win32 version 0.03
+============================
+
+Simple Term::Screen style interface to the Win32::Console::ANSI capabilities
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Win32::Console::ANSI (version 1.00)
+  Win32::Console (version 0.191)
+  Carp
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Daniel Podolsky <tpaba@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

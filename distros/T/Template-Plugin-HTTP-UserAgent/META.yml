@@ -1,0 +1,27 @@
+---
+abstract: 'Template plugin for parsing HTTP User-Agent string'
+author:
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  Template: '0'
+  Template::Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-HTTP-UserAgent
+requires:
+  HTML::ParseBrowser: '0'
+  Template::Plugin: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/Template-Plugin-HTTP-UserAgent
+  repository: https://github.com/neilbowers/Template-Plugin-HTTP-UserAgent.git
+version: '0.08'

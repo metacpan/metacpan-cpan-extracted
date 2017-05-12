@@ -1,0 +1,23 @@
+0.04      Jan 03 2012
+
+0.03      Dec 04 2011
+
+    * replaced hardwired >>11 just in case sizeof(PerlInterpreter)
+      changes radically on different platforms
+
+    * use PERL_NO_GET_CONTEXT and aTHX rather than PERL_GET_THX
+
+0.02      Dec 02 2011
+
+    * exported function is now named 'interpreter_id'
+      with prototype ()
+
+    * added more tests
+
+    * convert to Dist::Zilla
+
+0.01      Nov 30 2011
+
+    * original version;
+      created by h2xs 1.23 with options -A -n Thread::IID
+

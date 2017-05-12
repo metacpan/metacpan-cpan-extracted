@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 3b557ba21edd18e5cc52dc1d48df0b89dad13c0b Build.PL
+SHA1 11d2a775f76aa8b1f50c7ee30256bb171a5701e9 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 feabc865faf03c31381f7b027c6a959b394fed64 MANIFEST
+SHA1 dc0012ac236d9def45081e1222658b7d844af82b META.yml
+SHA1 28ea0300a45a77220b82ae84871fe96cfeb246a4 Makefile.PL
+SHA1 5f7de0d7a673002d11c05670a6bf14ac5b10e192 README
+SHA1 f443c777f595accfe16943584594e6043e2d2d04 Todo
+SHA1 1fce16fe3f85cfcc1c22944de61a0d435e9d8bb2 bin/miniapp
+SHA1 136fb530c2dccebd84654b1b5dc86971ab725926 bin/pickhues
+SHA1 ad7f0269e71ddd8bd942e590f8bc0605fda57440 bin/qtk15puzzle
+SHA1 ac2ef23ab160d99324269458b630fd9290136872 lib/Tk/QuickTk.pm
+SHA1 ac946f7e92ad5a86964a9376c71239850b6b6a92 lib/Tk/QuickTk/WebColor.pm
+SHA1 3972d6d7c963a2a59b6924fb0435d83ad68bd542 lib/details.pod
+SHA1 9cbe32231fcc713bdb8bf043d325120ab35161d2 lib/internals.pod
+SHA1 4e7741d1b6c02643183dd3723ec91048db254c63 lib/scripts.pod
+SHA1 32db4ce87eb44f266658ad774cf5a2c1a2f37529 t/001_load.t
+SHA1 690849c7463cf1c7b1cb1ce0afed2908e49243f6 test.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iF4EAREIAAYFAk16jdUACgkQD315t5pfs0L5PwD7BUT63kMCO224GUMnDaaOTyIq
+sTsAA1njCz6oW7oZN8EA/2iWrB+8JjMdJRPYzXXhfT1IgxwTuHZuZU8htYaXxO+C
+=Vyww
+-----END PGP SIGNATURE-----

@@ -1,0 +1,28 @@
+---
+abstract: 'A spinner without so much Moose in it'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires:
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-Spinner-Lite
+requires:
+  Carp: 0
+  IO::Handle: 0
+  Time::HiRes: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Spinner-Lite
+  homepage: https://metacpan.org/dist/Term-Spinner-Lite
+  repository: git://github.com/mrallen1/perl-Term-Spinner-Lite.git
+version: 0.03

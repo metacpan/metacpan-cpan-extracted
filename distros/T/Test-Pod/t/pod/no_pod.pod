@@ -1,0 +1,7 @@
+Test::Pod test pod -- a valid pod file
+
+This is a pod file without pod commands
+ 
+Andy Lester, garbage-address@aol.com
+
+Copyright 2004, Andy Lester

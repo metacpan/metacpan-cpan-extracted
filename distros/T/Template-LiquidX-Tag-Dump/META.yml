@@ -1,0 +1,41 @@
+---
+abstract: 'Simple Perl Structure Dumping Tag (Functioning Custom Tag Example)'
+author:
+  - 'Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-LiquidX-Tag-Dump
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Template::LiquidX::Tag::Dump:
+    file: lib/Template/LiquidX/Tag/Dump.pm
+    version: v1.0.6
+recommends:
+  Data::Dump: '0'
+requires:
+  Data::Dumper: '0'
+  Template::Liquid: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/sanko/Template-LiquidX-Tag-Dump/issues
+  homepage: https://github.com/sanko/Template-LiquidX-Tag-Dump
+  repository: git://github.com/sanko/Template-LiquidX-Tag-Dump.git
+version: 1.0.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

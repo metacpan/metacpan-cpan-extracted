@@ -1,0 +1,43 @@
+---
+abstract: 'parser for crontab date and time field'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Time::Local: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Crontab
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Time::Crontab:
+    file: lib/Time/Crontab.pm
+    version: '0.04'
+requires:
+  List::MoreUtils: '0'
+  Set::Crontab: '1.03'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kazeburo/Time-Crontab/issues
+  homepage: https://github.com/kazeburo/Time-Crontab
+  repository: git://github.com/kazeburo/Time-Crontab.git
+version: '0.04'
+x_contributors:
+  - 'Barbie <barbie@missbarbell.co.uk>'
+  - 'Martin Barth <martin@senfdax.de>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

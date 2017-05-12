@@ -1,0 +1,93 @@
+? (
+<math title="(">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>(</mo>
+#      <mo></mo>
+    </mrow>
+  </mstyle>
+</math>
+$$($$
+
+? )
+<math title=")">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>)</mo>
+  </mstyle>
+</math>
+$$)$$
+
+? [
+<math title="[">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>[</mo>
+#      <mo></mo>
+    </mrow>
+  </mstyle>
+</math>
+$$[$$
+
+? ]
+<math title="]">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>]</mo>
+  </mstyle>
+</math>
+$$]$$
+
+? {
+<math title="{">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>{</mo>
+#      <mo></mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\{$$
+
+? }
+<math title="}">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>}</mo>
+  </mstyle>
+</math>
+$$\}$$
+
+? (:
+<math title="(:">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mo>&lang;</mo>
+#      <mo></mo>
+    </mrow>
+  </mstyle>
+</math>
+$$\langle$$
+
+? :)
+<math title=":)">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&rang;</mo>
+  </mstyle>
+</math>
+$$\rangle$$
+
+? {:
+<math title="{:">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+<mrow/></mstyle></math>
+$$ $$
+
+? :}
+<math title=":}">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+<mo>:}</mo></mstyle></math>
+$$:\}$$
+
+? {::}
+<math title="{::}">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+<mrow/></mstyle></math>
+$$ $$

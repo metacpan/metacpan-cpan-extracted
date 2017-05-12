@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 eb90423485fd63a3390e5a0f1b57989276676a91 Changes
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE
+SHA1 c41acf3474eaac81bcc94e8e81558b9bd4234890 LICENSE.bsd
+SHA1 ed9afed8d31cc386454b43c5b99f6e3e4c479afa MANIFEST
+SHA1 a2f3e9f29e069ad31ca639e843472c2aa74a1d3e META.yml
+SHA1 abc87bb6d07bb8089f51aed67bea831b5753e573 Makefile.PL
+SHA1 c3f88376aef7e654079d40a87764cbe17f682eda README
+SHA1 35b84c801417537198a164323d38efaa484e6db9 Tube.pm
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 7619584b1181c1dbe27b5e26741c0b0ad85e4c14 t/Task-Map-Tube/01-use.t
+SHA1 28f32937821ba95968df874f7c999fe6f0356bb1 t/Task-Map-Tube/02-version.t
+SHA1 28acc962f8d066ba41ee5af8d556848f26cb38c5 xt/Task-Map-Tube/01-pod_coverage.t
+SHA1 7d1194dcd2d485f3382aced28c8dd6201fbd760f xt/Task-Map-Tube/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXcPPaAAoJEJe+XXKaIuTlUacH/0H1ksgNhMU+CWviQmjMemv3
+oP6JWV9R2nYokUjhzjVmovQEgnuTjcKDmYQTqESFmv7PwSOCxOUz/xS3T/me/Gkb
+Bo9JDPotaWq033Bs7401FkMF/bocnsD0fGIwcXUQFlpgGVwzijbO5nAovckczyKk
+/R0tKZHQ9alvxgs9jpw/Dqpq8V9TD+Fa9phZ4ovjt7rre8rMQBDip1f/ac36zV0K
+n6gVPlF5ZV/jrW6O2nDy1j5BF9mAnsxpXFjlBtHRiyQuUTww1juu98gyPupjHeEG
+dEi+WcvczXZjrG/+sDx/b6YXXNi9XuD/B8vb2l3GBPBFtoh2rgKYwfmLaEvvMf8=
+=6xZt
+-----END PGP SIGNATURE-----

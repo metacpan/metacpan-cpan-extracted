@@ -1,0 +1,39 @@
+0.008     2017-02-01 11:50:33+11:00 Australia/Melbourne
+ - Converted to a Moo class internally
+ - Allow ports to be specified by caller
+
+0.007     2016-10-21 17:06:01+11:00 Australia/Melbourne
+ - Add enable_acls and acl_default_policy arguments in
+   preparation for supporting the ACL API in the Consul
+   module.
+
+0.006     2016-09-24 14:26:19+10:00 Australia/Melbourne
+ - Ensure that each port, and each class instance, gets unique
+   free ports.  This avoids some random test failures.
+ - When assigning SERF ports makes sure that not only is TCP
+   available, but UDP as well.  Again, avoids random test
+   failures.
+ - Increase the daemon start timeout from 10 to 30 seconds so
+   that 20-parallel.t can pass 100% even on my scrappy laptop.
+
+0.005     2016-09-22 21:18:37+10:00 Australia/Melbourne
+ - Support Consul 0.7.0 by specifying the new performance
+   parameter so that test startup does not timeout.
+ - Loosen constraints on the Consul version so that all is required
+   is v0.6.1 or newer.
+ - Added a skip_all_if_no_bin class method.
+ - Support setting the consul binary via the CONSUL_BIN env var.
+ - Support running multiple Test::Consul instances at once.
+ - Use the -dev option if datadir is not set.
+
+0.004     2016-03-29 21:44:20+11:00 Australia/Melbourne
+ - Update for Consul 0.6.4
+
+0.003     2016-02-19 08:52:55+11:00 Australia/Melbourne
+ - Update for Consul 0.6.3
+
+0.002     2015-12-08 16:57:50+11:00 Australia/Melbourne
+ - Update for Consul 0.6.0
+
+0.001     2015-11-04 13:32:28+11:00 Australia/Melbourne
+ - First release

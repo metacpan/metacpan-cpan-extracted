@@ -1,0 +1,1 @@
+For loop contents: <: expr x.__counter__ :>.

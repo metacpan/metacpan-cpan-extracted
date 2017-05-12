@@ -1,0 +1,9 @@
+# this is a comment, then a blank line
+
+00load.t
+01get_test_files.t 1 
+01make_test_manifest.t 2
+leading_space.t 2.9
+pod_coverage.t 1 # with a comment
+trailing_space.t 3 # with a comment
+99pod.t	3.1  

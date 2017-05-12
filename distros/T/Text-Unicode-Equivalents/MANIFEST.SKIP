@@ -1,0 +1,15 @@
+^blib/
+\.\$\$\$
+\.tmp
+\.bak
+\.old
+CVS/
+\.tar
+^test/
+\.cvsignore
+^Makefile$
+\~$
+\.exe
+\.ex_
+\.gz
+\.svn/

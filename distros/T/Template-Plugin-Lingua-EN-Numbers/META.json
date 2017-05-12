@@ -1,0 +1,69 @@
+{
+    "name": "Template-Plugin-Lingua-EN-Numbers",
+    "version": "0.02",
+    "abstract": "TT2 interface to Lingua::EN::Numbers modules",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "template toolkit",
+        "checksum",
+        "lingua"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Template": "2.07",
+                "Template::Plugin": "2.07",
+                "Template::Stash": "2.07",
+                "Lingua::EN::Numbers": "0",
+                "Lingua::EN::Numbers::Years": "0",
+                "Lingua::EN::Numbers::Ordinate": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Template::Test": "2.07",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Template::Plugin::Lingua::EN::Numbers": {
+            "file": "lib/Template/Plugin/Lingua/EN/Numbers.pm",
+            "version": "0.02"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-Lingua-EN-Numbers" },
+        "repository": {
+            "url": "git://github.com/barbie/template-plugin-lingua-en-numbers.git",
+            "web": "http://github.com/barbie/template-plugin-lingua-en-numbers",
+            "type": "git"
+        }
+    }
+}

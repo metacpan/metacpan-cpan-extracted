@@ -1,0 +1,19 @@
+<testsuites>
+  <testsuite failures="0"
+             errors="1"
+             tests="3"
+             name="data_tap_todo_inline">
+    <testcase name="1 - Foo"></testcase>
+    <testcase name="2 - Unexpected success">
+      <error type="TodoTestSucceeded"
+             message="Just testing the todo interface."><![CDATA[ok 2 - Unexpected success # TODO Just testing the todo interface.]]></error>
+    </testcase>
+    <testcase name="3 - This is not todo"></testcase>
+    <system-out><![CDATA[1..3
+not ok 1 - Foo # TODO Just testing the todo interface.
+ok 2 - Unexpected success # TODO Just testing the todo interface.
+ok 3 - This is not todo
+]]></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

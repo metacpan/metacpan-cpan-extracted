@@ -1,0 +1,194 @@
+Revision history for Perl extension Tcl::Tk.
+
+1.04	20-feb-2011
+	- t/canvas.t new test file, t/* files improved
+	- demos/tcltkdb.pm moved out into separate module
+
+1.03	19-feb-2011
+	- remove need_tk
+	- for a widget method now could be specified that it returns
+	  another widget (so it Tcl::Tk::Widget::xxx is instantiated)
+	- for a widget now could be specified methods that it processed
+	  itself (i.e. $canv->raise will be transformed to ".canv raise"
+	  and not to "raise .canv")
+	- small cleanups of Tcl::Tk and one bug fix for MainWindow
+	- tcltkdb.pm demo is better
+
+0.99	13-jan-2011
+	- removed $Tcl::Tk::DEBUG, sub _DEBUG, sub tkgestapo etc.
+	- sub new more Carp-friendly
+	- better _fast and manyCamelCaseMethods handling
+	- now wdiget methods that return widgets could be specified,
+	  (need documenting)
+	- Exporter was used not right WRT tags
+	- fix Optionmenu implementation, remove Optionmenu_obsolete
+	- TODO changed
+	- demos/tcltkdb.pm seriously reworked
+
+0.97    07-jun-2007
+	- $widget->camelCaseMethodSubmethodSubsubmethod
+	- cleaner Tcl::Tk::new method
+	- most widgets methods are expected to return single string
+
+0.95    11-may-2007
+	- fix lost file Tcl/Tk/Widget/Text.pm borrowed from perlTk
+	- actually make CPAN indexer happy
+
+0.94    09-may-2007
+	- Separator widget
+	- check for snit package
+
+0.92    17-oct-2006
+	- robust implementation of creation of widgets package
+	- Scrolled improvement - now wrapped widget could be dealt directly
+	- 'bind' now much better
+
+0.91    16-oct-2006
+	- starting from 0.90 snit is a requirement
+	- Scrolled reimplementation
+	- awkward Tcl::Tk::Widget::MultipleWidget gone away
+	- Optionmenu better implementation
+	- Declare(...) is now also interpreter method
+
+0.90    25-aug-2006
+	- ROText better implementation
+	- better CamelCase AUTOLOAD, refer to widget method if created with
+	  create_method_in_widget_package sub
+	- one more t/ file
+
+0.88    23-aug-2005
+	- bug fixes
+	- some tests
+
+0.87    02-feb-2005
+	- updates in documentation
+	- implement better cleanup on destruction of widgets, but not enable
+	  it currently
+	- AUTOLOAD for $interp->method(...), $interp->meThod(...) in the same
+          way as for Tcl::Tk::Widget objects
+	- $interp->_method(...) as faster $interp->method(...)
+
+0.86    28-jan-2005
+	- rework documentation
+	- $widget->_method(...) as faster but limited version of
+	  $widget->method(...)
+	- now module able to deal with multiple interpreters, having
+	  widgets with same names
+	- more perlTk compatibility
+	- documentation improvements
+	- more demos/ changes
+
+0.85    31-dec-2004
+	- new pkg_require command, deprecates need_tk
+	- minor test fixes for portability
+
+0.84    13-sept-2004
+	- more perlTk compatibility
+	- more tk-demos/ changes
+
+0.80    10-may-2004
+	- Makefile.PL now check if Tcl/Tk able to do 'package require Tk'
+	- fix META.yml syntax
+
+0.81    09-may-2004
+	- completely reworked how information about widgets is organized
+	- few bug fixes
+	- tk-demos few more demos adopted
+	- perlTk compatibility further additions (Bitmap widget, some
+	  widgets methods)
+
+0.80    03-may-2004
+	- Tcl::Tk module is now pure-perl module; will be part of 'Tcl'
+	  module
+	- tk-demos, demos directories updated
+	- added few more tests
+	- many improvements in perlTk compatibility code: more widgets,
+	  more supported functions, so on.
+
+0.77	17-apr-2004
+	- many changes from Jeff Hobbs, Gisle Aas, Vadim Konovalov
+	for perlTk compatibility, better structured objects, widgets.
+	more added tests (borrowed from perlTk). See ChangeLog for details.
+	- ceMakefile.PL now moved to Makefile.PL
+	
+0.76	05-apr-2004, Vadim Konovalov
+	- many changes from Jeff Hobbs
+	  * perlTk compatibility (Tree, Image, getOpenFile, getSaveFile,
+	    Menu, many other, see ChangeLog for bigger list), improvements
+	  * Makefile.pl, Tk.pm now better organized
+	- Tcl::Tk::Widget::MultipleWidget now usable but incomplete
+	- demo to use MultipleWidget
+	
+
+0.75	28-mar-2004, Vadim Konovalov
+	- pannedwindow => panedwindow (Jeff Hobbs)
+	- DEBUG now off by default
+	- Meta.yml
+	- README
+	- perlTk compatibility:
+	  * Listbox/perlTk => listbox
+	  * Tcl::Tk::Exists (Tk::Exists)
+	  * 'Darken' widget method (borrowed from Widget.pm/perlTk)
+	  * 'timer' behaves like widget
+	  * replaced options now could be subroutine ref
+	  * canvas bind
+	  * Photo
+	  * Menu, Menubutton much more capable now
+	  * few others (wm, winfo, ...)
+
+0.74	21-mar-2004, Vadim Konovalov
+	- accept many changes from Jeff Hobbs, TCL guru and lead developer:
+	  * pannedwindow
+	  * menu widget
+	  * many cleanup of code
+	- accept changes from Slaven Rezic, wishlist 5656 from rt.cpan.org,
+	  * "font" and "waitVariable" are now available
+	  * the standard "Message" widget is now available
+	- test is performed (although tiny)
+	- added some demos
+          
+0.73	(not released to public), Vadim Konovalov
+	- many perlTk compatibility changes, autoloading of perlTk widget
+	  methods of wwwVvvv type
+
+
+0.72	20-aug-2003, Vadim Konovalov
+	- provide very similar syntax as in perlTk, for SRC-level compatibility
+	  (widget methods Text, Button, Frame and so on)
+	  But need more and better documentation
+	- documentation fixes
+	- demos/wcolors.pl added to illustrate 'use Tcl::Tk qw(:perlTk);'
+
+0.7	02-jul-2003, Vadim Konovalov
+	- more 'tk-demos' implemented scripts (search.pl)
+        - some fixes from Slaven Rezic
+	- awidget, awidgets methods
+	- declare_widget method
+        - perl-5.005 support (FreeBSD has this version after installation)
+	- 'widget' method now return blessed object even if a widget was
+	  created outside our module.
+
+0.6	05-jun-2003, Vadim Konovalov
+	- more 'tk-demos' implemented scripts
+	- OO
+	- support for WinCE (ceMakefile.pl)
+	- More than one interpreter could be created
+
+0.5	25-may-2003, Vadim Konovalov
+	- more 'tk-demos' implemented scripts
+	- created 'demos' subdir and moved demo scripts to there
+	- 'linux' and 'cygwin' supported
+	- TODO file added
+
+0.4	19-may-2003, Vadim Konovalov
+	- changed version system and added module VERSION variable
+	- compatibility changes to support modern versions of Perl and Tcl
+	  (perl-5.6.0, perl-5.8.0, tcl-8.4.2)
+	- Makefile.PL changed to be more consistent
+	- implemented event fields
+	- added all files for 'widget' demo from Tcl/Tk distribution
+	- changed demos from tcl/tk distribution to run from current system:
+	  widget.pl, style.pl, unicodeout.pl, colors.pl, label.pl
+
+Tcl-b2 1997, Malcolm Beattie
+	- Created entire module.

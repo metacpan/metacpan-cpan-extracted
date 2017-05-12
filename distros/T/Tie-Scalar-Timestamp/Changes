@@ -1,0 +1,6 @@
+Revision history for Perl extension Tie::Scalar::Timestamp.
+
+0.01  Fri Feb 25 09:59:45 2005
+	- original version; created by h2xs 1.23 with options
+		-Xn Tie::Scalar::Timestamp
+

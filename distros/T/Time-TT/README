@@ -1,0 +1,73 @@
+NAME
+
+Time::TT - Terrestrial Time and its realisations
+
+DESCRIPTION
+
+Terrestrial Time (TT) is a time scale representing time on the surface
+of Terra.  Specifically, it is the proper time experienced by a clock
+located on the rotating geoid (i.e., at sea level).  It is indirectly the
+basis for Terran civil timekeeping, via its realisation International
+Atomic Time (TAI).  It is linearly related to (and in fact now defined
+in terms of) the astronomical time scale Geocentric Coordinate Time (TCG).
+
+This module represents instants on the TT time scale as a scalar number
+of SI seconds since an epoch.  This is an appropriate form for all manner
+of calculations.  The TT scale is defined with a well-known point at
+TAI instant 1977-01-01T00:00:00.0.  That instant is assigned the scalar
+value 599616000 exactly, corresponding to an epoch (scalar value zero)
+near the TAI epoch 1958-01-01T00:00:00.0.  This matches the convention
+used by "Time::TAI" for instants on the TAI scale.  Because TAI does not
+match the rate of TT perfectly, the TT epoch is not precisely equal to
+the TAI epoch, but is instead around 600 us earlier than it.
+
+There is also a conventional way to represent TT instants using day-based
+notations associated with planetary rotation `time' scales.  The `day'
+of TT is a nominal period of exactly 86400 SI seconds, which is slightly
+shorter than an actual Terran day.  The well-known point at TAI instant
+1977-01-01T00:00:00.0 is assigned the label 1977-01-01T00:00:32.184
+(MJD 43144.0003725).  Because TT is not connected to Terran rotation,
+and so has no inherent concept of a day, it is somewhat misleading to
+use such day-based notations.  Conversion between this notation and the
+linear count of seconds is supported by this module.  This notation does
+not match the similar day-based notation used for TAI.
+
+There is another conventional way to represent TT instants, using a larger
+unit approximating the duration of a Terran year.  The `Julian year' 
+is a nominal period of exactly 365.25 `days' of exactly 86400 SI seconds
+each.  The TT instant 2000-01-01T12:00:00.0 (MJD 51544.5) is labelled as
+Julian epoch 2000.0.  Julian epochs are used only with TT, not with any
+other time scale.  The Julian epoch numbers correspond approximately to
+Gregorian calendar years, for dates within a few kiloyears of the epoch.
+Because TT is not connected to the Terran orbit, and so has no inherent
+concept of a year, the year-based notation is somewhat misleading.
+Conversion between this notation and the linear count of seconds is
+supported by this module.
+
+Because TT is a theoretical time scale, not directly accessible for
+practical use, it must be realised using atomic clocks.  This is done
+by metrological agencies, each with different imperfections.  To achieve
+microsecond accuracy it is necessary to take account of these differences.
+This module supports conversion of times between different realisations
+of TT.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2010, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,28 @@
+---
+abstract: 'textile plugin for the Template Toolkit'
+author:
+  - 'The thin wrapper code (all ten lines of it) was written by Mark Fowler'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-Textile
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Template: 2
+  Text::Textile: 2.12
+resources:
+  homepage: http://github.com/2shortplanks/Template-Plugin-Textile/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/2shortplanks/Template-Plugin-Textile.git
+version: 2.02

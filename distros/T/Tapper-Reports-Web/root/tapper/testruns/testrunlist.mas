@@ -1,0 +1,93 @@
+<%args>
+    %testrunlist => ()
+    $mark_testrun_id => 0
+</%args>
+% use DateTime::Format::Strptime;
+% # ----------------------------------------------------------------------
+<%method single_testrun>
+  <%args>
+  $testrun
+  $just_group_member => 0
+  $mark_testrun_id    => 0
+  </%args>
+%               my $formatter    = DateTime::Format::Strptime->new(pattern     => '%Y-%m-%d %H:%M');
+%               my $full_width   = 50;
+%               my $green_width  = int (       $testrun->{success_ratio}  * $full_width / 100);
+%               my $red_width    = int ((100 - $testrun->{success_ratio}) * $full_width / 100);
+
+% # formatting is a display issue and belongs to the template
+
+% if    ($testrun->{updated_at}) { $testrun->{updated_at}->set_formatter($formatter)}
+% if ($testrun->{created_at}) { $testrun->{created_at}->set_formatter($formatter)}
+% if ($testrun->{started_at}) { $testrun->{started_at}->set_formatter($formatter)}
+
+                <tr>
+                        <td class="reportid">
+                              <b>
+                                <a title="Click to show details" href="/tapper/testruns/id/<% $testrun->{testrun_id} %>">tr<% $testrun->{testrun_id} %></a>
+                              </b>
+                        </td>
+                        <td><% $testrun->{updated_at} || $testrun->{created_at} ||  $testrun->{started_at}  %></td>
+
+                        <td>
+                            <a title="Add <% $testrun->{topic_name} %> to filter" href="/<% $c->req->path %>/topic/<% $testrun->{topic_name} %>">
+                            <img src="/tapper/static/images/plus.png" size="16"></a>
+                            <a title="Click to show testruns of topic '<% $testrun->{topic_name} %>'"
+                            href="/tapper/testruns/topic/<% $testrun->{topic_name} %>"><% $testrun->{topic_name} %></a>
+                        </td>
+                        <td>
+                            <a title="Add <% $testrun->{machine_name} %> to filter" href="/<% $c->req->path %>/host/<% $testrun->{machine_name} %>">
+                            <img src="/tapper/static/images/plus.png" size="16"></a>
+                            <a title="Click to show testruns on '<% $testrun->{machine_name} %>'"
+                            href="/tapper/testruns/host/<% $testrun->{machine_name} %>"><% $testrun->{machine_name} %></a>
+                        </td>
+                        <td>
+                            <a title="Add <% $testrun->{status} %> to filter" href="/<% $c->req->path %>/status/<% $testrun->{status} %>">
+                            <img src="/tapper/static/images/plus.png" size="16"></a>
+                            <a title="Click to show testruns on '<% $testrun->{status} %>'"
+                            href="/tapper/testruns/status/<% $testrun->{status} %>"><% $testrun->{status} %></a>
+                        </td>
+                        <td>
+% if ($testrun->{status} eq 'finished'){
+<a href="/tapper/testruns/id/<% $testrun->{testrun_id} || '' %>" title="<% $testrun->{success_ratio} || '' %>% - Click to show details"><img src="/tapper/static/images/green_bar.png" height="16" width="<% $green_width %>"><img src="/tapper/static/images/red_bar.png" height="16" width="<% $red_width %>"></a>
+% }
+                        </td>
+                        <td>
+                        <a title="Add <% $testrun->{owner} %> to filter" href="/<% $c->req->path %>/owner/<% $testrun->{owner} %>">
+                            <img src="/tapper/static/images/plus.png" size="16"></a>
+                            <a title="Click to show testruns of owner '<% $testrun->{owner} %>'" href="/tapper/testruns/owner/<% $testrun->{owner} %>">
+                            <% $testrun->{owner} %></a>
+                        </td>
+                </tr>
+</%method>
+% #
+% #
+% # ----------------------------------------------------------------------
+% #
+% #
+% my @testruns = @{$testrunlist{testruns} || []};
+% if (@testruns) {
+
+    <table class="reportlist">
+        <thead>
+                <tr>
+                         <th class="reportid">ID</th>
+                         <th>DateTime (GMT)</th>
+                         <th>Topic</th>
+                         <th>Machine</th>
+                         <th>state</th>
+                         <th>Ratio</th>
+                         <th>Owner</th>
+                </tr>
+        </thead>
+        <tbody>
+%   foreach my $testrun (@testruns) {
+        <& SELF:single_testrun, testrun => $testrun, mark_testrun_id => $mark_testrun_id &>
+%   }
+        </tbody>
+    </table>
+% }
+
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:

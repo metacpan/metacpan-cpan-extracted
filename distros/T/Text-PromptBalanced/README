@@ -1,0 +1,30 @@
+Text/PromptBalanced version 0.01
+================================
+
+Designed to help users create command-line prompts that can inform a user as to
+when their input consists of unclosed strings, parentheses or any other
+characters that the user chooses to type.  Later versions of this (hopefully
+fairly soon) will extend the strings to match more than one character.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jeffrey Goff
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

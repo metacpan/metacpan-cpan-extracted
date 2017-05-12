@@ -1,0 +1,63 @@
+NAME
+    Types::ReadOnly - type constraints and coercions for read-only data
+    structures and locked hashes
+
+SYNOPSIS
+       has foo => (is => 'ro', isa => ReadOnly[ArrayRef], coerce => 1);
+
+DESCRIPTION
+    This is a type constraint library for write-restricted references.
+
+    This module is built with Type::Tiny, which means that you can use it with
+    Moo, Mouse, Moose, or none of the above.
+
+  Type Constraints
+    This library provides the following type constraints:
+
+    `ReadOnly`
+        A type constraint for references to read-only scalars, arrays and
+        hashes. Values don't necessarily need to be deeply read-only to pass
+        the type check.
+
+        This type constraint *only works when it is parameterized*.
+
+        This type constraint inherits coercions from its parameter, and makes
+        the result read-only (deeply).
+
+    `Locked`
+        A type constraint for hashrefs with locked keys (see Hash::Util).
+
+        This type constraint *only works when it is parameterized with
+        `HashRef` or a hashref-like type constraint*. For example
+        `Locked[HashRef]` or `Locked[ Map[ IpAddr, HostName ] ]`.
+
+        When parameterized with a `Dict` type constraint (see
+        Types::Standard), it will use the `Dict` type as the authoritative
+        list of keys that the hashref should be locked with, unless the Dict
+        includes a slurpy parameter (e.g. `Dict[foo => Int, slurpy
+        HashRef[Num]]`).
+
+        This type constraint inherits coercions from its parameter, and
+        applies `lock_ref_keys` to the result.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-ReadOnly>.
+
+SEE ALSO
+    Type::Tiny::Manual, Hash::Util, Const::Fast, MooseX::Types::Ro.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

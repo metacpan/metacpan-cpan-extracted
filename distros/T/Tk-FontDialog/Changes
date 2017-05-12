@@ -1,0 +1,64 @@
+Revision history for Perl extension Tk::FontDialog.
+
+0.18	2017-03-22
+	- no real code changes, just fixes for perlcritic and cpants
+	  issues (by viviparous and Mohammad S Anwar)
+
+0.17
+	- no code changes, just a test fix
+
+0.16
+	- no code changes, just a minor Pod fix (RT #51766)
+	  and changed the repo address to github
+
+0.15
+	- more non-latin1 samples
+	- test script more robust, check for DISPLAY first
+
+0.14
+	- fixed Makefile.PL problem under Windows (RT #29425)
+
+0.13
+	- -altsample: do not display range from codepoint 128 to 160
+          rather display some non-latin1 samples
+
+0.12
+	- new method Tk::Widget::GetDescriptiveFontName
+	- InsertFamilies: ttf seem to need explicite size setting
+	  (visible in nicefonts)
+
+0.11
+	- introduced FontGetPoints, needed for Tk804.xxx (font sizes
+	  are now in pixels, not in points)
+	- more documentation (RefontTree, examples)
+	- some GUI cleanup by Martin Thurn
+
+0.10
+	- fixed test error if "if.pm" is not available (thanks Jack!)
+	- canvas scrollregion fix
+
+0.09
+	- cancel waitVariable if dialog is destroyed
+	- test now in BATCH mode per default
+
+0.08
+	- fix for Windows (noticed by Sheri)
+
+0.07
+	- PREREQ_PM was missing in Makefile.PL
+	- fixed failure when *font was not defined in the option database
+
+0.06
+	- new options: -fixedfont, -fixedfontsbutton, -nicefontsbutton
+
+0.04
+	- internationalization
+	- solved problems with empty family names and dots in family names
+	- cursor changes to watch for InsertFamilies
+
+0.03
+	- some minor fixes
+
+0.01  Sun Aug 23 02:21:15 1998
+	- original version; created by h2xs 1.18
+

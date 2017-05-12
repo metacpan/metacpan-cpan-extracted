@@ -1,0 +1,10 @@
+Changes made in Sense-Clusters version 0.19 during version 0.21
+
+Amruta Purandare amruta@cs.pitt.edu
+Ted Pedersen 	 tpederse@umn.edu
+
+University of Minnesota at Duluth
+
+1.	Added perldocs for programs in Toolkit/cluster 
+
+(Changelog-v0.19to0.21 Last Updated on 05/20/2003 by Amruta)

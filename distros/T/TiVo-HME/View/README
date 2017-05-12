@@ -1,0 +1,23 @@
+TiVo/HME/View version 1.x
+==========================
+
+Views are containers that hold Resources & scale/translations/transparencies.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Mark Ethan Trostler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

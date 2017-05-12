@@ -1,0 +1,20 @@
+Types-LoadableClass
+===================
+
+Created:      2013-10-03
+Home page:    <https://metacpan.org/release/Types-LoadableClass>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-LoadableClass>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2013-04-04
+
+ - Various features inspired by RT#91802
+   Benct Philip Jonsson++
+   <https://rt.cpan.org/Ticket/Display.html?id=91802>
+
+0.002	2013-10-03
+
+ [ Packaging ]
+ - List correct dependencies.
+
+0.001	2013-10-03	Initial release

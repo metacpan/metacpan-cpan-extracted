@@ -1,0 +1,18 @@
+digraph G {
+	node [label="\N"];
+	graph [bb="0,0,327,246"];
+	xyz [label="hello\nworld", color=slate_blue, fontsize=24, fontname="Palatino-Italic", style=filled, fontcolor="hot pink", pos="59,195", width="1.64", height="1.18"];
+	red [color=red, style=filled, pos="163,195", width="0.75", height="0.50"];
+	green [color=green, style=filled, pos="123,98", width="0.83", height="0.50"];
+	blue [color=blue, style=filled, fontcolor=black, pos="202,98", width="0.75", height="0.50"];
+	cyan [color=cyan, style=filled, pos="202,26", width="0.75", height="0.50"];
+	magenta [color=magenta, style=filled, pos="287,26", width="1.11", height="0.50"];
+	yellow [color=yellow, style=filled, pos="37,26", width="0.94", height="0.50"];
+	orange [color=orange, style=filled, pos="123,26", width="0.94", height="0.50"];
+	red -> green [pos="e,130,116 156,177 150,163 141,141 133,124"];
+	red -> blue [pos="e,195,116 170,177 176,163 185,141 192,124"];
+	blue -> cyan [pos="e,202,44 202,80 202,72 202,63 202,54"];
+	blue -> magenta [pos="e,268,42 219,84 231,74 248,60 261,48"];
+	green -> yellow [pos="e,55,41 105,83 93,73 76,59 62,47"];
+	green -> orange [pos="e,123,44 123,80 123,72 123,63 123,54"];
+}

@@ -1,0 +1,465 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_docs.html />
+
+<div class="width6 last">
+  <div class="section_header">Jobs</div>
+  <p>
+    A job is defined as any executable program that resides on the file
+    system. It is represented as a file in the files system whose name is
+    the same as the job name.  Jobs can depend on each other. Jobs can
+    also have start times before which a job may not by run.
+  </p>
+
+  <p>
+    When a job is run by the run wrapper (bin/run_with_log), two status semaphore files are
+    created in the <a href="/docs/configuring/options.html#log_dir">log directory</a>.  The first is created when a job starts
+    and has a name of <code>&#036;FamilyName.&#036;JobName.pid</code>.  This file contains some
+    attributes of the job.  When the job completes, more attributes are
+    written to this file.  
+  </p>
+
+  <p>
+    When the job completes, another semaphore file is written to the <a href="/docs/configuring/options.html#log_dir">log directory</a>.
+    The name of this file will be <code>&#036;FamilyName.&#036;JobName.0</code> if the job ran
+    successfully, and <code>&#036;FamilyName.&#036;JobName.1</code> if the job failed.  In either
+    case, the file will contain the exit code of the job (0 in the case of
+    success and non-zero otherwise).
+  </p>
+
+  <p>
+    When a job is run by the <code>run_with_log</code> run wrapper, any
+    output the job sends to stdout or stderr will be captured and stored
+    in a file
+    called <code>&#036;FamilyName.&#036;JobName.&#036;pid.&#036;start_time.stdout</code>
+    in the <a href="/docs/configuring/options.html#log_dir">log directory</a>.
+  </p>
+
+  
+  <div class="new_section_header"><a name="job_status">Job Status</a></div>
+  <p>
+    Within TaskForest, every job has a status, which is one of the
+    following values:
+  </p>
+  <ul class="bullet">
+    <li><b>Waiting</b> - One or more dependencies of the job have not been
+    met.</li>
+    <li><b>Ready</b> - All dependencies have been met; the job will run
+    during the next iteration of the <a href="/docs/runningTaskForest.html#main_loop"><code>taskforest</code>
+    main loop</a>.</li>
+    <li><b>Running</b> - The job is currently running</li>
+    <li><b>Success</b> - The job has run successfully</li>
+    <li><b>Failure</b> - The job was run, but the program exited with a
+    non-zero return code</li>
+  </ul>
+    
+  
+  <div class="new_section_header">Jobs &amp; Families</div>
+  <p>
+    Jobs can be grouped together into ``Families.'' A family has a start
+    time associated with it before which none of its jobs may run. A
+    family also has a either (a) a list of days-of-the-week or (b) a
+    calendar associated with it. Jobs within a family may only run on the
+    days specified by the days-of-the-week or the calendar.
+  </p>
+
+  <p>
+    Jobs and families are given simple names. A family is described in a
+    family file whose name is the family name. Each family file is a text
+    file that contains 1 or more job names. The layout of the job names
+    within a family file determine the dependencies between the jobs (if
+    any).  There are <a href="/about/text.html">several reasons why text files are a good choice for
+    Family files</a>.
+  </p>
+
+  <p>
+    Family names and job names should contain only the characters shown
+    below:<br>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_
+  </p>
+
+  <p>
+    Let's see a few examples. In these examples the dashes (-), pipes (|)
+    and line numbers are not parts of the files. They're only there for
+    illustration purposes. The main script expects environment variables
+    or command line options or configuration file settings that specify
+    the locations of the directory that contain family files, the
+    directory that contains job files, and the directory where the logs
+    will be written. The directory that contains family files should
+    contain only family files.
+  </p>
+
+  <div class="new_section_header">EXAMPLE 1 - Family file named F_ADMIN</div>
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', days => 'Mon,Wed,Fri'
+02 |
+03 | J_ROTATE_LOGS()
+04 |
+   +-------------------------------------------------------
+  </code></pre></div>
+
+  <p>
+    The first line in any family file always contains 3 bits of
+    information about the family: the start time, the time zone, and the
+    days on which this jobs in this family are run, or the calendar that
+    specifies on which dates jobs in this family are run.  
+  </p>
+  <p>
+    In this case, this family starts at 2:00 a.m. Chicago time.  The time
+    is adjusted for daylight savings time.  This family 'runs' on Monday,
+    Wednesday and Friday only.  Pay attention to the format: it's
+    important.
+  </p>
+  <p> 
+    Valid days are 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'.  Days
+    must be separated by commas. 
+  </p>
+  <p> 
+    All start times (for families and jobs) are in 24-hour format. '00:00'
+    is midnight, '12:00' is noon, '13:00' is 1:00 p.m. and '23:59' is one
+    minute before midnight. 
+  </p>
+  <p> 
+    There is only one job in this family - J_ROTATE_LOGS.  This family
+    will start at 2:00 a.m., at which time J_ROTATE_LOGS will immediately
+    be run.  Note the empty parentheses [()].  These are required.  
+  </p>
+  <p> 
+    What does it mean to say that J_ROTATE_LOGS will be run?  It means
+    that the system will look for a file called J_ROTATE_LOGS in the
+    directory that contains job files.  That file should be executable.
+    The system will execute that file (run that job) and keep track of
+    whether it succeeded or failed.  The J_ROTATE_LOGS script can be any
+    executable file: a shell script, a perl script, a C program etc. 
+  </p>
+  <p> 
+    To run the program, the system actually runs a wrapper script that
+    invokes the job script.  The location of the wrapper script is
+    specified on the command line or in an environment variable. 
+  </p>
+  <p> 
+    Now, let's look at a slightly more complicated example:
+  </p>
+
+  <div class="new_section_header">EXAMPLE 2 - Job Dependencies</div>
+  <p>
+    This family file is named WEB_ADMIN.
+  </p>
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 |               J_ROTATE_LOGS()
+04 |
+05 | J_RESOLVE_DNS()       Delete_Old_Logs()
+06 |
+07 |               J_WEB_REPORTS()      
+08 |
+09 |    J_EMAIL_WEB_RPT_DONE()  # send me a notification
+10 |
+   +-------------------------------------------------------
+  </code></pre></div>
+
+  <p>
+    A few things to point out here:
+  </p>
+
+  <ul class=bullet>
+    <li>Blank lines are ignored.
+    </li>
+    <li>
+      A hash (#) and anything after it, until the end of the line is
+      treated as a comment and ignored.
+    </li>
+    <li>
+      Job and family names do not have to start with J_ or be in upper
+      case.
+    </li>
+    <li>
+      Instead of specifying days of the week on which this Family may run,
+      this Family specifies a calendar to which it adheres.  The calendar
+      used in this case is called 'Weekdays.'  For a detailed description
+      of calendars, please see
+      the <a href="/docs/configuring/calendars.html">Calendars
+      documentation page</a>.
+    </li>
+  </ul>
+
+  <p>
+    It is possible to have a dependency on a job that's in another family.
+    If, for example, J_ROTATE_LOGS was in the Family named LOGS, then the
+    family above would look like this:
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 |            LOGS::J_ROTATE_LOGS()
+04 |
+05 | J_RESOLVE_DNS()       Delete_Old_Logs()
+06 |
+07 |               J_WEB_REPORTS()      
+08 |
+09 |    J_EMAIL_WEB_RPT_DONE()  # send me a notification
+10 |
+   +-------------------------------------------------------
+  </code></pre></div>
+
+  <p>
+    An external job dependency is different from 'normal' job
+    dependencies, because unlike 'normal' dependencies, it specifies only
+    the dependency, and not when the external job should run.  This means
+    that looking at the above family file, we cannot say when
+    J_ROTATE_LOGS will run.  More accurately, we cannot say when
+    LOGS::J_ROTATE_LOGS will run.  All we know is that after it runs,
+    J_RESOLVE_DNS and Delete_Old_Logs can run (after 2:00 GMT).
+  </p>
+  
+  <p>
+    This also means that external job dependencies may only be specified
+    on the first line of a Family, or the first line of a group of jobs
+    (see example 4).  Therefore the following is not allowed:
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 |            LOGS::J_ROTATE_LOGS()
+04 |
+05 | J_RESOLVE_DNS()       Delete_Old_Logs()
+06 |
+07 |            REPORTS::J_WEB_REPORTS()  # BAD!
+08 |
+09 |    J_EMAIL_WEB_RPT_DONE()  # send me a notification
+10 |
+   +-------------------------------------------------------
+  </code></pre></div>
+  
+  <p>
+    To see how this should be written, we need to know about Job Forests.
+    Since that's described in example 4, we'll defer the solution until then.
+  </p>
+
+  <p>
+    One last thing about external job dependencies: just because we're
+    waiting on a job in another family, that doesn't mean that the same
+    job cannot be run in this family.  For example, the following is
+    permitted:
+  </p>
+  
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 |            LOGS::J_ROTATE_LOGS()
+04 |
+05 | J_RESOLVE_DNS()       Delete_Old_Logs()
+06 |
+07 |               J_WEB_REPORTS()
+08 |
+09 |    J_EMAIL_WEB_RPT_DONE()  # send me a notification
+10 |
+11 |                J_ROTATE_LOGS()   # This is a different
+12 |                                  # job!
+13 |
+   +-------------------------------------------------------
+  </code></pre></div>
+
+  <p>
+    The family will not start until J_ROTATE_LOGS has run from the LOGS
+    family.  The last job run by this family will be J_ROTATE_LOGS.  It
+    has nothing to do with the instance of the job that ran in the LOGS
+    family.  Line 11 will actually run the job, while line 3 only checks
+    whether the job has run (by another family).  That's what I mean when
+    I say that external dependencies only specify the dependencies, while
+    normal dependencies also specify when the job should run.
+  </p>
+
+  <div class="new_section_header">EXAMPLE 3 - Time Dependencies</div>
+  <p>
+    Let's say that we don't want J_RESOLVE_DNS to start before 9:00
+    a.m. because it's very IO-intensive and we want to wait until the
+    relatively quiet time of 9:00 a.m.  In that case, we can put a time
+    dependency of the job. This adds a restriction to the job, saying that
+    it may not run before the time specified.  We would do this as follows:
+  </p>
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 |               J_ROTATE_LOGS()
+04 |
+05 | J_RESOLVE_DNS(start => '09:00')  Delete_Old_Logs()
+06 |
+07 |               J_WEB_REPORTS()      
+08 |
+09 |    J_EMAIL_WEB_RPT_DONE()  # send me a notification
+10 |
+   +-------------------------------------------------------
+  </code></pre></div>
+
+  <p>
+    J_ROTATE_LOGS will still start at 2:00, as always.  As soon as it
+    succeeds, Delete_Old_Logs is started.  If J_ROTATE_LOGS
+    succeeds before 09:00, the system will wait until 09:00 before
+    starting J_RESOLVE_DNS.  It is possible that
+    Delete_Old_Logs would have started and complete by then.
+    J_WEB_REPORTS would not have started in that case, because it is
+    dependent on two jobs, and both of them have to run successfully
+    before it can run.
+  </p>
+  <p>
+    For completeness, you may also specify a timezone for a job's time
+    dependency as follows: 
+  </p>
+
+  <div class="code"><pre><code>05 | J_RESOLVE_DNS(start=>'10:00', tz=>'America/New_York') ...</code></pre></div>
+
+  <div class="new_section_header">EXAMPLE 4 - Job Forests</div>
+  <p>
+    You can see in the example above that line 03 is the start of a group
+    of dependent jobs.  No job on any other line can start unless the job
+    on line 03 succeeds.  What if you wanted two or more groups of jobs in
+    the same family that start at the same time (barring any time
+    dependencies) and proceed independently of each other?
+  </p>
+  <p>
+    To do this you would separate the groups with a line containing one or
+    more dashes (only).  Consider the following family:
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 |               J_ROTATE_LOGS()
+04 |
+05 | J_RESOLVE_DNS(start => '09:00')    Delete_Old_Logs()
+06 |
+07 |               J_WEB_REPORTS()      
+08 |
+09 |    J_EMAIL_WEB_RPT_DONE()  # send me a notification
+10 |
+11 |-------------------------------------------------------
+12 |
+13 | J_UPDATE_ACCOUNTS_RECEIVABLE()
+14 |
+15 | J_ATTEMPT_CREDIT_CARD_PAYMENTS()
+16 |
+17 |-------------------------------------------------------
+18 |
+19 | J_SEND_EXPIRING_CARDS_EMAIL()
+20 |
+   +-------------------------------------------------------
+</code></pre></div>
+
+  <p>
+    Because of the lines of dashes on lines 11 and 17, the jobs on lines
+    03, 13 and 19 will all start at 02:00.  These jobs are independent of
+    each other.  J_ATTEMPT_CREDIT_CARD_PAYMENT will not run if
+    J_UPDATE_ACCOUNTS_RECEIVABLE fails.  That failure, however will not
+    prevent J_SEND_EXPIRING_CARDS_EMAIL from running.
+  </p>
+  <p>
+    Finally, you can specify a job to run repeatedly every 'n' minutes, as
+    follows: 
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 | J_CHECK_DISK_USAGE(every=>'30', until=>'23:00')
+04 |
+   +-------------------------------------------------------
+</code></pre></div>
+
+  <p>
+    This means that J_CHECK_DISK_USAGE will be called every 30 minutes and
+    will not run on or after 23:00.  By default, the 'until' time is
+    23:59.  If the job starts at 02:00 and takes 25 minutes to run to
+    completion, the next occurance will still start at 02:30, and not at
+    02:55.  By default, every repeat occurrance will only have one
+    dependency - the time - and will not depend on earlier occurances
+    running successfully or even running at all.  If line 03 were:
+    </p>
+  
+  <div class="code"><pre><code>J_CHECK_DISK_USAGE(every=>'30', until=>'23:00', chained=>1)</code></pre></div>
+
+  <p>
+    ...then each repeat job will be dependent on the previous occurance.
+
+  </p>
+
+  <p>
+    Now, let's get back to our discussion of external dependencies from
+    example 3.  I said that an external dependency may only be specified
+    on the first line of the file or the first line of a group of jobs.
+    This way of specifying a family is not allowed by TaskForest:
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 |            LOGS::J_ROTATE_LOGS()
+04 |
+05 | J_RESOLVE_DNS()       Delete_Old_Logs()
+06 |
+07 |            REPORTS::J_WEB_REPORTS()  # BAD!
+08 |
+09 |    J_EMAIL_WEB_RPT_DONE()  # send me a notification
+10 |
+   +-------------------------------------------------------
+  </code></pre></div>
+
+  <p>
+    With a few minor modifications, the family can be specified correctly:
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '02:00', tz => 'GMT', calendar => 'Weekdays'
+02 |
+03 |            LOGS::J_ROTATE_LOGS()
+04 |
+05 | J_RESOLVE_DNS()       Delete_Old_Logs()
+06 |
+07 |--------------------------------------------
+08 |
+09 | J_RESOLVE_DNS() Delete_Old_Logs() REPORTS::J_WEB_REPORTS()
+10 |  
+11 |   J_EMAIL_WEB_RPT_DONE()  # send me a notification
+12 |
+   +-------------------------------------------------------
+  </code></pre></div>
+
+  <p>
+    We've moved the external dependency to the first line of it's own
+    section.  Now J_EMAIL_WEB_RPT_DONE relies on all 3 jobs, 2 that run in
+    this Family, and one from the REPORTS family.
+  </p>
+
+  
+  <div class="new_section_header">EXAMPLE 5 - Tokens</div>
+  <include TaskForest::REST::PassThrough /docs/configuring/tokens.html />  
+  
+  <div class="new_section_header">EXAMPLE 6 - Calendars</div>
+  <include TaskForest::REST::PassThrough /docs/configuring/calendars_text.html />  
+  
+  <div class="new_section_header">EXAMPLE 7 - Automatic Retries</div>
+  <include TaskForest::REST::PassThrough /docs/configuring/retry_text.html />  
+  
+  <div class="new_section_header">EXAMPLE 8 - Emails</div>
+  <include TaskForest::REST::PassThrough /docs/configuring/email_text.html />  
+  
+  
+
+
+  
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

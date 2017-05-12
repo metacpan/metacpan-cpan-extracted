@@ -1,0 +1,60 @@
+{
+   "abstract" : "Text::CSV::Slurp - convert CSV into an array of hashes, or an array of hashes into CSV",
+   "author" : [
+      "BABF <babf@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-CSV-Slurp",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::File" : "0",
+            "IO::Scalar" : "0",
+            "Text::CSV" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/babf/Text-CSV-Slurp/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/babf/Text-CSV-Slurp.git",
+         "web" : "https://github.com/babf/Text-CSV-Slurp"
+      }
+   },
+   "version" : "1.03"
+}
+

@@ -1,0 +1,77 @@
+
+
+Tk-Canvas-Draw
+
+Here's a quick example to stimulate your immediate excitement.
+The following program 'doodle' lets you draw colorful freehand
+lines in a Tk Canvas!
+
+    use strict;
+    use warnings;
+    use Tk;
+    use Tk::Canvas::Draw;
+
+    my $help = qq[
+        Click and move the mouse anywhere in the white box to begin drawing.
+        Type 'Escape' to clear everything.
+    ];
+
+    my $a_all_ids = [ ];
+
+    my $mw = new MainWindow(-title => 'Doodle -- Tk::Canvas::Draw example');
+    my $cv = $mw->Canvas(-bg => 'white', -width  => 512, -height => 512)->pack;
+    $cv->createText(0, 0, -anch => 'nw', -text => $help);
+    Tk::Canvas::Draw->new($cv, \&done_drawing, { width => 5 });
+    $mw->bind("<Escape>" => sub { map { $cv->delete($_) } @$a_all_ids });
+    MainLoop;
+
+    # Tk::Canvas::Draw callback -- reinstall callback with a new, random color 
+    sub done_drawing {
+       my ($o_obj, $a_points, $a_ids) = @_;
+       push @$a_all_ids, @$a_ids;
+       my $color = sprintf "#%02x%02x%02x", rand(256), rand(256), rand(256);
+       $o_obj->restart( { color => $color });
+    }
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tk::Canvas::Draw
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-Canvas-Draw
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tk-Canvas-Draw
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tk-Canvas-Draw
+
+    Search CPAN
+        http://search.cpan.org/dist/Tk-Canvas-Draw/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 jcnorton
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

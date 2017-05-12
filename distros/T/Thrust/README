@@ -1,0 +1,255 @@
+NAME
+    Thrust - Perl bindings to the Thrust cross-platform application
+    framework
+
+SYNOPSIS
+        use Thrust;
+
+        my $t = Thrust->new;
+
+        my $w = $t->window(
+                  root_url => 'data:text/html,Hello World!', ## or file://, https://, etc
+                  title => 'My App',
+                  size => { width => 800, height => 600 },
+                )->show;
+
+        $t->run; ## enter event loop
+
+DESCRIPTION
+    Thrust is a chromium-based cross-platform and cross-language application
+    framework. It allows you to create "native"-like applications using
+    HTML/CSS for the interface and (of course) perl for the glue code to
+    filesystems, DBs, networking, libraries, and everything else perl is
+    great at.
+
+    This is the easiest way to install perl-thrust:
+
+        curl -sL https://raw.github.com/miyagawa/cpanminus/master/cpanm | sudo perl - Thrust
+
+    Read more about Thrust at its official website
+    <https://github.com/breach/thrust>. There are bindings for many other
+    languages such as node.js, go, and python.
+
+    Like the bindings for other languages, installing the perl module will
+    download a zip file from github which contains the "thrust_shell"
+    binary. It will extract this into the perl distribution's private share
+    directory.
+
+    Unlike the bindings for other languages, in the perl ones there are no
+    definitions for individual thrust methods. Instead, an AUTOLOAD is used
+    to automatically "forward" all perl method calls (and their JSON encoded
+    arguments) to the thrust shell. This has the advantage that there is
+    generally no need to do anything to the perl bindings when new
+    methods/parameters are added to the thrust shell. However, it has the
+    disadvantage that sometimes the API is less convenient. For instance,
+    instead of positional arguments in (for example) the "move" method, you
+    must use the named "x" and "y" parameters.
+
+    Like the bindings in other languages, methods can be invoked on a window
+    object even before the window is created. The methods will be queued up
+    and invoked in order once the window is ready. After that point, all
+    messages are delivered to the window asynchronously. For example, here
+    is a one-liner command to open a maximized window with the dev tools
+    console expanded:
+
+        $ perl -MThrust -e 'Thrust->window->show->maximize->open_devtools->run'
+
+    To understand how the above works, consider that the perl bindings also
+    support some one-liner shortcuts such as method chaining, an implicit
+    "Thrust" context created by "window", and a "run" method on the window.
+
+ASYNC PROGRAMMING
+    Like browser programming itself, programming the perl side of a Thrust
+    application is done asynchronously. The Thrust package depends on
+    AnyEvent for this purpose so you can use whichever event loop you
+    prefer. See the AnyEvent documentation for details on asynchronous
+    programming.
+
+    The "run" methods of the Thrust context/window objects simply wait on a
+    condition variable that will never be signalled (well you can if you
+    want to, it's in "$t->{cv}") in order to enter the event loop and "sleep
+    forever". "run" is mostly there so you don't need to type "use AnyEvent;
+    AE::cv->recv" in simple scripts/examples.
+
+    Almost all methods on the window object can optionally take a callback
+    argument that will be called once the operation has been completed. For
+    example:
+
+        $w->maximize(sub { say "window has been maximized" });
+
+    If present, the callback must be the final argument. For methods that
+    require parameters, the parameters must be in a hash-ref preceeding the
+    (optional) callback:
+
+        $w->resize({ width => 100, height => 100 },
+                   sub { say "window has been resized" });
+
+EVENT HANDLERS
+    Window objects have an "on" method which allows you to append a callback
+    to be invoked when a particular event is triggered.
+
+    For example, normally closing a window will not cause the termination of
+    your perl program. Instead, the "closed" event will be triggered. By
+    default nothing is listening for this event so it is discarded. If you
+    want you can make the closing of one or more windows terminate your perl
+    program as well (which in turn kills all the other windows this process
+    has started):
+
+        $window->on(closed => sub { exit });
+
+    If you ever wish to remove handlers for an event, window objects also
+    have a "clear" method:
+
+        $window->clear('closed');
+
+    See the thrust API docs for information on the potential events and
+    actions. To snoop on the event traffic to and from the thrust shell, set
+    the environment variable "THRUST_DEBUG" to 1 or higher. Set it to 2 or
+    higher to also see the standard error debugging output from the
+    "thrust_shell" process. Here is a simple example of the traffic when you
+    create and show a window:
+
+        $ THRUST_DEBUG=1 perl -MThrust -e 'Thrust->new->window->show->run'
+
+        Sending to thrust shell >>>>>>>>>>>>>>>>>
+        {
+           "_action" : "create",
+           "_args" : {},
+           "_id" : 10,
+           "_type" : "window"
+        }
+
+
+                    <<<<<<<<<<<<<<<<< Message from thrust shell
+                    {
+                       "_action" : "reply",
+                       "_error" : "",
+                       "_id" : 10,
+                       "_result" : {
+                          "_target" : 1
+                       }
+                    }
+                
+                
+        Sending to thrust shell >>>>>>>>>>>>>>>>>
+        {
+           "_action" : "call",
+           "_args" : null,
+           "_id" : 11,
+           "_method" : "show",
+           "_target" : 1
+        }
+
+
+                    <<<<<<<<<<<<<<<<< Message from thrust shell
+                    {
+                       "_action" : "reply",
+                       "_error" : "",
+                       "_id" : 11,
+                       "_result" : {}
+                    }
+                
+                
+                    <<<<<<<<<<<<<<<<< Message from thrust shell
+                    {
+                       "_action" : "event",
+                       "_event" : {},
+                       "_id" : 1,
+                       "_target" : 1,
+                       "_type" : "focus"
+                    }
+
+REMOTE EVENTS
+    One of the most useful features of thrust is its support for
+    bi-directional messaging between your application and the browser over
+    pipes connecting to the thrust shell's stdin/stdout. Without this
+    support we would need to allocate some kind of network port or unix
+    socket file and start something like an AJAX or websocket server.
+
+    In order for the browser to send a message to your perl code, it should
+    execute something like the following javascript code:
+
+        THRUST.remote.send({ foo: 'bar' }); // send message to perl
+
+    On the perl side, you will need to install an event handler for the
+    "remote" event by calling the "on" method of a window object:
+
+        $w->on('remote', sub {
+            my $msg = $_[0]->{message};
+
+            print $msg->{foo}; # prints bar
+        });
+
+    In order to send a message from perl to the browser, call the "remote"
+    method on a window object:
+
+        $w->remote({ message => { foo => 'bar' } });
+
+    On the javascript side, you will need to install a handler like so:
+
+        THRUST.remote.listen(function(msg) {
+            console.log(msg['foo']); // prints bar
+        });
+
+    IMPORTANT NOTE: Before applications can send messages from perl to
+    javascript, the "THRUST.remote.listen" function must have been called.
+    If you try to send a message before this, it is likely that the message
+    will be delivered to the browser before the handler has been installed
+    so your message will be lost. Applications should make javascript send a
+    message indicating that the communication channel is ready to indicate
+    to the perl component that it can begin sending messages to the browser.
+
+TESTS
+    Currently this software has two tests, "load.t" that verifies Thrust is
+    installed and "remote.t" which starts and shows the thrust shell, then
+    proceeds to confirm bi-directional transfer of messages between
+    javascript and perl. Maybe the test-suite shouldn't show a window by
+    default?
+
+BUGS
+    Haha this software is so beta. I've only tested this so far on 64-bit
+    linux so the cross-platform claim is theoretical.
+
+    Only the window object is currently exposed. Eventually the window code
+    should be refactored into a base class so that session and menu can be
+    implemented as well (as done in the node.js bindings).
+
+    Add a test that verifies "thrust_shell" is killed when your program
+    exits or is killed.
+
+    The perl bindings don't report errors from the thrust shell properly to
+    your code yet. Eventually I think they should use Callback::Frame.
+
+    Actually "thrust_shell" doesn't have great error checking itself. Any
+    error messages like the following probably indicate that you passed in
+    some malformed argument and terminated the thrust_shell abnormally:
+
+        AnyEvent::Handle uncaught error: Broken pipe at /usr/local/lib/perl/5.18.2/AnyEvent/Loop.pm line 248.
+
+    The fact that "thrust_shell" binaries are duplicated for every language
+    binding is good and bad: depending on how backwards compatible
+    everything is, duplication may be necessary because of protocol changes.
+    It's bad in that you can't immediately apply bug-fixes to all copies of
+    "thrust_shell" on your system.
+
+SEE ALSO
+    The Thrust perl module github repo <https://github.com/hoytech/Thrust>
+
+    Alien::Thrust
+
+    The Thrust project <https://github.com/breach/thrust> - Official website
+
+    The node.js Thrust bindings <https://github.com/breach/node-thrust/> -
+    These are the most complete bindings
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2014 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+
+    Thrust itself is Copyright (c) 2014 Stanislas Polu and is licensed under
+    the MIT license.
+

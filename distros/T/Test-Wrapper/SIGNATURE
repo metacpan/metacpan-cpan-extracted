@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 506e7843f0a2dbf9c0dac4d0334f8f598ffed47d AUTHOR_PLEDGE
+SHA1 8c5ffc5d2f807ad74925f0017fc9f51b9c407c31 Build.PL
+SHA1 46a321874927221eea446ab1b5387e1881b6dd3f CONTRIBUTORS
+SHA1 796b997394f80ae6bba112b0b995c1c562108a78 Changes
+SHA1 e4a662d3824e4bab3adfb40783fce95474e482e7 INSTALL
+SHA1 a258bb71db8b0eb019433c27d9480dd2cb15ede8 LICENSE
+SHA1 4f06b6ea3a9be8054948fc3a296d691cdf50f973 MANIFEST
+SHA1 bf48ea7d86b45ef90ab9bb11b9b4bd75adc4fdb1 META.json
+SHA1 d8bb93e0d15f0753c85591e4b83dcbbd53970e02 META.yml
+SHA1 a2ff1df92f42b4385278c7d5f5a53cdcffe98ef0 README
+SHA1 7b1bf241dd97d058825f4829aa4a29d4c6a5a854 README.mkdn
+SHA1 2f6102a11d04c3c1c2b2af4f5783823a26f05b8c lib/Test/Wrapper.pm
+SHA1 7e43c6ccf36345ee8f9bb0f9292314ebbf5f3dd4 t/00-compile.t
+SHA1 62a8b177c5ab8080704cbd4b1af11432af676ff7 t/000-report-versions-tiny.t
+SHA1 778a15532c68c17c8824aa04f74a183098efeca0 t/no-interference.t
+SHA1 c2c8f40f9f69a1fc57497c4878a00afe7dd02bcd t/test-wrap.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+SHA1 22877e8f2c33fa664dd6a0709995e6e95c92add9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlMftp4ACgkQ34Hwf+GwC4x2AgCfY9URChN8Kb/9H6jgtc0+KYyE
+sv0An3LFriOU2nGygW2caUywFSgoaHJx
+=+CLj
+-----END PGP SIGNATURE-----

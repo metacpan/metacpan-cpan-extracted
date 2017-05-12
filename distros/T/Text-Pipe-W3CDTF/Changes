@@ -1,0 +1,13 @@
+Revision history for Perl extension Text-Pipe-W3CDTF
+
+1.100890  2010-03-30 00:49:40 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.02  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.01  Thu, 29 May 2008 12:09:03 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version
+    - .shipit: fixed svk.tagpattern

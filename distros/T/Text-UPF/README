@@ -1,0 +1,13 @@
+Text::UPF version 1.0.1
+
+(UPF is a Population Format) - a module for auto-populating text.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

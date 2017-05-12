@@ -1,0 +1,21 @@
+Revision history for Perl module Template::Plugin::StringDump
+
+0.05 2012-10-25
+ - Added dump_codes from String::Dump 0.08
+ - Converted this file from YAML to the standard CPAN Changes format
+
+0.04 2012-01-26
+ - WARNING: Replaced dump('foo') filters with dump_foo filters, standardizing
+   with String::Dump 0.05
+ - APOLOGY: Sorry for the backward-incompatible change
+
+0.03 2011-12-13
+ - Removed utf8::all from tests because it requires Perl 5.10
+
+0.02 2011-12-12
+ - Fixed warnings in t/filter.t
+ - Updated for compatibility with String::Dump 0.03+
+ - NOTICE: String::Dump 0.03 is now required
+
+0.01 2011-12-12
+ - First release

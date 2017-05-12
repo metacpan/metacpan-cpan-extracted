@@ -1,0 +1,23 @@
+Tk::HexEntry
+============================
+
+Tk::HexEntry - A hexadecimal Entry widget with inc. & dec. Buttons 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1997-1998 Graham Barr. All rights reserved. This program is free software; 
+you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+Changes and new split to HexEntry Frank (xpix) Herrmann
+
+ 

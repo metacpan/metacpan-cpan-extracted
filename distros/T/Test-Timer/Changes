@@ -1,0 +1,155 @@
+Revision history for Test-Timer
+
+0.18 2016-12-30 Maintenance release, update not required
+
+- Reenabled Github issues over RT, the Dist::Zilla plugins not completely compatible
+
+
+0.17 2016-12-30 Maintenance release, update not required
+
+- Exchanged use of Test::Exception for Test::Fatal
+
+- Exchanged use of: Dist::Zilla::Plugin::GitHub::Meta for Dist::Zilla::Plugin::GithubMeta 
+  to specify a proper homepage attribute
+  
+  Ref: https://metacpan.org/pod/Dist::Zilla::Plugin::GithubMeta 
+
+
+0.16 2016-12-29 Maintenance release, update not required
+
+- Elimination of warnings in test suite, PR from p-alik
+
+
+0.15 2016-12-11 Maintenance release, update not required
+
+- Addressed Kwalitee test: has_meta_json 
+
+- Addressing minor cosmetics issues in release 0.14
+
+
+0.14 2016-12-10 Maintenance release, update not required
+
+- Corrections to file permissions, PR from Kent Fredric
+
+
+0.13 2016-08-05 Maintenance release, update not required
+
+- Corrections to the POD, feedback from Nick Morrott
+
+
+0.12 2015-08-02 Maintenance release, update not required
+
+- Added MetaProvides to Dist::Zilla build, this should assist in addressing the
+  issue listed on CPANTS, see also below
+
+- Addressing issue with inconsistent version
+
+  Ref: http://cpants.cpanauthors.org/dist/Test-Timer-0.11
+
+
+0.11 2015-07-15 Maintenance release, update not required
+
+- Requirement for Perl 5.12 sneaked in [issue #3], analysed code with Perl::MinimumVersion 
+  and decided for Perl version 5.6.0 as minimum requirement
+
+
+0.10 2015-06-01 Maintenance release, update not required
+
+- Test::Tester is marked as a normal runtime dependency [issue #2] (RT:1047699)
+
+  https://github.com/jonasbn/testt/issues/2
+
+- Upgraded license from Artistic license 1.0 to Artistic license 2.0
+
+- Migrated build system from Module::Build to Dist::Zilla
+
+
+0.09 2014-08-29 Maintenance release, update not required
+
+- Addressing [issue #1], the occassional report on failing the rigid test of
+  test_between
+
+  https://github.com/jonasbn/testt/issues/1
+
+
+0.08 2014-02-22 Maintenance release, update not required
+
+- Repository migrated to Github from hosted Subversion
+
+- Plenty of POD updates
+
+- Added changes.t automatic assertion of the integrity of the Changes file,
+  see also TESTT-4 [TESTT-6]
+
+  https://logiclab.jira.com/browse/TESTT-6
+
+
+0.07 2013-07-31 Maintenance release, update not required
+
+- Corrected minor issue in this file, had forgotten to run in through the
+  validator http://changes.cpanhq.org/validate [TESTT-4]
+
+  https://logiclab.jira.com/browse/TESTT-4
+
+
+0.06 2013-07-26 Maintenance release, update not required
+
+- Fixed up Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [TESTT-3]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/TESTT-3
+
+
+0.05 2008-11-16 Bug fix release, update not required
+
+- Added use of Test::Builder::Module
+
+- Added patch from brian d foy, bug in _run_test
+
+
+0.04 2007-03-18 Maintenance release, update not required
+
+- Added creation of traditional Makefile.PL to Build.PL
+
+- Added Makefile.PL to MANIFEST
+
+
+0.03 2007-03-11 Maintenance release, update not required
+
+- Removed version number from README
+
+- Read up on the Test::Perl::Critic documentation and updated my Perl::Critic
+  test (t/critic.t), introducing t/perlcriticrc and added a few of the
+  requirements needed by this test to build requirements
+
+- Moved Test::Tester to general requirements from build requirements
+
+- Minor changes to POD
+
+
+0.02 2007-03-10 Feature release, update recommended
+
+- Removed support for reference to arrays as second parameter to time_nok,
+  time_ok, time_almost and time_atleast - time_between is recommended
+
+- Read up on the Test::Builder does and eliminated the builder sub, this has
+  also been removed from the test-suite (t/test-tester.t)
+
+- Added some more tests, to get better coverage, thanks to PJCJ for Devel::Cover
+  this module really helps, since aiming at better coverage, makes you think
+  about your tests and code and you can eliminate stuff you do not need 
+
+- Updated POD added DIAGNOSTICS among other things
+
+- Fixed bug in Test::Timer, with alarm being scoped using my, should
+  be our, pointed out by Paul Evans
+
+- Ran all code through perltidy
+
+
+0.01 2007-03-01 Feature release
+
+- First version, released on an unsuspecting world.

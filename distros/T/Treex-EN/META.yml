@@ -1,0 +1,40 @@
+---
+abstract: 'collection of blocks for processing English'
+author:
+  - 'Treex team <treex@ufal.mff.cuni.cz>'
+build_requires:
+  File::Slurp: '9999'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Readonly: '0'
+  Test::More: '0'
+  Treex::Core::Document: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.026, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Treex-EN
+requires:
+  File::Slurp: '9999'
+  Lingua::EN::Tagger: '0'
+  Moose: '0'
+  Treex::Block::W2A::ParseMSTperl: '0'
+  Treex::Block::W2A::TagMorphoDiTa: '0'
+  Treex::Block::W2A::Tokenize: '0'
+  Treex::Core::Block: '0'
+  Treex::Core::Common: '0'
+  Treex::Core::Log: '0'
+  Treex::Core::Resource: '0'
+  Treex::Tool::Segment::RuleBased: '0'
+  Treex::Tool::Tagger::Featurama: '0'
+  Treex::Unilang: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '2.20151102'

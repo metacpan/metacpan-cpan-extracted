@@ -1,0 +1,26 @@
+<children name="widget inc." colour="#FF8888" size="10000000">
+   <children name="CEO" colour="#FFFFAA" size="250000" />
+   <children name="accounting" colour="#00FF00" size="1560000">
+      <children name="CFO" colour="#FFFFAA" size="190000" />
+      <children name="forecasting" colour="#9999FF" size="1000000" />
+      <children name="receivable" colour="#9999FF" size="185000" />
+      <children name="payroll" colour="#9999FF" size="185000" />
+   </children>
+   <children name="engineering" colour="#00FF00" size="2190000">
+      <children name="CTO" colour="#FFFFAA" size="190000" />
+      <children name="industrial" colour="#9999FF" size="1200000" />
+      <children name="consumer" colour="#9999FF" size="800000" />
+   </children>
+   <children name="manufacturing" colour="#00FF00" size="3000000">
+      <children name="industrial" colour="#9999FF" size="2000000" />
+      <children name="consumer" colour="#9999FF" size="1000000" />
+   </children>
+   <children name="sales" colour="#00FF00" size="1000000">
+      <children name="wholesale" colour="#9999FF" size="600000" />
+      <children name="commercial" colour="#9999FF" size="400000" />
+   </children>
+   <children name="support" colour="#00FF00" size="2000000">
+      <children name="wholesale" colour="#9999FF" size="1500000" />
+      <children name="commercial" colour="#9999FF" size="500000" />
+   </children>
+</children>

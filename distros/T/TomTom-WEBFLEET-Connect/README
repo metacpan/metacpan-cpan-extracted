@@ -1,0 +1,16 @@
+WHAT IS THIS?
+
+This is TomTom::WEBFLEET::Connect, a lightweight wrapper around
+the TomTom WEBFLEET.connect API in Perl.
+
+WHERE IS THE DOCUMENTATION?
+
+Documentation is found in POD (plain old documentation) form in
+TomTom::WEBFLEET::Connect.pm itself. When you install this module,
+the MakeMaker program will automatically install the manual pages
+for you (on UNIX systems, type "man TomTom::WEBFLEET::Connect".
+
+WHERE ARE THE EXAMPLES?
+
+A collection of examples demonstrating the use of TomTom::WEBFLEET::Connect
+are in the directory "examples".

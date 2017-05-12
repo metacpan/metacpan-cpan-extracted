@@ -1,0 +1,42 @@
+Revision history for Perl extension Time-Duration-Parse-AsHash
+
+0.10.6  2017-01-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Some rewording/rephrasing and more examples for better
+	  clarity.
+
+
+0.10.5  2016-05-17 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild, fix syntax of #IFUNBUILT to properly comment usage of
+          strict+warnings.
+
+
+0.10.4  2016-05-17 (PERLANCAR)
+
+	- Add option to return number like Time::Duration::Parse by passing
+	  a true value as second argument of parse_duration().
+
+
+0.10.3  2016-05-17 (PERLANCAR)
+
+        - Support milliseconds, microseconds, nanoseconds, decades.
+
+        - Support decimal seconds in hh:mm:ss.
+
+        - [Removed] Remove devscripts/bench (converted to Bencher scenario, see
+          Bencher::Scenario::TimeDurationParse::parse_duration).
+
+
+0.10.2  2015-09-26 (PERLANCAR)
+
+	- Support mo(s) and mon(s) for months.
+
+
+0.10.1   2015-09-25 (PERLANCAR)
+
+         - First release, forked from Time-Duration-Parse.

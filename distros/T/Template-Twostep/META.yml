@@ -1,0 +1,38 @@
+---
+abstract: 'Compile templates into a subroutine'
+author:
+  - 'Bernie Simon <bernie.simon@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.15.2, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Twostep
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Template::Twostep:
+    file: lib/Template/Twostep.pm
+    version: 1.05
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/Jinzang/Template-Twostep/issues
+  homepage: https://github.com/Jinzang/Template-Twostep
+  repository: https://github.com/Jinzang/Template-Twostep.git
+version: 1.05

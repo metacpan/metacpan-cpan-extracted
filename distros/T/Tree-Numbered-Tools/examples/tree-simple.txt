@@ -1,0 +1,28 @@
+# A simple tree structure.
+
+ File
+     New
+         Window
+         Document
+         Template
+             HTML
+     Open
+     Save
+     Close
+     Exit
+
+ Edit
+     Undo
+     Cut
+     Copy
+     Paste
+     Find
+         RegExp
+
+ View
+     Toolbars
+         Navigation
+         Location
+         Personal
+     Reload
+     Source

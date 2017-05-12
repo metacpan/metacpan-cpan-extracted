@@ -1,0 +1,72 @@
+Revision history for TableData-Object
+
+0.10    2017-01-01 (PERLANCAR)
+
+	- Add methods: set_col_val(), add_col().
+
+
+0.09    2016-01-13 (PERLANCAR)
+
+	- Add del_col(), rename_col(), switch_cols().
+
+
+0.08    2016-01-11 (PERLANCAR)
+
+	- [Removed feature] Remove const_col_idxs().
+
+        - Move const_col_names() to Base so all forms support it.
+
+        - Add uniq_col_names().
+
+
+0.07    2016-01-11 (PERLANCAR)
+
+	- Add const_col_names for aohos & aoaos (and const_col_idxs too for
+	  aoaos).
+
+
+0.06    2015-11-02 (PERLANCAR)
+
+	- [ux] select_*(): Allow cols to be optional.
+
+
+0.05    2015-11-02 (PERLANCAR)
+
+	- Add methods: rows_as_aoaos(), rows_as_aohos(), select_as_aoaos(),
+          select_as_aohos().
+
+        - [ux] If an array does not fit as aoaos or aohos, it will be assumed as
+           aos. (e.g. array of DateTime object, etc).
+
+	- [Incompatible change] Remove sort_rows(), the functionality is now
+	  incorporated into select_as_aoaos/select_as_aohos.
+
+	- Add documentation.
+
+	- Bug fixes.
+
+
+0.04    2015-10-29 (PERLANCAR)
+
+	- [Bugfix] Forgot to update package name.
+
+
+0.03    2015-09-15 (PERLANCAR)
+
+        - [Incompatible changes] Rewrite, with different interface.
+
+        - Implement row_count, col_count, and sort.
+
+
+0.02    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.01     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+        - First version.

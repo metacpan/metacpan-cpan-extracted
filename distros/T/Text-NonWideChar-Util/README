@@ -1,0 +1,24 @@
+SYNOPSIS
+
+     use Text::NonWideChar::Util qw(
+         length_height);
+    
+     # get length as well as number of lines
+     say mbswidth_height("one\ntwo\nthree"); # => [5, 3]
+
+DESCRIPTION
+
+    This module provides the non-wide version of some of the routines in
+    Text::WideChar::Util.
+
+FUNCTIONS
+
+ length_height($text) => [INT, INT]
+
+    This is the non-wide version of mbswidth_height() and can be used if
+    your text only contains printable ASCII characters and newlines.
+
+SEE ALSO
+
+    Text::WideChar::Util
+

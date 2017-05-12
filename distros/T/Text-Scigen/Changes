@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::Scigen.
+
+0.01  Tue Oct 25 11:09:50 2011
+	- original version; created by h2xs 1.23 with options
+		-n Text::Scigen -X
+

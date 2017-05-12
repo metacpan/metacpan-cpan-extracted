@@ -1,0 +1,41 @@
+Revision history for Test-Portability-Files
+
+0.07      2016-09-21 23:49:46+02:00 Europe/Vienna
+        - relax the ansi_chars check to allow for . and _ as the leading
+          character of a filename
+
+0.06      2012-11-12 19:24:46 Europe/Vienna
+        - created git repository on github.com
+        - converted to Dist::Zilla
+        - fixed options cannot take a false value (RT#21631)
+        - disabled AmigaOS and Mac OS Classic tests by default because they are
+          no longer supported by Perl itself (RT#12182)
+        - updated synopsis to show recommended author-only usage (RT#43948)
+
+0.05    2004.11.21
+        Bugfix: corrected test for special chars
+        Bugfix: disabled calling test_name_portability() on individual 
+        directory names
+
+0.04    2004.10.20
+        Bugfix: now using ExtUtils::Manifest::maniread() to read MANIFEST.
+
+0.03    2004.09.25
+        Directory names are also tested in normal mode. 
+        Added test_dir_noext to check that directories have no extension. 
+        Corrected several typos and mistakes in the documentation. 
+
+0.02_01 2004.07.28
+        Small changes in the documentation.
+        Added test script t/01basic.t
+
+0.02    2004.07.04
+        Added test_symlink to check if a file is not a symbolic link. 
+        Added test_vms_length to check against VMS limitations. 
+        Added test_amiga_length to check against AmigaOS limitations. 
+        Added section "SEE ALSO".
+        Corrected my email address (d'oh!)
+
+0.01    2004.06.26
+        First version, released on an unsuspecting world.
+

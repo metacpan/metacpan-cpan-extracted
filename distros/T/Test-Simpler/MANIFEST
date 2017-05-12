@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Test/Simpler.pm
+t/00.load.t
+t/basic.t
+t/basic_fail.t
+META.yml                                 Module meta-data (added by MakeMaker)

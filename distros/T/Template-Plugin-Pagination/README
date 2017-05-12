@@ -1,0 +1,58 @@
+NAME
+    Template::Plugin::Pagination - a plugin to help paginate pages of
+    results
+
+SYNOPSIS
+      [% USE page = Pagination(items, current_page, entries_per_page) %]
+
+            [% FOREACH item IN page.page_data; ...; DONE %]
+
+      First page: [% page.first_page %]
+      Prev page: [% page.previous_page %]
+      Next page: [% page.next_page %]
+      Last page: [% page.last_page %]
+
+DESCRIPTION
+    This plugin helps you construct pages that include subsets of data from
+    a list, such as search results which you'll paginated in groups of 10.
+
+    It's based heavily on Template::Plugin::Page, which you should see for a
+    detailed example of to use this. (That module is a thin wrapper around
+    Data::Page, whereas this one is a wrapper around Data::Paginated, which
+    is Data::Page + Data::Pageset + some extras).
+
+METHODS
+  Pagination
+    This is the constructor. It has one mandatory arguments: the list of
+    items we're working with. You can also pass the page number you're
+    currently working with which will otherwise default to 1) and the number
+    of entries there will be on each page (which defaults to 10).
+
+Pageset Methods
+    You now have available all the methods from Data::Page, Data::Pageset
+    and Data::Paginated, including:
+
+    page_data
+    first_page
+    last_page
+    next_page
+    previous_page
+
+    See their manual pages for details.
+
+AUTHOR
+    Tony Bowden, <cpan@tmtm.com>
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Template-Plugin-Pagination@rt.cpan.org
+
+SEE ALSO
+    Template::Plugin::Page, Data::Page, Data::Pageset, Data::Paginated
+
+COPYRIGHT
+    Copyright (C) 2004-2006 Tony Bowden. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself
+

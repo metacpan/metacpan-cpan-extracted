@@ -1,0 +1,36 @@
+Revision history for Term-HiliteDiff
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    Mar 19, 2007
+        Documentation improvments
+        Removed author tests
+        Added array ref feature
+
+0.03    Sometime in 2007
+
+0.04    Sun Dec 13, 2009
+        Mostly works, except for the syntax errors
+
+0.05    Sun Dec 14, 2009
+        It works!
+        Documentation updates
+
+0.06    Sun Dec 14, 2009
+        Documentation updates
+
+0.07    Sun Dec 14, 2009
+        Fixed pre-parse mode
+
+0.08    Tue Dec 16, 2009
+        Fixed lots of tests
+        Dropped the auto-print feature
+
+0.09    Sat Dec 19, 2009
+        Revamped documentation
+
+0.10    Tests pass for perl-5.12.2
+        Use Dist::Zilla
+        Remove `no warnings' for 5.005 compatibility
+

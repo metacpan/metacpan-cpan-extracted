@@ -1,0 +1,10 @@
+Revision history for Perl extension Test::SerialFork.
+$Id: Changes,v 1.1 2005/07/27 15:03:50 pmh Exp $
+
+0.01	2005-07-27 15:45
+	- Put the actual code, tests and docs in
+
+0.00_01  Wed Jul 27 14:01:17 2005
+	- original version; created by h2xs 1.23 with options
+		-A -B -X -n Test::SerialFork --use-new-tests
+

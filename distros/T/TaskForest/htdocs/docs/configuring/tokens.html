@@ -1,0 +1,85 @@
+  <p>
+    A token is a dependency.  It is something that a job must 'possess'
+    before it can run, if that job needs that token.  You can create
+    different types of tokens, giving each type a common name.  You can
+    also specify how many instances of tokens of each type are to exist.
+    For example, if the configuration file contained the following lines:
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 | ...   
+02 | &lt;token T&gt;
+03 |   number = 1
+04 | &lt;/token&gt;
+05 | &lt;token U&gt;
+06 |   number = 2
+07 | &lt;/token&gt;
+08 | ...
+   +-------------------------------------------------------
+</code></pre></div>
+
+  <p>
+    ...it means that there are two types of tokens: 'T' and 'U'.  There is
+    only one instance of token type 'T', and two of type 'U'.
+  </p>
+  <p>
+    Given the above configuration, if your Family file looked as follows:
+  </p>
+
+  <div class="code"><pre><code>
+   +-------------------------------------------------------
+01 |start => '00:00', tz => 'GMT', days => 'Mon,Wed,Fri'
+02 |
+03 | J1( token => 'T')  J2 ( token => 'T' ) J3()
+04 |
+05 |-------------------------------------------------------
+06 |
+07 | J6(token => 'U') J5(token => 'U') J4(token => 'U')
+08 | J8(token => 'T,U')
+09 | 
+   +-------------------------------------------------------
+</code></pre></div>
+
+  <p>
+    ...then that means that job J1 and J2 both need a token of type 'T' to
+    run.  But, there's only one instance of token T, so J1 and J2 cannot
+    both run at the same time (even though they would, if they didn't rely
+    on tokens).  The system will sort jobs alphabetically by name and
+    choose the first in the list.  In other words, in this case, J1 will
+    run first and J2 will only run after J1 completes (if no other job has
+    taken the token first).  To be more accurate, J1 and J3 will run
+    simultaneously, since J3 does not need any tokens.
+  </p>
+  <p>
+    To be even more accurate, J1, J3, J4 and J5 will run simultaneously.
+    This is because J4, J5 and J6 all rely on token U, but there are only
+    2 instances of token U.  Even though J6 appears on the line before J5
+    and J4, the system will choose J4 and J5 first, because they appear
+    first in alphabetical order, and J6 will run after one of the other
+    two have completed.
+  </p>
+  <p>
+    Because the system always chooses the job with the smallest name
+    (alphabetically), it is possible to experience 'resource starvation' -
+    where a job with a 'larger' name could never get an opportunity to
+    run, because there are too many other jobs with smaller names that get
+    to run first by virtue of their names.  Future versions of TaskForest
+    will implement heuristics to prevent resource starvations.
+  </p>
+  <p>
+    Note that J8 relies on two tokens: T and U.  It will only run when it
+    can acquire one of both tokens.  If it can acquire one, but not the
+    other, it will release the first and try to acquire both at a later
+    time.
+  </p>
+  <p>
+    Finally, tokens can also be used to control the load on the machine on
+    which taskforest is running.  If you've got several independent jobs
+    that don't depend on each other, but which use a fair amount of
+    resources, you can have all the jobs use the same token.  Then you can
+    tweak the maximum number of instances of that token to a value that
+    maximizes the number of simultaneous jobs without putting too much
+    strain on the server.
+  </p>
+

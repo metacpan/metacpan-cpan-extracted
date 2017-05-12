@@ -1,0 +1,36 @@
+h1. Text::Textile::Plaintext - Convert Textile markup to other formats
+
+Version: 0.101 (See CHANGES below)
+
+h2. WHAT IS IT
+
+This distribution provides modules that convert Textile markup into plain
+text, PostScript, or RTF. It also includes a simple command-line tool for
+performing the conversions.
+
+h2. BUILDING/INSTALLING
+
+This package uses Makefile.PL:
+
+<pre>
+<code>
+        perl Makefile.PL
+        make && make test
+        make install
+</code>
+</pre>
+
+You may need super-user access to install.
+
+h2. PROBLEMS/BUG REPORTS
+
+Please send any reports of problems or bugs to rjray@blackperl.com.
+
+h2. CHANGES
+
+* lib/App/Textile2x.pm
+* lib/Text/Textile/Plaintext.pm
+* lib/Text/Textile/PostScript.pm
+* lib/Text/Textile/RTF.pm
+
+p{margin-bottom:2em}. Forgot warnings pragma in modules.                              

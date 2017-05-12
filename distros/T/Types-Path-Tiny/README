@@ -1,0 +1,112 @@
+NAME
+    Types::Path::Tiny - Path::Tiny types and coercions for Moose and Moo
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+      ### specification of type constraint with coercion
+
+      package Foo;
+
+      use Moose;
+      use Types::Path::Tiny qw/Path AbsPath/;
+
+      has filename => (
+        is => 'ro',
+        isa => Path,
+        coerce => 1,
+      );
+
+      has directory => (
+        is => 'ro',
+        isa => AbsPath,
+        coerce => 1,
+      );
+
+      ### usage in code
+
+      Foo->new( filename => 'foo.txt' ); # coerced to Path::Tiny
+      Foo->new( directory => '.' ); # coerced to path('.')->absolute
+
+DESCRIPTION
+    This module provides Path::Tiny types for Moose, Moo, etc.
+
+    It handles two important types of coercion:
+
+    *   coercing objects with overloaded stringification
+
+    *   coercing to absolute paths
+
+    It also can check to ensure that files or directories exist.
+
+SUBTYPES
+    This module uses Type::Tiny to define the following subtypes.
+
+  Path
+    "Path" ensures an attribute is a Path::Tiny object. Strings and objects
+    with overloaded stringification may be coerced.
+
+  AbsPath
+    "AbsPath" is a subtype of "Path" (above), but coerces to an absolute
+    path.
+
+  File, AbsFile
+    These are just like "Path" and "AbsPath", except they check "-f" to
+    ensure the file actually exists on the filesystem.
+
+  Dir, AbsDir
+    These are just like "Path" and "AbsPath", except they check "-d" to
+    ensure the directory actually exists on the filesystem.
+
+CAVEATS
+  Path vs File vs Dir
+    "Path" just ensures you have a Path::Tiny object.
+
+    "File" and "Dir" check the filesystem. Don't use them unless that's
+    really what you want.
+
+  Usage with File::Temp
+    Be careful if you pass in a File::Temp object. Because the argument is
+    stringified during coercion into a Path::Tiny object, no reference to
+    the original File::Temp argument is held. Be sure to hold an external
+    reference to it to avoid immediate cleanup of the temporary file or
+    directory at the end of the enclosing scope.
+
+    A better approach is to use Path::Tiny's own "tempfile" or "tempdir"
+    constructors, which hold the reference for you.
+
+        Foo->new( filename => Path::Tiny->tempfile );
+
+SEE ALSO
+    *   Path::Tiny
+
+    *   Moose::Manual::Types
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/types-path-tiny/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/types-path-tiny>
+
+      git clone git://github.com/dagolden/types-path-tiny.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Toby Inkster <tobyink@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

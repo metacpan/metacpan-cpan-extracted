@@ -1,0 +1,24 @@
+Revision history for Perl extension Tk::LogScale.
+
+0.11	2017-03-25
+	- test fix: make sure windows are not interactively places,
+	  for older window managers like twm
+0.10
+	- no code changes, just moved to github
+
+0.09
+	- more robust test against missing DISPLAYs
+
+0.08	2007-12-09
+	- first CPAN release
+	- some distribution cleanups
+
+0.06  Thu Jan 10 10:18:03 CET 2002
+	- another (disabled) test
+
+0.05  Mon Dec 20 01:22:00 CET 1999
+	- working version
+
+0.01
+	- original version; created by h2xs 1.19
+

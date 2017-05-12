@@ -1,0 +1,27 @@
+---
+abstract: 'Provides a localized interface to the select function'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tie-Select
+no_index:
+  file:
+    - README.pod
+provides:
+  Tie::Select:
+    file: lib/Tie/Select.pm
+    version: 0.01
+requires:
+  perl: v5.6.2
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Tie-Select
+version: 0.01

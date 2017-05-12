@@ -1,0 +1,14 @@
+^.git/
+blib/
+^.gitignore
+Build
+_build*
+pm_to_blib
+.tar.gz$
+.zip$
+^Makefile$
+MYMETA.*
+XS.c$
+.o$
+.bs$
+.SKIP$

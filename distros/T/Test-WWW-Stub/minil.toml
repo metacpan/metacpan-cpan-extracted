@@ -1,0 +1,4 @@
+name = "Test-WWW-Stub"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

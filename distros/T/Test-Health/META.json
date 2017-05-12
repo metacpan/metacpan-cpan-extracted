@@ -1,0 +1,85 @@
+{
+   "abstract" : "Perl API to process tests and send an e-mail report in case of failures",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Health",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008009"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Email::Sender::Transport::SMTP" : "1.300021",
+            "Email::Stuffer" : "0.012",
+            "File::Spec" : "0",
+            "Getopt::Std" : "0",
+            "Moo" : "2.000002",
+            "Pod::Usage" : "0",
+            "TAP::Formatter::HTML" : "0.11",
+            "TAP::Harness" : "3.30",
+            "Types::Standard" : "1.000005",
+            "namespace::clean" : "0.26",
+            "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "Moose" : "2.1805",
+            "Test::Moose" : "2.1805",
+            "Test::Most" : "0.34",
+            "Test::TempDir::Tiny" : "0.016",
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Health" : {
+         "file" : "lib/Test/Health.pm",
+         "version" : "0.003"
+      },
+      "Test::Health::Email" : {
+         "file" : "lib/Test/Health/Email.pm",
+         "version" : "0.003"
+      },
+      "Test::Health::Harness" : {
+         "file" : "lib/Test/Health/Harness.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/Test-Health/issues"
+      },
+      "homepage" : "https://github.com/glasswalk3r/Test-Health",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/Test-Health.git",
+         "web" : "https://github.com/glasswalk3r/Test-Health"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

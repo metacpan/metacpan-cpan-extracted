@@ -1,0 +1,35 @@
+Tk::SMListbox Module 1.10
+
+Tk::SMListbox is a derivitive of MListbox that adds optional tiny up and 
+down arrow graphics to columns in the SMListbox that the data is 
+currently sorted on indicating ascending and/or descending order.
+
+Sorting is done by clicking on one of the column headings in the 
+widget. The first click will sort the data with the selected column as 
+key, a new click will reverse the sort order.  Sorting can also now be 
+done when the widget has the focus by pressing <Alt-hotkeyletter> where 
+a column's header text contains "~hotkeyletter".
+
+Tk::SMListbox supports all the options provided by Tk::MListbox:
+
+Tk::MListbox lets the user resize the columns by dragging a separator bar
+between each column. The user might change the order of the column by dragging
+the column headers. The data in the widget might be sorted by clicking one of
+the column headers. A new click, and the sort order is reversed.
+
+Tk::SMListbox is scrollable and supports the Scrolled() method.
+
+Tk::SMListbox is designed for displaying reports like the result of a database
+query or the contents of a directory.
+
+test.pl is a very simple file browser for unix/windows.
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make install
+
+Tk::SMListbox.pm contains pod documentation.
+

@@ -1,0 +1,35 @@
+---
+abstract: 'Fast QueryString Parser'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Module::Build::Pluggable::Repository: 0.01
+  Module::Build::Pluggable::XSUtil: 1.00
+configure_requires:
+  ExtUtils::ParseXS: 2.21
+  Module::Build: 0.40
+  Module::Build::Pluggable: 0.05
+  Module::Build::Pluggable::Repository: 0.01
+  Module::Build::Pluggable::XSUtil: 1.00
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-QueryString
+provides:
+  Text::QueryString:
+    file: lib/Text/QueryString.pm
+    version: 0.03
+  Text::QueryString::PP:
+    file: lib/Text/QueryString/PP.pm
+    version: 0
+requires:
+  URI::Escape: 0
+  XSLoader: 0.02
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: git://github.com/lestrrat/p5-Text-QueryString.git
+version: 0.03

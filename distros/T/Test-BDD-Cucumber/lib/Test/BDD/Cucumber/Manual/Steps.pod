@@ -1,0 +1,91 @@
+package Test::BDD::Cucumber::Manual::Steps;
+
+=head1 NAME
+
+Test::BDD::Cucumber::Manual::Steps - How to write Step Definitions
+
+=head1 VERSION
+
+version 0.52
+
+=head1 INTRODUCTION
+
+The 'code' part of a Cucumber test-suite are the Step Definition files which
+match steps, and execute code based on them. This document aims to give you a
+quick overview of those.
+
+=head1 STARTING OFF
+
+Most of your step files will want to start something like:
+
+ #!perl
+
+ use strict;
+ use warnings;
+
+ use Test::More;
+ use Test::BDD::Cucumber::StepFile;
+
+The fake shebang line gives some hints to syntax highlighters, and
+C<use strict;> and C<use warnings;> are hopefully fairly standard at this point.
+
+Most of I<my> Step Definition files make use of L<Test::More>, but you can use
+any L<Test::Builder> based testing module. Your step will pass its pass or fail
+status back to its harness via L<Test::Builder> - B<each step is run as if it
+were its own tiny test file>, with its own localized L<Test::Builder> object.
+
+L<Test::BDD::Cucumber::StepFile> gives us the functions C<Given()>, C<When()>,
+C<Then()> and C<Step()>. These pass the step definitions to the class loading
+the step definitions, and specify which Step Verb should be used - C<Step()>
+matches any.
+
+=head1 STEP DEFINITIONS
+
+ Given qr/I have (\d+)/, sub {
+    S->{'count'} += $1;
+ };
+
+ When "The count is an integer", sub {
+    S->{'count'} =
+        int( S->{'count'} );
+ };
+
+ Then qr/The count should be (\d+)/, sub {
+    is( S->{'count'}, C->matches->[0], "Count matches" );
+ };
+
+Each of the exported verb functions accept a regular expression (or a string
+that's used as one), and a coderef. The coderef is passed a single argument,
+the L<Test::BDD::Cucumber::StepContext> object. Before the subref is executed,
+localized definitions of C<S> and C<C> are set, such that the lines below are
+equivalent:
+
+  # Access the first match
+  sub { my $context = shift; print $context->matches->[0] }
+  sub { C->matches->[0] }
+
+  # Set a value in the scenario-level stash
+  sub { my $context = shift; my $stash = $context->stash->{'scenario'}; $stash->{'count'} = 1 }
+  sub { S->{'count'} = 1 }
+
+We will evaluate the regex immediately before we execute the coderef, so you
+can use $1, $2, $etc, although these are also available via the StepContext.
+
+=head1 NEXT STEPS
+
+How step files are loaded is discussed in
+L<Test::BDD::Cucumber::Manual::Architecture>, but isn't of much interest. Of
+far more interest should be seeing what you have available in
+L<Test::BDD::Cucumber::StepContext>...
+
+=head1 AUTHOR
+
+Peter Sergeant C<pete@clueball.com>
+
+=head1 LICENSE
+
+Copyright 2011-2016, Peter Sergeant; Licensed under the same terms as Perl
+
+=cut
+
+1;

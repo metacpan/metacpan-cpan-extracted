@@ -1,0 +1,29 @@
+Revision history for Test-Regression
+
+0.01    12-09-2009
+        First version
+
+0.02	13-09-2009
+	Headline documentation error. Fixed t/changes.t and t/manifest.t
+
+0.03 	20-09-2009
+	Added more dependencies and license
+
+0.04 	28-09-2009
+	Various documentation changes
+
+0.05 	21-01-2010
+	Tested for zero-length output in generating file (rt53893).
+	Added tests for 'open' and 'print' functions failing.
+	Migrated to OS independent access to file system in test scripts
+
+0.06    19-11-2010
+        Switched to binmode for better portability (rt60638).
+        Thank to Christian Walde. Also switched to utf8 format for code.
+
+0.07    11-07-2013
+        Marked more tests as author tests to avoid bogus fails.
+
+0.08    05-03-2017
+        Mainly release engineering changes.
+        Removed a warning that occurred on error messages if no test name was provided.

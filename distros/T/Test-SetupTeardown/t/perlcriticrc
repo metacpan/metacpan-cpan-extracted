@@ -1,0 +1,8 @@
+severity = 3
+verbose = 8
+
+[-RegularExpressions::RequireExtendedFormatting]
+[-Subroutines::RequireArgUnpacking]
+[Modules::RequireExplicitPackage]
+allow_import_of = utf8
+[-ErrorHandling::RequireCheckingReturnValueOfEval]

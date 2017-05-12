@@ -1,0 +1,23 @@
+Changes
+lib/Test/Steering.pm
+lib/Test/Steering/Wheel.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/author.t
+t/conformance.t
+t/delegation.t
+t/demux.t
+t/sample-tests/bailout
+t/sample-tests/descriptive
+t/sample-tests/die
+t/sample-tests/no_nums
+t/sample-tests/simple
+t/sample-tests/simple_fail
+t/sample-tests/simple_yaml
+xt/author/pod-coverage.t
+xt/author/pod.t
+xt/misc/all-in-one.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

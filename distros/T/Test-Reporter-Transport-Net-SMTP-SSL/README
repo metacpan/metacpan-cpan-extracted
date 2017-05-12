@@ -1,0 +1,43 @@
+Test-Reporter-Transport-Net-SMTP-SSL
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Reporter::Transport::Net::SMTP::SSL
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Reporter-Transport-Net-SMTP-SSL
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Reporter-Transport-Net-SMTP-SSL
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Reporter-Transport-Net-SMTP-SSL
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Reporter-Transport-Net-SMTP-SSL/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Theodore Robert Campbell Jr
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,74 @@
+Quick reference for Time::Format formatting codes.
+
+$time{$format}
+$time{$format, $time_value}
+
+Numbers:
+    yyyy       4-digit year
+    yy         2-digit year, 00-99
+
+    m          1- or 2-digit month, 1-12
+    mm         2-digit month, 01-12
+    ?m         month with leading space if < 10
+
+    m{on}      Unambiguous month, 1-12
+    mm(on}     Unambiguous month, 01-12
+    ?m(on}     Unambiguous month with leading space if < 10
+
+    d          day number, 1-31
+    dd         day number, 01-31
+    ?d         day with leading space if < 10
+
+    h          hour, 0-23
+    hh         hour, 00-23
+    ?h         hour, 0-23 with leading space if < 10
+
+    H          hour, 1-12
+    HH         hour, 01-12
+    ?H         hour, 1-12 with leading space if < 10
+
+    m          minute, 0-59
+    mm         minute, 00-59
+    ?m         minute, 0-59 with leading space if < 10
+
+    m{in}      Unambiguous minute, 1-12
+    mm(in}     Unambiguous minute, 01-12
+    ?m(in}     Unambiguous minute with leading space if < 10
+
+    s          second, 0-59
+    ss         second, 00-59
+    ?s         second, 0-59 with leading space if < 10
+
+    mmm        millisecond, 000-999
+    uuuuuu     microsecond, 000000-999999
+
+Names and other strings:
+    Month      full month name, mixed-case (locale-specific capitalization)
+    MONTH      full month name, all-uppercase
+    month      full month name, all-lowercase
+
+    Mon        3-letter month abbreviation
+    MON        ditto, all-uppercase
+    mon        ditto, all-lowercase
+
+    Weekday    weekday name
+    WEEKDAY    weekday name, all-uppercase
+    weekday    weekday name, all-lowercase
+
+    Day        3-letter weekday name abbreviation
+    DAY        ditto, all-uppercase
+    day        ditto, all-lowercase
+
+    th         day suffix (st, nd, rd, or th)
+    TH         uppercase suffix
+
+    am         The string "am" or "pm"
+    pm         ditto
+    AM         The string "AM" or "PM"
+    PM         ditto
+    a.m.       The string "a.m." or "p.m."
+    p.m.       ditto
+    A.M.       The string "A.M." or "P.M."
+    P.M.       ditto
+
+    tz         time zone abbreviation

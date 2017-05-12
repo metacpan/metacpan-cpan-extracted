@@ -1,0 +1,30 @@
+Revision history for Perl extension Tk-LabPopEntry-0.04
+
+0.01  Initial release. 
+
+0.02  Methods 'addItem' and 'deleteItem' added.
+
+0.03  Bindings removed from 'Control' and 'Alt' keys to
+      prevent conflict with 'Key' binding.
+     
+      'Sel. All' now disabled if entire contents of Entry
+      widget are already selected.
+
+0.04  The 'spaces allowed' issued was resolved with regards to -pattern.
+      Regular expression for 'float' pattern works.
+      Turned all "Control" strings on the menu into "Ctrl" so that the
+      pop down menu would align properly in all window managers.
+      Binds now work better, though the window manager can still take
+      control for various sequences with unpredictable results.
+      Toplevel control made better with judicious use of 'ismapped()'.
+      Pod fixed (hopefully) and updated.
+
+0.05  Fri Apr 12 23:45:01 2002
+      - Fixed issue where cursor did not scroll to right if
+      text inserted exceeded with of the Entry widget.  Thanks
+      to Amable Ventura Miguel Angel for the spot.
+
+      - Fixed some 'uninitialized' warnings that started
+      showing up in Perl 5.6.
+
+      - Fixed the Makefile.PL so that it installed in the proper directory

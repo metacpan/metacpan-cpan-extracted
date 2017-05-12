@@ -1,0 +1,16 @@
+start => '00:00', tz => 'America/Chicago', days => 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
+
+J1()
+J2()  J3()
+J4()
+J5()
+------------
+J2()
+J7() J8()
+------------
+J8()
+J9()
+------------
+J10()
+J12(every=>60, until=>'10:00', chained=>1)
+J13() 

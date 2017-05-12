@@ -1,0 +1,4 @@
+Makefile.PL
+MANIFEST
+lib/Term/Multiplexed.pm
+META.yml                                 Module meta-data (added by MakeMaker)

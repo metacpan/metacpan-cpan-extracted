@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Test-LatestPrereqs
+version:            0.02
+abstract:           test if the required module versions are big enough
+author:
+    - Kenichi Ishigaki <ishigaki@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Inspector:     0
+    CPAN::Version:        0
+    File::Find::Rule:     0
+    File::Spec:           0
+    Test::More:           0.47
+    Test::UseAllModules:  0.11
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

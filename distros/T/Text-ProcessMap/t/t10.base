@@ -1,0 +1,60 @@
+----------------------------------------------------------------------------------
+                                      Lorem                                       
+                                   Lorem Ipsum                                    
+                                Diagram Number 10                                 
+----------------------------------------------------------------------------------
+            Lorem Ipsum dolor sit amet, consectetuer adipiscing elit.             
+----------------------------------------------------------------------------------
+         Column 1         ||         Column 2         ||         Column 3         
+----------------------------------------------------------------------------------
+
++------------------------.  +------------------------.  +------------------------.
+|         [I01]          |  |         [P02]          |  |         [O01]          |
+|         Lorem          |  |         Lorem          |  |         Lorem          |
+|      Lorem Ipsum       |  |      Lorem Ipsum       |  |      Lorem Ipsum       |
+|    dolor sit amet,     |  |    dolor sit amet,     |  |    dolor sit amet,     |
+|      consectetuer      |  |      consectetuer      |  |      consectetuer      |
+|    adipiscing elit.    |  |    adipiscing elit.    |  |    adipiscing elit.    |
+|  Line1: In sem nisl,   |  |  Line1: In sem nisl,   |  |  Line1: In sem nisl,   |
+| dapibus id, fringilla  |  | dapibus id, fringilla  |  | dapibus id, fringilla  |
+|quis, lacinia et, nisl. |  |quis, lacinia et, nisl. |  |quis, lacinia et, nisl. |
+|  Line2: In sem nisl,   |  |  Line2: I2 sem nisl,   |  |  Line2: In sem nisl,   |
+| dapibus id, fringilla  |  | dapibus id, fringilla  |  | dapibus id, fringilla  |
+|quis, lacinia et, nisl. |  |quis, lacinia et, nisl. |  |quis, lacinia et, nisl. |
+`------------------------'  `------------------------'  `------------------------'
+                                                                                  
++------------------------.                              +------------------------.
+|         [I02]          |                              |         [O02]          |
+|         Lorem          |                              |         Lorem          |
+|      Lorem Ipsum       |                              |      Lorem Ipsum       |
+|    dolor sit amet,     |                              |    dolor sit amet,     |
+|      consectetuer      |                              |      consectetuer      |
+|    adipiscing elit.    |                              |    adipiscing elit.    |
+|  Line1: In sem nisl,   |                              |  Line1: In sem nisl,   |
+| dapibus id, fringilla  |                              | dapibus id, fringilla  |
+|quis, lacinia et, nisl. |                              |quis, lacinia et, nisl. |
+|  Line2: In sem nisl,   |                              |  Line2: In sem nisl,   |
+| dapibus id, fringilla  |                              | dapibus id, fringilla  |
+|quis, lacinia et, nisl. |                              |quis, lacinia et, nisl. |
+`------------------------'                              `------------------------'
+                                                                                  
++------------------------.                                                        
+|         [P01]          |                                                        
+|         Lorem          |                                                        
+|      Lorem Ipsum       |                                                        
+|    dolor sit amet,     |                                                        
+|      consectetuer      |                                                        
+|    adipiscing elit.    |                                                        
+|  Line1: In sem nisl,   |                                                        
+| dapibus id, fringilla  |                                                        
+|quis, lacinia et, nisl. |                                                        
+|  Line2: In sem nisl,   |                                                        
+| dapibus id, fringilla  |                                                        
+|quis, lacinia et, nisl. |                                                        
+`------------------------'                                                        
+
+            Lorem Ipsum dolor sit amet, consectetuer adipiscing elit.             
+
+----------------------------------------------------------------------------------
+lorem_ipsum                                                             00/00/0000
+----------------------------------------------------------------------------------

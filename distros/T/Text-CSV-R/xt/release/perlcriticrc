@@ -1,0 +1,23 @@
+severity=1
+verbose=11
+
+[-Documentation::RequirePodSections]
+[-Documentation::RequirePodLinksIncludeText]
+
+[-ClassHierarchies::ProhibitExplicitISA]
+
+[-Variables::ProhibitPunctuationVars]
+
+[-Miscellanea::ProhibitTies]
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+[InputOutput::RequireBriefOpen]
+lines = 15
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/release/perltidyrc
+
+[Documentation::PodSpelling]

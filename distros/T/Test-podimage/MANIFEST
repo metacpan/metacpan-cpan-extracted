@@ -1,0 +1,4 @@
+MANIFEST
+Makefile.PL
+podimage.pm
+META.yml                                 Module meta-data (added by MakeMaker)

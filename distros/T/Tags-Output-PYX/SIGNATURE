@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 69c01d6022ef2c483b120179d12360edd63600a5 Changes
+SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
+SHA1 9f0d0937bc29348953a8afd0214aade3286d181a MANIFEST
+SHA1 2d2324d796b879070e7e7273eadcd6df269c41a8 META.yml
+SHA1 20c975cd3bc3879850c5fad10b38fb2c51058bae Makefile.PL
+SHA1 933141f84f45b86bc247edc04c25c848355cfda1 PYX.pm
+SHA1 4d141b94186dd4fda48550d327af817df1eb7fb0 README
+SHA1 f619dcef652f4c9ff859b7a7184bf40579612bb6 examples/ex1.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 a8ba99d76e81aebf9f5f15aa6e236109e207aea0 t/Tags-Output-PYX/01-use.t
+SHA1 e6beacc2aef993b269757d25a4f99778887f42d1 t/Tags-Output-PYX/02-version.t
+SHA1 828e7b8c9cd11c5c6bbc1b6084b711f1ddbc9e42 t/Tags-Output-PYX/03-new.t
+SHA1 66476486d0fc1e3ab34d910defdbe632bcde1330 t/Tags-Output-PYX/04-finalize.t
+SHA1 fb3437db8bd2109e542b085a5b97a6f55699261a t/Tags-Output-PYX/05-output_handler.t
+SHA1 bc1bd6b35cb412cb070db1332b29a7d0cb476234 t/Tags-Output-PYX/06-open_tags.t
+SHA1 d3c291a9aa75b8fb4720073f1039998bbd752f45 t/Tags-Output-PYX/07-put-cdata.t
+SHA1 ce07051bc33bedc0be6c9e2d76b240b2c575e208 t/Tags-Output-PYX/08-put-comment.t
+SHA1 ae1a91fe8a16f47c6ef210669453877ca5b0333e t/Tags-Output-PYX/09-put-instruction.t
+SHA1 8ccd6131d7f198293f1474fcfd88ddb862c5a507 t/Tags-Output-PYX/10-put-raw.t
+SHA1 bec5c29f59bc3a533988d6221804e88c70da4825 t/Tags-Output-PYX/11-put-simple_tag.t
+SHA1 043fa8b4bf59af5353fc82b99a0fceee89e18840 t/Tags-Output-PYX/12-put-tag.t
+SHA1 ba11d2670269da2d59b2bdceeb510f81feed9eaa xt/Tags-Output-PYX/01-pod_coverage.t
+SHA1 3c8bea75fb30827bf6c294fa7273809c6e8c825c xt/Tags-Output-PYX/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWIAaqAAoJEJe+XXKaIuTlCwAH/jXlfiWg637zNjeNIsh/3yI0
+90r1aR9/MQmqpR8OCjYANSZyV73kU1B3CEwskOLPGtcTacq073X3QC4RQE9yiL+F
+GM2TKmXw91H0mKXRMI43NhRuuBnYZGQf1dm6Uoaxvoz2HNz0tRBBpc4blvVBNBrm
+O3mxFT04Ic5Y1yxCTrpCRIDrXZ2RpxW1lRbaIgG4Gf8AUV4dAAt7TgOWHOanqB+L
+yfPVuU+FW7MRXrpHZi/0mIqhP+W1Cki3U1K74K19AsDB2g9znWqmzb2FLo+IGJM4
+J6UwweW4RoCako46A6Q5ZclHqeyr5eX8MDfOH4tnQcphCiHpi+cZd+Z0CjkgDDY=
+=WmyW
+-----END PGP SIGNATURE-----

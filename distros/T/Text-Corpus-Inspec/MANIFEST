@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Text/Corpus/Inspec.pm
+lib/Text/Corpus/Inspec/Document.pm
+scripts/examples_Text_Corpus_Inspec.pl
+t/001_test.t
+META.yml                                 Module meta-data (added by MakeMaker)

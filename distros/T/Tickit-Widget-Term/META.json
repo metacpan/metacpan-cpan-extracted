@@ -1,0 +1,71 @@
+{
+   "abstract" : "terminal emulation for Tickit",
+   "author" : [
+      "Tom Molesworth <cpan@perlsite.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tickit-Widget-Term",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.012000"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async" : "0.065",
+            "IO::Pty" : "0",
+            "IO::Tty" : "1.12",
+            "List::UtilsBy" : "0",
+            "Log::Any" : "0",
+            "Tickit" : "0.50",
+            "Tickit::Widget" : "0.50",
+            "Variable::Disposition" : "0.004",
+            "curry" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-tickit-widget-term at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Tickit-Widget-Term"
+      },
+      "homepage" : "http://search.cpan.org/dist/Tickit-Widget-Term/"
+   },
+   "version" : "0.002"
+}
+

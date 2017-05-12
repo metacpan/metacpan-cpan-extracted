@@ -1,0 +1,7 @@
+Revision history for Perl extension Task::CVSMonitor
+
+0.006004 Wed Nov 14 2007
+	- Updating to Module::Install 0.68
+
+0.006003 Sun Nov 20 2005
+	- Initial release

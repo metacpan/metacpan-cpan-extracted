@@ -1,0 +1,46 @@
+Revision history for time-tai-simple
+
+1.11 Sun Feb 19 13:56:00 PST 2017
+        - Pruned false dependencies File::Slurp and Data::Dumper.
+        - Replaced non-core dependency on LWP::Simple with in-core HTTP::Tiny.
+        - Test bugfix, was failing when tested prior to most recently added leapsecond.
+
+1.10 Thu Jan  5 13:52:35 PDT 2017
+        - Test bugfix
+
+1.09 Fri Dec 30 08:29:05 PDT 2016
+	- Updated data/leap-seconds.list from official source (new leapsecond).
+        - Test bugfix -- tolerance was too tight for some cpantesters.
+
+1.08 Tue Mar 22 19:18:15 PDT 2016
+	- Specify perl requirements so CPAN testers stop testing with v5.8 :-P
+
+1.07 Wed Jan 27 13:56:42 PDT 2016
+	- Test bugfix :-P
+        - Updated data/leap-seconds.list from official source (cosmetic changes only).
+        - Cosmetic documentation update.
+        - Require v5.10.0 due to use of // operator.
+
+1.06 Tue Jun 23 09:33:54 PDT 2015
+        - Explicitly added Test::Differences to dist.ini [Prereq] section, in attempt to avoid problems with testers' broken environments, such as http://www.cpantesters.org/cpan/report/16b6f230-bca4-11e4-86e5-45b0bf9d5952
+	- Renamed project from time-tai-simple to Time-TAI-Simple, per Ether's recommendation.
+
+1.05 Mon Jun 22 11:12:23 PDT 2015
+        - Updated leap-seconds.list data file from official source, and internal list.
+
+1.04 Tue Feb 24 09:54:38 PDT 2015
+        - Updated leap-seconds.list data file from official source, and internal list.
+
+1.03 Wed Aug  3 11:28:17 PDT 2014
+        - Added missing prerequisite: LWP::Simple
+
+1.02 Wed Aug  3 11:28:17 PDT 2014
+        - Added missing prerequisite: Test::Most
+        - Corrected formatting bug in bin/tai
+        - Corrected /bin/env --> /usr/bin/env in bin/* (some unixes lack /bin/env, but all seem to have binary or symlink to binary at /usr/bin/env)
+
+1.01 Wed Jul 30 13:55:52 PDT 2014
+        - Minor fixes: license, documentation
+
+1.00 Tue Jul 29 08:54:40 PDT 2014
+        - First version

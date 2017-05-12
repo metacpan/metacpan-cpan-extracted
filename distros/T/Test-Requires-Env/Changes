@@ -1,0 +1,7 @@
+Revision history for Perl extension Test::Requires::Env
+
+0.02    Tue Jul 12 13:29:30 2011
+        - Fixed pod;(
+
+0.01    Fri Jul  8 20:05:34 2011
+        - original version

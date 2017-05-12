@@ -1,0 +1,36 @@
+Revision history for Term-Terminfo
+
+0.08    CHANGES:
+         * Portability improvements to Build.PL configure test:
+            + don't rely on linking to lib[n]curses for term.h test
+            + try looking in /usr/include/ncurses to find term.h
+           (thanks to Casey Zacek, RT 78155)
+
+0.07    CHANGES:
+         * Optional support for unibilium in preference to term.h/-lcurses
+
+0.06    CHANGES:
+         * Provide accessors based on variable name
+         * Provide accessors for obtaining lists of cap or variable names
+
+0.05    CHANGES:
+         * Use XSLoader instead of DynaLoader
+         * Use ExtUtils::CChecker for build checking
+
+0.04    CHANGES:
+         * Avoid hv_fetchs/hv_stores; should work on perl 5.8.8 and earlier
+           now
+        BUGFIXES:
+         * Don't rely on some BSD's (broken) idea of whether VT100 supports
+           the 'xon' capability; try 'am' instead...
+
+0.03    CHANGES:
+         * Try to detect term.h and -lcurses in Build.PL; throw N/A instead of
+           failure if not found
+
+0.02    CHANGES:
+         * A better implementation using -lncurses instead of scraping the
+           output of `infocmp`
+
+0.01    First version, released on an unsuspecting world.
+

@@ -1,0 +1,65 @@
+
+2.7191: Wed Mar 25 2015
+   - resolve these vile -CA bugs
+   - remove open SYMBOL usages in t/ and replace with IPC::Run
+     or open my $mem, '>', \my $str
+   - switched from File::Slurp to Path::Tiny — not at all concerned about the
+     controversy or the implications of using slurp() from an author-only test
+     … I Just like Path::Tiny
+
+2.7191: Sun Mar 22 2015
+   - Experimenting with a new _hashed_ color that's random space madness hashed for each match
+     (more on this in the docs later if it survives testing)
+
+2.7190: Sun Mar 22 2015
+   - support utf8 in params to 'hi'
+
+2.7190: Tue Dec 09 2014
+   - limited Makefile support
+
+2.7189: Tue Jul 08 2014
+   - little fixes and things
+
+2.7187: Sun Jun 22 2014
+   - taught App::HI how to list all the colors
+   - XXX: interestingly, I can modify the color stack in %ENV, no reason to do
+     the weird scope hacking; project for later I guess
+     (There's also a coloralias() sub now, but you can't replace standard
+     colors, so it's not useful here.)
+   - use color() and colorvalid() instead of more scope hacking
+   - export color() and colorvalid() (et al) insteadof scope hacking
+   - move most of the hi command to App::HI
+   - changed my mind on black and pitch.  Reversing them.
+   - black is black, pitch is bold black; emotional problems solved.  Hrm,
+     coal.  Maybe coal?  Heck, I put that too.
+
+2.7186: Sat Jun 21 2014
+   - added a few more color nicknames
+
+2.7185: Sat Apr 30 2011
+   - Add App::HI namespace so I can install this easier
+
+2.7184: Mon Aug 10 2009
+   - hi default install
+   - make hi show up under App::HI
+
+2.7183: Fri May 22 09:14:55 EDT 2009
+   - docbug
+
+2.71828: Mon May  4 06:13:52 EDT 2009
+   - my dev was against a very old version of Term::ANSIColor
+   - fixed bugs
+   - fixed tests
+
+2.7182: Fri May  1 16:47:19 EDT 2009
+   - added a README
+
+2.718: Fri May  1 07:26:56 EDT 2009
+   - added support for bold-blue in ./hi
+
+2.71: Fri May  1 06:18:37 EDT 2009
+   - added many tests and skelled my truncate code
+
+2.71: Thu Apr 30 09:39:04 EDT 2009
+   - got extracolors working
+   - got autofh working

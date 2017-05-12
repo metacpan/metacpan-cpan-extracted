@@ -1,0 +1,152 @@
+NAME
+    Term::StatusBar - Dynamic progress bar
+
+SYNOPSIS
+        use Term::StatusBar;
+
+        my $status = new Term::StatusBar (
+                        label => 'My Status: ',
+                        totalItems => 10,  ## Equiv to $status->setItems(10)
+        );
+
+        $status->start;  ## Optional, but recommended
+
+        doSomething(10);
+
+        $status->reset;  ## Resets internal state
+        $status->label('New Status: ');  ## Reuse current object with new data
+        $status->char('|');
+
+        doSomething(20);
+
+        sub doSomething {
+            $status->setItems($_[0]);
+            for (1..$_[0]){
+                sleep 1;
+                $status->update;  ## Will call $status->start() if needed
+            }
+        }
+
+DESCRIPTION
+    Term::StatusBar provides an easy way to create a terminal status bar,
+    much like those found in a graphical environment. Term::Size is used to
+    ensure the bar does not extend beyond the terminal's width. All outout
+    is sent to STDOUT by default.
+
+METHODS
+  new(parameters)
+    This creates a new StatusBar object. It can take several parameters:
+
+       startRow     - This indicates which row to place the bar at. Default is 1.
+       startCol     - This indicates which column to place the bar at. Default is 1.
+       startPos     - This will replace startRow if specified. Currently takes ['bottom','top'].
+       label        - This places text to the left of the status bar. Default is "Status: ".
+       scale        - This indicates how long the bar is. Default is 40.
+       totalItems   - This tells the bar how many items are being iterated. Default is 1.
+       char         - This indicates which character to use for the base bar. Default is ' ' (space).
+       updateInc    - Updates bar every X%. Default is every 1%.
+       subText      - Text to display below the status bar.
+       subTextAlign - How to align subText ('left', 'center', 'right').
+       reverse      - Status bar empties to 0% rather than fills to 100%.
+       barColor     - Base color of the status bar (default white -- \033[7;37m).
+       fillColor    - Fill color of the status bar (default blue -- \033[7;34m).
+       colorTerm    - Specify if your terminal can handle colors. Default is 1.
+       fh           - User-defined file handle.
+       precision    - Formats percentage with decimals. Up to 4 places supported.
+       showTime     - Shows approximate time to completion in "00:00:00" format.
+
+  setItems(#)
+    This method does several things with the number that is passed in. First
+    it sets $obj->{totalItems}, second it sets an internal counter
+    'curItems', last it determines the update increment.
+
+    This method must be used, unless you pass totalItems to the constructor.
+
+  subText('text')
+    Sets subText and redisplays it if necessary.
+
+  addSubText('text')
+    This takes the original value of $obj->{subText} and concats 'text' to
+    it each time it is called. Text is then re-displayed to screen.
+
+  start()
+    This method 'draws' the initial status bar on the screen.
+
+  update($items)
+    This is really the core of the module. This updates the status bar and
+    gives the appearance of movement. It really just redraws the entire
+    thing, adding any new incremental updates needed.
+
+    You should only pass $items in when processing a file with an uneven
+    number of bytes per line. This is so you don't have to initially read
+    the file in to get a line count.
+
+  reset([\%options])
+    This resets the bar's internal state and makes it available for re-use.
+    If the optional hash ref is passed in, the status bar can be filled with
+    specified values. The keys are interpreted as function calls on the
+    status bar object with the values as parameters.
+
+  _printPercent()
+    Internal method to print the current percentage to the screen.
+
+  _printSubText()
+    Internal method to print the subText to the screen.
+
+  _calcTime()
+    Internal method to calculate and print estimated time to completion.
+
+  _get_max_term()
+    Internal method to get the terminal's current width and height.
+
+CHANGES
+       2003-06-12
+          + Added new options: startPos and colorTerm.
+          + Changed escape sequence to \033.
+
+       2003-06-11
+          + Fixed divide-by-zero error in _calcTime().
+          + Fixed bug in updateInc. Wasn't updating correctly.
+          + Fixed bug with subText() and _printSubText() being "out-of-sync".
+             - Caused text to not be displayed at the appropriate time.
+          + Fixed bug with long subTexts not being cleared.
+             - Caused extra characters to remain on the screen.
+          + Prevent long subText values from wrapping by truncating to StatusBar width.
+             - This should work with all subTextAlign types.
+          + update() can now take an argument of items processed. This should only be used when an 
+            uneven number of items are processed per iteration. An example would be the number of bytes 
+            a line in a file contains.
+
+       2003-05-06
+          + Fixed bug where subTextLength was not being re-evaluated.
+          + Bar's final state color is now appropriate. When emptied to 0% is was getting re-filled.
+          + Added "no warnings 'portable" so Perl 5.8 would be happy.
+          + Added ability to send output to user-defined file handle.
+          + Added precision for percentage output to a max of 4 decimal places. Default is 0.
+          + Can now specify a different 'updateInc', which adjusts how often the bar is updated. Default is every 1%.
+          + Can now indicate if you want to see approximate time to completion.
+
+       2003-01-27
+          + Added 'reverse' option to constructor.
+          + Cleaned up code a bit.
+          + Only update items when needed (subText was being updated even if it had not changed).
+          + Pre-compute lengths and use static value rather than calling length() every iteration.
+
+AUTHOR
+    Shay Harding <sharding@ccbill.com>
+
+NOTES
+    Has only been tested on Linux platform. I would like to hear of
+    successes/problems on other platforms. Patches, ideas and comments are
+    always welcome.
+
+ACKNOWLEDGEMENTS
+    Scott Wiersdorf's Term::Twiddle for the _get_max_width() function.
+
+COPYRIGHT
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Term::Report
+

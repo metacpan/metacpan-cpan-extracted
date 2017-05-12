@@ -1,0 +1,60 @@
+NAME
+    Term::InKey - Perl extension for clearing the screen and receiving a
+    keystroke.
+
+SYNOPSIS
+            use Term::InKey;
+
+            print "Press any key to clear the screen: ";
+            $x = &ReadKey;
+            &Clear;
+            print "You pressed $x\n";
+
+DESCRIPTION
+    This module implements Clear() to clear screen and ReadKey() to receive
+    a keystroke, on UNIX and Win32 platforms. As opposed to Term::ReadKey,
+    it does not contain XSUB code and can be easily installed on Windows
+    boxes.
+
+FUNCTIONS
+    *   Clear
+
+        Clear the screen.
+
+    *   ReadKey
+
+        Read one keystroke.
+
+    *   ReadPassword
+
+        Read a password, displaying asterisk instead of the characters
+        readed. Deleting one character back (DEL) and erasing the buffer
+        (^U) are supported. This function accepts one argument. It can be an
+        alternate char for displaying other than an asterisk, or if a
+        negative number, suppresses output to the screen and only receives
+        input.
+
+TODO
+    Write a function to receive a keystroke with time out. Easy with
+    select() on UNIX.
+
+COMPLIANCE
+    This module works only on UNIX systems and Win32 systems.
+
+AUTHOR
+    This module was written by Ariel Brosh (R.I.P), November 2001, for RAZ
+    Information Systems.
+
+    Now maintained by Oded S. Resnik razinf@cpan.org
+
+COPYRIGHT
+    Copyright (c) 2001, 2002, 2003, 2004 RAZ Information Systems Ltd.
+    http://www.raz.co.il/
+
+    This package is distributed under the same terms as Perl itself, see the
+    Artistic License on Perl's home page.
+
+SEE ALSO
+    stty, tcsetattr, termcap, Term::Cap, POSIX, Term::ReadKey,
+    Term::ReadPassword.
+

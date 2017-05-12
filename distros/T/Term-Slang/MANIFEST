@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Slang.pm
+Slang.xs
+Slang/Scroll.pm
+Slang/Window.pm
+TODO
+test.pl
+typemap
+demo/cursor
+demo/draw-box
+demo/keypad
+demo/smgtest

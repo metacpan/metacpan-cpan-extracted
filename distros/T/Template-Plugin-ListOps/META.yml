@@ -1,0 +1,24 @@
+---
+abstract: 'Plugin interface to list operations'
+author:
+  - 'Sullivan Beck <sbeck@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-ListOps
+provides:
+  Template::Plugin::ListOps:
+    file: lib/Template/Plugin/ListOps.pm
+    version: 2.01
+requires:
+  Array::AsObject: 0
+  Template: 0
+  Template::Plugin: 0
+  perl: 5.004
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.01

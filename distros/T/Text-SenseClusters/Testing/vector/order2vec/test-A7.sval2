@@ -1,0 +1,34 @@
+<corpus lang="english">
+<lexelt item="LEXELT">
+<instance id="line.w7_103: 2779:">
+<answer instance="line.w7_103: 2779:" senseid="cord"/>
+<context>
+voice overloud father
+</context>
+</instance>
+<instance id="line.w7_111: 3024:">
+<answer instance="line.w7_111: 3024:" senseid="tele-phone"/>
+<context>
+dozen president <sat id="call_for.068:0">for</sat> line item
+</context>
+</instance>
+<instance id="line.w7_114: 17236:">
+<answer instance="line.w7_114: 17236:" senseid="wire"/>
+<context>
+president zambia hawke prime minister
+</context>
+</instance>
+<instance id="line.w8_009: 6647:">
+<answer instance="line.w8_009: 6647:" senseid="product"/>
+<context>
+ordinary usual <head>chairs</head> instruments
+</context>
+</instance>
+<instance id="line.w8_016: 7501:">
+<answer instance="line.w8_016: 7501:" senseid="text"/>
+<context>
+pentagon minister bush <sat id="call_for.068:0">for</sat> agreement
+</context>
+</instance>
+</lexelt>
+</corpus>

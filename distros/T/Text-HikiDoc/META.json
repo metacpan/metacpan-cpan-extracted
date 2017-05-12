@@ -1,0 +1,104 @@
+{
+   "abstract" : "Pure Perl implementation of 'HikiDoc' which is a text-to-HTML conversion tool.",
+   "author" : [
+      "The original 'HikiDoc' was written by Kazuhiko <kazuhiko@fdiary.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-HikiDoc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Text::HikiDoc" : {
+         "file" : "lib/Text/HikiDoc.pm",
+         "version" : "1.023"
+      },
+      "Text::HikiDoc::Plugin" : {
+         "file" : "lib/Text/HikiDoc/Plugin.pm"
+      },
+      "Text::HikiDoc::Plugin::aa" : {
+         "file" : "lib/Text/HikiDoc/Plugin/aa.pm"
+      },
+      "Text::HikiDoc::Plugin::br" : {
+         "file" : "lib/Text/HikiDoc/Plugin/br.pm"
+      },
+      "Text::HikiDoc::Plugin::e" : {
+         "file" : "lib/Text/HikiDoc/Plugin/e.pm"
+      },
+      "Text::HikiDoc::Plugin::ins" : {
+         "file" : "lib/Text/HikiDoc/Plugin/ins.pm"
+      },
+      "Text::HikiDoc::Plugin::sub" : {
+         "file" : "lib/Text/HikiDoc/Plugin/sub.pm"
+      },
+      "Text::HikiDoc::Plugin::sup" : {
+         "file" : "lib/Text/HikiDoc/Plugin/sup.pm"
+      },
+      "Text::HikiDoc::Plugin::syntaxhighlighter" : {
+         "file" : "lib/Text/HikiDoc/Plugin/syntaxhighlighter.pm"
+      },
+      "Text::HikiDoc::Plugin::texthighlight" : {
+         "file" : "lib/Text/HikiDoc/Plugin/texthighlight.pm"
+      },
+      "Text::HikiDoc::Plugin::vimcolor" : {
+         "file" : "lib/Text/HikiDoc/Plugin/vimcolor.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/higemaru/p5-text-hikidoc/issues"
+      },
+      "homepage" : "https://github.com/higemaru/p5-text-hikidoc",
+      "repository" : {
+         "url" : "git://github.com/higemaru/p5-text-hikidoc.git",
+         "web" : "https://github.com/higemaru/p5-text-hikidoc"
+      }
+   },
+   "version" : "1.023",
+   "x_contributors" : [
+      "KAWABATA Kazumichi <kawabata@cpan.org>"
+   ]
+}

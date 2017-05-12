@@ -1,0 +1,51 @@
+---
+abstract: 'Install CPAN::Reporter and related dependencies'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-CPAN-Reporter
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Task::CPAN::Reporter:
+    file: lib/Task/CPAN/Reporter.pm
+    version: '0.003'
+requires:
+  CPAN::Meta::YAML: '0.016'
+  CPAN::Reporter: '1.1902'
+  IO::Socket::SSL: '1.42'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Test::Reporter::Transport::Metabase: '1.999008'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Task-CPAN-Reporter/issues
+  homepage: https://github.com/dagolden/Task-CPAN-Reporter
+  repository: https://github.com/dagolden/Task-CPAN-Reporter.git
+version: '0.003'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Alceu Rodrigues de Freitas Junior <alcjunio@localhost.localdomain>'
+  - 'David Golden <xdg@xdg.me>'
+  - 'James McCoy <vega.james@gmail.com>'

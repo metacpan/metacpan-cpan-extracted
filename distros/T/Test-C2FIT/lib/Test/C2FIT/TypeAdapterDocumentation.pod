@@ -1,0 +1,104 @@
+
+=head1 TypeAdapters
+
+TypeAdapters are responsible for two tasks:
+
+1. Converting the text contained in a cell into a "value", e.g. a string or a float. ("parse" method)
+
+2. Checking for equality of that value against the computed value delivered by the fixture. ("equals" method)
+
+
+
+Without specifying a TypeAdatper the GenericTypeAdapter will be usesd. This TypeAdapter performs no parsing,
+the cell text will be just passed to the subsequent stages.
+The "check"-part - at present - tries to figure out what kind the parameters (cell text and fixture value)
+are of, in order to make the right check - boolean, numerical or string.
+
+Parameters are treated as booleans if they contain one of the literal strings "true" or "false".
+
+Parameters are treated as numbers if they match some simple rules. The numerical equality check is then
+delegated to the ScientificDouble (domain-) type. 
+
+If the parameters are blessed objects, a call to C<$obj-E<gt>equals> is tried. The last possibility - and
+therefore the default behavior is the string "eq" check.
+
+
+So if all this is available, what are specific TypeAdapters good for?
+
+There are following reasons:
+
+
+=head3 Ensuring the right check-type (boolean, numerical, string or other)
+
+Given the two values '007' and '7', they are numerically equal, by contrast, they are not string equal.
+A specific TypeAdapter gives you the opportunity to define the right check.
+
+
+=head3 Different representation of a value
+
+Either the underlying domain type stores the value in a human-unreadable form, or there are different
+valid forms and the value stored in the underlying domain type is not in canonical form.
+An example for the first case is "duration". A human readable form might be "HH:MM:SS" or "MMM:SS", the
+domain type holds the value as number of seconds ("SSSSS"). In this case you need a specific parse-part, but no
+specific check part (as number of seconds can be compared numerically).
+The second case is used if a value entered by an user should be printed out in the very same form as entered.
+If this is true, the "equals"-part has to convert both values to canonical form and check them appropriately.
+
+
+=head3 The domain type in the system under test is not a scalar
+
+This is the case e.g. for GenericArrayAdapter. If a blessed reference is needed, you'll propably call a 
+C<object-E<gt>new()> in the parse method.
+You also have to ensure, that check makes the right job, unless:
+
+- Your domain type implements an C<equals()> method, or
+
+- Your domain type overloads the stringify (C<'""' =E<gt> 'as_string'>) or C<eq> operator
+
+
+=head3 The cell text cannot be converted one-to-one to a single value
+
+E.g. a date given in the form "YYY-MM-DD" may represent one or 86400 (24 * 60 * 60) values of a unix-time
+type (which holds a number of seconds since 1970-01-01), depending on your case.
+You have to implement both parse() and check() on your own.
+
+
+=head3 Valid values of the domain type are restricted.
+
+This is the case if the domain type is an enum (e.g. rating of a bond) or if the
+range is restricted - e.g a discount in percent which is valid only in the range 0 - 100.
+
+If the domain type is implemented using a scalar value, the validity check must be done in the
+specific TypeAdapter. If  the domain type is a blessed objects, this task might be delegated by
+the TypeAdapter to the domain type object.
+
+
+=head3 Domain Type is a foreign key
+
+This case occurs when the system under test operates on data comming from a relational database.
+
+B<important:> The following applies, only if your code does not interact with a database during the test!!!
+
+Imagine a simple 1:n relation: C<person> : C<hours_worked>. The code to test contains a business logic
+which summs the entries in C<hours_worked> per C<person> or per C<person> and some other criteria.
+Input to this business logic is a set of C<hours_worked> entries. Output is a set of C<payroll_items>.
+There is also a 1:n relation between C<person> and C<payroll_items>. So for the business logic, no
+attributes of C<person> are needed.
+
+Provided that the foreign key is numerical, a number could be written into the appropriate cells of
+the fit-document. This is simple, but you'd propably loose the willingness of your target audience
+ in terms of writing further fit-documents.
+
+A better solution is provided by a TypeAdapter which dynamically assigns a number (key) to a string
+(wrapped value) in a consistent way. All you need is an static hash and a static number generator.
+A fit-document contains a column "person name", this is bound to a specific TypeAdapter. Every
+C<parse(column text)> checks if the C<column text> has already been assigned a key, if not a new one
+will be generated. If a key has been assigned, it gets stored in the hash.
+
+The first usage of a name generates a key, this is completely ok, as the system under test should rely
+on already known foreign keys. (If the code under test generates new foreign keys, it must generate
+new primary keys too. Then you need a different test for it!)
+
+
+
+

@@ -1,0 +1,65 @@
+{
+   "abstract" : "Test::WWW::Mechanize for Mojo / Mojolicious",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-WWW-Mechanize-Mojo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "HTML::Entities" : "0",
+            "LWP" : "5.816",
+            "Mojolicious" : "4.75",
+            "Mojolicious::Lite" : "0",
+            "Test::WWW::Mechanize" : "1.14",
+            "WWW::Mechanize" : "1.50",
+            "base" : "0",
+            "perl" : "5.012",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::WWW::Mechanize::Mojo" : {
+         "file" : "lib/Test/WWW/Mechanize/Mojo.pm",
+         "version" : "v0.0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.berlios.de/modules/Test-WWW-Mechanize-Mojo/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/shlomif/perl-test-www-mechanize-mojo"
+      }
+   },
+   "version" : "v0.0.17"
+}

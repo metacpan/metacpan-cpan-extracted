@@ -1,0 +1,12 @@
+Revision history for Perl extension Trigger
+
+0.02   Tue Nov 20 23:29:05 2007
+	- Renewal of a document
+
+0.02_1 Fri Nov 16 12:12:05 2007
+	- それぞれの'trigger'に対して複数の'action'を設定できるようにしました。
+	- 初期処理でcontextを受け取れるようにしました。
+
+0.01   Wed Nov 14 21:03:48 2007
+	- original version
+

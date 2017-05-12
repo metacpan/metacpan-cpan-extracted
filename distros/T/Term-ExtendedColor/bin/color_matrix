@@ -1,0 +1,108 @@
+#!/usr/bin/perl
+use strict;
+use Term::ExtendedColor qw(bg);
+
+print "Purple:\n";
+for(my $i = 1; $i < 30; ++$i) {
+  print bg("purple$i", sprintf("% 3d", $i)), end($i);
+}
+
+print "\nGrey:\n";
+for(my $i = 1; $i < 24; ++$i) {
+  print bg("grey$i", sprintf("% 3d", $i)), end($i);
+}
+
+print "\nCyan:\n";
+for(my $i = 1; $i < 24; ++$i) {
+  print bg("cyan$i", sprintf("% 3d", $i)), end($i);
+}
+
+print "\nMagenta:\n";
+for(my $i = 1; $i < 26; ++$i) {
+  print bg("magenta$i", sprintf("% 3d", $i)), end($i);
+}
+
+print "\nYellow:\n";
+for(my $i = 1; $i < 18; ++$i) {
+  print bg("yellow$i", sprintf("% 3d", $i)), end($i);
+}
+
+print "\nBlue:\n";
+for(my $i = 1; $i < 17; ++$i) {
+  print bg("blue$i", sprintf("% 3d", $i)), end($i);
+}
+
+print "\nGreen:\n";
+for(my $i = 1; $i < 28; ++$i) {
+  print bg("green$i", sprintf("% 3d",  $i)), end($i);
+}
+
+print "\nOrange:\n";
+for(my $i = 1; $i < 5; ++$i) {
+  print bg("orange$i", sprintf("% 3d", $i)), end($i);
+}
+
+print "\nRed:\n";
+for(my $i = 1; $i < 5; ++$i) {
+  print bg("red$i", sprintf("% 3d", $i)), end($i);
+}
+
+print "\n";
+
+
+sub end {
+  my $i = shift;
+  if($i % 30 == 0) {
+    return "\n";
+  }
+  else {
+    return '';
+  }
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+color_matrix - a matrix of available colors from Term::ExtendedColor
+
+=head1 USAGE
+
+color_matrix
+
+=head1 DESCRIPTION
+
+A color matrix showing the available colors in the Perl module L<Term::ExtendedColor>.
+
+=head1 REPORTING BUGS
+
+Report bugs on rt.cpan.org or to magnus@trapd00r.se
+
+=head1 AUTHOR
+
+  Magnus Woldrich
+  CPAN ID: WOLDRICH
+  magnus@trapd00r.se
+  http://japh.se
+
+=head1 CONTRIBUTORS
+
+None required yet.
+
+=head1 COPYRIGHT
+
+Copyright 2011 B<THIS MODULE>s L</AUTHOR> and L</CONTRIBUTORS> as listed above.
+
+=head1 LICENSE
+
+This library is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<show_all_colors(1)>
+
+=cut

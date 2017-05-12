@@ -1,0 +1,10 @@
+[0.02] 2009/10/29
+    - FIX BUG <br /> right after <div class="user-area"> when #contents is used on mobile
+    - FIX BUG <br /> does not appear after some Block plugins
+    - Added Text::Livedoor::Wiki::Plugin::Function::Pad for game pad
+    - FIX BUG cannot contain ) at Text::Livedoor::Wiki::Plugin::Inline::Footnote
+    - FIX BUG input with no content at Text::Livedoor::Wiki::Plugin::Block::Toggle
+    - FIX typo at Text::Livedoor::Wiki::Plugin::Base::Block::List
+    - Require Test::Base 0.56 version for is_deep support;
+[0.01] 2009/08/20
+    - Initial release

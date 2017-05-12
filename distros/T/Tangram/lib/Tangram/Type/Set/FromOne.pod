@@ -1,0 +1,87 @@
+=head1 NAME
+
+Tangram::Type::Set::FromOne - map Set::Object using a foreign key
+
+=head1 SYNOPSIS
+
+   use Tangram;
+
+   # or
+   use Tangram::Core;
+   use Tangram::Type::Set::FromOne;
+
+   $schema = Tangram::Schema->new(
+
+      classes => { Basket => { fields => {
+
+      iset =>
+      {
+         # long form
+         fruits =>
+         {
+            class => 'Fruit',
+            coll => 'basket',
+         },
+
+         # or (short form)
+         fruits => 'Fruit',
+      }
+
+=head1 DESCRIPTION
+
+This class maps references to Set::Object collections in an intrusive
+fashion. The persistent fields are grouped in a hash under the C<iset>
+key in the field hash.
+
+The set may contain only objects of persistent classes. These classes
+must have a common persistent base class.
+
+Tangram uses a column on the element's table to store the id of the
+object containing the collection.
+
+CAUTION: the same object may not be an element of the same collection,
+in two different objects. This mapping may be used only for
+one-to-many relationships.
+
+The field names are passed in a hash that associates a field name with
+a field descriptor. The field descriptor may be either a hash or a
+string. The hash uses the following fields:
+
+=over 4
+
+=item * class
+
+Mandatory field C<class> specifies the class of the elements.
+
+=item * aggreg
+
+Optional field C<aggreg> specifies that the elements of the collection
+must be removed (erased) from persistent storage along with the
+containing object. The default is not to aggregate.
+
+=item * back
+
+Optional field C<back> sets the name of a field that is inserted in
+the elements. That field acts as a demand-loaded, read-only reference
+to the object containing the collection.
+
+=item * coll
+
+Optional field C<coll> sets the name the column containing the id of
+the containing object. This defaults to 'C_m', where 'C' is the class
+of the containing object (after passing through the normalisation
+function), and 'm' is the field name.
+
+=item * deep_update
+
+Optional field C<deep_update> specificies that all elements have to be
+updated automatically when C<update> is called on the collection
+object. Automatic update ensures consisitency between the Perl
+representation and the DBMS state, but degrades update performance so
+use it with caution. The default is not to do automatic updates.
+
+=back
+
+If the descriptor is a string, it is interpreted as the name of the
+element's class. This is equivalent to specifying only the C<class>
+field in the hash variant.

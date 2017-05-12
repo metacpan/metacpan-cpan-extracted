@@ -1,0 +1,22 @@
+Revision history for Perl extension Tk::SMListbox.
+
+1.10  Tue Oct 13 22:21:54 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n Tk::SMListbox
+2.00	Wed Oct 21
+	- Added setButtonHeight() function for resizing the height (pady) 
+	  of the column header buttons.
+	- Added column header button "underlined hotkey" capability for 
+	  keyboard-controlled column sorting.  The optional hotkey in 
+	  the column header (-text) values is preceded by a "~".
+	- Added focusColumn() function.
+2.01	Thu Oct 22
+	- Fixed small bug in the focus() function to ensure that the 
+	  widget properly takes focus.
+2.1	Thu Apr 30, 2015
+	- Fixed bug in columnDelete() when only a single column value passed.
+	- Fixed bug where sometimes more than one column showed sort arrow.
+	- Fixed bindCallback reference in columnInsert() to _bindCallback
+	  (MListbox bug#60812).
+	- Added -nocolumnfocus option to prevent first listbox from showing the 
+	  focused "______" when using my "hacked" Tk::Listbox widget.

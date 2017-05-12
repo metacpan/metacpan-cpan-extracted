@@ -1,0 +1,35 @@
+Changelog for Thrift-API-HiveClient
+
+0.003 2012-08-21T20:37:21
+ [Stephen R. Scaffidi <sscaffidi@gmail.com>]
+ - i keep thinking that pod isn't stupid
+
+ - MOAR DOCS
+
+ - ugh
+
+
+v0.002 2012-08-21T18:17:01
+ [Stephen R. Scaffidi <sscaffidi@gmail.com>]
+ - told autoprereqs to ignore private packages
+
+
+v0.001 2012-08-21T18:03:49
+ [Stephen R. Scaffidi <sscaffidi@gmail.com>]
+ - now with pod-weaver goodness
+
+ - more docs and little things
+
+ - more docs and little things
+
+ - more docs and little things
+
+ - added some documentation to HiveClient.pm,
+
+ - added gitignore, readme, improved perl-module generation
+
+ - added abstract
+
+ - initial commit
+
+

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL # Will be created by "./Build dist"
+META.yml # Will be created by "./Build dist"
+README   # Will be created by "./Build dist"
+lib/Template/Plugin/Subst.pm
+t/00-load.t
+t/01-filter.t
+t/02-vmethod.t
+t/pod.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

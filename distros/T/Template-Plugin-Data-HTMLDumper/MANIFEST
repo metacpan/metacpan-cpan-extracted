@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/Template-Plugin-Data-HTMLDumper.t
+lib/Template/Plugin/Data/HTMLDumper.pm

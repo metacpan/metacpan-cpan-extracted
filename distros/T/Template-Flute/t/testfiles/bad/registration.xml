@@ -1,0 +1,8 @@
+<specification>
+<form name="registration" link="name">
+<field name="eMail"/>
+<field name="password"/>
+<field name="verify"/>
+</form>
+<value name="form-Errors" field="errors" op="toggle"  />
+</specification>

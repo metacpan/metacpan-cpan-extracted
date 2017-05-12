@@ -1,0 +1,31 @@
+---
+abstract: "Harness output delegate for Atlassian's Bamboo CI server"
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Slurp: 0
+  Test::More: 0
+  Test::XML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: TAP-Formatter-BambooExtended
+provides:
+  TAP::Formatter::BambooExtended:
+    file: lib/TAP/Formatter/BambooExtended.pm
+    version: 1.01
+  TAP::Formatter::BambooExtended::Session:
+    file: lib/TAP/Formatter/BambooExtended/Session.pm
+    version: 1.01
+requires:
+  Encode: 2.42
+  TAP::Harness: 3.2
+  XML::LibXML: 2
+  HTML::Parser: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01

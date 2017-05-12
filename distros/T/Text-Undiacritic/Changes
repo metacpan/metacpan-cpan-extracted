@@ -1,0 +1,22 @@
+Revision history for Text::Undiacritic
+
+0.07  2014-12-29 23:30:21 CET
+      - change back for old perls
+
+0.06  2014-12-29 23:14:30 CET
+      - improve performance
+
+0.05  2014-08-16 23:46:36 CEST
+      - badges in pod
+
+0.04  2014-08-16 07:53:06 CEST
+      - add travis
+
+0.03  2014-04-22 18:18:00 CEST
+      - Adapted to current practices
+
+0.02  2007-12-09 16:00:00 CEST
+      - Move two tests to developer tests.
+
+0.01  2007-12-09 12:46:00 CEST
+      - Initial release.

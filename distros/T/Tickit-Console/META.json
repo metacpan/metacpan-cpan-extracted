@@ -1,0 +1,52 @@
+{
+   "abstract" : "build full-screen console-style applications",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tickit-Console",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Identity" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "String::Tagged" : "0.10",
+            "Tickit" : "0",
+            "Tickit::Widget::Entry" : "0",
+            "Tickit::Widget::Scroller" : "0.04",
+            "Tickit::Widget::Tabbed" : "0.015",
+            "Tickit::Window" : "0.45",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Tickit::Console" : {
+         "file" : "lib/Tickit/Console.pm",
+         "version" : "0.07"
+      },
+      "Tickit::Console::Tab" : {
+         "file" : "lib/Tickit/Console/Tab.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

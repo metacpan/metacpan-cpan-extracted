@@ -1,0 +1,204 @@
+Changes file for Task::BeLike::JONASBN
+
+$Id$
+
+Project site changelog:
+
+http://logicLAB.jira.com/browse/BJONASBN#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+1.07 2014-01-24
+
+- Update not required
+
+- Enabled warnings pragma [BJONASBN-58]
+
+  https://logiclab.jira.com/browse/BJONASBN-58
+
+- Changed repository to Github
+
+- Specified required Perl version to be 5.6.0 [BJONASBN-57]
+
+  https://logiclab.jira.com/browse/BJONASBN-57
+
+- Added Perl::Critic test (t/critic.t) and Perl::Critic resource file
+  accompanying the distribution (t/perlcriticrc)
+
+
+1.06 2014-01-18
+
+- Update not required
+
+- Added Perl::Critic::logicLAB
+
+- Added Task::Jenkins
+
+- Specified requirement for Devel::Cover to be atleast version 1.00 [BJONASBN-54]
+
+  https://logiclab.jira.com/browse/BJONASBN-54
+
+- Added Test::CPAN::Changes to list of distributions I like [BJONASBN-53]
+
+  https://logiclab.jira.com/browse/BJONASBN-53
+
+- Added Test::CPAN::Changes test (t/changes.t), implementing automatic integrity test of 
+  the Changes file, see also BJONASBN-50 [BJONASBN-52]
+
+  https://logiclab.jira.com/browse/BJONASBN-52
+
+- Added Test::Kwalitee test (t/kwalitee.t) [BJONASBN-55]
+
+  https://logiclab.jira.com/browse/BJONASBN-55
+  
+
+1.05 2013-08-01
+
+- Fixed up Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [BJONASBN-50]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+  
+  https://logiclab.jira.com/browse/BJONASBN-50
+
+
+1.04 2012-12-03
+
+- Maintenance release, update not required
+
+- [BJONASBN-43] Added File::Find::Rule
+  http://logiclab.jira.com/browse/BJONASBN-43
+
+- [BJONASBN-48] Added File::Which
+  http://logiclab.jira.com/browse/BJONASBN-48
+
+- [BJONASBN-47] Added Test::DatabaseRow
+  http://logiclab.jira.com/browse/BJONASBN-47
+
+- [BJONASBN-41] Added Tie::IxHash
+  http://logiclab.jira.com/browse/BJONASBN-41
+
+- [BJONASBN-44] Added Perl::Critic::Bangs
+  http://logiclab.jira.com/browse/BJONASBN-44
+
+- [BJONASBN-49] Added YAML::Shell
+  http://logiclab.jira.com/browse/BJONASBN-49
+
+- [BJONASBN-46] Added local::lib
+  http://logiclab.jira.com/browse/BJONASBN-46
+
+- Changed timestamps in Changes file to ISO8601 format (my personal favorite)
+
+
+1.03 2011-04-11
+
+- Maintenance release, update not required
+
+- [BJONASBN-38] Added App::Prove
+  http://logiclab.jira.com/browse/BJONASBN-38
+
+- [BJONASBN-36] Added Perl::Critic
+  http://logiclab.jira.com/browse/BJONASBN-36
+
+- [BJONASBN-35] Added TAP::Formatter::JUnit
+  http://logiclab.jira.com/browse/BJONASBN-35
+
+- [BJONASBN-37] Added Test::Fatal
+  http://logiclab.jira.com/browse/BJONASBN-37
+
+- [BJONASBN-34] Added Try::Tiny
+  http://logiclab.jira.com/browse/BJONASBN-34
+
+
+1.02 2010-11-24
+
+- Maintenance release, update not required
+
+- [BJONASBN-31]	Added App::Ack
+  http://logiclab.jira.com/browse/BJONASBN-31
+
+- [BJONASBN-32]	Add File::Copy
+  http://logiclab.jira.com/browse/BJONASBN-32
+
+- [BJONASBN-29]	Extracted and released Module::Build::Bundle in a bundle
+  compatible version separate distribution
+  http://logiclab.jira.com/browse/BJONASBN-29
+
+
+1.01 2010-09-04
+
+- Bugfix release, update not required
+
+- [BJONASBN-25] addressed failing test. Adhering to documentation from
+  Module::Build on requirements needed for configuration
+
+
+1.00 2010-09-01
+
+- Initial release, new packaging
+
+- [BJONASBN-21] readdressed, POD now nicely formatted again
+
+- Renamed distribution to Task::BeLike::JONASBN [BJONASBN-22]
+  Bundle::JONASBN, will eventually be removed from CPAN, but I will leave it
+  there for some time. I will not support it any longer. Task::BeLike::JONASBN
+  will be the new distribution
+
+- Implemented respect for build action, so the contents section in the 
+  Perl module is auto-generated based on the custom build module
+  Module::Build::Bundle [BJONASBN-16]
+
+################################################
+#                                              #
+# Under the distribution name: Bundle::JONASBN #
+#                                              #
+################################################
+
+0.04 2010-01-30
+
+- Update required
+
+- Added POD syntax test to test suite
+
+- Addressed failing tests, my perception of a bundle does not seem to be a
+real bundle
+
+
+0.03 2009-10-08
+
+- Update not required
+
+- Added DataFormValidator [BJONASBN-13]
+
+- Added CPAN::Mini [BJONASBN-14] 
+
+- Added CPAN::Reporter [BJONASBN-15] 
+
+- Added Pod::Simple::Wiki [BJONASBN-11] 
+
+- Added DBD:.Mock [BJONASBN-9] 
+
+- Added DateTime [BJONASBN-10] 
+
+
+0.02 2009-10-05
+
+- Update not required
+
+- Added sorting to Build contents action [BJONASBN-7]
+
+- Added WWW::Mechanize [BJONASBN-2]
+
+- Added WWW::Mechanize::Cached [BJONASBN-3]
+
+- Added Test::MockObject::Extends [BJONASBN-4]
+
+- Added File::Slurp [BJONASBN-5]
+
+- Added Devel::Cover [BJONASBN-6]
+
+- Added Changes file [BJONASBN-8] 
+
+
+0.01 2009-09-28
+
+- Initial release

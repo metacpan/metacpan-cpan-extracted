@@ -1,0 +1,25 @@
+Changes
+eg/a/t/01.t
+eg/a/t/assertions.t
+eg/a/t/many.t
+eg/a/t/undef.t
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+inc/Module/Install/Share.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Text/SmartLinks.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+script/smartlinks.pl
+share/smartlinks.js
+t/01-load.t
+t/02-parse.t
+t/03-process-t-file.t

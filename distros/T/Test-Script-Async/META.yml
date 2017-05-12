@@ -1,0 +1,31 @@
+---
+abstract: 'Non-blocking friendly tests for scripts'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Script-Async
+recommends:
+  EV: '0'
+requires:
+  AE: '0'
+  AnyEvent::Open3::Simple: '0.86'
+  Probe::Perl: '0'
+  Test2: '0.000042'
+  Test2::Suite: '0.000028'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Test-Script-Async/issues
+  homepage: http://perl.wdlabs.com/Test-Script-Async
+  repository: git://github.com/plicease/Test-Script-Async.git
+version: '0.02'

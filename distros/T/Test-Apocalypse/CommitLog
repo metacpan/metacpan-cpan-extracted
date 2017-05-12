@@ -1,0 +1,301 @@
+==================================================
+Changes from 2013-10-25 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.005 at 2014-10-25 20:06:12 +0000
+------------------------------------------
+
+  Change: 6408495efe592a8706ca0bc0a0c4224940820af5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 13:06:12 +0000
+
+    New CPAN release of Test-Apocalypse - v1.005
+
+    FakeRelease to test my dzil configs! 
+
+  Change: 079488833715302cf10ab1da3c4bdec80dc1e5fc
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 22:51:43 +0000
+
+    add missing Changes commit from previous rls, I need to fix this... 
+
+------------------------------------------
+version 1.004 at 2014-10-25 05:09:19 +0000
+------------------------------------------
+
+  Change: 06ec3c18e22eb14588ff2c513dc42040b3cdee90
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 22:09:19 +0000
+
+    New CPAN release of Test-Apocalypse - v1.004
+
+    Tweak how we skip/disable plugins because of the recent subtest
+    change, I broke some stuff :(
+
+    I give up on the Pod::No404s test, the internet is too flaky
+    everywhere :(
+
+    Removed the OutdatedPrereqs test because I now use
+    Dist::Zilla::Plugin::PromptIfStale, thanks ETHER! 
+
+  Change: 2aa664de9c9b1ae5f39e7d8b268fd56d760bdfbb
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 22:03:01 +0000
+
+    fix reused variable name error, arg 
+
+  Change: b4874d37f54ad1faf8a5fbcf6a70b9383241802b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 21:21:15 +0000
+
+    remove OutdatedPrereqs as I move to DZP::PromptIfStale 
+
+  Change: 1e897cd853926ad36e413da97694f71f1e23dd32
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 20:33:52 +0000
+
+    remove useless 'Executing plugin...' now that subtest prints too... 
+
+  Change: 279301ef1eaeb3f9cf0930e392563e2f9f2b49d7
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 20:33:03 +0000
+
+    disable 404s test 
+
+  Change: 2b521e722fb87eb8548a5bbee956d6875aae71c7
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 19:36:22 +0000
+
+    Test::Portability::Files is still br0ken :X 
+
+  Change: fcd04e95a0eacd4c36c7a00ce7d6264c7d9945fb
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 19:18:29 +0000
+
+    add changelog note 
+
+  Change: 81e690ba6f6f94e8b867dea39493129e041236f0
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 19:14:50 +0000
+
+    Tweak the way we skip/disable tests due to the new subtest style 
+
+  Change: a72dc9adaa1d4dcbac0e48cd36dcfa012f66a780
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 18:31:17 +0000
+
+    fix missing Changes commit 
+
+------------------------------------------
+version 1.003 at 2014-10-25 00:15:37 +0000
+------------------------------------------
+
+  Change: 52d4d513ab32013ba226285884632612bfe7f473
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 17:15:37 +0000
+
+    New CPAN release of Test-Apocalypse - v1.003
+
+    Add Test::Mojibake to the dist
+
+    Add more exclusions to the standard Perl::Critic config
+
+    Add PERL_CRITIC_STRICT env var to skip the bundled Perl::Critic
+    config
+
+    Fix an error in Test::Apocalypse::Script
+
+    Use Test::CPAN::Changes instead of the outdated Test::CheckChanges
+
+    Ripped out the dysfunctional Test::NoWarnings in favor of
+    Test::FailWarnings, thanks DAGOLDEN!
+
+    Ignore the 'perl' dependency when checking deps
+
+    Fix version mismatch error when checking dependencies ( 'v0.0.6' vs
+    '0.0.6' )
+
+    Thanks everyone who sent RT tickets to clean up the FAILs :)
+
+    Finally enabled the Test::Vars plugin as I've switched over to using
+    subtests instead of Test::Block 
+
+  Change: 47fa54f510bf4608f50418f9d7a242afe52d20d4
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 17:12:03 +0000
+
+    update use.perl.org url as it shutdown :X 
+
+  Change: 46b01bf4e7ba723463a3903fda48ed4500deec7d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 16:52:49 +0000
+
+    enable Test::Vars test 
+
+  Change: 9057ae04531f284b59fe0cf53b5d3bdd232bb85c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 16:51:55 +0000
+
+    fail kwalitee tests if PERL_APOCALYPSE=1 
+
+  Change: 93157cc96f550100dc162dbc77293dc975a1676c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 16:41:37 +0000
+
+    add missing check for PERL_APOCALYPSE 
+
+  Change: 8b5b448613e1f348f25ec6db998132c2dc10edb7
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 16:08:18 +0000
+
+    doc tweaks 
+
+  Change: c253dac0c98c3f19916a4b62356150a47ac640dd
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 15:39:11 +0000
+
+    Kwalitee has been improved since I was absent, updating it 
+
+  Change: 1820a6b52c9dd728b7ee5e86673a0c7e9092dc5b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 15:18:10 +0000
+
+    tweak Changes to be CPAN::Changes compatible 
+
+  Change: f278562605e26720e00a12b30f54fe029c637787
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 14:56:44 +0000
+
+    fix the perl prereq for good 
+
+  Change: a912c864b6d5e8296aa0952bdf7e26ceae7e8ce7
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 14:52:00 +0000
+
+    fix the Dependency checker 
+
+  Change: 4eefcbe8f047f4ee72b3530b77930e41ddf6d987
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 13:34:44 +0000
+
+    update CPANTS::Analyse version and silence more perlcritic 
+
+  Change: f3fca493ecf47574cf6c73f0b4796bfdfb045a5f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 13:28:43 +0000
+
+    silence more perlcritic stuff 
+
+  Change: bf0dd890530c856f0a2803bfc8930aa80f95c1f5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 13:22:33 +0000
+
+    Im old and cant change my habits that easily... 
+
+  Change: 915c8eb88637f4d17830acc808210c2f52aa8e9f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 13:21:02 +0000
+
+    allow warnings from gpg... 
+
+  Change: d5df2cc30535d4ad4c45a05a17ea36187d01ecb9
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 12:50:23 +0000
+
+    use Test::FailWarnings for less FAIL 
+
+  Change: ef2afd05b65062228f422bc175c566b2fb770428
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 12:37:01 +0000
+
+    exorcise Test::NoWarnings 
+
+  Change: 29c652697c3c66d04dd512d91345e4ed33a85527
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 11:33:00 +0000
+
+    better error reporting for subtests 
+
+  Change: 102365e0c4b7fedcd749eb45537af3e28b5f98e2
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 09:42:00 +0000
+
+    dont use Test::Block, use the new subtest feature 
+
+  Change: 72bef9d3f1488512ac8fed808fc719b93160e236
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 09:13:13 +0000
+
+    updates and use CPANChanges 
+
+  Change: 29321d480d8e3910988f454e6081692f40835ca8
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2013-03-16 13:38:50 +0000
+
+    cleanup gitignore 
+
+  Change: 89efd383a22e4d557c0789509e856d84e2945a95
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2012-01-03 00:46:53 +0000
+
+    ignore annoying perlcritic stuff 
+
+  Change: b6538708d040e9c67fd4e700cadc1e92ef378b94
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2012-01-03 00:02:27 +0000
+
+    add use of Test::Mojibake 
+
+  Change: c2322a196087f9120cee7780a2c366b01585f10f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2012-01-02 20:40:17 +0000
+
+    exclude yet more perlcritic stuff 
+
+  Change: ce9de51b9c8a90017f3f602f4e31101d857a4d6e
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2012-01-02 20:10:53 +0000
+
+    add new critic exclusion 
+
+  Change: 944f59e02decd45ce439632cd7b4a2d5f299dace
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2012-01-02 19:14:44 +0000
+
+    add Deprecated bundle for Perl::Critic 
+
+  Change: 52c0814ebf568e1d784da54957a122fe022e8fb8
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2012-01-02 17:08:24 +0000
+
+    Version::Requirements is now deprecated in favor of
+    CPAN::Meta::Requirements 
+
+  Change: cf71211c6ae5c8fe628c8cb14200eadbd955d06b
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-05-09 20:25:51 +0000
+
+    more critic exclusions 
+
+  Change: a9f97e41dad8533ce54bba4a1d96622e3017d39e
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-05-09 20:22:52 +0000
+
+    FFR complains if a dir doesnt exist 
+
+  Change: 160f589f5b65105551422927e830e17c7d87a099
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-05-02 20:57:47 +0000
+
+    add yet more perlcritic exclusion and add PERL_CRITIC_STRICT env var 
+
+  Change: 412748ad929e593f07f9b14f593a905e4428d9dc
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-05-01 19:50:35 +0000
+
+    sometimes we need prototypes, darn it 
+
+================================================
+Plus 3 releases after 2013-10-25 00:00:00 +0000.
+================================================

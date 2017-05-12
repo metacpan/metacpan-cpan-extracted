@@ -1,0 +1,100 @@
+Revision history for Perl extension Text::Hunspell.
+
+2.14    2016/01/14 08:36:00 Europe/Oslo (cosimo)
+
+        No functional changes. Now Text::Hunspell depends on Alien::Hunspell
+        version 0.04. Should finally compile nicely on Win32 platform.
+
+2.13    2016/01/11 10:59:00 Europe/Oslo (cosimo)
+
+        Win32 build support added (Graham Ollis, @plicease).
+        This should make Text::Hunspell build correctly on Windows. \o/
+
+        *** If you're using Win32, make sure you use a recent version of
+        Alien::Base (>= 0.024) and/or Alien::Hunspell (soon-to-be 0.04)
+
+2.12    2015/12/18 10:35:00 Europe/Oslo (cosimo)
+
+        Replaced ExtUtils::PkgConfig with Alien::Hunspell. This should allow
+        Text::Hunspell to build on non-pkgconfig-enabled systems, even though
+        I'm not sure how reliably it works. Will have to evaluate from CPAN
+        testers results. Thanks to Alien* expert Graham Ollis for this
+        contribution.
+
+2.11    2015/05/12 14:19:07 Europe/Oslo (cosimo)
+
+        No functional changes, only minor cleanups and a fix for RT#99810
+        (compilation on non-gcc based systems). Thanks to bjakubski for sending
+        in patches on Github.
+
+2.10    2015/03/26 11:24:00 Europe/Oslo (cosimo)
+
+        Fixed GH#5 (http://github.com/cosimo/perl5-text-hunspell/issues/5).
+        Should make Text::Hunspell installable without pain from CPAN and
+        cpanminus clients. The problem was in the undeclared use of
+        ExtUtils::PkgConfig, which needs to be known even before running
+        the configure (Makefile.PL) step. Thanks to Pavel Shaydo for reporting
+        the problem.
+
+2.09    2014/10/20 07:56:00 Europe/Oslo (cosimo)
+
+        Fixed RT#99548, which should make it easier to install Text::Hunspell
+        on most systems. Basically replace my broken way of checking for
+        libhunspell by looking up pkgconfig using ExtUtils::PkgConfig.
+        Thanks to David Gutteridge for teaching me how to do it!
+
+2.08    2013/05/01 23:22:35 Europe/Oslo (cosimo)
+
+        Improved main POD documentation for Hunspell.pm.
+        Fixes RT#84964. Thanks to Paul Flo Williams for the patch.
+        (https://github.com/cosimo/perl5-text-hunspell/pull/2)
+
+2.07    2013/03/26 20:45:00 Europe/Oslo (cosimo)
+
+        DEPRECATED the delete() method, and implemented proper
+        object handles in the hunspell XS glue. Again, thanks to
+        Paul Flo Williams for patch and test case. Closes RT#84054.
+
+2.06    2013/03/09 11:39:28 Europe/Oslo (cosimo)
+
+        Implemented new add_dic() function from hunspell API.
+        Fixes RT#83765. Thanks to Paul Flo Williams for patch
+        and test case.
+
+2.05    2012/09/21 08:17:00    (cosimo)
+
+        Fixed RT#79630 incorrect encoding of Hunspell.pm POD documentation.
+        Thanks to Paul for the patch.
+
+2.04    2012/09/20 23:05:00    (cosimo)
+
+        Fixed t/02_pod.t test due to newest Test::Pod and
+        missing =encoding directive. Thanks to SHLOMIF for
+        the patch.
+
+2.03    2011/06/24 11:12:00    (cosimo)
+
+        Fixed use of "qw()" as parenthesis in inc/Devel/CheckLib.pm
+        because deprecated in perl 5.14. Thanks to H. Merijn Brand
+        for reporting.
+
+2.02    2010/10/24 13:02:00    (cosimo)
+
+        Added an explicit warning if the unversioned libhunspell.so
+        symlink or library is not found. Linking will almost certainly
+        fail.
+
+2.01    2010/09                (cosimo)
+
+        Fixed build/test problems
+
+2.00    2010/09                (cosimo)
+
+        Now cosimo at cpan dot org is a co-maintainer for Text::Hunspell.
+
+        Added a dirty hack to work around some underlying changes in
+        libhunspell that made the XS code unable to initialize any
+        Hunspell object.
+
+1.xx    Author and maintainer was ELEONORA
+

@@ -1,0 +1,28 @@
+---
+abstract: "Verifies code hasn't left circular references"
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Memory-Cycle
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Devel::Cycle: 1.07
+  Getopt::Long: 0
+  PadWalker: 0
+  Test::Builder: 0
+  Test::Builder::Tester: 0
+  Test::More: 0
+  Test::Simple: 0.62
+version: 1.06

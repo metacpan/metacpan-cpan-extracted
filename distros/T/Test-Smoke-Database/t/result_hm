@@ -1,0 +1,2010 @@
+$rep = {
+         'rpt/2005.hm.rpt.18358' => [
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18358,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'B.11.11.06',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '183580',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18358,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.3',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '183581',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18358,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'A.10.32.30',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '183582',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18358,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.2',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '183583',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18358,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => 'vac 5.0.2.6',
+                                        'cc' => 'vac',
+                                        'archi' => 'aix',
+                                        'id' => '183584',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 8
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18358,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O      ',
+                                                     '-Duse64bitint' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => '3.1.1',
+                                        'cc' => 'gcc',
+                                        'archi' => 'aix',
+                                        'id' => '183585',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18354,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'B.11.11.06',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '183546',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18354,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.3',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '183547',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18354,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'A.10.32.30',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '183548',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18354,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.2',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '183549',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18354,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => 'vac 5.0.2.6',
+                                        'cc' => 'vac',
+                                        'archi' => 'aix',
+                                        'id' => '1835410',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 8
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18354,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O ?  ',
+                                                     '-Duse64bitint' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => '3.1.1',
+                                        'cc' => 'gcc',
+                                        'archi' => 'aix',
+                                        'id' => '1835411',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18351,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'B.11.11.06',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '1835112',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18351,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.3',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '1835113',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18351,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'A.10.32.30',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '1835114',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18351,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.2',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '1835115',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18351,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => 'vac 5.0.2.6',
+                                        'cc' => 'vac',
+                                        'archi' => 'aix',
+                                        'id' => '1835116',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 8
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18351,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O ?  ',
+                                                     '-Duse64bitint' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => '3.1.1',
+                                        'cc' => 'gcc',
+                                        'archi' => 'aix',
+                                        'id' => '1835117',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18350,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'B.11.11.06',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '1835018',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18350,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.3',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '1835019',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18350,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'A.10.32.30',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '1835020',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18350,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.2',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '1835021',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18350,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => 'vac 5.0.2.6',
+                                        'cc' => 'vac',
+                                        'archi' => 'aix',
+                                        'id' => '1835022',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 8
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18350,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => '3.1.1',
+                                        'cc' => 'gcc',
+                                        'archi' => 'aix',
+                                        'id' => '1835023',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 6
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18346,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'B.11.11.06',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '1834624',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18346,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.3',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '1834625',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18346,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'A.10.32.30',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '1834626',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18346,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.2',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '1834627',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18346,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => 'vac 5.0.2.6',
+                                        'cc' => 'vac',
+                                        'archi' => 'aix',
+                                        'id' => '1834628',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 8
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18346,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-12-24 22:30:07',
+                                        'file' => 't/rpt/2005.hm.rpt.18358',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Dusethreads -Duseithreads' => 'm m m m  ',
+                                                     '-Duse64bitint' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => '3.1.1',
+                                        'cc' => 'gcc',
+                                        'archi' => 'aix',
+                                        'id' => '1834629',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 6
+                                      }
+                                    ],
+         'rpt/1506.hm.rpt.18042' => [
+                                      {
+                                        'nbte' => 32,
+                                        'smoke' => 18042,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-10-22 22:35:03',
+                                        'file' => 't/rpt/1506.hm.rpt.18042',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Dusemorebits' => 'F F F F  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Duse64bitint' => 'F F F F  ',
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     '-Duse64bitall' => 'F F F F  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'F F F F  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'B.11.11.06',
+                                        'cc' => 'HPc',
+                                        'failure' => 'HP-UX 11.00  stdio/perlio     -DDEBUGGING  
+HP-UX 11.00  stdio/perlio     -DDEBUGGING  
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+',
+                                        'archi' => ' ',
+                                        'id' => '180420',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 32,
+                                        'smoke' => 18042,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-10-22 22:35:03',
+                                        'file' => 't/rpt/1506.hm.rpt.18042',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Dusemorebits' => 'F F F F  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Duse64bitint' => 'F F F F  ',
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     '-Duse64bitall' => 'F F F F  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'F F F F  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.2',
+                                        'cc' => 'gcc',
+                                        'failure' => 'HP-UX 11.00  stdio/perlio     -DDEBUGGING  
+HP-UX 11.00  stdio/perlio     -DDEBUGGING  
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+',
+                                        'archi' => ' ',
+                                        'id' => '180421',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 8,
+                                        'smoke' => 18042,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-10-22 22:35:03',
+                                        'file' => 't/rpt/1506.hm.rpt.18042',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Dusethreads -Duseithreads' => 'F F F F  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'A.10.32.30',
+                                        'cc' => 'HPc',
+                                        'failure' => 'HP-UX 10.20  stdio/perlio     -DDEBUGGING  
+HP-UX 10.20  stdio/perlio     -DDEBUGGING  
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  stdio            -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  perlio           -DDEBUGGING -Dusethreads -Duseithreads
+    t/op/rand............................FAILED at test 5
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  stdio            -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  perlio           -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    t/op/rand............................FAILED at test 5
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+',
+                                        'archi' => ' ',
+                                        'id' => '180422',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 8,
+                                        'smoke' => 18042,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-10-22 22:35:03',
+                                        'file' => 't/rpt/1506.hm.rpt.18042',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Dusethreads -Duseithreads' => 'F F F F  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.2',
+                                        'cc' => 'gcc',
+                                        'failure' => 'HP-UX 10.20  stdio/perlio     -DDEBUGGING  
+HP-UX 10.20  stdio/perlio     -DDEBUGGING  
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  stdio            -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  perlio           -DDEBUGGING -Dusethreads -Duseithreads
+    t/op/rand............................FAILED at test 5
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  stdio            -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+HP-UX 10.20  perlio           -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    t/op/rand............................FAILED at test 5
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+',
+                                        'archi' => ' ',
+                                        'id' => '180423',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18042,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-10-22 22:35:03',
+                                        'file' => 't/rpt/1506.hm.rpt.18042',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Dusemorebits' => 'F F F F  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Duse64bitint' => 'F F F F  ',
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Dusethreads -Duseithreads' => 'F F F F  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => 'vac 5.0.2.5',
+                                        'cc' => 'vac',
+                                        'archi' => 'aix',
+                                        'id' => '180424',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 8
+                                      },
+                                      {
+                                        'nbte' => 2,
+                                        'smoke' => 18042,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-10-22 22:35:03',
+                                        'file' => 't/rpt/1506.hm.rpt.18042',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Dusethreads -Duseithreads' => 'F ? ? ?  ',
+                                                     '-Duse64bitint' => 'F F F F  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => '3.1.1',
+                                        'cc' => 'gcc',
+                                        'failure' => 'AIX 4.3 gcc  stdio/perlio     -DDEBUGGING  
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING  
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+AIX 4.3 gcc  stdio            -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+',
+                                        'archi' => 'aix',
+                                        'id' => '180425',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18042,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-10-22 22:35:03',
+                                        'file' => 't/rpt/1506.hm.rpt.18042',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'F F F F  ',
+                                                     '-Dusethreads -Duseithreads' => 'F F F F  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => 'xlc 3.1.4.10',
+                                        'cc' => 'xlc',
+                                        'archi' => 'aix',
+                                        'id' => '180426',
+                                        'osver' => '4.2.1',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 134,
+                                        'smoke' => 18042,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2002-10-22 22:35:03',
+                                        'file' => 't/rpt/1506.hm.rpt.18042',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Dusemorebits' => 'F F F F  ',
+                                                     '-Duse64bitint' => 'F F F F  '
+                                                   },
+                                        'os' => 'cygwin',
+                                        'cc' => 'gcc',
+                                        'failure' => 'Cygwin 1.3   stdio            -DDEBUGGING  
+    ext/DB_File/t/db-btree...............FAILED at test 166
+    ext/DB_File/t/db-hash................FAILED at test 129
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 60
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 97
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   perlio           -DDEBUGGING  
+    t/comp/use...........................FAILED at test 23
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 223
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   stdio            -DDEBUGGING  
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   perlio           -DDEBUGGING  
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 60
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   stdio            -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    ext/Time/HiRes/HiRes.................FAILED at test 16
+    lib/ExtUtils/t/Constant..............FAILED at test 223
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   perlio           -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   stdio            -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/IPC/Open3........................FAILED at test 16
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   perlio           -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/IO/lib/IO/t/io_pipe..............FAILED at test 1
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   stdio            -DDEBUGGING -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 223
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   perlio           -DDEBUGGING -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 60
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   stdio            -DDEBUGGING -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   perlio           -DDEBUGGING -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/IO/lib/IO/t/io_pipe..............FAILED at test 1
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   stdio            -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   perlio           -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/AutoSplit........................FAILED at test 2
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   stdio            -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+Cygwin 1.3   perlio           -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 223
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+',
+                                        'archi' => 'i386',
+                                        'id' => '180427',
+                                        'osver' => '1.3.13',
+                                        'nbc' => 4
+                                      }
+                                    ],
+         'rpt/799.hm.rpt.17046' => [
+                                     {
+                                       'nbte' => 0,
+                                       'smoke' => 17046,
+                                       'version' => '5.8.0',
+                                       'nbco' => 0,
+                                       'date' => undef,
+                                       'file' => 't/rpt/799.hm.rpt.17046',
+                                       'author' => 'merijn@l1.procura.nl',
+                                       'matrix' => [
+                                                     'PERLIO = stdio',
+                                                     'PERLIO = perlio',
+                                                     'PERLIO = stdio  -DDEBUGGING',
+                                                     'PERLIO = perlio -DDEBUGGING'
+                                                   ],
+                                       'build' => {
+                                                    '-Duseperlio -Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitall' => 'O O O O  ',
+                                                    '-Duseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Dusemorebits' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitall -Duselongdouble' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitint' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Uuseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble' => 'O O O O  '
+                                                  },
+                                       'os' => 'hp-ux',
+                                       'ccver' => 'B.11.11.04',
+                                       'cc' => 'HPc',
+                                       'archi' => ' ',
+                                       'id' => '170460',
+                                       'osver' => '11.00',
+                                       'nbc' => 13
+                                     },
+                                     {
+                                       'nbte' => 0,
+                                       'smoke' => 17046,
+                                       'version' => '5.8.0',
+                                       'nbco' => 0,
+                                       'date' => undef,
+                                       'file' => 't/rpt/799.hm.rpt.17046',
+                                       'author' => 'merijn@l1.procura.nl',
+                                       'matrix' => [
+                                                     'PERLIO = stdio',
+                                                     'PERLIO = perlio',
+                                                     'PERLIO = stdio  -DDEBUGGING',
+                                                     'PERLIO = perlio -DDEBUGGING'
+                                                   ],
+                                       'build' => {
+                                                    '-Duseperlio -Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitall' => 'O O O O  ',
+                                                    '-Duseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Dusemorebits' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitall -Duselongdouble' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitint' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Uuseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble' => 'O O O O  '
+                                                  },
+                                       'os' => 'hp-ux',
+                                       'ccver' => '3.1',
+                                       'cc' => 'gcc',
+                                       'archi' => ' ',
+                                       'id' => '170461',
+                                       'osver' => '11.00',
+                                       'nbc' => 13
+                                     },
+                                     {
+                                       'nbte' => 0,
+                                       'smoke' => 17048,
+                                       'version' => '5.8.0',
+                                       'nbco' => 0,
+                                       'date' => undef,
+                                       'file' => 't/rpt/799.hm.rpt.17046',
+                                       'author' => 'merijn@l1.procura.nl',
+                                       'matrix' => [
+                                                     'PERLIO = stdio',
+                                                     'PERLIO = perlio',
+                                                     'PERLIO = stdio  -DDEBUGGING',
+                                                     'PERLIO = perlio -DDEBUGGING'
+                                                   ],
+                                       'build' => {
+                                                    '-Duseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Uuseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble' => 'O O O O  '
+                                                  },
+                                       'os' => 'hp-ux',
+                                       'ccver' => 'A.10.32.30',
+                                       'cc' => 'HPc',
+                                       'archi' => ' ',
+                                       'id' => '170482',
+                                       'osver' => '10.20',
+                                       'nbc' => 5
+                                     },
+                                     {
+                                       'nbte' => 0,
+                                       'smoke' => 17048,
+                                       'version' => '5.8.0',
+                                       'nbco' => 0,
+                                       'date' => undef,
+                                       'file' => 't/rpt/799.hm.rpt.17046',
+                                       'author' => 'merijn@l1.procura.nl',
+                                       'matrix' => [
+                                                     'PERLIO = stdio',
+                                                     'PERLIO = perlio',
+                                                     'PERLIO = stdio  -DDEBUGGING',
+                                                     'PERLIO = perlio -DDEBUGGING'
+                                                   ],
+                                       'build' => {
+                                                    '-Duseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Uuseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble' => 'O O O O  '
+                                                  },
+                                       'os' => 'hp-ux',
+                                       'ccver' => '3.0.4',
+                                       'cc' => 'gcc',
+                                       'archi' => ' ',
+                                       'id' => '170483',
+                                       'osver' => '10.20',
+                                       'nbc' => 5
+                                     },
+                                     {
+                                       'nbte' => 0,
+                                       'smoke' => 17021,
+                                       'version' => '5.8.0',
+                                       'nbco' => 0,
+                                       'date' => undef,
+                                       'file' => 't/rpt/799.hm.rpt.17046',
+                                       'author' => 'merijn@l1.procura.nl',
+                                       'matrix' => [
+                                                     'PERLIO = stdio',
+                                                     'PERLIO = perlio',
+                                                     'PERLIO = stdio  -DDEBUGGING',
+                                                     'PERLIO = perlio -DDEBUGGING'
+                                                   ],
+                                       'build' => {
+                                                    '-Duseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Dusemorebits' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitint' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Uuseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble' => 'O O O O  '
+                                                  },
+                                       'os' => 'aix',
+                                       'ccver' => 'vac 5.0.2.4',
+                                       'cc' => 'vac',
+                                       'archi' => 'aix',
+                                       'id' => '170214',
+                                       'osver' => '4.3.3',
+                                       'nbc' => 9
+                                     },
+                                     {
+                                       'nbte' => 0,
+                                       'smoke' => 16984,
+                                       'version' => '5.8.0',
+                                       'nbco' => 0,
+                                       'date' => undef,
+                                       'file' => 't/rpt/799.hm.rpt.17046',
+                                       'author' => 'merijn@l1.procura.nl',
+                                       'matrix' => [
+                                                     'PERLIO = stdio',
+                                                     'PERLIO = perlio',
+                                                     'PERLIO = stdio  -DDEBUGGING',
+                                                     'PERLIO = perlio -DDEBUGGING'
+                                                   ],
+                                       'build' => {
+                                                    '-Duseperlio -Duse64bitint' => 'O O O O  ',
+                                                    '-Duseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Uuseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble' => 'O O O O  '
+                                                  },
+                                       'os' => 'aix',
+                                       'ccver' => '3.0.4',
+                                       'cc' => 'gcc',
+                                       'archi' => 'aix',
+                                       'id' => '169845',
+                                       'osver' => '4.3.3',
+                                       'nbc' => 7
+                                     },
+                                     {
+                                       'nbte' => 0,
+                                       'smoke' => 17048,
+                                       'version' => '5.8.0',
+                                       'nbco' => 0,
+                                       'date' => undef,
+                                       'file' => 't/rpt/799.hm.rpt.17046',
+                                       'author' => 'merijn@l1.procura.nl',
+                                       'matrix' => [
+                                                     'PERLIO = stdio',
+                                                     'PERLIO = perlio',
+                                                     'PERLIO = stdio  -DDEBUGGING',
+                                                     'PERLIO = perlio -DDEBUGGING'
+                                                   ],
+                                       'build' => {
+                                                    '-Duseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Uuseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble' => 'O O O O  '
+                                                  },
+                                       'os' => 'aix',
+                                       'ccver' => 'xlc 3.1.4.10',
+                                       'cc' => 'xlc',
+                                       'archi' => 'aix',
+                                       'id' => '170486',
+                                       'osver' => '4.2.1',
+                                       'nbc' => 5
+                                     },
+                                     {
+                                       'nbte' => 2,
+                                       'smoke' => 17014,
+                                       'version' => '5.8.0',
+                                       'nbco' => 0,
+                                       'date' => undef,
+                                       'file' => 't/rpt/799.hm.rpt.17046',
+                                       'author' => 'merijn@l1.procura.nl',
+                                       'matrix' => [
+                                                     'PERLIO = stdio',
+                                                     'PERLIO = perlio',
+                                                     'PERLIO = stdio  -DDEBUGGING',
+                                                     'PERLIO = perlio -DDEBUGGING'
+                                                   ],
+                                       'build' => {
+                                                    '-Duseperlio -Dusemorebits' => 'F F F F  ',
+                                                    '-Duseperlio -Duse64bitint' => 'F F F F  ',
+                                                    '-Duseperlio' => 'F F F F  ',
+                                                    '-Uuseperlio' => 'O O O O  ',
+                                                    '-Duseperlio -Duselongdouble' => 'F F F F  '
+                                                  },
+                                       'os' => 'cygwin',
+                                       'cc' => 'gcc',
+                                       'failure' => 'Cygwin 1.3   stdio/perlio     -Duseperlio
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duseperlio
+Cygwin 1.3   stdio/perlio     -Duseperlio -Duse64bitint
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duseperlio -Duse64bitint
+Cygwin 1.3   stdio/perlio     -Duseperlio -Duselongdouble
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duseperlio -Duselongdouble
+Cygwin 1.3   stdio/perlio     -Duseperlio -Dusemorebits
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duseperlio -Dusemorebits
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 403
+',
+                                       'archi' => 'i386',
+                                       'id' => '170147',
+                                       'osver' => '1.3.10',
+                                       'nbc' => 5
+                                     }
+                                   ],
+         'rpt/2568.hm.rpt.18662' => [
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18662,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2003-02-06 22:30:03',
+                                        'file' => 't/rpt/2568.hm.rpt.18662',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'B.11.11.06',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '186620',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18662,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2003-02-06 22:30:03',
+                                        'file' => 't/rpt/2568.hm.rpt.18662',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duse64bitall -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duse64bitall' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitall -Duselongdouble' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.3',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '186621',
+                                        'osver' => '11.00',
+                                        'nbc' => 12
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18662,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2003-02-06 22:30:03',
+                                        'file' => 't/rpt/2568.hm.rpt.18662',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => 'A.10.32.30',
+                                        'cc' => 'HPc',
+                                        'archi' => ' ',
+                                        'id' => '186622',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18662,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2003-02-06 22:30:03',
+                                        'file' => 't/rpt/2568.hm.rpt.18662',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'hp-ux',
+                                        'ccver' => '3.2',
+                                        'cc' => 'gcc',
+                                        'archi' => ' ',
+                                        'id' => '186623',
+                                        'osver' => '10.20',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 0,
+                                        'smoke' => 18662,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2003-02-06 22:30:03',
+                                        'file' => 't/rpt/2568.hm.rpt.18662',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Dusemorebits -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     ' ' => 'O O O O  ',
+                                                     '-Dusemorebits' => 'O O O O  ',
+                                                     '-Duse64bitint -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Duse64bitint' => 'O O O O  ',
+                                                     '-Duselongdouble' => 'O O O O  ',
+                                                     '-Duselongdouble -Dusethreads -Duseithreads' => 'O O O O  ',
+                                                     '-Dusethreads -Duseithreads' => 'O O O O  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => 'vac 5.0.2.6',
+                                        'cc' => 'vac',
+                                        'archi' => 'aix',
+                                        'id' => '186624',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 8
+                                      },
+                                      {
+                                        'nbte' => 1,
+                                        'smoke' => 18662,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2003-02-06 22:30:03',
+                                        'file' => 't/rpt/2568.hm.rpt.18662',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Dusemorebits' => 'F F      ',
+                                                     '-Duse64bitint' => 'F F F F  '
+                                                   },
+                                        'os' => 'aix',
+                                        'ccver' => '3.3',
+                                        'cc' => 'gcc',
+                                        'failure' => 'AIX 4.3 gcc  stdio/perlio      
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING  
+AIX 4.3 gcc  stdio/perlio     -Duse64bitint
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint
+AIX 4.3 gcc  stdio/perlio     -Duselongdouble
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+AIX 4.3 gcc  stdio/perlio     -Dusemorebits
+    ext/Encode/t/Unicode ................ 5
+',
+                                        'archi' => 'aix',
+                                        'id' => '186625',
+                                        'osver' => '4.3.3',
+                                        'nbc' => 4
+                                      },
+                                      {
+                                        'nbte' => 2,
+                                        'smoke' => 18666,
+                                        'version' => '5.9.0',
+                                        'nbco' => 0,
+                                        'date' => '2003-02-06 22:30:03',
+                                        'file' => 't/rpt/2568.hm.rpt.18662',
+                                        'author' => 'merijn@l1.procura.nl',
+                                        'matrix' => [
+                                                      'PERLIO = stdio',
+                                                      'PERLIO = perlio',
+                                                      'PERLIO = stdio  -DDEBUGGING',
+                                                      'PERLIO = perlio -DDEBUGGING'
+                                                    ],
+                                        'build' => {
+                                                     '-Duselongdouble' => 'F F F F  ',
+                                                     ' ' => 'F F F F  ',
+                                                     '-Dusemorebits' => 'F F F ?  ',
+                                                     '-Duse64bitint' => 'F F F F  '
+                                                   },
+                                        'os' => 'cygwin',
+                                        'cc' => 'gcc',
+                                        'failure' => 'Cygwin 1.3   stdio/perlio      
+Cygwin 1.3   stdio/perlio     -DDEBUGGING  
+Cygwin 1.3   stdio/perlio     -Duse64bitint
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duse64bitint
+Cygwin 1.3   stdio/perlio     -Duselongdouble
+Cygwin 1.3   stdio/perlio     -DDEBUGGING -Duselongdouble
+Cygwin 1.3   stdio/perlio     -Dusemorebits
+Cygwin 1.3   stdio            -DDEBUGGING -Dusemorebits
+    lib/Test/Harness/t/strap-analyze .... 2
+    lib/warnings ........................ 414-416
+',
+                                        'archi' => 'i386',
+                                        'id' => '186666',
+                                        'osver' => '1.3.20s',
+                                        'nbc' => 4
+                                      }
+                                    ]
+       };
+

@@ -1,0 +1,28 @@
+#title The right alignment
+#lang en
+#topics testing
+
+
+Regular
+
+  blockquote[1]
+
+          *  *    * * * 
+
+but this is regular * * * * *
+
+ * * * * * and also this
+
+          * * * 
+
+          centered [2]
+
+                                The signature [3]
+
+
+[1] blockquote footnotes
+
+[2] my centered footnote
+
+[3] A smart thing
+

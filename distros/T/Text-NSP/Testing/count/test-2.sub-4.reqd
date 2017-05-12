@@ -1,0 +1,2 @@
+Illegal value for window size. Should be >= size of ngram (1 if size of ngram is 1).
+Type count.pl --help for help.

@@ -1,0 +1,53 @@
+Tk::TextDialog.pm, installation:
+
+Please remember that this software has not been tested thoroughly,
+only on the Linux and Windows 2000 operating systems.  Refer all questions
+and problem reports to the author, mark-daglish@blueyonder.co.uk.
+
+
+System requirements:
+
+1.  A Unix or derivative operating system.
+2.  Perl version 5.005 or greater.
+3.  Perl/Tk, version 800.x.
+4.  GNU make.
+
+
+Installation:
+
+1.  Unpack the TextDialog archive:
+
+    With GNU tar:
+
+    $ tar zxvf Tk-TextDialog-<version>.tar.gz
+
+    With standard tar:
+
+    $ gzip -dc Tk-TextDialog-<version>.tar.gz | tar xvf -
+
+2.  Change to the top-level subdirectory:
+
+    $ cd Tk-TextDialog-<version>
+
+3.  Build the Makefile for your system.
+
+    $ perl Makefile.PL
+
+4.  Build the program modules and documentation.  Type:
+
+    $ make
+
+5.  If necessary, become root (via "su", for example), and 
+    install the source files and documentation in the system's 
+    site_perl library, using the "make install" command:
+
+    $ su
+    Enter Password:
+    # make install
+
+Refer to the POD documentation ("man Tk::TextDialog" on most systems)
+for information about how to use the widget.
+
+Copyright:
+
+Refer to the file "Artistic" in this directory.

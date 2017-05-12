@@ -1,0 +1,30 @@
+digraph Stemma {
+    omega [ class=hypothetical ];
+    T1 [ class=extant ];
+    T2 [ class=extant ];
+    A [ class=extant ];
+    B [ class=extant ];
+    C [ class=extant ];
+    D [ class=extant ];
+    F [ class=extant ];
+    J [ class=extant ];
+    L [ class=extant ];
+    M [ class=extant ];
+    S [ class=extant ];
+    U [ class=extant ];
+    V [ class=extant ];
+    T1 -> T2;
+    T2 -> A;
+    A -> J;
+    A -> C;
+    C -> M;
+    C -> F;
+    C -> S;
+    S -> D;
+    A -> U;
+    U -> F;
+    U -> V;
+    U -> omega;
+    omega -> B;
+    B -> L;
+}

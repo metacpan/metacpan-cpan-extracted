@@ -1,0 +1,44 @@
+---
+abstract: 'Module for writing SMTP Server tests'
+author:
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
+build_requires:
+  Data::Dumper: '0'
+  IO::Socket: '0'
+  Net::Server::Mail: '0.13'
+  Net::Server::Mail::ESMTP: '0'
+  Net::Server::Mail::ESMTP::AUTH: '0'
+  Net::Server::Mail::ESMTP::Extension: '0'
+  Sys::Hostname: '0'
+  Test::Builder::Tester: '1.02'
+  Test::Exception: '0.21'
+  Test::More: '0.62'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  Test::Simple: '0.44'
+  base: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-SMTP
+requires:
+  Carp: '0'
+  Exporter: '0'
+  IO::Socket::SSL: '1.01'
+  Net::SMTP_auth: '0'
+  Test::Builder::Module: '0'
+  Test::Builder::Tester: '1.02'
+  perl: v5.8.5
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-SMTP
+  repository: https://github.com/pplu/Test-SMTP.git
+version: '0.05'

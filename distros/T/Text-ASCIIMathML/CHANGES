@@ -1,0 +1,36 @@
+CHANGES for vcp - Version CoPy
+
+
+0.81 Fri Jul 31 13:01:02 CST 2009
+   - Fixed a problem with using '&' as an operator
+   - Quote '#' character in latex output
+
+0.8  Tue Jun 09 13:19:31 CST 2009
+   - Improved POD documentation
+   - Allowed "a^b_c" to produce a subsup as well as "a_c^b".
+
+0.7  Thu Nov 29 16:04:37 CST 2007
+   - Treat latex "\!" as a no-op
+
+0.6  Wed Nov 07 16:34:40 CST 2007
+   - Changed the order so that symbols defined with newsymbol take
+     precedence over predefined symbols
+
+0.5  Mon Sep 10 10:57:30 CDT 2007
+   - Fixed latex output so it doesn't depend upon the order perl
+     returns hash elements using keys operator
+
+0.4  Fri Sep 07 10:42:12 CDT 2007
+   - Added ability to output latex using TextToMathMLTree->latex
+   - Added ability to define new commands and symbols on the fly
+   - Added acknowledgements
+   - Fixed typos in POD
+
+0.3  Thu Oct 12 10:33:41 CDT 2006
+   - Fixed POD
+
+0.2  Wed Oct 11 17:32:28 CDT 2006
+   - Fixed some installation issues
+
+0.1  Wed Oct 11 10:52:44 CDT 2006
+   - Initial public release.

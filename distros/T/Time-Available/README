@@ -1,0 +1,39 @@
+Time-Available version 0.04
+===========================
+
+Time::Available is used to calculate availability of some resource if start
+end end time of availability is available. That availability is calculated
+relative to some interval which is defined when new instance of module is
+created.
+
+Time::Avail is CPAN module that started it all. However, it lacked
+calculating of availability of some interval and precision in seconds, so
+this module was born.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Users of versions older than 0.03 are encouraged to upgrade to at least
+version 0.03.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  Time::Local
+  Test::More
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003-2005 by Dobrica Pavlinusic
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

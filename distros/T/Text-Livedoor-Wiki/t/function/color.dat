@@ -1,0 +1,41 @@
+=== basic
+--- wiki
+&color(#000)
+--- html
+<span style="color:#000;"></span>
+=== basic
+--- wiki
+&color(#000,red)
+--- html
+<span style="color:#000;background-color:red;"></span>
+=== basic
+--- wiki
+&color(,red)
+--- html
+<span style="background-color:red;"></span>
+=== synopsys
+--- wiki
+&color(red){red}
+&color(,red){back ground red}
+&color(red,black){ red text and block background}
+&color(#ffffff,#000000){hey hey}
+--- html
+<span style="color:red;">red</span>
+<span style="background-color:red;">back ground red</span>
+<span style="color:red;background-color:black;">red text and block background</span>
+<span style="color:#ffffff;background-color:#000000;">hey hey</span>
+=== no args
+--- wiki
+&color(){hoge}
+--- html
+&amp;color(){hoge}
+=== invalid color
+--- wiki
+&color(hoge_hoge){hoge}
+--- html
+&amp;color(hoge_hoge){hoge}
+=== invalid bg color
+--- wiki
+&color(red,hoge_hoge){hoge}
+--- html
+&amp;color(red,hoge_hoge){hoge}

@@ -1,0 +1,22 @@
+Revision history for Perl extension Template::Plugin::TagRescue
+
+0.06  Sun Apr  3 07:26:05 2005
+        - Changed escape_method() back into a faster version under mod_perl.
+
+0.05  Sun Apr  3 06:25:30 2005
+        - Fixed bug that the characters except for <, >, &, and " were encoded
+          by using &HTML::Entities::encode_entities. Because second argument wasn't passed.
+          Now my escape_html function works properly.
+          This is the same as &Template::Filters::html_filter.
+          (Thanks to Yasuhiro Horiuchi)
+
+0.04  Thu Aug 14 00:40:57 2003
+        - fixed bug in case that the filter function can't handle properly
+          when arrayref value was passed.
+
+0.02  Sun Dec 8 05:41:23 2002
+	- fixed bug in case that html entities was not escaped
+	  when they were included in normal text.
+
+0.01  Sat Dec 7 13:39:45 2002
+	- original version

@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Thrift::IDL;
+use Tapir::Validator;
+use Data::Dumper;
+
+my $validator = Tapir::Validator->new(
+    audit_types => 1,
+    warn_unused_types => 1,
+    docs => {
+        # Require all methods be documented
+        require => {
+            methods => 1,
+            rest    => 1,
+        },
+
+        # List the '@' keys that are flags and will have no value following them
+        flags => {
+            optional => 1,
+            utf8     => 1,
+            secure   => 1,
+        },
+    },
+);
+
+foreach my $fn (@ARGV) {
+    my $idl = Thrift::IDL->parse_thrift_file($fn);
+    my @errors = $validator->audit_idl_document($idl);
+    if (@errors) {
+        print "File $fn failed the audit:\n";
+        print " - $_\n" foreach @errors;
+    }
+    else {
+        print "File $fn passed the audit\n";
+        foreach my $service (@{ $idl->services }) {
+            print "Service " . $service->name . "\n";
+            foreach my $method (@{ $service->methods }) {
+                printf "  %s %s calls %s\n", uc($method->{doc}{rest}{method}), $method->{doc}{rest}{route}, $method->name;
+            }
+        }
+    }
+}

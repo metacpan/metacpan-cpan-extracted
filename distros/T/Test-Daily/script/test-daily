@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+test-daily - process tarball for Test::Daily
+
+=head1 SYNOPSIS
+
+	test-daily COMMAND WHAT
+	
+	COMMAND is one of:
+		tarball some_12345_i386.tar.gz
+		site-makefile
+		site-summary
+		project-makefile
+		project-summary
+		test-makefile
+		test-summary
+		make
+
+=head1 DESCRIPTION
+
+=cut
+
+
+use strict;
+use warnings;
+
+use 5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+use Test::Daily;
+
+exit main();
+
+sub main {
+	my $help;
+	GetOptions(
+		'help|h' => \$help,
+	) or pod2usage;
+	pod2usage if $help;
+
+	my $command = shift @ARGV;
+	pod2usage if not $command;
+	my $what    = shift @ARGV;
+	pod2usage if not $what and ($command ~~ [qw(tarball project-makefile)]);
+	
+	my $td = Test::Daily->new();
+	
+	given ($command) {
+		when ('tarball') { $td->extract_tarball($what); }
+		when ('site-makefile')    { $td->update_site_makefile; }
+		when ('project-makefile') { $td->update_project_makefile($what); }
+		when ('test-makefile')    { $td->update_test_makefile($what, @ARGV); }
+		when ('test-summary')     { $td->update_test_summary($what); }
+		when ('project-summary')  { $td->update_project_summary(); }
+		when ('site-summary')     { $td->update_site_summary(); }
+		when ('make')             { $td->run_make($what); }
+		when ('summary2rssfeed')  { $td->summary2rssfeed($what); }
+		when ('aggregatefeeds')   { $td->aggregatefeeds($what); }
+		default { pod2usage; }
+	}
+	
+	return 0;
+}

@@ -1,0 +1,146 @@
+NAME
+    Text::KwikiFormatish - convert Kwikitext into XML-compliant HTML
+
+SYNOPSIS
+      use Text::KwikiFormatish;
+      my $xml = Text::KwikiFormatish::format($text);
+
+DESCRIPTION
+    CGI::Kwiki includes a formatter (CGI::Kwiki::Formatter) for converting
+    Kwikitext (a nice form of wikitext) to HTML. Unfortunately, it isn't
+    easy to use the formatter outside the CGI::Kwiki environment.
+    Additionally, the HTML produced by the formatter isn't XHTML-1
+    compliant. This module aims to fix both of these issues and provide an
+    interface similar to Text::WikiFormat.
+
+    Essentially, this module is the code from Brian Ingerson's
+    CGI::Kwiki::Formatter with a "format" subroutine, code relating to
+    slides removed, tweaked subroutinesa, and more.
+
+    Since the wikitext spec for input wikitext for this module differs a
+    little from the default Kwiki formatter, I thought it best to call it
+    "Formatish" instead of *the* Kwiki Format.
+
+  format()
+    "format()" takes one or two arguments, with the first always being the
+    wikitext to translate. The second is a hash of options, but currently
+    the only option supported is "prefix" in case you want to prefix wiki
+    links with sommething. For example,
+
+      my $xml = Text::KwikiFormatish::format(
+        $text,
+        prefix => '/wiki/',
+        );
+
+  Differences from the Kwiki Formatter
+    * The output of the formatter is XML-compliant.
+    * Extra equal signs at the end of headings will be removed from the
+    output for compatibility with other wikitext formats.
+    * Italicized text is marked up by two slashes instead of one. This is to
+    prevent weirdness when writing filesystem paths in Kwikitext -- e.g.,
+    the text "Check /etc or /var or /usr/" will have unexpected results when
+    formatted in a regular Kwiki.
+    * Horizontal rules, marked by four or more hyphens, may be followed by
+    spaces.
+    * Processing order of text segments has been changed (tables are
+    processed last)
+    * Bold text is marked up as "<strong>" instead of "<b>"
+    * "Inline" is marked up as "<code>" instead of "<tt>"
+    * mdashes (really long hyphens) are created with wikitext "like---this"
+    * Tables and code sections are not indented with "<blockquote>" tags
+    * Comments do not have to have a space immediately following the hash
+    * Patch to named_link code
+    * All code pertaining to slides or Kwiki access control is removed, as
+    neither are within the scope of this module
+
+  Plugins
+        I've included two plugins, "img" and "icon", to do basic image
+        support besides the standard operation of including an image when
+        the URL ends with a common image extension.
+
+EXAMPLES
+    Here's some kwiki text:
+
+        = Level 1 Header
+    
+        == Level 2 with optional trailing equals ==
+    
+        Kwikitext provides a bit more flexibility than regular wikitext.
+    
+        All HTML code is <escaped>. Horizontal rules are four or more hyphens:
+    
+        ----
+    
+        While you can add an mdash---like this.
+    
+        ##
+        ## you can add comments in the kwikitext which appear as XML comments
+        ##
+    
+        == Links
+    
+        === Itemized Lists
+    
+        * Fruit
+        ** Oranges
+        ** Apples
+        * Eggs
+        * Salad
+    
+        === Enumerated Lists
+    
+        ##
+        ## below are zero's, not "oh's"
+        ##
+    
+        0 One
+        0 Two
+        0 Three
+    
+        * Comments in the wikitext
+        * Easier:
+        ** Bold/strong
+        ** Italic/emphasized
+    
+        == More Markup
+    
+        *strong or bold text*
+    
+        //emphasized or italic text//
+    
+          indented text is verbatim (good for code)
+    
+        == Links
+    
+        WikiLink
+    
+        !NotAWikiLink
+    
+        http://www.kwiki.org/
+    
+        [Kwiki named link http://www.kwiki.org/]
+    
+        == Images
+    
+        http://search.cpan.org/s/img/cpan_banner.png
+    
+        == KwikiFormatish plugins
+    
+        This inserts an image with the CSS class of "icon" -- good for inserting a right-aligned image for text to wrap around.
+    
+        [&icon /images/logo.gif]
+    
+        The following inserts an image with an optional caption:
+    
+        [&img /images/graph.gif Last Month's Earnings]
+
+AUTHOR
+    Ian Langworth - ian[aught]cpan.org
+
+SEE ALSO
+    CGI::Kwiki, CGI::Kwiki::Formatter, Text::WikiFormat
+
+LICENSE
+    This is free software. You may use it and redistribute it under the same
+    terms as perl itself.
+

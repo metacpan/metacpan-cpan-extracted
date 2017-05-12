@@ -1,0 +1,1 @@
+<!ELEMENT div1 (head, (p | list | note)*, div2)>

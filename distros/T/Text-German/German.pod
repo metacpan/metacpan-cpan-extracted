@@ -1,0 +1,43 @@
+#                              -*- Mode: Perl -*- 
+# German.pod -- 
+# Author          : Ulrich Pfeifer
+# Created On      : Tue Jul  2 11:24:15 1996
+# Last Modified By: Ulrich Pfeifer
+# Last Modified On: Sun Apr  3 11:52:51 2005
+# Language        : CPerl
+# Update Count    : 10
+# Status          : Unknown, Use with caution!
+
+=head1 NAME
+
+Text::German - German grundform reduction
+
+=head1 SYNOPSYS
+
+C<use Text::German;>
+
+C<$stem = Text::German::reduce($word)>
+
+=head1 DESCRIPTION
+
+This is a rather incomplete implementaion of work done by Gudrun
+Putze-Meier. I have to confess that I never read her original
+paper. So all credit belongs to her, all bugs are mine. I tried to get
+some insight from an implementation of two students of mine. They
+remain anonymous because their work was the wost piece of code I ever
+saw. My code behaves mostly as their implementation did except it is
+about 75 times faster.
+
+=head1 AUTHOR
+
+Ulrich Pfeifer F<E<lt>pfeifer@wait.deE<gt>>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1996 Ulrich Pfeifer. All rights reserved. This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+=head1 CHANGES
+
+0.5: Fixed copyright statement

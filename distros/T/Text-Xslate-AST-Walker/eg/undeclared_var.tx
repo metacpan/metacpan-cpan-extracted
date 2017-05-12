@@ -1,0 +1,2 @@
+: my $first_name = 'Hanae';
+Hello, <: $last_name :>, <: $first_name :>.

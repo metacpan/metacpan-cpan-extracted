@@ -1,0 +1,13 @@
+<%args>
+    $chart_type
+</%args>
+
+%   my @a_chart_types = $c->model('TestrunDB')->resultset('ChartTypes')->search();
+%   for my $or_chart_type ( @a_chart_types ) {
+%       if ( $chart_type && $or_chart_type->chart_type_id() == $chart_type ) {
+            <option selected value="<% $or_chart_type->chart_type_id() %>"><% $or_chart_type->chart_type_name() %></option>
+%       }
+%       else {
+            <option value="<% $or_chart_type->chart_type_id() %>"><% $or_chart_type->chart_type_name() %></option>
+%       }
+% }

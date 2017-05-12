@@ -1,0 +1,108 @@
+NAME
+    Test::Script::Run - test scripts with run
+
+SYNOPSIS
+        use Test::Script::Run;
+        # customized names of bin dirs, default is qw/bin sbin script ./;
+        @Test::Script::Run::BIN_DIRS = qw/bin/;
+        run_ok( 'app_name', [ app's args ], 'you_app runs ok' );
+        my ( $return, $stdout, $stderr ) = run_script( 'app_name', [ app's args ] );
+        run_output_matches(
+            'app_name', [app's args],
+            [ 'out line 1', 'out line 2' ],
+            [ 'err line 1', 'err line 2' ],
+            'run_output_matches'
+        );
+        run_output_matches_unordered(
+            'app_name', [ app's args ],
+            [ 'out line 2', 'out line 1' ],
+            [ 'err line 2', 'err line 1' ],
+            'run_output_matches_unordered'
+        );
+
+DESCRIPTION
+    This module exports some subs to help test and run scripts in your
+    dist's script directory( bin, sbin, script, etc ), if the script path is
+    not absolute.
+
+    Nearly all the essential code is stolen from Prophet::Test, we think
+    subs like those should live below "Test::" namespace, that's why we
+    packed them and created this module.
+
+FUNCTIONS
+  run_script($script, $args, $stdout, $stderr)
+    Runs the script $script as a perl script, setting the @INC to the same
+    as our caller.
+
+    $script is the name of the script to be run (such as 'prophet'). $args
+    is a reference to an array of arguments to pass to the script. $stdout
+    and $stderr are both optional; if passed in, they will be passed to
+    IPC::Run3's run3 subroutine as its $stdout and $stderr args. Otherwise,
+    this subroutine will create scalar references to pass to run3 instead
+    (which are treated as strings for STDOUT/STDERR to be written to).
+
+    Returns run3's return value and, if no $stdout and $stderr were passed
+    in, the STDOUT and STDERR of the script that was run.
+
+  run_ok($script, $args, $msg)
+    Runs the script, checking that it didn't error out.
+
+    $script is the name of the script to be run (e.g. 'prophet'). $args is
+    an optional reference to an array of arguments to pass to the script
+    when it is run. $msg is an optional message to print with the test. If
+    $args is not specified, you can still pass in a $msg.
+
+    Returns nothing of interest.
+
+  run_not_ok($script, $args, $msg)
+    opposite of run_ok
+
+  get_perl_cmd($script, @ARGS)
+    Returns a list suitable for passing to "system", "exec", etc. If you
+    pass $script then we will search upwards for it in @BIN_DIRS
+
+  is_script_output($scriptname \@args, \@stdout_match, \@stderr_match, $msg)
+    Runs $scriptname, checking to see that its output matches.
+
+    $args is an array reference of args to pass to the script. $stdout_match
+    and $stderr_match are references to arrays of expected lines. $msg is a
+    string message to display with the test. $stderr_match and $msg are
+    optional. (As is $stdout_match if for some reason you expect your script
+    to have no output at all. But that would be silly, wouldn't it?)
+
+    Allows regex matches as well as string equality (lines in $stdout_match
+    and $stderr_match may be Regexp objects).
+
+  run_output_matches($script, $args, $exp_stdout, $exp_stderr, $msg)
+    A wrapper around is_script_output that also checks to make sure the test
+    runs without throwing an exception.
+
+  run_output_matches_unordered($script, $args, $exp_stdout, $exp_stderr, $msg)
+    This subroutine has exactly the same functionality as
+    run_output_matches, but doesn't impose a line ordering when comparing
+    the expected and received outputs.
+
+  last_script_stdout
+    return last script's stdout
+
+  last_script_stderr
+    return last script's stderr
+
+  last_script_exit_code
+    return last script's exit code
+
+DEPENDENCIES
+    Test::More, Test::Exception, IPC::Run3, File::Basename, File::Spec
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+AUTHOR
+    sunnavy <sunnavy@bestpractical.com>
+
+LICENCE AND COPYRIGHT
+    Copyright 2009-2013 Best Practical Solutions.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

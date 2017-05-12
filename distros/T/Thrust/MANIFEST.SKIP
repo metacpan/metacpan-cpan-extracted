@@ -1,0 +1,13 @@
+MANIFEST.bak
+Makefile.old
+Makefile$
+README.pod
+.gitignore
+.git/
+blib/
+pm_to_blib
+MYMETA.*
+Thrust.*tar[.]gz$
+thrust.zip
+thrust.zip.partial
+share/

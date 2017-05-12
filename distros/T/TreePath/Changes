@@ -1,0 +1,82 @@
+Revision history for TreePath
+
+0.22   2015-05-14 23:59:52
+       fix bug : wrong treewithsync.yml
+       delete waring 'Wide character in print'
+
+0.21   2015-05-04 19:45:54
+       update pod
+       more info when die
+
+0.20   2015-05-01 19:47:54
+       can use has_many relationship
+       can add a node without a parent, an orphan
+
+0.19   2015-04-19 23:13:12
+       delete unnecessay module
+
+0.18   2015-04-19 14:51:12
+       test the synchronization between DBIx and TreePath
+
+0.17   2015-04-19 14:40:21
+       rewrite code to work with array of data
+       loading may be ordered
+       now the datas must be loaded, it's not automatic'
+
+0.16   2015-04-06 19:15:06
+       'traverse' return all nodes
+
+0.15   2015-04-06 18:33:12
+       use dbix relationships
+       delete rules and position
+       backend can update treepath but not the reverse
+
+0.14   2015-01-27 17:50:34
+       check rules when add, move or update
+
+0.13   2015-01-25 23:17:34
+       change order of arguments in 'add' method
+       add(parent,node) -> add(node,parent)
+
+0.12   2015-01-25 22:59:05
+       all type of children is ordered
+       rules to check nodes
+
+0.11   2015-01-25 17:34:34
+       update type when node is added or moved
+       rewrite method to load data from backend
+
+0.10   2015-01-24 01:16:54
+       add a optional type to the nodes
+
+0.09   2015-01-19 19:15:51
+       update dependencies
+
+0.08   2015-01-04 14:07:45
+       add update/move method
+
+0.07   2015-01-03 20:10:43
+       update dependancies
+
+0.06   2015-01-03 19:56:31
+       synchronize with dbix backend
+       delete several nodes at once
+
+0.05   2015-01-02 13:15:37
+       add/del/insert_before node
+       use 'position' field
+
+0.04   2014-12-20 13:40:50
+       traverse tree
+       update dependencies
+
+
+0.03   2014-12-18 21:59:01
+       directly use a hash as tree
+       test utf8
+
+0.02   2014-12-09 22:01:32
+       add DBIx backend
+
+0.01   2014-12-02 23:20:00
+       First version

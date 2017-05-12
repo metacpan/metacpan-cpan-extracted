@@ -1,0 +1,90 @@
+Revision history for Perl module Foo::Bar
+
+Release history is not exact for the pre 0.9.5 release
+
+0.11 2016-02-11
+
+  - found complete changes history im README and moved it to CHANGES file
+  - added tests to manifest
+  - minor POD tweaks
+  - added license info to module POD
+
+0.10 2016-02-05
+
+  - created GitHub repository for Tk::Text::SuperText at https://github.com/asb-capfan/Tk-Text-SuperText (please feel free to submit pull requests)
+  - added CHANGES file
+  - moved change logs from PM file to CHANGES file
+  - changed version to \d+\.\d+ format to satisfy CPAN::Meta::Spec#Version-Formats
+  - moved PM file to lib folder
+  - added test folder
+  - added "does the module load?" test
+  - added POD tests
+  - added eg directory for example scripts
+  - moved example script (test.pl) to eg directory
+  - removed AutoLoader
+  - removed focusNext and focusPrev methods to avoid endless loop (not sure if this worked in the past)
+
+0.9.5 2016-02-01
+
+  - applied patch from RT #24700 by Darren Meyer
+
+0.9.4 2001-01-17
+
+  - Added Tk-TextANSIColor module support and fixed multiplatform bugs. Everything provided by Jim Turner (<turnerjw2@netscape.net>). THANKS!!!
+
+0.9.3
+
+  - Windows backspace bug fixed (thanks to Jim Turner).
+  - "\" matching char bug fixed
+
+0.9.2
+
+  - Tk800 bug Fixed.
+
+0.9.1
+
+  - Fixed backward matching char search bug.
+
+0.9
+
+  - Removed all known bugs, speed up of parentheses matching and block shift. Now it should be really usefull ;)
+
+0.8.3
+
+  - Added @EXPORT methods
+
+0.8.2
+
+  - Corrected stupid bugs and typos
+
+0.8.1
+  - Adjusted '-foreground' bug;
+  - Added jumptToMatchingChar method;
+  - Made all bind subs available as public methods;
+
+0.8
+
+  - This is the first public release.
+  - old release history:
+  - example script: UnFixed use Tk 800
+  - TextANSIColor.pm cool support and bug fixes by Jim Turner
+  - Fixed "\" matching char bug
+  - Fixed Win32 BackSpace bug thanks to Jim Turner
+  - Fixed Tk 800 core dump
+  - Unfixed Tk 800,mouse selection doesn't work
+  - Fixed use Tk 800
+  - Fixed backward matching char search
+  - catched cut/copy/paste methods
+  - Speedup for matching and shifting
+  - Speedup for matching and shifting
+  - FIXME: block operations are slow!!!!
+  - example script: First stable version
+  - Removed Stupid typo error
+  - Changed DefaultEvent to return e reference to a hash
+  - Selection Scroll bux fixed
+  - added public methods,jumpToMatchingChar,fixed '-foreground' bug
+  - made virtual events associated methods public,removed some block und
+  - catch some errors on undo/redo pop
+  - Fixed undo/redo blocks
+  - First stable version
+  - Initial revision

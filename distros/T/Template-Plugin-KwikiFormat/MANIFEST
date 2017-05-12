@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Template/Plugin/KwikiFormat.pm
+MANIFEST			This list of files
+META.yml
+README
+t/01_load.t
+t/10_basic.t
+t/20_table.t
+t/30_links.t
+t/99_pod.t
+t/99_pod_coverage.t
+TODO
+Makefile.PL

@@ -1,0 +1,11 @@
+Revision history for Tk-JDialog
+
+1.00    Date/time
+        First version, released on an unsuspecting world.
+1.01    Add Tk to prerequisites and add code to skip sample program test run 
+        if AUTOMATED_TESTING is set.
+1.1     2016/01/20
+        Eliminate run-time warning messages when $ENV{DESKTOP_SESSION is not
+        defined. - NOT RELEASED.
+1.11    2016/01/20
+        Eliminate run-time warning message when no -escape_button is defined.

@@ -1,0 +1,164 @@
+Revision history for Perl extension Tcl.
+
+1.05	2016-06-28
+
+	- typo bug on Delete code ref
+	- jmcveigh, jhobbs changes to Tcl.xs
+
+1.04	2016-03-xx
+
+	- not seeking tkkit.dll
+	- some NpLoadLibrary adj
+
+1.03	2016-02-20
+
+	- many cleanup: Tcl::call now much smaller and does not tracks
+	  widgets anymore; $Tcl::STACK_TRACE, %widget_refs, sub wcall, etc
+	- proper disposal of CODE REFs when they are no more needed on tcl side.
+	- new test t/disposal-subs.t
+	- Tcl::call processes 'after' differently
+        - use direct object syntax for calls to 'new'
+        - fixed minor typos in POD
+        - removed superfluous Solaris check in Makefile.PL
+        - add Travis-CI configuration
+
+1.02	2011-02-11
+
+	- fix export_to_tcl and test
+
+1.01	2011-02-10
+
+	- export_to_tcl convenience sub
+
+1.00	2010-11-23
+
+	- 1.0 release
+
+0.99	2010-11-02
+
+	- more 'stubs' platform binaries
+	- hashes also treated specially in $interp->call(...)
+
+0.98	2009-11-24
+
+	- moved to git
+	- Add flag to CreateCommand to suppress useless first 3 args
+	- documentation
+	- better tkkit.dll support
+	- Makefile.PL has better support for AIX, Solaris, Windows 64, darwin
+
+0.97	2008-09-07
+
+	- --usestubs default on linux
+	- Makefile.PL should exit with status 0 on error
+
+0.95	2007-06-07
+
+	- configuration cygwin help from Jerry D. Hedden
+
+0.91	2006-11-13
+
+	--usestubs is no by default
+
+0.90	2006-11-11
+
+	- more Darwin support
+	- move 'new' method to Tcl.pm
+	- replace DynaLoader with XSLoader, Tcl is no more ISA-DynaLoader
+	- removed bogus insecure do"$Tcl::config::tcl_pm_path/Tcl.cfg"
+
+0.89    23-may-2006
+	- Binary stub archives for various platforms to allow building the
+	Tcl module without any Tcl distribution on the system.
+	- misc OS shared libraries loading improvements
+
+0.88    23-aug-2005
+	- documentation
+	- moveable distributions - implement & document
+	- TODO file removal
+	- more OS support in Makefile.PL
+	- some code modification in Tcl bridge
+	- more tests
+
+0.87    02-feb-2005
+	- automatic cleanup on widget deletion
+
+0.85    31-dec-2004
+	- Makefile.PL makes --usestubs the default
+	- minor test fixes for portability
+
+0.84    13-sept-2004
+	- Tcl.pm changes to be more perlTk compatible
+	- Makefile.PL contains few more OS-dependent processing
+
+0.81    09-may-2004
+	- some Tcl.xs improvements, Makefile.PL now requires Tcl/Tk version
+	  8.4 (Jeff Hobbs)
+
+0.80    03-may-2004
+	- many Tcl.xs improvements from Jeff Hobbs, Gisle Aas (better
+	  handling for numbers, Unicode)
+	- changes for event variables and in Tcl::Ev
+	- ::perl::Eval proc in Tcl to eval in Perl
+	- references to Perl objects now created in Tcl in ::perl namespace
+
+0.77    17-apr-2004
+	- quick fix of 1=>1.0 problem
+	- add wcall wrapper to Tcl.pm
+
+0.76    17-apr-2004
+	- many improvements in Tcl.pm, Tcl.xs from Jeff Hobbs
+	- many improvements in Tcl.pm, Tcl.xs from Gisle Aas
+	- more tests by Jeff Hobbs, Gisle Aas
+	- subclassing is more correct with respect to Tcl::Tk module
+	- Makefile.PL and ceMakefile.PL now integrated to one file
+	- General cleaning of code, more comments
+	- Tcl-800 currently not supported, only recent versions
+
+0.75    28-mar-2004, Vadim Konovalov
+	- ARRAY REF are processed in $interp->call(...) for perlTk compat
+	- replace undef with '' in $interp->call(...)
+
+0.72    20-aug-2003, Vadim Konovalov
+        - now widget object become replaced to widget path in arguments to 'call'
+        - better error handling and diagnostic for calls to Tcl/Tk
+        - now returning undef from handler subroutine do not causes an
+          error in Tcl side. Instead, some error traping should be invented
+
+0.71    03-jul-2003, Vadim Konovalov
+        - support Tcl version 8.0.x
+
+0.7     02-jul-2003, Vadim Konovalov
+        - Some possible coredumps were fixed (but not completely, hence FIXME
+          warning in Tcl.xs)
+        - some fixes from Slaven Rezic, (FreeBSD support and some more)
+        - perl-5.005 support (FreeBSD has this version after installation)
+
+0.6     08-jun-2003, Vadim Konovalov
+        - now Tcl 'is-a' Tcl::Tk
+        - improved access method for TCL Events (%y, %y and so on)
+        - WinCE support
+        - few BUGs fixed
+
+0.5	25-may-2003, Vadim Konovalov
+	- 'linux' and 'cygwin' supported
+
+0.4	19-may-2003, Vadim Konovalov
+	- changed version system and added module VERSION variable
+	- compatibility changes to support modern versions of Perl and Tcl
+	  (perl-5.6.0, perl-5.8.0, tcl-8.4.2)
+	- call to Tcl_FindExecutable, as long as Tcl now requires this
+	  (otherwise Tcl dumps core, as RTFS-ing of Tcl shows)
+	- XS function "Tcl::call" renamed to "Tcl::icall" and "Tcl::call"
+	  implemented in Tcl.pm and now contains more complex logic.
+	- sub create_tcl_sub and ev_sub were added, they could be used
+	  to create event fields-aware subroutines
+	- added 'tclcfg.tcl' to output tcl configuration, used from Makefile.PL
+	- Makefile.PL changed to be more consistent
+	- use strict;
+
+Tcl-b3	11-mar-2001, Andrew Brown
+	- minor update for compatability with perl 5.6.0 by Andrew Brown
+
+Tcl-b2	1997, Malcolm Beattie
+	- Created entire module.

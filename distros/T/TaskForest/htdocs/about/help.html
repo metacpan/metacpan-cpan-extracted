@@ -1,0 +1,39 @@
+<include TaskForest::REST::PassThrough /head.html />
+
+<include TaskForest::REST::PassThrough /head_about.html />
+
+<div class="width6 last">
+  <div class="section_header">TaskForest Design Philosophy</div>
+  <p>
+    The TaskForest Job Scheduler is designed with the philosophy that a
+    program should be no more complicated that the minimum amount required
+    to achieve its objectives.  Complicated functions can be achieved by a
+    conjunction of simpler functions.
+  </p>
+
+  <p>
+    To illustrate this, TaskForest has been designed to run as a single
+    command that, once invoked from the command line, launches any jobs
+    that need to be run, and then sleeps for a bit and then tries again.
+    If you want, the <code>taskforest</code> script can also exit and be
+    run repeatedly.  It is a stateless application.  You could
+    launch <code>taskforest</code> once a day, and have it run all day, or
+    you could run it once every minute (for example) using cron.
+  </p>
+
+  <p>
+    Since TaskForest does not need any graphical interface, it can be run
+    on headless servers that don't have X installed.  If you would prefer
+    a graphical interface, it also comes with its own web server so that
+    you can administer the application using any standard web browser.  We
+    also provide you a RESTful API that allow you to write your own web
+    clients, so that you can control TaskForest from within your program.
+    Everything you need to do to configure the system can be done by
+    editing text files.  More on that in the next section.
+  </p>
+
+</div>
+<div class="clear_both"></div>
+
+
+<include TaskForest::REST::PassThrough /foot.html />

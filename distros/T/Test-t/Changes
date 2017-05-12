@@ -1,0 +1,6 @@
+0.002 Thursday April 29 18:25:14 PDT 2010:
+    - Added ->path, for File::Spec canonization
+    - Fixed test to use canonical path
+
+0.001 Thursday April 29 17:57:25 PDT 2010:
+    - Initial release

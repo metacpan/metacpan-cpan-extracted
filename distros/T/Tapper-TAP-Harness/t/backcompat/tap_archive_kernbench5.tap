@@ -1,0 +1,632 @@
+1..1
+# Artemis-suite-version: 0.020016
+# Artemis-starttime-test-program: 20090514T115713
+# Artemis-machine-name: bullock-lutetium
+# Artemis-suite-name: KernBench
+# Artemis-reportgroup-arbitrary: 
+# Artemis-section: artemis-meta-information
+# Artemis-reportgroup-testrun: 3373
+ok 1 - artemis-meta-data
+1..1
+# Artemis-Section: stats-proc-interrupts-before
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 64
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge      timer
+  1:
+    CPU0: 0
+    CPU1: 3
+    CPU2: 4
+    linetail: IO-APIC-edge      i8042
+  4:
+    CPU0: 0
+    CPU1: 1
+    CPU2: 0
+    linetail: IO-APIC-edge
+  6:
+    CPU0: 1
+    CPU1: 0
+    CPU2: 1
+    linetail: IO-APIC-edge      floppy
+  7:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge      parport0
+  8:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge      rtc0
+  9:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-fasteoi   acpi
+  10:
+    CPU0: 181
+    CPU1: 28
+    CPU2: 26
+    linetail: IO-APIC-fasteoi   eth0
+  11:
+    CPU0: 6
+    CPU1: 7
+    CPU2: 9
+    linetail: IO-APIC-fasteoi   uhci_hcd:usb1, virtio0
+  12:
+    CPU0: 21
+    CPU1: 35
+    CPU2: 38
+    linetail: IO-APIC-edge      i8042
+  14:
+    CPU0: 716
+    CPU1: 707
+    CPU2: 2040
+    linetail: IO-APIC-edge      ata_piix
+  15:
+    CPU0: 55
+    CPU1: 72
+    CPU2: 42
+    linetail: IO-APIC-edge      ata_piix
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: Non-maskable interrupts
+  LOC:
+    CPU0: 9929
+    CPU1: 10007
+    CPU2: 10397
+    linetail: Local timer interrupts
+  RES:
+    CPU0: 2336
+    CPU1: 2250
+    CPU2: 2054
+    linetail: Rescheduling interrupts
+  CAL:
+    CPU0: 163
+    CPU1: 191
+    CPU2: 103
+    linetail: function call interrupts
+  TLB:
+    CPU0: 657
+    CPU1: 605
+    CPU2: 615
+    linetail: TLB shootdowns
+  TRM:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: Thermal event interrupts
+  THR:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: Threshold APIC interrupts
+  SPU:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: Spurious interrupts
+  ERR:
+    CPU0: 0
+    CPU1:
+    CPU2:
+    linetail:
+  ...
+1..1
+# Artemis-section: kernel-untar
+ok 1 - untar of kernel succeeded.
+1..1
+# Artemis-section: kernbench-untar
+ok 1 - untar of testsuite succeeded.
+1..1
+# Artemis-section: kernbench-testrun
+ok 1 - Run took ntp: 3760s, system: 3759s
+1..1
+ok 1 - KernBench
+  ---
+  Thu May 14 12:32:37 CEST 2009
+  2.6.27.7-9-default
+  Average Optimal load -j 12 Run (std deviation):
+  Elapsed Time 365.92 (14.185)
+  User Time 333.512 (1.28007)
+  System Time 204.362 (6.1359)
+  Percent CPU 146.6 (4.27785)
+  Context Switches 58128.6 (806.197)
+  Sleeps 32789.2 (145.543)
+  ...
+1..1
+# Artemis-section: kernbench-results
+ok 1 - KernBench
+  ---
+  Thu May 14 12:32:37 CEST 2009
+  2.6.27.7-9-default
+  Average Optimal load -j 12 Run (std deviation):
+  Elapsed Time 365.92 (14.185)
+  User Time 333.512 (1.28007)
+  System Time 204.362 (6.1359)
+  Percent CPU 146.6 (4.27785)
+  Context Switches 58128.6 (806.197)
+  Sleeps 32789.2 (145.543)
+  ...
+1..4
+# Artemis-Section: dmesg
+ok 1 - dmesg parsed (419 lines)
+not ok 2 - TSC
+# HPET/PMTIMER calibration failed due to SMI disturbance. Using PIT calibration
+not ok 3 - isp1760
+# probe of 0000:00:01.3 failed with error -16
+not ok 4 - decode_hpp # TODO okay for us
+# Could not get hotplug parameters. Use defaults
+# false positves ignored: 4
+1..171
+# Artemis-Section: var_log_messages
+ok 1 - /var/log/messages parsed (1523 lines)
+not ok 2 - TSC
+# HPET/PMTIMER calibration failed due to SMI disturbance. Using PIT calibration
+not ok 3 - isp1760
+# probe of 0000:00:01.3 failed with error -16
+not ok 4 - decode_hpp # TODO okay for us
+# Could not get hotplug parameters. Use defaults
+not ok 5 - rchal # TODO okay for us
+# May 14 11:56:02 boot with 'CPUFREQ=no' in to avoid this warning.
+not ok 6 - rchal # TODO okay for us
+# May 14 11:56:02 Cannot load cpufreq governors - No cpufreq driver available
+not ok 7 - SuSEfirewall2 # TODO okay for us
+# May 14 11:56:35 SuSEfirewall2 not active
+not ok 8 - SuSEfirewall2 # TODO okay for us
+# May 14 11:56:43 SuSEfirewall2 not active
+not ok 9 - SuSEfirewall2 # TODO okay for us
+# May 14 11:57:00 SuSEfirewall2 not active
+not ok 10 - SuSEfirewall2 # TODO okay for us
+# May 14 11:57:20 SuSEfirewall2 not active
+not ok 11 - SuSEfirewall2 # TODO okay for us
+# May 14 11:57:33 SuSEfirewall2 not active
+not ok 12 - SuSEfirewall2 # TODO okay for us
+# May 14 11:58:04 SuSEfirewall2 not active
+not ok 13 - SuSEfirewall2 # TODO okay for us
+# May 14 11:58:37 SuSEfirewall2 not active
+not ok 14 - SuSEfirewall2 # TODO okay for us
+# May 14 11:58:47 SuSEfirewall2 not active
+not ok 15 - SuSEfirewall2 # TODO okay for us
+# May 14 11:59:21 SuSEfirewall2 not active
+not ok 16 - SuSEfirewall2 # TODO okay for us
+# May 14 11:59:34 SuSEfirewall2 not active
+not ok 17 - SuSEfirewall2 # TODO okay for us
+# May 14 12:01:06 SuSEfirewall2 not active
+not ok 18 - SuSEfirewall2 # TODO okay for us
+# May 14 12:01:32 SuSEfirewall2 not active
+not ok 19 - SuSEfirewall2 # TODO okay for us
+# May 14 12:02:35 SuSEfirewall2 not active
+not ok 20 - SuSEfirewall2 # TODO okay for us
+# May 14 12:03:09 SuSEfirewall2 not active
+not ok 21 - SuSEfirewall2 # TODO okay for us
+# May 14 12:03:22 SuSEfirewall2 not active
+not ok 22 - SuSEfirewall2 # TODO okay for us
+# May 14 12:03:47 SuSEfirewall2 not active
+not ok 23 - SuSEfirewall2 # TODO okay for us
+# May 14 12:04:13 SuSEfirewall2 not active
+not ok 24 - SuSEfirewall2 # TODO okay for us
+# May 14 12:04:48 SuSEfirewall2 not active
+not ok 25 - SuSEfirewall2 # TODO okay for us
+# May 14 12:05:14 SuSEfirewall2 not active
+not ok 26 - SuSEfirewall2 # TODO okay for us
+# May 14 12:05:40 SuSEfirewall2 not active
+not ok 27 - SuSEfirewall2 # TODO okay for us
+# May 14 12:06:19 SuSEfirewall2 not active
+not ok 28 - SuSEfirewall2 # TODO okay for us
+# May 14 12:06:52 SuSEfirewall2 not active
+not ok 29 - SuSEfirewall2 # TODO okay for us
+# May 14 12:07:23 SuSEfirewall2 not active
+not ok 30 - SuSEfirewall2 # TODO okay for us
+# May 14 12:07:58 SuSEfirewall2 not active
+not ok 31 - SuSEfirewall2 # TODO okay for us
+# May 14 12:08:21 SuSEfirewall2 not active
+not ok 32 - SuSEfirewall2 # TODO okay for us
+# May 14 12:08:50 SuSEfirewall2 not active
+not ok 33 - SuSEfirewall2 # TODO okay for us
+# May 14 12:09:19 SuSEfirewall2 not active
+not ok 34 - SuSEfirewall2 # TODO okay for us
+# May 14 12:09:37 SuSEfirewall2 not active
+not ok 35 - SuSEfirewall2 # TODO okay for us
+# May 14 12:09:52 SuSEfirewall2 not active
+not ok 36 - SuSEfirewall2 # TODO okay for us
+# May 14 12:10:12 SuSEfirewall2 not active
+not ok 37 - SuSEfirewall2 # TODO okay for us
+# May 14 12:10:28 SuSEfirewall2 not active
+not ok 38 - SuSEfirewall2 # TODO okay for us
+# May 14 12:10:55 SuSEfirewall2 not active
+not ok 39 - SuSEfirewall2 # TODO okay for us
+# May 14 12:11:13 SuSEfirewall2 not active
+not ok 40 - SuSEfirewall2 # TODO okay for us
+# May 14 12:11:26 SuSEfirewall2 not active
+not ok 41 - SuSEfirewall2 # TODO okay for us
+# May 14 12:11:50 SuSEfirewall2 not active
+not ok 42 - SuSEfirewall2 # TODO okay for us
+# May 14 12:12:15 SuSEfirewall2 not active
+not ok 43 - SuSEfirewall2 # TODO okay for us
+# May 14 12:12:39 SuSEfirewall2 not active
+not ok 44 - SuSEfirewall2 # TODO okay for us
+# May 14 12:12:59 SuSEfirewall2 not active
+not ok 45 - SuSEfirewall2 # TODO okay for us
+# May 14 12:13:20 SuSEfirewall2 not active
+not ok 46 - SuSEfirewall2 # TODO okay for us
+# May 14 12:13:38 SuSEfirewall2 not active
+not ok 47 - SuSEfirewall2 # TODO okay for us
+# May 14 12:13:57 SuSEfirewall2 not active
+not ok 48 - SuSEfirewall2 # TODO okay for us
+# May 14 12:14:14 SuSEfirewall2 not active
+not ok 49 - SuSEfirewall2 # TODO okay for us
+# May 14 12:14:34 SuSEfirewall2 not active
+not ok 50 - SuSEfirewall2 # TODO okay for us
+# May 14 12:14:56 SuSEfirewall2 not active
+not ok 51 - SuSEfirewall2 # TODO okay for us
+# May 14 12:15:12 SuSEfirewall2 not active
+not ok 52 - SuSEfirewall2 # TODO okay for us
+# May 14 12:15:34 SuSEfirewall2 not active
+not ok 53 - SuSEfirewall2 # TODO okay for us
+# May 14 12:15:47 SuSEfirewall2 not active
+not ok 54 - SuSEfirewall2 # TODO okay for us
+# May 14 12:16:06 SuSEfirewall2 not active
+not ok 55 - SuSEfirewall2 # TODO okay for us
+# May 14 12:16:28 SuSEfirewall2 not active
+not ok 56 - SuSEfirewall2 # TODO okay for us
+# May 14 12:16:44 SuSEfirewall2 not active
+not ok 57 - SuSEfirewall2 # TODO okay for us
+# May 14 12:17:03 SuSEfirewall2 not active
+not ok 58 - SuSEfirewall2 # TODO okay for us
+# May 14 12:17:22 SuSEfirewall2 not active
+not ok 59 - SuSEfirewall2 # TODO okay for us
+# May 14 12:17:41 SuSEfirewall2 not active
+not ok 60 - SuSEfirewall2 # TODO okay for us
+# May 14 12:18:06 SuSEfirewall2 not active
+not ok 61 - SuSEfirewall2 # TODO okay for us
+# May 14 12:18:29 SuSEfirewall2 not active
+not ok 62 - SuSEfirewall2 # TODO okay for us
+# May 14 12:18:51 SuSEfirewall2 not active
+not ok 63 - SuSEfirewall2 # TODO okay for us
+# May 14 12:19:14 SuSEfirewall2 not active
+not ok 64 - SuSEfirewall2 # TODO okay for us
+# May 14 12:19:39 SuSEfirewall2 not active
+not ok 65 - SuSEfirewall2 # TODO okay for us
+# May 14 12:20:09 SuSEfirewall2 not active
+not ok 66 - SuSEfirewall2 # TODO okay for us
+# May 14 12:20:30 SuSEfirewall2 not active
+not ok 67 - SuSEfirewall2 # TODO okay for us
+# May 14 12:21:00 SuSEfirewall2 not active
+not ok 68 - SuSEfirewall2 # TODO okay for us
+# May 14 12:21:18 SuSEfirewall2 not active
+not ok 69 - SuSEfirewall2 # TODO okay for us
+# May 14 12:21:42 SuSEfirewall2 not active
+not ok 70 - SuSEfirewall2 # TODO okay for us
+# May 14 12:21:55 SuSEfirewall2 not active
+not ok 71 - SuSEfirewall2 # TODO okay for us
+# May 14 12:22:15 SuSEfirewall2 not active
+not ok 72 - SuSEfirewall2 # TODO okay for us
+# May 14 12:22:34 SuSEfirewall2 not active
+not ok 73 - SuSEfirewall2 # TODO okay for us
+# May 14 12:22:55 SuSEfirewall2 not active
+not ok 74 - SuSEfirewall2 # TODO okay for us
+# May 14 12:23:19 SuSEfirewall2 not active
+not ok 75 - SuSEfirewall2 # TODO okay for us
+# May 14 12:23:41 SuSEfirewall2 not active
+not ok 76 - SuSEfirewall2 # TODO okay for us
+# May 14 12:23:59 SuSEfirewall2 not active
+not ok 77 - SuSEfirewall2 # TODO okay for us
+# May 14 12:24:21 SuSEfirewall2 not active
+not ok 78 - SuSEfirewall2 # TODO okay for us
+# May 14 12:24:43 SuSEfirewall2 not active
+not ok 79 - SuSEfirewall2 # TODO okay for us
+# May 14 12:25:05 SuSEfirewall2 not active
+not ok 80 - SuSEfirewall2 # TODO okay for us
+# May 14 12:25:28 SuSEfirewall2 not active
+not ok 81 - SuSEfirewall2 # TODO okay for us
+# May 14 12:25:51 SuSEfirewall2 not active
+not ok 82 - SuSEfirewall2 # TODO okay for us
+# May 14 12:26:17 SuSEfirewall2 not active
+not ok 83 - SuSEfirewall2 # TODO okay for us
+# May 14 12:26:42 SuSEfirewall2 not active
+not ok 84 - SuSEfirewall2 # TODO okay for us
+# May 14 12:26:52 SuSEfirewall2 not active
+not ok 85 - SuSEfirewall2 # TODO okay for us
+# May 14 12:27:10 SuSEfirewall2 not active
+not ok 86 - SuSEfirewall2 # TODO okay for us
+# May 14 12:27:33 SuSEfirewall2 not active
+not ok 87 - SuSEfirewall2 # TODO okay for us
+# May 14 12:27:52 SuSEfirewall2 not active
+not ok 88 - SuSEfirewall2 # TODO okay for us
+# May 14 12:28:14 SuSEfirewall2 not active
+not ok 89 - SuSEfirewall2 # TODO okay for us
+# May 14 12:28:36 SuSEfirewall2 not active
+not ok 90 - SuSEfirewall2 # TODO okay for us
+# May 14 12:28:53 SuSEfirewall2 not active
+not ok 91 - SuSEfirewall2 # TODO okay for us
+# May 14 12:29:18 SuSEfirewall2 not active
+not ok 92 - SuSEfirewall2 # TODO okay for us
+# May 14 12:29:43 SuSEfirewall2 not active
+not ok 93 - SuSEfirewall2 # TODO okay for us
+# May 14 12:30:00 SuSEfirewall2 not active
+not ok 94 - SuSEfirewall2 # TODO okay for us
+# May 14 12:30:19 SuSEfirewall2 not active
+not ok 95 - SuSEfirewall2 # TODO okay for us
+# May 14 12:30:35 SuSEfirewall2 not active
+not ok 96 - SuSEfirewall2 # TODO okay for us
+# May 14 12:30:56 SuSEfirewall2 not active
+not ok 97 - SuSEfirewall2 # TODO okay for us
+# May 14 12:31:14 SuSEfirewall2 not active
+not ok 98 - SuSEfirewall2 # TODO okay for us
+# May 14 12:31:36 SuSEfirewall2 not active
+not ok 99 - SuSEfirewall2 # TODO okay for us
+# May 14 12:31:52 SuSEfirewall2 not active
+not ok 100 - SuSEfirewall2 # TODO okay for us
+# May 14 12:32:00 SuSEfirewall2 not active
+not ok 101 - SuSEfirewall2 # TODO okay for us
+# May 14 12:35:13 SuSEfirewall2 not active
+not ok 102 - SuSEfirewall2 # TODO okay for us
+# May 14 12:35:36 SuSEfirewall2 not active
+not ok 103 - SuSEfirewall2 # TODO okay for us
+# May 14 12:35:56 SuSEfirewall2 not active
+not ok 104 - SuSEfirewall2 # TODO okay for us
+# May 14 12:36:16 SuSEfirewall2 not active
+not ok 105 - SuSEfirewall2 # TODO okay for us
+# May 14 12:36:34 SuSEfirewall2 not active
+not ok 106 - SuSEfirewall2 # TODO okay for us
+# May 14 12:36:58 SuSEfirewall2 not active
+not ok 107 - SuSEfirewall2 # TODO okay for us
+# May 14 12:37:18 SuSEfirewall2 not active
+not ok 108 - SuSEfirewall2 # TODO okay for us
+# May 14 12:37:40 SuSEfirewall2 not active
+not ok 109 - SuSEfirewall2 # TODO okay for us
+# May 14 12:38:03 SuSEfirewall2 not active
+not ok 110 - SuSEfirewall2 # TODO okay for us
+# May 14 12:38:24 SuSEfirewall2 not active
+not ok 111 - SuSEfirewall2 # TODO okay for us
+# May 14 12:38:42 SuSEfirewall2 not active
+not ok 112 - SuSEfirewall2 # TODO okay for us
+# May 14 12:38:54 SuSEfirewall2 not active
+not ok 113 - SuSEfirewall2 # TODO okay for us
+# May 14 12:39:11 SuSEfirewall2 not active
+not ok 114 - SuSEfirewall2 # TODO okay for us
+# May 14 12:39:23 SuSEfirewall2 not active
+not ok 115 - SuSEfirewall2 # TODO okay for us
+# May 14 12:39:43 SuSEfirewall2 not active
+not ok 116 - SuSEfirewall2 # TODO okay for us
+# May 14 12:40:05 SuSEfirewall2 not active
+not ok 117 - SuSEfirewall2 # TODO okay for us
+# May 14 12:40:33 SuSEfirewall2 not active
+not ok 118 - SuSEfirewall2 # TODO okay for us
+# May 14 12:40:55 SuSEfirewall2 not active
+not ok 119 - SuSEfirewall2 # TODO okay for us
+# May 14 12:41:19 SuSEfirewall2 not active
+not ok 120 - SuSEfirewall2 # TODO okay for us
+# May 14 12:41:39 SuSEfirewall2 not active
+not ok 121 - SuSEfirewall2 # TODO okay for us
+# May 14 12:42:00 SuSEfirewall2 not active
+not ok 122 - SuSEfirewall2 # TODO okay for us
+# May 14 12:42:24 SuSEfirewall2 not active
+not ok 123 - SuSEfirewall2 # TODO okay for us
+# May 14 12:42:44 SuSEfirewall2 not active
+not ok 124 - SuSEfirewall2 # TODO okay for us
+# May 14 12:43:09 SuSEfirewall2 not active
+not ok 125 - SuSEfirewall2 # TODO okay for us
+# May 14 12:43:34 SuSEfirewall2 not active
+not ok 126 - SuSEfirewall2 # TODO okay for us
+# May 14 12:44:00 SuSEfirewall2 not active
+not ok 127 - SuSEfirewall2 # TODO okay for us
+# May 14 12:44:23 SuSEfirewall2 not active
+not ok 128 - SuSEfirewall2 # TODO okay for us
+# May 14 12:44:57 SuSEfirewall2 not active
+not ok 129 - SuSEfirewall2 # TODO okay for us
+# May 14 12:45:12 SuSEfirewall2 not active
+not ok 130 - SuSEfirewall2 # TODO okay for us
+# May 14 12:45:21 SuSEfirewall2 not active
+not ok 131 - SuSEfirewall2 # TODO okay for us
+# May 14 12:48:38 SuSEfirewall2 not active
+not ok 132 - SuSEfirewall2 # TODO okay for us
+# May 14 12:48:58 SuSEfirewall2 not active
+not ok 133 - SuSEfirewall2 # TODO okay for us
+# May 14 12:49:24 SuSEfirewall2 not active
+not ok 134 - SuSEfirewall2 # TODO okay for us
+# May 14 12:49:51 SuSEfirewall2 not active
+not ok 135 - SuSEfirewall2 # TODO okay for us
+# May 14 12:50:08 SuSEfirewall2 not active
+not ok 136 - SuSEfirewall2 # TODO okay for us
+# May 14 12:50:26 SuSEfirewall2 not active
+not ok 137 - SuSEfirewall2 # TODO okay for us
+# May 14 12:50:47 SuSEfirewall2 not active
+not ok 138 - SuSEfirewall2 # TODO okay for us
+# May 14 12:51:14 SuSEfirewall2 not active
+not ok 139 - SuSEfirewall2 # TODO okay for us
+# May 14 12:51:33 SuSEfirewall2 not active
+not ok 140 - SuSEfirewall2 # TODO okay for us
+# May 14 12:51:46 SuSEfirewall2 not active
+not ok 141 - SuSEfirewall2 # TODO okay for us
+# May 14 12:51:58 SuSEfirewall2 not active
+not ok 142 - SuSEfirewall2 # TODO okay for us
+# May 14 12:52:14 SuSEfirewall2 not active
+not ok 143 - SuSEfirewall2 # TODO okay for us
+# May 14 12:55:40 SuSEfirewall2 not active
+not ok 144 - SuSEfirewall2 # TODO okay for us
+# May 14 12:56:05 SuSEfirewall2 not active
+not ok 145 - SuSEfirewall2 # TODO okay for us
+# May 14 12:56:21 SuSEfirewall2 not active
+not ok 146 - SuSEfirewall2 # TODO okay for us
+# May 14 12:56:47 SuSEfirewall2 not active
+not ok 147 - SuSEfirewall2 # TODO okay for us
+# May 14 12:57:06 SuSEfirewall2 not active
+not ok 148 - SuSEfirewall2 # TODO okay for us
+# May 14 12:57:32 SuSEfirewall2 not active
+not ok 149 - SuSEfirewall2 # TODO okay for us
+# May 14 12:57:53 SuSEfirewall2 not active
+not ok 150 - SuSEfirewall2 # TODO okay for us
+# May 14 12:58:20 SuSEfirewall2 not active
+not ok 151 - SuSEfirewall2 # TODO okay for us
+# May 14 12:58:41 SuSEfirewall2 not active
+not ok 152 - SuSEfirewall2 # TODO okay for us
+# May 14 12:58:58 SuSEfirewall2 not active
+not ok 153 - SuSEfirewall2 # TODO okay for us
+# May 14 12:59:21 SuSEfirewall2 not active
+not ok 154 - SuSEfirewall2 # TODO okay for us
+# May 14 12:59:32 SuSEfirewall2 not active
+not ok 155 - SuSEfirewall2 # TODO okay for us
+# May 14 12:59:47 SuSEfirewall2 not active
+not ok 156 - SuSEfirewall2 # TODO okay for us
+# May 14 13:00:05 SuSEfirewall2 not active
+not ok 157 - SuSEfirewall2 # TODO okay for us
+# May 14 13:00:25 SuSEfirewall2 not active
+not ok 158 - SuSEfirewall2 # TODO okay for us
+# May 14 13:00:51 SuSEfirewall2 not active
+not ok 159 - SuSEfirewall2 # TODO okay for us
+# May 14 13:01:16 SuSEfirewall2 not active
+not ok 160 - SuSEfirewall2 # TODO okay for us
+# May 14 13:01:39 SuSEfirewall2 not active
+not ok 161 - SuSEfirewall2 # TODO okay for us
+# May 14 13:02:03 SuSEfirewall2 not active
+not ok 162 - SuSEfirewall2 # TODO okay for us
+# May 14 13:02:31 SuSEfirewall2 not active
+not ok 163 - SuSEfirewall2 # TODO okay for us
+# May 14 13:03:00 SuSEfirewall2 not active
+not ok 164 - SuSEfirewall2 # TODO okay for us
+# May 14 13:03:24 SuSEfirewall2 not active
+not ok 165 - SuSEfirewall2 # TODO okay for us
+# May 14 13:03:42 SuSEfirewall2 not active
+not ok 166 - SuSEfirewall2 # TODO okay for us
+# May 14 13:04:02 SuSEfirewall2 not active
+not ok 167 - SuSEfirewall2 # TODO okay for us
+# May 14 13:04:24 SuSEfirewall2 not active
+not ok 168 - SuSEfirewall2 # TODO okay for us
+# May 14 13:04:47 SuSEfirewall2 not active
+not ok 169 - SuSEfirewall2 # TODO okay for us
+# May 14 13:05:09 SuSEfirewall2 not active
+not ok 170 - SuSEfirewall2 # TODO okay for us
+# May 14 13:05:34 SuSEfirewall2 not active
+not ok 171 - SuSEfirewall2 # TODO okay for us
+# May 14 13:05:46 SuSEfirewall2 not active
+# false positves ignored: 4
+1..1
+# Artemis-Section: stats-proc-interrupts-after
+ok 1 - /proc/interrupts
+  ---
+  0:
+    CPU0: 64
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge      timer
+  1:
+    CPU0: 0
+    CPU1: 3
+    CPU2: 4
+    linetail: IO-APIC-edge      i8042
+  4:
+    CPU0: 0
+    CPU1: 1
+    CPU2: 0
+    linetail: IO-APIC-edge
+  6:
+    CPU0: 1
+    CPU1: 0
+    CPU2: 1
+    linetail: IO-APIC-edge      floppy
+  7:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge      parport0
+  8:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-edge      rtc0
+  9:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: IO-APIC-fasteoi   acpi
+  10:
+    CPU0: 258
+    CPU1: 5776
+    CPU2: 26
+    linetail: IO-APIC-fasteoi   eth0
+  11:
+    CPU0: 6
+    CPU1: 7
+    CPU2: 9
+    linetail: IO-APIC-fasteoi   uhci_hcd:usb1, virtio0
+  12:
+    CPU0: 21
+    CPU1: 35
+    CPU2: 38
+    linetail: IO-APIC-edge      i8042
+  14:
+    CPU0: 716
+    CPU1: 707
+    CPU2: 48842
+    linetail: IO-APIC-edge      ata_piix
+  15:
+    CPU0: 55
+    CPU1: 4148
+    CPU2: 42
+    linetail: IO-APIC-edge      ata_piix
+  NMI:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: Non-maskable interrupts
+  LOC:
+    CPU0: 414768
+    CPU1: 414641
+    CPU2: 417164
+    linetail: Local timer interrupts
+  RES:
+    CPU0: 59610
+    CPU1: 55469
+    CPU2: 50819
+    linetail: Rescheduling interrupts
+  CAL:
+    CPU0: 177
+    CPU1: 205
+    CPU2: 103
+    linetail: function call interrupts
+  TLB:
+    CPU0: 11949
+    CPU1: 12334
+    CPU2: 14354
+    linetail: TLB shootdowns
+  TRM:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: Thermal event interrupts
+  THR:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: Threshold APIC interrupts
+  SPU:
+    CPU0: 0
+    CPU1: 0
+    CPU2: 0
+    linetail: Spurious interrupts
+  ERR:
+    CPU0: 0
+    CPU1: ~
+    CPU2: ~
+    linetail: ~
+  ...
+1..1
+# Artemis-section: clocksource
+ok 1 - Clocksource
+  ---
+  kvm-clock
+  ...
+1..1
+# Artemis-section: uptime
+ok 1 - got uptime
+  ---
+  uptime: 4279s
+  idletime: 488s
+  ...

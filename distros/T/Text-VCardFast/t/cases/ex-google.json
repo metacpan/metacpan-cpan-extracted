@@ -1,0 +1,105 @@
+{
+   "objects" : [
+      {
+         "type" : "vcard",
+         "properties" : {
+            "x-skype" : [
+               {
+                  "value" : "joe.bloggs",
+                  "name" : "x-skype"
+               }
+            ],
+            "n" : [
+               {
+                  "name" : "n",
+                  "values" : [
+                     "Bloggs",
+                     "Joe",
+                     "",
+                     "",
+                     ""
+                  ]
+               }
+            ],
+            "version" : [
+               {
+                  "value" : "3.0",
+                  "name" : "version"
+               }
+            ],
+            "email" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "INTERNET",
+                        "HOME"
+                     ]
+                  },
+                  "value" : "me@joebloggs.com",
+                  "name" : "email"
+               }
+            ],
+            "tel" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "CELL"
+                     ]
+                  },
+                  "value" : "+44 20 1234 5678",
+                  "name" : "tel"
+               }
+            ],
+            "url" : [
+               {
+                  "group" : "item1",
+                  "value" : "http://joebloggs.com",
+                  "name" : "url"
+               },
+               {
+                  "group" : "item2",
+                  "value" : "http://twitter.com/test",
+                  "name" : "url"
+               }
+            ],
+            "x-ablabel" : [
+               {
+                  "group" : "item1",
+                  "value" : "_$!<HomePage>!$_",
+                  "name" : "x-ablabel"
+               },
+               {
+                  "group" : "item2",
+                  "value" : "Twitter",
+                  "name" : "x-ablabel"
+               }
+            ],
+            "adr" : [
+               {
+                  "params" : {
+                     "type" : [
+                        "HOME"
+                     ]
+                  },
+                  "name" : "adr",
+                  "values" : [
+                     "",
+                     "",
+                     "1 Trafalgar Square",
+                     "London",
+                     "",
+                     "WC2N",
+                     "United Kingdom"
+                  ]
+               }
+            ],
+            "fn" : [
+               {
+                  "value" : "Joe Bloggs",
+                  "name" : "fn"
+               }
+            ]
+         }
+      }
+   ]
+}

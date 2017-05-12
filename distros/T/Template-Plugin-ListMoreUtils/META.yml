@@ -1,0 +1,30 @@
+---
+abstract: 'TT2 plugin to use List::MoreUtils'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-ListMoreUtils
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  List::MoreUtils: '0.412'
+  Template: '2.20'
+  Template::Plugin::VMethods: '0.02'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-ListMoreUtils
+  homepage: https://metacpan.org/release/Template-Plugin-ListMoreUtils
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-utils/Template-Plugin-ListMoreUtils
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

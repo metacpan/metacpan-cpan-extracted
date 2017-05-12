@@ -1,0 +1,11 @@
+Revision history for Template-Context-Cacheable
+
+0.01	LongTimeAgo	Walery Studennikov
+	First version created.
+
+0.02	10-Jun-2010	Walery Studennikov
+	Renamed Template-Context-SRS to Template-Context-Cacheable
+	Created Build.PL, MANIFEST etc.
+
+0.03	29-Apr-2011	Walery Studennikov
+	Included "TOTAL" section into profiling report in DEBUG mode

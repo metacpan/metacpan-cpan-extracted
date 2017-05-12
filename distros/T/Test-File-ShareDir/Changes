@@ -1,0 +1,242 @@
+Release history for Test-File-ShareDir
+
+1.001002 2017-03-01T11:17:51Z 44658a2
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001001, see misc/*.deps* for details
+ - develop: +3 ↑4 (suggests: ↑2)
+
+ [Testfix]
+ - Update tooling to aovid .-in-@INC issues
+ - Closes https://github.com/kentnl/Test-File-ShareDir/issues/3
+
+1.001001 2015-03-01T05:44:37Z a89c745
+ [TestFixes]
+ - Try to guard against accidentally failing if a test distdir does in fact exist in the "Expect not to exist" test.
+
+1.001000 2015-02-28T11:09:38Z d703dd2
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000005, see misc/*.deps* for details
+ - configure: +1 (recommends: -1, suggests: +1)
+ - develop: +10 ↑3 -2 (suggests: +1 ↑2)
+ - runtime: +3 (suggests: +1)
+ - test: +1 (recommends: -2, suggests: +2)
+
+ [Deprecations]
+ - OO interfaces have a ->add_to_inc method which is being replaced with the more generic ->register, which wil retain
+   meaning when the interface no longer actually uses @INC
+
+ [Features]
+ - OO interfaces now all have a ->register and a ->clear method.
+ - Now supports exporting with_dist_dir and with_module_dir functions from Test::File::ShareDir
+
+1.000005 2014-08-15T23:41:58Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace greatly reduced.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000004, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update Test::ReportPrereqs
+
+1.000004 2014-07-22T19:29:27Z
+ [Doc Bugfix]
+ - Previous releases changelog was misleading.
+ - We're requiring a newer Path::Tiny to avoid a problem. ( As opposed to the impression that a newer Path::Tiny caused
+   the problem, grammar-- )
+
+1.000003 2014-07-22T19:02:06Z
+ [Bugfix]
+ - Attempt to avoid tempdir(CLEANUP => 1) being an error by requiring newer Path::Tiny
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - runtime: ↑1
+
+1.000002 2014-07-18T16:33:36Z
+ [00 Trivial]
+ - Minor packaging cleanups shaving ~7k
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: (suggests: ↑2)
+ - test: +2 ↑1 (recommends: +1)
+
+1.000001 2014-06-07T15:14:38Z
+ [00 Trivial]
+ - Mostly internal aesthetic changes / perlcritic things.
+ - tempdir behaviours used via Path::Tiny interface instead of directly.
+ - Silly runtime function proxies mostly deleted.
+ - packaging tweaked minorly
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: +3 -3 (suggests: +2 -1)
+ - runtime: -1
+ - test: (recommends: ↑2)
+
+1.000000 2014-01-30T15:23:48Z
+ [00 Tooling and Version replacement]
+ - Switched to EUMM to accelerate clean-install time.
+ - Build-time requirements are now softened
+ - Readvertise higher requirements as recommendations
+ - version schema moved from x.y.z to x.YYYzzz and is the primary reason for incrementing the major
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.4.1, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +7 ↑1 -9
+ - test: +4 ↓1 (recommends: +4)
+
+0.4.1 2013-11-21T06:51:24Z
+ [00 Trivial Doc Fix]
+ - Escaping of code containing > was done wrong.
+
+0.4.0 2013-11-21T06:38:44Z
+ [00 Major Changes]
+ - New Modules/Interfaces to make life easier for people who only need one of (Dist|Module) shares.
+
+ [Dependencies::Noteworthy]
+ - use Class::Tiny
+ - use new MB and TestMore
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.3, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +45 -1 (recommends: -1, suggests: +1 -1)
+ - runtime: +1
+ - test: +1 ↑1 -1
+
+ [Documentation]
+ - Encoding specified
+ - MetaPOD annotations added
+
+ [Packaging]
+ - use new MB syntax for fallback
+
+ [Tests]
+ - use Test::Compile::PerFile
+ - Regenerate ReportVersions::Tiny to not report develop deps.
+ - Regenerate CPAN::Changes test
+ - Regenerate Kwalitee test
+
+0.3.3 2013-04-03T11:32:08Z
+ [!Noteable Changes]
+ - Replace Path::Class with Path::Tiny
+
+ [Dependencies::Noteworthy]
+ - use Path::Tiny
+ - stop using Path::Class::Dir
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.2, see misc/*.deps* for details
+ - runtime: +1 -1
+
+0.3.2 2013-04-03T07:03:58Z
+ - Maintenance release for MB 0.4004
+
+ [Dependencies::Noteworthy]
+ - 5.006 is now minimum
+ - upgrade MB and TM
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.1, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 (recommends: ↑1, suggests: ↑1)
+ - runtime: +1
+ - test: ↑1
+
+ [Documentation]
+ - Reindent License
+ - Update Copyright Year
+ - Update Copyright address
+ - Add README.mkdn
+
+ [Meta]
+ - Bug tracker moved to github issues
+
+ [Packaging]
+ - Build.PL updated for 0.4004 / test_requires
+
+ [Tracking]
+ - This source version of 0.3.1 lost and reconstructed
+
+0.3.1 2011-10-28T20:58:28Z
+ [Bugs]
+ - Absolute paths were treated incorrectly as relative ones. Now using Path::Class properly which should fix this
+   problem. Thanks to RJBS for diagnosing and reporting this problem.
+
+ [Dependencies::Noteworthy]
+ - test removed: English
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.0, see misc/*.deps* for details
+ - runtime: +2
+ - test: -1
+
+ [Packaging]
+ - Updated License ( Indentation, Address )
+ - Extra tests moved to xt/
+
+0.3.0 2011-05-05T03:29:45Z
+ [Dependencies::Noteworthy]
+ - For testing, Now requires Cwd as provided by File-Spec / PathTools.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.0, see misc/*.deps* for details
+ - test: +1
+
+ [Documentation]
+ - Improved primary documentation to explain import flags
+
+ [Features]
+ - In the absense of passing the 'root' parameter, it will default to the current work directory. Considering that most
+   of the time, the Cwd is the project root directory when running tests, this constitutes a reasonably sane default.
+
+ [Tests]
+ - Now uses Test::CPAN::Changes plugin instead of CPANChangesTests plugin
+ - Added 03_cwd.t which tests how the module behaves when -root is implicit.
+
+0.2.0 2011-04-07T21:10:54Z
+ - Rereleased as 0.2.0 to signify backwards incompatible changes introduced in 0.1.2
+
+0.1.2 2011-04-07T21:08:05Z
+ [Features]
+ - Adds support for dist/package sharedirs. See synopsis for syntax.
+
+ [Packaging]
+ - Remove need for @Filter.
+ - Rework Changes for CPAN::Changes.
+
+ [Tests]
+ - Added CPAN::Changes tests.
+ - 01 Basics files moved to 01_files and 01 Basic is reformatted to match.
+ - Added 02_distdir and 02_files to test for dist feature.
+
+0.1.1 2011-03-10T16:35:13Z
+ - Overhauled the internals to make it easier to work on.
+ - Refactored code into an object.
+ - No externally visible changes.
+ - Slightly more strict, but just to stop you doing stupid things.
+ - Module Loading is now slightly lazier.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - runtime: +1 -1
+
+0.1.0 2011-02-21T12:42:47Z
+ - First version, released on an unsuspecting world.
+ - Presently only supports module share-dirs.

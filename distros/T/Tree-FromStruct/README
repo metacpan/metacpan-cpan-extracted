@@ -1,0 +1,80 @@
+SYNOPSIS
+
+    In your tree node class My/Person.pm:
+
+     package My::Person;
+    
+     sub new {
+         my $class = shift;
+         my %args = @_;
+         bless \%args, $class;
+     }
+    
+     sub parent {
+         my $self = shift;
+         $self->{_parent} = $_[0] if $@;
+         $self->{_parent};
+     }
+    
+     sub children {
+         my $self = shift;
+         $self->{_children} = $_[0] if $@;
+         $self->{_children};
+     }
+
+    In your code to build a tree:
+
+     use Tree::FromStruct qw(build_tree_from_struct);
+    
+     # require all the used classes
+     use My::Person;
+     use My::MarriedPerson;
+     use My::KidPerson;
+    
+     my $family_tree = build_tree_from_struct({
+         _class => 'My::Person', name => 'Andi', age => 60, _children => [
+             {name => 'Budi', age => 30},
+             {_class => 'My::MarriedPerson', name => 'Cinta', _children => [
+                  {class => 'My::KidPerson', name => 'Deni'},
+                  {class => 'My::KidPerson', name => 'Eno'},
+              ]},
+         ]});
+
+DESCRIPTION
+
+    Building a tree manually can be tedious: you have to connect the parent
+    and the children nodes together:
+
+     my $root = My::TreeNode->new(...);
+     my $child1 = My::TreeNode->new(...);
+     my $child2 = My::TreeNode->new(...);
+    
+     $root->children([$child1, $child2]);
+     $child1->parent($root);
+     $child2->parent($root);
+    
+     my $grandchild1 = My::TreeNode->new(...);
+     ...
+
+    This module provides a convenience function to build a tree of objects
+    in a single command. It connect the parent and children nodes for you.
+
+    The class can be any class that provides parent and children methods.
+    See Role::TinyCommons::Tree::Node for more details.
+
+FUNCTIONS
+
+ build_tree_from_struct($struct) => obj
+
+    This is basically Role::TinyCommons::Tree::FromStruct's new_from_struct
+    presented as a function. See the role's documentation for more details
+    on what you can put in $struct.
+
+SEE ALSO
+
+    Role::TinyCommons::Tree::FromStruct if you want to use this
+    functionality via consuming a role.
+
+    Other ways to create tree: Tree::FromText, Tree::FromTextLines,
+    Tree::Create::Callback, Tree::Create::Size.
+

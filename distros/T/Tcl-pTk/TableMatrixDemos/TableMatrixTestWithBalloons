@@ -1,0 +1,117 @@
+
+######### TableMatrix demo script showing how to add Balloons (AKA Tooltips) ######
+### Tool tips are defined using the %tipsData hash below, which has only a few
+###   cells setup with tooltips.
+
+use Tcl::pTk (qw/ :perlTk /);
+
+use Tcl::pTk::TableMatrix::SpreadsheetHideRows;
+use Tcl::pTk::Balloon;
+
+use Data::Dumper qw( DumperX);
+my $top = MainWindow->new;
+
+my $arrayVar = {};
+
+foreach my $row  (0..20){
+	foreach my $col (0..10){
+		$arrayVar->{"$row,$col"} = "r$row, c$col";
+	}
+}
+
+
+
+my $t = $top->Scrolled('TableMatrix', -rows => 21, -cols => 11, 
+                              -width => 6, -height => 6,
+			      -titlerows => 1, -titlecols => 1,
+			      -variable => $arrayVar,
+			      -selectmode => 'extended',
+			      -resizeborders => 'both',
+			      -titlerows => 1,
+			      -titlecols => 1,
+			      -bg => 'white',
+			     #  -state => 'disabled'
+			    #  -colseparator => "\t",
+			    #  -rowseparator => "\n"
+                    );
+		    
+$t->tagConfigure('active', -bg => 'gray90', -relief => 'sunken');
+$t->tagConfigure( 'title', -bg => 'gray85', -fg => 'black', -relief => 'sunken');
+
+# $t->bind("<Any-Enter>", sub { $t->focus });
+
+############ Setup Popup Balloons #############
+my %tipsdata; # Hash of tool-tips vs tablematrix index
+$tipsdata{"1,5"} = "Foo-Bar";
+$tipsdata{"2,3"} = "Bar of Soap";
+$tipsdata{"4,3"} = "This cell intentionally left blank"; 
+
+my $b = $t->Balloon;
+
+my ( $pointerX, $pointerY );
+my $lastIndex = '';    # last index the mouse was over
+my $currentIndex;
+my @BBox = ( 0, 0, 0, 0 );
+$b->attach(    $t,
+	-initwait        => 750,
+	-balloonposition => 'mouse',
+	-motioncommand   => sub {
+
+		# my $e = $tree->XEvent;
+		( $pointerX, $pointerY ) = $t->pointerxy;
+		$pointerX -= $t->rootx;
+		$pointerY -= $t->rooty;
+		$currentIndex = $t->index( '@' . "$pointerX,$pointerY" );
+		return unless ($currentIndex);
+
+		#print "Last/Current Index = '$lastIndex'/'$currentIndex'\n";
+
+		@BBox = $t->bbox($currentIndex);
+		return unless (@BBox);
+
+		# Change BBox elements 2 and 3, which are width/height into actual bbox coords
+		$BBox[2] += $BBox[0];
+		$BBox[3] += $BBox[2];
+
+		#print "Bbox = ".join(", ",@BBox)."\n";
+		#print " Pointer X/Y = $pointerX/$pointerY\n";
+		if ( $lastIndex eq $currentIndex ) {
+
+			#print "returning 0\n";
+
+			# Same item, and within it's bounding box don't cancel the Balloon
+			0;
+		}
+		else {
+
+			# New item - cancel it so a new balloon will
+			# be posted
+			$lastIndex = $currentIndex;
+
+			#print "returning 1\n";
+			1;
+
+		}
+	},
+	-postcommand => sub {
+
+		#print "postCommand\n";
+		return unless $currentIndex;
+		return unless @BBox;
+
+		my ( $row, $col ) = split( ",", $currentIndex );
+
+		# If tool-tip exits for this cell, post the balloon
+		my $message = $tipsdata{"$row,$col"}; # Name of setting we are over
+		return 0 unless( defined $message);
+		
+		$b->{"clients"}{$t}{-balloonmsg} = $message;
+		return 1;
+	  }
+
+);
+#########################################################################
+
+$t->pack(-expand => 1, -fill => 'both');
+
+MainLoop;

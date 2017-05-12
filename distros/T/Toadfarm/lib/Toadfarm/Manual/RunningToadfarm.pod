@@ -1,0 +1,187 @@
+=head1 NAME
+
+Toadfarm::Manual::RunningToadfarm - Command line options
+
+=head1 DESCRIPTION
+
+This manual goes through different options on how to start your
+L<Toadfarm> application.
+
+=head2 Basics
+
+You can see the different options by simply running your application with
+no options:
+
+  $ /path/to/your-toadfarm-script
+  $ /path/to/your-toadfarm-script help
+
+=head2 Actions
+
+In addition to all the default L<commands|Mojolicious::Commands/COMMANDS>,
+L<Toadfarm> adds some more:
+
+=over 4
+
+=item * L<Toadfarm::Command::start>
+
+  $ /path/to/your-script start
+
+Will only start your application if not running.
+
+=item * L<Toadfarm::Command::stop>
+
+  $ /path/to/your-script stop
+
+Will stop your application. Note that this command waits for the
+application to stop, which could take
+L<several seconds|Mojo::Server::Hypnotoad/graceful_timeout>.
+
+=item * L<Toadfarm::Command::reload>
+
+  $ /path/to/your-script reload
+
+Will either start the application or
+L<hot deploy|Mojo::Server::Hypnotoad/USR2> it. This means loading
+in a new version of your application, without losing any connections.
+
+=back
+
+=head2 Init script
+
+Your script can be used as an init-script. Example script:
+
+  #!/path/to/your/perl
+
+  eval 'exec /path/to/your/perl -S $0 ${1+"$@"}'
+      if 0; # not running under some shell
+
+  ### BEGIN INIT INFO
+  # Provides:          toadfarm
+  # Required-Start:    $local_fs $network mysql postgresql
+  # Required-Stop:     $local_fs $network mysql postgresql
+  # Default-Start:     2 3 4 5
+  # Default-Stop:      0 1 6
+  # Short-Description: Toadfarm web application
+  ### END INIT INFO
+
+  use Toadfarm -init;
+  run_as "www-data";
+  # logging, mount, plugins, ...
+  start;
+
+You can put the code above in C</etc/init.d/your-script>:
+
+  # Create a toadfarm script in init.d
+  $ sudo $EDITOR /etc/init.d/your-script
+
+  # Make it executable
+  $ sudo chmod +x /etc/init.d/your-script
+
+  # Make it start on boot
+  $ sudo update-rc.d your-script defaults;
+
+Remember that the hashbang can be anything, so if you have L<Toadfarm>
+and L<Mojolicious> running under L<plenv|https://github.com/tokuhirom/plenv>
+or L<Perlbrew|http://perlbrew.pl/> you need to change the hashbang part to
+something like:
+
+  #!/home/USERNAME/.plenv/versions/5.21.11/bin/perl5.21.11
+  #!/home/USERNAME/perl5/perlbrew/perls/perl-5.16.0/bin/perl
+
+=head2 Cron
+
+If you want to use crontab to start your script, you can do it with this line:
+
+  * * * * * /path/to/your-script start 1>/dev/null 2>/dev/null
+
+The trick here is to use "start" which will only start your server and not
+hot deploy it if it's already running.
+
+=head2 Docker
+
+The L</Docker> section is EXPERIMENTAL. Help wanted.
+
+A L<Toadfarm> powered script can be run inside a
+L<docker|https://www.docker.com> container with hot reloading. Here is an
+example C<Docker> file:
+
+  FROM perl:5.22.1
+  WORKDIR /usr/src/myapp
+  RUN cpanm Toadfarm
+  RUN chsh -s /bin/sh www-data
+  USER www-data
+  CMD [ "perl", "./your-toadfarm-script", "start", "--tail", "-f" ]
+
+Note "--tail" and "-f" is after L<start|Toadfarm::Command::start>, which will
+keep the script in foreground, even though your Mojolicious application has
+forked.
+
+The file can be built and started using these commands:
+
+  $ sudo docker build -t my-perl-app .
+  $ sudo docker run --name my-running-app -d \
+    -v $PWD:/usr/src/myapp:ro my-perl-app
+
+Later if you want to reload the application, you can do:
+
+  $ sudo docker exec my-perl-app perl your-toadfarm-script reload
+
+Or you can tail the application log with one of these commands:
+
+  $ sudo docker exec my-perl-app logs -f
+  $ sudo docker exec my-perl-app perl your-toadfarm-script tail -f
+
+=head2 Other ways
+
+It is possible to start the server using the standard L<Mojolicious> tools
+as well:
+
+  $ /path/to/your-script daemon --listen http://*:5000
+  $ morbo /path/to/your-script
+  $ hypnotoad /path/to/your-script
+
+=head2 Listen to standard HTTP ports
+
+Setting up iptables rules will allow Toadfarm to listen to port 8080, while
+still receiving traffic on the default port. This way you can start and run
+C<toadfarm> as a normal user instead of "root".
+
+  $ iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8080
+  $ iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp --dport 443 -j REDIRECT --to-ports 8443
+
+Replace "eth0" with the appropriate interface.  IP Forwarding in the
+kernel must also be enabled.  On most Linux distributions:
+
+  $ sysctl net.ipv4.ip_forward      # check
+  $ sysctl -w net.ipv4.ip_forward=1 # set
+
+The setting can be permanently enabled from /etc/sysctl.conf as:
+
+  net.ipv4.ip_forward = 1
+
+whereas on most *BSD and OSX, the setting for sysctl and
+/etc/sysctl.conf is
+
+  net.inet.ip.forwarding = 1
+
+See L<https://en.wikipedia.org/wiki/Sysctl#Examples> for further detail.
+
+=head2 Running as a non-privileged user
+
+You need to use L<Mojolicious::Plugin::SetUserGroup> if you want to start
+L<Toadfarm> as root and then change to a less privileged user in the workers.
+Example:
+
+  # logging, mount, ...
+  plugin SetUserGroup => {user => "www-data"};
+  start ["http://*:80"];
+
+=head1 SEE ALSO
+
+See also L<Toadfarm::Manual::Intro> and L<Toadfarm::Manual::Config>.
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

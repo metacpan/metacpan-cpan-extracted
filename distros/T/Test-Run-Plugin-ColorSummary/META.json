@@ -1,0 +1,62 @@
+{
+   "abstract" : "A Test::Run plugin that",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Run-Plugin-ColorSummary",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Run::CmdLine::Trap::ProveApp" : "0",
+            "Test::Run::Trap::Obj" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Term::ANSIColor" : "0",
+            "Test::More" : "0",
+            "Test::Run::CmdLine" : "0.0111",
+            "Test::Run::Core" : "0.0118",
+            "Test::Run::Obj" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Run::CmdLine::Plugin::ColorSummary" : {
+         "file" : "lib/Test/Run/CmdLine/Plugin/ColorSummary.pm",
+         "version" : "0.0202"
+      },
+      "Test::Run::Plugin::ColorSummary" : {
+         "file" : "lib/Test/Run/Plugin/ColorSummary.pm",
+         "version" : "0.0202"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.shlomifish.org/modules/Test-Run/",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-test-run"
+      }
+   },
+   "version" : "0.0202",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

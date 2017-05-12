@@ -1,0 +1,77 @@
+Revision history for Tapper-Installer
+
+5.0.0     2016-02-15
+        - fix experimental given/when
+
+4.1.1     2012-11-19
+        - dzil pluginbundle TAPPER
+
+4.1.0     2012-10-19
+        - [FIX] when to call log cleanup
+
+4.0.2     2012-07-05
+        - assert OS = Linux
+        - [FIX] regexp and typo
+        - [FEAT] install Tapper in Ubuntu
+        - [FEAT] tapper startscript for ubuntu added
+        - [TEST] now has log_to_file in generated PRC config
+        - log_to_file if requested
+
+4.0.1     2012-05-16
+        - [FEAT] Package precondition now supports url
+        - [FEAT] Exec precondition accepts ENV settings
+        - [FEAT] send keep-alive messages
+        - [FEAT] put swap into fstab
+        - [FEAT] add target_directory for package
+        - [FEAT] implemented mountdir
+        - [FEAT] installer uses http for status messages now
+        - [FIX] Exec on linux32
+        - [FIX] start script for Debian, and more LSBish
+        - [FIX] *lots* of bugs and cornercases everywhere
+        - [FIX] default usage of hosts/ports - OSRC#1016
+        - [FIX] messages containing slashes are sent as HTTP headers
+        - [FIX] More elaborated way to get kernel version
+        - [RFK] Installer now always get grub config from MCP
+        - [RFK] big Dist::Zilla roundhouse kick
+
+2011-04-07  Steffen Schwigon  <steffen.schwigon@amd.com>
+
+	* v3.0.10
+
+	* allow relative image paths
+	* grub handling polishing
+	* add Tapper server NFS to /etc/fstab
+	* release version++ roundhouse kick
+
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.5
+
+	* rewritable shebang line
+	* [FIX] call grub-install again
+	* [TEST] adapted to new $self->images layout
+	* [FIX] don't use basedir in elements of $self->images
+	* [FIX] write fstab new to get rid of old entries
+	* [FIX] do not prepend Exec command with basedir
+	* [RFK] get rid of Method::Signatures
+	* [TEST] detect nonexisting image
+	* [FIX] log using Log4perl
+
+2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.4
+
+	* distro maintenance
+
+	* Install rpm and deb in chroot
+	* Exec provided command now
+	* Refactoring
+
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.2
+	
+	* try to force YAML versions
+
+	* [FIX] error handling if git not installed
+

@@ -1,0 +1,46 @@
+Changes for Thread::Apartment
+
+0.51	2006-Aug-25 D. Arnold
+
+	- fixed Thread::Apartment::Common to include threads/threads::shared
+	
+	- fixed Thread::Apartment::Common to use base reference for marshalled objects
+	
+	- changed to require threads 1.38, threads::shared 1.02
+	
+	- changed references to threads::shared::_id() to is_shared()
+	
+	- fixed Thread::Apartment::Client::join() to use direct reference to
+	TID value to locate server thread object
+
+0.50	2005-Nov-25 D. Arnold
+
+	- updated to support TQQ/TQD changes for default redeem
+		of shared objects
+	
+	- renamed Thread::IOServer to Thread::EventServer
+	
+	- created Thread::MuxServer
+	
+	- added support for proxied closures
+	
+	- added Thread::Apartment::install() method to install
+		an existing thread into an apartment
+	
+	- added Thread::Apartment::Container class to support
+		thread-local access to proxied, installed objects 
+		(primarily for Tk::Threaded)
+
+	- updated to use TQD 0.92
+	
+	- added psichedoc classdocs
+	
+	- changed to Academic Free License v2.1
+	
+	- added re-entrancy, AptReentrant constructor parameter,
+		ta_reentrant_ method prefix
+	
+	- added alternate async method support: start(), rendezvous()
+
+0.10	2005-Aug-31	D. Arnold
+	Development release.

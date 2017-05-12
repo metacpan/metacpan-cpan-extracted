@@ -1,0 +1,42 @@
+Revision history for Perl module Template-AutoFilter
+
+0.143050  2014-11-01 16:44:04+01:00 Europe/Berlin
+    - apply auto-filtering to individual directives instead of an entire tag,
+      i.e. [% IF foo; bar; ELSE; baz; END %]
+
+0.140770  2014-03-18 10:49:54-07:00 America/Los_Angeles
+    - removed 'use lib' which breaks some people ( thanks to Aran Deltac <aran@ziprecruiter.com> )
+    - skip interpolated text (ITEXT) sections which are not supported ( thanks to Thomas Sibley <tsibley@cpan.org> )
+
+0.132690  2013-09-26 10:17:29 Europe/Berlin
+    - comments or empty blocks are not autofiltered anymore ( thanks to Ryan Olson <ryan@ziprecruiter.com> )
+
+0.130420  2013-02-11 15:59:01 Europe/Berlin
+    - PERL/RAWPERL blocks are not autofiltered anymore
+
+0.112350  2011-08-23 15:48:51 Europe/Berlin
+    - blocks with implicit assignments are not autofiltered anymore
+
+0.112120  2011-07-31 22:23:37 Europe/Berlin
+    - load proper test module versions to get the abilities we want
+
+0.112070  2011-07-26 21:53:24 Europe/Berlin
+    - switched test IDE adaption to Test::InDistDir
+
+0.111980  2011-07-17 16:07:35 Europe/Berlin
+    - nested fields do not cause warnings anymore
+
+0.110080  2011-01-08 12:09:13 Europe/Berlin
+    - added an option to customize the directives to be skipped
+
+0.110050  2011-01-05 12:01:50 Europe/Berlin
+    - just a documentation improvement
+
+0.110032  2011-01-03 22:47:24 Europe/Berlin
+    - slightly more efficient exclusion of directives in the parser
+
+0.110030  2011-01-03 01:16:21 Europe/Berlin
+    - better selection of directives to be filtered ( thanks to Tina Müller <tinita@cpan.org> )
+
+0.110020  2011-01-02 17:49:56 Europe/Berlin
+    - initial release

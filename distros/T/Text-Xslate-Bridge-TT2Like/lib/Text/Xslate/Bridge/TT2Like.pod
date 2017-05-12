@@ -1,0 +1,228 @@
+=head1 NAME
+
+Text::Xslate::Bridge::TT2Like - TT2 Variable Method Clone For Text::Xslate
+
+=head1 SYNOPSIS
+
+    use Text::Xslate;
+
+    my $xslate = Text::Xslate->new(
+        module => [
+            'Text::Xslate::Bridge::TT2Like'
+        ],
+    );
+
+    # Note that all methods require a set of parenthesis to be
+    # recognized as a method.
+    $xslate->render_string(
+        '<: $foo.length() :>',
+        { foo => "foo" }
+    );
+
+    $xslate->render_string(
+        '<: $foo.replace("foo", "bar") :>',
+        { foo => "foo" }
+    );
+
+=head1 DESCRIPTION
+
+Text::Xslate::Bridge::TT2Like exports Template-Toolkit variable methods into
+Text::Xslate namespace, such that you can use them on your variables.
+
+The only difference between this module and Text::Xslate::Bridge::TT2 is that
+Bridge::TT2 uses Template::Toolkit underneath, while this module is independent
+of Template::Toolkit and therefore does not require TT to be installed
+
+=head1 AVAILABLE FUNCTIONS
+
+Upon loading Text::Xslate::Bridge::TT2Like, you will be able to use the
+following functions in your template. Please note that some functions like
+C<uri> are available from Text::Xslate to start with, so we don't 
+reimplment them. Check the manual for Text::Xslate for more info.
+
+
+=head2 C<array>
+
+=over 4
+
+=item C<item>
+
+=item C<list>
+
+=item C<hash>
+
+=item C<push>
+
+=item C<pop>
+
+=item C<unshift>
+
+=item C<shift>
+
+=item C<max>
+
+=item C<size>
+
+=item C<defined>
+
+=item C<first>
+
+=item C<last>
+
+=item C<reverse>
+
+=item C<grep>
+
+=item C<join>
+
+=item C<sort>
+
+=item C<nsort>
+
+=item C<unique>
+
+=item C<import>
+
+=item C<merge>
+
+=item C<slice>
+
+=item C<splice>
+
+
+=back
+
+=head2 C<function>
+
+=over 4
+
+=item C<html_para>
+
+=item C<html_break>
+
+=item C<html_para_break>
+
+=item C<html_line_break>
+
+=item C<xml>
+
+=item C<url>
+
+=item C<upper>
+
+=item C<lower>
+
+=item C<ucfirst>
+
+=item C<lcfirst>
+
+=item C<trim>
+
+=item C<null>
+
+=item C<collapse>
+
+=item C<indent>
+
+=item C<format>
+
+=item C<truncate>
+
+=item C<repeat>
+
+=item C<replace>
+
+=item C<remove>
+
+
+=back
+
+=head2 C<hash>
+
+=over 4
+
+=item C<item>
+
+=item C<hash>
+
+=item C<size>
+
+=item C<each>
+
+=item C<keys>
+
+=item C<values>
+
+=item C<items>
+
+=item C<pairs>
+
+=item C<list>
+
+=item C<exists>
+
+=item C<defined>
+
+=item C<delete>
+
+=item C<import>
+
+=item C<sort>
+
+=item C<nsort>
+
+
+=back
+
+=head2 C<scalar>
+
+=over 4
+
+=item C<item>
+
+=item C<list>
+
+=item C<hash>
+
+=item C<length>
+
+=item C<size>
+
+=item C<defined>
+
+=item C<match>
+
+=item C<search>
+
+=item C<repeat>
+
+=item C<replace>
+
+=item C<remove>
+
+=item C<split>
+
+=item C<chunk>
+
+=item C<substr>
+
+
+=back
+
+
+=head1 ACKNOWLEDGEMENT
+
+Original code was taken from Template::VMethods, Template::Filters by Andy Wardley.
+
+=head1 AUTHOR
+
+Copyright (c) 2010 Daisuke Maki C<< <daisuke@endeworks.jp> >>
+
+=head1 LICENSE 
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

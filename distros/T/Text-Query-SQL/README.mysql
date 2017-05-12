@@ -1,0 +1,7 @@
+Short example for installing Msql-Mysql-modules-1.2017 :
+
+MYSQL_HOME=/usr IN_MYSQL_DISTRIBUTION=1 \
+ DBI_DB=mysql DBI_DSN=dbi:mysql:mysql DBI_USER=root DBI_PASS=passpass \
+ perl Makefile.PL
+make all
+make install

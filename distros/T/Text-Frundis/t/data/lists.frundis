@@ -1,0 +1,77 @@
+.Ch An interesting chapter
+.Bl
+.It
+I no see really why it is interesting.
+.It
+But it is.
+.El
+.Bl
+.It
+un
+.It deux
+.It
+trois
+.El
+.P
+.Bl
+.It
+un
+.It
+deux
+.It
+trois
+.El
+quatre.
+.Ch Another interesting chapter
+It is an interesting chapter:
+.Bl
+.It
+I no see really why it is interesting.
+.It
+But it is.
+.El
+.Bl -t enum
+.It first point
+.It
+.Sm second point
+.It text \&
+and more text
+.It
+and even more text
+.Sm in fourth point
+.El
+.\" description lists
+.Bl -t desc
+.It a description list
+is this.
+.It a poem
+is another thing.
+.El
+.\" nested lists
+.Bl
+.It
+.Bl
+.It
+a nested
+.It
+list
+.El
+.It
+Item text.
+.El
+.Bl -t enum
+.It
+.Bl -t enum
+.It some text in the nested list
+.It some other text in the nested list
+.El
+.It some text in the main list
+.El
+.Bl
+.It
+.Sm emphasized text
+Text
+.It
+.Sm more emphasized text
+Text.
+.El

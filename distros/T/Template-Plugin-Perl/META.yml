@@ -1,0 +1,15 @@
+abstract: TT2 plugin to import Perl built-in functions
+author: 'Agent Zhang, <agentzh@gmail.com>'
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Template-Plugin-Perl
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dumper: 0
+  Template: 0
+  perl: 5.004
+version: 0.06

@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+
+use File::Spec        qw( );
+use Getopt::Long 2.19 qw( GetOptions );
+
+my $DEBUG;
+my $prefix;
+GetOptions ('debug'    => \$DEBUG,
+            'prefix=s' => \$prefix,)
+  or die "Options parsing failed";
+
+my $perl;
+for (split /:/, $ENV{PATH}) {
+  my $try = File::Spec->catfile($_, 'perl');
+  $perl = $try, last
+    if -x $try;
+}
+
+die "Couldn't find a perl in your path!\n"
+  unless defined $perl;
+
+my @cmd = ($perl, 'Makefile.PL');
+push @cmd, sprintf "PREFIX=%s", $prefix
+  if defined $prefix;
+
+if ( $DEBUG ) {
+  print join (' ', @cmd), "\n";
+} else {
+  exec @cmd;
+}

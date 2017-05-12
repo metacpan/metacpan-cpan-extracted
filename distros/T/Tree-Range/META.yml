@@ -1,0 +1,27 @@
+---
+abstract: 'Map values belonging to non-overlapping ranges using a tree'
+author:
+  - 'Ivan Shmakov <oneingray@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::Fatal: 0.01
+  Test::More: 0.98
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120351'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tree-Range
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 1.2
+  Scalar::Util: 1.27
+  Tree::RB: 0.500003
+  perl: 5.01
+resources:
+  repository: http://am-1.org/~ivan/archives/git/tree-range-2013.git/
+version: 0.22

@@ -1,0 +1,991 @@
+This patch is already applied to files in Tk-OS2 distribution!
+
+It summarizes my changes to Illya Vaes's port to make it work with
+version 8.0 of Tk.
+
+diff -pru Tk402.003.db/pTk\mTk\os2/pTk.exc Tk800.005/pTk\mTk\os2/pTk.exc
+--- Tk402.003.db/pTk/mTk/os2/pTk.exc	Tue Feb  3 00:32:00 1998
++++ Tk800.005/pTk/mTk/os2/pTk.exc	Sun May 31 18:03:04 1998
+@@ -4,3 +4,4 @@ dllMain.c
+ tkMain.c
+ tkImgPhoto.c
+ testMain.c
++tkUnixInt.h
+diff -pru Tk402.003.db/pTk\mTk\os2/stubs.c Tk800.005/pTk\mTk\os2/stubs.c
+--- Tk402.003.db/pTk/mTk/os2/stubs.c	Tue Feb  3 00:32:00 1998
++++ Tk800.005/pTk/mTk/os2/stubs.c	Sat May 30 15:29:14 1998
+@@ -30,7 +30,7 @@ XSetWMClientMachine(display, w, text_pro
+ {
+ }
+ 
+-Status
++int
+ XStringListToTextProperty(list, count, text_prop_return)
+     char** list;
+     int count;
+@@ -180,7 +180,7 @@ XGetWindowAttributes(display, w, window_
+     return 0;
+ }
+ 
+-Status
++int
+ XGetWMColormapWindows(display, w, windows_return, count_return)
+     Display* display;
+     Window w;
+@@ -420,7 +420,7 @@ XmbLookupString(ic, event, buffer_return
+     char* buffer_return;
+     int bytes_buffer;
+     KeySym* keysym_return;
+-    Status* status_return;
++    int* status_return;
+ {
+     return 0;
+ }
+@@ -588,3 +588,88 @@ TkSelCvtFromX(propPtr, numValues, type, 
+ }
+ 
+ 
++/* These are new calls which are not implemented in 8.0 port yet. */
++
++void             
++TkCreateXEventSource(void)
++{
++    panic("Not implemented: TkCreateXEventSource");
++}
++int		
++TkUnixDoOneXEvent(Tcl_Time *timePtr) {
++    panic("Not implemented: TkUnixDoOneXEvent");
++    return 0;
++}
++#if 0
++void		
++TkUnixSetMenubar(Tk_Window tkwin,Tk_Window menubar) {
++    panic("Not implemented: TkUnixSetMenubar");
++}
++#endif
++
++#if 0
++TkWindow *	
++TkWmFocusToplevel(TkWindow *winPtr) {
++    panic("Not implemented: TkWmFocusToplevel");
++    return 0;
++}
++#endif
++
++void		
++TkpCloseDisplay(TkDisplay *displayPtr)
++{
++    TkDisplay *dispPtr = (TkDisplay *) displayPtr;
++
++    if (dispPtr->display != 0) {
++#if 0
++        Tcl_DeleteFileHandler(ConnectionNumber(dispPtr->display));
++	
++        (void) XSync(dispPtr->display, False);
++        (void) XCloseDisplay(dispPtr->display);
++#endif
++    }
++    
++    ckfree((char *) dispPtr);
++}
++void		
++TkpMakeMenuWindow(Tk_Window tkwin, int transient) {
++    /* panic("Not implemented: TkpMakeMenuWindow"); */
++    return;		/* Hopefully is not needed on OS/2 ?! */
++}
++TkDisplay *	
++TkpOpenDisplay(char *display_name) {
++    TkDisplay *dispPtr;
++    Display *display = XOpenDisplay(display_name);
++
++    if (display == NULL) {
++	return NULL;
++    }
++    dispPtr = (TkDisplay *) ckalloc(sizeof(TkDisplay));
++    dispPtr->display = display;
++#if 0
++    Tcl_CreateFileHandler(ConnectionNumber(display), TCL_READABLE,
++	    DisplayFileProc, (ClientData) dispPtr);
++#endif
++    return dispPtr;
++}
++int		
++TkpWindowWasRecentlyDeleted(Window win, TkDisplay *dispPtr)
++{
++    panic("Not implemented: TkpWindowWasRecentlyDeleted");
++    return 0;    
++}
++void 
++XFreeFontNames(char**sp) {
++    panic("Not implemented: XFreeFontNames");
++}
++char **
++XListFonts(
++    Display* disp		/* display */,
++    _Xconst char* pat	/* pattern */,
++    int	maxn		/* maxnames */,
++    int*	actp	/* actual_count_return */
++)
++{
++    panic("Not implemented: XListFonts");
++    return NULL;
++}
+diff -pru Tk402.003.db/pTk\mTk\os2/tkOS2Default.h Tk800.005/pTk\mTk\os2/tkOS2Default.h
+--- Tk402.003.db/pTk/mTk/os2/tkOS2Default.h	Wed Feb  4 00:10:22 1998
++++ Tk800.005/pTk/mTk/os2/tkOS2Default.h	Sat Apr  4 11:34:58 1998
+@@ -90,6 +90,11 @@
+ #define DEF_BUTTON_VALUE		""
+ #define DEF_BUTTON_WIDTH		"0"
+ #define DEF_BUTTON_WRAP_LENGTH		"0"
++
++#define DEF_CHKRAD_ACTIVE_FG_COLOR	DEF_BUTTON_ACTIVE_FG_COLOR /*Unixish*/
++#define DEF_BUTTON_DEFAULT		"disabled"
++#define DEF_CHKRAD_FG			DEF_BUTTON_FG
++
+ #define DEF_RADIOBUTTON_VARIABLE	"selectedButton"
+ #define DEF_CHECKBUTTON_VARIABLE	""
+ 
+@@ -172,6 +177,7 @@
+ #define DEF_FRAME_BORDER_WIDTH		"0"
+ #define DEF_FRAME_CLASS			"Frame"
+ #define DEF_FRAME_COLORMAP		""
++#define DEF_FRAME_CONTAINER		"0"
+ #define DEF_FRAME_CURSOR		""
+ #define DEF_FRAME_HEIGHT		"0"
+ #define DEF_FRAME_HIGHLIGHT_BG		NORMAL_BG
+@@ -179,6 +185,7 @@
+ #define DEF_FRAME_HIGHLIGHT_WIDTH	"0"
+ #define DEF_FRAME_RELIEF		"flat"
+ #define DEF_FRAME_TAKE_FOCUS		"0"
++#define DEF_FRAME_USE			""
+ #define DEF_FRAME_VISUAL		""
+ #define DEF_FRAME_WIDTH			"0"
+ 
+@@ -235,6 +242,11 @@
+ #define DEF_MENU_ENTRY_SELECT	(char *) NULL
+ #define DEF_MENU_ENTRY_UNDERLINE	"-1"
+ 
++#define DEF_MENU_ENTRY_COLUMN_BREAK	"0"
++#define DEF_MENU_ENTRY_HIDE_MARGIN	"0"
++#define DEF_MENU_TITLE			""
++#define DEF_MENU_TYPE			"normal"
++
+ /*
+  * Defaults for menus overall:
+  */
+@@ -278,6 +290,7 @@
+ #define DEF_MENUBUTTON_BITMAP		""
+ #define DEF_MENUBUTTON_BORDER_WIDTH	"2"
+ #define DEF_MENUBUTTON_CURSOR		""
++#define DEF_MENUBUTTON_DIRECTION	"below"
+ #define DEF_MENUBUTTON_DISABLED_FG_COLOR DISABLED
+ #define DEF_MENUBUTTON_DISABLED_FG_MONO	""
+ /*
+@@ -423,6 +436,7 @@
+ #define DEF_TEXT_SELECT_BD_MONO		"0"
+ #define DEF_TEXT_SELECT_FG_COLOR	SELECT_FG
+ #define DEF_TEXT_SELECT_FG_MONO		WHITE
++#define DEF_TEXT_SELECT_RELIEF		"flat"
+ #define DEF_TEXT_SET_GRID		"0"
+ #define DEF_TEXT_SPACING1		"0"
+ #define DEF_TEXT_SPACING2		"0"
+@@ -436,11 +450,18 @@
+ #define DEF_TEXT_YSCROLL_COMMAND	""
+ 
+ /*
++ * Defaults for canvas text:
++ */
++
++#define DEF_CANVTEXT_FONT		"10.Courier"
++
++/*
+  * Defaults for toplevels (most of the defaults for frames also apply
+  * to toplevels):
+  */
+ 
+ #define DEF_TOPLEVEL_CLASS		"Toplevel"
++#define DEF_TOPLEVEL_MENU		""
+ #define DEF_TOPLEVEL_SCREEN		""
+ 
+ #endif /* _TKOS2DEFAULT */
+diff -pru Tk402.003.db/pTk\mTk\os2/tkOS2Draw.c Tk800.005/pTk\mTk\os2/tkOS2Draw.c
+--- Tk402.003.db/pTk/mTk/os2/tkOS2Draw.c	Thu Dec 25 07:14:10 1997
++++ Tk800.005/pTk/mTk/os2/tkOS2Draw.c	Sat May 30 15:12:40 1998
+@@ -606,7 +606,7 @@ XCopyPlane(display, src, dest, gc, src_x
+ #ifdef DEBUG
+         printf("    GpiBitBlt (clip_mask None) %x -> %x returns %x\n", srcPS,
+                destPS, rc);
+-fflush(stdout);
++/* fflush(stdout); */
+ #endif
+         rc= GpiSetColor(destPS, oldColor);
+         rc= GpiSetBackColor(destPS, oldBackColor);
+diff -pru Tk402.003.db/pTk\mTk\os2/tkOS2Int.h Tk800.005/pTk\mTk\os2/tkOS2Int.h
+--- Tk402.003.db/pTk/mTk/os2/tkOS2Int.h	Tue Feb  3 21:13:36 1998
++++ Tk800.005/pTk/mTk/os2/tkOS2Int.h	Sat May 30 20:50:46 1998
+@@ -194,6 +194,10 @@ typedef struct TkWmInfo {
+     int flags;			/* Miscellaneous flags, defined below. */
+     struct TkWmInfo *nextPtr;	/* Next in list of all top-level windows. */
+     Arg  cmdArg;
++    Tk_Window menubar;		/* Token for window that is to serve as
++				 * menubar for tkwin.  Must not be a
++				 * toplevel window. */
++    int menuHeight;		/* Height of the menubar. */
+ } WmInfo;
+ 
+ /*
+@@ -202,6 +206,9 @@ typedef struct TkWmInfo {
+  * WM_NEVER_MAPPED -		non-zero means window has never been
+  *				mapped;  need to update all info when
+  *				window is first mapped.
++ * WM_MB_NEVER_MAPPED -		non-zero means window's menubar has never been
++ *				mapped;  need to update all info when
++ *				window is first mapped.
+  * WM_UPDATE_PENDING -		non-zero means a call to UpdateGeometryInfo
+  *				has already been scheduled for this
+  *				window;  no need to schedule another one.
+@@ -239,6 +246,7 @@ typedef struct TkWmInfo {
+ #define WM_ADDED_TOPLEVEL_COLORMAP	(1<<9)
+ #define WM_WIDTH_NOT_RESIZABLE		(1<<10)
+ #define WM_HEIGHT_NOT_RESIZABLE		(1<<11)
++#define WM_MB_NEVER_MAPPED		(1<<12)
+ 
+ /*
+  * Window styles for various types of toplevel windows.
+diff -pru Tk402.003.db/pTk\mTk\os2/tkOS2Port.h Tk800.005/pTk\mTk\os2/tkOS2Port.h
+--- Tk402.003.db/pTk/mTk/os2/tkOS2Port.h	Tue Feb  3 00:32:00 1998
++++ Tk800.005/pTk/mTk/os2/tkOS2Port.h	Mon Apr  6 23:48:04 1998
+@@ -43,6 +43,14 @@
+ 
+ #define OPEN_MAX 32
+ 
++#ifndef howmany
++#   define howmany(x, y) (((x)+((y)-1))/(y))
++#endif
++#ifndef NFDBITS
++#   define NFDBITS NBBY*sizeof(fd_mask)
++#endif
++#define MASK_SIZE howmany(FD_SETSIZE, NFDBITS)
++
+ /*
+  * The following define causes Tk to use its internal keysym hash table
+  */
+@@ -102,5 +110,43 @@ extern int gettimeofday(struct timeval *
+ #endif /* __EMX__ */
+ 
+ extern void panic();
++
++/* Various stubs added from Unix and Windows variants. */
++
++/*
++ * These calls implement native bitmaps which are not supported under
++ * UNIX.  The macros eliminate the calls.
++ */
++
++#define TkpDefineNativeBitmaps()
++#define TkpCreateNativeBitmap(display, source) None
++#define TkpGetNativeAppBitmap(display, name, w, h) None
++
++/*
++ * These functions do nothing under Unix, so we just eliminate calls to them.
++ */
++
++#define TkpDestroyButton(butPtr) {}
++
++/*
++ * This macro stores a representation of the window handle in a string.
++ */
++
++#define TkpPrintWindowId(buf,w) \
++	sprintf((buf), "0x%x", (unsigned int) (w))
++	    
++/*
++ * TkpScanWindowId is just an alias for Tcl_GetInt on Unix.
++ */
++
++#define TkpScanWindowId(i,s,wp) \
++	Tcl_GetInt((i),(s),(wp))
++	    
++/*
++ * The following stubs implement various calls that don't do anything
++ * under Windows.
++ */
++
++#define TkpSync(display)
+ 
+ #endif /* _OS2PORT */
+diff -pru Tk402.003.db/pTk\mTk\os2/tkOS2Window.c Tk800.005/pTk\mTk\os2/tkOS2Window.c
+--- Tk402.003.db/pTk/mTk/os2/tkOS2Window.c	Tue Feb  3 00:32:00 1998
++++ Tk800.005/pTk/mTk/os2/tkOS2Window.c	Tue Apr  7 02:26:56 1998
+@@ -161,6 +161,12 @@ XDestroyWindow(display, w)
+         ckfree((char *)todPtr);
+ #endif
+         todPtr= NULL;
++#ifndef TK_PARENT_DESTROYED
++	/*
++	 * The TK_PARENT_DESTROYED symbol is no longer defined in Tk 8.0
++	 */
++#   define TK_PARENT_DESTROYED 0
++#endif
+     } else if (!(winPtr->flags & TK_PARENT_DESTROYED)) {
+         rc = WinDestroyWindow(hwnd);
+ #ifdef DEBUG
+diff -pru Tk402.003.db/pTk\mTk\os2/tkOS2Wm.c Tk800.005/pTk\mTk\os2/tkOS2Wm.c
+--- Tk402.003.db/pTk/mTk/os2/tkOS2Wm.c	Tue Feb  3 01:02:08 1998
++++ Tk800.005/pTk/mTk/os2/tkOS2Wm.c	Sun May 31 14:51:36 1998
+@@ -48,6 +48,15 @@ static Tk_GeomMgr wmMgrType = {
+     (Tk_GeomLostSlaveProc *) NULL,	/* lostSlaveProc */
+ };
+ 
++static void		MenubarReqProc _ANSI_ARGS_((ClientData clientData,
++			    Tk_Window tkwin));
++
++static Tk_GeomMgr menubarMgrType = {
++    "menubar",				/* name */
++    MenubarReqProc,			/* requestProc */
++    (Tk_GeomLostSlaveProc *) NULL,	/* lostSlaveProc */
++};
++
+ /*
+  * Global system palette.  This value always refers to the currently
+  * installed foreground logical palette.
+@@ -78,6 +87,7 @@ static void	UpdateGeometryInfo _ANSI_ARG
+ static void TkWmFreeCmd _ANSI_ARGS_((WmInfo *wmPtr));
+ static void           IdleMapToplevel _ANSI_ARGS_((ClientData clientData));
+ static void           UnmanageGeometry _ANSI_ARGS_((Tk_Window tkwin));
++static void	      MenubarDestroyProc(ClientData clientData, XEvent *eventPtr);
+ 
+ 
+ void
+@@ -191,7 +201,8 @@ TkOS2WmSetLimits(hwnd, info)
+         info->ptlMaxTrackSize.x = info->ptlMinTrackSize.x;
+     }
+     if (wmPtr->flags & WM_HEIGHT_NOT_RESIZABLE) {
+-        info->ptlMinTrackSize.y = winPtr->changes.height + wmPtr->borderHeight;
++        info->ptlMinTrackSize.y = winPtr->changes.height +
++	    wmPtr->borderHeight + wmPtr->menuHeight;
+         info->ptlMaxTrackSize.y = info->ptlMinTrackSize.y;
+     }
+ #ifdef DEBUG
+@@ -257,6 +268,8 @@ TkWmNewWindow(winPtr)
+     wmPtr->iconFor = NULL;
+     wmPtr->withdrawn = 0;
+     wmPtr->sizeHintsFlags = 0;
++    wmPtr->menubar = NULL;
++    wmPtr->menuHeight = 0;
+ 
+     /*
+      * Default the maximum dimensions to the size of the display.
+@@ -298,7 +311,7 @@ TkWmNewWindow(winPtr)
+     wmPtr->protPtr = NULL;
+     wmPtr->cmdArgv = NULL;
+     wmPtr->clientMachine = NULL;
+-    wmPtr->flags = WM_NEVER_MAPPED;
++    wmPtr->flags = WM_NEVER_MAPPED | WM_MB_NEVER_MAPPED;
+     wmPtr->nextPtr = firstWmPtr;
+     firstWmPtr = wmPtr;
+     wmPtr->cmdArg = NULL;
+@@ -333,8 +346,50 @@ WmInfo *wmPtr;
+     }
+ }
+ 
++
++TkWindow *	
++TkpGetWrapperWindow(TkWindow *winPtr) {
++    return winPtr->wmInfoPtr->reparent ? 
++	(TkWindow*) ((TkOS2Drawable*)winPtr->wmInfoPtr->reparent)->window.winPtr 
++	: winPtr;
++}
++
++void
++CreateMenubar(Tk_Window menubar, Tk_Window winPtr)
++{
++	WmInfo *wmPtr = ((TkWindow*)winPtr)->wmInfoPtr;
++	TkWindow *menubarPtr = (TkWindow *) menubar;
++	int ret;
+ 
+-
++#if 0
++	XReparentWindow(Tk_Display(menubar), Tk_WindowId(menubar),
++		wmPtr->wrapperPtr->window, 0, 0);
++#else
++	ret = WinSetParent(TkOS2GetHWND(menubarPtr->window),
++			   TkOS2GetHWND(wmPtr->reparent), TRUE);
++#   ifdef DEBUG
++        if (ret != TRUE) {
++            printf("WinSetParent menubar c %x, p %x ERROR %x\n", TkOS2GetHWND(menubarPtr->window),
++			   TkOS2GetHWND(wmPtr->reparent),
++                   WinGetLastError(hab));
++        } else {
++            printf("WinSetParent menubar c %x, p %x OK\n", TkOS2GetHWND(menubarPtr->window),
++			   TkOS2GetHWND(wmPtr->reparent));
++        }
++#  endif 
++#endif 
++	menubarPtr->wmInfoPtr = wmPtr;
++	Tk_MoveResizeWindow(menubar, wmPtr->xInParent, 
++			    /* wmPtr->yInParent is for the main subwindow. */
++			    wmPtr->yInParent - wmPtr->menuHeight,
++			    Tk_Width(winPtr), wmPtr->menuHeight);
++	Tk_MapWindow(menubar);
++	Tk_CreateEventHandler(menubar, StructureNotifyMask, MenubarDestroyProc,
++		(ClientData) menubar);
++	Tk_ManageGeometry(menubar, &menubarMgrType, (ClientData) wmPtr);
++	menubarPtr->flags |= TK_REPARENTED;
++	wmPtr->flags |= ~WM_MB_NEVER_MAPPED;
++}
+ 
+ /*
+  *--------------------------------------------------------------
+@@ -374,7 +429,7 @@ TkWmMapWindow(winPtr)
+ #endif
+ 
+     if (wmPtr->flags & WM_NEVER_MAPPED) {
+-	int x, y, width, height;
++	int x, y, width, height, yInParent;
+ 	TkOS2Drawable *parentPtr;
+ 	HWND frame = NULLHANDLE;
+         FRAMECDATA fcdata;
+@@ -481,8 +536,13 @@ TkWmMapWindow(winPtr)
+                    wmPtr->borderHeight);
+ #endif
+         }
++
++	yInParent = wmPtr->yInParent;
++	wmPtr->yInParent += wmPtr->menuHeight;
++
+         if (wmPtr->exStyle & FCF_TITLEBAR) {
+             wmPtr->borderHeight += titleBar;
++	    wmPtr->yInParent += titleBar;
+ #ifdef DEBUG
+             printf("FCF_TITLEBAR: bH now %d\n", wmPtr->borderHeight);
+ #endif
+@@ -497,7 +557,8 @@ TkWmMapWindow(winPtr)
+         wmPtr->flags &= ~(WM_CREATE_PENDING|WM_MOVE_PENDING);
+ 
+         width = wmPtr->borderWidth + winPtr->changes.width;
+-        height = wmPtr->borderHeight + winPtr->changes.height;
++        height = wmPtr->borderHeight + winPtr->changes.height 
++	    + wmPtr->menuHeight;
+ #ifdef DEBUG
+         printf("+ height %d -> %d\n", winPtr->changes.height, height);
+ #endif
+@@ -631,10 +692,14 @@ TkWmMapWindow(winPtr)
+         printf("    wmPtr->xInParent %d, wmPtr->yInParent %d\n",
+                wmPtr->xInParent, wmPtr->yInParent);
+ #endif
+-        WinSetWindowPos(child, HWND_TOP, wmPtr->xInParent, wmPtr->yInParent,
++        WinSetWindowPos(child, HWND_TOP, wmPtr->xInParent, yInParent,
+                   winPtr->changes.width, winPtr->changes.height,
+                   SWP_SIZE | SWP_MOVE | SWP_SHOW);
+ 
++	/* Now process menubar: */
++	if (wmPtr->menubar)
++            CreateMenubar(wmPtr->menubar, winPtr);
++
+ 	/*
+ 	 * Generate a reparent event.
+ 	 */
+@@ -662,6 +727,9 @@ TkWmMapWindow(winPtr)
+ 	}
+ 	UpdateGeometryInfo((ClientData) winPtr);
+ 
++        if ((wmPtr->flags & WM_MB_NEVER_MAPPED) && wmPtr->menubar)
++            CreateMenubar(wmPtr->menubar, winPtr);
++
+ 	/* If applicable, make visible in switch-list */
+         if (wmPtr->exStyle & FCF_TASKLIST) {
+             HSWITCH hSwitch;
+@@ -688,9 +756,9 @@ TkWmMapWindow(winPtr)
+             rc = WinChangeSwitchEntry(hSwitch, &switchData);
+ #ifdef DEBUG
+             if (rc != 0) {
+-                printf("WinChangeSwitchEntry ERROR %x\n", WinGetLastError(hab));
++                printf("WinChangeSwitchEntry ON ERROR %x\n", WinGetLastError(hab));
+             } else {
+-                printf("WinChangeSwitchEntry %x OK\n", hSwitch);
++                printf("WinChangeSwitchEntry ON %x OK\n", hSwitch);
+             }
+ #endif
+         }
+@@ -745,6 +813,7 @@ TkWmMapWindow(winPtr)
+ 	wmPtr->flags &= ~WM_SYNC_PENDING;
+     }
+ }
++
+ 
+ /*
+  *--------------------------------------------------------------
+@@ -811,9 +880,9 @@ TkWmUnmapWindow(winPtr)
+         rc = WinChangeSwitchEntry(hSwitch, &switchData);
+ #ifdef DEBUG
+         if (rc != 0) {
+-            printf("WinQuerySwitchEntry ERROR %x\n", WinGetLastError(hab));
++            printf("WinChangeSwitchEntry OFF ERROR %x\n", WinGetLastError(hab));
+         } else {
+-            printf("WinQuerySwitchEntry %x OK\n", hSwitch);
++            printf("WinChangeSwitchEntry OFF %x OK\n", hSwitch);
+         }
+ #endif
+     }
+@@ -855,7 +924,7 @@ TkWmDeadWindow(winPtr)
+ 	return;
+     }
+ #ifdef DEBUG
+-    printf("TkWmDeadWindow\n");
++    printf("TkWmDeadWindow %x\n", TkOS2GetHWND(winPtr->window));
+ #endif
+ 
+     /*
+@@ -909,6 +978,8 @@ TkWmDeadWindow(winPtr)
+     if (wmPtr->flags & WM_UPDATE_PENDING) {
+ 	Tcl_CancelIdleCall(UpdateGeometryInfo, (ClientData) winPtr);
+     }
++    if (wmPtr->menubar != NULL)
++	Tk_DestroyWindow(wmPtr->menubar);
+ 
+     /*
+      * Destroy the decorative frame window.  Note that the back pointer
+@@ -2105,9 +2176,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
+                 rc = WinChangeSwitchEntry(hSwitch, &switchData);
+ #ifdef DEBUG
+                 if (rc != 0) {
+-                    printf("WinChangeSwitchEntry ERROR %x\n", WinGetLastError(hab));
++                    printf("WinChangeSwitchEntry Title ERROR %x\n", WinGetLastError(hab));
+                 } else {
+-                    printf("WinChangeSwitchEntry %x OK\n", hSwitch);
++                    printf("WinChangeSwitchEntry Title %x OK\n", hSwitch);
+                 }
+ #endif
+ 		/*
+@@ -2538,7 +2609,7 @@ UpdateGeometryInfo(clientData)
+     }
+     if (wmPtr->flags & WM_NEGATIVE_Y) {
+ 	y = DisplayHeight(winPtr->display, winPtr->screenNum) - wmPtr->y
+-		- (height + wmPtr->borderHeight);
++		- (height + wmPtr->borderHeight + wmPtr->menuHeight);
+     } else {
+ 	y =  wmPtr->y;
+ #ifdef DEBUG
+@@ -2570,13 +2641,13 @@ UpdateGeometryInfo(clientData)
+ #ifdef DEBUG
+             printf("   WinSetWindowPos(%x HWND_TOP %d, %d, %d, %d SIZE|MOVE)\n",
+                    TkOS2GetHWND(wmPtr->reparent), x,
+-                   yScreen - (y + height + wmPtr->borderHeight),
+-                   width + wmPtr->borderWidth, height + wmPtr->borderHeight);
++                   yScreen - (y + height + wmPtr->borderHeight + wmPtr->menuHeight),
++                   width + wmPtr->borderWidth, height + wmPtr->borderHeight + wmPtr->menuHeight);
+ #endif
+ 	    WinSetWindowPos(TkOS2GetHWND(wmPtr->reparent), HWND_TOP,
+-                            x, yScreen - (y + height + wmPtr->borderHeight),
++                            x, yScreen - (y + height + wmPtr->borderHeight + wmPtr->menuHeight),
+                             width + wmPtr->borderWidth,
+-                            height + wmPtr->borderHeight, SWP_SIZE | SWP_MOVE);
++                            height + wmPtr->borderHeight + wmPtr->menuHeight, SWP_SIZE | SWP_MOVE);
+             wmPtr->flags &= ~WM_SYNC_PENDING;
+         } else {
+             winPtr->changes.x = x;
+@@ -2589,6 +2660,22 @@ UpdateGeometryInfo(clientData)
+                    winPtr->changes.width, winPtr->changes.height);
+ #endif
+         }
++    } else if ((wmPtr->menubar != NULL)
++	    && ((Tk_Width(wmPtr->menubar) != winPtr->changes.width)
++	    || (Tk_Height(wmPtr->menubar) != wmPtr->menuHeight))) {
++	/*
++	 * It is possible that the window's overall size has not changed
++	 * but the menu size has.
++	 */
++	
++	Tk_MoveResizeWindow(wmPtr->menubar, wmPtr->xInParent, 
++			    /* wmPtr->yInParent is for the main subwindow. */
++			    wmPtr->yInParent - Tk_Height(wmPtr->menubar),
++			    winPtr->changes.width, wmPtr->menuHeight);
++	WinSetWindowPos(TkOS2GetHWND(wmPtr->reparent), HWND_TOP,
++			x, yScreen - (y + height + wmPtr->borderHeight + wmPtr->menuHeight),
++			width + wmPtr->borderWidth,
++			height + wmPtr->borderHeight + wmPtr->menuHeight, SWP_SIZE /*| SWP_MOVE*/);
+     } else {
+ 	return;
+     }
+@@ -2771,6 +2858,19 @@ Tk_GetRootCoords(tkwin, xPtr, yPtr)
+     while (1) {
+ 	x += winPtr->changes.x + winPtr->changes.border_width;
+ 	y += winPtr->changes.y + winPtr->changes.border_width;
++	if ((winPtr->wmInfoPtr != NULL)
++		&& (winPtr->wmInfoPtr->menubar == (Tk_Window) winPtr)) {
++	    /*
++	     * This window is a special menubar; switch over to its
++	     * associated toplevel, compensate for their differences in
++	     * y coordinates, then continue with the toplevel (in case
++	     * it's embedded).
++	     */
++
++	    y -= winPtr->wmInfoPtr->menuHeight;
++	    winPtr = winPtr->wmInfoPtr->winPtr;
++	    continue;
++	}
+ 	if (winPtr->flags & TK_TOP_LEVEL) {
+ 	    x += winPtr->wmInfoPtr->xInParent;
+ 	    y += winPtr->wmInfoPtr->yInParent;
+@@ -3280,7 +3380,7 @@ TkOS2WmConfigure(winPtr, pos)
+ {
+     XEvent event;
+     WmInfo *wmPtr;
+-    int width, height;
++    int width, height, notify_bar = 0;
+     SWP swp;
+     ULONG x11y;
+     ULONG rc;
+@@ -3333,7 +3433,7 @@ TkOS2WmConfigure(winPtr, pos)
+ #endif
+ 
+     width = pos->cx - wmPtr->borderWidth;
+-    height = pos->cy - wmPtr->borderHeight;
++    height = pos->cy - wmPtr->borderHeight - wmPtr->menuHeight;
+ 
+     /*
+      * Update size information from the event.  There are a couple of
+@@ -3395,23 +3495,49 @@ TkOS2WmConfigure(winPtr, pos)
+      * Update the shape of the contained window.
+      */
+ 
+-    winPtr->changes.x = pos->x;
+     if (wmPtr->exStyle & FCF_TITLEBAR) {
+         x11y += titleBar;
+ #ifdef DEBUG
+-        printf("TkOS2WmConfigure: adding FCF_TITLEBAR (%d)\n", titleBar);
++        printf("TkOS2WmConfigure: adding FCF_TITLEBAR height (%d)\n", titleBar);
+ #endif
+     }
+-    winPtr->changes.y = x11y;
+-    winPtr->changes.width = width;
+-    winPtr->changes.height = height;
+-#ifdef DEBUG
+-    printf("TkOS2WmConfigure %x, width %d, height %d, wmPtr->width %d, wmPtr->height %d\n",
+-           TkOS2GetHWND(wmPtr->reparent), width, height,
+-           wmPtr->width, wmPtr->height);
++    x11y += wmPtr->menuHeight;
++    
++#if 0
++    /* Ignore initial activate message: */
++    if (pos->fl != (pos->fl & (SWP_FOCUSACTIVATE | SWP_FOCUSDEACTIVATE))
++	&& (winPtr->changes.x != pos->x 
++            || winPtr->changes.y != x11y
++            || winPtr->changes.width != width
++            || winPtr->changes.height != height)) {
++#endif
++        winPtr->changes.x = pos->x;
++        winPtr->changes.y = x11y;
++        winPtr->changes.width = width;
++        winPtr->changes.height = height;
++#ifdef DEBUG
++        printf("TkOS2WmConfigure inside %x, width %d, height %d, wmPtr->width %d, wmPtr->height %d\n",
++               TkOS2GetHWND(wmPtr->reparent), width, height,
++               wmPtr->width, wmPtr->height);
++#endif
++        WinSetWindowPos(TkOS2GetHWND(winPtr->window), HWND_TOP, wmPtr->xInParent,
++                        pos->cy - wmPtr->yInParent - height, width, height, SWP_MOVE | SWP_SIZE);
++
++	if (wmPtr->menubar) {
++	    Tk_MoveResizeWindow(wmPtr->menubar, wmPtr->xInParent, 
++				wmPtr->yInParent - wmPtr->menuHeight,
++				width, wmPtr->menuHeight);
++#if 0
++	    WinSetWindowPos(TkOS2GetHWND(((TkWindow*)wmPtr->menubar)->window), 
++			    HWND_TOP, wmPtr->xInParent,
++			    pos->cy - wmPtr->yInParent, 
++			    width, wmPtr->menuHeight, SWP_MOVE | SWP_SIZE);
++#endif
++	    notify_bar = 1;
++	}
++#if 0
++    }
+ #endif
+-    WinSetWindowPos(TkOS2GetHWND(winPtr->window), HWND_TOP, wmPtr->xInParent,
+-                    wmPtr->yInParent, width, height, SWP_MOVE | SWP_SIZE);
+ 
+     /*
+      * Generate a ConfigureNotify event.
+@@ -3439,6 +3565,36 @@ TkOS2WmConfigure(winPtr, pos)
+         event.xconfigure.above = None;
+     }
+     Tk_QueueWindowEvent(&event, TCL_QUEUE_TAIL);
++    if (notify_bar) {
++	TkWindow *menubarPtr = (TkWindow *) wmPtr->menubar;
++	
++	/*
++	 * Generate a ConfigureNotify event.
++	 */
++
++	event.type = ConfigureNotify;
++	event.xconfigure.serial = winPtr->display->request;
++	event.xconfigure.send_event = False;
++	event.xconfigure.display = winPtr->display;
++	event.xconfigure.event = menubarPtr->window;
++	event.xconfigure.window = menubarPtr->window;
++	event.xconfigure.border_width = menubarPtr->changes.border_width;
++	event.xconfigure.override_redirect = menubarPtr->atts.override_redirect;
++	event.xconfigure.x = pos->x;
++	event.xconfigure.y = x11y - wmPtr->menuHeight;
++	event.xconfigure.width = width;
++	event.xconfigure.height = wmPtr->menuHeight;
++#ifdef DEBUG
++	printf("    event: x %d, y %d, w %d, h %d\n", event.xconfigure.x,
++	       event.xconfigure.y, event.xconfigure.width, event.xconfigure.height);
++#endif
++	if (menubarPtr->changes.stack_mode == Above) {
++	    event.xconfigure.above = winPtr->changes.sibling;
++	} else {
++	    event.xconfigure.above = None;
++	}
++	Tk_QueueWindowEvent(&event, TCL_QUEUE_TAIL);
++    }
+ }
+ 
+ /*
+@@ -3924,5 +4080,206 @@ GetMaxSize(wmPtr, maxWidthPtr, maxHeight
+                     + (tmp - wmPtr->winPtr->reqHeight)/wmPtr->heightInc;
+         }
+         *maxHeightPtr = tmp;
++    }
++}
++
++/*
++ *----------------------------------------------------------------------
++ *
++ * TkWmFocusToplevel --
++ *
++ *	This is a utility procedure invoked by focus-management code. It
++ *	exists because of the extra wrapper windows that exist under
++ *	Unix; its job is to map from wrapper windows to the
++ *	corresponding toplevel windows.  On PCs and Macs there are no
++ *	wrapper windows so no mapping is necessary;  this procedure just
++ *	determines whether a window is a toplevel or not.
++ *
++ * Results:
++ *	If winPtr is a toplevel window, returns the pointer to the
++ *	window; otherwise returns NULL.
++ *
++ * Side effects:
++ *	None.
++ *
++ *----------------------------------------------------------------------
++ */
++
++TkWindow *
++TkWmFocusToplevel(winPtr)
++    TkWindow *winPtr;		/* Window that received a focus-related
++				 * event. */
++{
++    if (!(winPtr->flags & TK_TOP_LEVEL)) {
++	return NULL;
++    }
++    return winPtr;
++}
++
++/* This is stolen from tkUnixWm.c */
++
++/*
++ *----------------------------------------------------------------------
++ *
++ * MenubarDestroyProc --
++ *
++ *	This procedure is invoked by the event dispatcher whenever a
++ *	menubar window is destroyed (it's also invoked for a few other
++ *	kinds of events, but we ignore those).
++ *
++ * Results:
++ *	None.
++ *
++ * Side effects:
++ *	The association between the window and its toplevel is broken,
++ *	so that the window is no longer considered to be a menubar.
++ *
++ *----------------------------------------------------------------------
++ */
++
++static void
++MenubarDestroyProc(clientData, eventPtr)
++    ClientData clientData;		/* TkWindow pointer for menubar. */
++    XEvent *eventPtr;			/* Describes what just happened. */
++{
++    WmInfo *wmPtr;
++
++    if (eventPtr->type != DestroyNotify) {
++	return;
++    }
++    wmPtr = ((TkWindow *) clientData)->wmInfoPtr;
++    wmPtr->menubar = NULL;
++    wmPtr->menuHeight = 0;
++    wmPtr->flags |= (WM_UPDATE_SIZE_HINTS | WM_MB_NEVER_MAPPED);
++    if (!(wmPtr->flags & (WM_UPDATE_PENDING|WM_NEVER_MAPPED))) {
++	Tcl_DoWhenIdle(UpdateGeometryInfo, (ClientData) wmPtr->winPtr);
++	wmPtr->flags |= WM_UPDATE_PENDING;
++    }
++}
++/*
++ *----------------------------------------------------------------------
++ *
++ * TkUnixSetMenubar --
++ *
++ *	This procedure is invoked by menu management code to specify the
++ *	window to use as a menubar for a given toplevel window.
++ *
++ * Results:
++ *	None.
++ *
++ * Side effects:
++ *	The window given by menubar will be mapped and positioned inside
++ *	the wrapper for tkwin and above tkwin.  Menubar will
++ *	automatically be resized to maintain the height specified by
++ *	TkUnixSetMenuHeight the same width as tkwin.  Any previous
++ *	menubar specified for tkwin will be unmapped and ignored from
++ *	now on.
++ *
++ *----------------------------------------------------------------------
++ */
++
++void
++TkUnixSetMenubar(tkwin, menubar)
++    Tk_Window tkwin;		/* Token for toplevel window. */
++    Tk_Window menubar;		/* Token for window that is to serve as
++				 * menubar for tkwin.  Must not be a
++				 * toplevel window.  If NULL, any
++				 * existing menubar is canceled and the
++				 * menu height is reset to 0. */
++{
++    WmInfo *wmPtr = ((TkWindow *) tkwin)->wmInfoPtr;
++    Tk_Window parent;
++    TkWindow *menubarPtr = (TkWindow *) menubar;
++    int ret;
++
++    if (wmPtr->menubar != NULL) {
++	/*
++	 * There's already a menubar for this toplevel.  If it isn't the
++	 * same as the new menubar, unmap it so that it is out of the
++	 * way, and reparent it back to its original parent.
++	 */
++
++	if (wmPtr->menubar == menubar) {
++	    return;
++	}
++	((TkWindow *) wmPtr->menubar)->wmInfoPtr = NULL;
++	((TkWindow *) wmPtr->menubar)->flags &= ~TK_REPARENTED;
++	Tk_UnmapWindow(wmPtr->menubar);
++	parent = Tk_Parent(wmPtr->menubar);
++	if (parent != NULL) {
++	    Tk_MakeWindowExist(parent);
++	    XReparentWindow(Tk_Display(wmPtr->menubar),
++		    Tk_WindowId(wmPtr->menubar), Tk_WindowId(parent), 0, 0);
++	}
++	Tk_DeleteEventHandler(wmPtr->menubar, StructureNotifyMask,
++		MenubarDestroyProc, (ClientData) wmPtr->menubar);
++	Tk_ManageGeometry(wmPtr->menubar, NULL, (ClientData) NULL);
++    }
++
++    wmPtr->menubar = menubar;
++    if (menubar == NULL) {
++	wmPtr->menuHeight = 0;
++    } else {
++
++#ifdef REGISTER_MQ
++	REGISTER_MQ;
++#endif
++
++	if ((menubarPtr->flags & TK_TOP_LEVEL)
++	     || (Tk_Screen(menubar) != Tk_Screen(tkwin))) {
++	    panic("TkUnixSetMenubar got bad menubar");
++	}
++	wmPtr->menuHeight = Tk_ReqHeight(menubar);
++	if (wmPtr->menuHeight <= 1) {
++	    wmPtr->menuHeight = 20;
++	}
++	Tk_MakeWindowExist(tkwin);
++	Tk_MakeWindowExist(menubar);
++
++	if (wmPtr->reparent) {
++	    CreateMenubar(menubar,tkwin);
++	}
++    }
++    wmPtr->flags |= WM_UPDATE_SIZE_HINTS;
++    if (!(wmPtr->flags & (WM_UPDATE_PENDING|WM_NEVER_MAPPED))) {
++	Tcl_DoWhenIdle(UpdateGeometryInfo, (ClientData) tkwin);
++	wmPtr->flags |= WM_UPDATE_PENDING;
++    }
++}
++
++/*
++ *----------------------------------------------------------------------
++ *
++ * MenubarReqProc --
++ *
++ *	This procedure is invoked by the Tk geometry management code
++ *	whenever a menubar calls Tk_GeometryRequest to request a new
++ *	size.
++ *
++ * Results:
++ *	None.
++ *
++ * Side effects:
++ *	None.
++ *
++ *----------------------------------------------------------------------
++ */
++
++static void
++MenubarReqProc(clientData, tkwin)
++    ClientData clientData;	/* Pointer to the window manager
++				 * information for tkwin's toplevel. */
++    Tk_Window tkwin;		/* Handle for menubar window. */
++{
++    WmInfo *wmPtr = (WmInfo *) clientData;
++
++    wmPtr->menuHeight = Tk_ReqHeight(tkwin);
++    if (wmPtr->menuHeight <= 0) {
++	wmPtr->menuHeight = 1;
++    }
++    wmPtr->flags |= WM_UPDATE_SIZE_HINTS;
++    if (!(wmPtr->flags & (WM_UPDATE_PENDING|WM_NEVER_MAPPED))) {
++	Tcl_DoWhenIdle(UpdateGeometryInfo, (ClientData) wmPtr->winPtr);
++	wmPtr->flags |= WM_UPDATE_PENDING;
+     }
+ }
+diff -pru Tk402.003.db/pTk\mTk\os2/tkOS2X.c Tk800.005/pTk\mTk\os2/tkOS2X.c
+--- Tk402.003.db/pTk/mTk/os2/tkOS2X.c	Sat Feb  7 15:05:42 1998
++++ Tk800.005/pTk/mTk/os2/tkOS2X.c	Sun May 31 01:18:52 1998
+@@ -791,6 +791,11 @@ TranslateEvent(hwnd, message, param1, pa
+ 	return;
+     }
+ 
++    /* WM_CLOSE message might have been misdirected to a menubar: */
++    if (message == WM_CLOSE && winPtr->wmInfoPtr 
++	&& winPtr == winPtr->wmInfoPtr->menubar) 
++	winPtr = winPtr->wmInfoPtr->winPtr;
++
+     hwndTop = hwnd;
+     hwnd = TkOS2GetHWND(winPtr->window);
+ 
+@@ -841,6 +846,7 @@ TranslateEvent(hwnd, message, param1, pa
+             printf("TranslateEvent WM_CLOSE hwnd %x\n", hwnd);
+ #endif
+ 	    event.type = ClientMessage;
++
+ 	    event.xclient.message_type =
+ 		Tk_InternAtom((Tk_Window) winPtr, "WM_PROTOCOLS");
+ 	    event.xclient.format = 32;
+@@ -1328,6 +1334,14 @@ DeleteWindow(hwnd)
+ {
+     TkOS2Drawable *todPtr;
+     Tcl_HashEntry *hPtr;
++
++#if 0
++    /* WM_CLOSE message might have been misdirected to a menubar: */
++    if (winPtr == wmPtr->menubar && wmPtr->winPtr) {
++	Tk_DestroyWindow(wmPtr->winPtr);
++	return;
++    }
++#endif
+ 
+     /*
+      * Remove the window from the window table.

@@ -1,0 +1,26 @@
+0.05 2016-03-23T21:22:44+01:00
+ - Add LICENSE file.
+ - Add tests for finalize() and open_tags() methods.
+ - Fix finalize() in SGML mode.
+ - Rewrite test files to better names.
+ - Update copyright years.
+
+0.04 2015-10-27T12:41:11+01:00
+ - Improve SEE ALSO section in doc.
+ - Improve doc.
+ - Move author tests to xt/ directory.
+
+0.03 2015-08-25T23:02:33+02:00
+ - Fix perl version in Makefile.PL and META.yml.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+
+0.02 2015-08-24T11:36:34+02:00
+ - Add Test::NoWarnings to version test.
+ - Add examples/ directory.
+ - Add minimal version of Perl.
+ - Fix test dependencies.
+ - Update Module::Install to 1.16 version.
+
+0.01 2015-03-17T10:54:46+01:00
+ - First version.

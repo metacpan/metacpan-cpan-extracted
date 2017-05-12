@@ -1,0 +1,18 @@
+Revision history for Perl extension Term::Twiddle.
+
+2.73  Tests now work in non-interactive environments (RSRCHBOY)
+
+2.72  DESTRUCTOR now invokes stop() method when object goes out of
+      scope.
+
+2.71  Minor fix for 'use warnings' cleanness
+
+2.70  Added new 'type' method (and supporting methods) for bouncing
+      ball and swishing motion. The bouncing ball is really cool!
+
+2.61  Removed 'use warnings' for faithful 5.005 users.
+
+2.60  Use Time::HiRes for setitimer implementation.
+
+2.51  First public release (but has been in private use for several
+      years).

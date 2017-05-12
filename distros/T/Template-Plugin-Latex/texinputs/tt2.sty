@@ -1,0 +1,37 @@
+%\iffalse
+\NeedsTeXFormat{LaTeX2e}[1994/12/01}
+\ProvidesPackage{tt2}
+%\fi
+% \title{The \textsf{tt2} package}
+% \author{\copyright\ 2007, Andrew Ford}
+% \maketitle
+%
+% \section{Overview}
+%
+% This package defines a single command, |\TTCODE|, which can be used
+% to identify Template Toolkit (TT2) code in a template LaTeX file.
+%
+% \section{|\TTCODE| command}
+%
+% The |\TTCODE| command is used to wrap Template Toolkit code.
+%
+% When run from the Template Toolkit LaTeX plugin the command
+% |\TTLATEX| is defined; in this case we define |\TTCODE| as a no-op,
+% taking no arguments -- the TT code will get evaluated by TT and we
+% typset the resulting text.
+%
+% If |\TTLATEX| is not defined then we define |\TTCODE| as a macro
+% taking one argument -- the TT code -- which we set in a small
+% typewriter font.
+%
+%    \begin{macrocode}
+\expandafter\ifx\csname TTLATEX\endcsname\relax
+\newcommand{\TTCODE}[1]{\texttt{\small #1}}
+\else
+\newcommand{\TTCODE}{}
+\fi
+%    \end{macrocode}
+%
+% \Finale
+%
+\endinput

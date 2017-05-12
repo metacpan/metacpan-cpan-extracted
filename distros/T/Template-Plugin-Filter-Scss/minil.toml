@@ -1,0 +1,4 @@
+name = "Template-Plugin-Filter-Scss"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

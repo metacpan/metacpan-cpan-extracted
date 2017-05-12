@@ -1,0 +1,8 @@
+Changes
+=======
+
+0.02 - 16 Nov 2005
+  - Add POD tests (only run on disttest)
+
+0.01 - 22 Jun 2005
+  - Initial CPAN release

@@ -1,0 +1,21 @@
+---
+name: Test-XML-Order
+version: 1.01
+author: []
+abstract: Compare the order of XML tags in perl tests
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.006
+recommends:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Test::XML::Order:
+    file: lib/Test/XML/Order.pm
+    version: 1.01
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

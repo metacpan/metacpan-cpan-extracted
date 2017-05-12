@@ -1,0 +1,13 @@
+MANIFEST
+Makefile.PL
+ShellKit.pm
+ShellKit/AutoPager.pm
+ShellKit/Changes.pod
+ShellKit/Commands.pm
+ShellKit/DBI.pm
+ShellKit/Dev.pm
+ShellKit/LineBuffer.pm
+ShellKit/ReadMe.pod
+ShellKit/TextFile.pm
+ShellKit/ToDo.pod
+test.pl

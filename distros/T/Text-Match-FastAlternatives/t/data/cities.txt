@@ -1,0 +1,63 @@
+Cities in which a YAPC has been held, ordered by start date of the first
+YAPC in that city, according to http://en.wikipedia.org/wiki/YAPC
+
+  Pittsburgh     24 Jun 1999
+  London         22 Sep 1999
+  Montréal       13 Jun 2001
+  Amsterdam      02 Aug 2001
+  Saint Louis    26 Jun 2002
+  München        18 Sep 2002
+  חיפה           11 May 2003
+  Ottawa         15 May 2003
+  Boca Raton     16 Jun 2003
+  Paris          23 Jul 2003
+  הרצליה         26 Feb 2004
+  Buffalo        16 Jun 2004
+  Belfast        15 Sep 2004
+  臺北市         26 Mar 2005
+  Porto Alegre   01 Jun 2005
+  Toronto        27 Jun 2005
+  Braga          31 Aug 2005
+  東京           29 Mar 2006
+  Chicago        26 Jun 2006
+  Birmingham     30 Aug 2006
+  São Paulo      03 Nov 2006
+  Houston        25 Jun 2007
+  Wien           28 Aug 2007
+  Москва         17 May 2008
+  København      13 Aug 2008
+
+In addition, workshops have been held in (among others);
+
+  London
+  Sankt Augustin
+  Budapest
+  København
+  Bonn
+  Arnhem
+  Wien
+  Paris
+  Schorndorf
+  Pisa
+  Dresden
+  Marseilles
+  Stockholm
+  Bochum
+  Delft
+  Oslo
+  Pittsburgh
+  München
+  Boston
+  Москва
+  Bruxelles
+  Lyon
+  Ramat Efal
+  Erlangen
+  Minneapolis
+  Київ
+  Zagreb
+  Albi
+  Braga
+  Владивосток
+  Bratislava
+  Мінск

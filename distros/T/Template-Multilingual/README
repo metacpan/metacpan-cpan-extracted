@@ -1,0 +1,54 @@
+$Id: README,v 1.2 2006-08-26 11:52:51 eric Exp $
+
+--------
+Abstract
+--------
+
+This subclass of Template Toolkit supports multilingual templates: templates that
+contain text in several languages.
+
+    <t>
+      <en>Hello!</en>
+      <fr>Bonjour !</fr>
+    </t>
+
+Then specify the language to use when processing a template:
+
+    use Template::Multilingual;
+
+    my $template = Template::Multilingual->new();
+    $template->language('en');
+    $template->process('example.ttml');
+
+------------
+Requirements
+------------
+
+This module requires Template Toolkit.
+
+------------
+Installation
+------------
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, 2006 Eric Cholet
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

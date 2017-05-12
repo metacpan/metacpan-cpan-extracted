@@ -1,0 +1,90 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@c unicode.texi
+@setfilename simple.info
+@settitle Simple Test
+@documentencoding UTF-8
+@c %**end of header
+
+@ifinfo
+@node Top, Naïve Overview, (dir), (dir)
+@top Unicode Tést
+
+This document tests Unicode handling in Texinfo::Menus.
+
+@menu
+* Naïve Overview::              This is the naïve overview
+* Data Structures::             This is the data structures chapter
+* Syntax::                      This is the syntax chapter
+@end menu
+@end ifinfo
+
+@node Naïve Overview, Data Structures, Top, Top
+@chapter Naïve Overview
+@c DESC: This is the naïve overview
+
+Overview goes here.
+
+@node Data Structures, Syntax, Naïve Overview, Top
+@chapter Data Structures
+@c DESC: This is the data structures chapter
+
+This part comes before the menu.
+
+@menu
+* Vâriable names::              The vâriable names section
+* Context::                     The Context section
+* Scalar values::               The scalar values section
+@end menu
+
+This part comes after the menu.
+
+@node Vâriable names, Context, Data Structures, Data Structures
+@section Vâriable names
+@c DESC: The vâriable names section
+
+Variable names defined here.
+
+@node Context, Scalar values, Vâriable names, Data Structures
+@section Context
+@c DESC: The Context section
+
+Context goes here.
+
+@node Scalar values, , Context, Data Structures
+@section Scalar values
+@c DESC: The scalar values section
+
+Scalar values go here.
+
+@node Syntax, , Data Structures, Top
+@chapter Syntax
+@c DESC: This is the syntax chapter
+
+Syntax goes here.  This comes before the menu.
+
+@menu
+* Syntax Overview::             The syntax overview section
+* Declarations::                The declarations section
+* Comments::                    The comments section
+@end menu
+
+@node Syntax Overview, Declarations, Syntax, Syntax
+@section Syntax Overview
+@c DESC: The syntax overview section
+
+Syntax Overview goes here.
+
+@node Declarations, Comments, Syntax Overview, Syntax
+@section Declarations
+@c DESC: The declarations section
+
+Declarations come here.
+
+@node Comments, , Declarations, Syntax
+@section Comments
+@c DESC: The comments section
+
+Comments here.
+
+@bye

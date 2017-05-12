@@ -1,0 +1,27 @@
+This is the Test::ParallelSubtest perl module.  For details run the command:
+
+    perldoc lib/Test/ParallelSubtest.pm
+
+from within this directory, or see:
+
+    http://search.cpan.org/dist/Test::ParallelSubtest
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Nick Cleaton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

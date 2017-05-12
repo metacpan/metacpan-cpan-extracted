@@ -1,0 +1,35 @@
+---
+abstract: "Wrappers for Term::ReadLine's new event_loop model."
+author:
+  - 'Darin McBride <dmcbride@cpan.org>'
+build_requires:
+  Module::Build: '0.3601'
+  Test::More: '0'
+  parent: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-ReadLine-Event
+no_index:
+  directory:
+    - ex
+requires:
+  IO::Handle: '0'
+  Scalar::Util: '0'
+  Term::ReadLine: '1.09'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/dmcbride/Term-ReadLine-Event
+  repository: https://github.com/dmcbride/Term-ReadLine-Event.git
+version: '0.05'
+x_contributors:
+  - 'Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>'
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+  - 'Chris Marshall <chm@cpan.org>'

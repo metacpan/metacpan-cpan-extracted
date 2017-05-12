@@ -1,0 +1,14 @@
+lib/Docs/Site_SVD/Tie_Gzip.pm
+MANIFEST
+Makefile.PL
+README
+lib/Tie/Gzip.pm
+t/Tie/Gzip.pm
+t/Tie/Gzip.t
+t/Tie/Gzip.d
+t/Tie/File/Package.pm
+t/Tie/File/SmartNL.pm
+t/Tie/Test/Tech.pm
+t/Tie/Data/Secs2.pm
+t/Tie/Data/SecsPack.pm
+t/Tie/gzip0.htm

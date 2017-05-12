@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Test/Resub.pm
+t/00-load.t
+t/01-main.t
+t/02-prototype.t
+t/03-copy.t
+t/TODO.t
+t/lib/IO/Capture.pm
+t/lib/IO/Capture/Stderr.pm
+t/lib/IO/Capture/Stdout.pm
+t/lib/IO/Capture/Tie_STDx.pm
+t/lib/IO/Capture/Overview.pod
+t/bulk-resub.t
+META.json                                Module JSON meta-data (added by MakeMaker)

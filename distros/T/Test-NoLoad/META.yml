@@ -1,0 +1,26 @@
+---
+abstract: 'Fail, if the module was loaded'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-NoLoad
+provides:
+  Test::NoLoad:
+    file: lib/Test/NoLoad.pm
+    version: 0.03
+requires:
+  Exporter: 0
+  Test::More: 0.88
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Test-NoLoad
+version: 0.03

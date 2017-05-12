@@ -1,0 +1,33 @@
+Tie-StorableDir version 0.06
+============================
+
+Tie::StorableDir is a module which ties a hash to a backing directory. It uses
+Storable.pm to serialize and deserialize perl data structures, and escapes keys
+so reserved characters may be used.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  * IO::Dir
+  * Storable
+  * Perl 5.8.0 or greater
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Bryan Donlan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

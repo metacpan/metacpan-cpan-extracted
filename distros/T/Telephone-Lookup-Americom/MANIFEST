@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Telephone-Lookup-Americom.t
+lib/Telephone/Lookup/Americom.pm
+META.yml                                 Module meta-data (added by MakeMaker)

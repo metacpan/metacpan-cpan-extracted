@@ -1,0 +1,168 @@
+#!/usr/bin/perl
+
+my $VAR1 = {
+          'children' => [
+                          {
+                            'children' => [],
+                            'values' => [
+                                          '60'
+                                        ],
+                            'key' => 'Interval'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'Example::Schema'
+                                        ],
+                            'key' => 'Schema'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'dbi:mysql:dbname=mydb:host=mysql.example.com'
+                                        ],
+                            'key' => 'DSN'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'gladistrippedthis'
+                                        ],
+                            'key' => 'Username'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'beforepushingtogit'
+                                        ],
+                            'key' => 'Password'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'machine'
+                                        ],
+                            'key' => 'ResultSet'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'name'
+                                        ],
+                            'key' => 'HostsFrom'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'machinet_id',
+                                          'name'
+                                        ],
+                            'key' => 'InstanceFrom'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'in2p3.fr'
+                                        ],
+                            'key' => 'DomainName'
+                          },
+                          {
+                            'children' => [
+                                            {
+                                              'children' => [],
+                                              'values' => [
+                                                            'memory'
+                                                          ],
+                                              'key' => 'Plugin'
+                                            },
+                                            {
+                                              'children' => [],
+                                              'values' => [
+                                                            'memory'
+                                                          ],
+                                              'key' => 'Type'
+                                            },
+                                            {
+                                              'children' => [],
+                                              'values' => [
+                                                            'free'
+                                                          ],
+                                              'key' => 'TypeInstance'
+                                            },
+                                            {
+                                              'children' => [
+                                                              {
+                                                                'children' => [],
+                                                                'values' => [
+                                                                              'block'
+                                                                            ],
+                                                                'key' => 'crazy'
+                                                              }
+                                                            ],
+                                              'values' => [],
+                                              'key' => 'nested'
+                                            }
+                                          ],
+                            'values' => [
+                                          'pff',
+                                          'pouf'
+                                        ],
+                            'key' => 'Match'
+                          },
+                          {
+                            'children' => [],
+                            'values' => [
+                                          'avg',
+                                          'min',
+                                          'max',
+                                          'count'
+                                        ],
+                            'key' => 'CFunc'
+                          },
+                          {
+                            'children' => [
+                                            {
+                                              'children' => [
+                                                              {
+                                                                'children' => [],
+                                                                'values' => [
+                                                                              'Up'
+                                                                            ],
+                                                                'key' => 'stat_id__name'
+                                                              },
+                                                              {
+                                                                'children' => [],
+                                                                'values' => [
+                                                                              'workerge'
+                                                                            ],
+                                                                'key' => 'usag_id__name'
+                                                              }
+                                                            ],
+                                              'values' => [],
+                                              'key' => 'Condition'
+                                            },
+                                            {
+                                              'children' => [
+                                                              {
+                                                                'children' => [],
+                                                                'values' => [
+                                                                              'stat_id',
+                                                                              'machinet_id',
+                                                                              'usag_id'
+                                                                            ],
+                                                                'key' => 'join'
+                                                              }
+                                                            ],
+                                              'values' => [],
+                                              'key' => 'Attributes'
+                                            }
+                                          ],
+                            'values' => [],
+                            'key' => 'Search'
+                          }
+                        ],
+          'values' => [
+                        'some_random_plugin'
+                      ],
+          'key' => 'Plugin'
+        };

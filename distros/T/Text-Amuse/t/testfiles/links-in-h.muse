@@ -1,0 +1,34 @@
+#title This should not break
+
+* [[https://amusewiki.org][*hello* <em>there</em>]]
+
+** This was an error
+[[https://amusewiki.org][hello]]
+
+*** [[https://amusewiki.org][hello]]
+
+**** [[https://amusewiki.org][hello]]
+
+***** [[https://amusewiki.org][hello]]
+
+* [[https://amusewiki.org]]
+
+** [[https://amusewiki.org]]
+
+*** [[https://amusewiki.org]]
+
+**** [[https://amusewiki.org]]
+
+***** [[https://amusewiki.org]]
+
+This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]
+
+> This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]
+
+  This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]
+
+ - This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]
+
+ [[https://amusewiki.org]] :: This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]] [1]
+
+[1] This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]

@@ -1,0 +1,17 @@
+0.04  Sat May 12 20:36:43 CEST 2007
+
+	Fixes compatibility issues with Text::Filter 1.8
+
+0.03  Tue Aug 13 14:14:42 CEST 2002
+	
+	Text::Annotated::Writer now also accepts a list of ordinary
+	strings as input, as long as you do not use the annotation
+	facility when writing.
+
+0.02  Tue Dec  5 16:45:23 MET 2000
+
+	Corrected an error in the documentation to Reader.pm
+
+0.01  Mon Sep 25 18:11:34 METDST 2000
+
+	Initial release

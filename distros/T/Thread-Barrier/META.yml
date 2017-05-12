@@ -1,0 +1,27 @@
+--- #YAML:1.0
+###########################################################################
+# $Id: META.yml,v 1.2 2007/03/23 14:09:13 wendigo Exp $
+###########################################################################
+#
+# META.yml
+#
+# Copyright (C) 2005, 2007 Mark Rogaski, mrogaski@cpan.org;
+# all rights reserved.
+#
+# See the README file included with the
+# distribution for license information.
+#
+# http://module-build.sourceforge.net/META-spec.html
+#
+###########################################################################
+
+name:               Thread-Barrier
+version:            0.300
+version_from:       Barrier.pm
+distribution_type:  module
+installdirs:        site
+requires:
+    threads:        0
+distribution_type:  module
+license:            perl
+

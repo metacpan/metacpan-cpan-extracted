@@ -1,0 +1,7 @@
+Revision history for Time-Piece-DayOfWeek
+
+0.02  2013-06-24 13:21:35 CLT
+				- Removed Data::Printer from tests.
+
+0.01  2013-06-21 16:26:38 CLT
+        - Initial release

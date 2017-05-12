@@ -1,0 +1,21 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Tempest.pm
+lib/Tempest/Gd.pm
+lib/Tempest/Graphicsmagick.pm
+lib/Tempest/Imagemagick.pm
+lib/Tempest/data/clut.png
+lib/Tempest/data/plot.png
+t/00-load.t
+t/01-api.t
+t/02-instantiation.t
+t/imagemagick.t
+t/gd.t
+t/graphicsmagick.t
+t/pod.t
+t/podcoverage.t
+t/data/compare.png
+t/data/screenshot.png
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Teng/Plugin/SearchJoined.pm
+lib/Teng/Plugin/SearchJoined/Iterator.pm
+t/00_compile.t
+t/01_search_joined.t
+t/Utils.pm
+t/lib/Mock/BasicJoin.pm
+t/lib/Mock/BasicJoin/Schema.pm
+t/lib/TengTest.pm
+META.yml
+MANIFEST

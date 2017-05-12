@@ -1,0 +1,24 @@
+Revision history for Tickit-Widget-Progressbar
+
+0.101     2014-08-16 03:29:00+01:00 Europe/London
+	No new features
+
+	Dependency fixes:
+	* Tickit::Widget
+
+0.100     2013-09-08 19:21:20 Europe/London
+	Features:
+	* Switched to Tickit::RenderBuffer
+	* Helper method to expose only the areas that need drawing
+	(currently disabled pending tests to prove that it's doing
+	the right thing)
+	* Style support
+	* Initial support for gradients, currently disabled since
+	it would require the Tickit::Colour mapping code which is
+	not yet on CPAN.
+
+0.002     2011-12-04 22:30:31 Europe/London
+	Fix abstract, update documentation
+
+0.001     2011-11-27 05:43:39 Europe/London
+	Initial CPAN release

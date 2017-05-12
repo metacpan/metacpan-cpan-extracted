@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::FixedLength::Extra.
+
+0.01  Wed Nov 29 12:27:15 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Text::FixedLength::Extra
+

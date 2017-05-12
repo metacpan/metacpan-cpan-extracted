@@ -1,0 +1,15 @@
+=== livedoor
+--- wiki
+&fukidashi(polocky){hoge hoge hoge}
+--- html
+<a target="_blank" title="polocky" href="http://profile.livedoor.com/polocky/"><img src="http://image.profile.livedoor.jp/icon/polocky_16.gif" /></a>hoge hoge hoge
+=== default
+--- wiki
+&fukidashi(){hage hage}
+--- html
+<img width="16" height="16"src="http://static.wiki.livedoor.jp/formatter-storage/images/function/fukidashi/icon_guest.gif">hage hage
+=== image 
+--- wiki
+&fukidashi(http://image02.wiki.livedoor.jp/img/usr_second/common/logo_wiki.gif){hage hage }
+--- html
+<img width="16" height="16"src="http://image02.wiki.livedoor.jp/img/usr_second/common/logo_wiki.gif">hage hage

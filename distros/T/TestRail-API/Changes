@@ -1,0 +1,226 @@
+Revision history for Perl module TestRail::API
+
+0.039 2017-02-22 TEODESIAN
+    - Fix issue where follow_post_redirect could not be passed to constructor
+    - Add getRunResults, getRunResultsPaginated Methods in TestRail::API
+    - Cache connections by default for speedups
+    - Cache getTests() for getTestByName()
+    - Fix warnings when testrail-results encounters 'assigned' results
+    - make --cachefile a multi argument in testrail-results
+    - add the --perfile argument to testrail-results
+    - add the --merged argument to testrail-results
+    - Add platform information and guidance on results_by_version to testrail-results
+
+0.038 2017-01-23 TEODESIAN
+    - Optimize TestRail::Utils::Find::getResults and testrail-results
+    - Add ability to follow POST redirects
+    - Don't print stack traces during constructor errors, this can leak auth info into logs
+    - Don't override filename in TAP Parser if we already have it
+    - Fix issue where non-standard status overrides were not possible
+    - Add finder callback to TestRail::Utils::FindTests
+    - Add testsuite_id filter to TestRail::API::getChildRunByName
+    - Add defect metrics to testrail-results
+    - Add version metrics to testrail-results
+
+0.037 2016-08-10 TEODESIAN
+    - Fix incorrect POD for TestRail::API::createRunInPlan
+    - Add testrail-results binary and TestRail::Utils::Find::getResults.
+    - Add TestRail::API::getChildSections, and modify Test::Rail::Parser to recursively search passed sections when spawning runs
+    - Change TestRail::API::getSections to cache the sections in a project.
+    - Add notices about problems with duplicate entries to POD.
+    - Add capability to auto-spawn configurations/groups to App::Prove::Plugin::TestRail and friends when configuration_group is passed
+
+0.036 2016-04-25 TEODESIAN
+    - Fix using wrong perl during testsuite when running binaries
+    - Silence testsuite for easier diagnosis of issues
+    - Fix warnings due to undef comparison in TestRail::Utils::Find
+    - Change to using Pod::Usage for help output rather than Pod::Perldoc
+
+0.035 2016-04-23 TEODESIAN
+    - Fix testrail-report and testrail-cases broken binary arg passing
+    - Fix issue where TODO PASS was reported in tests with TODO FAILs.
+    - Fix issue where TODO FAILED steps were reported as TODO PASS.
+    - Fix issue where the value of the step_results field was ignored by Test::Rail::Parser
+    - Fix issue where Test::Rail::Parser would truncate results in non case-per-ok mode
+    - Remove case_per_ok feature from Test::Rail::Parser, never really worked it turns out
+
+0.034 2016-02-18 TEODESIAN
+    - Use Capture::Tiny rahter than IO::CaptureOutput in unit tests
+    - Allow users to signal Test::Rail::Parser to set a custom status
+    - Fix issue where todo_pass would be marked even when a bad plan occurred
+    - Add functions for TestRail 5.2 add/update/remove configurations & groups
+    - Add bad plan step_result and a comment when not in case_per_ok & bad plan detected
+    - Add bailout step_result and a comment when not in case_per_ok & bailout detected
+
+0.033 2016-01-06 TEODESIAN
+    - Fix issue where running TestRail::Parser with multiple -j in prove corrupted results
+    - Add timestamps to every step reported for better test bottleneck detection
+
+0.032 2015-08-31 TEODESIAN
+    - Fix issue in getCases where arrayref filters were not handled properly
+    - Add TestRail::API::typeNamesToIds
+    - Add orphans option to testrail-tests, TestRail::Utils::Find::getTests
+    - Add TestRail::API::updateCase
+    - Add new TestRail::Utils::Find functions; getCases, findCases
+    - Add new script bin/testrail-cases
+    - Change all binaries into modulinos.
+    - Resolve issue where testrail-lock would not function
+
+0.031 2015-08-14 TEODESIAN
+    - Update getCases to use testRail 4.0 filters, change filter args to HASHREF
+    - Update TestRail::API::getCaseByName to take filter hashref too
+    - Update getRunSummary and getPlanSummary to use 'labels' rather than system names
+    - Add TestRail::API::statusNamesToLabels to ease interaction with above method updates
+    - Change TestRail::API::translateConfigNamesToIds to accept ARRAY arguments
+    - Make above function and TestRail::API::sectionNamesToIds return values in correct order
+    - Change the 'spawn' option in Test::Rail::Parser (and it's callers) to be --testsuite_id
+    - Add a --testsuite (name) option to Test::Rail::Parser
+    - Spawning runs will now take run/plan completion status into account, spawning new runs/plans when completion is detected.
+    - Removed the run_id option from Test::Rail::Parser and it's callers.  It isn't really useful in practice, and was not tested.
+
+0.030 2015-07-31 TEODESIAN
+    - Fix testrail-tests, was calling function in incorrect namespace
+    - Fix testrail-bulk-mark-results, was not including library
+    - Re-instate integration tests for binaries that were removed in 0.029
+    - Require more up-to-date Pod::Perldoc for help that works on old unices/perls
+    - Fix windows issue with TestRail::Find
+
+0.029 2015-07-30 TEODESIAN
+    - Add bulkAddResults function to TestRail::API
+    - Add new script testrail-bulk-mark-results and it's backend TestRail::Utils::Results
+    - Add new script testrail-lock and it's backend TestRail::Utils::Lock
+    - Re-factor much of the bin/ scripts into TestRail::Utils
+    - Modify all bin/ scripts to use POD as their help output, move help() to TestRail::Utils
+    - Modify all bin/ scripts to parse all the ~/.testrailrc options
+    - Fix an issue where statusNamesToIDs would return status IDs in the wrong order.
+    - Re-factor to use Type::Tiny parameter checking.
+    - Fix getCaseTypeByName, it's apparently been broken/noncovered this whole time
+    - Add options to sort FIFO/LIFO by creation, milestone due date in testrail-runs
+    - Add TestRail::Utils::Find as a backend to testrail-runs & testrail-tests, expand unit tests
+    - Move Test::LWP::UserAgent::TestRailMock to t/lib, no need to install it for users
+
+0.028 2015-06-16 TEODESIAN
+    - Hotfix: forgot to include a module in the prove plugin.  How did this pass compile.t? A mystery.
+    - Fix an issue where testrail-report incorrectly identified (or failed to identify) the file tested.
+    - Add character encoding support to TestRail::API and all its callers (default to utf8)
+
+0.027 2015-06-14 TEODESIAN
+    - If no tests are run (environment fail), set test status to 'retest' on non case-per-ok tests
+    - If the only oddities in a test are passing TODO tests, mark entire run as TODO PASS.
+    - Fix issue where having a ~/.testrailrc would prevent make test from allowing install by cpan client
+    - Fix issue where specifying sections past the first defined in a project would fail to restrict spawning to said sections
+    - Add Plan Summarizer function
+    - Always append the full raw TAP to all results
+    - Add closePlan and closeRun functions to TestRail::API
+    - Add option to binaries, plugin to close plan/run if no untested/retest exist at end of TAP parse
+
+0.026 2015-06-06 TEODESIAN
+    - Add --no-match option to testrail-tests to find orphan tests in a tree
+    - Upload full raw results to TestRail when not in step_results or case_per_ok mode
+    - Add ability to pass section IDs to discriminate when spawning runs in Test::Rail::Parser
+    - Add ability to pass section names to App::Prove::Plugin::TestRail and testrail-report when spawning runs.
+    - Add sectionNamesToIds convenience method to TestRail::API
+
+0.025 2015-05-21 TEODESIAN
+    - Fix test failures on windows (and an issue in testrail-tests on win32)
+    - Fix issue where testrail-tests was unresponsive to --help
+    - Fix issue where getChildRuns would not return all child runs.
+
+0.024 2015-05-17 TEODESIAN
+    - Allow spawning of plans in Test::Rail::Parser (and those programs depending on it)
+    - Fix issue where step_results were not uploaded correctly.
+
+0.023 2015-05-13 TEODESIAN
+    - Fix issue where spawning runs in plans with configurations failed.
+
+0.022 2015-05-08 TEODESIAN
+    - Fix issue where testrail-tests always attempted to turn test names into paths
+
+0.021 2015-04-08 TEODESIAN
+    - Fix issue where getChildRuns did not return anything past first run
+    - Fix issue where getChildRunByName did not perform configuration filtering correctly
+    - Add ability to filter by test status and assignedto id to getTests
+    - Add bin/testrail-tests and bin/testrail-runs
+    - Add statusNamesToIds and userNamesToIds convenience methods to TestRail::API
+    - Add getRunSummary to TestRail::API
+
+0.020 2015-03-25 TEODESIAN
+    - Add getRunsPaginated and getPlansPaginated to get around 250 hardlimit in TR results
+    - Modify getRuns and getPlans to use the above to actually get all runs/plans
+    - Fix various defective pod surrounding those methods
+    - Fix minor incorrectness in testrail-report POD
+
+0.019 2015-03-18 TEODESIAN
+    - Add createRunInPlan method to TestRail::API
+    - Add translateConfigNamesToIds method to TestRail::API
+    - Modified getConfigurations, and added GetConfigurationGroups for clarity
+    - Add ability to spawn runs to App::Prove::TestRail and testrail-report
+    - Stricter checking that passed configurations passed exist in Test::Rail::Parser
+    - Require minimum version of JSON::Maybe::XS to resolve smoker failures.
+
+0.018 2015-01-29 TEODESIAN
+    - Better finding of $HOME in testrail-report and the prove plugin for cross-platform usage
+    - Track elapsed time of tests when run as prove plugin, and report this to testrail
+
+0.017 2015-01-29 TEODESIAN
+    - Explicitly import List::Util in TestRail::API, this causes issues on some perls
+    - Require minimum version of Term::ANSIColor
+    - Fix bad regex for finding filename in testrail_report
+
+0.016 2015-01-26 TEODESIAN
+    - Use correct perl when invoking scripts to fix cpantesters failures.
+    - Use parent instead of base, this confuses older perls
+
+0.015 2015-01-25 TEODESIAN
+    - Remove all usage of IO::Capture for more concise verbose test output.  Makes cpantesters/travis wig out?
+
+0.014 2015-01-23 TEODESIAN
+    - Fixed issue where testrail-report would not parse the results of multiple tests in a TAP file or stream.
+    - Fixed issue where testrail-report would erroneously attempt to report the results of subtests.
+    - Parse TODO/SKIP messages correctly, add todo reason to the test notes
+    - Set SKIP_ALL tests status correctly
+    - Add TestRail::API::getConfigurations method
+    - Add TestRail::API::getChildRuns and getChildRunByName methods to extract runs from plans when passed names
+    - Add ability to pass version to testrail-report & App::Prove::Plugin::TestRail
+
+0.013 2015-01-04 TEODESIAN
+    - Remove usage of Types::Serialiser, and use JSON::MaybeXS (odd intermittent errors on testers)
+    - Remove checking of user being in getUsers, this won't work with external (LDAP) auth
+
+0.012 2014-12-30 TEODESIAN
+    - DZIL tidying
+    - Re-enabled some of the critic tests, fixed a few related issues
+    - Improve safety of constructor, try to die with helpful messages as soon as possible
+    - Add class usage checks and test for that as author tests
+    - Add tests for the server going away, and fix issues encountered therein.
+    - Add fatal type checking of inputs for all methods, add test to make sure exceptions thrown correctly
+    - Add offset argument to getTestResults call.
+    - Add (auto-generated) mock class so we don't have to skip practically all of TestRail-API.t
+    - Add getTestResultFieldByName method and relevant tests
+    - Add Test::Rail::Parser and App::Prove::Plugin::TestRail so you can upload results
+    - Add testrail-report binary for those who want to run on static TAP rather than 'do it live' with prove -P
+
+0.011 2014-12-04 TEODESIAN
+    - Converted to using dzil, and testing using TestingMania
+    - Fixed spelling errors thanks to more extensive testing so enabled
+    - Started signing the module
+
+0.010 2014-12-03 TEODESIAN
+    - Dist name was being set to TestRail::API instead of TestRail-API
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Added "use 5.010" to the module, to match min perl in metadata
+    - Made URL in SEE ALSO a hyperlink with L<...>
+    - Added link to github repo in pod
+
+0.009 2014-11-28 TEODESIAN
+    - Oops, forgot my Test deps
+
+0.008 2014-11-28 TEODESIAN
+    - Explicitly include Types::Serialiser, correct some POD issues
+
+0.007 2014-08-17 TEODESIAN
+    - 0.002 to this release: More or less the pursuit of Kwalitee
+
+0.001 2014-07-25 TEODESIAN
+    - First release to CPAN
+

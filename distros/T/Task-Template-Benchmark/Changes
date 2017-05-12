@@ -1,0 +1,11 @@
+Revision history for Task-Template-Benchmark
+
+1.00    Version released at 2010-08-02-06:58.
+        Version started at  2010-07-27-18:07.
+        Added "see also" to POD.
+        Stripped POD from README intro.
+        Typo fixes in documentation.
+
+0.99_01 Version released at 2010-07-27-16:48.  *** Development version. ***
+        Version started at  2010-07-26-10:45.
+        Initial release.

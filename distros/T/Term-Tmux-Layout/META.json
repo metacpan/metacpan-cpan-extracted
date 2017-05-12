@@ -1,0 +1,54 @@
+{
+   "abstract" : "Create tmux layout strings programmatically",
+   "author" : [
+      "Joel Maslak <jmaslak@antelope.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Term-Tmux-Layout",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Moose" : "0",
+            "autodie" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.8.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Spec" : "0",
+            "IO::Socket::IP" : "0",
+            "Test::More" : "0",
+            "Time::Out" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jmaslak/Term-Tmux-Layout.git",
+         "web" : "https://github.com/jmaslak/Term-Tmux-Layout"
+      }
+   },
+   "version" : "1.004"
+}
+

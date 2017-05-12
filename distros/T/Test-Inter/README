@@ -1,0 +1,1090 @@
+NAME
+    Test::Inter - framework for more readable interactive test scripts
+
+DESCRIPTION
+    This is another framework for writing test scripts. Some of the syntax
+    is loosely inspired by Test::More, and has most of it's functionality,
+    but it is not a drop-in replacement.
+
+    Test::More (and other existing test frameworks) suffer from two
+    weaknesses, both of which have prevented me from ever using them:
+
+       None offer the ability to access specific tests in
+       a reasonably interactive fashion
+
+       None offer the ability to write the tests in
+       whatever format would make the tests the most
+       readable
+
+    The way I write and use test scripts, existing Test::* modules are not
+    nearly as useful as they could be. Test scripts written using Test::More
+    work fine when running as part of the test suite, but debugging an
+    individual test requires extra steps, and the tests themselves are not
+    as readable as they should be.
+
+    I do most of my debugging using test scripts. When I find a bug, I write
+    a test case for it, debug it using the test script, and then leave the
+    test there so the bug won't come back (hopefully).
+
+    Since I use test scripts in two ways (part of a standard test suite and
+    to run the scripts in some interactive way to debug problems), I want to
+    be able to do the following trivially:
+
+    Easy access to a specific test or tests
+        If I'm running the test script interactively (perhaps in the
+        debugger), there are several common functions that I want to have
+        available, including:
+
+           Run only a single test, or a subset of tests
+
+           Set a breakpoint in the debugger to run
+           up to the start of the Nth test
+
+    Better diagnostics
+        When running a test script as part of a test suite, the pass/fail
+        status is really the only thing of interest. You just want to know
+        if the module passes all the tests.
+
+        When running interactively, additional information may allow me to
+        quickly track down the problem without even resorting to a debugger.
+
+        If a test fails, I almost always want to see why it failed if I'm
+        running it interactively. If reasonable, I want to see a list of
+        what was input, what was output, and what was expected.
+
+    The other feature that I wanted in a test suite is the ability to define
+    the tests in a format that is natural and readable FOR THE TESTS. In
+    almost every case, it is best to think of a test script as consisting of
+    two separate parts: a script part, and a test part.
+
+    The script part of a test script is the least important part! It's
+    usually fairly trivial, rarely needs to be changed, and is not the focus
+    of the test script.
+
+    The tests part of the script IS the important part, and these should be
+    expressed in a form that is natural to them, easy to maintain, easy to
+    read, and easy to modify, and none of these should involve modifying the
+    script portion of the test script in general. Because the content of the
+    tests is the important part of the script, the emphasis should be in
+    making them more readable, even at the expense of the script portion. As
+    a general rule, if the script portion of the test script obscures the
+    tests in any way, it's not written correctly!
+
+    The solution to this is well understood, and is common to many other
+    systems where you are mixing two "languages". The task of correctly
+    specifying both the tests and the test script is virtually identical to
+    the task of creating a PHP script which consists of a mixture of PHP and
+    HTML, or the task of creating a template file using some templating
+    system where the file consists of a mixture of text to be displayed and
+    templating commands. It is well understood in each of these cases that
+    the more the two "languages" are interwoven, the less readable both are,
+    and the harder it is to maintain. The more you are able to separate the
+    two, the easier both are to read and maintain.
+
+    As often as possible, I want the tests to be written in some sort of
+    text format which can be easily read as a table with no perl commands
+    interspersed. I want to the freedom to define the tests in one section
+    (a long string, the DATA section, or even in a separate file) which is
+    easily readable. This may introduce the necessity of parsing it, but it
+    makes it significantly easier to maintain the tests.
+
+    This flexibility makes it much easier to read the tests (as opposed to
+    the script) which is the fundamental content of a test script.
+
+    To illustrate some of this, in Test::More, a series of tests might be
+    specified as:
+
+       # test 1
+       $result = func("apples","bushels");
+       is($result, "enough");
+
+       # test 2
+       $result = func("grapefruit","tons");
+       is($result, "enough");
+
+       # test 3
+       $result = func("oranges","boatloads");
+       is($result, "insufficient");
+
+    Thinking about the features I want that I listed above, there are
+    several difficulties with this.
+
+    Debugging the script is tedious
+        Say you ran the test suite, and test 3 failed. To debug it using a
+        traditional Test::* module, you have to open up the test script,
+        find the 3rd test (which won't necessarily be trivial, especially if
+        you're talking about the 103rd test), and then run the debugger
+        setting a break point at that line number.
+
+        This sequence of steps is typically not very hard (especially when
+        the test script is as simple as the example above), but it's still
+        lots of steps that serve only to break your train of thought.
+
+        How much better to be able to set a break point in the function that
+        actually performs the test for the Nth test.
+
+        It would also be nice to be able to skip the first two tests...
+        perhaps they take a long time to run, and I want to get right to
+        work on test 3. You can do this easily too by setting the
+        $::TI_START variable.
+
+    Way too much perl interspersed with the tests
+        It's difficult to read the tests individually in this script because
+        there is too much perl code among them, and virtually impossible to
+        look at them as a whole.
+
+        It is true that looking at this particular example, it is very
+        simple... but the script ISN'T the content you're interested in (and
+        bear in mind that many test scripts are nowhere near this simple).
+        The REAL content of this script are the tests, which consist of the
+        function arguments and the expected result. Although it's not
+        impossible to see each of these in the script above, it's not in a
+        format that is conducive to studying the tests, and especially not
+        for examining the list of tests as a whole.
+
+    Now, look at an alternate way of specifying the tests using this module:
+
+       $tests = "
+
+         apples     bushels   => enough
+
+         grapefruit tons      => enough
+
+         oranges    boatloads => insufficient
+
+       ";
+
+       $o->tests(tests => $tests,
+                 func  => \&func);
+
+    Here, it's easy to see the list of tests, and adding additional tests is
+    a breeze.
+
+    This module supports a number of methods for defining tests, so you can
+    use whichever one is most convenient (including methods that are
+    identical to Test::More if that really is the best method).
+
+    In addition, the following debugger command works as desired:
+
+       b func ($::TI_NUM==3)
+
+    and you're ready to debug (assuming that the test function is named
+    'func').
+
+CREATING A TEST
+    Every test may have several pieces of information:
+
+    A name
+        Every test is automatically assigned a number, but it may be useful
+        to specify a name of a test (which is actually a short description
+        of the test). Whenever a test result is reported, the name will be
+        given (if one was specified).
+
+        The name may not have a '#' in it.
+
+        The name is completely optional, but makes the results more
+        readable.
+
+    An expected result
+        In order to test something, you need to know what result was
+        expected (or in some cases, what result was NOT expected).
+
+    A function and arguments OR a result
+        You also need to know the results that you're comparing to the
+        expected results.
+
+        This can be obtained by simply working with a set of results, or a
+        function name and a set of arguments to pass to it.
+
+    Conditions
+        It is useful to be able to specify state information at the start of
+        the test suite (for example, to see if certain features are
+        available), and some tests may only run if those conditions are met.
+
+        If no conditions are set for a test, it will always run.
+
+    Todo tests
+        Some tests may be marked as 'todo' tests. These are test which are
+        allowed to fail (meaning that they have been put in place for an
+        as-yet unimplemented feature). Since it is expected that the test
+        will fail, the test suite will still pass, even if these tests fail.
+
+        The tests will still run and if they pass, a message is issued
+        saying that the feature is now implemented, and the tests should be
+        graduated to non-todo state.
+
+BASE METHODS
+    new
+           $o = new Test::Inter [$name] [%options];
+
+        This creates a new test framework. There are several options which
+        may be used to specify which tests are run, how they are run, and
+        what output is given.
+
+        The entire test script can be named by passing in $name. Options can
+        be passed in as a hash of ($opt,$val) pairs.
+
+        Options can be set in four different ways. First, you can pass in an
+        ($opt,$val) pair in the new method. Second, you can set an
+        environment variable (which overrides any value passed to the new
+        method). Third, you can set a global variable (which overrides both
+        the environment variable and options passed to the new method).
+        Forth, you can call the appropriate method to set the option. This
+        overrides all other methods.
+
+        Each of the allowed options are described below in the following
+        base methods:
+
+           start
+           end
+           testnum
+           plan
+           abort
+           quiet
+           mode
+           skip_all
+           width
+
+    version
+           $o->version();
+
+        Returns the version of the module.
+
+    start
+           $o = new Test::Inter 'start' => $N;
+           $o->start($N)
+
+        To define which test you want to start with, pass in an ($opt,$val)
+        pair of ('start',N), set an environment variable TI_START=N, or a
+        global variable $::TI_START=N.
+
+        When the start test is defined, most tests numbered less than N are
+        completely ignored. If the tests are being run quietly (see the
+        quiet method below), nothing is printed out for these tests.
+        Otherwise, a skip message is printed out.
+
+        One class of tests IS still executed. Tests run using the require_ok
+        or use_ok methods (to test the loading of modules) are still run.
+
+        If no value (or a value of 0) is used, it defaults to the first
+        test.
+
+    end
+           $o = new Test::Inter 'end' => $M;
+           $o->end($M);
+
+        To define which test you want to end with, pass in an ($opt,$val)
+        pair of ('end',M), set an environment variable TI_END=M, or set a
+        global variable $::TI_END=M.
+
+        When the end test is defined, all tests numbered more than M are
+        completely ignored. If the tests are being run quietly (see the
+        quiet method below), nothing is printed out for these tests.
+        Otherwise, a skip message is printed out.
+
+        If no value is given, it defaults to 0 (which means that all
+        remaining tests are run).
+
+    testnum
+           $o = new Test::Inter 'testnum' => $N;
+           $o->testnum($N);
+
+        This is used to run only a single test. It is equivalent to setting
+        both the start and end tests to $N.
+
+    plan
+    done_testing
+           $o = new Test::Inter 'plan' => $N;
+           $o->plan($n);
+
+           $o->done_testing();
+           $o->done_testing($n);
+
+        The TAP API (the 'language' used to run a sequence of tests and see
+        which ones failed and which ones passed) requires a statement of the
+        number of tests that are expected to run.
+
+        This statement can appear at the start of the test suite, or at the
+        end.
+
+        If you know in advance how many tests should run in the test script,
+        you can pass in a non-zero integer in a ('plan',N) pair to the new
+        method, or set the TI_PLAN environment variable or the $::TI_PLAN
+        global variable, or call the plan method.
+
+        If you know how many tests should run at the end of the test script,
+        you can pass in a non-zero integer to the done_testing method.
+
+        Frequently, you don't really care how many tests are in the script
+        (especially if new tests are added on a regular basis). In this
+        case, you still need to include a statement that says that the
+        number of tests expected is however many were run. To do this, call
+        the done_testing method with no argument.
+
+        NOTE: if the plan method is used, it MUST be used before any tests
+        are run (including those that test the loading of modules). If the
+        done_testing method is used, it MUST be called after all tests are
+        run. You must specify a plan or use a done_testing statement, but
+        you cannot do both.
+
+        It is NOT strictly required to set a plan if the script is only run
+        interactively, so if for some reason this module is used for test
+        scripts which are not part of a standard perl test suite, the plan
+        and done_testing statements are optional. As a matter of fact, the
+        script will run just fine without them... but a perl installer will
+        report a failure in the test suite.
+
+    abort
+           $o = new Test::Inter 'abort' => 0/1/2;
+           $o->abort(0/1/2);
+
+        The abort option can be set using an ('abort',0/1/2) option pair, or
+        by setting the TI_ABORT environment variable, or the $::TI_ABORT
+        global variable.
+
+        If this is set to 1, the test script will run unmodified until a
+        test fails. At that point, all remaining tests will be skipped. If
+        it is set to 2, the test script will run until a test fails at which
+        point it will exit with an error code of 1.
+
+        In both cases, todo tests will NOT trigger the abort behavior.
+
+    quiet
+           $o = new Test::Inter 'quiet' => 0/1/2;
+           $o->quiet(0/1/2);
+
+        The quiet option can be set using an ('quiet',0/1/2) option pair, or
+        by setting the TI_QUIET environment variable, or the $::TI_QUIET
+        global variable.
+
+        If this is set to 0 (the default), all information will be printed
+        out. If it is set to 1, some optional information will not be
+        printed. If it is set to 2, all optional information will not be
+        printed.
+
+    mode
+           $o = new Test::Inter 'mode' => MODE;
+           $o->mode(MODE);
+
+        The mode option can be set using a ('mode',MODE) option pair, or by
+        setting the TI_MODE environment variable, or the $::TI_MODE global
+        variable.
+
+        Currently, MODE can be 'test' or 'inter' meaning that the script is
+        run as part of a test suite, or interactively.
+
+        When run in test mode, it prints out the results using the TAP
+        grammar (i.e. 'ok 1', 'not ok 3', etc.).
+
+        When run in interactive mode, it prints out results in a more human
+        readable format.
+
+    width
+           $o = new Test::Inter 'width' => WIDTH;
+           $o->width(WIDTH);
+
+        The width option can be set using a ('width',WIDTH) option pair, or
+        by setting the TI_WIDTH environment variable, or the $::TI_WIDTH
+        global variable.
+
+        WIDTH is the width of the terminal (for printing out failed test
+        information). It defaults to 80, but it can be set to any width (and
+        lines longer then this are truncated). If WIDTH is set to 0, no
+        truncation is done.
+
+    skip_all
+           $o = new Test::Inter 'skip_all' => REASON;
+           $o->skip_all(REASON);
+
+        The skip_all option can be set using an ('skip_all',REASON) option
+        pair, or by setting the TI_SKIP_ALL environment variable, or the
+        $::TI_SKIP_ALL global variable.
+
+        If this is set, the entire test script will be skipped for the
+        reason given. This must be done before any test is run, and before
+        any plan number is set.
+
+        The skip_all can also be called at any point during the script (i.e.
+        after tests have been run). In this case, all remaining scripts will
+        be skipped.
+
+           $o->skip_all(REASON,FEATURE,FEATURE,...);
+           $o->skip_all('',FEATURE,FEATURE,...);
+
+        This will skip all tests (or all remaining tests) unless all
+        features are available. REASON can be entered as an empty string and
+        the reason the tests are skipped will be a message about the missing
+        feature.
+
+    feature
+           $o->feature($feature,$val);
+
+        This defines a feature. If $val is non-zero, the feature is
+        available. Otherwise it is not.
+
+    diag
+    note
+           $o->diag($message);
+           $o->note($message);
+
+        Both of these print an optional message. Messages printed with the
+        note method are always optional and will be omitted if the quiet
+        option is set to 1 or 2. Messages printed with the diag method are
+        optional and will not be printed if the quiet option is set to 2,
+        but they will be printed if the quiet method is set to 1.
+
+    testdir
+        Occasionally, it may be necessary to know the directory where the
+        tests live (for example, there may be a config or data file in
+        there). This method will return the directory.
+
+METHODS FOR LOADING MODULES
+    Test scripts can load other modules (using either the perl 'use' or
+    'require' commands). There are three different modes for doing this
+    which determine how this is done.
+
+    required mode
+        By default, this is used to test for a module that is required for
+        all tests in the test script.
+
+        Loading the module is treated as an actual test in the test suite.
+        The test is to determine whether the module is available and can be
+        loaded. If it can be loaded, it is, and it is reported as a
+        successful test. If it cannot be loaded, it is reported as a failed
+        test.
+
+        In the result of a failed test, all remaining tests will be skipped
+        automatically (except for other tests which load modules).
+
+    feature mode
+        In feature mode, loading the module is not treated as a test (i.e.
+        it will not print out an 'ok' or 'not ok' line. Instead, it will set
+        a feature (named the same as the module) which can be used to
+        determine whether other tests should run or not.
+
+    forbid mode
+        In a few very rare cases, we may want to test for a module but
+        expect that it not be present. This is the exact opposite of the
+        'required' mode.
+
+        Successfully loading the module is treated as a test failure. In the
+        event of a failure, all remaining tests will be skipped.
+
+    The methods available are:
+
+    require_ok
+           $o->require_ok($module [,$mode]);
+
+        This is used to load a module using the perl 'require' function. If
+        $mode is not passed in, the default mode (required) is used to test
+        the existence of the module.
+
+        If $mode is passed in, it must be either the string 'forbid' or
+        'feature'.
+
+        If $mode is 'feature', a feature named $module is set if the module
+        was able to be loaded.
+
+    use_ok
+           $o->use_ok(@args [,$mode]);
+
+        This is used to load a module with 'use', or check a perl version.
+
+           BEGIN { $o->use_ok('5.010'); }
+           BEGIN { $o->use_ok('Some::Module'); }
+           BEGIN { $o->use_ok('Some::Module',2.05); }
+           BEGIN { $o->use_ok('Some::Module','foo','bar'); }
+           BEGIN { $o->use_ok('Some::Module',2.05,'foo','bar'); }
+
+        are the same as:
+
+           use 5.010;
+           use Some::Module;
+           use Some::Module 2.05;
+           use Some::Module qw(foo bar);
+           use Some::Module 2.05 qw(foo bar);
+
+        Putting the use_ok call in a BEGIN block allows the functions to be
+        imported at compile-time and prototypes are properly honored. You'll
+        also need to load the Test::Inter module, and create the object in a
+        BEGIN block.
+
+        $mode acts the same as in the require_ok method.
+
+METHODS FOR RUNNING TEST
+    There are several methods for running tests. The ok, is, and isnt
+    methods are included for those already comfortable with Test::More and
+    wishing to stick with the same format of test script. The tests method
+    is the suggested method though since it makes use of the full power of
+    this module.
+
+    ok
+           $o->ok(TESTS);
+
+        A test run with ok looks at a result, and if it evaluates to 0 (or
+        false), it fails. If it evaluates to non-zero (or true), it passes.
+
+        These tests do not require you to specify the expected results. If
+        expected results are given, they will be compared against the result
+        received, and if they differ, a diagnostic message will be printed,
+        but the test will still succeed or fail based only on the actual
+        result produced.
+
+        These tests require a single result and either zero or one expected
+        results.
+
+        To run a single test, use any of the following:
+
+           $o->ok();          # always succeeds
+
+           $o->ok($result);
+           $o->ok($result,$name);
+           $o->ok($result,$expected,$name);
+
+           $o->ok(\&func);
+           $o->ok(\&func,$name);
+           $o->ok(\&func,$expected,$name);
+
+           $o->ok(\&func,\@args);
+           $o->ok(\&func,\@args,$name);
+           $o->ok(\&func,\@args,$expected,$name);
+
+        If $result is a scalar, the test passes if $result is true. If
+        $result is a list reference, and the list is either empty, or the
+        first element is a scalar), the test succeeds if the list contains
+        any values (except for undef). If $result is a hash reference, the
+        test succeeds if the hash contains any key with a value that is not
+        undef.
+
+        If \&func and \@args are passed in, then $result is generated by
+        passing @args to &func and behaves identically to the calls where
+        $result is passed in. If \&func is passed in but no arguments, the
+        function takes no arguments, but still produces a result.
+
+        $result may be a scalar, list reference, or hash reference. If it is
+        a list reference, the test passes is the list contains any defined
+        values. If it is a hash reference, the test passes if any of the
+        keys contain defined values.
+
+        If an expected value is passed in and the result does not match it,
+        a diagnostic warning will be printed, even if the test passes.
+
+    is
+    isnt
+           $o->is(TESTS);
+           $o->isnt(TESTS);
+
+        A test run with is looks at a result and tests to see if it is
+        identical to an expected result. If it is, the test passes.
+        Otherwise it fails. In the case of a failure, a diagnostic message
+        will show what result was actually obtained and what was expected.
+
+        A test run with isnt looks at a result and tests to see if the
+        result obtained is different than an expected result. If it is
+        different, the test passes. Otherwise it fails.
+
+        The is method can be called in any of the following ways:
+
+           $o->is($result,$expected);
+           $o->is($result,$expected,$name);
+
+           $o->is(\&func,$expected);
+           $o->is(\&func,$expected,$name);
+
+           $o->is(\&func,\@args,$expected);
+           $o->is(\&func,\@args,$expected,$name);
+
+        The isnt method can be called in exactly the same way.
+
+        As with the ok method, the result can be a scalar, hashref, or
+        listref. If it is a hashref or listref, the entire structure must
+        match the expected value.
+
+    tests
+           $o->tests($opt=>$val, $opt=>$val, ...)
+
+        The options available are described in the following section.
+
+    file
+           $o->file($func,$input,$outputdir,$expected,$name [,@args]);
+
+        Sometimes it may be easiest to store the input, output, and expected
+        output from a test in a text file. In this case, each line of output
+        will be treated as a single test, so the output and expected output
+        must match up exactly.
+
+        $func is a reference to a function which will produce a temporary
+        output file.
+
+        If $input is specified, it is the name of the input file. If it is
+        empty, no input file will be used. The input file can be fully
+        specified, or it can be relative to the test directory.
+
+        If $outputdir is passed in, it is the directory where the output
+        file will be written. It can be fully specified, or relative to the
+        test directory. If $outputdir is left blank, the temporary file will
+        be written to the test directory.
+
+        $expected is the name of a file which contains the expected output.
+        It can be fully specified, or it will be checked for in the test
+        directory.
+
+        $name is the name of this series of tests.
+
+        @args are extra arguments to pass to the test function.
+
+        The function will be called with the arguments:
+
+           &$func( [$input,] $output,@args);
+
+        $input is only passed in if it was passed in to this method. If no
+        input file is specified, nothing will be passed to the function.
+
+        $output is the name of a temporary file where the output will be
+        written to.
+
+USING THE TESTS METHOD
+    It is expected that most tests (except for those that load a module)
+    will be run using the tests method called as:
+
+       $o->tests($opt => $val, $opt => $val, ...);
+
+    The following options are available:
+
+    name
+           name => NAME
+
+        This sets the name of this set of tests. All tests will be given the
+        same name.
+
+    tests
+    func
+    expected
+        In order to specify a series of tests, you have to specify either a
+        function and a list of arguments, or a list of results.
+
+        Specifying the function and list of arguments can be done using the
+        pair:
+
+           func  => \&FUNCTION
+           tests => TESTS
+
+        If the func option is not set, tests contains a list of results.
+
+        A list of expected results may also be given. They can be included
+        in the
+
+           tests => TESTS
+
+        option or included separately as:
+
+           expected => RESULTS
+
+        The way to specify these are covered in the next section SPECIFYING
+        THE TESTS.
+
+    feature
+    disable
+           feature => [FEATURE1, FEATURE2, ...]
+
+           disable => [FEATURE1, FEATURE2, ...]
+
+        The default set of tests to run is determined using the start, end,
+        and skip_all methods discussed above. Using those methods, a list of
+        tests is obtained, and it is expected that these will run.
+
+        The feature and disable options modify the list.
+
+        If the feature option is included, the tests given in this call will
+        only run if ALL of the features listed are available.
+
+        If the disable option is included, the tests will be run unless ANY
+        of the features listed are available.
+
+    skip
+           skip => REASON
+
+        Skip these tests for the reason given.
+
+    todo
+           todo => 0/1
+
+        Setting this to 1 says that these tests are allowed to fail. They
+        represent a feature that is not yet implemented.
+
+        If the tests succeed, a message will be printed notifying the
+        developer that the tests are now ready to promote to actual use.
+
+SPECIFYING THE TESTS
+    A series of tests can be specified in two different ways. The tests can
+    be written in a very simple string format, or stored as a list.
+
+    Demonstrating how this can be done is best done by example, so let's say
+    that there is a function (func) which takes two arguments, and returns a
+    single value. Let's say that the expected output (and the actual output)
+    from 3 different sets of arguments is:
+
+       Input   Expected Output  Actual Output
+       -----   ---------------  -------------
+       1,2     a                a
+       3,4     b                x
+       5,6     c                c
+
+    (so in this case, the first and third tests pass, but the 2nd one will
+    fail).
+
+    Specifying these tests as lists could be done as:
+
+       $o->tests(
+          func     => &func,
+          tests    => [ [1,2], [3,4], [5,6] ],
+          expected => [ [a],   [b],   [c] ],
+       );
+
+    Here, the tests are stored as a list, and each element in the list is a
+    listref containing the set of arguments.
+
+    If the func option is not passed in, the tests option is set to a list
+    of results to compare with the expected results, so the following is
+    equivalent to the above:
+
+       $o->tests(
+          tests    => [ [a],   [x],   [c] ],
+          expected => [ [a],   [b],   [c] ],
+       );
+
+    If an argument (or actual result) or an expected result is only a single
+    value, it can be entered as a scalar instead of a list ref, so the
+    following is also equivalent:
+
+       $o->tests(
+          func     => &func,
+          tests    => [ [1,2], [3,4], [5,6] ],
+          expected => [ a,     b,     [c] ],
+       );
+
+    The only exception to this is if the single value is itself a list
+    reference. In this case it MUST be included as a reference. In other
+    words, if you have a single test, and the expected value for this test
+    is a list reference, it must be passed in as:
+
+       expected => [ [ \@r ] ]
+
+    NOT as:
+
+       expected => [ \@r ]
+
+    Passing in a set of expected results is optional. If none are passed in,
+    the tests are treated as if they had been passed to the 'ok' method
+    (i.e. if they return something true, they pass, otherwise they fail).
+
+    The second way to specify tests is as a string. The string is a
+    multi-line string with each tests being separate from the next test by a
+    blank line. Comments (lines which begin with '#') are allowed, and are
+    ignored. Whitespace at the start and end of the line is ignored.
+
+    The string may contain the results directly, or results may be passed in
+    separately. For example, the following all give the same sets of tests
+    as the example above:
+
+       $o->tests(
+          func     => &func,
+          tests    => "
+                       # Test 1
+                       1 2 => a
+
+                       # Test 2
+                       3 4 => b
+
+                       5 6 => c
+                      ",
+       );
+
+       $o->tests(
+          func     => &func,
+          tests    => "
+                       1 2
+
+                       3 4
+
+                       5 6
+                      ",
+           expected => [ [a], [b], [c] ]
+       );
+
+       $o->tests(
+          func     => &func,
+          tests    => [ [1,2], [3,4], [5,6] ],
+          expected => "
+                       a
+
+                       b
+
+                       c
+                      ",
+       );
+
+       $o->tests(
+          func     => &func,
+          tests    => "
+                       1 2
+
+                       3 4
+
+                       5 6
+                      ",
+          expected => "
+                       a
+
+                       b
+
+                       c
+                      ",
+       );
+
+    The expected results may also consist of only a single set of results
+    (in this case, it must be passed in as a listref). In this case, all of
+    the tests are expected to have the same results.
+
+    So, the following are equivalent:
+
+       $o->tests(
+          func     => &func,
+          tests    => "
+                       1 2 => a b
+
+                       3 4 => a b
+
+                       5 6 => a b
+                      ",
+       );
+
+       $o->tests(
+          func     => &func,
+          tests    => "
+                       1 2
+
+                       3 4
+
+                       5 6
+                      ",
+          expected  => [ [a, b] ],
+       );
+
+       $o->tests(
+          func     => &func,
+          tests    => "
+                       1 2
+
+                       3 4
+
+                       5 6
+                      ",
+          expected  => "a b",
+       );
+
+    The number of expected values must either be 1 (i.e. all of the tests
+    are expected to produce the same value) or exactly the same number as
+    the number of tests.
+
+    The parser is actually quite powerful, and can handle multi-line tests,
+    quoted strings, and nested data structures.
+
+    The test may be split across any number of lines, provided there is not
+    a completely blank line (which signals the end of the test), so the
+    following are equivalent:
+
+       tests => "a b c",
+       tests => "a b
+                 c",
+
+    Arguments (or expected results) may include data structures. For
+    example, the following are equivalent:
+
+       tests => "[ a b ] { a 1 b 2 }"
+       tests => [ [ [a,b], { a=>1, b=>2 } ] ]
+
+    Whitespace is mostly optional, but there is one exception. An item must
+    end with some kind of delimiter, so the following will fail:
+
+       tests => "[a b][c d]"
+
+    The first element (the list ref [a b]) must be separated from the second
+    element by the delimiter (which is whitespace in this case), so it must
+    be written as:
+
+       tests => "[a b] [c d]"
+
+    As already demonstrated, hashrefs and listrefs may be included and
+    nested. Elements may also be included inside parens, but this is
+    optional since all arguments and expected results are already treated as
+    lists, so the following are equivalent:
+
+       tests => "a b c"
+       tests => "(a b) c"
+
+    Although parens are optional, they may make things more readable, and
+    allow you to use something other than whitespace as the delimiter.
+
+    If the character immediately following the opening paren, brace, or
+    bracket is a punctuation mark, then it is used as the delimiter instead
+    of whitespace. For example, the following are all equivalent:
+
+       [ a b c ]
+       [a b c]
+       [, a,b,c ]
+       [, a, b, c ]
+
+    A delimiter is a single character, and the following may not be used as
+    a delimiter:
+
+       any opening/closing characters () [] {}
+       single or double quotes
+       alphanumeric characters
+       underscore
+
+    Whitespace (including newlines) around the delimiter is ignored, so the
+    following is valid:
+
+       [, a,
+          b,
+          c ]
+
+    Two delimiters next to each other or a trailing delimiter produce an
+    empty string.
+
+       "(,a,b,)" => (a, b, '')
+       "(,a,,b)" => (a, '', b)
+
+    Hashrefs may be specified by braces and the following are equivalent:
+
+       { a 1 b 2 }
+       {, a,1,b,2 }
+       {, a,1,b,2, }
+
+    Note that a trailing delimiter is ignored if there are already an even
+    number of elements, or an empty string otherwise.
+
+    Nested structures are allowed:
+
+       "[ [1 2] [3 4] ]"
+
+    For example,
+
+       $o->tests(
+          func     => &func,
+          tests    => "a [ b c ] { d 1 e 2 } => x y"
+       );
+
+    is equivalent to:
+
+       $o->tests(
+          func     => &func,
+          tests    => [ [a, [b,c], {d=>1,e=>2}] ],
+          results  => [ [x,y] ],
+       );
+
+    Any single value can be surrounded by single or double quotes in order
+    to include the delimiter. So:
+
+       "(, a,'b,c',e )"
+
+    is equivalent to:
+
+       "( a b,c e )"
+
+    Any single value can be the string '__undef__' which will be turned into
+    an actual undef. If the value is '__blank__' it is turned into an empty
+    string (''), though it can also be specified as '' directly. Any value
+    can have an embedded newline by including a __nl__ in the value, but the
+    value must be written on a single line.
+
+    Expected results are separated from arguments by ' => '.
+
+ENVIRONMENT VARIABLES
+    To summarize the information above, the following environment variables
+    (and main:: variables) exist. Each can be set in a perl script as a
+    variable in the main namespace:
+
+       $::TI_END
+
+    or as an environment variable:
+
+       $ENV{TI_END}
+
+    TI_START
+        Set this to define the test you want to start with.
+
+        Example: If you have a perl test script (my_test_script) and you
+        want to start running it at test 12, run the following shell
+        commands:
+
+           TI_START=12
+           ./my_test_script.t
+
+    TI_END
+        Set this to define the test you want to end with.
+
+    TI_TESTNUM
+        Set this to run only a single test
+
+    TI_QUIET
+        How verbose the test script is.
+
+    TI_MODE
+        How the output is formatted.
+
+    TI_WIDTH
+        The width of the terminal.
+
+    TI_NOCLEAN
+        When running a file test, the temporary output file will not be
+        removed if this is set.
+
+HISTORY
+    The history of this module dates back to 1996 when I needed to write a
+    test suite for my Date::Manip module. At that time, none of the Test::*
+    modules currently available in CPAN existed (the earliest ones didn't
+    come along until 1998), so I was left completely on my own writing my
+    test scripts.
+
+    I wrote a very basic version of my test framework which allowed me to
+    write all of the tests as a string, it would parse the string, count the
+    tests, and then run them.
+
+    Over the years, the functionality I wanted grew, and periodically, I'd
+    go back and reexamine other Test frameworks (primarily Test::More) to
+    see if I could replace my framework with an existing module... and I've
+    always found them wanting, and chosen to extend my existing framework
+    instead.
+
+    As I've written other modules, I've wanted to use the framework in them
+    too, so I've always just copied it in, but this is obviously tedious and
+    error prone. I'm not sure why it took me so long... but in 2010, I
+    finally decided it was time to rework the framework in a module form.
+
+    I loosely based my module on Test::More. I like the functionality of
+    that module, and wanted most of it (and I plan on adding more in future
+    versions). So this module uses some similar syntax to Test::More (though
+    it allows a great deal more flexibility in how the tests are specified).
+
+    One thing to note is that I may have been able to write this module as
+    an extension to Test::More, but after looking into that possibility, I
+    decided that it would be faster to not do that. I did "borrow" a couple
+    of routines from it (though they've been modified quite heavily) as a
+    starting point for a few of the functions in this module, and I thank
+    the authors of Test::More for their work.
+
+KNOWN BUGS AND LIMITATIONS
+    None known.
+
+SEE ALSO
+    Test::More - the 'industry standard' of perl test frameworks
+
+LICENSE
+    This script is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Sullivan Beck (sbeck@cpan.org)
+

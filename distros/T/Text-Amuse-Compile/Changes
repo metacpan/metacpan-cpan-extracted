@@ -1,0 +1,357 @@
+Revision history for perl module Text::Amuse::Compile
+
+0.90 2017-04-07
+
+ - Obey #notoc for HTML as well
+
+0.89 2017-04-06
+
+ - Obey #notoc if set in the header
+ - Always obey #nocoverpage (both in header or in option)
+
+0.88 2017-04-04
+
+ - Fix handling of internal linking in epub and bump Text::Amuse
+   version
+
+0.87 2016-11-11
+
+ - Store metadata in the PDF (both plain and imposed)
+
+0.86 2016-10-22
+
+ - Do not use $_ when reading files and pipes.
+
+0.85 2016-10-18
+
+ - Improved fontspec.json creator
+
+0.84 2016-10-18
+
+ - Support consistent font selection across all the formats.
+
+0.83 2016-10-18
+
+ - Fixed font validation (it was too strict, preventing sans or mono
+   fonts to be used as main font).
+
+0.82 2016-10-16
+
+ - New options: epub_embed_fonts (defaults to true)
+
+0.81 2016-10-15
+
+ - Fixed tests for case insensitive file systems
+
+0.80 2016-10-14
+
+ - New way to select the fonts. To activate it, you need to pass
+   fontspec to the constructor (or to the script).
+
+0.74 2016-09-30
+
+ - In merged files, do not display the title on a page on itself if
+   there is no sectioning. This way the output when collecting
+   articles is much better.
+
+0.73 2016-09-02
+
+ - Embed authors and topics in the EPUB under the relevant fields
+
+0.72 2016-07-21
+
+ - Permit font dimensions from 9 to 14 (and stop people complaining
+   about fonts being too small)
+
+0.71 2016-07-19
+
+ - Assert we can compile texts with multiline footnotes in the title names
+
+0.70 2016-07-13
+
+ - Add support for internal linking in epub, partials and merged files.
+
+0.65 2016-06-28
+
+ - Fix an infinite loop which is triggered when Text::Amuse spits warnings and the logger
+   calls warn().
+
+0.64 2016-06-20
+
+ - Try to always keep the cover image on the first page, enforcing the height to
+   0.5 of the text height (and keeping the aspect ratio).
+
+0.63 2016-06-18
+
+ - Fixed tests on windows
+
+0.62 2016-06-17
+
+ - Fixed tests
+
+0.61 2016-06-17
+
+ - Obey #cover and #coverwidth if found in the muse file (with proper
+   filtering).
+
+0.60 2016-06-09
+
+ - Fixed tex.t (RT #115177), thanks to Slaven Rezić for the report.
+
+0.59 2016-05-12
+
+ - Another round of test fixes for ancient perls
+
+0.58 2016-05-11
+
+ - Fixed tests for ancient perls 5.8.x
+
+0.57 2016-05-10
+
+ - Fixed syntax error on perl 5.8.9 (thanks to ribasushi)
+
+0.56 2016-05-09
+
+ - Avoid hyphenation on the last word of a paragraph in PDF
+ - Improved toc removing strings like "start body" and "titlepage" in
+   ToCs (#4)
+ - Removed minimum perl version
+ - Let the image to expand on the EPUB covers (#3)
+
+0.55 2016-02-25
+
+ - Removed footer/header from first page with nocoverpage option
+
+0.54 2015-01-01
+
+ - Previous release was not installable because of too strict (and too
+   weird) filename check. Fixed.
+
+0.53 2015-01-01
+
+ - Adjusted spacing between headings and text body in PDFs
+ - When cover option is passed, actually use it for the EPUB
+
+0.52 2015-12-31
+
+ - NYE release :-)
+ - New papersize options allowed: B3-B6 and A3
+ - headings option now takes a value (but boolean still accepted)
+
+0.51 2015-12-19
+
+ - Layout fixes for bare tex output: do not put the postamble in the
+   title page, but append it to the end of the body.
+
+0.50 2015-12-05
+
+ - Handle partials
+
+0.46 2015-12-02
+
+ - Handle long author's name in documents, avoiding \maketitle
+ - Added headings option to the template
+
+0.45 2015-10-30
+
+ - Fixed bug on fileparse() usage.
+
+0.44 2015-10-28
+
+ - Added class to parse the muse headers
+ - Added methods to the template options to get some defaults
+
+0.43 2015-10-15
+
+ - Cleanup files left by previous compilation and remove LaTeX
+   leftovers (.aux, .vrb, etc).
+
+0.42 2015-10-14
+
+ - "slides" is now an alias for "sl_pdf"
+
+0.41 2015-10-14
+
+ - Fixed default for older Moo
+
+0.40 2015-10-13
+
+ - Generate slides when the header #slides is true.
+ - New beamer themes options
+ - New option for sans serif and typewriter fonts
+ - Updated styles for description lists
+ - Internal refactoring for option handling
+ - New option --purge to muse-compile
+
+0.38 2015-08-26
+
+ - Replaced EBook::EPUB with EBook::EPUB::Lite (to lighten up the
+   dependecies, no XS).
+
+0.37 2015-05-10
+
+ - Added --luatex option to use lualatex instead of xelatex
+
+0.36 2015-04-08
+
+ - Adjusted definition of \forcelinebreak preventing a pagebreak after
+   that. This could have some unwanted side effects in some corner
+   case (like poetry overflowing).
+
+0.35 2015-02-14
+
+ - It looks like Archive::Zip 1.30 fails to extract the whole zip with
+   the syntax $zip->extractTree('', $dest). This appears to work at
+   least on 1.37 and 1.45 (latest). Changes file doesn't talk about
+   this, though. 1.30 is shipped by debian, so we have to support
+   this. Relevant tests updated.
+
+ - Added support in the class and in the script for embedding fonts in
+   the EPUB (--webfontsdir)
+
+0.34 2015-02-12
+
+ - Table of contents for EPUB now is properly nested
+
+ - The compiler now can merge multiple texts into an EPUB. Merging
+   into a single HTML document would require rewriting the footnotes
+   reference and honestly doesn't make much sense.
+
+0.33 2015-02-05
+
+ - Fixed dumb validations for filename. This is still strict and
+   probably will create validation problems on some setups (passing
+   absolute filenames with spaces will fail miserably).
+
+0.32 2015-02-03
+
+ - Support for #hyphenation tag in the header. Dependency of
+   Text::Amuse bumped because of needed hyphenation method.
+
+0.31 2015-01-19
+
+ - New option: opening (for chapter pages)
+ - Interpret (via Text::Amuse) and so escape all the strings passed
+   to the templates
+
+0.30 2015-01-18
+
+ - Downgraded requirement from Template to Template::Tiny. This change
+   should produce a minor performance improvement (both speed and
+   memory-wise) and, more important, pull out the complicated logic
+   from the the LaTeX template into the code. This of course will
+   prevent to do crazy stuff into the template. I see this as a
+   feature. Eventually, if the need arise, there could be an option to
+   use Template instead, given that the interface is the same. This is
+   a major cleanup which has the potential to introduce bugs.
+
+ - Added validation for extra values
+
+0.27 2015-01-13
+
+ - Fixed minor bug with missing cleardoublepage after title page
+ - Prepared tests for upcoming downgrade from Template to Template::Tiny
+
+0.26 2014-12-12
+
+ - Fixed bug with missing escape in the epub's titlepage
+
+0.25 2014-10-10
+
+ - Fixed output out missing character report (missing newline)
+ - Removed File::Slurp from the script
+
+0.24 2014-09-08
+
+ - LaTeX template change: reduced the footskip to 2 baselines.
+
+0.23 2014-09-02
+
+ - No code change. More verbose output in the methods.t which had a
+   bunch of unexplicable test failing on windows.
+
+0.22 2014-08-30
+
+ - Added notoc option to suppress the table of content generation
+
+0.21 2014-08-08
+
+ - Changed default LaTeX class to book, even for texts without a table
+   of contents. You can switch to the old behaviour either setting
+   nocoverpage to a true value in the header or passing the extra key
+   nocoverpage=1 to the compiler.
+
+0.20 2014-07-26
+ - Avoid useless and warmful decoding of TeX log file (known to have invalid utf8)
+
+0.19 2014-07-20
+ - Removed dependency on File::Slurp
+ - Basic validation of extra options which enter the template not interpolated
+ - Report missing fonts when compiling the PDF
+
+0.18 2014-06-08
+ - Set the language code in the html tag in the HTML output
+ - Removed the need for a lock file using flock
+ - Respect bcor and twoside option when building only plain pdf
+
+0.17 2014-05-29
+ - Added method to see if a file has already been compiled
+
+0.16 2014-05-22
+ - Adjusted logger
+
+0.15 2014-05-17
+ - Added --extra cover and --extra cover-width keys and documentation
+
+0.14 2014-04-15
+ - Adjusted code and tests for directory names with dots
+
+0.13 2014-04-07
+ - Restored slightly verbose logging
+ - Added recursive compilation
+ - Added --recursive and --dry-run to muse-compile.pl
+ - Use a status file instead of dummy .ok
+ - Added cleanup option to remove the status file
+ - Decode --extra arguments passed on the command line
+ - Hopefully fixed tests on Win32
+
+0.12 2014-03-30
+ - Remove the use of fork when compiling (save for the latex exec)
+ - Improved logging
+
+0.11 2014-03-23
+ - Fixed test failures because of hash randomization
+
+0.10 2014-03-23
+ - Use IO::Pipe instead of |- construct.
+
+0.09 2014-03-22
+ - Handle the merging of files in different languages
+
+0.08 2014-03-16
+ - New EXPERIMENTAL feature: file merging (only tex and pdf for now)
+
+0.07 2014-03-08
+ - New format: zip file with sources and attachments
+
+0.06 2014-03-02
+ - Removed noisy debug (leftover of the previous change)
+
+0.05 2014-03-02
+ - Force bcor=0mm and oneside=true for default .tex output
+ - Renamed option size to papersize to avoid TT problems (which would interpret
+   the size as the size of the options hashref
+
+0.04 2014-03-01
+ - Disabled testing with XeLaTeX by default and fixed localtime warning
+
+0.03 2014-03-01
+ - Added options to pass to the templates
+
+0.02 2014-02-26
+ - Fixed missing binary in MANIFEST
+
+0.01 2014-02-26
+ - First public version with basic features
+
+

@@ -1,0 +1,80 @@
+Revision history for perl module Text::Haml
+
+0.990118 2017-01-18T18:39:25Z
+
+    [Fixes]
+    - Update HAML reference links in POD (grtodd)
+    - Update HAML reference links in README (grtodd)
+
+0.990117 2016-04-25T09:25:07Z
+
+    All changes by Mark Aufflick.
+
+    [Improvements]
+    - Added test to ensure sequential multiline code blocks work
+    - Since we no longer allow statement continuation across `-` code block lines, implemented support for multiline
+      code blocks.
+    - Fair attempt at block capturing helpers
+    - Now bracing whole level, including blocks which is a precursor to allowing helpers to enclose blocks
+    - Need implicit braces around block contents also
+    - Eliminate need for closing brace block by implicitly adding open/close braces at level changes
+
+    [Fixes]
+    - Fixed regression introduced by implicit bracing where final trailing newlines were no longer suppressed where they
+      should have been.
+    - Fixed bogus <> and </> from wrapping lines beginning with ( or {
+
+0.990116 2014-04-25T10:06:26Z
+
+    [Documentation]
+    - Update docs on how to use Data::Section::Simple (TheAthlete)
+    [Fixes]
+    - Bug fix in html comments with double quotes (TheAthlete)
+    - Bug fix html comment (TheAthlete)
+    - Fixed bug with adding a newline in the last line of the template (TheAthlete)
+    - Bug fix comment haml inside tag (TheAthlete)
+
+0.990115 2014-01-18T16:06:12Z
+
+    - Fix comment in :css filter (TheAthlete)
+
+0.990114 2013-12-20T09:47:23Z
+
+    - correct behaviour when working with false and undefined values (Keedi Kim)
+    - :css filter (TheAthlete);
+
+0.990113 2013-11-26T09:36:12Z
+
+    - Fix test failure on windows (\r\n -> \n) (TheAthlete)
+    - Fix bug with html escaping (TheAthlete)
+
+0.990112 2013-11-05T18:20:38Z
+
+    - Fix support for caching of templates in __DATA__ section (TheAthlete)
+    - Fix hashref interpolation inside filters (TheAthlete)
+
+0.990111
+
+    - Fix dependency list (Keedi Kim)
+
+0.990110 2013-10-16
+
+0.990109 2013-08-08
+
+0.990108 2013-04-22
+
+0.990107 2012-09-26
+
+0.990106 2012-08-27
+
+0.990105 2012-08-27
+
+0.990104 2010-10-14
+
+0.990103 2010-05-02
+
+0.990102 2010-02-08
+
+0.990101 2009-12-26
+    - first version released to CPAN
+

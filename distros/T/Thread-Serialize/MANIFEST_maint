@@ -1,0 +1,12 @@
+MANIFEST
+MANIFEST_blead
+CHANGELOG
+README
+Makefile.PL
+lib/Thread/Serialize.pm
+lib_blead/Thread/Serialize.pm_blead
+t/Serialize.t
+t_blead/001basic.t_blead
+META.yml                                Module meta-data (added by MakeMaker)
+threadsforks                threads/forks test (added by Devel::ThreadsForks)
+maintblead                      maint/blead test (added by Devel::MaintBlead)

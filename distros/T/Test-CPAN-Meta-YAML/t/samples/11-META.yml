@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                PerlPoint-Package
+version:             0.46
+abstract:            A framework to write PerlPoint converters.
+author:              Jochen Stenzel (perl@jochen-stenzel.de)
+license:             artistic
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:    
+    Digest::SHA1:                  1
+    File::Spec:                    0.8
+    File::Temp:                    0.12
+    Getopt::Long:                  2.24
+    IO::File:                      1
+    Pod::Simple:                   3.02
+    Storable:                      1
+    Test::Harness:                 1.25
+    Test::More:                    0.11
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+

@@ -1,0 +1,188 @@
+############# Text Edit with Syntax highlighting for Test Cases Only ###########
+
+
+# Highlight text pattern, read from _DATA_ and the end of the file
+my $HIGHLIGHT_PATTERNS;
+
+
+# Sub to create a text window populated with the contents of the given filename.
+sub createTextWindow{
+	my $mw = shift;
+	my $filename = shift;
+	
+	open(INFILE, $filename) or die("Can't open filename '$filename'\n");
+	
+	# Widgets need containers to properly work with Tk::CaptureRelease
+	#   i.e. bare widgets don't work.
+	my $container = $mw->Frame();
+	my $textWidget = $container->Scrolled('Text', 
+			-relief => 'sunken',
+			-height => 10,
+			-width => 80,
+			-scrollbars => 'se',
+                        -wrap => 'none',
+			);
+	$textWidget->pack(-fill => 'both', -expand => 1);
+	my @lines;
+	my $lineCount = 0;
+	while(defined($_ = <INFILE>) && ($lineCount < 200) ){ # For speed, limit lines to 200
+		s/\r//; #get rid of dos newlines
+		push @lines, $_;
+		$lineCount++;
+	}
+	close INFILE;
+	
+	$textWidget->insert('0.0', join("", @lines));
+
+        # Create Tags for syntax highlighting
+        $textWidget->tagConfigure('Subroutine', -foreground => 'brown');
+        $textWidget->tagConfigure('Subroutine1', -foreground => 'chocolate');
+        $textWidget->tagConfigure('Numeric Const', -foreground => 'RoyalBlue4');
+        $textWidget->tagConfigure('String', -foreground => 'RoyalBlue3');
+        $textWidget->tagConfigure('String2', -foreground => 'RoyalBlue3');
+        
+        $textWidget->tagConfigure('Identifier1', -foreground => 'Black');
+        $textWidget->tagConfigure('Keyword', -foreground => 'Purple4');
+        $textWidget->tagConfigure('Comment', -foreground => 'seagreen');
+
+        $HIGHLIGHT_PATTERNS = readHighlightPatterns();
+        
+        # Apply text highlighting
+        applyHighlighting($textWidget, $HIGHLIGHT_PATTERNS);
+        
+	return $container;
+}
+
+# Sub to return syntax highlight patterns.
+#   This is a quick-and-dirty tranlation of the Nedit perl highlighting patterns
+sub readHighlightPatterns{
+	
+        my $patterns = 
+        {
+          'statements' => {
+                            'highlightStyle' => 'Keyword',
+                            'options' => 'D',
+                            'errorMatch' => '',
+                            'endMatch' => '',
+                            'parentPattern' => '',
+                            'startMatch' => '\\b(if|until|while|elsif|else|unless|for(each)?|continue|last|goto|next|redo|do(?=\\s*\\{)|BEGIN|END)bb'
+                          },
+          'library functions' => {
+                                   'highlightStyle' => 'Subroutine',
+                                   'options' => undef,
+                                   'errorMatch' => '',
+                                   'endMatch' => '',
+                                   'parentPattern' => '',
+                                   'startMatch' => '\\b((?# arithmetic functions)abs|atan2|cos|exp|int|log|rand|sin|sqrt|srand|time|(?# conversion functions)chr|gmtime|hex|localtime|oct|ord|vec|(?# structure conversion)pack|unpack|(?# string functions)chomp|chop|crypt|eval(?=\\s*[^{])|index|lc|lcfirst|length|quotemeta|rindex|substr|uc|ucfirst|(?# array and hash functions)delete|each|exists|grep|join|keys|map|pop|push|reverse|scalar|shift|sort|splice|split|unshift|values|(?# search and replace functions)pos|study|(?# file operations)chmod|chown|link|lstat|mkdir|readlink|rename|rmdir|stat|symlink|truncate|unlink|utime|(?# input/output)binmode|close|eof|fcntl|fileno|flock|getc|ioctl|open|pipe|print|printf|read|readline|readpipe|seek|select|sprintf|sysopen|sysread|sysseek|syswrite|tell|(?# formats)formline|write|(?# tying variables)tie|tied|untie|(?# directory reading routines)closedir|opendir|readdir|rewinddir|seekdir|telldir|(?# system interaction)alarm|chdir|chroot|die|exec|exit|fork|getlogin|getpgrp|getppid|getpriority|glob|kill|setpgrp|setpriority|sleep|syscall|system|times|umask|wait|waitpid|warn|(?# networking)accept|bind|connect|getpeername|getsockname|getsockopt|listen|recv|send|setsockopt|shutdown|socket|socketpair|(?# system V ipc)msgctl|msgget|msgrcv|msgsnd|semctl|semget|semop|shmctl|shmget|shmread|shmwrite|(?# miscellaneous)defined|do|dump|eval(?=\\s*\\{)|local|my|ref|reset|undef|(?# informations from system databases)endpwent|getpwent|getpwnam|getpwuid|setpwent|endgrent|getgrent|getgrgid|getgrnam|setgrent|endnetent|getnetbyaddr|getnetbyname|getnetent|setnetent|endhostend|gethostbyaddr|gethostbyname|gethostent|sethostent|endservent|getservbyname|getservbyport|getservent|setservent|endprotoent|getprotobyname|getprotobynumber|getprotoent|setprotoent)\\b'
+                                 },
+          'subroutine call' => {
+                                 'highlightStyle' => 'Subroutine1',
+                                 'options' => 'D',
+                                 'errorMatch' => '',
+                                 'endMatch' => '',
+                                 'parentPattern' => '',
+                                 'startMatch' => '&\\w(\\w|::)\\b|\\b\\w(\\w|::)*(?=\\s*\\()'
+                               },
+          'comment' => {
+                         'highlightStyle' => 'Comment',
+                         'options' => undef,
+                         'errorMatch' => '',
+                         'endMatch' => '$',
+                         'parentPattern' => '',
+                         'startMatch' => '(?:[^$]|^)#'
+                       },
+          'dq string' => {
+                           'highlightStyle' => 'String2',
+                           'options' => undef,
+                           'errorMatch' => '\\n\\s*\\n',
+                           'endMatch' => '',
+                           'parentPattern' => '',
+                           'startMatch' => '"[^\'\\n]*"'
+                         },
+          'sq string' => {
+                           'highlightStyle' => 'String',
+                           'options' => undef,
+                           'errorMatch' => '\\n\\s*\\n',
+                           'endMatch' => '',
+                           'parentPattern' => '',
+                           'startMatch' => '\'[^\'\\n]*\''
+                         }
+        };
+	return $patterns;
+}
+
+########## Sub to actually apply the text highlighting patterns ############
+sub applyHighlighting{
+
+	my $text = shift;
+	my $patterns = shift;
+	
+	
+	my $startIndex = shift || '1.0';
+	
+	my $stopIndex =  shift || 'end';
+	
+	#my $patterns = $text->cget('-highlightpatterns');
+	
+	my $string = $text->get($startIndex,$stopIndex);
+        #print "Highlighting $startIndex, $stopIndex '$string'\n";
+
+	my ($pos1, $pos2); # starting/stopping positions in the text
+	# Go Thru each highlighting pattern
+	
+	
+	foreach my $patName(keys %$patterns){
+
+		my @fromToIndexes; # Array of from/to indexes to use for this patName
+				   # These are accumulated and then a call to $text->tagAdd is done all at once
+
+		#print "Pattern '$patName'..";
+		my $pattern = $patterns->{$patName};
+
+		# Get Vars for this pattern:
+		my ($startMatch, $endMatch, $errorMatch, $highlightStyle, $parentPattern, $options) = @$pattern{ qw/ startMatch endMatch errorMatch highlightStyle parentPattern options /};
+
+		# Get rid of existing styles
+		$text->tagRemove($highlightStyle,$startIndex,$stopIndex);
+
+		pos($string) = 0; # Start Matching from the begining of the string
+
+		# If no end pattern, then just do a simple match
+		unless( $endMatch){
+
+			while($string =~ m/$startMatch/mg){
+				#print "$patName match, pos = ".pos($string)."\n";				
+				$pos2 = pos($string);
+				$pos1 = $pos2 - length($&); # get the match at the begining
+				push @fromToIndexes, "$startIndex +$pos1"."chars","$startIndex +$pos2"."chars";
+				
+				#print "pattern $patName: '$&'\n";
+				
+			}
+		}
+		else{  # Starting and ending pattern
+
+			while($string =~ m/$startMatch/mg){
+				#print "$patName match, pos = ".pos($string)."\n";				
+				$pos1 = pos($string) - length($&); # get the match at the begining
+				# Look for ending match:
+				if( $string =~ m/$endMatch/mg ){
+					$pos2 = pos($string); 
+					push @fromToIndexes, "$startIndex +$pos1"."chars","$startIndex +$pos2"."chars";
+				}
+				else{  # couldn't find ending pattern
+					last;
+				}
+			}
+		}
+		#print "   2) Done getting tag locations  ";
+		# Highlight all the indexes found
+		$text->tagAdd($highlightStyle, @fromToIndexes) if( @fromToIndexes);
+		#print "   3) Done adding Tags to text\n";
+
+	}
+}
+1;
+
+
+

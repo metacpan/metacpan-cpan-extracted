@@ -1,0 +1,37 @@
+Revision history for Perl module Tee
+
+0.14      2011-01-28 09:40:36 EST5EDT
+
+    [BUG FIXES]
+
+    - fix error writing to undef handle on MSWin32 in some circumstances
+
+    [OTHER]
+
+    - converted distribution to Dist::Zilla
+
+0.13_51 Thu Dec 11 00:48:32 EST 2008
+
+    - moved guts of ptee to Tee::App; removed ptee search logic from Tee.pm
+
+    - bumped some prerequisites; dropped others
+
+    - changed to the Apache License, version 2.0; (it's clearer, relicensable,
+      and is explicit about contributions)
+
+0.13 Thu Aug 17 13:09:03 EDT 2006
+    - customize Makefile.PL for auto/Tee
+    - handle spaces in ptee path in Tee.pm
+
+0.12 Thu Aug 17 07:40:23 EDT 2006
+    - store a copy of ptee in auto/Tee for tee()
+    - removed unused test files
+    - downgraded IPC::Run3 prereq version to 0.033
+
+0.11 Thu Aug  3 14:49:31 EDT 2006
+    - added multiple file support to tee() to match documentation
+    - Pod addition and cleanups
+
+0.10 Wed Aug  2 22:20:22 EDT 2006
+    - initial release
+

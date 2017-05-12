@@ -1,0 +1,41 @@
+This is the first normal line
+@PERL << ^END_OF_PERL$
+  sub Hello {
+    Vpp_Out(join('',"Hello world"," - Here I am"),"and here on the next line");
+  }
+  
+  sub Chances($$) {
+    my ($nseq,$num) = @_;
+    # compute the chance to draw a sequence of <nseq> specific balls
+    # out of <num> balls.
+    my $chance;
+    if ( $nseq > $num ) {
+      $chance= 0;
+    } else {
+      $chance= 1;
+      for (my $k=1; $k <= $nseq; $k++) {
+        $chance*= $k/($num-$k);
+      }
+    }
+    Vpp_Out(sprintf ('double chance_%d_of_%d = %.12f;',$nseq,$num, $chance));
+  }
+  
+  sub WhoIs($) {
+    my $Subject = $_[0];
+    return "our $Subject is $$VAR{$Subject}";
+  }
+  
+  sub WhoIs($) {
+    my $Subject = $_[0];
+    return "our $Subject is $$VAR{$Subject}";
+  }
+  
+END_OF_PERL
+This is the second normal line
+@EVAL &Hello
+This is the third normal line
+@EVAL &Chances(7,49)
+This is the fourth normal line
+@EVAL &Chances(6,16)
+Who is the Guru : @@WhoIs('Guru')@@ :
+This is the last line

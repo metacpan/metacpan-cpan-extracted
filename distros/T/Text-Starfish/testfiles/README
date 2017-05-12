@@ -1,0 +1,25 @@
+2 - simple test, variable testing
+3 - repeated test 2
+
+01 - testing hook adding, with replace
+02 - testing .html.sfish style
+03 - testing .tex with a lot of patterns (previous memory issue)
+
+7 - html example
+
+13,14,15 - testing some macros //m!newdefe
+
+16 - testing .tex file (tex style, after init config)
+
+17,18 - simple example with p_t.java
+
+19,20 - testing html -> html, file permissions: if the output file is
+    specified and mode is not give, it should not be changed.
+
+21 - HTML example 2
+
+22 - HTML example 3
+
+25 - Makefile example
+
+26 - testing include

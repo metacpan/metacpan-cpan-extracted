@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Test/MockModule.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README.md
+t/inheritance.t
+t/lib/ExampleModule.pm
+t/mockmodule.t
+t/pod.t
+t/pod_coverage.t

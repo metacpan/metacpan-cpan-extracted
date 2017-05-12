@@ -1,0 +1,1 @@
+This is a file needed to test the error filed in bug #67334

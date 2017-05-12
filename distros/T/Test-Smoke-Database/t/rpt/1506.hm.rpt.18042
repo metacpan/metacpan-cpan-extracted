@@ -1,0 +1,481 @@
+From: h.m.brand@hccnet.nl (H.Merijn Brand)
+
+--------_3DB6585FDDA903261008_MULTIPART_MIXED_
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+
+--------_3DB6585FDDA903261008_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18042 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1 [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC085E552 for merijn@procura.nl; Wed, 23 Oct 2002 05:08:20 +0200
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_18546)/8.9.3) id WAA10771 for merijn@procura.nl; Tue, 22 Oct 2002 22:30:02 +0200 (METDST)
+Date: Tue, 22 Oct 2002 22:30:02 +0200 (METDST)
+From: "H.M. Brand" <merijn@l1.procura.nl>
+Message-Id: <200210222030.WAA10771@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18042 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18042                               cc            gcc
+                                                      | HP-UX 11.00  B.11.11.06    3.2   32-bit
+O = OK                                                |                            3.2   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.5   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.13              3.2-1
+
+ HP-UX    HP-UX    HP-UX    HP-UX     AIX      AIX      AIX    cygwin  
+ 11.00    11.00    10.20    10.20    4.3.3    4.3.3    4.2.1   1.3.13-2  
+  HPc      gcc      HPc      gcc      vac      gcc      xlc      gcc   
+ 18042    18042    18042    18042    18042    18042    18042    18042   Configuration
+-------  -------  -------  -------  -------  -------  -------  -------  --------------------------------------------------------------------
+F F F F  F F F F  F F F F  F F F F  F F F F  F F F F  F F F F  F F F F   
+F F F F  F F F F                    F F F F  F F F F           F F F F  -Duse64bitint
+F F F F  F F F F                                               . . . .  -Duse64bitall
+F F F F  F F F F  F F F F  F F F F  F F F F  F F F F  F F F F  F F F F  -Duselongdouble
+F F F F  F F F F                    F F F F                    F F F F  -Dusemorebits
+F F F F  F F F F                                               . . . .  -Duse64bitall -Duselongdouble
+F F F F  F F F F  F F F F  F F F F  F F F F  F ? ? ?  F F F F           -Dusethreads -Duseithreads
+F F F F  F F F F                    F F F F  ? ? ? ?           ? ? ? ?  -Duse64bitint -Dusethreads -Duseithreads
+F F F F  F F F F                             ? ? ? ?           ? ? ? ?  -Duse64bitall -Dusethreads -Duseithreads
+F F F F  F F F F  F F F F  F F F F  F F F F  ? ? ? ?  F F F F  ? ? ? ?  -Duselongdouble -Dusethreads -Duseithreads
+F F F F  F F F F                    F F F F  ? ? ? ?           ? ? ? ?  -Dusemorebits -Dusethreads -Duseithreads
+F F F F  F F F F                             ? ? ? ?           ? ? ? ?  -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+| |                            | |
+| +----- PERLIO = perlio       | +- PERLIO = perlio -DDEBUGGING
++------- PERLIO = stdio        +--- PERLIO = stdio  -DDEBUGGING
+
+Failures:
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING  
+HP-UX 11.00  stdio/perlio     -DDEBUGGING  
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 0
+    ext/DB_File/t/db-hash................FAILED at test 0
+    ext/DB_File/t/db-recno...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 11.00  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING  
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING  
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitall
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitall
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Dusemorebits
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Dusemorebits
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitall -Dusethreads -Duseithreads
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitall -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+HPUX 11 gcc  stdio/perlio     -DDEBUGGING -Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+    lib/Net/t/smtp.......................FAILED at test 0
+
+HP-UX 10.20  stdio/perlio     -DDEBUGGING  
+HP-UX 10.20  stdio/perlio     -DDEBUGGING  
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 10.20  stdio            -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 10.20  perlio           -DDEBUGGING -Dusethreads -Duseithreads
+    t/op/rand............................FAILED at test 5
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 10.20  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 10.20  stdio            -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HP-UX 10.20  perlio           -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    t/op/rand............................FAILED at test 5
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+HPUX 10 gcc  stdio/perlio     -DDEBUGGING  
+HPUX 10 gcc  stdio/perlio     -DDEBUGGING  
+HPUX 10 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+HPUX 10 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+HPUX 10 gcc  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HPUX 10 gcc  stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+HPUX 10 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+HPUX 10 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.3      stdio/perlio     -DDEBUGGING  
+AIX 4.3      stdio/perlio     -DDEBUGGING  
+AIX 4.3      stdio/perlio     -DDEBUGGING -Duse64bitint
+AIX 4.3      stdio/perlio     -DDEBUGGING -Duse64bitint
+AIX 4.3      stdio/perlio     -DDEBUGGING -Duselongdouble
+AIX 4.3      stdio/perlio     -DDEBUGGING -Duselongdouble
+AIX 4.3      stdio/perlio     -DDEBUGGING -Dusemorebits
+AIX 4.3      stdio/perlio     -DDEBUGGING -Dusemorebits
+AIX 4.3      stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+AIX 4.3      stdio/perlio     -DDEBUGGING -Dusethreads -Duseithreads
+AIX 4.3      stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+AIX 4.3      stdio/perlio     -DDEBUGGING -Duse64bitint -Dusethreads -Duseithreads
+AIX 4.3      stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+AIX 4.3      stdio/perlio     -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+AIX 4.3      stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+AIX 4.3      stdio/perlio     -DDEBUGGING -Dusemorebits -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING  
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING  
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duse64bitint
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+AIX 4.3 gcc  stdio/perlio     -DDEBUGGING -Duselongdouble
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.3 gcc  stdio            -DDEBUGGING -Dusethreads -Duseithreads
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      stdio/perlio     -DDEBUGGING  
+AIX 4.2      stdio/perlio     -DDEBUGGING  
+AIX 4.2      stdio/perlio     -DDEBUGGING -Duselongdouble
+AIX 4.2      stdio/perlio     -DDEBUGGING -Duselongdouble
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      stdio            -DDEBUGGING -Dusethreads -Duseithreads
+    ext/GDBM_File/gdbm...................FAILED at test 5
+    lib/Memoize/t/tie_gdbm...............FAILED at test 1
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      perlio           -DDEBUGGING -Dusethreads -Duseithreads
+    ext/GDBM_File/gdbm...................FAILED at test 0
+    lib/Memoize/t/tie_gdbm...............FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      stdio            -DDEBUGGING -Dusethreads -Duseithreads
+    ext/GDBM_File/gdbm...................FAILED at test 5
+    lib/Memoize/t/tie_gdbm...............FAILED at test 1
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      perlio           -DDEBUGGING -Dusethreads -Duseithreads
+    ext/GDBM_File/gdbm...................FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      stdio            -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    ext/GDBM_File/gdbm...................FAILED at test 5
+    lib/Memoize/t/tie_gdbm...............FAILED at test 1
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      perlio           -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    ext/GDBM_File/gdbm...................FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      stdio            -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    ext/GDBM_File/gdbm...................FAILED at test 5
+    lib/Memoize/t/tie_gdbm...............FAILED at test 1
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+AIX 4.2      perlio           -DDEBUGGING -Duselongdouble -Dusethreads -Duseithreads
+    ext/GDBM_File/gdbm...................FAILED at test 0
+    lib/Net/Ping/t/450_service...........FAILED at test 2
+
+Cygwin 1.3   stdio            -DDEBUGGING  
+    ext/DB_File/t/db-btree...............FAILED at test 166
+    ext/DB_File/t/db-hash................FAILED at test 129
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 60
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 97
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   perlio           -DDEBUGGING  
+    t/comp/use...........................FAILED at test 23
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 223
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   stdio            -DDEBUGGING  
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   perlio           -DDEBUGGING  
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 60
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   stdio            -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    ext/Time/HiRes/HiRes.................FAILED at test 16
+    lib/ExtUtils/t/Constant..............FAILED at test 223
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   perlio           -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   stdio            -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/IPC/Open3........................FAILED at test 16
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   perlio           -DDEBUGGING -Duse64bitint
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/IO/lib/IO/t/io_pipe..............FAILED at test 1
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   stdio            -DDEBUGGING -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 223
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   perlio           -DDEBUGGING -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 60
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   stdio            -DDEBUGGING -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   perlio           -DDEBUGGING -Duselongdouble
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/IO/lib/IO/t/io_pipe..............FAILED at test 1
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   stdio            -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   perlio           -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/AutoSplit........................FAILED at test 2
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   stdio            -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+Cygwin 1.3   perlio           -DDEBUGGING -Dusemorebits
+    ext/DB_File/t/db-btree...............FAILED at test 17
+    ext/DB_File/t/db-hash................FAILED at test 15
+    ext/Socket/socketpair................FAILED at test 27
+    lib/ExtUtils/t/Constant..............FAILED at test 223
+    lib/Net/Ping/t/450_service...........FAILED at test 20
+    lib/Test/Harness/t/strap-analyze.....FAILED at test 2
+    lib/warnings.........................FAILED at test 413
+
+--------_3DB6585FDDA903261008_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 18042 /pro/3gl/CPAN/perl-current
+
+Return-Path: <merijn@l1.procura.nl>
+Received: from l1.procura.nl (l1 [192.0.1.2]) by procura.nl with SMTP (Mailtraq/2.1.0.1323) id PRCRC085E54E for merijn@procura.nl; Wed, 23 Oct 2002 05:08:19 +0200
+Received: (from merijn@localhost) by l1.procura.nl (8.9.3 (PHNE_18546)/8.9.3) id WAA10836 for merijn@procura.nl; Tue, 22 Oct 2002 22:35:03 +0200 (METDST)
+Date: Tue, 22 Oct 2002 22:35:03 +0200 (METDST)
+From: "H.M. Brand" <merijn@l1.procura.nl>
+Message-Id: <200210222035.WAA10836@l1.procura.nl>
+To: merijn@procura.nl
+Subject: Smoke 18042 /pro/3gl/CPAN/perl-current
+Mime-Version: 1.0
+X-Hops: 1
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 18042                               cc         gcc
+                                                      | HP-UX 11.00  B.11.11.04    3.2   32-bit
+O = OK                                                |                            3.2   64-bit +GNUld
+F = Failure(s), extended report at the bottom         | HP-UX 10.20  A.10.32.30    3.2  
+? = still running or test results not (yet) available | AIX 4.3.3.0  vac 5.0.2.5   3.1.1
+Build failures during:       - = unknown,   = skipped | AIX 4.2.1.0  xlc 3.1.4.10  3.1.1
+    c = Configure, m = make, t = make test-prep       | Cygwin 1.3.13              3.2-1
+
+     HP-UX            HP-UX            HP-UX            HP-UX             AIX              AIX              AIX            cygwin      
+     11.00            11.00            10.20            10.20            4.3.3            4.3.3            4.2.1           1.3.13-2      
+      HPc              gcc              HPc              gcc              vac              gcc              xlc              gcc       
+     18042            18042            18042            18042            18042            18042            18042            18042       Configuration
+---------------  ---------------  ---------------  ---------------  ---------------  ---------------  ---------------  ---------------  --------------------------------------------------------------------
+100  99  90  90 | 71  72  71  72 | 58  56  53  51 | 49  49  48  49 | 48  47  43  43 | 44  44  39  39 | 35  35  30  29 | 61  60  55  57 | 
+ 84  82  74  71 | 76  75  71  72 |                |                | 48  48  42  41 | 43  43  38  38 |                | 57  58  54  55 |-Duse64bitint
+ 82  82  73  72 |                |                |                |                |                |                |  .   .   .   . |-Duse64bitall
+                |                |                |                | 47  48  41  39 | 43  43  38  39 | 35  35  30  29 | 59  62  55  56 |-Duselongdouble
+                |                |                |                | 47  47  41  41 |                |                | 57  59  55  56 |-Dusemorebits
+                |                |                |                |                |                |                |  .   .   .   . |-Duse64bitall -Duselongdouble
+ 63  64  55  54 | 51  51  51  51 | 32  30  28  28 | 26  26  27  26 | 38  38  31  30 | 38  40         | 23  23  19  19 |                |-Dusethreads -Duseithreads
+ 56  55  50  49 | 49  48  49  49 |                |                | 38  37  33  33 |                |                |  ?   ?   ?   ? |-Duse64bitint -Dusethreads -Duseithreads
+ 57  58  50  51 |                |                |                |                |                |                |  ?   ?   ?   ? |-Duse64bitall -Dusethreads -Duseithreads
+                |                |                |                | 38  37  34  34 |                | 23  23  19  19 |  ?   ?   ?   ? |-Duselongdouble -Dusethreads -Duseithreads
+                |                |                |                | 37  37  33  33 |                |                |  ?   ?   ?   ? |-Dusemorebits -Dusethreads -Duseithreads
+                |                |                |                |                |                |                |  ?   ?   ?   ? |-Duse64bitall -Duselongdouble -Dusethreads -Duseithreads
+  |   |                    |   |
+  |   +- PERLIO = perlio   |   +- PERLIO = perlio -DDEBUGGING
+  +----- PERLIO = stdio    +----- PERLIO = stdio  -DDEBUGGING
+--------_3DB6585FDDA903261008_MULTIPART_MIXED_--
+
+

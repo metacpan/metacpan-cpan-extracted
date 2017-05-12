@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Tk-CanvasFig
+version:            1.017
+abstract:           ~
+author:
+    - Slaven Rezic (slaven@rezic.de)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Tk:  0
+resources:
+    repository:  git://github.com/eserte/tk-canvasfig.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

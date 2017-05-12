@@ -1,0 +1,17 @@
+
+Let's see if the new link format works.
+
+
+
+	- [[link [link1]]
+	- [[this is a link [link1]]
+	- [[Justin Mason]] ... etc
+	- my homepage ... etc 
+
+	[link1]: http://webmake.taint.org/
+	[Justin Mason]: http://jmason.org/contact.html
+	Auto: [my homepage]: http://jmason.org/
+
+
+
+

@@ -1,0 +1,7 @@
+Revision history for Test-AnyEvent-Time
+
+0.01    2012/06/18
+        First release.
+        Provides elapsed_time, time_cmp_ok,
+        time_between_ok and time_within_ok.
+

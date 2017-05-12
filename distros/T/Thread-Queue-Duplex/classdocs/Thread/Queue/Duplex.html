@@ -1,0 +1,1129 @@
+
+<html>
+<head>
+<title>Thread::Queue::Duplex</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;<A HREF='#constructor_summary'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;<A HREF='#constructor_detail'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Thread::Queue::Duplex</h2>
+
+<p>
+<dl>
+<dt><b>Inherits from:</b>
+<dd><a href='../../Thread/Queue/TQDContainer.html'>Thread::Queue::TQDContainer</a></dd>
+<dd><a href='../../Thread/Queue/Queueable.html'>Thread::Queue::Queueable</a></dd>
+<dd><a href='../../Exporter.html'>Exporter</a></dd>
+</dt>
+</dl>
+
+<hr>
+
+Thread-safe request/response queue with identifiable elements.
+Provides methods for N threads to queue items to other threads, and
+then wait only for responses to specific queued items.
+<p>
+Note: this object is derived from an threads::shared arrayref
+to optimize performance.
+<p>
+Licensed under the Academic Free License version 2.1, as specified in the
+License.txt file included in this software package, or at
+<a href="http://www.opensource.org/licenses/afl-2.1.php">OpenSource.org</a>.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.92</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2005-12-01
+</dd>
+
+<dt><b>See Also:</b></dt>
+	<dd><a href='./Queueable.html'>Thread::Queue::Queueable</a></dd>
+
+<p>
+<i>Unless otherwise noted, <code>$obj
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th colspan=2 align=left><font size='+2'>Exported Symbols</font></th></tr>
+<tr><td align=right valign=top><code>$tqd_global_lock</code></td><td align=left valign=top>global threads::shared variable for locking
+</td></tr>
+<tr><td align=right valign=top><code>TQD_Q</code></td><td align=left valign=top>object field index of threads::shared array used for the queue
+</td></tr>
+<tr><td align=right valign=top><code>TQD_MAP</code></td><td align=left valign=top>object field index of threads::shared hash mapping queue request IDs to requests/responses
+</td></tr>
+<tr><td align=right valign=top><code>TQD_IDGEN</code></td><td align=left valign=top>object field index of threads::shared scalar integer used to generate request IDs
+</td></tr>
+<tr><td align=right valign=top><code>TQD_LISTENERS</code></td><td align=left valign=top>object field index of threads::shared scalar integer count of current listeners
+</td></tr>
+<tr><td align=right valign=top><code>TQD_REQUIRE_LISTENER</code></td><td align=left valign=top>object field index of threads::shared scalar flag indicating if listeners are required before permitting an enqueue operation
+</td></tr>
+<tr><td align=right valign=top><code>TQD_MAX_PENDING</code></td><td align=left valign=top>object field index of threads::shared scalar integer max number of pending requests before an enqueue will block
+</td></tr>
+<tr><td align=right valign=top><code>TQD_URGENT_COUNT</code></td><td align=left valign=top>object field index of threads::shared scalar integer count of current urgent requests
+</td></tr>
+<tr><td align=right valign=top><code>TQD_MARKS</code></td><td align=left valign=top>object field index of threads::shared hash mapping request IDs of marked requests
+</td></tr>
+
+</table>
+<p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Constructor Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Thread::Queue::Duplex'>new</a>(ListenerRequired =&gt; <i>value</i>, MaxPending =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates a new empty queue, and associated mapping hash
+</td></tr>
+</table><p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#available'>available</a>(@ids)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test if a response is available for a either any request,
+or for any of a set of requests
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#cancel'>cancel</a>(@ids)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cancel one or more pending requests
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#cancel_all'>cancel_all</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cancel <b>all</b> current requests and responses, using the
+<a href='#cancel'>cancel()</a> algorithm above, plus cancels
+all simplex requests still in the queue
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#dequeue'>dequeue</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dequeue the next request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#dequeue_nb'>dequeue_nb</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dequeue the next request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#dequeue_until'>dequeue_until</a>($timeout)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dequeue the next request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#dequeue_urgent'>dequeue_urgent</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dequeue the next urgent request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#enqueue'>enqueue</a>(@args)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enqueue a request to the tail of the queue
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#enqueue_and_wait'>enqueue_and_wait</a>(@args)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enqueue a request to the tail of the queue, and wait for the response
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#enqueue_and_wait_until'>enqueue_and_wait_until</a>($timeout, @args)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enqueue a request to the tail of the queue, and wait up to $timeout seconds
+for the response
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#enqueue_simplex'>enqueue_simplex</a>(@args)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enqueue a simplex request to the tail of the queue
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#enqueue_simplex_urgent'>enqueue_simplex_urgent</a>(@args)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enqueue a simplex request to the head of the queue
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#enqueue_urgent'>enqueue_urgent</a>(@args)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enqueue a request to the head of the queue
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#enqueue_urgent_and_wait'>enqueue_urgent_and_wait</a>(@args)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enqueue a request to the head of the queue, and wait up to $timeout seconds
+for the response
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#enqueue_urgent_and_wait_until'>enqueue_urgent_and_wait_until</a>($timeout, @args)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enqueue a request to the head of the queue, and wait up to $timeout seconds
+for the response
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#get_mark'>get_mark</a>($id)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns any current mark on a specified request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#ignore'>ignore</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Deregister as a queue listener
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#listen'>listen</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Register as a queue listener
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#mark'>mark</a>($id, $value)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mark a request with a value
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#marked'>marked</a>($id, $value)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test if a request is marked, or if the mark is a specified value
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#pending'>pending</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Report the number of pending requests
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#ready'>ready</a>($id)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test if a response is available for a specific request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#respond'>respond</a>($id, @response)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Post a response to a request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#set_max_pending'>set_max_pending</a>($limit)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set maximum number of pending requests permitted
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#unmark'>unmark</a>($id)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remove any marks from a request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#wait'>wait</a>($id)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait for a response to a request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#wait_all'>wait_all</a>(@IDs_or_container_refs)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait for a response to all specified requests
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#wait_all_until'>wait_all_until</a>($timeout, @IDs_or_container_refs)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait up to $timeout seconds for a response to all specified requests
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#wait_any'>wait_any</a>(@IDs_or_container_refs)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait for a response to any specified request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#wait_any_until'>wait_any_until</a>($timeout, @IDs_or_container_refs)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait up to $timeout seconds for a response to any specified request
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#wait_for_listener'>wait_for_listener</a>($timeout)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait until a listener has registered
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#wait_until'>wait_until</a>($id, $timeout)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait up to $timeout seconds for a response to a request
+</td></tr>
+</table>
+<p>
+
+<a name='constructor_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Constructor Details</font></th>
+</tr>
+</table>
+
+<a name='new'></a>
+<h3>new</h3>
+<pre>
+new(ListenerRequired =&gt; <i>value</i>, MaxPending =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd>Creates a new empty queue, and associated mapping hash.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>ListenerRequired</code> =&gt; boolean value indicating if registered listener
+required before enqueue is permitted.
+</dd>
+<dd><code>MaxPending</code> =&gt; positive integer maximum number of pending requests;
+enqueue attempts will block until the pending count
+drops below this value. The limit may be applied or modified later
+via the <a href='#set_max_pending'>set_max_pending()</a> method.
+A value of zero indicates no limit.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='available'></a>
+<h3>available</h3>
+<pre>
+available(@ids)
+</pre><p>
+<dl>
+<dd>Test if a response is available for a either any request,
+or for any of a set of requests.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@ids</code> - (optional) list of request IDs of responses for which to test.
+
+</dd>
+<dt><b>In scalar context, returns:</b><dd>first request ID of available responses, or undef if none available
+</dd>
+<dt><b>In list context, returns:</b><dd>(list of request IDs of available responses, or undef if none available
+)</dd>
+</dl></dd></dl><hr>
+
+<a name='cancel'></a>
+<h3>cancel</h3>
+<pre>
+cancel(@ids)
+</pre><p>
+<dl>
+<dd>Cancel one or more pending requests.
+<p>
+If a response to a cancelled request has already been
+posted to the queue response map (i.e., the request has already
+been serviced), the response is removed from the map,
+the <a href='./Queueable.html#onCancel>onCancel()</a> method is
+invoked on each <a href='./Queueable.html>Thread::Queue::Queueable</a>
+object in the response, and the response is discarded.
+<p>
+If a response to a cancelled request has <b>not</b> yet been posted to
+the queue response map, an empty entry is added to the queue response map.
+(<b>Note:</b> threads::shared doesn't permit splicing shared arrays yet,
+so we can't remove the request from the queue).
+<p>
+When a server thread attempts to <code>dequeue[_nb|_until]()</code> a cancelled
+request, the request is discarded and the dequeue operation is retried.
+If the cancelled request is already dequeued, the server thread will
+detect the cancellation when it attempts to <a href='#respond'>respond</a> to the request,
+and will invoke the <a href='./Queueable.html#onCancel>onCancel()</a>
+method on any <a href='./Queueable.html>Thread::Queue::Queueable</a>
+objects in the response, and then discards the response.
+<p>
+<b>Note</b> that, as simplex requests do not have an identifier, there
+is no way to explicitly cancel a specific simplex request.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@ids</code> - list of request IDs to be cancelled.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='cancel_all'></a>
+<h3>cancel_all</h3>
+<pre>
+cancel_all()
+</pre><p>
+<dl>
+<dd>Cancel <b>all</b> current requests and responses, using the
+<a href='#cancel'>cancel()</a> algorithm above, plus cancels
+all simplex requests still in the queue.
+<p>
+<b>Note:</b> In-progress requests (i.e.,
+request which have been removed from the queue, but do not yet
+have an entry in the response map)  will <b>not</b> be cancelled.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='dequeue'></a>
+<h3>dequeue</h3>
+<pre>
+dequeue()
+</pre><p>
+<dl>
+<dd>Dequeue the next request. Waits until a request is available before
+returning.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>arrayref of request values. The request ID is the first element
+in the returned array.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='dequeue_nb'></a>
+<h3>dequeue_nb</h3>
+<pre>
+dequeue_nb()
+</pre><p>
+<dl>
+<dd>Dequeue the next request. Returns immediately if no request is available.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>undef if no request available; otherwise,
+arrayref of request values. The request ID is the first element
+in the returned array.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='dequeue_until'></a>
+<h3>dequeue_until</h3>
+<pre>
+dequeue_until($timeout)
+</pre><p>
+<dl>
+<dd>Dequeue the next request. Waits until a request is available, or up to
+$timeout seconds, before returning.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - number of seconds to wait for a request
+
+</dd>
+<dt><b>Returns:</b><dd>undef if no request available within $timeout seconds. Otherwise,
+arrayref of request values. The request ID is the first element
+in the returned array.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='dequeue_urgent'></a>
+<h3>dequeue_urgent</h3>
+<pre>
+dequeue_urgent()
+</pre><p>
+<dl>
+<dd>Dequeue the next urgent request. Waits until an urgent request is available before
+returning.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>arrayref of request values. The request ID is the first element
+in the returned array.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='enqueue'></a>
+<h3>enqueue</h3>
+<pre>
+enqueue(@args)
+</pre><p>
+<dl>
+<dd>Enqueue a request to the tail of the queue.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@args</code> - the request. Request values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Request ID if successful; undef if ListenerRequired and no listeners
+are registered
+</dd>
+</dl></dd></dl><hr>
+
+<a name='enqueue_and_wait'></a>
+<h3>enqueue_and_wait</h3>
+<pre>
+enqueue_and_wait(@args)
+</pre><p>
+<dl>
+<dd>Enqueue a request to the tail of the queue, and wait for the response.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@args</code> - the request. Request values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Response structure if successful; undef if ListenerRequired and no listeners
+are registered
+</dd>
+</dl></dd></dl><hr>
+
+<a name='enqueue_and_wait_until'></a>
+<h3>enqueue_and_wait_until</h3>
+<pre>
+enqueue_and_wait_until($timeout, @args)
+</pre><p>
+<dl>
+<dd>Enqueue a request to the tail of the queue, and wait up to $timeout seconds
+for the response.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - number of seconds to wait for a response
+</dd>
+<dd><code>@args</code> - the request. Request values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Response structure if successful; undef if ListenerRequired and no listeners
+are registered, or if no response is received within the specified $timeout
+</dd>
+</dl></dd></dl><hr>
+
+<a name='enqueue_simplex'></a>
+<h3>enqueue_simplex</h3>
+<pre>
+enqueue_simplex(@args)
+</pre><p>
+<dl>
+<dd>Enqueue a simplex request to the tail of the queue. Simplex requests
+do not generate responses.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@args</code> - the request. Request values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object if successful; undef if ListenerRequired and
+no listeners are registered
+</dd>
+</dl></dd></dl><hr>
+
+<a name='enqueue_simplex_urgent'></a>
+<h3>enqueue_simplex_urgent</h3>
+<pre>
+enqueue_simplex_urgent(@args)
+</pre><p>
+<dl>
+<dd>Enqueue a simplex request to the head of the queue. Simplex requests
+do not generate responses.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@args</code> - the request. Request values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object if successful; undef if ListenerRequired and
+no listeners are registered
+</dd>
+</dl></dd></dl><hr>
+
+<a name='enqueue_urgent'></a>
+<h3>enqueue_urgent</h3>
+<pre>
+enqueue_urgent(@args)
+</pre><p>
+<dl>
+<dd>Enqueue a request to the head of the queue.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@args</code> - the request. Request values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Request ID if successful; undef if ListenerRequired and no listeners
+are registered
+</dd>
+</dl></dd></dl><hr>
+
+<a name='enqueue_urgent_and_wait'></a>
+<h3>enqueue_urgent_and_wait</h3>
+<pre>
+enqueue_urgent_and_wait(@args)
+</pre><p>
+<dl>
+<dd>Enqueue a request to the head of the queue, and wait up to $timeout seconds
+for the response.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@args</code> - the request. Request values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Response structure if successful; undef if ListenerRequired and no listeners
+are registered
+</dd>
+</dl></dd></dl><hr>
+
+<a name='enqueue_urgent_and_wait_until'></a>
+<h3>enqueue_urgent_and_wait_until</h3>
+<pre>
+enqueue_urgent_and_wait_until($timeout, @args)
+</pre><p>
+<dl>
+<dd>Enqueue a request to the head of the queue, and wait up to $timeout seconds
+for the response.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - number of seconds to wait for a response
+</dd>
+<dd><code>@args</code> - the request. Request values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Response structure if successful; undef if ListenerRequired and no listeners
+are registered, or if no response is received within the specified $timeout
+</dd>
+</dl></dd></dl><hr>
+
+<a name='get_mark'></a>
+<h3>get_mark</h3>
+<pre>
+get_mark($id)
+</pre><p>
+<dl>
+<dd>Returns any current mark on a specified request.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - ID of request whose mark is to be returned.
+
+</dd>
+<dt><b>Returns:</b><dd>the mark value; undef if not marked
+</dd>
+</dl></dd></dl><hr>
+
+<a name='ignore'></a>
+<h3>ignore</h3>
+<pre>
+ignore()
+</pre><p>
+<dl>
+<dd>Deregister as a queue listener. When all listeners
+deregister, a "ListenerRequired" queue will no longer
+accept new requests until a listener registers via
+<a href='#listen'>listen()</a>
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='listen'></a>
+<h3>listen</h3>
+<pre>
+listen()
+</pre><p>
+<dl>
+<dd>Register as a queue listener. Permits "ListenerRequired"
+queues to accept requests when at least one listener
+has registered.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='mark'></a>
+<h3>mark</h3>
+<pre>
+mark($id, $value)
+</pre><p>
+<dl>
+<dd>Mark a request with a value. Provides a means to
+associate properties to a request after it has been
+queued, but before the response has been posted. The
+responder may test for marks via the <a href='#marked'>marked()</a>
+method, or retrieve the mark value via <a href='#get_mark'>get_mark()</a>.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - ID of request to be marked
+</dd>
+<dd><code>$value</code> - (optional) value to be added as a mark; if not specified,
+a default value of 1 is used.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='marked'></a>
+<h3>marked</h3>
+<pre>
+marked($id, $value)
+</pre><p>
+<dl>
+<dd>Test if a request is marked, or if the mark is a specified value.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - ID of request to test for a mark
+</dd>
+<dd><code>$value</code> - (optional) value to test for
+
+</dd>
+<dt><b>Returns:</b><dd>1 if the request is marked and either no $value was specified,
+or, if a $value was specified, the mark value equals $value; undef
+otherwise.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='pending'></a>
+<h3>pending</h3>
+<pre>
+pending()
+</pre><p>
+<dl>
+<dd>Report the number of pending requests.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>number of requests remaining in the queue.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='ready'></a>
+<h3>ready</h3>
+<pre>
+ready($id)
+</pre><p>
+<dl>
+<dd>Test if a response is available for a specific request.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - the request ID of the response for which to test.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object if response is available; undef otherwise.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='respond'></a>
+<h3>respond</h3>
+<pre>
+respond($id, @response)
+</pre><p>
+<dl>
+<dd>Post a response to a request. If the request has been cancelled,
+the response is discarded; otherwise, all threads blocked on the
+queue are signalled that a new response is available.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - the ID of the request being responded to.
+</dd>
+<dd><code>@response</code> - the response. Response values must be either scalars,
+references to threads::shared variables, or Thread::Queue::Queueable
+objects
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='set_max_pending'></a>
+<h3>set_max_pending</h3>
+<pre>
+set_max_pending($limit)
+</pre><p>
+<dl>
+<dd>Set maximum number of pending requests permitted. Signals any
+currently threads which may be blocked waiting for the number
+of pending requests to drop below the maximum permitted.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$limit</code> - positive integer maximum number of pending requests permitted.
+A value of zero indicates no limit.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='unmark'></a>
+<h3>unmark</h3>
+<pre>
+unmark($id)
+</pre><p>
+<dl>
+<dd>Remove any marks from a request.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - ID of request to be unmarked.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='wait'></a>
+<h3>wait</h3>
+<pre>
+wait($id)
+</pre><p>
+<dl>
+<dd>Wait for a response to a request. Also available as <code>dequeue_response()</code>
+alias.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - the request ID of the response for which to wait.
+
+</dd>
+<dt><b>Returns:</b><dd>the response as an arrayref.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='wait_all'></a>
+<h3>wait_all</h3>
+<pre>
+wait_all(@IDs_or_container_refs)
+</pre><p>
+<dl>
+<dd>Wait for a response to all specified requests. May be called as either
+an instance or class method.
+<p>
+As an instance method, a list of request IDs is provided, and the method waits for
+a response event on all of the specified requests.
+<p>
+As a class method, the caller provides a list of either Thread::Queue::TQDContainer objects,
+or arrayrefs with a Thread::Queue::TQDContainer object, and zero or more request
+IDs. For Thread::Queue::TQDContainer object arguments, and arrayref arguments
+with no identifiers, waits for responses to all current requests on the queue.
+For arrayref arguments with IDS, waits for a response to all
+of the specified IDs.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@IDs_or_container_refs</code> - as instance method, a list of request IDs to wait for;
+as class method, a list of either of Thread::Queue::TQDContainer objects,
+or arrayrefs containing a Thread::Queue::TQDContainer object, followed by
+zero or more request IDs for the queue object.
+
+</dd>
+<dt><b>Returns:</b><dd>as an instance method, returns a hashref of request IDs mapped to their response;
+as a class method, returns a list of queues which have events pending.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='wait_all_until'></a>
+<h3>wait_all_until</h3>
+<pre>
+wait_all_until($timeout, @IDs_or_container_refs)
+</pre><p>
+<dl>
+<dd>Wait up to $timeout seconds for a response to all specified requests. May be called as either
+an instance or class method.
+<p>
+As an instance method, a list of request IDs is provided, and the method waits for
+a response event on all of the specified requests.
+<p>
+As a class method, the caller provides a list of either Thread::Queue::TQDContainer objects,
+or arrayrefs with a Thread::Queue::TQDContainer object, and zero or more request
+IDs. For Thread::Queue::TQDContainer object arguments, and arrayref arguments
+with no identifiers, waits for responses to all current requests on the queue.
+For arrayref arguments with IDS, waits for a response to all
+of the specified IDs.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - number of seconds to wait for all response
+</dd>
+<dd><code>@IDs_or_container_refs</code> - as instance method, a list of request IDs to wait for;
+as class method, a list of either of Thread::Queue::TQDContainer objects,
+or arrayrefs containing a Thread::Queue::TQDContainer object, followed by
+zero or more request IDs for the queue object.
+
+</dd>
+<dt><b>Returns:</b><dd>undef unless all response events occured within $timeout seconds; otherwise,
+as an instance method, returns a hashref of request IDs mapped to their response;
+as a class method, returns a list of queues which have events pending.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='wait_any'></a>
+<h3>wait_any</h3>
+<pre>
+wait_any(@IDs_or_container_refs)
+</pre><p>
+<dl>
+<dd>Wait for a response to any specified request. May be called as either
+an instance or class method.
+<p>
+As an instance method, a list of request IDs is provided, and the method waits for
+a response event on any of the specified requests.
+<p>
+As a class method, the caller provides a list of either Thread::Queue::TQDContainer
+objects (<i>TQD is itself a TQDContainer</i>),
+or arrayrefs with a Thread::Queue::TQDContainer object, and zero or more request
+IDs. For Thread::Queue::TQDContainer object arguments, and arrayref arguments
+with no identifiers, waits for any enqueue event on the contained queue.
+For arrayref arguments with IDS, waits for a response event for any
+of the specified IDs.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@IDs_or_container_refs</code> - as instance method, a list of request IDs to wait for;
+as class method, a list of either of Thread::Queue::TQDContainer objects,
+or arrayrefs containing a Thread::Queue::TQDContainer object, followed by
+zero or more request IDs for the queue object.
+
+</dd>
+<dt><b>Returns:</b><dd>as an instance method, returns a hashref of request IDs mapped to their response;
+as a class method, returns a list of TQD containers which have events pending.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='wait_any_until'></a>
+<h3>wait_any_until</h3>
+<pre>
+wait_any_until($timeout, @IDs_or_container_refs)
+</pre><p>
+<dl>
+<dd>Wait up to $timeout seconds for a response to any specified request. May be called as either
+an instance or class method.
+<p>
+As an instance method, a list of request IDs is provided, and the method waits for
+a response event on any of the specified requests.
+<p>
+As a class method, the caller provides a list of either Thread::Queue::TQDContainer objects,
+or arrayrefs with a Thread::Queue::TQDContainer object, and zero or more request
+IDs. For Thread::Queue::TQDContainer object arguments, and arrayref arguments
+with no identifiers, waits for any enqueue event on the queue.
+For arrayref arguments with IDS, waits for a response event for any
+of the specified IDs.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - number of seconds to wait for a response event
+</dd>
+<dd><code>@IDs_or_container_refs</code> - as instance method, a list of request IDs to wait for;
+as class method, a list of either of Thread::Queue::TQDContainer objects,
+or arrayrefs containing a Thread::Queue::TQDContainer object, followed by
+zero or more request IDs for the queue object.
+
+</dd>
+<dt><b>Returns:</b><dd>undef if no response events occured within $timeout seconds; otherwise,
+as an instance method, returns a hashref of request IDs mapped to their response;
+as a class method, returns a list of queues which have events pending.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='wait_for_listener'></a>
+<h3>wait_for_listener</h3>
+<pre>
+wait_for_listener($timeout)
+</pre><p>
+<dl>
+<dd>Wait until a listener has registered.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$timeout</code> - (optional) number of seconds to wait for a listener.
+
+</dd>
+<dt><b>Returns:</b><dd>Thread::Queue::Duplex if a listener is registered; undef otherwise.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='wait_until'></a>
+<h3>wait_until</h3>
+<pre>
+wait_until($id, $timeout)
+</pre><p>
+<dl>
+<dd>Wait up to $timeout seconds for a response to a request.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$id</code> - the request ID of the response for which to wait.
+</dd>
+<dd><code>$timeout</code> - number of seconds to wait
+
+</dd>
+<dt><b>Returns:</b><dd>the response as an arrayref, or undef if none available within the timeout
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Sun Mar  5 11:01:53 2006</i>
+</center>
+</small>
+</body>
+</html>

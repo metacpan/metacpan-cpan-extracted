@@ -1,0 +1,20 @@
+<%args>
+$testrun
+$force
+</%args>
+
+% my $id = $testrun->id;
+% if (not $force){
+<H3>Do you really want to delete Testrun <% $id %>?</h3>
+<ul class="additional_table">
+  <li><a href="/tapper/testruns/delete/<% $id %>/force/">Really delete Testrun <% $id %></a></li>
+  <li><a href="/tapper/testruns/id/<% $id %>">Go back to overview of Testrun <% $id %></a></li>
+</ul>
+% } else {
+
+<h1>Testrun <% $id %> deleted</h1>
+% }
+%# Local Variables:
+%# buffer-file-coding-system: utf-8
+%# End:
+

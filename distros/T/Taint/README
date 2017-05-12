@@ -1,0 +1,52 @@
+                           Taint.pm
+		Tom Phoenix <rootbeer@teleport.com>
+
+Perl has the ability to mark data as 'tainted', as described
+in the perlsec(1) manpage. Perl will prevent tainted data
+from being used for some operations, and you may wish to add
+such caution to your own code. The routines in this module
+provide convenient ways to taint data and to check data for
+taint.
+
+  ******************************************************
+  *                                                    *
+  * This is a trial version of this module.   Beware!  *
+  * Some features may change before the final release. *
+  *                                                    *
+  * This module is not (yet) released under the same   *
+  * standard licenses which are used for Perl itself.  *
+  * (See copyright within the module's POD docs.)      *
+  *                                                    *
+  ******************************************************
+
+SYNOPSIS
+       use Taint;
+       warn "Oops"
+         if tainted $foo, @bar;      # Test for tainted data
+       kill $foo, @bar;              # before using it
+
+       use Taint qw(taint);
+       taint @some_vars;             # Intentionally taint data
+
+REQUIRES
+    This should work with any Perl system which can use MakeMaker
+    (that is, I believe at least Unix, Win32, VMS), and it should
+    be easy (if not trivial) to port to other Perl systems. It uses
+    no C code.
+
+AUTHOR
+     Tom Phoenix, <rootbeer@teleport.com>
+
+AVAILABILITY
+    You should find the latest version of this module on
+    CPAN in (something like) this location.
+
+	http://www.perl.com/CPAN/authors/Tom_Phoenix/
+    
+    Please don't rely upon an old version of this module.
+
+SPECIAL NOTE
+    There is a different Taint module available in the 
+    CPAN directory for Dan Sugalski. Please compare and
+    contrast these modules' approaches so that we may all
+    reach a consensus about how this module should act.

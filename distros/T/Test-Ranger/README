@@ -1,0 +1,46 @@
+Test-Ranger version 0.0.4
+
+"The computer should be doing the hard work. 
+        That's what it's paid to do, after all."
+                                          -- Larry Wall
+
+This is a comprehensive testing module compatible with Test::More and friends 
+within TAP::Harness. Helper scripts and templates are included to make 
+test-driven development quick, easy, and reliable. Test data structure is 
+open; choose from object-oriented methods or procedural/functional calls. 
+
+Tests themselves are formally untestable. All code conceals bugs. Do you want 
+to spend your time debugging tests or writing production code? 
+The Test::Ranger philosophy is to reduce the amount of code in a test script 
+and let test data (given inputs and wanted outputs) dominate. 
+
+Many hand-rolled test scripts examine expected output to see if it matches 
+expectations. Test::Ranger traps fatal exceptions cleanly and makes it easy 
+to check every execution for both expected and unexpected output. 
+
+Developers, please feel free to pull from: 
+http://github.com/Xiong/test-ranger
+and know that your comments are welcome. 
+
+INSTALLATION
+
+To install this module with Module::Build, run the following commands:
+
+    perl Build.PL
+    Build
+    Build test
+    Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+LICENSE
+
+Copyright (C) 2010 Xiong Changnian <xiong@cpan.org>
+
+This library and its contents are released under Artistic License 2.0:
+
+(http://www.opensource.org/licenses/artistic-license-2.0.php)

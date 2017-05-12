@@ -1,0 +1,13 @@
+/\s(<[^>]*>)*local(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*<head>Mosaic<\/head>(<[^>]*>)*\s/ @name=local<><head>Mosaic</head>
+/\s(<[^>]*>)*cucumber(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*<head>mosaic<\/head>(<[^>]*>)*\s/ @name=cucumber<><head>mosaic</head>
+/\s(<[^>]*>)*<head>mosaics<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*local(<[^>]*>)*\s/ @name=<head>mosaics</head><>local
+/\s(<[^>]*>)*<head>Mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*pattern(<[^>]*>)*\s/ @name=<head>Mosaic</head><>pattern
+/\s(<[^>]*>)*<head>Mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*trisomy(<[^>]*>)*\s/ @name=<head>Mosaic</head><>trisomy
+/\s(<[^>]*>)*<head>Mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*analysis(<[^>]*>)*\s/ @name=<head>Mosaic</head><>analysis
+/\s(<[^>]*>)*somatic(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*<head>mosaics<\/head>(<[^>]*>)*\s/ @name=somatic<><head>mosaics</head>
+/\s(<[^>]*>)*<head>mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*pattern(<[^>]*>)*\s/ @name=<head>mosaic</head><>pattern
+/\s(<[^>]*>)*<head>mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*embryos(<[^>]*>)*\s/ @name=<head>mosaic</head><>embryos
+/\s(<[^>]*>)*<head>mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*form(<[^>]*>)*\s/ @name=<head>mosaic</head><>form
+/\s(<[^>]*>)*<head>mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*potyvirus(<[^>]*>)*\s/ @name=<head>mosaic</head><>potyvirus
+/\s(<[^>]*>)*<head>mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*local(<[^>]*>)*\s/ @name=<head>mosaic</head><>local
+/\s(<[^>]*>)*<head>mosaic<\/head>(<[^>]*>)*\s(<[^>]*>\s)*(<[^>]*>)*cucumovirus(<[^>]*>)*\s/ @name=<head>mosaic</head><>cucumovirus

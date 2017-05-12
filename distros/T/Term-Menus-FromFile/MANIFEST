@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Term/Menus/FromFile.pm
+LICENSE
+Makefile
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001_load.t
+t/002_basic.t
+t/003_Advanced.t
+test_data/menu1
+test_data/menu2
+test_data/test_command.pl
+Todo

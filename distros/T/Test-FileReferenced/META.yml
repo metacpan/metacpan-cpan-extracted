@@ -1,0 +1,30 @@
+---
+abstract: 'Test against reference data stored in file(s).'
+author:
+  - 'Bartłomiej Syguła <natanael@natanael.krakow.pl>'
+build_requires:
+  Test::Exception: 0.27
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-FileReferenced
+provides:
+  Test::FileReferenced:
+    file: lib/Test/FileReferenced.pm
+    version: 0.02
+requires:
+  Cwd: 3.2701
+  File::Basename: 2.74
+  File::Spec: 3.2701
+  FindBin: 1.47
+  Test::More: 0.94
+  YAML::Any: 0.71
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

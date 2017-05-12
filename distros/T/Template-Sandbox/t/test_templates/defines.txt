@@ -1,0 +1,3 @@
+Outermost file has no defines,
+Including next file with DEFINEA=10 and DEFINEB="11 is what I am".
+<: include included_outer_defines.txt DEFINEA=10 DEFINEB="11 is what I am" :>

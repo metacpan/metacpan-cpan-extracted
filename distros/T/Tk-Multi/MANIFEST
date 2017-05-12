@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+Multi/Manager.pm
+Multi/Text.pm
+Multi/Canvas.pm
+Multi/Any.pm
+Multi/Frame.pm
+Multi/Toplevel.pm
+README
+t/without_menu.t
+t/without_mgr.t
+t/with_menu.t
+t/canvas.t
+t/frame.t
+t/toplevel.t
+META.yml                                 Module meta-data (added by MakeMaker)

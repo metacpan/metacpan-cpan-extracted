@@ -1,0 +1,94 @@
+#!/usr/bin/perl -w
+
+# This was originally the example code from Term::ShellUI's documentation
+# but it grew too big.  Now it's intended to demonstrate most of the
+# available features and still be easy to read.
+
+# This file is released under the MIT license.
+
+use strict;
+use lib '../lib';
+
+
+use Term::ShellUI;
+my $term = new Term::ShellUI(
+		commands => get_commands(),
+		history_file => '~/.shellui-synopsis-history',
+	);
+$term->add_eof_exit_hook(sub {print "Type 'quit' to quit.\n"; return 1;});
+print 'Using '.$term->{term}->ReadLine."\n";
+$term->run(@ARGV);
+
+
+sub get_commands
+{
+	return {
+		"h" =>		{ alias => "help", exclude_from_completion => 1 },
+		"?" =>		{ alias => "help", exclude_from_completion =>1 },
+		"help" => {
+			desc => "Print helpful information",
+			args => sub { shift->help_args(undef, @_); },
+			method => sub { shift->help_call(undef, @_); }
+		},
+		"history" => { desc => "Prints the command history",
+			doc => "Specify a number to list the last N lines of history\n" .
+				"Pass -c to clear the command history, " .
+				"-d NUM to delete a single item\n",
+			args => "[-c] [-d] [number]",
+			method => sub { shift->history_call(@_) },
+			exclude_from_history => 1,
+		},
+		"exit" => {
+			desc => "Exits the program.",
+			maxargs => 0,
+			method => sub { shift->exit_requested(1); },
+		},
+		"exists" => {
+			desc => "Shows whether files exist",
+			args => sub { shift->complete_files(@_); },
+			proc => sub {
+				print "exists: " .
+					join(", ", map {-e($_) ? "<$_>":$_} @_) .
+					"\n";
+			},
+			doc => <<EOL,
+Comprehensive documentation for our the exists command.
+Pass any number of filenames.  If a file exists, it is
+printed in <angle brackets>.
+This detailed doc can\nspan\nmany\nlines
+EOL
+		},
+		"show" => {
+			desc => "An example of using subcommands",
+			cmds => {
+				"warranty" => { proc => "You have no warranty!\n" },
+				"args" => {
+					args => [ sub {['create', 'delete']},
+						\&Term::ShellUI::complete_files ],
+					desc => "Print the passed arguments",
+					method => sub {
+						my $self = shift;
+						my $parms = shift;
+						print $self->get_cname($parms->{cname}) .
+							": " . join(" ",@_), "\n";
+					},
+				},
+			},
+		},
+		"quit" => {
+			desc => "Quit using Fileman",
+			maxargs => 0,
+			method => sub { shift->exit_requested(1); },
+		},
+
+		# Term::ShellUI normally displays "asdf: unknown command".
+		# This shows how to use the default command.  If the user
+		# types an unknown command, ShellUI calls '' if it exists.
+		'' => {
+			proc => "No command here by that name!\n",
+			desc => "No help for unknown commands.",
+			doc => "Well, here's a little help: don't type them.\n",
+		},
+	};
+}
+

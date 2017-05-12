@@ -1,0 +1,50 @@
+---
+abstract: 'retrieve modules specified by Test::Requires'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Requires-Scanner
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Requires::Scanner:
+    file: lib/Test/Requires/Scanner.pm
+    version: '0.01'
+  Test::Requires::Scanner::CLI:
+    file: lib/Test/Requires/Scanner/CLI.pm
+  Test::Requires::Scanner::Constants:
+    file: lib/Test/Requires/Scanner/Constants.pm
+  Test::Requires::Scanner::Result:
+    file: lib/Test/Requires/Scanner/Result.pm
+  Test::Requires::Scanner::Walker:
+    file: lib/Test/Requires/Scanner/Walker.pm
+requires:
+  Class::Accessor::Lite: '0'
+  Compiler::Lexer: '0'
+  Const::Common: '0'
+  File::Zglob: '0'
+  perl: '5.008001'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/Songmu/p5-App-TestRequires-Scanner/issues
+  homepage: https://github.com/Songmu/p5-App-TestRequires-Scanner
+  repository: git://github.com/Songmu/p5-App-TestRequires-Scanner.git
+version: '0.01'
+x_authority: cpan:SONGMU

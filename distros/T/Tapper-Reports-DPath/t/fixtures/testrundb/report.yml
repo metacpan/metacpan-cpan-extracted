@@ -1,0 +1,227 @@
+---
+
+# ---------- Suite ----------
+
+- schema: Suite
+  name: perfmon suite
+  data:
+    id: 4
+    name: Topic-Xen
+    type: software
+    description: The Xen Dummy Suite
+  
+- schema: Suite
+  name: perfmon suite
+  data:
+    id: 5
+    name: CTCS
+    type: software
+    description: The CTCS Dummy Suite
+  
+- schema: Suite
+  name: perfmon suite
+  data:
+    id: 7
+    name: perfmon
+    type: software
+    description: The Perfmon Dummy Suite
+  
+# ---------- Report ----------
+
+- schema: Report
+  name: dummy 0
+  data:
+    id: 20
+    suite_id: 5
+    suite_version: 3.12
+    successgrade: PASS
+
+- schema: Tap
+  name: tap 10
+  data:
+    id: 10
+    report_id: 20
+    tap: |
+      1..2
+      ok 1 metainformation
+      # Tapper-section: Metainfo
+      # Tapper-Suite-Name: Host-Overview
+      # Tapper-Suite-version: 0.010003
+      # Tapper-machine-name: athene
+      # Tapper-machine-description: PC-Ware
+      # Tapper-cpuinfo: 1x Family: 15, Model: 75, Stepping: 2
+      # Tapper-ram: 3967 MB
+      # Tapper-uptime: 0 hrs
+      # Tapper-reportgroup-testrun: 6567
+      ok 1 host metadata
+      1..1
+      # Tapper-section: XEN-Metainfo
+      # Tapper-xen-version: 3.4.2-rc1-pre
+      # Tapper-xen-changeset: 19754:7422afed66ee
+      # Tapper-xen-base-os-description: SUSE Linux Enterprise Server 10 SP2 (i586)
+      # Tapper-xen-dom0-kernel: 2.6.18.8-xen i686
+      ok 1 xen metadata
+      1..1
+      # Tapper-section: guest_1_suse_sles10_sp3_rc2_32b_smp_qcow
+      # Tapper-xen-guest-description: 001-lmbench
+      # Tapper-xen-guest-start: 2009-09-10 11:00:16 CEST
+      # Tapper-xen-guest-flags: acpi=1; apic=1; hap=1; hpet=0; memory=1024; pae=1; shadow_memory=10; timer_mode=2; vcpus=2
+      ok 1 - Guest info
+      1..1
+      # Tapper-section: guest_2_opensuse_11_1_32b_qcow
+      # Tapper-xen-guest-description: 002-ctcs
+      # Tapper-xen-guest-start: 2009-09-10 11:00:19 CEST
+      # Tapper-xen-guest-flags: acpi=1; apic=1; hap=1; hpet=0; memory=1280; pae=1; shadow_memory=12; timer_mode=2; vcpus=1
+      ok 1 - Guest info
+
+- schema: Report
+  name: dummy 1
+  data:
+    id: 21
+    suite_id: 7
+    suite_version: 1.01
+    successgrade: FAIL
+
+- schema: Tap
+  name: tap 11
+  data:
+    id: 11
+    report_id: 21
+    tap: |
+      1..4
+      ok 1 foo
+      ok 2 bar
+      not ok 3 affe
+      ok 4 zomtec
+
+- schema: Report
+  name: dummy 2
+  data:
+    id: 22
+    suite_id: 7
+    suite_version: 1.02
+    successgrade: PASS
+
+- schema: Tap
+  name: tap 12
+  data:
+    id: 12
+    report_id: 22
+    tap: |
+      1..3
+      ok 1 berlin
+      ok 2 prag
+      ok 3 warschau
+
+- schema: Report
+  name: dummy 3
+  data:
+    id: 23
+    suite_id: 7
+    suite_version: 1.03
+    successgrade: PASS
+
+- schema: Tap
+  name: tap 13
+  data:
+    id: 13
+    report_id: 23
+    tap: |
+      1..4
+      ok 1 affe
+      ok 2 loewe
+      ok 3 fink
+      ok 4 star
+      1..3
+      ok 1 - foo
+      ok 2 - bar
+      ok 3 - baz
+
+# ----- Report sections -----
+
+- schema: ReportSection
+  name: 20-1-Metainfo
+  data:
+    id: 3051
+    report_id: 20
+    succession: 1
+    name: Metainfo
+    cpuinfo: "1x Family: 15, Model: 75, Stepping: 2"
+    ram: 3967 MB
+    uptime: 0 hrs
+
+- schema: ReportSection
+  name: 20-2-Xen-Metainfo
+  data:
+    id: 3052
+    report_id: 20
+    succession: 2
+    name: Xen-Metainfo
+    xen_changeset: 19754:7422afed66ee
+    xen_version: 3.4.2-rc1-pre
+    xen_dom0_kernel: 2.6.18.8-xen i686
+    xen_base_os_description: SUSE Linux Enterprise Server 10 SP2 (i586)
+
+- schema: ReportSection
+  name: 20-3-guest_1_suse_sles10_sp3_rc2_32b_smp_qcow
+  data:
+    id: 3053
+    report_id: 20
+    succession: 3
+    name: guest_1_suse_sles10_sp3_rc2_32b_smp_qcow
+    xen_guest_description: 001-lmbench
+    xen_guest_flags: acpi=1; apic=1; hap=1; hpet=0; memory=1024; pae=1; shadow_memory=10; timer_mode=2; vcpus=2
+    xen_guest_start: 2009-09-10 11:00:16 CEST
+
+- schema: ReportSection
+  name: 20-4-guest_2_opensuse_11_1_32b_qcow
+  data:
+    id: 3054
+    report_id: 20
+    succession: 4
+    name: guest_2_opensuse_11_1_32b_qcow
+    xen_guest_description: 002-ctcs
+    xen_guest_flags: acpi=1; apic=1; hap=1; hpet=0; memory=1280; pae=1; shadow_memory=12; timer_mode=2; vcpus=1
+    xen_guest_start: 2009-09-10 11:00:19 CEST
+
+# ----- group reports together
+
+# testrun 17: [ 23, 22, 20 ]
+
+- schema: ReportgroupTestrun
+  name: 17-23
+  data:
+    testrun_id: 17
+    report_id: 23
+    primaryreport: 1
+
+- schema: ReportgroupTestrun
+  name: 17-22
+  data:
+    testrun_id: 17
+    report_id: 22
+    primaryreport: 0
+
+- schema: ReportgroupTestrun
+  name: 17-20
+  data:
+    testrun_id: 17
+    report_id: 20
+    primaryreport: 0
+
+# arbitrary zomtec: [ 20, 22 ]
+
+- schema: ReportgroupArbitrary
+  name: zomtec-23
+  data:
+    arbitrary_id: zomtec
+    report_id: 20
+    primaryreport: 0
+
+- schema: ReportgroupArbitrary
+  name: zomtec-22
+  data:
+    arbitrary_id: zomtec
+    report_id: 22
+    primaryreport: 0
+

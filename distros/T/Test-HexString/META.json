@@ -1,0 +1,42 @@
+{
+   "abstract" : "test binary strings with hex dump diagnostics",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-HexString",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Builder::Tester" : 0,
+            "Test::More" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::Builder" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Test::HexString" : {
+         "file" : "lib/Test/HexString.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

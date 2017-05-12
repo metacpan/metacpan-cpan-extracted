@@ -1,0 +1,50 @@
+Telephone-Mnemonic-US version 0.01
+===============================
+
+Telephone::Mnemonic::US - Maps US telephone numbers from mnemonic 'easy-to-remember' words to digits, it
+can also attempts the reverse and maps telephone digits to mnemonic words.
+
+ to_words('(263) 748 7233');           => ameritrade  
+ to_words('(263) 748 7233', 9);        => ameritrade   but might timeout after 9 sec of searching
+ to_num('ameritrade') ;                => (263) 748 7233 
+
+
+The scripts tel2num.pl and tel2mnemonic.pl are usufull for instant gratification.
+
+NOTE: Only for the case of converting to mnemonics, I assume your system already has a dictionary
+in either /usr/dict/words or /usr/share/dict/words sorted in dictionary order. It should be a
+problem for nost Unix system. I'll warn you during installation if I can't find.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   It will also install two scripts: tel2num.pl and tel2mnemonic.pl
+
+
+DEPENDENCIES
+         Data::Dumper
+         Moose
+         Carp::Assert
+         List::MoreUtils
+         List::Util
+         Tie::DictFile
+         Getopt::Compact for included scripts
+         plus more modules for testing.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by Ioannis Tambouras
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

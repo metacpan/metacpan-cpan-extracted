@@ -1,0 +1,84 @@
+REF:Test1
+<[REF:Test1]>
+{This }REF:Test1{.}
+<[{This }REF:Test1{.}]>
+Some text before REF:Test1
+I love fire<[REF:Test1]>
+Some text before {this }REF:Test1{.}
+Some text before <[{this }REF:Test1{.}]>
+REF:Test1 Some text after is here.
+<[REF:Test1]>ites galore
+{This }REF:Test1{.}  Some text after.
+<[{This }REF:Test1{.}]>..some text after.
+Some text before REF:Test1.  Some text after.
+I love fire<[REF:Test1]>!!!
+Some text before {this }REF:Test1{.}  Some text after.
+Some text before <[{this }REF:Test1{.}]>..some text after.
+ACT:Mothers
+<[ACT:Mothers]>
+{This }ACT:Mothers{.}
+<[{This }ACT:Mothers{.}]>
+Some text before ACT:Mothers
+I love fire<[ACT:Mothers]>
+Some text before {this }ACT:Mothers{.}
+Some text before <[{this }ACT:Mothers{.}]>
+ACT:Mothers Some text after is here.
+<[ACT:Mothers]>ites galore
+{This }ACT:Mothers{.}  Some text after.
+<[{This }ACT:Mothers{.}]>..some text after.
+Some text before ACT:Mothers.  Some text after.
+I love fire<[ACT:Mothers]>!!!
+Some text before {this }ACT:Mothers{.}  Some text after.
+Some text before <[{this }ACT:Mothers{.}]>..some text after.
+IF:Test1{this works}
+IF:Null{this doesn't work}
+<[IF:Test1{this works}]>
+<[IF:Null{this doesn't work}]>
+text before IF:Test1{this works}
+text before IF:Null{this doesn't work}
+text before...<[IF:Test1{this works}]>
+text before...<[IF:Null{this doesn't work}]>
+IF:Test1{this works} text after
+IF:Null{this doesn't work}text after
+<[IF:Test1{this works}]> text after
+<[IF:Null{this doesn't work}]>...text after
+text before IF:Test1{this works} text after
+text before IF:Null{this doesn't work}text after
+text before...<[IF:Test1{this works}]>...text after
+text before...<[IF:Null{this doesn't work}]>text after
+NEG:Null{this works}
+NEG:Test1{this doesn't work}
+<[NEG:Null{this works}]>
+<[NEG:Test1{this doesn't work}]>
+text before NEG:Null{this works}
+text before NEG:Test1{this doesn't work}
+text before...<[NEG:Null{this works}]>
+text before...<[NEG:Test1{this doesn't work}]>
+NEG:Null{this works} text after
+NEG:Test1{this doesn't work}text after
+<[NEG:Null{this works}]> text after
+<[NEG:Test1{this doesn't work}]>...text after
+text before NEG:Null{this works} text after
+text before NEG:Test1{this doesn't work}text after
+text before...<[NEG:Null{this works}]>...text after
+text before...<[NEG:Test1{this doesn't work}]>text after
+REF:TestCase:upper
+REF:TestCase:lower
+REF:TestName:lower:proper
+REF:TestFloat:int
+REF:TestFloat:percent
+REF:TestFloat:int:percent
+$REF:TestFloat:dollars
+REF:TestDate:abbr
+REF:TestDate:short
+REF:TestDate:time
+REF:TestDate:24h
+REF:TestDate:dateonly
+REF:TestDate:date
+REF:TestDate:ext
+REF:TestDate:unix
+REF:TestEscape:escape
+REF:TestEscape:escape:unescape
+REF:TestName:lower:proper:indent5
+REF:TestParagraph:paragraph30
+REF:TestParagraph:paragraph35:indent5

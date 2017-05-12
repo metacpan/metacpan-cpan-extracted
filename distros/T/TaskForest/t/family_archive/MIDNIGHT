@@ -1,0 +1,4 @@
+start => '00:00', tz=>'GMT', days => 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
+
+J_005( start=>'04:59')  # 11:59pm Chicago time April 19 2009
+J1()

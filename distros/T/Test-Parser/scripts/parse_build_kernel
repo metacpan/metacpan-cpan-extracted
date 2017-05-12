@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+# This script parses the output of kernel builds, presenting the info in
+# a structure more ameniable to post-processing tools for test reports
+#
+# Usage:  parse_build_kernel < my_build.log
+
+use strict;
+use warnings;
+use Test::Parser::KernelBuild;
+
+my $parser = new Test::Parser::KernelBuild
+    or die "Couldn't create Test::Parser::KernelBuild object\n";
+
+$parser->parse($ARGV[0] or \*STDIN)
+    or die "Could not parse kernel build log.\n";
+
+print "WARNINGS:  ", $parser->num_warnings(), "\n";
+print "  ERRORS:  ", $parser->num_errors(), "\n";
+print "\n";
+
+print "\n";
+print "MAKE TARGET SUMMARY\n";
+print "-------------------\n";
+my $col=0;
+foreach my $var (sort keys %{$parser->make_targets()}) {
+    printf("%12s:%6d   ", $var, $parser->make_targets()->{$var});
+    if (++$col % 4 == 0) {
+        print "\n";
+    }
+}
+
+print "\n\n";
+print "ERRORS\n";
+print "------\n";
+foreach my $err (@{$parser->errors()}) {
+    print $err;
+}
+
+print "\n";
+print "WARNINGS\n";
+print "--------\n";
+foreach my $warn (@{$parser->warnings()}) {
+    print $warn;
+}
+
+

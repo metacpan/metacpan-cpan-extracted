@@ -1,0 +1,62 @@
+#!perl
+use strict;
+use warnings;
+
+use Project::Libs;
+use Text::LTSV;
+use Getopt::Long;
+use UNIVERSAL::require;
+
+my $opt = Getopt::Long::Parser->new(
+    config => ['no_ignore_case', 'pass_through'],
+);
+$opt->getoptions(
+    'k|keys=s@'        => \my @keys,
+    'i|ignore-keys=s@' => \my @ignore,
+    'o|ordered'        => \my $ordered,
+    'no-color'         => \my $no_color,
+    'j|json'           => \my $use_json,
+    't|tag=s'            => \my $tag,
+);
+
+my $p = Text::LTSV->new;
+$p->want_fields(map { split ',' } @keys) if @keys;
+$p->ignore_fields(map { split ',' } @ignore) if @ignore;
+
+# FIXME: This option does not work
+# so that YAML::Tiny::Color does not keep original order.
+$p->ordered(1) if $ordered;
+
+my $dumper = sub {
+    if ($use_json) {
+        JSON->require or die $@;
+        my $json = JSON->new;
+        $json->encode(shift) . "\n";
+    } else {
+        my $module = $no_color ? 'YAML::Tiny' : 'YAML::Tiny::Color';
+        $module->require or die $@;
+        my $method = \&{$module . "::Dump"};
+        $method->(shift);
+    }
+};
+
+while (<>) {
+    my $out = $dumper->( $p->parse_line($_) );
+    if ($tag) {
+        $out = sprintf "@[%s] %s", $tag, $out;
+    }
+    print $out;
+}
+
+__END__
+
+=head1 NAME
+
+ltsview - convert LTSV to color-formatted output
+
+=head1 USAGE
+
+  ## in top of this module's direcotry
+  $ cat example/example_log.ltsv | perl bin/ltsview -k ua,req,time
+
+NOTE: You need to install L<YAML::Tiny::Color>

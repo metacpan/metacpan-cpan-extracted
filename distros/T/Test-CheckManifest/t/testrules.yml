@@ -1,0 +1,4 @@
+seq:
+    - t/*.t
+    - extra/*.t
+    - xt/*.t

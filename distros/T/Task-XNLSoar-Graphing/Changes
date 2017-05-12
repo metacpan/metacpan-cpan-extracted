@@ -1,0 +1,10 @@
+Revision history for Task::XNLSoar::Graphing
+
+0.03      2013-01-17 18:07:27 UTC
+	Added JSON::XS for JSON graphing
+
+0.02      2013-01-06 02:36:38 UTC
+	Added GraphViz
+
+0.01      2012-12-21 03:14:57 UTC
+	First release.

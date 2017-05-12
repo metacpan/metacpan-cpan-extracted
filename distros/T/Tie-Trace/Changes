@@ -1,0 +1,77 @@
+Revision history for Tie-Trace
+
+0.17 2017-01-27T22:49:55Z
+	fix test for windows
+
+0.16 2016-12-21T00:29:59Z
+	fix test again for bleadperl.
+	fix cpanfile.
+
+0.15 2016-12-19T16:37:04Z
+	fix test for bleadperl.
+	Thanks to ANDK@cpan.org.
+
+0.14	2009-12-29 02:41
+	fix bug: problem occured when deleted value of hash is undef.
+ 
+0.13    2009-12-02 05:00:00
+ 	implement CLEAR method for Hash and Array.
+   	implement STORESIZE method for Array.
+
+0.12    2009-11-24 03:49:12
+	fix bug of output variable whose value is 0.
+    	Thanks to Christoph.
+
+0.11    2008-06-10 01:21:00
+        add Test::Base in Makefile.PL
+
+0.10    2008-06-08 16:26:00
+        fix detecting source line number.
+
+0.09    2008-06-08 11:41:00
+        * wrong release * 
+
+0.08    2007-08-14 00:24:00
+        fix typo
+        remove some no needed variales
+        warning about deleted value
+        add test
+        some code improvement(not bug)
+        
+0.07    2007-08-13 02:28:00
+        fix typo
+        update Japanese Document.
+
+0.06    2007-08-12 20:26:00
+        add "watch" function, use it instead of tie ...
+        fix typo
+        change email address
+        improve warning message
+        fix bug with ARRAY handling
+        add more test
+        include test script test/test_script.pl
+
+0.05    2006-09-04 01:39:00
+        fix document
+
+0.04    2006-09-03 15:32:00
+        fix document
+        add test for internal method
+        refuctor some internal method
+        can use coderef in value, key and debug_value option
+        
+0.03    2006-09-01 03:47:00
+        remove no needed warning
+        add Japanese document
+
+0.02    2006-09-01 02:55:00
+        change warning message
+        add caller option
+        add debug_value option
+        no need to specify variable type(::Hash, ::Array, ::Scalar)
+        fix document
+        change test name
+        some changes of internal variable name
+
+0.01    2006-08-29 21:18:49
+        First version

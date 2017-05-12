@@ -1,0 +1,41 @@
+NAME
+
+Time::OlsonTZ::Data - Olson timezone data
+
+DESCRIPTION
+
+This module encapsulates the Olson timezone database, providing binary
+tzfiles and ancillary data.  Each version of this module encapsulates
+a particular version of the timezone database.  It is intended to be
+regularly updated, as the timezone database changes.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+The Olson timezone database was compiled by Arthur David Olson, Paul
+Eggert, and many others.  It is maintained by the denizens of the mailing
+list <tz@iana.org> (formerly <tz@elsie.nci.nih.gov>).
+
+The Time::OlsonTZ::Data Perl module wrapper for the database was developed
+by Andrew Main (Zefram) <zefram@fysh.org>.
+
+COPYRIGHT
+
+The Olson timezone database is is the public domain.
+
+The Time::OlsonTZ::Data Perl module wrapper for the database is
+Copyright (C) 2010, 2011, 2012, 2013, 2014
+Andrew Main (Zefram) <zefram@fysh.org>.
+
+LICENSE
+
+No license is required to do anything with public domain materials.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

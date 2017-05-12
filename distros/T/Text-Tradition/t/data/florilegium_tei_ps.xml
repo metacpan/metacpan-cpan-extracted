@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>La Lettre B du Florilège Coislin: editio princeps.</title>
+      </titleStmt>
+      <publicationStmt>
+        <p>Byzantion, 80 (2010), 72-12</p>
+      </publicationStmt>
+      <sourceDesc>
+        <listWit>
+          <witness xml:id="A">witness A
+          </witness>
+          <witness xml:id="B">witness B
+          </witness>
+          <witness xml:id="C">witness C
+          </witness>
+          <witness xml:id="D">witness D
+          </witness>
+          <witness xml:id="E">witness E
+          </witness>
+          <witness xml:id="F">witness F
+          </witness>
+          <witness xml:id="G">witness G
+          </witness>
+          <witness xml:id="H">witness H
+          </witness>
+          <witness xml:id="K">witness K
+          </witness>
+          <witness xml:id="P">witness P
+          </witness>
+          <witness xml:id="Q">witness Q
+          </witness>
+          <witness xml:id="S">witness S
+          </witness>
+          <witness xml:id="T">witness T
+          </witness>
+        </listWit>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <div n="1">
+        <head>
+          <app xml:id="a1"><rdg wit="#A #C #P #S #T #D #E #F #H #K #Q"><witStart/></rdg></app>
+          <app xml:id="a1.0">
+            <rdg wit="#A #P #S #K">Μαξίμου</rdg>
+            <rdg wit="F #H">Μαξίμου ἁγίου</rdg>
+            <rdg wit="#C #D #E #T #Q"/>
+          </app>
+        </head>
+        <p>
+          <app xml:id="a1.1_0">
+            <lem wit="#A #S #T #D #E #F #H #K #Q">Ἡ</lem>
+            <rdg wit="#C #P"/>
+          </app> περὶ 
+          <app xml:id="a1.1_1">
+            <lem wit="#A #C #P #S #T #D #E #F #K">τῆς</lem>
+            <rdg wit="#H #Q"/>
+          </app> τοῦ 
+          <app xml:id="a1.1_2">
+            <lem wit="#A #C #T #E #F #H #K">πνεύματος τοῦ ἁγίου</lem>
+            <rdg wit="#P #S #D #Q">ἁγίου πνεύματος</rdg>
+          </app>
+          <app xml:id="a1.1_3">
+            <rdg wit="#Q">βλασφημία</rdg>
+            <lem wit="#A #C #P #S #T #D #E #F #H #K">βλασφημίας ἀπορία</lem>
+          </app>
+          <app xml:id="a1.2_0">
+            <rdg wit="#E #K #Q">αὐτόθεν</rdg>
+            <rdg wit="#A #C #P #S #T #D #F #H">αὐτόθι</rdg>
+          </app>
+          <app xml:id="a1.2_1">
+            <rdg wit="#A #C #S #T #D #E #F #H #K #Q">ἔχει</rdg>
+            <rdg wit="#P">ἔχειν</rdg>
+          </app> τὴν λύσιν· ὁ δὲ δεύτερος ἐστὶν οὗτος·  ὅτάν 
+          <app xml:id="a1.20_0">
+            <rdg wit="#A #C #P #S #T #D #E #H #K #Q">τις</rdg>
+            <rdg wit="#F"/>
+          </app> ἐν ἁμαρτίαις ἐνεχόμενος, ἀκούων δὲ τοῦ κυρίου λέγοντος μὴ 
+          <app xml:id="a1.21_0">
+            <rdg wit="#C #P #S #E #F #K #Q">κρίνετε</rdg>
+            <rdg wit="#H" type="s.l.">κρίνετε</rdg>
+            <rdg wit="#A #T #D #H">κρίνεται</rdg>
+          </app> φοβούμενος οὐδένα 
+          <app xml:id="a1.22_1">
+            <rdg wit="#A #T #D #E #F #H #K">κρίνει</rdg>
+            <rdg wit="#Q" type="a.c.">κρίνει</rdg>
+            <rdg wit="#C #P #S #Q">κρίνῃ</rdg>
+          </app> ἐν τῇ
+          <app xml:id="a1.22">      
+            <rdg wit="#G"><witStart/></rdg>
+          </app> ἐξετάσει τῶν βεβιωμένων ὡς φύλαξ τῆς ἐντολῆς οὐ κρίνεται· εἰ μὴ τὸ γενέσθαι πιστόν, εἰκότως ὅταν ἐν ἁμαρτίαις τίς ὢν 
+          <app xml:id="a1.26_0">
+            <rdg wit="#S #T #D #E #F #G #H">οἰκονομεῖται</rdg>
+            <rdg wit="#A #C #P #K #Q">οἰκονομῆται</rdg>
+          </app> ἐκ τῆς προνοίας ἐν συμφοραῖς, ἐν ἀνάγκαις, ἐν νόσοις — 
+          <app xml:id="a1.27_0">
+            <rdg wit="#A #C #P #S #T #D #E #F #G #H #K #Q">ὡς οὐκ οἶδε</rdg>
+            <rdg wit="#P" type="a.c."/>
+          </app> γὰρ διὰ τῶν τοιούτων 
+          <app xml:id="a1.28_0">
+            <rdg wit="#S">καθεαυτὸν</rdg>
+            <rdg wit="#A #C #P #T #D #E #F #G #H #K #Q">καθαίρει αὐτὸν</rdg>
+          </app> ὁ θεός — 
+          <app xml:id="a1.40_0">
+            <rdg wit="#A #C #P #S #T #D #F #H #Q">οὖν</rdg>
+            <rdg wit="#E #G #K"/>
+          </app>
+          <app xml:id="a1.40_1">
+            <rdg wit="#A #C #P #S #T #D #E #F #G #H #Q">τῷ</rdg>
+            <rdg wit="#K">τῶν</rdg>
+          </app> ἐν 
+          <app xml:id="a1.40_2">
+            <rdg wit="#A #P #D">ἀπιστεία</rdg>
+            <rdg wit="#C #S #T #E #F #G #H #K #Q">ἀπιστίᾳ</rdg>
+          </app> τὸν βίον 
+          <app xml:id="a1.41_0">
+            <rdg wit="#A #C #P #S #T #D #H #K">κατακλείσαντι</rdg>
+            <rdg wit="#Q" type="a.c.">κατακλείσαντι</rdg>
+            <rdg wit="#E" type="a.c.">καταλύσαντι</rdg>
+            <rdg wit="#Q" type="s.l.">καταλύσαντι</rdg>
+            <rdg wit="#F">καταλύσαντι</rdg>
+            <rdg wit="#E" type="s.l.">κατακλύσαντι</rdg>
+            <rdg wit="#G">κατακλύσαντι</rdg>
+          </app> οὔτε ἐνταῦθα οὔτε ἐν τῷ μέλλοντι ἀφεθήσεται τῆς ἀπιστίας καὶ ἀθεΐας ἡ ἁμαρτία.
+          <app xml:id="a1.42">
+            <rdg wit="#K"><witEnd/></rdg>
+          </app></p>
+      </div>
+      
+      <div n="2">
+        <head>
+          <app xml:id="a2.0_0">
+            <rdg wit="#C #P #S #D #E #H">Ἰσιδώρου 
+              <app xml:id="a2.0_1">
+                <rdg wit="#C #E #H">Πηλουσίου</rdg>
+                <rdg wit="#P #S #D">πηλουσιώτ(ου)</rdg>
+              </app>
+            </rdg>
+            <rdg wit="#Q" type="margin">νείλου</rdg>
+            <rdg wit="#A #T #F"/>
+            <rdg wit="#G" type="illegible"/>
+          </app>
+        </head>
+      </div>
+      
+      <div n="3">
+        <head>
+          <app xml:id="a3.0_0">
+            <rdg wit="A #C #P #S #T #D #E #F #G #H">Γρηγορίου Νύσης</rdg>
+            <rdg wit="#Q">τοῦ νύσσης</rdg>
+          </app>
+        </head>
+        <p>Ἤκουσά που τῆς ἁγίας γραφῆς 
+          <app xml:id="a3.1_0">
+            <rdg wit="#Q" type="a.c.">κατακινούσης</rdg>
+            <rdg wit="#A #C #P #S #T #D #E #F #G #H #Q">κατακρινούσης</rdg>
+          </app> ἐκείνους, οἳ κατὰ 
+          <app xml:id="a3.2_0">
+            <rdg wit="#A #C #P #S #T #D #E #F #G #H">τῆς</rdg>
+            <rdg wit="#Q"/>
+          </app> τοῦ θεοῦ βλασφημίας αἴτιοι γίνονται. Οὐαὶ γὰρ 
+          <app xml:id="a3.3_0">
+            <rdg wit="#A #C #P #S #T #D #E #G #Q">φησὶν</rdg>
+            <rdg wit="#F #H"/>
+          </app> δι᾽ οὓς
+          <app xml:id="a3.3">
+            <rdg wit="#B"><witStart/></rdg>
+          </app> τὸ ὄνομά μου βλασφημεῖται ἐν τοῖς ἔθνεσι. Διὰ 
+          <app xml:id="a3.17_0">
+            <rdg wit="#Q">τοῦτο γὰρ</rdg>
+            <rdg wit="#A #B #C #P #S #T #D #E #F #G #H">τοῦτο</rdg>
+          </app> χαλεπὴν τοῖς τοιούτοις ἀπειλὴν ὁ λόγος ἐπανατείνεται λέγων ἐκείνοις εἶναι τὸ Οὐαὶ δι᾽ οὓς τὸ ὄνομά μου βλασφημεῖται ἐν τοῖς ἔθνεσιν.
+        </p>
+      </div>
+
+      <div n="9">
+        <head>
+          <app xml:id="a9">
+            <rdg wit="#K #Q"><witStart/></rdg>
+          </app>
+          <app xml:id="a9.0_0">
+            <rdg wit="#A #B #C #S #T #D #E #G #H #K #Q">Νείλου 
+              <app xml:id="a9.0_1">
+                <rdg wit="#A #B #C #S #T #D #E #G #Q">μοναχοῦ</rdg>
+                <rdg wit="#H #K"/>
+              </app>
+            </rdg>
+            <rdg wit="#F">Νείλου μοναχοῦ ἀπὸ τῶν τῆς κακίας ὀκτῶ λογισμῶν</rdg>
+            <rdg wit="#P"/>
+          </app>
+        </head>
+        <p><app xml:id="a9.1_0">
+          <rdg wit="#H">ἡ Ὄψις</rdg>
+          <rdg wit="#A #B #C #P #S #T #D #E #F #G #K #Q">Ὄψις</rdg>
+        </app> γυναικὸς 
+          <app xml:id="a9.1_1">
+            <rdg wit="#T">μέλος ἐστὶ πεφαρμακευμένον</rdg>
+            <rdg wit="#A #C #D #E #F #G #H #K #Q">βέλος ἐστὶ πεφαρμακευμένον</rdg>
+            <rdg wit="#B #P #S">πεφαρμακευμένον βέλος ἐστὶ</rdg>
+          </app>, ἔτρωσε τὴν ψυχὴν, καὶ τὸν ἰὸν ἐναπέθετο, καὶ ὅσον χρονίζει, πλείονα τὴν σῆψιν ἐργάζεται. βέλτιον γὰρ οἴκοι μένοντα σχολάζειν διηνεκῶς τῇ προσευχῇ, ἢ διὰ τοῦ τιμᾶν τὰς ἑορτὰς 
+          <app xml:id="a9.7_0">
+            <rdg wit="#H">παρανάλωμα</rdg>
+            <rdg wit="#A #B #C #P #S #T #D #E #F #G #K #Q">πάρεργον</rdg>
+          </app> γίνεσθαι 
+          <app xml:id="a9.7_1">
+            <rdg wit="#B #C #P #S #T #D #E #F #G #H #K #Q">τῶν ἐχθρῶν</rdg>
+            <rdg wit="#A">τὸν ἐχθρόν</rdg>
+            <rdg wit="#T" type="a.c.">τὸν ἐχθρῶν</rdg>
+          </app>. Φεῦγε συντυχίας γυναικῶν ἐὰν θέλῃς σωφρονεῖν, καὶ 
+          <app xml:id="a9.8_0">
+            <rdg wit="#S">μηδαμῶς</rdg>
+            <rdg wit="#A #B #C #P #T #D #E #F #G #H #K #Q">μὴ δῷς</rdg>
+          </app>
+          <app xml:id="a9.8_1">
+            <rdg wit="#P">αὐτῆς</rdg>
+            <rdg wit="#A #B #C #S #T #D #E #F #G #H #K #Q">αὐταῖς</rdg>
+          </app> παρρησίαν θαρρῆσαι σοί ποτε.  
+          <app xml:id="a9.30_0">
+            <rdg wit="#A #C #T #D #E #F #G #H #K #Q">Θάλλει</rdg>
+            <rdg wit="#B #P #S">θάλπει</rdg>
+          </app>
+          <app xml:id="a9.30_1">
+            <rdg wit="#A #C #T #D #E #F #G #H #K #Q">βοτάνη 
+              <app xml:id="a9.30_2">
+                <rdg wit="#H">ἰστῶσα</rdg>
+                <rdg wit="#T">ἐστῶσα</rdg>
+                <rdg wit="#A #C #D #E #F #G #K #Q">ἑστῶσα</rdg>
+              </app></rdg>
+            <rdg wit="#B #P #S">ἑστῶσα βοτάνη</rdg>
+          </app> παρ᾽ ὕδατι, καὶ πάθος ἀκολασίας, ἐν συντυχίαις γυναικῶν.
+          <app xml:id="a9.31">
+            <rdg wit="#T #D #E #F #G #H #K #Q"><witEnd/></rdg>
+          </app></p>
+      </div>  
+      
+      <div n="5">
+        <head>τοῦ Χρυσοστόμου</head>
+        <p>    Τοὺς ἐν τῇ πόλει βλασφημοῦντας, σωφρόνιζε. Κἂν ἀκούσῃς τινὸς ἐν 
+          <app xml:id="a5.2_0">
+            <rdg wit="#A #C">ἀμφόδῳ</rdg>
+            <rdg wit="#B #P #S">ἀμφόδῳ ἢ ἐν ὁδῶ</rdg>
+          </app> ἢ ἐν ἀγορᾷ βλασφημοῦντος τὸν Θεόν, πρόσελθε, ἐπιτίμησον, κἂν πληγὰς ἐπιθεῖναι δέῃ, μὴ 
+          <app xml:id="a5.4_0">
+            <rdg wit="#S">παρεστήση</rdg>
+            <rdg wit="#A #B #C #P">παραιτήσῃ</rdg>
+          </app> ῥάπισον αὐτοῦ τὴν ὄψιν, σύντριψον αὐτοῦ τὸ στόμα, ἁγίασόν σου τὴν χεῖρα διὰ τῆς πληγῆς, κἂν ἐγκαλῶσι τινές, κὰν εἰς δικαστήριον ἕλκωσιν, ἀκολούθησον.
+          <app xml:id="a29.9">
+            <rdg wit="#A #B #C #P #S"><witEnd/></rdg>
+          </app>
+        </p>
+      </div>
+    </body>
+  </text>
+</TEI>

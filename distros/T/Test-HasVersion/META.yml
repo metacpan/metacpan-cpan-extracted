@@ -1,0 +1,29 @@
+---
+abstract: 'Check Perl modules have version numbers'
+author:
+  - 'Adriano R. Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-HasVersion
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Test::Builder: '0'
+  Test::Builder::Tester: '1.04'
+  Test::More: '0'
+resources:
+  repository: http://github.com/aferreira/cpan-Test-HasVersion
+version: '0.014'

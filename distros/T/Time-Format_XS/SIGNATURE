@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 625797b98c3f57af8634e40940ec556f058b4882 Changes
+SHA1 92485369b85c1f8898e0b23f54ab488bc3c63a0b Format_XS.pm
+SHA1 3d5d423477ab3622ae3955dc157517067e8f6240 Format_XS.xs
+SHA1 dc64bc4ac0e47a8baabf097c2a2451041f6f7d16 MANIFEST
+SHA1 aebd2be7b7e4d3a7c0f5b91b86fcfcc3914cabca MANIFEST.SKIP
+SHA1 2fba4a346c1ee96c5ba798c5dde5668efca3baf9 META.yml
+SHA1 bca3baf160d7d3e81961bf5a5dc547de3dcba7d1 Makefile.PL
+SHA1 45fda1a9bd2763e7bf1e18033153d995e5de74c3 README
+SHA1 60970ba783258e992c00c97fbbd22f0b15b0de99 format.c
+SHA1 49620fe225be4e6c86378e629cf3472382025910 format.h
+SHA1 dcd774c12c4b077e168f7e9240bd206f6a55d852 ppport.h
+SHA1 6cc7025e20823326ba07cbb45909e57de42c948b t/DateTime.t
+SHA1 38d6d6f24c5a8dcd15e9f79dfdb486a49e68af28 t/func.t
+SHA1 0e04b510f383df841469216f89d28de9abcc4835 t/iso8601.t
+SHA1 1baaa8c44e09d87200d5fa7873f24f2396247232 t/quot.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Cygwin)
+
+iEYEARECAAYFAko68+IACgkQwoSYc5qQVqoiRACffnlwYHIDiLxktpKDoL0Gcwix
+PG8AoKDicWyVh5AMfy8nPPJCubufUDMv
+=T9dJ
+-----END PGP SIGNATURE-----

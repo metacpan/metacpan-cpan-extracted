@@ -1,0 +1,15 @@
+name: Template-Ast
+version: 0.01
+abstract: Handling Perl AST used with Perl Template Toolkit
+author: Agent Zhang <agent2002@126.com>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+  File::Compare: 0
+requires:
+  Data::Dumper: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

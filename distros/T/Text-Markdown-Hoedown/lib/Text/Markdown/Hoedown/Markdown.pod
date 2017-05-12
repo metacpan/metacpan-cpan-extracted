@@ -1,0 +1,32 @@
+=head1 NAME
+
+Text::Markdown::Hoedown::Markdown - markdown
+
+=head1 DESCRIPTION
+
+Note. Any API will change without notice.
+
+=head1 METHODS
+
+=over 4
+
+=item C<< my $md = Text::Markdown::Hoedown::Markdown->new($extensions:UV, $max_nesting:UV, $callbacks:Text::Markdown::Hoedown::Renderer::*); >>
+
+Create new instance.
+
+I<$extensions> is the bit flags, listed on L<Text::Markdown::Hoedown>.
+
+I<$max_nesting> is the max nesting level.
+
+I<$callbacks> is the callback object. It's instance of L<Text::Markdown::Hoedown::Renderer::*>.
+
+=item C<< my $src = $md->render($src:Str); >>
+
+Render the markdown.
+
+=back
+
+=head1 SEE ALSO
+
+L<Text::Markdown::Hoedown>
+

@@ -1,0 +1,66 @@
+Tk::TreeGraph is a Canvas specialized to draw trees on a Canvas using
+arrows and nodes. A node is simply some text imbedded in a rectangular
+shape.
+
+TreeGraph is able to draw the following items:
+
+- node: some text in a rectangular shape.
+- direct arrow: an arrow to go from one node to the following one.
+- slanted arrow: an arrow to make a new branch 
+- shortcuts arrow: an arrow to represent a shortcut between 2 nodes from
+  different branches.
+
+TreeGraph is now in released status.
+
+Starting from version 1.007, all coordinates are handled by the
+object.  Hence drawing the tree is much simpler.
+
+Starting from version 1.008, you don't need to draw the direct and
+slanted arrows yourself, the object will do it for you when you add a
+node.
+
+Hence drawing the tree is even more simple.
+
+Starting from version 1.013, the drawing is more compact.
+
+Starting from version 1.016 TreeGraph no longer messes with
+-scrollregion. When a Scrolled TreeGraph is used, the -scrollregion
+will have to be modified by the user.
+
+Starting from version 1.023, you can modify a node color or text or
+make a node flash.
+
+
+You can run all test with argument '1' to run the test in interactive mode
+with traces. (i.e "perl t/only_node.t 1").
+
+See the embedded documentation in the module for more details.
+
+Comments and suggestions are always welcome.
+
+Thanks to Ralf Valerien for the bug fix and the spline shortcut arrow.
+
+Legal mumbo jumbo:
+
+ Copyright (c) 1999-2004 Dominique Dumont. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.
+
+ - Dominique Dumont
+   dominique_dumont@grenoble.hp.com
+
+---------------------------------------------------------------------
+INSTALLATION
+
+   	 gunzip -c <dist_file>.tar.gz | tar xvf -
+   	 cd <dist_directory>
+   	 perl Makefile.PL
+   	 make test          
+   	 make install
+
+
+
+
+
+
+

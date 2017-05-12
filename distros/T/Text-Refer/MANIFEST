@@ -1,0 +1,15 @@
+COPYING
+MANIFEST
+Makefile.PL
+README
+docs/Makefile
+docs/Text/Refer-gifs/h1bullet.gif
+docs/Text/Refer-gifs/h2bullet.gif
+docs/Text/Refer.pm.html
+lib/Text/Refer.pm
+t/Checker.pm
+t/imbibe.t
+test/imbibe
+testin/medium.bib
+testin/one.bib
+testin/small.bib

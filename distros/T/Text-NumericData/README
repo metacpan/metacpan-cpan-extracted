@@ -1,0 +1,95 @@
+=head1 ABOUT
+
+This archive contains the distribution Text-NumericData
+
+It consists of some modules for parsing and working with files
+that contain columns of numerical data in text files (ASCII, dat,
+txt, csv, tsv ... I name them txd, for "TeXt numerical Data").
+Those files occur as a flexible human-readable format for exchange
+of small to intermediate data sets. As such, they appear in rich
+variety and need some flexibility in programs that work with them.
+
+The main benefit of the package is the supplied set of tools to directly
+work with these files, offering various operations like selection of subsets,
+sorting, basic statistics and flexible computations (also involving
+auxillary files influencing the main data set).
+Those operations are ideally combined via pipelines
+constructed in the shell (a cross-platform GUI for building filtering
+pipelines exists for an earlier version and might re-emerge if demand
+is there).
+
+The tools, starting with the prefix "txd", generally work as filters and
+are designed to work on multiple files sent via L<Text::ASCIIPipe>, to
+avoid the penalty of recompiling the scripts all the time --- the raw
+parsing and computing performance is secondary to that, for usual data sets.
+There are some specific tools to convert from more esoteric formats. While
+there is some general adaptivity in the parsing, this can be necessary to
+get the data into an understandable shape.
+
+To get an idea of the canonical format the package uses, you can fire up
+
+	txdconstruct --numformat=%.3f '[1]=C2; [2]=sin(2*pi()*[1])' \
+	| txdfilter 'The title' x y
+
+which produces this content:
+
+	#The title
+	#"x"	"y"
+	0.000	0.000
+	0.111	0.643
+	0.222	0.985
+	0.333	0.866
+	0.444	0.342
+	0.556	-0.342
+	0.667	-0.866
+	0.778	-0.985
+	0.889	-0.643
+	1.000	-0.000
+
+Care has been taken to enable transparent handling of files with differing
+line endings (DOS and UNIX, theoretically old-style Mac, too, but only on
+old-style Macs) independent of
+the current platform. The rule is that output shares the line end of the input,
+unless you override it on the command line.
+
+Handling of command-line parameters and configuration files as well as the
+actual generation of POD for the tools is achieved via L<Config::Param>.
+
+This package starts with version 2, indicating that it is the successor
+to the TextData package by the same author, which was not available via
+CPAN. About eight years of experience went into straightening things out.
+The main changes are in the module API, while the command-line tools are
+mostly compatible to their predecessors. You should test your use-case and
+adapt the odd changed parameter (or, more sober script name in the case
+of txdderiv, not being txderiv anymore) when upgrading from TextData.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for the main module with the
+perldoc command.
+
+	perldoc Text::NumericData
+
+The installed scripts with the prefix txd also feature POD, which is installed
+as man-pages and give the same information interactively, for example txdcalc
+with
+
+	txdcalc --help
+
+Have fun.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2005-2013 Thomas Orgis
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

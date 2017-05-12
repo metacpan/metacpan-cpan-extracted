@@ -1,0 +1,29 @@
+---
+doctype: dist
+
+header:
+  name: Test-Mojo-Trim
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Mojolicious: 5.00
+
+plugins:
+ - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /Test-Mojo-Trim-*

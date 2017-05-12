@@ -1,0 +1,7 @@
+Revision history for Perl extension Text::Striphigh.
+
+0.01  Fri Mar 28 17:19:54 1997
+	- original version; created by h2xs 1.16
+
+0.02  Fri Mar 28 17:35:39 MET 1997
+	- inserted Striphigh.pm and added documentation

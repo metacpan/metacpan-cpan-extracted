@@ -1,0 +1,27 @@
+Revision history for Perl extension Test::WWW::Mechanize::JSON.
+
+0.74
+	- Nicer error on JSON array
+	
+0.72
+	- Typo fixed
+
+0.71
+	- Updated so use of HTTP::Request::Common::PUT works like POST,
+	  rather than like GET, to conform to HTTP spec.
+
+0.7
+	- Added extra HTTP verbs for AJAX CRUD project.
+
+0.06	2011-04-10
+	- Removed 'use parent'
+
+0.05	2011-01-11
+	- Added support for utf-8 checks and utf-8 code
+	- Added support for x-json header testing
+	- Use JSON::Any
+	- any_json_ok
+
+0.01  Fri Feb  6 11:29:03 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n Test::WWW::Mechanize::JSON

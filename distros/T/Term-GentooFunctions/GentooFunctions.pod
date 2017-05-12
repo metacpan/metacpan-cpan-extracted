@@ -1,0 +1,124 @@
+=head1 NAME
+
+Term::GentooFunctions - provides gentoo's einfo, ewarn, eerror, ebegin and eend.
+
+=head1 SYNOPSIS
+
+    use Term::GentooFunctions qw(:all)
+
+    einfo "this is kinda neat...";
+
+    ebegin "I hope this works...";
+     ....
+    eend $truefalse; # the result is backwards of gentoo; ie, 0 is bad, 1 is good.
+
+=head1 PRINTS
+
+C<einfo>, C<ewarn>, and C<eerror> show informative lines with stars at the
+beginning colored green, yellow, and red (respectively).
+
+=head1 BOOKENDS
+
+C<ebegin> and C<eend> show the beginning and ends of things. C<ebegin> also
+prints the given error message using L<einfo|/PRINTS>.
+
+C<eend> returns the result passed in for handy returns at the bottom of
+functions...
+
+    sub eg {
+        eend 0; # eg now returns a false!!  Huzzah!
+    }
+
+C<eend> will use L<$_|perlvar/_> if it is not passed any arguments.
+
+=head1 DEATH
+
+Print an error with L<eerror|/PRINTS> and L<exit|perlfunc/exit>(0x65).
+
+=head1 INDENT
+
+You can also use C<eindent> and C<eoutdent> to show trees of things happening,
+example:
+
+    einfo "something"
+    eindent 
+    einfo "something else" # indented
+    eoutdent
+    einfo "something else (again)" # un-dented
+
+=head1 DO
+
+C<edo> is an extra magic function that aggregates several of the functions
+above:
+
+    use IPC::System::Simple qw(systemx);
+    edo "removing file" => sub {
+
+        systemx(qw(rm file));
+
+    };
+
+C<edo> handles L<ebegin|/BOOKENDS> and L<eend|/BOOKENDS> automatically and
+catches errors for optional L<edie|/DEATH> after execution.  Nested C<edo>
+functions will automatically L<eindent|/INDENT> as well:
+
+    edo test1 => sub {
+        edo test2 => sub {
+            systemx(qw(rm file));
+
+        }
+    }
+
+Minor caveat: L<edie|/DEATH> isn't catchable (see: L<eval|perlfunc/eval>) since
+it calls L<exit|perlfunc/exit>, therefore, inner death(s) should use
+L<die|perlfunc/die> rather than L<edie|/DEATH>.
+
+=head1 SPINNERS
+
+Strictly speaking, these functions aren't in the real Gentoo functions.sh
+script, but man they're handy.
+
+    use Time::HiRes qw(sleep);
+    start_spinner "testing the spinner";
+    for (1 .. 20) {
+        step_spinner; # spin the spinner
+        # step_spinner "$_/20"; # optional msg arg
+        sleep 0.1;
+    }
+    end_spinner 1; # works just like eend
+
+=head1 SHELL
+
+L<Term::GentooFunctions> will use C<RC_INDENTATION> and C<RC_DEFAULT_INDENT>
+from Gentoo's /sbin/functions.sh.  So you can L<eindent|/INDENT> in a
+bash_script.sh and your perl_script.pl will use the indent level!  However, to
+get it to work you must first export them to your perl scripts:
+
+    export RC_INDENTATION RC_DEFAULT_INDENT 
+    
+L<Term::GentooFunctions> will not be able to modify the indent level in a way
+that will propagate back up to bash -- that would technically be impossible
+through environment variables.
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+I am using this software in my own projects...  If you find bugs, please
+please please let me know. :) Actually, let me know if you find it handy at
+all.  Half the fun of releasing this stuff is knowing that people use it.
+
+=head1 LICENSE
+
+Copyright (C) 2007-2010, Paul Miller,
+
+This module is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=head1 SEE ALSO
+
+L<Term::Size>, L<Term::ANSIColor>, L<Term::ANSIScreen>

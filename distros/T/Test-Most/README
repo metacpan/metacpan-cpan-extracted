@@ -1,0 +1,37 @@
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Test::Most
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Most
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Test-Most
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Test-Most
+
+    Search CPAN
+        http://search.cpan.org/dist/Test-Most
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Curtis Poe
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

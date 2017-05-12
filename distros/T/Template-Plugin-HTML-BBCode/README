@@ -1,0 +1,27 @@
+Template::Plugin::HTML::BBCode version 0.01
+========================================
+
+Template::Plugin::HTML::BBCode - Template Toolkit plugin which 
+implements wrapper around HTML::BBCode module and provides filter
+for converting BBCode.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   Template 
+   HTML::BBCode
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Igor Lobanov. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

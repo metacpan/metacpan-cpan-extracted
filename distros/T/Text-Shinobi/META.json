@@ -1,0 +1,75 @@
+{
+   "abstract" : "忍びいろは (Ninja Alphabet) encoding",
+   "author" : [
+      "Naoki Tomita aka \"Tomimaru\" <tomita@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Shinobi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Lingua::JA::Regular::Unicode" : "0",
+            "Unicode::Normalize" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Shinobi" : {
+         "file" : "lib/Text/Shinobi.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tomill/Text-Shinobi/issues"
+      },
+      "homepage" : "https://github.com/tomill/Text-Shinobi",
+      "repository" : {
+         "url" : "git://github.com/tomill/Text-Shinobi.git",
+         "web" : "https://github.com/tomill/Text-Shinobi"
+      }
+   },
+   "version" : "0.01"
+}

@@ -1,0 +1,27 @@
+---
+abstract: 'Brings in all Perl modules which are RPM packaged and shipped with B<cPanel & WHM> and B<EasyApache>.'
+author:
+  - 'cPanel <cpanel@cpan.org>'
+build_requires:
+  FindBin: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Cpanel
+requires:
+  Task::Cpanel::3rdparty: 0
+  Task::Cpanel::Catalyst: 0
+  Task::Cpanel::Core: 0
+  Task::Cpanel::Internal: 0
+  Task::Cpanel::Kensho: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/CpanelInc/Task-Cpanel
+version: 11.36.001

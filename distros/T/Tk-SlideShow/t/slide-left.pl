@@ -1,0 +1,10 @@
+Tk::SlideShow::Sprite->Get('i7')->place(416,465);
+Tk::SlideShow::Sprite->Get('i8')->place(379,371);
+Tk::SlideShow::Sprite->Get('i9')->place(428,282);
+Tk::SlideShow::Sprite->Get('i10')->place(448,199);
+Tk::SlideShow::Sprite->Get('i1')->place(537,402);
+Tk::SlideShow::Sprite->Get('i2')->place(532,299);
+Tk::SlideShow::Sprite->Get('i3')->place(597,181);
+Tk::SlideShow::Sprite->Get('i4')->place(672,292);
+Tk::SlideShow::Sprite->Get('i5')->place(684,407);
+Tk::SlideShow::Sprite->Get('i6')->place(543,487);

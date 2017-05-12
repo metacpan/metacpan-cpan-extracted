@@ -1,0 +1,42 @@
+---
+abstract: 'Pager using DataPageset'
+author:
+  - 'tokubass <tokubass {at} cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Teng-Plugin-Pager-DataPageset
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Teng::Plugin::Pager::DataPageset:
+    file: lib/Teng/Plugin/Pager/DataPageset.pm
+    version: '0.01'
+requires:
+  Data::Pageset: '0'
+  Teng: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokubass/p5-Teng-Plugin-Pager-DataPageset/issues
+  homepage: https://github.com/tokubass/p5-Teng-Plugin-Pager-DataPageset
+  repository: git://github.com/tokubass/p5-Teng-Plugin-Pager-DataPageset.git
+version: '0.01'
+x_contributors:
+  - 'tokubass <tokubass@cpan.org>'

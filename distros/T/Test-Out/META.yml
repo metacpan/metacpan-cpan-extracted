@@ -1,0 +1,21 @@
+---
+name: Test-Out
+version: 0.21
+author:
+  - 'Lane Davis <cpan@upt.org>'
+abstract: Create captured output tests
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::Builder: 0.17
+  Carp: 1.04
+  Carp::Assert: 0.20
+  perl: 5.6.1
+provides:
+  Test::Out:
+    file: lib/Test/Out.pm
+    version: 0.21
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

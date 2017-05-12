@@ -1,0 +1,35 @@
+Text-CSV-R version 0.3
+======================
+
+This is just a convenient wrapper around Text::CSV. It behaves mostly like R's
+read.table and write.table functions. This module has a very simple API and
+uses the simplest possible data structure for a table: a reference to a
+two-dimensional array. It is very lightweight and has Text::CSV as only
+dependency.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or 
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+    
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Text::CSV
+    
+COPYRIGHT AND LICENCE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perlartistic.

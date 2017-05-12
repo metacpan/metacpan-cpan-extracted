@@ -1,0 +1,49 @@
+---
+abstract: 'Auto fill test names from caller line'
+author:
+  - 'cho45 <cho45@lowreal.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::Differences: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Name-FromLine
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Name::FromLine:
+    file: lib/Test/Name/FromLine.pm
+    version: '0.13'
+requires:
+  File::Slurp: '0'
+  Filter::Util::Call: '0'
+  Test::Builder: '0'
+resources:
+  bugtracker: https://github.com/cho45/Test-Name-FromLine/issues
+  homepage: https://github.com/cho45/Test-Name-FromLine
+  repository: git://github.com/cho45/Test-Name-FromLine
+version: '0.13'
+x_contributors:
+  - 'mechairoi <ttsujikawa@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'mattn <mattn.jp@gmail.com>'

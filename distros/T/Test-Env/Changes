@@ -1,0 +1,30 @@
+Revision history for Perl module Test::Env
+
+1.082 2016-01-24T17:43:14Z
+	* Remove the Test::Prereq test.
+
+1.081 2016-01-13T19:08:50Z
+	* Freshen module
+
+1.08 - 2007-08-12
+	* dist cleanup to fix META.yml. No need to upgrade.
+
+1.07 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.06 - 2006-05-17
+	* Updated dist for copyright and kwalitee. No need to upgrade.
+
+1.05 - 2005-03-08
+	* Added POD coverage tests: no need to upgrade
+
+0.11 - 2004-09-07
+	* cleaned up the distribution and added a README
+	* no need to upgrade
+
+0.6 - 2002-10-09
+	* cleaned up the distribution (no code changes)
+
+0.5_02 - 2002-09-09
+    * got rid of Test::Manifest

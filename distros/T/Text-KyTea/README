@@ -1,0 +1,86 @@
+NAME
+    Text::KyTea - Perl wrapper for KyTea
+
+SYNOPSIS
+      use Text::KyTea;
+
+      my $kytea   = Text::KyTea->new(%config);
+      my $results = $kytea->parse($text);
+
+      for my $result (@{$results})
+      {
+          print $result->{surface};
+
+          for my $tags (@{$result->{tags}})
+          {
+              print "\t";
+
+              for my $tag (@{$tags})
+              {
+                  print " ", $tag->{feature}, "/", $tag->{score};
+              }
+          }
+
+          print "\n";
+      }
+
+DESCRIPTION
+    KyTea is a general toolkit developed for analyzing text, with a focus on
+    Japanese, Chinese and other languages requiring word or morpheme
+    segmentation.
+
+    This module works under KyTea Ver.0.4.2 and later. Under the old
+    versions of KyTea, this module does not work!
+
+    If you've changed the default install directory of KyTea, please install
+    Text::KyTea in interactive mode (e.g., cpanm --interactive or cpanm -v).
+
+    For more information about KyTea, please see the "SEE ALSO" section of
+    this page.
+
+METHODS
+  $kytea = Text::KyTea->new(%config)
+    Creates a new Text::KyTea instance.
+
+      my $kytea = Text::KyTea->new(
+          model       => 'model.bin', # default is "$INSTALL_DIRECTORY/share/kytea/model.bin"
+          notag       => [1,2],       # default is []
+          nounk       => 0,           # default is 0 (Estimates the pronunciation of unkown words.)
+          unkbeam     => 50,          # default is 50
+          tagmax      => 3,           # default is 3
+          deftag      => 'UNK',       # default is 'UNK'
+          unktag      => '',          # default is ''
+          prontag_num => 1,           # default is 1 (Normally no need to change the default value.)
+      );
+
+  $results_arrayref = $kytea->parse($text)
+    Parses the given text via KyTea, and returns the results. The results
+    are returned as an array reference.
+
+  $pron = $kytea->pron( $text [, $replacement ] )
+    Returns the estimated pronunciation of the given text. Unknown
+    pronunciations are replaced with $replacement.
+
+    If $replacement is not specified, unknown pronunciations are replaced
+    with the original characters.
+
+    This is the mere shortcut method.
+
+  $kytea->read_model($path)
+    Reads the given model file. Model files should be read by new(model =>
+    $path) method.
+
+    Model files are available at <http://www.phontron.com/kytea/model.html>.
+
+AUTHOR
+    pawa <pawapawa@cpan.org>
+
+SEE ALSO
+    <http://www.phontron.com/kytea/>
+
+LICENSE
+    Copyright (C) pawa All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

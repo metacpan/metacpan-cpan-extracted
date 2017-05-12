@@ -1,0 +1,96 @@
+---
+
+# -------------------- systems
+
+- schema: Systems
+  name: a system called affe
+  data:
+    lid: 42
+    systemname: affe
+
+- schema: Systems
+  name: a system called iring
+  data:
+    lid: 12
+    systemname: iring
+    revision_id: 112
+
+- schema: Systems
+  name: a system called bascha
+  data:
+    lid: 15
+    systemname: bascha
+
+- schema: Systems
+  name: a system called bullock
+  data:
+    lid: 8
+    systemname: bullock
+
+
+# ------ revision
+
+- schema: Revision
+  name: iring revisions
+  data:
+    lid: 112
+    revision_id: 112
+    component_type: cpu
+    component_id: 3112
+
+
+- schema: Revision
+  name: iring revisions
+  data:
+    lid: 113
+    revision_id: 112
+    component_type: Ram
+    component_id: 3212
+
+- schema: Revision
+  name: iring revisions
+  data:
+    lid: 114
+    revision_id: 112
+    component_type: Ram
+    component_id: 3213
+
+
+# ----- CPU
+
+- schema: Cpu
+  name: iring cpu 3B2
+  data:
+    lid: 3112
+    vendor: AMD
+    family: 10
+    model: 3
+    stepping: 2
+    revision: B
+
+
+# ------ RAM
+- schema: Ram
+  name: iring ram
+  data:
+    lid: 3212
+    size_mbyte: 2048
+    vendor: Kingston
+
+- schema: Ram
+  name: second iring ram
+  data:
+    lid: 3213
+    size_mbyte: 2048
+    vendor: Kingston
+
+# ------ Network
+- schema: Network
+  name: iring network card
+  data:
+    lid: 3311
+    vendor: RealTek
+    chipset: rtl8169
+    mac: 00:18:4d:76:7a:12
+    bus_type: PCI
+    media: RJ45

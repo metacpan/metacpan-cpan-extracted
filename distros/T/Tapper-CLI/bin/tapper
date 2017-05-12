@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+# PODNAME: tapper
+# ABSTRACT: Tapper - primary cmdline frontend - the future Platzhirsch
+
+use App::Rad;
+use Module::Load;
+
+use strict;
+use warnings;
+use 5.010;
+
+sub setup {
+
+    my ( $or_app_rad ) = @_;
+
+    for my $s_module (qw/
+        Tapper::CLI::Notification
+        Tapper::CLI::Schema
+        Tapper::CLI::Testplan
+        Tapper::CLI::User
+        Tapper::CLI::Host
+        Tapper::CLI::HostFeature
+        Tapper::CLI::Cobbler
+        Tapper::CLI::Init
+        Tapper::CLI::Testrun
+        Tapper::CLI::Precondition
+        Tapper::CLI::Queue
+        Tapper::CLI::Scenario
+    /) {
+        Module::Load::load( $s_module );
+        if ( my $fh_setup = $s_module->can('setup') ) {
+            $fh_setup->( $or_app_rad );
+        }
+    }
+
+    return 1;
+
+}
+
+App::Rad->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper - Tapper - primary cmdline frontend - the future Platzhirsch
+
+=head1 AUTHOR
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

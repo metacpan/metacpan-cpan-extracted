@@ -1,0 +1,8 @@
+Revision history for Tie-PagedArray
+
+0.01    23-Sep-2013
+        First version.
+0.02    04-Jan-2013
+        each() on arrays works in v5.012 and later. Fixed the tests regarding this.
+0.03	02-Feb-2014
+		Changes to test files to avoid parsing errors on using each() in versions < 5.012

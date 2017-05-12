@@ -1,0 +1,101 @@
+
+=head1 NAME
+
+Tie::FlatFile::Array - Treat a flatfile database as an
+array of arrays.
+
+=head1 SYNOPSIS
+
+    use Tie::FlatFile::Array;
+    use Fcntl;
+
+    tie @flat, 'Tie::FlatFile::Array', 'data.file',
+	    O_RDWR | O_CREAT, 0644, { packformat => 'A30L' };
+    
+    @flat = (
+	    [www.yahoo.com => 3601],
+	    [www.google.com => 5214]
+	    );
+
+    untie @flat;
+
+
+=head1 DESCRIPTION
+
+This module allows the programmer to treat a flatfile database as
+as array of arrays. For example, let's say you have a
+datafile that has fixed-length records like so:
+
+  Field-name	Type
+  URL		ASCII characters, length 30
+  Referals	Integer, 4 bytes, binary in network order
+
+If you were going to use C<pack> to create a record like
+this, you'd use a format string of C<A30N>. Since
+C<Tie::FlatFile::Array> does the packing and unpacking
+behind the scenes, you would use that pack
+format string in the call to C<tie>:
+
+  tie @flat, 'Tie::FlatFile::Array', 'data.file',
+  	O_RDWR | O_CREAT, 0644, { packformat => 'A30N' }
+	or die("Tie failure: $!");
+
+To insert an item into the data file, you would assign an
+array reference to one of the array's elements like so:
+
+  $flat[0] = [ 'www.yahoo.com', 3601 ];
+
+Behind the scenes, code something like this will be
+executed:
+
+  seek($fh, 0, SEEK_SET);
+  print $fh pack('A30N', @{['www.yahoo.com', 3601]});
+
+If you were to assign something to the second element in the
+tied array:
+
+  $flat[1] = [ 'www.google.com', 5814 ];
+
+Something like this would happen:
+
+  seek($fh, 34, SEEK_SET);
+  print $fh pack('A30N', @{['www.google.com', 5814]});
+
+When you insert data into the file, you must use an array
+reference, and when you extract data from the file you
+receive an array reference. This
+code should display the file's contents:
+
+    use Tie::FlatFile::Array;
+    use Fcntl;
+
+    tie @flat, 'Tie::FlatFile::Array', 'data.file',
+	O_RDWR | O_CREAT, 0644, { packformat => 'A30N' };
+
+    foreach my $index (0..$#flat) {
+	my $ref = $flat[$index];
+	print "@{$ref}\n";
+    }
+
+    untie @flat;
+
+Note that fetching beyond the bounds of the array results
+in C<undef>.
+
+=head1 SEE ALSO
+
+See perltie, "perldoc -f pack" and possibly Tie::Array and
+Carp.
+
+=head1 AUTHOR
+
+  Copywright 2007-2009 Mumia Wotse
+  Mumia Wotse <mumia.w.18.spam+nospam [at] earthlink.net>
+
+This program is under the General Public License (GPL).
+
+=cut
+
+ vim: wm=20 ts=8
+
+

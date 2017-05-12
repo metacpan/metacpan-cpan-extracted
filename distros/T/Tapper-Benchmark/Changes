@@ -1,0 +1,64 @@
+Revision history for Tapper-Benchmark
+
+5.0.0     2016-02-15
+        - bring in sync with BenchmarkAnything
+
+0.012     2015-09-17
+        - refactor common methods between db backends
+
+0.011     2015-09-16
+        - let the db take care of compression in raw queue
+
+0.010     2015-09-15
+        - drop feature 'switch' - replace given/when with classic if/else
+
+0.009     2015-09-11
+        - DB tuning/tweaking:
+          * avoid deadlocks due to gap locking
+          * fix missing finish_transaction
+          * be crisp about UNSIGNED and use BLOB for raw queue
+          * simplify resetting of AutoCommit mode
+
+0.008     2015-09-08
+        - enable transactions for garbage collector
+
+0.007     2015-09-08
+        - queuing mode for high-throughput incoming results
+          * part 1) adds raw results into separate table
+          * part 2) process one of those values,
+                    likely called in bundles or from multiple workers
+          * part 3) garbage collect successfully processed results
+
+0.006     2015-08-26
+        - disable caching due to wrong behaviour
+
+0.005     2015-08-24
+        - larger field sizes
+        - select_benchmark_point_essentials()
+          Get NAME, VALUE, UNIT of a single benchmark point
+        - select_complete_benchmark_point()
+          Get all additional key/value fields of a single benchmark point
+        - get_single_benchmark_point()
+          Reconstruct a complete single benchmark point
+
+0.004     2015-08-20
+        - get list of benchmark NAMEs
+
+0.003     2015-08-18
+        - handling of duplicates and undefined values
+
+0.002     2015-08-17
+        - store benchmark VALUEs as VARCHAR to avoid rounding
+          and allow non-number values en passant
+        - dependency++ to DBD::SQLite 1.48 to avoid error
+          'no such column: bav2.bench_additional_value"
+
+0.001     2015-08-16
+        - Initial release - CPAN DAY - 2015-08-16
+        - based on the released code from early 2014
+        - This is a library to provide a schema for
+          storing benchmark values in an SQL database
+        - Primarily targets mysql, SQLite support
+          is basically so far by cutting away known
+          trouble maker SQL statement parts
+        - Read more about the schema on http://benchmarkanything.org/

@@ -1,0 +1,6 @@
+To manually install this module:
+
+perl Makefile.PL
+make
+make test
+make install

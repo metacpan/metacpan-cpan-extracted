@@ -1,0 +1,62 @@
+{
+   "abstract" : "Everything you need to play with Mojolicious, and more",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-MojoLearningEnvironment",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Mojolicious" : "0",
+            "Redis" : "0",
+            "Sereal" : "0",
+            "XML::Twig" : "0",
+            "local::lib" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.95"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/Task-MojoLearningEnvironment/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/Task-MojoLearningEnvironment",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/Task-MojoLearningEnvironment.git",
+         "web" : "https://github.com/briandfoy/Task-MojoLearningEnvironment"
+      }
+   },
+   "version" : "0.002"
+}

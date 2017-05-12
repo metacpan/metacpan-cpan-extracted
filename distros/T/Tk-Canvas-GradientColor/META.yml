@@ -1,0 +1,24 @@
+---
+abstract: 'To create a Canvas widget with background gradient color.'
+author:
+  - 'Djibril Ousmanou <djibel@cpan.org>'
+build_requires:
+  POSIX: 0
+  Test::More: 0
+  Tk: 800
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-Canvas-GradientColor
+provides:
+  Tk::Canvas::GradientColor:
+    file: lib/Tk/Canvas/GradientColor.pm
+    version: 1.06
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.06

@@ -1,0 +1,31 @@
+---
+abstract: 'load fixture data to storage for DBIx::Skinny'
+author:
+  - 'Atsushi Kobayashi <nekokak _at_ gmail _dot_ com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Fixture-DBIxSkinny
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DBIx::Skinny: 0.04
+  Kwalify: 1.16
+  Params::Validate: 0.89
+  YAML::Syck: 1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/nekokak/p5-test-fixture-dbixskinny.git
+version: 0.01

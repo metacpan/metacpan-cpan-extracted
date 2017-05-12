@@ -1,0 +1,756 @@
+Welcome to the rsync server for the Archive of perl/Changes.
+
+This server exposes only selected parts of the APC.  The full version
+is also available via ftp and http:
+
+    ftp://public.activestate.com/pub/apc/
+    http://public.activestate.com/pub/apc/
+ or
+    http://mirrors.develooper.com/perl/APC/
+
+See the 00README file there for more information on the Archive.
+
+receiving file list ... done
+./
+.patch
+t/uni/
+pp.c
+t/uni/overload.t
+
+sent 1102 bytes  received 77780 bytes  3093.41 bytes/sec
+total size is 58850314  speedup is 746.06
+C:\Test-Smoke\perl-current-bc now up to patchlevel 28014
+Reading build configurations from C:\Test-Smoke\smoke\59xbc.cfg
+Reading 'Policy.sh' from default content(1)
+Running smoke tests without $ENV{PERLIO}
+make distclean ...Smoking patch 28014
+
+Configuration: -Dusedevel -DINST_DRV=P: -DCCTYPE=BORLAND -DCCHOME=C:\Borland\BCC55 -Duseithreads -Duselargefiles
+------------------------------------------------------------------------------
+make distclean ...
+Copy Policy.sh ...
+Configure ...
+make ...Could Not Find C:\Test-Smoke\perl-current-bc\win32\config.h
+dmake.exe:  Error code 1, while making '.\config.h' (Ignored)
+Running config_h.PL
+Writing config.h
+config.h has changed
+Running config_h.PL
+Writing config.h
+Options: (PERL_DONT_CREATE_GVSV PERL_MALLOC_WRAP)
+Defines: (HAVE_DES_FCRYPT MULTIPLICITY PERL_DONT_CREATE_GVSV PERL_IMPLICIT_CONTEXT PERL_IMPLICIT_SYS PERL_MALLOC_WRAP PERL_RELOCATABLE_INC PERL_TARGETARCH PL_OP_SLAB_ALLOC USE_DYNAMIC_LOADING USE_ITHREADS USE_LARGE_FILES USE_PERLIO USE_STDIO_BASE USE_STDIO_PTR USE_STRUCT_COPY USE_THREADS WIN32 _MT _RTLDLL _WIN32_WINNT __USELOCALES__)
+dmake.exe:  Error code 1, while making '..\pp_ctl.obj'
+
+del /f config.h
+copy config_H.bc config.h
+        1 file(s) copied.
+bcc32 -c  -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -operlglob.obj perlglob.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+perlglob.c:
+bcc32 -c -w -v -tWM -I"C:\Borland\BCC55\include" perlglob.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+perlglob.c:
+ilink32 -Tpe -ap   -L"P:\perl\lib\CORE" -L"C:\Borland\BCC55\lib" 		-L"C:\Borland\BCC55\lib\PSDK" -Gn c0x32.obj perlglob.obj \
+	    "C:\Borland\BCC55\lib\32BIT\wildargs.obj",..\perlglob.exe,,import32.lib cw32mt.lib,
+Turbo Incremental Link 5.00 Copyright (c) 1997, 2000 Borland
+if not exist ".\mini" mkdir ".\mini"
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\av.obj ..\av.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\av.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\deb.obj ..\deb.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\deb.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\doio.obj ..\doio.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\doio.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\doop.obj ..\doop.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\doop.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\dump.obj ..\dump.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\dump.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\globals.obj ..\globals.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\globals.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\gv.obj ..\gv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\gv.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\hv.obj ..\hv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\hv.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\locale.obj ..\locale.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\locale.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\mathoms.obj ..\mathoms.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\mathoms.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\mg.obj ..\mg.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\mg.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\numeric.obj ..\numeric.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\numeric.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\op.obj ..\op.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\op.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\pad.obj ..\pad.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pad.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\perl.obj ..\perl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perl.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\perlapi.obj ..\perlapi.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perlapi.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\perly.obj ..\perly.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perly.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\pp.obj ..\pp.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp.c:
+Warning W8079 ..\pp.c 3433: Mixing pointers to different 'char' types in function Perl_pp_ucfirst
+Warning W8079 ..\pp.c 3464: Mixing pointers to different 'char' types in function Perl_pp_ucfirst
+Warning W8079 ..\pp.c 3557: Mixing pointers to different 'char' types in function Perl_pp_uc
+Warning W8079 ..\pp.c 3563: Mixing pointers to different 'char' types in function Perl_pp_uc
+Warning W8079 ..\pp.c 3657: Mixing pointers to different 'char' types in function Perl_pp_lc
+Warning W8079 ..\pp.c 3663: Mixing pointers to different 'char' types in function Perl_pp_lc
+Warning W8041 ..\pp.c 4013: Negating unsigned value in function Perl_pp_hslice
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\pp_ctl.obj ..\pp_ctl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_ctl.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\pp_hot.obj ..\pp_hot.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_hot.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\pp_pack.obj ..\pp_pack.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_pack.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\pp_sort.obj ..\pp_sort.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_sort.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\pp_sys.obj ..\pp_sys.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_sys.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\reentr.obj ..\reentr.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\reentr.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\regcomp.obj ..\regcomp.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\regcomp.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\regexec.obj ..\regexec.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\regexec.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\run.obj ..\run.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\run.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\scope.obj ..\scope.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\scope.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\sv.obj ..\sv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\sv.c:
+Warning W8019 ..\sv.c 3938: Code has no effect in function Perl_sv_usepvn_flags
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\taint.obj ..\taint.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\taint.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\toke.obj ..\toke.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\toke.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\universal.obj ..\universal.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\universal.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\utf8.obj ..\utf8.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\utf8.c:
+Warning W8070 ..\utf8.c 1747: Function should return a value in function Perl_swash_fetch
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\util.obj ..\util.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\util.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\xsutils.obj ..\xsutils.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\xsutils.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\miniperlmain.obj ..\miniperlmain.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\miniperlmain.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -DPERL_EXTERNAL_GLOB -o.\mini\perlio.obj ..\perlio.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perlio.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -o.\mini\win32.obj win32.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+win32.c:
+Warning W8065 win32.c 2062: Call to function 'win32_create_message_window' with no prototype in function win32_alarm
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -o.\mini\win32sck.obj win32sck.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+win32sck.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -o.\mini\win32thread.obj win32thread.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+win32thread.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -o.\mini\win32io.obj win32io.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+win32io.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL -o.\mini\fcrypt.obj fcrypt.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+fcrypt.c:
+Warning W8004 fcrypt.c 348: 'in' is assigned a value that is never used in function des_set_key
+Warning W8004 fcrypt.c 505: 'b' is assigned a value that is never used in function des_fcrypt
+if not exist C:\Borland\BCC55\lib\PSDK\odbccp32.lib \
+	    cd C:\Borland\BCC55\lib\PSDK && implib odbccp32.lib C:\WINNT\system\odbccp32.dll
+ilink32 -Tpe -ap   -L"P:\perl\lib\CORE" -L"C:\Borland\BCC55\lib" 		-L"C:\Borland\BCC55\lib\PSDK" -Gn \
+	    @C:\DOCUME~1\abeltje\LOCALS~1\Temp\mk00051b
+Turbo Incremental Link 5.00 Copyright (c) 1997, 2000 Borland
+cd .. && miniperl minimod.pl > lib\ExtUtils\Miniperl.pm
+copy config.bc config.w32
+        1 file(s) copied.
+..\miniperl.exe -I..\lib config_sh.PL --cfgsh-option-file \
+	    C:\DOCUME~1\abeltje\LOCALS~1\Temp\mk000644 config.w32 > ..\config.sh
+cd .. && miniperl configpm
+written lib/Config.pod
+updated lib/Config.pm
+updated lib/Config_heavy.pl
+if exist lib\* xcopy /f /r /i /e /d /y lib\*.* ..\lib\
+xcopy /f /r /i /d /y ..\*.h ..\lib\CORE\*.*
+C:\Test-Smoke\perl-current-bc\av.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\av.h
+C:\Test-Smoke\perl-current-bc\cc_runtime.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\cc_runtime.h
+C:\Test-Smoke\perl-current-bc\cop.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\cop.h
+C:\Test-Smoke\perl-current-bc\cv.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\cv.h
+C:\Test-Smoke\perl-current-bc\dosish.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\dosish.h
+C:\Test-Smoke\perl-current-bc\embed.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\embed.h
+C:\Test-Smoke\perl-current-bc\embedvar.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\embedvar.h
+C:\Test-Smoke\perl-current-bc\EXTERN.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\EXTERN.h
+C:\Test-Smoke\perl-current-bc\fakesdio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\fakesdio.h
+C:\Test-Smoke\perl-current-bc\fakethr.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\fakethr.h
+C:\Test-Smoke\perl-current-bc\form.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\form.h
+C:\Test-Smoke\perl-current-bc\gv.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\gv.h
+C:\Test-Smoke\perl-current-bc\handy.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\handy.h
+C:\Test-Smoke\perl-current-bc\hv.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\hv.h
+C:\Test-Smoke\perl-current-bc\INTERN.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\INTERN.h
+C:\Test-Smoke\perl-current-bc\intrpvar.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\intrpvar.h
+C:\Test-Smoke\perl-current-bc\iperlsys.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\iperlsys.h
+C:\Test-Smoke\perl-current-bc\keywords.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\keywords.h
+C:\Test-Smoke\perl-current-bc\madly.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\madly.h
+C:\Test-Smoke\perl-current-bc\malloc_ctl.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\malloc_ctl.h
+C:\Test-Smoke\perl-current-bc\mg.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\mg.h
+C:\Test-Smoke\perl-current-bc\nostdio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\nostdio.h
+C:\Test-Smoke\perl-current-bc\op.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\op.h
+C:\Test-Smoke\perl-current-bc\opcode.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\opcode.h
+C:\Test-Smoke\perl-current-bc\opnames.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\opnames.h
+C:\Test-Smoke\perl-current-bc\pad.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\pad.h
+C:\Test-Smoke\perl-current-bc\patchlevel.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\patchlevel.h
+C:\Test-Smoke\perl-current-bc\perl.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perl.h
+C:\Test-Smoke\perl-current-bc\perlapi.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlapi.h
+C:\Test-Smoke\perl-current-bc\perlio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlio.h
+C:\Test-Smoke\perl-current-bc\perliol.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perliol.h
+C:\Test-Smoke\perl-current-bc\perlsdio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlsdio.h
+C:\Test-Smoke\perl-current-bc\perlsfio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlsfio.h
+C:\Test-Smoke\perl-current-bc\perlvars.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlvars.h
+C:\Test-Smoke\perl-current-bc\perly.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perly.h
+C:\Test-Smoke\perl-current-bc\pp.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\pp.h
+C:\Test-Smoke\perl-current-bc\pp_proto.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\pp_proto.h
+C:\Test-Smoke\perl-current-bc\proto.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\proto.h
+C:\Test-Smoke\perl-current-bc\reentr.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\reentr.h
+C:\Test-Smoke\perl-current-bc\regcomp.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\regcomp.h
+C:\Test-Smoke\perl-current-bc\regexp.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\regexp.h
+C:\Test-Smoke\perl-current-bc\regnodes.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\regnodes.h
+C:\Test-Smoke\perl-current-bc\scope.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\scope.h
+C:\Test-Smoke\perl-current-bc\sv.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\sv.h
+C:\Test-Smoke\perl-current-bc\thrdvar.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\thrdvar.h
+C:\Test-Smoke\perl-current-bc\thread.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\thread.h
+C:\Test-Smoke\perl-current-bc\uconfig.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\uconfig.h
+C:\Test-Smoke\perl-current-bc\unixish.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\unixish.h
+C:\Test-Smoke\perl-current-bc\utf8.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\utf8.h
+C:\Test-Smoke\perl-current-bc\utfebcdic.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\utfebcdic.h
+C:\Test-Smoke\perl-current-bc\util.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\util.h
+C:\Test-Smoke\perl-current-bc\warnings.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\warnings.h
+C:\Test-Smoke\perl-current-bc\XSUB.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\XSUB.h
+53 File(s) copied
+xcopy /f /r /i /d /y *.h ..\lib\CORE\*.*
+C:\Test-Smoke\perl-current-bc\win32\config.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\config.h
+C:\Test-Smoke\perl-current-bc\win32\perlhost.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlhost.h
+C:\Test-Smoke\perl-current-bc\win32\vdir.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\vdir.h
+C:\Test-Smoke\perl-current-bc\win32\vmem.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\vmem.h
+C:\Test-Smoke\perl-current-bc\win32\win32.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\win32.h
+C:\Test-Smoke\perl-current-bc\win32\win32iop.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\win32iop.h
+C:\Test-Smoke\perl-current-bc\win32\win32thread.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\win32thread.h
+7 File(s) copied
+xcopy /f /r /i /d /y ..\ext\re\re.pm ..\lib\*.*
+C:\Test-Smoke\perl-current-bc\ext\re\re.pm -> C:\Test-Smoke\perl-current-bc\lib\re.pm
+1 File(s) copied
+xcopy /f /r /i /e /d /y include ..\lib\CORE\*.*
+C:\Test-Smoke\perl-current-bc\win32\include\dirent.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\dirent.h
+C:\Test-Smoke\perl-current-bc\win32\include\netdb.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\netdb.h
+C:\Test-Smoke\perl-current-bc\win32\include\arpa\inet.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\arpa\inet.h
+C:\Test-Smoke\perl-current-bc\win32\include\sys\socket.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\sys\socket.h
+4 File(s) copied
+..\miniperl.exe -I..\lib config_h.PL "INST_VER=" \
+	    || C:\dmake\dmake.exe -S   ..\lib\Config.pm ..\lib\Config_heavy.pl -f smoke.mk
+`..\lib\Config.pm' is up to date
+`..\lib\Config_heavy.pl' is up to date
+cd .. && miniperl configpm
+written lib/Config.pod
+if exist lib\* xcopy /f /r /i /e /d /y lib\*.* ..\lib\
+xcopy /f /r /i /d /y ..\*.h ..\lib\CORE\*.*
+0 File(s) copied
+xcopy /f /r /i /d /y *.h ..\lib\CORE\*.*
+0 File(s) copied
+xcopy /f /r /i /d /y ..\ext\re\re.pm ..\lib\*.*
+0 File(s) copied
+xcopy /f /r /i /e /d /y include ..\lib\CORE\*.*
+0 File(s) copied
+..\miniperl.exe -I..\lib config_h.PL "INST_VER=" \
+	    || C:\dmake\dmake.exe -S   ..\lib\Config.pm ..\lib\Config_heavy.pl -f smoke.mk
+cd ..\lib\unicore && \
+	..\..\miniperl.exe -I.. mktables
+..\miniperl.exe -I..\lib buildext.pl --create-perllibst-h
+..\miniperl.exe -w ..\makedef.pl PLATFORM=win32 -O2 -D_RTLDLL -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 \
+	 -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS CCTYPE=BORLAND > perldll.def
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\av.obj ..\av.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\av.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\deb.obj ..\deb.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\deb.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\doio.obj ..\doio.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\doio.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\doop.obj ..\doop.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\doop.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\dump.obj ..\dump.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\dump.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\globals.obj ..\globals.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\globals.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\gv.obj ..\gv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\gv.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\hv.obj ..\hv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\hv.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\locale.obj ..\locale.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\locale.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\mathoms.obj ..\mathoms.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\mathoms.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\mg.obj ..\mg.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\mg.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\numeric.obj ..\numeric.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\numeric.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\op.obj ..\op.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\op.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pad.obj ..\pad.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pad.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\perl.obj ..\perl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perl.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\perlapi.obj ..\perlapi.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perlapi.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\perly.obj ..\perly.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perly.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pp.obj ..\pp.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp.c:
+Warning W8079 ..\pp.c 3433: Mixing pointers to different 'char' types in function Perl_pp_ucfirst
+Warning W8079 ..\pp.c 3464: Mixing pointers to different 'char' types in function Perl_pp_ucfirst
+Warning W8079 ..\pp.c 3557: Mixing pointers to different 'char' types in function Perl_pp_uc
+Warning W8079 ..\pp.c 3563: Mixing pointers to different 'char' types in function Perl_pp_uc
+Warning W8079 ..\pp.c 3657: Mixing pointers to different 'char' types in function Perl_pp_lc
+Warning W8079 ..\pp.c 3663: Mixing pointers to different 'char' types in function Perl_pp_lc
+Warning W8041 ..\pp.c 4013: Negating unsigned value in function Perl_pp_hslice
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pp_ctl.obj ..\pp_ctl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_ctl.c:
+Error E2451 ..\pp_ctl.c 3032: Undefined symbol 'my_perl' in function S_check_type_and_open
+*** 1 errors in Compile ***
+
+Unable to make anything but miniperl in this configuration
+TSTENV = minitest	bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pp_ctl.obj ..\pp_ctl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_ctl.c:
+Error E2451 ..\pp_ctl.c 3032: Undefined symbol 'my_perl' in function S_check_type_and_open
+*** 1 errors in Compile ***
+dmake.exe:  Error code 1, while making '..\pp_ctl.obj'
+Error while reading pipe:  at C:/Test-Smoke/20smoke/Test/Smoke.pm line 174
+    bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -O2 -D_RTLDLL  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pp_ctl.obj ..\pp_ctl.c
+    Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+    ..\pp_ctl.c:
+    Error E2451 ..\pp_ctl.c 3032: Undefined symbol 'my_perl' in function S_check_type_and_open
+    *** 1 errors in Compile ***
+
+OK, archive results ...
+
+Configuration: -Dusedevel -DINST_DRV=P: -DCCTYPE=BORLAND -DCCHOME=C:\Borland\BCC55 -Duseithreads -Duselargefiles -DDEBUGGING
+------------------------------------------------------------------------------
+make distclean ...
+Copy Policy.sh ...
+Configure ...
+make ...Could Not Find C:\Test-Smoke\perl-current-bc\win32\config.h
+dmake.exe:  Error code 1, while making '.\config.h' (Ignored)
+Running config_h.PL
+Writing config.h
+config.h has changed
+Running config_h.PL
+Writing config.h
+Options: (DEBUGGING PERL_DONT_CREATE_GVSV PERL_MALLOC_WRAP)
+Defines: (DEBUGGING HAVE_DES_FCRYPT MULTIPLICITY PERL_DONT_CREATE_GVSV PERL_IMPLICIT_CONTEXT PERL_IMPLICIT_SYS PERL_MALLOC_WRAP PERL_RELOCATABLE_INC PERL_TARGETARCH PL_OP_SLAB_ALLOC USE_DYNAMIC_LOADING USE_ITHREADS USE_LARGE_FILES USE_PERLIO USE_STDIO_BASE USE_STDIO_PTR USE_STRUCT_COPY USE_THREADS WIN32 _MT _RTLDLL _WIN32_WINNT __USELOCALES__)
+dmake.exe:  Error code 1, while making '..\pp_ctl.obj'
+
+del /f config.h
+copy config_H.bc config.h
+        1 file(s) copied.
+bcc32 -c  -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -operlglob.obj perlglob.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+perlglob.c:
+bcc32 -c -w -v -tWM -I"C:\Borland\BCC55\include" perlglob.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+perlglob.c:
+ilink32 -Tpe -ap  -v -L"P:\perl\lib\CORE" -L"C:\Borland\BCC55\lib" 		-L"C:\Borland\BCC55\lib\PSDK" -Gn c0x32.obj perlglob.obj \
+	    "C:\Borland\BCC55\lib\32BIT\wildargs.obj",..\perlglob.exe,,import32.lib cw32mt.lib,
+Turbo Incremental Link 5.00 Copyright (c) 1997, 2000 Borland
+if not exist ".\mini" mkdir ".\mini"
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\av.obj ..\av.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\av.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\deb.obj ..\deb.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\deb.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\doio.obj ..\doio.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\doio.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\doop.obj ..\doop.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\doop.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\dump.obj ..\dump.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\dump.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\globals.obj ..\globals.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\globals.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\gv.obj ..\gv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\gv.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\hv.obj ..\hv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\hv.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\locale.obj ..\locale.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\locale.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\mathoms.obj ..\mathoms.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\mathoms.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\mg.obj ..\mg.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\mg.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\numeric.obj ..\numeric.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\numeric.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\op.obj ..\op.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\op.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\pad.obj ..\pad.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pad.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\perl.obj ..\perl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perl.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\perlapi.obj ..\perlapi.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perlapi.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\perly.obj ..\perly.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perly.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\pp.obj ..\pp.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp.c:
+Warning W8079 ..\pp.c 3433: Mixing pointers to different 'char' types in function Perl_pp_ucfirst
+Warning W8079 ..\pp.c 3464: Mixing pointers to different 'char' types in function Perl_pp_ucfirst
+Warning W8079 ..\pp.c 3557: Mixing pointers to different 'char' types in function Perl_pp_uc
+Warning W8079 ..\pp.c 3563: Mixing pointers to different 'char' types in function Perl_pp_uc
+Warning W8079 ..\pp.c 3657: Mixing pointers to different 'char' types in function Perl_pp_lc
+Warning W8079 ..\pp.c 3663: Mixing pointers to different 'char' types in function Perl_pp_lc
+Warning W8041 ..\pp.c 4013: Negating unsigned value in function Perl_pp_hslice
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\pp_ctl.obj ..\pp_ctl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_ctl.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\pp_hot.obj ..\pp_hot.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_hot.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\pp_pack.obj ..\pp_pack.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_pack.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\pp_sort.obj ..\pp_sort.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_sort.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\pp_sys.obj ..\pp_sys.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_sys.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\reentr.obj ..\reentr.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\reentr.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\regcomp.obj ..\regcomp.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\regcomp.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\regexec.obj ..\regexec.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\regexec.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\run.obj ..\run.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\run.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\scope.obj ..\scope.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\scope.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\sv.obj ..\sv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\sv.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\taint.obj ..\taint.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\taint.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\toke.obj ..\toke.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\toke.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\universal.obj ..\universal.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\universal.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\utf8.obj ..\utf8.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\utf8.c:
+Warning W8070 ..\utf8.c 1747: Function should return a value in function Perl_swash_fetch
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\util.obj ..\util.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\util.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\xsutils.obj ..\xsutils.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\xsutils.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\miniperlmain.obj ..\miniperlmain.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\miniperlmain.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -DPERL_EXTERNAL_GLOB -o.\mini\perlio.obj ..\perlio.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perlio.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -o.\mini\win32.obj win32.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+win32.c:
+Warning W8065 win32.c 2062: Call to function 'win32_create_message_window' with no prototype in function win32_alarm
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -o.\mini\win32sck.obj win32sck.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+win32sck.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -o.\mini\win32thread.obj win32thread.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+win32thread.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -o.\mini\win32io.obj win32io.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+win32io.c:
+bcc32 -c -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING -o.\mini\fcrypt.obj fcrypt.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+fcrypt.c:
+Warning W8004 fcrypt.c 348: 'in' is assigned a value that is never used in function des_set_key
+Warning W8004 fcrypt.c 505: 'b' is assigned a value that is never used in function des_fcrypt
+if not exist C:\Borland\BCC55\lib\PSDK\odbccp32.lib \
+	    cd C:\Borland\BCC55\lib\PSDK && implib odbccp32.lib C:\WINNT\system\odbccp32.dll
+ilink32 -Tpe -ap  -v -L"P:\perl\lib\CORE" -L"C:\Borland\BCC55\lib" 		-L"C:\Borland\BCC55\lib\PSDK" -Gn \
+	    @C:\DOCUME~1\abeltje\LOCALS~1\Temp\mk00051b
+Turbo Incremental Link 5.00 Copyright (c) 1997, 2000 Borland
+cd .. && miniperl minimod.pl > lib\ExtUtils\Miniperl.pm
+copy config.bc config.w32
+        1 file(s) copied.
+..\miniperl.exe -I..\lib config_sh.PL --cfgsh-option-file \
+	    C:\DOCUME~1\abeltje\LOCALS~1\Temp\mk000644 config.w32 > ..\config.sh
+cd .. && miniperl configpm
+written lib/Config.pod
+updated lib/Config.pm
+updated lib/Config_heavy.pl
+if exist lib\* xcopy /f /r /i /e /d /y lib\*.* ..\lib\
+xcopy /f /r /i /d /y ..\*.h ..\lib\CORE\*.*
+C:\Test-Smoke\perl-current-bc\av.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\av.h
+C:\Test-Smoke\perl-current-bc\cc_runtime.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\cc_runtime.h
+C:\Test-Smoke\perl-current-bc\cop.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\cop.h
+C:\Test-Smoke\perl-current-bc\cv.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\cv.h
+C:\Test-Smoke\perl-current-bc\dosish.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\dosish.h
+C:\Test-Smoke\perl-current-bc\embed.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\embed.h
+C:\Test-Smoke\perl-current-bc\embedvar.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\embedvar.h
+C:\Test-Smoke\perl-current-bc\EXTERN.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\EXTERN.h
+C:\Test-Smoke\perl-current-bc\fakesdio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\fakesdio.h
+C:\Test-Smoke\perl-current-bc\fakethr.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\fakethr.h
+C:\Test-Smoke\perl-current-bc\form.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\form.h
+C:\Test-Smoke\perl-current-bc\gv.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\gv.h
+C:\Test-Smoke\perl-current-bc\handy.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\handy.h
+C:\Test-Smoke\perl-current-bc\hv.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\hv.h
+C:\Test-Smoke\perl-current-bc\INTERN.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\INTERN.h
+C:\Test-Smoke\perl-current-bc\intrpvar.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\intrpvar.h
+C:\Test-Smoke\perl-current-bc\iperlsys.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\iperlsys.h
+C:\Test-Smoke\perl-current-bc\keywords.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\keywords.h
+C:\Test-Smoke\perl-current-bc\madly.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\madly.h
+C:\Test-Smoke\perl-current-bc\malloc_ctl.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\malloc_ctl.h
+C:\Test-Smoke\perl-current-bc\mg.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\mg.h
+C:\Test-Smoke\perl-current-bc\nostdio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\nostdio.h
+C:\Test-Smoke\perl-current-bc\op.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\op.h
+C:\Test-Smoke\perl-current-bc\opcode.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\opcode.h
+C:\Test-Smoke\perl-current-bc\opnames.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\opnames.h
+C:\Test-Smoke\perl-current-bc\pad.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\pad.h
+C:\Test-Smoke\perl-current-bc\patchlevel.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\patchlevel.h
+C:\Test-Smoke\perl-current-bc\perl.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perl.h
+C:\Test-Smoke\perl-current-bc\perlapi.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlapi.h
+C:\Test-Smoke\perl-current-bc\perlio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlio.h
+C:\Test-Smoke\perl-current-bc\perliol.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perliol.h
+C:\Test-Smoke\perl-current-bc\perlsdio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlsdio.h
+C:\Test-Smoke\perl-current-bc\perlsfio.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlsfio.h
+C:\Test-Smoke\perl-current-bc\perlvars.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlvars.h
+C:\Test-Smoke\perl-current-bc\perly.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perly.h
+C:\Test-Smoke\perl-current-bc\pp.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\pp.h
+C:\Test-Smoke\perl-current-bc\pp_proto.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\pp_proto.h
+C:\Test-Smoke\perl-current-bc\proto.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\proto.h
+C:\Test-Smoke\perl-current-bc\reentr.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\reentr.h
+C:\Test-Smoke\perl-current-bc\regcomp.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\regcomp.h
+C:\Test-Smoke\perl-current-bc\regexp.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\regexp.h
+C:\Test-Smoke\perl-current-bc\regnodes.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\regnodes.h
+C:\Test-Smoke\perl-current-bc\scope.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\scope.h
+C:\Test-Smoke\perl-current-bc\sv.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\sv.h
+C:\Test-Smoke\perl-current-bc\thrdvar.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\thrdvar.h
+C:\Test-Smoke\perl-current-bc\thread.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\thread.h
+C:\Test-Smoke\perl-current-bc\uconfig.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\uconfig.h
+C:\Test-Smoke\perl-current-bc\unixish.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\unixish.h
+C:\Test-Smoke\perl-current-bc\utf8.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\utf8.h
+C:\Test-Smoke\perl-current-bc\utfebcdic.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\utfebcdic.h
+C:\Test-Smoke\perl-current-bc\util.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\util.h
+C:\Test-Smoke\perl-current-bc\warnings.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\warnings.h
+C:\Test-Smoke\perl-current-bc\XSUB.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\XSUB.h
+53 File(s) copied
+xcopy /f /r /i /d /y *.h ..\lib\CORE\*.*
+C:\Test-Smoke\perl-current-bc\win32\config.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\config.h
+C:\Test-Smoke\perl-current-bc\win32\perlhost.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\perlhost.h
+C:\Test-Smoke\perl-current-bc\win32\vdir.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\vdir.h
+C:\Test-Smoke\perl-current-bc\win32\vmem.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\vmem.h
+C:\Test-Smoke\perl-current-bc\win32\win32.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\win32.h
+C:\Test-Smoke\perl-current-bc\win32\win32iop.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\win32iop.h
+C:\Test-Smoke\perl-current-bc\win32\win32thread.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\win32thread.h
+7 File(s) copied
+xcopy /f /r /i /d /y ..\ext\re\re.pm ..\lib\*.*
+C:\Test-Smoke\perl-current-bc\ext\re\re.pm -> C:\Test-Smoke\perl-current-bc\lib\re.pm
+1 File(s) copied
+xcopy /f /r /i /e /d /y include ..\lib\CORE\*.*
+C:\Test-Smoke\perl-current-bc\win32\include\dirent.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\dirent.h
+C:\Test-Smoke\perl-current-bc\win32\include\netdb.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\netdb.h
+C:\Test-Smoke\perl-current-bc\win32\include\arpa\inet.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\arpa\inet.h
+C:\Test-Smoke\perl-current-bc\win32\include\sys\socket.h -> C:\Test-Smoke\perl-current-bc\lib\CORE\sys\socket.h
+4 File(s) copied
+..\miniperl.exe -I..\lib config_h.PL "INST_VER=" \
+	    || C:\dmake\dmake.exe -S   ..\lib\Config.pm ..\lib\Config_heavy.pl -f smoke.mk
+`..\lib\Config.pm' is up to date
+`..\lib\Config_heavy.pl' is up to date
+cd .. && miniperl configpm
+written lib/Config.pod
+if exist lib\* xcopy /f /r /i /e /d /y lib\*.* ..\lib\
+xcopy /f /r /i /d /y ..\*.h ..\lib\CORE\*.*
+0 File(s) copied
+xcopy /f /r /i /d /y *.h ..\lib\CORE\*.*
+0 File(s) copied
+xcopy /f /r /i /d /y ..\ext\re\re.pm ..\lib\*.*
+0 File(s) copied
+xcopy /f /r /i /e /d /y include ..\lib\CORE\*.*
+0 File(s) copied
+..\miniperl.exe -I..\lib config_h.PL "INST_VER=" \
+	    || C:\dmake\dmake.exe -S   ..\lib\Config.pm ..\lib\Config_heavy.pl -f smoke.mk
+cd ..\lib\unicore && \
+	..\..\miniperl.exe -I.. mktables
+..\miniperl.exe -I..\lib buildext.pl --create-perllibst-h
+..\miniperl.exe -w ..\makedef.pl PLATFORM=win32 -v -D_RTLDLL -DDEBUGGING -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 \
+	 -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS CCTYPE=BORLAND > perldll.def
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\av.obj ..\av.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\av.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\deb.obj ..\deb.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\deb.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\doio.obj ..\doio.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\doio.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\doop.obj ..\doop.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\doop.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\dump.obj ..\dump.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\dump.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\globals.obj ..\globals.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\globals.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\gv.obj ..\gv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\gv.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\hv.obj ..\hv.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\hv.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\locale.obj ..\locale.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\locale.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\mathoms.obj ..\mathoms.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\mathoms.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\mg.obj ..\mg.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\mg.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\numeric.obj ..\numeric.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\numeric.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\op.obj ..\op.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\op.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pad.obj ..\pad.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pad.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\perl.obj ..\perl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perl.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\perlapi.obj ..\perlapi.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perlapi.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\perly.obj ..\perly.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\perly.c:
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pp.obj ..\pp.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp.c:
+Warning W8079 ..\pp.c 3433: Mixing pointers to different 'char' types in function Perl_pp_ucfirst
+Warning W8079 ..\pp.c 3464: Mixing pointers to different 'char' types in function Perl_pp_ucfirst
+Warning W8079 ..\pp.c 3557: Mixing pointers to different 'char' types in function Perl_pp_uc
+Warning W8079 ..\pp.c 3563: Mixing pointers to different 'char' types in function Perl_pp_uc
+Warning W8079 ..\pp.c 3657: Mixing pointers to different 'char' types in function Perl_pp_lc
+Warning W8079 ..\pp.c 3663: Mixing pointers to different 'char' types in function Perl_pp_lc
+Warning W8041 ..\pp.c 4013: Negating unsigned value in function Perl_pp_hslice
+bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pp_ctl.obj ..\pp_ctl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_ctl.c:
+Error E2451 ..\pp_ctl.c 3032: Undefined symbol 'my_perl' in function S_check_type_and_open
+*** 1 errors in Compile ***
+
+Unable to make anything but miniperl in this configuration
+TSTENV = minitest	bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pp_ctl.obj ..\pp_ctl.c
+Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+..\pp_ctl.c:
+Error E2451 ..\pp_ctl.c 3032: Undefined symbol 'my_perl' in function S_check_type_and_open
+*** 1 errors in Compile ***
+dmake.exe:  Error code 1, while making '..\pp_ctl.obj'
+Error while reading pipe:  at C:/Test-Smoke/20smoke/Test/Smoke.pm line 174
+    bcc32 -c -I..\ -w -g0 -tWM -tWD -I..\lib\CORE -I.\include -I. -I.. -I"C:\Borland\BCC55\include" -DWIN32 -DHAVE_DES_FCRYPT -D_MT -D__USELOCALES__ -D_WIN32_WINNT=0x0410 -DPERLDLL -DPERL_CORE 		 -v -D_RTLDLL -DDEBUGGING  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -o..\pp_ctl.obj ..\pp_ctl.c
+    Borland C++ 5.5.1 for Win32 Copyright (c) 1993, 2000 Borland
+    ..\pp_ctl.c:
+    Error E2451 ..\pp_ctl.c 3032: Undefined symbol 'my_perl' in function S_check_type_and_open
+    *** 1 errors in Compile ***
+
+OK, archive results ...
+Finished smoking 28014
+Reading smokeresult from C:\Test-Smoke\perl-current-bc\mktest.out
+Processing [-DINST_DRV=P: -DCCTYPE=BORLAND -DCCHOME=C:\Borland\BCC55 -Duseithreads -Duselargefiles]
+Processing [-DDEBUGGING -DINST_DRV=P: -DCCTYPE=BORLAND -DCCHOME=C:\Borland\BCC55 -Duseithreads -Duselargefiles]
+Writing report to 'C:\Test-Smoke\perl-current-bc\mktest.rpt':Locally applied patches from 'C:\Test-Smoke\perl-current-bc\patchlevel.h': open ok
+Patches: 'SMOKE28014'
+Looking for cc messages: 'bcc32'
+Reading logfile 'C:\Test-Smoke\smoke\59xbc.log'
+Pattern(bcc32): /(^(?:(?:Warning W\d+ .+? \d+)|(?:Error E\d+)): .+?$)/
+ OK
+Sending report to smokers-reports@perl.org OK

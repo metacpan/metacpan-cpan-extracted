@@ -1,0 +1,38 @@
+---
+abstract: 'Test upgrade scripts for L<< DBIx::Class::Schema::Versioned >>'
+author:
+  - "spudsoup\" <\"spudsoup@cpan.org"
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.133380'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-DBIC-Versioned
+provides:
+  Test::DBIC::Versioned:
+    file: lib/Test/DBIC/Versioned.pm
+    version: 0.02
+  Test::DBIC::Versioned::MySQL:
+    file: lib/Test/DBIC/Versioned/MySQL.pm
+    version: 0.02
+requires:
+  Capture::Tiny: 0
+  File::Slurp: 0
+  File::Temp: 0
+  JSON: 0
+  Moose: 0
+  MooseX::StrictConstructor: 0
+  Test::mysqld: 0
+  Try::Tiny: 0
+  perl: 5.016
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/chrestomanci/Test-DBIC-Versioned/issues
+  repository: git://github.com/chrestomanci/Test-DBIC-Versioned.git
+version: 0.02

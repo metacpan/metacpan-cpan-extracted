@@ -1,0 +1,10 @@
+before include
+in include.dat
+before include1.dat
+
+in include1.dat
+leaving include1.dat
+
+after include1.dat
+leaving include.dat
+after include

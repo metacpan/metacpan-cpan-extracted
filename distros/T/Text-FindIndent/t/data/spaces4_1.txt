@@ -1,0 +1,12 @@
+
+use strict;
+BEGIN {
+    $|  = 1;
+    $^W = 1;
+}
+
+use Test::More tests => 2;
+
+ok( $] >= 5.00503, 'Perl version is new enough' );
+
+use_ok( 'Text::FindIndent' );

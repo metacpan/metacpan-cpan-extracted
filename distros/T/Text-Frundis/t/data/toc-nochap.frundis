@@ -1,0 +1,12 @@
+.Sh A section
+Some text.
+.Ss A subsection
+Some text
+.P paragraph with title
+Text.
+.Bm
+Text.
+.P another paragraph with title
+Text.
+.Em
+.Tc

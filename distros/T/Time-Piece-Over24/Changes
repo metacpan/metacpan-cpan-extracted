@@ -1,0 +1,6 @@
+0.016      2015-03-21
+        - change Makefile.PL build_requires 'Time::Piece::MySQL'
+
+0.015      2015-03-21
+        - add DST test
+        - change 01_usage test is GMT test

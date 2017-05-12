@@ -1,0 +1,57 @@
+Tkx-Scrolled
+
+This module defines a Tkx megawidget that simplifies that task of adding 
+scrollbars to your widgets.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Alternatively, to install with ExtUtils::MakeMaker, you can use the 
+following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+	Perl 5.006
+	Tkx
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tkx::Scrolled
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tkx-Scrolled
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tkx-Scrolled
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Tkx-Scrolled
+
+    Search CPAN
+        http://search.cpan.org/dist/Tkx-Scrolled
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2010 Michael J. Carman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

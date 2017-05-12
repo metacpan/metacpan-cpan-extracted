@@ -1,0 +1,148 @@
+=head1 NAME
+
+TiVo::Calypso - a Perl interface to the TiVo Calypso protocol
+
+=head1 SYNOPSIS
+
+  use TiVo::Calypso;
+  
+  my $server = TiVo::Calypso::Server->new(
+      SERVER_NAME => "My Server",
+      CACHE_DIR   => "/tmp"
+  );
+  
+  my $music_service = TiVo::Calypso::Container::Music->new(
+      TITLE     => "Music Library",
+      PATH      => "/mp3",      
+      SERVICE   => "/Music",
+      SCROBBLER =>
+      {
+          POSTURL  => 'http://post.audioscrobbler.com',
+          USERNAME => 'scrobbleuser',
+          PASSWORD => 'p4ssw0rd'
+      }
+  );
+  
+  $server->add_service( $music_service );
+
+=head1 DESCRIPTION
+
+TiVo::Calypso provides a Perl interface to the TiVo Calypso protocol,
+allowing development of custom server and CGI applications to act as
+a media source for the TiVo consumer platform.
+
+TiVo::Calypso depends on the following third-party modules for
+full functionality:
+
+  Storable        ( enables caching )
+  Digest::MD5     ( enables caching )
+  IO::File        ( enables general file serving )
+  MP3::Info       ( enables MP3 serving )
+  LWP::Simple     ( AudioScrobbling )
+
+TiVo::Calypso defines the following classes:
+
+  TiVo::Calypso::Server
+      TiVo::Calypso::Request
+      TiVo::Calypso::Container
+          TiVo::Calypso::Container::Server
+          TiVo::Calypso::Container::Music
+      TiVo::Calypso::Item
+          TiVo::Calypso::Item::MP3
+
+=head1 METHODS
+
+=over 4
+
+=item TiVo::Calypso::Server->new()
+
+Expects a hash of arguments to define the new Calypso server:
+
+=over 4
+
+=item SERVER_NAME
+
+defines the string by which the server identifies itself.
+It is purely cosmetic. (optional)
+
+=item CACHE_DIR
+
+defines the directory used to cache data objects and scaled
+images. This directory must be readable and writable in order for
+caching to take place.
+
+=back
+
+=item TiVo::Calypso::Server->add_service()
+
+Expects to be passed a TiVo::Container object which will be added to
+the master list of services available on this server.
+
+=item TiVo::Calypso::Server->request( $script_name, $path_info, $query_string )
+
+Expects to be passed three scalars (or a single predefined
+TiVo::Calypso::Request object) of the same format as the environment
+variables SCRIPT_NAME, PATH_INFO, and QUERY_STRING defined by a
+standard web server.
+
+TiVo::Calypso::Server->request returns a list with 2 elements.  The first
+element is a reference to a hash which contains the recommended HTTP
+headers to be returned to the client. The second element is a reference
+to either a scalar or an IO::File object, depending on the type of
+data requested.
+
+TiVo::Calypso::Server->request returns undef on a bad request.
+
+=item TiVo::Calypso::Container::Music->new()
+    
+Expects a hash of arguments to define a service (directory of content):
+
+=over 4
+
+=item PATH
+
+defines the directory on the local filesystem to search for content
+to be made available via this service.
+
+=item SERVICE
+
+is the virtual directory name which will be used to describe this
+service in URLs.
+
+=item TITLE
+    
+is the descriptive label which will be used to describe this service
+in messages from the server.  (optional)
+
+=back
+
+=back
+
+=head1 MODIFICATIONS
+
+TiVo::Calypso is a branch of TiVo.pm, originally released by TiVo Inc.
+TiVo.pm has been declared 'dead' by TiVo Inc. and released into the
+public domain.
+
+Additional modifications since the initial 1.0 release from TiVo
+include the following:
+
+Aggressive caching has been fixed.
+
+A smarter sort method has been implemented.
+
+AudioScrobbler (last.fm) support has been added.  The synopsis should
+be enough to explain how to use it.
+
+TiVo::Calypso::Container::Music now defaults to an alphabetical list
+for browsing.  200+ artists made browsing terribly slow/painful.
+
+=head1 AUTHOR
+
+TiVo.pm was initially written by TiVo, Inc.
+
+Modifications and maintenance of TiVo::Calypso is now done by Scott
+Schneider <sschneid@gmail.com>.
+
+=cut
+

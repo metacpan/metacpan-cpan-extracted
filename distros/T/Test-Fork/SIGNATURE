@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2cc539ab3e2d740694f20056a2d9b374f3decafe Build.PL
+SHA1 7d9cbad6b26af198d003e4b6393410c23988d689 Changes
+SHA1 c2227da32f8555d33a7890f6b7610842dac47832 MANIFEST
+SHA1 5713a9b99f67f99637b03df278fb6e58e7bafeb4 META.yml
+SHA1 bc7de84e525570f72d5d642e80ffc16ef3e3c849 lib/Test/Fork.pm
+SHA1 07942516a9c2c05ce673391679273038bd14da5a t/failed_fork.t
+SHA1 df16b4479b5f07126752c2fd8bdeee3ebbda05b9 t/fork.t
+SHA1 f8d72f86a18a318c779139b23d3a5139e46bab74 t/fork_ok_return.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Darwin)
+
+iEYEARECAAYFAkj1drUACgkQWMohlhD1QydqhQCgpAi4a3IGPA7ztPVTf9Sg7uWp
+taAAoKy5s6G0XtqC6bsehRXKKg2cSfM5
+=JiTC
+-----END PGP SIGNATURE-----

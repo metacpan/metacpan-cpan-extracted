@@ -1,0 +1,10 @@
+The files in this directory have been created and submitted by NSP users 
+for inclusion in the package. These are not automatically installed but 
+can be run from this directory if you wish. 
+
+The following programs extend ../deprecated/huge-count.pl to trigrams
+and were contributed by Cyrus Shaoul (Cyrus.Shaoul at ualberta.ca)
+ 
+huge-count3.pl 		(needs split-data.pl from ../deprecated)
+huge-combine3.pl
+sort-trigrams.pl

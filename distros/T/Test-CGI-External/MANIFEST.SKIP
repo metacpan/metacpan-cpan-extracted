@@ -1,0 +1,19 @@
+^(build|clean|deploy|make-pod)\.pl$
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^Test-CGI-External-[0-9\.]+/$
+^Test-CGI-External-[0-9\.]+\.tar\.gz$
+# Output of the example programs
+^examples/.*\-out\.txt$
+^lib/Test/CGI/External\.pod\.tmpl$
+# Internal file.
+^USERS$
+# Time sheet
+^timesheet\.txt$
+# Author tests
+^xt/.*\.t$

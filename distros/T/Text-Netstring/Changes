@@ -1,0 +1,36 @@
+Revision history for Perl extension Text::Netstring.
+$Id: Changes,v 1.10 2006/11/20 18:28:49 james Exp $
+
+0.07  Mon 20 Nov 2006 18:27:41 GMT
+	Correct a CVS revisioning mistake.
+
+0.06  Mon 20 Nov 2006 18:20:13 GMT
+	Small efficiency improvements and more `make test' tests.
+
+0.05  Thu 19 Aug 2004 10:21:54 IST
+	Fix a problem doing decode and verify on netstrings with
+	  embedded newlines. Thanks to Ralf Doblitz.
+
+0.04  Tue Jun 24 18:20:16 IST 2003
+	Add a netstring_read() function which reads a netstring from
+	  a socket.
+	The return value of netstring_verify() when called with a list
+	  argument in scalar context has a new meaning.
+	Expand some tests.
+
+0.03  Fri Jun 13 12:08:28 IST 2003
+	The functions now accept as an argument a list reference in
+	 addition to scalars and lists.
+	Add more tests.
+
+0.02  Sat Feb  1 21:31:07 GMT 2003
+	Add POD documentation for each function.
+	netstring_encode() and netstring_decode() return a different
+	 value for a list argument, if called in scalar or list context.
+	netstring_decode() returns "" instead of undef for decode
+	 failures.
+
+0.01  Thu Jan 30 20:06:10 2003
+	First release; netstring_encode(), netstring_decode() and
+	 netstring_verify().
+	- original version; created by h2xs 1.19

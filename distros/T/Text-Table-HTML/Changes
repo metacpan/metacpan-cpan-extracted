@@ -1,0 +1,16 @@
+0.003   2017-01-25 (PERLANCAR)
+
+	- [dist][Bugfix] Don't comment-out 'use 5.010001' because we need
+	  state variable.
+
+
+0.002   2016-12-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Delete extraneous files.
+
+
+0.001   2016-12-29 (PERLANCAR)
+
+        - First release.

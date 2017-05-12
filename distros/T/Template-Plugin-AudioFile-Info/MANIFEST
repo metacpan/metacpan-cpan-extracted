@@ -1,0 +1,12 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST			This list of files
+README
+META.yml
+lib/Template/Plugin/AudioFile/Info.pm
+t/1.t
+t/pod.t
+t/pod-coverage.t
+t/test.ogg
+t/test.mp3

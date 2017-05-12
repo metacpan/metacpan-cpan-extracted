@@ -1,0 +1,9 @@
+Revision history for Perl extension Timestamp::Simple.
+
+1.00  Thu Feb  1 08:20:09 2007
+	- original version; created by h2xs 1.21 with options
+		-X -v 1.00 -n Timestamp::Simple
+
+1.01  Thu Feb  7 09:14:36 2007
+	- repackaged to conform better to CPAN standards
+

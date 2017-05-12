@@ -1,0 +1,5 @@
+The following job has failed.
+
+Family:         $TASKFOREST_FAMILY_NAME
+Job:            $TASKFOREST_JOB_NAME
+Exit Code:      $TASKFOREST_RC

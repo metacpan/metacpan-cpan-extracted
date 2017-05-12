@@ -1,0 +1,6 @@
+Revision history for Perl extension Tk::BarberPole.
+
+0.01  Tue Oct 19 16:58:27 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n Tk::BarberPole
+

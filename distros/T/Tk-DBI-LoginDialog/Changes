@@ -1,0 +1,37 @@
+Revision history for Perl extension Tk::DBI::LoginDialog.
+
+1.006	Thu, Oct 20, 2016 12:39:47 AM
+	- Fixed button hard-naming in login (retry) routine.
+	- cutover tests to standardised harness to avoid duplicate code.
+	- amended POD for button label overrides.
+	- fixed missing DESTROY routine in harness
+	- more testing of button labelling
+
+1.005	Tue, Jan 26, 2016  1:01:58 AM
+	- Fixed Bug #108406
+	- added -pressed property to allow polling of pressed button
+	- advertises Label widgets in-case of requirement for relabelling
+	- subordinated the DBI login routine to its own connect() function
+	- added a disconnect() function
+	- allow button labels to be changed with dynamic polling of buttons in cb_login
+
+1.004	Fri, Oct 17, 2014  7:00:28 AM
+	- changed geometry management to FORM for credentialling widgets
+	- added version widget
+	- more feedback from CPAN Testing
+
+1.003	Mon, Oct 13, 2014  7:24:19 PM
+	- tweaks from CPAN Testing and CPANTS
+	- added version method
+	- removed MANIFEST.SKIP which is causing packaging issues
+
+1.002  Fri, Sep 19, 2014  5:42:48 AM
+	- corrected "o" versus "self" in Populate
+	- additional unit tests, particularly of SUPER/Subwidget properties
+	- added some minimal perl/module version dependencies
+	- tweaks from CPAN Testing and CPANTS
+
+1.001  Sun May  5 09:27:29 2013
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Tk::DBI::LoginDialog
+

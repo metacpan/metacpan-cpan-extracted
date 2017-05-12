@@ -1,0 +1,8 @@
+store|city|state|zip
+Big Store|Norwich|Norfolk|NR2 3AU
+Small Store|San Francisco|California|94141
+Another Store|San Francisco|California|94121
+Yet Another Store|San Francisco|California|94911
+Oh, Not Another Store|San Francisco|California|94113
+Somewhere Else|Sacramento|California|723451
+This is anoither store in Norwich|Norwich|Norfolk|NR1 6AA

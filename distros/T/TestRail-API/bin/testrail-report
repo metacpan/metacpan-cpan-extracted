@@ -1,0 +1,264 @@
+#!/usr/bin/env perl
+# ABSTRACT: Upload your TAP results to TestRail after they've finished
+# PODNAME: TestRail::Bin::Report
+
+package TestRail::Bin::Report;
+$TestRail::Bin::Report::VERSION = '0.039';
+use strict;
+use warnings;
+
+use TestRail::Utils;
+use Getopt::Long qw{GetOptionsFromArray};
+use Test::Rail::Parser;
+use File::HomeDir qw{my_home};
+
+if ( !caller() ) {
+    my ( $out, $code ) = run( 'args' => \@ARGV );
+    print $out;
+    exit $code;
+}
+
+#Main loop------------
+sub run {
+    my %params = @_;
+    my %opts;
+
+    #parse switches
+    GetOptionsFromArray(
+        $params{'args'},
+        'run=s'          => \$opts{run},
+        'apiurl=s'       => \$opts{apiurl},
+        'password=s'     => \$opts{password},
+        'user=s'         => \$opts{user},
+        'project=s'      => \$opts{project},
+        'step-results=s' => \$opts{step_results},
+        'config=s@'      => \$opts{configs},
+        'plan=s'         => \$opts{plan},
+        'version=s'      => \$opts{version},
+        'testsuite_id=i' => \$opts{testsuite_id},
+        'testsuite=s'    => \$opts{testsuite},
+        'section=s@'     => \$opts{sections},
+        'autoclose'      => \$opts{autoclose},
+        'e|encoding=s'   => \$opts{encoding},
+        'help'           => \$opts{help},
+    );
+
+    if ( $opts{help} ) { return ( '', TestRail::Utils::help() ); }
+    $opts{'browser'} = $params{'browser'};
+
+    #Parse config file if we are missing api url/key or user
+    my $homedir = my_home() || '.';
+    if ( -e $homedir . '/.testrailrc'
+        && ( !$opts{apiurl} || !$opts{password} || !$opts{user} ) )
+    {
+        ( $opts{apiurl}, $opts{password}, $opts{user} ) =
+          TestRail::Utils::parseConfig( $homedir, 1 );
+    }
+
+    #If argument is passed use it instead of stdin
+    my $file = $params{'args'}->[0];
+    die "No Such File $file" if ( $file && !-e $file );
+
+    die
+      "ERROR: Interactive mode not allowed when piping input.  See --help for options."
+      if ( !$opts{run}
+        || !$opts{apiurl}
+        || !$opts{password}
+        || !$opts{user}
+        || !$opts{project} );
+
+    print "testrail-report\n----------------------\n";
+
+    my @files = TestRail::Utils::TAP2TestFiles($file);
+
+    TestRail::Utils::interrogateUser( \%opts,
+        qw{apiurl user password project run} );
+
+    $opts{result_options} = { 'version' => $opts{version} } if $opts{version};
+
+    $opts{'debug'} = 1 if $opts{'browser'};
+
+    my $tap;
+    foreach my $phil (@files) {
+        $tap = Test::Rail::Parser->new(
+            {
+                'tap'            => $phil,
+                'apiurl'         => $opts{apiurl},
+                'user'           => $opts{user},
+                'pass'           => $opts{password},
+                'run'            => $opts{run},
+                'project'        => $opts{project},
+                'step_results'   => $opts{step_results},
+                'debug'          => $opts{debug},
+                'browser'        => $opts{browser},
+                'plan'           => $opts{plan},
+                'configs'        => $opts{configs},
+                'result_options' => $opts{result_options},
+                'testsuite_id'   => $opts{testsuite_id},
+                'testsuite'      => $opts{testsuite},
+                'sections'       => $opts{sections},
+                'autoclose'      => $opts{autoclose},
+                'encoding'       => $opts{encoding},
+                'merge'          => 1
+            }
+        );
+        $tap->run();
+    }
+
+    #all done
+    return ( "Done.\n", 0 );
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+TestRail::Bin::Report - Upload your TAP results to TestRail after they've finished
+
+=head1 VERSION
+
+version 0.039
+
+=head1 SYNOPSIS
+
+  testrail-report [OPTIONS] tapfile
+  prove -v sometest.t > results.tap && testrail-report [OPTIONS] results.tap
+
+  prove -v sometest.t | testrail-report [OPTIONS]
+
+  prove -PTestRail='apiurl=http://some.testrail.install/,user=someUser,password=somePassword,project=TestProject,run=TestRun,plan=TestPlan,configs=Config1:Config2:Config3,version=0.014' sometest.t
+
+  require `which testrail-report`;
+  TestRail::Bin::Report::run('args' => @args);
+
+=head1 DESCRIPTION
+
+testrail-report - report raw TAP results to a TestRail install
+
+Can be used as the modulino TestRail::Bin::Report.
+Has a single 'run' function which accepts a hash with the 'args' parameter being the array of arguments.
+
+=head2 PARAMETERS:
+
+=head3 MANDATORY PARAMETERS
+
+    --project [someproject] : associate results (if any) with theprovided project name.
+
+    --run [somerun] : associates results (if any) with the provided run name.
+
+IF none of these options are provided, you will be asked to type
+these in as needed, supposing you are not redirecting input
+(such as piping into this command).
+
+=head3 SEMI-OPTIONAL PARAMETERS
+
+    --plan [someplan] : look for the provided run name within the provided plan.
+
+    --config [someconfig] : filter run by the provided configuration.
+      This option can be passed multiple times for detailed filtering.
+
+    -e --encoding: Character encoding of arguments.  Defaults to UTF-8.
+                   See L<Encode::Supported> for supported encodings.
+
+Test plans can have runs with the same name, but different configurations, which is understandably confusing.
+You can do the same outside of plans, and without configurations; but doing so is ill advised, and the only option from there is to use IDs.
+So, try not to do that if you want to use this tool, and want sanity in your Test management system.
+
+The way around this is to specify what plan and configuration you want to set results for.
+This should provide sufficient uniqueness to get any run using names.
+
+=head3 OPTIONAL PARAMETERS
+
+    --testsuite_id [testsuite_id] : Attempt to create a run based on the provided testsuite ID.  Uses the name provided with --run.
+      If plans/configurations are supplied, it will attempt to create it as a child of the provided plan, and with the supplied configurations.
+      If the specified run already exists, the program will simply use the existing run, and disregard the supplied testsuite_id.
+      If the specified plan does not exist, it too will be created for you.
+
+    --testsuite [testsuite name] : Pretty much the same as the testsuite_id, but a name instead.  Mutually exclusive with testsuite_id.
+
+    --section [section_name] : When spawning, restrict the cases used in the provided testsuite ID to these sections.
+      Option may be passed multiple times to specify multiple sections.
+
+=head3 CONFIG OPTIONS
+
+In your $HOME (or the current directory, if your system has no concept of a home directory), put a file called .testrailrc with key=value
+syntax separated by newlines.  Valid Keys are: apiurl,user,password
+
+=head3 CONFIG OVERRIDES
+
+These override the config, if present.  If neither are used, you will be prompted.
+
+    --apiurl   [url] : full URL to get to TestRail index document
+
+    --password [key] : Your TestRail Password or a valid API key (TestRail 4.2 and above).
+
+    --user    [name] : Your TestRail User Name.
+
+=head3 BEHAVIOR
+
+    --case-ok : Whether to consider each OK to correspond to a test in TestRail
+
+    --step-results [name] : 'System Name' of a 'step_results' type field to set for your tests.
+
+These options are mutually exclusive.  If neither is set, the
+overall result of the test will be used as the pass/fail for the test.
+
+=head3 RESULT OPTIONS
+
+    --version   : String describing the version of the system under test.
+    --autoclose : If there are no more tests in 'untested' or 'retest' status for the specified run/plan, close it.
+
+=head2 PROVE PLUGIN:
+
+passing -PTestRail='key=value,...' to prove will
+automatically upload your test results while the test is running if
+real-time results are desired.
+
+See L<App::Prove::Plugin::TestRail> for more information.
+
+=head2 REQUIREMENTS:
+
+Your TestRail install must have 3 custom statuses with the internal
+names 'skip', 'todo_pass', and 'todo_fail', to represent those
+states which TAP can have.
+
+Also, be sure your tests don't output non-TAP (unknown) lines ending in dots (.)
+This will cause the preceding characters to be interpreted as a test name, which may lead to unexpected results.
+
+=head1 SEE ALSO
+
+L<TestRail::API>
+
+L<App::Prove::Plugin::TestRail>
+
+L<TAP::Parser>
+
+L<File::HomeDir> for the finding of .testrailrc
+
+=head1 SPECIAL THANKS
+
+Thanks to cPanel Inc, for graciously funding the creation of this distribution.
+
+=head1 AUTHOR
+
+George S. Baugh <teodesian@cpan.org>
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by George S. Baugh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

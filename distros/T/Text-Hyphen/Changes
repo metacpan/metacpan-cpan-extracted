@@ -1,0 +1,21 @@
+Revision history for Text-Hyphen
+
+0.2 2015-10-06T17:36:19Z
+		- Incompatible interface change: in list context with defined
+		  delimiter hyphenate() method now works as if the context is
+		  scalar.
+		  This usage didn't make sense previously, delimiter was
+		  ignored, so hopefully nothing breaks.
+		- Also, fix cases with falsy but defined delimiter.
+
+0.12 2015-10-05T22:00:35Z
+		- Conversion to Minilla
+
+0.11    Mon Dec  8 03:14:38 MSK 2008
+        Module::Install requires including parts of it into dist.
+
+0.1     Sat Dec  6 04:01:51 MSK 2008
+        First version, released on an unsuspecting world. Does
+        hyphenation for English. Is much faster than all analogs on
+        CPAN.
+

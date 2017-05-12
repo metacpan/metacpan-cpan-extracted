@@ -1,0 +1,28 @@
+---
+abstract: 'Bootstrap CPANPLUS with cpanm like BINGOS does'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BINGOS-Bootstrap
+requires:
+  CPANPLUS: '0.9105'
+  CPANPLUS::Internals::Source::CPANIDX: '0.04'
+  CPANPLUS::YACSmoke: '0.62'
+  Test::Reporter::Transport::Socket: '0.16'
+resources:
+  homepage: https://github.com/bingos/task-bingos-bootstrap
+  repository: https://github.com/bingos/task-bingos-bootstrap.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

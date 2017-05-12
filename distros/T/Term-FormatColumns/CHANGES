@@ -1,0 +1,58 @@
+Changelog for Term-FormatColumns
+
+0.007 2015-02-09T02:40:20
+ - fix the travis/coveralls badges
+ - add fmtcol utility to format columns in the shell
+ - add dzil plugin for prereqs and compile tests
+ - remove root dotfiles and root ini files from dist
+ - switch to dzil Git::GatherDir
+ - fix contributors dependency
+ - update copyright year
+
+0.006 2015-01-02T23:29:17Z
+ - remove the _ prototype to fix 5.8
+ - remove s///r to allow Perl prior to 5.14
+ - update module for Pod::Weaver docs
+ - add authordep on Pod::Weaver::Section::Contributors
+ - use updated Git::Contributors dzil plugin
+ - add contributors dzil plugin for proper attribution
+ - rebuild build artifacts to trigger a travis build
+ - add travis-ci for testing
+ - update dist.ini to current best practices
+ - add missing prereqs
+ - Fix whitespace errors, use qw and __END__
+ - Remove unnecessary prototypes
+ - Use strict and warnings
+ - Add newline at end of format_columns_for_fh non-tty output
+ - Ignore ANSI SGR sequences when computing string length
+ - Pad lists shorter than rows * cols with empty strings
+ - update weaver.ini from new skeleton
+ - SurgicalPodWeaver -> PodWeaver
+
+0.005 2014-04-08T03:08:58Z
+ - fix name resolution issue with sub
+ - add build artifacts from dist.ini, for easier contributions
+ - update to my standard dist.ini
+
+0.004 2013-01-11T02:48:12Z
+ - update README from POD
+ - clarify the docs a little bit
+ - use glob in the prototype instead of scalars, recommended by Joel Berger
+
+0.003 2013-01-11T01:20:38Z
+ - update README from POD
+ - add an actual test routine!
+ - don't pad out the last column with unnecessary whitespace
+ - add a simple compile test
+ - always end with a \n
+ - add format_columns_for_width in case we don't have a tty
+ - update e-mail address
+
+0.002 2012-12-30T22:30:16Z
+ - updated readme from POD
+ - rename the subs to be a more consistent with the module name
+ - Sub::Exporter wants a list, not an arrayref
+
+0.001 2012-12-28T04:08:00Z
+ - Initial commit
+

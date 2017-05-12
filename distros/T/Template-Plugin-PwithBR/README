@@ -1,0 +1,48 @@
+Template-Plugin-PwithBR version 0.01
+====================================
+
+NAME
+
+  Template::Plugin::PwithBR - TT Plugin that changes paragraph and newline into p with br.
+
+SYNOPSIS
+
+  [% USE PwithBR %]
+  [% FILTER p_with_br %]
+  foo
+  bar
+  
+  hoge
+  [% END %]
+
+Output:
+
+  <p>
+  foo<br />
+  bar
+  </p>
+  
+  <p>
+  hoge</p>
+
+DESCRIPTION
+
+  Template::Plugin::PinBR is TT plugin.When this plugin is used,
+  <p> and <br> are appropriately output.
+
+  It is not possible to achieve it with the filter html_para and
+  html_break / html_para_break or html_line_break.
+
+SEE ALSO
+
+  Template, Template::Plugin
+
+AUTHOR
+
+  Daisuke Komatsu, <taro@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself, either Perl version 5.8.7 or,
+  at your option, any later version of Perl 5 you may have available.

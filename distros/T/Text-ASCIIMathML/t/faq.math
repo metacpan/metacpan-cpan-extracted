@@ -1,0 +1,102 @@
+? quad|A| = |{:(a,b),(c,d):}| = ad-bc quad\ 
+<math title="quad|A| = |{:(a,b),(c,d):}| = ad-bc quad\ ">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mo>&nbsp;&nbsp;</mo>
+    <mrow>
+      <mo>|</mo>
+      <mi>A</mi>
+      <mo>|</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <mo>|</mo>
+      <mrow>
+        <mtable columnalign="left">
+          <mtr>
+            <mtd>
+              <mi>a</mi>
+            </mtd>
+            <mtd>
+              <mi>b</mi>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mi>c</mi>
+            </mtd>
+            <mtd>
+              <mi>d</mi>
+            </mtd>
+          </mtr>
+        </mtable>
+      </mrow>
+      <mo>|</mo>
+    </mrow>
+    <mo>=</mo>
+    <mi>a</mi>
+    <mi>d</mi>
+    <mo>-</mo>
+    <mi>b</mi>
+    <mi>c</mi>
+    <mo>&nbsp;&nbsp;</mo>
+    <mo>&nbsp;</mo>
+  </mstyle>
+</math>
+$$\,\, | A | = \left| \begin{array}{ll}
+  a & b \\
+  c & d \\
+\end{array}
+ \right| = a d - b c \,\, \,$$
+
+? {:|A|:}={:|{:(a,b),(c,d):}|:}=ad-bc quad\ 
+<math title="{:|A|:}={:|{:(a,b),(c,d):}|:}=ad-bc quad\ ">
+  <mstyle mathcolor="red" displaystyle="true" fontfamily="serif">
+    <mrow>
+      <mrow>
+        <mo>|</mo>
+        <mi>A</mi>
+        <mo>|</mo>
+      </mrow>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <mrow>
+        <mo>|</mo>
+        <mrow>
+          <mtable columnalign="left">
+            <mtr>
+              <mtd>
+                <mi>a</mi>
+              </mtd>
+              <mtd>
+                <mi>b</mi>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mi>c</mi>
+              </mtd>
+              <mtd>
+                <mi>d</mi>
+              </mtd>
+            </mtr>
+          </mtable>
+        </mrow>
+        <mo>|</mo>
+      </mrow>
+    </mrow>
+    <mo>=</mo>
+    <mi>a</mi>
+    <mi>d</mi>
+    <mo>-</mo>
+    <mi>b</mi>
+    <mi>c</mi>
+    <mo>&nbsp;&nbsp;</mo>
+    <mo>&nbsp;</mo>
+  </mstyle>
+</math>
+$$| A | = \left| \begin{array}{ll}
+  a & b \\
+  c & d \\
+\end{array}
+ \right| = a d - b c \,\, \,$$

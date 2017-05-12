@@ -1,0 +1,88 @@
+.#de -perl use-var
+my $self = shift;
+return unless $self->process;
+$self->phrasing_macro_begin();
+$self->vars->{var} = 1;
+print "ok\en" if $self->vars->{var};
+.#.
+.#de -perl count
+my $self = shift;
+$self->vars->{count}++;
+$self->ivars->{count}++;
+return unless $self->process;
+$self->phrasing_macro_begin();
+print $self->vars->{count}, "\en";
+print $self->ivars->{count};
+.#.
+.count
+.count
+.count
+.use-var
+.P
+.#de -perl use-perl-package
+use lib 't/data';
+use PerlFrundisPackage;
+.#.
+.use-perl-package
+.#de -perl quote
+my $self = shift;
+return unless $self->process;
+$self->phrasing_macro_begin();
+print PerlFrundisPackage::quote(join(" ", @Arg));
+.#.
+.quote "Quoted text"
+.quote More Quoted text
+.#de -perl test-methods
+my $self = shift;
+return unless $self->process;
+$self->phrasing_macro_begin();
+print $self->escape_text('$%&'), "\en";
+print Text::Frundis::Processing::escape_text('$%&'), "\en";
+print $self->escape("\e\e\e$\e\e%\e\e&amp;"), "\en";
+print $self->file, "\en";
+print $self->flag("ns"), "\en";
+print $self->format, "\en";
+my %opts = $self->parse_options({ ns => "b" });
+print "ns\en" if $opts{ns};
+print "`", $self->get_close_delim, "'", "\en";
+print $self->lnum, "\en";
+print $self->macro, "\en";
+.\"print $self->param("xhtml5"), "\en";
+print $self->param("chorizo", 1), "\en";
+$self->vars->{myvar} = 1;
+print $self->vars->{myvar};
+.#.
+Text.
+.test-methods -ns ;
+.#de -perl hello-world
+.\" Get Frundis main object
+my $self = shift;
+.\" Return unless in processing phase
+return unless $self->process;
+.\" Handle previous accumulated text as in a phrasing macro such as Sm
+$self->phrasing_macro_begin();
+if ($self->format eq "latex") {
+	print "\e\eemph{Hello, World!}";
+}
+elsif ($self->format eq "xhtml" or $self->format eq "epub") {
+	print "<em>Hello, World!</em>";
+}
+.#.
+.\" Now print "Hello, World" valid for any format
+.hello-world
+.#de -perl Repeat
+my $self = shift;
+return unless $self->process;
+$self->phrasing_macro_begin();
+print $Arg[0];
+.#.
+.#de -perl end_phrase
+my $self = shift;
+return unless $self->process;
+$self->phrasing_macro_end();
+print "End of phrasing macro";
+.#.
+.Repeat "Hi."
+.Repeat "Hi again."
+Text.
+.end_phrase

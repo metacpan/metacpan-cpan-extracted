@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution Test-Bits,
+version 0.02:
+
+  Provides a bits_is() subroutine for testing binary data
+
+This software is Copyright (c) 2013 by MaxMind, Inc..
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+

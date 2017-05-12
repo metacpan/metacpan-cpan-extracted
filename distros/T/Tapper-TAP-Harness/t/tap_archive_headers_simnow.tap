@@ -1,0 +1,41 @@
+1..1
+# Tapper-section: Metainfo
+# Tapper-Suite-Name: Daily-Report
+# Tapper-Suite-version: 0.01
+# Tapper-machine-name: irida
+# Tapper-Hardwaredb-Systems-Id: 4712
+# Tapper-machine-description: PC-Ware
+# Tapper-cpuinfo: 1x Family: 15, Model: 107, Stepping: 1
+# Tapper-ram: 3967 MB
+# Tapper-uptime: 96 hrs
+ok 1 host metadata
+1..1
+# Tapper-section: SimNow-Metainfo
+# Tapper-SimNow-SVN-Version: 17050
+# Tapper-SimNow-Version: 4.6.1
+# Tapper-SimNow-SVN-Repository: svn+ssh://svdcsvn1/proj/svn/smn/simnow/trunk
+# Tapper-SimNow-Device-Interface-Version: 16384
+# Tapper-SimNow-BSD-File: vp_bd_phase2
+# Tapper-SimNow-Image-File: openSUSE11.1
+ok 1 simnow metadata
+1..3
+# Tapper-section: guest_1_redhat_rhel4u8_beta_32b_up_qcow
+# Tapper-xen-guest-description: 001-CTCS
+# Tapper-xen-guest-test: CTCS-1.3.1pre1
+# Tapper-xen-guest-start: 2009-04-06 17:54:57 CEST
+# Tapper-xen-guest-flags: acpi=1; apic=1; memory=2048; pae=1; shadow_memory=20; timer_mode=2; vcpus=1
+ok 1 general
+ok 2 time 
+ok 3 CTCS 1.3.1pre1
+1..3
+# Tapper-section: guest_2_redhat_rhel4u8_beta_32b_smp_qcow
+# Tapper-xen-guest-description: 002-lmbench
+# Tapper-xen-guest-test: LMBENCH-3.0-a9
+# Tapper-xen-guest-start: 2009-04-06 17:55:03 CEST
+# Tapper-xen-guest-flags: acpi=1; apic=1; memory=1024; pae=1; shadow_memory=10; timer_mode=2; vcpus=2
+ok 1 general
+ok 2 time 
+ok 3 LMBENCH 3.0-a9
+1..1
+# Tapper-section: dom0
+ok 1 no test performed 

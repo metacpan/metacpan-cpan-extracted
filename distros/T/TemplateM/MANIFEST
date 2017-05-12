@@ -1,0 +1,18 @@
+lib/TemplateM.pm
+lib/TemplateM/Galore.pm
+lib/TemplateM/GaloreWin32.pm
+lib/TemplateM/Simple.pm
+lib/TemplateM/Util.pm
+t/01-use-default.t
+t/02-use-galore.t
+t/03-stash.t
+t/04-loop.t
+t/05-ifelse.t
+t/06-void.t
+CHANGES
+Makefile.PL
+MANIFEST
+README
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

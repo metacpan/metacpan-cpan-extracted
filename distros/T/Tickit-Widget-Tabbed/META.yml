@@ -1,0 +1,35 @@
+---
+abstract: 'Basic tabbed window support'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  Test::Identity: '0'
+  Test::More: '0.88'
+  Test::Refcount: '0'
+  Tickit::Test: '0.43'
+  Tickit::Widget::Static: '0'
+  Tickit::Widget::VBox: '0'
+  Tickit::Window: '0.57'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tickit-Widget-Tabbed
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  List::Util: '1.26'
+  Scalar::Util: '0'
+  Tickit::ContainerWidget: '0.44'
+  Tickit::Widget: '0.36'
+  Tickit::Window: '0.28'
+  parent: '0'
+  perl: '5.010'
+version: '0.021'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

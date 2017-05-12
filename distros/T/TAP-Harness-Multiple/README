@@ -1,0 +1,14 @@
+README for TAP-Harness-Multiple
+
+This distribution includes packages for extending the functionality of the
+TAP::Harness and TAP::Harness::Archive distributions from CPAN.
+
+You should be able to use this set of instructions
+to install the module:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

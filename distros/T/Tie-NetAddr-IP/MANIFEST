@@ -1,0 +1,14 @@
+.cvsignore
+IP.pm
+README
+MANIFEST
+Makefile.PL
+t/.cvsignore
+t/00-load.t
+t/basic.t
+t/clear.t
+t/example.t
+t/next.t
+t/keys.t
+
+

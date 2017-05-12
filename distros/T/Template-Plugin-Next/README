@@ -1,0 +1,102 @@
+SYNOPSIS
+
+    This is a plugin for the Template Toolkit distribution that allows the
+    inclusion of template files with identical relative paths like the
+    present template. Those templates are 'hidden' by the present template,
+    because their respective INCLUDE_PATH entries are dominated by the one
+    of the including template.
+
+    The functionality provided by this plugin might come handy in multi
+    skin situations where default templates are selectively redefined by a
+    skin using a dominating INCLUDE_PATH entry for the skin and identical
+    relative paths to the templates as with the default templates - thus
+    hiding them.
+
+    The Next-plugin allows to include the dominated default templates from
+    inside the hiding template in order to decorate the default template or
+    include a parameterized version of it.
+
+    Example:
+
+      # We assume: INCLUDE_PATH='/templates/c:/templates/b:/templates/a'
+    
+      # template a/test.tt (note this template accepts a "parameter" called 'repeat'):
+      [% repeat = repeat || 1; 'a' | repeat(repeat) %]
+      
+      # template b/test.tt:
+      b
+      [% USE Next; Next.include( repeat => 3 ); %]
+      b
+      
+      # template c/test.tt:
+      c
+      [% USE Next; Next.include(); %]
+      c
+    
+      # a call to template test.tt
+      [% INCLUDE test.tt %]
+      
+      # would yield something like the following (with POST_CHOMP set to 1):
+      
+      c
+      b
+      aaa
+      b
+      c
+
+EXPORT
+
+    Exported stash variable: Next_
+
+METHODS
+
+ process
+
+    Includes the 'next' dominated template with an identical relative path
+    like the one this plugin method is called from. It accepts named
+    parameters like its TT directive counterpart PROCESS that will result
+    in stash variables.
+
+ include
+
+    Same as process() but with stash localisation.
+
+CAVEATS
+
+      * INCLUDE_PATH stability is required during a single call to
+      Template::process().
+
+      * Only template providers of class Template::Provider are supported.
+
+BUGS
+
+    Please report any bugs or feature requests to bug-template-plugin-next
+    at rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-Next. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Template::Plugin::Next
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Plugin-Next
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Template-Plugin-Next
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Template-Plugin-Next
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Template-Plugin-Next/
+

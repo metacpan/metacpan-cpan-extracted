@@ -1,0 +1,22 @@
+Revision history for Perl extension Test::Reporter::POEGateway
+
+* 0.04
+
+	There was a typo in Build.PL - I should have listed Digest::SHA1 as the prereq!
+	Minor POD tweaks
+	Bumped POE::Session::AttributeBased prereq version - thanks to http://cpantesters.org/cpan/report/6599428
+
+* 0.03
+
+	Added the "delay" argument to the emailer for throttling
+
+* 0.02
+
+	Added the "maildone" event to the emailer
+	Minor POD tweaks
+	Don't load file-related modules if we're using intra-session passing of reports
+	Improved SMTP error reporting
+
+* 0.01
+
+	initial release

@@ -1,0 +1,30 @@
+renderer: pod
+title: POD render example
+summary: 
+From: foo@bar
+publish: 1
+Date: Fri, 3 Feb 2012 10:15:39 -0600
+MIME-Version: 1.0
+
+
+=head1 POD Renderer
+
+This is a example of using POD for rendering.
+
+    #a code block example
+    my $a=3;
+    my $b=4;
+    my $c=$a+$b;
+    print $c."\n";
+
+=head2 Something else...
+
+A level2 header...
+
+=head1 Another Header
+
+A link to to the L<Toader> module documentation.
+
+A link of L<http://cpan.org/>.
+
+=cut

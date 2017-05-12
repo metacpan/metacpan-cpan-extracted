@@ -1,0 +1,15 @@
+Todo list for ToolSet
+
+- add support for export_ok(), export_lazy() and export_tags functions
+
+E.g.
+
+ToolSet->export_ok(
+    Carp => 'confess cluck',
+);
+
+question -- can it be a default?  Also what to do if export() is default and
+export_ok is given?
+
+- add support for own @EXPORT_OK array for custom functions in the
+  toolset

@@ -1,0 +1,154 @@
+=pod
+
+=head1 NAME
+
+Text::Placeholder - simple placeholder system for text
+
+=head1 SYNOPSIS
+
+	use Text::Placeholder;
+	my $placeholder = Text::Placeholder->new(
+		my $counter = '::Counter',
+		my $os_unix_file_name = '::OS::Unix::File::Name');
+	$placeholder->compile('#[=counter=]. [=file_name_base=]');
+
+	my @file_names = qw(/etc/hosts nonexisting.txt /etc/passwd);
+	foreach my $file_name (@file_names) {
+		$os_unix_file_name->subject($file_name);
+		print ${$placeholder->execute()}, "\n";
+	}
+
+=head1 DESCRIPTION
+
+Text::Placeholder substitutes symbolic placeholders in a text with actual values. The core package is less than 120 lines of Perl code. There is hardly intelligence or convenience in the core. The work of producing actual values is mostly delegated to special objects called placeholder groups. Thus the approach stays small and extensible. Several such groups can be combined and placeholder resolution is done in the given order of the groups. In the synopsis a counter and a file name group are combined to create a listing.
+
+The objective of Text::Placeholder is to preserve the natural division of labor among specialists for various computer technologies. That is achieved by connecting instead of mixing existing languages. It's a subtle difference, which isn't catched by any of the usual punchy claims, like easy, fast, or secure. For details see the example appliances.
+
+The default format for placeholders is [=...=] and anything inside the bracket-equal delimiter is taken as the name of the placeholder. The format can be changed with build_parser, parser and default_parser (see API and examples/synopsis_parser.pl).
+
+=head2 Template Systems
+
+The term template commonly refers to mixtures of languages. The most advanced and widely used template system is probably PHP, which mixes HTML with a straightforward programming language. The development effort behind PHP is huge, so that there is no point in trying to re-invent or imitate PHP. You can't in an afternoon. Going beyond PHP requires a totally different approach.
+
+Thus Text::Placeholder doesn't try to be a template system. No mix of languages. It aims for simple placeholders. However, the syntax for placeholders is free. Up to the extend of wildcard placeholders, which match anything inside the delimiters. ::Perl_Inlined is a such placeholder group. It's sole purpose is the theoretic discussion in this section. It interprets the placeholder as Perl code. Therefore it provides language mixing in theory. Text::Placeholder has the potential for mixing due to its flexibility. The point is, that you don't want to explore this potential once you studied the ::Appliances::* modules.
+
+=head1 APPLIANCE MODULES
+
+Text::Placeholder suggests three layers of conceptual API wrapping. The first layer is the implementation of placeholders, then aggregations, then appliances. The latter are the interface definition for a specific use of Text::Placeholder.
+
+The appliance ::Directory_Listing uses all three layers. On the lowest level it uses placeholder implementations for the name parts and for the properties of a file. The implementations are organized in two different groups, because a name doesn't need to exist, while a file property makes only sense for an existing file. In the case of a directory listing, both groups are related via the full file name. The relation is handled by Text::Placeholder::Aggregator. Still the interface isn't punchy. In the last layer, the appliance, two method calls hide all the details. It looks like this. Compare this code (found in examples/directory_listing.pl) to the full code in Directory_Listing.pm
+
+	use Text::Placeholder::Appliance::Directory_Listing;
+
+	my $listing = Text::Placeholder::Appliance::Directory_Listing->new(
+		'[=counter=]. [=file_name_full=] [=file_mode_rwx=]');
+	my $rows = $listing->generate('/');
+	print join("\n", @$rows), "\n";
+
+There is another example appliance called ::SQL::Retrieval_n_Display and it's example use is found in examples/retrieval_n_display.pl.
+
+=head1 METHOD REFERENCE (API)
+
+The design goal was a simple and robust API with a straightforward implementation, respecting all limitations of Perl 5.
+
+=over 8
+
+=item new([$specification], [$group, ...])
+
+The constructor. For convenience it takes two types of optional arguments: a placeholder parser and/or placeholder groups. If a placeholder parser (see below) is passed, then it's used instead of the default parser. Placeholder groups are passed to add_groups (see below).
+
+=item compile($text)
+
+Parses a given string and stores a representation suitable for fast execution. Work is delegated to placeholder groups.
+
+=item execute
+
+Executes the compiled text. Returns a string ref with all placeholders substituted by actual values. Work is delegated to placeholder groups. Calling it multiple times makes sense if the data of a placeholder group is modified in between two calls.
+
+=item parser($specification) or parser
+
+Sets or gets the parser used to recognize and substitute the placeholders in the text. The specification can be given as a code reference or as a regular expression, which is automatically turned into a suitable code reference.
+
+If the specification is given as a regular expression, then it must have two capture groups. The first one should capture everything up to the next placeholder and the second should capture the name of the placeholder.
+
+=item default_parser($specification) or default_parser
+
+Like parser above, but sets the default parser, which is used from here onwards.
+
+=item Text::Placeholder::build_parser($re_specification)
+
+Not a method, but a plain subroutine. Returns a code reference created from the regular expression $re_specification. The code reference can then be re-used for the constructor. For cases where you don't want to touch the default parser.
+
+=item add_groups($group, ...)
+
+Add placeholder groups. In order to do something useful, you need to have placeholder groups. The group can be referred to as a package/class name relative to Text::Placeholder or as a fully qualified package/class name or as a ready-made object.
+
+The order in which groups are given is preserved. This is important for groups matching any placeholder.
+
+=back
+
+=head1 PLACEHOLDER GROUPS
+
+The following is an overview of the groups shipped with Text::Placeholder.
+
+=over 8
+
+=item L<::Aggregator|Text::Placeholder::Aggregator>
+
+Groups placeholder groups, which share the same subject. For example, the subject is the file name for OS::Unix::File::Name/Properties.
+
+=item L<::Counter|Text::Placeholder::Generic>
+
+Provides no placeholders by default. Any sense has to be added via add_placeholder.
+
+=item L<::Counter|Text::Placeholder::Counter>
+
+Provides the placeholder 'counter'. Increments the counter each time 'execute' is called.
+
+=item L<::URI|Text::Placeholder::URI>
+
+Provides the placeholders uri_(scheme|opaque|host|path|full). A proof-of-concept module.
+
+=item L<::Perl_Inlined|Text::Placeholder::Perl_Inlined>
+
+Provides no specific placeholders. Instead any placeholder is treated as perl code. A proof-of-concept module, which over-stretches Text::Placeholder. There are no plans to maintain it or develop it further.
+
+=item L<::OS::Unix::File::Name|Text::Placeholder::OS::Unix::File::Name>
+
+Provides the placeholders file_(name_full|name_path|name_only|name_extension). The file doesn't need to exists.
+
+=item L<::OS::Unix::File::Properties|Text::Placeholder::OS::Unix::File::Properties>
+
+Provides the placeholders file_(owner_id|owner_name|group_id|group_name|size|timestamp_creation|timestamp_modification|timestamp_status). The file must exist. Can be used together with ::OS::Unix::File::Name via ::Aggregator for the name.
+
+=item L<::SQL::Result|Text::Placeholder::SQL::Result>
+
+Provides placeholders based on a configurable RE, which requires one capture group. Placeholders substituted by the captured pattern. A list of captures can be obtained. In between two calls to execute the row data is changed.
+
+=item L<::SQL::Statement|Text::Placeholder::SQL::Statement>
+
+Provides placeholders based on a configurable RE. All placeholders matching the RE are substituted by question marks. A list of matches can be obtained.
+
+=back
+
+You might want to search CPAN for placeholder groups, which are distributed separately.
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+Text::Placeholder was part of a bigger software project and has recently been separated. However, the quality of the code should be good enough for an initial release.
+
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

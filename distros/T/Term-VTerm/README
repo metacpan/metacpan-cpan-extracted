@@ -1,0 +1,169 @@
+NAME
+    `Term::VTerm' - emulate a virtual terminal using libvterm
+
+EXPORTED CONSTANTS
+    The following sets of constants are exported, with the given tag names.
+
+  VALUETYPE_* (:types)
+    Type constants for the types of `VTermValue', as returned by
+    `get_attr_type' and `get_prop_type'.
+
+  ATTR_* (:attrs)
+    Attribute constants for pen attributes.
+
+  PROP_* (:props)
+    Property constants for terminal properties.
+
+  DAMAGE_* (:damage)
+    Size constants for `VTermScreen' damage merging.
+
+CONSTRUCTOR
+  $vterm = Term::VTerm->new( %args )
+    Constructs a new `Term::VTerm' instance of the initial size given by the
+    arguments.
+
+    rows, cols => INT
+            Gives the initial size of the terminal area.
+
+METHODS
+  ( $rows, $cols ) = $vterm->get_size
+    Returns the current size of the terminal area.
+
+  $vterm->set_size( $rows, $cols )
+    Sets the new size of the terminal area.
+
+  $utf8 = $vterm->get_utf8
+  $vterm->set_utf8( $utf8 )
+    Return or set UTF-8 mode on the parser.
+
+  $len = $vterm->input_write( $str )
+    Writes the bytes of the given string into the terminal parser buffer.
+
+  $len = $vterm->output_read( $buf, $maxlen )
+    Reads bytes from the output buffer of the terminal into the given
+    variable, up to the maximum length requested. Returns the number of
+    bytes actually read.
+
+  $vterm->keyboard_unichar( $char, $mod )
+    Sends a keypress to the output buffer, encoding the given Unicode
+    character *number* (i.e. not a string), with the optional modifier (as a
+    bitmask of one or more of the `MOD_*' constants).
+
+  $vterm->mouse_move( $row, $col, $mod )
+    Moves the mouse cursor to the given position, with optional modifier (as
+    a bitmask of one or more of the `MOD_*' constants). It is OK to call
+    this regardless of the current mouse mode; if the mode doesn't want move
+    report events or drag events then no output will be generated.
+
+  $vterm->mouse_button( $button, $is_pressed, $mod )
+    Performs a mouse button report event on the given button, to either
+    press or release it, with optional modifier (as a bitmask of one or more
+    of the `MOD_*' constants). It is OK to call this regardless of the
+    current mouse mode; if mouse reporting is disabled then no output will
+    be generated.
+
+  $vterm->parser_set_callbacks( %cbs )
+    Sets the parser-layer callbacks. Takes the following named arguments:
+
+    on_text => CODE
+             $on_text->( $text )
+
+    on_control => CODE
+             $on_control->( $ctrl )
+
+            `$ctrl' is an integer giving a C0 or C1 control byte value.
+
+    on_escape => CODE
+             $on_escape->( $str )
+
+    on_csi => CODE
+             $on_csi->( $leader, $command, @args )
+
+            Where `$leader' may be `undef', and each element of `@args' is
+            an ARRAY reference containing sub-arguments. Each sub-argument
+            may be `undef'.
+
+    on_osc => CODE
+             $on_osc->( $command )
+
+    on_dcs => CODE
+             $on_dcs->( $str )
+
+    on_resize => CODE
+             $on_resize->( $rows, $cols )
+
+  $state = $vterm->obtain_state
+    Returns a Term::VTerm::State object representing the terminal state
+    layer, creating it if necessary. After calling this method, any parser
+    callbacks will no longer work.
+
+  $screen = $vterm->obtain_screen
+    Returns a Term::VTerm::Screen object representing the terminal screen
+    layer, creating it if necessary. After calling this method, any parser
+    or state callbacks will no longer work.
+
+COLOR OBJECTS
+    A `VTermColor' instance can be constructed by
+
+  $color = Term::VTerm::Color->new( red => $r, green => $g, blue => $b )
+    A `VTermColor' instance has the following field accessors:
+
+  $r = $color->red
+  $g = $color->green
+  $b = $color->blue
+    The components of the colour as an integer between 0 and 255.
+
+  $hex = $color->rgb_hex
+    A 6-character string containing the three colour components, hex
+    encoded.
+
+GLYPH INFO OBJECTS
+    A `VTermGlyphInfo' instance has the following field accessors:
+
+  @chars = $info->chars
+    A list of Unicode character numbers. This list does not include the
+    terminating 0.
+
+  $width = $info->width
+    The width of this glyph in screen columns.
+
+  $str = $info->str
+    A Unicode string containing the characters.
+
+POSITION OBJECTS
+    A `VTermPos' instance can be constructed by
+
+  $pos = Term::VTerm::Pos->new( row => $row, col => $col )
+    A `VTermPos' instance has the following field accessors:
+
+  $row = $pos->row
+  $col = $pos->col
+    The row and column number of the position, 0-indexed.
+
+RECTANGLE OBJECTS
+    A `VTermRect' instance can be constructed by
+
+  $rect = Term::VTerm::Rect->new( start_row => ..., end_row => ..., start_col => ..., end_col => ... )
+    A `VTermRect' instance has the following field accessors:
+
+  $row = $rect->start_row
+  $col = $rect->start_col
+    The row and column number of the top left corner of the rectangle.
+
+  $row = $rect->end_row
+  $col = $rect->end_col
+    The row and column number of the cell just after the bottom right corner
+    of the rectangle; i.e. exclusive limit.
+
+FUNCTIONS
+    The following utility functions are also exported.
+
+  $type = get_attr_type( $attr )
+    Returns the type of the given pen attribute.
+
+  $type = get_prop_type( $prop )
+    Returns the type of the given terminal property.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

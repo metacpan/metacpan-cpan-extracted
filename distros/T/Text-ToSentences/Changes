@@ -1,0 +1,12 @@
+Revision history for Perl extension Text::ToSentences.
+
+0.01  Tue Jul 31 19:30:02 2007
+	- original version; created by h2xs 1.23 with options
+		-X -n Text::ToSentences
+
+0.9   Mon Dec 28 19:30:02 2009
+	- first public version
+
+0.91 Wed Dec 30 22:04:02 2009
+        - fixed typo in documentation (Thanks to Andrew Shitov)
+

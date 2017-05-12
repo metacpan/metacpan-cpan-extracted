@@ -1,0 +1,197 @@
+Version History for TMDB
+Mithun Ayachit
+
+
+
+1.2.1
+
+
+-   Fix #6 -- Add IO::Socket::SSL and Net::SSLeay as dependencies
+
+
+
+1.2.0
+
+
+-   Fix #4 Dies with 'Wide character in subroutine entry' in Session.pm
+-   Fix #5 Specifying a custom JSON object does not work
+
+
+
+1.1.2
+
+
+-   Add documentation about TV shows (lost from PR)
+
+
+
+1.1.1
+
+
+-   Fix dependencies in Build.PL
+
+
+
+1.1.0
+
+
+-   Add TV support. Implemented by Sarah Fortune
+-   Remove JSON::Any in favor of JSON::MaybeXS
+
+
+
+1.0.1
+
+
+-   Bump version to allow change in version number strategy
+
+
+
+0.11.1
+
+
+-   No functional changes. Use semver and move bugtracker to
+    github-issues
+
+
+
+0.11
+
+
+-   Add support to _find_ from external sources like IMDB
+
+
+
+0.10
+
+
+-   [POD Updates] Fix link to API documentation
+-   [RT#94609] Fix _year_ regex for discover. Also added support
+    for prinmary_release_year. Thanks KENTNL.
+-   Use the SSL endpoint. This can be overriden in the constructor
+-   Attempt to check the API status responses
+
+
+
+0.09
+
+
+-   [RT#92190] add helpers for hompeage and movie studios
+-   [RT#91676] fix issue where an exception was thrown for unavailable
+    backdrops and other info fields
+
+
+
+0.08
+
+
+-   [RT#86184] Fix movie search when a _year_ is used
+-   add support for movie discovery
+-   added support to search for lists, keywords and collections
+-   added support for person/latest and person/popular
+-   fix movie/latest API call. Document upcoming API
+-   added lists, reviews and changes to movies API
+-   Read logo, secure URLs and change keys from Config
+-   updated API documentation and support links
+
+
+
+0.07
+
+
+-   [RT #85530] Fixed issue where API results were being double (utf8)
+    encoded. Thanks david
+-   Do not try to print a hashref when debugging
+-   [minor] code formatting tweaks
+
+
+
+0.061
+
+
+-   Fixed POD errors reported by metacpan
+
+
+
+0.6
+
+
+-   Added support for the following API calls:
+    -   /genres
+    -   /company
+    -   /movies/:id/similar_movies
+    -   /movie/upcoming
+-   Better language support. Most API calls will now actually pass along
+    language preferences
+-   Pagination: The default number of pages fetched is now _1_. This
+    used to be _5_
+-   Some internal code cleanup
+
+
+
+0.052
+
+
+-   Fixed HTTP::Tiny dependency
+
+
+
+0.051
+
+
+-   Added lists for popular, now_playing and top_rated
+-   Moved _latest_ movie into a search method
+-   Document search configuration
+
+
+
+0.05
+
+
+-   No changes. 0.04_03 is now promoted to a stable release
+
+
+
+0.04_03
+
+
+-   More POD changes
+
+
+
+0.04_02
+
+
+-   Updated minimum dependencies
+-   Indent code blocks in POD by one more level
+
+
+
+0.04_01
+
+
+-   Code Re-write
+-   uses TMDb APIv3
+
+
+
+0.03
+
+
+-   Updated to use JSON instead of YAML
+
+
+
+0.02
+
+
+-   Fixed Makefile.PL
+
+
+
+0.01
+
+
+-   Initial Release
+
+------------------------------------------------------------------------

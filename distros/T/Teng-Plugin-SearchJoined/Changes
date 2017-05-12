@@ -1,0 +1,17 @@
+Revision history for Perl extension Teng-Plugin-SearchJoined
+
+0.05 2014-02-17T18:08:49Z
+    - use `Teng#new_row_from_hash` for row inflation
+    - Bump up deps to Teng 0.21
+
+0.04 2014-01-07T15:54:20Z
+    - `next` method in scalar context is deprecated
+
+0.03 2013-07-09T03:26:17Z
+    - fix document only
+
+0.02 2013-07-08T15:40:17Z
+    - fix dependencies
+
+0.01 2013-07-08T15:21:29Z
+    - original version

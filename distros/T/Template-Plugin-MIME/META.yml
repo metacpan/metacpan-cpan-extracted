@@ -1,0 +1,27 @@
+---
+abstract: 'TemplateToolkit plugin providing a interface to MIME::Entity'
+author:
+  - 'David Zurborg <david@fakenet.eu>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Template-Plugin-MIME
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::SHA: 5.71
+  MIME::Entity: 5.5
+  Sys::Hostname: 1.16
+  Template: 2.24
+  Test::More: 0
+  Try::Tiny: 0.19
+version: 0.12

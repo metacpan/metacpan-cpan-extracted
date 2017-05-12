@@ -1,0 +1,38 @@
+
+Changes from NSP version 0.63 to 0.65
+-------------------------------------
+
+Ted Pedersen, tpederse@d.umn.edu
+University of Minnesota, Duluth
+December 30, 2003
+
+Docs
+----
+	
+	1) modified INSTALL to discuss CPAN site
+
+	2) fixed MANIFEST to not include INSTALL.bak and Makefile
+
+	3) renamed GPL.txt and FDL.txt as GPL and FDL
+
+Measures
+--------
+	
+	1) created perldoc for all measures (.pm files in /Measures) 
+
+Testing
+-------
+
+	1) added ALL-TESTS.sh, which is a script that will run all
+	of the test scripts for all of the measures/programs
+
+Makefile.PL
+-----------
+
+	1) x2.pm was not being installed in 0.63. This is fixed. 
+
+kocos.pl
+--------
+
+	1) kocos.pl was overwritten with combig.pl. This is fixed. 
+	

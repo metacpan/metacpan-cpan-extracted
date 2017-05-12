@@ -1,0 +1,28 @@
+---
+abstract: 'Standard for masking frames in stack traces.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2: '1.302026'
+  Test2::Suite: '0.000030'
+  Test2::Workflow: '0.000009'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Trace-Mask
+requires:
+  B: '0'
+  Carp: '1.03'
+  Exporter: '0'
+  List::Util: '1.10'
+  Scalar::Util: '1.10'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/exodist/Trace-Mask/issues
+  repository: http://github.com/exodist/Trace-Mask/
+version: '0.000008'

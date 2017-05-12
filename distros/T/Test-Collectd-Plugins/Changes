@@ -1,0 +1,23 @@
+Revision history for Test-Collectd-Plugins
+
+0.1009  Thu Jan 26 10:19:20 CET 2017
+        - remove deprecated call to POSIX/isdigit
+          that caused cpantester failures
+
+0.1007  Tue Jan 13 11:07:42 CET 2015
+        - duplicate key for _values in order to allow read_ok("My::Module",not_plugin_name)
+
+0.1005  Thu Sep 20 13:09:37 CEST 2012
+        - slight change to add absolute path to "yapp" in Makefile postamble
+          as suggested by BinGOs on #cpantesters-discuss
+
+0.1004  Thu Sep 20 09:21:51 CEST 2012
+        - bumped Parse::Yapp requirement to version 0.22 (yapp.pl renamed to yapp)
+          this presumably caused UNKNOWN test state in some build systems on cpantesters
+0.1003  Fri Aug 24 15:14:08 CEST 2012
+        - fix bug where import args were not passed through thus making 'tests => N' work
+        - make comments more polite
+
+0.1001  May 16 12:04:01 CEST 2012
+        Release
+

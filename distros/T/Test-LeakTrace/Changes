@@ -1,0 +1,67 @@
+Revision history for Perl extension Test::LeakTrace
+
+0.15 2014-11-14 07:51:22+0900
+    - Fix test failure on Windows (#1)
+
+0.14 2011-10-07 02:22:11
+    - Fix Test::Valgrind failures (thanks to @shohex)
+
+0.13 Sun Aug  1 15:17:23 2010
+    - Fix tests for older perls
+
+0.12 Sun Aug  1 15:11:34 2010
+    - Use ">= 0", instead of "== 0" for no_leaks_ok()
+    - Add count_sv() to count all the SVs in a perl interpreter
+
+0.11 Mon Jun 14 16:16:49 2010
+    - Resolve RT #58133: "False-positive related to XS code"
+
+0.10 Wed Jul  1 15:36:57 2009
+	- support for Test::More subtests (http://use.perl.org/~Ovid/journal/39193)
+		- thanks to charsbar (http://d.hatena.ne.jp/charsbar/20090701/1246415840)
+	- remove deprecated functions (not_leaked() and leaked_cmp_ok())
+
+0.09 Mon Mar 30 11:11:53 2009
+	- test functions become no-op under Devel::Cover (RT#294666)
+	- merge LeakTrace/Heavy.pm into LeakTrace.pm
+
+0.08 Sat Mar 28 12:48:03 2009
+	- fix typo in pods
+	- fix SvPADSTALE emulation in older perls
+	- more informative description for test functions
+
+0.07 Thu Mar  5 10:29:03 2009
+	- fix confuging reports on SVs with SvPADSTALE
+
+0.06 Sat Feb 28 13:20:13 2009
+	- rename test functions
+		- not_leaked()    to no_leaks_ok()
+		- leaked_cmp_ok() to leaks_cmp_ok()
+	- fix ptr_table.h (and now it is automatically tested)
+	- fix the title of Test::LeakTrace::JA
+	- fix some bugs
+	- internal cleanup
+
+0.05 Thu Feb 26 15:56:34 2009
+	- add a Japanese document, Test::LeakTrace::JA
+
+0.04 Wed Feb 25 14:40:08 2009
+	- significant improvements:
+		- redefine reporting modes: -simple, -sv_dump, -lines and -verbose
+		- leaktrace logs are reported to *STDERR
+		- all the test results are reported via Test::Builder->diag()
+	- fix reported line numbers
+	- remove 'EXPERIMENTAL' tag from NAME section in the pod
+
+0.03 Mon Feb 23 11:59:50 2009
+	- fix some issues
+	- fix filename problems caused by eval()
+	- support for non-threaded older perls
+
+0.02 Sun Feb 22 13:55:18 2009
+	- internal cleanup
+	- internal change: use PL_runops, instead of PL_ppaddr[OP_NEXTSTATE]
+	- improve functionality of not_leaked() and leaked_cmp_ok()
+
+0.01 Tue Feb 17 12:45:10 2009
+	- original version; created by Module::Setup

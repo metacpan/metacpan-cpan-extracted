@@ -1,0 +1,46 @@
+Revision history for Perl extension Template::Like.
+
+0.12  Tue Aug 13 13:37:16 JST 2013
+	- support perl 5.17 and later
+
+0.11  Mon Feb  4 01:18:12 JST 2008
+	- elsif bug fix.
+	- add filter "comma" [% calc | comma %] => 1,00
+	- add VMethod "comma" [% calc.comma %] => 1,00
+
+0.10  Mon Feb  4 01:18:12 JST 2008
+	- bug fix.
+
+0.09  Mon Feb  4 01:18:12 JST 2008
+	- semicolon support.
+	- input.t and output.t mkdir second argment set 0755.
+
+0.08  Wed Jan 30 04:05:42 2008
+	- [% USE Dumper(indent=4,varname='FOO'); Dumper.dump(var) %] syntax support.
+	- add directives.t
+
+0.07  Tue Jan 29 22:12:26 2008
+	- USE Dumper(indent=4,varname='FOO') syntax support.
+	- input.t and output.t use tmpdir.
+
+0.06  Thu Jan 24 22:40:39 2008
+	- USE support.
+	- add Template::Like::Plugin::Dumper.
+
+0.05  Thu Sep 20 09:00:00 2007
+	- PRE_CHOMP / POST_CHOMP 0-4 (-=~+) support.
+
+0.04  Wed Sep 12 09:00:00 2007
+	- SYNOPSIS code debug.
+	- POST_CHOMP debug.
+
+0.03  Tue Sep 11 09:00:00 2007
+	- edit document.
+
+0.02  Tue Sep 11 09:00:00 2007
+	- add document.
+
+0.01  Thu Jul 12 21:00:46 2007
+	- original version; created by h2xs 1.23 with options
+		-Xan Template::Like
+

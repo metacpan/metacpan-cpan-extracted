@@ -1,0 +1,14 @@
+Build.PL
+CONTRIBUTING
+Changes
+MANIFEST
+META.json
+META.yml
+cpanfile
+lib/Test/Mojo/Role.pm
+lib/Test/Mojo/Role/Null.pm
+lib/Test/Mojo/WithRoles.pm
+metamerge.json
+t/basic.t
+t/lib/Test/Mojo/Role/Awesome.pm
+t/lib/Test/Mojo/Role/Cool.pm

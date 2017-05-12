@@ -1,0 +1,25 @@
+---
+abstract: 'a UTC version of C<mktime()>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::CChecker: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Time-timegm
+provides:
+  Time::timegm:
+    file: lib/Time/timegm.pm
+    version: 0.01
+requires:
+  POSIX: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+ignore.txt
+lib/TestModule1.pm
+lib/TestModule2.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
